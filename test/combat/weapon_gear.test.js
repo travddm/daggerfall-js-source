@@ -1,5 +1,5 @@
 // WEAPON-GEAR: online, each point of gear on a weapon
-// skill adds 0.1% to its blow (to 5%) from the first point, added to MARTIAL2's climb (GEAR-ADDS,, "need to be the same end result but also help the begingin"); the fists are their own, and nothing
+// skill adds 0.02% to its blow (to 1%) from the first point, added to MARTIAL2's climb (GEAR-ADDS,, "need to be the same end result but also help the begingin"); the fists are their own, and nothing
 // of it reaches a player, a refereed fight, a mentor or the beast.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -35,28 +35,28 @@ const online = (fn) => {
 
 const near = (a, b, why) => assert.ok(Math.abs(a - b) < 1e-9, `${why}: ${a} against ${b}`);
 
-test('WEAPON-GEAR: 0.1% a point of gear from the first point - the sheet of 872 (trained 200, 672 on it) x1.13, counted to 5', () => {
-  assert.equal(WEAPON_GEAR_PER_POINT, 0.1);
+test('WEAPON-GEAR: 0.02% a point of gear from the first point - the sheet of 872 (trained 200, 672 on it) x1.038, counted to 1', () => {
+  assert.equal(WEAPON_GEAR_PER_POINT, 0.02);   // PIN MOVED: B5 (was 0.1)
   assert.equal(skillValue(player(200, 672), SKILLS.LongBlade), 140 + 672, 'the gear on the skill counts');
-  near(weaponGearPct(player(200, 672), SKILLS.LongBlade, ON), 5, 'the top kit, held at the most');
-  near(weaponGearPct(player(50, 20), SKILLS.LongBlade, ON), 2, 'a low weapon player gains from the first point');
-  near(weaponGearPct(player(100, 30), SKILLS.LongBlade, ON), 3, 'below 200 live');
+  near(weaponGearPct(player(200, 672), SKILLS.LongBlade, ON), 1, /* PIN MOVED: B5 (was 5) */ 'the top kit, held at the most');
+  near(weaponGearPct(player(50, 20), SKILLS.LongBlade, ON), 0.4, /* PIN MOVED: B5 (was 2) */ 'a low weapon player gains from the first point');
+  near(weaponGearPct(player(100, 30), SKILLS.LongBlade, ON), 0.6, /* PIN MOVED: B5 (was 3) */ 'below 200 live');
   assert.equal(weaponGearPct(player(200), SKILLS.LongBlade, ON), 0, 'no gear: none');
   assert.equal(weaponGearPct(player(100, 5000), SKILLS.LongBlade, ON), WEAPON_GEAR_PCT_MOST, 'counted to the most');
   assert.equal(BLOW_TOPS.mastery, masteryBlowTop(), 'the ceiling\'s mastery top is the climb\'s most and the gear\'s');
-  assert.equal(BLOW_TOPS.mastery, 21);
+  assert.equal(BLOW_TOPS.mastery, 7);   // PIN MOVED: B5 (was 21)
 });
 
 test('WEAPON-GEAR: every weapon family adds its climb and its gear - the sword, the axe, the bow, the dagger; never the fists', () => {
   const sword = daedric(WEAPONS.Longsword), axe = daedric(WEAPONS.War_Axe), bow = daedric(WEAPONS.Long_Bow), dagger = daedric(WEAPONS.Dagger);
   const geared = player(200, 672), trained = player(200), both = player(200, 100);
-  for (const w of [sword, bow]) near(weaponPastPct(w, geared, foe, ON), 13, `${w.templateIndex}: the climb's 8 and the gear's 5`);
-  near(weaponPastPct(dagger, geared, foe, ON), 5, 'the dagger\'s climb is its pace, its gear its blow');
-  near(weaponPastPct(axe, geared, foe, ON), 5, 'the axe at full health: its climb pays nothing there, its gear does');
-  near(weaponPastPct(axe, geared, low, ON), 21, 'the axe\'s finish and its gear');
-  assert.equal(weaponPastPct(sword, trained, foe, ON), 8, 'no gear: MARTIAL2\'s climb, as it was');
-  assert.equal(weaponPastPct(axe, trained, low, ON), 16, 'the axe\'s finish, as it was');
-  near(weaponPastPct(sword, both, foe, ON), 13, '100 of gear (held at 5) on a trained 200 adds, never the greater');
+  for (const w of [sword, bow]) near(weaponPastPct(w, geared, foe, ON), 3.8, `${w.templateIndex}: the climb's 2.8 and the gear's 1`);   // PIN MOVED: B5 (was 13)
+  near(weaponPastPct(dagger, geared, foe, ON), 1, /* PIN MOVED: B5 (was 5) */ 'the dagger\'s climb is its pace, its gear its blow');
+  near(weaponPastPct(axe, geared, foe, ON), 1, /* PIN MOVED: B5 (was 5) */ 'the axe at full health: its climb pays nothing there, its gear does');
+  near(weaponPastPct(axe, geared, low, ON), 6.6, /* PIN MOVED: B5 (was 21) */ 'the axe\'s finish and its gear');
+  near(weaponPastPct(sword, trained, foe, ON), 2.8, /* PIN MOVED: B5 (was 8) */ 'no gear: MARTIAL2\'s climb, as it was');
+  near(weaponPastPct(axe, trained, low, ON), 5.6, /* PIN MOVED: B5 (was 16) */ 'the axe\'s finish, as it was');
+  near(weaponPastPct(sword, both, foe, ON), 3.8, /* PIN MOVED: B5 (was 13) */ '100 of gear (held at 1) on a trained 200 adds, never the greater');
   assert.equal(weaponPastPct(null, geared, foe, ON), 0, 'the fists read their skill in their roll already');
 });
 
@@ -67,16 +67,16 @@ test('WEAPON-GEAR: only my blow online at a foe - offline, a mentor, the beast, 
   assert.equal(weaponGearPct({ ...player(100, 672), isInBeastForm: true }, SKILLS.LongBlade, ON), 0);
   assert.equal(weaponGearPct({ ...player(100, 672), peer: true }, SKILLS.LongBlade, ON), 0);
   online(() => {
-    assert.equal(weaponMasteryBlow(sword, 100, player(200, 672), foe), 113, 'x1.13, the fraction carried');
+    assert.equal(weaponMasteryBlow(sword, 100, player(200, 672), foe), 103, /* PIN MOVED: B5 (was 113; the 0.8 carried) */ 'x1.038, the whole points, the fraction carried');
     assert.equal(weaponMasteryBlow(sword, 100, player(200, 672), { isPlayer: true }), 100, 'a player takes the blow as struck');
     assert.equal(weaponMasteryBlow(sword, 100, player(100), foe), 100, 'skill 100, no gear: as struck');
   });
 });
 
-test('WEAPON-GEAR: through the real core - a Daedric Longsword at the same roll strikes x1.05 for 672 gear against none', () => online(() => {
+test('WEAPON-GEAR: through the real core - a Daedric Longsword at the same roll strikes x1.01 for 672 gear against none', () => online(() => {
   const sword = daedric(WEAPONS.Longsword);
   const at = (p) => pcaaoWeaponAttackDamage(p, foe, 0, 0, sword, () => 0.5, M);
   const bare = at(player(100)), geared = at(player(100, 672));
   assert.ok(bare > 0);
-  assert.ok(Math.abs(geared - bare * 1.05) <= 1, `${geared} against ${bare}`);
+  assert.ok(Math.abs(geared - bare * 1.01) /* PIN MOVED: B5 (was 1.05) */ <= 1, `${geared} against ${bare}`);
 }));

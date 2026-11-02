@@ -15,6 +15,7 @@ import { imbuePiece, imbueTarget } from '../../src/systems/reforge.js';
 import { welkyndShards } from '../../src/systems/gate/gateSpoils.js';
 import { counterValueOf } from '../../src/systems/tradeModes.js';
 import { sigilFloor } from '../../src/systems/sigil/sigil.js';
+import { PARTY_MAX } from '../../src/net/wire.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 
@@ -84,14 +85,16 @@ test('AUDIT UPDATE L2: a found Magic piece imbued Rare stands at the Rare\'s law
     assert.ok(t[0].value >= TECHNIQUE_BANDS.rare[0] && t[0].value <= TECHNIQUE_BANDS.rare[1], `in the Rare's band: ${t[0].value}`);
   }
   assert.ok(n >= 40, `pieces imbued: ${n}`);
-  for (const power of [1, 2]) {
-    const r = lcg(1000 + power);
+  // PIN MOVED: B5 (sigil bands magic [1,1], rare [1,2]: a Magic piece holds power 1 only, so the Rare's floor is shown raised at the biggest party, where it is 2)
+  for (const party of [1, PARTY_MAX]) {
+    const power = 1;
+    const r = lcg(1000 + party);
     const w = foundMagic(r);
-    w.sigil = { power, party: 1, xp: 0 };
+    w.sigil = { power, party, xp: 0 };
     assert.deepEqual(itemFindings(w), []);
     const p = purse(); p.items.push(w);
     assert.equal(imbuePiece(w, p, r).ok, true);
-    assert.equal(w.sigil.power, sigilFloor('rare', 1), 'raised to the Rare\'s floor');
+    assert.equal(w.sigil.power, sigilFloor('rare', party), 'raised to the Rare\'s floor');
     assert.deepEqual(itemFindings(w), []);
   }
   // the guard: a law that holds what the Imbue made - the piece put back exactly and nothing paid

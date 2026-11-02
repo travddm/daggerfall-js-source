@@ -204,7 +204,7 @@ test('AUDIT SCHOOLS L1 M3: FORESIGHT IS ASKED BEFORE ANY MODIFIER - a foreseen b
   } finally { registerPlayerDamageMod('auditSchoolsProbe', null); }
 }));
 
-test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 20-point blows a twenty-fifth (4%) lighter take 20, 19 and 19 (58 of 60, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
+test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 20-point blows a fiftieth (2%) lighter take 20, 20 and 19 (59 of 60, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
   let now = 10;
   POW._setArcanePowersClockForTests(() => now);
   const wa = pathMage('warden', 100);
@@ -217,7 +217,7 @@ test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CAR
   const orc = realFoe(MT.knight);
   const took = [];
   for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 20); hurtPlayer(wa, 20); took.push(b - wa.health); }
-  assert.deepEqual(took, [20, 19, 19], '0.8 owed: 0 off; 1.6: 1 off; 2.4: 2 off - 2 of the 2.4 owed');   // 20 x 4% = 0.8 a blow
+  assert.deepEqual(took, [20, 20, 19], '0.4 owed: 0 off; 0.8: 0 off; 1.2: 1 off - 1 of the 1.2 owed');   // 20 x 2% = 0.4 a blow   // PIN MOVED: B5 (was [20, 19, 19], 4% a blow)
   assert.ok(Number.isInteger(wa.health), 'whole');
   now = 10 + 29.9;
   let b = wa.health; setStruck(orc, wa, 100); hurtPlayer(wa, 100);
@@ -486,10 +486,10 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.deepEqual(t200.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [50], 'the item\'s own 50');
   const own = mage([THA], 200);
   page(true, () => applySpell(SELF(eff(21, 255, { durationBase: 5, chanceBase: 50 })), 20, own, {}, () => 0.5, { entity: own }));
-  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [54], 'my own cast: x1.08');
+  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [51], 'my own cast: x1.028');   // PIN MOVED: B5 (was [54], x1.08)
   const heal = SELF(eff(10, 8, { magnitudeBaseLow: 50, magnitudeBaseHigh: 50 }));
   assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }, { reflectedCount: 1 }).healed), 50, 'turned back at me');
-  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 54, 'my own');
+  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 51, 'my own');   // PIN MOVED: B5 (was 54)
   // Troll's Blood held: a Regenerate's rounds read no school
   const worn = mage([RES], 200);
   let got = 0;
@@ -497,20 +497,20 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.equal(got, 10, 'a worn Regenerate: its own 10');
 }));
 
-test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damage over time does - cast at Restoration 200 it heals 11 a round, a mentoring or a refereed fight begun mid-way takes the climb off the next round, and it comes back when they end (mutants: frozen at the cast)', () => clean(() => {
+test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damage over time does - cast at Restoration 200 it heals 41 a round, a mentoring or a refereed fight begun mid-way takes the climb off the next round, and it comes back when they end (mutants: frozen at the cast)', () => clean(() => {
   const r200 = mage([RES], 200);
   r200.health = 10; r200.maxHealth = 10000;
   const sinks = { heal: (n) => { r200.health += n; }, hurt() {}, say() {} };
-  page(true, () => applySpell(SELF(eff(18, 255, { durationBase: 10, magnitudeBaseLow: 10, magnitudeBaseHigh: 10 })), 20, r200, sinks, () => 0.5, { entity: r200 }));
+  page(true, () => applySpell(SELF(eff(18, 255, { durationBase: 10, magnitudeBaseLow: 40, magnitudeBaseHigh: 40 })), 20, r200, sinks, () => 0.5, { entity: r200 }));
   const round = (k) => { const b = r200.health; page(true, () => runMagicRoundsFor(r200, k, k + 1, { sinks, rolls: () => 0.5 })); return r200.health - b; };
-  assert.equal(round(0), 11, 'x1.08');
+  assert.equal(round(0), 41, 'x1.028 (41.1)');   // PIN MOVED: B5 (was 10 a round, 11; the base is 40 so the climb still shows)
   assert.equal(refreshMentor(r200, [5, 5]), 'on', 'a party of level 5s: mentoring');
-  assert.equal(round(1), 10, 'mentoring');
+  assert.equal(round(1), 40, 'mentoring');
   assert.equal(refreshMentor(r200, []), 'off');
   setSigilDueling(true);
-  assert.equal(round(2), 10, 'a refereed fight');
+  assert.equal(round(2), 40, 'a refereed fight');
   setSigilDueling(false);
-  assert.equal(round(3), 11, 'back');
+  assert.equal(round(3), 41, 'back');
 }));
 
 test('AUDIT SCHOOLS L2 F5: MENTORING LEAVES A SIGNATURE SPELL IN ITS PATH\'S SCHOOLS - priced, trained and sold by the pair (pathHeld), the powers awake at the mentor\'s share (pathAwake - MENTOR2: they had slept); a Necromancer\'s Siphon Life never turns into the Destruction they never chose (mutants: the cast school through pathAwake; the shelf through pathAwake)', () => clean(() => {
@@ -544,12 +544,12 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
   for (const [sub, kind] of [[23, 'chameleonNormal'], [24, 'shadeNormal']]) {
     const rounds = (raw) => {
       const p = mage([ILL], raw);
-      page(true, () => applySpell(SELF(eff(sub, 0, { durationBase: 10 })), 20, p, {}, () => 0.5, { entity: p }));
+      page(true, () => applySpell(SELF(eff(sub, 0, { durationBase: 40 })), 20, p, {}, () => 0.5, { entity: p }));
       const a = p.activeEffects.find((x) => x.kind === kind);
       assert.ok(a, `${kind} landed (${p.activeEffects.map((x) => x.kind)})`);
       return a.roundsRemaining + 1;
     };
-    assert.deepEqual([rounds(100), rounds(200)], [10, 11], `${kind}: 10 rounds, x1.08`);
+    assert.deepEqual([rounds(100), rounds(200)], [40, 41], `${kind}: 40 rounds, x1.028`);   // PIN MOVED: B5 (was 10 rounds [10, 11]; base 40 so the climb still shows)
   }
   const m200 = mage([MYS, THA], 200);   // Comprehend Languages is Mysticism's (spellcost.js '44,255')
   page(true, () => applySpell(SELF(eff(44, 255, { durationBase: 5, chanceBase: 50 })), 20, m200, {}, () => 0.5, { entity: m200 }));

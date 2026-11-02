@@ -48,9 +48,9 @@ export const WEAPON_HALF_PER_POINT = 2 * WEAPON_POTENCY_PER_POINT;
 export const WEAPON_HALF_LINE = 0.5;
 /** WEAPON-GEAR: the percent each point of gear on a weapon skill adds to its blow. B1 (tame player power): 0.1, was 0.44,
  *  which paid +296% for 672 points of gear and was the largest single term of the blow stack. */
-export const WEAPON_GEAR_PER_POINT = 0.1;
+export const WEAPON_GEAR_PER_POINT = 0.02;
 /** WEAPON-GEAR: the most percent gear adds (50 points) - with the axe's 16, the ceiling's mastery top of 21 (B1; was 320). */
-export const WEAPON_GEAR_PCT_MOST = 5;
+export const WEAPON_GEAR_PCT_MOST = 1;
 
 /** The skill a blow is struck with, by its family (combat/technique/techniqueRoster.js techniqueFamily - an RRI class's
  *  own included): the bare hand Hand-to-Hand. Null for anything else. */

@@ -183,13 +183,13 @@ test('AUDIT MARTIAL L1 L2: Flowing Steel builds from a blow that counts whole - 
 test('AUDIT MARTIAL L1 L3 / L1 L7: a signature\'s window opens AS THE PRESS GOES - the runner\'s real press, no foe struck: Rallying Cleave\'s blows, Cyclone\'s pace, Earthsplitter\'s guard, Savage Whirl\'s leech, Phantom Strike\'s evasion (the words say so; told at a landing, the window opened mid-sweep and never on a whiff) (mutants: the press untold; a window at the landing)', () => clean(() => {
   const pressOf = (id, item) => { const me = pathFighter(id); held(me, item); me.fatigue = maxFatigue(me); door([], me); stepTechnique(1 / 60, press(me, item)); return me; };
   let me = pressOf('warblade', weapon(WEAPONS.War_Axe));
-  assert.equal(weaponBlowMods(weapon(WEAPONS.War_Axe), 100, me, realFoe(ORC), { unaware: false }) >= 102, true, 'Rallying Cleave 2% on the next blow');
+  assert.equal(weaponBlowMods(weapon(WEAPONS.War_Axe), 100, me, realFoe(ORC), { unaware: false }) >= 101, true, 'Rallying Cleave 1% on the next blow');   // PIN MOVED: B5 (was >= 102, 2%)
   assert.equal(POW.martialBlowPct(me, realFoe(ORC)), MP.MARTIAL_NUMBERS.rallyingCleave.pct);
   reset(); me = pressOf('bladedancer', weapon(WEAPONS.Longsword));
   assert.equal(POW.martialPace({ entity: me }), MP.MARTIAL_NUMBERS.cyclone.pace, 'Cyclone\'s quickening');
   reset(); me = pressOf('juggernaut', weapon(WEAPONS.Warhammer));
   me.health = me.maxHealth = 1000; setStruck(realFoe(ORC), me, 100); hurtPlayer(me, 100);
-  assert.equal(me.health, 904, 'Earthsplitter 4% lighter, the swing a whiff');
+  assert.equal(me.health, 902, 'Earthsplitter 2% lighter, the swing a whiff');   // PIN MOVED: B5 (was 904, 4%)
   reset(); me = pressOf('berserker', weapon(WEAPONS.War_Axe));
   me.health = 100; POW.martialStrike(me, realFoe(ORC, { health: 1000, maxHealth: 1000 }), 50);
   assert.equal(me.health, 105, 'Savage Whirl\'s leech from the press on');
@@ -261,16 +261,16 @@ test('AUDIT MARTIAL L1 L6 / L2 F2: a signature\'s HUD chip makes nothing a frame
   assert.ok(r.out.signature < 2, `a signature in hand: ${r.out.signature.toFixed(2)} bytes a frame`);
 }));
 
-test('AUDIT MARTIAL L3 F2 / L2 F1: a body the relay runs reads no half line - its health a placeholder - so the Axe and the Blunt Weapon past 100 each pay the plain potency there (x1.4 at 200, the halves\' mean); an ordinary foe keeps its halves (mutants: the placeholder read as full)', () => clean(() => {
+test('AUDIT MARTIAL L3 F2 / L2 F1: a body the relay runs reads no half line - its health a placeholder - so the Axe and the Blunt Weapon past 100 each pay the plain potency there (x1.028 at 200, the halves\' mean); an ordinary foe keeps its halves (mutants: the placeholder read as full)', () => clean(() => {
   const axe = fighter([AX], 200), hammer = fighter([BL], 200);
   const boss = bossStandIn({ mobile: 31 }, 'the Warden');
   const at = (p, w, foe) => WM.weaponPastPct(w, p, foe, { online: true });
-  assert.equal(at(axe, weapon(WEAPONS.War_Axe), boss), 8);
-  assert.equal(at(hammer, weapon(WEAPONS.Warhammer), boss), 8);
+  assert.equal(at(axe, weapon(WEAPONS.War_Axe), boss), 2.8);   // PIN MOVED: B5 (was 8)
+  assert.equal(at(hammer, weapon(WEAPONS.Warhammer), boss), 2.8);   // PIN MOVED: B5 (was 8)
   const wounded = realFoe(ORC); wounded.health = Math.floor(wounded.maxHealth * 0.2);
   const fresh = realFoe(ORC);
-  assert.deepEqual([at(axe, weapon(WEAPONS.War_Axe), wounded), at(axe, weapon(WEAPONS.War_Axe), fresh)], [16, 0]);
-  assert.deepEqual([at(hammer, weapon(WEAPONS.Warhammer), wounded), at(hammer, weapon(WEAPONS.Warhammer), fresh)], [0, 16]);
+  assert.deepEqual([at(axe, weapon(WEAPONS.War_Axe), wounded), at(axe, weapon(WEAPONS.War_Axe), fresh)], [5.6, 0]);   // PIN MOVED: B5 (was [16, 0])
+  assert.deepEqual([at(hammer, weapon(WEAPONS.Warhammer), wounded), at(hammer, weapon(WEAPONS.Warhammer), fresh)], [0, 5.6]);   // PIN MOVED: B5 (was [0, 16])
 }));
 
 test('AUDIT MARTIAL L3 F3 / EVENT-RULES: Grit regrows health HELD in the court whose law holds regeneration (WBX6) - half a round, none just after a hurt - its fatigue whole; outside it, both whole (mutants: the court unread; the pause unread)', () => clean(() => {
@@ -301,7 +301,7 @@ test('AUDIT MARTIAL L2 F3: the swing\'s pace reads the weapon only once a climb 
     const sword = held(fighter([LB], 200), weapon(WEAPONS.Longsword));
     assert.equal(getMeleeWeaponAnimTime(50, { entity: sword, weaponType: 0, usingRightHand: true }), 0.2);
     const dirk = held(fighter([SB], 200), weapon(WEAPONS.Shortsword));
-    assert.ok(Math.abs(getMeleeWeaponAnimTime(50, { entity: dirk, weaponType: 0, usingRightHand: true }) - 0.2 / 1.08) < 1e-9, 'x1.08 at 200');
+    assert.ok(Math.abs(getMeleeWeaponAnimTime(50, { entity: dirk, weaponType: 0, usingRightHand: true }) - 0.2 / 1.028) < 1e-9, 'x1.028 at 200');   // PIN MOVED: B5 (was 1.08)
     assert.equal(asked, 0, 'the record never built');
   } finally { registerMeleeWeaponAnimTime(null); installSwingLaw(); if (had === undefined) delete globalThis.location; else globalThis.location = had; }
 }));
@@ -373,7 +373,7 @@ test('AUDIT MARTIAL L2 F7: the Stats page\'s estimate keeps nothing - eight real
     assert.ok(new Set(flow).size > 1, `Flowing Steel's carry shows: ${flow}`);
     for (const opens of [1, 2, 3]) assert.deepEqual(flowing(opens), flow, `Flowing Steel's carry kept from the page (${opens})`);
     const sword = weapon(WEAPONS.Longsword);
-    const master = () => held(fighter([LB], 173), sword);
+    const master = () => held(fighter([LB], 200), sword);   // PIN MOVED: B5 (was 173: at 0.07% a point 173 never carries a whole point in 8 blows of 7)
     const blades = seq(master, sword, 0);
     assert.ok(new Set(blades).size > 1, `the Long Blade's carry shows: ${blades}`);
     for (const opens of [1, 2, 3]) assert.deepEqual(seq(master, sword, opens), blades, `the past-100 carry kept from the page (${opens})`);
@@ -382,8 +382,8 @@ test('AUDIT MARTIAL L2 F7: the Stats page\'s estimate keeps nothing - eight real
 
 test('AUDIT MARTIAL L2 F9 / L2 F11: each skill notable keeps every stat it had before BAL10, the skill beside it; and Roleplay & Realism\'s own arm blends a short blade as the dagger it handles as (mutants: a stat traded away; the blend the long blade\'s)', () => clean(() => {
   const named = (name) => ({ ...[...FIRM_NODES.values()].find((n) => n.name === name).stats });
-  for (const [name, before, skill] of [['Blade Dancer', { longDmg: 4, speed: 2 }, 'skill.LongBlade'], ['Iron Knuckles', { fistDmg: 5, strength: 3 }, 'skill.HandToHand'],
-    ['Headsman', { axeDmg: 4, strength: 3 }, 'skill.Axe'], ['Bonebreaker', { bluntDmg: 4, meleeDmg: 2 }, 'skill.BluntWeapon']]) {
+  for (const [name, before, skill] of [['Blade Dancer', { longDmg: 1, speed: 2 }, 'skill.LongBlade'], ['Iron Knuckles', { fistDmg: 1, strength: 3 }, 'skill.HandToHand'],   // PIN MOVED: B5 (the damage channels x0.2: was longDmg 4, fistDmg 5, axeDmg 4, bluntDmg 4, meleeDmg 2)
+    ['Headsman', { axeDmg: 1, strength: 3 }, 'skill.Axe'], ['Bonebreaker', { bluntDmg: 1, meleeDmg: 0.5 }, 'skill.BluntWeapon']]) {
     const now = named(name);
     for (const [k, v] of Object.entries(before)) assert.equal(now[k], v, `${name} keeps ${k}`);
     assert.ok(now[skill] > 0, `${name} raises ${skill}`);
@@ -590,10 +590,10 @@ test('AUDIT MARTIAL L5 H4: THE PRESS PRODUCES THE SIGNATURE\'S BLOW AND ITS ONE 
   } finally { registerTechniqueUsedListener('audit-press', null); registerTechniqueLandedListener('audit-press', null); }
 }));
 
-test('AUDIT MARTIAL L5 H5: NEVER AT A PLAYER, NEVER THE WARD, NEVER IN A REFEREED FIGHT - a path\'s blow at a player\'s body or a warded foe lands as it was (Opening Strike would be 5%), a strike on a player builds no stack, and no pace quickens a swing in a duel (mutants: the blow\'s gate; the strike\'s gate; the ward unread; the pace in a duel)', () => clean(() => {
+test('AUDIT MARTIAL L5 H5: NEVER AT A PLAYER, NEVER THE WARD, NEVER IN A REFEREED FIGHT - a path\'s blow at a player\'s body or a warded foe lands as it was (Opening Strike would be 3%), a strike on a player builds no stack, and no pace quickens a swing in a duel (mutants: the blow\'s gate; the strike\'s gate; the ward unread; the pace in a duel)', () => clean(() => {
   const as = pathFighter('assassin');
   const sword = weapon(WEAPONS.Shortsword);
-  assert.equal(weaponBlowMods(sword, 100, as, realFoe(ORC), { unaware: false }), 105, 'a foe: 5% harder');
+  assert.equal(weaponBlowMods(sword, 100, as, realFoe(ORC), { unaware: false }), 103, 'a foe: 3% harder');   // PIN MOVED: B5 (was 105, Opening Strike 5)
   assert.equal(weaponBlowMods(sword, 100, as, { ...realFoe(ORC), isPlayer: true }, { unaware: false }), 100, 'a player\'s body');
   assert.equal(weaponBlowMods(sword, 100, as, realFoe(ORC, { warded: true }), { unaware: false }), 100, 'the Warden\'s ward');
   const bm = pathFighter('blademaster');
@@ -604,12 +604,12 @@ test('AUDIT MARTIAL L5 H5: NEVER AT A PLAYER, NEVER THE WARD, NEVER IN A REFEREE
   try {
     const dirk = held(fighter([SB], 200), weapon(WEAPONS.Shortsword));
     const ctx = { entity: dirk, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true };
-    assert.equal(swingPacePct(ctx, readSwing(ctx)), 8);
+    assert.equal(swingPacePct(ctx, readSwing(ctx)), 2.8);   // PIN MOVED: B5 (was 8)
     setSigilDueling(true);
     assert.equal(swingPacePct(ctx, readSwing(ctx)), 0, 'a duel: no pace');
     setSigilDueling(false);
     registerSwingPaceMod('audit-slow', () => -30);
-    try { assert.equal(swingPacePct(ctx, readSwing(ctx)), 8, 'a modifier answering less than nothing slows nothing'); } finally { registerSwingPaceMod('audit-slow', null); }
+    try { assert.equal(swingPacePct(ctx, readSwing(ctx)), 2.8, /* PIN MOVED: B5 (was 8) */ 'a modifier answering less than nothing slows nothing'); } finally { registerSwingPaceMod('audit-slow', null); }
   } finally { setSigilDueling(false); if (had === undefined) delete globalThis.location; else globalThis.location = had; }
 }));
 
@@ -628,9 +628,9 @@ test('AUDIT MARTIAL L5 M1: EVERY LINE ON BOTH SIDES, EVERY WINDOW AT ITS END - S
   bz.health = 99; assert.equal(POW.martialPace({ entity: bz }), MP.MARTIAL_NUMBERS.frenzy.pace);
   const N = MP.MARTIAL_NUMBERS;
   const edge = (label, open, on, seconds) => { reset(); const t0 = _clock; const read = open(); _clock = t0 + seconds - 0.01; assert.ok(on(read), `${label}: on just before its end`); _clock = t0 + seconds + 0.01; assert.ok(!on(read), `${label}: off just after`); };
-  edge('Earthsplitter', () => { const me = pathFighter('juggernaut'); POW.martialUsed({ id: 'earthsplitter', entity: me }); door([], me); return me; }, (me) => { me.health = me.maxHealth = 1000; setStruck(realFoe(ORC), me, 100); hurtPlayer(me, 100); return me.health === 904; }, N.earthsplitter.seconds);
+  edge('Earthsplitter', () => { const me = pathFighter('juggernaut'); POW.martialUsed({ id: 'earthsplitter', entity: me }); door([], me); return me; }, (me) => { me.health = me.maxHealth = 1000; setStruck(realFoe(ORC), me, 100); hurtPlayer(me, 100); return me.health === 902; }, N.earthsplitter.seconds);
   edge('Savage Whirl', () => { const me = pathFighter('berserker'); POW.martialUsed({ id: 'savageWhirl', entity: me }); return me; }, (me) => { me.health = 100; POW.martialStrike(me, realFoe(ORC, { health: 1000, maxHealth: 1000 }), 50); return me.health === 105; }, N.savageWhirl.seconds);
-  edge('Knockout', () => { const me = pathFighter('brawler'); door([], me); const thug = realFoe(ORC); land('knockout', rec('t', thug), 10); return { me, thug }; }, ({ me, thug }) => { me.health = me.maxHealth = 1000; setStruck(thug, me, 100); hurtPlayer(me, 100); return me.health === 904; }, N.knockout.seconds);
+  edge('Knockout', () => { const me = pathFighter('brawler'); door([], me); const thug = realFoe(ORC); land('knockout', rec('t', thug), 10); return { me, thug }; }, ({ me, thug }) => { me.health = me.maxHealth = 1000; setStruck(thug, me, 100); hurtPlayer(me, 100); return me.health === 902; }, N.knockout.seconds);
   edge('Flowing Steel', () => { const me = pathFighter('blademaster'); POW.martialStrike(me, realFoe(ORC), 10); return me; }, (me) => POW.martialBlowPct(me, realFoe(ORC)) === N.flowingSteel.pct, N.flowingSteel.seconds);
   edge('War Rhythm', () => { const me = pathFighter('warblade'); door([], me); reportPlayerKill(realFoe(ORC)); return me; }, (me) => POW.martialPace({ entity: me }) === N.warRhythm.pct, N.warRhythm.seconds);
   edge('Rallying Cleave', () => { const me = pathFighter('warblade'); POW.martialUsed({ id: 'rallyingCleave', entity: me }); return me; }, (me) => POW.martialBlowPct(me, realFoe(ORC)) === N.rallyingCleave.pct, N.rallyingCleave.seconds);

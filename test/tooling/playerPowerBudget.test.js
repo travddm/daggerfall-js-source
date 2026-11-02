@@ -12,7 +12,13 @@ import { SPELL_POWER_MOST, POTENCY_CAP } from '../../src/systems/loot/lootPowers
 const SWINGS = 1500;
 const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'average');
 
-/** B4 (tame loot and economy) rescaled the loot affixes toward DFU's enchantment strength, which took the maxed builds from
+/** B5 (the owner's budget: melee about x1.6, casters about x1.75, with ARENA2's attributes; these figures are without it, where
+ *  every foe attribute reads 50 and the character looks stronger): the sources were rescaled at their records (sets, loot powers,
+ *  sigil, paths, the Firmament tree, mastery), the blow net is the tops summed (+34.5%) and the hurt keeps 86.35%. The maxed
+ *  character now wears its online health too (`skyHealth`: Renown none, the tree's Health at its sums). Lowered from B4's
+ *  2.08 / 2.13 / 2.0 / 1.96 / 2.2, which had no health and the old nets. B4's note follows.
+ *
+ *  B4 (tame loot and economy) rescaled the loot affixes toward DFU's enchantment strength, which took the maxed builds from
  *  2.25 / 2.31 / 2.17 / 2.02 / 2.36 (B3's pins, below) to the values pinned here, rounded up in the third place. The rest of
  *  the excess is the nets of the other registries (the Firmament tree, the sets, mastery) and the online health floor, which
  *  B5 takes. B3's note follows. Power at level 45 with every source at its cap, no ARENA2: what B3 reached. B1 left these at
@@ -22,11 +28,11 @@ const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'ave
  *  health and the Firmament tree, the spell magnitudes) lower toward 1.5 and never raise. The owner accepted these higher
  *  values for B3: B4 (loot affixes) and B5 (health) rescale the remaining stacks at their source to bring maxed builds
  *  back near 1.5. */
-const MAXED_POWER_MOST = Object.freeze({ warrior: 2.08, archer: 2.13, spellsword: 2.0, mage: 1.96, thief: 2.2 });
+const MAXED_POWER_MOST = Object.freeze({ warrior: 1.77, archer: 1.82, spellsword: 1.85, mage: 1.84, thief: 1.84 });
 
-test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%) and sit above a normal kit', () => {
-  assert.ok(BLOW_MOST < 1.76 && BLOW_MOST > 1.74, `blow ${BLOW_MOST}`);
-  assert.ok(GUARD_LEAST < 0.75 && GUARD_LEAST > 0.73, `hurt ${GUARD_LEAST}`);
+test('budget: the nets are the tops summed (B5: the blow +34.5%, the hurt keeps 86.35%) and sit above a normal kit', () => {
+  assert.ok(BLOW_MOST < 1.35 && BLOW_MOST > 1.34, `blow ${BLOW_MOST}`);
+  assert.ok(GUARD_LEAST < 0.87 && GUARD_LEAST > 0.86, `hurt ${GUARD_LEAST}`);
   assert.ok(
     POTENCY_CAP <= SPELL_POWER_MOST,
     'worn potency lines fit under the loot spell cap, so it cuts nothing a card prints',
@@ -34,7 +40,7 @@ test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%)
 });
 
 test('budget: a level-45 character with every stacking source at its cap stays inside the power budget', () => {
-  const layers = parseLayers('+ceiling,-hero,-stats');
+  const layers = parseLayers('+ceiling,+skyHealth,-hero,-stats');
   const rows = averageRows(buildReport({ levels: [45], layers, swings: SWINGS }));
   assert.equal(rows.length, Object.keys(MAXED_POWER_MOST).length);
   for (const row of rows) {
@@ -56,5 +62,13 @@ test("budget: inside DFU's level range the default character, against DFU's own 
       Math.abs(row.ratios.power - AT_B4[row.build]) <= 0.05,
       `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${AT_B4[row.build]} at B4`,
     );
+  }
+});
+
+test('budget (B5): typical gear at level 45, with no stacking source beyond what it wears, stays at or under x1.55 of DFU', () => {
+  const rows = averageRows(buildReport({ levels: [45], swings: SWINGS, layers: parseLayers('default,-hero,-stats') }));
+  assert.equal(rows.length, Object.keys(MAXED_POWER_MOST).length);
+  for (const row of rows) {
+    assert.ok(row.ratios.power <= 1.55, `${row.build}: typical power x${row.ratios.power.toFixed(2)} is over x1.55`);
   }
 });

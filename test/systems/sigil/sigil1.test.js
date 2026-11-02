@@ -40,45 +40,46 @@ function balanced(text, from, open = '(', close = ')') {
 const seq = (...v) => { let i = 0; return () => v[i++]; };
 const magicSword = (extra = {}) => ({ group: 'Weapons', templateIndex: 120, material: 0, rarity: 'magic', affixes: [], ...extra });
 
-test('SIGIL1 the law: a sigil\'s power is a per cent of damage at its full rank, in its tier\'s band (Magic 1-2, Rare 2-3, Legendary 3-4); a won weapon carries one 200 per mille alone and 40 more a fighter past the first, the band\'s floor rising a seventh a fighter so eight always win its top; five stages - Faint, Kindled, Bright, Radiant, Ascendant - each 20% more of the power, the sigil\'s own rank by what it has drunk and the wielder\'s Renown opening each at 1, 10, 20, 30, 40, the lower of the two standing; no Renown, dormant (mutants: a band, the chance, the floor, a stage\'s share or threshold, the lower of the two, a forged record taken)', () => {
-  assert.deepEqual(SIGIL_BANDS, { magic: [1, 2], rare: [2, 3], legendary: [3, 4] });
-  assert.equal(SIGIL_POWER_MAX, 4);
+test('SIGIL1 the law: a sigil\'s power is a per cent of damage at its full rank, in its tier\'s band (Magic 1, Rare 1-2, Legendary 2-3); a won weapon carries one 200 per mille alone and 40 more a fighter past the first, the band\'s floor rising a seventh a fighter so eight always win its top; five stages - Faint, Kindled, Bright, Radiant, Ascendant - each 20% more of the power, the sigil\'s own rank by what it has drunk and the wielder\'s Renown opening each at 1, 10, 20, 30, 40, the lower of the two standing; no Renown, dormant (mutants: a band, the chance, the floor, a stage\'s share or threshold, the lower of the two, a forged record taken)', () => {
+  assert.deepEqual(SIGIL_BANDS, { magic: [1, 1], rare: [1, 2], legendary: [2, 3] });   // PIN MOVED: B5 (bands one step down)
+  assert.equal(SIGIL_POWER_MAX, 3);   // PIN MOVED: B5 (4 -> 3)
   assert.deepEqual([SIGIL_CHANCE_BASE, SIGIL_CHANCE_PER], [200, 40]);
   assert.deepEqual(SIGIL_STAGES.map((s) => [s.name, s.xp, s.renown, s.share]), [
     ['Faint', 0, 1, 20], ['Kindled', 5000, 10, 40], ['Bright', 12500, 20, 60], ['Radiant', 22500, 30, 80], ['Ascendant', 37500, 40, 100],
   ]);
   assert.equal(SIGIL_XP_MAX, 37500);
   assert.deepEqual([1, 2, 4, 8, 99, 0, Number.NaN].map(sigilChance), [200, 240, 320, 480, 480, 200, 200], 'one in five alone, nearly one in two for a full party');
-  assert.deepEqual([1, 2, 4, 8].map((n) => sigilFloor('magic', n)), [1, 1, 1, 2]);
-  assert.deepEqual([1, 2, 4, 8].map((n) => sigilFloor('rare', n)), [2, 2, 2, 3]);
-  assert.deepEqual([1, 2, 4, 8].map((n) => sigilFloor('legendary', n)), [3, 3, 3, 4], 'a fight of eight: the band\'s top');
+  assert.deepEqual([1, 2, 4, 8].map((n) => sigilFloor('magic', n)), [1, 1, 1, 1]);   // PIN MOVED: B5 (Magic band [1,1])
+  assert.deepEqual([1, 2, 4, 8].map((n) => sigilFloor('rare', n)), [1, 1, 1, 2]);   // PIN MOVED: B5 (Rare band [1,2])
+  assert.deepEqual([1, 2, 4, 8].map((n) => sigilFloor('legendary', n)), [2, 2, 2, 3], 'a fight of eight: the band\'s top');
   assert.equal(sigilFloor('common', 8), 0);
   // the roll: at or over the chance, nothing; under it, a fresh record at Faint, the power from the fight's floor up
   assert.equal(rollSigil('magic', 1, seq(0.2)), null, '200 per mille is not under 200');
   assert.deepEqual(rollSigil('magic', 1, seq(0.1999, 0)), { power: 1, party: 1, xp: 0 });
-  assert.deepEqual(rollSigil('magic', 1, seq(0, 0.999)), { power: 2, party: 1, xp: 0 }, 'the band is inclusive');
-  assert.deepEqual(rollSigil('legendary', 1, seq(0, 0)), { power: 3, party: 1, xp: 0 });
+  assert.deepEqual(rollSigil('magic', 1, seq(0, 0.999)), { power: 1, party: 1, xp: 0 }, 'a band of one');   // PIN MOVED: B5 (Magic band [1,1])
+  assert.deepEqual(rollSigil('rare', 1, seq(0, 0.999)), { power: 2, party: 1, xp: 0 }, 'the band is inclusive');
+  assert.deepEqual(rollSigil('legendary', 1, seq(0, 0)), { power: 2, party: 1, xp: 0 });   // PIN MOVED: B5 (Legendary band [2,3])
   assert.equal(rollSigil('legendary', 1, seq(0.3)), null);
-  assert.deepEqual(rollSigil('legendary', 8, seq(0.47, 0)), { power: 4, party: 8, xp: 0 }, 'eight fighting: 480 per mille, and the top every time');
-  assert.deepEqual(rollSigil('rare', 4, seq(0.3, 0)), { power: 2, party: 4, xp: 0 });
-  assert.deepEqual(rollSigil('rare', 99, seq(0, 0)), { power: 3, party: PARTY_MAX, xp: 0 }, 'never past the seats');
+  assert.deepEqual(rollSigil('legendary', 8, seq(0.47, 0)), { power: 3, party: 8, xp: 0 }, 'eight fighting: 480 per mille, and the top every time');
+  assert.deepEqual(rollSigil('rare', 4, seq(0.3, 0)), { power: 1, party: 4, xp: 0 });
+  assert.deepEqual(rollSigil('rare', 99, seq(0, 0)), { power: 2, party: PARTY_MAX, xp: 0 }, 'never past the seats');
   assert.equal(rollSigil('common', 8, seq(0, 0)), null);
   assert.equal(rollSigil('artifact', 8, seq(0, 0)), null);
   // the rank, the stage, the per cent
-  const s = (xp, power = 4) => ({ power, party: 1, xp });
+  const s = (xp, power = 3) => ({ power, party: 1, xp });
   assert.deepEqual([0, 4999, 5000, 12499, 12500, 22499, 22500, 37499, 37500].map((x) => sigilRank(s(x))), [0, 0, 1, 1, 2, 2, 3, 3, 4]);
   assert.deepEqual([null, 0, 1, 9, 10, 19, 20, 29, 30, 39, 40, 50, 1.5, Number.NaN].map(renownSigilStage), [-1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, -1, -1]);
   assert.equal(sigilStageIn(s(37500), 12), 1, 'an Ascendant sigil in a Renown 12 hand stands at Kindled');
   assert.equal(sigilStageIn(s(0), 50), 0, 'a Faint sigil in a Renown 50 hand stands at Faint');
   assert.equal(sigilStageIn(s(37500), null), -1, 'no Renown: dormant');
-  assert.deepEqual([0, 5000, 12500, 22500, 37500].map((x) => sigilPercent(s(x, 4), 40)), [0.8, 1.6, 2.4, 3.2, 4]);
+  assert.deepEqual([0, 5000, 12500, 22500, 37500].map((x) => sigilPercent(s(x, 3), 40)), [0.6, 1.2, 1.8, 2.4, 3]);   // PIN MOVED: B5 (top power 4 -> 3)
   assert.deepEqual([0, 5000, 12500, 22500, 37500].map((x) => sigilPercent(s(x, 2), 40)), [0.4, 0.8, 1.2, 1.6, 2]);
-  assert.equal(sigilPercent(s(37500, 4), 25), 2.4, 'held at Bright by Renown 25');
-  assert.equal(sigilPercent(s(37500, 4), null), 0);
+  assert.equal(sigilPercent(s(37500, 3), 25), 1.8, 'held at Bright by Renown 25');
+  assert.equal(sigilPercent(s(37500, 3), null), 0);
   // the record
   assert.ok(validSigil({ power: 1, party: 1, xp: 0 }));
   assert.ok(validSigil({ power: SIGIL_POWER_MAX, party: PARTY_MAX, xp: SIGIL_XP_MAX }));
-  for (const bad of [null, [], 'Ascendant', { power: 0, party: 1, xp: 0 }, { power: 5, party: 1, xp: 0 }, { power: 2.5, party: 1, xp: 0 },
+  for (const bad of [null, [], 'Ascendant', { power: 0, party: 1, xp: 0 }, { power: 4, party: 1, xp: 0 }, { power: 5, party: 1, xp: 0 }, { power: 2.5, party: 1, xp: 0 },
     { power: 2, party: 0, xp: 0 }, { power: 2, party: PARTY_MAX + 1, xp: 0 }, { power: 2, party: 1, xp: -1 }, { power: 2, party: 1, xp: SIGIL_XP_MAX + 1 },
     { power: 2, party: 1, xp: 0.5 }, { power: 2, party: 1 }]) {
     assert.equal(validSigil(bad), false, JSON.stringify(bad));
@@ -86,11 +87,11 @@ test('SIGIL1 the law: a sigil\'s power is a per cent of damage at its full rank,
   }
 });
 
-test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its per cent of the whole blow at a foe, the fraction carried on the weapon (Faint 0.8% on blows of 30 lands a point on the 5th and the 9th); offline, or online before my Renown is known, nothing; never a duel\'s blow, a peer\'s, a foe\'s, a blow at a player, a hand without a sigil; FormulaHelper\'s weapon damage reads it at its tail (mutants: the online gate, the Renown cap, the carry, the duel\'s stub or a player target taken, the registration or the tail dropped)', () => {
+test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its per cent of the whole blow at a foe, the fraction carried on the weapon (Faint 0.6% on blows of 40 lands a point on the 5th and the 9th); offline, or online before my Renown is known, nothing; never a duel\'s blow, a peer\'s, a foe\'s, a blow at a player, a hand without a sigil; FormulaHelper\'s weapon damage reads it at its tail (mutants: the online gate, the Renown cap, the carry, the duel\'s stub or a player target taken, the registration or the tail dropped)', () => {
   _resetSigilForTests();
   const me = { isPlayer: true };
   const rat = { careerIndex: 0 };
-  const held = (xp, power = 4) => magicSword({ sigil: { power, party: 1, xp } });
+  const held = (xp, power = 3) => magicSword({ sigil: { power, party: 1, xp } });
   assert.equal(sigilBlow(held(37500), 100, me, rat), 100, 'offline: dormant');
   setSigilRenown(40);
   assert.equal(sigilRenown(), null, 'offline, no Renown is taken');
@@ -99,12 +100,12 @@ test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its
   assert.equal(sigilBlow(held(37500), 100, me, rat), 100, 'online, before my Renown is known: dormant');
   setSigilRenown(1);
   const faint = held(0);
-  assert.deepEqual(Array.from({ length: 10 }, () => (sigilBlow(faint, 30, me, rat, { estimate: true }), sigilBlow(faint, 30, me, rat))), [30, 30, 30, 30, 31, 30, 30, 30, 31, 30], 'Faint 0.8% of 30, carried - the Stats page\'s reading between blows carrying nothing (PIN ADDED, AUDIT MARTIAL L2 F7)');
-  assert.equal(sigilBlow(held(0), 30, me, rat), 30, 'a second weapon carries its own');
+  assert.deepEqual(Array.from({ length: 10 }, () => (sigilBlow(faint, 40, me, rat, { estimate: true }), sigilBlow(faint, 40, me, rat))), [40, 40, 40, 40, 41, 40, 40, 40, 41, 40], 'Faint 0.6% of 40, carried - the Stats page\'s reading between blows carrying nothing (PIN ADDED, AUDIT MARTIAL L2 F7)');
+  assert.equal(sigilBlow(held(0), 40, me, rat), 40, 'a second weapon carries its own');
   setSigilRenown(40);
-  assert.equal(sigilBlow(held(37500), 100, me, rat), 104, 'Ascendant in a Renown 40 hand: the whole power');
+  assert.equal(sigilBlow(held(37500), 100, me, rat), 103, 'Ascendant in a Renown 40 hand: the whole power');
   setSigilRenown(12);
-  assert.equal(sigilBlow(held(37500), 100, me, rat), 101, 'held at Kindled by Renown 12: 1.6 of 100');
+  assert.equal(sigilBlow(held(37500), 100, me, rat), 101, 'held at Kindled by Renown 12: 1.2 of 100');
   setSigilRenown(40);
   assert.equal(sigilBlow(held(37500), 100, { isPlayer: true, peer: true }, rat), 100, 'a peer\'s blow resolved here - the duel\'s stub');
   assert.equal(sigilBlow(held(37500), 100, me, { isPlayer: true }), 100, 'a blow at a player');
@@ -114,14 +115,14 @@ test('SIGIL1 the blow: online, with my Renown known, my weapon\'s sigil adds its
   assert.equal(sigilBlow(null, 100, me, rat), 100, 'the bare hand');
   assert.equal(sigilBlow(held(37500), 100, me, null), 100);
   assert.equal(sigilBlow(held(37500), 0, me, rat), 0, 'a miss stays a miss');
-  assert.equal(weaponBlowMods(held(37500), 100, me, rat), 104, 'registered with the entity\'s blow modifiers');
+  assert.equal(weaponBlowMods(held(37500), 100, me, rat), 103, 'registered with the entity\'s blow modifiers');
   // FormulaHelper's weapon damage, whole: a player's longsword at a rat
   const player = { isPlayer: true, level: 1, stats: { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, activeEffects: [], items: [] };
   const w = createWeapon(120, 0, () => 0.5);
-  const base = weaponAttackDamage(player, rat, 42, w, () => 0.5);   // a swing's modifier big enough that a tenth is whole
-  assert.equal(base, 50, 'the longsword\'s 8 and the swing\'s 42');
-  w.sigil = { power: 4, party: 1, xp: 37500 };
-  assert.equal(weaponAttackDamage(player, rat, 42, w, () => 0.5), 52, 'the sigil over the whole blow');
+  const base = weaponAttackDamage(player, rat, 92, w, () => 0.5);   // a swing's modifier big enough that a per cent is whole
+  assert.equal(base, 100, 'the longsword\'s 8 and the swing\'s 92');   // PIN MOVED: B5 (swing 42 -> 92)
+  w.sigil = { power: 3, party: 1, xp: 37500 };
+  assert.equal(weaponAttackDamage(player, rat, 92, w, () => 0.5), 103, 'the sigil over the whole blow');   // PIN MOVED: B5 (top power 4 -> 3; swing 42 -> 92 so 3% of the blow is whole)
   setSigilOnline(false);
   assert.equal(sigilRenown(), null, 'going offline forgets the Renown');
   assert.equal(weaponAttackDamage(player, rat, 42, w, () => 0.5), 50, 'offline: the blow as Daggerfall rolls it');
@@ -139,7 +140,7 @@ test('SIGIL1 the stamp: a list won online - a body at its death, a pile at its m
     { group: 'Weapons', templateIndex: 123, material: 0, rarity: 'rare', artifact: true },
     { group: 'Weapons', templateIndex: 121, material: 0, rarity: 'rare', questItem: true },
     { group: 'Armor', templateIndex: 102, material: 0, rarity: 'rare' },
-    { group: 'Weapons', templateIndex: 118, material: 0, rarity: 'rare', sigil: { power: 4, party: 1, xp: 77 } },
+    { group: 'Weapons', templateIndex: 118, material: 0, rarity: 'rare', sigil: { power: 3, party: 1, xp: 77 } },
   ];
   const offline = list();
   assert.equal(stampWonWeapons(offline, 8, { rolls: () => 0 }), 0, 'offline: nothing, whatever the odds');
@@ -148,10 +149,10 @@ test('SIGIL1 the stamp: a list won online - a body at its death, a pile at its m
   const won = list();
   assert.equal(stampWonWeapons(won, 4, { rolls: () => 0 }), 3, 'the Magic sword and the Legendary claymore - and (SET4) the Rare cuirass');
   assert.deepEqual(won[0].sigil, { power: 1, party: 4, xp: 0, set: 'malacath' }, 'four fighting: the Magic band from 1 (SET4: a roll of 0 joins the first set too)');
-  assert.deepEqual(won[1].sigil, { power: 3, party: 4, xp: 0, set: 'malacath' }, 'and the Legendary band from 3');
+  assert.deepEqual(won[1].sigil, { power: 2, party: 4, xp: 0, set: 'malacath' }, 'and the Legendary band from 2');   // PIN MOVED: B5 (Legendary band [2,3])
   assert.ok(won.slice(2, 6).every((it) => it.sigil === undefined), 'Common, ammunition, an artifact, a quest\'s: never');
   assert.deepEqual(won[6].sigil, { set: 'malacath', party: 4, xp: 0 }, 'SET4: the Rare cuirass carries a set\'s sigil, no blow');
-  assert.deepEqual(won[7].sigil, { power: 4, party: 1, xp: 77 }, 'one already marked keeps its own');
+  assert.deepEqual(won[7].sigil, { power: 3, party: 1, xp: 77 }, 'one already marked keeps its own');
   const at = (v) => () => v;
   assert.equal(stampWonWeapons([magicSword()], 1, { rolls: at(0.21) }), 0, '210 per mille misses alone');
   assert.equal(stampWonWeapons([magicSword()], 2, { rolls: at(0.21) }), 1, 'and lands for two');
@@ -165,7 +166,7 @@ test('SIGIL1 the stamp: a list won online - a body at its death, a pile at its m
 
 test('SIGIL1 the drink and the words: the weapon in my hand drinks the Renown XP I earn with it - online, my Renown known - as a NEW record (a copy taken before keeps its own), never past Ascendant, and says a rise, with what my Renown holds it at; a tooltip reads what it gives in my hand, how far it has grown and what holds it, and sleeps offline - under the tier and its affixes, on an unidentified weapon too (mutants: a drink offline, the record written in place, the cap, a rise unsaid, the hold unsaid, the lines dropped)', () => {
   _resetSigilForTests();
-  const sword = magicSword({ name: 'Longsword', sigil: { power: 4, party: 3, xp: 4990 } });
+  const sword = magicSword({ name: 'Longsword', sigil: { power: 3, party: 3, xp: 4990 } });
   assert.equal(drinkSigil(sword, 100), null, 'offline: it drinks nothing');
   assert.equal(sword.sigil.xp, 4990);
   setSigilOnline(true);

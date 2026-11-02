@@ -116,7 +116,7 @@ test('AUDIT 625 P3 (Mac: "A coil per foe"): every foe holds its own Constrict co
   T = 10;
   const sweep = [];
   for (let i = 0; i < 6; i++) { sweep.push(swing(e, s, RAT)); sweep.push(swing(e, s, WOLF)); }
-  assert.deepEqual(sweep, [100, 100, 101, 101, 102, 102, 103, 103, 104, 104, 105, 105], 'both built, to the cap');
+  assert.deepEqual(sweep, [100, 100, 100, 101, 101, 101, 101, 102, 102, 102, 102, 103], 'both built, to the cap');   // PIN MOVED: B5 (Constrict is 0.5% a stack, was 1%; the fraction carried on the weapon)
   assert.deepEqual([coilStacksAt(RAT), coilStacksAt(WOLF)], [COIL_STACKS, COIL_STACKS]);
   assert.equal(coiledFoe(), WOLF, 'the states say the foe struck last');
   reportPlayerKill(RAT);
@@ -160,8 +160,10 @@ test('AUDIT 625 P5: the Coilscale\'s powers driven by the pieces its PRODUCER mi
   assert.deepEqual(awakeTiersOf(e).get('coilscale').map((t) => t !== null), [true, true, true]);
   const fang = e.items.find((it) => it.group === 'Weapons');
   T = 10;
-  const first = swing(e, fang, RAT), second = swing(e, fang, RAT);
-  assert.ok(second > first, `the second blow bites deeper (${first} then ${second})`);
+  const first = swing(e, fang, RAT);
+  let second = first;
+  for (let i = 0; i < 4; i++) second = swing(e, fang, RAT);   // PIN MOVED: B5 (Constrict is 0.5% a stack, so one blow's carry pays nothing: the fifth is compared)
+  assert.ok(second > first, `the fifth blow bites deeper (${first} then ${second})`);
   const v = fresh();   // the powers' memory anew, the minted nine still worn
   setPlayerDoor({ foes: () => [], feet: () => [0, 0, 0], hurtFoe() {}, castOnPlayer() {}, player: () => e });
   e.health = 100;

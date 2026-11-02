@@ -75,7 +75,7 @@ test('LOOT5: thirty powers - one a record, named, briefed inside the card\'s 32,
   assert.equal(LR.powerOf('loot5-test-own').name, 'Own', 'a mod\'s record may carry its own');
   const w = legendary('wyrmbane');
   const lines = LR.rarityLines(w);
-  assert.ok(lines.includes('Dragonsbane: +6% vs dragons and giants'), 'the card says it');
+  assert.ok(lines.includes('Dragonsbane: +1.5% vs dragons and giants'), 'the card says it'); // PIN MOVED: B5 (Dragonsbane 6 -> 1.5)
   assert.equal(lines.at(-1), LR.legendaryById('wyrmbane').lore, 'the lore still last');
 });
 
@@ -89,7 +89,7 @@ test('LOOT5: who - my worn pieces, one count a power, a weapon\'s on its own blo
   assert.equal(LP.wornPowers(me).length, 1, 'a power counts once');
   assert.deepEqual(LP.wornPowers({ ...me, peer: true }), [], 'never a peer');
   const zombie = foe(17);
-  assert.equal(LP.lootBlow(nw, 100, me, zombie, { unaware: true }), 109, 'Silent Death on its own blow');
+  assert.equal(LP.lootBlow(nw, 100, me, zombie, { unaware: true }), 102, 'Silent Death on its own blow'); // PIN MOVED: B5 (Silent Death 9 -> 2.5, 102.5 floors)
   assert.equal(LP.lootBlow(nw, 100, me, zombie, { unaware: false }), 100, 'a foe that has noticed me: nothing');
   const other = createWeapon(116, 0, () => 0.5);
   assert.equal(LP.lootBlow(other, 100, me, zombie, { unaware: true }), 100, 'another weapon\'s blow: not its power');
@@ -109,12 +109,12 @@ test('LOOT5: the blow - bane, unaware, sanctified, venom, moon, rage, execute, f
   fresh();
   const me = player();
   const w = wear(me, legendary('wyrmbane'));
-  assert.equal(LP.lootBlow(w, 100, me, foe(34), {}), 106, 'a dragonling');
-  assert.equal(LP.lootBlow(w, 100, me, foe(16), {}), 106, 'the giant');
+  assert.equal(LP.lootBlow(w, 100, me, foe(34), {}), 101, 'a dragonling'); // PIN MOVED: B5 (Dragonsbane 6 -> 1.5)
+  assert.equal(LP.lootBlow(w, 100, me, foe(16), {}), 102, 'the giant'); // PIN MOVED: B5 (Dragonsbane 1.5%: the dragonling's 0.5 carry (shareOf) rides this blow, 1.5 + 0.5 = 2)
   assert.equal(LP.lootBlow(w, 100, me, foe(16, { affinity: 'Human' }), {}), 100, 'a class foe whose career index is 16 is no giant');
   const g = legendary('graveward');
   const me2 = player(); wear(me2, g);
-  assert.equal(LP.lootBlow(g, 100, me2, foe(28), {}), 105, 'a vampire is undead');
+  assert.equal(LP.lootBlow(g, 100, me2, foe(28), {}), 101, 'a vampire is undead'); // PIN MOVED: B5 (Sanctified 5 -> 1.5, floors to 1)
   assert.equal(LP.lootBlow(g, 100, me2, foe(7), {}), 100);
   const t = legendary('tsaesci-fang'); const me3 = player(); wear(me3, t);
   assert.equal(LP.lootBlow(t, 10, me3, foe(7), {}), 18, '8 poison');
@@ -124,25 +124,25 @@ test('LOOT5: the blow - bane, unaware, sanctified, venom, moon, rage, execute, f
   setWorldMinutes(12 * 60);
   assert.equal(LP.lootBlow(b, 100, me4, foe(4), {}), 100, 'noon: nothing');
   setWorldMinutes(23 * 60);
-  assert.equal(LP.lootBlow(b, 100, me4, foe(7), {}), 104, 'night');
-  assert.equal(LP.lootBlow(b, 100, me4, foe(4), {}), 108, 'night, and a beast');
+  assert.equal(LP.lootBlow(b, 100, me4, foe(7), {}), 101, 'night'); // PIN MOVED: B5 (Hunter's Moon 4+4 -> 1+1)
+  assert.equal(LP.lootBlow(b, 100, me4, foe(4), {}), 102, 'night, and a beast'); // PIN MOVED: B5 (Hunter's Moon 4+4 -> 1+1)
   const c = legendary('gortwogs-cleaver'); const me5 = player(); wear(me5, c);
   assert.equal(LP.lootBlow(c, 100, me5, foe(7), {}), 100);
   me5.health = 30;
-  assert.equal(LP.lootBlow(c, 100, me5, foe(7), {}), 104, 'under a third');
+  assert.equal(LP.lootBlow(c, 100, me5, foe(7), {}), 101, 'under a third'); // PIN MOVED: B5 (Orc Rage 4 -> 1)
   const nm = player(); wear(nm, legendary('night-mothers-embrace'));
   const sword = createWeapon(120, 0, () => 0.5);
-  assert.equal(LP.lootBlow(sword, 100, nm, foe(7, { health: 20 }), {}), 105, 'armour\'s power rides any blow: under a quarter');
+  assert.equal(LP.lootBlow(sword, 100, nm, foe(7, { health: 20 }), {}), 101, 'armour\'s power rides any blow: under a quarter'); // PIN MOVED: B5 (Sweet Mother's Kiss 5 -> 1.5, floors to 1)
   assert.equal(LP.lootBlow(sword, 100, nm, foe(7, { health: 30 }), {}), 100);
   const dv = player(); wear(dv, legendary('duelists-vambrace'));
   const orc = foe(7);
-  assert.equal(LP.lootBlow(sword, 100, dv, orc, {}), 106, 'First Blood');
+  assert.equal(LP.lootBlow(sword, 100, dv, orc, {}), 102, 'First Blood'); // PIN MOVED: B5 (First Blood 6 -> 1.5; the sword's 0.5 carry from Sweet Mother's Kiss rides it: 2)
   LP.lootStrike(dv, orc, 160, sword);
   assert.equal(LP.lootBlow(sword, 100, dv, orc, {}), 100, 'once a foe');
   const ae = legendary('anseis-edge'); const fl = player(); wear(fl, ae);
   for (let i = 0; i < 7; i++) LP.lootStrike(fl, foe(7), 10, ae);
   assert.equal(LP.flowStacks(), 5, 'Flow stacks to five');
-  assert.equal(LP.lootBlow(ae, 100, fl, foe(7), {}), 105);
+  assert.equal(LP.lootBlow(ae, 100, fl, foe(7), {}), 102); // PIN MOVED: B5 (Way of the Sword 1 -> 0.5 x 5 stacks = 2.5, floors to 2)
   T = 7;
   assert.equal(LP.flowStacks(), 0, 'and runs out');
   // TWO-HANDS (AUDIT 2): a blow that does not count whole (an off-hand blow's share of the time - formulas.js `blow`)
@@ -224,22 +224,22 @@ test('LOOT5: the damage I take - Dawnward, the Raven, Hex, Bedrock, Bulwark, Las
   blow(me, 100, orc);
   assert.equal(me.health, 900, 'the first blow hexes its foe');
   blow(me, 100, orc);
-  assert.equal(me.health, 804, 'a hexed blow: 4% less');
+  assert.equal(me.health, 801, 'a hexed blow: 1% less'); // PIN MOVED: B5 (Hex 4 -> 1)
   T = 9; blow(me, 100, orc);
-  assert.equal(me.health, 704, 'the hex runs out');
+  assert.equal(me.health, 701, 'the hex runs out'); // PIN MOVED: B5 (Hex 4 -> 1)
   fresh();
   me = player(); wear(me, legendary('mountains-root'));
   me.maxHealth = me.health = 1000;
   blow(me, 100, orc);
   assert.equal(me.health, 900, 'the first lands whole');
   blow(me, 100, orc);
-  assert.equal(me.health, 801, 'the second lessened by one stack: 1%');
+  assert.equal(me.health, 800, 'the second lessened by one stack: 0.5%, 99.5 rounds back to 100'); // PIN MOVED: B5 (Bedrock 1 -> 0.5)
   blow(me, 100, orc);
-  assert.equal(me.health, 703, 'the third by two: 2%');
+  assert.equal(me.health, 701, 'the third by two: 1%'); // PIN MOVED: B5 (Bedrock 1 -> 0.5)
   assert.equal(LP.bedrockStacks(), 3);
   T = 7;
   blow(me, 100, orc);
-  assert.equal(me.health, 603, 'the stacks run out after six seconds');
+  assert.equal(me.health, 601, 'the stacks run out after six seconds'); // PIN MOVED: B5 (Bedrock 1 -> 0.5)
   fresh();
   me = player(); wear(me, legendary('wall-of-daggerfall'));
   blow(me, 12, orc);
@@ -253,7 +253,7 @@ test('LOOT5: the damage I take - Dawnward, the Raven, Hex, Bedrock, Bulwark, Las
   assert.equal(me.health, 900, 'above its line, nothing');
   me.health = 200;
   hurtPlayer(me, 100);
-  assert.equal(me.health, 104, 'under a quarter: 4% less, any hurt');
+  assert.equal(me.health, 101, 'under a quarter: 1% less, any hurt'); // PIN MOVED: B5 (Last Stand 4 -> 1)
   fresh();
   me = player(); wear(me, legendary('titanheart'));
   hurtPlayer(me, 60);

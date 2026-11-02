@@ -145,7 +145,7 @@ test('AUDIT SETS L3: A GUARD\'S BLOW THE ARREST FLOW HOLDS BACK is heard when it
   at(3);   // the surrender box, answered "fight on"
   remarkPlayerBlow(held);
   hurtPlayer(e, 5);
-  assert.equal(setBlow(s, 100, e, RAT, {}), 104, 'Riposte opened by the blow as it landed (+4% at Faint)');
+  assert.equal(setBlow(s, 100, e, RAT, {}), 101, 'Riposte opened by the blow as it landed (+1% at Faint)');   // PIN MOVED: B5 (Riposte Faint 4 -> 1)
   at(3 + RIPOSTE_SECONDS + 1);
   setStruck(RAT, e, 5);
   at(3 + RIPOSTE_SECONDS + 1 + BLOW_WINDOW_S * 2);
@@ -168,7 +168,7 @@ test('AUDIT SETS L4: A BLOW THE WARDEN\'S WARD TURNS spends no power - Riposte s
   hurtPlayer(e, 5);
   const s = sword();
   assert.equal(setBlow(s, 100, e, { name: 'the Warden', warded: true }, {}), 100, 'turned whole: no Riposte on it');
-  assert.equal(setBlow(s, 100, e, RAT, {}), 104, 'and the next blow that lands has it');
+  assert.equal(setBlow(s, 100, e, RAT, {}), 101, 'and the next blow that lands has it');   // PIN MOVED: B5 (Riposte Faint 4 -> 1)
 });
 
 // ═══ THE WIRE AND THE ROOM ═══════════════════════════════════════════════════════════════════════
@@ -181,9 +181,9 @@ test('AUDIT SETS M1: A FOE\'S MAXIMUM HEALTH RIDES ITS RECORD (`k`) - bounded as
   const e = wearSet(player(), 'thieftaker', 4);
   door([], e);
   const puppet = { name: 'raider', health: 40, maxHealth: 100 };
-  assert.equal(setBlow(sword(), 100, e, puppet, {}), 102, 'my roll: under half');
+  assert.equal(setBlow(sword(), 1000, e, puppet, {}), 1005, 'my roll: under half');   // PIN MOVED: B5 (Run Them Down Faint 2 -> 0.5; 1000 so the half per cent is a whole point)
   puppet.maxHealth = validFoeRecord({ i: 1, h: 40, k: 70 }).k;
-  assert.equal(setBlow(sword(), 100, e, puppet, {}), 100, 'the owner\'s: not');
+  assert.equal(setBlow(sword(), 1000, e, puppet, {}), 1000, 'the owner\'s: not');
 });
 
 test('AUDIT SETS M2: A ROOM\'S WORD THIS BUILD CANNOT READ - a newer game\'s item in a building\'s container - marks the container spoken and unreadable, never landed; a word it can read lands and clears it; neither host claims, closes over or opens one (mutants: the unreadable forgotten; the claim made over it; the close said over it; the dungeon\'s opened)', () => {

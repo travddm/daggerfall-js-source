@@ -101,7 +101,7 @@ B1 rescaled the numbers on the sources, so a card prints what a blow gets and no
 - each registry's records reach exactly its top (`BLOW_TOPS`, `GUARD_TOPS` in `powerCeiling.js`), held equal by
   `test/combat/powerceiling.test.js`;
 - blow percents add (the runner sums them; they multiplied before);
-- the net (`BLOW_MOST`, +75.4%, and `GUARD_LEAST`, 74%) sits above a normal kit and below the tops summed;
+- the net (`BLOW_MOST` and `GUARD_LEAST`) was +75.4% and 74% at B1, above a normal kit and below the tops summed; B5 made it the tops summed (+34.5%, 86.35%);
 - a skill past 100 pays 0.2% a point, gear on a weapon skill 0.1% a point up to 5%, and a mastered skill reads at most 110
   to hit and to crit (`AIM_PAST_MAX`);
 - a technique aims +5 to +10 and tops at x1.95 of a blow. The Firmament tree is left to B5.
@@ -232,6 +232,54 @@ the time the foe takes to kill the character, ours over DFU's. Before -> after:
 At level 45 the changes take 150 to 172 points (16% to 26%) off the body of a maxed character. A character with no Renown
 and no tree is unchanged. The raw points weigh most at level 1, where a full tree is 15 on a body of 40, and that tree is
 out of reach before the Renown that buys its stars.
+
+## The finished budget (B5)
+
+The owner's target (decision 41): a maxed character about x1.6 a DFU one in melee and about x1.75 for the casters, typical gear
+at or under x1.5. Loot (B4) could not take the maxed builds lower, because typical gear sat under its target. So B5 took the
+rest from the other sources, each rescaled at its records. A card, a sheet and a tooltip print what applies. The net is the tops
+summed, so it is met only by a kit with every registry at its top, and it cuts nothing a card prints.
+
+| Source | Blow, at its best (was -> now) | Where |
+| --- | --- | --- |
+| Weapon skill past 100 (Master Skills to 200) | +21 -> +7 (0.2% -> 0.07% a point; gear 5 -> 1) | `spellPower.js`, `weaponMastery.js` |
+| Sigil (Legendary) | +4 -> +3 (bands 1 / 1-2 / 2-3) | `sigil.js` |
+| Sets, best two of four | +20 -> +6 (percents x0.3, to the half) | `sigilSets.js` |
+| Loot powers, best kit | +23 -> +8.5 (Silent Death 9 -> 2.5, Sweet Mother's Kiss 5 -> 1.5, First Blood 6 -> 1.5) | `lootRarity.js`, `gilded.js` |
+| Firmament, damage stars | +50 -> +6 (stars x0.2; blow cap 5, total 6) | `firmamentTree.js`, `firmamentLaw.js` |
+| Paths (martial) | +6 -> +4 | `martialPaths.js` |
+| **Net** | **+75.4 -> +34.5** | `powerCeiling.js` |
+
+Guards (share off a hurt, at their best): loot 12.4 -> 4.4, sets 10 -> 3, Firmament 15 -> 3, martial and arcane paths 4 -> 2. The
+net keeps 86.35% (was 74.1%). Spell potency: the loot's cap 9 -> 4 (worn potency 6 -> 3), the Firmament's spell stars x0.2 (cap 6).
+Techniques keep their own setting and aim at +5 to +10 (B1). The swing is not a lever: heft is already at the 15% bound
+(`swinglaw.test.js`), so it stays. Technique and swing numbers are unchanged. A Firmament damage star is at least half a per
+cent. The Firmament's Health is in the health section above.
+
+Character power (ARENA2 attributes, DFU's own foe row), before -> after. Typical gear (default run, B4 numbers before):
+
+| Typical | L1 | L10 | L20 | L30 | L45 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Warrior | 0.85 -> 0.85 | 0.66 -> 0.66 | 0.92 -> 0.92 | 0.94 -> 0.94 | 1.32 -> 1.29 |
+| Thief | 1.14 -> 1.14 | 0.94 -> 0.94 | 1.03 -> 1.03 | 1.11 -> 1.11 | 1.28 -> 1.25 |
+| Mage | 0.90 -> 0.90 | 0.89 -> 0.89 | 0.93 -> 0.93 | 1.17 -> 1.17 | 1.49 -> 1.46 |
+| Spellsword | 0.91 -> 0.91 | 0.84 -> 0.84 | 1.03 -> 1.03 | 1.20 -> 1.20 | 1.48 -> 1.44 |
+| Archer | 0.99 -> 0.99 | 0.94 -> 0.94 | 1.08 -> 1.08 | 1.17 -> 1.17 | 1.31 -> 1.27 |
+
+Maxed (`+ceiling,+skyHealth`: every source at its top and the online health at its most), before -> after:
+
+| Maxed | L1 | L10 | L20 | L30 | L45 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Warrior | 1.55 -> 1.25 | 1.10 -> 0.89 | 1.50 -> 1.21 | 1.51 -> 1.22 | 2.04 -> 1.65 |
+| Thief | 2.03 -> 1.66 | 1.57 -> 1.26 | 1.69 -> 1.36 | 1.78 -> 1.45 | 2.05 -> 1.62 |
+| Mage | 1.52 -> 1.29 | 1.36 -> 1.17 | 1.31 -> 1.18 | 1.57 -> 1.43 | 2.00 -> 1.77 |
+| Spellsword | 1.68 -> 1.35 | 1.38 -> 1.13 | 1.59 -> 1.33 | 1.68 -> 1.49 | 2.00 -> 1.75 |
+| Archer | 1.83 -> 1.48 | 1.57 -> 1.27 | 1.77 -> 1.43 | 1.90 -> 1.54 | 2.02 -> 1.63 |
+
+The casters stay higher than the melee builds because they sit at x1.54 to x1.57 with no stacking source at all: the level-45
+spell magnitude, Master school potency and the health floor are not stacking sources. `MAXED_POWER_MOST` in
+`test/tooling/playerPowerBudget.test.js` is 1.77 / 1.82 / 1.85 / 1.84 / 1.84 (warrior, archer, spellsword, mage, thief; no
+ARENA2, with the online health), down from B4's 2.08 / 2.13 / 2.0 / 1.96 / 2.2.
 
 ## Not modelled
 

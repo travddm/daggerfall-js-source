@@ -84,6 +84,21 @@ const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 // stands a line draws a fork or a chain; any other draws a wheel (a fork's three small stars and two notables make a
 // small wheel of five).
 
+/** B5: the sky's damage and guard channels, scaled to the budget (the blow's powers add to +34.5% at the most, the hurt's guards
+ *  keep 86%). A star's number is the scale times what the design page first wrote, to the half per cent and never under it. The
+ *  Health, the attributes, the skills and the lives are not scaled. */
+const SKY_BLOW_SCALE = 0.2;
+const SKY_GUARD_SCALE = 0.25;
+const SKY_BLOW_KEYS = new Set(['weaponDmg', 'meleeDmg', 'bowDmg', 'fistDmg', 'shortDmg', 'longDmg', 'axeDmg', 'bluntDmg', 'undeadDmg', 'daedraDmg', 'beastDmg', 'unawareDmg', 'rageDmg', 'spellPower']);
+const SKY_GUARD_KEYS = new Set(['blowTaken', 'spellTaken']);
+const skyScaled = (stats) => {
+  const out = {};
+  for (const [k, v] of Object.entries(stats)) {
+    const scale = SKY_BLOW_KEYS.has(k) ? SKY_BLOW_SCALE : SKY_GUARD_KEYS.has(k) ? SKY_GUARD_SCALE : 1;
+    out[k] = scale === 1 ? v : Math.sign(v) * Math.max(0.5, Math.round(Math.abs(v) * scale * 2) / 2);
+  }
+  return out;
+};
 const N = (name, stats) => Object.freeze({ name, stats: Object.freeze(stats) });
 const K = (name, stats, text) => Object.freeze({ name, stats: Object.freeze(stats), text });
 
@@ -304,7 +319,7 @@ function build() {
     edges.push(arc ? { a, b, arc } : { a, b });
   };
   const node = (key, kind, ring, sector, cluster, name, stats, p, text = undefined) =>
-    add(/** @type {FirmNode} */ ({ key, kind, ring, sector, cluster, name, stats: Object.freeze(kind === 'small' || kind === 'road' ? smallStats(stats) : { ...stats }), ...(text ? { text } : {}), x: p.x, y: p.y }));
+    add(/** @type {FirmNode} */ ({ key, kind, ring, sector, cluster, name, stats: Object.freeze(skyScaled(kind === 'small' || kind === 'road' ? smallStats(stats) : stats)), ...(text ? { text } : {}), x: p.x, y: p.y }));
 
   // the middle, the starts and the inner ring
   node('sp.start', 'start', 'combat', 'sp', null, SERPENT.name, { luck: 2 }, { x: 0, y: 0 });

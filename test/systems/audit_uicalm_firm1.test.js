@@ -175,12 +175,12 @@ test('AUDIT UICALM-FIRM1 L1 M2: THE GAINS ARE CAPPED, THEN THE PRICE IS PAID - p
   assert.ok(treeParts(mage).gains.spellPower > statDef('spellPower').max, 'the mage stands past the cap');
   assert.equal(treeStats(mage).spellPower, statDef('spellPower').max);
   assert.equal(treeStats(vow).spellPower, statDef('spellPower').max + treeParts(vow).prices.spellPower);
-  // Night Mother's Embrace: -5 in an open fight, though melee and short blades already pass the group's 30
+  // Night Mother's Embrace: -1 in an open fight, though melee and short blades already pass the group's 5
   const without = walk('sh.start', named('Dagger Dance'), 'sh.c5.0', 'sh.c5.1', 'sh.c5.2', 'sh.c5.3', 'sh.c5.4', 'sh.c5.5', 'sh.c5.6', 'st.k');
   const nm = { start: without.start, keys: [...without.keys, ...pathTo(without, 'sh.k')] };
   const aware = (t) => blowPct(treeStats(t), { skill: 'ShortBlade', group: 'humanoid' });
-  assert.equal(aware(without), 30);
-  assert.equal(aware(nm), 25);
+  assert.equal(aware(without), BLOW_CAP); // PIN MOVED: B5 (BLOW_CAP 30 -> 5)
+  assert.equal(aware(nm), BLOW_CAP - 1); // PIN MOVED: B5 (cap 5 less the keystone's price -1, was 30 less 5)
   assert.ok(blowPct(treeStats(nm), { skill: 'ShortBlade', unaware: true }) > blowPct(treeStats(without), { skill: 'ShortBlade', unaware: true }), 'and it pays off on the unaware');
   // through the real blow door
   const me = { isPlayer: true, health: 100, maxHealth: 100 };
@@ -188,7 +188,7 @@ test('AUDIT UICALM-FIRM1 L1 M2: THE GAINS ARE CAPPED, THEN THE PRICE IS PAID - p
   const dagger = { templateIndex: 113 };
   setFirmamentOnline(true);
   const hundred = (t) => { setFirmamentTree(t); _resetFirmamentPowersForTests(); let n = 0; for (let i = 0; i < 100; i++) n += weaponBlowMods(dagger, 100, me, foe, { unaware: false }); return n; };
-  assert.equal(hundred(nm), hundred(without) - 500);
+  assert.equal(hundred(nm), hundred(without) - 100); // PIN MOVED: B5 (the price -5% -> -1%: 100 blows of 100)
   // and the price's own reader: a channel with no price reads as it did (a hand-made sheet has none)
   assert.equal(castCostPct({ castCost: 30 }), 25);
 });
@@ -526,8 +526,8 @@ test('AUDIT UICALM-FIRM1 L5 H4: every craft route takes the tree\'s hand on its 
 test('AUDIT UICALM-FIRM1 L5 M3: the budget\'s numbers as the design page says them, and every price small, whichever way its channel reads', () => {
   const at = (k) => [STAT_DEFS[k].min, STAT_DEFS[k].max];
   assert.deepEqual([STAT_DEFS.strength.max, statDef('skill.LongBlade').max, STAT_DEFS.hp.max, STAT_DEFS.mp.max], [15, 15, 15, 75]);
-  assert.deepEqual([at('spellPower')[1], at('castCost')[1], at('castSpeed')[1], at('blowTaken')[0], at('evade')[1]], [30, 25, 15, -15, 10]);
-  assert.deepEqual([BLOW_CAP, BLOW_TOTAL_CAP, CAST_COST_CAP], [30, 50, 25]);
+  assert.deepEqual([at('spellPower')[1], at('castCost')[1], at('castSpeed')[1], at('blowTaken')[0], at('evade')[1]], [6, 25, 15, -3, 10]); // PIN MOVED: B5 (spellPower cap 30 -> 6, blowTaken floor -15 -> -3)
+  assert.deepEqual([BLOW_CAP, BLOW_TOTAL_CAP, CAST_COST_CAP], [5, 6, 25]); // PIN MOVED: B5 (blow caps 30 / 50 -> 5 / 6)
   assert.deepEqual([REFUND_FREE_BELOW_RENOWN, REFUND_SILVER_PER_STAR, FIRM_RESPEC_GOLD, FIRM_RENOWN_MAX], [10, 10, 10_000, 50]);
   assert.deepEqual([refundSilver(3, 9), refundSilver(3, 10)], [0, 30]);
   assert.deepEqual([starsFor(50), starsFor(51)], [98, 98]);

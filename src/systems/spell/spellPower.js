@@ -37,7 +37,7 @@ import { sigilDueling } from '../sigil/sigil.js';   // SCHOOLS2: a self perk sle
 
 /** Each effective point of Destruction past 100 is this much more damage. B1 (tame player power): a fifth of a per cent,
  *  was 1% (CLIMB-PAST's CLIMB_OVERCAP_SPEED_PER_POINT), so a school mastered to 200 (effective 140) is x1.08, not x1.40. */
-export const DESTRUCTION_POTENCY_PER_POINT = 0.002;
+export const DESTRUCTION_POTENCY_PER_POINT = 0.0007;
 /** SCHOOLS2: and every school's own - one law, one number. */
 export const SCHOOL_POTENCY_PER_POINT = DESTRUCTION_POTENCY_PER_POINT;
 

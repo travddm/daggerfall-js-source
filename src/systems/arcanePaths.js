@@ -80,7 +80,7 @@ export const PATH_NUMBERS = Object.freeze({
   aegisBolt: Object.freeze({ times: 2, most: 20, rounds: 8 }),
   fleetingHold: Object.freeze({ rounds: 6 }),
   riftLance: Object.freeze({ metres: 4, share: 1 / 3 }),
-  livingAegis: Object.freeze({ seconds: 30, lighter: 4 }),
+  livingAegis: Object.freeze({ seconds: 30, lighter: 2 }),
   prismaticWard: Object.freeze({ seconds: 30, chance: 40 }),
   shadowBolt: Object.freeze({ rounds: 3 }),
   unravel: Object.freeze({ back: 1 / 3 }),

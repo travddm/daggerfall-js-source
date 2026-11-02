@@ -52,7 +52,7 @@ test('SET1 the registry: the sets in the record\'s own order - the four of the w
     assert.deepEqual(set.tiers.map((t) => t.at), [...SET_TIERS], set.id);
     for (const t of set.tiers) {
       for (const [k, pair] of Object.entries(t.values)) {
-        assert.ok(Array.isArray(pair) && pair.length === 2 && pair.every(Number.isInteger), `${set.id}.${t.key}.${k}`);
+        assert.ok(Array.isArray(pair) && pair.length === 2 && pair.every((n) => Number.isInteger(['more', 'stack', 'less', 'lighter'].includes(k) ? n * 2 : n)), `${set.id}.${t.key}.${k}`);   // PIN MOVED: B5 (a percent is a whole number or a half, the others stay whole)
       }
       for (const st of [0, SET_STAGE_MAX]) {
         const words = t.text(tierValues(t, st));
@@ -167,8 +167,8 @@ test('SET1 the stage: the lowest worn piece\'s rank capped by the Renown\'s stag
   assert.equal(st.heldRenown, false);
   assert.deepEqual(st.tiers.map((t) => t.awake), [true, true, false], 'four pieces: the 2 and the 4');
   assert.deepEqual(st.tiers[0].values, { strength: 3, critical: 6 }, 'Kindled\'s numbers');
-  assert.equal(st.tiers[1].text, 'Your weapon deals 3% more damage, or 6% more while you are below half health');
-  assert.equal(st.tiers[1].full, 'Your weapon deals 5% more damage, or 10% more while you are below half health', 'and what it is at Ascendant');
+  assert.equal(st.tiers[1].text, 'Your weapon deals 1% more damage, or 2% more while you are below half health');   // PIN MOVED: B5 (Bloodfury [0.5, 1.5], Kindled rounds to 1)
+  assert.equal(st.tiers[1].full, 'Your weapon deals 1.5% more damage, or 3% more while you are below half health', 'and what it is at Ascendant');   // PIN MOVED: B5 (Bloodfury Ascendant 5 -> 1.5)
   // Renown 9 opens only Faint: the Renown holds it
   st = setState('dagon', pieces, 9, true);
   assert.equal(st.stage, 0);
@@ -220,7 +220,7 @@ test('SET1 the session and the powers\' one question: awake online with my Renow
     setSigilRenown(40);
     assert.equal(setsAwake(), true);
     assert.deepEqual(awakeTier(e, 'dagon', 0), { strength: 6, critical: 12 });
-    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 5 });
+    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 1.5 });   // PIN MOVED: B5 (Bloodfury Ascendant 5 -> 1.5)
     assert.equal(awakeTier(e, 'dagon', 2), null, 'four pieces: the third sleeps');
     assert.equal(awakeTier(e, 'mora', 0), null, 'a set not worn');
     setSetsDueling(true);

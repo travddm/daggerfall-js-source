@@ -111,7 +111,7 @@ test('BAL-ARCHERY: a shaft is 35% faster; a spell stays on MISSILE_SPEED; the bo
   assert.equal(CLASSIC_UPDATE_INTERVAL, 0.0625);
 });
 
-test('BAL-ARCHERY: mastery is +0.2% of the blow per effective point past 100, and never against a player', () => {
+test('BAL-ARCHERY: mastery is +0.07% of the blow per effective point past 100, and never against a player', () => {
   const loc = globalThis.location;
   globalThis.location = { search: '?online' };
   try {
@@ -119,9 +119,9 @@ test('BAL-ARCHERY: mastery is +0.2% of the blow per effective point past 100, an
     const bowW = bow();
     assert.equal(weaponPastPct(bowW, player(100), foe), 0);
     assert.equal(weaponPastPct(blade(), player(100), foe), 0);
-    assert.equal(weaponPastPct(bowW, player(200), foe), 8);
-    assert.equal(weaponPastPct(blade(), player(200), foe), 8);
-    assert.equal(weaponMasteryBlow(bowW, 100, player(200), foe), 108);
+    assert.ok(Math.abs(weaponPastPct(bowW, player(200), foe) - 2.8) < 1e-9);   // PIN MOVED: B5 (was 8)
+    assert.ok(Math.abs(weaponPastPct(blade(), player(200), foe) - 2.8) < 1e-9);   // PIN MOVED: B5 (was 8)
+    assert.equal(weaponMasteryBlow(bowW, 100, player(200), foe), 102);   // PIN MOVED: B5 (was 108; 2.8% of 100, the 0.8 carried)
     assert.equal(weaponMasteryBlow(bowW, 100, player(200), { isPlayer: true }), 100, 'a player target takes the blow as struck');
     assert.equal(weaponMasteryBlow(bowW, 100, player(200), { ...foe, warded: true }), 100);
   } finally {
@@ -196,7 +196,7 @@ test('BAL-ARCHERY: sustained damage of a Daedric Long Bow and a Daedric Longswor
     _resetWeaponMasteryForTests();
     const hard = mean(player(200), foe, b, SWING_MODS.StrikeDown.damage);
     const sword = mean(player(200), foe, s, clickSwing);
-    assert.ok(Math.abs(hard / bowHit - 1.08) < 0.02, `mastery ${hard}`);
+    assert.ok(Math.abs(hard / bowHit - 1.028) < 0.02, `mastery ${hard}`);   // PIN MOVED: B5 (was x1.08)
     assert.ok(Math.abs((hard / bowGap) / (sword / bladeGap) - bowDps / bladeDps) < 0.02, 'skill 200 scales both, so the ratio holds');
   } finally {
     globalThis.location = loc;

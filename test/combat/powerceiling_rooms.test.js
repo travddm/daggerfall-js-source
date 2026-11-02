@@ -107,8 +107,8 @@ test('POWER-CEILING MASTERY OBEYS ITS ROOM (AUDIT HORIZONTAL D2): an axe at a sk
   const me = hero([S.Axe], 200);
   const axe = weapon(WEAPONS.War_Axe);
   const low = foe({ health: 10 });
-  assert.equal(weaponPastPct(axe, me, low), 16, 'the axe four tenths of a per cent an effective point past 100, at 140');
-  assert.equal(openBlow(() => weaponMasteryBlow(axe, 1000, me, low)), 1160, 'whole: +16%');
+  assert.equal(weaponPastPct(axe, me, low), 5.6, 'the axe 0.14 of a per cent (B5; was four tenths) an effective point past 100, at 140');
+  assert.equal(openBlow(() => weaponMasteryBlow(axe, 1000, me, low)), 1056, 'whole: +5.6%');
   assert.equal(spentBlow(() => weaponMasteryBlow(axe, 1000, me, low)), 1000, `no room, no more - ${RULE}`);
   reset();
 }));
@@ -118,12 +118,12 @@ test('POWER-CEILING THE MARTIAL PATH OBEYS ITS ROOM (AUDIT HORIZONTAL D2): the A
   const assassin = hero(MP.MARTIAL_BY_ID.assassin.skills);
   assert.equal(MP.chooseMartialPath(assassin, 'assassin').ok, true);
   const blade = weapon(WEAPONS.Dagger);
-  assert.equal(openBlow(() => POW.martialBlow(blade, 1000, assassin, foe(), {})), 1050, 'whole: the first blow at a foe, +5%');
+  assert.equal(openBlow(() => POW.martialBlow(blade, 1000, assassin, foe(), {})), 1030, 'whole: the first blow at a foe, +3% (B5; was +5%)');
   assert.equal(spentBlow(() => POW.martialBlow(blade, 1000, assassin, foe(), {})), 1000, `no room, no more - ${RULE}`);
   reset();
   const vanguard = hero(MP.MARTIAL_BY_ID.vanguard.skills);
   assert.equal(MP.chooseMartialPath(vanguard, 'vanguard').ok, true);
-  assert.equal(struck(vanguard, 1000), 970, 'whole: 3% lighter');
+  assert.equal(struck(vanguard, 1000), 980, 'whole: 2% lighter (B5; was 3%)');
   assert.equal(struck(vanguard, 1000, [POW.MARTIAL_POWERS, POW.martialDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();
 }));
@@ -133,7 +133,7 @@ test('POWER-CEILING THE LIVING AEGIS AND UNBROKEN OBEY THEIR ROOM (AUDIT HORIZON
   const warden = hero(AP.PATH_BY_ID.warden.schools, 150, MAGE);
   assert.equal(AP.choosePath(warden, 'warden').ok, true);
   APOW.pathLanded({ caster: warden, spell: signatureSpell('warden'), r: {}, self: true });   // Living Aegis cast on myself
-  assert.equal(struck(warden, 1000), 960, 'whole: 4% lighter');
+  assert.equal(struck(warden, 1000), 980, 'whole: 2% lighter (B5; was 4%)');
   warden.health = 2000;
   assert.equal(struck(warden, 1000, [APOW.ARCANE_POWERS, APOW.pathDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();
@@ -150,7 +150,7 @@ test('POWER-CEILING THE LIVING AEGIS AND UNBROKEN OBEY THEIR ROOM (AUDIT HORIZON
   assert.equal(orcBane.health, 1, 'Unbroken: the killing blow leaves one, and the half begins');
   orcBane.health = 4000;   // over half: no Hold the Line, no Last Stand - the half alone
   now = 1;
-  assert.equal(struck(orcBane, 1000), 900, 'whole: 10% less');
+  assert.equal(struck(orcBane, 1000), 970, 'whole: 3% less (B5; was 10%)');
   orcBane.health = 4000;
   assert.equal(struck(orcBane, 1000, [SIGIL_SETS_POWER, setDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();

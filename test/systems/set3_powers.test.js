@@ -171,17 +171,17 @@ test('SET3 the blow - Bloodfury\'s per cent (twice below half health), taken of 
   fresh(); online(1);
   const e = wearSet(player(), 'dagon', 4);
   const s = sword();
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'Bloodfury at Faint: +2%');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, 'Bloodfury at Faint: +0.5%');   // PIN MOVED: B5 (Bloodfury Faint 2 -> 0.5; 1000 so the half per cent is a whole point)
   e.health = 50;
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'at half health: not below it');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, 'at half health: not below it');
   e.health = 49;
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'below half: twice');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1010, 'below half: twice');
   e.health = 100;
   const knife = createWeapon(113, 0, () => 0.5);
-  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 20, e, RAT)), [20, 20], '0.4 a blow, carried: 0.8 stands on the knife');
-  assert.equal(weaponBlowMods(sword(), 20, e, RAT), 20, 'another weapon carries its own - never the knife\'s 0.8');
-  assert.equal(weaponBlowMods(knife, 20, e, RAT), 21, 'the knife\'s 0.8 and this blow\'s 0.4 make the whole point');
-  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 20, e, RAT)), [20, 21], 'and on: 0.6, then 1.0');
+  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 80, e, RAT)), [80, 80], '0.4 a blow, carried: 0.8 stands on the knife');
+  assert.equal(weaponBlowMods(sword(), 80, e, RAT), 80, 'another weapon carries its own - never the knife\'s 0.8');
+  assert.equal(weaponBlowMods(knife, 80, e, RAT), 81, 'the knife\'s 0.8 and this blow\'s 0.4 make the whole point');
+  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 80, e, RAT)), [80, 81], 'and on: 0.6, then 1.0');
   assert.equal(weaponBlowMods(s, 0, e, RAT), 0, 'a miss');
   assert.equal(weaponBlowMods(s, 100, e, { isPlayer: true }), 100, 'a blow at a player');
   assert.equal(weaponBlowMods(s, 100, { ...e, peer: 'p1' }, RAT), 100, 'a peer\'s blow resolved here');
@@ -200,22 +200,22 @@ test('SET3 the Rampage: each kill of mine a stack, up to three, every one refres
   door([], { me: e });
   const s = sword();
   at(100);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'Bloodfury alone');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, 'Bloodfury alone');   // PIN MOVED: B5 (Bloodfury 0.5 and Rampage 0.5 a stack; 1000 so the half per cent is a whole point)
   reportPlayerKill(RAT, { kind: 'melee' });
   assert.equal(rampageStacks(), 1);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, '+2% a stack at Faint');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1010, '+0.5% a stack at Faint');
   reportPlayerKill(RAT); reportPlayerKill(RAT); reportPlayerKill(RAT);
   assert.equal(rampageStacks(), RAMPAGE_STACKS, 'three at most');
   assert.equal(RAMPAGE_STACKS, 3);
   assert.deepEqual(v.said, ['Rampage I', 'Rampage II', 'Rampage III'], 'said as it rises, not again at the cap');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 108);
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1020);
   at(105);
   reportPlayerKill(RAT, { kind: 'arrow' });
   at(105 + RAMPAGE_SECONDS - 0.01);
   assert.equal(rampageStacks(), 3, 'the last kill refreshed them all');
   at(105 + RAMPAGE_SECONDS);
   assert.equal(rampageStacks(), 0, 'twelve seconds after the last kill');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 102);
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005);
   reportPlayerKill(RAT);
   assert.equal(rampageStacks(), 1, 'a new run starts at one');
   // AUDIT SET L8: my summoned atronach, a bound ally, a guard of the watch - none is a kill of mine
@@ -237,8 +237,8 @@ test('SET3 the Rampage: each kill of mine a stack, up to three, every one refres
 test('SET3 Nightfall Strike: a weapon blow at a foe that had not noticed me (the host\'s `unaware`), a bow\'s too; and the Burning Gate\'s sear, flat on every weapon blow after the per cents - AUDIT L7 never on a foe immune to fire (mutants: Nightfall on an aware foe; Nightfall never on an arrow; the sear inside the per cent; the sear on a fire-immune foe)', () => {
   fresh(); online(1);
   const e = wearSet(player(), 'nocturnal', 4);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: true }), 104, '+4% at Faint');
-  assert.equal(weaponBlowMods(bow(), 100, e, RAT, { unaware: true }), 104, 'arrows too');
+  assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: true }), 101, '+1% at Faint');   // PIN MOVED: B5 (Nightfall Faint 4 -> 1)
+  assert.equal(weaponBlowMods(bow(), 100, e, RAT, { unaware: true }), 101, 'arrows too');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: false }), 100, 'a foe that saw me');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT), 100, 'no word: aware');
   fresh(); online(1);
@@ -431,18 +431,18 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   at(1000);
   assert.equal(hurtPlayer(e, 500), false);
   assert.equal(e.health, 1, 'left at 1');
-  assert.deepEqual(v.said, ['Unbroken! Damage cut by 10% for 4 s.']);   // WB13b
+  assert.deepEqual(v.said, ['Unbroken! Damage cut by 3% for 4 s.']);   // PIN MOVED: B5 (Unbroken 10 -> 3)   // WB13b
   assert.deepEqual(v.sounds, ['unbroken']);
   e.health = 50;
   at(1001);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 41, '10% less: 90% of 10 is 9 - whole points, 9 land');
+  assert.equal(e.health, 41, '3% less: 97% of 10 is 9.7 - whole points, 9 land');
   hurtPlayer(e, 11);
-  assert.equal(e.health, 32, 'AUDIT L1: 90% of eleven is 9.9 - nine land, whole points, never a health of 31.1');
-  assert.equal(setDamageMod(e, 1), 0, 'a single point at 90% is none');
+  assert.equal(e.health, 31, 'AUDIT L1: 97% of eleven is 10.67 - ten land, whole points, never a health of 30.33');   // PIN MOVED: B5 (Unbroken 10 -> 3)
+  assert.equal(setDamageMod(e, 1), 0, 'a single point at 97% is none');
   at(1004);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 22, 'four seconds at Faint, then whole');
+  assert.equal(e.health, 21, 'four seconds at Faint, then whole');   // PIN MOVED: B5 (follows Unbroken 10 -> 3: 31 before this hurt)
   at(1100);
   hurtPlayer(e, 500);
   assert.equal(e.health, 0, 'inside the recovery: a death');
@@ -505,11 +505,11 @@ test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30%
   assert.deepEqual(d.hurts, [['near', 10]], 'crossed: 10 at Faint, only within six metres');
   assert.deepEqual(v.said, ['Wrath of the Warden! 1 foe struck.']);
   assert.deepEqual(v.sounds, ['wrath']);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 104, 'the fury (+2%) and the sear (+2)');
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1007, 'the fury (+0.5%) and the sear (+2)');   // PIN MOVED: B5 (Wrath fury Faint 2 -> 0.5; 1000 so the half per cent is a whole point)
   at(WRATH_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 104);
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1007);
   at(WRATH_SECONDS);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 102, 'ten seconds');
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1002, 'ten seconds');
   e.health = 50;
   at(100);
   blow(e, 25);
@@ -533,7 +533,7 @@ test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30%
   e.health = 50; at(1000);
   blow(e, 25);   // AUDIT FINAL F10: through the door, which takes the mark as it opens
   assert.equal(v.said.at(-1), 'Wrath of the Warden!', 'no door: the fury still wakes, no count said');
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 104);
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1007);   // PIN MOVED: B5 (Wrath fury Faint 2 -> 0.5)
   // AUDIT SET H1/M4/L7: who the Nova spares - asked in that order, the host's ray last (only for a foe otherwise struck)
   const w = fresh(); online(1);
   const me = wearSet(player(), 'ruhn', 6);
@@ -610,9 +610,9 @@ test('SET3 Mora\'s Mantle: my spells cost less at four pieces (whole, at least o
   const e = wearSet(player(), 'mora', 4);
   const skilled = calculateCastCost(spell, e, { portMods: false }).sp;
   assert.ok(skilled < plain, `Forbidden Lore's schools already cheapen it, as any school a skill raises does (${plain} -> ${skilled})`);
-  assert.equal(calculateCastCost(spell, e).sp, Math.max(1, Math.round(skilled * 0.95)), 'then 5% less at Faint');
+  assert.equal(calculateCastCost(spell, e).sp, Math.max(1, Math.round(skilled * 0.985)), 'then 1.5% less at Faint');   // PIN MOVED: B5 (Waters of Oblivion Faint 5 -> 1.5)
   assert.equal(calculateCastCost(spell, { ...e, isPlayer: false }).sp, skilled, 'a caster that is not the player: none of it');
-  assert.equal(setCastCost(e, 100), 95);
+  assert.equal(setCastCost(e, 100), 98.5);   // PIN MOVED: B5 (Waters of Oblivion Faint 5 -> 1.5)
   assert.equal(setCastCost({ ...e, peer: 'p1' }, 100), 100);
   const dmg = spell.effects[0];
   assert.equal(setAbsorbChance(e), 0, 'four pieces: no Eye');
@@ -629,7 +629,7 @@ test('SET3 Mora\'s Mantle: my spells cost less at four pieces (whole, at least o
   fresh(); online(40);
   const asc = wearSet(player(), 'mora', 6, XP[4]);
   assert.equal(setAbsorbChance(asc), 30);
-  assert.equal(setCastCost(asc, 100), 85);
+  assert.equal(setCastCost(asc, 100), 95.5);   // PIN MOVED: B5 (Waters of Oblivion Ascendant 15 -> 4.5)
 });
 
 test('SET3 the round: each recovering power is said ready again at the first magic round after its time - once, and silently forgotten while the sets sleep; the magic round runner calls it for my entity (mutants: said before its time; said every round; said in a duel)', () => {
