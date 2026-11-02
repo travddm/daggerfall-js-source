@@ -32,7 +32,7 @@ import { progressionOf, VIRTUE_POINTS_PER_LEVEL } from './progression.mjs';
 
 /** The rule layers, each with the game switch it flips. `default` is the game as an online room runs it. */
 export const LAYERS = Object.freeze({
-  pcaao: 'Physical Combat And Armor Overhaul: armour reduces damage, skill counts x1.5 to hit, crits multiply (mod setting pcaao Enabled)',
+  pcaao: 'Physical Combat And Armor Overhaul: armour reduces damage, skill counts once to hit, crits multiply (mod setting pcaao Enabled)',
   stats: 'Classic monster stat rows under Enemy Expansion and MUDEX, with the stat pass (systems/enemyExpansion/classic-stat-pass.ts)',
   master: 'Master Skills: mastered skills climb to 200 and read up to 140 (entity.masterSkills)',
   online: 'Online-only rules: the level law (systems/levelClimb.js), the blow and pace of a weapon skill past 100 (systems/weaponMastery.js), school potency and spell cost past 100',

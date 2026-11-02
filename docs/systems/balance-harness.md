@@ -45,7 +45,7 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 
 | Layer | What it switches |
 | --- | --- |
-| `pcaao` | Physical Combat And Armor Overhaul (`installPcaao`). |
+| `pcaao` | Physical Combat And Armor Overhaul (`installPcaao`), tuned toward DFU in B3. |
 | `stats` | The classic monster rows under Enemy Expansion and MUDEX, with the stat pass, read when the foe is built. |
 | `master` | Master Skills: mastered skills climb to 200 and read up to 140. |
 | `online` | Online-only rules: the level law, the weapon skill's blow and pace past 100, school potency and spell cost past 100. |
@@ -53,7 +53,7 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 | `hero` | Hero's threat: plain foes grow with player level past 30 (`heroThreat`). |
 | `power` | Loot-ladder gear: a damage line on the weapon, an armour line on each piece, at the tier the level wears. |
 | `techniques` | The best weapon technique the gear tier can roll. |
-| `swing` | The port's own swing and cast speed curve. |
+| `swing` | The swing law: DFU's Speed line with the weapon's heft and handling (B3). |
 | `virtue` | Oblivion-style levelling, 12 attribute points a level (off by default). |
 | `ceiling` | The maxed character: the blow takes the rest of its room up to `BLOW_MOST`, the hurt and the spell likewise (off by default; add it with `--layers +ceiling,-hero,-stats`). |
 
@@ -106,6 +106,51 @@ B1 rescaled the numbers on the sources, so a card prints what a blow gets and no
 - a technique aims +5 to +10 and tops at x1.95 of a blow. The Firmament tree is left to B5.
 
 `test/tooling/playerPowerBudget.test.js` holds the character-power bounds.
+
+## The combat core (B3)
+
+B3 tuned the combat core toward DFU and gave the swing its Speed line back. Each departure from DFU is named in the
+code next to it.
+
+- **To hit** (`pcaao.js`): the weapon skill counts once, as `FormulaHelper.cs` reads it (the mod's x1.5 is gone). To
+  keep the hit chance at DFU's from level 10 to 30, a weapon's material gives x6 + 2 (DFU x10, the mod x2 + 2) and
+  dodging takes a quarter (DFU's; the mod halves it).
+- **Critical strikes** (`pcaao-critical.ts`): a critical multiplies the blow by `1 + 0.025` a five points of Critical
+  Strike (x1.5 at 100; the mod's x2.0, DFU's none) and adds `crit / 10` to the chance to hit (DFU's; the mod `crit /
+  4`). A slight edge over DFU: about +12% a blow at 100, rolled one blow in four.
+- **Swing** (`weaponStates.js`): the frame time is DFU's `3 * (115 - Speed) / 980` with Speed held to 0..100, times
+  the weapon's heft (at most +8%) and handling (0.9 to 1.04, two-handers x1.03). The slowest weapon costs 13.6% of
+  DFU's swing rate. Before B3 the port flattened the line (1.4 at Speed 0 to 0.6 at 100) and added up to +35% heft and
+  +12% handling, so a Speed-100 build swung at 0.42 of DFU's rate.
+- **Bows**: the strength term is taken once, as DFU does (BAL-ARCHERY doubled it). The +1 on the damage span stays, as
+  does the random shield armour (not touched here).
+
+Effect on the budget (ARENA2 attributes, DFU's own foe row, character power, base -> B3):
+
+| Typical gear (default run) | Level 1 | 10 | 20 | 30 | 45 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Warrior | 0.82 -> 0.85 | 0.63 -> 0.69 | 0.88 -> 0.96 | 0.84 -> 1.01 | 0.89 -> 1.47 |
+| Thief | 1.00 -> 1.14 | 0.77 -> 0.96 | 0.75 -> 1.05 | 0.72 -> 1.17 | 0.85 -> 1.34 |
+| Mage | 0.84 -> 0.90 | 0.84 -> 0.89 | 0.85 -> 0.94 | 1.10 -> 1.17 | 1.39 -> 1.50 |
+| Spellsword | 0.89 -> 0.91 | 0.83 -> 0.87 | 1.00 -> 1.05 | 1.16 -> 1.22 | 1.38 -> 1.52 |
+| Archer | 1.00 -> 0.99 | 0.98 -> 0.97 | 1.18 -> 1.11 | 1.32 -> 1.23 | 1.50 -> 1.40 |
+
+The target line runs from 1.0 at level 1 to 1.5 at level 45. A character at Speed 100 swings 2.1 times as often as one
+at Speed 75 in DFU's own formula, so the melee builds that reach Speed 100 climb past level 30; that is DFU's law with
+level 45 attributes. The maxed character (`+ceiling`) rises with it:
+
+| Maxed (`+ceiling`), level 45 | B1 | B3 |
+| --- | ---: | ---: |
+| Warrior | 1.32 | 2.16 |
+| Thief | 1.29 | 2.04 |
+| Spellsword | 1.77 | 1.96 |
+| Mage | 1.74 | 1.91 |
+| Archer | 2.21 | 2.06 |
+
+Even with no blow bonus at all, a Speed-100 warrior at level 45 is roughly 1.6 (estimated from the dps and survival
+ratios) against DFU's level-31 character, so the swing law alone puts the maxed melee builds over 1.5. The remaining
+distance is the gear and the Firmament tree (B4, B5). `test/tooling/playerPowerBudget.test.js` holds the new bounds;
+they are higher than B1's for the swinging builds.
 
 ## Not modelled
 

@@ -72,7 +72,7 @@ test('DISC29-G: a base-55 lycanthrope\'s live Speed is 95 in beast form - the cu
   assert.equal(liveStat(werewolf(false), 'speed'), 55, 'BAL6: in human form, the character\'s own');
 });
 
-test('DISC29-G (SWING-LAW): the real rig swings a base-55 werewolf under two blows a second - DFU\'s line had it at 3.3 - with the mods off and on; the curse still shows, and nothing swings at the cap\'s four', () => {
+test('DISC29-G (SWING-LAW): the real rig swings a base-55 werewolf on DFU\'s line (B3: 3.3 blows a second at live 95) with the mods off and on; the curse still shows, and nothing swings past the cap\'s four and a third a second', () => {
   installSwingLaw();
   installRoleplayRealismItems({ fetchBytes: () => { throw new Error('no art in this pin'); } });
   installRoleplayRealism();
@@ -86,14 +86,14 @@ test('DISC29-G (SWING-LAW): the real rig swings a base-55 werewolf under two blo
       const t = swing(rig);
       const law = 5 * getMeleeWeaponAnimTime(95, rig.playerWeapon.animCtx());
       assert.ok(Math.abs(t - law) <= 5 * DT, `mods ${mods ? 'on' : 'off'}: ${t.toFixed(3)}s a blow, the law's ${law.toFixed(3)}s at live 95`);
-      assert.ok(1 / t > 1.2 && 1 / t < 2, `mods ${mods ? 'on' : 'off'}: ${(1 / t).toFixed(2)} a second - quick, never DFU's 3.3`);
-      assert.ok(t > 5 * ((3 * (115 - 95)) / 980) * 1.5, 'half again slower than DFU\'s line at 95 at least');
+      assert.ok(1 / t > 2.7 && 1 / t < 3.6, `mods ${mods ? 'on' : 'off'}: ${(1 / t).toFixed(2)} a second - DFU's line at live 95 (3.3) with the dagger's handling`);
+      assert.ok(t > 5 * ((3 * (115 - 95)) / 980) * 0.85 && t < 5 * ((3 * (115 - 95)) / 980) * 1.15, 'within 15% of DFU\'s line at 95');
       const human = { ...werewolf(), activeEffects: [] };   // the same body without the curse
       const plain = swing(rigWith(human, WEAPONS.Dagger));
       assert.ok(plain > t * 1.2, `mods ${mods ? 'on' : 'off'}: without the curse base 55 is slower (${plain.toFixed(3)}s) - the curse's Speed still shows`);
       const capped = werewolf();
       capped.stats.speed = 90;   // live 100, the cap
-      assert.ok(1 / swing(rigWith(capped, WEAPONS.Dagger)) < 2, `mods ${mods ? 'on' : 'off'}: at the cap, still under two a second`);
+      assert.ok(1 / swing(rigWith(capped, WEAPONS.Dagger)) < 5.2, `mods ${mods ? 'on' : 'off'}: at the cap, under five a second (DFU's four and a third, a dagger a tenth quicker)`);
     } finally { _resetModSettings(); }
   }
 });

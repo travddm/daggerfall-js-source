@@ -79,9 +79,9 @@ test('PCO1: Mathf.Round rounds half to EVEN, and a float32 half lands where the 
   assert.equal(pcaaoPercentageReductionCalculationWithUnarmed({ group: 'Armor', templateIndex: 103, material: 0 }, 1, 50, 15, false, 0, modsOf({ conditionBasedEffectiveness: false })), 14);
 });
 
-test('PCO1: DamageModifier is ten points a point, and the weapon\'s hit bonus is material x2 + 2 ("+14, not +60")', () => {
+test('PCO1: DamageModifier is ten points a point, and the weapon\'s hit bonus is material x6 + 2 (B3: DFU x10, the mod x2 + 2)', () => {
   assert.equal(pcaaoDamageModifier(60), 1); assert.equal(pcaaoDamageModifier(50), 0); assert.equal(pcaaoDamageModifier(45), -1); assert.equal(pcaaoDamageModifier(100), 5);
-  assert.equal(pcaaoWeaponToHit({ material: 9 }), 14); assert.equal(pcaaoWeaponToHit({ material: 0 }), 0); assert.equal(pcaaoWeaponToHit({ material: 1 }), 2);
+  assert.equal(pcaaoWeaponToHit({ material: 9 }), 38); assert.equal(pcaaoWeaponToHit({ material: 0 }), -4); assert.equal(pcaaoWeaponToHit({ material: 1 }), 2);
 });
 
 test('PCO1: the hit\'s helpers - armour, adrenaline, stat diffs, skills, adjustments; AUDIT SET P-M1 the port\'s armour points protect (mutants: AUDIT-SET-the-points-as-exposure)', () => {
@@ -107,12 +107,12 @@ test('PCO1: the hit\'s helpers - armour, adrenaline, stat diffs, skills, adjustm
   assert.equal(pcaaoStatDiffsToHit(a, t2), -2, 'luck -5 -> 0 (truncated toward zero); the target\'s +15 rounds 1.5 to 2');
   assert.equal(pcaaoStatDiffsToHit(mkPlayer({ stats: stats({ agility: 70, speed: 66 }) }), p), 5 + 2, 'agility /4, speed /8');
   const dodger = mkPlayer({ skills: skillsAll(50) });
-  assert.equal(pcaaoSkillsToHit(p, dodger, fixed(0.99), M), -25, 'dodging HALVED, and no crit roll under the crit module');
+  assert.equal(pcaaoSkillsToHit(p, dodger, fixed(0.99), M), -12, 'dodging QUARTERED (B3: DFU, the mod halves it), and no crit roll under the crit module');
   const critter = mkPlayer({ skills: skillsAll(90) });
-  assert.equal(pcaaoSkillsToHit(critter, dodger, fixed(0.1), modsOf({ criticalStrikesIncreaseDamage: false })), -25 + 30, 'without the module: the player rolls crit/3 (30) for +crit/3');
+  assert.equal(pcaaoSkillsToHit(critter, dodger, fixed(0.1), modsOf({ criticalStrikesIncreaseDamage: false })), -12 + 9, 'without the module: the player rolls crit/3 (30) for +crit/10 (B3: DFU, the mod +crit/3)');
   const critMon = monster(0); critMon.skills = skillsAll(90);
-  assert.equal(pcaaoSkillsToHit(critMon, dodger, fixed(0.29), modsOf({ criticalStrikesIncreaseDamage: false })), -25 + 30, 'a monster rolls crit/3 (30) for +crit/3, as the player does');
-  assert.equal(pcaaoSkillsToHit(critMon, dodger, fixed(0.3), modsOf({ criticalStrikesIncreaseDamage: false })), -25, 'and misses it over');
+  assert.equal(pcaaoSkillsToHit(critMon, dodger, fixed(0.29), modsOf({ criticalStrikesIncreaseDamage: false })), -12 + 9, 'a monster rolls crit/3 (30) for +crit/10, as the player does');
+  assert.equal(pcaaoSkillsToHit(critMon, dodger, fixed(0.3), modsOf({ criticalStrikesIncreaseDamage: false })), -12, 'and misses it over');
   assert.equal(pcaaoAdjustmentsToHit(mkPlayer({ biographyAvoidHitMod: 5 })), -55);
   assert.equal(pcaaoAdjustmentsToHit(mon), 0, 'a monster: +50 - 50');
   assert.equal(pcaaoAdjustmentsToHit(cls), -50);
@@ -184,7 +184,7 @@ test('PCO1: the damage - hand-to-hand, the weapon roll, the silver six, the two-
   const claymore = { group: 'Weapons', templateIndex: 122, material: 1, flags: 0 };
   assert.equal(pcaaoWeaponAttackDamage(mkPlayer({ stats: stats({ strength: 70 }) }), monster(0), 0, 0, claymore, fixed(0), M), 2 + 2 * 2, 'two-handed: the strength term doubled');
   const bow = { group: 'Weapons', templateIndex: 130, material: 1, flags: 0 };
-  assert.equal(pcaaoWeaponAttackDamage(mkPlayer({ stats: stats({ strength: 70 }) }), monster(0), 0, 0, bow, fixed(0), M), 5 + 2 * 2, 'BAL-ARCHERY: a bow takes the two-handed strength term, and its base is +1');
+  assert.equal(pcaaoWeaponAttackDamage(mkPlayer({ stats: stats({ strength: 70 }) }), monster(0), 0, 0, bow, fixed(0), M), 5 + 2, 'BAL-ARCHERY: its base is +1; B3: the strength term once, as DFU gives it');
 });
 
 test('PCO1: Roleplay Realism\'s archery, as baked in - the draw time\'s hit and damage tables', () => {
@@ -422,9 +422,9 @@ test('PCO1: the whole blow - a sword through the overhaul, the monster loop with
   assert.ok(sword.currentCondition < 1000, 'and the sword wore, pre-reduction');
   // the soft material: an iron blade against a foe that wants silver takes a 60% cut rather than a refusal
   const iron = { group: 'Weapons', templateIndex: 120, material: 0, flags: 0, maxCondition: 1000, currentCondition: 1000 };
-  const ghost = monster(18); ghost.minMetalToHit = 3;   // three tiers over iron: x0.4, under the 0.45 that speaks
+  const ghost = monster(18); ghost.minMetalToHit = 3;   // three tiers over iron: x0.4, under the 0.45 that speaks (B3: on a blow of eight; a blow of two rounds up to x0.5)
   const said = [];
-  const soft = pcaaoAttackDamage(p, ghost, { weapon: iron, rolls: fixed(0.01), dfRand: fixed(0), say: (t, s) => said.push([t, s]), modules: M });
+  const soft = pcaaoAttackDamage(p, ghost, { weapon: iron, damageMod: 6, rolls: fixed(0.01), dfRand: fixed(0), say: (t, s) => said.push([t, s]), modules: M });
   assert.ok(soft > 0, 'not refused');
   assert.ok(said.some(([t, s]) => t === 'This Weapon Is Not Very Effective Against This Creature.' && s === 1), 'and the HUD says so for a second');
   const hard = pcaaoAttackDamage(p, ghost, { weapon: iron, rolls: fixed(0.01), dfRand: fixed(0), say: (t) => said.push([t]), modules: modsOf({ softMaterialRequirements: false }) });

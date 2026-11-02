@@ -150,7 +150,7 @@ test('RR1 weaponSpeed: the speed/strength blend by hands (:350-387), behind Role
   assert.equal(t({ liveSpeed: 50, liveStrength: 50, weaponType: 15 }), law(50, 15), 'bare hands: the speed alone');
   assert.equal(t({ liveSpeed: 80, liveStrength: 80 }), law(80 * (0.8 - 0.08) + 80 * (0.2 - 0.08)), 'past 70 each ratio loses the cap (the C#\'s own float order)');
   assert.equal(t({ liveSpeed: 80, liveStrength: 80, hands: 'Both' }), law(80 * (0.5 - 0.15) + 80 * (0.5 - 0.15), -1, true));
-  assert.ok(t({ liveSpeed: 100, liveStrength: 100, weaponType: 4 }) >= SWING_FRAME_MIN && 1 / (5 * t({ liveSpeed: 100, liveStrength: 100, weaponType: 4 })) < 2, 'the quickest blend swings under two a second, where the mod\'s line swung four');
+  assert.ok(t({ liveSpeed: 100, liveStrength: 100, weaponType: 4 }) >= SWING_FRAME_MIN && 1 / (5 * t({ liveSpeed: 100, liveStrength: 100, weaponType: 4 })) < 5.2, 'the quickest blend swings under five and a quarter a second: DFU\'s line at the cap, a dagger a tenth quicker');
   // the seam: Items' weaponBalance (on by default) answers first
   const player = { stats: { strength: 50, speed: 50 }, activeEffects: [], items: [] };
   equipTableOf(player)[EQUIP_SLOTS.RightHand] = sword();

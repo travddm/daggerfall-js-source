@@ -144,10 +144,11 @@ test('ours: the same seed gives the same number, and the overhaul moves a level-
   const stock = cell([]);
   assert.deepEqual(cell([]), stock, 'seeded: identical on a second run');
   const overhaul = cell(['pcaao']);
-  // audit C1: the Orc Warlord is hit 27 per cent of the time by the stock core and 46 per cent under the overhaul
+  // audit C1: the Orc Warlord is hit 27 per cent of the time by the stock core and 46 per cent under the mod's overhaul;
+  // B3 took the overhaul's x1.5 on the skill away and put its other terms toward DFU's, so it reads 41 per cent
   near(stock.hitChance, 0.27, 0.03, 'stock hit chance');
-  near(overhaul.hitChance, 0.46, 0.03, 'overhaul hit chance');
-  assert.ok(overhaul.perSwing > stock.perSwing * 1.3, 'the overhaul lands more damage a swing');
+  near(overhaul.hitChance, 0.405, 0.03, 'overhaul hit chance');
+  assert.ok(overhaul.perSwing > stock.perSwing * 1.15, 'the overhaul lands more damage a swing (B3: x1.25; the x1.5 on the skill made it x1.5)');
   const stats = cell(['pcaao', 'stats']);
   assert.ok(stats.foeHealth > overhaul.foeHealth, 'the stat pass raises the Warlord');
   assert.ok(stats.foeHealth <= overhaul.foeHealth * 1.3 + 1, 'and no more than 30%');

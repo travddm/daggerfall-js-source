@@ -86,16 +86,16 @@ test('BAL-ARCHERY: both bows are +1 at each end, and nothing else in the span mo
   assert.equal(RRI_WEAPON_MIN_DAMAGE[WEAPONS.Mace], 4, 'the mace stayed on the mod\'s row');
 });
 
-test('BAL-ARCHERY: a bow takes the two-handed strength term, in either hand; the stock core still adds it once', () => {
+test('B3: a bow takes the strength term once, in either hand, as the stock core does; a claymore keeps its doubled term', () => {
   const p = player(100);
   assert.equal(pcaaoDamageModifier(STR), 2);
-  assert.equal(pcaaoWeaponAttackDamage(p, foe, 0, 0, { ...bow(), material: 1 }, () => 0, M), 5 + 4, 'min 5 plus the doubled term');
+  assert.equal(pcaaoWeaponAttackDamage(p, foe, 0, 0, { ...bow(), material: 1 }, () => 0, M), 5 + 2, 'min 5 plus the term once (BAL-ARCHERY doubled it; B3 gives it back)');
   const clay = pcaaoWeaponAttackDamage(p, foe, 0, 0, { ...daedric(WEAPONS.Claymore), material: 1 }, () => 0, M);
-  assert.equal(clay, 2 + 4, 'a claymore was already doubled, and is not doubled again');
+  assert.equal(clay, 2 + 4, 'a claymore is doubled, and is not doubled again');
   setValue('Enhancements', 'BowLeftHandWithSwitching', true);
   try {
     assert.equal(getItemHands(bow()), ITEM_HANDS.LeftOnly);
-    assert.equal(pcaaoWeaponAttackDamage(p, foe, 0, 0, { ...bow(), material: 1 }, () => 0, M), 5 + 4, 'a left-hand bow still doubles');
+    assert.equal(pcaaoWeaponAttackDamage(p, foe, 0, 0, { ...bow(), material: 1 }, () => 0, M), 5 + 2, 'a left-hand bow takes it once too');
   } finally {
     setValue('Enhancements', 'BowLeftHandWithSwitching', false);
   }
@@ -164,23 +164,23 @@ test('BAL-ARCHERY: sustained damage of a Daedric Long Bow and a Daedric Longswor
   const plateId = pcaaoArmorMaterialIdentifier(plate);
   const cut = (d) => pcaaoPercentageReductionCalculationWithWeapon(plate, plateId, STR, d, false, 1, false, 0, M);
   const frames = (gap) => Math.round(gap * 60);
-  assert.equal(bowHit, 26);
+  assert.equal(bowHit, 24);
   assert.equal(beforeHit, 23);
   assert.equal(bladeHit, 17);
   assert.equal(frames(bowGap), 96, 'seven bow ticks plus the cooldown, at 60 fps');
-  assert.equal(frames(bladeGap), 55);
+  assert.equal(frames(bladeGap), 45);
   assert.equal(clickSwing, 0);
   assert.ok(Math.abs(bowGap - (7 * CLASSIC_UPDATE_INTERVAL + getBowCooldownTime(SPD))) < 0.05);
   assert.ok(Math.abs(bladeGap - 5 * frame) < 0.05, `blade gap ${bladeGap} frame ${frame}`);
   const bowDps = bowHit / bowGap, bladeDps = bladeHit / bladeGap, beforeDps = beforeHit / bowGap;
-  assert.ok(Math.abs(bowDps / bladeDps - 0.876) < 0.002, `PvE ${(bowDps / bladeDps).toFixed(3)} — target 0.80-0.90`);
-  assert.ok(Math.abs(beforeDps / bladeDps - 0.775) < 0.002, 'the same clocks, the span and the strength term as they were');
-  assert.equal(cut(bowHit), 9);
+  assert.ok(Math.abs(bowDps / bladeDps - 0.662) < 0.002, `PvE ${(bowDps / bladeDps).toFixed(3)} - B3: the sword swings on DFU's Speed line, the bow clock is DFU's too, and the strength term is once`);
+  assert.ok(Math.abs(beforeDps / bladeDps - 0.634) < 0.002, 'the span and the strength term as they were before BAL-ARCHERY, against the sword now');
+  assert.equal(cut(bowHit), 8);
   assert.equal(cut(bladeHit), 6);
   const pvp = (cut(bowHit) / bowGap) / (cut(bladeHit) / bladeGap);
-  assert.ok(Math.abs(pvp - 0.859) < 0.002, `PvP vs Daedric plate ${(pvp).toFixed(3)} — target 0.70-0.80, not met: no PvP multiplier was added`);
+  assert.ok(Math.abs(pvp - 0.625) < 0.002, `PvP vs Daedric plate ${(pvp).toFixed(3)}`);
   assert.equal(mean({ ...p, stats: { ...stats, strength: 50 } }, foe, b, SWING_MODS.StrikeDown.damage), 22);
-  assert.equal(mean({ ...p, stats: { ...stats, strength: 100 } }, foe, b, SWING_MODS.StrikeDown.damage), 32);
+  assert.equal(mean({ ...p, stats: { ...stats, strength: 100 } }, foe, b, SWING_MODS.StrikeDown.damage), 27);
   assert.equal(frames(hitGap(b, 50)), 108);
   assert.equal(frames(hitGap(b, 100)), 77);
   const notes = { hit: false, critical: false, backstab: false };
@@ -188,8 +188,8 @@ test('BAL-ARCHERY: sustained damage of a Daedric Long Bow and a Daedric Longswor
   const bladeNotes = { hit: false, critical: false, backstab: false };
   const critBlade = pcaaoAttackDamage(p, foe, { weapon: s, damageMod: clickSwing, backstabChance: 100, rolls: () => 0, modules: M, notes: bladeNotes });
   assert.equal(notes.critical && notes.backstab && bladeNotes.critical && bladeNotes.backstab, true);
-  assert.equal(critBow, 137);
-  assert.equal(critBlade, 72);
+  assert.equal(critBow, 91);
+  assert.equal(critBlade, 54);
   const loc = globalThis.location;
   globalThis.location = { search: '?online' };
   try {
