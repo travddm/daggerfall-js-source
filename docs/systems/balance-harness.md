@@ -305,10 +305,11 @@ budget. It reads the factors from the modules that apply them (`tools/balance/ti
 - Ocean bands (decision 29) already hold: a ruin isle x1.1 to x1.4 health and x1.05 to x1.15 blows by ring, a Deep Aether
   vault x1.8 / x1.2, an Abyss vault x2 / x1.3 (they replace the Elite dungeon's step), gold at most x1.25.
 
-What changed: `dpsRef` is 5 + level to level 30 and 3.5 a level past it (it was 5 + level): the tamed budget's typical melee
-character deals 63 at level 35, 80 at 40 and 88 at 45, so the gate's four minutes had become two. The blows of an elite in an
-Elite dungeon went from x4 to x2.6, and of an elite in the Abyss from x4.5 to x3 (their health stays x7 and x9): a typical
-mage at level 45 took 80% and 90% of its body in one blow. Foe health and the Abyss's own x4 / x2.5 stand.
+What changed: `dpsRef` is 5 + level to level 30 and 3.5 a level past it (it was 5 + level): the tamed budget's
+typical melee character deals 63 at level 35, 80 at 40 and 88 at 45, so the gate's four minutes had become two. The
+blows of an elite in an Elite dungeon went from x4 to x2.6, and of an elite in the Abyss from x4.5 to x3 (their
+health stays x7 and x9): a typical mage at level 45 took 80% and 90% of its body in one blow. Foe health and the
+Abyss's own x4 / x2.5 stand.
 
 Level 45, typical gear / maxed (fight seconds, before -> after):
 
@@ -325,9 +326,9 @@ Level 45, K (solo wins above 1) and top blow over the body, typical / maxed, bef
 | Abyss foe (unchanged) | K 5.7, 9% / K 9.3 | K 1.5, 50% / K 2.2 | K 1.5, 30% / K 2.4 |
 | Abyss elite | K 1.4 -> 2.1, 17% -> 11% / K 2.3 -> 3.5 | K 0.37 -> 0.55, 90% -> 60% / K 0.54 -> 0.81 | K 0.34 -> 0.52, 53% -> 35% / K 0.58 -> 0.87 |
 
-Read with: the caster rows use a 30 s horizon, so a mage's gate dps is a burst, not a four-minute rate; the archer's dps is
-low in the harness at every level (28 at 45 against a warrior's 98), so its rows are long. The harness has no foe armour or
-resistances for a boss.
+Read with: the caster rows use a 30 s horizon, so a mage's gate dps is a burst, not a four-minute rate; the
+archer's dps is low in the harness at every level (28 at 45 against a warrior's 98), so its rows are long. The
+harness has no foe armour or resistances for a boss.
 
 ## Not modelled
 
