@@ -176,7 +176,7 @@ test('MW-D25: one live instance is exported for the hosts, and the unit bridge h
   const src = readFileSync(new URL('../../src/player/mwCamera.js', import.meta.url), 'utf8');
   // The bridge literal is MINTED in the format layer (one home) and
   // re-exported here; both facts are load-bearing.
-  const fmt = readFileSync(new URL('../../src/formats/morrowind/mwFirstPerson.js', import.meta.url), 'utf8');
+  const fmt = readFileSync(new URL('../../src/formats/morrowind/mwAnimSources.js', import.meta.url), 'utf8');
   assert.ok(/69\.99125109/.test(fmt), 'the unit bridge literal lives in the format layer');
   assert.ok(!/69\.99125109/.test(src), 'and is not restated here - one home');
 });

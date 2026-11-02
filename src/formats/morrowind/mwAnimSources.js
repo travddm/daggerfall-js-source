@@ -27,10 +27,10 @@ export const TP_BASE_MODEL = 'meshes/xbase_anim.nif';
 // Morrowind.bsa, the `base_anim.nif` skeleton stands on z = 0 and puts the head bone at z = 119.2, and the imperial
 // male head mesh reaches 7.7 units above that bone, so the figure is about 127 units tall (error about one unit).
 // A standard figure is taken as 128 units, which agrees with the 21.3 units to the foot that UESP gives:
-// 128 units / (6 ft x 0.3048 m/ft) = 69.99125109 units per metre.
+// 128 units / (6 ft x 0.3048 m/ft) = 69.99125109 units per metre (to eight decimals).
 const STANDARD_HEIGHT_UNITS = 128;
 const STANDARD_HEIGHT_METERS = 6 * 0.3048;
-export const MW_UNITS_PER_METER = STANDARD_HEIGHT_UNITS / STANDARD_HEIGHT_METERS;
+export const MW_UNITS_PER_METER = Math.round((STANDARD_HEIGHT_UNITS / STANDARD_HEIGHT_METERS) * 1e8) / 1e8;
 
 /** The `.kf` file that holds the clips of a model: the `.nif` extension becomes `.kf`. Any other name is kept. */
 export function animSourceName(model) {

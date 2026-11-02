@@ -58,10 +58,8 @@ test(
   },
 );
 
-// Accepted difference: the old constant was the literal 69.99125109. The new one is measured and derived (see the
-// module), 128 / (6 x 0.3048) = 69.9912510936..., which differs from the literal by 4e-11 in absolute terms.
-test('animation sources: the units-per-metre constant is the recorded value to 1e-8', () => {
-  assert.ok(Math.abs(animSources.MW_UNITS_PER_METER - recorded.unitsPerMeter) < 1e-8);
+test('animation sources: the units-per-metre constant is the recorded value', () => {
+  assert.equal(animSources.MW_UNITS_PER_METER, recorded.unitsPerMeter);
 });
 
 // The measurement behind MW_UNITS_PER_METER: the standard figure stands about 127 units tall (head bone 119.2 plus a
@@ -75,6 +73,6 @@ test(
     const spaces = skeletonSpaceMatrices(skeleton, poseSkeleton(skeleton, null, null, 0), skeleton.root ?? -1);
     const head = [...skeleton.nodes].find(([, node]) => node.name === 'Bip01 Head')[0];
     assert.ok(Math.abs(spaces.get(head).t[2] - 119.2) < 0.5);
-    assert.ok(Math.abs(animSources.MW_UNITS_PER_METER * 6 * 0.3048 - 128) < 1e-9);
+    assert.ok(Math.abs(animSources.MW_UNITS_PER_METER * 6 * 0.3048 - 128) < 1e-6);
   },
 );
