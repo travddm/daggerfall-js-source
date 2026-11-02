@@ -5,7 +5,7 @@
 // so 7 m out into the Karth on the west: its six berths were the river's shore at the terrace, each ship's hull through
 // the west wall and her quay inside it, two of them under the arch. Alinor's river runs through the middle of its city, and
 // its six ships lay in it; Torval's two and the Waterfront's one lay through a pier. A town past the Bay walled on its
-// outline (TOWN-SHAPES TS4) and a Bay city walled the same way (TS7) stand their wall where the shore may be too.
+// outline (TOWN-SHAPES TS4) stands its wall where the shore may be too.
 //
 // THE KEEP (`harbourKeep(loc, rect)`): `(x, z) => boolean` in the scene's frame of the town's footprint `rect` (metres, x
 // east, z north - navalHarbourNear's), true where no ship of the harbour may lie, nor her quay, nor her jetty's way - or

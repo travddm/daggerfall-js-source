@@ -90,7 +90,6 @@ test('TS10 with ARENA2: every twelfth city and town past the Bay on a pixel with
   const { installTownOutline, outlineTownLocation, townOutlineBlockJson } = await import('../../src/world/townOutline.js');
   const { standTownWall } = await import('../../src/world/townWalls.js');
   const { arenaTemplates } = await import('../../src/world/arenaLocations.js');
-  const { unwalledLocation } = await import('../../src/world/townShape.js');
   const { layoutLocation } = await import('../../src/world/locationLayout.js');
   const { craftYardSitesOn } = await import('../../src/world/merchantYards/merchantYardSites.js');
   const { DIR } = await import('../../src/world/road/roadNetwork.js');
@@ -102,7 +101,7 @@ test('TS10 with ARENA2: every twelfth city and town past the Bay on a pixel with
   const bay = maps.getLocationByName('Daggerfall', 'Gothway Garden');
   const p = longitudeLatitudeToMapPixel(bay.mapTableData.longitude, bay.mapTableData.latitude);
   const rows = [];
-  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(unwalledLocation(lc)); } }
+  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(lc); } }
   const T = arenaTemplates(rows);
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
   let yards = 0, onBefore = 0;

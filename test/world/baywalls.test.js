@@ -1,79 +1,23 @@
-// TOWN-SHAPES TS7: the Bay's walled
-// cities walled on their outline as the door reads them (their ring open, their wall's carrier in its corner, every
-// building kept), the places past the Bay cloning them as they were; what stood at Daggerfall's gates - the two bulletin
-// boards, Immersive Travel's carriage and driver - carried to each new gate and stood clear of its towers; a town's yards
-// on its own ground.
+// A wall stood on a town's outline past the Bay: what stood at its template's gates (the two bulletin boards, Immersive
+// Travel's carriage and driver) carried to each new gate and stood clear of its towers, and a town's yards on its own
+// ground. The Bay's cities keep Daggerfall's own ring, so none of this runs there.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { wallBayCity, unwalledLocation, outlineTownLocation, townOutlineBlockJson, TOWN_OUTLINE_BLOCK } from '../../src/world/townOutline.js';
-import { townWall, townWallCells, townWallCellsOf, townWallBlockName, townWallBlockIndex, gateFurniture, townBlockedCells, townWalkShut, registerTownWall, GATE_CLEAR, WALL_MODELS } from '../../src/world/townWalls.js';
+import { outlineTownLocation, townOutlineBlockJson } from '../../src/world/townOutline.js';
+import { townWallBlockName, gateFurniture, townBlockedCells, townWalkShut, registerTownWall, GATE_CLEAR, WALL_MODELS } from '../../src/world/townWalls.js';
 import { carriageRecordsOf, installImmersiveTravelGates, hasCarriageGate } from '../../src/world/immersiveTravelGates.js';
-import { getNewDFBlockIndex, installWorldDataReplacement } from '../../src/formats/worldData/worldDataReplacement.js';
+import { installWorldDataReplacement } from '../../src/formats/worldData/worldDataReplacement.js';
 import { setLocationTiles } from '../../src/world/terrain/terrainTiles.js';
 import { townGroundOf } from '../../src/world/merchantYards/merchantYardSites.js';
 import { CityNavigation } from '../../src/world/city/cityNavigation.js';
-import { isWallCarrier, townTiles, townShapeField, townRound, WALL_ROUND } from '../../src/world/townShape.js';
+import { isWallCarrier } from '../../src/world/townShape.js';
 
-const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const ARENA2 = process.env.ARENA2_PATH;
 const skipReal = !ARENA2 || !existsSync(join(ARENA2 ?? '', 'BLOCKS.BSA')) ? 'ARENA2_PATH not set or missing - real-data validation skipped' : false;
 const RING = ['WALLAA02.RMB', 'WALLAA10.RMB', 'WALLAA03.RMB', 'WALLAA07.RMB', 'H.RMB', 'WALLAA05.RMB', 'WALLAA00.RMB', 'WALLAA08.RMB', 'WALLAA01.RMB'];
 const city = (names, mapId = 4321) => ({ name: 'Bayton', mapTableData: { mapId }, exterior: { buildings: [], exteriorData: { width: 3, height: 3, blockNames: names.slice() } } });
-const door = { getBlockByName: () => null, getBlockIndex: () => -1, checkName: (n) => n, readClassicBlock: () => null };
-const inRound = (pts, x, y) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
-
-test('TS7 a Bay city read: a ring of Daggerfall\'s wall blocks and only them opened, its south-west corner its wall\'s carrier on the door, its own grid kept, walled; once; a ring a mod rebuilt, a wall inside, a capital and no door each left as read; its template as it was (mutants: the ring unread; the corner open; the grid unkept; a composite taken; a template reader unwalled none)', async () => {
-  installWorldDataReplacement();
-  const loc = city(RING, 4321);
-  assert.equal(wallBayCity(loc, null, door), true);
-  const names = loc.exterior.exteriorData.blockNames;
-  assert.deepEqual(names, [townWallBlockName(4321), TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, 'H.RMB', TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK]);
-  assert.deepEqual(loc.exterior.exteriorData.wallTook, RING);
-  assert.deepEqual({ ...loc.outline }, { kept: 1, left: 8, walled: true, bay: true });
-  assert.equal(getNewDFBlockIndex(townWallBlockName(4321)), townWallBlockIndex(4321), 'its carrier on the door');
-  assert.equal(wallBayCity(loc, null, door), false, 'once');
-  const again = city(RING, 4321);
-  assert.equal(wallBayCity(again, null, door), true, 'read again: edited again, its wall registered once');
-  assert.equal(wallBayCity(city(RING.map((n) => (n === 'WALLAA08.RMB' ? 'WALLAA08.FARMAA00.RMB' : n)), 4322), null, door), false, 'Beautiful Cities\' composite: its ring kept');
-  assert.equal(wallBayCity(city(RING.map((n) => (n === 'H.RMB' ? 'WALLAA04.RMB' : n)), 4323), null, door), false, 'a wall inside');
-  assert.equal(wallBayCity(city(RING.map((n) => (n === 'WALLAA05.RMB' ? 'H.RMB' : n)), 4324), null, door), false, 'a ring broken');
-  assert.equal(wallBayCity({ ...city(RING, 4325), capital: true }, null, door), false, 'a capital');
-  assert.equal(wallBayCity(city(RING, 4326), null, null), false, 'no door');
-  const back = unwalledLocation(loc);
-  assert.deepEqual(back.exterior.exteriorData.blockNames, RING);
-  assert.equal(back.outline, undefined);
-  assert.equal(back.exterior.exteriorData.wallTook, undefined);
-  assert.equal(unwalledLocation(city(['H.RMB'])).name, 'Bayton');
-  const plain = city(['H.RMB']);
-  assert.equal(unwalledLocation(plain), plain, 'any other location itself');
-  // the places past the Bay clone it as it was: every template reader, and the outline's own read
-  const { arenaTemplates } = await import('../../src/world/arenaLocations.js');
-  const { countryTemplates } = await import('../../src/world/tamrielCountry.js');
-  const { capitalBase, cityBlockNames } = await import('../../src/world/tamrielCapitals.js');
-  const row = { ...loc, mapTableData: { ...loc.mapTableData, locationType: 0 } };
-  assert.deepEqual(arenaTemplates([row])['city-state'][0].exterior.exteriorData.blockNames, RING);
-  assert.deepEqual(countryTemplates([{ ...row, mapTableData: { ...row.mapTableData, locationType: 2 } }]).get(2)[0].exterior.exteriorData.blockNames, RING);
-  assert.deepEqual(capitalBase([row]).exterior.exteriorData.blockNames, RING);
-  assert.deepEqual([...cityBlockNames([row]).keys()].sort(), ['H.RM']);
-  const served = (n) => (n === 'H.RMB' ? { rmbBlock: { fldHeader: { autoMapData: new Uint8Array(4096).fill(5), numBlockDataRecords: 0, buildingDataList: [] }, subRecords: [], misc3dObjectRecords: [], miscFlatObjectRecords: [] } } : null);
-  const io = { classicOf: served, servedOf: served };
-  const tmpl = { ...city(RING, 77), exterior: { buildings: [], exteriorData: { width: 3, height: 3, blockNames: RING.slice() } } };
-  const edited = city(RING, 77);
-  wallBayCity(edited, null, door);
-  assert.deepEqual(outlineTownLocation({ ...edited, mapTableData: { mapId: 99 } }, io).exterior.exteriorData.blockNames, outlineTownLocation({ ...tmpl, mapTableData: { mapId: 99 } }, io).exterior.exteriorData.blockNames, 'a clone of it the clone of its template');
-  // its wall made when first asked: a house in the middle, gates north and south (the walk grid's cells, the town map's)
-  const houses = new Uint8Array(4096);
-  for (let r = 8; r < 56; r++) for (let c = 8; c < 56; c++) houses[r * 64 + c] = 5;
-  const gate = (z) => ({ rmbBlock: { subRecords: [{ xPos: 2048, zPos: z, yRotation: 0, exterior: { block3dObjectRecords: [{ modelIdNum: 446, xPos: 0, zPos: -64 }] } }], misc3dObjectRecords: [], miscFlatObjectRecords: [] } });
-  const blocks = { 'H.RMB': { rmbBlock: { fldHeader: { autoMapData: houses }, misc3dObjectRecords: [], miscFlatObjectRecords: [], subRecords: [] } }, 'WALLAA08.RMB': gate(3584), 'WALLAA10.RMB': gate(512) };
-  const lazy = city(RING, 4400);
-  assert.equal(wallBayCity(lazy, null, { ...door, getBlockByName: (n) => blocks[n] ?? null }), true);
-  const cells = townWallCellsOf(lazy);
-  assert.ok(cells && cells.some(Boolean), 'its wall made when its cells are asked');
-  assert.deepEqual([...cells], [...townWallCells(townWall(lazy, RING, (n) => blocks[n]?.rmbBlock ?? null), 3, 3)]);
-});
 
 test('TS7 what stands at a gate: the template gate\'s own records - the game\'s block, Immersive Travel\'s while loaded - carried from its frame to the new gate\'s and turned with it, its start marker TS4\'s; each gate its nearest template gate, once (mutants: the frame unturned; the turn unread; the marker carried; the extra unread)', () => {
   // a template gate facing north at (38.4, 11.2) of its block at (0, 204.8); the new gate faces east at (300, 150)
@@ -155,7 +99,6 @@ test('TS7 the ground under a carrier never read for the terrain (its wall made w
   assert.deepEqual(read, [1], 'the carrier never read');
   // the walk shut: off the ground, and on the wall
   const loc = city(RING, 7777);
-  wallBayCity(loc, null, door);
   const nav = new CityNavigation(3, 3);
   nav.grid.fill(7 << 4);
   const ground = new Uint8Array(128 * 128).fill(1);
@@ -173,69 +116,6 @@ test('TS7 the ground under a carrier never read for the terrain (its wall made w
   assert.equal(typeof registerTownWall, 'function');
 });
 
-test('TS7 with ARENA2: every one of the Bay\'s walled cities walled on its outline - four gates, closed, no house under it; at each gate its two boards inside and Immersive Travel\'s carriage and driver outside, every one clear of the wall and the houses and on the town\'s ground (mutants: the clearing unread; the frames unread)', { skip: skipReal }, async () => {
-  const { BlocksFile } = await import('../../src/formats/blocksFile.js');
-  const { MapsFile } = await import('../../src/formats/mapsFile.js');
-  const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
-  const blocks = new BlocksFile(); blocks.load(bytes('BLOCKS.BSA'));
-  const maps = new MapsFile(); maps.load(bytes('MAPS.BSA'), bytes('CLIMATE.PAK'), bytes('POLITIC.PAK')); maps.autoDiscard = false;
-  const patches = ['08', '09', '10', '11'].map((g) => JSON.parse(rd(`vendor/immersive-travel/WorldDataPatches/WALLAA${g}.RMB.json`)));
-  installImmersiveTravelGates(patches, patches.map(() => null), () => true);
-  const classicOf = (n) => { const i = blocks.getBlockIndex(blocks.checkName(n)); return i < 0 ? null : blocks.readClassicBlock(i); };
-  const rmbOf = (n) => (isWallCarrier(n) || n === TOWN_OUTLINE_BLOCK ? null : blocks.getBlockByName(n)?.rmbBlock ?? null);
-  let n = 0;
-  for (let r = 0; r < 62; r++) {
-    const reg = maps.getRegion(r);
-    if (!reg) continue;
-    for (let l = 0; l < reg.locationCount; l += 2) {
-      const loc = maps.getLocation(r, l);
-      if (!loc?.exterior?.exteriorData?.blockNames?.some((x) => /^WALLAA/.test(x))) continue;
-      assert.ok(wallBayCity(loc, maps, door), `${loc.name}: walled on its outline`);
-      const wall = townWall(loc, loc.exterior.exteriorData.wallTook, rmbOf);
-      assert.equal(wall.pieces.filter((p) => p.model === WALL_MODELS.gate).length, 4, `${loc.name}: its four gates`);
-      // each gate's frame: Daggerfall's gate model 1.6 m in from its subrecord, facing out of its side of the ring
-      const sides = { 'WALLAA08.RMB': [0, 1], 'WALLAA09.RMB': [1, 0], 'WALLAA10.RMB': [0, -1], 'WALLAA11.RMB': [-1, 0] };
-      for (const fr of wall.frames) {
-        assert.deepEqual(fr.out.map((v) => Math.round(v * 1e9) / 1e9 + 0), sides[fr.name], `${loc.name}: ${fr.name} faces out`);
-        const g = wall.gates[wall.frames.indexOf(fr)];
-        assert.ok(Math.abs(fr.at[0] - (g[0] - 1.6 * fr.out[0])) < 1e-6 && Math.abs(fr.at[1] - (g[1] - 1.6 * fr.out[1])) < 1e-6, `${loc.name}: its gate's origin`);
-      }
-      const blocked = townBlockedCells(loc, wall, rmbOf), cells = townWallCells(wall, loc.exterior.exteriorData.width, loc.exterior.exteriorData.height);
-      const { width: w, height: h } = loc.exterior.exteriorData, W = w * 64, H = h * 64;
-      for (let i = 0; i < cells.length; i++) if (cells[i]) assert.ok(blocked.cells[i], 'the wall\'s cells blocked');
-      const T = 16, PAD = 12, occ = townTiles(w, h, (bx, by) => rmbOf(loc.exterior.exteriorData.blockNames[by * w + bx])), PW = w * T + 2 * PAD, PH = h * T + 2 * PAD, padded = new Uint8Array(PW * PH);
-      for (let y = 0; y < h * T; y++) padded.set(occ.subarray(y * w * T, (y + 1) * w * T), (y + PAD) * PW + PAD);
-      const field = townShapeField(townRound(padded, PW, PH).inside, PW, PH, loc.mapTableData.mapId >>> 0, { core: WALL_ROUND.apron });
-      const f = gateFurniture(wall, classicOf, carriageRecordsOf, blocked);
-      const at = (rec) => [rec.XPos * 0.025, (rec.ZPos + 4096) * 0.025];
-      assert.equal(f.models.filter((m) => m.ModelIdNum === 41739).length, 8, `${loc.name}: two boards a gate`);
-      assert.equal(f.flats.filter((t) => t.FactionID === 8642).length, 4, `${loc.name}: a driver a gate`);
-      for (const m of f.models) {
-        const [x, z] = at(m);
-        if (m.ModelIdNum === 41739) assert.ok(inRound(wall.line, x, z), `${loc.name}: a board inside`);
-        if (m.ModelIdNum === 41214) assert.ok(!inRound(wall.line, x, z), `${loc.name}: a carriage outside`);
-        const gx = Math.floor(x / 1.6), gz = Math.floor(z / 1.6);
-        assert.ok(!(gx >= 0 && gz >= 0 && gx < W && gz < H && blocked.cells[gz * W + gx]), `${loc.name}: ${m.ModelIdNum} clear`);
-        const bx = Math.floor(gx / 64), by = Math.floor(gz / 64), byte = rmbOf(loc.exterior.exteriorData.blockNames[by * w + bx])?.fldHeader?.autoMapData?.[(63 - (gz % 64)) * 64 + (gx % 64)] ?? 0;
-        assert.ok(!byte || byte === 0xfb, `${loc.name}: ${m.ModelIdNum} on no house`);
-        assert.ok(field[(Math.floor(z / 6.4) + PAD) * PW + Math.floor(x / 6.4) + PAD] > 0, `${loc.name}: on its ground`);
-      }
-      // closed on its walk grid
-      let s0 = (H >> 1) * W + (W >> 1);
-      while (cells[s0]) s0++;
-      const seen = new Uint8Array(W * H), stack = [s0];
-      seen[s0] = 1;
-      while (stack.length) {
-        const i = stack.pop(), x = i % W, y = (i - x) / W;
-        assert.ok(x > 0 && y > 0 && x < W - 1 && y < H - 1, `${loc.name}: its wall open`);
-        for (const k of [i - 1, i + 1, i - W, i + W]) if (!seen[k] && !cells[k]) { seen[k] = 1; stack.push(k); }
-      }
-      n++;
-    }
-  }
-  assert.ok(n > 150, `${n} cities`);
-});
-
 test('TS7 with ARENA2: a town past the Bay\'s yards on its own ground - every yard of every sixth city and town on its outline\'s tiles with its walk shut, where some stood partly off it without (mutant: the yards unshut)', { skip: skipReal }, async () => {
   const { BlocksFile } = await import('../../src/formats/blocksFile.js');
   const { MapsFile } = await import('../../src/formats/mapsFile.js');
@@ -251,7 +131,7 @@ test('TS7 with ARENA2: a town past the Bay\'s yards on its own ground - every ya
   const maps = new MapsFile(); maps.load(bytes('MAPS.BSA'), bytes('CLIMATE.PAK'), bytes('POLITIC.PAK')); maps.autoDiscard = false;
   installWorldDataReplacement(); bindWorldDataBlocks(blocks); installTownOutline();
   const rows = [];
-  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const loc = maps.getLocation(r, l); if (loc) rows.push(unwalledLocation(loc)); } }
+  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const loc = maps.getLocation(r, l); if (loc) rows.push(loc); } }
   const T = arenaTemplates(rows);
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
   let yards = 0, offWithout = 0;

@@ -894,8 +894,8 @@ export async function bootExterior(canvas, renderer, params, status) {
     // tree flat BLOCKS its cell), tile weights from the same ground
     // grid the renderer reads.
     // WATER-NPC: the same wider family, off the same one switch.
-    // AUDIT TESA III E1-2: a Bay city walled on its outline (TS7, the door's read) carries its wall in its bytes here - no
-    // walker crosses it (the streaming host's townWalkShut; this bench stands no terrain mask)
+    // A city walled on its outline carries its wall in its bytes here, so no walker crosses it. The streaming host
+    // uses townWalkShut instead; this bench stands no terrain mask.
     cityNav.setBlockData(b.x, b.y, wallLaidBytes(dfLocation, b.x, b.y, b.dfBlock.rmbBlock.fldHeader.autoMapData),
       (tx, ty) => srcTiles[tx][ty].textureRecord, { enhancedWater: waterSwitchOn() });
     for (const light of collectCityLights(b.dfBlock, lightSize)) {
