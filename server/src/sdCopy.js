@@ -121,11 +121,11 @@ export function sdOpenGate(ip, now) {
 
 /** SD-SOLO: THE WORKER'S WALK of a Hollow's shared Hours - the first that holds me, else the first open, as `{ n }`
  *  (`n` null: none answered, or all SD_PUB_MAX full). They open in order, so the one I am in comes first.
- *  @param {any} env @param {URL} url @param {string} [ip] the client's address, for sdOpenGate */
+ *  @param {any} env @param {URL} url @param {string} [ip] the client's address, for sdOpenGate; none (a test) is not gated */
 export async function sdOpenDoor(env, url, ip = '') {
   const s = Number(url.searchParams.get('s')), o = String(url.searchParams.get('o') ?? '');
   const head = { 'content-type': 'application/json', 'access-control-allow-origin': '*' };
-  if (!sdOpenGate(ip, Date.now())) return new Response(JSON.stringify({ n: null }), { status: 429, headers: head });
+  if (ip && !sdOpenGate(ip, Date.now())) return new Response(JSON.stringify({ n: null }), { status: 429, headers: head });
   if (!sdRoomKey(s, o) || isSdPubOwner(o) || !env?.ROOMS?.idFromName) return new Response(JSON.stringify({ n: null }), { status: 400, headers: head });
   for (let n = 0; n < SD_PUB_MAX; n++) {
     const key = /** @type {string} */ (sdRoomKey(s, /** @type {string} */ (sdPubOwner(n))));
