@@ -57,7 +57,6 @@ An async read must store its result in the cache generation it started under.
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
 | `mwFirstPerson.js` | The first-person and body-assembly rules, the record extraction, and the diagnostics. Re-exported by `src/tools/mwInspect.js` for `mw-inspect.html`. |
-| `mwWeaponAnim.js` | The weapon animation rules: weapon-type table, attack text keys, wind-up and release timing, the stance, weapon and movement group ladders, jump state. Re-exported by `mwFirstPerson.js`. |
 | `mwItemMap.js` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. |
 | `mwFaceMatch.js` | Pairs Daggerfall portraits with Morrowind heads and hairs. |
 | `mwCloakFit.js`, `mwPartClock.js` | Cloak fitting and parts that animate on their own clock (for example an arrow on a bow). |
