@@ -128,7 +128,7 @@ test('AUDIT C&C H5 A STRIKER\'S BUFFS HELP ITS BLOW AND NO LUCK HARMS IT: the li
     for (const [, put] of ARMS) { const e = mintPlayer(); put(e); pcaao.push(swings(e, 4000)); }
   } finally { uninstallPcaao(); }
   for (const [, put] of ARMS) { const e = mintPlayer(); put(e); stock.push(swings(e, 4000)); }
-  assert.deepEqual(pcaao, [[2318, 10769], [2318, 10769], [2381, 11055], [2381, 11055], [2318, 10769], [2381, 11055]], 'the overhaul\'s core: [hits, damage] of 4,000 swings');
+  assert.deepEqual(pcaao, [[2177, 9940], [2177, 9940], [2222, 10154], [2222, 10154], [2177, 9940], [2222, 10154]], 'the overhaul\'s core: [hits, damage] of 4,000 swings');
   assert.deepEqual(stock, [[2201, 10067], [2196, 12198], [2201, 10067], [2196, 12198], [2201, 10067], [2233, 10195]], 'DFU\'s own core: an unarmoured body (a stand-in with no table read 0, an armour past any - 3 blows in 100 landed)');
 });
 

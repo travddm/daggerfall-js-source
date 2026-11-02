@@ -76,6 +76,7 @@
 // console line. Recorded in Combat-Arc PCO1.
 // ═══════════════════════════════════════════════════════════════════
 
+import { PCAAO_CRIT_HIT_DIVISOR, pcaaoCritDamageMultiplier } from './pcaao-critical.ts';
 import { modSetting, modSettingIfDeclared } from '../systems/modSettings.js';
 import { liveStat } from '../systems/statMods.js';
 import { skillValue, aimSkill, SKILLS } from '../systems/skills.js';   // B1: a mastered weapon skill's aim stops 10 points past 100
@@ -317,9 +318,9 @@ export function pcaaoRacialModifiers(attacker, weapon, player) {
 }
 
 // ── the hit ───────────────────────────────────────────────────────
-/** CalculateWeaponToHit: material modifier x2 + 2 ("that daedric sword
- *  will now give +14 to the wielder's hit chance, instead of +60"). */
-export const pcaaoWeaponToHit = (weapon) => materialModifier(weapon) * 2 + 2;
+/** CalculateWeaponToHit: material modifier x6 + 2 (DFU x10, the mod x2 + 2; toward DFU: with the skill's x1.5 gone, x2 + 2 left
+ *  a skill-70 fighter in mithril at 43% against a Giant Scorpion where DFU's formula gives 90%). */
+export const pcaaoWeaponToHit = (weapon) => materialModifier(weapon) * 6 + 2;
 
 /** CalculateArmorToHit: the struck part's ArmorValues entry, then the
  *  PLAYER reads `100 - Increased - Decreased` whatever the part, and a
@@ -356,16 +357,16 @@ export function pcaaoStatDiffsToHit(attacker, target) {
     - unityRound(F((stat(target, 'luck') - 50) / 10));
 }
 
-/** CalculateSkillsToHit: dodging halved (DFU quarters it), and WITHOUT
+/** CalculateSkillsToHit: dodging quartered (DFU's own; the mod halves it), and WITHOUT
  *  the critical-strike module the classic crit roll - the player's at
  *  crit/3 for +crit/3, a monster's at crit for +crit/10.
  *  BAL2: A DEPARTURE - one roll for every striker, the player's: crit/3 for
  *  +crit/3 (a monster's every-blow roll for a tenth was a nudge the player's own third outclassed). */
 export function pcaaoSkillsToHit(attacker, target, rolls, modules, notes = null) {
-  let mod = -int(skill(target, SKILLS.Dodging) / 2);
+  let mod = -int(skill(target, SKILLS.Dodging) / 4);
   if (!modules.criticalStrikesIncreaseDamage) {
     const crit = aimSkill(attacker, SKILLS.CriticalStrike, skill(attacker, SKILLS.CriticalStrike));
-    if (dice100(int(crit / 3), rolls())) { mod += int(crit / 3); if (notes) notes.critical = true; }   // BAL2: every striker's
+    if (dice100(int(crit / 3), rolls())) { mod += int(crit / PCAAO_CRIT_HIT_DIVISOR); if (notes) notes.critical = true; }   // BAL2: every striker's roll; DFU's +crit / 10
   }
   return mod;
 }
@@ -499,7 +500,7 @@ const SKELETAL_WARRIOR = 15;
 
 /** CalculateWeaponAttackDamage: the roll, the Skeletal Warrior's edged
  *  halving and silver doubling, the six others' silver doubling, the
- *  strength term DOUBLED for a two-handed weapon and for a bow,
+ *  strength term DOUBLED for a two-handed weapon (not a bow),
  *  the material modifier, the floor, the enemy-type term, the archery
  *  module. */
 export function pcaaoWeaponAttackDamage(attacker, target, damageModifier, weaponAnimTime, weapon, rolls, modules, info = undefined) {
@@ -518,10 +519,10 @@ export function pcaaoWeaponAttackDamage(attacker, target, damageModifier, weapon
       damage *= 2;
     }
   }
-  // BAL-ARCHERY: a bow takes the two-handed strength term even when BowLeftHandWithSwitching makes it LeftOnly.
+  // A bow takes the strength term ONCE, as DFU's FormulaHelper gives it (BAL-ARCHERY doubled it, as for a two-hander).
   const bow = weapon.templateIndex === WEAPONS.Short_Bow || weapon.templateIndex === WEAPONS.Long_Bow;
   const twoHanded = getItemHands(weapon) === ITEM_HANDS.Both && !bow;
-  damage += (bow || twoHanded) ? pcaaoDamageModifier(stat(attacker, 'strength')) * 2 : pcaaoDamageModifier(stat(attacker, 'strength'));
+  damage += twoHanded ? pcaaoDamageModifier(stat(attacker, 'strength')) * 2 : pcaaoDamageModifier(stat(attacker, 'strength'));
   damage += materialModifier(weapon);
   if (damage < 1) damage = 0;
   if (damage >= 1) damage += pcaaoBonusOrPenaltyByEnemyType(attacker, target, rolls);
@@ -1077,18 +1078,17 @@ export function pcaaoAttackDamage(attacker, target, {
   } else {
     skillID = SKILLS.HandToHand;
   }
-  // BAL2: A DEPARTURE - ONE RULE FOR EVERY STRIKER. The mod gave the player
-  // half his skill again to hit and a foe its skill alone, and the player's crit twice the foe's damage and two and a
-  // half times its aim; a foe's Long Blade and Critical Strike are the same skills as the player's and are read the same
-  // way now (a duel was always both players'). The armour term is NOT made one rule: the player's flat 100 is the mod's
-  // premise (armour reduces damage, never the chance to be hit), and every even version of it eases the fight.
-  chanceToHitMod = Math.ceil(F(aimSkill(attacker, skillID, skill(attacker, skillID)) * F(1.5)));
+  // BAL2: A DEPARTURE - ONE RULE FOR EVERY STRIKER: a foe's Long Blade and Critical Strike are the same skills as the player's and
+  // are read the same way (a duel was always both players'). Both count their skill once to hit, as DFU's FormulaHelper does
+  // (the mod gave the player half again). The armour term is NOT made one rule: the player's flat 100 is the mod's premise
+  // (armour reduces damage, never the chance to be hit), and every even version of it eases the fight.
+  chanceToHitMod = aimSkill(attacker, skillID, skill(attacker, skillID));   // the skill itself, as DFU's FormulaHelper reads it (the mod's x1.5 is gone)
   if (modules.criticalStrikesIncreaseDamage) {
     critSuccess = pcaaoCriticalStrike(attacker, rolls);
     if (critSuccess) {
       const crit = aimSkill(attacker, SKILLS.CriticalStrike, skill(attacker, SKILLS.CriticalStrike));
-      critDamMulti = F(F(int(crit / 5) * F(0.05)) + 1);
-      critHitAddi = int(crit / 4);
+      critDamMulti = pcaaoCritDamageMultiplier(crit);
+      critHitAddi = int(crit / PCAAO_CRIT_HIT_DIVISOR);
       chanceToHitMod += critHitAddi;
       if (notes) notes.critical = true;
     }

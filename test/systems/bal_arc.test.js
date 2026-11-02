@@ -119,7 +119,7 @@ test('BAL1 through the blow: a fresh blade strikes a third harder only with the 
 
 // ── BAL2 ──────────────────────────────────────────────────────────
 
-test('BAL2 one rule for every striker: a foe\'s weapon skill counts x1.5 to hit, its crit doubles a blow as the player\'s does; the armour term is the mod\'s', () => {
+test('BAL2 one rule for every striker: a foe\'s weapon skill counts once to hit (B3), its crit multiplies a blow as the player\'s does; the armour term is the mod\'s', () => {
   const sword = createWeapon(120, 1);
   const player = mkPlayer();
   const M = modsOf();
@@ -133,22 +133,22 @@ test('BAL2 one rule for every striker: a foe\'s weapon skill counts x1.5 to hit,
     }
     return n;
   };
-  assert.equal(landed(20), 62, 'Long Blade 20: ceil(20 x 1.5) = 30 to hit, on the bare player\'s flat 100');
-  assert.equal(landed(30) - landed(20), 15, 'ten more skill is fifteen more to hit, as the player\'s (it was ten)');
+  assert.equal(landed(20), 62, 'Long Blade 20: 20 to hit, on the bare player\'s flat 100');
+  assert.equal(landed(30) - landed(20), 10, 'ten more skill is ten more to hit (B3: fifteen under the mod\'s x1.5)');
   assert.equal(landed(60), 97, 'the clamp still holds both ways (DISC19-D)');
-  // the crit: Critical Strike 100 at Luck 50 lands one blow in four (100 / 4), x2.0 and +25 to hit
+  // the crit: Critical Strike 100 at Luck 50 lands one blow in four (100 / 4), x1.5 (B3: the mod's was x2.0) and +10 to hit (DFU's crit / 10)
   const blow = (crit, v) => {
     const notes = { hit: false, critical: false };
     const d = pcaaoAttackDamage(knight(60, crit, { stats: stats({ strength: 100 }) }), player, { weapon: createWeapon(121, 1), rolls: fixed(v), dfRand: () => 0, modules: M, notes });
     return [d, notes.critical];
   };
   assert.deepEqual(blow(0, 0.15), [10, false]);
-  assert.deepEqual(blow(100, 0.15), [20, true], 'a foe\'s crit multiplies by 1 + 20 x 0.05 = 2, the player\'s own (it was 1.5)');
-  assert.deepEqual(blow(100, 0.24), [2 * blow(0, 0.24)[0], true], 'crit / (4 - 0) = 25%: 0.24 crits, and doubles');
+  assert.deepEqual(blow(100, 0.15), [15, true], 'a foe\'s crit multiplies by 1 + 20 x 0.025 = 1.5, the player\'s own');
+  assert.deepEqual(blow(100, 0.24), [Math.trunc(1.5 * blow(0, 0.24)[0]), true], 'crit / (4 - 0) = 25%: 0.24 crits, and takes half again');
   assert.equal(blow(100, 0.25)[1], false, 'and 0.25 does not (a foe\'s was crit / 5)');
-  // and a landed crit's aim: on a player who dodges at 100, Long Blade 0 lands at the 3% floor - a crit's +25 lands every
-  // one of the quarter of rolls that crit (it was +10: twelve)
-  const dodger = mkPlayer({ skills: skillsAll(40, { [SKILLS.Dodging]: 100 }) });
+  // and a landed crit's aim: on a player who dodges at 100, with Agility, Speed and Luck at 100, Long Blade 0 lands at the 3%
+  // floor - a crit's +10 (DFU's crit / 10; the mod's was +25) lands every one of the quarter of rolls that crit
+  const dodger = mkPlayer({ stats: stats({ strength: 70, agility: 100, speed: 100, luck: 100 }), skills: skillsAll(40, { [SKILLS.Dodging]: 100 }) });
   const landedOn = (crit) => {
     let n = 0;
     for (let i = 0; i < 100; i++) {
@@ -159,7 +159,7 @@ test('BAL2 one rule for every striker: a foe\'s weapon skill counts x1.5 to hit,
     return n;
   };
   assert.equal(landedOn(0), 3, 'the floor');
-  assert.equal(landedOn(100), 25, 'crit / 4 = +25 to hit on every crit');
+  assert.equal(landedOn(100), 9, 'crit / 10 = +10 to hit on every crit, from under the floor (-1 + 10 = 9)');
 });
 
 // the open world's pool, on a crafted MONSTER.BSA (test/scenes/world6bii.test.js's rig): an Orc Warlord (base level 16, a

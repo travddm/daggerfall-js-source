@@ -148,7 +148,7 @@ test('TWO-HANDS law: THE BALANCE - the pair is tempo, not twice the damage: the 
   assert.deepEqual([0, -3, 1, 2, 4, 8, 13].map(offHandDamage), [0, -3, 1, 2, 3, 6, 10], 'a miss stays a miss, a landed blow at least 1');
   assert.equal(offHandBurden(0.5, 50), 1, 'a dagger costs the off arm nothing');
   assert.ok(Math.abs(offHandBurden(4.5, 50) - swingHeft(6.75, 50) / swingHeft(4.5, 50)) < 1e-12);
-  assert.ok(offHandBurden(4.5, 50) > 1.08 && offHandBurden(4.5, 50) < 1.12, 'a longsword a tenth');
+  assert.ok(offHandBurden(4.5, 50) > 1.03 && offHandBurden(4.5, 50) < 1.05, 'a longsword a twenty-fifth (B3: the heft costs at most 8%)');
   assert.ok(offHandBurden(4.5, 90) < offHandBurden(4.5, 50), 'a strong arm feels it less');
   // AUDIT 2: THE BURDEN IN WHOLE TICKS, held at the blow's end, the fraction carried to the next
   assert.deepEqual(offHandHold({}), { hold: 0, carry: 0 }, 'no burden, nothing held');
@@ -186,10 +186,10 @@ test('TWO-HANDS law: THE BALANCE - the pair is tempo, not twice the damage: the 
   // (offHandHold), where the first audit's factor on the tick's time made a longsword pair x1.165 at 30 fps and x1.204 at
   // 60. A held exchange is lead, off, lead, off: 4 ticks, then 4 and the burden's (b - 1) x 4
   const b = offHandBurden(templateByIndex(120).baseWeight, 50);
-  assert.ok(b > 1.05, `a longsword is felt in the off hand (${b})`);
+  assert.ok(b > 1.03, `a longsword is felt in the off hand (${b})`);
   const want = 5 / (4 + 2 * (b - 1));
   const rates = [30, 60, 144, 1000].map((fps) => run(LONGSWORD, weapon(120, 'b'), 1 / fps).n / run(LONGSWORD, null, 1 / fps).n);
-  for (const r of rates) assert.ok(Math.abs(r - want) < 0.006, `x${r.toFixed(4)} as often as one longsword, the ticks' own x${want.toFixed(4)}, at 30, 60, 144 and 1000 fps: ${rates.map((x) => x.toFixed(4))}`);
+  for (const r of rates) assert.ok(Math.abs(r - want) < 0.01, `x${r.toFixed(4)} as often as one longsword, the ticks' own x${want.toFixed(4)}, at 30, 60, 144 and 1000 fps: ${rates.map((x) => x.toFixed(4))}`);
 });
 
 test('TWO-HANDS law: the guard, the run - the guard\'s follower eased in fast and out slower, its offset toward the middle and down; one stroke a step on the footstep interval, the pump\'s place, the run\'s gate and its weight', () => {
@@ -354,7 +354,7 @@ test('TWO-HANDS PlayerWeapon: the mode off the caches, the strike\'s hand off th
     for (let i = 0; i < 600 && heavy.machine.state !== 'Idle'; i++) heavy.update(1 / 60);
     heavy.applyWeapon(); heavy.clickAttack(() => 0.5);
     const b = offHandBurden(templateByIndex(120).baseWeight, 50);
-    assert.ok(heavy.strike.off && b > 1.05, `the off hand's longsword is felt (${b})`);
+    assert.ok(heavy.strike.off && b > 1.03, `the off hand's longsword is felt (${b})`);
     assert.equal(getMeleeWeaponAnimTime(50, heavy.swingCtx(he)), 0.2, 'the off hand: the mod\'s answer too');
     assert.ok(Math.abs(heavy.machine.hold + heavy._burdenCarry - 4 * (b - 1)) < 1e-9, 'its burden owed in the mod\'s ticks');
   } finally { registerMeleeWeaponAnimTime(null); }

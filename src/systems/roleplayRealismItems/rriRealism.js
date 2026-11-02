@@ -16,7 +16,7 @@
 import { rriModule } from './rriItems.js';
 import { WEAPONS } from '../../characters/weapons.js';
 import { MOBILE_TYPES } from '../../characters/mobile/mobileTypes.js';
-import { swingFrameSeconds, swingHandling } from '../../characters/weaponStates.js';   // SWING-LAW: the port's swing law answers the mod's Speed
+import { swingFrameSeconds, swingHandling, modHeft } from '../../characters/weaponStates.js';   // SWING-LAW: the port's swing law answers the mod's Speed
 
 // ---- constants (RoleplayRealismItemsMod.cs:19-22) --------------------
 export const SPEED_REDUCTION_FACTOR = 3.4;
@@ -225,13 +225,10 @@ export const rriWeaponMaxDamage = (weapon) => (weaponBalanceOn() ? (RRI_WEAPON_M
  *  speed capped at 98 as `speed * reduction / 90`. Truncations are
  *  the C# int casts. `weaponWeight` is the ItemTemplate's baseWeight;
  *  `melee` is `weaponType == WeaponTypes.Melee`.
- *  SWING-LAW: the adjusted speed
- *  is the Speed the swing is read at, and the port's law turns it into
- *  time - its bounded curve and the handling of `weaponType` (two-handed
- *  or not; characters/weaponStates.js swingFrameSeconds) - where the mod's
- *  `3 * (115 - speed)` over the classic frame update ran a light blade at
- *  four swings a second. The weight is the mod's to weigh, so the law's
- *  own heft is not asked. */
+ *  SWING-LAW: the swing is read at the live Speed, and the cost of the mod's adjusted speed over it is a heft
+ *  (characters/weaponStates.js modHeft, at most the port's own heft bound) with the handling of `weaponType` (two-handed
+ *  or not): the adjusted speed as the Speed fed to DFU's steep line cost a Speed-100 build half of DFU's swing rate. The
+ *  weight is the mod's to weigh, so the law's own heft is not asked. */
 export function rriMeleeWeaponAnimTime({ liveSpeed, liveStrength, weaponWeight = null, melee = false, weaponType = melee ? 15 : 0, twoHanded = false, shortBlade = false }) {
   let adjustedSpeed;
   if (melee || weaponWeight == null) {
@@ -243,5 +240,5 @@ export function rriMeleeWeaponAnimTime({ liveSpeed, liveStrength, weaponWeight =
     const playerSpeed = Math.min(liveSpeed, 98);
     adjustedSpeed = Math.trunc(playerSpeed - (playerSpeed * speedReductionPerc / 90));
   }
-  return swingFrameSeconds(adjustedSpeed, { handling: swingHandling(weaponType, twoHanded, shortBlade) });   // BAL10: `shortBlade` - the dagger's handling for every short blade
+  return swingFrameSeconds(liveSpeed, { heft: modHeft(liveSpeed, adjustedSpeed), handling: swingHandling(weaponType, twoHanded, shortBlade) });   // BAL10: `shortBlade` - the dagger's handling for every short blade
 }

@@ -12,9 +12,14 @@ import { SPELL_POWER_MOST, POTENCY_CAP } from '../../src/systems/loot/lootPowers
 const SWINGS = 1500;
 const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'average');
 
-/** Power at level 45 with every source at its cap, no ARENA2: what B1 reached, rounded up in the third place. A ceiling that later lanes
- *  (B3 bow rules, B5 health, the spell magnitudes) lower toward 1.5 and never raise. Before B1 these were x20 to x54. */
-const MAXED_POWER_MOST = Object.freeze({ warrior: 1.38, archer: 2.42, spellsword: 1.86, mage: 1.79, thief: 1.4 });
+/** Power at level 45 with every source at its cap, no ARENA2: what B3 reached, rounded up in the third place. B1 left these at
+ *  1.38 / 2.42 / 1.86 / 1.79 / 1.40 with the port's flattened swing law; B3 gave the swing DFU's Speed line back (a Speed-100
+ *  build swings 2.1 times as often as a Speed-75 one in DFU's own formula), which lifts every build that swings, and took the
+ *  x1.5 off the skill and the doubled Strength term off the bow, which lowered the archer. A ceiling later lanes (B4 gear, B5
+ *  health and the Firmament tree, the spell magnitudes) lower toward 1.5 and never raise. The owner accepted these higher
+ *  values for B3: B4 (loot affixes) and B5 (health) rescale the remaining stacks at their source to bring maxed builds
+ *  back near 1.5. */
+const MAXED_POWER_MOST = Object.freeze({ warrior: 2.25, archer: 2.31, spellsword: 2.17, mage: 2.02, thief: 2.36 });
 
 test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%) and sit above a normal kit', () => {
   assert.ok(BLOW_MOST < 1.76 && BLOW_MOST > 1.74, `blow ${BLOW_MOST}`);
@@ -37,16 +42,16 @@ test('budget: a level-45 character with every stacking source at its cap stays i
   }
 });
 
-test("budget: inside DFU's level range the default character, against DFU's own foe, is where B1 left it (within 0.05 of power)", () => {
-  const BEFORE_B1 = { warrior: 0.797, mage: 1.12, archer: 1.394 };
+test("budget: inside DFU's level range the default character, against DFU's own foe, is where B3 left it (within 0.05 of power)", () => {
+  const AT_B3 = { warrior: 0.992, mage: 1.188, archer: 1.369 };
   const rows = averageRows(
-    buildReport({ builds: Object.keys(BEFORE_B1), levels: [30], swings: SWINGS, layers: parseLayers('default,-hero,-stats') }),
+    buildReport({ builds: Object.keys(AT_B3), levels: [30], swings: SWINGS, layers: parseLayers('default,-hero,-stats') }),
   );
   assert.equal(rows.length, 3);
   for (const row of rows) {
     assert.ok(
-      Math.abs(row.ratios.power - BEFORE_B1[row.build]) <= 0.05,
-      `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${BEFORE_B1[row.build]} at B1`,
+      Math.abs(row.ratios.power - AT_B3[row.build]) <= 0.05,
+      `${row.build} L30: power x${row.ratios.power.toFixed(3)} against x${AT_B3[row.build]} at B3`,
     );
   }
 });

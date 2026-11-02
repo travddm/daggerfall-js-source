@@ -15,7 +15,8 @@ import { heroThreat } from '../../src/systems/heroThreat.js';
 import { dexClassicRow } from '../../src/systems/enemyExpansion/dexInstall.js';
 import { AFFIX_RANGES } from '../../src/systems/loot/lootRarity.js';
 import { promoteEliteFoe } from '../../src/systems/eliteFoes.js';
-import { getMeleeWeaponAnimTime, getBowCooldownTime, CLASSIC_UPDATE_INTERVAL } from '../../src/characters/weaponStates.js';
+import { getMeleeWeaponAnimTime, getBowCooldownTime, CLASSIC_UPDATE_INTERVAL, registerMeleeWeaponAnimTime } from '../../src/characters/weaponStates.js';
+import { rriAnimTimeOverride } from '../../src/systems/roleplayRealismItems/rriKits.js';
 import { WEAPON_TYPES } from '../../src/combat/fpsWeapon.js';
 import { weaponMasteryBlow, weaponMasteryPace, WEAPON_MASTERY } from '../../src/systems/weaponMastery.js';
 import { registerWeaponBlowMod } from '../../src/systems/entityMods.js';
@@ -32,7 +33,7 @@ import { progressionOf, VIRTUE_POINTS_PER_LEVEL } from './progression.mjs';
 
 /** The rule layers, each with the game switch it flips. `default` is the game as an online room runs it. */
 export const LAYERS = Object.freeze({
-  pcaao: 'Physical Combat And Armor Overhaul: armour reduces damage, skill counts x1.5 to hit, crits multiply (mod setting pcaao Enabled)',
+  pcaao: 'Physical Combat And Armor Overhaul: armour reduces damage, skill counts once to hit, crits multiply (mod setting pcaao Enabled)',
   stats: 'Classic monster stat rows under Enemy Expansion and MUDEX, with the stat pass (systems/enemyExpansion/classic-stat-pass.ts)',
   master: 'Master Skills: mastered skills climb to 200 and read up to 140 (entity.masterSkills)',
   online: 'Online-only rules: the level law (systems/levelClimb.js), the blow and pace of a weapon skill past 100 (systems/weaponMastery.js), school potency and spell cost past 100',
@@ -40,7 +41,7 @@ export const LAYERS = Object.freeze({
   hero: "Hero's threat: foes grow with player level past 30 (systems/heroThreat.js)",
   power: 'Loot-ladder gear: a damage line on the weapon, an armour line on each piece (systems/loot/lootRarity.js)',
   techniques: 'Weapon techniques: a burst of 1.2 to 1.8 times a blow every cooldown, on a gear tier that rolls one (combat/technique/techniqueRoster.js)',
-  swing: 'Swing law: the port\'s own swing speed curve (characters/weaponStates.js swingFrameSeconds)',
+  swing: "Swing law: DFU's Speed line with the weapon's heft and handling, and Items' weaponBalance as the game ships it (characters/weaponStates.js swingFrameSeconds, modHeft)",
   ceiling: 'Every stacking source at its cap: the blow takes the room up to the net (BLOW_MOST) and the hurt down to GUARD_LEAST (systems/powerCeiling.js). The maxed character; not in the default set',
   virtue: 'Oblivion-style levelling: 12 attribute points a level instead of 5 (mod oblivion-remaster-leveling)',
 });
@@ -172,6 +173,19 @@ export function oursFoe(id, character, layers, { career = DEFAULT_CAREER, kind =
   return foe;
 }
 
+/** The game ships Roleplay & Realism: Items' weaponBalance on, and its swing time answers for the player (weight and Strength
+ *  against Speed, read through the swing law as a heft). The harness switches the mod's other rules off, so it raises the swing
+ *  answer alone, around the one call. */
+function whileItemsWeaponBalance(call) {
+  registerMeleeWeaponAnimTime(rriAnimTimeOverride);
+  setModSetting('roleplay-realism-items', 'Enabled', true);
+  setModSetting('roleplay-realism-items', 'weaponBalance', true);
+  try { return call(); } finally {
+    setModSetting('roleplay-realism-items', 'Enabled', false);
+    registerMeleeWeaponAnimTime(null);
+  }
+}
+
 /** Seconds a swing or shot takes for this character under the layers. */
 export function oursSwingSeconds(character, layers) {
   const { entity, kit } = character;
@@ -180,7 +194,7 @@ export function oursSwingSeconds(character, layers) {
   const weaponType = kit.weapon.templateIndex === WEAPON_TEMPLATES.Dagger ? WEAPON_TYPES.Dagger
     : kit.weapon.templateIndex === WEAPON_TEMPLATES.Staff ? WEAPON_TYPES.Staff : WEAPON_TYPES.LongBlade;
   const frame = layers.has('swing')
-    ? getMeleeWeaponAnimTime(speed, { entity, weaponType, usingRightHand: true })
+    ? whileItemsWeaponBalance(() => getMeleeWeaponAnimTime(speed, { entity, weaponType, usingRightHand: true }))
     : getMeleeWeaponAnimTime(speed);
   return 5 * frame;
 }

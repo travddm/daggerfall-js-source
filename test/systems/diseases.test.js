@@ -261,9 +261,9 @@ test('diseases: the multi-attack loop fires onMonsterHit per landed hit (Formula
     rolls: seq(0, 0.99, 0.02, 0, 0.99, 0.03, 0.5),
     onMonsterHit: (att, tgt, dmg) => hits.push([att.careerIndex, tgt.isPlayer, dmg]),
   });
-  // lands it) and a monster's crit multiplies as the player's: the blow 2 x 1.4 = 2.8 -> 3 (x1.2: 2.4 -> 2). The hit
+  // lands it) and a monster's crit multiplies as the player's: the blow 2 x 1.2 = 2.4 -> 2 (B3: the mod's x1.4 gave 2.8 -> 3). The hit
   // handed to onMonsterHit is the span's own roll, before the crit - unmoved.
-  assert.equal(d, 3);
+  assert.equal(d, 2);
   assert.deepEqual(hits, [[MOBILE_TYPES.Rat, true, 2]]);   // per HIT, not per attack
 });
 

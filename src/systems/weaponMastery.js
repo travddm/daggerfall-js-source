@@ -16,7 +16,7 @@
 //   Blunt Weapon  a blow at a foe at half its health or more 0.4% harder (x1.16): the WEAPON BLOW modifier
 //                 the hammer opens
 //   Short Blade   every swing 0.2% quicker (x1.08 the swings) - never past the  the SWING PACE (characters/weaponStates.js)
-//                 swing law's floor of 0.45 s a swing (SWING_FRAME_MIN)
+//                 swing law's floor of 0.2 s a swing (SWING_FRAME_MIN)
 //   Hand-to-Hand  nothing more - its formula reads the climb in its damage already
 //
 // The two halves of a fight read as one: a foe killed from full health by a blow of one size takes its first half at x1

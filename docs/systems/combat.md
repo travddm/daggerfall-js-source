@@ -75,25 +75,31 @@ the player's reflexes (`50 - 10 * (reflexes - 2)` per cent).
 reduces damage instead of lowering the chance to be hit: the player reads a flat 100, a class foe a flat 60, a monster
 its part's armour value.
 
-Departures from the mod: every striker's weapon skill counts x1.5 to hit (`Math.ceil(skill * 1.5)`), and every
-striker rolls criticals as `crit / (4 - luckTerm)`. Condition bands above 75% give no bonus while
+Departures from the mod, toward DFU: the weapon skill counts once to hit, as in `FormulaHelper.cs` (the mod's x1.5 is
+gone); dodging takes a quarter off the chance to hit (DFU's; the mod halves it); a weapon's material gives x6 + 2 to
+hit (DFU x10, the mod x2 + 2). Every striker rolls criticals as `crit / (4 - luckTerm)`; a critical adds `crit / 10`
+to the chance to hit (DFU's) and multiplies the blow by `1 + 0.025` a five points of Critical Strike (x1.5 at 100;
+DFU's adds nothing to the damage, the mod's was x2.0). Condition bands above 75% give no bonus while
 `equipmentDamageEnhanced` is off (`pcaaoAlterDamageBasedOnWepCondition`'s `sharpEdge`); worn gear still loses
-effectiveness. Bows take the two-handed strength term.
+effectiveness. A bow takes the strength term once, as DFU does; a two-handed melee weapon takes it twice.
 
 ## Weapons and swing timing
 
 `weapons.js` holds DFU's weapon enums, the damage table (`weaponMinDamage`, `weaponMaxDamage`), material modifiers
 and multipliers, and `weaponSkillUsed`. Departure: the Short Bow deals 5-17 and the Long Bow 5-19 (DFU 4-16, 4-18).
 
-Swing tempo is the game's own law, not DFU's (`weaponStates.js`, read through `swingLaw.js`):
+Swing time is DFU's Speed line with the weapon's heft on top (`weaponStates.js`, read through `swingLaw.js`):
 
 ```text
-frame seconds = clamp(0.09, 0.4, SWING_BASE_FRAME * swingTempo(speed) * heft * handling)
+frame seconds = clamp(0.04, 0.4, 3 * (115 - min(speed, 100)) / 980 * heft * handling)
 ```
 
-- `swingTempo`: 1.4 at Speed 0, 1 at 50, 0.6 at 100.
-- `swingHeft(weightKg, strength)`: weight above 2.5 kg slows the swing, less with high Strength, at most +35%.
-- `swingHandling`: per weapon type; two-handers x1.06; every short blade handles as a dagger.
+- The Speed term is `GetMeleeWeaponAnimTime` as DFU has it (`swingTempo` is its ratio to Speed 50). Speed past 100
+  reads as 100.
+- `swingHeft(weightKg, strength)`: weight above 2.5 kg slows the swing, less with high Strength, at most +8%.
+- `swingHandling`: per weapon type, from 0.9 (dagger, bare hands) to 1.04 (war hammer); two-handers x1.03; every short
+  blade handles as a dagger. The slowest product is 1.157, so a build at Speed 100 keeps at least 86% of DFU's swing
+  rate.
 - `registerSwingPaceMod` lets powers speed the swing (at most `SWING_PACE_MOST`, 50%).
 
 The enemy melee timer (`enemyAttack.js` `resetMeleeTimer`) and bow cooldown (`getBowCooldownTime`) stay DFU's.

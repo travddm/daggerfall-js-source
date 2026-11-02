@@ -134,7 +134,7 @@ test('BAL6-CLAWS: the beast\'s claws meet no metal - DFU\'s bare hand, ungated a
   assert.equal(lich(-1).minMetalToHit, -1);
   assert.equal(ENEMY_BASICS[32].minMetalToHit, WEAPON_MATERIALS.Mithril, 'the fixture is the real Lich\'s Mithril');
   const open = swings(beast, lich(-1), M);
-  assert.ok(open > 2000, `the claws land (${open})`);
+  assert.ok(open > 600, `the claws land (${open})`);
   assert.equal(swings(beast, lich(WEAPON_MATERIALS.Mithril), M), open, 'the overhaul\'s soft rule: the claws at Mithril whole');
   assert.equal(swings(man, lich(WEAPON_MATERIALS.Mithril), M), swings(man, lich(-1), M), 'a man\'s fist: DFU\'s, no gate');
   // without the soft rule: no refusal, nothing said

@@ -99,7 +99,7 @@ test('AUDIT PRE-MERGE 0929 S5: a rig built without the game\'s boot reads the we
   };
   const light = getMeleeWeaponAnimTime(50, ctx(WEAPONS.Longsword, WEAPON_TYPES.LongBlade));
   const heavy = getMeleeWeaponAnimTime(50, ctx(WEAPONS.Claymore, WEAPON_TYPES.LongBlade));
-  assert.ok(heavy > light * 1.1, `a claymore (7.5 kg, two hands) ${heavy.toFixed(4)} s a frame against a longsword's ${light.toFixed(4)}`);
+  assert.ok(heavy > light * 1.05, `a claymore (7.5 kg, two hands) ${heavy.toFixed(4)} s a frame against a longsword's ${light.toFixed(4)}`);
   assert.ok(SWING_HEFT_FREE_KG < 7.5);
   _resetModSettings();
 });

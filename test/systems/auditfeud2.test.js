@@ -239,7 +239,7 @@ test('AUDIT FEUD 2 S2: THE HARNESS IS ITS SEEDS - a fight\'s result is its seed\
   assert.deepEqual(run(1), run(777777), 'eight revenant fights and eight of TELL\'s, whatever the stream held');
   let trade = 0, dodge = 0;
   for (let seed = 1; seed <= 12; seed++) { trade += D.revenantFight({ rank: 3, seed }).hitsOnMe; dodge += D.revenantFight({ rank: 3, mode: 'dodge', seed }).hitsOnMe; }
-  assert.ok(trade >= 12, `a trader is struck (${trade} in 12 fights)`);
+  assert.ok(trade >= 8, `a trader is struck (${trade} in 12 fights; a foe's skill counts once to hit now, so 8 where it was 12)`);
   assert.ok(dodge * 10 <= trade, `a perfect dodger a tenth as often or less (${dodge})`);
   assert.equal(D.revenantFight({ rank: 2, seed: 3 }).sig, true, 'rank 2: its signature');
   assert.equal(D.revenantFight({ rank: 1, seed: 3 }).sig, false);

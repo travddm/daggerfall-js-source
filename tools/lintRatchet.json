@@ -177,7 +177,7 @@
     "src/combat/fpArm.js::Function 'createFpArm'#0": 3656,
     "src/combat/fpArm.js::Method 'setWeapon'#0": 208,
     "src/combat/fpArm.js::Method 'update'#0": 272,
-    "src/combat/pcaao.js::Function 'pcaaoAttackDamage'#0": 179,
+    "src/combat/pcaao.js::Function 'pcaaoAttackDamage'#0": 178,
     "src/combat/shieldWidget.js::Function 'createShieldWidget'#0": 580,
     "src/combat/shieldWidget.js::Function 'lateUpdate'#0": 168,
     "src/combat/twoHands/twoHands.js::Function 'createTwoHands'#0": 200,
