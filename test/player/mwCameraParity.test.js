@@ -2,6 +2,12 @@
 // sessions (test/player/mwCameraSweep.mjs) on the current camera and compare every observable with a recording of the
 // implementation it replaced (test/fixtures/mw/mwCameraParity.json), so the hosts see the same camera as before.
 //
+// The recording came from src/player/mwCamera.js at commit 0ff2a7ba66 (origin/feat/tamriel-review before the rewrite):
+// copy that file out with `git show`, point its two imports at the repository, run makeSession and recordSession
+// from mwCameraSweep.mjs over sessions 0-49 and makeFocalSession and recordFocalSession over sessions 0-39, and
+// write { sessions, focal } as JSON. The new code was written from the module's exports, its call sites and its
+// existing tests, and from the old module's outputs; no third-party engine source was read.
+//
 // Not covered by the recording, and different on purpose:
 // - Wheel input that is not a whole number of clicks (the hosts send whole notches only).
 // - Changing the focal shift's speed while a transition is under way without retargeting it. The camera always sets

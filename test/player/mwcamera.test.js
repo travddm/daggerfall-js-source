@@ -1,10 +1,7 @@
-// MW-D25: the Morrowind camera machine, pinned against the reference's
-// own numbers and sentences:
-//   camera.cpp (apps/openmw/mwrender)        - position/mode machine
-//   camera.lua (files/data/scripts/omw/camera) - the zoom law
-//   third_person.lua                          - the distance law
-//   actionbindings.lua (omw/input)            - the wheel's units
-//   constants.hpp:10                          - UnitsPerMeter
+// The Morrowind camera machine: the zoom ladder, the first/third person switch, the eye's equation, the focal
+// guard, the queued view change and the saved state. The numbers are the camera's tuning, kept from the previous
+// camera so that hosts and saves see no change; test/player/mwCameraParity.test.js pins the whole behaviour against
+// a recording of it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,27 +11,19 @@ import {
   WHEEL_STEP, CAMERA_OBSTACLE_LIMIT, FOCAL_OBSTACLE_LIMIT,
 } from '../../src/player/mwCamera.js';
 
-test('MW-D25: the constants are the reference\'s own numbers', () => {
-  // constants.hpp:10
+test('MW-D25: the camera tuning constants', () => {
   assert.equal(MW_UNITS_PER_METER, 69.99125109);
-  // camera.cpp:63
   assert.equal(FOCAL_HEIGHT, 124);
-  // third_person.lua:16
   assert.equal(BASE_DISTANCE, 192);
-  // camera.lua:137
   assert.equal(MIN_DISTANCE, 30);
-  // settings.lua:43
   assert.equal(MAX_DISTANCE, 800);
-  // actionbindings.lua:106
   assert.equal(WHEEL_STEP, 10);
-  // camera.cpp:172-173
   assert.equal(CAMERA_OBSTACLE_LIMIT, 5);
   assert.equal(FOCAL_OBSTACLE_LIMIT, 10);
 });
 
 test('MW-D25: the camera boots in first person and the eye is the host\'s own', () => {
-  // camera.cpp:58 - mFirstPersonView(true); camera.cpp:165-169 - first
-  // person leaves the position to the tracked node and zeroes distance.
+  // First person leaves the position to the host's own head and has no boom length.
   const cam = createMwCamera();
   assert.equal(cam.mode(), 'first');
   const fpEye = [3, 1.7, -2];
@@ -45,20 +34,19 @@ test('MW-D25: the camera boots in first person and the eye is the host\'s own', 
 });
 
 test('MW-D25: wheel-down leaves the head onto the CLOSEST ring, not the remembered one', () => {
-  // camera.lua:155-158 - primaryMode = ThirdPerson; baseDistance = minDistance.
+  // Leaving the head puts the camera on the closest ring, whatever the boom length was before.
   const cam = createMwCamera();
   cam.wheel(-1);
   assert.equal(cam.mode(), 'third');
   assert.equal(cam.baseDistance(), MIN_DISTANCE);
-  // and wheel-up from that ring goes straight back in (camera.lua:147-150)
+  // and wheel-up from that ring goes straight back in
   cam.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });   // settle cameraDistance
   cam.wheel(1);
   assert.equal(cam.mode(), 'first');
 });
 
 test('MW-D25: the zoom ladder walks 10 units a click between 30 and 800', () => {
-  // camera.lua:151-153 - baseDistance = clamp(base - delta - obstacleDelta, 30, 800)
-  // with delta = clicks*10 (actionbindings.lua:106).
+  // The boom length moves 10 units a click, from where the eye really is, within 30 and 800.
   const cam = createMwCamera();
   cam.wheel(-1);                     // -> third at 30
   const settle = () => cam.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });
@@ -66,7 +54,7 @@ test('MW-D25: the zoom ladder walks 10 units a click between 30 and 800', () => 
   cam.wheel(-1); assert.equal(cam.baseDistance(), 40);
   settle();
   cam.wheel(-3); assert.equal(cam.baseDistance(), 70);
-  // clamp at the far end (settings.lua:43)
+  // clamp at the far end
   settle();
   cam.wheel(-200); assert.equal(cam.baseDistance(), MAX_DISTANCE);
   // and back down to the closest ring, never past it while > MIN
@@ -85,7 +73,7 @@ test('MW-D25: a wall-pinned camera zooms from where it actually is, and out-zoom
   cam.wheel(-20);  // out to 230
   assert.equal(cam.baseDistance(), 230);
   // A wall 1m behind the focal: the eye pulls in to 1m minus the
-  // 5-unit clearance (camera.cpp:200-206)...
+  // 5-unit clearance...
   const wall = () => 1.0;
   const r = settle(wall);
   const u = 1 / MW_UNITS_PER_METER;
@@ -93,20 +81,19 @@ test('MW-D25: a wall-pinned camera zooms from where it actually is, and out-zoom
     `pulled-in distance backs off the clearance (${r.distance})`);
   const actual = cam.cameraDistance();
   assert.ok(actual < 70 && actual > 60, `actual distance is the pinned one in MW units (${actual})`);
-  // ...zooming OUT while pinned is a no-op (camera.lua:151 - the
-  // obstacleDelta gate)...
+  // ...zooming OUT while pinned is a no-op...
   cam.wheel(-1);
   assert.equal(cam.baseDistance(), 230);
   // ...and zooming IN subtracts the obstacle debt, so one click brings
-  // the base to ten units inside the camera's REAL ring (camera.lua:152).
+  // the base to ten units inside the camera's REAL ring.
   cam.wheel(1);
   assert.ok(Math.abs(cam.baseDistance() - (actual - WHEEL_STEP)) < 1e-9,
     `base caught up to the pinned camera (${cam.baseDistance()} vs actual ${actual})`);
 });
 
-test('MW-D25: the third-person eye is the reference equation in the port\'s meters', () => {
-  // camera.cpp:96-97 (focal = tracked + 124*scale up), :196-208
-  // (eye = focal + orient*(0,-dist,0)), through constants.hpp:10.
+test('MW-D25: the third-person eye sits the boom length behind the focal point, in meters', () => {
+  // The focal point is 124 units (times the actor's height scale) above the feet; the eye is the boom length
+  // behind it along the look direction.
   const cam = createMwCamera();
   cam.wheel(-1);
   const settle = () => cam.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });
@@ -127,14 +114,13 @@ test('MW-D25: the third-person eye is the reference equation in the port\'s mete
   }
   // the eye is BEHIND and (looking down-range) the focal is dead centre:
   // looking along fwd from the eye for `dist` lands exactly on the focal -
-  // vanilla's centered camera (settings.lua:44 viewOverShoulder false).
+  // the centred camera, with the shoulder option off.
   assert.ok(Math.abs((r.eye[0] + fwd[0] * dist) - r.focal[0]) < 1e-9);
 });
 
 test('MW-D25: the focal keeps ten units of ceiling clearance and drops at most its own offset', () => {
-  // camera.cpp:177-193 with the default zero focal offset: only the +10
-  // ceiling term (camera.cpp:180) survives, and adjustmentCoef clamps
-  // at -1 so the drop never exceeds the offset length.
+  // With the default zero focal offset only the ceiling clearance applies, and the focal point never drops by more
+  // than that clearance.
   const cam = createMwCamera();
   cam.wheel(-1);
   const u = 1 / MW_UNITS_PER_METER;
@@ -153,8 +139,7 @@ test('MW-D25: the focal keeps ten units of ceiling clearance and drops at most i
 });
 
 test('MW-D25: a view change while the upper body is busy QUEUES, and lands when ready', () => {
-  // camera.cpp:225-232 ("queue the view change for later") resolved by
-  // camera.cpp:135 on the next update once upperBodyReady.
+  // The change waits in the queue and is applied by the next update once the upper body is ready.
   const cam = createMwCamera();
   cam.wheel(-1, { ready: false });
   assert.equal(cam.mode(), 'first', 'the crossing waits');
@@ -165,16 +150,14 @@ test('MW-D25: a view change while the upper body is busy QUEUES, and lands when 
   assert.equal(cam.mode(), 'third', 'the queued change lands');
   assert.equal(cam.queued(), null);
   // distance zoom inside third person never queues - it is not a view
-  // change (only the FP boundary stops animations, camera.cpp:225).
+  // change (only crossing the first-person boundary waits for the arms).
   cam.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });
   cam.wheel(-2, { ready: false });
   assert.equal(cam.baseDistance(), 50);
 });
 
 test('MW-D25: state round-trips and restore clamps', () => {
-  // Both halves persist: the distance through camera.lua:347-352's
-  // onSave, the first/third flag in the REC_CAM_ savegame record
-  // (worldimp.cpp:425-427, force-applied at statemanagerimp.cpp:617-618).
+  // Both halves persist: the boom length and the first/third flag.
   const cam = createMwCamera();
   cam.wheel(-1);
   cam.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });
@@ -219,9 +202,8 @@ import { PITCH_LIMIT } from '../../src/player/mwCamera.js';
 import { mwViewPendingClicks, mwViewFrame as mwvf } from '../../src/player/mwView.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-test('MW-D30: the pitch clamp is the reference\'s own, and every host rides it', () => {
-  // camera.cpp:323-331 - +/-(PI/2 - 0.000001f). The hand-rolled +/-1.5
-  // stopped the look ~4 degrees short of vertical.
+test('MW-D30: the pitch clamp keeps the look off the vertical, and every host rides it', () => {
+  // The limit is a hair under straight up or down; a hand-rolled +/-1.5 stopped the look ~4 degrees short.
   assert.equal(PITCH_LIMIT, Math.PI / 2 - 0.000001);
   // AUDIT 68 S22: the clamp is the look filter's (lookFilter.js), and a host rides it by driving its camera through
   // one - an import of PITCH_LIMIT the host never read satisfied this pin while proving nothing.
@@ -234,24 +216,20 @@ test('MW-D30: the pitch clamp is the reference\'s own, and every host rides it',
 });
 
 test('MW-D30: wheel clicks ACCUMULATE and flush once per frame', () => {
-  // actionbindings.lua:98-115 - every press sums into zoomInOut and
-  // zoom() runs ONCE per frame on the total; the port's DOM events do
-  // the same through the pending count.
+  // Every notch adds to a pending count, and the camera zooms ONCE per frame on the total.
   assert.equal(mwViewPendingClicks(), 0);
   assert.equal(mwViewWheel(-120), true, 'wheel-up queues even in first person');
   mwViewWheel(-120); mwViewWheel(-120);
   assert.equal(mwViewPendingClicks(), 3, 'three notches, one pending sum');
   mwvf({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });
   assert.equal(mwViewPendingClicks(), 0, 'the frame flushed them in one zoom() call');
-  assert.equal(mwCamera.mode(), 'first', 'zoom-in inside the head is the reference no-op');
+  assert.equal(mwCamera.mode(), 'first', 'zoom-in inside the head does nothing');
 });
 
 test('MW-D30: the pose carries the camera and the load FORCES it', () => {
-  // worldimp.cpp:425-427 saves the flag; statemanagerimp.cpp:617-618
-  // togglePOVs the live camera to match on load; camera.lua:347-352
-  // rides the distance. The port's one pose-apply does both through
-  // mwCamera.restore, and a pose without a camera (older save, the
-  // classic import) leaves the live camera standing.
+  // A save carries the flag and the boom length, and a load forces the live camera to match. The one pose-apply
+  // does both through mwCamera.restore, and a pose without a camera (an older save, the classic import) leaves the
+  // live camera standing.
   const src = hostText('src/scenes/world.js');
   // AUDIT 39 (#24) MOVED THIS PIN: the pose grew `transport` after the
   // camera (the mount rides the quicksave now), so the camera is no

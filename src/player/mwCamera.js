@@ -4,7 +4,8 @@
 // This is a design of our own, described in the port's units. Distances here are in Morrowind units (the game's
 // native length), which is how the tuning below is written; positions in and out of the camera are in metres, and
 // MW_UNITS_PER_METER is the bridge. Morrowind itself has no data for this camera (the game's third person is a
-// fixed chase view), so every number here is a tuning choice of this project.
+// fixed chase view), so the tuning numbers are not game data. They are kept from the previous camera so that hosts
+// and saves see no change; changing one changes how every player's camera feels.
 //
 // The pieces:
 //   - a focal point: where the camera looks, a fixed height above the player's feet, optionally shifted to one side

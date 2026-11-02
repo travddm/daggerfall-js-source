@@ -3,6 +3,10 @@
 // replaced (test/fixtures/mw/spineAimParity.json): the pitch weight over every combination of state, weapon type,
 // animation group, playhead, key times and follow-through, and the spine bones' world pose on the retail biped over a
 // range of look pitches.
+//
+// The recording came from src/combat/spineAim.js at commit 0ff2a7ba66 (origin/feat/tamriel-review before the rewrite):
+// run pitchFactorDigest and recordSpineAim from spineAimSweep.mjs with that file's exports and write { factor, aim } as
+// JSON. No third-party engine source was read for the new code.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
