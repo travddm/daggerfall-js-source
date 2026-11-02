@@ -10879,7 +10879,7 @@ export function createWorldModes(host) {
       fatigue: playerEntity.fatigue ?? null, magicka: playerEntity.magicka ?? null,
     });
     window.__foes = () => (dungeonCtx ? JSON.stringify(dungeonCtx.foes.map((f, i) => ({
-      i, type: f.mobileType, dead: !!f.dead, health: f.entity?.health,
+      i, type: f.mobileType, dead: !!f.dead, health: f.entity?.health, loot: f.entity?.items?.length ?? 0,   // loot: what the corpse will hold (the dungeon probe picks a foe that carries some)
       corpse: !!f.corpseBatch,   // V1's DESTROY-vs-KILL discriminator
       pos: f.ai ? f.ai.feet.map((v) => +v.toFixed(2)) : null,
     }))) : null);
