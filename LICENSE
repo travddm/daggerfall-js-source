@@ -23,6 +23,41 @@ SOFTWARE.
 
 ----------------------------------------------------------------------
 
+What this license does not cover
+
+The MIT License above covers this project's own work. The parts below are
+other people's work. Each keeps its own terms, and the MIT License grants no
+rights in them.
+
+- vendor/ holds mods and files by other authors. Each folder's README.md
+  names the author, the terms the work is carried under and its source, and
+  docs/formats/mods-and-vendor.md lists every folder. Some of these works are
+  under an open license, and you may use them under its terms. For the
+  others, nothing in this repository grants you a right to use them.
+
+- These folders hold art from those mods, under the same terms as the mod:
+
+    public/art/daggerfall-enemy-expansion/
+    public/art/daggerfall-enemy-expansion-repainted/
+    public/art/diverse-weapons/
+    public/art/grimoire-ui/ (its fonts too)
+    public/art/roleplay-realism/
+    public/art/roleplay-realism-items/
+    public/art/sands-of-the-alikr/
+    public/art/snowfall/
+    public/art/vanilla-enhanced/
+
+- Code that ports a mod's behaviour names the mod in its comments. The mod
+  author's rights in what was ported stay with the author.
+
+- Fonts are under the SIL Open Font License, whose text sits beside them
+  (app/launcher/fonts/, public/fonts/opendyslexic/, vendor/silkscreen-five/).
+
+- public/sfx/SOURCES.md gives the source of each sound. A sound it credits to
+  someone else keeps that source's terms.
+
+----------------------------------------------------------------------
+
 Daggerfall Unity
 
 The game logic, data-layer readers and formulas in this port are translated
@@ -33,38 +68,6 @@ table verbatim. Daggerfall Unity is licensed as follows:
 MIT License
 
 Copyright (c) 2009-2023 Daggerfall Workshop
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-----------------------------------------------------------------------
-
-OpenTESArena
-
-The reader of The Elder Scrolls: Arena's CITYDATA (src/formats/arenaCityData.js)
-and its executable's unpacker and coastal-city list (src/formats/arenaExe.js,
-after ExeUnpacker and the address maps aExeStrings.txt / acdExeStrings.txt)
-are translated from OpenTESArena (https://github.com/afritz1/OpenTESArena),
-which is licensed as follows:
-
-The MIT License (MIT)
-
-Copyright (c) 2016-2026 The OpenTESArena Developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -117,8 +120,17 @@ SOFTWARE.
 
 ----------------------------------------------------------------------
 
-The Elder Scrolls II: Daggerfall is the property of Bethesda Softworks. This
-port contains none of its data; the game's files are supplied by the player
-at runtime and never enter this repository. The same holds for The Elder
-Scrolls: Arena, also the property of Bethesda Softworks: the player's own
-copy is read at runtime, and none of it is in this repository.
+The Elder Scrolls II: Daggerfall, The Elder Scrolls: Arena and The Elder
+Scrolls III: Morrowind are the property of Bethesda Softworks. The MIT License
+does not cover any of their content.
+
+The game reads Daggerfall's files from the player's own copy at runtime, and
+those files never enter this repository. One exception: vendor/dfu-quests
+carries Daggerfall Unity's text form of the original game's quests, as
+Daggerfall Unity distributes it. The quests themselves are Bethesda's work.
+
+For the optional 3D layer, the game reads Morrowind's files from the player's
+own copy at runtime. Those files never enter this repository.
+
+Earlier versions read the places past the Iliac Bay from the player's copy of
+Arena. Nothing of Arena is read now.
