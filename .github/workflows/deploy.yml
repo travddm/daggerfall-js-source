@@ -67,6 +67,9 @@ jobs:
 
   site:
     needs: main
+    # PAGES-PRIVATE: GitHub Pages needs a paid plan for a private repository, so a private repository publishes no
+    # site (docs/ci/self-hosted-runner.md); `npm run pages:build` builds it locally. Public: unchanged.
+    if: ${{ !github.event.repository.private }}
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       account_version: ${{ steps.account.outputs.version }}
@@ -144,6 +147,9 @@ jobs:
 
   deploy:
     needs: [verify, site]
+    # PAGES-PRIVATE: GitHub Pages needs a paid plan for a private repository, so a private repository publishes no
+    # site (docs/ci/self-hosted-runner.md); `npm run pages:build` builds it locally. Public: unchanged.
+    if: ${{ !github.event.repository.private }}
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     environment:
       name: github-pages

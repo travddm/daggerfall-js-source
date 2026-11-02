@@ -1,0 +1,26 @@
+name: pages-local-test
+# Temporary: proves tools/pagesSite.mjs on Linux for the self-hosted runner pull request. Removed before merge.
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pages-local-test.yml'
+permissions:
+  contents: read
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run pages:build
+      - run: |
+          npx vite preview --outDir scratch/pages-site --port 4173 --strictPort &
+          sleep 8
+          curl -fsS http://localhost:4173/ | grep -o '<title>[^<]*'

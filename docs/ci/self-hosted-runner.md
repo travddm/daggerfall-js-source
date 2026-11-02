@@ -31,6 +31,25 @@ runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-
 - Steps that assume GitHub-hosted tools carry `if: runner.environment == 'github-hosted'` or `'self-hosted'`
   (`probes.yml`: Chromium with system libraries, and ARENA2). A GitHub-hosted run executes the same steps as before.
 
+## GitHub Pages while private
+
+GitHub Pages needs a paid plan for a private repository ([pages]), so the `site` and `deploy` jobs of `deploy.yml` carry
+`if: ${{ !github.event.repository.private }}`. A private repository publishes no site. The Cloudflare deploys
+(`relay-deploy.yml`, `account-deploy.yml`) are separate workflows and still run. The two jobs run again once the
+repository is public, with no other change.
+
+To view the site locally, build what the `site` job publishes and serve it:
+
+```bash
+npm ci
+npm run pages:build              # tools/fetch-vendor.sh, then the production build, into scratch/pages-site
+npm run pages:preview            # http://localhost:4173/
+npm run pages:build -- --atlas   # also builds the chatgpt/exact-face-atlas preview and mounts it, as the workflow does
+```
+
+The build needs network for the vendored files. `tools/pagesSite.mjs` limits open files on Windows, where Vite's build
+otherwise fails with "too many open files". Keep the script in step with the `site` job.
+
 ## Architecture
 
 ```text
@@ -89,8 +108,9 @@ Things to know about the shared daemon:
    `objects.githubusercontent.com` ([runner-comms]), plus npm, `nodejs.org`, Playwright's CDN, Cloudflare for the deploy
    jobs, and the ARENA2 source (`drive.usercontent.google.com`).
 3. Free disk: about 40 GB for the image, caches and four jobs' work folders. More for more slots.
-4. Org owner access on `Daggerfall-JS`, and the numbers: how many cores and how much RAM the CI may use (Capacity).
-5. A token that can mint runner configurations (Credential).
+4. Org owner access on `Daggerfall-JS`.
+5. **Open, waiting for the owner:** how many cores and how much RAM the CI may use (Capacity), and a token that can mint
+   runner configurations (Credential).
 
 ## Setup
 
@@ -224,14 +244,16 @@ job. A job's own cache writes go to its container and die with it.
   kernel is shared. A container escape reaches the game servers. Keep the host patched.
 - The single-use JIT configuration is passed in the container's environment and removed from it before the job starts;
   it remains in the runner's command line for that job. It is valid only for that runner.
-- Deploy secrets. The deploy workflows read `secrets.CLOUDFLARE_API_TOKEN` (and Patreon, Discord and Anthropic keys in
-  `account-deploy.yml`) as repository secrets, and only `deploy.yml` uses `environment:`. **A Free organization cannot
-  configure environments for private repositories** ([environments]), so secrets cannot be scoped to a deploy
-  environment there. GitHub Pages in a private repository also needs a paid plan ([pages]). On the Free plan, a pull
-  request job from a branch in the same repository can be made to read a repository secret by whoever can push the
-  branch. Options: upgrade the org to GitHub Team (environments, required reviewers, branch rules); or keep deploy
-  secrets only in a second private repository that has the deploy workflows and few writers; or limit write access to
-  the owner. The owner decides; until then, do not run the deploy workflows from a private repository.
+- Repository secrets (the private-repository setup). The deploy workflows read `secrets.CLOUDFLARE_API_TOKEN` (and the
+  Patreon, Discord and Anthropic keys in `account-deploy.yml`) as repository secrets. The organization is on the Free
+  plan, which cannot configure environments for private repositories ([environments]), so while the repository is
+  private these stay repository-wide secrets. Anyone who can push a branch to the repository can write a workflow that
+  reads them. That is accepted for now: keep write access to the owner and trusted collaborators, and keep the
+  Cloudflare token's scope to what the deploys need. A job runs in a fresh container, so a secret does not outlive it.
+- Going public again: first move every deploy secret into an environment (for example `production`) with deployment
+  branches limited to `main`, point the deploy jobs at it with `environment:`, and delete the repository-wide copies.
+  Then make the repository public. A public repository gets GitHub-hosted runners from the expression, and the private
+  runner group does not accept it.
 - Rotate the runner token on a schedule, and when a collaborator leaves.
 
 ## Capacity
