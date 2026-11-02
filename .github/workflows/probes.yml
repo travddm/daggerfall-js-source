@@ -23,25 +23,56 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/probes.yml'
+  # A manual run repeats one probe, to tell a flaky probe from a real fault: `gh workflow run probes --ref <branch>
+  # -f probe=save -f repeat=10`. Leave `probe` empty for one run of every probe.
   workflow_dispatch:
+    inputs:
+      probe:
+        description: 'One probe to repeat (empty: every probe once)'
+        required: false
+        default: ''
+      repeat:
+        description: 'How many runs of that probe'
+        required: false
+        default: '5'
 
 permissions:
   contents: read
 
 concurrency:
-  group: probes-${{ github.event.pull_request.number || github.ref }}
+  group: probes-${{ github.event_name }}-${{ inputs.probe }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  plan:
+    name: plan
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - id: plan
+        env:
+          PROBE: ${{ inputs.probe }}
+          REPEAT: ${{ inputs.repeat }}
+        run: |
+          # run 0: a plain run, whose job keeps the name "probe <name>"; 1..N: the repeats of a manual run
+          include=""
+          if [ -n "$PROBE" ]; then
+            for i in $(seq 1 "$REPEAT"); do include="$include{\"probe\":\"$PROBE\",\"run\":$i},"; done
+          else
+            for p in boot dungeon town travel rest save pause online; do include="$include{\"probe\":\"$p\",\"run\":0},"; done
+          fi
+          echo "matrix={\"include\":[${include%,}]}" >> "$GITHUB_OUTPUT"
+
   probe:
-    name: probe ${{ matrix.probe }}
+    needs: plan
+    name: "probe ${{ matrix.probe }}${{ matrix.run > 0 && format(' #{0}', matrix.run) || '' }}"
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
       # every probe reports, so one red run shows every broken part
       fail-fast: false
-      matrix:
-        probe: [boot, dungeon, town, travel, rest, save, pause, online]
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -83,7 +114,7 @@ jobs:
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
-          name: probe-shots-${{ matrix.probe }}
+          name: probe-shots-${{ matrix.probe }}-${{ matrix.run }}
           path: ${{ runner.temp }}/probe-shots
           retention-days: 7
           if-no-files-found: ignore
