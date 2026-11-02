@@ -154,8 +154,8 @@ export const REALM_LEVEL_CLAIM_MAX = 45;
 /** WHAT THE IDENTITY MINT SIGNS OF THE CHARACTER IT IS MINTED FOR - `{ rc, cl, wa, house, name }`, one read of its row.
  *  - `rc` REALM-DOOR: IS THIS ONE OF THE ACCOUNT'S REALM CHARACTERS? The relay's door refuses a
  *    0, so online is the realm's at the servers, not only in the new build's boot. A realm id of this account's own,
- *    standing - LEGACY7: never a tombstone - and INT9 (AUDIT): IN PLAY, a lease held (the token's `ci` is whose record a
- *    death in the zone drops from, and its `cl` and `wa` what a referee reads: a tab playing one character named a poor
+ *    standing - LEGACY7: never a tombstone - and INT9 (AUDIT): IN PLAY, a lease held (the token's `ci` names the character whose
+ *    record the relay's referee reads, and its `cl` and `wa` what a referee reads: a tab playing one character named a poor
  *    other, its lease freed at the join, and its deaths dropped the other's record). Anything else is 0: an offline
  *    character's id (what a build from before the realm names), another account's, one deleted, none.
  *  - `cl` ARENA4b: THE LEVEL ON ITS TILE. INT7: the level the judge trusts (`level_seen` - verdict.js trustedLevel: the
@@ -518,7 +518,7 @@ export function realmAtOf(/** @type {any} */ v) {
  * leftover, claimed from the Lost and Found - post.js claimPost): the budget charges it as it charges that piece taken
  * off the floor, so the service's hand is no road past the budget for what the client said.
  * @param {any} ctx @param {string} playerId @param {{ id: string, lease: string, seq: number }} at
- * @param {(save: any) => string | null} change @param {{ outbound?: boolean, escrow?: boolean | Set<string>, seize?: boolean, take?: boolean, witness?: boolean }} [opts]
+ * @param {(save: any) => string | null} change @param {{ outbound?: boolean, escrow?: boolean, seize?: boolean, take?: boolean, witness?: boolean }} [opts]
  *   `escrow`: the pieces leaving in the service's hands (ledger.js ledgerMoves - true all, a Set those keys)
  */
 export async function prepareRealmRecord({ db, bucket, rand, nowS }, playerId, at, change, { outbound = false, escrow = false, seize = false, take = false, witness = true } = {}) {
@@ -573,14 +573,13 @@ export async function prepareRealmRecord({ db, bucket, rand, nowS }, playerId, a
 }
 
 /**
- * INT9: A REALM CHARACTER'S RECORD SEIZED - changed by the service on another player's word the relay signed (a death in
- * the zone, its killer carrying the fall's receipt after the fallen's own tab let its grace go by (wildReceipt.js wildFallGraceS):
- * server-account/src/wild.js), so with no tab's `at`: the record read where it stands, `change(save)` applied, written one
+ * INT9: A REALM CHARACTER'S RECORD SEIZED - changed by the service on its own word (staff's Put back, the judge's
+ * rollback), so with no tab's `at`: the record read where it stands, `change(save)` applied, written one
  * sequence on, and THE LEASE CLEARED - whatever tab held the character plays a record that moved under it, and its next
  * join reads the new one (the staff rollback's way, review.js). Answers prepareRealmRecord's `{ steps, key, prev, seq }`,
  * guarded on the sequence it read, or `{ error }`.
  * @param {any} ctx @param {string} playerId @param {string} charId
- * @param {(save: any) => string | null} change @param {{ escrow?: boolean | Set<string>, take?: boolean }} [opts] `take` prepareRealmRecord's
+ * @param {(save: any) => string | null} change @param {{ escrow?: boolean, take?: boolean }} [opts] `take` prepareRealmRecord's
  */
 export async function seizeRealmRecord(ctx, playerId, charId, change, { escrow = true, take = false } = {}) {
   const row = await ctx.db.prepare('SELECT seq, lease FROM realm_characters WHERE id = ? AND player = ? AND dead_at IS NULL').bind(charId, playerId).first();
@@ -698,11 +697,6 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   // online"), and any character of the account may stock a trader in one now - so goods another of them has standing at
   // one wait, as a sale waits for them (homes.js releaseHome): the delete would leave them for sale at a trader gone
   if (Number((await db.prepare(HOME_VENDOR_STOCK_SQL).bind(playerId, id).first())?.n ?? 0) > 0) return { error: 'home-vendor-stocked' };
-  // AUDIT SEA VENTURES B4: gold owed it at sea, a wreck's goods held for it, and its own hold's goods due back come home
-  // to it first (seaBounty.js, seaWreck.js) - deleted, they stood owed to no character for good
-  if (await db.prepare(`SELECT 1 FROM sea_bounty_owed WHERE killer = ?1 AND killer_char = ?2 AND paid_at IS NULL
-    UNION ALL SELECT 1 FROM sea_prizes WHERE killer = ?1 AND killer_char = ?2 AND state = 'held' AND until_s > ?3
-    UNION ALL SELECT 1 FROM sea_prizes WHERE victim = ?1 AND victim_char = ?2 AND state = 'held' AND until_s <= ?3 LIMIT 1`).bind(playerId, id, nowS).first()) return { error: 'sea-held' };
   // HOME-RENT: a room another player is renting in its home waits for its days to run out, and rent held for it waits to
   // be collected - the delete takes the home with it. AUDIT: then no room of it is offered any more, and both are asked
   // again - a rent landing between the first asking and the delete's batch was deleted with the home (a rent needs its

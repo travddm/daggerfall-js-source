@@ -73,7 +73,7 @@ test('GUILD1c the token: a character\'s guild rides it as three claims - its id,
 });
 
 test('GUILD1c the orders: `guild` says the carrier\'s guild now (all three or none), `guildout` a member removed (`gm`) or a guild gone (no `gm`) and never a tag; each kind carries its own fields and no other\'s, and the mute and renown orders carry none of a guild\'s; verifyOrder asks for its kind by name (mutants: a guild order read at the renown door; a guildout with a tag; a mute carrying a guild)', async () => {
-  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'remains', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
+  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
   const o = { s: 'acct-0001', i: 1000, e: 1000 + ORDER_TTL_S };
   assert.equal(orderValid({ o: 'guild', ...o, gi: G1, gt: 'HND', gm: 'm3' }), true);
   assert.equal(orderValid({ o: 'guild', ...o }), true, 'none: a leave, a disbanding');
@@ -120,7 +120,7 @@ test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s
   assert.equal(readGuildTag({ gt: '<b>' }), null, 'a stranger\'s word about themselves');
   assert.equal(readGuildTag({ gt: ['HND'] }), null);
   assert.equal(readGuildTag({}), null);
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
   const g1 = guildGate(null, 1000);
   assert.equal(GUILD_ORDER_HZ_MAX, 1);
   assert.equal(g1.pass, true);

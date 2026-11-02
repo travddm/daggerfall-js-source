@@ -28,7 +28,6 @@ import { BAY_REGION_COUNT } from '../../formats/mapsTables.js';
 import { BASE_HEIGHT_SCALE, SCALED_OCEAN_ELEVATION } from '../../world/terrain/terrainSampler.js';
 import { spawnsDungeon, WORLD_SALT } from '../../world/spawnedDungeons.js';
 import { pickGateRegion, pickGatePixel, gateSpotLocal, omenRing } from '../../net/gate/gateLaw.js';
-import { WILD_REGION } from '../wild/wildZone.js';   // PVPDUNGEONS: no world event in the open zone
 
 const W = 1000, H = 500;
 /** The towns a gate may be reached from: DFU's fast-travel towns. */
@@ -144,7 +143,7 @@ export function gateScanner(maps, { spawnSalt = WORLD_SALT, heightAt = null } = 
 }
 
 /** The regions a gate may open in, ascending. */
-export const gateRegions = (scan) => [...scan.byRegion.keys()].filter((r) => r !== WILD_REGION && scan.byRegion.get(r).length >= GATE_REGION_MIN_PIXELS).sort((a, b) => a - b);
+export const gateRegions = (scan) => [...scan.byRegion.keys()].filter((r) => scan.byRegion.get(r).length >= GATE_REGION_MIN_PIXELS).sort((a, b) => a - b);
 
 /**
  * A day's gate site, or null when the world offered no ground at all.

@@ -14,7 +14,6 @@ import { GUARD_MOBILE_TYPE } from '../../src/scenes/cityGuards.js';
 import { residentLook, residentWalkerActor } from '../../src/characters/rosterBodies.js';
 import { CREATURE_MATCH } from '../../src/characters/creatureBodies.js';
 import { ELITE_FOE_SIZE } from '../../src/systems/eliteFoes.js';
-import { WILD_GIANT_SIZE } from '../../src/systems/wild/wildZone.js';   // AUDIT MW-NPC II P4
 import { createNpcBodies, createPopulationLane, createFrameBudget, NPC_BODY_TIERS, WATCH_BODY_TIERS, NPC_FRAME_TIERS } from '../../src/characters/npcBodies.js';
 import { creatureLook } from '../../src/characters/creatureBodies.js';
 import { MOBILE_TYPES as M } from '../../src/characters/mobile/mobileTypes.js';
@@ -247,20 +246,13 @@ test('AUDIT MW-NPC D3: a foe\'s body is drawn the size its sprite is - an elite\
   pool.foes.push(elite);
   pool.batches();
   assert.equal(L.offered[0].scale, ELITE_FOE_SIZE, 'the elite as large as its sprite');
-  // AUDIT MW-NPC II P4: the giant and the dead too - a living elite's sprite size and its giant's are one number, so the
-  // pool's `szG` and `szE` were the same to every pin; the wild zone's giant, and the corpse's size, each its own
-  const giant = poolFoe(130, [4, 0, 3]);
-  giant.entity.wildGiant = true;
+  // AUDIT MW-NPC II P4: the dead too - the corpse's size is its own
   const deadElite = poolFoe(131, [6, 0, 3], { dead: true, corpse: true });
   deadElite.entity.eliteFoe = true;
-  const deadGiant = poolFoe(132, [8, 0, 3], { dead: true, corpse: true });
-  deadGiant.entity.wildGiant = true;
-  pool.foes.push(giant, deadElite, deadGiant);
+  pool.foes.push(deadElite);
   pool.batches();
   const by = (f) => L.offered.find((a) => a.feet[0] === f.ai.feet[0] || a.feet === f.ai.feet);
-  assert.equal(by(giant).scale, WILD_GIANT_SIZE, 'the open zone\'s giant four times a man, as its sprite');
   assert.equal(by(deadElite).scale, ELITE_FOE_SIZE, 'a dead elite as large as its corpse');
-  assert.equal(by(deadGiant).scale, WILD_GIANT_SIZE, 'a dead giant too');
 });
 
 test('AUDIT MW-NPC D4/D5: no creature that flies or swims in Daggerfall stands in a Morrowind creature that walks - the imp (a flyer; the scamp walks) and the dreugh (a swimmer) keep their sprites, as the bat, the harpy and the slaughterfish do; the table holds it for every row', () => {

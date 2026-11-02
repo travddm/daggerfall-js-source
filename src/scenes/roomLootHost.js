@@ -20,17 +20,16 @@ import { neverPeerHanded, peerHanded, notCarried } from '../systems/peerWord.js'
 import { playerEntity } from '../characters/playerEntity.js';
 import { raiseEnemyDeath } from './corpseMarker.js';
 import { rollCorpseKit } from '../systems/foeLootCap.js';
-import { rollRoomBonus, spawnEnemyLoot, wildLootAfter } from './hostCombat.js';
+import { rollRoomBonus, spawnEnemyLoot } from './hostCombat.js';
 import { setMidScreenText } from '../ui/midScreenText.js';
 import { stampWonWeapons } from '../systems/loot/lootRarity.js';
 import { championTraitFor } from '../systems/champions.js';   // a body's champion mark, judged at the room's level
-import { wildPileMore } from '../systems/wild/wildZone.js';
 import { seaPileMore } from '../systems/sea/seaSpoils.js';
 
 /** @param {any} host */
 export function createRoomLoot(host) {
   const {
-    _deepCleared, _deepFoeCleared, _sharedFoe, _wildDungeon, _wildRing, eliteLootOpts, fightN, foes, lootKeyOf,
+    _deepCleared, _deepFoeCleared, _sharedFoe, eliteLootOpts, fightN, foes, lootKeyOf,
     lootableBody, opts, respawnDue, rollPileItems, roomLootKey, searchHeard, searchables, settleLootFlat, dfLocation
   } = host;
   // ── PARTY-LOOT ──
@@ -165,11 +164,10 @@ export function createRoomLoot(host) {
     return rec;
   }
   /** A pile's base: rollPileItems on the room's terms (the party's level, the name's gender, Luck 50, RENOWN-LOOT's
-   *  first stage, no finder), the open zone's share on the same dice, and a pile a company passed empty (LW14). */
+   *  first stage, no finder), and a pile a company passed empty (LW14). */
   function roomPileBase(h, terms, rolls, gender) {
     const t = { rolls, level: terms.lv, gender, luck: ROOM_BASE_LUCK, quarters: ROOM_BASE_QUARTERS, find: ROOM_BASE_FIND };
     const items = rollPileItems(t);
-    if (_wildDungeon) wildPileMore(items, () => rollPileItems(t), _wildRing, rolls);
     seaPileMore(items, dfLocation, rolls);   // SEA-SET: an isle's ruin of the deep - the Tidemail's share, last, on the room's dice
     if (h.pile.stopKey && _deepCleared.has(h.pile.stopKey)) items.length = 0;
     return items;
@@ -197,7 +195,6 @@ export function createRoomLoot(host) {
       e.items = [];
       e.equip = undefined;   // the base's kit is laid on a table of its own, never over the one the foe wore
       spawnEnemyLoot(e, f.mobileType, ENEMY_BASICS[f.mobileType], roller, { ...eliteLootOpts(f.src), where: 'dungeon', ...o, rejects });
-      if (_wildDungeon) wildLootAfter(e);
       if (f.src?.eliteFoe) grantEliteLoot(e, terms.lv, rolls);
       rollCorpseKit(e, o);
       stampWonWeapons(e.items, terms.n ?? 1, { rolls });

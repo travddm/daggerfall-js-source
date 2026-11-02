@@ -97,7 +97,7 @@ test('CHAT-LANG wire: one channel per language, keyed by its code under its own 
   assert.equal(chatLangRoom('toString'), null);
   for (const code of Object.keys(CHAT_LANGS)) { assert.ok(isChatRoom(chatLangRoom(code)), code); assert.ok(!isRegionRoom(chatLangRoom(code)), code); }
   assert.equal(isChatRoom('chat:lang.xx'), false);
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
 });
 
 test('CHAT-LANG tab and commands: the Language tab rides a room of its own, off the bar until chosen; /lang lists, chooses and leaves; /lc says a line on it', () => {

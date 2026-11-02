@@ -1,10 +1,10 @@
-// INT10: SPELLS BETWEEN PLAYERS CAPPED BY THE REFEREE, AS THE ARENA'S ARE. DUEL1 and WILD1 handed a player's
+// INT10: SPELLS BETWEEN PLAYERS CAPPED BY THE REFEREE, AS THE ARENA'S ARE. DUEL1 handed a player's
 // spell to its target's own machine (the whole spell, at the caster's claimed level) - a crafted client's Damage Health
 // was whatever it said, and a target that never applied one never took it. Since INT8 and INT9 every place one player's
 // spell meets another's is a referee's: the caster's own machine counts the harm on a stand-in - a neutral one since
 // AUDIT C&C H5 (combat/duelCombat.js duelStandIn), the caster's own sheet before it, so its race and willpower saved
 // against its own spell (combat/siegeCombat.js siegeSpellNumbers) - and sends a number, and the relay clips it to one cast's most and bounds the
-// rate - the duel's, the open zone's, a siege's and the arena's alike - and no target's machine applies a peer's harm at
+// rate - the duel's, a siege's and the arena's alike - and no target's machine applies a peer's harm at
 // all. And a Royal Tourney's bout, blows alone, takes no cast (the relay refereed a crafted client's as a siege's).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,7 +12,6 @@ import { readFileSync } from 'node:fs';
 
 import { SIEGE_CASTS, SIEGE_HIT, SIEGE_UNITS_PER_M, ROYAL_RING, royalRoomKey, newFighter, refereeCast } from '../../../src/net/siege/siegeRef.js';
 import { newDuelRef, duelNote, duelOpen, duelBlow } from '../../../src/net/duel/duelRef.js';
-import { newWildRef, wildZone, wildBlow, WILD_REF, WILD_GRACE } from '../../../src/net/wild/wildRef.js';
 import { ARENA_SPELLS_IN, ARENA_SPELL_WINDOW_MS, ARENA_SPELL_MAX } from '../../../src/net/arena/arenaLaw.js';
 import { mintSiegeOrder } from '../../../src/net/identityToken.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
@@ -22,7 +21,7 @@ const { subtle } = globalThis.crypto;
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const M = SIEGE_UNITS_PER_M;
 
-test('INT10 ONE CAP: a cast between players is clipped to one cast\'s most and bounded to so many a window - the siege\'s referee, the duel\'s and the open zone\'s on its one law, the arena\'s pinned equal (mutants: the clip unread; the rate unread; a heal let into a duel or the zone)', () => {
+test('INT10 ONE CAP: a cast between players is clipped to one cast\'s most and bounded to so many a window - the siege\'s referee, the duel\'s on its one law, the arena\'s pinned equal (mutants: the clip unread; the rate unread; a heal let into a duel or the zone)', () => {
   assert.deepEqual([ARENA_SPELLS_IN, ARENA_SPELL_WINDOW_MS, ARENA_SPELL_MAX], [SIEGE_CASTS.max, SIEGE_CASTS.windowMs, SIEGE_CASTS.damageMax], 'the arena\'s cap, the referee\'s');
   const near = (x) => ({ x: 1000 * M + x * M, y: 0, z: 1000 * M });
   // the siege's referee
@@ -38,19 +37,6 @@ test('INT10 ONE CAP: a cast between players is clipped to one cast\'s most and b
   const t = bout.startMs + 10;
   const d = [0, 1, 2, 3].map((k) => duelBlow(st, 'acct-a', 'peer-b', { d: 9999, r: SIEGE_HIT.Spell }, t + k * 100));
   assert.deepEqual(d.map((x) => x.dealt), [SIEGE_CASTS.damageMax, SIEGE_CASTS.damageMax, SIEGE_CASTS.damageMax, 0]);
-  // the open zone's
-  const z = newWildRef();
-  wildZone(z, 'acct-a', { id: 'peer-a', lv: 10 }, true, near(-1), 0);
-  wildZone(z, 'acct-b', { id: 'peer-b', lv: 10 }, true, near(1), 0);
-  // both in the zone a mend's length first (AUDIT INT9: a fighter mends only once it has stood there as long), so every
-  // blow below is a mend's moment - the striker unstruck, and its own casts' window never cleared by it
-  // (ZONE-GRACE, 2026-10-26): and past the safe passage their entry gave them, whichever is longer
-  const t0 = Math.max(WILD_REF.mendMs, WILD_GRACE.ms) + 1000;
-  const w = [0, 1, 2, 3].map((k) => wildBlow(z, 'acct-a', 'acct-b', { d: 9999, r: SIEGE_HIT.Spell, rid: `00000000000${k}` }, t0 + k * 100));
-  assert.deepEqual(w.map((x) => x.dealt), [SIEGE_CASTS.damageMax, SIEGE_CASTS.damageMax, SIEGE_CASTS.damageMax, 0]);
-  // AUDIT TESA II (lane Z): and the fourth refused BY ITS CASTS' WINDOW (`rate`) - three of damageMax fill BAL8's harm
-  // ceiling too (SIEGE_HARM), which refuses with no word, so a mend that cleared the window lived under the count alone
-  assert.deepEqual(w.map((x) => [x.ok, x.why]), [[true, null], [true, null], [true, null], [false, 'rate']], 'the casts\' window, never mended');
 });
 
 test('INT10 THE ROYAL TOURNEY\'S BOUT IS BLOWS ALONE: no cast between its two lands - a crafted client\'s damaging spell as its heal - while a blow is judged as ever (mutants: the damaging cast refereed)', async () => {

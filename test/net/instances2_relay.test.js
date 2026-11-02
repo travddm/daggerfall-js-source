@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fakeRoom, fakeRooms } from '../fakeRoom.mjs';
 import { instanceOwnerOf, instanceRoomOf, INSTANCE_KIN_KEEP_MS, INSTANCE_DOOR_WORD } from '../../src/net/instanceRoom.js';
-import { SOCIAL_ROOM, CLOSE_POLICY, CLOSE_BUSY, INSTANCE_TTL_MS, WORLD_TTL_MS, PARTY_OFFLINE_MS, validPartyPose, wdunRoomKey } from '../../src/net/wire.js';
+import { SOCIAL_ROOM, CLOSE_POLICY, CLOSE_BUSY, INSTANCE_TTL_MS, WORLD_TTL_MS, PARTY_OFFLINE_MS, validPartyPose, seaVaultMapId } from '../../src/net/wire.js';
 
 const refusal = (ws) => ws.sent.find((m) => m.t === 'error')?.m ?? null;
 /** The relay's out-of-door work (a re-check's hub ask and its refusal) let run to its end. */
@@ -173,8 +173,8 @@ test('INSTANCES at the relay (the audit): the hub answers by the party AS IT STA
   } finally { Date.now = realNow; }
 });
 
-test('INSTANCES at the relay (the audit): a zone hall keeps no instance - its PvP, its locks and the hub\'s reset are its public room\'s - refused to everyone, staff and owner alike', async () => {
-  const hall = wdunRoomKey('210,99');
+test('INSTANCES at the relay (the audit): a sea vault isle dungeon keeps no instance - its vault is its public room, a private copy would stand outside the gate - refused to everyone, staff and owner alike', async () => {
+  const hall = `dungeon:m${seaVaultMapId(210, 99)}`;
   const key = instanceRoomOf(hall, { owner: await instanceOwnerOf('acct-alice'), epoch: '89abcdef' });
   assert.ok(key, 'the law keys it (the page never asks one)');
   const r = fakeRoom(key);

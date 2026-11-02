@@ -74,8 +74,8 @@
 // SEA-SET - THE ELTHERIC TIDEMAIL, the deep sea's own, through the
 // same seams and one of its own:
 //   Stormwrack                 the FOLD (shock resistance and Speed)
-//   Undertow                   the BLOW: its share whole while I stand in the open Eltheric Ocean (the zone's live flag on
-//                              the sea's ground - systems/wild/wildZone.js wildZoneKind), half of it anywhere else
+//   Undertow                   the BLOW: its share whole while I stand in the open Eltheric Ocean (the sea ground flag the world
+//                              host sets - systems/sea/etherRings.js seaGroundHere), half of it anywhere else
 //   The Captain's Due          THE SHIP'S DOOR (captainsDue): the naval host asks it of my ship's every ball and every hurt
 //                              her hull takes from a ball or a ram (scenes/naval/navalHost.js gunsRefit, myHullHurt) - the
 //                              player the door's (systems/playerDoor.js player())
@@ -105,9 +105,8 @@ import { careerTolerance, EFFECT_FLAGS } from '../spellcast.js';
 import { KNIGHT_CITY_WATCH } from '../../characters/mobile/mobileTypes.js';
 import { hallowedFoe } from '../festival/festivalFoes.js';   // WITCH1: the Wyrd's Raiment's Tallow-Ward - the dead and the summoned
 import { HARVEST_TEXT } from '../festival/festivalWords.js';   // WITCH1: Soul Harvest's words, in the player's language
-import { healthShare } from '../../combat/healthShare.js';
-import { wildZoneKind } from '../wild/wildZone.js';   // SEA-SET: Undertow - the open sea's ground on the zone's live flag
-import { ETHER_KIND } from '../wild/etherWild.js';   // FIELD BUGS 2026-10-18f RELAY-SHARE: a body's share of its health, the one law
+import { healthShare } from '../../combat/healthShare.js';   // FIELD BUGS 2026-10-18f RELAY-SHARE: a body's share of its health, the one law
+import { seaGroundHere } from '../sea/etherRings.js';   // SEA-SET: Undertow - the open sea's ground, set by the world host
 import {
   wornSets, setsAwake, RAMPAGE_SECONDS, RAMPAGE_STACKS, CLEAVE_METRES, WRATH_BELOW, NOVA_METRES, WRATH_SECONDS,
   RIPOSTE_SECONDS, MARK_METRES, MARK_SECONDS, BLOOD_SECONDS, BLOOD_STACKS, COIL_STACKS, COIL_SECONDS, SHED_BELOW,
@@ -322,8 +321,8 @@ function stranded(attacker, target, whole = true) {
 }
 
 // ── SEA-SET: the open sea, and the Captain's Due ──
-/** SEA-SET: do I stand in the open Eltheric Ocean - the open PvP zone on the sea's ground (Undertow's whole share)? */
-const atSea = () => wildZoneKind() === ETHER_KIND;
+/** SEA-SET: do I stand in the open Eltheric Ocean (Undertow's whole share)? */
+const atSea = () => seaGroundHere();
 /** SEA-SET, THE CAPTAIN'S DUE (scenes/naval/navalHost.js): the multipliers my ship's balls and her hull's hurts take while the
  *  tier is awake on me - `{ guns, hull }`, `guns` over 1 (her balls' harm), `hull` under 1 (a ball's or a ram's on her);
  *  1 and 1 while it sleeps or with no player (the door's). One read a ball. */

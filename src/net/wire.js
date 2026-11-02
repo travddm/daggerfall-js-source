@@ -1199,7 +1199,7 @@ export const LAYER_HEADER = 'x-df-layer';
 export const LAYER_FULL_HEADER = 'x-df-full';
 /** AUDIT SCALE II R3-3: the header the Worker's walk sets on its FIRST try alone, when the page asked a layer (`?ly=`) -
  *  an asked layer past the place that holds no socket answers LAYER_EMPTY_HEADER, and the walk starts again at the
- *  place: `?ly=` was any page's private, empty copy of any cell, building or dungeon (in the Wild zone, a hiding place
+ *  place: `?ly=` was any page's private, empty copy of any cell, building or dungeon (a hiding place
  *  from its fights). An empty layer is admitted only when the walk reaches it in turn, every layer before it full. */
 export const LAYER_ASK_HEADER = 'x-df-ask';
 /** AUDIT SCALE II R3-3: the header an asked, empty layer's refusal carries. */
@@ -1374,9 +1374,6 @@ export function validFoeRecord(r) {
   // none of them: the relay reads it), absent for a foe that is none; the reader stands its puppet as the same champion
   if (r.cp !== undefined) { if (!Number.isInteger(r.cp) || r.cp < 0 || r.cp > CHAMPION_TRAIT_MAX) return null; out.cp = r.cp; }
   if (r.gr !== undefined) { if (!Array.isArray(r.gr) || r.gr.length !== 2 || !Number.isSafeInteger(r.gr[0]) || r.gr[0] < 0 || r.gr[0] > 0x7fffffff || !Number.isInteger(r.gr[1]) || r.gr[1] < 0 || r.gr[1] > 23) return null; out.gr = [r.gr[0], r.gr[1]]; }   // GRANT3: its grant's number and its member - the frame's `gs` holds the grant
-  // GREATER-GIANT: `gg` the zone's Greater Giant this foe is (its index, 0..7 - systems/wild/wildGiants.js), absent for any other -
-  // every puppet stands it at its size and its name, and a client that sees one never stands a copy of its own
-  if (r.gg !== undefined) { if (!Number.isInteger(r.gg) || r.gg < 0 || r.gg > 7) return null; out.gg = r.gg; }
   // REVENANT-WIRE: `nm` its REVENANT's name, the owner's own (systems/revenant/revenant.js) - so every puppet is called what its owner
   // calls it; printable, bounded, absent for a foe that is none
   if (r.nm !== undefined) { if (typeof r.nm !== 'string' || !r.nm.length || r.nm.length > REVENANT_NAME_MAX || /[\u0000-\u001f\u007f]/.test(r.nm)) return null; out.nm = r.nm; }
@@ -1659,7 +1656,9 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
 // Integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world283';
+export const RELAY_VERSION = 'world284';
+// world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
+//   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
 // world282: one version for client and relay - the per-feature relay gates are gone, and a welcome naming another
 //   RELAY_VERSION (or none) is refused (relayMatches); relay files changed only in the gates and comments removed.
 // world276: TESA's release (#1184) and SHOP, one version - TESA's world275 below renumbered past main's SD-PARTY world275 (live) at the eighth merge of main; its gates (WORLD_WIDE, GUILD_INSTANCE, WW5, RAID_WORLD, OW_WORLD) open at 276. SHOP: the vocabulary's three new words - GENESIS last of TITLES, ORIGIN last of GLYPHS, ETERNAL last of AURAS - which the relay reads off every token (net/identityToken.js) - and the hello's token body bound, 896 (TOKEN_RE): a token wearing every glyph, the Origin with them, is 867. Deploy the relay first.
@@ -2290,7 +2289,7 @@ export function inRangeOf(roomKey, from) {
   return (to) => !!to && Math.max(Math.abs(fx - Math.floor(to.x / PIXEL_UNITS)), Math.abs(fy - Math.floor(to.z / PIXEL_UNITS))) <= RANGE_PIXELS;
 }
 
-/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'wild'|'wdun'|'lease', ...}
+/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'sea'|'lease', ...}
  *  or {error} - the caller closes on an error. INSPECT1: every arm below, named - this line had fallen seven behind
  *  (test/net/auditworld2.test.js derives the list from the arms now, so it cannot fall behind again - the merge with
  *  main's HCC-PARK was its first catch: the park arm, unnamed). */
@@ -2356,17 +2355,11 @@ export function parseClient(text, { hasHello = false } = {}) {
     const data = validWedData(m.data);
     return data ? { t: 'wed', data } : { error: 'bad wed' };
   }
-  if (m.t === 'wdun') {   // PVPDUNGEONS: a word on the zone's halls, to the hub alone
-    if (!hasHello) return { error: 'wdun before hello' };
-    if (text.length > WDUN_FRAME_MAX) return { error: 'frame too large' };
-    const w = validWdunIn(m);
-    return w ? { t: 'wdun', ...w } : { error: 'bad wdun' };
-  }
-  if (m.t === 'wild') {   // WILD1: the open zone's frame - a blow, a death's gear, a remains' deposit or a take - projected by validWildData; the relay routes the directed and keeps the room's remains (net/wild/wildLaw.js)
-    if (!hasHello) return { error: 'wild before hello' };
-    if (text.length > WILD_FRAME_MAX) return { error: 'frame too large' };
-    const data = validWildData(m.data);
-    return data ? { t: 'wild', data } : { error: 'bad wild' };
+  if (m.t === 'sea') {   // SEA-EVENTS: a word on the treasure fleets, to the social room alone
+    if (!hasHello) return { error: 'sea before hello' };
+    if (text.length > SEA_FRAME_MAX) return { error: 'frame too large' };
+    const w = validSeaIn(m);
+    return w ? { t: 'sea', ...w } : { error: 'bad sea' };
   }
   if (m.t === 'look') {   // PROFILE2: my look again, mid-session - the hello's look through the hello's own door
     if (!hasHello) return { error: 'look before hello' };
@@ -4245,9 +4238,8 @@ export function validDuelData(d) {
 
 /** INT8: the referee's word kinds (`{t:'dref', k, s, ...}`, the relay's alone - it routes none a client sends). */
 export const DUEL_REF_KINDS = Object.freeze(['bout', 'hp', 'end', 'no']);
-/** INT8: the longest receipt the referees hand over - a duel's (net/duel/duelReceipt.js DUEL_RECEIPT_MAX) or, SEA-BOUNTY,
- *  a fall's (net/wild/wildReceipt.js WILD_RECEIPT_MAX - its room and its killer's character signed too): the longer, pinned. */
-export const DUEL_REF_RECEIPT_MAX = 512;
+/** INT8: the longest receipt the referees hand over - a duel's (net/duel/duelReceipt.js DUEL_RECEIPT_MAX), pinned. */
+export const DUEL_REF_RECEIPT_MAX = 400;
 /** INT8: the two fighters' vitality as the referee says it - `[[id, hp, max], [id, hp, max]]`, the challenger first. */
 function duelRefVitals(h) {
   if (!Array.isArray(h) || h.length !== 2) return null;
@@ -4337,78 +4329,14 @@ export function validWedData(d) {
   return out;
 }
 
-// ═══ WILD1
-// THE OPEN ZONE'S FRAMES. One frame type, `{t:'wild', data}`, from a hello'd socket in a PLACE room (a cell or a world
-// room - streamsFoes), in two families:
-//
-// DIRECTED - `to` names one socket in the room (the relay stamps the sender's id and its verified account `sub`):
-//   strike / spell   the duel's blow frames, field for field (validDuelData projects them) - INT9 (bible/06-Systems/
-//                    Integrity-Arc.md lane 2): THE RELAY REFEREES THEM (net/wild/wildRef.js) and routes them to nobody; WILD1
-//                    had the defender resolve every blow on its own machine, and a defender that never took one never fell
-//   worn             the fallen to their killer: the worn pieces their body offers (`s` the death's id) - shown, never
-//                    believed: the account service reads the fallen's own record for the piece the killer picks
-// INT9's `result` (the defender's answer) and `gave` (the fallen's gift) retired with the defender's word.
-//
-// ROOM - kept by the relay:
-//   zone   my word that I stand in the zone (`z` 1) or have left it (`z` 0) - the referee's fights are between two that
-//          both said so (INT9: the relay cannot see the map)
-//   pick   the killer's choice of ONE worn piece of a fall of its own (`r` the remains' id, `w` its place in the offer) -
-//          the relay waits on it before it signs the fall (net/wild/wildReceipt.js `f1`)
-//          (AUDIT INT9: `t`, `m` - the piece's template and material as the offer showed it, signed as the receipt's `wt`)
-//   fall   a deposit, WILD_ITEMS_MAX records a frame, `last` on the final one - INT9: every chunk carries the account
-//          service's `remains` order (`o` - net/identityToken.js): its id is the order's, its records digest to the
-//          order's, or the room keeps none of it (net/wild/wildLaw.js)
-//   take   one record off a remains, or `n` of its stack - THE RELAY DECIDES: the first take of a record wins it, and
-//          the record itself comes back to its taker alone (`got`); everyone in the room hears what left (`rm`)
-// Items are checked for SHAPE only (plain objects, bounded) - the relay cannot import the game's item law; every
-// receiver projects each through systems/loot/loot.js validLootList before a field is read (the trade's own law).
-// The referee's own word is the `wref` frame (validWildRefOut, below), never a wild frame: the relay routes none a
-// client sends.
-/** Every kind a wild frame may carry. INT9: `result` and `gave` retired; `zone` its own word. SHIP-PVP (net/sea/seaRef.js):
- *  a captain's word at her helm (`helm`), her shot on another's ship (`shot`), her boarding of her wreck (`board`). */
-export const WILD_KINDS = Object.freeze(['strike', 'spell', 'worn', 'pick', 'zone', 'fall', 'take', 'helm', 'shot', 'board']);
-/** The kinds that name one socket (`to`); the rest are the room's. INT9: a strike and a spell name their target and are
- *  the referee's, routed to nobody; `worn` alone is routed. SHIP-PVP: a shot names her ship's captain, the referee's too -
- *  sent through the socket of the room that captain stands in; a boarding is the wreck's room's (her captain may be gone). */
-export const WILD_DIRECTED = Object.freeze(['strike', 'spell', 'worn', 'shot']);
-/** SHIP-PVP: the kinds of the open sea's guns (net/sea/seaRef.js). */
-export const SEA_PVP_KINDS = Object.freeze(['helm', 'shot', 'board']);
-/** SHIP-PVP: the most hull or canvas one shot word claims (a gathered volley's), and a toughness said in hundredths. */
-export const SEA_SHOT_MAX = 8000;
-export const SEA_TOUGH_WIRE_MAX = 240;
-/** What the room says back: a remains' records (`ri`, a chunk), a record taken (`rm`), a take won (`got`) or lost
- *  (`no`), a remains gone (`gone`); MAC: a killer's COLLECT (`cr` - the room's signed
- *  word that its killer took the piece the service holds in escrow, net/wild/wildReceipt.js `g1`, for the killer's tab to
- *  carry to the service; an older client drops the kind, so it never takes the room's record of a piece in escrow). */
-export const WILD_OUT_KINDS = Object.freeze(['ri', 'rm', 'got', 'no', 'gone', 'cr']);
-/** MAC: the longest collect on the wire (net/wild/wildReceipt.js WILD_RECEIPT_MAX, pinned equal). */
-export const WILD_COLLECT_MAX = 512;
-/** The widest wild frame - a deposit of WILD_ITEMS_MAX heavy records, the trade frame's own bound. */
-export const WILD_FRAME_MAX = 12 * 1024;
-export const WILD_DATA_MAX = WILD_FRAME_MAX - 96;
-/** The most item records one frame carries. */
-export const WILD_ITEMS_MAX = 16;
-/** The most records one remains holds (a bag and a cart, at most), and how long it lies. */
-export const WILD_REMAINS_ITEMS_MAX = 96;
-export const WILD_REMAINS_MS = 12 * 60_000;   // PVPDUNGEONS: ten minutes to get back to them AFTER the two minutes' respawn wait (the despawn does not run while the respawn does)
-/** The most remains one room keeps - the oldest goes for a new one past it. */
-export const WILD_ROOM_REMAINS_MAX = 24;
-/** A stack's bound on a take. */
-export const WILD_STACK_MAX = 1_000_000;
-/** A socket's wild frames a second, out and in - a fight's swings and shafts, a deposit's chunks, a looter's takes. */
-export const WILD_HZ_MAX = 12;
-export const WILD_IN_HZ_MAX = WILD_HZ_MAX * 2;
-
-// ── PVPDUNGEONS: THE ZONE'S HALLS, KEPT BY THE HUB ─────────────────────
-// The halls themselves are every client's own pure pick (systems/wild/wildDungeons.js) from the DAY - and the day is the
-// relay's (`st.day`), never a client's clock, so every player sees the same halls. What no client may decide is kept
-// by the social hub (server/src/index.js `_wdun*`, net/wild/wildLaw.js wdun*): an account's hour-long lock on a hall it left
-// or fell in (lifted while its own remains still lie there), who is inside (a heartbeat; a silent one lapses), the
-// empty hall's reset (its world room wiped once it has stood empty WDUN_RESET_MS) and the crows over a hall a body
-// lies in, said to everyone online.
+// ═══ SEA: THE TREASURE FLEETS' RECORD, KEPT BY THE SOCIAL ROOM
+// One frame type, `{t:'sea', k, ...}`, from a hello'd socket in the social room. The client asks the state (`hi`) or says
+// that its treasure fleet's flagship went down (`fk`, the sailing's number); the room answers a `hi` with the state (`st`)
+// and tells everyone online when a flagship is newly down (`fd`). The fleets' routes and ships are every client's own pure
+// pick off the sailing's number (systems/sea/seaEvents.js); the record of a sunk flagship is net/sea/fleetHub.js.
 /** SEA-EVENTS: THE TREASURE FLEET'S SAILINGS - one each
- *  SEA_FLEET_PERIOD_MS of the relay's clock, numbered from its epoch; the hub keeps a sailing's flagship sunk for
- *  everyone (net/wild/wildLaw.js wdunFleetSunk), the clients draw its route and its ships (systems/sea/seaEvents.js). */
+ *  SEA_FLEET_PERIOD_MS of the relay's clock, numbered from its epoch; the social room keeps a sailing's flagship sunk for
+ *  everyone (net/sea/fleetHub.js), the clients draw its route and its ships (systems/sea/seaEvents.js). */
 export const SEA_FLEET_PERIOD_MS = 3 * 3_600_000;
 /** The sailing a moment of the relay's clock (ms) falls in. */
 export const seaFleetSailing = (nowMs) => Math.floor(nowMs / SEA_FLEET_PERIOD_MS);
@@ -4418,19 +4346,14 @@ export const seaFleetSailing = (nowMs) => Math.floor(nowMs / SEA_FLEET_PERIOD_MS
 export const SEA_FLEET_OFFSET_MS = 60 * 60_000;
 export const SEA_FLEET_SAIL_MS = 90 * 60_000;
 export const SEA_FLEET_LATE_MS = 60_000;
+/** The length of a game day on the relay's clock, ms: a sea vault's epoch (its chests' key) is the day number. */
 export const WDUN_DAY_MS = 24 * 3_600_000;
-export const WDUN_LOCK_MS = 60 * 60_000;
-export const WDUN_RESET_MS = 20 * 60_000;
-export const WDUN_HERE_MS = 60_000;          // the client's heartbeat while inside
-export const WDUN_STALE_MS = 3 * 60_000;     // a hall's occupant silent this long has left (at their last word)
-export const WDUN_FRAME_MAX = 160;
-export const WDUN_HZ_MAX = 2;
-/** A zone hall's key, `"x,y"` - WW-C2: a world map pixel's (net/wire.js worldPixelOk), Cyrodiil's halls past the Bay;
- *  the Wrothgarian Mountains' were the Bay's 1000 x 500 alone. */
-const WDUN_HALL = /^(-?\d{1,4}),(-?\d{1,4})$/;
+/** The longest sea frame a client sends (a `fk` or a `hi` is a few dozen bytes). */
+export const SEA_FRAME_MAX = 160;
+/** A socket's sea frames a second. */
+export const SEA_HZ_MAX = 2;
 /** SEA-VAULTS: a vault of the deep's key, `"e<cx>,<cy>"` - the cell
- *  of the Eltheric Ocean's lattice its ruin isle stands in (world/ethericSea.js etherCellOf), never negative, never a
- *  mountain hall's `"px,py"`. The lattice's size and an isle place's map id are the sea's law's (world/ethericSea.js CELLS_W,
+ *  of the Eltheric Ocean's lattice its ruin isle stands in (world/ethericSea.js etherCellOf), never negative. The lattice's size and an isle place's map id are the sea's law's (world/ethericSea.js CELLS_W,
  *  CELLS_H; world/etherPlaces.js etherPlaceId), copied here for the relay's bundle and held equal by
  *  test/systems/sea/seavaults.test.js. */
 const WDUN_SEA = /^e(\d{1,3}),(\d{1,3})$/;
@@ -4443,8 +4366,8 @@ export const seaVaultMapId = (cx, cy) => (((0xe7 << 20) | (500000 + cy * WDUN_SE
 export const seaVaultKey = (cx, cy) => `e${cx},${cy}`;
 /** AUDIT SEA VENTURES D7, D8: A VAULT'S OWN ROOM - its isle's place's map id in a lane of its own (SEA_VAULT_LANE in the high
  *  12 bits, the same low 20): the room a vault is stood in (world.js, the room key - while the gate let me in, or while I
- *  stand in the day's vault) and the one the hub wipes (wdunRoomKey). The isle's own room (seaVaultMapId) is its plain
- *  ruin's every day: the hub wiped ANY ruin's room on a client's word for its key, and at the day's turn a vault and its
+ *  stand in the day's vault) and the one the isle's dungeon door builds. The isle's own room (seaVaultMapId) is its plain
+ *  ruin's every day: at the day's turn a vault and its
  *  plain ruin shared one room, built two ways. */
 export const SEA_VAULT_LANE = 0xe8;
 export const seaVaultRoomMapId = (cx, cy) => (((SEA_VAULT_LANE << 20) | (500000 + cy * WDUN_SEA_CELLS_W + cx)) >>> 0);
@@ -4454,10 +4377,6 @@ export function seaVaultRoomId(/** @type {unknown} */ mapId, /** @type {unknown}
   const sea = seaVaultCell(hall);
   return sea && Number(mapId) === seaVaultMapId(sea[0], sea[1]) ? seaVaultRoomMapId(sea[0], sea[1]) : mapId;
 }
-/** SEA-BOUNTY: THE SEA'S BOX on the map, in pixels -
- *  world/ethericSea.js ETHER_BOX, copied for the relay's and the service's bundles and held equal by
- *  test/systems/sea/seabounty.test.js. */
-export const WILD_SEA_BOX = Object.freeze({ x0: 64, x1: 8128, y0: -7680, y1: -2688 });
 /** An isle place's map id, its cell read back (seaVaultMapId's inverse) - a vault's own room's lane too (seaVaultRoomMapId)
  *  - or null for any other place's. */
 const seaPlaceCell = (id) => {
@@ -4465,294 +4384,49 @@ const seaPlaceCell = (id) => {
   const n = (id & 0xfffff) - 500000, cy = Math.floor(n / WDUN_SEA_CELLS_W);
   return n >= 0 && cy < WDUN_SEA_CELLS_H ? [n % WDUN_SEA_CELLS_W, cy] : null;
 };
-/** SEA-BOUNTY: IS A ROOM THE OPEN SEA'S - the room a fall's receipt names (net/wild/wildReceipt.js `m`)? A world cell
- *  (`world:<cx>,<cy>`, WORLD_CELL pixels a side) whose middle lies in the sea's box, or an isle place's dungeon or building
- *  (`dungeon:m<id>...`, `interior:m<id>...` - its map id the sea's own lane). Veilhaven's peace is the sea's too: the
- *  relay referees no fall there, so none is named. */
-export function seaRoomOf(key) {
-  if (typeof key !== 'string' || key.length > 96) return false;
-  const w = /^world:(-?\d{1,4}),(-?\d{1,4})$/.exec(key);
-  if (w) {
-    const x = (Number(w[1]) + 0.5) * WORLD_CELL, y = (Number(w[2]) + 0.5) * WORLD_CELL;
-    return x >= WILD_SEA_BOX.x0 && x < WILD_SEA_BOX.x1 && y >= WILD_SEA_BOX.y0 && y < WILD_SEA_BOX.y1;
-  }
-  const p = /^(?:dungeon|interior):m([1-9]\d{0,9})(?:\.|$)/.exec(key);
-  return !!p && seaPlaceCell(Number(p[1])) != null;
-}
 /** The isle cell `[cx, cy]` a sea place's dungeon room names - seaVaultMapId's inverse, the room `dungeon:m<id>` its door
- *  builds (any isle's, a vault's today or not) - or null. THE OPEN SEA KEEPS NO INSTANCE (SEA-VAULTS): every ruin past
- *  Veilhaven's peace is a dungeon of the open zone and today's vaults its halls, which the relay cannot tell from the
- *  rest without drawing the day's picks - so the relay refuses an instance of any isle's dungeon room, as it refuses a
- *  mountain hall's (wdunHallOfRoom), and the page's door never offers one (scenes/instanceDoor.js keepsNone). */
+ *  builds (any isle's, a vault's today or not) - or null. A sea vault keeps no instance: the relay refuses an instance of
+ *  any isle's dungeon room, and the page's door never offers one (scenes/instanceDoor.js keepsNone). */
 export const seaRoomCell = (key) => {
   const m = typeof key === 'string' ? /^dungeon:m([1-9]\d{0,9})$/.exec(key) : null;
   return m ? seaPlaceCell(Number(m[1])) : null;
 };
-/** A sea vault's cell `[cx, cy]` of its key, or null (a mountain hall's key, or none). */
+/** A sea vault's cell `[cx, cy]` of its key, or null (or none). */
 export function seaVaultCell(h) {
   const m = typeof h === 'string' ? WDUN_SEA.exec(h) : null;
   if (!m) return null;
   const cx = Number(m[1]), cy = Number(m[2]);
   return cx < WDUN_SEA_CELLS_W && cy < WDUN_SEA_CELLS_H ? [cx, cy] : null;
 }
-/** A hall's key, `"px,py"` - WW-C2: a world map pixel's - SEA-VAULTS: or a vault of the deep's, `"e<cx>,<cy>"` - or null. */
-export function wdunHall(h) {
-  const sea = seaVaultCell(h);
-  if (sea) return seaVaultKey(sea[0], sea[1]);
-  const m = typeof h === 'string' ? WDUN_HALL.exec(h) : null;
-  if (!m) return null;
-  const x = Number(m[1]), y = Number(m[2]);
-  return worldPixelOk(x) && worldPixelOk(y) ? `${x},${y}` : null;
-}
-const WDUN_IN = new Set(['hi', 'in', 'out', 'here', 'die', 'gk', 'fk']);   // ZONE-GIANTS: 'gk' - a zone giant killed; SEA-EVENTS: 'fk' - a treasure fleet's flagship sunk
-/** A client's word to the hub: {k:'hi'} | {k:'in'|'out'|'here', h} | {k:'die', h} | {k:'gk', g} | {k:'fk', n}. */
-export function validWdunIn(m) {
-  if (!m || typeof m !== 'object' || !WDUN_IN.has(m.k)) return null;
-  if (m.k === 'hi') return { k: 'hi' };
-  if (m.k === 'gk') return Number.isSafeInteger(m.g) && m.g >= 0 && m.g < 8 ? { k: 'gk', g: m.g } : null;
-  if (m.k === 'fk') return fleetN(m.n) ? { k: 'fk', n: m.n } : null;   // SEA-EVENTS: the sailing whose flagship went down
-  const h = wdunHall(m.h);
-  return h ? { k: m.k, h } : null;
-}
-const msOf = (v) => (Number.isFinite(v) && v >= 0 && v <= 7 * WDUN_DAY_MS ? Math.round(v) : null);
-/** ZONE-GIANTS: the giants down, `[[g, msLeft]]` (g 0..7). */
-const giantPairs = (list) => (Array.isArray(list) ? list.slice(0, 8).filter((e) => Array.isArray(e) && Number.isSafeInteger(e[0]) && e[0] >= 0 && e[0] < 8 && msOf(e[1]) != null).map((e) => [e[0], msOf(e[1])]) : []);
-/** SEA-EVENTS: a sailing's number, and the sailings sunk (at most the hub's two - this one and the last - and room over). */
-const fleetN = (n) => Number.isSafeInteger(n) && n >= 0 && n < 1e8;
-const fleetList = (list) => (Array.isArray(list) ? list.slice(0, 4).filter(fleetN) : []);
-const pairs = (list, max = 64) => (Array.isArray(list) ? list.slice(0, max).map((e) => (Array.isArray(e) ? [wdunHall(e[0]), msOf(e[1])] : [null, null])).filter(([h, ms]) => h && ms != null) : []);
-/** The hub's word: st (the day, my locks, the crows, the epochs, the giants, the fleets), ok/no (an entry), lk (my new lock),
- *  cr (the crows), gd (the giants), fd (the fleets sunk). */
-export function validWdunOut(m) {
-  if (!m || typeof m !== 'object' || m.t !== 'wdun') return null;
-  if (m.k === 'st') {
-    const day = Number.isSafeInteger(m.day) && m.day >= 0 && m.day < 1e7 ? m.day : null;
-    if (day == null) return null;
-    return { k: 'st', day, now: Number.isFinite(m.now) ? m.now : null, locks: pairs(m.locks), crows: pairs(m.crows, 128), giants: giantPairs(m.giants), fleets: fleetList(m.fleets) };
-  }
-  if (m.k === 'ok') { const h = wdunHall(m.h); const ep = Number.isSafeInteger(m.ep) && m.ep >= 0 && m.ep < 1e9 ? m.ep : 0; return h ? { k: 'ok', h, ep } : null; }
-  if (m.k === 'no') { const h = wdunHall(m.h); const left = msOf(m.left); return h && left != null ? { k: 'no', h, left } : null; }
-  if (m.k === 'lk') { const h = wdunHall(m.h); const left = msOf(m.left); return h && left != null ? { k: 'lk', h, left } : null; }
-  if (m.k === 'cr') return { k: 'cr', crows: pairs(m.crows, 128), ...(typeof m.who === 'string' && m.who.length > 0 && m.who.length <= 128 ? { who: m.who } : {}) };   // CROW-NEWS: `who` - the account whose death set them (its party is not told)
-  if (m.k === 'gd') return { k: 'gd', giants: giantPairs(m.giants) };   // ZONE-GIANTS: the giants down, said to everyone
-  if (m.k === 'fd') return { k: 'fd', fleets: fleetList(m.fleets) };   // SEA-EVENTS: the sailings whose flagship is down, said to everyone
-  return null;
-}
-/** The internal door a hub uses to wipe a hall's world room (its foes and its loot as they were left). */
-export const WDUN_INTERNAL_RESET = '/internal/wdun/reset';
-/** The internal door a place room asks the hub whether a taker is of the fallen's party (PVPDUNGEONS: no party or guild
- *  member takes a fallen friend's remains - the guild half the room reads off its own sockets). */
-export const WDUN_INTERNAL_KIN = '/internal/wdun/kin';
-/** The internal door a place room tells the hub a remains is gone (its crows go with it). */
-export const WDUN_INTERNAL_GONE = '/internal/wdun/gone';
-/** INT9 (AUDIT): the internal door a place room keeps a zone fighter's vitality at the hub, and asks it back when the
- *  fighter stands in its zone (net/wild/wildRef.js wildCarry - a step into another cell was a fresh bar). */
-export const WILD_INTERNAL_VIT = '/internal/wild/vit';
-/** A zone hall's spawn salt - the template its pixel clones (world/spawnedDungeons.js pickTemplate), never a wandering
- *  spawn's. */
-export const WDUN_SALT = 7;
 /** WW-C2: the halls' lane of map ids - the high 4 bits - over a world map pixel's key in the low 28 (world/worldWide/
  *  worldGrid.js worldPixelKey, restated: the relay's bundle reads no world/ module); no spawned dungeon's salt (the high
  *  12 bits' small numbers, world/spawnedDungeons.js spawnedMapId) reaches it, nor MAPS.BSA's ids. */
 export const WDUN_WORLD_LANE = 0xf;
 const WDUN_SPAN = 2 * WORLD_PIXEL_BOUND;
-/** A zone hall's world room, `dungeon:m<mapId>` (wire.js WORLD_ROOM) - WW-C2: its world map pixel under the halls' lane
- *  (the Wrothgarian Mountains' halls were WDUN_SALT's spawned id, the Bay's pixel in the low 20 bits). */
+/** A hall's world room map id (wire.js WORLD_ROOM `dungeon:m<mapId>`): its world map pixel under the halls' lane. */
 export const spawnedHallMapId = (x, y) => (((WDUN_WORLD_LANE << 28) | ((y + WORLD_PIXEL_BOUND) * WDUN_SPAN + (x + WORLD_PIXEL_BOUND))) >>> 0);
 /** AUDIT WW F1: is `id` a zone hall's map id - the halls' lane, above every MAPS.BSA row's (whose high 12 bits reach
  *  0x728)? Its low 20 bits are a world pixel key's, NO Bay pixel's `y * 1000 + x`: a reader that masks a map id to the
  *  Bay's pixel (systems/discovery.js, the carriage towns, Immersive Travel's docks and capitals) asks this first. */
 export const isHallMapId = (id) => Number.isSafeInteger(id) && id >= 0 && id <= 0xffffffff && id >>> 28 === WDUN_WORLD_LANE;
-export const wdunRoomKey = (h) => {
-  const k = wdunHall(h);
-  if (!k) return null;
-  const sea = seaVaultCell(k);
-  if (sea) return `dungeon:m${seaVaultRoomMapId(sea[0], sea[1])}`;   // SEA-VAULTS: its ruin isle's vault room (AUDIT SEA VENTURES D7, D8 - never the plain ruin's)
-  const [x, y] = k.split(',').map(Number);
-  return `dungeon:m${spawnedHallMapId(x, y)}`;
-};
-/** INSTANCES (the audit): the zone hall a world room's key names - wdunRoomKey's inverse, its hall as wdunHall spells it -
- *  or null. A hall keeps no instance (net/instanceRoom.js): its PvP, its locks and the hub's reset (WDUN_INTERNAL_RESET)
- *  are its public room's, and a private copy of one would stand outside all three. */
-export const wdunHallOfRoom = (key) => {
-  const m = typeof key === 'string' ? /^dungeon:m([1-9]\d{0,9})$/.exec(key) : null;
-  const id = m ? Number(m[1]) : 0;
-  if (!isHallMapId(id)) return null;
-  const k = id & 0x0fffffff, h = wdunHall(`${(k % WDUN_SPAN) - WORLD_PIXEL_BOUND},${Math.floor(k / WDUN_SPAN) - WORLD_PIXEL_BOUND}`);
-  return h && wdunRoomKey(h) === key ? h : null;
-};
-export const wildGate = (bucket, nowMs) => tokenGate(bucket, nowMs, WILD_HZ_MAX);
-export const wildInGate = (bucket, nowMs) => tokenGate(bucket, nowMs, WILD_IN_HZ_MAX);
-/** A remains' id and a death's id: the duel's alphabet. */
-export const WILD_ID_RE = /^[A-Za-z0-9]{6,16}$/;
-/** The sid a zone's blow wears when it is projected through the duel's own law - never a duel's (a duel mints ten). */
-const WILD_BLOW_SID = 'wildzone';
-/** A point in the room's own frame: a cell's is the world frame (natives on x and z, metres on y), a dungeon's or a
- *  building's is its scene's - so either sign, inside the world's span. */
-export function wildPoint(p) {
-  if (!Array.isArray(p) || p.length !== 3 || !p.every(finite)) return null;
-  if (Math.abs(p[0]) > POSE_BOUND || Math.abs(p[2]) > POSE_BOUND || Math.abs(p[1]) > POSE_Y_BOUND) return null;
-  return [p[0], p[1], p[2]];
+
+const SEA_IN = new Set(['hi', 'fk']);
+/** SEA-EVENTS: a sailing's number, and the sailings sunk (at most the room's two - this one and the last - and room over). */
+const fleetN = (n) => Number.isSafeInteger(n) && n >= 0 && n < 1e8;
+const fleetList = (list) => (Array.isArray(list) ? list.slice(0, 4).filter(fleetN) : []);
+/** A client's word to the social room: {k:'hi'} (ask the state) | {k:'fk', n} (the flagship of sailing `n` went down), or null. */
+export function validSeaIn(m) {
+  if (!m || typeof m !== 'object' || !SEA_IN.has(m.k)) return null;
+  if (m.k === 'hi') return { k: 'hi' };
+  return fleetN(m.n) ? { k: 'fk', n: m.n } : null;
 }
-/** A list of item records, by SHAPE: `min`..WILD_ITEMS_MAX plain objects. */
-function wildItems(v, min = 1) {
-  if (!Array.isArray(v) || v.length < min || v.length > WILD_ITEMS_MAX) return null;
-  for (const it of v) if (!it || typeof it !== 'object' || Array.isArray(it)) return null;
-  return v;
-}
-/**
- * One wild frame's data, PROJECTED: `{k, ...exactly what its kind carries}` or null - anything outside refuses the
- * whole frame. One home: the relay's parser, the sender's sendWild and the receiver's arm run this same function.
- */
-export function validWildData(d) {
-  if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
-  if (typeof d.k !== 'string' || !WILD_KINDS.includes(d.k)) return null;
-  let out = null;
-  if (d.k === 'strike' || d.k === 'spell') {
-    // the duel's blow, field for field - projected by its own law under a sid no duel mints, the sid then dropped
-    const b = validDuelData({ ...d, s: WILD_BLOW_SID });
-    if (!b) return null;
-    out = { ...b };
-    delete out.s;
-  } else if (d.k === 'worn') {
-    const to = typeof d.to === 'string' && ID_RE.test(d.to) ? d.to : null;
-    const s = typeof d.s === 'string' && WILD_ID_RE.test(d.s) ? d.s : null;
-    const it = wildItems(d.items, 0);
-    if (!to || !s || !it) return null;
-    out = { to, k: 'worn', s, items: it };
-  } else if (d.k === 'zone') {
-    if (d.z !== 0 && d.z !== 1) return null;
-    out = { k: 'zone', z: d.z, ...(d.z === 0 && d.dd === 1 ? { dd: 1 } : {}) };   // INT9: my word on the zone - AUDIT FOE-KEEPS E2: `dd` 1, left it dead
-  } else if (d.k === 'helm') {
-    // SHIP-PVP: my word at my helm - my hull (-1: left it), my toughness in hundredths, my boat's uid, my hull per mille
-    // AUDIT SEA VENTURES A4: a ship said is a boat the service can name - a hull with no uid (u 0) was a ship that could be
-    // wrecked and never signed: no prize, no kill at sea
-    if (!intIn(d.hl, -1, 4) || !intIn(d.t, 100, SEA_TOUGH_WIRE_MAX) || !intIn(d.u, d.hl >= 0 ? 1 : 0, 0x7fffffff) || !intIn(d.h, 0, 1000)) return null;
-    out = { k: 'helm', hl: d.hl, t: d.t, u: d.u, h: d.h };
-  } else if (d.k === 'shot') {
-    // SHIP-PVP: my balls on her ship - the hull and canvas my game reckoned they struck, and a fire set
-    const to = typeof d.to === 'string' && ID_RE.test(d.to) ? d.to : null;
-    if (!to || !intIn(d.d, 0, SEA_SHOT_MAX) || !intIn(d.s, 0, SEA_SHOT_MAX) || (d.f !== 0 && d.f !== 1)) return null;
-    out = { to, k: 'shot', d: d.d, s: d.s, f: d.f };
-  } else if (d.k === 'board') {
-    // SHIP-PVP: I board her - my wreck of her ship, said to the room that wrecked her
-    const r = typeof d.r === 'string' && WILD_ID_RE.test(d.r) ? d.r : null;
-    if (!r) return null;
-    out = { k: 'board', r };
-  } else {
-    const r = typeof d.r === 'string' && WILD_ID_RE.test(d.r) ? d.r : null;
-    if (!r) return null;
-    if (d.k === 'pick') {
-      if (!intIn(d.w, -1, WILD_ITEMS_MAX - 1)) return null;
-      out = { k: 'pick', r, w: d.w };   // INT9: the killer's choice, the relay's to sign
-      // AUDIT INT9: and what the offer showed there - its template and material, signed beside the place (`wt`)
-      if (d.t !== undefined || d.m !== undefined) {
-        if (d.w < 0 || !intIn(d.t, 0, 65535) || !intIn(d.m, 0, 65535)) return null;
-        out.t = d.t; out.m = d.m;
-      }
-    } else if (d.k === 'fall') {
-      const p = wildPoint(d.p), items = wildItems(d.items);
-      if (!p || !items || (d.last !== 0 && d.last !== 1)) return null;
-      if (typeof d.o !== 'string' || !d.o.length || d.o.length > WILD_ORDER_MAX) return null;   // INT9: the service's order, on every chunk
-      out = { k: 'fall', r, p, items, last: d.last, o: d.o };
-    } else {
-      if (!intIn(d.i, 0, WILD_REMAINS_ITEMS_MAX - 1) || !intIn(d.n, 1, WILD_STACK_MAX)) return null;
-      out = { k: 'take', r, i: d.i, n: d.n };
-    }
-  }
-  if (JSON.stringify(out).length > WILD_DATA_MAX) return null;
-  return out;
-}
-/** INT9: the longest `remains` order a deposit carries (net/identityToken.js TOKEN_MAX_CHARS, pinned equal). */
-export const WILD_ORDER_MAX = 1024;
-/** INT9: the zone referee's word kinds (`{t:'wref', k, ...}`, the relay's alone). */
-export const WILD_REF_KINDS = Object.freeze(['hp', 'fell', 'rc', 'hull', 'wreck', 'wc', 'down', 'grace']);
-/** WILD-REJOIN: the longest a `down` word says a fallen has left to lie, ms (net/wild/wildRef.js WILD_REF.riseMs, pinned
- *  equal - this leaf imports no referee). */
-export const WILD_DOWN_MS_MAX = 120_000;
-/** ZONE-GRACE: the most a `grace` word says is left of safe passage, ms (net/wild/wildRef.js WILD_GRACE.ms, pinned equal - this
- *  leaf reads no referee). */
-export const WILD_GRACE_MS_MAX = 60_000;
-/**
- * INT9: THE ZONE REFEREE'S WORD, PROJECTED - the relay's `{t:'wref', ...}`, or null:
- *   hp    { by, to, d, r, h }   a blow or a cast landed: who on whom, what it dealt, its kind, both fighters' vitality
- *   fell  { id, by, r }         a fighter fell - `by` its killer, `r` the remains' id the fall will be signed under
- *   rc    { r, rc }             the fall signed (net/wild/wildReceipt.js `f1`): to its fallen and its killer
- *   hull  { by, to, d, s, f, h } SHIP-PVP (net/sea/seaRef.js): a captain's shot landed on another's ship - per mille of her
- *                                bar and of her canvas, a fire set, her bar left
- *   wreck { id, by, r }         SHIP-PVP: a captain's ship wrecked - `by` her killer, `r` the wreck's id
- *   wc    { r, rc }             SHIP-PVP: the wreck signed (wildReceipt.js `n1`): to its captain and its killer
- *   down  { ms, r?, p? }        WILD-REJOIN (wildRef.js wildDownWord): to a fallen still down whose game closed on the
- *                                death screen and came back - how long it has left to lie, and, from the room that
- *                                refereed the fall, its remains' id and where the body lies
- *   grace { id, ms, n? }        ZONE-GRACE (wildRef.js WILD_GRACE): a fighter's safe passage - begun or carried in (`ms` left),
- *                                ended by its own blow (`ms` 0); `n` 1, to a striker alone: a blow it kept off
- */
-export function validWildRefOut(m) {
-  if (!m || typeof m !== 'object' || m.t !== 'wref' || typeof m.k !== 'string' || !WILD_REF_KINDS.includes(m.k)) return null;
-  const idOk = (x) => typeof x === 'string' && ID_RE.test(x);
-  if (m.k === 'hp') {
-    const h = duelRefVitals(m.h);
-    if (!idOk(m.by) || !idOk(m.to) || !intIn(m.d, 0, CARD_VITAL_MAX) || !intIn(m.r, 0, 2) || !h) return null;
-    return { k: 'hp', by: m.by, to: m.to, d: m.d, r: m.r, h };
-  }
-  if (m.k === 'hull') {
-    // SHIP-PVP: a captain's shot landed - per mille of her bar (`d`) and her canvas (`s`), a fire (`f`), her bar left (`h`)
-    if (!idOk(m.by) || !idOk(m.to) || !intIn(m.d, 0, 1000) || !intIn(m.s, 0, 1000) || (m.f !== 0 && m.f !== 1) || !intIn(m.h, 0, 1000)) return null;
-    return { k: 'hull', by: m.by, to: m.to, d: m.d, s: m.s, f: m.f, h: m.h };
-  }
-  if (m.k === 'down') return validWildDown(m);
-  if (m.k === 'grace') return idOk(m.id) && intIn(m.ms, 0, WILD_GRACE_MS_MAX) && (m.n === undefined || m.n === 1) ? { k: 'grace', id: m.id, ms: m.ms, ...(m.n === 1 ? { n: 1 } : {}) } : null;   // ZONE-GRACE
-  const r = typeof m.r === 'string' && WILD_ID_RE.test(m.r) ? m.r : null;
-  if (!r) return null;
-  if (m.k === 'fell') return idOk(m.id) && idOk(m.by) ? { k: 'fell', id: m.id, by: m.by, r } : null;
-  if (m.k === 'wreck') return idOk(m.id) && idOk(m.by) ? { k: 'wreck', id: m.id, by: m.by, r } : null;   // SHIP-PVP: her ship wrecked
-  if (m.k === 'wc') return typeof m.rc === 'string' && m.rc.length && m.rc.length <= DUEL_REF_RECEIPT_MAX ? { k: 'wc', r, rc: m.rc } : null;   // SHIP-PVP: the wreck signed (wildReceipt.js n1)
-  return typeof m.rc === 'string' && m.rc.length && m.rc.length <= DUEL_REF_RECEIPT_MAX ? { k: 'rc', r, rc: m.rc } : null;
-}
-/** WILD-REJOIN: a `down` word projected - its time left, and the body's remains' id and place together or neither. */
-function validWildDown(/** @type {any} */ m) {
-  if (!intIn(m.ms, 1, WILD_DOWN_MS_MAX)) return null;
-  if (m.r === undefined && m.p === undefined) return { k: 'down', ms: m.ms };
-  const r = typeof m.r === 'string' && WILD_ID_RE.test(m.r) ? m.r : null;
-  if (!r) return null;
-  if (m.p === undefined) return { k: 'down', ms: m.ms, r };
-  const p = wildPoint(m.p);
-  return p ? { k: 'down', ms: m.ms, r, p } : null;
-}
-/** Is this projected frame one the relay routes to a socket (true), or the room's own (false)? */
-export const wildDirected = (d) => !!d && WILD_DIRECTED.includes(d.k);
-/**
- * A room's word on its remains, PROJECTED (the relay's words to a client, `{t:'wild', k, ...}`): or null.
- *   ri    { r, p, nm, os, oid, ttl, off, items, end } - records `off`.. of a remains (a taken one null), `end` on its last
- *         chunk; `os` the owner's account as the relay verified it (null for a guest), `oid` their peer id then
- *   rm    { r, i, n }  - `n` of record `i` left it
- *   got   { r, i, it } - the record I took
- *   no    { r, i }     - a take I lost
- *   gone  { r }        - the remains is no more (emptied, or its time is up)
- */
-export function validWildOut(m) {
-  if (!m || typeof m !== 'object' || Array.isArray(m) || !WILD_OUT_KINDS.includes(m.k)) return null;
-  const r = typeof m.r === 'string' && WILD_ID_RE.test(m.r) ? m.r : null;
-  if (!r) return null;
-  switch (m.k) {
-    case 'ri': {
-      const p = wildPoint(m.p);
-      if (!p || !intIn(m.ttl, 0, WILD_REMAINS_MS) || !intIn(m.off, 0, WILD_REMAINS_ITEMS_MAX - 1) || (m.end !== 0 && m.end !== 1)) return null;
-      if (!Array.isArray(m.items) || m.items.length > WILD_ITEMS_MAX || m.off + m.items.length > WILD_REMAINS_ITEMS_MAX) return null;
-      for (const it of m.items) if (it !== null && (!it || typeof it !== 'object' || Array.isArray(it))) return null;
-      const os = typeof m.os === 'string' && m.os.length <= 64 ? m.os : null;
-      const oid = typeof m.oid === 'string' && ID_RE.test(m.oid) ? m.oid : null;
-      // INT9: and the killer whose worn piece is one of its records (`wk`, `wi`) - theirs alone to take
-      const killer = typeof m.wk === 'string' && m.wk.length <= 64 && intIn(m.wi, 0, WILD_REMAINS_ITEMS_MAX - 1) ? { wk: m.wk, wi: m.wi } : {};
-      return { k: 'ri', r, p, nm: typeof m.nm === 'string' ? sanitizeName(m.nm) : '', os, oid, ttl: m.ttl, off: m.off, items: m.items, end: m.end, ...killer };
-    }
-    case 'rm': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && intIn(m.n, 1, WILD_STACK_MAX) ? { k: 'rm', r, i: m.i, n: m.n } : null;
-    case 'got': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && m.it && typeof m.it === 'object' && !Array.isArray(m.it) ? { k: 'got', r, i: m.i, it: m.it } : null;
-    case 'no': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) ? { k: 'no', r, i: m.i } : null;
-    case 'cr': return intIn(m.i, 0, WILD_REMAINS_ITEMS_MAX - 1) && typeof m.cr === 'string' && m.cr.length > 0 && m.cr.length <= WILD_COLLECT_MAX ? { k: 'cr', r, i: m.i, cr: m.cr } : null;   // MAC: a killer's collect
-    default: return { k: 'gone', r };
-  }
+/** The social room's word: `st` (the sailings whose flagship is down, and the relay's clock; the answer to `hi`) or `fd`
+ *  (the sailings down, said to everyone when a flagship is newly down). The clean word, or null. */
+export function validSeaOut(m) {
+  if (!m || typeof m !== 'object' || m.t !== 'sea') return null;
+  if (m.k === 'st') return { k: 'st', fleets: fleetList(m.fleets), now: Number.isFinite(m.now) ? m.now : null };
+  if (m.k === 'fd') return { k: 'fd', fleets: fleetList(m.fleets) };
+  return null;
 }
 
 // ═══ WB3: THE GATE'S BOSS ROOM ════════════════════════════════════════════════════════════════════════════════════
@@ -4862,10 +4536,9 @@ export const gateLaneWire = (d) => Math.floor(d / GATE_LANE_SPAN_WIRE);
  *  - places registered past the Bay (systems/gate/theatreGateSite.js) - and the relay holds no picture of any (its
  *  ground is the clients'): a lane the clock alone opened was a court no honest client could find, its receipts any two
  *  accounts' for the asking. So the lanes are named here, the law both ends read. WW-GATES-EVERYWHERE: the Bay's and
- *  every province's past it, 1 to 8 - TESA's places stand in each (WW7-1), and the freeware's scan finds a gate's ground
- *  in all eight (test/world/worldWide/ww_gates_everywhere.test.js); Cyrodiil's (9) never - the open zone stands no gate
- *  (theatreGateSite.js). */
-export const GATE_LANES_OPEN = Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+ *  every province's past it, 1 to 9 - TESA's places stand in each (WW7-1), and the freeware's scan finds a gate's ground
+ *  in each (test/world/worldWide/ww_gates_everywhere.test.js). */
+export const GATE_LANES_OPEN = Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 /** AUDIT WW F2: does lane `lane` stand. */
 export const gateLaneOpen = (lane) => GATE_LANES_OPEN.includes(lane);
 /** AUDIT WW F3: a gate's number as a client may name one - a safe integer on a lane that stands (the hub keeps its
@@ -4883,11 +4556,10 @@ export function gateLanePixelOk(lane, px, py) {
 }
 /** WW5: THE THEATRES A SITE-BOUND WORLD EVENT STANDS IN - a Starfall coven night and an Abyss
  *  Dungeon's slot each, a LANE a theatre (world/worldWide/worldGrid.js - the Iliac Bay's 0, each province past it its
- *  own). The Bay's lane always; the eight provinces' (1..8), each holding ground for a site since TESA's places are the
- *  registry's (WW7-1 - the gates' scans found sites in all eight, AUDIT NO SYSTEM LEFT BEHIND A2); Cyrodiil's (9) never:
- *  the open zone stands no site-bound world event (systems/gate/theatreGateSite.js, systems/wild/wildZone.js). The law
+ *  own). The Bay's lane always; the nine provinces' (1..9), each holding ground for a site since TESA's places are the
+ *  registry's (WW7-1 - the gates' scans found sites in each, AUDIT NO SYSTEM LEFT BEHIND A2). The law
  *  both ends read - the relay holds no picture, so the lanes are named here. */
-export const SITE_EVENT_LANES = Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+export const SITE_EVENT_LANES = Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 /** WW5: does lane `lane` stand a star night and a Hollow. */
 export const siteEventLaneOpen = (lane) => SITE_EVENT_LANES.includes(lane);
 /** WW5: the map pixel a site-bound event on lane `lane` names on the wire - the Bay's own map on the Bay's lane (0..999,
@@ -5964,10 +5636,10 @@ export const SD_REGION_COUNT = CHAT_REGION_COUNT;
 /** The highest slot a record may carry - nine digits, the room key's bound. */
 export const SD_SLOT_MAX = 999_999_999;
 /** WW5 (WW5): A HOLLOW'S SLOT IN EVERY THEATRE - each lane that stands (SITE_EVENT_LANES: the
- *  Bay's, the eight provinces'; Cyrodiil's open zone none) keeps its own director, one Hollow at a time, and numbers its
+ *  Bay's, the nine provinces') keeps its own director, one Hollow at a time, and numbers its
  *  slots in its own span: lane `t`'s are t * SD_LANE_SPAN + 1, + 2 ... So the Bay's are the 1, 2, 3 they always were -
  *  every realm, receipt, spoils key and sd_kills row keeps its number - and every slot is still one Hollow's whole
- *  identity, its room `sd:<s>` nine digits at most (lane 8's ten million Hollows end at 89,999,999). */
+ *  identity, its room `sd:<s>` nine digits at most (lane 9's ten million Hollows end at 99,999,999). */
 export const SD_LANE_SPAN = 10_000_000;
 /** WW5: the lane slot `s` is on. */
 export const sdLaneWire = (s) => Math.floor(s / SD_LANE_SPAN);

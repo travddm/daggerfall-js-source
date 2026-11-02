@@ -174,19 +174,6 @@ test('BAY-LEFT-MAPS C2 AN OLDER CLIENT: a line naming a point it cannot place is
   fresh();
 });
 
-test('BAY-LEFT-MAPS C2 WILD-WAYPOINT IN CYRODIIL: a death in the open zone by the Imperial City and by Bruma plants the remains\' followed flag (mutants: the Bay\'s bound back)', async () => {
-  fresh();
-  const W = await import('../../src/systems/wild/wildRemainsWaypoint.js');
-  const until = Date.now() + 3600e3;
-  const ic = W.markRemains({ mx: 2069.5, my: 658.5, until });
-  assert.ok(ic && waypointById(ic), 'by the Imperial City');
-  assert.deepEqual([waypointById(ic).mx, waypointById(ic).my, waypointById(ic).name], [2069.5, 658.5, W.WILD_WP_NAME]);
-  const bruma = W.markRemains({ mx: 2030.5, my: 560.5, until });
-  assert.ok(bruma && waypointById(bruma) && !waypointById(ic), 'by Bruma - the last flag gone first');
-  W.clearRemainsMark();
-  fresh();
-});
-
 test('BAY-LEFT-MAPS C2 THE HELD MAP\'S RIGHT CLICK: the add menu opens on a point past the Bay while the continent is shown, and on the Bay\'s sheet alone while it is not; "Travel here" is offered on a flag on the Bay and never on one past it (TESA-NO-FAST) (mutants: the menu held to the Bay; Travel here past the Bay)', async () => {
   _resetForTests();
   setTamrielFit(null);

@@ -43,7 +43,6 @@ import { hurtPlayer, setDeathListener } from '../../../src/characters/playerEnti
 import { reviveForPlay } from '../../../src/systems/deathRespawn.js';
 import { stateDeathLoss, statedDeathLoss } from '../../../src/systems/deathPenalty.js';
 import { DeathScreen, ONLINE_RESPAWN_SECONDS } from '../../../src/ui/deathScreen.js';
-import { WILD_DEATH_HOLD_S, setWildDeath } from '../../../src/systems/wild/wildZone.js';
 import { rezSnapshot, rezFor, resurrectionSpell, RESURRECT_TEXT, RESURRECT_HEALTH_PCT, RESURRECT_HOLD_MS, RESURRECT_TYPE, RESURRECT_SUBTYPE } from '../../../src/systems/resurrect.js';
 import { buildCustomSpell } from '../../../src/systems/spell/spellMaker.js';
 import { validPartyPose, validPartyFrame } from '../../../src/net/wire.js';
@@ -198,7 +197,7 @@ async function party({ model = MODELS.bloodline, online = true, ear = true } = {
     _respawning: false, _rezSeen: null, _deadMark: null, _partyComposedAt: 0, _deathWasOnline: true,
     social: { acct: 'acct-ysolde', others: () => r.ysoldeHears ?? [] }, modes: { sdRealmSlot: () => null, clearDeath() {} },
     legacyHost: r.host, madeRuleHere, rezSnapshot, rezFor, reviveForPlay, playerEntity: r.e, RESURRECT_HEALTH_PCT, RESURRECT_TEXT, DeathScreen,
-    statedDeathLoss, stateDeathLoss, townTalk: r.townTalk, wildGhostEnd: () => {}, wildDeathKill: () => false, forgetLastSlew: () => {}, player: { stopAutorun() {} },
+    statedDeathLoss, stateDeathLoss, townTalk: r.townTalk, forgetLastSlew: () => {}, player: { stopAutorun() {} },
     hourRezOpen: () => true, _sdFallen: { rise() {} },   // SD-REZ (EVENT-RULES): no Hour here - a Resurrect is always open, and a rise lets no slot go
   };
   r.ysolde = v;
@@ -282,8 +281,8 @@ test('REZ-BLOODLINE AUDIT R1 the realm holds the death, never the page: died at 
   assert.equal(r.host.raisable(), true);
   assert.equal(r.host.tick(), null, 'no Succession under the death screen');
   assert.equal(r.host.tick(), null);
-  // late in the longest stand an online death screen makes (the open zone's two minutes)
-  later(WILD_DEATH_HOLD_S * 1000 - 1000);
+  // late in the stand an online death screen makes
+  later(ONLINE_RESPAWN_SECONDS * 1000 - 1000);
   assert.equal(r.toBran().p.fg, undefined, 'her pose says nothing of a death for good');
   assert.equal(r.resurrect(), false, 'the call reaches her frame: the realm is asked first - down until it answers');
   assert.ok(r.branSaid.includes(RESURRECT_TEXT.cast('Ysolde')), 'Bran calls her back');
@@ -755,8 +754,7 @@ test('REZ-BLOODLINE AUDIT R2 the online death screen counts the wall clock, as t
     const r = await party();
     r.die();
     await settle();
-    setWildDeath({ killer: 'a wolf', dropped: 0 });
-    try {
+    {
       let reset = false;
       const screen = new DeathScreen({ eyeHeight: 1.6, capsuleHeight: 1.8, online: true, entity: r.e, onReset: () => { reset = true; } });
       const start = Date.now();
@@ -769,22 +767,21 @@ test('REZ-BLOODLINE AUDIT R2 the online death screen counts the wall clock, as t
         legacyT -= dt;
         if (legacyT <= 0) { legacyT = 1; r.host.tick(); }   // legacyStep: once a second of the same dt
         assert.equal(r.host.raisable(), true, `${fps} fps: raisable while the screen stands (${((Date.now() - start) / 1000).toFixed(1)} s, "RISING IN ${screen.respawnIn}")`);
-        if (f === Math.round(fps * 60)) said = screen.respawnIn;
+        if (f === Math.round(fps * 30)) said = screen.respawnIn;
       }
       const wall = (Date.now() - start) / 1000;
-      assert.ok(reset && wall <= WILD_DEATH_HOLD_S + 1, `${fps} fps: the screen goes at ${wall.toFixed(1)} s on the wall`);
+      assert.ok(reset && wall <= ONLINE_RESPAWN_SECONDS + 1, `${fps} fps: the screen goes at ${wall.toFixed(1)} s on the wall`);
       assert.ok(wall * 1000 < REZ_HOLD_MS, 'inside the window');
-      assert.equal(said, WILD_DEATH_HOLD_S - 60, 'a minute in, it says a minute left');
-    } finally {
-      setWildDeath(null);
+      assert.equal(said, ONLINE_RESPAWN_SECONDS - 30, 'half a minute in, it says half a minute left');
     }
   }
   // a frame's own count still leads where its dt outruns the wall (a host stepping the screen by hand)
   const s = new DeathScreen({ eyeHeight: 1.6, capsuleHeight: 1.8, online: true, entity: ent(), wall: () => 0 });
   s.tick(ONLINE_RESPAWN_SECONDS / 2);
   assert.equal(s.respawnIn, ONLINE_RESPAWN_SECONDS / 2);
-  // one window at both doors: the longest online death screen and half a minute
-  assert.equal(REZ_HOLD_S, Math.max(ONLINE_RESPAWN_SECONDS, WILD_DEATH_HOLD_S) + 30);
+  // one window at both doors: at least the online death screen and half a minute (150 s since the open zone's two-minute hold set it)
+  assert.equal(REZ_HOLD_S, 150);
+  assert.ok(REZ_HOLD_S >= ONLINE_RESPAWN_SECONDS + 30);
   assert.equal(REZ_HOLD_MS, REZ_HOLD_S * 1000);
   assert.ok(REZ_SETTLE_MAX >= 1);
   const raw = d1()._raw;

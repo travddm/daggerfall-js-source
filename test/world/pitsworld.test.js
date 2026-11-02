@@ -3,24 +3,23 @@
 // dungeon was named by its pixel's id's low twenty bits (world/oceanHoles.js GetAbyssMapId), the Bay's 1000 x 500 alone
 // apart: past it a pit a thousand pixels from a Bay pit would have shared its abyss. TAMRIEL-DEEP carves the continent's
 // sea now, so the key was the only thing in the way. The owner's call taken ("Every single thing here needs to be
-// addressed. No exceptions.", 2026-10-26): the abyss past the Bay in a world id lane; and the open PvP zone stands none.
+// addressed. No exceptions.", 2026-10-26): the abyss past the Bay in a world id lane.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { getAbyssMapId, isAbyssMapId, pitPixelOk, isPitPixel } from '../../src/world/oceanHoles.js';
-import { createOceanHoles, openZoneAtNow } from '../../src/scenes/oceanHolesHost.js';
+import { createOceanHoles } from '../../src/scenes/oceanHolesHost.js';
 import { worldLaneMapId, worldLanePixel, ABYSS_WORLD_LANE, SPAWN_WORLD_LANE } from '../../src/world/worldWide/worldLanes.js';
 import { spawnedMapId, WORLD_SALT } from '../../src/world/spawnedDungeons.js';
-import { spawnedHallMapId, isWorldRoom, isHallMapId } from '../../src/net/wire.js';
+import { isWorldRoom } from '../../src/net/wire.js';
 import { discoveryKeyOf } from '../../src/systems/discovery.js';
 import { countryPlaceId } from '../../src/world/tamrielCountry.js';
 import { lairPlaceId } from '../../src/world/tamrielDungeons.js';
 import { capitalPlaceId } from '../../src/world/tamrielCapitals.js';
 import { arenaPlaceId } from '../../src/world/arenaLocations.js';
 import { hasDock, nearDock } from '../../src/systems/immersiveTravel.js';
-import { hostText } from '../hostText.mjs';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const SIZE = 819.2;
@@ -49,11 +48,9 @@ test('PITS-WORLD the abyss\'s id (world/oceanHoles.js getAbyssMapId): the Bay\'s
 test('PITS-WORLD isAbyssMapId: the Bay\'s abyss and the world\'s abyss lane alone - never a zone hall\'s (whose id from 0xf0000000 opened the Ocean Holes\' page), an Abyss Dungeon\'s, a spawn\'s (the Bay\'s or the world\'s), a MAPS row\'s, a lair\'s, a capital\'s or Arena\'s (mutants: the Bay\'s bound, the lane read back)', () => {
   for (const [x, y] of [[0, 0], [999, 499], [392, 338], [2441, 1500], [-1, 250], [4000, -5000]]) assert.equal(isAbyssMapId(getAbyssMapId(x, y)), true, `${x},${y}`);
   const others = [0, 1, 0x7283288c, (0x600 << 20) | 500000, ((0x600 << 20) | 0xfffff) >>> 0 & ~0x80000, spawnedMapId(1, 392, 338), spawnedMapId(2049, 0, 0), spawnedMapId(4095, 999, 499),
-    spawnedMapId(WORLD_SALT, 2441, 1500), worldLaneMapId(SPAWN_WORLD_LANE, -8191, -8191), spawnedHallMapId(2160, 720), spawnedHallMapId(-8192, -8192),
+    spawnedMapId(WORLD_SALT, 2441, 1500), worldLaneMapId(SPAWN_WORLD_LANE, -8191, -8191), 0xf0000000 + 123, 0xffffffff - 1,
     lairPlaceId(5), countryPlaceId(1234), capitalPlaceId(3), arenaPlaceId({ provinceIndex: 2, id: 7 }), 0x80000000, 0xffffffff, -1, 2 ** 32, 0.5, null, 'x'];
   for (const id of others) assert.equal(isAbyssMapId(id), false, String(id));
-  assert.equal(isHallMapId(spawnedHallMapId(2160, 720)), true);
-  assert.ok(spawnedHallMapId(2160, 720) >= 0x60000000, 'a hall\'s id was one the old readers took for an abyss');
 });
 
 test('PITS-WORLD the hold (pitPixelOk): IsValidMapPixel\'s, the Bay\'s map, now the world\'s grid - where an abyss has an id (mutants: the hold the Bay\'s)', () => {
@@ -62,7 +59,7 @@ test('PITS-WORLD the hold (pitPixelOk): IsValidMapPixel\'s, the Bay\'s map, now 
 });
 
 /** The pit host (scenes/oceanHolesHost.js) over a fake Iliac Puddle No More whose floor stands deep at every pixel. */
-function rig({ openZoneAt, bake = null } = {}) {
+function rig({ bake = null } = {}) {
   const built = new Map(), pits = [], floors = new Map(), log = [];
   const deepWaters = {
     bake: bake ?? { loaded: true, mapPixelHasWaterCells: () => true, mapPixelHasLandCells: () => false, isCarvedWater: () => true, sampleEdgeDistanceMeters: () => 1000 },
@@ -75,7 +72,7 @@ function rig({ openZoneAt, bake = null } = {}) {
     deepWaters, built, pixelTranslation: (px, py) => [px * SIZE, 0, -py * SIZE], hasLocation: () => false, worldClimateOf: () => 223,
     pits: { create: (e, pit) => { pits.push([e.px, e.py, pit]); return {}; }, destroy: () => {} },
     settings: () => ({ surfaceHoleRadius: 20, seafloorHoleScale: 1, pitSpawnRate: 0.5, miasmaParticleCount: 72, miasmaHeight: 300, dungeonVisualIntensity: 0.5, dungeonVisualDarkness: 0.5 }),
-    warn: () => {}, ...(openZoneAt ? { openZoneAt } : {}),
+    warn: () => {},
   });
   const stand = (px, py, floorY = OCEAN_LOCAL_Y - 150) => {
     const e = { px, py };
@@ -90,32 +87,15 @@ function rig({ openZoneAt, bake = null } = {}) {
 }
 const pitAt = (x0, y) => { for (let x = x0; ; x++) if (isPitPixel(x, y, 0.5)) return [x, y]; };
 
-test('PITS-WORLD the host: a pixel the hash picks past the Bay - the continent\'s sea and the Eltheric Ocean\'s - is cut and its pit stood as the Bay\'s; in the open zone none (mutants: the zone\'s gate gone)', () => {
+test('PITS-WORLD the host: a pixel the hash picks past the Bay - the continent\'s sea and the Eltheric Ocean\'s - is cut and its pit stood as the Bay\'s', () => {
   const r = rig();
   for (const at of [pitAt(2441, 1500), pitAt(4000, -5000), pitAt(-500, 250), pitAt(300, 200)]) assert.equal(r.stand(...at), 'built', `${at}`);
   assert.equal(r.pits.length, 4);
-  const zone = new Set();
-  const z = rig({ openZoneAt: (x, y) => zone.has(`${x},${y}`) });
-  const [lx, ly] = pitAt(2160, 720);
-  zone.add(`${lx},${ly}`);
-  assert.equal(z.stand(lx, ly), 'rejected:open-zone', 'Lake Rumare\'s water is the zone\'s');
-  assert.deepEqual([z.pits.length, z.log.length], [0, 0], 'no pit, no cut');
-  assert.equal(z.stand(...pitAt(2441, 1500)), 'built', 'outside it, the pit');
-});
-
-test('PITS-WORLD the open zone\'s ask (scenes/oceanHolesHost.js openZoneAtNow): offline there is no zone, whatever the shape says; online none before the trace lands (cyrodiilMask\'s own law) (mutants: the online gate)', () => {
-  const was = globalThis.location;
-  try {
-    globalThis.location = /** @type {any} */ ({ search: '' });
-    assert.equal(openZoneAtNow(2160, 720), false, 'offline: no zone');
-    globalThis.location = /** @type {any} */ ({ search: '?online=1' });
-    assert.equal(openZoneAtNow(2160, 720), false, 'online, no trace: no zone');
-  } finally { globalThis.location = was; }
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD'].every((n) => existsSync(join(ARENA2, n)));
-test('PITS-WORLD with ARENA2: over the player\'s own picture and the continent\'s carved sea (TAMRIEL-DEEP\'s bake), the pits past the Bay stand where the bake verifies the deep - the Topal Bay\'s open water; online the zone\'s water (Lake Rumare, the Niben) stands none', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
+test('PITS-WORLD with ARENA2: over the player\'s own picture and the continent\'s carved sea (TAMRIEL-DEEP\'s bake), the pits past the Bay stand where the bake verifies the deep - the Topal Bay\'s open water', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
   globalThis.atob ??= (s) => Buffer.from(s, 'base64').toString('binary');
   const bytes = (n) => new Uint8Array(readFileSync(join(/** @type {string} */ (ARENA2), n)));
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
@@ -142,12 +122,5 @@ test('PITS-WORLD with ARENA2: over the player\'s own picture and the continent\'
     }
     assert.ok(out.built >= 5, `pits stand in the Topal Bay (${JSON.stringify(out)})`);
     assert.equal(out.rejected['rejected:off-the-map'], undefined, 'none held off the map');
-    // online, the zone's own water stands none (systems/wild/cyrodiilZone.js: the province and the water it encloses)
-    globalThis.location = /** @type {any} */ ({ search: '?online=1' });
-    const lake = [];
-    for (let y = 700; y < 740 && lake.length < 3; y++) for (let x = 2140; x < 2180 && lake.length < 3; x++) if (isPitPixel(x, y, 0.5) && openZoneAtNow(x, y)) lake.push([x, y]);
-    assert.ok(lake.length > 0, 'pit pixels in the zone\'s water about the Imperial City');
-    for (const [x, y] of lake) assert.equal(real.stand(x, y), 'rejected:open-zone', `${x},${y}`);
-    assert.equal(openZoneAtNow(2441, 1500), false, 'the Topal Bay is no zone\'s');
   } finally { globalThis.location = was; setTamrielTrace(null); setTamrielFit(null); }
 });

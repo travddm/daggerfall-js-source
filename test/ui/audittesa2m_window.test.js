@@ -1,33 +1,23 @@
 // AUDIT TESA II, lane M - THE HELD MAP'S WINDOW PAST THE BAY, pinned where the audit found it wrong
 // (ui/heldMap.js; TESA15, MAP-LINES):
 //   M2  the window's "paint it again" (the zones' borders landing, the web face landing) inks the sheet's kept parts too;
-//   M4  the zone's halls are inked over its fog;
-//   M5  offline the zone is drawn and none of its laws is said - its key, its press, its legend; Cyrodiil's travel law;
-//   M6  on the zone map each of Cyrodiil's cities is named once, and Hide place names hides it;
 //   M8  bare land past the Bay answers with its ore card, off the host's own maps (ARENA2: the producer's shape);
 //   M9  a region landing repaints the window and strokes the sheet's ink again nowhere;
 //   M11 the kept parts made only while the land past the Bay is in the view; the road ink let go on close;
-//   K3  ZOOM-FAST's settle a law of its own, and the frame after a zoom settles paints the tiles it owed;
-//   K5  ZONE-NAMES' kinds: a capital and a city-state the city, a town the village.
-// A held map on a document whose canvases carry recording 2D contexts, on the authored land and Cyrodiil's mask.
+//   K3  ZOOM-FAST's settle a law of its own, and the frame after a zoom settles paints the tiles it owed.
+// A held map on a document whose canvases carry recording 2D contexts, on the authored land.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { HeldMapWindow, createZoomSettle, ZOOM_SETTLE_MS } from '../../src/ui/heldMap.js';
-import { CLIMATES, LOCATION_TYPES, MapsFile } from '../../src/formats/mapsFile.js';
-import { setTamrielFit, BAY_W } from '../../src/world/tamriel/tamrielFrame.js';
+import { CLIMATES, LOCATION_TYPES } from '../../src/formats/mapsFile.js';
+import { setTamrielFit } from '../../src/world/tamriel/tamrielFrame.js';
 import { setTamrielTrace } from '../../src/world/tamriel/tamrielLand.js';
-import { cyrodiilMask } from '../../src/systems/wild/cyrodiilZone.js';
-import { wildInside, WILD_TEXT } from '../../src/systems/wild/wildZone.js';
-import { tamrielInkFor, roadKeptCounts, arenaRoadInkAt } from '../../src/ui/tamrielInk.js';
-import { ZONE_MAP_TEXT, ZONE_RULES, zoneRules } from '../../src/ui/wild/wildZoneMap.js';
-import { toPaper, HALL_INK } from '../../src/ui/ink/inkMap.js';
+import { roadKeptCounts, arenaRoadInkAt } from '../../src/ui/tamrielInk.js';
 import { setArenaRoads, beyondKey } from '../../src/world/arenaRoads.js';
 import { addPastBayPlaces, resetPastBayPlaces } from '../../src/world/pastBayPlaces.js';
 import { DIR } from '../../src/world/road/roadNetwork.js';
-import { oreMapTip } from '../../src/ui/oreMapTip.js';
-import { hostText } from '../hostText.mjs';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -67,19 +57,18 @@ function fakeDocument() {
   };
 }
 const texts = (n, out = []) => { if (!n) return out; if (n.textContent) out.push(n.textContent); if (n.title) out.push(n.title); for (const c of n.children ?? []) if (typeof c === 'object') texts(c, out); return out; };
-/** A held map on the authored land with Cyrodiil's zone; `extra` the host's deps. Ticked up, its ink canvas recording. */
+/** A held map on the authored land; `extra` the host's deps. Ticked up, its ink canvas recording. */
 function openMap(extra = {}) {
-  const mask = cyrodiilMask();
   const win = new HeldMapWindow({
     getPlayerPixel: () => ({ x: 500, y: 250 }), getClimateIndex: () => CLIMATES.Woodlands,
     woods: { heightMapBuffer: new Uint8Array(500000).fill(10) }, mapSize: { width: 1000, height: 500 },
     gold: () => 0, goldPieces: () => 0, hasHorse: false, hasCart: false, hasShip: false, diseaseCount: () => 0, poisonCount: () => 0,
-    wildMask: () => mask, ...extra,
+    ...extra,
   });
   for (let i = 0; i < 20; i++) win.tick(0.05);
   win._chrome.ink.id = 'ink';
   win._phase = 'map';
-  return { win, mask };
+  return { win };
 }
 /** The window painted again, the zoom settled first (ZOOM_SETTLE_MS) - the calls of that paint. */
 async function paintSettled(win, bust = true) {
@@ -114,54 +103,6 @@ test('AUDIT TESA II M2: the web face landing inks the sheet\'s kept parts again,
   log = []; win._paint();
   assert.ok(log.some(([c, fn]) => c === under && fn === 'fillText') || log.some(([c, fn]) => c === over && fn === 'fillText'), 'the face landed: the names lettered again');
   assert.ok(log.filter(([c]) => c === under).length > 0, 'the under part too');
-}));
-
-test('AUDIT TESA II M4: online, a zone hall\'s door is inked over the zone\'s fog - beside it, in the sheet\'s over part, never in the marks\' bake under it (mutants: the halls left in the bake; the halls under the fog)', withMap(async () => {
-  const mask = cyrodiilMask();
-  let hall = null;
-  for (let y = 0; y < 2000 && !hall; y += 7) for (let x = 1000; x < 3500 && !hall; x += 7) if (wildInside(mask, x + 0.5, y + 0.5)) hall = { x, y };
-  const summary = { id: 9e9, pixel: hall, mapID: 9e9, mapId: 9e9, regionIndex: 62, mapIndex: -1, locationType: LOCATION_TYPES.DungeonKeep, dungeonType: 0, wildHall: { ring: 2, key: 'h1', name: 'Elite hall', crows: false } };
-  const { win } = openMap({ wildHallSummaries: () => [summary], wildDungeons: () => [{ key: 'h1', x: hall.x, y: hall.y }] });
-  win._setView({ ox: hall.x - 150, oy: hall.y - 90, scale: 4 });   // the hall in the middle of the view
-  const calls = await paintSettled(win);
-  const over = win._subLayers.over.id, bake = win._marksLayer?.canvas?.id;
-  // the hall's door is the one glyph in HALL_INK (inkMap.js paintInkMarks)
-  const at = (c) => calls.map((e, i) => [e, i]).filter(([[id, fn, , , , fill, stroke]]) => id === c && (fn === 'fill' || fn === 'stroke') && (fill === HALL_INK || stroke === HALL_INK));
-  const fog = calls.findIndex(([c, fn, a]) => c === over && fn === 'drawImage' && a.length === 5);
-  assert.ok(fog >= 0, 'the fog laid on the over part');
-  assert.ok(at(over).length > 0 && at(over).every(([, i]) => i > fog), 'the hall\'s door after it');
-  assert.ok(bake, 'the marks baked');
-  assert.equal(at(bake).length, 0, 'and none in the marks\' bake');
-  assert.ok(win._model.marks.some((m) => m.kind === 'hall'), 'the hover and the press keep it among the marks');
-}));
-
-test('AUDIT TESA II M6 and K5: on the zone map each of Cyrodiil\'s cities is named once - the zone map\'s names, with their kinds (a capital and a city-state the city, a town the hamlet, a village the village: REGION-LINES\' one glyph a kind across Tamriel) - and Hide place names hides them all (mutants: the continent\'s names kept; the kinds flattened)', withMap(async () => {
-  const { win } = openMap();
-  assert.ok(win._openZoneMap());
-  const names = (calls) => calls.filter(([c, fn]) => c === win._subLayers.over.id && fn === 'fillText').map(([, , a]) => a[0]);
-  const inZone = tamrielInkFor(win._model).cities.filter((c) => wildInside(cyrodiilMask(), c.x, c.y)).map((c) => c.name);
-  assert.ok(inZone.length > 0);
-  for (const zoom of [1, 3]) {
-    win._setView({ ...win._view, scale: win._view.scale * zoom });
-    const got = names(await paintSettled(win));
-    for (const n of inZone) assert.ok(got.filter((g) => g === n).length <= 1, `${n} named once at x${zoom}`);
-  }
-  win._zoneNames = false;
-  const hid = names(await paintSettled(win));
-  assert.ok(!inZone.some((n) => hid.includes(n)), `hidden: ${hid.join(', ')}`);
-  // K5: the kinds, over a model with a capital, a city-state and a town in the zone
-  const fake = { cities: [{ name: 'Cap', capital: true, kind: 'city-state', x: 0, y: 0 }, { name: 'Sta', capital: false, kind: 'city-state', x: 0, y: 0 }, { name: 'Tow', capital: false, kind: 'town', x: 0, y: 0 }, { name: 'Vil', capital: false, kind: 'village', x: 0, y: 0 }] };
-  const p = tamrielInkFor(win._model).cities.find((c) => wildInside(cyrodiilMask(), c.x, c.y));
-  for (const c of fake.cities) { c.x = p.x; c.y = p.y; }
-  const real = tamrielInkFor(win._model);
-  const saved = real.cities;
-  real.cities = fake.cities;
-  try {
-    const kinds = Object.fromEntries(win._zonePlaces().filter((z) => fake.cities.some((c) => c.name === z.name)).map((z) => [z.name, z.kind]));
-    assert.deepEqual(kinds, { Cap: 'city', Sta: 'city', Tow: 'hamlet', Vil: 'village' });
-    win.filters.towns = true;
-    assert.equal(win._zonePlaces().filter((z) => fake.cities.some((c) => c.name === z.name)).length, 0, 'AUDIT TESA II M7: under the map\'s filters');
-  } finally { real.cities = saved; win.filters.towns = false; }
 }));
 
 test('AUDIT TESA II M9: a region landing far off the view repaints the window - its tiles compare their words - and strokes the sheet\'s ink, its parts and the marks\' bake again nowhere (mutant: the versions back in the static key)', withMap(async () => {

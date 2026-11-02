@@ -20,7 +20,7 @@ import { rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonW
 import { peerHanded, neverPeerHanded, notCarried } from '../../src/systems/peerWord.js';
 import { addItem, stacksWith, isGoldPieces, addGoldPieces } from '../../src/systems/inventory.js';
 import { isEquipped, unequipItem } from '../../src/systems/equip.js';
-import { spawnEnemyLoot, wildLootAfter, rollRoomBonus } from '../../src/scenes/hostCombat.js';
+import { spawnEnemyLoot, rollRoomBonus } from '../../src/scenes/hostCombat.js';
 import { raiseEnemyDeath, corpseTextureOf } from '../../src/scenes/corpseMarker.js';
 import { rollCorpseKit, capFoeLoot } from '../../src/systems/foeLootCap.js';
 import { makeEnemyEntity } from '../../src/characters/enemy/enemyEntity.js';
@@ -40,7 +40,6 @@ import { installSurvivalLoot } from '../../src/systems/survival/loot.js';
 import { grantEliteLoot, promoteEliteFoe } from '../../src/systems/eliteFoes.js';
 import { markDungeonChampions, applyChampion, championTraitFor, CHAMPION_MIN_LEVEL } from '../../src/systems/champions.js';   // CHAMP-BASE: the layout's champions, as the build marks and stands them
 import { ClassFile } from '../../src/formats/classFile.js';   // CHAMP-BASE: a class foe's career, through the real reader
-import { wildPileMore } from '../../src/systems/wild/wildZone.js';
 import { seaPileMore } from '../../src/systems/sea/seaSpoils.js';
 import { markRoomCarried } from '../../src/systems/loot/roomCarriedList.js';
 import { quickLootTake, foldQuickLoot, resetQuickLoot, quickLootWheel } from '../../src/systems/quickLoot.js';
@@ -107,8 +106,8 @@ const BLOCK = PARTS ? `${PARTS.lets}${PARTS.fn}\n  ${PARTS.ctor}\n` : '';
  *  are the mount's, never the body's own destructured copies of them), `tail` run in it with the block's internal
  *  members (rollRoomBase) in reach - for a mount with none of the host's doors beside it. */
 const blockBody = (tail) => (PARTS ? `${PARTS.lets}const host = ${PARTS.handles};\n  {\n  ${PARTS.body}\n  ${tail}\n  }\n` : '');
-/** The build's pile loop, its list and its open zone's ring - the two lines the build mints a pile's list with. */
-const PILE_BUILD = (() => { const m = /\n(\s*const items = [^\n]*rollPileItems\(\);[^\n]*\n\s*if \(_wildDungeon[^\n]*)\n/.exec(SRC); assert.ok(m, 'the build mints a pile\'s list'); return m[1]; })();
+/** The build's pile loop, its list and the deep's last roll - the two lines the build mints a pile's list with. */
+const PILE_BUILD = (() => { const m = /\n(\s*const items = [^\n]*rollPileItems\(\);[^\n]*\n\s*if \(!onlineRoom\(\)\) seaPileMore[^\n]*)\n/.exec(SRC); assert.ok(m, 'the build mints a pile\'s list'); return m[1]; })();
 const scoped = (state) => new Proxy(state, {
   has: (t, k) => k !== '__s',
   get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : globalThis[k])),
@@ -177,15 +176,15 @@ function peer(net, { id, level, luck, renown, seed, host, foraging, partners, ch
     foes: [], _layoutFoes: FOES, _sharedById: new Map(), lootPiles: [], searchables: [], _locationKey: `dungeon:${location}`,
     _lootSeen: new Set(), _lootUnreadable: new Set(), _lootAt: new Map(), _lootOpenKey: null, _lootTooBig: new Set(),
     _authority: host, playerEntity: player, dfLocation: { mapTableData: { dungeonType: DUNGEON_TYPE } }, lootKey: DUNGEON_LOOT_KEYS[DUNGEON_TYPE],
-    _superTier: false, _wildDungeon: false, _wildRing: null, _deepCleared: new Set(), _deepFoeCleared: new Set(),
+    _superTier: false, _deepCleared: new Set(), _deepFoeCleared: new Set(),
     SUPER_LOOT_DROP_MULT: 1.5, ELITE_LOOT_DROP_MULT: 1.2, SUPER_LOOT_QUALITY_MULT: 1.5, ELITE_LOOT_QUALITY_MULT: 1.2,
     opts: { selfId: () => id, onActions: (data) => net.send(id, data), onLootClaimed: () => {}, partyLevels: () => partners, roomHost: () => seat.id },
     _foesFrom: host ? null : seat.id, _sharedStamp: `st${seed}`, _foesSeqIn: -1, clearSurplus: () => {}, ...TRAIT_DOORS,   // WORLD2: the host this client follows, and the seat's handover
     addItem, stacksWith, isGoldPieces, addGoldPieces, isEquipped, unequipItem, neverPeerHanded, notCarried,   // AUDIT AUTO-HOLD: the give asks it (offline here: no filter)
     onlineRoom: () => true, _wallNow: () => clock.t, respawnDue, validLootList, peerHanded, LOOT_LIST_MAX, LOOT_NEWER_TEXT, ENEMY_BASICS, corpseTextureOf,   // AUDIT DEX A1: the corpse mints read it
     generateLootItems: generateItems, addPileLootExtras, rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons,
-    spawnEnemyLoot, wildLootAfter, grantEliteLoot, rollCorpseKit, raiseEnemyDeath, capFoeLoot, rollRoomBonus: (args) => { bonusCalls.push(args); return rollRoomBonus(args); }, applyChampion, championTraitFor, promoteEliteFoe, _retyping: new Set(),   // CHAMP-BASE: the build's champion and elite arms (applyEliteScaling) and the base's
-    wildPileMore, seaPileMore, isDeepPileKey, effectiveLevel, liveStat, asTheRoom, withRollerLevel, markRoomCarried, CLAIM_KEEP_MS, CLAIMS_KEPT_MAX, SEARCH_COOLDOWN_MINUTES, SEARCH_LOOT_MAX, sharedClassicMinutes, ...RL,
+    spawnEnemyLoot, grantEliteLoot, rollCorpseKit, raiseEnemyDeath, capFoeLoot, rollRoomBonus: (args) => { bonusCalls.push(args); return rollRoomBonus(args); }, applyChampion, championTraitFor, promoteEliteFoe, _retyping: new Set(),   // CHAMP-BASE: the build's champion and elite arms (applyEliteScaling) and the base's
+    seaPileMore, isDeepPileKey, effectiveLevel, liveStat, asTheRoom, withRollerLevel, markRoomCarried, CLAIM_KEEP_MS, CLAIMS_KEPT_MAX, SEARCH_COOLDOWN_MINUTES, SEARCH_LOOT_MAX, sharedClassicMinutes, ...RL,
     eliteLootOpts: () => ({}), searchHeard: () => {}, settleLootFlat: () => {}, _sharedFoe: () => false, fightN: () => 1,
     spawnCorpseNow: async (f) => { f.corpsePos = [...f.ai.feet]; }, renderer: { destroyBillboardBatch: () => {} }, billboardBatches: [], renownFoeRevived: () => {},
     respawnFoe: () => false, camps: { applyOwner: () => {}, activate: () => false }, roomEncounterAsked: () => false, actions: { applyRemote: () => 0 },

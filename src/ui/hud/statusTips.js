@@ -12,8 +12,6 @@ import { BOON } from '../../systems/survival/needs.js';
 import { t } from '../../systems/textManager.js';   // L10N4: HEARTY-MEAL's line in the player's language
 import { LEVEL_WORDS } from '../../systems/survival/status.js';
 import { STIFF_PENALTY } from '../../systems/survival/rest.js';
-import { WILD_TEXT, zoneWord } from '../../systems/wild/wildZone.js';
-import { zoneSafe, ZONE_SAFE_TEXT } from '../../systems/wild/zoneSafe.js';   // ZONE-SAFE: a settlement's streets are peace
 import { madeLevelRule } from '../../systems/madeLevel.js';   // EVENT-RULES: what a world event's made level holds
 import { REGEN_HELD_HURT_MS, regenHeldNow } from '../../systems/courtRules.js';
 import { SD_REZ_MS } from '../../net/superDungeon/sdLaw.js';   // SD-REZ: the Hour's window for a friend's Resurrect
@@ -140,12 +138,6 @@ export function statusTip(tile, entity, extra = {}) {
   let title = String(tile.name ?? '');
   if (tile.key === 'more') {
     return { title, meta, lines: ['Not every effect fits on the screen. Make room or open your character sheet to see them all.'], foot: null };
-  }
-  if (tile.key === 'wild') {
-    title = zoneSafe() ? ZONE_SAFE_TEXT.chip : WILD_TEXT.chip;
-    lines.push(String(tile.name ?? ''), zoneWord('chipTip'));   // ETHER-WILD: the ground's own tip (the sea's past the Veil)
-    lines.push(zoneSafe() ? ZONE_SAFE_TEXT.enter : ZONE_SAFE_TEXT.rule);   // ZONE-SAFE: in a settlement's streets, their peace; elsewhere, where it is
-    return { title, meta: 'Zone', lines, foot: tile.foot ? `Ring ${tile.foot}` : null };
   }
   if (tile.key === 'mentor') {   // MENTOR2: what mentoring does now - the level fought at, the powers' share, the pupil's bonus
     const card = mentorTipCard(entity);

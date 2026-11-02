@@ -97,7 +97,8 @@ A location is assembled by `layoutLocation` (`src/world/locationLayout.js`), a p
 `DaggerfallLocation.LayoutLocation`. Each MAPS.BSA grid cell names an RMB block in BLOCKS.BSA; the block is placed at
 `(x * RMB_SIDE, y * RMB_SIDE)`.
 
-- `src/world/rmbLayout.js` `layoutRmbBlock`: one block's buildings, models and ground tilemap. `src/world/rmbFlats.js`: block and misc flats (billboards). Editor flats (archive 199) are kept with `editor: true`
+- `src/world/rmbLayout.js` `layoutRmbBlock`: one block's buildings, models and ground tilemap.
+  `src/world/rmbFlats.js`: block and misc flats (billboards). Editor flats (archive 199) are kept with `editor: true`
   and not drawn. Departure: nature flats under a building's footprint are not placed.
 - `src/world/staticBuildings.js`, `staticDoors.js`, `buildingNames.js`: bounds, doors, names. Interiors:
   `src/world/interior/`. `src/world/city/`: NPC walk grid (`cityNavigation.js`), gates by the clock, street lights.
@@ -174,12 +175,6 @@ account to one life per slot; `sdSpoils.js` rolls rewards. `sdScore.js` is music
 - Editor-placed POIs are a separate system in `src/poi/` (`poiLaw.js`, `poiRuntime.js`, `poiService.js`), approved by
   the realm and drawn with a map marker.
 
-### Wild zones
-
-`src/systems/wild/wildZone.js` defines the online PvP zone over Cyrodiil (`src/systems/wild/cyrodiilZone.js`): four
-rings from the border to the heart, each with harder foes and better loot. `wildDungeons.js` places elite halls per
-ring. `etherWild.js` is the second zone kind, over the Eltheric Ocean.
-
 ## Travel
 
 `src/systems/travel/travel.js` ports Daggerfall Unity's travel maths:
@@ -221,7 +216,7 @@ The Tamriel trace past the Bay is being remade. This section describes the code 
   `tamrielCountry.js`, `tamrielDungeons.js`) and roads (`src/world/tamrielRoads.js` in `tamrielRoadsWorker.js`, cached
   through `roadsCache.js`). Nothing is read from Arena's own files.
 - The terrain worker streams ground past the Bay, so it can be walked. `src/systems/travel/pastBayTravel.js`
-  `pastBayJourney` refuses fast travel to it, except inside an open zone; teleports and Portal Stones
+  `pastBayJourney` refuses fast travel to it; teleports and Portal Stones
   (`portalLandAt`) may land there.
 - Without the trace (`?tamrieltrace=off` or missing files), the authored continent stands and no places appear past
   the Bay.
@@ -236,7 +231,7 @@ The Tamriel trace past the Bay is being remade. This section describes the code 
 | Towns | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js` |
 | Dungeons | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js` |
 | Delve, super dungeons | `test/systems/sense1_dungeonsense.test.js`, `test/systems/echo1_dungeonecho.test.js`, `test/systems/superDungeon/sd2_sdsite.test.js` |
-| Discovery, wild, travel | `test/systems/audit26_discovery.test.js`, `test/systems/wild1_zone.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js` |
+| Discovery, travel | `test/systems/audit26_discovery.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js` |
 | Past the Bay | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js` |
 
 Tests that read the map need ARENA2: run `sh tools/fetch-data.sh` and set `ARENA2_PATH`.

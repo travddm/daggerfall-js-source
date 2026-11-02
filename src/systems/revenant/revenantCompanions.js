@@ -21,12 +21,6 @@
 //    here (a fight won at my side, swornFightWon; an errand home, once an errand, returnFromErrand), its sky set from the
 //    page (setSwornStars - never abroad), and read where its numbers are: its health and blows (applySwornStrength), its
 //    loyalty's losses and its rests (each site below).
-import { wildHere, zoneWord, wildStoreRefusal } from '../wild/wildZone.js';   // PVPDUNGEONS
-// PVPDUNGEONS: how many sworn revenants may stand at the player's side in the open zone - COMPANION-DROP: and which ones
-// (wildSwornAtSide), so the zone stands the ones whose packs drop; the drop's law reads the same leaf (wildLeaf.js - no
-// imports, so standing a revenant never pulls the drop law's graph, the item law among it, into a client's)
-import { WILD_REVENANTS_MAX, wildSwornAtSide } from '../wild/wildLeaf.js';
-export { WILD_REVENANTS_MAX };
 import { swornRevenants, revenantCompanionUpdate, revenantRecord, setSwornLeftListener, revenantBetrays, revenantPerson, revenantMomentEvent, revenantEvent, revenantSay } from './revenant.js';   // FB1012d ALLY-RACE: its person
 import { registerCompanionCount, companionsWithYou, COMPANION_SLOTS } from '../companionSlots.js';
 import { addItem, addGoldPieces, isGoldPieces } from '../inventory.js';   // a released one's pack, handed back
@@ -81,11 +75,6 @@ export const retinue = () => swornRevenants().slice().sort((a, b) => b.rank - a.
 export const revenantsWithYou = () => swornRevenants().filter((r) => stateOf(r) === 'with');
 /** The sworn sent away, or resting after a fall. */
 export const revenantsAway = () => swornRevenants().filter((r) => stateOf(r) !== 'with');
-/** THE SWORN AT THE PLAYER'S SIDE - every one walking with them, and in the open zone the ones it stands
- *  (wildLeaf.js wildSwornAtSide: the first WILD_REVENANTS_MAX - PVPDUNGEONS; the rest wait outside it). COMPANION-DROP
- *  (FIELD BUGS 2026-10-19f) had a death there drop their packs and kits, and so kept them at my side; STORE-KEEPS
- *  made every pack storage no death takes, and a sworn one comes and goes in the zone as anywhere. */
-export const swornAtYourSide = () => (wildHere() ? wildSwornAtSide(revenantsWithYou()) : revenantsWithYou());
 registerCompanionCount('revenant', () => revenantsWithYou().length);
 
 /** May the player spare one more - a place in the retinue? */
@@ -141,7 +130,6 @@ export function callRefusal(r, now) {
   if (stateOf(r) === 'with') return null;
   if (stateOf(r) === 'resting' && now < restUntil(r, now)) return 'Still recovering.';
   if (stateOf(r) === 'errand') return t('rvn.errand.callAbroad', 'Abroad, {left}.', { left: errandLeftWords(errandUntil(r.companion.errand, now), now, sharedClockOn()) });   // RVN-ERRAND
-  if (wildHere() && revenantsWithYou().length >= WILD_REVENANTS_MAX) return zoneWord('revenantOne');   // PVPDUNGEONS - AUDIT SEA VENTURES C7: the ground's own words
   if (companionsWithYou() >= COMPANION_SLOTS) return `Your companions are full (${COMPANION_SLOTS}).`;
   return null;
 }
@@ -315,7 +303,7 @@ export function giveSwornGear(id, item, { kindName = null } = {}) {
   const r = revenantRecord(_player, id);
   if (!_player || !r) return t('rvn.sworn.gone', 'It is no longer sworn to you.');
   const key = gearKeyOf(item);
-  const why = gearRefusal(r, item, { kindName }) ?? wildStoreRefusal();   // AUDIT PVP-EASE L2-1: a sworn one's kit is storage no zone death takes - the combat lock
+  const why = gearRefusal(r, item, { kindName });
   if (why) return why;
   if (equipTableOf(_player).includes(item)) return t('rvn.gear.no.worn', 'You are wearing it.');
   const pack = _player.items ?? [];
@@ -440,7 +428,7 @@ function memberOf(r) {
  */
 export function revenantParty({ onWake = null } = {}) {
   return {
-    get party() { const list = revenantsWithYou().filter((r) => !held(r.id)); return swornAtYourSide().filter((r) => list.includes(r)).map(memberOf); },   // PVPDUNGEONS: in the zone one stands, the rest wait outside it - COMPANION-DROP: the one whose pack drops with mine
+    get party() { return revenantsWithYou().filter((r) => !held(r.id)).map(memberOf); },
     wake(now) {
       chargeErrands(now);   // OFFLINE-ROAD: online the world's time carries an errand on (AUDIT RVN F1's lived step before the relay is heard)
       for (const r of swornRevenants()) if (stateOf(r) === 'errand' && r.companion.errand && now >= r.companion.errand.until) returnFromErrand(r.id, now);   // RVN-ERRAND: back from abroad

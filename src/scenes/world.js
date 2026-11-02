@@ -7,9 +7,6 @@
 // recenters the world (streamingWorld.js).
 
 import { DecisionBoxWindow } from '../ui/decisionBox.js';   // REST-WARN2: the Plus decision box
-import { wildGiantsAt, WILD_GIANT_STAND_M, WILD_GIANT_RESPAWN_MS, giantGroundBlocked } from '../systems/wild/wildGiants.js';   // ZONE-GIANTS   // GOTHWAY-BOARDS: at the north entrance
-import { cyrodiilMask } from '../systems/wild/cyrodiilZone.js';   // WW-C2: the open zone is Cyrodiil's
-import { createZoneHalls } from './zoneHallsHost.js';   // WW-C2: the zone's halls and their ground, out of bootWorld   // ZONE-GIANTS   // GOTHWAY-BOARDS: at the north entrance
 import { pixelKeyText } from '../world/pixelKeys.js';   // PIXEL-KEYS: a built pixel's key text made once   // GOTHWAY-NORTH: the walk grid's cell
 import { resetPlayerGpsState } from '../world/playerGps.js';   // AUDIT DEX C1: PlayerGPS.ResetState, the jump core's
 import { restAilmentLines } from '../systems/rest/restWarning.js';   // REST-WARN
@@ -133,7 +130,7 @@ import { patronWords } from '../systems/livingWorld/patrons.js';   // LW15: a pa
 import { routeOf as deepRouteOf, clearedOf as deepClearedOf, stopOfMinute, DIVE_CLEAR_MIN } from '../systems/livingWorld/deepRoute.js';   // LW14: a company's way through the deep
 import { hideoutsOf, outlawBandAt, bandTrouble } from '../systems/livingWorld/outlaws.js';   // LW12: the outlaws
 import { createWorldPlaces } from '../world/worldWide/worldPlaces.js';   // WW1: the world's places, wherever they stand
-import { pastBayJourney, teleportJourney } from '../systems/travel/pastBayTravel.js';   // AUDIT TESA II P4: no journey into the land past the Bay
+import { pastBayJourney } from '../systems/travel/pastBayTravel.js';   // AUDIT TESA II P4: no journey into the land past the Bay
 import { bayPlaceRows, BAY_SOURCE } from '../world/worldWide/bayPlaces.js';   // WW1: the game's own rows, the registry's first provider
 import { createTownTable } from '../world/worldWide/townTable.js';   // WW7: a town by its map id, the Bay's and the registry's
 import { createLivingTrips } from './livingWorld/livingTrips.js';   // WW1: the living world's towns and dungeons, off the registry; WW7-7: its trips' world, everywhere
@@ -235,7 +232,7 @@ import { hasCustomLocationPosition } from '../world/locationLayout.js';   // ROA
 import { FootstepMachine, pickFootstepSet, pickFootstepKind } from '../systems/footsteps.js';   // FS-slice; PEER-FS1: pickFootstepKind for the pose's own `fk`
 import { immersiveFootsteps, reportModCompatibilityIssues } from '../systems/immersiveFootsteps.js';
 import { betterAmbience, classicFootstepAllowed } from '../systems/betterAmbience.js';   // BA1: Better Ambience - the shake, the dungeon's fog and light, the reverb, the indoor rain, its own stride   // IF1: Immersive Footsteps owns the stride and the three landing sounds once its clips are in (DisableVanillaFootsteps)
-import { createExteriorFoes, MAX_ACTIVE_ENCOUNTER_FOES, encounterCap, WILD_PACK_MULT, CAMP_CULL_DISTANCE, ENCOUNTER_CULL_DISTANCE, siteFoeSpawn, carrySiteFoe } from './exteriorFoes.js';   // X-slice; OW6: the pool's bound, a warband's too, and the culls a walk-away handover comes before
+import { createExteriorFoes, MAX_ACTIVE_ENCOUNTER_FOES, encounterCap, CAMP_CULL_DISTANCE, ENCOUNTER_CULL_DISTANCE, siteFoeSpawn, carrySiteFoe } from './exteriorFoes.js';   // X-slice; OW6: the pool's bound, a warband's too, and the culls a walk-away handover comes before
 import { createBreather, frameFitBudget } from '../systems/buildBreather.js';   // PERF7: the stream build yields to the frame; PERF-EXT24: a slice of what the frame left
 import { pieceIndex } from '../render/labGrass.js';   // PERF8: the piece under a point, by arithmetic
 import { meterFor } from '../render/perfMeter.js';   // GRASS2: the field gets a zone of its own - it was inside the world's
@@ -339,7 +336,6 @@ import { createStartsHost } from './startsHost.js';   // START2: where a new cha
 import { voyageSails } from '../systems/naval/passage.js';   // FIELD BUGS 2026-10-21d PASSAGE-IN: from her port's roadstead she runs in
 import { createWardenShows } from './wagon/wagonWardenShow.js';   // WARDEN1: the town watch's throw, played
 import { createWagonWarden, wardenTownIn, wardenTownOfPixel } from './wagon/wagonWardenHost.js';   // WARDEN1: the town watch - my wagon's stamp, the cell's words, the offline clock; AUDIT WARDEN1 D3: the town under a point, one pure home
-import { createWildEscrowHost } from './wildEscrowHost.js';   // PVP-ESCROW: the two-phase handoff's two sides, out of bootWorld (HOST-SPLIT)
 import { WARDEN_VENDOR } from '../systems/wagon/wagonWarden.js';   // WARDEN1: the stamp's save slot, and the towns a watch keeps
 import { townGroundSteps, yardSitesSteps, craftYardSitesSteps, MONUMENT_KEEP_M, yardMeasuresSteps, placedModelBox } from '../world/merchantYards/merchantYardSites.js';   // MERCHANT-YARDS: where they stand off the town's layout, and the people's navgrid carved round them; IC-STUTTER: each pass a step at a time
 import { stepsBreathing } from '../world/puddleMask.js';   // IC-STUTTER: OW-HITCH's runner - a town's places through the build's breather
@@ -506,7 +502,7 @@ import { showTravelViewHud, hideTravelViewHud, updateTravelViewHud, travelViewHu
 import { createBandSprites } from '../world/bandSprites.js';   // OW-FOES: the bands as their monsters, faded in near
 import { shownWaypoints, isWaypointFollowed, waypointById, mapPointToNative, nativeToMapPoint, receiveWaypointLine, setWaypointSender, syncWaypointGroups } from '../systems/map/mapWaypoints.js';   // WAYPOINTS: the flags on the Overworld, their wire on the hub's party and guild channels
 import { openWaypointMenu, waypointMenuOpen } from '../ui/waypointMenu.js';   // WAYPOINTS: the right-click menu
-import { onTravelPace, setPaceGround, setPaceZoneCap, WILD_PACE_CAP } from '../systems/travel/travelPace.js';   // PACE-DIALS: a dial turned under a running journey; the road rule's ground
+import { onTravelPace, setPaceGround } from '../systems/travel/travelPace.js';   // PACE-DIALS: a dial turned under a running journey; the road rule's ground
 import { showPaceBox, hidePaceBox } from '../ui/travel/travelPaceControls.js';   // PACE-DIALS: the other skins' dials, while a journey runs
 import { markShown, travellerKin } from '../systems/travel/travelViewFilters.js';   // OW-FILTER: a hidden group's sprites hidden with its marks
 import { travelPathMode, travelPathUsesRoads, pickTakesPlace, pickNearPlaceMiddle, fineMoveHeld, TRAVEL_PATH_TEXT } from '../systems/travel/travelPathMode.js';   // OW-PATH: roads or free, and the snap to a town; OW-TOWN-ROUND: only at its middle
@@ -786,13 +782,13 @@ import { isOnFoot } from '../systems/transport.js';   // TransportManager.IsOnFo
 import { lateSolidsOf } from '../player/lateSolid.js';   // ROCK-CLEAR: the world collider's late solids, withheld from the walking body until it is clear
 import { floorLanding, doorWorldPosition, dungeonEntranceLanding, repositionFeetY, openGroundNear, heldInSolid, safeGroundAt, safeGroundNear } from '../player/enterExit.js';   // FixStanding for the exterior arrivals; SD2b: where a Hollow's mouth stands, to find it at
 import { jumpSpeedMultiplier, isEnhancedJumping, tallySkill, SKILLS } from '../systems/skills.js';   // TO1: the avoid-encounter roll reads skillValue live (imported above) Stealth   // AUDIT 64 F2: CheckAirControl's IsEnhancedJumping disjunct
-import { playerEntity, surfacePlayer, hurtPlayer, forcePlayerDeath, presentHeardDeath, playerBlowCameToNothing, setDeathPresenter, presentPlayerDeath, setDeathListener, setAvoidDeathHook, setStaffPowers, staffPowers, registerPlayerDamageMod, registerLevitateWard, registerFreeFlight } from '../characters/playerEntity.js';   // AUDIT-SEATS G5: a siege's ward on Levitate   // AUDIT-SEATS G4: a spectator's flight
+import { playerEntity, surfacePlayer, hurtPlayer, forcePlayerDeath, playerBlowCameToNothing, setDeathPresenter, presentPlayerDeath, setDeathListener, setAvoidDeathHook, setStaffPowers, staffPowers, registerPlayerDamageMod, registerLevitateWard, registerFreeFlight } from '../characters/playerEntity.js';   // AUDIT-SEATS G5: a siege's ward on Levitate   // AUDIT-SEATS G4: a spectator's flight
 import { bodySayer } from '../net/bossBody.js';   // INT15: my body, said to a boss fight's room
 import { SOUND } from '../systems/soundClips.js';
 import { createWeaponRig, autoBuildArms, armIdentityOf, armBuiltFor, armsReady, sheetHolderOf, buildArmsFor, prebuildArmsForSave } from '../combat/weapon/weaponRig.js';   // MWA1: the arms at boot; MWA3: the identity the arm should stand for, beside the one it does; MW-EARLY: and before the world is read
 import { weaponPoseOf, applyWeaponPose, playerMeleeCanHit, registerPlayerSwingListener } from '../combat/playerWeapon.js';   // HARD2c: the sheath+hand pair as ONE law, and SL-2's per-field merge with the mode host's live rig
 import { ArrowFlight, playerArrowHitFoe, shaftOnRelayBody } from '../combat/arrowFlight.js';   // C13: visible exterior arrows; AUDIT 39 (#64): and the shaft that LANDS
-import { addItem, addGoldPieces, isGoldPieces, spendAmmoFor, carriedWeight } from '../systems/inventory.js';
+import { addItem, addGoldPieces, spendAmmoFor, carriedWeight } from '../systems/inventory.js';
 import { storesIn, spendStore, mintStores } from '../systems/naval/navalStores.js';
 import { orderRows } from '../systems/naval/shipCrew.js';   // SHIP-CREW: the orders list   // SEA-REPAIR: carpenter's stores in a hold   // E4: PlayerEntity.CarriedWeight carries the gold counter's own term
 import { calculateAttackDamage } from '../combat/formulas.js';   // X2-slice: enemy-arrow impacts
@@ -826,8 +822,8 @@ import { INSIGNIA, insigniaRefusal } from '../net/insignia.js';   // WB9g
 import { createFirmamentBook, setFirmamentBook } from '../net/firmament/firmamentBook.js';   // FIRM1: the Firmament - this device's tree and purses
 import { setFirmamentTree, setFirmamentOnline } from '../systems/firmamentLive.js';   // FIRM1: the tree in force, online alone
 import { starsFor } from '../net/firmament/firmamentLaw.js';   // FIRM1: the Stars a Renown level brings, said with it
-import { withoutFirmament } from '../systems/firmamentPowers.js';   // FIRM1: a strike or a spell at a player - a duel's, a siege's, the Wrothgarian zone's - is rolled with the sky off
-import { accountTokenMinter, storedSession, muteAccount, serviceBase, accountRefusalText, accountDuels, accountWild, accountRenown, accountRoll, accountHomes, accountDecor, accountGuilds, accountGates, accountMarks, accountBoard, accountProf, accountRaids, accountMarket, accountWrits, accountSeats, accountSerpents, accountSds, accountLamp, accountFirmament, nameWhyText } from '../net/accountClient.js';   // NAME-AS: nameWhyText, why my character's name stood aside   // ACC1d: the hello's signed word, minted per connection from the account session this device holds   // ACC4's beat knocks through the tab's heartbeat (SCALE4c), not from here
+import { withoutFirmament } from '../systems/firmamentPowers.js';   // FIRM1: a strike or a spell at a player - a duel's, a siege's - is rolled with the sky off
+import { accountTokenMinter, storedSession, muteAccount, serviceBase, accountRefusalText, accountDuels, accountRenown, accountRoll, accountHomes, accountDecor, accountGuilds, accountGates, accountMarks, accountBoard, accountProf, accountRaids, accountMarket, accountWrits, accountSeats, accountSerpents, accountSds, accountLamp, accountFirmament, nameWhyText } from '../net/accountClient.js';   // NAME-AS: nameWhyText, why my character's name stood aside   // ACC1d: the hello's signed word, minted per connection from the account session this device holds   // ACC4's beat knocks through the tab's heartbeat (SCALE4c), not from here
 import { parseModCommand, runModCommand, mutedText, mutedNotices } from '../net/moderation.js';   // MOD1: /mute and /unmute, and the line a muted player reads
 import { createHeartbeat, whileLive } from '../net/heartbeat.js';   // SCALE4c: the beat, the letterbox and the town's board in one request
 import { startPlayClock } from '../net/playClock.js';   // ACC4: time played, knocked from here and measured by the account service's clock
@@ -878,7 +874,7 @@ import { createStaffMessages } from '../net/staffMessages.js';   // STAFF-PANEL5
 import { createStaffFreezeHost } from './staffFreezeHost.js';   // STAFF-PANEL5-FREEZE: the staff freeze's screen and the Staff tab
 import { skyClassicMinutes, wallMsForSkyMinutes, skyMinutesPerMsAt } from '../net/skyLaw.js';   // TIME1: the sky's own clock, installed beside the event clock
 import { POSE_STRIKES, isWorldRoom, isCellRoom, cellHaloFor, actFrameFits, sharedClassicMinutes, wallMsForClassicMinutes } from '../net/wire.js';   // WORLD6b-iii(b): the cell seam's halo   // MAC7 #1: the swing's kind on the wire; AUDIT WORLD4 A1: whether an act frame can be said at all
-import { WILD_DATA_MAX, WILD_ITEMS_MAX, POSE_RIDE } from '../net/wire.js';   // INT9 (AUDIT): a deposit's chunks, bounded by the wire's frame; COATS3D: POSE_RIDE - a peer on a horse rides the 3D one
+import { POSE_RIDE } from '../net/wire.js';   // INT9 (AUDIT): a deposit's chunks, bounded by the wire's frame; COATS3D: POSE_RIDE - a peer on a horse rides the 3D one
 import { hasDaggerfallArrows } from '../combat/fpArm.js';   // MAC7 #2: the arrow bit on the wire - weaponRig's own read
 import { drawText } from '../ui/text.js';   // ONLINE1: the session's status line
 import { RemotePlayers, composeLook, createSightCache } from '../net/remotePlayers.js';   // ONLINE1: the others, drawn; NAME1: and the sight test their names take, cached and hysteresised (AUDIT NAME1 F2/F5)
@@ -948,29 +944,11 @@ import { createSocialMenu, socialPlaqueRows, plaqueRowFor } from '../ui/socialMe
 import { createProfileWindow, profileView, profileDuelLine, profileRenown, profileRecordLines } from '../ui/profileWindow.js';   // INSPECT1: the profile the F-menu's Inspect opens
 import { createDuelManager, DUEL_RADIUS_M, DUEL_RANGE_M, DUEL_COUNTDOWN_MS, ringCentre, validRingRecord } from '../net/duel/duelSession.js';   // DUEL1: the duel's state machine (pure)
 import { duelVitality } from '../net/duel/duelBar.js';   // DUEL-BAR: my vitality as the referee says it, the HUD's health bar's for the duel's length
-// WILD1: THE OPEN ZONE - the Wrothgarian Mountains: its law (a leaf), a
-// death's drop and its one piece, the fights between players, the room's remains as piles, and the HUD's two glyphs
-import { wildHallPicks, wildHallAt, wildHallTemplateOk } from '../systems/wild/wildDungeons.js';   // PVPDUNGEONS: the day's halls, picked alike on every client   // PVPDUNGEONS
-import { setWildHere, wildHere, isWildRegion, WILD_REGION, wildInside, wildNear, setWildDeath, wildDeath, wildDeathAtHand, wildDeathKill, wildFallHeard, WILD_TEXT, WILD_DEATH_HOLD_S, WILD_NAME, ZONE_WATCH_SCALE } from '../systems/wild/wildZone.js';
-import { createPartyTruce } from '../systems/wild/wildZone.js';   // PARTY-TRUCE (FIELD BUGS 2026-10-09b)
-import { settledAt, zoneSafe, zoneSafeFrame, ZONE_SAFE_TEXT } from '../systems/wild/zoneSafe.js';   // ZONE-SAFE: a settlement's streets are peace
-import { GREATER_GIANT_CALL, GREATER_GIANT_CALL_AT, noteWildBlow } from '../systems/wild/wildZone.js';   // GREATER-GIANT; AUDIT PVP-EASE L2-1: the combat lock's blow
-import { wildRing, wildRingAt, wildRingName, wildRingBonus, wildZoneKind, zoneWord, zoneRingName, setWildMask, wildMask, WILD_RINGS, wildJourney, WILD_GIANT, WILD_GIANT_CHANCE, WILD_GIANT_MAX, WILD_STRANGER_M, WILD_STRANGER_SEE_M, WILD_STRANGER_SLOW_M, WILD_STRANGER_RGBA } from '../systems/wild/wildZone.js';   // WILD2: the four rings; WILD3: the journeys
-import { etherWildRingAt, etherRisePort, etherRiseSite, etherInPeace, ETHER_KIND, ETHER_WILD_TEXT } from '../systems/wild/etherWild.js';   // ETHER-WILD: the Eltheric Ocean past Veilhaven's peace, an open PvP zone
+import { etherRisePort, etherWildRingAt, setSeaGround } from '../systems/sea/etherRings.js';   // AUDIT CAPTAIN'S SEA P4: where a death at sea rises - the nearest freeport; SEA-SET: whether I stand on open sea ground
 import { createSeaVentures, seaStormShown } from './seaVenturesHost.js';   // SEA VENTURES: the sea's vaults, its events, its bounties and boards - wired here, held there
-import { wornOffer, wildRecord, wildChunks, wildSpawnSpot, wildRisePicks } from '../systems/wild/wildDeath.js';   // WILD1: the worn offer, the deposit's chunks, the rise
-import { readWildReceipt, wildFallGraceS } from '../net/wild/wildReceipt.js';   // INT9: the relay's fall, carried to the service
-import { WILD_REF, wildKin, sameGuild } from '../net/wild/wildRef.js';   // INT9: the zone referee's numbers (its mend, for the HUD); MAC: and its kin, one law with the referee's
-import { createWildFight } from '../net/wild/wildFight.js';
-import { createWildRemains, WILD_PILE_ICON, WILD_NO_STORE } from '../net/wild/wildRemains.js';   // WILD-WAYPOINT: my remains' flag on both maps (below)
-import { markRemains, remainsMarkTick, remainsGone, keepMine, keptMine, forgetMine } from '../systems/wild/wildRemainsWaypoint.js';   // WILD-KEEP: and my remains' record, kept on the device
-import { setLootMarksLive } from './lootLines.js';   // WILD1: my remains' line with the rarity row off
-import { WILD_REMAINS_MS, WDUN_DAY_MS, WDUN_LOCK_MS, WDUN_HERE_MS, spawnedHallMapId } from '../net/wire.js';
-import { validLootList } from '../systems/loot/loot.js';
-import { stacksWith } from '../systems/inventory.js';
-import { setHudZone } from '../ui/enhanced/enhancedHud.js';
+import { setLootMarksLive } from './lootLines.js';   // a remains' line with the rarity row off
+import { WDUN_DAY_MS } from '../net/wire.js';
 import { setHudPauseAt } from '../ui/hud/hudAdvance.js';   // FIRM-STARS: the stars' tile beside the Renown bar opens the Firmament page
-import { setZoneEntity } from '../ui/hud/hudActiveSpells.js';   // WILD1: the classic row's zone glyph
 import { createWedManager, wedWhyText, wedMineText } from '../net/wedSession.js';   // LEGACY7 part three: two players wed - the handshake's state machine (pure)
 import { createFamilyBodies, familyRoomSprites } from '../world/familyBodies.js';
 import { createPopulationLane, holdNpcBodies } from '../characters/npcBodies.js'; import { folkActor } from '../characters/folkBodies.js'; import { residentWalkerActor } from '../characters/rosterBodies.js';
@@ -1000,7 +978,7 @@ import { createQuestBridge, tokensToRows, choiceDoor } from './quest/questBridge
 import { loadQuestPack } from './quest/questData.js';
 import { ensureFactionRep, getReputation, changeReputation } from '../systems/faction/factionRep.js';
 import { changeLegalRep, CRIMES, setCrimeCommitted, lowerRepForCrime, setCrimeRepFactor } from '../systems/court.js';   // the region's LegalRep: the status box, the quest actions, the crimes (REP1 retired :498-511's levy)
-import { isEquipped, unequipSlot, unequipItem, wearableItem } from '../systems/equip.js';   // HACKED-GOLD: a worn offer holds what can be worn
+import { isEquipped, unequipSlot } from '../systems/equip.js';   // HACKED-GOLD: a worn offer holds what can be worn
 import { ServiceFlowWindow } from '../ui/guildServiceWindows.js';
 import { isShelved } from '../systems/quest/quest.js';   // QUEST-SHELF: a quest set aside
 import { guildOfFaction, membershipOf, guildFactionIdOfGroup, joinedGuildOfGroup, activeMemberships, guildInitiationQuestEnded } from '../systems/guild/guilds.js';   // V2e: the per-read vampire book pick; F96: the TG/DB initiation listener
@@ -1073,7 +1051,7 @@ import { staffFollowOnPage, relinkGame } from './staffFollowHost.js';   // STAFF
 import { createStaffViewHost } from './staffViewHost.js';   // STAFF-VIEW1: the staff tags, Shift+M and a tag's follow
 import { privateInteriorPrefix, privateInteriorRoom, privateBoatRoom, privateInteriorOf } from '../net/privateInterior.js';
 import { createInstanceDoor } from './instanceDoor.js';   // INSTANCES: public or an instance, at the door
-// TESTBUILD: every player may use the staff's /god (/godmode), /fly, /heal, /tp - god mode also lifts the zone's travel law and makes map journeys instant
+// TESTBUILD: every player may use the staff's /god (/godmode), /fly, /heal, /tp - god mode also makes map journeys instant
 const TEST_GODMODE = false;
 const isStaffT = (g) => TEST_GODMODE || isStaff(g);
 import { isStaff, parseStaffCommand, STAFF_HELP_LINES, findPlace } from '../net/staffCommands.js';   // STAFF1: the staff's own commands
@@ -1189,13 +1167,8 @@ import { createCsaAudio } from './csaAudio.js';   // HOST-SPLIT
 import { createOceanHolesPits } from './oceanHolesPits.js';   // HOST-SPLIT
 import { horseVolume } from '../systems/animalVolume.js';   // HORSE-VOL: the Wagon Warden's lifted team neighs on the Audio tab's Horse Volume
 import { createVendorHost } from './vendorHost.js';   // HOST-SPLIT
-import { createWildSeizeHost } from './wildSeizeHost.js';   // HOST-SPLIT
-import { createWildRejoin } from '../systems/wild/wildRejoin.js';   // WILD-REJOIN: a fall that outlives its page
 import { windowHoldsDungeon } from './windowWorld.js';   // RPT1026-FIGHTS (WINDOW-ONLINE): a dungeon's window holds its foes offline alone
 import { createPortalStoneHost } from './portalStoneHost.js';   // HOST-SPLIT
-import { createWildDropHost } from './wildDropHost.js';   // HOST-SPLIT
-import { createWildInsureBook, setWildInsureBook } from '../net/wild/wildInsureBook.js';   // WILD-INSURE: my policies on my gear
-import { createWildGrace } from '../systems/wild/wildGrace.js';   // ZONE-GRACE: safe passage, as the referee says it
 import { createMarketPieces } from './marketPiecesHost.js';   // HOST-SPLIT
 import { createRaidHost } from './raidHost.js';   // HOST-SPLIT
 import { createSpawnGroundHost } from './spawnGroundHost.js';   // HOST-SPLIT
@@ -2399,7 +2372,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const key = `${p.x},${p.y}`;
     if (!locationIndex.get(key)?.spawned) return;
     if (locationIndex.get(key).superTier) return;   // SD2b: a Hollow's life is the hub's record - a cleared one is not two days from gone
-    if (locationIndex.get(key).wildHall) return;   // AUDIT SPAWN-REBIRTH F6: nor is a Wild Zone hall's - its day is the hub's (net/wild/wildLaw.js)
     _spawnLedger.clear(key, _spawnClock());
     owSayRow(key);   // OW6L: and the cell hears the short clock start
   };
@@ -2465,7 +2437,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  (onDungeonSpawned), never a pixel streaming in - and a row of a life that is over is none (the ledger's `has`). */
   function _spawnSeen(key) {
     if (locationIndex.get(key)?.superTier) return;   // SD2b: never a Hollow's - its life is the hub's record, not a spawn's clocks
-    if (locationIndex.get(key)?.wildHall) return;   // AUDIT SPAWN-REBIRTH F6: nor a Wild Zone hall's - its day is the hub's; noted, it was taken out at its pixel's next build fourteen real hours on, and on a pixel the spawn roll also holds the cell took the row
     const now = _spawnClock();
     const fresh = !_spawnLedger.has(key, now);
     _spawnLedger.note(key, now);
@@ -2486,21 +2457,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     _spawnUnroaded.clear();
   }
   const _spawnGround = createSpawnGround(woods);   // SPAWN-SHORE: dry ground under the plateau, never the sea's edge
-  // BOOT-TDZ2 (THE WROTHGARIAN ZONE): THE ZONE'S HALLS STAND FROM ABOVE THE BUILDER THAT ASKS THEM. The boot's first
-  // build asks spawnedDungeonAt of the player's own pixel, and in the zone that is a hall's stand - its day, its free
-  // ground, its picks, its templates. Declared with the rest of PVPDUNGEONS, fifteen thousand lines below the build,
-  // every one was in its dead zone on an online boot in the zone, and the builder's try swallowed the ReferenceError: no
-  // hall on a first pixel that has one (test/scenes/bootorder.test.js). The picks and the stand take the zone's mask from their
-  // caller - the builder hands them the one it just read off the maps (online off `params`, its own gate: the session's
-  // handles are declared far below too), play's callers the session's (wildActiveNow and wildHallStand, PVPDUNGEONS).
-  let _wdunSkew = 0;   // the hub's clock less mine, off its `st` (wdunWord)
-  const wdunDayNow = () => Math.floor((Date.now() + _wdunSkew) / WDUN_DAY_MS);
-  /** WW-C2: THE ZONE'S HALLS (scenes/zoneHallsHost.js) - Cyrodiil's, their ground the continent's own whatever the land
-   *  switch, a place's pixels the registry's; the giants walk the same ground. */
-  const zoneHalls = createZoneHalls({ maps, woods, places: worldPlaces, locationIndex, isMainStory: isMainStoryDungeon, dayNow: wdunDayNow, indexMoved: () => { _locIndexGen += 1; } });
   const { _locationToBuild } = createSpawnStand({   // HOST-SPLIT: src/scenes/spawnStandHost.js
     _arenaTemplates, _capitalBase, _countryTemplates, _insideSpawn, _spawnGround, _spawnLedger, _spawnSalt,
-    _spawnUnroaded, etherPlaceAt, etherSea, locationIndex, maps, params, terrainGen, zoneHalls,
+    _spawnUnroaded, etherPlaceAt, etherSea, locationIndex, maps, params, terrainGen,
     get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; },
     get _spawnClock() { return _spawnClock; },
     get _spawnCloneAt() { return _spawnCloneAt; },
@@ -2529,7 +2488,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const { _tamrielRoads, arenaLocationAt, arenaWarm, capitalLocationAt, countryLocationAt, lairLocationAt, nearestTownOf, provinceQuestPlaces, tamrielPlaceName } = createTamrielPlaces({   // HOST-SPLIT: src/scenes/tamrielPlacesHost.js; WW7: arenaWarm registers TESA's places
     _arenaTemplates, _capitalBase, _capitalNames, _countryCounts, _countryTemplates, _lairCounts, _lairPools,
     _lairTemplates, arenaJoinLand, arenaRoadsLanded, arenaStands, blocks, locationIndex, maps, tamrielLand, terrainGen,
-    townSeats, woodsBytes, worldPlaces, zoneHalls,   // AUDIT TESA II P7: the places past the Bay on the world's registry; Z7: the rolls the zone's halls keep off
+    townSeats, woodsBytes, worldPlaces,   // AUDIT TESA II P7: the places past the Bay on the world's registry
     get _locIndexGen() { return _locIndexGen; }, set _locIndexGen(v) { _locIndexGen = v; },
     get woods() { return woods; },
   });
@@ -7616,7 +7575,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const sailingCabins = createSailingCabinAccess({
     available: () => !!csaRuntime && csaOn(),
     boats: () => csaRuntime?.AllBoats ?? [], mode: () => modes?.mode ?? 'exterior', busy: () => worldMoveBusy(),
-    csa: () => csaRuntime, hostile: () => navalHostileNear() || !!naval?.pvp?.captainNear?.(),   // FB1020c CABIN-FOES: the helm read off the runtime; no cabin with a hostile ship near (scenes/sailingCabin.js) - AUDIT SEA VENTURES E6A: nor a stranger captain's (navalPvp.js captainNear)
+    csa: () => csaRuntime, hostile: () => navalHostileNear(),   // FB1020c CABIN-FOES: the helm read off the runtime; no cabin with a hostile ship near (scenes/sailingCabin.js)
     aboard: csaStandsOn,
     peerBoat: (owner, uid) => csaPeers.boatByUid(owner, uid),
     boardPeer: (boat) => csaAboard.board(boat, CSA_ABOARD_GRACE),
@@ -9272,7 +9231,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (why) { if (_crossSaid !== way) { _crossSaid = way; townTalk.say(CROSS_REFUSED[why], 4); } return; }
     crossGate.asked(way);
     const boat = csaRuntime.state.CurrentBoat;
-    _crossBox = new YesNoBoxWindow({ rows: crossingRows(way, { pvp: _onlineWorldSession() && !!online }), onYes: () => { _crossBox = null; crossYes(way, boat); }, onNo: () => { _crossBox = null; } });
+    _crossBox = new YesNoBoxWindow({ rows: crossingRows(way), onYes: () => { _crossBox = null; crossYes(way, boat); }, onNo: () => { _crossBox = null; } });
     townTalk.showOverlay(_crossBox);
   }
   /** AUDIT CAPTAIN'S SEA X2: Yes is the question as it stands NOW - the same helm, the same waters, no enemy, no passenger,
@@ -10291,7 +10250,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     playerWeaponSheathed: () => !!weaponRig.playerWeapon.sheathed,   // AUDIT 24 (wave 42): pacification's drawn-weapon penalty
     shake: (k) => betterAmbience.weaponKick(k),   // AUDIT TELL H6: my blow that staggers a watchman kicks the camera
     raidHere: () => raidDefendingHere(),   // RAID-GUARDS: a raid on in this town spares its defenders every blow of the player's
-    guardScale: () => (wildHere() ? ZONE_WATCH_SCALE : 1),   // ZONE-WATCH (systems/wild/wildZone.js ZONE_WATCH_SCALE): the open zone's towns post their watch ten times as strong
     levelBonus: () => seatEdicts.guardLevelBonus(Math.floor(skyMinutes())),   // SEAT1d: a Curfew's night watch - AUDIT SEATS-3 E1: the sky's night (TIME1), the one the town sees
     fightHere: () => fightNear([...cityGuards.guards, ...exteriorFoes.foes], player.pos),   // PROTECT-FIGHT: under the protection, a fight spares the street's walkers - AUDIT FB1025i D3: a fight near me, a peer's foes too (encounters.js fightNear)
     oneVoice: () => livingWorldOn(), windowUp: () => townTalk.overlayActive,   // HALT-ONE: the living watch calls as one, and nobody under a window (cityGuards.js)
@@ -10619,13 +10577,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         fauna: maps.getFaunaBand?.(playerTravelPixel().x, playerTravelPixel().y),   // TESA-BIOME: past the Bay its zone's wild
         playerLevel: effectiveLevel(playerEntity),   // SOFTCAP2: mentor mode - the group's encounters
       });
-      // WILD3: in the open zone's open country a wanderer is a GIANT one roll in WILD_GIANT_CHANCE (there are giants to meet)
-      if (hit && _m === 'exterior' && wildHere()) {
-        // PVPGIANT: at most WILD_GIANT_MAX giants roam the zone at once (a giant of the pool counts, and is not stood past two)
-        // ZONE-GIANTS: the zone's giants are its eight walkers (wildGiantsFrame) -
-        // a wanderer's roll never stands one, and a Giant the tables roll here is passed by
-        if (hit.mobileType === WILD_GIANT) continue;
-      }
       // REVENANT: a due revenant may take an open-world roll instead - the player's own, whoever rolls the group's wanderers
       const _revenant = hit && _m === 'exterior' ? revenantToReturn(playerEntity, { now }) : null;
       if (_revenant) { Promise.resolve(_standEncounterFoe({ ...hit, mobileType: _revenant.mobileType, revenant: _revenant }, playerFeet)).then((f) => { if (!f) releaseRevenantStand(_revenant); }); break; }   // claimed by the roll; a stand that stood nobody frees it
@@ -11738,7 +11689,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** PSCALE1: a group's members, grown with the party it meets - OW6: never past the pool's own bound (a warband of six
    *  met by a party of eight grew to nine, and the eight-foe pool stood none of it; the widest camp, five and three, is
    *  exactly the bound, so a camp is as it was). */
-  const campMembers = (types) => partyGroupMembers(types, partySize()).slice(0, encounterCap());   // PVPDUNGEONS: the zone's packs are allowed their four times
+  const campMembers = (types) => partyGroupMembers(types, partySize()).slice(0, encounterCap());
   const _standCampEncounter = (hit, feet) => {
     // CAMP-FAR: the anchor stands a hundred to a hundred and fifty metres
     // out, just outside the view, on the TERRAIN's own floor
@@ -13483,7 +13434,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (link.type !== playerEntity.ownedShip) return false;
     const boat = csaRuntime.AllBoats.find((b) => b.uid === link.uid && b.hull === link.hull && !b.inside);
     if (!boat?.MapPixel) { townTalk.say('Summon your linked ship from Holdings > Fleet, or place its parts, first.'); return true; }
-    if (!loading && (wildTeleportRefused(boatPixelOf(boat)) || veilRefused(boatPixelOf(boat)))) return true;   // AUDIT SEA VENTURES C1: a teleport to her like any - never into, out of or about the open zone, nor across the Veil (each says its own refusal)
+    if (!loading && veilRefused(boatPixelOf(boat))) return true;   // AUDIT SEA VENTURES C1: a teleport to her like any - never across the Veil (it says its own refusal)
     if (csaRuntime.isSailing() || navalHostileNear()) { townTalk.say(csaRuntime.isSailing() ? CABIN_REFUSAL.helm : CABIN_REFUSAL.enemies); return true; }   // FB1020c CABIN-FOES: nor below from a deck a hostile ship is near - the door's own law (systems/sailingCabin.js)
     modes?.forceExitToExterior({ cacheScene: !loading });
     cabinLink.close();
@@ -13684,10 +13635,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // "Anchor must be set" - the 4001 box (:268-275). The cast is
     // spent either way; DFU refunds nothing.
     if (!plan) { townTalk.say('You must set an anchor first.'); return; }
-    if (plan.kind !== 'same-interior' && (wildTeleportRefused(plan.anchor?.pixel ?? null) || veilRefused(plan.anchor?.pixel ?? null))) return;   // PVPDUNGEONS: no Recall into, out of or inside the zone - AUDIT CAPTAIN'S SEA P6: nor across the Veil
-    const wildTrip = plan.kind === 'same-interior' ? { ok: true, fee: 0 } : wildTravelGate(plan.anchor.pixel, 0, teleportJourney);   // WILD3: Recall is a fast journey too - PORTAL-BAY: a teleport's, under the teleport's law past the Bay (an anchor set past the Bay is reached, as the guild's teleport is)
-    if (!wildTrip.ok) return;
-    wildTravelPaid(wildTrip);
+    if (plan.kind !== 'same-interior' && veilRefused(plan.anchor?.pixel ?? null)) return;   // AUDIT CAPTAIN'S SEA P6: no Recall across the Veil
     _recalling = true;
     try {
       if (plan.kind === 'same-interior') {
@@ -13812,10 +13760,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   async function teleportTo(pick) {
     if (worldMoveBusy()) return false;   // AUDIT 68 S22
     if (_teleporting) return false;
-    if (wildTeleportRefused(pick.pixel) || veilRefused(pick.pixel)) return false;   // PVPDUNGEONS: the guild's teleport never into, out of or inside the zone - AUDIT CAPTAIN'S SEA P6: nor across the Veil
-    const wildTrip = wildTravelGate(pick.pixel, 0, teleportJourney);   // WILD3: the guild's teleport is a fast journey too - PORTAL-BAY: under the teleport's law past the Bay (systems/travel/pastBayTravel.js teleportJourney: a teleport is TESA-NO-FAST's own road there, never refused as a journey)
-    if (!wildTrip.ok) return false;
-    wildTravelPaid(wildTrip);
+    if (veilRefused(pick.pixel)) return false;   // AUDIT CAPTAIN'S SEA P6: the guild's teleport never across the Veil
     _teleporting = true;
     try {
       modes?.forceExitToExterior();
@@ -13917,7 +13862,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // (GetRandomCemetery's CurrentRegionIndex, :196), and the dungeon this
   // host mounts carries this same arm (worldModes' buildDungeonContext
   // opts), so a dungeon's registration no longer drops it.
-  // AUDIT CAPTAIN'S SEA P4: where a death past the Veil rises - systems/wild/etherWild.js etherRisePort (HOST-SPLIT)
+  // AUDIT CAPTAIN'S SEA P4: where a death past the Veil rises - systems/sea/etherRings.js etherRisePort (HOST-SPLIT)
   function transferToCemeteryArm() {
     // AUDIT CAPTAIN'S SEA P4: no cemetery of the Bay's past the Veil - the transfer skipped, as where a region has none
     { const p = playerTravelPixel(); if (etherSea && inEther(p.x, p.y)) { console.warn('[infection] past the Veil - no cemetery a crossing away; the transfer is skipped'); return; } }
@@ -13974,8 +13919,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  closed in place with no exit and no teleport; the next frame rejoins the room from right here. */
   function resurrectInPlace(rez) {
     if (_respawning) return;
-    const spared = wildDeathKill() ? 0 : statedDeathLoss() ?? 0;   // AUDIT FOE-KEEPS H4: a kill's tenth lies in the remains - none was spared
-    wildGhostEnd();   // WILD1: a body raised in the open zone - its offer over (what it dropped stays dropped), its cell let go to be joined again
+    const spared = statedDeathLoss() ?? 0;
     _rezSeen = null;
     _sdFallen.rise(modes?.sdRealmSlot?.());   // SD-REZ (EVENT-RULES): raised in the Hour I fell in - its slot let go, the realm lets me back
     _deadMark = null; _partyComposedAt = -Infinity;   // PCORPSE3: my body is gone - my party pose says so at once
@@ -14198,10 +14142,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     _respawning = true;
     endPlayerFights();   // RVN10 (Feud-Arc.md 21.2): the death ended every fight - the respawn's jump routs nobody (a death no hurt told)
     wagonRiders?.leave();   // WAGONS2 (AUDIT): a death ends a ride in another's wagon - the risen body is never pinned back on its seat
-    // WILD1: a death in the open zone rises OUT of it - the nearest town beyond the mountains - its body's offer over and
-    // its cell let go (the ghost), the team brought along whatever its settings say
-    const wildRise = !!wildDeath() || wildDeathKill(), wildKilled = wildDeathKill();   // FOE-KEEPS: a player's kill drops the zone's share; a foe's takes the usual tenth (AUDIT FOE-KEEPS H1: the kill the referee's word, H2: a zone's death even when its first dead frame found no room)
-    wildGhostEnd();
     // DEATHLOOP1: the health AND the cause. MAC-D3 put the heal first
     // so no frame could see a dead player with no death screen; this
     // also ends the drains that were emptying the bar, because a
@@ -14211,7 +14151,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     reviveForPlay(playerEntity, { force: true });
     surfacePlayer();
     player.stopAutorun();   // SEA-RISE: a player raised from death does not come up running - the latch walked them back into the sea
-    const goldLost = wildKilled || madeRuleHere('deathPenalty') === 'none' ? 0 : applyDeathPenalty(playerEntity);   // WILD GOLD: a kill in the zone takes its tenth into the remains instead of the usual penalty   // EG-H2 (Elite-Gates.md section 24): DEATH-PENALTY exempted where the made level's law says none
+    const goldLost = madeRuleHere('deathPenalty') === 'none' ? 0 : applyDeathPenalty(playerEntity);   // EG-H2 (Elite-Gates.md section 24): DEATH-PENALTY exempted where the made level's law says none
     // DEATH-PENALTY: once per death - the _respawning guard above is what makes it once
     // AUDIT REP, Mac's call ("What do you think? I trust you"): A DEATH ENDS THE CHASE. The respawn is handled as the
     // journey it most resembles (HCC H2, below) and the travel map's arrival clears the crime (PostFastTravel), but the
@@ -14257,11 +14197,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       const isPrivateersHold = wasInDungeon
         && px.x === getInt('Startup', 'StartCellX') && px.y === getInt('Startup', 'StartCellY');
       let kind, land = px;
-      // WILD1: a death in the open zone - the nearest town or temple OUTSIDE it, a dungeon's death too (its door is in
-      // the mountains, and the mountains' own towns are the next fight)
-      const wildSite = wildRise ? wildRiseSite(px, wasInDungeon, wildKilled) : null;   // AUDIT FOE-KEEPS E1: a foe's death rises inside the zone
-      if (wildSite) { land = wildSite.mapPixel; kind = wildSite.kind; }
-      else if (wasInDungeon && !isPrivateersHold) kind = 'dungeon';   // the door out: the pixel already under the player
+      if (wasInDungeon && !isPrivateersHold) kind = 'dungeon';   // the door out: the pixel already under the player
       else if (etherSea && inEther(px.x, px.y)) {
         // AUDIT CAPTAIN'S SEA P4: past the Veil, the nearest port isle's town - the region's search read Betony's rows, and
         // the dead woke at a Bay temple a crossing away (the ship and her hold left past the Veil)
@@ -14288,17 +14224,11 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // HCC (AUDIT HCC H2): the online respawn is the port's own teleport - DFU raises no event for it (a death there
       // is a load) - and a following team left on its old pixel's coordinates stands nowhere. It is handled as the
       // journey it most resembles: the travel map's (fastTravelTo below), the FollowFastTravel setting deciding.
-      // WILD1: out of the zone the
-      // team comes along whatever Follow Fast Travel says - a waiting or following team is called to follow first
-      if (wildRise) hccRuntimeOn()?.forceNextFastTravel?.();   // WILD1: this journey's pair is a forced one
       hccRuntimeOn()?.handlePreFastTravel();
       try {
         if (ohReturn) { await ohTeleportToWorld(ohReturn.worldX, ohReturn.worldZ); await ohAbyss.standAtPit(ohReturn); }   // AUDIT OH-F B5
         else await _teleportToPixel(land.x, land.y, null, { reposition: REPOSITION.RandomStartMarker });
       } finally { hccRuntimeOn()?.handlePostFastTravel(); }   // AUDIT HCC (branch audit): a teleport that threw still lifts the following team's suspension
-      // WILD1: stood clear of the others and of the walls the team stands against - before the team is placed (the post
-      // only arms the team's relocation; it lands behind the player on a later frame, tryCompleteFastTravelHorseRelocation)
-      if (wildRise) wildClearSpawn();
       _lastEncMinutes = Math.floor(playerTicker.ownMinutes);   // PreventEnemySpawns parity, the cemetery transfer's own line
       // MAC-D3: the heal is at the TOP now, before anything is torn
       // down or awaited. Re-asserted here only because a teleport can
@@ -14330,8 +14260,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // ship's passage) teleported the pinned body away, its motor held at the far end until the owner's word lapsed. The
     // journey that follows the owner is the party's own (`besideAt`)
     if (typeof pick.besideAt !== 'function' && wagonRiders?.seated()) { tvSay(TRAVEL_VIEW_TEXT.rider); hudFade.clearFade(); return false; }
-    const wildTrip = wildTravelGate(pick.pixel, computed?.piecesCost ?? 0);   // WILD3: never into or out of the open zone; inside it, the fee and the wait
-    if (!wildTrip.ok) { hudFade.clearFade(); return false; }
+    if (!travelGate(pick.pixel).ok) { hudFade.clearFade(); return false; }   // TESA-NO-FAST: no fast journey past the Bay
     // HCC (AUDIT HCC H2): DaggerfallTravelPopUp.OnPreFastTravel [IL_a1d8] - the mod's ONE subscription for a
     // journey: the following team's pose is cached to ride along, or it waits at the departure with
     // FollowFastTravel off. Before `_traveling` rises (the runtime's ready() reads it) and before the gold goes.
@@ -14367,7 +14296,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         deductGold(playerEntity, computed.totalCost - (computed.piecesCost ?? 0));
       };
       if (!partyArrival) payFare();
-      wildTravelPaid(wildTrip);   // WILD3: the mountain road's fee, and its ten minutes begin
       // WA1: RaiseOnPreFastTravelEvent (DaggerfallTravelPopUp.cs:328) - after DeductFastTravelGold, before the teleport:
       // Warm Ashes' OnPreFastTravel reads the journey's ocean pixels and the ship toggle
       if (warmAshesOn()) warmAshesPreTravel({ oceanPixels: computed.oceanPixels ?? 0, travelShip: !!opts.travelShip });
@@ -15436,11 +15364,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // FB1020c STREETS-TAB (scenes/exteriorAutomapToggle.js travelTown): in a town the window holds its streets too, opening on the bay
     _travelMap = buildTravelMapWindow({ ...travelTown(), onTravel: (pick, opts, computed) => {
       if (TEST_GODMODE && staffPowers().god && pick?.pixel) { teleportTo(pick); return; }   // TESTBUILD: god mode - the map's journey is instant, from anywhere to anywhere
-      // HALL-HERE: a journey to the zone hall I already stand at is no journey - said, and nothing begun
-      if (pick?.pixel && !pick.coords) {
-        const at = playerTravelPixel();
-        if (at && at.x === pick.pixel.x && at.y === pick.pixel.y && wildHallAt(wildActiveNow(), at.x, at.y)) { townTalk.say('You are already there.'); setMidScreenText('You are already there.', 3); hudFade.clearFade(); return; }
-      }
       if (partyTravel?.propose(pick, opts, computed)) { hudFade.clearFade(); return; }   // PARTY-TRAVEL: "...the option for party members to ready up and travel together" - the leader's Begin with the party gathered asks them first (a walked trip is never a round: the session says no to it)
       if (opts?.playerControlled && beginAcceleratedTravel(pick, opts, { estimateMinutes: computed?.minutes ?? null })) return;   // AUDIT-TO1 L5: the popup's estimate rides along for the panel's ETA
       // AUDIT OW3 J2: a walked trip the OVERWORLD refused (no way by land, the peaks, the water, foes near) is refused -
@@ -15533,8 +15456,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     get travelOptions() { return travelOptions; },
     get travelView() { return travelView; },
     get veilRefused() { return veilRefused; },
-    get wildTeleportRefused() { return wildTeleportRefused; },
-    get wildTravelGate() { return wildTravelGate; },   // PORTAL-BAY: the teleport's gate, asked at the pick and the step
   });
 
   // ── TO1: TRAVEL OPTIONS ────────────────────────────────────────────
@@ -16040,15 +15961,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       party: () => partyMarkers(),
       waypointCtx: () => waypointCtx(),   // WAYPOINTS: who I am on a shared waypoint, and which kinds I can share
       travellers: () => travellerBook.live(Date.now()).filter((t) => !social?.inMyParty(social.accountOfPeer(t.id))).map((t) => ({ id: t.id, name: t.name, ...t.p, ship: isShipMark(t.p), kin: travellerKin({ friend: !!social?.isFriendPeer(t.id), gt: t.gt }, myGuildTag()), lv: t.lv ?? null })),   // OW-KIN / OW-WHO: who they are to me, and their Renown   // OWS1: one at sea drawn as a ship   // TV3: the region's travellers, as the view draws them - AUDIT DEEP T3-9: bar my party, whom the map already rings as theirs
-      travellerHidden: (t) => wildHidesPlayer({ kin: t.kin, pixel: t }),   // WILD1: in or near the open zone only my party and my guild are seen (the map asks of each row)
-      wildMask: () => cyrodiilMask(),   // WILD1: the open zone's fog and red line (ui/wild/wildMapInk.js) - ZONE-OFFLINE: Cyrodiil's on the map online and off; its rules (the halls, the giants, the drop) stay online's (wildMapMask)
-      wildDungeons: () => wildActiveNow(),
-      wildGiants: () => wildGiantMarks(),
-      zoneFirst: () => wildHere() && !!wildMapMask() && modes?.mode !== 'dungeon',   // ZONE-FIRST: V in the zone opens the zone map   // ZONE-GIANTS: the zone's eight giants where they walk
-      wildLocks: () => { const now = Date.now(), out = new Set(); for (const [h, u] of _wdunLocks) if (u > now && !(_wildMine?.dungeon === h && _wildMine.until > now)) out.add(h); return out.size ? out : null; },   // HALL-LOCK MARK
-      wildHallSummaries: () => wildHallSummaries(),   // PVPDUNGEONS: the halls as place rows - marked like every place, for everyone in the zone
-      wildCrows: () => (_wdunCrows.size ? new Set(_wdunCrows.keys()) : null),   // PVPDUNGEONS: crows over every hall a body lies in - the hub's word, everyone's deaths   // PVPDUNGEONS: crows over the hall a death lies in (mine; the room's other deaths need the relay)   // PVPDUNGEONS: the day's open halls, marked on the world map and the zone map
-      wildRemains: () => wildRemainsMarks(),   // WILD1: where my remains lie, and for how long
       // WB1: THE OBLIVION GATE'S RING - a function for the party's reason (the countdown moves while the map stands
       // open); null offline and while no gate is marked, and both maps draw nothing
       gate: () => gateOmen?.mapMark() ?? null,
@@ -17066,8 +16978,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  makes to the pack (checkpointedTradePack). Refused where the exit save is, and while a duel is in play. Answers
    *  whether it wrote. */
   let _checkpointAt = -Infinity;
-  /** The checkpoint gate as it stands now - its inputs built once, so the periodic checkpoint and the zone's death
-   *  checkpoint below ask the same question and a new input reaches both (Home.md, THE ONE CONSTRUCTION SEAM). */
+  /** The checkpoint gate as it stands now - its inputs built once, so the periodic checkpoint and
+   *  the arrivals' sweep ask the same question and a new input reaches both (Home.md, THE ONE CONSTRUCTION SEAM). */
   const checkpointGateOpen = () => checkpointAllowed({ online: !!online, spawned: playerSpawned, seatOut: seatOut(), duel: !!duelMgr?.duel, walkWaiting: ownWalkWaiting(playerEntity), realm: !!realmSession });
   const onlineCheckpoint = ({ sink = null } = {}) => {   // AUDIT PRE-MERGE 1003 O10: `sink` a realm save's sink of the caller's (onlineCheckpointLanded)
     if (!checkpointGateOpen()) return false;   // AUDIT LIVED1b S1
@@ -20015,18 +19927,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // DUEL1: A DUEL FRAME AT ME - the law decides (net/duel/duelSession.js); `sub` the sender's account as the relay stamped it
     online.onDuel = (id, d, sub = null) => { duelMgr.onFrame(id, d, sub); };
     online.onDuelRef = (g, room) => { if (g.k === 'bout') _duelRoom = room ?? null; duelMgr.onRef(g); };   // INT8: the referee's word on my bout - AUDIT INT8: and its room, where its frames go
-    online.onWild = (id, d, sub = null) => { wildFight.onFrame(id, d, sub); };   // WILD1: a fallen's offer at me (INT9: the one frame the zone routes) - the zone's law decides (net/wild/wildFight.js)
-    online.onWildRef = (g, room) => wildRefIn(g, room);   // INT9: the zone referee's word - a blow landed, a fall, a fall signed
-    // WILD1: my room's word on its remains (net/wild/wildRemains.js). WILD-SEEN: the book is told the room FIRST - the frame told it a frame late, and a near relay's hello answered inside
-    // that frame, so the room's remains were heard and then cleared as "another room's" by the frame's setRoom
-    // HALO-REMAINS: a halo's word too - the cell beside mine says its remains at its hello, and a crossing into it promotes
-    // that socket with no hello again; the book holds every room I hold (its records go when their room is let go)
-    online.onWildRoom = (w, room) => {
-      if (!online.heldRooms().includes(room)) return;
-      wildRemains.setRooms(online.heldRooms());
-      wildRemains.onWord(w, room);
-      if (w?.k === 'gone') { remainsGone(w.r); forgetMine(w.r); }   // WILD-WAYPOINT: all taken, or let go - the flag goes with them; WILD-KEEP: and the kept record
-    };
     online.onWed = (id, d, sub = null, sc = null) => { wedMgr.onFrame(id, d, sub, sc); };   // LEGACY7 part three: a wed frame at me - the wedding's law decides; AUDIT LEGACY III O1: `sc` their realm character as the relay stamped it
     online.onGate = (g) => { if (g?.k === 'bd') bossCountFell(modes?.gateArenaDay?.() != null); else gateLink?.word(g); };   // WB3b: the court's room's word about its boss; INT11: the relay's count's fall of me
     online.onSdHall = (w) => sdHallHeard(w);   // SD6c: the realm's word on the Orrery's hall - the stones, the fray, the Concord; the snap's lash
@@ -20255,10 +20155,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         } }
         if (staffHost?.claims(tabId)) return staffHost.send(tabId, text);   // STAFF-PANEL5-FREEZE: the Staff tab's line goes to the service; a freeze shuts every other tab, the commands below too
         if (/^\/unstuck(\s+cancel)?$/i.test(text.trim())) {
-          // PVPUNSTUCK: outside the zone at once (30 min cooldown); in the zone after a five-minute wait with a bar that can
-          // be cancelled (a second /unstuck or "/unstuck cancel" cancels too), and a 60 minute cooldown - overworld and dungeons
+          // PVPUNSTUCK: at once, with a 30 minute cooldown - overworld and dungeons
           const say = (t) => chatLog.push(tabId, { text: t, system: true });
-          if (/cancel/i.test(text) || _unstuckWait) { if (_unstuckWait) { unstuckCancel('You stay where you are.'); } else say('Nothing to cancel.'); return true; }
+          if (/cancel/i.test(text)) { say('Nothing to cancel.'); return true; }
           // EG-H2 (Elite-Gates.md section 24): a made level's /unstuck is the made level's law's -
           // AUDIT SD III (H10): in the Shattered Hour, the Hour's own way out - under its veil, in its words, as every other
           // way out of it is; refused there (the dead's is the death's), nothing more said
@@ -20269,14 +20168,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           const madeUnstuck = madeRuleHere('unstuck');
           if (madeUnstuck === 'wayHome') { if (sdWayHome()) say('You find your way back outside.'); return true; }
           if (madeUnstuck === 'refused') { say(madeSaysHere('unstuck')); return true; }
-          const inZone = wildHere() && !(TEST_GODMODE && staffPowers().god);   // TESTBUILD: god mode - /unstuck at once, no cooldown
           const _godU = TEST_GODMODE && staffPowers().god;
-          if (inZone && (modes?.mode ?? 'exterior') === 'exterior') { say(zoneWord('unstuckOut')); return true; }   // PVPDUNGEONS - AUDIT SEA VENTURES C6: the ground's own words
-          const cool = inZone ? UNSTUCK_COOLDOWN_ZONE_MS : UNSTUCK_COOLDOWN_MS;
-          const wait = cool - (Date.now() - _unstuckAt);
+          const wait = UNSTUCK_COOLDOWN_MS - (Date.now() - _unstuckAt);
           if (!_godU && _unstuckAt && wait > 0) { say(`/unstuck can be used again in ${Math.ceil(wait / 60000)} minute${Math.ceil(wait / 60000) === 1 ? '' : 's'}.`); return true; }
-          if (!_godU && wildStrangerWithin(UNSTUCK_ENEMY_M)) { say(`You cannot use /unstuck with another player within ${UNSTUCK_ENEMY_M} m in the open PvP zone.`); return true; }
-          if (inZone) { unstuckBegin(say); return true; }
           const moved = unstuckNow();
           if (moved) _unstuckAt = Date.now();
           say(moved ? 'You find your way free.' : 'There is nowhere to send you from out here.');
@@ -20859,15 +20753,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** DUEL_RANGE_M between two BODIES, the trade's own measure (metres, never a pixel or a room). */
   const duelNear = (peerId) => { const b = duelBody(peerId); return !!b && tradeDistance(player.feetAt(), b.feet) <= DUEL_RANGE_M; };
   const duelAccount = accountDuels({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() });
-  const wildAccount = accountWild({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() });   // INT9: a death in the open zone's drop
-  // WILD-INSURE: my policies - the pack's card writes one and the drop's answer
-  // spends them. Written online for a realm character, outside the zone; paid as the Firmament's respec pays (the record's
-  // act, the wallet reserved first)
-  const wildInsure = createWildInsureBook({ door: wildAccount, realm: realmSession ? { act: (o) => realmGoldAct({ ...o, session: realmSession, checkpoint: () => onlineCheckpoint() }) } : null,
-    wallet: realmWallet, character: () => realmSession?.id ?? null, region: () => _questRegionIndex() ?? 0, inZone: () => wildHere(), now: () => Date.now() + _sharedOffsetMs });   // AUDIT PVP-EASE L4-1, L4-5: the joined character, the shared clock
-  setWildInsureBook(wildInsure);
-  wildInsure.read();
-  const wildGrace = createWildGrace({ me: () => online?.id ?? null, say: (l) => { setMidScreenText(l); townTalk.say(l); } });   // ZONE-GRACE (systems/wild/wildGrace.js)
   const _duelSent = new Map();   // my blow's number -> { kind, weapon } - what it was
   let _duelLastWeapon = null;    // INT8: the weapon of my last strike - the referee's word on it names no number
   let _duelFoe = null;      // my opponent as the HUD's target bar reads a foe ({ entity: { name, health, maxHealth }, dead })
@@ -21048,7 +20933,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const siegeMeleeHit = (eye, inViewFn) => {
     const battle = royalSession?.active() ? royalSession : siegeSession;   // CROWN1 part two: a Royal Tourney's bout, the same arm
     const foes = battle?.foes() ?? [];
-    if (!foes.length) return (battle === siegeSession && siegeWorkHit()) || wildMeleeHit(eye, inViewFn);   // SEAT2b part two (b): no foe - the work in reach; WILD1: no battle at all - a fair player of the open zone
+    if (!foes.length) return battle === siegeSession && siegeWorkHit();   // SEAT2b part two (b): no foe - the work in reach
     let best = null, bestD = Infinity;
     const near = peersNear();   // AUDIT SEATS-3 C3: the room's bodies read once for the sweep, not once per foe
     for (const id of foes) {
@@ -21092,7 +20977,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  which clips it to DFU's range for the weapon my look holds (net/siege/siegeRef.js). True when it was the battle's. */
   const siegeStrikeOut = (to, by, weapon, swing, drawMs = 0, { off = false } = {}) => {
     const battle = royalSession?.active() ? royalSession : siegeSession;
-    if (!to || !battle?.active() || !battle.foes().includes(to)) return wildStrikeOut(to, by, weapon, swing, drawMs, { off });   // WILD1: not the battle's - perhaps a fair player of the open zone's
+    if (!to || !battle?.active() || !battle.foes().includes(to)) return false;
     const a = withoutFirmament(playerEntity, () => duelAttackerOf(playerEntity, weapon)), w = duelWeaponOf(weapon), sw = duelSwingOf(swing);
     const r = resolveDuelStrike({ by, a, ...(w ? { w } : {}), ...(sw ? { sw } : {}), ...(drawMs > 0 ? { at: Math.min(60000, Math.trunc(drawMs)) } : {}), ...(off ? { off } : {}) }, duelStandIn(playerEntity));
     if (r.dmg > 0) {
@@ -21116,7 +21001,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const duelArrowTargets = () => {
     if (!duelMgr.fighting) {
       const bodies = battleFoeBodies(royalSession?.active() ? royalSession : siegeSession);
-      return bodies.length ? bodies.map((b) => ({ feet: b.feet, ref: { duel: true, id: b.id, dead: false, ai: { feet: b.feet, height: b.height ?? CAPSULE_HEIGHT } } })) : wildArrowTargets();   // WILD1: no battle - the open zone's fair players
+      return bodies.length ? bodies.map((b) => ({ feet: b.feet, ref: { duel: true, id: b.id, dead: false, ai: { feet: b.feet, height: b.height ?? CAPSULE_HEIGHT } } })) : NO_BODIES;
     }
     const b = duelBody(duelMgr.opponent);
     return b ? [{ feet: b.feet, ref: { duel: true, id: b.id, dead: false, ai: { feet: b.feet, height: b.height ?? CAPSULE_HEIGHT } } }] : [];
@@ -21125,12 +21010,12 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  outside a duel. A Royal Tourney's bout is blows alone (its referee takes no cast). */
   const siegeSpellMarks = () => {
     const bodies = battleFoeBodies(siegeSession);
-    return bodies.length ? bodies.map((b) => ({ ...b, name: b.name ?? peerName(b.id) ?? 'a foe' })) : wildSpellMarks();   // SEAT2b part two (c): a guard or a rebel by its own name; WILD1: no siege - the open zone's fair players
+    return bodies.length ? bodies.map((b) => ({ ...b, name: b.name ?? peerName(b.id) ?? 'a foe' })) : null;   // SEAT2b part two (c): a guard or a rebel by its own name
   };
   /** AUDIT-SEATS G5: A SPELL OF MINE MET A SIEGE'S FOE - its harm, counted on the neutral stand-in
    *  (combat/siegeCombat.js siegeSpellNumbers), to the referee as a cast (it clips, and bounds the rate). */
   const siegeSpellOut = (peerId, sp) => {
-    if (!siegeSession?.isFoe(peerId)) return wildSpellOut(peerId, sp);   // WILD1: not the siege's - perhaps a fair player of the open zone's
+    if (!siegeSession?.isFoe(peerId)) return false;
     const { harm } = withoutFirmament(playerEntity, () => siegeSpellNumbers(sp, Math.max(1, Math.trunc(playerEntity.level || 1)), duelStandIn(), playerEntity));
     return harm > 0 && siegeSession.cast(peerId, siegeCastClamp(harm, false));
   };
@@ -21255,914 +21140,56 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // a tab put away (a phone's home button, another tab) is checkpointed while the page still can be
     whenPageHides(globalThis.document, () => { if (online) onlineCheckpoint(); });
   }
-  // ═══ WILD1: THE OPEN ZONE - THE WROTHGARIAN MOUNTAINS ═════════════════════════
-  // The owner: "Wrothgarian mountains need to be turned into a open pvp zone". The law is in its own modules - the zone
-  // and its numbers (systems/wild/wildZone.js), what a death drops and keeps (systems/wild/wildDeath.js), the fights and a body's
-  // one piece (net/wild/wildFight.js), the room's remains as piles (net/wild/wildRemains.js); this block joins them to this
-  // scene's socket, bodies, pack and windows. THE FOUR HOSTS RULE: this host (the street, the fights and the remains in
-  // its pool) WIRED; worldModes.js (a building's pool, the remains) and dungeonContext.js (a dungeon's pool, its foes
-  // and piles four times and twice) WIRED; exterior.js, the offline fixed city, NOT WIRED on purpose - the zone is
-  // online's alone.
-  /** The zone's mask over the maps file - for the maps, online alone (offline the mountains are Daggerfall's own). */
-  const wildMapMask = () => (_onlineWorldSession() ? cyrodiilMask() : null);
-  /** Is a world-frame point (natives on x and z) in the zone - or, `near`, within its band? */
-  const wildAtWire = (p, near = false) => {
-    const m = cyrodiilMask();
-    if (!p) return false;
-    const px = worldCoordToMapPixel(p[0], p[2]);
-    if (etherSea && (near ? inEther(px.x, px.y) : etherWildRingAt(px.x, px.y) > 0)) return true;   // ETHER-WILD: the open sea - and, near it, the whole sea past the Veil
-    return !!m && (near ? wildNear(m, px.x, px.y) : wildInside(m, px.x, px.y));
-  };
-  const wildOutdoors = () => (modes?.mode ?? 'exterior') === 'exterior';
-  /** A region mark's place (its px/py and 256ths) as a world-frame point. */
-  /** May I fight in the zone now: a relay that carries it, standing in the zone, outdoors (the fights are the open
-   *  country's - a building's and a dungeon's foes are the zone's danger there), alive. */
-  // ── PVPDUNGEONS: THE ZONE'S OWN HALLS (systems/wild/wildDungeons.js picks them; the hub keeps them - net/wild/wildLaw.js) ──
-  // The day is the RELAY's (`st`), so every client stands the same halls; the hour's lock, who is inside, the empty hall's
-  // reset and the crows are the hub's word. With no hub to ask (an older relay, a lost socket) the day falls back to this
-  // machine's clock and the lock to this session's own memory - the halls still stand, the rules still hold for me.
-  let _wdunLink = null, _wdunHiAt = 0, _wdunHeard = false;   // (_wdunSkew, the hub's clock less mine, is declared above the pixel builder - BOOT-TDZ2)
-  const _wdunLocks = new Map();   // hall -> until (this machine's clock)
-  const _wdunCrows = new Map();   // hall -> until (this machine's clock)
-  let _wdunWait = null;           // the entry asked of the hub: { h, done }
-  let _wdunInside = null;         // the hall I stand in: { h, hereAt }
-  let _wdunEpoch = new Map();     // hall -> its epoch as the hub last said it (a reset is a new one)
-  // SEA VENTURES (scenes/seaVenturesHost.js): the sea's own - SEA-VAULTS' vaults of the deep keep the halls' hub, locks and crows
+  // SEA VENTURES (scenes/seaVenturesHost.js): the sea standing's vaults, its storm and its treasure fleet - wired here, held there.
+  // The vaults have no hub: the day number of the shared clock is their epoch (their chests' keys).
   const seaVentures = createSeaVentures({
-    live: () => etherSea && _onlineWorldSession() && !!online, day: wdunDayNow, pixel: playerTravelPixel, locks: _wdunLocks, crows: _wdunCrows, mine: () => _wildMine,
-    clock: () => raidNowMs(), naval: () => naval, state, link: socialLink, ether: etherHost,   // SEA-EVENTS: the shared clock (asked when called - raidNowMs stands further down, V4), the naval host, the scene, the hub, the purse and the words (the ether host's)
-    session: realmSession, checkpoint: onlineCheckpoint, wallet: realmWallet, region: _questRegionIndex,   // SEA-BOUNTY: the record's gold acts (the character the sea's host's own)
-    cell: () => online, foe: (id) => wildIsStranger(id, online?.drawable?.()?.find((d) => d.id === id)?.gt),   // SHIP-PVP: my cell's socket (a peer's name its own), a stranger captain
+    live: () => etherSea,
+    day: () => Math.floor(raidNowMs() / WDUN_DAY_MS),
+    pixel: playerTravelPixel,
+    clock: () => raidNowMs(),   // the shared clock, asked when called: raidNowMs stands further down (V4)
+    naval: () => naval,
+    state,
+    link: socialLink,
+    ether: etherHost,
+    session: realmSession,   // SEA-SEASON: the season boards need the realm character
   });
-  const _giantsDown = new Map();  // ZONE-GIANTS: giant -> when it walks again (this machine's clock)
-  const _giantsStood = new Map(); // ZONE-GIANTS: giant -> { foe, promise } - the one stood here
-  let _giantsAt = 0;
-  const _giantHeight = zoneHalls.heightAt;   // GIANT-FIELDS: the low ground's test - AUDIT WW F4: the continent's, never the land switch's
-  /** GIANT-FIELDS: where on the ground a giant at scene point `at` stands - the flattest open spot within 160 m, never on a
-   *  peak or a slope: each candidate's ground read at its four sides four metres out (the steepest step its slope), and
-   *  one standing higher than the ring round it marked down (a crest). Null when no spot is flat enough. */
-  const giantFieldSpot = (at) => {
-    let best = null, bestScore = Infinity;
-    for (let r = 0; r <= 160; r += 20) {
-      const n = r === 0 ? 1 : Math.max(6, Math.round(r / 10));
-      for (let i = 0; i < n; i++) {
-        const a = (i / n) * Math.PI * 2, x = at[0] + Math.cos(a) * r, z = at[2] + Math.sin(a) * r;
-        const h = heightAt(x, z);
-        if (!Number.isFinite(h)) continue;
-        let slope = 0, ring = 0, m = 0;
-        for (const [dx, dz] of [[4, 0], [-4, 0], [0, 4], [0, -4]]) { const q = heightAt(x + dx, z + dz); if (Number.isFinite(q)) slope = Math.max(slope, Math.abs(q - h)); }
-        for (let k = 0; k < 8; k++) { const b = (k / 8) * Math.PI * 2, q = heightAt(x + Math.cos(b) * 30, z + Math.sin(b) * 30); if (Number.isFinite(q)) { ring += q; m++; } }
-        const crest = m ? Math.max(0, h - ring / m) : 0;
-        if (slope > 1.6 || crest > 4 || giantGroundBlocked(collider, x, h, z)) continue;   // a slope steeper than ~22 degrees, or a rise over its surroundings - RPT1026-MISC GIANT-ROCK: or a rock where it would stand
-        { const c = state.worldCoords([x, h, z]), w = worldCoordToMapPixel(c.x, c.z); if (tvWater(w.x, w.y)) continue; const zm = wildMapMask(); if (zm && !wildInside(zm, w.x, w.y)) continue; }   // never in the water; GIANT-LEASH: never outside the zone
-        const score = slope * 4 + crest * 2 + r * 0.02;
-        if (score < bestScore) { bestScore = score; best = [x, h, z]; }
-      }
-      if (best && bestScore < 1.5) break;   // flat enough near its place: no need to look farther
-    }
-    return best;
-  };
-  /** ZONE-GIANTS: the eight giants' walks now (the relay's clock), the dead left out. */
-  const wildGiantsNow = () => {
-    const mask = wildMapMask();
-    if (!mask) return [];
-    const now = Date.now();
-    return wildGiantsAt(mask, zoneHalls.free, now + _wdunSkew, (g) => (_giantsDown.get(g) ?? 0) > now, _giantHeight);
-  };
-  // GIANT-FALL: the
-  // ground shakes for everyone in the zone; the notice is a Plus box to click away - held while I am in a fight and shown
-  // the moment it ends; and the giant's skull stays on the map, crossed out, where it fell until it walks again.
-  const _giantFalls = new Map();   // giant -> { x, y, said } - where it fell (map pixels), once its fall was told here
-  let _giantNotice = [];           // notices held while I fight
-  const giantFallPlace = (g) => {
-    const mask = wildMapMask();
-    const until = _giantsDown.get(g) ?? Date.now();
-    const at = until - WILD_GIANT_RESPAWN_MS + _wdunSkew;
-    return mask ? (wildGiantsAt(mask, zoneHalls.free, at, () => false, _giantHeight).find((q) => q.g === g) ?? null) : null;
-  };
-  const giantFell = (g, where = null) => {
-    if (_giantFalls.get(g)?.said) return;
-    const p = where ?? giantFallPlace(g);
-    _giantFalls.set(g, { x: p?.x ?? null, y: p?.y ?? null, ring: p?.ring ?? Math.floor(g / 2) + 1, said: true });
-    if (!wildHere()) return;   // the zone's own news - told to those in it
-    for (let k = 0; k < 6; k++) setTimeout(() => { try { betterAmbience.weaponKick(k === 0 ? 6 : 3.5 - k * 0.5); } catch { /* no shaker */ } }, k * 220);
-    const ring = p?.ring ?? Math.floor(g / 2) + 1;
-    _giantNotice.push(['A Greater Giant has fallen!', `${wildRingName(ring)} trembles as it hits the ground.`, 'It will rise again in half an hour.']);
-    townTalk.say(`A Greater Giant has fallen in ${wildRingName(ring)}.`);
-  };
-  /** GIANT-FALL: the held notices, one box at a time, once no foe is near and no box stands. */
-  const giantNoticeFrame = () => {
-    if (!_giantNotice.length || playerEntity.health <= 0) return;
-    const fighting = duelEnemyNear() || areEnemiesNearby((modes?.mode ?? 'exterior') === 'exterior' ? [...exteriorFoes.foes, ...cityGuards.guards] : (modes?.insideFoes?.() ?? [])) || wildFight.inFight?.();
-    if (fighting || townTalk.overlay) return;
-    const rows = _giantNotice.shift();
-    townTalk.showOverlay(new DecisionBoxWindow({ rows, ok: true }));
-  };
-  /** ZONE-GIANTS: the giants for the maps - a giant stood in my world at its body's own place, the rest on their walk. */
-  const wildGiantMarks = () => {
-    if (!wildMapMask()) return [];
-    const now = Date.now();
-    const fallen = [];
-    for (const [g, f] of _giantFalls) {
-      if (!((_giantsDown.get(g) ?? 0) > now)) { _giantFalls.delete(g); continue; }   // up again: its walk comes back
-      if (f.x != null) fallen.push({ g, ring: f.ring, x: f.x, y: f.y, dead: true });
-    }
-    return [...fallen, ...wildGiantsNow().map((gi) => {
-      const st = _giantsStood.get(gi.g)?.foe ?? exteriorFoes.foes.find((f) => f?.puppet && !f.dead && f.entity?.zoneGiant === gi.g);   // GREATER-GIANT: someone else's, where its body stands
-      const feet = st && !(st.entity?.health <= 0) ? (st.ai?.feet ?? st.feet) : null;
-      if (feet) { const w = campToWire(feet); return { ...gi, x: w[0] / 32768, y: 500 - w[2] / 32768, here: true }; }
-      return gi;
-    })];
-  };
-  // GIANT-RETREAT: the moment I step out of
-  // the zone, every giant stood here drops me and walks back GIANT_RETREAT_M into the zone (its own walk, by the motor's
-  // run - EnemyMotor.flee steered at its goal each frame), and only then is a foe again. Still outside when it gets there
-  // and it comes for the border, it turns back again - the border's wall holds it meanwhile.
-  // HALL-ARRIVE2: A WATCH ON EVERY JOURNEY TO A ZONE HALL, whichever door began it (the map's Begin journey, the
-  // Overworld's plate, a resume, a party's walk) - the moment I stand at its door (its pixel, inside its ground grown by
-  // HALL_ARRIVE_M) or go down into it, the journey is over: the bar closed, the clock back to one, said once.
-  const HALL_ARRIVE_M = 40;
-  const hallArrivalWatch = () => {
-    const st = travelOptions?.state;
-    if (!st || !travelOptions.isTravelActive) return;
-    const summary = st.route?.summary ?? st.destinationSummary ?? null;
-    const named = /\((\d{1,3}),(\d{1,3})\)\s*$/.exec(String(st.route?.name ?? st.destinationName ?? summary?.name ?? ''));
-    const px = summary?.pixel?.x ?? (named ? Number(named[1]) : null), py = summary?.pixel?.y ?? (named ? Number(named[2]) : null);
-    if (px == null || py == null) return;
-    const hallLoc = summary?.loc?.wildHall ? summary.loc : (wildHallAt(wildActiveNow(), px, py) ? locationIndex.get(`${px},${py}`) : null);
-    if (!hallLoc?.wildHall) return;
-    let there = (modes?.mode ?? 'exterior') === 'dungeon';
-    if (!there) {
-      const at = playerTravelPixel();
-      if (at && at.x === px && at.y === py) {
-        const r = locationWorldRect(hallLoc, px, py), n = state.worldCoords(player.feetAt()), g = HALL_ARRIVE_M * 40;   // native units: 40 a metre
-        there = ![r?.minX, r?.maxX, r?.minZ, r?.maxZ].every(Number.isFinite) || (n.x >= r.minX - g && n.x <= r.maxX + g && n.z >= r.minZ - g && n.z <= r.maxZ + g);   // no ground to read: its pixel is its door
-      }
-    }
-    if (!there) return;
-    travelOptions.interruptTravel?.();
-    travelOptions.clearTravelDestination();
-    townTalk.say('You have arrived.');
-  };
-  /** GREATER-GIANT: its call -
-   *  GREATER_GIANT_CALL giants stood in a ring about it, 10 to 18 m out, each on the zone's own ground (never past its
-   *  border), ordinary (never an elite, never a champion) and on the fight at once; the ground shakes and it is said. */
-  const greaterGiantCall = (f, mask) => {
-    const c = f.ai.feet;
-    let stood = 0;
-    for (let k = 0; k < GREATER_GIANT_CALL * 2 && stood < GREATER_GIANT_CALL; k++) {
-      const a = (k / GREATER_GIANT_CALL) * Math.PI * 2 + (k >= GREATER_GIANT_CALL ? 0.3 : 0), r = 10 + ((k * 7) % 9);
-      const x = c[0] + Math.cos(a) * r, z = c[2] + Math.sin(a) * r, h = heightAt(x, z);
-      if (!Number.isFinite(h)) continue;
-      const [mx, my] = giantMapAt([x, h, z]);
-      if (!wildInside(mask, mx, my) || giantGroundBlocked(collider, x, h, z)) continue;   // RPT1026-MISC GIANT-ROCK: nor one of its call inside a rock
-      stood++;
-      exteriorFoes.spawnFoe(WILD_GIANT, [x, h, z], { yaw: Math.atan2(c[0] - x, c[2] - z), eliteFoe: false, champion: null, transient: true })
-        .then((g) => { if (g) { g.ai.target = f.ai.target ?? g.ai.target; g.ai.makeHostileToPlayer?.(undefined, g.ai.feet); } })
-        .catch(() => {});
-    }
-    try { betterAmbience.weaponKick(5); } catch { /* no shaker */ }
-    const line = 'The Greater Giant bellows, and the giants of the mountains answer its call!';
-    setMidScreenText(line, 4); townTalk.say(line);
-  };
-  const GIANT_RETREAT_M = 200;
-  const giantMapAt = (p) => { const w = campToWire(p); return [w[0] / 32768, 500 - w[2] / 32768]; };
-  /** Where a giant at `feet` retreats to: of sixteen ways out GIANT_RETREAT_M long, the ones whose whole line stays inside
-   *  the zone, the deepest at its end (the farthest from the border) - null when none does. */
-  const giantRetreatGoal = (mask, feet) => {
-    let best = null, bestDepth = -1;
-    for (let k = 0; k < 16; k++) {
-      const a = (k / 16) * Math.PI * 2, dx = Math.cos(a), dz = Math.sin(a);
-      let ok = true;
-      for (const r of [50, 100, 150, GIANT_RETREAT_M]) { const [mx, my] = giantMapAt([feet[0] + dx * r, feet[1], feet[2] + dz * r]); if (!wildInside(mask, mx, my)) { ok = false; break; } }
-      if (!ok) continue;
-      const to = [feet[0] + dx * GIANT_RETREAT_M, feet[1], feet[2] + dz * GIANT_RETREAT_M];
-      const [mx, my] = giantMapAt(to);
-      const d = mask.depth?.[Math.floor(my) * mask.width + Math.floor(mx)] ?? 0;
-      if (d > bestDepth) { bestDepth = d; best = to; }
-    }
-    if (best) { const h = heightAt(best[0], best[2]); if (Number.isFinite(h)) best[1] = h; }
-    return best;
-  };
-  /** GIANT-LEASH: every frame, a giant stood
-   *  here that has stepped over the zone's edge is put back where it last stood inside - the edge is a wall to it. And
-   *  GIANT-RETREAT: me out of the zone, it walks back into it. */
-  const giantLeashFrame = () => {
-    if (!_giantsStood.size) return;
-    const mask = wildMapMask();
-    if (!mask) return;
-    const now = Date.now();
-    const meOut = playerSpawned && (modes?.mode ?? 'exterior') === 'exterior' && (() => { const [mx, my] = giantMapAt(player.feetAt()); return !wildInside(mask, mx, my); })();
-    for (const s of _giantsStood.values()) {
-      const f = s.foe, feet = f?.ai?.feet;
-      if (!feet || f.entity?.health <= 0) continue;
-      // GREATER-GIANT: at half its health, once a life, it calls ten giants of the ordinary kind about it
-      if (!s.called && f.entity.maxHealth > 0 && f.entity.health <= f.entity.maxHealth * GREATER_GIANT_CALL_AT) { s.called = true; greaterGiantCall(f, mask); }
-      const [mx, my] = giantMapAt(feet);
-      const inside = wildInside(mask, mx, my);
-      if (inside) s.inside = [feet[0], feet[1], feet[2]];
-      else if (s.inside) { feet[0] = s.inside[0]; feet[1] = s.inside[1]; feet[2] = s.inside[2]; }
-      if (!meOut) s.retreated = false;   // back in the zone: the next step out sends it back again
-      // the retreat under way: steered at its goal every frame, done there (or after a minute, whatever held it)
-      if (s.retreat) {
-        const r = s.retreat, d = Math.hypot(r.to[0] - feet[0], r.to[2] - feet[2]);
-        if (d < 12 || now > r.until) { f.ai.fleeLeft = 0; s.retreat = null; if (f.entity && f.entity.maxHealth > 0) f.entity.health = f.entity.maxHealth; continue; }   // GIANT-RETREAT: back in the zone, whole again
-        const ux = (r.to[0] - feet[0]) / d, uz = (r.to[2] - feet[2]) / d;
-        f.ai.fleeFrom = [feet[0] - ux * 10, feet[1], feet[2] - uz * 10];   // it runs FROM a point behind it - toward its goal
-        if (!(f.ai.fleeLeft > 1)) f.ai.fleeLeft = 5;
-        continue;
-      }
-      // the moment I am out (once a step out), or it is pressed at the border while I stay out (every ten seconds)
-      const pressed = !inside && now - (s.retreatAt ?? 0) > 10_000;
-      if (meOut && (!s.retreated || pressed)) {
-        const to = giantRetreatGoal(mask, feet);
-        s.retreated = true; s.retreatAt = now;
-        if (!to) continue;
-        s.retreat = { to, until: now + 60_000 };
-        f.ai.flee([feet[0] * 2 - to[0], feet[1], feet[2] * 2 - to[2]], 60, 1.4);   // drops me, and walks
-      }
-    }
-  };
-  /** ZONE-GIANTS: each half second outdoors in the zone - a giant whose walk has come near me stands on the ground at its
-   *  place (by the party's roller, as a wanderer is - its puppet for the rest); a stood one that fell is told to the hub,
-   *  down for everyone; one the pool let go is free to stand again. */
-  const wildGiantsFrame = () => {
-    const now = Date.now();
-    if (now - _giantsAt < 500) return;
-    _giantsAt = now;
-    for (const [g, u] of _giantsDown) if (u <= now) _giantsDown.delete(g);
-    for (const [g, s] of [..._giantsStood]) {
-      const f = s.foe;
-      if (!f) { if (s.at && now - s.at > 15_000) _giantsStood.delete(g); continue; }   // a stand that never came
-      if (f.entity?.health <= 0) {
-        _giantsStood.delete(g);
-        _giantsDown.set(g, now + WILD_GIANT_RESPAWN_MS);
-        { const feetF = f.ai?.feet ?? f.feet; const w = feetF ? campToWire(feetF) : null; giantFell(g, w ? { x: w[0] / 32768, y: 500 - w[2] / 32768, ring: Math.floor(g / 2) + 1 } : null); }   // GIANT-FALL: where its body lies
-        const link = socialLink();
-        if (link?.status === 'open') link.sendWdun({ k: 'gk', g });
-        continue;
-      }
-      if (!exteriorFoes.foes.includes(f)) _giantsStood.delete(g);   // let go (far behind me): it walks on, on its path
-    }
-    if (!wildOutdoors() || !wildHere() || playerEntity.health <= 0 || modes?.mode !== 'exterior') return;
-    // GREATER-GIANT ONE-FOR-ALL: ONE copy of each giant for
-    // everyone near it - party or stranger. A giant already streamed to me (a puppet with its `gg`) is someone's: never
-    // stood twice. One handed to me as an heir is mine now (adopted below). Of the players near its place, the lowest
-    // id stands it - every client asks the same question of the same peers, so one answers yes.
-    const pool = exteriorFoes.foes;
-    for (const f of pool) {
-      const g = f?.entity?.zoneGiant;
-      if (!Number.isInteger(g) || f.puppet || f.dead || _giantsStood.get(g)?.foe === f) continue;
-      _giantsStood.set(g, { foe: f, at: now, inside: null });   // handed to me: its leash, its call and its death are mine
-    }
-    const feet = player.feetAt();
-    const peers = peersNear() ?? [];
-    for (const gi of wildGiantsNow()) {
-      if (_giantsStood.has(gi.g)) continue;
-      if (pool.some((f) => f?.puppet && !f.dead && f.entity?.zoneGiant === gi.g)) continue;   // someone else's - I see theirs
-      const near = tvSceneOf(gi.x * 32768, (500 - gi.y) * 32768, 0);
-      if (!near || !Number.isFinite(near[1])) continue;
-      if (Math.hypot(near[0] - feet[0], near[2] - feet[2]) > WILD_GIANT_STAND_M) continue;
-      const me = String(online?.id ?? '');
-      if (me && peers.some((p) => p?.id != null && String(p.id) < me && Array.isArray(p.feet) && Math.hypot(p.feet[0] - near[0], p.feet[2] - near[2]) <= WILD_GIANT_STAND_M + 150)) continue;   // a lower id is as near: theirs
-      const at = giantFieldSpot(near);   // GIANT-FIELDS: on open, flat ground - never a peak or a slope
-      if (!at) continue;
-      const rec = { foe: null, at: now };
-      _giantsStood.set(gi.g, rec);
-      exteriorFoes.spawnFoe(WILD_GIANT, [at[0], at[1], at[2]], { yaw: Math.atan2(feet[0] - at[0], feet[2] - at[2]), zoneGiant: gi.g, transient: true })
-        .then((f) => { if (f) rec.foe = f; else _giantsStood.delete(gi.g); })
-        .catch(() => { _giantsStood.delete(gi.g); });
-    }
-  };
-  /** The hub's word on the halls. */
-  const wdunWord = (w) => {
-    const now = Date.now();
-    seaVentures.hubWord(w);   // SEA-EVENTS: the treasure fleets scattered
-    if (w.k === 'st') {
-      _wdunHeard = true;
-      if (Number.isFinite(w.now)) _wdunSkew = w.now - now;
-      _wdunLocks.clear(); for (const [h, left] of w.locks) _wdunLocks.set(h, now + left);
-      _wdunCrows.clear(); for (const [h, left] of w.crows) _wdunCrows.set(h, now + left);
-      _giantsDown.clear(); for (const [g, left] of w.giants ?? []) _giantsDown.set(g, now + left);   // ZONE-GIANTS
-      return;
-    }
-    if (w.k === 'gd') {   // ZONE-GIANTS
-      const before = new Set(_giantsDown.keys());
-      _giantsDown.clear(); for (const [g, left] of w.giants) _giantsDown.set(g, now + left);
-      for (const g of _giantsDown.keys()) if (!before.has(g)) giantFell(g);   // GIANT-FALL: a giant down that was not
-      return;
-    }
-    if (w.k === 'cr') {
-      const before = new Set(_wdunCrows.keys());
-      _wdunCrows.clear(); for (const [h, left] of w.crows) _wdunCrows.set(h, now + left);
-      // CROW-NEWS: crows over a hall that had none - never told to the fallen's own party (nor the fallen)
-      const kin = !!w.who && (!!social?.inMyParty?.(w.who) || w.who === social?.myAcct?.());
-      if (!kin) for (const h of _wdunCrows.keys()) if (!before.has(h)) crowsSay(h);
-      return;
-    }
-    if (w.k === 'lk') { _wdunLocks.set(w.h, now + w.left); return; }
-    if ((w.k === 'ok' || w.k === 'no') && _wdunWait?.h === w.h) { const d = _wdunWait.done; _wdunWait = null; d(w); }
-  };
-  // CROW-NEWS: crows gathering
-  // over a hall are told to everyone in the zone - its name and its tier, on the screen and in the chat. My own death
-  // there is not news to me (the death screen said it).
-  const crowsSay = (h) => {
-    const sea = seaVentures.crowLine(h);   // SEA-VAULTS: a vault of the deep's crows - told at sea, a hall's in the mountains
-    if (!wildHere() || !!sea !== (wildZoneKind() === ETHER_KIND)) return;
-    if (_wildMine?.dungeon === h && Date.now() - (_wildMine.until - WILD_REMAINS_MS) < 30_000) return;
-    const [x, y] = h.split(',').map(Number);
-    const hall = wildHallAt(wildActiveNow(), x, y);
-    const name = locationIndex.get(h)?.name ?? 'an elite hall';
-    const line = sea ?? `Crows gather over ${name}${hall ? ` in ${wildRingName(hall.ring)}` : ''}. Someone has fallen there.`;
-    setMidScreenText(line, 5);
-    townTalk.say(line);
-    _wildLineHold = { line, until: Date.now() + WILD_LINE_HOLD_MS };   // WILD-LINE-HOLD: real seconds, whatever the journey's pace
-  };
-  /** Each frame: the hub's word wired to the social link (a new link, or the old one back, says hello again), the
-   *  heartbeat while I stand in a hall, and the halls of a day gone taken off the map. */
-  const wdunFrame = () => {
-    const link = socialLink(), now = Date.now();
-    if (link !== _wdunLink) { _wdunLink = link; _wdunHiAt = 0; if (link) link.onWdun = (w) => wdunWord(w); }
-    const open = link?.status === 'open';
-    if (!open) _wdunHiAt = 0;
-    else if (!_wdunHiAt || now - _wdunHiAt > 10 * 60_000) { if (link.sendWdun({ k: 'hi' })) _wdunHiAt = now; }
-    if (_wdunInside && open && now - _wdunInside.hereAt >= WDUN_HERE_MS) { link.sendWdun({ k: 'here', h: _wdunInside.h }); _wdunInside.hereAt = now; }
-    for (const [h, u] of _wdunCrows) if (u <= now) _wdunCrows.delete(h);
-    wildHallsRoll();
-  };
-  /** The day's halls `[{ x, y, ring, key }]` (null where there is no zone) - over the session's mask (BOOT-TDZ2: the
-   *  picks themselves, zoneHalls.activeOf, are built above the pixel builder that stands them). */
-  const wildActiveNow = () => zoneHalls.activeOf(wildMapMask());
-  let _wildHallsDay = null;
-  /** A day gone: its halls leave the index (the one I stand in stays until I leave it). */
-  const wildHallsRoll = () => {
-    const day = wildMapMask() ? wdunDayNow() : null;
-    if (day == null || day === _wildHallsDay) return;
-    _wildHallsDay = day;
-    for (const key of [...zoneHalls.keys]) if (locationIndex.get(key)?.wildHallDay !== day && !_insideSpawn(key)) { locationIndex.delete(key); zoneHalls.keys.delete(key); _locIndexGen += 1; }
-  };
-  /** The hall on this pixel today, or null - stood over the session's mask (BOOT-TDZ2: zoneHalls.standOf, above the pixel
-   *  builder that asks it first). */
-  const wildHallStand = (px, py) => zoneHalls.standOf(wildMapMask(), px, py);
-  /** The halls as the maps' own place rows (ui/heldMap.js marks them as it marks every place - a door in the map's
-   *  ink, seen by everyone in the zone, explored or not). */
-  const wildHallSummaries = () => (wildActiveNow() ?? []).map((h) => {
-    const loc = wildHallStand(h.x, h.y);
-    const lt = loc?.mapTableData?.locationType;
-    return {
-      id: spawnedHallMapId(h.x, h.y), pixel: { x: h.x, y: h.y }, mapID: spawnedHallMapId(h.x, h.y), mapId: spawnedHallMapId(h.x, h.y), regionIndex: loc?.regionIndex ?? WILD_REGION, mapIndex: -1,   // WW-C2: a world pixel - its own `pixel`, its id the hall's room's (never a Bay pixel's `y * 1000 + x`)
-      locationType: lt === LOCATION_TYPES.DungeonLabyrinth || lt === LOCATION_TYPES.DungeonRuin ? lt : LOCATION_TYPES.DungeonKeep,
-      dungeonType: loc?.mapTableData?.dungeonType ?? 0,
-      wildHall: { ring: h.ring, key: h.key, name: loc?.name ?? `Elite hall (${h.x},${h.y})`, crows: _wdunCrows.has(h.key) },
-    };
-  });
-  const wildHallHere = () => { const a = wildActiveNow(), p = playerTravelPixel(); return seaVentures.vaultHere() ?? (a && p ? wildHallAt(a, p.x, p.y) : null); };   // SEA-VAULTS: a vault of the deep is a hall of its own
-  const wildDungeonIsOpenHere = () => !!wildHallHere();
-  const wdKey = () => { const p = playerTravelPixel(); return seaVentures.vaultHere()?.key ?? `${p.x},${p.y}`; };   // SEA-VAULTS: a vault of the deep's own key (a death after a load, which ran no gate)
-  /** May I go down into the dungeon at this door. In the zone only the day's halls open, and the hub says whether my
-   *  hour's lock still holds (lifted while my own remains lie inside); with no hub, this session's own lock. */
-  const wildDungeonGate = async (hit, fromLoad = false) => {
-    const mask = wildMapMask();
-    if (!mask || fromLoad) return true;
-    const p = playerTravelPixel();
-    if ((!wildInside(mask, p.x, p.y) && !seaVentures.vaultHere()) || hit?.dfLocation?.capital) return true;   // SEA-VAULTS: past the Veil a vault keeps a hall's door; every other ruin is open; WW7-4: a capital's castle is no ruin - the White-Gold Tower's halls open in the zone
-    const hall = wildHallHere();
-    // TESTBUILD: god mode walks into a sealed door - but a HALL keeps its hour's lock for god mode too (HALL-LOCK, the
-    // owner: "i can still leave and reenter the dungeon as much as i want in the zone" - god mode skipped the whole gate,
-    // so no hall was ever marked as entered, and nothing locked behind it)
-    if (!hall) {
-      if (TEST_GODMODE && staffPowers().god) return true;
-      townTalk.say('The way in is sealed. Only the halls marked on the map are open today.'); return false;
-    }
-    const lockSay = (left) => setMidScreenText(`You cannot enter this hall again for ${Math.max(1, Math.ceil(left / 60000))} minute${Math.ceil(left / 60000) === 1 ? '' : 's'}.`, 4);
-    // HALL-LOCK: this machine's own memory of the lock answers first - a hub that never heard my way out (a word lost on
-    // a closed socket) must not open the door again
-    {
-      const left = (_wdunLocks.get(hall.key) ?? 0) - Date.now();
-      const myPile = !!_wildMine && _wildMine.dungeon === hall.key && _wildMine.until > Date.now();
-      if (left > 0 && !myPile) { lockSay(left); return false; }
-    }
+  // SEA-EVENTS: the treasure fleets' record is the social room's. The room's word comes to the sea ventures' host, and
+  // the room is asked for it when a socket opens and every ten minutes after, so a client that missed a word hears it again.
+  const SEA_HUB_HI_MS = 10 * 60_000;
+  let _seaHubLink = null;
+  let _seaHubHiAt = 0;
+  const seaHubFrame = () => {
+    const px = playerTravelPixel();
+    setSeaGround(etherSea && _onlineWorldSession() && !!online && playerSpawned && !!px && etherWildRingAt(px.x, px.y) > 0);   // SEA-SET: the sea sets (Undertow) read the open sea past Veilhaven's peace
     const link = socialLink();
-    if (link?.status === 'open' && !_wdunWait) {
-      const w = await new Promise((done) => {
-        _wdunWait = { h: hall.key, done };
-        if (!link.sendWdun({ k: 'in', h: hall.key })) { _wdunWait = null; done(null); return; }
-        setTimeout(() => { if (_wdunWait?.done === done) { _wdunWait = null; done(null); } }, 4000);
-      });
-      if (w?.k === 'no') { _wdunLocks.set(hall.key, Date.now() + w.left); lockSay(w.left); return false; }
-      if (w?.k === 'ok') { _wdunEpoch.set(hall.key, w.ep ?? 0); _wdunInside = { h: hall.key, hereAt: Date.now() }; return true; }
+    if (link !== _seaHubLink) {
+      _seaHubLink = link;
+      _seaHubHiAt = 0;
+      if (link) link.onSea = (word) => seaVentures.hubWord(word);
     }
-    // no hub's word: this session's own memory of the lock (and my remains' way back)
-    const left = (_wdunLocks.get(hall.key) ?? 0) - Date.now();
-    const myPile = !!_wildMine && _wildMine.dungeon === hall.key && _wildMine.until > Date.now();
-    if (left > 0 && !myPile) { lockSay(left); return false; }
-    _wdunInside = { h: hall.key, hereAt: Date.now() };
-    return true;
-  };
-  /** I left the hall I stood in (walked out, unstuck, fell): the hub told, my hour's lock started here too. */
-  const wdunLeft = (died = false) => {
-    const h = _wdunInside?.h;
-    if (!h) return;
-    _wdunInside = null;
-    _wdunLocks.set(h, Date.now() + WDUN_LOCK_MS);
-    if (died) _wdunCrows.set(h, Date.now() + WILD_REMAINS_MS);
-    socialLink()?.sendWdun?.({ k: died ? 'die' : 'out', h });
-  };
-  const wildCan = () => online?.status === 'open' && wildHere() && (wildOutdoors() ? !settledAt(campToWire(player.feetAt()), locationIndex) : modes?.mode === 'dungeon') && playerEntity.health > 0 && !modes?.deathUp?.();   // PVPDUNGEON: players fight in the zone's dungeons too - ZONE-SAFE (systems/wild/zoneSafe.js): never outdoors in a settlement's streets
-  /** Is this player one I may fight (and be fought by): standing in the zone, and never KIN - net/wild/wildRef.js wildKin, the
-   *  referee's own law: my party, or one under its truce; my duel's opponent (a duel's blows are the duel's own); or, MAC'S
-   *  DECISION, one of my guild - its tag as the relay stamped it, mine as the hub
-   *  says it (a tag is one guild's alone). */
-  const _wildTruce = createPartyTruce();   // PARTY-TRUCE: a party left is no fight for ten minutes, both ways
-  const wildFair = (peerId) => {
-    if (!peerId || !wildCan()) return false;
-    if (wildKin({ party: !!social?.isPartyPeer(peerId) || _wildTruce.holds(peerId, Date.now()), duel: duelMgr.live && duelMgr.opponent === peerId, guilds: [myGuildTag(), online?.guildTagOf?.(peerId) ?? null] })) return false;
-    return modes?.mode === 'dungeon' || (wildAtWire(duelWorldOf(peerId)) && !settledAt(duelWorldOf(peerId), locationIndex));   // ZONE-SAFE: never a body in a settlement's streets - AUDIT FB1018 L3-5: in a dungeon a peer's pose is the dungeon's own frame - the place is the zone (wildCan's wildHere, the door's pixel), and the room is that place's
-  };
-  /** PARTY-TRUCE: the row a party's walk asks with when it ends in the zone or at its edge - the walk is the one door
-   *  into it no journey's gate asks (wildJourney: "The Overworld map's journeys are walked, never asked"). */
-  const wildWalkRow = (x, y) => { const m = wildMask(); return !online ? null : etherSea && etherWildRingAt(x, y) > 0 ? zoneWord('walkInto', ETHER_KIND) : m && wildNear(m, x, y) ? WILD_TEXT.walkInto : null; };   // wildNear: inside, or within its band - AUDIT SEA VENTURES C3: and the open sea past Veilhaven's peace
-  /** The fair players' bodies in this scene (peersNear's { id, feet, height }). */
-  const wildBodiesNow = () => {
-    if (!wildCan()) return NO_BODIES;
-    const out = [];
-    for (const b of peersNear() ?? []) if (wildFair(b.id)) out.push(b);
-    return out;
-  };
-  let _wildLastWeapon = null;   // INT9: the weapon of my last strike that left - the referee's word on it wears it
-  // ZONE-WATCH: my blow or my spell on a player in a
-  // town of the zone is ASSAULT, the watch's own crime, and the watch comes (ten times as strong here - ZONE_WATCH_SCALE) for
-  // me; once each ten seconds, so a fight keeps it called without a storm of posts. ZONE-SAFE: no blow is struck in a settlement's streets, nor under any roof, so the towns
-  // it answers are DFU's others - a farm, a manor, an inn, a temple (systems/wild/zoneSafe.js says why they are no settlements)
-  let _zoneWatchAt = -Infinity;
-  const zoneWatchCall = () => {
-    const mode = modes?.mode ?? 'exterior';
-    const inTown = mode === 'exterior' && _isPlayerInTownStrict();
-    if (!inTown || !wildHere()) return;
-    const now = performance.now();
-    if (now - _zoneWatchAt < 10_000) return;
-    _zoneWatchAt = now;
-    setCrimeCommitted(playerEntity, CRIMES.Assault);
-    _crimeResponse();
-    townTalk.say('The town watch saw you strike. The guards are coming!');
-  };
-  /** MY BLOW ON A FAIR PLAYER `to` - a swing or a shaft. INT9: rolled on my own sheet against the neutral stand-in (a
-   *  siege's way: the target's sheet is not mine to read - AUDIT C&C H5), the number sent for the RELAY to referee
-   *  (net/wild/wildRef.js clips it to the weapon my look holds and the arms my token signs); a swing that rolled nothing is a
-   *  miss, said here, and the referee's word on one that landed comes back as `wildHpIn`. True when the swing was the
-   *  zone's. */
-  const wildStrikeOut = (to, by, weapon, swing, drawMs = 0, { off = false } = {}) => {
-    if (!wildFair(to)) return false;
-    const a = withoutFirmament(playerEntity, () => duelAttackerOf(playerEntity, weapon)), w = duelWeaponOf(weapon), sw = duelSwingOf(swing);
-    const at = drawMs > 0 ? { at: Math.min(60000, Math.trunc(drawMs)) } : {};
-    const r = resolveDuelStrike({ by, a, ...(w ? { w } : {}), ...(sw ? { sw } : {}), ...at, ...(off ? { off } : {}) }, duelStandIn(playerEntity));
-    if (!(r.dmg > 0)) { reportPlayerAttack({ hit: false, damage: 0, critical: false, backstab: false, ineffective: false }); zoneWatchCall(); return true; }
-    const n = wildFight.blow(to, 'strike', { by, p: campToWire(player.feetAt()), d: Math.trunc(r.dmg), ...(w ? { w } : {}), ...(sw ? { sw } : {}), ...at });
-    if (n) { _wildLastWeapon = weapon ?? null; zoneWatchCall(); }
-    return !!n;
-  };
-  /** My harmful spell met a fair player (the cast engine's marks): INT9 - its harm counted on the neutral stand-in
-   *  (combat/siegeCombat.js siegeSpellNumbers, a siege's way), to the referee as a cast (it clips, and bounds the rate). */
-  const wildSpellOut = (peerId, sp) => {
-    if (!wildFair(peerId)) return false;
-    const { harm } = withoutFirmament(playerEntity, () => siegeSpellNumbers(sp, Math.max(1, Math.trunc(playerEntity.level || 1)), duelStandIn(), playerEntity));
-    if (!(harm > 0)) return false;
-    const n = wildFight.blow(peerId, 'spell', { p: campToWire(player.feetAt()), d: siegeCastClamp(harm, false) });
-    if (n) zoneWatchCall();
-    return !!n;
-  };
-  /** The melee arm in the zone: the nearest fair body within a weapon's reach, in view and in sight (the duel's test). */
-  const wildMeleeHit = (eye, inViewFn) => {
-    let best = null, bestD = Infinity;
-    for (const b of wildBodiesNow()) {
-      const c = [b.feet[0], b.feet[1] + (b.height ?? CAPSULE_HEIGHT) / 2, b.feet[2]];
-      const dx = c[0] - eye[0], dy = c[1] - eye[1], dz = c[2] - eye[2];
-      const dist = Math.hypot(dx, dy, dz), l = dist || 1;
-      const wall = collider.raycast(eye, [dx / l, dy / l, dz / l], dist);
-      if (!playerMeleeCanHit(dist, !!inViewFn?.(c), !Number.isFinite(wall) || wall >= dist - 1e-3)) continue;
-      if (dist < bestD) { bestD = dist; best = b.id; }
-    }
-    return best ? wildStrikeOut(best, 'melee', weaponRig.playerWeapon.strikingWeapon, weaponRig.playerWeapon.machine?.state, 0, { off: weaponRig.playerWeapon.offStrike }) : false;
-  };
-  /** The fair bodies as the arrows' targets (each marked a duel's: a shaft stops on it dealing nothing here, and the
-   *  blow is the referee's - INT9), and as the cast engine's marks. */
-  const wildArrowTargets = () => {
-    const bodies = wildBodiesNow();
-    return bodies.length ? bodies.map((b) => ({ feet: b.feet, ref: { duel: true, id: b.id, dead: false, ai: { feet: b.feet, height: b.height ?? CAPSULE_HEIGHT } } })) : NO_BODIES;
-  };
-  const wildSpellMarks = () => {
-    const bodies = wildBodiesNow();
-    return bodies.length ? bodies.map((b) => ({ ...b, name: peerName(b.id) ?? 'another player' })) : null;
-  };
-  // ── INT9: THE REFEREE'S WORD (net/wild/wildRef.js - the relay holds the zone's fights) ──
-  /** THE ZONE'S HUD - the referee's vitality (the Royal Tourney's, never my save's health: that is the foes' alone), mine
-   *  and my last foe's, on the battles' readout (ui/siegeHud.js, with nothing to leave) while the fight is fresh - the
-   *  referee makes a fighter no player has struck for WILD_REF.mendMs whole again. */
-  let _wildHud = null;
-  let _wildVit = null;   // { mine: [hp, max] | null, foe: { id, hp, max } | null, at }
-  const wildHudSay = () => {
-    if (!_wildVit) { _wildHud?.hide(); return; }
-    _wildHud ??= createSiegeHud(document);
-    const f = _wildVit.foe, name = f ? (peerName(f.id) ?? 'another player') : '';
-    _wildHud.update({ bar: [WILD_NAME, f ? `${name}: ${f.hp} / ${f.max}` : ''], sides: '', self: _wildVit.mine ? [`Your vitality: ${_wildVit.mine[0]} / ${_wildVit.mine[1]}`] : [], works: '', arms: null, card: null });
-  };
-  const wildHudFrame = () => { if (_wildVit && (Date.now() - _wildVit.at > WILD_REF.mendMs || !wildHere())) { _wildVit = null; wildHudSay(); } };
-  /** A BLOW OR A CAST LANDED (`wref` `hp`): the HUD's vitality; a blow of mine - the HUD's number (HN1's seam), and for a
-   *  strike the sound, the blood and my weapon's wear (FormulaHelper's DamageEquipment attacker half, on what the referee
-   *  let land - the duel's own); a blow on me - its flash, its sound and my voice. */
-  const wildHpIn = (g) => {
-    const me = online?.id ?? '';
-    if (g.by !== me && g.to !== me) return;
-    noteWildBlow();   // AUDIT PVP-EASE L2-1: a blow landed, mine or on me - storing locked (wildZone.js WILD_STORE_LOCK_MS)
-    const foeId = g.by === me ? g.to : g.by;
-    const mine = g.h.find((x) => x[0] === me), theirs = g.h.find((x) => x[0] === foeId);
-    _wildVit = { mine: mine ? [mine[1], mine[2]] : (_wildVit?.mine ?? null), foe: theirs ? { id: foeId, hp: theirs[1], max: theirs[2] } : null, at: Date.now() };
-    wildHudSay();
-    if (g.by === me) {
-      reportPlayerAttack({ hit: true, damage: g.d, critical: false, backstab: false, ineffective: false });
-      const b = duelBody(g.to);
-      if (g.r !== DUEL_REF_KIND.Spell && b) {
-        audio.play3d(hitSoundFor(_wildLastWeapon), b.feet, ENEMY_HIT_VOLUME, { maxDistance: 16 });
-        (modes?.liveHitEffects?.() ?? hitEffects).showBloodSplash(0, [b.feet[0], b.feet[1] + (b.height ?? CAPSULE_HEIGHT) / 2, b.feet[2]], null, bloodHit(g.d, { maxHealth: theirs?.[2] ?? 1 }, { fromPlayer: true, weapon: _wildLastWeapon }));   // PVP-BLOOD: the pool I stand in, as a peer's blow
-      }
-      if (g.r !== DUEL_REF_KIND.Spell && _wildLastWeapon) {
-        let wear = Math.trunc((10 * duelWearDamage(g.d, _wildLastWeapon, playerEntity) + 50) / 100);
-        if (wear === 0 && Math.random() < 0.2) wear = 1;
-        if (wear > 0) lowerCondition(_wildLastWeapon, dfuBlowWear(wear), playerEntity, (l) => townTalk.say(l));
-      }
+    if (link?.status !== 'open') {
+      _seaHubHiAt = 0;
       return;
     }
-    if (g.d > 0) {
-      if (g.r !== DUEL_REF_KIND.Spell) audio.playOneShot(hitSoundFor(null), PLAYER_HIT_VOLUME);
-      flashPlayerDamage(g.d);
-      playPlayerVoice(audio, playerPainVoice(playerEntity, g.d));
-    }
+    const now = Date.now();
+    if (_seaHubHiAt && now - _seaHubHiAt <= SEA_HUB_HI_MS) return;
+    if (link.sendSea({ k: 'hi' })) _seaHubHiAt = now;
   };
-  const _wildSeize = new Map();   // a fall I won, signed: r -> { rc, room, p, due, tries } - its drop the fallen's tab's first
-  const wildRejoin = createWildRejoin({ present: () => presentHeardDeath(playerEntity), place: () => ({ dungeon: modes?.mode === 'dungeon' ? (_wdunInside?.h ?? wdKey()) : null, px: playerTravelPixel() }) });   // WILD-REJOIN: whether a referee's `down` word is this page's death to take
-  const _wildFellAt = new Map();  // AUDIT INT9: where a fall I won lay, in its room's frame, when the referee called it: r -> p
-  /** A FALL (`wref` `fell`): mine - a death in the zone, the referee's word, whatever my save's health says; my foe's at my
-   *  hand - its body's offer awaited under the fall's id, from the room that refereed it. */
-  const wildFellIn = (g, room) => {
-    const me = online?.id ?? '';
-    if (g.id === me) {
-      wildDeathAtHand({ r: g.r, by: g.by, room, at: Date.now() }, peerName(g.by));   // AUDIT FOE-KEEPS H1: a kill, whenever its word comes - the rise and the screen read it (wildZone.js)
-      _wildVit = null; wildHudSay();
-      // AUDIT INT9: THE REFEREE'S FALL IS A DEATH, whatever this machine would say - no guild's AvoidDeath, no withheld
-      // blow, no save (the SetHealth(0) door turned it aside, and the fallen stood with a fall already called on it)
-      forcePlayerDeath(playerEntity);
-      return;
-    }
-    if (g.by !== me) return;
-    wildFight.fell(g.id, g.r, room);
-    { const p = duelWorldOf(g.id); if (p) { _wildFellAt.set(g.r, p); if (_wildFellAt.size > 16) _wildFellAt.delete(_wildFellAt.keys().next().value); } }   // AUDIT INT9: the seizure lays the remains where the body fell
-    if (_wildVit?.foe?.id === g.id) { _wildVit = null; wildHudSay(); }
-  };
-  /** A FALL SIGNED (`wref` `rc`, net/wild/wildReceipt.js): mine - my drop taken off my record against it, now; my foe's - theirs
-   *  to carry first, mine to carry once its grace has gone by with no remains of theirs in the room (wildFallGraceS: none
-   *  when it was signed with them gone - WILD-REJOIN). */
-  const wildRcIn = (g, room) => {
-    const c = readWildReceipt(g.rc), me = social?.acct ?? null;
-    if (!c || c.r !== g.r || !me) return;
-    if (c.f === me) { wildTakeDrop(g.rc, room); return; }
-    if (c.k !== me || _wildSeize.has(c.r)) return;
-    _wildSeize.set(c.r, { rc: g.rc, room, p: _wildFellAt.get(c.r) ?? null, due: Date.now() + (wildFallGraceS(c) + 5) * 1000, tries: 0 });
-    if (_wildSeize.size > 16) _wildSeize.delete(_wildSeize.keys().next().value);
-  };
-  /** WILD-REJOIN: the referee says I am still down (net/wild/wildRef.js wildDownWord) - this page came back after its game
-   *  closed on the death screen. It lies down again for the time left, its body where the fall was, so the receipt that
-   *  follows lays my drop there. The closed page heard the death itself, so its subscribers are not told it again. */
-  const wildDownIn = (g, room) => {
-    const death = wildRejoin.heard(g, { alive: playerEntity.health > 0 });
-    if (death) _wildBody = wildRejoin.bodyAt(death.p ?? campToWire(player.feetAt()), room);
-  };
-  const wildRefIn = (g, room) => {
-    if (g.k === 'hp') wildHpIn(g);
-    else if (g.k === 'fell') wildFellIn(g, room);
-    else if (g.k === 'down') wildDownIn(g, room);
-    else if (g.k === 'rc') wildRcIn(g, room);
-    else if (g.k === 'grace') wildGrace.heard(g);   // ZONE-GRACE: safe passage, the referee's word
-    else seaVentures.wref(g, room);   // SHIP-PVP: the open sea's guns - a shot landed, a wreck (its room boarded), a wreck signed
-  };
-
-  // ── A BODY'S ONE PIECE (the killer's side) ──
-  /** My victims' bodies I may take from: peer -> { pile, minted, name } - an unseen pile under their body in the
-   *  street's pool, opened in choose-one (the pack's own reward mode, on either skin). */
-  const _wildBodies = new Map();
-  const wildBodyGone = (peer) => { const b = _wildBodies.get(peer); if (b) { droppedLoot.removePile(b.pile); _wildBodies.delete(peer); } };
-  const wildBodyArrived = (from, body) => {
-    wildBodyGone(from);
-    remotePlayers?.holdCorpse?.(from, WILD_DEATH_HOLD_S * 1000);   // "the body ... disappears in 2 minutes"
-    // AUDIT INT9: each record minted alone, its place in the offer kept - a record the law refused shifted every later one,
-    // and the pick named another piece
-    // HACKED-GOLD: and a WORN offer holds what can be worn (systems/wild/wildDropLaw.js wornOffer: the fallen's worn pieces
-    // alone) - a coin pile in one went through the window's gold arm, which pays the purse and answers before the
-    // choice, so a modified client's offer paid its killer up to a million gold and was never chosen
-    const minted = (Array.isArray(body.items) ? body.items : []).map((it) => { const r = validLootList([it])?.[0] ?? null; return r && wearableItem(r) ? r : null; });
-    const items = minted.filter(Boolean);
-    if (!items.length || !wildOutdoors()) return;
-    const mark = remotePlayers?.corpseMarks?.(onlineToScene)?.find((c) => c.id === from) ?? null;
-    if (!mark) return;
-    const name = peerName(from) ?? 'Another player';
-    const pile = droppedLoot.seedPile(items, mark.feet, WILD_PILE_ICON, null, null, { unsaved: true, drawn: false, owner: 'wild' });
-    pile.noStore = WILD_NO_STORE; pile.wildBody = from; pile.label = `${name}'s body`;
-    _wildBodies.set(from, { pile, minted, name });
-    tradeSay(`${name} has fallen by your hand. Search the body to take one piece of their gear.`);
-  };
-  /** The body pressed: the pack in choose-one over its worn pieces - "players can choose 1 item of the equipped ones". */
-  const openWildBody = (pile) => {
-    const peer = pile.wildBody, b = _wildBodies.get(peer);
-    if (!b || !wildFight.body(peer)) { wildBodyGone(peer); townTalk.say(WILD_TEXT.gone); return; }
-    const w = makeInventoryWindow({ chooseOne: { items: pile.items, title: `${b.name} - choose one`, onChoose: (taken) => wildBodyChosen(peer, taken) } });
-    if (w) townTalk.showOverlay(w);
-  };
-  /** The choice made: what the window put in my pack goes straight back out, and the pick goes to the relay (INT9) - it
-   *  signs the fall with it, the service takes that piece off the fallen's record, and it reaches me from their remains
-   *  (net/wild/wildRemains.js asks for it the moment the room says them). */
-  const wildBodyChosen = (peer, taken) => {
-    const b = _wildBodies.get(peer);
-    const list = playerEntity.items ?? [];
-    const at = taken ? list.indexOf(taken) : -1;
-    if (at >= 0) { if (isEquipped(taken)) unequipItem(playerEntity, taken); list.splice(at, 1); }
-    const i = b && taken ? b.minted.indexOf(taken) : -1;
-    wildBodyGone(peer);
-    if (i < 0 || !wildFight.pick(peer, i)) { townTalk.say(WILD_TEXT.gone); return; }
-    townTalk.say(WILD_TEXT.chosen(b.name, itemLongName(taken)));
-  };
-
-  // ── MY DEATH IN THE ZONE (the fallen's side) ──
-  let _wildGhost = false;  // my socket stays in the room while my body lies (the drop's deposit, and the relay's receipt, reach it)
-  let _wildGhostEndAt = null;   // AUDIT INT9: a hall's or a building's ghost leaves then (a cell's: null, it stays while the body lies)
-  const WILD_GHOST_HOLD_MS = 15_000;
-  let _wildMine = null;    // my remains: { r, room, p, until } - for the world map's mark
-  let _wildBody = null;    // where my body lies: { p, room, dungeon, px } - read at the death, for the deposit that follows
-  // WILD-KEEP (FIELD BUGS 2026-10-09c): kept on the device for the character that fell, and read back once - a game that
-  // crashed or closed inside the remains' ten minutes knows them again (systems/wild/wildRemainsWaypoint.js)
-  const wildWho = () => (realmSession?.id != null ? `realm:${realmSession.id}` : playerEntity?.name ? `name:${playerEntity.name}` : null);
-  let _wildMineRead = false;
-  /** THE ZONE'S DEATH CHECKPOINT. A dead character is never the realm's save (realmCheckpoint), and a death in the zone
-   *  takes things out of the pack that the room then holds for anyone - so a game closed on the death screen must not
-   *  come back with them (a copy in the pack and on the ground). The character is saved AS IT WILL RISE: one health,
-   *  where it fell, without what it dropped. Answers whether a save was handed over. */
-  const wildDeathCheckpoint = () => {
-    const allowed = checkpointGateOpen();   // the periodic checkpoint's own gate
-    if (!allowed) return false;
-    const hp = playerEntity.health;
-    if (!(hp > 0)) playerEntity.health = 1;
-    try {
-      _checkpointAt = performance.now();
-      if (realmSession) {
-        if (realmSession.lost) return false;
-        return !!(modes ? modes?.quickSaveNow(QUICK_SAVE_NAME, { quiet: true }) : worldQuickSave(QUICK_SAVE_NAME, { quiet: true }));
-      }
-      return onlineCheckpoint();
-    } catch (e) { console.error('[wild] the death checkpoint failed', e); return false; } finally { playerEntity.health = hp; }
-  };
-  const _wildTaking = new Set();   // the falls whose drop this tab has asked for (a receipt said twice is one act)
-  const { wildTakeDrop } = createWildDropHost({   // HOST-SPLIT: src/scenes/wildDropHost.js
-    _wildTaking, realmSession, townTalk, wildAccount, wildDeathCheckpoint, wildInsure,
-    get _wildBody() { return _wildBody; },
-    get naval() { return naval; },
-    get online() { return online; },
-    get wildDeposit() { return wildDeposit; },
-    get wildEscrow() { return wildEscrow; },
-  });
-  // PVP-ESCROW's two sides (scenes/wildEscrowHost.js - HOST-SPLIT, FIELD BUGS 2026-10-15c)
-  const wildEscrow = createWildEscrowHost({ townTalk, session: realmSession, modes: () => modes, wildAccount, checkpoint: () => onlineCheckpoint() });
-  /** THE DEPOSIT - the service's records to the room, chunk by chunk on the wild frames' own pace, each chunk carrying its
-   *  order (the room keeps the remains only when the records digest to it: net/wild/wildLaw.js). An order is good a minute. */
-  const _wildDeposits = [];   // { r, chunks, k, o, p, room, mine, at }
-  const wildDeposit = (dep) => {
-    if (_wildDeposits.some((x) => x.r === dep.r)) return;
-    // AUDIT INT9: chunked by their bytes too - each frame and its order inside the wire's bound
-    const room = WILD_DATA_MAX - JSON.stringify({ k: 'fall', r: dep.r, p: dep.p, items: [], last: 0, o: dep.o }).length - 16;
-    _wildDeposits.push({ ...dep, chunks: wildChunks(dep.items, WILD_ITEMS_MAX, room), k: 0, at: Date.now() });
-  };
-  const wildDepositFrame = () => {
-    for (const dep of [..._wildDeposits]) {
-      while (dep.k < dep.chunks.length && online?.sendWild({ k: 'fall', r: dep.r, p: dep.p, items: dep.chunks[dep.k], last: dep.k === dep.chunks.length - 1 ? 1 : 0, o: dep.o }, { room: dep.room })) {
-        if (dep.k === 0 && dep.mine) wildMineLies(dep);
-        dep.k++;
-      }
-      if (dep.k >= dep.chunks.length || Date.now() - dep.at > 50_000) {
-        _wildDeposits.splice(_wildDeposits.indexOf(dep), 1);
-        if (dep.mine && _wildGhostEndAt != null) _wildGhostEndAt = Math.min(_wildGhostEndAt, Date.now());   // AUDIT INT9: a hall's or a building's ghost lingers no longer
-      }
-    }
-  };
-  /** My remains lie: the world map's mark, kept on the device (WILD-KEEP), and a followed flag where they lie
-   *  (WILD-WAYPOINT - the street's point, or a building's or a dungeon's door). */
-  const wildMineLies = (dep) => {
-    const b = dep.mine;
-    _wildMine = { r: dep.r, room: dep.room, p: dep.p, until: Date.now() + WILD_REMAINS_MS, dungeon: b.dungeon };   // PVPDUNGEONS: a death underground locks the hall for the hour; my pile's life is the key back in
-    keepMine(_wildMine, wildWho());
-    const at = isCellRoom(dep.room) ? nativeToMapPoint(dep.p[0], dep.p[2]) : (b.px ? { mx: b.px.x + 0.5, my: b.px.y + 0.5 } : null);
-    if (at) markRemains({ mx: at.mx, my: at.my, until: _wildMine.until, r: dep.r });
-  };
-  const { wildSeizeFrame } = createWildSeizeHost({   // HOST-SPLIT: src/scenes/wildSeizeHost.js
-    _wildSeize, campToWire, player, wildAccount, wildDeposit,
-    get online() { return online; },
-    get wildRemains() { return wildRemains; },
-  });
-  /** THE FIRST DEAD FRAME IN THE ZONE (onlineFrame's dead branch, the room still mine): at another player's hand (the
-   *  referee's word, wildZone.js wildFallHeard) my worn pieces are shown to my killer and the drop waits on the fall the relay signs;
-   *  to a foe, nothing drops (FOE-KEEPS, - the
-   *  usual tenth of the purse at the rise, and the service refuses a foe's fall). Either way my socket stays in the room
-   *  while my body lies, so the deposit and the receipt reach it. Answers whether the death was the zone's. */
-  const wildDeathBegin = () => {
-    if (!wildHere() || !online || online.status !== 'open' || !online.room || !_deadMark) return false;
-    const fell = wildFallHeard();   // AUDIT FOE-KEEPS H1: any fall heard since my last rise (wildGhostEnd clears it) - a hidden tab hears it, runs no frame
-    // WILD-REJOIN: a death the referee told of has its body and its words already (wildDownIn), and offers nothing
-    const rejoined = wildRejoin.begin();
-    if (!rejoined) _wildBody = wildRejoin.bodyAt([_deadMark.x, _deadMark.y, _deadMark.z], online.room);
-    // HALL-CROWS: a death in
-    // a hall always locks it and sets the crows over it - whether or not the pack had anything to drop
-    if (modes?.mode === 'dungeon' && _wdunInside) wdunLeft(true);
-    if (!rejoined) setWildDeath({ killer: fell ? (peerName(fell.by) ?? 'Another player') : null, dropped: 0 });
-    _wildVit = null; wildHudSay();   // AUDIT INT9: the readout goes with the life
-    _wildGhost = true;
-    // AUDIT INT9: a cell keeps my body's socket while it lies; a hall's or a building's room keeps it only until my deposit
-    // has gone (its fall is signed at once), or a moment - a ghost there held the room's world as its host
-    _wildGhostEndAt = isCellRoom(online.room) ? null : Date.now() + WILD_GHOST_HOLD_MS;
-    if (fell) {
-      const worn = isCellRoom(online.room) ? wornOffer(playerEntity.items) : [];   // AUDIT PVP-EASE L2-2: an insured piece offered as any - a pick of one lands on nothing, its policy spent
-      if (worn.length) wildFight.offerWorn(fell.by, fell.r, worn.map(wildRecord));
-    }
-    return true;
-  };
-  /** My body is gone (the rise, a party mate's Resurrect, the game left): the cell let go. */
-  const wildGhostEnd = () => {
-    setWildDeath(null);   // and the referee's fall with it (wildZone.js)
-    wildGhostLeave();
-  };
-  /** The ghost's socket let go - its room left, the dead stay dead. */
-  const wildGhostLeave = () => {
-    _wildGhostEndAt = null;
-    if (!_wildGhost) return;
-    _wildGhost = false;
-    if (online?.room) { online.leave(); exteriorFoes.clearPuppets(); modes?.clearOwnPuppets?.(); _foesRoom = null; }
-  };
-  /** THE RISE: a kill's at the
-   *  nearest town or temple OUTSIDE the zone; AUDIT FOE-KEEPS E1: a foe's, which drops
-   *  nothing, inside it in the ring it fell in - never the zone's free way out (wildDeath.js wildRisePicks). */
-  const wildRiseSite = (px, inDungeon = false, kill = true) => {
-    if (etherSea && inEther(px.x, px.y)) return etherRiseSite(px.x, px.y);   // ETHER-WILD: the nearest freeport (AUDIT CAPTAIN'S SEA P4's), an isle's ruin's death too - the sea has no outside near enough
-    // PVPDUNGEONS: a death in a hall rises in the
-    // town nearest the hall - in the mountains too - so the way back to the remains is a run, not a journey
-    for (const pick of wildRisePicks(cyrodiilMask(), px, { inDungeon, kill })) { const at = nearestTownOf(px, pick); if (at) return at; }   // AUDIT TESA II P3/Z3: the world's towns (scenes/tamrielPlacesHost.js nearestTownOf) - Cyrodiil's own, in the ring and in the zone, where MAPS.BSA's rows alone put every rise at a Bay town 900 pixels and more away
-    return null;
-  };
-  /** "make sure it doesnt stuck the player when he spawns and other players": stood clear of every other body here and
-   *  facing open ground for the team that follows (wildDeath.js wildSpawnSpot) - after the arrival, before the team
-   *  is placed behind the player. */
-  const wildClearSpawn = () => {
-    const bodies = (peersNear() ?? []).map((b) => b.feet);
-    const eye = (pos) => [pos[0], pos[1] + 1, pos[2]];
-    const clear = (pos, yaw) => {
-      const back = [-Math.sin(yaw), 0, -Math.cos(yaw)];   // the horse and the wagon stand behind the player
-      const hit = collider.raycast(eye(pos), back, 7);
-      return !Number.isFinite(hit) || hit >= 7;
-    };
-    const spot = wildSpawnSpot(player.feetAt(), { bodies, clear, yaw: cam.yaw });
-    if (spot.pos[0] !== player.feetAt()[0] || spot.pos[2] !== player.feetAt()[2]) {
-      const y = heightAt(spot.pos[0], spot.pos[2]);
-      player.spawn(spot.pos[0], (Number.isFinite(y) ? y : spot.pos[1]) + 0.15, spot.pos[2]);
-    }
-    cam.yaw = spot.yaw; cam.pos = player.eyeAt();
-  };
-
-  // ── THE ZONE'S FRAME ──
-  let _wildWas = false;
-  let _wildRingWas = 0;   // WILD2: the ring last said
-  const WILD_LINE_HOLD_MS = 7000;
-  let _wildLineHold = null;   // WILD-LINE-HOLD: { line, until }
-  /** A crossing's line: on the screen's middle, in the talk, and held (WILD-LINE-HOLD, below). */
-  const wildSay = (line) => { setMidScreenText(line); townTalk.say(line); _wildLineHold = { line, until: Date.now() + WILD_LINE_HOLD_MS }; };
-  /** Every frame (onlineFrame, the dead's too): the zone under my feet and its crossing said, the fights' clocks, my
-   *  victims' bodies, the room's remains in this host's pool, my remains' time. */
-  const wildFrame = () => {
-    setWildMask(cyrodiilMask());   // WW-C2: Cyrodiil's, kept while the picture stands (built again when the trace or the fit moves)
-    try { wdunFrame(); } catch (e) { console.warn('[wdun]', e?.message ?? e); }   // PVPDUNGEONS: the hub's word, the heartbeat, the day's halls
-    const seaRing = _onlineWorldSession() && !!online && etherSea && playerSpawned ? etherWildRingAt(playerTravelPixel()?.x, playerTravelPixel()?.y) : 0;   // ETHER-WILD: the sea past Veilhaven's peace, its band the ring
-    const here = seaRing > 0 || (_onlineWorldSession() && !!online && playerSpawned && (() => { const px = playerTravelPixel(); return !!px && wildRingAt(px.x, px.y) > 0; })());   // WW-C2: Cyrodiil's mask (the Wrothgarian cut retired)
-    if (_wildTruce.frame(social?.partyPeers?.() ?? new Set(), Date.now()).length && here) townTalk.say(zoneWord('truce'));   // PARTY-TRUCE
-    wildGrace.frame(here);   // ZONE-GRACE: my safe passage run out, said - out of the zone, forgotten (AUDIT PVP-EASE L3-7)
-    if (playerEntity.health > 0 && !modes?.deathUp?.()) {
-      // WILD2: the ring under my feet (a building's or a dungeon's: its door's pixel) - 1 the outer, 4 the heart
-      let ring = 0;
-      if (here) { const px = playerTravelPixel(); ring = seaRing || wildRingAt(px.x, px.y) || WILD_RINGS; }
-      setWildHere(here, ring, seaRing ? ETHER_KIND : undefined);   // ETHER-WILD: the ground, for the zone's words
-      if ((here && wildZoneKind()) !== _wildWas) {   // ETHER-WILD: the kind stood in (false outside) - the words of the ground left
-        const left = _wildWas;
-        _wildWas = here && wildZoneKind();
-        _wildRingWas = ring;
-        const line = here ? `${zoneWord('enter')} ${zoneWord('ring')(ring)}` : zoneWord(left === ETHER_KIND && !etherInPeace(playerTravelPixel()?.x, playerTravelPixel()?.y) ? 'quiet' : 'leave', left || undefined);   // AUDIT SEA VENTURES C7: "Veilhaven's peace" only where it is
-        if (here) noteFirstUse('wild-zone');   // TUT1: the first step into the open zone
-        wildSay(line);
-      } else if (here && ring !== _wildRingWas) {
-        const deeper = ring > _wildRingWas;
-        _wildRingWas = ring;
-        wildSay(zoneWord('ringCross')(ring, deeper));
-      }
-      // ZONE-SAFE (systems/wild/zoneSafe.js): a settlement's streets crossed in the zone, said - in a building the word I had
-      zoneSafeFrame(here, here && wildOutdoors() && settledAt(campToWire(player.feetAt()), locationIndex), wildSay, modes?.mode === 'interior');
-    }
-    // WILD-LINE-HOLD: the label counts GAME seconds (ui/midScreenText.js tick, at the time scale), and the zone is
-    // crossed at a journey's pace - at 20x its 1.5 s were 75 ms. The crossing's line is held for WILD_LINE_HOLD_MS of REAL
-    // time: put back whenever the label has gone blank (a later message of its own still shows, and the line after it).
-    if (_wildLineHold) {
-      if (Date.now() > _wildLineHold.until) _wildLineHold = null;
-      else if (!_wildMidText.text) setMidScreenText(_wildLineHold.line);
-    }
-    setPaceZoneCap(wildHere() && wildZoneKind() !== ETHER_KIND ? WILD_PACE_CAP : null);   // WILD3: "max 20x in the wilds and 40x on the roads" - ETHER-WILD: never at sea, whose leagues are its own price
-    wildStrangersFrame();
-    try { wildGiantsFrame(); } catch (e) { console.warn('[giants]', e?.message ?? e); }   // ZONE-GIANTS
-    try { giantLeashFrame(); } catch (e) { console.warn('[giants] leash', e?.message ?? e); }   // GIANT-LEASH
-    try { hallArrivalWatch(); } catch (e) { console.warn('[halls] arrival', e?.message ?? e); }   // HALL-ARRIVE2
-    try { giantNoticeFrame(); } catch (e) { console.warn('[giants] notice', e?.message ?? e); }   // GIANT-FALL
-    wildFight.tick();
-    for (const peer of [..._wildBodies.keys()]) if (!wildFight.body(peer)) wildBodyGone(peer);
-    online?.setWildZone?.(wildCan() ? 1 : 0, playerEntity.health <= 0);   // INT9: my word on the zone, for its referee - standing in it, alive, where it fights (AUDIT FOE-KEEPS E2: and left dying, its kill credit)
-    wildDepositFrame(); wildSeizeFrame(); wildHudFrame();   // INT9: a drop's deposit, a fall to seize, the referee's readout
-    wildEscrow.frame();   // MAC: my piece in escrow asked back, my collect carried
-    wildRemains.setRooms(online?.status === 'open' ? online.heldRooms() : []);   // HALO-REMAINS: my room and the halo's
-    wildRemains.setPool(wildOutdoors() ? droppedLoot : (modes?.droppedPool?.() ?? null));
-    wildRemains.tick();
-    setLootMarksLive(wildRemains.hasMine());   // my remains' red line stands with the rarity row off too
-    if (!_wildMineRead) { _wildMineRead = true; _wildMine ??= keptMine(Date.now(), wildWho()); }   // WILD-KEEP: back from a crash or a close
-    if (_wildMine && Date.now() > _wildMine.until) { _wildMine = null; keepMine(null); }
-    remainsMarkTick(Date.now());   // WILD-WAYPOINT: the flag goes with its remains' time
-    seaVentures.guns();   // AUDIT SEA VENTURES E6A: the open sea's guns every online frame - paused, a window open or below, my helm is said
-  };
-  // WILD3: THE STRANGERS - every other player in the zone with me, outside my party and my guild, within WILD_STRANGER_M
-  // (their bodies as the room draws them): enemies to the Overworld (marked in red, "Stranger"), to the journey's pace
-  // (within WILD_STRANGER_SLOW_M it slows as for any foe) and to the names (no name of theirs is shown). Read four times
-  // a second; one coming near is said.
   // PVPUNSTUCK: the cooldown, the enemy ring, and the outdoors' own step out of whatever holds the player
-  const UNSTUCK_COOLDOWN_MS = 30 * 60_000, UNSTUCK_ENEMY_M = 600;
+  const UNSTUCK_COOLDOWN_MS = 30 * 60_000;
   let _unstuckAt = 0;
-  const wildStrangerWithin = (m) => {
-    if (!wildHere()) return false;
-    for (const d of online?.drawable?.() ?? []) {
-      if (!d?.shown || !wildIsStranger(d.id, d.gt)) continue;
-      const f = onlineToScene(_peerMapPoses.get(d.id) ?? d.shown);
-      if (Math.hypot(f[0] - player.pos[0], f[2] - player.pos[2]) <= m) return true;
-    }
-    return false;
-  };
-  const UNSTUCK_COOLDOWN_ZONE_MS = 60 * 60_000, UNSTUCK_WAIT_MS = 5 * 60_000;
-  let _unstuckWait = null;   // { until, timer, el } while the zone's five minutes run
   /** The deed: a dungeon's or a building's door out, or outdoors the nearest town. */
   const unstuckNow = () => {
     let moved = modes?.unstuck?.();   // AUDIT 24 wave37: guarded on the OBJECT - `modes` is a `var` assigned further down, so a line typed before the mode machine exists reads `undefined`, never throws
     if (!moved && (modes?.mode ?? 'exterior') === 'exterior') moved = unstuckOutdoors();
     return moved;
   };
-  const unstuckCancel = (why) => {
-    const w = _unstuckWait;
-    if (!w) return;
-    clearInterval(w.timer); w.el?.remove?.(); _unstuckWait = null;
-    if (why) townTalk.say(why);
-  };
-  /** The zone's wait: a bar with the minutes left and a Cancel; the deed at the end unless a stranger is within 600 m then. */
-  const unstuckBegin = (say) => {
-    const until = Date.now() + UNSTUCK_WAIT_MS;
-    let el = null;
-    if (typeof document !== 'undefined') {
-      el = document.createElement('div');   // z 30: the HUD's own tier (the gate banner's, the pace box's) - under every window, and under the asset picker (test/scenes/mwattach.test.js), never 9999
-      el.style.cssText = 'position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:30;min-width:260px;padding:8px 12px;background:rgba(10,13,17,0.92);border:1px solid #8f2216;color:#e9e4d9;font:600 13px Georgia,serif;text-align:center;pointer-events:auto';
-      const label = document.createElement('div'); label.className = 'unstuck-label';
-      const track = document.createElement('div'); track.style.cssText = 'height:6px;margin:6px 0;background:#2a1c12';
-      const fill = document.createElement('div'); fill.style.cssText = 'height:100%;width:0;background:#b3261a'; track.append(fill);
-      const btn = document.createElement('button'); btn.type = 'button'; btn.textContent = 'Cancel'; btn.style.cssText = 'padding:3px 14px;cursor:pointer';
-      btn.onclick = () => unstuckCancel('You stay where you are.');
-      el.append(label, track, btn); el._label = label; el._fill = fill;
-      document.body.append(el);
-    }
-    const tickBar = () => {
-      const left = until - Date.now();
-      if (playerEntity.health <= 0) { unstuckCancel(null); return; }
-      if (left <= 0) {
-        unstuckCancel(null);
-        if (wildStrangerWithin(UNSTUCK_ENEMY_M)) { townTalk.say(`/unstuck failed: another player is within ${UNSTUCK_ENEMY_M} m.`); return; }
-        const moved = unstuckNow();
-        if (moved) _unstuckAt = Date.now();
-        townTalk.say(moved ? 'You find your way free.' : 'There is nowhere to send you from out here.');
-        return;
-      }
-      if (el) { const m = Math.floor(left / 60000), sec = Math.floor((left % 60000) / 1000); el._label.textContent = `Unsticking in ${m}:${String(sec).padStart(2, '0')}`; el._fill.style.width = `${Math.round(100 * (1 - left / UNSTUCK_WAIT_MS))}%`; }
-    };
-    _unstuckWait = { until, el, timer: setInterval(tickBar, 250) };
-    tickBar();
-    say('You will be free in 5 minutes. Cancel with the bar or /unstuck cancel.');
-  };
-  /** PVPUNSTUCK: outdoors, /unstuck is the walk to the nearest town -
-   *  the zone's own towns too - arrived at like the guild's teleport but never asked of the zone's travel law. */
+  /** PVPUNSTUCK: outdoors, /unstuck is the walk to the nearest town - arrived at like the guild's teleport. */
   const unstuckOutdoors = () => {
     if (playerEntity.health <= 0 || _teleporting || worldMoveBusy()) return false;
     const px = playerTravelPixel();
-    const _zm = cyrodiilMask();
-    const town = etherSea && inEther(px.x, px.y) ? wildRiseSite(px) : nearestTownOf(px, (hit) => hit.kind === 'city' && !(_zm && wildNear(_zm, hit.mapPixel.x, hit.mapPixel.y)));   // PVPDUNGEONS: never into the zone - ETHER-WILD: past the Veil the nearest freeport (wildRiseSite's sea), never a Bay town across it (AUDIT CAPTAIN'S SEA P6) - AUDIT TESA II P2: the world's towns (scenes/tamrielPlacesHost.js nearestTownOf): past the Bay MAPS.BSA's rows alone sent the player to a Bay city a continent away
+    const port = etherSea && inEther(px.x, px.y) ? etherRisePort(px.x, px.y) : null;
+    const town = port ? { mapPixel: { x: port.px, y: port.py }, kind: 'city' } : nearestTownOf(px, (hit) => hit.kind === 'city');   // ETHER-WILD: past the Veil the nearest freeport, never a Bay town across it (AUDIT CAPTAIN'S SEA P6) - AUDIT TESA II P2: the world's towns (scenes/tamrielPlacesHost.js nearestTownOf): past the Bay MAPS.BSA's rows alone sent the player to a Bay city a continent away
     if (!town) return false;
     _teleporting = true;
     (async () => {
@@ -22176,65 +21203,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     })();
     return true;
   };
-  let _wildStrangers = [];
-  let _strangerRateNow = 0;   // PVPNEAR: the pace a stranger near holds the journey to (0: none) - the journey box says it
-  const _wildStrangerIds = new Set();
-  let _wildStrangersAt = 0;
-  const _wildStrangerSaid = new Map();   // id -> when last said
-  const wildIsStranger = (id, gt) => !!id && wildHere() && !social?.isPartyPeer(id) && !sameGuild(gt, myGuildTag());
-  const wildStrangersFrame = () => {
-    const now = performance.now();
-    if (now - _wildStrangersAt < 250) return;
-    _wildStrangersAt = now;
-    _wildStrangers = [];
-    _wildStrangerIds.clear();
-    if (!wildHere() || playerEntity.health <= 0) return;
-    for (const d of online?.drawable?.() ?? []) {
-      if (!d?.shown || _hiddenPeers.has(d.id) || _veils.has(d.id) || !wildIsStranger(d.id, d.gt)) continue;
-      const f = onlineToScene(_peerMapPoses.get(d.id) ?? d.shown);
-      const dist = Math.hypot(f[0] - player.pos[0], f[2] - player.pos[2]);
-      if (dist > WILD_STRANGER_SEE_M) continue;   // STRANGER-SEE: marked this far
-      _wildStrangers.push({ id: d.id, feet: f, dist });
-      // PVPNEAR (the owner: \"when 70m near the stranger it also auto puts both in 3d mode\"): each client drops its own view
-      if (dist <= 100 && (travelView?.state === 'up' || travelView?.state === 'rising')) { travelView.exit('key'); _tvAttack = null; }
-      _wildStrangerIds.add(d.id);
-      const said = _wildStrangerSaid.get(d.id) ?? -Infinity;
-      if (dist <= WILD_STRANGER_M) {   // the warning keeps its 600 m - the mark is seen from farther
-        if (Date.now() - said > 60_000) { setMidScreenText(WILD_TEXT.strangerNear(dist)); townTalk.say(WILD_TEXT.strangerNear(dist)); }
-        _wildStrangerSaid.set(d.id, Date.now());
-      }
-    }
-  };
-  /** WILD3: a player's name over their head in the zone - my party's and my guild's as ever, anyone else's never: a
-   *  "Stranger" in its place (the colour is colorOf's, the enemy's red), with none of their badges. */
-  const wildNameMask = (p) => {
-    if (!p?.id || !online?.peers?.has?.(p.id) || !wildIsStranger(p.id, p.gt)) return p;
-    _wildStrangerIds.add(p.id);   // within the names' reach is within the strangers' - red at once, before the next read
-    if (!(travelView?.active)) return null;   // PVPNEAR (the owner: \"the red stranger name should not appear when in 3d mode\"): the Overworld's marks name them; the 3D scene shows no name at all
-    return { ...p, name: WILD_TEXT.stranger, title: null, glyphs: [], lv: null, gt: null, rb: null, house: null, tint: WILD_STRANGER_RGBA };   // in the enemy's red (nameFrame's tint)
-  };
-  /** My remains for the world map: where they lie (map pixels) and the minutes they have left. */
-  const wildRemainsMarks = () => {
-    if (!_wildMine) return [];
-    const m = _wildMine;
-    if (!isCellRoom(m.room)) return [];   // a building's or a dungeon's remains lie at its door on the map - the place's own mark
-    return [{ x: m.p[0] / 32768, y: 500 - m.p[2] / 32768, minutes: Math.max(1, Math.ceil((m.until - Date.now()) / 60_000)) }];
-  };
-  /** The maps' law for players: in or near the zone only my party and my guild are seen (- asked, "only parties and guilds can see each other"). `kin` the mark's own
-   *  (travellerKin), `wire` the player's world-frame point, `party` whether they are of my party. */
-  const wildHidesPlayer = ({ kin = null, wire = null, pixel = null, party = false } = {}) => {
-    if (party || kin === 'guild' || !_onlineWorldSession()) return false;
-    const mine = wildHere() || (wildOutdoors() && wildAtWire(campToWire(player.feetAt()), true));
-    if (mine) return true;
-    if (pixel) { const m = cyrodiilMask(); return (etherSea && inEther(pixel.x, pixel.y)) || (!!m && wildNear(m, pixel.x, pixel.y)); }   // a map's row: its map pixel (ETHER-WILD: anywhere past the Veil)
-    return wildAtWire(wire, true);
-  };
-  /** WILD3: MAY THIS FAST JOURNEY GO (systems/wild/wildZone.js wildJourney) - from where I stand to map pixel `to`, the
-   *  coin a fare already asked (`spoken`) set aside; said when it may not. Offline, or at a relay that does not raise the
-   *  zone, every journey goes. */
-  /** PVPDUNGEONS: a teleport - the guild's, Recall, the party's journey to its leader - neither leaves
-   *  from nor lands in the open zone. Said, and true when refused. The zone's own roads between its tiers (the travel
-   *  map's journey, wildTravelGate) are the one way about it. */
   /** AUDIT CAPTAIN'S SEA P6: NO TELEPORT ACROSS THE VEIL - Recall, a guild's teleport, a portal stone, a party's journey
    *  to its leader: the crossing is the one way over (the sea "is reached only by THE CROSSING"), and a ship left on the
    *  far side came round to the caster by the Fleet's Summon. `to` the pixel it would land at; null: the door itself,
@@ -22247,59 +21215,14 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     townTalk.say('The Bay\'s magic does not reach across the Veil. Only the crossing does.');
     return true;
   };
-  const wildTeleportRefused = (to = null) => {
-    if (TEST_GODMODE && staffPowers().god) return false;   // TESTBUILD
-    const m = online ? wildMapMask() : null;
-    if (m && etherSea && (etherWildRingAt(playerTravelPixel()?.x, playerTravelPixel()?.y) > 0 || (to && etherWildRingAt(to.x, to.y) > 0))) { townTalk.say(ETHER_WILD_TEXT.teleport()); return true; }   // ETHER-WILD: nor about the open sea
-    if (!m) return false;
-    const from = playerTravelPixel();
-    if (!(from && wildInside(m, from.x, from.y)) && !(to && wildInside(m, to.x, to.y))) return false;
-    townTalk.say(`You cannot teleport into or out of ${WILD_NAME}. Walk or ride its roads.`);   // WW-C2: Cyrodiil's
-    return true;
-  };
-  /** `law` the verdict past the Bay: a journey's (pastBayJourney, TESA-NO-FAST), or a teleport's (PORTAL-BAY:
-   *  pastBayTravel.js teleportJourney - teleportTo and a stone's pick and step, scenes/portalStoneHost.js). */
-  const wildTravelGate = (to, spoken = 0, law = pastBayJourney) => {
+  /** TESA-NO-FAST: no fast journey past the Bay (systems/travel/pastBayTravel.js pastBayJourney); said when refused. */
+  const travelGate = (to) => {
     if (TEST_GODMODE && staffPowers().god) return { ok: true, fee: 0 };   // TESTBUILD: god mode travels anywhere, free
-    const j = law(playerTravelPixel(), to, online ? wildMapMask() : null, wildJourney({ from: playerTravelPixel(), to, mask: online ? wildMapMask() : null, lastAt: playerEntity.wildTravelAt ?? null, gold: legacyGold(playerEntity) - spoken }));   // AUDIT TESA II P4: never a journey INTO the land past the Bay (systems/travel/pastBayTravel.js - TESA-NO-FAST's law at the gate every journey passes: a party's to its leader, a rider's), the zone's own journeys its own
+    const j = pastBayJourney(playerTravelPixel(), to, null, { ok: true, fee: 0 });
     if (!j.ok) townTalk.say(j.text);
     return j;
   };
-  /** WILD3: a journey inside the zone paid - its fee out of the purse's coin, and its ten minutes begun. */
-  const wildTravelPaid = (j) => {
-    if (!(j?.fee > 0)) return;
-    deductGoldPieces(playerEntity, j.fee);
-    playerEntity.wildTravelAt = Date.now();
-    townTalk.say(WILD_TEXT.travelPaid(j.fee));
-  };
-  const wildFight = createWildFight({
-    send: (d, o) => online?.sendWild(d, o) === true,
-    now: () => performance.now(),
-    can: wildCan,
-    fair: wildFair,
-    onBody: (from, body) => wildBodyArrived(from, body),
-  });
-  const wildRemains = createWildRemains({
-    send: (d, room) => online?.sendWild(d, { room }) === true,   // HALO-REMAINS: a take to the room that keeps the pile
-    pool: () => (wildOutdoors() ? droppedLoot : (modes?.droppedPool?.() ?? null)),
-    toScene: (p) => onlineToScene({ x: p[0], y: p[1], z: p[2] }),
-    canTake: (rec) => rec.mine || !(rec.oid && (social?.isPartyPeer(rec.oid) || sameGuild((online?.drawable?.() ?? []).find((d) => d.id === rec.oid)?.gt, myGuildTag()))),   // PVPDUNGEONS: party and guild members cannot take a fallen friend's pile
-    mine: (rec) => (!!rec.os && rec.os === (social?.acct ?? null)) || (!!rec.oid && rec.oid === online?.id) || rec.r === _wildMine?.r,
-    pack: () => (playerEntity.items ??= []),
-    mint: (list) => validLootList(list),
-    addItem: (list, item) => (isGoldPieces(item) ? addGoldPieces(playerEntity, item.stackCount ?? 1) : addItem(list, item)),   // WILD GOLD: coin goes to the purse
-    unpurse: (n) => { const h = playerEntity.goldPieces ?? 0; const t = Math.min(h, n); playerEntity.goldPieces = h - t; return t; },   // WILD GOLD: a take the window already put in the purse
-    stacksWith: (a, b) => stacksWith(a, b),
-    unequip: (item) => { if (isEquipped(item)) unequipItem(playerEntity, item); },
-    say: (l) => townTalk.say(l),
-    now: () => performance.now(),
-    nameOf: (item) => itemLongName(item),
-    me: () => social?.acct ?? null,   // INT9: the killer's piece, mine alone
-    collect: (cr, at) => wildEscrow.collectHeard(cr, at),   // MAC: the room's collect of my piece in escrow, carried to the service
-  });
-  setHudZone(() => (wildHere() ? { name: `${zoneSafe() ? ZONE_SAFE_TEXT.chip : WILD_TEXT.chip} - ${zoneRingName(wildRing())}, ${wildRingBonus(wildRing())}`, foot: `${wildRing()}/${WILD_RINGS}` } : null));   // WILD1: the HUD's glyph, on the enhanced skin...
   setHudPauseAt((at) => { if (!modes?.openPauseAt?.(at)) hudCtx.togglePause({ at }); });   // FIRM-STARS: a pause page by name, wherever the player stands (the /mail door's)
-  setZoneEntity(playerEntity);   // ...and on the classic row
   /** The duel's rows on a peer (ui/socialMenu.js): 'Accept duel' + 'Decline duel' while their challenge waits, 'Yield the
    *  duel' while we fight - nothing else (the challenge itself is the Inspect card's). */
   const duelActionsFor = (peerId) => {
@@ -25474,7 +24397,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   /** PARTY-TRAVEL: the journey itself - the travel popup's own order (ui/travel/travelPopUp.js tick): the screen smashed to
    *  black, then fastTravelTo, whose arrival fades it back; a journey that did not go clears it. */
   const partyTravelJourney = (pick, opts, computed) => {
-    if (pick?.besideAt && (wildTeleportRefused(pick.pixel ?? null) || (!pick.veil && veilRefused(pick.pixel ?? null)))) return Promise.resolve(false);   // AUDIT CAPTAIN'S SEA P6: nor to a leader across the Veil - VEIL-PARTY: but a member following her captain's crossing (veilParty.js `veil`)   // PVPDUNGEONS: no teleport to the leader into, out of or inside the zone (a party's own journey on the zone's roads is fastTravelTo's, under wildTravelGate)
+    if (pick?.besideAt && !pick.veil && veilRefused(pick.pixel ?? null)) return Promise.resolve(false);   // AUDIT CAPTAIN'S SEA P6: nor to a leader across the Veil - VEIL-PARTY: but a member following her captain's crossing (veilParty.js `veil`)
     hudFade.smashHUDToBlack();
     return fastTravelTo(pick, opts, computed).then((went) => { if (!went) hudFade.clearFade(); return !!went; },
       (e) => { console.error('[party-travel] the journey failed:', e); hudFade.clearFade(); return false; });
@@ -26190,7 +25113,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       const where = tw.sx != null ? TRAVEL_VIEW_TEXT.theSpot : (tvPlaceSummary(tw.x, tw.y)?.name ?? TRAVEL_VIEW_TEXT.theSpot);   // AUDIT OW5 P5: "to the marked spot"
       const round = tw.at;
       const box = new YesNoBoxWindow({
-        rows: [`${leadRow.name ?? 'Your leader'} leads the party to ${where}.`, ...[wildWalkRow(tw.x, tw.y)].filter(Boolean), 'Travel with them?'],   // PARTY-TRUCE: the zone named
+        rows: [`${leadRow.name ?? 'Your leader'} leads the party to ${where}.`, 'Travel with them?'],
         onYes: () => walkAnswered(box, round, true),
         onNo: () => walkAnswered(box, round, false),
       });
@@ -26523,16 +25446,13 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // AUDIT NAMES N2-3: and never while I am concealed (invisible, blending, a shade) - within the pose range the others
     // mark no concealed player (`_hiddenPeers`/`_veils`), and the region's mark would name me to all of them; the clear
     // is sent the frame the concealment takes
-    // WILD1: in or near the open zone my mark is for my guild alone - a player with none sends none (my party has its own
-    // poses), and the maps of everyone else hide one they hear anyway (wildHidesPlayer)
-    const wildHidden = outdoors && !myGuildTag() && wildAtWire(campToWire(player.feetAt()), true);
     const shown = outdoors && isEnhanced() && getPref('showToTravellers') !== false && channelOf(link.room) === chatRegionRoom(_questRegionIndex()) && !concealBits(playerEntity);   // SCALE5c part two: the region's channel, on whichever of its shards
-    const n = shown && !wildHidden ? state.worldCoords(player.pos) : null;
+    const n = shown ? state.worldCoords(player.pos) : null;
     // OWS1: at a helm or aboard, the region sees a ship, headed as its bow (a changed way is sent at once - travellerDue)
     const ship = n ? csaBoatUnderMe() : null;
     const mark = n ? travellerMarkOf({ x: n.x, z: n.z, yaw: ship ? csaBoatYaw(ship) : cam.yaw, mode: ship ? TRANSPORT_MODES.Ship : player.transportMode, journey: !!travelControlUI?.isShowing }) : null;
     if (mark) Object.assign(mark, regionChaseWords(bandWordOf(_bandChase, _bandSpentAt), raiderWordOf(seaRaidHeld(), tvRaid.spentAt), Math.floor(bandNowMs() / BAND_LIFE_MS), Math.floor(raidNowMs() / RAIDER_LIFE_MS)));   // OW-CHASE-RANGE: my chases, region-wide, beside the mark (systems/travel/regionChase.js)
-    const due = travellerDue(travellerSent, { now, mark, alone: link.othersHere === 0, shown, chasing: _bandChase.size > 0 || tvRaid.chase.size > 0 });   // WILD1: no mark (wildHidden) is a clear; AUDIT OW-REVISITED L4-8: refreshed while a chase runs, never for a ship that only stands
+    const due = travellerDue(travellerSent, { now, mark, alone: link.othersHere === 0, shown, chasing: _bandChase.size > 0 || tvRaid.chase.size > 0 });   // AUDIT OW-REVISITED L4-8: refreshed while a chase runs, never for a ship that only stands
     if (due === 'send' && link.sendTraveller(mark)) { travellerSent.last = mark; travellerSent.at = now; }
     else if (due === 'clear' && link.sendTraveller(null)) { travellerSent.last = null; travellerSent.at = now; }
   };
@@ -27101,7 +26021,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (!modes?.sailingCabin || seatOut() || playerEntity.health <= 0 || modes?.deathUp?.()) cabinLink.close();
     chatFrame();   // CHAT1: before the dead return, so the channels keep their heartbeat and their reconnect while the death screen is up (the panel itself is paused away like any HUD - AUDIT CHAT B7)
     tradeFrame();   // TRADE1: retries, timeouts, a peer gone or out of reach - before the dead return, as the chat's is
-    duelFrame(); wildFrame();   // DUEL1: the duel's law, and the ring my body is kept in - before the dead return, so a fall ends the duel; WILD1: wildFrame - the open zone's (where I stand, the fights' clocks, the bodies, the room's remains: the dead's too, my body's offer is answered while it lies)
+    duelFrame();   // DUEL1: the duel's law, and the ring my body is kept in - before the dead return, so a fall ends the duel
+    seaHubFrame();   // SEA-EVENTS: the social room's word on the treasure fleets, asked for - the dead's too
     wedFrame();   // LEGACY7 part three: the wedding's clock, and the account's unions read again
     profileFrame();   // INSPECT1: the card's ask retried and its wait timed - the trade's own kind of work, beside it
     pageFrame();   // JOURNAL1: a page whose writer left the room goes with them
@@ -27137,9 +26058,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (townTalk.overlay instanceof DeathScreen || modes?.deathUp?.()) {
       if (_deathWasOnline == null) _deathWasOnline = _onlineWorldSession();   // D-ONLINE1: the modal hosts' deaths (a dungeon's, a building's) are captured here, BEFORE the leave below clears online.room
       { const hourSlot = modes?.sdRealmSlot?.() ?? null; if (hourSlot != null) _sdFallen.add(hourSlot); }   // SD-ONELIFE: a death in the Hour is final for its Hollow (AUDIT SD III: under D-ONLINE1's capture, the block's first statement as AUDIT WORLD B6 and MWBODY1 hold it)
-      if (_wildGhost && online.room) online.tick();   // WILD1: the ghost's socket kept alive (its pings, its reconnect) - it sends no pose
-      if (_wildGhost && _wildGhostEndAt != null && Date.now() >= _wildGhostEndAt && !_wildDeposits.length) wildGhostLeave();   // AUDIT INT9: a hall's or a building's ghost, its deposit gone
-      if (online.room && !_wildGhost) {
+      if (online.room) {
         // PCORPSE1: the body is left where it fell - one last pose, flagged, before the leave below takes the living figure
         _deadMark = online._pose ? { k: online.room, x: online._pose.x, y: online._pose.y, z: online._pose.z, at: Date.now() } : null;
         _partyComposedAt = -Infinity;
@@ -27148,12 +26067,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         const _handed = handOverFoes() || handOverRoomFoes();   // QUEST-PARTY phase 3b: or my building's
         if (_handed) console.info(`[foes] handed ${_handed} foe(s) to the survivors`);
         online.sendDeath?.();
-        // WILD1: a death in the open zone - at another player's hand (FOE-KEEPS: a foe's drops nothing) the bag and the
-        // cart dropped to the room's remains while the room is still mine, and my worn gear offered to them: then my socket stays in the cell (a cell has
-        // no host to hand over) while my body lies, so their pick reaches me (wildDeathBegin sets _wildGhost)
-        wildDeathBegin();
       }
-      if (online.room && !_wildGhost) { worldPublish(now, true); online.leave(); exteriorFoes.clearPuppets(); modes?.clearOwnPuppets?.(); _foesRoom = null; }
+      if (online.room) { worldPublish(now, true); online.leave(); exteriorFoes.clearPuppets(); modes?.clearOwnPuppets?.(); _foesRoom = null; }
       // RESURRECT1: a party member's call, new since I fell - I rise where I lie. AUDIT CONTRIB A6: only while DEAD -
       // an outdoor respawn's teleport keeps this screen up for its whole await with the player already healed, and a
       // snapshot taken then outlived the respawn: the next death read an old call (cast at the old body, still on the
@@ -27183,7 +26098,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       const loc = _questLoc();   // the location under the player: an interior's room is named by it
       key = ident?.private ? privateRoomHere(ident) : roomKeyFor({
         host: 'world', mode,
-        mapId: ident?.kind === 'dungeon' ? seaVaultRoomId(ident.mapId ?? null, _wdunInside?.h ?? seaVentures.vaultHere()?.key) : (loc?.mapTableData?.mapId ?? null),   // AUDIT SEA VENTURES D7, D8: a vault of the deep's room its own lane (net/wire.js seaVaultRoomId) - the vault the gate let me into, or the day's I stand in
+        mapId: ident?.kind === 'dungeon' ? seaVaultRoomId(ident.mapId ?? null, seaVentures.vaultHere()?.key) : (loc?.mapTableData?.mapId ?? null),   // AUDIT SEA VENTURES D7, D8: a vault of the deep's room its own lane (net/wire.js seaVaultRoomId) - the vault the gate let me into, or the day's I stand in
         regionIndex: ident?.kind === 'dungeon' ? ident.regionIndex : (loc?.regionIndex ?? -1),
         locationName: ident?.kind === 'dungeon' ? ident.name : (loc?.name ?? ''),
         buildingKey: ident?.buildingKey ?? 0,
@@ -27366,7 +26281,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     for (const d of drawable) if (d?.shown) _peerMapPoses.set(d.id, d.shown);
     if (hccOn()) hcc.driverGlue(drawable, { toWire: campToWire });   // WAGONS3: a driver on their bench, drawn seated there - after the map's poses, where `peerAnchor` reads the puller their wagon hangs from
     const ranged = peerRange.cut(cabin ? drawable : drawable.filter((d) => !csaPeers.isBelowDeck(d.id)), { on: !travelView?.active, me: player.pos, at: (d) => onlineToScene(d.shown), range: peerRangeOf(getPref('peerRange')), mate: (id) => !!social?.isPartyPeer(id) || id === duelMgr.opponent });   // PEER-RANGE: past the distance on the Other players card a player stands nowhere on this screen - GATE-CROWD's cut by distance (net/peer/peerRange.js): my party and the one I duel always, nobody cut under the travel view (OW-PEERS grows them to be seen from overhead); their map marks, above, are kept
-    const visiblePeers = gateCrowd.cut(ranged, { on: modes?.gateArenaDay?.() != null || !(travelView?.active || wildHere() || siegeSession?.active() || royalSession?.active() || modes?.roomIdentity?.()?.kind === 'arena'), me: player.pos, at: (d) => onlineToScene(d.shown), max: gateCrowdMax(getPref('gateCrowd')), mate: crowdKept(social?.partyPeers?.(), [duelMgr.opponent, tradeMgr.session?.peer], wagonRiders?.ridingWithMe(), csaAboard.shipmates(), _duelRings.keys()) });   // GATE-CROWD: past the count on the Other players card only the nearest are drawn, my party always (net/gate/gateCrowd.js) - the rest stand nowhere on this screen this frame: no body, sprite, name, light, cast or step (their map marks, above, are kept); CROWD-WIDE: everywhere, not the court alone - but never where a stranger can fight me (the open zone, a battle, an arena's room) nor under the travel view; AUDIT CROWD-WIDE A2: never cut, those I fight, trade, ride or sail with and a duel's two fighters (net/gate/gateCrowd.js crowdKept)
+    const visiblePeers = gateCrowd.cut(ranged, { on: modes?.gateArenaDay?.() != null || !(travelView?.active || siegeSession?.active() || royalSession?.active() || modes?.roomIdentity?.()?.kind === 'arena'), me: player.pos, at: (d) => onlineToScene(d.shown), max: gateCrowdMax(getPref('gateCrowd')), mate: crowdKept(social?.partyPeers?.(), [duelMgr.opponent, tradeMgr.session?.peer], wagonRiders?.ridingWithMe(), csaAboard.shipmates(), _duelRings.keys()) });   // GATE-CROWD: past the count on the Other players card only the nearest are drawn, my party always (net/gate/gateCrowd.js) - the rest stand nowhere on this screen this frame: no body, sprite, name, light, cast or step (their map marks, above, are kept); CROWD-WIDE: everywhere, not the court alone - but never where a stranger can fight me (the open zone, a battle, an arena's room) nor under the travel view; AUDIT CROWD-WIDE A2: never cut, those I fight, trade, ride or sail with and a duel's two fighters (net/gate/gateCrowd.js crowdKept)
     peerCastVisuals(visiblePeers);   // SPELLFX1: a peer's new cast, drawn once
     if (modes?.gateArenaDay?.() != null) gateCourt?.stepsIn(drawable, (d) => (d?.shown ? onlineToScene(d.shown) : null));   // AUDIT GATE-FBX C3: a player stepping out of the court's way in opens it - every one in the room, the crowd's cut or not (the fire is the court's, not a body this screen draws)
     _veilT += dt > 0 ? dt : 0;
@@ -27555,7 +26470,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       layer: nameLayer, log: chatLog, colorOf: (id) => social?.colorOf(id) ?? null, blocked,
       renderer, font: townTalk.font, scale, hudScale: enhancedHudScale(),
       extra: noticeCountPoints,   // NOTICE1: "3 new" over a Notice Board, in the names' own face and law
-      mask: wildNameMask,   // WILD3: in the open zone no name but my party's and my guild's - the rest are Strangers, in red
     });
     if (covered) { sayNetStatus(null); return; }
     sayNetStatus(online?.statusLine());   // AUDIT ONLINE D12/E11: connecting, reconnecting, refused, replaced - said, not silent (FONT1: in the enhanced face)
@@ -27643,7 +26557,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const seatHalls = createSeatHallHost({ seatHere, guild: () => guildBook?.guild ?? null });   // HOST-SPLIT (DOMAIN2): a seat's halls, out of this scope
   const instanceDoor = createInstanceDoor({ online: () => onlineOn, instanceOk: () => !!(online || chatLinks?.get('world')), account: () => social?.acct ?? null, character: () => realmSession?.id ?? null,
     castle: (site) => (online || chatLinks?.get('world') ? seatHalls.castleAt(site.mapId) : null),   // DOMAIN2: my guild's castle there (AUDIT DOMAINS R3: the world link stands in, as for the instances)
-    members: () => social?.others() ?? [], questMachine: () => questBridge?.machine ?? null, openOverlay: (w, onClosed) => townTalk.pushOverlay(w, onClosed), say: (l) => townTalk.say(l), wild: () => { const m = wildMapMask(), p = playerTravelPixel(); return (!!m && wildInside(m, p.x, p.y)) || seaVentures.openSeaAt(p); },   // `wild`: inside the open zone nothing keeps an instance - its dungeons sealed, its halls the relay's to refuse; SEA-VAULTS: the open sea's too
+    members: () => social?.others() ?? [], questMachine: () => questBridge?.machine ?? null, openOverlay: (w, onClosed) => townTalk.pushOverlay(w, onClosed), say: (l) => townTalk.say(l), wild: () => seaVentures.openSeaAt(playerTravelPixel()),   // `wild`: on the open sea nothing keeps an instance (SEA-VAULTS)
     remains: () => legacyHost?.remainsWhere() ?? [] });   // HEIR-WHOLE: where the line's remains lie - a dungeon they lie in whole is the death quest's place
   // WITCH1: THE WITCHES' FESTIVAL IN THE STREETS (scenes/witchesHost.js) - the town
   // underfoot's Hearth Offerings stood at their doors, taken from and filled; the Wyrd Sisters' window; the finds' doors.
@@ -27731,9 +26645,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     gateHost: () => gateCourt?.hostTargets() ?? null,   // WB11c: his host as bodies my blows meet
     onHostHit: (hit) => !!gateCourt?.hostHit(hit),   // WB11c: a blow's number on one, out to the room
     arenaRival: () => arenaRivalBody(),   // ARENA4: my opponent on a relay's sand, as a body my blows meet
-    wildBodies: () => wildBodiesNow(),   // PVPDUNGEON: the fair players' bodies, for the dungeon's own swing
-    wildStrike: (id, weapon, swing, o) => wildStrikeOut(id, 'melee', weapon, swing, 0, o),
-    wildSpellMarks: () => wildSpellMarks(), wildSpellOut: (id, sp) => wildSpellOut(id, sp),   // PVPDUNGEON: spells at strangers underground, as above ground
     onArenaHit: (hit) => !!arenaOnline?.hit(hit),   // ARENA4: a blow's number on them, out to the referee
     // WB9f: HIS SPOILS ON THE FLOOR, pressed - the pool's resting pieces as targets, their words and their items for the
     // plaque, and the press that takes one into the pack (the court's dungeon arm, worldModes.js standCourt); SD9e: in the
@@ -27841,13 +26752,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     raiseFallen: (f) => raiseFallenDoor(f),
     plaquePeerAct: (eye, dir) => plaquePeerAct(eye ?? cam.pos, dir ?? socialFwd()),   // ACT-MENU: the building's and the dungeon's press on a player the plaque lit, on the press's own ray (AUDIT DISC7 A9)
     pointerSurfaceUp: () => pointerSurfaces.size > 0,   // AUDIT DROPS E1: the plaque comes down under the F-menu, the chat and the friends panel indoors and underground too (AUDIT-WH2 L3-F3's law, the street's own term)
-    wildDungeonGate: (hit, fromLoad) => wildDungeonGate(hit, fromLoad),   // PVPDUNGEONS: only the day's halls open, an hour's lock after leaving one
-    wildDungeonElite: () => wildDungeonIsOpenHere(),   // PVPDUNGEONS: every open hall is an elite dungeon
-    wildHallRing: () => wildHallHere()?.ring ?? 0,   // PVPDUNGEONS: its tier
-    wildHallEpoch: () => { const h = wildHallHere(); return h ? (_wdunEpoch.get(h.key) ?? 0) : 0; },   // PVPDUNGEONS: its reset's epoch
-    wildNoBank: () => { if (!wildHere()) return false; townTalk.say('There are no banks in the mountains.'); return true; },
-    wildNoHouse: () => { if (!wildHere()) return false; townTalk.say(`No house is for sale in ${WILD_NAME}.`); return true; },   // PVPDUNGEONS   // PVPDUNGEONS: no banks, so no houses either
-    onDungeonLeave: () => { if (_wdunInside) wdunLeft(false); const n = handOverRoomFoes(); if (n) console.info(`[foes] handed ${n} quest foe(s) at the dungeon's door`); doorToken.leaving(); gatherHost?.leaveDungeon(); worldPublish(performance.now(), true); },   // WORLD1: the room's memory goes out while the dungeon still stands; QUEST-PARTY phase 3c: my shared quest's foes to the party who stay   // DOOR-TOKEN: the cell outside's token, if the walk to the door did not mint it
+    wildDungeonElite: () => !!seaVentures.vaultHere(),   // SEA-VAULTS: a vault of the deep is an elite dungeon
+    wildHallRing: () => seaVentures.vaultHere()?.ring ?? 0,   // SEA-VAULTS: its band's tier
+    wildHallEpoch: () => (seaVentures.vaultHere() ? Math.floor(raidNowMs() / WDUN_DAY_MS) : 0),   // SEA-VAULTS: its chests' keys turn with the day (no hub: nothing resets a vault)
+    onDungeonLeave: () => { const n = handOverRoomFoes(); if (n) console.info(`[foes] handed ${n} quest foe(s) at the dungeon's door`); doorToken.leaving(); gatherHost?.leaveDungeon(); worldPublish(performance.now(), true); },   // WORLD1: the room's memory goes out while the dungeon still stands; QUEST-PARTY phase 3c: my shared quest's foes to the party who stay   // DOOR-TOKEN: the cell outside's token, if the walk to the door did not mint it
     // OH-D: the four DFU events There's a Hole in the Bottom of the Ocean subscribes to (its Install), raised by the doors
     onSetDungeon: (ctx) => ohAbyss?.onDungeonSet(ohDungeonOf(ctx)),   // DaggerfallDungeon.OnSetDungeon
     onTransitionDungeonInterior: (ctx) => { navalStow(); ohAbyss?.onDungeonEntered(ohDungeonOf(ctx)); csaOnTransition(); dungeonTierSay(); navalTransition(); },   // PlayerEnterExit.OnTransitionDungeonInterior (CSA-C: Come Sail Away's OnTransition after OceanHoles' - the mods' load order); TIER1: the tier said, online
@@ -28942,7 +27850,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     return Math.max(g, tvSeaY() + CURTAIN_FOOT_MARGIN_M);
   };
   const { carriageTown, tvEtherPlace, tvKnownGen, tvPlaceSummary, tvFarSettlements, junctionPlaceAt } = createMapPlaces({   // HOST-SPLIT: src/scenes/mapPlacesHost.js
-    captainLedger, etherPlaceClone, etherSea, locationIndex, mapDict, wildActiveNow, wildHallStand,
+    captainLedger, etherPlaceClone, etherSea, locationIndex, mapDict,
     provinceQuestPlaces, worldPlaces,   // BAY-LEFT-MAPS: a place past the Bay stood where it was found; TV5's near query
     get _locIndexGen() { return _locIndexGen; },
   });
@@ -29008,32 +27916,23 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
   // mod never stands a site on a path's pixel, LocationLoader.cs:146-151) - handed to the ground whenever the list or
   // the roads have changed since
   let _tvRocksFrom = null, _tvRocksRoads = null, _tvRocks = null;
-  let _tvRocksMask = null;
   function tvWodRocks() {
     const src = wod ? wod.mountainPixels() : null;
     const net = terrainGen.roads();
-    const wm = wildMapMask();
-    if (src === _tvRocksFrom && net === _tvRocksRoads && wm === _tvRocksMask && _tvRocks) return _tvRocks;
-    const n = src?.length || (wm?.region?.length ?? 0);
+    if (src === _tvRocksFrom && net === _tvRocksRoads && _tvRocks) return _tvRocks;
+    const n = src?.length ?? 0;
     if (!n) return null;
     const out = new Uint8Array(n);
     const onRoad = (i) => ((net?.roads?.[i] ?? 0) | (net?.tracks?.[i] ?? 0));
     if (src) for (let i = 0; i < n; i++) if (src[i] && !onRoad(i)) out[i] = 1;
-    // THE WROTHGARIAN MOUNTAINS, ON FOOT (the owner): inside the open zone nothing blocks (tvWildFree) - and since
-    // MOUNTAINS WALKABLE (systems/travel/travelRoute.js) nothing blocks outside it either: the massifs' table is still handed
-    // to the planner, whose step law no longer refuses it.
-    _tvRocksFrom = src; _tvRocksRoads = net; _tvRocksMask = wm; _tvRocks = out;
+    // MOUNTAINS WALKABLE (systems/travel/travelRoute.js): the massifs' table is still handed to the planner, whose step law no longer refuses it.
+    _tvRocksFrom = src; _tvRocksRoads = net; _tvRocks = out;
     return out;
   }
-  /** Inside the open zone nothing blocks a walker: its pixels read as plain flat ground (no Mountain climate, no steep rise). */
-  const tvWildFree = (x, y) => { const m = wildMapMask(); return !!m && wildInside(m, x, y); };
-  let _tvGroundWild = false;
   const tvRouteGround = () => {
-    const wildOn = !!wildMapMask();
-    if (wildOn !== _tvGroundWild) { _tvGroundWild = wildOn; _tvRouteGround = null; }   // the ground's tables are read once: re-read when the zone comes or goes (online or off)
     (_tvRouteGround ??= routeGround(
-      (x, y) => (tvWildFree(x, y) && woods.getHeightMapValue(x, y) > WATER_BYTE ? 0 : maps.getClimateIndex(x, y)),
-      (x, y) => { const h = woods.getHeightMapValue(x, y); return tvWildFree(x, y) && h > WATER_BYTE ? WATER_BYTE + 8 : h; },   // inside the zone: flat dry ground, water still water
+      (x, y) => maps.getClimateIndex(x, y),
+      (x, y) => woods.getHeightMapValue(x, y),
       WATER_BYTE, 1000, 500, (x, y) => !tvWater(x, y), undefined, rumareSeaPixel)).setRocks(tvWodRocks());   // TV-BEYOND: the land past the Bay walked, as the view shows it; RUMARE-WATER: the Imperial City's lake sailed
     return _tvRouteGround;
   };
@@ -29506,17 +28405,11 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
   const TV_DOUBLE_CLICK_MS = 450;
   let _tvEnemyClick = null;   // { key, t } - the last press on an enemy's marker
   let _tvAttack = null;       // { kind: 'band' | 'camp', id } - the enemy attacked, exempt from the slowdown
-  const tvEnemyMarkKey = (key) => key.startsWith('band:') || key.startsWith('camp:') || (key.startsWith('peer:') && _wildStrangerIds.has(key.slice(5)));   // PVPNEAR: a stranger's marker is an enemy's too
+  const tvEnemyMarkKey = (key) => key.startsWith('band:') || key.startsWith('camp:');
   /** The camp a live foe stands in, as travelViewCamps keys it (mine, or a peer's by the tags their frames carry). */
   const foeCampKey = (f) => (f?.site && f.site === riteHost?.siteNow() ? `rite:${f.site}` : f?.puppet ? (f._pupCamp ? `${f.puppet}:${f._pupCamp.id}` : null) : f?.campId != null ? `me:${f.campId}` : null);   // AUDIT WB12d (C15): the faithful by their rite
   /** The attacked enemy's marker: its name, and where it stands now (a scene point and its pixel) - or null, gone. */
   function tvAttackTarget(key) {
-    if (key.startsWith('peer:')) {   // PVPNEAR: a stranger - a journey straight at them; at 100 m both are put in 3D (wildStrangersFrame)
-      const id = key.slice(5), g = _wildStrangers.find((o) => o.id === id);
-      if (!g) return null;
-      const n = state.worldCoords(g.feet);
-      return { kind: 'peer', id, label: WILD_TEXT.stranger, point: g.feet, pix: worldCoordToMapPixel(n.x, n.z) };
-    }
     if (key.startsWith('band:')) {
       const id = key.slice(5);
       const b = travelViewBands().find((o) => o.id === id) ?? [..._bandChase.values()].find((c) => c.band.id === id)?.band;
@@ -29574,7 +28467,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     for (let y = at.y - r; y <= at.y + r; y++) {
       for (let x = at.x - r; x <= at.x + r; x++) {
         const summary = tvPlaceSummary(x, y);
-        if (!summary || summary.loc?.wildHall) continue;   // HALL-PLATE: a hall wears the dungeons' plate alone (travelViewDungeons)
+        if (!summary) continue;
         const rect = tvPlaceRect(summary);
         list.push({ key: `place:${summary.mapId}`, summary, x: rect.cx, z: rect.cz });
       }
@@ -29799,8 +28692,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     for (let i = _bandSpentAt.length - 1; i >= 0; i--) if (bandLifeOf(_bandSpentAt[i]) < life - 1) _bandSpentAt.splice(i, 1);   // AUDIT OW4 B7: said no more
   }
   /** A band's make, once: the themed group its seed rolls from its birthplace's table (the climate x day/night). */
-  /** PVPDUNGEONS: was this pixel in the open zone (the mask every client builds alike - a band's size is the same everywhere)? */
-  function wildBornHere(px, py) { const m = cyrodiilMask(); return (!!m && wildInside(m, px, py)) || (etherSea && _onlineWorldSession() && etherWildRingAt(px, py) > 0); }   // ETHER-WILD: the open sea's packs too, online
   function bandMake(b) {
     if (_bandMake.has(b.id)) return _bandMake.get(b.id);
     const px = Math.floor(b.born.x / 32768), py = 499 - Math.floor(b.born.z / 32768);
@@ -29808,7 +28699,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     // overworld"): its NUMBER its own roll (one to six), and online its tables read at the BAND's own level - every player
     // the same band, the same kind and number over it (each viewer's own level made two players read two bands)
     const hit = rollGroupComposition({ climateIndex: maps.getClimateIndex(px, py), fauna: maps.getFaunaBand?.(px, py), playerLevel: online ? bandLevelOf(b) : playerEntity.level, inLocationRect: false,
-      gameMinutes: b.night ? 0 : 720, size: bandSizeOf(b) * (wildBornHere(px, py) ? WILD_PACK_MULT : 1) }, seededRng(bandMakeSeed(b)));   // PVPDUNGEONS: a pack born in the zone is four times as many   // AUDIT OW3 T7-4: its own stream; T7-8: its life's night
+      gameMinutes: b.night ? 0 : 720, size: bandSizeOf(b) }, seededRng(bandMakeSeed(b)));   // AUDIT OW3 T7-4: its own stream; T7-8: its life's night
     const mk = hit?.mobileTypes?.length ? { mobileTypes: hit.mobileTypes, name: enemyDisplayName(hit.mobileTypes[0]) } : null;
     _bandMake.set(b.id, mk);
     return mk;
@@ -29921,7 +28812,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
   }
   // OW-CHASE-RANGE (scenes/regionChaseHost.js): a traveller's chases, off the words beside their region mark - withdrawn
   // when it no longer names them, never heard of one my map hides (WILD1: the guild's mark is no stranger's)
-  const regionChase = createRegionChaseHearing({ bandHear, seaRaidHear, bands: () => _bandPeer, raids: () => tvRaid.peer, me: () => playerTravelPixel(), wildHides: wildHidesPlayer, social: () => social, guildTag: myGuildTag });
+  const regionChase = createRegionChaseHearing({ bandHear, seaRaidHear, bands: () => _bandPeer, raids: () => tvRaid.peer, me: () => playerTravelPixel(), social: () => social, guildTag: myGuildTag });
   /** TV7b: my band word, on the cell's foes frame - asked with `frame` null whether it must ride (a chase moves every
    *  frame; a spent band is said on the full frames too), then written into the frame. */
   let _bandWordKey = '';
@@ -30044,11 +28935,11 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
   const owForecast = createOverworldForecast({ climateAt, ground: mapGroundHere, minuteNow: () => playerTicker.classicMinutes, here: () => state.worldCoords(player.pos), alt: () => fieldXZ()[2], tvTrip, tvTripLive, travel: () => travelOptions, shared: sharedClockOn, rateNow: worldTimeScale });   // OW-FORECAST: the weather ahead (scenes/overworldForecastHost.js)
   const { travelViewMarks } = createTravelViewMarks({   // HOST-SPLIT: src/scenes/travelViewMarks.js
     TV_PLACE_LIFT, _bandChase, _bandSpent, _hiddenPeers, _lodesSensed, _peerMapPoses, _townOfMapId, _tvBountyHold,
-    _tvLodeHold, _tvPartyHold, _tvVendorHold, _tvWaypointHold, _veils, _wildStrangerIds, bandMake, bandNowMs,
+    _tvLodeHold, _tvPartyHold, _tvVendorHold, _tvWaypointHold, _veils, bandMake, bandNowMs,
     bandPlace, cam, carriageTown, csaOn, exteriorFoes, livingHideoutsHostOf, lodeSense, lodeWords, motherlodeBook,
     myGuildTag, owForecast, params, player, playerTravelPixel, questPixel, seaRaidPeerChase, townEcon, state, travelViewBands,
     travelViewCamps, travelViewDungeons, travelViewFarPlaces, travelViewPlaces, travelViewRaiders, travellerBook, tvPlaceRect, tvPlaceSummary,
-    tvRaid, tvSceneKept, tvTrip, tvTripLive, walkMode, wildCampKeys, wildHidesPlayer,
+    tvRaid, tvSceneKept, tvTrip, tvTripLive, walkMode, wildCampKeys,
     get _sharedOffsetMs() { return _sharedOffsetMs; },
     get bountyHost() { return bountyHost; },
     get gatherHost() { return gatherHost; },
@@ -30354,9 +29245,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     // HOSTILE_NEAR_M, where the journey stops, so it slows before her ring (or her lookout past it), closing at her pace
     // once she comes for me (navalHost.js threats)
     for (const t of naval?.threats() ?? []) out.push({ dx: t.pos[0] - fx[0], dz: t.pos[2] - fx[2], reach: t.reach, holds: t.holds, ...(t.chasing ? { chasing: true, mps: t.mps } : {}) });   // TIME-DILATION: and the ring she holds the clock to x1 in
-    // WILD3: in the open zone every
-    // stranger is an enemy the journey slows for, its reach WILD_STRANGER_SLOW_M
-    for (const g of _wildStrangers) if (!(_tvAttack?.kind === 'peer' && _tvAttack.id === g.id)) out.push({ dx: g.feet[0] - fx[0], dz: g.feet[2] - fx[2], reach: WILD_STRANGER_SLOW_M });
     return out;
   }
   /** OW6: the enemies' cap on this frame's fast travel - at the traveller's own pace (the motor's, unscaled) along the way
@@ -30365,17 +29253,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
   function journeyThreatCap(up, keys = false) {
     const yaw = _travelDrive ? (_travelDrive.yaw * Math.PI) / 180 : keys ? _tvWalkYaw : null;
     const r = threatCap({ threats: journeyThreats(up), heading: yaw == null ? null : { x: Math.sin(yaw), z: Math.cos(yaw) }, speedMps: travellerPace(player, csaBoatUnderMe()) });   // PASSAGE-PACE: the boat's way at her helm
-    // PVPNEAR (the owner: \"near a stranger 300m 10x, 200m 5x speed\", then STRANGER-PACE): the nearest stranger's own pace, whatever the foe dial says
-    let sr = 0;
-    for (const g of _wildStrangers) {
-      if (_tvAttack?.kind === 'peer' && _tvAttack.id === g.id) continue;
-      // STRANGER-PACE: the nearer, the slower - at 100 m the journey's
-      // own pace is the walk's (and the view comes down there anyway - PVPNEAR)
-      const rate = g.dist <= 100 ? 1 : g.dist <= 200 ? 3 : g.dist <= 300 ? 5 : g.dist <= 600 ? 10 : 0;
-      if (rate && (!sr || rate < sr)) sr = rate;
-    }
-    _strangerRateNow = sr;
-    return sr ? { ...r, strangerRate: sr } : r;
+    return r;
   }
   /** OW6: said ONCE as an enemy begins to hold the journey (again after it has let go and a while has passed) - the view's
    *  bands are marked on the land, and the panel says the rate; on the classic skin this line is all the player is told. */
@@ -30433,7 +29311,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
       // the classic skin's journey on the ground, and First-Person Travel's (OW-TOGGLE): the mod's own ask, under the
       // enemies' cap alone (no view, no ground to watch) - nothing near, it is the ask handed back whole. Never over the
       // helm's own time step: Come Sail Away holds the clock then (AUDIT OW5 G5's law, whose restore asks this rate)
-      const rate = csaHoldsTimeScale() ? null : (foes.strangerRate ? Math.min(foeRate(foes, travelAsked), foes.strangerRate) : foeRate(foes, travelAsked));
+      const rate = csaHoldsTimeScale() ? null : foeRate(foes, travelAsked);
       if (rate != null && worldTimeScale() !== rate) setWorldTimeScale(rate);
       tvHeld = rate != null && rate < travelAsked ? rate : null;
       tvHeldWhy = tvHeld != null ? 'foes' : null;
@@ -30476,7 +29354,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     const unbuilt = uc.n;
     const want = journey ? travelAsked : walk;   // AUDIT TV A2: what the mod asked - its ground's rate under its own cap (RATE-LAW); TV-WASD: or the keys' travel
     const load = travelGovernor.step(dt, { unbuilt, requested: want, owed: uc.owed, feet: unbuilt ? state.worldCoords(player.feetAt()) : null, speedMps: travellerPace(player, csaBoatUnderMe()) });   // OW-LEAD: held by how near the nearest owed pixel is, at the traveller's own pace - PASSAGE-PACE: a boat's at her helm
-    const foeCap = foes.strangerRate ? Math.min(foeRate(foes, want), foes.strangerRate) : foeRate(foes, want);   // ENEMY-PACE: the enemies' cap, never under the near-enemy pace (RATE-LAW: fixed)
+    const foeCap = foeRate(foes, want);   // ENEMY-PACE: the enemies' cap, never under the near-enemy pace (RATE-LAW: fixed)
     const town = tvTownPace() ?? Infinity;   // OW-TOWN-WALK: in a town, its pace - a journey's own streets ask it already, the keys' travel is held to it
     const rate = Math.min(load, foeCap, town);   // OW6: the ground's cap and the enemies', the lower
     if (worldTimeScale() !== rate) setWorldTimeScale(rate);
@@ -31666,8 +30544,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
               // frame() - the return left before requestAnimationFrame(frame) at its foot, so a take or its refusal ("You
               // cannot carry any more stuff.") stopped the game loop: no look, no walk, no foes. A handled press opens no
               // window and the frame runs on (worldModes' own negated take). test/scenes/ql_frame.test.js holds every return.
-              if (pile?.wildBody) openWildBody(pile);   // WILD1: a body I felled in the open zone - choose one of its worn pieces
-              else if (pile || _fish) {
+              if (pile || _fish) {
                 const _hooks = _fish ? dwFishLootHooks(_fish) : droppedLootHooks(pile);
                 // SILVER-FINDS (AUDIT 625 S2): a scene's own TREASURE container out here - World of Daggerfall's piles and
                 // casket, Deep Waters' chests (`container: true`) - rolls its find as an interior's and a dungeon's pile does,
@@ -33751,7 +32628,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
           onRoad: !!travelControlUI?.onRoad,   // RATE-LAW: and which ground it is
           held: tvHeld,   // TV2: the travel view's cap, while it holds the clock under the ground's rate
           heldWhy: tvHeldWhy,   // AUDIT OW5 G1: and why; OW6: the land loading, an enemy near, or the view down (its ground)
-          stranger: _strangerRateNow,   // PVPNEAR
           message: travelControlUI?.message ?? '',
           minutesLeft: travelOptions?.minutesLeft ?? null,   // AUDIT-TO1 L5: the popup's estimate, run down on the world clock
           from: playerTravelPixel(),

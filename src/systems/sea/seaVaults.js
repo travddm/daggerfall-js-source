@@ -6,11 +6,9 @@
 // A VAULT is an isle's ruin of the Deep Aether or the Abyss that the day has chosen (the relay's day, WDUN_DAY_MS - every
 // player sees the same vaults): SEA_VAULTS of them a band, each the ruin isle nearest a point the day's hash draws in its
 // band's waters (the legends' haunts' corridor: HAUNT_SPREAD rows north and south of Veilhaven, the Abyss's first
-// ABYSS_HAUNT_LEAGUES), SEA_VAULT_SPACING_CELLS apart at least. A vault is the mountains' hall on the sea: an elite
-// dungeon whose foes are its ring's high tier (systems/wild/wildDungeons.js wildHallFoes), its chests keyed by its reset's
-// epoch, an hour's lock on whoever leaves it, the crows over it while a body lies in it, wiped twenty minutes empty - the
-// social hub's record (net/wild/wildLaw.js wdun*, keyed `"e<cx>,<cy>"` - net/wire.js seaVaultKey). Every other ruin of the
-// sea stays open and itself.
+// ABYSS_HAUNT_LEAGUES), SEA_VAULT_SPACING_CELLS apart at least. A vault is an elite dungeon
+// on the sea: its foes are its ring's high tier (systems/sea/vaultFoes.js vaultFoes), its chests keyed by the day it stands
+// (net/wire.js seaVaultKey, keyed `"e<cx>,<cy>"`). Every other ruin of the sea stays open and itself.
 //
 // Pure: the day in, the vaults out; no map files, no clock. Every client and the hub could draw them alike.
 // ═══════════════════════════════════════════════════════════════════

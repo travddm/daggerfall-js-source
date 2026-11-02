@@ -101,8 +101,6 @@ import {
 } from '../../systems/equip.js';
 import { armourBadge, armourPlaque, compareBlock, lineCompareBlock, wearComparison } from '../armourCard.js';   // AC-COMPARE: the doll's numbers on the map, the overall figure, the card's comparison
 import { statFlip } from '../statsCard.js';   // STATS-CARD: the paperdoll's flip side, its Stats button
-import { wildInsureBook } from '../../net/wild/wildInsureSlot.js';   // WILD-INSURE: a policy's line on the card, and its Insure act
-import { WILD_TEXT } from '../../systems/wild/wildZone.js';
 import { temperaturePlaque, temperatureCompareBlock } from '../temperatureCard.js';   // TEMP-UI: the felt temperature on the figure and on a wearable's card
 import {
   itemWeight, isEnchanted, totalWeight, addItem, goldStack,
@@ -381,7 +379,7 @@ export function remoteModel(deps = {}, state = {}) {
       : deps.loot ? (deps.loot.storage === true ? 'storage' : 'container') : 'ground';   // SHIP-STORE: the player's own storage
   return {
     kind,
-    title: (kind === 'reward' && typeof state.chooseOne?.title === 'string' && state.chooseOne.title)   // WILD1: a choice may name itself (a fallen player's gear)
+    title: (kind === 'reward' && typeof state.chooseOne?.title === 'string' && state.chooseOne.title)   // a choice may name itself
       || (kind === 'storage' && typeof deps.loot?.title === 'string' && deps.loot.title) || REMOTE_TITLE[kind],   // CARGO-ANYWHERE: and a ship's hold (holdDoor.js - "The Sea Wolf's hold")
     items,
     count: items.length,
@@ -3467,7 +3465,6 @@ function infoCard(picked, side, ready = render, { body = false, own = true } = {
   const bline = boundLine(picked);   // AUDIT AUTO-HOLD: a piece the realm locked says so in its own words
   if (bline) into.append(el('p', 'boundline', bline));   // SS1: the lock's line style, without its padlock
   if (isStolen(picked)) into.append(el('p', 'boundline', stolenLine()));   // STOLEN-GOODS: what a counter and a court do with it
-  { const ins = side === 'local' ? wildInsureBook()?.lineOf(picked) : null; if (ins) into.append(el('p', 'boundline insuredline', ins)); }   // WILD-INSURE: its policy, and when it is in force
   if (line.quest != null) into.append(el('p', 'boundline', questLine(line.quest)));   // QUEST-MARK: whose quest it is
   const dl = el('dl', 'stats');
   // CARD-FIT: each pair in its own group, so a narrow card flows them two a line and never breaks a pair across two
@@ -3561,14 +3558,6 @@ function itemActs(picked, side, { qty = true } = {}) {
       acts.append(t);
       const max = (picked.stackCount ?? 1) > 1 ? splitMax(picked, 'store') : 0;
       if (qty && max > 1) acts.append(qtyField(picked, max));   // DISC25-F
-    }
-    // WILD-INSURE: a policy on this piece, written from its own card - online, for a
-    // piece the realm tracks and a kill in the zone could take; pressed inside the zone, the book says why not
-    const ins = wildInsureBook();
-    if (ins?.offers(picked)) {
-      const b = el('button', 'act', WILD_TEXT.insureAct(ins.premiumOf(picked)));
-      b.onclick = async () => { b.disabled = true; const r = await ins.insure(picked); notice = r.text; render(); };
-      acts.append(b);
     }
   } else {
     // G6: taking ONE from a reward tray IS the claim, and the window

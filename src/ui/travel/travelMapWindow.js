@@ -565,8 +565,6 @@ export class TravelMapWindow {
     this._dotsBuf = new Uint32Array(REGION_W * REGION_H);
     this._outlineBuf = new Uint32Array(REGION_W * REGION_H);
     this._identifyBuf = new Uint32Array(REGION_W * REGION_H);
-    // WW-C2: the open zone's layer (WILD1: a fog over the Wrothgarian Mountains' page and the province map) retired with
-    // the mountains' zone - Cyrodiil lies past the Bay, on no page of this map (the held map's continent draws it)
     this._dotsDirty = true;
     this._identifyDirty = true;
     // SOC6: the party's last drawn

@@ -19,7 +19,7 @@ test('CHAT-TRADE wire: the Trade and LFG channels are two whitelisted rooms of t
   assert.deepEqual([CHAT_TRADE_ROOM, CHAT_LFG_ROOM], ['chat:trade', 'chat:lfg']);
   for (const room of [CHAT_TRADE_ROOM, CHAT_LFG_ROOM]) { assert.ok(CHAT_ROOMS.has(room), room); assert.ok(isChatRoom(room), room); assert.ok(!isRegionRoom(room), room); }
   assert.equal(isChatRoom('chat:trade.1'), false, 'a whitelist, not a prefix');
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
 });
 
 test('CHAT-TRADE tabs: Trade and LFG ride rooms of their own and stand OFF the bar until joined - a player who never joins sees the bar as it was', () => {

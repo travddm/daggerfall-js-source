@@ -211,10 +211,10 @@ test('OW-WOD-PATH, then MOUNTAINS WALKABLE (the owner, the Wrothgarian zone\'s m
   assert.deepEqual(planRoute(from, to, { width: W, height: H, ...g }).pixels, straight.pixels, 'the table taken away: the same route');
 });
 
-test('OW-WOD-PATH: the host hands its planner the massifs less every pixel a road or a track crosses, again when the list, the roads or the open zone change (MOUNTAINS WALKABLE: the planner walks them now - above); a spot the ground names a peak is refused', () => {
+test('OW-WOD-PATH: the host hands its planner the massifs less every pixel a road or a track crosses, again when the list or the roads change (MOUNTAINS WALKABLE: the planner walks them now - above); a spot the ground names a peak is refused', () => {
   const w = hostText('src/scenes/world.js');
   assert.match(w, /const src = wod \? wod\.mountainPixels\(\) : null;/);
-  assert.match(w, /if \(src === _tvRocksFrom && net === _tvRocksRoads && wm === _tvRocksMask && _tvRocks\) return _tvRocks;/, 'kept for the list, the roads and the zone it was read with');
+  assert.match(w, /if \(src === _tvRocksFrom && net === _tvRocksRoads && _tvRocks\) return _tvRocks;/, 'kept for the list and the roads it was read with');
   assert.match(w, /const onRoad = \(i\) => \(\(net\?\.roads\?\.\[i\] \?\? 0\) \| \(net\?\.tracks\?\.\[i\] \?\? 0\)\);\n\s*if \(src\) for \(let i = 0; i < n; i\+\+\) if \(src\[i\] && !onRoad\(i\)\) out\[i\] = 1;/, 'a path\'s pixel is no massif');
   assert.match(w, /WATER_BYTE, 1000, 500, \(x, y\) => !tvWater\(x, y\), undefined, rumareSeaPixel\)\)\.setRocks\(tvWodRocks\(\)\);[^\n]*\n\s*return _tvRouteGround;\n {2}\};/);
   assert.match(w, /if \(!door && !water && tvRouteGround\(\)\.peakAt\(pix\.x, pix\.y\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.mountains\); return false; \}/);

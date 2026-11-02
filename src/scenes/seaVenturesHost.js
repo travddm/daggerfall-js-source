@@ -4,10 +4,10 @@
 // the streaming world: what the world host (scenes/world.js) asks of the sea's ventures, in a module of its own (HOST-SPLIT:
 // fishHost.js's shape - the host wires, this holds).
 //
-//   THE VAULTS (SEA-VAULTS): the day's vaults of the deep (systems/sea/seaVaults.js) while the open sea is an open zone -
-//   the one the player stands at (`vaultHere`: the door's hall, the mountains' gate's - its hub lock, its epoch, its
-//   high-tier foes), the chart's marks (`chartWord`: each vault, its crows, my padlock) and the crows' news (`crowLine`);
-//   and where the open sea is (`openSeaAt` - nothing keeps an instance there, as in the mountains).
+//   THE VAULTS (SEA-VAULTS): the day's vaults of the deep (systems/sea/seaVaults.js) while the sea stands - the one the
+//   player stands at (`vaultHere`: the door's hall, its high-tier foes), the chart's marks (`chartWord`: each vault) and
+//   where the open sea is (`openSeaAt` - nothing keeps an instance there, as in the mountains). A vault has no hub: no
+//   lock, no crows, no reset - its epoch is the day number of the shared clock.
 //
 //   THE EVENTS (SEA-EVENTS, systems/sea/seaEvents.js - the shared clock's): the Aether Storm - its weather over the player
 //   (`stormWord`, the world's shown weather), its wrack (`wrackSites`, `gather` - the naval host's sites and casks), its
@@ -15,52 +15,33 @@
 //   host (`step`), its flagship's purse and the hub's word that it is down (`fleetEnded`, `hubWord`), its words; both on the
 //   chart (`chartWord`) and in a freeport harbourmaster's talk (`rumours`).
 //
-//   THE OPEN SEA'S GUNS (SHIP-PVP, scenes/naval/seaBroadsides.js and scenes/seaWreckHost.js): broadsides between captains
-//   past Veilhaven's peace, refereed by the relay - attached to the naval host, stepped here, the referee's words heard
-//   (`wref`), a wreck's receipt carried to the service.
-//
-//   A FREEPORT HARBOURMASTER'S BOARDS (`office` - the tab's sections, spread into its model): the Wanted section
-//   (SEA-BOUNTY, scenes/seaBountyHost.js - `wanted`) and the season's captains (SEA-SEASON, scenes/seaSeasonHost.js -
-//   `season`).
+//   A FREEPORT HARBOURMASTER'S BOARDS (`office` - the tab's sections, spread into its model): the season's captains
+//   (SEA-SEASON, scenes/seaSeasonHost.js - `season`).
 //
 // deps = {
-//   live() -> bool          the open sea is an open zone now (online, at a relay that raises it, the sea standing)
-//   day() -> number         the relay's day (world.js wdunDayNow - the halls' own)
+//   live() -> bool          the sea stands (the sea's standing - online or offline)
+//   day() -> number         the day number of the shared clock (floor(raidNowMs() / WDUN_DAY_MS))
 //   pixel() -> { x, y }     the player's map pixel (a building's or a dungeon's: its door's)
-//   locks: Map              the hub's word on my locks, key -> until (world.js _wdunLocks)
-//   crows: Map              the crows over every hall, key -> until (world.js _wdunCrows)
-//   mine() -> { dungeon, until } | null   my own remains (world.js _wildMine) - a lock never shuts my way back to them
 //   clock() -> ms           the shared clock (world.js raidNowMs - the relay's, offline this machine's)
 //   naval() -> host | null  the naval host (fleet, stormStrike), when the sea fight runs
 //   state                   the streaming world's state (localFromWorld - a map pixel in the scene)
-//   link() -> OnlineSession | null   the social socket (sendWdun)
+//   link() -> OnlineSession | null   the social socket (sendSea)
 //   ether                   the ether host (scenes/etherHost.js): credit(n), mid(text, s), say(text, s)
-//   session, checkpoint, wallet, character, region   SEA-BOUNTY's (scenes/seaBountyHost.js): the realm session, its
-//                           checkpoint, the record's wallet, the realm character (its own - systems/characterId.js
-//                           characterIdOf, when none is given), the region stood in
-//   bountyDoor?             the bounty board's service door (its own, when none is given)
+//   session                 the realm session (SEA-SEASON's: null - no realm character)
+//   character?() -> id      the realm character (its own - systems/characterId.js characterIdOf, when none is given)
 //   seasonDoor?             the season boards' service door (its own, when none is given)
-//   cell() -> OnlineSession | null   SHIP-PVP's: my cell's socket (sendWild, `id`, `acct`, a peer's name)
-//   foe(id) -> bool         SHIP-PVP's: a peer outside my party and guild (world.js wildIsStranger)
-//   name?(id) -> string     SHIP-PVP's: a peer's name, as shown (its own - the socket's peer's, when none is given)
 // }
 // ═══════════════════════════════════════════════════════════════════
 import { inEther, etherBandAt, compassPoint } from '../world/ethericSea.js';
-import { seaVaultPicks, seaVaultAt, seaVaultByKey } from '../systems/sea/seaVaults.js';
-import { seaVaultCell } from '../net/wire.js';
-import { etherRingName, etherWildRingAt } from '../systems/wild/etherWild.js';
+import { seaVaultPicks, seaVaultAt } from '../systems/sea/seaVaults.js';
+import { etherRingName, etherWildRingAt, etherWayWord } from '../systems/sea/etherRings.js';
 import { stormAt, stormHere, stormEye, nextStorm, stormWrackSlot, wrackOf, stormStrikeOf, fleetAt, nextFleet, fleetPlace, fleetOf } from '../systems/sea/seaEvents.js';
 import { rollElthericPiece, elthericChance } from '../systems/aetheric.js';
 import { setById } from '../systems/sigil/sigilSets.js';
 import { mintGood, goodById } from '../systems/naval/tradeGoods.js';
 import { STRAND_SITE, STRAND_YIELD } from './etherHost.js';
 import { NATIVE_PIXEL } from '../systems/seaRaiders.js';
-import { createSeaBounty } from './seaBountyHost.js';
 import { createSeaSeason } from './seaSeasonHost.js';
-import { createSeaBroadsides } from './naval/seaBroadsides.js';
-import { createSeaWreckHost } from './seaWreckHost.js';
-import { wildHere, wildZoneKind } from '../systems/wild/wildZone.js';
-import { ETHER_KIND, etherWayWord } from '../systems/wild/etherWild.js';
 import { t } from '../systems/textManager.js';
 import { characterIdOf } from '../systems/characterId.js';
 import { playerEntity } from '../characters/playerEntity.js';
@@ -82,16 +63,13 @@ const bandName = (id) => etherRingName(['shallows', 'reaches', 'deep', 'abyss'].
 let _stormShown = null;
 export const seaStormShown = () => _stormShown;
 
-/** A name opening a sentence, its first letter raised ("the Isle of X" leads as "The Isle of X"). */
-const capFirst = (s) => String(s ?? '').replace(/^./, (c) => c.toUpperCase());
-
 /** @param {any} deps */
 export function createSeaVentures(deps) {
   const live = () => !!deps.live?.();
-  /** The open sea at map pixel `p` (`{ x, y }`): live, and past Veilhaven's peace inside the sea's box - where nothing keeps
-   *  an instance (scenes/instanceDoor.js `wild`, the mountains' own rule). */
+  /** The open sea at map pixel `p` (`{ x, y }`): standing, and past Veilhaven's peace inside the sea's box - where nothing
+   *  keeps an instance (scenes/instanceDoor.js, the mountains' own rule). */
   const openSeaAt = (p) => live() && !!p && etherWildRingAt(p.x, p.y) > 0;
-  /** The day's vaults of the deep, while the open sea is an open zone - none otherwise. */
+  /** The day's vaults of the deep, while the sea stands - none otherwise. */
   const vaultsNow = () => (live() ? seaVaultPicks(deps.day()) : []);
   /** The vault whose ruin stands at the player's pixel today, or null. */
   function vaultHere() {
@@ -100,27 +78,11 @@ export function createSeaVentures(deps) {
     if (!p || !inEther(p.x, p.y)) return null;
     return seaVaultAt(vaultsNow(), p.x, p.y);
   }
-  const myWayBack = (key, now) => { const m = deps.mine?.(); return !!m && m.dungeon === key && m.until > now; };
-  /** The chart's word of the sea's ventures: the open sea's fights (`pvp`) and the day's vaults - each its place, its
-   *  name and band, my padlock on it (my lock still shuts it, and no remains of mine lie in it) and its crows. */
-  function chartWord(now = Date.now()) {
+  /** The chart's word of the sea's ventures: the day's vaults of the deep - each its place, its name and band. */
+  function chartWord() {
     return {
-      pvp: live(),
-      vaults: vaultsNow().map((v) => ({
-        key: v.key, x: v.x, y: v.y, name: v.name, band: v.band, ring: v.ring,
-        locked: (deps.locks?.get(v.key) ?? 0) > now && !myWayBack(v.key, now), crows: !!deps.crows?.has(v.key),
-      })),
+      vaults: vaultsNow().map((v) => ({ key: v.key, x: v.x, y: v.y, name: v.name, band: v.band, ring: v.ring })),
     };
-  }
-  /** THE CROWS' NEWS of a vault of the deep (`"e<cx>,<cy>"`): its name and its band - today's vault or yesterday's (a body
-   *  lies twelve minutes past the day's turn) - or, a vault no day names, the sea's own words; null for a mountain hall. */
-  function crowLine(h) {
-    if (!seaVaultCell(h)) return null;
-    const d = Number(deps.day?.()) || 0;
-    const v = seaVaultByKey(vaultsNow(), h) ?? (live() ? seaVaultByKey(seaVaultPicks(d - 1), h) : null);
-    return v
-      ? t('sea.vault.crows', 'Crows gather over {name} ({band}). Someone has fallen there.', { name: capFirst(v.name), band: etherRingName(v.ring) })
-      : t('sea.vault.crowsAnon', 'Crows gather over a vault of the deep. Someone has fallen there.');
   }
   // ── SEA-EVENTS ─────────────────────────────────────────────────────────────────────────────────────────────────────
   const clock = () => Number(deps.clock?.()) || Date.now();
@@ -171,7 +133,7 @@ export function createSeaVentures(deps) {
   /** A sailing's flagship down: the hub's word, mine, or my ledger's (AUDIT SEA VENTURES D4: a reload stood her again). */
   const down = (n) => sunk.has(n) || mine.has(n) || !!deps.ether?.fleetDone?.(n);
   /** My word to the hub that a sailing's flagship went down (online, at a relay that reads it) - whether it left. */
-  const tellHub = (n) => { const link = deps.link?.(); return link?.status === 'open' && link.sendWdun({ k: 'fk', n }) === true; };
+  const tellHub = (n) => { const link = deps.link?.(); return link?.status === 'open' && link.sendSea({ k: 'fk', n }) === true; };
   let fkAt = -Infinity;
   let fedAt = -Infinity, heardStorm = null, heardFleet = null, inStorm = null, strikesSeen = null;
   /** The way from the player's pixel to a point, in words ("west-north-west"), or '' where they stand on it. */
@@ -260,31 +222,9 @@ export function createSeaVentures(deps) {
     else { const g = nextStorm(now); out.push(t('sea.rumour.stormNext', 'Sailors say an Aether storm will gather {way} of here in {min} minutes.', { way: wayTo(port && { x: port.px, y: port.py }, { x: g.x0, y: g.y0 }) || etherWayWord('north'), min: mins(g.start - now) })); }
     return out;
   }
-  // ── SEA-BOUNTY ─────────────────────────────────────────────────────────────────────────────────────────────────────
   /** The realm character I play (HOST-SPLIT, SEA VENTURES: its own, unless the host gives it). */
   const character = deps.character ?? (() => characterIdOf(playerEntity));
-  const bounty = createSeaBounty({ live, session: deps.session, checkpoint: deps.checkpoint, wallet: deps.wallet, character, region: deps.region, door: deps.bountyDoor, now: clock });
-  // ── SHIP-PVP ───────────────────────────────────────────────────────────────────────────────────────────────────────
-  const wrecks = createSeaWreckHost({ session: deps.session, checkpoint: deps.checkpoint, character, me: () => deps.cell?.()?.acct ?? null, naval: deps.naval, say: (text, s) => say(text, s) });
-  const broadsides = createSeaBroadsides({
-    live: () => live() && !!deps.cell?.() && wildHere() && wildZoneKind() === ETHER_KIND,
-    naval: deps.naval, send: (d, o) => deps.cell?.()?.sendWild?.(d, o) === true, me: () => deps.cell?.()?.id ?? null,
-    stranger: (id) => !!deps.foe?.(id), name: (id) => (deps.name ? deps.name(id) : deps.cell?.()?.peers?.get?.(id)?.name) || '', receipt: (rc) => wrecks.receipt(rc),
-    say: (text, s) => say(text, s), mid: (text, s) => mid(text, s),
-  });
-  let armed = null;   // the naval host the guns are attached to
-  /** The open sea's guns' step, every online frame (world.js wildFrame - AUDIT SEA VENTURES E6A: the exterior's unpaused
-   *  frames alone left a captain with a window open unsaid at her helm, and a wreck's carry unasked below): attached to
-   *  the naval host that stands now, stepped; a wreck's carry come due. */
-  function pvpStep() {
-    try {   // the zone's frame goes on whatever the sea's guns do
-      const nv = deps.naval?.() ?? null;
-      if (nv && nv !== armed) { nv.pvp?.attach?.(broadsides); armed = nv; }
-      broadsides.step();
-      wrecks.frame();
-    } catch (e) { console.warn('[sea] guns', e?.message ?? e); }
-  }
   // ── SEA-SEASON ─────────────────────────────────────────────────────────────────────────────────────────────────────
   const season = createSeaSeason({ live, session: deps.session, character, door: deps.seasonDoor, now: clock });
-  return { vaultsNow, vaultHere, openSeaAt, chartWord: (now) => ({ ...chartWord(now), ...eventsWord() }), crowLine, stormWord, stormTurned, wrackSites, office: () => ({ wanted: bounty.office(), season: season.office() }), wref: (g, room) => broadsides.hear(g, room), gather, step, guns: pvpStep, fleetEnded, hubWord, rumours, fleetList: (now = clock()) => fleetList(now, deps.pixel?.()) };
+  return { vaultsNow, vaultHere, openSeaAt, chartWord: () => ({ ...chartWord(), ...eventsWord() }), stormWord, stormTurned, wrackSites, office: () => ({ season: season.office() }), gather, step, fleetEnded, hubWord, rumours, fleetList: (now = clock()) => fleetList(now, deps.pixel?.()) };
 }

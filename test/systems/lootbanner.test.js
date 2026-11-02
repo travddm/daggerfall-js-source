@@ -21,7 +21,6 @@ import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { mintAetheric, AETHERIC_RECORDS } from '../../src/systems/aetheric.js';
 import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
-import { wildRecord } from '../../src/systems/wild/wildDeath.js';
 import { ITEM_FIELDS } from '../../src/systems/item/itemFields.js';
 import { templateByIndex } from '../../src/systems/item/itemTemplates.js';
 import { HUD_PIECES } from '../../src/ui/hud/hudLayout.js';
@@ -62,7 +61,7 @@ test('ACQUIRE1 THE WATCHER: the first frame is a baseline; a new Rare piece arri
   assert.equal(W.markable(potion), false); assert.equal(W.markable({ group: 'Weapons', templateIndex: 131 }), false, 'an arrow never');
 });
 
-test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it ends, and a new entity announce nothing; the mark is the receiver\'s - stripped by the wire\'s clamp and the zone\'s record, so a piece another player hands over arrives (mutants: no baseline at a load; the starter deck announced; the wire keeping the mark)', () => {
+test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it ends, and a new entity announce nothing; the mark is the receiver\'s - stripped by the wire\'s clamp, so a piece another player hands over arrives (mutants: no baseline at a load; the starter deck announced; the wire keeping the mark)', () => {
   on();
   const watch = W.createAcquireWatch();
   const me = hero({ chargenDone: false });
@@ -79,7 +78,6 @@ test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it 
   assert.equal(ITEM_FIELDS.acquired.kind, 'bool', 'a declared field: it rides the save');
   const mine = Object.assign(tiered('rare', 6), { acquired: true });
   assert.equal(validLootItem(JSON.parse(JSON.stringify(mine))).acquired, undefined, 'the wire\'s clamp strips it');
-  assert.equal(wildRecord(mine).acquired, undefined, 'the zone\'s record too');
   const me2 = hero();
   watch.observe(me2);
   me2.items.push(validLootItem(JSON.parse(JSON.stringify(mine))));

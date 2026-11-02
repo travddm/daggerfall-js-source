@@ -14,7 +14,6 @@ import { newDuelRef, duelNote, duelOpen, duelBlow, duelPose, duelForfeit, duelSt
 import { ROYAL_RING, SIEGE_UNITS_PER_M, SIEGE_HIT, siegeVitality, siegeBlowMax, SIEGE_CASTS } from '../../../src/net/siege/siegeRef.js';
 import { mintRoyalReceipt, verifyRoyalReceipt } from '../../../src/net/siege/siegeReceipt.js';
 import { validDuelRefOut, DUEL_REF_RECEIPT_MAX, parseClient } from '../../../src/net/wire.js';
-import { WILD_RECEIPT_MAX } from '../../../src/net/wild/wildReceipt.js';
 import { DUEL_START_WAIT_MS, DUEL_OUT_MS, DUEL_GONE_MS } from '../../../src/net/duel/duelSession.js';
 import { createDuelClaims, duelClaimSettles } from '../../../src/net/siege/siegeClaims.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
@@ -49,7 +48,7 @@ test('INT8 THE RECEIPT: `d1` names the two fighters and the winner\'s place, the
   const unsigned = await mintDuelReceipt({ f: ['acct-aaaa', 'acct-bbbb'], w: 0, n: '0123456789ab' }, null, { subtle, nowS: T });
   assert.equal(readDuelReceipt(unsigned).signed, false);
   assert.equal((await verifyDuelReceipt(unsigned, kp.publicKey, { subtle, nowS: T })).why, 'unsigned');
-  assert.equal(DUEL_REF_RECEIPT_MAX, Math.max(DUEL_RECEIPT_MAX, WILD_RECEIPT_MAX), 'the wire carries the longest one');
+  assert.equal(DUEL_REF_RECEIPT_MAX, DUEL_RECEIPT_MAX, 'the wire carries a duel receipt whole');
 });
 
 /** Two fighters' sides for the referee's law, a few metres apart at the ring's centre. */

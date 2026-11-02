@@ -621,7 +621,7 @@ test('LIVE-FIGHT: the remains\' fight is the place the one played stands in - a 
   }
 });
 
-test('REMAINS-STAND: the line and the find - its own mark stands its line with the rarity row off, the open zone\'s word never puts it out; it holds no silver find; the hosts by source (mutants: the mark dropped from lootFinds; one word for every kind; the find rolled)', () => {
+test('REMAINS-STAND: the line and the find - its own mark stands its line with the rarity row off, another word never puts it out; it holds no silver find; the hosts by source (mutants: the mark dropped from lootFinds; one word for every kind; the find rolled)', () => {
   _resetForTests(); setPref('lootRarity', false);
   const pool = groundPool();
   const items = [{ group: 'UselessItems2', templateIndex: 1810, name: 'The remains of X' }];
@@ -637,7 +637,7 @@ test('REMAINS-STAND: the line and the find - its own mark stands its line with t
   const pass = createLootLines(gl);
   const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
   setLootMarksLive(true, 'legacy');
-  setLootMarksLive(false);   // the open zone's word, every frame online: none of mine there
+  setLootMarksLive(false, 'other');   // another word of the marks, every frame: none of mine there
   assert.equal(pass.draw(() => pool.lootFinds(), I, I, [0, 1.6, 0], 1), true, 'the house\'s word keeps the pass: its line stands');
   assert.equal(pass.draw(() => pool.lootFinds(), I, I, [1, 1.6, 31], 1), true, 'seen across a hall: thirty metres off, its line stands (AUDIT FB1013d C8)');
   setLootMarksLive(false, 'legacy');

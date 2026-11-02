@@ -5,78 +5,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { spawnedHallMapId, isHallMapId, wdunHallOfRoom, WORLD_PIXEL_BOUND } from '../../../src/net/wire.js';
-import { discoverLocation, hasDiscoveredLocationId, restoreDiscovery, snapshotDiscovery } from '../../../src/systems/discovery.js';
-import { hasDock, nearDock, isCapital, isPlayerInTownForShips } from '../../../src/systems/immersiveTravel.js';
-import { CAPITAL_MAP_IDS, LARGE_DOCK_MAP_IDS, DOCK_PIXEL_IDS } from '../../../src/systems/immersiveTravelTables.js';
-import { LOCATION_TYPES } from '../../../src/formats/mapsFile.js';
 import { createEventToasts } from '../../../src/systems/eventBoard.js';
 import { gateEventId } from '../../../src/systems/eventTimers.js';
 import { gateNumber } from '../../../src/net/gate/gateLaw.js';
 import { createLivingLanes } from '../../../src/scenes/livingWorld/livingLanes.js';
-import { createZoneHalls } from '../../../src/scenes/zoneHallsHost.js';
-import { groundWoods } from '../../../src/world/tamriel/tamrielGround.js';
 import { setTamrielTrace } from '../../../src/world/tamriel/tamrielLand.js';
 import { setTamrielFit } from '../../../src/world/tamriel/tamrielFrame.js';
 import { worldPixelKey } from '../../../src/world/worldWide/worldGrid.js';
 import { PORT_ID_WORLD } from '../../../src/world/worldWide/worldPorts.js';
 import { codeOnly } from '../../codeOnly.mjs';
-import { hostText } from '../../hostText.mjs';   // AUDIT TESA II (lane K's K6): the negatives read the host WHOLE (HOST-SPLIT 2, the second read)
 
 setTamrielTrace(null); setTamrielFit(null);   // the authored shape and fit: no player's picture in the suite
 const src = (p) => codeOnly(readFileSync(new URL('../../../' + p, import.meta.url), 'utf8'));
-
-/** A zone hall's map id whose low 20 bits are `low` - a Bay pixel id's, as 13 of a Cyrodiil day's 840 halls' are. */
-function hallOver(low) {
-  const x = (low & 0x3fff) - WORLD_PIXEL_BOUND, y = (low >>> 14) - WORLD_PIXEL_BOUND + 64 * 120;
-  const id = spawnedHallMapId(x, y);
-  assert.equal(id & 0xfffff, low, 'its low bits the Bay pixel\'s');
-  return id;
-}
-
-test('AUDIT WW F1: A ZONE HALL\'S MAP ID IS NO BAY PIXEL\'S - known by its lane above every MAPS.BSA row\'s; never filed nor found in the discovered places (a hall entered named a Bay town found); never a dock, a large dock or a capital; never a carriage town (mutants: the lane test; the discovery guard; the docks\' guard; the carriage guard)', () => {
-  for (const [x, y] of [[1400, -300], [-8192, -8192], [8191, 8191], [0, 0]]) {
-    const id = spawnedHallMapId(x, y);
-    assert.equal(isHallMapId(id), true, `${x},${y}`);
-  }
-  assert.equal(wdunHallOfRoom(`dungeon:m${spawnedHallMapId(1400, -300)}`), '1400,-300', 'the room reads its hall back through the one test');
-  for (const id of [0, 1, (0x728 << 20) | 499999, 0x7283288c, (0xe << 28) >>> 0, -1, 2 ** 32, 0.5, NaN]) assert.equal(isHallMapId(id), false, String(id));
-  // the discovered places: a hall over a Bay place's pixel id
-  restoreDiscovery(null);
-  const bayId = (7 << 20) | (240 * 1000 + 310), hall = hallOver(bayId & 0xfffff);
-  assert.equal(discoverLocation(hall, { regionName: 'Cyrodiil', locationName: 'Elite hall' }), false, 'a hall is never filed');
-  assert.equal(hasDiscoveredLocationId(bayId), false, 'the Bay place it masks to stays unfound');
-  assert.deepEqual(snapshotDiscovery().locations, {});
-  assert.equal(discoverLocation(bayId), true);
-  assert.equal(hasDiscoveredLocationId(hall), false, 'and a found Bay place finds no hall');
-  restoreDiscovery(null);
-  // Immersive Travel's tables
-  const dock = DOCK_PIXEL_IDS[0], cap = CAPITAL_MAP_IDS[0] & 0xfffff, large = LARGE_DOCK_MAP_IDS[0] & 0xfffff;
-  assert.equal(hasDock(dock), true);
-  assert.equal(hasDock(hallOver(dock)), false, 'no dock');
-  assert.equal(nearDock(hallOver(dock)), false);
-  assert.equal(nearDock(hallOver(dock + 1)), false, 'nor beside one');
-  assert.equal(isCapital(CAPITAL_MAP_IDS[0]), true);
-  assert.equal(isCapital(hallOver(cap)), false, 'no capital');
-  const gps = (mapId) => ({ locationType: LOCATION_TYPES.DungeonKeep, mapId, regionIndex: 70 });
-  assert.equal(isPlayerInTownForShips(gps(LARGE_DOCK_MAP_IDS[0])), true);
-  assert.equal(isPlayerInTownForShips(gps(hallOver(large))), false, 'a hall is no large dock');
-});
-
-test('AUDIT WW F4: THE GIANTS\' LOW GROUND IS THE CONTINENT\'S - the halls\' module answers the height the halls\' ground reads, a Bay-only client\'s the same as one that walks the continent; the host hands it to the giants (mutants: the host\'s own woods)', () => {
-  const MAP_W = 1000, MAP_H = 500;
-  const bay = { getHeightMapValue: (x, y) => 3 + ((Math.max(0, Math.min(MAP_W - 1, x)) + Math.max(0, Math.min(MAP_H - 1, y))) % 5) };
-  const deps = (woods) => ({ maps: {}, woods, places: { at: () => null }, locationIndex: new Map(), isMainStory: () => false, dayNow: () => 1, indexMoved: () => {} });
-  const bayOnly = createZoneHalls(deps(bay)), continent = createZoneHalls(deps(groundWoods(bay))), land = groundWoods(bay);
-  let past = 0;
-  for (const [x, y] of [[1400, -300], [1700, 200], [500, 250], [-40, 100], [2100, 600]]) {
-    assert.equal(bayOnly.heightAt(x, y), land.getHeightMapValue(x, y), `${x},${y}`);
-    assert.equal(continent.heightAt(x, y), bayOnly.heightAt(x, y));
-    if (bayOnly.heightAt(x, y) !== bay.getHeightMapValue(x, y)) past++;
-  }
-  assert.ok(past > 0, 'past the Bay the clamp\'s answer is not the continent\'s');
-  assert.equal(bayOnly.heightAt, bayOnly.heightAt, 'one function: the giants\' cache\'s key');
-});
 
 test('AUDIT WW F5: EVERY GATE\'S LINES ON ITS OWN CARD - the Bay\'s gate and a lane\'s are two cards, each line and announcement on its own gate\'s (its number\'s id, the Timers row\'s); the host says the omen\'s, the fall\'s and the rite\'s lines with the gate\'s number (mutants: the Bay\'s lines id-less; the fall\'s; the rite\'s)', () => {
   const bayN = gateNumber(900, 0), laneN = gateNumber(900, 3);

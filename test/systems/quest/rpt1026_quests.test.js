@@ -34,9 +34,6 @@ import { Collider } from '../../../src/player/collider.js';
 import { templateByIndex } from '../../../src/systems/item/itemTemplates.js';
 import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { rmbBlock, town, worldOf, mark, SPAWN } from '../../fb1004dTowns.mjs';
-import { mapPixelToWorldCoord, mapPixelToLongitudeLatitude } from '../../../src/formats/mapsFile.js';
-import { setWildMask, buildWildMask, wildMask, wildInside, WILD_REGION } from '../../../src/systems/wild/wildZone.js';
-import { linkSiteOf } from '../../../src/systems/quest/machine.js';
 import { createArenaOnline, CLIMB_WAIT_MS } from '../../../src/scenes/arena/arenaOnline.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
 import { arenaBoutRoom } from '../../../src/net/arena/arenaLaw.js';
@@ -372,99 +369,6 @@ test('NO-GIVES-BACK: the Queen of Sentinel asks again after a No that only hands
   click();
   tick(4);
   assert.equal(prompts.length, 3, 'a Yes is final');
-});
-
-// ── QUEST-ZONE ─────────────────────────────────────────────────────────────────────────────────────────────────────
-// A private report, a vampire quest: its dungeon lay near the middle of the Open World, unmarked on the map as any
-// dungeon, and could not be entered. Every real dungeon inside the zone is sealed online (world.js
-// wildDungeonGate) and its map draws only the day's halls; DFU's SelectRemoteDungeonSite drew any of the region's. The
-// region below is the zone's (its map pixels region 16), the mask the map files' own (wildZone.js wildMaskOf); the quest
-// world is kvarhold.test.js's shape: the player's town, then two Human Strongholds - one inside the zone's cut, one
-// outside it - the nearest few both.
-
-const ZONE_HOME = { x: 138, y: 70 };
-const zoneLair = { position: 9000, rdbBlock: { objectRootList: [{ rdbObjects: [11, 18].map((record, i) => ({ type: 3, position: 100 + i * 8, xPos: 10, yPos: 4, zPos: 20, resources: { flatResource: { textureArchive: 199, textureRecord: record } } })) }] } };
-/** The zone's region over map pixels x 100..199, y 50..149 (the cut keeps its north-east: x ~142..180, y 50..95). */
-const zoneRegionAt = (x, y) => (x >= 100 && x < 200 && y >= 50 && y < 150 ? WILD_REGION : 0);
-function zoneWorld(found = []) {
-  const all = [{ kind: 'town', at: ZONE_HOME }, { kind: 'dungeon', at: { x: 145, y: 70 } }, { kind: 'dungeon', at: { x: 130, y: 70 } }];
-  const locations = all.map((s, index) => {
-    const wc = mapPixelToWorldCoord(s.at.x, s.at.y), ll = mapPixelToLongitudeLatitude(s.at.x, s.at.y);
-    const dungeon = s.kind === 'dungeon';
-    return {
-      loaded: true, regionIndex: 0, regionName: 'Wrothgarian Mountains', name: `${s.kind}${s.at.x}`, locationIndex: index, hasDungeon: dungeon,
-      mapTableData: { mapId: 7000 + index, locationType: dungeon ? 7 : 0, dungeonType: dungeon ? 2 : -1, longitude: ll.x, latitude: ll.y },
-      exterior: { buildings: [], recordElement: { header: { x: wc.x, y: wc.y } }, exteriorData: { locationId: 0x700 + index, width: 0, height: 0, blockNames: [] } },
-      dungeon: dungeon ? { blocks: [{ x: 0, z: 0, blockName: 'ZONEAA00.RDB' }] } : null,
-    };
-  });
-  const region = { name: 'Wrothgarian Mountains', locationCount: locations.length, mapTable: locations.map((l) => ({ ...l.mapTableData })), mapNameLookup: new Map(locations.map((l, i) => [l.name, i])) };
-  return {
-    locations,
-    maps: {
-      regionCount: 1, getRegion: (r) => (r === 0 ? region : null), getLocation: (r, l) => (r === 0 ? locations[l] ?? null : null),
-      getLocationByName: (rn, ln) => locations.find((l) => l.name === ln) ?? null, getRegionIndexAt: zoneRegionAt,
-      readLocationIdFast: (r, l) => locations[l].exterior.exteriorData.locationId, getClimateIndex: () => 231,
-    },
-    getBlock: (name) => (name === 'ZONEAA00.RDB' ? zoneLair : null),
-    currentLocation: () => locations[0], currentRegionIndex: () => 0, currentLocationIndex: () => 0, currentRegionName: () => 'Wrothgarian Mountains',
-    isPlayerInLocationRect: () => true, playerInside: () => null, isHouseOwned: () => false,
-    playerPixel: () => ({ ...ZONE_HOME }), buildingNameOpts: () => ({}),
-    discoverLocation: (_r, location) => { found.push(location); }, addNote: () => {},
-  };
-}
-/** WW-C2 (the fourth merge of main into #1184): the open zone the host's own mask (wildZone.js setWildMask - Cyrodiil's in
- *  the game), here the fixture's cut of its zone region: x 142..179, y 50..95. */
-const zoneMask = () => buildWildMask({ width: 1000, height: 500, inZone: (x, y) => zoneRegionAt(x, y) === WILD_REGION && x >= 142 && x < 180 && y < 96 });
-const zoneQuest = (lines) => ['Quest: __ZN', 'QRC:', 'Message:  1011', ' x', '', 'QBN:', ...lines, '', 'variable _pad_'];
-const zoneRolls = (seed) => { let s = seed * 7919; return () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; }; };
-
-test('QUEST-ZONE: online a quest\'s remote dungeon is never one the open zone seals - forty draws, the stronghold inside the cut never drawn, the one outside always; offline DFU\'s draw takes either (mutants: the seal unread; read offline too)', (t) => {
-  t.after(() => setWildMask(null));   // the host's zone left as it was
-  const world = zoneWorld();
-  setWildMask(zoneMask());
-  const mask = wildMask();
-  assert.equal(wildInside(mask, 145, 70), true, 'the setup: inside the zone');
-  assert.equal(wildInside(mask, 130, 70), false, 'and outside it');
-  const draws = (online) => {
-    const names = new Set();
-    for (let seed = 1; seed <= 40; seed++) {
-      const m = new QuestMachine({ nowSeconds: () => 0, world, playerLevel: () => 1, sharedClock: () => online });
-      const q = quiet(() => m.scheduleQuest(zoneQuest(['Place _lair_ remote dungeon2']), 0, { rolls: zoneRolls(seed) }));
-      names.add(q.getResource({ name: 'lair' }).siteDetails.locationName);
-    }
-    return [...names].sort();
-  };
-  assert.deepEqual(draws(true), ['dungeon130'], 'online: the sealed stronghold is no quest\'s');
-  assert.deepEqual(draws(false), ['dungeon130', 'dungeon145'], 'offline: the mountains are Daggerfall\'s own');
-});
-
-test('QUEST-ZONE: a save whose remote dungeon the zone seals has it drawn again online at the load\'s re-seat (KVAR-HOLD\'s law): the foe carried, the link following, the reveal made again; offline it stays (mutants: the re-seat unwidened)', (t) => {
-  t.after(() => setWildMask(null));   // the host's zone left as it was
-  const found = [];
-  const world = zoneWorld(found);
-  setWildMask(zoneMask());
-  const build = (online) => {
-    const m = new QuestMachine({ nowSeconds: () => 0, world, playerLevel: () => 1, sharedClock: () => online });
-    const q = quiet(() => m.scheduleQuest(zoneQuest(['Place _lair_ remote dungeon2', '', 'Foe _vamp_ is Vampire', '', ' reveal _lair_', ' place foe _vamp_ at _lair_']), 0, { rolls: zoneRolls(3) }));
-    quiet(() => { m.tick(); m.tick(); });
-    const place = q.getResource({ name: 'lair' });
-    // the save as a build before this one wrote it: the same draw, landed in the sealed stronghold
-    const sealed = world.locations[1];
-    place.siteDetails = { ...place.siteDetails, mapId: sealed.mapTableData.mapId, locationId: sealed.exterior.exteriorData.locationId, locationName: sealed.name };
-    for (const link of m.siteLinks) if (link.questUID === q.uid) Object.assign(link, linkSiteOf(place));
-    return { m, q, place };
-  };
-  const off = build(false);
-  assert.equal(quiet(() => off.m.reseatMovedSites(world)), 0, 'offline: DFU\'s site stands');
-  const on = build(true);
-  found.length = 0;
-  assert.equal(quiet(() => on.m.reseatMovedSites(world)), 1, 'online: drawn again');
-  const sd = on.place.siteDetails;
-  assert.equal(sd.locationName, 'dungeon130');
-  assert.ok(sd.selectedMarker.targetResources.some((s) => s.name === 'vamp'), 'the foe carried to the new site');
-  assert.ok(on.m.siteLinks.filter((l) => l.questUID === on.q.uid).every((l) => l.mapId === sd.mapId), 'the link follows');
-  assert.deepEqual(found, ['dungeon130'], 'its reveal made again');
 });
 
 // ── ARENA-ORDER ────────────────────────────────────────────────────────────────────────────────────────────────────

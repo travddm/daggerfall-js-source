@@ -1,13 +1,13 @@
 // SEA-EVENTS: the Aether Storm and the treasure fleet -
-// the wire's `fk`/`fd` and the hub's record of a sailing scattered, end to end (net/wire.js, net/wild/wildLaw.js); the law
+// the wire's `fk`/`fd` and the social room's record of a sailing scattered, end to end (net/wire.js, net/sea/fleetHub.js); the law
 // of where each is (systems/sea/seaEvents.js); the fleet's ships at sea (scenes/naval/treasureFleet.js); the sea's host
 // (scenes/seaVenturesHost.js - the storm's weather, wrack and lightning, the fleet's feed, purse and hub word, the
 // rumours); the chart's marks (ui/etherChartWindow.js); the seams by source. tools/mutants/seaevents.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { SOCIAL_ROOM, validWdunIn, validWdunOut, parseClient, SEA_FLEET_PERIOD_MS, seaFleetSailing } from '../../../src/net/wire.js';
-import * as L from '../../../src/net/wild/wildLaw.js';
+import { SOCIAL_ROOM, validSeaIn, validSeaOut, parseClient, SEA_FLEET_PERIOD_MS, seaFleetSailing } from '../../../src/net/wire.js';
+import { fleetHubEmpty, fleetHubOf, fleetHubPrune, fleetSunk, fleetsDown } from '../../../src/net/sea/fleetHub.js';
 import * as E from '../../../src/systems/sea/seaEvents.js';
 import { BANDS, VEIL_X, LEAGUE_PX, veilhaven, etherBandAt, inEther, ETHER_GOODS } from '../../../src/world/ethericSea.js';
 import { HAUNT_SPREAD } from '../../../src/systems/naval/etherShips.js';
@@ -25,57 +25,59 @@ const NP = 32768;
 /** A fake streaming state: a native unit a fortieth of a metre (the port's), the scene's origin the world's. */
 const STATE = { localFromWorld: (x, z) => [x / 40, z / 40] };
 
-test('SEA-EVENTS the wire and the hub: a sailing scattered is `fk` in, `fd` out and in the hello\'s `st`; the hub keeps this sailing\'s or the last\'s alone, once, till the sailing after it is over (mutants: the bounds, the window, the once, the keep)', () => {
+test('SEA-EVENTS the wire and the hub\'s record: a sailing scattered is `fk` in, `fd` out and in the answer `st` to `hi`; the record keeps this sailing\'s or the last\'s alone, once, till the sailing after it is over (mutants: the bounds, the window, the once, the keep)', () => {
   assert.equal(P, 3 * 3_600_000);
   assert.equal(seaFleetSailing(P * 7 + 5), 7);
   assert.equal(seaFleetSailing(P * 7 - 1), 6);
-  assert.deepEqual(validWdunIn({ k: 'fk', n: 12 }), { k: 'fk', n: 12 });
-  for (const n of [-1, 1.5, 1e8, '3', null]) assert.equal(validWdunIn({ k: 'fk', n }), null, String(n));
-  assert.deepEqual(parseClient(JSON.stringify({ t: 'wdun', k: 'fk', n: 4 }), { hasHello: true }), { t: 'wdun', k: 'fk', n: 4 });
-  assert.deepEqual(validWdunOut({ t: 'wdun', k: 'fd', fleets: [3, -1, 'x', 4, 5, 6, 7] }), { k: 'fd', fleets: [3, 4] });
-  assert.deepEqual(validWdunOut({ t: 'wdun', k: 'st', day: 2, locks: [], crows: [], fleets: [9] }).fleets, [9]);
-  assert.deepEqual(validWdunOut({ t: 'wdun', k: 'st', day: 2, locks: [], crows: [] }).fleets, [], 'an older hub\'s hello: none');
+  assert.deepEqual(validSeaIn({ k: 'hi' }), { k: 'hi' });
+  assert.deepEqual(validSeaIn({ k: 'fk', n: 12 }), { k: 'fk', n: 12 });
+  for (const n of [-1, 1.5, 1e8, '3', null]) assert.equal(validSeaIn({ k: 'fk', n }), null, String(n));
+  assert.equal(validSeaIn({ k: 'in', h: '1,2' }), null, 'a hall\'s word is no sea word');
+  assert.deepEqual(parseClient(JSON.stringify({ t: 'sea', k: 'fk', n: 4 }), { hasHello: true }), { t: 'sea', k: 'fk', n: 4 });
+  assert.deepEqual(validSeaOut({ t: 'sea', k: 'fd', fleets: [3, -1, 'x', 4, 5, 6, 7] }), { k: 'fd', fleets: [3, 4] });
+  assert.deepEqual(validSeaOut({ t: 'sea', k: 'st', fleets: [9], now: 5 }), { k: 'st', fleets: [9], now: 5 });
+  assert.deepEqual(validSeaOut({ t: 'sea', k: 'st' }).fleets, [], 'no sailings named: none');
+  assert.equal(validSeaOut({ t: 'wdun', k: 'fd', fleets: [1] }), null, 'the old frame is no sea word');
   // her said nothing yet) and a word late on its way - never "this sailing or the last" by the period alone
-  const st = L.wdunEmpty(), now = P * 100 + E.FLEET_OFFSET_MS + 5000;
+  const st = fleetHubEmpty(), now = P * 100 + E.FLEET_OFFSET_MS + 5000;
   assert.deepEqual(st.fleets, {});
-  assert.equal(L.wdunFleetSunk(st, 101, now), false, 'a sailing not yet come');
-  assert.equal(L.wdunFleetSunk(st, 98, now), false, 'one long past');
-  assert.equal(L.wdunFleetSunk(L.wdunEmpty(), 100, P * 100 + E.FLEET_OFFSET_MS - 1), false, 'in port yet');
-  assert.equal(L.wdunFleetSunk(st, 100, now), true, 'this sailing, under way');
-  assert.equal(L.wdunFleetSunk(st, 100, now + 1), false, 'once');
-  assert.equal(L.wdunFleetSunk(st, 99, P * 99 + E.FLEET_OFFSET_MS + E.FLEET_SAIL_MS + 60_000), true, 'the last, a word late on its way');
-  assert.equal(L.wdunFleetSunk(L.wdunEmpty(), 99, P * 99 + E.FLEET_OFFSET_MS + E.FLEET_SAIL_MS + 60_001), false, 'and no later');
+  assert.equal(fleetSunk(st, 101, now), false, 'a sailing not yet come');
+  assert.equal(fleetSunk(st, 98, now), false, 'one long past');
+  assert.equal(fleetSunk(fleetHubEmpty(), 100, P * 100 + E.FLEET_OFFSET_MS - 1), false, 'in port yet');
+  assert.equal(fleetSunk(st, 100, now), true, 'this sailing, under way');
+  assert.equal(fleetSunk(st, 100, now + 1), false, 'once');
+  assert.equal(fleetSunk(st, 99, P * 99 + E.FLEET_OFFSET_MS + E.FLEET_SAIL_MS + 60_000), true, 'the last, a word late on its way');
+  assert.equal(fleetSunk(fleetHubEmpty(), 99, P * 99 + E.FLEET_OFFSET_MS + E.FLEET_SAIL_MS + 60_001), false, 'and no later');
   assert.equal(st.fleets[100], 102 * P, 'kept till the sailing after it is over');
-  assert.deepEqual(L.wdunFleets(st, now), [99, 100]);
-  assert.deepEqual(L.wdunState(st, 'a', now).fleets, [99, 100]);
-  assert.deepEqual(L.wdunOf(JSON.parse(JSON.stringify(st))).fleets, { 99: 101 * P, 100: 102 * P }, 'stored and read back');
-  assert.equal(L.wdunPrune(st, 101 * P), true);
-  assert.deepEqual(L.wdunFleets(st, 101 * P), [100], 'the last one let go when its keep runs out');
-  assert.equal(L.wdunFleetSunk(L.wdunEmpty(), 1.5, now), false);
+  assert.deepEqual(fleetsDown(st, now), [99, 100]);
+  assert.deepEqual(fleetHubOf(JSON.parse(JSON.stringify(st))).fleets, { 99: 101 * P, 100: 102 * P }, 'stored and read back');
+  assert.equal(fleetHubPrune(st, 101 * P), true);
+  assert.deepEqual(fleetsDown(st, 101 * P), [100], 'the last one let go when its keep runs out');
+  assert.equal(fleetSunk(fleetHubEmpty(), 1.5, now), false);
 });
 
-test('SEA-EVENTS the hub, end to end over the fake relay: a flagship sunk is said to everyone online and in every hello after; a second word moves nothing; another sailing\'s is refused (mutants: the hub\'s arm)', async () => {
+test('SEA-EVENTS the social room, end to end over the fake relay: a flagship sunk is said to everyone online and in the answer to every `hi` after; a second word moves nothing; another sailing\'s is refused (mutants: the hub\'s arm)', async () => {
   const realNow = Date.now; let clock = P * 92592 + E.FLEET_OFFSET_MS + 60_000; Date.now = () => clock;
   try {
     const world = fakeRooms({ now: () => clock });
     const hub = world.room(SOCIAL_ROOM);
     const join = async (n, kind = 'linked') => { const ws = hub.connect(); await hub.hello(ws, `peer-${n}`, null, { name: n, acct: `acct-${n}`, asecret: `secret-${n}`, kind }); clock += 700; return ws; };
     const a = await join('a'), b = await join('b'), g = await join('g', 'guest');
-    const wd = (ws, o) => hub.raw(ws, JSON.stringify({ t: 'wdun', ...o }));
-    const got = (ws, k) => ws.sent.filter((m) => m.t === 'wdun' && m.k === k);
+    const say = (ws, o) => hub.raw(ws, JSON.stringify({ t: 'sea', ...o }));
+    const got = (ws, k) => ws.sent.filter((m) => m.t === 'sea' && m.k === k);
     const n = seaFleetSailing(clock);
-    await wd(g, { k: 'fk', n }); clock += 700;
+    await say(g, { k: 'fk', n }); clock += 700;
     assert.equal(got(b, 'fd').length, 0, 'a guest\'s word refused');
-    await wd(a, { k: 'fk', n: n + 5 }); clock += 700;
+    await say(a, { k: 'fk', n: n + 5 }); clock += 700;
     assert.equal(got(b, 'fd').length, 0, 'another sailing\'s refused');
-    await wd(a, { k: 'fk', n }); clock += 700;
-    assert.deepEqual(got(b, 'fd').at(-1), { t: 'wdun', k: 'fd', fleets: [n] }, 'said to everyone online');
+    await say(a, { k: 'fk', n }); clock += 700;
+    assert.deepEqual(got(b, 'fd').at(-1), { t: 'sea', k: 'fd', fleets: [n] }, 'said to everyone online');
     assert.deepEqual(got(a, 'fd').at(-1)?.fleets, [n]);
-    await wd(b, { k: 'fk', n }); clock += 700;
+    await say(b, { k: 'fk', n }); clock += 700;
     assert.equal(got(a, 'fd').length, 1, 'a second word moves nothing');
     const c = await join('c');
-    await wd(c, { k: 'hi' }); clock += 700;
-    assert.deepEqual(got(c, 'st').at(-1).fleets, [n], 'in every hello after');
+    await say(c, { k: 'hi' }); clock += 700;
+    assert.deepEqual(got(c, 'st').at(-1).fleets, [n], 'in the answer to every ask after');
   } finally { Date.now = realNow; }
 });
 
@@ -287,9 +289,9 @@ test('SEA-EVENTS the flagship\'s spoils (treasureFleet.js ended): sunk or taken,
 function ventures(t) {
   const said = [], mids = [], credits = [], sent = [], fed = [], strikes = [];
   const naval = { fleet: (list, o) => fed.push([list, o]), stormStrike: (k) => { strikes.push(k); return t.hit ?? true; } };
-  const link = { status: 'open', sendWdun: (w) => { sent.push(w); return true; } };
+  const link = { status: 'open', sendSea: (w) => { sent.push(w); return true; } };
   const sea = createSeaVentures({
-    live: () => false, day: () => 0, pixel: () => t.px, locks: new Map(), crows: new Map(), mine: () => null,
+    live: () => false, day: () => 0, pixel: () => t.px,
     clock: () => t.now, naval: () => naval, state: STATE, link: () => link,
     ether: { credit: (n) => credits.push(n), mid: (s) => mids.push(s), say: (s) => said.push(s) },
   });
@@ -401,7 +403,7 @@ test('SEA-EVENTS the fleet at the host: fed to the naval host FLEET_FEED_MS apar
   assert.equal(v.fed.length, 2);
   assert.equal(v.mids.filter((m) => m.startsWith('A treasure fleet weighs anchor (')).length, 1, 'once a sailing');
   // the hub's word: scattered by another
-  assert.equal(v.sea.hubWord({ k: 'cr', crows: [] }), false);
+  assert.equal(v.sea.hubWord({ k: 'zz' }), false);
   assert.equal(v.sea.hubWord({ k: 'fd', fleets: [f.n] }), true);
   assert.ok(v.mids.includes('The treasure fleet\'s flagship has gone down. The fleet scatters.'));
   t.now += FLEET_FEED_MS;

@@ -13,10 +13,8 @@ import {
   SMOOTH_LAND, PROVINCE_OF_ID, LAW_TILE,
 } from '../../src/world/tamriel/tamrielLand.js';
 import { setTamrielFit, pictureToBay, bayToPicture } from '../../src/world/tamriel/tamrielFrame.js';
-import { lawLines, linkPieces, linkSteps, squareEnds, segKey, LINE_BISECT, LINK_STEP } from '../../src/world/tamriel/tamrielLines.js';
+import { lawLines, linkPieces, linkSteps, squareEnds, LINE_BISECT, LINK_STEP } from '../../src/world/tamriel/tamrielLines.js';
 import { tracedChains, tracedSteps, startTracedJob, setTracedScheduler, INK_THIN, TRACED_SLICE_STEPS } from '../../src/ui/tamrielInk.js';
-import { cyrodiilMask, zoneLineOf, ZONE_LINE_STEP } from '../../src/systems/wild/cyrodiilZone.js';
-import { wildInside } from '../../src/systems/wild/wildZone.js';
 import { authoredHeightByte } from '../../src/world/tamriel/tamrielGround.js';
 import { pictureSea } from '../../src/world/arenaPlaces.js';
 import { pictureSeaMask, beyondLaneWay, worldLaneWater, moorCell, MOOR_REACH } from '../../src/scenes/naval/worldLanes.js';
@@ -208,7 +206,7 @@ test('SMOOTH-LAND the lines: every crossing on the law\'s own edge to the halvin
   for (const c of [...coast, ...borders]) assert.ok(sharpest(c) < 30, `a turn of ${sharpest(c).toFixed(1)} degrees`);
 });
 
-test('SMOOTH-LAND a saddle of the map\'s own pixels, one picture pixel a map pixel: the strait\'s square joined as the law at its middle says - the two of Cyrodiil\'s apart, each its own ring - and the zone\'s line the same (mutants: the saddle\'s join, the lines\' and the zone\'s)', () => {
+test('SMOOTH-LAND a saddle of the map\'s own pixels, one picture pixel a map pixel: the strait\'s square joined as the law at its middle says - the two of Cyrodiil\'s apart, each its own ring (mutants: the saddle\'s join, the lines\')', () => {
   install({ ox: -2000, oy: 0, ppu: 1 });
   const lines = lawLines(tamrielTrace());
   const sq = lines.square(2002, 26);
@@ -216,10 +214,6 @@ test('SMOOTH-LAND a saddle of the map\'s own pixels, one picture pixel a map pix
   const coast = linkPieces(lines.all().segs.filter((s) => s.kind === 'coast'), lines.points);
   const small = coast.filter((c) => c.every((p) => p.x < 2005 && p.y > 25));
   assert.equal(small.length, 2, 'the two pixels each a ring');
-  const m = cyrodiilMask();
-  assert.ok(wildInside(m, 2002, 26) && wildInside(m, 2003, 27) && !wildInside(m, 2003, 26));
-  const zone = zoneLineOf(tamrielTrace());
-  assert.equal(zone.chains.filter((c) => c.every((p) => p.x < 2005 && p.y > 25)).length, 2, 'the zone\'s line round each');
 });
 
 test('SMOOTH-LAND three labels about a square, one picture pixel a map pixel: two of one label on a diagonal are two lines past each other where the law\'s middle holds them apart (two islets of two provinces, the sea between: each its own ring, no border), else the other two meet between them at two points on the chords about the twice-held\'s corners, a line between them (Cyrodiil and Elsweyr meeting between two corners of Skyrim\'s: each its own ring) (mutants: the diagonal\'s pass; its meeting points; the line between them)', () => {
@@ -258,9 +252,9 @@ test('SMOOTH-LAND three labels about a square, one picture pixel a map pixel: tw
 
 test('SMOOTH-LAND its readers, one law without a copy: a map pixel\'s province (provinceKeyBeyondBay, theatreAt), the ground\'s bytes, the picture\'s sea under the places and the ports, the lanes\' open sea a cell\'s centre, Cyrodiil\'s zone to the pixel and its line\'s centre rule, the held map\'s lines the law\'s own points thinned by a quarter of a pixel (mutants: a reader on the picture\'s pixel; the zone\'s kinds; the ink\'s thinning)', () => {
   const t = install();
-  const lines = lawLines(tamrielTrace()), m = cyrodiilMask();
+  const lines = lawLines(tamrielTrace());
   const theatre9 = theatreAt(2000 + 16 * 25, 16 * 15);
-  const off = { key: 0, theatre: 0, sea: 0, ground: 0, zone: 0 };
+  const off = { key: 0, theatre: 0, sea: 0, ground: 0 };
   for (let y = 0; y < 30 * 16; y += 1) {
     for (let x = 2000; x < 2000 + 40 * 16; x += 1) {
       const l = lines.label(x, y), [qx, qy] = bayToPicture(x + 0.5, y + 0.5);
@@ -268,23 +262,11 @@ test('SMOOTH-LAND its readers, one law without a copy: a map pixel\'s province (
       if ((theatreAt(x, y) === theatre9) !== (l === 9)) off.theatre++;
       if (pictureSea(t, x, y) !== (l === 0)) off.sea++;
       if ((x + y) % 3 === 0 && (authoredHeightByte(qx, qy) > 0) !== (l !== 0)) off.ground++;
-      if (wildInside(m, x, y) !== (l === 9)) off.zone++;
     }
   }
-  assert.deepEqual(off, { key: 0, theatre: 0, sea: 0, ground: 0, zone: 0 }, 'every reader the law\'s');
+  assert.deepEqual(off, { key: 0, theatre: 0, sea: 0, ground: 0 }, 'every reader the law\'s');
   const sea = pictureSeaMask(tamrielTrace());
   for (let y = 0; y < t.h; y++) for (let x = 0; x < t.w; x++) assert.equal(sea(x, y), labelOf(t, x, y) === 0, `cell ${x}, ${y}`);
-  // the zone's line: a pixel the zone's exactly when its centre lies inside; its coast and its borders the law's kinds
-  const zone = zoneLineOf(tamrielTrace());
-  const inZone = insideOf(zone.chains);
-  let apart = 0;
-  for (let y = 0; y < 30 * 16; y++) for (let x = 2000; x < 2000 + 40 * 16; x++) if (inZone(x, y) !== wildInside(m, x, y)) apart++;
-  assert.equal(apart, 0, 'a pixel the zone\'s exactly when its centre lies inside its line');
-  assert.ok(zone.coast.length >= 1 && zone.borders.length === 1, `the zone's coast and its one border, Skyrim's and Elsweyr's through their meeting (${zone.borders.length})`);
-  const law = lines.all().segs, kindOf = new Map(law.map((s) => [segKey(s), s.kind]));
-  assert.ok([...zone.keys].every((k) => kindOf.has(k)), 'every piece of the zone\'s line a piece of the law\'s');
-  const coastLen = (cs) => cs.reduce((n, c) => n + c.slice(1).reduce((d, p, i) => d + Math.hypot(p.x - c[i].x, p.y - c[i].y), 0), 0);
-  assert.ok(Math.abs(coastLen(zone.borders) - coastLen(linkPieces(law.filter((s) => s.kind === 'border' && (s.pair % 16 === 9)), lines.points))) < 1e-9, 'the zone\'s borders the law\'s borders of Cyrodiil');
   // the ink: every point a point of the law's, every law point within a quarter of a pixel of the ink's line
   assert.equal(INK_THIN, 0.25);
   const ink = tracedChains(tamrielTrace()), pts = new Set([...lines.points.values()].map((p) => `${p.x},${p.y}`));
@@ -350,7 +332,7 @@ test('SMOOTH-LAND (AUDIT RELEASE R4-7, the law\'s first build) the law made as i
 // AUDIT RELEASE R4-7: the held map's first open held the page a second and
 // more for the continent's lines, Cyrodiil's line and the linking - now made in idle time as the trace lands
 test('SMOOTH-LAND (AUDIT RELEASE R4-7) the held map\'s lines in idle time: a trace landing on the page starts the job, which makes the traced chains TRACED_SLICE_STEPS steps a slice - byte for byte the whole walk\'s - into the keep the map\'s open then takes; a step\'s work bounded (a picture square\'s map squares, LINK_STEP pieces); a trace that moves on stops its job; no scheduler, no job (mutants: the job unheard; a slice the whole; the keep dropped; the walk\'s step, the linking\'s; the moved trace walked on)', () => {
-  assert.deepEqual([TRACED_SLICE_STEPS, LINK_STEP, ZONE_LINE_STEP], [24, 2048, 4096]);
+  assert.deepEqual([TRACED_SLICE_STEPS, LINK_STEP], [24, 2048]);
   const queue = [];
   setTracedScheduler((run) => queue.push(run));
   try {

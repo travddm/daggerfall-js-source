@@ -53,7 +53,6 @@
 
 import { lootRarityOn } from '../loot/lootRarity.js';
 import { renownOpens } from '../sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
-import { wildHere } from '../wild/wildZone.js';   // PVPDUNGEONS: no revenant is made in, nor returns to, the open zone
 import { registerPlayerBlowLanded } from '../sigil/sigilSetPowers.js';
 import { registerPlayerHurtListener } from '../../characters/playerEntity.js';   // REVENANT-HARM: a death no blow names
 import { registerPlayerStruckListener, registerPlayerStrikeListener } from '../../combat/formulas.js';   // REVENANT-HARM: a foe's blow leaves its mark (its poison's ticks come later); RVN1: my blow, in its fight's ledger
@@ -76,7 +75,6 @@ import { unequipItem, equipTableOf, EQUIP_SLOTS } from '../equip.js';   // RVN8:
 import { isLocked } from '../item/itemLock.js';   // RVN8: LOCK1's promise - a locked piece stays yours
 import { isBagItem } from '../../net/bagLaw.js';   // RVN8: never the Materials Bag
 import { isPackOnly, isRealmLocked } from '../item/itemBound.js';   // AUDIT 625 W2: nor a pack-only piece (the Wallet); AUDIT FB1025i F1: nor a realm-locked one
-import { WILD_NEVER_GROUPS } from '../wild/wildLeaf.js';   // STEED-KEPT: nor what never changes hands - a vehicle, a deed (the zone's own leaf - never the drop law's graph)
 import { BOAT_TEMPLATES } from '../../net/realm/realmTradeLaw.js';   // STEED-KEPT: nor a ship's deed or parts
 import { DECOR_OWN_KEPT_BACK } from '../../net/decorLaw.js';   // STEED-KEPT: nor a deed as Daggerfall files one, nor the spellbook
 import { hudTextWhenShown } from '../notify.js';   // STEED-KEPT: a piece home again, said once the world can say it
@@ -104,6 +102,9 @@ import { registerBlowTakenMod } from '../blowTaken.js';   // RVN2: what its adap
 import { registerEntityFold, newMods, EMPTY_MODS, computeEntityMods } from '../entityMods.js';   // RVN2: its elemental adaptations on the saving throw
 import { registerSilverDoubleVeto } from '../../combat/formulas.js';   // RVN2: a Silver-scarred one's double gone
 import { setFeudGate, setFeudClock, noteFeudHarm, noteFeudBackstab, takeFeud, setFeudWeakTest, feudWeakBlow, elementFeudClass, feudOf } from '../feudLedger.js';
+
+/** STEED-KEPT: the groups whose pieces never change hands: a vehicle, a deed, a quest's own item, coin. */
+const NEVER_TAKEN_GROUPS = new Set(['Transportation', 'Deeds', 'QuestItems', 'Currency']);
 
 // ── the numbers ─────────────────────────────────────────────────────
 /** A revenant is a foe of this level or more (LOOT7's champion floor, ELITE-FLOOR's). */
@@ -503,7 +504,6 @@ export function revenantCandidate(entity, rec = null) {
   if (!entity || !revenantOn()) return false;
   if (revenantHeld()) return false;   // RENOWN-GATE: held - none made, none runs (a flight that could make no revenant would only rob a kill), no ledger kept
   if (entity.retinueOf != null) return false;   // RVN6 (Feud-Arc.md 17): a band's follower is its master's, never one itself
-  if (entity.wildFoe || entity.wildGiant) return false;   // PVPDUNGEONS
   if (entity.bout) return false;   // AUDIT ARENA-LADDER 2: a fighter on the sand is its bout's - an elite champion never flees it as a revenant, nor becomes one
   const special = !!entity.revenant || !!entity.eliteFoe || (typeof entity.champion === 'string' && !!entity.champion);
   if (!special) return false;
@@ -519,7 +519,7 @@ export function revenantCandidate(entity, rec = null) {
 // UNQUIET (section 46): THE MARK's gate (systems/revenant/unquietMark.js) - drawn only with the arc on, not held, room for
 // another (fewer than REVENANT_MAX living), and on a foe that could ever rise (revenantCandidate's own exclusions)
 setUnquietGate((entity) => revenantOn() && !revenantHeld() && huntingRevenants().length < REVENANT_MAX
-  && !!entity && !entity.revenant && entity.retinueOf == null && !entity.wildFoe && !entity.wildGiant && !entity.bout
+  && !!entity && !entity.revenant && entity.retinueOf == null && !entity.bout
   && (entity.level | 0) >= REVENANT_MIN_LEVEL && entity.mobileType !== KNIGHT_CITY_WATCH && entity.team !== 'PlayerAlly' && entity.mobileTeam !== 'PlayerAlly');
 
 // ── the deeds ───────────────────────────────────────────────────────
@@ -908,7 +908,7 @@ function goesHome(r, wall, foes) {
 /** An open-world encounter roll's question: does a revenant come instead? The one due (its time come, none of the
  *  character's out in the world already), the highest rank first, on REVENANT_RETURN_CHANCE. Answers the record, or null. */
 export function revenantToReturn(player, { now = nowMinutes(), rolls = Math.random } = {}) {
-  if (!revenantOn() || wildHere()) return null;   // PVPDUNGEONS: none returns in the open zone
+  if (!revenantOn()) return null;
   if (revenantHeld()) return null;   // RENOWN-GATE: held - none returns, and none is claimed
   ensureMirror(player);
   const living = livingRevenants();
@@ -932,20 +932,18 @@ export function forgetLastSlew() { _lastSlew = null; }
  *  wallet once. LETTERS-HOME (FIELD BUGS 2026-10-18b): nor a LETTER OF CREDIT - a letter is gold (its `value` is the
  *  gold it stands for), and "gold" was the coin alone, so a 500,000-gold letter was the pack's most valuable piece and
  *  the likeliest drawn. STEED-KEPT (FIELD BUGS 2026-10-19f):
- *  nor what never changes hands, as the open zone's death reads it (wildDropLaw.js wildCanLose) - A VEHICLE (the zone's
- *  own groups, WILD_NEVER_GROUPS: a horse, a cart), A DEED (those groups' Deeds, and the decor's kept-back list,
+ *  nor what never changes hands - A VEHICLE (NEVER_TAKEN_GROUPS: a horse, a cart), A DEED (those groups' Deeds, and the decor's kept-back list,
  *  decorLaw.js DECOR_OWN_KEPT_BACK - a house's or a ship's deed as Daggerfall files them, and the spellbook with them:
  *  "Your spellbook never leaves you", KEEP-SPELLBOOK), or A SHIP'S DEED OR PARTS (Come Sail Away's own two,
  *  realmTradeLaw.js BOAT_TEMPLATES - a deed handed on is a second boat): a stable's horse beside a worn longsword was drawn
- *  one death in six. A BOUND piece stays its own (AUDIT 625 W2, "RVN8 names its own exclusions"), decided again: the zone
- *  keeps one because a death's remains are anyone's, and what a revenant takes never rides to another player - its body
- *  hands what it carried to its owner alone (net/bodyLoot.js shareableRecord, peerWord.js neverPeerHanded). AUDIT FB1025i
+ *  one death in six. A BOUND piece stays its own (AUDIT 625 W2, "RVN8 names its own exclusions"), decided again: what a revenant
+ *  takes never rides to another player - its body hands what it carried to its owner alone (net/bodyLoot.js shareableRecord, peerWord.js neverPeerHanded). AUDIT FB1025i
  *  F1 (FIELD BUGS 2026-10-25i COPY-LIFT): but never a piece THE REALM LOCKED (itemBound.js isRealmLocked - a copy the
  *  ledger wrote down): what it took rides on its record, a list the checkpoint's ledger never reads, and a copy hidden
  *  there while staff's keep lifted the other came back after as a second, live one. One taken before comes home at the
  *  load (ensureMirror), where the ledger reads it. */
 export const revenantMayTake = (item) => !!item && typeof item === 'object' && Number.isInteger(item.templateIndex) && !isLetterOfCredit(item)
-  && !WILD_NEVER_GROUPS.has(item.group) && !DECOR_OWN_KEPT_BACK.has(item.templateIndex) && !BOAT_TEMPLATES.includes(item.templateIndex)   // STEED-KEPT
+  && !NEVER_TAKEN_GROUPS.has(item.group) && !DECOR_OWN_KEPT_BACK.has(item.templateIndex) && !BOAT_TEMPLATES.includes(item.templateIndex)   // STEED-KEPT
   && !isRealmLocked(item)   // AUDIT FB1025i F1: nor a piece the realm locked
   && !item.questItem && !isSummoned(item) && !isGoldPieces(item) && !isBagItem(item) && !isPackOnly(item) && !isLocked(item);
 /** AUDIT FEUD: a piece it took, named after "your", "my" or "lovely" - the name the pack shows, its own article gone
@@ -1007,7 +1005,7 @@ export function revenantHandBack(player, r, entity = null) {
  *  standing up (goesHome) - a known lair was found empty when the road's return had stood it a moment before. */
 export function revenantForLair(player, here, { now = nowMinutes(), dueOnly = false, foes = [] } = {}) {   // `dueOnly`: a rest's answer - due, never merely known; LAIR-HOME: `foes` the lair's own pool
   if (revenantHeld()) return null;   // RENOWN-GATE: held - none is at home, and none is claimed
-  if (!revenantOn() || wildHere() || !here || !Number.isInteger(here.px) || !Number.isInteger(here.py)) return null;   // PVPDUNGEONS: no lair in the open zone
+  if (!revenantOn() || !here || !Number.isInteger(here.px) || !Number.isInteger(here.py)) return null;
   ensureMirror(player);
   const wall = Date.now();
   const r = livingRevenants().filter((x) => (!x.out || goesHome(x, wall, foes)) && x.lair && x.lair.px === here.px && x.lair.py === here.py && (x.dread || x.dueAt <= now || (!dueOnly && x.lairKnown)))   // UNQUIET: the Dread is always at home

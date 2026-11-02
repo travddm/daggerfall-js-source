@@ -1,20 +1,16 @@
 // @ts-check
-// HULL-PASS: ANOTHER PLAYER'S SHIP IS NO ROCK TO MY HELM OUTSIDE A PVP ZONE.
+// HULL-PASS: ANOTHER PLAYER'S SHIP IS NO ROCK TO MY HELM.
 //
 // FIELD BUGS 2026-10-01b stood every
 // peer's ship in my collider as my own boats stand (world.js csaSyncColliders), and so her hull met my helm's sweep as a
 // rock (Come Sail Away's CheckCollision: the way into her cancelled, the turn toward her refused) - at sea, in a harbour,
 // and in Sethrakul's waters, where a dozen ships close on one serpent and every shot was lined up against a neighbour's
-// shove. Now the sweep drops another player's hull outside a PvP zone (wildZone.js wildHere: the Eltheric Ocean past
-// Veilhaven's peace, the Wrothgarian Mountains), and inside one she is a rock as before - AUDIT FB1026d D3: the zone
-// alone, as the report asked ("off outside of PVP zone"); a ship may be one the broadsides spare (a party's, a guild's,
-// a relay without sea PvP) and still meet mine there. Sethrakul's site stands on the Bay's lanes, never in the ether's
-// box, so the serpent fight is always outside one (SERPENT4's bumpers, which pushed ships apart there alone, went with
-// it - navalHost.js).
+// shove. Now the sweep drops another player's hull everywhere: players' ships never meet (there is no
+// fight between players at sea, and no zone where a hull is a rock).
 //
 // WHAT PASSES MY HELM PASSES MY DECK (AUDIT FB1026d D1). Her hull stays in my collider, so I walk her deck, stand on it,
 // climb aboard her, and a swimmer meets her side (comeSailAwayAboard.js) - but a ship let through my hull would then
-// sail her deck through the body standing on mine and shove it off, or carry it away aboard her. So outside a zone, while
+// sail her deck through the body standing on mine and shove it off, or carry it away aboard her. So while
 // my body stands on a deck (my helm's, another's I am aboard, or the one under my feet, kept through a jump while my feet
 // stay over it), every player's hull that overlaps that deck's - hers through mine, mine through hers, one peer's through
 // another's - leaves my collider until they part (hullsStood); the sea's ships and everything else stand as they did.
@@ -26,21 +22,11 @@
 // through mine onto her hull. The ladder says it (deckPressed, world.js csaFinishBoarding, Come Sail Away's BoardBoat):
 // the boat it set me on is my deck while my feet stay over it.
 //
-// THE ZONE TURNING DOES NOT JAM THEM (AUDIT FB1026d D2). Two hulls overlapping when the zone turns PvP - a party's ships
-// leaving Veilhaven's peace together, one moored over another - met as rocks from that frame, each refusing the other's
-// way and turn. A hull already through my deck as hulls start to meet goes on passing, the sweep's and the collider's
-// alike (hullsStood keeps it out of the collider the helm's sweep sweeps), until it is clear of my deck (the latch); one
-// that comes into my deck after meets it.
-//
 // The host wires all three through here (world.js: Come Sail Away's `sphereCastAll`, csaSyncColliders' boats, the aboard
 // door's deckGround), so it does not grow.
 
-import { wildHere } from '../../systems/wild/wildZone.js';
 import { hullOverlap } from '../../systems/naval/navalShips.js';
 import { colliderPoses, invertAffine, boxColliderTriangles } from '../../world/prefabColliders.js';
-
-/** Whether another player's hull meets my helm here: only inside a PvP zone. */
-export const peerHullsMeet = () => wildHere();
 
 /** @type {WeakMap<object, { root: any, variant: any, box: number[] | null }>} each boat's hull in its root's own frame */
 const _local = new WeakMap();
@@ -84,7 +70,7 @@ const within = (h, p) => {
   return Math.abs(d[0] * h.f[0] + d[1] * h.f[1]) <= h.hl && Math.abs(d[0] * h.r[0] + d[1] * h.r[1]) <= h.hw;
 };
 
-/** The latch: the deck my body stands on, and the players' hulls passing through it. */
+/** The latch: the deck my body stands on, and the players' hulls passing through it (the deck is kept through a jump). */
 let _latch = { deck: /** @type {any} */ (null), passing: /** @type {Set<any>} */ (new Set()) };
 /** The boat a ladder last set me on (AUDIT FB1026d II E2) and the host's word for my deck as it set me there: my deck
  *  while my feet stay over it and the host's word stands (another ladder, a helm taken, a landing - the host's again). */
@@ -102,8 +88,7 @@ export const hullPassesMyDeck = (boat) => _latch.passing.has(boat);
 const ownerOf = (b, mine) => { if (mine.has(b)) return mine; const k = b?.peerKey; return typeof k === 'string' && k.includes(':') ? k.slice(0, k.lastIndexOf(':')) : b; };
 
 /**
- * The players' hulls passing through `deck` now (AUDIT FB1026d D1/D2): outside a PvP zone every one of `hulls` that
- * overlaps it; inside one, those already passing on this deck as hulls began to meet, while they still overlap it.
+ * The players' hulls passing through `deck` now (AUDIT FB1026d D1): every one of `hulls` that overlaps it.
  * Never one of the deck's own owner's (`whose`, AUDIT FB1026d II E1): her helm meets them.
  * @param {any} deck @param {any[]} hulls @param {(c: any) => any} geometry @param {((b: any) => any) | null} [whose]
  */
@@ -115,9 +100,8 @@ export function hullsPassing(deck, hulls, geometry, whose = null) {
     const P = hullPlan(b, geometry);
     if (P && hullOverlap(D, P)) over.add(b);
   }
-  const passing = !peerHullsMeet() ? over : deck !== _latch.deck ? new Set() : new Set([..._latch.passing].filter((b) => over.has(b)));
-  _latch = { deck, passing };
-  return passing;
+  _latch = { deck, passing: over };
+  return over;
 }
 
 /**
@@ -141,13 +125,11 @@ export function hullsStood(boats, deck, feet, pool, geometry) {
 /**
  * The helm's sweep with the peers' hulls dropped where they do not meet: `sweep` is the host's own
  * (o, r, d, dist, opts) -> hits, each hit's `root` a boat's GameObject or null; `pool` is Come Sail Away's pool, whose
- * `peerBoats` are the other players' ships as they stand now. Inside a PvP zone a hull still passing through my helm's
- * deck (the latch) is met by nothing here either: hullsStood took it out of the collider the sweep sweeps.
+ * `peerBoats` are the other players' ships as they stand now.
  */
 export function peerHullSweep(sweep, pool) {
   return (o, r, d, dist, opts = null) => {
     const hits = sweep(o, r, d, dist, opts);
-    if (peerHullsMeet()) return hits;
     const peers = pool?.peerBoats;
     if (!peers?.length) return hits;
     return hits.filter((h) => !h.root || !peers.some((b) => b.GameObject === h.root));

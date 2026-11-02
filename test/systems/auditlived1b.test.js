@@ -137,12 +137,9 @@ test('AUDIT LIVED1b S1 (F2, K2): an online checkpoint waits while a raise waits 
   setWorldMinutes(1000);
   e.lastGameMinutes = 500;
   assert.equal(ownWalkWaiting(e), false, 'offline, never: the host saves on its own, as before');
-  // each gate by its own line - AUDIT C&C (the list's run): the zone's death checkpoint (WILD1) copied the gate, and one
-  // pattern held either copy, so the realm checkpoint's could lose its walk under a pin that still passed
   const world = rd('src/scenes/world.js');
   assert.match(world, /const checkpointGateOpen = \(\) => checkpointAllowed\(\{ online: !!online, spawned: playerSpawned, seatOut: seatOut\(\), duel: !!duelMgr\?\.duel, walkWaiting: ownWalkWaiting\(playerEntity\), realm: !!realmSession \}\);/, 'the gate carries the walk');
   assert.match(world, /if \(!checkpointGateOpen\(\)\) return false;/, 'the host asks');
-  assert.match(world, /const allowed = checkpointGateOpen\(\);/, 'and the zone\'s death checkpoint, the same gate');
 });
 
 test('AUDIT LIVED1b P3 (A4, K3): the world\'s arms walk what no walk covered - a fast machine clock at the boot, a correction forward then back: every lived world minute once, none twice', () => {

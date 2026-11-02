@@ -98,13 +98,13 @@ test('UNQUIET THE MARK: one in four, drawn on its voice id (no die moved) - the 
   assert.equal(K.isUnquiet(null), false);
 });
 
-test('UNQUIET THE GATE: drawn only with the arc on, room for another, on a foe that could ever rise - never the watch, an ally, a band\'s follower, a zone foe, a bout\'s, one under level 3 or a revenant; a closed gate stores nothing (mutants: each gate dropped; a closed gate\'s false kept)', () => {
+test('UNQUIET THE GATE: drawn only with the arc on, room for another, on a foe that could ever rise - never the watch, an ally, a band\'s follower, a bout\'s, one under level 3 or a revenant; a closed gate stores nothing (mutants: each gate dropped; a closed gate\'s false kept)', () => {
   K._forceUnquietForTests(true);
   const p = me();
   const drawn = (over) => { const e = foe({ unquiet: undefined, ...over }); K.markUnquiet(e); return e.unquiet; };
   assert.equal(drawn({}), true);
   for (const [why, over] of [['the watch', { mobileType: KNIGHT_CITY_WATCH }], ['an ally', { team: 'PlayerAlly' }], ['an ally kind', { mobileTeam: 'PlayerAlly' }],
-    ['a follower', { retinueOf: 'x' }], ['the zone', { wildFoe: true }], ['a giant', { wildGiant: true }], ['a bout', { bout: {} }], ['level 2', { level: 2 }], ['a revenant', { revenant: { id: 'r' } }]]) {
+    ['a follower', { retinueOf: 'x' }], ['a bout', { bout: {} }], ['level 2', { level: 2 }], ['a revenant', { revenant: { id: 'r' } }]]) {
     assert.equal(drawn(over), undefined, why);
   }
   setPref('lootRarity', false);

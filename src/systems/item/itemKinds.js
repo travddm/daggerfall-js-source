@@ -1,7 +1,6 @@
 // @ts-check
-// INT9: THE ITEM KINDS A DEATH IN THE ZONE
-// READS, A LEAF. The template indices DaggerfallUnityItem's predicates name (ItemEnums.cs) and the two predicates the
-// zone's drop law asks (systems/wild/wildDropLaw.js) - their home since INT9, so the account Worker bundles them without the
+// INT9: THE ITEM KINDS, A LEAF. The template indices DaggerfallUnityItem's predicates name (ItemEnums.cs) and the two
+// predicates built on them - their home since INT9, so the account Worker bundles them without the
 // use handler's whole graph (systems/useItem.js re-exports every one). Imports nothing.
 
 /** The template indices the predicates name (ItemEnums.cs). */

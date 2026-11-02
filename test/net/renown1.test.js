@@ -251,7 +251,7 @@ test('RENOWN1 the token and the order: `lv` optional and within 1..50 when there
   assert.ok(claimsValid({ ...id, lv: 50 }));
   for (const lv of [0, 51, 1.5, '9', null]) assert.equal(claimsValid({ ...id, lv }), false, `lv ${lv}`);
   assert.equal(renownIssuable(12), true);
-  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'remains', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
+  assert.deepEqual([...ORDER_KINDS], ['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);
   const lvOrder = { o: 'renown', s: 'acct-mara', lv: 9, i: T0, e: T0 + 30 };
   assert.ok(orderValid(lvOrder));
   assert.equal(orderValid({ ...lvOrder, mu: 0 }), false, 'a renown order carrying a mute is neither');
@@ -284,7 +284,7 @@ test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bo
   assert.deepEqual(parseClient('{"t":"renown","order":"v1.a.b"}', { hasHello: false }), { error: 'renown before hello' });
   assert.deepEqual(parseClient('{"t":"renown"}', { hasHello: true }), { error: 'bad renown' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'renown', order: 'x'.repeat(1025) }), { hasHello: true }), { error: 'bad renown' });
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
   assert.equal(RENOWN_HZ_MAX, 1);
   const g1 = renownGate(null, 1000);
   assert.equal(g1.pass, true);

@@ -9,7 +9,8 @@ import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { WILD_GIANT } from '../../src/systems/wild/wildZone.js';
+import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
+const GIANT = MOBILE_TYPES.Giant;   // a plain Giant: the pool's tallest ordinary foe
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
 import { createGrantHost, grantSpeciesOf } from '../../src/scenes/grantHost.js';
 import { signGrant, grantMarksFor, grantMarksAllow, grantKindOf, validGrant, GRANT_TTL_MS, GRANT_TALLY_MS, GRANT_RENEW_LEAD_MS, GRANT_KINDS, GRANT_MARKLESS, GRANT_OPEN_KINDS } from '../../src/net/grantLaw.js';
@@ -32,7 +33,7 @@ function craftMonsterBsa(records) {
   for (const [name, bytes] of records) { for (let i = 0; i < name.length; i++) out[pos + i] = name.charCodeAt(i); v.setInt32(pos + NAME_FIELD, bytes.length, true); pos += ENTRY; }
   return out;
 }
-const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(WILD_GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
+const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
 const stubTex = { getSize: () => ({ width: 64, height: 100 }), getScale: () => ({ width: 0, height: 0 }), recordCount: 8, getFrameCount: () => 1 };
 const settle = async (n = 8) => { for (let i = 0; i < n; i++) await new Promise((r) => setTimeout(r, 0)); };
 const playerEntity = () => ({ level: 9, reflexes: 2, health: 50, maxHealth: 50, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], stats: { strength: 50, agility: 50, luck: 50, speed: 50, endurance: 50 }, armorValues: new Array(7).fill(100) });
@@ -158,7 +159,7 @@ test('GRANT3 THE OWNER: a turn\'s stands of a kind are one ask; each stands as i
   assert.deepEqual(O.session.asks.filter((a) => a.k === 'free').map((a) => a.gs), [[gr.g]]);
   // a grant naming its champions: each member stands as its grant says, never as the street's own roll would
   O.session.marks = { e: 0, c: [4, 4] };
-  const marked = await Promise.all([0, 1].map((k) => O.pool.spawnFoe(WILD_GIANT, [140 + k, 0, 100], { grantKind: 'enc' })));
+  const marked = await Promise.all([0, 1].map((k) => O.pool.spawnFoe(GIANT, [140 + k, 0, 100], { grantKind: 'enc' })));
   assert.ok(marked.every((f) => (f.entity.level | 0) >= 3), 'a foe a trait may stand on');
   assert.deepEqual(marked.map((f) => f.entity.champion), ['thorned', 'thorned']);
 });

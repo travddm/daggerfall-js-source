@@ -15,7 +15,6 @@ import { YesNoBoxWindow } from '../../../src/ui/yesNoBox.js';
 import { createTownTalk } from '../../../src/scenes/townTalk.js';
 import { TRAVEL_VIEW_TEXT } from '../../../src/scenes/travelView.js';
 import { BAND_GIVE_UP_MS } from '../../../src/systems/travel/travelBands.js';
-import { WILD_TEXT } from '../../../src/systems/wild/wildZone.js';   // PARTY-TRUCE
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
@@ -73,7 +72,7 @@ test('TV8 wire (world124): the leader\'s walk and a member\'s stop ride the part
   }
   assert.equal(validPartyPose({ ...base, ts: -1 }).ts, undefined);
   assert.equal(validPartyPose({ ...base, ts: 'x' }).ts, undefined);
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
 });
 
 test('TV8 host: the leader\'s walk begins with an Overworld journey (a gathered member, a hub that carries it) and runs on the law\'s own steps (AUDIT OW3: leaderWalkStep, halted through the panel); a member hears it with a grace, is asked only when free, walks the same journey on a yes, halts with the party through the panel, publishes only their own stops', () => {
@@ -418,7 +417,6 @@ function walkHost(world, acct, over = {}) {
     wagonRiders: { seated: () => !!c.seated },   // WAGONS2: seated in the back of another's wagon
     tvWater: (x, y) => !!c.sea?.(x, y),   // AUDIT OW5 P3
     tvSay: (t) => { c.said = [...(c.said ?? []), t]; },   // AUDIT OW5 P5
-    wildWalkRow: (x, y) => c.wild?.(x, y) ?? null,   // PARTY-TRUCE: the zone's row, where the client's world says so
     memberPresent, distanceToPartyAccount: (other) => (world.far.has(acct) || world.far.has(other) ? 500 : 10),
     tvPlaceSummary: (x, y) => (x === RIPWYCH.pixel.x && y === RIPWYCH.pixel.y ? RIPWYCH : null),
     mapPixelToWorldCoords: mapPixelWorldOrigin,
@@ -786,15 +784,3 @@ test('AUDIT OW5b D3 (run on the host\'s own code): THE LEADER\'S SPAWN IS A DOOR
   assert.match(rd('src/scenes/spawnGroundHost.js'), /const tvLocationAt = \(x, y\) => locationIndex\.get\(`\$\{x\},\$\{y\}`\) \?\? \(params\.has\('online'\) && !inEtherLaw\(x, y\) && spawnsDungeon\(_spawnSalt, x, y\) \? tvSpawnAt\(x, y\) : null\);/, 'the index, else the spawn its roll would stand (online; side-effect free)');
 });
 
-test('PARTY-TRUCE (FIELD BUGS 2026-10-09b): a party\'s walk that ends in the open PvP zone, or at its edge, says so in its question - the walk is the one door into the zone no journey\'s gate asks; a walk elsewhere asks as it did (mutant: the row never asked)', () => {
-  const w = walkParty('L', 'M');
-  const [L, M] = w.clients;
-  M.wild = (x, y) => (x === RIPWYCH.pixel.x && y === RIPWYCH.pixel.y ? WILD_TEXT.walkInto : null);
-  w.now = 1000;
-  assert.equal(L.routeTo(), true);
-  w.tick(1100);
-  assert.deepEqual(M.box.rows, ['L leads the party to Ripwych.', WILD_TEXT.walkInto, 'Travel with them?']);
-  assert.match(WILD_TEXT.walkInto, /open PvP zone\. Other players may kill you there and take what you carry/);
-  const w8 = rd('src/scenes/world.js');
-  assert.match(w8, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/, 'the host asks the zone\'s mask, its band included');
-});
