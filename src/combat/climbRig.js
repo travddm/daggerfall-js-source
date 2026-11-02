@@ -28,7 +28,7 @@
 // as the clip has it.
 //
 // THE POSE MAP: an untracked bone's entry is the skeleton's own shared `node.rest` (mwSkin.js poseSkeleton) - every
-// write here is a NEW entry through pose.set, never a mutation (the hazard applyFirstPersonNeck's note names).
+// write here is a NEW entry through pose.set, never a mutation (the hazard pitchNeck's note names).
 //
 // BODY-MOTION (characters/bodyMotion/bodySolve.js) poses the walking, carrying and striking body on the same algebra -
 // `rotationPart`, `restAxes` and `orthonormal` are exported for it beside the solves it already took.

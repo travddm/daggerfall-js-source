@@ -12,7 +12,7 @@ import {
   FP_CLIP_PATH, NIF_TO_PASS, FP_FIELD_OF_VIEW, firstPersonEye, FP_FLOATS,
   collectArmTextures,
 } from '../../../src/combat/fpArm.js';
-import { firstPersonCameraRef, FP_NECK_ROTATE_FACTOR } from '../../../src/formats/morrowind/mwFirstPerson.js';
+import { headViewRef, HEAD_VIEW_TUNING } from '../../../src/formats/morrowind/mwFirstPerson.js';
 
 // MW-D8: THE ARM IN THE GAME.
 //
@@ -133,10 +133,10 @@ test('MW-D10 rule 54: the camera is a NODE OF THE RIG - Camera, then Head, then 
   // and pushed it a constant distance in front of the eye, which is the
   // arrangement in Mac's screenshot: forearms adrift at the horizon.
   const skel = (names) => ({ byName: new Map(names.map((n, i) => [n, i + 1])) });
-  assert.equal(firstPersonCameraRef(skel(['bip01', 'camera', 'head'])), 2, 'Camera wins');
-  assert.equal(firstPersonCameraRef(skel(['bip01', 'head'])), 2, 'Head is the fallback');
-  assert.equal(firstPersonCameraRef(skel(['bip01', 'bip01 neck'])), -1, 'and nothing else is');
-  assert.equal(firstPersonCameraRef(null), -1);
+  assert.equal(headViewRef(skel(['bip01', 'camera', 'head'])), 2, 'Camera wins');
+  assert.equal(headViewRef(skel(['bip01', 'head'])), 2, 'Head is the fallback');
+  assert.equal(headViewRef(skel(['bip01', 'bip01 neck'])), -1, 'and nothing else is');
+  assert.equal(headViewRef(null), -1);
 });
 
 test('MW-D10: a rig with neither node REFUSES, naming the stage', async () => {
@@ -182,7 +182,7 @@ test('MW-D10: the Z-up rig turns into a Y-up pass - the conversion nothing in th
   assert.equal(firstPersonEye(mats, 9), null, 'and a missing node is not an eye at the origin');
 });
 
-test('MW-D10: the neck takes 0.75 of the look, and the port pitches the OTHER WAY', async () => {
+test('MW-D10: the neck takes part of the look, and the port pitches the OTHER WAY', async () => {
   const built = await fpFixtureBuild();
   assert.equal(built.ok, true, built.error);
   const eyeAt = (neckPitch) => {
@@ -198,28 +198,18 @@ test('MW-D10: the neck takes 0.75 of the look, and the port pitches the OTHER WA
   assert.ok(up[2] > level[2], 'and a negative one tips it back');
   assert.ok(Math.abs(down[1] - level[1]) > 1e-4, 'the eye MOVES with the neck - it is not a lens tilt');
 
-  // 0.75, from npcanimation.cpp:719 `0.75f + 0.25f * mAimingFactor`,
-  // with the aiming factor at its resting zero.
-  assert.equal(FP_NECK_ROTATE_FACTOR, 0.75);
+  // The neck takes a share of the look between a half and all of it (mwHeadViewBehaviour.test.js pins the turn).
+  assert.ok(HEAD_VIEW_TUNING.restShare > 0.5 && HEAD_VIEW_TUNING.restShare < 1);
   // files/settings-default.cfg: `first person field of view = 60.0`.
   // Nothing in a picture says the lens is wrong - a narrower one just
   // makes the arms bigger - so the number is pinned against the file it
   // comes from.
   assert.equal(FP_FIELD_OF_VIEW, Math.PI / 3);
 
-  // AND THE CONJUGATION. The controller expresses the pitch in the
-  // OBJECT ROOT's frame and conjugates it into the node's own; with an
-  // axis-aligned neck that is the identity, so armfp.nif TURNS its neck
-  // 8 degrees and a port that rotates in the local frame moves the eye
-  // somewhere else. BOW-AIM (Field-Bugs-2026-10-26c.md): OSG's
-  // `worldOrient * rotate * worldOrient^-1 * localRot` is a ROW-vector
-  // product; in this port's column convention it is localRot * W^T *
-  // rotate * W (mwFirstPerson.js rootSpaceTurn), the letters' copy turned
-  // retail's neck the other way - MW-D20 below works it by hand.
-  const src2 = rd('src/formats/morrowind/mwHeadView.js');
-  assert.match(src2, /mat33Mul\(mat33Mul\(mat33Mul\(local, transpose33\(w\)\), rotate\), w\)/,
-    'localRot * W^T * rotate * W - OSG\'s row-vector line in this port\'s column convention');
-  assert.match(src2, /const rotation = rootSpaceTurn\(local\.rotation, w, rotate\);/, 'and the neck turns through it');
+  // AND THE CONJUGATION. The pitch is a turn in the OBJECT ROOT's frame laid on the neck's own orientation; with an
+  // axis-aligned neck that is the identity, so armfp.nif TURNS its neck 8 degrees and a port that rotates in the local
+  // frame moves the eye somewhere else. mwHeadViewBehaviour.test.js pins the turn on the retail rigs, and MW-D20 below
+  // works it by hand.
 
   // AND THE SIGN CONVERSION. Morrowind counts pitch downward; this port
   // counts it upward (world.js SUBTRACTS the mouse's y delta). Passed
@@ -887,7 +877,7 @@ test('MW-D20: the camera bone reads from the same space (rule 54 stays coherent)
     skeletonBytes: f('armskelx.nif'),
     parts: [{ slot: 'hand', bytes: f('armhandx.nif') }],
   });
-  const camRef = firstPersonCameraRef(arm.skeleton);
+  const camRef = headViewRef(arm.skeleton);
   assert.ok(camRef >= 0);
   const eye = firstPersonEye(arm.mats, camRef);
   // Camera graph rest = (2,0,10)+(0,0,5)+(0,0,7) = (2,0,22); the eye is
@@ -913,13 +903,13 @@ test('MW-D20: the neck conjugates in the OBJECT ROOT frame - the file root\'s ro
   // a retail root carries rotation.
   const { poseSkeleton, buildSkeleton, skeletonSpaceMatrices, GRAPH_ROOT } =
     await import('../../../src/formats/morrowind/mwSkin.js');
-  const { applyFirstPersonNeck } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
+  const { pitchNeck } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
   const { sampleTrack: st } = await import('../../../src/formats/morrowind/mwAnim.js');
   const skel = buildSkeleton(parseNif(f('armneckx.nif')));
   // Through poseAssembly - the REAL call site - so a caller that hands
   // the conjugation a root-relative frame dies here, not only a direct
   // call with the right argument.
-  void applyFirstPersonNeck; void GRAPH_ROOT;
+  void pitchNeck; void GRAPH_ROOT;
   const assembly = {
     fns: { poseSkeleton, skelMats: skeletonSpaceMatrices },
     skeleton: skel, pieces: [],

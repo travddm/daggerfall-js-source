@@ -35,6 +35,8 @@ export const COMBOS = [
   { pitch: 0.5, focus: 1, offset: null },
   { pitch: 1.0, focus: 0.5, offset: null },
   { pitch: 0.5, focus: 0, offset: [0, 0, -12] },
+  { pitch: 0, focus: 0, offset: [0, 0, -12] },
+  { pitch: 0, focus: 0, offset: [5, -3, 2] },
 ];
 
 const to4 = (value) => Math.round(value * 1e4) / 1e4;
@@ -51,7 +53,11 @@ export function readInputs({ dataPath, fs, path, modules }) {
   const archives = ['Morrowind', 'Tribunal', 'Bloodmoon'].map(
     (name) => new MwBsaFile(new Uint8Array(fs.readFileSync(path.join(dataPath, `${name}.bsa`)))),
   );
-  const get = (name) => archives.find((archive) => archive.has(name)).get(name).slice();
+  const get = (name) =>
+    archives
+      .find((archive) => archive.has(name))
+      .get(name)
+      .slice();
   const rigs = {};
   for (const rig of RIGS) {
     const skeleton = skin.buildSkeleton(parseNif(get(rig.nif)));
@@ -141,7 +147,15 @@ export function recordHeadView(api, inputs, skin) {
       rigOut.clips[group] = clip.poses.map((recorded) =>
         COMBOS.map((combo) => {
           const pose = poseOf(recorded);
-          const applied = api.applyNeck(skeleton, pose, rootRef, skin.skeletonSpaceMatrices, combo.pitch, combo.focus, combo.offset);
+          const applied = api.applyNeck(
+            skeleton,
+            pose,
+            rootRef,
+            skin.skeletonSpaceMatrices,
+            combo.pitch,
+            combo.focus,
+            combo.offset,
+          );
           const m = worlds(skeleton, pose).get(viewRef);
           return [applied ? 1 : 0, ...Array.from(m.t), m.a[0], m.a[3], m.a[6], m.a[2], m.a[5], m.a[8]].map(to3);
         }),
@@ -164,7 +178,11 @@ export function recordHeadView(api, inputs, skin) {
   const run = (fps) => {
     let focus = 0;
     const values = [];
-    for (const [seconds, aiming] of [[0.5, false], [0.4, true], [3, false]]) {
+    for (const [seconds, aiming] of [
+      [0.5, false],
+      [0.4, true],
+      [3, false],
+    ]) {
       for (let i = 0; i < Math.round(seconds * fps); i++) {
         focus = api.stepFocus(focus, aiming, 1 / fps);
         values.push(to4(focus));

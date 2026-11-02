@@ -178,7 +178,7 @@ export * from './mwWeaponAnim.js';
 import { SKIN_SWEEP_SLOTS, resolveBodyParts } from './mwBodyParts.js';
 export * from './mwBodyParts.js';
 export * from './mwAnimSources.js';   // the animation sources moved out; callers keep importing them from here   // the body-part resolution moved out; callers keep importing it from here   // the weapon animation rules moved out; callers keep importing them from here
-import { applyFirstPersonNeck } from './mwHeadView.js';
+import { pitchNeck } from './mwHeadView.js';
 export * from './mwHeadView.js';   // the camera node and the neck turn moved out; callers keep importing them from here
 
 /** The four parts allowed to fall back to a third-person mesh when the
@@ -1930,7 +1930,7 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // coincide exactly when every declared root is the root and the root's
   // transform is identity - true of every fixture, false of retail data,
   // where the difference is a hand floating away from its forearm.
-  applyFirstPersonNeck(skeleton, pose, GRAPH_ROOT, fns.skelMats, neckPitch, neckAim, neckOffset);
+  pitchNeck(skeleton, pose, GRAPH_ROOT, fns.skelMats, neckPitch, neckAim, neckOffset);
   // BOW-AIM (combat/spineAim.js): the third person's ranged aim - the spine controllers over the clip's pose, as the
   // reference's run after its animation (weaponanimation.cpp:175-211), and under the body motion, which keeps the clip's
   // chest while the clip has the arms

@@ -1,184 +1,129 @@
 // @ts-check
-// The first-person view follows the head: which skeleton node carries the camera, and the neck turn that pitches the view.
-// Moved out of mwFirstPerson.js unchanged; mwFirstPerson.js still exports everything here.
+// The first-person view follows the head: which skeleton node carries the camera, and how the look pitch turns the neck.
+//
+// What the retail files show (Morrowind.bsa, measured on the recorded rigs of test/fixtures/mw/mwHeadViewParity.json):
+//   - xbase_anim.1st.nif and base_anim_female.1st.nif carry a node `Camera`, a child of `Head`, about 5 units from the
+//     head bone. base_animkna.1st.nif (the beast arms) has no such node, so the head bone itself is the view.
+//   - The first-person clips (xbase_anim.1st.kf, xbase_animkna.1st.kf) key the spine chain but leave the neck and head
+//     at rest, so the view has no bob of its own in first person. The third-person body does move its head (up to 3
+//     units a frame at a run, 8 in a jump), and the same code serves it.
+//   - Neck to camera is about 10 units. A neck turn of `a` radians moves the eye 2 * 10 * sin(a / 2) units along an arc,
+//     which is the cost of following the look with the neck instead of with the lens alone.
+//
+// The turn is made about the actor root's X axis, not the neck's own axis. The neck of a retail rig is not axis-aligned,
+// so a turn about its own axis would also yaw the head sideways.
 
 import { mat33Mul } from './mwNifMesh.js';
 
-/**
- * RULE 54, VERBATIM: THE FIRST-PERSON CAMERA IS A NODE OF THE RIG.
- *
- *   mAnimation->setViewMode(NpcAnimation::VM_FirstPerson);
- *   mTrackingNode = mAnimation->getNode("Camera");
- *   if (!mTrackingNode) mTrackingNode = mAnimation->getNode("Head");
- *   mHeightScale = 1.f;
- *                            - mwrender/camera.cpp:346-357
- *
- * and the position it yields is that node's world TRANSLATION with no
- * height term at all in first person (calculateTrackedPosition, :87-99:
- * the `res.z() += mHeight * mHeightScale` line is inside
- * `if (mMode != Mode::FirstPerson)`).
- *
- * There is no third fallback. A rig with neither node has no first-person
- * camera, and inventing one is what MW-D8's port mapper did.
- */
-export function firstPersonCameraRef(skeleton) {
+/** The nodes that can carry the camera, most specific first. A rig with neither has no first-person view. */
+const VIEW_NODES = ['camera', 'head'];
+
+/** @param {{byName?: Map<string, number>} | null | undefined} skeleton @returns {number} the node ref, or -1 */
+export function headViewRef(skeleton) {
   const byName = skeleton && skeleton.byName;
   if (!byName) return -1;
-  if (byName.has('camera')) return byName.get('camera');
-  if (byName.has('head')) return byName.get('head');
+  for (const name of VIEW_NODES) if (byName.has(name)) return /** @type {number} */ (byName.get(name));
   return -1;
 }
 
-/** The node NpcAnimation hangs the first-person RotateController on. */
-export const FP_NECK_BONE = 'bip01 neck';
+/** The bone that takes the look pitch. */
+export const NECK_BONE = 'bip01 neck';
 
 /**
- * NpcAnimation::runAnimation (:711-723), whole:
+ * The three tunable numbers.
  *
- *   if (mAccurateAiming) mAimingFactor = 1.f;
- *   else mAimingFactor = std::max(0.f, mAimingFactor - timepassed * 0.5f);
- *   float rotateFactor = 0.75f + 0.25f * mAimingFactor;
+ * restShare is the part of the look pitch the neck takes while the actor is not aiming. The lens takes all of the
+ * pitch whatever the neck does, so the arms, which hang from the spine, slide in the picture by (1 - share) * pitch.
+ * Two limits bound the share, both at a pitch of 1.4 radians (about 80 degrees, steeper than play reaches):
+ *   - The arms must stay in frame. Half of the 60-degree lens is 0.52 radians, and the arms sit in the lower part of it,
+ *     so the slide stays under 0.42 radians (24 degrees): share >= 0.7.
+ *   - The eye must stay in front of the neck. Its arc is 2 * 10 * sin(share * pitch / 2) units with 10 units between
+ *     neck and camera, so the arc stays under 10 units: share <= 0.75.
+ * 0.7 takes the end of that range that keeps the arms in frame.
  *
- * MW-D13 CLOSED THE OTHER HALF. The factor is not the constant 0.75 the
- * port shipped: it is 0.75 at rest and rises to 1.0 WHILE AIMING, which
- * is `mUpperBodyState > UpperBodyState::WeaponEquipped`
- * (character.cpp:1894) - every attack section, and nothing else. So the
- * arms lag the look by a quarter of it normally and follow it EXACTLY
- * while you are swinging, which is what makes a blow land where you are
- * looking.
+ * While aiming the neck takes all of the pitch (focus 1), so an arm that is swinging points where the player looks.
  *
- * The rise is INSTANT and the fall is a 0.5-per-second ramp, so the arms
- * snap onto the aim and drift back off it over two seconds. An
- * implementation that eased both ways, or that decayed per frame instead
- * of per second, would look almost right and be wrong at every frame
- * rate but one.
- *
- * MW-D12's upper-body machine is what makes this reachable at all - with
- * a constant idle there was no aiming state to be in, which is why the
- * constant was honest when it was written and is a gap now.
+ * The focus rises by riseRate and falls by fallRate each second. A rise that took one frame would move the eye by
+ * (1 - restShare) * pitch at once: 0.3 radians at a pitch of one, a visible snap at the start of every swing. At 8 per
+ * second the same change is spread over about 8 frames at 60 fps. The fall is slower than the rise so the view does not
+ * spring back at the end of a swing. These two rates, unlike restShare, come from no measurement: they are judged by
+ * eye and meant to be adjusted.
  */
-export const FP_NECK_ROTATE_FACTOR = 0.75;
-export const FP_AIM_SPAN = 0.25;
-export const FP_AIM_DECAY_PER_SECOND = 0.5;
+export const HEAD_VIEW_TUNING = Object.freeze({ restShare: 0.7, riseRate: 8, fallRate: 1.2 });
 
-/** mAimingFactor's own step. `prev` is last frame's value; the caller
- *  keeps it, because it is a decaying state and not a function of the
- *  current frame alone. */
-export function aimingFactor(prev, accurate, dt) {
-  if (accurate) return 1;
-  return Math.max(0, (prev || 0) - dt * FP_AIM_DECAY_PER_SECOND);
+/** The aiming focus after `seconds`: 0 when idle, 1 while aiming, moving toward the target at a fixed rate. */
+export function stepAimFocus(previous, aiming, seconds) {
+  const { riseRate, fallRate } = HEAD_VIEW_TUNING;
+  const focus = previous || 0;
+  return aiming ? Math.min(1, focus + seconds * riseRate) : Math.max(0, focus - seconds * fallRate);
 }
 
-/** rotateFactor, which is what multiplies the pitch. */
-export function neckRotateFactor(aim = 0) {
-  return FP_NECK_ROTATE_FACTOR + FP_AIM_SPAN * aim;
+/** The part of the look pitch the neck takes, from restShare at focus 0 to all of it at focus 1. */
+export function neckPitchShare(focus = 0) {
+  const { restShare } = HEAD_VIEW_TUNING;
+  return restShare + (1 - restShare) * focus;
 }
 
-const transpose33 = (m) => Float32Array.from([m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]);
-
-/**
- * `matrix.getRotate()` - the ROTATION, with the scale divided out.
- *
- * MW-D15: the skeleton-space 3x3 this module works in is rotation TIMES
- * SCALE (rule 55 folds a NIF's uniform scale into the matrix), and
- * RotateController takes `worldMat.getRotate()`, which is the rotation
- * alone. Conjugating with the scaled matrix gives `s^2 * (R rot R^T)`
- * and translating with its transpose gives `s * offset` - both silently
- * correct at s = 1, which every fixture and most retail rigs are, and
- * both wrong the moment a rig scales its neck chain.
- *
- * NIF scale is a single float, so the columns share one length and one
- * division does it.
- */
-const rotationOf = (m) => {
-  const s = Math.hypot(m[0], m[3], m[6]);
-  if (!(s > 1e-8) || Math.abs(s - 1) < 1e-6) return m;
-  const out = new Float32Array(9);
-  for (let i = 0; i < 9; i++) out[i] = m[i] / s;
-  return out;
-};
-/** Rotation about -X by `rad`, which is the axis the neck controller
- *  takes: `osg::Quat(pitch * rotateFactor, osg::Vec3f(-1, 0, 0))` - and the third person's ranged aim
- *  (combat/spineAim.js, BOW-AIM: `osg::Quat(pitch / 2, osg::Vec3f(-1, 0, 0))`). */
-export const rotNegX = (rad) => {
-  const c = Math.cos(rad); const sn = Math.sin(rad);
-  return Float32Array.from([1, 0, 0, 0, c, sn, 0, -sn, c]);
-};
-
-/**
- * RotateController's turn (mwrender/rotatecontroller.cpp:41-60), the node's new local rotation:
- *
- *   worldOrient = rotation of the node's matrix relative to the object root
- *   orient = worldOrient * mRotate * worldOrient^-1 * matrix.getRotate()
- *
- * i.e. `rotate` is a turn in the OBJECT ROOT's frame, laid on the node's world orientation as the animation left it -
- * the node's world becomes `rotate * world`, its translation untouched.
- *
- * BOW-AIM: THAT LINE IS OSG's, AND OSG MULTIPLIES ROW VECTORS. Its
- * matrices (and the quaternion product, `q1 * q2` = q1 then q2) are the transposes of this port's: here a world is
- * `parent * local` and a point is `M v` (mwNifMesh.js composeTransform). Written in this port's convention the line is
- *
- *   local' = local * W^T * rotate * W          (W the node's world rotation, its own local inside it)
- *
- * so the world is `parent * local' = rotate * parent * local` - `rotate` in the root's frame. The port had copied the
- * line's letters (`W * rotate * W^T * local`), which turns the world by `rotate` conjugated by parent*W instead: on
- * retail's third-person skeleton a "look down" of 0.3 tipped the chest BACK 0.3, about an axis 3 degrees off the
- * root's X, where the corrected line turns it exactly `rotate`. Measured on the vendored retail biped
- * (test/combat/fb1026c_bowaim.test.js); MW-D20's fixture (a file root turned Rz90) is the same law worked by hand.
- */
-function rootSpaceTurn(local, w, rotate) {
-  return mat33Mul(mat33Mul(mat33Mul(local, transpose33(w)), rotate), w);
+/** The 3x3 (row-major) that tips the root's up axis forward, so a positive angle looks down. */
+export function pitchDown(radians) {
+  const c = Math.cos(radians);
+  const s = Math.sin(radians);
+  return Float32Array.from([1, 0, 0, 0, c, s, 0, -s, c]);
 }
 
+const IDENTITY = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+const transpose = (m) => [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]];
+
+/** A node's parent frame: the parent's world 3x3 with its (uniform) scale divided out, and that scale. */
+function parentFrame(skeleton, worlds, ref) {
+  const parent = skeleton.nodes.get(ref).parent;
+  const world = parent >= 0 ? worlds.get(parent) : null;
+  const scale = world ? Math.hypot(world.a[0], world.a[3], world.a[6]) : 0;
+  if (!(scale > 1e-8)) return { rotation: IDENTITY, scale: 1 };
+  // A unit scale (every retail rig) is left alone: dividing by 1 +- 1e-7 would only add float noise to the pose.
+  if (Math.abs(scale - 1) < 1e-6) return { rotation: world.a, scale: 1 };
+  return { rotation: Array.from(world.a, (v) => v / scale), scale };
+}
+
+/** `turn` (in the root's frame) laid on a node whose parent frame is P: P^T * turn * P * local. */
+const turnedLocal = (local, P, turn) => mat33Mul(mat33Mul(mat33Mul(transpose(P), turn), P), local.rotation);
+
 /**
- * The first-person neck rotation, applied the way RotateController does it (rootSpaceTurn): the pitch is expressed in
- * the OBJECT ROOT's frame and laid on whatever the animation already put there. Doing it in the node's local frame
- * instead would pitch the head sideways as soon as the neck is not axis-aligned.
+ * Lays `turn`, a 3x3 in the actor root's frame, on node `ref`: its world orientation becomes turn * (what the animation
+ * left), and its world position stays. Returns false where the skeleton has no such node.
  */
-export function applyFirstPersonNeck(skeleton, pose, rootRef, skelMats, pitch, aim = 0, offset = null) {
-  const ref = skeleton && skeleton.byName ? skeleton.byName.get(FP_NECK_BONE) : undefined;
-  const sinking = !!(offset && (offset[0] || offset[1] || offset[2]));
-  if (ref === undefined || (!pitch && !sinking)) return false;
-  const world = skelMats(skeleton, pose, rootRef).get(ref);
-  if (!world) return false;
+export function turnInRootFrame(skeleton, pose, rootRef, skelMats, ref, turn) {
+  if (ref === undefined || ref === null || !skeleton?.nodes?.has(ref)) return false;
   const local = pose.get(ref) ?? skeleton.nodes.get(ref).rest;
-  const w = rotationOf(world.a);
-  const rotate = rotNegX(pitch * neckRotateFactor(aim));
-  const rotation = rootSpaceTurn(local.rotation, w, rotate);
-  // RULE 32(a), and it rides the SAME controller as the pitch because it
-  // is the same line of the same function:
-  //   matrix.setTrans(matrix.getTrans() + worldOrientInverse * mOffset);
-  //                                     (rotatecontroller.cpp:52)
-  // worldOrientInverse turns a vector given in the OBJECT ROOT's space
-  // into the neck's own, which is the transpose of the same world 3x3 the
-  // rotation is turned by (a quaternion applied to a vector is the same
-  // turn in either convention - only the product's order flips). Applying the offset in the neck's local
-  // frame instead would sink the body along whatever way the neck
-  // happens to be pointing.
-  let translation = local.translation;
-  if (sinking) {
-    const inv = transpose33(w);
-    translation = [
-      local.translation[0] + inv[0] * offset[0] + inv[1] * offset[1] + inv[2] * offset[2],
-      local.translation[1] + inv[3] * offset[0] + inv[4] * offset[1] + inv[5] * offset[2],
-      local.translation[2] + inv[6] * offset[0] + inv[7] * offset[1] + inv[8] * offset[2],
-    ];
-  }
-  pose.set(ref, { rotation, translation, scale: local.scale });
+  const { rotation: P } = parentFrame(skeleton, skelMats(skeleton, pose, rootRef), ref);
+  pose.set(ref, { rotation: turnedLocal(local, P, turn), translation: local.translation, scale: local.scale });
   return true;
 }
 
 /**
- * BOW-AIM: RotateController's rotation alone on node `ref`
- * (rootSpaceTurn; applyFirstPersonNeck's law with no offset) - `rotate`, a 3x3 in the OBJECT ROOT's space, laid on the
- * node's world rotation as the pose now stands it. Answers false where the skeleton has no such node.
+ * Pitches the view: turns the neck by neckPitchShare(focus) * pitch in the root's frame, and moves it by `offset`, a
+ * shift given in the root's frame (the body sinking, for one). A local translation is measured in the parent's frame,
+ * so the offset goes through the inverse of the parent's world matrix.
+ * Returns false when there is no neck or nothing to apply.
  */
-export function applyRotateController(skeleton, pose, rootRef, skelMats, ref, rotate) {
-  if (ref === undefined || ref === null || !skeleton?.nodes?.has(ref)) return false;
-  const world = skelMats(skeleton, pose, rootRef).get(ref);
-  if (!world) return false;
+export function pitchNeck(skeleton, pose, rootRef, skelMats, pitch, focus = 0, offset = null) {
+  const ref = skeleton && skeleton.byName ? skeleton.byName.get(NECK_BONE) : undefined;
+  const shifted = !!(offset && (offset[0] || offset[1] || offset[2]));
+  if (ref === undefined || (!pitch && !shifted)) return false;
   const local = pose.get(ref) ?? skeleton.nodes.get(ref).rest;
-  const w = rotationOf(world.a);
-  pose.set(ref, { rotation: rootSpaceTurn(local.rotation, w, rotate), translation: local.translation, scale: local.scale });
+  const { rotation: P, scale } = parentFrame(skeleton, skelMats(skeleton, pose, rootRef), ref);
+  const rotation = pitch ? turnedLocal(local, P, pitchDown(pitch * neckPitchShare(focus))) : local.rotation;
+  let translation = local.translation;
+  if (shifted) {
+    const inverse = transpose(P).map((v) => v / scale);
+    translation = [0, 1, 2].map(
+      (row) =>
+        local.translation[row] +
+        inverse[row * 3] * offset[0] +
+        inverse[row * 3 + 1] * offset[1] +
+        inverse[row * 3 + 2] * offset[2],
+    );
+  }
+  pose.set(ref, { rotation, translation, scale: local.scale });
   return true;
 }

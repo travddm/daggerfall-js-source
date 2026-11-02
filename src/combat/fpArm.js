@@ -60,9 +60,9 @@ import {
   armReport, armMeshPaths, bodyParts,
   weaponRecords, dfWeaponToMw, dfWeaponShape, pickWeaponRecord, weaponAttachBone, MW_WEAPON_TYPE,
   ammoTypeFor, arrowAttachBone, ARROW_FALLBACK_NODE, reloadsItself, shootsRatherThanSwings,
-  firstPersonCameraRef, composeStanceGroup, composeWeaponGroup, mwAttackType, attackKeys, MW_SHOOT_ATTACK, strikeReversed,
+  headViewRef, composeStanceGroup, composeWeaponGroup, mwAttackType, attackKeys, MW_SHOOT_ATTACK, strikeReversed,
   weaponShortGroup, calculateWindUp, releaseStartPoint, EQUIP_KEYS, UNEQUIP_KEYS, isRealWeapon,
-  aimingFactor, fpAnimSources, pickAnimSource, anySourceHasGroup, FP_BASE_MODEL, animSourceName,
+  stepAimFocus, fpAnimSources, pickAnimSource, anySourceHasGroup, FP_BASE_MODEL, animSourceName,
   gmstValue, GMST_SNEAK_DELTA, sneakOffset,
   lightRecords, pickTorchRecord, blendMaskBones, overlayTracks, overlaySampler, weaponFlags, MW_TWO_HANDED,   // MW-D51: the held torch
   pickLanternRecord, hangAnchor, hookOnBone, hangAffine,   // HT-WAIST: the lantern at the waist, and the part that hangs
@@ -3067,7 +3067,7 @@ export async function buildFpArm({
     // RULE 54. No third fallback, and no invented camera: a rig with
     // neither node has no first-person view, and saying so is the whole
     // difference between this and the mapper it replaces.
-    const cameraRef = firstPersonCameraRef(arm.skeleton);
+    const cameraRef = headViewRef(arm.skeleton);
     if (cameraRef < 0) {
       return {
         ok: false,
@@ -6239,7 +6239,7 @@ export function createFpArm() {
       // whatever the four-slot winner does with the rest of the body.
       refreshTorch();
       if (torchState) advanceClip(torchState, (torchSource || rig()).keys, dt, null);
-      aimFactor = aimingFactor(aimFactor, accurateAiming(upper), dt);
+      aimFactor = stepAimFocus(aimFactor, accurateAiming(upper), dt);
       // BODY-MOTION: its clocks, after the clips so a blow reads this frame's section (a frame that does not pose still walks)
       // the word the layer reads, a line for each of what it says: the body, its blow, its hands (AUDIT BODY-MOTION RIG-10)
       motion.step(dt, motionWord({
