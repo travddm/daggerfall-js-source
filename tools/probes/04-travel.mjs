@@ -8,7 +8,27 @@ import { TOWN_URL, enterTown, nativeClick, clearBoxes } from './lib/town.mjs';
 
 export const name = 'travel';
 
+/**
+ * A wild foe near the road stops a journey the way Daggerfall's does (the avoid-encounter box, the clock back at x1):
+ * the game is right to stop, and a trip that was stopped is not a trip to judge. Its attempt ends with 'stopped by foe',
+ * and the next one boots a fresh world (the wild's foes are rolled per boot).
+ */
+const ATTEMPTS = 4;
+
 export async function run({ browser, base, ck }) {
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+    const rows = [];
+    const outcome = await tryTrip({ browser, base, ck: (...r) => rows.push(r) });
+    if (outcome === 'stopped by foe' && attempt < ATTEMPTS) {
+      console.log(`   attempt ${attempt}: a foe stopped the trip; a fresh boot`);
+      continue;
+    }
+    for (const r of rows) ck(...r);
+    return;
+  }
+}
+
+async function tryTrip({ browser, base, ck }) {
   const g = new Game(browser, base);
   const travelState = () => g.J(() => window.__travelProbe());
   const travelMap = () => g.J(() => window.__travelMap());
@@ -81,7 +101,6 @@ export async function run({ browser, base, ck }) {
     let lastLine = 0;
     let lastState = null;
     let idleSince = 0;
-    let dumped = false;
     const landed = await g.until(
       async () => {
         const t = await travelState();
@@ -96,21 +115,20 @@ export async function run({ browser, base, ck }) {
           lastLine = Date.now();
           console.log(`   [${Math.round((Date.now() - t0) / 1000)}s] pixel ${pixel}, frame ${await g.frame()}, journey ${JSON.stringify(j)}`);
         }
-        // A trip that is back at x1 short of its place was stopped (a foe, a box): say what stood in its way, once
-        idleSince = j.scale === 1 ? idleSince || Date.now() : 0;
-        if (!dumped && idleSince && Date.now() - idleSince > 90000) {
-          dumped = true;
-          const world = await g.page.evaluate(() => JSON.stringify({ overworld: window.__overworld?.(), mode: window.__mode?.(), overlay: window.__overlayKind?.() }));
-          console.log(`   [stopped short at ${pixel}] ${world}`);
-          await g.shot('travel-stopped');
-          g.diagnostics('travel stopped short', 40);
-        }
         if (Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1) return true;
+        // A trip that is back at x1 short of its place was stopped (a foe, a box): a foe near with the avoid-encounter box up is the game stopping it
+        idleSince = j.scale === 1 ? idleSince || Date.now() : 0;
+        if (idleSince && Date.now() - idleSince > 30000) {
+          const world = await g.page.evaluate(() => ({ danger: window.__overworld?.().danger, overlay: window.__overlayKind?.() }));
+          console.log(`   [stopped short at ${pixel}] ${JSON.stringify(world)}`);
+          if (world.danger && world.overlay === 'ActionTextBox') return 'stopped by foe';
+        }
         return Date.now() - movedAt > STALL_MS || Date.now() - t0 > ABSOLUTE_MS ? 'gave up' : false;
       },
       ABSOLUTE_MS + 60000,
       1000,
     );
+    if (landed === 'stopped by foe') return landed;
     if (landed === 'gave up') console.log(`  --- the journey stopped moving; last state ${JSON.stringify(lastState)}`);
     await g.until(() => g.page.evaluate(() => window.__streamIdle?.() === true), 240000);
     const after = await travelState();
