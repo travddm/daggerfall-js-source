@@ -97,7 +97,7 @@ frame seconds = clamp(0.04, 0.4, 3 * (115 - min(speed, 100)) / 980 * heft * hand
 - The Speed term is `GetMeleeWeaponAnimTime` as DFU has it (`swingTempo` is its ratio to Speed 50). Speed past 100
   reads as 100.
 - `swingHeft(weightKg, strength)`: weight above 2.5 kg slows the swing, less with high Strength, at most +8%.
-- `swingHandling`: per weapon type, from 0.9 (dagger, bare hands) to 1.04 (warhammer); two-handers x1.03; every short
+- `swingHandling`: per weapon type, from 0.9 (dagger, bare hands) to 1.04 (war hammer); two-handers x1.03; every short
   blade handles as a dagger. The slowest product is 1.157, so a build at Speed 100 keeps at least 86% of DFU's swing
   rate.
 - `registerSwingPaceMod` lets powers speed the swing (at most `SWING_PACE_MOST`, 50%).
