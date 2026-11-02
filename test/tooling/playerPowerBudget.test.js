@@ -16,7 +16,9 @@ const averageRows = (report) => report.rows.filter((row) => row.foeKind === 'ave
  *  1.38 / 2.42 / 1.86 / 1.79 / 1.40 with the port's flattened swing law; B3 gave the swing DFU's Speed line back (a Speed-100
  *  build swings 2.1 times as often as a Speed-75 one in DFU's own formula), which lifts every build that swings, and took the
  *  x1.5 off the skill and the doubled Strength term off the bow, which lowered the archer. A ceiling later lanes (B4 gear, B5
- *  health and the Firmament tree, the spell magnitudes) lower toward 1.5 and never raise. */
+ *  health and the Firmament tree, the spell magnitudes) lower toward 1.5 and never raise. The owner accepted these higher
+ *  values for B3: B4 (loot affixes) and B5 (health) rescale the remaining stacks at their source to bring maxed builds
+ *  back near 1.5. */
 const MAXED_POWER_MOST = Object.freeze({ warrior: 2.33, archer: 2.31, spellsword: 2.17, mage: 2.02, thief: 2.36 });
 
 test('budget: the nets are the ones B1 set (the blow +75.4%, the hurt keeps 74%) and sit above a normal kit', () => {
