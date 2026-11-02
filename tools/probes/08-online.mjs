@@ -11,7 +11,7 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { Game, sleep } from './lib/harness.mjs';
+import { Game } from './lib/harness.mjs';
 import { editsPlugin } from '../frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from '../onlineFrameProbe.mjs';
 import { standServices, stopAll, localFetch, botStorage, LOAD_SERVICE } from '../loadHarness.mjs';
@@ -175,38 +175,48 @@ export async function run({ browser, base, ck }) {
         await g.key(i % 2 ? 'Escape' : 'Enter');
       }
     }
-    const say = async (g) => {
-      await g.page.keyboard.press('Enter');
-      // the key is handled on a frame, and a frame takes seconds in software GL: type only once the field has the focus,
-      // or the letters fall on the key bindings (the journal opens)
-      await g.until(
-        () => g.page.evaluate(() => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)),
-        120000,
-        250,
-      );
-      await g.page.keyboard.type(line, { delay: 20 });
-      await g.page.keyboard.press('Enter');
-    };
-    await say(a);
-    // a first line is held behind the code of conduct (SAFE1): agree to it, then say the line again
+    // Enter focuses the chat field; the key is handled on a frame, and a frame takes seconds in software GL. Each step waits
+    // on the game's state (the field has the focus, the conduct card is up, the line stands in the log), never on a time:
+    // typing before the field has the focus drops the letters on the key bindings (the journal opens).
     const agree = a.page.getByRole('button', { name: 'I agree' });
-    if (
-      await agree.waitFor({ timeout: 60000 }).then(
-        () => true,
-        () => false,
-      )
-    ) {
-      // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
-      await agree.evaluate((b) => b.click());
-      await sleep(800);
-      await say(a);
+    const inLog = (g) => g.page.evaluate((t) => document.body.innerText.includes(t), line);
+    const fieldFocused = (g) =>
+      g.page.evaluate(() => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName));
+    const agreeShown = () => agree.isVisible().catch(() => false);
+    let agreed = false;
+    for (let attempt = 1; attempt <= 6 && !(await inLog(a)); attempt++) {
+      await a.page.keyboard.press('Enter');
+      // a first line is held behind the code of conduct (SAFE1): the card may come instead of the field
+      const got = await a.until(async () => ((await fieldFocused(a)) ? 'field' : (await agreeShown()) ? 'card' : null), 120000, 250);
+      lap(`chat attempt ${attempt}: ${got}`);
+      if (got === 'card') {
+        // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
+        await agree.evaluate((btn) => btn.click());
+        agreed = true;
+        await a.until(async () => !(await agreeShown()), 60000, 250);
+        continue;
+      }
+      if (got !== 'field') continue;
+      await a.page.keyboard.type(line, { delay: 20 });
+      await a.page.keyboard.press('Enter');
+      // the line stands in the sender's log, or the card has come up and the next attempt agrees
+      await a.until(async () => (await inLog(a)) || (await agreeShown()), 60000, 250);
     }
+    lap(`chat line sent (conduct agreed: ${agreed})`);
     await a.shot('07-alice-chat');
     const heard = await b.until(() => b.page.evaluate((t) => document.body.innerText.includes(t), line), 180000, 500);
     await b.shot('07-bob-chat');
     ck('the chat line reaches bob', !!heard, line);
     const sent = await a.page.evaluate((t) => document.body.innerText.includes(t), line);
     ck("and stands in alice's own log", sent, line);
+    if (!heard || !sent) {
+      for (const g of [a, b]) {
+        g.diagnostics(`${g.label}'s page`, 60);
+        console.log(`      ${g.label}'s text: ${(await g.page.evaluate(() => document.body.innerText)).replace(/s+/g, ' ').slice(-500)}`);
+      }
+      console.log(`  --- account service log tail
+${svc.account.log.slice(-2500)}`);
+    }
 
     for (const g of players) g.noErrors(ck, `${g.label}'s page`);
   } finally {

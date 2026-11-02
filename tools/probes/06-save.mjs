@@ -22,11 +22,23 @@ const snapshot = (g) =>
         .filter((i) => i.group !== 'Currency')
         .map((i) => `${i.name}x${i.stackCount ?? 1}`)
         .sort(),
+      // every piece as the game holds it, for the dump of a failed comparison
+      pack: items.map((i) => JSON.stringify(i).slice(0, 400)),
+      saves: window.__saveKeys?.() ?? null,
       pixel: window.__currentPixel(),
       pos: window.__player.pos.map((v) => Math.round(v * 10) / 10),
       mode: window.__mode(),
     };
   });
+
+/** The two snapshots item by item: the pack lines that only one side holds, and the saves the page can see. */
+const dump = (g, label, a, b) => {
+  console.log(`  --- ${label}: gold ${a.gold} -> ${b.gold}, pack ${a.pack.length} -> ${b.pack.length}`);
+  console.log(`      saves before: ${a.saves}\n      saves after:  ${b.saves}`);
+  for (const l of a.pack.filter((x) => !b.pack.includes(x))) console.log(`      only before: ${l}`);
+  for (const l of b.pack.filter((x) => !a.pack.includes(x))) console.log(`      only after:  ${l}`);
+  g.diagnostics(label, 60);
+};
 
 const sameAs = (a, b) => {
   const d = [];
@@ -82,6 +94,7 @@ export async function run({ browser, base, ck }) {
     const loaded = await snapshot(g);
     const diff = sameAs(saved, loaded);
     ck('loading in the page restores the save', diff.length === 0, diff.join('; '));
+    if (diff.length) dump(g, 'in-page load', saved, loaded);
 
     // across a reload: the page boots anew, the boot door loads the most recent save
     await g.page.evaluate(() => window.__quickSave('probe-save'));
@@ -96,6 +109,7 @@ export async function run({ browser, base, ck }) {
       diff2.length === 0,
       diff2.join('; ') || `${after.gold}g, ${after.items.length} items, level ${after.level}`,
     );
+    if (diff2.length) dump(g, 'reload and load', before, after);
     g.noErrors(ck, 'save and load');
   } finally {
     await g.close();
