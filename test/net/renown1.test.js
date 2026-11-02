@@ -20,7 +20,7 @@ import { ROUTES, OPEN_ROUTES } from '../../server-account/src/service.js';
 import {
   RENOWN_MAX, RENOWN_XP_MAX, renownXpFor, renownForXp, renownProgress, renownProgressText, renownText,
   renownKillXp, renownQuestXp, renownPartyXp, renownBonus, RENOWN_XP_REPORT_MAX, RENOWN_XP_HOUR_MAX, RENOWN_TRACKS_MAX, RENOWN_REPORT_MS,
-  RENOWN_KILL_XP_PER_LEVEL, RENOWN_KILL_LEVEL_MAX, RENOWN_PARTY_COUNT_MAX, RENOWN_HP_PER_LEVEL, RENOWN_MP_PER_LEVEL, renownRate,
+  RENOWN_KILL_XP_PER_LEVEL, RENOWN_KILL_LEVEL_MAX, RENOWN_PARTY_COUNT_MAX, RENOWN_MP_PER_LEVEL, renownRate,
 } from '../../src/net/renown.js';
 import {
   claimsValid, mintToken, verifyToken, orderValid, mintOrder, mintRenownOrder, verifyOrder, renownIssuable, ORDER_KINDS,
@@ -31,7 +31,7 @@ import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
 import { accountTokenMinter, accountRenown, SESSION_KEY, REFUSALS } from '../../src/net/accountClient.js';
 import { createRenownTracker, renownFoeStruck, renownFoeDied, renownFoeLevel, setRenownKillHandler, RENOWN_ASSIST_MS, _resetRenownKillsForTests } from '../../src/net/renownTracker.js';
-import { setRenownLayer, offlineVitals, keepFraction, renownHpOf, renownMpOf } from '../../src/systems/renownLayer.js';
+import { setRenownLayer, setOnlineLayerExtra, offlineVitals, keepFraction, renownHpOf, renownMpOf } from '../../src/systems/renownLayer.js';
 import { defineLiveMaxHealth, defineLiveMaxMagicka } from '../../src/systems/chargen.js';
 import { snapshotPlayer } from '../../src/systems/save/save.js';
 import { createNameLayer } from '../../src/ui/nameLayer.js';
@@ -107,7 +107,7 @@ test('RENOWN1 the curve: EverQuest\'s shape in integers - level 2 at 100, 10 at 
   for (const bad of [0, 51, 1.5, '12', null, undefined]) assert.equal(renownText(bad), null, `${bad} is no level`);
 });
 
-test('RENOWN1 the rules: a kill is ten to its foe\'s level (clamped 1..30) and a quest 100 + 40 a character level at the full rate - RENOWN-ACCOUNT pays three quarters of both (7.5 a foe level, 75 + 30 a character level); a party adds 10% a head beyond the first up to its eight seats; the online bonus is 3 health and 2 magicka a level past the first - level 1 adds nothing, level 50 adds 147 and 98 (mutants: a party that SPLITS the kill; the bonus from level 0; a clamp unread)', () => {
+test('RENOWN1 the rules: a kill is ten to its foe\'s level (clamped 1..30) and a quest 100 + 40 a character level at the full rate - RENOWN-ACCOUNT pays three quarters of both (7.5 a foe level, 75 + 30 a character level); a party adds 10% a head beyond the first up to its eight seats; the online bonus is 2 magicka a level past the first and no health (B5) - level 1 adds nothing, level 50 adds 0 and 98 (mutants: a party that SPLITS the kill; the bonus from level 0; a clamp unread)', () => {
   // RENOWN3 reads both against the Renown; at the cap's Renown nothing is read lower, so these are the RENOWN1 rules
   // themselves at RENOWN-ACCOUNT's rate (test/net/renown3.test.js holds the ceiling, test/server/renown_account.test.js the rate)
   assert.equal(renownKillXp(1, RENOWN_MAX), 7);
@@ -122,8 +122,8 @@ test('RENOWN1 the rules: a kill is ten to its foe\'s level (clamped 1..30) and a
   assert.equal(renownPartyXp(100, 99), 100 + 10 * (RENOWN_PARTY_COUNT_MAX - 1));
   assert.equal(renownPartyXp(100, 0), 100);
   assert.deepEqual(renownBonus(1), { hp: 0, mp: 0 });
-  assert.deepEqual(renownBonus(2), { hp: RENOWN_HP_PER_LEVEL, mp: RENOWN_MP_PER_LEVEL });
-  assert.deepEqual(renownBonus(50), { hp: 147, mp: 98 });
+  assert.deepEqual(renownBonus(2), { hp: 0, mp: RENOWN_MP_PER_LEVEL });
+  assert.deepEqual(renownBonus(50), { hp: 0, mp: 98 });
   assert.deepEqual(renownBonus(99), renownBonus(50));
   assert.equal(RENOWN_XP_REPORT_MAX, 5000);
   assert.equal(RENOWN_XP_HOUR_MAX, 15000, 'RENOWN-ACCOUNT: a quarter off the 20,000, as every source');
@@ -495,6 +495,7 @@ const liveEntity = () => {
 test('RENOWN1 the layer: "On top" - both live maximums read the level\'s bonus over everything they already sum, health and magicka keep their FRACTION as it goes on, rises and comes off; a level-up adds to the stored health and never the layer; the lycanthrope\'s limiter caps Daggerfall\'s own maximum and the layer rides above it; 0 stays 0 (mutants: the bonus in the stored value; current health left behind; the fraction lost)', () => {
   const e = liveEntity();
   assert.deepEqual([e.maxHealth, e.health, e.maxMagicka, e.magicka], [80, 60, 50, 50]);
+  setOnlineLayerExtra(e, { hp: 33 });   // B5: Renown adds no health; the layer's health is the floor's and the Firmament's, stood in for here
   assert.deepEqual(setRenownLayer(e, 12), { hp: 33, mp: 22 });
   assert.deepEqual([e.maxHealth, e.health, e.maxMagicka, e.magicka], [113, 85, 72, 72], 'three quarters stays three quarters; full stays full');
   assert.equal(e.rawMaxHealth, 80, 'the stored health never takes the layer');
@@ -517,6 +518,7 @@ test('RENOWN1 the layer: "On top" - both live maximums read the level\'s bonus o
 test('RENOWN1 the save: a save written online is the save the character would have written offline - the stored maximum health, and current health, magicka and maximum magicka taken back through the layer at their fraction; nothing of the layer rides (mutants: the layered health saved; the layered magicka maximum saved)', () => {
   const e = liveEntity();
   Object.assign(e, { name: 'Mara', level: 3, stats: { intelligence: 50 }, skills: [], items: [], spells: [], activeEffects: [] });
+  setOnlineLayerExtra(e, { hp: 57 });   // B5: Renown adds no health; 57 stands in for the floor's and the Firmament's
   setRenownLayer(e, 20);   // +57 health, +38 magicka
   e.health = e.maxHealth;
   e.magicka = Math.round(e.maxMagicka / 2);

@@ -126,7 +126,7 @@ beforeEach(() => { _resetFirmamentLiveForTests(); _resetFirmamentPowersForTests(
 
 // ─── LANE 1: the law, the sky and the powers ────────────────────────
 
-test('AUDIT UICALM-FIRM1 L1 H1: a key star\'s raw points and a small star\'s share are ONE channel - the build that made +21 Strength and +86 Health makes +15 and +75, the budget\'s', () => {
+test('AUDIT UICALM-FIRM1 L1 H1: a key star\'s raw points and a small star\'s share are ONE channel - the build that made +21 Strength makes +15, the budget\'s; B5: its Health is the card\'s points and share, a few per cent of the body, under no sum over both', () => {
   const t = walk('wr.start', 'wr.c7.2', named('Warlord'), named('Headsman'), named("Giant's Heart"), named("Troll's Blood"), named('Shield Wall'), named("The Lady's Favor"), named('Reaver'));
   const c = treeStats(t);
   assert.ok(c.strength > 0 && c['pct.strength'] > 0 && c.hp > 0 && c.hpPct > 0, 'the build carries both kinds of each');
@@ -137,7 +137,9 @@ test('AUDIT UICALM-FIRM1 L1 H1: a key star\'s raw points and a small star\'s sha
   const s0 = liveStat(p, 'strength'), h0 = p.maxHealth;
   setFirmamentOnline(true); setFirmamentTree(t); computeEntityMods(p); firmamentLayer(p);
   assert.equal(liveStat(p, 'strength') - s0, statDef('strength').max, 'Strength +15');
-  assert.equal(p.maxHealth - h0, statDef('hp').max, 'Health +75');
+  const body = 600 + p.evenHp;
+  assert.equal(p.maxHealth - h0, c.hp + Math.floor((body * c.hpPct) / 100), 'Health: the raw points and the share of the floored body, as the cards print them');
+  assert.ok((p.maxHealth - h0) / body < 0.07, 'a few per cent of the body');
 });
 
 test('FIRM2: a Strength already at 100 still takes the stars\' points, up to the sky\'s own +15 and no further', () => {
@@ -523,7 +525,7 @@ test('AUDIT UICALM-FIRM1 L5 H4: every craft route takes the tree\'s hand on its 
 
 test('AUDIT UICALM-FIRM1 L5 M3: the budget\'s numbers as the design page says them, and every price small, whichever way its channel reads', () => {
   const at = (k) => [STAT_DEFS[k].min, STAT_DEFS[k].max];
-  assert.deepEqual([STAT_DEFS.strength.max, statDef('skill.LongBlade').max, STAT_DEFS.hp.max, STAT_DEFS.mp.max], [15, 15, 75, 75]);
+  assert.deepEqual([STAT_DEFS.strength.max, statDef('skill.LongBlade').max, STAT_DEFS.hp.max, STAT_DEFS.mp.max], [15, 15, 15, 75]);
   assert.deepEqual([at('spellPower')[1], at('castCost')[1], at('castSpeed')[1], at('blowTaken')[0], at('evade')[1]], [30, 25, 15, -15, 10]);
   assert.deepEqual([BLOW_CAP, BLOW_TOTAL_CAP, CAST_COST_CAP], [30, 50, 25]);
   assert.deepEqual([REFUND_FREE_BELOW_RENOWN, REFUND_SILVER_PER_STAR, FIRM_RESPEC_GOLD, FIRM_RENOWN_MAX], [10, 10, 10_000, 50]);

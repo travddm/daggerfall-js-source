@@ -180,7 +180,7 @@ test('POWER-CEILING THE PATHS AND THE SKY (AUDIT HORIZONTAL D8): every number of
   const SKY_STRONGEST = {
     absorb: 15, 'act:life': 40, armor: 10, attribute: 15, axeDmg: 30, beastDmg: 30, blowCap: 30, blowTaken: 15, blowTotal: 50, bluntDmg: 30,
     bowDmg: 30, carry: 40, castCost: 25, 'castCost:combat': 20, castCostCap: 25, castSpeed: 15, coldDegrees: 10, daedraDmg: 30, dry: 40,
-    evade: 10, fallLess: 40, fatigueLess: 40, fistDmg: 30, heatDegrees: 10, hp: 75, hpPct: 15, hpRegen: 10, killHeal: 6, killMana: 6,
+    evade: 10, fallLess: 40, fatigueLess: 40, fistDmg: 30, heatDegrees: 10, hp: 15, hpPct: 8, hpRegen: 10, killHeal: 6, killMana: 6,
     longDmg: 30, meleeDmg: 30, mp: 75, mpPct: 15, mpRegen: 10, 'pct:combat': 15, 'pct:life': 15, rageDmg: 25, 'resist:combat': 20,
     sailSpeed: 15, shortDmg: 30, 'skill:combat': 15, 'skill:life': 20, 'skillPct:combat': 20, 'skillPct:life': 25, spellPierce: 10,
     spellPower: 30, spellTaken: 15, standing: 10, unawareDmg: 40, undeadDmg: 30, warmth: 6, weaponDmg: 30, 'xp:life': 35, 'yield:life': 30,

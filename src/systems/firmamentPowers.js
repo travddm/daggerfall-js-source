@@ -214,7 +214,7 @@ export function firmamentLayer(entity = me()) {
   if (!entity) return;
   const baseHp = Number.isFinite(entity.rawMaxHealth) ? entity.rawMaxHealth : (entity.maxHealth ?? 0) - renownHpOf(entity);
   const baseMp = (entity.maxMagicka ?? 0) - renownMpOf(entity);
-  // AUDIT UICALM-FIRM1 L1 H1: the raw points and the share together inside the budget (+75 Health, +75 Spell Points)
+  // AUDIT UICALM-FIRM1 L1 H1: the raw points and the share together inside the budget (+75 Spell Points; B5: Health is held by its two channels' own sums)
   // LEVEL-EVEN (systems/levelEven.js): and the stars' Endurance, which the online health floor reads
   const end = attributeGain(entity, 'endurance', (key) => c[key] ?? 0);   // an attribute is a combat channel (firmamentLaw.js statDef)
   // AUDIT LEVEL-EVEN L2-4: a small star's share is of the body the floor stands the stored one at (never of the layer)
