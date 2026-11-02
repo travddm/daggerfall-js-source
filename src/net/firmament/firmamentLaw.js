@@ -111,13 +111,15 @@ export const STAT_DEFS = Object.freeze({
   blowTaken: def('combat', 30, (v) => pctLess(v, 'damage from blows'), -15),
   spellTaken: def('combat', 30, (v) => pctLess(v, 'damage from spells and other harm'), -15),
   armor: def('combat', 10, (v) => `${signed(v)} to Armor Rating`),
-  hp: def('combat', 75, (v) => `${signed(v)} maximum Health`, 0),
+  // B5: Health is a few per cent of a body - the key stars' raw points 15 at most and the small stars' share 8% (the tree's sums, no cap
+  // above them), where it was 75 and 15% (a quarter of a level-45 body) beside Renown's 147
+  hp: def('combat', 15, (v) => `${signed(v)} maximum Health`, 0),
   mp: def('combat', 75, (v) => `${signed(v)} maximum Spell Points`, 0),
   // RAW ON THE KEY STARS, PERCENT ON THE SMALL (the lead dev, 2026-10-13: "combined with the ascend system you will get
   // waaay to many stat points just add stats with raw numbers to the key nodes and percentages to the smaller ones"): a
   // small star's Health and Spell Points are a share of the character's own, as its attributes and skills are (pct.*,
   // skillPct.* below)
-  hpPct: def('combat', 15, (v) => `${signed(v)}% maximum Health`, 0),
+  hpPct: def('combat', 8, (v) => `${signed(v)}% maximum Health`, 0),
   mpPct: def('combat', 15, (v) => `${signed(v)}% maximum Spell Points`, 0),
   hpRegen: def('combat', 10, (v) => `${(v / 10).toFixed(1)}% of Health restored each round`, 0),
   mpRegen: def('combat', 10, (v) => `${(v / 10).toFixed(1)}% of Spell Points restored each round`, 0),
@@ -167,6 +169,12 @@ const SKILL_PCT_DEF = Object.freeze({
 });
 /** The raw points a share of `base` comes to: whole, toward nothing. */
 export const pctOf = (base, pct) => (Number.isFinite(base) && base > 0 && pct > 0 ? Math.floor((base * pct) / 100) : 0);
+/** The Health the sky gives a body of `body` (the stored maximum with the online floor in it): the key stars' raw points and the
+ *  small stars' share together. `c` is the tree's capped totals (`treeStats`): each channel is held to its own sum, and the two
+ *  together are held to nothing (B5; the +75 budget over both is gone, so a card's number is what applies). Whole. */
+export function firmamentHealth(c, body) {
+  return (c.hp ?? 0) + pctOf(body, c.hpPct ?? 0);
+}
 const profName = (p) => cap1(p);
 const SKILL_DEF = Object.freeze({
   combat: Object.freeze(Object.fromEntries(COMBAT_SKILLS.map((n) => [n, def('combat', 15, (v) => `${signed(v)} ${SKILL_WORDS(n)}`)]))),

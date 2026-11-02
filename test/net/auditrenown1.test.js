@@ -44,7 +44,7 @@ import {
   renownFoeRevived, renownFoeLevel, setRenownKillHandler, _resetRenownKillsForTests,
 } from '../../src/net/renownTracker.js';
 import { KNIGHT_CITY_WATCH } from '../../src/characters/mobile/mobileTypes.js';
-import { setRenownLayer, offlineVitals, keepFraction } from '../../src/systems/renownLayer.js';
+import { setRenownLayer, setOnlineLayerExtra, offlineVitals, keepFraction } from '../../src/systems/renownLayer.js';
 import { defineLiveMaxHealth, defineLiveMaxMagicka } from '../../src/systems/chargen.js';
 import { lycanthropyMagicRound, cureLycanthropy, createLycanthropyCurse, currentMaxHealth, NEED_TO_KILL_PERIOD } from '../../src/systems/lycanthropy.js';
 import { LYCANTHROPY_TYPES } from '../../src/systems/infection.js';
@@ -431,6 +431,7 @@ const liveEntity = (over = {}) => {
 
 test('AUDIT RENOWN1 GAME-4: the layer rides ABOVE the lycanthrope\'s limiter - a Renown 50 werewolf keeps its 147 through the urge (it fell to 100 of 100), the urge\'s clamp and every full heal read the same ceiling, and the cure heals to the whole maximum (it left 100 of 247) (mutants: the limiter capping the layer; the cure to the raw value)', () => {
   const e = liveEntity();
+  setOnlineLayerExtra(e, { hp: 147 });   // B5: Renown adds no health; 147 stands in for the floor's and the Firmament's
   setRenownLayer(e, 50);
   assert.equal(e.maxHealth, 247);
   e.health = 247;

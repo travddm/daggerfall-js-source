@@ -25,6 +25,8 @@ import { registerSpellPowerMod } from '../../src/systems/spell/spellPower.js';
 import { SPELL_POWER_MOST as LOOT_SPELL_POWER_MOST } from '../../src/systems/loot/lootPowers.js';
 import { registerSwingPaceMod } from '../../src/characters/weaponStates.js';
 import { evenHpFloor } from '../../src/systems/levelEven.js';
+import { renownBonus, RENOWN_MAX } from '../../src/net/renown.js';
+import { firmamentHealth, statDef } from '../../src/net/firmament/firmamentLaw.js';
 import { playerDamageMods, registerPlayerDamageMod } from '../../src/characters/playerEntity.js';
 import { liveStat } from '../../src/systems/statMods.js';
 import { mintKit, wearKit } from './gear.mjs';
@@ -38,6 +40,7 @@ export const LAYERS = Object.freeze({
   master: 'Master Skills: mastered skills climb to 200 and read up to 140 (entity.masterSkills)',
   online: 'Online-only rules: the level law (systems/levelClimb.js), the blow and pace of a weapon skill past 100 (systems/weaponMastery.js), school potency and spell cost past 100',
   onlineHealth: 'Online health floor: Endurance repays every earlier level (systems/levelEven.js evenHpFloor)',
+  skyHealth: "The online layer's other health, at its most: Renown's at Renown 50 (net/renown.js renownBonus) and the Firmament's at its channels' caps (net/firmament/firmamentLaw.js firmamentHealth). Not in the default set",
   hero: "Hero's threat: foes grow with player level past 30 (systems/heroThreat.js)",
   power: 'Loot-ladder gear: a damage line on the weapon, an armour line on each piece (systems/loot/lootRarity.js)',
   techniques: 'Weapon techniques: a burst of 1.2 to 1.8 times a blow every cooldown, on a gear tier that rolls one (combat/technique/techniqueRoster.js)',
@@ -46,9 +49,9 @@ export const LAYERS = Object.freeze({
   virtue: 'Oblivion-style levelling: 12 attribute points a level instead of 5 (mod oblivion-remaster-leveling)',
 });
 export const LAYER_NAMES = Object.freeze(Object.keys(LAYERS));
-/** `virtue` is a per-character choice offline and is off in the room; `ceiling` is the maxed character, a scenario and not the
- *  room as played. The default set leaves both out. */
-const OUT_OF_DEFAULT = new Set(['virtue', 'ceiling']);
+/** `virtue` is a per-character choice offline and is off in the room; `ceiling` and `skyHealth` are the maxed character, a scenario and
+ *  not the room as played (Renown and a full Firmament tree are a long climb). The default set leaves all three out. */
+const OUT_OF_DEFAULT = new Set(['virtue', 'ceiling', 'skyHealth']);
 export const DEFAULT_LAYERS = Object.freeze(LAYER_NAMES.filter((name) => !OUT_OF_DEFAULT.has(name)));
 
 const DEFAULT_CAREER = Object.freeze({
@@ -155,6 +158,11 @@ export function oursCharacter(build, level, layers, { gearPercentile, override =
   for (const item of [kit.weapon, ...kit.armour]) item.maxCondition = item.currentCondition = UNBREAKABLE;
   if (layers.has('onlineHealth')) {
     entity.maxHealth = Math.max(entity.maxHealth, evenHpFloor(entity, entity.stats.endurance));
+    entity.health = entity.maxHealth;
+  }
+  if (layers.has('skyHealth')) {
+    const sky = { hp: statDef('hp').max, hpPct: statDef('hpPct').max };
+    entity.maxHealth += renownBonus(RENOWN_MAX).hp + firmamentHealth(sky, entity.maxHealth);
     entity.health = entity.maxHealth;
   }
   return { entity, kit, progression, build };

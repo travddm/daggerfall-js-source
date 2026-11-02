@@ -32,7 +32,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { SKILLS, SKILL_KEYS, permanentSkillValue } from './skills.js';
-import { ATTRIBUTES, COMBAT_SKILLS, LIFE_SKILLS, FIRM_ELEMENTS, blowPct, castCostPct, statDef, pctOf } from '../net/firmament/firmamentLaw.js';
+import { ATTRIBUTES, COMBAT_SKILLS, LIFE_SKILLS, FIRM_ELEMENTS, blowPct, castCostPct, statDef, pctOf, firmamentHealth } from '../net/firmament/firmamentLaw.js';
 import { firmamentStats, firmamentStatsAt, onFirmamentChange, firmamentInForce } from './firmamentLive.js';
 import { mentorPowerScale } from './mentorMode.js';   // MENTOR2: the combat stars at the mentor's share
 import { sigilDueling } from './sigil/sigil.js';
@@ -214,12 +214,12 @@ export function firmamentLayer(entity = me()) {
   if (!entity) return;
   const baseHp = Number.isFinite(entity.rawMaxHealth) ? entity.rawMaxHealth : (entity.maxHealth ?? 0) - renownHpOf(entity);
   const baseMp = (entity.maxMagicka ?? 0) - renownMpOf(entity);
-  // AUDIT UICALM-FIRM1 L1 H1: the raw points and the share together inside the budget (+75 Health, +75 Spell Points)
+  // AUDIT UICALM-FIRM1 L1 H1: the raw points and the share together inside the budget (+75 Spell Points; B5: Health is held by its two channels' own sums)
   // LEVEL-EVEN (systems/levelEven.js): and the stars' Endurance, which the online health floor reads
   const end = attributeGain(entity, 'endurance', (key) => c[key] ?? 0);   // an attribute is a combat channel (firmamentLaw.js statDef)
   // AUDIT LEVEL-EVEN L2-4: a small star's share is of the body the floor stands the stored one at (never of the layer)
   const floored = baseHp + (Number.isFinite(entity.rawMaxHealth) ? evenHpOf(entity, (entity.stats?.endurance ?? NaN) + end) : 0);
-  setOnlineLayerExtra(entity, { hp: capAt('hp', (c.hp ?? 0) + pctOf(floored, c.hpPct ?? 0)), mp: capAt('mp', (c.mp ?? 0) + pctOf(baseMp, c.mpPct ?? 0)), end });
+  setOnlineLayerExtra(entity, { hp: firmamentHealth(c, floored), mp: capAt('mp', (c.mp ?? 0) + pctOf(baseMp, c.mpPct ?? 0)), end });
 }
 
 // ── registered at import ───────────────────────────────────────────

@@ -30,7 +30,7 @@
 // a character can go back and forth between the two forever.
 //
 // Online, and only online, the level adds `renownBonus(level)` to the
-// character's maximum health and magicka: a layer put on when
+// character's maximum magicka (B5: not its health): a layer put on when
 // the character comes online, taken off when it leaves, and never
 // written to a save (systems/renownLayer.js).
 //
@@ -225,18 +225,19 @@ export function renownPartyXp(xp, present) {
 
 /* ═══ WHAT IT GIVES, ONLINE ═══════════════════════════════════════════
  *
- * "On top" (Mac): Daggerfall's own maximum health and magicka are what
- * they always were, and online the level ADDS to both. Level 1 adds
- * nothing, so a character with no track yet plays online exactly as it
- * plays offline; level 50 adds 147 health and 98 magicka.
+ * "On top" (Mac): Daggerfall's own maximum magicka is what it always was, and online the level ADDS to it. Level 1 adds
+ * nothing, so a character with no track yet plays online exactly as it plays offline; level 50 adds 98 magicka.
+ *
+ * B5 (balance lane): Renown adds NO health. It added 3 a level (147 at level 50, on top of the Endurance floor and the
+ * Firmament), a share of a body that grew with no cost and that Daggerfall Unity does not have. The balance harness's
+ * `skyHealth` layer measures what the online layer's health adds to a fight.
  */
-export const RENOWN_HP_PER_LEVEL = 3;
 export const RENOWN_MP_PER_LEVEL = 2;
 
-/** The health and magicka a level adds online. */
+/** The health and magicka a level adds online: no health (B5), `RENOWN_MP_PER_LEVEL` magicka a level past the first. */
 export function renownBonus(level) {
   const L = clampInt(level, 1, RENOWN_MAX);
-  return { hp: RENOWN_HP_PER_LEVEL * (L - 1), mp: RENOWN_MP_PER_LEVEL * (L - 1) };
+  return { hp: 0, mp: RENOWN_MP_PER_LEVEL * (L - 1) };
 }
 
 /* ═══ THE SERVICE'S BOUNDS ════════════════════════════════════════════

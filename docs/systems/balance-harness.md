@@ -50,6 +50,7 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 | `master` | Master Skills: mastered skills climb to 200 and read up to 140. |
 | `online` | Online-only rules: the level law, the weapon skill's blow and pace past 100, school potency and spell cost past 100. |
 | `onlineHealth` | The online health floor (`evenHpFloor`). |
+| `skyHealth` | The online layer's other health at its most: Renown's (`renownBonus`, Renown 50) and the Firmament's at its channels' sums (`firmamentHealth`). Off by default; the maxed character adds it (`+ceiling,+skyHealth`). |
 | `hero` | Hero's threat: plain foes grow with player level past 30 (`heroThreat`). |
 | `power` | Loot-ladder gear: a damage line on the weapon, an armour line on each piece, at the tier the level wears. |
 | `techniques` | The best weapon technique the gear tier can roll. |
@@ -191,6 +192,46 @@ archer 2.06 -> 1.92. Loot lowers a maxed melee or archer build by 0.05 to 0.16 a
 rest of the excess is the swing law, the other registries' tops (the Firmament tree, the sets, mastery) and the online
 health floor, which B5 takes. `MAXED_POWER_MOST` in `test/tooling/playerPowerBudget.test.js` is 2.08 / 2.13 / 2.00 /
 1.96 / 2.20 (no ARENA2), down from B3's 2.25 / 2.31 / 2.17 / 2.02 / 2.36.
+
+## Online health (B5)
+
+Online, a body is the stored health, the Endurance floor (`levelEven.js` `evenHpFloor`), and the layer that rides
+above it (`renownLayer.js`). DFU has the stored health alone: each level's roll (`CalculateHitPointsPerLevelUp`, with
+`HitPointsModifier`, Endurance / 10 - 5) added once and never repaid. Decisions (the owner's):
+
+- **Endurance floor: kept.** A departure from DFU, online: a character never sits under the average-roll body of its class,
+  level and current Endurance. In the harness it is the `onlineHealth` layer.
+- **Firmament health: a few per cent.** The tree's Health was 66 raw points on six key stars and 17% on the small stars,
+  held to +75 together by a hidden cap, a quarter of a level-45 body. The key stars now give 15 raw points in all (Giant's
+  Heart 4, Cavalier 3, the other four 2) and the small stars 8% (one per cent a star). `hp` and `hpPct` end at those
+  sums (15 and 8%), the +75 budget over both is gone, and a card prints what applies. The whole tree is a tenth of a
+  level-45 body at most, and a walk to the Warrior's Health wheel a few per cent.
+- **Renown health: dropped.** Renown gave 3 health a level (147 at Renown 50) on top of the floor and the tree. It still
+  gives 2 magicka a level.
+
+Survival, the harness's `skyHealth` layer on the maxed character (`+ceiling,+skyHealth`; Renown 50 and a full tree at
+every level, so low levels show the raw points at their largest). ARENA2 attributes, DFU's own foe row. Survival is
+the time the foe takes to kill the character, ours over DFU's. Before -> after:
+
+| Survival | L1 | L10 | L20 | L30 | L45 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Warrior | 6.98 -> 1.52 | 1.93 -> 0.92 | 2.96 -> 1.91 | 2.13 -> 1.62 | 1.47 -> 1.24 |
+| Thief | 10.19 -> 2.00 | 4.69 -> 1.64 | 3.66 -> 1.83 | 3.45 -> 2.22 | 2.51 -> 1.95 |
+| Mage | 10.43 -> 1.98 | 5.72 -> 1.78 | 3.98 -> 1.78 | 3.59 -> 2.15 | 2.16 -> 1.61 |
+| Spellsword | 8.05 -> 1.63 | 3.70 -> 1.49 | 3.85 -> 2.18 | 3.33 -> 2.26 | 2.32 -> 1.85 |
+| Archer | 8.01 -> 1.62 | 3.81 -> 1.53 | 3.75 -> 2.03 | 3.19 -> 2.17 | 2.53 -> 2.03 |
+
+| Body (health) | L1 | L10 | L20 | L30 | L45 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Warrior | 261 -> 57 | 373 -> 178 | 517 -> 333 | 710 -> 542 | 943 -> 793 |
+| Thief | 255 -> 50 | 309 -> 108 | 388 -> 194 | 516 -> 332 | 739 -> 573 |
+| Mage | 253 -> 48 | 293 -> 91 | 357 -> 160 | 470 -> 282 | 671 -> 499 |
+| Spellsword | 257 -> 52 | 333 -> 134 | 437 -> 247 | 561 -> 381 | 807 -> 646 |
+| Archer | 257 -> 52 | 333 -> 134 | 418 -> 226 | 561 -> 381 | 807 -> 646 |
+
+At level 45 the changes take 150 to 172 points (16% to 26%) off the body of a maxed character. A character with no Renown
+and no tree is unchanged. The raw points weigh most at level 1, where a full tree is 15 on a body of 40, and that tree is
+out of reach before the Renown that buys its stars.
 
 ## Not modelled
 
