@@ -3,8 +3,9 @@
 // race, sex and view, of the werewolf and of every creature of the three retail .esm files; then, for every distinct
 // list, the clip picked, the velocity and the text-key time for every group that a retail .kf names.
 //
-// The recording came from src/formats/morrowind/mwAnimSources.js at the commit that moved it out of mwFirstPerson.js
-// unchanged: run readInputs and recordAnimSources from mwAnimSourcesSweep.mjs over the retail files and that module.
+// The recording came from src/formats/morrowind/mwAnimSources.js at commit 8d0737319c (the code moved out of
+// mwFirstPerson.js unchanged): run readInputs and recordAnimSources from mwAnimSourcesSweep.mjs over the retail files and
+// that module. No third-party engine source was read for the new code.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -12,6 +13,8 @@ import { join } from 'node:path';
 import * as animSources from '../../../src/formats/morrowind/mwAnimSources.js';
 import * as firstPerson from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { MwBsaFile } from '../../../src/formats/morrowind/mwBsaFile.js';
+import { parseNif } from '../../../src/formats/morrowind/mwNifFile.js';
+import { buildSkeleton, poseSkeleton, skeletonSpaceMatrices } from '../../../src/formats/morrowind/mwSkin.js';
 import { clipGroups, resetClip } from '../../../src/formats/morrowind/mwAnim.js';
 import { recordAnimSources } from './mwAnimSourcesSweep.mjs';
 
@@ -55,6 +58,23 @@ test(
   },
 );
 
-test('animation sources: the units-per-metre constant is the recorded value', () => {
-  assert.equal(animSources.MW_UNITS_PER_METER, recorded.unitsPerMeter);
+// Accepted difference: the old constant was the literal 69.99125109. The new one is measured and derived (see the
+// module), 128 / (6 x 0.3048) = 69.9912510936..., which differs from the literal by 4e-11 in absolute terms.
+test('animation sources: the units-per-metre constant is the recorded value to 1e-8', () => {
+  assert.ok(Math.abs(animSources.MW_UNITS_PER_METER - recorded.unitsPerMeter) < 1e-8);
 });
+
+// The measurement behind MW_UNITS_PER_METER: the standard figure stands about 127 units tall (head bone 119.2 plus a
+// head 7.7 above it), taken as 128 units for a person of about 6 feet.
+test(
+  'animation sources: the third-person skeleton puts the head bone where the units-per-metre derivation says',
+  { skip: !archivePaths.every(existsSync) },
+  () => {
+    const archive = new MwBsaFile(new Uint8Array(readFileSync(archivePaths[0])));
+    const skeleton = buildSkeleton(parseNif(archive.get('meshes/base_anim.nif').slice()));
+    const spaces = skeletonSpaceMatrices(skeleton, poseSkeleton(skeleton, null, null, 0), skeleton.root ?? -1);
+    const head = [...skeleton.nodes].find(([, node]) => node.name === 'Bip01 Head')[0];
+    assert.ok(Math.abs(spaces.get(head).t[2] - 119.2) < 0.5);
+    assert.ok(Math.abs(animSources.MW_UNITS_PER_METER * 6 * 0.3048 - 128) < 1e-9);
+  },
+);
