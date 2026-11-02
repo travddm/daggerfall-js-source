@@ -1,3 +1,4 @@
+// @ts-check
 // The `untaken` mark. A source door marks every eligible piece it rolls `untaken`; the first take clears it. KIT-ROLL
 // (foeLootCap.js rollCorpseKit) reads the mark to tell a body's rolled loot from the kit the foe wore, so the mark
 // must keep clearing on a take whatever else listens to takes. It rides the piece (a saved field, a body's record, a
