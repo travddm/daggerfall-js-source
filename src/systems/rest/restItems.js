@@ -37,7 +37,6 @@ import { survivalOf, sleepStage, wakingHeld, WAKING_DEBT_HOURS } from '../surviv
 import { ownMinutes } from '../worldTick.js';
 import { maxFatigue } from '../statMods.js';
 import { registerTabledLootHandler, registerEnemyLootExtra } from '../loot/loot.js';
-import { registerLootSupply } from '../foeLootCap.js';   // CAP-SUPPLIES: the seven are supplies to a body's cap
 import { renownLootQuarters, lootEased } from '../renownLoot.js';   // RENOWN-LOOT: the chances by the roller's Renown
 
 /** The online sources' switch (shelves, piles, foes, recipes) - false for the release the templates shipped in, on since
@@ -70,7 +69,6 @@ const INDICES = new Set(Object.values(REST_ITEM));
 // INT9: the predicate's home is systems/rest/restItemRows.js (the rows' leaf - a death in the zone's drop reads it on the account
 // Worker), re-exported here
 export { isRestItem };
-registerLootSupply('REST', isRestItem);   // CAP-SUPPLIES: a full body's cap keeps one before a Common piece (foeLootCap.js)
 export const isBedroll = (item) => item?.templateIndex === REST_ITEM.Bedroll;
 export const isEmberJar = (item) => item?.templateIndex === REST_ITEM.EmberJar;
 export const isFirewood = (item) => item?.templateIndex === REST_ITEM.Firewood;

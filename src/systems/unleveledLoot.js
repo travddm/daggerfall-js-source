@@ -53,6 +53,7 @@
 // is the port's. The ten switches and Enabled live in the Mods pane.
 // ═══════════════════════════════════════════════════════════════════
 
+import { killGoldFromRange } from './loot/kill-gold.ts';
 import { modSetting } from './modSettings.js';
 import { liveStat } from './statMods.js';
 import { registerFormulaOverride, dice100 } from '../combat/formulas.js';
@@ -300,8 +301,8 @@ export function addOrcish(loot, enemyId, rolls, level = playerLevel()) {
 }
 /** UnlevelDroppedLoot_OnEnemyDeath: the corpse's collection - a Daedra
  *  (MobileAffinity.Daedra) or an Orc (MobileTeams.Orcs) may drop its
- *  metal; every gold stack is divided by the level (never under 1) and
- *  multiplied by Range(1, luck's tenth + 1). */
+ *  metal; every gold stack is divided by the level (never under 1), then (B4) scaled by the log curve of the level
+ *  (loot/kill-gold.ts: the mod left it flat), and multiplied by Range(1, luck's tenth + 1). */
 export function unlevelDroppedLoot(entity, { rolls = Math.random, r = null, luck = undefined, level: levelIn = undefined } = {}) {   // PARTY-LOOT: the raiser's Luck and level when it names them (a room's base rolls on the room's), else the player's
   if (!entity || !Array.isArray(entity.items)) return;
   const luckNow = luck ?? playerLuck();
@@ -317,8 +318,7 @@ export function unlevelDroppedLoot(entity, { rolls = Math.random, r = null, luck
     luckMod = int(luckNow / 10);   // the armour drop's override set it again - to the same raiser's Luck now
     for (const item of entity.items) {
       if (item.group !== 'Currency' || item.templateIndex !== GOLD_TEMPLATE) continue;
-      item.stackCount = int((item.stackCount ?? 0) / level);
-      if (item.stackCount < 1) item.stackCount = 1;
+      item.stackCount = killGoldFromRange(int((item.stackCount ?? 0) / level), level);   // B4: the level's multiple is the log curve's, not 1 (kill-gold.ts)
       item.stackCount *= rangeInt(1, luckMod + 1, rolls);
     }
   } finally { [_raiserLuck, _raiserLevel] = was; }

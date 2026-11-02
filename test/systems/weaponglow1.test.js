@@ -92,14 +92,14 @@ test('WEAPON-GLOW1: the element is the blow\'s - a minted line names it, at the 
   for (const el of LR.PROC_ELEMENTS) {
     const { it, line } = mintMagic(el);
     assert.deepEqual([line.id, line.param, line.value], ['elemental', el, LR.AFFIX_RANGES.elemental.magic[1]]);
-    assert.deepEqual(WG.weaponElement(it), { element: el, total: 3 });
+    assert.deepEqual(WG.weaponElement(it), { element: el, total: 2 });   // PIN MOVED: B4 rescale, the Magic elemental top is 2
     assert.deepEqual(WG.weaponGlow(it, { on: true }), { look: el, level: 1 });
     // the blow's own reader agrees on the number
-    assert.equal(LP.linesOf(it, 'elemental').filter((a) => a.param === el).reduce((n, a) => n + a.value, 0), 3);
+    assert.equal(LP.linesOf(it, 'elemental').filter((a) => a.param === el).reduce((n, a) => n + a.value, 0), 2);
   }
   // law 3: the bands' own edges
   assert.deepEqual(WG.GLOW_LEVEL_EDGES, [LR.AFFIX_RANGES.elemental.magic[1], LR.AFFIX_RANGES.elemental.rare[1]]);
-  assert.deepEqual([1, 3, 4, 6, 7, 10, 16].map(WG.glowLevel), [1, 1, 2, 2, 3, 3, 3]);
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 16].map(WG.glowLevel), [1, 1, 2, 2, 3, 3, 3]);
   // a weapon with no element shows nothing, and no other kind names one
   const plain = sword();
   LR.applyRarity(plain, 'magic', lcg(7));
@@ -139,11 +139,11 @@ test('WEAPON-GLOW1: the Legendary band reads level 3 - an Exalted\'s own element
 test('WEAPON-GLOW1: gems count as the blow reads them - capped; the most wins, a tie in PROC_ELEMENTS\' order', () => {
   on();
   const tie = mintRare();
-  LR.setGem(tie, 'sapphire'); LR.setGem(tie, 'ruby');   // frost 3 then fire 3: a tie, and fire is first
-  assert.deepEqual(WG.weaponElement(tie), { element: 'fire', total: 3 });
+  LR.setGem(tie, 'sapphire'); LR.setGem(tie, 'ruby');   // frost 2 then fire 2: a tie, and fire is first
+  assert.deepEqual(WG.weaponElement(tie), { element: 'fire', total: 2 });
   const more = mintRare();
-  LR.setGem(more, 'ruby'); LR.setGem(more, 'perfect-sapphire');   // fire 3, frost 6
-  assert.deepEqual(WG.weaponElement(more), { element: 'frost', total: 6 });
+  LR.setGem(more, 'ruby'); LR.setGem(more, 'perfect-sapphire');   // fire 2, frost 4 (the Rare top)
+  assert.deepEqual(WG.weaponElement(more), { element: 'frost', total: 4 });   // PIN MOVED: B4, the perfect sapphire's line stands at the Rare top 4
   assert.deepEqual(WG.weaponGlow(more, { on: true }), { look: 'frost', level: 2 });
   const capped = mintRare();
   LR.setGem(capped, 'perfect-ruby'); LR.setGem(capped, 'perfect-ruby');   // 6 + 6, and law 6 holds the gems to one Rare line

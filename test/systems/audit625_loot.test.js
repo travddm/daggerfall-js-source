@@ -78,11 +78,11 @@ test('AUDIT 625 L3 (Mac: "The plain ladder"): EVERY foe\'s worn kit rolls the pl
 
 test('AUDIT 625 L5: a joiner\'s copy of a body and an arrival\'s are capped as the host\'s death caps its own - after their kit, their food and their sigils - so no copy the room may adopt (WORLD4: the first opener\'s list is the room\'s) carries past its cap (mutants: either copy uncapped)', async () => {
   const { readFileSync } = await import('node:fs');
-  // and the cap itself, on a copy the food overfilled: gold kept, the best by tier, then the supplies, then the dearest
+  // B4 removed the count cap: a copy the food overfilled keeps all of it
   const { capFoeLoot } = await import('../../src/systems/foeLootCap.js');
   const e = { lootCap: 3, items: [goldStack(4), { name: 'a', group: 'Weapons', value: 10 }, { name: 'b', group: 'Armor', value: 20 }, { name: 'meat', group: 'UselessItems2', value: 1 }, { name: 'c', group: 'Armor', value: 5 }] };
   capFoeLoot(e);
-  assert.equal(e.items.length, 3);
+  assert.equal(e.items.length, 5);
 });
 
 // ─── THE KIT'S ROLL, WHOLE ───────────────────────────────────────────

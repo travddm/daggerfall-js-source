@@ -547,7 +547,7 @@ export function lootFind() {
  *  MY entity (systems/entityMods.js), so the leaves that read them stay import-free - survival's felt temperature (the
  *  degrees, survival/needs.js through wardrobeCtx), DRESS1's standing (clothingStanding.js), the shared fatigue and fall
  *  laws (scenes/shared.js), skillValue. A power counts once (wornPowers); nothing for anyone but me, with the switch off,
- *  or in a duel. Unseen answers the hood of the piece that carries it - the hood up, 25 Stealth; down, none. */
+ *  or in a duel. Unseen answers the hood of the piece that carries it - the hood up, 18 Stealth; down, none. */
 export function wardrobeFold(entity) {
   const powers = wornPowers(entity);
   if (!powers.length) return EMPTY_MODS;

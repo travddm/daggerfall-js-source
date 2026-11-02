@@ -1,46 +1,31 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FOE-CAP.
+// FOE LOOT: THE PLAIN LADDER, THE KIT AND THE SUMMON.
 //
-// THE PORT'S OWN, not DFU's: DFU caps nothing and has no ladder.
+// THE PORT'S OWN, not DFU's: DFU has no ladder. B4 (tame loot and economy) removed the count cap FOE-CAP put on a plain
+// foe's body (three pieces, five in an Elite Dungeon): a body carries what DFU's tables and the ladder's rolls gave it.
 //
 // WHO IS PLAIN. A foe with no title of its own - never an elite foe
 // (`eliteFoe`), a LOOT7 champion (`champion`), a revenant (`revenant`) or
 // a feature's named foe (`properName`), and never a BOSS by the ladder's
 // own law (lootRarity.js corpseSource: a Daedra, or level BOSS_LEVEL and
 // up). An Elite DUNGEON's ordinary foe (`elite`, the place's doubling -
-// not an elite foe) is plain too, at the larger cap and on the ladder it
-// already had.
+// not an elite foe) is plain too, but keeps the ladder it already had.
 //
-// ONE STAMP, TWO DOORS. spawnEnemyLoot (scenes/hostCombat.js) decides once
-// and writes `entity.lootCap`; the cap is applied there, after the whole
-// spawn chain, and again by raiseEnemyDeath (scenes/corpseMarker.js) after
-// every OnEnemyDeath handler has added its own (food, a mod's find) - so
-// "never more than three" holds for what the body actually carries.
-//
-// LOOT-EASE: the
-// ladder eased, the cap keeping a supply before a Common piece
-// (CAP-SUPPLIES), and a plain foe's kit rolled at its death (KIT-ROLL) -
-// the same stamp read a third time, by every body door.
-// ═══════════════════════════════════════════════════════════════════
+// ONE STAMP. spawnEnemyLoot (scenes/hostCombat.js) decides once and writes `entity.plainLadder`, which a room's bonus
+// reads. A plain foe's kit is rolled at its death (KIT-ROLL), by every body door.
+// ═════════════════════════════════════════════════
 
 import {
-  corpseSource, rarityRank, lootRarityOn, rarityEligible, rollRarity, applyRarity, lastPass, legendaryFindMult, isGarment, RARITIES,
+  corpseSource, lootRarityOn, rarityEligible, rollRarity, applyRarity, lastPass, legendaryFindMult, isGarment,
   cursePass,   // LOOT16
   damnPass,   // TRUE-CURSE
   socketPass,   // LOOT20
   weaponSocketPass,   // GEM1
   techniquePass,   // TECH1
 } from './loot/lootRarity.js';
-import { isGoldPieces, ARROW_TEMPLATE } from './inventory.js';   // STUCK-ARROWS: the quiver rides past the cap
-import { isPotion } from './useItem.js';   // CAP-SUPPLIES: a potion IS the glass bottle - DFU's IsPotion, its one export (AUDIT 625 L7)
 import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';   // KIT-ROLL: the row every host hands its spawn
 import { renownLootQuarters, lootEased } from './renownLoot.js';
-
-/** The most a plain foe's body carries, gold included. */
-export const PLAIN_FOE_LOOT_CAP = 3;
-/** ...and a plain foe's in an Elite Dungeon. */
-export const ELITE_DUNGEON_FOE_LOOT_CAP = 5;
 
 /** THE PLAIN FOE'S LADDER (per mille of reaching AT LEAST the tier, lootRarity.js RARITY_WEIGHTS' shape). White is the
  *  rule; Magic (blue) rare - 5% at level 0, 19% at most; Rare (yellow) very rare - 0.6% to 3.8%; Legendary (orange)
@@ -78,78 +63,15 @@ export function plainFoeRarityWeights(quarters = renownLootQuarters()) {
 export const titledFoe = (entity) => !!(entity?.eliteFoe || entity?.champion || entity?.revenant || entity?.properName || entity?.worldBoss);
 
 /**
- * THE RULE for one freshly built foe: its cap and whether its corpse rolls on the plain ladder - or null for a foe the
- * rule leaves alone (titled, or a boss). `elite` is the Elite Dungeon's mark, which the dungeon host writes before the
- * loot is rolled (dungeonContext.js applyEliteScaling).
- * @returns {{ cap: number, plainLadder: boolean } | null}
+ * THE RULE for one freshly built foe: whether its corpse rolls on the plain ladder - or null for a foe the rule leaves
+ * alone (titled, or a boss). `elite` is the Elite Dungeon's mark, which the dungeon host writes before the loot is
+ * rolled (dungeonContext.js applyEliteScaling). B4 removed the count cap this rule once carried.
+ * @returns {{ plainLadder: boolean } | null}
  */
 export function plainFoeLootRule(entity, basics = null) {
   if (!entity || titledFoe(entity)) return null;
   if (corpseSource(basics, entity.level, entity.mobileType).boss) return null;
-  const eliteDungeon = !!entity.elite;
-  return { cap: eliteDungeon ? ELITE_DUNGEON_FOE_LOOT_CAP : PLAIN_FOE_LOOT_CAP, plainLadder: !eliteDungeon };
-}
-
-/** CAP-SUPPLIES (LOOT-EASE, 2026-10-05, Mac: the rest items, "majicka potions" and "health pots" "should be more common
- *  loot drops"): THE SUPPLIES - what a body's cap keeps before a Common piece of gear. A potion (DFU's IsPotion: the
- *  glass bottle - the trio's, the healing and the magicka supplies'), and whatever a module registers by name
- *  (restItems.js: REST6's seven). Ranked by worth alone, a Common steel blade outbid every potion and supply on a full
- *  body and the cap threw them away first - measured, two in five of a plain humanoid's supplies at the new rates. */
-const _supplies = new Map();
-export function registerLootSupply(name, fn) { if (typeof fn === 'function') _supplies.set(name, fn); else _supplies.delete(name); }
-export function isLootSupply(item) {
-  if (!item) return false;
-  if (isPotion(item)) return true;
-  for (const fn of _supplies.values()) { try { if (fn(item)) return true; } catch { /* a predicate's throw is not the cap's */ } }
-  return false;
-}
-/** The cap's order, best first: a Magic-or-better piece by its tier, then a supply, then the rest. */
-// LOOT14 (the Loot arc II): a GARMENT below Legendary ranks under a supply
-// and over a plain piece - a Magic shirt never pushes a Potion of Healing off a three-piece body (LOOT-EASE's call)
-const GARMENT_UNDER_SUPPLY = 0.5;
-// AUDIT LOOT II A9: with the ladder on - off, a garment ranks as it always did (a DFU magic shirt, Magic by its
-// enchantment, over a potion: law 6)
-const garmentRank = (it) => (lootRarityOn() && isGarment(it) && rarityRank(it) > 0 && rarityRank(it) < RARITIES.legendary.rank ? GARMENT_UNDER_SUPPLY : null);
-const capRank = (it) => { const r = rarityRank(it); const g = garmentRank(it); if (g != null) return g; return r > 0 ? 1 + r : (isLootSupply(it) ? 1 : 0); };
-
-/** STUCK-ARROWS (): AN ARROW
- *  IS NO FIND. The shafts the player put into a body (combat/arrowFlight.js playerArrowHitFoe) and an archer's own quiver
- *  are ammunition, not the body's loot - and the cheapest Common thing on it, so the cap threw them away FIRST: a plain
- *  foe at its three pieces gave back none of the arrows it was shot with. They ride past the cap now, uncounted. */
-const isQuiverArrow = (it) => it?.group === 'Weapons' && it.templateIndex === ARROW_TEMPLATE;
-
-/**
- * CAP A LIST IN PLACE: gold first (every coin stack folded into the first - one item, its count the sum), then a quest's
- * items (never thrown away, even past the cap), then the rest best first until the cap: a Magic-or-better piece by its
- * tier, then a supply (CAP-SUPPLIES), then the rest - the dearer first within each. Arrows are kept and not counted
- * (STUCK-ARROWS, above). Answers the items dropped.
- * @param {any[]} items
- * @param {number} cap
- */
-export function capLootList(items, cap) {
-  if (!Array.isArray(items) || !(cap >= 0)) return [];
-  const quiver = items.filter(isQuiverArrow);   // STUCK-ARROWS: kept, uncounted
-  if (items.length - quiver.length <= cap) return [];
-  let gold = null;
-  for (const it of items) {
-    if (!isGoldPieces(it)) continue;
-    if (!gold) gold = it;
-    else gold.stackCount = (gold.stackCount | 0) + (it.stackCount | 0);
-  }
-  const quest = items.filter((it) => it?.questItem && it !== gold);
-  const rest = items.filter((it) => it && it !== gold && !isGoldPieces(it) && !it.questItem && !isQuiverArrow(it))
-    .map((it, i) => ({ it, i }))
-    .sort((a, b) => (capRank(b.it) - capRank(a.it)) || ((b.it.value ?? 0) - (a.it.value ?? 0)) || (a.i - b.i))
-    .map((r) => r.it);
-  const keep = [...(gold ? [gold] : []), ...quest];
-  for (const it of rest) { if (keep.length >= cap) break; keep.push(it); }
-  const kept = new Set([...keep, ...quiver]);
-  const dropped = items.filter((it) => !kept.has(it));
-  // in place, in the list's own order (the inventory window reads it as it stands)
-  const order = items.filter((it) => kept.has(it));
-  items.length = 0;
-  items.push(...order);
-  return dropped;
+  return { plainLadder: !entity.elite };
 }
 
 /**
@@ -212,13 +134,11 @@ export function markSummoned(f, r) {
   return f;
 }
 
-/** The body's own cap, as its spawn stamped it (`entity.lootCap`); nothing for a foe without one. RPT1026-PROGRESS: a
- *  summon's (`summoned`) nothing at all. */
+/** A summon's body carries nothing at all (`summoned`): whatever its death's handlers laid on it goes. Any other body keeps
+ *  what its rolls and handlers gave it (B4 removed the count cap). Answers the items taken off. */
 export function capFoeLoot(entity) {
   if (entity?.summoned === true && Array.isArray(entity.items)) return entity.items.splice(0);   // RPT1026-PROGRESS: a summon's body (summonedBody)
-  const cap = entity?.lootCap;
-  if (!Number.isInteger(cap) || !Array.isArray(entity.items) || titledFoe(entity)) return [];   // a foe promoted after its spawn (the street's elite) is titled by its death
-  return capLootList(entity.items, cap);
+  return [];
 }
 
 /**

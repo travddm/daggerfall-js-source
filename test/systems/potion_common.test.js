@@ -55,37 +55,38 @@ test('POTION-COMMON: an alchemist stocks 2 + a fifth of its quality a day, a gen
   assert.equal(healing(second), 0, 'a second shelf: none');
 });
 
-test('POTION-COMMON: a J-O pile holds one 8 times in 100 and no other pile ever; a looting foe carries one 4 times in 100 and a foe with no loot table never (LOOT-EASE: 12 and 6 raised; POT-THIN: 18 and 10 cut; mutants: either chance at 0 or back; every pile)', () => {
-  assert.equal(HEALING_PILE_CHANCE, 8);
-  assert.equal(HEALING_ENEMY_CHANCE, 4);
+test('POTION-COMMON: a J-O pile holds one 0.45 times in 100 and no other pile ever; a looting foe carries one 0.35 times in 100 (B4: the DFU random potion gives 0.2 and 0.15) and a foe with no loot table never (LOOT-EASE: 12 and 6 raised; POT-THIN: 18 and 10 cut; B4: 8 and 4 cut; mutants: either chance at 0 or back; every pile)', () => {
+  assert.equal(HEALING_PILE_CHANCE, 0.45);
+  assert.equal(HEALING_ENEMY_CHANCE, 0.35);
+  assert.ok(HEALING_PILE_CHANCE <= 3 * 0.2 && HEALING_ENEMY_CHANCE <= 3 * 0.15, 'within three times the DFU random potion');
   for (const key of ['J', 'O']) {
-    assert.equal(healing(addPileLootExtras([], key, at(0.07), { online: false })), 1, `${key}: 7 under 8`);
-    assert.equal(healing(addPileLootExtras([], key, at(0.08), { online: false })), 0, `${key}: 8 is not`);
+    assert.equal(healing(addPileLootExtras([], key, at(0.004), { online: false })), 1, `${key}: 0.4 under 0.45`);
+    assert.equal(healing(addPileLootExtras([], key, at(0.0046), { online: false })), 0, `${key}: 0.45 is not`);
   }
   for (const key of ['A', 'I', 'P']) assert.equal(healing(addPileLootExtras([], key, at(0), { online: false })), 0, `${key}: never - J to O alone`);
-  assert.equal(healing(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.039))), 1, '3.9 under 4');
-  assert.equal(healing(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.04))), 0, '4 is not');
+  assert.equal(healing(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.0034))), 1, '0.34 under 0.35');
+  assert.equal(healing(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.0036))), 0, '0.35 is not');
   assert.equal(healing(addEnemyLootExtras([], { lootTableKey: '-', mapChance: 0 }, at(0))), 0, 'no loot table, no potion');
 });
 
-test('MAGICKA-COMMON (LOOT-EASE, 2026-10-05): DFU\'s own Potion of Restore Power - classicRecipeKeys[4], a bottle worth 75 - in a J-O pile 4 times in 100 and on a looting foe 2 (POT-THIN: 10 and 6), never elsewhere, its draw after the healing potion\'s (mutants: another recipe\'s key; either chance moved; the draw first; the extras\' install dropping it)', () => {
+test('MAGICKA-COMMON (LOOT-EASE, 2026-10-05): DFU\'s own Potion of Restore Power - classicRecipeKeys[4], a bottle worth 75 - in a J-O pile 2 times in 100 and on a looting foe 1 (B4: halved from 4 and 2; POT-THIN: 10 and 6), never elsewhere, its draw after the healing potion\'s (mutants: another recipe\'s key; either chance moved; the draw first; the extras\' install dropping it)', () => {
   assert.equal(MAGICKA_RECIPE_KEY, CLASSIC_RECIPE_KEYS[4]);
   assert.equal(potionRecipeByKey(MAGICKA_RECIPE_KEY)?.name, 'restorePower');
   const p = mintMagickaPotion();
   assert.deepEqual([p.group, p.templateIndex, p.potionRecipeKey, p.value], ['UselessItems1', POTION_TEMPLATE_INDEX, MAGICKA_RECIPE_KEY, 75]);
-  assert.deepEqual([MAGICKA_PILE_CHANCE, MAGICKA_ENEMY_CHANCE], [4, 2]);
+  assert.deepEqual([MAGICKA_PILE_CHANCE, MAGICKA_ENEMY_CHANCE], [2, 1]);
   for (const key of ['J', 'O']) {
-    assert.equal(magicka(addPileLootExtras([], key, at(0.039), { online: false })), 1, `${key}: 3.9 under 4`);
-    assert.equal(magicka(addPileLootExtras([], key, at(0.04), { online: false })), 0, `${key}: 4 is not`);
+    assert.equal(magicka(addPileLootExtras([], key, at(0.019), { online: false })), 1, `${key}: 1.9 under 2`);
+    assert.equal(magicka(addPileLootExtras([], key, at(0.02), { online: false })), 0, `${key}: 2 is not`);
   }
   for (const key of ['A', 'I', 'P']) assert.equal(magicka(addPileLootExtras([], key, at(0), { online: false })), 0, `${key}: never - J to O alone`);
-  assert.equal(magicka(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.019))), 1, '1.9 under 2');
-  assert.equal(magicka(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.02))), 0, '2 is not');
+  assert.equal(magicka(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.009))), 1, '0.9 under 1');
+  assert.equal(magicka(addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, at(0.01))), 0, '1 is not');
   assert.equal(magicka(addEnemyLootExtras([], { lootTableKey: '-', mapChance: 0 }, at(0))), 0, 'no loot table, no potion');
   // the order: DFU's trio, the field kit, the healing potion, then this one - a foe's sixth draw is the magicka potion's
-  const foe = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.99, 0.5, 0.01));
+  const foe = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.99, 0.5, 0.005));
   assert.deepEqual([healing(foe), magicka(foe)], [0, 1], 'the healing potion\'s draw missed, the magicka potion\'s landed');
-  const foe2 = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.99, 0.01, 0.5));
+  const foe2 = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.99, 0.003, 0.5));
   assert.deepEqual([healing(foe2), magicka(foe2)], [1, 0], 'and the other way');
 });
 
@@ -93,12 +94,12 @@ test('POTION-COMMON: installed with the smithing install, both extras roll - the
   // a J pile: the map's, the random potion's and the recipe's draws (DFU's), then the field kit's 5 under 6, then the potion's 50
   const pile = addPileLootExtras([], 'J', seq(0.99, 0.99, 0.99, 0.05, 0.5), { online: false });
   assert.deepEqual([kits(pile), healing(pile)], [1, 0], 'the kit took the first of the extras\' draws');
-  const pile2 = addPileLootExtras([], 'J', seq(0.99, 0.99, 0.99, 0.5, 0.05), { online: false });
+  const pile2 = addPileLootExtras([], 'J', seq(0.99, 0.99, 0.99, 0.5, 0.003), { online: false });
   assert.deepEqual([kits(pile2), healing(pile2)], [0, 1], 'and the potion the second');
   // a looting foe: the map's (drawn at a chance of 0 too), the random potion's and the recipe's draws, then the kit's 2
   // under 3, then the potion's 50
   const foe = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.02, 0.5));
   assert.deepEqual([kits(foe), healing(foe)], [1, 0]);
-  const foe2 = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.5, 0.03));   // POT-THIN: under the foe's 4
+  const foe2 = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.5, 0.003));   // B4: under the foe's 0.35
   assert.deepEqual([kits(foe2), healing(foe2)], [0, 1]);
 });

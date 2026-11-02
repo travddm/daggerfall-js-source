@@ -23,8 +23,8 @@ top of DFU's loot tables.
 | Physical items | `src/systems/physicalItems.js`, `src/scenes/physicalItemsLayer.js`, `src/scenes/droppedLoot.js` |
 | Loot tables | `src/systems/loot/loot.js`, `src/systems/loot/lootDataTables.js`, `src/systems/loot/lootThemes.js` |
 | Rarity ladder | `src/systems/loot/lootRarity.js`, `src/systems/loot/lootPowers.js`, `src/systems/loot/lootLevelGate.js` |
-| Loot extras | `lootDrought.js`, `lootCodex.js`, `lootCurse.js`, `lootScry.js` (all in `src/systems/loot/`), `src/systems/reforge.js` |
-| Drop shaping | `src/systems/unleveledLoot.js`, `src/systems/foeLootCap.js`, `src/systems/renownLoot.js` |
+| Loot extras | `taken-mark.ts`, `lootCodex.js`, `lootCurse.js`, `lootScry.js` (all in `src/systems/loot/`), `src/systems/reforge.js` |
+| Drop shaping | `src/systems/unleveledLoot.js`, `src/systems/loot/kill-gold.ts`, `src/systems/foeLootCap.js`, `src/systems/renownLoot.js` |
 | Gems | `src/systems/gems.js`, `src/systems/loot/gemGrades.js`, `src/ui/socketWells.js` |
 | Quick loot | `src/systems/quickLoot.js` |
 | Banking and wallet | `src/systems/banking.js`, `src/ui/bankWindow.js`, `src/systems/walletItem.js` |
@@ -153,9 +153,12 @@ Test: `test/systems/pi1_physicalitems.test.js`.
 and dungeon type drive them instead of player level. It divides a corpse's gold by the player's level and adds a
 daedric or orcish piece to Daedra and Orcs. It is a feature switch (`features.js` `unleveledLoot`).
 
-**Drop shaping.** `foeLootCap.js` caps how many items a plain foe drops and gives plain foes their own rarity
-weights. Elite foes, champions, bosses and named foes are exempt. `renownLoot.js` scales the loot bonus with the
-roller's Renown online.
+**Drop shaping.** `foeLootCap.js` marks plain foes for their own rarity weights (the plain ladder), rolls a foe's kit at
+its death, and keeps a summon's body bare. It no longer caps how many items a foe drops (B4). Elite foes, champions,
+bosses and named foes stay off the plain ladder. `kill-gold.ts` sets a killed foe's gold: the table's range times
+`1 + 1.5 ln(level)`, so gold grows early and flattens late (DFU multiplies by the level; Unleveled Loot made it flat).
+It applies where Unleveled Loot's death handler runs. `renownLoot.js` scales the loot bonus with the roller's Renown
+online.
 
 The hosts apply rarity where they mint loot: `scenes/hostCombat.js` for bodies (`rollCorpseLoot`), and
 `scenes/dungeonContext.js`, `scenes/interiorContext.js`, `scenes/world.js` and `src/systems/searchables.js` for piles
@@ -194,7 +197,7 @@ only the general rule. Tests: `test/systems/lootgate1.test.js`.
 
 **Around the ladder:**
 
-- `lootDrought.js`: taking eligible pieces without a Legendary raises the source's Legendary chance, up to a cap.
+- `taken-mark.ts`: the first take of a rolled piece clears its `untaken` mark, which the kit roll reads. The bad-luck drought that once rode on this listener is gone (B4).
 - `lootCodex.js`: a collection log of every Legendary and Aetheric taken. It also imprints a Legendary's power on a
   Rare.
 - `lootCurse.js`: some Rare and Legendary finds are cursed: one extra line and one drawback. A temple lifts it.

@@ -109,8 +109,8 @@ test('MEND-THIRD: online a smith\'s whole repair of a found piece adds nothing t
     const plate = found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0);
     const mended = { ...plate, currentCondition: plate.maxCondition };
     const best = { mercantile: 100, personality: 100 };
-    assert.equal(quote('Repair', plate, { quality: 1, skills: best }), 11531);
-    assert.equal(quote('Sell', mended, { quality: 20, skills: best }) - quote('Sell', plate, { quality: 20, skills: best }), 0, 'cross-counter: the sale gains nothing for 11,531');
+    assert.equal(quote('Repair', plate, { quality: 1, skills: best }), 34595);
+    assert.equal(quote('Sell', mended, { quality: 20, skills: best }) - quote('Sell', plate, { quality: 20, skills: best }), 0, 'cross-counter: the sale gains nothing for 34,595');
     for (let rank = 0; rank <= 9; rank++) {
       const discount = (price) => reducedRepairCost(fighters, { rank }, price);
       const repair = quote('Repair', plate, { reducedRepairCost: discount });
@@ -120,28 +120,28 @@ test('MEND-THIRD: online a smith\'s whole repair of a found piece adds nothing t
 });
 
 test('MEND-THIRD: the thread\'s ways sell again - a field kit on a found Daedric cuirass, a ring of Repairs Objects through an eight-hour rest over six, and the Varla Stone each lift the online sale by a third of what they mended (mutants: nothing credited; the ring\'s or the stone\'s mend uncredited)', () => {
-  // the kit: a Daedric cuirass found at 47% (Mercantile 30, Personality 40, a quality-10 counter) - +1,188 (+2,377 before
-  // DAEDRIC-SALE halved what a counter pays for Daedric; every price below is half what it was)
+  // the kit: a Daedric cuirass found at 47% (Mercantile 30, Personality 40, a quality-10 counter) - +2,377 (B4 took the
+  // Daedric sale rule off, so a counter pays Daedric whole again)
   const plate = found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0.5);
   assert.deepEqual([plate.value, plate.currentCondition, plate.maxCondition], [153600, 15564, 32768]);
-  assert.equal(online(() => quote('Sell', plate)), 11175);
+  assert.equal(online(() => quote('Sell', plate)), 22350);
   const pack = [plate, mintFieldRepairKit()];
   assert.equal(repairKitUse(pack[1], pack).text, 'The Daedric Cuirass is mended: 47% to 62%.');
   online(() => {
-    assert.equal(quote('Sell', plate), 12363, 'a third of the kit\'s 15%');   // PIN MOVED (DAEDRIC-SALE): 24,727
+    assert.equal(quote('Sell', plate), 24727, 'a third of the kit\'s 15%');   // PIN MOVED (B4: the Daedric sale rule is gone)
     assert.ok(quote('Sell', plate) < quote('Sell', { ...plate, foundCondition: undefined }), 'never the whole 62%');
   });
   // the ring (AUDIT MEND-THIRD L2-3, the faucet as it stands): six Daedric cuirasses found at 47%,
-  // carried through an eight-hour rest's 480 rounds - +18,546 on 67,050 (+37,092 on 134,100 before DAEDRIC-SALE), where SELL-AS-FOUND gave nothing
+  // carried through an eight-hour rest's 480 rounds - +37,092 on 134,100 (B4 took the Daedric sale rule off; it was +18,546 on 67,050), where SELL-AS-FOUND gave nothing
   const six = Array.from({ length: 6 }, () => found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0.5));
   const ring = repairsRing();
   const p = player([...six, ring]);
   equipItem(p, ring);
   const before = online(() => six.reduce((s, it) => s + quote('Sell', it), 0));
-  assert.equal(before, 67050);
+  assert.equal(before, 134100);
   runMagicRoundsFor(p, 0, 480, { sinks: {} });
   assert.ok(six.every((it) => it.selfMended === it.currentCondition - it.foundCondition), 'every tick its wearer\'s own');
-  assert.equal(online(() => six.reduce((s, it) => s + quote('Sell', it), 0)), 85596);
+  assert.equal(online(() => six.reduce((s, it) => s + quote('Sell', it), 0)), 171192);
   // the stone (AUDIT MEND-THIRD L2-7): an enchanted Daedric cuirass found at 20%, worn, mended whole - a third of it sells
   const charmed = found(Object.assign(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), { enchantments: [{ type: T.RepairsObjects, param: -1 }] }), 0);
   const wearer = player([charmed]);
@@ -152,6 +152,6 @@ test('MEND-THIRD: the thread\'s ways sell again - a field kit on a found Daedric
   assert.deepEqual([charmed.currentCondition, charmed.selfMended], [32768, 26215]);
   online(() => {
     assert.equal(saleConditionPercentage(charmed), 46, '6,553 and a third of 26,215');
-    assert.deepEqual([asFound, quote('Sell', { ...charmed, equipSlot: undefined })], [4755, 10937]);
+    assert.deepEqual([asFound, quote('Sell', { ...charmed, equipSlot: undefined })], [9510, 21874]);
   });
 });

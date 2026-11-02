@@ -697,7 +697,7 @@ test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "Loot will sometime be unobtainable an
   // the build's own picture: one pick of the layout's records on both machines, each standing them at its own level
   const marked = (p) => p.state.foes.flatMap((f, i) => (f.src.champion != null ? [i] : []));
   const champs = (p) => p.state.foes.map((f) => f.entity.champion ?? null);
-  const caps = (p) => p.state.foes.map((f) => f.entity.lootCap ?? null);
+  const caps = (p) => p.state.foes.map((f) => f.entity.plainLadder ?? null);
   // the layout's one roll for a record lands an elite or a champion, never both: the elite at ELITE_FOE leaves one champion
   const champions = (p) => marked(p).filter((i) => !p.state.foes[i].src.eliteFoe);
   assert.deepEqual(marked(r.A), [3], 'the layout marks one of the six a champion');
@@ -710,17 +710,17 @@ test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "Loot will sometime be unobtainable an
   assert.deepEqual(champs(r.B), Array(FOES).fill(null), 'the level-2 joiner stands none - CHAMPION_MIN_LEVEL at its own level, its fight its own');
   assert.ok(RL.roomBaseLevel(30, [2]) >= CHAMPION_MIN_LEVEL, 'the room\'s level is a champion\'s');
   const builtCaps = [caps(r.A), caps(r.B)];
-  assert.ok(champions(r.B).every((i) => Number.isInteger(builtCaps[1][i])), 'the joiner\'s plain copies carry a plain cap from their build');
+  assert.ok(champions(r.B).every((i) => builtCaps[1][i] === true), 'the joiner plain copies carry the plain-ladder mark from their build');
   fall(r);
   assert.deepEqual([...r.B.state._lootUnreadable], [], 'no body reads as another build\'s on the joiner');
   for (const key of KEYS) assert.deepEqual(baseRows(shown(r.B, key)), baseRows(shown(r.A, key)), `${key}: the joiner's plaque names the host's base`);
-  // the base is a CHAMPION's where the layout marks one: no plain cap (FOE-CAP's plainFoeLootRule), a plain body's cap elsewhere
+  // the base is a CHAMPION's where the layout marks one: no plain-ladder mark (plainFoeLootRule), a plain body's mark elsewhere
   for (const p of [r.A, r.B]) {
     for (let i = 0; i < FOES; i++) {
-      const cap = p.host.bases.get(`corpse:${i}`)?.lootCap;
-      if (marked(p).includes(i)) assert.equal(cap, null, `${p.id} corpse:${i}: a champion's base`);
-      else if (i === ELITE_FOE) assert.equal(cap, null, `${p.id} corpse:${i}: the elite's base`);
-      else assert.ok(Number.isInteger(cap), `${p.id} corpse:${i}: a plain body's base`);
+      const cap = p.host.bases.get(`corpse:${i}`)?.plainLadder;
+      if (marked(p).includes(i)) assert.equal(cap, false, `${p.id} corpse:${i}: a champion's base`);
+      else if (i === ELITE_FOE) assert.equal(cap, false, `${p.id} corpse:${i}: the elite's base`);
+      else assert.equal(cap, true, `${p.id} corpse:${i}: a plain body's base`);
     }
   }
   for (const i of marked(r.A)) {
@@ -737,7 +737,7 @@ test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "Loot will sometime be unobtainable an
   for (const i of champions(r.B)) {
     const base = r.B.host.bases.get(`corpse:${i}`);
     assert.equal(base.champion, hostChamps[i], `corpse:${i}: the base keeps the champion it rolled`);
-    const bonus = r.B.bonusCalls.filter((call) => call.baseItems === base.items);
+    const bonus = r.B.bonusCalls.filter((call) => call.champion === hostChamps[i] && call.plainLadder === base.plainLadder);
     assert.ok(bonus.length > 0 && bonus.every((call) => call.champion === hostChamps[i]), `corpse:${i}: the joiner's bonus rolls over a champion`);
   }
   // a party under CHAMPION_MIN_LEVEL: the mark is no champion in the room's base either, as at either player's build
@@ -745,7 +745,7 @@ test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "Loot will sometime be unobtainable an
   assert.ok(RL.roomBaseLevel(2, [1]) < CHAMPION_MIN_LEVEL, 'the room\'s level is under a champion\'s');
   fall(low);
   assert.deepEqual([...low.B.state._lootUnreadable], [], 'one base in the low room too');
-  for (const i of champions(low.A)) assert.ok(Number.isInteger(low.A.host.bases.get(`corpse:${i}`)?.lootCap), `corpse:${i}: a plain body's base at the room's level`);
+  for (const i of champions(low.A)) assert.equal(low.A.host.bases.get(`corpse:${i}`)?.plainLadder, true, `corpse:${i}: a plain body's base at the room's level`);
 });
 
 test('CHAMP-BASE (FIELD BUGS 2026-10-25b, "This was also happening when solo"): a word the room\'s MEMORY hands back that this build cannot match was the room\'s own - an earlier visit\'s, often on the build before an update - so its host starts the container over one generation on, and every client takes the new mint; a live peer\'s word, or the memory\'s on a client that is not the host, is still another build\'s', (t) => {
@@ -824,7 +824,7 @@ test('PARTY-LOOT by source: no Math.random in the room\'s law (systems/roomLoot.
   assert.doesNotMatch(strip(readFileSync(new URL('../../src/systems/roomLoot.js', import.meta.url), 'utf8')), /Math\.random/, 'the room\'s law draws only on its seeded dice');
   assert.ok(BLOCK, 'the dungeon carries the PARTY-LOOT block (PIN MOVED, HOST-SPLIT: constructed from src/scenes/roomLootHost.js)');
   assert.doesNotMatch(strip(BLOCK), /Math\.random/, 'and the block takes no draw of its own');
-  assert.match(modFn('rollRoomBase'), /asTheRoom\(\(\) => withRollerLevel\(terms\.lv, \(\) => \{\s*if \(h\.pile\) items = roomPileBase\(h, terms, rolls, gender\);\s*else \(\{ items, lootCap, champion \} = roomBodyBase\(h\.foe, terms, rolls, gender, rejects\)\);\s*\}\)\);/);
+  assert.match(modFn('rollRoomBase'), /asTheRoom\(\(\) => withRollerLevel\(terms\.lv, \(\) => \{\s*if \(h\.pile\) items = roomPileBase\(h, terms, rolls, gender\);\s*else \(\{ items, plainLadder, champion \} = roomBodyBase\(h\.foe, terms, rolls, gender, rejects\)\);\s*\}\)\);/);
   assert.match(modFn('roomBodyBase'), /spawnEnemyLoot\(e, f\.mobileType, ENEMY_BASICS\[f\.mobileType\], roller, \{ \.\.\.eliteLootOpts\(f\.src\), where: 'dungeon', \.\.\.o, rejects \}\);/);
   assert.match(memberSrc('lootContents'), /if \(\(kind === 'loot' \|\| kind === 'corpse'\) && \(roomUnborn\(key\) \|\| _lootUnreadable\.has\(roomLootKey\(key\)\)\)\) return null;/);
   assert.match(memberSrc('takeLoot'), /if \(\(kind === 'loot' \|\| kind === 'corpse'\) && roomUnborn\(key\)\) return 0;/);

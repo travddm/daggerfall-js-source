@@ -142,12 +142,12 @@ test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 0.2% a point of Destruct
   // no harder, and nothing lifts the climb past its effective cap
   on();
   const lifted = mage(100);
-  wear(lifted, legendary('eye-of-magnus'));   // +25 Destruction
-  assert.equal(page(true, () => skillValue(lifted, D)), 125, 'the live value the price reads');
+  wear(lifted, legendary('eye-of-magnus'));   // +15 Destruction (B4 rescale: 25 to 15)
+  assert.equal(page(true, () => skillValue(lifted, D)), 115, 'the live value the price reads');
   assert.equal(page(true, () => lands(BOLT(100), lifted)), 100, 'a school lifted past 100 by a worn line strikes as at 100');
   const capped = mage(200);
   wear(capped, legendary('eye-of-magnus'));
-  assert.equal(page(true, () => skillValue(capped, D)), 165);
+  assert.equal(page(true, () => skillValue(capped, D)), 155);
   assert.equal(page(true, () => lands(BOLT(100), capped)), 108, 'x1.08, whatever is worn');
   off();
   // MENTOR2: mentoring reads the MENTORED climb (spell/spellPower.js fightingClimb) - none beside a level 5, where the edge reads none
@@ -163,15 +163,15 @@ test('BAL9c THE LINES: potency and wellspring - a caster\'s, banded, worth focus
   assert.deepEqual([...well.groups], ['Jewellery']);
   assert.equal(pot.proc, true); assert.equal(well.proc, true);
   assert.equal(pot.params, null); assert.equal(well.params, null);
-  assert.deepEqual(LR.AFFIX_RANGES.potency, { magic: [1, 2], rare: [2, 3], legendary: [3, 5] });
-  assert.deepEqual(LR.AFFIX_RANGES.wellspring, { magic: [2, 4], rare: [4, 7], legendary: [7, 10] });
+  assert.deepEqual(LR.AFFIX_RANGES.potency, { magic: [1, 1], rare: [1, 2], legendary: [2, 3] });   // PIN MOVED: B4 rescale
+  assert.deepEqual(LR.AFFIX_RANGES.wellspring, { magic: [1, 2], rare: [2, 4], legendary: [4, 6] });
   assert.equal(LR.AFFIX_WORTH.potency, 60); assert.equal(LR.AFFIX_WORTH.wellspring, 60);
-  assert.equal(LR.affixLabel({ id: 'potency', value: 4 }), '+4% spell damage');
+  assert.equal(LR.affixLabel({ id: 'potency', value: 3 }), '+3% spell damage');
   assert.equal(LR.affixLabel({ id: 'wellspring', value: 5 }), '5% magicka on a kill');
   assert.deepEqual(['magic', 'rare', 'legendary'].map((t) => LR.affixWord({ id: 'potency', value: 3 }, t)), ["Evoker's", "Battlemage's", "Warlock's"]);
   assert.deepEqual(['magic', 'rare', 'legendary'].map((t) => LR.affixWord({ id: 'wellspring', value: 3 }, t)), ['of the Spring', 'of the Wellspring', 'of the Font']);
-  assert.equal(LR.validAffix({ id: 'potency', value: 6 }), false);
-  assert.equal(LR.validAffix({ id: 'wellspring', value: 11 }), false);
+  assert.equal(LR.validAffix({ id: 'potency', value: 4 }), false);
+  assert.equal(LR.validAffix({ id: 'wellspring', value: 7 }), false);
   assert.equal(LR.validAffix({ id: 'potency', param: 'fire', value: 5 }), false, 'no param');
   // the last pass: a jewel's four (focus, castSpeed, potency, wellspring), a blade's five (... castSpeed, potency), armour none
   const jewel = () => ring([]);
@@ -224,15 +224,15 @@ test('BAL9c THE CASTER\'S MAGICKA AND ITS THROW: wellspring on a kill under 10; 
   on();
   const me = plain({ magicka: 0, maxMagicka: 200 });
   setPlayerDoor({ foes: () => [], player: () => me, castOnPlayer: () => {} });
-  wear(me, ring([{ id: 'wellspring', value: 7 }], 135));
+  wear(me, ring([{ id: 'wellspring', value: 6 }], 135));
   LP.lootKill(foe());
-  assert.equal(me.magicka, 14, '7% of 200');
-  wear(me, ring([{ id: 'wellspring', value: 7 }], 133));
+  assert.equal(me.magicka, 12, '6% of 200');
+  wear(me, ring([{ id: 'wellspring', value: 6 }], 133));
   assert.equal(LP.WELLSPRING_CAP, 10);
   LP.lootKill(foe());
-  assert.equal(me.magicka, 34, 'never past 10% a kill (20 of 200)');
+  assert.equal(me.magicka, 32, 'never past 10% a kill (20 of 200; two rings at 6 are 12%)');
   LP.lootKill(foe({ team: 'PlayerAlly' }));
-  assert.equal(me.magicka, 34, 'my ally\'s death pays nothing');
+  assert.equal(me.magicka, 32, 'my ally\'s death pays nothing');
   // the Ring of Artaeum, each magic round
   const r = plain({ magicka: 150, maxMagicka: 200 });
   wear(r, legendary('ring-of-artaeum'));

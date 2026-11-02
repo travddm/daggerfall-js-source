@@ -81,8 +81,8 @@ function nightwhisperExalted() {
   throw new Error('no seed exalts a slayer at the top');
 }
 
-test('POWER-CEILING THE TOPS, MEASURED: each registry\'s own most from the records and laws it reads - the blow\'s +4 / +20 / +24 / +50 / +21 / +6 (B1; were +12 / +200 / +240 / +50 / +400 / +40; the Firmament tree is left to B5), the guards\' 12.45 / 10 / 15 / 4 / 4 off (were 55 / 50 / 15 / 30 / 20) - and the law\'s tables are those numbers (mutants: a top in the law raised; Bound in Silk at 150; Last Stand at 30)', () => {
-  assert.deepEqual(BLOW_TOPS, { sigil: 4, sets: 20, loot: 24, firmament: 50, mastery: 21, martial: 6 }, RULE);
+test('POWER-CEILING THE TOPS, MEASURED: each registry\'s own most from the records and laws it reads - the blow\'s +4 / +20 / +23 / +50 / +21 / +6 (B1; were +12 / +200 / +240 / +50 / +400 / +40; the Firmament tree is left to B5), the guards\' 12.45 / 10 / 15 / 4 / 4 off (were 55 / 50 / 15 / 30 / 20) - and the law\'s tables are those numbers (mutants: a top in the law raised; Bound in Silk at 150; Last Stand at 30)', () => {
+  assert.deepEqual(BLOW_TOPS, { sigil: 4, sets: 20, loot: 23, firmament: 50, mastery: 21, martial: 6 }, RULE);
   assert.deepEqual(GUARD_TOPS, { loot: 12.448, sets: 10, firmament: 15, martial: 4, arcane: 4 }, RULE);
   assert.deepEqual(measureBlowTops(), BLOW_TOPS, `a record moved a registry's top onto one blow - ${RULE}`);
   const keeps = measureGuardKeeps();
@@ -101,16 +101,16 @@ test('POWER-CEILING THE TOPS, MEASURED: each registry\'s own most from the recor
   assert.ok(Object.values(BLOW_TOPS).reduce((a, b) => a + b, 0) > BLOW_NET_PCT, 'and the tops summed are over it: the net is only for a kit with every registry near its top');
   assert.deepEqual(setsBlowTop().kit, ['wyrd 4', 'starspun 4'], 'the sets\' top: Bound in Silk and the sea set\'s Undertow');
   assert.deepEqual(setsGuardKeep().kit, ['numidium 4'], 'the sets\' guards: Gearward');
-  assert.deepEqual(lootBlowTop().kit, ['nightwhisper', 'night-mothers-embrace', 'duelists-vambrace', 'slayer 4', 'fresh']);
+  assert.deepEqual(lootBlowTop().kit, ['nightwhisper', 'night-mothers-embrace', 'duelists-vambrace', 'slayer 3', 'fresh']);
   assert.deepEqual(lootGuardKeep().kit, ['the-warden', 'mountains-root', 'witch-sisters-ring']);
   assert.equal(setKits().every((kit) => kit.reduce((n, [, c]) => n + c, 0) <= 9), true, 'never past the nine places');
 });
 
-test('POWER-CEILING THE NET IS NEVER REACHED BY A KIT A CHARACTER CAN WEAR (B1): one weapon, the nine places in the best sets, the best worn powers, one mastered skill, one path and the sigil add to +75 on a blow (net +75.4) and keep 75.6% of a hurt (net 74.1%) - the Firmament tree, +50 on its own, is the one registry left over the net until B5 retunes it', () => {
+test('POWER-CEILING THE NET IS NEVER REACHED BY A KIT A CHARACTER CAN WEAR (B1): one weapon, the nine places in the best sets, the best worn powers, one mastered skill, one path and the sigil add to +74 on a blow (net +75.4) and keep 75.6% of a hurt (net 74.1%) - the Firmament tree, +50 on its own, is the one registry left over the net until B5 retunes it', () => {
   const kit = bestRealKit();
   assert.ok(kit.blowPct <= BLOW_NET_PCT, `the best real kit adds +${kit.blowPct}, the net is +${BLOW_NET_PCT} - ${RULE}`);
   assert.ok(kit.guardKeep >= GUARD_LEAST, `the best real kit keeps ${kit.guardKeep}, the net keeps ${GUARD_LEAST} - ${RULE}`);
-  close(kit.blowPct, 75, 'the best real kit blow');
+  close(kit.blowPct, 74, 'the best real kit blow');
   assert.ok(kit.blowPct + BLOW_TOPS.firmament > BLOW_NET_PCT, 'with a full Firmament tree the net is reachable: B5 owns that');
 });
 
@@ -163,8 +163,8 @@ test('POWER-CEILING THE BLOW, BY EXECUTION: the sigil\'s +12%, the sets\' +200% 
   const unaware = { unaware: true };
   assert.equal(sigilBlow(nw, 1000, me, foe, unaware), 1040, 'the sigil at Ascendant: +4%');
   assert.equal(setBlow(nw, 1000, me, foe, unaware), 1200, 'the sets: +10% and +10%');
-  assert.equal(LP.lootBlow(nw, 1000, me, foe, unaware), 1240, 'the loot: +9%, +5%, +6%, +4%');
-  assert.equal(weaponBlowMods(nw, 1000, me, foe, unaware), 1480, 'together, whole, and ADDED: +4 +20 +24');
+  assert.equal(LP.lootBlow(nw, 1000, me, foe, unaware), 1230, 'the loot: +9%, +5%, +6%, +3% (the slayer top fell 4 to 3 in the B4 rescale: PIN MOVED)');
+  assert.equal(weaponBlowMods(nw, 1000, me, foe, unaware), 1470, 'together, whole, and ADDED: +4 +20 +23');
   assert.deepEqual(ceilingProducts(), { blow: null, guard: null }, 'the runner closes its product');
   registerWeaponBlowMod('powerceiling-test', (w, d) => d + Math.floor((d * blowRoom(1e6)) / 100));
   try {

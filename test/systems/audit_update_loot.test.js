@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { registerRollerLevel, withRollerLevel, rollerLevel, droughtHeld, gateLevel } from '../../src/systems/loot/lootLevelGate.js';
+import { registerRollerLevel, withRollerLevel, rollerLevel, gateLevel } from '../../src/systems/loot/lootLevelGate.js';
 import { applyRarity, addTechniqueLine, rarityEligible, rarityChances, pileSource, rollCorpseLoot, LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
 import { techniquesFor, TECHNIQUE_BANDS } from '../../src/combat/technique/techniqueRoster.js';
 import { itemFindings } from '../../src/systems/item/itemLaw.js';   // registers the item law the Imbue's guard reads (loot.js setItemLaw)
@@ -14,7 +14,6 @@ import { worthCeiling } from '../../src/systems/item/itemLaw.js';
 import { imbuePiece, imbueTarget } from '../../src/systems/reforge.js';
 import { welkyndShards } from '../../src/systems/gate/gateSpoils.js';
 import { counterValueOf } from '../../src/systems/tradeModes.js';
-import { noteTaken, droughtOf, _setDroughtForTests } from '../../src/systems/loot/lootDrought.js';
 import { sigilFloor } from '../../src/systems/sigil/sigil.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
@@ -143,22 +142,9 @@ test('AUDIT UPDATE L5: an imbued piece sells at a counter for what it sold at be
   }
 });
 
-test('AUDIT UPDATE L6: under level 10 the drought does not count a piece - but a Legendary taken still empties it (mutants: the Legendary held too; the hold lifted)', () => {
-  registerRollerLevel(() => 6);
-  try {
-    _setDroughtForTests(240);
-    assert.equal(noteTaken({ rarity: 'rare', untaken: true, templateIndex: 0, group: 'Weapons' }), false, 'a Rare under 10 counts nothing');
-    assert.equal(droughtOf(), 240);
-    assert.equal(noteTaken({ rarity: 'legendary', untaken: true, templateIndex: 0, group: 'Weapons' }), true);
-    assert.equal(droughtOf(), 0, 'a Legendary empties it at any level');
-  } finally { registerRollerLevel(null); _setDroughtForTests(0); }
-});
-
 test('AUDIT UPDATE L9: one reading of a level - a number\'s string gates as its number, an empty one or nonsense as none (mutants: a string unread; an empty string held)', () => {
   const crypt = pileSource(9);
   assert.deepEqual(rarityChances({ ...crypt, rollerLevel: '3' }), rarityChances({ ...crypt, rollerLevel: 3 }));
   assert.deepEqual(rarityChances({ ...crypt, rollerLevel: '' }), rarityChances(crypt));
   assert.deepEqual([gateLevel('7'), gateLevel(''), gateLevel('x'), gateLevel(0), gateLevel(-2), gateLevel(null)], [7, null, null, null, null, null]);
-  assert.equal(droughtHeld(''), false);
-  assert.equal(droughtHeld('5'), true);
 });

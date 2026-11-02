@@ -7,9 +7,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../../src/systems/loot/lootPowers.js';   // the shipping registration (registerRollerLevel)
 import { setPlayerDoor } from '../../src/systems/playerDoor.js';
-import { rollerLevel, withRollerLevel, DROUGHT_FROM } from '../../src/systems/loot/lootLevelGate.js';
+import { rollerLevel, withRollerLevel } from '../../src/systems/loot/lootLevelGate.js';
 import { rarityChances, rollRarity, rollLootRarity, pileSource, applyRarity, rarityEligible, LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
-import { noteTaken, droughtOf, _setDroughtForTests } from '../../src/systems/loot/lootDrought.js';
 import { eliteLoot } from '../../src/systems/eliteFoes.js';
 import { revenantLoot } from '../../src/systems/revenant/revenant.js';
 import { imbuePiece, imbueRefusal, imbueTarget, IMBUE_PRICE, shardsHeld } from '../../src/systems/reforge.js';
@@ -52,19 +51,6 @@ test('AUDIT UPDATE P3: every door reads it - rollRarity at the live player\'s le
   rollLootRarity(a, src, { rolls: () => r });
   rollLootRarity(b, src, { rolls: () => r, level: 1 });
   assert.deepEqual([a[0].rarity, b[0].rarity], ['rare', 'magic'], 'the level handed in decides it');
-});
-
-test('AUDIT UPDATE P3: the drought - held under DROUGHT_FROM, counted from it (mutants: the hold\'s level moved)', () => {
-  const rare = () => ({ rarity: 'rare', untaken: true, templateIndex: 0, group: 'Weapons' });
-  try {
-    _setDroughtForTests(0);
-    door({ level: DROUGHT_FROM - 1 });
-    assert.equal(noteTaken(rare()), false);
-    assert.equal(droughtOf(), 0, 'one under: nothing counted');
-    door({ level: DROUGHT_FROM });
-    assert.equal(noteTaken(rare()), true);
-    assert.equal(droughtOf(), 1, 'at it: counted');
-  } finally { door(null); _setDroughtForTests(0); }
 });
 
 test('AUDIT UPDATE P3: an elite\'s share and a revenant\'s - their Rare and Legendary held back at the roller\'s level, nothing else of them (mutants: an elite\'s Rare ungated; its Legendary ungated; a revenant\'s Legendary ungated)', () => {

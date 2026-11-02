@@ -13,7 +13,7 @@ import { Collider } from '../../src/player/collider.js';
 import { startShotTally, stopShotTally } from '../../src/systems/shotTally.js';
 import { spendAmmoFor, ARROW_TEMPLATE, ammoCountFor } from '../../src/systems/inventory.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
-import { capLootList } from '../../src/systems/foeLootCap.js';
+import { capFoeLoot } from '../../src/systems/foeLootCap.js';
 import { stockShopShelf, shopArrowStack, shopAmmoStack, SHOP_ARROWS_MAX, SHOP_ITEM_GROUPS, endlessArrowsAt, GENERAL_STORE_ARROWS } from '../../src/systems/shopStock.js';
 import { BUILDING_TYPES as B } from '../../src/world/buildingNames.js';
 import { useItem, usableItem } from '../../src/systems/useItem.js';
@@ -194,20 +194,12 @@ test('ARROW LODGE: a real shaft that strikes a foe lodges in its pack ARROW_LODG
   assert.equal(arrowCount(f.entity.items), 1, 'the last draw (0.3) decided it, the first (0.99) was the blow\'s');
 });
 
-test('ARROW LODGE: AN ARROW IS NO FIND - a plain body keeps its cap of pieces AND every arrow in it, uncounted (mutants: arrows counted; arrows dropped; arrows ranked)', () => {
+test('ARROW LODGE: a plain body keeps every piece and every arrow in it (B4 removed the count cap that once counted pieces and spared the quiver)', () => {
   const piece = (v) => ({ group: 'Weapons', templateIndex: 113, material: 0, value: v });
-  const full = [piece(10), piece(20), piece(30), arrows(4)];
-  assert.deepEqual(capLootList(full, 3), [], 'three pieces and the quiver: nothing thrown away');
-  assert.equal(full.length, 4);
-  const over = [piece(10), arrows(2), piece(20), piece(30), piece(40)];
-  const dropped = capLootList(over, 3);
-  assert.deepEqual(dropped.map((it) => it.value), [10], 'the cheapest piece goes, never the arrows');
-  assert.deepEqual(over.map((it) => it.templateIndex === ARROW_TEMPLATE ? 'arrows' : it.value), ['arrows', 20, 30, 40], 'in the list\'s own order');
-  assert.equal(capLootList([arrows(1), arrows(1), piece(1)], 0).length, 1, 'cap 0: the piece goes, the arrows stay');
-  // the quiver never takes a piece's place, however cheap the pieces
-  const cheap = [piece(1), piece(1), piece(1), piece(1), arrows(9)];
-  assert.equal(capLootList(cheap, 3).length, 1, 'one piece over the cap - and only one');
-  assert.equal(cheap.filter((it) => it.templateIndex === 113).length, 3);
+  const body = { lootCap: 3, items: [piece(10), arrows(2), piece(20), piece(30), piece(40), piece(50)] };
+  assert.deepEqual(capFoeLoot(body), [], 'nothing thrown away');
+  assert.equal(body.items.length, 6);
+  assert.equal(body.items.filter((it) => it.templateIndex === ARROW_TEMPLATE).length, 1, 'the quiver stays');
 });
 
 test('SHOP-ARROWS: the counter\'s quiver is the counter\'s law (SHOP-PELLETS\' own) at SHOP_ARROWS_MAX - a Weapon Smith 50 to 100, an Armorer and a General Store 14 to 29, a Pawn Shop 7 to 14, none where no weapon sells (mutants: the max)', () => {

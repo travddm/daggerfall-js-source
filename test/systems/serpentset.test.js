@@ -133,7 +133,7 @@ test('SERPENT-SET the records: nine in the places\' order - the seven body piece
   assert.equal(SERPENT_SET_POWER, Math.round((SIGIL_BANDS.legendary[0] + SIGIL_BANDS.legendary[1]) / 2));
   assert.equal(aethericById('coilscale-fang').power, 4);
   const mid = (id) => Math.round((AFFIX_RANGES[id].legendary[0] + AFFIX_RANGES[id].legendary[1]) / 2);
-  assert.deepEqual(['armor', 'stat', 'resist', 'skill', 'weight', 'damage'].map(mid), [16, 13, 43, 25, 43, 30]);
+  assert.deepEqual(['armor', 'stat', 'resist', 'skill', 'weight', 'damage'].map(mid), [10, 8, 26, 15, 43, 18]);   // PIN MOVED (B4 rescale): the Legendary band's middles, armour 7-12, stat 6-9, resist 21-30, skill 12-18, damage 12-24 (were 16, 13, 43, 25, 30)
   for (const r of SERPENT_SET_PIECES) for (const a of r.affixes) assert.equal(a.value, mid(a.id), `${r.id} ${a.id}`);
   assert.deepEqual(SERPENT_SET_PIECES.map((r) => r.affixes.map((a) => a.param ?? a.id)), [
     ['armor', 'willpower', 'shock'], ['armor', 'strength', SKILLS.Swimming], ['armor', 'endurance', 'poison'],
@@ -207,7 +207,7 @@ test('SERPENT-SET the hoard: every hoard - a ship that dealt and one that stood 
     ["Warrior's Flail of Skill", 'rare'], ['Torc of Warding', 'magic'],
   ]]);
   // gem arc's - this seed's broadsword rolls Leap Strike there, its line after the last pass's
-  assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 3 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
+  assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 2 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (B4 rescale: potency's Legendary band is 2-3 now, the same draw lands on 2; earlier BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
   assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 12 }, 'TECH1: and the technique\'s, last');
   assert.deepEqual(rollSerpentSpoils(6, 12, 'dealt'), h, 'the same seed, the same hoard');
   const grip = rollSerpentSpoils(12345, 20, 'dealt').pieces[2];

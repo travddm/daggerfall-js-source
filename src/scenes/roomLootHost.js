@@ -130,7 +130,7 @@ export function createRoomLoot(host) {
   }
   /** THE BASE: a container's chain on the room's dice and the room's terms, computed here as on every client in the
    *  room (cached for one set of terms). Rolled AS THE ROOM (onlineLane.js asTheRoom): every mod at its shipped
-   *  default. Answers `{ name, terms, items, full, rejects, lootCap, champion, h }` - `champion` the trait id the base
+   *  default. Answers `{ name, terms, items, full, rejects, plainLadder, champion, h }` - `champion` the trait id the base
    *  rolled a body as, or null. */
   function rollRoomBase(canon, terms) {
     if (isCarried(canon)) {   // OUTDOOR-LOOT: a find's base is the searcher's roll, carried with the state - never computed
@@ -138,7 +138,7 @@ export function createRoomLoot(host) {
       if (!st?.base || !sameMint(st.terms, terms)) return null;
       const was = _roomBase.get(canon);
       if (was?.carried === st.base) return was;
-      const rec = { name: canon, terms: { ...st.terms }, items: st.base.items, full: st.base.full, rejects: [], lootCap: null, h: st.base.h, carried: st.base };
+      const rec = { name: canon, terms: { ...st.terms }, items: st.base.items, full: st.base.full, rejects: [], plainLadder: false, h: st.base.h, carried: st.base };
       _roomBase.set(canon, rec);
       return rec;
     }
@@ -150,15 +150,15 @@ export function createRoomLoot(host) {
     const rolls = seededRolls(name);
     const gender = roomBaseGender(name);
     const rejects = [];
-    let items = [], lootCap = null, champion = null;
+    let items = [], plainLadder = false, champion = null;
     // AUDIT UPDATE L1: and at the room's level - every LOOT-GATE under it (the corpse door, the kit, an elite's and a
     // revenant's share) reads terms.lv, never this client's own player, so every client rolls the one base
     asTheRoom(() => withRollerLevel(terms.lv, () => {
       if (h.pile) items = roomPileBase(h, terms, rolls, gender);
-      else ({ items, lootCap, champion } = roomBodyBase(h.foe, terms, rolls, gender, rejects));
+      else ({ items, plainLadder, champion } = roomBodyBase(h.foe, terms, rolls, gender, rejects));
     }));
     if (items.length > ROOM_BASE_MAX) items.length = ROOM_BASE_MAX;
-    const rec = { name, terms: { ...terms }, items, full: items.map((it) => (Number.isInteger(it?.stackCount) ? it.stackCount : null)), rejects, lootCap, champion, h: baseSignature(items) };
+    const rec = { name, terms: { ...terms }, items, full: items.map((it) => (Number.isInteger(it?.stackCount) ? it.stackCount : null)), rejects, plainLadder, champion, h: baseSignature(items) };
     _roomBase.set(canon, rec);
     _roomBonus.delete(canon);
     return rec;
@@ -173,13 +173,13 @@ export function createRoomLoot(host) {
     return items;
   }
   /** A body's base: SetEnemyCareer's whole loot chain (spawnEnemyLoot) and its death's (the kit's ladder, the sigils at
-   *  the fight's count, OnEnemyDeath's subscribers and the cap), run over the fallen foe's own entity on the room's
+   *  the fight's count and OnEnemyDeath's subscribers), run over the fallen foe's own entity on the room's
    *  dice and terms - a class foe at the party's level, as SetEnemyCareer stands one at the player's, and its champion
    *  mark judged at that level - and handed back without touching what the foe wore or fought with. `rejects` receives
    *  what PLAIN-LOOT's keep let go. */
   function roomBodyBase(f, terms, rolls, gender, rejects) {
     const e = f.entity;
-    const saved = { items: e.items, weapon: e.weapon, armorValues: e.armorValues, equip: e.equip, level: e.level, champion: e.champion, lootCap: e.lootCap };
+    const saved = { items: e.items, weapon: e.weapon, armorValues: e.armorValues, equip: e.equip, level: e.level, champion: e.champion, plainLadder: e.plainLadder };
     const roller = roomRoller(terms.lv, gender);
     const o = { rolls, quarters: ROOM_BASE_QUARTERS, luck: ROOM_BASE_LUCK, find: ROOM_BASE_FIND };
     try {
@@ -189,9 +189,9 @@ export function createRoomLoot(host) {
       // copy draws PLAIN-LOOT's keep dice a champion skips, and the host's word about the body reads as another build's.
       // An elite foe is never a champion, as applyEliteScaling stands it.
       e.champion = e.eliteFoe ? undefined : championTraitFor(e, f.src?.champion)?.id;
-      // A plain copy's build stamped its own loot cap, and a champion's chain stamps none; the base's record must carry
-      // the cap its own chain stamps, because the player's bonus reads it.
-      e.lootCap = undefined;
+      // A plain copy's build stamped its plain-ladder mark, and a champion's chain stamps none; the base's record must
+      // carry the mark its own chain stamps, because the player's bonus reads it.
+      e.plainLadder = undefined;
       e.items = [];
       e.equip = undefined;   // the base's kit is laid on a table of its own, never over the one the foe wore
       spawnEnemyLoot(e, f.mobileType, ENEMY_BASICS[f.mobileType], roller, { ...eliteLootOpts(f.src), where: 'dungeon', ...o, rejects });
@@ -199,7 +199,7 @@ export function createRoomLoot(host) {
       rollCorpseKit(e, o);
       stampWonWeapons(e.items, terms.n ?? 1, { rolls });
       raiseEnemyDeath(e, { ...o, level: terms.lv, room: true });   // `room`: the room's base, every client's - no kill (systems/eliteGates/egFind.js asks at the kill)
-      return { items: e.items, lootCap: Number.isInteger(e.lootCap) ? e.lootCap : null, champion: e.champion ?? null };
+      return { items: e.items, plainLadder: e.plainLadder === true, champion: e.champion ?? null };
     } finally {
       Object.assign(e, saved);
     }
@@ -208,7 +208,7 @@ export function createRoomLoot(host) {
    *  own Renown and Luck (RENOWN-LOOT, "the roller's own"): the pieces PLAIN-LOOT's keep let go that their Renown's keep
    *  keeps (bonusShare, so the base's keep and theirs together are their own), the supplies their Renown's share adds
    *  over the base's (rollBonusSupplies), each piece on their own ladder (their Luck, their finders, their Renown's plain
-   *  weights) and the sigils at the fight's count - inside the cap's room above the base, never past it. Rolled outside
+   *  weights) and the sigils at the fight's count. Rolled outside
    *  the room's scope: the player's own switches decide what is theirs. Never said to the room. */
   function roomBonusOf(canon, base) {
     const who = playerEntity?.characterId ?? opts.selfId?.() ?? 'me';
@@ -220,7 +220,7 @@ export function createRoomLoot(host) {
     const pieces = rollRoomBonus({   // hostCombat.js: the knobs' one home, at this player's own stage and Luck
       rolls: seededRolls(key), player: playerEntity, pile: !!h?.pile, deepPile: !!h?.pile && isDeepPileKey(host.lootKey), rejects: base.rejects,
       basics: f ? ENEMY_BASICS[f.mobileType] : null, mobileType: f?.mobileType ?? null, champion: base.champion ?? null,
-      level: f ? (f.entity.isClass ? base.terms.lv : f.entity.level) : base.terms.lv, lootCap: base.lootCap, baseItems: base.items, fighters: base.terms.n ?? 1,
+      level: f ? (f.entity.isClass ? base.terms.lv : f.entity.level) : base.terms.lv, plainLadder: base.plainLadder, fighters: base.terms.n ?? 1,
     });
     for (const it of pieces) markPersonal(it);
     const rec = { key, pieces, composed: false };

@@ -57,11 +57,12 @@ test('LOOT20: DFU\'s eight gems and their lines - a weapon\'s blow, every other 
   assert.deepEqual(LR.GEM_IDS.map((g, i) => [LR.GEM_NAMES[g], templateByIndex(i).name]), LR.GEM_IDS.map((g, i) => [templateByIndex(i).name, templateByIndex(i).name]), 'the templates\' own order and names');
   assert.deepEqual(LR.SOCKET_PER_MILLE, { rare: 150, legendary: 300 });
   assert.deepEqual(LR.SOCKET_GROUPS, ['Weapons', 'Armor', 'Jewellery'], 'never a garment - the wardrobe keeps the fight off the clothes');
+  // PIN MOVED: B4 rescale, the plain column follows the new gem rows (elemental, leech and stat gems 2)
   const want = {
-    ruby: [['elemental', 'fire', 3], ['resist', 'fire', 10]], sapphire: [['elemental', 'frost', 3], ['resist', 'frost', 10]],
-    emerald: [['leech', undefined, 3], ['resist', 'poison', 10]], diamond: [['damage', undefined, 6], ['resist', 'magic', 10]],
-    amber: [['stat', 'speed', 4], ['stat', 'luck', 3]], jade: [['stat', 'willpower', 4], ['stat', 'willpower', 4]],
-    turquoise: [['stat', 'agility', 4], ['stat', 'personality', 4]], malachite: [['stat', 'strength', 4], ['stat', 'endurance', 4]],
+    ruby: [['elemental', 'fire', 2], ['resist', 'fire', 10]], sapphire: [['elemental', 'frost', 2], ['resist', 'frost', 10]],
+    emerald: [['leech', undefined, 2], ['resist', 'poison', 10]], diamond: [['damage', undefined, 6], ['resist', 'magic', 10]],
+    amber: [['stat', 'speed', 2], ['stat', 'luck', 3]], jade: [['stat', 'willpower', 2], ['stat', 'willpower', 2]],
+    turquoise: [['stat', 'agility', 2], ['stat', 'personality', 2]], malachite: [['stat', 'strength', 2], ['stat', 'endurance', 2]],
   };
   for (const g of LR.GEM_IDS) {
     const w = LR.gemLine(sword(), g), o = LR.gemLine(ring(), g);
@@ -95,20 +96,20 @@ test('LOOT20: a set gem\'s line through every reader - the fold, LOOT12\'s cap, 
   on();
   const e = player();
   const r1 = socketed(ring, 'rare', 4);
-  r1.affixes = [{ id: 'resist', param: 'fire', value: 35 }, { id: 'stat', param: 'strength', value: 6 }];
-  LR.setGem(r1, 'ruby');
+  r1.affixes = [{ id: 'resist', param: 'fire', value: 30 }, { id: 'stat', param: 'strength', value: 6 }];   // PIN MOVED: B4 rescale, a resistance line tops at 30, so a perfect ruby (20) reaches the 45 cap
+  LR.setGem(r1, 'perfect-ruby');
   e.items.push(r1); equipItem(e, r1); computeEntityMods(e);
   assert.equal(e._mods.resist.fire, LR.RESIST_CAP, '35 and the ruby\'s 10: to the cap - a socket counts toward it');
-  assert.deepEqual(LR.rolledResistOf(e, 'fire'), { worn: 45, counts: 45 });
+  assert.deepEqual(LR.rolledResistOf(e, 'fire'), { worn: 50, counts: 45 });
   const r2 = socketed(ring, 'rare', 5);
   r2.affixes = [{ id: 'stat', param: 'agility', value: 6 }];
   LR.setGem(r2, 'jade');
   e.items.push(r2); equipItem(e, r2); computeEntityMods(e);
-  assert.equal(e._mods.stats.willpower, 4, 'a jewel\'s jade: Willpower to its wearer');
+  assert.equal(e._mods.stats.willpower, 2, 'a jewel\'s jade: Willpower to its wearer');
   // a weapon's: its procs and its damage
   const blade = socketed(sword, 'rare', 6);
   LR.setGem(blade, 'ruby');
-  assert.deepEqual(linesOf(blade, 'elemental').map((a) => [a.param, a.value]), [['fire', 3]], 'the ruby\'s fire on a blow (lootPowers.js)');
+  assert.deepEqual(linesOf(blade, 'elemental').map((a) => [a.param, a.value]), [['fire', 2]], 'the ruby\'s fire on a blow (lootPowers.js)');
   const plain = socketed(sword, 'rare', 7);
   plain.affixes = [{ id: 'stat', param: 'strength', value: 6 }];
   const withDiamond = JSON.parse(JSON.stringify(plain));
@@ -117,12 +118,12 @@ test('LOOT20: a set gem\'s line through every reader - the fold, LOOT12\'s cap, 
   assert.equal(LR.affixWeaponDamage(plain, 100), 100);
   const leech = JSON.parse(JSON.stringify(plain));
   LR.setGem(leech, 'emerald');
-  assert.deepEqual(linesOf(leech, 'leech').map((a) => a.value), [3]);
+  assert.deepEqual(linesOf(leech, 'leech').map((a) => a.value), [2]);
   // the card
   const at = r1.affixes.length - 1;
-  assert.equal(LR.affixLine(r1, at), 'Ruby: +10% Fire resistance');
+  assert.equal(LR.affixLine(r1, at), 'Perfect Ruby: +20% Fire resistance');
   assert.equal(LR.affixBand(r1, at), null, 'no band');
-  assert.ok(LR.rarityLines(r1).includes('Ruby: +10% Fire resistance'));
+  assert.ok(LR.rarityLines(r1).includes('Perfect Ruby: +20% Fire resistance'));
   const empty = socketed(ring, 'rare', 8);
   assert.ok(LR.rarityLines(empty).includes('Socket: empty'));
   assert.ok(!LR.rarityLines(r1).includes('Socket: empty'));
@@ -240,7 +241,7 @@ test('LOOT20: the Reforge\'s presses - a gem from the pack, every refusal taking
   assert.equal(worn._mods.stats.willpower ?? 0, 0);
   assert.equal(RF.setGemRefusal(wp, 'jade', worn), null);
   assert.equal(RF.setGemPiece(wp, 'jade', worn).ok, true);
-  assert.equal(worn._mods.stats.willpower, 4, 'the jade\'s Willpower on its wearer with no fold of the test\'s own');
+  assert.equal(worn._mods.stats.willpower, 2, 'the jade\'s Willpower on its wearer with no fold of the test\'s own');
   assert.equal(RF.unsetGemRefusal(wp), null);
   assert.equal(RF.unsetGemPiece(wp, worn).ok, true);
   assert.equal(worn._mods.stats.willpower ?? 0, 0, 'and off again');

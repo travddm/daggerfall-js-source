@@ -277,7 +277,7 @@ test('FB0929: a repair is a purchase too (GetTradePrice :497-498) - a cheap blad
   dagger.currentCondition = dagger.maxCondition - 1;   // a blow's wear
   const ctx = { quality: 1, priceAdjustment: 750, skills: SKILLS };
   const lot = tradeCost('Repair', [dagger], ctx);
-  assert.deepEqual(lot, { cost: 1, modeActionEnabled: true, pieces: 1 }, 'CalculateItemRepairCost: a tenth of 3 floors to 1, then CalculateCost\'s 2 - REPAIR-EASE: two thirds of it, rounded, 1');
+  assert.deepEqual(lot, { cost: 2, modeActionEnabled: true, pieces: 1 }, 'CalculateItemRepairCost: a tenth of 3 floors to 1, then CalculateCost\'s 2 - B4: the full DFU price');
   assert.equal(calculateTradePrice(lot.cost, 1, SKILLS, false), 0, 'Daggerfall mends it for nothing');
   assert.equal(getTradePrice('Repair', lot.cost, 1, SKILLS, lot.pieces), 1);
   // FightersGuild.ReducedRepairCost at rank 9 is 25/256 of the cost: CalculateCost's 2 truncates to nothing

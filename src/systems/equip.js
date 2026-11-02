@@ -529,7 +529,7 @@ export function _wearScaleForTests(scale = CONDITION_WEAR_SCALE) { _wearScale = 
  *  (scenes/world.js). At DFU's own rate (WEAR-VANILLA) a steel longsword lost about 6.5% of itself to a hundred swings
  *  and armour hardly wore, so wear put no pressure on an outing - the economy arc's friction ("the pressure to return
  *  is capacity, supplies and wear, never price", 06-Systems/Economy-Arc.md). The mods' own wear modules, which a
- *  player may turn on offline, keep their own amounts; repairs keep REPAIR-RATE's third. A whole number, so it draws
+ *  player may turn on offline, keep their own amounts; repairs cost what DFU asks (B4). A whole number, so it draws
  *  no roll. A departure (Ledger A, WEAR-TWICE).
  *  WEAR-ONE (2026-10-02,; asked how much, "Daggerfall's
  *  rate (1x)"): TWICE WAS TOO MUCH - a 50-point dagger or bow broke in about 25 landed blows, and every blow cost at

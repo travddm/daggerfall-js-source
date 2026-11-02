@@ -20,7 +20,6 @@ import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import { rarityOf } from '../../src/systems/loot/lootRarity.js';
 import { isMap } from '../../src/systems/useItem.js';
 import { isAmmunition } from '../../src/systems/item/itemTemplates.js';
-import { ELITE_DUNGEON_FOE_LOOT_CAP } from '../../src/systems/foeLootCap.js';   // the Rest arc's merge of main's #576 (FOE-CAP)
 import { enemyLootSpawned } from '../../src/characters/enemy/enemyEntity.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -76,7 +75,7 @@ test('PLAIN-LOOT: a foe that is no elite leaves THREE PIECES IN FOUR of what it 
       // THE REST ARC'S MERGE of main's #576 (RE-AIMED): FOE-CAP holds an Elite Dungeon's ordinary foe to five, gold
       // included, after the whole chain - PLAIN-LOOT's exemption is that it is never HALVED: on the coin that leaves a
       // plain foe its gold alone, it carries more than its gold, within its cap
-      assert.ok(carried(e).length > 0 && e.items.length <= ELITE_DUNGEON_FOE_LOOT_CAP, 'elite: never halved, within the five');
+      assert.ok(carried(e).length > 0, 'elite: never halved');
       continue;
     }
     assert.ok(e.items.some(isGoldPieces) && carried(e).some((it) => !kit.has(it)) && e.items.some((it) => kit.has(it)) && e.items.some(isMap), `${Object.keys(mark)[0]}: its gold, the table, the kit and the map`);

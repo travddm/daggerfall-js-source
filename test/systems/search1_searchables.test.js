@@ -12,7 +12,7 @@ import { WATER_SPECIES } from '../../src/characters/dungeonEnemies.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { DOOR_ACTIVATION_DISTANCE } from '../../src/player/activate.js';
 import { ActionTextBox } from '../../src/ui/actionText.js';
-import { capLootList, capFoeLoot, plainFoeLootRule, PLAIN_FOE_RARITY_WEIGHTS } from '../../src/systems/foeLootCap.js';
+import { capFoeLoot, plainFoeLootRule, PLAIN_FOE_RARITY_WEIGHTS } from '../../src/systems/foeLootCap.js';
 import { rarityChances } from '../../src/systems/loot/lootRarity.js';
 import { goldStack, isGoldPieces } from '../../src/systems/inventory.js';
 
@@ -93,8 +93,8 @@ test('SEARCH1: the box acts only once it is clicked away, and never when replace
 
 test('FOE-CAP: who is plain - champions, elites, revenants and bosses are not', () => {
   const lvl = { level: 5 };
-  assert.deepEqual(plainFoeLootRule({ level: 5 }, lvl), { cap: 3, plainLadder: true });
-  assert.deepEqual(plainFoeLootRule({ level: 5, elite: true }, lvl), { cap: 5, plainLadder: false });
+  assert.deepEqual(plainFoeLootRule({ level: 5 }, lvl), { plainLadder: true });
+  assert.deepEqual(plainFoeLootRule({ level: 5, elite: true }, lvl), { plainLadder: false });
   assert.equal(plainFoeLootRule({ level: 5, champion: 'thorned' }, lvl), null);
   assert.equal(plainFoeLootRule({ level: 5, eliteFoe: true }, lvl), null);
   assert.equal(plainFoeLootRule({ level: 5, revenant: { name: 'x' } }, lvl), null);
@@ -102,13 +102,10 @@ test('FOE-CAP: who is plain - champions, elites, revenants and bosses are not', 
   assert.equal(plainFoeLootRule({ level: 5 }, { level: 5, affinity: 'Daedra' }), null);
 });
 
-test('FOE-CAP: three at most, gold folded and kept, a quest item never dropped, the best kept', () => {
-  const items = [{ name: 'a', value: 5 }, goldStack(10), { name: 'b', value: 50 }, goldStack(7), { name: 'c', value: 1, rarity: 'rare' }, { name: 'q', questItem: true }, { name: 'd', value: 99 }];
-  capLootList(items, 3);
-  assert.deepEqual(items.map((i) => (isGoldPieces(i) ? `gold${i.stackCount}` : i.name)), ['gold17', 'c', 'q']);
+test('FOE-CAP: a body keeps what it carries (B4 removed the count cap); a promoted foe is still titled by its death', () => {
   const e = { lootCap: 3, items: [goldStack(1), { name: 'x' }, { name: 'y' }, { name: 'z' }], eliteFoe: true };
   capFoeLoot(e);
-  assert.equal(e.items.length, 4);   // promoted after its spawn: titled by its death
+  assert.equal(e.items.length, 4);
 });
 
 test('FOE-CAP: the plain ladder - white the rule, blue rare, yellow very rare, orange almost never (LOOT-EASE: a quarter more blue, half again the yellow and the orange)', () => {
@@ -129,23 +126,6 @@ test('FOE-CAP: the plain ladder - white the rule, blue rare, yellow very rare, o
     const p = rarityChances({ tier: t, weights: PLAIN_FOE_RARITY_WEIGHTS }), f = rarityChances({ tier: t });
     assert.ok(p.magic <= f.magic / 2 && p.rare <= f.rare / 2 && p.legendary <= f.legendary / 4, `tier ${t}: at most half the whole ladder's blue and yellow, a quarter its orange`);
   }
-});
-
-test('CAP-SUPPLIES (LOOT-EASE): a full body keeps a Magic-or-better piece first, then a supply - a potion, a rest supply - before a Common piece of gear, however dear (mutants: the supply rank dropped; a supply over a Magic piece; the rest items never registered)', async () => {
-  const { POTION_TEMPLATE_INDEX } = await import('../../src/systems/loot/loot.js');
-  const { createRestItem, REST_ITEM } = await import('../../src/systems/rest/restItems.js');   // registers the seven as supplies
-  const { isLootSupply } = await import('../../src/systems/foeLootCap.js');
-  const potion = { name: 'potion', group: 'UselessItems1', templateIndex: POTION_TEMPLATE_INDEX, potionRecipeKey: 4975678, value: 50 };
-  const tonic = { ...createRestItem(REST_ITEM.Tonic), name: 'tonic' };
-  const steel = { name: 'steel', group: 'Weapons', templateIndex: 120, material: 1, value: 360 };
-  const blue = { name: 'blue', group: 'Weapons', templateIndex: 113, material: 0, value: 30, rarity: 'magic' };
-  assert.deepEqual([potion, tonic, steel, blue].map(isLootSupply), [true, true, false, false]);
-  const a = [steel, goldStack(5), potion, { name: 'boots', group: 'Armor', value: 400 }];
-  capLootList(a, 3);
-  assert.deepEqual(a.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['gold', 'potion', 'boots'], 'the potion over the steel blade; the dearer Common after it');
-  const b = [steel, tonic, goldStack(5), blue, potion];
-  capLootList(b, 3);
-  assert.deepEqual(b.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['gold', 'blue', 'potion'], 'the Magic piece first, then the dearer supply');
 });
 
 test('KIT-ROLL (LOOT-EASE): a foe\'s dropped kit rolls the plain ladder at its death - never at the spawn; once; marked for the drought; a piece its spawn\'s roll rolled never; off, nothing (mutants: the ladder never read; the drought\'s mark dropped; the plain ladder lost; the carried piece rolled twice). PIN MOVED (AUDIT 625 L1-L3): the kit is what the spawn\'s roll left unmarked - so the carried piece is the producer\'s, marked `untaken` - laddered as a copy, and every foe\'s rolls (Mac: "The plain ladder"); test/systems/audit625_loot.test.js pins the three', async () => {

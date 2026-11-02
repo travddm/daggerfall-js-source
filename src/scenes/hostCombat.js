@@ -8,7 +8,7 @@
 // FormulaHelper.cs, DaggerfallUnityItem.cs, PlayerActivate.cs
 // (MIT, Daggerfall Workshop).
 
-import { plainFoeLootRule, capFoeLoot, plainFoeRarityWeights, capLootList } from '../systems/foeLootCap.js';   // FOE-CAP: a plain foe's cap and ladder (RENOWN-LOOT: at the roller's Renown)
+import { plainFoeLootRule, capFoeLoot, plainFoeRarityWeights } from '../systems/foeLootCap.js';   // FOE-CAP: a plain foe's cap and ladder (RENOWN-LOOT: at the roller's Renown)
 import { renownLootQuarters, lootEased } from '../systems/renownLoot.js';   // RENOWN-LOOT: LOOT-EASE's buff by the roller's Renown
 import { SKILLS, tallySkill, skillValue, SKILL_NAMES } from '../systems/skills.js';
 import { effectiveLevel, lootGateLevel } from '../systems/mentorMode.js';   // SOFTCAP2: mentor mode - the level the world is built around; MENTOR2: the gate's, the real one
@@ -30,7 +30,7 @@ import { conditionBasedPricesOn, randomConditionLootItems } from '../systems/rol
 import { isHumanoid } from '../systems/survival/loot.js';   // MOD: the same humanoid test SURV2's corpse food already draws its line with
 import { rollCorpseLoot, lootRarityOn, rarityRank, RARITIES, rarityEligible, applyRarity, lastPass, stampWonWeapons } from '../systems/loot/lootRarity.js';   // RF2: and the port's, after it; LOOT7: a champion's guarantee
 import { championOf } from '../systems/champions.js';   // LOOT7: the champions' traits register at import
-import { isGoldPieces, ARROW_TEMPLATE } from '../systems/inventory.js';   // PLAIN-LOOT: a plain foe's gold all of it; PARTY-LOOT: a shaft is never counted under the cap
+import { isGoldPieces } from '../systems/inventory.js';   // PLAIN-LOOT: a plain foe's gold all of it
 import { bonusShare, rollBonusSupplies, ROOM_BASE_QUARTERS } from '../systems/roomLoot.js';   // PARTY-LOOT: a player's own layer over a room's shared base
 import { liveStat, FATIGUE_DRAIN_SCALE } from '../systems/statMods.js';   // RF2: the player's live luck for the roll   // AUDIT 58: ItemHelper's EquipItem half - a foe's equip table is what DamageEquipment's struck side reads
 import { GLOBAL_SCALE } from '../world/meshReader.js';
@@ -165,10 +165,10 @@ export function spawnEnemyLoot(entity, mobileType, basics, player, { rolls = Mat
   // (above) does not, and a foe's cuirass is worn either way.
   if (conditionBasedPricesOn()) randomConditionLootItems([...new Set([...entity.items, ...(eq?.worn ?? [])])], rolls);
   enemyLootSpawned.raise({ mobileType, lootTableKey: enemyLootTableKey(mobileType, basics?.lootTableKey ?? '-'), items: entity.items, worn: eq?.worn ?? [], where, rolls, roller: player });   // PARTY-LOOT: the roll's dice and roller ride the event, so a subscriber draws on the caller's terms   // OH-E: ...and every other subscriber, in the one list (the worn set is Items' too, as above)
-  // FOE-CAP (systems/foeLootCap.js): a plain foe - no title, no boss - rolls the plain ladder (outside an Elite Dungeon)
-  // and carries at most its cap, gold included; the stamp rides the entity so the death's handlers are capped too
+  // systems/foeLootCap.js: a plain foe - no title, no boss - rolls the plain ladder (outside an Elite Dungeon). A body
+  // carries what its rolls gave it (B4 removed the count cap); the stamp tells the room's bonus to use the plain ladder
   const plain = plainFoeLootRule(entity, basics);
-  if (plain) entity.lootCap = plain.cap;
+  if (plain) entity.plainLadder = plain.plainLadder;
   rollCorpseLoot(entity, basics, { rolls, luck, find, qualityMult: lootQualityMult, weights: plain?.plainLadder ? plainFoeRarityWeights(ease) : null, level: lootGateLevel(player) });   // PARTY-LOOT: the caller's Luck and finders; AUDIT UPDATE L4: and its level (LOOT-GATE) - a scene's first foes are rolled before any host frame; MENTOR2: a mentor's real one
   capFoeLoot(entity);
   return entity.items;
@@ -180,9 +180,9 @@ export function spawnEnemyLoot(entity, mobileType, basics, player, { rolls = Mat
  *  each piece PLAIN-LOOT's keep let go at the base's stage (`rejects`) kept at the step between the two keeps
  *  (roomLoot.js bonusShare - the base's keep and the bonus's together the player's own), the supplies' share above the
  *  base's for a foe with a table, then the plain ladder at the player's Luck, finders and stage, the sigils at the
- *  fight's count, and the cap's room above the base (`lootCap` less the base's counted pieces - a shaft never counted).
+ *  fight's count.
  *  A deep PILE's: the supplies' share alone (it has no keep). Answers the pieces, none of them the room's. */
-export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, rejects = [], basics = null, mobileType = null, champion = null, level = 1, lootCap = null, baseItems = [], fighters = 1 }) {
+export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, rejects = [], basics = null, mobileType = null, champion = null, level = 1, plainLadder = false, fighters = 1 }) {
   const own = renownLootQuarters();
   let pieces = [];
   if (!pile) {
@@ -192,12 +192,11 @@ export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, r
     if (key && key !== '-') rollBonusSupplies(pieces, 'enemy', ROOM_BASE_QUARTERS, own, rolls);   // addEnemyLootExtras' own gate: a foe with a table
     if (pieces.length) {
       const body = { items: pieces, level, mobileType, champion };
-      rollCorpseLoot(body, basics, { rolls, luck: liveStat(player, 'luck'), weights: Number.isInteger(lootCap) ? plainFoeRarityWeights(own) : null });
+      rollCorpseLoot(body, basics, { rolls, luck: liveStat(player, 'luck'), weights: plainLadder ? plainFoeRarityWeights(own) : null });
       pieces = body.items;
     }
   } else if (deepPile) rollBonusSupplies(pieces, 'pile', ROOM_BASE_QUARTERS, own, rolls);
   stampWonWeapons(pieces, fighters, { rolls });
-  if (Number.isInteger(lootCap)) capLootList(pieces, Math.max(0, lootCap - baseItems.filter((it) => !(it?.group === 'Weapons' && it.templateIndex === ARROW_TEMPLATE)).length));   // FOE-CAP: the body's cap is the base's and the bonus's together (STUCK-ARROWS: a shaft is never counted)
   return pieces;
 }
 
