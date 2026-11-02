@@ -14,3 +14,5 @@ tools/lintRatchet.json
 src/buildTag.js
 *.html
 *.png
+test/fixtures/mw/mwCameraParity.json
+test/fixtures/mw/spineAimParity.json

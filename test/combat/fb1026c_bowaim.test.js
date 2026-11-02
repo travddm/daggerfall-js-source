@@ -1,9 +1,9 @@
 // BOW-AIM (FIELD BUGS 2026-10-26c, feature-feedback via;
 // ) - THE THIRD-PERSON BODY AIMS A RANGED WEAPON WHERE ITS OWNER LOOKS
-// (combat/spineAim.js): the reference's two spine RotateControllers, half the pitch each, and its pitch factor. On the
+// (combat/spineAim.js): two spine bones turned by half the pitch each, and the pitch weight. On the
 // vendored retail biped (test/fixtures/mw/retailRig.mjs).
 //
-// What is pinned: setPitchFactor's law verbatim (character.cpp:1868-1895); the turn in the ACTOR ROOT's frame, laid on
+// What is pinned: the pitch weight's law; the turn in the ACTOR ROOT's frame, laid on
 // spine1 and spine2 so the chest and everything above it carry the whole pitch about the root's X, + down; the
 // conjugation in this port's column convention (mwFirstPerson.js rootSpaceTurn - the letters' copy of OSG's row-vector
 // line tipped the chest the other way, about a skewed axis); the slot in poseAssembly, after the neck and before the body
@@ -38,7 +38,7 @@ const at = (m, n) => m.get(sk.byName.get(n));
 /** The turn a bone's world rotation took in the root's frame: world' * world^T. */
 const turnOf = (m0, m1, n) => mul(unit(at(m1, n).a), T(unit(at(m0, n).a)));
 
-test('BOW-AIM THE PITCH FACTOR is character.cpp:1868-1895 verbatim: none unless a Ranged or Thrown weapon is in its wind-up, release or follow (or a cast); eased in over "start" to "min attack" (unless the group is a random attack); 1 through the release; eased out over the follow - a crossbow\'s in its first tenth (mutants: BOW-AIM-melee-pitches, BOW-AIM-idle-pitches, BOW-AIM-no-ramp-in, BOW-AIM-crossbow-slow, BOW-AIM-follow-held)', () => {
+test('BOW-AIM THE PITCH FACTOR: none unless a Ranged or Thrown weapon is in its wind-up, release or follow (or a cast); eased in over "start" to "min attack" (unless the group is a random attack); 1 through the release; eased out over the follow - a crossbow\'s in its first tenth (mutants: BOW-AIM-melee-pitches, BOW-AIM-idle-pitches, BOW-AIM-no-ramp-in, BOW-AIM-crossbow-slow, BOW-AIM-follow-held)', () => {
   assert.deepEqual([...SPINE_AIM_BONES], ['bip01 spine1', 'bip01 spine2']);
   assert.deepEqual([...RANDOM_ATTACK_GROUPS], ['attack1', 'attack2', 'attack3', 'swimattack1', 'swimattack2', 'swimattack3']);
   assert.deepEqual([...AIMING_STATES], ['AttackWindUp', 'AttackRelease', 'AttackEnd', 'Casting']);

@@ -1,11 +1,10 @@
 // MW-SHOULDER (FIELD BUGS 2026-10-26c, feature-feedback via eye of the beholder" mod) for morrowind 3rd person models ... because crosshair is located on top of
 // character's head and it is inconvenient to target something with ranged attacks"; bible/01-Overview/bugs/
-// Field-Bugs-2026-10-26c.md) - THE REFERENCE'S VIEW OVER THE SHOULDER, the player's option (player/mwCamera.js).
+// Field-Bugs-2026-10-26c.md) - THE VIEW OVER THE SHOULDER, the player's option (player/mwCamera.js).
 //
-// What is pinned: the reference's numbers (settings.lua:45-46, third_person.lua:27, :110-116); the focal transition,
-// camera.cpp:247-294 verbatim; the shoulder's state (third_person.lua:86-127) - the chosen shoulder, the combat offset
+// What is pinned: the camera's numbers; the focal transition's easing; the shoulder's state - the chosen shoulder, the combat offset
 // with a weapon or a spell out and in the water, at once on the frame third person or the option begins; the offset in
-// the frame (to the strafe's right, MW units, 10 down) and the guard that keeps it off a wall (camera.cpp:177-193); the
+// the frame (to the strafe's right, MW units, 10 down) and the guard that keeps it off a wall; the
 // option off is the vanilla camera to the bit; and the wiring - the feature row, its place in Settings, the seam's one
 // read of it and of the arm's stance.
 import '../modsOff.js';
@@ -37,18 +36,18 @@ function offsetOf(eye, yaw, heightScale = 1) {
   return { right: (d[0] * Math.cos(yaw) - d[2] * Math.sin(yaw)) * U, up: d[1] * U, along: (d[0] * Math.sin(yaw) + d[2] * Math.cos(yaw)) * U };
 }
 
-test('MW-SHOULDER THE REFERENCE\'S NUMBERS: the shoulder 30 right and 10 down (settings.lua:45-46), the combat offset 15 up and centred (third_person.lua:27), the transition 5 into and out of combat and 1 otherwise (:110-116), and the player\'s three sides (mutants: MW-SHOULDER-offset-moved, MW-SHOULDER-combat-centred-low)', () => {
+test('MW-SHOULDER THE NUMBERS: the shoulder 30 right and 10 down, the combat offset 15 up and centred, the transition 5 into and out of combat and 1 otherwise, and the player\'s three sides (mutants: MW-SHOULDER-offset-moved, MW-SHOULDER-combat-centred-low)', () => {
   assert.deepEqual([...SHOULDER_OFFSET], [30, -10]);
   assert.deepEqual([...COMBAT_OFFSET], [0, 15]);
   assert.deepEqual({ ...FOCAL_TRANSITION_SPEED }, { combat: 5.0, normal: 1.0 });
   assert.deepEqual([...SHOULDER_SIDES], ['off', 'right', 'left']);
-  assert.equal(FOCAL_OBSTACLE_LIMIT, 10, 'the guard\'s sphere, camera.cpp:173');
+  assert.equal(FOCAL_OBSTACLE_LIMIT, 10, 'the guard\'s sphere');
 });
 
-test('MW-SHOULDER THE FOCAL TRANSITION is camera.cpp:247-294 verbatim: a new target carries the speed the offset moved at, fading at the transition\'s speed; each frame closes dt * (1 + 5 / |delta|) * speed of the way, at most all of it; instantTransition lands on the next step; a frame of no time moves nothing (mutants: MW-SHOULDER-transition-linear, MW-SHOULDER-transition-carries-nothing, MW-SHOULDER-instant-ignored)', () => {
+test('MW-SHOULDER THE FOCAL TRANSITION: a new target carries the speed the offset moved at, fading at the transition\'s speed; each frame closes dt * (1 + 5 / |delta|) * speed of the way, at most all of it; instantTransition lands on the next step; a frame of no time moves nothing (mutants: MW-SHOULDER-transition-linear, MW-SHOULDER-transition-carries-nothing, MW-SHOULDER-instant-ignored)', () => {
   const f = createFocalOffset();
   f.setTarget([30, -10]); f.instant();
-  assert.deepEqual(f.step(0), [0, 0], 'no time, no step - not even the instant one (camera.cpp:256-257)');
+  assert.deepEqual(f.step(0), [0, 0], 'no time, no step - not even the instant one');
   assert.deepEqual(f.step(1 / 60), [30, -10], 'the instant transition lands whole');
   // into combat at speed 5: the first frame the old speed (0) is carried with influence 1, so the closing term is scaled
   // by (1 - influence) after it fades by dt * 5
@@ -69,7 +68,7 @@ test('MW-SHOULDER THE FOCAL TRANSITION is camera.cpp:247-294 verbatim: a new tar
   assert.ok(near(at[0], 0, 1e-3) && near(at[1], 15, 1e-3), `combat reached within two seconds (${at})`);
 });
 
-test('MW-SHOULDER THE SHOULDER\'S STATE (third_person.lua:86-127, autoSwitchShoulder off): off, no offset; on, the chosen shoulder - the left the right\'s mirror - and the combat offset while a weapon or a spell is out or the actor swims; at once on the frame third person begins or the option changes, eased otherwise, fast into combat (mutants: MW-SHOULDER-left-not-mirrored, MW-SHOULDER-combat-ignored, MW-SHOULDER-swim-ignored, MW-SHOULDER-entry-eased, MW-SHOULDER-setting-change-eased)', () => {
+test('MW-SHOULDER THE SHOULDER\'S STATE: off, no offset; on, the chosen shoulder - the left the right\'s mirror - and the combat offset while a weapon or a spell is out or the actor swims; at once on the frame third person begins or the option changes, eased otherwise, fast into combat (mutants: MW-SHOULDER-left-not-mirrored, MW-SHOULDER-combat-ignored, MW-SHOULDER-swim-ignored, MW-SHOULDER-entry-eased, MW-SHOULDER-setting-change-eased)', () => {
   const c = third();
   const dt = 1 / 60;
   c.stepShoulder(dt, null);
@@ -137,7 +136,7 @@ test('MW-SHOULDER THE OFFSET IN THE FRAME: the focal point 30 units to the straf
   assert.ok(near(t.right, 30, 1e-4) && near(t.up, -10, 1e-4));
 });
 
-test('MW-SHOULDER THE GUARD (camera.cpp:177-193): a sphere of 10 swept from the actor\'s line, under the focal by the ceiling\'s 10, to the offset focal point - a wall at the shoulder leaves the focal where the sphere touches it, short of the shoulder; open ground leaves it whole; with the option off the guard is the vanilla clause (mutants: MW-SHOULDER-guard-unread, MW-SHOULDER-guard-run-flat)', () => {
+test('MW-SHOULDER THE GUARD: a sphere of 10 swept from the actor\'s line, under the focal by the ceiling\'s 10, to the offset focal point - a wall at the shoulder leaves the focal where the sphere touches it, short of the shoulder; open ground leaves it whole; with the option off the guard is the vanilla clause (mutants: MW-SHOULDER-guard-unread, MW-SHOULDER-guard-run-flat)', () => {
   const yaw = 0, pitch = 0, dt = 1 / 60;
   const c = third();
   c.setShoulder('right'); c.stepShoulder(dt, null);
@@ -170,12 +169,12 @@ test('MW-SHOULDER OFF IS THE VANILLA CAMERA TO THE BIT: no offset, no cast of it
   assert.deepEqual(b.eye(args), a.eye(args));
 });
 
-test('MW-SHOULDER THE WIRING: the feature row (off by default, Off / Right / Left, the viewer\'s), its place in Settings beside Eye Of The Beholder, and the seam - player/mwView.js sets the side from the pref and steps the shoulder on the arm\'s stance once a frame before the eye, for all four hosts; the arm answers third_person.lua\'s two questions (mutants: MW-SHOULDER-pref-unread, MW-SHOULDER-stance-unread, MW-SHOULDER-sheathed-is-combat)', () => {
+test('MW-SHOULDER THE WIRING: the feature row (off by default, Off / Right / Left, the viewer\'s), its place in Settings beside Eye Of The Beholder, and the seam - player/mwView.js sets the side from the pref and steps the shoulder on the arm\'s stance once a frame before the eye, for all four hosts; the arm answers the two stance questions of the camera (mutants: MW-SHOULDER-pref-unread, MW-SHOULDER-stance-unread, MW-SHOULDER-sheathed-is-combat)', () => {
   const row = FEATURES.find((f) => f.id === 'mw-shoulder-camera');
   assert.ok(row, 'the row');
   assert.equal(row.control.store, 'prefs');
   assert.equal(row.control.key, 'mwShoulderCam');
-  assert.equal(row.control.initial, 'off', 'off, as the reference ships it (settings.lua:44)');
+  assert.equal(row.control.initial, 'off', 'off by default');
   assert.equal(row.control.online, 'player');
   assert.deepEqual(row.control.tiers.map((t) => t[0]), ['off', 'right', 'left']);
 });
