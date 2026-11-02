@@ -261,23 +261,26 @@ export function refereeCast(by, to, { from = null, at = null, d = 0, heal = fals
     by.heals = (by.heals ?? []).filter((t) => now - t < SIEGE_CASTS.windowMs);
     if (by.heals.length >= SIEGE_CASTS.max) return { ok: false, dealt: 0, fell: false, why: 'rate' };
     by.heals.push(now);
-    const got = Math.min(want, SIEGE_CASTS.healMax, to.max - to.hp);
+    const room = magickaRoom(by, now), wanted = Math.min(want, SIEGE_CASTS.healMax, to.max - to.hp), got = Math.min(wanted, room);
+    spendMagicka(by, got, now);
     to.hp += got;
-    return { ok: true, dealt: -got, fell: false, why: null };
+    return { ok: true, dealt: -got, fell: false, why: null, dry: room < wanted };
   }
   if (by === to) return { ok: false, dealt: 0, fell: false, why: 'no-fighter' };
   by.casts = by.casts.filter((t) => now - t < SIEGE_CASTS.windowMs);
   if (by.casts.length >= SIEGE_CASTS.max) return { ok: false, dealt: 0, fell: false, why: 'rate' };
   by.casts.push(now);
   if (now < to.safeTo) return { ok: false, dealt: 0, fell: false, why: 'protected' };
-  const got = Math.min(want, SIEGE_CASTS.damageMax, to.hp, harmRoom(by, now));   // BAL8: the blows' and the casts' one ceiling
+  const room = magickaRoom(by, now), wanted = Math.min(want, SIEGE_CASTS.damageMax, to.hp, harmRoom(by, now));   // BAL8: the blows' and the casts' one ceiling
+  const got = Math.min(wanted, room);   // and the magicka pool's
+  spendMagicka(by, got, now);
   spendHarm(by, now, got);
   by.clipped += want - got;
   by.dealt += got;
   to.hp -= got;
   const fell = to.hp <= 0;
   if (fell) to.down = true;
-  return { ok: true, dealt: got, fell, why: null };
+  return { ok: true, dealt: got, fell, why: null, dry: room < wanted };
 }
 
 /** AUDIT-SEATS R2: the longest a step's allowance runs - a second's run and the slack, however long the silence before. */
@@ -384,27 +387,8 @@ const flat = (p, q) => Math.hypot((p.x - q[0]) / SIEGE_UNITS_PER_M, (p.z - q[1])
 /** AUDIT-SEATS R1: how far above or below THE FIELD'S GROUND a fighter may stand and still stand at a point, metres - the
  *  banner's own 8 m, so a point is a sphere about its ground, never a column to the sky. */
 export const SIEGE_HEIGHT_M = 8;
-/**
- * AUDIT-SEATS R1: THE FIELD'S GROUND - the middle height (the median; two middles, their mean) of the sided fighters
- * standing in the room (`fighters` as battleStep takes them), in the room's units, or null with none.
- *
- * DECIDED here: the pass's points are `[x, z]` alone (net/identityToken.js's field - the service signs no height, and
- * the relay holds no ground), and presence was judged flat - a fighter 2,000 m over a banner stood at it, contesting it
- * for ever where no blow reached (a lone floater took two banners and the Throne). A seat town's ground is level (DFU
- * flattens a location's terrain - the camps and points all stand in or at its edge), and the fighters standing on it are
- * the room's honest many, so their middle height is the ground: a floater or a sinker more than SIEGE_HEIGHT_M off it
- * stands at no point. Its limit, recorded: a whole side lying together moves the middle by half - then nobody stands at
- * any point, and a siege's banners keep the holder's (a Tourney's whoever held them). The cure is a height in the
- * field's points, the service's to sign (SEAT2b's to ask).
- */
-export function siegeGround(fighters) {
-  const ys = [];
-  for (const f of fighters) if (!f.down && f.pose && f.here && (f.side === 'attack' || f.side === 'defend') && Number.isFinite(f.pose.y)) ys.push(f.pose.y);
-  if (!ys.length) return null;
-  ys.sort((p, q) => p - q);
-  const h = ys.length >> 1;
-  return ys.length % 2 ? ys[h] : (ys[h - 1] + ys[h]) / 2;
-}
+export { siegeGround, anchoredGround, SIEGE_MAGICKA, SIEGE_GROUND_DRIFT_UNITS } from './siegeCaps.js';   // the ground the clients' heights give, held near its first; the casts' magicka
+import { magickaRoom, spendMagicka, anchoredGround, siegeGround } from './siegeCaps.js';
 /** AUDIT SEATS-3 B1: how far `p` stands above or below the field's `ground` (both in the room's units), metres - 0 where
  *  either is unknown (no ground judges no height). */
 export const siegeOffGround = (ground, p) => (ground == null || !Number.isFinite(ground) || !Number.isFinite(p?.y) ? 0 : Math.abs(p.y - ground) / SIEGE_UNITS_PER_M);
@@ -530,8 +514,9 @@ export function refereeWorkBlow(by, work, { point = null, size = 0, from = null,
   if (!from || flat(from, point) > SIEGE_REACH.melee + SIEGE_REACH.slack + size) return { ok: false, dealt: 0, broke: false, why: 'reach' };
   if (ground != null && Math.abs(from.y - ground) / SIEGE_UNITS_PER_M > SIEGE_HEIGHT_M) return { ok: false, dealt: 0, broke: false, why: 'reach' };
   const want = Math.max(0, Math.trunc(Number(d) || 0));
-  const got = Math.min(want, siegeBlowMax(held.w, held.m, wa));
+  const got = Math.min(want, siegeBlowMax(held.w, held.m, wa), harmRoom(by, now));   // the striker's harm ceiling holds on a work as on a fighter
   if (got <= 0) return { ok: false, dealt: 0, broke: false, why: 'nothing' };
+  spendHarm(by, now, got);
   by.clipped += want - got;
   by.dealt += got;
   const dealt = Math.min(work.hp, Math.max(1, Math.round(got * share)));
@@ -810,7 +795,7 @@ export function battleStep(b, fighters, nowMs) {
     f.stood = (f.stood ?? 0) + dt;   // Honours' half (6.8): its seconds in the room since the start
     if (f.side === 'attack') b.attackSeen = true; else b.defendSeen = true;
   }
-  const ground = siegeGround(fighters);   // AUDIT-SEATS R1: the field's ground, this beat
+  const ground = anchoredGround(b, siegeGround(fighters));   // AUDIT-SEATS R1: the field's ground, this beat, held near its first
   b.ground = ground;   // SEAT2b part two (b): kept for a blow on a work between beats (refereeWorkBlow)
   // SEAT2b part two (c): the relay's own fighters' beat - and a guard counted where it stands, as a defender is
   npcStep(b, fighters, nowMs, ground, out);

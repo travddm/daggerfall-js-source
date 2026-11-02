@@ -14,6 +14,7 @@ import {
 } from '../../../src/net/arena/arenaLaw.js';
 import { parseClient, RELAY_VERSION } from '../../../src/net/wire.js';
 import { COUNT_MS, callMs, WALK_MAX_MS, END_HOLD_MS, VERDICT_MS, HEAL_HOLD_MS } from '../../../src/systems/arena/arenaBout.js';
+const ARMED = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 120, group: 'Weapons', equipSlot: 19, material: 1 }, { templateIndex: 123, group: 'Weapons', equipSlot: 21, material: 9 }] };   // the weapons the bouts' blows name: the referee holds a claim to the look
 
 const { subtle } = globalThis.crypto;
 const C = ARENA_FLOOR_CENTRE;
@@ -62,8 +63,8 @@ test('ARENA4 the door and the wire: the Worker opens the hall and a bout\'s room
   assert.equal(validArenaOut({ k: 'st', o: 'x' }), null);
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee, w: 123, m: 9 }), 2 * (21 + 6 + 20), 'a Daedric dai-katana, a critical\'s double');
   assert.equal(arenaBlowCap({ r: ARENA_HIT.Spell }), 60);
-  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), 2 * (41 + 20), 'ARENA5: a bare hand\'s most (DFU\'s past the softcap) and the modifiers\' room, doubled');
-  assert.equal(RELAY_VERSION, 'world284');
+  assert.equal(arenaBlowCap({ r: ARENA_HIT.Melee }), 2 * (41 + 20), "ARENA5: a bare hand's most (DFU's past the softcap) and the modifiers' room, doubled");
+  assert.equal(RELAY_VERSION, 'world285');
 });
 
 test('ARENA4 the hall: two registered fighters queued are offered one bout, both say yes and are sent to its room on their sides; a guest is not queued; the band widens with the wait (mutants: the guest queued; the offer to one alone; the sides swapped; the band\'s widening or the offer\'s clock changed; paired youngest first, past the narrower band, short of the nearest, or with themselves)', async () => onClock(async ({ step }) => {
@@ -160,8 +161,8 @@ async function matched(W, step) {
   const pair = await relayPair();
   R.env.GATE_SIGNING_KEY = pair.pkcs8;
   const a = R.connect(), b = R.connect();
-  await R.hello(a, 'fight-alva', { x: C[0] - 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: 20 });
-  await R.hello(b, 'fight-brann', { x: C[0] + 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 30 });
+  await R.hello(a, 'fight-alva', { x: C[0] - 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: 20, look: ARMED });
+  await R.hello(b, 'fight-brann', { x: C[0] + 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 30, look: ARMED });
   await word(R, a, { k: 'in', r: 'f' });
   assert.equal(last(a, 'st').ph, 'wait', 'one fighter on the sand waits for the other');
   await word(R, b, { k: 'in', r: 'f' });
@@ -280,7 +281,7 @@ test('ARENA4 a forfeit and a void: a fighter gone from a live fight past fifteen
   const o = last(A, 'go').o;   // AUDIT PRE-MERGE 1003 S7: the room the go names
   const R2 = W2.room(arenaBoutRoom(o));
   const x = R2.connect();
-  await R2.hello(x, 'fight-x01', null, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva' });
+  await R2.hello(x, 'fight-x01', null, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', look: ARMED });
   await word(R2, x, { k: 'in', r: 'f' });
   for (let t = 0; t <= ARENA_JOIN_WAIT_MS + 1000; t += 1000) { step(1000); await R2.fire(); }
   assert.equal(last(x, 'no').m, 'void');
@@ -296,7 +297,7 @@ test('ARENA4 the ladder on the relay: the fighter\'s own `in` opens a ladder bou
   R.env.GATE_SIGNING_KEY = (await relayPair()).pkcs8;
   const p = R.connect();
   let px = C[0] - 6;
-  await R.hello(p, 'fight-ceryn', { x: px, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Ceryn', kind: 'linked', tokenSub: 'acct-ceryn' });
+  await R.hello(p, 'fight-ceryn', { x: px, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Ceryn', kind: 'linked', tokenSub: 'acct-ceryn', look: ARMED });
   await word(R, p, { k: 'in', r: 'f', tier: 0, bout: 1, lv: 6, mh: 90, z: 'feedc0de00000001' });
   const st = last(p, 'st');
   assert.equal(st.kind, 'pve');
@@ -327,7 +328,7 @@ test('ARENA4 the ladder on the relay: the fighter\'s own `in` opens a ladder bou
   // I beat it
   for (let i = 0; i < 60 && !last(p, 'rc'); i++) {
     step(300); await pose(R, p, px, C[2]); await R.fire();
-    await word(R, p, { k: 'hit', i: 'a0', d: 8, r: 0, w: 116, m: 1, q: 500 + i });
+    await word(R, p, { k: 'hit', i: 'a0', d: 8, r: 0, w: 120, m: 1, q: 500 + i });
   }
   for (let i = 0; i < 4 && !last(p, 'rc'); i++) { step(ARENA_TICK_MS); await R.fire(); }
   const c = readArenaReceipt(last(p, 'rc').r);

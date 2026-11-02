@@ -38,13 +38,21 @@ export function sdCopyLine(owner, n) {
 
 /**
  * @param {{ social: () => any, store?: { get?: (k: string) => any, set?: (k: string, v: any) => void } | null,
- *   relay?: () => string|null|undefined, fetchImpl?: typeof fetch }} deps
+ *   relay?: () => string|null|undefined, fetchImpl?: typeof fetch, token?: (room: string) => Promise<string|null> }} deps
  *   `social` the hub link (its `acct`, its `party`: `{ leader, members: [{ acct }] }`), `store` the device's, `relay` its address
  */
-export function createSdCopy({ social, store = null, relay = () => null, fetchImpl = (...a) => fetch(...a) }) {
+export function createSdCopy({ social, store = null, relay = () => null, fetchImpl = (...a) => fetch(...a), token = async () => null }) {
   let mem = null;
   const kept = () => { if (mem) return mem; try { return store?.get?.(SD_COPY_KEY) ?? null; } catch { return null; } };
   const keep = (v) => { mem = v; try { store?.set?.(SD_COPY_KEY, v); } catch { /* memory holds it */ } };
+  /** The Worker's walk for slot `s`: the shared Hour's number, or null (no token, no relay, or it did not answer). */
+  const walkOf = async (s, me, base) => {
+    try {
+      const tok = base && me ? await token('sd:open') : null;
+      const res = tok ? await fetchImpl(`${base}/sd/open?s=${s}&o=${me}`, { headers: { authorization: `Bearer ${tok}` } }) : null;
+      return res?.ok ? (await res.json())?.n ?? null : null;
+    } catch { return null; }
+  };
   return {
     /** The owner's digest of the copy slot `s` takes me to, kept - or null with no account. */
     async ownerFor(s) {
@@ -53,8 +61,7 @@ export function createSdCopy({ social, store = null, relay = () => null, fetchIm
       const party = so?.party ?? null;
       if (!(party?.members ?? []).some((m) => typeof m?.acct === 'string' && m.acct !== mine)) {
         const me = await instanceOwnerOf(mine), base = sdRelayHttp(relay());
-        let n = null;
-        try { const res = base && me ? await fetchImpl(`${base}/sd/open?s=${s}&o=${me}`) : null; n = res?.ok ? (await res.json())?.n ?? null : null; } catch { n = null; }
+        const n = await walkOf(s, me, base);
         return sdPubOwner(n) ?? me;   // SD-SOLO: the shared Hour, or alone my own
       }
       const accts = [mine, ...(party?.members ?? []).map((m) => m?.acct).filter((a) => typeof a === 'string' && a !== mine)];

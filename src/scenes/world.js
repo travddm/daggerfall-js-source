@@ -21766,7 +21766,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   }) : null;
   registerMadeLevelHere(() => modes?.madeLevel?.() ?? null);   // EG-H2 (Elite-Gates.md section 24): where the player stands, for the made level's doors with no host in reach (an item, a technique, the motor)
   registerJumpForgiveness(() => madeRuleHere('jumpBuffer'), () => madeRuleHere('latePress'));   // EG-H2 (section 10.8): THE FORGIVENESS - a made level's jump buffer and late press; elsewhere none, DFU's motor
-  const sdCopy = createSdCopy({ social: () => social, store: _spoilsStore, relay: () => online?.url });   // SD-SOLO: alone, the relay's walk finds the shared Hour   // SD-PARTY: which party's Hour the Rift takes me to
+  const sdCopy = createSdCopy({ social: () => social, store: _spoilsStore, relay: () => online?.url, token: (room) => identityMinter(room) });   // SD-SOLO: alone, the relay's walk finds the shared Hour   // SD-PARTY: which party's Hour the Rift takes me to
   let _omenClockAt = null;   // AUDIT WB C4: when the relay's clock was first read this session (the omen's fallback wait)
   // WW2: A GATE A GAME DAY IN EVERY THEATRE (scenes/gate/gateLanes.js) - the Bay's lane the
   // gate it always was, off the Bay's own scan; a theatre past the Bay's off the world's registry, its ground the

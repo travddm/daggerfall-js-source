@@ -30,12 +30,13 @@ import { canModerate } from './titles.js';   // VOID: a moderator's, or a develo
 import { mustChange } from './realm.js';
 import { gatherStandings } from './seatInfluence.js';   // AUDIT-SEATS S8: a Tourney's dead heat as the Turning counted it
 import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';
-import { mintSiegeOrder, siegeFieldValid } from '../../src/net/identityToken.js';
+import { settleBattleField } from './seatField.js';   // the battle's field, settled for its first pass
+import { mintSiegeOrder } from '../../src/net/identityToken.js';
 import { SIEGE_RAMS_MAX } from '../../src/net/siege/siegeRef.js';   // SEAT2b part two (b): the most Rams a pass carries
 import { verifySiegeReceipt, SIEGE_RECEIPT_TTL_S } from '../../src/net/siege/siegeReceipt.js';   // AUDIT-SEATS R6: a late pass lives the receipt's week
 import { RENOWN_XP_MAX, RENOWN_TRACKS_MAX } from '../../src/net/renown.js';
 import {
-  seatWeekOf, seatKeyOk, settleField, passWindowEnds, passOpens, siegeWinner, siegeAftermath, spoilsOf, SIEGE_HONOURS,
+  seatWeekOf, seatKeyOk, passWindowEnds, passOpens, siegeWinner, siegeAftermath, spoilsOf, SIEGE_HONOURS,
   CLAIM_FEE, STANDING_START, STANDING_MAX, seasonFloor, seasonZeroOf, siegeMinutes, seatWeekStartMs, seasonOf, STANDING_CHANGES,
 } from '../../src/net/townSeatLaw.js';
 import { domainsFor } from './domains.js';   // DOMAIN3: a Tourney's dead heat counts the region's homes at a seat of power
@@ -83,7 +84,7 @@ const revoltStood = (db, K, W, guild, name, nowS, history) => [
 /**
  * THE PASS (6.2, 6.4, 6.6): this week's battle at `key`, from ten minutes before its start until its window closes - a
  * signed fighter on its side, anyone else a spectator. A fighter's game sends the field it derived from the town
- * (`field`, the pass's `sf`); the battle's field is settled as the law says (townSeatLaw.js settleField) and every pass
+ * (`field`, the pass's `sf`); the battle's field is settled as seatField.js says and every pass
  * carries it. Answers `{ pass, side, week, key, startsAt, endsAt, window }`; `pass` null where this service holds no
  * signing key (the room then admits nobody - said, never a pass that cannot be checked).
  *
@@ -113,21 +114,8 @@ export async function siegePass({ db, nowS, subtle }, player, env, { key, field,
   const row = await db.prepare('SELECT side FROM town_seat_rosters WHERE week = ? AND key = ? AND account = ?').bind(week, key, player.id).first();
   const side = row?.side === 'attack' || row?.side === 'defend' ? row.side : 'watch';
   if (late && (side === 'watch' || !b.field)) return { error: 'pass-late' };   // AUDIT-SEATS R6: a rostered fighter of a fought battle alone
-  let settled = b.field ?? null;
-  if (!settled) {
-    if (side !== 'watch') {
-      if (!siegeFieldValid(field, b.tier)) return { error: 'field-bad' };
-      await db.prepare(`INSERT INTO town_seat_fields (week, key, account, side, field, at) VALUES (?, ?, ?, ?, ?, ?)
-        ON CONFLICT (week, key, account) DO UPDATE SET field = excluded.field, at = excluded.at`)
-        .bind(week, key, player.id, side, JSON.stringify(field), nowS).run();
-    }
-    const { results: rows = [] } = await db.prepare('SELECT side, field, at FROM town_seat_fields WHERE week = ? AND key = ? ORDER BY at, rowid').bind(week, key).all();
-    const f = settleField(rows.map((r) => ({ side: r.side, field: r.field, at: Number(r.at) })), nowS >= b.starts_at, b.kind);   // SEAT2b part two (c): a revolt's first defender's
-    if (!f) return { error: 'field-unsettled' };
-    // settled once: a second request racing this one keeps the first's
-    await db.prepare('UPDATE town_seat_battles SET field = ? WHERE week = ? AND key = ? AND field IS NULL').bind(f, week, key).run();
-    settled = (await db.prepare('SELECT field FROM town_seat_battles WHERE week = ? AND key = ?').bind(week, key).first())?.field ?? f;
-  }
+  const settled = b.field ?? await settleBattleField({ db, nowS }, { b, week, key, side, field, playerId: player.id });
+  if (settled?.error) return settled;
   const out = { side, week, key, startsAt: b.starts_at, endsAt: b.ends_at, window: se, ...(late ? { late: true } : {}) };   // AUDIT-SEATS R6: a late pass says so
   if (!signingKey) return { ...out, pass: null };
   const sf = JSON.parse(String(settled));
