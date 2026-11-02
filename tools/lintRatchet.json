@@ -139,8 +139,7 @@
     "src/world/imperialFabric.js": 1150,
     "src/world/interior/fabricInterior.js": 1001,
     "src/world/landforms.js": 1609,
-    "src/world/townStandIns.js": 1055,
-    "src/world/townWalls.js": 1001
+    "src/world/townStandIns.js": 1055
   },
   "max-lines-per-function": {
     "server-account/src/decorBatch.js::Async function 'commitDecorBatch'#0": 188,
@@ -1849,8 +1848,6 @@
     "src/world/tamriel/tamrielLand.js": 2,
     "src/world/terrain/terrainGenClient.js": 1,
     "src/world/terrain/terrainNature.js": 2,
-    "src/world/townOutline.js": 1,
-    "src/world/townShape.js": 1,
     "src/world/underwater/underwaterLoot.js": 1,
     "src/world/unityAnimator.js": 1
   },
