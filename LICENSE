@@ -133,4 +133,7 @@ For the optional 3D layer, the game reads Morrowind's files from the player's
 own copy at runtime. Those files never enter this repository.
 
 Earlier versions read the places past the Iliac Bay from the player's copy of
-Arena. Nothing of Arena is read now.
+Arena, with readers translated from OpenTESArena
+(https://github.com/afritz1/OpenTESArena, MIT License, Copyright (c) 2016-2026
+The OpenTESArena Developers). Those readers were removed, and nothing of Arena
+is read now.
