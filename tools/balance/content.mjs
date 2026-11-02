@@ -28,24 +28,62 @@ const gearLayers = (name) => new Set([...GEARS[name]].filter((layer) => LAYER_NA
  * One tier against one character: the foe is the table's strong pick at the tier's level.
  * @returns {{tier: string, build: string, gear: string, level: number, foe: string, foeHealth: number, kill: number, taken: number, dies: number, most: number, mostShare: number, body: number}}
  */
-export function tierCell({ tier, build, gear, level, swings = MC_DEFAULT_SWINGS, gearPercentile = DEFAULT_GEAR_PERCENTILE, careerOf = () => null, dungeon = CONTENT_DUNGEON }) {
+export function tierCell({
+  tier,
+  build,
+  gear,
+  level,
+  swings = MC_DEFAULT_SWINGS,
+  gearPercentile = DEFAULT_GEAR_PERCENTILE,
+  careerOf = () => null,
+  dungeon = CONTENT_DUNGEON,
+}) {
   const layers = gearLayers(gear);
   const foeLevel = Math.max(level, CONTENT_TIERS[tier].foeLevel ?? 0);
   const id = representativeFoes(foeLevel, dungeon).strong;
   applyLayers(layers);
-  const cell = oursCell(BUILDS[build], build, level, id, layers, { career: careerOf(id) ?? undefined, swings, gearPercentile, dungeonType: dungeon, kind: tier });
+  const cell = oursCell(BUILDS[build], build, level, id, layers, {
+    career: careerOf(id) ?? undefined,
+    swings,
+    gearPercentile,
+    dungeonType: dungeon,
+    kind: tier,
+  });
   return {
-    tier, build, gear, level, foe: cell.foeName, foeHealth: cell.foeHealth, kill: cell.ttk, taken: cell.foeDps, dies: cell.ttkPlayer,
-    most: cell.perAttackMost, mostShare: cell.perAttackMost / cell.playerHealth, body: cell.playerHealth,
+    tier,
+    build,
+    gear,
+    level,
+    foe: cell.foeName,
+    foeHealth: cell.foeHealth,
+    kill: cell.ttk,
+    taken: cell.foeDps,
+    dies: cell.ttkPlayer,
+    most: cell.perAttackMost,
+    mostShare: cell.perAttackMost / cell.playerHealth,
+    body: cell.playerHealth,
   };
 }
 
 /** The character's damage a second on the table's average foe at a level (what the relay's bosses are measured by). */
-export function characterDps({ build, gear, level, swings = MC_DEFAULT_SWINGS, gearPercentile = DEFAULT_GEAR_PERCENTILE, careerOf = () => null, dungeon = 1 }) {
+export function characterDps({
+  build,
+  gear,
+  level,
+  swings = MC_DEFAULT_SWINGS,
+  gearPercentile = DEFAULT_GEAR_PERCENTILE,
+  careerOf = () => null,
+  dungeon = 1,
+}) {
   const layers = gearLayers(gear);
   const id = representativeFoes(level, dungeon).average;
   applyLayers(layers);
-  return oursCell(BUILDS[build], build, level, id, layers, { career: careerOf(id) ?? undefined, swings, gearPercentile, dungeonType: dungeon }).dps;
+  return oursCell(BUILDS[build], build, level, id, layers, {
+    career: careerOf(id) ?? undefined,
+    swings,
+    gearPercentile,
+    dungeonType: dungeon,
+  }).dps;
 }
 
 /**
@@ -56,16 +94,29 @@ export function characterDps({ build, gear, level, swings = MC_DEFAULT_SWINGS, g
 export function bossFight({ ttkSeconds, level, dps, size = 1 }) {
   const ref = dpsRef(level);
   const rate = Math.min(dps, BUCKET_RATE_X * ref);
-  return { ref, dps, rate, share: dps / ref, seconds: (ttkSeconds * ref) / rate, groupSeconds: (ttkSeconds * ref * size) / (rate * size) };
+  return {
+    ref,
+    dps,
+    rate,
+    share: dps / ref,
+    seconds: (ttkSeconds * ref) / rate,
+    groupSeconds: (ttkSeconds * ref * size) / (rate * size),
+  };
 }
 
 export const RELAY_BOSSES = Object.freeze({
   gate: { ttkSeconds: BOSS_TTK_S, note: 'the Oblivion gate (BOSS_TTK_S x dpsRef a claim)' },
-  remnant: { ttkSeconds: SD_TTK_S * SD_SHARE_X, note: "the Abyss Remnant (SD_TTK_S x SD_SHARE_X x dpsRef a claim)" },
+  remnant: { ttkSeconds: SD_TTK_S * SD_SHARE_X, note: 'the Abyss Remnant (SD_TTK_S x SD_SHARE_X x dpsRef a claim)' },
 });
 
 /** Everything the content report holds, for the given builds and gears. */
-export function contentReport({ builds = BUILD_NAMES, levels = CONTENT_LEVELS, gears = Object.keys(GEARS), swings = 1500, careerOf = () => null } = {}) {
+export function contentReport({
+  builds = BUILD_NAMES,
+  levels = CONTENT_LEVELS,
+  gears = Object.keys(GEARS),
+  swings = 1500,
+  careerOf = () => null,
+} = {}) {
   const tiers = [];
   const bosses = [];
   for (const build of builds) {
@@ -73,7 +124,8 @@ export function contentReport({ builds = BUILD_NAMES, levels = CONTENT_LEVELS, g
       for (const level of levels) {
         for (const tier of CONTENT_TIER_NAMES) tiers.push(tierCell({ tier, build, gear, level, swings, careerOf }));
         const dps = characterDps({ build, gear, level, swings, careerOf });
-        for (const [name, spec] of Object.entries(RELAY_BOSSES)) bosses.push({ boss: name, build, gear, level, ...bossFight({ ttkSeconds: spec.ttkSeconds, level, dps }) });
+        for (const [name, spec] of Object.entries(RELAY_BOSSES))
+          bosses.push({ boss: name, build, gear, level, ...bossFight({ ttkSeconds: spec.ttkSeconds, level, dps }) });
       }
     }
   }
@@ -84,11 +136,34 @@ const f = (v, d = 1) => (Number.isFinite(v) ? v.toFixed(d) : 'never');
 
 export function contentMarkdown(report) {
   const lines = ['# Balance harness: content', ''];
-  lines.push('## Foe tiers, solo', '', 'The strong foe of the table at the tier\'s level (`kill` the seconds to kill it, `taken` the damage a second it deals, `dies` the seconds to die, `K` = dies / kill: above 1 the character wins alone, `top blow` the biggest blow it landed over a body).', '');
-  lines.push('| Tier | Gear | Build | Lvl | Foe | Foe hp | kill s | taken /s | dies s | K | top blow |', '| --- | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |');
-  for (const c of report.tiers) lines.push(`| ${c.tier} | ${c.gear} | ${c.build} | ${c.level} | ${c.foe} | ${f(c.foeHealth, 0)} | ${f(c.kill)} | ${f(c.taken)} | ${f(c.dies)} | ${f(c.dies / c.kill, 2)} | ${f(100 * c.mostShare, 0)}% |`);
-  lines.push('', '## Relay bosses', '', 'The seconds a group takes at the character\'s real damage a second (`share` of the reference `dpsRef`; the bucket stops a rate over 3x it). The fight\'s length does not depend on the group size: each claim brings its own health.', '');
-  lines.push('| Boss | Gear | Build | Lvl | dpsRef | dps | share | fight s |', '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |');
-  for (const b of report.bosses) lines.push(`| ${b.boss} | ${b.gear} | ${b.build} | ${b.level} | ${f(b.ref, 0)} | ${f(b.dps, 0)} | ${f(b.share, 2)} | ${f(b.seconds, 0)} |`);
+  lines.push(
+    '## Foe tiers, solo',
+    '',
+    "The strong foe of the table at the tier's level (`kill` the seconds to kill it, `taken` the damage a second it deals, `dies` the seconds to die, `K` = dies / kill: above 1 the character wins alone, `top blow` the biggest blow it landed over a body).",
+    '',
+  );
+  lines.push(
+    '| Tier | Gear | Build | Lvl | Foe | Foe hp | kill s | taken /s | dies s | K | top blow |',
+    '| --- | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |',
+  );
+  for (const c of report.tiers)
+    lines.push(
+      `| ${c.tier} | ${c.gear} | ${c.build} | ${c.level} | ${c.foe} | ${f(c.foeHealth, 0)} | ${f(c.kill)} | ${f(c.taken)} | ${f(c.dies)} | ${f(c.dies / c.kill, 2)} | ${f(100 * c.mostShare, 0)}% |`,
+    );
+  lines.push(
+    '',
+    '## Relay bosses',
+    '',
+    "The seconds a group takes at the character's real damage a second (`share` of the reference `dpsRef`; the bucket stops a rate over 3x it). The fight's length does not depend on the group size: each claim brings its own health.",
+    '',
+  );
+  lines.push(
+    '| Boss | Gear | Build | Lvl | dpsRef | dps | share | fight s |',
+    '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |',
+  );
+  for (const b of report.bosses)
+    lines.push(
+      `| ${b.boss} | ${b.gear} | ${b.build} | ${b.level} | ${f(b.ref, 0)} | ${f(b.dps, 0)} | ${f(b.share, 2)} | ${f(b.seconds, 0)} |`,
+    );
   return `${lines.join('\n')}\n`;
 }

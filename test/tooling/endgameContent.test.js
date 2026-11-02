@@ -45,7 +45,10 @@ test('a group fights as long as one: each claim brings its own health', () => {
 test('the blows of a tier: no tier lands more than 60% of a typical body in one blow, at level 45 for the frailest build', () => {
   for (const tier of Object.keys(CONTENT_TIERS)) {
     const cell = tierCell({ tier, build: 'mage', gear: 'typical', level: 45, swings: SWINGS });
-    assert.ok(cell.mostShare <= 0.62, `${tier}: ${(100 * cell.mostShare).toFixed(0)}% of a ${cell.body.toFixed(0)} body`);
+    assert.ok(
+      cell.mostShare <= 0.62,
+      `${tier}: ${(100 * cell.mostShare).toFixed(0)}% of a ${cell.body.toFixed(0)} body`,
+    );
   }
 });
 
@@ -72,7 +75,8 @@ test('the ocean bands: deeper is harder, a vault sits like an elite, gold is at 
   assert.ok(v4.health >= v3.health && v4.damage >= v3.damage);
   assert.ok(v4.health >= 1.8 && v4.health <= 2.2 && v4.damage >= 1.2 && v4.damage <= 1.4);
   const ruins = [1, 2, 3, 4].map((ring) => oceanBandDifficulty({ ring }));
-  for (let i = 1; i < ruins.length; i++) assert.ok(ruins[i].health > ruins[i - 1].health && ruins[i].damage > ruins[i - 1].damage);
+  for (let i = 1; i < ruins.length; i++)
+    assert.ok(ruins[i].health > ruins[i - 1].health && ruins[i].damage > ruins[i - 1].damage);
   for (const f of [...ruins, v3, v4]) assert.ok(f.gold <= 1.25);
   assert.ok(ruins[3].health < v4.health && ruins[3].damage < v4.damage, 'a plain ruin takes the smaller step');
   assert.equal(CONTENT_TIERS.vault4.health, v4.health);
