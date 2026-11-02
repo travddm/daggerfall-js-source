@@ -17,3 +17,4 @@ src/buildTag.js
 test/fixtures/mw/mwCameraParity.json
 test/fixtures/mw/spineAimParity.json
 test/fixtures/mw/mwWeaponAnimParity.json
+test/fixtures/mw/mwBodyPartsParity.json

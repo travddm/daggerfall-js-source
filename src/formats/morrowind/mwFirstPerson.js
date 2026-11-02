@@ -175,7 +175,9 @@ import { applyClimbRig } from '../../combat/climbRig.js';   // CLIMB6: the climb
 import { applyMirrorRig, limbSkeleton, offWeaponBoneAddon, WEAPON_BONE_LEFT_SOURCE, mirrorBindSources } from '../../combat/twoHands/mirrorRig.js';   // TWO-HANDS: the second hand - an arm, or the body, in the mirror; the left hand's weapon bone   // MIRROR-BIND: the skins it is mirrored by
 import { ownFacePools } from '../../characters/ownModels/ownHeadModels.js';   // MW-HEADS1: the port's own heads and hairs - a race's pools where it has them
 import { MW_WEAPON_TYPE } from './mwWeaponAnim.js';
-export * from './mwWeaponAnim.js';   // the weapon animation rules moved out; callers keep importing them from here
+export * from './mwWeaponAnim.js';
+import { SKIN_SWEEP_SLOTS, resolveBodyParts } from './mwBodyParts.js';
+export * from './mwBodyParts.js';   // the body-part resolution moved out; callers keep importing it from here   // the weapon animation rules moved out; callers keep importing them from here
 
 /** The four parts allowed to fall back to a third-person mesh when the
  *  first-person record is missing (rule 3 / npcanimation.cpp:1217-1253).
@@ -910,66 +912,6 @@ export function pickWeaponRecord(records, type, material = null, { has = null, s
 /** The report the reverted arc never printed: for one race, which
  *  first-person arm records actually exist, and what each one would fall
  *  back to. Answers are about the PLAYER'S data, never about ours. */
-/** MW-D32: sBodyPartMap's slot list (npcanimation.cpp:1187-1197) - the
- *  mesh parts the skin sweep maps to visible slots. NO head, NO hair
- *  (those come off the actor's own record - the chargen face law), NO
- *  clavicle (deliberately never mapped to any PRT slot). */
-export const SKIN_SWEEP_SLOTS = Object.freeze([
-  'neck', 'chest', 'groin', 'hand', 'wrist', 'forearm', 'upperarm',
-  'foot', 'ankle', 'knee', 'upperleg', 'tail',
-]);
-
-const ARM_SLOT_SET = new Set(['hand', 'wrist', 'forearm', 'upperarm']);
-
-/**
- * MW-D32: GETBODYPARTS, WHOLE (npcanimation.cpp:1167-1297). One record
- * sweep in LOAD ORDER over the sBodyPartMap slots, with the reference's
- * exact ladder:
- *  - BPF_NotPlayable skipped, MT_Skin only, race matched - and NO
- *    vampire filter: the sweep never had one (vampire heads live on the
- *    actor's own record path, and head/hair are not in the map at all)
- *  - a first-person HAND slot missing its .1st record falls back to
- *    third-person skins (:1232-1254): same gender fills, same gender
- *    upgrades an other-gender fallback, male fills for a female
- *  - every other slot takes parts of ITS view only (:1258)
- *  - male parts fall back for females: fill when empty, and a male
- *    .1st upgrades a 3P hand fallback (:1261-1280)
- *  - a PROPER match (right view, right gender) OVERWRITES - the LAST
- *    record in load order wins (:1286-1293), which is how an expansion
- *    overrides a base-game body
- * @returns {Map} slot -> chosen record (absent: no record for the slot)
- */
-export function resolveBodyParts(parts, race, female, { firstPerson = false } = {}) {
-  const want = String(race || '').toLowerCase();
-  const isF = !!female;
-  const out = new Map();
-  for (const p of parts ?? []) {
-    if (!p.playable || !p.skin) continue;
-    if (p.race !== want) continue;
-    const slot = p.slot;
-    if (!SKIN_SWEEP_SLOTS.includes(slot)) continue;
-    const isHand = ARM_SLOT_SET.has(slot);
-    const sameGender = !!p.female === isF;
-    if (firstPerson && isHand && !p.firstPerson) {
-      const cur = out.get(slot);
-      if (!cur && sameGender) out.set(slot, p);
-      else if (cur && sameGender && !!cur.female !== isF) out.set(slot, p);
-      else if (!cur && isF) out.set(slot, p);
-      continue;
-    }
-    if (!!p.firstPerson !== !!firstPerson) continue;
-    if (isF && !p.female) {
-      const cur = out.get(slot);
-      if (!cur) out.set(slot, p);
-      else if (isHand && !cur.firstPerson && p.firstPerson) out.set(slot, p);
-      continue;
-    }
-    if (isF !== !!p.female) continue;
-    out.set(slot, p);   // proper match: LAST in load order wins
-  }
-  return out;
-}
-
 export function armReport(parts, race, female) {
   const want = String(race || '').toLowerCase();
   // MW-D32: the PICKS come from the one reference-whole resolver
