@@ -202,8 +202,8 @@ test('FIRM1 powers: WHAT LANDS ON ME - a spell\'s damage by its channel, and the
   setRenownLayer(p, null);
   assert.equal(renownHpOf(p), 0, 'offline, the whole layer goes - nothing of it in a save');
   // a spell's damage (no blow pending) by `spellTaken`; none asleep
-  setFirmamentTree(walk('rt.start', named('Spell Turning')));   // 4% less
-  assert.equal(firmamentDamage(p, 100), 96);
+  setFirmamentTree(walk('rt.start', named('Spell Turning')));   // 1% less (guards x0.25)
+  assert.equal(firmamentDamage(p, 100), 99); // PIN MOVED: B5 (Spell Turning 4% -> 1%, firmament guards x0.25)
   setSigilDueling(true);
   assert.equal(firmamentDamage(p, 100), 100);
 });

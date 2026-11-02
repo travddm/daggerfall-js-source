@@ -176,7 +176,7 @@ test('FIRM1 law: THE BUDGET - the whole sky allocated at once holds every channe
     }
   }
   assert.equal(blowPct({ weaponDmg: 25, meleeDmg: 25, axeDmg: 25 }, { skill: 'Axe' }), BLOW_CAP);
-  assert.equal(blowPct({ weaponDmg: 10, bowDmg: 10, meleeDmg: 99 }, { skill: 'Archery' }), 20, 'a bow is no melee weapon');
+  assert.equal(blowPct({ weaponDmg: 2, bowDmg: 2, meleeDmg: 99 }, { skill: 'Archery' }), 4, 'a bow is no melee weapon'); // PIN MOVED: B5 (BLOW_CAP 5 would swallow the old 10+10; 2+2 stays under it, so a counted melee 99 would show as 5)
   assert.equal(blowPct({ unawareDmg: 40, weaponDmg: -10 }, { skill: 'ShortBlade' }), -10, 'the keystone\'s price in an open fight');
   assert.equal(blowPct({ unawareDmg: 40, weaponDmg: 30 }, { skill: 'ShortBlade', unaware: true }), BLOW_TOTAL_CAP);
   assert.equal(castCostPct({ castCost: 20, 'castCost.Destruction': 20 }, ['Destruction']), CAST_COST_CAP);

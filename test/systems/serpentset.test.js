@@ -106,7 +106,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
   assert.deepEqual([0, 1, 2].map((p) => raidSetOf(p)?.id), ['oath', 'thieftaker', 'orcsbane'], 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'sea-scale', 'Sea-Scale', { frost: [10, 30], endurance: [2, 6] }],
-    [4, 'constrict', 'Constrict', { stack: [1, 2] }],
+    [4, 'constrict', 'Constrict', { stack: [0.5, 0.5] }],   // PIN MOVED: B5 (Constrict 1-2 -> 0.5)
     [6, 'shed-skin', 'Shed Skin', { heal: [10, 30], recover: [240, 120] }],
   ]);
   assert.deepEqual([COIL_STACKS, COIL_SECONDS, SHED_BELOW], [5, 6, 0.35]);
@@ -117,7 +117,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
     }
   }
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], 0)), 'Under 35%: shed skin, heal 10%');
-  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+2% per hit on a foe, up to 5');
+  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+0.5% per hit on a foe, up to 5');   // PIN MOVED: B5 (Constrict Ascendant 2 -> 0.5)
 });
 
 test('SERPENT-SET the records: nine in the places\' order - the seven body pieces, a kite shield and a ONE-HANDED Katana (so all nine are worn at once) - Ebony, the set\'s own; every affix at the Legendary band\'s middle (over a town\'s thanks, under the Warden), the blow the band\'s middle too; never a frost resistance and one resistance of an element at most; AETHERIC_RECORDS the Regalia, the raids\' and then these (mutants: a number off the middle; a frost piece; the make; the order)', () => {
@@ -129,9 +129,9 @@ test('SERPENT-SET the records: nine in the places\' order - the seven body piece
   ]);
   assert.equal(WEAPON_HANDS['121'], 'Either', 'the Katana is one-handed - the shield beside it');
   for (const r of SERPENT_SET_PIECES) assert.deepEqual([r.set, r.make], ['coilscale', 'Ebony'], r.id);
-  assert.equal(SERPENT_SET_POWER, 4);
+  assert.equal(SERPENT_SET_POWER, 3);   // PIN MOVED: B5 (legendary band [2,3], middle 2.5 rounds to 3)
   assert.equal(SERPENT_SET_POWER, Math.round((SIGIL_BANDS.legendary[0] + SIGIL_BANDS.legendary[1]) / 2));
-  assert.equal(aethericById('coilscale-fang').power, 4);
+  assert.equal(aethericById('coilscale-fang').power, 3);
   const mid = (id) => Math.round((AFFIX_RANGES[id].legendary[0] + AFFIX_RANGES[id].legendary[1]) / 2);
   assert.deepEqual(['armor', 'stat', 'resist', 'skill', 'weight', 'damage'].map(mid), [10, 8, 26, 15, 43, 18]);   // PIN MOVED (B4 rescale): the Legendary band's middles, armour 7-12, stat 6-9, resist 21-30, skill 12-18, damage 12-24 (were 16, 13, 43, 25, 30)
   for (const r of SERPENT_SET_PIECES) for (const a of r.affixes) assert.equal(a.value, mid(a.id), `${r.id} ${a.id}`);
@@ -152,7 +152,7 @@ test('SERPENT-SET minted and checked: each record mints as its make - Ebony armo
     const it = mintAetheric(r);
     assert.deepEqual([it.name, it.rarity, it.aetheric, it.isIdentified], [r.name, AETHERIC, r.id, true], r.id);
     assert.equal(it.material, aethericMaterial(r), r.id);
-    assert.deepEqual(it.sigil, r.group === 'Weapons' ? { power: 4, set: 'coilscale', party: 1, xp: 0 } : { set: 'coilscale', party: 1, xp: 0 });
+    assert.deepEqual(it.sigil, r.group === 'Weapons' ? { power: 3, set: 'coilscale', party: 1, xp: 0 } : { set: 'coilscale', party: 1, xp: 0 });
     assert.ok(validLootItem(JSON.parse(JSON.stringify(it))), `${r.id} off the wire`);
   }
   assert.equal(mintAetheric(aethericById('coilscale-fang')).material, WEAPON_MATERIALS.Ebony);
@@ -248,12 +248,12 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   door([], { me: e });
   const s = sword();
   at(10);
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => swing(e, s, RAT)), [100, 101, 102, 103, 104, 105, 105], 'one per cent a stack at Faint, five at the most');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => swing(e, s, RAT, 1000)), [1000, 1005, 1010, 1015, 1020, 1025, 1025], 'half a per cent a stack at Faint, five at the most');   // PIN MOVED: B5 (Constrict 1 -> 0.5 a stack; 1000 so the half per cent is a whole point)
   assert.equal(coilStacks(10), COIL_STACKS);
   assert.equal(coiledFoe(10), RAT);
-  assert.equal(swing(e, s, WOLF), 100, 'another foe: its own coil, nothing yet');
+  assert.equal(swing(e, s, WOLF, 1000), 1000, 'another foe: its own coil, nothing yet');
   assert.equal(coiledFoe(10), WOLF, 'the states say the foe struck last');
-  assert.equal(swing(e, s, RAT), 105, 'the first foe keeps its own five');
+  assert.equal(swing(e, s, RAT, 1000), 1025, 'the first foe keeps its own five');
   at(10 + COIL_SECONDS - 0.01);
   assert.equal(coilStacks(), COIL_STACKS, 'held to the window\'s end');
   assert.equal(coilStacksAt(WOLF), 1, 'the other foe its own');
@@ -276,7 +276,7 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   fresh(); online(40);
   const asc = wearSet(player(), 'coilscale', 4, XP[4]);
   door([], { me: asc });
-  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT)), [100, 102, 104], 'Ascendant: two a stack (the tier is [1, 2])');
+  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT, 1000)), [1000, 1005, 1010], 'Ascendant: still half a per cent a stack (the tier is [0.5, 0.5])');   // PIN MOVED: B5 (Constrict Ascendant 2 -> 0.5)
   fresh();
   const off = wearSet(player(), 'coilscale', 4);
   swing(off, s, RAT); swing(off, s, RAT);

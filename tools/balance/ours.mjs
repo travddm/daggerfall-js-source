@@ -59,8 +59,8 @@ const DEFAULT_CAREER = Object.freeze({
   attackModifierFlags: 0, hitPointsPerLevel: 8,
 });
 const CEILING_MOD = 'harness-ceiling';
-/** The most per cent a spell's modifiers add together: the loot's lines under their cap, an arcane path's best (the Firmament tree is left to B5). */
-const SPELL_LINES_TOP = LOOT_SPELL_POWER_MOST + 5;
+/** The most per cent a spell's modifiers add together: the loot's lines under their cap, the Firmament tree's spellPower channel and an arcane path's best (3). */
+const SPELL_LINES_TOP = LOOT_SPELL_POWER_MOST + statDef('spellPower').max + 3;
 export const MC_DEFAULT_SWINGS = 4000;
 const NEUTRAL_BLOW_REFLEXES = 2;
 const UNBREAKABLE = 1e9;

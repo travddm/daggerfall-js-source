@@ -89,27 +89,27 @@ const def = (kind, max, words, min = -max) => Object.freeze({ kind, max, min, wo
 export const STAT_DEFS = Object.freeze({
   ...Object.fromEntries(ATTRIBUTES.map((a) => [a, def(a === 'personality' ? 'life' : 'combat', 15, (v) => `${signed(v)} ${cap1(a)}`)])),
   // the weapon's blow - each channel capped, then the blow's whole group (BLOW_CAP, blowPct)
-  weaponDmg: def('combat', 30, (v) => `${signed(v)}% damage with all weapons`, -20),
-  meleeDmg: def('combat', 30, (v) => `${signed(v)}% melee weapon damage`, -20),
-  bowDmg: def('combat', 30, (v) => `${signed(v)}% damage with bows`),
-  fistDmg: def('combat', 30, (v) => `${signed(v)}% hand-to-hand damage`),
-  shortDmg: def('combat', 30, (v) => `${signed(v)}% damage with short blades`),
-  longDmg: def('combat', 30, (v) => `${signed(v)}% damage with long blades`),
-  axeDmg: def('combat', 30, (v) => `${signed(v)}% damage with axes`),
-  bluntDmg: def('combat', 30, (v) => `${signed(v)}% damage with blunt weapons`),
-  undeadDmg: def('combat', 30, (v) => `${signed(v)}% weapon damage against the undead`),
-  daedraDmg: def('combat', 30, (v) => `${signed(v)}% weapon damage against daedra`),
-  beastDmg: def('combat', 30, (v) => `${signed(v)}% weapon damage against animals`),
-  unawareDmg: def('combat', 40, (v) => `${signed(v)}% weapon damage against unaware foes`, 0),
-  rageDmg: def('combat', 25, (v) => `${signed(v)}% weapon damage while below half Health`, 0),
+  weaponDmg: def('combat', 6, (v) => `${signed(v)}% damage with all weapons`, -4),
+  meleeDmg: def('combat', 7, (v) => `${signed(v)}% melee weapon damage`, -4),
+  bowDmg: def('combat', 7, (v) => `${signed(v)}% damage with bows`),
+  fistDmg: def('combat', 6, (v) => `${signed(v)}% hand-to-hand damage`),
+  shortDmg: def('combat', 6, (v) => `${signed(v)}% damage with short blades`),
+  longDmg: def('combat', 6, (v) => `${signed(v)}% damage with long blades`),
+  axeDmg: def('combat', 6, (v) => `${signed(v)}% damage with axes`),
+  bluntDmg: def('combat', 6, (v) => `${signed(v)}% damage with blunt weapons`),
+  undeadDmg: def('combat', 6, (v) => `${signed(v)}% weapon damage against the undead`),
+  daedraDmg: def('combat', 6, (v) => `${signed(v)}% weapon damage against daedra`),
+  beastDmg: def('combat', 6, (v) => `${signed(v)}% weapon damage against animals`),
+  unawareDmg: def('combat', 8, (v) => `${signed(v)}% weapon damage against unaware foes`, 0),
+  rageDmg: def('combat', 5, (v) => `${signed(v)}% weapon damage while below half Health`, 0),
   // the spell
-  spellPower: def('combat', 30, (v) => `${signed(v)}% damage from your spells`, -20),
+  spellPower: def('combat', 6, (v) => `${signed(v)}% damage from your spells`, -4),
   spellPierce: def('combat', 10, (v) => `-${v} to saving throws against your spells`, 0),
   castCost: def('combat', 25, (v) => (v >= 0 ? `Spells cost ${v}% fewer Spell Points` : `Spells cost ${-v}% more Spell Points`), -20),
   castSpeed: def('combat', 15, (v) => `${signed(v)}% casting speed`),
   // what lands on you
-  blowTaken: def('combat', 30, (v) => pctLess(v, 'damage from blows'), -15),
-  spellTaken: def('combat', 30, (v) => pctLess(v, 'damage from spells and other harm'), -15),
+  blowTaken: def('combat', 8, (v) => pctLess(v, 'damage from blows'), -3),
+  spellTaken: def('combat', 8, (v) => pctLess(v, 'damage from spells and other harm'), -3),
   armor: def('combat', 10, (v) => `${signed(v)} to Armor Rating`),
   // B5: Health is a few per cent of a body - the key stars' raw points 15 at most and the small stars' share 8% (the tree's sums, no cap
   // above them), where it was 75 and 15% (a quarter of a level-45 body) beside Renown's 147
@@ -196,10 +196,10 @@ export const statWords = (key, v) => statDef(key)?.words(v) ?? `${key} ${signed(
 
 /** The most the sky adds to one weapon blow from its general channels (any weapon, melee, the weapon's family, the foe's
  *  kind) - and the most it takes away. */
-export const BLOW_CAP = 30;
+export const BLOW_CAP = 5;
 export const BLOW_FLOOR = -20;
 /** And from everything, the blow's conditions with it (an unaware foe, a wounded wielder). */
-export const BLOW_TOTAL_CAP = 50;
+export const BLOW_TOTAL_CAP = 6;
 /** The most the sky takes off a spell's price, all channels together. */
 export const CAST_COST_CAP = 25;
 

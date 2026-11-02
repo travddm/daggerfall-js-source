@@ -48,7 +48,7 @@ test('POWER-CEILING THE LADDER: seven rungs in their order, three rolled bands a
   for (const [id, bands] of Object.entries(AFFIX_RANGES)) assert.deepEqual(Object.keys(bands), ROLLED_TIERS, `${id}: a band for each rolled tier and no other - ${RULE}`);
   assert.deepEqual(Object.fromEntries(Object.keys(AFFIX_RANGES).map((id) => [id, AFFIX_RANGES[id].legendary[1]])), TOPS, `the Legendary tops - ${RULE}`);
   assert.deepEqual(Object.keys(SIGIL_BANDS), ROLLED_TIERS);
-  assert.equal(SIGIL_POWER_MAX, 4, 'the sigil\'s top: the Legendary band\'s 4 (B1; was 12)');
+  assert.equal(SIGIL_POWER_MAX, 3, 'the sigil\'s top: the Legendary band\'s 3 (B5; was 4 at B1, 12 before)');
   assert.equal(SIGIL_POWER_MAX, SIGIL_BANDS.legendary[1]);
   assert.deepEqual(TECHNIQUE_BANDS.legendary, [20, 30]);
 });
@@ -142,8 +142,8 @@ test('POWER-CEILING THE SETS AND THE POWERS: every number at Ascendant and in ev
   // today's strongest of each role - a record past one moves it, and fails here with its name
   const STRONGEST = {
     // most frequent (lower is stronger)
-    above: 75, below: 33, blow: 10, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
-    gold: 5, guard: 10, heal: 30, hitCap: 25, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
+    above: 75, below: 33, blow: 3, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
+    gold: 5, guard: 3, heal: 30, hitCap: 25, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
     rounds: 4, seconds: 8, ship: 30, spell: 3, splash: 60, stacks: 5, thorns: 30, ward: 40,
   };
   holdRoles(powerNumbers(), 135, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
@@ -171,19 +171,19 @@ function holdRoles(numbers, least, strongest, lower, table) {
 test('POWER-CEILING THE PATHS AND THE SKY (AUDIT HORIZONTAL D8): every number of every martial and arcane path has a role, a line\'s under the Legendary band\'s top, every other at or under today\'s strongest path number of its role; every channel the sky can carry at or under today\'s cap - a new path, star or channel fails until it is measured (mutants: Prismatic Ward past 40; Opening Strike past 30; Absolution sooner; a path number with no role; a weapon channel raised; the blow\'s whole raised)', () => {
   // the paths keep their shares as fractions, so their strongest are their own (the loot's chance is 30, Prismatic Ward's 40)
   const PATH_STRONGEST = {
-    below: 0.5, blow: 5, blowStack: 1, castSpeed: 20, chance: 40, cost: 20, extra: 0.5, fatigue: 15, foes: 3, guard: 4, heal: 25,
+    below: 0.5, blow: 3, blowStack: 0.5, castSpeed: 20, chance: 40, cost: 20, extra: 0.5, fatigue: 15, foes: 3, guard: 2, heal: 25,
     killHeal: 5, killMana: 20, leech: 10, leechShare: 0.5, manaShare: 0.25, oneIn: 3, pace: 20, perMissing: 2, pierce: 20, reach: 8,
     recover: 120, refund: 1 / 3, regen: 2, rounds: 8, seconds: 30, shieldCap: 20, spell: 5, spellStack: 3, stacks: 5, times: 2,
   };
   holdRoles(pathNumbers(), 100, PATH_STRONGEST, PATH_LOWER_IS_STRONGER, 'PATH_FIELD_ROLES');
   // the sky's channels, each at its cap: the most the whole tree gives, whatever its stars add up to
   const SKY_STRONGEST = {
-    absorb: 15, 'act:life': 40, armor: 10, attribute: 15, axeDmg: 30, beastDmg: 30, blowCap: 30, blowTaken: 15, blowTotal: 50, bluntDmg: 30,
-    bowDmg: 30, carry: 40, castCost: 25, 'castCost:combat': 20, castCostCap: 25, castSpeed: 15, coldDegrees: 10, daedraDmg: 30, dry: 40,
-    evade: 10, fallLess: 40, fatigueLess: 40, fistDmg: 30, heatDegrees: 10, hp: 15, hpPct: 8, hpRegen: 10, killHeal: 6, killMana: 6,
-    longDmg: 30, meleeDmg: 30, mp: 75, mpPct: 15, mpRegen: 10, 'pct:combat': 15, 'pct:life': 15, rageDmg: 25, 'resist:combat': 20,
-    sailSpeed: 15, shortDmg: 30, 'skill:combat': 15, 'skill:life': 20, 'skillPct:combat': 20, 'skillPct:life': 25, spellPierce: 10,
-    spellPower: 30, spellTaken: 15, standing: 10, unawareDmg: 40, undeadDmg: 30, warmth: 6, weaponDmg: 30, 'xp:life': 35, 'yield:life': 30,
+    absorb: 15, 'act:life': 40, armor: 10, attribute: 15, axeDmg: 6, beastDmg: 6, blowCap: 5, blowTaken: 3, blowTotal: 6, bluntDmg: 6,
+    bowDmg: 7, carry: 40, castCost: 25, 'castCost:combat': 20, castCostCap: 25, castSpeed: 15, coldDegrees: 10, daedraDmg: 6, dry: 40,
+    evade: 10, fallLess: 40, fatigueLess: 40, fistDmg: 6, heatDegrees: 10, hp: 15, hpPct: 8, hpRegen: 10, killHeal: 6, killMana: 6,
+    longDmg: 6, meleeDmg: 7, mp: 75, mpPct: 15, mpRegen: 10, 'pct:combat': 15, 'pct:life': 15, rageDmg: 5, 'resist:combat': 20,
+    sailSpeed: 15, shortDmg: 6, 'skill:combat': 15, 'skill:life': 20, 'skillPct:combat': 20, 'skillPct:life': 25, spellPierce: 10,
+    spellPower: 6, spellTaken: 3, standing: 10, unawareDmg: 8, undeadDmg: 6, warmth: 6, weaponDmg: 6, 'xp:life': 35, 'yield:life': 30,
   };
   holdRoles(skyNumbers(), 130, SKY_STRONGEST, [], 'skyNumbers');
 });

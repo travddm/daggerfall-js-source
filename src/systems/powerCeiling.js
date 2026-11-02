@@ -6,20 +6,21 @@
 // The net (BLOW_MOST, GUARD_LEAST) is above what a normal kit reaches and only catches a kit with every registry near its
 // top at once. The runners (entityMods.js, playerEntity.js) and registries import this leaf.
 
-/** THE BLOW POWERS' TOPS: each registry's most onto one blow (per cent), measured from today's records and laws. B1 (tame
- *  player power) rescaled the records themselves (the sets from +200 to +20, the loot's powers from +240 to +24, the sigil
- *  from 12 to 4, the paths from 40 to 6), so no printed number is cut. The Firmament tree (+50) is untouched: B5 retunes it. */
-export const BLOW_TOPS = Object.freeze({ sigil: 4, sets: 20, loot: 23, firmament: 50, mastery: 21, martial: 6 });
+/** THE BLOW POWERS' TOPS: each registry's most onto one blow (per cent), measured from today's records and laws. B1 (tame player
+ *  power) rescaled the records themselves (the sets from +200 to +20, the loot's powers from +240 to +24); B5 finished the
+ *  budget (decision 41: melee about x1.6, casters about x1.75) and rescaled every source again, the Firmament tree too, so no
+ *  printed number is cut. */
+export const BLOW_TOPS = Object.freeze({ sigil: 3, sets: 6, loot: 8.5, firmament: 6, mastery: 7, martial: 4 });
 /** THE GUARDS' TOPS: each registry's most off one hurt (per cent), its guards multiplied; measured as the blow's are. */
-export const GUARD_TOPS = Object.freeze({ loot: 12.448, sets: 10, firmament: 15, martial: 4, arcane: 4 });
-/** THE BLOW NET: the most all the registries add together, per cent. The registries' tops sum to 101; a kit with all six
- *  near their tops at once is cut to this (x1.754). Before B1 the blow's powers multiplied to x119.95. */
-export const BLOW_NET_PCT = 75.4;
+export const GUARD_TOPS = Object.freeze({ loot: 4.44025, sets: 3, firmament: 3, martial: 2, arcane: 2 });
+/** THE BLOW NET: the tops summed, per cent. B5 made it the sum, so a kit with every registry at its top meets it and nothing
+ *  a card prints is cut (+75.4 at B1, above a normal kit and below the sum; before B1 the blow's powers multiplied to x119.95). */
+export const BLOW_NET_PCT = 34.5;
 /** A blow is at most this many times the damage it was handed. */
 export const BLOW_MOST = 1 + BLOW_NET_PCT / 100;
-/** THE GUARD NET: a hurt keeps at least this share of what reached the guards (74.09%; 10.71% before B1). Points (Bulwark, a
- *  ward, a Shield's pool), a hit capped by health (Unyielding) and a blow turned aside whole are no share, and stand outside it. */
-export const GUARD_LEAST = 0.7408776192;
+/** THE GUARD NET: the registries' keeps multiplied (86.35%; 74.09% at B1, 10.71% before). Points (Bulwark, a ward, a Shield's pool),
+ *  a hit capped by health (Unyielding) and a blow turned aside whole are no share, and stand outside it. */
+export const GUARD_LEAST = 0.8635164689;
 /** Rounding's slack: a product taken in another order differs in its last bits, and that is no stacking. */
 const SLACK = 1e-6;
 
