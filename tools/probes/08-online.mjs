@@ -168,12 +168,20 @@ export async function run({ browser, base, ck }) {
 
     // one chat line: typed in alice's chat field (Enter focuses it, Enter sends), read from bob's chat log
     const line = `probe line ${Math.random().toString(36).slice(2, 8)}`;
-    // the opening story page of the classic start holds the keys: put it away first, as a player does
+    // the opening story page of the classic start holds the keys: put it away first, as a player does. A frame takes seconds
+    // in software GL, so press until the game says no overlay is up, not a counted number of times.
     for (const g of [a, b]) {
-      for (let i = 0; i < 12 && (await g.overlayKind()); i++) {
-        await g.page.waitForTimeout(600);
-        await g.key(i % 2 ? 'Escape' : 'Enter');
-      }
+      let n = 0;
+      const gone = await g.until(
+        async () => {
+          if (!(await g.overlayKind())) return true;
+          await g.key(n++ % 2 ? 'Escape' : 'Enter');
+          return false;
+        },
+        300000,
+        600,
+      );
+      lap(`${g.label}: overlay put away: ${!!gone}`);
     }
     // Enter focuses the chat field; the key is handled on a frame, and a frame takes seconds in software GL. Each step waits
     // on the game's state (the field has the focus, the conduct card is up, the line stands in the log), never on a time:
@@ -181,13 +189,13 @@ export async function run({ browser, base, ck }) {
     const agree = a.page.getByRole('button', { name: 'I agree' });
     const inLog = (g) => g.page.evaluate((t) => document.body.innerText.includes(t), line);
     const fieldFocused = (g) =>
-      g.page.evaluate(() => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName));
+      g.page.evaluate(() => !!document.activeElement?.classList.contains('dfchat-input'));
     const agreeShown = () => agree.isVisible().catch(() => false);
     let agreed = false;
     for (let attempt = 1; attempt <= 6 && !(await inLog(a)); attempt++) {
       await a.page.keyboard.press('Enter');
       // a first line is held behind the code of conduct (SAFE1): the card may come instead of the field
-      const got = await a.until(async () => ((await fieldFocused(a)) ? 'field' : (await agreeShown()) ? 'card' : null), 120000, 250);
+      const got = await a.until(async () => ((await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null), 120000, 250);
       lap(`chat attempt ${attempt}: ${got}`);
       if (got === 'card') {
         // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
