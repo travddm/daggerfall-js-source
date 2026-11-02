@@ -111,13 +111,15 @@ test('TECH1 THE SWING: PlayerWeapon.resolveHit with a technique\'s blow - its re
   pw.techniqueBlow = T.swingBlow('whirlwind', 20, { feet: [0, 0, 0], yaw: 0 });
   const duellist = { ...foeAt(0, -2.4), duel: true };
   assert.deepEqual(pw.resolveHit([duellist], player(), sight, () => 0.01), [], 'a player\'s body behind me: the plain swing\'s view');
-  // the to-hit: a roll the plain swing misses on, the technique's +30 lands
+  // the to-hit: a roll the plain swing misses on, the technique's +10 (Skull Crack) lands
+  // B1: Skull Crack's term is +10 (was +30), so the window needs a hand that is not already at the formula's floor
+  const skilled = player({ skills: new Array(35).fill(90) });
   let missAt = null;
-  for (let r = 0.05; r < 1 && missAt == null; r += 0.01) {
+  for (let r = 0.001; r < 1 && missAt == null; r += 0.002) {
     pw.techniqueBlow = null;
-    const p = pw.resolveHit([near], player(), sight, () => r)[0].damage;
+    const p = pw.resolveHit([near], skilled, sight, () => r)[0].damage;
     pw.techniqueBlow = T.swingBlow('crush', 0, { feet: [0, 0, 0], yaw: 0 });
-    const c = pw.resolveHit([near], player(), sight, () => r)[0].damage;
+    const c = pw.resolveHit([near], skilled, sight, () => r)[0].damage;
     if (p === 0 && c > 0) missAt = r;
   }
   assert.ok(missAt != null, 'a sure blow lands where a plain one missed');

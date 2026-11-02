@@ -62,7 +62,7 @@ async function risen(W) {
 }
 
 test('SD3 the wire: the frame\'s one kind each way, projected; the record\'s law moved beside it (net/superDungeon/sdLaw.js re-exports it); (mutants: a slot of 0 believed; a pixel off the map; the record\'s s 0 fanned)', () => {
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
   assert.deepEqual([...SD_KINDS], ['found', 'pz', 'in', 'hit', 'ehit', 'xhit', 'spent', 'vt', 'rz']);   // AUDIT WORLD-EVENTS L1-1 (
   assert.deepEqual([...SD_OUT_KINDS], ['ev', 'pz', 'st', 'mv', 'atk', 'hp', 'ph', 'ec', 'cx', 'cxh', 'cxb', 'stun', 'fell', 'lost', 'no', 'rcpt', 'bd', 'ln']);
   assert.deepEqual(validSdIn({ k: 'found', s: 3, px: PX, py: PY, junk: 1 }), { k: 'found', s: 3, px: PX, py: PY }, 'projected');

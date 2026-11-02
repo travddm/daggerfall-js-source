@@ -1656,7 +1656,7 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
 // Integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world283';
+export const RELAY_VERSION = 'world284';
 // world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
 //   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
 // world282: one version for client and relay - the per-feature relay gates are gone, and a welcome naming another

@@ -94,6 +94,12 @@ export function effectiveSkill(v) {
 /** The highest effective value a skill can reach (a HUD bar's full width). */
 export const EFFECTIVE_SKILL_MAX = effectiveSkill(SKILL_HARD_CAP);
 
+/** B1 (tame player power): the points of a mastered weapon skill or Critical Strike past 100 that still count to aim (to hit
+ *  and to crit). A skill-200 weapon read 140 to hit, +60 over a skill-100 one (+90 after PCAAO's x1.5), and Critical Strike
+ *  140 made a crit 20% harder and likelier; together +32% a blow on a bow. Past 100 a mastered skill now pays in damage
+ *  (weaponMastery.js), not in aim: +10 here. */
+export const AIM_PAST_MAX = 10;
+
 // CLIMB-PAST (FIELD BUGS 2026-10-01 #7, "Running jumping climbing dint work passed 100"). The run, the swim and the jump read the effective value in their own speed laws, so their
 // points past 100 move the body. Climbing drives one thing in Daggerfall - CalculateClimbingChance, which clamps the
 // skill to 5..95 and is certain at 95 (Luck 40 or more) - and GetClimbingSpeed reads no skill, so a Climbing mastered

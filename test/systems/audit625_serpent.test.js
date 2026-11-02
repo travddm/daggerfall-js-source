@@ -97,7 +97,7 @@ test('AUDIT 625 P2: the duel\'s word is ONE, kept by SIGIL1\'s door (sigil.js se
   setSigilDueling(false);
   assert.equal(setsDueling(), false);
   // the weapon's sigil: a Faint Magic blade in a Renown 1 hand bites a stand-in - and not under the duel's word
-  const blade = { group: 'Weapons', templateIndex: 120, material: 0, rarity: 'magic', affixes: [], sigil: { power: 5, party: 1, xp: 0 } };
+  const blade = { group: 'Weapons', templateIndex: 120, material: 0, rarity: 'magic', affixes: [], sigil: { power: 2, party: 1, xp: 0 } };
   const me = { isPlayer: true };
   const awake = Array.from({ length: 50 }, () => sigilBlow(blade, 100, me, rival)).reduce((a, b) => a + b, 0);
   assert.ok(awake > 5000, 'awake: the sigil adds its per cent');
@@ -116,7 +116,7 @@ test('AUDIT 625 P3 (Mac: "A coil per foe"): every foe holds its own Constrict co
   T = 10;
   const sweep = [];
   for (let i = 0; i < 6; i++) { sweep.push(swing(e, s, RAT)); sweep.push(swing(e, s, WOLF)); }
-  assert.deepEqual(sweep, [100, 100, 103, 103, 106, 106, 109, 109, 112, 112, 115, 115], 'both built, to the cap');
+  assert.deepEqual(sweep, [100, 100, 101, 101, 102, 102, 103, 103, 104, 104, 105, 105], 'both built, to the cap');
   assert.deepEqual([coilStacksAt(RAT), coilStacksAt(WOLF)], [COIL_STACKS, COIL_STACKS]);
   assert.equal(coiledFoe(), WOLF, 'the states say the foe struck last');
   reportPlayerKill(RAT);

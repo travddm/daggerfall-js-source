@@ -61,7 +61,7 @@ test('TECH1 THE ROSTER: twelve techniques, two to each family that swings, every
 });
 
 test('TECH1 THE NUMBERS: one power band for every technique, the per-mille at a door, the multiplier and the card\'s words (mutants: a band moved; a chance moved; the multiplier off the value)', () => {
-  assert.deepEqual(JSON.parse(JSON.stringify(RO.TECHNIQUE_BANDS)), { magic: [5, 15], rare: [15, 30], legendary: [30, 50] });
+  assert.deepEqual(JSON.parse(JSON.stringify(RO.TECHNIQUE_BANDS)), { magic: [5, 10], rare: [10, 20], legendary: [20, 30] });
   assert.deepEqual({ ...RO.TECHNIQUE_PER_MILLE }, { magic: 120, rare: 300, legendary: 450 });
   assert.equal(RO.techniqueMult(1.4, 0), 1.4);
   assert.ok(Math.abs(RO.techniqueMult(1.4, 25) - 1.75) < 1e-12);
@@ -75,11 +75,11 @@ test('TECH1 THE NUMBERS: one power band for every technique, the per-mille at a 
   assert.ok(v.spread / (v.arrows - 1) >= 1 / ARENA_HIT_HZ_MAX + 1 / 60, `${v.spread / (v.arrows - 1)} s a shaft`);
   assert.equal(RO.techniqueBrief('volley', 22), 'Aim: 6 arrows rain down within 3.5 m, 61% each. 6 fatigue, 16s');
   assert.equal(RO.techniqueBrief('execute', 0), 'Strike for 120%, to 220% on the wounded. 5 fatigue, 11s');
-  assert.equal(RO.techniqueBrief('leap', 50), 'Aim: leap 9 m, strike all in 2.5 m, 210%. 5 fatigue, 12s');
+  assert.equal(RO.techniqueBrief('leap', 30), 'Aim: leap 9 m, strike all in 2.5 m, 169%. 5 fatigue, 12s');
   assert.equal(RO.techniqueBrief('nonesuch', 10), '');
   // AUDIT TECH1: no blow is 'sure' (law 1), and the Gauntlets' two say they are the bare hand's
-  assert.equal(RO.techniqueBrief('crush', 0), 'One heavy blow, 160%, +30 to hit. 5 fatigue, 10s');
-  assert.equal(RO.techniqueBrief('haymaker', 0), 'Bare-handed: one heavy blow, 180%, +30 to hit. 4 fatigue, 9s');
+  assert.equal(RO.techniqueBrief('crush', 0), 'One heavy blow, 140%, +10 to hit. 5 fatigue, 10s');
+  assert.equal(RO.techniqueBrief('haymaker', 0), 'Bare-handed: one heavy blow, 150%, +10 to hit. 4 fatigue, 9s');
   assert.equal(RO.techniqueBrief('kick', 0), 'Bare-handed, aim: leap 6 m, strike all in 2 m, 130%. 4 fatigue, 10s');
 });
 
@@ -98,8 +98,8 @@ test('TECH1 THE LINE: a kind of its own, appended last, a weapon\'s or the Gaunt
   assert.equal(LR.AFFIX_WORTH.technique, 30);
   assert.equal(LR.affixLabel({ id: 'technique', param: 'volley', value: 22 }), 'Volley +22%');
   assert.equal(LR.affixLabel({ id: 'technique', param: 'nonesuch', value: 22 }), '', 'an unknown technique is no line');
-  assert.equal(LR.validAffix({ id: 'technique', param: 'leap', value: 50 }), true);
-  assert.equal(LR.validAffix({ id: 'technique', param: 'leap', value: 51 }), false, 'past the Legendary ceiling');
+  assert.equal(LR.validAffix({ id: 'technique', param: 'leap', value: 30 }), true);
+  assert.equal(LR.validAffix({ id: 'technique', param: 'leap', value: 31 }), false, 'past the Legendary ceiling');
   assert.deepEqual(LR.kindParams('technique', createWeapon(129, 1)), ['volley', 'pierce']);
   assert.deepEqual(LR.kindParams('technique', cuirass()), [], 'a cuirass has no hand');
   // never drawn by another line's pool: the numbers', the proc line's, an Exalted's, a curse's
@@ -127,7 +127,7 @@ test('TECH1 ADD: a technique of the piece\'s family, its band, its worth, set be
   const worth = bow.value;
   const line = LR.addTechniqueLine(bow, lcg(10));
   assert.ok(['volley', 'pierce'].includes(line.param));
-  assert.ok(line.value >= 15 && line.value <= 30);
+  assert.ok(line.value >= 10 && line.value <= 20);
   assert.equal(bow.value, worth + 30 * line.value);
   assert.equal(LR.addTechniqueLine(bow, lcg(11)), null, 'one at most');
   assert.equal(LR.techniqueLineOf(bow), line);
@@ -136,7 +136,7 @@ test('TECH1 ADD: a technique of the piece\'s family, its band, its worth, set be
   assert.equal(LR.addTechniqueLine(LR.applyRarity(createWeapon(120, 1), 'rare', lcg(1)), lcg(2), { id: 'volley' }), null, 'a sword never volleys');
   const leg = LR.applyRarity(createWeapon(120, 1), 'legendary', lcg(4));
   const lt = LR.addTechniqueLine(leg, lcg(5), { id: 'whirlwind' });
-  assert.ok(lt.value >= 30 && lt.value <= 50, 'a Legendary\'s in the Legendary band');
+  assert.ok(lt.value >= 20 && lt.value <= 30, 'a Legendary\'s in the Legendary band');
   // a gem's line stays last
   const g = LR.applyRarity(createWeapon(120, 1), 'rare', lcg(6));
   g.socket = LR.SOCKET_EMPTY;
@@ -248,33 +248,33 @@ test('TECH1 THE REFORGE AND THE HONE: REFORGE-REPLACE - a technique\'s line is n
   const ti = honed.affixes.findIndex(LR.isTechniqueAffix);
   assert.ok(LR.honeableLines(honed).includes(ti));
   for (let i = 0; i < 40 && LR.honeableLines(honed).includes(ti); i++) LR.honeAffix(honed, ti, lcg(i + 1));
-  assert.equal(honed.affixes[ti].value, 30, 'up to the Rare band\'s top');
+  assert.equal(honed.affixes[ti].value, 20, 'up to the Rare band\'s top');
   // an Exalted Legendary with a technique: the Reforge takes the Exalted's line, never the technique's
-  const leg = withTech(() => createWeapon(120, 1), 'leap', 40, 'legendary');
+  const leg = withTech(() => createWeapon(120, 1), 'leap', 25, 'legendary');
   assert.equal(LR.exaltLegendary(leg, lcg(3)), true);
   const tl = leg.affixes.findIndex(LR.isTechniqueAffix);
   assert.equal(tl, leg.affixes.length - 1, 'the Exalted\'s line set before it');
   assert.deepEqual(LR.reforgeableLines(leg), [tl - 1]);
-  assert.deepEqual(LR.affixBand(leg, tl), [30, 50]);
+  assert.deepEqual(LR.affixBand(leg, tl), [20, 30]);
 });
 
 test('TECH1 THE CARD: the line with its band, then what a press does with its numbers; nothing with the switch off (mutants: the detail line dropped; its numbers off the value)', () => {
   on();
-  const bow = withTech(() => createWeapon(130, 1), 'volley', 22);
+  const bow = withTech(() => createWeapon(130, 1), 'volley', 16);
   assert.deepEqual(LR.rarityLines(bow), ['Rare', 'Unidentified'], 'a Rare is read once it is known (DFU\'s IsIdentified) - its technique works all the same');
   bow.isIdentified = true;
   const lines = LR.rarityLines(bow);
-  const i = lines.indexOf('Volley +22% [15-30]');
+  const i = lines.indexOf('Volley +16% [10-20]');
   assert.ok(i > 0, lines.join(' | '));
-  assert.equal(lines[i + 1], 'Aim: 6 arrows rain down within 3.5 m, 61% each. 6 fatigue, 16s');
+  assert.equal(lines[i + 1], 'Aim: 6 arrows rain down within 3.5 m, 58% each. 6 fatigue, 16s');
   assert.equal(LR.techniqueDetail({ id: 'damage', value: 5 }), '');
   // a Legendary's technique line - rolled at the find, Exalted or not - reads the Legendary band (its record's lines none)
-  const leg = withTech(() => createWeapon(120, 1), 'leap', 41, 'legendary');
+  const leg = withTech(() => createWeapon(120, 1), 'leap', 25, 'legendary');
   leg.isIdentified = true;
   assert.equal(leg.exalted, undefined);
   const at = leg.affixes.findIndex(LR.isTechniqueAffix);
-  assert.equal(LR.affixLine(leg, at), 'Leap Strike +41% [30-50]');
-  assert.deepEqual(LR.affixBand(leg, at), [30, 50]);
+  assert.equal(LR.affixLine(leg, at), 'Leap Strike +25% [20-30]');
+  assert.deepEqual(LR.affixBand(leg, at), [20, 30]);
   setPref('lootRarity', false);
   assert.deepEqual(LR.rarityLines(bow), []);
   _resetForTests();
@@ -292,10 +292,10 @@ test('TECH1 THE LAW: a technique of the piece\'s family, one, last of its own li
   assert.ok(Number(/^acct(\d+)$/.exec(ACCOUNT_VERSION)?.[1]) >= LAW_SERVICE[ITEM_LAW_VERSION], `${ACCOUNT_VERSION} predates item law ${ITEM_LAW_VERSION}`);
   const lawful = [
     withTech(() => createWeapon(130, 1), 'pierce', 20), withTech(() => createWeapon(116, 1), 'lunge', 10, 'magic'),
-    withTech(gauntlets, 'kick', 25), withTech(() => createWeapon(126, 1), 'slam', 45, 'legendary'),
+    withTech(gauntlets, 'kick', 15), withTech(() => createWeapon(126, 1), 'slam', 28, 'legendary'),
   ];
   for (const it of lawful) assert.deepEqual(itemFindings(it), [], it.name);
-  const ex = withTech(() => createWeapon(120, 1), 'leap', 40, 'legendary');
+  const ex = withTech(() => createWeapon(120, 1), 'leap', 25, 'legendary');
   LR.exaltLegendary(ex, lcg(3));
   assert.deepEqual(itemFindings(ex), [], 'an Exalted after the technique: its line before it');
   const cu = withTech(() => createWeapon(120, 1), 'leap', 20);
@@ -314,14 +314,14 @@ test('TECH1 THE LAW: a technique of the piece\'s family, one, last of its own li
   assert.ok(forged((it) => { it.affixes.at(-1).param = 'volley'; }).includes('affixes'), 'a sword\'s volley');
   assert.ok(forged((it) => { it.affixes.push({ id: 'technique', param: 'whirlwind', value: 20 }); }).includes('affixes'), 'two techniques');
   assert.ok(forged((it) => { const t = it.affixes.pop(); it.affixes.unshift(t); }).includes('affixes'), 'not its last line');
-  assert.ok(forged((it) => { it.affixes.at(-1).value = 31; }).includes('affixes'), 'past the Rare band');
+  assert.ok(forged((it) => { it.affixes.at(-1).value = 21; }).includes('affixes'), 'past the Rare band');
   const cuirassTech = LR.applyRarity(cuirass(), 'rare', lcg(2));
   cuirassTech.affixes.push({ id: 'technique', param: 'kick', value: 20 });
   assert.ok(itemFindings(cuirassTech).includes('affixes'), 'a cuirass has no hand');
   const ringTech = LR.applyRarity(ring(), 'rare', lcg(2));
   ringTech.affixes.push({ id: 'technique', param: 'kick', value: 20 });
   assert.ok(itemFindings(ringTech).includes('affixes'), 'a jewel is not of the group');
-  const legLow = withTech(() => createWeapon(120, 1), 'leap', 20, 'legendary');
+  const legLow = withTech(() => createWeapon(120, 1), 'leap', 19, 'legendary');
   assert.ok(itemFindings(legLow).includes('affixes'), 'a Legendary\'s under its band');
   // the wire's own door takes an honest piece
   assert.ok(validLootItem(JSON.parse(JSON.stringify(lawful[0]))));
@@ -337,7 +337,7 @@ test('TECH1 THE TEST ROOM: one Rare a technique, each on a piece of its family a
     const a = LR.techniqueLineOf(it);
     assert.equal(it.rarity, 'rare');
     assert.equal(it.isIdentified, true);
-    assert.equal(a.value, 23, 'the band\'s middle');
+    assert.equal(a.value, 15, 'the band\'s middle');
     assert.ok(RO.TECHNIQUES[a.param].families.includes(RO.techniqueFamily(it)));
     assert.deepEqual(itemFindings(it), [], it.name);
   }

@@ -73,9 +73,9 @@ import { blowRoom } from '../powerCeiling.js';   // POWER-CEILING: the blow's on
 
 /** The power band per tier, per cent at full rank: [min, max] inclusive. */
 export const SIGIL_BANDS = Object.freeze({
-  magic: Object.freeze([2, 5]),
-  rare: Object.freeze([4, 8]),
-  legendary: Object.freeze([7, 12]),
+  magic: Object.freeze([1, 2]),
+  rare: Object.freeze([2, 3]),
+  legendary: Object.freeze([3, 4]),
 });
 export const SIGIL_POWER_MAX = SIGIL_BANDS.legendary[1];
 

@@ -10,7 +10,7 @@ import { SPECIAL_ABILITY_BITS } from './specialAdvantages.js';
 import { localizedStrings, localizedText, getLocalizedTextWithReversion, TextCollections } from './textManager.js';   // L10N3d: GetSkillName's words
 // SOFTCAP1: two more leaves (neither imports anything) - the softcap's law
 // and mentor mode's overlay.
-import { effectiveSkill, overcapTallyWeight, movementTallyWeight, SKILL_SOFT_CAP, SKILL_HARD_CAP } from './skillSoftcap.js';   // MOVE-REAL: the movement skills' own weight
+import { effectiveSkill, overcapTallyWeight, movementTallyWeight, SKILL_SOFT_CAP, SKILL_HARD_CAP, AIM_PAST_MAX } from './skillSoftcap.js';   // MOVE-REAL: the movement skills' own weight
 import { mentoredSkill, MENTOR_PUPIL_TALLY } from './mentorMode.js';
 import { masterCappedSkill, skillCanPassCap } from './masterSkills.js';   // SOFTCAP3: Master Skills - past 100 only when on (and online)
 export { SKILL_SOFT_CAP, SKILL_HARD_CAP, effectiveSkill } from './skillSoftcap.js';
@@ -101,6 +101,9 @@ export function permanentSkillValue(entity, skillId) {
 
 /** DaggerfallSkills.GetLiveSkillValue (:135-143): the permanent value
  *  PLUS the effect mod. */
+/** The skill a to-hit or crit roll reads: `live`, held at 100 + AIM_PAST_MAX for a player whose own skill has climbed
+ *  past 100. A skill at or under 100 (gear lines included) and every foe's skill read as they did. */
+export const aimSkill = (entity, id, live) => (entity?.isPlayer && (entity.skills?.[id] ?? 0) > SKILL_SOFT_CAP ? Math.min(live, SKILL_SOFT_CAP + AIM_PAST_MAX) : live);
 export function skillValue(entity, skillId) {
   const o = entity.skillOverrides;
   if (o && o[skillId] != null) return o[skillId];

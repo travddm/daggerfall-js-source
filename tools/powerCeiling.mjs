@@ -317,3 +317,16 @@ if (isMain(import.meta.url)) {
   console.log('THE SKY\'S CHANNELS, each at its cap:');
   console.log(`  ${JSON.stringify(roleTops(skyNumbers(), []))}`);
 }
+
+/** THE BEST KIT A CHARACTER CAN REALLY WEAR, NOT COUNTING THE FIRMAMENT TREE: one weapon (so one weapon power, one mastered
+ *  skill and one sigil), the nine places filled with the best sets, the loot's best worn powers, and one path (a martial path
+ *  or an arcane one, never both). Its blow percents and its share of a hurt kept, to hold under the nets (BLOW_MOST,
+ *  GUARD_LEAST). The Firmament tree (+50) is left out: B5 retunes it, and it alone is two thirds of the blow net. */
+export function bestRealKit() {
+  const tops = measureBlowTops();
+  const keeps = measureGuardKeeps();
+  return {
+    blowPct: tops.sigil + tops.sets + tops.loot + tops.mastery + tops.martial,
+    guardKeep: keeps.loot * keeps.sets * Math.min(keeps.martial, keeps.arcane),
+  };
+}

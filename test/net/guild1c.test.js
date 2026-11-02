@@ -120,7 +120,7 @@ test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s
   assert.equal(readGuildTag({ gt: '<b>' }), null, 'a stranger\'s word about themselves');
   assert.equal(readGuildTag({ gt: ['HND'] }), null);
   assert.equal(readGuildTag({}), null);
-  assert.equal(RELAY_VERSION, 'world283');
+  assert.equal(RELAY_VERSION, 'world284');
   const g1 = guildGate(null, 1000);
   assert.equal(GUILD_ORDER_HZ_MAX, 1);
   assert.equal(g1.pass, true);

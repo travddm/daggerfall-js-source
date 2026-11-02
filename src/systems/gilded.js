@@ -70,9 +70,9 @@ export const DRAGONFIRE = Object.freeze({
  *  crystal of the next Reckoning, kept its stacks for good); a foe it fells gives `heal`% of my health back. Read once at
  *  import, frozen. */
 export const UNDERTOW = Object.freeze({
-  name: 'Undertow', kind: 'undertow', pct: 10, max: 5, seconds: 6, heal: 10,
-  brief: '+10%/hit on a foe; kills heal',   // inside the card's row (sigilSets.js BRIEF_MAX)
-  text: 'Each hit drags the foe deeper: +10% damage to your next hits on it for 6 s, up to +50%. A kill heals you for 10% of your health',
+  name: 'Undertow', kind: 'undertow', pct: 2, max: 5, seconds: 6, heal: 10,
+  brief: '+2%/hit on a foe; kills heal',   // inside the card's row (sigilSets.js BRIEF_MAX)
+  text: 'Each hit drags the foe deeper: +2% damage to your next hits on it for 6 s, up to +10%. A kill heals you for 10% of your health',
 });
 
 /** A record's line, frozen. */

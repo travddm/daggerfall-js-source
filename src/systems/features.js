@@ -38,6 +38,7 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
+import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -756,12 +757,9 @@ export const FEATURES = Object.freeze([
   // LR1: LOOT RARITY - the port's own item ladder
   // (systems/loot/lootRarity.js): Common, Magic, Rare, Legendary, with
   // DFU's artifacts as the ceiling. Enhanced, and ON (LR5, 2026-09-15,
-  // ). It shipped off beside
-  // enhancedAI on the reasoning that a row changing the RULES waits to
-  // be asked for; Mac's call is that this one is the port's own game
-  // and should be what a player meets. The 1:1 lane is not lost - the
-  // row is one press away, and off is DFU's loot exactly, field for
-  // field.
+  // ). It shipped off beside enhancedAI on the reasoning that a row changing the RULES waits to
+  // be asked for; Mac's call is that this one is the port's own game and should be what a player meets. The 1:1 lane is
+  // not lost - the row is one press away, and off is DFU's loot exactly, field for field.
   Object.freeze({
     id: 'loot-rarity',
     group: 'loot',
@@ -774,6 +772,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
   }),
+  WEAPON_TECHNIQUES_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame

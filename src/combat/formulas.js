@@ -26,7 +26,7 @@ import { rand } from '../formats/dfRandom.js';
 import { enchantChanceToHitMod, doItemEnchantmentPayloads, PAYLOAD, isEnchantedItem, entityImprovedAdrenalineRush } from '../systems/enchantments.js';   // E1: the enchantment channels + the Strikes payload; AUDIT 39: ImprovesTalents' adrenaline flag lives in the fold's bag   // the monster multi-attack reflex gate (F2)
 import { entityArmorMod, entityWeightMult, weaponDamageMods, weaponBlowMods } from '../systems/entityMods.js';   // RF1: one read per channel - DFU's enchantment channel and every enhancement fold, summed there
 import { liveStat } from '../systems/statMods.js';   // S14: fortify-aware stat reads
-import { skillValue, SKILLS } from '../systems/skills.js';
+import { skillValue, aimSkill, SKILLS } from '../systems/skills.js';
 import { noteSkillChallenge } from '../systems/skillSoftcap.js';   // SOFTCAP1: the foe a blow was traded with, for the real-use law
 import { mentorArmorValue, mentorGearScale, mentorDamageTakenMult } from '../systems/mentorMode.js';   // SOFTCAP1: mentor mode's overlay   // S3: real skills (enemies stay flat, verbatim)
 import { RACES } from '../systems/races.js';   // CalculateRacialModifiers reads the DFU-numbered race id
@@ -306,7 +306,7 @@ export const statsToHit = (a, t) =>
 // ---- CalculateSkillsToHit (classic's /4 dodging; crit roll adds crit/10) ----
 export function skillsToHit(a, t, roll01 = Math.random(), notes = null) {
   let mod = -Math.floor(skillValue(t, SKILLS.Dodging) / 4);            // classic's /4 bug preserved
-  const crit = skillValue(a, SKILLS.CriticalStrike);
+  const crit = aimSkill(a, SKILLS.CriticalStrike, skillValue(a, SKILLS.CriticalStrike));
   // HN1: the CRITICAL STRIKE roll is Daggerfall's own "critical hit" -
   // it lands on the chance to hit, not the damage (classic parity) -
   // and the enhanced HUD's numbers name it when it succeeds. The notes
@@ -661,7 +661,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
   // skill or HandToHand), + player mods. Enemies read the same value
   // for every skill (flat, SetEnemyCareer verbatim).
   const attackSkill = weapon ? (weaponSkillUsed(weapon.templateIndex) ?? SKILLS.HandToHand) : SKILLS.HandToHand;
-  let chanceToHitMod = skillValue(attacker, attackSkill) + toHitMod;
+  let chanceToHitMod = aimSkill(attacker, attackSkill, skillValue(attacker, attackSkill)) + toHitMod;
   let damageModifiers = damageMod;
   // FormulaHelper.cs:594-613, the `attacker == player` block, in DFU's
   // order: swing mods (the caller's damageMod/toHitMod - they need the

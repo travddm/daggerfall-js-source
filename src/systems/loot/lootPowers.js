@@ -96,9 +96,9 @@ export const CAST_SPEED_CAP = 30;
 export const LEECH_CAP = 10;
 /** BAL9c: all the potency a wearer's pieces sum to, at most (%) - focus's and
  *  castSpeed's own 30. */
-export const POTENCY_CAP = 30;
+export const POTENCY_CAP = 6;
 /** BAL9c: all the loot adds to a damage spell's landing, potency and powers together, at most (%) - SPELL_CUT_MOST's 50. */
-export const SPELL_POWER_MOST = 50;
+export const SPELL_POWER_MOST = 9;
 /** BAL9c: all the wellspring a wearer's pieces sum to, at most (% of my magicka a kill) - LEECH_CAP's 10, the caster's
  *  leech (Soul Siphon's 15 is the Legendary's own, beside it). */
 export const WELLSPRING_CAP = 10;

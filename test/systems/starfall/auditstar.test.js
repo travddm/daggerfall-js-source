@@ -118,7 +118,7 @@ test('AUDIT STAR S1: BOUND IN SILK - the held blow\'s landing cuts the count wha
   setPlayerDoor({ foes: () => [], feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, player: () => e });
   const s = createWeapon(120, 0, () => 0.5);
   T = 10;
-  assert.deepEqual([swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT, false), swing(e, s, RAT)], [100, 100, 100, 160, 100], 'the part-blow held, the count cut');
+  assert.deepEqual([swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT, false), swing(e, s, RAT)], [100, 100, 100, 106, 100], 'the part-blow held, the count cut');
   assert.equal(strandsAt(RAT), 1, 'and the next whole blow laid the first again');
   fresh();
   const f = wearSet(player(), 'starspun', 4);

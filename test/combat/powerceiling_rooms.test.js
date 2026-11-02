@@ -102,38 +102,38 @@ test('POWER-CEILING THE SKY OBEYS ITS ROOM (AUDIT HORIZONTAL D2): a sword under 
   reset();
 });
 
-test('POWER-CEILING MASTERY OBEYS ITS ROOM (AUDIT HORIZONTAL D2): an axe at a skill of 200 (140 effective) on a foe under half health lands its +80% whole with room and nothing once the product is spent (mutant: mastery asking and spending the raw per cent)', () => online(() => {
+test('POWER-CEILING MASTERY OBEYS ITS ROOM (AUDIT HORIZONTAL D2): an axe at a skill of 200 (140 effective) on a foe under half health lands its +16% whole with room and nothing once the product is spent (mutant: mastery asking and spending the raw per cent)', () => online(() => {
   reset();
   const me = hero([S.Axe], 200);
   const axe = weapon(WEAPONS.War_Axe);
   const low = foe({ health: 10 });
-  assert.equal(weaponPastPct(axe, me, low), 80, 'the axe\'s two per cent an effective point past 100, at 140');
-  assert.equal(openBlow(() => weaponMasteryBlow(axe, 1000, me, low)), 1800, 'whole: +80%');
+  assert.equal(weaponPastPct(axe, me, low), 16, 'the axe four tenths of a per cent an effective point past 100, at 140');
+  assert.equal(openBlow(() => weaponMasteryBlow(axe, 1000, me, low)), 1160, 'whole: +16%');
   assert.equal(spentBlow(() => weaponMasteryBlow(axe, 1000, me, low)), 1000, `no room, no more - ${RULE}`);
   reset();
 }));
 
-test('POWER-CEILING THE MARTIAL PATH OBEYS ITS ROOM (AUDIT HORIZONTAL D2): the Assassin\'s Opening Strike (+30%) and the Vanguard\'s Iron Discipline (10% lighter) whole with room, nothing once the product or the share is spent (mutants: the path\'s blow and its guard each asking and spending the raw per cent)', () => online(() => {
+test('POWER-CEILING THE MARTIAL PATH OBEYS ITS ROOM (AUDIT HORIZONTAL D2): the Assassin\'s Opening Strike (+5%) and the Vanguard\'s Iron Discipline (3% lighter) whole with room, nothing once the product or the share is spent (mutants: the path\'s blow and its guard each asking and spending the raw per cent)', () => online(() => {
   reset();
   const assassin = hero(MP.MARTIAL_BY_ID.assassin.skills);
   assert.equal(MP.chooseMartialPath(assassin, 'assassin').ok, true);
   const blade = weapon(WEAPONS.Dagger);
-  assert.equal(openBlow(() => POW.martialBlow(blade, 1000, assassin, foe(), {})), 1300, 'whole: the first blow at a foe, +30%');
+  assert.equal(openBlow(() => POW.martialBlow(blade, 1000, assassin, foe(), {})), 1050, 'whole: the first blow at a foe, +5%');
   assert.equal(spentBlow(() => POW.martialBlow(blade, 1000, assassin, foe(), {})), 1000, `no room, no more - ${RULE}`);
   reset();
   const vanguard = hero(MP.MARTIAL_BY_ID.vanguard.skills);
   assert.equal(MP.chooseMartialPath(vanguard, 'vanguard').ok, true);
-  assert.equal(struck(vanguard, 1000), 900, 'whole: 10% lighter');
+  assert.equal(struck(vanguard, 1000), 970, 'whole: 3% lighter');
   assert.equal(struck(vanguard, 1000, [POW.MARTIAL_POWERS, POW.martialDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();
 }));
 
-test('POWER-CEILING THE LIVING AEGIS AND UNBROKEN OBEY THEIR ROOM (AUDIT HORIZONTAL D2): the Warden\'s cast guard (20% lighter) and Malacath\'s halving whole with room, nothing once the share is spent (mutants: each asking and spending the raw per cent)', () => online(() => {
+test('POWER-CEILING THE LIVING AEGIS AND UNBROKEN OBEY THEIR ROOM (AUDIT HORIZONTAL D2): the Warden\'s cast guard (4% lighter) and Malacath\'s halving whole with room, nothing once the share is spent (mutants: each asking and spending the raw per cent)', () => online(() => {
   reset();
   const warden = hero(AP.PATH_BY_ID.warden.schools, 150, MAGE);
   assert.equal(AP.choosePath(warden, 'warden').ok, true);
   APOW.pathLanded({ caster: warden, spell: signatureSpell('warden'), r: {}, self: true });   // Living Aegis cast on myself
-  assert.equal(struck(warden, 1000), 800, 'whole: 20% lighter');
+  assert.equal(struck(warden, 1000), 960, 'whole: 4% lighter');
   warden.health = 2000;
   assert.equal(struck(warden, 1000, [APOW.ARCANE_POWERS, APOW.pathDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();
@@ -150,7 +150,7 @@ test('POWER-CEILING THE LIVING AEGIS AND UNBROKEN OBEY THEIR ROOM (AUDIT HORIZON
   assert.equal(orcBane.health, 1, 'Unbroken: the killing blow leaves one, and the half begins');
   orcBane.health = 4000;   // over half: no Hold the Line, no Last Stand - the half alone
   now = 1;
-  assert.equal(struck(orcBane, 1000), 500, 'whole: half');
+  assert.equal(struck(orcBane, 1000), 900, 'whole: 10% less');
   orcBane.health = 4000;
   assert.equal(struck(orcBane, 1000, [SIGIL_SETS_POWER, setDamageMod]), 1000, `no room, nothing off - ${RULE}`);
   reset();

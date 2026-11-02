@@ -29,7 +29,7 @@ const armour = (templateIndex, set, xp = 0) => {
   if (set) it.sigil = { set, party: 1, xp };
   return it;
 };
-const weapon = (templateIndex, set, xp = 0, power = 5) => {
+const weapon = (templateIndex, set, xp = 0, power = 3) => {
   const it = createWeapon(templateIndex, 0);
   it.rarity = 'rare';
   it.sigil = set ? { power, set, party: 1, xp } : { power, party: 1, xp };
@@ -75,9 +75,9 @@ test('SET1 the numbers\' line: a number at a stage is its place on the line from
 });
 
 test('SET1 the record: a sigil carries a power, a set, or both - never neither - and a set is one the registry knows; every reader of the power reads a set\'s armour as no blow (no per cent, no "undefined" in its words, a card with no blow); the item field and the loot door take a set piece and refuse a forged set (mutants: power still required; any set taken; the blow read off a set piece)', () => {
-  const weaponSigil = { power: 5, party: 1, xp: 0 };
+  const weaponSigil = { power: 3, party: 1, xp: 0 };
   const armourSigil = { set: 'dagon', party: 2, xp: 100 };
-  const setWeapon = { power: 5, set: 'mora', party: 1, xp: 0 };
+  const setWeapon = { power: 3, set: 'mora', party: 1, xp: 0 };
   for (const s of [weaponSigil, armourSigil, setWeapon]) assert.ok(validSigil(s), JSON.stringify(s));
   for (const s of [
     { party: 1, xp: 0 },                       // neither
@@ -98,7 +98,7 @@ test('SET1 the record: a sigil carries a power, a set, or both - never neither -
   try {
     setSigilOnline(true); setSigilRenown(40);
     assert.equal(sigilPercent(armourSigil, 40), 0, 'no power, no blow');
-    assert.equal(sigilPercent(setWeapon, 40), 1, 'a set weapon keeps its blow (5% at Faint)');
+    assert.equal(sigilPercent(setWeapon, 40), 0.6, 'a set weapon keeps its blow (0.6% at Faint)');
     const piece = armour(102, 'dagon');
     const lines = sigilLines(piece);
     assert.deepEqual(lines, ['Sigil (Faint)', 'Faint: 0 / 5,000 to Kindled']);
@@ -106,7 +106,7 @@ test('SET1 the record: a sigil carries a power, a set, or both - never neither -
     assert.equal(v.blow, false); assert.equal(v.pct, 0); assert.equal(v.full, null); assert.equal(v.set, 'dagon');
     setSigilOnline(false);
     assert.deepEqual(sigilLines(piece), ['Sigil (Dormant: works online only)']);
-    assert.deepEqual(sigilLines(weapon(120, null)), ['Sigil (Dormant: works online only): +5% at Ascendant'], 'a weapon\'s words are what they were');
+    assert.deepEqual(sigilLines(weapon(120, null)), ['Sigil (Dormant: works online only): +3% at Ascendant'], 'a weapon\'s words are what they were');
   } finally { _resetSigilForTests(); }
   assert.deepEqual(validItemField('sigil', armourSigil), armourSigil);
   assert.equal(validItemField('sigil', { set: 'nobody', party: 1, xp: 0 }), undefined);
@@ -167,8 +167,8 @@ test('SET1 the stage: the lowest worn piece\'s rank capped by the Renown\'s stag
   assert.equal(st.heldRenown, false);
   assert.deepEqual(st.tiers.map((t) => t.awake), [true, true, false], 'four pieces: the 2 and the 4');
   assert.deepEqual(st.tiers[0].values, { strength: 3, critical: 6 }, 'Kindled\'s numbers');
-  assert.equal(st.tiers[1].text, 'Your weapon deals 6% more damage, or 12% more while you are below half health');
-  assert.equal(st.tiers[1].full, 'Your weapon deals 12% more damage, or 24% more while you are below half health', 'and what it is at Ascendant');
+  assert.equal(st.tiers[1].text, 'Your weapon deals 3% more damage, or 6% more while you are below half health');
+  assert.equal(st.tiers[1].full, 'Your weapon deals 5% more damage, or 10% more while you are below half health', 'and what it is at Ascendant');
   // Renown 9 opens only Faint: the Renown holds it
   st = setState('dagon', pieces, 9, true);
   assert.equal(st.stage, 0);
@@ -220,7 +220,7 @@ test('SET1 the session and the powers\' one question: awake online with my Renow
     setSigilRenown(40);
     assert.equal(setsAwake(), true);
     assert.deepEqual(awakeTier(e, 'dagon', 0), { strength: 6, critical: 12 });
-    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 12 });
+    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 5 });
     assert.equal(awakeTier(e, 'dagon', 2), null, 'four pieces: the third sleeps');
     assert.equal(awakeTier(e, 'mora', 0), null, 'a set not worn');
     setSetsDueling(true);

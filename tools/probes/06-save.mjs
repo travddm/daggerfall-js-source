@@ -32,7 +32,10 @@ const sameAs = (a, b) => {
   const d = [];
   for (const k of ['name', 'level', 'gold', 'pixel', 'mode', 'maxHealth'])
     if (a[k] !== b[k]) d.push(`${k}: ${a[k]} vs ${b[k]}`);
-  if (a.items.join('|') !== b.items.join('|')) d.push(`items: ${a.items.length} vs ${b.items.length}`);
+  if (a.items.join('|') !== b.items.join('|'))
+    d.push(
+      `items: ${a.items.length} vs ${b.items.length}; only before: ${a.items.filter((x) => !b.items.includes(x)).join(',')}; only after: ${b.items.filter((x) => !a.items.includes(x)).join(',')}`,
+    );
   const off = Math.hypot(a.pos[0] - b.pos[0], a.pos[2] - b.pos[2]);
   if (off > 1) d.push(`position off by ${off.toFixed(1)}`);
   return d;

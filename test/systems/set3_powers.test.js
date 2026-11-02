@@ -171,17 +171,17 @@ test('SET3 the blow - Bloodfury\'s per cent (twice below half health), taken of 
   fresh(); online(1);
   const e = wearSet(player(), 'dagon', 4);
   const s = sword();
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'Bloodfury at Faint: +4%');
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'Bloodfury at Faint: +2%');
   e.health = 50;
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'at half health: not below it');
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'at half health: not below it');
   e.health = 49;
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 108, 'below half: twice');
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'below half: twice');
   e.health = 100;
   const knife = createWeapon(113, 0, () => 0.5);
-  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 10, e, RAT)), [10, 10], '0.4 a blow, carried: 0.8 stands on the knife');
-  assert.equal(weaponBlowMods(sword(), 10, e, RAT), 10, 'another weapon carries its own - never the knife\'s 0.8');
-  assert.equal(weaponBlowMods(knife, 10, e, RAT), 11, 'the knife\'s 0.8 and this blow\'s 0.4 make the whole point');
-  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 10, e, RAT)), [10, 11], 'and on: 0.6, then 1.0');
+  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 20, e, RAT)), [20, 20], '0.4 a blow, carried: 0.8 stands on the knife');
+  assert.equal(weaponBlowMods(sword(), 20, e, RAT), 20, 'another weapon carries its own - never the knife\'s 0.8');
+  assert.equal(weaponBlowMods(knife, 20, e, RAT), 21, 'the knife\'s 0.8 and this blow\'s 0.4 make the whole point');
+  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 20, e, RAT)), [20, 21], 'and on: 0.6, then 1.0');
   assert.equal(weaponBlowMods(s, 0, e, RAT), 0, 'a miss');
   assert.equal(weaponBlowMods(s, 100, e, { isPlayer: true }), 100, 'a blow at a player');
   assert.equal(weaponBlowMods(s, 100, { ...e, peer: 'p1' }, RAT), 100, 'a peer\'s blow resolved here');
@@ -200,22 +200,22 @@ test('SET3 the Rampage: each kill of mine a stack, up to three, every one refres
   door([], { me: e });
   const s = sword();
   at(100);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'Bloodfury alone');
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 102, 'Bloodfury alone');
   reportPlayerKill(RAT, { kind: 'melee' });
   assert.equal(rampageStacks(), 1);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 108, '+4% a stack at Faint');
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, '+2% a stack at Faint');
   reportPlayerKill(RAT); reportPlayerKill(RAT); reportPlayerKill(RAT);
   assert.equal(rampageStacks(), RAMPAGE_STACKS, 'three at most');
   assert.equal(RAMPAGE_STACKS, 3);
   assert.deepEqual(v.said, ['Rampage I', 'Rampage II', 'Rampage III'], 'said as it rises, not again at the cap');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 116);
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 108);
   at(105);
   reportPlayerKill(RAT, { kind: 'arrow' });
   at(105 + RAMPAGE_SECONDS - 0.01);
   assert.equal(rampageStacks(), 3, 'the last kill refreshed them all');
   at(105 + RAMPAGE_SECONDS);
   assert.equal(rampageStacks(), 0, 'twelve seconds after the last kill');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104);
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 102);
   reportPlayerKill(RAT);
   assert.equal(rampageStacks(), 1, 'a new run starts at one');
   // AUDIT SET L8: my summoned atronach, a bound ally, a guard of the watch - none is a kill of mine
@@ -237,8 +237,8 @@ test('SET3 the Rampage: each kill of mine a stack, up to three, every one refres
 test('SET3 Nightfall Strike: a weapon blow at a foe that had not noticed me (the host\'s `unaware`), a bow\'s too; and the Burning Gate\'s sear, flat on every weapon blow after the per cents - AUDIT L7 never on a foe immune to fire (mutants: Nightfall on an aware foe; Nightfall never on an arrow; the sear inside the per cent; the sear on a fire-immune foe)', () => {
   fresh(); online(1);
   const e = wearSet(player(), 'nocturnal', 4);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: true }), 125, '+25% at Faint');
-  assert.equal(weaponBlowMods(bow(), 100, e, RAT, { unaware: true }), 125, 'arrows too');
+  assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: true }), 104, '+4% at Faint');
+  assert.equal(weaponBlowMods(bow(), 100, e, RAT, { unaware: true }), 104, 'arrows too');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: false }), 100, 'a foe that saw me');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT), 100, 'no word: aware');
   fresh(); online(1);
@@ -424,25 +424,25 @@ test('SET3 Spite of the Spurned: a foe\'s blow that LANDS on me - marked at the 
   assert.deepEqual(d2.hurts, [['rat', 12]], '30% at Ascendant');
 });
 
-test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded, and every blow for the next seconds is halved (AUDIT L1: in whole points); it recovers in its time and is said ready again at the next round - never on a SetHealth(0) door or a duel\'s blow, and a second death inside the recovery is a death; AUDIT L10: a voice that throws never turns the save into a death (mutants: no recovery; the halving never ends; the recovery read off the halving; a half point kept; the voice unguarded)', () => {
+test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded, and every blow for the next seconds is cut by UNBROKEN_LESS (AUDIT L1: in whole points); it recovers in its time and is said ready again at the next round - never on a SetHealth(0) door or a duel\'s blow, and a second death inside the recovery is a death; AUDIT L10: a voice that throws never turns the save into a death (mutants: no recovery; the halving never ends; the recovery read off the halving; a half point kept; the voice unguarded)', () => {
   const v = fresh(); online(1);
   const e = wearSet(player(), 'malacath', 6);
   e.health = 50;
   at(1000);
   assert.equal(hurtPlayer(e, 500), false);
   assert.equal(e.health, 1, 'left at 1');
-  assert.deepEqual(v.said, ['Unbroken! Damage halved for 4 s.']);   // WB13b
+  assert.deepEqual(v.said, ['Unbroken! Damage cut by 10% for 4 s.']);   // WB13b
   assert.deepEqual(v.sounds, ['unbroken']);
   e.health = 50;
   at(1001);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 45, 'halved');
+  assert.equal(e.health, 41, '10% less: 90% of 10 is 9 - whole points, 9 land');
   hurtPlayer(e, 11);
-  assert.equal(e.health, 40, 'AUDIT L1: eleven halved is five - whole points, never a health of 39.5');
-  assert.equal(setDamageMod(e, 1), 0, 'a single point halved is none');
+  assert.equal(e.health, 32, 'AUDIT L1: 90% of eleven is 9.9 - nine land, whole points, never a health of 31.1');
+  assert.equal(setDamageMod(e, 1), 0, 'a single point at 90% is none');
   at(1004);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 30, 'four seconds at Faint, then whole');
+  assert.equal(e.health, 22, 'four seconds at Faint, then whole');
   at(1100);
   hurtPlayer(e, 500);
   assert.equal(e.health, 0, 'inside the recovery: a death');
@@ -470,7 +470,7 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   at(0);
   hurtPlayer(asc, 50);
   at(7.99);
-  assert.equal(setDamageMod(asc, 10), 5, 'eight seconds at Ascendant');
+  assert.equal(setDamageMod(asc, 10), 9, 'eight seconds at Ascendant');
   at(8);
   assert.equal(setDamageMod(asc, 10), 10);
   at(149);
@@ -484,7 +484,7 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   mute.health = 50;
   assert.equal(hurtPlayer(mute, 500), false, 'no death');
   assert.equal(mute.health, 1, 'saved, whatever the voice did');
-  assert.equal(setDamageMod(mute, 10), 5, 'and the halving runs');
+  assert.equal(setDamageMod(mute, 10), 9, 'and the 10% cut runs');
 });
 
 test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30% to under it - never a killing blow, and AUDIT L3 never a fall\'s or a poison\'s hurt - bursts a Nova on every live foe within six metres of my feet through the door, said with the count and sounded, and my weapon blows deal more for ten seconds; it recovers in its time; AUDIT H1/M4/L7: the Nova spares my ally and a foe at peace, and never reaches a storey away, through a wall (the host\'s own ray) or a foe the fire cannot touch (mutants: a fall waking it; any blow under the line waking it; the Nova past its reach; the fury never ending; no recovery; a killing blow waking it; the Nova on an ally or a pacified foe; the Nova a storey up; the Nova through a wall; the Nova on a fire daedra)', () => {
@@ -505,9 +505,9 @@ test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30%
   assert.deepEqual(d.hurts, [['near', 10]], 'crossed: 10 at Faint, only within six metres');
   assert.deepEqual(v.said, ['Wrath of the Warden! 1 foe struck.']);
   assert.deepEqual(v.sounds, ['wrath']);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 112, 'the fury (+10%) and the sear (+2)');
+  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 104, 'the fury (+2%) and the sear (+2)');
   at(WRATH_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 112);
+  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 104);
   at(WRATH_SECONDS);
   assert.equal(weaponBlowMods(sword(), 100, e, RAT), 102, 'ten seconds');
   e.health = 50;
@@ -533,7 +533,7 @@ test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30%
   e.health = 50; at(1000);
   blow(e, 25);   // AUDIT FINAL F10: through the door, which takes the mark as it opens
   assert.equal(v.said.at(-1), 'Wrath of the Warden!', 'no door: the fury still wakes, no count said');
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 112);
+  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 104);
   // AUDIT SET H1/M4/L7: who the Nova spares - asked in that order, the host's ray last (only for a foe otherwise struck)
   const w = fresh(); online(1);
   const me = wearSet(player(), 'ruhn', 6);

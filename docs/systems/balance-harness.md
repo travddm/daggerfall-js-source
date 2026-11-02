@@ -56,6 +56,7 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 | `techniques` | The best weapon technique the gear tier can roll. |
 | `swing` | The port's own swing and cast speed curve. |
 | `virtue` | Oblivion-style levelling, 12 attribute points a level (off by default). |
+| `ceiling` | The maxed character: the blow takes the rest of its room up to `BLOW_MOST`, the hurt and the spell likewise (off by default; add it with `--layers +ceiling,-hero,-meaner,-scaling`). |
 
 The default is the game as an online room runs it.
 
@@ -89,10 +90,29 @@ level 1. Two numbers are compared with it:
 
 `Character / target` is how far each level is from the target: 1.00 is on target.
 
+## The player-power budget (B1)
+
+The default run measures typical gear, which never reaches the stacking limits. `+ceiling` measures the same character with
+every stacking source near its top, held by the safety net. Before B1 that character was x20 to x54 a DFU character at level
+45 (ARENA2 attributes, DFU's own foe row).
+
+B1 rescaled the numbers on the sources, so a card prints what a blow gets and no registry is cut:
+
+- each registry's records reach exactly its top (`BLOW_TOPS`, `GUARD_TOPS` in `powerCeiling.js`), held equal by
+  `test/combat/powerceiling.test.js`;
+- blow percents add (the runner sums them; they multiplied before);
+- the net (`BLOW_MOST`, +75.4%, and `GUARD_LEAST`, 74%) sits above a normal kit and below the tops summed;
+- a skill past 100 pays 0.2% a point, gear on a weapon skill 0.1% a point up to 5%, and a mastered skill reads at most 110
+  to hit and to crit (`AIM_PAST_MAX`);
+- a technique aims +5 to +10 and tops at x1.95 of a blow. The Firmament tree is left to B5.
+
+`test/tooling/playerPowerBudget.test.js` holds the character-power bounds.
+
 ## Not modelled
 
 The `power` layer gives a caster no spell line (potency, cast speed): a mage's gear line is a damage line on a staff it
-rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, slams), shields and the block roll,
-backstab, saving throws and elemental tolerance, class foes, Enemy Expansion tables, spell effects other than damage,
-fatigue, and healing. A value from the harness is a comparison of rule sets on these builds, not a prediction of play.
+rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, slams), shields and
+the block roll, backstab, saving throws and elemental tolerance, class foes, Enemy Expansion tables, spell
+effects other than damage, fatigue, and healing. A value from the harness is a comparison of rule sets on these
+builds, not a prediction of play.
 The audit's theoretical x119.95 blow stack is a cap; the `power` layer measures the gear a level typically wears.

@@ -427,7 +427,7 @@ test('AUDIT MERGE-PLUS C8 the hotbar repaints a slot when its frame changes: Loo
       frame();
       assert.equal(slot().dataset.rarity, 'rare', 'and on again');
       assert.equal(slot().dataset.sigil, undefined);
-      sword.sigil = { power: 7, party: 1, xp: 0 };
+      sword.sigil = { power: 3, party: 1, xp: 0 };
       frame();
       assert.equal(slot().dataset.sigil, '', 'a sigil come to the piece: the rune');
       assert.equal(slot().title, 'Iron Longsword', 'nothing else the slot shows moved');
