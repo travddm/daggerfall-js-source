@@ -95,7 +95,7 @@ jobs:
   # app-v1.2.3";touch${IFS}x;"), and the number is written into scripts
   # below - read from the environment there, and never anything but digits.
   version:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       tag: ${{ steps.reltag.outputs.tag }}
       version: ${{ steps.reltag.outputs.version }}
@@ -285,7 +285,7 @@ jobs:
   publish:
     needs: [version, build]
     if: needs.version.outputs.tag != ''
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     permissions:
       contents: write
       pull-requests: read   # REL6: the notes are the merged pull requests' own

@@ -14,6 +14,7 @@ touched code are in [coding-standards.md](coding-standards.md).
 | [systems/](systems/README.md) | Gameplay: characters, combat, magic, items, quests, professions, the world, naval, UI, audio, AI |
 | [multiplayer/](multiplayer/README.md) | The relay, the wire protocol, the client's net layer, the account service, chat safety, staff tools |
 | [testing/](testing/README.md) | Running and writing tests, and the browser probes |
+| [ci/](ci/self-hosted-runner.md) | The self-hosted CI runner: design, server setup, security, capacity, rollback |
 | [operations/](operations/README.md) | Workflows, deploying the site and services, the desktop release, admin workflows |
 
 ## Writing these pages

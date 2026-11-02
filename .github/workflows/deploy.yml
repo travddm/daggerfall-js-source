@@ -38,7 +38,7 @@ jobs:
   # the one commit every job below verifies, builds and publishes: main's
   # head as this run began
   main:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       sha: ${{ steps.sha.outputs.sha }}
     steps:
@@ -67,7 +67,7 @@ jobs:
 
   site:
     needs: main
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       account_version: ${{ steps.account.outputs.version }}
       account_base: ${{ steps.account.outputs.base }}
@@ -144,7 +144,7 @@ jobs:
 
   deploy:
     needs: [verify, site]
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -46,6 +46,8 @@ See [admin-workflows.md](admin-workflows.md) for inputs and procedure.
 
 - **Permissions** default to `contents: read`. No checkout keeps a token (`persist-credentials: false`) where nothing
   pushes.
+- **Runner**: every job picks `dfo-self-hosted` in a private repository and `ubuntu-latest` otherwise; see
+  [self-hosted-runner.md](../ci/self-hosted-runner.md). A step that needs a GitHub-hosted tool tests `runner.environment`.
 - **Dependencies** are cached by `package-lock.json`; `npm ci` runs only on a cache miss.
 - **Inputs reach scripts as environment variables**, never pasted into the script text, so an input cannot inject
   shell. Keep this when you add an input.

@@ -29,7 +29,7 @@ permissions:
 jobs:
   save:
     name: save the shards' times
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
         with:
