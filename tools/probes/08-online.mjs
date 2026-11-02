@@ -191,21 +191,27 @@ export async function run({ browser, base, ck }) {
     const fieldFocused = (g) =>
       g.page.evaluate(() => !!document.activeElement?.classList.contains('dfchat-input'));
     const agreeShown = () => agree.isVisible().catch(() => false);
+    const field = a.page.locator('.dfchat-input');
     let agreed = false;
-    for (let attempt = 1; attempt <= 6 && !(await inLog(a)); attempt++) {
-      await a.page.keyboard.press('Enter');
-      // a first line is held behind the code of conduct (SAFE1): the card may come instead of the field
-      const got = await a.until(async () => ((await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null), 120000, 250);
+    for (let attempt = 1; attempt <= 8 && !(await inLog(a)); attempt++) {
+      let got = (await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null;
+      if (!got) {
+        await a.page.keyboard.press('Enter');
+        // a first line is held behind the code of conduct (SAFE1): the card may come instead of the field
+        got = await a.until(async () => ((await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null), 120000, 250);
+      }
       lap(`chat attempt ${attempt}: ${got}`);
       if (got === 'card') {
         // world notices float over the card in CI's slow frames; click the button itself, not the point it covers
         await agree.evaluate((btn) => btn.click());
         agreed = true;
         await a.until(async () => !(await agreeShown()), 60000, 250);
+        await a.waitFrames(4);
         continue;
       }
       if (got !== 'field') continue;
-      await a.page.keyboard.type(line, { delay: 20 });
+      // the line that waited behind the card stays in the field: set it rather than type it over itself
+      await field.fill(line);
       await a.page.keyboard.press('Enter');
       // the line stands in the sender's log, or the card has come up and the next attempt agrees
       await a.until(async () => (await inLog(a)) || (await agreeShown()), 60000, 250);

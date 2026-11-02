@@ -46,9 +46,29 @@ export async function run({ browser, base, ck }) {
       const x = await travelMap();
       return x?.top === 'confirm' || x?.popUp;
     }, 60000);
+    let lastPress = 0;
+    // Each key waits for the window it belongs to: a frame takes seconds in software GL, and a key pressed before its window
+    // is up is swallowed (the CI runs where the trip never began and the player stood where it started).
     if ((await travelMap())?.top === 'confirm') await g.key('y', 1);
-    await g.key('b', 8);
-    await g.until(async () => (await travelMap()) === null, 90000);
+    const popUp = await g.until(async () => (await travelMap())?.popUp, 120000, 500);
+    console.log(`   travel pop-up: ${JSON.stringify({ up: !!popUp, map: await travelMap() })}`.slice(0, 600));
+    // 'b' begins the trip; press it again while the pop-up still stands (a press the window had not yet read)
+    let pressed = 0;
+    await g.until(
+      async () => {
+        const m = await travelMap();
+        if (m === null) return true;
+        if (pressed === 0 || Date.now() - lastPress > 30000) {
+          pressed++;
+          lastPress = Date.now();
+          await g.key('b', 2);
+        }
+        return false;
+      },
+      300000,
+      500,
+    );
+    console.log(`   'b' pressed ${pressed} time(s)`);
     // The journey walks the player a frame at a time, and software GL on a CI runner decides how many frames a minute
     // gives: a trip took 525 s to 785 s whole on most runners and over 1400 s on a slow one. So the wait is on progress,
     // not on a clock: it ends on arrival, or when the pixel has not changed for STALL_MS (a journey held by streaming
