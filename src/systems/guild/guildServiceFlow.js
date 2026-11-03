@@ -27,7 +27,7 @@ import { isMember, joinedGuildOfGroup, updateRank, rankNeeds, getTitle, membersh
   isJoinableByApplication, membershipKey,   // WAY-BACK: a stranger is told the way in where one walks in
   GUILD_EXPEL_BELOW, DAYS_BETWEEN_RANK_CHANGES, RANK_REQ_REPUTATION, RANK_REQ_SKILL_HIGH, RANK_REQ_SKILL_LOW } from './guilds.js';
 import { QUEST_SUCCESS_REP } from '../quest/questRepute.js';   // WAY-BACK: what a stranger's quest done pays the guild (the leaf - AUDIT GUIDE O6)
-import { RECOVERY_INTERVAL_MINUTES } from '../court.js';   // WAY-BACK: REP4's week, a bad name's point back
+import { RECOVERY_INTERVAL_MINUTES } from '../court.js';   // WAY-BACK: REP4's interval, a bad name's point back
 import { MINUTES_PER_DAY } from '../gameDate.js';
 import { getReputation } from '../faction/factionRep.js';   // AUDIT GUILD-WORDS L1-2: the review's warnings read the standing
 import { standingOwedOf } from '../standingOwed.js';   // STANDING-WORDS: what the Roll still owes, online
