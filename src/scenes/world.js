@@ -2511,7 +2511,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // U31 / THE CLASSIC START (and EE13's random spawn, and the named start) - HOST-SPLIT: scenes/bootStartHost.js.
   // BAY-LEFT-B: a start past the Bay (a family's seat there) stands the world on the Bay, then moves to it once its land
   // stands (`farStart`, which a birth waits on) - as a save made past the Bay loads
-  const { startLoc, farStart } = createBootStart({ locationIndex, locationName, maps, params, regionName, _teleportToPixel, worldPlaces, _worldReady,
+  const { startLoc, farStart, landAtStart } = createBootStart({ locationIndex, locationName, maps, params, regionName, _teleportToPixel, worldPlaces, _worldReady,
     get arenaTraced() { return arenaTraced; }, get townTalk() { return townTalk; } });
   const startPixel = longitudeLatitudeToMapPixel(
     startLoc.mapTableData.longitude, startLoc.mapTableData.latitude);
@@ -27502,6 +27502,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // keeps a door's height above the terrain) to the terrain under the
     // entrance - into whatever the structure stands on.
     if (entered) playerSpawned = true;
+  } else {
+    await landAtStart();   // a named start stands in its town, not at its edge (scenes/bootStartHost.js)
   }
   _bootLoaded = true; if (testRoomOffline) townTalk.say(TEST_ROOM_OFFLINE_TEXT);   // HOTFIX 1003d: the boot's character loaded (moveArenaHomesOnline waits for it)   // AUDIT SET D4: said once the world stands, the character loaded
   if (realmRefused) townTalk.say(REALM_OFFLINE_TEXT);   // REALM P1.3: an online boot with no realm character plays offline, and says so
