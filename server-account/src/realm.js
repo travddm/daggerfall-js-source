@@ -44,7 +44,7 @@
 // no route takes a player id from a caller.
 // ═══════════════════════════════════════════════════════════════════
 
-import { isMode, codeOf, legacy as legacyMode, DEFAULT_MODE } from '../../src/net/modeLaw.js';   // CHARACTER MODES
+import { isMode, tokenCodeOf, modeOfRequest, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
 import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
@@ -132,7 +132,7 @@ const view = (/** @type {any} */ r, /** @type {number} */ nowS) => {
     id: r.id, name: r.name, summary, seq: r.seq, bytes: r.bytes,
     playing: !!r.lease && nowS - r.lease_at < REALM_PLAYING_S,
     createdAt: r.created_at, updatedAt: r.updated_at,
-    mode: r.mode ?? 'classic',   // CHARACTER MODES: the mode it was created in (net/modeLaw.js)
+    mode: r.mode,   // CHARACTER MODES: the mode it was created in (net/modeLaw.js)
     lineage: r.lineage_id ?? null, person: r.person_id ?? null,   // LEGACY7: the line and the person it plays (legacy.js)
     house: r.line ? houseOn(r.line, r.person_id) : null,   // LEGACY7 part two: its house, for the tile (net/houseLaw.js)
   };
@@ -178,6 +178,9 @@ export const REALM_LEVEL_CLAIM_MAX = 45;
  *  asked by every mint - and a relay deploy's wave asks the mint of every player at once. One statement answers exactly
  *  what the four answered: test/server/scale4f.test.js holds it to them, as they stood at acct106, over every state a row can be
  *  in. */
+/** The mint's mode claim from `realmMintFacts`: `{ md }` for a mode but Classic, else nothing. */
+export const modeClaimOf = (/** @type {{ md: number | null }} */ facts) => (facts.md == null ? {} : { md: facts.md });
+
 export async function realmMintFacts({ db }, /** @type {string} */ playerId, /** @type {unknown} */ id) {
   const none = { rc: 0, cl: null, wa: null, house: null, name: null, md: null };
   if (typeof id !== 'string' || !REALM_ID_RE.test(id)) return none;
@@ -193,7 +196,7 @@ export async function realmMintFacts({ db }, /** @type {string} */ playerId, /**
     cl: Number.isSafeInteger(lv) && lv >= 1 && lv <= REALM_LEVEL_CLAIM_MAX ? lv : null,
     wa: armsIssuable(arms) ? /** @type {[number, 0|1]} */ (arms) : null,
     house: houseOn(row.record, row.person),   // no line, no record: none (houseOn's own null)
-    md: row.mode !== DEFAULT_MODE && isMode(row.mode) ? codeOf(row.mode) : null,   // CHARACTER MODES: the mode's token code; Classic says nothing, the bytes as before
+    md: tokenCodeOf(row.mode),   // CHARACTER MODES: the mode's token code; Classic says nothing, the bytes as before
     name: typeof row.name === 'string' && row.name ? row.name : null,   // NAME-AS: its own name, for the mint to wear where chosen
   };
 }
@@ -214,12 +217,10 @@ async function freeOthers({ db }, /** @type {string} */ playerId, /** @type {str
  */
 export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null, mode = undefined }) {
   const n = realmNameOf(name);
-  if (!playerId || !n) return { error: 'body' };
   const born = lineage != null || person != null;
-  // CHARACTER MODES: a request that names no mode is the build from before them - a line's birth is the Legacy mode, any other Classic. A named mode
-  // must agree with the birth: the Legacy mode is born of a line and no other mode is
-  const chosen = mode === undefined || mode === null ? (born ? 'legacy' : DEFAULT_MODE) : mode;
-  if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
+  const chosen = modeOfRequest(mode, born);
+  const refused = createRefusal(playerId, n, born, chosen);
+  if (refused) return refused;
   if (born && Number.isSafeInteger(person)) {
     // LEGACY7: A BIRTH WHOSE FIRST SAVE NEVER LANDED is taken up again - the same row, a new lease -
     // never refused as a person already played: the realm never held a save of them
@@ -246,6 +247,13 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
   if (!wrote.meta.changes) return { error: 'too-many-characters' };
   await freeOthers({ db }, playerId, id);
   return { id, lease, seq: 0 };
+}
+
+/** What createRealm refuses before it writes: no account or name ('body'); and, CHARACTER MODES, a mode that is no mode or
+ *  does not agree with the birth - the Legacy mode is born of a line and no other mode is ('mode'). */
+function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen) {
+  if (!playerId || !n) return { error: 'body' };
+  return !isMode(chosen) || born !== legacyMode(chosen) ? { error: 'mode' } : null;
 }
 
 /**

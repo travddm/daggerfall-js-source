@@ -1,9 +1,9 @@
-// CHARACTER MODES: a realm character is created in a mode, the service keeps it on the row, signs it into the identity
+// CHARACTER CHARACTER_MODES: a realm character is created in a mode, the service keeps it on the row, signs it into the identity
 // token (`md`, absent for Classic) and shows it on the roster's tile - on the real Worker over the real migrations.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mintToken, verifyToken, claimsValid } from '../../src/net/identityToken.js';
-import { MODES, MODE_CODES } from '../../src/net/modeLaw.js';
+import { CHARACTER_MODES, CHARACTER_MODE_CODES } from '../../src/net/modeLaw.js';
 import { standService } from '../accountDb.mjs';
 import { realmMintFacts } from '../../server-account/src/realm.js';
 
@@ -16,7 +16,7 @@ test('the token carries a mode code for a realm character, and refuses a code th
   const nowS = 1_800_000_000;
   const who = { s: 'p0123456789abcdef', n: 'Mira', k: 'guest', rc: 1, ci: 'r0123456789abcdef0123' };
   const base = { ...who, i: nowS, e: nowS + 60 };
-  for (const m of MODES.slice(1)) assert.equal(claimsValid({ ...base, md: MODE_CODES[m] }), true, m);
+  for (const m of CHARACTER_MODES.slice(1)) assert.equal(claimsValid({ ...base, md: CHARACTER_MODE_CODES[m] }), true, m);
   for (const bad of [0, 5, -1, 1.5, '1', null]) assert.equal(claimsValid({ ...base, md: bad }), false, String(bad));
   assert.equal(claimsValid({ ...base, rc: 0, ci: undefined, md: 3 }), false, "a mode is a realm character's");
   assert.equal(claimsValid(base), true, 'absent is Classic and a service from before the modes');
@@ -44,11 +44,11 @@ test('a realm character keeps the mode it was created in; the mint signs it and 
   );
 
   const iron = (await call('/v1/realm/create', { name: 'Iron', mode: 'ironman' })).body;
-  assert.equal(claims((await call('/v1/auth/token', { character: iron.id })).body.token).md, MODE_CODES.ironman);
-  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, iron.id)).md, MODE_CODES.ironman);
+  assert.equal(claims((await call('/v1/auth/token', { character: iron.id })).body.token).md, CHARACTER_MODE_CODES.ironman);
+  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, iron.id)).md, CHARACTER_MODE_CODES.ironman);
 
   const hard = (await call('/v1/realm/create', { name: 'Hard', mode: 'hardcore' })).body;
-  assert.equal(claims((await call('/v1/auth/token', { character: hard.id })).body.token).md, MODE_CODES.hardcore);
+  assert.equal(claims((await call('/v1/auth/token', { character: hard.id })).body.token).md, CHARACTER_MODE_CODES.hardcore);
 
   const byName = Object.fromEntries((await tiles()).map((t) => [t.name, t.mode]));
   assert.deepEqual(byName, { Plain: 'classic', Iron: 'ironman', Hard: 'hardcore' });
@@ -87,8 +87,8 @@ test("the Legacy mode is born of a line and no other mode is; a request naming n
   const born = (await call('/v1/realm/create', { name: 'Ysolde Hlaalu', mode: 'legacy', lineage: FAM, person: 1 }))
     .body;
   assert.ok(born.id);
-  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, born.id)).md, MODE_CODES.legacy);
+  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, born.id)).md, CHARACTER_MODE_CODES.legacy);
   const old = (await call('/v1/realm/create', { name: 'Aldo Hlaalu', lineage: FAM, person: 2 })).body;
   assert.ok(old.id, 'a build from before the modes names no mode');
-  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, old.id)).md, MODE_CODES.legacy);
+  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, old.id)).md, CHARACTER_MODE_CODES.legacy);
 });

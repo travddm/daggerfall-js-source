@@ -123,7 +123,7 @@ import { sanitizeName, NAME_MAX } from './wire.js';
 import { GUILD_ID_RE, GUILD_TAG_RE, GUILD_MEMBER_RE } from './guild/guildLaw.js';   // GUILD1c: a guild rides the token - the law's own three shapes
 import { ribbonClaimOk } from './heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon - heraldryLaw.js imports nothing, so the worker's graph stays flat
 import { worksOf } from './siege/siegeRef.js';   // SEAT2b part two (b): a siege's works on its pass - siegeRef.js imports nothing
-import { modeOfCode } from './modeLaw.js';   // CHARACTER MODES: the mode's codes - modeLaw.js imports nothing
+import { modeClaimsOk } from './modeLaw.js';   // CHARACTER MODES: the mode's codes - modeLaw.js imports nothing
 import { houseClaimOk } from './houseLaw.js';   // LEGACY7: a house rides the token - houseLaw.js imports nothing, so the worker's graph stays flat
 import { homeMapIdOk, homeBuildingKeyOk, HOME_ORDER_KEYS_MAX } from './homeLaw.js';   // QUEST-HOME: a home order names a town and its buildings in the homes' own shapes - homeLaw.js imports nothing
 
@@ -337,9 +337,8 @@ export function nameIsIssuable(name) {
  *      the line's surname, the member's given name, 1 for a Bloodline,
  *      the generation's numeral - `hn` or none of them; absent for a
  *      character of no line and from a service before LEGACY7
- *   md the character's MODE code (CHARACTER MODES, net/modeLaw.js MODE_CODES: 1 hardcore, 2 legacy, 3 ironman, 4
- *      hardcore ironman), beside a 1 `rc` alone; absent for Classic and from a service before the modes. The relay reads
- *      it for the Ironman refusals and never a mode the client names
+ *   md the character's MODE code (CHARACTER MODES, net/modeLaw.js CHARACTER_MODE_CODES: 1 to 4), beside a 1 `rc` alone;
+ *      absent for Classic and from a service before the modes. The relay reads it, never a mode the client names
  *   hd 1 for a hidden staff spectator's socket (STAFF-PANEL5), absent
  *      for every player
  *   fo the account a hidden spectator follows (STAFF-PANEL5-FOLLOW),
@@ -439,8 +438,7 @@ export function claimsValid(c, { maxTtlS = MAX_TTL_S } = {}) {
   if (c.cl !== undefined && !characterLevelIssuable(c.cl)) return false;
   // INT7: the realm character's arms (every referee's clip): beside the realm's yes alone, of its shape or refused
   if (c.wa !== undefined && !(c.rc === 1 && armsIssuable(c.wa))) return false;
-  if (c.md !== undefined && !(c.rc === 1 && c.md !== 0 && modeOfCode(c.md) !== null)) return false;   // CHARACTER MODES: a realm character's, a non-Classic code of the table
-  if (!houseClaimOk(c)) return false;   // LEGACY7: the house - absent for none, each field of its shape or refused
+  if (!extraClaimsOk(c)) return false;   // LEGACY7: the house - absent for none, each field of its shape or refused
   // STAFF-PANEL5 (design doc "DFO Staff Panel: design", Invisible follow; the hidden builder's claim and the follow
   // builder's): `hd` 1 a hidden staff spectator's socket, minted only by the account service's staff doors - absent for
   // every player; `fo` the account a hidden spectator follows, beside `hd` alone and never its own subject
@@ -464,6 +462,15 @@ export const TOKEN_MAX_CHARS = 1024;
 export const TOKEN_BODY_MAX = 864;
 /** A token's body, the part between its version and its signature. */
 export const tokenBodyOf = (/** @type {string} */ token) => String(token ?? '').split('.')[1] ?? '';
+
+/** LEGACY7 + CHARACTER MODES: the house claims (`hn` with `hc`, `hb`, `hg`) and the mode's (`md`), asked and written together. */
+const extraClaimsOk = (/** @type {any} */ c) => houseClaimOk(c) && modeClaimsOk(c);
+function houseAndModeClaims(/** @type {any} */ who) {
+  const out = /** @type {Record<string, any>} */ ({});
+  if (who?.hn !== undefined) { out.hn = who.hn; for (const k of ['hc', 'hb', 'hg']) if (who[k] !== undefined) out[k] = who[k]; }
+  if (who?.md !== undefined) out.md = who.md;   // only for a realm character of a mode but Classic - Classic, the bytes as before
+  return out;
+}
 
 /**
  * MINT. The account service's half - it holds the private key and
@@ -498,8 +505,7 @@ export async function mintToken(who, privateKey, { subtle, nowS, ttlS = MAX_TTL_
   if (who?.cl !== undefined) claims.cl = who.cl;   // ARENA4b: only when a character was named - a mint naming none, the bytes as before
   if (who?.wa !== undefined) claims.wa = who.wa;   // INT7: only for a realm character judged since - before one, the bytes as before
   // LEGACY7: only for a realm character of a Project Legacy line - a character of none, the bytes as before
-  if (who?.hn !== undefined) { claims.hn = who.hn; for (const k of /** @type {const} */ (['hc', 'hb', 'hg'])) if (who[k] !== undefined) claims[k] = who[k]; }
-  if (who?.md !== undefined) claims.md = who.md;   // CHARACTER MODES: only for a realm character of a mode but Classic - Classic, the bytes as before
+  Object.assign(claims, houseAndModeClaims(who));
   if (who?.hd !== undefined) claims.hd = who.hd;   // STAFF-PANEL5: a hidden staff spectator alone - a player mints the bytes they always did
   if (who?.fo !== undefined) claims.fo = who.fo;   // STAFF-PANEL5-FOLLOW: the account it follows, beside `hd` alone
   // A BAD CLAIM SET IS REFUSED AT THE MINTER. The verifier would refuse
