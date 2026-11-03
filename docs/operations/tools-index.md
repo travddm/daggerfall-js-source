@@ -3,7 +3,7 @@
 Most of `tools/` is reached from `package.json`, a workflow, a doc or another tool. This page lists the hand-run
 tools that none of those name. Each is run by a person, and its header comment holds the usage.
 
-The browser probes (`tools/*Probe.mjs`) are covered by [../testing/probes.md](../testing/probes.md). The probe suite,
+The probes are covered by [../testing/probes.md](../testing/probes.md). The probe suite,
 the balance harness and the CI runner live in `tools/probes/`, `tools/balance/` and `tools/ci-runner/`.
 
 ## Data from ARENA2, Daggerfall Unity or a mod
