@@ -155,7 +155,9 @@ export class Game {
 
   /** Prints the tail of the page's trace: what tells a failed check from a slow machine. */
   diagnostics(what, tail = 80) {
-    console.log(`  --- ${what}: the last ${Math.min(tail, this.trace.length)} of ${this.trace.length} page trace lines`);
+    console.log(
+      `  --- ${what}: the last ${Math.min(tail, this.trace.length)} of ${this.trace.length} page trace lines`,
+    );
     for (const l of this.trace.slice(-tail)) console.log(`      ${l}`);
   }
 

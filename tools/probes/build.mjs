@@ -35,5 +35,10 @@ fs.promises.readFile = async function cappedReadFile(...args) {
 const t0 = Date.now();
 process.chdir(ROOT);
 const { build } = await import('vite');
-await build({ root: ROOT, configFile: join(ROOT, 'vite.config.js'), build: { outDir, emptyOutDir: true }, logLevel: 'warn' });
+await build({
+  root: ROOT,
+  configFile: join(ROOT, 'vite.config.js'),
+  build: { outDir, emptyOutDir: true },
+  logLevel: 'warn',
+});
 console.log(`built the game into ${outDir} in ${Math.round((Date.now() - t0) / 1000)}s`);
