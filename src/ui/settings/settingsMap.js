@@ -103,7 +103,7 @@ export const CATEGORIES = Object.freeze([
     sec("aftermath", "Seeing & bleeding", [
       "feat:enhanced-combat-visuals", "feat:blood"]),
     sec("sea", "At sea", [
-      "feat:naval-combat"]),
+      "feat:naval-combat", "feat:eltheric-sea"]),
   ]),
   tab("world", "World", [
     sec("land", "Land", [

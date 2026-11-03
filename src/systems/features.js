@@ -38,7 +38,7 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
-import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
+import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js'; import { ELTHERIC_SEA_ROW } from './elthericSeaRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -889,11 +889,9 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'tamrielLand', initial: true, online: 'player' }),
   }),
-  // WEATHER2b: THE WEATHER FIELD - the
-  // day's words as places (systems/weather/weatherField.js), read by the sim
-  // every exterior frame (weatherSim.js weatherFieldOn). FORCED ON
-  // ONLINE: one field for every player under the shared day's roll.
-  // `?wxfield=off` the kill door.
+  // WEATHER2b: THE WEATHER FIELD - the day's words as places (systems/weather/weatherField.js), read by the sim
+  // every exterior frame (weatherSim.js weatherFieldOn). FORCED ON ONLINE: one field for every player under the shared
+  // day's roll. `?wxfield=off` the kill door.
   Object.freeze({
     id: 'weather-events',
     group: 'world',
@@ -904,6 +902,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'weatherEvents', initial: true, online: true }),   // WEATHER2b: weatherSim.js weatherFieldOn; forced on online - one sky
   }),
+  ELTHERIC_SEA_ROW,   // ETHER-SEA: its own switch, beside the weather
   // FOREST1: REAL
   // FORESTS - the wilderness's trees gathered into woods with open land
   // between them, in place of DFU's even scatter (world/terrain/terrainNature.js
