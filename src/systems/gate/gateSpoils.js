@@ -162,18 +162,25 @@ export function magicOrBetter(rolls, source = SPOILS_SOURCE) {
   return r < c.legendary ? 'legendary' : r < c.rare ? 'rare' : 'magic';
 }
 
+/** A Rare-or-better tier by the source's own chances (the same cumulative draw as magicOrBetter, the Magic share cut
+ *  away) - what a portent turns one of the plain Magic-or-better pieces into. Rare and Legendary keep the source's gate. */
+export function rareOrBetter(rolls, source = SPOILS_SOURCE) {
+  const c = rarityChances(source);
+  return rolls() * c.rare < c.legendary ? 'legendary' : 'rare';
+}
+
 /** The gate's trophy, minted on its own row. */
 export function sigilStone() {
   return mintCondition(setItemFields({ group: 'Gems', templateIndex: SIGIL_STONE_TEMPLATE }));
 }
 
 /**
- * THE SPOILS of one kill for one player: `{ gold, pieces: [{ item, tier }], sigil, gems, portent }` - the pieces in the order they
+ * THE SPOILS of one kill for one player: `{ gold, pieces: [{ item, tier }], sigil, gems }` - the pieces in the order they
  * leave him (the Rare-or-better first; SET6: a Regalia piece, when one drops, after them; GILDED2: the Dragonfire Oath,
- * when it drops; WB14g: a portent night's pieces last, `portent` of them). The same seed, level, portents and world answer
+ * when it drops; PORTENT-FOLD: a portent night turns plain pieces Rare-or-better, it adds none). The same seed, level, portents and world answer
  * the same spoils.
  * @param {number} seed the receipt's `c` @param {number} level the player's
- * @param {number} [p] WB14g: the receipt's portents (net/gate/gateReceipt.js `p`) - a bit each, none a plain night
+ * @param {number} [p] WB14g: the receipt's portents (net/gate/gateReceipt.js `p`) - a bit each (two count at most), none a plain night
  */
 export function rollSpoils(seed, level, p = 0) {
   const rolls = seededRng(seed >>> 0);
@@ -182,7 +189,10 @@ export function rollSpoils(seed, level, p = 0) {
   const pieces = [];
   const first = rolls() < SPOILS_LEGENDARY ? 'legendary' : 'rare';
   pieces.push(graded(spoilsBase(lv, rolls), first, rolls));
-  for (let i = 0; i < 2; i++) pieces.push(graded(spoilsBase(lv, rolls), magicOrBetter(rolls), rolls));
+  // PORTENT-FOLD: a portent pays in the plain pieces' tier, never in a piece more: each of the night's portents turns
+  // one of the two Magic-or-better pieces into a Rare-or-better one (the same draw count, so a plain night is unmoved)
+  const upgrades = portentCount(p);
+  for (let i = 0; i < 2; i++) pieces.push(graded(spoilsBase(lv, rolls), i < upgrades ? rareOrBetter(rolls) : magicOrBetter(rolls), rolls));
   // SET6 (Sigil Sets): a piece of the Warden's own Regalia, Aetheric, a
   // sixth of the time - rolled LAST, so every spoils before it is what it was for its seed; it leaves him last
   const regalia = rollRegalia(rolls);
@@ -206,22 +216,13 @@ export function rollSpoils(seed, level, p = 0) {
   // technique pass), so every spoils before it is what it was for its seed; a static roll, so no pass ever reaches it
   const oath = rollDragonfireOath(rolls);
   if (oath) pieces.push({ item: oath, tier: oath.rarity });
-  // WB14g: WHAT A PORTENT PAYS - one more piece of Magic or better for each
-  // portent the receipt says, after every draw before (the Oath's law: every spoils rolled before is what it was for its seed)
-  // AUDIT WB14 (PLAY-7): and each such piece through the passes every other piece had - the ladder's last (an Exalted), the
-  // sockets', the weapons' and the technique's - over them alone, after them, so nothing drawn before them moves
-  const more = [];
-  for (const bit of SPOILS_PORTENT_BITS) if ((p & bit) !== 0) more.push(graded(spoilsBase(lv, rolls), magicOrBetter(rolls), rolls));
-  if (more.length) {
-    const items = more.map((q) => q.item);
-    lastPass(items, rolls); socketPass(items, rolls); weaponSocketPass(items, rolls); techniquePass(items, rolls);
-    for (const q of more) { q.tier = q.item.rarity ?? q.tier; pieces.push(q); }
-  }
-  return { gold, pieces, sigil: sigilStone(), gems, portent: more.length };
+  return { gold, pieces, sigil: sigilStone(), gems };
 }
 
-/** WB14g: the portents' bits a receipt's `p` may carry, in the order their pieces are drawn (net/gate/gateMods.js GATE_PORTENTS). */
+/** WB14g: the portents' bits a receipt's `p` may carry (net/gate/gateMods.js GATE_PORTENTS). */
 export const SPOILS_PORTENT_BITS = Object.freeze([1, 2, 4]);
+/** How many of the two plain Magic-or-better pieces a receipt's portents turn Rare-or-better: one a bit, two at most. */
+const portentCount = (p) => Math.min(2, SPOILS_PORTENT_BITS.filter((bit) => (p & bit) !== 0).length);
 
 /** WB14e: A TITHE-IMP'S TITHE for one who struck it - gold (TITHE_GOLD_PER_LEVEL
  *  a level, the seed varying it a fifth either way) and one gem of the classic eight (ItemBuilder's own CreateRandomGem), off

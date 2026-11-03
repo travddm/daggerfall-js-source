@@ -411,20 +411,21 @@ test('AUDIT WB14 RECORD-8 after a long Vanguard the new arsenal waits its cooldo
   assert.deepEqual(marked.map((o) => ATTACK_BY_ID[o.a].key), [], 'none of the six before its cooldown from his wake');
 });
 
-test('AUDIT WB14 WIRE-6 the account: a portent night\'s receipt fills the wealth budget a piece\'s room more for each portent it pays (one a bit, three at most) - the claim carries its portents to the fill and never in its answer (mutants: the fill a plain receipt\'s; the pieces miscounted; the portents said to the player)', async () => {
-  const { portentPieces, grantSpoils, SPOILS_GRANT_PIECE, SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL } = await import('../../../server-account/src/budget.js');
-  assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, -1, 1.5, '3', null].map(portentPieces), [0, 1, 1, 2, 1, 2, 2, 3, 0, 0, 0, 0, 0]);
+test('AUDIT WB14 WIRE-6 (PORTENT-FOLD) the account: a portent night\'s receipt fills the wealth budget as a plain win\'s - the grant is the base and the level\'s share, whatever the receipt\'s portents (mutants: a piece\'s room added again)', async () => {
+  const budget = await import('../../../server-account/src/budget.js');
+  const { grantSpoils, spoilsGrantStatement, SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL } = budget;
+  assert.equal('portentPieces' in budget, false);
+  assert.equal('SPOILS_GRANT_PIECE' in budget, false);
   const binds = [];
   const db = { prepare: (sql) => ({ bind: (...a) => ({ run: async () => binds.push([sql, a]) }) }) };
-  await grantSpoils(db, 'p1'); await grantSpoils(db, 'p1', 2); await grantSpoils(db, 'p1', 9);
-  assert.deepEqual(binds.map(([, a]) => a), [['p1', SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL, 0], ['p1', SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL, 2 * SPOILS_GRANT_PIECE], ['p1', SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL, 3 * SPOILS_GRANT_PIECE]]);
-  assert.match(binds[0][0], /allowance = allowance \+ \?2 \+ \?3 \* MAX\(1, COALESCE\(level_seen, 1\)\) \+ \?4/);
-  const { readFileSync } = await import('node:fs');
-  const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-  assert.match(read('server-account/src/accounts.js'), /if \(recorded\) return \{ recorded, day: c\.d, stones: embers, \.\.\.\(c\.p > 0 \? \{ portent: c\.p \} : \{\}\),/);
-  const svc = read('server-account/src/index.js');
-  assert.match(svc, /if \(r\.recorded === true\) await grantSpoils\(ctx\.db, who\.player\.id, portentPieces\(r\.portent\)\);/);
-  assert.match(svc, /delete answer\.portent;/);
+  await grantSpoils(db, 'p1'); await grantSpoils(db, 'p1', 2);
+  assert.deepEqual(binds.map(([, a]) => a), [['p1', SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL], ['p1', SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL]]);
+  assert.equal(binds[0][0], 'UPDATE realm_characters SET allowance = allowance + ?2 + ?3 * MAX(1, COALESCE(level_seen, 1)) WHERE player = ?1 AND lease IS NOT NULL AND allowance IS NOT NULL AND dead_at IS NULL');
+  // a claim\'s own batch holds the fill to its row: the guard\'s parameters follow the three of the grant
+  const guarded = [];
+  spoilsGrantStatement({ prepare: (sql) => ({ bind: (...a) => guarded.push([sql, a]) }) }, 'p1', 'x = ?4 AND y = ?5', 'key', 'nonce');
+  assert.deepEqual(guarded[0][1], ['p1', SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL, 'key', 'nonce']);
+  assert.ok(guarded[0][0].endsWith(' AND (x = ?4 AND y = ?5)'));
 });
 
 // ═══ PLAY: the balance by simulation ══════════════════════════════════════════════════════════════════════════════
@@ -453,16 +454,25 @@ test('AUDIT WB14 PLAY-4 on a Vanguard night his health is less its Vanguard\'s -
   assert.equal(newFight(7, T0, WRATH, 'ruhn', null, ['sunder']).vg, null);
 });
 
-test('AUDIT WB14 PLAY-7 a portent\'s pieces go through every pass the others had - socketed about as often - and nothing drawn before them moves (mutants: the passes skipped)', async () => {
+test('AUDIT WB14 PLAY-7 (PORTENT-FOLD) a portent adds no piece: it turns plain Magic-or-better pieces Rare-or-better - one a portent, two at most - and the first piece and the passes are the plain night\'s (mutants: a piece added; a slot left Magic; a third slot turned)', async () => {
   const { rollSpoils } = await import('../../../src/systems/gate/gateSpoils.js');
-  let socketed = 0, n = 0;
+  const rare = (tier) => ['rare', 'legendary', 'exalted'].includes(tier);
+  let socketed = 0, pieces = 0, magicSlots = 0;
   for (let s = 1; s <= 300; s++) {
-    const seed = (s * 2654435761) >>> 0, plain = rollSpoils(seed, 30, 0), rich = rollSpoils(seed, 30, 1);
-    assert.deepEqual(rich.pieces.slice(0, plain.pieces.length).map((q) => [q.item.name, q.tier, (q.item.sockets ?? []).length]), plain.pieces.map((q) => [q.item.name, q.tier, (q.item.sockets ?? []).length]));
-    const q = rich.pieces.at(-1);
-    n++; if ((q.item.sockets ?? []).length) socketed++;
+    const seed = (s * 2654435761) >>> 0, plain = rollSpoils(seed, 30, 0);
+    for (const [p, turned] of [[1, 1], [2, 1], [3, 2], [7, 2]]) {
+      const rich = rollSpoils(seed, 30, p);
+      // the three plain pieces, and past them only the Regalia and the Oath a plain night rolls too (their draws follow the pieces')
+      assert.ok(rich.pieces.length >= 3 && rich.pieces.length <= 5, `p=${p}: no piece more (${rich.pieces.length})`);
+      assert.equal(rich.gold, plain.gold);
+      assert.ok(rare(rich.pieces[0].tier), 'the first piece is Rare-or-better as ever');
+      for (let i = 1; i <= turned; i++) assert.ok(rare(rich.pieces[i].tier), `p=${p}: slot ${i} turned Rare-or-better (${rich.pieces[i].tier})`);
+      if (p === 1) { for (const q of rich.pieces) { pieces++; if ((q.item.sockets ?? []).length) socketed++; } }
+    }
+    for (const i of [1, 2]) if (!rare(plain.pieces[i].tier)) magicSlots++;
   }
-  assert.ok(socketed / n > 0.06, `${socketed} of ${n} socketed`);
+  assert.ok(magicSlots > 100, 'a plain night leaves most of its two slots at Magic, so the turn is a change');
+  assert.ok(socketed / pieces > 0.06, `${socketed} of ${pieces} socketed`);
 });
 
 test('AUDIT WB14 RECORD-6 two claims a test\'s title made and nothing held: while the Vanguard holds he waits - a body that stands in his court before the way to him is laid draws no blow of his; and the ward spent is said once, never a state a beat after (mutants: the Vanguard never holding him; the ward spent again each beat)', () => {
