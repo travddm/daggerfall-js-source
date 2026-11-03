@@ -367,7 +367,7 @@ test('JUNGLE-ROADSIDE THE DRAWN GROUND\'S LOWEST AND HIGHEST, exactly: lowestDra
     const hi = highestDrawn(hm, [at(-1, -1), at(1, -1), at(1, 1), at(-1, 1)]);
     assert.ok(hi >= fine - 1e-9 && hi <= fine + 0.01, `the highest over (${x}, ${z}): ${hi} against the walk's ${fine}`);
   }
-  // a saddle: two corners of a cell raised - the cell is cut along them (terrainQuadCut.js: a ridge's crest joined, never
+  // a saddle: two corners of a cell raised - the cell is cut along them (terrain-quad-cut.ts: a ridge's crest joined, never
   // a pit between two peaks), so the drawn ground at its middle is the raised diagonal's, 2 m over the bilinear's
   const saddle = new Float32Array(H * H).fill(100 / yScale);
   saddle[10 * H + 11] += 4 / yScale; saddle[11 * H + 10] += 4 / yScale;

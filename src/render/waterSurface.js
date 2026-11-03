@@ -41,7 +41,7 @@ import { FOG_GLSL } from './fogGlsl.js';   // AUDIT 68 S17-fog-glsl-dup: the fog
 import { SEA_LOOK_GLSL, SEA_HAZE_BAND } from './horizonHaze.js';   // FAR-SEA1: the sea takes the far ring's haze; AUDIT FAR-SEA1 C12: and the open sea's light is one text with the ring's sea
 import { pageParam } from '../systems/pageQuery.js';
 import { EDGE_NOISE_GLSL } from './roadEdgeGlsl.js';
-import { quadCutsSeNw, writeQuadTriangles } from '../world/terrain/terrainQuadCut.js';   // COAST-LOOK: the edges' lattice noise, its one text
+import { quadCutsSeNw, writeQuadTriangles } from '../world/terrain/terrain-quad-cut.ts';   // COAST-LOOK: the edges' lattice noise, its one text
 import { groundWanderGlsl, groundKindsGlsl } from './groundEdgeGlsl.js';   // COAST-LOOK: the shore's wander and the transitions' table, the ground's own (the sheet, the sand and the silt on one line)
 import { RIPPLE_CELLS, RIPPLE_SCALE } from '../world/water/waterRipples.js';
 import { NO_BED_DEPTH, SHELF_SHEET_DEPTH } from '../world/water/waterCorners.js';   // AUDIT WATER-NEXT H2: its one home, the water's leaf (the kernel's worker writes it)   // WATER-NEXT 4: the ripple field the shader reads   // PERF-URL: the page's query, parsed once a search

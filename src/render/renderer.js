@@ -7207,7 +7207,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
 
   /** Create one pixel's terrain surface (positions + normals grid). The
    *  indices are the pixel's own (each quad cut by its samples,
-   *  terrainQuadCut.js), so the index buffer is the surface's and dies
+   *  terrain-quad-cut.ts), so the index buffer is the surface's and dies
    *  with it in destroyMesh. */
   createTerrainSurface(positions, normals, indices) {
     const gl = this.gl;

@@ -231,7 +231,7 @@ const PIXEL = TERRAIN_SIZE, HALF = PIXEL / 2;
 
 /**
  * THE LOWEST DRAWN GROUND under a disc of `r` about (x, z) - the ground as it is drawn (terrainSurface.js
- * surfaceHeightAt: two planes a heightmap cell, cut on one of its diagonals (terrainQuadCut.js) - AUDIT JUNGLE-ROADSIDE DOC-5: not the bilinear
+ * surfaceHeightAt: two planes a heightmap cell, cut on one of its diagonals (terrain-quad-cut.ts) - AUDIT JUNGLE-ROADSIDE DOC-5: not the bilinear
  * groundAt, which stands up to half a metre over it). The drawn ground is flat on each triangle, so its lowest under the
  * disc is at a sample inside the disc or on its rim; and on the rim, between two of the rim's crossings of the triangles'
  * edges, it is the one plane's - lowest at a crossing or where the rim faces straight down that plane. Every such point

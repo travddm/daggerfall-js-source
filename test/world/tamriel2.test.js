@@ -280,7 +280,7 @@ test('TAMRIEL2-WORKER: every module the terrain worker reaches, at any depth, li
   // world/lands/landPropMesh.js), RED-MOUNTAIN's cone (world/tamriel/redMountain.js) and SOLITUDE-RELIEF's rock
   // (world/solitudeRelief.js, world/terrain/capitalRelief.js), each fold under the ceiling alone and the three at it - all pure.
   // (world/road/roadEdge.js), both pure
-  // PIN MOVED (TERRAIN-CUT): 73 - which diagonal a quad is cut on (world/terrain/terrainQuadCut.js), the grid's triangles made
-  // on the worker with the grid; pure, its one import the sampler the worker holds already
+  // world/terrain/terrain-quad-cut.ts, which cuts the grid's triangles on the worker, is pure; its one import is the sampler
+  // the worker holds already.
   assert.ok(seen.size > 20 && seen.size < 74, `${seen.size} modules`);
 });

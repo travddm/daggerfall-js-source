@@ -32,7 +32,7 @@
 import { HEIGHTMAP_DIMENSION } from '../terrain/terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from '../terrain/terrainTiles.js';
 import { heightSample, mapDataHasWater, mapDataFullySubmerged, DW_WATER_THRESHOLD } from './deepWaterClassification.js';
-import { quadCutsSeNw, writeQuadTriangles } from '../terrain/terrainQuadCut.js';
+import { quadCutsSeNw, writeQuadTriangles } from '../terrain/terrain-quad-cut.ts';
 import { CLIP_SENTINEL } from '../terrain/terrainSurface.js';   // FAR-CLIP1: the byte's one home, the TileMap format's module - the renderer reads it there too
 
 const f32 = Math.fround;
@@ -169,7 +169,7 @@ export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples =
         for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (!cut(tz * dim + tx)) { clipped = false; break; }
       }
       if (clipped) { dropped++; continue; }
-      const quad = [0, 0, 0, 0, 0, 0];   // a quad that stands is cut as `samples` cut its ground (terrainQuadCut.js)
+      const quad = [0, 0, 0, 0, 0, 0];   // a quad that stands is cut as `samples` cut its ground (terrain-quad-cut.ts)
       writeQuadTriangles(quad, 0, z * g + x, g, samples !== null && quadCutsSeNw(samples, x, z, stride));
       out.push(...quad);
     }

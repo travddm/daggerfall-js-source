@@ -1,7 +1,7 @@
-// TERRAIN-CUT (2026-10-31): EACH QUAD OF THE GROUND IS CUT ON THE DIAGONAL ITS GROUND FOLLOWS.
+// terrain-quad-cut.ts: each quad of the ground is cut on the diagonal its ground follows.
 //
 // One fixed diagonal for every quad folded a ridge or a valley that runs along the other diagonal into a row of teeth.
-// world/terrain/terrainQuadCut.js now decides the cut a quad at a time from the pixel's samples, and every reader of the
+// world/terrain/terrain-quad-cut.ts now decides the cut a quad at a time from the pixel's samples, and every reader of the
 // drawn ground asks it. These tests build the real mesh (buildTerrainGrid's vertices, buildTerrainIndices' triangles)
 // and hold the ridge to its crest, and every reader to the triangles the mesh draws.
 import { test } from 'node:test';
@@ -10,7 +10,7 @@ import {
   buildTerrainGrid, buildTerrainIndices, surfaceHeightAt, walkGroundAt, drawnGroundAt, surfaceNormalAt,
   surfaceNormalFromSamples, gridValueAt, terrainSampleHeightAt, CLIP_SENTINEL,
 } from '../../../src/world/terrain/terrainSurface.js';
-import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from '../../../src/world/terrain/terrainQuadCut.js';
+import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from '../../../src/world/terrain/terrain-quad-cut.ts';
 import { HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE } from '../../../src/world/terrain/terrainSampler.js';
 import { carveBed } from '../../../src/world/water/waterBed.js';
 import { WATER_DRAW_MASK_TABLE } from '../../../src/world/water/waterCorners.js';
@@ -98,7 +98,7 @@ const triangleKeys = (indices) => {
   return keys;
 };
 
-test('TERRAIN-CUT: a knife ridge across the grid draws its crest, not a row of teeth - near and at the far ring\'s stride', () => {
+test('a knife ridge across the grid draws its crest, not a row of teeth - near and at the far ring\'s stride', () => {
   const data = samplesOf(knifeRidge);
   for (const stride of [1, 4]) {
     const mesh = meshOf(data, stride);
@@ -130,7 +130,7 @@ test('TERRAIN-CUT: a knife ridge across the grid draws its crest, not a row of t
   }
 });
 
-test('TERRAIN-CUT: flat and planar ground keep the old cut, and both cuts wind up', () => {
+test('flat and planar ground keep the old cut, and both cuts wind up', () => {
   const flat = new Float32Array(H * H).fill(0.3);
   assert.deepEqual(buildTerrainIndices(1, flat), buildTerrainIndices(1), 'a flat pixel draws the old triangles exactly');
   const plane = samplesOf((x, z) => 50 + 2 * x - 3 * z);
@@ -170,7 +170,7 @@ test('TERRAIN-CUT: flat and planar ground keep the old cut, and both cuts wind u
   }
 });
 
-test('TERRAIN-CUT: every reader of the drawn ground agrees with the triangles it draws, at sampled points', () => {
+test('every reader of the drawn ground agrees with the triangles it draws, at sampled points', () => {
   const data = samplesOf(roughGround);
   for (const stride of [1, 4]) {
     const grid = buildTerrainGrid(data, stride, null);
@@ -204,7 +204,7 @@ test('TERRAIN-CUT: every reader of the drawn ground agrees with the triangles it
   }
 });
 
-test('TERRAIN-CUT: the water\'s sheet, the coast\'s clip and the fence\'s ground walk take the ground\'s own triangles', () => {
+test('the water\'s sheet, the coast\'s clip and the fence\'s ground walk take the ground\'s own triangles', () => {
   const data = samplesOf(roughGround);
   const water = WATER_DRAW_MASK_TABLE.findIndex((wet) => wet);
   for (const stride of [1, 4]) {
@@ -234,7 +234,7 @@ test('TERRAIN-CUT: the water\'s sheet, the coast\'s clip and the fence\'s ground
   }
 });
 
-test('TERRAIN-CUT: the kernel publishes the triangles of the samples it publishes, near and far', () => {
+test('the kernel publishes the triangles of the samples it publishes, near and far', () => {
   const woods = new WoodsFile();
   assert.equal(woods.load(syntheticWoodsBytes()), true);
   for (const stride of [1, 4]) {

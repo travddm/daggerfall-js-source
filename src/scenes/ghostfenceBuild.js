@@ -23,7 +23,7 @@ export const CURTAIN_SOLID_TOP = PYLON.collar.to + PYLON.collar.rim;
 const FOOTING_FROM = 0.5;
 
 /** The lowest and highest walk ground (`samples`, the pixel's) on the pixel-local segment (ax, az)-(bx, bz) - at its ends
- *  and every crossing of the ground's cells and both their diagonals (a quad is cut on either: terrainQuadCut.js), where
+ *  and every crossing of the ground's cells and both their diagonals (a quad is cut on either: terrain-quad-cut.ts), where
  *  the triangles' plane turns: exact. */
 export function groundAlong(samples, ax, az, bx, bz) {
   const cell = TERRAIN_SIZE / 128, dx = bx - ax, dz = bz - az, ts = [0, 1];

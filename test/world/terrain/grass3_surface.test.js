@@ -1,7 +1,7 @@
 // GRASS3: A BLADE STANDS ON THE SURFACE THAT IS DRAWN.
 //
 // The terrain is TRIANGLES. `buildTerrainIndices` cuts every quad on one
-// of its diagonals (terrainQuadCut.js decides which from the samples), so
+// of its diagonals (terrain-quad-cut.ts decides which from the samples), so
 // inside a quad the drawn ground is two PLANES - and a bilinear patch over the same four samples is a
 // different surface, agreeing only at the corners.
 // The grass placer read bilinear, so every blade off the diagonal stood
@@ -17,7 +17,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildTerrainGrid, buildTerrainIndices, surfaceHeightAt } from '../../../src/world/terrain/terrainSurface.js';
-import { quadCutsSeNw } from '../../../src/world/terrain/terrainQuadCut.js';
+import { quadCutsSeNw } from '../../../src/world/terrain/terrain-quad-cut.ts';
 import { HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE } from '../../../src/world/terrain/terrainSampler.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 

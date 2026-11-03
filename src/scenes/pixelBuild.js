@@ -1490,7 +1490,7 @@ export function createPixelBuild(host) {
       chapterHalls: pixelChapterHalls,   // CHAP7b (above)
       beach: beach ?? null,   // AUDIT LANDFORMS II H2: DFU's own blend in a location's pixel with the row on - where a gathering node asks the beach line
       px, py, terrain, water, tilemapTex, tilemap, groundArchive, models, windmills, batches, flatAnims, texRemap, lights: pixelLights, hearths: pixelHearths, animals: pixelAnimals, springs: pixelSprings, skyBase: climate.skyBase, samples, natureCount: nature.length,
-      terrainIndices,   // its ground's triangles, cut by its samples (terrainQuadCut.js): a re-carve draws the same ones
+      terrainIndices,   // its ground's triangles, cut by its samples (terrain-quad-cut.ts): a re-carve draws the same ones
       tilemapBytes, season: pixelSeason,   // GR1: the placer reads the tiles and the season (PRECIP4: the pixel's)
       _snow: snowSeen,   // PRECIP4: the snow it was built under, every season it took (the sweep's - AUDIT PRECIP HOST-6)
       // AUDIT PRECIP HOST-7: what a re-skin reads (reskinPixelNow), on the snow lane alone - its flats as logged, its blocks'

@@ -21,7 +21,7 @@ import {
   HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE,
 } from './terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from './terrainTiles.js';
-import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from './terrainQuadCut.js';
+import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from './terrain-quad-cut.ts';
 
 /** Verbatim UpdateTileMapDataJob byte conversion, for ONE tile - the
  *  one home, because FD1 needed the same conversion per-tile off the
@@ -94,7 +94,7 @@ export const TERRAIN_SKIRT_DEPTH = 40;
  *
  * WHY THIS IS NOT BILINEAR, which is the whole point of it. The terrain
  * is TRIANGLES: `buildTerrainIndices` cuts every quad on one of its
- * diagonals, the one terrainQuadCut.js decides from the samples (TERRAIN-CUT).
+ * diagonals, the one terrain-quad-cut.ts decides from the samples.
  * Inside a quad the drawn surface is therefore two PLANES, and a bilinear
  * patch is a different surface that agrees with it only at the corners. Anything placed by bilinear sits off the ground it is
  * supposed to stand on, by up to a quarter of the quad's saddle term.
@@ -272,7 +272,7 @@ export function surfaceNormalFromSamples(heightmapData, lx, lz, stride = 1, out 
  * order (x fastest, `gx` vertices a row, `cell` world units apart: buildTerrainIndices' and flatGrid's) read on the
  * triangle under (lx, lz), cut on surfaceHeightAt's diagonal. WATER-NEXT's bed depths through it are what the carve
  * took off the drawn ground there - for what is laid ON that ground (the snow). A streamed pixel passes its `samples`
- * and stride for its cut (terrainQuadCut.js); the town's flatGrid passes none and keeps flat ground's cut.
+ * and stride for its cut (terrain-quad-cut.ts); the town's flatGrid passes none and keeps flat ground's cut.
  * @param {ArrayLike<number>} values gx * gz, x fastest
  * @returns {number}
  */
@@ -303,7 +303,7 @@ const UNITY_HEIGHT_PER_STEP = Math.fround((MAX_TERRAIN_HEIGHT * STREAMING_TERRAI
  * scale Unity's terrain tools write as 32766/65535 on the heightmap's 16-bit
  * texture. Terrain.SampleHeight reads those steps: GetInterpolatedHeight over
  * the quad's two triangles, cut on Unity's fixed diagonal (a quad the port
- * cuts the other way, TERRAIN-CUT, on its own), kMaxHeight steps a height.
+ * cuts the other way on its own), kMaxHeight steps a height.
  *
  * A step is 1923.75 / 32766 = 0.0587 m, nothing to anything that stands on
  * the ground. It is everything to a law whose line IS the sea: the sampler
@@ -342,7 +342,7 @@ export function terrainSampleHeightAt(heightmapData, lx, lz, stride = 1) {
   const z00 = at(x0, z0), z11 = at(x1, z1);
   let h;
   if (quadCutsSeNw(heightmapData, qx, qz, stride)) {
-    // The port's own cut (terrainQuadCut.js), which Unity's fixed diagonal below never takes. Flat sea keeps Unity's
+    // The port's own cut (terrain-quad-cut.ts), which Unity's fixed diagonal below never takes. Flat sea keeps Unity's
     // cut and its float steps exactly: a quad on one plane is never cut this way.
     return f(quadValueAt(z00, at(x1, z0), at(x0, z1), z11, u, v, true) * UNITY_HEIGHT_PER_STEP);
   }
@@ -489,7 +489,7 @@ export function buildTerrainGrid(heightmapData, stride = 1, ghost = null) {
 }
 
 /** A pixel's triangle indices for the 129x129 grid (row-major x-fastest),
- *  each quad cut as terrainQuadCut.js decides from `heightmapData`; with
+ *  each quad cut as terrain-quad-cut.ts decides from `heightmapData`; with
  *  none, every quad takes flat ground's south-west to north-east cut.
  *  EV4: `stride` > 1 indexes the matching strided grid and stitches
  *  its skirt - both windings on the skirt quads, so the curtain shows

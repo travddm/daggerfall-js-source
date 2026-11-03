@@ -18,7 +18,7 @@ import {
   SOLITUDE_CRAG, SOLITUDE_LANE, SOLITUDE_TERRACES,
 } from './solitudeRelief.js';   // SOLITUDE-RELIEF: its ground
 import { perlinNoise } from './perlin.js';
-import { quadCutsSeNw, quadValueAt } from './terrain/terrainQuadCut.js';
+import { quadCutsSeNw, quadValueAt } from './terrain/terrain-quad-cut.ts';
 
 const MARBLE = art(CAPITAL_ART.marble), GOLD = art(CAPITAL_ART.gold), ROOF = art(CAPITAL_ART.roof), BRIDGE = art(CAPITAL_ART.bridgeStone);
 const DARK = art(CAPITAL_ART.dark), ROCK = art(CAPITAL_ART.rock), BLUE = art(CAPITAL_ART.blueSlate), TIMBER = art(CAPITAL_ART.timber), NORD = art(CAPITAL_ART.nordStone);
@@ -519,7 +519,7 @@ export function buildSolitudeCliffs() {
       for (let i = 0; i <= K; i++) { pts.push([]); for (let j = 0; j <= K; j++) pts[i].push(at(i / K, j / K)); }
       for (let i = 0; i < K; i++) {
         for (let j = 0; j < K; j++) {
-          // the drawn ground's own cut (terrainQuadCut.js), so the skin's folds lie on the ground's
+          // the drawn ground's own cut (terrain-quad-cut.ts), so the skin's folds lie on the ground's
           const sw = pts[i][j], se = pts[i + 1][j], nw = pts[i][j + 1], ne = pts[i + 1][j + 1];
           for (const [a, b, c] of seNw ? [[sw, nw, se], [se, nw, ne]] : [[sw, nw, ne], [sw, ne, se]]) {
             const n = faceUp(a, b, c);
