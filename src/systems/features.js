@@ -1626,10 +1626,10 @@ export const FEATURES = Object.freeze([
     group: 'world',
     get title() { return t('features.wildernessCamps.title', 'Wilderness camps & packs'); },
     get note() { return t('features.wildernessCamps.note', 'Out in the wilds you sometimes meet a small group of enemies, a camp or a roaming pack, instead of '
-      + 'only one at a time. Off keeps the classic single encounters.'); },
+      + 'only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'player' }),
+    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: true }),   // CAMP-RARE: forced on online, the room's ground (the groups are rare: systems/campEncounters.js); Off is DFU's lone wanderers
   }),
   // WILD-ROAD (FIELD BUGS 2026-10-04e, Discord: "having to completely halt my travel because 1 rat chose today to die
   // can be quite the interruption"): systems/roadEncounters.js - the port's own. On a journey or the Overworld, a
