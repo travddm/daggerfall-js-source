@@ -19,6 +19,16 @@ export async function run({ browser, base, ck }) {
     await clearBoxes(g);
     const dest = await g.J(() => window.__travelNearest());
     ck('the map knows a place to go', !!dest?.name, dest ? `${dest.name}, ${dest.region}` : 'none');
+    // A random road encounter stops the journey short (CI runs on #51, #57 and #67 ended at the same pixel). The roll is
+    // skipped while the entity's preventEnemySpawns is true (world.js runEncounterTick), and the game clears the flag after
+    // each tick, so it is pinned true here: the journey is the same on every run. The probe does not cover encounters.
+    await g.page.evaluate(() => {
+      Object.defineProperty(window.__playerEntity, 'preventEnemySpawns', {
+        get: () => true,
+        set: () => {},
+        configurable: true,
+      });
+    });
     const before = await travelState();
 
     await g.key('v');
@@ -94,18 +104,27 @@ export async function run({ browser, base, ck }) {
         }
         if (Date.now() - lastLine > 60000) {
           lastLine = Date.now();
-          console.log(`   [${Math.round((Date.now() - t0) / 1000)}s] pixel ${pixel}, frame ${await g.frame()}, journey ${JSON.stringify(j)}`);
+          console.log(
+            `   [${Math.round((Date.now() - t0) / 1000)}s] pixel ${pixel}, frame ${await g.frame()}, journey ${JSON.stringify(j)}`,
+          );
         }
         // A trip that is back at x1 short of its place was stopped (a foe, a box): say what stood in its way, once
         idleSince = j.scale === 1 ? idleSince || Date.now() : 0;
         if (!dumped && idleSince && Date.now() - idleSince > 90000) {
           dumped = true;
-          const world = await g.page.evaluate(() => JSON.stringify({ overworld: window.__overworld?.(), mode: window.__mode?.(), overlay: window.__overlayKind?.() }));
+          const world = await g.page.evaluate(() =>
+            JSON.stringify({
+              overworld: window.__overworld?.(),
+              mode: window.__mode?.(),
+              overlay: window.__overlayKind?.(),
+            }),
+          );
           console.log(`   [stopped short at ${pixel}] ${world}`);
           await g.shot('travel-stopped');
           g.diagnostics('travel stopped short', 40);
         }
-        if (Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1) return true;
+        if (Math.abs(t.pixel.x - dest.pixel.x) <= 1 && Math.abs(t.pixel.y - dest.pixel.y) <= 1 && j.scale === 1)
+          return true;
         return Date.now() - movedAt > STALL_MS || Date.now() - t0 > ABSOLUTE_MS ? 'gave up' : false;
       },
       ABSOLUTE_MS + 60000,

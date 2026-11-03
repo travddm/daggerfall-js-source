@@ -172,6 +172,8 @@ jobs:
           tar -xzf "$RUNNER_TEMP/probe-dist-pack/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist"
       - name: Probe ${{ matrix.probe }}
         env:
+          # the world streams a small grid (tools/probes/lib/harness.mjs): software GL is what makes the probes slow
+          PROBE_LIGHT: '1'
           PROBE_DIST: ${{ matrix.probe != 'online' && format('{0}/probe-dist', runner.temp) || '' }}
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots

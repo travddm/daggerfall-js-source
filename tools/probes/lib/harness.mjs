@@ -19,6 +19,9 @@ export const sleep = (ms) =>
 /** The probes read state, not pixels, and software GL costs by the pixel: a small window keeps CI's frames affordable. PROBE_W/PROBE_H change it. */
 const VIEWPORT = { width: Number(process.env.PROBE_W || 640), height: Number(process.env.PROBE_H || 400) };
 
+/** PROBE_LIGHT=1: the light settings in Game.open. Off unless asked for. */
+const LIGHT = process.env.PROBE_LIGHT === '1';
+
 const SWIFTSHADER_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
 /**
@@ -107,6 +110,25 @@ export class Game {
           /* no storage */
         }
       });
+      // PROBE_LIGHT=1: the world streams 1 map block around the player instead of 3 (DFU's Experimental/TerrainDistance), and the
+      // enhanced skin draws a view distance of 1 instead of 5 (the landViewDistance pref, src/world/landView.js). Both are settings
+      // a player changes; they are stored, so no game code changes. On software GL the world was ready 22 s after load instead of
+      // 86 s, and every reload the same. Off unless asked for.
+      if (LIGHT)
+        await this.context.addInitScript(() => {
+          try {
+            const k = 'dagger.settings.v1';
+            const v = JSON.parse(localStorage.getItem(k) ?? '{}');
+            localStorage.setItem(
+              k,
+              JSON.stringify({ ...v, Experimental: { ...v.Experimental, TerrainDistance: '1' } }),
+            );
+            const u = JSON.parse(localStorage.getItem('dagger.ui.v1') ?? '{}');
+            localStorage.setItem('dagger.ui.v1', JSON.stringify({ ...u, landViewDistance: 1 }));
+          } catch {
+            /* no storage */
+          }
+        });
       if (init) await this.context.addInitScript(init.fn, init.arg);
       // hermetic: the game phones the live account service (/v1/poi/live) even offline; a probe never reaches it
       await this.context.route(

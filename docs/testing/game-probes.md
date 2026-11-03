@@ -32,6 +32,9 @@ npm run probes -- save pause     # the named probes
   `node tools/probes/build.mjs [outDir]` (default `scratch/probe-dist`; run `sh tools/fetch-vendor.sh` first). A dev
   server transforms every module on its first request, in every run; a built game is a few chunks. A probe that edits
   the source in memory (`online`) keeps the dev server.
+- `PROBE_LIGHT=1` sets two stored settings before the game loads: the streamed grid (`Experimental/TerrainDistance`) to 1
+  and the enhanced skin's `landViewDistance` to 1. On software GL the world is ready in 22 s instead of 86 s. CI sets it;
+  it is off by default and changes nothing in the game.
 - `online` needs the relay's tools: `npm ci --prefix server`. It uses ports 8872 and 8873 (`PROBE_SVC_PORT`).
 - `PROBE_PORT` moves the first Vite port (default 5260). `SHOT_DIR` sets where screenshots go (default
   `scratch/probe-shots/`, ignored by git).
