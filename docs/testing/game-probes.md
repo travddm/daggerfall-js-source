@@ -30,11 +30,15 @@ npm run probes -- save pause     # the named probes
   The window is 640x400 (`PROBE_W`, `PROBE_H`): software GL costs by the pixel.
 - `PROBE_DIST=<folder>` serves a built game (`vite preview`) instead of a dev server. Build it once with
   `node tools/probes/build.mjs [outDir]` (default `scratch/probe-dist`; run `sh tools/fetch-vendor.sh` first). A dev
-  server transforms every module on its first request, in every run; a built game is a few chunks. A probe that edits
-  the source in memory (`online`) keeps the dev server.
+  server transforms every module on its first request, in every run; a built game is a few chunks. `online` needs a
+  build made with its source edits: `node tools/probes/build.mjs <outDir> --online`.
 - `PROBE_LIGHT=1` sets two stored settings before the game loads: the streamed grid
   (`Experimental/TerrainDistance`) to 1 and the enhanced skin's `landViewDistance` to 1. On software GL the world is
   ready in 22 s instead of 86 s. CI sets it; it is off by default and changes nothing in the game.
+- `PROBE_NODRAW=1` stubs the WebGL draw calls (`drawArrays`, `drawElements` and their instanced forms, `clear`) for a
+  probe that opened its `Game` with `drawless: true`: every probe but `boot`. They read state through the hooks and the
+  DOM, never pixels; the simulation, loading, input and UI run, and software GL draws nothing. `boot` keeps drawing. A
+  probe that reads the canvas must not set `drawless`; its screenshots (taken on a failure) come out black in this mode.
 - `online` needs the relay's tools: `npm ci --prefix server`. It uses ports 8872 and 8873 (`PROBE_SVC_PORT`).
 - `PROBE_PORT` moves the first Vite port (default 5260). `SHOT_DIR` sets where screenshots go (default
   `scratch/probe-shots/`, ignored by git).
@@ -70,7 +74,9 @@ boot, and two read hooks. The repository is not changed. Every other probe runs 
 
 `.github/workflows/probes.yml` runs on pull requests that touch `src/`, `server/`, `server-account/` or the probes, one
 runner per probe, so the slowest probe (`online`) sets the wall time. It is not part of the `check` job. ARENA2 is
-downloaded once and cached. A `build` job builds the game once and the probes download it (`PROBE_DIST`).
+downloaded once and cached. A `build` job builds the game once (and once more with the online probe's edits) and the
+probes download it (`PROBE_DIST`). Playwright's Chromium is cached by its version. The set does not run for a
+change that touches only documents (`*.md`, `docs/`); it also runs every night and on demand.
 
 To tell a flaky probe from a real fault, run one probe many times on CI (each run is its own runner):
 
