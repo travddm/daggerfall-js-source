@@ -268,8 +268,8 @@ test('TELL8: the blow\'s class - its K, its back flag and its weakness flag as o
   assert.equal(hitClassOf({}), null);
   // judged against the puppet: K by its kind and weapon, my feet behind its facing
   const ai = { _tac: { puppet: true, state: 'windup', blow: makeBlow('lunge', [0, 0, 0], 0, 10) } };
-  assert.deepEqual(blowClassOf(ai, { kind: 'melee' }, [0, 0, 2]), { k: TELL.K_HANDS, back: false, weak: false });
-  assert.deepEqual(blowClassOf(ai, { kind: 'arrow' }, [0, 0, -2]), { k: TELL.K_ARROW, back: true, weak: false });
+  assert.deepEqual(blowClassOf(ai, { kind: 'melee' }, [0, 0, 2]), { k: TELL.K_HANDS, back: false });
+  assert.deepEqual(blowClassOf(ai, { kind: 'arrow' }, [0, 0, -2]), { k: TELL.K_ARROW, back: true });
   assert.equal(blowClassOf({ _tac: { state: 'engage' } }, { kind: 'melee' }, [0, 0, 2]), null, 'not winding up: no class');
   // the owner's door
   const foe = () => ({ entity: { health: 100, maxHealth: 100 }, ai: { feet: [0, 0, 0], _tac: { state: 'windup', blow: makeBlow('lunge', [0, 0, 0], 0, 10) } } });

@@ -375,7 +375,7 @@ export function revenantDeed(player, entity, deedName, { mobileType = entity?.mo
   r.dueAt = dueFrom(now, rolls);
   deed(r, deedName, now);
   // the foe that did it wears its name at once - while it still stands (a killer over my body), it IS the revenant
-  entity.revenant = { id: r.id, name: r.name, rank: r.rank };
+  entity.revenant = { id: r.id, name: r.name, rank: r.rank, person: revenantPerson(r) };   // FB1012d ALLY-RACE: its person, every stand
   r.out = deedName === 'slew';
   r.outAt = r.out ? Date.now() : 0;
   touch(r);
@@ -548,7 +548,7 @@ export function revenantSpawnOptions(r, playerLevel) {
  *  OUT from here until the foe dies, escapes or leaves the world. */
 export function applyRevenant(entity, r, { now = nowMinutes() } = {}) {
   if (!entity || !r) return false;
-  entity.revenant = { id: r.id, name: r.name, rank: r.rank };
+  entity.revenant = { id: r.id, name: r.name, rank: r.rank, person: revenantPerson(r) };   // FB1012d ALLY-RACE: its person, every stand
   entity.maxHealth = Math.max(1, Math.round((entity.maxHealth || 1) * (1 + REVENANT_HEALTH_PER_RANK * r.rank)));
   entity.health = entity.maxHealth;
   entity.healthMult = (entity.healthMult ?? 1) * (1 + REVENANT_HEALTH_PER_RANK * r.rank);   // TELL1: what was stood on the kind's own health (ai/tells.js kindHealth - its poise)

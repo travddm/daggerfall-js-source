@@ -18,7 +18,7 @@ import { getPref } from '../systems/uiPrefs.js';   // TELL9: the telegraph contr
 export const telegraphContrastOn = () => getPref('telegraphContrast') === true;
 
 /** The shapes as the shader's `uKind` says them. */
-export const BLOW_KIND = Object.freeze({ lunge: 0, sweep: 1, slam: 2, ring: 3, charge: 0, leap: 2 });   // TELL6: the charge's lane and the aimed line are the lunge's branch, the leap's disc the slam's - each its own numbers
+export const BLOW_KIND = Object.freeze({ lunge: 0, sweep: 1, slam: 2, ring: 3, charge: 0, leap: 2, aimed: 0 });   // TELL6: the charge's lane and the aimed line are the lunge's branch, the leap's disc the slam's - each its own numbers
 /** TELL6: a shape's reach from the foe's feet (its farthest point). */
 const REACH = Object.freeze({ lunge: BLOW.lunge.len, sweep: BLOW.sweep.r, slam: BLOW.slam.ahead + BLOW.slam.r, ring: BLOW.ring.rOut, charge: BLOW.charge.len, leap: BLOW.leap.range + BLOW.leap.r, aimed: 0 });
 /** TELL6: a blow's quad half-extent - its own shape and the line's glow past its outline (TELL2 draws 0.5 m out), so a
