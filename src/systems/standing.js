@@ -15,7 +15,7 @@
 //   - Banishment could follow any sentence below zero, for ever. REP3: a Murder's or a Treason's alone (court.js
 //     BANISHABLE_CRIMES), lifting after thirty days of the world's calendar or with a pardon bought at a temple - a
 //     sanctuary the watch does not enter.
-//   - NormalizeReputations: a point toward zero every 112 days. REP4: a standing below zero recovers a point every seven
+//   - NormalizeReputations: a point toward zero every 112 days. REP4: a standing below zero recovers a point every 28 days
 //     (court.js RECOVERY_INTERVAL_MINUTES); a temple's penance buys back five points of a region's law at a price that
 //     rises with every one bought there; a bounty contract finished pays two.
 //

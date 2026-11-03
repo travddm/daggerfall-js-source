@@ -27,7 +27,7 @@ import { isMember, joinedGuildOfGroup, updateRank, rankNeeds, getTitle, membersh
   isJoinableByApplication, membershipKey,   // WAY-BACK: a stranger is told the way in where one walks in
   GUILD_EXPEL_BELOW, DAYS_BETWEEN_RANK_CHANGES, RANK_REQ_REPUTATION, RANK_REQ_SKILL_HIGH, RANK_REQ_SKILL_LOW } from './guilds.js';
 import { QUEST_SUCCESS_REP } from '../quest/questRepute.js';   // WAY-BACK: what a stranger's quest done pays the guild (the leaf - AUDIT GUIDE O6)
-import { RECOVERY_INTERVAL_MINUTES } from '../court.js';   // WAY-BACK: REP4's week, a bad name's point back
+import { recoveryIntervalMinutes } from '../repRecovery.js';   // WAY-BACK: REP4's interval, a bad name's point back (F3a: the player's choice)
 import { MINUTES_PER_DAY } from '../gameDate.js';
 import { getReputation } from '../faction/factionRep.js';   // AUDIT GUILD-WORDS L1-2: the review's warnings read the standing
 import { standingOwedOf } from '../standingOwed.js';   // STANDING-WORDS: what the Roll still owes, online
@@ -388,7 +388,7 @@ export function rankNeedsLines(entity, guild, memberships, store, ctx = null) {
  *  Both roads were always open and nothing said either. A stranger may ask the hall's quest-giver for work
  *  (NonMemberGuild.CanAccessService's Quests, guildServices.js baseCanAccessService; QuestList-Classic's `N` rows), and
  *  each one done pays the guild DFU's QUEST_SUCCESS_REP (Quest.cs EndQuest - the guild's faction, a member or not); and a
- *  standing below 0 recovers a point every RECOVERY_INTERVAL_MINUTES of the character's own time (REP4; rests and
+ *  standing below 0 recovers a point every recoveryIntervalMinutes() of the character's own time (REP4; rests and
  *  journeys count, LIVED1), and online across a log-off too, on the world's clock (worldTick.js normalizeAcross, from
  *  save.js payAbsenceWhenHeard - AUDIT WAY-BACK L1-2/L3-2). Null where the join is not offered (a member of the slot -
  *  this guild, or another temple or order in it, as showsJoinButton reads it - or a guild joined only by invitation),
@@ -427,7 +427,7 @@ export function wayBackLines(guild, entity, memberships, store, ctx = null) {
     questsLine(w),
     ...(ctx?.shut ? [t('guild.wayBack.shut', 'This hall is shut this Season. The guild\'s halls in other regions still give work.')] : []),
     t('guild.wayBack.drift', 'Below 0 your standing also recovers a point {days, plural, one {every day} other {every # days}} of your own time. Rests and journeys count{online, select, yes {, and so does time logged off} other {}}.',
-      { days: RECOVERY_INTERVAL_MINUTES / MINUTES_PER_DAY, online: ctx?.online ? 'yes' : 'no' }),
+      { days: recoveryIntervalMinutes() / MINUTES_PER_DAY, online: ctx?.online ? 'yes' : 'no' }),
     ...(ctx?.paced ? [t('guild.wayBack.paced', 'Online, quests and the recovery raise it by at most {max} a real day (days start at midnight UTC){owed, plural, =0 {} other {, with # more standing on the way}}. On top of that, a chapter writ of the guild\'s on a notice board adds {writ}.',
       { max: ROLL_GAIN_DAY_MAX, owed: w.owed, writ: HALL_WRIT_REP })] : []),
   ];
