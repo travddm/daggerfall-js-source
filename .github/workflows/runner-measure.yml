@@ -25,19 +25,19 @@ jobs:
           echo "| job | cores | wall s | peak RAM added MB | CPU busy % | peak tasks added | exit |" >> "$GITHUB_STEP_SUMMARY"
           echo "| --- | --- | --- | --- | --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
           nproc; free -m | head -2
-      - run: tools/ci-runner/measure-job.sh shard-1of8 0-3 node tools/testShards.mjs 1/8
+      - run: bash tools/ci-runner/measure-job.sh shard-1of8 0-3 node tools/testShards.mjs 1/8
         continue-on-error: true
-      - run: tools/ci-runner/measure-job.sh shard-1of8 0-1 node tools/testShards.mjs 1/8
+      - run: bash tools/ci-runner/measure-job.sh shard-1of8 0-1 node tools/testShards.mjs 1/8
         continue-on-error: true
-      - run: tools/ci-runner/measure-job.sh shard-5of8 0-3 node tools/testShards.mjs 5/8
+      - run: bash tools/ci-runner/measure-job.sh shard-5of8 0-3 node tools/testShards.mjs 5/8
         continue-on-error: true
-      - run: tools/ci-runner/measure-job.sh build 0-3 npm run build
+      - run: bash tools/ci-runner/measure-job.sh build 0-3 npm run build
         continue-on-error: true
-      - run: tools/ci-runner/measure-job.sh build 0-1 npm run build
+      - run: bash tools/ci-runner/measure-job.sh build 0-1 npm run build
         continue-on-error: true
-      - run: tools/ci-runner/measure-job.sh lint+types 0-3 bash -c 'npm run lint && npm run types'
+      - run: bash tools/ci-runner/measure-job.sh lint+types 0-3 bash -c 'npm run lint && npm run types'
         continue-on-error: true
-      - run: tools/ci-runner/measure-job.sh lint+types 0-1 bash -c 'npm run lint && npm run types'
+      - run: bash tools/ci-runner/measure-job.sh lint+types 0-1 bash -c 'npm run lint && npm run types'
         continue-on-error: true
   probes:
     runs-on: ubuntu-latest
@@ -64,6 +64,6 @@ jobs:
         run: |
           for cpus in 0-3 0-1; do
             for p in dungeon save online; do
-              tools/ci-runner/measure-job.sh "probe-$p" "$cpus" npm run probes -- "$p" || true
+              bash tools/ci-runner/measure-job.sh "probe-$p" "$cpus" npm run probes -- "$p" || true
             done
           done
