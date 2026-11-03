@@ -18,15 +18,21 @@
 // (ui/enhanced/enhancedMenu.js tileStates, BLOOD AUDIT 5), and the shelf's load
 // drops it (uiPrefs.js loadPrefs), so the bar and the laws never disagree.
 import { getPref } from '../uiPrefs.js';
-import { SURVIVAL_OFF, tierOfStored, rulesForTier } from './difficulty.js';
+import { SURVIVAL_OFF, SURVIVAL_RULES, tierOfStored, rulesForTier } from './difficulty.js';
+import { boonsOff } from './boonProfile.js';
 import { isOnlinePage } from '../online/onlineLane.js';   // CORPSE-FOOD: a leaf too - it imports nothing
 
 export const SURVIVAL_PREF = 'survival';
+/** F3b: the Boons tier with its rewards taken off - nothing is ever taken either (difficulty.js SURVIVAL_RULES). */
+const NO_BOON_RULES = Object.freeze({ ...SURVIVAL_RULES.boons, boons: false });
 /** 'off', 'boons', 'casual' or 'hard' (SURV-BOONS). */
 export const survivalTier = () => tierOfStored(getPref(SURVIVAL_PREF));
 export const survivalOn = () => survivalTier() !== SURVIVAL_OFF;
 /** The live tier's rules (difficulty.js SURVIVAL_RULES), or null when the arc is off. */
-export const survivalRules = () => rulesForTier(survivalTier());
+export const survivalRules = () => {
+  const rules = rulesForTier(survivalTier());
+  return rules?.boons && boonsOff() ? NO_BOON_RULES : rules;   // F3b: Boon size None is DFU's - a Boons body earns nothing
+};
 /**
  * CORPSE-FOOD. ONLINE, A BODY'S FOOD IS THE
  * ROOM'S. A corpse is minted by whoever raises the death - the foe's owner in a cell, the host in a dungeon - and

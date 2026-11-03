@@ -43,7 +43,8 @@
 import { feltTemperature, temperatureWord, wardrobeCtx, sunlit } from './temperature.js';
 import { drinkFrom, findDrink, waterskinName, DRINK_RELIEF, TEMPLATE, isFood, foodStage, FOOD_STAGE, rotFoodDay, rotWeight, ROT_DAY_MINUTES } from './food.js';
 import { STAT_KEYS_ORDER, maxFatigue, liveStat, FATIGUE_MULTIPLIER } from '../statMods.js';
-import { HARD_RULES, BOON_FED_MINUTES, BOON_QUENCHED_BELOW } from './difficulty.js';
+import { HARD_RULES } from './difficulty.js';
+import { boonProfile, BOON_PROFILES } from './boonProfile.js';
 /** SURV4: speed and agility down by this while stiff (survival/rest.js's STIFF_PENALTY, restated here so rest.js may import this module). */
 const STIFF_PENALTY = 5;
 import { MINUTES_PER_DAY, dateFromClassicMinutes } from '../gameDate.js';
@@ -108,12 +109,7 @@ export function heartyMeal(s, at) {
  * is a longer one - food.js satiety), Quenched while the thirst is, Well rested while a night's bank lasts, and
  * Thriving for all three at once. The order is the strip's.
  */
-export const BOON = Object.freeze({
-  fed: Object.freeze({ strength: 1, endurance: 2 }),
-  quenched: Object.freeze({ agility: 1, speed: 2 }),
-  rested: Object.freeze({ intelligence: 1, willpower: 2 }),
-  thriving: Object.freeze({ luck: 2 }),
-});
+export { BOON } from './boonProfile.js';   // the default size's table; the live one is boonProfile().boon (F3b)
 export const BOON_IDS = Object.freeze(['fed', 'quenched', 'rested', 'thriving', 'hearth']);
 /** AUDIT SURV-BOONS C4: the boons a line is said for as they are earned - not the hearth, which every brazier in a street
  *  or a tavern raised on the way past (eleven lines an hour beside a row of them, at a full pool): its tile says it. */
@@ -124,7 +120,7 @@ export const HEARTH_FATIGUE = FATIGUE_MULTIPLIER;
 /** SURV-BOONS: Well rested - minutes banked a minute asleep in a bed or by a fire (160 minutes of sleep
  *  fill it), and the most a body holds (four hours, F3b). The rest window's rough sleep banks none: the bed and the fire are the go-to rest. */
 export const WELL_RESTED_PER_SLEEP_MINUTE = 1.5;
-export const WELL_RESTED_MAX_MINUTES = 4 * 60;
+export const WELL_RESTED_MAX_MINUTES = BOON_PROFILES.small.bankMinutes;   // F3b: the live bank is boonProfile().bankMinutes
 // SURV-TIERS: `FLOOR_FATIGUE = 64` stood here under "rough drains cannot
 // take the last of a pool by themselves", and nothing read it. Hard's
 // drains DO take the last point - the collapse that follows is the cost
@@ -284,7 +280,7 @@ export function paySleep(s, sleeping, minutes, now, rules = HARD_RULES) {
   s.awakeSince = now;
   // SURV-BOONS: a night in a bed or by a fire banks Well rested, in a tier that rewards - both payers (the minute law's
   // night and REST-SLEEP1's short rest) come through here
-  if (rules?.boons && sleeping !== 'rough' && minutes > 0) s.wellRested = Math.min(WELL_RESTED_MAX_MINUTES, (s.wellRested ?? 0) + WELL_RESTED_PER_SLEEP_MINUTE * minutes);
+  if (rules?.boons && sleeping !== 'rough' && minutes > 0) s.wellRested = Math.min(boonProfile().bankMinutes, (s.wellRested ?? 0) + WELL_RESTED_PER_SLEEP_MINUTE * minutes);
 }
 
 /**
@@ -295,8 +291,8 @@ export function paySleep(s, sleeping, minutes, now, rules = HARD_RULES) {
 export function survivalBoons(s, now, { vampire = false, hearth = false } = {}) {
   const out = [];
   if (!vampire) {
-    if (hungerMinutes(s, now) < BOON_FED_MINUTES) out.push('fed');
-    if ((s.thirst ?? 0) < BOON_QUENCHED_BELOW) out.push('quenched');
+    if (hungerMinutes(s, now) < boonProfile().fedMinutes) out.push('fed');
+    if ((s.thirst ?? 0) < boonProfile().quenchedBelow) out.push('quenched');
     if (s.wellRested > 0 && sleepStage(s.sleepDebt ?? 0) === 'rested') out.push('rested');   // AUDIT SURV-BOONS A1: a bank beside an unpaid debt is no rest - a short night from Exhausted woke Well rested (and Thriving) under an Exhausted chip
     if (out.length === 3) out.push('thriving');
   }
@@ -322,7 +318,7 @@ export function survivalStatMods(s, temp, now, { endurance = 50, rules = HARD_RU
   }
   // SURV-BOONS: the boons the minute granted (the record's `boons`, written by the law before this is read), in a tier
   // that rewards - the hearth is stamina, not an attribute, and has no row here
-  if ((rules ?? HARD_RULES).boons) for (const id of s.boons ?? []) for (const [k, n] of Object.entries(BOON[id] ?? {})) mods[k] = (mods[k] ?? 0) + n;
+  if ((rules ?? HARD_RULES).boons) for (const id of s.boons ?? []) for (const [k, n] of Object.entries(boonProfile().boon[id] ?? {})) mods[k] = (mods[k] ?? 0) + n;
   if (s.drunk > endurance / 2) {
     const d = Math.trunc((s.drunk - endurance / 2) / 10);
     sub(['agility', 'intelligence', 'willpower', 'speed'], d);

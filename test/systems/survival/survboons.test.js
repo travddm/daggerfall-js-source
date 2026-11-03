@@ -8,7 +8,8 @@ import {
   NEED, BOON, BOON_IDS, SAID_BOONS, HEARTH_FATIGUE, WELL_RESTED_PER_SLEEP_MINUTE, WELL_RESTED_MAX_MINUTES, SURVIVAL_TEXT,
   newSurvival, survivalMinute, runSurvivalMinutes, survivalBoons, survivalStatMods, paySleep, pauseSurvival, alignSurvival, boonNotes, drinkWater,
 } from '../../../src/systems/survival/needs.js';
-import { BOON_FED_MINUTES, BOON_QUENCHED_BELOW } from '../../../src/systems/survival/difficulty.js';
+import { BOON_PROFILES } from '../../../src/systems/survival/boonProfile.js';
+const BOON_FED_MINUTES = BOON_PROFILES.small.fedMinutes, BOON_QUENCHED_BELOW = BOON_PROFILES.small.quenchedBelow;
 import { sunlit } from '../../../src/systems/survival/temperature.js';   // AUDIT C&C R2: the sun the hosts read
 import { HUD_BOON_WORDS, STATUS_TEXT, survivalHudChips, survivalStatusLines, temperatureReadout, boonEffect, restedLeft } from '../../../src/systems/survival/status.js';
 import { restCost } from '../../../src/systems/survival/rest.js';

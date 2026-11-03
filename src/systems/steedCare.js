@@ -24,6 +24,7 @@
 // steedStats, stepBreath, steedSpeedScale, teamDraftScale, feedHorse and tendHorses - and a law handed none runs HARD,
 // so every pin written before the tiers still pins it. Everything else here is the world's, in every tier.
 
+import { boonProfile, BOON_PROFILES } from './survival/boonProfile.js';   // F3b: the bond's step is the player's Boon size
 import { isHorseItem } from './horse/horseCoats.js';
 import { UPKEEP_ITEM } from './upkeep/upkeepItemRows.js';
 import { HORSE_CARE_HARD } from './upkeep/upkeepTiers.js';   // HORSE-TIERS: what a law handed no rules runs
@@ -64,7 +65,7 @@ export const horseBornStats = (item) => bornStats(seedOf(item));
 /** The bond is kept in tenths (`horseBond` 1..BOND_TENTHS_MAX; absent, none). */
 export const BOND_TENTHS_MAX = 1000;
 /** Every BOND_STEP points of bond are a point on every stat. */
-export const BOND_STEP = 50;
+export const BOND_STEP = BOON_PROFILES.small.bondStep;   // the default size's step; the live one is boonProfile().bondStep
 /** The words a bond is said in, from the points each begins at. */
 export const BOND_TIERS = Object.freeze([
   Object.freeze({ min: 0, name: 'Wary' }),
@@ -82,7 +83,7 @@ const bondTenths = (item) => (Number.isInteger(item?.horseBond) ? Math.max(0, Ma
 /** The bond's word for `points`. */
 export const bondTier = (points) => [...BOND_TIERS].reverse().find((t) => points >= t.min)?.name ?? BOND_TIERS[0].name;
 /** The points a bond of `points` adds to every stat. */
-export const bondBonus = (points) => Math.floor(Math.max(0, points) / BOND_STEP);
+export const bondBonus = (points) => Math.floor(Math.max(0, points) / boonProfile().bondStep);   // F3b: the live step is the player's Boon size
 
 // ── hunger ──────────────────────────────────────────────────────────
 export const MINUTES_A_DAY = 1440;

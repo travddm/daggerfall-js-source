@@ -94,7 +94,6 @@
     "src/systems/snowfall.js": 1157,
     "src/systems/snowfallRuntime.js": 1470,
     "src/systems/song/songPlayer.js": 1082,
-    "src/systems/survival/needs.js": 1001,
     "src/systems/travel/travelOptions.js": 1494,
     "src/systems/travel/travelRoute.js": 1148,
     "src/systems/weather/weatherMap.js": 1128,
