@@ -11,5 +11,5 @@ outside the suite.
   town, travel, save and load, pause menu, two clients online), as the safety net for refactors of the host files.
 - [lint-ratchet.md](lint-ratchet.md) - the size, complexity, unused-code and `@ts-check` limits of production code,
   recorded as a ratchet that may only fall.
-- [probes.md](probes.md) - the Playwright probes in `tools/*Probe.mjs`, the account-service probe, the load harness
+- [probes.md](probes.md) - the single-purpose Playwright probes, the account-service probe, the load harness
   and the desktop-shell probe: what they need and how to run one.
