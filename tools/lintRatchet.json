@@ -14,7 +14,7 @@
     "src/combat/pcaao.js": 1258,
     "src/combat/weapon/weaponRig.js": 2001,
     "src/formats/blocksFile.js": 1008,
-    "src/formats/morrowind/mwFirstPerson.js": 2654,
+    "src/formats/morrowind/mwFirstPerson.js": 2476,
     "src/formats/morrowind/mwNifFile.js": 1138,
     "src/net/accountClient.js": 2340,
     "src/net/gate/gateBrain.js": 2315,
@@ -139,8 +139,7 @@
     "src/world/imperialFabric.js": 1150,
     "src/world/interior/fabricInterior.js": 1001,
     "src/world/landforms.js": 1609,
-    "src/world/townStandIns.js": 1055,
-    "src/world/townWalls.js": 1001
+    "src/world/townStandIns.js": 1055
   },
   "max-lines-per-function": {
     "server-account/src/decorBatch.js::Async function 'commitDecorBatch'#0": 188,
@@ -1479,7 +1478,7 @@
     "src/world/terrain/terrainGen.js": 74,
     "src/world/terrain/terrainGenWorker.js": 35,
     "src/world/terrain/terrainNature.js": 12,
-    "src/world/terrain/terrainTiles.js": 24,
+    "src/world/terrain/terrainTiles.js": 21,
     "src/world/townGates.js": 5,
     "src/world/townOutline.js": 6,
     "src/world/townStandIns.js": 18,
@@ -1849,8 +1848,6 @@
     "src/world/tamriel/tamrielLand.js": 2,
     "src/world/terrain/terrainGenClient.js": 1,
     "src/world/terrain/terrainNature.js": 2,
-    "src/world/townOutline.js": 1,
-    "src/world/townShape.js": 1,
     "src/world/underwater/underwaterLoot.js": 1,
     "src/world/unityAnimator.js": 1
   },

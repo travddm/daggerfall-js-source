@@ -35,7 +35,7 @@ jobs:
   check:
     if: ${{ always() }}
     needs: [verify]
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - name: Every part of the check passed
         run: |
@@ -50,7 +50,7 @@ jobs:
   # own: `check` stays the lint, types, tests and build, and a branch rule may require this one too.
   standards:
     if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
         with:

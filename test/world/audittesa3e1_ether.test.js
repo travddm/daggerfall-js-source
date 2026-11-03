@@ -29,9 +29,12 @@ const template = (mapId, names, w, h) => ({
 });
 const TEMPLATES = { towns: [template(901, ['A.RMB', 'B.RMB'], 2, 1), template(902, ['B.RMB', 'A.RMB'], 2, 1)], havens: [template(903, ['A.RMB', 'B.RMB', 'B.RMB', 'A.RMB'], 2, 2)], ruins: [template(904, ['B.RMB'], 1, 1)] };
 const rectOf = (loc) => setLocationTiles(loc, mapsFile, blocksFile, new Uint8Array(WORLD_MAP_TILE_DIM * WORLD_MAP_TILE_DIM));
+/** A template read for the bake as the host reads it (scenes/world.js: locationRectReader's `as` marks it an isle's place,
+ *  the only kind of location of the game's rows that stands an outline). */
+const bakeRectOf = (loc) => rectOf({ ...loc, ether: true });
 
 test('AUDIT TESA III E1-4 THE OUTLINE\'S BASIS: locationShapeField is its basis drawn under the location\'s own map id - the basis rides on the outline unenumerated (never a field a copy or a post carries), and another id draws another outline off the same grid (mutant: the basis drawn under a fixed seed)', () => {
-  const loc = TEMPLATES.towns[0], rmbOf = (bx, by) => BLOCKS[blocksFile.getBlockIndex(loc.exterior.exteriorData.blockNames[by * 2 + bx])].rmbBlock;
+  const loc = { ...TEMPLATES.towns[0], ether: 'isle' }, rmbOf = (bx, by) => BLOCKS[blocksFile.getBlockIndex(loc.exterior.exteriorData.blockNames[by * 2 + bx])].rmbBlock;
   const shape = locationShapeField(loc, rmbOf);
   assert.ok(shape && shape.some(Boolean), 'an outline');
   const basis = locationOutlineBasis(loc, rmbOf);
@@ -44,10 +47,10 @@ test('AUDIT TESA III E1-4 THE OUTLINE\'S BASIS: locationShapeField is its basis 
 });
 
 test('AUDIT TESA III E1-4 THE ISLES\' BAKE STANDS EACH ISLE\'S OWN OUTLINE: etherPlaceRects keeps each template\'s basis once (packed a bit a tile), and etherRectAt answers an isle\'s place with the outline its clone\'s streamed build stands - setLocationTiles over synthesizeEtherLocation, the isle\'s own map id - for a haven, a port and a ruin; a template with no outline answers the rect alone (mutants: the shape dropped; the template\'s id seeding it; every basis none; a bit packed wrong)', () => {
-  const rects = etherPlaceRects(TEMPLATES, rectOf);
+  const rects = etherPlaceRects(TEMPLATES, bakeRectOf);
   assert.equal(rects.bases.length, 4, 'four grids, four bases');
   assert.deepEqual(rects.towns.map((r) => r[4]), [0, 1]);
-  const dup = etherPlaceRects({ towns: [TEMPLATES.towns[0], TEMPLATES.towns[0]] }, rectOf);
+  const dup = etherPlaceRects({ towns: [TEMPLATES.towns[0], TEMPLATES.towns[0]] }, bakeRectOf);
   assert.equal(dup.bases.length, 1, 'a basis kept once however many templates share it');
   const at = etherRectAt(rects), h = veilhaven();
   const isles = [h, ...['port', 'ruin'].map((kind) => islesNear(h.px, h.py, 80).find((i) => i.kind === kind && !i.haven))];
@@ -58,7 +61,7 @@ test('AUDIT TESA III E1-4 THE ISLES\' BAKE STANDS EACH ISLE\'S OWN OUTLINE: ethe
     assert.ok(got?.shape, `${isle.kind}: an outline`);
     assert.deepEqual([...got.shape], [...streamed.shape], `${isle.kind}: the clone's own outline, to the tile`);
     assert.deepEqual([got.xMin, got.xMax, got.yMin, got.yMax], [streamed.xMin, streamed.xMax, streamed.yMin, streamed.yMax], `${isle.kind}: its bounds`);
-    const own = rectOf(t);
+    const own = bakeRectOf(t);
     assert.ok(own.shape.some((v, i) => v !== streamed.shape[i]), `${isle.kind}: the template's own id draws another outline - the one the bake had`);
   }
   // a template with no outline (no block read): the rect alone

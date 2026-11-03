@@ -8,8 +8,8 @@ import { join } from 'node:path';
 import { outlineCells, wholeOutline, townOutlineCells, classicKinds, outlineTownLocation, buildingKind, townOutlineBlockJson, installTownOutline, TOWN_OUTLINE, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK_INDEX } from '../../src/world/townOutline.js';
 import { drawNamedBuildings } from '../../src/systems/talk/talkTopics.js';
 import { setLocationTiles, GROUND_RECORD_LIMIT } from '../../src/world/terrain/terrainTiles.js';
-import { blockFromJson, getNewDFBlockIndex } from '../../src/formats/worldData/worldDataReplacement.js';
-import { townWallBlockName } from '../../src/world/townWalls.js';
+import { blockFromJson, getNewDFBlockIndex, installWorldDataReplacement, bindWorldDataBlocks, editLocation } from '../../src/formats/worldData/worldDataReplacement.js';
+import { townWallBlockName, townWallCellsOf } from '../../src/world/townWalls.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const ARENA2 = process.env.ARENA2_PATH;
@@ -194,4 +194,60 @@ test('TS3 with ARENA2: every city the places past the Bay clone keeps one of eac
     assert.deepEqual(outlineTownLocation(loc, { ...io, classicOf: (n) => blocks.getBlockByName(n) }).exterior.exteriorData.blockNames, ed.blockNames, 'the same cells either way (no mod here)');
   }
   assert.ok(interiorLeft > T['city-state'].length, `the cities leave out cells inside their walls too (${interiorLeft})`);
+});
+
+// The Bay's cities keep Daggerfall's grid and its WALLAA ring as DFU lays them. The door's location edits must leave a
+// Bay city's ring as read, whether it is the game's own ring (town packs off) or a pack's rebuilt one (packs on).
+const BAY_RING = ['WALLAA02.RMB', 'WALLAA10.RMB', 'WALLAA03.RMB', 'WALLAA07.RMB', 'H.RMB', 'WALLAA05.RMB', 'WALLAA00.RMB', 'WALLAA08.RMB', 'WALLAA01.RMB'];
+const bayCity = (names, mapId) => ({ name: 'Bayton', mapTableData: { mapId }, exterior: { buildings: [], exteriorData: { width: 3, height: 3, blockNames: names.slice() } } });
+
+test('a Bay city read through the door keeps its wall ring: the game\'s own WALLAA ring and a town pack\'s composite ring each stay as read, with no outline and no wall of the port\'s (mutant: the Bay\'s walled cities edited onto an outline)', () => {
+  installWorldDataReplacement();
+  installTownOutline();
+  bindWorldDataBlocks({ getBlockByName: () => null, getBlockIndex: () => -1, checkName: (n) => n, readClassicBlock: () => null });
+  try {
+    const packsOff = BAY_RING, packsOn = BAY_RING.map((n) => (n === 'WALLAA08.RMB' ? 'WALLAA08.FARMAA00.RMB' : n));
+    for (const [ring, mapId] of [[packsOff, 5101], [packsOn, 5102]]) {
+      const loc = editLocation(bayCity(ring, mapId));
+      assert.deepEqual(loc.exterior.exteriorData.blockNames, ring, 'its ring as read');
+      assert.equal(loc.outline, undefined, 'no outline');
+      assert.equal(townWallCellsOf(loc), null, 'no wall of the port\'s');
+    }
+  } finally {
+    bindWorldDataBlocks(null);
+  }
+});
+
+test('with ARENA2: Daggerfall, Wayrest and Sentinel read through the door keep every WALLAA block of their ring and no outline, while a clone of each past the Bay is still walled on its outline (mutant: the Bay\'s walled cities edited onto an outline)', { skip: skipReal }, async () => {
+  const { BlocksFile } = await import('../../src/formats/blocksFile.js');
+  const { MapsFile } = await import('../../src/formats/mapsFile.js');
+  const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
+  const blocks = new BlocksFile(); blocks.load(bytes('BLOCKS.BSA'));
+  installWorldDataReplacement();
+  installTownOutline();
+  bindWorldDataBlocks(blocks);
+  try {
+    const maps = new MapsFile(); maps.load(bytes('MAPS.BSA'), bytes('CLIMATE.PAK'), bytes('POLITIC.PAK')); maps.autoDiscard = false;
+    const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
+    const seen = [];
+    for (let r = 0; r < 62; r++) {
+      const reg = maps.getRegion(r);
+      if (!reg) continue;
+      for (let l = 0; l < reg.locationCount; l++) {
+        const loc = maps.getLocation(r, l);
+        if (!loc || !['Daggerfall', 'Wayrest', 'Sentinel'].includes(loc.name) || loc.mapTableData.locationType !== 0) continue;
+        const { width: w, height: h, blockNames } = loc.exterior.exteriorData;
+        const border = blockNames.filter((n, i) => { const x = i % w, y = (i - x) / w; return x === 0 || y === 0 || x === w - 1 || y === h - 1; });
+        assert.ok(border.every((n) => /^WALLAA\d\d\.RMB$/i.test(n)), `${loc.name}: its WALLAA ring kept`);
+        assert.equal(loc.outline, undefined, `${loc.name}: no outline`);
+        assert.equal(townWallCellsOf(loc), null, `${loc.name}: no wall of the port's`);
+        const clone = outlineTownLocation({ ...loc, mapTableData: { ...loc.mapTableData, mapId: 9_000_000 + seen.length } }, io);
+        assert.equal(clone.outline?.walled, true, `${loc.name}: a clone past the Bay walled on its outline`);
+        seen.push(loc.name);
+      }
+    }
+    assert.deepEqual(seen.sort(), ['Daggerfall', 'Sentinel', 'Wayrest']);
+  } finally {
+    bindWorldDataBlocks(null);
+  }
 });

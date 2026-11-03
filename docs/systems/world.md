@@ -56,8 +56,10 @@ Invariants:
 - Landforms are a pure function of world position, `WOODS.WLD` and the road network. There is no session seed. Two
   pixels that share an edge compute the same heights there.
 - At or under the beach knee (41.5) heights are Daggerfall Unity's unchanged, so coasts and water tiles do not move.
-- A location's rectangle is flattened to the pixel's mean (`blendLocationTerrain`). Capitals flatten through
-  `src/world/terrain/capitalRelief.js` and `capitalSea.js`.
+- A location of Daggerfall's own map has every ground tile of its grid stamped and its rectangle flattened to the
+  pixel's mean, as in Daggerfall Unity (`setLocationTiles`, `blendLocationTerrain`). A location the port makes past the
+  Bay (`isPortMadeLocation`) is stamped and flattened to its outline instead (`blendShapedTerrain`). Capitals flatten
+  through `src/world/terrain/capitalRelief.js` and `capitalSea.js`.
 
 ## Streaming
 
@@ -105,8 +107,8 @@ A location is assembled by `layoutLocation` (`src/world/locationLayout.js`), a p
 
 ### Town shapes
 
-Iliac Bay towns keep Daggerfall's grid and its own wall blocks (`WALLAA**`). Towns past the Bay get an outline and
-round walls of their own:
+Iliac Bay towns keep Daggerfall's grid, its own wall blocks (`WALLAA**`) and Daggerfall Unity's square town ground.
+Towns past the Bay get an outline, ground shaped to it, and round walls of their own:
 
 - `src/world/townShape.js` maps each block's AutoMap bytes to tiles (`townOccupancy`) and grows a noisy margin around the
   buildings (`townShapeField`, `TOWN_SHAPE`).

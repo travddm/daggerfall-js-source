@@ -1,17 +1,14 @@
-// TOWN-SHAPES: a town's ground is
+// TOWN-SHAPES: a town past the Bay's ground is
 // its own outline - every building's tile, its streets, a margin wandering on its own seed - stamped, flattened to its own
 // land and eased back to the land; the sea past its margin the sea's; the road's ring round the outline.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { townOccupancy, townShapeField, townShape, tileDistance, shapeWander, shapeFieldDistance, isWallBlock, TOWN_SHAPE } from '../../../src/world/townShape.js';
 import { locationShapeField, setLocationTiles, blendLocationTerrain, townGroundMask, unstampOffShape, townRoadRing, SHAPE_BLEND_TILES } from '../../../src/world/terrain/terrainTiles.js';
 import { HEIGHTMAP_DIMENSION, SCALED_OCEAN_ELEVATION, SCALED_BEACH_ELEVATION, MAX_TERRAIN_HEIGHT } from '../../../src/world/terrain/terrainSampler.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const ARENA2 = process.env.ARENA2_PATH;
-const skipReal = !ARENA2 || !existsSync(ARENA2) ? 'ARENA2_PATH not set or missing - real-data validation skipped' : false;
 const H = HEIGHTMAP_DIMENSION, D = 128;
 const land = (m) => Math.fround(m / MAX_TERRAIN_HEIGHT);
 
@@ -42,7 +39,8 @@ test('TOWN-SHAPES a block\'s town map read the right way up: its byte row r the 
   assert.equal(townOccupancy(1, 1, () => am, () => true).reduce((s, v) => s + v, 0), 0, 'a wall block takes none');
 });
 
-/** A grid of synthetic blocks: each its town-map bytes, its ground (all record 2), its misc records. */
+/** A town past the Bay (`country`: the only kind of location with an outline) on a grid of synthetic blocks: each its
+ *  town-map bytes, its ground (all record 2), its misc records. */
 function synthTown(w, h, built = () => true, misc = []) {
   const blocks = [];
   for (let by = 0; by < h; by++) for (let bx = 0; bx < w; bx++) {
@@ -51,7 +49,7 @@ function synthTown(w, h, built = () => true, misc = []) {
     const groundTiles = Array.from({ length: 16 }, () => Array.from({ length: 16 }, () => ({ textureRecord: 2, tileBitfield: 2 })));
     blocks.push({ rmbBlock: { fldHeader: { autoMapData: am, groundData: { groundTiles } }, misc3dObjectRecords: misc.filter((m) => m.bx === bx && m.by === by), miscFlatObjectRecords: [] } });
   }
-  const loc = { name: 'Synth', exterior: { exteriorData: { width: w, height: h, blockNames: blocks.map((_, i) => `S${i}.RMB`) } }, mapTableData: { mapId: 4242, locationType: 1 } };
+  const loc = { name: 'Synth', exterior: { exteriorData: { width: w, height: h, blockNames: blocks.map((_, i) => `S${i}.RMB`) } }, mapTableData: { mapId: 4242, locationType: 1 }, country: { type: 1 } };
   const maps = { getRmbBlockName: (l, bx, by) => `S${by * w + bx}.RMB` };
   const file = { checkName: (n) => n, getBlockIndex: (n) => Number(n.slice(1, -4)), getBlock: (i) => blocks[i] };
   return { loc, maps, file, blocks };
@@ -100,23 +98,3 @@ test('TOWN-SHAPES the ground: the outline flattened to the mean of the land unde
   assert.equal(blendLocationTerrain(plain, 0.25, { xMin: 40, xMax: 80, yMin: 40, yMax: 80 }), 0.25, 'no outline: DFU\'s blend, its average answered');
 });
 
-test('TOWN-SHAPES on the freeware: a hamlet\'s outline no rectangle; a coast town keeps its sea where DFU lifted it all; every Bay town\'s buildings inside its outline (real data)', { skip: skipReal }, async () => {
-  const { MapsFile, longitudeLatitudeToMapPixel } = await import('../../../src/formats/mapsFile.js');
-  const { WoodsFile } = await import('../../../src/formats/woodsFile.js');
-  const { BlocksFile } = await import('../../../src/formats/blocksFile.js');
-  const { generatePixelTerrain } = await import('../../../src/world/terrain/terrainGen.js');
-  const b = (f) => new Uint8Array(readFileSync(join(ARENA2, f)));
-  const maps = new MapsFile(); maps.load(b('MAPS.BSA'), b('CLIMATE.PAK'), b('POLITIC.PAK')); maps.autoDiscard = false;
-  const woods = new WoodsFile(); woods.load(b('WOODS.WLD'));
-  const blocks = new BlocksFile(); blocks.load(b('BLOCKS.BSA'));
-  const g = maps.getLocationByName('Daggerfall', 'Gothway Garden');
-  const gt = new Uint8Array(D * D), gr = setLocationTiles(g, maps, blocks, gt);
-  const starts = new Set();
-  for (let y = 0; y < D; y++) { let x = 0; while (x < D && !gr.shape[x + y * D]) x++; if (x < D) starts.add(x); }
-  assert.ok(starts.size >= 4, `its west edge wanders (${starts.size} different starts), no straight side`);
-  const a = maps.getLocationByName('Tigonus', 'Antelibuton'), p = longitudeLatitudeToMapPixel(a.mapTableData.longitude, a.mapTableData.latitude);
-  const tilemap = new Uint8Array(D * D), rect = setLocationTiles(a, maps, blocks, tilemap);
-  const t = generatePixelTerrain({ woods, px: p.x, py: p.y, tilemap, locationRect: rect, hasLocation: true, climateType: 0 });
-  const water = t.samples.filter((v) => v * MAX_TERRAIN_HEIGHT <= SCALED_OCEAN_ELEVATION + 1e-3).length;
-  assert.ok(water > 3000, `its sea stands (${water} samples; DFU's blend left about 240)`);
-});
