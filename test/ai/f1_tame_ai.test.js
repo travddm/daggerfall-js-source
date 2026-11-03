@@ -10,7 +10,13 @@ import { EnemyAI } from '../../src/characters/enemy/enemyMotor.js';
 import { EnemyAttack } from '../../src/characters/enemy/enemyAttack.js';
 import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
 import {
-  TACT, setTacticsClock, resetTactics, tokensOut, LOCAL_TARGET, isCoward, noteLocalPlayer,
+  TACT,
+  setTacticsClock,
+  resetTactics,
+  tokensOut,
+  LOCAL_TARGET,
+  isCoward,
+  noteLocalPlayer,
 } from '../../src/ai/tactics.js';
 import { BLOW, makeBlow, liveBlows, resetBlows } from '../../src/ai/foeBlows.js';
 import * as foeBlows from '../../src/ai/foeBlows.js';
@@ -20,7 +26,12 @@ import { signatureStamp, pyreSpell, SIG } from '../../src/systems/revenant/reven
 const DT = 1 / 60;
 let T = 0;
 setTacticsClock(() => T);
-beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', true); });
+beforeEach(() => {
+  resetTactics();
+  resetBlows();
+  T = 0;
+  setPref('enhancedAI', true);
+});
 
 function crowd(n, { r = 10, mobileType = MOBILE_TYPES.Orc, health = 50, level = 5 } = {}) {
   const c = new Collider(() => 0);
@@ -50,7 +61,15 @@ function run(foes, secs, { player = [0, 0, 0], each = null } = {}) {
 }
 
 test('F1: a humanoid coward near death runs; a beast, an undead and a daedra fight on', () => {
-  for (const [name, runs] of [['Thief', true], ['Mage', true], ['Rat', false], ['GrizzlyBear', false], ['SabertoothTiger', false], ['Zombie', false], ['FireDaedra', false]]) {
+  for (const [name, runs] of [
+    ['Thief', true],
+    ['Mage', true],
+    ['Rat', false],
+    ['GrizzlyBear', false],
+    ['SabertoothTiger', false],
+    ['Zombie', false],
+    ['FireDaedra', false],
+  ]) {
     resetTactics();
     const foes = crowd(1, { mobileType: MOBILE_TYPES[name] });
     run(foes, 2);
@@ -64,7 +83,11 @@ test('F1: a humanoid coward near death runs; a beast, an undead and a daedra fig
 test('F1: strike tokens still limit the foes that swing at once', () => {
   const foes = crowd(6, { r: 6 });
   let mostMelee = 0;
-  run(foes, 10, { each: () => { mostMelee = Math.max(mostMelee, tokensOut(LOCAL_TARGET, 'melee')); } });
+  run(foes, 10, {
+    each: () => {
+      mostMelee = Math.max(mostMelee, tokensOut(LOCAL_TARGET, 'melee'));
+    },
+  });
   assert.ok(mostMelee >= 1, 'somebody held a token');
   assert.ok(mostMelee <= TACT.MELEE_TOKENS, `${mostMelee} melee tokens out, at most ${TACT.MELEE_TOKENS}`);
   assert.ok(foes.filter((f) => f.swings > 0).length >= 3, 'and the foes took turns: each of several got to swing');
@@ -90,7 +113,8 @@ test('F1: a landed telegraphed blow leaves the formula roll alone, and the pyre 
   const ai = new EnemyAI(c, [0, 0, 8], Math.PI, { vitals: () => ent });
   const atk = new EnemyAttack({ liveSpeed: () => 50, playerLevel: () => 5, reflexes: 2 });
   const f = { ai, atk };
-  let blow = null, verdict = null;
+  let blow = null,
+    verdict = null;
   run([f], 60, {
     each: () => {
       if (!blow && ai._tac?.state === 'windup') blow = liveBlows().get(ai);
@@ -101,5 +125,8 @@ test('F1: a landed telegraphed blow leaves the formula roll alone, and the pyre 
   assert.equal(verdict, true, 'and it landed on the player standing in it');
   const [lo, hi] = SIG.PYRE_BASE;
   const effect = pyreSpell('Pyre', 4).effects[0];
-  assert.deepEqual([effect.magnitudeBaseLow, effect.magnitudeBaseHigh, effect.magnitudeLevelBase], [lo, hi, SIG.PYRE_PER]);
+  assert.deepEqual(
+    [effect.magnitudeBaseLow, effect.magnitudeBaseHigh, effect.magnitudeLevelBase],
+    [lo, hi, SIG.PYRE_PER],
+  );
 });
