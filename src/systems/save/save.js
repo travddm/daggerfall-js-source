@@ -101,9 +101,7 @@ const ENTITY_FIELDS = [
   // LEGACY-CHOICE: Project Legacy's answer, the same kind of fact - asked ONCE, at chargen, and the character's own: a
   // model, or no lineage (systems/legacy/family.js NO_LINEAGE), which keeps them out of the system for good. A save
   // written before it carries none, and reads as a character who was never asked.
-  'legacyChoice',
-  // CHARACTER MODES: the mode picked at chargen (net/modeLaw.js), the character's own and changed only by a drop
-  'characterMode',
+  'legacyChoice', 'characterMode',   // CHARACTER MODES: the mode picked at chargen (net/modeLaw.js), the character's own
   // AUDIT 17h F1: the six BIOGRAPHY modifiers, which DFU persists
   // one-for-one (SerializablePlayer.cs:136-141, :305-310). Without
   // them a load reset every biography answer's lasting effect.

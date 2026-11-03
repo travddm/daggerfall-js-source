@@ -187,7 +187,8 @@ character's beneficial spells have none on others (a gift is a trade by another 
 - **Abyss copies:** `sdCopyRight` (`server/src/sdCopy.js`) admits an Ironman owner alone and refuses an Ironman
   character entering another's copy.
 - **Raids, serpent, sieges, Royal Tourney, crew signs:** entry checks refuse an Ironman token (`md`), at the Worker as they
-  refuse a closed room today (`gateHolds`, `sdLiveAsk`). Gate rooms are shared, so an Ironman character enters a solo copy of the gate, as it does in the Abyss (decided; new content).
+  refuse a closed room today (`gateHolds`, `sdLiveAsk`). Gate rooms are shared, so an Ironman character enters a solo
+  copy of the gate, as it does in the Abyss (decided; new content).
 - **Peer effects:** peers' beneficial acts on an Ironman character are dropped at the receiver and by the relay where
   the act is routed; the exact `act` routing needs a read in PR 5.
 - Chat stays open; loneliness is not a goal.

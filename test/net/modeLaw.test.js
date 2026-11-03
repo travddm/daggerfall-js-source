@@ -1,9 +1,9 @@
-// CHARACTER MODES: the shared law (src/net/modeLaw.js) - the codes, the predicates and the drop table.
+// CHARACTER CHARACTER_MODES: the shared law (src/net/modeLaw.js) - the codes, the predicates and the drop table.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  MODES,
-  MODE_CODES,
+  CHARACTER_MODES,
+  CHARACTER_MODE_CODES,
   DEFAULT_MODE,
   isMode,
   codeOf,
@@ -20,14 +20,14 @@ import {
 
 test('the codes are one to one with the modes and the default is Classic', () => {
   assert.equal(DEFAULT_MODE, 'classic');
-  assert.deepEqual(Object.keys(MODE_CODES), [...MODES]);
-  assert.equal(new Set(Object.values(MODE_CODES)).size, MODES.length);
-  for (const m of MODES) assert.equal(modeOfCode(codeOf(m)), m);
+  assert.deepEqual(Object.keys(CHARACTER_MODE_CODES), [...CHARACTER_MODES]);
+  assert.equal(new Set(Object.values(CHARACTER_MODE_CODES)).size, CHARACTER_MODES.length);
+  for (const m of CHARACTER_MODES) assert.equal(modeOfCode(codeOf(m)), m);
 });
 
 test('a code outside the table is no mode, and an unknown mode reads as the default', () => {
   for (const bad of [-1, 5, 1.5, '1', null, NaN]) assert.equal(modeOfCode(bad), null);
-  assert.equal(codeOf('nonsense'), MODE_CODES.classic);
+  assert.equal(codeOf('nonsense'), CHARACTER_MODE_CODES.classic);
   assert.equal(isMode('toString'), false);
   assert.equal(modeClaimOk(undefined), true);
   assert.equal(modeClaimOk(4), true);
@@ -46,24 +46,24 @@ test('the death and Ironman switches make the five modes', () => {
 });
 
 test('a server offers the modes its profile names; Classic is always offered', () => {
-  assert.deepEqual(creatableModes(), [...MODES]);
+  assert.deepEqual(creatableModes(), [...CHARACTER_MODES]);
   assert.deepEqual(
     creatableModes({ legacy: false }),
-    MODES.filter((m) => m !== 'legacy'),
+    CHARACTER_MODES.filter((m) => m !== 'legacy'),
   );
   assert.deepEqual(
     creatableModes({ classic: false, hardcore: false }),
-    MODES.filter((m) => m !== 'hardcore'),
+    CHARACTER_MODES.filter((m) => m !== 'hardcore'),
   );
   assert.deepEqual(creatableModes(offeredFromList('classic,hardcore,bogus')), ['classic', 'hardcore']);
   assert.deepEqual(creatableModes(offeredFromList('hardcore')), ['classic', 'hardcore']);
   for (const none of [undefined, '', ' , ', 'bogus', 7])
-    assert.deepEqual(creatableModes(offeredFromList(none)), [...MODES], String(none));
+    assert.deepEqual(creatableModes(offeredFromList(none)), [...CHARACTER_MODES], String(none));
 });
 
 test('a mode is only loosened, never tightened', () => {
-  for (const from of MODES) {
-    for (const to of MODES) {
+  for (const from of CHARACTER_MODES) {
+    for (const to of CHARACTER_MODES) {
       if (!canDrop(from, to)) continue;
       assert.ok(!(!permadeath(from) && permadeath(to)), `${from} -> ${to} adds permadeath`);
       assert.ok(!(!ironman(from) && ironman(to)), `${from} -> ${to} adds Ironman`);
@@ -86,5 +86,5 @@ test('the drop table', () => {
 });
 
 test('a dead character changes nothing', () => {
-  for (const from of MODES) assert.deepEqual(dropsFrom(from, { dead: true }), []);
+  for (const from of CHARACTER_MODES) assert.deepEqual(dropsFrom(from, { dead: true }), []);
 });

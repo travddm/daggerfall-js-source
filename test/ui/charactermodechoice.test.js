@@ -1,16 +1,16 @@
-// CHARACTER MODES: the mode question (ui/characterModeChoice.js) - the five answers with their pros and cons, Classic
+// CHARACTER CHARACTER_MODES: the mode question (ui/characterModeChoice.js) - the five answers with their pros and cons, Classic
 // first, the Legacy answer only while Project Legacy's master switch is on, and a compact screen that fits the 200.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { characterModeOptions, characterModeScreen, MODE_TAGS } from '../../src/ui/characterModeChoice.js';
 import { choiceHeight, choiceAtNative, CHOICE_COMPACT_TOP, CHOICE_COMPACT_GAP } from '../../src/ui/choiceScreen.js';
-import { MODES } from '../../src/net/modeLaw.js';
+import { CHARACTER_MODES } from '../../src/net/modeLaw.js';
 
 test('five answers, Classic first and recommended, each with a pro and a con', () => {
   const options = characterModeOptions({ offered: {} });
   assert.deepEqual(
     options.map((o) => o.id),
-    [...MODES],
+    [...CHARACTER_MODES],
   );
   assert.match(options[0].title, /recommended/i);
   for (const o of options) {
@@ -23,7 +23,7 @@ test('five answers, Classic first and recommended, each with a pro and a con', (
 test('the Legacy answer is offered only while the master switch is on', () => {
   assert.deepEqual(
     characterModeOptions({ offered: { legacy: false } }).map((o) => o.id),
-    MODES.filter((m) => m !== 'legacy'),
+    CHARACTER_MODES.filter((m) => m !== 'legacy'),
   );
 });
 

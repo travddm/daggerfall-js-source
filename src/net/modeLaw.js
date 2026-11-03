@@ -1,5 +1,5 @@
 // @ts-check
-// CHARACTER MODES: the law both ends share (docs/systems/character-modes.md). A character picks one mode at creation.
+// CHARACTER CHARACTER_MODES: the law both ends share (docs/systems/character-modes.md). A character picks one mode at creation.
 // A mode is two switches: how death works (`classic`, `hardcore`, `legacy`) and whether the character is Ironman (no
 // player trade, no groups). The account service stores the mode on the realm character, signs its code into the
 // identity token (`md`), and the relay reads it from there; a client field is never read for enforcement.
@@ -7,24 +7,35 @@
 // PURE: no DOM, no storage, no clock. The relay bundles this file, so it imports nothing.
 
 /** Every mode, in the order the picker lists them. */
-export const MODES = Object.freeze(['classic', 'hardcore', 'legacy', 'ironman', 'hardcore_ironman']);
+export const CHARACTER_MODES = Object.freeze(['classic', 'hardcore', 'legacy', 'ironman', 'hardcore_ironman']);
 
 /** The mode of a character that was never asked: DFU's rules. */
 export const DEFAULT_MODE = 'classic';
 
 /** The token's `md` codes. Fixed once shipped: a code is never reused for another mode. */
-export const MODE_CODES = Object.freeze({ classic: 0, hardcore: 1, legacy: 2, ironman: 3, hardcore_ironman: 4 });
+export const CHARACTER_MODE_CODES = Object.freeze({
+  classic: 0,
+  hardcore: 1,
+  legacy: 2,
+  ironman: 3,
+  hardcore_ironman: 4,
+});
 
 /** @param {unknown} m */
-export const isMode = (m) => typeof m === 'string' && Object.hasOwn(MODE_CODES, m);
+export const isMode = (m) => typeof m === 'string' && Object.hasOwn(CHARACTER_MODE_CODES, m);
 
 /** The token code of a mode. */
 export const codeOf = (/** @type {string} */ m) =>
-  isMode(m) ? MODE_CODES[/** @type {keyof typeof MODE_CODES} */ (m)] : MODE_CODES[DEFAULT_MODE];
+  isMode(m)
+    ? CHARACTER_MODE_CODES[/** @type {keyof typeof CHARACTER_MODE_CODES} */ (m)]
+    : CHARACTER_MODE_CODES[DEFAULT_MODE];
 
 /** A token's `md` claim read back: the mode, or null for a value outside the codes. */
 export function modeOfCode(/** @type {unknown} */ md) {
-  return MODES.find((m) => MODE_CODES[/** @type {keyof typeof MODE_CODES} */ (m)] === md) ?? null;
+  return (
+    CHARACTER_MODES.find((m) => CHARACTER_MODE_CODES[/** @type {keyof typeof CHARACTER_MODE_CODES} */ (m)] === md) ??
+    null
+  );
 }
 
 /** Whether a token may carry this `md`: absent, or a whole code of a mode. */
@@ -42,7 +53,7 @@ export const legacy = (/** @type {unknown} */ m) => m === 'legacy';
 /** The modes a server offers, as `{ hardcore: false }` says it: a mode is offered unless named false. Classic is always
  *  offered (it is DFU's rule). Project Legacy's master switch is the `legacy` entry. */
 export const creatableModes = (/** @type {Record<string, boolean>} */ offered = {}) =>
-  MODES.filter((m) => m === DEFAULT_MODE || offered[m] !== false);
+  CHARACTER_MODES.filter((m) => m === DEFAULT_MODE || offered[m] !== false);
 
 /** A server profile's list of offered modes, `MODES_OFFERED` (comma separated, e.g. `classic,hardcore,ironman`), read as an
  *  `offered` table. Absent or empty offers every mode. A name that is no mode is ignored. */
@@ -54,7 +65,7 @@ export function offeredFromList(/** @type {unknown} */ text) {
           .map((s) => s.trim())
           .filter(isMode)
       : [];
-  return Object.fromEntries(MODES.map((m) => [m, named.length === 0 || named.includes(m)]));
+  return Object.fromEntries(CHARACTER_MODES.map((m) => [m, named.length === 0 || named.includes(m)]));
 }
 
 /**
@@ -77,4 +88,17 @@ const DROPS = Object.freeze({
 
 /** The modes a character may drop to now. */
 export const dropsFrom = (/** @type {unknown} */ from, /** @type {{ dead?: boolean }} */ at = {}) =>
-  MODES.filter((to) => canDrop(from, to, at));
+  CHARACTER_MODES.filter((to) => canDrop(from, to, at));
+
+/** A token's mode claims, whole: `md` only beside a realm character (`rc` 1) and only a non-Classic code of the table. */
+export const modeClaimsOk = (/** @type {any} */ c) =>
+  c?.md === undefined || (c.rc === 1 && c.md !== 0 && modeOfCode(c.md) !== null);
+
+/** The token code the mint signs for a character's mode: none for Classic (the bytes as before) or a value that is no mode. */
+export const tokenCodeOf = (/** @type {unknown} */ m) =>
+  isMode(m) && m !== DEFAULT_MODE ? codeOf(/** @type {string} */ (m)) : null;
+
+/** The mode a create request means: the one it names, else the build from before the modes - a line's birth is the
+ *  Legacy mode, any other Classic. The caller still checks it with `isMode`. */
+export const modeOfRequest = (/** @type {unknown} */ named, /** @type {boolean} */ born) =>
+  named == null ? (born ? 'legacy' : DEFAULT_MODE) : named;

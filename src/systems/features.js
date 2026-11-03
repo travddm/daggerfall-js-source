@@ -190,8 +190,7 @@ export const MOD_CURATED = Object.freeze({
   'world-tooltips': Object.freeze(['HideDefaultInteractTooltip']),
   // LEGACY1: the mod's three Family dials and the port's own Legacy ones - all a player's choice (LEGACY-HOME: the
   // family in the world, Mac's "can be toggled off").
-  'character-modes': Object.freeze(['Modes.Hardcore', 'Modes.Ironman', 'Modes.Hardcore Ironman']),
-  'project-legacy': Object.freeze(['Family.Descendants', 'Family.Max Siblings', 'Family.Siblings Probability', 'Legacy.Model', 'Legacy.Toll', 'Legacy.Heirloom Chance', 'Legacy.Family In World']),
+  'character-modes': Object.freeze(['Modes.Hardcore', 'Modes.Ironman', 'Modes.Hardcore Ironman']), 'project-legacy': Object.freeze(['Family.Descendants', 'Family.Max Siblings', 'Family.Siblings Probability', 'Legacy.Model', 'Legacy.Toll', 'Legacy.Heirloom Chance', 'Legacy.Family In World']),
   'weapon-widget': Object.freeze(['Swings.Speed', 'Bob.Length', 'Inertia.Scale']),
   // SW1: the three a player reaches for first - how big the shield sits,
   // where it sits, and what it does when the weapon comes out.
@@ -1344,11 +1343,9 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'mwModelDetail', initial: 'pixel', online: 'player', tiers: Object.freeze([tier('pixel', () => t('features.mwModelDetail.pixel', 'Pixelated')), tier('sharp', () => t('features.mwModelDetail.sharp', 'Sharp'))]) }),
   }),
-  // CHARACTER MODES: which modes a new character may pick - a character's mode is fixed at creation.
   modFeature('character-modes', () => t('features.mod.characterModes.effect', 'Takes effect for the next character you create.'), 'character'),
-  // LEGACY1: PROJECT LEGACY - Mac's own mod. A family is founded around
-  // the character played when the mod is on (at creation, or at the first load of a character made before it), and its
-  // model is the family's for good - so the switch lands at once for the tree and the key, and a family keeps its model.
+  // CHARACTER MODES (the row above): which modes a new character may pick. LEGACY1: PROJECT LEGACY - Mac's own mod. A family is founded around the
+  // character played when the mod is on (at creation, or at the first load of one made before it); its model is the family's for good.
   modFeature('project-legacy', () => t('features.mod.projectLegacy.effect', 'Takes effect at once; a family keeps the model it was founded with.'), 'character'),
   // FT10: DFU'S OWN DUNGEON ENHANCEMENTS - three of the
   // Enhancements section's switches, each read by the port at the point
