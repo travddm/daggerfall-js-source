@@ -32,10 +32,10 @@ clock, and gets numbers or events back. Keep it that way; the tests depend on it
 - **Only the streaming world has a sea.** Interiors and dungeons (`src/scenes/worldModes.js`,
   `src/scenes/dungeonContext.js`) have none, and every transition, teleport and load empties the sea. The `?exterior`
   bench (`src/scenes/exterior.js`) has no Come Sail Away runtime and therefore no sea fight.
-- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; forced off online) plus the
-  drawer prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`, `naval-handling`
-  (`responsive` or `classic`) and `naval-auto-repair`. `navalOn()` in `world.js` needs both the Come Sail Away runtime
-  and the `naval` pref. With Come Sail Away off there is no sea fight.
+- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; forced off online)
+  plus the drawer prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`,
+  `naval-handling` (`responsive` or `classic`) and `naval-auto-repair`. `navalOn()` in `world.js` needs both the Come
+  Sail Away runtime and the `naval` pref. With Come Sail Away off there is no sea fight.
 
 ## Boats and sailing (Come Sail Away)
 
