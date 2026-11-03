@@ -228,6 +228,8 @@ PROFESSIONS_OPEN = "on"
 # Shipped at "dev": the developers witness the seats, see the map's rings and the arrival lines first; opened to
 # everyone by this one line.
 SEATS_OPEN = "on"
+# PROFESSION-CAPS: the day's bound on a profession track (src/net/profCapLaw.js PROF_DAY_CAP). "off" lifts it.
+PROF_DAY_CAPS = "on"
 # CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the Admins alone)
 # or "on". Shipped at "dev": the developers' realm characters keep their guild standing on the service first; everyone
 # else's stays the save's, as before CHAP1, until this line says "on". CHAP2a: and the halls' witness, a hall writ's

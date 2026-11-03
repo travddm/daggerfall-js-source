@@ -146,7 +146,7 @@
     "server-account/src/index.js::Async method 'route'#0": 1792,
     "server-account/src/market.js::Async function 'marketBuy'#0": 194,
     "server-account/src/market.js::Async function 'marketRead'#0": 243,
-    "server-account/src/professions.js::Async function 'harvestNode'#0": 286,
+    "server-account/src/professions.js::Async function 'harvestNode'#0": 285,
     "server-account/src/seatTurning.js::Async function 'settleWeek'#0": 369,
     "server-account/src/staffCases.js::Async function 'staffCases'#0": 164,
     "server-account/src/staffDesk.js::Async function 'staffDesk'#0": 203,

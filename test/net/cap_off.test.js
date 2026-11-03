@@ -1,3 +1,4 @@
+// PROFESSION-CAPS: the service here runs with PROF_DAY_CAPS off (src/net/profCapLaw.js), the operator's switch for no cap; test/net/profcaps_service.test.js pins the caps on.
 // CAP-OFF. A gathering profession gave a character 60 harvests a
 // UTC day (the Basket's among Herbalism's) and an account 120 in a craft (AUDIT 29 A3); Fishing 40 hauls an account;
 // Hunting 30 hides. Past them the service refused (`prof-cap`, `prof-account-cap`, `prof-fish-cap`, `prof-hunt-cap`), the
@@ -55,9 +56,10 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
   const realNow = Date.now;
   Date.now = () => NOON * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', PROF_DAY_CAPS: 'off' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
+    s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
     const day = utcDay(NOON);
     const at = NOON - 2;
     /** `n` rows of `profession` today on the account's character `char`, as a harvest writes them. */

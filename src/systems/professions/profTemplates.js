@@ -47,7 +47,7 @@
 // ═══════════════════════════════════════════════════════════════════
 import { registerCustomTemplates, registerKitDye, registerCustomItemsForGroup } from '../item/itemTemplates.js';
 import { DYE_COLORS } from '../../characters/dyes.js';
-import { ORES, INGOTS, STONES, TIER_VALUES, WOOD_TEMPLATES, HIDE_TEMPLATES, SKINNING_KNIFE, SIEGE_GEM, MASONRY_TEMPLATES, ICON_LODESTONE, ESSENCE_TEMPLATES } from '../../net/professionLaw.js';   // PROF11: Mortar; PROF12: Arcane Essence
+import { ORES, INGOTS, STONES, WOOD_TEMPLATES, HIDE_TEMPLATES, SKINNING_KNIFE, SIEGE_GEM, MASONRY_TEMPLATES, ICON_LODESTONE, ESSENCE_TEMPLATES } from '../../net/professionLaw.js';   // PROF11: Mortar; PROF12: Arcane Essence
 import { REPAIR_KIT_TEMPLATE, STONE_DECOR, DISHES } from '../../net/recipeLaw.js';   // PROF11: the Sculptor's four; PROF9: the dishes
 import { SURVIVAL_TEMPLATES } from '../survival/items.js';   // PROF9: C&C's food rows the dishes stand on
 import { TEMPLATE as CC, FOOD, registerFoods } from '../survival/food.js';
@@ -60,10 +60,12 @@ import { TROPHY_ROW } from '../../net/trophyLaw.js';   // HUNTERS-MARK: the Moun
 export const PROF_ITEM_GROUP = 'UselessItems2';
 /** Weights (kg): an ore as DFU's Iron (0.5), an ingot twice it, stone a heavy lump. */
 const WEIGHT = Object.freeze({ ore: 0.5, ingot: 1, 'stone:rough': 3, 'stone:cut': 2.5 });
-/** A gold price in DFU's metals' scale (Iron 6, Platinum 30): 8 x the tier's Marks value, an ingot two and a half
- *  times its ore's; stone the cheapest thing in a pack. */
+/** A tier's gold price on DFU's own ingredient scale: its metals' prices by tier - Iron 6, Brass 8, Silver 12, Gold 20,
+ *  Platinum 30 (itemTemplatesData, MetalIngredients) - the same step again for the two tiers past Platinum. */
+export const DFU_TIER_PRICE = Object.freeze([6, 8, 12, 20, 30, 45, 60]);
+/** An ore's gold price: its tier's, an ingot two and a half times its ore's; stone the cheapest thing in a pack. */
 const priceOf = (m) => (m.key === 'stone:rough' ? 2 : m.key === 'stone:cut' ? 5
-  : Math.round(8 * TIER_VALUES[m.tier - 1] * (m.key.startsWith('ingot:') ? 2.5 : 1)));
+  : Math.round(DFU_TIER_PRICE[m.tier - 1] * (m.key.startsWith('ingot:') ? 2.5 : 1)));
 const weightOf = (m) => WEIGHT[m.key] ?? (m.key.startsWith('ingot:') ? WEIGHT.ingot : WEIGHT.ore);
 
 /** Every row, in DFU's columns and the port's two (`stackable`, `iconDye`). */
@@ -96,7 +98,7 @@ registerCustomTemplates(MINING_TEMPLATE_ROWS);
 const WOOD_WEIGHT = Object.freeze({ log: 2, plank: 1, 'wood:charcoal': 0.5, 'wood:resin': 0.25, 'wood:heartwood': 1 });
 const woodWeight = (m) => WOOD_WEIGHT[m.key] ?? WOOD_WEIGHT[m.key.slice(0, m.key.indexOf(':'))] ?? 1;
 /** A gold price in the metals' scale: 8 x the tier's Marks value, a plank half again a log's (it was sawn). */
-const woodPrice = (m) => Math.round(8 * TIER_VALUES[m.tier - 1] * (m.key.startsWith('plank:') ? 1.5 : 1));
+const woodPrice = (m) => Math.round(DFU_TIER_PRICE[m.tier - 1] * (m.key.startsWith('plank:') ? 1.5 : 1));
 /** The logs, planks, Charcoal, Resin and Heartwood - the rows the law names, on DFU's own pictures (a plank the Staff's,
  *  dyed as DFU dyes an Iron Staff: its `iconDye`), stacking, never shelved. */
 export const WOOD_TEMPLATE_ROWS = Object.freeze(WOOD_TEMPLATES.map((m) => Object.freeze({
@@ -129,7 +131,7 @@ registerKitDye(kitDye);
 const hideWeight = (m) => (m.key === 'hide:spider' || m.key === 'hide:harpy' ? 0.25 : m.key.startsWith('cloth:') ? 0.5 : 1);
 /** A gold price in the metals' scale: 8 x the tier's Marks value, half again a leather's (it was cured) and a Silk
  *  Bolt's (it was woven). */
-const hidePrice = (m) => Math.round(8 * TIER_VALUES[m.tier - 1] * (m.key.startsWith('leather:') || m.key === 'cloth:silk' ? 1.5 : 1));
+const hidePrice = (m) => Math.round(DFU_TIER_PRICE[m.tier - 1] * (m.key.startsWith('leather:') || m.key === 'cloth:silk' ? 1.5 : 1));
 /** The hides, leathers and cloth - the rows the law names, on the DFU pictures it borrows (professionLaw ICON_HAIR and
  *  its kin), stacking, never shelved. */
 export const HIDE_TEMPLATE_ROWS = Object.freeze(HIDE_TEMPLATES.map((m) => Object.freeze({
@@ -168,7 +170,7 @@ registerCustomTemplates(MASONRY_TEMPLATE_ROWS);
  *  32 gold), on Ectoplasm's picture undyed (professionLaw ARCANE_ESSENCE), stacking, never shelved - the Stores its one
  *  door, as every row here. */
 export const ESSENCE_TEMPLATE_ROWS = Object.freeze(ESSENCE_TEMPLATES.map((m) => Object.freeze({
-  index: m.templateIndex, name: m.name, baseWeight: 0.1, hitPoints: 50, capacityOrTarget: 0, basePrice: 8 * TIER_VALUES[m.tier - 1],
+  index: m.templateIndex, name: m.name, baseWeight: 0.1, hitPoints: 50, capacityOrTarget: 0, basePrice: DFU_TIER_PRICE[m.tier - 1],
   enchantmentPoints: 0, rarity: 10, variants: 0, drawOrderOrEffect: 0, isBluntWeapon: false, isLiquid: false,
   isOneHanded: false, isIngredient: false, worldTextureArchive: m.icon[0], worldTextureRecord: m.icon[1],
   playerTextureArchive: 0, playerTextureRecord: 0, stackable: true,
