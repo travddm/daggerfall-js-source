@@ -252,25 +252,25 @@ test('BOW-CLOCK: the real arm - shotBusy through the bow coming up and the draw,
   assert.equal(arm.shotBusy(), false, 'a sheathed arm holds no shot up');
   arm.setSheathed(false);
   arm.update(0.01);
-  assert.equal(arm.status().upper, UPPER_BODY.Equipping);
+  assert.equal(arm.status().upper, UPPER_BODY.Drawing);
   assert.equal(arm.shotBusy(), true, 'the bow coming up cannot draw yet');
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   assert.equal(arm.shotBusy(), false, 'the bow up and idle can');
   assert.equal(arm.attack('StrikeDown'), 'shoot');
   assert.equal(arm.shotBusy(), true, 'drawing');
   // shoot start 5.8 -> shoot max attack 6.2 -> shoot release 6.4: busy every frame until the release, and not after
   let busyFrames = 0;
-  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.AttackEnd; i++) {
+  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.Recovering; i++) {
     if (arm.shotBusy()) busyFrames++;
     arm.update(0.05);
   }
-  assert.equal(arm.status().upper, UPPER_BODY.AttackEnd, 'the arrow loosed');
+  assert.equal(arm.status().upper, UPPER_BODY.Recovering, 'the arrow loosed');
   assert.ok(busyFrames >= 10, `busy through the draw and the release (${busyFrames} frames of 0.05s)`);
   assert.equal(arm.shotBusy(), false, 'past "shoot release" the follow-through takes the next draw');
   // the rig never asked for this release (its arrow already went at the ceiling): it is LEFT OVER
-  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   assert.equal(arm.attack('StrikeDown'), 'shoot', 'the next draw');
   assert.equal(arm.takeShootRelease(), false, 'and the last draw\'s release is not its own');
   for (let i = 0; i < 40 && !arm.takeShootRelease(); i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.AttackEnd, 'its own comes at its own "shoot release"');
+  assert.equal(arm.status().upper, UPPER_BODY.Recovering, 'its own comes at its own "shoot release"');
 });
