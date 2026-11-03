@@ -1,11 +1,11 @@
 // Shared harness of the end-to-end probes (docs/testing/game-probes.md): one Vite server per plugin set, one
 // browser, and a Game per probe that reads state through the `?shot` hooks and fails on any console error that
 // ALLOWED_ERRORS does not name.
-import { createServer } from 'vite';
+import { createServer, preview } from 'vite';
 import { chromium } from 'playwright';
 import { fileURLToPath } from 'node:url';
 import { mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { ALLOWED_ERRORS } from './allowedErrors.mjs';
 import { fakePointerLock } from './fakePointerLock.mjs';
 
@@ -21,8 +21,24 @@ const VIEWPORT = { width: Number(process.env.PROBE_W || 640), height: Number(pro
 
 const SWIFTSHADER_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
-/** Starts a Vite dev server on `port`. HMR and the watcher are off: a reload under a probe destroys its page. */
+/**
+ * Starts a server on `port`. PROBE_DIST (a folder from tools/probes/build.mjs) serves the built game with `vite preview`;
+ * a dev server transforms thousands of modules on first load, in every run, and that is minutes on CI. A probe that
+ * passes `plugins` (edits to the source) needs the dev server and gets it whatever PROBE_DIST says.
+ * HMR and the watcher are off on the dev server: a reload under a probe destroys its page.
+ */
 export async function serve({ port, plugins = [] }) {
+  const dist = process.env.PROBE_DIST;
+  if (dist && !plugins.length) {
+    const server = await preview({
+      root: ROOT,
+      configFile: join(ROOT, 'vite.config.js'),
+      build: { outDir: resolve(dist) },
+      preview: { port, strictPort: true, host: 'localhost' },
+      logLevel: 'error',
+    });
+    return { base: `http://localhost:${port}`, close: () => server.close() };
+  }
   const server = await createServer({
     root: ROOT,
     configFile: join(ROOT, 'vite.config.js'),

@@ -28,6 +28,10 @@ npm run probes -- save pause     # the named probes
   Playwright's Chromium runs on SwiftShader, which is what CI uses and is several times slower.
 - `PROBE_SOFTGL=1` with `PW_CHANNEL` renders on SwiftShader through the installed browser: it reproduces CI's speed.
   The window is 640x400 (`PROBE_W`, `PROBE_H`): software GL costs by the pixel.
+- `PROBE_DIST=<folder>` serves a built game (`vite preview`) instead of a dev server. Build it once with
+  `node tools/probes/build.mjs [outDir]` (default `scratch/probe-dist`; run `sh tools/fetch-vendor.sh` first). A dev
+  server transforms every module on its first request, in every run; a built game is a few chunks. A probe that edits
+  the source in memory (`online`) keeps the dev server.
 - `online` needs the relay's tools: `npm ci --prefix server`. It uses ports 8872 and 8873 (`PROBE_SVC_PORT`).
 - `PROBE_PORT` moves the first Vite port (default 5260). `SHOT_DIR` sets where screenshots go (default
   `scratch/probe-shots/`, ignored by git).
@@ -63,7 +67,7 @@ boot, and two read hooks. The repository is not changed. Every other probe runs 
 
 `.github/workflows/probes.yml` runs on pull requests that touch `src/`, `server/`, `server-account/` or the probes, one
 runner per probe, so the slowest probe (`online`) sets the wall time. It is not part of the `check` job. ARENA2 is
-downloaded once and cached.
+downloaded once and cached. A `build` job builds the game once and the probes download it (`PROBE_DIST`).
 
 To tell a flaky probe from a real fault, run one probe many times on CI (each run is its own runner):
 

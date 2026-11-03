@@ -64,8 +64,46 @@ jobs:
           fi
           echo "matrix={\"include\":[${include%,}]}" >> "$GITHUB_OUTPUT"
 
+  # The game is built once and every probe serves the build with `vite preview` (tools/probes/build.mjs). A dev server
+  # transformed thousands of modules on each probe's first page load; that was 5 to 9 minutes for each start of the
+  # game world. The online probe edits the source in memory and keeps the dev server, so it ignores the build.
+  build:
+    name: build
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cached dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
+      - name: Build the game
+        run: node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist"
+      # One archive: the build is 30,000 small files, which the artifact service handles slowly one by one
+      - name: Pack the build
+        run: tar -czf "$RUNNER_TEMP/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-dist
+          path: ${{ runner.temp }}/probe-dist.tgz
+          compression-level: 0
+          retention-days: 1
+
   probe:
-    needs: plan
+    needs: [plan, build]
     name: "probe ${{ matrix.probe }}${{ matrix.run > 0 && format(' #{0}', matrix.run) || '' }}"
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 40
@@ -121,8 +159,20 @@ jobs:
           else
             sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
           fi
+      - name: Download the build
+        if: matrix.probe != 'online'
+        uses: actions/download-artifact@v4
+        with:
+          name: probe-dist
+          path: ${{ runner.temp }}/probe-dist-pack
+      - name: Unpack the build
+        if: matrix.probe != 'online'
+        run: |
+          mkdir -p "$RUNNER_TEMP/probe-dist"
+          tar -xzf "$RUNNER_TEMP/probe-dist-pack/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist"
       - name: Probe ${{ matrix.probe }}
         env:
+          PROBE_DIST: ${{ matrix.probe != 'online' && format('{0}/probe-dist', runner.temp) || '' }}
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots
         run: npm run probes -- ${{ matrix.probe }}
