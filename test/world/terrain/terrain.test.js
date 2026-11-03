@@ -261,15 +261,13 @@ test('terrain: Daggerfall city on terrain - integration pins', { skip: skipReal 
 
   const tilemap = new Uint8Array(128 * 128);
   const rect = setLocationTiles(loc, maps, blocks, tilemap);
-  // hold the city square until they follow it)
-  assert.deepEqual({ xMin: rect.xMin, xMax: rect.xMax, yMin: rect.yMin, yMax: rect.yMax }, { xMin: 11, xMax: 116, yMin: 11, yMax: 116 });
-  assert.equal(rect.shape.filter((v) => v).length, 12214, 'the city within its walls and its margin');
+  assert.deepEqual(rect, { xMin: 11, xMax: 116, yMin: 11, yMax: 116 });
   let stamped = 0;
   for (const t of tilemap) if (t) stamped++;
   assert.equal(stamped, 9989);
 
-  approx(blendLocationTerrain(samples, avg, rect), 0.166139, 1e-6);
-  approx(samples[64 * 129 + 64], 0.166139, 1e-6); // flattened
+  blendLocationTerrain(samples, avg, rect);
+  approx(samples[64 * 129 + 64], 0.166147, 1e-6); // flattened
   approx(samples[0], 0.161704, 1e-6); // corner untouched
 
   const tileData = generateTileData(samples, 207, 213);
@@ -332,7 +330,7 @@ test('terrain: full location corpus - all 15251 stamp clean, rects stay interior
     }
   }
   assert.equal(locations, 15251);
-  assert.equal(stampedTotal, 9252505);
+  assert.equal(stampedTotal, 9565908);
   // Corpus invariant: every clearance rect stays interior to the pixel -
   // blend divisors (1/xMin, 1/(1-xMax), ...) are finite game-wide, so the
   // blend never produces NaN heights (verified with a full stamp + blend
@@ -446,13 +444,11 @@ test('terrain: nature on Daggerfall environs - integration pins', { skip: skipRe
   // (TERRAIN-SCALE1); the prefab's 1.5 put them at 372.938 and 373.096.
 
   // City pixel: the expanded rect suppresses most of the pixel.
-  // four tiles past it - the city's ground runs out past its walls nearly to the pixel's edge, so the band DFU's rect left
-  // the woods (seven tiles each side) is the town's but for its outer tiles: 1237 flats -> 808, the first DFU's own
   const city = run(207, 213, true);
-  assert.equal(city.length, 808);
+  assert.equal(city.length, 1237);
   assert.equal(city[0].record, 16);
   approx(city[0].x, 6.4, 1e-6);
-  approx(city[0].y, 310.785, 1e-3);
+  approx(city[0].y, 310.781, 1e-3);
   approx(city[0].z, 0, 1e-6);
 
   // Wilderness neighbor: dense woodland scatter.

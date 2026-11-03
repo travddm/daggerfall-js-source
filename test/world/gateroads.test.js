@@ -257,7 +257,7 @@ test('GATE-ROADS a wall on its outline hands its gates\' openings as it stands t
 // ── WITH ARENA2: the freeware's cities ──────────────────────────
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['BLOCKS.BSA', 'MAPS.BSA', 'WOODS.WLD'].every((f) => existsSync(join(ARENA2, f)));
-test('GATE-ROADS with ARENA2: online the Bay\'s walled cities keep Beautiful Cities\' rings - every sixth one\'s every gate joined to the painter\'s roads where a third were; past the Bay every sixth city\'s every gate on the road; the gate model\'s floor its opening (mutants: the roads never laid; the slide unread)', { skip: HAVE ? false : 'ARENA2_PATH not set', timeout: 900_000 }, async () => {
+test('GATE-ROADS with ARENA2: online the Bay\'s walled cities keep Beautiful Cities\' rings - every sixth one\'s every gate on the painter\'s roads, with the gate roads and without; past the Bay every sixth city\'s every gate on the road; the gate model\'s floor its opening (mutants: the roads never laid; the slide unread)', { skip: HAVE ? false : 'ARENA2_PATH not set', timeout: 900_000 }, async () => {
   // the gate model's opening (GATE_OPENING): its floor face, every point at the ground, x -8.05 to 1.68 m of its frame
   const { Arch3dFile } = await import('../../src/formats/arch3dFile.js');
   const arch = new Arch3dFile(); arch.load(new Uint8Array(readFileSync(join(ARENA2, 'ARCH3D.BSA'))));
@@ -295,7 +295,8 @@ test('GATE-ROADS with ARENA2: online the Bay\'s walled cities keep Beautiful Cit
   // the Bay as online stands it: Beautiful Cities' rings kept, their gates the mod's
   const bay = sw.rows.filter((l) => l.exterior?.exteriorData?.blockNames?.some((x) => /^WALLAA/.test(x))).filter((_, k) => k % 6 === 0);
   const b = tally(bay, () => [roadsB, tracksB]);
-  assert.ok(b.gates > 250 && b.after === b.gates && b.before / b.gates < 0.4, `the Bay's gates on the road: ${b.before} of ${b.gates} before, ${b.after} now`);
+  // on DFU's square town ground the painter's roads already reach every gate, and the gate roads keep them there
+  assert.ok(b.gates > 250 && b.after === b.gates && b.before === b.gates, `the Bay's gates on the road: ${b.before} of ${b.gates} before, ${b.after} now`);
   // past the Bay: every sixth city template, walled on its outline, a road every way
   setTownWallPaths(() => ({ roads: ROADS_EVERY_WAY, tracks: 0, curved: false }));
   try {
