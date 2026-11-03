@@ -6,6 +6,9 @@
 // thousands of them: each start of the game world cost minutes on CI. A built game is a few chunks. The probes serve
 // it with `vite preview` when PROBE_DIST names the folder (lib/harness.mjs).
 //
+// The build is not minified: probes read window hooks that answer a class's name (`__overlayKind`: Inventory, Tavern,
+// Rest), and a minifier renames the classes. Nothing a player gets changes: this build is never deployed.
+//
 // It runs `vite build` without the `prebuild` hook: buildTag.mjs rewrites a tracked file, and the probes do not read
 // the build tag. Run `sh tools/fetch-vendor.sh` first, as the deploy does.
 import fs from 'node:fs';
@@ -38,7 +41,7 @@ const { build } = await import('vite');
 await build({
   root: ROOT,
   configFile: join(ROOT, 'vite.config.js'),
-  build: { outDir, emptyOutDir: true },
+  build: { outDir, emptyOutDir: true, minify: false },
   logLevel: 'warn',
 });
 console.log(`built the game into ${outDir} in ${Math.round((Date.now() - t0) / 1000)}s`);
