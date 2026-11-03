@@ -6,6 +6,10 @@ The docs are in `docs/`. Start at `docs/README.md`, and read `docs/architecture/
   when it is a written, agreed design that is better for play. Name each departure where you make it, and say which of
   the two it is. A departure that makes play or progression feel worse than DFU is a defect: revert it
   (`docs/README.md`, "Scope").
+- **Every departure is a mod**: content or behaviour that differs from DFU ships as a mod, every tuning value that
+  differs from DFU is a player setting with DFU's value selectable, and a server pins a curated mod list and settings
+  that every player uses; only purely cosmetic mods and settings are left free (`docs/README.md`, "Every departure is
+  a mod").
 - **Coding standards**: naming, tests, TypeScript, formatting and the changed-files checks are in
   `docs/coding-standards.md`. They apply to new and touched files only. New files are `.ts`; run `npm run format:fix`,
   `npm run markdown` and `npm run spell` on what you changed.

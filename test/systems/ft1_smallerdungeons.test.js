@@ -27,7 +27,7 @@ const read = (p) => readFileSync(join(root, p), 'utf8');
 
 const PRIVATEERS_HOLD = 187853213;   // a main-story dungeon (dungeonTextures.js)
 const block = (name) => ({ blockName: name, x: 9, z: 9, isStartingBlock: false });
-const loc = (names, mapId = 777) => ({ name: 'T', hasDungeon: true, mapTableData: { mapId }, dungeon: { blocks: names.map(block) } });
+const loc = (names, mapId = 786) => ({ name: 'T', hasDungeon: true, mapTableData: { mapId }, dungeon: { blocks: names.map(block) } });
 const BIG = ['N0000000.RDB', 'N0000001.RDB', 'W0000002.RDB', 'B0000003.RDB', 'B0000004.RDB', 'b0000005.RDB', 'B0000006.RDB'];
 const SMALL = ['N0000000.RDB', 'B0000003.RDB', 'B0000004.RDB'];
 const { NotSet, Disabled, Enabled } = SMALLER_DUNGEONS_STATE;
@@ -71,7 +71,7 @@ test('FT1: the departure, driven - online builds the room\'s size whatever the s
     // stamp says the build
     const huge = loc([...BIG, 'W0000007.RDB', 'B0000008.RDB', 'B0000009.RDB']);
     const onlineHuge = dungeonLocationFor(huge, { online: true });
-    assert.equal(onlineDungeonSize(huge), 'medium', 'map 777\'s draw');
+    assert.equal(onlineDungeonSize(huge), 'medium', 'map 786\'s draw');
     assert.equal(builtDungeonSize(onlineHuge), onlineDungeonSize(huge), 'online, the world\'s size for it');
     assert.equal(isMediumDungeon(onlineHuge), true, '...over eight blocks: the medium build');
     assert.equal(smallerDungeonsStamp(onlineHuge), MEDIUM_DUNGEONS_STATE);
