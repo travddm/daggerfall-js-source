@@ -46,7 +46,7 @@ concurrency:
 jobs:
   plan:
     name: plan
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
@@ -67,7 +67,7 @@ jobs:
   probe:
     needs: plan
     name: "probe ${{ matrix.probe }}${{ matrix.run > 0 && format(' #{0}', matrix.run) || '' }}"
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 40
     strategy:
       # every probe reports, so one red run shows every broken part
@@ -94,16 +94,33 @@ jobs:
         if: matrix.probe == 'online'
         run: npm ci --prefix server
       - name: Install Chromium
+        if: ${{ runner.environment == 'github-hosted' }}
         run: npx playwright install --with-deps chromium
+      # The self-hosted image carries Chromium and its system libraries (docs/ci/self-hosted-runner.md). The job user
+      # has no sudo, so --with-deps cannot run there; this downloads only if the image's revision is not the lockfile's.
+      - name: Chromium from the runner image
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: npx playwright install chromium
       - name: Cached game data (ARENA2)
         id: arena
+        if: ${{ runner.environment == 'github-hosted' }}
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/arena-data
           key: arena2-freeware-v1
       - name: Fetch ARENA2 (freeware Daggerfall data, never in the repository)
-        if: steps.arena.outputs.cache-hit != 'true'
+        if: ${{ runner.environment == 'github-hosted' && steps.arena.outputs.cache-hit != 'true' }}
         run: sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
+      # The runner's host keeps ARENA2 and mounts it read-only; a runner without the mount downloads it as above.
+      - name: ARENA2 from the runner's own cache
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/arena-data"
+          if [ -d /opt/dfo-cache/arena2 ]; then
+            ln -s /opt/dfo-cache/arena2 "$RUNNER_TEMP/arena-data/arena2"
+          else
+            sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
+          fi
       - name: Probe ${{ matrix.probe }}
         env:
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2

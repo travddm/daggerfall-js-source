@@ -81,7 +81,7 @@ jobs:
   # version in source differs from the live one; the deploy job below
   # asks the same question again and decides as it always did.
   drift:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       deploying: ${{ steps.d.outputs.deploying }}
     steps:
@@ -106,7 +106,7 @@ jobs:
     needs: [drift, verify]
     # the suite passed, or had nothing to pass because nothing deploys (skipped)
     if: ${{ !cancelled() && needs.drift.result == 'success' && (needs.verify.result == 'success' || needs.verify.result == 'skipped') }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
 

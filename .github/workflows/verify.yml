@@ -63,7 +63,7 @@ permissions:
 jobs:
   static:
     name: lint and types
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -91,7 +91,7 @@ jobs:
 
   times:
     name: the shards' times
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       key: ${{ steps.find.outputs.cache-matched-key }}
     steps:
@@ -108,7 +108,7 @@ jobs:
   test:
     name: tests ${{ matrix.shard }}/8
     needs: times
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     strategy:
       # every shard reports, so one red run shows every failing file
       fail-fast: false
@@ -156,7 +156,7 @@ jobs:
 
   build:
     if: ${{ inputs.build }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
         with:

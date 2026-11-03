@@ -11,6 +11,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "pages:build": "node tools/pagesSite.mjs",
+    "pages:preview": "vite preview --outDir scratch/pages-site",
     "pretest": "sh tools/fetch-vendor.sh",
     "test": "node tools/testShards.mjs 1/1",
     "lint": "eslint --cache --cache-strategy content --cache-location node_modules/.cache/eslint/ src/ server/src/ server-account/src/ test/ tools/ scripts/ app/ *.config.js && node tools/lintRatchet.mjs",
