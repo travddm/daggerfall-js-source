@@ -35,11 +35,10 @@ npm run probes -- save pause     # the named probes
 - `PROBE_LIGHT=1` sets two stored settings before the game loads: the streamed grid
   (`Experimental/TerrainDistance`) to 1 and the enhanced skin's `landViewDistance` to 1. On software GL the world is
   ready in 22 s instead of 86 s. CI sets it; it is off by default and changes nothing in the game.
-- `PROBE_NODRAW=1` stubs the WebGL draw calls (`drawArrays`, `drawElements` and their instanced forms, `clear`) for a probe
-  that opened its `Game` with `drawless: true`: `dungeon`, `travel`, `rest`, `save`, `pause` and `online`. They read state
-  through the hooks and the DOM, never pixels; the simulation, loading, input and UI run, and software GL draws nothing.
-  `boot` and `town` keep drawing. A probe that reads the canvas must not set `drawless`; its screenshots (taken on
-  a failure) come out black in this mode.
+- `PROBE_NODRAW=1` stubs the WebGL draw calls (`drawArrays`, `drawElements` and their instanced forms, `clear`) for a
+  probe that opened its `Game` with `drawless: true`: every probe but `boot`. They read state through the hooks and the
+  DOM, never pixels; the simulation, loading, input and UI run, and software GL draws nothing. `boot` keeps drawing. A
+  probe that reads the canvas must not set `drawless`; its screenshots (taken on a failure) come out black in this mode.
 - `online` needs the relay's tools: `npm ci --prefix server`. It uses ports 8872 and 8873 (`PROBE_SVC_PORT`).
 - `PROBE_PORT` moves the first Vite port (default 5260). `SHOT_DIR` sets where screenshots go (default
   `scratch/probe-shots/`, ignored by git).
