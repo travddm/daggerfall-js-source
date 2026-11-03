@@ -587,7 +587,6 @@ export const ROUTES = new Set([
   '/v1/market/read', '/v1/market/list', '/v1/market/buy', '/v1/market/cancel', '/v1/market/order', '/v1/market/fill',
   '/v1/market/unorder', '/v1/market/collect', '/v1/market/report', '/v1/market/remove', '/v1/market/auction', '/v1/market/bid',
   '/v1/market/gold',
-  '/v1/sea/season/board',   // SEA-SEASON: the sea's season boards
   '/v1/crew/hall', '/v1/crew/sign', '/v1/crew/release',   // CREW-SIGNED: a crew hall's recruit signed once online (crewSigns.js)
   // HOME-VENDOR: a home's trader's stock, and the region's traders
   '/v1/market/vendor', '/v1/market/vendors', '/v1/market/myvendors',

@@ -71,7 +71,7 @@ export function createEtherHost(deps) {
    *  kind) - and the deepest the captain has gone kept. Answers the isles newly charted. */
   function sight(px, py) {
     if (!inEther(px, py)) return [];
-    L.deepest?.(etherDepthAt(px), day());   // SEA-SEASON: and the season's, by the world's day
+    L.deepest?.(etherDepthAt(px));
     const fresh = islesNear(px, py, SIGHT_PX).filter((i) => L.chartIsle(i.key));
     for (const i of fresh) deps.say?.(`Land ho! ${i.name.replace(/^./, (c) => c.toUpperCase())}${i.kind === 'port' || i.kind === 'ruin' ? ` - ${KIND_WORDS[i.kind]}` : ''}. It is on your charts.`, 4);   // AUDIT CAPTAIN'S SEA X17: "the Sepulchre" opening a sentence
     return fresh;
