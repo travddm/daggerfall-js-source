@@ -377,7 +377,7 @@ async function hostFires({ hearths, blocks, size = { w: 1, h: 2 } }) {
   const fnEnd = D.indexOf('\n  }\n', D.indexOf(endMark)) + 4;
   const body = at >= 0 && D.indexOf(endMark) > at ? D.slice(at, fnEnd) : '';
   const state = {
-    isGateArena: () => false, isArenaFloor: () => false, dungeonFirePlan: DF.dungeonFirePlan, placeDungeonFires, colliderFireProbe: () => open, collider: null,
+    isGateArena: () => false, isArenaFloor: () => false, getPref: () => true, dungeonFirePlan: DF.dungeonFirePlan, placeDungeonFires, colliderFireProbe: () => open, collider: null,
     fireLayoutInputs, dungeon: { blocks }, dfLocation: { dungeon: { recordElement: { header: { locationId: 1234 } } } },
     DUNGEON_FIRE_FLAT: DF.DUNGEON_FIRE_FLAT, getTexture: async () => ({ recordCount: 30 }), billboardSize: () => size,
     flatGroups: new Map(), torches: [], iilLightFlats: [], lights: [], billboardBatches: [], FIRE_LIGHT_UP: 1, FIRE_LIGHT_RANGE: 12,

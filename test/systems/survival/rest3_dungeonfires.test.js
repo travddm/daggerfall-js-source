@@ -4,6 +4,7 @@
 // hearth (warmth, cooking, the camp rest kind, a rest point online), on the held map once seen and on the
 // compass.
 import { test } from 'node:test';
+import * as DF from '../../../src/world/dungeon/dungeonFires.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
@@ -109,6 +110,9 @@ test('REST3 the choice: the entrance fire by the start; the law asks for one (DU
   assert.deepEqual(placeDungeonFires({ blocks, probe: open, seed: 1234, existing: [[8, 0, 8]] }), []);
   // an elite: still the one
   assert.equal(placeDungeonFires({ blocks, probe: open, seed: 1234, elite: true }).length, 1);
+  // the `dungeon-fires` row off: DFU's dungeon, no fire and no ray cast
+  assert.deepEqual(DF.dungeonFirePlan({ blocks, probe: open, seed: 1234, enabled: false }), { fires: [], doorFire: null, candidates: 0, valid: 0 });
+  assert.equal(DF.FIRES_PREF, 'dungeonFires');
   // nothing valid, nothing placed
   assert.deepEqual(placeDungeonFires({ blocks, probe: { floor: () => null, room: () => true }, seed: 1 }), []);
 });

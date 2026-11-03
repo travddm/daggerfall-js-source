@@ -33,6 +33,8 @@ import { RDB_SIDE } from '../rdbLayout.js';
 import { isDungeonExitDoor } from './dungeonLayout.js';   // AUDIT REST-PARTY C6: the doors the law keeps clear of are the host's
 import { transformPoint } from '../mat4.js';   // AUDIT REST II F7: a door's face centre, as dungeonLayout's own overlap test reads it
 
+/** The prefs key (the `dungeon-fires` Features row): off, a dungeon stands no fire, as in Daggerfall Unity. */
+export const FIRES_PREF = 'dungeonFires';
 /** The flame a placed fire draws: TEXTURE.210 record 1, the camp's own (survival/camp.js FIRE_FLAT). */
 export const DUNGEON_FIRE_FLAT = Object.freeze({ archive: 210, record: 1 });
 /** The editor markers a fire may stand on (archive 199): start, enter, random treasure, quest spawn, quest item. */
@@ -353,8 +355,8 @@ export const chooseFires = (valid, opts) => chooseFirePlan(valid, opts).fires;
  * valid }`: the fires placed ([[x, y, z], ...], in pick order), the layout fire adopted as the entrance's or null (F5),
  * and the candidates' and the landed ones' counts (tools/dungeonFireProbe.mjs reports them off this one call).
  */
-export function dungeonFirePlan({ blocks, probe, doors = [], existing = [], seed = 0, elite = false, cold = false } = {}) {
-  if (cold) return { fires: [], doorFire: null, candidates: 0, valid: 0 };   // SD4a: a Super dungeon - the Hour is cold, no ray cast
+export function dungeonFirePlan({ blocks, probe, doors = [], existing = [], seed = 0, elite = false, cold = false, enabled = true } = {}) {
+  if (cold || !enabled) return { fires: [], doorFire: null, candidates: 0, valid: 0 };   // SD4a: a Super dungeon - the Hour is cold, no ray cast
   const count = layoutFireCount(blocks, elite);
   const cands = fireCandidates(blocks);
   const valid = count > 0 ? landCandidates(cands, { probe, doors, enemies: enemyMarks(blocks), items: itemMarks(blocks) }) : [];

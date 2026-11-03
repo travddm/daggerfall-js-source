@@ -1047,7 +1047,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     probe: colliderFireProbe(collider),   // the rays, the law's own (world/dungeon/dungeonFires.js) - the probe tool casts the same
     ...fireLayoutInputs(dungeon.blocks, dungeonHearths),   // AUDIT REST-PARTY C6: the law's doors and fires, read as tools/dungeonFireProbe.mjs reads them
     seed: dfLocation?.dungeon?.recordElement?.header?.locationId ?? 0,
-    elite: !!dfLocation?.elite,
+    elite: !!dfLocation?.elite, enabled: getPref('dungeonFires') !== false,   // DUNGEON-FIRE-ONE: the `dungeon-fires` row; off, DFU's dungeon
     cold: _superTier || _sdRealm,   // SD4a: none in a Super dungeon - the Hour is cold; SD5a: nor in the Hour itself
   });
   const placedFires = firePlan?.fires ?? [];
