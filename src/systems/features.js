@@ -359,14 +359,14 @@ export const FEATURES = Object.freeze([
   }),
   // SD-ONLINE: THE WORLD'S
   // DUNGEON SIZES. Online every dungeon is built at the size one seeded draw on its map id gives it - small, medium or
-  // large, half of them medium, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
+  // large, five in eight of them large, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
   // room's law there, so the lane forces this row ON online and the sync copies it home: offline it asks for the same
   // sizes. Below DFU's switch (Smaller wins when both are on), above the medium one.
   Object.freeze({
     id: 'world-dungeon-sizes',
     group: 'world',
     title: 'Dungeon sizes as online',
-    note: 'Every dungeon takes the size it has online (small, medium or large, half of them medium), the same every '
+    note: 'Every dungeon takes the size it has online (small, medium or large, five in eight of them large), the same every '
       + 'visit. If Smaller dungeons is on too, it wins; this row wins over Medium dungeons. A quest keeps the size it '
       + 'was set up at. Online it is always on.',
     effect: 'Takes effect on the next dungeon you enter. A save made at another size puts you at the dungeon\u2019s start.',
