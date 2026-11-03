@@ -20,7 +20,7 @@ const WAYREST = { key: 5023, name: 'Wayrest', region: 23, tier: 'crown', pixel: 
 const DAY = 86400;
 
 test('SEAT1c THE VOCABULARY: five seat title ids and four glyphs, closed; a seat title rides with its claim [key, Season] and only beside one; `badged` stamps it and `readBadge` reads it back, never beside another title (mutants: the claim required; the claim refused elsewhere; the bounds; the stamp; the reader)', () => {
-  assert.deepEqual([...SEAT_TITLES], ['warden', 'protector', 'crowned', 'keeper', 'champion']);
+  assert.deepEqual([...SEAT_TITLES], ['warden', 'protector', 'champion']);
   for (const t of SEAT_TITLES) assert.ok(TITLES.includes(t));
   for (const g of ['tower', 'crownDF', 'crownWR', 'crownSN']) assert.ok(GLYPHS.includes(g));
   const base = { s: 'acct-0001', n: 'Gamal', k: 'linked', i: T0, e: T0 + 60 };
@@ -48,8 +48,6 @@ test('SEAT1c THE LAW AND THE WORDS: the glyphs a guild\'s Charters give (the tow
   const place = (k) => ({ 3021: ANTICLERE, 5023: WAYREST })[k] ?? null;
   assert.equal(seatTitleText('warden', [3021, 0], place), 'Warden of Anticlere');
   assert.equal(seatTitleText('protector', [5023, 0], place), 'Protector of Wayrest');
-  assert.equal(seatTitleText('keeper', [3021, 2], place), 'Keeper of Anticlere, Season 2');
-  assert.equal(seatTitleText('crowned', [5023, 3], place), 'Crowned in Season 3');
   assert.equal(seatTitleText('warden', [1, 0], place), null);
   setSeatTitlePlaces(place);
   assert.equal(titleBadge({ title: 'warden', ts: [3021, 0] }).text, 'Warden of Anticlere');

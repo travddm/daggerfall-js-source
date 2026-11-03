@@ -10,7 +10,7 @@
 //  - IS A PORT TOWN (`at`): the place on the pixel, its provider's word that it is a port - the host's port test
 //    (csaIsPortTown's, by data alone, as the Bay's byte is read) past the Bay.
 //  - A PORT OF THE SEA (`list`): a port town of the port's own kinds (systems/portPlaces.js isPortTownType - a city, a
-//    town, a village) that the OPEN SEA bears on (net/fortLaw.js seaBears, the shipyard's and the harbour board's law) -
+//    town, a village) that the OPEN SEA bears on (net/sea/seaRing.js seaBears, the shipyard's and the harbour board's law) -
 //    the lanes' ports, the board's and the director's nearest.
 //  - ITS ID (`portIdOf`): a port's one number wherever it stands - the Bay's masked map id (Travel Options' and the map
 //    directory's, its pixel id: what the lanes and the living world's sailors always filed a Bay port by) on the Bay, and
@@ -30,7 +30,7 @@ import { worldPixelKey, areaAt } from './worldGrid.js';
 import { inBay } from '../tamriel/tamrielFrame.js';
 import { isPortTownType } from '../../systems/portPlaces.js';
 import { maskMapId } from '../../systems/travel/travelPorts.js';
-import { seaBears } from '../../net/fortLaw.js';
+import { seaBears } from '../../net/sea/seaRing.js';
 import { longitudeLatitudeToMapPixel } from '../../formats/mapsFile.js';
 import { capitalOnPixel } from '../tamrielCapitals.js';   // NIBEN-SEA: a capital's harbour bears its capital's name
 

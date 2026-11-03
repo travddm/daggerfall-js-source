@@ -174,7 +174,6 @@ export function mintPiece({ recipe, quality, seed, maker = null, marked = false,
   const r = recipeById(recipe);
   if (!r || typeof provenance !== 'string' || !PROVENANCE_RE.test(provenance)) return null;
   const mark = makerMark(maker);   // TEXT-F1
-  if (r.kind === 'siege') return null;   // PROF4: the Ram Kit is the Stores' (and made with the sieges)
   if (r.kind === 'dish') return mintDish({ recipe, maker, hand }, provenance);   // PROF9: a dish, its cook's hand the record's
   if (r.kind === 'arrows') {
     // PROF4: CreateWeapon's arrow arm (combat/enemyEquipment.js), the stack the recipe's - no quality, no provenance
@@ -496,10 +495,6 @@ export function craftedText(pieces) {
   if (isCraftedFurniture(it)) return `You made ${one}. It waits in your things until you place it in a room`;
   return pieces.length > 1 ? `You made ${pieces.length} ${name}s` : `You made ${one}`;
 }
-/** SEAT2b part two (PROF0 4.8: "690 | Ram Kit | Stores (a siege work)"): what a siege work's craft says - its kits go to
- *  the Stores, never the pack (the service answers no piece - professions.js craftAtAnvil): "You made a Ram Kit - it waits
- *  in your Stores". */
-export const storedText = (name, count = 1) => (count > 1 ? `You made ${count} ${name}s. They wait in your Stores` : `You made a ${name}. It waits in your Stores`);
 /** What a craft whose answer did not come says: kept, and made when it does. */
 export const CRAFT_KEPT_TEXT = 'The anvil rang, but the realm has not answered yet. Your work is kept and will be made when it does.';
 /** AUDIT 30 A4: the workbench's own (Carpentry's work is planed, not struck). */

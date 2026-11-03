@@ -1,8 +1,7 @@
 // @ts-check
 // PROF3 - THE RECIPE LAW: Smithing's recipes, the quality they are made at, the
 // XP they give and the heat they are struck in. Design: 9.1-9.4 (the record) and
-// 24 (PROF3 as built); the name is section 14's ("recipeLaw.js (to be written, with PROF3)"). PROF4: Carpentry's recipes beside them - the staves, bows, arrows, furniture, the Basket and the
-// Ram Kit - and the plane they are drawn with; a recipe names its profession. PROF7: Outfitting's - the leather armour, DFU's clothing in its four cloths and its dyes, the rugs, tapestries and skins,
+// 24 (PROF3 as built); the name is section 14's ("recipeLaw.js (to be written, with PROF3)"). PROF4: Carpentry's recipes beside them - the staves, bows, arrows, furniture, the Basket - and the plane they are drawn with; a recipe names its profession. PROF7: Outfitting's - the leather armour, DFU's clothing in its four cloths and its dyes, the rugs, tapestries and skins,
 // the Fishing-Net - and the stitch they are sewn with; the Skinning Knife at the anvil; the Harpy-feathered arrows.
 // PROF11 (Professions-Arc 3.2, 3.3, 9.3, 9.4): Masonry's - the Sculptor's four stone pieces for DECOR, the chisel the
 // mason's bench strikes with, and the bench's XP (its cut and its mix are the forge's works' shape: professionLaw
@@ -21,7 +20,7 @@
 // ArmorMaterialTypes - plate 0x0200 + the metal, chain 0x0100); the item is minted by DFU's own law and the quality
 // laid on it after. Not a DFU member: DFU crafts nothing. Ledger A (the professions' row).
 import {
-  INGOTS, TIER_RANKS, topTierOf, actBand, minedMaterial, WOODS, PINE_PLANK, RESIN, HEARTWOOD, LINEN, WOOL, BEAR_HIDE, CLOTHS, HIDES,
+  INGOTS, TIER_RANKS, topTierOf, actBand, minedMaterial, WOODS, PINE_PLANK, RESIN, HEARTWOOD, LINEN, WOOL, CLOTHS, HIDES,
   CURED_LEATHER, HARDENED_LEATHER, SKINNING_KNIFE, COUNTER_ONLY, CUT_STONE, MORTAR, PROF_RANK_MAX,   // PROF11: the mason's stone
   GEMS, PEARL, SIEGE_GEM,   // PROF10: the gems a jeweller sets, and a Lapidary's Siege-cracked one
   GRADED_GEMS, gemGradeOfKey,   // CLOTH-GEMS: and every grade of them
@@ -173,9 +172,6 @@ export const STAFF_TEMPLATE = 115, SHORT_BOW_TEMPLATE = 129, LONG_BOW_TEMPLATE =
 export const ARROWS_STACK = 20;
 /** DFU's Twigs (a plant of both lands - PlantIngredients1 and 2, template 8), as the Stores keep it twice. */
 export const TWIGS_NORTH = 'p1:8', TWIGS_SOUTH = 'p2:8';
-/** The Ram Kit (PROF0 4.8's 690) - a siege work, rank 60 (9.3). */
-export const RAM_KIT_TEMPLATE = 690;
-export const RAM_KIT_RANK = 60;
 const woodName = (id) => WOODS.find((w) => w.id === id)?.name ?? id;
 const woodTier = (id) => WOODS.find((w) => w.id === id)?.tier ?? 1;
 /** @returns {Recipe} */
@@ -198,8 +194,7 @@ const BEDS = Object.freeze([
   ['bed-fancy-single', 'Fancy Single Bed', 218, 'cherry'], ['bed-fancy-double', 'Fancy Double Bed', 220, 'teak'],
 ]);
 /** EVERY RECIPE the workbench knows, in its window's order: the staves and bows at every wood; the arrows (the northern
- *  Twigs', the southern's and - PROF7 - the Harpy's feathers'); the furniture; the Basket; the Ram Kit (named, never made
- *  - PROF0 25). */
+ *  Twigs', the southern's and - PROF7 - the Harpy's feathers'); the furniture; the Basket. */
 export const CARPENTRY_RECIPES = Object.freeze([
   ...WOODS.map((w) => carpentry({ id: `staff:${w.id}`, name: `${w.name} Staff`, kind: 'staff', family: 'staves', templateIndex: STAFF_TEMPLATE, wood: w.id, material: WOOD_MATERIAL[w.id], inputs: [[plank(w.id), 3]], pattern: 'Staff' })),
   ...WOODS.map((w) => carpentry({ id: `shortbow:${w.id}`, name: `${w.name} Short Bow`, kind: 'bow', family: 'bows', templateIndex: SHORT_BOW_TEMPLATE, wood: w.id, material: WOOD_MATERIAL[w.id], inputs: [[plank(w.id), 3], [RESIN.key, 1]], pattern: 'Short Bow' })),
@@ -214,7 +209,6 @@ export const CARPENTRY_RECIPES = Object.freeze([
   ...FURNITURE_WOODS.map(([w, i]) => carpentry({ id: `chair:${w}`, name: `${woodName(w)} Chair`, kind: 'furniture', family: 'furniture', templateIndex: 229 + i, wood: w, inputs: [[plank(w), 2]], pattern: 'Chair' })),
   ...BEDS.map(([p, name, t, w]) => carpentry({ id: `${p}:${w}`, name, kind: 'furniture', family: 'furniture', templateIndex: t, wood: w, inputs: [[plank(w), 8], [LINEN.key, 2]] })),
   carpentry({ id: 'basket:pine', name: 'Basket', kind: 'tool', family: 'tools', templateIndex: 1607, wood: 'pine', inputs: [[PINE_PLANK.key, 2]] }),
-  carpentry({ id: 'ramkit:oak', name: 'Ram Kit', kind: 'siege', family: 'siege', templateIndex: RAM_KIT_TEMPLATE, wood: 'oak', tier: 5, rank: RAM_KIT_RANK, inputs: [[plank('oak'), 40], ['ingot:iron', 20], [BEAR_HIDE.key, 4]] }),
 ]);
 // ─── OUTFITTING (PROF0 9.3, 29) ──────────────────────────────────────
 
@@ -713,8 +707,8 @@ export const QUALITY_EFFECTS = Object.freeze([
 /** A tool's life by its quality (FORAGE0 14.7): Crude 37 uses, Standard 50, Fine 57, Superior and Masterwork 65. */
 export const TOOL_LIFE = Object.freeze([37, 50, 57, 65, 65]);
 /** Whether a recipe's piece takes a quality at all: a Repair Kit does not (it is measured by its work); PROF4: nor
- *  arrows (DFU mints a quiver at condition 0 - nothing for a quality to act on) nor the Ram Kit (a siege work). */
-export const takesQuality = (r) => r.kind !== 'kit' && r.kind !== 'arrows' && r.kind !== 'siege' && r.kind !== 'dish';   // PROF9: nor a dish - it is eaten, and its worth is its effect
+ *  arrows (DFU mints a quiver at condition 0 - nothing for a quality to act on). */
+export const takesQuality = (r) => r.kind !== 'kit' && r.kind !== 'arrows' && r.kind !== 'dish';   // PROF9: nor a dish - it is eaten, and its worth is its effect
 /** CRAFT5 (Professions-Arc 41.8): whether a recipe's craft ROLLS a quality - every piece that takes one, and a Repair Kit,
  *  whose quality is its reach (kitReach), never its condition or its weight; the kit stays out of everything takesQuality
  *  rules (a commission's least quality, an auction's Masterwork). */
@@ -819,7 +813,7 @@ export const FIRST_MAKE_FLOOR = 500;
 /** FIRST-BUDGET RETUNED: what one first-make pays on each crafting track - Smithing's 500, and each other track's the
  *  least share that brings it to Master in Smithing's 172 crafts (tools/craftPace.mjs firstShares, on this recipe set;
  *  a change to a track's recipes, its pool or its XP moves the derivation, and the law's test says by how much). */
-export const FIRST_MAKE_SHARE = Object.freeze({ smithing: 500, outfitting: 511, building: 1823, provisioning: 3155 });
+export const FIRST_MAKE_SHARE = Object.freeze({ smithing: 500, outfitting: 511, building: 1869, provisioning: 3155 });
 /** Each track's first-makes, in the tables' order: RECIPES, then the mason's works, then DFU's twenty. */
 const FIRST_MAKES = new Map();
 const firstMake = (/** @type {string} */ track, /** @type {string} */ key) => {
@@ -947,7 +941,7 @@ export const chiselMarkS = (rank, band = 1) => (rank >= PROF_RANK_MAX ? CHISEL_A
 /**
  * Masonry's tier for a work's XP, at a rank. DECIDED - XP FOLLOWS THE RANK: the
  * bench's stone sits on tiers 1-2 and nothing higher (4.5), so at the craft's own tier a quarter falls on it from rank 40
- * (Cut Stone) and 55 (Mortar) and Masonry could never climb to its Sculptor or its Fortifier (100); worked at the rank's
+ * (Cut Stone) and 55 (Mortar) and Masonry could never climb to its Sculptor (100); worked at the rank's
  * own tier, as a haul is, it climbs as every other craft does. The recipe's tier still gates its rank (workOpen).
  */
 export const masonTier = (rank) => topTierOf(rank);

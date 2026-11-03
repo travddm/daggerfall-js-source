@@ -40,7 +40,6 @@ import {
 import { GUILD_RANK_MASTER } from '../net/guild/guildLaw.js';
 import { HANDLE_RE } from '../net/handleShape.js';
 import { WRIT_MOVED } from '../net/writBook.js';
-import { FORT_MATERIALS, RAM_KIT_KEY } from '../net/fortLaw.js';   // SEAT2b: what a seat writ may ask; part two: a Siege Camp's Ram Kits
 import { bannerSvg } from './heraldryArt.js';   // AUDIT-SEATS G11: a guild writ's card under its guild's banner
 import { t } from '../systems/textManager.js';   // L10N4: the Work tab's words in the player's language
 
@@ -88,17 +87,6 @@ const labelled = (text, field, cls = '') => {
   l.append(el('span', 'work-label-text', text), field);
   return l;
 };
-/** SEAT2b: where a seat writ's units go, as the card and the form say it. */
-export function seatWritPlace(x, { cap = false } = {}) {
-  const name = x?.name || '';
-  if (x?.camp) {
-    if (!name) return cap ? t('prof.work.seat.campNoneCap', 'The Siege Camp at the seat') : t('prof.work.seat.campNone', 'the Siege Camp at the seat');
-    return cap ? t('prof.work.seat.campCap', 'The Siege Camp at {name}', { name }) : t('prof.work.seat.camp', 'the Siege Camp at {name}', { name });
-  }
-  if (!name) return cap ? t('prof.work.seat.stockpileNoneCap', "The seat's stockpile") : t('prof.work.seat.stockpileNone', "the seat's stockpile");
-  return t('prof.work.seat.stockpile', "{name}{endsInS, select, yes {''} other {''s}} stockpile", { name: cap ? name.replace(/^t/, 'T') : name, endsInS: endsInS(name) });
-}
-export const seatWritFor = (x) => t('prof.work.seat.for', 'for {place}', { place: seatWritPlace(x) });
 /** AUDIT-SEATS G11: a guild writ's banner - the port's own drawing of its guild's heraldry - or null for none. */
 const writBanner = (heraldry) => {
   if (!heraldry) return null;
@@ -210,12 +198,11 @@ export function createWorkTab(w, ui) {
   // ─── A GUILD WRIT ──────────────────────────────────────────────────
   function guildWritCard(x, data) {
     const li = el('li', `notice-card notice-writ seal-guild${x.state !== 'open' ? ' done' : ''}`);
-    li.append(el('span', 'notice-pin'), el('span', 'writ-kind', x.seat != null ? t('prof.work.writ.seatKind', 'Seat writ') : t('prof.work.writ.kind', 'Guild writ')));
+    li.append(el('span', 'notice-pin'), el('span', 'writ-kind', t('prof.work.writ.kind', 'Guild writ')));
     const flag = writBanner(x.guild?.heraldry);   // AUDIT-SEATS G11: its guild's banner
     if (flag) li.append(flag);
     const need = { guild: guildName(x.guild), n: Number(x.left), material: w.countName(x.material, x.left) };
-    li.append(el('p', 'writ-need', x.seat != null ? t('prof.work.writ.needFor', '{guild} needs {n, number} more {material} for {place}', { ...need, place: seatWritPlace({ name: x.seatName, camp: x.camp }) })
-      : t('prof.work.writ.need', '{guild} needs {n, number} more {material}', need)));
+    li.append(el('p', 'writ-need', t('prof.work.writ.need', '{guild} needs {n, number} more {material}', need)));
     li.append(el('p', 'writ-pay', t('prof.work.writ.pay', 'Pays {pay} each - {done, number} / {units, number} delivered', { pay: marksText(x.pay), done: Number(x.units - x.left), units: Number(x.units) })));
     li.append(el('p', 'writ-left', writLeftText(x.expiresAt, ui.nowS())));
     const held = w.held(x.material);
@@ -412,16 +399,8 @@ export function createWorkTab(w, ui) {
     const max = () => writPayMax(st.writ.material);
     const f = st.writ;
     f.pay = intOf(f.pay, 1, Math.max(1, max()));
-    // SEAT2b (Professions-Arc 11): a seat writ - for a seat of this region the guild holds (its stockpile) or is pledged to
-    // this week (its Siege Camp) - asks only what a work asks
-    const seats = Array.isArray(g.seats) ? g.seats : [];
-    if (!seats.some((x) => x.key === f.seat)) f.seat = null;
-    // SEAT2b part two (Seats-Arc 4.2): a Siege Camp's writ may ask Ram Kits too; a kit is a camp's alone (writs.js)
-    const camp = f.seat != null && !!seats.find((x) => x.key === f.seat)?.camp;
-    const choices = f.seat != null ? catalogue.filter((m) => FORT_MATERIALS.includes(m.key) || (camp && m.key === RAM_KIT_KEY)) : catalogue.filter((m) => m.key !== RAM_KIT_KEY);
+    const choices = catalogue;
     if (!choices.some((m) => m.key === f.material)) f.material = choices[0]?.key ?? f.material;
-    const forSel = seats.length ? select([['', t('prof.work.writ.guildStores', 'The guild Stores')], ...seats.map((x) => [String(x.key), seatWritPlace(x, { cap: true })])], f.seat == null ? '' : String(f.seat),
-      (v) => { f.seat = v === '' ? null : Number(v); ui.rerender(); }, t('prof.work.writ.forLabel', "Where the writ's units go")) : null;
     const mat = select(choices.map((m) => [m.key, w.countName(m.key, 2)]), f.material, (v) => { f.material = v; f.pay = Math.min(f.pay, writPayMax(v)); ui.rerender(); }, t('prof.work.writ.materialLabel', 'The material the writ asks'));
     const units = input('number', f.units, t('prof.work.writ.unitsAsked', 'Units the writ asks'), 'writ|units');
     units.min = '1'; units.max = String(WRIT_UNITS_MAX);
@@ -429,7 +408,7 @@ export function createWorkTab(w, ui) {
     pay.min = '1'; pay.max = String(max());
     const said = el('p', 'work-hint');
     said.setAttribute('aria-live', 'polite');
-    const go = button('primary work-post', t('prof.work.post', 'Post'), () => act(() => w.writs.post({ region: w.region, material: f.material, units: f.units, pay: f.pay, ...(f.seat != null ? { seat: f.seat } : {}) }),
+    const go = button('primary work-post', t('prof.work.post', 'Post'), () => act(() => w.writs.post({ region: w.region, material: f.material, units: f.units, pay: f.pay }),
       () => { st.form = null; return t('prof.work.posted', 'Posted in {region} for 7 days.', { region: w.regionName }); }));
     const standing = (data?.yours?.guildWrits ?? []).length;
     const refresh = () => {
@@ -451,7 +430,6 @@ export function createWorkTab(w, ui) {
     pay.oninput = () => { f.pay = intOf(pay.value, 1, Math.max(1, max())); refresh(); };
     refresh();
     const row = el('div', 'work-fields');
-    if (forSel) row.append(labelled(t('prof.work.label.for', 'For'), forSel, 'work-label-wide'));
     row.append(labelled(t('prof.work.label.material', 'Material'), mat, 'work-label-wide'), labelled(t('prof.work.label.units', 'Units'), units), labelled(t('prof.work.label.silverEach', 'Silver each'), pay), go);
     box.append(row, said);
     return box;
@@ -518,8 +496,7 @@ export function createWorkTab(w, ui) {
    * BOARD-SIFT: this region's guild writs, contracts and commissions, each as the Work tab's bar sifts it (ui/workSift.js
    * WorkEntry) - a guild writ fillable while the reader may deliver to it and has a unit it takes; a contract never at the
    * board (it is earned in a raid); a commission naming the reader while a piece of theirs answers it. Its card is made
-   * only when it is drawn. AUDIT BOARD-SIFT: a writ's words its material one and many, and a seat writ's what its card
-   * says (its kind, its stockpile or Siege Camp - lane B L1: "seat" and "camp" found none); a contract's silver what one
+   * only when it is drawn. AUDIT BOARD-SIFT: a writ's words its material one and many, and a contract's silver what one
    * defender is paid (SILVER-WAYS' contracts came best-paying first, `contracts.js` contractBoard - "Most silver" keeps it).
    * @returns {import('./workSift.js').WorkEntry[]}
    */
@@ -529,9 +506,8 @@ export function createWorkTab(w, ui) {
     return [
       ...gws.map((x) => {
         const name = w.countName(x.material, 2), open = x.state === 'open';
-        const seat = x.seat != null ? [t('prof.work.writ.seatKind', 'Seat writ'), seatWritPlace({ name: x.seatName, camp: x.camp })] : [];
         return { kind: 'guild', open, fill: open && mayDeliver(data, x) && guildWritMost(x) > 0, pay: Number(x.pay) * Number(x.left) || 0,
-          ends: Number(x.expiresAt) || 0, name, words: wordsOf(name, w.countName(x.material, 1), guildName(x.guild), ...seat), card: () => guildWritCard(x, data) };
+          ends: Number(x.expiresAt) || 0, name, words: wordsOf(name, w.countName(x.material, 1), guildName(x.guild)), card: () => guildWritCard(x, data) };
       }),
       ...gcs.map((x) => ({ kind: 'contract', open: x.state === 'open', fill: false, pay: Number(x.pay) || 0, ends: Number(x.expiresAt) || 0,
         name: guildName(x.guild), words: wordsOf(guildName(x.guild), w.regionNameOf(x.region)), card: () => contractCard(x, data) })),

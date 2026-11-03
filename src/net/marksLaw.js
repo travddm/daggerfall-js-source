@@ -41,8 +41,7 @@ export const MARK_WORTH_GOLD = 10;
  * THE FAUCETS - acts a server witnessed, each capped (SILVER-FINDS' `gather` and `find` bounded by the day instead -
  * above). MARKS1 strikes the first (the gate's receipts); the rest come with their slices, and are named here so the
  * cap is the law before the faucet is built.
- *   gate      - an Oblivion Gate receipt the relay signed and the service counted (WB5b): 50 (100 under a Daedric
- *               Incursion, SEAT0 9.3 - the second half at the Turning, seatIncursion.js). SILVER-WAYS: under the day's
+ *   gate      - an Oblivion Gate receipt the relay signed and the service counted (WB5b): 50. SILVER-WAYS: under the day's
  *               COMBAT cap (MARKS_COMBAT) with the raids', no longer two a day of its own.
  *   raid      - SILVER-WAYS: a town defended - a raid's receipt the relay signed at its
  *               cleanse (RAID3/RAID4) and the service counted once a (raid, account): 30, under the COMBAT cap.
@@ -145,9 +144,6 @@ export const MARKS_KINDS = Object.freeze({
   'royal-escrow': 'move',     // CROWN1: a Royal Tourney's prize, held from the crown's treasury while it rules
   'royal-prize': 'move',      // CROWN1: the prize, out of the escrow to the champion's account
   'royal-return': 'move',     // CROWN1: a Tourney no bout won - the prize home
-  'fealty-tribute': 'move',   // CROWN2: a vassal's 5% of its Tithe to its liege
-  'gate-incursion': 'mint',   // AUDIT-SEATS: a Daedric Incursion's second half of a gate's Marks, once three claims agree (9.3)
-  fort: 'burn',               // SEAT2b: a fortification project's Marks, from the holder's treasury as it is begun (7.5)
   'seat-strike-refund': 'mint', // AUDIT-SEATS S4: a struck seat's claim fee, minted back to its holder within the Season (16)
   raid: 'mint',               // SILVER-WAYS: a town defended - the relay's raid receipt, counted (under the day's combat cap)
   'guild-deed': 'mint',       // SILVER-WAYS: a guild deed - three of a guild's accounts on one raid or gate - into its treasury
@@ -162,10 +158,6 @@ export const MARKS_KINDS = Object.freeze({
   patron: 'burn',             // CHAP7a: the winning bid, burnt at the Turning that opens its Season (Chapters-Arc 8, CALL 6)
   'patron-return': 'move',    // CHAP7a: a losing bid, home to its guild at that Turning - burnt where the guild is gone or full
   star: 'mint',               // STAR7: a fallen star's receipt, counted
-  castle: 'burn',             // DOMAIN2: a castle's price, from the buying guild's treasury (6)
-  'castle-sale': 'mint',      // DOMAIN2: 85% of it home, the castle given up while its region is held
-  'castle-lost': 'mint',      // DOMAIN2: half of it home, the castle gone with its region
-  'domain-fold': 'mint',      // DOMAIN3: a Charter folded into its region's at the region law's first Turning, its claim fee home (seatTurning.js)
   firmament: 'burn',          // FIRM1: the Firmament's refunds - silver a star taken back, at Renown 10 and past (firmamentLaw.js refundSilver)
   'craft-writ': 'mint',       // CRAFT-WRITS: a crafting writ filled - goods the service saw made, out of the realm record (server-account/src/craftWrits.js)
 });

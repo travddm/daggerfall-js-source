@@ -9,7 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { byClass } from '../chargenDom.mjs';
-import { createTownSeatBook, SEAT_LIST_RETRY_MS, SEAT_RED_READ_MS, SEAT_LIST_CACHE_MS } from '../../src/net/townSeatBook.js';
+import { createTownSeatBook, SEAT_LIST_RETRY_MS, SEAT_RED_READ_MS } from '../../src/net/townSeatBook.js';
 import { createHallBanners } from '../../src/scenes/hallBanners.js';
 import { REFUSALS, accountRefusalText } from '../../src/net/accountClient.js';
 import { boardTithePct, seatTitheCap, CROWN_SIEGE_SLOT } from '../../src/net/townSeatLaw.js';
@@ -92,13 +92,13 @@ test('AUDIT SEATS-3 C3: a battle\'s foes\' bodies read the room once a sweep - o
   const peers = Array.from({ length: 39 }, (_, i) => `p${i}`);
   const S = {
     peersNear: () => { calls++; return peers.map((id) => ({ id, feet: [id.length, 0, 0], height: 1.8 })); },
-    siegeNpcs: { body: (id) => (id === 'npc-guard' ? { id, feet: [9, 0, 9], height: 1.7, name: 'a guard' } : null) }, duelMgr: { fighting: false }, royalSession: { active: () => false }, CAPSULE_HEIGHT: 1.8,
-    siegeSession: { active: () => true, foes: () => [...peers.slice(0, 19), 'npc-guard', 'gone'] },
+    duelMgr: { fighting: false }, royalSession: { active: () => false }, CAPSULE_HEIGHT: 1.8,
+    siegeSession: { active: () => true, foes: () => [...peers.slice(0, 19), 'gone'] },
   };
-  const f = new Function('S', `const { peersNear, siegeNpcs, duelMgr, royalSession, siegeSession, CAPSULE_HEIGHT } = S; ${duelBodySrc}\n${duelBodyInSrc}\n${bodiesSrc}\n${arrowSrc}\n return { duelArrowTargets, duelBody };`)(S);
+  const f = new Function('S', `const { peersNear, duelMgr, royalSession, siegeSession, CAPSULE_HEIGHT } = S; ${duelBodySrc}\n${duelBodyInSrc}\n${bodiesSrc}\n${arrowSrc}\n return { duelArrowTargets, duelBody };`)(S);
   const t = f.duelArrowTargets();
   assert.equal(calls, 1, 'one read of the room for the frame\'s arrows');
-  assert.equal(t.length, 20, 'nineteen peers and the relay\'s guard; the gone one none');
+  assert.equal(t.length, 19, 'nineteen peers; the gone one none');
   calls = 0;
   const oracle = S.siegeSession.foes().map((id) => f.duelBody(id)).filter(Boolean);
   assert.deepEqual(t.map((x) => x.ref.id), oracle.map((b) => b.id), 'the same bodies, in the same order');
@@ -109,23 +109,7 @@ test('AUDIT SEATS-3 C3: a battle\'s foes\' bodies read the room once a sweep - o
   assert.doesNotMatch(melee + bodiesSrc, /duelBody\(id\)/);
 });
 
-test('AUDIT SEATS-3 C4: the Watchtowers\' seats filtered once a list read and guild, not each frame; the halls\' banners one kept list, refilled in place; the frame\'s banners one kept list (mutants: a filter a frame; a fresh list or banner a frame; the merge or the nearest lost)', async () => {
-  let filters = 0;
-  const seats = Array.from({ length: 120 }, (_, i) => ({ key: i + 1, state: 'confirmed', holder: i === 7 ? { guild: { id: 'g-mine' } } : null, forts: i === 7 ? { watchtowers: 1 } : undefined }));
-  const origFilter = seats.filter.bind(seats);
-  seats.filter = (...a) => { filters++; return origFilter(...a); };
-  let t = 1e9;
-  const book = createTownSeatBook({ door: { list: async () => ({ ok: true, data: { seats } }) }, nowMs: () => t });
-  await book.read();
-  for (let fr = 0; fr < 600; fr++) book.towersDue('g-mine');
-  assert.equal(filters, 1, 'one filter for the read and the guild');
-  assert.equal(book.towersDue('g-mine'), true);
-  assert.equal(book.towersDue('g-other'), false);
-  assert.equal(filters, 2, 'another guild asked: filtered again');
-  t += SEAT_LIST_CACHE_MS; await book.read();
-  book.towersDue('g-other');
-  assert.equal(filters, 3, 'a new read: filtered again');
-
+test('AUDIT SEATS-3 C4: the halls\' banners one kept list, refilled in place; the frame\'s banners one kept list (mutants: a fresh list or banner a frame; the merge or the nearest lost)', async () => {
   const frame = { box: [0, 0, 0, 10, 5, 10], door: { a: [4, 0, 10], b: [6, 0, 10] } };
   const built = new Map([['k', { px: 1, py: 1, homeTown: 7, homeFrames: new Map([[3, frame]]) }]]);
   let tr = [0, 0, 0];
@@ -179,13 +163,12 @@ test('AUDIT SEATS-3 C5: a seats\' list read that failed (a timeout, offline, the
   assert.equal(shut.open, false);
 });
 
-test('AUDIT SEATS-3 C6: the Tithe refused says the cap the Market Hall raises - never a bare 10% and 15% (mutant: the old words)', () => {
+test('AUDIT SEATS-3 C6: the Tithe refused says the cap each tier allows, and the Seat tab offers it (mutant: the old words)', () => {
   const t = REFUSALS['bad-tithe'];
   assert.equal(accountRefusalText('bad-tithe'), t);
-  assert.doesNotMatch(t, /at most 10% at a palace seat, 15% at a crown\.$/);
-  assert.match(t, /10% at a palace and 15% at a crown, and a point more for each stage of its Market Hall/);
-  assert.equal(seatTitheCap({ tier: 'palace', forts: { market: 3 } }), 13);
-  assert.equal(seatTitheCap({ tier: 'crown', forts: { market: 3 } }), 18);
+  assert.match(t, /10% at a palace and 15% at a crown/);
+  assert.equal(seatTitheCap({ tier: 'palace' }), 10);
+  assert.equal(seatTitheCap({ tier: 'crown' }), 15);
 });
 
 const tabOver = (data, over = {}) => {
@@ -254,7 +237,6 @@ test('AUDIT SEATS-3 D3: a board\'s Tithe as the seats\' list says it (its bailiw
   assert.equal(boardTithePct(seats, 17, [205, 120]), 8, 'the nearest seat of its region: held at 8%');
   assert.equal(boardTithePct(seats, 17, [258, 161]), 0, 'the unheld seat\'s bailiwick');
   assert.equal(boardTithePct(seats, 23, [500, 100]), 10, 'never over the palace\'s cap');
-  assert.equal(boardTithePct([{ ...seats[2], forts: { market: 3 } }], 23, null), 13, 'a Market Hall\'s cap');
   assert.equal(boardTithePct(seats, 40, [0, 0]), 0, 'a region with no seat');
   assert.equal(boardTithePct(null, 17, null), 0);
 

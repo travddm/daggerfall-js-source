@@ -80,12 +80,10 @@ export const TITLE_TEXT = Object.freeze({
   hierophant: 'Hierophant',
   gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought
   herald: 'Herald',                  // HERALD: the Patreon tier between Disciple and Hierophant
-  // SEAT1c (Seats-Arc 7.4): the seats' five - each worded off its claim where this client knows the place
+  // SEAT1c (Seats-Arc 7.4): the seats' three - each worded off its claim where this client knows the place
   // (townSeatLaw.js seatTitleText: "Warden of Anticlere"), and these words alone where it does not
   warden: 'Warden',
   protector: 'Protector',
-  crowned: 'Crowned',
-  keeper: 'Keeper',
   champion: 'Champion',
   grandchampion: 'Grand Champion',   // ARENA4
   arenachampion: 'Arena Champion',   // ARENA4: "Being the #1 pvp arena player comes with it's own temporary title/glyph"
@@ -199,12 +197,10 @@ export const TITLE_RGBA = Object.freeze({
   // and brighter and bluer-violet than the moderator's shield, which is a shield and never a trumpet. Chosen over a
   // periwinkle (lost on a day sky), a silver (read as a bare name) and a purple (the Apostle's) on five grounds.
   herald: Object.freeze([0.31, 0.49, 1, 1]),          // #4f7dff
-  // SEAT1c: the seats' - a Warden's bronze, a Protector's royal purple, the Crowned's pale gold, a Keeper's
-  // weathered green, a Champion's silver; none another title's
+  // SEAT1c: the seats' - a Warden's bronze, a Protector's royal purple, a Champion's
+  // silver; none another title's
   warden: Object.freeze([0.769, 0.549, 0.290, 1]),    // #c48c4a
   protector: Object.freeze([0.580, 0.365, 0.851, 1]), // #945dd9
-  crowned: Object.freeze([1, 0.886, 0.541, 1]),       // #ffe28a
-  keeper: Object.freeze([0.471, 0.706, 0.443, 1]),    // #78b471
   champion: Object.freeze([0.851, 0.867, 0.890, 1]),  // #d9dde3
   // ARENA4: the GRAND CHAMPION in a champion's BRONZE - the cup on the Hall of Champions'
   // wall, darker and browner than the Dungeon Master's bright orange and the Gatebreaker's fire, and no gold (the

@@ -54,11 +54,7 @@ import { canModerate, isDeveloper } from './titles.js';
 import { marksOpenFor, balanceOf } from './marks.js';
 import { boardOpenFor } from './board.js';
 import { titheAt } from './seatHolding.js';   // SEAT1d: the bailiwick's Tithe
-import { listingsCapAt } from './seatForts.js';   // SEAT2b: a Market Hall's listings
 import { titheOf, TITHE_CAP } from '../../src/net/townSeatLaw.js';
-import { marketHallTitheCap } from '../../src/net/fortLaw.js';
-import { tideNow } from './tides.js';   // SEASON1 part two: a Bandit Summer's couriers (9.3)
-import { tideCourier } from '../../src/net/tideLaw.js';
 import { profOpenFor, spendStatements, spendOrigins, spendableSql, storeOf, silverClothIn } from './professions.js';   // WOVEN-PAYS: a cloth bought with Drakes, counted
 import { REALM_ID_RE, realmActFirst, prepareRealmRecord, mustChange, dropIfUnnamed, recordMovedOf, dropObjects, realmHoldOf, holdStandsSql } from './realm.js';   // GOLD-MARKET
 import { lawfulItem, itemWorth } from '../../src/systems/item/itemLaw.js';   // INT1: no piece the law cannot stand behind is listed; LW15: a patron's judge
@@ -87,7 +83,7 @@ import {
   goodRefusal, goodFamily, GOOD_GROUP_FAMILIES, MARKET_HELD_MAX,   // MARKET-ANY
   fillTaxOn,   // MARKET-AUDIT S2
   wearOf,   // INT19: a crafted piece's wear, its record's
-  marketPageOf, marketSortOf, marketQualityOf, recipesNamed, marketRecipesOf,   // BOARD-SIFT: a page, its order, a search's recipes
+  MARKET_LISTINGS_MAX, marketPageOf, marketSortOf, marketQualityOf, recipesNamed, marketRecipesOf,   // BOARD-SIFT: a page, its order, a search's recipes
 } from '../../src/net/marketLaw.js';
 import { MASTERWORK, PROVENANCE_RE } from '../../src/net/recipeLaw.js';
 import { mintVersionOf, masterLinesOf } from '../../src/net/productRecord.js';   // CRAFT-PROCS: a piece's mint version, its record's; MASTER-ART: a Master's lines
@@ -162,17 +158,14 @@ function hubsFrom(keys, /** @type {any[]} */ results, own) {
   for (const r of results) { const a = by.get(r.key) ?? []; a.push({ account: r.account, report: r.report, at: Number(r.at) }); by.set(r.key, a); }
   return new Map(keys.map((k) => [Number(k), hubPixel(by.get(k) ?? [], own.get(Number(k)) ?? null)]));
 }
-/** The courier between two regions: `{ courier, seconds, road }` - nothing on the same region, null with no road.
- *  SEASON1 part two: `slow` the Tide's factor on its seconds where it is bound (tideLaw.js tideCourier). */
-function courierOf(hubs, from, to, units, slow = 1) {
+/** The courier between two regions: `{ courier, seconds, road }` - nothing on the same region, null with no road. */
+function courierOf(hubs, from, to, units) {
   if (from === to) return { courier: 0, seconds: 0, road: 0 };
   const a = hubs.get(from), b = hubs.get(to);
   if (!a || !b) return null;
   const road = roadPixels(a, b);
-  return { courier: courierFee(units, road), seconds: courierSeconds(road) * slow, road };
+  return { courier: courierFee(units, road), seconds: courierSeconds(road), road };
 }
-/** SEASON1 part two (9.3): a Bandit Summer where a courier is bound, while a Season is counted. */
-const courierSlow = (env, nowS, to) => tideCourier(tideNow(env, nowS, to));
 /** AUDIT 30 S3: whether the ledger already holds this account's line `rid` + `suffix` - a request id spent, though the
  *  row that would answer its repeat was pruned. */
 const spent = async (db, me, rid, suffix) => !!(await db.prepare('SELECT 1 FROM marks_ledger WHERE actor = ?1 AND rid = ?2').bind(me, `${rid}${suffix}`).first());
@@ -267,9 +260,9 @@ const bidView = (b) => ({
 });
 /** PROF5b: a sale's tax and Tithe off its whole, in SQL - `x`'s floor of hundredths, as saleTax and saleTithe are. */
 const netSql = (x) => `${x} - (${x} * ${MARKET_TAX_PCT}) / 100 - (${x} * ${MARKET_TITHE_PCT}) / 100`;
-/** AUDIT SCALE A1: the most any seat's Tithe can take of a sale - the crown's cap and a Market Hall's whole rise
- *  (townSeatLaw.js TITHE_CAP, fortLaw.js marketHallTitheCap) - and so the least a seller can be owed. */
-export const TITHE_PCT_MOST = marketHallTitheCap(Math.max(...Object.values(TITHE_CAP)), Infinity);
+/** AUDIT SCALE A1: the most any seat's Tithe can take of a sale - the crown's cap (townSeatLaw.js TITHE_CAP) - and so the
+ *  least a seller can be owed. */
+export const TITHE_PCT_MOST = Math.max(...Object.values(TITHE_CAP));
 const leastNetSql = (x) => `${x} - (${x} * ${MARKET_TAX_PCT}) / 100 - (${x} * ${TITHE_PCT_MOST}) / 100`;
 /** SEAT1d: a board's town pixel as a request names it (`board: [x, y]`), or null - an older client's names none. */
 const boardOf = (b) => (Array.isArray(b) && b.length === 2 && hubPixelOk(b[0], b[1]) ? [b[0], b[1]] : null);
@@ -447,7 +440,7 @@ const auctionsDueRead = (db, nowS) => db.prepare(`SELECT id, high, region, board
  * auction closes unsold. AUDIT 31 S1: a standing bid whose row is gone (its bidder's account deleted - no route does
  * it, Professions-Arc 18) closes it unsold too, never a sale to no one: the owner written NULL failed every read after.
  */
-export async function closeAuctions(ctx, read = null, env = null) {   // DOMAIN3: `env`, the region law's week (the Tithe's bailiwick)
+export async function closeAuctions(ctx, read = null) {
   const { db, nowS, rand } = ctx;
   // MARKET-SPEED: the candidates as a read's first batch found them (auctionsDueRead), or read here - the clock's
   const due = read ?? ((await auctionsDueRead(db, nowS).all()).results ?? []);
@@ -465,7 +458,7 @@ export async function closeAuctions(ctx, read = null, env = null) {   // DOMAIN3
     const nonce = mintId(rand);
     const high = a.high == null ? null : Number(a.high);
     // SEAT1d: the Tithe of the seat the auction's board belongs to, from the seller's proceeds
-    const tt = high == null ? null : await titheAt(db, nowS, Number(a.region), rowBoard(a), env);
+    const tt = high == null ? null : await titheAt(db, nowS, Number(a.region), rowBoard(a));
     const tithe = tt ? saleTithe(high, tt.pct) : 0;
     const tax = high == null ? 0 : saleTaxOn(0, high), gets = high == null ? 0 : high - tax - tithe;
     const room = Number(a.balance) + gets <= MARKS_MAX;
@@ -652,7 +645,7 @@ function mediansFrom(keys, /** @type {any[]} */ results, today) {
  * (AUDIT BOARD-SIFT: the client's reading of its words) and Crafted the least `quality` - each read by marketLaw's own
  * word, anything else its default.
  */
-export async function marketRead(ctx, player, env, { character, region, view, family = null, tier = null, material: key = null, materials = null, hubs, currency = 'marks', pieces = null, board = null,
+export async function marketRead(ctx, player, env, { character, region, view, family = null, tier = null, material: key = null, materials = null, hubs, currency = 'marks', pieces = null,
   page: pageAsked = 0, sort: sortAsked = null, recipes: recipesAsked = null, quality: qualityAsked = 0 } = {}) {
   const { db, nowS } = ctx;
   const refused = asks(player, { character, needRid: false });
@@ -671,7 +664,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
   // closes them each minute, so a read nearly always finds none); the settle's reads then asked again, behind the close
   const first = await readAll(db, [...settleReads(db, me, nowS), auctionsDueRead(db, nowS)]);
   const dueAuctions = first[first.length - 1];
-  if (dueAuctions.length) await closeAuctions(ctx, dueAuctions, env);
+  if (dueAuctions.length) await closeAuctions(ctx, dueAuctions);
   const touched = await settle(ctx, player, dueAuctions.length ? null : first.slice(0, -1));
   const today = utcDay(nowS);
   const own = hubsOf(hubs);
@@ -683,8 +676,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
   // AUDIT 30 U1: this character's Stores the settle moved, answered so the pages read them
   const stores = await Promise.all([...touched].map((t) => t.split('|')).filter(([c]) => c === character).map(([c, m]) => storeOf(db, me, c, m)));
   /** MARKET-SPEED: THE VIEW'S ROWS AND THE ACCOUNT'S OWN, ONE BATCH - `reads` the view's statements, answered in order
-   *  as `rows`; behind them what every answer carries (`base`); and, beside the batch, the listings a board allows
-   *  (AUDIT SEATS-3 D2: its own reads, the seats' places off the isolate's kept rows). */
+   *  as `rows`; behind them what every answer carries (`base`). */
   const read = async (/** @type {any[]} */ reads) => {
     // PROF5b: an open auction is among the thirty; the bids standing, and what every bid not yet back holds
     const own0 = [
@@ -698,16 +690,14 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
       db.prepare('SELECT balance FROM marks WHERE account = ?').bind(me),
       ...roadReads(db, me),
     ];
-    const [all, listingsMax] = await Promise.all([readAll(db, [...reads, ...own0]), listingsCapAt(db, nowS, boardOf(board))]);
+    const all = await readAll(db, [...reads, ...own0]);
     const [[counts] = [], [gold] = [], [bal] = [], ...road] = all.slice(reads.length);
     return {
       rows: all.slice(0, reads.length),
       base: {
         ok: true, view, region, currency, road: roadFrom(road, nowS), balance: bal ? Number(bal.balance) : 0,
         counts: { listings: Number(counts?.listings ?? 0), orders: Number(counts?.orders ?? 0), bids: Number(counts?.bids ?? 0) },
-        // AUDIT SEATS-3 D2: the open listings this account may hold at the board read from (`board`, its map pixel, as the
-        // post's), a Market Hall's quarter a tier in it - the count's measure, so the board never says thirty where it lists more
-        listingsMax,
+        listingsMax: MARKET_LISTINGS_MAX,
         held: Number(counts?.held ?? 0), stores, goldHeld: Number(gold?.gold ?? 0),
       },
     };
@@ -733,7 +723,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
     const by = new Map(q.map(([name], i) => [name, got[i]]));
     const at = hubKeys.length ? hubsFrom(hubKeys, by.get('hubs') ?? [], own) : new Map();
     return {
-      quotes: quoted.map((l) => courierOf(at, Number(l.region), region, unitsOf(l), courierSlow(env, nowS, region))),
+      quotes: quoted.map((l) => courierOf(at, Number(l.region), region, unitsOf(l))),
       medians: medianKeys?.length ? mediansFrom(medianKeys, by.get('medians') ?? [], today) : new Map(),
       reports: new Map((by.get('reports') ?? []).map((r) => [r.listing, Number(r.n)])),
       auctionReports: new Map((by.get('auctions') ?? []).map((r) => [r.auction, Number(r.n)])),
@@ -975,7 +965,7 @@ const pieceSoldSteps = (db, p, binds) => [
  */
 export async function marketList(ctx, player, env, { character, region, kind, material: key = null, units = 1, provenance = null, wear = null, price, hubs, rid, currency = 'marks', board = null, item = null, pick = null, realm = null, vendor = null } = {}) {
   // MARKET-ANY: a piece from the pack moves its seller's realm record - its own door, where the record stands asked first
-  if (kind === 'item') return listGood(ctx, player, env, { character, region, item, pick, price, hubs, rid, currency, realm, board, vendor });   // AUDIT SEATS-3 D2: and its board
+  if (kind === 'item') return listGood(ctx, player, env, { character, region, item, pick, price, hubs, rid, currency, realm, vendor });
   if (vendor != null) return { error: 'bad-vendor' };   // HOME-VENDOR: a trader sells pieces from the pack alone
   const { db, bucket, nowS, rand } = ctx;
   const refused = asks(player, { character, rid });
@@ -1005,7 +995,7 @@ export async function marketList(ctx, player, env, { character, region, kind, ma
   if (!currencyOk(currency)) return { error: 'bad-act' };
   if (currency === 'gold' && !REALM_ID_RE.test(character)) return { error: 'market-gold-realm' };   // GOLD-MARKET: gold is a realm record's
   const gold = currency === 'gold';
-  const listingsMax = await listingsCapAt(db, nowS, boardOf(board));   // SEAT2b (7.5): a Market Hall's town lists a quarter more a tier
+  const listingsMax = MARKET_LISTINGS_MAX;
   const other = gold ? 'gold' : 'bought';   // GOLD-MARKET: the listing's second origin - bought in its own currency
   if (kind === 'material') {
     if (!material(key) || looseOnly(key)) return { error: 'bad-material' };   // CLOTH-GEMS: a graded gem lists from the pack, never the Stores
@@ -1133,7 +1123,7 @@ async function pieceListRefusal(db, me, provenance, currency) {
  * as a crafted piece ('market-piece-route' - its record's owner then moves with its sale); one whose record names
  * another lists from the pack like any piece. Answers the listing and the record's new sequence (`realm.seq`).
  */
-async function listGood(ctx, player, env, { character, region, item, pick, price, hubs, rid, currency, realm, board = null, vendor = null }) {
+async function listGood(ctx, player, env, { character, region, item, pick, price, hubs, rid, currency, realm, vendor = null }) {
   const { db, bucket, nowS, rand } = ctx;
   const refused = asks(player, { character, rid });
   if (refused) return refused;
@@ -1174,7 +1164,7 @@ async function listGood(ctx, player, env, { character, region, item, pick, price
   // MARKET-AUDIT: a trader's stock its own count, a board listing the board's - each its own cap
   const salesSql = vend ? stallSalesSql() : openSalesSql('?2');
   const open = await db.prepare(`SELECT ${salesSql} AS n`).bind(...(vend ? [me] : [me, nowS])).first();
-  const listingsMax = vend ? VENDOR_STOCK_MAX : await listingsCapAt(db, nowS, boardOf(board));   // AUDIT SEATS-3 D2: a Market Hall's town lists a piece a quarter more a tier too, as every other listing
+  const listingsMax = vend ? VENDOR_STOCK_MAX : MARKET_LISTINGS_MAX;
   if (Number(open?.n ?? 0) >= listingsMax) return { error: vend ? 'vendor-full' : 'market-listings-max' };
   // THE RECORD'S OWN PIECE: the very record at `pick`, as offered, out of it - never what the tab says it holds
   let moved = null;
@@ -1321,10 +1311,10 @@ export async function marketBuy(ctx, player, env, { character, region, listing: 
   // the courier the buyer's board's seat takes, out of what is burnt
   const [hubsNow, tt, ctAny] = await Promise.all([
     hubsAt(db, [from, region], own),
-    at ? null : titheAt(db, nowS, from, rowBoard(l), env),
-    at || from === region ? null : titheAt(db, nowS, region, boardOf(board), env),
+    at ? null : titheAt(db, nowS, from, rowBoard(l)),
+    at || from === region ? null : titheAt(db, nowS, region, boardOf(board)),
   ]);
-  const road = courierOf(hubsNow, from, region, units, courierSlow(env, nowS, region));
+  const road = courierOf(hubsNow, from, region, units);
   if (!road) return { error: 'market-no-road' };
   if (at) return buyWithGold(ctx, player, { character, region, l, units, max, rid, road, own, at, answer, vend, landed: landed === true });
   const total = units * Number(l.price);
@@ -1655,7 +1645,7 @@ export async function marketFill(ctx, player, env, { character, region, order: i
   const pay = total - tax - road.courier;
   if (pay < 1) return { error: road.courier > 0 ? 'market-courier-dear' : 'market-taxed-out' };
   if (Number.isSafeInteger(least) && pay < least) return { error: 'market-price-moved' };
-  const ct = road.courier > 0 ? await titheAt(db, nowS, region, boardOf(board), env) : null;
+  const ct = road.courier > 0 ? await titheAt(db, nowS, region, boardOf(board)) : null;
   const fillTithe = ct ? titheOf(road.courier, ct.pct) : 0;   // the buy's courier share (SEAT1d), the filler's board's
   const nonce = mintId(rand);
   const day = utcDay(nowS);
@@ -1908,7 +1898,7 @@ export async function marketAuction(ctx, player, env, { character, region, prove
   if (!regionOk(region)) return { error: 'bad-region' };
   if (!provenanceOk(provenance)) return { error: 'bad-provenance' };
   if (!wearOk(wear)) return { error: 'bad-wear' };
-  const auctionsMax = await listingsCapAt(db, nowS, boardOf(board));   // SEAT2b (7.5): a Market Hall's town lists a quarter more a tier
+  const auctionsMax = MARKET_LISTINGS_MAX;
   if (!priceOk(opening)) return { error: 'bad-price' };
   const made = await db.prepare('SELECT recipe, quality FROM products WHERE provenance = ?1').bind(provenance).first();
   if (made && !pieceListable(made.recipe)) return { error: 'market-not-listable' };
@@ -2027,7 +2017,7 @@ export async function marketBid(ctx, player, env, { character, region, auction: 
   if (amount < next) return { error: 'auction-low' };
   const from = Number(a.region);
   const own = hubsOf(hubs);
-  const road = courierOf(await hubsAt(db, [from, region], own), from, region, 1, courierSlow(env, nowS, region));
+  const road = courierOf(await hubsAt(db, [from, region], own), from, region, 1);
   if (!road) return { error: 'market-no-road' };
   const held = amount + road.courier;
   const bidId = mintId(rand);

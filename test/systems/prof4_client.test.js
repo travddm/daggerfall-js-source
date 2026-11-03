@@ -397,7 +397,7 @@ test('PROF4 pages: the Workbench at a Furniture Store - the saws for the logs he
   assert.deepEqual(works.at(-1), ['burn:oak', 1], 'the Forge\'s Burn is the held log\'s');
   await buttons().find((b) => b.textContent === 'Saw').onclick();
   assert.deepEqual(works.at(-1), ['saw:oak', 1]);
-  assert.deepEqual(BENCH_FAMILIES.map(([id]) => id), ['staves', 'bows', 'arrows', 'furniture', 'tools', 'siege']);
+  assert.deepEqual(BENCH_FAMILIES.map(([id]) => id), ['staves', 'bows', 'arrows', 'furniture', 'tools']);
   assert.ok(anvilRecipes('tools', 'ingot:iron').every((r) => r.profession === 'smithing'), 'the Basket is the workbench\'s');
   assert.deepEqual(benchRecipes('furniture', 'plank:oak').map((r) => r.id), ['table-large:oak', 'table-small:oak', 'chair:oak', 'bed-plain-double:oak']);
   press('Furniture');

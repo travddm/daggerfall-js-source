@@ -335,7 +335,7 @@ test('SEAT1b THE HOSTS BY SOURCE: the relay ticks in its pose arm and nowhere el
   assert.match(w, /      seats: townSeats,   \/\/ DOMAIN1 \(HOST-SPLIT\)/);
   const seatPixelAt = seatPixelTest({ list: [{ pixel: [402, 151] }, { pixel: [7, 9] }] });
   assert.deepEqual([seatPixelAt(402, 151), seatPixelAt(7, 9), seatPixelAt(151, 402), seatPixelAt(402, 152), seatPixelTest(null)(0, 0)], [true, true, false, false, false]);
-  assert.match(w, /seat: seatAt \? \{ seat: seatAt, book: seatBook, nameOf: \(k\) => seatAtMapId\(townSeats, k\)\?\.name \?\? null, port: coastalAt\(town\.px, town\.py, seaPixel, csaIsPortTown\(town\.px, town\.py\)\), countName: materialCountLabel \} : null,/);   // SEAT2b: and whether DFU names the town a port, the works' material words
+  assert.match(w, /seat: seatAt \? \{ seat: seatAt, book: seatBook, nameOf: \(k\) => seatAtMapId\(townSeats, k\)\?\.name \?\? null } : null,/);
   assert.match(w, /const seatAt = seatHere\(town\.mapId\);/);
   // own province's (scenes/gate/gateSeat.js gateSeatRegion), named where there is one
   assert.match(w, /const character = characterIdOf\(playerEntity\);\n[^\n]*\n\s*return region != null \? \{ region, character \} : character \? \{ character \} : null;/);

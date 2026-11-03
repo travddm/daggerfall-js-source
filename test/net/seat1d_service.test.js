@@ -2,17 +2,15 @@
 // each Charter's upkeep (Overreach's share, the crown's scale), puts a short treasury in Neglect and lapses a Charter
 // neglected twice, and reckons every row of Standing; a challenger's influence at a seat in Unrest risen a quarter; the
 // Tithe set once a week and taken across its bailiwick from a sale and a courier's share; the Edicts proclaimed for the
-// coming week and made law (or let fall) at the Turning - Open Gates' homes, the Levy's stockpile, the Bounty's camps.
+// coming week and made law (or let fall) at the Turning - Open Gates' homes, the Bounty's camps.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 // 7.1-7.3, 7.6; `06-Systems/Online-Arc.md` SEAT1d.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { holdPieces } from '../realmSeat.mjs';   // INT19: a crafted piece in its seller's realm record
-import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';
-import { sharedClassicMinutes } from '../../src/net/wire.js';
+import { MARKS_MAX } from '../../src/net/marksLaw.js';
 import { gameDayAt, gateTimes } from '../../src/net/gate/gateLaw.js';
-import { boulders, nodeKey } from '../../src/net/nodeLaw.js';
 import { saleTax, courierFee, roadPixels, AUCTION_S } from '../../src/net/marketLaw.js';
 import {
   seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S, SEAT_UPKEEP, CROWN_SCALE, EDICTS,
@@ -281,34 +279,12 @@ test('SEAT1d THE EDICTS: proclaimed by an Officer for the coming week, replaced 
   assert.equal((await town(off)).openGates, undefined, 'Open Gates over with its week');
 });
 
-test('SEAT1d THE LEVY AND THE BOUNTY: a harvest in a Levy seat\'s bailiwick gives the seat a tenth (the gatherer keeps the rest, at least one) - and nowhere else; a Bounty\'s set-aside escrowed at the Turning pays 20 Drakes a camp cleared in its bailiwick, a camp once a day whoever cleared it, five an account a day, never past the set-aside; what is left goes home at the next Turning (mutants: the levy; the stockpile; the bailiwick; the escrow; the pay; the caps; the return)', async (t) => {
+test('SEAT1d THE BOUNTY: a Bounty\'s set-aside escrowed at the Turning pays 20 Drakes a camp cleared in its bailiwick, a camp once a day whoever cleared it, five an account a day, never past the set-aside; what is left goes home at the next Turning (mutants: the escrow; the pay; the caps; the return)', async (t) => {
   let now = T0 + 3600;
   t.mock.method(Date, 'now', () => now * 1000);
   const { svc, raw, guild, member, treasury, purse, hold, watch, lines, list } = await stood();
   const sh = await guild('Gamal', 'The Silver Hand', 'SH');
   hold(ANTICLERE, sh.gid);
-  // THE LEVY rules this week at Anticlere
-  raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, state, at) VALUES (?, ?, 'levy', ?, 'x', 'law', ?)").run(ANTICLERE.key, W, sh.gid, T0);
-  const miner = await svc.seated('Moira');
-  // noon on the shared clock today - the harvest keeps the daylight
-  const hr = (s) => Math.floor((((Math.floor(sharedClassicMinutes(s * 1000)) % 1440) + 1440) % 1440) / 60);
-  for (let s = utcDay(T0) * DAY + 3600; ; s += 30) if (hr(s) === 12 && hr(s - 60) === 12 && hr(s + 60) === 12) { now = s; break; }
-  const MOUNTAIN = 226;
-  const stone = (x, slot) => ({ character: miner.character, node: nodeKey({ kind: 'boulder', x, y: 150, day: utcDay(now), slot }), kind: 'stone', climate: MOUNTAIN, region: 21, act: { glints: 0 }, at: now - 2, rid: rid() });
-  assert.ok(boulders({ x: 404, y: 150, day: utcDay(now), climate: MOUNTAIN }).length >= 1);
-  // every draw of the service's dice at 0.098: a boulder of 3, its tenth's fraction kept (0.098 < 0.3) - one to the seat
-  const real = globalThis.crypto.getRandomValues.bind(globalThis.crypto);
-  t.mock.method(globalThis.crypto, 'getRandomValues', (b) => { b.fill(0x19); return b; });
-  const r = await svc.call('/v1/prof/harvest', stone(404, 0), miner.secret);
-  t.mock.method(globalThis.crypto, 'getRandomValues', real);
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual([r.body.qty, r.body.levy], [2, { qty: 1, key: ANTICLERE.key }], 'three quarried: two kept, one levied');
-  assert.deepEqual({ ...raw.prepare('SELECT material, qty FROM town_seat_stockpile WHERE key = ?').get(ANTICLERE.key) }, { material: 'stone:rough', qty: 1 });
-  // far from Anticlere, in Ashfield's bailiwick (unheld, no Levy): nothing levied
-  t.mock.method(globalThis.crypto, 'getRandomValues', (b) => { b.fill(0x19); return b; });
-  const far = await svc.call('/v1/prof/harvest', { ...stone(472, 0), node: nodeKey({ kind: 'boulder', x: 472, y: 160, day: utcDay(now), slot: 0 }) }, miner.secret);
-  t.mock.method(globalThis.crypto, 'getRandomValues', real);
-  assert.deepEqual([far.body.qty, far.body.levy], [3, undefined], 'outside the bailiwick: the whole yield');
   // THE BOUNTY, proclaimed for next week with 60 Drakes set aside, escrowed at the Turning
   const off = await member(sh, 'Ofelia', 1);
   assert.equal((await svc.call('/v1/seats/edict', { character: off.character, key: ANTICLERE.key, edict: 'bounty', setAside: 10 }, off.secret)).body.error, 'bad-bounty');

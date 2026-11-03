@@ -48,7 +48,6 @@ import {
   SEAT_WITNESS_REPORTS_HOUR, SEAT_WITNESSES_AUDIT, seasonFloor, seasonZeroOf,
 } from '../../src/net/townSeatLaw.js';
 import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';   // AUDIT-SEATS S4: a struck Charter's fee refunded
-import { fortsLapsedStatements } from './seatForts.js';   // AUDIT SEATS-2 S5: a struck Charter's building projects fall with it
 import { DB_ROOT, replicaDb, d1Overloaded, bookmarkOf } from './service.js';   // STORM-SHED: the binding a request's counted Proxy wraps; SEAT-REPLICA: the kept read's session
 import { exactRows, witnessRow, strikeWitness, LEAN_ROWS } from './leanWitness.js';   // LEAN-WITNESS
 
@@ -287,10 +286,9 @@ export async function listSeats({ db, nowS }, player, env) {
  * SEAT1b: THE SEATS A PLEDGE, A TICK OR A TRIBUTE MAY NAME - every confirmed seat (a disputed one too: it keeps every
  * effect it had), by key: `Map<key, { key, name, region, tier, pixel, state }>`. The ignored accounts left out, as the
  * list leaves them. STORM-SHED: the Watch's claims read the isolate's kept rows (seatRowsOf); GATHER-SPEED and
- * MARKET-SPEED kept them too for the asks on a harvest's or a market read's way - a Levy's seat (seatHolding.js levyAt),
- * a Tithe's (titheAt) and a board's Market Hall (seatForts.js listingsCapAt), each of which read every seat row on
- * every harvest, read and buy. D1-LOAD: AND EVERY OTHER CALLER - the
- * standings (every board opened, and a holder's members' Watchtowers every ten minutes), the minute's auctions closed,
+ * MARKET-SPEED kept them too for the ask on a market read's way - a Tithe's seat (seatHolding.js titheAt),
+ * which read every seat row on every read and buy. D1-LOAD: AND EVERY OTHER CALLER - the
+ * standings (every board opened), the minute's auctions closed,
  * a Bounty's camp, a pledge - so kept is the rule, not a choice each caller must remember: all 4,050 of the seats'
  * witness rows were STORM-SHED's costliest read by time. A seat's facts move only with a witness's report or a strike
  * (each lets the rows go here) and by the week, so the minute's bound is the list's own. `fresh` reads the table as it
@@ -303,10 +301,6 @@ export async function confirmedSeats(db, nowS, { fresh = false } = {}) {
   const { seats } = fresh ? seatFacts(await judgedSeatRows(db, nowS), nowS) : await keptSeatFacts(db, nowS);   // SEAT-FACTS: the service's kept facts
   return new Map(seats.filter((s) => factConfirmed(s.fact)).map((s) => [s.key, { ...s.fact.seat, state: s.fact.state }]));
 }
-
-/** DOMAIN3: the accounts the seats' law ignores this week (seatIgnoredAccounts), off the service's kept facts - a seat
- *  of power's witness counts none of theirs, as a seat's does not (domains.js). */
-export const seatIgnored = async (db, nowS) => (await keptSeatFacts(db, nowS)).ignored;
 
 /**
  * A SEAT WITNESSED - the client standing in a seat town reports the seat it derived (`{ key, name, region, tier, pixel }`,
@@ -367,7 +361,6 @@ export async function strikeSeat({ db, nowS }, dev, env, { key } = {}) {
     db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at)
       SELECT ?1, ?2, 'strike', json_set(?3, '$.refund', COALESCE((SELECT amount FROM marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4`)
       .bind(key, week, JSON.stringify({ by: dev.handle ?? null, ...(h ? { guild: { name: h.name ?? '', tag: h.tag ?? '' } } : {}) }), nowS, rid),
-    ...fortsLapsedStatements(db, key, nowS),   // AUDIT SEATS-2 S5: a building project falls with the Charter
   ]);
   forgetSeatRows(db, nowS);   // STORM-SHED: the struck seat's reports are gone - asked afresh here
   return { ok: true, key, reports: Number(late?.meta?.changes ?? 0) + Number(rest?.meta?.changes ?? 0) };

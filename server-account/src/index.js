@@ -278,21 +278,14 @@ import { vaultOf, vaultPut, vaultTake, vaultGrant } from './guildVault.js';   //
 import { HOME_ORDER_KEYS_MAX } from '../../src/net/homeLaw.js';   // QUEST-HOME: the most buildings one home order names
 import { buyHall, sellHall, setHallEntry, setHeraldry } from './halls.js';   // GUILD1d: the guild hall and heraldry
 import { readGuildBoard, pinGuildNote, takeDownGuildNote } from './guildBoard.js';   // GUILD1e: a guild's own board
-import { listSeats, strikeSeat, seatsOpenFor } from './townSeats.js';   // SEAT1a: the seats' witnessed registry
-import { pledgeSeat, claimWatch, creditGate, creditRenown, readStandings, payTribute, claimOrcCamp, readRecords } from './seatInfluence.js';   // SEAT1b: influence   // SEASON1 part two: an Orc Raid's camp
+import { listSeats, witnessSeat, strikeSeat, seatsOpenFor } from './townSeats.js';   // SEAT1a: the seats' witnessed registry
+import { pledgeSeat, claimWatch, creditGate, creditRenown, readStandings, payTribute, readRecords } from './seatInfluence.js';   // SEAT1b: influence
 import { settleDueOnce, seatsBoard, relinquishSeat, seatBadgeOf, seatTitlesOf } from './seatTurning.js';   // SEAT1c: the Turning, the Charters, their titles and glyphs
 import { setTithe, proclaimEdict, claimBounty } from './seatHolding.js';   // SEAT1d: the holder's levers, a Bounty's camp
 import { setWindow, signBattle, unsignBattle, hireSellsword, withdrawHire, siegesLive } from './seatBattles.js';   // SEAT2a: the battles' week
 import { siegePass, claimSiege, voidSiege } from './seatSiege.js';   // SEAT2a part three: the pass, the result, Honours   // VOID: a moderator's void
-import { royalPass, claimRoyal, keptTitleOf, KEPT_TITLES } from './seatRoyal.js';   // CROWN1 part two: the Royal Tourney's pass, its bouts, its champion's title (SEASON1: every title kept)
-import { ribbonOf } from './seatRibbons.js';   // SEASON1 part two: a Season's banner ribbon, on the token
+import { royalPass, claimRoyal, keptTitleOf, KEPT_TITLES } from './seatRoyal.js';   // CROWN1 part two: the Royal Tourney's pass, its bouts, its champion's title
 import { seatWeekOf, seasonOf, seasonZeroOf } from '../../src/net/townSeatLaw.js';   // SEASON1: the Season counted
-import { offerFealty, acceptFealty, breakFealty, offerPact, breakPact } from './seatPolitics.js';   // CROWN2: fealty and Pacts, the red lines
-import { fundFort, readForts } from './seatForts.js';   // SEAT2b: a seat's fortifications
-import { giveToSeat, readGifts } from './seatGifts.js';   // DOMAIN1: a member's gift to the guild's stockpile or Siege Camp
-import { witnessSeatAndDomain, domainsBoard } from './domains.js';   // DOMAIN3: a region's seat of power witnessed beside the seat; the list's word of the region law
-import { domainsWeekOf, chartersMarked } from '../../src/net/domainLaw.js';   // DOMAIN3: the region law's first week, the Turning's; the list's holdings marked
-import { buyCastle, sellCastle } from './castles.js';   // DOMAIN2: a guild's castle, bought and given up
 
 /** SEAT1c: the account's row with the Charter titles it may wear laid on it (`seatTitles`, titles.js titlesHeld), while the
  *  seats are open to it - for the wardrobe's read and its write. */
@@ -497,10 +490,8 @@ const GUILD_STATUS = Object.freeze({
   'board-closed': 403, muted: 403, 'no-note': 404, 'notes-full': 409, 'board-rate': 429, 'board-ops-rate': 429,
   // REALM P2.2: a realm character's record moves with the act - where it stands, and whether it can pay
   'realm-needed': 400, 'realm-gold': 409, lease: 409, seq: 409, 'no-realm-character': 404, 'no-data': 404, 'no-storage': 503,
-  // DOMAIN2: a castle - the seats' switch shut, no castle there, the region's crown not the guild's, another's castle, none
-  // of the guild's to give up, the treasury short
-  'seats-closed': 403, 'bad-rid': 400, 'castle-none': 404, 'castle-not-held': 409, 'castle-taken': 409, 'castle-not-yours': 404, 'guild-marks-short': 409,
-  'seats-settling': 503,   // AUDIT DOMAINS S6: a castle act while another holds the Turning - asked again in a moment
+  'seats-closed': 403, 'bad-rid': 400, 'guild-marks-short': 409,
+  'seats-settling': 503,
 });
 /** MARKS1: each Marks refusal's status - not this account's (a guest, the switch, a rank, a developer's; AUDIT 625 S1:
  *  the finds of an account not yet a week registered) 403, no guild 404, short or capped 409, the hour's acts spent
@@ -533,7 +524,7 @@ const TOWN_STATUS = Object.freeze({ 'towns-need-account': 403, 'towns-rate': 429
 /** SEAT1a (SEAT1b): each seat refusal's status - not this account's (a guest, the switch, a developer's act) 403, a seat struck
  *  409, the hour's reports spent 429, a bad shape 400 (the default). */
 /** SEAT-LEASE: the seat routes that only read, answered from the state as it stands while another settles the Turning. */
-const SEAT_READS = new Set(['/v1/seats/list', '/v1/seats/standings', '/v1/seats/records', '/v1/seats/forts', '/v1/seats/gifts']);   // DOMAIN1: and where a gift goes
+const SEAT_READS = new Set(['/v1/seats/list', '/v1/seats/standings', '/v1/seats/records']);
 const SEAT_STATUS = Object.freeze({
   'seats-need-account': 403, 'seats-closed': 403, 'not-developer': 403, 'seat-struck': 409, 'seats-rate': 429,
   'not-moderator': 403,   // VOID: `/siege void` asked by anyone but a moderator or a developer
@@ -543,7 +534,6 @@ const SEAT_STATUS = Object.freeze({
   'seat-reckoning': 409, 'seat-pledges-full': 409, 'seat-no-pledge': 409, 'seat-tribute-cap': 409, 'guild-marks-short': 409,
   'no-gate-key': 503,
   'seat-not-held': 409, 'seat-held-here': 409,   // SEAT1c: a Charter not the guild's to give up; a region its Charter pledges
-  'seat-not-charter': 409,   // DOMAIN3: a holding is pledged through its region's Charter
   // SEAT1d: the Tithe set this week already, an Edict two weeks running, none to take back, the balance's cap 409
   'tithe-this-week': 409, 'edict-twice': 409, 'seat-no-edict': 409, 'marks-full': 409, 'edict-tier': 409,
   // SEAT2a: no battle, no contract, no such account 404; a side not this guild's, a member hired 403; the rosters' close, a
@@ -559,13 +549,6 @@ const SEAT_STATUS = Object.freeze({
   'battle-settled': 409,   // AUDIT 529 V5: a `/siege void` after the battle's week was settled
   // CROWN1 part two: no Royal Tourney here 404; its week's champion named, its ring unsettled 409
   'royal-none': 404, 'royal-over': 409, 'ring-unsettled': 409,
-  // CROWN2: no such guild, offer or Pact 404; a pair that does not fit, one sworn or signed already, a pledge between them 409
-  'guild-unknown': 404, 'fealty-none': 404, 'pact-none': 404, 'fealty-unfit': 409, 'fealty-sworn': 409, 'fealty-pledged': 409,
-  'pact-signed': 409, 'pact-self': 409, 'pact-pledged': 409, 'fealty-pledge': 409, 'pact-pledge': 409,
-  // SEAT2b: a work the seat may not raise, one building already, one at its last tier, a treasury short 409
-  'fort-not-here': 409, 'fort-building': 409, 'fort-max': 409, 'seat-treasury': 409,
-  // DOMAIN1: a gift - the Stores' account and switch 403; no place in the region, the Stores short of it 409; the writs' bucket 429
-  'prof-need-account': 403, 'prof-closed': 403, 'seat-none-here': 409, 'stores-short': 409, 'stores-gold': 409, 'writ-rate': 429,
   ...JUDGE_STATUS,   // a held character's Stores go to no guild's ends (realm.js realmHoldOf)
 });
 /** PROF1: each professions refusal's status - not this account's (a guest, the switch, the Marks' switch, the rank) 403,
@@ -579,7 +562,7 @@ const PROF_STATUS = Object.freeze({
   'prof-deep-cap': 409, 'prof-spec-stale': 409, 'prof-spec-taken': 409, 'prof-trial-over': 409,   // AUDIT PERK-TRIAL P4: a change asked free, its day out   // AUDIT 29 (CAP-OFF: no `prof-account-cap`)
   'prof-no-pack-form': 409,   // PROF3: the smith's stock stays in the Stores until its professions' templates
   'carried-full': 409, 'carried-short': 409,   // BAG1: a carried count at its bound, or holding fewer than a deposit asks
-  'prof-later': 409,   // PROF4: a recipe whose slice is to come - the Ram Kit (PROF0 25)
+  'prof-later': 409,   // PROF4: a recipe whose slice is to come
   'prof-hunt-high': 409, 'prof-foe': 400, 'prof-dye': 400,   // PROF7: Hunting's rare hides (3 of tiers 5-6 a day - CAP-OFF: no `prof-hunt-cap`, nor PROF8's `prof-fish-cap`), a body no knife skins, a dye asked of what takes none
   'prof-sculptor': 403,   // PROF11: the stone decor is a Sculptor's - a skill's door, as the rank's
   'prof-master': 400, 'prof-master-lines': 400, 'prof-master-day': 409,   // MASTER-ART: no tier, lines the piece may not carry, the day's work made
@@ -1153,13 +1136,12 @@ const service = {
         const seats = seatsOpenFor(who.player, env);
         const worn = await withChapterTitles(ctx, seats ? { ...who.player, seatTitles: await seatTitlesOf(ctx.db, who.player.id) } : who.player, env);   // CHAP4c: and a chapter's
         const zero = seasonZeroOf(env.SEASON_ZERO_WEEK);   // SEASON1: the Season on a title's claim
-        // SCALE4f part two: THE CHARACTER'S MEMBERSHIP READ ONCE (guilds.js mintMemberOf) for the seat badge, the ribbon and the
-        // guild's badge below - three reads of one row; each keeps its own law over it
+        // SCALE4f part two: THE CHARACTER'S MEMBERSHIP READ ONCE (guilds.js mintMemberOf) for the seat badge and the
+        // guild's badge below - two reads of one row; each keeps its own law over it
         const member = renownCharacterOk(body.character) && (seats || body.guild === true) ? await mintMemberOf(ctx, who.player.id, body.character) : undefined;
         const seatBadge = seats && renownCharacterOk(body.character) ? await seatBadgeOf(ctx.db, who.player.id, body.character, seasonOf(seatWeekOf(nowS * 1000), zero)?.n ?? 0, member) : null;
         const wornT = titleWorn(worn, env);
-        // CROWN1 part two: the champion's is the account's own, kept for good - no guildmaster's; SEASON1: and so are a
-        // Season's crowned and keeper (seatRoyal.js keptTitleOf)
+        // CROWN1 part two: the champion's is the account's own, kept for good - no guildmaster's
         const kept = seats && KEPT_TITLES.includes(wornT) ? await keptTitleOf(ctx.db, who.player.id, wornT, zero) : null;
         // CHAP4c: a chapter's seat's title worn only by a character of the account that holds it, with its claim - the
         // named character's own first, else none (a title a character does not hold is not signed for it)
@@ -1168,15 +1150,11 @@ const service = {
         const seatT = KEPT_TITLES.includes(wornT) ? (kept ? { t: wornT, ts: kept.ts } : {})
           : SEAT_TITLES.includes(wornT) ? (seatBadge?.title === wornT ? { t: wornT, ts: seatBadge.ts } : {})
             : CHAPTER_TITLES.includes(wornT) ? (chapterT ? { t: chapterT.high ? 'highmaster' : wornT, ts: chapterT.ts } : {}) : (wornT ? { t: wornT } : {});   // CHAP6e: a Master's in an Ascendancy signed its High Master
-        // SEASON1 part two (Seats-Arc 9.1): AND A SEASON'S BANNER RIBBON - the named character's, where its guild kept a
-        // seat through the Season before and it was a member at that Season's last Turning (seatRibbons.js ribbonOf)
-        const rb = seats && renownCharacterOk(body.character) ? await ribbonOf(ctx.db, who.player.id, body.character, seasonOf(seatWeekOf(nowS * 1000), zero), member) : null;
         const wardrobe = {
           ...seatT,
           g: [...glyphsOf(who.player, env, nowS), ...(seatBadge?.glyphs ?? [])],
           au: auraWorn(who.player, env),   // WB9g: the aura worn, the title's law - absent for none; AEGIS: a list's read off the config
           pi: iconWorn(who.player),   // WITCH1: the profile icon worn, the aura's law - absent for none (the character's face)
-          ...(rb ? { rb } : {}),
         };
         // GLYPH-WEAR: the glyphs taken off ride BESIDE `g`, never out of it - `g` is what is true and what the relay's
         // rights read (/red, /dm); `gx` is paint, which every face that draws a badge leaves out. Absent for none.
@@ -1262,8 +1240,7 @@ const service = {
           guild: guild ? guild.gt : null,   // GUILD1c: the tag my own name wears, beside the token as the level is
           aura: wardrobe.au ?? null,   // WB9g: the aura at my own feet, beside the token as the title is
           icon: wardrobe.pi ?? null,   // WITCH1: the profile icon in my own portrait well, beside the token as the aura is
-          ribbon: wardrobe.rb ?? null,   // SEASON1 part two: the ribbon under my own name, beside the token as the aura is
-          house: houseWorn ?? null,   // LEGACY7: the house my token wears, beside it as the ribbon is
+          house: houseWorn ?? null,   // LEGACY7: the house my token wears, beside it as the aura is
           expiresAt: nowS + MAX_TTL_S,
         }, 200, origin);
       }
@@ -1731,7 +1708,6 @@ const service = {
         }
         if (path === '/v1/guilds/invites') return json(await invitesOf(ctx, who.player), 200, origin);
         if (accountKind(who.player) !== 'linked') return no('guilds-need-account', 403, origin);
-        const castleAct = (f) => async (c, p, b) => (seatsOpenFor(p, env) && (await settleDueOnce(c.db, nowS, seasonZeroOf(env.SEASON_ZERO_WEEK), domainsWeekOf(env.DOMAINS_WEEK))).pending ? { error: 'seats-settling' } : f(c, p, b));
         const act = {
           '/v1/guilds/found': foundGuild, '/v1/guilds/invite': inviteToGuild, '/v1/guilds/answer': answerInvite,
           '/v1/guilds/leave': leaveGuild, '/v1/guilds/remove': removeFromGuild, '/v1/guilds/rank': rankGuildMember,
@@ -1745,10 +1721,6 @@ const service = {
           // GUILD2a: a new name, for a price; GUILD2b: the vault - a piece in and out on the realm record, the grants
           '/v1/guilds/rename': renameGuild, '/v1/guilds/vault': vaultOf, '/v1/guilds/vault/put': vaultPut, '/v1/guilds/vault/take': vaultTake,
           '/v1/guilds/vault/grant': vaultGrant,
-          // DOMAIN2 (Domains.md 6): the region's castle, bought in silver by its holder's Guildmaster and given up - AUDIT
-          // DOMAINS S6: after the Turnings due, as every seat act is (a castle bought in the minutes a week has turned
-          // unsettled bought a crown that Turning was about to lapse, and lost half its price at once)
-          '/v1/guilds/castle/buy': castleAct(buyCastle), '/v1/guilds/castle/sell': castleAct(sellCastle),
         }[path];
         if (!act) return no('not-found', 404, origin);
         const r = await act({ ...ctx, env, bucket: env.SAVES }, who.player, body);   // REALM P2.2: a realm character's record is in R2; AUDIT 28 M5: the switch says whether the Marks show
@@ -1836,17 +1808,16 @@ const service = {
         // N's boundary" - every Turning due, before the ask is answered (one read when none is)
         // SEAT-LEASE: one settler at a time (seatTurning.js settleDueOnce) - while another holds the Turning a read answers
         // the state as it stands, and an act is told to ask again in a moment, never made on a week half turned
-        if (seatsOpenFor(who.player, env) && (await settleDueOnce(ctx.db, nowS, seasonZeroOf(env.SEASON_ZERO_WEEK), domainsWeekOf(env.DOMAINS_WEEK))).pending && !SEAT_READS.has(path)) return no('seats-settling', 503, origin);   // SEASON1: a Season's end at its Turning
+        if (seatsOpenFor(who.player, env) && (await settleDueOnce(ctx.db, nowS, seasonZeroOf(env.SEASON_ZERO_WEEK))).pending && !SEAT_READS.has(path)) return no('seats-settling', 503, origin);   // SEASON1: a Season's end at its Turning
         const act = {
           '/v1/seats/list': async () => {
             const r = await listSeats(ctx, who.player, env);
             if ('error' in r) return r;
-            const domains = await domainsBoard(ctx.db, nowS, env, seatWeekOf(nowS * 1000));   // DOMAIN3: the region law, where DOMAINS_WEEK is set
             const board = await seatsBoard(ctx.db, r.seats, nowS);
-            return { ...r, ...board, ...(domains?.rule ? { seats: chartersMarked(board.seats, domains.seats) } : {}), zero: seasonZeroOf(env.SEASON_ZERO_WEEK), ...(domains ? { domains } : {}) };   // SEAT-BATCH: the holders, battles, Edicts, works and red lines in one batch   // SEAT1c: each seat's holder and battle   // CROWN2: the server's red lines   // SEASON1 part two: the week Season 0 began, for the client's Tides
+            return { ...r, ...board, zero: seasonZeroOf(env.SEASON_ZERO_WEEK) };   // SEAT-BATCH: the holders, battles and Edicts in one batch   // SEASON1: the week Season 0 began
           },
           '/v1/seats/relinquish': () => relinquishSeat(ctx, who.player, env, body),   // SEAT1c: a Charter given up at its board
-          '/v1/seats/witness': () => witnessSeatAndDomain(ctx, who.player, env, body),   // DOMAIN3: and its region's seat of power
+          '/v1/seats/witness': () => witnessSeat(ctx, who.player, env, body),
           '/v1/seats/strike': () => strikeSeat(ctx, who.player, env, body),
           // SEAT1b: influence - a guild's pledge, the standings at a seat, the Watch's ticks claimed, Tribute paid
           '/v1/seats/pledge': () => pledgeSeat(ctx, who.player, env, body),
@@ -1858,7 +1829,6 @@ const service = {
           '/v1/seats/tithe': () => setTithe(ctx, who.player, env, body),
           '/v1/seats/edict': () => proclaimEdict(ctx, who.player, env, body),
           '/v1/seats/bounty': () => claimBounty(ctx, who.player, env, body),
-          '/v1/seats/orc-camp': () => claimOrcCamp(ctx, who.player, env, body),   // SEASON1 part two (9.3): an Orc Raid's camp cleared
           // SEAT2a: the battles' week - the holder's window; a side signed, unsigned; a Sellsword hired, withdrawn
           '/v1/seats/window': () => setWindow(ctx, who.player, env, body),
           '/v1/seats/siege/sign': () => signBattle(ctx, who.player, env, body),
@@ -1872,18 +1842,6 @@ const service = {
           // CROWN1 part two: a Royal Tourney's pass (the ring the contender's game derived); a bout's receipt claimed
           '/v1/seats/royal/pass': async () => royalPass(ctx, who.player, env, body, await signingKey(env, subtle)),
           '/v1/seats/royal/claim': async () => claimRoyal(ctx, who.player, env, body, await gatePublicKey(env, subtle)),
-          // CROWN2: fealty offered (as vassal or liege), accepted, broken; a Pact offered (or accepted) and broken
-          '/v1/seats/fealty': () => offerFealty(ctx, who.player, env, body),
-          '/v1/seats/fealty/accept': () => acceptFealty(ctx, who.player, env, body),
-          '/v1/seats/fealty/break': () => breakFealty(ctx, who.player, env, body),
-          '/v1/seats/pact': () => offerPact(ctx, who.player, env, body),
-          '/v1/seats/pact/break': () => breakPact(ctx, who.player, env, body),
-          // SEAT2b (7.5): the works read, a project begun
-          '/v1/seats/forts': () => readForts(ctx, who.player, env, body),
-          '/v1/seats/fort/fund': () => fundFort(ctx, who.player, env, body),
-          // DOMAIN1 (Domains.md 5): where a member's gift goes in a region, and a gift made
-          '/v1/seats/gifts': () => readGifts(ctx, who.player, env, body),
-          '/v1/seats/give': () => giveToSeat(ctx, who.player, env, body),
         }[path];
         if (!act) return no('not-found', 404, origin);
         const r = await act();

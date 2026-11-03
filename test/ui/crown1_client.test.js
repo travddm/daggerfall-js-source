@@ -35,7 +35,7 @@ test('CROWN1 THE CROWN\'S LEVER: at a crown its Officer is offered Conscription 
   const crown = mount(WAYREST);
   await tick();
   const sel = byClass(crown.host, 'notice-seat-edict')[0];
-  assert.deepEqual(sel.children.map((o) => o.value), ['market-day', 'open-gates', 'curfew', 'levy', 'bounty', 'conscription', 'royal-tourney']);   // part two: and the Royal Tourney
+  assert.deepEqual(sel.children.map((o) => o.value), ['market-day', 'open-gates', 'curfew', 'bounty', 'conscription', 'royal-tourney']);   // part two: and the Royal Tourney
   sel.value = 'conscription';
   sel.onchange();
   await tick();

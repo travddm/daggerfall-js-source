@@ -61,7 +61,7 @@ test('CRAFT3 law: ten tracks - the five that gather, the five that craft; eight 
   const ids = (p, r) => SPECIALISATIONS[p][r].map((s) => s.id);
   assert.deepEqual(Object.keys(SPECIALISATIONS), PROFESSIONS.map((p) => p.id));
   assert.deepEqual([ids('smithing', 50), ids('smithing', 100)], [['weaponsmith', 'armoursmith', 'gemcutter', 'goldsmith'], ['masterwright', 'quartermaster', 'master-jeweller', 'lapidary']]);
-  assert.deepEqual([ids('building', 50), ids('building', 100)], [['bowyer', 'joiner', 'quarryman', 'builder'], ['siegewright', 'master-joiner', 'fortifier', 'sculptor']]);
+  assert.deepEqual([ids('building', 50), ids('building', 100)], [['bowyer', 'joiner', 'quarryman'], ['master-joiner', 'sculptor']]);
   assert.deepEqual([ids('provisioning', 50), ids('provisioning', 100)], [['brewer', 'distiller', 'cook', 'field-cook'], ['master-alchemist', 'transmuter', 'chef', 'provisioner']]);
   assert.deepEqual([ids('outfitting', 50), ids('enchanting', 100), ids('mining', 50)], [['tailor', 'leatherworker'], ['soulbinder', 'runecaster'], ['prospector', 'deep-delver']]);
   assert.deepEqual(['gemcutter', 'sculptor', 'chef', 'tailor', 'prospector', 'nobody'].map(specDiscipline), ['jewelcrafting', 'masonry', 'cooking', 'outfitting', 'mining', null]);
@@ -69,7 +69,8 @@ test('CRAFT3 law: ten tracks - the five that gather, the five that craft; eight 
   // a choice whose slice is to come is named, never chosen (AUDIT 29 A17) - the Couturier, the Saddler
   // (HUNTERS-MARK): the Trophy Hunter is chosen since its trophy was built (Professions-Arc 58)
   assert.deepEqual([specOk('hunting', 100, 'trophy-hunter'), specOk('outfitting', 100, 'couturier'), specOk('outfitting', 100, 'saddler'), specOk('hunting', 100, 'butcher')], [true, false, false, true]);
-  for (const p of PROFESSIONS) for (const r of SPEC_RANKS) assert.equal(SPECIALISATIONS[p.id][r].length, disciplinesOf(p.id).length > 1 ? 4 : 2, `${p.id} ${r}`);
+  // Building's Masonry 50, Masonry 100 and Carpentry 100 hold one choice each, so it has 3 at 50 and 2 at 100
+  for (const p of PROFESSIONS) for (const r of SPEC_RANKS) assert.equal(SPECIALISATIONS[p.id][r].length, p.id === 'building' ? (r === 50 ? 3 : 2) : disciplinesOf(p.id).length > 1 ? 4 : 2, `${p.id} ${r}`);
 });
 
 test('CRAFT3 law: the crafter\'s limit two of five - a third craft past Journeyman stops at 50, a gathering track no craft, a discipline asked its craft\'s (a Ring held by Smithing\'s own rank never)', () => {
@@ -142,10 +143,10 @@ test('CRAFT3 page: the Professions tab lists the ten; Building\'s four cards a r
     rows.find((b) => b.textContent.startsWith('Building')).onclick();
     const cards = [...root.querySelectorAll('button')].filter((b) => b.className.includes('prof-spec'));
     assert.deepEqual(cards.map((c) => [c.querySelector('b').textContent, c.querySelector('.prof-of')?.textContent]), [
-      ['Bowyer', 'Carpentry'], ['Joiner', 'Carpentry'], ['Quarryman', 'Masonry'], ['Builder', 'Masonry'],
-      ['Siegewright', 'Carpentry'], ['Master Joiner', 'Carpentry'], ['Fortifier', 'Masonry'], ['Sculptor', 'Masonry'],
+      ['Bowyer', 'Carpentry'], ['Joiner', 'Carpentry'], ['Quarryman', 'Masonry'],
+      ['Master Joiner', 'Carpentry'], ['Sculptor', 'Masonry'],
     ]);
-    assert.deepEqual(cards.slice(0, 4).map((c) => c.querySelector('.prof-cost')?.textContent ?? null), ['Change: free, once', 'Change: free, once', null, 'Change: free, once']);
+    assert.deepEqual(cards.slice(0, 3).map((c) => c.querySelector('.prof-cost')?.textContent ?? null), ['Change: free, once', 'Change: free, once', null]);
     assert.match(root.textContent, /Masonry: Cut Stone, from Rough Stone/);
     assert.match(root.textContent, /Carpentry: Pine: staves, bows, arrows, the Basket, a plain single bed/);
     assert.match(root.textContent, /Crafts above Journeyman: 1 of 2/);

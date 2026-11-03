@@ -515,10 +515,9 @@ export function trees(p) {
 /** A tree's base roll (the service's dice): 2 to 4 logs. */
 export const TREE_YIELD = Object.freeze([2, 4]);
 /** A TREE'S YIELD, in PROF0 6's order: the base roll; a march's +25%; the fraction a chance. The act moves no logs. */
-export function treeYield({ roll, march = false, tideMult = 1 }, chance) {
+export function treeYield({ roll, march = false }, chance) {
   let y = roll;
   if (march) y *= MARCH_MULT;
-  y *= tideMult;   // SEASON1 part two: the land's Tide on confirmed ground (tideLaw.js tideYield)
   return Math.max(1, wholeYield(y, chance));
 }
 /**
@@ -599,10 +598,9 @@ export function bodyFinds({ hide, torn = false, butcher = false }, dice) {
  * march's +25% on confirmed ground, a school's fish (a Netter's two), a Slaughterfish's weight (a fish more); the fraction
  * a chance. At least one.
  */
-export function haulYield({ roll, clean = false, march = false, school = false, netter = false, slaughterfish = false, tideMult = 1 }, chance) {
+export function haulYield({ roll, clean = false, march = false, school = false, netter = false, slaughterfish = false }, chance) {
   let y = roll * (clean ? ACT_YIELD_MAX : 1);
   if (march) y *= MARCH_MULT;
-  y *= tideMult;   // SEASON1 part two: the land's Tide on confirmed ground (tideLaw.js tideYield)
   if (school) y += netter ? SCHOOL_FISH.netter : SCHOOL_FISH.plain;
   if (slaughterfish) y += 1;
   return Math.max(1, wholeYield(y, chance));
@@ -643,20 +641,18 @@ export function schoolSpots(x, y, day, k) {
  * autumn's berries x1.5; a Seasonal Eye's off-season herb x0.5); the act's step - a bruised herb one less, at least one;
  * a march's +25%; the fraction a chance.
  */
-export function herbYield({ roll, common = false, gardener = false, seasonMult = 1, offSeason = false, bruised = false, march = false, tideMult = 1 }, chance) {
+export function herbYield({ roll, common = false, gardener = false, seasonMult = 1, offSeason = false, bruised = false, march = false }, chance) {
   let y = roll + (common && gardener ? 1 : 0);
   y *= seasonMult;
   if (offSeason) y *= OFF_SEASON_MULT;
   if (bruised) y = Math.max(1, y - 1);
   if (march) y *= MARCH_MULT;
-  y *= tideMult;   // SEASON1 part two: the land's Tide on confirmed ground (tideLaw.js tideYield)
   return Math.max(1, wholeYield(y, chance));
 }
 /** THE BASKET'S YIELD: the block's roll, the search's step (x1.5 all three, x1.25 two), a march's +25%, the fraction. */
-export function foodYield({ roll, step = 1, march = false, tideMult = 1 }, chance) {
+export function foodYield({ roll, step = 1, march = false }, chance) {
   let y = roll * step;
   if (march) y *= MARCH_MULT;
-  y *= tideMult;   // SEASON1 part two: the land's Tide on confirmed ground (tideLaw.js tideYield)
   return Math.max(1, wholeYield(y, chance));
 }
 /** A vein's base roll (the service's dice): 2 to 3 ore. A boulder's: 3 to 5 Rough Stone. */
@@ -667,11 +663,10 @@ export const BOULDER_YIELD = Object.freeze([3, 5]);
  * on a confirmed pixel - the caller's `march`); the fraction a chance. The act moves no ore (its step waits for
  * PROF3's quality - PROF0 23).
  */
-export function veinYield({ roll, deep = false, deepDelver = false, march = false, tideMult = 1 }, chance) {
+export function veinYield({ roll, deep = false, deepDelver = false, march = false }, chance) {
   let y = roll;
   if (deep && deepDelver) y *= DEEP_DELVER_MULT;
   if (march) y *= MARCH_MULT;
-  y *= tideMult;   // SEASON1 part two: the land's Tide on confirmed ground (tideLaw.js tideYield)
   return Math.max(1, wholeYield(y, chance));
 }
 /**
@@ -679,10 +674,9 @@ export function veinYield({ roll, deep = false, deepDelver = false, march = fals
  * Surveyor - the Stonebreaker until MINE-PERKS - always) cuts it at the rock, two to one, into Cut Stone (at least one). One chance, the service's, for
  * whichever fraction is left last.
  */
-export function boulderYield({ roll, march = false, cut = false, tideMult = 1 }, chance) {
+export function boulderYield({ roll, march = false, cut = false }, chance) {
   let y = roll;
   if (march) y *= MARCH_MULT;
-  y *= tideMult;   // SEASON1 part two: the land's Tide on confirmed ground (tideLaw.js tideYield)
   if (cut) return { material: 'stone:cut', qty: Math.max(1, wholeYield(y / CUT_RATIO, chance)) };
   return { material: 'stone:rough', qty: Math.max(1, wholeYield(y, chance)) };
 }

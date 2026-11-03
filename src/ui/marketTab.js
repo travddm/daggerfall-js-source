@@ -301,7 +301,7 @@ export function createMarketTab(m, ui) {
   const q = () => {
     const found = st.view === 'materials' ? searched() : null;
     return { region: m.region, hubs: m.hubs, ...(['materials', 'orders', 'crafted', 'auctions', 'goods'].includes(st.view) ? { family: st.family } : {}),
-      ...at(),   // AUDIT SEATS-3 D2: the board read from - the listings its Market Hall allows answered with the counts
+      ...at(),   // AUDIT SEATS-3 D2: the board read from
       ...(st.view === 'mine' ? { pieces: heldIds() } : {}),   // MARKET-ANY
       ...(st.view === 'materials' && st.tier ? { tier: st.tier } : {}), ...(found ? { materials: found } : {}),
       ...(viewCurrency() === 'gold' ? { currency: 'gold' } : {}),   // GOLD-MARKET: a gold view asks gold's rows

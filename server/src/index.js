@@ -242,7 +242,7 @@ import { isGateRoom, gateDayOfRoom, gateAdmits, gateHolds, gateTimes, gateBossOf
 import { bookNew, isGateBook, placeSeat, courtFell, nightDone, nightWord, riteOnly, bookNextAt, courtOk, courtCounts, courtsJoined, GATE_COURT_FIGHTERS, GATE_MATES_KEEP_MS } from '../../src/net/gate/gateCourts.js';   // GATE-COURTS: a night's courts and the first court's book
 import { GATE_INTERNAL_SEAT, GATE_INTERNAL_COURT, GATE_INTERNAL_PARTY } from './relay.js';   // GATE-COURTS: the doors between a night's courts, and the book's to the hub
 import { riteNear, riteHeard, riteStands, cageStands, RITE_HELPERS_MAX } from '../../src/net/gate/gateRite.js';   // WB12d: the faithful's rite; BROKER-CAGE: the Broker's cage, omen to midnight
-import { isSiegeRoom, newFighter, armsOk, SIEGE_HIT, ROYAL_RING, isSiegeNpcId, siegeNpcFoe, siegeNpcPose, siegeNpcFell, siegeNpcInReach, siegeNpcProvoked, refereeBlow, refereeCast, refereeStep, siegeHeld, siegeNextWave, siegeRise, SIEGE_WAVE_MS, SIEGE_FIGHTERS_MAX, SIEGE_SPECTATORS_MAX, SIEGE_OPENS_MS, SIEGE_TICK_MS, siegeNextBeat, fieldOf, newBattle, battleStep, honoured, siegeCampPose, siegeFieldFrame, isBattleRoom, isRoyalRoom, battleOfRoom, royalAsk, royalAccept, royalMarks, royalMayStrike, royalStepOk, royalEnd, royalStep, royalLadder, royalNextBeat, ROYAL_RC_KEEP, siegePlaceFree, siegeReturn, royalPrune, worksOf, refereeWorkBlow, siegeWaveMs, siegeRamDown, siegeBreach, SIEGE_WORK_IDS, SIEGE_GATEHOUSE, SIEGE_RAM, siegeGroundOf, siegeOffGround, siegeStepLevel, royalLevel, SIEGE_HEIGHT_M } from '../../src/net/siege/siegeRef.js';   // PVP-REF: a siege's referee - siegeRef.js imports nothing, so the worker's graph stays flat   // SEAT2a: and its battle   // AUDIT-SEATS T3/R5: a side's places, a fighter's return, a tourney's records   // SEAT2b part two (b): the works in battle
+import { isSiegeRoom, newFighter, armsOk, SIEGE_HIT, ROYAL_RING, refereeBlow, refereeCast, refereeStep, siegeHeld, siegeNextWave, siegeRise, SIEGE_WAVE_MS, SIEGE_FIGHTERS_MAX, SIEGE_SPECTATORS_MAX, SIEGE_OPENS_MS, SIEGE_TICK_MS, siegeNextBeat, fieldOf, newBattle, battleStep, honoured, siegeCampPose, siegeFieldFrame, isBattleRoom, isRoyalRoom, battleOfRoom, royalAsk, royalAccept, royalMarks, royalMayStrike, royalStepOk, royalEnd, royalStep, royalLadder, royalNextBeat, ROYAL_RC_KEEP, siegePlaceFree, siegeReturn, royalPrune, siegeGroundOf, siegeOffGround, siegeStepLevel, royalLevel, SIEGE_HEIGHT_M } from '../../src/net/siege/siegeRef.js';   // PVP-REF: a siege's referee - siegeRef.js imports nothing, so the worker's graph stays flat   // SEAT2a: and its battle   // AUDIT-SEATS T3/R5: a side's places, a fighter's return, a tourney's records
 import { mintSiegeReceipt, SIEGE_RECEIPT_TTL_S, mintRoyalReceipt } from '../../src/net/siege/siegeReceipt.js';   // SEAT2a: the relay's fourth signature - a fighter's result and Honours
 import { newDuelRef, duelNote, duelOpen, duelBoutOf, duelBlow, duelPose, duelEnd, duelForfeit, duelStep, duelVitals } from '../../src/net/duel/duelRef.js';   // INT8: the duel refereed
 import { mintDuelReceipt } from '../../src/net/duel/duelReceipt.js';   // INT8: a duel won, signed
@@ -891,7 +891,6 @@ export class Room {
     this._seaRate = new WeakMap();  // SEA-EVENTS: each socket's own bucket for sea words
     this._instanceKin = new Map();  // INSTANCES: an instance room's yeses from the hub, `subject|owner` -> { kin, at } (INSTANCE_KIN_KEEP_MS)
     this._instanceAsked = new WeakMap();   // INSTANCES (the audit): when a member let in as the owner's party was last asked again (_instanceRecheck)
-    this._instanceGuildRefused = new WeakSet();   // DOMAIN2: the castle guests already refused out (_instanceGuildOut)
     this._owLoad = null;            // OW6L: a cell's overworld ledger (net/overworldLaw.js) - the one storage read an instance life, its promise shared by every word and hello that lands while it runs; storage is the truth, written at every change
     this._roomOw = null;            // OW6L: a cell's budget for fanning its ledger's changes (OW_ROOM_HZ_MAX) - on the instance, as the chat's is
     this._herald = undefined;       // DISCORD-GATES: the hub's door to Discord ({hook, role}), read once - undefined: not read yet, null: none (no posts)
@@ -1160,7 +1159,6 @@ export class Room {
       this._attachedAt.set(ws, now);
     }
     const idx = this._all(), was = idx.get(ws);
-    if (a.ig && a.gi !== a.ig) this._instanceGuildOut(ws);   // DOMAIN2: a castle's guest that no longer wears its guild
     if (ws.virtual && was) this._vlaw(ws, was, a);   // AUDIT SCALE II R2-5: a ShardSocket's law moved - said to its shard
     if (!was) this._enter(ws);   // SCALE5a: new to the index - last in its order
     this._reindex(ws, was, a);   // SOC1: the account index follows the ids alone - a pose's write leaves it standing; SCALE5a: moved, not dropped
@@ -2695,10 +2693,8 @@ export class Room {
     const one = gm === undefined ? undefined : this._guildOuts.get(`${gi}:${gm}`);
     return (all !== undefined && all > i) || (one !== undefined && one > i);
   }
-  /** GUILD1c: an attachment with its guild taken off (its id, tag and member row) - AUDIT-SEATS: and its Season's banner
-   *  ribbon, which is a guild's (a member who leaves, or changes guild, wears it no more; a token minted since says the
-   *  same). */
-  _unguild(a) { const b = { ...a }; delete b.gi; delete b.gt; delete b.gm; delete b.rb; return b; }
+  /** GUILD1c: an attachment with its guild taken off (its id, tag and member row). */
+  _unguild(a) { const b = { ...a }; delete b.gi; delete b.gt; delete b.gm; return b; }
   /** GUILD1c: a player's guild tag as a frame - `gt` absent for none. */
   _guildFrame(id, gt) { return JSON.stringify(gt ? { t: 'guild', id, gt } : { t: 'guild', id }); }
   /** CHAT-CHAN + DICE1: A LINE OUT, on the channel it was said on - the chat's and the roll's one fan. `frame` is the
@@ -3264,7 +3260,7 @@ export class Room {
     // INT7: and its ARMS (`wa`, the judged pack's most reach and its bow) - every referee's clip of a blow between players
     if (c.fo) house.fo = c.fo;   // STAFF-PANEL5-FOLLOW: `fo`, the account a hidden spectator follows (beside `hd` alone - claimsValid); set here, as the return's literal is pinned by other mutant lists
     if (c.hd === 1) this._hidHellos.add(m);   // STAFF-PANEL5-HIDDEN: `hd`, a hidden staff spectator's token - the hello marked off the signature (staffHidden.js hiddenHello)
-    return { name: c.n, kind: c.k, subject: c.s, title: c.t, ts: c.ts, glyphs: c.g, gx: c.gx, au: c.au, pi: c.pi, rb: c.rb, mu, lt, lv: c.lv, ...guild, gio: c.i, ar: c.ar, cl: c.cl, ...house, ci: c.ci, wa: c.wa };   // ARENA4: the season's rating, the hall's queue's   // ARENA4b: `cl` the character's level, a ladder fighter's vitality's
+    return { name: c.n, kind: c.k, subject: c.s, title: c.t, ts: c.ts, glyphs: c.g, gx: c.gx, au: c.au, pi: c.pi, mu, lt, lv: c.lv, ...guild, gio: c.i, ar: c.ar, cl: c.cl, ...house, ci: c.ci, wa: c.wa };   // ARENA4: the season's rating, the hall's queue's   // ARENA4b: `cl` the character's level, a ladder fighter's vitality's
   }
 
   /** The verifying key, imported once. Shared by the hello and by
@@ -3531,7 +3527,7 @@ export class Room {
       // INSTANCES: AN INSTANCE ADMITS ITS OWNER, STAFF AND THE OWNER'S PARTY - asked before anything is written (the owned
       // room's law above), its hello gate spent first by account (_instanceHello); the hub silent is busy, and the page
       // tries again. A member let in as the party is marked (`ip`) - the room asks again while it stays
-      let instAtt = {};   // DOMAIN2: what the door's right marks on the socket - `ip` the owner's party, `ig` a castle's guild
+      let instAtt = {};   // what the door's right marks on the socket - `ip` the owner's party
       if (instRoom) { const v = await this._instanceHello(a.key, who, now); if (v.no) { this._refuse(ws, v.no, v.no === 'busy' ? CLOSE_BUSY : undefined); return; } instAtt = v.att; }
       // WB3: A GATE'S ROOM ADMITS ONLY INSIDE ITS DAY'S WINDOW, asked before anything is written (the token's law just
       // above): a newcomer while the gate is open and its boss stands, a fighter already in the fight (a reconnect, a
@@ -5605,7 +5601,7 @@ export class Room {
     if (c.s !== who.subject || !room || c.sk !== room.key || c.sw !== room.week) return { no: 'that pass is for another battle' };
     if ((room.kind === 'royal') !== (c.sn === 'royal')) return { no: 'that pass is for another battle' };   // CROWN1 part two: a Royal Tourney's pass to its own room alone
     if (now < c.sb * 1000 - SIEGE_OPENS_MS) return { no: 'the siege is not open' };
-    const of = { sk: c.sk, sw: c.sw, sn: c.sn, st: c.st, sb: c.sb, se: c.se, sf: JSON.stringify(c.sf), sx: JSON.stringify(c.sx ?? null) };   // SEAT2b part two (b): and its works
+    const of = { sk: c.sk, sw: c.sw, sn: c.sn, st: c.st, sb: c.sb, se: c.se, sf: JSON.stringify(c.sf) };
     if (s?.of && Object.keys(of).some((k) => s.of[k] !== of[k])) return { no: 'that pass is for another battle' };
     const mine = s?.fighters?.[who.subject];
     // AUDIT-SEATS R6: PAST THE WINDOW'S CLOSE, A FIGHTER COMES FOR ITS RECEIPT. The door shut at `se` for everyone, and the
@@ -5641,9 +5637,8 @@ export class Room {
     } else if (s) { const no = this._siegeRoomFor(s, who.subject, c.sd, now); if (no) return { no }; }   // AUDIT-SEATS T3/R5: a side's places, a tourney's contenders in the room
     if (!s?.battle) {
       const field = fieldOf(c.sf, c.st, c.sn);
-      const works = worksOf(c.sx, c.st, c.sn);   // SEAT2b part two (b): the works the service froze (orderValid read them well made)
-      if (!field || !works) return { no: 'that pass will not do' };
-      this._siege = { ...(s ?? { fighters: {} }), of, battle: newBattle({ kind: c.sn, tier: c.st, startMs: c.sb * 1000, endMs: c.se * 1000, field, works }) };
+      if (!field) return { no: 'that pass will not do' };
+      this._siege = { ...(s ?? { fighters: {} }), of, battle: newBattle({ kind: c.sn, tier: c.st, startMs: c.sb * 1000, endMs: c.se * 1000, field }) };
       await this._siegeSave(now, true);
       await this._siegeArm(c.sn === 'royal' ? royalNextBeat(this._siege.battle, now) : now + SIEGE_TICK_MS);   // CROWN1 part two: a tourney with no bout on wakes at its week's end
     }
@@ -5748,7 +5743,7 @@ export class Room {
       for (const [sub, f] of Object.entries(s.fighters)) { const sk = socks.get(sub); if (sk) st.push([sk[1].id, f.hp, f.max, f.down ? 1 : 0, ...(f.side === 'attack' || f.side === 'defend' ? [f.side === 'attack' ? 1 : 2] : [])]); }   // SEAT2a: a sided fighter's side (1 attacking, 2 defending)
       this._send(ws, JSON.stringify({ t: 'siege', k: 'st', f: st }));
       if (b?.kind === 'royal') { this._royalSay(ws, s, b, a.sub); return; }   // CROWN1 part two: the ladder, the bout on, this contender's receipts - no banners
-      if (b) this._send(ws, JSON.stringify({ t: 'siege', ...siegeFieldFrame(b, this._siegeCounts(s), now) }));   // CROWN1 part two: the ladder, the bout on, this contender's receipts   // SEAT2b part two (c): the relay's own fighters where they stand now
+      if (b) this._send(ws, JSON.stringify({ t: 'siege', ...siegeFieldFrame(b, this._siegeCounts(s)) }));
       if (b?.result) this._send(ws, JSON.stringify({ t: 'siege', k: 'end', r: b.result, a: b.raised ? 1 : 0, ...(s.receipts?.[a.sub] ? { rc: s.receipts[a.sub] } : {}) }));
       return;
     }
@@ -5756,11 +5751,9 @@ export class Room {
     if (!by) { this._junk(ws); return; }   // a correct client says `in` first
     if (m.k === 'ask' || m.k === 'yes') { if (b?.kind === 'royal' && by.side === 'duel') await this._royalHand(ws, a, s, b, m, now); else this._junk(ws); return; }   // CROWN1 part two   // AUDIT-SEATS R9: a contender's alone
     if (b && (b.result || now < b.startMs)) return;   // SEAT2a: the battle is not joined yet, or over
-    if (m.to === SIEGE_WORK_IDS.gate || m.to === SIEGE_WORK_IDS.ram) { await this._siegeWorkBlow(ws, a, s, b, by, m, now); return; }   // SEAT2b part two (b): a blow on a work
     // AUDIT SEATS-3 B1: and none struck from more than SIEGE_HEIGHT_M off the field's ground (siegeGroundOf - a bout's for
-    // its two) - a defender 45 m over the Rebel Captain shot every rebel down where none of their blows reached it
+    // its two) - a defender 45 m over the field shot attackers down where none of their blows reached it
     if (siegeOffGround(siegeGroundOf(b, a.sub), by.pose) > SIEGE_HEIGHT_M) return;
-    if (isSiegeNpcId(m.to)) { await this._siegeNpcBlow(ws, a, s, b, by, m, now); return; }   // SEAT2b part two (c): on one of the relay's own fighters
     const target = this._idFirst(m.to)?.[1] ?? null;   // SCALE5b: by the id index
     const to = target?.sub ? s.fighters[target.sub] : null;
     if (!to) return;   // a spectator, or a socket gone: nothing to strike
@@ -5786,74 +5779,12 @@ export class Room {
     if (res.fell && b?.kind === 'royal') { this._siegeFan(frames); await this._royalBoutEnd(s, b, royalEnd(b, a.sub, now), now); return; }   // CROWN1 part two: a fall ends the bout
     if (res.fell) {
       by.felled = (by.felled ?? 0) + 1;   // SEAT2a: Honours' other half (6.8)
-      to.upAt = siegeNextWave(now, b ? siegeWaveMs(b, to.side) : SIEGE_WAVE_MS.palace);   // SEAT2a: the seat's own tier's wave - SEAT2b part two (b): a defender's the Walls' quicker
+      to.upAt = siegeNextWave(now, SIEGE_WAVE_MS[b?.tier] ?? SIEGE_WAVE_MS.palace);   // SEAT2a: the seat's own tier's wave
       frames.push({ k: 'fell', id: m.to, by: a.id });
       await this._siegeArm(to.upAt);
     }
     this._siegeFan(frames);
     await this._siegeSave(now, res.fell);
-  }
-  /**
-   * SEAT2b part two (b) (Seats-Arc 6.2): A BLOW ON A WORK - the Gatehouse (`gh`) an attacker's, at a tenth of its damage;
-   * the Ram (`rm`) a defender's, in full - judged by the referee (net/siege/siegeRef.js refereeWorkBlow: the striker's bucket,
-   * a melee blow from the weapon its look holds, within reach of the work's edge, on the field's ground). A Gatehouse at
-   * none is breached (the Throne unbarred); a Ram at none is destroyed and the camp's next fielded at the attackers' next
-   * wave. A blow at a work that is not there (none raised, breached, no Ram standing) is the honest race - nothing; a
-   * blow outside a siege (a Tourney's field, PVP-REF's ground) is junk. The field's frame said at once on a breach or a
-   * Ram's end, else at the next beat.
-   */
-  async _siegeWorkBlow(ws, a, s, b, by, m, now) {
-    if (!b || b.kind !== 'siege' || m.k !== 'blow') { this._junk(ws); return; }
-    const gate = m.to === SIEGE_WORK_IDS.gate;
-    if (by.side !== (gate ? 'attack' : 'defend')) return;   // the sides are kept: a defender batters no gate, an attacker no Ram of its own
-    const work = gate ? (b.breached ? null : b.gate) : b.ram;
-    if (!work) return;
-    let look = this._looks.get(a.id) ?? null;
-    if (!look) { look = (await this.state.storage.get(lookKey(a.id))) ?? null; if (look) this._looks.set(a.id, look); }
-    const res = refereeWorkBlow(by, work, { point: b.field.throne, size: gate ? SIEGE_GATEHOUSE.sizeM : SIEGE_RAM.sizeM, from: by.pose, ground: b.ground ?? null,
-      held: siegeHeld(look, m.w, m.m), d: m.d, r: m.r, share: gate ? SIEGE_GATEHOUSE.blowShare : 1, wa: a.wa ?? null }, now);   // INT7: the striker's signed arms
-    if (!res.ok) return;
-    if (res.broke) {
-      if (gate) siegeBreach(b); else siegeRamDown(b, now);
-      this._siegeFan([siegeFieldFrame(b, this._siegeCounts(s), now)]);   // AUDIT SEATS-2 R2: the relay's own fighters where they stand now, not at the last beat
-      await this._siegeSave(now, true);
-      return;
-    }
-    await this._siegeSave(now, false);
-  }
-  /**
-   * SEAT2b part two (c) (Seats-Arc 7.5, 7.7): A BLOW OR A CAST ON ONE OF THE RELAY'S OWN FIGHTERS (`n<i>` - a Barracks
-   * guard, a rebel, the Rebel Captain) - judged by the referee as a blow on a fighter is (net/siege/siegeRef.js refereeBlow,
-   * refereeCast: the striker's bucket, the weapon its look holds, the reach to its body where its walk has carried it, on
-   * the field's ground); an enemy of the striker's side alone (siegeNpcFoe - a defender strikes no guard, an attacker no
-   * rebel), and a heal reaches none of them. Its vitality fanned; its fall said (`fell`, by the striker), credited to the
-   * striker's Honours and the field's frame said at once - a guard to rise with the defenders' wave, a rebel and the
-   * Captain for good (the Captain's fall ends a revolt at the next beat). A blow at one already down is the honest race -
-   * nothing; at a number the battle never fielded, or outside a battle that fields any, junk.
-   */
-  async _siegeNpcBlow(ws, a, s, b, by, m, now) {
-    const n = b && b.kind !== 'royal' ? (b.npcs ?? []).find((x) => x.id === m.to) ?? null : null;
-    if (!n) { this._junk(ws); return; }
-    if ((m.k === 'cast' && m.h === 1) || !siegeNpcFoe(n, by.side) || n.down) return;
-    if (!siegeNpcInReach(n, by.pose, b.ground ?? null)) return;   // AUDIT SEATS-2 R1: none felled from where it can never answer   // AUDIT SEATS-3 B1: nor from above or below the field
-    let look = this._looks.get(a.id) ?? null;
-    if (m.k === 'blow' && !look) { look = (await this.state.storage.get(lookKey(a.id))) ?? null; if (look) this._looks.set(a.id, look); }
-    const at = siegeNpcPose(n, now, b.ground ?? null, by.pose?.y ?? 0);
-    const res = m.k === 'cast'
-      ? refereeCast(by, n, { from: by.pose, at, d: m.d }, now)
-      : refereeBlow(by, n, { from: by.pose, at, held: siegeHeld(look, m.w, m.m), d: m.d, r: m.r, wa: a.wa ?? null }, now);   // INT7
-    this._metrics.c.magickaDry += +(res.dry === true);   // the magicka pool cut a cast short
-    if (!res.ok || !res.dealt) return;
-    if (res.fell) {
-      siegeNpcFell(b, n, now);
-      by.felled = (by.felled ?? 0) + 1;   // 6.8: a foe felled - Honours' other half
-      this._siegeFan([{ k: 'hp', id: n.id, h: 0, m: n.max }, { k: 'fell', id: n.id, by: a.id }, siegeFieldFrame(b, this._siegeCounts(s), now)]);
-      await this._siegeSave(now, true);
-      return;
-    }
-    siegeNpcProvoked(n, a.sub, now);   // AUDIT SEATS-2 R1: it comes for whoever struck it
-    this._siegeFan([{ k: 'hp', id: n.id, h: n.hp, m: n.max }]);
-    await this._siegeSave(now, false);
   }
   /** SEAT2a: who is in - the two sides' fighters with a socket here, and the spectators. */
   _siegeCounts(s) {
@@ -5905,7 +5836,7 @@ export class Room {
       return true;
     }
     const frames = [];
-    let next = Infinity, felled = false;
+    let next = Infinity;
     for (const [sub, f] of Object.entries(s.fighters)) {
       if (siegeRise(f, now)) {
         const sk = this._siegeSocketOf(sub);
@@ -5916,24 +5847,14 @@ export class Room {
     this._siegeFan(frames);
     if (b) {
       const list = [];
-      for (const [sub, f] of Object.entries(s.fighters)) if (f.side) { f.here = !!this._siegeSocketOf(sub); f.sub = sub; list.push(f); if (!f.here && !Number.isFinite(f.goneAt)) f.goneAt = now; }   // AUDIT-SEATS T3: a leave the room never heard (a restarted object's) stamped at its first beat   // SEAT2b part two (c): and its account, the relay's own fighters' mark
+      for (const [sub, f] of Object.entries(s.fighters)) if (f.side) { f.here = !!this._siegeSocketOf(sub); list.push(f); if (!f.here && !Number.isFinite(f.goneAt)) f.goneAt = now; }   // AUDIT-SEATS T3: a leave the room never heard (a restarted object's) stamped at its first beat
       const events = battleStep(b, list, now);
-      for (const f of list) { delete f.here; delete f.sub; }
-      // SEAT2b part two (c): a blow of the relay's own landed - the fighter's vitality, and its fall (by the one that struck)
-      const struck = [];
-      for (const e of events) {
-        if (e.k !== 'nhit') continue;
-        const sk = this._siegeSocketOf(e.to);
-        if (!sk) continue;
-        struck.push({ k: 'hp', id: sk[1].id, h: e.h, m: e.m });
-        if (e.fell) struck.push({ k: 'fell', id: sk[1].id, by: e.n });
-      }
-      felled = events.some((e) => e.k === 'nup' || (e.k === 'nhit' && e.fell));   // a fall or a rise kept at once, as a fighter's blow's is
-      this._siegeFan([...struck, siegeFieldFrame(b, this._siegeCounts(s))]);
+      for (const f of list) delete f.here;
+      this._siegeFan([siegeFieldFrame(b, this._siegeCounts(s))]);
       if (events.some((e) => e.k === 'end')) { await this._siegeEnd(s, now); return true; }
       next = Math.min(next, siegeNextBeat(b, now));
     }
-    await this._siegeSave(now, frames.length > 0 || felled);
+    await this._siegeSave(now, frames.length > 0);
     if (Number.isFinite(next)) await this.state.storage.setAlarm(next);
     return true;
   }
@@ -9136,23 +9057,9 @@ export class Room {
     if (seaRoomCell(instanceOf(key)?.base)) return { no: INSTANCE_DOOR_WORD };
     let silent = false;
     const kin = async (subject, owner) => { const k = await this._instanceKinOf(subject, owner, now); if (k == null) silent = true; return k === true; };
-    const as = await instanceAdmission(key, who?.subject, { staff: isStaff(who?.glyphs) || !!who?.hid, kin, guild: who?.gi ?? null });   // STAFF-PANEL5-HIDDEN: a hidden spectator's right is staff's - no seat, no membership; DOMAIN2: a castle's guild, the token's own
-    // what the right marks on the socket: a member let in as the party is asked again while it stays (`ip`); one let in as
-    // a castle's guild (`ig`, the guild it came in as) is refused out the moment it wears another or none (_setAttach)
-    return as ? { as, att: as === 'party' ? { ip: 1 } : as === 'guild' ? { ig: who.gi } : {} } : { no: silent ? 'busy' : INSTANCE_DOOR_WORD };
-  }
-  /** DOMAIN2 (6): A CASTLE'S GUEST WHO LEFT ITS GUILD - a socket let in as the castle's
-   *  guild (`ig`) whose guild moved (a removal or a disbanding carried in, a join elsewhere: the guild arms of _message, a
-   *  shard's hello) is refused out, as a party member whose party moved is (_instanceRecheck). Asked off the attachment's
-   *  write (_setAttach), deferred so the write's caller finishes first; once a socket. */
-  _instanceGuildOut(ws) {
-    if (this._instanceGuildRefused.has(ws)) return;
-    this._instanceGuildRefused.add(ws);
-    Promise.resolve().then(async () => {
-      if (this._dead.has(ws) || this._gone.has(ws) || !this.state.getWebSockets().includes(ws)) return;   // AUDIT DOMAINS R5: one already gone (a replacement's close) is refused no second time
-      this._refuse(ws, INSTANCE_DOOR_WORD);
-      await this._reap();
-    }).catch((e) => console.warn('[instance] guild out', e?.message ?? e));
+    const as = await instanceAdmission(key, who?.subject, { staff: isStaff(who?.glyphs) || !!who?.hid, kin });   // STAFF-PANEL5-HIDDEN: a hidden spectator's right is staff's - no seat, no membership
+    // what the right marks on the socket: a member let in as the party is asked again while it stays (`ip`)
+    return as ? { as, att: as === 'party' ? { ip: 1 } : {} } : { no: silent ? 'busy' : INSTANCE_DOOR_WORD };
   }
   /** INSTANCES (the audit): A MEMBER LET IN AS THE OWNER'S PARTY IS ASKED AGAIN WHILE IT STAYS - the hello's word was the
    *  party as it stood then; one kicked, lapsed, or whose party the owner left is refused out of the room within

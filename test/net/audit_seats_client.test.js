@@ -25,8 +25,6 @@ import { SEAT_RELINQUISH_WORDS, SEAT_WATCH_CLAIM_MAX, seatWeekStartMs, seatWeekO
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';
 import { mintSiegeReceipt, mintRoyalReceipt } from '../../src/net/siege/siegeReceipt.js';
 import { mintWatchReceipt } from '../../src/net/watchReceipt.js';
-import { ribbonTints } from '../../src/net/remotePlayers.js';
-import { ribbonRgba } from '../../src/net/heraldryLaw.js';
 import { createSeatBanners } from '../../src/scenes/seatBanners.js';
 import { createSiegeHerald, heraldMarks, heraldDue, fightAnnouncement, SIEGE_HERALD_BEFORE_MS, SIEGE_HERALD_TICK_MS } from '../../src/net/siege/siegeHerald.js';
 import { siegeBlowKind, siegeCastClamp, siegeSpellNumbers, siegeSpellBarred, SIEGE_SPELL_BARRED_TEXT, SIEGE_BARRED_EFFECTS } from '../../src/combat/siegeCombat.js';
@@ -413,7 +411,7 @@ test('AUDIT-SEATS C11 THE HALL OF RECORDS READ ONCE AT A TIME: a press while a r
   assert.match(m, /const dropRecords = \(w\) => \{ try \{ w\?\.dispose\?\.\(\); \} catch \{ \/\* already gone \*\/ \} \};/);
 });
 
-test('AUDIT-SEATS C12 NOTHING MADE A FRAME FOR NOTHING: the Watch\'s due asked in sync agrees with its claim; a ribbon\'s tints parsed once; the seats\' banners one kept list, refilled in place as the origin moves (mutants: the due\'s terms; the cache; the kept list)', async () => {
+test('AUDIT-SEATS C12 NOTHING MADE A FRAME FOR NOTHING: the Watch\'s due asked in sync agrees with its claim; the seats\' banners one kept list, refilled in place as the origin moves (mutants: the due\'s terms; the cache; the kept list)', async () => {
   // the Watch's due
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const T = Math.floor(AT / 1000);
@@ -442,18 +440,11 @@ test('AUDIT-SEATS C12 NOTHING MADE A FRAME FOR NOTHING: the Watch\'s due asked i
   assert.equal(b2.claimWatchDue(), true, 'the oldest ten minutes old');
   const w = hostText('src/scenes/world.js');
   assert.match(w, /if \(seatBook\?\.claimWatchDue\(\)\) seatBook\.claimWatch\(\);/);
-  // the ribbon
-  const a = ribbonTints([0, 2]);
-  assert.deepEqual(a, ribbonRgba([0, 2]));
-  assert.equal(ribbonTints([0, 2]), a, 'the same tints, not parsed again');
-  assert.equal(ribbonTints([1, 1]), null);
-  assert.equal(ribbonTints('junk'), null);
-  assert.match(rd('src/net/remotePlayers.js'), /const band = ribbonTints\(n\.rb\);/);
   // the banners
   let t = [100, 0, 200];
   const anchors = Array.from({ length: 3 }, (_, i) => ({ top: [i, 1, 0], right: [1, 0, 0], out: [0, 0, 1] }));
   const built = new Map([['p', { px: 1, py: 2, homeTown: 3021, seatAnchors: anchors }]]);
-  const sb = createSeatBanners({ built: () => built, seatAt: () => ({ key: 3021, tier: 'palace', region: 21, holder: null }), translation: () => t, now: () => 0, version: () => 1 });
+  const sb = createSeatBanners({ built: () => built, seatAt: () => ({ key: 3058, tier: 'palace', region: 58, holder: null }), translation: () => t, now: () => 0, version: () => 1 });
   const first = sb.list();
   assert.equal(first.length, 3);
   t = [110, 5, 210];

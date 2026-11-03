@@ -589,15 +589,16 @@ test('AUDIT FB1018f L5-6 the Firmament\'s hand at the fire, the alchemy station 
     try {
       assert.ok(page.notes('The Mason\'s Bench').includes(LIMIT(most - 1, 'Building', 'Smithing and Outfitting')), page.notes('The Mason\'s Bench').join('|'));
     } finally { page.done(); }
-    // the fire's clean pan with the town's step, the percent on it, as the Worker pays it
+    // the fire's pans' XP with the percent on it, as the Worker pays it
     const S = await standBook({ FIRMAMENT_OPEN: 'on' });
     S.raw.prepare('INSERT INTO firmament (player, char_id, tree, updated_at) VALUES (?, ?, ?, ?)').run(S.mac.id, S.mac.character, packTree(tree), NOON);
     S.track('provisioning', xpForRank(30));
     assert.equal((await S.book.refresh()).ok, true);
-    page = standPage(S.book, { fire: true, cookSteps: () => 1 });
+    page = standPage(S.book, { fire: true });
     try {
       page.press('The Fire', 'Hunter\'s Stew');
-      assert.match(page.box('The Fire')[1].join('|'), new RegExp(`${scaleXp(cookXp(30, { clean: true, steps: 1 }), pP)} Provisioning experience instead of ${scaleXp(cookXp(30, { steps: 1 }), pP)}`));
+      assert.match(page.box('The Fire')[1].join('|'), new RegExp(`half as much again as its ${scaleXp(cookXp(30), pP)} Provisioning experience`));
+      assert.notEqual(scaleXp(cookXp(30), pP), cookXp(30), 'the percent is on the figure');
     } finally { page.done(); }
   } finally { _resetFirmamentLiveForTests(); }
 });

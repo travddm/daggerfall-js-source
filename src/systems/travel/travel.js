@@ -83,14 +83,6 @@ export function travelPixelMinutes(terrain, transportModifier, {
   return thisMove;
 }
 
-/** SEASON1 part two (9.3: "Storm Season - sea travel slowed"): the factor on a
- *  voyage's ocean pixels by where it is bound - `fn(end)` set by the online world (scenes/world.js, the destination's
- *  land's Tide), null offline, where every voyage is DFU's own. Every reckoning reads it (the travel window, the maps,
- *  the quest clock, the party's fare), so the time shown is the time taken. */
-let seaTide = null;
-export function setSeaTide(fn) { seaTide = typeof fn === 'function' ? fn : null; }
-const seaTideAt = (end) => (seaTide && end ? seaTide(end) : 1);
-
 /** GetPlayerTravelPosition (:47-56) - the ONE origin every travel
  *  reckoning starts from, and the reason CalculateTravelTime resolves
  *  its own start in C# rather than taking one:
@@ -126,7 +118,7 @@ export function playerTravelPosition(player, boardShipPosition, currentPixel) {
  *  longest-axis walk, priced pixel by pixel. */
 export function calculateTravelTime(start, end, {
   speedCautious = false, sleepModeInn = false, travelShip = false,
-  hasHorse = false, hasCart = false, seaMult = seaTideAt(end),
+  hasHorse = false, hasCart = false,
 } = {}, getClimateIndex) {
   const transportModifier = hasHorse ? 128 : hasCart ? 192 : 256;
 
@@ -135,7 +127,7 @@ export function calculateTravelTime(start, end, {
     const terrain = getClimateIndex(x, y);
     if (terrain === CLIMATES.Ocean) ++oceanPixels;
     const m = travelPixelMinutes(terrain, transportModifier, { travelShip, sleepModeInn });
-    minutes += terrain === CLIMATES.Ocean && seaMult !== 1 ? Math.floor(m * seaMult) : m;   // SEASON1 part two: a Storm Season's sea
+    minutes += m;
   }
 
   if (!speedCautious) minutes = minutes >> 1;

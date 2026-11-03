@@ -35,7 +35,7 @@ import { titleBadge, glyphBadges, cssRgba, GLYPH_STROKE } from '../playerBadge.j
 import { PIXEL_STACK } from '../pixelifyFive.js';   // AUDIT NAMES N1-4: the in-play name face
 import { renownText } from '../../net/renown.js';
 import { guildTagText } from '../../net/guild/guildLaw.js';
-import { ribbonColours, heraldryOf, heraldryColourOf, heraldryKey } from '../../net/heraldryLaw.js';   // AUDIT-SEATS: a Season's banner ribbon, under the name here too; AUDIT HERALDRY H4: the tag's frame
+import { heraldryOf, heraldryColourOf, heraldryKey } from '../../net/heraldryLaw.js';   // AUDIT HERALDRY H4: the tag's frame
 import { drawShield } from '../heraldryArt.js';   // AUDIT HERALDRY H4: the guild's shield, in its tag's frame, on the canvas
 import { TV_FILTER_GROUPS, TV_FILTER_TEXT, travelViewFilters, toggleTravelViewFilter, onTravelViewFilters, markShown, countGroups } from '../../systems/travel/travelViewFilters.js';   // OW-FILTER
 import { TV_WHO_GROUPS, TV_WHO_TEXT, TV_KIN_COLORS, travelViewWho, toggleTravelViewWho, cycleTravelViewRenown, cycleTravelViewNodeKm } from '../../systems/travel/travelViewFilters.js';   // OW-WHO / OW-NODE-KM / OW-KIN
@@ -1140,19 +1140,17 @@ export function setTravelViewArmsOf(fn) { armsOf = typeof fn === 'function' ? fn
 const badgeArms = (b) => (guildTagText(b?.gt) && armsOf ? heraldryOf(armsOf(b.gt)) : null);
 /** The badge's own words and marks, off a mark's `badge` (the peer's, as the relay stamped them). */
 function badgeParts(b) {
-  return { lv: renownText(b?.lv), gt: guildTagText(b?.gt), title: titleBadge(b), glyphs: glyphBadges(b), rb: ribbonColours(b?.rb), arms: badgeArms(b) };
+  return { lv: renownText(b?.lv), gt: guildTagText(b?.gt), title: titleBadge(b), glyphs: glyphBadges(b), arms: badgeArms(b) };
 }
 /** Its key in the sprite cache and the frame's picture - H4: its tag's heraldry too, so new arms make a new sprite. */
 const badgeKey = (b) => {
   if (!b) return '';
   const h = badgeArms(b);
-  return `${b.title ?? ''}|${(b.glyphs ?? []).join(',')}|${b.lv ?? ''}|${b.gt ?? ''}|${(Array.isArray(b.rb) ? b.rb : []).join('/')}|${h ? heraldryKey(h) : ''}`;   // AUDIT GUILD2 G12: the whole arms
+  return `${b.title ?? ''}|${(b.glyphs ?? []).join(',')}|${b.lv ?? ''}|${b.gt ?? ''}|${h ? heraldryKey(h) : ''}`;   // AUDIT GUILD2 G12: the whole arms
 };
 /** AUDIT HERALDRY H4: the tag's frame as the in-play face's (.dfname-guild.armed) - a dark plate edged in the guild's
  *  border colour, the shield at its left - px (the shield's width a share of the tag's size). */
 export const TRAVEL_VIEW_ARMS = Object.freeze({ back: 'rgba(14,16,19,0.78)', shield: 0.82, pad: 2, gap: 2 });
-/** AUDIT-SEATS: a Season's banner ribbon under the row - its field's band and its border's edge, px. */
-export const TRAVEL_VIEW_RIBBON = Object.freeze({ band: 2, edge: 1, gap: 1 });
 /**
  * OVERWORLD NAMES: A PLAYER'S NAME AS IT READS OVER THEIR HEAD IN PLAY - the
  * title its own line above, in its own colour (a gradient title across its letters); under it one row centred as the
@@ -1183,8 +1181,7 @@ function badgeSprite(doc, m, size, party, dpr, bk = badgeKey(m.badge)) {
   const glyphW = P.glyphs.length ? P.glyphs.length * gs + (P.glyphs.length - 1) * 2 : 0;
   const rowW = lvW + (lvW ? gap : 0) + nameW + arrowW + (gtW ? gap + gtW : 0) + (glyphW ? gap + glyphW : 0);
   const titleH = P.title ? small + 3 : 0, rowH = size + 6;
-  const ribbonH = P.rb ? TRAVEL_VIEW_RIBBON.gap + TRAVEL_VIEW_RIBBON.band + TRAVEL_VIEW_RIBBON.edge : 0;   // AUDIT-SEATS
-  const w = Math.ceil(Math.max(rowW, titleW) + 8), h = Math.ceil(titleH + rowH + 2 + ribbonH);
+  const w = Math.ceil(Math.max(rowW, titleW) + 8), h = Math.ceil(titleH + rowH + 2);
   c.width = Math.ceil(w * dpr); c.height = Math.ceil(h * dpr);
   x.scale(dpr, dpr);
   x.textBaseline = 'top';
@@ -1212,13 +1209,6 @@ function badgeSprite(doc, m, size, party, dpr, bk = badgeKey(m.badge)) {
   }
   let cx = (w - rowW) / 2;
   const ry = titleH + 3;
-  if (P.rb) {   // AUDIT-SEATS: a Season's banner ribbon under the row, the row's width - its field, edged in its border
-    const R = TRAVEL_VIEW_RIBBON, by = ry + size + 3 + R.gap;
-    x.shadowBlur = 0; x.shadowOffsetY = 0;
-    x.fillStyle = P.rb.field; x.fillRect(cx, by, rowW, R.band);
-    x.fillStyle = P.rb.border; x.fillRect(cx, by + R.band, rowW, R.edge);
-    x.shadowBlur = 3; x.shadowOffsetY = 1;
-  }
   if (P.lv) {   // the Renown, boxed, left of the name
     x.shadowBlur = 0; x.shadowOffsetY = 0;
     x.fillStyle = N.renownBack; x.fillRect(cx, ry - 1, lvW, size + 2);

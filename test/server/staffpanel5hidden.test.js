@@ -124,7 +124,7 @@ test('STAFF-PANEL5-HIDDEN: HIDE ME (pressed - STAFF-HIDE-TOGGLE made it off by d
       for (const g of c.g ?? []) assert.ok(HIDDEN_GLYPHS.includes(g), `a staff glyph alone (${g})`);
       assert.equal(r.body.hidden, 1); assert.equal(r.body.sub, sub); assert.equal(r.body.name, HIDDEN_NAME);
       assert.equal(r.body.accountName, h, 'the staff member\'s own page still knows who it is');
-      for (const k of ['title', 'guild', 'aura', 'icon', 'ribbon', 'house', 'level', 'xp']) assert.equal(r.body[k], null, k);
+      for (const k of ['title', 'guild', 'aura', 'icon', 'house', 'level', 'xp']) assert.equal(r.body[k], null, k);
       const again = await s.mint(h);
       assert.equal(claimsOf(again.body.token).s, sub, 'the same subject for every socket of one session');
     }

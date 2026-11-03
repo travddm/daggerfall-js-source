@@ -68,7 +68,7 @@ test('SEASON1 THE HALL OF RECORDS AS A BOOK: the title centred in the title face
     'In week 11, Ebon Oath <EO> held Anticlere unchallenged.', 'In week 16, the Silver Hand <SH> took the Charter of Anticlere with 6,200 influence.'], 'no Season counted: no headings');
 });
 
-test('SEASON1 THE HALL OF RECORDS IN THE SERVICE: a seat\'s Chronicle oldest first, its newest HALL_OF_RECORDS_ROWS, each row\'s data read back, beside the week Season 0 began (none where none is set); the standings keep their own few; a bad seat and the seats shut refused (mutants: the order; the bound; the zero; the refusals)', async (t) => {
+test('SEASON1 THE HALL OF RECORDS IN THE SERVICE: a seat\'s Chronicle oldest first, its newest HALL_OF_RECORDS_ROWS, each row\'s data read back; the standings keep their own few; a bad seat and the seats shut refused (mutants: the order; the bound; the zero; the refusals)', async (t) => {
   const W = seatWeekOf(T0 * 1000);
   t.mock.method(Date, 'now', () => T0 * 1000);
   for (const zero of [null, W - 2]) {
@@ -85,7 +85,6 @@ test('SEASON1 THE HALL OF RECORDS IN THE SERVICE: a seat\'s Chronicle oldest fir
     assert.equal(r.body.rows.length, HALL_OF_RECORDS_ROWS);
     assert.deepEqual(r.body.rows[0], { kind: 'held', week: n + 1 - HALL_OF_RECORDS_ROWS, data: { guild: SH, standing: n + 1 - HALL_OF_RECORDS_ROWS } }, 'the oldest of the newest');
     assert.deepEqual(r.body.rows.at(-1), { kind: 'held', week: n, data: {} }, 'the newest last, its unread data none');
-    assert.equal(r.body.zero, zero, 'the week Season 0 began');
     assert.equal(r.body.key, ANTICLERE.key);
     assert.equal((await svc.call('/v1/seats/records', { key: 'x' }, me.secret)).body.error, 'bad-seat');
     // the standings keep their own few

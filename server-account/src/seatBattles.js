@@ -109,7 +109,7 @@ export async function signBattle({ db, nowS }, player, env, { character, key } =
     const turningS = Math.floor(seatWeekStartMs(week) / 1000);
     if (Number(me.joined_at) > turningS - SEAT_MEMBER_WAIT_S) return { error: 'sign-new-member' };
     const then = (await db.prepare('SELECT guild_id FROM town_seat_binds WHERE week = ? AND account = ?').bind(week - 1, player.id).first())?.guild_id ?? null;
-    if (then !== me.guild_id && b.kind !== 'revolt') return { error: 'sign-unbound' };   // AUDIT SEATS-2 L2: a revolt won no Right - its week asks no bind (7.7)
+    if (then !== me.guild_id) return { error: 'sign-unbound' };
     if (bound != null && bound !== me.guild_id) return { error: 'sign-bound-elsewhere' };
     const r = await db.prepare(`INSERT INTO town_seat_rosters (week, key, account, char_id, guild_id, side, sellsword, fee, at)
       SELECT ?1, ?2, ?3, ?4, ?5, ?6, 0, 0, ?7
