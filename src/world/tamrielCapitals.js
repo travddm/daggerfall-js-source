@@ -60,7 +60,6 @@ import { imperialSliceMarkers, imperialOwnName, imperialAnchorCarrier, imperialS
 import { ARENA_BLOCK } from './arena/arenaCity.js';   // IC-GRAND: Daggerfall's arena in the Arena District
 import { solitudeGroundTile, solitudeBlockLift, inDocks, gateRoadAt, SOLITUDE_TILES, SOLITUDE_DOCKS, SOLITUDE_LEVELS, SOLITUDE_MAIN_GATE, SOLITUDE_GATE_ROAD, SOLITUDE_EDGE_BAND, SOLITUDE_PIXEL } from './solitudeRelief.js';   // SOLITUDE-RELIEF: its ground
 import { TOWN_OUTLINE_BLOCK } from './townOutline.js';   // TS5: the open ground past the Imperial City's lake
-import { unwalledLocation } from './townShape.js';   // TS7: a Bay city's own grid
 import {
   MOURNHOLD_PLAN, MOURNHOLD_DISTRICTS, MOURNHOLD_BLOCKS, ALINOR_PLAN, ALINOR_DISTRICTS, ALINOR_BLOCKS, FALINESTI_PLAN, FALINESTI_DISTRICTS,
   FALINESTI_BLOCKS, TORVAL_PLAN, TORVAL_DISTRICTS, TORVAL_BLOCKS, HELSTROM_PLAN, HELSTROM_DISTRICTS, HELSTROM_BLOCKS, CAPITAL_RIM_M, CAPITAL_RIM_TILES,
@@ -490,7 +489,7 @@ export function capitalPin(place) {
  * @param {Iterable<any>} rows @param {(mapId: number) => boolean} [isMain] */
 export function capitalBase(rows, isMain = () => false) {
   const id = (l) => (l?.mapTableData?.mapId ?? 0) >>> 0;
-  return [...(rows ?? [])].map(unwalledLocation).filter((l) => l?.mapTableData?.locationType === LOCATION_TYPES.TownCity && l.exterior?.exteriorData && !l.hasDungeon   // TS7: as it was read
+  return [...(rows ?? [])].filter((l) => l?.mapTableData?.locationType === LOCATION_TYPES.TownCity && l.exterior?.exteriorData && !l.hasDungeon
     && !l.spawned && !l.ether && !l.arena && !l.country && !l.capital && !isMain(id(l))).sort((a, b) => id(a) - id(b))[0] ?? null;
 }
 
@@ -500,7 +499,7 @@ export function cityBlockNames(rows) {
   const out = new Map();
   for (const l of rows ?? []) {
     if (l?.mapTableData?.locationType !== LOCATION_TYPES.TownCity) continue;
-    for (const n of unwalledLocation(l).exterior?.exteriorData?.blockNames ?? []) {   // TS7: the city's own grid
+    for (const n of l.exterior?.exteriorData?.blockNames ?? []) {
       const kind = String(n).slice(0, 4);
       if (kind === 'WALL' || kind === 'PALA') continue;
       if (!out.has(kind)) out.set(kind, new Set());

@@ -249,14 +249,4 @@ export function onTownTile(tiles, tilePos, gx, gy) {
   const tx = tilePos.x + (gx >> 2);
   return tx >= 0 && ty >= 0 && tx < D && ty < D && !!tiles[tx + ty * D];
 }
-/** TS7: a location as its template was read - a Bay city world/townOutline.js wallBayCity walled, its own ring again and
- *  no outline (the places past the Bay clone their templates' grids, rings and gates and all); any other location itself.
- *  @param {any} loc */
-export function unwalledLocation(loc) {
-  const ed = loc?.exterior?.exteriorData;
-  if (!ed?.wallTook) return loc;
-  const { wallTook, ...rest } = ed;
-  const { outline, ...out } = loc;
-  return { ...out, exterior: { ...loc.exterior, exteriorData: { ...rest, blockNames: wallTook } } };
-}
 

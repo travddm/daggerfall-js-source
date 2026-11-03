@@ -122,7 +122,6 @@ test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring 
   const { installTownOutline, outlineTownLocation, townOutlineBlockJson } = await import('../../../src/world/townOutline.js');
   const { standTownWall } = await import('../../../src/world/townWalls.js');
   const { arenaTemplates } = await import('../../../src/world/arenaLocations.js');
-  const { unwalledLocation } = await import('../../../src/world/townShape.js');
   const { setArenaRoads, beyondKey } = await import('../../../src/world/arenaRoads.js');
   const b = (f) => new Uint8Array(readFileSync(join(ARENA2, f)));
   const maps = new MapsFile(); maps.load(b('MAPS.BSA'), b('CLIMATE.PAK'), b('POLITIC.PAK')); maps.autoDiscard = false;
@@ -132,7 +131,7 @@ test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring 
   const bay = maps.getLocationByName('Daggerfall', 'Gothway Garden');
   const p = longitudeLatitudeToMapPixel(bay.mapTableData.longitude, bay.mapTableData.latitude);
   const rows = [];
-  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(unwalledLocation(lc)); } }
+  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(lc); } }
   const t = arenaTemplates(rows)['city-state'][9];
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
   const city = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500009) >>> 0, longitude: bay.mapTableData.longitude, latitude: bay.mapTableData.latitude } }, io);

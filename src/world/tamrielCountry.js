@@ -32,7 +32,6 @@ import { srand, rand, getSeed, setSeed } from '../formats/dfRandom.js';
 import { firstName, surname, GENDERS, BANK_TYPES, withGameNameBanks } from '../characters/nameHelper.js';   // AUDIT TESA II P10: a place's name on the game's own banks
 import { tavernsA, tavernsB } from './buildingNames.js';   // L10N: the tavern words - AUDIT TESA II P10: read in DFU's own English for a place (withBaseText)
 import { withBaseText } from '../systems/textManager.js';
-import { unwalledLocation } from './townShape.js';   // TS7: a Bay city cloned as it was read
 import { BAY_W, BAY_H, tamrielFit } from './tamriel/tamrielFrame.js';
 import { tamrielLandVersion } from './tamriel/tamrielLand.js';   // AUDIT-TESA A7-1: the ground's reads kept a land
 import { CAPITAL_LANE } from './tamrielCapitals.js';   // TESA10: the capitals' lane, after the lairs'
@@ -89,7 +88,7 @@ const idOf = (l) => (l?.mapTableData?.mapId ?? 0) >>> 0;
  * @returns {Map<number, any[]>}
  */
 export function countryTemplates(rows, isMain = () => false) {
-  const list = [...(rows ?? [])].map(unwalledLocation).filter((l) => l?.exterior?.exteriorData && !l.hasDungeon && !l.spawned && !l.ether && !l.arena && !l.country && !isMain(idOf(l)));   // TS7
+  const list = [...(rows ?? [])].filter((l) => l?.exterior?.exteriorData && !l.hasDungeon && !l.spawned && !l.ether && !l.arena && !l.country && !isMain(idOf(l)));
   const out = new Map();
   for (const type of COUNTRY_TYPES) out.set(type, list.filter((l) => l.mapTableData?.locationType === type).sort((a, b) => idOf(a) - idOf(b)));
   return out;
