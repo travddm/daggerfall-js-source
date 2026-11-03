@@ -141,7 +141,7 @@ test('SD2d a save taken inside a Hollow: its clone names its own pixel - the sav
   assert.deepEqual({ x: p.x, y: p.y }, { x: site.px, y: site.py }, 'the dungeon home a save inside it writes (dungeonContext.js dungeonHome)');
   assert.notDeepEqual({ x: p.x, y: p.y }, { x: 450, y: 400 }, 'not the template\'s');
   const w = read('src/scenes/world.js');
-  assert.match(w, /else if \(onlineOn && !\(pixel\.x === getInt\('Startup', 'StartCellX'\) && pixel\.y === getInt\('Startup', 'StartCellY'\)\) && !starts\.resumesAt\(pixel\)\) \{/, 'online: every dungeon save but the tutorial\'s wakes outside');   // PIN MOVED (AUDIT STARTS W3): and a province start's own dungeon, its commission still in it
+  assert.match(w, /else if \(onlineOn && !\(pixel\.x === getInt\('Startup', 'StartCellX'\) && pixel\.y === getInt\('Startup', 'StartCellY'\)\)\) \{/, 'online: every dungeon save but the tutorial\'s wakes outside');
   // read the Alik'r's past the map; the Bay's pixels as before
   assert.match(w, /const wake = inEther\(from\.x, from\.y\) \|\| !onTheBay\(from\.x, from\.y\) \? \{ kind: 'dungeon', mapPixel: \{ x: from\.x, y: from\.y \} \} : undergroundWakeSpot\(maps\.getRegion\(maps\.getRegionIndexAt\(from\.x, from\.y\)\)\?\.mapTable \?\? \[\], from\);/, 'by the nearest temple, town or graveyard to its pixel');
   assert.match(w, /else \{ _wodInside = false; townTalk\.say\('\(the dungeon could not be entered\. Your character is restored at its door\)'\); \}/, 'offline, no Hollow stands: at its door');

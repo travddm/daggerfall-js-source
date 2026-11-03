@@ -6476,17 +6476,14 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // reason); this is where it used to be, and the comment above still
   // describes what it is for.
   let _questStartPending = false, _questStarted = false;
-  // START2 (scenes/startsHost.js): WHERE THE STORY BEGINS - the page's answer (`startKey`, ui/startChoice.js), a
-  // province's start dungeon past the Bay the character is moved into first, and its quest
-  const starts = createStartsHost({ params, pastBay: !!_lairTemplates, quests: () => questWorld,
-    teleport: _teleportToPixel, landReady: arenaTraced, talk: townTalk, machine: () => questBridge?.machine, ready: _worldReady });
-  const questInitAtGameStart = (startKey = null) => {
+  // START (scenes/startsHost.js): WHERE THE STORY BEGINS - Privateer's Hold, as DFU's; the quest the character starts in
+  const starts = createStartsHost({ params, machine: () => questBridge?.machine });
+  const questInitAtGameStart = () => {
     if (_questStarted) return;
-    if (!questBridge) { _questStartPending = startKey ?? true; return; }   // START2: the page's answer kept while the bridge is still to come
+    if (!questBridge) { _questStartPending = true; return; }
     _questStarted = true;
-    // TUT1: DFO's welcome tour, where DFU's _TUTOR__ spoke its first page (questBridge.js gameStartQuests) - START2: both
-    // once the character stands where their story begins
-    starts.begin((start) => { questBridge.initAtGameStart(start); startTutorialTour(); }, startKey);
+    // TUT1: DFO's welcome tour, where DFU's _TUTOR__ spoke its first page (questBridge.js gameStartQuests)
+    starts.begin((start) => { questBridge.initAtGameStart(start); startTutorialTour(); });
     // BA1: StartGameBehaviour.OnStartGame's two listeners in Better Ambience (the fog, the rain source), and
     // Immersive Footsteps' ModCompatibilityWarning_OnStartGame - the box a DFU player sees with both strides on.
     betterAmbience.onStartGame();
@@ -6670,7 +6667,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         // this is a door the GAME opened - the same law `exitToTitleMenu`
         // follows. A player who presses Cancel has asked to leave.
         onCancel: () => { releaseUnloadGuard(); location.reload(); },
-        startChoice: starts.page,   // START2: where the story begins - the page past the Bay's starts (ui/startChoice.js)
         onDone: (r) => {
           setLoadingAside('window', false);   // AUDIT LOAD1 2: a boot still going stands its screen again; the frame asks from its first
           finishChargen(playerEntity, r, sbi);
@@ -6681,7 +6677,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           preloadPaperDollArt({ renderer, fetchBytes, palette, getTexture },
             { race: r.race, gender: r.gender, faceIndex: r.faceIndex });
           surfacePlayer();
-          questInitAtGameStart(r.startKey);   // Q4-v: OnStartGame for the new character - START2: where their story begins
+          questInitAtGameStart();   // Q4-v: OnStartGame for the new character
           autoBuildArms(playerEntity);   // MWA1: the new character's arms - race, sex and face are known now
           legacyHost?.onCharacterMade(r.legacyModel ?? null);   // LEGACY1: the family founded at the character's birth (D9), its model the question's answer
           if (realmNew) starts.settled.then(realmBirth).catch((e) => { console.error('[realm] the birth failed', e); realmLost('server'); });   // REALM P1.3: born online - START2: where the story begins
@@ -9171,8 +9167,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // there - her boat at her berth, the Overworld's crossing at her helm (OWS2) - and the passage over when I step off her
   const passage = createPassageHost({ naval: () => naval, csa: () => (csaRuntime && csaOn() ? csaRuntime : null), ports: navalPortList, here: navalPortHere, pixel: playerTravelPixel,
     ether: (p) => !!etherSea && inEther(p.x, p.y), place: (p) => tvPlaceSummary(p.px, p.py), canGo: travelViewCanGo, route: travelViewRouteTo, travel: () => travelOptions,
-    journeyTo: () => tvTrip.plan?.summary?.pixel ?? (tvTrip.plan ? 'spot' : null), standsOn: csaStandsOn, busy: worldMoveBusy, player, remount: setTransportModeHere, talk: townTalk,
-    writ: starts.writ });   // START2: an opened commission's writ of passage to Daggerfall (scenes/startsHost.js)
+    journeyTo: () => tvTrip.plan?.summary?.pixel ?? (tvTrip.plan ? 'spot' : null), standsOn: csaStandsOn, busy: worldMoveBusy, player, remount: setTransportModeHere, talk: townTalk });
   setHoldingsProvider({
     ...stableProviderFor({ runtime: hccRuntime, on: hccOn, hasHorse: () => hasTransport(TRANSPORT_HORSE), hasCart: () => hasTransport(TRANSPORT_SMALL_CART), wagonKind: () => activeWagonKind(playerEntity.items ?? []), items: () => playerEntity.items ?? [], onPainted: () => { _hccDirty = true; },
       upkeep, pass: upkeepPass }),   // WAGONS1: the Stable names the wagon driven - WAGONS2: and paints it; STEED1/WAGONS4: and keeps them (a kit's hour a skip, as a camp meal's)
@@ -15025,7 +15020,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         const pixel = extras.dungeon?.pixel ?? null;
         csaElsewhere = !pixel;   // CSA-J (the audit): a dungeon this world cannot find is no landing at the save's place
         if (!pixel) townTalk.say('(the dungeon you saved in could not be found. Your character is restored; travel there yourself)');
-        else if (onlineOn && !(pixel.x === getInt('Startup', 'StartCellX') && pixel.y === getInt('Startup', 'StartCellY')) && !starts.resumesAt(pixel)) {   // AUDIT STARTS W3: nor a start's own dungeon, its commission still in it
+        else if (onlineOn && !(pixel.x === getInt('Startup', 'StartCellX') && pixel.y === getInt('Startup', 'StartCellY'))) {
           // ONLINE-UNDERGROUND-LOAD1 (Lost, 2026-09-19): an online page never puts a character back INSIDE a dungeon -
           // it wakes them at the nearest temple, town or graveyard to it (the death respawn's own search, over the
           // region the dungeon stands in), on that place's start marker. The tutorial dungeon is the exception
@@ -15044,7 +15039,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         } else {
           _wodInside = true;   // WOD6: a dungeon save lands inside - no marker hears this load
           await _teleportToPixel(pixel.x, pixel.y, null, { modEvent: 'load' });   // SIB2: SaveLoadManager.OnLoad
-          const entered = await (modes?.startInDungeon?.({ locationKey: extras.locationKey, fromLoad: true, recorded: starts.resumesAt(pixel) ? undefined : extras.dungeon ?? {} }) ?? false);   // AUDIT STARTS W3: a start's dungeon through the quest's own entry (its instance)   // StartDungeonInterior: the enter marker first, the saved position over it; CASTLE1: the SAVED dungeon's door, not the first one loaded
+          const entered = await (modes?.startInDungeon?.({ locationKey: extras.locationKey, fromLoad: true, recorded: extras.dungeon ?? {} }) ?? false);   // StartDungeonInterior: the enter marker first, the saved position over it; CASTLE1: the SAVED dungeon's door, not the first one loaded
           if (entered) { playerSpawned = true; await modes?.restoreDungeonSave?.(extras); }   // AUDIT OH-F B1: RestoreEnemyData whole before the mod loop below
           else { _wodInside = false; townTalk.say('(the dungeon could not be entered. Your character is restored at its door)'); }   // WOD6: it landed outside after all
           if (!entered) csaElsewhere = true;   // CSA-J (the audit): outside at its door, not where the save stood
@@ -18830,7 +18825,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // The clock the tally stamps its three-day letter from - the same
   // classic minute every other dated law in this host reads.
   setCrimeGuildClock(() => Math.floor(playerTicker.ownMinutes));
-  if (_questStartPending) questInitAtGameStart(_questStartPending);
+  if (_questStartPending) questInitAtGameStart();
   // ONLINE1: THE
   // OTHERS. `?online` (the front door's Online button, main.js) joins the
   // relay with this player's look and pose and draws the peers of the
