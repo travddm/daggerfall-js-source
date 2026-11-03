@@ -1767,9 +1767,9 @@ export const FEATURES = Object.freeze([
     }),
   }),
   // NAV: THE SEA FIGHT - the port's own, on Come Sail Away's hulls, so
-  // it stands nothing without that mod. ONE SWITCH, FORCED ON ONLINE: the ships at sea are the room's world (one player
-  // stands the sea for everyone near - scenes/naval/navalHost.js), and a room where one player sees the pirate boarding another
-  // and the other does not is two worlds. The rest is each player's own: the traffic the sea they stand is filled with,
+  // it stands nothing without that mod. ONE SWITCH, OFF BY DEFAULT AND OFF ONLINE (NAVAL-OFF): Daggerfall Unity has no sea fight; the
+  // boat itself (sail, row, cargo) is Come Sail Away's own switch. Online the sea is the room's world (scenes/naval/navalHost.js), and
+  // one player seeing a boarding another does not is two worlds, so there is no per-player switch. The rest is each player's own: the traffic the sea they stand is filled with,
   // whether pirates grapple THEIR boat, and whether THEIR voyage's beaten raiders leave a hold to plunder.
   Object.freeze({
     id: 'naval-combat',
@@ -1778,11 +1778,11 @@ export const FEATURES = Object.freeze([
     get note() { return t('features.navalCombat.note', 'Ship battles on Come Sail Away\u2019s boats: at the helm, look to one side and hold Attack to aim a broadside, '
       + 'then let go to fire. Pirates, merchant ships and navies sail the Bay; batter a ship until it surrenders, board '
       + 'it, take its cargo, then sink it or let it go. Piracy is a crime, and pirates can board your ship and '
-      + 'fight you on deck. Online, everyone in the room shares one sea.'); },
-    get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always on.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
+      + 'fight you on deck. Offline only: online rooms have no sea fight.'); },
+    get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always off.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'naval', initial: true, online: true,   // scenes/world.js navalOn: the host stands down and empties the sea
+      store: 'prefs', key: 'naval', initial: false, online: false,   // scenes/world.js navalOn: the host stands down and empties the sea
       also: Object.freeze([
         Object.freeze({ store: 'prefs', key: 'naval-ships', initial: 'some', online: 'player' }),   // systems/naval/navalDirector.js DENSITY
         Object.freeze({ store: 'prefs', key: 'naval-boarders', initial: true, online: 'player' }),   // navalHost.js: a pirate's grapple on MY boat
