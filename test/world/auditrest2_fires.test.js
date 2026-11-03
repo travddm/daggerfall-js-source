@@ -29,7 +29,7 @@ import { isDungeonLightFixture } from '../../src/world/oceanHoles.js';
 import { withFireMarks } from '../../src/ui/nodeMarks.js';
 import { isHearthFlat } from '../../src/systems/survival/hearth.js';
 
-const { DFIRE, fireCandidates, landCandidates, colliderFireProbe, placeDungeonFires, fireLayoutInputs, inFireWard } = DF;
+const { DFIRE, fireCandidates, landCandidates, colliderFireProbe, placeDungeonFires, fireLayoutInputs } = DF;
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const I = Object.freeze([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const mk = (record, x, z, y = 0.5, archive) => (archive == null ? { record, x, y, z } : { record, x, y, z, archive });
@@ -112,7 +112,7 @@ function joinerDoors({ col, feet = [2, 0, 0], fires = [[0, 0, 0]], wire = true, 
     opts: { selfId: () => 'me', onActions: (d) => { asked.push(d); return wire; } },
     _authority: false, lastPlayerFeet: feet, _motorYaw: 0, _locationKey: 'dungeon:7',
     collider: col, foes: [], placeFoeEnv: ((rolls) => (o) => placeFoeEnv({ ...o, rolls }))(seeded(seed)), entityOccupancy, placeFoeFreely, fieldOfView: () => (65 * Math.PI) / 180,
-    sharedClockOn: () => true, inFireWard, dungeonFires: fires,
+    sharedClockOn: () => true, dungeonFires: fires,
     ambushNight: () => { ambushes.push(1); return ambush(); },
     _spawnEncounter: () => assert.fail('a joiner stands no foe of its own'),
   };
@@ -125,19 +125,22 @@ function joinerDoors({ col, feet = [2, 0, 0], fires = [[0, 0, 0]], wire = true, 
   return { ...doors, asked, ambushes };
 }
 
-test('AUDIT REST II F1: a joiner asks the host only for a foe the host can stand - in a room the fire\'s 15 m ward fills, no ask and no break; in a hall, the ask', () => {
+test('AUDIT REST II F1 (DUNGEON-FIRE-ONE): a joiner asks the host for a foe where its placement finds a spot - a fire no longer wards its room, so a small room asks too; a room with no free floor does not', () => {
   const small = joinerDoors({ col: collider(hall(10)) });   // a 20 m room, the fire in its middle, the joiner 2 m from it
-  for (let i = 0; i < 25; i++) small.restEncounter(HIT);
-  assert.deepEqual(small.asked, [], 'the host would refuse every spot (its ward) - so nothing is asked');
-  assert.deepEqual(small.ambushes, [], 'and no night is broken for it');
-  assert.equal(small.roomEncounterComing(), false, 'nor at the hour\'s check');
+  small.restEncounter(HIT);
+  assert.equal(small.asked.length, 1, 'no ward: the room has spots, so the host is asked');
+  const none = joinerDoors({ col: collider(hall(1)) });   // a 2 m closet: no spot in the band
+  for (let i = 0; i < 25; i++) none.restEncounter(HIT);
+  assert.deepEqual(none.asked, [], 'no spot found: nothing is asked');
+  assert.deepEqual(none.ambushes, [], 'and no night is broken for it');
+  assert.equal(none.roomEncounterComing(), false, 'nor at the hour\'s check');
   const big = joinerDoors({ col: collider(hall(20)) });   // a 40 m hall: spots outside the ward
   big.restEncounter(HIT);
-  assert.equal(big.asked.length, 1, 'a spot stands outside the ward: the host is asked');
+  assert.equal(big.asked.length, 1, 'a spot stands: the host is asked');
   const { s: bigSpot, ...bigAsk } = big.asked[0].rs;
   assert.deepEqual(bigAsk, { t: 5, lo: HIT.minDistance, hi: HIT.maxDistance, v: 0, f: [2, 0, 0], y: 0 });
-  assert.ok(Array.isArray(bigSpot) && !inFireWard([[0, 0, 0]], { x: bigSpot[0], y: bigSpot[1], z: bigSpot[2] }), 'and names the spot it found, outside the ward (AUDIT III E1)');
-  // offline there is no ward (AUDIT REST-PARTY C1) - and a fire nowhere near is no ward either
+  assert.ok(Array.isArray(bigSpot) && bigSpot.length === 3, 'and names the spot it found (AUDIT III E1)');
+  // a fire nowhere near changes nothing
   const far = joinerDoors({ col: collider(hall(10)), fires: [[400, 0, 0]] });
   far.restEncounter(HIT);
   assert.equal(far.asked.length, 1, 'no fire near: the room is the host\'s to stand a foe in');
@@ -175,9 +178,9 @@ test('AUDIT REST II F1 (A1\'s latch, the joiner\'s): the ask breaks a night runn
   assert.equal(refused.roomEncounterComing(), false);
 });
 
-test('AUDIT REST II F1 by source: the host\'s stand and the joiner\'s ask read ONE placement (encounterSpot), the ward inside it', () => {
+test('AUDIT REST II F1 by source: the host\'s stand and the joiner\'s ask read ONE placement (encounterSpot), one placement and no ward', () => {
   const spot = optional('encounterSpot');
-  assert.match(spot, /spot = placeFoeFreely\(env, \{ minDistance, maxDistance, lineOfSightCheck \}\);\n      if \(spot && sharedClockOn\(\) && inFireWard\(dungeonFires, spot\)\) spot = null;/);
+  assert.doesNotMatch(spot, /inFireWard/, 'DUNGEON-FIRE-ONE: a fire wards nothing');
   assert.match(optional('_spawnEncounter'), /const spot = \(asked && askedSpotStands\(asked, \{ minDistance, maxDistance \}, feet\)\) \|\| encounterSpot\(\{ minDistance, maxDistance, lineOfSightCheck \}, feet, yaw\);[^\n]*\n    if \(!spot\) return null;\n    ambushNight\(\);/);   // AUDIT III E1 re-aim: the joiner's spot first
   assert.match(optional('restEncounter'), /const spot = encounterSpot\(hit, feet, _motorYaw\);\n    if \(!spot\) return null;[^\n]*\n/);   // AUDIT III E1 re-aim: the spot kept, for the ask
   assert.equal((D.match(/placeFoeFreely\(env, \{ minDistance, maxDistance, lineOfSightCheck \}\)/g) ?? []).length, 1, 'one placement, not a copy');
@@ -188,7 +191,7 @@ function hostDoors({ col, fires = [[0, 0, 0]], foes = [] } = {}) {
   const stood = [];
   const state = {
     opts: { selfId: () => 'host' }, _authority: true, collider: col, foes, placeFoeEnv: ((rolls) => (o) => placeFoeEnv({ ...o, rolls }))(seeded(97)), entityOccupancy, placeFoeFreely, PLACE_FOE_DEFAULTS,
-    fieldOfView: () => (65 * Math.PI) / 180, sharedClockOn: () => true, inFireWard, dungeonFires: fires,
+    fieldOfView: () => (65 * Math.PI) / 180, sharedClockOn: () => true, dungeonFires: fires,
     ambushNight: () => false, ENEMY_BASICS: { 5: {} }, foeDeps: {}, lastPlayerFeet: null, _motorYaw: 0,
     _ctxDead: false, _sharedSeq: 0, _sharedById: new Map(),
     buildFoeAt: async (rec) => { stood.push([rec.x, rec.y, rec.z]); return { ai: {} }; },
@@ -200,8 +203,8 @@ function hostDoors({ col, fires = [[0, 0, 0]], foes = [] } = {}) {
   return { ...doors, stood };
 }
 
-test('AUDIT REST III E1: the host stands a joiner\'s encounter on the spot the joiner\'s placement found - one trial, not two: in a fire room 26 m across, where the two trials disagreed about half the time, every ask stands its foe where the joiner saw it', () => {
-  const col = collider(hall(13));   // the fire in its middle, the joiner 2 m from it: about half the ring's spots inside the ward
+test('AUDIT REST III E1: the host stands a joiner\'s encounter on the spot the joiner\'s placement found - one trial, not two: in a room 26 m across, where two trials could disagree, every ask stands its foe where the joiner saw it', () => {
+  const col = collider(hall(13));   // the fire in its middle, the joiner 2 m from it
   let asks = 0;
   for (let i = 0; i < 300; i++) {
     const j = joinerDoors({ col, seed: i + 1 });
@@ -213,10 +216,10 @@ test('AUDIT REST III E1: the host stands a joiner\'s encounter on the spot the j
     assert.equal(h.roomEncounterAsked(`peer${i}`, rs), true);
     assert.deepEqual(h.stood, [rs.s], 'the host stands the foe it was asked for, on the joiner\'s spot - never nothing, never elsewhere');
   }
-  assert.ok(asks > 60 && asks < 240, `a room the two trials split in (${asks} asks of 300)`);
+  assert.ok(asks > 240, `the joiner found a spot (${asks} asks of 300)`);
 });
 
-test('AUDIT REST III E1: the joiner\'s spot is held to what the placement asks of a spot - a forged one (out of the band, through a wall, floating, in the ward, on a foe) is not stood; the host searches for itself, as before', () => {
+test('AUDIT REST III E1: the joiner\'s spot is held to what the placement asks of a spot - a forged one (out of the band, through a wall, floating, on a foe) is not stood; the host searches for itself, as before', () => {
   const m = hall(20);
   m.quad([5, 0, -20], [5, 0, 20], [5, 6, 20], [5, 6, -20]);   // a partition across the hall at x 5
   const walled = collider(m), open40 = collider(hall(20));
@@ -231,7 +234,6 @@ test('AUDIT REST III E1: the joiner\'s spot is held to what the placement asks o
     ['inside the band\'s near edge', open40, [-3, 1.25, 0], {}],
     ['through a wall', walled, [12, 1.25, 0], {}],
     ['floating', open40, [-12, 4.25, 0], {}],
-    ['in a fire\'s ward', open40, [-12, 1.25, 0], { fires: [[-14, 0, 0]] }],
     ['on a foe', open40, [-12, 1.25, 0], { foes: [{ ai: { feet: [-12, 0, 0.2] } }] }],
   ]) {
     const h = hostDoors({ col, fires: far, ...over });
@@ -260,8 +262,8 @@ test('AUDIT REST II F2: a palace stands no fire - its castle block\'s none (AUDI
   // the castle block anywhere in the layout makes it a palace
   assert.deepEqual(placeDungeonFires({ blocks: row(12, { castleAt: 7 }), probe: open, seed: 42 }), []);
   // and a dungeon with none is no palace: its count is REST3's
-  assert.equal(DF.layoutFireCount?.(row(12)), 4);
-  assert.equal(placeDungeonFires({ blocks: row(12), probe: open, seed: 42 }).length, 4);
+  assert.equal(DF.layoutFireCount?.(row(12)), 1);
+  assert.equal(placeDungeonFires({ blocks: row(12), probe: open, seed: 42 }).length, 1);
   // the probe tool says so: none wanted, none short
   const r = PROBE.probeFires(new Collider(() => -Infinity), palace.map((b) => ({ ...b, layout: { ...b.layout, placements: [], flats: [] } })), { seed: 42 });
   assert.equal(r.wanted, 0);
@@ -273,7 +275,7 @@ test('AUDIT REST II F2: a palace stands no fire - its castle block\'s none (AUDI
 test('AUDIT REST II F3: no fire stands on a loot pile, a quest marker or the player\'s way in - each at least 1.5 m clear of every such marker; the start\'s fire on its ring, 2 m out', () => {
   const blocks = row(12);
   const fires = placeDungeonFires({ blocks, probe: open, seed: 1234 });
-  assert.equal(fires.length, 4);
+  assert.equal(fires.length, 1, 'DUNGEON-FIRE-ONE: the entrance fire alone');
   const items = blocks.flatMap((b) => b.layout.markers.map((m) => [m.x + b.originX, m.y, m.z + b.originZ]));
   for (const f of fires) for (const m of items) assert.ok(flat2(f, m) >= DFIRE.itemM ** 2, `${f} is ${Math.sqrt(flat2(f, m)).toFixed(2)} m from the marker at ${m}`);
   assert.deepEqual(fires[0], [7, 0, 5], 'the entrance fire: the first bearing of the start\'s ring - never on the start (the player appears there)');
@@ -352,7 +354,7 @@ test('AUDIT REST II F5: the law says which layout fire it took for the entrance\
   const blocks = row(12);
   const plan = DF.dungeonFirePlan?.({ blocks, probe: open, seed: 1234, existing: [[8, 0, 8], [RDB_SIDE * 6, 0, 30]] });
   assert.deepEqual(plan?.doorFire, [8, 0, 8]);
-  assert.equal(plan.fires.length, 3, 'C5: the brazier counts toward N');
+  assert.equal(plan.fires.length, 0, 'C5: the brazier counts toward N, and N is one');
   assert.deepEqual(plan.fires, placeDungeonFires({ blocks, probe: open, seed: 1234, existing: [[8, 0, 8], [RDB_SIDE * 6, 0, 30]] }), 'the placed list and its keys unchanged');
   // two braziers by the door: the nearer; at the same reach, the lesser coordinates - in any order
   for (const ex of [[[9, 0, 5], [5, 0, 8]], [[5, 0, 8], [9, 0, 5]], [[5, 0, 10], [9, 0, 5], [5, 0, 1]], [[5, 0, 1], [9, 0, 5], [5, 0, 10]]]) {
@@ -385,21 +387,20 @@ async function hostFires({ hearths, blocks, size = { w: 1, h: 2 } }) {
   return { ...api, state };
 }
 
-test('AUDIT REST II F5: the brazier taken for the entrance\'s fire keeps a campfire\'s promises - the online ward, the compass\'s yellow mark and the held map read it with the placed fires', async () => {
+test('AUDIT REST II F5: the brazier taken for the entrance\'s fire keeps a campfire\'s promises - the compass\'s yellow mark and the held map read it with the placed fires', async () => {
   const blocks = row(12);
   const brazier = { x: 8, y: 1, z: 8, foot: 0, lawFoot: 0, w: 1, h: 2 };
   const { dungeonFires, state } = await hostFires({ hearths: [brazier], blocks });
-  assert.equal(state.dungeonHearths.filter((h) => h.placed).length, 3, 'three placed past the brazier (C5)');
+  assert.equal(state.dungeonHearths.filter((h) => h.placed).length, 0, 'none placed past the brazier (C5): it is the one');
   assert.deepEqual(dungeonFires[0], [8, 0, 8], 'the door\'s brazier, first');
   assert.deepEqual(dungeonFires.slice(1), state.dungeonHearths.filter((h) => h.placed).map((h) => [h.x, h.foot, h.z]), 'then the placed fires, in their order');
-  assert.equal(inFireWard(dungeonFires, { x: 14, y: 0, z: 8 }), true, 'a wandering spawn 6 m from the brazier is warded (encounterSpot reads this list)');
   assert.ok(withFireMarks(null, dungeonFires, [5, 0, 5]).some((p) => p.mark === 'fire' && p.xz[0] === 8 && p.xz[1] === 8), 'the compass marks it');
   // the compass and the held map read this one list (REST3's pins name the reads; this is the list they name)
   assert.match(D, /nodes: playerFeet \? withFireMarks\(opts\.nodeMarks\?\.\(playerFeet\) \?\? null, dungeonFires, playerFeet\) : null,/);
   assert.match(D, /fires: dungeonFires,   \/\/ REST3/);
   // no brazier by the door: the placed fires alone
   const plain = await hostFires({ hearths: [], blocks });
-  assert.equal(plain.dungeonFires.length, 4);
+  assert.equal(plain.dungeonFires.length, 1);
   assert.deepEqual(plain.dungeonFires, plain.state.dungeonHearths.map((h) => [h.x, h.foot, h.z]));
 });
 
@@ -434,19 +435,19 @@ test('AUDIT REST II F7: an exit door is measured from its face\'s centre (doorWo
   assert.deepEqual(landCandidates([cand], { probe: { floor: () => ({ y: c[1], ny: 1 }), room: () => true }, doors }), []);
 });
 
-test('AUDIT REST II F8: the drowned abyss puts the fires out - the light fixtures\' removal takes the placed fires\' hearths, the ward and the marks with their flames; AUDIT REST III E4 (RE-AIMED): and the layout\'s own braziers, the one taken for the entrance\'s among them - no flameless "Fire" to cook at under the water', async () => {
+test('AUDIT REST II F8: the drowned abyss puts the fires out - the light fixtures\' removal takes the placed fires\' hearths and the marks with their flames; AUDIT REST III E4 (RE-AIMED): and the layout\'s own braziers, the one taken for the entrance\'s among them - no flameless "Fire" to cook at under the water', async () => {
   const blocks = row(12);
   const brazier = { x: 8, y: 1, z: 8, foot: 0, lawFoot: 0, w: 1, h: 2, archive: 210, record: 0 };   // a layout row names its flat (E4)
   const { dungeonFires, abyss, state } = await hostFires({ hearths: [brazier], blocks });
-  assert.equal(dungeonFires.length, 4);
-  assert.deepEqual(state.dungeonHearths.filter((h) => h.placed).map((h) => [h.archive, h.record]), [[210, 1], [210, 1], [210, 1]], 'each placed row names its flat');
+  assert.equal(dungeonFires.length, 1, 'the brazier, the one');
+  const placedRows = (await hostFires({ hearths: [], blocks })).state.dungeonHearths;
+  assert.deepEqual(placedRows.map((h) => [h.archive, h.record]), [[210, 1]], 'a placed row names its flat');
   abyss.removeLightFixtures((a, r) => a === 210 && r === 99);   // a removal that spares every hearth's flat: the fires stand
-  assert.equal(dungeonFires.length, 4);
-  assert.equal(state.dungeonHearths.length, 4);
+  assert.equal(dungeonFires.length, 1);
+  assert.equal(state.dungeonHearths.length, 1);
   abyss.removeLightFixtures(isDungeonLightFixture);   // There's a Hole in the Bottom of the Ocean's RemoveDungeonLightFixtures
-  assert.deepEqual(dungeonFires, [], 'no ward, no compass mark, no map mark');
+  assert.deepEqual(dungeonFires, [], 'no compass mark, no map mark');
   assert.deepEqual(state.dungeonHearths, [], 'no hearth under the water - placed or the layout\'s own');
-  assert.equal(inFireWard(dungeonFires, { x: 8, y: 0, z: 8 }), false);
   // the invariant the abyss leans on: every hearth's flame, and the placed fires', is a dungeon light fixture
   for (let r = 0; r < 64; r++) if (isHearthFlat(210, r)) assert.equal(isDungeonLightFixture(210, r), true, `hearth 210/${r}`);
   assert.equal(isDungeonLightFixture(DF.DUNGEON_FIRE_FLAT.archive, DF.DUNGEON_FIRE_FLAT.record), true);

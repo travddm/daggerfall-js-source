@@ -13,15 +13,19 @@
 //               every fire the layout stands, C2; a layout fire by the door, or nearer it than that, IS the entrance's
 //               and counts, C5), the deep fire (farthest from it, height counted twice), then farthest-point spread 80 m
 //               apart and 80 m from every fire the layout already stands - a height band with candidates and no fire
-//               served first - until N = clamp(round(blocks / 3), 2, 7), blocks the non-border ones; an elite dungeon
-//               half (at least one)
+//               served first - until N = 1 (DUNGEON-FIRE-ONE; it was clamp(round(blocks / 3), 2, 7), blocks the non-border ones; an elite dungeon
+//               half (at least one))
+//
+// DUNGEON-FIRE-ONE: N is 1 (DFIRE.min = DFIRE.max): the entrance fire alone, and no ward round it. The deep fire and the
+// spread below are kept for a layout that asks for more; the game asks for one. Daggerfall Unity stands no fire in a
+// dungeon, so this stays a departure from it, a small one.
 //
 // AUDIT REST II (the dungeon fires audited again): a palace stands none (F2 - any castle block in its layout); a marker's
 // fire never stands on the marker - a loot pile, a quest item or the player's own entry is there - but on the first spot
 // of a ring 2 m out that keeps every rule, and no fire stands within 1.5 m of any such marker (F3); a floor is a face
 // that looks UP (a closed room's roof, seen from the void between storeys, is a ceiling's back - F4) with 1.4 m of level
 // floor round it, so a tabletop, a plinth or a ledge is no hearth; a door is measured from its face's centre (F7); and
-// the law says which layout fire it took for the entrance's, so the host gives it a campfire's ward and marks (F5).
+// the law says which layout fire it took for the entrance's, so the host gives it a campfire's marks (F5).
 
 import { hash32 } from '../spawnedDungeons.js';
 import { GLOBAL_SCALE } from '../meshReader.js';
@@ -52,11 +56,10 @@ export const DFIRE = Object.freeze({
   entranceM: 25,      // the entrance fire's reach from the start
   spacingM: 80,       // about a block and a half
   storeyM: 6,         // the height band that stands in for a storey (automapFloors builds off the draw, after these)
-  wardM: 15,          // no wandering spawn stands this near a placed fire (OPEN 9)
   ceilingM: 10,       // a ceiling within this far over it: inside a room, never on a room's roof
   enclosedM: 30,      // ...and walls round it - at least `enclosedRays` of the eight rays meet one within this far
   enclosedRays: 4,
-  min: 2, max: 7, perBlocks: 3,
+  min: 1, max: 1, perBlocks: 3,   // DUNGEON-FIRE-ONE: the entrance fire alone (was clamp(round(blocks / 3), 2, 7))
 });
 const WATER_NONE = 10000;
 
@@ -312,7 +315,7 @@ export function chooseFirePlan(valid, { seed = 0, existing = [], start = null, c
   // fires and none at the door. One fewer is placed: an elite of one stands its brazier and nothing more.
   const reach = Math.max(SQ(DFIRE.entranceM), first ? d2(first.pos, from) : Infinity);
   const doorFire = existing.some((q) => d2(q, from) < reach);
-  // AUDIT REST II F5: ...and the law says WHICH (the nearest the door): the ward, the compass and the map read only what
+  // AUDIT REST II F5: ...and the law says WHICH (the nearest the door): the compass and the map read only what
   // it reports, so a brazier it adopted for the entrance's kept none of a campfire's promises
   const adopted = doorFire ? nearestOf(existing, from) : null;
   if (!doorFire) take(first);   // never null here: no clear candidate means a layout fire, and none is "nearer" than Infinity
@@ -340,10 +343,6 @@ export function chooseFirePlan(valid, { seed = 0, existing = [], start = null, c
 }
 /** The choice's fires alone (chooseFirePlan). */
 export const chooseFires = (valid, opts) => chooseFirePlan(valid, opts).fires;
-
-/** THE WARD: is a spawn's spot (`{ x, y, z }`) within DFIRE.wardM of a placed fire? The bonfire's promise, not a
- *  guarantee - a layout foe can still walk up. */
-export const inFireWard = (fires, spot) => !!spot && (fires ?? []).some((q) => SQ(q[0] - spot.x) + SQ(q[1] - spot.y) + SQ(q[2] - spot.z) < SQ(DFIRE.wardM));
 
 /**
  * The whole law in one call, for the scene: `blocks` the layout's, `probe` the collider's answers, `doors` the

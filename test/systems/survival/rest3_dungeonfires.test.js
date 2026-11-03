@@ -1,14 +1,14 @@
 // REST3: THE DUNGEON'S OWN FIRES - a pure law over the layout's markers, blocks, water and doors,
 // the collider's answers handed in; every client the same fires, nothing on the wire. The entrance fire, the deep fire,
-// the spread 80 m apart; N = clamp(round(blocks / 3), 2, 7), an elite half. Drawn as the layout's own 210/1, lit, a
-// hearth (warmth, cooking, the camp rest kind, a rest point online), a 15 m ward, on the held map once seen and on the
+// the spread 80 m apart; N = 1 (DUNGEON-FIRE-ONE: the entrance fire; it was clamp(round(blocks / 3), 2, 7)). Drawn as the layout's own 210/1, lit, a
+// hearth (warmth, cooking, the camp rest kind, a rest point online), on the held map once seen and on the
 // compass.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   DFIRE, DUNGEON_FIRE_FLAT, dungeonFireCount, fireCandidates, landCandidates, chooseFires, placeDungeonFires, dungeonStart,
-  enemyMarks, isBorderBlock, inFireWard, colliderFireProbe,
+  enemyMarks, isBorderBlock, colliderFireProbe,
 } from '../../../src/world/dungeon/dungeonFires.js';
 import { Collider } from '../../../src/player/collider.js';
 import { RDB_SIDE } from '../../../src/world/rdbLayout.js';
@@ -30,12 +30,13 @@ function row(n, { water = 10000, enemiesAt = [] } = {}) {
 }
 const open = { floor: (p) => ({ y: 0, ny: 1 }), room: () => true };   // a flat open floor at y 0 everywhere
 
-test('REST3 the count: clamp(round(blocks / 3), 2, 7) over the non-border blocks; an elite half, at least one; the flame is the camp\'s 210/1', () => {
-  assert.deepEqual([0, 1, 4, 6, 9, 12, 21, 40].map((b) => dungeonFireCount(b)), [2, 2, 2, 2, 3, 4, 7, 7]);
-  assert.deepEqual([3, 9, 21].map((b) => dungeonFireCount(b, true)), [1, 1, 3]);
+test('REST3 the count: one fire, the entrance (DUNGEON-FIRE-ONE), whatever the size; an elite one too; the flame is the camp\'s 210/1', () => {
+  assert.deepEqual([0, 1, 4, 6, 9, 12, 21, 40].map((b) => dungeonFireCount(b)), [1, 1, 1, 1, 1, 1, 1, 1]);
+  assert.deepEqual([3, 9, 21].map((b) => dungeonFireCount(b, true)), [1, 1, 1]);
   assert.deepEqual(DUNGEON_FIRE_FLAT, FIRE_FLAT);
   assert.equal(isBorderBlock('B0000004.RDB'), true); assert.equal(isBorderBlock('N0000004.RDB'), false);
-  assert.deepEqual([DFIRE.spacingM, DFIRE.entranceM, DFIRE.doorM, DFIRE.enemyM, DFIRE.dryM, DFIRE.wardM], [80, 25, 3, 8, 0.5, 15]);
+  assert.deepEqual([DFIRE.spacingM, DFIRE.entranceM, DFIRE.doorM, DFIRE.enemyM, DFIRE.dryM], [80, 25, 3, 8, 0.5]);
+  assert.equal(DFIRE.wardM, undefined, 'no ward');
 });
 
 test('REST3 the candidates: start, enter, treasure and quest markers (199), fixed treasure (216), each non-border block\'s centre - never an enemy marker, never a 216 sharing a 199 record', () => {
@@ -90,22 +91,24 @@ test('REST3 the rays (colliderFireProbe, the host\'s and the probe tool\'s): the
   assert.equal(colliderFireProbe(room({ ceiling: false })).room([0, 0, 0]), false, 'walls round it, open over it: a roof, not a room');
 });
 
-test('REST3 the choice: the entrance fire by the start, the deep fire at the far reach, the spread 80 m apart - none near a fire the layout already stands; the same every call', () => {
-  const blocks = row(12);   // 11 inner blocks -> round(11 / 3) = 4
+test('REST3 the choice: the entrance fire by the start; the law asks for one (DUNGEON-FIRE-ONE), the deep fire at the far reach and the spread 80 m apart when a count asks for more - none near a fire the layout already stands; the same every call', () => {
+  const blocks = row(12);
   const fires = placeDungeonFires({ blocks, probe: open, seed: 1234 });
-  assert.equal(fires.length, 4);
-  // AUDIT REST II F3 (
-  // marker it stood on the player's own way in, the defect this pin used to hold
+  assert.equal(fires.length, 1, 'DUNGEON-FIRE-ONE: the entrance fire alone');
+  // AUDIT REST II F3: the entrance fire stands on its ring 2 m out, never on the start marker the player appears at
   assert.deepEqual(fires[0], [5 + DFIRE.ringM, 0, 5], 'the entrance fire by the start marker');
-  const far = Math.max(...fireCandidates(blocks).map((c) => c.pos[0]));
-  assert.equal(fires[1][0], far + DFIRE.ringM, 'the deep fire at the far end');
-  for (let i = 0; i < fires.length; i++) for (let j = i + 1; j < fires.length; j++) assert.ok(Math.hypot(fires[i][0] - fires[j][0], fires[i][2] - fires[j][2]) >= DFIRE.spacingM);
   assert.deepEqual(placeDungeonFires({ blocks, probe: open, seed: 1234 }), fires, 'deterministic');
-  // a brazier by the door: no entrance fire is added - the layout's own is it
-  const withBrazier = placeDungeonFires({ blocks, probe: open, seed: 1234, existing: [[8, 0, 8]] });
-  assert.ok(withBrazier.every((p) => Math.hypot(p[0] - 8, p[2] - 8) >= DFIRE.spacingM), 'none within 80 m of the brazier');
-  // an elite: half
-  assert.equal(placeDungeonFires({ blocks, probe: open, seed: 1234, elite: true }).length, 2);
+  // the choice itself still spreads when asked for four
+  const valid = landCandidates(fireCandidates(blocks), { probe: open, doors: [], enemies: enemyMarks(blocks), items: [] });
+  const four = chooseFires(valid, { seed: 1234, start: dungeonStart(blocks), count: 4 });
+  assert.equal(four.length, 4);
+  const far = Math.max(...fireCandidates(blocks).map((c) => c.pos[0]));
+  assert.equal(four[1][0], far + DFIRE.ringM, 'the deep fire at the far end');
+  for (let a = 0; a < four.length; a++) for (let b = a + 1; b < four.length; b++) assert.ok(Math.hypot(four[a][0] - four[b][0], four[a][2] - four[b][2]) >= DFIRE.spacingM);
+  // a brazier by the door: no entrance fire is added - the layout\'s own is it, and it is the one
+  assert.deepEqual(placeDungeonFires({ blocks, probe: open, seed: 1234, existing: [[8, 0, 8]] }), []);
+  // an elite: still the one
+  assert.equal(placeDungeonFires({ blocks, probe: open, seed: 1234, elite: true }).length, 1);
   // nothing valid, nothing placed
   assert.deepEqual(placeDungeonFires({ blocks, probe: { floor: () => null, room: () => true }, seed: 1 }), []);
 });
@@ -132,13 +135,6 @@ test('REST3 the name: a placed fire is a Campfire on the plaque, a layout brazie
   assert.deepEqual([p.hoverName('hearth:0').title, p.hoverName('hearth:1').title], ['Fire', 'Campfire']);
   assert.deepEqual(p.hoverName('hearth:1').actions.map((a) => a.id), ['rest', 'cook']);
   _resetForTests();
-});
-
-test('REST3 the ward: no wandering spawn stands within 15 m of a dungeon fire', () => {
-  const fires = [[0, 0, 0]];
-  assert.equal(inFireWard(fires, { x: 10, y: 0, z: 10 }), true);
-  assert.equal(inFireWard(fires, { x: 12, y: 0, z: 10 }), false);
-  assert.equal(inFireWard([], { x: 0, y: 0, z: 0 }), false);
 });
 
 test('REST3 the compass: a fire within reach in the flame\'s yellow, under the nodes (the nodes stay last), dimmer the farther; none, the nodes alone', () => {
