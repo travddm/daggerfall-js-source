@@ -61,7 +61,7 @@ jobs:
           PROBE: ${{ inputs.probe }}
           REPEAT: ${{ inputs.repeat }}
           # Probes to leave out of a plain run, space-separated (the repository variable DFO_PROBE_SKIP, empty: none).
-          # A small self-hosted box sets it to "online", whose two clients and workerd peak near 9.5 GB
+          # A self-hosted box short of RAM sets it to "online", whose two clients and workerd peak near 6 GB
           # (docs/ci/self-hosted-runner.md, Measuring a job). A manual run of one probe ignores it.
           SKIP: ${{ vars.DFO_PROBE_SKIP }}
         run: |
@@ -106,9 +106,15 @@ jobs:
       # Two builds side by side: the game, and the game with the online probe's three seams (build.mjs --online)
       - name: Build the game
         run: |
-          node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist" &
-          node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online &
-          wait -n && wait -n
+          if [ "$RUNNER_ENVIRONMENT" = self-hosted ]; then
+            # each build peaks near 5 GB; a small self-hosted runner has 8 GB, so one after the other
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist"
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online
+          else
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist" &
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online &
+            wait -n && wait -n
+          fi
       # One archive each: a build is 30,000 small files, which the artifact service handles slowly one by one
       - name: Pack the builds
         run: |
