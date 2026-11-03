@@ -59,7 +59,7 @@ export function materialKeys() {
 let _byItem = null;
 const itemKey = (it) => `${it?.group}|${it?.templateIndex}`;
 /** THE MAP FROM AN ITEM TO ITS MATERIAL, built by minting each material - both ways a food mints (Climates & Calories
- *  on or off) - so it is the mint's own inverse. A key with no pack form (the Ram Kit, Arcane Essence) has none. */
+ *  on or off) - so it is the mint's own inverse. A key with no pack form (Arcane Essence) has none. */
 function byItem() {
   if (_byItem) return _byItem;
   const m = new Map();
@@ -133,7 +133,7 @@ export function roomFor(entity, key) {
 export function mintCarried(entity, key, n, { cc, slowRot = false, noRot = false } = {}) {
   const out = { bag: 0, pack: 0, left: 0 };
   if (!entity || !Number.isSafeInteger(n) || n < 1) return out;
-  // AUDIT2 BAG1 H12: only what has a pack form (professionLaw.js withdrawable) - an Arcane Essence or a Ram Kit minted as
+  // AUDIT2 BAG1 H12: only what has a pack form (professionLaw.js withdrawable) - an Arcane Essence minted as
   // an item was a shop's gold (PROF12 E1's closed faucet) and a held count of none
   if (!withdrawable(key)) { out.left = n; return out; }
   if (!Array.isArray(entity.items)) entity.items = [];

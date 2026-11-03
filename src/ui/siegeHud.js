@@ -1,8 +1,7 @@
 // @ts-check
 // SEAT2a part four: THE SIEGE
 // HUD AND THE RESULT CARD (19). The bar across the top - the seat, the holder against
-// the challenger, the clock, each banner by name and mark, the Throne (SEAT2b part two (b): and the works - the
-// Gatehouse, the Ram, the Walls) - each side's fighters up and down under it, and
+// the challenger, the clock, each banner by name and mark, the Throne - each side's fighters up and down under it, and
 // this fighter's own vitality and wave (a spectator's count instead); at the end, the result card over it, with the
 // fighter's Honours once the service has answered its receipt.
 //
@@ -31,7 +30,6 @@ export const SIEGE_HUD_CSS = `
 .sg-arm-defend { left: 6px; }
 .sg-arm-attack { right: 6px; }
 .sg-sides { margin-top: 3px; font-size: 12px; opacity: 0.9; }
-.sg-works { margin-top: 2px; font-size: 12px; color: #e8c890; }
 .sg-self { position: fixed; right: 24px; bottom: 120px; text-align: right; font-size: 13px; }
 .sg-card { margin: 18px auto 0; width: 520px; max-width: 90vw; border: 1px solid rgba(240,210,140,0.8); background: rgba(14,10,6,0.85);
   padding: 10px 14px; pointer-events: auto; text-align: left; white-space: normal; }
@@ -56,8 +54,7 @@ export function createSiegeHud(doc, { onClaim = null, onLeave = null } = {}) {
     root = doc.createElement('div'); root.className = 'sg-hud';
     const bar = doc.createElement('div'); bar.className = 'sg-bar';
     parts.title = doc.createElement('div'); parts.banners = doc.createElement('div');
-    parts.works = doc.createElement('div'); parts.works.className = 'sg-works'; parts.works.style.display = 'none';   // SEAT2b part two (b): the Gatehouse, the Ram, the Walls
-    bar.appendChild(parts.title); bar.appendChild(parts.banners); bar.appendChild(parts.works);
+    bar.appendChild(parts.title); bar.appendChild(parts.banners);
     // HERALDRY-SHOWN: the defender's shield at the bar's left (named first), the challenger's at its right - hidden for none
     for (const side of ['defend', 'attack']) {
       const img = parts[`arm-${side}`] = doc.createElement('img');
@@ -86,7 +83,6 @@ export function createSiegeHud(doc, { onClaim = null, onLeave = null } = {}) {
       if (!root) make();
       root.style.display = '';
       put('title', m.bar[0]); put('banners', m.bar[1]); put('sides', m.sides); put('self', m.self.join('\n'));
-      put('works', m.works ?? ''); parts.works.style.display = m.works ? '' : 'none';   // SEAT2b part two (b)
       paintSwatch(parts['arm-defend'], m.arms?.defend); paintSwatch(parts['arm-attack'], m.arms?.attack);   // HERALDRY-SHOWN: painted when it changes
       parts.card.style.display = m.card ? '' : 'none';
       parts.leave.style.display = m.card || !onLeave ? 'none' : '';   // AUDIT-SEATS C1: the card's Close stands for it once the battle has ended; INT9: a readout with nothing to leave (the open zone's) has none

@@ -70,10 +70,9 @@ export const ITEM_PLACES = Object.freeze(['carried', 'bag', 'wagon', 'furnisher'
  *  STAFF-PANEL3-PLAYERS FIX (flaw review, "Handle rename rewrites other accounts' rows"): each is `[table, column, scope]`,
  *  `scope` the row's own account column (?3, the renamed account's id) wherever the table keeps one beside the name, so a
  *  copy is this account's and no other's. A copy with no scope keeps no account id beside the name; it holds only
- *  displayName (a handle, unique, or a guest's name, which a handle never matches). Six more columns that hold
+ *  displayName (a handle, unique, or a guest's name, which a handle never matches). Three more columns that hold
  *  no handle at all, left out here: renown_tracks.name (a character's name, as the client sends it), guild_writs and
- *  guild_contracts' closed_by (an account's id), guild_fealty's offered_by and broken_by and guild_pacts.offered_by (a
- *  guild's id). */
+ *  guild_contracts' closed_by (an account's id). */
 export const NAME_COPIES = Object.freeze([
   ['letters', 'from_name', 'from_id = ?3'], ['homes', 'owner_name', 'player = ?3 AND guild_id IS NULL'], ['home_rooms', 'tenant_name', 'tenant = ?3'],
   ['board_notes', 'author_name', 'author = ?3'], ['board_notices', 'author_name', 'author = ?3'], ['guilds', 'moved_by'], ['guild_members', 'name', 'player = ?3'],

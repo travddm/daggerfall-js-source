@@ -94,7 +94,7 @@ import { firstHotkey } from '../../systems/dialogShortcuts.js';   // A8: the Dag
 // two journeys a trip takes is decided HERE, by the three toggles
 // against the player's settings, and the fare is scaled here too.
 import { TRAVEL_OPTIONS_TEXT as TO_TEXT, format as toFormat } from '../../systems/travel/travelOptionsText.js';
-import { hasPortFor as hasPort } from '../../systems/travel/travelPorts.js';   // SEAT2b part two: HasPort, or a members' Harbour at a seat (travelPorts.js hasPortFor)
+import { hasPort } from '../../systems/travel/travelPorts.js';
 import { calculateTradePrice, essentialPrice } from '../../systems/shopStock.js';   // TravelTimeCalculatorTO's FormulaHelper.CalculateTradePrice
 import { isOnlinePage } from '../../systems/online/onlineLane.js';   // ESSENTIALS-HALF: online, a fare costs half
 import { liveStat } from '../../systems/statMods.js';

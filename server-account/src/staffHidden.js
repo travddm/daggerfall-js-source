@@ -124,7 +124,7 @@ export async function hiddenToken(ctx, env, player, key) {
   const token = await mintToken({ s: sub, n: HIDDEN_NAME, k: accountKind(player), ...(g.length ? { g } : {}), ...(mu ? { mu } : {}), hd: 1 }, key, { subtle, nowS });
   return {
     token, name: HIDDEN_NAME, accountName: displayName(player), nameAs: nameAsOf(player), kind: accountKind(player), title: null, glyphs: g,
-    mutedUntil: mu ?? 0, conduct: conductAgreed(player), level: null, xp: null, guild: null, aura: null, icon: null, ribbon: null, house: null,
+    mutedUntil: mu ?? 0, conduct: conductAgreed(player), level: null, xp: null, guild: null, aura: null, icon: null, house: null,
     expiresAt: nowS + MAX_TTL_S, hidden: 1, sub,
   };
 }

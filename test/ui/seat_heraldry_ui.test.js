@@ -73,7 +73,7 @@ test('HERALDRY-SHOWN THE INDEX: a guild\'s heraldry by its tag off what the clie
   assert.deepEqual(m.get('EO'), EO_ARMS);
   assert.deepEqual([...heraldryByTag({ holder: { guild: SH }, standings: [{ guild: IC }], battle: { guild: EO, against: null } }).keys()], ['SH', 'EO', 'IC'], 'a seat\'s standings answer');
   assert.deepEqual([...heraldryByTag({ holder: { guild: EO } }).keys()], ['EO'], 'a dressed seat');
-  assert.deepEqual([...heraldryByTag({ battle: { kind: 'revolt', guild: null, against: IC } }).keys()], ['IC'], 'a battle\'s holder alone (a revolt\'s)');
+  assert.deepEqual([...heraldryByTag({ battle: { kind: 'siege', guild: null, against: IC } }).keys()], ['IC'], 'a battle\'s holder alone (no attacker)');
   const mine = { id: 'g1', tag: 'SH', name: 'The Silver Hand', heraldry: { field: 'teal', border: 'rose', device: 'sun' } };
   assert.equal(heraldryByTag(mine, list).get('SH').field, 'teal', 'the first source\'s word on a tag kept');
   assert.equal(heraldryByTag(list, mine).get('SH').field, 'azure');
@@ -107,10 +107,6 @@ test('HERALDRY-SHOWN THE INDEX: a guild\'s heraldry by its tag off what the clie
   assert.equal(of('siege-forfeit', { guild: SH, against: EO }), 'EO');
   assert.equal(of('siege-void', { battle: 'siege', guild: EO, holder: SH, carried: true }), 'SH');
   assert.equal(of('siege-void', { battle: 'tourney', guild: EO, holder: SH }), null, 'a void Tourney names neither');
-  assert.equal(of('fealty-sworn', { vassal: IC, liege: SH }), 'IC');
-  assert.equal(of('fealty-broken', { vassal: IC, liege: SH, breaker: SH }), 'SH');
-  assert.equal(of('fealty-tribute', { vassal: EO, liege: SH, marks: 5 }), 'EO');
-  assert.equal(of('fealty-lapsed', { vassal: EO, liege: SH }), 'EO');
   assert.equal(of('royal-champion', { name: 'Mara', wins: 3 }), null);
   assert.equal(of('held', { guild: { name: 'X', tag: '' } }), null);
   assert.equal(of('held', { guild: 'SH' }), null);
@@ -165,7 +161,7 @@ test('HERALDRY-SHOWN THE TAG\'S FRAME: a peer\'s <TAG> whose guild\'s heraldry t
   assert.match(NAME_CSS, /\.dfname-guild\.armed \{ padding: \.06em \.3em \.04em 1\.25em; border: 1px solid; border-radius: \.12em;\n  background: rgba\(14, 16, 19, \.78\) no-repeat \.22em 50% \/ \.82em auto; \}/);
 });
 
-test('HERALDRY-SHOWN THE SIEGE HUD: each side\'s shield on the bar - the defender\'s at its left, the challenger\'s at its right - from the fight its guilds dressed in the seat\'s heraldry (the fight\'s answer carries none); a revolt\'s rising town and a guild with none show none, and a Royal Tourney\'s model none at all; the session dresses the fight it enters (mutants: the sides; the revolt; the dress; the paint)', () => {
+test('HERALDRY-SHOWN THE SIEGE HUD: each side\'s shield on the bar - the defender\'s at its left, the challenger\'s at its right - from the fight its guilds dressed in the seat\'s heraldry (the fight\'s answer carries none); a guild with none shows none, and a Royal Tourney\'s model none at all; the session dresses the fight it enters (mutants: the sides; the revolt; the dress; the paint)', () => {
   const plain = (g) => ({ id: g.id, name: g.name, tag: g.tag });
   const seat = { ...ANTICLERE, holder: { guild: SH }, battle: { kind: 'siege', guild: EO, against: SH } };
   const fight = { kind: 'siege', tier: 'palace', attackerGuild: plain(EO), defenderGuild: plain(SH), sides: {} };
@@ -176,16 +172,12 @@ test('HERALDRY-SHOWN THE SIEGE HUD: each side\'s shield on the bar - the defende
   assert.deepEqual(fightArmed(own, seat).attackerGuild.heraldry, IC.heraldry, 'a guild already dressed keeps its own');
   assert.equal(fightArmed(fight, ANTICLERE).attackerGuild, fight.attackerGuild, 'a seat with no dress: as it came');
   assert.equal(fightArmed(null, seat), null);
-  const revoltFight = fightArmed({ kind: 'revolt', tier: 'palace', attackerGuild: null, defenderGuild: plain(SH) }, seat);
-  assert.equal(revoltFight.attackerGuild, null);
   // the model
   const AT = 1_800_000_000_000;
   const s = foldSiege(SIEGE_STATE_EMPTY, { k: 'f', b: [[2, 0, 0], [2, 0, 0], [2, 0, 0]], th: 0, s: AT, e: AT + 1_800_000, n: [1, 1, 0] }, AT);
   const battle = { seat: 'Anticlere', kind: 'siege', tier: 'palace', attacker: armed.attackerGuild, defender: armed.defenderGuild };
   assert.deepEqual(siegeHudModel(s, battle, 'me', AT).arms, { defend: SH_ARMS, attack: EO_ARMS });
   assert.deepEqual(siegeHudModel(s, { ...battle, attacker: plain(EO) }, 'me', AT).arms, { defend: SH_ARMS, attack: null }, 'a guild with none');
-  assert.deepEqual(siegeHudModel(s, { ...battle, kind: 'revolt', attacker: armed.attackerGuild }, 'me', AT).arms, { defend: SH_ARMS, attack: null }, 'a revolt: the town has none');
-  assert.deepEqual(siegeHudModel({ ...s, revolt: true }, battle, 'me', AT).arms, { defend: SH_ARMS, attack: null }, 'a field that says revolt');
   // the bar
   const hud = createSiegeHud(document);
   hud.update(siegeHudModel(s, battle, 'me', AT));
@@ -194,8 +186,6 @@ test('HERALDRY-SHOWN THE SIEGE HUD: each side\'s shield on the bar - the defende
   const [d, a] = [byClass(bar, 'sg-arm-defend')[0], byClass(bar, 'sg-arm-attack')[0]];
   assert.deepEqual([d.className, d.tagName, d.src, d.alt, d.style.display], ['sg-arm sg-arm-defend', 'IMG', heraldrySwatchSrc(SH_ARMS), 'Azure bordered Gold, a Tower', '']);
   assert.deepEqual([a.className, a.src, a.style.display], ['sg-arm sg-arm-attack', heraldrySwatchSrc(EO_ARMS), '']);
-  hud.update(siegeHudModel(s, { ...battle, kind: 'revolt' }, 'me', AT));
-  assert.deepEqual([d.style.display, a.style.display], ['', 'none'], 'a revolt: the challenger\'s hidden');
   hud.update({ bar: ['ROYAL', ''], works: null, sides: '', self: [], card: null });
   assert.deepEqual([d.style.display, a.style.display], ['none', 'none'], 'a Royal Tourney\'s model: none');
   assert.match(SIEGE_HUD_CSS, /\.sg-bar \{ position: relative;[^\n]*padding: 3px 34px; \}\n\.sg-arm \{ position: absolute; top: 4px; width: 22px; height: auto;[^\n]*\}\n\.sg-arm-defend \{ left: 6px; \}\n\.sg-arm-attack \{ right: 6px; \}/);
@@ -288,9 +278,6 @@ test('AUDIT HERALDRY H2 the Roll of Arms names only the guilds a row\'s LINE nam
   assert.deepEqual(roll([{ kind: 'siege-void', week: 4, data: { battle: 'siege', guild: NAMED(EO), holder: NAMED(SH), carried: true } }]), [
     'The Silver Hand <SH>: Azure bordered Gold, a Tower.', 'Ebon Oath <EO>: Crimson bordered Argent, a Wolf.',
   ], 'a carried void: the holder its line names first, then the attacker');
-  assert.deepEqual(roll([{ kind: 'fealty-broken', week: 6, data: { vassal: NAMED(IC), liege: NAMED(SH), breaker: NAMED(SH) } }]), [
-    'The Silver Hand <SH>: Azure bordered Gold, a Tower.', 'Iron Circle <IC>: Vert bordered Sable, an Axe.',
-  ], 'the breaker first, as the line says it');
   assert.deepEqual(roll([{ kind: 'siege-voided', week: 7, data: { battle: 'siege', guild: NAMED(EO), holder: NAMED(SH), restored: false } }]), [], 'a voided battle restored to none names no guild');
 });
 

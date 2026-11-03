@@ -2,8 +2,7 @@
 // cut, a mix or a carving, or a home's station) - the cut and the mix with their counts and ranks, the Quarryman's two,
 // THE CHISEL (the stone's lines, the marked one moving by the glint's rule, a press on a line or the arrows and Space,
 // every strike true a clean act), Quick, Gentle acts, one act a page, Escape setting it down; the Sculptor's stone decor
-// with its own chisel of seven; Masonry practised on the Professions page (the Builder's and the Fortifier's cards waiting
-// on the fortifications); Mortar and the four stone pieces as items and as DECOR's own things; the book carrying the
+// with its own chisel of seven; Masonry practised on the Professions page; Mortar and the four stone pieces as items and as DECOR's own things; the book carrying the
 // chisel's report; and the done-when, driven through the real Worker: ROUGH STONE CUT WITH A CLEAN CHISEL AT A GENERAL
 // STORE'S BENCH, MORTAR MIXED, AND A SCULPTOR'S STONE COLUMN CARVED, MINTED AMONG THE HOME'S THINGS, SET DOWN IN A HOME AS
 // ITS ONE MODEL AND READ BY A VISITOR WITH ITS MAKER'S MARK. Then the hosts' wiring.
@@ -134,8 +133,8 @@ test('PROF11 DONE WHEN: Rough Stone cut with a clean chisel at a General Store\'
     await settled();
     assert.equal(book.held('stone:cut'), 5);
     assert.equal(book.held('stone:rough'), 10);
-    assert.equal(book.track('masonry').xp, 5 * 20 * 1.5 + 1823, 'a clean chisel half again, and the first cut\'s - Building\'s share');
-    assert.deepEqual([said.at(-1), player.gold], ['+1973 building', 950]);
+    assert.equal(book.track('masonry').xp, 5 * 20 * 1.5 + 1869, 'a clean chisel half again, and the first cut\'s - Building\'s share');
+    assert.deepEqual([said.at(-1), player.gold], ['+2019 building', 950]);
     // THE MIX: rank 10 opens it
     // Building's share - 1,973 now, rank 14, so the Mortar stands open after it (Mortar's rank pinned by the service's own test)
     assert.match(page.text(), /BuildingNovice 14[^]*Mortar x10[^]*Mix/, 'the cut alone past rank 10: the Mortar open');
@@ -146,7 +145,7 @@ test('PROF11 DONE WHEN: Rough Stone cut with a clean chisel at a General Store\'
     await settled();
     assert.equal(book.held('stone:mortar'), 10, 'ten at a time');
     assert.deepEqual([book.held('metal:sulphur'), book.held('metal:lead'), book.held('stone:rough')], [0, 0, 5]);
-    assert.equal(said.at(-1), `+${1 * 20 * 2 + 1823} building`, 'a quick mix: no chisel, no half again - rank 10\'s tier, and its first\'s share');
+    assert.equal(said.at(-1), `+${1 * 20 * 2 + 1869} building`, 'a quick mix: no chisel, no half again - rank 10\'s tier, and its first\'s share');
     // THE SCULPTOR'S COLUMN: a Master who chose the Sculptor, the dice steered to a Masterwork (the mark)
     track(PROF_XP_MAX, 'quarryman', 'sculptor');
     give('stone:cut', 12);
@@ -377,15 +376,15 @@ test('PROF11 pages: the chisel\'s keys - the arrows move it a line, a digit sets
   } finally { both.done(); setProfessionsPages(null); }
 });
 
-test('PROF11 pages: the Sculptor\'s stone decor - shut to all but a Sculptor ("a Sculptor\'s"), said where it comes from; a Sculptor\'s Craft strikes seven with the chisel and asks the carving clean, Quick craft plain; its stone short holds Craft; the Professions page: Masonry practised, the Quarryman and the Sculptor chosen, the Builder and the Fortifier waiting on the fortifications, its unlocks by rank', async () => {
-  stubPages({ rank: 100, specs: { 50: 'quarryman', 100: 'fortifier' }, held: { 'stone:cut': 20, 'stone:mortar': 5 } });
+test('PROF11 pages: the Sculptor\'s stone decor - shut to all but a Sculptor ("a Sculptor\'s"), said where it comes from; a Sculptor\'s Craft strikes seven with the chisel and asks the carving clean, Quick craft plain; its stone short holds Craft; the Professions page: Masonry practised, the Quarryman and the Sculptor chosen, its unlocks by rank', async () => {
+  stubPages({ rank: 100, specs: { 50: 'quarryman', 100: 'master-joiner' }, held: { 'stone:cut': 20, 'stone:mortar': 5 } });
   const shut = pageOf();
   try {
     assert.match(shut.text(), /Stone decor, such as columns, benches, fonts and statue plinths, is carved by a Sculptor \(a Masonry choice at 100\)\./);
     const col = shut.buttons().find((b) => b.textContent.startsWith('Stone Column'));
     assert.match(col.textContent, /a Sculptor's/);
     col.onclick();
-    assert.equal(shut.button('Craft').disabled, true, 'a Fortifier carves nothing');
+    assert.equal(shut.button('Craft').disabled, true, 'a Master Joiner carves no stone');
     assert.doesNotMatch(shut.text(), /margin/);
   } finally { shut.done(); }
   const { calls } = stubPages({ rank: 100, specs: { 50: 'quarryman', 100: 'sculptor' }, held: { 'stone:cut': 20, 'stone:mortar': 5 } });
@@ -427,11 +426,9 @@ test('PROF11 pages: the Sculptor\'s stone decor - shut to all but a Sculptor ("a
     const cards = [...root.querySelectorAll('button')].filter((b) => b.className.includes('prof-spec'));
     const card = (name) => cards.find((b) => b.textContent.startsWith(name));
     assert.deepEqual(cards.map((c) => [c.querySelector('b')?.textContent, c.querySelector('.prof-of')?.textContent ?? null, c.disabled]), [
-      ['Bowyer', 'Carpentry', false], ['Joiner', 'Carpentry', false], ['Quarryman', 'Masonry', false], ['Builder', 'Masonry', false],
-      ['Siegewright', 'Carpentry', true], ['Master Joiner', 'Carpentry', true], ['Fortifier', 'Masonry', true], ['Sculptor', 'Masonry', true],
-    ], 'at 50: any of the four - PIN MOVED (SEAT2b): the Builder is chosen now');
-    assert.doesNotMatch(card('Builder').textContent, /Comes with the fortifications/);
-    assert.doesNotMatch(card('Fortifier').textContent, /Comes with the fortifications/);
+      ['Bowyer', 'Carpentry', false], ['Joiner', 'Carpentry', false], ['Quarryman', 'Masonry', false],
+      ['Master Joiner', 'Carpentry', true], ['Sculptor', 'Masonry', true],
+    ], 'at 50: any of the three');
     const unlocks = [...root.querySelectorAll('.px-stat')].filter((r) => !r.className.includes('prof-raise')).map((r) => r.textContent);
     assert.deepEqual(unlocks.filter((u) => u.startsWith('Masonry: ')), ['Masonry: Cut Stone, from Rough Stonerank 0', 'Masonry: Mortar, from Sulphur, Lead and Rough Stonerank 10']);
     assert.equal(unlocks.every((u) => /^(Carpentry|Masonry): /.test(u)), true, unlocks.join(' | '));

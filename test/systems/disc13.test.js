@@ -349,7 +349,7 @@ function shipLocationOf({ loc = null, travelOptions = false, ports = [], onShip 
   assert.ok(line, 'world.js answers shipLocation');
   const src = line.slice(line.indexOf('() => {'), line.lastIndexOf('; },') + 3);
   // SEAT2b part two (
-  const make = new Function('_questLoc', 'modSetting', 'hasPortFor', 'isOnShip', 'playerEntity', 'playerTravelPixel', `return (${src});`);
+  const make = new Function('_questLoc', 'modSetting', 'hasPort', 'isOnShip', 'playerEntity', 'playerTravelPixel', `return (${src});`);
   return make(() => loc, (v, k) => (v === 'travel-options' && k === 'Enabled' ? travelOptions : undefined),
     (mapId) => ports.includes(mapId), () => onShip, { boardShipPosition: null }, () => ({ x: 0, y: 0 }))();
 }

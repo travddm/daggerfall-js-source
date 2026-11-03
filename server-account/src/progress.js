@@ -32,7 +32,6 @@ import { RAID_CLAIMS_DAY_MAX } from './raids.js';
 import { RENOWN_XP_HOUR_MAX } from '../../src/net/renown.js';
 import { WATCH_DAY_CAP, BOUNTY_CAMPS_DAY } from '../../src/net/townSeatLaw.js';
 import { WATCH_TICK_MS } from '../../src/net/watchReceipt.js';
-import { TIDE_EFFECTS } from '../../src/net/tideLaw.js';
 import { MARKS_FAUCETS } from '../../src/net/marksLaw.js';
 import { writXp } from '../../src/net/professionLaw.js';
 
@@ -49,7 +48,6 @@ export const PROGRESS_LINE = Object.freeze({
     renown: Object.freeze({ rate: RENOWN_XP_HOUR_MAX, cap: RENOWN_XP_HOUR_MAX }),   // Renown's clock hour, read per hour of play
     raid: Object.freeze({ rate: RAID_CLAIMS_DAY_MAX / RAID_GAME_DAY_HOURS, cap: RAID_CLAIMS_DAY_MAX }),   // a game day's six cleanses
     bounty: Object.freeze({ rate: BOUNTY_CAMPS_DAY, cap: BOUNTY_CAMPS_DAY }),   // a seat's Bounty camps, and (HUNTERS-MARK) the boards' clears
-    camp: Object.freeze({ rate: TIDE_EFFECTS.orcsCampsDay, cap: TIDE_EFFECTS.orcsCampsDay }),   // an Orc Raid's camps
     watch: Object.freeze({ rate: 3_600_000 / WATCH_TICK_MS, cap: WATCH_DAY_CAP }),   // a tick for each two minutes stood
     find: Object.freeze({ rate: MARKS_FAUCETS.find.perDay, cap: MARKS_FAUCETS.find.perDay }),   // silver finds
     gather: Object.freeze({ rate: MARKS_FAUCETS.gather.perDay, cap: MARKS_FAUCETS.gather.perDay }),   // a harvest's silver
@@ -68,7 +66,6 @@ export const PROGRESS_ROUTES = Object.freeze({
   '/v1/raid/claim': Object.freeze(['raid', true]),
   '/v1/seats/bounty': Object.freeze(['bounty', true]),
   '/v1/hunt/clear': Object.freeze(['bounty', true]),   // HUNTERS-MARK: a bounty board's clear (hunts.js)
-  '/v1/seats/orc-camp': Object.freeze(['camp', true]),
   '/v1/seats/watch': Object.freeze(['watch', true]),
   // AUDIT TOWN-ECON 2 SVC-2: the town Watch's footsteps too - asked of the account's seat (the body names none), as every
   // claim of the Watch is; it earns its player nothing, so it spends no bucket (progressSpentOf), and an enforced line
@@ -225,7 +222,6 @@ export function progressSpentOf(path, a) {
     case '/v1/star/claim': if (a.recorded === true) add('renown', n(a.renown?.credited)); break;   // STAR7: the Renown a star paid (its count is bounded by the day - stars.js STAR_CLAIMS_DAY_MAX)
     case '/v1/seats/bounty': if (n(a.paid)) add('bounty', 1); break;
     case '/v1/hunt/clear': if (a.recorded === true) add('bounty', 1); break;   // HUNTERS-MARK: a clear recorded
-    case '/v1/seats/orc-camp': if (a.counted === true) add('camp', 1); break;
     case '/v1/seats/watch': add('watch', n(a.counted)); break;
     case '/v1/towns/watch': break;   // AUDIT TOWN-ECON 2 SVC-2: a town's share, never its player's progress
     case '/v1/marks/find': if (n(a.struck)) add('find', 1); break;

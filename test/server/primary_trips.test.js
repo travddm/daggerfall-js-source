@@ -50,13 +50,13 @@ test('PRIMARY-TRIPS SEAT-BATCH: the seats\' list asks its holders, the week\'s b
   await S.call('/v1/seats/list', {}, who.secret);   // the first settles a fresh service's week
   const { r, trips } = await ask(() => S.call('/v1/seats/list', {}, who.secret));
   assert.equal(r.status, 200);
-  assert.ok(Array.isArray(r.body.seats) && Array.isArray(r.body.red) && 'zero' in r.body, 'the list\'s answer as it was');
+  assert.ok(Array.isArray(r.body.seats) && 'zero' in r.body, 'the list\'s answer as it is');
   const boards = trips.filter((t) => t.batch);
   assert.equal(boards.length, 1, 'one batch');
   const b = boards[0].batch;
-  assert.equal(b.length, 6);
-  for (const re of [/FROM town_seat_holds h\s+JOIN guilds/, /FROM town_seat_rights r/, /x\.kind = 'revolt'/, /FROM town_seat_edicts WHERE week = \? AND state = 'law'/, /FROM town_seat_forts/, /FROM town_seat_red/]) assert.ok(b.some((s) => re.test(s)), `${re} in the batch`);
-  assert.ok(!trips.some((t) => t.sql && /town_seat_holds h|town_seat_red|town_seat_forts|town_seat_rights/.test(t.sql)), 'none of them a trip of its own');
+  assert.equal(b.length, 3);
+  for (const re of [/FROM town_seat_holds h\s+JOIN guilds/, /FROM town_seat_rights r/, /FROM town_seat_edicts WHERE week = \? AND state = 'law'/]) assert.ok(b.some((s) => re.test(s)), `${re} in the batch`);
+  assert.ok(!trips.some((t) => t.sql && /town_seat_holds h|town_seat_rights/.test(t.sql)), 'none of them a trip of its own');
 });
 
 test('PRIMARY-TRIPS YARDS-REPLICA: a town\'s yards are read on a session of their own - any instance\'s first, then from the last kept read\'s bookmark, and the primary\'s right after a decor write in this isolate - and the route itself never opens one (mutants: the read on the binding; a write not marked; the bookmark not kept)', async () => {

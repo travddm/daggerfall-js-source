@@ -1,8 +1,8 @@
-// MWNPC10b: THE SIEGE'S
-// FIGHTERS AND THE SHIPS' CREWS IN THEIR MORROWIND BODIES. Neither keeps an entity, so a class one is dressed by its
+// MWNPC10b: THE
+// SHIPS' CREWS IN THEIR MORROWIND BODIES. A crew keeps no entity, so a class one is dressed by its
 // class (characters/foeBodies.js rosterLook: a race and face off its seed, a foe's clothes in their dyes, steel for the
-// knight, the warrior, the spellsword and the watch - the watch helmed) and a creature one is its creature; each driver
-// offers its shown sprites on a lane of its own (siegeNpcs.js, navalCrew.js) before the world's passes draw them.
+// knight, the warrior, the spellsword and the watch - the watch helmed) and a creature one is its creature; the driver
+// offers its shown sprites on a lane of its own (navalCrew.js) before the world's passes draw them.
 // Pinned on the real drivers (their own tests' stand-ins) over recording lanes, and the world's draw points by source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,8 +12,6 @@ import { rosterLook } from '../../src/characters/foeBodies.js';
 import { MOBILE_TYPES as M } from '../../src/characters/mobile/mobileTypes.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { ARMOR_ENUM } from '../../src/combat/enemyEquipment.js';
-import { createSiegeNpcs } from '../../src/scenes/siegeNpcs.js';
-import { SIEGE_UNITS_PER_M as REF_M } from '../../src/net/siege/siegeRef.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const settle = () => new Promise((r) => setTimeout(r, 0));
@@ -50,39 +48,6 @@ test('MWNPC10b-1 rosterLook: a class one dressed by its class off its seed - ste
   const l = rosterLook(rec, { mobileType: M.Bard, seed: 3 });
   assert.equal(rosterLook(rec, { mobileType: M.Bard, seed: 3 }), l, 'kept: one build');
   assert.notEqual(rosterLook(rec, { mobileType: M.Bard, gender: 'female', seed: 3 }), l, 'another one: another look');
-});
-
-test('MWNPC10b-2 the siege: each shown fighter offered in its body on the siege\'s lane - the guard in the watch\'s steel, the captain a fifth again a man; walking as it walks, each new attack a swing, each hurt a recoil, down dead; its feet its billboard\'s; leaving lets the lane go; the origin moves them', async () => {
-  const T = 1_000_000;
-  const renderer = { textures: new Set(), createBillboardBatch: (archive, record, size) => ({ archive, record, size, bounds: [0, 0, 0, 0] }), destroyBillboardBatch: () => {} };
-  const tex = { getFrameCount: () => 4, getSize: () => ({ width: 40, height: 80 }), getScale: () => ({ x: 0, y: 0 }) };
-  let lane = null;
-  const d = createSiegeNpcs({ renderer, getTexture: async () => tex, uploadRecordFrame: () => {}, cam: () => [0, 2, 10], toScene: (x, z) => [x / REF_M, 7, z / REF_M],
-    wantBodies: () => true, makeBodies: () => (lane = recordingLane()) });
-  const n = { id: 'n0', kind: 'guard', hp: 360, max: 360, x: 0, z: 0, tx: 10 * REF_M, tz: 0, at: T, down: false, atk: 0, hurtAt: -Infinity };
-  const cap = { ...n, id: 'n9', kind: 'captain', tx: 0, x: 3 * REF_M };
-  const twin = { ...n, id: 'n1', x: -3 * REF_M, tx: -3 * REF_M };
-  d.frame([n, cap, twin], T + 100); await settle(); d.frame([n, cap, twin], T + 116);
-  d.drawBodies({}, null, null, [0, 0, 0], 1 / 60);
-  const g = lane.offered.find((o) => o.id === 'n0'), c = lane.offered.find((o) => o.id === 'n9');
-  assert.ok(g && c, 'both offered');
-  assert.notDeepEqual(lane.offered.find((o) => o.id === 'n1').look, g.look, 'two guards two people - the look seeded off the id');
-  assert.ok(g.look.items.some((it) => it.templateIndex === ARMOR_ENUM.Helm), 'the guard in the watch\'s helmed steel');
-  assert.equal(g.moving, true, 'walking where its walk carries it');
-  assert.equal(c.scale, 1.2, 'the captain as his sprite stands him');
-  assert.equal(g.feet, d.batches()[0].origin, 'its feet its billboard\'s');
-  d.frame([{ ...n, atk: T + 1000 }, cap], T + 200);
-  d.frame([{ ...n, atk: T + 1000, hurtAt: T + 300 }, cap], T + 300);
-  d.drawBodies({}, null, null, [0, 0, 0], 1 / 60);
-  const g2 = lane.offered.find((o) => o.id === 'n0');
-  assert.deepEqual([g2.swings, g2.hits], [1, 1], 'an attack a swing, a hurt a recoil');
-  d.frame([{ ...n, down: true, at: T + 400 }, cap], T + 400);
-  d.drawBodies({}, null, null, [0, 0, 0], 1 / 60);
-  assert.ok(lane.offered.find((o) => o.id === 'n0').dead > 0, 'down: dead');
-  d.offsetBodies([5, 0, 5]);
-  assert.deepEqual(lane.offsets, [[5, 0, 5]]);
-  d.leave();
-  assert.equal(lane.destroyed, 1);
 });
 
 test('MWNPC10b-3 the crews: each hand on her deck offered his class\'s look off her seed and his place, at his sprite\'s feet and his world facing, concealed with her owner; each swing at his work a blow; the hands below and the gone none; cleared, the lane let go', async () => {

@@ -63,7 +63,7 @@ test('CRAFT5 DONE WHEN: a Superior Steel Repair Kit mends a Steel Longsword at 7
 test('CRAFT5 law: a kit\'s craft rolls a quality, its reach - never a takesQuality piece (no commission\'s least quality, no auction); the record a kit\'s quality, or none for one made before; the reach Superior up', () => {
   assert.deepEqual([KIT_CEILING, KIT_CEILING_HIGH, KIT_HIGH_QUALITY], [0.75, 0.9, 3]);
   const kitR = recipeById('kit:steel');
-  assert.deepEqual([rollsQuality(kitR), takesQuality(kitR), rollsQuality(recipeById('arrows:north')), rollsQuality(recipeById('longsword:steel')), rollsQuality(recipeById('ramkit:oak'))], [true, false, false, true, false]);
+  assert.deepEqual([rollsQuality(kitR), takesQuality(kitR), rollsQuality(recipeById('arrows:north')), rollsQuality(recipeById('longsword:steel'))], [true, false, false, true]);
   assert.deepEqual([null, {}, { quality: -1 }, { quality: 0 }, { quality: 2 }, { quality: 3 }, { quality: 4 }, { quality: 1.5 }].map(kitReach), [0.75, 0.75, 0.75, 0.75, 0.75, 0.9, 0.9, 0.75]);
   assert.deepEqual([kitCeilingText(null), kitCeilingText({ quality: 3 })], [KIT_CEILING_TEXT, KIT_CEILING_HIGH_TEXT]);
   const s = worn(0.5);

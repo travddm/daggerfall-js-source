@@ -1266,7 +1266,6 @@ test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own 
   // the off hand's terms reach every blow between players (AUDIT): each melee arm hands the STRIKING rig's off flag on
   const world = rd('src/scenes/world.js');
   assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 2, 'the duel and the battle');
-  assert.match(world, /\.\.\.\(weaponRig\.playerWeapon\.offStrike \? \{ off: true \} : \{\}\) \}, duelStandIn\(playerEntity\)\);$/m, 'and the siege\'s works');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS): the stand-in struck by me
   assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 2, 'each strike-out hands it to the roll (the duel and the siege; the open zone one is gone)');
   // the classic sprite's placement is FPSWeapon's, shared by the second hand
   const fps = rd('src/combat/fpsWeapon.js');

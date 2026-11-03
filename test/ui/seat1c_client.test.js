@@ -92,7 +92,7 @@ test('SEAT1c THE WORDS AND THE MARKS: the Chronicle\'s lines; the holder\'s, the
   assert.equal(seatArrivalLine(ANTICLERE, SH), 'Anticlere, held by the Silver Hand <SH>.');
   assert.equal(seatInfoLine(ANTICLERE, SH), 'The Charter of Anticlere: held by the Silver Hand <SH>');
   const heldSeat = { ...ANTICLERE, holder: { guild: SH } };
-  assert.deepEqual(seatMapMark(heldSeat), { ring: '#d4a017', crown: null, second: ['#3b6fd8', '#b3262e'], fill: '#3b6fd8', split: null, siege: false });
+  assert.deepEqual(seatMapMark(heldSeat), { ring: '#d4a017', crown: null, second: null, fill: '#3b6fd8', split: null, siege: false });
   const contested = { ...ANTICLERE, holder: null, battle: { kind: 'tourney', guild: SH, against: EO } };
   assert.deepEqual(seatMapMark(contested).split, ['#3b6fd8', '#b3262e']);
   assert.equal(seatMapMark({ ...heldSeat, battle: { kind: 'siege', guild: EO, against: SH } }).siege, true);
@@ -167,9 +167,9 @@ test('SEAT1c THE BOOK AND THE SEAT TAB: a derived seat dressed in its holder and
 
 test('SEAT1c THE HOSTS BY SOURCE: the service settles the Turning before any seat answer, decorates the list with holders and battles, routes relinquish; a guild holding a Charter or named in a battle to come does not go; the holder counts at its seat and pledges nowhere else in its region; the client\'s seats are dressed, the arrival names the holder, the banners fly its colours (mutants: each seam)', () => {
   const idx = rd('server-account/src/index.js');
-  assert.match(idx, /if \(seatsOpenFor\(who\.player, env\) && \(await settleDueOnce\(ctx\.db, nowS, seasonZeroOf\(env\.SEASON_ZERO_WEEK\), domainsWeekOf\(env\.DOMAINS_WEEK\)\)\)\.pending && !SEAT_READS\.has\(path\)\) return no\('seats-settling', 503, origin\);[^\n]*\n\s*const act = \{/);
-  // works and red lines in one batch (seatTurning.js seatsBoard answers `{ seats, red }`)
-  assert.match(idx, /if \('error' in r\) return r;[^\n]*\n[^\n]*\n\s*const board = await seatsBoard\(ctx\.db, r\.seats, nowS\);\n\s*return \{ \.\.\.r, \.\.\.board, \.\.\.\(domains\?\.rule \? \{ seats: chartersMarked\(board\.seats, domains\.seats\) \} : \{\}\), zero: seasonZeroOf\(env\.SEASON_ZERO_WEEK\), \.\.\.\(domains \? \{ domains \} : \{\}\) \};/);   // CROWN2: the red lines; SEASON1 part two: Season 0's week
+  assert.match(idx, /if \(seatsOpenFor\(who\.player, env\) && \(await settleDueOnce\(ctx\.db, nowS, seasonZeroOf\(env\.SEASON_ZERO_WEEK\)\)\)\.pending && !SEAT_READS\.has\(path\)\) return no\('seats-settling', 503, origin\);[^\n]*\n\s*const act = \{/);
+  // the holders and battles in one batch (seatTurning.js seatsBoard answers `{ seats }`)
+  assert.match(idx, /if \('error' in r\) return r;[^\n]*\n\s*const board = await seatsBoard\(ctx\.db, r\.seats, nowS\);\n\s*return \{ \.\.\.r, \.\.\.board, zero: seasonZeroOf\(env\.SEASON_ZERO_WEEK\) \};/);   // the holders and battles in one batch; SEASON1 part two: Season 0's week
   assert.match(idx, /'\/v1\/seats\/relinquish': \(\) => relinquishSeat\(ctx, who\.player, env, body\),/);
   assert.ok(rd('server-account/src/service.js').includes("'/v1/seats/relinquish',"));
   const gu = rd('server-account/src/guilds.js');

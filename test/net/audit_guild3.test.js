@@ -67,7 +67,7 @@ test('AUDIT GUILD3 W1: an OPEN writ or contract holds its pay in escrow by right
 
 test('AUDIT GUILD3 W2: a silver line the SERVICE made is the guild\'s - its `who` is a label (\'A Sellsword\', \'The Turning\', \'The registry\', a writ\'s material, an auction\'s id, a work\'s name), never the sentence\'s subject; a member\'s own act (a deposit, a withdrawal, the arms, a deed, a contract put up, a Tribute, a patron\'s bid) says its name (mutants: the member kinds, the subject)', () => {
   assert.deepEqual([...GUILD_SILVER_MEMBER_KINDS].sort(), ['contract-escrow', 'guild-deed', 'guild-deposit', 'guild-withdraw', 'heraldry', 'patron-escrow', 'tribute']);
-  const labels = { 'sellsword-escrow': 'A Sellsword', 'seat-claim': 'The Turning', 'seat-strike-refund': 'The registry', 'writ-escrow': 'iron', tithe: 'auction:9f', fort: 'Palisade', 'royal-escrow': 'The Tourney' };
+  const labels = { 'sellsword-escrow': 'A Sellsword', 'seat-claim': 'The Turning', 'seat-strike-refund': 'The registry', 'writ-escrow': 'iron', tithe: 'auction:9f', 'royal-escrow': 'The Tourney' };
   for (const [raw, who] of Object.entries(labels)) {
     const t = guildSilverLineText({ who, raw, out: raw !== 'tithe' && raw !== 'seat-strike-refund', amount: 100 });
     assert.match(t, /^The guild /, raw);
@@ -125,18 +125,18 @@ test('AUDIT GUILD3 S3: the silver the guildmaster\'s account has no room for is 
   assert.ok(GUILD_HOLD_CODES.includes('marks-full'), 'the view\'s word stands for it - a refusal\'s older word not repeated');
 });
 
-test('AUDIT GUILD3 S4: a line between two guilds reads by THIS guild - a Conscription received from another guild came in, a fealty share paid to one went out (mutants: the guild\'s own id dropped from `out`)', async () => {
+test('AUDIT GUILD3 S4: a line between two guilds reads by THIS guild - a Conscription received from another guild came in, a Conscription paid to one went out (mutants: the guild\'s own id dropped from `out`)', async () => {
   const s = await guildService();
   s.raw.prepare("INSERT INTO guilds (id, name, name_key, tag, ranks, treasury, founded_at) VALUES ('gother', 'The Other', 'the other', 'OTH', '[]', 0, 1)").run();
   s.raw.prepare("INSERT INTO guild_marks (guild_id, balance) VALUES ('gother', 100)").run();
   const line = (src, dst, kind, amount, rid) => s.raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('guild', ?, 'guild', ?, ?, ?, 1, ?, 'seats', 'The Turning', ?)`).run(src, dst, kind, amount, T0, rid);
   line('gother', s.gid, 'conscription', 30, 'r-con');
-  line(s.gid, 'gother', 'fealty-tribute', 5, 'r-fea');
+  line(s.gid, 'gother', 'conscription', 5, 'r-fea');
   const view = (await s.call('/v1/guilds/mine', { character: s.gm.character }, s.gm.secret)).body.guild;
-  const by = Object.fromEntries(view.marksLedger.map((l) => [l.raw, l.out]));
-  assert.deepEqual(by, { conscription: false, 'fealty-tribute': true });
-  assert.deepEqual(view.marksLedger.map(guildSilverLineText).sort(), ['The guild paid its liege a fealty share of 5 silver', 'The guild received Conscription of 30 silver']);
+  const by = view.marksLedger.map((l) => [l.amount, l.out]).sort((a, b) => b[0] - a[0]);
+  assert.deepEqual(by, [[30, false], [5, true]]);
+  assert.deepEqual(view.marksLedger.map(guildSilverLineText).sort(), ['The guild paid Conscription of 5 silver', 'The guild received Conscription of 30 silver']);
 });
 
 // ─── THE CHAPTERS' LAW (lane L) and THE RECORD'S LAW 1 (R1) ─────────
@@ -334,13 +334,12 @@ test('AUDIT GUILD3 T9: the words, each a literal - the primer, the Overview\'s E
     'contract-escrow': 'put up a contract of', 'contract-return': 'had a contract\'s unpaid pay come home:',
     'writ-escrow': 'set aside a guild writ\'s pay of', 'writ-return': 'had a guild writ\'s unpaid pay come home:',
     tribute: 'paid Tribute of', 'seat-claim': 'paid a Charter\'s claim fee of', 'seat-upkeep': 'paid a Charter\'s upkeep of',
-    'seat-edict': 'paid for an Edict:', fort: 'paid for the Works:', 'seat-strike-refund': 'had a struck Charter\'s fee refunded:',
+    'seat-edict': 'paid for an Edict:', 'seat-strike-refund': 'had a struck Charter\'s fee refunded:',
     tithe: 'collected a Tithe of', 'bounty-escrow': 'set a Bounty aside:', 'bounty-return': 'had a Bounty\'s unpaid silver come home:',
     'sellsword-escrow': 'hired a Sellsword for', 'sellsword-return': 'had a Sellsword\'s unpaid fee come home:',
     'royal-escrow': 'put up a Royal Tourney prize of', 'royal-return': 'had a Royal Tourney prize come home:',
     'patron-escrow': 'bid for a chapter\'s patronage:', 'patron-return': 'had a patronage bid come home:',
     conscription: { in: 'received Conscription of', out: 'paid Conscription of' },
-    'fealty-tribute': { in: 'received a vassal\'s fealty share of', out: 'paid its liege a fealty share of' },
   });
 });
 

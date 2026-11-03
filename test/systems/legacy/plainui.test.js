@@ -98,7 +98,7 @@ test('PLAIN-UI the Seat tab\'s guide stands open for a reader whose guild is not
 
 test('PLAIN-UI Words on this board: every name the Seat tab uses, in a word list, each number the law\'s own - a crown\'s line and Tithe its own (mutants: the claim\'s line a palace\'s at a crown; Unrest\'s bonus; the Tribute\'s rate)', async () => {
   const words = seatWords(ANT);
-  assert.deepEqual(words.map(([w]) => w), ['Charter', 'Influence', 'Muster, Reckoning, Turning', 'Pledge', 'Defence', 'Right of Siege', 'Tourney', 'Standing', 'Tithe', 'Edict', 'Tribute', 'Sellsword', 'The Works', 'Fealty and Pacts', 'Season and Tide']);   // AUDIT PLAIN-UI T6: the Works and crown politics too
+  assert.deepEqual(words.map(([w]) => w), ['Charter', 'Influence', 'Muster, Reckoning, Turning', 'Pledge', 'Defence', 'Right of Siege', 'Tourney', 'Standing', 'Tithe', 'Edict', 'Tribute', 'Sellsword', 'Season']);
   const said = (seat, w) => seatWords(seat).find(([k]) => k === w)[1];
   assert.match(said(ANT, 'Right of Siege'), new RegExp(`at least ${n(CLAIM_THRESHOLD.palace)} influence`));
   assert.match(said({ tier: 'crown' }, 'Right of Siege'), new RegExp(`at least ${n(CLAIM_THRESHOLD.crown)} influence`));

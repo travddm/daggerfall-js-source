@@ -24,7 +24,6 @@ import { liveStat } from '../../src/systems/statMods.js';
 import { liveBundles, canEndBundle, endBundle } from '../../src/systems/mysticism.js';
 import { mintPiece, mintPieces, craftedText, asMinted, COOK_KEPT_TEXT } from '../../src/systems/smithItems.js';
 import { mintDish, dishUse, feedEffect, dishStaminaFactor, setFeastShare, installCooking, feastSharedLine, DISH_STAMINA_KIND, isDish, isPartyDishSpell, takeFeastGift, renewDish, isFeastRecord, dishStandsLine, shareFeastWith } from '../../src/systems/cookItems.js';
-import { hallStepsFor } from '../../src/net/fortLaw.js';
 import { DISH_TEMPLATE_ROWS, DISH_FOODS } from '../../src/systems/professions/profTemplates.js';
 import { materialLabel, withdrawIntoPack } from '../../src/systems/professions/profItems.js';
 import { templateByIndex } from '../../src/systems/item/itemTemplates.js';
@@ -501,7 +500,7 @@ test('PROF9 wiring: the fire is any lit one (the street\'s camps and braziers, a
   assert.match(p, /\['fire', \(d\) => drawCookFire\(d, rerender, kit\)\],   \/\/ PROF9/);
   assert.match(src('src/ui/enhanced/enhancedPlusStyle.js'), /\.prof-heatbar\.prof-panbar \{ background: linear-gradient/);
   const svc = src('server-account/src/professions.js');
-  assert.match(svc, /const xp = scaleXp\(r\.kind === 'dish' \? cookXp\(rank, \{ clean: clean === true, steps: halls \}\) : craftXp\(r\.tier, rank\),/);
+  assert.match(svc, /const xp = scaleXp\(r\.kind === 'dish' \? cookXp\(rank, \{ clean: clean === true \}\) : craftXp\(r\.tier, rank\),/);
   assert.match(svc, /const hand = dishHand\(r, specs\[100\]\) \?\? jewelHand\(r, specs\[50\]\);/);
   assert.match(d1()._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('products').sql, /\n +hand +INTEGER CHECK \(hand IS NULL OR hand IN \(1, 2\)\),/);
   assert.equal(recipeById('feast:hearth').profession, 'cooking');
@@ -616,27 +615,6 @@ test('AUDIT PROF-541 K6: the Orchard Tart\'s stamina is the player\'s to end, as
   assert.deepEqual([me.activeEffects.length, dishStaminaFactor(me)], [0, 1], 'ended');
 });
 
-test('AUDIT PROF-541 K7: the fire\'s XP line says what the service pays - the town Apothecary\'s steps in it (recipeLaw cookXp\'s `steps`, the host\'s cookSteps), a plain line where there are none', () => {
-  // to take it (a Master's track takes none: the service credits MIN(earned, PROF_XP_MAX - held))
-  stubPages({ rank: 90, over: { cookSteps: () => 2 } });
-  let page = pageOf();
-  try {
-    page.dish('Hunter\'s Stew (northern').onclick();
-    assert.match(page.text(), /Take every pan off in time for 350 Provisioning experience instead of 280, with the town Apothecary's 2 steps in both\./);
-    page.done();
-    stubPages({ rank: 90, over: { cookSteps: () => 1 } });
-    page = pageOf();
-    page.dish('Hunter\'s Stew (northern').onclick();
-    assert.match(page.text(), /in time for 280 Provisioning experience instead of 210, with the town Apothecary's step in both\./);   // PIN MOVED (CRAFT3): Provisioning XP
-    page.done();
-    stubPages({ rank: 90, over: { cookSteps: () => 0 } });
-    page = pageOf();
-    page.dish('Hunter\'s Stew (northern').onclick();
-    assert.match(page.text(), /Take every pan off in time for half as much again as its 140 Provisioning experience\./);
-  } finally { page.done(); setProfessionsPages(null); }
-  assert.match(hostText('src/scenes/world.js'), /cookSteps: \(\) => myHall\('cooking'\)\.steps,/);
-});
-
 test('AUDIT PROF-541 K8: a Brew pressed while another craft holds the one-craft latch (profBook.js prof-busy) says the hands are busy, not that a brew is in the cauldron', () => {
   const w = hostText('src/scenes/world.js');
   assert.match(w, /r\?\.error === 'prof-busy' \? 'Your hands are busy with another craft\.' : `\$\{accountRefusalText\(r\?\.error\)\}\$\{movedFirstText\(r\)\}`/);
@@ -722,23 +700,4 @@ test('AUDIT PROF-541 R2-K10: a dish eaten while a longer one of it stands says s
     const loose = mintDish({ recipe: 'stew:south' }, PROV);
     assert.equal(dishUse(loose, [loose], {}).text, 'You eat the Hunter\'s Stew.');
   } finally { setFeastShare(null); setPref('survival', 'casual'); }
-});
-
-test('AUDIT PROF-541 R2-H1: a station\'s steps where my guild holds the town, by one law for every profession (fortLaw.js hallStepsFor - the craft\'s seat, the alchemy station\'s line, the fire\'s): the works\' steps in it and the seat named, none for another guild\'s town, an unheld one, no guild of mine or no works (mutants: any guild; the seat named with no step; one profession for all)', () => {
-  const seat = { key: 3021, holder: { guild: { id: 'g1' } }, forts: { apothecary: 2, forge: 1, workshop: 3, walls: 3 } };
-  assert.deepEqual(['cooking', 'alchemy', 'jewelcrafting', 'smithing', 'carpentry', 'nonsense'].map((p) => hallStepsFor(seat, 'g1', p)),
-    [{ steps: 2, seat: 3021 }, { steps: 2, seat: 3021 }, { steps: 2, seat: 3021 }, { steps: 1, seat: 3021 }, { steps: 3, seat: 3021 }, { steps: 0, seat: null }]);
-  const none = { steps: 0, seat: null };
-  assert.deepEqual(hallStepsFor(seat, 'g2', 'cooking'), none, 'another guild\'s town');
-  assert.deepEqual(hallStepsFor({ ...seat, holder: null }, 'g1', 'cooking'), none, 'unheld');
-  assert.deepEqual(hallStepsFor({ ...seat, holder: { guild: { id: null } } }, null, 'cooking'), none, 'no guild of mine');
-  assert.deepEqual(hallStepsFor({ ...seat, forts: { walls: 3 } }, 'g1', 'cooking'), none, 'no works stepping it: no seat named');
-  assert.deepEqual(hallStepsFor(null, 'g1', 'cooking'), none, 'no seat here');
-  // the host's wiring (world.js's boot closure - no test stands its seat and guild books up, the repo's exception): every
-  // station's guard is it, written once
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const myHall = \(profession\) => hallStepsFor\(seatHere\(_musicLoc\?\.mapTableData\?\.mapId\), guildBook\?\.guild\?\.id \?\? null, profession\);\n\s+const alchemyHall = \(\) => myHall\('alchemy'\);/);
-  assert.match(w, /const \{ seat \} = myHall\(recipeById\(recipe\)\?\.profession\);/);
-  assert.match(w, /cookSteps: \(\) => myHall\('cooking'\)\.steps,/);
-  assert.equal(w.match(/holder\?\.guild\?\.id === \(guildBook/g), null, 'no guard of its own left in world.js');
 });

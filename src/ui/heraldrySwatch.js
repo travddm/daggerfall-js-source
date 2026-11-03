@@ -93,11 +93,10 @@ export function heraldryLookup(sources) {
 /** The guild each Chronicle row's line names first (net/townSeatLaw.js chronicleLine), where it is not `guild`. */
 const CHRONICLE_FIRST = Object.freeze({
   contested: 'a', 'siege-forfeit': 'against', 'siege-void': 'holder',
-  'fealty-sworn': 'vassal', 'fealty-broken': 'breaker', 'fealty-tribute': 'vassal', 'fealty-lapsed': 'vassal',
 });
 /**
  * THE GUILD A CHRONICLE ROW IS ABOUT - the one its line names first, `{ name, tag }` as it was that day - or null for a row
- * that names none (a Royal Tourney's, a work's raising, a battle moved, a void Tourney's, a voided battle that restored
+ * that names none (a Royal Tourney's, a battle moved, a void Tourney's, a voided battle that restored
  * no holder).
  */
 export function chronicleGuildOf(row) {

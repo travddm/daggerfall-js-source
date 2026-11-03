@@ -6,7 +6,7 @@
 // sockets (test/fakeRoom.mjs). `06-Systems/Online-Arc.md` AUDIT SEATS-3.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_HEIGHT_M, SIEGE_NPC, SIEGE_FIGHTERS_MAX, siegeNpcAt, siegeNpcInReach, siegeOffGround, siegeStepLevel, siegeGroundOf, royalLevel, royalMarks, siegeCampPose } from '../../src/net/siege/siegeRef.js';
+import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_HEIGHT_M, SIEGE_FIGHTERS_MAX, siegeOffGround, siegeStepLevel, siegeGroundOf, royalLevel, royalMarks, siegeCampPose } from '../../src/net/siege/siegeRef.js';
 import { validSiegeOut, SIEGE_IN_MS } from '../../src/net/wire.js';
 import { mintSiegeOrder } from '../../src/net/identityToken.js';
 import { fakeRoom } from '../fakeRoom.mjs';
@@ -36,8 +36,8 @@ async function withBattle({ sn = 'siege', st = 'crown', se = SB + 7200, sf = SF,
 const backs = (ws, from = 0) => ws.sent.slice(from).filter((x) => x.t === 'siege' && x.k === 'back');
 const refusal = (ws) => ws.sent.find((x) => x.t === 'error')?.m ?? null;
 
-test('AUDIT SEATS-3 B1: a defender climbing over a revolt is pulled back at SIEGE_HEIGHT_M off the field\'s ground, the rising strikes it there; one 45 m over the Rebel Captain lands nothing on him and walks back down; on the ground it is struck as before (mutants: the step\'s height; the striker\'s; the walk back)', async () => {
-  await withBattle({ sn: 'revolt' }, async ({ r, say, enter, until, place, tick, now }) => {
+test('AUDIT SEATS-3 B1: a defender climbing over a siege is pulled back at SIEGE_HEIGHT_M off the field\'s ground; a step back toward the ground is kept, a step further off is not (mutants: the step\'s height; the walk back)', async () => {
+  await withBattle({ sn: 'siege' }, async ({ r, enter, until, place, tick }) => {
     const d1 = await enter('peer-0001', 'defend'), d2 = await enter('peer-0002', 'defend'), d3 = await enter('peer-0003', 'defend');
     const f3 = () => r.room._siege.fighters[d3.att.sub];
     await until(T + 1000);
@@ -48,26 +48,12 @@ test('AUDIT SEATS-3 B1: a defender climbing over a revolt is pulled back at SIEG
     for (let i = 0; i < 25; i++) { tick(100); p = { ...p, y: p.y + 1.8 * M }; await r.pose(d3, p); }
     assert.ok(backs(d3, n0).length > 0, 'the climb past the field\'s height pulled back');
     assert.ok(f3().pose.y / M <= SIEGE_HEIGHT_M, `held within ${SIEGE_HEIGHT_M} m of the ground (stood at ${f3().pose.y / M} m)`);
-    const hp0 = f3().hp;
-    await until(now() + 30_000);
-    assert.ok(f3().hp < hp0, 'within the field\'s height the rising reaches it');
-    // 45 m over the Captain's post (a pose the room held before this law): its shafts land on nothing
-    await until(now() + 60_000);   // whatever felled it has risen it
-    const cap = r.room._siege.battle.npcs.find((n) => n.kind === 'captain');
-    const [cx, cz] = siegeNpcAt(cap, now());
-    place(d3, cx / M, cz / M, 45);
-    for (let i = 0; i < 6; i++) { tick(300); await say(d3, { k: 'blow', to: cap.id, w: 130, m: 9, d: 10000, r: 1 }); }
-    assert.equal(cap.hp, cap.max, 'nothing lands from 45 m over the field');
     // a step back toward the ground is kept, though it is still off it; a step further off is not
     const up = { ...f3().pose }, n1 = d3.sent.length;
     tick(100); await r.pose(d3, { ...up, y: up.y + 1 * M });
     assert.equal(backs(d3, n1).length, 1, 'further off: pulled back');
     tick(100); await r.pose(d3, { ...up, y: up.y - 1.5 * M });
     assert.equal(f3().pose.y, up.y - 1.5 * M, 'nearer the ground: kept');
-    // on the ground beside him it lands
-    place(d3, cx / M + 1.5, cz / M, 0);
-    tick(1000); await say(d3, { k: 'blow', to: cap.id, w: 123, m: 9, d: 10000, r: 0 });
-    assert.ok(cap.hp < cap.max, 'on the field\'s ground it lands');
   });
 });
 
@@ -121,17 +107,11 @@ test('AUDIT SEATS-3 B1: a fighter sinking 100 m under the field is pulled back, 
   assert.equal(siegeStepLevel(0, null, at(0, 0, 40)), true, 'a first pose');
   assert.equal(siegeStepLevel(null, at(0), at(0, 0, 400)), true, 'no ground');
   assert.equal(siegeGroundOf({ kind: 'siege', ground: 3 }, 'x'), 3);
-  assert.equal(siegeGroundOf({ kind: 'revolt', ground: null }, 'x'), null);
   const royal = { kind: 'royal', field: { ring: [0, 0] }, bout: { a: 'a', b: 'b' } };
   royalMarks(royal, { y: 2 * M }, { y: 4 * M });
   assert.equal(royal.bout.y, 3 * M, 'the marks\' middle height');
   assert.deepEqual([siegeGroundOf(royal, 'a'), siegeGroundOf(royal, 'b'), siegeGroundOf(royal, 'c'), siegeGroundOf({ kind: 'royal', bout: null }, 'a')], [3 * M, 3 * M, null, null]);
   assert.deepEqual([royalLevel(at(0), at(0, 0, SIEGE_HEIGHT_M)), royalLevel(at(0), at(0, 0, SIEGE_HEIGHT_M + 1)), royalLevel(null, at(0, 0, 99))], [true, false, true]);
-  const n = { kind: 'rebel', post: [0, 0], down: false };
-  assert.equal(siegeNpcInReach(n, at(1, 0, 40), 0), false, 'from 40 m over its post');
-  assert.equal(siegeNpcInReach(n, at(1, 0, 4), 0), true);
-  assert.equal(siegeNpcInReach(n, at(1, 0, 40)), true, 'no ground judges no height');
-  assert.ok(SIEGE_NPC.rebel.leashM > 1);
 });
 
 test('AUDIT SEATS-3 B2: a fighter back from a drop is at its camp and down until its side\'s wave at the door - one that never says `in` stands nowhere it dropped and strikes nothing; its `in` says the camp, its wave unmoved (mutants: the return at the door; its stamp kept for the `in`)', async () => {

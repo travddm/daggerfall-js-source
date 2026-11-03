@@ -7,9 +7,8 @@ import { PIXEL_UNITS } from './wire.js';
 /** The field a client derives from the town, settled for a battle (DECIDED, part three): the first one an attacker and a
  *  defender submitted alike (two sides whose interests differ agreeing on it), else - once the battle is joined and a side
  *  is absent altogether - the one most submitted, the earliest first. `rows` `[{ side, field, at }]` (`field` its JSON), oldest
- *  first. Null while nothing settles it. SEAT2b part two (c): a revolt (`kind`) has the holder's side alone - its first
- *  defender's field settles it (DECIDED: no other side's interest to weigh it against; the rising is the relay's). */
-export function settleField(rows, joined, kind = 'siege') {
+ *  first. Null while nothing settles it. */
+export function settleField(rows, joined) {
   const seen = new Map();
   for (const r of rows ?? []) {
     const k = String(r.field);
@@ -19,7 +18,6 @@ export function settleField(rows, joined, kind = 'siege') {
     else if (r.side === 'defend') v.defend = true;
     v.n++;
     if (v.attack && v.defend) return k;
-    if (kind === 'revolt' && v.defend) return k; // SEAT2b part two (c): a revolt has one side - its first defender's
   }
   if (!joined || !seen.size) return null;
   // Two sides that submitted and never agreed settle nothing: a count would hand the field to the bigger side's own

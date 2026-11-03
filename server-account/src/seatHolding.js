@@ -3,8 +3,8 @@
 // SEAT1d - HOLDING A
 // SEAT: the holder's levers on its board (the Tithe, the Edict), what a
 // Charter pays (the Tithe across its bailiwick, beside every sale that
-// takes one - market.js), what its Edicts do on the service (the Levy on
-// a harvest, the Bounty's camps paid, Open Gates' homes), and what the
+// takes one - market.js), what its Edicts do on the service (the Bounty's
+// camps paid, Open Gates' homes), and what the
 // Seat tab shows the holder (its Standing, Tithe, Edicts and upkeep).
 //
 // 7.1-7.3, 7.6. The numbers are
@@ -21,11 +21,7 @@
 // ═════════════════════════════════════════════════════════════════════
 import { accountKind, displayName, mintId, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
-import { titheCapAt } from './seatForts.js';   // SEAT2b: the Market Hall's Tithe cap
-import { marketHallTitheCap } from '../../src/net/fortLaw.js';   // AUDIT SEATS-3 A2: and a Tithe charged under it
 import { confirmedSeats, seatsOpenFor } from './townSeats.js';
-import { domainsFor } from './domains.js';   // DOMAIN3: the region law, where DOMAINS_WEEK rules
-import { charterSeats } from '../../src/net/domainLaw.js';
 import { MARKS_MAX, utcDay } from '../../src/net/marksLaw.js';
 import {
   seatWeekOf, seatWeekStartMs, SEAT_WEEK_MS, seatKeyOk, seatRegionOk, edictOk, edictForTier, edictMayFollow, bailiwickOf, bountyClaimPixel, overreachOf, seatUpkeep,
@@ -37,12 +33,10 @@ const LEVERS_SQL = SEAT_LEVER_RANKS.join(', ');
 /** The most a Bounty may set aside - a week of its 5-camp days for a hundred accounts. */
 export const BOUNTY_SET_ASIDE_MAX = 100_000;
 
-/** DOMAIN3 (Domains law 1: "The bailiwick | The whole region"): THE SEATS A NOTICE BOARD'S BAILIWICK IS READ AMONG - every
- *  confirmed seat, and where the region law rules this week (`env`'s DOMAINS_WEEK) the Charters alone, so every board of a
- *  region with a seat of power is its Charter's - its Tithe, its Levy, its Bounty. */
-async function bailiwickSeats(db, nowS, env) {
-  const seats = (await confirmedSeats(db, nowS)).values();
-  return charterSeats(seats, await domainsFor(db, nowS, env, weekAt(nowS)));
+/** THE SEATS A NOTICE BOARD'S BAILIWICK IS READ AMONG - every confirmed seat; a board's Tithe and Bounty are those of
+ *  the seat of its region nearest it. */
+async function bailiwickSeats(db, nowS) {
+  return [...(await confirmedSeats(db, nowS)).values()];
 }
 
 /** THE ACCOUNTS THAT PLAYED IN A WEEK (SEAT0 7.1, the crown's scale) - a registered account whose last play beat
@@ -77,7 +71,7 @@ const stillSql = (rid, g) => `EXISTS (SELECT 1 FROM guild_members WHERE rowid = 
 export async function setTithe({ db, nowS }, player, env, { character, key, pct } = {}) {
   const l = await leverOf(db, player, env, character, key);
   if ('error' in l) return l;
-  const cap = await titheCapAt(db, key, l.hold.tier, nowS);   // SEAT2b (7.5): a Market Hall's point a tier
+  const cap = TITHE_CAP[l.hold.tier] ?? 0;
   if (!Number.isSafeInteger(pct) || pct < 0 || pct > cap) return { error: 'bad-tithe' };
   const week = weekAt(nowS);
   if (l.hold.tithe_week != null && Number(l.hold.tithe_week) === week) return { error: 'tithe-this-week' };
@@ -153,37 +147,21 @@ export async function holdingOf(db, key, nowS) {
   };
 }
 
-// ─── THE BAILIWICK'S TITHE, THE LEVY, OPEN GATES ────────────────────
+// ─── THE BAILIWICK'S TITHE, OPEN GATES ────────────────────
 
 /**
  * THE SEAT A BOARD IN `region` AT `pixel` BELONGS TO, AND ITS HOLDER'S TITHE (SEAT0 7.2) - `{ key, guild, pct }`, or
  * null where its seat is unheld or the region has none. One read when the region holds no Charter.
  */
-export async function titheAt(db, nowS, region, pixel = null, env = null) {
+export async function titheAt(db, nowS, region, pixel = null) {
   if (!seatRegionOk(region)) return null;
-  // AUDIT SEATS-3 A2: and the Market Hall standing under it - a Tithe never charged above the cap its Hall gives now (the
-  // Season's wear clamps the row in its own batch, seatForts.js fortsSeasonStatements; this is the belt to those braces).
-  // The stored tier, no project raised: a Tithe was set under a cap read after its rise (titheCapAt), and only a wear or
-  // a lapse lowers a tier after that
-  const { results: held = [] } = await db.prepare(`SELECT h.key, h.guild_id, h.tithe, h.tier,
-    (SELECT f.tier FROM town_seat_forts f WHERE f.key = h.key AND f.work = 'market') AS market FROM town_seat_holds h WHERE h.region = ?`).bind(region).all();
+  const { results: held = [] } = await db.prepare('SELECT key, guild_id, tithe, tier FROM town_seat_holds WHERE region = ?').bind(region).all();
   if (!held.length) return null;
   // MARKET-SPEED: the seats' places off the isolate's kept witness rows (townSeats.js seatRowsOf) - the holder and its
   // Tithe above are read as they stand; only which seat a board's bailiwick is comes from the minute's rows
-  const seat = bailiwickOf(await bailiwickSeats(db, nowS, env), region, pixel);   // DOMAIN3: the region's Charter, where the region law rules
+  const seat = bailiwickOf(await bailiwickSeats(db, nowS), region, pixel);
   const h = seat ? held.find((x) => Number(x.key) === seat.key) : null;
-  return h ? { key: seat.key, guild: h.guild_id, pct: Math.min(Number(h.tithe), marketHallTitheCap(TITHE_CAP[h.tier] ?? 0, Number(h.market ?? 0))) } : null;
-}
-
-/** THE LEVY'S SEAT for a harvest at `pixel` in `region` (SEAT0 7.6: "from the nodes of the region nearer this seat than
- *  any other seat of the region"): the bailiwick's seat key, where its Levy rules this week - else null. */
-export async function levyAt(db, nowS, region, pixel, env = null) {
-  if (!seatRegionOk(region) || !pixel) return null;
-  const { results = [] } = await db.prepare("SELECT key FROM town_seat_edicts WHERE week = ? AND state = 'law' AND edict = 'levy'").bind(weekAt(nowS)).all();
-  if (!results.length) return null;
-  // GATHER-SPEED: the seats' places off the isolate's kept witness rows - every harvest under a Levy read them whole
-  const seat = bailiwickOf(await bailiwickSeats(db, nowS, env), region, pixel);   // DOMAIN3: the region's Charter, where the region law rules
-  return seat && results.some((e) => Number(e.key) === seat.key) ? seat.key : null;
+  return h ? { key: seat.key, guild: h.guild_id, pct: Math.min(Number(h.tithe), TITHE_CAP[h.tier] ?? 0) } : null;
 }
 
 /** OPEN GATES (SEAT0 7.6: "homes in the town may not be set private this week"): whether it rules at the town `mapId`
@@ -212,7 +190,7 @@ export async function claimBounty({ db, nowS, rand }, player, env, { character, 
   const week = weekAt(nowS), day = utcDay(nowS);
   const { results: rules = [] } = await db.prepare("SELECT key FROM town_seat_edicts WHERE week = ? AND state = 'law' AND edict = 'bounty'").bind(week).all();
   if (!rules.length) return { ok: true, paid: 0, why: 'no-bounty' };
-  const seat = bailiwickOf(await bailiwickSeats(db, nowS, env), region, pixel);   // DOMAIN3: the region's Charter, where the region law rules
+  const seat = bailiwickOf(await bailiwickSeats(db, nowS), region, pixel);
   if (!seat || !rules.some((e) => Number(e.key) === seat.key)) return { ok: true, paid: 0, why: 'no-bounty' };
   if (await overRate({ db, nowS }, `seat-bounty:${player.id}`, BOUNTY_CAMPS_DAY * 4, 3600)) return { error: 'seats-rate' };
   const n = mintId(rand);

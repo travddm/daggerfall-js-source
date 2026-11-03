@@ -49,7 +49,7 @@ import { graphemesOf } from '../systems/graphemes.js';   // EMOTE1's characters,
 import { renownText } from '../net/renown.js';   // RENOWN1: Renown, left of the name
 import { guildTagText } from '../net/guild/guildLaw.js';   // GUILD1c: the guild's tag, right of the name
 import { houseLine } from '../net/houseLaw.js';   // LEGACY7: the house, under the name
-import { ribbonColours, heraldryOf, heraldryColourOf, heraldryKey } from '../net/heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon, under the name; HERALDRY-SHOWN: the tag's frame
+import { heraldryOf, heraldryColourOf, heraldryKey } from '../net/heraldryLaw.js';   // HERALDRY-SHOWN: the tag's frame
 import { heraldrySwatchSrc } from './heraldrySwatch.js';   // HERALDRY-SHOWN (Seats-Arc 8.1): the guild's shield, in its tag's frame
 
 export const NAME_STYLE_ID = 'dagger-names-style';
@@ -236,12 +236,6 @@ export const NAME_CSS = `${PIXELIFY_FIVE_FACE}
   border-right: 1px solid var(--iron, #2b323b); border-bottom: 1px solid var(--iron, #2b323b);
   transform: rotate(45deg); }
 .dfname-bubble.off { display: none; }
-/* SEASON1 part two (Seats-Arc 9.1) - A SEASON'S BANNER RIBBON, UNDER THE NAME: a thin band the label's own width in the
-   guild's field colour, edged beneath in its border colour (the colours written per peer, only when they change). A
-   peer wearing none has it off and takes no room: the label is the one it wore before. */
-.dfname-ribbon { align-self: stretch; height: .2em; margin-top: .14em; border-bottom: .1em solid transparent;
-  box-shadow: 0 1px 0 #000; }
-.dfname-ribbon.off { display: none; }
 `;
 
 /** The sheet, once (ui/partyPanel.js injectPartyStyle's own shape). */
@@ -310,18 +304,15 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
     const guild = doc.createElement('span');
     guild.className = 'dfname-guild';
     tag.append(lv, name, guild, glyphs);
-    // SEASON1 part two: a Season's banner ribbon, a sibling under the name row
-    const ribbon = doc.createElement('div');
-    ribbon.className = 'dfname-ribbon off';
     // LEGACY7: the house, a line under the name row ("☠ Ysolde II of House Hlaalu" - net/houseLaw.js houseLine)
     const house = doc.createElement('div');
     house.className = 'dfname-house';
-    node.append(bubble, title, tag, house, ribbon);
+    node.append(bubble, title, tag, house);
     root.append(node);
-    return { node, bubble, title, tag, lv, name, guild, glyphs, house, ribbon, worn: null, titled: null, inked: undefined, banded: '', armed: '',
+    return { node, bubble, title, tag, lv, name, guild, glyphs, house, worn: null, titled: null, inked: undefined, armed: '',
       // PERF-NAMES1: what this tag's DOM was last told, kept here and compared here - a read of `style.x` or
       // `textContent` asks the browser to serialise the value back, a cost a frame for every label
-      at: null, size: null, lvOf: undefined, gtOf: undefined, houseOf: undefined, said: null, nameText: null, titleText: null, bubbleOn: null, bubbleText: null, bubbleAlpha: null };   // HERALDRY-SHOWN: `armed`, the frame as written   // SEASON1 part two: `banded`, the ribbon as written   // `titled`, the title whose paint is on; AUDIT A10: `inked`, the name's colour as written
+      at: null, size: null, lvOf: undefined, gtOf: undefined, houseOf: undefined, said: null, nameText: null, titleText: null, bubbleOn: null, bubbleText: null, bubbleAlpha: null };   // HERALDRY-SHOWN: `armed`, the frame as written   // `titled`, the title whose paint is on; AUDIT A10: `inked`, the name's colour as written
   };
 
   /** ACC3: the glyph run, REBUILT ONLY WHEN IT CHANGES. A glyph set is
@@ -438,7 +429,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
         if (tag.gtOf !== p.gt) { tag.gtOf = p.gt; setText(tag.guild, guildTagText(p.gt) ?? ''); }   // GUILD1c: "<HND>", or nothing
         if (tag.houseOf !== p.house) { tag.houseOf = p.house; setText(tag.house, houseLine(p.house) ?? ''); }   // LEGACY7: "☠ Ysolde II of House Hlaalu", or nothing
         // HERALDRY-SHOWN (Seats-Arc 8.1): the tag framed in its guild's heraldry where the client knows it - written when
-        // it CHANGES, as the ribbon is
+        // it CHANGES
         const arms = guildTagText(p.gt) && armsOf ? heraldryOf(armsOf(p.gt)) : null;
         const armed = arms ? heraldryKey(arms) : '';   // AUDIT GUILD2 G12: the whole arms, never GUILD1d's three alone
         if (tag.armed !== armed) {
@@ -451,16 +442,6 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
         // so the diffing door rewrote a party mate's green every frame - written when it CHANGES, as the title is
         const ink = cssRgba(colorOf?.(p.id)) ?? '';
         if (tag.inked !== ink) { tag.inked = ink; tag.name.style.color = ink; }
-        // SEASON1 part two (Seats-Arc 9.1): a Season's banner ribbon under the name, in its guild's two colours - written
-        // when it CHANGES, as the name's ink is
-        const band = ribbonColours(p.rb);
-        const banded = band ? `${band.field}/${band.border}` : '';
-        if (tag.banded !== banded) {
-          tag.banded = banded;
-          setCls(tag.ribbon, band ? 'dfname-ribbon' : 'dfname-ribbon off');
-          tag.ribbon.style.background = band?.field ?? '';
-          tag.ribbon.style.borderBottomColor = band?.border ?? '';
-        }
         // ACC3: the title above, in ITS colour, and the glyphs beside.
         // `colorOf` is deliberately not asked for either: the party's
         // green says "this is my party" about a NAME, and gold says

@@ -18,9 +18,7 @@ import { accountProf, SESSION_KEY, accountRefusalText } from '../../src/net/acco
 import { createProfBook } from '../../src/net/profBook.js';
 import { realmGoldAct } from '../../src/systems/realmSaves.js';   // AUDIT PROF-541 R2-C1
 import { xpForRank, ALCHEMY_FEE, ENCHANT_FEE, stockOf, trackOf, professionName } from '../../src/net/professionLaw.js';   // CRAFT3: trackOf, professionName
-import { potionById, POTENT, enchantGold, potentChance } from '../../src/net/alchemyLaw.js';
-import { FORT_EFFECT_WORDS, STATION_PROFESSIONS } from '../../src/net/fortLaw.js';
-import { cookXp } from '../../src/net/recipeLaw.js';
+import { potionById, POTENT, enchantGold } from '../../src/net/alchemyLaw.js';
 import { potionRecipeKey, potionBundle, POTION_RECIPES } from '../../src/systems/potions.js';
 import { brewItems, brewedText, BREW_KEPT_TEXT } from '../../src/systems/alchemyItems.js';
 import { POTION_TEMPLATE_INDEX } from '../../src/systems/loot/loot.js';
@@ -394,9 +392,7 @@ test('PROF12 wiring: the alchemy station an Alchemist\'s (open for trade) or a h
   assert.match(src('src/ui/item/itemMakerWindow.js'), /enchantDecision\(this\.selected, this\.powers, this\.sideEffects, \{ gold: this\.gold\(\), discountPct: this\.goldDiscountPct\(\), souls: this\._souls \}\)/);
   const w = hostText('src/scenes/world.js');
   assert.match(w, /alchemy: \(\) => modes\?\.alchemyHere\?\.\(\) \?\? null,/);
-  assert.match(w, /const myHall = \(profession\) => hallStepsFor\(seatHere\(_musicLoc\?\.mapTableData\?\.mapId\), guildBook\?\.guild\?\.id \?\? null, profession\);\n\s*const alchemyHall = \(\) => myHall\('alchemy'\);/);
-  assert.match(w, /const \{ seat \} = alchemyHall\(\);\n\s*const r = await profBook\.brew\(potion, keys, \{ fee: f\.fee > 0 \? f\.fee : 0, seat \}, profMintCraft\);/);
-  assert.match(w, /alchemySteps: \(\) => alchemyHall\(\)\.steps,/, 'AUDIT PROF-541 B4: the station\'s line says the steps the service adds');
+  assert.match(w, /const r = await profBook\.brew\(potion, keys, \{ fee: f\.fee > 0 \? f\.fee : 0 \}, profMintCraft\);/);
   assert.match(w, /if \(typeof data\?\.potion === 'string'\) \{\n\s*const potions = brewItems\(data\);/);
   assert.match(w, /const f = \(alch \? modes\?\.alchemyHere\?\.\(\) : mason \?/);
   assert.match(w, /r = await profBook\.disenchant\(provenance\);\n\s*if \(r\?\.ok && here\(\) && !r\.elsewhere\) takeOut\(\);/);
@@ -498,27 +494,19 @@ test('AUDIT PROF12 A3 client (Mac: "Potent lasts longer"): a Potent potion whose
 
 // ─── AUDIT PROF12 ───────────────────────────────────────
 
-test('AUDIT PROF12 P1: the Apothecary\'s words say each profession\'s step as the law gives it - a piece of jewellery a quality step a tier, a dish half again the XP (twice at tier 2: recipeLaw cookXp), a brew +10% Potent chance a tier (alchemyLaw potentChance) - never a quality step for a dish or a brew', () => {
-  assert.equal(FORT_EFFECT_WORDS.apothecary(1), 'members\' jewelry here a quality step better, their dishes half again the XP, their brews +10% Potent chance');
-  assert.equal(FORT_EFFECT_WORDS.apothecary(2), 'members\' jewelry here 2 quality steps better, their dishes twice the XP, their brews +20% Potent chance');
-  assert.deepEqual([1, 2].map((t) => cookXp(50, { steps: t }) / cookXp(50)), [1.5, 2], 'the XP the words say');
-  assert.deepEqual([1, 2].map((t) => potentChance(75, { steps: t }) - potentChance(75)), [POTENT.apothecary, 2 * POTENT.apothecary], 'the Potent chance the words say');
-  assert.deepEqual(STATION_PROFESSIONS.apothecary, ['alchemy', 'cooking', 'jewelcrafting']);
-});
-
 // ─── AUDIT PROF-541: B2, B3, B4, B8 ─────────────────────
 
-test('AUDIT PROF-541 B3/B4 client: the station\'s Potent chance carries the town\'s Apothecary (+10 a step, as the service adds it); a Cure of DFU\'s default magnitude says it is never Potent (no chance, no herb\'s +5) and its potions are never minted Potent - nor named, nor worth more', () => {
-  stubPages({ alchemy: { kind: 'home', fee: 0 }, alchemyTrack: { rank: 75, specs: { 50: null, 100: null } }, over: { alchemySteps: () => 2 } });
+test('AUDIT PROF-541 B3/B4 client: a Cure of DFU\'s default magnitude says it is never Potent (no chance, no herb\'s +5) and its potions are never minted Potent - nor named, nor worth more', () => {
+  stubPages({ alchemy: { kind: 'home', fee: 0 }, alchemyTrack: { rank: 75, specs: { 50: null, 100: null } } });
   const page = pageOf();
   try {
-    assert.match(page.text(), /ProvisioningExpert 75[^]*?2 potions a brew\. Potent 30% \(\+25% magnitude or duration\) \(the Apothecary's \+20% with it\)/);   // PIN MOVED (CRAFT-HALL): the rank is the station header's bar, not the station's sentence;   // PIN MOVED (CRAFT3): Provisioning's rank
+    assert.match(page.text(), /ProvisioningExpert 75[^]*?2 potions a brew\. Potent 10% \(\+25% magnitude or duration\)/);   // PIN MOVED (CRAFT-HALL): the rank is the station header's bar, not the station's sentence;   // PIN MOVED (CRAFT3): Provisioning's rank
     page.recipe('Healing').onclick();
-    assert.match(page.text(), /2 potions a brew\. Potent 30% \(\+25% magnitude\) - and \+5% for each of its herbs/);
+    assert.match(page.text(), /2 potions a brew\. Potent 10% \(\+25% magnitude\) - and \+5% for each of its herbs/);
     page.recipe('Cure Disease').onclick();
     assert.match(page.text(), new RegExp(`2 potions a brew\\. ${POTENT_NONE_LINE.replace(/[()]/g, '\\$&')}\\. \\d+ Provisioning experience`));
     page.recipe('Purification').onclick();
-    assert.match(page.text(), /Potent 30% \(\+25% magnitude\)/, 'Purification\'s magnitude stays Potent');
+    assert.match(page.text(), /Potent 10% \(\+25% magnitude\)/, 'Purification\'s magnitude stays Potent');
   } finally { page.done(); setProfessionsPages(null); }
   const [cure] = brewItems({ potion: 'cureDisease', count: 1, potent: 25 });
   const [plain] = brewItems({ potion: 'cureDisease', count: 1, potent: 0 });
@@ -595,15 +583,4 @@ test('AUDIT PROF-541 R2-C2: one latch holds every craft and brew (profBook _craf
   assert.deepEqual(await book.craft('dish:bread', {}, () => {}), { ok: false, error: 'prof-busy' });
   release({ ok: false, error: 'bad-recipe' });
   await brewing;
-});
-
-test('AUDIT PROF-541 R2-C3: the station\'s Apothecary steps a whole number or none, as the fire\'s (cookSteps) - a fraction never a share of a step, a word never a step', () => {
-  for (const [steps, says] of [[2.7, '+20%'], [-3, null], ['x', null], [1, '+10%']]) {
-    stubPages({ alchemy: { kind: 'home', fee: 0 }, alchemyTrack: { rank: 75, specs: { 50: null, 100: null } }, over: { alchemySteps: () => steps } });
-    const page = pageOf();
-    try {
-      if (says) assert.ok(page.text().includes(`(the Apothecary's ${says} with it)`), String(steps));
-      else assert.equal(page.text().includes('the Apothecary'), false, String(steps));
-    } finally { page.done(); setProfessionsPages(null); }
-  }
 });

@@ -30,17 +30,6 @@ import { appearanceOf, validWireAppearance } from './appearanceLaw.js';   // APP
 import { meshGlow, glowWord } from '../systems/weaponGlow.js';   // WEAPON-GLOW1: a held weapon's glow, said on the look
 import { renownText } from './renown.js';   // RENOWN1: Renown's words, left of the name in the bitmap face too
 import { guildTagText } from './guild/guildLaw.js';   // GUILD1c: the guild's tag, right of the name in the bitmap face too
-import { ribbonRgba } from './heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon, under the name in the bitmap face too
-/** AUDIT-SEATS C12: each ribbon's two tints, parsed once - by its claim's two colour indexes (one number, no string made),
- *  for every ribboned name every frame; anything that is no claim is asked of the law itself (it answers null). */
-const _ribbonTints = new Map();
-export function ribbonTints(rb) {
-  const k = Array.isArray(rb) && Number.isInteger(rb[0]) && Number.isInteger(rb[1]) && rb[0] >= 0 && rb[1] >= 0 && rb[0] < 256 && rb[1] < 256 ? rb[0] * 256 + rb[1] : -1;
-  if (k < 0) return ribbonRgba(rb);
-  let t = _ribbonTints.get(k);
-  if (t === undefined) { t = ribbonRgba(rb); _ribbonTints.set(k, t); }
-  return t;
-}
 // 2026-09-17 (per-request, the NON-Morrowind peer only - net/peer/peerBodies.js and its Morrowind body are untouched):
 // the same class-enemy sprite classic dungeon humanoids already use (Warrior, Mage, Knight, ...), driven by simple
 // moving/striking flags off the peer's synced pose instead of AI - the reusable pieces dungeonContext.js already
@@ -1326,7 +1315,6 @@ export class RemotePlayers {
       // RENOWN1: and Renown, the relay's stamp - left of the name in both faces
       out.push({ id: e.peer.id, name: e.peer.name ?? '', x: s.x, y: s.y,
         title: e.peer.title ?? null, glyphs: Array.isArray(e.peer.glyphs) ? e.peer.glyphs : [], lv: e.peer.lv ?? null, gt: e.peer.gt ?? null,   // GUILD1c: and the guild's tag, the relay's stamp
-        rb: e.peer.rb ?? null,   // SEASON1 part two: and a Season's banner ribbon, the relay's stamp - under the name in both faces
         house: e.peer.house ?? null,   // LEGACY7: and the house, the relay's stamp - a line under the name
         scale: nameScaleFor(s.depth) * lens, depth: s.depth, lens });
     }
@@ -1390,16 +1378,6 @@ export class RemotePlayers {
       const top = n.y - NAME_GAP_PX * scale - font.fnt.fixedHeight * s;
       drawText(renderer, font, run, Math.round(n.x - tw / 2), Math.round(top), s, colorOf?.(n.id) ?? [1, 1, 1, 1]);
       drawn++;
-      // SEASON1 part two (Seats-Arc 9.1): A SEASON'S BANNER RIBBON under the name - a band the run's width in its guild's
-      // field colour, edged beneath in its border colour; two solid quads (a null texture is a colour), in the gap the
-      // label already keeps over the head
-      const band = ribbonTints(n.rb);   // AUDIT-SEATS C12: parsed once a ribbon, not a name a frame
-      if (band && renderer.drawScreenQuad) {
-        const bx = Math.round(n.x - tw / 2), by = Math.round(top + font.fnt.fixedHeight * s + s), bw = Math.round(tw);
-        const bh = Math.max(2, Math.round(2 * s)), eh = Math.max(1, Math.round(s));
-        renderer.drawScreenQuad(null, { x: bx, y: by, w: bw, h: bh }, undefined, band.field);
-        renderer.drawScreenQuad(null, { x: bx, y: by + bh, w: bw, h: eh }, undefined, band.border);
-      }
       // ACC3: THE TITLE IS ITS OWN LINE, ABOVE, in its own colour - which is the
       // one thing on this label `colorOf` does NOT get an opinion on,
       // because gold IS the Founder title and a party's green would

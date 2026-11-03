@@ -49,7 +49,7 @@ test('TOWN-ECON the law\'s numbers: the towns are MAPS\' three town types, keyed
   assert.deepEqual(TOWN_SIZE, { 0: 6, 1: 2, 2: -2 });
   assert.deepEqual(TOWN_CYCLE, [{ amp: 12, days: 11 }, { amp: 6, days: 29 }]);
   assert.equal(TOWN_STANDING_DIV, 5);
-  assert.deepEqual(TOWN_EDICT_TERMS, { 'market-day': 6, festival: 8, 'open-gates': 3, levy: -6, curfew: -4 });
+  assert.deepEqual(TOWN_EDICT_TERMS, { 'market-day': 6, festival: 8, 'open-gates': 3, curfew: -4 });
   for (const id of Object.keys(TOWN_EDICT_TERMS)) assert.ok(EDICTS[id], `${id} is one of the seats' own Edicts`);
   assert.equal(TOWN_RAID_TERM, -15);
   assert.equal(TOWN_PLAYERS_MAX, 30);
@@ -73,7 +73,7 @@ test('TOWN-ECON a town\'s Prosperity: the base, its size, its cycle, its seat (S
   assert.equal(townProsperity({ key: KEY, type: 2, day: DAY }), 53, '50 - 2 + 5.07');
   const seat = (standing, edict = null) => ({ tier: 'palace', holder: { guild: SH, standing, edict } });
   assert.equal(townSeatTerm(seat(80, 'market-day')), 12, '(80 - 50) / 5 + 6');
-  assert.equal(townSeatTerm(seat(20, 'levy')), -12, '(20 - 50) / 5 - 6');
+  assert.equal(townSeatTerm(seat(20, 'curfew')), -10, '(20 - 50) / 5 - 4');
   assert.equal(townSeatTerm({ tier: 'palace', holder: null }), 0, 'an unheld seat');
   assert.equal(townSeatTerm(null), 0);
   assert.equal(townSeatTerm(seat(50, 'bounty')), 0, 'an Edict that does not move trade');
@@ -92,8 +92,8 @@ test('TOWN-ECON a town\'s Prosperity: the base, its size, its cycle, its seat (S
   assert.equal(townProsperity({ key: KEY, type: 0, day: DAY, players: -40 }), 61, 'and never below nothing');
   assert.equal(townProsperity({ key: KEY, type: 0, day: DAY, players: NaN }), 61);
   assert.equal(townProsperity({ key: KEY, type: 0, day: DAY, seat: seat(100, 'festival'), players: 30 }), 100, 'held at the top');
-  assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(0, 'levy'), raided: true }), 11, '50 - 2 - 5.61 - 10 - 6 - 15');
-  assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(-100, 'levy'), raided: true }), 0, 'held at the bottom');
+  assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(0, 'curfew'), raided: true }), 13, '50 - 2 - 5.61 - 10 - 4 - 15');
+  assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(-100, 'curfew'), raided: true }), 0, 'held at the bottom');
 });
 
 test('TOWN-ECON the bands: Destitute, Struggling, Steady, Thriving, Booming at 0, 15, 35, 65 and 85 (mutants: TOWNECON-bands)', () => {
@@ -215,7 +215,7 @@ test('TOWN-ECON the card\'s words: the economy out of 100 and the market\'s tren
   assert.equal(townPriceLine(28, 0.9), 'Shops here ask the region\'s usual prices and pay 11% less.', 'a markup Market Day cancels to the percent');
   assert.equal(townPriceLine(10, 0.9), 'Shops here ask 8% more and pay 20% less than the region\'s usual prices.', '1.2 x 0.9 = 1.08; 0.8 - each number its own');
   assert.equal(townReasonLine({ raided: true, edict: 'festival', players: 3 }), TOWN_REASONS.raid);
-  assert.equal(townReasonLine({ edict: 'levy', players: 3 }), 'The Levy weighs on trade.');
+  assert.equal(townReasonLine({ edict: 'curfew', players: 3 }), 'The Curfew keeps buyers home.');
   assert.equal(townReasonLine({ edict: 'bounty', players: 3 }), TOWN_REASONS.players, 'an Edict that moves no trade gives no reason');
   assert.equal(townReasonLine({ players: 1 }), TOWN_REASONS.players, 'one act of the players\' is busy');
   assert.equal(townReasonLine({ players: 0.5 }), null);
