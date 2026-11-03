@@ -36,7 +36,6 @@ import { hurtPlayer } from '../characters/playerEntity.js';
 import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';
 import { enemyDisplayName } from '../characters/enemy/enemyBasics.js';   // LOOT7-CHECK CHAMP-SAID: the name the death line says
 import { popupMessage } from './notify.js';   // LOOT7-CHECK CHAMP-SAID: DaggerfallUI.PopupMessage, the live host's line
-import { markUnquiet } from './revenant/unquietMark.js';   // UNQUIET (Revenants.md section 46): one champion in four carries the mark - its own, never a puppet's
 
 /** Per mille of the foes that may be one that stand as a champion. */
 export const CHAMPION_PER_MILLE = PROMOTION.champion.perMille;
@@ -102,16 +101,14 @@ export function championTraitFor(entity, traitIndex) {
  * MAKE IT A CHAMPION - on its entity, in place, right after the entity is built and BEFORE its loot is rolled (the loot
  * reads the mark): its trait, twice its health (the Stalwart's half again more), its blows a quarter harder (the
  * Mighty's half again more) multiplied onto whatever `damageScale` it has (an elite's double stands under it), the
- * Swift's Speed. Nothing where championTraitFor answers none. Answers whether it stood as one. UNQUIET: `own` - one of
- * this pool's own (never a puppet, its owner's word): its mark drawn (systems/revenant/unquietMark.js).
+ * Swift's Speed. Nothing where championTraitFor answers none. Answers whether it stood as one.
  */
-export function applyChampion(entity, traitIndex, { own = true } = {}) {
+export function applyChampion(entity, traitIndex) {
   const t = championTraitFor(entity, traitIndex);
   if (!t) return false;
   entity.champion = t.id;
   scalePromoted(entity, { health: CHAMPION_HEALTH * (t.health ?? 1), damage: CHAMPION_DAMAGE * (t.damage ?? 1) });
   if (t.speed && entity.stats) entity.stats.speed = Math.min(100, (entity.stats.speed ?? 50) + t.speed);
-  if (own) markUnquiet(entity);   // UNQUIET: the mark that lets it rise
   return true;
 }
 

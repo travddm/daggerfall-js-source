@@ -1209,8 +1209,7 @@ function settleAbsence() {
 /** AUDIT FB1021 L3-1: THE RELAY'S CLOCK AS LAST HEARD - the world's minute at the welcome that heard it and this
  *  machine's MONOTONIC clock then (`perf`, performance.now's ms; `n` the hearing's count this session), null before it. The
  *  world's reading after it is the machine's wall clock run through the relay's offset (world.js's source), so a machine
- *  clock set forward after the welcome moves it - an errand abroad reads it no further than the monotonic time since
- *  (revenantErrands.js errandWorldMinute). */
+ *  clock set forward after the welcome moves it. */
 let _heardMark = null;
 export const sharedClockHeardMark = () => _heardMark;
 const monotonicMs = () => (typeof globalThis.performance?.now === 'function' ? globalThis.performance.now() : Date.now());

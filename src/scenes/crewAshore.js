@@ -70,7 +70,7 @@ export function companionPerson(c) {
  *     fx?: { arrive?: (rec: any) => void, leave?: (rec: any, done: () => void) => void, jump?: (rec: any, from: number[]) => void } } | null),
  *   leader: () => ({ feet: number[], yaw: number, grounded?: boolean } | null),
  *   now: () => number,
- *   onKnocked?: (c: any, by: any) => void,
+ *   onKnocked?: (c: any) => void,
  *   onStood?: (c: any, rec: any) => void,
  *   seat?: (i: number, n: number) => ({ feet: number[], yaw: number } | null),
  *   seatDraw?: (i: number, n: number) => ({ feet: number[], yaw: number, g: number } | null),
@@ -166,7 +166,7 @@ export function createCrewAshore(deps) {
       const i = list.indexOf(s.c);
       if (rec._knockedOut) {
         stood.delete(k); leave(s);   // COMPANION-PORTAL: carried off through a portal
-        if (party.knock(s.c.boat, s.c.name, now)) deps.onKnocked?.(s.c, rec._knockedBy ?? null);   // RVN10 (Feud-Arc.md 21.1): and the foe whose blow it was
+        if (party.knock(s.c.boat, s.c.name, now)) deps.onKnocked?.(s.c);
         continue;
       }
       // the place swept it - a cull, a remove, or (AUDIT CC-A1) a clear that empties the list and marks nobody (the

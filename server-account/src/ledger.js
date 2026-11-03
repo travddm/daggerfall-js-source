@@ -253,9 +253,7 @@ const copyRows = (/** @type {any} */ db, /** @type {string[]} */ keys, /** @type
  * locked. A copy is lifted ONLY in the batch of a service act that itself leaves the record one of the piece (staff's
  * purge with `keep` - staffRealm.js: its batch destroys a copy of it wherever the save holds one, or staff's Remove took
  * one and keeps it): never on a checkpoint's word that the record shows it once, which no service can tell from a copy
- * moved where the record lists nothing - a deserter revenant's take (revenant.js RVN8: splitPack, and a kill's take,
- * pickTaken - neither takes a realm-locked piece now, AUDIT FB1025i F1, and a forged client's is the keep's to find),
- * a counter, the ground - and brought back after (AUDIT FB1025i). Of `pieces` (`{ key, fp }`, one of each the act
+ * moved where the record lists nothing - a counter, the ground - and brought back after (AUDIT FB1025i). Of `pieces` (`{ key, fp }`, one of each the act
  * keeps), the keys liftable: a `twice` copy of `char`'s, no trail check found or found it innocent (AUDIT FB1025i F7: an
  * `unclear` one is staff's to settle first), its row `char`'s own, held and unclaimed and of that piece, no other
  * record's copy known. Every other copy stays locked for good.

@@ -12,9 +12,8 @@ import { validFoeRecord, LOOK_GROUPS } from '../../src/net/wire.js';
 import { peerStubEntity } from '../../src/net/remotePlayers.js';
 import { drawnPiece, lookOfKey } from '../../src/net/appearanceLaw.js';
 import { noteHeldLooks, wearAppearance } from '../../src/systems/appearances.js';
-import { applySwornGear } from '../../src/systems/revenant/revenantGear.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
-import { equipItem, unequipItem, EQUIP_SLOTS } from '../../src/systems/equip.js';
+import { equipItem, unequipItem, EQUIP_SLOTS, equipTableOf } from '../../src/systems/equip.js';
 import { WEAPONS } from '../../src/characters/weapons.js';
 import { MOBILE_TYPES as M } from '../../src/characters/mobile/mobileTypes.js';
 import { ARMOR_MATERIAL } from '../../src/systems/armorMaterials.js';
@@ -63,8 +62,18 @@ function dressedSword() {
   unequipItem(me, sword);
   return { sword, twin: createWeapon(WEAPONS.Longsword, 1) };
 }
-/** The sworn one's record, its weapon slot the piece given (systems/revenant/revenantGear.js wornGear). */
-const sworn = (weapon) => ({ id: 'rv1', sworn: true, mobileType: M.Knight, rank: 5, companion: { gear: { weapon } } });
+/** A piece put in a foe's right hand, the piece it replaces (`taken`) taken out of its slots. */
+const sworn = (weapon) => ({ weapon });
+function applySwornGear(entity, { weapon }, { taken = [] } = {}) {
+  const slots = equipTableOf(entity);
+  for (const it of taken) {
+    for (let s = 0; s < slots.length; s++) if (slots[s] === it) slots[s] = null;
+    if (entity.weapon === it) entity.weapon = null;
+  }
+  entity.weapon = weapon;
+  slots[EQUIP_SLOTS.RightHand] = weapon;
+  return 1;
+}
 const held = (look) => look.items.find((it) => it.equipSlot === EQUIP_SLOTS.RightHand);
 
 test('APPEARANCES-II THE KIT SAYS ITS LOOK: a sworn one given a piece in a look wears it so on the owner\'s screen, and its record carries the look beside the kit - `la` [the piece\'s index in `lw`, t, m, v], each `lw` piece its six numbers as ever, a kit with no look none of it; another screen\'s puppet is the owner\'s man in that look, drawn through drawnPiece (mutants: the look never encoded; the look never decoded; the decoder\'s index; the record\'s `la` unread by the wire)', async () => {

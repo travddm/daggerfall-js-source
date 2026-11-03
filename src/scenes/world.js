@@ -26,9 +26,8 @@ import { wodSiteId, yieldsTo } from '../world/worldOfDaggerfall/wodShared.js';  
 import { alignBillboardToGround, alignControllerToGround } from '../world/groundAlign.js';   // WOD3: SpawnLoot's drop; CSA-D: BoardBoat's AlignControllerToGround
 import { rollHoldFoes } from '../world/worldOfDaggerfall/wodPrivateersHold.js';   // WOD4: the camp at Privateer's Hold
 import { rollLootRarity, pileSource, dungeonRarityTier, stampWonWeapons } from '../systems/loot/lootRarity.js';   // WOD3: LR1 over the camps' piles; SIGIL1: their weapons' sigils
-import { revenantToReturn, revenantSpawnOptions, revenantPresence, takeRevenantNotice, revenantSay, releaseRevenantStand, revenantRecord, revenantMomentEvent, revenantRumor, revenantMapMarks, revenantHuntEntries, revenantTakes, revenantFelled, revenantFelledEvent, revenantRoutSweep, revenantRoutedEvent, revenantWarnEvent, revenantBetrayEvent, forgetLastSlew, killerOf as revenantKillerOf, inheritRevenant } from '../systems/revenant/revenant.js';   // REVENANT: who comes back, and what the player is told
-import { endPlayerFights, playerHarmMark } from '../systems/harmMark.js';   // RVN10 (21.2): a respawn's jump is no flight
-import { DEVOTED } from '../systems/revenant/revenantFeud.js';   // RVN11 (Feud-Arc.md 22.1): a Devoted one's wait between warnings
+import { revenantToReturn, revenantSpawnOptions, revenantPresence, takeRevenantNotice, revenantSay, releaseRevenantStand, revenantRecord, revenantMomentEvent, killerOf as revenantKillerOf, inheritRevenant } from '../systems/revenant/revenant.js';   // REVENANT: who comes back, and what the player is told
+import { playerHarmMark } from '../systems/harmMark.js';
 import { SKY_CLEAR } from '../render/renderer.js'; import { centreFromFeet } from '../characters/enemy/enemyAnchor.js';   // REVIEW 2026-09-05: one line, so the cites below it hold
 import { Arch3dFile } from '../formats/arch3dFile.js';
 import { requestLook, releaseLook, makeLookGate, bindCursorToggle, setCursorActive, cursorActive, holdCursor } from '../player/pointerLock.js';   // U45: bindCursorToggle is PlayerMouseLook.cursorActive; releaseLook: the chat's open (AUDIT CHAT C2); HERB-CURSOR: an act's free cursor
@@ -166,7 +165,7 @@ import { calculateCastCost } from '../systems/spellcost.js';   // M2   // T3b
 import { rangedDamageSpells } from '../systems/spellcast.js';   // U42: the flight probe's picker
 import { worldMinutes, skyMinutes, setWorldMinutes, setSharedClock, sharedClockOn, sharedWallMs, alignEntityClocks, CLASSIC_MINUTES_PER_SECOND, setWorldPriceTilt, empireJoin, ownMinutes, advanceOwnMinutes, worldNightfallText, hearSharedClock, ownWalkWaiting, trustedWorldMinutes, raisedMinutes } from '../systems/worldTick.js';   // ECON1 / AUDIT ALL E1: the world's tilt off the file's base powers   // AUDIT 23 (C2): the ONE clock
 import { setSyntheticTimeIncrease } from '../systems/effectBroker.js';   // AUDIT 63 F13: DaggerfallTravelPopUp_OnPostFastTravel (EntityEffectBroker.cs:846-847)
-import { tallySwingSkills, SWING_FATIGUE_COST, playerPainVoice, playPlayerVoice, makeEnemiesHostile, isBowWeapon, enemyHeavyPainVoice, playerClimbStrain, aimedBlowInfo, playerBlowFrame, setWindupAtMeListener } from './hostCombat.js';   // ROAD-B: GameManager.MakeEnemiesHostile
+import { tallySwingSkills, SWING_FATIGUE_COST, playerPainVoice, playPlayerVoice, makeEnemiesHostile, isBowWeapon, enemyHeavyPainVoice, playerClimbStrain, aimedBlowInfo, playerBlowFrame } from './hostCombat.js';   // ROAD-B: GameManager.MakeEnemiesHostile
 import { flashPlayerDamage } from '../ui/damageFlash.js';
 import { knockedDown } from '../systems/blowEffects.js';   // TELL6e: knocked down, no swing
 import { resetVitalsDetector } from '../ui/hud/hudVitals.js';   // BLOOD AUDIT 5: the load's detector reset   // AUDIT 24 (wave 46): the arrow owes the flash too   // AUDIT 23 (C14)
@@ -489,7 +488,7 @@ import { createCityGuards } from './cityGuards.js';   // G1
 import { createArrestFlow } from './arrestFlow.js';
 import { clearCrimeOnLocationExit, addGold, goldAmount, deductGold, payUndoable, totalGoldAmount, deductGoldPieces } from '../systems/court.js';   // AUDIT 17e F6   // G2   // F-slice: travel gold; U41: GetGoldAmount + the pieces half of DeductFastTravelGold
 import { makeInView } from '../player/cameraView.js';   // AUDIT 17e F24
-import { isBackFacing, SIGHT_RADIUS, foeFrameDt } from '../characters/enemy/enemyMotor.js';   // OW6: SIGHT_RADIUS, a foe's own sight (a camp's is its own)   // DUEL1: a duel opponent's blow from behind me is a backstab's chance
+import { SIGHT_RADIUS, foeFrameDt } from '../characters/enemy/enemyMotor.js';   // OW6: SIGHT_RADIUS, a foe's own sight (a camp's is its own)   // DUEL1: a duel opponent's blow from behind me is a backstab's chance
 import { markFoeStruck } from '../ui/hud/hudFoeTarget.js';   // DUEL1: my duel opponent's health, on the enhanced HUD's target bar
 import { lowerCondition, dfuBlowWear } from '../systems/equip.js';   // DUEL1: my weapon wears on a blow that landed on my opponent; BALANCE1: on the port's wear scale
 import { reportPlayerAttack, registerAttackResolutionListener } from '../combat/formulas.js';   // DUEL1: the defender's answer, on my HUD's damage numbers
@@ -682,7 +681,7 @@ import { createNavalCrew, CREW_RANGE, CREW_KEEP } from './naval/navalCrew.js';  
 import { asleepHour } from '../systems/naval/shipWatch.js';   // SHIP-WATCH: the crews' sleeping hours
 import { crewRoster, crewCount } from '../systems/naval/crewLife.js';
 import { createCrewAshore } from './crewAshore.js';   // CREW-COMPANIONS: the party ashore, stood in every place
-import { revenantParty, setRetinuePlayer, setRetinueListener, setRetinueBodies, revenantsWithYou, isRevenantCompanionKey, revenantIdOfKey, applySwornStrength, sendRevenantAway, forgetSwornMember, swornFightStep, swornFightWon, devotedWithYou } from '../systems/revenant/revenantCompanions.js';   // REVENANT-COMPANION: the sworn, stood by the same layer
+import { revenantParty, setRetinuePlayer, setRetinueListener, setRetinueBodies, revenantsWithYou, isRevenantCompanionKey, revenantIdOfKey, applySwornStrength, sendRevenantAway, forgetSwornMember } from '../systems/revenant/revenantCompanions.js';   // REVENANT-COMPANION: the sworn, stood by the same layer
 import { registerCompanionCount, registerCompanionRoster, companionsWithYou, COMPANION_SLOTS } from '../systems/companionSlots.js';   // COMPANION-SLOTS: the crew's hands ashore counted with the sworn
 import { PERSONALITIES } from '../systems/revenant/revenantPersonality.js';   // REVENANT-COMPANION: the party card's word for one
 import { hullBuild } from '../systems/naval/navalShips.js';   // LIVING CREW: a room's boat's crew, her hull's own
@@ -730,7 +729,6 @@ import { PING_TRAVEL_M } from '../systems/party/partyPing.js';   // PARTY-PING: 
 import { createBountyFarms, farmSpotLocal, pickFarm } from './bountyFarms.js';   // BOUNTY-FARM: a farm on a farm bounty's pixel, while it is held
 import { questBoardIndices } from '../systems/bounty/bountyBoard.js';   // BOUNTY1: which of a town's boards post bounties (half)
 import { bountyLandWild } from '../systems/bounty/bountyQuarry.js';   // QUARRY-WORLD: the land's own wild about a board's town
-import { createLairDoor } from './lairHost.js';   // RVN7, LAIR-DOOR: a revenant's lair, an enterable dungeon in the boards' ring
 import { createBountyOverlay, closeBountyDoor, bountyDoorOpen } from '../ui/bounty/bountyDoor.js';   // BOUNTY1: the board's window and the payday notice
 import { isQualifyingThreatState } from '../systems/horse/horseFollow.js';   // HCC: CollectThreats' qualification, the mod's own five-term test
 import { totalWeight } from '../systems/inventory.js';   // HCC: PlayerEntity.WagonWeight
@@ -1757,7 +1755,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const _bountyFarmLocs = [];   // BOUNTY-FARM: the game's own farmsteads - the nearest lends a farm bounty its buildings
   const _bountyDungeonPixels = new Map();   // BOUNTY1: the game's own dungeons, by pixel -> name, for a board's underground hunts
   const _bountyGraveyardPixels = new Set();   // BOUNTY-GRAVEYARD: the game's own graveyards, by pixel - a board's hunt there stands outside
-  const _dungeonRegionPixels = new Map();   // RVN7: those dungeons' regions, by pixel - a revenant's lair names its region (its rumours' reach)
   const _bountyLocPixels = new Set();   // BOUNTY1: the pixels the game's OWN locations stand on (no spawn, no mod row), for a hunt's ground
   // AUDIT OW4 D5: THE INDEX'S GENERATION - bumped at every set and delete after the boot's fill (the spawns: stood,
   // expired, taken back by a road), so a reader that keeps a list off the index (the Overworld's dungeons) sees ANY
@@ -1788,7 +1785,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
         if (lt === LOCATION_TYPES.HomeFarms) _bountyFarmLocs.push({ px: p.x, py: p.y, loc });   // BOUNTY-FARM: the game's own farms, whose first block a farm bounty stands
         if (loc.hasDungeon && lt !== LOCATION_TYPES.TownCity && lt !== LOCATION_TYPES.TownHamlet && lt !== LOCATION_TYPES.TownVillage) {
           _bountyDungeonPixels.set(`${p.x},${p.y}`, String(loc.name ?? ''));
-          _dungeonRegionPixels.set(`${p.x},${p.y}`, r);   // RVN7
           if (lt === LOCATION_TYPES.Graveyard || /graveyard|cemetery/i.test(String(loc.name ?? ''))) _bountyGraveyardPixels.add(`${p.x},${p.y}`);
         }
       }
@@ -9784,13 +9780,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // AUDIT CC-A1: `has` - a place's clear empties its list and marks nobody (the street's clearLive), so the layer
     // asks the list itself whether a body still stands there
     // COMPANION-PORTAL: each place's portals (`fx` - the pool draws them with its foes)
-    // RVN11c (22.3): `turn` - a betrayer stood HOSTILE where its body stood (its record's
-    // stand at its feet: no band, no return counted)
-    const turnIn = (pool) => (r, feet, yaw) => pool.spawnFoe(r.mobileType, feet, { yaw, feetGiven: true, loose: true, band: false, turned: true, ...revenantSpawnOptions(r, effectiveLevel(playerEntity)) });   // `loose`: no encounter's slot - it stands whatever the pool holds
-    if (mode === 'exterior') return { key: exteriorFoes, spawn: standIn(exteriorFoes), remove: (f) => exteriorFoes.removeFoe(f), has: (f) => exteriorFoes.foes.includes(f), spot: spotOf(collider), fx: exteriorFoes.companionFx, turn: turnIn(exteriorFoes) };
+    if (mode === 'exterior') return { key: exteriorFoes, spawn: standIn(exteriorFoes), remove: (f) => exteriorFoes.removeFoe(f), has: (f) => exteriorFoes.foes.includes(f), spot: spotOf(collider), fx: exteriorFoes.companionFx };
     if (mode === 'interior') {
       const pool = modes?.interiorPool?.();
-      return pool ? { key: pool, spawn: standIn(pool), remove: (f) => pool.removeFoe(f), has: (f) => pool.foes.includes(f), spot: spotOf(modes?.interiorCollider), fx: pool.companionFx, turn: turnIn(pool) } : null;
+      return pool ? { key: pool, spawn: standIn(pool), remove: (f) => pool.removeFoe(f), has: (f) => pool.foes.includes(f), spot: spotOf(modes?.interiorCollider), fx: pool.companionFx } : null;
     }
     const d = _dungeonPool();
     if (!d?.spawnLooseFoe || !d.removeLooseFoe) return null;
@@ -9800,23 +9793,15 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // the room stands him as my ally (dungeonContext.js companionPuppet); off the lane he was nobody's to see
       spawn: (mobile, feet, o) => d.spawnLooseFoe(mobile, feet, { yawRad: o.yaw, allied: true, gender: o.gender }),
       remove: (f) => d.removeLooseFoe(f), has: (f) => d.foes.includes(f), spot: spotOf(d.collider), fx: d.companionFx ?? null,
-      turn: (r, feet, yaw) => { const so = revenantSpawnOptions(r, effectiveLevel(playerEntity)); return d.spawnLooseFoe(r.mobileType, feet, { yawRad: yaw, revenant: r, turned: true, gender: so.gender, level: so.level }); },   // RVN11c
     };
   }
-  /** RVN10 (21.1): FELLED - my companion knocked out by `by`'s blow (the pool's record the
-   *  knock-out arm noted; none for a spell's, or a foe on another's machine): the deed `felled` on it, the companion's
-   *  name on it, and its card. */
-  const felledBy = (by, ally) => {
-    const r = by ? revenantFelled(playerEntity, by, ally) : null;
-    if (r) revenantSay(revenantFelledEvent(r, ally, { archive: by.archive ?? by.mobileArchive ?? null }), (l) => townTalk.say(l));
-  };
   const crewCount = () => (navalOn() ? naval?.companions?.party?.length ?? 0 : 0);
   const crewAshore = createCrewAshore({
     party: () => (navalOn() ? naval?.companions ?? null : null),
     place: companionPlace,
     leader: () => (playerSpawned ? { feet: [player.pos[0], player.pos[1], player.pos[2]], yaw: cam.yaw, grounded: !!player.grounded && !player.levitating && !player.swimming } : null),   // AUDIT CC-A3: on a floor or not
     now: () => Math.floor(playerTicker.ownMinutes),
-    onKnocked: (c, by) => { naval?.companionKnocked?.(c); felledBy(by, c.name); },   // RVN10: a special foe's blow fells him - a deed on it
+    onKnocked: (c) => { naval?.companionKnocked?.(c); },
     seat: (i) => wagonRiders?.companionSeat(i, hcc.carriesCompanions()) ?? null,   // WAGONS1: the crew's hands take the seats in my wagon's back first
     seatDraw: (i) => wagonRiders?.companionSeatDrawn(i, hcc.carriesCompanions()) ?? null,   // WAGONS2: and drawn there as the wagon is drawn (grown under the Overworld)
   });
@@ -9828,8 +9813,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   setRetinuePlayer(playerEntity);
   /** The sworn ones the player just called or spared, who say so as they step through (the roster's call). */
   const _revenantArrivals = new Set();
-  /** RVN11c: the sworn turned on me, waiting for the layer's next frame. */
-  const _revenantBetrayals = [];
   const revenantCompanionSay = (kind, id, body = null) => {
     const r = revenantRecord(playerEntity, id);
     if (r) revenantSay(revenantMomentEvent(kind, r, playerEntity?.name, body ? { body } : {}), (l) => townTalk.say(l));
@@ -9840,9 +9823,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     place: () => companionPlace({ crew: false }),
     leader: () => (playerSpawned ? { feet: [player.pos[0], player.pos[1], player.pos[2]], yaw: cam.yaw, grounded: !!player.grounded && !player.levitating && !player.swimming } : null),
     now: () => Math.floor(playerTicker.ownMinutes),
-    onKnocked: (c, by) => {
+    onKnocked: (c) => {
       revenantCompanionSay('downed', c.name, `${c.title ?? 'It'} falls, and is carried off through a portal to recover.`);
-      felledBy(by, revenantRecord(playerEntity, c.name)?.given ?? null);   // RVN10: a special foe's blow fells it - a deed on it, its given name on the deed
     },
     onStood: (c, rec) => {
       const r = revenantRecord(playerEntity, c.name);
@@ -9862,7 +9844,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // AUDIT: opposite acts in one pause cancel - a call after a sending-away (the body never left) says neither
   // word, nor leaves an arrival waiting for the next door; a release carries its pack's count for its words
   setRetinueListener((kind, r, extra) => {
-    if (kind === 'betray') { _revenantArrivals.delete(r.id); _revenantBetrayals.push(r); return; }   // RVN11c: its turning, at the layer's next frame
     const sentAt = _revenantDepartures.findIndex((d) => d.kind === 'dismiss' && d.r.id === r.id);
     if (kind === 'arrive') { if (sentAt >= 0) _revenantDepartures.splice(sentAt, 1); else noteRevenantArrival(r.id); return; }
     _revenantArrivals.delete(r.id);
@@ -9870,8 +9851,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   });
   /** AUDIT: the sworn's layer lifted for a load - its bodies, the words still to say, and every member (so
    *  no spell the last game's body wore stands with the loaded one). */
-  const clearSworn = () => { revenantAshore.clear(); _revenantArrivals.clear(); _revenantDepartures.length = 0; _revenantBetrayals.length = 0; forgetSwornMember(); };   // AUDIT FEUD: and a turning queued under a window - the loaded game's is its own
-  setRetinueBodies((id) => revenantAshore.bodies().find((b) => b.revenantCompanion === id && !b.dead && !b._knockedOut)?.entity ?? null);   // AUDIT FEUD: a knocked-out one stands for nothing - no turning, no warning, no witness
+  const clearSworn = () => { revenantAshore.clear(); _revenantArrivals.clear(); _revenantDepartures.length = 0; forgetSwornMember(); };
+  setRetinueBodies((id) => revenantAshore.bodies().find((b) => b.revenantCompanion === id && !b.dead && !b._knockedOut)?.entity ?? null);   // a knocked-out one stands for nothing
   registerCompanionRoster('crew', () => (navalOn() ? (naval?.companions?.party ?? []).map((c) => ({ name: c.name, role: c.role })) : []));
   /** REVENANT-COMPANION: A SWORN ONE'S WORD IN A FIGHT, now and then and never a chatter - as it goes in (BARK_BATTLE), over
    *  a foe it put down (BARK_KILL) - each one's own wait between, and a quiet spell for the whole party after any. */
@@ -9950,24 +9931,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (++_companionPruneN >= 60) { _companionPruneN = 0; naval?.pruneCompanions?.(); }
     try { crewAshore.frame(); } catch (e) { console.warn('[companions]', e?.message ?? e); }
   }
-  /** RVN11c (22.3): BETRAYED - its card; its body lifted at once (no portal: it turns where
-   *  it stood - the layer then finds it swept, never carried off), and the hostile revenant its record now is stood there,
-   *  set on me. No body here (another place, or none stood): it comes later, as any living revenant. */
-  function turnSworn(r) {
-    revenantSay(revenantBetrayEvent(r, { playerName: playerEntity?.name }), (l) => townTalk.say(l));   // RVN12a: its words, my name in them
-    const rec = revenantAshore.bodies().find((b) => b.revenantCompanion === r.id && !b.dead && !b._knockedOut && b.ai?.feet);
-    const place = rec ? companionPlace({ crew: false }) : null;
-    if (!rec || !place?.turn || place.has?.(rec) === false) return;   // AUDIT FEUD: a body a respawn's sweep took is no place to stand it (AUDIT CC-A1's `has`)
-    const feet = [rec.ai.feet[0], rec.ai.feet[1], rec.ai.feet[2]], yaw = rec.ai.yaw ?? 0;
-    try { place.remove(rec); } catch (e) { console.warn('[companions] a betrayer would not lift', e?.message ?? e); }
-    Promise.resolve(place.turn(r, feet, yaw)).then((f) => {
-      if (f?.ai && !f.dead) f.ai.makeHostileToPlayer?.(undefined, [player.pos[0], player.pos[1], player.pos[2]]);
-    }, (e) => console.warn('[companions] a betrayer would not stand', e?.message ?? e));
-  }
   /** REVENANT-COMPANION: the sworn's layer's frame, in every mode beside the crew's - never the naval arc's to stop. */
   function revenantAshoreTick() {
     if (gamePaused()) return;   // the sworn wait out a window too (AUDIT CC-A10's law: no knock, no stand, no catch-up under one)
-    while (_revenantBetrayals.length) turnSworn(_revenantBetrayals.shift());   // RVN11c: before the layer's frame - its body lifted, no portal
     try { revenantAshore.frame(); } catch (e) { console.warn('[companions] the sworn', e?.message ?? e); }
     while (_revenantDepartures.length) {   // COMPANION-ROSTER: its parting words, as it goes
       const d = _revenantDepartures.shift();
@@ -9979,23 +9945,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // slots, the one most lately sworn steps away to wait
     if (companionsWithYou() > COMPANION_SLOTS) {
       const last = revenantsWithYou().sort((a, b) => (b.swornAt ?? 0) - (a.swornAt ?? 0))[0];
-      if (last && sendRevenantAway(last.id, { byYou: false })) townTalk.say(`Your companions are full. ${last.name} steps away to wait.`);   // RVN11: the slots' hold, never the player's sending (no loyalty lost)
+      if (last && sendRevenantAway(last.id)) townTalk.say(`Your companions are full. ${last.name} steps away to wait.`);
     }
     try { revenantCompanionBarks(); } catch { /* a bark is no frame's business */ }
-    // RVN11 (22.1): a fight won at my side, +3 loyalty
-    for (const rec of revenantAshore.bodies()) if (rec.revenantCompanion && !rec.dead && swornFightStep(rec)) swornFightWon(rec.revenantCompanion);
   }
-  /** RVN11 (Feud-Arc.md 22.1): A DEVOTED ONE'S WARNING - a wind-up at me begun behind me (the duel's own back test), while
-   *  a Devoted companion stands at my side: "Behind you, Ayla!" - DEVOTED.WARN_S between. */
-  let _devotedWarnAt = -Infinity;
-  setWindupAtMeListener((f) => {
-    if (!playerSpawned || !f?.ai?.feet || Date.now() - _devotedWarnAt < DEVOTED.WARN_S * 1000) return;
-    if (!isBackFacing(cam.yaw, player.feetAt(), f.ai.feet)) return;
-    const r = devotedWithYou();
-    if (!r) return;
-    _devotedWarnAt = Date.now();
-    revenantSay(revenantWarnEvent(r, playerEntity?.name), (l) => townTalk.say(l));
-  });
   /** CREW-COMPANIONS: a boat of mine's hands to take ashore (two at most) or send back aboard - a picker of her roster,
    *  a refused row with its reason (crewCompanions.js companionRows), the press the host's (navalHost companionPress). */
   function navalCompanions(boat) {
@@ -10332,7 +10285,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     spellsByIndex: () => spellsByIndex,
     magicHooks: {
       explodeAt: (...a) => magic.explodeAt(...a),
-      strikePlayer: (spell, casterLevel, foe) => { if (walkMode && playerSpawned) magic.strikePlayerFrom(spell, casterLevel, foe); },   // RVN5: a revenant's pyre - its blast on me through the one cast engine (fireMissile's gate)
       fireMissile: (from, spell, casterLevel, foe, aimAt = null) => {   // WORLD6b-iii: aimed where the executor says (a peer's or a foe's transform), at my LIVE transform otherwise (AUDIT 62 F21) - AUDIT WORLD6b-iii(a) C3: through the ONE law, the three hosts alike
         if (!(walkMode && playerSpawned)) return;
         magic.fireEnemyMissile(from, missileAimDirection(from, aimAt ?? targetAimPoint(null, player.pos, player.height)), spell, casterLevel, foe);
@@ -11341,9 +11293,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const crowdDrawnHere = (p) => gateCrowd.shows(p.id) && peerRange.shows(p.id);   // GATE-CROWD: a player the crowd's count leaves undrawn is not there to press or aim a gift at; PEER-RANGE: nor one past the distance
   const magic = createPlayerMagic({
     renderer, audio, getTexture, uploadRecord, uploadRecordFrame,
-    // RVN7 (18.1): a deed in the open world - my map pixel (or the one asked: LAIR-DOOR's mend), and the named
-    // dungeons in the boards' ring about it; LAIR-DOOR (FIELD BUGS 2026-10-22d): those the player can go down into (scenes/lairHost.js)
-    lairHere: createLairDoor({ maps, blocks, arch, locations: locationIndex, dungeons: _bountyDungeonPixels, regions: _dungeonRegionPixels, here: playerTravelPixel, pastBay: provinceQuestPlaces }),   // LAIR-WORLD: and the lairs past the Bay
     allyMarks: (sp) => allyMarksNear(sp),   // AID1 onto ALLY-CAST: the party mates' bodies, for a beneficial touch, missile or blast (declared beside allyTargetPick, below) - SPELL-GIFT: the spell rides, for the strangers its list may reach
     peerBodies: () => peersNear(),   // SPELLFX1: every player's body, where a peer's drawn missile stops (declared below this engine's build)
     companionBodies: () => [...crewAshore.bodies(), ...revenantAshore.bodies()],   // COMPANION-KIT: my companions here - my healing and buffs reach them (REVENANT-COMPANION: the sworn too)
@@ -13075,7 +13024,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     _seasonHoldKey = null;    // ...nor a held motor: the spawn below re-anchors it anyway
     _wasInLocationRect = false;   // F062: ResetState (:398-401) - no exit event on arrival
     resetPlayerGpsState(modEvent);   // AUDIT DEX C1: and the GPS's own flag (world/playerGps.js), the jump's kind handed - the module resets on the two that raise ResetState in DFU, a load's start and a fast travel's end (PlayerGPS.cs:301-303)
-    if (modEvent !== 'load') routByJump();   // RVN10 (Feud-Arc.md 21.2): a jump out of a fight routs me - never a load's
     // AUDIT 39: CleanupUntrackedObjects (StreamingWorld.cs:1620-1644,
     // on SaveLoadManager_OnStartLoad) - "remove loose enemies,
     // missiles, etc. on load or new game" - and the same sweep a
@@ -13613,12 +13561,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   };
 
   let _recalling = false;
-  /** RVN10 (21.2): ROUTED BY A JUMP - a Recall or a teleport taking me out of a fight:
-   *  each engaged special of the pool I leave (the door's) routed and told, before its sweep takes it. A respawn's jump
-   *  routs nobody (the death ended every fight - systems/harmMark.js endPlayerFights). */
-  function routByJump() {
-    for (const { r, f } of revenantRoutSweep(playerEntity)) revenantSay(revenantRoutedEvent(r, { archive: f.archive ?? f.mobileArchive ?? null }), (l) => townTalk.say(l));
-  }
   /** TeleportPlayer (:119-164) + the respawner's tail (:228-256). */
   async function recallToAnchor() {
     if (worldMoveBusy()) return;   // AUDIT 68 S22
@@ -13656,7 +13598,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // makes). Inside a dungeon: NOTHING, because DFU takes
       // TransitionDungeonExteriorImmediate there and dungeons are not
       // scene-cached at all.
-      routByJump();   // RVN10 (21.2): out of a fight - the pool I leave asked before a mode's teardown takes it (a dungeon's, a building's)
       if (plan.cacheScene === 'exterior') cacheExteriorScene(playerTravelPixel());
       if ((modes?.mode ?? 'exterior') !== 'exterior') {
         modes?.forceExitToExterior({ cacheScene: plan.cacheScene === 'building' });
@@ -13924,7 +13865,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     _sdFallen.rise(modes?.sdRealmSlot?.());   // SD-REZ (EVENT-RULES): raised in the Hour I fell in - its slot let go, the realm lets me back
     _deadMark = null; _partyComposedAt = -Infinity;   // PCORPSE3: my body is gone - my party pose says so at once
     reviveForPlay(playerEntity, { force: true });
-    forgetLastSlew();   // AUDIT FEUD (RVN8): no respawn - its killer takes nothing, now or at a later death
     playerEntity.health = Math.max(1, Math.round((playerEntity.maxHealth ?? playerEntity.health) * RESURRECT_HEALTH_PCT / 100));
     player.stopAutorun();   // AUDIT 27h S2: SEA-RISE's law for every rise - a drowned autorunner raised on the seabed walked on
     _deathWasOnline = null;
@@ -13988,9 +13928,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const out = legacyHost?.deathOutcome() ?? { kind: 'none' };
     if (out.kind === 'rise') {
       // LEGACY2: the respawn is D-ONLINE1's own. BAL4: OFFLINE THE TOLL AND
-      // THE TENTH - the death screen stated the respawn's loss (DeathScreen `rises`), and the respawn takes it, as online;
-      // a revenant's theft stays online's (RVN8)
-      if (!(_deathWasOnline ?? _onlineWorldSession())) forgetLastSlew();
+      // THE TENTH - the death screen stated the respawn's loss (DeathScreen `rises`), and the respawn takes it, as online.
       respawnOnlinePlayer();
       townTalk.say(out.line);   // Arkay's years, on the notices over the waking
       return true;
@@ -14140,7 +14078,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // clear the overlay, all synchronous). This is that order.
     if (_respawning) return;   // and a second death mid-flight cannot start a second respawn
     _respawning = true;
-    endPlayerFights();   // RVN10 (Feud-Arc.md 21.2): the death ended every fight - the respawn's jump routs nobody (a death no hurt told)
     wagonRiders?.leave();   // WAGONS2 (AUDIT): a death ends a ride in another's wagon - the risen body is never pinned back on its seat
     // DEATHLOOP1: the health AND the cause. MAC-D3 put the heal first
     // so no frame could see a dead player with no death screen; this
@@ -14160,7 +14097,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // (no guard's blow lands in it); a charge already laid stays whole - only a sentence gives any of it back.
     setCrimeCommitted(playerEntity, CRIMES.None);
     arrestFlow.abandon();   // the surrender question withdrawn, the chase's charge and slain watchman forgotten
-    const took = revenantTakes(playerEntity, { online: true });   // RVN8 (19): a revenant's kill takes one piece - online alone, once a death (the same guard)
     _deathWasOnline = null;   // armed fresh for the NEXT death
     const mode = modes?.mode ?? 'exterior';
     const wasInDungeon = mode === 'dungeon';
@@ -14237,7 +14173,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (!(playerEntity.health > 0)) { reviveForPlay(playerEntity); surfacePlayer(); }
       ohAbyss?.onRespawnerComplete();   // OH-D: the port's own respawn - a respawn anywhere but the bound abyss clears it, as the respawner's does
       if (diedInHour) { gateVeil?.flash('hourCast'); kind = 'hour'; }   // AUDIT SD II (L6 F4): the Hour's veil, and its own words; SD-LOOK: its face shattered
-      townTalk.showOverlay(new ActionTextBox([respawnFlavorText(kind), deathPenaltyText(goldLost), took?.line].filter(Boolean)));   // DEATH-PENALTY: and what the fall cost; RVN8: and what it took
+      townTalk.showOverlay(new ActionTextBox([respawnFlavorText(kind), deathPenaltyText(goldLost)].filter(Boolean)));   // DEATH-PENALTY: and what the fall cost
     }).catch((e) => {
       // RISE-STUCK: A RISE THAT THREW STILL RISES. The heal ran first
       // (MAC-D3), so the player is alive; a screen left up here has its
@@ -15978,8 +15914,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       quests: () => (marksOn() ? questMapMarks(questTracker.views, questTracker.shown()?.id ?? null, questPixel) : []),
       // BOUNTY1 (, then black - green is the party's): each held bounty's pixel, on both maps
       bounties: () => [...(bountyHost?.mapMarks() ?? []), ...(legacyHost?.mapMarks() ?? [])],   // LEGACY4: and where the house's fallen lie, ringed as a hunt is
-      // RVN7c (18.3): each revenant lair heard of - a blood-red circle, on both maps
-      revenants: () => revenantMapMarks(),
       // MINE-PERKS (Professions-Arc 43): a Motherlode Sense's day's Motherlodes - each on its pixel from the day's start,
       // its ore and its hour (ui/lodeMapMark.js); none without the Sense, nor with the professions shut
       lodes: () => lodeMapMarksNow(),
@@ -18246,7 +18180,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // quest topic mark its dialog-linked resources. Unset, every %hnt
     // answer printed its macros raw; it is the mill's seam, one home.
     expandQuestTokens,
-    getNewsOrRumors: (session) => sdHost?.rumor(rumorHere(), session) ?? revenantRumor(rumorHere(), session) ?? rumorMill.getNewsOrRumors(session),   // RVN7b (18.2): a revenant's lair near, the news may be of it; SD2c: a Super dungeon by this city first - the taverns' word of it
+    getNewsOrRumors: (session) => sdHost?.rumor(rumorHere(), session) ?? rumorMill.getNewsOrRumors(session),   // SD2c: a Super dungeon by this city first - the taverns' word of it
     isPlayerInside: () => (modes?.mode ?? 'exterior') !== 'exterior',
     /** ROAD-B B4: GameManager.IsPlayerInsideCastle (GameManager.cs:420-423)
      *  is PlayerEnterExit.IsPlayerInsideDungeonCastle and nothing else, and
@@ -18757,7 +18691,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const baseQuestLog = questBridge.questLog.bind(questBridge);
     questBridge.questLog = (o) => {   // AUDIT FB1022d E8: the lens's `{ windows: false }` reaches the walk (questBridge.js)
       const log = baseQuestLog(o);
-      const extra = [...(bountyHost?.questLogEntries?.() ?? []), ...revenantHuntEntries(rumorHere()), ...(legacyHost?.questLogEntries() ?? [])];   // LEGACY4: and the death quests   // RVN7c: and each hunt - a lair heard of, the way there from where I stand
+      const extra = [...(bountyHost?.questLogEntries?.() ?? []), ...(legacyHost?.questLogEntries() ?? [])];   // LEGACY4: and the death quests
       return extra.length ? { ...log, active: [...(log?.active ?? []), ...extra] } : log;
     };
   }
