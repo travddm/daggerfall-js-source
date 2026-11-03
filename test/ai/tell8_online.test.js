@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { validFoeRecord, hitClassField, hitClassOf, HIT_CLASS_K_MAX, FOE_WINDUP_MS, FOE_WINDUP_REACH, POSE_BOUND, RELAY_VERSION } from '../../src/net/wire.js';
 import { setTacticsClock, resetTactics, noteLocalPlayer, tacticsStep, foeGlint, poiseTrack, LOCAL_TARGET, staggeredNow, overreachedNow, tokensOut } from '../../src/ai/tactics.js';
-import { makeBlow, resetBlows, liveBlows, drawableBlows, blowConnects, blowScaled, BLOW, IRON_COLOR, BLOW_COLOR } from '../../src/ai/foeBlows.js';
+import { makeBlow, resetBlows, liveBlows, drawableBlows, blowConnects, BLOW, IRON_COLOR, BLOW_COLOR } from '../../src/ai/foeBlows.js';
 import { TELL } from '../../src/ai/tells.js';
 import { WIRE_KINDS, WIRE_IRON, WIRE_FEINT, WIRE_LANDED, WIRE_LANDED_S, WIRE_LAND_MS, PUPPET_HELD_UNTIL, blowWire, blowWireKey, applyBlowRecord, puppetBlowTurn, puppetGapLanded, blowClassOf, puppetBlow } from '../../src/ai/puppetBlows.js';
 import { blowTakenScale } from '../../src/systems/blowTaken.js';
@@ -53,7 +53,7 @@ test('TELL8: the record\'s law - the wind-up\'s four fields together (its shape 
   for (const ws of [0, 3, '1', true]) assert.equal(validFoeRecord({ ...base, ws }), null, `ws ${ws}`);
   assert.equal(WIRE_LAND_MS, FOE_WINDUP_MS, 'the writer\'s ceiling is the reader\'s');
   assert.deepEqual([...WIRE_KINDS], ['lunge', 'sweep', 'slam', 'ring', 'charge', 'leap', 'aimed']);
-  assert.equal(RELAY_VERSION, 'world288');
+  assert.equal(RELAY_VERSION, 'world289');
 });
 
 test('TELL8: the owner\'s word - a live wind-up\'s shape, iron and feint flags, yaw, landing in ms (clamped), origin through the record\'s projection and point; none for a cut feint, a landed blow or a puppet; the stagger and the overreach; the dedupe key never carries `wl` (mutants: a flag dropped; wl in the key)', () => {
@@ -146,7 +146,7 @@ test('TELL8: the field gone - a feint\'s cut dashes its mark and lets its swing 
   assert.equal(blowTakenScale(null, ent), 1, 'its owner said it ended');
 });
 
-test('TELL8: each judges their own feet - a puppet\'s blow AT ME lands on my feet: in it the verdict, its weight and its effect for the host\'s door; out of it a dodge; inside at the late sample and out at the landing a perfect dodge; an onlooker judges nothing; an aimed shot\'s arrow is its owner\'s (mutants: the verdict judged at an onlooker; the weight unset; the perfect never)', () => {
+test('TELL8: each judges their own feet - a puppet\'s blow AT ME lands on my feet: in it the verdict and its effect for the host\'s door; out of it a dodge; inside at the late sample and out at the landing a perfect dodge; an onlooker judges nothing; an aimed shot\'s arrow is its owner\'s (mutants: the verdict judged at an onlooker; the perfect never)', () => {
   const at = (me) => { const ai = { feet: [0, 0, 0] }; applyBlowRecord(ai, { wk: 0, wy: 0, wl: 500, wo: [0, 0, 0], wn: 1 }, { origin: [0, 0, 0], me }); return ai; };
   // in the lane at the landing: a hit
   let ai = at(true);
@@ -154,11 +154,9 @@ test('TELL8: each judges their own feet - a puppet\'s blow AT ME lands on my fee
   T = 10.3; puppetBlowTurn(ai, [0, 0, 2], T);
   T = 10.55; puppetBlowTurn(ai, [0, 0, 2], T);
   assert.equal(ai._blowVerdict, true);
-  assert.equal(ai._blowMult, BLOW.lunge.mult);
   assert.deepEqual(ai._blowFx, { kind: 'lunge', iron: false, at: 10.55 });
   assert.equal(ai._blowLandedAt, 10.55);
   assert.equal(blowConnects(ai, false, T), true, 'the host\'s reach test answers the verdict');
-  assert.equal(blowScaled(ai, 10), 15, 'and its weight');
   const fx = landBlowEffect({ ai, entity: {} }, 15, [0, 0, 2], T);
   assert.equal(fx?.push, 3, 'and its effect, on MY machine');
   // out of it at the landing, in it at the late sample: a perfect dodge
@@ -235,7 +233,6 @@ test('TELL8: the owner\'s real brain winds up at a peer it hunts (OPEN 9), aimed
   try { while (T < b.land + 0.05) { T += 1 / 16; tacticsStep(ai, 20, 2); } } finally { Math.random = rnd; }
   assert.equal(ai._tac.state, 'overreach', 'the owner\'s view opens the window');
   assert.equal(ai._blowVerdict, null);
-  assert.equal(ai._blowMult, undefined);
   assert.equal(ai._blowFx, null);
   assert.deepEqual(blowWire(ai, T).ws, 2, 'and says so to the peers');
   // a second, the peer standing in it: the owner's view says a hit - and still nothing is left to land here

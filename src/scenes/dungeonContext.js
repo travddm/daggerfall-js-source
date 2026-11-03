@@ -332,7 +332,7 @@ import { foeHitFlash, setBatchHitFlash, puppetHurtStep, setBatchGlint, prefersRe
 import { localizedText, getLocalizedLocationName, getLocalizedRegionName } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language; L10N3e: and the place names shown
 import { createCoverIndex, isCoverFlat, coverProxy } from '../ai/cover.js';   // TACT1: billboards are cover
 import { flatBodies } from '../world/propBodies.js';   // PROP-BODIES: the solid flats' bodies, beside their cover
-import { blowConnects, blowScaled } from '../ai/foeBlows.js';   // TACT4
+import { blowConnects } from '../ai/foeBlows.js';   // TACT4
 import { foeGlint, tacticsNow, beginRoar } from '../ai/tactics.js';   // TELL2: a wind-up's glint; TELL8: the record's wind-up on the foes' clock; RVN4: a last stand's roar
 import { lastStandGlint, lastStandSize, pyreSpell, LAIR_GOLD, bandMembers, bandName, bandWord, BAND_SCATTER_S, BAND_SPACING, RALLY_KIN, feudWire, feudFromWire, puppetRevenantBlows, SIG } from '../systems/revenant/revenantFeud.js';   // RVN4: phase two's rim and size; RVN5: the pyre's blast; RVN7d: a lair's gold, its band; RVN13: the wire's feud fields; FEUD WIRE: a puppet's blows and signature
 import { feudRevealWeak, feudWeakBlow } from '../systems/feudLedger.js';   // RVN13: a joiner's blow of its weakness; AUDIT FEUD: and mine on the host's
@@ -1813,7 +1813,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       f.ai._blowPyre = null;
       if (sb?.kind === 'pyre') {
         audio.play3dId?.(SPELL_CAST_SOUND[sb.element] ?? SPELL_CAST_SOUND[4], [f.ai.feet[0], f.ai.feet[1], f.ai.feet[2]], 1, { maxDistance: 16 });
-        magic.strikePlayerFrom(pyreSpell(sb.name, sb.element, p.mult), f.entity.level ?? 1, f);
+        magic.strikePlayerFrom(pyreSpell(sb.name, sb.element), f.entity.level ?? 1, f);
       }
     }
   }
@@ -6932,7 +6932,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       applyDamageToNonPlayer(f, t, {
         weapon: wpn, direction: fwd, rolls: Math.random,
         calculateAttackDamage: foeDeps.calculateAttackDamage,
-        dealDamage: (tt, d) => tt.hurtFromFoe?.(blowScaled(f.ai, d), fwd, f),
+        dealDamage: (tt, d) => tt.hurtFromFoe?.(d, fwd, f),
         audio, hitEffects,
         // AUDIT 58: FormulaHelper.cs:691-696 has NO player gate - a
         // poisoned foe blade doses the foe it strikes, on DFU's own
@@ -6971,7 +6971,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     tallySkill(foeDeps.playerEntity, SKILLS.Dodging, 1);
     // S18: the special-attack rider seam - monster weaponless hits
     // run OnMonsterHit per hit (disease/paralysis/fatigue)
-    const dmg = blowScaled(f.ai, _weighHit(f, foeDeps.calculateAttackDamage(f.entity, foeDeps.playerEntity, {   // TACT4: a telegraphed blow's weight
+    const dmg = _weighHit(f, foeDeps.calculateAttackDamage(f.entity, foeDeps.playerEntity, {  
       weapon: wpn,   // AUDIT 18: target group derived from the entity (isPlayer -> Humanoid)
       onMonsterHit: (att, tgt, hit) => onMonsterHit(att, tgt, hit, {
         currentDay: Math.floor(classicMinutesRef.value / MINUTES_PER_DAY), sinks: playerSinks,
@@ -6985,7 +6985,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       // formulas clear the weapon's poison)
       onInflictPoison: (att, tgt, pt) => inflictPoison(foeDeps.playerEntity, pt, false, { currentMinute: Math.floor(classicMinutesRef.value) }),
       say: (l) => hudText.add(l),   // C-slice: equipment breaks speak
-    })));   // PSCALE1: harder for the players fighting it - weighed once, so the flash and the cry below read what I took (AUDIT PSCALE1 DOORS-3)
+    }));   // PSCALE1: harder for the players fighting it - weighed once, so the flash and the cry below read what I took (AUDIT PSCALE1 DOORS-3)
     if (dmg > 0) audio.playOneShot(hitSoundFor(wpn), PLAYER_HIT_VOLUME);   // AUDIT 58: PlayerFootsteps.cs:330-344 - the blow that lands ON the player is volumeScale 1, not EnemySounds' 1.1
     // C2-slice (combat-9): a connected attack that LOST the roll
     // rings the miss sound too (ApplyDamageToPlayer's else arm).

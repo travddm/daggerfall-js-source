@@ -54,7 +54,7 @@ test('AUDIT TELL B1: a wind-up nobody stepped tells nothing and holds nothing - 
   assert.deepEqual(poiseTrack(ai), { state: 'empty', fill: 0, word: '' });
   ai._tac.seen = T; ai.canAct = false;
   assert.equal(windupHolds(ai), false, 'a foe that cannot act holds nothing');
-  ai.canAct = true; ai._blowVerdict = true; ai._blowMult = 1.3;
+  ai.canAct = true; ai._blowVerdict = true;
   assert.equal(breakWindup(ai), true);
   assert.equal(ai._tac.state, 'engage');
   assert.equal(ai._tac.blow, null);

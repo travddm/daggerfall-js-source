@@ -32,7 +32,7 @@ test('ELITE x PSCALE1: an elite foe\'s blow on a party is elite\'s double, THEN 
   // the dungeon weighs a shared foe's weapon and arrow hit AROUND the blow the formula returned - elite's tail inside it
   const d = rd('src/scenes/dungeonContext.js');
   assert.match(d, /function _weighHit\(f, dmg\) \{ return f && _sharedFoe\(f\) \? partyFoeHits\(dmg, fightN\(f\), playerEntity\) : dmg; \}/);
-  assert.match(d, /const dmg = (?:blowScaled\(f\.ai, )?_weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the melee hit');
+  assert.match(d, /const dmg = _weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the melee hit');
   assert.match(d, /const dmg = foeDeps && shooter \? _weighHit\(shooter, foeDeps\.calculateAttackDamage\(shooter\.entity, playerEntity, \{/, 'the arrow');
 });
 

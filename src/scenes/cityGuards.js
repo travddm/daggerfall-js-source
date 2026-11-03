@@ -57,7 +57,7 @@ import { setEnemyAlert } from '../systems/encounters.js';   // AUDIT 24 (wave 36
 import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, CAPSULE_RADIUS, CAPSULE_HEIGHT } from '../player/motor.js';   // AUDIT 24 (wave 36): ApplyFallDamage, for the watch too   // ROAD-B: PlayerController.radius, for the indoor arm's door clearance
 import { findLowestOuterInteriorDoor } from '../player/enterExit.js';   // ROAD-B: DaggerfallInterior.FindLowestOuterInteriorDoor
 import { coverDistance } from '../ai/cover.js';   // TACT1: a witness does not see through a tree
-import { blowConnects, blowScaled } from '../ai/foeBlows.js';   // TACT4
+import { blowConnects } from '../ai/foeBlows.js';   // TACT4
 import { foeGlint } from '../ai/tactics.js';   // TELL2: a wind-up's glint
 import { SOUND } from '../systems/soundClips.js';
 import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';
@@ -1349,11 +1349,11 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
           // InflictPoison seam the dungeon host already passes -
           // guard weapon poison was ROLLED at spawn and could never
           // be inflicted, because the exterior call dropped the hook.
-          const dmg = blowScaled(g.ai, calculateAttackDamage(g.entity, playerEntity, {   // TACT4: a telegraphed blow's weight
+          const dmg = calculateAttackDamage(g.entity, playerEntity, {  
             weapon: wpn,   // AUDIT 18: target group derived from the entity (isPlayer -> Humanoid)
             onInflictPoison: (att, tgt, pt) => inflictPoison(playerEntity, pt, false, { currentMinute: Math.floor(currentMinute()) }),
             say,   // C-slice: equipment breaks speak
-          }));
+          });
           // AUDIT 24 (wave 39): EnemyAttack.cs:406 -
           // `PlayerObject.SendMessage("RemoveHealth", damage)` - which
           // is ShowPlayerDamage.Flash's trigger. An enemy's BLOW

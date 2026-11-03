@@ -293,7 +293,8 @@ ARENA2, with the online health), down from B4's 2.08 / 2.13 / 2.0 / 1.96 / 2.2.
 ## Not modelled
 
 The `power` layer gives a caster no spell line (potency, cast speed): a mage's gear line is a damage line on a staff it
-rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, slams), shields and
+rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, flanking; F1 removed its
+damage multipliers, so a foe's blow is the formulas' roll in the room as here), shields and
 the block roll, backstab, saving throws and elemental tolerance, class foes, Enemy Expansion tables, spell
 effects other than damage, fatigue, and healing. A value from the harness is a comparison of rule sets on these
 builds, not a prediction of play.

@@ -1,7 +1,7 @@
 // TELL6d - THE AIMED SHOT (;, then "Go" on every call). A class archer of the whole set (an elite, a champion, a revenant - section 9's table:
 // an ordinary archer of the tier keeps DFU's plain shot) aims one shot in three at the local player while it holds a
 // ranged token: the line from it to its target is drawn on the ground and LOCKED (0.6 s, 0.5 m wide); at the landing
-// the arrow leaves along it x1.3 as fast, and strikes for x1.4. No blowConnects - the arrow's own flight
+// the arrow leaves along it x1.3 as fast, and strikes for its plain damage. No blowConnects - the arrow's own flight
 // decides: stepping off the line is the dodge. No held swing, no feint, no window.
 // The law (its numbers, its line and the ground's mirror, the locked bearing, the arrow's speed and weight end to end
 // through the formulas); ON THE REAL MOTOR an elite archer's aimed shot - wound up instead of a plain one, its line
@@ -34,8 +34,8 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 
 // ── the law ─────────────────────────────────────────────────────────
 
-test('TELL6d: the aimed shot - 0.6 s, a line 0.5 m wide to its target, x1.4, x1.3 as fast; one shot in three; the ground draws its line its own length (mutants: any number moved; the line not its length)', () => {
-  assert.deepEqual({ ...BLOW.aimed }, { windup: 0.6, halfW: 0.25, mult: 1.4, speed: 1.3 });
+test('TELL6d: the aimed shot - 0.6 s, a line 0.5 m wide to its target, x1.3 as fast; one shot in three; the ground draws its line its own length (mutants: any number moved; the line not its length)', () => {
+  assert.deepEqual({ ...BLOW.aimed }, { windup: 0.6, halfW: 0.25, speed: 1.3 });
   assert.equal(TELL.AIMED_SHARE, 1 / 3);
   const b = makeBlow('aimed', [0, 0, 0], 0, 0);
   b.ahead = 20;
@@ -50,7 +50,7 @@ test('TELL6d: the aimed shot - 0.6 s, a line 0.5 m wide to its target, x1.4, x1.
   assert.equal(BLOW_KIND.aimed, BLOW_KIND.lunge, 'the lane\'s branch');
 });
 
-test('TELL6d: the loose - the arrow\'s pitch kept, its heading the line\'s; x1.3 as fast in flight; x1.4 where it strikes, end to end through the formulas (mutants: the bearing unlocked; the speed or the weight lost)', () => {
+test('TELL6d: the loose - the arrow\'s pitch kept, its heading the line\'s; x1.3 as fast in flight; its plain damage where it strikes, end to end through the formulas (mutants: the bearing unlocked; the speed lost)', () => {
   const dir = [0.6, -0.2, 0.7746];   // DFU's aim at my live transform (a dip and all)
   const shot = { yaw: Math.PI / 2, fired: true };
   const d = aimedDirection(dir, shot);
@@ -70,9 +70,9 @@ test('TELL6d: the loose - the arrow\'s pitch kept, its heading the line\'s; x1.3
   fl.fire([0, 1, 0], [0, 0, 1], { enemy: true, speedScale: 1.3 });
   fl.update(0.05, {});
   assert.ok(near(fl.arrows[1].pos[2] / fl.arrows[0].pos[2], 1.3, 1e-6), `${fl.arrows[0].pos[2]} -> ${fl.arrows[1].pos[2]}`);
-  // its weight
-  assert.ok(blowTakenNames().includes('tell-aimed'));
-  assert.equal(blowTakenScale(null, {}, null, { kind: 'arrow', aimed: true }), 1.4);
+  // no weight: an aimed arrow takes no mod
+  assert.equal(blowTakenNames().includes('tell-aimed'), false);
+  assert.equal(blowTakenScale(null, {}, null, { kind: 'arrow', aimed: true }), 1);
   assert.equal(blowTakenScale(null, {}, null, { kind: 'arrow' }), 1);
   const STATS = { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 };
   const attacker = { isPlayer: false, isClass: true, level: 20, skills: 60, stats: STATS, career: { attackModifierFlags: 0 } };
@@ -80,7 +80,7 @@ test('TELL6d: the loose - the arrow\'s pitch kept, its heading the line\'s; x1.3
   const opts = { weapon: { templateIndex: WEAPONS.Long_Bow, material: 1, flags: 0 }, toHitMod: 1000, rolls: () => 0.5, dfRand: () => 0.5 };
   const plain = calculateAttackDamage(attacker, { ...target }, opts);
   assert.ok(plain > 0, `an arrow that lands (${plain})`);
-  assert.equal(calculateAttackDamage(attacker, { ...target }, { ...opts, blowInfo: aimedBlowInfo({ aimed: true }) }), Math.max(1, Math.round(plain * 1.4)));
+  assert.equal(calculateAttackDamage(attacker, { ...target }, { ...opts, blowInfo: aimedBlowInfo({ aimed: true }) }), plain);
 });
 
 // ── on the real motor ───────────────────────────────────────────────
