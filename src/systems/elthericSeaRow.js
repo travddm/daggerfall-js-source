@@ -5,12 +5,13 @@
 // host reads it once, at its mount (scenes/shared.js etherSeaOn); `?ether=off` is the kill door. Its own file keeps
 // systems/features.js from growing (docs/testing/lint-ratchet.md).
 import { t } from './textManager.js';
+import { ETHER_WORD } from '../world/ethericSea.js';
 
 export const ELTHERIC_SEA_ROW = Object.freeze({
   id: 'eltheric-sea',
   group: 'world',
   get title() {
-    return t('features.elthericSea.title', 'Eltheric Sea');
+    return t('features.elthericSea.title', '{word} Sea', { word: ETHER_WORD });
   },
   get note() {
     return t(
