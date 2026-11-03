@@ -29,7 +29,7 @@ test('RF4: every prefs row declares its switch, and the shelf and the lane deriv
   assert.ok(declared.length > prefsRows.length, 'the covered prefs are declared');
   for (const [f, c] of declared) {
     assert.ok(c.initial !== undefined, `${f.id} declares ${c.key}'s initial`);
-    assert.ok([true, false, 'player'].includes(c.online), `${f.id} declares ${c.key}'s online answer`);
+    assert.ok([true, false, 'player', ...(c.tiers ?? []).map((x) => x[0])].includes(c.online), `${f.id} declares ${c.key}'s online answer`);
     assert.equal(PREF_DEFAULTS[c.key], c.initial, `${f.id}: the shelf's default for ${c.key} is the row's`);
     if (c.online === 'player') { assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes(c.key), `${c.key}: the player's online, by name`); assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, c.key)); }
     else assert.equal(ONLINE_FORCED_PREFS[c.key], c.online, `${c.key}: forced online as the row says`);
@@ -55,7 +55,7 @@ test('RF4: the lane door - true/false forces, \'player\' leaves it by name, idem
     declareOnlinePrefs({ rf4x: 'player', rf4y: true });
     assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, 'rf4x') && ONLINE_PLAYERS_OWN_PREFS.includes('rf4x'));
     assert.equal(ONLINE_FORCED_PREFS.rf4y, true); assert.ok(!ONLINE_PLAYERS_OWN_PREFS.includes('rf4y'));
-    declareOnlinePrefs({ rf4q: 'nonsense' });
+    declareOnlinePrefs({ rf4q: 42 });
     assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, 'rf4q') && !ONLINE_PLAYERS_OWN_PREFS.includes('rf4q'), 'an unknown answer declares nothing');
   } finally {
     delete ONLINE_FORCED_PREFS.rf4x; delete ONLINE_FORCED_PREFS.rf4y; delete ONLINE_FORCED_PREFS.rf4z;

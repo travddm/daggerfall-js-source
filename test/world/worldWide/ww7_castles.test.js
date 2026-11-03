@@ -104,7 +104,7 @@ test('WW7-4 the castle is the capital\'s centre\'s dungeon: its blocks, its map 
   const centre = synthesizeCapitalLocation({ cap: ic, k: 0 }, ctx(171)), corner = synthesizeCapitalLocation({ cap: ic, k: 0, s: 0 }, ctx(170));
   assert.deepEqual([centre.hasDungeon, centre.dungeon.recordElement.header.locationId], [true, capitalPlaceId(0)], 'the White-Gold Tower\'s halls');
   assert.deepEqual([corner.hasDungeon, corner.dungeon, n > 1], [false, null, true], 'a slice no castle');
-  assert.equal(dungeonSizeFor({ hasDungeon: true, mapTableData: { mapId: 9 }, dungeon: { blocks: [] } }, { online: true, world: true }) === 'full', false, 'a plain dungeon still the world\'s size');
+  assert.equal(dungeonSizeFor({ hasDungeon: true, mapTableData: { mapId: 786 }, dungeon: { blocks: [] } }, { online: true, world: true }) === 'full', false, 'a plain dungeon still the world\'s size');
 });
 
 test('WW7-4 every castle\'s door: one dungeon entrance on its palace\'s dark door - the White-Gold Tower\'s east, the Blue Palace\'s, Mournhold\'s to the plaza, Alinor\'s on its top, the Graht-Oak\'s porch, the Mane\'s, the Xanmeer\'s shrine - its normal out, turned north with the model (mutants: no door; the door\'s z left map-wise)', () => {

@@ -4,11 +4,11 @@ A probe is a script in `tools/` that checks what `node --test` cannot: layout an
 running in real workerd, or the Electron shell. Probes are not part of `npm test` or CI. Run the probes that cover a
 change by hand, and before a visible change ships.
 
-## Browser probes (`tools/*Probe.mjs`)
+## Browser probes
 
-There are a few hundred, one or more for each feature that draws something. Find the ones for your change by name
-(`ls tools/*Chat*Probe.mjs`) or by searching for the module you changed. The header comment of each probe says what
-it checks, how to run it and what it needs.
+The end-to-end game probes are `tools/probes/`; run them with `npm run probes` ([game-probes.md](game-probes.md)). A
+few single-purpose probes remain in `tools/` and are named in `package.json` and the pages that use them. The header
+comment of each says what it checks, how to run it and what it needs.
 
 ### The common shape
 

@@ -55,7 +55,7 @@ export const SMALLER_DUNGEON_THRESHOLD = 5;
  * SD-ONLINE: ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S. Not
  * the player's settings, which are each player's own while every peer in a dungeon's room must lay one layout (AUDIT
  * WORLD34 B2, which made it the whole dungeon): online each dungeon the guards let through is built at the size one
- * seeded draw on its map id gives it - small, medium or large, half of them medium (ONLINE_DUNGEON_SIZES,
+ * seeded draw on its map id gives it - small, medium or large, five in eight of them large (ONLINE_DUNGEON_SIZES,
  * onlineDungeonSize) - the same on every client and every visit, whatever either switch says. A dungeon's room is its
  * layout's (net/online.js roomKeyFor: `dungeon:m<id>.s`, `dungeon:m<id>.m`, or the plain room for the whole dungeon).
  * The quest freeze carries it as ONLINE_DUNGEONS_STATE, so a quest started online builds its dungeons at their online
@@ -86,8 +86,11 @@ export const mediumDungeonsWanted = () => isEnhanced() && getPref(MEDIUM_DUNGEON
 /** SD-ONLINE: the quest freeze's value for "each dungeon at the size the online world gives it" (onlineDungeonSize) -
  *  appended past the medium size, as the medium size was past DFU's three, and read by an older build as neither. */
 export const ONLINE_DUNGEONS_STATE = 4;
-/** SD-ONLINE: the online world's sizes and their weights - small 1, medium 2, large (the whole dungeon) 1. */
-export const ONLINE_DUNGEON_SIZES = Object.freeze([['small', 1], ['medium', 2], ['full', 1]].map((r) => Object.freeze(r)));
+/** SD-ONLINE: the online world's sizes and their weights - small 1, medium 2, large (the whole dungeon) 5. DWHOLE: Daggerfall
+ *  Unity lays every dungeon whole (Smaller Dungeons is a player's option there), so the whole dungeon is the common size
+ *  here, five in eight, and the shorter ones are the exception; it was one in four, and the online world laid
+ *  about 23% less map than Unity. */
+export const ONLINE_DUNGEON_SIZES = Object.freeze([['small', 1], ['medium', 2], ['full', 5]].map((r) => Object.freeze(r)));
 /** SD-ONLINE: the draw's own salt, so a dungeon's size is not any other roll the port makes on its map id. */
 export const ONLINE_DUNGEON_SIZE_SALT = 0x5d1e5a2b;
 /** SD-ONLINE: THE SIZE THE ONLINE WORLD GIVES A DUNGEON - one draw of the port's seeded die on its map id and the

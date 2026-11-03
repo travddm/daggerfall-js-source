@@ -24,7 +24,7 @@ import { staticDoorName } from '../../src/systems/worldTooltips.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const PRIVATEERS_HOLD = 187853213;
-const SMALL_ID = 700, MEDIUM_ID = 701, LARGE_ID = 704;   // test/systems/sdonline.test.js pins each to its size
+const SMALL_ID = 703, MEDIUM_ID = 700, LARGE_ID = 704;   // test/systems/sdonline.test.js pins each to its size
 const block = (name) => ({ blockName: name, x: 9, z: 9, isStartingBlock: false });
 const loc = (n, mapId, extra = {}) => ({
   name: `Keep ${mapId}`, regionIndex: 17, hasDungeon: true, mapTableData: { mapId },

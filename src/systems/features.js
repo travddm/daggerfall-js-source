@@ -38,7 +38,7 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
-import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
+import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW } from './settingRows.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -359,14 +359,14 @@ export const FEATURES = Object.freeze([
   }),
   // SD-ONLINE: THE WORLD'S
   // DUNGEON SIZES. Online every dungeon is built at the size one seeded draw on its map id gives it - small, medium or
-  // large, half of them medium, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
+  // large, five in eight of them large, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
   // room's law there, so the lane forces this row ON online and the sync copies it home: offline it asks for the same
   // sizes. Below DFU's switch (Smaller wins when both are on), above the medium one.
   Object.freeze({
     id: 'world-dungeon-sizes',
     group: 'world',
     title: 'Dungeon sizes as online',
-    note: 'Every dungeon takes the size it has online (small, medium or large, half of them medium), the same every '
+    note: 'Every dungeon takes the size it has online (small, medium or large, five in eight of them large), the same every '
       + 'visit. If Smaller dungeons is on too, it wins; this row wins over Medium dungeons. A quest keeps the size it '
       + 'was set up at. Online it is always on.',
     effect: 'Takes effect on the next dungeon you enter. A save made at another size puts you at the dungeon\u2019s start.',
@@ -772,7 +772,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
   }),
-  WEAPON_TECHNIQUES_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity
+  WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
@@ -1626,10 +1626,10 @@ export const FEATURES = Object.freeze([
     group: 'world',
     get title() { return t('features.wildernessCamps.title', 'Wilderness camps & packs'); },
     get note() { return t('features.wildernessCamps.note', 'Out in the wilds you sometimes meet a small group of enemies, a camp or a roaming pack, instead of '
-      + 'only one at a time. Off keeps the classic single encounters.'); },
+      + 'only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'player' }),
+    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: true }),   // CAMP-RARE: forced on online, the room's ground (the groups are rare: systems/campEncounters.js); Off is DFU's lone wanderers
   }),
   // WILD-ROAD (FIELD BUGS 2026-10-04e, Discord: "having to completely halt my travel because 1 rat chose today to die
   // can be quite the interruption"): systems/roadEncounters.js - the port's own. On a journey or the Overworld, a
@@ -1870,7 +1870,7 @@ export function checkFeature(f) {
   else if (c.store === 'prefs') {
     // RF4: a prefs row is the ONE declaration of its switch - the shelf's default and the lane's answer ride it
     if (c.initial === undefined) out.push('a prefs row declares its initial value');
-    if (!(c.online === true || c.online === false || c.online === 'player')) out.push("a prefs row declares its online answer: true, false or 'player'");
+    if (![true, false, 'player', ...(c.tiers ?? []).map((x) => x[0])].includes(c.online)) out.push("a prefs row declares its online answer: true, false or 'player'");   // F3a: or one of its own tiers, the room's pin
     if (c.lane && !_lanes.has(c.lane)) out.push(`lane '${c.lane}' is not registered`);
     if (c.tiers !== undefined) {
       if (!Array.isArray(c.tiers) || !c.tiers.length) out.push('tiers is not a list');

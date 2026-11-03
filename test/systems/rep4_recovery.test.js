@@ -22,22 +22,35 @@ const store = (a, b) => {
   return { dict };
 };
 
-test('REP4: lived, a standing below zero recovers a point every seven days - legal and faction alike; a positive standing wears down on DFU\'s 112 days only, and the 112th day pays a bad name one point, not two (mutants: DFU\'s 112-day recovery; the week wearing the good down; the boundary paying twice)', () => {
-  assert.deepEqual([RECOVERY_INTERVAL_MINUTES, NORMALIZE_INTERVAL_MINUTES % RECOVERY_INTERVAL_MINUTES], [7 * 1440, 0]);
+test('REP4: lived, a standing below zero recovers a point every 28 days (4x DFU) - legal and faction alike; a positive standing wears down on DFU\'s 112 days only, and the 112th day pays a bad name one point, not two (mutants: DFU\'s 112-day recovery; the week wearing the good down; the boundary paying twice)', () => {
+  assert.deepEqual([RECOVERY_INTERVAL_MINUTES, NORMALIZE_INTERVAL_MINUTES % RECOVERY_INTERVAL_MINUTES], [28 * 1440, 0]);
   const e = { legalRep: { 1: -30, 2: 30 }, factionRep: store(-30, 30) };
-  // [1, 16 weeks + 1): the minute values 10080, 20160 ... 161280 - sixteen boundaries, the last DFU's own
+  // [1, 112 days + 1): the minute values 40320, 80640 ... 161280 - four boundaries, the last DFU's own
   runCalendarArms(e, 1, NORMALIZE_INTERVAL_MINUTES + 1, { arms: DAY_ARMS.own });
-  assert.deepEqual(e.legalRep, { 1: -14, 2: 29 }, 'sixteen weeks: sixteen points back; the good name one point down, at the 112th day');
-  assert.deepEqual([e.factionRep.dict.get(1).rep, e.factionRep.dict.get(2).rep], [-14, 29]);
+  assert.deepEqual(e.legalRep, { 1: -26, 2: 29 }, '112 days: four points back; the good name one point down, at the 112th day');
+  assert.deepEqual([e.factionRep.dict.get(1).rep, e.factionRep.dict.get(2).rep], [-26, 29]);
   const shielded = { legalRep: { 1: -30 }, preventNormalizingReputations: true };
   runCalendarArms(shielded, 1, RECOVERY_INTERVAL_MINUTES + 1, { arms: DAY_ARMS.own });
-  assert.equal(shielded.legalRep[1], -30, 'the prison skip\'s shield holds the week too');
+  assert.equal(shielded.legalRep[1], -30, 'the prison skip\'s shield holds the interval too');
 });
 
 test('REP4: away, every week the world\'s calendar crossed pays a bad name its point - a good name is kept (TM-1\'s "Recovery only") (mutant: the absence on DFU\'s 112 days)', () => {
   const e = { legalRep: { 1: -30, 2: 30 } };
   assert.equal(normalizeAcross(e, 1, 5 * RECOVERY_INTERVAL_MINUTES + 1), 5);
   assert.deepEqual(e.legalRep, { 1: -25, 2: 30 });
+});
+
+test('REP4 (F3a): days to clear a standing under DFU (112 per point), the old week (7) and now (28): a theft (-8), a -30 name', () => {
+  const daysToClear = (points, interval) => points * interval / 1440;
+  assert.deepEqual([8, 30].map((n) => daysToClear(n, NORMALIZE_INTERVAL_MINUTES)), [896, 3360], 'DFU');
+  assert.deepEqual([8, 30].map((n) => daysToClear(n, 10080)), [56, 210], 'the week, 16x');
+  assert.deepEqual([8, 30].map((n) => daysToClear(n, RECOVERY_INTERVAL_MINUTES)), [224, 840], 'now, 4x');
+  const e = { legalRep: { 1: -8 } };
+  runCalendarArms(e, 1, 224 * 1440 + 1, { arms: DAY_ARMS.own });
+  assert.equal(e.legalRep[1], 0, 'a theft -8 is clear after 224 days, and not before');
+  const early = { legalRep: { 1: -8 } };
+  runCalendarArms(early, 1, 223 * 1440, { arms: DAY_ARMS.own });
+  assert.equal(early.legalRep[1], -1);
 });
 
 test('REP4: a penance - five points of a region\'s law back toward zero and never past it; 200 gold, then 400, 600; nothing to mend at zero or above (mutants: past zero; the price flat)', () => {
