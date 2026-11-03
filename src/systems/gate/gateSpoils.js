@@ -164,7 +164,7 @@ export function magicOrBetter(rolls, source = SPOILS_SOURCE) {
 
 /** A Rare-or-better tier by the source's own chances (the same cumulative draw as magicOrBetter, the Magic share cut
  *  away) - what a portent turns one of the plain Magic-or-better pieces into. Rare and Legendary keep the source's gate. */
-export function rareOrBetter(rolls, source = SPOILS_SOURCE) {
+export function rareSpoilsPiece(rolls, source = SPOILS_SOURCE) {
   const c = rarityChances(source);
   return rolls() * c.rare < c.legendary ? 'legendary' : 'rare';
 }
@@ -192,7 +192,7 @@ export function rollSpoils(seed, level, p = 0) {
   // PORTENT-FOLD: a portent pays in the plain pieces' tier, never in a piece more: each of the night's portents turns
   // one of the two Magic-or-better pieces into a Rare-or-better one (the same draw count, so a plain night is unmoved)
   const upgrades = portentCount(p);
-  for (let i = 0; i < 2; i++) pieces.push(graded(spoilsBase(lv, rolls), i < upgrades ? rareOrBetter(rolls) : magicOrBetter(rolls), rolls));
+  for (let i = 0; i < 2; i++) pieces.push(graded(spoilsBase(lv, rolls), i < upgrades ? rareSpoilsPiece(rolls) : magicOrBetter(rolls), rolls));
   // SET6 (Sigil Sets): a piece of the Warden's own Regalia, Aetheric, a
   // sixth of the time - rolled LAST, so every spoils before it is what it was for its seed; it leaves him last
   const regalia = rollRegalia(rolls);
