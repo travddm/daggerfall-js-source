@@ -26,7 +26,7 @@
 // Pure: no clock (every `now` an argument), no socket, no storage - the relay's room (server/src/index.js) keeps the
 // state in its memory (DECIDED: a room that restarts mid-bout - a deploy - ends it as a cancel, recording nothing).
 // ═════════════════════════════════════════════════════════════════════
-import { ROYAL_RING, SIEGE_UNITS_PER_M, SIEGE_HIT, newFighter, refereeBlow, refereeCast, refereeStep } from '../siege/siegeRef.js';
+import { ROYAL_RING, SIEGE_UNITS_PER_M, SIEGE_HIT, newFighter, refereeBlow, refereeCast, refereeStep } from '../pvp/pvpRef.js';
 
 /** DUEL1's own numbers the ring does not carry (net/duel/duelSession.js DUEL_START_WAIT_MS, DUEL_OUT_MS - pinned equal: this
  *  leaf imports no client module). */
