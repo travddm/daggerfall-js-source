@@ -14,7 +14,17 @@ const URL = '/play/?world&region=Daggerfall&loc=Daggerfall&class=1&novideo&play&
 const clean = (t) => t.replace(/[◆◇]/g, '').trim();
 
 export async function run({ browser, base, ck }) {
-  const g = new Game(browser, base);
+  // The probe reads the pause menu's text, not the world: PROBE_LIGHT turns off what software GL spends most of its frame on
+  // (the enhanced sky, clouds, water, lighting and grass). On CI the probe took 617 s with only the view distance lowered.
+  const g = new Game(browser, base, {
+    lightPrefs: {
+      enhancedEnvironments: false,
+      enhancedWater: false,
+      enhancedLighting: false,
+      grassDensity: 0,
+      cloudQuality: 'low',
+    },
+  });
   try {
     await enterTown(g, URL);
     // a quest box at the start swallows Escape; put it away first

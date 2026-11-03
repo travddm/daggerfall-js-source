@@ -83,11 +83,13 @@ export function ledger(name) {
  * HTTP errors from a local origin) are collected; `noErrors()` checks them against ALLOWED_ERRORS.
  */
 export class Game {
-  constructor(browser, base, { viewport = VIEWPORT, ...ctxOpts } = {}) {
+  constructor(browser, base, { viewport = VIEWPORT, lightPrefs = {}, ...ctxOpts } = {}) {
     this.browser = browser;
     this.base = base;
     this.viewport = viewport;
     this.ctxOpts = ctxOpts;
+    /** Prefs a probe that asserts nothing about them lets PROBE_LIGHT turn off (enhancedWater, cloudQuality ...). */
+    this.lightPrefs = lightPrefs;
     this.errors = [];
     /** Console lines and the local requests that failed or answered 4xx/5xx, for `diagnostics()`. */
     this.trace = [];
@@ -115,7 +117,7 @@ export class Game {
       // a player changes; they are stored, so no game code changes. On software GL the world was ready 22 s after load instead of
       // 86 s, and every reload the same. Off unless asked for.
       if (LIGHT)
-        await this.context.addInitScript(() => {
+        await this.context.addInitScript((lightPrefs) => {
           try {
             const k = 'dagger.settings.v1';
             const v = JSON.parse(localStorage.getItem(k) ?? '{}');
@@ -124,11 +126,11 @@ export class Game {
               JSON.stringify({ ...v, Experimental: { ...v.Experimental, TerrainDistance: '1' } }),
             );
             const u = JSON.parse(localStorage.getItem('dagger.ui.v1') ?? '{}');
-            localStorage.setItem('dagger.ui.v1', JSON.stringify({ ...u, landViewDistance: 1 }));
+            localStorage.setItem('dagger.ui.v1', JSON.stringify({ ...u, landViewDistance: 1, ...lightPrefs }));
           } catch {
             /* no storage */
           }
-        });
+        }, this.lightPrefs);
       if (init) await this.context.addInitScript(init.fn, init.arg);
       // hermetic: the game phones the live account service (/v1/poi/live) even offline; a probe never reaches it
       await this.context.route(
