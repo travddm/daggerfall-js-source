@@ -39,6 +39,7 @@ import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
 import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
+import { TOWN_SEATS_ROW } from './town/townSeatsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -773,6 +774,7 @@ export const FEATURES = Object.freeze([
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
   }),
   WEAPON_TECHNIQUES_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity
+  TOWN_SEATS_ROW,   // TOWN-SEATS: the seat mod's switch
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
@@ -1006,10 +1008,8 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'nearbyQuests', initial: true, online: 'player' }),
   }),
-  // QL1: QUESTLINES - every quest's
-  // objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
-  // forces it on online (the owner: locked); offline the player's, on by default (the owner's answer). Read when a quest
-  // STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
+  // QL1: QUESTLINES - every quest's objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
+  // forces it on online; offline the player's, on by default. Read when a quest STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
   Object.freeze({
     id: 'questlines',
     group: 'world',

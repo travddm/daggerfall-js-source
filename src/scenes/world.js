@@ -840,6 +840,7 @@ import { pickRegionHubs, hubAtMapId, hubArrivalLine, hubClaim } from '../systems
 import { dungeonTier, tierPhrase } from '../systems/dungeon/dungeonTier.js';   // TIER1: a dungeon's tier, said online...
 import { dungeonTierLabel } from '../world/dungeon/dungeonLabel.js';   // ...with its size, never over a place the port made
 import { deriveTownSeats, seatAtMapId } from '../systems/town/townSeats.js';   // SEAT1a: every palace a seat, the three capitals crowns
+import { townSeatsOnline } from '../systems/town/townSeatsOn.js';
 import { createTownSeatBook, parseSeatCommand, parseSiegeCommand } from '../net/townSeatBook.js';   // SEAT1a: the seats open, confirmed, witnessed   // VOID: a moderator's /siege void
 import { seatArrivalLine, boardTithePct } from '../net/townSeatLaw.js';   // SEAT1a: the seat's arrival line; AUDIT SEATS-3 D3: a board's Tithe (SEAT-HALL's and CROWN-HALL's halls: scenes/seatHallHost.js)
 import { createSeatHallHost } from './seatHallHost.js';   // DOMAIN2 (HOST-SPLIT): a seat's halls and the guild's castle
@@ -1960,11 +1961,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const noticeBook = params.has('online')
     ? createNoticeBook({ door: accountBoard({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }), storage: appStorage() })
     : null;
-  // SEAT1a (Seats-Arc 3.2): whether the seats are open to this account (SEATS_OPEN), the ones the witnesses confirmed,
-  // and the seat this client stands in reported once a day (net/townSeatBook.js). Online only - offline the Bay is DFU's.
+  // SEAT1a (Seats-Arc 3.2): whether the seats are open to this account (SEATS_OPEN), the ones the witnesses confirmed, and the seat this client stands in reported once a day (net/townSeatBook.js). Online only, the Town seats row on - offline the Bay is DFU's.
   // SEAT1b: and this device's half of influence - the standings, a pledge, Tribute, and the Watch's receipts, kept for the
   // signed-in account while they stand in a seat's own pixel as this client derives the seats
-  const _seatDoor = params.has('online') ? accountSeats({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }) : null;
+  const _seatDoor = townSeatsOnline(params) ? accountSeats({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }) : null;
   const seatBook = _seatDoor
     ? createTownSeatBook({
       door: _seatDoor, storage: appStorage(), me: _seatDoor.me, character: () => characterIdOf(playerEntity),
