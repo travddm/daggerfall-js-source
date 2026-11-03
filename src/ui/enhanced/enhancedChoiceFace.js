@@ -43,6 +43,9 @@ function buildFace(doc, owner) {
   shell.setAttribute('aria-labelledby', `${CHOICE_FACE_ID}-title`);
   // LEGACY-CHOICE: three answers (Project Legacy's online popup) widen the window to stand them side by side
   const win = el(doc, 'div', owner.options.length >= 3 ? 'px-win lvl-win lvl-three' : 'px-win lvl-win');
+  // A question that sets `listLines` shows each of an answer's lines on a row of its own (pros, then cons)
+  if (owner.faceText.listLines) win.classList.add('lvl-listed');
+  if (owner.options.length >= 4) win.classList.add('lvl-many');
   for (const c of ['tl', 'tr', 'bl', 'br']) win.append(el(doc, 'span', `px-gem px-corner px-${c}`));
   const body = el(doc, 'div', 'px-body');
   const card = el(doc, 'div', 'card lvl-card');
@@ -62,7 +65,8 @@ function buildFace(doc, owner) {
     const head = el(doc, 'div', 'lvl-opt-head');
     head.append(el(doc, 'span', 'lvl-key', String(i + 1)), el(doc, 'span', 'lvl-opt-title', opt.title),
       el(doc, 'span', 'lvl-tag', tags[opt.id] ?? ''));
-    const lines = el(doc, 'p', 'lvl-opt-body', opt.lines.join(' '));
+    const lines = words.listLines ? el(doc, 'div', 'lvl-opt-body') : el(doc, 'p', 'lvl-opt-body', opt.lines.join(' '));
+    if (words.listLines) for (const line of opt.lines) lines.append(el(doc, 'p', 'lvl-opt-line', line));
     const foot = el(doc, 'div', 'lvl-opt-foot');
     foot.append(opt.locked ? el(doc, 'span', 'lvl-lock', opt.lockNote) : el(doc, 'span', 'lvl-pick', words.pick));
     node.append(head, lines, foot);

@@ -17,7 +17,8 @@ export const MODE_FACE = Object.freeze({
   title: 'How will you play?',
   lead: 'Your mode is fixed at creation. It can be loosened later, never tightened. Death and trade rules apply online.',
   pick: 'Choose',
-  hint: 'Click one · up/down and Enter · 1 to 5',
+  hint: (n) => `Click one · up/down and Enter · 1 to ${n}`,
+  listLines: true,
 });
 /** Each answer's short tag on the Plus face. */
 export const MODE_TAGS = Object.freeze({
@@ -68,14 +69,13 @@ export function characterModeOptions({ offered = offeredModes() } = {}) {
 }
 
 /** The question, answering `onAnswer(mode)` once. */
-export const characterModeScreen = (
-  /** @type {(mode: string) => void} */ onAnswer,
-  { offered = offeredModes() } = {},
-) =>
-  new ChoiceScreen(onAnswer, {
-    options: characterModeOptions({ offered }),
+export function characterModeScreen(/** @type {(mode: string) => void} */ onAnswer, { offered = offeredModes() } = {}) {
+  const options = characterModeOptions({ offered });
+  return new ChoiceScreen(onAnswer, {
+    options,
     text: MODE_TEXT,
-    faceText: MODE_FACE,
+    faceText: { ...MODE_FACE, hint: MODE_FACE.hint(options.length) },
     faceTags: MODE_TAGS,
     compact: true,
   });
+}

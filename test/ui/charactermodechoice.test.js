@@ -46,3 +46,9 @@ test('a screen without the Legacy answer numbers the rest from 1', () => {
   s.input('char:3');
   assert.deepEqual(answers, ['ironman']);
 });
+
+test("the Plus face hint counts the answers shown, and the face lists each answer's lines", () => {
+  assert.match(characterModeScreen(() => {}, { offered: { legacy: false } }).faceText.hint, /1 to 4$/);
+  assert.match(characterModeScreen(() => {}, { offered: {} }).faceText.hint, /1 to 5$/);
+  assert.equal(characterModeScreen(() => {}, { offered: {} }).faceText.listLines, true);
+});
