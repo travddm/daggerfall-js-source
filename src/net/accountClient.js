@@ -2289,13 +2289,6 @@ export function accountMarket({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) 
   };
 }
 
-/** SEA-SEASON: THE SEA'S SEASON BOARDS' DOOR (server-account/src/seaSeason.js) - the season's deepest voyages and legends
- *  ended, and the asking character's rank each way (`board`: `{ character }`). Its answer is `call`'s shape. */
-export function accountSeaSeason({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return { board: (req) => post('/v1/sea/season/board', req) };
-}
-
 /** CREW-SIGNED: A CREW HALL'S DOOR (server-account/src/crewSigns.js) - a town's hall on a day (`hall`: `{ town, day }` -
  *  the slots others hold and the asker's), a recruit held (`sign`: `{ id }`) and let go (`release`: `{ id }`). Every
  *  answer is `call`'s shape. */

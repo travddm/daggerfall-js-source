@@ -151,7 +151,6 @@ on:
       - "src/net/siege/siegeRef.js"
       - "src/net/siege/siegeReceipt.js"
       - "src/net/duel/duelReceipt.js"
-      - "src/net/sea/seaSeasonLaw.js"
       - "src/net/crewSignLaw.js"
       - "src/systems/item/itemKinds.js"
       - "src/net/gate/gateMods.js"
