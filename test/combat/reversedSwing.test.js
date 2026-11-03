@@ -75,8 +75,8 @@ async function drawnArm() {
   const res = await arm.build({ race: 'fprace', weapon: { templateIndex: 120 }, deps: deps() });
   assert.ok(res.ok, `${res.stage}: ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   return arm;
 }
 const keyAt = (arm, name) => {
@@ -94,7 +94,7 @@ test('MS1: a right slash runs the clip backwards on the same arm - wind-up from 
   assert.equal(arm.attack('StrikeRight'), 'slash', 'rule 11: a side slash is Morrowind\'s slash');
   let st = arm.status();
   assert.equal(st.attackReversed, true);
-  assert.equal(st.upper, UPPER_BODY.AttackWindUp);
+  assert.equal(st.upper, UPPER_BODY.Winding);
   assert.ok(Math.abs(st.poseTime - fStop) < 1e-6, `the wind-up begins at the follow-through's END (${st.poseTime} vs ${fStop})`);
   // the playhead walks forward, the pose walks backward
   const before = arm.status();
@@ -104,20 +104,20 @@ test('MS1: a right slash runs the clip backwards on the same arm - wind-up from 
   assert.ok(after.poseTime < before.poseTime, 'and the pose retreats through the follow-through');
   // run the wind-up out: it ends at the follow's START, and the release
   // begins at the HIT and runs back to max attack
-  for (let i = 0; i < 200 && arm.status().upper === UPPER_BODY.AttackWindUp; i++) arm.update(0.05);
+  for (let i = 0; i < 200 && arm.status().upper === UPPER_BODY.Winding; i++) arm.update(0.05);
   st = arm.status();
-  assert.equal(st.upper, UPPER_BODY.AttackRelease, 'uncharged: straight into the release');
+  assert.equal(st.upper, UPPER_BODY.Striking, 'uncharged: straight into the release');
   assert.equal(st.attackReversed, true);
   assert.ok(Math.abs(st.poseTime - hit) < 1e-6, `the sweep begins at the hit (${st.poseTime} vs ${hit})`);
   let lowest = Infinity;
-  for (let i = 0; i < 200 && arm.status().upper === UPPER_BODY.AttackRelease; i++) { arm.update(0.05); lowest = Math.min(lowest, arm.status().poseTime); }
+  for (let i = 0; i < 200 && arm.status().upper === UPPER_BODY.Striking; i++) { arm.update(0.05); lowest = Math.min(lowest, arm.status().poseTime); }
   assert.ok(lowest <= max + 1e-6 && lowest >= max - 1e-6, `and ends at max attack (${lowest} vs ${max}) - the blade crossed left to right`);
   st = arm.status();
-  assert.equal(st.upper, UPPER_BODY.AttackEnd);
+  assert.equal(st.upper, UPPER_BODY.Recovering);
   assert.ok(Math.abs(st.poseTime - max) < 1e-6, 'the settle begins where the sweep ended');
-  for (let i = 0; i < 200 && arm.status().upper === UPPER_BODY.AttackEnd; i++) arm.update(0.05);
+  for (let i = 0; i < 200 && arm.status().upper === UPPER_BODY.Recovering; i++) arm.update(0.05);
   st = arm.status();
-  assert.equal(st.upper, UPPER_BODY.WeaponEquipped, 'and the blow is over');
+  assert.equal(st.upper, UPPER_BODY.Ready, 'and the blow is over');
   assert.equal(st.attackReversed, false, 'the hand rests; nothing is reversed between blows');
 
   // the other way is the clip's own way
@@ -125,7 +125,7 @@ test('MS1: a right slash runs the clip backwards on the same arm - wind-up from 
   st = arm.status();
   assert.equal(st.attackReversed, false);
   assert.ok(Math.abs(st.poseTime - start) < 1e-6, 'a left slash begins at "slash start", forward');
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   assert.equal(arm.attack('StrikeDownRight'), 'chop');
   assert.equal(arm.status().attackReversed, false, 'a chop backwards is an uppercut - the chops keep their one way');
 });

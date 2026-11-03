@@ -284,8 +284,8 @@ test('MW-D14: an ATTACK poses from ITS source, which is not the idle\'s', async 
   assert.equal(arm.status().idleSource, 'meshes/xbase_anim_female.1st.kf');
   assert.equal(arm.status().actionSource, 'meshes/xbase_anim.1st.kf',
     'the equip section came from the OTHER file');
-  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   // The slot is empty between sections, which is why the source is read
   // while something is playing and not after.
   assert.equal(arm.status().actionSource, null);

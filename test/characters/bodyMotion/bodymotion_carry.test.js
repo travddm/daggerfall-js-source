@@ -342,9 +342,9 @@ test('BODY-MOTION THE RIG\'S WORD: on only in third person, on a base_anim skele
   assert.deepEqual(['dead', 'hit'].map((k) => motionWord({ ...base, [k]: true }).busy), ['dead', 'hit']);
   assert.equal(motionWord({ ...base, climb: 0.5 }).busy, 'climb');
   assert.equal(motionWord({ ...base, cam: { ...cam, seat: {} } }).busy, 'seat');
-  assert.deepEqual(['AttackWindUp', 'AttackRelease', 'AttackEnd'].map((upper) => motionWord({ ...base, upper, attackType: 'chop', progress: 0.5 }).blow.section), ['windup', 'release', 'follow']);
-  assert.equal(motionWord({ ...base, upper: 'WeaponEquipped', attackType: 'chop' }).blow, null);
-  assert.equal(motionWord({ ...base, upper: 'Equipping' }).equip, true);
+  assert.deepEqual(['Winding', 'Striking', 'Recovering'].map((upper) => motionWord({ ...base, upper, attackType: 'chop', progress: 0.5 }).blow.section), ['windup', 'release', 'follow']);
+  assert.equal(motionWord({ ...base, upper: 'Ready', attackType: 'chop' }).blow, null);
+  assert.equal(motionWord({ ...base, upper: 'Drawing' }).equip, true);
   // SHIELD-RUN: a shield is a piece the body wears in the composer's shield slot, named for its record
   assert.equal(w.shield, false, 'no pieces: no shield');
   for (const slot of ['shield (iron_shield)', "shield (nordic_trollbone_shield) - ground mesh, the reference's own fallback"]) {

@@ -659,7 +659,7 @@ async function castingArmWithMagic({ hands = true } = {}) {
   });
   assert.ok(res.ok, `build: ${res.stage} ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   return { arm, log: r.log };
 }
 

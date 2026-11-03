@@ -65,7 +65,7 @@ export function spellHandLimbs({ casting = false, ready = false, weaponIdle = nu
  * @returns {'wait' | 'afterCast' | 'drop' | 'keep'}
  */
 export function spellHandStanceStep({ upper, spellReady }, U) {
-  if (upper === U.Equipping || upper === U.Unequipping) return 'wait';
+  if (upper === U.Drawing || upper === U.Stowing) return 'wait';
   if (upper === U.Casting) return 'afterCast';
   return spellReady ? 'drop' : 'keep';
 }
