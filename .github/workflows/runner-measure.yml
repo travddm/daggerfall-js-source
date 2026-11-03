@@ -57,13 +57,22 @@ jobs:
       - run: |
           echo "| job | cores | wall s | peak RAM added MB | CPU busy % | peak tasks added | exit |" >> "$GITHUB_STEP_SUMMARY"
           echo "| --- | --- | --- | --- | --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
-      - name: probes at 4 and 2 cores
+      - name: the probes' builds, then the probes, at 4 and 2 cores
         env:
+          PROBE_LIGHT: '1'
+          PROBE_NODRAW: '1'
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots
         run: |
+          m="bash tools/ci-runner/measure-job.sh"
+          $m probe-build 0-3 node tools/probes/build.mjs "$RUNNER_TEMP/dist"
+          $m probe-build 0-1 node tools/probes/build.mjs "$RUNNER_TEMP/dist-2"
+          # both builds at once, as probes.yml's build job runs them
+          $m probe-build-both 0-3 bash -c 'node tools/probes/build.mjs "$RUNNER_TEMP/dist-a" & node tools/probes/build.mjs "$RUNNER_TEMP/dist-online" --online & wait'
           for cpus in 0-3 0-1; do
-            for p in dungeon save online; do
-              bash tools/ci-runner/measure-job.sh "probe-$p" "$cpus" npm run probes -- "$p" || true
+            for p in boot dungeon save online; do
+              pkill -f chrome || true; pkill -f workerd || true; pkill -f "vite" || true
+              dist="$RUNNER_TEMP/dist"; [ "$p" = online ] && dist="$RUNNER_TEMP/dist-online"
+              PROBE_DIST="$dist" $m "probe-$p" "$cpus" npm run probes -- "$p" || true
             done
           done

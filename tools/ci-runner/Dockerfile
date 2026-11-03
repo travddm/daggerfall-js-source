@@ -38,4 +38,8 @@ RUN chmod 0755 /usr/local/bin/entrypoint.sh
 USER runner
 WORKDIR /home/runner/actions-runner
 ENV RUNNER_MANUALLY_TRAP_SIG=1 ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=1
+# The site build peaks near 5 GB. Node sizes its default heap from the container's memory limit, and in an 8 GB
+# container that default stops the build ("JavaScript heap out of memory", as release-desktop.yml's REL9 note says of
+# a 7 GB runner), so the cap is set here, as that workflow does for its builds.
+ENV NODE_OPTIONS=--max-old-space-size=4096
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
