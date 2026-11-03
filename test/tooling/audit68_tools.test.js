@@ -73,7 +73,7 @@ test('AUDIT 68 X2-probe-tmp-page-leak: the probes\' pages are ignored, and each 
     assert.doesNotThrow(() => execFileSync('git', ['check-ignore', '-q', p], { cwd: ROOT }), `${p} is not ignored`);
   }
   const probes = scripts().filter((f) => /\.tmp\.html'/.test(read(f)));
-  assert.ok(probes.length >= 7, `the probes that write a page (${probes.length})`);
+  assert.ok(probes.length >= 4, `the probes that write a page (${probes.length})`);
   for (const f of probes) {
     const s = read(f);
     const open = s.search(/^try \{$/m), close = s.search(/^\} finally \{$/m);

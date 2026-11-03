@@ -112,7 +112,7 @@ export function campAnchorSpot({ feet, yawRad, fovDegrees, groundAt, minDistance
 // it appears, and a camp can be approached before it notices. Every other foe keeps SIGHT_RADIUS.
 export const CAMP_SIGHT_RADIUS = 60;
 
-export const CAMP_SIZE = Object.freeze([3, 5]);   // inclusive
+export const CAMP_SIZE = Object.freeze([2, 4]);   // inclusive; CAMP-RARE: the pack's band too, one small group
 export const PACK_SIZE = Object.freeze([2, 4]);
 export const CAMP_SPACING = 3;     // metres between members - tight, a settled group
 export const PACK_SPACING = 6;     // metres between members - loose, a group in transit
@@ -165,12 +165,14 @@ export const rollCampKind = (roll01 = Math.random()) => (roll01 < 0.5 ? 'camp' :
 // chunk streaming to hang a roll off, so the timer below is the only
 // trigger it can have, and it still calls it.
 //
-// CAMP-RING: the chance is 50% per chunk entered, and a hit stands THREE groups at
-// once, spread round the player a hundred to a hundred and fifty metres out (campGroupBearings).
-export const CAMP_CHANCE_ON_CHUNK_LOAD = 0.50;   // 50% per chunk entered
+// CAMP-RARE: a camp is a thing you come across, not a toll on every pixel. The chance is 12.5% per chunk entered
+// (the middle of the owner's 10-15%) and a hit stands ONE group of two to four, a hundred to a hundred and fifty
+// metres out. It was 50% and three groups (CAMP-RING), about five foes a pixel. Daggerfall Unity has lone
+// wanderers only, so this is still a departure from it, but a rare one.
+export const CAMP_CHANCE_ON_CHUNK_LOAD = 0.125;   // 12.5% per chunk entered
 export const rollCampChanceOnChunkLoad = (roll01 = Math.random()) => roll01 < CAMP_CHANCE_ON_CHUNK_LOAD;
 /** CAMP-RING: how many groups one chunk-load hit stands. */
-export const CAMP_GROUPS_ON_CHUNK_LOAD = 3;
+export const CAMP_GROUPS_ON_CHUNK_LOAD = 1;
 
 /**
  * CAMP-RING: bearings (degrees off the player's facing, clockwise from above - Unity's yaw) for
