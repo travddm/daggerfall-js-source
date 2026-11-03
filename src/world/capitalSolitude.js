@@ -461,6 +461,9 @@ export const CLIFF_SKIN = Object.freeze({ least: 0.15, bulge: 1.5, masonry: 0.25
  * cell round a vertex is the cliff's, eased so two cells meet without a crack. Its foot plunges CLIFF_SKIN.under metres
  * under the sea; inside the docks' square it is the Docks Way's battered masonry.
  */
+/** A skin cell's two triangles, folded on the drawn ground's own cut (terrain-quad-cut.ts quadCutsSeNw). */
+const skinTriangles = (seNw, sw, se, nw, ne) => (seNw ? [[sw, nw, se], [se, nw, ne]] : [[sw, nw, ne], [sw, ne, se]]);
+
 export function buildSolitudeCliffs() {
   const mb = new MeshBuilder(), P = SOLITUDE_PIXEL, band = SOLITUDE_EDGE_BAND, K = CLIFF_SKIN.sub, { N, Hd, cell, H, h } = solitudeDrawn();
   const ax = (x) => P.x0 + x * cell, az = (y) => P.z0 + (N - y) * cell;   // a vertex (x east, y north) in the anchor's metres
@@ -521,7 +524,7 @@ export function buildSolitudeCliffs() {
         for (let j = 0; j < K; j++) {
           // the drawn ground's own cut (terrain-quad-cut.ts), so the skin's folds lie on the ground's
           const sw = pts[i][j], se = pts[i + 1][j], nw = pts[i][j + 1], ne = pts[i + 1][j + 1];
-          for (const [a, b, c] of seNw ? [[sw, nw, se], [se, nw, ne]] : [[sw, nw, ne], [sw, ne, se]]) {
+          for (const [a, b, c] of skinTriangles(seNw, sw, se, nw, ne)) {
             const n = faceUp(a, b, c);
             if (n) mb.tri(tex, a, b, c, n);
           }

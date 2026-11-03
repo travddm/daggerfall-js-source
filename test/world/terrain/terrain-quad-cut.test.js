@@ -7,11 +7,24 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildTerrainGrid, buildTerrainIndices, surfaceHeightAt, walkGroundAt, drawnGroundAt, surfaceNormalAt,
-  surfaceNormalFromSamples, gridValueAt, terrainSampleHeightAt, CLIP_SENTINEL,
+  buildTerrainGrid,
+  buildTerrainIndices,
+  surfaceHeightAt,
+  walkGroundAt,
+  drawnGroundAt,
+  surfaceNormalAt,
+  surfaceNormalFromSamples,
+  gridValueAt,
+  terrainSampleHeightAt,
+  CLIP_SENTINEL,
 } from '../../../src/world/terrain/terrainSurface.js';
 import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from '../../../src/world/terrain/terrain-quad-cut.ts';
-import { HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE } from '../../../src/world/terrain/terrainSampler.js';
+import {
+  HEIGHTMAP_DIMENSION,
+  MAX_TERRAIN_HEIGHT,
+  STREAMING_TERRAIN_SCALE,
+  TERRAIN_SIZE,
+} from '../../../src/world/terrain/terrainSampler.js';
 import { carveBed } from '../../../src/world/water/waterBed.js';
 import { WATER_DRAW_MASK_TABLE } from '../../../src/world/water/waterCorners.js';
 import { buildPixelWaterIndices } from '../../../src/render/waterSurface.js';
@@ -39,11 +52,12 @@ function samplesOf(heightAt) {
 const knifeRidge = (x, z) => 700 - 6 * Math.abs((x + z - 128) / Math.SQRT2) + 0.3 * (x - z);
 
 /** Rough ground for the readers: knife ridges both ways, a valley and some swell, so both cuts occur everywhere. */
-const roughGround = (x, z) => 1000
-  - 5 * Math.abs((x + z - 90) / Math.SQRT2)
-  - 4 * Math.abs((x - z - 20) / Math.SQRT2)
-  + 3 * Math.abs((x + z - 190) / Math.SQRT2)
-  + 8 * Math.sin(x * 0.21) * Math.cos(z * 0.17);
+const roughGround = (x, z) =>
+  1000 -
+  5 * Math.abs((x + z - 90) / Math.SQRT2) -
+  4 * Math.abs((x - z - 20) / Math.SQRT2) +
+  3 * Math.abs((x + z - 190) / Math.SQRT2) +
+  8 * Math.sin(x * 0.21) * Math.cos(z * 0.17);
 
 /** The drawn mesh of a pixel's samples at a stride: a vertical line met with the triangle under it, off the real
  *  vertex and index buffers. Answers the triangle's three vertex indices and their weights. */
@@ -98,12 +112,12 @@ const triangleKeys = (indices) => {
   return keys;
 };
 
-test('a knife ridge across the grid draws its crest, not a row of teeth - near and at the far ring\'s stride', () => {
+test("a knife ridge across the grid draws its crest, not a row of teeth - near and at the far ring's stride", () => {
   const data = samplesOf(knifeRidge);
   for (const stride of [1, 4]) {
     const mesh = meshOf(data, stride);
     const fixed = meshOf(data, stride);
-    fixed.indices.set(buildTerrainIndices(stride));   // the old law: every quad on the south-west to north-east diagonal
+    fixed.indices.set(buildTerrainIndices(stride)); // the old law: every quad on the south-west to north-east diagonal
     // the crest, x + z = 128, between its samples - the true ridge is a straight line there
     let worstCut = 0;
     let worstFixed = 0;
@@ -115,9 +129,13 @@ test('a knife ridge across the grid draws its crest, not a row of teeth - near a
       worstFixed = Math.max(worstFixed, crest - fixed.height(lx, lz));
     }
     assert.ok(worstCut < 1e-3, `stride ${stride}: the crest is drawn where it stands, to ${worstCut} m`);
-    assert.ok(worstFixed > 6 * stride * 0.7, `stride ${stride}: the fixed cut dipped ${worstFixed.toFixed(2)} m between crest samples (the teeth)`);
+    assert.ok(
+      worstFixed > 6 * stride * 0.7,
+      `stride ${stride}: the fixed cut dipped ${worstFixed.toFixed(2)} m between crest samples (the teeth)`,
+    );
     // and every crest quad took the south-east to north-west cut
-    for (let q = 4; q < 128 / stride - 4; q++) assert.equal(quadCutsSeNw(data, q, 128 / stride - 1 - q, stride), true, `crest quad ${q}`);
+    for (let q = 4; q < 128 / stride - 4; q++)
+      assert.equal(quadCutsSeNw(data, q, 128 / stride - 1 - q, stride), true, `crest quad ${q}`);
   }
   // a valley the same way, and a ridge along the other diagonal, are drawn whole too
   const valley = samplesOf((x, z) => 100 + 6 * Math.abs((x + z - 128) / Math.SQRT2) + 0.3 * (x - z));
@@ -125,18 +143,31 @@ test('a knife ridge across the grid draws its crest, not a row of teeth - near a
   const valleyMesh = meshOf(valley, 1);
   const ridgeMesh = meshOf(mainRidge, 1);
   for (let t = 8; t <= 120; t += 0.41) {
-    assert.ok(Math.abs(valleyMesh.height(t * CELL, (128 - t) * CELL) - (100 + 0.3 * (2 * t - 128))) < 1e-3, `valley floor at ${t}`);
-    assert.ok(Math.abs(ridgeMesh.height(t * CELL, t * CELL) - (400 + 0.6 * t)) < 1e-3, `the other ridge's crest at ${t}`);
+    assert.ok(
+      Math.abs(valleyMesh.height(t * CELL, (128 - t) * CELL) - (100 + 0.3 * (2 * t - 128))) < 1e-3,
+      `valley floor at ${t}`,
+    );
+    assert.ok(
+      Math.abs(ridgeMesh.height(t * CELL, t * CELL) - (400 + 0.6 * t)) < 1e-3,
+      `the other ridge's crest at ${t}`,
+    );
   }
 });
 
 test('flat and planar ground keep the old cut, and both cuts wind up', () => {
   const flat = new Float32Array(H * H).fill(0.3);
-  assert.deepEqual(buildTerrainIndices(1, flat), buildTerrainIndices(1), 'a flat pixel draws the old triangles exactly');
+  assert.deepEqual(
+    buildTerrainIndices(1, flat),
+    buildTerrainIndices(1),
+    'a flat pixel draws the old triangles exactly',
+  );
   const plane = samplesOf((x, z) => 50 + 2 * x - 3 * z);
   const mesh = meshOf(plane, 1);
   for (const [lx, lz] of points(300, 0x7a11)) {
-    assert.ok(Math.abs(mesh.height(lx, lz) - (50 + 2 * lx / CELL - 3 * lz / CELL)) < 2e-3, 'and a plane is its own height everywhere');
+    assert.ok(
+      Math.abs(mesh.height(lx, lz) - (50 + (2 * lx) / CELL - (3 * lz) / CELL)) < 2e-3,
+      'and a plane is its own height everywhere',
+    );
   }
   // every triangle of both cuts faces up (counter-clockwise from above), as the ground's culling needs
   const rough = samplesOf(roughGround);
@@ -155,7 +186,12 @@ test('flat and planar ground keep the old cut, and both cuts wind up', () => {
   const out = new Uint32Array(6);
   for (const cut of [false, true]) {
     writeQuadTriangles(out, 0, 0, 2, cut);
-    const corner = [[0, 0], [1, 0], [0, 1], [1, 1]];
+    const corner = [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ];
     const values = [1, 5, 2, 11];
     for (const [ax, az] of points(50, 0x51 + Number(cut), 1)) {
       const inFirst = cut ? ax + az <= 1 : az >= ax;
@@ -183,8 +219,14 @@ test('every reader of the drawn ground agrees with the triangles it draws, at sa
     for (const [lx, lz] of points(3000, 0x7e44 + stride, TERRAIN_SIZE - 0.01)) {
       const want = mesh.height(lx, lz);
       worst.height = Math.max(worst.height, Math.abs(surfaceHeightAt(data, lx, lz, stride) - want));
-      worst.drawn = Math.max(worst.drawn, Math.abs(drawnGroundAt(data, lx, lz, stride, depths) - carved.height(lx, lz)));
-      worst.value = Math.max(worst.value, Math.abs(gridValueAt(depths, g, g, CELL * stride, lx, lz, data, stride) - mesh.value(lx, lz, depths)));
+      worst.drawn = Math.max(
+        worst.drawn,
+        Math.abs(drawnGroundAt(data, lx, lz, stride, depths) - carved.height(lx, lz)),
+      );
+      worst.value = Math.max(
+        worst.value,
+        Math.abs(gridValueAt(depths, g, g, CELL * stride, lx, lz, data, stride) - mesh.value(lx, lz, depths)),
+      );
       worst.unity = Math.max(worst.unity, Math.abs(terrainSampleHeightAt(data, lx, lz, stride) - want));
       const normal = surfaceNormalFromSamples(data, lx, lz, stride);
       const meshNormal = [0, 1, 2].map((k) => mesh.value(lx, lz, grid.normals, 3, k));
@@ -198,13 +240,16 @@ test('every reader of the drawn ground agrees with the triangles it draws, at sa
     }
     assert.ok(worst.height < 1e-3, `stride ${stride}: surfaceHeightAt is the mesh to ${worst.height}`);
     assert.ok(worst.drawn < 1e-3, `stride ${stride}: drawnGroundAt is the carved mesh to ${worst.drawn}`);
-    assert.ok(worst.value < 1e-4, `stride ${stride}: gridValueAt reads the bed on the mesh's triangles to ${worst.value}`);
+    assert.ok(
+      worst.value < 1e-4,
+      `stride ${stride}: gridValueAt reads the bed on the mesh's triangles to ${worst.value}`,
+    );
     assert.ok(worst.normal < 1e-5, `stride ${stride}: the normals are the mesh's to ${worst.normal}`);
     assert.ok(worst.unity < 0.1, `stride ${stride}: terrainSampleHeightAt is the mesh to Unity's step, ${worst.unity}`);
   }
 });
 
-test('the water\'s sheet, the coast\'s clip and the fence\'s ground walk take the ground\'s own triangles', () => {
+test("the water's sheet, the coast's clip and the fence's ground walk take the ground's own triangles", () => {
   const data = samplesOf(roughGround);
   const water = WATER_DRAW_MASK_TABLE.findIndex((wet) => wet);
   for (const stride of [1, 4]) {
@@ -212,15 +257,25 @@ test('the water\'s sheet, the coast\'s clip and the fence\'s ground walk take th
     const bytes = new Uint8Array(128 * 128);
     for (let tz = 20; tz < 90; tz++) for (let tx = 10; tx < 100; tx++) bytes[tz * 128 + tx] = water;
     const sheet = buildPixelWaterIndices(bytes, stride, data);
-    assert.ok(sheet.length > 0 && [...triangleKeys(sheet)].every((k) => ground.has(k)), `stride ${stride}: every water triangle is one the ground draws`);
+    assert.ok(
+      sheet.length > 0 && [...triangleKeys(sheet)].every((k) => ground.has(k)),
+      `stride ${stride}: every water triangle is one the ground draws`,
+    );
     const clip = new Uint8Array(128 * 128);
     for (let tz = 0; tz < 40; tz++) for (let tx = 0; tx < 128; tx++) clip[tz * 128 + tx] = CLIP_SENTINEL;
     const kept = clippedTerrainIndices(clip, stride, false, data);
     const keptQuads = [...triangleKeys(kept.subarray(0, (128 / stride) * (128 / stride - 40 / stride) * 6))];
-    assert.ok(keptQuads.every((k) => ground.has(k)), `stride ${stride}: the clip keeps the ground's own triangles`);
+    assert.ok(
+      keptQuads.every((k) => ground.has(k)),
+      `stride ${stride}: the clip keeps the ground's own triangles`,
+    );
   }
   // a fence's ground walk is exact on either cut: its lowest and highest are the drawn ground's along the segment
-  for (const [ax, az, bx, bz] of [[30, 700, 760, 40], [100, 100, 700, 650], [410.3, 12.2, 409.1, 800.7]]) {
+  for (const [ax, az, bx, bz] of [
+    [30, 700, 760, 40],
+    [100, 100, 700, 650],
+    [410.3, 12.2, 409.1, 800.7],
+  ]) {
     const [lo, hi] = groundAlong(data, ax, az, bx, bz);
     let fineLo = Infinity;
     let fineHi = -Infinity;
@@ -229,7 +284,10 @@ test('the water\'s sheet, the coast\'s clip and the fence\'s ground walk take th
       fineLo = Math.min(fineLo, y);
       fineHi = Math.max(fineHi, y);
     }
-    assert.ok(lo <= fineLo + 1e-9 && lo > fineLo - 2e-2, `lowest along (${ax}, ${az})-(${bx}, ${bz}): ${lo} against ${fineLo}`);
+    assert.ok(
+      lo <= fineLo + 1e-9 && lo > fineLo - 2e-2,
+      `lowest along (${ax}, ${az})-(${bx}, ${bz}): ${lo} against ${fineLo}`,
+    );
     assert.ok(hi >= fineHi - 1e-9 && hi < fineHi + 2e-2, `highest along it: ${hi} against ${fineHi}`);
   }
 });
@@ -238,7 +296,19 @@ test('the kernel publishes the triangles of the samples it publishes, near and f
   const woods = new WoodsFile();
   assert.equal(woods.load(syntheticWoodsBytes()), true);
   for (const stride of [1, 4]) {
-    const out = generatePixelTerrain({ woods, px: 300, py: 180, stride, tilemap: new Uint8Array(128 * 128), hasLocation: false, climateType: 0 });
-    assert.deepEqual(out.indices, buildTerrainIndices(stride, out.samples), `stride ${stride}: the build's index set is its samples' cut`);
+    const out = generatePixelTerrain({
+      woods,
+      px: 300,
+      py: 180,
+      stride,
+      tilemap: new Uint8Array(128 * 128),
+      hasLocation: false,
+      climateType: 0,
+    });
+    assert.deepEqual(
+      out.indices,
+      buildTerrainIndices(stride, out.samples),
+      `stride ${stride}: the build's index set is its samples' cut`,
+    );
   }
 });

@@ -131,6 +131,10 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
   return { hide, tilemap: clip ? patchTilemapForClip(tilemapBytes, mapData) : null };
 }
 
+/** Which way each standing quad is cut: as `samples` cut their ground, or, without them, on the fixed cut flat
+ *  ground keeps. */
+const quadCutOf = (samples, stride) => (samples ? (x, z) => quadCutsSeNw(samples, x, z, stride) : () => false);
+
 /**
  * THE CLIP'S CULL. The mod discards a clipped texel in its terrain shader
  * (TilemapTextureArrayClipWater's `(255, 0, 255)` test), and so does the
@@ -152,10 +156,11 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
  * @param {number} [stride]
  * @returns {?Uint32Array} null when no quad or skirt segment is clipped
  */
-export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples = null) {
+export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples) {
   const dim = WORLD_MAP_TILE_DIM;
   const g = (HEIGHTMAP_DIMENSION - 1) / stride + 1;
   const q = g - 1;
+  const cutsSeNw = quadCutOf(samples, stride);
   // COAST-LOOK (`ring`, renderer.coastEdges): the clip program cuts on a wandering line inside the clipped tiles, so a
   // clipped tile goes only when it and the eight about it are clipped (wholeCut) - the coast's ring is the program's
   const gone = ring ? wholeCut(bytes, dim) : null;
@@ -170,7 +175,7 @@ export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples =
       }
       if (clipped) { dropped++; continue; }
       const quad = [0, 0, 0, 0, 0, 0];   // a quad that stands is cut as `samples` cut its ground (terrain-quad-cut.ts)
-      writeQuadTriangles(quad, 0, z * g + x, g, samples !== null && quadCutsSeNw(samples, x, z, stride));
+      writeQuadTriangles(quad, 0, z * g + x, g, cutsSeNw(x, z));
       out.push(...quad);
     }
   }
