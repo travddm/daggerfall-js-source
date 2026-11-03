@@ -5,6 +5,7 @@
 // timed, its answers' rows summed, and a replica's serving counted (metrics.js countedDb) - a primary going under shows
 // first as that wait. An overloaded D1 is answered `server` still (every book asks that again), but 503, counted apart.
 // tools/mutants/scale4f.json.
+import { codeOf } from '../../src/net/modeLaw.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -57,10 +58,16 @@ async function realmHouseOf({ db }, playerId, id) {
   return row ? houseOn(row.record, row.person) : null;
 }
 
+/** CHARACTER MODES: a sixth read of the same row - the mode's token code, null for Classic (the fold did not exist for it). */
+async function realmModeCode(ctx, playerId, id) {
+  const row = await ctx.db.prepare('SELECT mode FROM realm_characters WHERE id = ? AND player = ?').bind(id, playerId).first();
+  return row && row.mode !== 'classic' ? codeOf(row.mode) : null;
+}
+
 /** What the mint asked before the fold - the four reads, each only behind `rc` as the mint asked them. */
 async function oracle(ctx, playerId, id) {
   const rc = (await realmCharacterHeld(ctx, playerId, id)) ? 1 : 0;
-  return { rc, cl: rc ? await realmLevelOf(ctx, playerId, id) : null, wa: rc ? await realmArmsOf(ctx, playerId, id) : null, house: rc ? await realmHouseOf(ctx, playerId, id) : null, name: rc ? await realmOwnName(ctx, playerId, id) : null };
+  return { rc, cl: rc ? await realmLevelOf(ctx, playerId, id) : null, wa: rc ? await realmArmsOf(ctx, playerId, id) : null, house: rc ? await realmHouseOf(ctx, playerId, id) : null, name: rc ? await realmOwnName(ctx, playerId, id) : null, md: rc ? await realmModeCode(ctx, playerId, id) : null };
 }
 
 test('SCALE4f the mint\'s four reads of one row, in one - exactly what the four answered, over every state a row can be in: held or not, leased or not, a tombstone, another\'s, a level judged, summarised, none or out of bounds, arms with a bow, without, unjudged, a house, a line gone, a name the filter refuses, no person - NAME-AS: and its own name, a fifth answer of the same read (mutants: the lease unread; a tombstone read as held; the summary\'s level unread; the level\'s bounds unread; the bow unread; the arms\' law unread; a house without its line; the house never read)', async () => {
@@ -110,7 +117,7 @@ test('SCALE4f the mint\'s four reads of one row, in one - exactly what the four 
     }
   }
   assert.ok(held >= 20 && housedSeen >= 5, `the states reached both sides of every arm (${held} held, ${housedSeen} housed)`);
-  for (const bad of [null, 7, '', 'r123', 'R'.padEnd(21, 'f'), `${housed.id}x`]) assert.deepEqual(await realmMintFacts(ctx, g.id, bad), { rc: 0, cl: null, wa: null, house: null, name: null }, String(bad));
+  for (const bad of [null, 7, '', 'r123', 'R'.padEnd(21, 'f'), `${housed.id}x`]) assert.deepEqual(await realmMintFacts(ctx, g.id, bad), { rc: 0, cl: null, wa: null, house: null, name: null, md: null }, String(bad));
 });
 
 // ═══ HOW BUSY THE PRIMARY IS ═══════════════════════════════════════════════════════════════════════════════════════
