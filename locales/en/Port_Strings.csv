@@ -1626,7 +1626,7 @@ features.weaponTechniques.note,"Some weapons carry a technique: a special attack
 features.weaponTechniques.title,"Weapon techniques"
 features.weatherEvents.note,"Rain, storms and snow move across the land with the wind, so you can see a storm coming, walk into it and out the other side. Off uses the classic weather, the same everywhere in the region."
 features.weatherEvents.title,"Weather as places"
-features.wildernessCamps.note,"Out in the wilds you sometimes meet a small group of enemies, a camp or a roaming pack, instead of only one at a time. Off keeps the classic single encounters."
+features.wildernessCamps.note,"Out in the wilds you sometimes meet a small group of enemies, a camp or a roaming pack, instead of only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on."
 features.wildernessCamps.title,"Wilderness camps & packs"
 features.wind.note,"See the wind in the enhanced outdoors: trees and plants lean and sway with it, and faint streaks of air show which way it blows and how hard."
 features.wind.sway,"Sway"

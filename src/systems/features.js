@@ -359,14 +359,14 @@ export const FEATURES = Object.freeze([
   }),
   // SD-ONLINE: THE WORLD'S
   // DUNGEON SIZES. Online every dungeon is built at the size one seeded draw on its map id gives it - small, medium or
-  // large, half of them medium, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
+  // large, five in eight of them large, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
   // room's law there, so the lane forces this row ON online and the sync copies it home: offline it asks for the same
   // sizes. Below DFU's switch (Smaller wins when both are on), above the medium one.
   Object.freeze({
     id: 'world-dungeon-sizes',
     group: 'world',
     title: 'Dungeon sizes as online',
-    note: 'Every dungeon takes the size it has online (small, medium or large, half of them medium), the same every '
+    note: 'Every dungeon takes the size it has online (small, medium or large, five in eight of them large), the same every '
       + 'visit. If Smaller dungeons is on too, it wins; this row wins over Medium dungeons. A quest keeps the size it '
       + 'was set up at. Online it is always on.',
     effect: 'Takes effect on the next dungeon you enter. A save made at another size puts you at the dungeon\u2019s start.',
@@ -1626,10 +1626,10 @@ export const FEATURES = Object.freeze([
     group: 'world',
     get title() { return t('features.wildernessCamps.title', 'Wilderness camps & packs'); },
     get note() { return t('features.wildernessCamps.note', 'Out in the wilds you sometimes meet a small group of enemies, a camp or a roaming pack, instead of '
-      + 'only one at a time. Off keeps the classic single encounters.'); },
+      + 'only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'player' }),
+    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: true }),   // CAMP-RARE: forced on online, the room's ground (the groups are rare: systems/campEncounters.js); Off is DFU's lone wanderers
   }),
   // WILD-ROAD (FIELD BUGS 2026-10-04e, Discord: "having to completely halt my travel because 1 rat chose today to die
   // can be quite the interruption"): systems/roadEncounters.js - the port's own. On a journey or the Overworld, a

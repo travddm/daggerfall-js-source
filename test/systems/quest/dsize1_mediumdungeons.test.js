@@ -106,17 +106,17 @@ test('DSIZE1: generated - the two from the interior pool, the ring from the bord
 });
 
 test('DSIZE1: the size a dungeon is built at - the guards, the quest\'s frozen size, then Smaller, then Medium; DFU\'s UseSmallerDungeon verbatim beside it (A6)', () => {
-  const big = loc(20);
+  const big = loc(20, 786);
   assert.equal(dungeonSizeFor(big, { setting: false, medium: false }), 'full');
   assert.equal(dungeonSizeFor(big, { setting: false, medium: true }), 'medium');
   assert.equal(dungeonSizeFor(big, { setting: true, medium: true }), 'small', 'Smaller Dungeons wins');
   assert.equal(dungeonSizeFor(big, { setting: true, medium: true, online: true }), onlineDungeonSize(big), 'online, the world\'s size for it (SD-ONLINE - PIN MOVED: it was the whole dungeon)');
   assert.equal(dungeonSizeFor(big, { setting: false, medium: false, online: true }), onlineDungeonSize(big), '...whatever either switch says');
-  assert.equal(onlineDungeonSize(big), 'medium', 'map 777\'s draw (test/systems/sdonline.test.js holds the law)');
+  assert.equal(onlineDungeonSize(big), 'medium', 'map 786\'s draw (test/systems/sdonline.test.js holds the law)');
   assert.equal(dungeonSizeFor(loc(20, PRIVATEERS_HOLD), { setting: true, medium: true }), 'full', 'main story never shrinks');
   assert.equal(dungeonSizeFor({ hasDungeon: false }, { setting: true }), 'full');
   const machine = (state) => ({
-    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 777 ? [{ questUID: 5 }] : []),
+    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 786 ? [{ questUID: 5 }] : []),
     getQuest: () => ({ smallerDungeonsState: state }),
   });
   assert.equal(dungeonSizeFor(big, { setting: true, medium: false, questMachine: machine(MEDIUM_DUNGEONS_STATE) }), 'medium', 'the quest compiled at medium');
@@ -156,12 +156,12 @@ test('DSIZE1: the quest\'s stamp, the save\'s stamp and the warp - three layouts
 });
 
 test('DSIZE1 E5: the machine\'s Start takes a linked dungeon\'s size where the medium size is either side - the size the markers were chosen on; DFU\'s two values left DFU\'s', () => {
-  const quest = (uid, state, mapId = 777) => ({
+  const quest = (uid, state, mapId = 786) => ({
     uid, smallerDungeonsState: state,
     resources: new Map([['dun', { isPlace: true, siteDetails: { siteType: SITE_TYPES.Dungeon, mapId } }], ['npc', { isPerson: true }]]),
   });
   const machineOf = (held) => ({
-    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 777 && held != null ? [{ questUID: 1 }] : []),
+    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 786 && held != null ? [{ questUID: 1 }] : []),
     getQuest: (uid) => (uid === 1 ? { smallerDungeonsState: held } : null),
   });
   const S = SMALLER_DUNGEONS_STATE, M = MEDIUM_DUNGEONS_STATE, O = ONLINE_DUNGEONS_STATE;
@@ -194,7 +194,7 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   // two blocks, a spawn marker in each, at block (0,0) and (1,0)
   const flat = (record, x) => ({ type: RDB_RESOURCE_TYPES.Flat, position: x, xPos: x, yPos: 0, zPos: 0, resources: { flatResource: { textureArchive: 199, textureRecord: record } } });
   const blockData = { W1: { position: 100, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 1), flat(18, 2)] }] } }, B1: { position: 200, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 3)] }] } } };
-  const built = { name: 'Keep', mapTableData: { mapId: 777 }, dungeon: { blocks: [{ blockName: 'W1', x: 0, z: 0 }, { blockName: 'B1', x: 1, z: 0 }] } };
+  const built = { name: 'Keep', mapTableData: { mapId: 786 }, dungeon: { blocks: [{ blockName: 'W1', x: 0, z: 0 }, { blockName: 'B1', x: 1, z: 0 }] } };
   q.hooks = { ...(q.hooks ?? {}), world: {
     maps: { getRegion: (r) => (r === 3 ? { mapNameLookup: new Map([['Keep', 5]]) } : null), getLocation: (r, l) => (r === 3 && l === 5 ? built : null) },
     getBlock: (n) => blockData[n] ?? null,
@@ -202,7 +202,7 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   const dun = new Place(q);
   dun.symbol = sym('dun');
   const old = (id, x, z) => ({ markerType: 0, flatPosition: { x: id, y: 0, z: 0 }, dungeonX: x, dungeonZ: z, buildingKey: 0, markerID: id, targetResources: null });
-  dun.siteDetails = { siteType: SITE_TYPES.Dungeon, mapId: 777, regionIndex: 3, locationName: 'Keep', buildingKey: 0, magicNumberIndex: 0,
+  dun.siteDetails = { siteType: SITE_TYPES.Dungeon, mapId: 786, regionIndex: 3, locationName: 'Keep', buildingKey: 0, magicNumberIndex: 0,
     selectedMarker: { targetResources: [sym('boss')] }, questSpawnMarkers: [old(1, 0, -1)], questItemMarkers: [] };
   dun._range = () => 0;
   q.resources.set('dun', dun);
