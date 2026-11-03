@@ -92,6 +92,7 @@ import { RAY_DISTANCE, TREASURE_ACTIVATION_DISTANCE } from '../player/activate.j
 import { adoptLight } from '../render/lightId.js';   // LIGHT-ID: a piece's light named by its piece
 import { LOST_OWED_MAX_MS } from '../net/lostLaw.js';   // LOST-SPOILS: how long a floor's leftovers are asked after
 import { t } from '../systems/textManager.js';
+import { getPref } from '../systems/uiPrefs.js';   // PORTENT-FOLD: the Features row `gate-portent-loot`
 
 /** WBX3: an item's picture stands this many metres a texel tall on the floor, and never taller than the most. */
 export const SPOILS_ICON_M_PER_PX = 0.022;
@@ -147,7 +148,7 @@ export function spoilsList(seed, level, claims = null) {
   const look = seededRng((seed ^ 0x5eed) >>> 0);
   const flat = () => RANDOM_TREASURE_ICONS[Math.floor(look() * RANDOM_TREASURE_ICONS.length)];
   if (claims?.x === 'rite') return [{ kind: 'item', item: sigilStone(), tier: SIGIL_TIER, record: flat() }];
-  const s = rollSpoils(seed, level, claims?.p ?? 0);   // PORTENT-FOLD: a portent night's pieces rolled at a higher tier
+  const s = rollSpoils(seed, level, getPref('gatePortentLoot') ? claims?.p ?? 0 : 0);   // PORTENT-FOLD: a portent night's pieces rolled at a higher tier, when the row is on
   // AUDIT WORLD-REWARDS A1: the Dragonfire Oath's picture is drawn LAST of all (below) - drawn in its place among the pieces,
   // it moved every picture after it (the ember's, the gold's, the gems') off what the seed gave them, in
   // every spoils it came in. It still leaves among the pieces, its glow's line in the frame's first eight.

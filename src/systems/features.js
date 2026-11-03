@@ -38,7 +38,7 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
-import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
+import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js'; import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -772,7 +772,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
   }),
-  WEAPON_TECHNIQUES_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity
+  WEAPON_TECHNIQUES_ROW, GATE_PORTENT_LOOT_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; PORTENT-FOLD: the Breach portents' loot
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
