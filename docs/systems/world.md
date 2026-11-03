@@ -33,6 +33,9 @@ both from the player's ARENA2 folder; nothing of it ships in the repository.
   marching-squares `assignTiles`, and flattens locations (`blendLocationTerrain`, `calcAvgMaxHeight`,
   `setLocationTiles`). These are ports of Daggerfall Unity's `TerrainHelper`.
 - `src/world/terrain/terrainSurface.js` builds the mesh and answers ground queries (`surfaceHeightAt`, `walkGroundAt`).
+- `src/world/terrain/terrain-quad-cut.ts` decides which diagonal each mesh quad is cut on, from the pixel's samples, so
+  a ridge or a valley is not folded into a row of teeth. Every reader of the drawn ground uses it: the index buffers, the
+  height and normal reads, the water sheet and the placers.
 - `src/world/terrain/terrainNature.js`, `floraCover.js` and `jungleNature.js` scatter plants; `src/world/ecotone.js`
   makes the seam between two pixel climates wander.
 
@@ -40,6 +43,9 @@ Water levels: a height at or under `SCALED_OCEAN_ELEVATION` (27.2) is a water ti
 
 Departure: `src/world/perlin.js` uses Ken Perlin's improved noise, not Unity's `Mathf.PerlinNoise`. Terrain samples are
 therefore close to Daggerfall Unity's, not byte-equal.
+
+Departure (an agreed design, better for play): Unity cuts every terrain quad on one fixed diagonal. The port cuts each
+quad on the diagonal that its ground follows (`terrain-quad-cut.ts`).
 
 ## Landforms
 
