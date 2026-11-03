@@ -39,7 +39,7 @@ function arena2DevServer() {
   // /play/arena2/*; the probes' direct imports still fetch /arena2/*.
   // Same handler, both doors - a dev server that answered one and not
   // the other is the mixed-case bug above in a new coat.
-  return {
+  const plugin = {
     name: 'arena2-dev-server',
     configureServer(server) {
       for (const mount of ['/arena2', '/play/arena2']) server.middlewares.use(mount, (req, res, next) => {
@@ -79,6 +79,9 @@ function arena2DevServer() {
       });
     },
   };
+  // `vite preview` serves a built game to the probes (tools/probes/build.mjs): the data is mounted there too
+  plugin.configurePreviewServer = plugin.configureServer;
+  return plugin;
 }
 
 // THE DEPLOY'S OWN NAME, stamped where a verifier can read it without

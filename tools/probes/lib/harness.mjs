@@ -1,11 +1,11 @@
 // Shared harness of the end-to-end probes (docs/testing/game-probes.md): one Vite server per plugin set, one
 // browser, and a Game per probe that reads state through the `?shot` hooks and fails on any console error that
 // ALLOWED_ERRORS does not name.
-import { createServer } from 'vite';
+import { createServer, preview } from 'vite';
 import { chromium } from 'playwright';
 import { fileURLToPath } from 'node:url';
 import { mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { ALLOWED_ERRORS } from './allowedErrors.mjs';
 import { fakePointerLock } from './fakePointerLock.mjs';
 
@@ -19,10 +19,29 @@ export const sleep = (ms) =>
 /** The probes read state, not pixels, and software GL costs by the pixel: a small window keeps CI's frames affordable. PROBE_W/PROBE_H change it. */
 const VIEWPORT = { width: Number(process.env.PROBE_W || 640), height: Number(process.env.PROBE_H || 400) };
 
+/** PROBE_LIGHT=1: the light settings in Game.open. Off unless asked for. */
+const LIGHT = process.env.PROBE_LIGHT === '1';
+
 const SWIFTSHADER_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
-/** Starts a Vite dev server on `port`. HMR and the watcher are off: a reload under a probe destroys its page. */
+/**
+ * Starts a server on `port`. PROBE_DIST (a folder from tools/probes/build.mjs) serves the built game with `vite preview`;
+ * a dev server transforms thousands of modules on first load, in every run, and that is minutes on CI. A probe that
+ * passes `plugins` (edits to the source) needs the dev server and gets it whatever PROBE_DIST says.
+ * HMR and the watcher are off on the dev server: a reload under a probe destroys its page.
+ */
 export async function serve({ port, plugins = [] }) {
+  const dist = process.env.PROBE_DIST;
+  if (dist && !plugins.length) {
+    const server = await preview({
+      root: ROOT,
+      configFile: join(ROOT, 'vite.config.js'),
+      build: { outDir: resolve(dist) },
+      preview: { port, strictPort: true, host: 'localhost' },
+      logLevel: 'error',
+    });
+    return { base: `http://localhost:${port}`, close: () => server.close() };
+  }
   const server = await createServer({
     root: ROOT,
     configFile: join(ROOT, 'vite.config.js'),
@@ -64,11 +83,13 @@ export function ledger(name) {
  * HTTP errors from a local origin) are collected; `noErrors()` checks them against ALLOWED_ERRORS.
  */
 export class Game {
-  constructor(browser, base, { viewport = VIEWPORT, ...ctxOpts } = {}) {
+  constructor(browser, base, { viewport = VIEWPORT, lightPrefs = {}, ...ctxOpts } = {}) {
     this.browser = browser;
     this.base = base;
     this.viewport = viewport;
     this.ctxOpts = ctxOpts;
+    /** Prefs a probe that asserts nothing about them lets PROBE_LIGHT turn off (enhancedWater, cloudQuality ...). */
+    this.lightPrefs = lightPrefs;
     this.errors = [];
     /** Console lines and the local requests that failed or answered 4xx/5xx, for `diagnostics()`. */
     this.trace = [];
@@ -91,6 +112,25 @@ export class Game {
           /* no storage */
         }
       });
+      // PROBE_LIGHT=1: the world streams 1 map block around the player instead of 3 (DFU's Experimental/TerrainDistance), and the
+      // enhanced skin draws a view distance of 1 instead of 5 (the landViewDistance pref, src/world/landView.js). Both are settings
+      // a player changes; they are stored, so no game code changes. On software GL the world was ready 22 s after load instead of
+      // 86 s, and every reload the same. Off unless asked for.
+      if (LIGHT)
+        await this.context.addInitScript((lightPrefs) => {
+          try {
+            const k = 'dagger.settings.v1';
+            const v = JSON.parse(localStorage.getItem(k) ?? '{}');
+            localStorage.setItem(
+              k,
+              JSON.stringify({ ...v, Experimental: { ...v.Experimental, TerrainDistance: '1' } }),
+            );
+            const u = JSON.parse(localStorage.getItem('dagger.ui.v1') ?? '{}');
+            localStorage.setItem('dagger.ui.v1', JSON.stringify({ ...u, landViewDistance: 1, ...lightPrefs }));
+          } catch {
+            /* no storage */
+          }
+        }, this.lightPrefs);
       if (init) await this.context.addInitScript(init.fn, init.arg);
       // hermetic: the game phones the live account service (/v1/poi/live) even offline; a probe never reaches it
       await this.context.route(
@@ -139,7 +179,9 @@ export class Game {
 
   /** Prints the tail of the page's trace: what tells a failed check from a slow machine. */
   diagnostics(what, tail = 80) {
-    console.log(`  --- ${what}: the last ${Math.min(tail, this.trace.length)} of ${this.trace.length} page trace lines`);
+    console.log(
+      `  --- ${what}: the last ${Math.min(tail, this.trace.length)} of ${this.trace.length} page trace lines`,
+    );
     for (const l of this.trace.slice(-tail)) console.log(`      ${l}`);
   }
 
