@@ -7,14 +7,14 @@ project's own design.
 
 ## Building blocks
 
-| Layer | What it is | Where |
-| --- | --- | --- |
-| Boats | Port of the **Come Sail Away 2.1** mod (RedRoryOTheGlen): boats as items, placing, oars, sails, waves, cargo, the position map | `src/systems/comeSailAway/`, `src/scenes/comeSailAway/`, `vendor/come-sail-away/` |
-| Responsive helm | How a hull gathers way and answers the helm, for the player and the AI | `src/systems/helmWay.js` |
-| Sea fight | Ships, guns, damage, AI captains, boarding, law, plunder | `src/systems/naval/` (pure), `src/scenes/naval/` (host) |
-| Pirate quests | Port of **Warm Ashes - Ships 1.1** (Kamer): ship encounters on sea travel and the pirate quest | `src/systems/warmAshesShips.js`, `src/systems/seaRaiders.js` |
-| Swimming | Port of **Iliac Puddle No More** (jet082): its player API lets a boat suppress the outdoor swim | `src/systems/deepWater/`, `vendor/iliac-puddle-no-more/` |
-| Eltheric Ocean | A procedural sea past "the Veil", with its own events and vaults | `src/systems/naval/etherCrossing.js`, `etherShips.js`, `src/systems/sea/`, `src/world/ethericSea.js` |
+| Layer           | What it is                                                                                                                     | Where                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Boats           | Port of the **Come Sail Away 2.1** mod (RedRoryOTheGlen): boats as items, placing, oars, sails, waves, cargo, the position map | `src/systems/comeSailAway/`, `src/scenes/comeSailAway/`, `vendor/come-sail-away/`                    |
+| Responsive helm | How a hull gathers way and answers the helm, for the player and the AI                                                         | `src/systems/helmWay.js`                                                                             |
+| Sea fight       | Ships, guns, damage, AI captains, boarding, law, plunder                                                                       | `src/systems/naval/` (pure), `src/scenes/naval/` (host)                                              |
+| Pirate quests   | Port of **Warm Ashes - Ships 1.1** (Kamer): ship encounters on sea travel and the pirate quest                                 | `src/systems/warmAshesShips.js`, `src/systems/seaRaiders.js`                                         |
+| Swimming        | Port of **Iliac Puddle No More** (jet082): its player API lets a boat suppress the outdoor swim                                | `src/systems/deepWater/`, `vendor/iliac-puddle-no-more/`                                             |
+| Eltheric Ocean  | A procedural sea past "the Veil", with its own events and vaults                                                               | `src/systems/naval/etherCrossing.js`, `etherShips.js`, `src/systems/sea/`, `src/world/ethericSea.js` |
 
 Almost every module under `src/systems/naval/` is pure: the host passes positions, a water test, the wind and the
 clock, and gets numbers or events back. Keep it that way; the tests depend on it.
@@ -32,8 +32,8 @@ clock, and gets numbers or events back. Keep it that way; the tests depend on it
 - **Only the streaming world has a sea.** Interiors and dungeons (`src/scenes/worldModes.js`,
   `src/scenes/dungeonContext.js`) have none, and every transition, teleport and load empties the sea. The `?exterior`
   bench (`src/scenes/exterior.js`) has no Come Sail Away runtime and therefore no sea fight.
-- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; forced off online) plus the drawer
-  prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`, `naval-handling`
+- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; forced off online) plus the
+  drawer prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`, `naval-handling`
   (`responsive` or `classic`) and `naval-auto-repair`. `navalOn()` in `world.js` needs both the Come Sail Away runtime
   and the `naval` pref. With Come Sail Away off there is no sea fight.
 
@@ -131,18 +131,18 @@ contacts.
 
 ## Crews and captains
 
-| Module | Holds |
-| --- | --- |
-| `shipCrew.js` | Named hands with roles, morale and deck orders; saved per boat |
-| `crewLife.js` | Crew walking, talking and singing on deck; `playerCrewCount` per hull |
-| `navalDeck.js` | The walkable deck read from a ship's colliders |
-| `shipWatch.js` | Night watch, lookout, lanterns |
-| `crewCompanions.js` | Up to two hands who follow the player ashore |
-| `captainLedger.js` | The captain's log, standing with each crown, ranks and favours, letters of marque (save vendor `Captain`) |
-| `captainTree.js` | The captain's skill tree |
-| `shipKnowledge.js` | The spyglass: what a captain knows of a ship before and after looking |
-| `harbourBoard.js` | The harbourmaster's contracts and bounties |
-| `src/systems/crewHall.js` | The shipyard's daily roster of recruits |
+| Module                    | Holds                                                                                                     |
+| ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `shipCrew.js`             | Named hands with roles, morale and deck orders; saved per boat                                            |
+| `crewLife.js`             | Crew walking, talking and singing on deck; `playerCrewCount` per hull                                     |
+| `navalDeck.js`            | The walkable deck read from a ship's colliders                                                            |
+| `shipWatch.js`            | Night watch, lookout, lanterns                                                                            |
+| `crewCompanions.js`       | Up to two hands who follow the player ashore                                                              |
+| `captainLedger.js`        | The captain's log, standing with each crown, ranks and favours, letters of marque (save vendor `Captain`) |
+| `captainTree.js`          | The captain's skill tree                                                                                  |
+| `shipKnowledge.js`        | The spyglass: what a captain knows of a ship before and after looking                                     |
+| `harbourBoard.js`         | The harbourmaster's contracts and bounties                                                                |
+| `src/systems/crewHall.js` | The shipyard's daily roster of recruits                                                                   |
 
 ## Ports, shipyards and passage
 
@@ -193,12 +193,12 @@ Storm, treasure fleet on a shared clock), `seaVaults.js` and `seaSpoils.js` are 
 
 ## Save
 
-| Vendor | Holds |
-| --- | --- |
-| `come-sail-away` | The player's boats, placed or packed, their cargo |
+| Vendor                                         | Holds                                                                                                 |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `come-sail-away`                               | The player's boats, placed or packed, their cargo                                                     |
 | `NavalCombat` (`NAVAL_SAVE_VENDOR`, version 1) | Each boat's hull, sails, crew, fire and state by deed UID; notoriety and its decay day; raids started |
-| `Captain` | The captain's ledger |
-| `Fleet` | The fleet book |
+| `Captain`                                      | The captain's ledger                                                                                  |
+| `Fleet`                                        | The fleet book                                                                                        |
 
 The sea's AI ships are never saved: they are rolled again from the waters and the day.
 
