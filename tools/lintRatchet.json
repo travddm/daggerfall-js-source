@@ -2042,7 +2042,6 @@
     "src/formats/spellsStd.js": 1,
     "src/formats/textRsc.js": 1,
     "src/formats/textureFile.js": 1,
-    "src/formats/umRandom.js": 1,
     "src/formats/unity/unityBundle.js": 1,
     "src/formats/unity/unityBundleClient.js": 1,
     "src/formats/unity/unityBundlePool.js": 1,
