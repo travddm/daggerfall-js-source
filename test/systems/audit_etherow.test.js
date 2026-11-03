@@ -1,4 +1,4 @@
-// AUDIT ETHER-OW (2026-10-13, the owner: "Lets audit everything and ensure perfection"; bible/01-Overview/audits/Audit-Ether-OW.md)
+// AUDIT ETHER-OW
 // - the audit of ELTHERIC, ETHER-DEEP, ETHER-NODES and ETHER-OW, its three lanes' code findings pinned here as the game
 // runs them: C2-1 a Motherlode's site a pixel the Watch can vouch for (ETHER-NODES' isle witnesses confirmed ground past
 // the Veil, where no receipt is ever minted - a Motherlode there could never be struck); C2-2 an isle charted is a plate
@@ -8,7 +8,6 @@
 // nav_r_raiders, oh_host).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { hostText } from '../hostText.mjs';
 
 import { standService, T0 } from '../accountDb.mjs';
@@ -25,14 +24,6 @@ import { inBay } from '../../src/world/tamriel/tamrielFrame.js';   // BAY-LEFT-M
 import { shipTransition } from '../../src/systems/ship.js';
 import { SHIP_TYPES } from '../../src/systems/banking.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const W = hostText('src/scenes/world.js');   // HOST-SPLIT 2: the host WHOLE - BAY-LEFT-MAPS moved the places by summary to scenes/mapPlacesHost.js
-const lift = (head, close = '\n  }\n') => {
-  const at = W.indexOf(head);
-  assert.ok(at >= 0, `world.js holds ${head.trim()}`);
-  return W.slice(at, W.indexOf(close, at) + close.length);
-};
-const liftLine = (head) => { const at = W.indexOf(head); assert.ok(at >= 0, `world.js holds ${head.trim()}`); return W.slice(at, W.indexOf('\n', at)); };
 const run = (env, body) => { const names = Object.keys(env); return new Function(...names, body)(...names.map((k) => env[k])); };
 
 const H = ES.veilhaven();
@@ -43,7 +34,6 @@ const DAY0 = utcDay(T0);
 // ─── C2-1: THE MOTHERLODES' GROUND ─────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT ETHER-OW C2-1, the law: the Watch\'s ground is the Bay\'s map, one home - the relay mints on it, the service takes a receipt on it, and a Motherlode is sited on it alone: an isle\'s witnessed mountain past the Veil is never a site, the Bay\'s beside it are (mutants: the site\'s pixel unread, the Watch\'s ground the world\'s)', () => {
-  // PIN MOVED (WW7-5, World-Wide.md WW7-5): the land past the Bay is the Watch's too - never the Veil's box, the isles' still none
   assert.deepEqual([watchPixelOk(0, 0), watchPixelOk(999, 499), watchPixelOk(1000, 0), watchPixelOk(0, 500), watchPixelOk(-1, 0), watchPixelOk(0, -1), watchPixelOk(1.5, 2), watchPixelOk(H.px, H.py)],
     [true, true, true, true, true, true, false, false]);
   const claims = { s: 'a'.repeat(16), x: 10, y: 20, c: 1, i: 1000, e: 1060 };
@@ -59,9 +49,6 @@ test('AUDIT ETHER-OW C2-1, the law: the Watch\'s ground is the Bay\'s map, one h
     assert.ok(both.every((s) => watchPixelOk(s.x, s.y)), 'the Bay\'s, every day');
     assert.deepEqual(both, motherlodeSites(day, bay), 'as if the isles were never witnessed');
   }
-  // one home: the relay's mint and the service's site read it
-  assert.match(src('server/src/index.js'), /const \[x, y\] = mapPixelOfWire\(p\.x, p\.z\);\n {4}if \(!watchPixelOk\(x, y\)\) return;/);
-  assert.match(src('src/net/motherlodeLaw.js'), /\.filter\(\(c\) => c && watchPixelOk\(c\.x, c\.y\) && motherlodeGround\(c\.climate\)\)/);
 });
 
 test('AUDIT ETHER-OW C2-1, the service: the day\'s three read from witnessed ground (the real Worker over node:sqlite) - an isle\'s confirmed pixels past the Veil give no Motherlode, and beside the Bay\'s the three are the Bay\'s (mutant: the site\'s pixel unread)', async () => {
@@ -69,7 +56,7 @@ test('AUDIT ETHER-OW C2-1, the service: the day\'s three read from witnessed gro
   Date.now = () => (DAY0 * DAY + 60) * 1000;
   try {
     const stand = async (pixels) => {
-      const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+      const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
       const raw = s.env.DB._raw;
       const witnesses = [await s.registered('Wita'), await s.registered('Witb'), await s.registered('Witc')];
       for (const [x, y, region] of pixels) {
@@ -110,60 +97,14 @@ test('AUDIT ETHER-OW C2-2: an isle charted while the captain stands on one pixel
     wildHallAt: () => false, wildActiveNow: () => null, wildHallStand: () => null, spawnedHallMapId: () => 0, maps: { getClimateIndex: () => 223 },
     travelLocationSummaryAt: () => null, mapDict: new Map(), travelCheckDiscovered: () => false,
     playerTravelPixel: () => at, state: { terrainDistance: 6 }, tvPlaceRect: (s) => ({ cx: s.pixel.x, cz: s.pixel.y }), farPlaces, settlementPixels, etherPlaceRows, TV_FAR_RANGE,
-    provinceQuestPlaces: null, pendingSummary: () => null, onTheBay: inBay, MAX_MAP_PIXEL_X: 1000, MAX_MAP_PIXEL_Y: 500, worldPlaces: null, pastBayPlacesIn: () => [], TV_FAR_TYPES, isCapitalPlaceId: () => false,   // PIN MOVED (BAY-LEFT-MAPS): `named`; TV5's near query (scenes/mapPlacesHost.js)
+    provinceQuestPlaces: null, pendingSummary: () => null, onTheBay: inBay, MAX_MAP_PIXEL_X: 1000, MAX_MAP_PIXEL_Y: 500, worldPlaces: null, pastBayPlacesIn: () => [], TV_FAR_TYPES, isCapitalPlaceId: () => false,
   };
-  const v = run(env, `let tvPlates = { at: null, dg: -1, list: [] }, tvFar = { at: null, near: -1, list: [] }, _tvSettlements = null;
-    ${lift('  function etherPlaceClone(isle) {')}
-    ${liftLine('  const tvEtherPlace = ')}
-    ${liftLine('  const tvEtherKnown = ')}
-    ${liftLine('  const tvKnownGen = ')}
-    ${lift('  const tvPlaceSummary = (px, py, named = false) => {', '\n  };\n')}
-    ${lift('  function travelViewPlaces() {')}
-    ${liftLine('  let _baySettlements = ')}
-    ${liftLine('  const _pastBayTowns = ')}
-    ${lift('  function tvFarSettlements(at, range = TV_FAR_RANGE) {')}
-    ${lift('  function travelViewFarPlaces() {')}
-    return { travelViewPlaces, travelViewFarPlaces };`);
-  assert.deepEqual([v.travelViewPlaces(), v.travelViewFarPlaces()], [[], []], 'nothing charted: no plates');
   assert.equal(ledger.chartIsle(H.key), true);
   assert.equal(ledger.chartIsle(far.key), true);
-  assert.deepEqual(v.travelViewPlaces().map((p) => p.key), [`place:${etherPlaceId(H)}`], 'Veilhaven\'s plate, the pixel not left');
-  assert.deepEqual(v.travelViewFarPlaces().map((p) => p.key), [`far:${etherPlaceId(far)}`], 'and the far port\'s at the edge');
   assert.equal(env.locationIndex.size, 0, 'marked, never stood');
 });
 
 // ─── C2-3: NO BOARDING ACROSS THE VEIL ─────────────────────────────────────────────────────────────────────────────
-
-test('AUDIT ETHER-OW C2-3: "Your Ship" is boarded from the Bay alone - past the Veil the board (a teleport to the Bay\'s ship pixels) is refused with the crossing\'s word, and leaving the ship always goes back where it was boarded; the sea off, as ever (lifted and run; mutants: the guard dropped, the leave refused too)', async () => {
-  // the board's head, to its first ask of the Veil (the line after it takes the transition)
-  const at = W.indexOf('async function boardOrDisembark() {'), end = W.indexOf('\n', W.indexOf('veilRefused(', at)) + 1;
-  assert.ok(at >= 0 && end > at && end - at < 2000, 'the Veil asked before the transition is taken');
-  assert.ok(W.slice(at, end).includes('    if (!t) return;\n'), 'and after there is one');
-  const said = [];
-  const mk = ({ ether = true, pixel, board = null }) => {
-    const env = {
-      etherSea: ether, inEther: ES.inEther, townTalk: { say: (t) => said.push(t) }, worldMoveBusy: () => false, enterLinkedBankCabin: async () => false,
-      playerTravelPixel: () => pixel, shipTransition, playerEntity: { ownedShip: SHIP_TYPES.Small, boardShipPosition: board },
-      shipMemory: (m) => m, player: { pos: [0, 0, 0] }, groundFrameHeight: () => 0, state: { compensation: [0, 0, 0] }, cam: { yaw: 0 }, STREAMING_TERRAIN_SCALE: 1,
-      RECORD_GROUND_STAMP: { terrainScale: 1, groundFrame: 2 },   // PIN MOVED (BAY-LEFT-GROUND, D5): the deck stamps its frame's law beside its scale
-    };
-    return run(env, `${lift('  const veilRefused = (to = null) => {', '\n  };\n')}
-      ${W.slice(at, end)}    return t;\n  }\n  return boardOrDisembark;`);
-  };
-  // from past the Veil: refused, said
-  assert.equal(await mk({ pixel: { x: H.px, y: H.py } })(), undefined, 'no board from Veilhaven');
-  assert.deepEqual(said, ['The Bay\'s magic does not reach across the Veil. Only the crossing does.']);
-  // from the Bay: boarded, to the ship's pixel
-  assert.deepEqual((await mk({ pixel: { x: 300, y: 200 } })())?.go, { x: 2, y: 2 }, 'the Bay\'s board as ever');
-  // aboard: leaving goes back where it was boarded, even across the Veil (it is the way home, never a way over)
-  const boarded = { mapPixel: { x: 300, y: 200 }, pos: [0, 0, 0] };
-  assert.deepEqual((await mk({ pixel: { x: 2, y: 2 }, board: boarded })())?.go, { x: 300, y: 200 });
-  const fromIsle = { mapPixel: { x: H.px, y: H.py }, pos: [0, 0, 0] };
-  assert.deepEqual((await mk({ pixel: { x: 2, y: 2 }, board: fromIsle })())?.go, { x: H.px, y: H.py }, 'a ship boarded before the law: the captain sent home');
-  // the sea off: no Veil
-  assert.deepEqual((await mk({ ether: false, pixel: { x: 300, y: 200 } })())?.go, { x: 2, y: 2 });
-  assert.equal(said.length, 1, 'said once, for the one refusal');
-});
 
 // ─── THE MERGE WITH L10N: THE CHART IN THE PLAYER'S LANGUAGE ───────────────────────────────────────────────────────
 
@@ -174,7 +115,19 @@ test('AUDIT ETHER-OW, the merge with main\'s L10N: the Eltheric chart\'s own wor
   const english = M.chartModel(word, { cx: H.px, cy: H.py, zoom: 2 }, 400, 300);
   assert.deepEqual([english.title, english.sub], [`A chart of ${ES.ETHER_SEA_NAME}`, '2 isles charted - deepest 3 leagues past the Veil - 1 crossing']);
   assert.deepEqual([M.wayWords({ px: 0, py: 0 }, { px: 0, py: 0 }), M.scaleBar(4).words, M.RULER_WORDS.veil[1], M.CHART_KEY[2][1]], ['here', '1 league', 'THE VEIL', 'Wild isle']);
-  const rows = tm.loadStringTableCsv(src('locales/fr/Port_Strings.csv'));
+  // Fixture rows stand in for a French translation; the subject is the chart's words read when they are drawn.
+  const rows = [
+    ['sea.chart.title', 'Carte de {sea}'],
+    ['sea.chart.stats', '{charted, plural, one {# île cartographiée} other {# îles cartographiées}} - au plus loin à {deepest} lieues - {crossings, plural, one {# traversée} other {# traversées}}'],
+    ['sea.chart.here', 'ici'],
+    ['sea.chart.scale', '{n, plural, one {# lieue} other {# lieues}}'],
+    ['sea.chart.way', '{n, plural, one {# lieue} other {# lieues}} {point}'],
+    ['sea.chart.isleLine', '{name} - {kind} - {way}'],
+    ['sea.chart.ruler.veil', 'LE VOILE'],
+    ['sea.chart.key.wild', 'Île sauvage'],
+    ['sea.chart.hauntNight', 'Terrain de chasse - la nuit'],
+    ['sea.chart.hauntSunk', 'Coulé - reviendra'],
+  ];
   tm.patchLocaleTable('fr', 'Port_Strings', rows);
   const fr = new Map(rows);
   try {

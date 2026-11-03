@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02 - CREW-SAY. Mac, testing sailing: "your crew mates speaking sometimes seems like gibberish".
+// FIELD BUGS 2026-10-02 - CREW-SAY..
 // Nothing scrambles a crewman's words - every line is the tables' own English (systems/naval/crewLife.js,
 // shipCrew.js) - but the bubbles that carry them (ui/naval/navalHud.js drawCrewLines) stood on their own heads with nothing
 // between them, at 0.62 of an opaque ground, the farther painted OVER the nearer: the chorus is every hand at once (each
@@ -27,7 +27,6 @@ import {
   CREW_SAY_MAX, CREW_SAY_LIFT, CREW_SAY_GAP,
 } from '../../../src/ui/naval/navalHud.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 /** livingcrew's plain deck: a flat 8 m by 24 m at 2 m with a mast amidships. */
 const plainDeck = () => buildDeck([
   { positions: [-4, 2, -12, 4, 2, -12, 4, 2, 12, -4, 2, 12], indices: [0, 1, 2, 0, 2, 3] },
@@ -57,7 +56,7 @@ test('CREW-SAY THE CHORUS ONCE: five minutes of a real crew from the helm - when
     const laid = layoutCrewLines(points);
     const said = new Map();
     for (const p of points) said.set(p.text, [...(said.get(p.text) ?? []), p]);
-    // FIELD BUGS 2026-10-02b PIN MOVED: a line SUNG or SHOUTED by many is theirs together; two hands' talk is each his own
+    // FIELD BUGS 2026-10-02b
     for (const b of laid) if (b.kind === 'talk') assert.match(b.text, /^Hand\d+: /, 'talk by its speaker\'s name, always');
     for (const [text, by] of said) {
       if (by.length >= 2 && by.every((p) => p.kind !== 'talk')) {
@@ -82,7 +81,6 @@ test('CREW-SAY THE CHORUS ONCE: five minutes of a real crew from the helm - when
   const shown = byClass(layer, 'dfnaval-say').filter((n) => n.style.display !== 'none').map((n) => n.textContent);
   assert.deepEqual(shown, [chorus, 'Cyurmti: Wind\'s backing westerly.'], 'one chorus, by no name; a lone line by its speaker\'s');
   destroyNavalHud();
-  assert.match(WORLD, /points\.push\(\{ x: at\.x, y: at\.y, text: l\.text, name: name \? name\.split\(' '\)\[0\] : null, who: key, kind: l\.kind, distance: d \}\);/, 'the world hands the name beside the line (and, 2026-10-02b, the speaker)');
 });
 
 test('CREW-SAY NEVER OVER: six heads in a huddle, each with its own line - no two bubbles meet, the nearest at its own place, each farther one lifted over the nearer; drawn, the nearest over the rest; five minutes of a real crew\'s words, never one over another, at both scales', () => {

@@ -1,8 +1,7 @@
-// LIGHT-NEAR1 (2026-09-23, kurkku on Discord, with video: "shadows disappear seemingly when you're too close to
-// the light source" - a tavern lamp at head height, the shadows gone as the player walks under it): THERE IS NO
+// LIGHT-NEAR1: THERE IS NO
 // CAMERA-DISTANCE RULE ANY MORE.
 //
-// F3 (2026-09-17) kept the light in the hand out of the caster slots by a proxy - "within 1.5 of the eye"
+// F3 kept the light in the hand out of the caster slots by a proxy - "within 1.5 of the eye"
 // (SHADOW_CASTER_MIN_DISTANCE, and AIR_GLARE_MIN_DISTANCE for the glare, pinned to be the same number) - and
 // MAC-T1 replaced that proxy with the fact BY NAME: the torch and candle records say `carried`, every host with
 // a player light composes through withPlayerLights, and the caster pick, the contact march (-2 in the caster

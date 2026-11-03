@@ -1,5 +1,4 @@
-// STAFF-PANEL5 LIVE (2026-10-23, mob: "follow does not work", "tried didnt follow player at all", "freeze does nothing",
-// "froze a player he still moves") - THE WHOLE FOLLOW AND THE WHOLE FREEZE OVER THE REAL RELAY: a target's real OnlineSession (its cell and its hub link, which hops to its shard and sends where
+// STAFF-PANEL5 LIVE - THE WHOLE FOLLOW AND THE WHOLE FREEZE OVER THE REAL RELAY: a target's real OnlineSession (its cell and its hub link, which hops to its shard and sends where
 // notes) and the real createStaffHook (its hub link and its eye), every socket a bridge to a real Room (test/fakeRoom.mjs),
 // the hub's sixteen shards and their bus driven to rest between frames, follow tokens shaped as the account service mints
 // them (server-account/src/staffFollow.js). No step stubbed between the panel's pick and the camera. The freeze: the
@@ -112,7 +111,6 @@ test('STAFF-PANEL5-FOLLOW LIVE: a staff pick follows a solo player over the real
     };
     for (let i = 0; i < 20; i++) await frame();
     assert.ok(H.isHubShard(thub.room), `the target's hub link sits on its shard (${thub.room})`);
-    assert.ok(main.followOk, 'the relay says follow at its welcome');
     hook.follow(TARGET);
     const trace = [];
     for (let i = 0; i < 80; i++) { await frame(); trace.push(`${i}:${hook.locked() ? 'L' : '-'}:${hook.room() ?? '?'}:${hook.view() ? 'V' : '-'}`); }

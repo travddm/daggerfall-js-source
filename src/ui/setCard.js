@@ -1,6 +1,5 @@
 // @ts-check
-// SET5 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md; Mac: "sigil armor sets that also come with set
-// builds (think having multiple of one set type grants detailed abilities)"): THE SET, DRAWN.
+// SET5: THE SET, DRAWN.
 //
 // A set piece's card carries its set as its own block under the sigil's: the set's name in its Prince's colour (the
 // Aetheric set's in its own), who it answers to and what it is for, the nine places it is worn as nine sockets - lit
@@ -10,8 +9,7 @@
 // them. The pack's card and the Info box take the block from here; the paperdoll's column takes the strip - a line a
 // worn set, a press on it showing that set's piece.
 //
-// CARD-FIT (2026-09-28, Discord - Cruor: "New sigil items descriptor is a bit long! ... all the buttons on it's pop-up
-// card are.. off the screen"): TWO DRESSES. The CARD's block (the default) says what a glance needs - the set, the
+// CARD-FIT: TWO DRESSES. The CARD's block (the default) says what a glance needs - the set, the
 // pieces worn and its stage in one head, the nine places, what would raise it, and each tier as ONE short row (its
 // brief - sigilSets.js BRIEF_MAX), the sentence under the pointer; a set piece's card was 1,000 px tall in a 660 px
 // window, the three sentences alone 250 of it. The INFO box asks `{ full: true }` and says everything: the Prince and

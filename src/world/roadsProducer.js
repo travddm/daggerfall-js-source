@@ -1,7 +1,7 @@
 // ROADS 3: THE PRODUCER. The one place the road network is built from
 // the player's own archives - MAPS.BSA for where the settlements are,
 // WOODS.WLD for the ground between them - and the reason roadNetwork.js
-// could stay pure. Nothing here is Hazelnut's; see bible/03-World/Roads.md.
+// could stay pure. Nothing here is Hazelnut's; see.
 
 import { longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';
 import { MAP_WIDTH, MAP_HEIGHT } from '../formats/woodsFile.js';

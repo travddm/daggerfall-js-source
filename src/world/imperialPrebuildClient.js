@@ -1,5 +1,5 @@
 // @ts-check
-// IC-GRAND's perf pass (bible/03-World/Arena-Provinces.md IC-GRAND, "Off the page's thread") - THE PAGE'S SIDE OF THE
+// IC-GRAND's perf pass (IC-GRAND, "Off the page's thread") - THE PAGE'S SIDE OF THE
 // IMPERIAL CITY'S WORKER (world/imperialPrebuild.js says what and why; world/imperialPrebuildWorker.js makes the pieces).
 // It tells the worker which slices are wanted, nearest first (`want`), holds what comes back a bounded number at a time,
 // and hands a piece over once (`takeBlock`, `takeModel`) - the world-data door and the models' family ask it before they
@@ -9,8 +9,7 @@
 // injectable, so node never evaluates `new Worker`; THE FALLBACK IS THE SAME WORK - no Worker, a factory that throws, a
 // worker that errors: nothing is held, and every piece is made on this thread as it always was.
 //
-// IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
-// Arena-Provinces.md IC-STUTTER): A POOL, AND A PIECE ASKED FOR. At x60 a slice is crossed every two or three seconds and
+// IC-STUTTER: A POOL, AND A PIECE ASKED FOR. At x60 a slice is crossed every two or three seconds and
 // each crossing asks three to five slices near and as many at the stream's edge far - more city than one worker makes,
 // so the page made the rest itself, each piece a unit no breath parts (a block 40-480 ms, a slice's skyline 0.2-0.5 s).
 // Now PREBUILD_POOL_MAX workers at most (prebuildPoolSize: the machine's cores less two) share the slices, each slice one

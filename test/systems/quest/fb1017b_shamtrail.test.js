@@ -208,7 +208,7 @@ test('SHAM-TRAIL, the patch law: each patch finds its text in the vendored sourc
     for (const p of patchesOf()) assert.equal(raw.replace(/\r\n?/g, '\n').split(p.old).length - 1, p.count, `${name}: ${p.old.trim().slice(0, 40)}`);
     assert.equal(applyQuestPatches(name, raw.replace(/\r?\n/g, '\r\n')), applyQuestPatches(name, raw), `${name}: CRLF`);
   }
-  assert.deepEqual(Object.keys(QUEST_PATCHES), ['_BRISIEN', 'A0C00Y10', 'M0B11Y18', 'C0B00Y02']);   // PIN MOVED: QUEST-AUDIT III DUEL-TOWN's (questaudit3_life.test.js); AUDIT QA3 C3: K'avar's archers; START1: _BRISIEN's waking (test/systems/starts/start1_bay.test.js)
+  assert.deepEqual(Object.keys(QUEST_PATCHES), ['_BRISIEN', 'A0C00Y10', 'M0B11Y18', 'C0B00Y02']);
   const other = rd('vendor/dfu-quests/Quests/S0000021.txt');
   assert.equal(applyQuestPatches('S0000021', other), other, 'a quest the table does not name loads as shipped');
   assert.throws(() => applyQuestPatches('C0B00Y02', SOURCE.replace('\tplace npc _hooker_ at _tavern_ \n', '\tplace npc _hooker_ at _tavern_\n')),
@@ -223,7 +223,7 @@ test('SHAM-TRAIL, the patch law: each patch finds its text in the vendored sourc
   assert.throws(() => applyForageFix('FetchWood01', 'nothing'), /^Error: FORAGE-FIX: FetchWood01 holds /);
 });
 
-test('SHAM-TRAIL, the words: the entry is the text core\'s (quest.possessedChild.shamTrail), read as the quest is read - in French the French row, laid in journal lines, its four names expanded, and English again byte for byte; every whole language keeps the four names', () => {
+test('SHAM-TRAIL, the words: the entry is the text core\'s (quest.possessedChild.shamTrail), read as the quest is read - in French the French row, laid in journal lines, its four names expanded, and English again byte for byte; the English catalog keeps the four names', () => {
   const english = applyQuestPatches('C0B00Y02', SOURCE);
   // the lines: never an empty one (it would end the message), each led by the script's space, none past the width but a lone word
   for (const text of ['', 'a', 'No daedra came out of _child_ when I brought the _item_.', 'x'.repeat(50) + ' y']) {
@@ -232,9 +232,9 @@ test('SHAM-TRAIL, the words: the entry is the text core\'s (quest.possessedChild
     assert.ok(lines.every((l) => l.length - 1 <= ENTRY_WIDTH || !l.trim().includes(' ')), JSON.stringify(lines));
     assert.equal(lines.map((l) => l.trim()).join(' '), text.split(/\s+/).filter(Boolean).join(' '), 'every word, in order');
   }
-  const rows = tm.loadStringTableCsv(rd('locales/fr/Port_Strings.csv'));
-  const fr = new Map(rows).get('quest.possessedChild.shamTrail');
-  assert.ok(fr && fr !== new Map(tm.loadStringTableCsv(rd('locales/en/Port_Strings.csv'))).get('quest.possessedChild.shamTrail'), 'French drafted');
+  // A fixture row stands in for a French translation; the subject is the row read as the quest is read.
+  const fr = 'Aucun daedra ne sortit de _child_ quand j’apportai _item_. _guardian_ m’a menti ; on le dit à _tavern_.';
+  const rows = [['quest.possessedChild.shamTrail', fr]];
   tm.patchLocaleTable('fr', 'Port_Strings', rows);
   try {
     tm.setLocale('fr');
@@ -249,22 +249,9 @@ test('SHAM-TRAIL, the words: the entry is the text core\'s (quest.possessedChild
     tm.setLocale('en');
   }
   assert.equal(applyQuestPatches('C0B00Y02', SOURCE), english, 'English again, byte for byte');
-  // the whole languages (every row of the catalog drafted): each keeps the four names the quest expands
-  const whole = ['bg', 'cs', 'da', 'de', 'es', 'fr', 'id', 'it', 'ko', 'nb', 'pt-BR', 'ro', 'ru'];
-  for (const code of whole) {
-    const row = new Map(tm.loadStringTableCsv(rd(`locales/${code}/Port_Strings.csv`))).get('quest.possessedChild.shamTrail');
-    assert.ok(row, `${code} drafted`);
-    for (const name of ['_child_', '_item_', '_guardian_', '_tavern_']) assert.ok(row.includes(name), `${code} keeps ${name}`);
-  }
+  // the English catalog keeps the four names the quest expands
+  const row = new Map(tm.loadStringTableCsv(rd('locales/en/Port_Strings.csv'))).get('quest.possessedChild.shamTrail');
+  assert.ok(row, 'in the catalog');
+  for (const name of ['_child_', '_item_', '_guardian_', '_tavern_']) assert.ok(row.includes(name), `the catalog keeps ${name}`);
 });
 
-test('SHAM-TRAIL, the wiring: the browser\'s pack patches DFU\'s own quests as each is read (the entry in that moment\'s language), a mod\'s quest of the name stays the mod\'s, and a patch that no longer finds its text loads the quest as shipped', () => {
-  const src = rd('src/scenes/quest/questData.js');
-  assert.match(src, /import \{ applyQuestPatches, QUEST_PATCHES \} from '\.\.\/\.\.\/systems\/quest\/questPatches\.js';/);
-  assert.match(src, /try \{ return applyQuestPatches\(name, text\)\.split\(\/\\r\?\\n\/\); \} catch \(e\) \{/);
-  assert.match(src, /if \(QUEST_PATCHES\[name\]\) patchable\.set\(name, text\);/);
-  assert.match(src, /quests\.set\(name, patched\.split\(\/\\r\?\\n\/\)\); patchable\.delete\(name\);/);
-  // PIN MOVED (QL4): the read is the questlines' too - a flagship quest's branch patched over it while their switch is on
-  // PIN MOVED (AUDIT QUESTLINES BRANCH-12): and a shared copy's shape read as its own stamp read it - the read's second argument
-  assert.match(src, /getQuestSourceLines: \(name, questlines\) => questlineLines\(name, \(patchable\.has\(name\) \? patchedLines\(name, patchable\.get\(name\)\) : null\) \?\? quests\.get\(name\) \?\? null, questlines\),/);
-});

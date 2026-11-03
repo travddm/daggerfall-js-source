@@ -1,5 +1,5 @@
 // @ts-check
-// STEED1 / WAGONS4 (2026-10-11): THE UPKEEP, A FRAME AT A TIME - horse care (systems/steedCare.js) and wagon upkeep
+// STEED1 / WAGONS4: THE UPKEEP, A FRAME AT A TIME - horse care (systems/steedCare.js) and wagon upkeep
 // (systems/wagon/wagonUpkeep.js) run over a host's pack and clock. One a host (scenes/world.js, scenes/exterior.js -
 // createUpkeep), its doors the host's:
 //
@@ -48,7 +48,7 @@ export function bondWay(bond) {
 }
 
 /**
- * HORSE-TIERS (2026-10-15): `horseCare()` answers the live tier's rules (upkeepTiers.js HORSE_CARE_RULES) or null for
+ * HORSE-TIERS: `horseCare()` answers the live tier's rules (upkeepTiers.js HORSE_CARE_RULES) or null for
  * Off - each door below reads it once, at its call, so a turn of the tier takes effect at once. WAGON-TIERS: and
  * `wagonUpkeep()` wagon upkeep's (WAGON_UPKEEP_RULES), the same way.
  * @param {{ items: () => any[], now: () => number, horseCare?: () => any, wagonUpkeep?: () => any,

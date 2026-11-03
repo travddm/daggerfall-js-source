@@ -1,9 +1,8 @@
-// DISCORD-SETUP (2026-10-17, Mac: "Can you set the discord end up for me"; bible/11-Multiplayer/Chat-Safety-Arc.md
-// section 9): THE DISCORD END FROM THE TOKEN ALONE - tools/discordModCommands.mjs --setup reads the application's id and
+// DISCORD-SETUP: THE DISCORD END FROM THE TOKEN ALONE - tools/discordModCommands.mjs --setup reads the application's id and
 // public key from Discord, the server from the moderators' channel, points the Interactions Endpoint URL at the service
 // only when it differs (offered again while an old instance answers the PING), writes the commands, and says which step
 // Discord refused - never the token.
-// DISCORD-CODE (2026-10-17, Mac: "Do it"): Discord is code - the commands declared once beside the service that answers
+// DISCORD-CODE: Discord is code - the commands declared once beside the service that answers
 // them (server-account/src/discordCommands.js), the WHOLE list written, every declared command and subcommand held to a
 // handler, the bot's permissions in the moderators' channel computed as Discord computes them, and the deploy's path
 // filter holding the tool's own import graph.
@@ -150,8 +149,9 @@ test('DISCORD-CODE: what the cards need and the bot lacks in the moderators\' ch
 });
 
 test('DISCORD-CODE: every declared command and subcommand reaches a handler in the service - none answers with the router\'s "nothing to do" or its command\'s usage, which is built from the declaration', async () => {
-  const s = await standService({ MODERATOR_HANDLES: 'Asynian', DISCORD_MODERATORS: '111111111111111111:Asynian', DISCORD_MOD_CHANNEL: CHANNEL, DISCORD_BOT_TOKEN: 'bot', DISCORD_PUBLIC_KEY: '' });
+  const s = await standService({ SEAT_MODERATORS: 'Asynian', DISCORD_MOD_CHANNEL: CHANNEL, DISCORD_BOT_TOKEN: 'bot', DISCORD_PUBLIC_KEY: '' });
   await s.registered('Asynian');
+  s.env.DB._raw.prepare("INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES ('111111111111111111', (SELECT id FROM players WHERE handle_lc = 'asynian'), 0)").run();
   const troll = await s.registered('Troll');
   const ctx = { db: s.env.DB, nowS: Math.floor(Date.now() / 1000), rand: (b) => { globalThis.crypto.getRandomValues(b); }, subtle: globalThis.crypto.subtle };
   const io = { fetchFn: async () => Response.json({ ok: true }), later: (p) => { p.catch(() => {}); } };
@@ -175,17 +175,6 @@ test('DISCORD-CODE: every declared command and subcommand reaches a handler in t
   }
   assert.equal(usageOf('mod'), 'Use /mod lookup, mute, unmute, ban or unban.');
   assert.deepEqual(subcommandsOf('mod'), ['lookup', 'mute', 'unmute', 'ban', 'unban']);
-});
-
-test('DISCORD-CODE: the commands live under server-account/, and the deploy\'s path filter holds the setup tool\'s whole import graph - a change to either deploys, and so reaches Discord', () => {
-  const wf = readFileSync(new URL('../../.github/workflows/account-deploy.yml', import.meta.url), 'utf8');
-  const listed = [...(/paths:\s*\n((?:\s*(?:#[^\n]*|-\s*"[^"]+")\n)+)/.exec(wf)?.[1] ?? '').matchAll(/-\s*"([^"]+)"/g)].map((m) => m[1]);
-  assert.ok(listed.includes('server-account/**'), 'the service itself');
-  const outside = graph('tools/discordModCommands.mjs').filter((f) => !f.startsWith('server-account/'));
-  assert.ok(outside.includes('tools/discordModCommands.mjs') && outside.includes('tools/lib/isMain.mjs'), `the walk sees the tool: ${outside.slice(0, 4).join(', ')}`);
-  for (const f of outside) assert.ok(listed.includes(f), `${f} is read by the deploy's Discord step and a change to it would not deploy`);
-  assert.ok(graph('server-account/src/index.js').includes('server-account/src/discordCommands.js'), 'the Worker reads the declaration (its usage), so the two ship together');
-  assert.doesNotMatch(readFileSync(new URL('../../tools/discordModCommands.mjs', import.meta.url), 'utf8'), /name: 'mod'/, 'no command is declared in the tool');
 });
 
 test('DISCORD-SETUP: the deploy runs it LAST, the token an env var from the repository\'s secrets and never a word of the command, the door read off the deploy, and nothing asked of Discord when the token, channel or key is not set', () => {

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-FEEDS (2026-10-22, design doc "DFO Staff Panel: design": Monster watch, Server load, Weak spots "Monster
-// watch would flag honest dungeon hosts") - THE PANEL'S MONSTER WATCH, server wide, Admins alone.
+// STAFF-PANEL5-FEEDS - THE PANEL'S MONSTER WATCH, server wide, Admins alone.
 //
 // /v1/staff/monsters { from } - per player: the live monsters it owns outdoors, split regular, elite, boss and sea, and
 // the ones it hosts indoors (the relay's net feed, staff_foe_rows - staffNet.js keeps them); its spawn asks an hour of

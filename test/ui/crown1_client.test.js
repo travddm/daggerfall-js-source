@@ -1,6 +1,6 @@
-// CROWN1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE SEAT TAB AT A CROWN - its holder's
+// CROWN1 part one: THE SEAT TAB AT A CROWN - its holder's
 // Officer offered the crown's Conscription beside every tier's Edicts, with its words; a palace's never offered it; the
-// service's refusal in the board's words (bible/11-Multiplayer/Seats-Arc.md 7.6, 7.9; src/ui/seatTab.js).
+// service's refusal in the board's words (7.6, 7.9; src/ui/seatTab.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';

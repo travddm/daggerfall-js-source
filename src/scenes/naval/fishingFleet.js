@@ -1,5 +1,5 @@
 // @ts-check
-// FISH-BOATS (2026-10-27; bible/03-World/Naval-Combat.md FISH-BOATS) - A PORT'S FISHING BOATS, STOOD: the naval host's
+// FISH-BOATS - A PORT'S FISHING BOATS, STOOD: the naval host's
 // half of systems/naval/fishingBoats.js (navalHost.js wires it). The player who rolls the port stands its day's boats
 // where the day finds them; every other player meets them on the wire. Past HARBOUR_LEAVE they fade, stood again the
 // same on return; one sunk or taken today is not.

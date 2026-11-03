@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC10 (2026-10-09, the MW-NPC arc's tenth slice - bible/04-Characters/Morrowind-NPCs.md section 15): AN ACTOR FOR A
+// MWNPC10: AN ACTOR FOR A
 // POPULATION THAT KEEPS NO FOE RECORD. The gate's boss and host, the siege's people, a ship's crew are driven by a relay
 // or a roster, not by a foe pool: no `_atkA` attack count, no hit flash marks, no entity. What their hosts DO change is a
 // key a frame - the relay's attack time, the time a blow met them - so the actor keeps its own counts on the record,
@@ -45,7 +45,7 @@ export function rosterActor(rec, { id, look, feet, yaw, moving = false, running 
 export const STILL_WARDROBE = Object.freeze({ courtier: 'noble', priest: 'priest', keeper: 'merchant', merchant: 'merchant' });
 
 /**
- * MWNPC10c (bible/04-Characters/Morrowind-NPCs.md section 15c): ONE OF THE LIVING WORLD'S PEOPLE AS THEIR SPRITE SHOWS
+ * MWNPC10c: ONE OF THE LIVING WORLD'S PEOPLE AS THEIR SPRITE SHOWS
  * THEM (systems/livingWorld/census.js's resident, or a road's foe - world/travellerSprites.js draws both): in a class's
  * sprite (`cls` - an armed traveller, a guild's member, a foe) that class's look (foeBodies.js rosterLook) in their
  * own race and sex, a foe in the Bay's; a STILL picture their kind's garments (a courtier a noble's, in their dyes);

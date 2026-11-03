@@ -1,6 +1,5 @@
 // @ts-check
-// TESA7 (2026-10-12, the owner: "Populating the world with unique and smaller towns, farms, etc"; bible/03-World/
-// Arena-Provinces.md TESA7) - THE COUNTRYSIDE PAST THE BAY: the hamlets, villages, farms, homes, inns, temples and shrines
+// TESA7 - THE COUNTRYSIDE PAST THE BAY: the hamlets, villages, farms, homes, inns, temples and shrines
 // that stand between Arena's places, as thick on the ground as the Bay's own. Pure: the world host (scenes/world.js
 // `_locationToBuild`) asks it of a pixel past the Bay that Arena's places leave free, as the pixel builds, and stands the
 // answer in its index.
@@ -33,7 +32,6 @@ import { srand, rand, getSeed, setSeed } from '../formats/dfRandom.js';
 import { firstName, surname, GENDERS, BANK_TYPES, withGameNameBanks } from '../characters/nameHelper.js';   // AUDIT TESA II P10: a place's name on the game's own banks
 import { tavernsA, tavernsB } from './buildingNames.js';   // L10N: the tavern words - AUDIT TESA II P10: read in DFU's own English for a place (withBaseText)
 import { withBaseText } from '../systems/textManager.js';
-import { unwalledLocation } from './townShape.js';   // TS7: a Bay city cloned as it was read
 import { BAY_W, BAY_H, tamrielFit } from './tamriel/tamrielFrame.js';
 import { tamrielLandVersion } from './tamriel/tamrielLand.js';   // AUDIT-TESA A7-1: the ground's reads kept a land
 import { CAPITAL_LANE } from './tamrielCapitals.js';   // TESA10: the capitals' lane, after the lairs'
@@ -90,7 +88,7 @@ const idOf = (l) => (l?.mapTableData?.mapId ?? 0) >>> 0;
  * @returns {Map<number, any[]>}
  */
 export function countryTemplates(rows, isMain = () => false) {
-  const list = [...(rows ?? [])].map(unwalledLocation).filter((l) => l?.exterior?.exteriorData && !l.hasDungeon && !l.spawned && !l.ether && !l.arena && !l.country && !isMain(idOf(l)));   // TS7
+  const list = [...(rows ?? [])].filter((l) => l?.exterior?.exteriorData && !l.hasDungeon && !l.spawned && !l.ether && !l.arena && !l.country && !isMain(idOf(l)));
   const out = new Map();
   for (const type of COUNTRY_TYPES) out.set(type, list.filter((l) => l.mapTableData?.locationType === type).sort((a, b) => idOf(a) - idOf(b)));
   return out;
@@ -193,7 +191,7 @@ export function countryStandsAt({ rates, templates, climateAt, heightAt, ground 
 }
 /** AUDIT TESA II Z7/Z9: MAY the countryside stand on (px, py) - countryStandsAt without its dry plateau (the dear part,
  *  a kernel's sum): every pixel it stands on, and the few it would where its plateau lies under the beach. A neighbour's
- *  test (scenes/zoneHallsHost.js: a hall never beside a place) asks this, so a hall's ground costs no farm's plateau.
+ *  test (scenes/tamrielPlacesHost.js countryNear) asks this, so its search costs no farm's plateau.
  *  @param {{ rates: any, templates: any, climateAt: (x: number, y: number) => number, heightAt: (x: number, y: number) => number }} roll */
 export function countryMayStandAt({ rates, templates, climateAt, heightAt }, px, py) {
   return !!countryPick(rates, templates, climateAt(px, py), px, py) && heightAt(px, py) > WATER_BYTE;

@@ -59,9 +59,7 @@ export function getHolidayId(gameMinutes, regionIndex) {
   return HOLIDAYS.None;
 }
 
-/** HOLY-DAYS (2026-10-11, a profile of a player's live client entering the world: the Living World's pilgrims asked
- *  getHolidayId of every day of their cycle at every temple near - a day-of-year sum and the 53 rows each - ~2 s of a
- *  single frozen frame). THE HOLIDAY ROW ON A DAY OF THE YEAR - `{ id, region }` (the id GetHolidayId returns, the region
+/** HOLY-DAYS. THE HOLIDAY ROW ON A DAY OF THE YEAR - `{ id, region }` (the id GetHolidayId returns, the region
  *  id that keeps it, 0xFF every region) - or null. Each day of the table is one row's (no two rows share a day, every one
  *  inside HOLIDAY_LAST_DAY), so GetHolidayId on a day is this row where `holidayKeptIn` says so, else None. Read off the
  *  tables once. */

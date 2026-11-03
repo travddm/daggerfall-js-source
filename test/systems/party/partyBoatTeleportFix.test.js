@@ -6,7 +6,7 @@ import { createPartyTravel } from '../../../src/systems/party/partyTravel.js';
 import { BESIDE_LEVEL } from '../../../src/systems/party/partyTravelLaw.js';
 import { besideLeaderLanding, waitForPartyArrival, PartyArrivalUnavailable } from '../../../src/systems/party/partyArrival.js';
 import { validPartyPose, PIXEL_UNITS } from '../../../src/net/wire.js';
-import { floorLanding, openGroundNear, heldInSolid } from '../../../src/player/enterExit.js';   // UNSTUCK-OUT (PIN MOVED): the landing's rock check rides the lifted block
+import { floorLanding, openGroundNear, heldInSolid } from '../../../src/player/enterExit.js';   // UNSTUCK-OUT (
 import { StreamingWorldState } from '../../../src/world/streamingWorld.js';
 import { rig, HULL_NAMES, boardPlaceOf, raycastColliders, FLOOR, SEA, FIXED_DT, IDLE } from '../../partyBoatTeleportRig.mjs';
 

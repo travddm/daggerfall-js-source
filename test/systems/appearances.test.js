@@ -1,4 +1,4 @@
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): THE WARDROBE'S LAW AND THE CHARACTER'S LOOKS - the kinds held to
+// APPEARANCES: THE WARDROBE'S LAW AND THE CHARACTER'S LOOKS - the kinds held to
 // what every renderer draws a piece with, the catalogue, the collection off the producers' own pieces, the Wardrobe's acts
 // and its fee, the save, the item field and the receiver's mark - and that a look never changes a number.
 import '../modsOff.js';
@@ -23,7 +23,6 @@ import { validLootItem } from '../../src/systems/loot/loot.js';
 import { createArtifact } from '../../src/systems/loot/loot.js';
 import { readMagicDef, MAGIC_ITEM_RECORD_SIZE } from '../../src/formats/magicDef.js';
 import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { DFU_MAGIC_ITEMS } from '../dfuMagicItems.mjs';
 
@@ -79,7 +78,6 @@ test('APPEARANCES THE KINDS ARE WHAT THE RENDERERS DRAW: two armour templates sh
 test('APPEARANCES THE CATALOGUE: every look there is - each template\'s materials (leather, chain and ten plates; ten metals for a weapon) and the styles SetVariant\'s clamp draws, a look twice never; 473 in all (mutants: Chain2 a look of its own; a helm\'s styles clamped; a shield given styles; the dagger a short blade)', () => {
   const byKind = {};
   for (const a of L.ALL_LOOKS) byKind[a.kind] = (byKind[a.kind] ?? 0) + 1;
-  // PIN MOVED (AUDIT HORIZONTAL E3): 474 -> 473 - chain boots' second style, which no mint makes, is no look (feet 23 -> 22)
   assert.deepEqual(byKind, { head: 72, rightArm: 32, leftArm: 32, chest: 32, hands: 12, legs: 43, feet: 22, shield: 48, dagger: 10, shortBlade: 30, longBlade: 40, greatBlade: 20, axe: 10, greatAxe: 10, mace: 10, flail: 10, warhammer: 10, staff: 10, bow: 20 });
   assert.equal(L.ALL_LOOKS.length, 473);
   assert.equal(new Set(L.ALL_LOOKS.map(L.lookCode)).size, 473, 'no look twice');
@@ -94,7 +92,7 @@ test('APPEARANCES THE CATALOGUE: every look there is - each template\'s material
   assert.equal(L.lookOfKey('131.0.0'), null, 'an arrow is none');
 });
 
-test('APPEARANCES A PIECE IS ITS LOOK: the producers\' own pieces - a weapon, a piece of armour of each family, a style past its clamp - read as the look they draw; an artifact\'s and a Gilded piece\'s own art, an arrow, a gun and a mod\'s piece are none (mutants: the clamp unread; Chain2 its own; an artifact collected; a Gilded piece collected)', () => {
+test('APPEARANCES A PIECE IS ITS LOOK: the producers\' own pieces - a weapon, a piece of armour of each family, a style past its clamp - read as the look they draw; an artifact\'s and a Gilded piece\'s own art, an arrow and a mod\'s piece are none (mutants: the clamp unread; Chain2 its own; an artifact collected; a Gilded piece collected)', () => {
   assert.deepEqual(L.lookOfPiece(createWeapon(WEAPONS.Katana, 7)), { t: 121, m: 7, v: 0, kind: 'longBlade' });
   assert.deepEqual(L.lookOfPiece(armour(102, ARMOR_MATERIAL.Iron, 0)), { t: 102, m: 0x200, v: 1, kind: 'chest' }, 'loot\'s variant 0 draws style 1 (SetVariant)');
   assert.deepEqual(L.lookOfPiece(armour(102, ARMOR_MATERIAL.Chain2, 2)), { t: 102, m: 0x100, v: 4, kind: 'chest' }, 'Chain2 draws as chain');
@@ -104,7 +102,6 @@ test('APPEARANCES A PIECE IS ITS LOOK: the producers\' own pieces - a weapon, a 
   assert.equal(L.lookVariant(107, ARMOR_MATERIAL.Steel, 9), 5);
   assert.equal(L.lookOfPiece(artifact('The Mehrunes Razor')), null, 'an artifact wears its own record');
   assert.equal(L.lookOfPiece(mintGilded(DRAGONFIRE_OATH)), null, 'a Gilded piece its own gold');
-  assert.equal(L.lookOfPiece(createThunderlock()), null, 'a gun has one look');
   assert.equal(L.lookOfPiece({ ...createWeapon(WEAPONS.Dagger, 0), group: 'Armor' }), null, 'a group that is not its template\'s');
   assert.equal(L.lookOfPiece(setItemFields({ group: 'Armor', templateIndex: 520, material: 0 })), null, 'Roleplay & Realism\'s jerkin is no look');
 });
@@ -122,7 +119,7 @@ test('APPEARANCES THE SWEEP: every look in the pack, the wagon and the Materials
   assert.notEqual(me.appearances, was, 'a new list');
   assert.deepEqual(was, ['107.521.2', '112.0.0', '120.1.0', '130.5.0'], 'the old one untouched - a save\'s copy may share it');
   assert.deepEqual(me.appearances, ['107.521.2', '112.0.0', '120.1.0', '120.9.0', '130.5.0']);
-  assert.deepEqual(A.looksCount(me), { held: 5, total: 473 });   // PIN MOVED (AUDIT HORIZONTAL E3): 473 looks
+  assert.deepEqual(A.looksCount(me), { held: 5, total: 473 });
   me.appearances = ['120.1.0', 'nonsense', '999.0.0', 7];
   assert.deepEqual([...A.appearancesOf(me)], ['120.1.0'], 'a save\'s list read as looks there are');
   // the save
@@ -132,8 +129,6 @@ test('APPEARANCES THE SWEEP: every look in the pack, the wagon and the Materials
   const back = {};
   restorePlayer(back, JSON.parse(JSON.stringify(snap)));
   assert.deepEqual(back.appearances, ['120.1.0', '107.521.2'], 'and a load restores them');
-  assert.match(readFileSync(new URL('../../src/systems/save/save.js', import.meta.url), 'utf8'), /\n {2}'appearances',\n\];/, 'a field of ENTITY_FIELDS, copied both ways');
-  assert.match(readFileSync(new URL('../../src/ui/hud/hud.js', import.meta.url), 'utf8'), /drawRevenantCards\(\{ hidden: cursorActive[^\n]*\n {2}try \{ noteHeldLooks\(vitals\); \}[^\n]*\n {2}\/\/ LOOT-BANNER:/, 'swept once a frame on the HUD\'s one call, outside the skin\'s gate as the loot watcher is - every host, every skin');
 });
 
 test('APPEARANCES A LOOK WORN: of its kind only, off the item or the wire; the piece drawn as it - one copy a piece and look, made again when the slot or the look changes - its dye its metal\'s, an artifact\'s and a Gilded piece\'s own art dropped, its enchantments kept (mutants: the kind unchecked; the memo never kept; the memo never renewed; the dye kept; the artifact kept)', () => {
@@ -250,7 +245,7 @@ test('APPEARANCES THE WORDS: a look named by its metal (past the helm and shield
   assert.equal(A.slotName(EQUIP_SLOTS.LeftHand), 'Left hand');
   const groups = A.lookGroups(who([]));
   assert.deepEqual(groups.map((g) => g.kind), [...L.LOOK_KIND_ORDER]);
-  assert.equal(groups.reduce((n, g) => n + g.total, 0), 473);   // PIN MOVED (AUDIT HORIZONTAL E3)
+  assert.equal(groups.reduce((n, g) => n + g.total, 0), 473);
 });
 
 test('APPEARANCES THE FIELD AND THE MARK: `appearance` a declared item field, `{ t, m, v }` a look there is; the wearer\'s mark - a piece off the wire, a realm trade\'s record or a wild death\'s arrives in its own look (mutants: the field undeclared; a stray key passed; the mark not stripped)', () => {

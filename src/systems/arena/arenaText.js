@@ -1,11 +1,10 @@
-// ARENA1 (2026-10-02): THE ARENA'S WORDS, in one frozen table so a test can pin them (the gate chart's
-// GATE_CHART_TEXT is the precedent). Mac, 2026-10-02: "All aspects ... All UI elements and text must be enhanced UI
-// plus" - the lines here are said through the port's one box (ui/actionText.js ActionTextBox), which the enhanced
+// ARENA1: THE ARENA'S WORDS, in one frozen table so a test can pin them (the gate chart's
+// GATE_CHART_TEXT is the precedent). - the lines here are said through the port's one box (ui/actionText.js ActionTextBox), which the enhanced
 // skin draws as its notice panel (ui/enhanced/enhancedNotice.js) and the classic skin as Daggerfall's parchment.
 //
-// ARENA2 (2026-10-02): THE BOUTS' WORDS - the Herald's choice at the gate, his calls and verdicts on the sand, the
-// countdown, the crowd's barks, the HUD's labels and the refusals of a bout in play (bible/11-Multiplayer/Arena.md
-// "2. The fights", "4. The crowd"). The house tone (bible/10-UI/UI-Arc.md SITE2, the Plainer Menus pass): plain player
+// ARENA2: THE BOUTS' WORDS - the Herald's choice at the gate, his calls and verdicts on the sand, the
+// countdown, the crowd's barks, the HUD's labels and the refusals of a bout in play (
+// "2. The fights", "4. The crowd"). The house tone (SITE2, the Plainer Menus pass): plain player
 // English, short lines, " - " between clauses and never a long dash, no engine words. The crowd talks as an Iliac Bay
 // crowd would - rough, partisan, a little funny. Lines that take a name are functions; everything is frozen.
 

@@ -1,9 +1,9 @@
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE ROYAL TOURNEY, AS THE SERVICE KEEPS
+// CROWN1 part two: THE ROYAL TOURNEY, AS THE SERVICE KEEPS
 // IT - the Edict at a crown alone, its 5,000 escrowed at the Turning that makes it law; the pass over the ring two
 // contenders' games agree; each bout a winner's `t1` receipt brings, counted once and the same two three times a UTC
 // day; the ladder on the Seat tab; and at the Turning that ends its week the champion named, paid and titled for good
 // (worn with its crown and Season), or the prize home. Driven through the real Worker over node:sqlite with every
-// migration applied (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md 7.6; `06-Systems/Online-Arc.md` CROWN1.
+// migration applied (test/accountDb.mjs). 7.6; `06-Systems/Online-Arc.md` CROWN1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
@@ -150,7 +150,7 @@ test('CROWN1 THE CHAMPION: at the Turning that ends its week the ladder\'s first
   assert.deepEqual([minted.title, minted.ts], ['champion', [WAYREST.key, 0]]);
   const v = await verifyToken(minted.token, s.svc.identityPublic, { subtle, nowS: s.getNow() });
   assert.deepEqual([v.claims.t, v.claims.ts], ['champion', [WAYREST.key, 0]]);
-  assert.equal(seatTitleText('champion', minted.ts, (k) => (k === WAYREST.key ? WAYREST : null)), 'Champion of Wayrest');   // PIN MOVED (AUDIT-SEATS L7): with no Season counted, none named
+  assert.equal(seatTitleText('champion', minted.ts, (k) => (k === WAYREST.key ? WAYREST : null)), 'Champion of Wayrest');
   // a week with no bout won: the prize home
   assert.deepEqual((await s.call('/v1/seats/edict', { character: s.gm.character, key: WAYREST.key, edict: 'royal-tourney' }, s.gm)).body, { ok: true, next: 'royal-tourney' }, 'proclaimed again for week W + 3');
   s.watch(W + 2);

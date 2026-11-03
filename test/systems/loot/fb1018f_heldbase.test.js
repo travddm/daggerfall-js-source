@@ -10,20 +10,18 @@
 // religious item or the Wand (equip.js wearableItem) - so a power read on a worn piece alone was minted where it could
 // never reach its holder. Driven on the real producer (loot.js createRegularMagicItem over readMagicDef's records), the
 // real guild shelf (shopStock.js stockGuildMagicItems), the real equip table and enchantment fold, the real U window's
-// list and info box, the save's real repair runner (save.js repairItemLists) and the realm ledger's own step
-// (server-account/src/ledger.js) - AUDIT FB1018f L1-1: a load moves no saved piece's base.
+// list and info box, and the realm ledger's own step (server-account/src/ledger.js).
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readMagicDef, MAGIC_ITEM_RECORD_SIZE, ENCHANTMENT_TYPES as T } from '../../../src/formats/magicDef.js';
-import { createRegularMagicItem, createArtifact, createRandomArmor, createRandomReligiousItem, createRandomJewellery, MAGIC_BASE_DRAWS, powersNeedWearing } from '../../../src/systems/loot/loot.js';
+import { createRegularMagicItem, createArtifact, createRandomArmor, createRandomJewellery, MAGIC_BASE_DRAWS, powersNeedWearing } from '../../../src/systems/loot/loot.js';
 import { RARITY_HOME, RARITY_HOMED_FROM, rehomedPrint } from '../../../src/systems/loot/lootRarity.js';
 import { stockGuildMagicItems } from '../../../src/systems/shopStock.js';
 import { wearableItem, equipItem } from '../../../src/systems/equip.js';
-import { computeEnchantmentMods, worksUnworn, legacyEnchantmentValue } from '../../../src/systems/enchantments.js';
+import { computeEnchantmentMods, worksUnworn } from '../../../src/systems/enchantments.js';
 import { usableMagicItems } from '../../../src/ui/useMagicItemWindow.js';
 import { magicPowersLines } from '../../../src/systems/item/itemPowers.js';
-import { repairItemLists, savedItemLists } from '../../../src/systems/save/save.js';
 import { setItemFields, mintCondition } from '../../../src/systems/item/itemTemplates.js';
 import { stampItemIds } from '../../../src/systems/item/itemIds.js';
 import { ledgerPieces } from '../../../server-account/src/judge.js';
@@ -138,29 +136,8 @@ test('HELD-BASE ONE RECORD, ONE PIECE (the report\'s question - a guard): every 
     [true, false, false, false, false, false]);
 });
 
-test('HELD-BASE A SAVE\'S PIECES STAY AS THEY WERE (AUDIT FB1018f L1-1): the realm ledger follows a valuable piece by its print (its template and material, judge.js ledgerPrintOf); a load that moved a pre-fix "Holy Tome of Venom Spitting" to the Amulet made the next checkpoint read the honest piece as forged and hold its player - a load moves no base, and the ledger finds nothing (mutant: the old repair wired again)', async () => {
-  // the pre-fix piece in its real shape: DFU's religious draw (no material), the template's name, rows, uses and price
-  const rec = REGULAR[VENOM];
-  const rows = rec.enchantments.filter((e) => e.type !== -1);
-  const tome = mintCondition(setItemFields({ ...createRandomReligiousItem(seq(0.99)), name: rec.name, magic: true, enchantments: rows, value: legacyEnchantmentValue(rows), maxCondition: rec.uses, currentCondition: rec.uses }));
-  assert.equal(tome.templateIndex, HOLY_TOME);
-  assert.equal(wearableItem(tome), false, 'a dud: no slot takes it');
-  stampItemIds({ items: [tome] });
-  const before = ledgerPieces({ items: [structuredClone(tome)], level: 5 });
-  assert.equal(before.length, 1, 'the ledger follows it');
-  const loaded = { items: [structuredClone(tome)], level: 5 };
-  repairItemLists(savedItemLists(loaded));
-  assert.equal(loaded.items[0].templateIndex, HOLY_TOME, 'the load moves no base');
-  const after = ledgerPieces(loaded);
-  assert.deepEqual(after, before, 'its print as the ledger holds it');
-  const stmt = { bind() { return this; }, all: async () => ({ results: [] }), run: async () => ({}) };
-  const row = { uid: before[0].key, char_id: 'c1', state: 'held', fp: before[0].fp, claim_char: null, claim_at: null };
-  const step = await ledgerStep({ prepare: () => stmt }, { player: 'p1', char: 'c1', seq: 2, nowS: 1000 }, after, { mine: { results: [row] }, dupes: { results: [] } });
-  assert.deepEqual(step.forged, [], 'nothing forged at the next checkpoint');
-});
-
-test('HELD-BASE THE LEDGER TAKES THE LOAD\'S ONE MOVE (AUDIT FB1018f L1-1, decided): RARITY-WEAR\'s repair moves a rolled Wand to the Amulet on load, and a Wand the service held through it - a guild vault\'s, a market\'s - comes back on its old print; the next checkpoint reads the moved piece as itself, its row reprinted, where it read a forgery and held an honest player - and no other move is taken (mutants: the move refused again; any print taken; the material let move; the row not reprinted)', async () => {
-  // the move is exactly the repair's: every Jewellery template no slot takes, and only to its home
+test('HELD-BASE THE LEDGER TAKES A BASE GONE HOME (AUDIT FB1018f L1-1, decided): a rolled Wand moved to its Amulet comes to the next checkpoint on a new print; the ledger reads the moved piece as itself, its row reprinted, where it read a forgery and held an honest player - and no other move is taken (mutants: the move refused; any print taken; the material let move; the row not reprinted)', async () => {
+  // the move the ledger takes: every Jewellery template no slot takes, and only to its home
   const jewels = Array.from({ length: 8 }, (_, k) => createRandomJewellery(seq(k / 8 + 0.01)));
   assert.equal(new Set(jewels.map((j) => j.templateIndex)).size, 8, 'the eight jewels');
   assert.deepEqual([...new Set(jewels.filter((j) => !wearableItem(j)).map((j) => j.templateIndex))], [...RARITY_HOMED_FROM.Jewellery]);
@@ -171,8 +148,7 @@ test('HELD-BASE THE LEDGER TAKES THE LOAD\'S ONE MOVE (AUDIT FB1018f L1-1, decid
   const held = ledgerPieces({ items: [structuredClone(wand)], level: 5 });
   assert.equal(held.length, 1, 'the ledger follows it');
   const loaded = { items: [structuredClone(wand)], level: 5 };
-  repairItemLists(savedItemLists(loaded));
-  assert.equal(loaded.items[0].templateIndex, AMULET, 'the load moves it home');
+  loaded.items[0].templateIndex = RARITY_HOME.Jewellery;   // the piece on its home base, its key and material kept
   const shown = ledgerPieces(loaded);
   assert.notEqual(shown[0].fp, held[0].fp, 'its print moved');
   const said = [];

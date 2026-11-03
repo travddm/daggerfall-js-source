@@ -36,7 +36,6 @@ import { EYE_HEIGHT } from '../player/motor.js';   // DEATH3: the standing eye t
 import { isOnlinePage } from '../systems/online/onlineLane.js';   // DEATH4: the online screen counts down, the offline one waits
 import { stateDeathLoss, deathGoldLoss, deathPenaltyLine } from '../systems/deathPenalty.js';   // DEATH-PENALTY: the screen says what the respawn is about to take
 import { goldPiecesOf } from '../systems/inventory.js';   // DEATH-PENALTY: the purse the loss is read off
-import { wildDeath, wildDeathLines, WILD_DEATH_HOLD_S } from '../systems/wild/wildZone.js';   // WILD1: a death in the open zone holds two minutes, Enter or not
 import { noteFirstUse } from '../systems/tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
 import { t } from '../systems/textManager.js';   // L10N4: the classic face's words in the player's language
 
@@ -113,7 +112,7 @@ export class DeathScreen {
     // goes - a box pushed while it is up waits beneath (ui/windowStack.js
     // holdsTop), so the rise's replace takes THIS window, not the box.
     this.holdsTop = true;
-    // DUPE-LOAD (2026-10-11): the ONE window a quickload is pressed from under (its "F11 load" hint, FIX-E) - the world
+    // DUPE-LOAD: the ONE window a quickload is pressed from under (its "F11 load" hint, FIX-E) - the world
     // host's arm and routeKey's both ask this, and every other window keeps its keys, as DFU's HUD takes no QuickLoad
     // under a window. A load from under the pack, a loot window or a counter restored the save while the window still
     // held what it had taken off the old one, and its close handed it back: a drop doubled the purse every load.
@@ -129,18 +128,17 @@ export class DeathScreen {
     // AUDIT 28 B5: a host whose death never respawns online (the fixed city, the standalone dungeon) says so - its
     // screen counts no online respawn down and shows no loss it will never take
     this.online = online ?? isOnlinePage();
-    // BAL4 (bible/05-Combat/Balance-Arc.md section 6): AN OFFLINE DEATH PROJECT LEGACY WILL RAISE IS A RESPAWN TOO. The
+    // BAL4: AN OFFLINE DEATH PROJECT LEGACY WILL RAISE IS A RESPAWN TOO. The
     // host whose reset asks Legacy first hands `rises` (the outcome is decided before this screen goes up - Legacy's
     // onDeath runs first, playerEntity.js hearDeath); the fixed city and the standalone dungeon hand none, and never
     // rise. Read once, here: the screen says Rise where it said End the journey, and states the respawn's loss.
     this.rises = !this.online && !!rises?.();
-    // DEATH-PENALTY (Mac: "and it should be shown in the death screen"): the gold the respawn will take,
+    // DEATH-PENALTY: the gold the respawn will take,
     // read HERE, once - and STATED (systems/deathPenalty.js stateDeathLoss): the respawn takes exactly this, capped
     // at the purse, whatever the purse did while the player lay dead (AUDIT 28 B5: a mate's bounty clear pays the
     // dead too, and the respawn took its share of the bigger purse). A death with no respawn (the run ends) takes none.
     const respawns = this.online || this.rises;
-    // EG-H2 (bible/11-Multiplayer/Elite-Gates.md section 24): a made level whose law exempts DEATH-PENALTY (the Spire's -
-    // systems/madeLevel.js) hands `penalty: false`: the respawn takes nothing, so the screen states nothing
+    // A made level whose law exempts DEATH-PENALTY (systems/madeLevel.js) hands `penalty: false`: the respawn takes nothing, so the screen states nothing
     this.goldLoss = respawns && penalty !== false ? deathGoldLoss(goldPiecesOf(entity)) : 0;
     if (respawns) stateDeathLoss(this.goldLoss);
     this.goldLossLine = deathPenaltyLine(this.goldLoss);   // drawn ONCE: the enhanced face redraws every frame and the words must not change under the player
@@ -200,21 +198,16 @@ export class DeathScreen {
     if (this._view) { this._view.cam.pitch = this._view.pitch; this._view = null; }
     removeEnhancedDeath();   // AUDIT CONTRIB A4: the veil goes with the screen, not STALE_MS after it - the risen see at once
   }
-  /** WILD1 (systems/wild/wildZone.js): a death in the open zone - read live, since the world host says so the frame after the
-   *  screen goes up. The owner: "When a player dies by mobs he has to wait 2mins till respawn" - and at a player's hand
-   *  "the body ... disappears in 2 minutes and with it the player can only then respawn". */
-  get wild() { return this.online ? wildDeath() : null; }
-  /** DEATH6 / WILD1: the online wait - the body's minute, or the zone's two. WILD-REJOIN: less what a death the referee
-   *  told this page of had lain before it came back (systems/wild/wildZone.js `served`). */
-  get holdSeconds() { return this.wild ? WILD_DEATH_HOLD_S - (this.wild.served ?? 0) : ONLINE_RESPAWN_SECONDS; }
+  /** DEATH6: the online wait, the body's minute. */
+  get holdSeconds() { return ONLINE_RESPAWN_SECONDS; }
   /** DEATH4: whole seconds left before an online respawn, or null offline. */
   get respawnIn() {
     if (!this.online) return null;
     return Math.max(0, Math.ceil(this.holdSeconds - this.clock));
   }
   input(action) {
-    // ENTER ends the run now; the sequence's own reset is the timer. WILD1: not in the open zone - the dead wait there
-    if (action === 'confirm' && !this.wild) this.sequence.tick(DEATH_TIME_BEFORE_RESET + 1);
+    // ENTER ends the run now; the sequence's own reset is the timer
+    if (action === 'confirm') this.sequence.tick(DEATH_TIME_BEFORE_RESET + 1);
   }
   draw(renderer, canvas, font, s) {
     // FadeHUDToBlack over the death: the world dims to black behind
@@ -228,15 +221,8 @@ export class DeathScreen {
     if (isEnhanced() && typeof document !== 'undefined') { drawEnhancedDeath(this, fade); return; }
     const died = t('death.title', 'YOU HAVE DIED');
     drawText(renderer, font, died, (canvas.width - measureText(font.fnt, died) * s) / 2, canvas.height / 2 - 10 * s, s, [0.9, 0.2, 0.15, 1]);
-    const hint = this.online ? (this.wild ? t('death.risingInWild', 'RISING IN {n}', { n: this.respawnIn }) : t('death.risingIn', 'RISING IN {n}   ENTER now', { n: this.respawnIn })) : hintText(this.rises ? riseHint(this.hint) : this.hint);   // WILD1: no Enter in the zone   // AUDIT CONTRIB A5: the hold said out loud, as the enhanced face's "Rising in"   // BAL4: a Legacy rise's Enter raises
+    const hint = this.online ? t('death.risingIn', 'RISING IN {n}   ENTER now', { n: this.respawnIn }) : hintText(this.rises ? riseHint(this.hint) : this.hint);   // AUDIT CONTRIB A5: the hold said out loud, as the enhanced face's "Rising in"   // BAL4: a Legacy rise's Enter raises
     drawText(renderer, font, hint, (canvas.width - measureText(font.fnt, hint) * s) / 2, canvas.height / 2 + 6 * s, s, DIM);
-    // WILD1: the zone's lines on the classic face, under the hold (the enhanced face draws its own)
-    let wy = canvas.height / 2 + (this.goldLoss > 0 ? 38 : 22) * s;
-    for (const l of wildDeathLines(this.wild)) {
-      const up = l.toUpperCase();
-      drawText(renderer, font, up, (canvas.width - measureText(font.fnt, up) * s) / 2, wy, s, [0.85, 0.35, 0.25, 1]);
-      wy += 12 * s;
-    }
     if (this.goldLoss > 0) {   // DEATH-PENALTY: the classic face says it too, one line under the hold
       const loss = t('death.goldLoss', 'DEATH CLAIMS {gold} GOLD', { gold: this.goldLoss });
       drawText(renderer, font, loss, (canvas.width - measureText(font.fnt, loss) * s) / 2, canvas.height / 2 + 22 * s, s, [0.9, 0.2, 0.15, 1]);

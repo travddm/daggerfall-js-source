@@ -1,5 +1,4 @@
-// ENHANCED COMBAT VISUALS 1 (ECV1, 2026-09-07, Mac: "ill let you lead
-// this. This can fold into a new toggle Enhanced Combat Visuals").
+// ENHANCED COMBAT VISUALS 1 (ECV1, 2026-09-07).
 //
 // THE PROBLEM IT ANSWERS. An imp casts Chameleon on itself (its classic
 // spell list is Wizard's Fire, Free Action, Toxic Cloud and Chameleon -
@@ -11,8 +10,7 @@
 // between the cast and its next landed blow (which breaks a normal-
 // power concealment: EnemyAttack.cs:316-318 for a foe's blow on
 // anything, :255-257 on the player; WeaponManager.cs:549-552 the
-// player's). Mac: "the imp enemy type goes invisible and still can be
-// attacked" - it reads as a bug.
+// player's). - it reads as a bug.
 // It is DFU's rule, kept 1:1 on the classic lane (the A5 skip in every
 // foe draw). This is the ENHANCED lane's drawing of the same state.
 //
@@ -143,8 +141,7 @@ export function foePhase(foe) {
 }
 
 /**
- * INVIS-LOOK (2026-09-27, Mac: "Give invisibility the same invisibility
- * we give enemies in enhanced AI. That transparent look"). ANOTHER
+ * INVIS-LOOK. ANOTHER
  * PLAYER, CONCEALED. INVIS-NET put a player's concealment on the pose
  * (`cv`: 1 invisible, 2 blending, 4 a shade) and drew a concealed peer
  * as the A5 law draws a concealed foe - not at all. On this lane a peer

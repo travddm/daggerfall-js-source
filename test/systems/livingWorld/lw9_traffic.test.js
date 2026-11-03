@@ -1,4 +1,4 @@
-// LW9 (bible/06-Systems/Living-World-II.md "LW9"): THE ROAD'S TRAFFIC - the road's new travellers appended to the
+// LW9 ("LW9"): THE ROAD'S TRAFFIC - the road's new travellers appended to the
 // census (a farm's and a village's carters to market, their hunters into the wild, a city's patrol, its noble in
 // procession with their retainers, its minstrel), each job's tables, the one a traveller rides with, a carter's market
 // day, a hunter's wild, the inn on the road and its guests, the patrol's cover on trouble and its halt of a wanted
@@ -99,10 +99,8 @@ test('LW9 the census: the road\'s new traffic APPENDED after the first roster (L
 
 test('LW9 the tables and the lives: the road\'s new traffic\'s own pace, cycle, chance, reach and stay beside the first\'s (which stand whole), and its hazard (mutants: each row)', () => {
   assert.deepEqual({ ...ROAD_PACE }, { carter: 0.8, hunter: 1, patrol: 1, noble: 0.85, retainer: 0.85, minstrel: 0.95 });
-  // PIN MOVED (AUDIT LW-II F2): a minstrel's cycle six days - at four no trip of theirs ever fitted at the calendar's pace
   assert.deepEqual({ ...ROAD_CYCLE_DAYS }, { carter: 7, hunter: 4, patrol: 6, noble: 20, minstrel: 6 });
   assert.deepEqual({ ...ROAD_TRIP_CHANCE }, { carter: 0.8, hunter: 0.75, patrol: 0.95, noble: 0.6, minstrel: 0.8 });
-  // PIN MOVED (AUDIT LW-II E5): a carter's reach what a morning's walk fits (two pixels; its four were never walked)
   assert.deepEqual({ ...ROAD_RANGE_PX }, { carter: [1, 2], hunter: [1, 3], patrol: [3, 12], noble: [6, 18], minstrel: [3, 8] });
   assert.deepEqual({ ...ROAD_STAY_DAYS }, { carter: [0, 0], hunter: [0, 0], patrol: [0, 1], noble: [1, 2], minstrel: [1, 2] });
   assert.deepEqual({ ...ROAD_HAZARD }, { carter: 0.003, hunter: 0.01, patrol: 0.008, noble: 0.004, retainer: 0.008, minstrel: 0.006 });
@@ -260,7 +258,6 @@ test('LW9 the inn on the road: a roadside tavern within INN_REACH_PX of a way\'s
       assert.ok(g.trip.way.inns.some((x) => x.town.mapId === i2.mapId));
       assert.equal(partyAt(g.trip, g.inT).inn?.mapId, i2.mapId, 'in when it lodges');
       assert.ok(g.inT % DAY_MIN >= WALK_TO_H * 60 || g.inT % DAY_MIN < WALK_FROM_H * 60, 'in from nightfall');
-      // PIN MOVED (AUDIT LW-II E2): out as the party leaves - its day's walk come up to the inn, past first light (before,
       // out at first light, and nowhere till the walk came up)
       assert.ok(g.outT % DAY_MIN >= WALK_FROM_H * 60 && g.outT % DAY_MIN < WALK_TO_H * 60, 'out by day');
       assert.equal(partyAt(g.trip, g.outT - 1).inn?.mapId, i2.mapId, 'lodged till it goes');
@@ -323,8 +320,6 @@ test('LW9 the night\'s camps shared round one fire: camps within CAMP_SHARE_N on
   const party = (id, n) => ({ id, party: Array.from({ length: n }, (_, i) => ({ id: `${id}.${i}`, cls: null })), way: { pts: [[0, 0], [1, 0]], cum: [0, 1], len: 1, kinds: [] } });
   const A = { trip: party('a', 2), at: { x: 0, z: 0, camp: true } }, B = { trip: party('b', 3), at: { x: 1200, z: 0, camp: true } }, C = { trip: party('c', 1), at: { x: 9000, z: 0, camp: true } };
   const g = campGroups([C, B, A]);
-  // PIN MOVED (AUDIT LW-II-2 R4): each camp says whether its fire burns (`lit`: a party of it not halted)
-  // PIN MOVED (AUDIT LW-III): and its teams' one park - each party's first (`k0`), the camp's count, the first's turn
   const turn = (id) => campTurn({ id });
   assert.deepEqual(g.get('a'), { x: 0, z: 0, i0: 0, n: 5, first: true, lit: true, k0: 0, teams: 0, turn: turn('a') });
   assert.deepEqual(g.get('b'), { x: 0, z: 0, i0: 2, n: 5, first: false, lit: true, k0: 0, teams: 0, turn: turn('a') });
@@ -429,7 +424,7 @@ test('LW9 the days: a carter come to market keeps a stall from MARKET_STALL_H; a
 test('LW9 the host: the roads\' trouble world reads the patrol\'s cover, the town\'s visitors take the inn\'s guests at a roadside tavern, the stands the patrol\'s halt by the region\'s law; the layer keeps a lodged party out of the open (mutants: each seam)', async () => {
   const { readFileSync } = await import('node:fs');
   const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /covered: \(trip\) => livingCovered\(patrolCover\(trip, livingTripWorld/);   // PIN MOVED (AUDIT LW-II E1): a cover waiting on a round's way waits
+  assert.match(w, /covered: \(trip\) => livingCovered\(patrolCover\(trip, livingTripWorld/);
   assert.match(w, /town\.type === INN_TYPE \? innGuestsOf\(town, day, livingTripWorld, o\)/);
   // FIELD BUGS 2026-10-21d PATROL-GRACE: the region's law outside the grace an answered law gives (standing.js patrolHalts)
   assert.match(w, /wanted: \(res, trip\) => \(res\.job === 'patrol' && trip\?\.from\?\.region != null && patrolHalts\(playerEntity, trip\.from\.region/);
@@ -438,7 +433,7 @@ test('LW9 the host: the roads\' trouble world reads the patrol\'s cover, the tow
   assert.equal(paceScale(CALENDAR_MPM), 1);
 });
 
-// ═══ AUDIT LW-II (2026-10-10): LW9's findings, each pinned ═══
+// ═══ AUDIT LW-II: LW9's findings, each pinned ═══
 
 /** The host's trouble as world.js composes it - troubleOf with the patrol's cover, a cover waiting on a round's way no
  *  answer (undefined: townTrips waits), each trip's trouble kept once known (world.js `_livingFates`). */

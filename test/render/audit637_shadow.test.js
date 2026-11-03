@@ -1,5 +1,5 @@
-// AUDIT 637 (2026-10-06, Mac: "Audit this"), the shadow lens: PR #637's PERF-SHADOW1 (render/shadowPass.js - a
-// lantern's six faces sharing one walk), audited. bible/01-Overview/audits/Audit-637.md. The faces are held to the draws they
+// AUDIT 637, the shadow lens: PR #637's PERF-SHADOW1 (render/shadowPass.js - a
+// lantern's six faces sharing one walk), audited.. The faces are held to the draws they
 // made against the same pass with the pre-pass off (SHADOW_TUNING.facePrepass), and the savings by count. Never on a
 // clock.
 import { test } from 'node:test';
@@ -260,7 +260,6 @@ test('AUDIT 637 B2: UNDER THE STATIC CACHE TOO, a wood is asked of its quads onc
     }
     return { out, walks, faces };
   });
-  // PIN MOVED (PERF-VOL; AUDIT PERF-ARENA O2): BOTH arms ask every face afresh, as before the planes were named - with
   // the answers kept (bounds.js placementsInVolumeOf) a still lantern's faces walk the woods once, on the frame they
   // are named, so the kept answers would hide a dead pre-pass on every frame after; this pin holds the pre-pass, perfvol the memo
   SHADOW_TUNING.volumeMemo = false;

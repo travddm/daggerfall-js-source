@@ -1,4 +1,4 @@
-// SD4a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 5): THE SUPER DUNGEON'S
+// SD4a: THE SUPER DUNGEON'S
 // DIFFICULTY (world/superDungeon/sdDungeon.js) - the port's hardest. A Hollow is a Super dungeon by its location's word
 // (systems/dungeon/dungeonTier.js), read once by the dungeon host: three foes at every enemy marker as an Elite's, each x4
 // health and x2.5 damage, its random foes rolled at the encounter tables' top band and a class foe built at the band's
@@ -35,8 +35,8 @@ const fnSrc = (name) => {
 /** The host's applyEliteScaling and eliteLootOpts, run over the real laws. */
 function hostScale() {
   const body = `${fnSrc('eliteLootOpts')}\n${fnSrc('applyEliteScaling')}\nreturn { eliteLootOpts, applyEliteScaling };`;
-  return new Function('promoteEliteFoe', 'scaleSuperFoe', 'applyChampion', 'SUPER_LOOT_OPTS', 'ELITE_LOOT_DROP_MULT', 'ELITE_LOOT_QUALITY_MULT', 'ELITE_HEALTH_SCALE', 'ELITE_DAMAGE_SCALE', '_wildDungeon', '_wildRing', 'wildLootOpts', 'eliteTraits', body)(
-    promoteEliteFoe, scaleSuperFoe, applyChampion, SUPER_LOOT_OPTS, ELITE_LOOT_DROP_MULT, ELITE_LOOT_QUALITY_MULT, ELITE_HEALTH_SCALE, ELITE_DAMAGE_SCALE, false, 0, (o) => o, eliteTraits);   // BOSS-TRAITS: an elite's trait, off the pick's seed   // WILD1: a dungeon out of the open zone
+  return new Function('promoteEliteFoe', 'scaleSuperFoe', 'applyChampion', 'SUPER_LOOT_OPTS', 'ELITE_LOOT_DROP_MULT', 'ELITE_LOOT_QUALITY_MULT', 'ELITE_HEALTH_SCALE', 'ELITE_DAMAGE_SCALE', '_oceanBand', 'eliteTraits', body)(
+    promoteEliteFoe, scaleSuperFoe, applyChampion, SUPER_LOOT_OPTS, ELITE_LOOT_DROP_MULT, ELITE_LOOT_QUALITY_MULT, ELITE_HEALTH_SCALE, ELITE_DAMAGE_SCALE, null, eliteTraits);   // BOSS-TRAITS: an elite's trait, off the pick's seed   // WILD1: a dungeon out of the open zone
 }
 const foe = (over = {}) => ({ maxHealth: 60, health: 60, level: 10, mobileType: 20, team: 'Monster', ...over });
 
@@ -93,21 +93,23 @@ test('SD4a the list: a Super dungeon\'s layout rolled at the band, three at ever
   assert.equal(pickDungeonElites([foe(), foe()], 1, { count: 0 }), 0);
 });
 
-test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health the dungeon\'s and the elite\'s added (x9), its damage the dungeon\'s and the elite\'s extra (x4.5) - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', () => {
-  assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [SUPER_HEALTH_SCALE + ELITE_FOE_HEALTH_MULT, SUPER_DAMAGE_SCALE + (ELITE_FOE_DAMAGE_MULT - 1)]);
-  assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [ELITE_HEALTH_SCALE + ELITE_FOE_HEALTH_MULT, ELITE_DAMAGE_SCALE + (ELITE_FOE_DAMAGE_MULT - 1)], 'the Elite\'s own, read the same way');
+test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health x9, its damage x4.5 - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', () => {
+  // The dungeon stacks are their own numbers: they stay put when the open world's elite multiples (ELITE_FOE_HEALTH_MULT) move.
+  assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [9, 3]);   // PIN MOVED: B6 (the blows 4.5 -> 3)
+  assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [7, 2.6], 'the Elite\'s own');
+  assert.ok(ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT > SUPER_HEALTH_SCALE && ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT > ELITE_HEALTH_SCALE, 'each above the dungeon\'s own doubling');
   const s = foe();
   assert.ok(promoteEliteFoe(s, { eliteDungeon: true, superDungeon: true, checkLevel: false }));
-  assert.deepEqual([s.maxHealth, s.damageScale], [540, 4.5]);
+  assert.deepEqual([s.maxHealth, s.damageScale], [540, 3]);   // PIN MOVED: B6 (4.5 -> 3)
   const el = foe();
   promoteEliteFoe(el, { eliteDungeon: true, checkLevel: false });
-  assert.deepEqual([el.maxHealth, el.damageScale], [420, 4]);
+  assert.deepEqual([el.maxHealth, el.damageScale], [420, 2.6]);   // PIN MOVED: B6 (4 -> 2.6)
   const plain = foe();
   promoteEliteFoe(plain);
-  assert.deepEqual([plain.maxHealth, plain.damageScale], [300, 3]);
+  assert.deepEqual([plain.maxHealth, plain.damageScale], [60 * ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT]);
   const pup = foe({ damageScale: 1 });
   promoteEliteFoe(pup, { own: false, superDungeon: true });
-  assert.deepEqual([pup.maxHealth, pup.damageScale], [60, 4.5], 'a puppet: its owner\'s maximum, the Super\'s blows');
+  assert.deepEqual([pup.maxHealth, pup.damageScale], [60, 3], 'a puppet: its owner\'s maximum, the Super\'s blows');
 });
 
 test('SD4a the host\'s scale and loot, run: a Super record x4 / x2.5 with the Elite mark, its elite x9 / x4.5, its body +50% - an Elite record and a plain one as they were (mutants: the Super\'s scale lost; the Elite\'s doubling in a Super; the loot the Elite\'s)', () => {
@@ -117,7 +119,7 @@ test('SD4a the host\'s scale and loot, run: a Super record x4 / x2.5 with the El
   assert.deepEqual([sup.maxHealth, sup.damageScale, sup.elite, sup.healthMult], [240, 2.5, true, 4]);
   const supElite = foe();
   applyEliteScaling(supElite, { elite: true, superTier: true, eliteFoe: true });
-  assert.deepEqual([supElite.maxHealth, supElite.damageScale, supElite.eliteFoe, supElite.elite], [540, 4.5, true, true]);
+  assert.deepEqual([supElite.maxHealth, supElite.damageScale, supElite.eliteFoe, supElite.elite], [540, 3, true, true]);
   const refused = foe({ team: 'PlayerAlly' });
   applyEliteScaling(refused, { elite: true, superTier: true, eliteFoe: true });
   assert.deepEqual([refused.maxHealth, refused.damageScale, !!refused.eliteFoe], [240, 2.5, false], 'a refused promotion falls through to the Super\'s scale');
@@ -144,16 +146,16 @@ test('SD4a the host by source: the tier read once by its one law before the fire
   const tier = DC.indexOf('const _superTier = ');
   const fires = DC.indexOf('  const firePlan = isGateArena(dfLocation)');
   assert.ok(tier > 0 && fires > tier, 'read before the fires');
-  assert.match(DC.slice(fires, fires + 1200), /\n {4}cold: _superTier(?: \|\| _sdRealm)?,[^\n]*\n {2}\}\);/);   // SD5a (PIN MOVED): and the Shattered Hour's
+  assert.match(DC.slice(fires, fires + 1200), /\n {4}cold: _superTier(?: \|\| _sdRealm)?,[^\n]*\n {2}\}\);/);   // SD5a (
   assert.match(DC, /playerLevel: _superTier \? superFoeLevel\(effectiveLevel\(playerEntity\)\) : effectiveLevel\(playerEntity\),[^\n]*SOFTCAP2: a mentor's dungeon/, 'the layout\'s roll');
   assert.match(DC, /playerLevel: _superTier \? superFoeLevel\(effectiveLevel\(playerEntity\)\) : effectiveLevel\(playerEntity\),[^\n]*SOFTCAP2: mentor mode/, 'the rest\'s roll');
   assert.match(DC, /D\.makeEnemyEntity\(e\.mobileType, basics, await D\.loadEnemyCareer\(e\.mobileType, D\.fetchBytes\), e\.level \?\? \(_superTier \? superFoeLevel\(effectiveLevel\(D\.playerEntity\)\) : effectiveLevel\(D\.playerEntity\)\)\);/, 'a class foe at the band (a revenant\'s or a bout\'s own level first)');
   assert.match(DC, /const enemies = dfLocation\?\.elite \|\| _superTier[^\n]*\n {4}\? expandEliteEnemies\(_layoutEnemies, \{\n {6}copies: ELITE_FOE_MULTIPLIER,/);
   assert.match(DC, /\n {2}if \(_superTier\) for \(const e of enemies\) e\.superTier = true;/);
   assert.ok(DC.indexOf('if (_superTier) for (const e of enemies) e.superTier = true;') < DC.indexOf('if (elitesAllowed({ onlinePage: isOnlinePage()'), 'marked before the pick and every build');
-  // PIN MOVED (AUDIT BAL, bible/05-Combat/Balance-Arc.md section 10): and offline the class foes' built level for ELITE-FLOOR
-  assert.match(DC, /pickDungeonElites\(enemies, [^\n]*\{ elite: !!dfLocation\?\.elite, count: _superTier \? SUPER_ELITE_FOES : null, classLevel: _eliteOnline \? Infinity : [^\n]*\}\);/);
-  assert.match(DC, /generateLootItems\(lootKey, [^\n]*, rolls, _superTier \? \{ itemChanceScale: SUPER_LOOT_DROP_MULT \} : elite \? \{ itemChanceScale: ELITE_LOOT_DROP_MULT \} : \{\}\);/);   // PIN MOVED (PARTY-LOOT): on the roll's own dice - a room's base its seeded ones
+  assert.match(DC, /pickDungeonElites\(enemies, [^\n]*\{ elite: !!dfLocation\?\.elite, count: _superTier \? SUPER_ELITE_FOES : null, classLevel: _eliteClassLevel \}\);/);
+  assert.match(DC, /\n {2}const _eliteClassLevel = _eliteOnline \? Infinity : \(_superTier \? superFoeLevel\(effectiveLevel\(playerEntity\)\) : effectiveLevel\(playerEntity\)\);\n/, 'the class foes\' level, one reading for the pick and the roll');
+  assert.match(DC, /markDungeonPromotions\(enemies, [^\n]*\{ eliteOpen: [^\n]*&& !dfLocation\?\.elite && !_superTier, classLevel: _eliteClassLevel \}\);/, 'an ordinary dungeon rolls its elites and champions per foe; an Elite or Super dungeon places its elites by count');
+  assert.match(DC, /generateLootItems\(lootKey, [^\n]*, rolls, _superTier \? \{ itemChanceScale: SUPER_LOOT_DROP_MULT \} : elite \? \{ itemChanceScale: ELITE_LOOT_DROP_MULT \} : \{\}\);/);
   assert.match(DC, /qualityMult: _superTier \? SUPER_LOOT_QUALITY_MULT : elite \? ELITE_LOOT_QUALITY_MULT : 1,/);
-  assert.match(read('bible/11-Multiplayer/Super-Dungeons.md'), /### SD4a - shipped 2026-10-07/);
 });

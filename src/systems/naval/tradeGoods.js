@@ -1,14 +1,12 @@
 // @ts-check
-// CAPT-TRADE (2026-10-11, the owner: "giving a reason to players to experience it" - and, of the Eltheric Ocean, "exotic
-// resources"; bible/03-World/Captains-Sea.md CAPT-TRADE) - THE EXCHANGE: goods bought cheap where they are made and sold
+// CAPT-TRADE - THE EXCHANGE: goods bought cheap where they are made and sold
 // dear where they are wanted, carried in a ship's hold (Come Sail Away's cargo, its weight on her way). The port's own -
 // Daggerfall's shops buy a captain's cargo at its value and no more.
 //
 // THE GOODS: the Bay's eight - each crown MAKES some (`CROWN_TRADE` - MADE_K of a good's base) and WANTS others (WANT_K);
 // every port twists its crown's trade by one good of its own (`portTrade`, off its key); and the Eltheric Ocean's three,
 // made on its isles alone (the Eltheric Ocean's freeports - ETHER-PORTS) and wanted in every port of the Bay. ISLE-TRADE
-// (2026-10-17, the owner: "make it so each island does sell at least one normal exchange product so you could feasibly
-// live and trade out in the veil"): and every isle's freeport makes one good of the Bay besides (`isleGood`, off its key),
+// and every isle's freeport makes one good of the Bay besides (`isleGood`, off its key),
 // sold there as any port sells what it makes - so an isle's exchange is a market of the Veil's own, and a captain can
 // carry one isle's good to the next isle that wants it without crossing back to the Bay. A day's price
 // drifts PRICE_DRIFT about it, the same for every client on the world's day; the exchange sells at SPREAD over it and buys at
@@ -19,8 +17,7 @@
 // template from GOODS_TEMPLATE on, stackable, its weight and its base price the row's: a cask of wine in a pack or a
 // hold is a cask of wine, sold at any shop at its base like any item.
 //
-// CREW-TRADE (2026-10-23, the owner: "add crew as a resource that can be sold and traded"; asked, the owner chose the
-// exchange alone, a headcount, at a price that varies by port - bible/03-World/Captains-Sea.md CREW-TRADE): and CREW, a
+// CREW-TRADE: and CREW, a
 // row of the exchange that is no item. A port has sailors to spare, is short of them, or neither (`crewStandOf`, off its
 // key; an isle of the Veil always short), and prices a man as any good by that stand and the day's drift (`priceOf`);
 // the exchange signs men on to the ship at the quay and takes them off her (systems/naval/crewTrade.js - her side of it).
@@ -124,7 +121,7 @@ const BAY = GOODS.filter((g) => !g.ether).map((g) => g.id);
 const ETHER = GOODS.filter((g) => g.ether).map((g) => g.id);
 
 /**
- * ISLE-TRADE (2026-10-17): the good of the Bay an Eltheric isle's freeport makes - one of the eight, drawn off its key
+ * ISLE-TRADE: the good of the Bay an Eltheric isle's freeport makes - one of the eight, drawn off its key
  * (`etherPortOf`'s `"px,py"`, scenes/world.js) on its own scrambled draw: a plain `hash % 8` gave neighbouring isles the
  * same few goods (Veilhaven and its five nearest: silver, iron, iron, wine, silver, iron), the draw an even spread (the
  * 234 ports within 400 px of Veilhaven, 19 to 34 of each good). The same on every client, as the key is.
@@ -187,7 +184,7 @@ export function priceOf(port, id, day) {
  * its price, its stand, and how many more it sells (`sells`) and buys (`buys`) today - `dealt` the captain's dealing
  * here today: `{ bought: { id: n } }` from the exchange, `{ sold: { id: n } }` to it. CAPTAIN-TREE: `edge` the share of the
  * SPREAD the captain's dealing closes (systems/naval/captainTree.js `trade`, to TRADE_MOST): each price nearer the
- * good's middle, the exchange still buying under what it sells. SEA-TRADE (bible/06-Systems/Town-Economy-Arc.md section
+ * good's middle, the exchange still buying under what it sells. SEA-TRADE (section
  * 8): `town` the port town's economy, online (net/townEconLaw.js townExchangeFactors - `ask` on what it sells, `pay` on
  * what it pays, the pay never above the ask), or null (offline, an isle of the Veil: no town economy) - the prices as
  * they were. CREW-TRADE: `crew` - and crew's row first, priced, spread and stocked as a good's (crewTrade.js crewRowOf

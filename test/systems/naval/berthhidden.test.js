@@ -1,11 +1,10 @@
-// BERTH-HIDDEN (2026-10-04 - found chasing Mac's "The classic style ship is broken. its two ships clipped inside of
-// eachother", which was the sailing cabin's: test/systems/comeSailAway/fb1003b_cabinhull.test.js) - a ship made fast at a port's quay, out of sight,
+// BERTH-HIDDEN - a ship made fast at a port's quay, out of sight,
 // read as a free berth. Come Sail Away hides a boat more than a map pixel off
 // and every one while the player is indoors (comeSailAway.js UpdateBoatVisibility), and the berths asked only the boats
 // it shows: from HARBOUR_STAND (1,200 m off the mouth - two pixels from her, coming in) the port's roll moored its own
 // ship at her berth, and as the player came within a pixel she stood again inside it. A berth asks of every boat of
 // mine placed outdoors, shown or not (scenes/naval/navalHost.js berthBoats), and of another player's boat hidden under its
-// owner at its helm. bible/03-World/Holdings.md section 7.
+// owner at its helm.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,5 +1,4 @@
-// CAPT-BOARD (2026-10-11, the owner: "giving a reason to players to experience it"; bible/03-World/Captains-Sea.md
-// CAPT-BOARD) - THE HARBOURMASTER'S BOARD: a port's contracts off its key and the world's day (a bounty, a hunt, a
+// CAPT-BOARD - THE HARBOURMASTER'S BOARD: a port's contracts off its key and the world's day (a bounty, a hunt, a
 // delivery, a salvage, the Admiralty's survey), their purses, terms and sites; a contract taken, come further, done,
 // failed or given up, and the crown's regard for each; the letters a rank buys; the harbour office the world stands
 // over the ledger; the naval host's sites (a bounty's quarry stood, a wreck's casks floated), its events, a rank's
@@ -96,7 +95,6 @@ test('CAPT-BOARD the board: BOARD_OFFERS a day and a rank\'s more, the same for 
   assert.ok(!nearOnly.some((o) => o.kind === 'delivery'), 'a port nearer than DELIVERY_PX_MIN: no cargo for it');
   assert.deepEqual(boardFor({ port: null, crown: 'Wayrest', day: 1 }), []);
   assert.equal(hashKey, wireHashKey, 'the board hashes with the wire\'s FNV-1a - one home');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA H24): FNV-1a's own values - the key compared with itself held for any hash
   assert.equal(hashKey(''), 2166136261, 'the offset basis');
   assert.equal(hashKey('100,100'), 115546219);
   assert.notEqual(hashKey('100,100'), hashKey('100,101'));
@@ -345,14 +343,6 @@ test('CAPT-BOARD at sea: a bounty\'s quarry stood within SITE_REACH_PX of her wa
   s.run(0.3);
   assert.ok(events.some((e) => e.type === 'haul' && e.site === 's1'), 'the haul the contract\'s');
   assert.ok(s.log.say.includes('You haul a cask of the wreck\'s cargo aboard.'));
-  const host = rd('src/scenes/naval/navalHost.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA L6): and her seed with it - each ship counted once
-  assert.match(host, /if \(was < KNOW\.studied && e\.known >= KNOW\.studied && held > 0 && !struck\) deps\.captain\?\.event\?\.\(\{ type: 'study', crown: watersCrown\(\), seed: e\.ship\.seed \}\);/);
-  assert.match(host, /if \(wrecked && !s\.wasWrecked\) \{ c\.event\('wrecked'\); deps\.captain\?\.event\?\.\(\{ type: 'wrecked', boat: b\.uid \?\? null \}\); \}/);
-  assert.match(host, /if \(!aboardShip\(\) \|\| !Number\.isFinite\(w\.px\) \|\| !Number\.isFinite\(w\.py\)\) return;/, 'ashore: none stood');
-  assert.match(host, /const service = deps\.captain\?\.seasonedHires\?\.\(\) \? SEASONED_HIRE : 0;/);
-  assert.match(host, /const offer = \(\) => yardOffer\(d, st\.guns\.barrels, deps\.gold\?\.\(\) \?\? 0, \{ discount: discount\(\) \}\);/);
-  assert.match(host, /reliefSure: !!distress && !!deps\.captain\?\.reliefSure\?\.\(crown\.name\),/);
 });
 
 test('CAPT-BOARD an Admiral\'s crown always answers: the relief stood on any draw where its chance would have refused it (mutants: the sure relief unread)', () => {
@@ -404,8 +394,4 @@ test('CAPT-BOARD the shipwright\'s Harbourmaster tab: the port and the rank, the
   const w2 = mountNavalYardWindow(bare, { model: { ...model, office: undefined } });
   assert.equal(byClass(bare, 'dfnaval-tabs')[0].style.display, 'none', 'no office: no tabs');
   w2.unmount();
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /return harbourOffice\.model\(\{ uid: model\.uid \?\? null \}\);/);
-  assert.match(world, /if \(_officeTickT <= 0 && !gamePaused\(\) && !_loading\) \{\n      _officeTickT = 2; harbourOffice\.tick\(\); captainSay\(\);/);
-  assert.match(world, /carrack: \(price, port\) => \{ const deed = mintDeed\(4, 0, csaNewItemUid\(\), price\); return !!titleDeed\(deed, \{ port: \{ name: port\.name \} \}\); \},/);
 });

@@ -1,4 +1,4 @@
-// FOE-BOUNDS and GRANT-ASKS (2026-10-19, Mac: "Spec + B + A"; bible/11-Multiplayer/Spawn-Grants.md sections 19 and 21):
+// FOE-BOUNDS and GRANT-ASKS:
 // THE RELAY'S OWN COUNT OPENS A CASE (server-account/src/grants.js) - a record the relay itself stripped because no
 // builder could give it opens the case on its sender alone, its evidence on the line; an account's own asks far past its
 // budget in one cell's window do too; one batch's findings on one account are ONE line (a case line is keyed by its
@@ -20,7 +20,7 @@ const hex16 = () => [...crypto.getRandomValues(new Uint8Array(8))].map((x) => x.
 const ENC_ALLOW = Math.ceil(GRANT_KINDS.enc.cap + GRANT_KINDS.enc.rate * GRANT_RATE_SPAN_MIN_S);
 
 async function rig() {
-  const s = await standService({ DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const aged = async (handle) => { const p = await s.registered(handle); raw.prepare('UPDATE players SET created_at = created_at - ?1 WHERE id = ?2').run(60 * 86400, p.id); return p.id; };
   /** One cell's window: tallies [reader, sender, reason, n, evidence?], asks [account, kind, how many]. */

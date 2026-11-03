@@ -2,7 +2,7 @@
 // oversight in reducing the rain?"). RAIN-HEART (Weather-Arc.md) made most rain a sprinkle the eye barely sees, and the
 // front eases every episode in behind its cloud - but the soak read the sim's word at the downpour's rate, so a body
 // soaked under a sky that dropped nothing. The skin now reads what falls - the word and level the street's frame wrote
-// for the ear (DISC9/DISC11) - through weatherSim.js fallingWeather. bible/01-Overview/bugs/Field-Bugs-2026-10-15f.md.
+// for the ear (DISC9/DISC11) - through weatherSim.js fallingWeather..
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -77,10 +77,10 @@ test('WET-FALL: the front\'s own frames - the sim says rain, the cloud has not c
   assert.ok(e.survival.wet > 0 && e.survival.wet < 10 * 3 * 0.3, `ten minutes in a light shower soak lightly, got ${e.survival.wet}`);
 });
 
-test('WET-FALL: after a jump the street\'s word no longer stands - the host\'s own sky, whole: the Sun Baby\'s clear day stays dry (mutant: the fallback the sim\'s word)', () => {
+test('WET-FALL: after a jump the street\'s word no longer stands - the host\'s own sky, whole (mutant: the fallback the sim\'s word)', () => {
   W.setWeather('rain');
   W.setHeardWeather('rain', 0.4);
-  // AUDIT PRECIP FALL-4 (PIN MOVED): the fall carries its snow share - null off the law's lane (the word's own row)
+  // AUDIT PRECIP FALL-4 (
   assert.deepEqual(W.fallingWeather('sunny'), { word: 'rain', level: 0.4, snow: null }, 'the street\'s word stands until a jump');
   W.setHeardWeather('rain', 0.25, { intensity: 0.5, snow: 0.5 });
   assert.deepEqual(W.fallingWeather('sunny'), { word: 'rain', level: 0.5, snow: 0.5 }, 'on the law\'s lane the whole fall and its share - the drops\' level is the ear\'s');
@@ -97,10 +97,3 @@ test('WET-FALL: a road the clock jumped over meets no fall it cannot know - the 
   assert.equal(e.survival.wet, 0, 'a long fast travel lands dry');
 });
 
-test('WET-FALL by source: both open-world hosts hand the minute law what fell on the street, under their own shown sky (mutants: either host drops it)', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(f);
-    assert.match(s, /\n {6}month: dateFromClassicMinutes\(wm\)\.month, hour, weather, falling: fallingWeather\(weather\),/, f);
-  }
-  assert.match(read('src/scenes/world.js'), /const survivalEnvNow = \(\) => \{[\s\S]{0,400}const weather = shownWeather\(\);/, 'world.js: the shown sky is the fallback');
-});

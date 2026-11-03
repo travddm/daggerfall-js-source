@@ -1,5 +1,4 @@
-// DA9 (2026-09-29, Mac: "How can we drastically improve the install
-// experience? ... I really want to make it AAA grade"): THE SHELL LOOKS
+// DA9: THE SHELL LOOKS
 // BEFORE IT ASKS, AND KNOWS A WHOLE FOLDER FROM A PART OF ONE.
 //
 // TWO FAULTS, ONE FILE.

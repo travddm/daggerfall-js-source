@@ -1,5 +1,4 @@
-// SCALE4d (2026-10-10, Mac: "we just hit 500 online people. I think its time to scale up our server and improve
-// performance for more people"; bible/11-Multiplayer/Scale-Arc.md SCALE4d): THE TOKEN'S READS OFF THE ONE PRIMARY. A
+// SCALE4d: THE TOKEN'S READS OFF THE ONE PRIMARY. A
 // relay deploy asks every player's token in the same minute, and a mint is a dozen reads - the wave that overloaded the
 // account database twice on 2026-10-06 (STORM-SHED). The mint now runs on ONE D1 session (server-account/src/service.js
 // replicaDb, REPLICA_ROUTES): its first statement, the session lookup, the primary's; every read after it a read
@@ -59,16 +58,14 @@ test('SCALE4d the mint runs on ONE D1 session opened first-primary - its first s
   const [s] = raw._sessions;
   assert.equal(s.constraint, 'first-primary', 'its first statement the primary\'s');
   assert.match(s.statements[0], /FROM sessions s LEFT JOIN players p/, 'and that first statement is the session lookup');
-  // PIN MOVED (SCALE4f): a realm character's mint is five statements here - the session, Renown, the guild, its realm row
   // (the four reads of it folded into one, realm.js realmMintFacts) and the rating; it was eight
   assert.ok(s.statements.length >= 5, `a realm character's mint - the session, Renown, guild, its realm row and rating - rides it (${s.statements.length})`);
   // AUDIT SCALE4d A1: the arena's and Iliac Hand's honours - the one read-then-write a mint makes (a stale #1 counted
   // again and stored) - on the binding, and nothing else of the mint
   // (the board a #1 is counted over reads arena_pvp, as the token's own rating read does - that one is a claim read, and
   // rides the session; the honours' own tables are the Grand Champion's, the kept #1s and Iliac Hand's)
-  // PIN MOVED (EG-E2): and the Spire Champions' - the kept last season's (eg_champions), kept first off that season's
   // Descent (eg_runs) the first time a read of the new season finds it unkept: the same read-then-write, on the binding
-  const honours = /arena_pve|arena_champions|iliac_|eg_champions|gambit_/, onBinding = /arena_pve|arena_champions|arena_pvp|iliac_|eg_champions|eg_runs|gambit_/;   // PIN MOVED (KG6): and The King's Gambit's (gambit.js), Iliac Hand's twin
+  const honours = /arena_pve|arena_champions|iliac_|eg_champions|gambit_/, onBinding = /arena_pve|arena_champions|arena_pvp|iliac_|eg_champions|eg_runs|gambit_/;
   assert.ok(asked.some((q) => honours.test(q)), 'the honours read on the binding');
   assert.deepEqual(asked.filter((q) => !onBinding.test(q)), [], 'nothing but the honours on the binding');
   assert.deepEqual(s.statements.filter((q) => honours.test(q)), [], 'and none of them on the session');
@@ -80,20 +77,18 @@ test('SCALE4d every other route stays on the binding - no session opened (mutant
   raw._sessions.length = 0;
   // AUDIT SCALE4d D3: real routes, each answered 200 (two of these four were routes the service never served - a 404 opens
   // no session either, so they proved nothing)
-  // PIN MOVED (SCALE4g): the heartbeat and the realm's list ride a session now (test/server/scale4g.test.js) - the beat's own
   // route and Renown's, both writes, stay on the binding
   for (const [path, body] of [['/v1/account/played', {}], ['/v1/renown/xp', { character: R.id, xp: 1 }]]) {
     const r = await S.call(path, body, who.secret);
     assert.equal(r.status, 200, `${path} answered (${JSON.stringify(r.body)})`);
   }
   assert.equal(raw._sessions.length, 0, 'no session for either write');
-  // PIN MOVED (DISPLAY-REPLICA, 2026-10-13): the realm's lines ride a session now (test/server/display_replica.test.js); PIN MOVED
   // (YARDS-REPLICA, 2026-10-16): and a town's yards, which an isolate keeps for every caller, ride ONE session of their
   // own - any instance's, the route itself on the binding (test/yards_replica.test.js holds the rest)
   const yards = await S.fetch('https://accounts.invalid/v1/homes/yards', { method: 'POST', headers: { authorization: `Bearer ${who.secret}`, 'content-type': 'application/json' }, body: '{"mapId":1}' });
   assert.equal(yards.status, 200, 'a town\'s yards answered');
   assert.deepEqual(raw._sessions.map((x) => x.constraint), ['first-unconstrained'], 'the yards\' read on a session of its own');
-  assert.match(raw._sessions[0].statements.join('\n'), /LEFT JOIN home_yards_ver v ON v\.map_id = q\.m LEFT JOIN home_yards y/);   // PIN MOVED (YARD-SNAP; AUDIT LEAN-READS 2 B3): the town's version and built row
+  assert.match(raw._sessions[0].statements.join('\n'), /LEFT JOIN home_yards_ver v ON v\.map_id = q\.m LEFT JOIN home_yards y/);
 });
 
 test('SCALE4d the claims a session mints are the claims the binding mints - byte for byte, the same token (mutant: none; the oracle is the binding)', async () => {
@@ -121,7 +116,7 @@ test('SCALE4d a mint on a session is still a mint\'s statements on its metrics p
   assert.equal((await S.call('/v1/auth/token', { character: R.id, guild: true }, who.secret)).status, 200);
   const p = points.find((x) => x.indexes[0] === '/v1/auth/token');
   assert.ok(p, 'the mint wrote its point');
-  assert.ok(raw._sessions[0].statements.length >= 5);   // PIN MOVED (SCALE4f): five, the realm row's four reads in one
+  assert.ok(raw._sessions[0].statements.length >= 5);
   assert.equal(p.doubles[2], raw._sessions[0].statements.length + asked.length, 'every statement the session ran, counted - beside the honours\' on the binding (AUDIT SCALE4d A1)');
   assert.ok(p.doubles[2] >= 6, `a realm character's mint (${p.doubles[2]})`);
 });

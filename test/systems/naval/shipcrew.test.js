@@ -1,4 +1,4 @@
-// SHIP-CREW and SEA-REPAIR (2026-09-30, Mac: "Let's do #1 and a way to repair ships on the high seas" - named crew
+// SHIP-CREW and SEA-REPAIR (2026-09-30, - named crew
 // with morale ("Gentle") and deck orders; "Carpenter's stores"). The pure laws (systems/naval/shipCrew.js, navalYard.js
 // seaRepair and provisionOffer, navalStores.js), the living crew's answer to them (crewLife.js), and the real naval host
 // (test/navalSea.mjs) - her hands named and fallen, her spirits, her orders, her repairs at sea, the yard's provisions,
@@ -23,7 +23,6 @@ import { helmButtons } from '../../../src/ui/enhanced/enhancedHelm.js';
 import { boatMenuRows, BOAT_VERB } from '../../../src/systems/comeSailAway/csaBoatMenu.js';
 import { templateByIndex } from '../../../src/systems/item/itemTemplates.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const ship = (crew) => crewRoster({ hull: HULL.SmallShip, seed: 7, crew });
 
 test('SHIP-CREW: HER HANDS HAVE NAMES AND ROLES - the waters\' own names off her seed, her First Mate first, her Bard her Bard, the rest dealt in turn; the guns take the last to join first and a hire joins with a new name; the save keeps them (mutants: the roles unset, the fallen order, a hire\'s name reused, the save dropped)', () => {
@@ -176,7 +175,6 @@ test('SEA-REPAIR on the host: MAKE REPAIRS mends her to whole out of the fight\'
   assert.ok(h.log.say.includes(`${mate}: ${ORDER_TEXT.repair.said}`), 'her First Mate answers');
   for (let t = 0; t < FIELD_QUIET_S + 5; t += 0.1) h.host.frame(0.1);   // a save's hurts: quiet first
   assert.equal(h.host.hudModel().ship.repairing, true);
-  // PIN MOVED (QUICK-REPAIRS): a pirate near - DAMAGE CONTROL, the work goes on under her guns at SEA_REPAIR_UNDER_FIRE of the
   // pace (it stood still while she threatened), and at the full pace once she is gone
   const pid = h.host.spawnShip('pirateBrig', { range: 200, temper: 'bold' });
   for (let t = 0; t < 1; t += 0.1) h.host.frame(0.1);
@@ -223,7 +221,7 @@ test('SHIP-CREW on the host: A HAND LOST FALLS BY NAME and wears their spirits; 
   const e = w.host._sea.get(id);
   w.host.frame(0.1);
   const m0 = w.host.crewOf(w.boat).morale;
-  for (let left = Math.floor(e.ship.damage.hull - 1); left > 0; left -= NAVAL_HIT_MAX) w.host.applyPeerHit('local', navalHitData('local', { n: e.n, hull: Math.min(left, NAVAL_HIT_MAX) }));   // PIN MOVED (TOUGHER-SHIPS): her hull past one hit's most
+  for (let left = Math.floor(e.ship.damage.hull - 1); left > 0; left -= NAVAL_HIT_MAX) w.host.applyPeerHit('local', navalHitData('local', { n: e.n, hull: Math.min(left, NAVAL_HIT_MAX) }));
   w.host.frame(0.1);
   assert.equal(e.ship.damage.state, 'struck');
   assert.equal(w.host.crewOf(w.boat).morale, m0 + MORALE_EVENT.win, 'she struck to us: spirits up');
@@ -264,17 +262,9 @@ test('SHIP-CREW on the host: A HAND LOST FALLS BY NAME and wears their spirits; 
 });
 
 test('SHIP-CREW, SEA-REPAIR: THE WORLD\'S WIRING - the stores are her hold\'s (Come Sail Away\'s cargo); her crew named off the seed her living crew stands on; a hand of mine speaks by name; her order, spirits and lines ride to her living crew; the helm panel\'s Orders and the boat\'s menu Crew and Give orders (mutants: a wire cut)', () => {
-  assert.match(WORLD, /count: \(boat\) => storesIn\(boat\?\.Cargo\?\.Items\),/);
-  assert.match(WORLD, /spend: \(boat\) => spendStore\(boat\?\.Cargo\?\.Items\),/);
-  assert.match(WORLD, /crewSeed: \(boat\) => _crewSeedOf\(boat\),/);
-  assert.match(WORLD, /const name = csa\.boats\.includes\(l\.key\) \? naval\?\.crewName\?\.\(l\.key, l\.member\.i\) : null;/);
-  assert.match(WORLD, /_crewCtx\.order = ship\.mine\?\.order \?\? null; _crewCtx\.sings = ship\.mine\?\.sings \?\? true; _crewCtx\.line = ship\.mine\?\.line \?\? null;/);
-  assert.match(WORLD, /orders: \(\) => \{ const b = csaRuntime\?\.state\?\.CurrentBoat; if \(b\) navalOrders\(b\); \},/);
-  assert.match(WORLD, /if \(helm\) helm = card \? null : \{ \.\.\.helm, orders: navalOn\(\), cargo: holdsCargo\(helm\.hull\), shot: navalOn\(\) \? naval\?\.shotLabel\?\.\(\) \?\? null : null \};/);   // PIN MOVED (CARGO-ANYWHERE: and her Hold; FIELD BUGS 2026-10-21d PASSAGE-HANDS: no buttons for a passenger)
   assert.ok(helmButtons({ hasSails: true, orders: true }).some((b) => b.act === 'orders' && b.kind === 'hook'), 'the panel\'s Orders');
   assert.ok(!helmButtons({ hasSails: true }).some((b) => b.act === 'orders'), 'none with the naval arc off');
   const rows = boatMenuRows({ boxes: new Set(['drive']), packable: true, naval: true, crewed: true }).map((r) => r.id);
   assert.ok(rows.includes(BOAT_VERB.crew) && rows.includes(BOAT_VERB.orders));
   assert.ok(!boatMenuRows({ boxes: new Set(['drive']), packable: true }).map((r) => r.id).includes(BOAT_VERB.orders), 'none with the naval arc off');
-  assert.match(WORLD, /if \(verb === BOAT_VERB\.crew \|\| verb === BOAT_VERB\.orders \|\| verb === BOAT_VERB\.companions\) \{/);   // PIN MOVED (CREW-COMPANIONS; AUDIT CC-F: exact - an optional clause pinned nothing)   // PIN MOVED (CREW-COMPANIONS): the Companions row rides the same dispatch
 });

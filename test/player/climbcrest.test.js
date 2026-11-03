@@ -1,5 +1,4 @@
-// CLIMB-CREST (2026-10-26, the owner: "Pre existing issue where walls cant be climbed over"; bible/03-World/
-// Parkour-Arc.md CLIMB-CREST): Daggerfall's city wall has no top to stand on - each face rises to a knife edge, and the
+// CLIMB-CREST: Daggerfall's city wall has no top to stand on - each face rises to a knife edge, and the
 // coping's back falls 76 degrees to the wall walk 1.6 m under it (ARCH3D 445: faces to 8.05 m, the walk at 6.45 between
 // copings 0.4 m deep). The enhanced climb read the coping's back as a roof too steep to stand on: a free climb stuck under
 // the edge until its grip gave, and a body on the walk could not leave it. A CREST - the face's own top, its far side

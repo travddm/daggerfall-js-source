@@ -4,7 +4,7 @@
 // Lodestone record 66, and every new ore borrowed 66 - and PROF2 drew each vein as its metal's picture alone, where
 // PROF0 4.8 had said "tinted per ore". Every ore that shares a picture now wears its own wash (scenes/mineHost.js
 // ORE_WASH, through ARENA5's batch wash - render/renderer.js uBatchTint), and the gathering host stands each wash as
-// its own batch, on the open ground and underground. bible/01-Overview/bugs/Field-Bugs-2026-10-11d.md.
+// its own batch, on the open ground and underground..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -29,7 +29,6 @@ test('VEIN-WASH: no two ores that share DFU\'s picture look alike - the first of
     byLook.set(look, key);
   }
   // the pictures' owners keep DFU's own colours, and the five with a picture of their own take no wash
-  // PIN MOVED (VEIN-HUE, FIELD BUGS 2026-10-12b): Lodestone wears a wash of its own - its picture is the boulder's lump
   for (const key of ['metal:lead', 'metal:mercury', 'metal:gold', 'metal:iron', 'metal:tin', 'metal:sulphur']) assert.equal(mineWash(vein(key)), null, key);
   assert.deepEqual(Object.keys(ORE_WASH).sort(), ['metal:copper', 'metal:lodestone', 'metal:platinum', 'metal:silver', 'ore:adamantium', 'ore:dwarven', 'ore:ebony', 'ore:mithril', 'ore:moonstone', 'ore:orichalcum']);
   for (const [k, w] of Object.entries(ORE_WASH)) assert.ok(w.length === 3 && w.every((c) => c > 0), `${k}: a colour`);
@@ -104,7 +103,6 @@ test('VEIN-WASH: a deep vein wears its ore\'s wash on the dungeon\'s own batch -
     keyLabel: () => 'E', input: () => ({ held: false, attack: false, choice: false }), active: () => false, activeDungeon: () => true,
   });
   const stoodBatches = [];
-  // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): an unwitnessed dungeon draws its whole deep table now - 88's every
   // vein was Silver and is Platinum today - so the dungeon is 92, its Silver beside an Adamantium
   const DUNGEON = 92;
   const law = dungeonVeins({ dungeon: DUNGEON, day: 20500, climate: WOODS, confirmed: false });

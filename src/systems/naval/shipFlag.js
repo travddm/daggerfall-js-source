@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-COLOURS (2026-10-17, the owner: "Finally, a fully customizable flag with the option to use your guild insignia";
-// bible/03-World/Naval-Refit.md SHIP-COLOURS) - A SHIP'S FLAG. The port's own; pure.
+// SHIP-COLOURS - A SHIP'S FLAG. The port's own; pure.
 //
 // Come Sail Away's boats fly a PENNANT: their FlagObject's particle system streams small cubes downwind off her masthead
 // (vendor/come-sail-away, the prefab's FlagEmitter; scenes/world.js csaParticleLists draws them, a sea ship's tinted her

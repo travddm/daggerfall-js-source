@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA-BIOME (2026-10-24, bible/03-World/Tamriel-Biomes.md) - THE FAUNA PAST THE BAY: what each biome's wild is home to,
+// TESA-BIOME - THE FAUNA PAST THE BAY: what each biome's wild is home to,
 // as the encounter law rolls it.
 //
 // Daggerfall picks a wilderness foe from one of eighteen climate tables (RandomEncounters.cs, systems/encounters.js

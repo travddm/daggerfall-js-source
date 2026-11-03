@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RPT1026-ITEMS HELD-OUT (2026-10-26; three private reports of gear lost around an Identify at the Mages Guild - one
-// of them Legendaries identified there and missing once the client had restarted for a new version):
+// RPT1026-ITEMS HELD-OUT:
 // THE PLAYER'S GOODS A WINDOW HOLDS OUT OF THE PACK ARE STILL THE PLAYER'S, AND EVERY SAVE SAYS SO.
 //
 // A trade counter stages the player's own pieces OUT of the pack (DaggerfallTradeWindow.TransferItem, :795 - D7 made the

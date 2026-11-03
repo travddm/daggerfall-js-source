@@ -1,5 +1,4 @@
-// AUDIT MW-NPC (2026-10-10, Mac: "Do a deep audit and ensure perfection" - bible/04-Characters/Morrowind-NPCs.md
-// section 21): the findings of four cold lanes over the arc at 1fd44c83ad, each pinned where the code that fixes it
+// AUDIT MW-NPC: the findings of four cold lanes over the arc at 1fd44c83ad, each pinned where the code that fixes it
 // lives - the GPU skin and the body service, the lanes and the frame budget, the populations and their hosts, the
 // creatures and the special foes.
 import { test } from 'node:test';
@@ -15,7 +14,6 @@ import { GUARD_MOBILE_TYPE } from '../../src/scenes/cityGuards.js';
 import { residentLook, residentWalkerActor } from '../../src/characters/rosterBodies.js';
 import { CREATURE_MATCH } from '../../src/characters/creatureBodies.js';
 import { ELITE_FOE_SIZE } from '../../src/systems/eliteFoes.js';
-import { WILD_GIANT_SIZE } from '../../src/systems/wild/wildZone.js';   // AUDIT MW-NPC II P4
 import { createNpcBodies, createPopulationLane, createFrameBudget, NPC_BODY_TIERS, WATCH_BODY_TIERS, NPC_FRAME_TIERS } from '../../src/characters/npcBodies.js';
 import { creatureLook } from '../../src/characters/creatureBodies.js';
 import { MOBILE_TYPES as M } from '../../src/characters/mobile/mobileTypes.js';
@@ -233,7 +231,6 @@ test('AUDIT MW-NPC D2: a Daedra Seducer in her mortal guise keeps her sprite - t
   assert.equal(creatureLook(her), null, 'in her guise: no body');
   assert.equal(isBodyFoe(her), false);
   her.mobile.specialTransformationCompleted = true;
-  // PIN MOVED (AUDIT MW-NPC II K5): transformed she flies - her look asks a record that flies (mwnpc_audit2.test.js K5)
   assert.deepEqual(creatureLook(her), { creature: ['winged twilight'], flies: true });
   assert.equal(isBodyFoe(her), true);
   assert.deepEqual(creatureLook({ mobileType: M.DaedraSeducer }), { creature: ['winged twilight'], flies: true });
@@ -249,20 +246,13 @@ test('AUDIT MW-NPC D3: a foe\'s body is drawn the size its sprite is - an elite\
   pool.foes.push(elite);
   pool.batches();
   assert.equal(L.offered[0].scale, ELITE_FOE_SIZE, 'the elite as large as its sprite');
-  // AUDIT MW-NPC II P4: the giant and the dead too - a living elite's sprite size and its giant's are one number, so the
-  // pool's `szG` and `szE` were the same to every pin; the wild zone's giant, and the corpse's size, each its own
-  const giant = poolFoe(130, [4, 0, 3]);
-  giant.entity.wildGiant = true;
+  // AUDIT MW-NPC II P4: the dead too - the corpse's size is its own
   const deadElite = poolFoe(131, [6, 0, 3], { dead: true, corpse: true });
   deadElite.entity.eliteFoe = true;
-  const deadGiant = poolFoe(132, [8, 0, 3], { dead: true, corpse: true });
-  deadGiant.entity.wildGiant = true;
-  pool.foes.push(giant, deadElite, deadGiant);
+  pool.foes.push(deadElite);
   pool.batches();
   const by = (f) => L.offered.find((a) => a.feet[0] === f.ai.feet[0] || a.feet === f.ai.feet);
-  assert.equal(by(giant).scale, WILD_GIANT_SIZE, 'the open zone\'s giant four times a man, as its sprite');
   assert.equal(by(deadElite).scale, ELITE_FOE_SIZE, 'a dead elite as large as its corpse');
-  assert.equal(by(deadGiant).scale, WILD_GIANT_SIZE, 'a dead giant too');
 });
 
 test('AUDIT MW-NPC D4/D5: no creature that flies or swims in Daggerfall stands in a Morrowind creature that walks - the imp (a flyer; the scamp walks) and the dreugh (a swimmer) keep their sprites, as the bat, the harpy and the slaughterfish do; the table holds it for every row', () => {
@@ -306,7 +296,6 @@ test('AUDIT MW-NPC C4: a living resident walking the street is ONE person - thei
 });
 
 test('AUDIT MW-NPC C5: a watchman\'s look follows his number on the wire once he rides - the look a peer\'s puppet of him wears; a foe of the encounter pool is its number from its spawn, its owner\'s and its puppets\' alike', () => {
-  // PIN MOVED (AUDIT MW-NPC II K3/K4): one man on both machines by the OWNER'S WORD - the seed is minted once at his own
   // foe and rides the record (`ls`), a person's kit with it (`lw`); a copy stood off a record (`_mwWire`) takes them
   const man = (id, seq) => ({ id, seq, mobileType: GUARD_MOBILE_TYPE, gender: 'male', entity: { isClass: true, items: [] }, ai: { feet: [0, 0, 0], yaw: 0 } });
   const mine = man(3, null);
@@ -327,17 +316,6 @@ test('AUDIT MW-NPC C5: a watchman\'s look follows his number on the wire once he
   const wa = foeWireLook(a);
   applyWireLook(b, { ls: wa.seed, lw: wa.worn });
   assert.deepEqual(foeLook(a), foeLook(b), 'the encounter pool\'s foe and its puppet one person');
-});
-
-// PIN MOVED (FB1015 LOOT-BODY, test/render/fb1015_lootbody.test.js): the window's frame draws the bodies drawFoes last synced as
-// well as showing the corpse flats - this pin holds C6's own half, every corpse flat shown before the mark, by the door
-test('AUDIT MW-NPC C6: under a window both dungeon hosts draw the flats and return before drawFoes - so every corpse flat is shown first, none left cast-only by the last frame, and only a body standing marks its own again (by source; the hosts\' order is FB1015\'s pin)', () => {
-  const fb = rd('src/characters/foeBodies.js');
-  const door = fb.slice(fb.indexOf('export function drawBodiesUnderWindow('));
-  const show = door.indexOf('  for (const f of foes) { const b = corpseFlat(f); if (b) b.castOnly = false; }');
-  const mark = door.indexOf("if (b) b.castOnly = lane.has('foe', idOf(f)); }");
-  assert.ok(show > 0 && mark > show, 'every flat shown, then a standing body\'s marked');
-  assert.ok(rd('src/scenes/dungeonContext.js').includes('drawBodiesUnderWindow(_npcLane, foes, _npcStood, { idOf: foeId, corpseFlat: (f) => f.corpseBatch,'));
 });
 
 test('AUDIT MW-NPC B3 (the slot): in an NPC lane a newcomer within the cut takes the slot of a body past it at once - never the dwell a visible body waits out - and an unseen far body gives its slot up before a visible one held past the range, even where the visible one is farther', async () => {

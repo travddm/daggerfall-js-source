@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WILD-ALERT (2026-10-04, Mac: "Wilderness enemies now approach/non approach based on distance and a stealth check.
-// Enemies alerted are given an exclamation point and slow down as they do now, non alerted enemies do not slowdown or
-// bother the player"). The port's own, as the Overworld is (no DFU original: DFU has no fast travel through a living
+// WILD-ALERT. The port's own, as the Overworld is (no DFU original: DFU has no fast travel through a living
 // wilderness to notice anyone in).
 //
 // THE LAW. A wilderness enemy within its reach of a fast traveller - a band's sight on the Overworld (TV7), a foe's own

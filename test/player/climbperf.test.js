@@ -1,5 +1,4 @@
-// PERF-CLIMB (the Enhanced Climbing arc's dense-mesh limit - bible/03-World/Parkour-Arc.md; Mac: "Take care of the
-// remaining items"): A RESOLVE THAT MOVED NOTHING STOPS. The capsule's resolve ran three passes whatever the first
+// PERF-CLIMB (the Enhanced Climbing arc's dense-mesh limit): A RESOLVE THAT MOVED NOTHING STOPS. The capsule's resolve ran three passes whatever the first
 // found; a pass that ends where it began, to the bit, is the same pass again (collider.js _resolveCapsule), so it is
 // the last. Measured on a 714-brick wall (8,568 triangles, one mesh): the free climb's top-out step 14.3 -> 10.8 ms,
 // a step pressed into the wall 23.3 -> 13.5 ms, a corner's turn on a brick tower 15.1 -> 9.5 ms - and the answers

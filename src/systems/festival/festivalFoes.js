@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): WHAT A FOE IS TO THE FESTIVAL - "the dead do walk tonight"
+// WITCH1: WHAT A FOE IS TO THE FESTIVAL - "the dead do walk tonight"
 // (Tales and Tallows, TEXT.RSC 8387) and "the creatures created or summoned there may plague Tamriel for eons" (the
 // Witches' Festival, 8392). A foe's find is asked by its kind (net/festivalLaw.js FIND_SOURCES): the undead and the
 // summoned - the Daedra and the atronachs - give more; an elite and a boss more again. The Wyrd's Raiment's Tallow-Ward

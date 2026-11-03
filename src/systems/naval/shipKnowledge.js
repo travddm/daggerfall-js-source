@@ -1,6 +1,5 @@
 // @ts-check
-// SPYGLASS (2026-10-11, the owner: "Removing observable names from ships and instead implementing a spyglass option where
-// you can aim and view to observe other ships, their allegiance, cargo, etc." - bible/03-World/Captains-Sea.md) - WHAT A
+// SPYGLASS - WHAT A
 // CAPTAIN KNOWS OF A SHIP, AND HOW. A sail on the horizon is a hull and a rig - "a galleon", "a sloop" - and nothing more:
 // no name hangs over her, no colour on her bar says friend or foe. Knowledge is earned, ship by ship, and kept while she
 // is in the sea:

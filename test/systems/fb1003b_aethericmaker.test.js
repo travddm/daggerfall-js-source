@@ -1,4 +1,4 @@
-// AETHERIC-MAKER (FIELD BUGS 2026-10-03b, Discord: "Not sure if intentional or not, buuut: Enchanting Aetheric sets" - "You can enchant Ruhn's gear, lol"; `bible/01-Overview/bugs/Field-Bugs-2026-10-03b.md`).
+// AETHERIC-MAKER (FIELD BUGS 2026-10-03b, Discord: "Not sure if intentional or not, buuut: Enchanting Aetheric sets" - "You can enchant Ruhn's gear, lol"; ` `).
 // Every fixture from its real producer (TEST THE SHAPE THE PRODUCER MINTS): the gate boss's spoils, the Sigil Broker's ware, a raid's thanks.
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -17,7 +17,7 @@ test('AETHERIC-MAKER: an Aetheric piece is never on the item maker\'s list and n
   setPref('lootRarity', true);
   let seed = 1;
   while (!rollSpoils(seed, 12).pieces.some((p) => p.item.aetheric === 'ruhn-gatecleaver')) seed++;
-  assert.equal(seed, 2, 'the first kill whose spoils carry the Gatecleaver');   // PIN MOVED (AFFIX-LINES): seed 17 before - the spoils' pieces draw their lines over the lines (one roll a pick, as before), so a seed's stream lands on other lines and the Gatecleaver on another kill
+  assert.equal(seed, 2, 'the first kill whose spoils carry the Gatecleaver');
   const axe = rollSpoils(seed, 12).pieces.find((p) => p.item.aetheric === 'ruhn-gatecleaver').item;
   const ware = brokerStock(20000).find((o) => o.kind === 'regalia').item;
   let raid = null;

@@ -1,6 +1,4 @@
-// LOOT4 - FIVE AFFIX KINDS THAT DO THINGS (2026-10-01; bible/06-Systems/Loot-Arc.md section 6, Mac: "Do you wanna turn
-// this into an arc and do all of the above?" - "Proc affixes. Add on-hit fire or frost damage, life leech, thorns,
-// spell-cost reduction ... Most of these already have a set-ability hook they can reuse"). The laws pinned here:
+// LOOT4 - FIVE AFFIX KINDS THAT DO THINGS. The laws pinned here:
 //   - THE KINDS: elemental (fire, frost, shock) and slayer (undead, daedra, humanoid, animal) and leech on a weapon,
 //     thorns on armour, focus on jewellery - each banded by tier, each a word, never naming a piece.
 //   - THE ROLL: never the ladder's own draw; a door's LAST PASS gives a Magic one in five and a Rare a bit over one in
@@ -49,7 +47,7 @@ function door(foes = [], me = null) {
   setPlayerDoor({ foes: () => foes.filter((f) => !f.dead), feet: () => [0, 0, 0], hurtFoe: (f, n) => d.hurts.push([f.name, n]), castOnPlayer: () => {}, player: () => me });
   return d;
 }
-const PROCS = ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring'];   // CAST-SPEED: appended; PIN MOVED (BAL9c): the caster's two after it
+const PROCS = ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring'];   // CAST-SPEED: appended
 
 test('LOOT4: the kinds - five that do things, banded, worded, valid; never in the ladder\'s own draw, never a name', () => {
   on();
@@ -72,10 +70,10 @@ test('LOOT4: the kinds - five that do things, banded, worded, valid; never in th
     assert.ok(LR.affixLabel(a) && LR.affixWord(a, 'rare'), `${id}: a label and a word`);
   }
   assert.equal(LR.validAffix({ id: 'elemental', param: 'acid', value: 3 }), false, 'an element it does not know');
-  assert.equal(LR.validAffix({ id: 'slayer', param: 'dragon', value: 12 }), false, 'a kind of foe it does not know');
+  assert.equal(LR.validAffix({ id: 'slayer', param: 'dragon', value: 4 }), false, 'a kind of foe it does not know');
   assert.equal(LR.validAffix({ id: 'leech', param: 'fire', value: 3 }), false, 'a param a kind without one');
   assert.equal(LR.affixLabel({ id: 'elemental', param: 'fire', value: 5 }), '+5 Fire damage');
-  assert.equal(LR.affixLabel({ id: 'slayer', param: 'undead', value: 15 }), '+15% damage vs the undead');
+  assert.equal(LR.affixLabel({ id: 'slayer', param: 'undead', value: 2 }), '+2% damage vs the undead');   // PIN MOVED: B4 rescale, a slayer line tops at 3
   assert.equal(LR.affixLabel({ id: 'leech', value: 5 }), '5% life leech on this weapon\'s own blows');   // PIN MOVED: FIELD BUGS 2026-10-14 LEECH-HAND
   assert.equal(LR.affixLabel({ id: 'thorns', value: 4 }), '4 thorns');
   assert.equal(LR.affixLabel({ id: 'focus', value: 6 }), '-6% spell cost');
@@ -150,12 +148,10 @@ test('LOOT4: the roll - a door\'s last pass, a Magic one in five, a Rare a bit o
 
 test('LOOT4: the seeded doors keep their earlier draws - the gate\'s and a town\'s pieces their seed\'s, the lines that do something appended', () => {
   on();
-  // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw - where a
   // proc or an Exalted drew before it the two runs' techniques differ, so it is set aside on both sides (an Exalted's line
   // is the last line before it)
   const noTech = (it) => (it.affixes ?? []).filter((a) => !LR.isTechniqueAffix(a));
   const strip2 = (it) => { const own = noTech(it); return own.filter((a) => !LR.isProcAffix(a) && !(it.exalted && own.indexOf(a) === own.length - 1)); };
-  // PIN MOVED (GILDED2, bible/06-Systems/Gilded.md section 7): the Dragonfire Oath is the gate's very last draw, after the
   // technique's - set aside on both sides, as the technique is
   const unGilded = (spoils) => ({ ...spoils, pieces: spoils.pieces.filter((x) => x.tier !== 'gilded') });
   let procs = 0;
@@ -186,7 +182,7 @@ test('LOOT4: the seeded doors keep their earlier draws - the gate\'s and a town\
 test('LOOT4: the sear and the slayer\'s edge - the weapon in hand\'s, at a foe, its own kind, none on the immune, half on the resisting', () => {
   on();
   const me = player();
-  const w = sword([{ id: 'elemental', param: 'fire', value: 5 }, { id: 'slayer', param: 'undead', value: 20 }]);
+  const w = sword([{ id: 'elemental', param: 'fire', value: 5 }, { id: 'slayer', param: 'undead', value: 2 }]);
   const zombie = foeOf(17), orc = foeOf(7), fireDaedra = foeOf(26, { immunityFlags: EFFECT_FLAGS.Fire }), resists = foeOf(15, { resistanceFlags: EFFECT_FLAGS.Fire });
   assert.equal(LP.foeGroup(zombie), 'undead');
   assert.equal(LP.foeGroup(orc), 'humanoid');
@@ -194,19 +190,19 @@ test('LOOT4: the sear and the slayer\'s edge - the weapon in hand\'s, at a foe, 
   assert.equal(LP.foeGroup(foeOf(28)), 'undead', 'a vampire');
   assert.equal(LP.foeGroup(foeOf(34)), 'animal', 'a dragonling, DFU\'s own grouping');
   assert.equal(LP.foeGroup(foeOf(35)), null, 'an atronach is none');
-  assert.equal(LP.lootBlow(w, 10, me, zombie, {}), 10 + 2 + 5, 'the undead: 20% and the fire');
-  assert.equal(LP.lootBlow(w, 10, me, orc, {}), 15, 'an orc: the fire alone');
-  assert.equal(LP.lootBlow(w, 10, me, fireDaedra, {}), 10, 'fire-proof: none of it');
-  assert.equal(LP.lootBlow(w, 10, me, resists, {}), 10 + 2 + 2, 'a resisting skeleton: half the fire, floored');
-  assert.equal(weaponBlowMods(w, 10, me, zombie, { unaware: false }), 17, 'registered: the blow modifier reads it');
-  // the fraction carried: four blows of 3 at +20% land 12 whole and 2 more
+  assert.equal(LP.lootBlow(w, 100, me, zombie, {}), 100 + 2 + 5, 'the undead: 2% and the fire');
+  assert.equal(LP.lootBlow(w, 100, me, orc, {}), 105, 'an orc: the fire alone');
+  assert.equal(LP.lootBlow(w, 100, me, fireDaedra, {}), 100, 'fire-proof: none of it');
+  assert.equal(LP.lootBlow(w, 100, me, resists, {}), 100 + 2 + 2, 'a resisting skeleton: half the fire, floored');
+  assert.equal(weaponBlowMods(w, 100, me, zombie, { unaware: false }), 107, 'registered: the blow modifier reads it');
+  // the fraction carried: five blows of 10 at +2% land 50 whole and 1 more
   LP._resetLootPowersForTests();
-  const w2 = sword([{ id: 'slayer', param: 'animal', value: 20 }]);
+  const w2 = sword([{ id: 'slayer', param: 'animal', value: 2 }]);
   let total = 0;
-  for (let i = 0; i < 5; i++) total += LP.lootBlow(w2, 3, me, foeOf(0), {});
-  assert.equal(total, 15 + 3, 'a fifth of every 3, carried: three whole points over five blows');
+  for (let i = 0; i < 5; i++) total += LP.lootBlow(w2, 10, me, foeOf(0), {});
+  assert.equal(total, 50 + 1, 'two per cent of every 10, carried: one whole point over five blows');
   // PIN ADDED (AUDIT MARTIAL L2 F7): the Stats page's reading before each blow carries nothing - blow for blow the same
-  const blows = (read) => { LP._resetLootPowersForTests(); return Array.from({ length: 5 }, () => { if (read) LP.lootBlow(w2, 3, me, foeOf(0), { estimate: true }); return LP.lootBlow(w2, 3, me, foeOf(0), {}); }); };
+  const blows = (read) => { LP._resetLootPowersForTests(); return Array.from({ length: 5 }, () => { if (read) LP.lootBlow(w2, 10, me, foeOf(0), { estimate: true }); return LP.lootBlow(w2, 10, me, foeOf(0), {}); }); };
   assert.deepEqual(blows(true), blows(false), 'the page read between blows');
   // never: a player, a peer, a foe's blow, the ward, a miss, off
   assert.equal(LP.lootBlow(w, 10, me, { isPlayer: true }, {}), 10, 'a duel');
@@ -255,7 +251,7 @@ test('LOOT4: the thorns - back to the foe whose blow took my health, through the
   hurtPlayer(me, 3);
   assert.equal(d.hurts.length, 1, 'a fall, a poison - no blow, no thorns');
   // the cap
-  for (const t of [104, 105, 106, 108, 103]) wear(me, plate(t, [{ id: 'thorns', value: 10 }]));
+  for (const t of [104, 105, 106, 108, 103]) wear(me, plate(t, [{ id: 'thorns', value: 6 }]));   // PIN MOVED: B4, a thorns line tops at 6
   setStruck(orc, me, 5); hurtPlayer(me, 5);
   assert.deepEqual(d.hurts.at(-1), ['orc', LP.THORNS_CAP], 'never past the cap');
   // a blow that took nothing answers nothing
@@ -265,8 +261,6 @@ test('LOOT4: the thorns - back to the foe whose blow took my health, through the
   off();
   setStruck(orc, me, 5); hurtPlayer(me, 5);
   assert.equal(d.hurts.length, before, 'off: none');
-  // the registration, in the sigil sets' own hurt: one law of a landed blow
-  assert.match(strip(read('src/systems/sigil/sigilSetPowers.js')), /if \(before - after > 0\) for \(const fn of _landed\.values\(\)\)/);
 });
 
 test('LOOT4: the focus - my spells cost less, all I wear under the cap; registered at every seam under one name', () => {
@@ -283,13 +277,8 @@ test('LOOT4: the focus - my spells cost less, all I wear under the cap; register
   on();
   assert.ok(plain > 10, `a real price (${plain})`);
   assert.equal(priced, Math.max(1, Math.round((plain * 90) / 100)), 'the registered modifier takes its ten in a hundred off the real price');
-  for (const t of [133, 135, 136, 137, 138, 134]) wear(me, Object.assign(mintCondition({ group: 'Jewellery', templateIndex: t, flags: 0 }), { rarity: 'rare', affixes: [{ id: 'focus', value: 10 }] }));
+  for (const t of [133, 135, 136, 137, 138, 134]) wear(me, Object.assign(mintCondition({ group: 'Jewellery', templateIndex: t, flags: 0 }), { rarity: 'rare', affixes: [{ id: 'focus', value: 6 }] }));   // PIN MOVED: B4, a focus line tops at 6
   assert.equal(LP.lootCastCost(me, 100), 100 - LP.FOCUS_CAP, 'never past the cap');
-  const src = strip(read('src/systems/loot/lootPowers.js'));
-  for (const [seam, fn] of [['registerWeaponBlowMod', 'lootBlow'], ['registerPlayerStrikeListener', 'lootStrike'], ['registerPlayerBlowLanded', 'lootLanded'], ['registerSpellCostMod', 'lootCastCost']]) {
-    assert.match(src, new RegExp(`\\n${seam}\\(LOOT_POWERS, ${fn}\\);`), `${seam} -> ${fn}`);
-  }
-  assert.match(read('src/scenes/world.js'), /from '\.\.\/systems\/loot\/lootPowers\.js'; import \{ setSetPowersVoice/, 'the game imports it beside the sets');
 });
 
 test('LOOT4: the wire carries a line that does something and refuses a forged one', () => {

@@ -1,4 +1,4 @@
-// QUEUE-OWED (bible/06-Systems/Travel-View.md QUEUE-OWED; a player's report, 2026-10-18: "the world isnt loading at times
+// QUEUE-OWED (QUEUE-OWED; a player's report, 2026-10-18: "the world isnt loading at times
 // in the overworld and when it doesnt load his overworld speed goes down to 1x").
 //
 // THE QUEUE BUILT WHAT THE STREAM HAD LET GO. A crossing queues the grid's new edge (StreamingWorldState.update's load
@@ -70,7 +70,6 @@ test('QUEUE-OWED, the host\'s pump: crossings that leave queued pixels behind - 
     return Promise.resolve(built.get(k));
   };
   const destroyPixel = (px, py) => { built.delete(`${px},${py}`); };
-  // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers which pixel is ready (scenes/capitalPrebuild.js
   // firstReady) - none of the city's here, every pixel ready
   const s = { state, built, queue, buildPixel, destroyPixel, _wodArrival: { keys: new Set() }, console: { error() {} }, performance: { now: () => 0 }, capitalPrebuild: { firstReady: () => true } };
   const pump = new Function('s', `let { state, built, queue, buildPixel, destroyPixel, _wodArrival, console, performance, capitalPrebuild } = s;
@@ -123,7 +122,7 @@ async function journey({ mps, buildS, turnS, seconds }) {
   const player = { pos: at, speed: mps, isPlayerSwimming: false, feetAt: () => [...player.pos] };
   let cur = null;
   const scope = {
-    capitalPrebuild: { firstReady: () => true },   // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers - none here
+    capitalPrebuild: { firstReady: () => true },
     travelControlUI: { isShowing: true }, travelOptions: { state: { autopilot: {} } },
     travelView: { active: true, state: 'up' }, tvOwnsJourneys: () => true,
     worldTimeScale: timeScale, setWorldTimeScale: setTimeScale, resetTimeScale, createLoadGovernor, travellerPace, MAX_TIME_SCALE,

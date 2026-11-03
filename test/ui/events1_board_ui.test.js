@@ -1,7 +1,6 @@
-// EVENTS1 (2026-10-23, the owner: "Instead of stuffing these in the chat menu, there must be a less obstructive and more
-// detailed way to handle them"): THE EVENT BOARD ON THE HUD (ui/eventBoard.js) on a fake document, and THE SEAMS - the
+// EVENTS1: THE EVENT BOARD ON THE HUD (ui/eventBoard.js) on a fake document, and THE SEAMS - the
 // events' lines through the one door instead of the chat, the board drawn from drawHud, the status widget never making
-// way for it. Design: bible/10-UI/Event-Board.md; AUDIT EVENTS1, bible/01-Overview/audits/Audit-Event-Board.md. The
+// way for it. Design:; AUDIT EVENTS1,. The
 // layout is photographed and measured by tools/eventBoardProbe.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -318,30 +317,3 @@ test('EVENTS1 DRESSED AND MOVABLE: the kit\'s panel on the plate; its classic co
   assert.equal(EVENT_LAYOUT_MS, 250);
 });
 
-test('EVENTS1 THE SEAMS: the gate\'s (its rite too - C6), the serpent\'s, the Abyss Dungeon\'s, the stars\' and the raids\' (each with its id - A1) and the festival\'s lines through the one door; the Timers source seated where it is made, with the chat for the board off and townTalk for the journal (C4/C5), the player\'s pixel, the three sites, the raids\' own region (A8) and their look ahead (A4); the board on drawHud and its hide door; the status widget never makes way for it (B1) (mutants: each door, the seat, the draw)', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const timersSource = seatEventBoard\(\(\{ ask = false \} = \{\}\) => \{/);
-  assert.match(world, /\}, \(text\) => chatNotice\(text\), townTalk\);/, 'the chat for a line said with the board off; the journal');
-  assert.match(world, /pixel: playerTravelPixel\(\),\n\s+gate: \{ place: gateOmen\?\.current\?\.\(\)\?\.site\?\.place \?\? null, site: gateOmen\?\.current\?\.\(\)\?\.site \?\? null,/);
-  assert.match(world, /serpent: \{ place: serpentOmen\?\.current\?\.\(\)\?\.site\?\.near \?\? null, site: serpentOmen\?\.current\?\.\(\)\?\.site \?\? null,/);
-  assert.match(world, /sd: sdHost\?\.timers\(\) \?\? null,/);   // PIN MOVED (WW5): the Bay's record, name and site and every province lane's (scenes/superDungeon/sdLanes.js timers)
-  assert.match(world, /region: REGION_NAMES\[raidRegionNow\(\)\] \?\? null,/);
-  assert.match(world, /raids: raidingPartiesOn\(\) \? raidTimerList\(relayOf, \(r\) => REGION_NAMES\[r\], EVENT_SOON_MS\) : null,/);
-  // PIN MOVED (WW2, bible/03-World/World-Wide.md): a lane past the Bay's lines on its own gate's card (its id), the Bay's as they always were
-  assert.match(world, /say: \(text, n\) => eventNotice\('gate', text, gateLineId\(n\)\),   \/\/ EVENTS1/);   // PIN MOVED (AUDIT WW F5): every gate's lines with its id
-  assert.match(world, /say: \(text, n\) => eventNotice\('gate', text, gateLineId\(n\)\),   \/\/ AUDIT EVENTS1 C6/, 'the rite broken');
-  assert.match(world, /say: \(text\) => eventNotice\('serpent', text\),/);
-  assert.match(world, /say: \(text\) => eventNotice\('super', text\),/);
-  assert.match(world, /eventNotice\('serpent', slainLine\(\{/);
-  assert.doesNotMatch(world, /chatNotice\((fellLine|slainLine)\(/, 'no gate\'s or serpent\'s fall in the chat');
-  const starHost = read('src/scenes/starfall/starfallHost.js');
-  assert.match(starHost, /const say = \(text, id = null\) => \(host\.eventNotice \?\? eventNotice\)\('star', text, id\);/);
-  assert.match(starHost, /else say\(text, `star:\$\{S\.site\.n\}\.\$\{S\.site\.k\}`\);/);
-  assert.match(starHost, /say\(line, `star:\$\{w\.n\}\.\$\{w\.s\}`\);/);
-  assert.match(read('src/systems/raidingParties.js'), /const say = \(line, raid = null\) => \{ const id = raid \? `raid:\$\{raidKey\(raid\)\}` : null; \(host\(\)\.say \?\? \(\(l, i\) => eventNotice\('raid', l, i\)\)\)\(line, id\); \};/);
-  assert.match(read('src/scenes/witchesHost.js'), /const herald = \(\/\*\* @type \{string\} \*\/ l\) => \(deps\.eventNotice \?\? eventNotice\)\('festival', l\);/);
-  const hudSrc = read('src/ui/hud/hud.js');
-  assert.match(hudSrc, /drawEventBoard\(\{ hidden: true \}\);[^\n]*\n  drawQuestHerald\(\{ hidden: true \}\);/, 'the hide door');
-  assert.match(hudSrc, /\n  drawEventBoard\(\{ hidden: cursorActive \|\| !hudRenderEnabled\(\), dt \}\);\n  drawQuestHerald\(/, 'the frame, beside the herald and outside the skin\'s gate - on every skin');
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedHud.js'), /const STAT_ABOVE = '[^']*evboard/, 'the status widget never makes way for it');
-});

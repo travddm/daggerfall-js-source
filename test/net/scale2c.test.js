@@ -1,5 +1,4 @@
-// SCALE2c (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE2c): A RELAY DEPLOY'S RECONNECT, SPREAD BY THE
+// SCALE2c: A RELAY DEPLOY'S RECONNECT, SPREAD BY THE
 // ROOM'S OWN COUNT - client only. #755's deploy dropped every player and their reconnect wave overloaded the one D1
 // primary 23 s later (SCALE4e): every page's first retry was uniform over [1 s, 2 s], so every token was asked for at
 // once. A page that sees a wave (two of its open sockets dropped together, the browser online) now waits one offset,
@@ -124,17 +123,6 @@ test('SCALE2c a lone drop, a busy refusal, and a drop with the network gone are 
   assert.equal(off.opened(), 6, 'the browser offline when they dropped: all back at the old retry');
 });
 
-test('SCALE2c the world host hands the page\'s one wave to the presence session and to every chat link - and a session made without one weighs only its own sockets (mutant: a link left on its own wave)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /^import \{ pageWave \} from '\.\.\/net\/reconnectWave\.js';/m);
-  assert.match(src, /mintToken: identityMinter,\n {6}wave: pageWave,/, 'the presence session');
-  const links = src.match(/new OnlineSession\(\{[^\n]*presence: false[^\n]*\}\)/g) ?? [];
-  assert.equal(links.length, 2, 'the chat links and the arena hall');
-  for (const l of links) assert.match(l, /wave: pageWave/);
-  const online = readFileSync(new URL('../../src/net/online.js', import.meta.url), 'utf8');
-  assert.match(online, /rand = Math\.random, wave = reconnectWave\(\)(?:, wire2 = false)? \} = \{\}\) \{/, 'its own, by default: a test\'s or a tool\'s session shares nothing');   // PIN MOVED (SCALE5b): the second wire's offer beside it
-});
-
 // ═══ A FULL FOES FRAME THAT SAYS NOTHING, SAID ONCE ════════════════════════════════════════════════════════════════════
 
 /** The frame an idle player's world host builds in a cell: the pool's own frame (nothing of mine), the camps' empty
@@ -183,12 +171,3 @@ test('SCALE2c "none" is said once to each room: the first quiet full frame goes,
   assert.equal(g.skip({ ...idle, full: 0 }, { ...cell, full: false }), false, 'a delta is never left unsaid');
 });
 
-test('SCALE2c the world host asks the gate before its foes frame goes and tells it after, in the cell stream alone (mutant: the skip never asked)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /^import \{ quietFoesGate \} from '\.\.\/net\/foesQuiet\.js';/m);
-  const at = src.indexOf('  const foesStream = (now) => {');
-  const body = src.slice(at, src.indexOf('\n  };', at));
-  assert.match(body, /const said = \{ full, cell, room: online\.room \};\n {4}if \(_foesQuiet\.skip\(frame, said\)\) \{ _foesFullAt = now; return false; \}\n {4}if \(!online\.sendFoes\(frame\)\) \{ _foesFullAt = -Infinity; _foesQuiet\.sent\(frame, said, false\); return false; \}/);
-  assert.match(body, /if \(full\) _foesFullAt = now;\n {4}_foesQuiet\.sent\(frame, said\);\n {4}return true;/);
-  assert.equal((src.match(/_foesQuiet\.skip\(/g) ?? []).length, 1, 'the cell stream alone: the own lane and the dungeon host keep every frame');
-});

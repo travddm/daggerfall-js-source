@@ -1,4 +1,4 @@
-// SOUL-LAW (FIELD BUGS 2026-10-20h, bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md) - THE MOD'S ENEMIES BY THEIR IDS,
+// SOUL-LAW (FIELD BUGS 2026-10-20h) - THE MOD'S ENEMIES BY THEIR IDS,
 // READ WITHOUT ITS INSTALL. Daggerfall Enemy Expansion's fifty (256-290 its monsters, 384-398 its people) join the game's
 // table at its load (dexInstall.js installEnemyExpansion, BestiaryMod.Start). The account service loads none of the game,
 // and it judges every realm checkpoint's items with the item law (systems/item/itemLaw.js) - where a soul gem holds the

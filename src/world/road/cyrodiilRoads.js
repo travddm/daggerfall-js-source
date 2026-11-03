@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// VOYAGER-CYRODIIL (2026-10-26, bible/03-World/Roads.md VOYAGER-CYRODIIL) - CYRODIIL'S NAMED ROADS.
+// VOYAGER-CYRODIIL - CYRODIIL'S NAMED ROADS.
 //
-// KPbICA, on the spec the owner forwarded: "For Cyrodill I would suggest to use this detailed map" - the "Province of
+// KPbICA, on the spec - the "Province of
 // Cyrodiil, 3E 433" map (Natalia Dravarol, cartographer: another game's published art). It is read as a REFERENCE for
 // which road runs between which cities, and nothing else: the image never enters the repository and nothing is traced
 // from it. What it gives is the table below - each road's name and the cities it joins, in order, and one point of the

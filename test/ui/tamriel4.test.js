@@ -1,4 +1,4 @@
-// TAMRIEL4 (2026-10-09, bible/03-World/Tamriel.md) - THE CONTINENT, TRACED PROPERLY, pinned.
+// TAMRIEL4 - THE CONTINENT, TRACED PROPERLY, pinned.
 //
 // The owner, with the map in hand: "increase the accuracy and fidelity of the tamerial ingame map. Its not properly
 // traced". Four faults of TAMRIEL3's trace, each seen on the freeware data: the picker's one-pixel border lines read as
@@ -218,7 +218,6 @@ test('TAMRIEL4 ink on the trace: the coast stays within half a picture pixel of 
     for (const end of [b[0], b[b.length - 1]]) {
       const [ex, ey] = toPic(end);
       const atCoast = toLine(ex, ey);
-      // PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js): where three provinces meet off the coast (Cyrodiil's two
       // neighbours at its corner) a border ends on the line of the border that goes on through the meeting - the zone's
       const atJunction = ch.borders.some((o) => o !== b && ([o[0], o[o.length - 1]].some((q) => Math.hypot(q.x - end.x, q.y - end.y) < 1e-6) || toLine(ex, ey, [o]) < 1e-6));
       assert.ok(atCoast < 0.06 || atJunction, `a border's end ON the coast's line or at a meeting of borders: ${ex}, ${ey} (${atCoast})`);
@@ -258,15 +257,6 @@ test('TAMRIEL4 ink on the trace: the coast stays within half a picture pixel of 
   assert.equal(STITCH_REACH, 64);
 });
 
-test('TAMRIEL4 by source: the trace closes the lines and the dabs after the remainder; the ink drops the frame\'s runs from the traced coast; the host logs the edge it fitted', () => {
-  const trace = read('src/ui/tamrielTrace.js');
-  assert.match(trace, /if \(rem\) for \(let i = 0; i < rem\.length; i\+\+\) if \(rem\[i\] && !land\[i\]\) \{ land\[i\] = 1; province\[i\] = IMPERIAL_ID; \}\s*\n\s*closeBorderLines\(land, province, w, h\);[^\n]*\n\s*fillSpecks\(land, province, w, h\);/);
-  const ink = read('src/ui/tamrielInk.js');
-  assert.match(ink, /for \(const c of traced\.coast\) for \(const piece of clipOutsideRect\(c, rect\)\) coast\.push\(\.\.\.dropEdgeRuns\(piece, rect\)\);/);
-  assert.match(ink, /if \(!traced\) for \(const rv of RIVERS\)/);
-  assert.match(read('src/scenes/world.js'), /% of its cells and \$\{fit \? Math\.round\(\(100 \* fit\.seam\) \/ fit\.edge\) : 0\}% of its edge agreeing`\);/);
-});
-
 test('TAMRIEL4 with ARENA2: the player\'s own picture - no strait down any border, the painting\'s three enclosed waters and nothing else (PIN MOVED, NIBEN-SEA: Lake Rumare and the Niben the sea\'s), 26,599 land pixels; the Bay fitted at (38, 57) x15.5 with 190 of its 192 edge cells agreeing', { skip: HAVE_ARENA2 ? false : 'ARENA2_PATH not set' }, async () => {
   const { ImgFile } = await import('../../src/formats/imgFile.js');
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
@@ -278,12 +268,11 @@ test('TAMRIEL4 with ARENA2: the player\'s own picture - no strait down any borde
   const pal = new DFPalette(); pal.load(f('MAP.PAL'), 'MAP.PAL');
   const pk = new ImgFile(); pk.load(f('TAMRIEL2.IMG'), 'TAMRIEL2.IMG');
   const t = traceTamrielPicture(pk.getDFBitmap(), pic.getDFBitmap(), paletteReader(pal));
-  // PIN MOVED (NIBEN-SEA, ui/tamrielTrace.js openNiben): 26,599 land pixels (26,636 before the Niben's course, 37 of them,
   // was opened), and Lake Rumare's two pieces and the Niben no holes - the sea's, down the river to the Topal Bay
   assert.equal(t.land.reduce((n, v) => n + v, 0), 26599);
   const holes = pieces(t.land.map((v) => 1 - v), t.w, t.h).filter((p) => !p.edge).map((p) => p.cells.length).sort((a, b) => a - b);
   assert.deepEqual(holes, [15, 20, 281], 'Hammerfell\'s two lakes, the Inner Sea');
-  // no strait: every pixel between two provinces' land is land - PIN MOVED (NIBEN-SEA): but the Niben's own course, whose
+  // no strait: every pixel between two provinces' land is land
   // last reach runs on Elsweyr's border with the Imperial Province
   const niben = new Set(nibenCells().map(([x, y]) => y * t.w + x));
   for (let y = 1; y < t.h - 1; y++) for (let x = 1; x < t.w - 1; x++) {

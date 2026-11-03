@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): THE WARDROBE AT THE COUNTER - the row a Clothing Store's, an
+// APPEARANCES: THE WARDROBE AT THE COUNTER - the row a Clothing Store's, an
 // Armorer's or a Weaponsmith's keeper puts on their popup (either skin's: ui/merchant/merchantServiceWindow.js shopRowRect,
 // the Enhanced Plus panel's press), the window it opens (ui/wardrobe/wardrobeDoor.js), and the wear and the clear it asks
 // for - the law's (systems/appearances.js), on the player's own worn pieces and purse.

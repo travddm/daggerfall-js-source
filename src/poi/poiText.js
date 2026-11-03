@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-3 (2026-10-14) - WHAT THE EDITOR SAYS, IN THE BUILDER'S LANGUAGE.
+// POI-3 - WHAT THE EDITOR SAYS, IN THE BUILDER'S LANGUAGE.
 //
 // The law (poi/poiLaw.js), the glTF reader (poi/gltfImport.js), the mesh (poi/poiMesh.js) and the picture header
 // (poi/poiImage.js) speak in CODES - a stable word and the numbers it turns on - so the service, the game and the

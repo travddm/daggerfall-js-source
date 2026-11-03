@@ -1,4 +1,4 @@
-// PERF7 - THE STREAM BUILD BREATHES (2026-09-11). A streamed pixel is
+// PERF7 - THE STREAM BUILD BREATHES. A streamed pixel is
 // built by an async function that awaits per model, and an await on a
 // promise that is already settled continues as a MICROTASK - it never
 // gives the frame back. On a cold load the fetches are real and the
@@ -34,16 +34,14 @@ export const BUILD_SLICE_MARGIN_MS = 2.5;
 /** PERF-EXT24: a stream that has been at it this long gets the whole
  *  slice again - the bound on how much later a pixel can arrive. */
 export const BUILD_STREAM_AGE_MS = 2000;
-/** OW-BUILD (bible/06-Systems/Travel-View.md OW-BUILD): the frame a slice is sized against while the Overworld is up -
+/** OW-BUILD (OW-BUILD): the frame a slice is sized against while the Overworld is up -
  *  30 a second, whatever the display's. */
 export const BUILD_OVERWORLD_FRAME_MS = 1000 / 30;
 /** OW-BUILD: the most an Overworld slice lends - a light frame still draws at 30 a second or better. */
 export const BUILD_SLICE_OVERWORLD_MS = 20;
 
 /**
- * PERF-EXT24 (2026-09-25, the players: "fps issues in the exterior but
- * fine in the interior", "me too my friend.. don't know why. I got a
- * RX6600"): THE SLICE IS WHAT THE FRAME LEFT. The breather resumes inside
+ * PERF-EXT24: THE SLICE IS WHAT THE FRAME LEFT. The breather resumes inside
  * its own animation-frame callback - the SAME rendering opportunity as the
  * frame's (60 of 60 resumptions carried the frame's timestamp in headless
  * Chromium) - so a flat 6 ms slice sat on top of a frame that had already
@@ -58,7 +56,7 @@ export const BUILD_SLICE_OVERWORLD_MS = 20;
  * a build something is waiting on (the boot's, a teleport's) always does.
  * Pure: every input is an argument.
  *
- * OW-BUILD (bible/06-Systems/Travel-View.md OW-BUILD; the owner's call, 2026-10-18): UNDER THE OVERWORLD THE GROUND
+ * OW-BUILD (OW-BUILD; the owner's call, 2026-10-18): UNDER THE OVERWORLD THE GROUND
  * COMES FIRST. A journey there runs the clock at up to a hundred times walking pace, the ground the stream has not
  * built is what holds it (TV2's governor halves it to x1 - systems/travel/travelGovernor.js), and the traveller is
  * watching the land from the sky, not fighting on it. So while the view is up (`overworld`) a slice is what a frame of

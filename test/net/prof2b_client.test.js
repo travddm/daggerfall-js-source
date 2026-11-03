@@ -1,9 +1,9 @@
-// PROF2b (2026-10-03, Mac: "plus we need to build motherloads"): THE MOTHERLODES ON THE CLIENT - the device's book
+// PROF2b: THE MOTHERLODES ON THE CLIENT - the device's book
 // (net/motherlodeBook.js: today's three read and read again, the warning ten minutes ahead and a Sense's thirty, the
 // rising said once, the relay's Watch receipts kept the newest a pixel and this account's alone, a strike's answer
 // heard), the mining host's half (scenes/mineHost.js: where a Motherlode stands on its pixel, its heap, its plan, its
 // act refused with no Watch and carrying it with one, its silver said), the professions' book carrying the receipt to
-// the service, and the world host's seams by source. bible/06-Systems/Professions-Arc.md 38.
+// the service, and the world host's seams by source. 38.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -33,7 +33,7 @@ async function relayKey() {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   return importReceiptKey(Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64'), { subtle });
 }
-// AUDIT SILVER-WAYS D1 (PIN MOVED): the rig's device turns the day at its first moment (`rand` 0) - the spread is pinned
+// AUDIT SILVER-WAYS D1 (
 // in test/net/auditsilver_client.test.js
 function bookRig({ lodes = [lode(0), lode(1), lode(2)], found = null, rand = () => 0 } = {}) {
   let nowS = DAY0 * 86400 + 60, nowMs = 1_000_000;
@@ -82,7 +82,7 @@ test('PROF2b the book: today\'s three read on arrival and again every five minut
   const l1 = s.b.state.lodes[1];
   s.at(l1.opensAt - 1800); s.b.tick({ sense: true });
   assert.deepEqual(s.said, [MOTHERLODE_TEXT.warn('Ebony', 'Wrothgarian Mountains', 30)]);
-  // the day's turn reads again - AUDIT SILVER-WAYS D1 (PIN MOVED): a retry's minute since the last asked at least (the
+  // the day's turn reads again - AUDIT SILVER-WAYS D1 (
   // rig's milliseconds stood still across the day)
   s.ms(1_000_000 + MOTHERLODE_RETRY_MS); s.at((DAY0 + 1) * 86400 + 5); s.b.tick(); await tick();
   assert.equal(s.reads.length, 2);
@@ -214,11 +214,11 @@ test('PROF2b the seams by source: the professions\' book sends a harvest\'s Watc
   assert.match(w, /const motherlodeBook = motherlodeDoor \? createMotherlodeBook\(\{/);
   assert.match(w, /nowS: \(\) => Math\.floor\(\(Date\.now\(\) \+ _sharedOffsetMs\) \/ 1000\),/);
   assert.match(w, /onChange: \(l\) => gatherHost\?\.restandAt\(l\.x, l\.y\),/);
-  assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);   // PIN MOVED (TOWN-ECON TE2): and the towns' book keeps it where a town stands
+  assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);
   assert.match(w, /motherlodeBook\?\.tick\(\{ sense: profBook\.track\('mining'\)\.specs\?\.\[100\] === 'motherlode-sense' \}\)/);
   assert.match(w, /mineKind\(\{ book: profBook, lodes: motherlodeBook, marks: marksBook \}\)/);
-  assert.match(w, /for \(const l of motherlodeBook\.markedAll\(_lodesUp\)\) \{/);   // AUDIT SILVER-WAYS D7 (PIN MOVED): into the frame's own list; FIELD BUGS 2026-10-12g LODE-MARK (PIN MOVED): from its warning on
-  assert.match(w, /return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);   // LODE-MARK (PIN MOVED): drawn over the near nodes
+  assert.match(w, /for \(const l of motherlodeBook\.markedAll\(_lodesUp\)\) \{/);   // AUDIT SILVER-WAYS D7 (
+  assert.match(w, /return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);   // LODE-MARK (
   assert.match(src('src/scenes/gatherHost.js'), /restandAt\(px, py\) \{ restandAt\(px, py\); \},/);
   assert.doesNotMatch(src('src/ui/professions/profPages.js'), /PROF2b/, 'no card waits on the Motherlodes');
   for (const e of ['motherlode-closed', 'motherlode-watch', 'motherlode-found', 'motherlode-full']) assert.ok(REFUSALS[e], e);

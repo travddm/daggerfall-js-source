@@ -1,4 +1,4 @@
-// AUDIT NAV2 (2026-09-30) - THE LIVING CREW, SECOND PASS (slice D: Mac, "Crew members shouldnt be the static sprites and
+// AUDIT NAV2 - THE LIVING CREW, SECOND PASS (slice D: Mac, "Crew members shouldnt be the static sprites and
 // instead the enemy type sprites with multiple animations, they should navigate the deck, talk with each other, blurb,
 // sing chantys, etc" and "Boarding scenarios should be seamless, with crew naturally getting into position and fighting
 // enemies"). The crew, online and frame lenses' findings, each pinned on the real code:
@@ -75,7 +75,6 @@ function liftCrewFrame(s) {
   const at = WORLD.indexOf('\n  function navalCrewFrame(dt) {', from);
   assert.ok(from > 0 && at > from, 'the crews\' frame in the world');
   const end = WORLD.indexOf('\n  }\n', at) + 5;
-  // PIN MOVED (SHIP-WATCH): the crews' night - the world's hour (noon unless a test says), read through the watch's law
   const names = ['csa', 'modes', 'naval', 'navalCrew', 'cam', 'walkMode', 'playerSpawned', 'player', 'hullBuild', 'crewCount', 'crewRoster', 'intoDeck', 'CREW_KEEP', 'CREW_RANGE', 'navalOn', 'online', 'csaRuntime', 'asleepHour', 'hourOf', 'minuteNow'];
   // eslint-disable-next-line no-new-func
   return new Function('s', `const { ${names.join(', ')} } = s;\n${WORLD.slice(from, end)}\nreturn { navalCrewFrame };`)({
@@ -249,7 +248,6 @@ test('AUDIT NAV2 F40 THE RAIL DEALT FORE TO AFT: the muster\'s rail slots go to 
       assert.ok(walkers.every((m) => Math.abs(m.pos[0]) > 1.5 && Math.sign(m.pos[0]) === side), `${cls} ${seed}: at her ${side > 0 ? 'starboard' : 'port'} rail`);
       // the rail's places are the walkers' - a station keeps his post and takes none (her captain's and her helmsman's
       // on the Small Ship's poop sent her walkers to the forward half of it)
-      // PIN MOVED (GALLEON, 2026-10-01): her main deck's rail - the new galleon's castle aft of it, up its flights
       const ext = deckExtentZ(deck, mainLevel(deck)), aft = Math.min(...walkers.map((m) => m.pos[2]));
       assert.ok(aft <= ext[0] + (ext[1] - ext[0]) / walkers.length + 0.5, `${cls} ${seed}: her aftmost walker at the rail's aftmost place (${aft.toFixed(1)})`);
       for (let k = 1; k < before.length; k++) {
@@ -278,7 +276,6 @@ test('AUDIT NAV2 F62 THE MUSTER ON HER MAIN DECK (F40 after F34, found at the me
   }
   // the Small Ship's, through her crew's own muster: every walker ready at her main deck's rail on the side asked
   const deck = pool.deckOf(2, 0), main = mainLevel(deck);
-  // PIN MOVED (GALLEON, 2026-10-01): the new galleon's raised deck is her castle, aft, up its two flights
   assert.ok(deckExtentZ(deck)[0] < deckExtentZ(deck, main)[0] - 5, 'her castle is her deck, aft of her main deck');
   for (let seed = 1; seed <= 6; seed++) {
     const life = createCrewLife({ deck, roster: crewRoster({ hull: 2, seed, shipClass: pirate }), seed, places: placesOf(hullOf(2), deck), faction: 'pirate' });
@@ -291,7 +288,7 @@ test('AUDIT NAV2 F62 THE MUSTER ON HER MAIN DECK (F40 after F34, found at the me
       assert.ok(m.pos[0] * side > 1.5 && Math.abs(m.pos[1] - main) <= DECK_STEP, `seed ${seed}: #${m.i} at her main deck's ${side > 0 ? 'starboard' : 'port'} rail: ${m.pos.map((v) => v.toFixed(2))}`);
     }
   }
-  // AUDIT GALLEON T2 (2026-10-02): her own crews never reach her raised deck's rows - a hull-2 class stands six, her
+  // AUDIT GALLEON T2: her own crews never reach her raised deck's rows - a hull-2 class stands six, her
   // officer and her coxswain at their stations on her castle, and four walkers' slots lie forward of her flights (her
   // main deck's extent ends at z -9.16; eight hands' aftmost slot, -7.44, falls on her flights' foot tread, a step up
   // and her main deck's band either way) - so the rail asked at no level survived on every hull. A muster of twelve
@@ -334,7 +331,7 @@ test('AUDIT NAV2 F41 NO TWO ON ONE SPOT: ten minutes on the Galley\'s deck and t
     }
   }
   assert.ok(worst <= 1, `two stood on one spot ${worst.toFixed(1)} s - ${where}`);
-  // AUDIT GALLEON T2 (2026-10-02): the passing-over rule pinned on its own - the real hulls' runs reach it by chance of
+  // AUDIT GALLEON T2: the passing-over rule pinned on its own - the real hulls' runs reach it by chance of
   // their spots (the Carrack's changed with her cargo hatch, and it went unreached). On the plain deck: #6 stands
   // still at (-2.25, -2); #5 walks fore along x -2.25 through him; #3, before him in the roster, walks the same line
   // 1.3 m ahead of the point where #5 passes over #6 and is held there by someone in his own way (`avoid`, the player)
@@ -381,7 +378,6 @@ test('AUDIT NAV2 F41 A TALK BEGUN ON ONE SPOT, AND A SHIPMATE IN THE WAY: two me
   // the talk: every man but two stood at the rail aft (a muster's `ready` - nothing moves him), the two on one point
   const life = createCrewLife({ deck, roster: crewRoster({ hull: 3, seed: 2, shipClass: pirate }), seed: 2 });
   for (const m of life.members) { m.pos = [-3.25, 2, -11 + m.i * 1.3]; m.state = 'ready'; m.path = null; }
-  // PIN MOVED (AUDIT WK-W1): her lookout (#1 here) stands from her first step and nobody talks with him - the man
   // talked to is #2
   const [a, , b] = life.members;
   assert.notEqual(b, life.lookout());
@@ -398,14 +394,14 @@ test('AUDIT NAV2 F41 A TALK BEGUN ON ONE SPOT, AND A SHIPMATE IN THE WAY: two me
   ], { minX: -6, maxX: 6, minZ: -14, maxZ: 14 });
   const l3 = createCrewLife({ deck: hatch, roster: crewRoster({ hull: 3, seed: 3, shipClass: pirate }), seed: 3 });
   for (const m of l3.members) { m.pos = [-3.25, 2, -11 + m.i * 1.3]; m.state = 'ready'; m.path = null; }
-  const [c, , e] = l3.members;   // PIN MOVED (AUDIT WK-W1): #2, never her lookout
+  const [c, , e] = l3.members;
   assert.notEqual(e, l3.lookout());
   e.pos = [0, 2, -3.25]; e.state = 'idle'; e.t = 1e9;   // just aft of the hatch; he comes from forward of it
   tries = 0;
   while (!c.mate && tries++ < 400) { c.pos = [0, 2, 3.25]; c.path = null; c.state = 'idle'; c.t = 0; l3.step(0.01, {}); }
   assert.ok(c.mate === e && c.path, 'a talk across the hatch');
   assert.ok(Math.hypot(c.path.at(-1)[0] - e.pos[0], c.path.at(-1)[2] - e.pos[2]) > 0.9, `a place of his own: ${c.path.at(-1)}`);
-  // AUDIT GALLEON D-wall (2026-10-02): a third man's place pinned on its own - the real hulls' ten-minute runs reached
+  // AUDIT GALLEON D-wall: a third man's place pinned on its own - the real hulls' ten-minute runs reached
   // it by chance of their spots (the Carrack's moved with her deck's walls, and it went unreached): a third man stands
   // where the talk's first place falls (CREW_TALK_REACH fore of the man talked to) - the place is the next turn's
   const l4 = createCrewLife({ deck, roster: crewRoster({ hull: 3, seed: 2, shipClass: pirate }), seed: 2 });
@@ -502,7 +498,7 @@ test('AUDIT NAV2 F35 A STATION TAKEN STANDS ON HER DECK: a fight takes her men w
       }
     }
   }
-  // AUDIT GALLEON T2 (2026-10-02): the station off her deck, on the plain deck - her captain's post on a poop 5.5 m out
+  // AUDIT GALLEON T2: the station off her deck, on the plain deck - her captain's post on a poop 5.5 m out
   // and 1.2 m over her deck: taken, his feet on her deck's point nearest it, never on the air at his post
   const plain = plainDeck();
   const lp = createCrewLife({ deck: plain, roster: crewRoster({ hull: 3, seed: 2, shipClass: pirate }), seed: 2, places: [[5.5, 3.2, -11]] });
@@ -682,7 +678,7 @@ test('AUDIT NAV2 F48 THE WALKS\' EDGES: a walk to a talk or to the muster held b
   const block = [m.pos[0] + (next[0] - m.pos[0]) / d * 0.5, 2, m.pos[2] + (next[2] - m.pos[2]) / d * 0.5];
   for (let t = 0; t < CREW_BLOCKED_S + 0.5; t += 0.05) l2.step(0.05, { muster: -1, avoid: block });
   assert.equal(m.state, 'ready', 'the muster stood to where he is');
-  // AUDIT GALLEON T2 (2026-10-02): the first leg pinned on its own - a lone hand on the plain deck off his cell's
+  // AUDIT GALLEON T2: the first leg pinned on its own - a lone hand on the plain deck off his cell's
   // centre at (-1, 2), mustered to her starboard rail: his walk's second corner lies across her mast's hole from where
   // he stands, so a walk straight at it (its first corner skipped) strides off her deck
   const l3 = createCrewLife({ deck, roster: [{ mobile: MOBILE.Warrior, gender: 'male' }], seed: 1 });

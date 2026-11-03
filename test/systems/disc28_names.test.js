@@ -1,5 +1,4 @@
-// DISC28-K (2026-09-28, Discord: two Mages Guild "cast the Sleep spell" jobs sent to the same house - the second showed
-// the first's residence name). A residence Place rolls a fresh surname on every pick (Place.cs:1219-1224, :1298-1311),
+// DISC28-K. A residence Place rolls a fresh surname on every pick (Place.cs:1219-1224, :1298-1311),
 // and discoverBuilding returned early on any building already discovered (PlayerGPS.cs:926-927) - before the live
 // quest's name was read. The first job's name was never cleared: both undiscovers act at the current location only and
 // only on a stored name equal to the new one. DFU does the same; the port re-stamps a stored name the live quest no

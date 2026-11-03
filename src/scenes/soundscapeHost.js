@@ -1,7 +1,6 @@
 // @ts-check
-// SOUNDSCAPE (2026-10-24, the owner: "enhancing sound and ambience, different music and ambience sounds for sailing,
-// more varied horse sounds, and whatever else we could improve") - THE SOUNDSCAPE'S HOST HALF. Design:
-// bible/08-Audio/Audio.md SOUNDSCAPE. The laws are the systems' (systems/soundscape/seaAir.js, worldAir.js,
+// SOUNDSCAPE - THE SOUNDSCAPE'S HOST HALF. Design:
+// SOUNDSCAPE. The laws are the systems' (systems/soundscape/seaAir.js, worldAir.js,
 // seaScore.js); this module reads the world host's doors once a frame, keeps what is dear to ask (the shore's edge, the
 // land near, the doors near, a port near) on clocks of its own, and plays them. The world host constructs it once and
 // calls it (HOST-SPLIT: fishHost.js's shape) - three calls: `frame` on the exterior frame, `stop` on every modal one

@@ -1,6 +1,5 @@
-// TRAVEL-ONLINE (2026-10-03, Mac: "Remove instant travel online"). Online, Daggerfall's fast travel is a teleport - it
-// arrives at the world's present, with no world time to spend (OL2, LIVED1) - and TO-ONLINE (2026-09-19, Mac: "travel
-// options uses instant travel for the online mod, which shouldn't be the case") had left three switches that reached
+// TRAVEL-ONLINE. Online, Daggerfall's fast travel is a teleport - it
+// arrives at the world's present, with no world time to spend (OL2, LIVED1) - and TO-ONLINE had left three switches that reached
 // it: Travel Options off, and either of the two dials that send a Cautious or an Inns trip down the journey (TO-LIVE put
 // both on the tile). All three are the room's now (systems/online/onlineLane.js ONLINE_ROOM_MOD_KEYS): online a land trip is
 // travelled whatever the player's own store says; offline every switch is still theirs.

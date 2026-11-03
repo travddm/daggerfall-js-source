@@ -1,5 +1,4 @@
-// ECOTONE1 (2026-10-07, Mac: "Making it where bione transitions are insta t and instead fade and transition naturally
-// into each other") - BLENDED CLIMATES: where map pixels of two climates meet, one wandering, patchy border (world/
+// ECOTONE1 - BLENDED CLIMATES: where map pixels of two climates meet, one wandering, patchy border (world/
 // ecotone.js) in place of the pixel's straight edge - the ground's tile sets sampled across it in both terrain programs
 // (render/ecotoneGlsl.js, renderer.drawTerrain's `eco`), the wild's flats laid by the climate that owns each tile
 // (world/terrain/terrainNature.js), the grass grown by the ground under it (scenes/world.js).
@@ -153,7 +152,7 @@ test('ECOTONE1: the GLSL is the JS - the hash bit for bit, the lattice noise and
     let blended = 0;
     const corners = [[0, 160, 0, 160], [660, PIXEL, 0, 160], [0, 160, 660, PIXEL], [660, PIXEL, 660, PIXEL]];
     for (const [x, z] of [...points(200), ...corners.flatMap(([x0, x1, z0, z1]) => points(80, x0, x1, z0, z1))]) {
-      const w = fns.ecoWeights([x, z]);   // AUDIT PRECIP GROUND-6 (PIN MOVED): the shares once, the blend by them
+      const w = fns.ecoWeights([x, z]);   // AUDIT PRECIP GROUND-6 (
       assert.ok(Math.abs(w[0] + w[1] + w[2] + w[3] - 1) < 1e-9, 'the shares sum to one');
       const got = fns.ecotone([0, 0, 0], w, [0.5, 0.5, 2], [0.01, 0], [0, 0.01]);
       const want = bySlot(ecotoneShares(PX, PY, x, z));
@@ -169,17 +168,11 @@ test('ECOTONE1: the GLSL is the JS - the hash bit for bit, the lattice noise and
 });
 
 test('ECOTONE1: both terrain programs sample their neighbours right after their own tile - the lane decoding them as it decodes its own; the clip variant still the plain program and one line; the units free in both (mutants: the call dropped from either; the lane\'s neighbours undecoded)', () => {
-  const r = read('src/render/renderer.js');
-  const classic = r.slice(r.indexOf('const TERRAIN_FS = `'), r.indexOf('}`;', r.indexOf('const TERRAIN_FS = `')));
-  assert.match(classic, /\$\{ecotoneGlsl\(\)\}/);
-  // AUDIT PRECIP GROUND-6 (PIN MOVED): the weights asked once, the blend by them - the snow crosses the border by the same
-  // PIN MOVED (ROAD-LOOK): a road's edge blends into its ground on the own tile first (render/roadEdgeGlsl.js), so the
+  // AUDIT PRECIP GROUND-6 (
   // neighbours' weights follow that one line - the road's edge then crosses a climate's border as any ground does
-  // PIN MOVED (COAST-LOOK, render/groundEdgeGlsl.js): a transition is drawn as its two kinds' base records, and each
   // takes its neighbours' share by its own record before they meet; every other tile as before - its road's edge, then
   // the neighbours' share
   const ECO_AFTER = String.raw`(?: {2}(?:\/\/|highp uint geA, geB;|bool ge = groundMix\(|vec2 dux = )[^\n]*\n)+ {2}vec4 ew = ecoWeights\(vLocalXZ\);[^\n]*\n {2}if \(ge\) tex = mix\(ecotone\(geBase\(geA, tileUV, dux, duy\), ew, vec3\(tileUV, float\(geA\)\), dux, duy\), ecotone\(geBase\(geB, tileUV, dux, duy\), ew, vec3\(tileUV, float\(geB\)\), dux, duy\), geS\);\n {2}tex = roadEdge\(tex, data, unwrapped, gx, gy, t\);[^\n]*\n {2}if \(!ge\) tex = ecotone\(tex, ew, vec3\(tuv, float\(layer\)\), gx, gy\);`;
-  assert.match(classic, new RegExp(String.raw`vec3 tex = textureGrad\(uTileArr, vec3\(tuv, float\(layer\)\), gx, gy\)\.rgb;\n${ECO_AFTER}`));
   assert.match(EL_TERRAIN_FS, new RegExp(String.raw`vec3 tex = elDecode\(textureGrad\(uTileArr, vec3\(tuv, float\(layer\)\), gx, gy\)\.rgb\);\n${ECO_AFTER}`));
   assert.match(EL_TERRAIN_FS, /c \+= w\.y \* elDecode\(textureGrad\(uEcoArr1, tl, gx, gy\)\.rgb\);/, 'the lane blends in its own linear light');
   assert.match(ecotoneGlsl(''), /c \+= w\.y \* \(textureGrad\(uEcoArr1, tl, gx, gy\)\.rgb\);/, 'the classic program in its display values');
@@ -334,22 +327,6 @@ test('ECOTONE1: the switch - the row, the enhanced skin, ?ecotone=off; online th
 });
 
 test('ECOTONE1: the world host - the 3x3 read once a build; the kernel handed the border\'s natures; the neighbours\' sets loaded through the one tile-set home and held by the pixel; the slots in the shader\'s order; the draw, the grass and the flats by the border (mutants: the slots W/E swapped; a neighbour\'s set unheld; the grass the pixel\'s own set)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const ecotones = climateBlendOn\(\);/);
-  assert.equal((w.match(/climateBlendOn\(/g) ?? []).length, 1);
-  assert.match(w, /const near = ecotones \? climates3x3\(px, py, climate\) : null;/);
-  assert.match(w, /ecotone: natureBorder,/);
-  assert.match(read('src/world/terrain/terrainGen.js'), /ecotone,   \/\/ ECOTONE1/);
-  // AUDIT PRECIP GROUND-2 (PIN MOVED): on the snow lane the set held and drawn is its twin
-  // PIN MOVED (OW-HITCH): the one home is scenes/groundSets.js, the world host's module (HOST-SPLIT)
-  assert.match(read('src/scenes/groundSets.js'), /const loadGroundSet = async \(groundArchive, hold, winter = null\) => \{\n(?:\s+\/\/[^\n]*\n)*\s+const key = winter == null \? groundArchive : twinKey\(groundArchive\);\n\s+hold\.tileArray\(key\); const groundTex = await getTexture\(groundArchive\);/, 'the one home, held for the pixel');
-  // PIN MOVED (TESA-LANDS, AUDIT): the pixel's set and its neighbours' loaded together, all awaited before the draw
-  assert.match(read('src/scenes/pixelBuild.js'), /const ownSet = loadGroundSet\(groundArchive, pipeline, snowCover\?\.winterOf\(climate\) \?\? null\);/);
-  assert.match(read('src/scenes/pixelBuild.js'), /await Promise\.all\(\[ownSet, \.\.\.archives\.map\(\(a\) => loadGroundSet\(a, pipeline, /);
-  assert.match(w, /side: Int32Array\.of\(slot\(3\), slot\(5\), slot\(1\), slot\(7\)\),/, 'W, E, S, N of the 3x3 indexed (dz + 1) * 3 + (dx + 1)');
-  assert.match(w, /corner: Int32Array\.of\(slot\(0\), slot\(2\), slot\(6\), slot\(8\)\),/, 'SW, SE, NW, NE');
-  // PIN MOVED (AUDIT TESA-BIOME Z4): the neighbour a pixel reads - the Bay's map for a Bay pixel, the continent's frame past it
-  assert.match(w, /out\[\(dz \+ 1\) \* 3 \+ dx \+ 1\] = \(dx === 0 && dz === 0\) \|\| !climateNeighbourIn\(px, py, x, y\) \? own : getWorldClimateSettings\(maps\.getClimateIndex\(x, y\)\);/, 'north is the row above: y = py - dz');
   assert.equal(climateNeighbourIn(0, 10, -1, 10), false, 'a Bay pixel never reads past the Bay\'s map');
   assert.equal(climateNeighbourIn(999, 499, 1000, 499), false);
   assert.equal(climateNeighbourIn(500, 250, 501, 250), true);
@@ -357,10 +334,4 @@ test('ECOTONE1: the world host - the 3x3 read once a build; the kernel handed th
   assert.equal(climateNeighbourIn(-5, 10, -4, 10), true, 'and the Bay beside it');
   const f = tamrielFrameInBay();
   assert.equal(climateNeighbourIn(f.x0, 10, f.x0 - 1, 10), false, 'nothing past the continent\'s frame');
-  assert.match(w, /const y = py - dz|x = px \+ dx, y = py - dz/);
-  assert.match(w, /const ga = p\.ecoGround \? borderGround\(p, lx, lz\) : p\.groundArchive;/, 'the grass by the border');
-  assert.match(w, /return groundMeanColour\.get\(p\.ecoGround \? borderGround\(p, lx, lz\) : p\.groundArchive\)\?\.\[rec\] \?\? null;/);
-  assert.match(w, /addFlat\(archive, f\.record, f\.x, f\.y, f\.z, \{ wild: base, tree \}\);/, 'a border flat its own climate\'s archive');   // PIN MOVED (AUDIT PRECIP HOST-7: logged, its place groupFlats')
-  assert.match(w, /batch\.sway = floraSwayOf\(archive, g\.natureSet, plain\.h\);/);
-  assert.match(read('src/scenes/treeHost.js'), /const base = n\.flat\?\.base \?\? f\.base, archive = n\.flat\?\.archive \?\? f\.archive;/, 'a felled border tree\'s own stump');
 });

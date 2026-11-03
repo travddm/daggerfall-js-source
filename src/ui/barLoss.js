@@ -8,8 +8,7 @@
  *  how fast it drains once it goes (percent of the bar per second). */
 export const GHOST_HOLD = 0.55;
 export const GHOST_RATE = 70;
-/** GHOST-CAP (2026-10-02, Discord "Fatigue Bar": "When you get your Fatigue damaged while fighting Daedra, the pending
- *  change on the fatigue bar is white ... you can die from it while fighting"): the longest the strip stands still
+/** GHOST-CAP: the longest the strip stands still
  *  (seconds) however the losses keep coming. Every fresh loss restarted the hold, so a bar losing a little every few
  *  frames - fatigue through a fight, a Daedra's drain - never drained its strip at all: it stood at the fight's first
  *  level, a full-looking bar over one nearly empty. */

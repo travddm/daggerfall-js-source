@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-22d PEER-ART (bible/01-Overview/bugs/Field-Bugs-2026-10-22d.md, report 2): Foretold on the Discord's
+// FIELD BUGS 2026-10-22d PEER-ART (, report 2): Foretold on the Discord's
 // #bug-reports, "Memory Leak": "viewing task manager shows an instance out of 7 that is leaking 5gb of ram"; Xuurath:
 // "Yep massive memory leak on desktop app". The peers' art store (net/peer/peerRiders.js createEotbArt) kept every
 // sprite's decoded pictures for the session, and let a texture go only for a rider's horse look (COATS1) - a worn-armour
@@ -49,7 +49,6 @@ test('PEER-ART a sprite\'s look: a horse\'s its coat; a worn-armour walker\'s it
   assert.equal(spriteLookOf({ key: 'FMRM_0-0', archive: 1, rec: 0 }), null, 'a class sprite every player shares stands');
 });
 
-// PIN MOVED (AUDIT FB1022d D1): the store lets a look go in its once-a-frame sweep (the riders' settle), so each frame here
 // is swept as the world host's is
 test('PEER-ART the store lets an outfit go: past RIDER_LOOKS_KEPT outfits, one undrawn RIDER_LOOK_IDLE_MS is evicted - every texture of it - and one drawn now is never (mutants: walkers\' looks unkept)', async () => {
   const r = rig();

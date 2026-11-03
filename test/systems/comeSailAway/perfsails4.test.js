@@ -1,5 +1,4 @@
-// PERF-SAILS4 (2026-10-14, the owner's client online in a port after PERF-SAILS3: a ship's animators 0.31 ms of the
-// frame and her running rope's holders 0.45; bible/07-Rendering/Performance-Crowd.md PERF-SAILS4) - A CLIP'S CURVES
+// PERF-SAILS4 - A CLIP'S CURVES
 // BOUND ONCE AND A STILL CLIP POSED ONCE (world/unityAnimator.js), AND A ROPE'S BONES READ OFF THE FRAME'S WALK
 // (scenes/comeSailAway/comeSailAwayPool.js worldOf) - every pose the animators write and every bake the ropes make what it was.
 import '../../modsOff.js';

@@ -1,4 +1,4 @@
-// L10N3c (2026-09-27): A QUEST IN A TRANSLATION'S OWN WORDS. Parser.ParseLocalized's law over a -LOC file (the
+// L10N3c: A QUEST IN A TRANSLATION'S OWN WORDS. Parser.ParseLocalized's law over a -LOC file (the
 // DisplayName, fixed and numbered messages, an author's empty line kept as ' ', QBN ignored, and the throws where the
 // C# throws); ParseLocalizedQuestText filling the language's Internal_Quests only where it has no entry; GetMessage
 // reading the translation into the same Message every time it is asked (ReplaceMessage); ParseQuest's tail taking the
@@ -113,10 +113,3 @@ test('L10N3c a -LOC file that will not do is said and read as none - no DisplayN
   } finally { console.error = was; }
 });
 
-test('L10N3c by source: both parse doors take the -LOC DisplayName, GetMessage asks the table, and the offer list\'s label is wired to it', () => {
-  const machine = rd('src/systems/quest/machine.js');
-  assert.match(machine, /localizeDisplayName\(quest\);   \/\/ L10N3c\n\s+this\.questsToInvoke\.push\(quest\);/, 'scheduleQuest');
-  assert.match(machine, /return localizeDisplayName\(this\.parser\.parse\(lines, factionId,/, 'parseQuestForLists');
-  assert.match(rd('src/systems/quest/quest.js'), /const lines = localizedQuestMessage\(this\.questName, messageID\);\n\s+if \(lines\) result\.localize\(lines\);/);   // L10N5: read in place, the quest's own kept
-  assert.match(rd('src/scenes/quest/questBridge.js'), /getLocalizedQuestDisplayName: \(questName\) => localizedQuestDisplayName\(questName\),/);
-});

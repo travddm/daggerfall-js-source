@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FIRST-BUDGET (2026-10-25, SaberGGaming's report: "Provisioning is slow"; bible/06-Systems/Professions-Arc.md 52): THE
+// FIRST-BUDGET: THE
 // CRAFTS A TRACK TAKES TO JOURNEYMAN AND TO MASTER, MEASURED. Each crafting track is walked from no XP: every act the best
 // the rank opens - an unmade first-make where one is open (its own XP and its first's), else the best repeat - each a
 // unit (a cut, a mix, a dish, a brew, a piece); the clean act wherever the act has one (a clean pan, a clean chisel - a
@@ -7,7 +7,7 @@
 // the weave and the spin are the loom's works, not counted, and pay no first); no Firmament, no seat, no crafter's limit;
 // a Sculptor's carvings only at 100. `first` what a first-make pays: the law's own share (recipeLaw firstCraftXp asked as
 // own, workFirstXp, brewFirstXp), a flat figure every track (500, the law before FIRST-BUDGET), or a figure a track.
-// FIRST-BUDGET RETUNED (the owner, asked: "Match Smithing's pace"): firstShares DERIVES the law's shares - each track's
+// FIRST-BUDGET RETUNED: firstShares DERIVES the law's shares - each track's
 // the least, never under the floor's 500, at which this walk reaches Master in the crafts Smithing takes at its 500;
 // recipeLaw.js FIRST_MAKE_SHARE pins them and test/net/firstbudget_law.test.js holds the two equal.
 //

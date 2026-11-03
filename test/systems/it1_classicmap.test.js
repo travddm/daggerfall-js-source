@@ -1,4 +1,4 @@
-// IT1 (2026-10-04): IMMERSIVE TRAVEL ON THE CLASSIC WINDOW (ui/travel/travelMapWindow.js) - the mod's CarriageMap: the
+// IT1: IMMERSIVE TRAVEL ON THE CLASSIC WINDOW (ui/travel/travelMapWindow.js) - the mod's CarriageMap: the
 // five-texel page (Travel Options' routine as the mod copied it) with its own road switches and dot sizes, a driver's
 // refusals as the mod's OK box over the map, its popups never the remembered one, and the player's own map turned into
 // a CarriageMap while Travel Options is off (Init IL_03bf-03d2).

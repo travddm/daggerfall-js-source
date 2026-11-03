@@ -1,5 +1,4 @@
-// HUD-ICON1 (2026-09-24, Mac: "the classic interaction (grab, info etc) ui element is missing the sprite and is just
-// large text") - DFU'S INTERACTION-MODE ICONS, THE PICTURES THEMSELVES.
+// HUD-ICON1 - DFU'S INTERACTION-MODE ICONS, THE PICTURES THEMSELVES.
 //
 // U38 drew the mode's NAME in the HUD font: HUDInteractionModeIcon loads its four pictures out of Unity's
 // Resources folder (Assets/Resources/Icons/, DaggerfallUI.GetTextureFromResources), which is DFU-authored art and was

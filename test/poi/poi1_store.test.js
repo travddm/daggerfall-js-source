@@ -1,5 +1,5 @@
-// POI-1 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE POI FORMAT AND THE STORE THAT APPROVES IT.
-// Mac: "POI Tool (General Map Editor) ... a tool my developers can use without having to access the codebase"; "I need
+// POI-1 - THE POI FORMAT AND THE STORE THAT APPROVES IT.
+// "I need
 // to be able to approve changes"; "Developers + Builders".
 //   - the mesh (src/poi/poiMesh.js): one layout each way, and every way a mesh is refused;
 //   - the texture's header (src/poi/poiImage.js): PNG, JPEG and WebP known by their own bytes;
@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { encodePoiMesh, decodePoiMesh, poiMeshError, POI_MESH_LIMITS } from '../../src/poi/poiMesh.js';
 import { poiImageMetaOf } from '../../src/poi/poiImage.js';
 import { poiDocProblems, poiAssetProblems, poiAssetsOf, mintPoiId, unitQuat, problemLine, DEFAULT_MATERIAL, POI_LIMITS } from '../../src/poi/poiLaw.js';
-import { standService } from '../accountDb.mjs';
+import { d1, standService } from '../accountDb.mjs';
 import { poiPathOf } from '../../server-account/src/service.js';
 import { forgetPoiFeed, POI_FEED_KEEP_MS } from '../../server-account/src/poi.js';
 
@@ -116,7 +116,6 @@ test('POI-1 DOCUMENT: a whole POI answers no problems; every field short of the 
   assert.match(badL({ name: '' }), /^name:/m);
   assert.deepEqual(bad({ about: 'two\nlines' }), []);
   assert.match(badL({ about: 'a\u0007bell' }), /^about:/m);
-  // PIN MOVED (AUDIT RELEASE R2-8): a place's pixel is the world's grid - (1000, y) and (x, -1) are land past the Bay now
   assert.match(badL({ place: { ...good.place, px: 8192 } }), /^place\.px:/m);
   assert.match(badL({ place: { ...good.place, py: -8192 } }), /^place\.py:/m);
   assert.match(badL({ place: { ...good.place, x: 819.2 } }), /^place\.x:/m);
@@ -159,7 +158,7 @@ test('POI-1 PATHS: the store\'s paths matched as a save slot is - and nothing th
 
 async function theStore() {
   forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const mac = await s.registered('Mac'), dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), player = await s.registered('Player');
   const req = async (method, path, { who = null, body, raw, headers = {} } = {}) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
@@ -179,7 +178,7 @@ async function theStore() {
 }
 
 test('POI-1 STORE: the roles - a guest and a player build nothing; a developer and a listed builder build; only the listed approver decides; the lists read fresh (mutants: a developer not a builder; a builder an approver)', async () => {
-  const { req, mac, dev, mapper, player, guest, env } = await theStore();
+  const { req, mac, dev, mapper, player, guest, env, setStaff } = await theStore();
   const g = await guest();
   assert.deepEqual((await req('GET', '/v1/poi/me', { who: { secret: g.secret } })).json, { handle: null, builder: false, approver: false });
   assert.deepEqual((await req('GET', '/v1/poi/me', { who: player })).json, { handle: 'Player', builder: false, approver: false });
@@ -190,7 +189,7 @@ test('POI-1 STORE: the roles - a guest and a player build nothing; a developer a
   assert.equal((await req('GET', '/v1/poi/queue', { who: dev })).status, 403);
   assert.equal((await req('GET', '/v1/poi/queue', { who: mac })).status, 200);
   assert.equal((await req('GET', '/v1/poi/me')).status, 401, 'no session, no answer');
-  env.BUILDER_HANDLES = '';
+  setStaff('Mapper', 'none');
   assert.equal((await req('GET', '/v1/poi/me', { who: mapper })).json.builder, false, 'a handle taken off the list is refused at its next call');
 });
 
@@ -250,7 +249,6 @@ test('POI-1 STORE: draft, submit, approve - the feed is live revisions only: a d
   assert.equal(q.json.queue[0].doc.name, 'The Watchtower');
   assert.equal(q.json.queue[0].stale, false);
   assert.equal((await req('POST', '/v1/poi/review', { who: dev, body: { id, rev: 1, verdict: 'approve' } })).status, 403);
-  // PIN MOVED (AUDIT POI S1): an approval names the document the approver saw - the queue's `docSha`
   assert.deepEqual((await req('POST', '/v1/poi/review', { who: mac, body: { id, rev: 1, verdict: 'approve', note: 'Good.', docSha: q.json.queue[0].docSha } })).json, { id, rev: 1, state: 'approved' });
   assert.equal((await req('POST', '/v1/poi/review', { who: mac, body: { id, rev: 1, verdict: 'reject' } })).status, 409, 'decided once');
 
@@ -273,7 +271,6 @@ test('POI-1 STORE: rejected with a word; a retirement asked and approved takes t
   const id = 'poi-0000000000aa';
   const save = async (who, name, base = null) => (await req('PUT', '/v1/poi/draft', { who, body: { doc: docOf(id, m.sha, { name }), base } })).json;
   const submit = async (who, rev) => (await req('POST', '/v1/poi/submit', { who, body: { id, rev } })).json;
-  // PIN MOVED (AUDIT POI S1): the approver's word names the document seen, as the queue gives it
   const review = async (rev, verdict, note) => {
     const seen = (await req('GET', '/v1/poi/queue', { who: mac })).json.queue.find((x) => x.id === id && x.rev === rev);
     return (await req('POST', '/v1/poi/review', { who: mac, body: { id, rev, verdict, note, docSha: seen?.docSha ?? null } })).json;
@@ -318,7 +315,6 @@ test('POI-1 STORE: rejected with a word; a retirement asked and approved takes t
   const list = (await req('GET', '/v1/poi/list', { who: mapper })).json.pois;
   assert.equal(list[0].name, 'First');
   assert.equal(list[0].liveRev, 1);
-  // PIN MOVED (AUDIT POI S14): the rollback is a revision of its own, the approver's, approved
   assert.deepEqual(list[0].revs.map((x) => [x.kind, x.state]), [['doc', 'approved'], ['doc', 'approved'], ['doc', 'rejected'], ['doc', 'draft'], ['retire', 'approved'], ['rollback', 'approved']]);
 });
 
@@ -336,11 +332,10 @@ test('POI-1 STORE: the feed kept in the isolate - asked again inside its keep, n
   assert.equal(n, 3, 'the version alone');
 });
 
-test('POI-1 RECORDS: the store is in the migrations, the roles in the config, its shared law in the account deploy\'s filter', () => {
-  assert.match(src('server-account/migrations/0116_poi.sql'), /CREATE TABLE IF NOT EXISTS poi_revs/);
+test('POI-1 RECORDS: the store is in the schema, the roles in the config, its shared law in the account deploy\'s filter', () => {
+  assert.ok(d1()._raw.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'poi_revs'").get());
   const toml = src('server-account/wrangler.toml');
-  assert.match(toml, /^APPROVER_HANDLES = "Lattymoy"$/m);
-  assert.match(toml, /^BUILDER_HANDLES = ""$/m);
+  assert.doesNotMatch(toml, /^(APPROVER|BUILDER)_HANDLES/m, 'no role is named in config');
   const wf = src('.github/workflows/account-deploy.yml');
   for (const f of ['src/poi/poiLaw.js', 'src/poi/poiMesh.js', 'src/poi/poiImage.js']) assert.ok(wf.includes(`- "${f}"`), `${f} is not in the deploy's filter`);
 });

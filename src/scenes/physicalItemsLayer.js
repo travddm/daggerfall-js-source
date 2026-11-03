@@ -1,6 +1,6 @@
 // @ts-check
-// PI1 (2026-10-07): PHYSICAL ITEMS IN THE SCENE - demifiend000's mod (vendor/physical-items; its law is
-// systems/physicalItems.js, its record bible/06-Systems/Physical-Items.md) as one layer every host's ground-pile pool
+// PI1: PHYSICAL ITEMS IN THE SCENE - demifiend000's mod (vendor/physical-items; its law is
+// systems/physicalItems.js, its record) as one layer every host's ground-pile pool
 // builds for itself (scenes/droppedLoot.js createDroppedLoot - THE ONE CONSTRUCTION SEAM: four hosts, one constructor),
 // so its pictures, its ray targets, its plaque, its lines and its recentre ride the doors each host already calls on
 // that pool.
@@ -14,19 +14,19 @@
 // - AN ITEM OF ITS OWN (Independent): the shift-drop's one-item pile (droppedLoot.js dropPhysical), which the pool keeps
 //   and saves as it keeps every pile, wearing its item's picture where the pile's bag would stand.
 //
-// THE PICTURE, two ways (Mac: "This should work for both morrowind and the sprite system"): the item's Morrowind picture
+// THE PICTURE, two ways: the item's Morrowind picture
 // while a Morrowind build stands (combat/fpArm.js mountPicture - the ground mesh face-on, the decor room's own door), else
 // the pack's own picture (ui/item/itemIconColor32.js - the classic art, a replacement, the item's dye). A build that lands or
 // goes (fpArm.js mountPictureStamp) has every item ask again. Either is cut to its visible texels and stood at the mod's
 // size (BuildVisual [IL_0982]).
 //
-// THE RARITY DRESS (Mac: "the rarity treatment (like we do for the world boss)"): the world boss's loot line out of the
+// THE RARITY DRESS: the world boss's loot line out of the
 // top of a Rare-or-better picture (`finds` - scenes/lootLines.js, which leaves a presented item out of its body's own
 // line) and the port's own tier rim on a Magic-or-better one (systems/physicalItems.js rarityRim), both read every frame
 // so the rarity row's switch reaches what already lies.
 //
-// AUDIT PI1 (2026-10-07, Mac: "Lets do a conprehensive audit and ensure this is perfection"): five readers, each one
-// dimension (the IL, the hosts, this layer, the draw, the pins and the records); bible/01-Overview/audits/Audit-PI1.md is the
+// AUDIT PI1: five readers, each one
+// dimension (the IL, the hosts, this layer, the draw, the pins and the records); is the
 // record, and every `AUDIT PI1 <id>` below names the finding it closes.
 //
 // Not a DFU member. Ledger A (PI).

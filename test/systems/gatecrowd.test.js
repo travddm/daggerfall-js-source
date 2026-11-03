@@ -1,12 +1,10 @@
-// GATE-CROWD (2026-10-07, Mac: "We need to not allow followers inside the oblivion gates, plus need some type of filter
-// when there are too many people"): THE COURT, ALONE AND THINNED. GATE-ALONE - no companion steps into an Oblivion
+// GATE-CROWD: THE COURT, ALONE AND THINNED. GATE-ALONE - no companion steps into an Oblivion
 // Gate's court (scenes/world.js companionPlace answers no place there, so the companion layer, scenes/crewAshore.js,
 // lifts the crew's hands and the sworn as the player steps in and stands them again outside), the party panel draws no
 // card for them there, and the court says so once as a fighter steps in with any at their side. THE CROWD - past the
 // count on the Other players card only the nearest other players are drawn, the party always, the places held against a
 // newcomer only a little nearer (net/gate/gateCrowd.js; the online frame's drawn list) - in a court, and since
-// CROWD-WIDE (2026-10-23, the owner: "Can we implement the player toggle we have for the oblivion gate into the entire
-// game?") everywhere a stranger cannot fight me, my duel's opponent always. Design: bible/11-Multiplayer/World-Bosses.md
+// CROWD-WIDE everywhere a stranger cannot fight me, my duel's opponent always. Design:
 // section 21.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -148,17 +146,17 @@ test('GATE-CROWD the host\'s crowd: where the count does not cut every peer, the
 
 // ── the host: the crowd's cut in the online frame ─────────────────────────────────────────────────────────────────
 
-test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are kept and before a cast, a light or a body is drawn - at the card\'s count, nearest to where I stand; CROWD-WIDE: everywhere, in a court wherever it stands (in the zone, in a battle), and never in the open zone, a siege\'s or a tourney\'s battle, an arena\'s room or under the travel view; AUDIT CROWD-WIDE A2: never cut - my party, my duel\'s opponent, my trade\'s partner, those I ride or sail with and a duel\'s two fighters; with no social state; a stored value that is no tier reads as everyone (mutants: cut only in a court; cut in the zone, a battle, an arena or overhead; the court\'s own cut lost; the count unread; the tier unread; the party, the duel, the trade, the ride, the boat or the ring unasked; my place unread; social assumed)', () => {
+test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are kept and before a cast, a light or a body is drawn - at the card\'s count, nearest to where I stand; CROWD-WIDE: everywhere, in a court wherever it stands (in a battle), and never in the open zone, a siege\'s or a tourney\'s battle, an arena\'s room or under the travel view; AUDIT CROWD-WIDE A2: never cut - my party, my duel\'s opponent, my trade\'s partner, those I ride or sail with and a duel\'s two fighters; with no social state; a stored value that is no tier reads as everyone (mutants: cut only in a court; cut in the zone, a battle, an arena or overhead; the court\'s own cut lost; the count unread; the tier unread; the party, the duel, the trade, the ride, the boat or the ring unasked; my place unread; social assumed)', () => {
   const m = lift(/\n\s*for \(const d of drawable\) if \(d\?\.shown\) _peerMapPoses\.set\(d\.id, d\.shown\);\n(?:\s*if \(hccOn\(\)\) hcc\.driverGlue\(drawable, \{ toWire: campToWire \}\);[^\n]*\n)?\s*const ranged = peerRange\.cut\(cabin \? drawable : drawable\.filter\(\(d\) => !csaPeers\.isBelowDeck\(d\.id\)\), [^\n]*\n\s*const visiblePeers = gateCrowd\.cut\(ranged, (\{ on: [^\n]*?\})\);[^\n]*\n\s*peerCastVisuals\(visiblePeers\);/, 'the crowd\'s cut');   // PIN MOVED (PEER-RANGE): the court's crowd is cut from the players within the draw distance (test/systems/peerrange.test.js)
   assert.match(WORLD, /const gateCrowd = createGateCrowd\(\);/);
   // the cut's question, evaluated as the frame asks it
-  const ask = new Function('d', `const { modes, player, onlineToScene, gateCrowdMax, getPref, social, travelView, wildHere, siegeSession, royalSession, duelMgr, crowdKept, tradeMgr, wagonRiders, csaAboard, _duelRings } = d; return ${m[1]};`);
+  const ask = new Function('d', `const { modes, player, onlineToScene, gateCrowdMax, getPref, social, travelView, siegeSession, royalSession, duelMgr, crowdKept, tradeMgr, wagonRiders, csaAboard, _duelRings } = d; return ${m[1]};`);
   const prefs = { gateCrowd: 12 };
   const ME2 = [517, 3, -260];
-  const host = (day, { zone = false, siege = false, royal = false, room = 'dungeon', overhead = false, opponent = null, social = { partyPeers: () => new Set(['m1']) }, trade = null, riding = [], sailing = [], rings = [] } = {}) => ({
+  const host = (day, { siege = false, royal = false, room = 'dungeon', overhead = false, opponent = null, social = { partyPeers: () => new Set(['m1']) }, trade = null, riding = [], sailing = [], rings = [] } = {}) => ({
     modes: { gateArenaDay: () => day, roomIdentity: () => (room ? { kind: room } : null) }, player: { pos: ME2 }, onlineToScene: (p) => [p.x, p.y, p.z], gateCrowdMax,
     getPref: (k) => prefs[k], social, travelView: overhead ? { active: true } : { active: false },
-    wildHere: () => zone, siegeSession: { active: () => siege }, royalSession: { active: () => royal }, duelMgr: { opponent },
+    siegeSession: { active: () => siege }, royalSession: { active: () => royal }, duelMgr: { opponent },
     crowdKept, tradeMgr: { session: trade ? { peer: trade } : null }, wagonRiders: { ridingWithMe: () => riding }, csaAboard: { shipmates: () => sailing }, _duelRings: new Map(rings.map((id) => [id, {}])),
   });
   // nineteen strangers within 19 m east of me, my party mate and five others past them - and two standing at the scene's
@@ -179,12 +177,11 @@ test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are
   assert.equal(court.length, 12, 'in the court: twelve');
   assert.ok(has(court, 'm1'), 'my party mate across the court among them');
   // never where a stranger can fight me, nor under the travel view
-  assert.equal(cutAt(host(null, { zone: true })), crowd, 'the open zone: never cut');
   assert.equal(cutAt(host(null, { siege: true })), crowd, 'entered in a siege: never cut');
   assert.equal(cutAt(host(null, { royal: true })), crowd, 'entered in a Royal Tourney: never cut');
   assert.equal(cutAt(host(null, { room: 'arena' })), crowd, 'an arena\'s room: never cut');
   assert.equal(cutAt(host(null, { overhead: true })), crowd, 'under the travel view: never cut');
-  for (const o of [{ zone: true }, { siege: true }, { royal: true }]) assert.equal(cutAt(host(7, o)).length, 12, `a court is cut wherever its gate stands, and whatever I am entered in (${Object.keys(o)[0]}) - nobody fights anybody there but him`);
+  for (const o of [{ siege: true }, { royal: true }]) assert.equal(cutAt(host(7, o)).length, 12, `a court is cut wherever its gate stands, and whatever I am entered in (${Object.keys(o)[0]}) - nobody fights anybody there but him`);
   // AUDIT CROWD-WIDE A2: those I fight, trade, ride or sail with, and a duel's two fighters, past the twelfth, drawn and counted
   const kept = cutAt(host(null, { opponent: 'foe', trade: 'trader', riding: ['driver'], sailing: ['captain'], rings: ['duelist'] }));
   assert.equal(kept.length, 12);
@@ -205,7 +202,7 @@ test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are
   // ...and the doors that answer a player on this screen: one the crowd leaves undrawn is not there to press, aim a gift
   // at, hand a page or hear struck (INVIS-NET's law for the concealed) - the crosshair's pick and the plaque, a gift's
   // aim and its burst, a page, a blow's spark and a cry
-  assert.match(WORLD, /const crowdDrawnHere = \(p\) => gateCrowd\.shows\(p\.id\) && peerRange\.shows\(p\.id\);/);   // PIN MOVED (PEER-RANGE): and the distance's
+  assert.match(WORLD, /const crowdDrawnHere = \(p\) => gateCrowd\.shows\(p\.id\) && peerRange\.shows\(p\.id\);/);
   assert.match(WORLD, /const peerInSight = \(eye, dir\) => \{\n\s*const hit = pickPeerInFront\(eye, dir, openPeers\(peersNear\(\), isPartyMate\)\.filter\(crowdDrawnHere\), SOCIAL_REACH, rayPersonDistance\);/, 'the F key and the plaque');
   assert.match(WORLD, /const giftablePeers = \(list\) => openPeers\(list, isPartyMate\)\.filter\(\(p\) => !\(duelMgr\.fighting && p\.id === duelMgr\.opponent\) && crowdDrawnHere\(p\)\);/, 'a gift\'s aim and its burst');
   assert.match(WORLD, /const pageReaders = \(\) => \{[\s\S]{0,200}?return openPeers\(near, isPartyMate\)\.filter\(crowdDrawnHere\)\.map\(/, 'AUDIT CROWD-WIDE B5: a page');
@@ -246,7 +243,7 @@ function placeOf(day, mode = 'dungeon') {
     navalOn: () => true, walkMode: true, playerSpawned: true, _loading: false, travelView: null, csaRuntime: null,
     modes: { transitioning: false, gateArenaDay: () => day, interiorPool: () => street, interiorCollider: null }, _mode: () => mode,
     exteriorFoes: street, collider: null, revenantSpawnOptions: () => ({}), effectiveLevel: () => 1, playerEntity: {}, _dungeonPool: () => pool,
-    madeRuleHere: (rule) => madeLevelRule(day != null ? 'court' : null, rule),   // PIN MOVED (EG-H2): the world host's word on the made level - a court of day `day` is the court (systems/madeLevel.js)
+    madeRuleHere: (rule) => madeLevelRule(day != null ? 'court' : null, rule),
   });
 }
 
@@ -259,7 +256,7 @@ test('GATE-ALONE the place: a gate\'s court is no place for a companion - the cr
   assert.ok(placeOf(null, 'interior')(), 'a building');
   assert.ok(placeOf(null, 'exterior')({ crew: false }), 'the street');
   assert.ok(placeOf(0)() === null, 'the court of day zero is a court');
-  assert.match(PLACE, /if \(\(crew && !navalOn\(\)\) \|\|[^\n]*\) return null;\n\s*if \(madeRuleHere\('companions'\) === 'out'\) return null;   \/\/ GATE-ALONE/, 'asked before any place is made');   // PIN MOVED (EG-H2): the made level's law (the court's row keeps companions out)
+  assert.match(PLACE, /if \(\(crew && !navalOn\(\)\) \|\|[^\n]*\) return null;\n\s*if \(madeRuleHere\('companions'\) === 'out'\) return null;   \/\/ GATE-ALONE/, 'asked before any place is made');
   assert.equal(madeLevelRule('court', 'companions'), 'out', 'the law: the court keeps companions out');
 });
 

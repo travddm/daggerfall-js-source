@@ -1,5 +1,5 @@
 // @ts-check
-// GRANT2 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md section 12): THE SPAWN GRANTS'
+// GRANT2: THE SPAWN GRANTS'
 // MEASURE, KEPT AND READ. The relay's cells post their windows of grant asks (src/net/grantMeasure.js), signed with the
 // relay's receipt key, to POST /v1/mod/grant-feed - a door proven by that signature, never a session (the chat feed's,
 // safety.js takeFeed). A developer reads them with /v1/mod/realm-grants (review.js; tools/realmReview.mjs grants):
@@ -7,7 +7,7 @@
 // cells' most live granted members. GRANT5 sets the buckets and the ceiling from it after seven days (the owner, question 3):
 // each kind's rate and the ceiling come back suggested beside the standing ones (grantRateSuggested, grantCeilingSuggested).
 // GRANT7 (section 15): readers' tallies against one sender, from enough accounts at once, open the moderators' case.
-// FOE-BOUNDS and GRANT-ASKS (2026-10-19, Mac: "Spec + B + A"; sections 19 and 21): so does the relay's OWN count - a
+// FOE-BOUNDS and GRANT-ASKS: so does the relay's OWN count - a
 // record of a sender's it stripped because no builder could give it, and an account's own asks far past its budget.
 import { openGrantMeasure, GRANT_RELAY_READER } from '../../src/net/grantMeasure.js';
 import { GRANT_KINDS, GRANT_CELL_CEILING, GRANT_CASE_REASONS } from '../../src/net/grantLaw.js';
@@ -20,7 +20,7 @@ import { discordOn } from './discord.js';
 export const GRANT_FEED_PATH = '/v1/mod/grant-feed';
 /** The shortest window an account's rate is read over, s - a cell that slept a minute after one ask is not sixty an hour. */
 export const GRANT_RATE_SPAN_MIN_S = 600;
-/** GRANT7 (the owner, 2026-10-18, question 2: "3 accounts / 10 min"): how many readers' accounts, each one that counts
+/** GRANT7: how many readers' accounts, each one that counts
  *  (safety.js credibleReporter: registered, not muted, no sprout), tallying a case's reasons against one sender inside
  *  GRANT_CASE_WINDOW_S open its moderators' case. */
 export const GRANT_CASE_READERS = 3;

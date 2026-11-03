@@ -1,6 +1,6 @@
 // @ts-check
-// ARENA4 (2026-10-02): THE BOUTS' RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE - the gate's carrier's law
-// (net/gate/gateClaims.js) for the arena's signature (net/arena/arenaReceipt.js). Design: bible/11-Multiplayer/Arena.md "7. Online".
+// ARENA4: THE BOUTS' RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE - the gate's carrier's law
+// (net/gate/gateClaims.js) for the arena's signature (net/arena/arenaReceipt.js). Design: "7. Online".
 //
 // THE RELAY SIGNS, THE ACCOUNT SERVICE COUNTS, THIS FILE CARRIES. A receipt the relay hands this socket at a bout's end
 // (net/arena/arenaLink.js `rc`) is kept on the device (ARENA_CLAIMS_KEY), one a bout, and offered to `/v1/arena/claim`

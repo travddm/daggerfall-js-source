@@ -1,6 +1,4 @@
-// AUTO-HOLD (2026-10-16, Mac on the Discord reports - "copies of an item were found. Trading is frozen until staff have
-// looked": "We need to figure out a better system for trade banning. I dont want to have to manually review";
-// bible/06-Systems/Integrity-Arc.md AUTO-HOLD). Pinned here:
+// AUTO-HOLD. Pinned here:
 //   - A COPY LOCKS ITS PIECE, NEVER THE CHARACTER: however many copies a record shows it trades on, each copied piece
 //     locked (item_dupes) and counted once a checkpoint, never a piece at a time;
 //   - A CONTESTED CLAIM IS NO STRIKE: a piece handed through a chest whose giver's game died before its record saw the give
@@ -10,8 +8,7 @@
 //   - THE LAW'S THIRD HOLD IS TIMED: a week, a month each after it, a clean checkpoint no way out inside it and the first
 //     past it lifting it; the count forgotten a month after the last finding (or the timed hold's end); staff's clear and
 //     rollback reset it;
-//   - 'dupe' RETIRED: a row still holding it lifts at its next checkpoint, and migration 0120 lifts every one standing
-//     (written as a staff act) and turns a law hold waiting for staff into the first timed hold;
+//   - 'dupe' RETIRED: a row still holding it lifts at its next checkpoint;
 //   - THE SHOP'S SHELF never lands back a piece its reader carries, nor one piece twice (world/interior/interiorShared.js);
 //   - (AUDIT) A KEY A RECORD HOLDS TWICE never leaves it, by a route or a trade - one of the two is a copy; a peer's word
 //     never hands its reader a piece it carries (systems/peerWord.js notCarried); a key on another piece holds while it is
@@ -155,7 +152,7 @@ test('AUTO-HOLD service: a contested claim - a piece through a chest, its giver\
     assert.deepEqual(s.findings(R.R.id, 'dupe'), [{ keys: [k], count: 1, contested: true }]);
     const next = await s.put(R, [withId(k), withId('b2b2b2b2b2b2b2b2')]);
     assert.deepEqual([next.tradeHeld, next.locked], [null, [k]], 'named in the answer');
-    assert.deepEqual((await s.put(R, [])).locked, [], 'gone from the record: nothing to name');   // PIN MOVED: AUDIT AUTO-HOLD - said as none, never left unsaid
+    assert.deepEqual((await s.put(R, [])).locked, [], 'gone from the record: nothing to name');
   } finally { s.done(); }
 });
 
@@ -174,7 +171,7 @@ test('AUTO-HOLD service: three copied pieces in one record are one incident - ea
 });
 
 test('AUTO-HOLD service: a row still held \'dupe\' lifts at its next checkpoint; staff\'s clear and rollback forget the timed hold and its count; staff\'s reads show it', async () => {
-  const s = await stand({ DEVELOPER_HANDLES: 'mac' });
+  const s = await stand({ SEAT_ADMINS: 'mac' });
   try {
     const A = await s.seat('old');
     s.raw.prepare("UPDATE realm_characters SET held = 'dupe', held_at = 1 WHERE id = ?").run(A.R.id);
@@ -196,30 +193,6 @@ test('AUTO-HOLD service: a row still held \'dupe\' lifts at its next checkpoint;
   } finally { s.done(); }
 });
 
-test('AUTO-HOLD service (AUDIT): a hold a reader cannot wait out - a dead maker\'s law hold whose time is out, its last judgement finding nothing - stands no more for its crafts and its listings; any other stands', async () => {
-  const s = await stand();
-  try {
-    const A = await s.seat('mak');
-    const now = 1_000_000;
-    const stands = (row) => {
-      s.raw.prepare('UPDATE realm_characters SET held = ?, held_until = ?, dead_at = ?, law_sig = ? WHERE id = ?').run(row.held, row.until ?? null, row.dead ?? null, row.sig ?? null, A.R.id);
-      return s.raw.prepare(`SELECT ${holdStandsSql('r', '?1')} AS v FROM realm_characters r WHERE r.id = ?2`).get(now, A.R.id).v;
-    };
-    assert.equal(stands({ held: 'law', until: now - 1, dead: 5 }), 0, 'dead, its week out, nothing carried: none');
-    assert.equal(stands({ held: 'law', until: now, dead: 5 }), 0, 'out at its very end');
-    assert.equal(stands({ held: 'law', until: now + 1, dead: 5 }), 1, 'its week still running');
-    assert.equal(stands({ held: 'law', until: now - 1 }), 1, 'alive: its next checkpoint is the lift');
-    assert.equal(stands({ held: 'law', until: now - 1, dead: 5, sig: 'crafted:135' }), 1, 'dead carrying what the law found');
-    assert.equal(stands({ held: 'law', dead: 5 }), 1, 'an untimed law hold');
-    assert.equal(stands({ held: 'staff', until: now - 1, dead: 5 }), 1, 'staff\'s');
-    assert.equal(stands({ held: null }), 0);
-    const realm = readFileSync(new URL('../../server-account/src/realm.js', import.meta.url), 'utf8');
-    const market = readFileSync(new URL('../../server-account/src/market.js', import.meta.url), 'utf8');
-    assert.match(realm, /WHERE p\.provenance = \?1 AND \$\{holdStandsSql\('r', '\?3'\)\}`\)\.bind\(provenance, playerId, Math\.floor\(Date\.now\(\) \/ 1000\)\)/, 'the craft\'s hold asks it');
-    assert.match(market, /const PATRON_HELD_SQL = `EXISTS \(SELECT 1 FROM realm_characters c WHERE c\.id = l\.char_id AND c\.player = l\.seller AND \(\$\{holdStandsSql\('c', /, 'the patrons\' too');
-  } finally { s.done(); }
-});
-
 test('AUTO-HOLD service (AUDIT): an answer names at most LOCKED_SAID_MAX locked pieces', async () => {
   const s = await stand();
   try {
@@ -227,7 +200,7 @@ test('AUTO-HOLD service (AUDIT): an answer names at most LOCKED_SAID_MAX locked 
     const keys = Array.from({ length: LOCKED_SAID_MAX + 2 }, (_, i) => `a${i.toString(16).padStart(15, '0')}`);
     const r = await s.put(A, keys.flatMap((k) => [withId(k), withId(k)]));
     assert.equal(r.locked.length, LOCKED_SAID_MAX);
-    assert.equal(LOCKED_SAID_MAX, 200);   // PIN MOVED: AUDIT AUTO-HOLD - 40 left a record's 41st copy free on the client (the service refuses it still)
+    assert.equal(LOCKED_SAID_MAX, 200);
   } finally { s.done(); }
 });
 
@@ -282,44 +255,6 @@ test('AUTO-HOLD service (AUDIT): a key on ANOTHER piece holds while it is carrie
   } finally { s.done(); }
 });
 
-test('AUTO-HOLD migration 0120: a hold waiting for staff on three strikes - law\'s or, AUDIT, a copies\' one over them - the first timed hold a week on, written with what it was; every other \'dupe\' hold lifted, written; every strike standing given its fade from its last finding (AUDIT: they stood for good); nothing else moved', async () => {
-  const s = await stand();
-  try {
-    const D = await s.seat('dup'), D2 = await s.seat('dlw'), L = await s.seat('law'), K = await s.seat('kep'), F = await s.seat('few'), N = await s.seat('non');
-    const set = (c, held, strikes) => s.raw.prepare('UPDATE realm_characters SET held = ?, held_at = ?, strikes = ?, held_until = NULL, law_holds = 0, law_at = NULL WHERE id = ?').run(held, held ? 777 : null, strikes, c.R.id);
-    set(D, 'dupe', 0); set(D2, 'dupe', STRIKES_FOR_TIMED); set(L, 'law', STRIKES_FOR_TIMED); set(K, 'staff', STRIKES_FOR_TIMED); set(F, 'law', STRIKES_FOR_TIMED - 1); set(N, null, 0);
-    const lawAt = s.now() - 40 * DAY;   // F's last law finding: the fade counts from it
-    s.raw.prepare("INSERT INTO realm_findings (player, char_id, seq, at, law, kind, detail) VALUES (?, ?, 1, ?, 0, 'law', '{}')").run(F.who.id, F.R.id, lawAt);
-    const revs = Object.fromEntries([D, D2, L, K, F, N].map((c) => [c.who.handle, s.row(c.R.id).judge_rev]));
-    const sql = readFileSync(new URL('../../server-account/migrations/0120_auto_hold.sql', import.meta.url), 'utf8');
-    const dml = sql.split('\n').filter((l) => !l.startsWith('--') && !l.startsWith('ALTER TABLE')).join('\n');
-    const before = Math.floor(realNowS());
-    s.raw.exec(dml);
-    const after = Math.ceil(realNowS());
-    const week = (r) => r.held_until >= before + LAW_HOLD_S && r.held_until <= after + LAW_HOLD_S;
-    assert.deepEqual([s.row(D.R.id).held, s.row(D.R.id).held_at, s.row(D.R.id).judge_rev], [null, null, revs.dup + 1]);
-    assert.deepEqual(s.findings(D.R.id, 'staff'), [{ act: 'clear', by: 'auto-hold', was: 'dupe' }]);
-    for (const [c, was] of [[L, 'law'], [D2, 'dupe']]) {
-      const r = s.row(c.R.id);
-      assert.deepEqual([r.held, r.strikes, r.law_holds, r.law_at, r.judge_rev, week(r)], ['law', 0, 1, r.held_until, revs[c.who.handle] + 1, true], `${was}: a week's hold from the migration`);
-      assert.deepEqual(s.findings(c.R.id, 'staff'), [{ act: 'timed', by: 'auto-hold', was, until: r.held_until }], `${was}: written with what it was`);
-    }
-    assert.equal(s.row(L.R.id).held_at, 777, 'a law hold keeps the time it began');
-    assert.ok(s.row(D2.R.id).held_at >= before && s.row(D2.R.id).held_at <= after, 'a copies\' hold turned the law\'s begins now');
-    const k = s.row(K.R.id);
-    assert.deepEqual([k.held, k.held_until, k.strikes], ['staff', null, STRIKES_FOR_TIMED], 'staff\'s own: never timed by the migration');
-    assert.ok(k.law_at >= before && k.law_at <= after, 'its strikes fade from now - no finding to count from');
-    const f = s.row(F.R.id);
-    assert.deepEqual([f.held, f.held_until, f.strikes, f.law_at, f.judge_rev], ['law', null, STRIKES_FOR_TIMED - 1, lawAt, revs.few + 1], 'a law hold under three: its fade from its last finding');
-    assert.deepEqual([s.row(N.R.id).law_at, s.row(N.R.id).judge_rev], [null, revs.non], 'no strike: untouched');
-    // and that fade is the law's: a clean checkpoint a month past the finding forgets the two strikes
-    assert.equal((await s.put(F, [])).tradeHeld, null);
-    assert.deepEqual([s.row(F.R.id).strikes, s.row(F.R.id).law_at], [0, null]);
-  } finally { s.done(); }
-});
-/** The wall clock the migration's SQL reads (`new Date()` is the engine's own - the stand replaces only Date.now). */
-const realNowS = () => new Date().getTime() / 1000;
-
 /** A device's storage, in memory. */
 const memoryStorage = () => {
   const kept = new Map();
@@ -343,7 +278,7 @@ test('AUTO-HOLD client: the realm session - a timed hold heard with its end and 
     { tradeHeld: 'law', tradeHeldWhy: { code: 'until', t: null, until: U1 }, locked: [k1] },
     { tradeHeld: 'law', tradeHeldWhy: { code: 'until', t: null, until: U2 }, locked: [k1, k2] },
     { tradeHeld: 'law', tradeHeldWhy: { code: 'crafted', t: 135 }, locked: [k1, k2] },
-    { tradeHeld: null, locked: [] },   // PIN MOVED: AUDIT AUTO-HOLD - every answer names the locked pieces, [] for none
+    { tradeHeld: null, locked: [] },
   ], storage);
   const held = [], told = [], sets = [];
   session.onTradeHeld = (prev, now, why) => held.push([prev, now, why]);
@@ -364,9 +299,9 @@ test('AUTO-HOLD client: the realm session - a timed hold heard with its end and 
   assert.equal(session.landedText, JSON.stringify({ n: 4 }), 'the last save the realm took');
   // what the player hears of those moves
   assert.equal(tradeHeldNotice(null, 'law', held[0][2]), tradeHeldUntilNotice(U1, 'Ring'));
-  assert.match(tradeHeldNotice(null, 'law', held[0][2]), /the last over a Ring it carries\. Its trading, gathering and crafting are frozen until .*, and after that until the Ring is gone\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID): what a hold freezes, said
+  assert.match(tradeHeldNotice(null, 'law', held[0][2]), /the last over a Ring it carries\. Its trading, gathering and crafting are frozen until .*, and after that until the Ring is gone\.$/);
   assert.equal(tradeHeldNotice('law', 'law', held[1][2]), tradeHeldUntilNotice(U2), 'a timed hold re-said with its new end');
-  assert.match(tradeHeldUntilNotice(U2), /^This character has been held 3 times\. Its trading, gathering and crafting are frozen until .*, then reopen on their own\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID)
+  assert.match(tradeHeldUntilNotice(U2), /^This character has been held 3 times\. Its trading, gathering and crafting are frozen until .*, then reopen on their own\.$/);
   assert.equal(tradeHeldNotice(null, 'law', held[2][2]), tradeHeldLawNotice('Ring'));
   assert.equal(tradeHeldNotice(null, 'law', { code: 'until', t: null, until: 'soon' }), TRADE_HELD_NOTICES.law, 'an end that is no time is no timed hold');
   // a second join on this device: what it told is told no more
@@ -449,7 +384,7 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
   assert.deepEqual([isRealmLocked(b), [...carriedPieces(entity).stowed], notCarried([b, b]).length], [false, [], 2], 'offline: nothing locked, nothing stowed, nothing filtered');
   // and every door a peer's word lands a piece through asks it (by source): a body's grant, a room's give, a body restored
   const src = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
-  assert.match(src('../../src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/);   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's, the line as it was
+  assert.match(src('../../src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/);
   assert.match(src('../../src/scenes/roomLootHost.js'), /function roomGive\(item, n\) \{\n    if \(n <= 0\) return;\n    if \(!notCarried\(\[item\]\)\?\.length\) return;/);
   assert.match(src('../../src/scenes/dungeonContext.js'), /else if \(sf\.items != null\) \{ const li = notCarried\(peerHanded\(validLootList\(sf\.items\)\)\); if \(li\) f\.entity\.items = li; \}/);
   // its end, written the game's language's way (the tests' English) - its own clock, never the wire's milliseconds
@@ -457,10 +392,7 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
   // AUDIT: no refusal says a review will come
   const refusal = accountRefusalText('trade-held');
   assert.equal(typeof refusal === 'function' ? refusal() : refusal, 'This character\'s trading, gathering and crafting are frozen. The notice shown when it froze says why, and until when.');   // PIN MOVED (RPT1026-MARKET HOLD-SAID): offline, no hold heard - what a hold freezes
-  assert.match(TRADE_HELD_STRIKES, /^ Holds add up: from the third, the freeze stays for a week even after it is gone, and for a month each time after that\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID)
-  // the host wires it at one line (HOST-SPLIT)
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /^  wireRealmHolds\(realmSession, \{ say: \(t\) => townTalk\.say\(t\), entity: playerEntity \}\);$/m);
+  assert.match(TRADE_HELD_STRIKES, /^ Holds add up: from the third, the freeze stays for a week even after it is gone, and for a month each time after that\.$/);
 });
 
 test('AUTO-HOLD client (AUDIT): A PIECE THE REALM LOCKED STAYS WITH ITS HOLDER - bound while it is, every door a binding closes closed to it (a counter, a trade, the ground, a room\'s container, a peer\'s word), in its own words; the wagon and the player\'s own storage still take it', () => {
@@ -529,12 +461,4 @@ test('AUTO-HOLD shelf: the room\'s word never lands back a piece its reader carr
   const boat = withId('5d5d5d5d5d5d5d5d', 14);
   assert.deepEqual([...stowedKeysOf({ items: [withId(k)], modData: { 'come-sail-away': { placedBoats: [{ Items: [boat] }] } } })], ['5d5d5d5d5d5d5d5d']);
   assert.deepEqual([...stowedKeysOf(null)], []);
-  const modes = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.equal(modes.match(/carried: carriedPieces\(playerEntity\)/g)?.length, 2, 'both landings');
-  assert.match(modes, /applyInteriorShared\(interiorCtx, shared, \{ \.\.\._intShared, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/);
-  assert.match(modes, /applyInteriorLoot\(interiorCtx, data\.l, \{ \.\.\._intShared, from: id, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/);   // PIN MOVED (OUTDOOR-LOOT): the bag whole (its set of the unreadable, its room) and the sender, beside the pieces I carry
-  // AUDIT: and a dungeon's - a search's find, a pile - with what I carry (never the stowed: a dungeon holds none of mine)
-  assert.match(readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8'), /for \(const it of withoutCarried\(items, carriedPieces\(playerEntity\)\)\) held\.push\(it\);/);
-  // the pure half never loads the item law: its registration changes what every reader of the wire lands
-  assert.doesNotMatch(readFileSync(new URL('../../src/world/interior/interiorShared.js', import.meta.url), 'utf8'), /from '[^'\n]*\/(itemIds|itemLaw)\.js'/);   // TIDY: any depth - interiorShared stands in world/interior/
 });

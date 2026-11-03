@@ -1,10 +1,10 @@
 // @ts-check
-// TWO-HANDS (2026-10-16, Mac: "Duel wielding and bare hand improvements" - "When bare handed, the fist should be
+// TWO-HANDS (2026-10-16, - "When bare handed, the fist should be
 // mirrored on the other side of the screen (like 2 hands). Attacking should utilize both hands in a detailed way",
 // "When bare handed, or with nothing equipped, sprinting should show the hands in a running motion", "Weapons should
 // now be able to be duel wielded instead of using a hand swap. With 2 weapons equipped, both weapons can be seen and
 // animated in view", "With duel wielding, we need to balance this to not be overpowered and make sense"). THE LAW OF THE
-// TWO HANDS. Design and record: bible/05-Combat/Two-Hands.md.
+// TWO HANDS. Design and record:.
 //
 // DFU is the reference and has none of this: WeaponManager fights with ONE hand at a time - `usingRightHand`, flipped by
 // ToggleHand (WeaponManager.cs:702-729) - and FPSWeapon draws one sprite, mirrored only for a left-handed player
@@ -26,14 +26,8 @@ export const HANDS_MODE = Object.freeze({ Single: 'single', Fists: 'fists', Dual
 /** DFU's WeaponTypes (combat/fpsWeapon.js WEAPON_TYPES - pinned equal; this module is a leaf) a dual pair may hold: the
  *  one-handed melee kinds. Blades, daggers, maces, flails, hammers and axes, plain and magic - whatever of them takes one
  *  hand (`hands`, below, decides that: a flail or a warhammer is two-handed in DFU's table, a custom class may not be).
- *  Never a staff's (two-handed always), a bow's, the bare hand's, a beast's claws or the port's own gun. */
+ *  Never a staff's (two-handed always), a bow's, the bare hand's or a beast's claws. */
 export const DUAL_TYPES = Object.freeze([0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
-/** PISTOLET (2026-10-21, the owner: "a dwarven flintlock style pistol" that "can also be duel wielded"): the one gun a
- *  pair may hold - the Dwarven Pistolet, plain and enchanted (WEAPON_TYPES Pistolet 19, Pistolet_Magic 20 - pinned equal).
- *  Two Pistolets are a pair, and since MIXED-PAIR (2026-10-23, the owner: "Being able to hold a melee and pistolet as a
- *  duel wield option") so are a one-handed melee weapon and a Pistolet - a blade and a gun (`gunHandOf`, MIXED below).
- *  The Thunderlock is two-handed and never here. */
-export const DUAL_GUN_TYPES = Object.freeze([19, 20]);
 /** ItemHands.Both (characters/equipTable.js ITEM_HANDS - pinned equal). */
 const HANDS_BOTH = 4;
 
@@ -42,21 +36,19 @@ const HANDS_BOTH = 4;
  *   One hand's item as the law reads it: the item (null for an empty hand), its WeaponTypes, its ItemHands, a shield.
  */
 
-/** Can this hand's item be one of a dual pair: a weapon, not a shield, one-handed, of a dual kind (melee, or the gun). */
+/** Can this hand's item be one of a dual pair: a weapon, not a shield, one-handed, of a dual kind. */
 export function dualEligible(/** @type {HandDesc} */ h) {
   const t = /** @type {number} */ (h?.type);
-  return !!h?.item && !h.shield && h.hands !== HANDS_BOTH && (DUAL_TYPES.includes(t) || DUAL_GUN_TYPES.includes(t));
+  return !!h?.item && !h.shield && h.hands !== HANDS_BOTH && DUAL_TYPES.includes(t);
 }
-/** PISTOLET: is this hand a gun of a pair. */
-const dualGun = (/** @type {HandDesc} */ h) => DUAL_GUN_TYPES.includes(/** @type {number} */ (h?.type));
 
 /**
  * The way the hands are held. A transformed lycanthrope (`claws`) is the beast's - DFU's racial override, one claw
  * sprite (ApplyWeapon's first arm) - and stays single. A light carried in a hand (`leftBusy`: a lit torch or lantern
  * not hung at the waist - Handheld Torches' hand, the Morrowind arm's Shield Bone) takes that hand: one fist beside it,
  * DFU's and the mod's (and a pair never meets one - the mod stows a light when no hand is free). Both hands empty is the
- * fists; a shield is not an empty hand (a fist and a shield, DFU's). Two one-handed weapons are the pair - two blades, two
- * Pistolets, or (MIXED-PAIR) one of each; anything else is DFU's one used hand.
+ * fists; a shield is not an empty hand (a fist and a shield, DFU's). Two one-handed weapons are the pair; anything else is
+ * DFU's one used hand.
  * @param {{ right?: HandDesc, left?: HandDesc, claws?: boolean, leftBusy?: boolean }} hands
  */
 export function handsModeOf({ right = null, left = null, claws = false, leftBusy = false } = {}) {
@@ -66,58 +58,15 @@ export function handsModeOf({ right = null, left = null, claws = false, leftBusy
   return HANDS_MODE.Single;
 }
 
-// ---- THE MIXED PAIR (a blade and a Pistolet) ------------------------------------------------------------------------
-
-/** MIXED-PAIR's own terms on the pair's (DUAL's are untouched). */
-export const MIXED = Object.freeze({
-  /** THE ONE-HANDED RELOAD: a mixed pair's Pistolet reloads this much longer than with a hand free - the hand that would
-   *  ram the next ball holds a blade. AUDIT MIXED-PAIR L1-2: measured in the game's own swing (the rig's `swingCtx`, the
-   *  blade's heft) over Speed and frame rate (bible/05-Combat/Two-Hands.md "A blade and a gun"): a longsword and a Pistolet
-   *  land a fifth over a longsword pair at Speed 10-50, a tenth at 75, level at 100, on a fifth of a gun pair's Pellets.
-   *  The gun is asked only as the blade's blow ends, so a reload counts in whole blows: the 1.5 first chosen was the free
-   *  hand's two blows at most Speeds - it changed nothing - where 2 is a blow more at every Speed. */
-  RELOAD: 2,
-});
-
-/**
- * MIXED-PAIR (2026-10-23, the owner: "Being able to hold a melee and pistolet as a duel wield option"; bible/05-Combat/
- * Two-Hands.md "A blade and a gun"). Which hand of a pair holds the gun when the other holds a blade - 'R', 'L', or null
- * for any other hands (two blades, two Pistolets, one hand, none). The pair keeps this page's law whole: the lead opens,
- * the other hand answers inside FLURRY_WINDOW, the off hand pays DUAL's terms. A gun pair's two machines may overlap (a
- * second pistol leaves while the first is mid-shot - PISTOL-PORT); a mixed pair's two hands TAKE TURNS - a blow or a
- * shot, one at a time, each waiting for the other to end - so the blade fills the gun's reload rather than doubling its
- * shots. The gun reloads on its own clock beside the blade's swings - one-handed, MIXED.RELOAD times a free hand's.
- * @param {HandDesc} right
- * @param {HandDesc} left
- * @returns {'R' | 'L' | null}
- */
-export function gunHandOf(right, left) {
-  if (!dualEligible(right) || !dualEligible(left)) return null;
-  const r = dualGun(right), l = dualGun(left);
-  return r === l ? null : r ? 'R' : 'L';
-}
-
-/**
- * MIXED-PAIR: THE PULL FALLS TO THE BLADE. The law names a strike's hand (strikeHandOf); when it names a mixed pair's gun
- * and the gun cannot fire - still reloading, or no Pellet owed to it - the pull is the blade's instead, as a gun pair's
- * pull falls to the loaded pistol (combat/gun/pistolPair.js, PISTOL-PORT's departure: a sword can always swing, a pistol
- * mid-reload cannot fire). The blade's blow so given is never a flurry's (the blade hand did not just wait raised while
- * the other struck - it struck itself or opens) and is the off hand's exactly when the blade is not the lead.
- * @param {{ hand: 'R'|'L', flurry: boolean, off: boolean }} strike the law's answer
- * @param {{ gunHand?: 'R'|'L'|null, gunReady?: boolean, lead?: 'R'|'L' }} pair
- * @returns {{ hand: 'R'|'L', flurry: boolean, off: boolean }}
- */
-export function mixedStrike(strike, { gunHand = null, gunReady = true, lead = 'R' } = {}) {
-  if (!gunHand || strike.hand !== gunHand || gunReady) return strike;
-  const hand = otherHand(gunHand);
-  return { hand, flurry: false, off: hand !== (lead === 'L' ? 'L' : 'R') };
-}
-
 /** Both hands up and both swinging - the two modes the second hand is drawn and struck in. */
 export const twoHanded = (mode) => mode === HANDS_MODE.Fists || mode === HANDS_MODE.Dual;
 
 /** 'R' or 'L'. */
 export const otherHand = (hand) => (hand === 'L' ? 'R' : 'L');
+
+/** AUDIT MIXED-PAIR L3-8: the weapon that strikes - a pair's LEFT blow is its left weapon's (its record's pace), any other
+ *  the right's (the Morrowind arm draws one weapon in the right hand, MW-HAND). */
+export const blowWeaponOf = ({ hand = null, weapon = null, offWeapon = null } = {}) => (hand === 'L' && offWeapon ? offWeapon : weapon);
 
 // ---- WHICH HAND STRIKES ---------------------------------------------------------------------------------------------
 
@@ -220,7 +169,7 @@ export function strikePicture(hand, state, { leftHanded = false, painted = () =>
  * into its swing - four ticks of five, the hit a tick sooner - which is 0.8 of one weapon's time at ANY frame rate; and
  * (AUDIT 2) the off weapon's burden is whole ticks held at its blows' end (offHandHold), never a factor on the tick.
  *
- * Measured through the machine and the formula, not on paper (bible/05-Combat/Two-Hands.md "The balance"): a held button
+ * Measured through the machine and the formula, not on paper ("The balance"): a held button
  * swings 1.25 times as often as one light weapon; a matched pair lands about 9% more damage a second than one of its
  * weapons when they are light and about 4% when heavy (a longsword pair: the off arm's burden), at any frame rate and
  * Speed, for a quarter more fatigue a second (DFU's per-swing cost) and the shield. A lighter off weapon trades its
@@ -288,7 +237,7 @@ export const OFF_HAND_BLOW = Object.freeze({ blowShare: offHandDamage, blowWeigh
 /** While one hand strikes, the other draws in: toward the middle of the view and down, the shoulder turned behind the
  *  blow - eased in fast, back out slower (ClimbPose's limb law: no pop between states). IN and DOWN are design pixels on
  *  DFU's 320x200 surface - the fists' tuck. A pair's resting WEAPON lowers by LOWER of its own drawn height, and only
- *  lowers (Mac: "When attacking with a weapon, the other weapon in hand should lower slightly"; then, of the tuck, "The
+ *  lowers (; then, of the tuck, "The
  *  sprite on the right moves ... and exposes where it clips off"): a weapon's picture is several fists tall (a dagger's
  *  143 design pixels, a katana's 86), so the fists' nine pixels did not read on it - a share of its own height lowers
  *  every weapon alike; and every weapon a pair holds is painted with its hand leaving the frame through its OUTER side
@@ -334,8 +283,7 @@ export function guardOffset(g, side, { time = 0, bounce = 0, hand = 'R', height 
 
 // ---- THE SPREAD (a pair in the Morrowind arm's first person) --------------------------------------------------------
 
-/** TWO-HANDS SPREAD (2026-10-17, Mac: "For the morrowind first person, when duel wielding can we spread out the arms a
- *  bit more sense it can make the weapons overlap"). The first-person pair holds its left arm as the right's mirror
+/** TWO-HANDS SPREAD. The first-person pair holds its left arm as the right's mirror
  *  across the picture's middle (mirrorRig.js pictureMirrorArm), and Morrowind's one-handed stance holds its weapon
  *  leaning in toward that middle - so the glass alone crossed a long pair's blades there. Both arms are turned OUTWARD,
  *  each about the upright line through its own top joint (mirrorRig.js's `spread`: the left still the right's mirror,
@@ -378,7 +326,7 @@ export function pairSpreadAngle(innerAt, fov) {
 export const RUN_STEP_M = 2.5;
 
 /**
- * The pump. THE RUNNING ARM IS THE ART'S OWN (Mac: "theres no arm portion of the sprite, so it looks like floating hands").
+ * The pump. THE RUNNING ARM IS THE ART'S OWN.
  * The bare hand's idle (WEAPON10.CIF record 0, 63x53) is a fist cut at the wrist, painted to stand on the view's bottom
  * edge - lifted, its cut floats. So a running hand is a frame of the bare hand's art that holds a fist on its own grey
  * forearm from the frame's foot, drawn as FPSWeapon draws a frame - its foot on the view's bottom edge (OnGUI's
@@ -391,8 +339,7 @@ export const RUN_STEP_M = 2.5;
  * peak, an upright forearm 98 pixels high, half the screen, held at the top by a snap; and then, its lowest frame alone,
  * "Why is the underhand showing when extended and not the fist": an uppercut shows the fist's INSIDE, curled fingers
  * toward the eye, in every frame. THE CUT STAYS OFF THE SCREEN: record 2's frame 1 leaves its frame through its FOOT
- * alone (measured on the shipped file: no row cut down either side; record 5's frame 0 had 15 down its right - Mac: "The
- * sprite on the right moves to the right and exposes where it clips off").
+ * alone (measured on the shipped file: no row cut down either side; record 5's frame 0 had 15 down its right).
  *   ARM_STATE / ARM_FRAME - the record (by its state) and its frame: the fist's back, leaving only at the foot;
  *   DROP      - the back of the stroke, down, of the frame's height (past the view's edge: the hand passing the hip);
  *   IN/OUT    - toward the middle at the top (the arm across the chest) and out at the bottom, of the view's width;
@@ -499,8 +446,7 @@ export function pumpOf(phase, hand) {
  * (combat/climbRig.js), its fist clenched (`CURL` radians, each finger's share), its palm turned in, its elbow out and
  * back. The top of the stroke is the bottom of the picture, before the hand's own shoulder; the bottom is under the
  * frame - the hand passing the hip. The same stride, the same stroke, the same weight as the sprite lane's (pumpOf,
- * runWeightStep). RUN-WIDE (2026-10-19, Mac: "The hands are way too close together when running both in third and first
- * person"): the top stood 0.36 of the half-frame out - 14 cm across at its 0.42 m, inside the shoulder joint's 15.5 (the
+ * runWeightStep). RUN-WIDE: the top stood 0.36 of the half-frame out - 14 cm across at its 0.42 m, inside the shoulder joint's 15.5 (the
  * retail biped's) - so each fist came up toward the middle; 0.6 is 21 cm, before and just outside its own shoulder.
  */
 export const RUN_3D = Object.freeze({

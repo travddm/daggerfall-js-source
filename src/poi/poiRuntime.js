@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-2 (2026-10-14) - A POI AS THE RENDERER DRAWS IT: PURE.
+// POI-2 - A POI AS THE RENDERER DRAWS IT: PURE.
 //
 // The POI editor's document (poi/poiLaw.js) and meshes (poi/poiMesh.js) as the game stands them (bible/06-Systems/
 // POI-Editor-Arc.md). Everything here is arithmetic over arrays - no GL, no DOM - so the host (scenes/poiHost.js) and

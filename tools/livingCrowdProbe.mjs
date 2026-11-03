@@ -1,5 +1,4 @@
-// LW-SPACE (2026-10-06, Mac: "I notice NPCs and walk stuck inside each other, and in towns some NPCs can group up too
-// much when talking to each other"; bible/06-Systems/Living-World.md "LW-SPACE"): THE LIVING TOWN'S STREET ON THE GAME'S
+// LW-SPACE: THE LIVING TOWN'S STREET ON THE GAME'S
 // OWN TOWNS, MEASURED - each town as the streaming host builds it (test/lwRealTown.mjs, the population block replayed
 // word for word), its living town run at the hours asked with the player standing at its square, 30 frames a second:
 //   - INSIDE ANOTHER: the share of the body-frames in view within half a metre of another body, and by what the two were

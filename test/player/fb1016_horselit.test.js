@@ -1,5 +1,4 @@
-// HORSE-LIT (bible/01-Overview/bugs/Field-Bugs-2026-10-16.md; Mac, 2026-10-16: "Horses in first person should be affected by
-// lighting"). TransportManager.OnGUI draws the ridingTexture white; the port's first-person horse takes the weapon's
+// HORSE-LIT (). TransportManager.OnGUI draws the ridingTexture white; the port's first-person horse takes the weapon's
 // tint now - MAC-I's `flatLightAt` at the camera, under the same switch - on the sprite and on RR2's neck band alike.
 // Driven through the real mount rig (player/mountRig.js) over a recording renderer.
 import { test } from 'node:test';

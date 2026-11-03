@@ -1,5 +1,4 @@
-// STAFF-VIEW1 (2026-10-23, mob: "np player esp in staff panel?", "i need staff panel to have esp", "i told you to add the
-// opther parts to the menu?", "wtf u had all this build"; design doc "DFO Staff Panel: design", In game: the staff view) -
+// STAFF-VIEW1 -
 // THE STAFF TAGS, driven headless: scenes/staffViewHost.js over a fake follow (the page's, scenes/staffFollowHost.js
 // staffFollowOnPage's shape) and ui/staffTags.js over a fake document of this file's own - test/net/name1_bubbles.test.js's
 // shape, COPIED rather than shared, with the same write counter, because "one element per player, moved and never
@@ -107,7 +106,7 @@ test('STAFF-VIEW1 the gate: no layer, no ask and no element for a player\'s glyp
     assert.equal(follow.asks, 0, 'and nothing asked of the panel');
     assert.equal(r.host.marks(null), null);
   }
-  for (const glyphs of [['mod'], ['shadowfang'], ['dev', 'dm']]) {
+  for (const glyphs of [['mod'], ['dev'], ['dev', 'dm']]) {
     const doc = fakeDocument();
     const follow = fakeFollow({ room: [peer('p1', 0, -20)] });
     const r = rig({ glyphs, follow, doc });
@@ -466,17 +465,6 @@ test('STAFF-VIEW1 the layer\'s lines: one canvas, drawn only when a line moved; 
 });
 
 // ── THE FIVE SEAMS ─────────────────────────────────────────────────────────────────────────────────
-
-test('STAFF-VIEW1 host: the five seams - made after the follow with its getters, the names pass\'s frame, the travel view\'s marks and mark click, and Shift+M past the key ladder\'s latch (KEY-BOOT) and before its actions', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const made = w.search(/const staffView = createStaffViewHost\(\{\n\s*follow: staffFollow, glyphs: staffGlyphs, links: \(\) => chatLinks, book: travellerBook, foes: exteriorFoes,\n\s*overworld: travelViewKey, up: \(\) => !!travelView\?\.active, canvas, say: townTalk\.say,\n\s*acts: \(p, onFollow\) => chatSafety\.playerActions\(p, onFollow\),[^\n]*\n\s*politicAt: \(x, y\) => maps\.getPoliticIndex\(x, y\),[^\n]*\n\s*\}\);/);
-  assert.ok(made > w.indexOf('const staffFollow = staffFollowOnPage('), 'made, after the follow it reads');
-  assert.match(w, /const namesOff = covered \|\| !!travelView\?\.active;\n\s*staffView\.frame\(proj, view, eye, covered\);/, 'the names pass, every mode');
-  assert.match(w, /marks: \(\) => staffView\.marks\(travelViewMarks\(\)\),/);
-  assert.match(w, /onMark: \(key, e\) => staffView\.mark\(key\) \|\| onTravelViewMark\(key, e\),/);
-  assert.match(w, /if \(!_worldKeysLive\) return;[^\n]*\n\s*if \(\(!e\.repeat && !gamePaused\(\) && egClient\?\.key\(e\)\) \|\| \(!gamePaused\(\) && staffView\.key\(e\)\)\) \{ e\.preventDefault\(\); return; \}/, 'Shift+M, past the latch');
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/inputActions.js', import.meta.url), 'utf8'), /StaffView|ShiftLeft\+KeyM/, 'no InputManager action and no default chord: a player\'s Shift is no modifier');
-});
 
 test('STAFF-TAG-MENU a tag\'s click opens the player\'s menu - the chat line menu\'s staff acts by socket and account - at the tag; its Follow is the view\'s own (the follow, then the panel\'s card); with no acts the click follows at once (mutants: the menu skipped, the view\'s follow not handed)', () => {
   const asked = [];

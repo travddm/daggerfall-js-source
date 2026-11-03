@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW2 (2026-10-24, bible/03-World/World-Wide.md WW2): WHERE A THEATRE'S GATE STANDS - the gate's site law
+// WW2: WHERE A THEATRE'S GATE STANDS - the gate's site law
 // (systems/gate/gateSite.js, WB1's) over a theatre past the Bay, read off the world's registry of places
 // (world/worldWide/worldPlaces.js) instead of MAPS.BSA's rows.
 //
@@ -24,11 +24,10 @@
 import { spawnsDungeon, WORLD_SALT } from '../../world/spawnedDungeons.js';
 import { pickGateRegion, pickGatePixel, gateSpotLocal, omenRing } from '../../net/gate/gateLaw.js';
 import { GATE_TOWN_TYPES, GATE_TOWN_MIN_PX, GATE_TOWN_MAX_PX, GATE_REGION_MIN_PIXELS } from './gateSite.js';
-import { WILD_REGION } from '../wild/wildZone.js';   // PVPDUNGEONS: no world event in the open zone
 import { onGhostfence } from '../../world/tamriel/ghostfence.js';   // FENCE-CLEAR: no gate on the Ghostfence's line
 import { redMountainLavaIn } from '../../world/tamriel/redMountain.js';   // LAVA-CLEAR: nor where Red Mountain's lava runs
-import { worldPixelKey, worldPixelOfKey, inWorldGrid, areaName, isBayArea, theatreOfArea } from '../../world/worldWide/worldGrid.js';
-import { theatreOfRegion, regionOfTheatre } from '../../formats/mapsTables.js';   // WW-C2: the open zone's theatre, by its region; WW-GATES-EVERYWHERE: a province's region (WW-R)
+import { worldPixelKey, worldPixelOfKey, inWorldGrid, areaName, isBayArea } from '../../world/worldWide/worldGrid.js';
+import { regionOfTheatre } from '../../formats/mapsTables.js';   // WW-GATES-EVERYWHERE: a province's region (WW-R)
 
 const TOWN_TYPES = new Set(/** @type {readonly number[]} */ (GATE_TOWN_TYPES));
 
@@ -125,10 +124,9 @@ export function theatreGateScanner({ towns, placeAt, inTheatre, areaAt, wet, the
   };
 }
 
-/** The areas a theatre's gate may open in, ascending - the Bay scan's own (gateSite.js gateRegions): enough ground, never
- *  the open zone - WW-C2: never an area of Cyrodiil's theatre, the zone being the province whole (its lane opens no gate).
+/** The areas a theatre's gate may open in, ascending - the Bay scan's own (gateSite.js gateRegions): enough ground.
  *  @param {TheatreGateScan} scan */
-export const theatreGateAreas = (scan) => [...scan.byArea.keys()].filter((a) => theatreOfArea(a) !== theatreOfRegion(WILD_REGION) && /** @type {Int32Array} */ (scan.byArea.get(a)).length >= GATE_REGION_MIN_PIXELS).sort((a, b) => a - b);
+export const theatreGateAreas = (scan) => [...scan.byArea.keys()].filter((a) => /** @type {Int32Array} */ (scan.byArea.get(a)).length >= GATE_REGION_MIN_PIXELS).sort((a, b) => a - b);
 
 /**
  * A theatre's gate's site, by its number `n` (net/gate/gateLaw.js gateNumber - its lane the theatre's), or null when the

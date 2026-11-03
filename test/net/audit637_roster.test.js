@@ -1,5 +1,5 @@
-// AUDIT 637 (2026-10-06, Mac: "Audit this"), the roster lens: PR #637's PERF-ON3 (net/roster.js, ui/chatPanel.js
-// paintWho) and the friends list's order beside it (ui/socialPanel.js friendOrder), audited. bible/01-Overview/audits/Audit-637.md.
+// AUDIT 637, the roster lens: PR #637's PERF-ON3 (net/roster.js, ui/chatPanel.js
+// paintWho) and the friends list's order beside it (ui/socialPanel.js friendOrder), audited..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

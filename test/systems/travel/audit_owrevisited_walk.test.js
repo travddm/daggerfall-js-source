@@ -1,5 +1,4 @@
-// AUDIT OW-REVISITED (2026-10-20, the owner, of THE OVERWORLD REVISITED: "Audit this and ensure perfection";
-// bible/01-Overview/audits/Audit-Overworld-Revisited.md): THE WALKS - OW-ROAD-TRUE's lanes and OW-TOWN-WALK's streets, as
+// AUDIT OW-REVISITED: THE WALKS - OW-ROAD-TRUE's lanes and OW-TOWN-WALK's streets, as
 // the cold lanes found them (L1, the town walk; L2, the road; L6, the record's pins) and as they are now. Each test names
 // the findings it pins; each flies the real autopilot, the real Travel Options or the real town walk host.
 import { test } from 'node:test';

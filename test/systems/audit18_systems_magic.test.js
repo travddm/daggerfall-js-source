@@ -148,7 +148,7 @@ const expectedTable = () => {
 test('audit18 magic: EFFECT_COST_TABLE is DFU\'s whole effect library, key for key', () => {
   // DFU's library, plus the ONE row the port adds of its own: RESURRECT1's Resurrect (45,255, no classic key uses
   // 45), zero-component and priced by the fudge at Restoration as MorphSelf is at Illusion
-  // PARTY-MAP (2026-09-30): and a second, Shared Cartography (46,255), a Mysticism duration buff priced as Light is
+  // PARTY-MAP: and a second, Shared Cartography (46,255), a Mysticism duration buff priced as Light is
   const want = { ...expectedTable(), '45,255': { skill: SKILLS.Restoration }, '46,255': { skill: SKILLS.Mysticism, duration: { A: 8, B: 8, offset: 0 } } };
   // plain-object copy so deepEqual compares values, not frozenness
   const got = {};

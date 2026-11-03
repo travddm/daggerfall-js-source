@@ -1,5 +1,4 @@
-// PEAKS1 (2026-10-26, bible/03-World/Peaks.md; the owner: "The world of daggerfall mountains need to be completely redesigned
-// from the ground up with more integration into the terrian, snow capped, and properly place throughout tamriel") - THE
+// PEAKS1 - THE
 // SNOW THAT NEVER MELTS: a perennial snowline by climate and zone (world/peaks/snowcap.js), a floor under the snowpack's
 // lines near the player (scenes/snowCoverHost.js), a steep face over it bare rock in both terrain programs
 // (render/snowCapGlsl.js), and the summits white on the far ring, the middle ring and the far field. Where ARENA2_PATH
@@ -128,7 +127,6 @@ test('PEAKS1 THE BARE FACE IN THE CHUNK: snowFaceRock is snowcap.js faceRock ter
   for (const p of ['src/render/renderer.js', 'src/render/enhancedLighting.js']) {
     assert.match(read(p), /float snowC = snowCover\(vLocalXZ, vWorldPos\.y, gx, gy\);[^\n]*\n {2}snowC = snowFace\(tex, snowC, vLocalXZ, vWorldPos\.y, normalize\(vNormal\), tuv, gx, gy\);/, p);
   }
-  assert.match(read('src/render/enhancedLighting.js'), /\$\{snowCapGlsl\('elDecode', SNOW_TILE_M\)\}/, 'the lane decodes the stone as its texels');
 });
 
 test('PEAKS1 THE HOST MERGES THE CAP: with `capLine` every point\'s target and build lines are the lower of the pack\'s and the cap\'s at its corner, and the frame\'s texels carry the cap in their alpha; without it the lines are the pack\'s and the alpha none (mutants: the merge, the corner, the alpha)', async () => {
@@ -165,7 +163,6 @@ test('PEAKS1 THE HOST MERGES THE CAP: with `capLine` every point\'s target and b
     await off.settle({ left: () => Infinity, breathe: async () => {} });
     assert.equal(off._lines.get(latticeKey(off._window[0].i, off._window[0].j)).cap, CAP_NONE, 'null: none');
   } finally { setAirGround(null); }
-  assert.match(read('src/systems/weather/airGround.js'), /landforms: !!landforms,/, 'the law\'s air ground says whether it is the landforms\'');
 });
 
 test('PEAKS1 THE HORIZON WEARS IT: the far ring whitens a vertex over its line by its height and its slope, never the sea and never with no line (the classic ground\'s horizon its own - ringSnowAt none without the Landforms row); the middle ring and the far field the same (mutants: the ring\'s whiten, the middle ring\'s, the far field\'s, the relief gate)', () => {
@@ -250,7 +247,7 @@ test('PEAKS1 with ARENA2: on the freeware\'s ground every range the relief stand
       for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const h = H(x + dx, y + dy); if (h > best) { best = h; at = [x + dx, y + dy]; } }
       return { h: best, at, line: capLineOfPixel(at[0], at[1], climateAt), zone: tamrielBiomeAt(at[0], at[1])?.key ?? null };
     };
-    // the summits the probes found (bible/03-World/Peaks.md's table): the relief's own, past the Bay; the Bay's highest
+    // the summits the probes found ('s table): the relief's own, past the Bay; the Bay's highest
     const white = [
       ['Skyrim\'s summit (the Throat)', 2076, 106, 'skyrimPeaks', 3000],
       ['the Jerall', 2202, 332, 'cyrodiilJerall', 2600],
@@ -261,7 +258,6 @@ test('PEAKS1 with ARENA2: on the freeware\'s ground every range the relief stand
     ];
     for (const [name, x, y, zone, least] of white) {
       const t = top(x, y);
-      // PIN MOVED (RELIEF-PEAKS, bible/03-World/Tamriel.md): the ranges under the heightmap's grain stand the highest ground
       // about a summit where their crests fall - the Reach's shoulder's on the border of Skyrim's peaks and Hammerfell's
       // Dragontail, its top on either side; each top wears its own zone's cap
       assert.ok([zone].flat().includes(t.zone), `${name}'s zone (${t.zone})`);

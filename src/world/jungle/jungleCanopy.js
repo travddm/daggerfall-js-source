@@ -1,12 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// VALENWOOD-CANOPY (2026-10-24, bible/03-World/Tamriel-Biomes.md "Valenwood's closed canopy"; the owner, with ESO's
-// concept art of a Bosmer village under the graht-oaks: "i want valenwood to have no sky like the trees will cover it
-// up") - THE CLOSED CANOPY: where a zone's canopy closes (world/tamriel/tamrielBiomes.js `canopy` - Valenwood's forest),
+// VALENWOOD-CANOPY - THE CLOSED CANOPY: where a zone's canopy closes (world/tamriel/tamrielBiomes.js `canopy` - Valenwood's forest),
 // the sky overhead is the leaves'. PURE - the jungle's host (scenes/jungleHost.js) hands it the frame's eye and colour and
 // hands its answer to the world host's light and the water.
-// GRAHT1 (bible/03-World/Graht-Oaks.md; the owner, 2026-10-25: "The current simple skybox method is very low quality and
-// band aided"): THE LEAVES OVERHEAD ARE THE GRAHT-OAKS' OWN - the trees themselves (world/jungle/grahtOaks.js,
+// GRAHT1 (): THE LEAVES OVERHEAD ARE THE GRAHT-OAKS' OWN - the trees themselves (world/jungle/grahtOaks.js,
 // scenes/grahtHost.js) stand over the canopy's zones and close the sky with their crowns, its gaps theirs; no ceiling is
 // drawn. What stays here is the canopy's LIGHT, which every tree under the crowns stands in.
 //

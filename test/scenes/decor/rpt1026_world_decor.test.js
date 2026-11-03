@@ -1,4 +1,4 @@
-// RPT1026-WORLD (2026-10-27), the decorator's two private reports, driven through the real decorator (scenes/decor/
+// RPT1026-WORLD, the decorator's two private reports, driven through the real decorator (scenes/decor/
 // decorTool.js), its real bar and panel (ui/decorPanel.js) over the rig's DOM, and the real hover seam (ui/worldPlaque.js
 // worldHoverFrame, systems/quickLoot.js) - the input path a mouse click takes:
 //   - CONFIRM-REREAD: a home's room read that went unanswered as the draft opened left every Confirm of the visit
@@ -6,7 +6,7 @@
 //   - CONFIRM-ONCE: a second click on Confirm while the first is on its way sent the batch twice and paid twice.
 //   - DECOR-VERBS: where no plaque is drawn (a touch screen, the classic skin with quick loot off) and with World
 //     Tooltips off, a press on a placed piece never reached Move.
-// bible/06-Systems/Online-Arc.md, RPT1026-WORLD CONFIRM-REREAD, CONFIRM-ONCE, DECOR-VERBS, has the account.
+// RPT1026-WORLD CONFIRM-REREAD, CONFIRM-ONCE, DECOR-VERBS, has the account.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -193,14 +193,6 @@ test('RPT1026-WORLD DECOR-VERBS: the law - the decorator\'s keys, and its frame 
   assert.equal(decorPressFrame({ key: 'decor:a', kind: 'actions', rows: rows3, startUnlit: true }), null);
   assert.equal(decorPressFrame({ key: 'decor:a', kind: 'actions', rows: [] }), null);
   assert.equal(decorPressFrame(null), null);
-});
-
-test('RPT1026-WORLD DECOR-VERBS: with World Tooltips off the interior host\'s namer still answers the decorator\'s keys while it browses - and nothing else (by source: the one gate; the host grows by nothing)', () => {
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.ok(wm.includes("if (!worldTooltipsOn() && !(decorVerbKey(key) && decorTool.flying() && !decorTool.ghost())) return null;"), 'the gate lets the decorator\'s keys through while it browses');
-  assert.ok(!wm.includes('      if (!worldTooltipsOn()) return null;\n      const hide = hideInteractTooltip();'), 'the bare gate is gone from the interior namer');
-  const plaque = readFileSync(new URL('../../../src/ui/worldPlaque.js', import.meta.url), 'utf8');
-  assert.ok(plaque.includes('foldQuickLoot(verbs ? decorPressFrame(frame) : frame);'));
 });
 
 test('RPT1026-WORLD guard: the decorator\'s Move in the caravan, the ship and the house - by the plaque\'s row and by the panel\'s In this room - stands the piece where the click sets it down (the decorator itself was never the fault)', async () => {

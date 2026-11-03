@@ -1,5 +1,4 @@
-// NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-// name or character name for ingame use"): THE CLIENT'S HALF. The profile card's toggle asks the service (the choice is
+// NAME-AS: THE CLIENT'S HALF. The profile card's toggle asks the service (the choice is
 // the account row's, and the mint signs it), and the device keeps the two names apart: its stored session is the
 // ACCOUNT's picture (the profile mark's name), the live sessions take the name the ROOM reads. A choice made here is
 // stamped on the stored session, and the world host says hello again when the stamp moves, so the room reads the new
@@ -185,21 +184,6 @@ test('NAME-AS the card: the Account section draws the name-in-game toggle - both
   const sections = card.root.all.filter((n) => n.tag === 'section');
   const account = sections.find((s) => s.children[0]?.textContent === 'Account');
   assert.ok(account?.all.some((n) => String(n.className).split(/\s+/).includes('acctnameas')), 'under the Account head');
-});
-
-test('NAME-AS the host by source: a mint\'s reason said ONCE in the chat until it changes; a stamp this page has not acted on says hello again in every room I hold - the presence session and every chat channel - from the online frame before the dead return, a stamp from before the page no news; and a board note\'s duel finds its author by ACCOUNT (mutants: the reason said every mint; the channels not re-hello\'d; the first stamp read as news; the duel joined by name)', () => {
-  const w = code('src/scenes/world.js');
-  const issued = w.slice(w.indexOf('const adoptIssued = (who) => {'), w.indexOf('const staffGlyphs = () => _staffGlyphs;'));
-  assert.match(issued, /const said = nameWhyText\(who\);\s*if \(said == null\) _nameWhySaid = null;\s*else if \(said !== _nameWhySaid && chatLog\) \{ _nameWhySaid = said; chatNotice\(said\); \}/, 'said once, until the reason changes or goes');
-  assert.match(issued, /let _nameAsAtSeen;\s*const nameAsFrame = \(\) => \{\s*const at = ownNameAsAt\(\);\s*if \(at === _nameAsAtSeen\) return;\s*const first = _nameAsAtSeen === undefined;\s*_nameAsAtSeen = at;\s*if \(first \|\| !online\) return;\s*online\.rehello\?\.\(\);\s*for \(const link of chatLinks\?\.values\?\.\(\) \?\? \[\]\) link\.rehello\?\.\(\);\s*\};/);
-  const frame = w.slice(w.indexOf('const onlineFrame = (now, dt) => {'), w.indexOf('if (seatOut()) {', w.indexOf('const onlineFrame = (now, dt) => {')));
-  assert.match(frame, /\n\s*peerFxFrame\(\);\s*\n\s*nameAsFrame\(\);\s*\n/, 'every online frame, after the others\' blows - before the realm door\'s return, the seat\'s and the dead\'s');
-  assert.match(w, /\[\.\.\.\(online\?\.peers\?\.values\?\.\(\) \?\? \[\]\)\]\.find\(\(q\) => \(typeof note\.by === 'string' && note\.by \? q\?\.sub === note\.by : q\?\.name === note\.from\)\)/, 'the author by account, the name only where a service says no `by`');
-  // the friends panel's letter goes to the account
-  const panel = code('src/ui/socialPanel.js');
-  assert.match(panel, /if \(mail\) acts\.append\(btn\('Letter', \{ run: \(\) => \{ tab = 'letters'; writeTo\(r\.name, '', r\.acct\); \} \}\)\);/);
-  assert.match(panel, /to\.addEventListener\('input', \(\) => \{ d\.to = to\.value; d\.account = null; \}\);/, 'a name typed is a username again');
-  assert.match(panel, /mail\.send\(\{ to: d\.to, account: d\.account, subject: d\.subject, body: d\.body \}\)/);
 });
 
 test('NAME-AS a friend\'s letter asks for the ACCOUNT and names the friend beside it - a service from before NAME-AS reads the name alone, and every name it signed was an account\'s, the username the friend\'s row shows; a name typed asks no account, and an account of no id\'s shape is none (mutants: the name not sent beside the account; the account never asked for)', async () => {

@@ -1,12 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEAT1a (2026-09-30, Mac: "Finish the seats") — THE SEATS OF THE ILIAC
-// BAY, as every client derives them (bible/11-Multiplayer/Seats-Arc.md
+// SEAT1a — THE SEATS OF THE ILIAC
+// BAY, as every client derives them (
 // 3.1).
 //
-// Mac: "So the 3 main castle hubs should be larger capture points, while
-// every other location with a palace (must have) will be a lower capture
-// point"; asked which palace locations: "Every palace location". So:
+// asked which palace locations: "Every palace location". So:
 //   - a CROWN seat: a location named for one of the three kingdoms'
 //     capitals (regionHubs.js HUB_CAPITALS) that stands in the region of
 //     that name - Daggerfall (17), Wayrest (23), Sentinel (20);
@@ -56,7 +54,7 @@ export function seatOfLocation(loc, { regionNameOf = (r) => REGION_NAMES[r] ?? '
 }
 
 /**
- * DOMAIN3 (bible/11-Multiplayer/Domains.md section 7): WHETHER SEAT `a` (its location's hub claim `ca`) OUTRANKS SEAT `b`
+ * DOMAIN3: WHETHER SEAT `a` (its location's hub claim `ca`) OUTRANKS SEAT `b`
  * (`cb`) AS ITS REGION'S SEAT OF POWER - the crown first, then HUB1's own claim (regionHubs.js hubClaim: a city over a
  * town, the one named for its region, the largest), a seat whose location claims no hub after every one that does, and
  * the lower key last.
@@ -105,8 +103,7 @@ function seatsBook(byMapId, powers) {
 }
 
 /**
- * WW7-3 (2026-10-25, bible/03-World/World-Wide.md WW7; the owner: "we need the same city nodes populating the entire map
- * of tamriel"): THE SEATS PAST THE BAY, as every client derives them off the port's own places - a CROWN at each
+ * WW7-3: THE SEATS PAST THE BAY, as every client derives them off the port's own places - a CROWN at each
  * province's capital (world/tamrielCapitals.js CAPITALS, its centre's id, `capitals`), its kingdom the province's
  * (net/kingdomLaw.js); a PALACE at every Arena city-state standing on the trace (world/arenaPlaces.js; every city-state
  * of Arena's holds a palace - its ruler's), but one a capital's pixel holds (`cities`). Each `{ key, name, px, py, region }`

@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-B (2026-09-28) - A BURNING SHIP'S FLAMES: Daggerfall's own fire flat (TEXTURE.210 record 1 - the camp's fire,
+// NAV-B - A BURNING SHIP'S FLAMES: Daggerfall's own fire flat (TEXTURE.210 record 1 - the camp's fire,
 // systems/survival/camp.js FIRE_FLAT) stood on her deck and carried with her as she drifts, heels and settles. The
 // naval host asks `flame(pos)` for each fire it lights (scenes/naval/navalHost.js igniteShip - one on a rowboat, three along
 // a larger deck) and moves or retires the handle; the smoke and embers over them are the naval pass's own

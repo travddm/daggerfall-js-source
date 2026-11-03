@@ -1,11 +1,10 @@
-// WALLET-WEIGHT (2026-10-19, from play: "Are these supposed to be weighing us down even in the wallet? ... If this isn't a
-// bug, it might be prudent to list the total weight of the wallet up top as the wallet's weight"): THE WALLET SAYS WHAT
+// WALLET-WEIGHT: THE WALLET SAYS WHAT
 // IT HOLDS WEIGHS. The pieces it holds weigh what they always did (WALLET1: an organizer, never a second list - 309
 // Welkynd Shards are 30.9 kg of the carry weight), but the enhanced pack had moved them off its pages into the wallet's
 // sheet, and the wallet's own row and card said its own weight - none. Now the wallet's row and card say its own and what
 // it holds (enhancedInventory.js shownKg), and each holding's ledger row says its own (walletItem.js walletLedger's
 // `weight`); the carry weight is untouched, each piece counted once, and the classic box's words stand. The record:
-// bible/06-Systems/Wallet.md WALLET-WEIGHT.
+// WALLET-WEIGHT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mintWallet, walletContents, walletLedger, walletLines, walletKg, setWalletSilver, _resetWalletForTests } from '../../src/systems/walletItem.js';

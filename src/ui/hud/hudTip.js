@@ -1,5 +1,4 @@
-// HUD-TIP (2026-10-20, Dudey: "make every other icon of debuffs, buffs, hunger etc hoverable when hovering over it
-// with the mouse so it tells you in a toolbox like in the inventory what it does") - THE HUD'S HOVER CARD. The pack's own
+// HUD-TIP - THE HUD'S HOVER CARD. The pack's own
 // card (ui/enhanced/enhancedInventory.js showTip: `.inv-tip > .card`, an h3, a `.meta` line, the body), so each skin and
 // each dress paints it the way it paints the pack's - Enhanced Plus's stone, DFO Grimoire's scroll - and nothing here
 // names a colour. One card at a time, on the body, pointer-transparent, placed above the thing it speaks for (below it

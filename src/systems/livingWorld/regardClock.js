@@ -8,7 +8,7 @@
 // the sky is a real hour a day and runs while the player is away (net/skyLaw.js), so a friendship eased twelve points a
 // real day logged off, and a player who played an evening at a time came back to nought every evening: the +40 a
 // courtship asks (legacy/marriage.js FRIEND_AT) was never reached. A word counted once a real hour. And the stamps were
-// SAVED on the sky, which the clock law forbids (bible/06-Systems/Online-Time-Arc.md section 5: "No stamp is taken on the
+// SAVED on the sky, which the clock law forbids (: "No stamp is taken on the
 // sky") - LIVED1 puts a character's standing on their own clock, and the courtship beside the regard was already there
 // (legacyHost.js ownDay). Offline the sky, the world's clock and the character's are one clock: nothing changes there.
 //

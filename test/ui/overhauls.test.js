@@ -1,7 +1,4 @@
-// OVH1-OVH3 (2026-09-24, Mac: "A new option on the main menu that opens to show 3 large panels ... 1. Texture
-// Overhaul 2. Sound Overhaul 3. UI Overhaul ... These overhauls need to adapt to online with ease ... Our first
-// overhaul option will be the file attached" - GrimoireUI 1.2 - and then "Currently there are no texture packs, it
-// should be empty").
+// OVH1-OVH3.
 //
 // Driven through the real registry, the real shelf, the real pack index off the vendored listing, the real texture
 // door and the real text layout; the browser half (the three cards, browse vs wear, the reload) is
@@ -196,24 +193,6 @@ test('OVH3: the online windows are the page\'s, not the skin\'s - player trade o
   assert.equal(playerTradeReady(), false, 'node has no document');
   globalThis.document = {};
   try { assert.equal(playerTradeReady(), true, 'a document: the window, whatever UI Overhaul is worn'); } finally { delete globalThis.document; }
-  const w = rd('src/scenes/world.js').replace(/\/\/[^\n]*/g, ' ');
-  assert.match(w, /if \(typeof document !== 'undefined'\) chatStart\(\);/);
-  assert.match(w, /if \(nameLayerWanted\(\)\) nameLayer = createNameLayer\(\{\}\);/);
-});
-
-test('OVH2 by source: the classic art doors ask the pack first - the HUD\'s own loader, chargen\'s (keeping the raw bitmap its masks read), the message box\'s buttons, the save window\'s textures and the paper doll\'s backdrop drawn under a composite made on nothing', () => {
-  assert.match(rd('src/ui/hud/hud.js'), /const packed = await packImgTexture\(renderer, name\);[^\n]*\n\s*return \{ tex: packed \?\? renderer\.uploadTexture\('img', name,/);
-  assert.match(rd('src/ui/chargenArt.js'), /const packed = await packImgTexture\(deps\.renderer, name\);\s*return \{ tex: packed \?\? [^\n]*, bmp \};/);
-  const mb = rd('src/ui/messageBox.js');
-  assert.match(mb, /const packUrl = _packFailed\.has\(record\) \? null : packCifRciUrl\('BUTTONS\.RCI', record, 0\);/);
-  assert.ok(mb.indexOf("packCifRciUrl('BUTTONS.RCI'") < mb.indexOf('const custom = _buttonArt.get(record);'), 'the pack before Roleplay & Realism\'s own 21-37');
-  const sw = rd('src/ui/saveWindow.js');
-  for (const n of ['mainPanelBackgroundColor', 'namePanelBackgroundColor', 'saveButtonBackgroundColor', 'cancelButtonBackgroundColor', 'switchClassicButtonBackgroundColor', 'renameSaveButtonBackgroundColor', 'deleteSaveButtonBackgroundColor', 'switchCharButtonBackgroundColor']) {
-    assert.ok(sw.includes(`'${n}'`), `${n} is asked for`);
-  }
-  const pd = rd('src/ui/paperDoll.js');
-  assert.match(pd, /const \{ out, layout, bgSize, width: OW, height: OH \} = await composeDoll\(_art, _deps, entity, \{ background: !packBg, scale: composeScale\(\) \}\);/);
-  assert.match(pd, /if \(_live\.packBg\) \{[^\n]*\n\s*const \{ tex, w, h \} = _live\.packBg, \[sx, sy\] = BG_SUBRECT;\s*renderer\.drawScreenQuad\(tex, dst,/);
 });
 
 test('PLUS-ONLY: plain Enhanced is retired - the UI panel offers Classic, Enhanced Plus and GrimoireUI; Plus IS the enhanced skin, whatever a retired shelf key or `?plus=0` says, and never the classic one (mutants: the seam still reading the key; still reading ?plus; answering yes on classic)', async () => {

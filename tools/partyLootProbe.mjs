@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PARTY-LOOT's END-TO-END PROBE (bible/06-Systems/Online-Arc.md PARTY-LOOT) - the report, played: "When in a party, if a
+// PARTY-LOOT's END-TO-END PROBE (PARTY-LOOT) - the report, played: "When in a party, if a
 // monster is killed, loot drops for one player but the other player sees 'Empty'. If that player clicks 'Empty' it wipes
 // out the loot for the other player." Two players in the REAL game in headless Chromium over the player's own ARENA2, both
 // online in Privateer's Hold against the REAL relay and the REAL account service in local workerd
@@ -18,7 +18,7 @@
 //   the joiner opens a body and takes a base piece - the host's base must lose that one piece and keep the rest.
 //   PASS: every body names one base on both copies, the three windows leave both bases as the takes left them, and no
 //   page threw. A body a copy cannot read fails the run; so does a run whose bodies hold nothing to take.
-//   TREE=<a checkout before PARTY-LOOT (2026-10-15, #923)> plays the report as it was - no base is shared there, every
+//   TREE=<a checkout before PARTY-LOOT > plays the report as it was - no base is shared there, every
 //   row reads as the room's, and the run fails.
 //
 //   ARENA2_PATH=/path/to/arena2 node tools/partyLootProbe.mjs       KILLS=6 the bodies; TREE=<dir> the page's tree (the

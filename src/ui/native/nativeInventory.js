@@ -66,7 +66,6 @@ import { boundRefusesPut, boundText, isPackOnly, packOnlyText } from '../../syst
 import { letterRefusesPut, letterPutText } from '../../systems/peerWord.js';   // HACKED-GOLD: online a letter of credit goes nowhere a peer's word could hand it on
 import { walletContents, walletLines, refreshWalletSilver } from '../../systems/walletItem.js';   // WALLET1: the wallet's box
 import { lookLine } from '../../systems/appearances.js';   // APPEARANCES-II: the Info box says the look a piece wears
-import { BINDER_CARD_LINES } from '../../systems/iliac/iliacItems.js';   // CARDS8 (AUDIT CARDS-5 C5): the binder's box
 import { dismantleStones, dismantleRefusal, dismantleWare, DISMANTLE_INSTEAD, DISMANTLED, wareName } from '../../systems/sigil/sigilBroker.js';   // SS5: a Broker ware back into stones
 import { YesNoBoxWindow } from '../yesNoBox.js';   // SS5: the dismantle's question, DFU's own Yes/No box
 import { ListPickerWindow, listPickerArtLoaded } from '../listPicker.js';   // MEND-AIM: the piece a repair kit mends, chosen
@@ -479,7 +478,7 @@ export class NativeInventoryWindow {
     // exactly what TransferItem polls (:1516).
     this.inputBox = null;
     this._controlDown = false;
-    // SHIFT-STOW (2026-10-04, Mac: "shift click to deposit items (like materials) needs to be a thing"): Shift held as
+    // SHIFT-STOW: Shift held as
     // Control is - a state from its down edge to its up edge, per key, and the pointer's own word on every move (hover);
     // read through `_shiftDown`
     this._shiftKeys = new Set();
@@ -744,7 +743,7 @@ export class NativeInventoryWindow {
       this.infoItem = it;
       return;
     }
-    // APPEARANCES-II (bible/04-Characters/Wardrobe.md section 5): a look worn over the piece is the record's last line, in
+    // APPEARANCES-II: a look worn over the piece is the record's last line, in
     // its alignment - the pack's picture is the piece's own, so the box says what the body shows. A box of its own would
     // wait behind a click; the Enhanced Plus pack says it too (enhancedInventory.js itemInfoBoxes)
     const look = lookLine(it);
@@ -819,7 +818,6 @@ export class NativeInventoryWindow {
     }
     // WALLET1: the wallet says what it holds - DFU's own click-anywhere box, its lines; this window is DFU's and keeps
     // DFU's four tabs, the currencies where they always were. The account's silver asked afresh for the next look.
-    if (r.kind === 'binder') { this.boxes = [{ rows: BINDER_CARD_LINES.map((text) => ({ text, center: true })) }]; return; }   // CARDS8 (AUDIT CARDS-5 C5): the binder's lines in DFU's box
     if (r.kind === 'wallet') noteFirstUse('wallet');   // TUT1: the wallet's box read
     if (r.kind === 'wallet') { this.boxes = [{ rows: walletLines(walletContents(this.hooks.items(), this.hooks.entity)).map((text) => ({ text, center: true })) }]; void refreshWalletSilver(); return; }
     // MEND-AIM: a use that asks WHICH (a repair kit, with more than one piece to mend) pushes DFU's list picker over
@@ -1095,7 +1093,7 @@ export class NativeInventoryWindow {
     if (refusal.text) this.boxes = [{ rows: [{ text: refusal.text, center: true }] }];
   }
 
-  /** SS5 (Mac: "The ability to dismantle in the inventory and recieve back sigil stones"): THE DISMANTLE, ON THIS SKIN.
+  /** SS5: THE DISMANTLE, ON THIS SKIN.
    *  Its six buttons are DFU's art, so the question comes where the player tries to be rid of a ware - Remove over the
    *  ground, which its binding refuses: the refusal and the offer in DFU's own Yes/No box (ui/yesNoBox.js, pressed or
    *  keyed). Yes dismantles it (systems/sigil/sigilBroker.js dismantleWare) and says so; No leaves it in the pack. */

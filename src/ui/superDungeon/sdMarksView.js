@@ -1,6 +1,5 @@
 // @ts-check
-// SD18b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD18b;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MARKS, SEEN - its Ending and its two omens
+// SD18b: THE HOUR'S MARKS, SEEN - its Ending and its two omens
 // (net/superDungeon/sdMarks.js) as the gate shows the Warden's (ui/gate/gateMarksView.js, WB9a): a row under the Remnant's bar all fight
 // long, and the marks' card as a fighter steps into the Hour. The gate's own card and row draw them (one node each - the
 // Hour and a court are never stood in at once); the signs are the Hour's own - the six stones' (the lion, the sun, the

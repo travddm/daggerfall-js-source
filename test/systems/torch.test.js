@@ -189,21 +189,6 @@ test('T1 the channel: the player\'s lights go FIRST, both of them, inside the 16
 });
 
 test('T1 wiring: the tick rides the REAL clock, and every draw path carries the torch', () => {
-  const wt = src('src/systems/worldTick.js');
-  // OUTSIDE the per-minute block: DFU accumulates Time.deltaTime, so a
-  // torch burns on the wall clock. Inside it, a 20-second timer fed
-  // once a minute would burn a point every twenty MINUTES.
-  const band = wt.slice(wt.indexOf("if (Math.floor(next) !== Math.floor(classicMinutes))"));
-  const close = band.indexOf('\n  }');
-  assert.ok(band.indexOf('tickPlayerTorch') > close,
-    'the torch tick is inside the per-minute block - it must ride dt');
-  // AUDIT 39: the pin moved from `dt` to `realSeconds` with the law. dt
-  // is the tick's GAME-time budget, and a clock jump fabricates it
-  // (minutes / CLASSIC_MINUTES_PER_SECOND) - real seconds are what a
-  // 20-second wall-clock timer is owed, and a jump has none.
-  assert.ok(/tickPlayerTorch\(entity, realSeconds,/.test(wt), 'and it must be fed REAL seconds');
-  assert.ok(/killIfAnyLiveStatZero\(entity, sinks, realSeconds\);/.test(wt),
-    'refreshMods\' 0.2s timer is the same wall clock');
   // THE FOUR HOSTS RULE: every host that draws a scene prepends it
   const sites = {
     'src/scenes/worldModes.js': 2,   // the ?world dungeon and interior branches

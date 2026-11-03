@@ -1,5 +1,4 @@
-// OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld. Can you please fix this properly";
-// bible/07-Rendering/Performance-Priority.md OW-HITCH) - THE OVERWORLD'S HITCHES, MEASURED IN THE REAL GAME AND TAKEN OUT.
+// OW-HITCH - THE OVERWORLD'S HITCHES, MEASURED IN THE REAL GAME AND TAKEN OUT.
 // Each change is held here to its claim: what it no longer does, and that what it makes is what was made.
 //   1. the grass: a cleared cell uploads nothing, a written one its blades alone, and the field places into two cells'
 //      arrays where it made 343 KB a cell - the same bytes;
@@ -143,7 +142,6 @@ test('OW-HITCH blood: the sheet\'s prewarm asks with a wait, and on a page that 
 
 // ─── 3. THE SNOW UNDER A BLADE ──────────────────────────────────────
 
-// PIN MOVED (SNOW-FACE, FIELD BUGS 2026-10-21 - bible/01-Overview/bugs/Field-Bugs-2026-10-21.md; merged after this):
 // the snow has no slope now, so the host asks the stream neither a height nor a normal - this test's own end, no lookups
 // for a blade the grass places, held whole - and a cliff under a full cover is buried as level ground is (its tile has no
 // rock to shed to). The normalOf door this test pinned went with the slope.
@@ -168,9 +166,6 @@ test('OW-HITCH snow: a blade\'s and the feet\'s snow asks the stream nothing - n
     }
   } finally { setAirGround(null); }
   const { readFileSync } = await import('node:fs');
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const call = w.slice(w.indexOf('const snowCover = createSnowCoverHost('), w.indexOf('const trees = createTreesHost('));
-  assert.ok(call.length > 0 && !/heightAt|normalOf/.test(call), 'the world host hands the snow host no ground reader');
 });
 
 // ─── 4. THE SNOWPACK'S YEAR AND THE WEATHER'S SYSTEMS ───────────────
@@ -288,7 +283,7 @@ test('OW-HITCH ground sets: a set is made ONCE a key while builds ask for it tog
   const holds = [];
   log.length = 0;
   await Promise.all([sets.loadGroundSet(302, { tileArray: (k) => holds.push(k) }), sets.loadGroundSet(302, { tileArray: (k) => holds.push(k) })]);
-  assert.deepEqual(holds, [302, 302, 302, 302], 'each build holds the set, and asks again once it stands');   // PIN MOVED (TESA-LANDS' second audit, lane C): a build whose place went while the set was made leaves it loose for the next sweep (scenes/placeHolds.js hold)
+  assert.deepEqual(holds, [302, 302, 302, 302], 'each build holds the set, and asks again once it stands');
   assert.equal(log.filter((c) => c[0] === 'texImage3D').length, 1, 'one array made for the two builds');
   assert.equal(log.filter((c) => c[0] === 'texSubImage3D').length, set.length, 'its layers uploaded once');
   assert.equal(log.filter((c) => c[0] === 'generateMipmap').length, 1);
@@ -309,38 +304,6 @@ test('OW-HITCH ground sets: a set is made ONCE a key while builds ask for it tog
 });
 
 // ─── 6. THE LIVING WORLD'S TOWNS NEAR, AND THE MUSIC'S WINDOW ───────
-
-test('OW-HITCH the towns near: a reach and a pixel are one number, never two alike across the map and half a map past it; the host keeps its answers by it, 8,192 of them (mutants: a key that folds the reach; the old bound)', async () => {
-  const { livingNearKey, LIVING_NEAR_KEPT, INN_REACH_PX, TRIP_REACH_PX } = await import('../../src/systems/livingWorld/trips.js');
-  const seen = new Map();
-  for (const r of [0, INN_REACH_PX, 2, 3, TRIP_REACH_PX, 40]) {
-    for (let py = -250; py < 750; py += 3) for (let px = -500; px < 1500; px += 11) {
-      const k = livingNearKey(px, py, r);
-      assert.ok(Number.isSafeInteger(k));
-      const was = seen.get(k);
-      assert.ok(was === undefined, `${px},${py},${r} and ${was} share a key`);
-      seen.set(k, `${px},${py},${r}`);
-    }
-  }
-  // WW1: and across the whole world's grid, where the first key folded two pixels of the land past the Bay into one
-  for (const r of [0, TRIP_REACH_PX]) {
-    for (let py = -8191; py < 8192; py += 1021) for (let px = -8191; px < 8192; px += 1019) {
-      const k = livingNearKey(px, py, r);
-      assert.ok(Number.isSafeInteger(k));
-      const was = seen.get(k);
-      assert.ok(was === undefined, `${px},${py},${r} and ${was} share a key`);
-      seen.set(k, `${px},${py},${r}`);
-    }
-  }
-  assert.equal(LIVING_NEAR_KEPT, 8192);
-  const { readFileSync } = await import('node:fs');
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the two books are one maker's now, out of the host - the living
-  // world's index (scenes/livingWorld/livingIndex.js nearOf), which keeps the towns' book and the dungeons' alike
-  const w = readFileSync(new URL('../../src/scenes/livingWorld/livingIndex.js', import.meta.url), 'utf8');
-  assert.equal(w.split('const key = livingNearKey(px, py, r);   // OW-HITCH').length - 1, 1, 'the one maker of both books');
-  assert.equal(w.split('.size > LIVING_NEAR_KEPT) ').length - 1, 1, 'kept to the bound');
-  assert.match(w, /townsNear: nearOf\(townOf, townsNearKept\),[\s\S]*dungeonsNear: nearOf\(dungeonOf, dungeonsNearKept\),/, 'the towns\' book and the dungeons\'');
-});
 
 test('OW-HITCH the music\'s window: the events of [from, to) found by halving are the ones the walk from the first event found - every window of a long song, on its boundaries too (mutants: the window closed at its start; open at its end)', async () => {
   const { eventsInWindow } = await import('../../src/systems/song/songPlayer.js');

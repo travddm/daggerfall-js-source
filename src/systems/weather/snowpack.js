@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PRECIP3 (2026-10-19, the owner: "If its snowing in one area and raining in the next, the transition should be seamless
-// both in ground texture and everything else. This needs to be accurate and as detailed as possible") - THE SNOW THE
+// PRECIP3 - THE SNOW THE
 // GROUND KEEPS: the snowpack's water (SWE, millimetres of water) at every place and height, integrated over the world
 // weather map's own history (weatherMap.js) in the air of airTemperature.js. Pure in (place, height, minute): the same
-// white on every client, offline and online, as the systems that dropped it are. bible/07-Rendering/Biome-Precipitation.md
+// white on every client, offline and online, as the systems that dropped it are.
 // is the record.
 //
 // DFU's ground wears its climate's winter archive for the whole of Winter and never otherwise (TerrainMaterialProvider,
@@ -393,7 +392,7 @@ export class SnowpackLattice {
    * of the two about it), its year-before spin first, earliest step first, for at most `budgetMs` of the clock (`now`
    * the clock: performance.now's). Answers true when every point stands there.
    *
-   * SNOW-BUDGET (2026-10-20, a player via the owner: "something about our weather system affecting fps"): THE BUDGET IS
+   * SNOW-BUDGET: THE BUDGET IS
    * KEPT. The deadline was read only after a whole step of the window - 121 points' air and pack, ~10 ms - so a 3 ms
    * frame's integration ran a step at the least, and each of a frame's readers ran its own. Now a step's points stop at
    * it (`_step`): the rest carry on in the next call, each point's history its own, so every pack is the one it was. A

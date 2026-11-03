@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ROAD-LOOK (2026-10-27, KPbICA on the DFO Online Discord through the owner: "No bridges across the big rivers (like this
-// one that starts around IC and goes south)"; the owner: "No band aids or half assed work"; bible/03-World/Roads.md
-// ROAD-LOOK) - A ROAD OVER A RIVER WIDER THAN A FORD CROSSES IT ON A BRIDGE.
+// ROAD-LOOK - A ROAD OVER A RIVER WIDER THAN A FORD CROSSES IT ON A BRIDGE.
 //
 // Past the Bay the roads are the port's own (world/tamrielRoads.js) and CYRODIIL-WATERS carves ten rivers into the land,
 // narrower than a pixel (world/tamriel/tamrielWaters.js). RIVER-FORDS prices a step onto a channel's pixel so a road

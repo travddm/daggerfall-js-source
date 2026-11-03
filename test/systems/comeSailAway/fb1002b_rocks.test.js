@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02b - THE ROCKS' RECORD AUDITED (Mac: "Audit this"). FIELD BUGS 2026-10-02's ROCK-FREE answered
+// FIELD BUGS 2026-10-02b - THE ROCKS' RECORD AUDITED. FIELD BUGS 2026-10-02's ROCK-FREE answered
 // Come Sail Away's hull sweep part by part (player/collider.js hullSweepAll) - and its audit, through the real
 // modules, found it short of Unity's SphereCastAll five ways, and the C#'s own reach a sixth:
 //   BETWEEN THE SPOKES - the sweep was nine rays (the centre and eight on her sphere's rim): a rock smaller than the
@@ -243,7 +243,6 @@ test('ROCK-FREE HER OWN, HER KEEL: CheckCollision hands the host her keel line -
     lowest = Math.min(lowest, colliderBounds({ models: s.deps.pool.models }, boat.MeshObject, boat.MeshCollider).min[1]);
   }
   assert.ok(calls.length > 100, `swept every frame she moves (${calls.length})`);
-  // PIN MOVED (AUDIT GALLEON, the merge with main, 2026-10-02): the Small Ship is Mac's galleon - her box's foot 4.64 m
   // under the line, where the mod's galleon's stood 3.35
   const keel = 34 + hullBuild(SMALL_SHIP).keel;
   for (const opts of calls) {

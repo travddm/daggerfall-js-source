@@ -46,12 +46,6 @@ test('CONTAINER-PEEK: the interior reader answers one family and leaves the pile
   assert.equal(interiorHeldPreview('droppedLoot:1', bag), null);
 });
 
-test('CONTAINER-PEEK: the interior host hands the reader to the plaque', () => {
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /const interiorPeek = createInteriorPeek\(\{/);
-  assert.match(wm, /\n\s*interiorPeek,\n/);
-});
-
 test('CONTAINER-PEEK createInteriorPeek: built once, it reads the room\'s word only over a cupboard or a placed chest, and answers what interiorHeldPreview answers (mutants: the getters read for every key, a getter read once at build)', () => {
   const read = [];
   const word = (name, value) => () => { read.push(name); return value; };

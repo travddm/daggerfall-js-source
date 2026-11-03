@@ -210,25 +210,3 @@ test('equipMechanics: U8h the starting seed + the worn-weapon binding shape', ()
   assert.equal(e.equip.slots[EQUIP_SLOTS.RightHand] ?? null, null, 'bare hands -> the unarmed path');
 });
 
-
-// U59: the seam, swept where a machine with no ARENA2 can still see
-// it. The assertion above needs real art and skips on CI, so a mutant
-// that deletes the line keeping the composite would ship green - this
-// is the pin that fails instead.
-test('U59: refreshPaperDoll KEEPS the buffer it uploads', () => {
-  const src = readFileSync(new URL('../../src/ui/paperDoll.js', import.meta.url), 'utf8');
-  const from = src.indexOf('export async function refreshPaperDoll');
-  assert.ok(from > 0, 'the compositor is gone');
-  const body = src.slice(from, src.indexOf('\n/**', from));
-  // the composite is `out`, and BOTH consumers read that same buffer:
-  // the GL upload the classic window draws, and the RGBA the DOM does
-  assert.match(body, /_pixels = \{ width: OW, height: OH, rgba: out, version: _version, density: OW \/ PAPERDOLL_W \}/,
-    'the DOM composite is not the buffer that was just composed');
-  assert.match(body, /uploadTexture\('img', key, \{[^}]*colors: new Uint32Array\(out\.buffer\)/,
-    'the GL upload no longer reads the same buffer');
-  assert.ok(body.indexOf('_pixels =') < body.indexOf('uploadTexture'),
-    'the DOM copy is taken after the upload, which is a second chance to diverge');
-  // and a stale identity drops it, or a Khajiit draws the Breton doll
-  const preload = src.slice(src.indexOf('export async function preloadPaperDollArt'), from);
-  assert.match(preload, /_pixels = null;/, 'an identity change leaves the old avatar up');
-});

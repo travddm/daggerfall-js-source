@@ -1,6 +1,4 @@
-// BLD (2026-10-26, the owner, having walked the Imperial City: "The new building layouts in the city look like some
-// windows are upside down, clip into the ground and into the roofs, no doors/interiors, and no lighting sources like the
-// original layouts"; bible/03-World/Arena-Provinces.md IC-GRAND, BLD) - THE FABRIC'S BUILDINGS AS THE GL DRAWS THEM,
+// BLD - THE FABRIC'S BUILDINGS AS THE GL DRAWS THEM,
 // pinned: every wall's picture right side up on every facing, as the GL samples it; no window under the ground, over an
 // eave, on a gable or on a party wall, none cut at a wall's end, a balcony on a floor, every wall's foot under the ground
 // and no building over another; the capitals' own walls (vanillaTexels) right side up too.

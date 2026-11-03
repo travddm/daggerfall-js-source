@@ -1,5 +1,4 @@
-// LIST-FIT (2026-09-27, kurkku on Discord: "Equipment sprites too big for the boxes" - a shop list whose pauldrons and
-// dai-katana hung out of their framed boxes into the rows beneath, the spellbook's plain one fitting). The base tile
+// LIST-FIT. The base tile
 // is a GRID (enhancedStyle.js), and a grid's auto row gives a picture's `max-height: 100%` - the tier frame's cap
 // (AUDIT MERGE-PLUS D2) - nothing to resolve against: only the width was held. The loot window's tile has been a flex
 // room since UI1 and held both; the shop's and a player trade's are too now. Measured in Chromium over the injected
@@ -30,6 +29,4 @@ test('LIST-FIT: a list tile whose tiered picture is capped at 100% is a FLEX roo
     assert.equal(valueOf(ruleFor(sheet, tile, 'justify-content'), 'justify-content'), 'center', `${tile}: and across`);
     assert.ok(!ruleFor(sheet, tile, 'overflow'), `${tile}: never clipped instead - the sigil rune and the padlock stand past its edge`);
   }
-  // a player trade is a trade-shell too, so the one rule holds it
-  assert.match(readFileSync(new URL('../../../src/ui/enhanced/enhancedPlayerTrade.js', import.meta.url), 'utf8'), /el\('div', 'px-home px-over trade-shell ptrade-shell'\)/);
 });

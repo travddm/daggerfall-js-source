@@ -54,9 +54,7 @@ export const AMBIENT_SOUNDS = Object.freeze({
 });
 export const AMBIENT_RAIN_LOOP = 389;      // AmbientRaining
 export const AMBIENT_CRICKETS_LOOP = 6;    // AmbientCrickets
-/** CRICKET-QUIET (2026-09-22, Mac: "The cricket noise at night is way
- *  too persistent. I want to make a change that lowers its occurrence
- *  and persistence, but doesn't remove it as a sound"). A DEPARTURE,
+/** CRICKET-QUIET. A DEPARTURE,
  *  recorded (Port-Ledger A): DFU starts AmbientCrickets at full volume
  *  when night falls and never lets it rest until dawn
  *  (AmbientEffectsPlayer.Update, :138-141). Here the night keeps its
@@ -123,8 +121,7 @@ export function unmuteAmbientForVideo() {
  *  than the street. The ambience ticks indoors now, and inside a BUILDING its loops are the street heard through
  *  walls: the rain at INDOOR_RAIN_GAIN - or not at all while Better Ambience's indoor source is the rain you hear - of
  *  the street's own gain, so a building is never louder than the street (AUDIT DISC7 B1). Underground the rain loop
- *  carries on at the street's gain (the verbatim quirk below). DISC8-A (Mac, 2026-09-23: "no crickets indoors
- *  please"): the night's crickets sing under the open sky only - stopped in a building as underground
+ *  carries on at the street's gain (the verbatim quirk below). DISC8-A: the night's crickets sing under the open sky only - stopped in a building as underground
  *  (CRICKET-DUNGEON), the chorus clock held. The one-shots (birds, thunder, the cemetery) stay outdoor things. A recorded
  *  departure from the quirk, for buildings (Port-Ledger A). */
 export const INDOOR_RAIN_GAIN = 0.35;
@@ -240,7 +237,7 @@ export class AmbientEffects {
    *  DEPARTURE, not a fix, and this port is bug-for-bug. Recorded in
    *  Port-Ledger B, and F088 struck REFUTED with this reasoning.
    *
-   *  DISC6 (2026-09-23): in a BUILDING the port now departs on purpose -
+   *  DISC6: in a BUILDING the port now departs on purpose -
    *  the rain is the street's heard through the walls (INDOOR_RAIN_GAIN,
    *  the header above `update`) and the crickets are silent (DISC8-A),
    *  Port-Ledger A. Underground the carried loop stands as written (the
@@ -390,14 +387,13 @@ export class AmbientEffects {
       this._rainGainSet = rainGain;
     }
     // CRICKET-QUIET: choruses, not DFU's all-night loop (see CRICKET_CHORUS)
-    // CRICKET-DUNGEON (2026-09-23, Mac: "turn off cricket noises in
-    // dungeons"): the exterior ambience follows the player underground
+    // CRICKET-DUNGEON: the exterior ambience follows the player underground
     // (the verbatim quirk above setPreset), and with it the night's
     // crickets. The rain stays as DFU has it; the crickets do not sing
     // under the ground - the loop is stopped while `deps.underground`
     // and the chorus clock holds, so the surface takes the night up
     // where it stood. A recorded departure (Port-Ledger A). DISC8-A
-    // (Mac, 2026-09-23: "no crickets indoors please"): the same stop in
+    // : the same stop in
     // a building (`deps.inside`), beside the underground one.
     // SNDREP1 (uiPrefs `nightCrickets`): the player's switch is the same
     // stop. The audio door already refuses a NEW loop for a silenced clip,

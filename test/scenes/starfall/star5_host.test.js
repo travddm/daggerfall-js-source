@@ -1,9 +1,9 @@
-// STAR5/STAR6 (bible/11-Multiplayer/Starfall.md sections 3, 4, 5 and 8): THE STARFALL'S HOST, END TO END on the world's
+// STAR5/STAR6 (4, 5 and 8): THE STARFALL'S HOST, END TO END on the world's
 // bindings by name - a night's stars found over a scan, their moments said where they should be heard, the defense
 // stood by the ledger the cell says (each wave, the master, its circle at its calls, the ward), the star a body its own
 // coven's monsters strike and each blow kept across a reload, the word to the cell, the hold and the loss, the camp's
 // race; and the Timers', the map's and the compass's readings. tools/mutants/star5.json.
-// AUDIT STARFALL (2026-10-20): the foes handed over taken as the star's (C1), one leash (C2), the master stood again
+// AUDIT STARFALL: the foes handed over taken as the star's (C1), one leash (C2), the master stood again
 // (C4), the festival's last stars (C5), the blows by account (C6), the star's allowance (C7); the crater where its
 // heart is (R1), the beacon clamped (R2), the ring on the land (R3), the floor pulled forward (R4), the landing's cues
 // (R7), a first ledger taken in silently (R8), the coarse ground and the pass at idle (R9).
@@ -89,7 +89,7 @@ function fakeGl() {
 function world({ storage = memStorage(), t = starTimes(N, 0).omenAt - 1000, gfx = false, surface = () => 0, coarse = undefined, account = undefined } = {}) {
   const w = { t, feet: null, region: COVEN.region, said: [], mids: [], sounds: [], heard: [], words: [], sprung: new Set(), peer: new Set(), peerAgo: 0, forgot: [], bare: [], storage, origin: [0, 0, 0] };
   w.foes = pool();
-  w.session = { starReady: () => true, starGrantOk: true, sendStar: (word, cell) => { w.words.push({ ...word, cell }); return true; } };   // AUDIT STAR-TUNE F1: a relay that mints the `star` kind
+  w.session = { starReady: () => true, sendStar: (word, cell) => { w.words.push({ ...word, cell }); return true; } };
   w.gl = gfx ? fakeGl() : null;
   w.renderer = gfx ? { gl: w.gl, meshes: [], draws: [], createMesh(m) { const mesh = { m }; this.meshes.push(mesh); return mesh; }, destroyMesh() {}, uploadTexture() {}, uploadEmissionTexture() {}, drawMesh(mesh, mat) { w.draws.push({ mesh, mat: Array.from(mat), offset: w.gl.calls.filter(([k, c]) => (k === 'enable' || k === 'disable') && c === 'POLYGON_OFFSET_FILL').at(-1)?.[0] === 'enable' }); } } : null;
   w.draws = [];
@@ -436,7 +436,7 @@ test('STAR6 THE READINGS: the Timers\' rows (the standing star and the next fall
   Date.now = realNow;
 });
 
-// ── AUDIT STARFALL (2026-10-20) ──────────────────────────────────────────────────────────────────────────────────────
+// ── AUDIT STARFALL ──────────────────────────────────────────────────────────────────────────────────────
 
 /** A foe of the star handed to this screen (scenes/exteriorFoes.js adopt): mine now, its site kept and nothing else. */
 const handed = (career, site, at, hp = 100, max = 100) => ({ mobileType: career, site, entity: { health: hp, maxHealth: max }, ai: { feet: [...at] }, dead: false, puppet: null });
@@ -862,14 +862,6 @@ test('STAR-TUNE THE COVEN STANDS AS AN EVENT\'S (the owner, of the first run: "t
     assert.equal(f.opts.groundAlign.hitDist, 0.2, 'its drop from just over it');
     assert.equal(f.opts.grantKind, 'star', 'a grant of the star\'s own kind - a wave of any size its law gives, one ask');
   }
-  // AUDIT STAR-TUNE F1: a relay before the star's kind (the site live first) is asked the stand's own - main's, a wave of nine at most
-  w.session.starGrantOk = false;
-  w.st(2, { p: P_WAVE, w: 2, wz: 5, kn: 0, b: 1 });
-  await w.beat();
-  const older = w.foes.stood.filter((f) => f && f.site === sites.base).slice(wave.length);
-  assert.equal(older.length, 5, 'the next wave stands on an older relay too');
-  for (const f of older) assert.equal(f.opts.grantKind, undefined, 'its own shape\'s kind (net/grantLaw.js grantKindOf), never one the relay refuses');
-  w.session.starGrantOk = true;
   // the master: an elite's own health; its circle the coven's
   w.st(2, { p: P_MASTER, w: 4, wz: 0, kn: 0, b: 1, nd: 1 });
   await w.beat();

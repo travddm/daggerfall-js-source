@@ -1,6 +1,5 @@
 // @ts-check
-// FERRY-CLEAR (2026-10-24, Discord - "Ferrys still unstable": "Had several issues with the ferry ramming a neighbour
-// ship till it broke, or running ashore"; bible/03-World/Passage.md FERRY-CLEAR) - THE SHIPS A JOURNEY'S HAND STEERS
+// FERRY-CLEAR - THE SHIPS A JOURNEY'S HAND STEERS
 // ROUND. The hand on a crossing's helm (OWS2, scenes/world.js tvSeaSail and systems/seaHelm.js) - a booked ship's master
 // on a passage, the traveller's own on a crossing - looked at the water alone: a ship moored at the next berth along
 // the quay she left from stood dead ahead of her, and the hand drove her into it. A ship's hull is as land to it now:

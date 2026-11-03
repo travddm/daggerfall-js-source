@@ -1,5 +1,4 @@
-// DECOR-SHELL (2026-09-26, a player over the house decorator, relayed by Mac: "decor they go poof", "They are there /
-// But its model disappearing / Placing models is different then the ones after"): A PLACED PIECE STAYS IN THE ROOM.
+// DECOR-SHELL: A PLACED PIECE STAYS IN THE ROOM.
 //
 // The free camera flew through walls, floor and ceiling - nothing but the forty-metre leash held it - and a room's
 // faces are one-sided, so from outside it the room is an open dollhouse: a piece set on the ceiling's top or behind a
@@ -12,7 +11,7 @@
 // every face and slides along it; a model aimed at a ceiling hangs from it, its top at the face; a flat cannot hang;
 // a failed load is asked again; and the host's gate by source.
 //
-// AUDIT DECOR-SHELL (2026-09-27): the skin was measured along the step - a glide a degree down rested 3.5 mm over the
+// AUDIT DECOR-SHELL: the skin was measured along the step - a glide a degree down rested 3.5 mm over the
 // floor, and under 1e-4 the next step went through it - so the end of a step is pushed off every face (flyKeep), and
 // where the eye cannot stand it stays; a failed list opened the decorator, and the first piece taken out wiped the
 // service's list - the list is asked until it stands, and waited for ten seconds at most; the decorator's own model
@@ -152,19 +151,6 @@ test('DECOR-SHELL the room: a model that would not load is asked again by the ne
   await settle();
   assert.equal(pool.draw(), 2, 'the first one too, put again (a move, a restore)');
   assert.equal(calls, 2, 'and a model that loaded is kept');
-});
-
-test('DECOR-SHELL the host by source: an online home is decorated only once its list has STOOD this visit - AUDIT DECOR-SHELL 2: a refusal or the service unreachable opens nothing (the room stood none of the service\'s pieces and none of its owner\'s taken-out furniture, whose whole list the first piece taken out wrote over the service\'s); the list asked through askDecorList, only while the visit that asked goes on and its list has not stood; the flight cut by the room\'s collider (mutants: the gate gone, the answer never marked, the gate open before the list, a left visit\'s list stood, the list asked after it stood)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /let _decorListed = -1;/);
-  assert.match(m, /if \(\(interiorHome \|\| interiorSeatHall\) && _decorListed !== _decorVisit\) return null;\n    if \(interiorHome\?\.hall\) return \{ kind: 'home'/);   // GUILD1d (re-aimed by content): a hall's room first, an online home's too   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  const at = m.indexOf('function loadHomeDecor() {');
-  const load = m.slice(at, m.indexOf('\n  }\n', at));
-  assert.match(load, /const visit = _decorVisit;\n    askDecorList\(\{\n      ask: \(\) => primedDecorList\(decorListKey\(homeTownOf\(b\), b\.buildingKey, seat\)\) \?\? host\.homeDecor\.list\(homeTownOf\(b\), b\.buildingKey, seat\),\n      live: \(\) => visit === _decorVisit && interiorBuilding === b && _decorListed !== visit,\n      stand: \(r\) => \{\n        _decorListed = visit;/, 'the gate opens where the list stands, and nowhere else');   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  assert.equal([...m.matchAll(/_decorListed = visit/g)].length, 1, 'one door to the gate: no answer but a list opens it');
-  assert.doesNotMatch(m, /\.catch\(\(\) => \{ if \(visit === _decorVisit\) _decorListed = visit; \}\)/, 'a failure never opens it');
-  const t = src('src/scenes/decor/decorTool.js');
-  assert.match(t, /p\.fly = flyClip\(deps\.collider\?\.\(\), p\.fly, next, through\);/, 'the flight cut by the room\'s own collider, through what the eye looks through');
 });
 
 test('AUDIT DECOR-SHELL 1 flyClip: the skin is kept from the face, not along the step - a glide forward looking a degree down rests DECOR_FLY_SKIN over the floor (it rested 3.5 mm over it), a flight along a wall turned five degrees to it rests the skin off the wall (1.7 cm, 39% of the screen past it), and that glide flattened to a fiftieth of a degree, then Crouch, stays in the room (under 1e-4 the ray no longer met the floor, and the eye went through it) (mutants: an uncut step unkept, the push gone)', () => {

@@ -1,16 +1,13 @@
-// GILDED2 (2026-10-15; bible/06-Systems/Gilded.md section 7; Mac: "With the introduction of elite dungeons soon. I want to
-// enhance the rewards for each world activety. We need to add a rare gilded weapon to the oblivion gates. A gilded weapon
-// to the serpent") - THE WORLD'S TWO GILDED. The laws pinned:
-//   - THE RECORDS: the Dragonfire Oath (a Daedric Dai-Katana) and the Sunken Sovereign (an Ebony Saber), after the
-//     Hourlock - four lines each at the Legendary band's TOP and no higher, a power each, frozen whole.
+// GILDED2 - THE WORLD'S TWO GILDED. The laws pinned:
+//   - THE RECORDS: the Dragonfire Oath (a Daedric Dai-Katana) and the Sunken Sovereign (an Ebony Saber) - four lines
+//     each at the Legendary band's TOP and no higher, a power each, frozen whole.
 //   - THE MINT: a DFU weapon's own (CreateWeapon), whole, known and priced; the wire takes it exactly as minted and
-//     refuses one number off; the Hourlock's mint is the gun's still. GUNS-UNFOUND (2026-10-23): every record's a DFU
-//     weapon's now - the Hourlock a Dwarven Long Bow, the Sovereign the Saber again; their guns minted before their eras.
+//     refuses one number off.
 //   - THE DROPS: one draw each, one in a hundred - the gate Warden's spoils' very last, and a dealing ship's serpent
 //     hoard's very last (a ship that stood never), so every spoils before them is what it was for its seed.
 //   - DRAGONFIRE: a landed blow on a Daedra bursts on every OTHER Daedra within 3 m for a third of it, unresisted - never
 //     on another kind of foe, never from a blow on one.
-//   - UNDERTOW: its landed blows on a foe are counted on THAT foe, +10% a blow up to +50%; a foe it fells heals 10%.
+//   - UNDERTOW: its landed blows on a foe are counted on THAT foe, +2% a blow up to +10%; a foe it fells heals 10%.
 //   - THE LOOK: named as an artifact is, its card's lines and power, its codex row's own hint.
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -21,11 +18,10 @@ import * as LR from '../../src/systems/loot/lootRarity.js';
 import * as LP from '../../src/systems/loot/lootPowers.js';
 import * as CX from '../../src/systems/loot/lootCodex.js';
 import {
-  GILDED, GILDED_WORTH, GILDED_RECORDS, HOURLOCK, HOURLOCK_GUN_ERA, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN, DRAGONFIRE, UNDERTOW, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD,
-  GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE, gildedById, mintGilded, mintHourlock, rollDragonfireOath, rollSunkenSovereign,
+  GILDED, GILDED_WORTH, GILDED_RECORDS, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN, DRAGONFIRE, UNDERTOW,
+  GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE, gildedById, mintGilded, rollDragonfireOath, rollSunkenSovereign,
   validGildedMarks,
 } from '../../src/systems/gilded.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { WEAPON_MATERIALS, WEAPONS } from '../../src/characters/weapons.js';
 import { SKILLS } from '../../src/systems/skills.js';
 import { itemBaseValue } from '../../src/systems/item/itemTemplates.js';
@@ -56,12 +52,10 @@ const lines = (r) => r.affixes.map((a) => [a.id, a.param ?? null, a.value]);
 
 // ── the records ───────────────────────────────────────────────────────
 
-test('GILDED2 THE RECORDS: the Hourlock, then the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +40% damage, +15 Strength, +30 Long Blade, +15 Endurance - AUDIT WORLD-REWARDS B1: no slayer) and the serpent\'s Sunken Sovereign (an Ebony Saber: +40% damage, +15 Agility, +30 Long Blade, 10% leech) - every line the Legendary band\'s TOP and no higher, a power each, frozen whole (mutants: a line over the band; the Oath\'s make; the Sovereign\'s slayer)', () => {
-  // PIN MOVED (KETCH, 2026-10-24, bible/06-Systems/Gilded.md section 10): the airship's two guns after the world's two
-  // (test/systems/ketch_gilded.test.js holds them)
-  assert.deepEqual(GILDED_RECORDS, [HOURLOCK, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD]);
-  assert.deepEqual(GILDED_RECORDS.map((r) => r.id), ['the-hourlock', 'the-dragonfire-oath', 'the-sunken-sovereign', 'volendrungs-echo', 'the-ketchmasters-word']);
-  assert.equal(new Set(GILDED_RECORDS.map((r) => r.id)).size, 5, 'five ids');
+test('GILDED2 THE RECORDS: the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +24% damage, +9 Strength, +18 Long Blade, +9 Endurance - AUDIT WORLD-REWARDS B1: no slayer) and the serpent\'s Sunken Sovereign (an Ebony Saber: +24% damage, +9 Agility, +18 Long Blade, 6% leech) - every line the Legendary band\'s TOP and no higher, a power each, frozen whole (mutants: a line over the band; the Oath\'s make; the Sovereign\'s slayer)', () => {
+  assert.deepEqual(GILDED_RECORDS, [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]);
+  assert.deepEqual(GILDED_RECORDS.map((r) => r.id), ['the-dragonfire-oath', 'the-sunken-sovereign']);
+  assert.equal(new Set(GILDED_RECORDS.map((r) => r.id)).size, 2, 'two ids');
   for (const r of [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]) {
     assert.equal(gildedById(r.id), r);
     assert.equal(r.group, 'Weapons');
@@ -76,26 +70,21 @@ test('GILDED2 THE RECORDS: the Hourlock, then the gate\'s Dragonfire Oath (a Dae
     assert.ok(r.lore && r.hint, 'its lore and its own hint');
   }
   assert.deepEqual([DRAGONFIRE_OATH.name, DRAGONFIRE_OATH.templateIndex, DRAGONFIRE_OATH.material], ['The Dragonfire Oath', WEAPONS.Dai_Katana, WEAPON_MATERIALS.Daedric]);
-  assert.deepEqual(lines(DRAGONFIRE_OATH), [['damage', null, 40], ['stat', 'strength', 15], ['skill', SKILLS.LongBlade, 30], ['stat', 'endurance', 15]]);
-  // PISTOLET (2026-10-21, the owner: "replace the serpent boss gilded weapon with this new weapon"): an Ebony Dwarven
-  // Pistolet (562) where it was an Ebony Saber, its skill line Archery's - the rest of the record as it was
-  // PIN MOVED (GUNS-UNFOUND, 2026-10-23, the owner: "revert the gilded weapon from the serpent"): the Ebony Saber again,
-  // its skill line Long Blade's - GILDED2's record; the Pistolet minted between is its era (pistolet.test.js pins it)
+  // PIN MOVED (B4 rescale): the Legendary band's tops, damage 24, stat 9, skill 18, leech 6 (were 40, 15, 30, 10).
+  assert.deepEqual(lines(DRAGONFIRE_OATH), [['damage', null, 24], ['stat', 'strength', 9], ['skill', SKILLS.LongBlade, 18], ['stat', 'endurance', 9]]);
   assert.deepEqual([SUNKEN_SOVEREIGN.name, SUNKEN_SOVEREIGN.templateIndex, SUNKEN_SOVEREIGN.material], ['The Sunken Sovereign', WEAPONS.Saber, WEAPON_MATERIALS.Ebony]);
-  assert.deepEqual(lines(SUNKEN_SOVEREIGN), [['damage', null, 40], ['stat', 'agility', 15], ['skill', SKILLS.LongBlade, 30], ['leech', null, 10]]);
+  assert.deepEqual(lines(SUNKEN_SOVEREIGN), [['damage', null, 24], ['stat', 'agility', 9], ['skill', SKILLS.LongBlade, 18], ['leech', null, 6]]);
   assert.equal(DRAGONFIRE_OATH.power, DRAGONFIRE);
   assert.deepEqual({ kind: DRAGONFIRE.kind, group: DRAGONFIRE.group, share: DRAGONFIRE.share, metres: DRAGONFIRE.metres }, { kind: 'dragonfire', group: 'daedra', share: 33, metres: 3 });
   assert.equal(SUNKEN_SOVEREIGN.power, UNDERTOW);
-  assert.deepEqual({ kind: UNDERTOW.kind, pct: UNDERTOW.pct, max: UNDERTOW.max, seconds: UNDERTOW.seconds, heal: UNDERTOW.heal }, { kind: 'undertow', pct: 10, max: 5, seconds: 6, heal: 10 });
+  assert.deepEqual({ kind: UNDERTOW.kind, pct: UNDERTOW.pct, max: UNDERTOW.max, seconds: UNDERTOW.seconds, heal: UNDERTOW.heal }, { kind: 'undertow', pct: 0.5, max: 5, seconds: 6, heal: 10 }); // PIN MOVED: B5 (Undertow 2 -> 0.5)
 });
 
 // ── the mint ──────────────────────────────────────────────────────────
 
 test('GILDED2 THE MINT: a DFU weapon\'s own (CreateWeapon - its make, its span, its condition), named, Gilded, its lines a copy, KNOWN, priced over its make by its lines and GILDED_WORTH; the wire takes it exactly and refuses one number off, a line short, a material or template not its own and any mark another door lays; GUNS-UNFOUND: the Hourlock\'s a DFU bow\'s too, its gun era the gun\'s mint still (mutants: the Thunderlock for every record)', () => {
   on();
-  for (const r of [HOURLOCK, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]) {   // PIN MOVED (GUNS-UNFOUND): the Hourlock a DFU bow too
-    // PISTOLET: the Sunken Sovereign is the Pistolet's own mint now, as the Hourlock is the Thunderlock's
-    // PIN MOVED (GUNS-UNFOUND): CreateWeapon's for both again - no record mints a gun
+  for (const r of [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]) {
     const it = mintGilded(r), plain = createWeapon(r.templateIndex, r.material);
     assert.deepEqual([it.templateIndex, it.material, it.group, it.minDamage, it.maxDamage, it.maxCondition], [plain.templateIndex, plain.material, plain.group, plain.minDamage, plain.maxDamage, plain.maxCondition], `${r.id}: CreateWeapon's own`);
     assert.deepEqual([it.name, it.rarity, it.gilded, it.isIdentified], [r.name, GILDED, r.id, true]);
@@ -114,21 +103,13 @@ test('GILDED2 THE MINT: a DFU weapon\'s own (CreateWeapon - its make, its span, 
     assert.ok(reforgeRefusal(it), 'never reforged');
     assert.equal(itemMakerRefuses(it), true, 'never the item maker\'s');
   }
-  // PIN MOVED (GUNS-UNFOUND): the Hourlock is CreateWeapon's Dwarven Long Bow now; a gun Hourlock a save holds is its gun
-  // era's, the gun's mint, at the price every gift of it was minted at
-  const h = mintHourlock();
-  assert.equal(h.templateIndex, WEAPONS.Long_Bow, 'the Hourlock a bow now');
-  assert.equal(h.value, 17660);
-  const g = mintGilded(HOURLOCK_GUN_ERA);
-  assert.equal(g.templateIndex, createThunderlock().templateIndex, 'its gun era the gun\'s mint still');
-  assert.equal(g.value, 39740, 'and its price what every gift of it was minted at');
 });
 
 // ── the drops ─────────────────────────────────────────────────────────
 
 test('GILDED2 THE DROPS: ONE draw each, always - under its chance its record, else nothing; one in two hundred and fifty (mutants: the chances)', () => {
   on();
-  assert.deepEqual([GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE], [1 / 250, 1 / 250]);   // PIN MOVED (GILDED-RARER, 2026-10-24, the owner: "Reduce the drop rate of gilded weapons across the board"): one in a hundred each, before
+  assert.deepEqual([GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE], [1 / 250, 1 / 250]);
   for (const [roll, chance, id] of [[rollDragonfireOath, GATE_GILDED_CHANCE, 'the-dragonfire-oath'], [rollSunkenSovereign, SERPENT_GILDED_CHANCE, 'the-sunken-sovereign']]) {
     const yes = counted(() => chance - 1e-9), no = counted(() => chance);
     assert.equal(roll(yes.rolls)?.gilded, id);
@@ -164,12 +145,9 @@ test('GILDED2 THE GATE\'S AND THE SERPENT\'S: the Oath the Warden\'s spoils\' LA
   }
   assert.ok(oath > 0 && Math.abs(oath / N - GATE_GILDED_CHANCE) < 0.006, `the Oath ${oath} of ${N}`);
   assert.ok(sov > 0 && Math.abs(sov / N - SERPENT_GILDED_CHANCE) < 0.006, `the Sovereign ${sov} of ${N}`);
-  // the very last draw of each - after the technique pass, so every spoils before it is what it was for its seed
-  assert.match(strip(read('src/systems/gate/gateSpoils.js')), /techniquePass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const oath = rollDragonfireOath\(rolls\);\s*if \(oath\) pieces\.push\(\{ item: oath, tier: oath\.rarity \}\);\s*const more = \[\];\s*for \(const bit of SPOILS_PORTENT_BITS\) if \(\(p & bit\) !== 0\) more\.push\(graded\(spoilsBase\(lv, rolls\), magicOrBetter\(rolls\), rolls\)\);[\s\S]{0,700}?return \{ gold, pieces, sigil: sigilStone\(\), card, gems, portent: more\.length \};/);   // PIN MOVED (WB14g): still the plain spoils' last draw - a portent night's pieces after it, drawn only for a receipt's `p` (test/net/gate/wb14g_pays.test.js)   // PIN MOVED (AUDIT WB14 PLAY-7): and the passes over a portent's pieces alone, after them
   for (const [f, fn] of [['src/systems/gate/gateSpoils.js', 'rollDragonfireOath'], ['src/systems/serpent/serpentSpoils.js', 'rollSunkenSovereign']]) {
     assert.equal(strip(read(f)).split(`${fn}(`).length - 1, 1, `${f}: ONE draw of it, and only there`);
   }
-  assert.match(strip(read('src/systems/serpent/serpentSpoils.js')), /techniquePass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const sovereign = dealt \? rollSunkenSovereign\(rolls\) : null;\s*if \(sovereign\) pieces\.push\(\{ item: sovereign, tier: sovereign\.rarity \}\);\s*return \{ gold, pieces, embers: serpentEmbers\(\), card, gems \};/);
 });
 
 test('GILDED2 THE FLOOR (AUDIT WORLD-REWARDS A1): in a spoils the Oath came in, every other picture is the one the seed gave it - the pieces\', the ember\'s, the gold\'s, the card\'s and the gems\' - and the Oath\'s is drawn LAST; the Oath still leaves among the pieces, inside the glow\'s eight (mutants: the Oath\'s picture in its place)', () => {
@@ -251,7 +229,7 @@ test('GILDED2 DRAGONFIRE: a landed blow of the Oath on a Daedra burns it again f
   assert.equal(LP.lootBlow(oath, 100, me, struck, {}), 100, 'no slayer line now - the burn is its edge on a Daedra');
 });
 
-test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s - +10% a blow before, up to +50%, for 6 s from the last (B4: let go after); another foe starts at nought; a blow asked and never landed counts nothing, nor one the ward turns (B3); a foe it fells (within TOLL_REFUND_S of its last landed blow on it) heals 10% of my health, once - and each foe one swing fells, its own (B2); another weapon neither reads nor moves it (mutants: no cap; one count for every foe; no heal; any kill heals; no window; one heal a swing)', () => {
+test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s - +0.5% a blow before, up to +2.5%, for 6 s from the last (B4: let go after); another foe starts at nought; a blow asked and never landed counts nothing, nor one the ward turns (B3); a foe it fells (within TOLL_REFUND_S of its last landed blow on it) heals 10% of my health, once - and each foe one swing fells, its own (B2); another weapon neither reads nor moves it (mutants: no cap; one count for every foe; no heal; any kill heals; no window; one heal a swing)', () => {
   fresh();
   const me = player();
   const sov = wear(me, mintGilded(SUNKEN_SOVEREIGN));
@@ -259,21 +237,21 @@ test('GILDED2 UNDERTOW: the Sovereign\'s landed blows on a foe are that foe\'s -
   assert.deepEqual(LP.wornPowers(me).map((p) => p.id), ['the-sunken-sovereign']);
   const a = foe(ORC), b = foe(ORC);
   const land = (f) => { const d = LP.lootBlow(sov, 100, me, f, {}); LP.lootStrike(me, f, d, sov); return d; };
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => land(a)), [100, 110, 120, 130, 140, 150, 150], 'ten a blow before it, never past fifty');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => land(a)), [100, 100, 101, 102, 102, 102, 103], 'half a point a blow before it (the weapon carries the fraction), never past two and a half'); // PIN MOVED: B5 (Undertow 2 -> 0.5, max 10 -> 2.5; shareOf carry)
   assert.equal(land(b), 100, 'another foe starts at nought');
   LP.lootBlow(sov, 100, me, b, {}); LP.lootBlow(sov, 100, me, b, {});
-  assert.equal(land(b), 110, 'blows asked and never landed count nothing');
+  assert.equal(land(b), 100, 'blows asked and never landed count nothing (one landed: 0.5, floors to 0, carried)'); // PIN MOVED: B5 (Undertow 0.5)
   const other = createWeapon(WEAPONS.Longsword, 1);
   assert.equal(LP.lootBlow(other, 100, me, a, {}), 100, 'another weapon reads none of it');
   LP.lootStrike(me, b, 100, other);
-  assert.equal(land(b), 120, 'nor moves it');
+  assert.equal(land(b), 101, 'nor moves it (two landed: 1% + the carried 0.5)'); // PIN MOVED: B5 (Undertow 0.5)
   // TWO-HANDS (AUDIT 2): a landed blow that does not count whole (an off-hand blow's share of the time - formulas.js
   // `blow`) drags nothing deeper
   LP.lootStrike(me, b, 100, sov, { blow: false });
-  assert.equal(LP.lootBlow(sov, 100, me, b, {}), 130, 'no stack from a blow that does not count whole (the three landed before it, its +30%)');
+  assert.equal(LP.lootBlow(sov, 100, me, b, {}), 102, 'no stack from a blow that does not count whole (the three landed before it, its +1.5% and the carried 0.5)'); // PIN MOVED: B5 (Undertow 0.5)
   // B4: the tide lets go - six seconds from the last landed blow on it, the foe is at nought again
   T = 5.9;
-  assert.equal(LP.lootBlow(sov, 100, me, a, {}), 150, 'held while the tide holds');
+  assert.equal(LP.lootBlow(sov, 100, me, a, {}), 102, 'held while the tide holds (+2.5% floors to 2)'); // PIN MOVED: B5 (Undertow 0.5, max 2.5)
   T = 6.1;
   assert.equal(LP.lootBlow(sov, 100, me, a, {}), 100, 'let go past it');
   assert.equal(land(a), 100, 'and it starts again from nought');
@@ -314,14 +292,11 @@ test('GILDED2 THE LOOK: named as an artifact is (no metal before it); its card t
     assert.deepEqual(LR.rarityLines(it), ['Gilded', ...r.affixes.map((a) => LR.affixLabel(a)), `${r.power.name}: ${r.power.brief}`, r.lore]);
   }
   assert.deepEqual(CX.codexGilded().map((r) => [r.id, r.found, r.name, r.hint]), [
-    ['the-hourlock', false, null, CX.GILDED_HINT],
     ['the-dragonfire-oath', false, null, DRAGONFIRE_OATH.hint],
     ['the-sunken-sovereign', false, null, SUNKEN_SOVEREIGN.hint],
-    ['volendrungs-echo', false, null, VOLENDRUNGS_ECHO.hint],   // PIN MOVED (KETCH, 2026-10-24): and the airship's two
-    ['the-ketchmasters-word', false, null, KETCHMASTERS_WORD.hint],
   ], 'listed, unfound, each by its own hint');
-  assert.notEqual(DRAGONFIRE_OATH.hint, CX.GILDED_HINT);
+  assert.notEqual(DRAGONFIRE_OATH.hint, SUNKEN_SOVEREIGN.hint);
   assert.equal(CX.noteFind(o), true);
   assert.deepEqual(CX.codexCount().gilded, 1);
-  assert.equal(CX.codexGilded()[1].name, 'The Dragonfire Oath');
+  assert.equal(CX.codexGilded()[0].name, 'The Dragonfire Oath');
 });

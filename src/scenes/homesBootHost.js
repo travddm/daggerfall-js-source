@@ -21,9 +21,7 @@
 //     reads the deed off the record the boot loaded. A house given before
 //     the hold existed, and one whose hold at the grant was lost, are held
 //     here; a hold made already answers `repeat`.
-//   sweepGone - ACCOUNT-HOMES (2026-10-06, asked: "House ownership should
-//     be account bound, not character bound"; bible/06-Systems/
-//     Online-Arc.md ACCOUNT-HOMES): every home this character kept things
+//   sweepGone - ACCOUNT-HOMES: every home this character kept things
 //     in that its account holds no more - sold by another of its
 //     characters, or gone with the character that bought it - gives this
 //     character's own things that stood in it back to the pack

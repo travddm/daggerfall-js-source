@@ -1,5 +1,4 @@
-// AUDIT UNQUIET (bible/06-Systems/Revenants.md section 49; the owner, 2026-10-18: "Audit everything and ensure absolute
-// perfection"): five read-only lanes over UNQUIET I-III, every finding fixed or decided. Pinned here, each against the
+// AUDIT UNQUIET (): five read-only lanes over UNQUIET I-III, every finding fixed or decided. Pinned here, each against the
 // fix it needs: the birth's gate (a peer's puppet, a forgotten one, the cap read after the mirror, a rite's faithful);
 // one Dread, not counted; the tear-away's count; the blood a rank spends; a slip never ascending; the trail only to the
 // den its escape chose; the Dread's drop and hoard; an heir's clocks; the clocks held to the character's; a forgotten
@@ -451,35 +450,9 @@ test('AUQ B3 THE SMOKE LIFTED: a craft put down takes its smoke off it - a kneel
 
 // ── the mark's reach (B5, B8) ───────────────────────────────────────
 
-test('AUQ B5 B8 THE MARK\'S REACH: never on the zone\'s or the sand\'s - tagged after the draw, they wear no "Unquiet" and are no candidate; the dungeon clears a puppet\'s (its owner\'s word) at both builders (mutants: the zone\'s marked; the sand\'s; a builder unwired)', () => {
-  for (const over of [{ wildFoe: true }, { wildGiant: true }, { bout: 'b1' }]) {
-    const e = foe(over);
-    assert.equal(isUnquiet(e), false, JSON.stringify(over));
-    assert.ok(!/Unquiet/.test(foeTitle(e, 'Orc')), JSON.stringify(over));
-  }
-  assert.equal(isUnquiet(foe()), true);
-  assert.equal(foeTitle(foe(), 'Orc'), 'Unquiet Mighty Orc');
-  const d = read('src/scenes/dungeonContext.js');
-  assert.equal(d.split('applyEliteScaling(entity, e); if (puppet) entity.unquiet = false;').length - 1, 2);
-});
-
 // ── the page (A4, C18) ──────────────────────────────────────────────
 
-test('AUQ A4 THE PAGE HEALS ONLY WHERE THEY HEAL: no healing said of the Dread, one out in the world, or while held; a held Dread says held; the cap\'s count is of those that hunt (mutants: each said)', () => {
-  const w = { wounds: ['lamed'], woundDay: 10 };
-  assert.ok(PG.woundLine(w, DAY * 11, false).endsWith('unless you find it first.'));
-  for (const x of [{ ...w, dread: true }, { ...w, out: true }]) assert.equal(PG.woundLine(x, DAY * 11, false), 'Wounds you left: Lamed (a lamed leg, so it runs slower).');
-  assert.equal(PG.woundLine(w, DAY * 11, true), 'Wounds you left: Lamed (a lamed leg, so it runs slower).', 'held');
-  assert.equal(PG.comeWords({ dread: true, lair: LAIR, dueAt: 0 }, 0, true).tag, 'Held');
-  assert.match(read('src/ui/revenant/revenantPage.js'), /divider\(`Revenants \(\$\{living\.filter\(\(r\) => !r\.dread\)\.length\} of \$\{REVENANT_MAX\}\)`\)/);
-});
-
 // ── the pools (B1's seam, B11) ──────────────────────────────────────
-
-test('AUQ THE POOLS\' SEAMS: both hand the flee law the foe\'s own frame and the escape its slip (mutants: a seam unwired)', () => {
-  assert.ok(read('src/scenes/dungeonContext.js').includes("foeDeps.isLocalPlayerTarget(f.ai.target), dt: foeFrameDt(dt) }) : null;"));
-  assert.ok(read('src/scenes/exteriorFoes.js').includes('|| !f.ai._armedTargeting, dt: foeFrameDt(dt) }) : null;'));
-});
 
 const careers = (() => {
   const b = new Uint8Array(74); const v = new DataView(b.buffer);

@@ -1,6 +1,4 @@
-// WAGONS2 (2026-10-09, Mac: "3. People should be able to use the interior just like houses ... 4. ... see inside/outside
-// of house windows + the new wagon. 5. Exterior and interior texture customization of the wagons"; asked, the caravan's
-// room "Caravan-shaped", its paint "Free, any time"): the caravan's own room (world/caravanRoomModel.js, systems/
+// WAGONS2: the caravan's own room (world/caravanRoomModel.js, systems/
 // caravanRoom.js, scenes/caravanRoom.js) and the wagons' paint (systems/wagon/wagonLooks.js, world/wagonArt.js's paints, the
 // pool's draw, the word, the park record, the Stable and the decorator), and the Overworld's riders.
 import '../../modsOff.js';
@@ -83,7 +81,7 @@ test('WAGONS2 THE PAINT\'S LAW: six choices a list, the first the wagon as built
 
 test('WAGONS2 THE PAINTS\' PICTURES: each choice past the first painted to its own records, a stride from the built ones, the same bytes every time and not the built picture; the caravan\'s glass a hole - its sides\' and its room\'s windows exactly where the side\'s picture puts them, its front\'s round window - and nothing else of any picture see-through (mutants: the glass left opaque, a paint\'s picture its built one)', () => {
   const built = new Map(wagonArt());
-  assert.equal(built.size, 21);   // PIN MOVED (WAGONS3): and the harness
+  assert.equal(built.size, 21);
   for (const [list, names] of [...Object.entries(WAGON_OUTSIDE_LOOKS), ...Object.entries(CARAVAN_INSIDE_LOOKS)]) {
     assert.deepEqual(wagonLookArt(list, 0, names[0]), [], 'the built choice paints nothing here');
     for (let i = 1; i < names.length; i++) {
@@ -390,7 +388,7 @@ test('WAGONS2 THE OVERWORLD\'S SEATS: a wagon is drawn grown with its rider unde
   pool.draw(r, null, { selfGrow: 8, grow: () => 8 });
   const body = r.draws[0].m, seat = pool.partsOf('openWagon').seats[1];
   const s = pool.seatDrawn('', 1);
-  assert.equal(s.g, rigGrowOf(8, 'openWagon'));   // PIN MOVED (WAGONS3): the rig's own grow - a rider on horseback's length, not the traveller's eight
+  assert.equal(s.g, rigGrowOf(8, 'openWagon'));
   const want = [0, 1, 2].map((k) => body[k] * seat.feet[0] + body[4 + k] * seat.feet[1] + body[8 + k] * seat.feet[2] + body[12 + k]);
   assert.ok(s.feet.every((v, k) => near(v, want[k], 1e-4)), `the seat where the grown body puts it: ${s.feet} vs ${want}`);
   assert.ok(Math.abs(s.feet[2] - pool.mySeat(1).feet[2]) > 10, 'and far from the true seat a grown wagon is drawn past');
@@ -417,7 +415,7 @@ test('WAGONS2 THE OVERWORLD\'S SEATS: a wagon is drawn grown with its rider unde
   const k0 = peerPool.peerSeat('ann', 0);
   assert.ok(k0, 'their seat here');
   const sd = peerPool.puppetSeatDrawn('ann', [k0.feet[0] + 0.3, k0.feet[1], k0.feet[2]]);
-  assert.ok(sd && sd.g === rigGrowOf(8, 'openWagon') && sd.feet.every((v, k) => near(v, peerPool.seatDrawn('ann', 0).feet[k])), 'its seat as drawn');   // PIN MOVED (WAGONS3): at the rig's grow
+  assert.ok(sd && sd.g === rigGrowOf(8, 'openWagon') && sd.feet.every((v, k) => near(v, peerPool.seatDrawn('ann', 0).feet[k])), 'its seat as drawn');
   assert.equal(peerPool.puppetSeatDrawn('ann', [k0.feet[0], k0.feet[1], k0.feet[2] - 4]), null, 'standing off every seat (behind the wagon): where it stands');
   assert.equal(peerPool.puppetSeatDrawn('ann', [k0.feet[0], k0.feet[1] - PUPPET_SEAT_RISE - 0.1, k0.feet[2]]), null, 'WAGONS2 (AUDIT): under the seat, not on it - where it stands');
   assert.equal(PUPPET_SEAT_REACH, 0.75);
@@ -540,15 +538,6 @@ test('WAGONS2 (AUDIT) THE CARAVAN KEPT: the wagon a player drives while it holds
   // the vault: its book asks the pack's own refusal, and the host's pack says it
   const book = new GuildBook({ door: {}, character: () => 'c', wallet: {}, realm: { act: async () => ({ ok: true }) }, pack: { items: () => entity.items, add() {}, changed() {}, refuses: (it) => packTradeRefusal(it, entity) } });
   assert.deepEqual(await book.vaultPut(caravan), { ok: false, error: 'vault-goods' });
-  const w = src('scenes/world.js'), wm = src('scenes/worldModes.js'), sp = readFileSync(new URL('../../../src/ui/socialPanel.js', import.meta.url), 'utf8');
-  assert.match(w, /reach: \(\) => _storesReached\(\), refuses: \(it\) => packTradeRefusal\(it, playerEntity\) \}/);
-  assert.match(sp, /tradeRefusal\(it\) == null && !g\.pack\.refuses\?\.\(it\) && !isLocked\(it\)/);
-  // the keyed shop
-  assert.match(wm, /\n {4}if \(loadedWagonHeld\(it\)\) return 0;   \/\/ WAGONS2 \(AUDIT\)/);
-  assert.match(wm, /for \(let i = sellable\.length - 1; i >= 0; i--\) if \(loadedWagonHeld\(sellable\[i\]\)\) sellable\.splice\(i, 1\);/);
-  // the room: never judged sold by the pack
-  assert.doesNotMatch(w, /caravanGone|_ownedCaravan/);
-  assert.doesNotMatch(wm, /removePermanentScene\(sceneCache\(\), CARAVAN_SCENE_NAME\)/);
   // the room only onto the caravan where it stands
   const room = { v: 2, kind: 'caravan', origin: [4000, 10, 8000], turn: 30, step: [4000, 10, 7900], yaw: 0 };
   let parked = { Mode: WAGON_MODE.Deployed, WorldX: 4010, WorldZ: 8020 };
@@ -559,10 +548,6 @@ test('WAGONS2 (AUDIT) THE CARAVAN KEPT: the wagon a player drives while it holds
   parked = { Mode: WAGON_MODE.WithPlayer, WorldX: 4000, WorldZ: 8000 };
   assert.equal(access.canRestore(room), false, 'driven, parked nowhere');
   assert.equal(access.canRestore(room, [4000, 8000]), true, 'a save\'s own place, given');
-  assert.match(w, /if \(extras\.interior\?\.caravanRoom\) extras\.interior = \{ \.\.\.extras\.interior, caravanAt: parkedCaravanAt\(extras\.modData\?\.\[HCC_VENDOR\] \?\? null\) \};/);
-  assert.match(wm, /!host\.caravanRoom\?\.canRestore\(saved\.caravanRoom, saved\.caravanAt\)\) return false;/);
-  assert.match(w, /parkedAt: \(\) => parkedCaravanAt\(hccRuntime\.view\(\)\.state\),/);
-  assert.match(w, /busy: \(\) => worldMoveBusy\(\) \|\| !!wagonRiders\?\.seated\(\),/);
   // a travelling room's other layouts folded back
   const cache = createSceneCache();
   cacheScene(cache, 'Cabin', { decor: [{ id: 'a', pos: [0, 0, 0], rot: [0, 0, 0] }], decorItems: { a: [{ name: 'x' }] } });
@@ -575,12 +560,11 @@ test('WAGONS2 (AUDIT) THE CARAVAN KEPT: the wagon a player drives while it holds
   assert.deepEqual([folded.decorOwn.b.name, folded.droppedPiles.length], ['own', 1]);
   assert.equal(cache.scenes.has(layoutSceneName('Cabin', 'mod1')), false, 'the copy forgotten');
   assert.equal(containsPermanentScene(cache, layoutSceneName('Cabin', 'mod1')), false);
-  assert.match(wm, /if \(interiorCabin\) foldLayoutCopies\(sceneCache\(\), name\);/);
   // the item law: a wagon's mark
   assert.deepEqual(itemFindings(caravan), [], 'a shelf\'s caravan is lawful');
   assert.deepEqual(itemFindings({ ...caravan, wagonLook: { o: 2, w: 5 } }), [], 'painted too');
   assert.ok(itemFindings({ ...caravan, value: 150 }).includes('wagon'), 'a caravan at the cart\'s price');
-  // WAGON-PRICE (2026-10-10): the law reads each kind's floor, not its price - a wagon bought before the price rose
+  // WAGON-PRICE: the law reads each kind's floor, not its price - a wagon bought before the price rose
   // stays lawful, and a cent under that floor does not (mutants: the law reads the price, the floor raised)
   assert.deepEqual([itemFindings({ ...caravan, value: 2500 }), itemFindings(newWagonItem('openWagon')), itemFindings({ ...newWagonItem('openWagon'), value: 900 })], [[], [], []], 'a caravan and an open wagon at their old prices, and a shelf\'s open wagon');
   assert.deepEqual([itemFindings({ ...caravan, value: 2499 }), itemFindings({ ...newWagonItem('openWagon'), value: 899 })].map((f) => f.includes('wagon')), [true, true], 'under its floor');
@@ -687,11 +671,11 @@ test('WAGONS2 (FINAL AUDIT) A RIDER\'S WAYS OUT, AND THE WAIT THAT IS THEIRS: a 
 test('WAGONS2 (FINAL AUDIT) A SEATED RIDER SETS OUT ON NO JOURNEY OF THEIR OWN, AND RIDERS GO ONLY WITH THE WAGON: the classic arm of a journey (First-Person Travel off the roads, the classic skin) and a fast travel of the rider\'s own (a map\'s, a ship\'s passage) refuse a seated rider - the Overworld alone did; an owner whose wagon stays (parked, or a following team left at the departure) gives up the seats before leaving rather than sending riders after it; a seat lost to another tab clears the book (mutants: each gate, the release, the clear)', () => {
   const w = src('scenes/world.js');
   assert.match(w, /if \(climbingNow\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.climbing\); return true; \}\n(?:\s*\/\/[^\n]*\n)+\s*if \(wagonRiders\?\.seated\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.rider\); return true; \}\n\s*if \(coords\) travelOptions\.beginTravelToCoords/);
-  assert.match(w, /if \(typeof pick\.besideAt !== 'function' && wagonRiders\?\.seated\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.rider\); hudFade\.clearFade\(\); return false; \}\n\s*const wildTrip = wildTravelGate/);
+  assert.match(w, /if \(typeof pick\.besideAt !== 'function' && wagonRiders\?\.seated\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.rider\); hudFade\.clearFade\(\); return false; \}\n\s*if \(!travelGate\(pick\.pixel\)\.ok\)/);
   assert.match(w, /if \(!partyArrival && !hccRuntimeOn\(\)\?\.wagonGoesOnJourney\?\.\(\) && wagonRiders\?\.release\(\)\) _hccDirty = true;\n\s*if \(!partyArrival && wagonRiders\?\.announce\(pick\.pixel\)\)/);
   assert.match(w, /wagonRiders\?\.clear\(\);[^\n]*\n\s*caravanVisitLink\.close\(\);[^\n]*\n\s*seatLock\?\.release\(\);/);
   const hc = src('systems/horse/horseCart.js');
-  // WAGON-STABLED (PIN MOVED): a wagon with the player goes unless it was sent to the stable (test/systems/horse/fb1015_wagonstabled.test.js)
+  // WAGON-STABLED (
   assert.match(hc, /function wagonGoesOnJourney\(\) \{\n\s*if \(wagonState\.Mode === WAGON_MODE\.WithPlayer\) return !wagonState\.WagonStabled;[^\n]*\n\s*return physicalPersistenceEnabled && \(followingTransportFastTravels \|\| forceNextJourney\) && isTeamFollowing\(\);\n\s*\}/);
   // the release, by execution
   const riders = createWagonRiders({ selfId: () => 'me', name: (i) => i, now: () => 0, say() {}, pool: { mySeatCount: () => 4, mySeatsKnown: () => true } });

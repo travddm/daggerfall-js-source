@@ -105,8 +105,7 @@ export function pathCorners(mask, x, y, w = 1000) {
  * streams if water is on, then tracks - the first that paints a tile
  * wins, because a painted tile is skipped by the next.
  *
- * GRASS-PATH1 (2026-09-19, Mac: "The grass is causing issues with dirtroads etc it just overgrows them. Grass shouldnt
- * be on dirt paths"): WHICH TILES THE PAINTER WROTE, as a mask. The grass placer decides by RECORD (labGrass.js
+ * GRASS-PATH1: WHICH TILES THE PAINTER WROTE, as a mask. The grass placer decides by RECORD (labGrass.js
  * grassRecordsOf) and a record cannot answer this question: a track across grass writes 10/11/12/51, the very records
  * the natural dirt-grass marching squares write, so excluding them by number would strip the grass from every dirt edge
  * in the world to clear one path. Only the painter knows, and it knows it exactly - so it says so, one byte a tile, at
@@ -478,7 +477,7 @@ export function classify(x, y, mask) {
  *  this: the tile at y*tDim + x, the base at x*hDim + y. Byte for byte
  *  his.
  *
- *  THE RECORD WAS WRONG TWICE, and MODS AUDIT (2026-09-08) closes it.
+ *  THE RECORD WAS WRONG TWICE, and MODS AUDIT closes it.
  *  AUDIT 51 wrote that the mod's base was "the transpose" and the port
  *  corrected it on the tile read; AUDIT 58 found the port's base was
  *  itself transposed (y*hDim + x - every road bed unsmoothed and a

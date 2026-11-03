@@ -1,5 +1,4 @@
-// OW-BUILD (bible/06-Systems/Travel-View.md OW-BUILD; the owner's call, 2026-10-18, after QUEUE-OWED: "Build ground
-// faster during Overworld travel"). Under the Overworld a journey runs the clock at up to a hundred times walking pace,
+// OW-BUILD (OW-BUILD). Under the Overworld a journey runs the clock at up to a hundred times walking pace,
 // and the ground the stream has not built is what holds it - TV2's governor halves it to x1 while a pixel of the
 // counted grid is owed (scenes/world.js travelViewGovern). The stream's builds breathe (systems/buildBreather.js): a
 // slice of work a frame, 3 to 6 ms (PERF-EXT24's frameFitBudget), so the ground came at the pace of a 60-a-second frame

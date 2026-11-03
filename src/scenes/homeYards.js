@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-YARD (2026-09-30) — PIECES OUTSIDE A HOME, ON ITS OWN LOT.
+// HOME-YARD — PIECES OUTSIDE A HOME, ON ITS OWN LOT.
 //
 // Asked: "allowing for prop placement on the outside within the limits of
 // their house". An online home's owner decorates its YARD as they decorate
@@ -39,8 +39,7 @@
 // outside, is a tab of the yard's panel (ui/decorPanel.js), its look tried on
 // the house as it is chosen and written when it is painted.
 //
-// YARD-LIGHT (2026-10-07, Discord through Mac - a lamp post and a torch in
-// a yard at night, dark: "i wish lights worked outside.."): A YARD'S LAMP IS
+// YARD-LIGHT: A YARD'S LAMP IS
 // THE TOWN'S. A yard's piece carries no light of its own (net/decorLaw.js -
 // "an outdoor lamp is the town's"), and nothing lit it as the town either, so
 // a lamp post placed outside stood dark beside the street's lit ones. Now a
@@ -178,13 +177,13 @@ export const YARD_MARK_HIGH = 1;
 /** A town's yards, believed this long; an unanswered ask waits this long before the next. */
 export const YARD_TOWN_TTL_MS = 60_000;
 export const YARD_RETRY_MS = 10_000;
-/** PRIMARY-TRIPS audit (2026-10-16): how long the owner's own write stands over ANY answer of its town, asked after it
+/** PRIMARY-TRIPS audit: how long the owner's own write stands over ANY answer of its town, asked after it
  *  too - the service keeps a town's answer YARDS_KEPT_S (30 s) an isolate and reads it off a replica (YARDS-REPLICA,
  *  server-account/src/decor.js), so an answer asked after the write can still be one from before it, kept, or a replica
  *  behind. FB1001 YARD-STALE held a write over an answer asked before it alone. */
 export const YARD_WRITE_HOLD_MS = 60_000;
 /**
- * YARD-SHED (2026-10-06, the account service down - "D1 DB is overloaded. Requests queued for too long."): A TOWN'S
+ * YARD-SHED: A TOWN'S
  * YARDS ARE ASKED ONLY WITHIN REACH, AND A FAILED ASK BACKS OFF. Every built pixel's town was asked every minute - the
  * whole streaming grid's, where a yard is drawn only within YARD_DRAW_M of the eye - and a failed ask again every
  * YARD_RETRY_MS, so a database too slow to answer was asked six times as often: 3.0 million asks a day, 577 of the 930
@@ -202,7 +201,7 @@ export const YARD_SYNC_S = 0.5;
  *  stands every yard at once, and its merges are spread a frame each. */
 export const YARD_MERGES_A_FRAME = 1;
 /**
- * YARD-TOWN (2026-10-25, measured in Daggerfall's city on a local build): HOW MANY STRANGERS' YARDS ARE STOOD IN ONE
+ * YARD-TOWN: HOW MANY STRANGERS' YARDS ARE STOOD IN ONE
  * FRAME. A town's answer landing stood every yard in it in one sync - the city's 2,000 pieces one frame of 108 to 138 ms,
  * a city of 4,000 one of 142 to 208, whatever the Yard decorations range (it gates the draw, never the stand). Now a sync
  * stands this many and the next frame syncs again until the town is stood; the owner's own yard, and the one the decorator
@@ -377,7 +376,7 @@ export function yardFootMeets(poly, r, pad = 0) {
  * nor on the town's road or a path (`roads`, the road's tiles in the same frame - yardRoadsOf). YARD-HEIGHT: nor
  * higher over the ground than DECOR_YARD_HIGH (the frame's origin stands on the town's ground - scenes/world.js).
  * HOME-LINE (FIELD BUGS 2026-10-11b, ShikiX3: "I can't place in front of my door but I can place in front of another's
- * home"; afjiz: "my property line goes a little far into the property beside me"; Mac: "Split at the midline"): nor any
+ * home"; afjiz: "my property line goes a little far into the property beside me"): nor any
  * of it nearer another building's ground than the house's own - the lot is the house grown YARD_MARGIN, and two houses'
  * lots overlap where they stand closer than twice that, so the ground between them is split down its middle (a tie the
  * house's). The marked edge is still the lot's rectangle.

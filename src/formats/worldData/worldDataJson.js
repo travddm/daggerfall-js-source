@@ -1,4 +1,4 @@
-// WD1 (2026-09-25): A CLASSIC BLOCK IN DFU'S WORLD-DATA JSON, AND THE
+// WD1: A CLASSIC BLOCK IN DFU'S WORLD-DATA JSON, AND THE
 // DIFF THAT CARRIES A MOD'S EDIT OF IT.
 //
 // Aquatic Sprites, Detailed Ships and Warm Ashes - Ships ship their world
@@ -184,7 +184,7 @@ export function blockToDfuJson(dfBlock) {
   };
 }
 
-// ---- WD3 (2026-10-01): a classic LOCATION in the same shape ----
+// ---- WD3: a classic LOCATION in the same shape ----
 //
 // Beautiful Villages and Beautiful Cities (carademono) ship `location-<r>-<i>.json`: DFLocation as DFU's World
 // Data Editor writes it - the MAPS.BSA record the editor read, with the author's layout in it. Most of each file is
@@ -439,7 +439,7 @@ const clone = (v) => {
 /** Apply ops (diffJson's) to a deep copy of `base`. `resolve(ref)`
  *  answers a copy op's source - `{ block, path }`, a node of a classic
  *  block's JSON (the patch never carries what it can point at).
- *  WD-OWNED (2026-10-20, bible/07-Rendering/Performance-Priority.md WD-OWNED): `owned` - the base is the caller's
+ *  WD-OWNED: `owned` - the base is the caller's
  *  own, a plain JSON tree made for this patch and held nowhere else - is laid on in place: its copy would be itself
  *  (a JSON round trip changes no plain tree), and a pack's 7,727 town files each copied one at the boot. */
 export function patchJson(base, ops, resolve = null, { owned = false } = {}) {

@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/10-UI/Collections.md section 10): WHAT A CHARACTER HAS GATHERED - the fish its net has
+// HUNTERS-MARK: WHAT A CHARACTER HAS GATHERED - the fish its net has
 // brought up, by species (scenes/fishHost.js), and the trophies it has taken, by beast (systems/hunt/trophies.js) - kept in
 // its save (the per-mod slot, systems/modSaveData.js), read by the Collections page's Fish and Trophies parts. Each row is
 // how many and the UTC day of the first. Read defensively: a row out of its law is dropped.

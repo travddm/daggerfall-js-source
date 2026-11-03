@@ -1,5 +1,5 @@
 // @ts-check
-// BODY-MOTION (2026-10-18; bible/04-Characters/Body-Motion.md) - THE CARRY. How the arms hold what is in them while the
+// BODY-MOTION - THE CARRY. How the arms hold what is in them while the
 // body stands, walks, runs and creeps - one row per weapon class, per gait, per arm - in place of Morrowind's single
 // pose per weapon group, whose arms the walk only bobbed.
 //
@@ -85,8 +85,7 @@ export const CARRY = Object.freeze({
   one: Object.freeze({
     idle: { R: row(5, 21, 8, -7, 0, { blade: dir(0.26, 0.74, -0.62), edge: dir(-0.26, -0.56, -0.78) }), L: row(3, 8, 12, 4, 0) },
     walk: { R: row(5, 22, 3, -1, 0.3, { blade: dir(0.23, 0.81, -0.53), edge: dir(-0.39, -0.42, -0.82) }), L: row(2, 8, 12, 6, 1, { gaitElbow: 1 }) },
-    // ONE-RUN (feature-feedback via Mac, 2026-10-26: "Running and sprinting with one-handed weapon looks off, because hand
-    // is in twisted position pointing weapon to the side unnaturally"): the stand's own format at a run - the arm low and
+    // ONE-RUN (feature-feedback via): the stand's own format at a run - the arm low and
     // out, nearly straight, swinging with the stride, the blade forward and a little down. The blade had trailed behind,
     // down and out to the right, the forearm turned 64 to 74 degrees off its elbow's hinge to hold it there; a bent elbow
     // with the blade still forward and down asked the wrist for 40 to 95 degrees of ulnar deviation. And no `via`: the
@@ -126,7 +125,7 @@ export const CARRY = Object.freeze({
   dual: Object.freeze({
     idle: { R: row(8, 23, 12, -34, 0, { blade: dir(0.24, 0.8, -0.55), edge: dir(-0.49, -0.39, -0.78) }), L: row(8, 23, 12, -34, 0, { blade: dir(0.24, 0.8, -0.55), edge: dir(-0.49, -0.39, -0.78), mirror: true }) },
     walk: { R: row(5, 24, 6, 28, 0.28, { blade: dir(0.31, 0.81, -0.51), edge: dir(-0.38, -0.38, -0.84) }), L: row(5, 24, 6, 28, 0.28, { blade: dir(0.31, 0.81, -0.51), edge: dir(-0.38, -0.38, -0.84), mirror: true }) },
-    // DUAL-RUN (2026-10-20, Mac: "super stiff"): pumping a fifth of the gait's elbow and 0.4 of its swing behind the hips,
+    // DUAL-RUN: pumping a fifth of the gait's elbow and 0.4 of its swing behind the hips,
     // the shoulder turned out 60 so the forearm turns 66 off its hinge (locked straight and swinging a tenth, it turned 128)
     run: { R: row(-42, 10, 8, -60, 0.4, { blade: dir(0.55, -0.8, 0.3), edge: dir(0.3, -0.14, -0.94), gaitElbow: 0.2 }), L: row(-42, 10, 8, -60, 0.4, { blade: dir(0.55, -0.8, 0.3), edge: dir(0.3, -0.14, -0.94), gaitElbow: 0.2, mirror: true }) },
     sneak: { R: row(20, 20, 30, -44, 0.15, { blade: dir(0.12, 0.98, -0.18), edge: dir(0.26, -0.2, -0.95) }), L: row(20, 20, 30, -44, 0.15, { blade: dir(0.12, 0.98, -0.18), edge: dir(0.26, -0.2, -0.95), mirror: true }) },
@@ -329,8 +328,7 @@ export function trunkPush(at, a, c, fwd, clear) {
  * `wbL` the Weapon Bones. A weapon row turns the hand so the blade stands as the row says; the left of a pair is its
  * right's mirror across the chest's middle; a two-handed class's left closes on the haft. Pure.
  *
- * HELD-STEADY (2026-10-20, Mac: "When wielding 2 daggers and running, the character is super stiff and wobbles side to
- * side"): `steady` ({ turn, ride }, or null) - `turn` the rig rotation that takes the chest as it stands back to the
+ * HELD-STEADY: `steady` ({ turn, ride }, or null) - `turn` the rig rotation that takes the chest as it stands back to the
  * chest without the stride's counter-turn and counter-drop (gait.js gaitPose's `chest.wave`), `ride` the share of that
  * wave the chest was laid with (strideRide). A runner's chest turns against the hips because the swinging arms ride
  * it - an empty arm rides it by its row's own swing share (all of it in a run's pump, a little of it in a guard); a

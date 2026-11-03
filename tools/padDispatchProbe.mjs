@@ -1,4 +1,4 @@
-// PAD1 (2026-09-21) - THE DISPATCH-TARGET LAW, proved in a real browser.
+// PAD1 - THE DISPATCH-TARGET LAW, proved in a real browser.
 // ui/gamepadInput.js synthesises a keydown per pad button. Dispatched on
 // the WINDOW, an event's path is the window alone and a listener on the
 // DOCUMENT - the enhanced controls pane's capture, `document.addEventListener

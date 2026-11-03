@@ -1,5 +1,5 @@
 // @ts-check
-// HOME-VENDOR (Mac: "is there a worldmap vendor waypoint" - "yeah that would be great"): THE TRADER'S WAYPOINT, ON BOTH
+// HOME-VENDOR (- "yeah that would be great"): THE TRADER'S WAYPOINT, ON BOTH
 // WORLD MAPS - its own mark, apart from the map's one yellow mark (a town the player marked stays marked).
 //
 // The host hands the maps a FUNCTION (`vendor: () => mark|null`, beside BOUNTY1's `bounties`) and neither map learns
@@ -35,7 +35,7 @@ export function readVendorMark(fn, size) {
   return readVendorMarkIn(fn, { x0: 0, y0: 0, w: size.width, h: size.height });
 }
 
-/** BAY-LEFT-MAPS (bible/10-UI/Held-Map-Arc.md): the trader's waypoint over a BOX of map pixels (`box` {x0, y0, w, h} - the
+/** BAY-LEFT-MAPS: the trader's waypoint over a BOX of map pixels (`box` {x0, y0, w, h} - the
  *  held map's sheet: the continent's frame while it is shown, the Bay's own rectangle else), as the bounties are read
  *  (ui/bounty/bountyMapMark.js readBountyMarksIn) - a trader's house past the Bay is its town's coin where the Bay's
  *  1000 x 500 dropped it. The Bay's own box is readVendorMark's, to the pixel.

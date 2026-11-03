@@ -1,5 +1,4 @@
-// WAGON-FILTER + SHIFT-STOW (2026-10-04, Mac: "The wagon needs a filter option and shift click to deposit items (like
-// materials) needs to be a thing"). Pinned by DRIVING both skins: the enhanced pack mounted on the fake document
+// WAGON-FILTER + SHIFT-STOW. Pinned by DRIVING both skins: the enhanced pack mounted on the fake document
 // (test/invdrag.mjs) and clicked with the browser's own event, the classic window through its own click and key arms.
 //   - the filter (ui/storeFilter.js): the pack's nine pages and Materials over the wagon, the storage and the bag; the
 //     search reads the row's name; a take from a filtered list takes that piece; other remotes carry no filter;

@@ -1,10 +1,9 @@
-// CRAFT-WRITS (2026-10-22) - THE GUILDS' ASKS OF A CRAFTER, AS THE SERVICE KEEPS THEM: an account's three writs a UTC day
+// CRAFT-WRITS - THE GUILDS' ASKS OF A CRAFTER, AS THE SERVICE KEEPS THEM: an account's three writs a UTC day
 // posted on the first board read of any of its realm characters (/v1/writs/list's `crafts` - AUDIT CRAFT-WRITS E1), and a
 // writ filled (/v1/writs/craft) by any of them - a potion writ by the filler's own WITNESSED brews (a cauldron of loose
 // units is none) and the bottles out of its realm record, a dish or kit writ by pieces of its own unsold make, their rows
 // gone; the pay struck as a `craft-writ` mint, the XP to the craft's track, the Renown to the character, the guild's
 // standing on its Roll. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/06-Systems/Professions-Arc.md section 49.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -169,7 +168,6 @@ test('CRAFT-WRITS service: a potion writ filled - two Novice brews of Healing (t
   assert.deepEqual((await s.deliver(mac, w2.id)).body, { error: 'craft-unbrewed' }, 'yesterday\'s four went to yesterday\'s writ');
 });
 
-// PIN MOVED (ANY-GOODS, FIELD BUGS 2026-10-26, the owner: "Crafting writs should work with even store bought ingredients"):
 // a cauldron that spent a LOOSE unit was no witness and its potions filled nothing - it is the character's brew now
 test('CRAFT-WRITS service: a cauldron that spent a LOOSE unit (looted, or bought with gold - ANY-GOODS) is the character\'s brew all the same - its potions count; too few brews are refused craft-unbrewed; brews without the bottles in the record are refused craft-goods-gone and nothing moves; a writ of another character, of yesterday, or with no record named is refused (mutants: the witness asked again; the record\'s take)', async () => {
   const s = await stand();
@@ -286,7 +284,7 @@ test('CRAFT-WRITS service: a kit writ\'s XP is Smithing\'s, its kits made with t
   assert.deepEqual((await s.deliver(two, w4.id)).body, { error: 'marks-full' });
 });
 
-// ─── AUDIT CRAFT-WRITS (bible/01-Overview/audits/Audit-Craft-Writs.md) ─
+// ─── AUDIT CRAFT-WRITS ─
 
 test('AUDIT CRAFT-WRITS S1: a potion writ\'s brews are counted against the potion writs the character filled of THAT potion alone - a stew writ filled first takes none of them (the decision bound the product as the subquery\'s own column, so every filled writ of any product was taken away) (mutants: the product unbound)', async () => {
   const s = await stand();

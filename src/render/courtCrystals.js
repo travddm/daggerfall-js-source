@@ -1,10 +1,8 @@
 // @ts-check
-// WB9c (2026-09-30, Mac: "The boss should have a detailed wipe mechanic on the final phase that should require players to
-// destroy oblivion crystaline formations that grow anywhere within the final phase arena, which then stuns his wipe
-// mechanic"): THE CRYSTALS OF OBLIVION, DRAWN - each a cluster of faceted crystal grown up out of the court's floor as
+// WB9c: THE CRYSTALS OF OBLIVION, DRAWN - each a cluster of faceted crystal grown up out of the court's floor as
 // Dagon's Reckoning is called, glowing from within in his aspect's colour, feeding a beam of that colour into his chest,
 // cracking as it is broken down, flashing as it is struck, and shattering outward into tumbling shards when it breaks.
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9c).
+// Design: (WB9c).
 //
 // TWO PROGRAMS, one pass:
 //   - THE CLUSTER, OPAQUE: one model made once (`crystalCluster` - a great prism and its lesser ones, each a piece that
@@ -335,9 +333,8 @@ export class CourtCrystalRenderer {
     gl.depthMask(true); gl.disable(gl.BLEND); gl.enable(gl.CULL_FACE);
   }
 
-  /** AUDIT EG V (L6-5; Elite-Gates.md section 29, EVERY ALLOCATION HAS AN OWNER): its two programs, two vertex arrays and four
-   *  buffers let go - once; a destroyed pass draws nothing. The breach's fight frees its own at every way out of the Spire
-   *  (scenes/eliteGates/egFight.js leave); the Burning Court's is a screen's, kept. */
+  /** AUDIT EG V (L6-5, EVERY ALLOCATION HAS AN OWNER): its two programs, two vertex arrays and four buffers let go -
+   *  once; a destroyed pass draws nothing. The Burning Court's is a screen's, kept. */
   destroy() {
     const gl = this.gl;
     if (!gl) return;

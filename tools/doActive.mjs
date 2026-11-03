@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// HOW MANY ROOMS ARE AWAKE, READ BY THE OPERATOR (bible/11-Multiplayer/Scale-Arc.md, COST-0). Cloudflare bills a Durable
+// HOW MANY ROOMS ARE AWAKE, READ BY THE OPERATOR (, COST-0). Cloudflare bills a Durable
 // Object's duration while it runs or sits in memory unable to hibernate, 128 MB a second at $12.50 per million GB-s:
 // $0.135 an object-day. The owner's bill of 2026-10-24 was about $90 a day, $50 of it duration - some 370 objects awake
 // around the clock - and nothing in the tree could say which. Cloudflare's GraphQL analytics can:

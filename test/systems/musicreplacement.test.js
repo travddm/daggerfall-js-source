@@ -203,7 +203,7 @@ test('music: a replacement OVERRIDES, and a miss falls through to MIDI.BSA', () 
   const start = m.slice(m.indexOf('async _startReplacement('));
   assert.match(start.slice(0, start.indexOf('\n  }')), /if \(!buffer\) \{ player\.playing = false; this\._playBuiltIn\(name\); return; \}/);
   // ONE SETTING moves both players (the service's resync); the LAW split
-  // on 2026-08-27 (Mac: "fix it also"): the scheduler keeps the FM
+  // on 2026-08-27: the scheduler keeps the FM
   // bank's trim, a replacement - a mastered file - takes the setting
   // alone.
   const sp = src('systems/song/songPlayer.js');

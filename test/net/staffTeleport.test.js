@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse } from 'acorn';
-import { validStaffDestination, validStaffTeleportIn, validStaffTeleportOut, staffDestinationKey, followStaffPlayer, createStaffTeleportClient, staffTeleportSupported, staffTpLine } from '../../src/net/staffTeleport.js';
+import { validStaffDestination, validStaffTeleportIn, validStaffTeleportOut, staffDestinationKey, followStaffPlayer, createStaffTeleportClient, staffTpLine } from '../../src/net/staffTeleport.js';
 import { parseClient, SOCIAL_ROOM, RELAY_VERSION } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { StreamingWorldState } from '../../src/world/streamingWorld.js';
@@ -28,7 +28,6 @@ for (const d of destinations) test(`STAFF-TP: lossless validated destination ${d
 
 test('STAFF-TP: malformed positions, pixels, door identities and destinations fail closed', () => {
   for (const pos of [[NaN, 1, 2], [1, Infinity, 2], [1, 2], [1, 2, 3, 4], ['1', 2, 3], [1e10, 0, 0]]) assert.equal(validStaffDestination({ ...ext, pos }), null);
-  // PIN MOVED (AUDIT RELEASE R2-1): a pixel is the world's grid (wire.js WORLD_PIXEL_BOUND), not the Bay's 0..999 x 0..499 - (-1, 0), (1000, 0) and (0, 500) are land past the Bay now (test/net/auditrelease_r2.test.js)
   for (const pixel of [{ x: 8192, y: 0 }, { x: 0, y: -8192 }, { x: 1.5, y: 0 }, { x: '1', y: 0 }, null]) assert.equal(validStaffDestination({ ...ext, pixel }), null);
   for (const d of [{ ...interior, door: null }, { ...interior, door: { ...interior.door, buildingKey: -1 } }, { ...dungeon, mapId: null }, { ...gate, gate: { ...gate.gate, spot: [] } }, { ...boat, boat: { ...boat.boat, local: [0, NaN, 0] } }, { ...abyss, abyss: { ...abyss.abyss, TemplateRegionIndex: -1 } }, { ...ext, kind: 'made-up' }]) assert.equal(validStaffDestination(d), null);
   assert.deepEqual(parseClient(JSON.stringify({ t: 'stp', k: 'ask', name: 'Bran', nonce: 'n' })), { error: 'stp before hello' });
@@ -100,7 +99,7 @@ async function hub(fn, key = SOCIAL_ROOM) {
 }
 const messages = (ws, k) => ws.sent.filter((m) => m.t === 'stp' && m.k === k);
 
-for (const glyph of ['dev', 'dm', 'shadowfang']) test(`STAFF-TP relay: signed ${glyph} locates any hub player without region/party markers`, () => hub(async ({ join, send }) => {
+for (const glyph of ['dev', 'dm']) test(`STAFF-TP relay: signed ${glyph} locates any hub player without region/party markers`, () => hub(async ({ join, send }) => {
   const staff = await join('peer-staff', 'Mac', [glyph]), target = await join('peer-bran', 'Bran'), bystander = await join('peer-other', 'Other');
   await send(staff, { k: 'ask', name: 'Bran', nonce: 'lookup-one', glyphs: ['anything'] });
   const capture = messages(target, 'capture').at(-1); assert.ok(capture);
@@ -136,27 +135,13 @@ test('STAFF-TP relay: forged, replayed, expired and replaced-socket replies cann
   await r.drop(staff); await send(bran, { k: 'answer', ticket: replaced, dest: ext }); assert.equal(messages(staff, 'result').length, 1);
 }));
 
-test('STAFF-TP session: old servers are never sent an unknown frame; updated hub receives only valid frames', () => {
+test('STAFF-TP session: the hub receives only valid frames', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'peer-staff', secret: 'secret-staff', WebSocketImpl: FakeWS, presence: false });
   s.join(SOCIAL_ROOM); const ws = sockets[0]; ws.open();
-  const welcome = (v) => ws.receive({ t: 'welcome', id: 'peer-staff', peers: [], n: 1, v });
   const ask = { k: 'ask', nonce: 'n1', name: 'Bran' };
-  for (const version of [undefined, 'world154', 'world155', 'world156', 'world157', 'world158']) {
-    welcome(version);
-    assert.equal(staffTeleportSupported(version), false, `${version}: no combined relay law`);
-    assert.equal(s.staffTeleportOk, false);
-    assert.equal(s.sendStaffTeleport(ask), false);
-  }
-  assert.equal(ws.sent.map(JSON.parse).some((m) => m.t === 'stp'), false, 'unsupported relays receive no teleport frame');
-  for (const version of ['world159', 'world160', 'world161', 'world162', 'world163', 'world164', 'world165', 'world166', 'world167', 'world168', 'world169', 'world170', 'world171', 'world172', 'world173', 'world174', 'world175', 'world176', 'world177']) {   // the FEUD merge: and its own; CRYSTAL-FIST: and its own; WATCH-FIX: and its own; SERPENT3: and its own; LEGACY7: and its own; TEXT-F1: and its own; SUPER-DUNGEONS: and its own (world171 on its branch, then world172 and world175, renumbered past TEXT-F1's world175 to world176)
-    welcome(version);
-    assert.equal(staffTeleportSupported(version), true, `${version}: combined relay law supported`);
-    assert.equal(s.staffTeleportOk, true);
-    assert.equal(s.sendStaffTeleport(ask), true);
-  }
-  welcome(RELAY_VERSION); assert.equal(s.sendStaffTeleport(ask), true);
-  assert.equal(staffTeleportSupported(null), false);
+  ws.receive({ t: 'welcome', id: 'peer-staff', peers: [], n: 1, v: RELAY_VERSION });
+  assert.equal(s.sendStaffTeleport(ask), true);
   const heard = []; s.onStaffTeleport = (m) => heard.push(m);
   ws.receive({ t: 'stp', k: 'capture', ticket: 'valid-ticket' });
   ws.receive({ t: 'stp', k: 'capture', ticket: 'bad ticket' });
@@ -219,7 +204,7 @@ test('STAFF-TP dungeon identity selects the target dungeon; interior entry uses 
     restoreInterior: async (_saved, pos) => { assert.equal(pos, null, 'no unchecked target position during the build'); return true; } };
   const prepare = hostFunction('prepareStaffDestination', { gateLink: null, modes, _wodInside: false, playerSpawned: false,
     _teleportToPixel: async () => {}, staffLanding: (d) => d.pos, ohAbyss: null });
-  await prepare(d); assert.deepEqual(calls, [{ locationKey: 'dungeon:9812', holdOpen: true, recorded: { ins: null, whole: false, staff: true } }]);   // PIN MOVED (HOLD-ONCE): staff may land by a player in Privateer's Hold; PIN MOVED (INSTANCES' audit): in the room the player stands in - here its public room
+  await prepare(d); assert.deepEqual(calls, [{ locationKey: 'dungeon:9812', holdOpen: true, recorded: { ins: null, whole: false, staff: true } }]);
   const inst = validStaffDestination({ ...dungeon, locationKey: 'dungeon:9812', ins: '0123456789abcdef.89abcdef' });
   assert.deepEqual([inst.ins, inst.whole], ['0123456789abcdef.89abcdef', true], 'an instance\'s place is the dungeon whole');
   calls.length = 0; await prepare(inst);

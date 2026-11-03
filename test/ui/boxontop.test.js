@@ -1,4 +1,4 @@
-// BOX-ON-TOP (2026-10-25, the in-game check of the Identify refund): a message box pushed over an enhanced window -
+// BOX-ON-TOP: a message box pushed over an enhanced window -
 // the "Casting Spells" tutorial page over the Identify window - was the top of its host's stack, but the window's DOM
 // layer took every click, so the box could not be clicked away (ui/boxClickCatcher.js has the whole account).
 //

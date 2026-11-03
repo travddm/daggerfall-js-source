@@ -54,7 +54,7 @@ import { isEnchanted } from './inventory.js';   // UI2: an enchanted piece shows
 import { ENCHANTMENT_TYPES } from '../formats/magicDef.js';   // RPT1026-PROGRESS: a worn piece's Cast When Used
 import { isPower } from './enchantmentCatalogue.js';   // AUDIT RPT1026 F2: a power beside Cast When Used, never a side effect's cost
 import { shownSpellName } from './loot/loot.js';   // L10N3e: a slotted spell's name as the book shows it - the stored name stays the canonical one
-import { isAmmunition } from './item/itemTemplates.js';   // THUNDERLOCK-ART: a stack of shot shows its count, never a wear bar (the pack's rule)
+import { isAmmunition } from './item/itemTemplates.js';   // a stack of arrows shows its count, never a wear bar (the pack's rule)
 
 import { expandRowValues } from './quest/questMacros.js';   // MACROS1: a used item's record through its own context (%map)
 import { racialSuppressInventory, LYCANTHROPY_SPELL_TAG } from './lycanthropy.js';   // DISC10-E L3: the pack's refusal, at the two doors that reach into it; HB-LYCFREE: the curse's free spell
@@ -155,8 +155,7 @@ function computeKey(item) {
     item.legendary ?? '', ench, custom, affixes, item.aetheric ?? ''].join('|')   // SET6: an Aetheric piece's record, as a Legendary's
     + (item.gilded ? `|g${item.gilded}` : '')   // GILDED1: a Gilded piece's record - only when set, so a save's keys still resolve
     + (item.potent ? `|p${item.potent}` : '')   // AUDIT PROF12 A2: a Potent potion's share (set at the mint - the cache holds), so a slot and its count keep Potent and plain apart; AUDIT PROF-541 Q1: only when set, so a save's plain keys still resolve
-    + (typeof item.card === 'string' ? `|c${item.card}` : '')
-    + (item.templateIndex === BOOK_TEMPLATE && item.message != null ? `|m${item.message}` : '');   // AUDIT CARDS-5 C3: a book's own text (books.js `message = id`) - two titles are two books on the bar   // AUDIT CARDS-5 C3: a card's own card - a Rat and a Lamia are two kinds (only when set, so every other key stands)
+    + (item.templateIndex === BOOK_TEMPLATE && item.message != null ? `|m${item.message}` : '');   // AUDIT CARDS-5 C3: a book's own text (books.js `message = id`) - two titles are two books on the bar
 }
 
 /** What a consumable slot takes: a potion or a drug - the two arms of
@@ -320,8 +319,7 @@ export { hotbarInForce };
  * happened; the HUD's count says the rest.
  */
 /**
- * DISC21-C (2026-09-24, Scratchie on Discord: "Just started the game, equipped a weapon, it shows up in the '2' slot,
- * but when I press it the game says 'nothing is in that slot' and I can't attack anything"): WHAT AN EMPTY PRESS SAYS
+ * DISC21-C: WHAT AN EMPTY PRESS SAYS
  * TO A PLAYER WHO WANTS THEIR WEAPON. The weapon was in the diamond's MAIN cell, whose chip is ReadyWeapon's key - Z,
  * which in the skin's pixel face reads as a 2 - and a new character's weapon starts sheathed, as classic's does
  * (WeaponManager.Sheathed). So the player pressed 2, the bottom consumable slot, empty on a new character, and was told
@@ -531,7 +529,7 @@ function swapQuickslotNow({ entity = null, say = null, rows = null, hand = null 
 }
 
 /**
- * QS4 (Mac: "The 4th quickslot doesnt have a keybind") - THE OFF-HAND
+ * QS4 - THE OFF-HAND
  * CELL'S OWN PRESS.
  *
  * Three of the diamond's four corners named a key and the fourth did
@@ -553,10 +551,7 @@ function swapQuickslotNow({ entity = null, say = null, rows = null, hand = null 
  */
 export function offHandQuickslot(opts = {}) { return (_performed = offHandQuickslotNow(opts)); }   // AUDIT CONTRIB H3: what the press did, for the hotbar's flash
 function offHandQuickslotNow({ entity = null, say = null, toggleLight = null, switchHand = null } = {}) {
-  // MAC-R3 (2026-09-17, Mac: "Tapping the equip hand in the quickbar
-  // doesn't switch to your other weapon in hand (still bound to H). Even
-  // if a torch isn't equipped a message still shows up that you can't
-  // light the torch"): THE PRESS IS WHAT THE CELL SHOWS, in full. The
+  // MAC-R3: THE PRESS IS WHAT THE CELL SHOWS, in full. The
   // cell is the OFF HAND's readout (quickslotView: a lit light, else the
   // shield, else the weapon on the left hand, else the swap, else empty)
   // and QS4 gave its press ONE act - the light's toggle - so a cell
@@ -586,10 +581,6 @@ function offHandQuickslotNow({ entity = null, say = null, toggleLight = null, sw
 
 // ── QS6: THE SPELL SLOT, AND THE HOLD THAT PICKS WHAT IS IN A SLOT ──
 //
-// Mac, 2026-09-17: "for slot 3, I want to change it to be for spells.
-// So you should be able to hold the keybind to switch between
-// applicable spells, and then press the keybind to equip. Same for 2/3.
-// Pressing the keybind, if not equipped, should equip the slot."
 //
 // TWO THINGS, and they are separable. The first is a SPELL SLOT: the
 // third key readies a spell instead of swapping a weapon. The second is
@@ -619,7 +610,7 @@ const bookOf = (entity) => (Array.isArray(entity?.spells) ? entity.spells : []);
 /** A spell this slot can hold: one with the numeric index that is the
  *  port's name for it. Everything the book can contain has one. */
 const keyedSpell = (sp) => !!sp && typeof sp === 'object' && Number.isFinite(sp.index);
-/** HB-LYCFREE (2026-09-30, Mac: "Lycanthropy costs to cast from hotbar when it shouldnt"): the books' own law - the
+/** HB-LYCFREE: the books' own law - the
  *  curse's spell readies with DFU's noSpellPointCost (DaggerfallSpellBookWindow: `Tag == lycanthropySpellTag`), so
  *  from the slot and the bar as from the book it costs nothing. */
 const freeReady = (sp) => ({ free: sp?.tag === LYCANTHROPY_SPELL_TAG });
@@ -648,8 +639,7 @@ export function resolveSpellQuickslot(entity) {
 }
 
 /**
- * THE SPELL SLOT'S PRESS. Mac: "Pressing the keybind, if not equipped,
- * should equip the slot."
+ * THE SPELL SLOT'S PRESS.
  *
  * `magic` is the host's ONE cast engine (scenes/hostMagic.js) and every
  * law about readying is its own: the silence gate, the spell-point
@@ -997,7 +987,7 @@ export const HOTBAR_KINDS = Object.freeze(['consumable', 'weapon', 'light', 'shi
  *  The order matters: a torch is not a weapon and a potion is not a
  *  light, but a lit torch that is ALSO equippable must read as a light.
  *
- *  UI2 (2026-09-27, Mac: "you should be able to slot spells and different items"): ANY ITEM GOES ON THE BAR, and a
+ *  UI2: ANY ITEM GOES ON THE BAR, and a
  *  press is the pack's own primary act on it (ui/enhanced/enhancedInventory.js localPrimaryAct, the PAD's quick act): a piece
  *  a slot of the body takes - armour, clothing, jewellery, a gem's crystal - is WORN, put on or taken off when it is
  *  on; everything else is USED, the pack's Use - a book read, a map read, the spellbook opened, food eaten, a tent
@@ -1166,7 +1156,7 @@ export function hotbarView(entity, { readiedIndex = null, size = HOTBAR_CAPACITY
  *  pieces what the pack's tile shows a bar on (armour, and anything enchanted: its powers spend its condition). Never
  *  a gem, a book or a potion - a bar on everything is the noise the bar exists to cut. THUNDERLOCK-ART: and never
  *  ammunition, the pack's own word (ui/enhanced/enhancedInventory.js wearPct: "an arrow is spent, not worn") - a stack of arrows
- *  or pellets slotted as a weapon drew a bar under its count, the two on top of each other. */
+ *  slotted as a weapon drew a bar under its count, the two on top of each other. */
 const showsWear = (kind, item) => !isAmmunition(item) && (kind === 'weapon' || kind === 'shield' || kind === 'light'
   || item.group === 'Armor' || isEnchanted(item));   // AUDIT UI B6: anything enchanted - the Sanguine Rose spends its condition as a ring does (the pack's wearPct)
 

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PEER-ACTS (GATHER-FEEL II, 2026-10-13, Mac: "Do the not done" - GATHER-FEEL's open "a peer neither sees an act ... nor
-// hears one"; bible/06-Systems/Professions-Arc.md 5.1 "Others see it" and section 45) - ANOTHER PLAYER'S GATHERING, SEEN
+// PEER-ACTS (GATHER-FEEL II, 2026-10-13, - GATHER-FEEL's open "a peer neither sees an act ... nor
+// hears one"; 5.1 "Others see it" and section 45) - ANOTHER PLAYER'S GATHERING, SEEN
 // AND HEARD.
 //
 // THE WIRE. The pose carries the act (net/wire.js validPose, world200): `ga` its code - GATHER_POSE_ACTS' index + 1, what

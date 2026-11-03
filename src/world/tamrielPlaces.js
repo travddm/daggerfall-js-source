@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA12 (2026-10-13, the owner: "I want to make it where attaching the arena file isn't needed"; asked, "Canon +
-// generated" and "Remove it"; bible/03-World/Arena-Provinces.md TESA12) - THE PLACES PAST THE BAY, THE PORT'S OWN.
+// TESA12 - THE PLACES PAST THE BAY, THE PORT'S OWN.
 //
 // Arena's CITYDATA.65 stood the towns past the Bay from the player's own copy of Arena; nothing of Arena is read now. The
 // places are made here, on the trace (world/tamriel/tamrielLand.js - Daggerfall's own picture of Tamriel, the player's files), the

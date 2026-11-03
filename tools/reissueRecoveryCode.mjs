@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-// RECOVER-OP (2026-09-27) - A NEW RECOVERY CODE, ISSUED BY THE OPERATOR. Twoddle, to Mac: "i did a stupid and have
-// lost my password plus the code thing it gave ... is there anyway this can be fixed without starting a new account as
-// i would like to keep the founders badge? I am still signed in atm".
+// RECOVER-OP - A NEW RECOVERY CODE, ISSUED BY THE OPERATOR. Twoddle, to.
 //
 // ACC1c's design has no way back for a player who lost both, and on purpose: email is optional, so there is no second
 // fact about the player to reset against, and a signed-in device may not change the password without the old one (a

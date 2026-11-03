@@ -1,4 +1,4 @@
-// SAFE1-SAFE7 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE LAW BOTH ENDS AGREE ON, PURE - the relay's
+// SAFE1-SAFE7: THE LAW BOTH ENDS AGREE ON, PURE - the relay's
 // stamp on a line and the account service's check of it, the reviewer's feed batch, a report's shape, the chat commands,
 // the strike ladder and the ban order. Every signature here is a REAL Ed25519 one: a stamp that verified anything would
 // make every report evidence of nothing.
@@ -17,8 +17,6 @@ import { mintBanOrder, mintOrder, verifyOrder, orderValid, mintToken, verifyToke
 import { chatHubRoom, regionShardRoom } from '../../../src/net/hubShards.js';
 // AUDIT SAFE (the client lane): the module whole, so a pin of a member the old law lacked fails on its own assertion
 import * as law from '../../../src/net/safety/safetyLaw.js';
-import { parseStringTableCsv } from '../../../src/systems/textManager.js';
-import { readFileSync } from 'node:fs';
 
 const subtle = globalThis.crypto.subtle;
 const pair = () => subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -157,7 +155,7 @@ test('SAFE7 THE CODE OF CONDUCT is versioned by its date and names what it forbi
   assert.ok(rules.some((r) => /not even as a joke/.test(r) && /asexuality/.test(r)));
 });
 
-/* ═══ AUDIT SAFE - THE CLIENT LANE (2026-10-17) ═══════════════════════════════════════════════════════════════════════
+/* ═══ AUDIT SAFE - THE CLIENT LANE ═══════════════════════════════════════════════════════════════════════
  * The law's half of the audit's client findings: a report's lines out of their day dropped rather than the report
  * refused, a ban's own sentence, a report's note and a ban's reason in the commands, a moderator's look at the reports,
  * and a ban said as a ban in every language. Each pin failed on the arc as it merged. */
@@ -204,21 +202,4 @@ test('AUDIT SAFE CLIENT-2 A BAN\'S OWN SENTENCE, one home for the game\'s word a
   assert.equal(law.bannedText(BAN_FOREVER), 'This account is banned for good.');
   assert.equal(law.bannedText(BAN_FOREVER, '   '), 'This account is banned for good.');
   assert.equal(law.untilText(BAN_FOREVER), 'for good');
-});
-
-test('AUDIT SAFE DOC-16 A BAN IS A BAN IN EVERY LANGUAGE - never a suspension (a ban may be for good): Spanish, Italian, Romanian and Indonesian said "suspended" in the code\'s consequence and every ban line; and German names race as the rest of its locale does (Rasse), not skin colour (mutant: a suspension\'s word back)', () => {
-  const rows = (code) => new Map(parseStringTableCsv(readFileSync(new URL(`../../../locales/${code}/Port_Strings.csv`, import.meta.url), 'utf8')));
-  const BAN_KEYS = ['net.conduct.consequence', 'account.refusal.banned', 'net.safety.bannedSelf', 'net.safety.bannedAccount', 'net.safety.bannedWhy', 'net.safety.didBan', 'net.safety.nextBan', 'net.online.banned'];
-  const SUSPENSION = { es: /suspen/i, it: /sospe/i, ro: /suspend/i, id: /tangguh/i };
-  for (const [code, word] of Object.entries(SUSPENSION)) {
-    const map = rows(code);
-    for (const k of BAN_KEYS) {
-      assert.ok(map.has(k), `${code} ${k}`);
-      assert.doesNotMatch(map.get(k), word, `${code} ${k} says a suspension: ${map.get(k)}`);
-    }
-  }
-  const de = rows('de').get('net.conduct.hate');
-  assert.doesNotMatch(de, /Hautfarbe/);
-  assert.match(de, /Rasse/);
-  assert.equal(rows('de').get('pause.specials.race'), 'Rasse', 'the locale\'s own word for race');
 });

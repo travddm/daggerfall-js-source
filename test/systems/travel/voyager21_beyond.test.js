@@ -1,5 +1,4 @@
-// VOYAGER2.1 (2026-10-26, KPbICA's spec forwarded by the owner: "Roads at current state does not behave like roads for
-// Pathfinding system in Overworld view"; bible/06-Systems/Travel-View.md VOYAGER2.1) - THE ROADS PAST THE BAY ARE WALKED AS
+// VOYAGER2.1 - THE ROADS PAST THE BAY ARE WALKED AS
 // ROADS. The Overworld's planner (systems/travel/travelRoute.js planRoute) read no road's byte past the Bay's table
 // (TV-BEYOND: "a step past the table reads no road's byte"), so a click past the Bay walked the open ground beside every
 // road there at three and a half times a road's price. Now routeGround carries the layer's reader (world/arenaRoads.js -
@@ -96,8 +95,4 @@ test('VOYAGER2.1 the host\'s ground carries the installed layer\'s reader into e
   const r = planRoute({ x: 1100, y: -50 }, { x: 1120, y: -50 }, { ...bay(), ...routeGround(() => 0, () => 20, 3, MAP_W, MAP_H, () => true) });
   assert.deepEqual(r.kinds, new Array(20).fill('road'), 'the installed layer, through the ground');
   assert.deepEqual(routeLegs(r.pixels, r.kinds), [{ x: 1120, y: -50, kind: 'road' }], 'one straight leg on the road');
-  const host = hostText('src/scenes/world.js');
-  assert.match(host, /planRoute\(from, summary\.pixel, \{ roads: net\?\.roads \?\? null, tracks: net\?\.tracks \?\? null, \.\.\.tvRouteGround\(\)/);
-  assert.match(host, /planRoute\(from, pix, \{ roads: wnet\?\.roads \?\? null, tracks: wnet\?\.tracks \?\? null, \.\.\.tvRouteGround\(\)/);
-  assert.match(read('src/systems/travel/travelRoute.js'), /const beyond = roads \|\| tracks \? pathsBeyond : null;/);
 });

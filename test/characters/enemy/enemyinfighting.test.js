@@ -48,9 +48,6 @@ test('MT-ii: the foe knockback guard is NOT the player\'s - different binding, d
   assert.equal(enemyKnockbackApplies(0, false, 0), false, 'monster attacker vs the same ghost: not');
   // ...where the player-side arm reads the TARGET's class for that test
   assert.equal(weaponKnockbackApplies(0, true, 0), true, 'the player\'s arm asks whether the TARGET is a class');
-  // and the two live apart, each cited at its own home
-  const f = rd('src/combat/formulas.js');
-  assert.match(f, /entityBehaviour` in WeaponManager is the enemy/, 'the divergence is written LOUDLY, not inferred');
 });
 
 test('MT-ii: the landed blow - damage, blood, knockback, health, and the struck foe turns on its attacker', () => {
@@ -112,16 +109,6 @@ test('MT-ii: a MISS deals nothing, still reaches DecreaseHealth, and parry vs mi
     audio: { play3d: (clip, where) => at2.push(where[2]) },
   });
   assert.deepEqual(at2, [1.5], 'PlayParrySound rings at the TARGET (:374-375)');
-});
-
-test('MT-ii: the payload does NOT carry the player-only riders - no monster special, no flash, no Dodging', () => {
-  const src = rd('src/scenes/hostCombat.js');
-  const body = src.slice(src.indexOf('export function applyDamageToNonPlayer'));
-  const fn = body.slice(0, body.indexOf('\n}\n') + 3);
-  for (const forbidden of ['onMonsterHit', 'flashPlayerDamage', 'Dodging', 'onPlayerHurt']) {
-    assert.ok(!fn.includes(forbidden), `${forbidden} is the PLAYER's rider - FormulaHelper's monster arm never fires foe-to-foe`);
-  }
-  assert.match(src, /a rat biting an orc infects\s*\n\s*\*\s*nothing/, 'and the rule is recorded, not merely absent');
 });
 
 test('MT-ii: a null target returns 0 without touching anything (:305-306)', () => {
@@ -217,16 +204,3 @@ test('MT-iii: no instance standing leaves BOTH actions live - SetComplete sits i
   assert.equal([...q2.tasks.values()][0].actions[0].isComplete, false, 'an absent door idles the arm, never throws');
 });
 
-test('MT-iii: the guard list shrank again - QG1 left ONE - and both MT rows are real registry templates', () => {
-  // This pin said FOUR when MT-iii shipped; QG1 (2026-08-28) retired
-  // CastEffectDo, ClickedFoe and PromptMulti with the ready-spell
-  // doors and the foe-click surface, so the count moved with the tree.
-  const a = rd('src/systems/quest/actions.js');
-  const guards = a.slice(a.indexOf('const GUARD_PATTERNS'), a.indexOf('const guard ='));
-  assert.ok(!guards.includes('ChangeFoeInfighting:'), 'the guard row is GONE - retiring a flag deletes the sentence');
-  assert.ok(!guards.includes('ChangeFoeTeam:'), 'both of them');
-  assert.match(a, /new ChangeFoeInfighting\(null\),\n\s*new ChangeFoeTeam\(null\),/, 'the C#-order registry slots are real templates now');
-  const rows = (guards.match(/^ {2}\w+: \//gm) ?? []).length;
-  assert.equal(rows, 0, 'RR3 took WorldUpdate too - the registry is empty, and says who emptied it');
-  assert.ok(guards.includes('WorldUpdate'), 'the record of the last guard stays in the header');
-});

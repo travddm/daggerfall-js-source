@@ -1,7 +1,6 @@
 // @ts-check
-// NAME1 (2026-09-16, Mac: "Player names clip and cut off the top of the sprite head and additionally grow in size
-// the further away + are able to be seen through walls") and
-// BUBBLE1 (2026-09-16, Mac: "I want to introduce chat bubbles above the player when they chat"):
+// NAME1 and
+// BUBBLE1:
 // THE NAMES OVER THE OTHERS, AND WHAT THEY SAY - the enhanced skin's own DOM layer.
 //
 // WHY DOM AND NOT THE BITMAP PASS. Online forces the enhanced lane (OL1, systems/online/onlineLane.js), so a name over a
@@ -24,12 +23,12 @@
 // rules exactly - it is drawn only for a peer the name pass drew, so out of range, behind a wall or off the strip is
 // no bubble either. The game's own lines (`system`) and my own lines get none.
 //
-// CHAT-CHAN (2026-09-23): EVERY CHANNEL'S LINE, BUT NOT AN ASIDE. BUBBLE1 was the World tab's because the World tab was
+// CHAT-CHAN: EVERY CHANNEL'S LINE, BUT NOT AN ASIDE. BUBBLE1 was the World tab's because the World tab was
 // the chat; it said "a later channel tab ... says nothing over a head until somebody decides it should". Mac's own
 // words decide it: "chat bubbles above the player when they chat" - a line on the World, the Region, the Party or the
 // Local tab is chatting, and a player I can see who said something to me has it over their head whichever tab it came
 // on (a bubble is drawn on the HEARER's screen alone, so a party's line stands only where the party heard it). The one
-// line that stands over no head is an aside marked out of character - `(( ))`, net/chat.js isOocText (Addison Knox:
+// line that stands over no head is an aside marked out of character - `(())`, net/chat.js isOocText (Addison Knox:
 // "keeps immersion intact by separating in-character dialogue from coordination chatter"): what is said over a head
 // is what the character said.
 //
@@ -46,7 +45,6 @@
 import { PIXELIFY_FIVE_FACE, PIXEL_STACK } from './pixelifyFive.js';   // the enhanced face, with FIX-D's five ahead of it
 import { NAME_GAP_PX, namePixelSize, nameViewportScale } from '../net/remotePlayers.js';
 import { titleBadge, glyphBadges, glyphSvgNode, cssRgba, titlePaint, TITLE_PAINT_KEYS } from './playerBadge.js';   // ACC3: the same table the classic pass reads - one law, two faces   // the anchor's gap, and the size law's own two doors (AUDIT NAME1 F3)
-import { setTitleFlame } from './titleFlame.js';   // SHOP: a flame title's plate
 import { graphemesOf } from '../systems/graphemes.js';   // EMOTE1's characters, which JOURNAL1's notebook break reads too
 import { renownText } from '../net/renown.js';   // RENOWN1: Renown, left of the name
 import { guildTagText } from '../net/guild/guildLaw.js';   // GUILD1c: the guild's tag, right of the name
@@ -56,7 +54,7 @@ import { heraldrySwatchSrc } from './heraldrySwatch.js';   // HERALDRY-SHOWN (Se
 
 export const NAME_STYLE_ID = 'dagger-names-style';
 
-/** How long a bubble stands, ms. Mac: "a few seconds". */
+/** How long a bubble stands, ms.. */
 export const BUBBLE_MS = 6000;
 /** The share of that window the bubble holds full opacity before it fades - ChatLog.peek's own curve (net/chat.js),
  *  at this surface's own window, so a line over a head and the same line in the peek corner go out the same way. */
@@ -132,7 +130,7 @@ export function bubbleLineOk(line) {
  * heads. F7 found the two gates disagreeing (the layer on a classic page with no chat beside it) and tied the layer to
  * the enhanced skin the chat then needed.
  *
- * OVH3 (2026-09-24, Mac: "Online specific UI's will need to remain"): the chat mounts on EITHER skin now - the online
+ * OVH3: the chat mounts on EITHER skin now - the online
  * panels keep their own face over whatever UI Overhaul is worn - so the one gate both halves share is a document.
  * A page with none (a node host) keeps the classic bitmap names (the host's `if (!nameLayer)` fallback). A predicate
  * rather than an expression in the host, because a host's `if` is a thing only a regex can read.
@@ -158,7 +156,7 @@ export const NAME_CSS = `${PIXELIFY_FIVE_FACE}
    sit over the head, at any distance - which is the whole of Mac's first sentence. */
 .dfname { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center;
   transform: translate(-50%, -100%); contain: layout style; }
-/* PERF-NAMES1 (2026-10-10, Dudey: "big problems are caused by many players causing severe stutter"): A NAME IS MOVED
+/* PERF-NAMES1: A NAME IS MOVED
    BY ITS TRANSFORM, NOT BY ITS BOX. The anchor was \`left\`/\`top\`, so every frame a crowd moved through the view laid
    the layer out again - every label's flex column and its text, the browser's style and layout pass a frame
    (tools/nameLayerBench.mjs: 60 names, 3.0 ms of style and 4.8 of layout a frame on the measuring machine). The
@@ -211,12 +209,11 @@ export const NAME_CSS = `${PIXELIFY_FIVE_FACE}
 /* NOTICE1: a Notice Board's count - brass on a dark tab, never mistaken for a person's name */
 .dfname-board .dfname-tag { padding: 1px 6px; background: rgba(14,12,11,0.78); border: 1px solid #c08a3e; }
 .dfname-board .dfname-who { color: #f3cf86; letter-spacing: .06em; }
-/* RENOWN1 - THE RENOWN, LEFT OF THE NAME (Mac: "having their
-   level appear on the left side of character name"). A small plate in
+/* RENOWN1 - THE RENOWN, LEFT OF THE NAME. A small plate in
    the row the name and glyphs already are, so the whole run stays
    centred on the skull; amber, so it reads as a number about the player
    and never as a title's colour or the party's green. The number
-   alone, IN A BOX (Mac: "Just have it read 12 inside a box") - square
+   alone, IN A BOX - square
    corners, a full border, at least as wide as it is tall so a 1 and a
    50 are the same kind of box. Empty takes no room: a peer whose token
    carried no level (an older build) wears exactly the label it wore
@@ -324,7 +321,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
     return { node, bubble, title, tag, lv, name, guild, glyphs, house, ribbon, worn: null, titled: null, inked: undefined, banded: '', armed: '',
       // PERF-NAMES1: what this tag's DOM was last told, kept here and compared here - a read of `style.x` or
       // `textContent` asks the browser to serialise the value back, a cost a frame for every label
-      at: null, size: null, lvOf: undefined, gtOf: undefined, houseOf: undefined, said: null, nameText: null, titleText: null, bubbleOn: null, bubbleText: null, bubbleAlpha: null };   // HERALDRY-SHOWN: `armed`, the frame as written   // SEASON1 part two: `banded`, the ribbon as written   // SHADOW-FANG: `titled`, the title whose paint is on; AUDIT A10: `inked`, the name's colour as written
+      at: null, size: null, lvOf: undefined, gtOf: undefined, houseOf: undefined, said: null, nameText: null, titleText: null, bubbleOn: null, bubbleText: null, bubbleAlpha: null };   // HERALDRY-SHOWN: `armed`, the frame as written   // SEASON1 part two: `banded`, the ribbon as written   // `titled`, the title whose paint is on; AUDIT A10: `inked`, the name's colour as written
   };
 
   /** ACC3: the glyph run, REBUILT ONLY WHEN IT CHANGES. A glyph set is
@@ -408,7 +405,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
       for (const [id, b] of [...bubbles]) if (t - b.at >= BUBBLE_MS) bubbles.delete(id);
       const want = !covered && points.length > 0;
       if (want !== shownRoot) { shownRoot = want; root.style.display = want ? '' : 'none'; }
-      // PERF-LEAK1 (2026-10-10): NOBODY TO LABEL, NO LABELS KEPT. The sweep below ran only on a frame that drew names, so
+      // PERF-LEAK1: NOBODY TO LABEL, NO LABELS KEPT. The sweep below ran only on a frame that drew names, so
       // the crowd's last frame left every one of its tags in the page, hidden - ten elements a name until the next
       // person came into view (PERF-ON4's "240 DOM nodes more after sixty peers left", the peer lab's churn: 8 to 15
       // names a wave). A frame with no point lets them go; a frame merely COVERED (a window over the HUD) keeps them,
@@ -450,7 +447,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
           tag.guild.style.borderColor = arms ? heraldryColourOf(arms.border)?.hex ?? '' : '';
           tag.guild.style.backgroundImage = arms ? `url("${heraldrySwatchSrc(arms)}")` : '';
         }
-        // AUDIT A10 (SHADOW-FANG's audit, the title's own bug on the name): a browser reads a hex colour back as rgb(),
+        // AUDIT A10: a browser reads a hex colour back as rgb(),
         // so the diffing door rewrote a party mate's green every frame - written when it CHANGES, as the title is
         const ink = cssRgba(colorOf?.(p.id)) ?? '';
         if (tag.inked !== ink) { tag.inked = ink; tag.name.style.color = ink; }
@@ -471,7 +468,7 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
         // the distinction Mac asked for.
         const badge = titleBadge(p);
         put(tag, 'titleText', badge?.text ?? '', (v) => setText(tag.title, v));
-        // SHADOW-FANG: the title's whole paint - its colour, or a gradient clipped to its letters - written when
+        // the title's whole paint - its colour, or a gradient clipped to its letters - written when
         // the TITLE changes and not every frame: a browser reads a colour back normalised (#d3193c comes back
         // rgb(211, 25, 60)), so the diffing door would rewrite a gradient's keys on every frame for ever. Every
         // key is written, so the next title on this tag clears what this one set.
@@ -480,7 +477,6 @@ export function createNameLayer({ doc = document, now = () => Date.now(), armsOf
           tag.titled = titleKey;
           const paint = titlePaint(badge);
           for (const k of TITLE_PAINT_KEYS) tag.title.style[k] = paint[k];
-          setTitleFlame(tag.title, badge?.flame ? badge.key : null);   // SHOP: Genesis on its fire, written with its paint
         }
         if (p.glyphs?.length || tag.worn !== '') setGlyphs(tag, p);   // PERF-NAMES1: a peer with no glyph and none worn has nothing to compare
         const b = bubbles.get(p.id);

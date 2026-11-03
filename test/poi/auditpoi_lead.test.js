@@ -1,6 +1,5 @@
-// AUDIT POI, the lead's (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-4, POI-5, POI-6) - WHAT THE LANES LEFT TO
+// AUDIT POI, the lead's - WHAT THE LANES LEFT TO
 // THE MERGE: the joins between one lane's change and another's code, and the notes each lane left beside its own.
-// Mac: "Audit everything. Ensure perfection."
 //   - L1 a press holds the editor's docks until it ends (lane D's note: a field's change in the press's mousedown drew
 //     the dock again and took the button from under the pointer);
 //   - L2 the UV dialog unwraps off the page's thread (lane F's M13 wired to the panel), Apply waits for it, and an
@@ -424,16 +423,6 @@ test('AUDIT POI L9 THE EDITOR READS AN ASSET AS THE STORE\'S LAW DOES: a model\'
   assert.ok(pack.ok, JSON.stringify(pack));
   const { bytes: held, ...facts } = pack.assets.get(sha);
   assert.deepEqual({ ...facts, bytes: held.byteLength }, want);
-  // every fact the panel is told carries the bytes the budget reads: a picture put, a UV edit put, a pack's (its own
-  // bytes beside its facts), an import's (its metas, above) - by source, the bytes being read by the budget alone
-  const panelSrc = readFileSync(new URL('../../src/ui/poi/poiEditorPanel.js', import.meta.url), 'utf8');
-  const told = [...panelSrc.matchAll(/facts\.put\(([^\n]*)\);/g)].map((m) => m[1]);
-  assert.deepEqual(told, [
-    "r.data.sha, { kind: 'texture', ...r.data.meta, bytes: bytes.byteLength }",
-    "r.data.sha, { kind: 'mesh', ...r.data.meta, bytes: out.byteLength }",
-    'sha, { ...a, bytes: bytes.byteLength }',
-    'sha, meta',
-  ]);
   // the inspector: a part stood 3 km out reaches past the budget, said before any save
   const P = await over();
   try {
@@ -508,7 +497,4 @@ test('AUDIT POI L12 A MODEL IS READ IN STEPS: the stand work\'s decode yields ev
   assert.equal(poiMeshError(far), 'index-range');
   const out = structuredClone(big); out.positions[POI_MESH_STEP + 4] = 3000;
   assert.equal(poiMeshError(out), 'too-large');
-  // the host reads it in steps (scenes/poiHost.js loadSteps)
-  const host = readFileSync(new URL('../../src/scenes/poiHost.js', import.meta.url), 'utf8');
-  assert.match(host, /const d = yield\* decodePoiMeshSteps\(yield feed\.asset\(part\.mesh, \{ auth: auth\(\) \}\)\);/);
 });

@@ -1,4 +1,4 @@
-// RVN-OWNERS-CHOICE (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord's "I erased a
+// RVN-OWNERS-CHOICE (FIELD BUGS 2026-10-16b,; the Discord's "I erased a
 // Revenant fro[m]..." thread: "I've been using a 3x disintegrate as my main spell lately ... I believe it bypasses the
 // kill/spare on revenants. And it seems it does this to other players' revenants, too ... It probably shouldn't be doable
 // to other peoples revs"; the screenshot "Sekrath the Undying (dead)", "Isn't he supposed to give you a choice?").
@@ -163,7 +163,6 @@ test('RVN-OWNERS-CHOICE THE REPORT, on the real street pools: a party member\'s 
   assert.equal(N.revenantById(r.id).sworn, true, 'and what I chose stands');
 });
 
-// PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g - "Disintegrate just outright kills your rev with no option to hire"):
 // my own Disintegrate passes the stand and the will and KNEELS it; it no longer closes the record (fb1017g_rvnownkneel).
 test('RVN-OWNERS-CHOICE MY OWN Disintegrate (the same spell, my own door) kneels my revenant - its record open, past the last stand at rank 3; a stat drained to zero (a round\'s, nobody\'s) kneels it too (mutants: my whole kill withheld; nobody\'s whole kills)', async () => {
   const ann = client(player('char-ann', 'Ann'), 'ann-0001');
@@ -230,7 +229,6 @@ function dungeonDeathArm(scope) {
   return new Function(...k, `return (foe, _whole, fromPlayer, peer, bout = null, striker = null) => {\n${arm}\n      return 'dies';\n    }\n    return 'alive';\n  };`)(...k.map((x) => scope[x]));
 }
 
-// PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g): my own whole blow kneels it underground too.
 test('RVN-OWNERS-CHOICE UNDERGROUND (the dungeon\'s door, its lair\'s stand online - a loose foe of mine): my own whole blow kneels; a party member\'s (applyOwnHit\'s `z`) kneels it, stands it at rank 3, and tears it away once stood; a foe\'s kneels it; a room\'s shared foe online dies as ever (mutants: the dungeon\'s stand or kneel passed over for a peer\'s whole blow; my whole kill withheld underground)', async () => {
   const ann = client(player('char-ann', 'Ann'), 'ann-0001');
   const seen = [];

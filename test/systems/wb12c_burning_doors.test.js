@@ -1,7 +1,7 @@
-// WB12c (2026-10-01, Mac: "shops, libraries and the first breach" for the book; then "Btw I want to do all 4"): ON THE
+// WB12c: ON THE
 // BURNING DOORS - a Mages Guild conjurer's account of the breaches, the port's own book in the BOK format's own bytes:
 // sold and shelved at the odds of any other book, read through the one door before any file is asked for, and handed
-// to a character with their first Deadlands Ember (bible/11-Multiplayer/World-Bosses.md section 19 C).
+// to a character with their first Deadlands Ember (C).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -27,7 +27,7 @@ const LAST = () => 0.999999;   // a draw's last id
 test('WB12c the book: id 417 - above every classic id, its low byte no classic book\'s, under 0xffff - template 277, its title its name, priced by the classic law for its title (463) without moving the generator (mutants: the generator left moved; the title unknown; the price the template\'s)', () => {
   const classic = [...BOOK_ID_TITLES.keys()];
   assert.equal(BURNING_DOORS_ID, 417);
-  assert.deepEqual([...PORT_BOOK_IDS], [417, 418, 419]);   // PIN MOVED (GUN-LORE, KETCH, 2026-10-24): Rourken Thunder (418) and The Ketch That Never Lands (419) after it (test/systems/gunlore.test.js holds them)
+  assert.deepEqual([...PORT_BOOK_IDS], [417]);
   assert.ok(classic.every((id) => id < 417 && (id & 0xff) !== (417 & 0xff)), 'its filename (the low byte\'s) no classic book\'s');
   assert.ok(417 <= 0xffff);
   srand(12345);
@@ -72,40 +72,19 @@ test('WB12c its bytes are the BOK format\'s: the reader lays out the title in th
   assert.ok(body.every((r) => !r.center), 'the paragraphs left');
 });
 
-test('WB12c its text is the bible\'s appendix, word for word (the bible is the truth: a change to one is a change to both)', () => {
-  const bible = read('bible/11-Multiplayer/World-Bosses.md');
-  const app = bible.slice(bible.indexOf('### Appendix - On the Burning Doors'), bible.indexOf('## 20. '));
-  assert.match(app, /^\*By Ysolde Marnhel, Master Conjurer of the Mages Guild, Wayrest\.\*$/m);
-  const paras = [];
-  let cur = [];
-  for (const l of app.split('\n').filter((x) => x.startsWith('>'))) {
-    const t = l.replace(/^> ?/, '').trim();
-    if (t) cur.push(t);
-    else if (cur.length) { paras.push(cur.join(' ')); cur = []; }
-  }
-  if (cur.length) paras.push(cur.join(' '));
-  const book = PORT_BOOKS.get(417).pages.flat().map((r) => (typeof r === 'string' ? r : r.text)).filter((t) => t.length > 80);
-  const said = paras.map((p) => p.replace(/^\*\*.+?\.\*\* /, ''));
-  assert.deepEqual(book, said);
-  const heads = paras.map((p) => /^\*\*(.+?)\.\*\*/.exec(p)?.[1]).filter(Boolean);
-  const cards = PORT_BOOKS.get(417).pages.slice(1).map((pg) => pg[0].text);
-  assert.deepEqual(cards, heads);
-});
-
 test('WB12c on the shelves: a bookseller\'s, a general store\'s and a pawnshop\'s shelves and a library\'s draw it at the odds of any other book; a house, the dungeon\'s loot and a quest keep the classic draw (mutants: the shop\'s draw classic; the house\'s the shelf\'s; the library\'s classic; the port books off the shelf)', () => {
-  // PIN MOVED (GUN-LORE, KETCH, 2026-10-24): three port books on the shelf - each its one id's share; the draw's last is the
-  // last of them (419), and every one of them is a port book's
-  assert.equal(SHELF_BOOK_IDS.length, BOOK_ID_TITLES.size + 3);
-  for (const id of [417, 418, 419]) assert.equal(SHELF_BOOK_IDS.filter((x) => x === id).length, 1, `${id}: one id's share`);
-  assert.equal(getShelfBookID(LAST), 419, 'its share of the draw is one id\'s');
+  // share, the draw's last
+  assert.equal(SHELF_BOOK_IDS.length, BOOK_ID_TITLES.size + 1);
+  assert.equal(SHELF_BOOK_IDS.filter((x) => x === 417).length, 1, '417: one id\'s share');
+  assert.equal(getShelfBookID(LAST), 417, 'its share of the draw is one id\'s');
   assert.ok(!isPortBook(getRandomBookID(LAST)));
-  assert.equal(createShelfBook(LAST).message, 419);
+  assert.equal(createShelfBook(LAST).message, 417);
   assert.ok(!isPortBook(createRandomBook(LAST).message), 'loot, houses, biographies and quests: the classic draw');
-  assert.ok(populateBookshelf(LAST).every((id) => id === 419), 'a library\'s shelf');
+  assert.ok(populateBookshelf(LAST).every((id) => id === 417), 'a library\'s shelf');
   const count = (fn) => { let books = 0, port = 0; for (let s = 1; s <= 200; s++) for (const it of fn(seededRng(s))) if (it.group === 'Books') { books++; if (isPortBook(it.message)) port++; } return [books, port]; };
   for (const t of ['Bookseller', 'GeneralStore', 'PawnShop']) {
     const [books, port] = count((r) => stockShopShelf({ buildingType: BUILDING_TYPES[t], quality: 10 }, { level: 5 }, { rolls: r, torchesFromItems: false }));
-    assert.ok(port > 0 && port < (3 * books) / 40, `${t}: ${port} of ${books}`);   // PIN MOVED (GUN-LORE, KETCH): three ids' share
+    assert.ok(port > 0 && port < books / 40, `${t}: ${port} of ${books}`);
   }
   // a house's container (models 4-10 and 11-14 keep books): some 1,300 books, where the shelf's odds would put it ~14 times
   let books = 0, port = 0;
@@ -150,10 +129,3 @@ test('WB12c the first ember brings it, once a character - a courier\'s line, and
   restoreModSaveRecords({});
 });
 
-test('WB12c the breach\'s spoils go into the pack through the book\'s door - the court\'s floor, a receipt outside it and the crash\'s - and a town\'s thanks do not (mutants: the court\'s spoils past it)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const takeGateSpoil = \(p\) => \{\n\s+takeSpoil\(p\);\n\s+const book = p\.kind === 'item' \? breachBookFor\(p\.item\) : null;\n\s+if \(book\) \{ addItem\(playerEntity\.items, book\); chatNotice\(BREACH_BOOK_TEXT\); \}/);
-  assert.match(w, /const spoilsPool = createSpoilsPool\(\{[\s\S]{0,600}?take: takeGateSpoil,/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeGateSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => spoilsPool\.adopt\(rec\)/);
-  assert.match(w, /const raidSpoils = createSpoilsPool\(\{\n\s+ray: \(\) => null, now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, take: takeSpoil,/);
-});

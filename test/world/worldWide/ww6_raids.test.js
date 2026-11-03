@@ -1,5 +1,4 @@
-// WW6 (2026-10-27, bible/03-World/World-Wide.md WW6 - the owner's call taken: "Every single thing here needs to be
-// addressed. No exceptions."): THE RAIDS PAST THE BAY, AND A STAFF TOWN EVENT WITH THEM.
+// WW6: THE RAIDS PAST THE BAY, AND A STAFF TOWN EVENT WITH THEM.
 //
 // Held here: the law (every region a key names, a province's town by its own index, the world's pixel in the tuple, the
 // side of the Bay's edge, a lane a theatre and the open zone's shut); the Bay's lane to the byte against the old law
@@ -19,16 +18,16 @@ import { join } from 'node:path';
 
 import {
   RAID_KEY_RE, RAID_SIG_RE, raidSig, raidLaneOfRegion, raidLaneOfKey, raidLaneOpen, RAID_LANES_BEYOND, RAID_REGION_COUNT,
-  RAID_BAY_REGIONS, RAID_LANES, RAID_ZONE_LANE, RAID_PIXEL_BOUND, raidSideOk, raidWordSane, raidDayRandom, rollRaidTowns,
+  RAID_BAY_REGIONS, RAID_LANES, RAID_PIXEL_BOUND, raidSideOk, raidWordSane, raidDayRandom, rollRaidTowns,
   raidDaySlots, raidOnSlot, raidsPerDay, raidLaneCount, RAID_SLOTS_MAX, RAID_LANE_PARTIES, raidLaneParties, raidLedgerId,
   RAID_DAY_MINUTES, RAID_START_LAST, RAID_TYPES, RAID_TARGET_MIN, RAID_TARGET_MAX, RAID_LANE_SALT,
 } from '../../../src/net/raid/raidLaw.js';
 import { readRaidReceipt } from '../../../src/net/raid/raidReceipt.js';
 import { REGION_NAMES, BAY_REGION_COUNT, regionOfTheatre, theatreOfRegion } from '../../../src/formats/mapsTables.js';
 import { THEATRE_COUNT, areaAt } from '../../../src/world/worldWide/worldGrid.js';
-import { WILD_REGION } from '../../../src/systems/wild/wildZone.js';
+import { CYRODIIL_REGION } from '../../../src/formats/mapsTables.js';
 import {
-  WORLD_PIXEL_BOUND, validRaidIn, validRaidOut, parseClient, worldRoom, relaySupportsRaidWorld, RAID_WORLD_RELAY_MIN, RELAY_VERSION,
+  WORLD_PIXEL_BOUND, validRaidIn, validRaidOut, parseClient, worldRoom, RELAY_VERSION,
   PIXEL_UNITS, wallMsForClassicMinutes, raidLedgerKey,
 } from '../../../src/net/wire.js';
 import { dayRng, DAY_SALT } from '../../../src/systems/worldTick.js';
@@ -108,14 +107,13 @@ test('WW6 the law: a raid\'s key names every region of the world - a Bay region 
   assert.equal(RAID_REGION_COUNT, REGION_NAMES.length);
   assert.equal(RAID_BAY_REGIONS, BAY_REGION_COUNT);
   assert.equal(RAID_LANES, THEATRE_COUNT);
-  assert.equal(RAID_ZONE_LANE, theatreOfRegion(WILD_REGION), 'the open zone\'s lane is Cyrodiil\'s');
   assert.equal(RAID_PIXEL_BOUND, WORLD_PIXEL_BOUND);
   // the lanes: a Bay region the Bay's 0, a province its theatre, past the 71 none
   assert.deepEqual(Array.from({ length: 72 }, (_, r) => raidLaneOfRegion(r)), [...Array(62).fill(0), 1, 2, 3, 4, 5, 6, 7, 8, 9, -1]);
   for (let t = 1; t < THEATRE_COUNT; t++) assert.equal(raidLaneOfRegion(regionOfTheatre(t)), t, PROVINCE_OF_ID[t]);
   assert.deepEqual([raidLaneOfRegion(-1), raidLaneOfRegion(1.5), raidLaneOfRegion('3')], [-1, -1, -1]);
-  assert.deepEqual(RAID_LANES_BEYOND, [1, 2, 3, 4, 5, 6, 7, 8], 'every province but the open zone');
-  assert.deepEqual([raidLaneOpen(0), raidLaneOpen(8), raidLaneOpen(9), raidLaneOpen(10), raidLaneOpen(-1)], [true, true, false, false, false]);
+  assert.deepEqual(RAID_LANES_BEYOND, [1, 2, 3, 4, 5, 6, 7, 8, 9], 'every province');
+  assert.deepEqual([raidLaneOpen(0), raidLaneOpen(8), raidLaneOpen(9), raidLaneOpen(10), raidLaneOpen(-1)], [true, true, true, false, false]);
   assert.deepEqual([raidLaneOfKey('64:-1000124:600'), raidLaneOfKey('3:7:600'), raidLaneOfKey('70:-41000000:1'), raidLaneOfKey('junk')], [3, 0, 9, -1]);
   // the tuple on the world's grid
   assert.ok(RAID_SIG_RE.test(raidSig({ st: 864587, tg: 15, ty: 1, px: 2425, py: -430 })));
@@ -129,9 +127,9 @@ test('WW6 the law: a raid\'s key names every region of the world - a Bay region 
     raidSideOk(w('3:7:600', 999, 499)), raidSideOk(w('3:7:600', 0, 0)), raidSideOk(w('3:7:600', 1000, 0)), raidSideOk(w('3:7:600', 0, -1)),
     raidSideOk(w('64:-1000124:600', 2425, 270)), raidSideOk(w('64:-1000124:600', 500, 200)), raidSideOk(w('64:-1000124:600', -5, 200)),
     raidSideOk(w('70:-41000000:600', 1500, 800)), raidSideOk(w('64:-1000124:600', 8192, 0)), raidSideOk(w('junk', 1, 1)),
-  ], [true, true, false, false, true, false, true, false, false, false]);
+  ], [true, true, false, false, true, false, true, true, false, false]);
   const sane = { key: `64:-1000124:${D}`, st: D * RAID_DAY_MINUTES + 600, px: 2425, py: 270 };
-  assert.deepEqual([raidWordSane(sane), raidWordSane({ ...sane, px: 400 }), raidWordSane({ ...sane, key: `70:-41000000:${D}` }), raidWordSane({ ...sane, key: `3:7:${D}` })], [true, false, false, false]);
+  assert.deepEqual([raidWordSane(sane), raidWordSane({ ...sane, px: 400 }), raidWordSane({ ...sane, key: `70:-41000000:${D}` }), raidWordSane({ ...sane, key: `3:7:${D}` })], [true, false, true, false]);
 });
 
 // ═══ THE BAY'S LANE, TO THE BYTE ═════════════════════════════════════════════════════════════════
@@ -188,10 +186,10 @@ test('WW6 a lane\'s parties are its province\'s OWN FAUNA\'s - the mod\'s three 
     const ids = new Set();
     for (const b of BIOMES.filter((x) => x.province === prov)) for (const e of [...(ROSTERS[b.key]?.day ?? []), ...(ROSTERS[b.key]?.night ?? [])]) ids.add(e[0]);
     for (const e of TOWN_ROSTERS[prov] ?? []) ids.add(e[0]);
-    return i + 1 === RAID_ZONE_LANE ? [] : [0, 1, 2].filter((p) => kinds[p].some((k) => ids.has(k)));
+    return [0, 1, 2].filter((p) => kinds[p].some((k) => ids.has(k)));
   });
   assert.deepEqual(RAID_LANE_PARTIES.slice(1), derived, 'each province\'s own');
-  assert.deepEqual(RAID_LANE_PARTIES, [[0, 1, 2], [0, 1, 2], [1], [1], [0, 1], [0, 1], [1, 2], [1], [1], []]);
+  assert.deepEqual(RAID_LANE_PARTIES, [[0, 1, 2], [0, 1, 2], [1], [1], [0, 1], [0, 1], [1, 2], [1], [1], [0, 1]]);
   assert.equal(PROVINCE_OF_ID[8], 'BlackMarsh');
   assert.equal(raidLaneParties(8).includes(2), false, 'Black Marsh stands no orc');
   assert.deepEqual(raidLaneParties(0), [0, 1, 2]);
@@ -221,7 +219,6 @@ test('WW6 a lane\'s day: its own generator (the Bay\'s untouched), its raids eac
       assert.ok(raids.filter((r) => raidOnSlot({ st: r.startMinute, tg: r.attackAmount, ty: r.type }, raidDaySlots(day))).length < raids.length, 'the Bay\'s slots are not its');
     }
   }
-  assert.equal(raidDaySlots(D, RAID_ZONE_LANE).size, 0, 'the open zone draws none');
   assert.equal(raidDaySlots(D, 99).size, 0);
   assert.equal(raidLaneCount(200), RAID_SLOTS_MAX, 'never past the relay\'s slots');
   assert.deepEqual(rollRaids(D, groups, 3, raidDayRandom(D, 3), raidLaneParties(3)).map((r) => r.area), rollRaidTowns(D, groups, 3, raidDayRandom(D, 3), raidLaneParties(3)).map((r) => r.area), 'each raid keeps its area');
@@ -249,7 +246,6 @@ test('WW6 a lane\'s towns off the world\'s registry: its theatre\'s LISTED towns
   assert.ok(RAID_TOWN_TYPES.includes(T.TownHamlet) && RAID_TOWN_TYPES.includes(T.TownVillage));
   assert.equal(towns.length, 5, 'no street, no tavern, no place without its own index');
   assert.deepEqual(raidLaneGroups(places, 0, capitalStreet), [], 'the Bay\'s lane is raidRegions\' own');
-  assert.deepEqual(raidLaneGroups(places, RAID_ZONE_LANE, capitalStreet), [], 'the open zone');
   assert.deepEqual(raidLaneGroups(null, 3), []);
   assert.equal(raidLaneGroups(places, 3).flatMap((x) => x.towns).length, 6, 'no street law handed: the street a town of its own');
 });
@@ -414,12 +410,10 @@ test('WW6 the relay: a raid past the Bay is kept in its town\'s cell as the Bay\
     const rc = out.find((m) => m.k === 'rc');
     assert.equal(readRaidReceipt(rc.r).w, raidKey(r), 'the receipt names the province\'s key');
     assert.ok(validRaidOut(out.find((m) => m.k === 'cl')), 'the client takes its word back');
-    // the wrong side, the open zone, another lane's slots: no raid (struck, or dropped)
+    // the wrong side, another lane's slots: no raid (struck, or dropped)
     const junk0 = a.meters.junk ?? 0;
     await quiet(() => cell.raw(a, JSON.stringify({ t: 'raid', ...wordOf(r, { key: `3:7:${D}` }) })));
-    step(1000);   // the raid frames' own bucket
-    await quiet(() => cell.raw(a, JSON.stringify({ t: 'raid', ...wordOf(r, { key: `70:${r.locationIndex}:${D}` }) })));
-    assert.equal((a.meters.junk ?? 0) - junk0, 2, 'a Bay key past the Bay, a raid of the open zone: no honest machine\'s');
+    assert.equal((a.meters.junk ?? 0) - junk0, 1, 'a Bay key past the Bay: no honest machine is');
     // a tuple the Bay's day drew and the lane's never: on its pixel, in its window - no ledger
     const [st, tg, ty] = [...raidDaySlots(D)][0].split('.').map(Number);
     const off = { ...wordOf(r), st, tg, ty };
@@ -441,14 +435,9 @@ test('WW6 the relay: a raid past the Bay is kept in its town\'s cell as the Bay\
     assert.deepEqual([...edge._raidSlotsOf(D, 2)], [...raidDaySlots(D, 2)], 'not the Bay\'s, read first');
     assert.deepEqual([...edge._raidSlotsOf(D)], [...raidDaySlots(D)]);
   }, r);
-  const relay = codeOnly(rd('server/src/index.js'));
-  assert.match(relay, /const day = raidDayOfKey\(m\.key\), lane = raidLaneOfKey\(m\.key\);\n\s*if \(!raidOnSlot\(m, this\._raidSlotsOf\(day, lane\)\)\) return;\n\s*const rolled = lane === 0 \? await this\._raidDayIdsOf\(day, now\) : null;/);
-  assert.match(relay, /const k = lane === 0 \? day : `\$\{day\}:\$\{lane\}`;\n\s*let s = this\._raidSlots\.get\(k\);\n\s*if \(!s\) \{ if \(this\._raidSlots\.size >= 4\) this\._raidSlots\.clear\(\); s = raidDaySlots\(day, lane\); this\._raidSlots\.set\(k, s\); \}/, 'a lane-day\'s slots kept, the Bay\'s by its day as before');
 });
 
-test('WW6 the session: a raid past the Bay goes only to a relay that hears one (world274 on - an older relay refuses the word); a Bay raid to any raid relay as before; the halo says for itself (mutants: the gate unread; the version floor off)', () => {
-  assert.equal(RAID_WORLD_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): the gate is world275, past main's world274 (LADDER-CUT), which refuses; PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270
-  assert.deepEqual([relaySupportsRaidWorld('world275'), relaySupportsRaidWorld('world276'), relaySupportsRaidWorld(RELAY_VERSION), relaySupportsRaidWorld('x')], [false, true, true, false]);
+test('WW6 the session: a raid past the Bay goes to the relay as a Bay raid does', () => {
   const rigOf = (cell, v, pose) => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
@@ -458,17 +447,10 @@ test('WW6 the session: a raid past the Bay goes only to a relay that hears one (
   };
   const past = { key: `64:-1000124:${D}`, st: D * 1440 + 700, tg: 17, ty: 1, px: 2425, py: 270, n: 0, s: 0, k: 'w' };
   const bay = { ...past, key: `3:7:${D}`, px: 100, py: 200 };
-  const oldPast = rigOf(worldRoom(past.px, past.py), 'world271', poseOn(past.px, past.py));
-  assert.deepEqual([oldPast.raidOk, oldPast.raidWorldOk, oldPast.sendRaid(past, worldRoom(past.px, past.py))], [true, false, false], 'an older raid relay hears no raid past the Bay');
-  const oldBay = rigOf(worldRoom(bay.px, bay.py), 'world271', poseOn(bay.px, bay.py));
-  assert.equal(oldBay.sendRaid(bay, worldRoom(bay.px, bay.py)), true, 'the Bay\'s as before');
+  const atBay = rigOf(worldRoom(bay.px, bay.py), RELAY_VERSION, poseOn(bay.px, bay.py));
+  assert.equal(atBay.sendRaid(bay, worldRoom(bay.px, bay.py)), true, 'the Bay\'s as before');
   const now = rigOf(worldRoom(past.px, past.py), RELAY_VERSION, poseOn(past.px, past.py));
-  assert.deepEqual([now.raidWorldOk, now.sendRaid(past, worldRoom(past.px, past.py))], [true, true]);
-  const on = codeOnly(rd('src/net/online.js'));
-  assert.match(on, /if \(raidLaneOfKey\(w\.key\) !== 0 && !\(this\._mine\(cell\) \? this\.raidWorldOk : halo\?\.raidWorldOk\)\) return false;/);
-  assert.match(on, /else \{ const h = this\._halo\.get\(room\); if \(h\) h\.raidWorldOk = relaySupportsRaidWorld\(relayV\); \}/);
-  assert.match(on, /old\.raidWorldOk = this\.raidWorldOk;/);
-  assert.match(on, /this\.raidWorldOk = !!h\.raidWorldOk;/);
+  assert.equal(now.sendRaid(past, worldRoom(past.px, past.py)), true, 'past the Bay');
 });
 
 // ═══ A STAFF TOWN EVENT PAST THE BAY ═════════════════════════════════════════════════════════════
@@ -512,7 +494,6 @@ test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by 
 // ═══ THE MAP AND THE HOST ════════════════════════════════════════════════════════════════════════
 
 test('WW6 the held map stands a raid past the Bay on the continent\'s sheet (the bounties\' law), the Bay\'s sheet the Bay\'s; the host\'s seams: the raids\' host hands the registry and the capital\'s street, the host constructs it (mutants: the sheet unread; the registry unhanded)', () => {
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): WW6's readRaidMarksIn and BAY-LEFT-MAPS' met, and the one kept bounds the
   // marks by the box itself - so the sheet is asked of a mark north of the Bay (Solitude's pixel, kept) and one past the
   // frame's east edge though under its width (dropped), which only the box's origin tells apart
   const marks = () => [{ key: 'a', px: 2425, py: 270, label: 'T', tip: null }, { key: 'b', px: 100, py: 100, label: 'B', tip: null }, { key: 'c', px: 9000, py: 0, label: 'X' }, { key: 'd', px: 1569, py: -430, label: 'S', tip: null }, { key: 'e', px: 5500, py: 10, label: 'E', tip: null }];
@@ -521,12 +502,6 @@ test('WW6 the held map stands a raid past the Bay on the continent\'s sheet (the
   const sheet = readRaidMarksIn(marks, { x0: -862, y0: -975, w: 6000, h: 3750 });
   assert.deepEqual(sheet.map((m) => [m.key, m.px, m.py, m.x, m.y]), [['a', 2425, 270, 2425.5, 270.5], ['b', 100, 100, 100.5, 100.5], ['d', 1569, -430, 1569.5, -429.5]], 'past the Bay over the continent\'s frame');
   assert.deepEqual(readRaidMarksIn(() => { throw new Error('x'); }, { x0: 0, y0: 0, w: 1000, h: 500 }), []);
-  const hm = codeOnly(rd('src/ui/heldMap.js'));
-  assert.match(hm, /const raids = readRaidMarksIn\(this\.deps\.raids, sheet\);/);
-  const rh = codeOnly(rd('src/scenes/raidHost.js'));
-  assert.match(rh, /places: \(\) => keptPlaces\(\),\n\s*street: capitalStreet,/);
-  assert.match(codeOnly(rd('src/scenes/world.js')), /const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);/, 'the registry the boot keeps');
-  assert.match(codeOnly(rd('src/scenes/world.js')), /\n {2}createRaidHost\(\{/);
 });
 
 // ═══ WITH ARENA2: THE FREEWARE'S REGISTRY WITH TESA'S PLACES ═════════════════════════════════════

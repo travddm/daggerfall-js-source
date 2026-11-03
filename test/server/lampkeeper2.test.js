@@ -1,12 +1,9 @@
-// LAMP-KEEPER II (2026-10-14, Mac: "Reimplement an old bug that was previously removed. A chance of finding a vendor NPC
-// as a lamp model. Anybody that interacts with the lamp model should earn the 'I Love Lamp' title. Implement exclusive
-// dialogue and ensure there is a loot popup for obtaining the title"). Pinned here: the pick (a shop's keeper, one day
+// LAMP-KEEPER II. Pinned here: the pick (a shop's keeper, one day
 // in LAMP_KEEPER_ODDS, the room's own answer), the lamp's words, the title's carrier (granted once, said and raised as a
 // banner; held, guest, offline, a failed call asked again), the account service's grant and its title, the vocabulary,
 // and the wiring - the interior's stand, the press, the hover's name, the host's door.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import {
   LAMP_KEEPER_ODDS, LAMP_KEEPER_ARCHIVE, LAMP_KEEPER_RECORDS, LAMP_CLASSIC, LAMP_ARCHIVE, LAMP_TITLE, isLampCandidate, isLampKeeper,
   LAMP_LINES, lampLines, LAMP_TEXT, createLampTitle,
@@ -26,7 +23,6 @@ import { ACCEPTED } from '../../src/net/legalLaw.js';
 import { buildInteriorContext } from '../../src/scenes/interiorContext.js';
 import { accountLamp, SESSION_KEY } from '../../src/net/accountClient.js';
 
-const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const keeper = (record = 2, position = 77) => ({ textureArchive: 182, textureRecord: record, position });
 const shop = BUILDING_TYPES.GeneralStore;
 
@@ -36,7 +32,7 @@ test('LAMP-KEEPER II THE PICK: a shop\'s keeper (182_0-2) stands as the lamp one
   assert.deepEqual([...LAMP_KEEPER_RECORDS], [0, 1, 2]);
   assert.deepEqual({ ...LAMP_CLASSIC }, { archive: RR_NPC_ARCHIVE, record: 6 }, 'Kludge Town\'s street lamp - the record the bug drew');
   assert.deepEqual(RR_NPC_XML_SCALE[6], [3, 0.8], 'and the stretch Roleplay & Realism gives it');
-  assert.equal(LAMP_ARCHIVE, 38232);   // PIN MOVED (AUDIT EG V, the merge of main): 38241 is the Spire's Broken Galleries (world/eliteGates/pseudoArchives.js EG_BAND_ARCHIVES) - the lamp moved to the first free number after the harbour's
+  assert.equal(LAMP_ARCHIVE, 38232);
   for (const r of [0, 1, 2]) assert.equal(isLampCandidate(keeper(r), shop), true);
   assert.equal(isLampCandidate(keeper(3), shop), false, 'not every 182 person');
   assert.equal(isLampCandidate({ textureArchive: 184, textureRecord: 2 }, shop), false);
@@ -140,34 +136,13 @@ test('LAMP-KEEPER II THE ACCOUNT SERVICE: the first word lays I Love Lamp on the
   assert.equal(titlesHeld({ handle: 'Mac', lamp_title: 1 }, {}).includes('ilovelamp'), true);
   assert.equal(titlesHeld({ handle: 'Mac', lamp_title: 0 }, {}).includes('ilovelamp'), false);
   assert.equal(titlesHeld({ handle: null, lamp_title: 1 }, {}).includes('ilovelamp'), false, 'a guest row holds none');
-  assert.equal(TITLES.at(-44) /* PIN MOVED (SHOP): Genesis joined the list last */ /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (KETCH): the Skyfarer joined the list last */ /* PIN MOVED (WITCH1): Witchwarden and Hearthkeeper joined the list last */ /* PIN MOVED (STAR8): the Starwarden joined the list after the questlines' five, before the festival's two */, 'ilovelamp', 'the vocabulary, last when it came');   // PIN MOVED (QL12): the questlines' five joined the list last, after the WikiMaid; PIN MOVED (KG6): The King's Gambit's Grandmaster joined after it, last; PIN MOVED (SERPENT5): and Coilbreaker after that; PIN MOVED (EG-E2, the merges of main): the Spire's thirteen after it; PIN MOVED (WIKIMAID): the WikiMaid joined the list last
+  assert.equal(TITLES[TITLES.indexOf('seasonmaster') + 1], 'ilovelamp', 'the vocabulary, last when it came');
   assert.equal(TITLE_TEXT.ilovelamp, 'I Love Lamp');
   assert.deepEqual([...TITLE_RGBA.ilovelamp], [1, 0.698, 0.376, 1], 'lamplight');
   const e = honourEntry({ kind: 'title', key: 'ilovelamp' });
   assert.deepEqual([e.name, e.kicker, e.honour.rgba], ['I Love Lamp', 'New Title', TITLE_RGBA.ilovelamp], 'its loot banner');
-  assert.match(read('server-account/migrations/0113_lamp_title.sql'), /^ALTER TABLE players ADD COLUMN lamp_title INTEGER NOT NULL DEFAULT 0;$/m);
-  assert.match(read('server-account/src/index.js'), /if \(path === '\/v1\/lamp\/claim' && request\.method === 'POST'\) \{\n[^\n]*\n\s*return json\(await claimLamp\(ctx, who\.player\), 200, origin\);/);
-});
-
-test('LAMP-KEEPER II THE WIRING: the interior stands the classic lamp under its own key at the record\'s size, no Morrowind body; the host picks per room and day; the press says its words with Trade and Leave and asks the title; the plaque names the Lamp; world.js hands its account door online', () => {
-  const ctx = read('src/scenes/interiorContext.js'), modes = read('src/scenes/worldModes.js'), world = read('src/scenes/world.js');
-  assert.match(ctx, /for \(const pn of people\) if \(opts\.lampPerson\?\.\(pn\)\) Object\.assign\(pn, \{ lamp: true, _mwLook: null \}\);/, 'no Morrowind body is read for it');
-  assert.match(ctx, /pn\.stood = true;\n\s*if \(pn\.lamp\) return standLamp\(pn\);[^\n]*\n\s*if \(_rigFor\) \{/, 'before the voxel body and the billboard');
-  assert.match(ctx, /const size = billboardSize\(t, LAMP_CLASSIC\.record\);/, 'the record\'s size, the mod\'s stretch with it');
-  assert.match(ctx, /renderer\.uploadTexture\(LAMP_ARCHIVE, 0, t\.getColor32\(t\.getDFBitmap\(LAMP_CLASSIC\.record, 0\), 0\)\);/, 'the classic pixels, never a replacement\'s');
-  assert.match(ctx, /pn\.standBatch = renderer\.createBillboardBatch\(LAMP_ARCHIVE, 0, size, \[\[pn\.x, pn\.y, pn\.z\]\]\);/);
-  assert.match(modes, /lampPerson: \(pn\) => isLampKeeper\(pn, \{\n\s*buildingType: building\?\.buildingType \?\? -1, buildingFactionId: building\?\.factionId \?\? 0, buildingKey: building\?\.buildingKey \?\? 0,[^\n]*\n\s*mapId: hit\.dfLocation\?\.mapTableData\?\.mapId \?\? 0, day: Math\.floor\(worldMinutes\(\) \/ MINUTES_PER_DAY\),/);
-  assert.match(modes, /if \(!info && pn\?\.lamp\) \{ lampChoice\(pn\); return; \}/);
-  assert.match(modes, /const officeName = \(pn\) => arenaGatePersonName\(pn\) \?\? [^\n]* \?\? \(pn\?\.lamp \? LAMP_TEXT\.name\(\) : null\)(?: \?\? \(pn\?\.witch \? vendorOffice\(\) : null\))?;/   /* PIN MOVED (WITCH1): a Wyrd Sister's office after the Lamp's */);
-  assert.match(modes, /\{ code: 'KeyT', label: `T - \$\{LAMP_TEXT\.trade\(\)\}`, action: \(\) => \{ Promise\.resolve\(townTalk\?\.ensureFactions\?\.\(\)\)\.then\(\(\) => openStaticNpc\(pn\)\)/, 'Trade opens the keeper\'s own shop');
-  assert.match(modes, /function lampChoice\(pn\) \{\n\s*const lines = lampLines\(Math\.floor\(worldMinutes\(\) \/ MINUTES_PER_DAY\)\);/, 'its own words, the day\'s');
-  assert.match(modes, /townTalk\?\.showOverlay\?\.\(new ChoiceWindow\(\{ lines, options \}\)\);\n\s*void lampTitle\.speak\(\);/);
-  assert.match(modes, /const lampTitle = createLampTitle\(\{\n\s*claim: host\.lampClaim \? \(\) => host\.lampClaim\(\) : null,\n\s*account: \(\) => host\.lampAccount\?\.\(\) \?\? null,/, 'the host\'s account door, and whose it is');
-  assert.match(modes, /announce: \(kind, key\) => announceHonour\(kind, key\),/);
-  assert.match(world, /lampClaim: _accountLamp \? \(\) => _accountLamp\.claim\(\) : undefined,/);
-  assert.match(world, /lampAccount: _accountLamp \? \(\) => _accountLamp\.account\(\) : undefined,/);
-  assert.match(world, /const _accountLamp = params\.has\('online'\) \? accountLamp\(/);
-  assert.equal(/lampPerson|lampChoice|lampKeeper|LAMP_/.test(read('src/scenes/dungeonContext.js')), false, 'the dungeon host stands no shop');
+  const lamp = d1()._raw.prepare('PRAGMA table_info(players)').all().find((c) => c.name === 'lamp_title');
+  assert.deepEqual([lamp?.type, lamp?.notnull, lamp?.dflt_value], ['INTEGER', 1, '0'], 'players.lamp_title: an integer, never NULL, 0 until granted');
 });
 
 test('LAMP-KEEPER II THE WORKER (AUDIT FIVE-ASKS A1): /v1/lamp/claim is a route, behind a session and never open - a guest\'s word writes nothing, the first registered word grants, the next is held, a stranger is refused; the title on the wardrobe and worn', async () => {

@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): FRIENDS AND ENEMIES - how each resident of the living world
+// LW1: FRIENDS AND ENEMIES - how each resident of the living world
 // regards the player's character (LW0 decision 6: the world is shared; how it feels about you is yours).
 //
 // A REGARD per resident, from HOSTILE_AT and below to FRIEND_AT and above, kept by the resident's id (census.js:
@@ -60,7 +60,7 @@ export const MARK_KINDS = Object.freeze(['laid', 'heard', 'looted']);
  *  (`R<region>.<minute>`, the name of the one robbed). */
 export const TALE_KINDS = Object.freeze(['home', 'routed', 'held']);
 
-/** LW11 (bible/06-Systems/Living-World-II.md): THE ROAD'S RECORDS - a caravan's counter as this character left it
+/** LW11: THE ROAD'S RECORDS - a caravan's counter as this character left it
  *  (`wares`: the goods gone from its shelf and the coin its purse paid out, by trip, the WARES_MAX newest kept), the
  *  crimes a witness is carrying to a town (`reports`, REPORTS_MAX), and the escort the character is hired on (`escort`,
  *  one at a time) - each written into the save only once there is one (`road`, beside `people` and `turns`: an add-only
@@ -81,7 +81,7 @@ const leftOf = (list) => new Map(list.filter((e) => Array.isArray(e) && placeOk(
 const goneOut = (w) => [...[...w.gone].sort((a, b) => a - b), ...[...w.left].sort((a, b) => a[0] - b[0])];
 
 /** What moves a regard, and by how much. `talk` counts once a day per resident, and each tone of word (`polite`,
- *  `insulted`) once a day - TONE-TASTE (2026-10-15): as the resident took it (talkTopics.js toneTaste), never by the
+ *  `insulted`) once a day - TONE-TASTE: as the resident took it (talkTopics.js toneTaste), never by the
  *  tone's name: `polite` a tone they take kindly, `insulted` one they take ill (a Polite word to a Commoner too). LW7: one of their own slain turns them HOSTILE (an armed one draws on you beyond the walls). */
 export const EVENTS = Object.freeze({
   talk: 3,        // a word exchanged (the talk window opened on them)
@@ -98,7 +98,7 @@ export const EVENTS = Object.freeze({
   embrace: 3,     // COURT-DEEDS: a hug, from one they count a friend (once a day)
   kiss: 4,        // COURT-DEEDS: a kiss, in a courtship well begun (once a day)
 });
-/** COURT-DEEDS (2026-10-26, Discord #feature-feedback "Better Courtship"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md):
+/** COURT-DEEDS:
  *  each deed's day stamp on a record - a compliment, a gift, a hug or a kiss counts once a day per resident, as a tone. */
 export const DEED_STAMPS = Object.freeze({ compliment: 'compl', gift: 'gift', embrace: 'hug', kiss: 'kiss' });
 const STAMPED = Object.freeze(['polite', 'blunt', 'poach', ...Object.values(DEED_STAMPS)]);

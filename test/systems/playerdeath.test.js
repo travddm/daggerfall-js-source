@@ -191,7 +191,7 @@ test('DC1: the standalone dungeon sinks OUTSIDE the overlay-held walk branch, th
   assert.match(ctxSrc, /const _ms = opts\.motorState\?\.\(\) \?\? null;\n\s+activeOverlay = new DeathScreen\(\{ eyeHeight: _ms\?\.eyeLevel, capsuleHeight: _ms\?\.capsule, onReset:/,
     'the presenter takes the live heights through opts.motorState');
   assert.match(scene, /motorState: \(\) => \(_motorRef \? \{ eyeLevel: _motorRef\.eye\[1\] - _motorRef\.pos\[1\], capsule: _motorRef\.height, fallFrom: _motorRef\.falling \? _motorRef\.fallStart : null \} : null\)/,
-    'the scene passes the seam, late-bound like the F222 pose');   // AUDIT SD III (D1, PIN MOVED): and the fall under way, for the walked trail
+    'the scene passes the seam, late-bound like the F222 pose');   // AUDIT SD III (D1
   assert.match(scene, /_motorRef = player;/, 'the slot binds once the motor exists');
 });
 
@@ -252,7 +252,7 @@ test('merge audit: the death screen reads the LIVE character, not a host argumen
 });
 
 test('AUDIT-DEATH1: the lethal exhaustion collapse goes through the ONE damage door in all FOUR hosts, never a raw zero', () => {
-  // Mac, 2026-09-19: "sometimes get stuck at 0% health and live", with a
+  // with a
   // screenshot of a DUNGEON at HEALTH 0% / FATIGUE 0%, still playing.
   //
   // `hurtPlayer` (characters/playerEntity.js) raises the death presenter
@@ -269,7 +269,6 @@ test('AUDIT-DEATH1: the lethal exhaustion collapse goes through the ONE damage d
   // away, and a file-wide grep passed on THAT call while this one was
   // mutated back to a raw zero. A pin that another site can satisfy is
   // not a pin for this one.
-  // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): the collapse has no lethal branch left - with foes about it costs a
   // tenth of the health, and the tenth that reaches nothing is what kills. So the law moves with it: the foes-about arm
   // takes its share through the damage door, shield bypassed, and the collapse writes no health raw.
   for (const h of ['scenes/world.js', 'scenes/exterior.js', 'scenes/worldModes.js', 'scenes/dungeonContext.js']) {

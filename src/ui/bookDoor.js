@@ -1,8 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
-// EB1 - THE BOOK READER'S ONE DOOR (2026-09-12).
+// EB1 - THE BOOK READER'S ONE DOOR.
 //
-// Mac: "For the book reader, I was wondering if we could use the
-// animated book in my repo project-raum." Then: "Do it."
+// Then: "Do it."
 //
 // The eighth door of the shape the pause, the pack, the sheet, the
 // spellbook, the chronicle, the travel map and the talk panel wear:
@@ -117,8 +116,7 @@ function enhancedBookOverlay(model) {
     if (view) view.key('Escape');
     else { if (!model.done) model.input('Escape'); relock(); teardown(); }
   };
-  // EB4 (Mac: "tapping use doesn't do anything and then locks me out
-  // of pointerclick in inventory"): THE CANVAS MOUNTS ON THE HOST'S
+  // EB4: THE CANVAS MOUNTS ON THE HOST'S
   // FIRST DRAW, not on construction. The hook builds this window
   // before it knows whether the host will take it - showReader can
   // decline - and a canvas raised at construction stood over the

@@ -1,5 +1,4 @@
-// REL8 (2026-10-09, Mac: "Let's officially start numbering updates beginning with 0.0.1"; `01-Overview/Desktop-App.md`
-// REL8) - EVERY MERGE TO MAIN IS A NUMBERED UPDATE. MAJOR.MINOR is the line (scripts/updateLine.mjs, by hand); PATCH is
+// REL8 - EVERY MERGE TO MAIN IS A NUMBERED UPDATE. MAJOR.MINOR is the line (scripts/updateLine.mjs, by hand); PATCH is
 // the count of main's first-parent commits from the merge that last changed the line - derived, never bumped, so the
 // merge that brings the line is 0.0.1 whatever merged before it. The number is stamped into the build beside the
 // commit (scripts/buildTag.mjs), shown in the game, named on the release and read back by the launcher's news; the

@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PORTAL1 (2026-10-04, the owner: "So with the removal of fast travel, I want to implement a new item available at all
-// shops, this should cost weykar shards (from dismantling gear with rarity). These should always be readily available.
-// When using this item, it opens a portal allowing you to traverse to anywhere on the map. This is a one use item that
-// stays open for a short time, allowing multiple players to traverse"): THE PORTAL STONE.
+// PORTAL1: THE PORTAL STONE.
 //
 //   - THE STONE (systems/gate/gateSpoils.js, template 572 beside the Welkynd Shard's 571): bound, stacking with its own kind.
 //   - THE COUNTER: every shop's keeper (shopStock.js isShop - the nine kinds) sells them for PORTAL_STONE_SHARDS Welkynd
@@ -87,8 +84,6 @@ export const PORTAL_TEXT = Object.freeze({
   get event() { return t('portal.refused.event', 'A portal cannot open this close to an event\'s gate.'); },
   gone: `The ${PORTAL_STONE.name} is no longer where you kept it.`,
   opened: (name) => `A portal to ${name} tears open. Step through before it closes.`,
-  /** PORTAL-GIFT (gateSpoils.js givePortalGift): said once the world stands. */
-  gift: (n) => `You have been given ${n} ${PORTAL_STONE.name}s. Use one to open a portal to anywhere on the map.`,
 });
 
 /** THE HOLDS, in the ladder's order: what keeps a portal shut - for its opener at the door and at the pick, and for

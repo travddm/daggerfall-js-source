@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11): WHAT A PORT TOWN'S SHIPYARD IS MADE OF - the port's own geometry in the shipyard's own frame
+// SHIPYARDS: WHAT A PORT TOWN'S SHIPYARD IS MADE OF - the port's own geometry in the shipyard's own frame
 // (y up from its ground, its FRONT - its gate's side, the street's - along +z, its BACK - the sea's, where its slipway
 // runs out - along -z, x across), worn in the port's own art (world/portArt.js, PORT_ARCHIVE) through the yards' face kit
 // (world/merchantYards/merchantYardModels.js). Every face is wound outward and the collider is the same triangles; the hull on the

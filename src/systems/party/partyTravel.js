@@ -1,6 +1,5 @@
 // @ts-check
-// PARTY-TRAVEL (2026-09-25, Mac: "Implementing a prompt for online to travel to party leader and the option for party
-// members to ready up and travel together"): THE PARTY'S JOURNEY, AS A SESSION - what the leader's round and a member's
+// PARTY-TRAVEL: THE PARTY'S JOURNEY, AS A SESSION - what the leader's round and a member's
 // answer keep between frames, over the law (systems/party/partyTravelLaw.js, whose header carries the design) and the host's
 // seams. scenes/world.js owns the seams - the picture (net/social.js), who is gathered (the rest law's own near), the
 // fare (the travel map's own popup, headless), the refusals (the map door's rungs), the prompt (ui/yesNoBox.js, either
@@ -65,7 +64,7 @@ export function followerSeatOf(party, me) {
  *   travel(pick, opts, computed) -> Promise<boolean>   the map's fast travel (a pick may carry besideAt / besideText /
  *                       besideMissedText / besideSeat)
  *   openMap()           the travel map, after a No at its own offer
- *   clock()             a monotonic clock, ms (performance.now);  relayOk()  the hub carries the round's fields
+ *   clock()             a monotonic clock, ms (performance.now);  relayOk()  a hub link carries the round's fields
  *   poseDirty()         compose my party pose again on the next frame
  */
 export function createPartyTravel(host) {
@@ -99,7 +98,7 @@ export function createPartyTravel(host) {
     return party.members.find((m) => m.acct === party.leader) ?? null;
   };
   const roundOf = (lead) => (lead && memberPresent(lead) ? tripRoundOf(lead.p, social().now()) : null);
-  /** PARTY-READY (2026-10-01, Mac: "when party readying up, the ui element is hidden"): THE LEADER'S WAIT, ON THE HUD
+  /** PARTY-READY: THE LEADER'S WAIT, ON THE HUD
    *  FOR THE ROUND - it stood PARTY_REST_FAR_SECONDS (4) of a round that runs PARTY_READY_TIMEOUT_MS (60), and the
    *  rest of the ready-up showed nothing there. Set again only as the count moves (every label is a notebook line), for
    *  what is left of the round; the round's end says its own line over it. */
@@ -172,8 +171,8 @@ export function createPartyTravel(host) {
   }
 
   /** THE LEADER'S BEGIN WITH THE PARTY GATHERED - a PROPOSAL, not a departure. True when a round opened (the map's
-   *  journey waits on it); false and the journey is the map's own, alone, as always: no party, not its leader, a hub
-   *  from before PARTY_TRAVEL_RELAY_MIN (the round's fields would reach nobody), a WALKED trip (Travel Options' - the
+   *  journey waits on it); false and the journey is the map's own, alone, as always: no party, not its leader, no hub
+   *  link (the round's fields would reach nobody), a WALKED trip (Travel Options' - the
    *  party rides it together on its own feet, and no teleport can arrive beside anyone), a trip to where I stand,
    *  nobody gathered, a round of mine that set out and is still held for its followers. The leader's Begin is the
    *  leader's yes; the fare is taken when the party sets out. */
@@ -499,8 +498,7 @@ export function createPartyTravel(host) {
       if (s.leads()) return null;
       return respondTo(!!yes).line;
     },
-    /** PARTY-UI (2026-09-26, Mac: "Instead of party chat commands, we need to add the party travel commands to the
-     *  UI"): WHAT THE PARTY TAB'S JOURNEY SHOWS - its buttons are `command`'s two, so the tab and the chat are one
+    /** PARTY-UI: WHAT THE PARTY TAB'S JOURNEY SHOWS - its buttons are `command`'s two, so the tab and the chat are one
      *  door. Null outside a party. The leader: the round I lead (where, the count of the gathered, whether it has set
      *  out) or none. A member: the leader's open round (where; ready, staying behind, or neither; whether I stand
      *  gathered to answer it), whether I follow a journey, and whether the leader stands more than a pixel off (the tab

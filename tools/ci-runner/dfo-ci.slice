@@ -1,0 +1,7 @@
+# Caps all runner containers together, so a burst of CI cannot starve the game servers. Install as
+# /etc/systemd/system/dfo-ci.slice and edit the numbers to the box (docs/ci/self-hosted-runner.md, Capacity).
+[Slice]
+MemoryMax=24G
+MemorySwapMax=0
+CPUWeight=20
+TasksMax=16384

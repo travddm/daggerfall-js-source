@@ -1,6 +1,5 @@
 // @ts-check
-// WB9a (2026-09-30, Mac: "Can we add the modifers below his health bar? Allow people to see the modifers/trial as a
-// popup before it starts."): THE WARDEN'S MARKS, SEEN. WB8b gave him an aspect and two trials every gate and said them
+// WB9a: THE WARDEN'S MARKS, SEEN. WB8b gave him an aspect and two trials every gate and said them
 // in words - the omen's chat line, the map's card, a line as a fighter steps through, the names joined on a line of the
 // bar. None of it said what a mark DOES while the fight was on, and nothing showed them before the step. Now:
 //
@@ -124,8 +123,7 @@ export const MARKS_CARD_TEXT = Object.freeze({
 /** The card, stepping through: how long it stands over the court before it has gone (its last MARKS_CARD_FADE_MS a fade). */
 export const MARKS_CARD_ARRIVE_MS = 9000;
 export const MARKS_CARD_FADE_MS = 700;
-/** Where it stands - 'arrive' low on the right, clear of the crosshair and his bar (GATE-UX, 2026-10-01, Mac: "move
- *  the modifer panel that shows away from center of the screen, it's obstructive" - it stood over the middle of the
+/** Where it stands - 'arrive' low on the right, clear of the crosshair and his bar (GATE-UX, 2026-10-01, - it stood over the middle of the
  *  court as the fight began), 'gate' to the side, under the compass line. */
 export const MARKS_CARD_MODES = Object.freeze(['arrive', 'gate']);
 

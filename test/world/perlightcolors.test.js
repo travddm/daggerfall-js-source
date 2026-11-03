@@ -132,7 +132,7 @@ test('LT1: _pointColorData answers the host array as-is, or the shared colour sp
 
 test('LT1: all four fragment shaders accumulate vec3 pointAcc off uPointColors[i]; the scalar channel is GONE', () => {
   const r = src('render/renderer.js');
-  // MAC-BUG W4 (2026-09-20): FIVE, not four. The DECAL pass grew the
+  // MAC-BUG W4: FIVE, not four. The DECAL pass grew the
   // same term - a blood mark was lit by ambient alone while the gib
   // from the same blow took the full light - and it took this one
   // character for character, which is what EL1's own pin holds it to.
@@ -145,7 +145,6 @@ test('LT1: all four fragment shaders accumulate vec3 pointAcc off uPointColors[i
 
 test('LT1: both interior hosts feed colour x intensity from AddLight\'s own switch', () => {
   for (const host of ['scenes/worldModes.js', 'scenes/interior.js']) {
-    // PIN MOVED (INTERIOR-DIM, 2026-10-11): the product goes through the lane's law now - DFU's own off the lane
     assert.match(src(host), /\(l\) => interiorLightColor\(!!renderer\.lightingLane, l\.color, l\.intensity\)/,
       `${host} premultiplies intensity into the uploaded colour, the Unity light product`);
     assert.match(src(host), /setPointLights\(\w+\.data, null, \w+\.colors\)/,

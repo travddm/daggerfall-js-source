@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF-FLATMAP (2026-10-24, mob: "did u get the flat map done?", "make sure the overwolrd map and flat map works"; design
-// doc Flat map: a third in-game view, one region from above, dots red/grey, the Most urgent list) - THE FLAT MAP'S HOST,
+// STAFF-FLATMAP - THE FLAT MAP'S HOST,
 // out of bootWorld (HOST-SPLIT): made by the staff view (scenes/staffViewHost.js) and opened with Shift+N. It watches one
 // region at a time on the map's hidden link (net/staffMap.js - Hide me on, or nothing is sent and the sheet says so),
 // opens on the region the staff member stands in, and steps to the previous or next one. The land is the politic map's

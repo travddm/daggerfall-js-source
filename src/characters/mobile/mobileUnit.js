@@ -228,7 +228,7 @@ export function rollAttackFrames(basics, roll100) {
   return basics.primaryAttackAnimFrames ?? [0, 1, 2, 3, 4];
 }
 
-/** DEX4b (bible/04-Characters/Enemy-Expansion.md section 9): A MOD'S FORCED GENDER - `fn(mobileType)` -> 'male' |
+/** DEX4b: A MOD'S FORCED GENDER - `fn(mobileType)` -> 'male' |
  *  'female' | null. Daggerfall Enemy Expansion's OnLootSpawned sets the entity's gender and the unit summary's over
  *  whatever the unit resolved (BestiaryMod.cs:1364-1392), "so we get the correct groans": after the roll, never
  *  instead of it - the DFRandom draw is spent as it was. */
@@ -500,7 +500,7 @@ export class MobileUnit {
    * a level signal would replay the sequence inside one swing.
    */
   update(dt, { moving = false, striking = false, hurting = false, casting = false, rangedStriking = false, hold = false } = {}, yaw, feet, cameraPos) {
-    // TELL2 (bible/12-Enhanced-AI/Feud-Arc.md section 4.1): A TELEGRAPHED BLOW'S SWING, HELD. The port's own beat - DFU
+    // TELL2: A TELEGRAPHED BLOW'S SWING, HELD. The port's own beat - DFU
     // has none: `hold` true plays the swing that began under it up to the frame before its first -1 (the raised arm) and
     // stands there; false lets it strike on the next step; 'cancel' drops it (its wind-up broke, a paralysis). Only a
     // swing that BEGAN under the hold answers it - a DFU swing in flight is never held, never dropped (the wind-up's own

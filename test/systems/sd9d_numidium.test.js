@@ -1,4 +1,4 @@
-// SD9d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS OF NUMIDIUM -
+// SD9d: THE BRASS OF NUMIDIUM -
 // the Brass Remnant's own Aetheric set (systems/sigil/sigilSets.js 'numidium', systems/aetheric.js NUMIDIUM_SET_PIECES): its
 // law, its nine records of Dwarven brass at the Legendary band's top, the spoils' last roll that carries one a third of
 // the time, and its three tiers through the powers' seams (systems/sigil/sigilSetPowers.js) - Dwemer Brass (magic and shock
@@ -65,7 +65,7 @@ const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)
 // ── the law and the records ───────────────────────────────────────────
 
 test('SD9d THE LAW: The Brass of Numidium after the serpent\'s - Aetheric, Kagrenac its patron, the Hourbreaker\'s brass its colour, no raiding party\'s, never a world set; Dwemer Brass, Gearward and The Hour Turns at 2, 4 and 6 pieces, each a whole pair from Faint to Ascendant, every brief inside BRIEF_MAX at every stage (mutants: a tier\'s number; a world set)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(-5), ['numidium', 'panoply', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - the Brass Remnant\'s own - PIN MOVED (EG15): the Battlemage\'s Panoply after it - PIN MOVED (WITCH1): the Wyrd\'s Raiment after that - PIN MOVED (STAR7): the Starspun Weave last');
+  assert.deepEqual(SIGIL_SET_IDS.slice(-4), ['numidium', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - the Brass Remnant\'s own - PIN MOVED (WITCH1): the Wyrd\'s Raiment after it - PIN MOVED (STAR7): the Starspun Weave last');
   const s = setById('numidium');
   assert.deepEqual([s.id, s.name, s.prince, s.colour, s.aetheric, 'raid' in s, s.role],
     ['numidium', 'The Brass of Numidium', 'Kagrenac', '#b5862f', true, false, 'What the Warp kept of the Walking Brass']);
@@ -74,12 +74,12 @@ test('SD9d THE LAW: The Brass of Numidium after the serpent\'s - Aetheric, Kagre
   assert.ok(![0, 1, 2].some((p) => raidSetOf(p)?.id === 'numidium'), 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'dwemer-brass', 'Dwemer Brass', { magic: [4, 10], shock: [4, 10] }],
-    [4, 'gearward', 'Gearward', { lighter: [15, 30], recover: [18, 12] }],
+    [4, 'gearward', 'Gearward', { lighter: [2, 3], recover: [18, 12] }],   // PIN MOVED: B5 (Gearward 6-10 -> 2-3)
     [6, 'hour-turns', 'The Hour Turns', { heal: [15, 25], recover: [90, 60] }],
   ]);
   for (const t of s.tiers) for (let st = 0; st <= SET_STAGE_MAX; st++) { const b = t.brief(tierValues(t, st)); assert.ok(b.length <= BRIEF_MAX, `${t.key} at ${st}: "${b}"`); }
-  assert.deepEqual(s.tiers.map((t) => t.brief(tierValues(t, SET_STAGE_MAX))), ['+10 magic, +10 shock resist', 'A foe\'s blow 30% lighter', 'Death turned back, heal 25%']);
-  assert.equal(s.tiers[1].text(tierValues(s.tiers[1], 0)), 'The next enemy hit on you deals 15% less damage. Recovers in 18 s');
+  assert.deepEqual(s.tiers.map((t) => t.brief(tierValues(t, SET_STAGE_MAX))), ['+10 magic, +10 shock resist', 'A foe\'s blow 3% lighter', 'Death turned back, heal 25%']);   // PIN MOVED: B5 (Gearward Ascendant 10 -> 3)
+  assert.equal(s.tiers[1].text(tierValues(s.tiers[1], 0)), 'The next enemy hit on you deals 2% less damage. Recovers in 18 s');
 });
 
 test('SD9d THE RECORDS: nine in the places\' order - the seven body pieces, a round shield and a ONE-HANDED Longsword (all nine worn at once) - Dwarven, the Dwemer\'s brass; every affix at the Legendary band\'s TOP (the Regalia\'s), the blow the sigil\'s greatest; never a magic or shock resistance (the 2-piece tier\'s) and one of an element at most; AETHERIC_RECORDS ends with them (mutants: a number off the top; a doubled element; the make; the order)', () => {
@@ -103,7 +103,7 @@ test('SD9d THE RECORDS: nine in the places\' order - the seven body pieces, a ro
   assert.ok(!resists.includes('magic') && !resists.includes('shock'), 'never magic or shock - Dwemer Brass carries them');
   assert.equal(new Set(resists).size, resists.length, 'one resistance of an element at most');
   const upTo = REGALIA.length + RAID_SET_PIECES.length + SERPENT_SET_PIECES.length + NUMIDIUM_SET_PIECES.length;
-  assert.deepEqual(AETHERIC_RECORDS.slice(0, upTo), [...REGALIA, ...RAID_SET_PIECES, ...SERPENT_SET_PIECES, ...NUMIDIUM_SET_PIECES], 'PIN MOVED (EG15): then the Battlemage\'s Panoply');
+  assert.deepEqual(AETHERIC_RECORDS.slice(0, upTo), [...REGALIA, ...RAID_SET_PIECES, ...SERPENT_SET_PIECES, ...NUMIDIUM_SET_PIECES], 'the Brass after the serpent\'s');
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
 });
 
@@ -162,30 +162,30 @@ test('SD9d GEARWARD (4): while the gear is wound a foe\'s blow lands its share l
   door(e);
   at(10);
   blow(e, 40);
-  assert.equal(e.health, 66, 'Faint: 15% of 40 is 6 - the blow lands 34');
+  assert.equal(e.health, 61, 'Faint: 2% of 40 is 0.8, a whole point - the blow lands 39');   // PIN MOVED: B5 (Gearward Faint 6 -> 2)
   assert.deepEqual(v.sounds, ['gear'], 'the gear catches it');
   at(20);
   blow(e, 40);
-  assert.equal(e.health, 26, 'wound again only at 28: this one lands whole');
+  assert.equal(e.health, 21, 'wound again only at 28: this one lands whole');
   e.health = 100;
   at(30);
   hurtPlayer(e, 20);
   assert.equal(e.health, 80, 'a fall\'s hurt - no foe\'s blow - lands whole');
   blow(e, 30);
-  assert.equal(e.health, 55, 'the gear still wound for the blow after it: 15% of 30 is 4.5 - whole points, 5 turned');
+  assert.equal(e.health, 51, 'the gear still wound for the blow after it: 2% of 30 is 0.6 - whole points, 1 turned');   // PIN MOVED: B5 (Gearward Faint 6 -> 2)
   assert.equal(setPowerStates(30).gearLeft, 18, 'winding again for 18 s');
   fresh(); online(40);
   const asc = wearSet(player(), 'numidium', 4, XP[4]);
   door(asc);
   at(5);
   blow(asc, 50);
-  assert.equal(asc.health, 65, 'Ascendant: 30% of 50 is 15 - the blow lands 35');
+  assert.equal(asc.health, 52, 'Ascendant: 3% of 50 is 1.5, 2 whole points - the blow lands 48');   // PIN MOVED: B5 (Gearward Ascendant 10 -> 3)
   at(16);
   blow(asc, 10);
-  assert.equal(asc.health, 55, 'wound at 17: whole');
+  assert.equal(asc.health, 42, 'wound at 17: whole');
   at(17);
-  blow(asc, 10);
-  assert.equal(asc.health, 48, 'wound: 3 of 10 turned');
+  blow(asc, 20);
+  assert.equal(asc.health, 23, 'wound: 3% of 20 is 0.6, 1 turned');   // PIN MOVED: B5 (second blow 10 -> 20: 3% of 10 is under half a point and spends no winding)
   fresh(); online(1);
   const three = wearSet(player(), 'numidium', 3);
   door(three);
@@ -198,7 +198,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   const e = wearSet(player(), 'numidium', 6);
   door(e);
   at(10);
-  e.health = 99;   // PIN MOVED (FULL-GUARD, FIELD BUGS 2026-10-11b): a foe's blow from full leaves me at 1 before any death save - a point short of full, the Hour's own save takes it
+  e.health = 99;
   const dead = blow(e, 150);
   assert.equal(dead, false, 'no death');
   assert.equal(e.health, 16, 'left at 1, and 15% of 100 back');
@@ -221,7 +221,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   const asc = wearSet(player(), 'numidium', 6, XP[4]);
   door(asc);
   at(5);
-  asc.health = 99;   // PIN MOVED (FULL-GUARD): a point short of full
+  asc.health = 99;
   blow(asc, 500);
   assert.equal(asc.health, 26, 'Ascendant: a quarter back');
   assert.equal(setPowerStates(5).hourRecoverLeft, 60);
@@ -229,7 +229,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   fresh(); online(1);
   const five = wearSet(player(), 'numidium', 5);
   door(five);
-  five.health = 99;   // PIN MOVED (FULL-GUARD): a point short of full
+  five.health = 99;
   assert.equal(blow(five, 150), true, 'five pieces wake no Hour Turns');
   assert.deepEqual(awakeTiersOf(wearSet(player(), 'numidium', 5)).get('numidium').map((t) => t !== null), [true, true, false]);
   fresh(); online(1);
@@ -237,7 +237,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   door(duel);
   setSetsDueling(true);
   assert.equal(awakeTiersOf(duel), null);
-  duel.health = 99;   // PIN MOVED (FULL-GUARD): a point short of full
+  duel.health = 99;
   assert.equal(blow(duel, 150), true, 'asleep in a duel');
   setSetsDueling(false);
 });
@@ -246,10 +246,8 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
 
 test('SD9d THE HOST: world.js gives the Brass\'s powers the Orrery hall\'s own sounds through the voice\'s index door, as the hall plays them - the gear\'s clunk for Gearward, the low bell\'s toll for The Hour Turns (mutants: a power unvoiced; the sounds crossed)', () => {
   const w = strip(read('src/scenes/world.js'));
-  // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS): the snap's line is sdSnapLine's now (it names whom it lashes), so SD_HALL_TEXT
   // left the import; the sounds are the hall's as ever
   assert.match(w, /import \{ sdSnapLine, sdHallNamed, SD_HALL_SOUNDS \} from '\.\/superDungeon\/sdHall\.js';/);
-  // PIN MOVED (AUDIT SD IV A3): the index door (playOneShot) - the ID door played whatever record carries the ID 433 or
   // 107, not the hall's records (sd26_audio runs the voice)
   assert.match(w, /else if \(name === 'gear'\) audio\.playOneShot\(SD_HALL_SOUNDS\.clunk, 1\);/);
   assert.match(w, /else if \(name === 'hour'\) audio\.playOneShot\(SD_HALL_SOUNDS\.toll, 1\);/);

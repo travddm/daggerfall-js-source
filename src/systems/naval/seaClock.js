@@ -1,6 +1,5 @@
 // @ts-check
-// TIME-DILATION (2026-10-17, the owner: "fix a pre existing issue where AI can actually use the overworld as time
-// dilation"; bible/03-World/Naval-Refit.md TIME-DILATION) - THE SEA'S CLOCK. The sea fight is stepped on the world's
+// TIME-DILATION - THE SEA'S CLOCK. The sea fight is stepped on the world's
 // clock (scenes/world.js navalFrame: `dt * worldTimeScale()`, AUDIT NAV1's "the sea keeps the world's time"), so a fast
 // traveller's x5 to x100, or Come Sail Away's helm keys, ran every ship of the sea at that rate - her sailing, her
 // reloads, her volleys. Alone, that is the world's own time and the traveller's to keep (the journey and the helm hold

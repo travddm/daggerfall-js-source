@@ -183,7 +183,7 @@ export function chooseRandomEnemy(ctx, rolls = Math.random) {
 // the read below is DFU's own belt-and-braces copy at :560, whose
 // comment admits it "should not need" to be there.
 
-/** REST5 (bible/06-Systems/Rest-Arc.md 2.6): ONLY THE RESTER ROLLS. A party member's night carried for me runs my own
+/** REST5 (2.6): ONLY THE RESTER ROLLS. A party member's night carried for me runs my own
  *  RestSession through my own host's bag - its hourly checks, its catch-up loop - and every host's ambush is this one
  *  decision (the outdoor encounter tick and the dungeon's _restAdvance both ask it), so inside `quietNights(fn)` it
  *  answers nothing. Re-entrant; the count always comes back down. */
@@ -404,8 +404,7 @@ export function foeHostile(f) {
   return !!f && !f.dead && !!f.ai && (f.ai.isHostile ?? true) && mobileTeamOf(f.entity) !== 'PlayerAlly';
 }
 
-/** WILD-ALERT (2026-10-04, Mac: "Enemies alerted are given an exclamation point and slow down as they do now, non alerted
- *  enemies do not slowdown or bother the player"): A FOE ALERTED TO ME - hostile (the gate above), its target me (the
+/** WILD-ALERT: A FOE ALERTED TO ME - hostile (the gate above), its target me (the
  *  motor's own latch, `targetIsLocalPlayer`; a peer's puppet, its stream's), and seeing me or still hunting me blind
  *  (EnemyMotor.GiveUpTimer, the pursuit that outlives a lost sight). What holds a fast traveller's clock (OW6) and wears
  *  the "!" (systems/wild/wildAlert.js); a foe that has not noticed me is neither. */

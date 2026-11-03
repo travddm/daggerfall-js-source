@@ -26,6 +26,7 @@ import {
   pcaaoAdrenalineRushToHit, pcaaoStatDiffsToHit, pcaaoAdjustmentsToHit, pcaaoAlterDamageBasedOnWepCondition,
   PCAAO_BODY_PARTS, unityRound, pcaaoArmorToHit,
 } from './pcaao.js';
+import { pcaaoCritDamageMultiplier, PCAAO_CRIT_HIT_DIVISOR } from './pcaao-critical.ts';
 import { SWING_MODS } from './playerWeapon.js';
 import { enchantChanceToHitMod } from '../systems/enchantments.js';
 import { weaponDamageMods, weaponBlowMods } from '../systems/entityMods.js';
@@ -94,11 +95,11 @@ export function criticalModel(entity, core) {
   const crit = skillValue(entity, SKILLS.CriticalStrike);
   const pct = (n) => Math.max(0, Math.min(100, n)) / 100;
   if (!core.overhaul) return { chance: pct(crit), hitBonus: int(crit / 10), damageMult: 1, kind: 'hit' };   // CalculateSkillsToHit
-  if (!core.modules.criticalStrikesIncreaseDamage) return { chance: pct(int(crit / 3)), hitBonus: int(crit / 3), damageMult: 1, kind: 'hit' };
+  if (!core.modules.criticalStrikesIncreaseDamage) return { chance: pct(int(crit / 3)), hitBonus: int(crit / PCAAO_CRIT_HIT_DIVISOR), damageMult: 1, kind: 'hit' };
   const luckTerm = Math.floor(Math.fround((liveStat(entity, 'luck') - 50) / 25));
   return {
-    chance: pct(int(crit / (4 - luckTerm))), hitBonus: int(crit / 4),
-    damageMult: Math.fround(Math.fround(int(crit / 5) * Math.fround(0.05)) + 1), kind: 'damage',
+    chance: pct(int(crit / (4 - luckTerm))), hitBonus: int(crit / PCAAO_CRIT_HIT_DIVISOR),
+    damageMult: pcaaoCritDamageMultiplier(crit), kind: 'damage',
   };
 }
 
@@ -118,9 +119,9 @@ function hitModel(ctx, swing, foe) {
   let base; let other;
   const dodge = skillValue(foe, SKILLS.Dodging);
   if (core.overhaul) {
-    base = Math.ceil(Math.fround(skill * 1.5)) + swing.toHit + prof.toHitMod + racial.toHitMod + (weapon ? pcaaoWeaponToHit(weapon) : 0);
+    base = skill + swing.toHit + prof.toHitMod + racial.toHitMod + (weapon ? pcaaoWeaponToHit(weapon) : 0);
     other = pcaaoAdrenalineRushToHit(entity, foe) + enchantChanceToHitMod(entity) + pcaaoStatDiffsToHit(entity, foe)
-      - int(dodge / 2) + pcaaoAdjustmentsToHit(foe);
+      - int(dodge / 4) + pcaaoAdjustmentsToHit(foe);
   } else {
     base = skill + swing.toHit + prof.toHitMod + racial.toHitMod;
     if (weapon) {

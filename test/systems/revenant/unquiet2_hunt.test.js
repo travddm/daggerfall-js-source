@@ -1,4 +1,4 @@
-// UNQUIET II (bible/06-Systems/Revenants.md section 47; the owner, 2026-10-18: "Keep building", of UNQUIET's "we need to
+// UNQUIET II (;, of UNQUIET's "we need to
 // go deeper on the experience"). THE TRAIL: an escape with a lair to go to leaves a warm trail - its lair known at once,
 // and found there within twelve hours it is still wounded, at 60% of its health. OMENS: the day it is due, a card says it
 // is coming, in its ambition's words. THE DREAD'S TROPHY: Legendary always. Pinned: the numbers; the trail through the
@@ -89,7 +89,6 @@ test('UNQUIET II THE ESCAPE\'S CARD: where its trail leads, after its wound; a c
   setWorldMinutes(DAY * 10);
   const r = made(p, { now: DAY * 10 });
   const ev = N.revenantEscapeEvent(r, 'Ayla', { rolls: () => 0 });
-  // PIN MOVED (AUDIT UNQUIET, section 49): it recovers - "heal" is its wounds' word, on their own law
   assert.ok(ev.body.endsWith(' Its trail leads to Tomb of Vaness, where it has gone to ground to recover. Catch it before it is whole again.'), ev.body);
   assert.ok(ev.line.endsWith('Catch it before it is whole again.'), 'the line too');
   setWorldMinutes(DAY * 10 + U.HUNT.MINUTES);
@@ -123,7 +122,6 @@ test('UNQUIET II THE HUNT AND THE PAGE: while the trail is warm its hunt says so
   r.dueAt = DAY * 30;
   const hunt = (now) => N.revenantHuntEntries({ px: 100, py: 100 }, { now }).find((h) => h.id.endsWith(r.id));
   const lines = (now) => hunt(now).messages[0].map((l) => l.text);
-  // PIN MOVED (AUDIT UNQUIET, section 49): "Weakened", recovering - its wounds are the player's, healing on their own law
   assert.ok(lines(DAY * 10).includes('Weakened, it went to ground here to recover. It will be whole again in 12 hours.'));
   assert.ok(lines(DAY * 10 + 690).includes('Weakened, it went to ground here to recover. It will be whole again in 1 hour.'));
   assert.ok(!lines(DAY * 10 + U.HUNT.MINUTES).some((l) => l.startsWith('Weakened')), 'cold');

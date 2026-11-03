@@ -1,9 +1,6 @@
 // @ts-check
-// TECH1 (2026-10-10, the owner: "detailed weapon skill affixes for each weapon type. For example, a bow could roll with
-// an attack that allows you to aim and place a telegraph that shoots a volley of arrows, or a sword attack that allows
-// you to leap and attack your opponent, etc. This would have its own keybinding"; then "This is your baby. I want you
-// to be as detailed as possible and take your time. No exceptions"): THE WEAPON TECHNIQUES, AS DATA - the design and
-// its laws are bible/05-Combat/Weapon-Techniques.md.
+// TECH1: THE WEAPON TECHNIQUES, AS DATA - the design and
+// its laws are.
 //
 // A technique is a LINE ON THE WEAPON (systems/loot/lootRarity.js AFFIX_KINDS.technique): `{ id: 'technique', param: <a
 // technique's id>, value: <+% power> }`, rolled at a loot door's end, read by the card, reforged and honed like every
@@ -18,7 +15,6 @@
 // Physical Combat overhaul's model when it is on) - never a flat damage. A miss is still a miss.
 
 import { weaponSkillUsed } from '../../characters/weapons.js';
-import { isGunTemplate } from '../../characters/thunderlockIds.js';
 import { SKILLS } from '../../systems/skills.js';
 import { RRI_CLASSES } from '../../systems/roleplayRealismItems/rriItems.js';   // AUDIT TECH1: an RRI class answers its family whatever its switch says
 
@@ -26,21 +22,19 @@ import { RRI_CLASSES } from '../../systems/roleplayRealismItems/rriItems.js';   
 export const GAUNTLETS_TEMPLATE = 103;
 
 /** The families a piece belongs to, by the skill it swings with - DaggerfallUnityItem.GetWeaponSkillUsed's answer
- *  (characters/weapons.js weaponSkillUsed, an RRI custom class's own included). The Thunderlock is scored on Archery
- *  (its departure) but is a gun: it has a family of its own, so a volley of pellets never rains. */
-export const TECHNIQUE_FAMILIES = Object.freeze(['archery', 'thunderlock', 'longBlade', 'shortBlade', 'axe', 'blunt', 'handToHand']);
+ *  (characters/weapons.js weaponSkillUsed, an RRI custom class's own included). */
+export const TECHNIQUE_FAMILIES = Object.freeze(['archery', 'longBlade', 'shortBlade', 'axe', 'blunt', 'handToHand']);
 const FAMILY_OF_SKILL = new Map([
   [SKILLS.Archery, 'archery'], [SKILLS.LongBlade, 'longBlade'], [SKILLS.ShortBlade, 'shortBlade'],
   [SKILLS.Axe, 'axe'], [SKILLS.BluntWeapon, 'blunt'], [SKILLS.HandToHand, 'handToHand'],
 ]);
 
-/** A piece's technique family, or null: a weapon by its skill (an arrow or a pellet swings with none), the Gauntlets for
+/** A piece's technique family, or null: a weapon by its skill (an arrow swings with none), the Gauntlets for
  *  the bare hand. */
 export function techniqueFamily(item) {
   if (!item || typeof item !== 'object') return null;
   if (item.group === 'Armor') return item.templateIndex === GAUNTLETS_TEMPLATE ? 'handToHand' : null;
   if (item.group !== 'Weapons' || !Number.isInteger(item.templateIndex)) return null;
-  if (isGunTemplate(item.templateIndex)) return 'thunderlock';   // PISTOLET: the guns' family - the Pistolet takes the Thunderlock's Piercing Shot, never a volley
   // AUDIT TECH1: a Roleplay & Realism class is its class with its switch off too - the piece in the pack is still that
   // weapon, and a family that came and went with a mod's switch made its line read as a forgery and its Reforge refuse
   const rri = RRI_CLASSES[item.templateIndex];
@@ -48,10 +42,10 @@ export function techniqueFamily(item) {
   return FAMILY_OF_SKILL.get(skill ?? -1) ?? null;
 }
 
-/** THE POWER BANDS - the line's value, `+N%` on the technique's own multiplier, per rolled tier ([min, max]
+/** THE POWER BANDS (B1: 5-10 / 10-20 / 20-30, were 5-15 / 15-30 / 30-50; the best technique, Haymaker at x1.5, tops at x1.95 of a blow, was x2.7) - the line's value, `+N%` on the technique's own multiplier, per rolled tier ([min, max]
  *  inclusive). One band for every technique, so the ladder's machinery (the band on the card, the reforge, the hone, the
  *  law's value check) reads the line as it reads any other. */
-export const TECHNIQUE_BANDS = Object.freeze({ magic: Object.freeze([5, 15]), rare: Object.freeze([15, 30]), legendary: Object.freeze([30, 50]) });
+export const TECHNIQUE_BANDS = Object.freeze({ magic: Object.freeze([5, 10]), rare: Object.freeze([10, 20]), legendary: Object.freeze([20, 30]) });
 
 /** Per mille that a weapon (or gauntlets) of a tier, minted at a loot door, takes a technique line - one roll at the
  *  door's END (Loot-II law 9: every draw the door made before is still its seed's). A Rare a bit under one in three; a
@@ -96,28 +90,28 @@ const DEG = Math.PI / 180;
 export const TECHNIQUES = Object.freeze({
   volley: Object.freeze({ name: 'Volley', families: Object.freeze(['archery']), mech: 'rain', aim: 'ground', base: 0.5, fatigue: 6, cooldown: 16,
     arrows: 6, radius: 3.5, range: Object.freeze([6, 28]), height: 16, delay: 0.55, spread: 1.35 }),   // AUDIT TECH1: 0.27 s a shaft - never five in a second (an arena's referee lands four: net/arena/arenaLaw.js ARENA_HIT_HZ_MAX)
-  pierce: Object.freeze({ name: 'Piercing Shot', families: Object.freeze(['archery', 'thunderlock']), mech: 'pierce', aim: 'lane', base: 1.2, fatigue: 4, cooldown: 10,
+  pierce: Object.freeze({ name: 'Piercing Shot', families: Object.freeze(['archery']), mech: 'pierce', aim: 'lane', base: 1.2, fatigue: 4, cooldown: 10,
     through: 5, length: 30, speed: 1.6 }),
-  leap: Object.freeze({ name: 'Leap Strike', families: Object.freeze(['longBlade']), mech: 'leap', aim: 'target', base: 1.4, fatigue: 5, cooldown: 12,
-    range: Object.freeze([3, 9]), apex: 1.6, radius: 2.5, strike: 'StrikeDown', toHit: 20 }),
+  leap: Object.freeze({ name: 'Leap Strike', families: Object.freeze(['longBlade']), mech: 'leap', aim: 'target', base: 1.3, fatigue: 5, cooldown: 12,
+    range: Object.freeze([3, 9]), apex: 1.6, radius: 2.5, strike: 'StrikeDown', toHit: 8 }),
   whirlwind: Object.freeze({ name: 'Whirlwind', families: Object.freeze(['longBlade']), mech: 'swing', aim: null, base: 1.0, fatigue: 5, cooldown: 10,
-    reach: 3.0, arc: 'all', strike: 'StrikeLeft', toHit: 15 }),
+    reach: 3.0, arc: 'all', strike: 'StrikeLeft', toHit: 5 }),
   shadowstep: Object.freeze({ name: 'Shadowstep', families: Object.freeze(['shortBlade']), mech: 'dash', aim: 'foe', base: 1.2, fatigue: 4, cooldown: 9,
-    range: Object.freeze([2, 8]), behind: 1.0, reach: 2.2, arc: 'view', strike: 'StrikeRight', toHit: 20 }),
+    range: Object.freeze([2, 8]), behind: 1.0, reach: 2.2, arc: 'view', strike: 'StrikeRight', toHit: 8 }),
   lunge: Object.freeze({ name: 'Lunge', families: Object.freeze(['shortBlade']), mech: 'dash', aim: 'lane', base: 1.1, fatigue: 4, cooldown: 8,
-    length: 5, halfW: 0.9, strike: 'StrikeDown', toHit: 15 }),
+    length: 5, halfW: 0.9, strike: 'StrikeDown', toHit: 5 }),
   cleave: Object.freeze({ name: 'Cleave', families: Object.freeze(['axe']), mech: 'swing', aim: null, base: 1.2, fatigue: 5, cooldown: 9,
-    reach: 3.2, arc: 80 * DEG, strike: 'StrikeRight', toHit: 15 }),
+    reach: 3.2, arc: 80 * DEG, strike: 'StrikeRight', toHit: 5 }),
   execute: Object.freeze({ name: "Headsman's Chop", families: Object.freeze(['axe']), mech: 'swing', aim: null, base: 1.2, fatigue: 5, cooldown: 11,
-    reach: 2.5, arc: 'view', wounded: 1.0, strike: 'StrikeDown', toHit: 20 }),
+    reach: 2.5, arc: 'view', wounded: 1.0, strike: 'StrikeDown', toHit: 8 }),
   slam: Object.freeze({ name: 'Ground Slam', families: Object.freeze(['blunt']), mech: 'swing', aim: null, base: 0.9, fatigue: 6, cooldown: 12,
-    reach: 3.5, arc: 'all', strike: 'StrikeDown', toHit: 15 }),
-  crush: Object.freeze({ name: 'Skull Crack', families: Object.freeze(['blunt']), mech: 'swing', aim: null, base: 1.6, fatigue: 5, cooldown: 10,
-    reach: 2.5, arc: 'view', single: true, strike: 'StrikeDown', toHit: 30 }),
+    reach: 3.5, arc: 'all', strike: 'StrikeDown', toHit: 5 }),
+  crush: Object.freeze({ name: 'Skull Crack', families: Object.freeze(['blunt']), mech: 'swing', aim: null, base: 1.4, fatigue: 5, cooldown: 10,
+    reach: 2.5, arc: 'view', single: true, strike: 'StrikeDown', toHit: 10 }),
   kick: Object.freeze({ name: 'Flying Kick', families: Object.freeze(['handToHand']), mech: 'leap', aim: 'target', base: 1.3, fatigue: 4, cooldown: 10,
-    range: Object.freeze([2, 6]), apex: 1.2, radius: 2.0, strike: 'StrikeDown', toHit: 20, airborne: true }),   // KICK-AIR: from the air too
-  haymaker: Object.freeze({ name: 'Haymaker', families: Object.freeze(['handToHand']), mech: 'swing', aim: null, base: 1.8, fatigue: 4, cooldown: 9,
-    reach: 2.5, arc: 'view', single: true, strike: 'StrikeRight', toHit: 30 }),
+    range: Object.freeze([2, 6]), apex: 1.2, radius: 2.0, strike: 'StrikeDown', toHit: 8, airborne: true }),   // KICK-AIR: from the air too
+  haymaker: Object.freeze({ name: 'Haymaker', families: Object.freeze(['handToHand']), mech: 'swing', aim: null, base: 1.5, fatigue: 4, cooldown: 9,
+    reach: 2.5, arc: 'view', single: true, strike: 'StrikeRight', toHit: 10 }),
 });
 /** The ids, in the roster's order - the line's params. */
 export const TECHNIQUE_IDS = Object.freeze(Object.keys(TECHNIQUES));

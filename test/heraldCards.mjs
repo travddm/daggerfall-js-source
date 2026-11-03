@@ -1,4 +1,4 @@
-// HERALD-CARDS (2026-10-22): a herald's post read as its card (src/net/herald/heraldCard.js) - the parts the herald pins
+// HERALD-CARDS: a herald's post read as its card (src/net/herald/heraldCard.js) - the parts the herald pins
 // name, so a pin says `cardOf(p).fields.Where` rather than walking Discord's embed shape at every assertion.
 
 /** A post's card: its content (a pinging post's alone), its family, title, text, fields by name, footer and colour. */

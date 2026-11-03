@@ -1,5 +1,4 @@
-// DYNAMIC SKIES (DS1, 2026-09-04, Mac's call: "I want to implement this
-// mod 1:1. We received permission from the creator.")
+// DYNAMIC SKIES (DS1, 2026-09-04)
 //
 // The LOGIC of Dynamic Skies 2.3.4 for Daggerfall Unity, by BadLuckBurt
 // and carademono - BLBSkybox.cs and the Scripts/ structs - ported line
@@ -440,8 +439,7 @@ export const TEXTURE_SLOTS = Object.freeze([
   '_CloudTopDiffuse', '_CloudTopNormal', '_CloudDiffuse', '_CloudNormal',
   '_StarTex', '_StarTwinkleTex', '_TwinkleTex', '_MoonTex', '_SecundaTex',
 ]);
-// DS3 (2026-09-15, Mac: "the nighttime sky has these dark spots in the
-// skybox") - THE STAR FIELD IS FILTERED, AND THAT IS A DEPARTURE.
+// DS3 - THE STAR FIELD IS FILTERED, AND THAT IS A DEPARTURE.
 //
 // The mod imports every one of these Point, and the port matched it.
 // At night that costs the sky: `night * horizonValue` reaches 1.0, so

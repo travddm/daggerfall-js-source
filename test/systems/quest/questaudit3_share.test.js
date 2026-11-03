@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The audit's party-share fixes, each pinned here
+// QUEST-AUDIT III. The audit's party-share fixes, each pinned here
 // through the real machine and the real share path (prepareQuestShare -> receiveSharedQuest), two or three machines
 // passing real envelopes:
 //
@@ -21,7 +20,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { QuestMachine } from '../../../src/systems/quest/machine.js';   // PIN MOVED (AUDIT QA3 E1): SHARER_QUIET_TICKS is gone - the wait reads the sharer's seat, not the party's silence
+import { QuestMachine } from '../../../src/systems/quest/machine.js';
 import { loadQuestTables } from '../../../src/systems/quest/tables.js';
 import * as QS from '../../../src/systems/quest/questShare.js';
 import { takeLocalActions, sharedActionMatches } from '../../../src/systems/quest/shareActions.js';
@@ -125,13 +124,12 @@ test('SAME-COPY: an envelope with no identity (an older client\'s), or my copy w
 });
 
 // ---- SHARE-MEMORY ----
-// PIN MOVED (AUDIT QA3 A6/E6): the share memory is save state now (machine.js shareMemory) and a load reads it - read from
 // the quests themselves (a copy's share identity), it put a reclaimed copy back in step and forgot a finished one after its
 // tombstone's week. That reading stays for an envelope saved before the field (`reloadOld`), so each law below is held
 // through both loads.
 
 test('SHARE-MEMORY: a load keeps a running shared copy in step with its party - the partner\'s sync is taken, and their final ends it and pays once (mutants: the running copy forgotten)', () => {
-  for (const load of [reload, reloadOld]) {   // PIN MOVED (AUDIT QA3 A6/E6): the memory saved, and an envelope from before it
+  for (const load of [reload, reloadOld]) {
     const A = machine();
     let B = machine();
     const qa = take(A, '__X'); A.markQuestShared('__X');
@@ -156,7 +154,7 @@ test('SHARE-MEMORY: a load remembers a shared copy finished - the partner still 
   const A = machine();
   const qa = take(A, '__X'); A.markQuestShared('__X');
   const first = env(A, qa);
-  for (const load of [reload, reloadOld]) {   // PIN MOVED (AUDIT QA3 A6/E6): the memory saved, and an envelope from before it
+  for (const load of [reload, reloadOld]) {
     let B = machine();
     const qb = receive(B, '__X', first).quest; B.tick();
     task(qb, 'doA').start(); task(qb, 'doB').start(); run(B, 8);
@@ -176,7 +174,6 @@ test('SHARE-MEMORY: a load remembers a shared copy finished - the partner still 
   assert.equal(D.shelveQuest(qd.uid).ok, true);
   L = reload(D);
   assert.equal(L.hasSharedQuestNamed('__X'), false, 'set aside: it left the party\'s step, and a load does not put it back');
-  // PIN MOVED (AUDIT QA3 A6, the fixes' own audit): a copy ever shared writes the memory, so the read from identities
   // is an older save's alone - and there too a copy set aside stays out of step
   assert.equal(reloadOld(D).hasSharedQuestNamed('__X'), false, 'an older save: set aside, out of step');
   assert.equal(L.getQuest(qd.uid)?.shareId, qd.shareId, 'though it keeps its identity');
@@ -198,7 +195,6 @@ function qlMachine(asks, partySize, members = null) {
   return m;
 }
 
-// PIN MOVED (AUDIT QA3 E1): the wait read the party's silence - an envelope of the copy within SHARER_QUIET_TICKS - and two
 // minutes without a change is a journey: the holder asked under a sharer still there answered the same choice twice. It
 // reads the sharer's seat now (machine.js sharerHere: the receipt's `from`, in the party), so this test is re-cut on it.
 test('SHARER-GONE: a received copy waits at its choice while its sharer is in the party, however long the party is quiet, and its holder is asked once the sharer has left (mutants: the sharer unread, the receipt\'s sender unkept, the party unread)', () => {
@@ -211,8 +207,8 @@ test('SHARER-GONE: a received copy waits at its choice while its sharer is in th
   task(qb, 'found').start(); run(B, 6);
   assert.equal(bAsks.length, 0, 'the sharer chooses: the received copy waits');
   run(B, 2500);
-  assert.equal(bAsks.length, 0, 'the party quiet for four minutes, the sharer still in it: still waiting');   // PIN MOVED (AUDIT QA3 E1): quiet past SHARER_QUIET_TICKS, it asked
-  members.delete('acct-a');   // PIN MOVED (AUDIT QA3 E1): the sharer's leaving, not the quiet, is what asks
+  assert.equal(bAsks.length, 0, 'the party quiet for four minutes, the sharer still in it: still waiting');
+  members.delete('acct-a');
   run(B, 2);
   assert.equal(bAsks.length, 1, 'the sharer gone: its holder is asked');
   bAsks[0].respond(1); run(B, 6);
@@ -221,7 +217,6 @@ test('SHARER-GONE: a received copy waits at its choice while its sharer is in th
 });
 
 test('SHARER-GONE: the wait reads the party, not the holders heard - a party of two waits before its sharer is named; a party of one asks at once; a copy its holder shared on, and a copy loaded, wait on their sharer (mutants: the party read as the holders, the share-on chooses, the unknown sharer read as gone)', () => {
-  // PIN MOVED (AUDIT QA3 E1): a copy its holder shared on asked at once - its holder made a second chooser while the
   // sharer was still in the party; it waits now ([2, true, 0])
   for (const [party, shareOn, asked] of [[2, false, 0], [1, false, 1], [2, true, 0]]) {
     const aAsks = [], bAsks = [];
@@ -245,7 +240,7 @@ test('SHARER-GONE: the wait reads the party, not the holders heard - a party of 
   quiet(() => B2.restoreSaveData(JSON.parse(JSON.stringify(B.getSaveData()))));
   assert.equal(B2.hasSharedQuestNamed(FLOW), true);
   run(B2, 2);
-  assert.equal(loaded.length, 0, 'loaded, its sharer in the party: it waits on them');   // PIN MOVED (AUDIT QA3 E2): unheard since the load, it asked - the sharer is save state now
+  assert.equal(loaded.length, 0, 'loaded, its sharer in the party: it waits on them');
   members.delete('acct-a');
   run(B2, 2);
   assert.equal(loaded.length, 1, 'the sharer gone: asked');
@@ -275,7 +270,7 @@ test('PROGRESS-KEPT: two members\' deeds at about the same moment - each crossin
   const qr = R.sharedCandidateNamed('__X');
   assert.equal(qr._keptLocal, 0);
   assert.equal(QS.syncBaselineAfter(qr, r), QS.shareSignature(qr));
-  // the host's baseline after a receipt is this one (scenes/world.js onQuestShared) - PIN MOVED (AUDIT QA3 E4): handed the
+  // the host's baseline after a receipt is this one (scenes/world.js onQuestShared)
   // baseline it had too, which a held answer (merged by nobody) leaves as it was
   assert.match(W, /if \(q\) _questSyncSeen\.set\(quest\.questName, syncBaselineAfter\(q, result, _questSyncSeen\.get\(quest\.questName\)\)\);/);
 });
@@ -286,7 +281,6 @@ test('PROGRESS-KEPT: a journal step I logged stays; the partner\'s NEW `clear` a
   const qb = receive(B, '__P', env(A, qa)).quest; B.tick();
   task(qa, 'doA').start(); run(A, 2);
   assert.ok(qa.activeLogMessages.has(0) && task(qa, 'a').triggered);
-  // PIN MOVED (AUDIT QA3 E4, the fixes' own audit): B's copy unchanged since it came is a held word, merged by nobody -
   // B does a deed of its own, so its copy from before mine is a real merge
   task(qb, 'doC').start(); run(B, 2);
   receive(A, '__P', env(B, qb));   // B's copy, from before my deed
@@ -383,7 +377,6 @@ test('GOLD-HOLDERS: a shared quest\'s gold is split among the copies held - a sh
   assert.equal(qb.hooks.rewardShares(qb), 2, 'the sharer holds it');
   assert.equal(QS.syncBaselineAfter(qb, got), '', 'a copy new here answers once, so its sharer hears it is held');
   assert.equal(q2.hooks.rewardShares(q2), 1, 'not heard yet');
-  // PIN MOVED (AUDIT QA3 E4, the fixes' own audit): a copy unchanged since it came answers "held" (auditqa3_share's pin);
   // B's copy here has moved on, so its word is a resync - and a resync names its sender a holder too
   task(qb, 'doA').start(); run(B, 2);
   assert.equal(receive(A2, '__X', env(B, qb), { from: 'acct-b' }).resync, true);
@@ -461,7 +454,6 @@ test('GUARD-HOLDER: GUARD-ONLINE\'s watch is the holder\'s - a resync keeps the 
 // ---- KILL-ONCE ----
 
 const tigerOf = (q) => [...q.resources.values()].find((r) => r.isFoe);
-// PIN MOVED (AUDIT QA3 E3): the kills an envelope brought are learned BY ITS SENDER (Foe.learnedKills, a Map by the
 // envelope's `from`; '' for an envelope that names none), and a credit spends only its own owner's - one count for all,
 // a kill no holder saw swallowed a third member's credit that no envelope ever corrected. So the receipts here name their
 // sender, the credits their owner, and the learned are read by whose
@@ -476,7 +468,7 @@ test('KILL-ONCE: a partner\'s kill their envelope already brought is not counted
   const L = new KeptKillLedger();
   assert.equal(creditKeptKills(B, L, 'acct-a', [{ q: '__KK', s: 'tiger', i: 1 }], 0), 1, '...then its fall\'s word');
   run(B, 2);
-  assert.deepEqual([tigerOf(qb).killCount, learned(tigerOf(qb), 'acct-a')], [1, 0], 'counted once');   // PIN MOVED (AUDIT QA3 E3)
+  assert.deepEqual([tigerOf(qb).killCount, learned(tigerOf(qb), 'acct-a')], [1, 0], 'counted once');
   assert.equal(task(qb, 'S.03').triggered, false, 'one tiger: `killed 2` waits');
   assert.equal(tigerOf(qb).creditPartnerKill('acct-a'), true, 'a second kill, its word first');
   run(B, 2);
@@ -487,7 +479,7 @@ test('KILL-ONCE: a partner\'s kill their envelope already brought is not counted
   const qc = receive(C, '__KK', env(A2, q2)).quest; C.tick();
   tigerOf(q2).incrementKills(); receive(C, '__KK', env(A2, q2));
   tigerOf(q2).incrementKills(); receive(C, '__KK', env(A2, q2));
-  assert.deepEqual([tigerOf(qc).killCount, learned(tigerOf(qc))], [2, 2]);   // PIN MOVED (AUDIT QA3 E3)
+  assert.deepEqual([tigerOf(qc).killCount, learned(tigerOf(qc))], [2, 2]);
   assert.deepEqual([tigerOf(qc).creditPartnerKill(), tigerOf(qc).creditPartnerKill(), tigerOf(qc).killCount], [false, false, 2]);
   // a credit before the envelope: the envelope brings nothing new
   const A3 = machine(), D = machine();
@@ -496,12 +488,11 @@ test('KILL-ONCE: a partner\'s kill their envelope already brought is not counted
   tigerOf(q3).incrementKills();
   assert.equal(tigerOf(qd).creditPartnerKill('acct-a'), true);
   receive(D, '__KK', env(A3, q3), { from: 'acct-a' });
-  assert.deepEqual([tigerOf(qd).killCount, learned(tigerOf(qd), 'acct-a')], [1, 0]);   // PIN MOVED (AUDIT QA3 E3)
+  assert.deepEqual([tigerOf(qd).killCount, learned(tigerOf(qd), 'acct-a')], [1, 0]);
 });
 
 // ---- REPUTE-SHARE ----
 
-// PIN MOVED (AUDIT QA3 E7): the faction asked is the catalog row's guild's (guilds.js, by the row's group), never the
 // envelope's word - the sender writes it. So the receiver's catalog carries the two quests' rows (QuestList-Classic: the
 // Mages Guild's, Member) and the receiver is a member; the envelope's faction no longer decides
 const catalog = { ...lists, findQuestMeta: (n) => (n in ONLINE_REPUTE_GATES ? { scope: 'guild', group: 10, quest: { name: n, membership: 'M' } } : null) };

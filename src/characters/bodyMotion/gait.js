@@ -1,10 +1,10 @@
 // @ts-check
-// BODY-MOTION (2026-10-18; bible/04-Characters/Body-Motion.md) - THE GAIT. The Morrowind body's walk, run and sneak in
+// BODY-MOTION - THE GAIT. The Morrowind body's walk, run and sneak in
 // third person, made from the body's own measurements and the ground the body itself crosses, instead of a clip played
 // faster than it was drawn: Morrowind's walk is authored for 2.2 m/s and Daggerfall walks at 3.7 to 6.3, so the clip
 // ran at twice and more its own cadence and every foot slid.
 //
-// THE LAW, in the order the frame asks it (AUDIT BODY-MOTION, 2026-10-19 - bible/01-Overview/audits/Audit-Body-Motion.md
+// THE LAW, in the order the frame asks it (AUDIT BODY-MOTION, 2026-10-19
 // - rebuilt this law around feet that stand in the world: the first one placed each foot by a formula of the stride's
 // phase, which held a foot still only while the body went straight at a steady pace, and slid it under every start, stop,
 // turn, strafe, wall and change of key):

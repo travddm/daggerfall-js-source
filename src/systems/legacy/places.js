@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY1 (bible/06-Systems/Legacy-Arc.md section 4): THE HEIR IS BORN IN A TOWN. Project Legacy's `Teleport` threw
+// LEGACY1: THE HEIR IS BORN IN A TOWN. Project Legacy's `Teleport` threw
 // the heir to a coordinate pair taken from two DIFFERENT entries of its forty (B11) - often the sea - and its retry
 // re-rolled instead of searching near. The port names a PLACE: a town (a city, a hamlet or a village, MapsFile's
 // LocationTypes), which the boot stands the heir in through its own `?region=&loc=` start - BAY-LEFT-B: and `seat`, the

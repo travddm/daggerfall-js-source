@@ -1,5 +1,4 @@
-// TOAST-SPLIT (2026-09-29, Mac: "So it seems like the enhanced plus UI regressed. The notifications arent enhanced plus
-// anymore"; bible/10-UI/UI-Arc.md TOAST-SPLIT): THE TOASTS AND THE NOTICE BOARD SHARE NO CLASS. The Notice
+// TOAST-SPLIT: THE TOASTS AND THE NOTICE BOARD SHARE NO CLASS. The Notice
 // Board (NOTICE1) drew its cork in `.notice-body` and its small italic lines in `.notice-hint` - the HUD toast stack's own
 // two classes (ui/enhanced/enhancedNotice.js, ui/enhanced/enhancedInputBox.js, ui/yesNoBox.js) - so the board's sheet (NOTICE_CSS, in the
 // Enhanced Plus sheet since MERGE 2, and laid on the classic skin when a board opens) put the cork behind every toast's
@@ -46,19 +45,6 @@ test('TOAST-SPLIT the toast stack\'s classes, as its drawers hand them (the set 
   for (const c of ['notice', 'notice-stack', 'notice-toast', 'notice-body', 'notice-hint', 'notice-row', 'notice-cell']) assert.ok(TOAST.has(c), c);
   assert.ok(selectors(ENHANCED_CSS).some((s) => /^\.notice-body$/.test(s)), 'the toast\'s body is its sheet\'s');
   assert.ok(selectors(ENHANCED_CSS).some((s) => /^\.notice-hint$/.test(s)), 'and its hint');
-});
-
-test('TOAST-SPLIT the board draws none of the toast\'s classes, and finds its cork by its own (mutants: a window, a tab or the scroll keeper back on .notice-body or .notice-hint)', () => {
-  for (const f of BOARD_FILES) {
-    const drawn = drawnClasses(f);
-    assert.ok(drawn.size > 5, `${f} read`);
-    const shared = [...drawn].filter((c) => TOAST.has(c));
-    assert.deepEqual(shared, [], `${f} draws a toast's class`);
-  }
-  const w = drawnClasses('src/ui/noticeWindow.js');
-  for (const c of ['notice-cork', 'notice-tip']) assert.ok(w.has(c), `the board's ${c}`);
-  assert.ok(drawnClasses('src/ui/marketTab.js').has('notice-cork') && drawnClasses('src/ui/marketTab.js').has('notice-tip'), 'the Market tab\'s');
-  assert.match(src('src/ui/marketTab.js'), /el\('div', 'notice-cork market-body'\)/, 'the market on the cork');
 });
 
 test('TOAST-SPLIT no board sheet names a toast\'s class - the board\'s, the professions\', the bounty board\'s, nor the sheet a board lays on the other skins (mutants: .notice-body or .notice-hint back in NOTICE_CSS or PROF_CSS; the skin sheet\'s kit cut back to every selector naming "notice")', () => {

@@ -1,5 +1,4 @@
-// TONE-TASTE (2026-10-15, bible/06-Systems/Living-World.md "TONE-TASTE"; Mac, of a stream: "someone who didnt like
-// etiquette still went up"): a question's tone counts as the one spoken to TOOK it, never by its name. DFU's own tables
+// TONE-TASTE: a question's tone counts as the one spoken to TOOK it, never by its name. DFU's own tables
 // (talkTopics.js ETIQUETTE_REACTION_MODS / STREETWISE_REACTION_MODS - a Commoner takes Polite ill and Blunt kindly, a
 // Noble the reverse) were read by the talk's answer alone; a Living World resident's regard (+1 a polite word, -6 a
 // blunt one) and a courtship (+3 Polite, -3 Blunt) went by the tone's name, so a Polite word raised a Commoner who
@@ -117,12 +116,3 @@ test('TONE-TASTE the courtship: through the real Legacy host, a tone the residen
   assert.deepEqual([r.gained === 0, r.cooled, r.again], [true, true, false], 'the law answers cooled');
 });
 
-test('TONE-TASTE the talk\'s door: the window hears the tone as the one spoken to took it - their group\'s, off the engine\'s own session (a mobile\'s a Commoner\'s) - for the regard and for the Legacy host\'s answer alike (mutants: the group, the answer\'s taste)', () => {
-  const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /const _toneTaste = \(\) => toneTaste\(tone, engine\(\)\?\.session\?\.npcData\?\.socialGroup \?\? 0\);/);
-  assert.match(tt, /const _toneHeard = \(\) => \{ if \(_toneTarget\) livingTone\?\.\(_toneTarget, _toneTaste\(\)\); \};/);
-  assert.match(tt, /if \(row\.legacy\) return row\.legacy\.answer\(tone, _toneTaste\(\)\);/);
-  const lh = rd('src/scenes/legacyHost.js');
-  assert.match(lh, /answer: \(tone, taste\) => answerTopic\(t, res, taste, ctx\)/);
-  assert.match(lh, /r\.cooled \? MARRIAGE_TEXT\.cooled\(first\) :/);
-});

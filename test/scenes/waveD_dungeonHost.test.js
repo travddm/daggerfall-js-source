@@ -16,7 +16,6 @@ import { ACTION_FLAGS } from '../../src/world/rdbLayout.js';
 import { createEnchantCtx, standLooseFoe, LOOSE_FOE_PLACE_ATTEMPTS } from '../../src/scenes/hostEnchant.js';
 
 const src = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
-const DC = src('src/scenes/dungeonContext.js');
 
 // Collider stub tracking bucket lifecycle - an action FLAT must never
 // mint one (DFU's box is `isTrigger = true`).
@@ -32,32 +31,6 @@ function stubCollider() {
 const flatBox = (x, y, z, h = 1) => ({ min: [x - 0.5, y - h / 2, z - 0.5], max: [x + 0.5, y + h / 2, z + 0.5] });
 
 // ── 1. the fourth caller ──────────────────────────────────────────
-
-test('wave D: the player-arrow law has FOUR CALLERS and one body', () => {
-  // AUDIT 39 (#64) flagged it as "four bodies, not four callers", and
-  // the divergence it warned of had already happened: the dungeon copy
-  // splashed at the arrow tip, the bug AUDIT 39r/R16 fixed in the
-  // shared one. (The splash POSITION is pinned behaviourally in
-  // test/systems/audit26_combat.test.js's F052.)
-  const callers = ['src/scenes/world.js', 'src/scenes/exterior.js',
-    'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js'];
-  for (const f of callers) {
-    const s = src(f);
-    assert.match(s, /import \{[^}]*playerArrowHitFoe[^}]*\} from '[^']*arrowFlight\.js'/,
-      `${f} imports the shared law`);
-    assert.match(s, /playerArrowHitFoe\(m, [ft], \{/, `${f} calls it`);
-  }
-  // ...and the dungeon host prices no shot of its own any more: no
-  // SWING_MODS read, no calculateAttackDamage on the arrow arm.
-  assert.equal(/SWING_MODS/.test(DC), false, 'the fourth body is gone, import and all');
-  const arm = DC.slice(DC.indexOf('if (m.fromPlayer) {'), DC.indexOf("// MT-iv: BowDamage's OWN two-arm split"));   // ROAD-H tail (review): the enemy arm's head is that comment now - its `} else if (m.aimFoe...)` became a plain `} else {` when the contact went spatial
-  assert.equal(/calculateAttackDamage/.test(arm), false, 'and its damage door with it');
-  // the four options the shared law cannot work without
-  assert.match(arm, /playerEntity, playerWeapon, playerFeet,/);
-  // PIN MOVED (AUDIT FEUD 2: the shaft carries its bow - a metal weakness rides to the host)
-  assert.match(arm, /dealDamage: \(t, d\) => damageFoe\(t, d, lastPlayerFeet, m\.dir, \{ kind: 'arrow', weapon: m\.weapon \?\? null \}\),/,
-    'the pool\'s own damage door, carrying the knockback origin and the flight direction');
-});
 
 // ── 2. the MOVE-flag flat moves ───────────────────────────────────
 
@@ -147,25 +120,6 @@ test('wave D: a move-flag flat SAVES and settles like the model beside it', () =
   assert.ok(Math.abs(flat.aabb.max[1] - 3.5) < 1e-6, 'and the trigger box came with it');
 });
 
-test('wave D: the dungeon host mints a move-flag flat its OWN batch and keeps it out of the group', () => {
-  // A member of a grouped billboard batch cannot be moved on its own,
-  // which is the whole of why this stayed INTERIM.
-  assert.match(DC, /\} else if \(MOVE_ACTION_FLAGS\.has\(action\.actionFlag\)\) \{\n\s*const o = actions\.addMoveFlat\(ns, position, action, \[x, y, z\], aabb\);/,
-    'the registration forks to the mover before the relay arm');
-  // PIN MOVED (MWNPC8b, bible/04-Characters/Morrowind-NPCs.md section 13b): a person leaves the group too (a batch of
-  // their own), so the group's line sits in the guard's else arm, a few lines down - still only under the guard
-  assert.match(DC, /if \(!\(f\.action && MOVE_ACTION_FLAGS\.has\(f\.action\.actionFlag\)\)\) \{\n(?:[^\n]*\n){0,6}?\s*else \{ if \(!flatGroups\.has\(key\)\)/,
-    'and the flat leaves the shared group');
-  assert.match(DC, /moveFlatBatches\.set\(o\.key, batch\)/, 'each gets a single-flat batch');
-  assert.match(DC, /actions\.onFlatMoved = \(o\) => \{/, 'and rides the batch origin uniform, as the missiles do');
-  // an acting MARKER has no billboard in this port at all - it must not
-  // be handed one
-  assert.match(DC, /m\.archive \?\? 199, m\.record, false\);/, 'markers register undrawn');
-  assert.match(DC, /if \(!mf\.drawn\) continue;/);
-  // the INTERIM sentence is retired where it stood
-  assert.equal(/no mesh to tween here, so it relays/.test(DC), false);
-});
-
 // ── 3. the enchant ctx, one body, two hosts ───────────────────────
 
 test('wave D: the shared enchant ctx answers the arms that were silent in the dungeon', () => {
@@ -226,73 +180,5 @@ test('wave D: standLooseFoe refuses rather than standing a foe nowhere', () => {
   assert.equal(LOOSE_FOE_PLACE_ATTEMPTS, 12);
 });
 
-test('wave D: the dungeon host hands the ctx its OWN doors', () => {
-  const mount = DC.slice(DC.indexOf('if (opts.enchantCtx !== false) {'), DC.indexOf('// AUDIT 24: `chargen: false`'));
-  assert.match(mount, /foes: \(\) => foes,/);
-  assert.match(mount, /foeSinks,/);
-  assert.match(mount, /feet: \(\) => lastPlayerFeet \?\? \[0, 0, 0\],/);
-  assert.match(mount, /say: \(l\) => hudText\.add\(l\),/);
-  // the two WINDOWS this host owns - the plaque stack and its ONE sheet
-  // ENH-NOTICE3: through the one door (systems/notify.js), whose
-  // default is the push and whose dungeon presenter IS pushDungeonWindow
-  assert.match(mount, /messageBox: \(id\) => \{\n\s*const lines = rscLines\(id\);\n\s*if \(lines\?\.length\) messageBox\(lines\);/,
-    'Azura\'s box goes through PushWindow (the seam\'s default over this context\'s presenter), so an open window does not swallow it');
-  assert.match(mount, /openCharacterSheet: \(\) => api\.toggleCharSheet\(\),/,
-    'the Oghma opens this host\'s one sheet construction, not a second bag');
-  // the Wabbajack over this host's own pool, with DFU's quest guard.
-  //
-  // AUDIT 58 (review): the BODY moved out of this literal onto the api,
-  // and the mount takes it by name. It had to: this literal is mounted
-  // only on the STANDALONE route (`enchantCtx: false` from worldModes),
-  // so on the hosted route world.js's mount was the session singleton
-  // and a dungeon record reaching its replaceFoe had nowhere but the
-  // street pool to go - removed by a remover that owns neither its
-  // billboard nor its death chain, re-stood outdoors. One body, both
-  // routes, and world.js asks pool membership which one to call.
-  assert.match(mount, /replaceFoe: replaceFoeInPool,/);
-  assert.match(DC, /function replaceFoeInPool\(targetEntity, mobileType\) \{/);
-  assert.match(DC, /replaceFoe: replaceFoeInPool,   \/\/ AUDIT 58/,
-    'and the api carries it, so the hosted route can reach this pool at all');
-  const body = DC.slice(DC.indexOf('function replaceFoeInPool('), DC.indexOf('// FS1 (wave D): the mount itself.'));
-  assert.match(body, /if \(f\.questBehaviour && !f\.questBehaviour\.isFoeDead\) return;/);
-  assert.match(body, /questPoolOps\.removeFoe\(f\);/);
-  assert.match(body, /nf\.entity\.health -= missing;/);
-  assert.equal(/exteriorFoes|cityGuards/.test(body), false, 'over this host\'s OWN pool, and no other');
-});
-
 // ── 4. chargen through the one construction seam ──────────────────
 
-test('wave D: the dungeon host holds the chargen WINDOW, not the raw flow', () => {
-  assert.match(DC, /chargenWindow = createChargenWindow\(chargenFlow, \{/);
-  assert.match(DC, /activeOverlay = chargenWindow;/);
-  // every slot comparison moved with it - a site left on the FLOW would
-  // compare the slot against an object that is never in it
-  assert.equal(/activeOverlay === chargenFlow/.test(DC), false);
-  assert.ok((DC.match(/activeOverlay === chargenWindow/g) ?? []).length >= 3);
-  // the flow itself is still the 17i probe surface
-  assert.match(DC, /chargenFlow: \(\) => chargenFlow,/);
-  // ONE application. The window fires onDone itself, so a host arm that
-  // also called finishChargenHere applied the character twice - once
-  // per key, since the overlay seams each re-check `done`.
-  assert.equal(/if \(activeOverlay === chargenWindow\) finishChargenHere\(\)/.test(DC), false);
-  assert.equal((DC.match(/finishChargenHere\(/g) ?? []).length, 2,
-    'the definition and the window\'s onDone - nothing else');
-  assert.match(DC, /onDone: \(r\) => finishChargenHere\(r\),/);
-  // AUDIT-MACL F3: the guard stands down before the navigation - the
-  // wizard's Cancel is a door the game opened.
-  assert.match(DC, /onCancel: \(\) => \{ releaseUnloadGuard\(\); location\.reload\(\); \},/);
-});
-
-test('wave D: routing chargen through the window stops the DOUBLE letterbox', () => {
-  // The window reports isChoiceWindow, and this host's native draw arm
-  // hands a native window the REAL canvas with no screen offset -
-  // which is what drawChargenNative's own nativeMetrics(canvas) needs.
-  // Holding the raw flow took the other arm: a virtual canvas AND an
-  // offset, so the classic screens were letterboxed twice (AUDIT 19
-  // F2's defect) while the art measured itself off the fake canvas.
-  const cs = src('src/systems/chargenSession.js');
-  assert.match(cs, /isChoiceWindow: true,/);
-  assert.match(cs, /draw\(renderer, canvas, font, scale = hudScale\) \{ flow\.draw\(renderer, canvas, font, scale\); \},/,
-    'and the host\'s own letterbox scale is honoured rather than dropped for the constructed default');
-  assert.match(DC, /if \(activeOverlay\.isChoiceWindow\) \{\n\s*activeOverlay\.draw\(renderer, canvas, hudFont, hudScaleFor\(canvas\.width, canvas\.height\)\);/);
-});

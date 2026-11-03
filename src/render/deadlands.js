@@ -1,8 +1,6 @@
 // @ts-check
-// WB6a (2026-09-25, Mac, having walked the Burning Court: "the transition and the arena needs to be an oblivion
-// masterpiece ... the outside bounds arent a perfect square, maybe somehow introduce distant skybox design or some
-// other ambient detail. Whole thing needs to feel alive"): THE DEADLANDS' SKY AND SEA - what stands round the court
-// and burns under it. Design: bible/11-Multiplayer/World-Bosses.md section 4 ("The Deadlands").
+// WB6a: THE DEADLANDS' SKY AND SEA - what stands round the court
+// and burns under it. Design: ("The Deadlands").
 //
 // WHAT THEY REPLACE. The court stood on a SQUARE of fire 520 m across under a shell of flat fog-red: the fog hid the
 // square's middle and never its edge, and the shell was one colour. Both are gone from the court's mesh
@@ -33,7 +31,7 @@
 // Colours are DISPLAY-encoded (the frame image the lit lane draws foreign passes into is 8-bit and display encoded -
 // duelWall.js), scaled by `gain` with the court's fog (the lane darkens a dungeon's fog, and the sky must meet it).
 //
-// WB6b (2026-09-25, the same ask - "Whole thing needs to feel alive"): THE AIR'S LIFE (`drawLife`) - embers rising off
+// WB6b: THE AIR'S LIFE (`drawLife`) - embers rising off
 // the sea round the court and off its braziers, turning with the drift of the air (`deadlandsWind`), cooling as they
 // climb, and ash falling through it all - one vertex a mote, every life a whole number a period. And a strike LIGHTS
 // THE COURT (`courtLighting(flash)`): the trilight's sky flares and the key light swings toward the strike while it

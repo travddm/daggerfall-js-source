@@ -192,8 +192,7 @@ export function playerTorchLight(entity, feet, yaw = 0) {
     y: feet[1] + o.up,
     z: feet[2] - r[2] * o.left + f[2] * o.forward,
     range: st.range,
-    // MAC-T1 (Mac, 2026-09-18: "a ball of light that hovers over the third person character when having a torch
-    // equipped"): THE LIGHT IN THE HAND SAYS SO. EL7's "no glare for the torch in the hand" was written as "within
+    // MAC-T1: THE LIGHT IN THE HAND SAYS SO. EL7's "no glare for the torch in the hand" was written as "within
     // 1.5 of the CAMERA" (airPass.js, shadowPass.js's caster pick, enhancedLighting's contact march - one number,
     // three laws), and the third-person camera stands 2.7 behind the hand, so the exemption lapsed and the bloom's
     // glare sprite - a torso-sized additive ball - was painted over the body billboard, which the presence test took
@@ -212,7 +211,7 @@ let _offsetOverride = null;
 export function setPlayerTorchOffsetOverride(o) { _offsetOverride = o ? { left: +o.left || 0, up: +o.up || 0, forward: +o.forward || 0 } : null; }
 export const playerTorchOffsetOverride = () => _offsetOverride;
 
-// HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at the waist instead of having to be held"):
+// HT-WAIST:
 // THE LANTERN AT THE WAIST - the port's own switch on Handheld Torches' pane (`Handling.LanternsAtWaist`, off by
 // default; Ledger A). No new state: the lit lantern is still PlayerEntity.LightSource, burning through the tick
 // above and saved as it always was. "At the waist" is DERIVED - the light in hand is a lantern, the mod is on and
@@ -234,7 +233,7 @@ export function lanternAtWaist(item) {
   return modSetting('handheld-torches', 'Enabled') === true && modSetting('handheld-torches', 'Handling.LanternsAtWaist') === true;
 }
 
-/** HT-WAIST-NET (2026-09-24): the pose's `hl` bit (net/wire.js validPose) - 1 while the lit light is a lantern hung
+/** HT-WAIST-NET: the pose's `hl` bit (net/wire.js validPose) - 1 while the lit light is a lantern hung
  *  at the waist (the one question above, asked of PlayerEntity.LightSource), ABSENT otherwise (the wire's omission
  *  law: a pose without one keeps the bytes it always had). The others' Morrowind bodies hang it at the hip off it
  *  (net/peer/peerBodies.js); world.js puts it on every pose it sends. */
@@ -252,8 +251,7 @@ export function setPlayerWaistLightOverride(o) {
 }
 export const playerWaistLightOverride = () => _waistOverride;
 
-// PEERLIGHT1 (2026-09-26, the player: "when another player lights a torch you should be able to see them lighting
-// your way as well"): THE OTHERS' TORCHES LIGHT THE WORLD. My torch is a point light at my hand, and nothing of it
+// PEERLIGHT1: THE OTHERS' TORCHES LIGHT THE WORLD. My torch is a point light at my hand, and nothing of it
 // went over the wire - the waist-lantern bit (`hl`) hangs a lantern on a Morrowind body and lights nothing. So a
 // friend with a torch walked a dark dungeon as a dark sprite, and I saw nothing lit around them.
 //

@@ -1,5 +1,5 @@
 // @ts-check
-// PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client"): A
+// PRIVATE-REPORT: A
 // PLAYER'S PRIVATE REPORT, AS THIS CLIENT SEES IT - the desk the mailbox window's report form and the readers' inbox draw
 // (ui/enhanced/enhancedReport.js), kept on the host's PostBox (net/serverPost.js) for the sitting, so a report half
 // written survives the pause face being rebuilt, closed or opened again.

@@ -26,9 +26,7 @@
 // is picked up whole without a window (:948-952), and anything else
 // hands its items over.
 //
-// THAT RESIDUE IS PAID (MAC-E, 2026-09-17, Mac: "seems like when i
-// click on a dead enemy now, i loot all their items automatically? ...
-// it lets me exceed my carry weight with no penalty"). This header
+// THAT RESIDUE IS PAID (MAC-E, 2026-09-17). This header
 // used to read: "DFU's general arm opens the inventory window with the
 // corpse as the remote LootTarget (:957). The port transfers the lot
 // and reports the count - the pre-existing G3 shape, kept so this wave
@@ -173,7 +171,7 @@ export function raiseEnemyDeath(entity, opts = {}) {
 }
 
 /**
- * DEX5 (bible/04-Characters/Enemy-Expansion.md section 11): A MOD'S CORPSE PREFAB. DFU stands a corpse's billboard
+ * DEX5: A MOD'S CORPSE PREFAB. DFU stands a corpse's billboard
  * through MeshReplacement.ImportCustomFlatGameobject (GameObjectHelper.CreateLootContainer): a mod that ships a prefab
  * named for the corpse's archive and record (`<archive>_<record>`) puts it in the billboard's place, components and all,
  * and they run as the prefab's own from then on - Daggerfall Enemy Expansion's troll corpse (1618_20) takes the loot

@@ -1,7 +1,7 @@
-// JUNGLE-TRAILS (2026-10-19, the owner: "Implement procedural dirt pathways that cut through the forest"). The jungle's
+// JUNGLE-TRAILS. The jungle's
 // own trails: the middle-value lines of two warped, turned value noises on the world's lattice, painted into a pixel's
 // tile corners as dirt before the marching squares run, their tiles kept as a track's are, a jungle tree's foot kept off
-// them as VERGE1 keeps it off a road. world/jungle/jungleTrails.js; bible/03-World/Bantha-Jungle.md "The trails".
+// them as VERGE1 keeps it off a road. world/jungle/jungleTrails.js; "The trails".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JUNGLE_TRAILS, trailDistance, trailRoom, trailClear, paintJungleTrails, warpStretch, cornerCleared } from '../../src/world/jungle/jungleTrails.js';

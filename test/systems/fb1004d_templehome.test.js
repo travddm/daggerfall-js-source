@@ -177,7 +177,6 @@ test('TEMPLE-HOME, gated on ARENA2_PATH: with both packs on, each of the 34 stan
   }
   const asked = ALONE.length * DRAWS;
   assert.deepEqual(failed.ours, { C0B00Y01: 0, C0B00Y03: 0 }, `never failing in Daggerfall's temples (${asked} asks each)`);
-  // PIN MOVED (QUEST-AUDIT II NEAR-SITE): 15 in 16 and 1 in 2 of these failed before
   assert.deepEqual(failed.mods, { C0B00Y01: 0, C0B00Y03: 0 }, `never failing in the mod's temple either (${asked} asks each)`);
   // no other temple of the world is left without a house by the mods
   const bare = [];

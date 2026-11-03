@@ -1,9 +1,9 @@
-// AUDIT 30 (2026-09-29, Mac: "Do it") - LOGGING IN THE STREAMING WORLD, AS THE AUDIT FOUND IT (scenes/treeHost.js,
+// AUDIT 30 - LOGGING IN THE STREAMING WORLD, AS THE AUDIT FOUND IT (scenes/treeHost.js,
 // scenes/gatherHost.js, render/renderer.js): a Lumberjack's prompt its own chops; a felled tree's flat risen with the
 // day under a shut switch; a logs pile never laid for a pixel gone; a fall whose pixel was stood again under the ask the
 // node as it stands now, its failure its own; a static wood moved gridded where it is, its shadow told. A real gather
 // host with Logging's kind over a real book and a fake door (the harness the audit's probes stood on). Each pin failed
-// on the code before its fix. bible/06-Systems/Online-Arc.md AUDIT 30.
+// on the code before its fix. AUDIT 30.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -97,7 +97,7 @@ async function stand({ nowS, specs = { 50: null, 100: null }, slowTexture = fals
       host.tick(0.001);
     }
     input.v = { held: false, attack: false, choice: false };
-    host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last chop's blow lands - the tree falls then, not on the press
+    host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
     await tick(); await tick(); await tick();
   }
   return { host, book, door, entry, forest, made, destroyed, moved, said, clock, day, fell, feet, view, built, texGate, input };
@@ -164,7 +164,7 @@ test('AUDIT 30 A5: an answer landing on a pixel stood again under the ask falls 
   process.on('unhandledRejection', onRej);
   aim(w, n);
   assert.ok(w.host.press());
-  // GATHER-SPEED (PIN MOVED): the fall is the act's end's now (gatherHost.js fallNow), never the answer's - so the pixel
+  // GATHER-SPEED (
   // is stood again under the ACT, and its end falls the node as its pixel stands then
   w.host.onDestroyed(w.entry); w.built.set('400,150', entry2); w.host.onBuilt(entry2);
   for (let i = 0; i < 10 && w.host.acting(); i++) {
@@ -175,7 +175,7 @@ test('AUDIT 30 A5: an answer landing on a pixel stood again under the ask falls 
   }
   assert.equal(w.host.acting(), false, 'the act played to its end on the pixel stood again');
   w.input.v = { held: false, attack: false, choice: false };
-  w.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last chop's blow lands - the node falls then
+  w.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
   for (let i = 0; i < 8; i++) await tick();
   process.off('unhandledRejection', onRej);
   assert.equal(w.book.taken(n.key, 'logs'), true);
@@ -202,7 +202,7 @@ test('AUDIT 30 A5: an answer landing on a pixel stood again under the ask falls 
     v.host.tick(0.001);
   }
   v.input.v = { held: false, attack: false, choice: false };
-  v.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last chop's blow lands - the node falls then
+  v.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
   for (let i = 0; i < 8; i++) await tick();
   const fallen = v.made.filter((b) => b.tip);
   assert.equal(fallen.length, 1, 'the node fell');
@@ -267,7 +267,7 @@ test('AUDIT 30 A5: the fall is the node\'s as its pixel stands NOW - a wood re-l
     if (before && !w.host.acting()) { w.host.onDestroyed(w.entry); w.built.set('400,150', entry2); w.host.onBuilt(entry2); }
   }
   w.input.v = { held: false, attack: false, choice: false };
-  w.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last chop's blow lands - the tree falls then, as the wood stands now
+  w.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
   for (let i = 0; i < 8; i++) await tick();
   const falls = w.made.filter((b) => b.tip);
   assert.equal(falls.length, 1);

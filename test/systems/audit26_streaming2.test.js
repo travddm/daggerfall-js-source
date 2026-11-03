@@ -53,7 +53,7 @@ test('audit26 F059: the exhaustion collapse rides AreEnemiesNearby over EVERY fo
   // One encounter wolf that has SEEN the player: AreEnemiesNearby says
   // yes and the collapse is the foes-about arm - the arm the guard-only
   // read could never reach, because encounter foes were not consulted
-  // at all. PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): that arm
+  // at all.
   // is no longer DFU's death on 1072 but a tenth of the health and a
   // HUD line - the pin is still that the encounter pool reaches it.
   const encounter = [foe({ detected: true, inSight: true, dist: 900 })];

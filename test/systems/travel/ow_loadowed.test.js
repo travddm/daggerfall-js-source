@@ -1,7 +1,7 @@
 // LOAD-OWED (the bug-reports channel, 2026-10-14, 7 upvotes, confirmed by a second player: "When traveling using
 // Overworld, the speed randomly drops and gets locked at 1x after traveling for a while. There are no enemies or threats
 // nearby to trigger this slowdown. To get back to 100x speed, I have to cancel the travel and restart it manually" - on
-// foot, on horseback and with the cart). bible/06-Systems/Travel-View.md LOAD-OWED.
+// foot, on horseback and with the cart). LOAD-OWED.
 //
 // THE LATCH. Under the Overworld, TV2's governor holds the clock while the grid round the traveller has pixels it has not
 // built - the land loading (scenes/world.js travelViewGovern). A pixel whose build THROWS is let go by the stream (the
@@ -60,7 +60,6 @@ function journeyHost() {
   const d = { t: 0, pBuilds: 0, failP: null, said: [] };
   const player = { pos: at, speed: WALK_MPS, isPlayerSwimming: false, feetAt: () => [...player.pos] };
   const scope = {
-    // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers which pixel is ready (scenes/capitalPrebuild.js
     // firstReady) - none of the city's here, every pixel ready
     capitalPrebuild: { firstReady: () => true },
     // the journey and the view
@@ -133,7 +132,7 @@ test('LOAD-OWED: A PIXEL THE STREAM IS BUILDING HOLDS THE OVERWORLD\'S CLOCK, AN
   t.after(() => { resetTimeScale(); _resetTravelPace(); });
   const h = journeyHost();
   h.d.t = 0;
-  // P in flight: the land IS loading - the clock is held, and the panel says it is the land. PIN MOVED (OW-LEAD,
+  // P in flight: the land IS loading - the clock is held, and the panel says it is the land.
   // test/systems/travel/ow_lead.test.js): held by how near P is - the traveller eased toward it, never into it (it was halved to
   // x1 by the time P had stood unbuilt eight seconds, wherever P lay)
   await h.run(9);
@@ -162,7 +161,6 @@ test('LOAD-OWED: A PIXEL THE STREAM IS BUILDING HOLDS THE OVERWORLD\'S CLOCK, AN
 });
 
 test('LOAD-OWED: THE COUNT IS THE STREAM\'S OWN BOOKS - built, or not owed by the stream (its `loaded` grid: built or building), the line the host counts with; a pixel queued or in flight is owed, one let go is not, and where the world streams nothing nothing is ever loaded (ETHER-OW\'s law, kept)', () => {
-  // PIN MOVED (OW-LEAD, test/systems/travel/ow_lead.test.js): the count's line hands the owed pixels on too (`uc.owed`)
   const m = /\n {6}uc\.n = unbuiltAround\(px, radius, (\(x, y\) => [^\n]*?)(?:, uc\.owed)?\);\n/.exec(W);
   assert.ok(m, 'the governor\'s count');
   const state = new StreamingWorldState(1);

@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-VENDOR (2026-10-03, Mac: "add the ability for players that own houses to buy npcs that sell goods for them when
-// someone visits the house ... make the available npcs visible on the board with a tab and item search filter"; asked,
-// "Yes only in the house and you should be able to set a waypoint where the trader is ... Selfplaced npcs should sell
-// stuff waaaaay longer").
+// HOME-VENDOR.
 //
 // A VENDOR is a placed piece of a home's decor made the `vendor` station (net/decorLaw.js DECOR_STATIONS) - its licence
 // is the station's fee, paid once on the owner's record, as every station's. Its STOCK is market listings of pieces from

@@ -1,5 +1,4 @@
-// SHIP AUDIT (2026-10-27, the owner: "a comprehensive audit across everything ... this needs to be perfect"; bible/01-Overview/
-// audits/Audit-Ship-Ready.md) - A HARBOUR'S BERTHS ON A WAY OUT TO SEA. Lillandril on the freeware, once RELIEF-PEAKS moved
+// SHIP AUDIT - A HARBOUR'S BERTHS ON A WAY OUT TO SEA. Lillandril on the freeware, once RELIEF-PEAKS moved
 // it a pixel: the berths nearest the town lay in an inlet along its side with no way out, the open sea past its other side,
 // and findHarbour (systems/naval/shipLife.js) answered no harbour at all - six ships missing from a port past the Bay.
 import { test } from 'node:test';

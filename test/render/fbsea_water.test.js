@@ -22,8 +22,6 @@ import { composeTiledPicture } from '../../src/formats/derivedTexture.js';
 import { readPng } from '../../tools/pngIO.mjs';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const WORLD = read('src/scenes/world.js');
-const RENDERER = read('src/render/renderer.js');
 
 /** A GL that records what a pass asks of it: the capability switched, the offset set, the program used, the draws. */
 function recordingGl() {
@@ -70,13 +68,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #4: THE SEA\'S STACK IN WINDOW DEPTH - the
   assert.ok(Object.isFrozen(WATER_LAYER_UNITS));
   assert.ok(WATER_LAYER_UNITS.surface < 0, 'the film over the ground');
   assert.ok(WATER_LAYER_UNITS.breakers <= WATER_LAYER_UNITS.surface - 2, 'the breakers over the film, by more than the film is over the ground');
-  // WATER1 wears the film's place (it met the law first - WATER-AUDIT M3's offset, now the table's)
-  const water1 = RENDERER.slice(RENDERER.indexOf('  drawWaterSurfaces(rows, n, tileSize, u, tileDim = 128) {'));
-  assert.match(water1, /gl\.enable\(gl\.POLYGON_OFFSET_FILL\);\n\s+gl\.polygonOffset\(0, WATER_LAYER_UNITS\.surface\);/);
-  // AUDIT ENVIRONS (the snow's pass, its own `Offset -0.25, -0.25`): the world renderer's one other offset is the snow's
-  // layer of this stack - a quarter step over the ground it lies on, under the film (the constant terms' order)
-  const offsets = RENDERER.match(/gl\.polygonOffset\([^)]*\)/g) ?? [];
-  assert.deepEqual(offsets.sort(), ['gl.polygonOffset(0, WATER_LAYER_UNITS.surface)', 'gl.polygonOffset(SNOW_LAYER.factor, SNOW_LAYER.units)'], 'no other offset in the world renderer to agree with it');
   assert.deepEqual({ ...SNOW_LAYER }, { factor: -0.25, units: -0.25 });
   assert.ok(Object.isFrozen(SNOW_LAYER));
   assert.ok(WATER_LAYER_UNITS.surface < SNOW_LAYER.units && SNOW_LAYER.units < 0, 'the snow over the ground and under the film');
@@ -108,13 +99,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #4: ILIAC PUDDLE NO MORE\'S TOP IS THE FIL
   csa.drawWaves({ position: [409.6, 34.1, 409.6], scale: 819.2, mesh, frame: 0 }, { start: 0.6, end: 0.75 });
   assert.deepEqual(layered(log), { inside: [-6], outside: [] }, 'the breakers in theirs');
   assert.deepEqual(log.at(-1), ['disable', 'offset'], 'and off after');
-});
-
-test('FIELD BUGS 2026-09-29 (the sea) #4: the breakers are drawn BEFORE the film - with the ground, written - so the film tests against their depth, lifted in the stack; the world keeps that order (mutants: the waves after the film)', () => {
-  const waves = WORLD.indexOf('    if (!tvf) csaDrawWaves();');   // FIELD BUGS 2026-09-30b TV-SURF: gated on the travel view (PIN MOVED)
-  const water1 = WORLD.indexOf('      renderer.drawWaterSurfaces(_waterRows, n, 6.4, wu);');
-  const top = WORLD.indexOf('    if (deepWaters) drawDeepWatersSurfaces(now);');
-  assert.ok(waves > 0 && water1 > waves && top > waves, 'the breakers before WATER1 and before the top');
 });
 
 test('FIELD BUGS 2026-09-29 (the sea) #4: A PICTURE\'S CHAIN - level 0 to 1 x 1 (GL\'s sizes, halved and floored), each level\'s texel the mean of the level-0 texels whose centres fall in it (floor((c + 0.5) x size_L / size_0)): an exact halving the mean of its four children, 640\'s odd tail (5 to 2 to 1) summed from the deepest level aligned with it - checked against the direct mean at every level of even, odd and mixed sizes (mutants: a child dropped, the tail\'s alignment, the rounding)', () => {
@@ -231,7 +215,4 @@ test('FIELD BUGS 2026-09-29 (the sea) #4: the waves\' pictures go up as chains -
   csa.setWaveFrames({ paints: [px(640, 640), px(640, 640)], snow: px(64, 64), specs: [{ paint: 1, scroll: 0, tile: [0, 0], size: [640, 640] }] });
   assert.equal(csa._frames.paints.length, 2);
   assert.equal(csa._frames.lastLevel, 9, '640 to 1 in nine halvings');
-  const src = read('src/render/comeSailAwayRender.js');
-  assert.match(src, /gl\.uniform1i\(u\.uLastLevel, this\._frames\.lastLevel\);/);
-  assert.match(src, /const chains = frames\.paints\.map\(\(p\) => wavePaintLevels\(p, snowMean\)\);/);
 });

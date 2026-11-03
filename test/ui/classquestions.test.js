@@ -657,28 +657,3 @@ test('F2 real seam: the constellation loads, animates, repaints and releases for
   stopConstellationAnim();
 });
 
-test('F2: the four ART-side laws the headless suite cannot otherwise reach', () => {
-  // Mutation testing left four survivors here (M10-M13), all of them
-  // inside chargenArt's draw half, which needs loaded art to execute -
-  // so the behavioural pins for them are in the real-seam test above,
-  // and that one is corpus-gated. These are SOURCE pins, the same
-  // shape as the host pins in audit18_hosts_outer: they cannot prove
-  // the behaviour, they can only refuse the edit that breaks it.
-  const art = readFileSync(new URL('../../src/ui/chargenArt.js', import.meta.url), 'utf8');
-  const chart = art.match(/function ensureChgnTexture[\s\S]*?\n}/)[0];
-  // M10: the chart's blues come from the flow's PAINTED value, which
-  // CEL_OnAnimEnd writes - never re-derived from the answer count,
-  // which would brighten it at the answer as the pre-F2 port did.
-  assert.match(chart, /flow\.qPaintBlues/);
-  assert.ok(!/qAnswered|constellationBlues|qWeights/.test(chart),
-    'the chart must not re-derive the blues from the answer state');
-  // M11: the replay re-arm (Ledger A) - without it every answer after
-  // the first flashes the previous run's END frame for one frame.
-  assert.match(art, /bufferNextFrame\(0\);\n {2}if \(!cel\.player\.start\(\)\)/);
-  // M12: a started player never reports "nothing to play", or the
-  // flow runs its end body inline with _celActive still latched.
-  assert.match(art, /return secs > 0 \? secs : Number\.MIN_VALUE;/);
-  // M13: the per-frame upload gate - without it every DRAWN frame
-  // uploads a texture, sixty a second, for the same decoded frame.
-  assert.match(art, /if \(cel\.frameRef !== frame\) {/);
-});

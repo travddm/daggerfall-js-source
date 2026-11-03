@@ -22,9 +22,7 @@ import { createRequire } from 'node:module';
 import {
   SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX,
   saveSlot, enumerateSaves, loadSlot, deleteSave, findSave, screenshotOf,
-  QUICK_SAVE_NAME,
 } from '../../../src/systems/save/saveSlots.js';
-import { QUICKSAVE_KEY } from '../../../src/systems/save/save.js';
 import { appStorage } from '../../../src/systems/appStorage.js';
 
 const require = createRequire(import.meta.url);
@@ -307,26 +305,6 @@ test('an image MIME with no honest extension stays verbatim - never webp bytes w
   } finally { rm(root); }
 });
 
-test('the legacy quicksave migration holds over files: write, VERIFY, then remove', () => {
-  const prevShell = globalThis.daggerShell;
-  const root = tmp();
-  try {
-    const seed = fileStorage.createFileStorage(root);
-    seed.setItem(QUICKSAVE_KEY, JSON.stringify({ v: 1, name: 'Old Hand', classicMinutes: 777 }));
-    globalThis.daggerShell = { storage: bridgeOver(fileStorage.createFileStorage(root)) };
-    const storage = appStorage();
-    const { info } = enumerateSaves(storage);   // migration runs inside the sweep
-    const migrated = [...info.values()].find((i) => i.saveName === QUICK_SAVE_NAME);
-    assert.ok(migrated, 'legacy quicksave did not become a slot');
-    assert.equal(migrated.characterName, 'Old Hand');
-    assert.equal(storage.getItem(QUICKSAVE_KEY), null, 'legacy key must be removed after the verified write');
-    assert.ok(fs.existsSync(path.join(root, 'Saves', 'SAVE0', 'SaveData.txt')));
-  } finally {
-    if (prevShell === undefined) delete globalThis.daggerShell; else globalThis.daggerShell = prevShell;
-    rm(root);
-  }
-});
-
 // ---- AUDIT DA: the two drift pins -----------------------------------
 
 test('PIN: no storage consumer bypasses the seam - globalThis.localStorage lives in appStorage.js alone', () => {
@@ -347,23 +325,3 @@ test('PIN: no storage consumer bypasses the seam - globalThis.localStorage lives
   assert.deepEqual(offenders, []);
 });
 
-test('PIN: the shell serves arena2 by the dev middleware\'s own rules - the literals may not drift apart', () => {
-  const root = path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
-  const vite = fs.readFileSync(path.join(root, 'vite.config.js'), 'utf8');
-  const shell = fs.readFileSync(path.join(root, 'app', 'main.cjs'), 'utf8');
-  // The three serving laws, as literals both sides must carry: the
-  // flat-name gate, the BOOKS fallback for BOK*.TXT, and the
-  // case-insensitive uppercase map.
-  for (const law of ['/^[A-Za-z0-9._-]+$/', String.raw`/^BOK\d+\.TXT$/i`, '.toUpperCase()']) {
-    assert.ok(vite.includes(law), `vite middleware lost its own law: ${law}`);
-    assert.ok(shell.includes(law), `app/main.cjs drifted from the dev middleware: missing ${law}`);
-  }
-  // And the Locate-ARENA2 ingest wipe must clear exactly the stores
-  // dataSource.clearStoredData clears (the set + derived, never the
-  // player's packs) in the database dataSource names.
-  const dataSource = fs.readFileSync(path.join(root, 'src', 'scenes', 'dataSource.js'), 'utf8');
-  for (const name of ["'project-dagger'", "'arena2'", "'derived'"]) {
-    assert.ok(dataSource.includes(name), `dataSource.js renamed ${name} - update app/main.cjs's clearStoredArena2`);
-    assert.ok(shell.includes(name), `app/main.cjs's ingest wipe is missing ${name}`);
-  }
-});

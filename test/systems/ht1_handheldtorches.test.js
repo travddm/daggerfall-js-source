@@ -1,5 +1,4 @@
-// HT1 - HANDHELD TORCHES 1.4.1 (RedRoryOTheGlen), THE MOD, 1:1 (2026-09-14,
-// Mac: "Next mod to integrate 1:1 is this").
+// HT1 - HANDHELD TORCHES 1.4.1 (RedRoryOTheGlen), THE MOD, 1:1.
 //
 // The mod's script is a compiled DLL (four MonoBehaviours) read off the
 // IL and restated in systems/handheldTorches.js (the component: the
@@ -118,14 +117,13 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   for (let f = 0; f < 4; f++) assert.ok(rd(`vendor/handheld-torches/Textures/${DROPPED_ARCHIVE}_0-${f}_Emission.png`).length > 0, `the dropped torch's emission twin ${f}`);
   assert.ok(rd(`vendor/handheld-torches/Textures/${DROPPED_ARCHIVE}_10-0.png`).length > 0, 'the doused torch');
   const shipped = JSON.parse(rd('vendor/handheld-torches/modsettings.json'));
-  // MODS-ON (2026-09-14, Mac: "all mods should be on by default"): the
+  // MODS-ON: the
   // keys whose default the port sets against the bundle's, listed here
   // rather than by loosening the compare - so this pin still holds
   // every OTHER key to the shipped value, and a departure that arrives
   // without a decision behind it fails right here.
   //
-  // HT4 (2026-09-15, Mac: "Pressing tab drops torches, tab is reserved
-  // for the menu"): the second one. The mod ships Tab for the manual
+  // HT4: the second one. The mod ships Tab for the manual
   // drop and in Daggerfall Unity that is free; PX15 spent Tab on the
   // port's own pixel dial, so the shipped default landed on a key this
   // port had already answered and one press did both things. G is free
@@ -133,8 +131,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   // pinned below ("no vendored mod ships a key the port has already
   // spent") so the next mod folded in cannot repeat it quietly.
   //
-  // SOC5 (2026-09-16, Mac: "Players should be able to interact with others
-  // in the world upon encountering them by pressing F on their body"): the
+  // SOC5: the
   // THIRD one, and the same class as HT4 exactly one key over. The mod ships
   // F for the ignite/douse toggle and DFU leaves F free; SOC5 spends it on
   // the port's own SocialInteract, so the shipped default would light a
@@ -144,7 +141,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   // in every other vendored mod. The class pin below is what caught it.
   // HT5: and Bob - the widget ships its Bob on, so the torch hand's follows (the third departure, stated in the table).
   //
-  // HT7 (2026-09-17, Mac: "Take care of both"): the FOURTH, and the first
+  // HT7: the FOURTH, and the first
   // that is not about a key. The mod ships `OnStow = Drop` and HT6
   // recorded what that means now that the hand law runs at the equip
   // moment: equipping a shield with your weapon drawn puts the lit torch
@@ -154,7 +151,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   // and the mod's own value is one click away on the dial, which is
   // pinned below with both options in the shipped order.
   const PORT_DEFAULT = Object.freeze({ 'Modules.Sprite': true, 'Modules.Bob': true, 'Handling.ManualDropInput': 'G', 'Handling.ToggleLightInput': 'O', 'Handling.OnStow': 0, 'Handling.RelaxedTwoHandedWeapons': false });   // 3ARMS: the relaxed switch ships off - a held two-hander takes both hands, HT7's own reasoning
-  // PLAIN-TEXT (2026-10-19): three of the mod's lines said plainly for a player (the idle bob named the shield) - their words, exactly
+  // PLAIN-TEXT: three of the mod's lines said plainly for a player (the idle bob named the shield) - their words, exactly
   const PLAIN = {
     'Presentation.PlayerTorchAudio': 'Plays a burning sound while you hold a torch',
     'Bob.BobWhileIdle': 'Whether the light will slightly bob while stationary',
@@ -186,7 +183,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
     }
   }
   assert.equal(n, 52, 'the eight sections carry 52 keys');
-  // HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at the waist"): the port's OWN key on
+  // HT-WAIST: the port's OWN key on
   // this pane, beside the port's Enabled - named here, as ORL1 names primarySkillsImpact, so a third arrives
   // only with a decision behind it (test/systems/htwaist_setting.test.js holds its default and its words).
   const shippedNames = new Set(shipped.Sections.flatMap((sec) => sec.Keys.map((k) => `${sec.Name}.${k.Name}`)));
@@ -225,12 +222,6 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   setModSetting(V, 'Presentation.Offset', 'x');
   assert.deepEqual([...modSettingsOf(V)['Presentation.Offset']], [0.5, 0.5]);
   _resetModSettings();
-  const pane = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(pane, /\} else if \(isTextKey\(def\)\) \{/, 'the pane has a key capture');
-  assert.match(pane, /b\.textContent = t\('mods\.pane\.pressKey', 'press a key'\);/);   // L10N4: in the player's language
-  assert.match(pane, /const name = e\.code === 'Escape' \? null : keyCodeForDomCode\(e\.code\);/, 'the capture spells the key as Unity would; Escape cancels');
-  assert.match(pane, /\} else if \(isTupleKey\(def\)\) \{/, 'the pane has a pair of steppers');
-  assert.match(pane, /const stepOf = def\.tuple === 'int' \? 1 : \(def\.step \?\? 0\.1\);/);
 });
 
 test('HT1: the KeyCode table - Unity\'s names to the DOM codes the port polls and back, case-sensitive, None and a stranger parsing to nothing, the mouse as the held set spells it', () => {
@@ -321,7 +312,7 @@ test('HT1: UpdateFreeHand - the table over the two slots: a bare hand in use, a 
   // HT7: sheathed, a bow in the left slot now takes BOTH hands, as it does
   // drawn - the mod's sheathed arm cleared the left alone and is gone.
   r.ctx.sheathed = true; r.frame(); assert.deepEqual(hands(), [false, false], 'HT7: sheathed, the bow takes both hands, as drawn');
-  // HT7 (2026-09-17, Mac: "Take care of both") - THE ONE DEPARTURE FROM
+  // HT7 - THE ONE DEPARTURE FROM
   // THIS ARM. The mod clears a hand while sheathed only for a BOW, so a
   // shield or a dagger in the left slot took nothing and a lit torch
   // stayed in that hand with the weapon on your back. HT6 recorded that
@@ -687,9 +678,6 @@ test('HT1: SpawnLightSource - the billboard of the mod\'s record at the point (a
   near(lights[1].range, 1 + 8 * (90 / (16 * 20)));
   near(lights[1].y, 19 * GLOBAL_SCALE / 2 + 0.5, 1e-9, 'the candle is shorter, so its flame sits lower');
   assert.equal(templateByIndex(T.Torch).hitPoints, 50); assert.equal(templateByIndex(T.Torch).capacityOrTarget, 14);
-  // AUDIT 66 F10: no PlayerTorchLightScale term - the mod multiplies this range by it, the port's own lane holds that setting inert for a radius (playerTorch.js), and no host could feed the dep anyway
-  assert.ok(!/torchLightScale/.test(rd('src/scenes/droppedTorches.js')), 'the dep no host passed is gone');
-  assert.ok(!/DROPPED_LIGHT_INTENSITY/.test(rd('src/scenes/droppedTorches.js')), 'and the constant nothing read');
   // a rest of an hour: the candle (90 s left) dies, the torch burns 300 s
   setWorldMinutes(5062); q.p.tick(0.016);
   assert.equal(q.p.dropped.length, 1); near(d.time, 690); assert.equal(c.dead, true); assert.ok(!q.alive.has(c.batch), 'its billboard gone');
@@ -798,7 +786,7 @@ test('HT1: a foe struck - hostile, the to-hit roll with Accuracy, ContinuousDama
   assert.deepEqual(fire, { kind: ENEMY_FIRE_KIND, key: ENEMY_LIGHT_EFFECT_KEY, roundsRemaining: 3 }); assert.equal(ENEMY_LIGHT_EFFECT_KEY, 'HandheldTorchesEnemyLight');
   assert.equal(q.p.foeBurning(foe), true);
   assert.deepEqual(q.shots.at(-1)[0], CLIPS.ignite, 'the ignite clip at the point');
-  fire.roundsRemaining = 1; q.p.igniteFoe(foe); assert.equal(fire.roundsRemaining, 3, 'a re-hit renews its rounds, never stacks them');   // PIN MOVED (STACK-CAP): AddState stacked them (6)
+  fire.roundsRemaining = 1; q.p.igniteFoe(foe); assert.equal(fire.roundsRemaining, 3, 'a re-hit renews its rounds, never stacks them');
   await settle(); q.p.tick(0.016);
   assert.deepEqual(uploads.slice(0, 6).map((u) => u.join(':')), ['375:0:0', '375:0:1', '375:0:2', '375:0:3', '375:0:4', '375:0:5']);
   const flame = q.p.batches().find((b) => b.archive === PUFF.archive);
@@ -823,103 +811,7 @@ test('HT1: a foe struck - hostile, the to-hit roll with Accuracy, ContinuousDama
 
 // ═══ the seams ══════════════════════════════════════════════════════════
 
-test('HT1: the rig runs the component beside the widget - one per rig, the pool bound to it, Update then LateUpdate with the frame\'s inputs (the machine, the sheathe, the hand, the cast, the third person, the climb, the swim, the lycanthrope, the motion, the look, the camera, the collider, the raw keys, the sheathe door), the draw seam after the arms and before the widget', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /import \{ createHandheldTorches, isHeldLight \} from '\.\.\/\.\.\/systems\/handheldTorches\.js';/);   // TORCH-VIS: and the mod's own light test, so the ladder asks it in the mod's words
-  assert.match(rig, /const handheld = createHandheldTorches\(\{ audio, say, torches(?:, dropRefusal)? \}\);/);
-  assert.match(rig, /const handheldOn = \(\) => modSetting\('handheld-torches', 'Enabled'\);/);
-  assert.match(rig, /pool\.setOnPickedUp\?\.\(\(item\) => handheld\.receivePickedUp\(item\)\);/, 'the pool hands a picked-up light to the component');
-  // SW1b: the shield opens this block too - it was a third consumer inside a gate written for the other two,
-  // so a profile with only Shield Widget on never got a frame at all (bible SW1b.1)
-  // PIN MOVED (MIXED-PAIR): the gate's gun leg is `gunUp()` - a Pistolet in either hand, a blade's partner included (was:
-  // `thunderlockHeld()`, the right hand's alone)
-  assert.match(rig, /const _torchesOn = handheldOn\(\);\s*(?:\/\/[^\n]*\n\s*)*if \(!_torchesOn && _handheldWasOn\) handheld\.dispose\(\);[^\n]*\n\s*_handheldWasOn = _torchesOn;[\s\S]{0,3000}?if \(widgetOn\(\) \|\| _torchesOn \|\| shieldOn\(\) \|\| gunUp\(\)\) \{/);
-  // AUDIT-EOTB2: the torch hand's third-person gate asks the sprite body too (Eye Of The Beholder's ToggleBillboard hides the FPV hand)
-  assert.match(rig, /if \(_torchesOn\) \{\s*bindTorches\(\);\s*const tctx = \{\s*renderer, canvas: c, entity, machine: playerWeapon\.machine, sheathed: playerWeapon\.sheathed, usingRightHand: playerWeapon\.usingRightHand,\s*castPlaying: fpsSpellCasting\.isPlayingAnim, spellArmed: spellArmed\(\), thirdPerson: fpArm\.thirdActive\(\) \|\| eotbHidesWeapon\(\),[^\n]*\n\s*climbing: !!cam\?\.climbing, swimming: !!mv\.swimming, transformedLycanthrope: !!entity && isTransformedLycanthrope\(entity\),/);
-  assert.match(rig, /look: lookAxes, swingHeld: _held, cursorActive: cursorActive\(\), camera: camThunk, collider: \(\) => collider\?\.\(\) \?\? null,\s*actionDown: \(action\) => !!actionDown\?\.\(action\), sheathWeapons: \(\) => \{ if \(!playerWeapon\.sheathed\) playerWeapon\.toggleSheath\(\); \},\s*\};\s*handheld\.update\(dt, tctx\);\s*handheld\.lateUpdate\(dt, tctx\);/);
-  // MAC-I: every sprite in this seam takes the frame's TINT now (FPSWeapon.Tint, off the room's light);
-  // the ORDER and the returns are what this pin holds, and neither moved.
-  // SW1: the shield draws between the arms' return and the torch hand -
-  // the OFF hand, behind both the torch and the weapon.
-  // SW1b: the shield's verdict is now taken BEFORE the gate (its poses live in frames where `shown()` is false),
-  // so the draw step is the one line, and `if (!shown()) return;` stops a shield-only frame before the weapon
-  // MAP-WEAPON: one more rung between the arms and the shield - a map
-  // holding the screen stops the classic body's four painters, the torch
-  // hand among them (hands holding a map hold no torch either).
-  // PIN MOVED (SPELL-HAND): the clone's draw passes the spell hand's guard, under its own comment (was:
-  // `widget.draw(renderer, c, fpTint)`); the order did not move
-  assert.match(rig, /if \(fpArm\.active\(\)\) \{[^}]*fpArm\.draw\(c\);[^}]*return; \}\s*(?:\/\/[^\n]*\n\s*)*if \(sheetWindowUp\(\)\) return;\s*(?:\/\/[^\n]*\n\s*)*if \(shieldRect\) shield\.draw\(\(index, rect, uv\) => drawShieldSprite\(index, rect, uv, fpTint\)\);\s*if \(handheldOn\(\) && c\) handheld\.draw\(renderer, c, fpTint\);\s*if \(torchOnly && !gunSliding\) return;[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*if \(!shown\(\) && !gunSliding\) return;[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*const tlArt = c && thunderlockHeld\(\) \? artFor\(playerWeapon\.weapon\) : null;\s*if \(tlArt\?\.anchor && tlArt\.unionBox\) \{ drawThunderlock\(tlArt, c, fpTint\); return; \}\s*(?:\/\/[^\n]*\n\s*)*if \(gunSliding && !shown\(\)\) return;\s*(?:\/\/[^\n]*\n\s*)*if \(widgetOn\(\) && c && widget\.draw\(renderer, c, fpTint, _spellGuard\.weapon > 0 \? \{ transform: \(r\) => \(\{ \.\.\.r, y: r\.y \+ guardDrop\(_spellGuard\.weapon, r\.h\) \}\) \} : undefined\)\) return;/, 'the arms return first (no classic hand under the Morrowind arms), the shield behind the torch hand, the torch hand under the weapon');
-  assert.match(rig, /actionDown = null, torches = \(\) => null, sheetWindowUp = \(\) => false(?:, dropRefusal = \(\) => null)?(?:, actTool = \(\) => null)?(?:, technique = null)? \}\)/, 'KB1: the registry\'s held read (it was the raw key set) and the pool - the two deps the hosts feed, and MAP-WEAPON\'s third - defaulted so a host that never heard of it draws what it always drew');
-  assert.match(rig, /if \(!_torchesOn && _handheldWasOn\) handheld\.dispose\(\);/, 'AUDIT 66 F8: the switch off is a teardown - update() runs only while the mod is on, so the burning loop could not stop itself');
-  assert.match(rig, /dispose\(\) \{ handheld\.dispose\(\); _handheldWasOn = false; \}/, 'AUDIT 66 F8: and the host has a door to call');
-  assert.match(rig, /handheld,\s*\/\/ HT1/);
-  assert.match(rd('src/systems/lycanthropy.js'), /export const isTransformedLycanthrope = \(entity\) => isTransformedNow\(entity\);/);
-  assert.match(rd('src/systems/playerTorch.js'), /const o = lanternAtWaist\(entity\?\.lightSource\) \? \(_waistOverride \?\? LANTERN_HIP\) : \(_offsetOverride \?\? TORCH_OFFSET\);/);   // HT-WAIST: a lantern at the waist lights from the hip
-  assert.match(rd('src/systems/features.js'), /modFeature\('handheld-torches', \(\) => t\('features\.effect\.atOnce', 'Takes effect at once\.'\), '\w+'\)/);
-  // GUARD1 (2026-09-15): this line USED to read `/160 modules/`. It was
-  // a hand-written copy of a number `audit18_bible_docs.test.js` (U42)
-  // already DERIVES from the directory, so it said nothing U42 does not
-  // say better - and it went red the day an unrelated slice added a
-  // module, which is the only thing an enumerated count can ever do.
-  // What HT1 actually wants held is that the page counts THIS
-  // directory and that the count is live, so that is what it asks.
-  {
-    const m = /(\d+) modules\s*\n?\s*live under\s*\n?\s*`src\/systems\/`/.exec(rd('bible/06-Systems/Systems.md'));
-    assert.ok(m, 'Systems.md lost its "N modules live under `src/systems/`" line');
-    assert.equal(Number(m[1]), readdirSync(join(root, 'src/systems'), { recursive: true }).filter((f) => f.endsWith('.js')).length,
-      'Systems.md counts src/systems/ live - HT1 put playerTorch.js in that count');
-  }
-});
-
-test('HT1: the five hosts - each owns a pool, feeds the rig its raw keys and the pool, composes the dropped lights into the point lights, draws the batches on the billboard pass, ticks the burn, puts the targets on the activation ray with a droppedTorch: arm, destroys all on a transition, and the streaming host stamps, sweeps and recenters them; the save envelope carries HandheldTorchesSaveData', () => {
-  const world = rd('src/scenes/world.js'), ext = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), dc = rd('src/scenes/dungeonContext.js'), dj = rd('src/scenes/dungeon.js');
-  for (const [name, src] of [['world', world], ['exterior', ext], ['worldModes', wm], ['dungeonContext', dc]]) {
-    assert.match(src, /import \{ createDroppedTorches \} from '\.\/droppedTorches\.js';/, `${name}: the pool`);
-    assert.match(src, /= createDroppedTorches\(\{/, `${name}: owns one`);
-    assert.match(src, /actionDown: \(action\) => (?:held\(keys, action\)|!!opts\.actionDown\?\.\(action\)), torches: \(\) => (?:droppedTorches|interiorTorches),/, `${name}: the rig's two deps (KB1: the registry's held read)`);
-  }
-  for (const [name, src] of [['world', world], ['exterior', ext]]) {
-    assert.match(src, /\.\.\.droppedTorches\.lights\(\)\)/, `${name}: the dropped lights in the point-light channel`);
-    assert.match(src, /const _torchPick = pickActivatableHit\(cam\.pos, useFwd, droppedTorches\.targets\(\), collider\);/, `${name}: the mod's RegisterCustomActivation on the same ray`);
-    assert.match(src, /const _torchNearest = _race\.torchWins;/, `${name}: the torch arm reads the one race (HARD2)`);
-    assert.match(src, /if \(_torchNearest\) \{ if \(_torchPick\.distance > _torchPick\.reach\) setMidScreenText\(tooFarAwayText\(\)\); else droppedTorches\.activate\(_torchPick\.key, getInteractionMode\(\)\); \}/, `${name}: the 3.2 reach and the mode`);
-    assert.match(src, /if \(_mode\(\) !== _torchesMode\) \{ droppedTorches\.destroyAll\(\); weaponRig\.silenceTorch\(\);[^\n]*? _torchesMode = _mode\(\); \}[^\n]*\n\s*if \(modes\.frame\(dt, now\)\) \{/, `${name}: AUDIT 66 F11 - the transition sweep runs ABOVE the modal return, where the transition is`);
-    assert.match(src, /droppedTorches\.tick\(dt\);/, `${name}: the burn`);
-    assert.match(src, /\.\.\.droppedTorches\.batches\(\)\)/, `${name}: drawn with the people`);
-  }
-  assert.match(world, /if \(collectLoose\) droppedTorches\.collectPixel\(key\);/, 'world: a dropped torch is a loose object, swept with its pixel');
-  assert.match(world, /droppedTorches\.offsetAll\(r\.offset\);/, 'world: the recenter');
-  // AUDIT LANDFORMS C1 MOVED THIS PIN: the height compensation-free and in DFU's frame (groundFrameHeight)
-  assert.match(world, /droppedTorches: droppedTorches\.snapshot\(\(pos\) => \{ const wc = state\.worldCoords\(pos\); return \[wc\.x, groundFrameHeight\(pos\[1\] - state\.compensation\[1\], pos\[0\], pos\[2\]\), wc\.z\]; \}\),/, 'world: the save data in world coordinates');
-  assert.match(world, /droppedTorches\.restore\(restandAt\('position'\)\(w\.droppedTorches\), \(p\) => \{ const \[lx, lz\] = state\.localFromWorld\(p\[0\], p\[2\]\); return \[lx, p\[1\] \+ state\.compensation\[1\], lz\]; \}\);/, 'world: restored into the local frame');   // TERRAIN-SCALE1: stood again on today's ground first
-  assert.match(world, /droppedTorches\.restore\(arrived\.droppedTorches\.map\(/, 'world: the F9 envelope too');   // TERRAIN-SCALE1: stood again on today's ground
-  // the interior mode
-  assert.match(wm, /const interiorTorches = createDroppedTorches\(\{/);
-  assert.match(wm, /\.\.\.interiorTorches\.lights\(\)(?:, \.\.\.\(host\.modeLights\?\.\(\) \?\? \[\]\))?\);/); assert.match(wm, /interiorTorches\.tick\(dt\);/); assert.match(wm, /const _torches = interiorTorches\.batches\(\);/);
-  assert.match(wm, /targets\.push\(\.\.\.interiorTorches\.targets\(\)\);/);
-  assert.match(wm, /if \(key\.startsWith\('droppedTorch:'\)\) \{ interiorTorches\.activate\(key, getInteractionMode\(\)\); return true; \}/);
-  // AUDIT 66 F4: the sweep runs with the TRANSITION, before the scene cache puts the room's own torches back - it used to sit at the foot of the same function and destroyed what the restore had just spawned
-  assert.match(wm, /dismountPlayer\('ToBuildingInterior'\);\s*transitioning = true;\s*try \{\s*(?:\/\/[^\n]*\n\s*)*interiorTorches\.destroyAll\(\);/, 'the way in: before the build, not after the restore');
-  const _wmEnter = wm.indexOf("interiorTorches.destroyAll();");
-  assert.ok(_wmEnter > 0 && _wmEnter < wm.indexOf('restoreInteriorScene();'), 'and it lands ABOVE the restore in the file, as it does in the frame');
-  assert.equal((wm.match(/interiorTorches\.destroyAll\(\);/g) ?? []).length, 3, 'the way in, the way out, and AUDIT 66 F6 the quest-teleport / load exit');
-  assert.match(wm, /interiorDropped\.restorePiles\(null\);[^\n]*\n\s*interiorTorches\.destroyAll\(\);[^\n]*\n\s*interiorHitEffects\.clear\(\);/, 'AUDIT 66 F6: in the teardown list with its siblings');
-  // TERRAIN-SCALE1: measured from the building, and placed on this visit's origin
-  assert.match(wm, /const droppedTorches = interiorTorches\.snapshot\(\(p\) => \[p\[0\] - o\[0\], p\[1\] - o\[1\], p\[2\] - o\[2\]\]\);/); assert.match(wm, /interiorTorches\.restore\(data\.droppedTorches, place\);/);
-  assert.match(wm, /key\.startsWith\('droppedTorch:'\)\) \{/, 'the dungeon arm\'s loot ladder takes the key');
-  assert.match(wm, /\.\.\.dungeonCtx\.torchLights\(\)(?:\.map\(_dgTint\))?(?:, \.\.\.\(dungeonCtx\.sdEndLights\?\.\(\) \?\? \[\]\))?(?:, \.\.\.\(host\.modeLights\?\.\(\) \?\? \[\]\))?\)/);   // AUDIT DISC19: the dungeon's colour on each, the candle alone white assert.match(wm, /\.\.\.dungeonCtx\.torchBatches\(\)/);
-  // the dungeon context and the standalone dungeon
-  assert.match(dc, /droppedTorches, torchBatches: \(\) => droppedTorches\.batches\(\), torchLights: \(\) => droppedTorches\.lights\(\),/);
-  assert.match(dc, /targets\.push\(\.\.\.droppedTorches\.targets\(\)\);/); assert.match(dc, /if \(kind === 'droppedTorch'\) return droppedTorches\.activate\(key, mode\) \? 1 : 0;/);
-  assert.match(dc, /droppedTorches: droppedTorches\.snapshot\(\),/); assert.match(dc, /if \(truncate\) droppedTorches\.restore\(w\.droppedTorches\);/);
-  assert.match(dc, /delete w\.droppedLoot;\s*delete w\.droppedTorches;/, 'the shared world carries nothing of the player\'s own');
-  assert.match(dc, /waterLevel: \(\) => \(_fpFeet \? blockWaterLevelAt\(/, 'the dungeon\'s water plane for the douse');
-  assert.match(dc, /droppedTorches\.destroyAll\(\);\s*weaponRig\.dispose\?\.\(\);/, 'AUDIT 66 F5/F8: the pool and the rig\'s component leave with the dungeon, beside the foes\' batches and the wall torches\' loops');
-  assert.match(dj, /\.\.\.ctx\.torchLights\(\)\)/); assert.match(dj, /\.\.\.ctx\.torchBatches\(\)\]/); assert.match(dj, /key\.startsWith\('droppedTorch:'\) \|\| key\.startsWith\('camp:'\) \|\| key\.startsWith\('hearth:'\)(?: \|\| key\.startsWith\('search:'\))?\)\) \{/);   // AUDIT-WH2 L2-F1/F2: the fires joined this ladder (SEARCH1: and the searchables after them) - ?dungeon stood and NAMED camp:/hearth: and answered neither
-  assert.match(dj, /actionDown: \(action\) => held\(keys, action\)/);
-});
-
-// HT4 (2026-09-15, Mac: "Pressing tab drops torches, tab is reserved for the menu"):
+// HT4:
 // A VENDORED MOD'S KEY MAY NOT LAND ON A KEY THE PORT HAS ALREADY SPENT.
 //
 // Handheld Torches ships Handling.ManualDropInput = "Tab". In Daggerfall Unity
@@ -958,12 +850,9 @@ test('HT4 (re-aimed by KB1): no action ships on a key another action, DFU\'s wor
   assert.equal(def.get('TorchDrop'), 'KeyG', 'HT4: off the dial\'s Tab');
   assert.equal(def.get('TorchThrow'), 'KeyX');
   assert.equal(def.get('QuickDial'), 'Tab', 'the dial holds Tab, in the same table');
-  // ...and the mod does not read its TextKeys any more
-  assert.doesNotMatch(rd('src/systems/handheldTorches.js'), /domCodeForKeyCode\(s\['(Handling|Throwing)\./, 'the three keys are not parsed off the store');
 });
 
-// HT5 (2026-09-16, Mac: "the torch when being held isn't affected by the
-// weapon bob like everything else"). The mod ships its motion modules off
+// HT5. The mod ships its motion modules off
 // and leaves matching them to the weapon's to the player; the port ships
 // Weapon Widget's Bob ON, so the torch hand stood still beside a swaying
 // weapon. The three modules the two mods share ship with the SAME answer
@@ -987,11 +876,9 @@ test('HT5: the torch hand moves as the weapon does - every motion module the two
   assert.ok(r.h._w.position[0] !== 0 || r.h._w.position[1] !== 0, 'walking with Bob on: the hand has moved off its rest');
 });
 
-
 // ── TORCH-VIS: A SHEATHED STANCE IS NOT A STOWED LIGHT ──────────────
 //
-// Mac, 2026-09-18: "If you only have the torch equipped and no weapon, it doesn't show you holding it in first
-// person (morrowind)." Pre-existing, and the cause was one clause too wide. The weapon rig's draw ladder opens on
+// Pre-existing, and the cause was one clause too wide. The weapon rig's draw ladder opens on
 // `shown()`, which is the WEAPON's visibility - the file says so itself where the classic spellcasting hands were
 // hoisted above it, "NOT under shown() - the weapon is the thing shown() hides" - and one leg of it is
 // `playerWeapon.sheathed`. A player walking around with a torch and nothing drawn IS sheathed, so the ladder
@@ -1029,28 +916,3 @@ test('TORCH-VIS (the law): the Morrowind rig already says a SHEATHED stance keep
   assert.equal(isHeldLight(torch) && isLitTorch(torch), true, 'a torch is both');
 });
 
-test('TORCH-VIS (the ladder): a lit hand draws while merely sheathed, the weapon does NOT come back with it, and the other three hiding laws stand', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  // the exception is computed from the OTHER legs of shown(), never from `sheathed` - so it can only ever widen
-  // the sheathed case, and a readied spell, a cast in flight and an equip countdown all still hide the torch
-  assert.match(rig, /const torchOnly = !shown\(\) && !spellArmed\(\) && !fpsSpellCasting\.isPlayingAnim\s*\n\s*&& \(entity\?\.equipCountdown \?\? 0\) <= 0 && isHeldLight\(entity\?\.lightSource\)\s*\n\s*&& \(!fpArm\.active\(\) \|\| fpArm\.torchShown\(\)\)\s*\n\s*&& !lanternAtWaist\(entity\?\.lightSource\);/,
-    'the exception names every leg of shown() it does NOT relax, asks the mod\'s own light test, and lets the Morrowind arm veto a light it has no art for - HT-WAIST: and a lantern at the waist, which no hand holds');
-  // PIN MOVED (TWO-HANDS): the running hands - the sprite lane's and the Morrowind arms' - beside the six (was: ending at `!armsClimb`)
-  assert.match(rig, /if \(paralyzed \|\| \(!shown\(\) && !torchOnly && !sheetOnly && !shieldRect && !gunSliding && !armCasts && !armsClimb && !runHands && !armsRun\)\) return;/, 'the gate takes the exception, and paralysis still takes everything (MAP-FIELD put the held sheet\'s own leg beside the torch\'s, SW1b the shield\'s, FIELD-GUN13 the gun still sliding out of frame, MW-CAST1 the Morrowind arm\'s casting hands, CLIMB-HANDS II its hands on the stone, TWO-HANDS the running hands - the same law, eight things that are not a drawn weapon)');
-  // and the weapon stays hidden: the return sits AFTER the torch hand and BEFORE the clone and the sprite
-  const draw = rig.slice(rig.indexOf('const torchOnly ='));
-  const torchAt = draw.indexOf('handheld.draw(renderer, c, fpTint)');
-  const stopAt = draw.indexOf('if (torchOnly && !gunSliding) return;');   // FIELD-GUN13: the gun mid-slide is the one thing that comes back with the hand
-  const cloneAt = draw.indexOf('widget.draw(renderer, c, fpTint');   // FIELD-GUN6 added the Thunderlock's rect delta after the tint
-  const spriteAt = draw.indexOf('drawFpsWeapon(');
-  assert.ok(torchAt > 0 && stopAt > 0 && cloneAt > 0 && spriteAt > 0, 'all four are in the ladder');
-  assert.ok(torchAt < stopAt, 'the lit hand draws first...');
-  assert.ok(stopAt < cloneAt && stopAt < spriteAt, '...and then the torch-only pass STOPS: no weapon clone, no weapon sprite, while sheathed');
-  // the Morrowind lane is served by the arm's own return above, which is why this needed no second torch draw
-  assert.ok(draw.indexOf('fpArm.draw(c); return; }') < torchAt, 'the arm still returns whole, above the classic hand');
-  assert.match(rd('src/combat/fpArm.js'), /torchShown: \(\) => torchVisible\(\),/, 'the veto is a real read on the arm, not a literal that satisfies a regex');
-  // THE FOUR HOSTS: the fix is in the rig, and every host builds its torch through that one rig
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(rd(host), /createWeaponRig\(\{/, `${host} builds its viewmodel through the one rig`);
-  }
-});

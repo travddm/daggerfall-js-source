@@ -36,7 +36,7 @@
 // span is STREAM_SPAN_DAYS at most and pages STREAM_PAGE rows; the economy reads ECON_DAYS_MAX days at most; node
 // activity is a day and a week. The heavy answers (economy, guilds, node activity, the Home watch, usual prices) are
 // kept in the isolate's memory ECON_KEEP_S (node activity HARVEST_KEEP_S), keyed by the database binding, and an answer
-// says when it was read (`asOf`): the panel never polls them. Every statement stands on an index migration 0153 adds or
+// says when it was read (`asOf`): the panel never polls them. Every statement stands on an index the schema holds or
 // one already there (test/server/staffpanel3econ.test.js asks EXPLAIN QUERY PLAN).
 //
 // ═══ WHAT THE SERVICE CANNOT SEE ═══
@@ -95,7 +95,7 @@ export const HARVEST_PAGE = 50;
 export const HARVEST_ONE_MAX = 500;
 /** The richest characters and guilds named. */
 export const RICHEST = 20;
-/** A character this wealthy or more is in the rich index (migration 0153 idx_realm_characters_rich, whose condition this
+/** A character this wealthy or more is in the rich index (idx_realm_characters_rich, whose condition this
  *  literal is - the statement must say it as the index does, or the index is not used). Below it, no list is needed. */
 export const RICH_FLOOR = 250_000;
 /** Guilds one ranked list holds; pages of GUILDS_PAGE. */
@@ -110,7 +110,7 @@ const STREAM_KINDS = Object.freeze(['sale', 'fill', 'bid', 'trade', 'vault']);
 const LEVELS = Object.freeze(['low', 'medium', 'high']);
 const GUILD_SORTS = Object.freeze({ gold: 'treasury', realm: 'realm_gold', legacy: 'legacy', marks: 'marks', vault: 'vault_items', members: 'members' });
 
-/** ECON-LEFT-OUT (mob, 2026-10-25: "we need to remove gold of banned or trade held player in staff menu data", "economy"):
+/** ECON-LEFT-OUT (, "economy"):
  *  A CHARACTER THE ECONOMY LEAVES OUT - its account banned now, or a trade hold standing on it (realm.js holdStandsSql) -
  *  as SQL over the character aliased `c` and its account `p`, either of them perhaps missing (a LEFT JOIN). Their gold is
  *  never touched: it is only kept out of the economy's totals and lists, and its sum said beside them. */
@@ -547,7 +547,7 @@ export function economy(db, nowS, days) {
         (SELECT COALESCE(SUM(CASE WHEN ${out} THEN m.rent_due ELSE 0 END), 0) FROM homes m ${OUT_JOIN('m')}) AS rent_out`),
       db.prepare('SELECT COALESCE(SUM(balance), 0) AS s, COUNT(*) AS n FROM marks WHERE balance > 0'),
       db.prepare('SELECT COALESCE(SUM(balance), 0) AS s FROM guild_marks'),
-      // marks.js marksReport's escrow - the ledger's escrow end, what went in less what came out - on 0153's covering index
+      // marks.js marksReport's escrow - the ledger's escrow end, what went in less what came out - on the covering index
       db.prepare(`SELECT COALESCE(SUM(CASE WHEN dst_kind = 'escrow' THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN src_kind = 'escrow' THEN amount ELSE 0 END), 0) AS s
         FROM marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'`),
       db.prepare(`SELECT day, kind, CASE WHEN src_kind = 'mint' THEN 1 ELSE 0 END AS minted, SUM(amount) AS s FROM marks_ledger
@@ -564,8 +564,7 @@ export function economy(db, nowS, days) {
           (SELECT m.gold FROM market_gold m WHERE m.player = c.player AND m.char_id = c.id) AS market_gold
         FROM realm_characters c LEFT JOIN players p ON p.id = c.player
         WHERE c.wealth >= ${RICH_FLOOR} AND c.dead_at IS NULL AND NOT ${out} ORDER BY c.wealth DESC LIMIT ${RICHEST}`),
-      // ECON-WORTH (mob, 2026-10-25: "we need a total games worth as well with hover break down on gold held bank held
-      // and item total"): every living character the census has counted, the left out apart - the judge's wealth at
+      // ECON-WORTH: every living character the census has counted, the left out apart - the judge's wealth at
       // its last checkpoint (judge.js wealthOf), and its census tally's purse and banks (staffCensus.js censusTally).
       // A tally written before ECON-WORTH has no `b`: its purse and banks are one figure until its next checkpoint. A
       // character the judge never weighed (no `wealth`) is worth its gold, and no items.

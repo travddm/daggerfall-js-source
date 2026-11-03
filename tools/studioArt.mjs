@@ -1,4 +1,4 @@
-// STUDIO1 (2026-10-17, bible/07-Rendering/Studio-Art.md): THE STUDIO'S TOOL - what the game's artists can paint, the
+// STUDIO1: THE STUDIO'S TOOL - what the game's artists can paint, the
 // pictures they start from, and whether their folder is ready to ship.
 //
 //   node tools/studioArt.mjs                 every slot the port paints itself, and which the studio already covers

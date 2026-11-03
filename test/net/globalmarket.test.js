@@ -1,4 +1,4 @@
-// GLOBAL-MARKET (2026-10-04, Mac: "ensure the market is global") - EVERY BOARD'S MARKET IS THE BAY'S: a listing was read
+// GLOBAL-MARKET - EVERY BOARD'S MARKET IS THE BAY'S: a listing was read
 // from every region already (its courier quoted to the reader's board), but a buy order stood on the boards of its own
 // region alone - the Orders view read `region = ?1` and a fill from any other board was refused `market-elsewhere`. Now the
 // Orders view reads every board's open orders, each with its road from the reader's board, and a fill from another
@@ -152,6 +152,6 @@ test('GLOBAL-MARKET tab: an order of another region says where it stands and wha
   rows = [];
   await tab.load(true);
   node = tab.body();
-  assert.match(text(), /No buy orders right now\./);   // BOARD-UI (PIN MOVED): the words cut
+  assert.match(text(), /No buy orders right now\./);   // BOARD-UI (
   assert.match(text(), /on every board\)\. Sellers outside Daggerfall pay the courier\./);
 });

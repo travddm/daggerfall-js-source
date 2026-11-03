@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-4b (2026-10-14) - A LIBRARY ENTRY'S PICTURE: ITS PARTS DRAWN SMALL, AND WRITTEN AS A PNG.
+// POI-4b - A LIBRARY ENTRY'S PICTURE: ITS PARTS DRAWN SMALL, AND WRITTEN AS A PNG.
 //
-// Mac: "the ability to import models ... I want this to be a tool my developers can use without having to access the
-// codebase" (bible/06-Systems/POI-Editor-Arc.md POI-4b). The library's shelf shows each model as a picture, made by the
+// (POI-4b). The library's shelf shows each model as a picture, made by the
 // editor as the model is shelved - from the meshes and pictures it already holds - and stored as a texture asset by its
 // hash. Drawn here in software, not by the game's renderer: no GL context to borrow, and the same numbers draw the same
 // picture in a test and in every browser.

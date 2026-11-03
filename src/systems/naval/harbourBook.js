@@ -1,5 +1,5 @@
 // @ts-check
-// HARBOUR-BOOK (2026-10-04, from the field: the port towns' new docks "missing" for some players) - THE HARBOURS FOUND
+// HARBOUR-BOOK - THE HARBOURS FOUND
 // NEAR THE PLAYER, ONE BOOK FOR THE QUAYS AND THE SEA. SHIP-LIFE's harbours (shipLife.js findHarbour) were the naval
 // host's own Map, sounded in its frame alone - and that frame runs only while Naval Combat and Come Sail Away do, so a
 // player with either off stood no quay in any port. A port's quays are its town's, not the sea fight's: the harbours are
@@ -22,7 +22,7 @@
 // reads as land) and once a book's life (the scan is some five times the near one's): 36 of the 37 stand a harbour, and
 // Aldbrugh by the ring's square (ALDBRUGH-QUAY). An isle's port past the Veil sounds its own (AUDIT CAPTAIN'S SEA H1).
 //
-// PORT-SHIPS (2026-10-27, Solitude's ships inside its walls): A BERTH STANDS WHERE A SHIP CAN (shipLife.js berthStands) -
+// PORT-SHIPS: A BERTH STANDS WHERE A SHIP CAN (shipLife.js berthStands) -
 // the town keeps its ships out (`near.keep`, systems/naval/harbourKeep.js) and her waterplane floats over ground under the
 // sea's top (`deps.ground`, as navalIsWater reads it). Either missing asks nothing of it.
 //

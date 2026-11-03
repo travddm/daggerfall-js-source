@@ -1,7 +1,6 @@
 // @ts-check
-// RETRO1 (2026-09-24, Mac: "Can we get retro mode from DFU ported
-// over?") - DFU'S RETRO MODE: THE PASS. AUDIT RETRO1 (the same day,
-// Mac: "Audit this") - the colour DFU's screen shows, the LUT off the
+// RETRO1 - DFU'S RETRO MODE: THE PASS. AUDIT RETRO1 (the same day,
+// ) - the colour DFU's screen shows, the LUT off the
 // frame, and nothing of the image left bound after it is shown.
 //
 // systems/retroMode.js reads the settings and does the arithmetic; this
@@ -557,7 +556,7 @@ export class RetroPass {
    * TEXTURE0 active, and the draw-state baseline (depth test, depth
    * writes and culling on, blending off).
    *
-   * PERF-SCALE (2026-09-25): `smooth` is the render scale's image, not
+   * PERF-SCALE: `smooth` is the render scale's image, not
    * retro's - sampled LINEAR at the pixel's own spot (no presentation
    * texel, no effect - the shader's smooth arm returns first), so a 75% world is stretched
    * soft rather than blocky. The image's filter is switched here, where

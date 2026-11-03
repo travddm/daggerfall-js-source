@@ -1,5 +1,4 @@
-// ARENA4b (2026-10-03, the coordinator's note on the client stream's pennants: a rival's and a watched fighter's banner
-// are read off the relay's bills - `go.vs.b`, the hall's live list `a.b` / `b.b` - and the relay never sent one): THE
+// ARENA4b: THE
 // RELAY BILLS EACH FIGHTER'S BANNER. The token signs no banner, so the fighter's own word claims it (net/arena/arenaLaw.js
 // bannerClaim - 'red', 'blue' or none; anything else dropped, never a refusal): the queue's `q` and a ladder bout's
 // `in`. It is cosmetic only - a banner's points are the account service's, counted off its own arena_members row. The
@@ -89,7 +88,7 @@ test('ARENA4b the relay bills each fighter\'s banner: two queued under their ban
 test('ARENA4b the client claims my banner: the queue word and a ladder bout\'s `in` carry the account\'s banner (the board\'s), none before the board, and none for a banner the realm does not know; the hall\'s exhibition named off its hour under the banners the relay bills its sides by (mutants: the queue\'s banner unsent; the ladder `in`\'s unsent; an unknown banner claimed; the relay\'s exhibition banners ignored)', async () => {
   const hallSent = [], boutSent = [], entered = [];
   const hallLink = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   let board = { me: { ladder: arenaLadderOf([]) } };
   const deps = { now: () => 0, session: () => session, makeHall: () => hallLink, bouts: { ask() {}, relayWord: () => true, exhibitionWord: () => true, dismiss() {}, holds: () => false, relay: () => null },
     account: { board: async () => ({ ok: true, data: board }), claim: async () => ({ ok: true, data: {} }), attempt: async (tier, bout) => ({ ok: true, data: { ticket: 'feedc0de00000002', tier, bout } }), me: () => null }, enterFloor: (k, o) => { entered.push([k, o]); return true; }, level: () => 12,

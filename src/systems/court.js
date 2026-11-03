@@ -35,8 +35,7 @@
 // that is absent and an arm that is wrong read alike from the call
 // site). The prison time-skip riding the host clock callback is the
 // port's seam shape, not a remainder.
-// REP (2026-09-29, Mac: "overhauling the reputation system. Something just much better and not as punishing, but still
-// punishing"; his calls "The charge, with a mark" and "Timed or pardoned"): THREE OF DFU'S LAWS ABOVE ARE DEPARTED FROM,
+// REP: THREE OF DFU'S LAWS ABOVE ARE DEPARTED FROM,
 // and systems/standing.js is the overhaul's one home. RaiseReputationForDoingSentence gives the charge back (REP2,
 // sentenceRefund); an involuntary surrender is refused only when a watchman fell to the player in the chase (REP2,
 // surrenderToCityGuards); banishment is a Murder's or a Treason's alone (REP3, BANISHABLE_CRIMES) and is timed or
@@ -166,7 +165,7 @@ export const LEGAL_REP_MAX = 100;
 
 /** Minutes between NormalizeReputations runs (PlayerEntity.cs:457, 112 days). */
 export const NORMALIZE_INTERVAL_MINUTES = 161280;
-/** REP4 (Mac: "Earn it + faster drift"): a standing BELOW zero recovers a point every 7 days - legal and faction alike,
+/** REP4: a standing BELOW zero recovers a point every 7 days - legal and faction alike,
  *  lived and across an absence (worldTick.js) - where DFU's walk every 112 days takes it (and wears a positive standing
  *  down, which stays DFU's). 112 is a multiple of 7, so the 112-day walk is the week's own on its boundary. */
 export const RECOVERY_INTERVAL_MINUTES = 10080;
@@ -214,7 +213,7 @@ export function clampLegalReputations(player) {
  * the faction half fanned out; DFU's call passes no propagate flag).
  * The asymmetry is only direct-increment vs clamped ChangeReputation.
  *
- * AUDIT DISC28 TM-1 (Mac, 2026-09-28: "Recovery only"): `recoveryOnly` is
+ * AUDIT DISC28 TM-1: `recoveryOnly` is
  * the PORT'S ONLINE TIME MODEL, not DFU's - DFU's member walks both ways
  * and never meets an absence, because the single-player clock stands
  * while nobody plays. Online the world's clock runs through every
@@ -350,7 +349,7 @@ export function deductGold(player, amount) {
   }
   return 0;
 }
-/** MARKET-AUDIT (2026-10-04): deductGold, and the undo of exactly what it took - the coins back to the purse, each letter
+/** MARKET-AUDIT: deductGold, and the undo of exactly what it took - the coins back to the purse, each letter
  *  back to the value it had (a spent one into the pack again). A refused online payment gave its whole cost back as
  *  coins (`addGold`): a 30,000-gold letter paid out and refused came back as 150 kg of purse. The undo moves only what
  *  this payment moved, so gold the purse gained or a letter spent elsewhere between stays as it is. */
@@ -401,7 +400,7 @@ export function addGold(player, amount) {
 
 /** SurrenderToCityGuards. setHealth1 is the host's vitals write. Returns true when the arrest goes to court.
  *
- *  REP2 (Mac: "Surrender is always honoured, unless you killed a watchman during that chase" - the shape he signed):
+ *  REP2 (- the shape he signed):
  *  DFU refused an involuntary surrender - the blow that would kill, after an N - outright below -20 and on a coin flip
  *  from -20 to 0, and let the blow kill; online the respawn is in the same region. The watch takes a beaten criminal to
  *  court now, unless a watchman fell to them in this chase (`watchSlain`, cityGuards.js - cleared with the crime). The
@@ -428,7 +427,7 @@ export function startCourt(player, regionIndex, crime, { rolls = Math.random, df
   const crimeType = crime - 1;
   const legalRep = legalRepOf(player, regionIndex);
   let threshold1 = 0, threshold2 = 0;
-  // REP3 (Mac: "Timed or pardoned" - "Only for Murder and worse"): the banishment roll is a Murder's or a Treason's
+  // REP3 (- "Only for Murder and worse"): the banishment roll is a Murder's or a Treason's
   // alone; every lesser crime is fined or jailed whatever the standing (DFU rolled it for every crime below zero - 12% on
   // a first Theft). No roll is drawn for a lesser crime, so its court takes nothing from the stream.
   if (legalRep < 0 && BANISHABLE_CRIMES.has(crime)) {
@@ -506,7 +505,7 @@ export function raiseRepForSentence(player, court, { acquitted = false } = {}) {
  *  own half, truncated as the charge's was), spread as the charge spread - never past 0: an answer mends a charge, it
  *  buys no favour. Answers the points. Called once the law's own change is written (changeLegalRep), whose standing it
  *  reads.
- *  FINE-PEOPLE AUDIT (2026-10-16, S5): THE HALVES ADD UP TO THE CHARGE'S HALF. Each answer's half was truncated alone -
+ *  FINE-PEOPLE AUDIT: THE HALVES ADD UP TO THE CHARGE'S HALF. Each answer's half was truncated alone -
  *  `trunc(5 / 2)` a step - so the steps never summed to the charge's: one Theft (the law -5, the People -2) answered by
  *  one penance left the People -1 for good, the penance no longer offered (the law whole); a Breaking and Entering -1,
  *  two Thefts -2, the reporter's Murder and Assault -3 once every fine and penance was paid - where a served sentence
@@ -526,7 +525,7 @@ export function raisePeopleForAnswer(player, regionIndex, legalPts) {
   return pts;
 }
 
-/** REP2 (Mac: "The charge, with a mark" - "Lesser crimes come back in full; Murder and Assault leave half as a lasting
+/** REP2 (- "Lesser crimes come back in full; Murder and Assault leave half as a lasting
  *  mark"): what a sentence served, a fine paid or a guild's rescue gives back of the arrest's charge (lowerRepForCrime
  *  above: the legal loss, and half of it off the region's People). DFU gave back half the loss less one on the legal side
  *  (Conspiracy nothing, a Vagrancy one point MORE lost) and half that on the People's - so a sentence never paid its
@@ -626,7 +625,7 @@ export function resolveGuiltyVerdict(court, player) {
  *  takes what the prisoner carries. The arrest flow calls it at every guilty exit (scenes/arrestFlow.js finish - a
  *  sentence served, a fine paid, banishment); an acquittal and a guild's rescue never reach it. Answers what was
  *  taken. DFU's court takes nothing (DaggerfallCourtWindow has no item line) - the port's own, Ledger A.
- *  STOLEN-GOODS AUDIT (2026-10-16, S2): A STOLEN BAG TAKEN LEAVES ITS HONEST GOODS. The Materials Bag is an item in the
+ *  STOLEN-GOODS AUDIT: A STOLEN BAG TAKEN LEAVES ITS HONEST GOODS. The Materials Bag is an item in the
  *  pack, and owning one is holding one (net/bagLaw.js hasBag) - a bag taken off a shut General Store's shelf is stolen
  *  like any piece. Taken, it left `bagItems` behind with no bag to hold them: twenty honest ores in a list nobody owns,
  *  BAG1's own rule broken ("a loaded Materials Bag never leaves the pack" - bagMayLeave). So once the stolen goods are

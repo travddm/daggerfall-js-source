@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-3 (2026-10-14) - THE EDITOR'S PANEL: EVERYTHING A BUILDER READS AND PRESSES.
+// POI-3 - THE EDITOR'S PANEL: EVERYTHING A BUILDER READS AND PRESSES.
 //
-// Mac: "a tool my developers can use without having to access the codebase ... the best it can be" (bible/06-Systems/
+// (bible/06-Systems/
 // POI-Editor-Arc.md POI-3). The editor's screen over the world (scenes/poiEditorHost.js draws the handles in it):
 //
 //   - THE BAR (top): the tools (select, move, turn, size - Q W E R), the space (world or the thing's own - X), snap and

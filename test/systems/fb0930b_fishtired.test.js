@@ -9,7 +9,7 @@
 // the act's meter holds the eye. Measured on the real modules: from a full bar at Swimming 5, nine of twenty seeded days
 // died inside the forty (hauls 36-39); from three quarters at haul 30 with full health.
 //
-// SWIM-SPENT (systems/rest/rest.js; Mac: "I dont care about DFU") ends the death: a drain to nothing in the water now costs a
+// SWIM-SPENT (systems/rest/rest.js) ends the death: a drain to nothing in the water now costs a
 // tenth of the health a game minute, said on the HUD. The net still keeps its angler off it: no net is cast in
 // the water on the last quarter of the fatigue bar, and an act there ends when the bar falls into it - the prompt, and
 // E, say "too tired to fish in the water. Get out and rest", with a quarter of the bar to swim out on (of 6,400, four

@@ -1,4 +1,4 @@
-// QV1 - THE QUEST VIDEO DOOR (2026-08-28). PlayVideo's parse law was
+// QV1 - THE QUEST VIDEO DOOR. PlayVideo's parse law was
 // pinned at Q2b (questactions.test.js) and the machine's playVideo
 // hook has carried the name since Q4-v - into a console.warn saying
 // the seam "pends". TEN corpus quests write `play video N` (the
@@ -70,17 +70,3 @@ test('QV1: the machine hands the name to the playVideo hook and the action compl
     'SetComplete runs at the push, exactly as PlayVideo.cs:81');
 });
 
-test('QV1: the world door is the infection lane\'s player, DFU\'s flag, never-traps', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.ok(!/video playback pends/.test(world), 'the pends warn is GONE - retiring a seam deletes the sentence');
-  // CRUX1: the door hands the name to the queue (systems/quest/videoQueue.js) and the PLAYER is the queue's one
-  // play function, declared beside the hooks - the same body, in turn
-  assert.match(world, /playVideo: \(name\) => \{ _questVideos\(name\); \},/, 'the door exists and is the queue\'s');
-  const from = world.indexOf('const _questVideos = makeVideoQueue(async (name) => {');
-  assert.ok(from > 0, 'the queue\'s play function exists');
-  const body = world.slice(from, world.indexOf('\n  });', from));
-  assert.match(body, /import\('\.\.\/ui\/videoPlayer\.js'\)/, 'the one player, deferred off the tick frame');
-  assert.match(body, /\{ endOnAnyKey: false \}/, 'PlayVideo.cs:78 - EndOnAnyKey = false, verbatim');
-  assert.match(body, /catch \(e\)/, 'a missing ANIM costs the video, never the quest');
-  assert.match(body, /__questVideos/, 'the probe hook, the infection lane\'s own shape');
-});

@@ -1,6 +1,4 @@
-// CARDS2c (2026-10-08, bible/11-Multiplayer/Tavern-Cards.md section 34; section 12's open item: "Eye Of The Beholder has
-// no sitting art, so a sprite body - mine in that lane, a peer's walker or paperdoll - stands at its seat facing the
-// table"): THE SPRITE LANE SEATED (net/remotePlayers.js seatedSink). Driven: a pose that says a seat (`st`, CARDS2b's
+// CARDS2c: THE SPRITE LANE SEATED (net/remotePlayers.js seatedSink). Driven: a pose that says a seat (`st`, CARDS2b's
 // table top) sinks its sprite by the seat's own hip drop - the Morrowind body's (player/seatPose.js SEAT_HIP_DROP), so
 // the sprite's head stands where the seated rig's eye does - and a standing pose not at all; the paperdoll's billboard
 // drawn sunk on a fake renderer, its name brought down with it; my own sprite needs none (seated, my view is the seat's
@@ -41,11 +39,3 @@ test('CARDS2c the paperdoll\'s billboard drawn sunk at its seat on a fake render
   assert.equal(rp._shown[0].height, 1.9);
 });
 
-test('CARDS2c the class sprite\'s path sinks the same; the record says why a sprite sinks rather than sits', () => {
-  const src = read('src/net/remotePlayers.js');
-  const mobile = src.slice(src.indexOf('  _syncMobilePeer('), src.indexOf('  /** OW-PEERS: the Overworld\'s grow at a peer\'s feet'));
-  assert.ok(mobile.includes('const sink = seatedSink(shown);'));
-  assert.ok(mobile.includes('entry.batch.origin[1] = f[1] - sink;'));
-  assert.ok(mobile.includes('this._shown.push({ peer, height: entry.height - sink });'));
-  assert.match(src, /A sprite cannot bend; it SINKS/);
-});

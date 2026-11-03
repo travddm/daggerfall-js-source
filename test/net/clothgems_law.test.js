@@ -1,9 +1,9 @@
-// CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids") - THE LAW.
+// CLOTH-GEMS - THE LAW.
 // Linen and Wool were the Weavers' counter's alone (Professions-Arc 4.5: "never gathered"), and AUDIT 32 S1 withheld the
 // first-make 500 from every recipe made wholly of them - 152 of Outfitting's 332 first-craft keys could never pay, 19 of
 // 171 at tiers 1-2. The owner's decision: CRAFT THEM. The loom weaves Linen from Root Tendrils and spins Wool from furs
 // (net/professionLaw.js WEAVE_RECIPES, SPIN_RECIPES), and S1 judges the units' origin (net/recipeLaw.js firstCraftPays's
-// `own`), so the character's own cloth pays and the counter's never does. bible/06-Systems/Professions-Arc.md 50.
+// `own`), so the character's own cloth pays and the counter's never does. 50.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

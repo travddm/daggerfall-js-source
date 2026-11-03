@@ -23,8 +23,7 @@ import { hasReplacement, replacementBytes } from './musicReplacement.js';   // M
 import { onSettingChange } from './settings/settings.js';   // 2026-08-27: MusicVolume applies live
 import { MidiOutSongPlayer, midiOutName, findMidiOutput, onMidiOutChange } from './midiOut.js';   // MIDI-OUT1: a device as the voice
 
-/** DISC20-B (2026-09-24, Mac: "Sometimes when music tracks switch, its very abrupt instead of seamlessly fading in
- *  between tracks"): A SWITCH FADES. DFU cuts - DaggerfallSongPlayer.Play calls Stop first, and Stop is
+/** DISC20-B: A SWITCH FADES. DFU cuts - DaggerfallSongPlayer.Play calls Stop first, and Stop is
  *  audioSource.Stop() or midiSequencer.Stop() with NoteOffAll: the old song goes mid-note and the next starts at full
  *  level - and so did every switch the port makes (a weather ring crossed, dawn, a door, a new location, a quest's
  *  PlaySong). A RECORDED DEPARTURE (Port-Ledger A), at the owner's word: the song sounding fades out over
@@ -85,10 +84,6 @@ export class MusicService {
 
   /** MIDI-OUT1: is the music on a device? */
   get midiOut() { return this._midiOut; }
-
-  /** EG-G2 (bible/11-Multiplayer/Elite-Gates.md section 26, THE SPIRE MIX): duck what sounds `db` decibels for `seconds`
-   *  (systems/song/songPlayer.js SongPlayer.duck - a MIDI device or a replacement track is not ducked). */
-  duck(db, seconds) { this.player?.duck?.(db, seconds); }
 
   /** Re-level whatever is sounding to the MusicVolume setting. */
   resyncGain() {
@@ -273,6 +268,12 @@ export class MusicService {
       this._audio?.stop();
       if (sw.to && !this._start(sw.to) && this._current === sw.to) this._current = null;
     }, seconds * 1000);
+  }
+
+  /** Ramp the song sounding to `level` of its full level. The front door holds the title song lower under the menu
+   *  (systems/titleMusic.js). A switch under way owns the fader until the next song has started. */
+  fadeTo(level, seconds) {
+    if (!this._switch) this._fadeSounding(level, seconds);
   }
 
   _cancelSwitch() {

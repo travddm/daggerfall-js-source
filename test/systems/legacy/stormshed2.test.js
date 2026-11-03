@@ -1,5 +1,4 @@
-// STORM-SHED 2 (2026-10-06, the account database's follow-ups after the second overload; bible/06-Systems/Online-Arc.md
-// STORM-SHED 2): what the overload's numbers showed costing the database every hour, made small at the root:
+// STORM-SHED 2: what the overload's numbers showed costing the database every hour, made small at the root:
 //   A. the season's #1 - the whole board (BOARD_SQL) counted by every Worker each minute for the token's laurel, 109
 //      million of the database's 760 million rows a day - kept in `arena_champions`, counted when a rated bout lands and
 //      when the kept word is ARENA_CHAMPION_STORED_S old;
@@ -76,7 +75,7 @@ test('STORM-SHED 2 B: an account\'s rating is read off its own bouts - one read,
   assert.doesNotMatch(p, /idx_arena_pvp_season/, 'never the season\'s every bout');
 });
 
-test('STORM-SHED 2 B: a Grand Champion\'s row, asked on every registered account\'s token, is found by the account and the bout on idx_arena_pve_player_grand - never every ladder bout the account fought (mutant: migration 0086\'s index unwritten)', async () => {
+test('STORM-SHED 2 B: a Grand Champion\'s row, asked on every registered account\'s token, is found by the account and the bout on idx_arena_pve_player_grand - never every ladder bout the account fought (mutant: the index unwritten)', async () => {
   const db = d1();
   const { db: cdb, sqls } = counting(db, {});
   await arenaHonoursOf({ db: cdb }, { id: 'p1', handle: 'Somebody' }, 1_800_000_000).catch(() => null);
@@ -203,7 +202,7 @@ test('STORM-SHED 2 D: a Project Legacy save that changed nothing leaves the line
     put: async (_io, _id, record) => { puts.push(record.rev); return drop ? { ok: false, error: 'network' } : { ok: true, data: { rev: record.rev } }; } });
   const entity = { name: 'Ysolde Hlaalu', gender: 'female', race: 'DarkElf', raceId: 4, faceIndex: 3, careerIndex: 5,
     career: { name: 'Nightblade', primarySkills: [28, 22, 16], majorSkills: [19, 24, 13], minorSkills: [1, 2, 3, 4, 5, 6] },
-    level: 7, characterId: 'c-ysolde', chargenDone: true, levelingSystem: 'virtue',
+    level: 7, characterId: 'c-ysolde', chargenDone: true,
     stats: { strength: 60, intelligence: 72, willpower: 55, agility: 80, endurance: 50, personality: 40, speed: 70, luck: 50 },
     skills: Array.from({ length: 35 }, (_, i) => 10 + i) };
   const host = createLegacyHost({

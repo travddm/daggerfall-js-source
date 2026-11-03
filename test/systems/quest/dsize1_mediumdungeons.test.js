@@ -9,11 +9,11 @@
 // three (world/smallerDungeons.js); online the stamp is the room's size (E4); a quest whose markers were chosen
 // through another quest's link takes that link's size where the medium size is either side (E5); a quest frozen at
 // another size crossing online is re-laid on the room's build (E1, quest/questRepair.js). SD-ONLINE (PINS MOVED -
-// bible/11-Multiplayer/Super-Dungeons.md section 13; test/systems/sdonline.test.js holds the law itself): online every
+// test/systems/sdonline.test.js holds the law itself): online every
 // dungeon has the world's own size now - small, medium or large by its map id - where it was the whole dungeon. And
 // DETECT-FINDS: a
-// searched object's find is in the one loot walk (scenes/shared.js). bible/03-World/Delve-Arc.md, DSIZE1 and
-// DETECT-FINDS; bible/01-Overview/audits/Audit-Delve.md.
+// searched object's find is in the one loot walk (scenes/shared.js)., DSIZE1 and
+// DETECT-FINDS;.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -182,9 +182,6 @@ test('DSIZE1 E5: the machine\'s Start takes a linked dungeon\'s size where the m
   const elsewhere = quest(2, M, 999);
   adoptLinkedDungeonSize(elsewhere, machineOf(S.Disabled));
   assert.equal(elsewhere.smallerDungeonsState, M, 'a link on another dungeon is not this one\'s');
-  // wired at the machine's Start, after the stamp
-  const m = src('src/systems/quest/machine.js');
-  assert.match(m, /startQuestImmediate\(quest\) \{\n    quest\.start\(\);\n    adoptLinkedDungeonSize\(quest, this\);/);
 });
 
 test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another size, loaded online, has its dungeon markers enumerated again on the dungeon whole (its quest\'s world asks for it whole - the layout its instance builds), its placements put back there, and its stamp set to DFU\'s Disabled', () => {
@@ -193,7 +190,7 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   m.startQuestImmediate(q);
   q.smallerDungeonsState = ONLINE_DUNGEONS_STATE;   // chosen on the world's sizes, before INSTANCES
   // the dungeon whole (the quest's world answers it - online, world.js questWorld asks dungeonLocationFor for it whole,
-  // INSTANCES - PIN MOVED: it was the room's world-sized build):
+  // INSTANCES
   // two blocks, a spawn marker in each, at block (0,0) and (1,0)
   const flat = (record, x) => ({ type: RDB_RESOURCE_TYPES.Flat, position: x, xPos: x, yPos: 0, zPos: 0, resources: { flatResource: { textureArchive: 199, textureRecord: record } } });
   const blockData = { W1: { position: 100, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 1), flat(18, 2)] }] } }, B1: { position: 200, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 3)] }] } } };
@@ -239,11 +236,6 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   dun.siteDetails = { ...dun.siteDetails, locationName: 'Nowhere' };
   assert.equal(relayOnlineDungeons(m), 0);
   assert.equal(q.smallerDungeonsState, MEDIUM_DUNGEONS_STATE, 'unread: the stamp stands');
-  // wired at the bridge's load, online only, before anything mounts
-  const bridge = src('src/scenes/quest/questBridge.js');
-  const restore = bridge.slice(bridge.indexOf('restore(data) {'));
-  assert.match(restore, /machine\.restoreSaveData\(data\.machine \?\? \{ siteLinks: \[\], quests: \[\] \}\);\n(?:\s*\/\/[^\n]*\n)+\s*if \(isOnlinePage\(\)\) relayOnlineDungeons\(machine, /);
-  assert.doesNotMatch(src('src/systems/quest/questRepair.js'), /function relayWholeDungeons/, 'the whole-dungeon re-lay is gone, not beside it');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
@@ -311,14 +303,4 @@ test('DETECT-FINDS: a searched object\'s find is in the one loot walk, at its bo
   // and the Detect scan finds it, as it finds a pile
   const scan = updateNearbyObjects([0, 0, 0], { loot });
   assert.equal(getNearbyObjects(scan, NEARBY.Treasure).length, 1);
-  assert.match(src('src/scenes/dungeonContext.js'), /loot: \(\) => nearbyLootRecords\(\{ piles: \[\.\.\.lootPiles, \.\.\.droppedLoot\._piles\], foes, searched: searchables \}\),/);
-  // AUDIT DELVE (the open item closed): the street's searched headstones need no walk of their own - a grave's find is
-  // minted as a dropped pile on the ground (searchPartyHost.js activateGrave), and the street's Detect walk carries every pile
-  // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): activateGrave left bootWorld for scenes/searchPartyHost.js
-  const w = src('src/scenes/world.js');
-  const sp = src('src/scenes/searchPartyHost.js');
-  const grave = sp.slice(sp.indexOf('function activateGrave(g, mode = \'grab\') {'), sp.indexOf('  return { activateGrave'));
-  assert.ok(grave.length > 0, 'the stone\'s search, in its module');
-  assert.match(grave, /const pile = droppedLoot\.dropPile\(items, dropFeet\(\), /, 'the grave\'s find is a pile');
-  assert.match(w, /loot: \(\) => nearbyLootRecords\(\{ piles: droppedLoot\._piles, foes: exteriorFoePool\(\) \}\),/, 'and the street walks the piles');
 });

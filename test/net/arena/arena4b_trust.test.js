@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, the audit of ARENA4's ladder trust): A LADDER FIGHTER'S VITALITY IS THE RELAY'S. ARENA4 let the
+// ARENA4b: A LADDER FIGHTER'S VITALITY IS THE RELAY'S. ARENA4 let the
 // `in` word's client-claimed `lv` and `mh` win over anything signed, so a modified client could fight the Grand Champion
 // with the health it named. Now the token signs the character's level (`cl`, net/identityToken.js claimsValid - the
 // account service mints it, another stream's), the relay carries it onto the socket (server/src/index.js `_named`),
@@ -78,7 +78,7 @@ test('ARENA4b the relay holds a ladder fighter at the signed level\'s vitality: 
 
 test('ARENA4b the client\'s ladder `in`: the tier, the bout and my level - no health of mine is said (mutants: the health sent)', async () => {
   const boutSent = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const board = { me: { ladder: arenaLadderOf([{ tier: 0, bout: 0 }]) } };
   const entered = [];
   const A = createArenaOnline({ now: () => 0, session: () => session, makeHall: () => ({ status: 'open', join() {}, leave() {}, sendArena: () => true }), bouts: { ask() {}, relayWord: () => true, dismiss() {}, holds: () => false, relay: () => null },

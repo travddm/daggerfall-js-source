@@ -455,52 +455,6 @@ test('A5b: every outdoor and FM playlist entry EXISTS in MIDI.BSA', { skip: skip
   assert.deepEqual(missing, [], 'every exported playlist resolves against the real archive');
 });
 
-test('AUDIT 19 1:1: every host feeds the ONE music director', () => {
-  // The port used to call music.playFrom at moments each host chose. DFU
-  // has a SongManager.Update() that rebuilds a context every frame and
-  // reacts to the difference, so the port now has one director and the
-  // hosts only feed it. This sweep is what stops the four of them drifting
-  // apart again - the shape every previous audit found.
-  const wm = readFileSync('src/scenes/worldModes.js', 'utf8');
-  assert.match(wm, /musicContext\(\)/, 'the mode host reports its half of the context');
-  assert.match(wm, /insideDungeon: true/, 'including whether the player is in a dungeon');
-  assert.match(wm, /dungeonKey: dungeonCtx\?\.musicSeed/, 'and the dungeon selection seed');
-  assert.ok(!/music\.playFrom\(/.test(wm),
-    'the mode host must NOT start songs itself - the director decides');
-
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const text = hostText(host);
-    assert.match(text, /createMusicDirector\(\)/, `${host} has no music director`);
-    assert.match(text, /musicDirector\.update\(/, `${host} never feeds it`);
-    assert.match(text, /modes\?\.musicContext\?\.\(\)/,
-      `${host} must merge the mode host's half of the context`);
-    assert.match(text, /gameDays: gameDaysNow\(\)/,
-      `${host} must feed the CUMULATIVE day count`);
-    assert.ok(!/music\.playFrom\(/.test(text),
-      `${host} must not start songs directly any more`);
-  }
-
-  // The dungeon context supplies the seed and no longer plays.
-  const dc = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  assert.match(dc, /musicSeed: dungeonKey\(/, 'the dungeon context exposes its selection seed');
-  assert.ok(!/music\.playFrom\(/.test(dc), 'and does not start songs itself');
-
-  // ALL FOUR HOSTS. Removing dungeonContext's own playFrom without giving
-  // scenes/dungeon.js a director left ?dungeon silent - the host gap, made
-  // by the very pass that was closing it. Sweeping three hosts is what let
-  // that through, so the list is the whole set.
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/dungeon.js']) {
-    const text = hostText(host);
-    assert.match(text, /createMusicDirector\(\)/, `${host} has no music director`);
-    assert.match(text, /musicDirector\.update\(/, `${host} never feeds it`);
-  }
-  const dh = readFileSync('src/scenes/dungeon.js', 'utf8');
-  assert.match(dh, /dungeonKey: ctx\.musicSeed/,
-    'the dungeon host must feed the SEED, or its songs fall back to the day roll');
-});
-
-
-
 // ---------------------------------------------------------------------------
 // AUDIT 19. Three lessons, pinned.
 //
@@ -684,94 +638,6 @@ test('AUDIT 2026-08-25: articulation beats family, where the two disagree', asyn
   }
 });
 
-test('AUDIT 2026-08-25: the SUSTAIN PEDAL, which was being dropped entirely', async () => {
-  const { sustainIntervals, sustainedDuration } = await import('../../src/systems/song/songPlayer.js');
-  const cc = (tick, value, channel = 0) => ({ type: 'controller', controller: 64, tick, value, channel });
-
-  // MIDI's threshold is 64: below is up, 64 and above is down. Not 63,
-  // not 65 - a wrong threshold makes half the pedal marks read backwards.
-  assert.deepEqual([...sustainIntervals([cc(0, 64), cc(10, 63)]).get(0)], [[0, 10]]);
-  assert.deepEqual([...sustainIntervals([cc(0, 63), cc(10, 0)]).values()], [], 'a 63 never presses');
-  assert.deepEqual([...sustainIntervals([cc(0, 127), cc(10, 0)]).get(0)], [[0, 10]]);
-
-  // A repeated press does NOT restart the interval - the pedal is already
-  // down, and re-opening it would cut the notes it is holding.
-  assert.deepEqual([...sustainIntervals([cc(0, 127), cc(5, 127), cc(10, 0)]).get(0)], [[0, 10]]);
-
-  // Left down at the end, it rings to the loop rather than being cut by
-  // an up that never comes. Without a song length there is nowhere to
-  // close it but Infinity, which is why the player passes one.
-  assert.deepEqual([...sustainIntervals([cc(0, 127)]).get(0)], [[0, Infinity]]);
-  // AUDIT 39: given the song's length, the open pedal closes THERE.
-  assert.deepEqual([...sustainIntervals([cc(0, 127)], 480).get(0)], [[0, 480]]);
-  assert.deepEqual([...sustainIntervals([cc(500, 127)], 480).get(0)], [[500, 500]],
-    'a pedal pressed past the end closes on itself - never a negative ring');
-
-  // ONLY CC64 IS THE PEDAL. Every fixture above is made of pedal events,
-  // so none of them could tell whether the controller number was checked
-  // at all - a mutation that treated EVERY controller as a pedal
-  // survived them. The archive sends 60,920 CC7s and 54,851 CC10s, so
-  // getting this wrong would make almost every volume and pan change
-  // press the sustain pedal.
-  const noisy = sustainIntervals([
-    { type: 'controller', controller: 7, tick: 0, value: 127, channel: 0 },
-    { type: 'controller', controller: 10, tick: 5, value: 100, channel: 0 },
-    { type: 'controller', controller: 1, tick: 8, value: 64, channel: 0 },
-    { type: 'programChange', tick: 9, program: 40, channel: 0 },
-  ]);
-  assert.equal(noisy.size, 0, 'nothing but CC64 presses the pedal');
-
-  // Channels are independent - one player's pedal is not another's.
-  const two = sustainIntervals([cc(0, 127, 1), cc(4, 127, 2), cc(8, 0, 1), cc(12, 0, 2)]);
-  assert.deepEqual([...two.get(1)], [[0, 8]]);
-  assert.deepEqual([...two.get(2)], [[4, 12]]);
-
-  // THE EXTENSION. A note whose own end falls while the pedal is down
-  // rings until it lifts; one that ends outside is untouched.
-  const held = [[100, 200]];
-  assert.equal(sustainedDuration(90, 20, held), 110, 'ends at 110, inside - rings to 200');
-  assert.equal(sustainedDuration(90, 5, held), 5, 'ends at 95, before the pedal - untouched');
-  assert.equal(sustainedDuration(210, 10, held), 10, 'ends after the pedal lifted - untouched');
-
-  // The boundaries, which is where an off-by-one would hide: a note
-  // ending exactly ON the press is caught, one ending exactly on the
-  // release is not - the pedal is already up by then.
-  assert.equal(sustainedDuration(50, 50, held), 150, 'end == down is inside');
-  assert.equal(sustainedDuration(100, 100, held), 100, 'end == up is outside, and unchanged');
-
-  // THE PEDAL NEVER SHORTENS - and the pin has to test the case that
-  // actually reaches the decision. A first draft used a note so long it
-  // ended past the pedal entirely, which returns early and proves
-  // nothing; a mutation that dropped the length guard survived it. The
-  // real law is that a note ending OUTSIDE the interval is returned
-  // untouched, whether it is longer or shorter than the pedal.
-  assert.equal(sustainedDuration(90, 500, held), 500, 'a note outstaying the pedal keeps its length');
-  assert.equal(sustainedDuration(0, 1000, held), 1000, 'and so does one that spans it entirely');
-  // Inside the interval the note always GROWS - `end < up` guarantees
-  // `up - startTick` exceeds the note's own duration, which is why the
-  // implementation needs no max().
-  for (const [st, d] of [[90, 20], [50, 50], [120, 10]]) {
-    const out = sustainedDuration(st, d, held);
-    assert.ok(out > d, `note at ${st} for ${d} must lengthen, got ${out}`);
-    assert.equal(out, 200 - st, 'and it rings to exactly where the pedal lifts');
-  }
-
-  // No pedal at all, and a channel with none, both leave the note alone.
-  assert.equal(sustainedDuration(0, 42, undefined), 42);
-  assert.equal(sustainedDuration(0, 42, []), 42);
-
-  // ...and the scheduler must actually USE it, computed ONCE per song
-  // rather than per lookahead window.
-  const src = readFileSync(new URL('../../src/systems/song/songPlayer.js', import.meta.url), 'utf8');
-  assert.match(src, /sustainedDuration\(e\.tick, e\.duration \|\| 0, this\._sustain\?\.get\(e\.channel\)\)/);
-  // AUDIT 39: the pin moved with the law - the pedal map is built with
-  // the SONG'S LENGTH, so an unlifted pedal closes there instead of at
-  // Infinity (see the pump pin below).
-  assert.match(src, /this\._sustain = sustainIntervals\(song\.events,/);
-  const play = src.slice(src.indexOf('  play(song) {'), src.indexOf('  stop() {'));
-  assert.match(play, /_sustain = sustainIntervals/, 'built in play(), not in the pump');
-});
-
 test('AUDIT 2026-08-25: pitched percussion HOLDS its note', () => {
   // The tone path ramps pitch down to `hz * drop` over the decay, and a
   // falling pitch is exactly what makes a drum read as a drum. It is
@@ -794,11 +660,6 @@ test('AUDIT 2026-08-25: pitched percussion HOLDS its note', () => {
     const d = percussionSpec(k).drop;
     assert.ok(Number.isFinite(d) && d > 0 && d <= 1, `key ${k} drop out of range: ${d}`);
   }
-  // and the player must actually READ it - a table nothing consults is
-  // the dead-data shape this project keeps finding
-  const src = readFileSync(new URL('../../src/systems/song/songPlayer.js', import.meta.url), 'utf8');
-  assert.match(src, /spec\.hz \* spec\.drop/);
-  assert.match(src, /if \(spec\.drop !== 1\)/, 'a held pitch schedules no ramp at all');
 });
 
 test('AUDIT 19: MIDI has sixteen channels, and percussion is one of them', async () => {

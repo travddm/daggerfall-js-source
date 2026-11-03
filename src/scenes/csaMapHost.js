@@ -1,9 +1,9 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 //
-// BAY-LEFT-MAPS (2026-10-27, AUDIT LEFT IN THE BAY C12; bible/03-World/Come-Sail-Away.md BAY-LEFT-MAPS) grew it, after the
+// BAY-LEFT-MAPS grew it, after the
 // move: the third picture, Daggerfall's painting of Tamriel (TMAP00I0.IMG on its own palette - the reading's sheet past the
 // Bay, systems/comeSailAway/comeSailAwayMap.js mapSheetAt), built beside record 3, and a quad drawn by its sheet's picture.
 import { LINE_TEXTURE as CSA_LINE_TEXTURE, TRAVEL_MAP_IMG, travelMapPicture, TAMRIEL_MAP_IMG, tamrielMapPicture } from '../systems/comeSailAway/comeSailAwayMap.js';

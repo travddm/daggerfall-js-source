@@ -3,9 +3,6 @@
 // EM7 — THE FOUR QUARTERS: what a town's pixels and its names are,
 // asked once, for both skins.
 //
-// Mac (2026-09-21): "keep our own version of the colored buildings that
-// classic uses, plus let's enhance the location names on the buildings
-// more".
 //
 // CLASSIC COLOURS A TOWN BY WHAT IS IN IT. Every RMB block carries a
 // 64x64 byte grid (`autoMapData`), one byte a pixel, and the byte is
@@ -44,7 +41,7 @@ const byteOfType = (type) => type + 1;
 // the byte groups (ExteriorAutomap.cs:1482-1541; byte = BuildingType + 1)
 const DFU_SHOP_BYTES = [1, 3, 4, 6, 7, 9, 10, 11, 13, 14];
 const DFU_HOUSE_BYTES = [2, 5, 8, 17, 18, 19, 20, 21, 22, 23, 24];
-/** PROF-FOUND (2026-10-12, Mac: "Ensure all the professions new stores are flagged on the town map"; Ledger A): the
+/** PROF-FOUND: the
  *  bytes of the shops the port opened (world/buildingNames.js OPENED_SHOP_TYPES - the Furniture Store, byte 8, which DFU
  *  groups with the houses because classic never opened it) move from DFU's house group to its shop group, so both maps
  *  draw Carpentry's workbench as the shop it is. */

@@ -134,7 +134,7 @@ export function generatePixelTerrain({ woods, px, py, stride = 1, tilemap, locat
     const natural = flattenAt?.sea && !flattenAt.relief ? own() : null;   // RUMARE-WATER: the land's own ground, the far shore's and the rim's
     const raised = flattenAt?.relief ? own() : null;   // SOLITUDE-RELIEF: its edge band's
     avg = flat ? flat.avg : calcAvgMaxHeight(samples)[0];
-    // TOWN-SHAPES (bible/03-World/Town-Shapes.md): a town with an outline flattens to it, at its own land's height - the sea
+    // TOWN-SHAPES: a town with an outline flattens to it, at its own land's height - the sea
     // past its margin read on DFU's own samples (the classic pass's, where the ground is shaped), as its tiles are
     const ground = locationRect?.shape ? Float32Array.from(classic ?? samples) : null;
     avg = blendLocationTerrain(samples, avg, locationRect, HEIGHTMAP_DIMENSION, ground ?? samples);
@@ -275,9 +275,7 @@ export function generatePixelTerrain({ woods, px, py, stride = 1, tilemap, locat
 }
 
 /**
- * PERF-EXT26 (2026-09-25, the players: "fps issues in the exterior but
- * fine in the interior", "me too my friend.. don't know why. I got a
- * RX6600"): A PIXEL'S GRID AT A STRIDE, from its samples as the pixel
+ * PERF-EXT26: A PIXEL'S GRID AT A STRIDE, from its samples as the pixel
  * keeps them (post-blend, post-smoothing) and the ghost rows off the woods
  * for its edge normals (EV4). The build above, the world host's ring-class
  * swap (STREAM1's restride) and the terrain worker's `grid` job all run
@@ -285,7 +283,7 @@ export function generatePixelTerrain({ woods, px, py, stride = 1, tilemap, locat
  * on the main thread is, by construction.
  * LANDFORM1-3: the ghost rows are the neighbours' SHAPED ground - `landforms` when the caller holds them (the build
  * above), else made here from `landform` and the network (a promotion: the host's job, the worker's own network).
- * AUDIT WATER-NEXT P1 (2026-10-07, Mac: "ensure ... performance is unaffected"): `bed` - the converted TileMap to carve
+ * AUDIT WATER-NEXT P1: `bed` - the converted TileMap to carve
  * the water's bed by (world/water/waterBed.js), or null for none - and the answer carries it (`bed`: the depths and the carved
  * ground, null where no vertex is under water) beside the grid as it stood. WATER-NEXT 2 carved on the host's thread at
  * every build and restride, 0.3 ms for a pixel with no water at all and a millisecond or two for a coast's; here it rides

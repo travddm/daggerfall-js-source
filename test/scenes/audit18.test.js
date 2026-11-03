@@ -1,5 +1,5 @@
 // AUDIT 18 pins. Each one is mutation-proven: restoring the defect it
-// describes FAILS it. See bible/Home.md "Audits".
+// describes FAILS it. See "Audits".
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -138,7 +138,7 @@ test('AUDIT 18 F2: every ARENA2 name live code fetches survives the ingest diet'
   //
   // The stronger rule: if src/ NAMES an ARENA2 file anywhere in code, the
   // diet must keep it. That needs no guess about the call shape.
-  // HC1 (2026-09-14): .CFA joined the list. TR2 named its two riding
+  // HC1: .CFA joined the list. TR2 named its two riding
   // sprites as CONSTANTS (riding.js HORSE_TEXTURE/CART_TEXTURE), the diet
   // never kept .CFA, and this regex could not see the kind - so the horse
   // and cart drew nothing on the deployed site for a fortnight while this
@@ -246,7 +246,6 @@ test('AUDIT 18 F5: every host that gates on uiOverlayActive also ticks the overl
       // ticking, correctly - a click is not a frame. drawOverlay is
       // what marks the frame-loop branch.
       if (!/drawOverlay\(/.test(branch)) return;
-      // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): a one-line block that holds no return is no gate - the frame goes on
       // past it (the world-hosted dungeon's window drawn last over a frame that ran under it, online)
       if (/\{[^{}]*\}\s*(?:\/\/.*)?$/.test(line) && !/\breturn\b/.test(line)) return;
       assert.ok(/\breturn\b/.test(branch), `${rel}: the uiOverlayActive gate does not return`);

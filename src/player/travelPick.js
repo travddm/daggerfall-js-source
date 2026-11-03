@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV2 - THE TRAVEL VIEW'S PICK (bible/06-Systems/Travel-View.md).
+// TV2 - THE TRAVEL VIEW'S PICK.
 //
-// Mac (2026-09-27): "Even adding the option to tap/click to move to a
-// specific location." His call on what a click means: BOTH, BY TARGET -
+// His call on what a click means: BOTH, BY TARGET -
 // a town or a marker is reached by the roads, open ground by walking
 // straight there.
 //

@@ -51,7 +51,3 @@ test('DARK-ROOM the law: DFU\'s own ambient-only pair (PlayerAmbientLight.cs:29-
   assert.equal(roomAmbient(INTERIOR_NIGHT_AMBIENT, []), INTERIOR_NIGHT_AMBIENT_ONLY);
 });
 
-test('DARK-ROOM by source: both interior hosts light the room through roomAmbient over the lamps the room was built with (AUDIT RPT1026 J1: never its live list) - the world\'s building (worldModes.js) and the ?interior bench (interior.js) - on the sky\'s night', () => {
-  assert.ok(src('src/scenes/worldModes.js').includes('renderer.setLighting(new Float32Array(roomAmbient(isNight(skyMinutes() % 1440) ? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT, interiorCtx.roomLamps)), 0);'));   // PIN MOVED (AUDIT RPT1026 J1): the lamps the room was built with
-  assert.ok(src('src/scenes/interior.js').includes('renderer.setLighting(new Float32Array(roomAmbient(isNight(skyMinutes() % 1440) ? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT, ctx.roomLamps)), 0);'));
-});

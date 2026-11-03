@@ -1,4 +1,4 @@
-// GUILD-GRANT (2026-10-03, Mac: "Can we award the empire of tamriel guild 1.6mil gold") - gold into one guild's
+// GUILD-GRANT - gold into one guild's
 // treasury, awarded by the operator. `tools/grantGuildGold.mjs` writes the statements and
 // `.github/workflows/guild-grant.yml` runs them by hand - a dry run that reads the guild, then the award. The award is
 // the treasury AND `realm_gold`, so it buys a hall and comes back out to a realm character, and the guild's own ledger

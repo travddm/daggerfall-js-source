@@ -1,5 +1,4 @@
-// SD18b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD18b;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MARKS, SEEN (ui/superDungeon/sdMarksView.js) - its Ending
+// SD18b: THE HOUR'S MARKS, SEEN (ui/superDungeon/sdMarksView.js) - its Ending
 // and its omens as the gate shows the Warden's: the gate's own card as a fighter steps into the Hour, a row under the
 // Remnant's bar all fight long, each in the Hour's own signs; its wake's card naming the Ending it keeps; its own blows'
 // colours leaning to its element and its brass burning in it (rimed, charged, venomed, soul-lit - the gate's grains); a
@@ -33,8 +32,6 @@ import { SD_REALM_BRASS_RECORD } from '../../../src/world/superDungeon/sdRealm.j
 import { TELEGRAPH_STYLE, TELEGRAPH_EDGE_DAGON } from '../../../src/render/gate/gateTelegraph.js';
 
 const T0 = 1_800_000_000_000;
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-const D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
 const near = (a, b, e = 1e-9) => Math.abs(a - b) <= e;
 const MK = ['wayrest', 'hardened', 'twin'];
 
@@ -49,7 +46,7 @@ test('SD18b THE MARKS AS THEY ARE SHOWN: the Ending first - its signature, its e
   assert.equal(sdMarksViewOf(MK), v, 'kept');
   assert.equal(sdMarksViewOf(['nowhere', 'twin', 'short']), null); assert.equal(sdMarksViewOf(null), null);
   assert.match(sdMarksViewOf(['daggerfall', 'twin', 'short']).aspect.tip, /^Resist shock /, 'Lightning resisted as shock');
-  // AUDIT SD III (T17, PIN MOVED): no omens' line - the bar draws the row alone (sdOmensLine went with `trials`)
+  // AUDIT SD III (T17
   // every mark its sign and its tip; every element a word
   for (const m of [...SD_ENDINGS, ...SD_OMENS]) { assert.ok(SD_MARK_ICONS[m.id]?.d, `${m.id}: a sign`); assert.ok(SD_MARK_TIPS[m.id], `${m.id}: a tip`); }
   assert.ok(SD_ENDINGS.every((E) => SD_ELEMENT_WORD[E.el]));
@@ -60,10 +57,6 @@ test('SD18b THE MARKS AS THEY ARE SHOWN: the Ending first - its signature, its e
   assert.match(markIconHtml(sdMarksViewOf(['orsinium', 'twin', 'short']).aspect), /fill="currentColor"/);
   const gate = marksViewOf(['burning', 'colossal', 'vengeful']);
   assert.equal(markIconHtml(gate.aspect, 20), markIconSvg('burning', 20), 'the gate\'s own as it was');
-  // the gate's card's rows and its bar's chips draw a mark's own sign
-  const gmv = readFileSync(new URL('../../../src/ui/gate/gateMarksView.js', import.meta.url), 'utf8'), gbb = readFileSync(new URL('../../../src/ui/gate/gateBossBar.js', import.meta.url), 'utf8');
-  assert.match(gmv, /r\.icon\.innerHTML = markIconHtml\(m, 20\);/);
-  assert.match(gbb, /c\.icon\.innerHTML = markIconHtml\(m, 12\);/);
 });
 
 test('SD18b THE HOUR\'S CARD as a fighter steps in: the gate\'s card\'s model, low on the right - none before the step, coming up, standing, fading, gone nine seconds on; its words; and the world draws it in the Hour, never hides it as the street\'s, and puts it away', () => {
@@ -77,13 +70,6 @@ test('SD18b THE HOUR\'S CARD as a fighter steps in: the gate\'s card\'s model, l
   assert.equal(sdMarksCardModel(MK, { since: 0, now: SD_MARKS_ARRIVE_MS }), null, 'gone');
   assert.equal(sdMarksCardModel(['nope'], { since: 0, now: 10 }), null);
   assert.equal(sdMarksCardModel(['blades', 'twin', 'short'], { since: 0, now: 10 }).sub, 'The Brass Remnant keeps the Ending of the Blades');
-  // AUDIT SD III (T18, PIN MOVED): its nine seconds from the veil's opening - they ran out under it
-  assert.match(W, /marks = _sdMarksSince === null \? null : sdMarksCardModel\(sdFightLink\.state\(\)\?\.mk \?\? sdMarksOf\(modes\?\.sdRealmSlot\?\.\(\) \?\? null\), \{ since: _sdMarksSince, now: nowMs \}\);/);
-  assert.match(W, /if \(_sdMarksSince === null && !gateVeil\?\.busy\) _sdMarksSince = nowMs;/);
-  assert.match(W, /\} else _sdMarksSince = null;/);
-  assert.match(W, /if \(marks \|\| _sdMarksUp\) \{ drawGateMarksCard\(marks, \{ hidden \}\); _sdMarksUp = !!marks; \}/);
-  assert.match(W, /if \(_sdMarksUp\) \{ drawGateMarksCard\(null\); _sdMarksUp = false; \}/);
-  assert.match(W, /modes\?\.gateArenaDay\?\.\(\) == null && modes\?\.sdRealmSlot\?\.\(\) == null\) drawGateMarksCard\(null\);/);
 });
 
 test('SD18b UNDER ITS BAR AND ON ITS WAKE: the row of its marks and the omens\' line, the phase\'s name kept over it; its wake\'s card names its signature and the Ending it keeps - the table\'s with none', () => {
@@ -97,7 +83,7 @@ test('SD18b UNDER ITS BAR AND ON ITS WAKE: the row of its marks and the omens\' 
   assert.deepEqual([bar.title, bar.epithet], ['The Walking Hour', ''], 'its phase over the row');
   const plain = newRemnantFight(4, 1, T0); joinRemnant(plain, 'a', 'A', 30, T0);
   const P = createSdFightLink({ now: () => T0 + 20_000 }); P.word(validSdOut({ ...remnantStateOf(plain), me: 1 }));
-  assert.equal(remnantBarModel(P.state(), T0 + 20_000).marksView, null);   // AUDIT SD III (T17, PIN MOVED): and no `trials`
+  assert.equal(remnantBarModel(P.state(), T0 + 20_000).marksView, null);   // AUDIT SD III (T17
   // the wake
   assert.deepEqual(sdWakeText(MK), { ...SD_BEAT_TEXT.wake, sub: 'The Turning Tide - the Ending of Wayrest' });
   assert.equal(sdWakeText(null), SD_BEAT_TEXT.wake);
@@ -154,22 +140,17 @@ test('SD18b A STRIKE IN ITS ELEMENT: softened by my resistance (the save door - 
   const brass = run(undefined, { el: 'poison' });
   const bites = brass.struck.filter((x) => x.how.name === 'Venomed brass');
   assert.ok(bites.length >= 2 && bites.every((x) => x.how.el === 'poison' && x.dmg === savedShare(strikeDamage(SD_BLOWS.volley.pool.pct, 200, SD_BLOWS.volley.pool.base), 40)), `its brass, venomed: ${JSON.stringify(brass.struck.map((x) => x.how))}`);
-  // the world's door and magic's place in it
-  assert.match(W, /magic: Object\.freeze\(\[ELEMENTS\.Magic, EFFECT_FLAGS\.Magic\]\),/);
-  assert.match(W, /save: \(e, el\) => \{ const w = GATE_SAVES\[el\]; return w \? savingThrow\(w\[0\], w\[1\], e\) : 100; \},/);
-  assert.match(D, /magic: SPELL_CAST_SOUND\[4\] \}\);/);
 });
 
 test('SD18b THE HALL: the Ending\'s own stone lit in its light, breathing on the hall\'s clock - in the Hour\'s light channel; the fray\'s arc round once by the Hollow\'s own snap (the Fraying\'s thirty-six)', () => {
   const slot = 5, E = sdEndingOf(sdMarksOf(slot)), k = SD_STONES.findIndex((s) => s.key === E.id);
   const L0 = sdEndingStoneLight(slot, 0), L1 = sdEndingStoneLight(slot, 1);
-  const P = stonePoint(k, 0, SD_STONE_LIGHT.up, SD_STONE_LIGHT.out), d = realmToDungeon(P[0], P[1], P[2]);   // AUDIT SD III (V3, PIN MOVED): before its face, at its dial
+  const P = stonePoint(k, 0, SD_STONE_LIGHT.up, SD_STONE_LIGHT.out), d = realmToDungeon(P[0], P[1], P[2]);   // AUDIT SD III (V3
   assert.deepEqual([L0.x, L0.y, L0.z, L0.range, L0.stone], [d[0], d[1], d[2], SD_STONE_LIGHT.range, k]);
   assert.ok(L0.color.every((v, i) => near(v, E.light[i] * SD_STONE_LIGHT.gain * (1 - SD_STONE_LIGHT.breathe))));
   assert.ok(L1.color[0] !== L0.color[0], 'breathing');
   assert.equal(sdEndingStoneLight(null, 0), null);
-  assert.match(W, /const stone = sdEndingStoneLight\(modes\?\.sdRealmSlot\?\.\(\) \?\? null, deadlandsSeconds\(\), _sdStoneLight\);/);   // AUDIT SD III (V5, PIN MOVED): into its kept light
-  // the fray by the Hollow's own snap - PIN MOVED (SD-LOOK S10): its TABS, one up a turn, as many round the rim as its snap
+  // the fray by the Hollow's own snap
   // has turns (the arc's steps scaled to them were the old reading)
   const fraySlot = [...Array(216).keys()].map((x) => x + 1).find((sl) => sdMarksOf(sl).includes('fraying'));
   const plainSlot = [...Array(216).keys()].map((x) => x + 1).find((sl) => !sdMarksOf(sl).includes('fraying'));

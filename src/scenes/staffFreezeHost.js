@@ -1,5 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FREEZE (2026-10-22; design doc "DFO Staff Panel: design", Freeze player and Freeze chat): THE HOST'S WIRING
+// STAFF-PANEL5-FREEZE: THE HOST'S WIRING
 // of a staff freeze and the staff chat (net/staffChat.js, ui/freezeScreen.js), one a chat log - a module the host wires
 // (HOST-SPLIT: THE HOSTS DO NOT GROW), so scenes/world.js holds its calls alone. The relay's `frozen` comes in on every
 // session (`wire`), the staff nudge on the hub's link; a line typed on the Staff tab goes to the account service and its

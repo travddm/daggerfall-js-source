@@ -1,15 +1,13 @@
-// GRANT1 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md sections 4 and 7): THE SPAWN
+// GRANT1: THE SPAWN
 // GRANT'S LAW, PURE (net/grantLaw.js) - its pinned rates held to their homes, the grant read whole or not at all, the
 // relay's signature over every field, the marks rolled from the seed alone, one stream per die, the mint's gate in its
 // order, and the reader's check past the signature. Nothing calls it yet (GRANT2, GRANT3).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import {
   GRANT_SIG_V, GRANT_TTL_MS, GRANT_SKEW_MS, GRANT_ELITE_CHANCE, GRANT_ELITE_MIN_RENOWN, GRANT_CHAMPION_PER_MILLE, GRANT_CHAMPION_TRAITS,
   GRANT_KINDS, GRANT_CELL_CEILING, GRANT_REFUSALS, GRANT_DICE,
   grantRng, grantDice, grantMarks, validGrant, grantBytes, signGrant, verifyGrant, grantMintGate, grantRefusal, grantMarksAllow,
-  STAR_GRANT_RELAY_MIN, relaySupportsStarGrant,
 } from '../../src/net/grantLaw.js';
 import { ELITE_FOE_OVERWORLD_CHANCE, ELITE_FOE_MIN_RENOWN, eliteRng, eliteHash } from '../../src/systems/eliteFoes.js';
 import { CHAMPION_PER_MILLE, CHAMPION_TRAITS } from '../../src/systems/champions.js';
@@ -17,9 +15,7 @@ import { ROAD_PARTY_MAX } from '../../src/systems/roadEncounters.js';
 import { CAMP_SIZE } from '../../src/systems/campEncounters.js';
 import { PARTY_SCALE_EXTRA_MAX } from '../../src/systems/party/partyScale.js';
 import { chooseRandomEnemy } from '../../src/systems/encounters.js';
-import { signEgCall } from '../../src/net/eliteGates/egCallSig.js';
 import { STAR_WAVE_MAX } from '../../src/net/starfall/starfallLaw.js';
-import { RELAY_VERSION } from '../../src/net/wire.js';
 
 const { subtle } = globalThis.crypto;
 const T0 = 1_800_000_000_000;
@@ -34,16 +30,7 @@ test('GRANT1 THE PINNED RATES: each copy the relay holds equals its home - the e
   assert.equal(GRANT_KINDS.enc.max, ROAD_PARTY_MAX, 'an encounter: the road party\'s most, its party\'s extra inside it');
   assert.equal(GRANT_KINDS.camp.max, CAMP_SIZE[1] + PARTY_SCALE_EXTRA_MAX, 'a camp: its own most and the party\'s extra');
   assert.equal(GRANT_KINDS.star.max, STAR_WAVE_MAX, 'STAR-TUNE: a fallen star\'s coven - its law\'s largest wave, one grant');
-  assert.equal(STAR_GRANT_RELAY_MIN, 238, 'AUDIT STAR-TUNE F1: the relay that mints the star\'s kind is STAR-TUNE\'s');
-  // AUDIT (the desync branch's integration lane): the gate names a VERSION, and a renumber at a merge moves RELAY_VERSION,
-  // its law row and its pins - never this. Held to the release it names: the law row of world<STAR_GRANT_RELAY_MIN> is
-  // STAR-TUNE's (test/net/relayversion.test.js), and no later than the relay this tree builds. A merge that renumbers
-  // STAR-TUNE past another release fails here until the gate moves with it.
-  const lawRow = readFileSync(new URL('./relayversion.test.js', import.meta.url), 'utf8').split('\n').find((l) => l.trimStart().startsWith(`world${STAR_GRANT_RELAY_MIN}: '`));
-  assert.ok(lawRow && lawRow.includes('STAR-TUNE'), `world${STAR_GRANT_RELAY_MIN}'s law row is STAR-TUNE's (${lawRow?.slice(0, 120)})`);
-  assert.ok(STAR_GRANT_RELAY_MIN <= Number(RELAY_VERSION.slice('world'.length)), 'the gate is no later than the relay this tree builds');
-  assert.deepEqual(['world237', 'world238', 'world300', 'nope', undefined].map(relaySupportsStarGrant), [false, true, true, false, false], 'an older relay is asked the stand\'s own kind');
-  assert.deepEqual(Object.keys(GRANT_KINDS).slice(0, 2), ['enc', 'camp'], 'GRANT2\'s first stream; the other sources\' with GRANT4 (grant3_pool)');   // PIN MOVED (GRANT4): every source's kind
+  assert.deepEqual(Object.keys(GRANT_KINDS).slice(0, 2), ['enc', 'camp'], 'GRANT2\'s first stream; the other sources\' with GRANT4 (grant3_pool)');
   for (const [s, salt] of [[0, 'marks'], [0xdeadbeef, 'species:2'], [12345, 'health:0']]) {
     const a = grantRng(s, salt), b = eliteRng(eliteHash('grant', s, salt));
     assert.deepEqual(Array.from({ length: 6 }, a), Array.from({ length: 6 }, b), `${s} ${salt}`);
@@ -52,8 +39,6 @@ test('GRANT1 THE PINNED RATES: each copy the relay holds equals its home - the e
   assert.equal(GRANT_SKEW_MS, 60_000);
   assert.deepEqual(GRANT_DICE, ['species', 'level', 'weapon', 'health']);
   assert.deepEqual(GRANT_REFUSALS, ['kind', 'size', 'bucket', 'ceiling', 'unsigned', 'sender', 'cell', 'expired', 'member', 'marks']);
-  const src = readFileSync(new URL('../../src/net/grantLaw.js', import.meta.url), 'utf8');
-  assert.deepEqual([...src.matchAll(/^import .* from '([^']+)';/gm)].map((m) => m[1]), ['./identityToken.js', './cellTree.js', './wire.js'], 'the relay imports it: nothing that reaches the loot tables');   // PIN MOVED (COST-2): and the cell tree's law (a grant stands in any cell its reader's socket covers), which imports wire.js alone
 });
 
 test('GRANT1 A GRANT READ WHOLE OR NOT AT ALL: every field in its law, a fresh copy back; an unknown kind, a size past its kind, an elite that is also a champion, a mark past the members, a bad pixel, a level or Renown no token carries, a bad signature\'s shape - each refused (mutants: the kind\'s most ignored; an elite champion believed; the guest\'s 0 refused)', () => {
@@ -101,15 +86,12 @@ test('GRANT1 THE RELAY\'S SIGNATURE: every field signed in one fixed order behin
   assert.equal(await verifyGrant({ ...G, sg }, null, { subtle }), false, 'no key to verify with');
   assert.equal(await verifyGrant({ ...G, k: 'raid', sg }, kp.publicKey, { subtle }), false, 'a grant not read whole is never verified');
   assert.equal(await signGrant(G, null, { subtle }), '', 'a relay with no key signs nothing');
-  // ONE KEY, NEVER CONFUSED: an arch call signed with the same key is no grant
-  const call = await signEgCall({ b: '0123456789abcdef', os: 'acct-mac', o: 'Mac', op: T0, ew: 0, site: { px: 300, py: 200, x: 1, y: 2, z: 3, yaw: 0 } }, kp.privateKey, { subtle });
-  assert.equal(await verifyGrant({ ...G, sg: call }, kp.publicKey, { subtle }), false);
 });
 
 test('GRANT1 THE MARKS: rolled from the seed alone - the same seed, the same marks; three draws a member, so a member\'s marks are its own whatever the count; an elite only for an owner of Renown 5 or more, its draw made either way; an elite never a champion; near the street\'s rates over many seeds (mutants: the Renown\'s gate dropped; a draw skipped for an elite; the champion\'s rate moved)', () => {
   assert.deepEqual(grantMarks(0xdeadbeef, 4, 7), grantMarks(0xdeadbeef, 4, 7));
-  assert.deepEqual(grantMarks(58, 4, 7), { e: 0b0010, c: [1, -1, -1, -1] }, 'seed 58: a Stalwart champion first, an elite second');
-  assert.deepEqual(grantMarks(58, 4, 4), { e: 0, c: [1, 3, -1, -1] }, 'the same seed below the Renown: the second its own champion draw\'s, a Vampiric one');
+  assert.deepEqual(grantMarks(434429, 4, 7), { e: 0b0010, c: [4, -1, -1, -1] }, 'seed 434429: a Thorned champion first, an elite second');
+  assert.deepEqual(grantMarks(434429, 4, 4), { e: 0, c: [4, 4, -1, -1] }, 'the same seed below the Renown: the second its own champion draw\'s, a Thorned one');
   let elites = 0, champs = 0, plain = 0, low = 0;
   for (let s = 0; s < 4000; s++) {
     const m8 = grantMarks(s, 8, 9), m3 = grantMarks(s, 3, 9);

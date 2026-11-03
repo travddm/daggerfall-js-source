@@ -1,5 +1,4 @@
-// MW-HAND (2026-09-26, Mac: "Weapons when swapped into left hand dont work showing fists - id say remove the ability
-// when in morrowind since its not visible"; asked, "Never on an empty hand"): the Morrowind arm draws one weapon and no
+// MW-HAND: the Morrowind arm draws one weapon and no
 // second hand, so a weapon in the hand not in use was a weapon that would not show, over fists. In that lane the hand
 // in use follows the weapons, and H moves only between two held weapons. The classic lane keeps DFU's ToggleHand whole
 // - an empty left hand is still how a classic player fights with fists.

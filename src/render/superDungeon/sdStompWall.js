@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 9): THE STOMP'S RING AS A WALL - the ring a
+// SD-LOOK: THE STOMP'S RING AS A WALL - the ring a
 // Brass Stomp rolls out (net/superDungeon/sdRemnant.js stompRingAt - the very front the law strikes) stood up as a low wall of brass
 // light SD_STOMP_WALL.h tall, not a line on the floor: it reads "jump this". A cylinder strip of SD_STOMP_WALL.segs sides
 // about the Stomp's centre at the front's radius, ADDED onto the frame (the beam's law, render/superDungeon/sdBeam.js: fixed geometry

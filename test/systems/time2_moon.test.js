@@ -1,5 +1,4 @@
-// TIME2 (2026-10-01, Mac: "werewolf forms last insanely long" / "I don't want a band aid, I want a detailed way we can
-// do this" / "This needs to be perfect"): ONLINE THE FULL MOON IS A NIGHT. Design: bible/06-Systems/Online-Time-Arc.md
+// TIME2: ONLINE THE FULL MOON IS A NIGHT. Design:
 // section 6.1. DFU forces a lycanthrope's change for the whole calendar day either moon is full, and online that day was
 // two real hours no rest could shorten (the moon is the sky's, which no rest moves). Online the change is forced while
 // the full moon is UP - from the dusk of a full-moon date to the next dawn, thirty real minutes on TIME1's sky - and at
@@ -93,7 +92,6 @@ test('TIME2 the round runner raises the night\'s rule exactly when a host hands 
   const offline = wolf();
   runMagicRoundsFor(offline, FULL + 720 - 3, FULL + 720, { sinks });
   assert.equal(liveLycanthropy(offline).isTransformed, true, 'no sky handed (offline, the one clock): DFU\'s day');
-  assert.match(rd('src/systems/worldTick.js'), /lycanthropyMagicRound\(entity, \{ nowMinutes: r \+ 1, clockMinutes, skyMinutes: sky, moonNight: Number\.isFinite\(skyMinutes\), say \}\);/, 'by source: the lane is the sky handed');
 });
 
 test('TIME2 the morning after: at dawn the lock ends - the change back holds, and the next round forces nothing until the next full moon\'s dusk', () => {

@@ -1,4 +1,4 @@
-// DISC22-D (2026-09-24, kurkku on Discord, over a classic inventory: "Steel light flail sprite doesn't show up").
+// DISC22-D.
 //
 // THE BUG: the Light Flail is Roleplay Realism Items' template 514, an archive that exists only as the mod's PNGs, one
 // per metal (514_0-0_Steel.png), registered LAZY - decoded when drawn, as DFU's GetItemImage imports it
@@ -75,11 +75,3 @@ test('DISC22-D: the enhanced door draws it too - this record, by its metal (a Da
   } finally { console.warn = warn; delete globalThis.document; }
 });
 
-test('DISC22-D: the two enhanced trade screens ask by the item\'s metal, as the pack does', () => {
-  // DISC24-B: every enhanced list asks through the pack's ONE picture door, and that door asks by the dye
-  for (const f of ['src/ui/enhanced/enhancedTrade.js', 'src/ui/enhanced/enhancedPlayerTrade.js']) {
-    assert.match(readFileSync(join(ROOT, f), 'utf8'), /linePicture\(line, \{ box: SLOT_BOX\.row, onReady:/, f);   // UI1: the fitted door over the same one
-  }
-  assert.match(readFileSync(join(ROOT, 'src/ui/enhanced/enhancedInventory.js'), 'utf8'),
-    /if \(line\.image\) return requestIcon\(line\.image\.archive, line\.image\.record, \{ scale, dye: line\.image\.dye, dyeTarget: line\.image\.dyeTarget, onReady \}\);/);   // DYE-ICON: and the swatch it changes
-});

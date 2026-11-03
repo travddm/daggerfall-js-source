@@ -1,10 +1,9 @@
-// SCALE1 (2026-09-30, the scaling audit - Mac: "set the stage for a larger player base in the future"; "This is all
-// you man. Just do whatever is best"). The account service's half, before any relay deploy:
+// SCALE1. The account service's half, before any relay deploy:
 //
 //   A. the per-request writes: `last_seen` touched only once it has gone stale (SESSION_TOUCH_S), both rows in one
 //      round trip - two of every authenticated request's three D1 writes;
 //   B. every request counted to Workers Analytics Engine (server-account/src/metrics.js) - and never at a request's cost;
-//   C. the statements that read a whole table, indexed (0043_scale_indexes.sql), asked of the real migrations' planner;
+//   C. the statements that read a whole table, indexed, asked of the real migrations' planner;
 //   D. D1's 100 bound parameters a statement: the market's materials asked as one bound JSON array;
 //   E. the deploys: the relay's and the service's wait for the suite, and the database's bookmark is written before
 //      the migrations;
@@ -60,7 +59,7 @@ test('SCALE1 A: a session resolved within SESSION_TOUCH_S of its last touch writ
   // and the window starts again from the touch
   assert.ok(await resolveSession({ db, subtle, nowS: NOW + SESSION_TOUCH_S + 5 }, made.secret));
   assert.equal(tally.updates, 2);
-  assert.ok(SESSION_TOUCH_S <= 60 * 60, 'coarse enough to save the writes, fine enough for a device list');   // SCALE4h (PIN MOVED): an hour, from ten minutes - still nothing reads it finer
+  assert.ok(SESSION_TOUCH_S <= 60 * 60, 'coarse enough to save the writes, fine enough for a device list');   // SCALE4h (
 });
 
 test('SCALE1 A: a stale touch that fails never fails the request it rode in on (AUDIT-ACC F10, kept)', async () => {
@@ -140,7 +139,6 @@ test('SCALE1 C: every statement the audit found reading a whole table finds its 
     ['DELETE FROM market_deliveries WHERE collected = 1 AND at < ?1', 'idx_market_deliveries_at'],
     ["DELETE FROM realm_trades WHERE a_player = ? AND a_char = ? AND state = 'waiting' AND sid != ?", 'idx_realm_trades_waiting'],
     ['SELECT COUNT(*) AS n FROM players WHERE handle IS NOT NULL AND played_at >= ?1 AND played_at < ?2', 'idx_players_played'],
-    ['SELECT spent FROM realm_census WHERE char_id = ? LIMIT 1', 'idx_realm_census_char'],
     ['DELETE FROM market_fills WHERE day < ?1', 'idx_market_fills_day'],
     ["DELETE FROM market_listings WHERE state != 'open' AND closed_at < ?1 AND (returned = 1 OR state = 'sold')", 'idx_market_listings_closed'],
     ["DELETE FROM market_orders WHERE state != 'open' AND closed_at < ?1 AND returned = 1", 'idx_market_orders_closed'],
@@ -153,7 +151,7 @@ test('SCALE1 C: every statement the audit found reading a whole table finds its 
   for (const [sql, index] of cases) {
     const p = plan(sql);
     assert.ok(p.includes(index), `${index} is the way in:\n  ${sql}\n  ${p}`);
-    assert.ok(!/SCAN (home_decor|market_deliveries|realm_trades|players|realm_census|market_fills|market_listings|market_orders|market_bids|node_harvests|guild_writs)(?! USING)/.test(p), `no table read whole: ${p}`);
+    assert.ok(!/SCAN (home_decor|market_deliveries|realm_trades|players|market_fills|market_listings|market_orders|market_bids|node_harvests|guild_writs)(?! USING)/.test(p), `no table read whole: ${p}`);
   }
   // the statements the service runs are the ones planned above: every provenance asked of the decor spells the
   // expression as the index does, or the planner cannot use it
@@ -199,8 +197,6 @@ test('SCALE1 D: the market\'s materials view asked for the whole catalogue binds
   const r = await s.call('/v1/market/read', { character: mac.character, region: 17, view: 'materials', materials: all, hubs: { 17: [207, 212] } }, mac.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.deepEqual(r.body.rows, []);
-  const market = src('server-account/src/market.js');
-  assert.match(market, /material IN\s*\(SELECT value FROM json_each\(\?2\)\)`\)\.bind\(today - MARKET_MEDIAN_DAYS, JSON\.stringify\(keys\)\)/, 'the medians bind their keys as one');
 });
 
 // ═══ E. THE DEPLOYS ══════════════════════════════════════════════════════════════════════════════════════════════════

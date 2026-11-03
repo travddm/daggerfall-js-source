@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY3 (bible/06-Systems/Legacy-Arc.md section 11): THE TREE'S LAYOUT - Project Legacy's `FamilyLegacyWindow`
+// LEGACY3: THE TREE'S LAYOUT - Project Legacy's `FamilyLegacyWindow`
 // (`ConstructTreeFromCharacterData`, `DrawFamilyTree`, `DrawRootSiblings`) as a pure function of the record.
 //
 // The mod built the layout into Unity panels while it walked the record, from a `static FamilyNode root` (U5: a second

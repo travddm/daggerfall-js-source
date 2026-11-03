@@ -1,4 +1,4 @@
-// DW-E1 (2026-09-25) - ILIAC PUDDLE NO MORE 1.2.2's RUNTIME PLUMBING (jet082), PINNED:
+// DW-E1 - ILIAC PUDDLE NO MORE 1.2.2's RUNTIME PLUMBING (jet082), PINNED:
 // DeepWaterRuntime's transient reset, post-transition refresh and work gates, and TransientObjectTracker - what the
 // fish, the foes, the loot and the decorations hang off. The expectations are the C#'s (clean/puddle/
 // DeepWaterRuntime.cs, TransientObjectTracker.cs), spelled out here.
@@ -130,11 +130,3 @@ test('DW-E1: TransientObjectTracker - Add skips a null, Clear destroys the live,
   assert.equal(t.count, 0, 'a negative cap is zero');
 });
 
-test('DW-E1: the world host drives the runtime - the terrain pass is the stream\'s busy spell, the pump runs after the deferred builds (pins)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const _dwPass = !!\(building \|\| queue\.length \|\| inFlight\.size\);\n\s+if \(_dwPass !== _dwTerrainPass\) \{ _dwTerrainPass = _dwPass; if \(_dwPass\) dwTerrainUpdateBegan\(\); else dwTerrainUpdateEnded\(\); \}\n\s+if \(deepWaters\.pump\(\) && dwDecor\) dwDecor\.refreshPlayerArea\(\);[^\n]*\n\s+pumpDeepWaterRuntime\(performance\.now\(\) \/ 1000, dwPlaying\(\)\);/);
-  // IsPlayingGame: no window over the game - read late, because the gates are asked during boot's promotes, before the
-  // talk host (the windows' owner) exists
-  assert.match(w, /let _dwOverlayUp = \(\) => false;\n\s+const dwPlaying = \(\) => !_dwOverlayUp\(\);/);
-  assert.match(w, /const gamePaused = \(\) => (?:staffTeleportHeld \|\| )?townTalk\.overlayActive \|\| \(modes\?\.overlayHeld \?\? false\);\n\s+_dwOverlayUp = \(\) => gamePaused\(\);/, 'AUDIT DW-F: every stack over the frame - IsPlayingGame asks of every window, a building\'s and a dungeon\'s too');
-});

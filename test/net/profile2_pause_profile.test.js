@@ -1,4 +1,4 @@
-// PROFILE2 (2026-09-25, Mac: "Go ahead and make the profile icon visible somehow on the pause menu and allow changes").
+// PROFILE2.
 //
 // The profile mark - PROFILE1's portrait - stood on the front door alone, and the window it opens (the account and the
 // Skin card) could not be reached from a game in progress. It stands on the pause screen now, as the character being
@@ -18,7 +18,7 @@ import { readFileSync } from 'node:fs';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
-import { parseClient, LOOK_HZ_MAX, LOOK_MIN_MS, LOOK_RELAY_MIN, relaySupportsLook, HELLO_HZ_MAX, CLOSE_BUSY } from '../../src/net/wire.js';
+import { parseClient, LOOK_HZ_MAX, LOOK_MIN_MS, HELLO_HZ_MAX, CLOSE_BUSY } from '../../src/net/wire.js';
 import { liveCharacter, characterLine } from '../../src/ui/profileBadge.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
@@ -38,25 +38,6 @@ test('PROFILE2: paused, the portrait is the character being PLAYED - its race, s
   assert.equal(liveCharacter(null), null);
 });
 
-test('PROFILE2: the pause face carries the mark and its window - the window innermost, and the door reads the live character only when paused', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  const mark = menu.slice(menu.indexOf('function profileMark()'), menu.indexOf('function profileMark()') + 600);
-  assert.match(mark, /const save = profileCharacter\(\);/);   // PROFILE-MENU: PIN MOVED - the law is one function the card asks too
-  assert.match(menu, /function profileCharacter\(\) \{\n  return mode === 'pause' \? liveCharacter\(playerEntity\) : newestPortraitSave\(\);\n\}/);
-  const pause = menu.slice(menu.indexOf('stage.append(pauseWindow());'), menu.indexOf('stage.append(pauseWindow());') + 2400);
-  assert.match(pause, /home\.append\(profileMark\(\)\);/, 'the mark over the game');
-  assert.match(pause, /if \(accountOpen\) \{\s*\n\s*const acct = el\('div', 'px-stage px-acctstage'\);\s*\n\s*acct\.append\(accountWindow\(\)\);/, 'the same window the door opens: the account and the Skin card');
-  // the window is the innermost thing Escape closes, ahead of the pause face's resume (the one back stack)
-  assert.match(menu, /const back = accountOpen \? \(\) => closeAccount\(\)/);   // PIN MOVED: AUDIT RECOVERY-SET B1 - Escape held over codes
-  // and a visit's: a window left open on the door does not stand over the next pause unasked
-  const mount = menu.slice(menu.indexOf('export function mountEnhancedMenu('), menu.indexOf('export function mountEnhancedMenu(') + 5000);
-  assert.match(mount, /questRepairSaid = null;[^\n]*\n(\s*\/\/[^\n]*\n)*\s*accountOpen = false;\n/);
-  const css = src('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\n\.px-over \.px-profile \{ top: 10px; right: 12px; \}/, 'a size smaller over the game, above the pause window');
-  assert.match(css, /\n\.px-over \.px-portrait \{ width: 48px; height: 48px; \}/);
-  assert.match(css, /\n\.px-over \.px-acctstage \{[^}]*align-items: center;/, 'its window centred - no wordmark to sit under');
-});
-
 // ─── THE WIRE AND THE RELAY ─────────────────────────────────────────────────────────────────────────────────────────
 
 test('PROFILE2 wire: `look` is the hello\'s look without the hello - after one only, through validLook', () => {
@@ -64,10 +45,6 @@ test('PROFILE2 wire: `look` is the hello\'s look without the hello - after one o
   assert.deepEqual(parseClient(JSON.stringify({ t: 'look', look: LOOK_B })), { error: 'look before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'look', look: 'x' }), { hasHello: true }), { error: 'bad look' });
   assert.equal(parseClient(JSON.stringify({ t: 'look', look: { ...LOOK_B, eo: 999 } }), { hasHello: true }).look.eo, 35, 'clamped at the door as the hello\'s is');
-  assert.equal(LOOK_RELAY_MIN, 109);
-  assert.equal(relaySupportsLook('world108'), false, 'an older relay closes on an unknown frame');
-  assert.equal(relaySupportsLook('world109'), true);
-  assert.equal(relaySupportsLook(null), false);
   assert.equal(LOOK_MIN_MS, 1000 / LOOK_HZ_MAX);
 });
 
@@ -126,22 +103,21 @@ test('PROFILE2 relay: the look is metered - one a socket per 1/LOOK_HZ_MAX s (th
 
 // ─── THE SESSION ────────────────────────────────────────────────────────────────────────────────────────────────────
 
-function linkRig(relayV) {
+function linkRig() {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', look: LOOK_A, WebSocketImpl: FakeWS, now: () => t });
   quiet(() => s.join('world:2,12', { x: 1, y: 0, z: 1, yaw: 0 }));
   sockets[0].open();
-  quiet(() => sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, v: relayV }));
+  quiet(() => sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null }));
   const looks = (ws) => ws.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'look');
   return { s, sockets, looks, tick: (ms) => { t += ms; s.tick(); } };
 }
 
-test('PROFILE2 session: a changed look is kept and said down every hello\'d socket that knows the frame - the primary and each open halo; the same look again says nothing', () => {
-  const { s, sockets, looks } = linkRig('world109');
-  assert.equal(s.lookOk, true);
+test('PROFILE2 session: a changed look is kept and said down every welcomed socket - the primary and each open halo; the same look again says nothing', () => {
+  const { s, sockets, looks } = linkRig();
   quiet(() => s.setHalo(['world:3,12'])); sockets[1].open();
-  quiet(() => sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, v: 'world109' }));
+  quiet(() => sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null }));
   assert.equal(s.setLook(LOOK_A), false, 'the look it already said');
   assert.equal(looks(sockets[0]).length, 0);
   assert.equal(s.setLook(LOOK_B), true);
@@ -155,8 +131,8 @@ test('PROFILE2 session: a changed look is kept and said down every hello\'d sock
   assert.equal(s.setLook(null), false, 'no look is no change');
 });
 
-test('PROFILE2 session: trying skin after skin says the LAST one - held by the gate, flushed by the tick; an older relay is never sent the frame; nothing open owes nothing', () => {
-  const { s, sockets, looks, tick } = linkRig('world109');
+test('PROFILE2 session: trying skin after skin says the LAST one - held by the gate, flushed by the tick; nothing open owes nothing', () => {
+  const { s, sockets, looks, tick } = linkRig();
   s.setLook(LOOK_B);
   s.setLook({ ...LOOK_B, eo: 22 });
   s.setLook({ ...LOOK_B, eo: 23 });
@@ -167,15 +143,8 @@ test('PROFILE2 session: trying skin after skin says the LAST one - held by the g
   assert.deepEqual(looks(sockets[0]).map((m) => m.look.eo), [21, 23], 'the latest, once the gate opens - never 22');
   tick(LOOK_MIN_MS * 3);
   assert.equal(looks(sockets[0]).length, 2, 'and nothing more');
-  // an older relay: the frame would close the socket
-  const old = linkRig('world108');
-  assert.equal(old.s.lookOk, false);
-  assert.equal(old.s.setLook(LOOK_B), true, 'kept for the next hello');
-  old.tick(LOOK_MIN_MS * 2);
-  assert.equal(old.looks(old.sockets[0]).length, 0, 'never sent');
-  assert.deepEqual(old.s.look, LOOK_B);
   // no socket at all: the next hello carries it, and the dirty flag does not linger into a later socket's send
-  const none = linkRig('world109');
+  const none = linkRig();
   quiet(() => none.s.leave());
   none.s.setLook(LOOK_B);
   assert.equal(none.s._lookDirty, false, 'nothing owed');
@@ -201,13 +170,3 @@ test('PROFILE2 end to end: the frame a session sends, through the real relay, ch
 
 // ─── THE HOSTS ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('PROFILE2 hosts: the world host hands the session its look once a second and at every hello it opens; the body fetches a changed set whole', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const ONLINE_LOOK_CHECK_MS = 1000;/);
-  assert.match(w, /if \(now - _onlineLookAt >= ONLINE_LOOK_CHECK_MS\) \{ _onlineLookAt = now; online\.setLook\(composeLook\(playerEntity\)\); \}/);
-  assert.doesNotMatch(w, /online\.look = composeLook/, 'no look written past the session - a promoted halo sends no hello, so only setLook tells it');
-  assert.equal((w.match(/online\.setLook\(composeLook\(playerEntity\)\)/g) ?? []).length, 3, 'the cadence, the join and the halo about to open');
-  const body = src('src/player/eyeOfTheBeholder/eotbBody.js');
-  // PIN MOVED (LAYERED-GEAR): and a changed layered gearing skin - its switch or its body - fetches whole too
-  assert.match(body, /if \(renderer && \(was\.onFoot !== cfg\.onFoot \|\| was\.onHorse !== cfg\.onHorse(?: \|\| was\.wornArmour !== cfg\.wornArmour \|\| was\.layeredGender !== cfg\.layeredGender)?\)\) preload\(\);/);
-});

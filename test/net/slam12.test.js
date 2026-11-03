@@ -1,4 +1,4 @@
-// SLAM12 (2026-09-16, AUDIT SLAM over SLAM1..SLAM7): THE CLIENT'S HYGIENE - five findings, each small, each real.
+// SLAM12: THE CLIENT'S HYGIENE - five findings, each small, each real.
 //
 // ONE: SLAM2's first retry had a jitter span of exactly ZERO. `_backoff` starts at BACKOFF_MIN_MS, so
 // `_backoff - BACKOFF_MIN_MS` was 0 on the first retry and `rand()` was multiplied by nothing. Measured over 200

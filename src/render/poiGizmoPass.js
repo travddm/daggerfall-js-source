@@ -1,5 +1,5 @@
 // @ts-check
-// POI-3 (2026-10-14, bible/06-Systems/POI-Editor-Arc.md): THE EDITOR'S LINES - the gizmo's handles (poi/poiGizmo.js
+// POI-3: THE EDITOR'S LINES - the gizmo's handles (poi/poiGizmo.js
 // gizmoShape), a selection's box and the cursor's mark, drawn over the world in one foreign pass a batch.
 //
 // Lines as screen-width quads (render/superDungeon/sdStepsPass.js's law, never GL_LINES - WebGL caps those at one pixel, gone on a

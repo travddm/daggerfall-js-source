@@ -1,7 +1,5 @@
 // @ts-check
-// WEAPON-GLOW1 (2026-10-16, Mac: "What if we designed our own sort of animated outline for each element? And even
-// introduced the same, more detailed design for the morrowind weapons?" ... "this is your baby. I want you to make the
-// decisions"): WHAT A WEAPON'S GLOW SAYS. bible/05-Combat/Weapon-Glow.md is the page.
+// WEAPON-GLOW1: WHAT A WEAPON'S GLOW SAYS. is the page.
 //
 // Daggerfall says one thing about a weapon in the hand: enchanted or not. ItemHelper.ConvertItemToAPIWeaponType
 // promotes an enchanted item to its *_Magic type and the rig swings the WEAPO1xx sheet, the same frames painted with a
@@ -49,7 +47,7 @@ export const GLOW_LOOKS = Object.freeze(['none', 'fire', 'frost', 'shock', 'arca
 export const GLOW_CODE = Object.freeze(Object.fromEntries(GLOW_LOOKS.map((k, i) => [k, i])));
 
 /** Law 3: the strength a total reads at - the elemental bands' own edges (lootRarity.js AFFIX_RANGES.elemental). */
-export const GLOW_LEVEL_EDGES = Object.freeze([3, 6]);
+export const GLOW_LEVEL_EDGES = Object.freeze([2, 4]);
 export const glowLevel = (total) => (total <= GLOW_LEVEL_EDGES[0] ? 1 : total <= GLOW_LEVEL_EDGES[1] ? 2 : 3);
 
 /** Law 1 and 2 as the hot path asks them - every frame, for the held weapon and every peer's - so no object is built:
@@ -107,8 +105,7 @@ export function weaponGlow(item, { arcane = false, on, ladder } = {}) {
  * THE LOOKS' COLOURS, the one table both drawers read: four stops each, dark to hot, linear 0..1 RGB. The sprite's
  * outline steps through them in Daggerfall's own way (a ramp of a few palette shades, never a smooth blend); the
  * Morrowind shell mixes them. Fire is an ember's red to a flame's white heart; frost a deep glacier blue to rime;
- * shock an indigo to a spark's violet-white; arcane the Thunderlock's enchanted blue-violet (thunderlockArt.js
- * MAGIC_TINT) - the one enchanted look the port already drew.
+ * shock an indigo to a spark's violet-white; arcane an enchanted blue-violet.
  */
 export const GLOW_RAMPS = Object.freeze({
   fire: Object.freeze([[0.45, 0.06, 0.02], [0.88, 0.27, 0.04], [1.0, 0.62, 0.12], [1.0, 0.93, 0.62]]),

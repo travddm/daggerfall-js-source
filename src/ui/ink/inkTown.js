@@ -3,9 +3,6 @@
 // EM4 — THE TOWN'S INK: a city drawn in the hand that drew the Iliac
 // Bay and the dungeon's plan.
 //
-// Mac (2026-09-21): "we're going to put our own spin on the automap and
-// town map themselves, enhancing the look like how we did we the world
-// map."
 //
 // THE DATA IS A STAMP, NOT A DRAWING. Every RMB block carries a 64x64
 // byte grid in its FLD header (`autoMapData`), one byte a pixel, and
@@ -23,8 +20,6 @@
 //
 // ═══ EM7: AND THE ISLAND IS FOUR ISLANDS ═══════════════════════════
 //
-// Mac (2026-09-21): "keep our own version of the colored buildings that
-// classic uses".
 //
 // The first cut washed the ENTERABLE pixels in one flat sepia and left
 // a house as outline alone. It was legible and it threw away the one
@@ -136,8 +131,7 @@ export const QUEST_R = 7;
  *  rather than needing its own number per zoom. */
 export const ANCHOR_R = 1.8;
 export const LEAD_AT = 0.9;
-/** TOWN-MARKS: a board's or a home's glyph is centred ON its place (Mac: "I kinda wish the icons were on top of the
- *  building itself, not on the side") and reaches this far above and below it, in paper px - the name of a building
+/** TOWN-MARKS: a board's or a home's glyph is centred ON its place and reaches this far above and below it, in paper px - the name of a building
  *  that wears one is lettered under it (ui/town/townSheet.js), clear by this much. */
 export const TOWN_MARK_HALF = 6;
 
@@ -152,9 +146,7 @@ export const TOWN_MARK_HALF = 6;
  * second transform between them and no way for one to mirror against
  * the other.
  *
- * EM-BUG3 (2026-09-21, Mac from play: "enhanced local town maps are
- * rotated wrong... I was in the corner of town and It thinks entirely
- * different buildings are there") - AND THIS IS WHERE THAT CAME FROM.
+ * EM-BUG3 - AND THIS IS WHERE THAT CAME FROM.
  * The note this replaces reasoned about the shipped window's two flips
  * ACROSS blocks and concluded the anchor must be obeyed instead. Both
  * halves of that were wrong, and the second one was the bug:
@@ -466,7 +458,7 @@ function paintMarkShape(ctx, pts, fill) {
 }
 
 /**
- * TOWN-MARKS (Mac: "For the notice boards in town. Can we physically mark them on the town map"): A NOTICE BOARD - a
+ * TOWN-MARKS: A NOTICE BOARD - a
  * pinned card ON the board's place in the street, two lines of writing on it and a pin at its head. (x, y) is the
  * place, in paper px. Skin.
  */
@@ -487,7 +479,7 @@ export function paintBoardMark(ctx, x, y) {
 }
 
 /**
- * TOWN-MARKS (Mac: "and also mark owned player housing"): A PLAYER'S HOUSE - a house ON the building's place: the
+ * TOWN-MARKS: A PLAYER'S HOUSE - a house ON the building's place: the
  * player's own filled in the player's ink with a parchment door, another player's in parchment with an inked door
  * (the shape says "a player's house", the fill says whose - not the colour alone). Skin.
  */

@@ -1,8 +1,6 @@
-// PERF-SCALE (2026-09-25) - two players, relayed by Mac: "One user is
-// reporting fps issues in the exterior but fine in the interior ... GPU
-// is NVIDIA GeForce RTX 4060 Ti", and "me too my friend.. don't know
-// why. I got a RX6600". Mac: "It has nothing to do with our updates" -
-// FPS1 (2026-09-11) had already heard "the outside still has
+// PERF-SCALE - two players, relayed by, and "me too my friend.. don't know
+// why. I got a RX6600". -
+// FPS1 had already heard "the outside still has
 // optimization issues". The world was drawn at the window's full CSS
 // size with no cap and no dial, and nothing on screen said which GPU the
 // browser drew on or how many pixels it paid for.

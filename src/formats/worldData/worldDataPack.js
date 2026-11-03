@@ -1,9 +1,8 @@
-// WD3 (2026-10-01): A WORLD-DATA PACK - a mod's whole world data carried as the author's EDITS over the player's own
+// WD3: A WORLD-DATA PACK - a mod's whole world data carried as the author's EDITS over the player's own
 // MAPS.BSA and BLOCKS.BSA, every piece the mod repeats stored once, rebuilt file by file when the door asks.
 //
 // WD1 (formats/worldData/worldDataPatch.js) carries a mod's world data one file at a time: a patch a file, globbed and rebuilt
-// at boot. Beautiful Villages of Daggerfall and Beautiful Cities of Daggerfall (carademono, 2026-10-01, Mac: "These
-// are the next mods I'd like to implement (We have permission)") ship 7,727 `location-<r>-<i>.json` and 820 RMB
+// at boot. Beautiful Villages of Daggerfall and Beautiful Cities of Daggerfall (carademono, 2026-10-01) ship 7,727 `location-<r>-<i>.json` and 820 RMB
 // blocks between them - 439 MB of DFU JSON, most of it the classic game and the rest the same few thousand redecorated
 // buildings again and again (7,104 building records, 1,393 different interiors). WD3 is WD1's law at that scale:
 //

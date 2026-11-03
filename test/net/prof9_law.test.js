@@ -1,9 +1,9 @@
-// PROF9 (2026-10-02) - COOKING'S LAW: the four dishes of 9.3 as recipes (their inputs from the Stores, their ranks, the
+// PROF9 - COOKING'S LAW: the four dishes of 9.3 as recipes (their inputs from the Stores, their ranks, the
 // two-group herbs twice), their effects (DFU's Fortify Attribute at the dish's level - the shape ALLY-CAST's frame
 // carries, so the feast reaches the table as it lands on its eater - and the Tart's stamina), the cook's hand at 100 (a
 // Chef's feast, a Provisioner's dish) signed into the record, the servings (a Cook's two), the XP (the rank's tier, a
 // clean pan half again), the pan (its numbers and its machine), the fire (no fee), and the market's Dishes.
-// bible/06-Systems/Professions-Arc.md 3.3, 9.3, 9.4, 35.
+// 3.3, 9.3, 9.4, 35.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -44,14 +44,13 @@ test('PROF9 law: the four dishes of 9.3 (4.8\'s 685-688) - their inputs as 9.3 w
   // every input is a Stores material the law knows: C&C's foods and DFU's plants of both groups
   for (const r of COOKING_RECIPES) for (const i of r.inputs) assert.ok(FOOD_KEYS.includes(i.key) || material(i.key)?.family === 'herbs', i.key);
   for (const t of [13, 9, 17]) assert.ok(PLANT_GROUP_TEMPLATES.p1.includes(t) && PLANT_GROUP_TEMPLATES.p2.includes(t), `template ${t} grows north and south`);
-  assert.deepEqual(RECIPES.slice(-7 - 504, -504), [...COOKING_RECIPES]);   // PIN MOVED (CLOTH-GEMS): the jeweller's 504, every grade of every gem   // PIN MOVED (PROF10): the jeweller's 120 pieces come after the dishes
+  assert.deepEqual(RECIPES.slice(-7 - 504, -504), [...COOKING_RECIPES]);
   assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length, 'every id its own');
   assert.equal(recipeById('tart:south'), COOKING_RECIPES[5]);
   assert.deepEqual([dishOf('stew')?.id, dishOf('stew:south')?.id, dishOf(688)?.id, dishOf('stewed:x'), dishOf(684), dishOf(null)], ['stew', 'stew', 'feast', null, null, null]);
   assert.deepEqual([recipeOpen(recipeById('tart:north'), 9), recipeOpen(recipeById('tart:north'), 10), recipeOpen(recipeById('feast:hearth'), 69), recipeOpen(recipeById('feast:hearth'), 70)], [false, true, false, true]);
   assert.ok(COOKING_RECIPES.every((r) => firstCraftPays(r)), 'gathered goods: the first time\'s 500 pays');
   // AUDIT PROF-541 R2-S7: a dish's first craft its dish's, whichever herb's way - north and south one key
-  // PIN MOVED (CRAFT2): a first craft is its pattern at its tier's - a dish's two herbs' ways one dish still; the three
   // fletchings one quiver now; a jewel its piece and its base's tier (`ring:gold` is `ring@3`)
   assert.deepEqual(COOKING_RECIPES.map((r) => firstCraftKey(r)), ['stew@1', 'stew@1', 'supper@1', 'supper@1', 'tart@2', 'tart@2', 'feast@6']);
   assert.deepEqual([firstCraftKey(recipeById('arrows:north')), firstCraftKey(recipeById('ring:gold:ruby'))], ['arrows@1', 'ring@3'], 'the arrows one pattern; a jewel its piece and base');
@@ -62,14 +61,13 @@ test('PROF9 law: a dish takes no quality and lists among the Dishes (a commissio
     assert.equal(takesQuality(r), false, r.id);
     assert.deepEqual([pieceListable(r.id), commissionable(r.id), commissionTakesQuality(r.id), commissionQualityOk(r.id, null), commissionQualityOk(r.id, 1), auctionable(r.id, 4)], [true, true, false, true, false, false], r.id);
   }
-  assert.deepEqual(CRAFTED_FAMILIES.at(-2), ['dishes', 'Dishes']);   // PIN MOVED (PROF10): the jeweller's pieces list after them
+  assert.deepEqual(CRAFTED_FAMILIES.at(-2), ['dishes', 'Dishes']);
   const stew = recipeById('stew:north'), kit = recipeById('kit:iron');
   assert.deepEqual([craftCount(stew, null, null), craftCount(stew, null, COOK), craftCount(stew, 'quartermaster', null), craftCount(kit, null, COOK), craftCount(kit, 'quartermaster', null)], [1, 2, 1, 1, 2]);
   assert.equal(COOK, 'cook');
 });
 
 test('PROF9 law: Cooking\'s four (3.3) - the Cook and the Field Cook at 50, the Chef and the Provisioner at 100, every one chosen now; the cook\'s hand: a Provisioner\'s on any dish (never spoils), a Chef\'s on a feast alone (half again), none on anything else', () => {
-  // PIN MOVED (CRAFT3): SPECIALISATIONS is keyed by track - Cooking's four stand under Provisioning beside Alchemy's,
   // four a rank, one chosen; each still Cooking's own (specDiscipline), and a cooking ask reads its craft's (trackOf)
   assert.equal(SPECIALISATIONS.cooking, undefined, 'no track of Cooking\'s own');
   assert.deepEqual(SPECIALISATIONS.provisioning[50].map((s) => [s.id, s.name, s.later ?? null]), [['brewer', 'Brewer', null], ['distiller', 'Distiller', null], ['cook', 'Cook', null], ['field-cook', 'Field Cook', null]]);
@@ -132,7 +130,7 @@ test('PROF9 law: Cooking\'s XP follows the rank - 20 x the rank\'s own tier a co
   assert.deepEqual([0, 10, 25, 40, 55, 70, 90, 100].map((r) => cookXp(r)), [20, 40, 60, 80, 100, 120, 140, 140]);
   assert.deepEqual([0, 55, 100].map((r) => cookXp(r, { clean: true })), [30, 150, 210]);
   for (const r of [0, 33, 77, 100]) assert.equal(cookXp(r), 20 * topTierOf(r));
-  assert.deepEqual(COOKING_RECIPES.map((r) => firstCraftXp(r)), [3155, 3155, 3155, 3155, 3155, 3155, 3155]);   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp), no longer a flat 500 - every dish Provisioning's 3,155
+  assert.deepEqual(COOKING_RECIPES.map((r) => firstCraftXp(r)), [3155, 3155, 3155, 3155, 3155, 3155, 3155]);
 });
 
 // ─── THE PAN (9.4) ───────────────────────────────────────────────────

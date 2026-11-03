@@ -1,6 +1,5 @@
 // @ts-check
-// GROWTH3 (2026-10-17, the owner: the Firmament, the level-up page and the specialisations on a tab of their own; asked,
-// "Drawn in the tab"; bible/10-UI/Growth.md section 6) - THE STAGE: a full-screen face (the Firmament, the captain's
+// GROWTH3 - THE STAGE: a full-screen face (the Firmament, the captain's
 // stars, the Ascension) drawn IN the Growth tab's detail pane. The pause window redraws its whole tree on every press
 // (enhancedMenu.js render), so a face is mounted ONCE per visit into a host element of its own, and each draw of the
 // page moves that host into the new pane - the canvas, its view and its pending stars travel with it. Full screen moves

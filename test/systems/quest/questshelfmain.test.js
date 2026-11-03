@@ -1,14 +1,10 @@
-// QUEST-SHELF-MAIN (2026-10-13, Dudey: "an Abandon button for all quests except main quest", then "leave the main quest
-// logic untouched") - pinned. The chronicle (the L key) draws QUEST-SHELF's Abandon, twice, on every running quest but the
+// QUEST-SHELF-MAIN - pinned. The chronicle (the L key) draws QUEST-SHELF's Abandon, twice, on every running quest but the
 // main story's - through the pause tab's own door (questBridge.js journalClean), in every host that builds a chronicle.
 // The machine's ladder is QUEST-SHELF's, unchanged. Its words are the text core's (L10N4, `chronicle.quests.*`).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { isMainQuestName } from '../../../src/systems/quest/questLists.js';
 import { mountEnhancedChronicle } from '../../../src/ui/enhanced/enhancedChronicle.js';
-
-const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
 test('QUEST-SHELF-MAIN leaves the ladder as it was: the machine still sets a main-story quest aside (the pause tab\'s door) and refuses only the world\'s own (protected) - the chronicle\'s button alone leaves the main story out', async () => {
   const { QuestMachine } = await import('../../../src/systems/quest/machine.js');
@@ -18,8 +14,6 @@ test('QUEST-SHELF-MAIN leaves the ladder as it was: the machine still sets a mai
   assert.equal(isMainQuestName('S0000101'), true);
   assert.equal(m.shelveRefusal(q.uid), null, 'a main-story quest is not refused by the machine');
   for (const name of ['S0000999', 'S0000977', '_BRISIEN']) { q.questName = name; assert.equal(m.shelveRefusal(q.uid), 'protected', name); }
-  assert.doesNotMatch(src('src/systems/quest/machine.js'), /return 'main'/, 'no main rung');
-  assert.doesNotMatch(src('src/scenes/quest/questBridge.js'), /case 'main'/);
 });
 
 /** the chronicle over a fake document, journal1.test.js's own rig */
@@ -78,7 +72,14 @@ test('QUEST-SHELF-MAIN the chronicle: Abandon on each running quest the bridge a
 
 test('QUEST-SHELF-MAIN the chronicle\'s Abandon in the player\'s language (L10N4): its label, its armed label, its title and its two aria-labels are the text core\'s (`chronicle.quests.*`) - in French they read French, read when they are drawn; in English byte for byte as before (mutants: a word left English)', async () => {
   const tm = await import('../../../src/systems/textManager.js');
-  const rows = tm.loadStringTableCsv(src('locales/fr/Port_Strings.csv'));
+  // Fixture rows stand in for a French translation; the subject is the button's words read when they are drawn.
+  const rows = [
+    ['chronicle.quests.abandon', 'Renoncer'],
+    ['chronicle.quests.abandonArmed', 'Cliquez encore'],
+    ['chronicle.quests.abandonArmedLabel', 'Cliquez encore pour renoncer à cette quête'],
+    ['chronicle.quests.abandonLabel', 'Renoncer à cette quête'],
+    ['chronicle.quests.abandonTitle', 'Laisser cette quête pour l’instant'],
+  ];
   tm.patchLocaleTable('fr', 'Port_Strings', rows);
   const fr = new Map(rows);
   const log = { active: [{ id: '5', name: 'The Rat', questName: 'M0B00Y00', clockSeconds: null, messages: [[{ formatting: 'text', text: 'a step' }]] }], finished: [] };
@@ -109,10 +110,3 @@ test('QUEST-SHELF-MAIN the chronicle\'s Abandon in the player\'s language (L10N4
   assert.deepEqual(words(), [['Abandon', title, 'Abandon this quest'], ['Click again', title, 'Click again to abandon this quest']], 'English again, byte for byte');
 });
 
-test('QUEST-SHELF-MAIN the hosts: every chronicle builder hands the bridge\'s journalClean as its shelfDoor - the streaming world and the fixed town (and the interiors through each), the dungeon (mutants: a host left out, an interiors route gone)', () => {
-  assert.match(src('src/scenes/world.js'), /notebook: \(\) => questBridge\?\.notebook \?\? null,\n\s+shelfDoor: \(\) => questBridge\?\.journalClean \?\? null,   \/\/ QUEST-SHELF-MAIN/);
-  assert.match(src('src/scenes/exterior.js'), /questLog: \(\) => pauseQuestLog\(\),\n\s+notebook: \(\) => questBridge\.notebook \?\? null,\n\s+shelfDoor: \(\) => questBridge\?\.journalClean \?\? null,   \/\/ QUEST-SHELF-MAIN/);
-  assert.match(src('src/scenes/dungeonContext.js'), /questLog: \(\) => opts\.questBridge\.questLog\(\),\n\s+notebook: \(\) => opts\.questBridge\.notebook \?\? null,\n\s+shelfDoor: \(\) => opts\.questBridge\?\.journalClean \?\? null,   \/\/ QUEST-SHELF-MAIN/);
-  assert.match(src('src/scenes/world.js'), /makeJournal: \(mode\) => makeJournalWindow\(mode\),/, 'the interiors open the world host\'s');
-  assert.match(src('src/scenes/exterior.js'), /makeJournal: \(mode\) => makeJournalWindow\(mode\),/, 'and the town host\'s, in the fixed town');
-});

@@ -2,10 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC3 — WHAT A PLAYER HOLDS, AND WHAT A PLAYER WEARS.
 //
-// Mac (2026-09-22): "Player titles appear above a player name. We will
-// develop 2 titles to start out. 1st title is Founder with a gold
-// color, 2nd title is Developer with a red color. All current players
-// should be granted the founder title." And beside them, glyphs: "a
+// And beside them, glyphs: "a
 // sprouting green plant, attached to new accounts for 2 weeks" and "a
 // developer glyph specifically for developers".
 //
@@ -18,51 +15,35 @@
 //             its row's first contact, or (FOUNDER4) the first contact of
 //             a row it shares a character with (`first_played_at`) - or
 //             (FOUNDER5) your handle is in the service's FOUNDER_HANDLES.
-//   DEVELOPER your handle is in the service's DEVELOPER_HANDLES.
+//   DEVELOPER your ACCOUNT holds the Admin role (`staff_admin`, migration 0002) - a column, never a name.
 //   SPROUT    your account is younger than SPROUT_S.
-//   DEV       the same list as the Developer title.
+//   DEV       the same role as the Developer title.
 //   DUNGEON MASTER, DISCIPLE, APOSTLE, HIEROPHANT (TITLE-N, 2026-09-24)
 //             your handle is in that title's own list in the config;
 //             each list grants the title AND its glyph. PATREON-LINK
-//             (2026-10-01): or, for the three Patreon tiers, the Patreon
+//             or, for the three Patreon tiers, the Patreon
 //             account you linked is an active patron entitled to that
 //             tier now (patreon.js) - Patreon's word, stored as WB9g's
 //             sale is, and read against the config at every ask.
-//   SHADOW FANG (SHADOW-FANG, 2026-09-26) the same, one player's own -
-//             and since SHADOW-CLOAK (2026-10-04) an aura beside it: the
-//             Holo Shadow Cloak, granted with the title as the Oblivion
-//             Ward is.
-//   PENITENT (PENITENT, 2026-09-29) the same, Diggleborf's own.
 //   HERALD (HERALD, 2026-10-01) the same, and the Patreon tier's.
-//   AEGIS OF OBLIVION (AEGIS, 2026-10-03) the same, Sureme's own - and
-//             the list grants an AURA beside the title and its glyph
-//             (TIER_AURA): the Oblivion Ward, held while the handle is
-//             listed, as the glyph is. The first aura not bought.
-//   PRIMARCH (PRIMARCH, 2026-10-04) the same, GA00250's own - the title,
-//             its glyph and an aura: the Golden Radiance, a light about
-//             the body, granted with them as the Oblivion Ward is.
-//   CRYSTAL FIST (CRYSTAL-FIST, 2026-10-05) the same, Flylighter's own -
-//             the title, its glyph and an aura: the Crystal Resonance, a
-//             ring of purple squares rising and falling about the feet,
-//             granted with them as the Oblivion Ward is.
 //   GRAND CHAMPION, ARENA CHAMPION and THE LAUREL (ARENA4, 2026-10-02)
 //             the arena's rows (server-account/src/arena.js): a Grand
 //             Champion row the relay signed; the season's #1 of the
 //             refereed board, and its laurel, while they hold the top.
 //   GATEBREAKER (WB9g, 2026-09-30) - the ONE grant that is not derived
 //             but recorded: the title the Sigil Broker sells, held because
-//             the account bought it (the row's `insignia`, 0036). A sale is
+//             the account bought it (the row's `insignia`). A sale is
 //             a fact that happened, not a rule a row satisfies - and what
 //             is HELD is still read off the row at every ask, as the rest.
 //   HOURBREAKER (SD9b, 2026-10-07) - recorded the sale's way: a roll off
 //             a Brass Remnant's receipt on its kill's first write
 //             (sds.js claimSd) is a fact that happened, laid on the row
-//             (`sd_honours`, 0087) and held for good.
+//             (`sd_honours`) and held for good.
 //   I LOVE LAMP (LAMP-KEEPER II, 2026-10-14) - recorded the same way: the
 //             account's first word with a lamp keeper (lamp.js claimLamp),
-//             laid on the row (`lamp_title`, 0113) and held for good.
+//             laid on the row (`lamp_title`) and held for good.
 //   THE QUESTLINES' FIVE (QL12, 2026-10-19) - recorded the same way: a
-//             line's title, laid on the row (`ql_titles`, 0133 - a bit a
+//             line's title, laid on the row (`ql_titles` - a bit a
 //             line, questlineClaims.js qlTitleBit) by the claim that found
 //             its last witnessed step (questlines.js claimQl), held for good.
 //   THE MARKS OF MASTERY (HUNTERS-MARK, 2026-10-27) - derived: the hunt's
@@ -89,8 +70,7 @@
 //
 // ═══ HOLDING IS NOT WEARING ════════════════════════════════════════
 //
-// A player may hold two titles and wears at most one - Mac: "equip 1
-// feature". The WORN one is the only thing stored (`players.title`),
+// A player may hold two titles and wears at most one. The WORN one is the only thing stored (`players.title`),
 // because it is the only thing that is a choice. Equipping validates
 // against the derived set, so a title that lapses cannot go on being
 // worn by a row nobody has looked at since.
@@ -101,13 +81,11 @@ import { insigniaHeld, insigniaKeys } from '../../src/net/insignia.js';   // WB9
 import { patreonTitlesOf } from './patreon.js';   // PATREON-LINK: a Patreon tier's title, held by the pledge
 import { SD_HONOUR_TITLE, SD_HONOUR_AURA } from './sds.js';   // SD9b: the Hour's grants on the row
 import { SERPENT_HONOUR_TITLE, SERPENT_HONOUR_AURA } from './serpents.js';   // SERPENT5: the Old Coil's grants on the row
-import { EG_HONOUR, EG_HONOUR_TITLES, EG_HONOUR_AURA, EG_CHAMPION_TITLE, EG_FIRST_TITLE, EG_FIRST_AURA } from './egHonours.js';   // EG-E2: the Spire's honours on the row
 import { LAMP_TITLE } from './lamp.js';   // LAMP-KEEPER II: I Love Lamp on the row
 import { QL_TITLES, qlTitleBit } from '../../src/net/questlineClaims.js';   // QL12: the questlines' titles on the row
 import { festivalWaresHeld, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN } from '../../src/net/festivalLaw.js';   // WITCH1: the Witches' Festival's wares and honours on the row
 import { STAFF_GLYPHS } from '../../src/net/staffCommands.js';   // STAFF-PANEL2-FIX: the glyphs that open the staff's commands, none held while cut off
 import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MARKS-OF-MASTERY: the hunt's, a Master's and the sea's titles
-import { shopKeysOf } from '../../src/net/shopLaw.js';   // SHOP: a ware bought, its bit on the row
 
 /** THE FOUNDER CUTOFF, and it is a date rather than a count because
  *  "all current players" is a statement about a MOMENT. Everyone who
@@ -115,8 +93,7 @@ import { shopKeysOf } from '../../src/net/shopLaw.js';   // SHOP: a ware bought,
  *  registers after does, and no migration had to walk a table to say
  *  so. 2026-09-23T00:00:00Z - the end of the day he asked.
  *
- *  FOUNDER2 (2026-09-24, Mac: "I want to grant all current accounts the
- *  founder title if they dont have it already"): the SAME statement made
+ *  FOUNDER2: the SAME statement made
  *  again at a later moment, so the cutoff moves to the end of THIS day -
  *  2026-09-25T00:00:00Z - and every account registered since TITLE-R
  *  closed it is a founder too, with no row written. After it the title is
@@ -124,24 +101,17 @@ import { shopKeysOf } from '../../src/net/shopLaw.js';   // SHOP: a ware bought,
  *  compare, and a founding title on a row one storage clear from gone was
  *  never anybody's.
  *
- *  FOUNDER3 (2026-09-27, Mac: "we still need to grant everyone the founder
- *  title befire the original cut off date. A lot of people are missing
- *  it"): the SAME instant, read off when the account FIRST PLAYED rather
+ *  FOUNDER3: the SAME instant, read off when the account FIRST PLAYED rather
  *  than when it registered (`firstPlayed`, below). The instant does not
  *  move, in either direction: nobody who holds it loses it.
  *
- *  FOUNDER4 (2026-10-04, Mac: "We need to find a way to grant the founder
- *  title to everyone before the previous cut off date. Since people are
- *  still missing their founders title"; asked how, "Link shared
- *  characters"): the SAME instant again, and when the account first
+ *  FOUNDER4: the SAME instant again, and when the account first
  *  played may now be proven by ANOTHER row - one it shares a character
- *  with (migration 0078 `first_played_at`): a guest in one browser who
+ *  with (`first_played_at`): a guest in one browser who
  *  registered in another place, the desktop app's own storage above all,
  *  first played when that guest did.
  *
- *  FOUNDER5 (2026-10-07, Mac: "Can we grant every account before sept 25th
- *  the founder title. Ive tried this multiple times and its never worked";
- *  asked how, "Time zone + name list"): BEFORE THE 25TH WHEREVER THE PLAYER
+ *  FOUNDER5: BEFORE THE 25TH WHEREVER THE PLAYER
  *  WAS. 00:00Z on the 25th is 8pm on the 24th in New York and 5pm in Los
  *  Angeles, so a player in the Americas who first played that evening -
  *  before the 25th on their own clock - held nothing. The instant moves to
@@ -166,8 +136,7 @@ export const isNamedFounder = (player, env) =>
   typeof player?.handle === 'string' && !!player.handle
   && founderHandles(env).has(player.handle.toLowerCase());
 
-/** HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant them a unique different version of the aura,
- *  a title named Hour's First, and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
+/** HOURS-FIRST: THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
  *  accounts the first clear's claims name (sd_kills, slot 1; .github/workflows/sd-clears.yml read them). A list in config,
  *  the developers' law (FOUNDER5's): held while listed, and a guest - no handle - never is. It grants the title Hour's
  *  First and its aura, The First Hour, and no glyph (TIER_LISTS would owe one). */
@@ -179,37 +148,11 @@ export const isHoursFirst = (player, env) =>
   && hoursFirstHandles(env).has(player.handle.toLowerCase());
 /** HOURS-FIRST: the aura Hour's First carries - The Turning Hour in the first dawn's light (render/auraRing.js). */
 export const HOURS_FIRST_AURA = 'firsthour';
-/** EG-E2 (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 19, THE HONOURS): FIRST OF THE SPIRE - the first company
- *  ever to take Redoubt 10, by name, granted as Hour's First is: a list in config (wrangler.toml EG_FIRST_HANDLES - SPIRE-FIRST,
- *  2026-10-20: the account Serveride, who took it alone - SPIRE-FIRST-NAME: shown in the room by his character's name,
- *  Severide; this list is the account's HANDLE, never the name the herald reads), held while listed, never a guest's. The title and its aura, Firstlight. */
-export function egFirstHandles(env) {
-  return handleList(env?.EG_FIRST_HANDLES);
-}
-export const isSpireFirst = (player, env) =>
-  typeof player?.handle === 'string' && !!player.handle
-  && egFirstHandles(env).has(player.handle.toLowerCase());
 
 /** How long the sprout stays on a new account: two weeks, in seconds,
  *  spelled as the arithmetic rather than as 1209600 so a reader can
  *  check it against the sentence Mac wrote. */
 export const SPROUT_S = 14 * 24 * 60 * 60;
-
-/** The developers, off the service's own config. A LIST IN CONFIG and
- *  not a column, because granting one is a thing a person does by
- *  editing a file that is reviewed and deployed - not by reaching into
- *  a live database at three in the morning. Case-folded on the way in,
- *  because `handle_lc` is what uniqueness is really on. */
-export function developerHandles(env) {
-  return handleList(env?.DEVELOPER_HANDLES);
-}
-
-/** MOD1: the moderators, the same way and for the same reason. Mac
- *  names them; a deploy grants them; taking a handle off revokes the
- *  glyph and the commands on that player's next token and next call. */
-export function moderatorHandles(env) {
-  return handleList(env?.MODERATOR_HANDLES);
-}
 
 /** One reading of a comma list of handles, so the two lists cannot
  *  come to disagree about case or spaces. PRIVATE-REPORT: exported, the
@@ -219,7 +162,7 @@ export function handleList(raw) {
   return new Set(raw.split(',').map((h) => h.trim().toLowerCase()).filter(Boolean));
 }
 
-/** ═══ TITLE-N (2026-09-24, Mac) ═══════════════════════════════════
+/** ═══ TITLE-N ═══════════════════════════════════
  *
  * "Dungeon Master is an orange title with its own glyph. This title
  * allows the user to use the /dm to message chat with orange text
@@ -241,54 +184,25 @@ export const TIER_LISTS = Object.freeze({
   disciple: 'DISCIPLE_HANDLES',
   apostle: 'APOSTLE_HANDLES',
   hierophant: 'HIEROPHANT_HANDLES',
-  // SHADOW-FANG (2026-09-26, Mac): "SirMcMobdon gets a brand new title/glyph. Remove them from Apostle" - a title
-  // made for one player, granted the tiers' way: a list in the config, the title and its glyph together. SHADOW-CLOAK
-  // (2026-10-04): and the third list to grant an aura with it (TIER_AURA, below).
-  shadowfang: 'SHADOW_FANG_HANDLES',
-  // PENITENT (2026-09-29, Mac): "This new custom title/glyph is for the user Diggleborf" - a second title made for one
-  // player, granted the same way.
-  penitent: 'PENITENT_HANDLES',
-  // HERALD (2026-10-01, Mac: "Herald doesnt exist ingame yet" - "you'll need to develop the herald title/glyph"): the
-  // Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and by
-  // this list for a Herald Mac names.
+  // The Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and
+  // by this list for a handle the owners name.
   herald: 'HERALD_HANDLES',
-  // AEGIS (2026-10-03, the owner: "For the account named Sureme ... a title, glyph and new custom aura for this user.
-  // Title: Aegis of Oblivion. Theme: Purple"): a third title made for one player, granted the same way - and the first
-  // list to grant an aura with it (TIER_AURA, below).
-  aegis: 'AEGIS_HANDLES',
-  // PRIMARCH (2026-10-04, GA00250, relayed by the owner: "the title will be Primarch, the color will be that light gold
-  // color that you guys use in some places in the game menu"; "can the aura be a golden light around the character?"):
-  // a fourth title made for one player, and the second list to grant an aura with it (TIER_AURA, below).
-  primarch: 'PRIMARCH_HANDLES',
-  // CRYSTAL-FIST (2026-10-05, the owner, for Flylighter: "Title: Crystal Fist", a glyph of three purple slashes, and an
-  // aura "also purple, would be a circle of tiny purple squares going up and down out of the ground"): a fifth title made
-  // for one player, and a list that grants an aura with it (TIER_AURA, below).
-  crystalfist: 'CRYSTAL_FIST_HANDLES',
-  // WIKIMAID (2026-10-17, for SylviaBun: "the WikiMaid title and a purple aura with bunnies would be dope as hell" - "Lets
-  // go all out for this"): a sixth title made for one player, and a list that grants an aura with it (TIER_AURA, below).
-  wikimaid: 'WIKIMAID_HANDLES',
-  // NIRNROOT-SAGE (2026-10-26, for Blob-Marley, an Immortal backer: "a cloud of billowing smoke with nirnroots circling
-  // around me" - his final idea, "billowing smoke, circling nirn roots around midsection, small glowing green runes
-  // encircling feet"; the owner named the title Nirnroot Sage and its glyph a nirnroot sprig): a seventh title made for
-  // one player, and a list that grants an aura with it (TIER_AURA, below).
-  nirnrootsage: 'NIRNROOT_SAGE_HANDLES',
 });
 /** The glyph each of those titles carries, in the vocabulary's words. */
-export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'disciple', apostle: 'apostle', hierophant: 'hierophant', shadowfang: 'shadowfang', penitent: 'penitent', herald: 'herald', aegis: 'aegis', primarch: 'primarch', crystalfist: 'crystalfist', wikimaid: 'wikimaid', nirnrootsage: 'nirnrootsage' });
+export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'disciple', apostle: 'apostle', hierophant: 'hierophant', herald: 'herald' });
 /** AEGIS: THE AURA A LIST'S TITLE CARRIES, where it carries one - held while the handle is listed, exactly as its glyph
  *  is, and gone on the next token once it is not. A grant like the glyph and unlike the Broker's: derived from the
  *  config at every ask, never a sale recorded on the row. */
-export const TIER_AURA = Object.freeze({ aegis: 'oblivionward', primarch: 'radiance', shadowfang: 'shadowcloak', crystalfist: 'resonance', wikimaid: 'lilacwarren', nirnrootsage: 'sagesmoke' });   // NIRNROOT-SAGE: Sage's Smoke; WIKIMAID: the Lilac Warren; CRYSTAL-FIST: the Crystal Resonance; PRIMARCH: the Golden Radiance; SHADOW-CLOAK (2026-10-04, the owner, for SirMcMobdon: "I want to build a new unique AURA specifically for his account. A holo shadow cloak with red accents. Extremely detailed"): the Holo Shadow Cloak
+export const TIER_AURA = Object.freeze({});
 
 /** STAFF-PANEL2-FIX (design doc, Weak spots: "Cutting off a staff member misses most doors" - "A stored suspended flag is
- *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, migration 0156, staff.js
+ *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, staff.js
  *  /v1/staff/cut) holds no staff role while it stands - not a developer, not a moderator, and no title whose glyph opens
  *  the staff's commands (net/staffCommands.js STAFF_GLYPHS) - so the panel, the game's /v1/mod doors, Discord and the
  *  next token's glyphs all read it at once. @param {any} player */
 export const staffSuspended = (player) => player?.staff_suspended === 1;
 
-/** Does this player hold that list's title? A guest holds none, for the developer's reason. PATREON-LINK (2026-10-01,
- *  Mac: "having to manually hand out titles ... its really hard to keep up with it"): AND a Patreon tier's title is held
+/** Does this player hold that list's title? A guest holds none, for the developer's reason. PATREON-LINK: AND a Patreon tier's title is held
  *  by the pledge too - the account's linked Patreon membership, read against PATREON_TIERS (patreon.js) - so a patron
  *  needs no line here, and the lists stay for the titles Mac grants by name. */
 export const holdsTier = (title, player, env) =>
@@ -296,43 +210,40 @@ export const holdsTier = (title, player, env) =>
   && !(staffSuspended(player) && STAFF_GLYPHS.includes(TIER_GLYPH[/** @type {keyof typeof TIER_GLYPH} */ (title)]))
   && (handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase()) || patreonTitlesOf(player, env).includes(title));
 
-/** Is this player one of them? A handle a guest does not have cannot
- *  be in any list, so a guest is never a developer - which is right:
- *  the list names people, and a guest row is a device. */
-export const isDeveloper = (player, env) =>
+/** STAFF-ROLES-BY-ACCOUNT: is this player an Admin (a developer)? The ROLE IS THE ACCOUNT'S (`staff_admin`, migration 0002),
+ *  never a name's: a handle that a former staff member held grants nothing to whoever registers it. Read off the row at every
+ *  ask, so an Admin revoked loses the title, the glyph and the doors on the next token and the next call. A guest holds no
+ *  handle and so never is one. `env` is kept for the callers that pass it. */
+export const isDeveloper = (player, _env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
-  && developerHandles(env).has(player.handle.toLowerCase());
+  && player.staff_admin === 1;
 
-/** MOD1: is this player a moderator? A guest cannot be, for the same
- *  reason a guest cannot be a developer. STAFF-PANEL1: listed, or added by an Admin from the staff panel
- *  (`staff_mod`, migration 0144) - the account's, so a rename keeps it and a listed handle is never needed. */
-export const isModerator = (player, env) =>
+/** STAFF-ROLES-BY-ACCOUNT: is this player an Owner? An Owner is an Admin whose row also says `staff_owner` (migration 0002),
+ *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports and approves POIs. */
+export const isOwner = (player, env) => isDeveloper(player, env) && player.staff_owner === 1;
+
+/** MOD1: is this player a moderator? A guest cannot be, for the same reason a guest cannot be a developer. The role is
+ *  the account's `staff_mod`, added by an Admin from the staff panel or by the operator - so a rename keeps it and no
+ *  registered name earns it. */
+export const isModerator = (player, _env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
-  && (moderatorHandles(env).has(player.handle.toLowerCase()) || player.staff_mod === 1);
-
-/** SHADOW-FANG-MOD (2026-10-19, Mac: "Give the shadow fang title mod perms including ban"): THE TITLES THAT MODERATE -
- *  their holders may do everything canModerate opens (mute, ban, unban, strikes, the reports' queue, a case's buttons),
- *  and are protected as a moderator is. Held by the title's own list (TIER_LISTS), so taking the handle off takes the
- *  rights with the title on the next call. The GLYPH stays the title's own: no shield, as for a developer. */
-export const MOD_TIERS = Object.freeze(['shadowfang']);
+  && player.staff_mod === 1;
 
 /** MOD1: MAY THIS PLAYER MODERATE? A moderator may, and so may a
  *  developer - the people who can already speak as the server are not
  *  made to add themselves to a second list to mute somebody. The GLYPH
- *  stays the moderator list's alone: the dev mark already says more.
- *  SHADOW-FANG-MOD: and so may a holder of a MOD_TIERS title. */
-export const canModerate = (player, env) => isModerator(player, env) || isDeveloper(player, env)
-  || MOD_TIERS.some((t) => holdsTier(t, player, env));
+ *  stays the moderator list's alone: the dev mark already says more. */
+export const canModerate = (player, env) => isModerator(player, env) || isDeveloper(player, env);
 
 /** FOUNDER3: WHEN THIS ACCOUNT FIRST PLAYED. Founder was read off
  *  `registered_at`, and registering is only the moment a player chose a
  *  name: a player here as a guest since before the cutoff who registered
  *  after it held nothing (Field-Bugs 2026-09-26b, report 3). `created_at`
  *  is stamped at a row's first contact, guest or not, and registering is
- *  an upgrade IN PLACE of that same row (0002), so it is still there. A
+ *  an upgrade IN PLACE of that same row, so it is still there. A
  *  row without one is judged by its registration, as before. FOUNDER4:
  *  AND `first_played_at` - the first contact of a row this one shares a
- *  character with, where it is earlier (migration 0078 says how a
+ *  character with, where it is earlier (founderLink.js says how a
  *  character is shared); a row without one is judged as before. */
 const firstPlayed = (player) => Math.min(
   player.registered_at,
@@ -358,7 +269,7 @@ export function titlesHeld(player, env) {
   if (!held.includes('founder') && isNamedFounder(player, env)) held.push('founder');   // FOUNDER5: or by name
   if (isDeveloper(player, env)) held.push('developer');
   for (const t of Object.keys(TIER_LISTS)) if (holdsTier(t, player, env)) held.push(t);   // TITLE-N
-  // WB9g: AND THE BROKER'S - a title bought with Sigil Stones, held because the sale is recorded on the row (0037). A
+  // WB9g: AND THE BROKER'S - a title bought with Sigil Stones, held because the sale is recorded on the row. A
   // guest row cannot buy one (accounts.js buyInsignia refuses it), so none is ever read off one.
   for (const t of insigniaKeys(player?.insignia, 'title')) if (!held.includes(t)) held.push(t);
   // SEAT1c (Seats-Arc 7.4): AND A CHARTER'S - "Warden of <Town>", "Protector of <Kingdom>" - derived from the seats the
@@ -370,15 +281,12 @@ export function titlesHeld(player, env) {
   // derived from the account's characters' seats (npcChapters.js chapterTitlesOfAccount), laid on the row as
   // `chapterTitles` for this request alone, while CHAPTER_TITLES is on
   if (Array.isArray(player?.chapterTitles)) for (const t of player.chapterTitles) if (CHAPTER_TITLES.includes(t) && !held.includes(t)) held.push(t);
-  // ARENA4 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title. Being the #1 pvp arena player comes
-  // with it's own temporary title/glyph"): THE ARENA'S TWO, derived from the arena's rows as the founder is from a date -
+  // ARENA4: THE ARENA'S TWO, derived from the arena's rows as the founder is from a date -
   // read onto the row (`arena`, server-account/src/arena.js arenaHonoursOf) where a token is minted or a wardrobe shown.
   // The Grand Champion holds for good (a row only a relay-signed climb writes); the Arena Champion while the account is
   // the season's #1, so it passes to whoever takes the top and lapses by itself. A row read without them holds neither.
   if (player?.arena?.grand === true) held.push('grandchampion');
   if (player?.arena?.champion === true) held.push('arenachampion');
-  if (player?.iliac?.champion === true) held.push('iliacchampion');   // CARDS10: Iliac Hand's season #1 (iliac.js), while they hold the top
-  if (player?.gambit?.champion === true) held.push('grandmaster');   // KG6: The King's Gambit's season #1 (gambit.js), while they hold the top
   // SD9b: HOURBREAKER - rolled on a Brass Remnant's kill's first write and laid on the row (sds.js claimSd, `sd_honours`),
   // held for good. A guest's kill is never written, so a guest row holds none
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.sd_honours) & SD_HONOUR_TITLE)) held.push('hourbreaker');
@@ -389,12 +297,6 @@ export function titlesHeld(player, env) {
   // SERPENT5: COILBREAKER - rolled on a dealing ship's serpent kill's first write and laid on the row (serpents.js
   // claimSerpent, `serpent_honours`), held for good; a guest's kill is never written, so a guest row holds none
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.serpent_honours) & SERPENT_HONOUR_TITLE)) held.push('coilbreaker');
-  // EG-E2: THE SPIRE'S - the honours a recorded Redoubt wrote on the row (egHonours.js, `eg_honours`), held for good; a
-  // guest's claim is never written. Spire Champion while the row says a Descent bracket's top ten held it last season
-  // (`eg`, egHonours.js withEgHonours); First of the Spire by name
-  if (typeof player?.handle === 'string' && player.handle) for (const t of EG_HONOUR_TITLES) if (Number(player?.eg_honours) & EG_HONOUR[t]) held.push(t);
-  if (player?.eg?.champion === true) held.push(EG_CHAMPION_TITLE);
-  if (isSpireFirst(player, env)) held.push(EG_FIRST_TITLE);
   // QL12: THE QUESTLINES' - a line's title laid on the row by the claim that witnessed its last step (questlines.js
   // claimQl, `ql_titles`), held for good; a guest's claim writes nothing, so a guest row holds none
   if (typeof player?.handle === 'string' && player.handle) for (const t of QL_TITLES) if (Number(player?.ql_titles) & qlTitleBit(t)) held.push(t);
@@ -406,20 +308,16 @@ export function titlesHeld(player, env) {
     // HUNTERS-MARK, MARKS-OF-MASTERY: derived from the account's rows (hunts.js masteryMarksRead) - its board clears, a
     // living Master of a profession, the serpents it helped slay - laid on the row as `masteryMarks` for this request alone
     if (Array.isArray(player?.masteryMarks)) for (const t of MASTERY_MARKS) if (player.masteryMarks.includes(t) && !held.includes(t)) held.push(t);
-    for (const t of shopKeys(player, 'title')) if (!held.includes(t)) held.push(t);   // SHOP: Genesis, bought (shop.js)
   }
   return held;
 }
-/** SHOP (bible/06-Systems/Shop.md): the keys of one kind the shop sold this row (`shop_wares`, its bits - shop.js sets
- *  them on a paid order and takes them off on a refund). A registered account's alone: a guest cannot buy. */
-export const shopKeys = (/** @type {any} */ player, /** @type {string} */ kind) => (typeof player?.handle === 'string' && player.handle ? shopKeysOf(player?.shop_wares, kind) : []);
 /** WITCH1: the title an account's Hearth Offerings earn (net/identityToken.js TITLES's spelling). */
 export const HEARTHKEEPER_TITLE = 'hearthkeeper';
 /** WITCH1: the keys of one kind among the festival's account wares a row bought (festivalLaw.js FESTIVAL_WARES). */
 const festivalKeys = (/** @type {any} */ player, /** @type {string} */ kind) => festivalWaresHeld(player?.fest_wares).filter((id) => id.startsWith(`${kind}:`)).map((id) => id.slice(kind.length + 1));
 
-/** SERAPH-WINGS (2026-10-05, Mac: "I want to build an aura for the developers ... Golden Angel wings that flow"): THE
- *  DEVELOPERS' AURA - held while the handle is in DEVELOPER_HANDLES, as the developer title and glyph are, and gone on
+/** SERAPH-WINGS: THE
+ *  DEVELOPERS' AURA - held while the account is an Admin, as the developer title and glyph are, and gone on
  *  the next token once it is not. */
 export const DEVELOPER_AURA = 'seraphwings';
 /** WB9g: THE AURAS THIS PLAYER HOLDS - the Broker's, bought (the row's `insignia`), in the offers' order. AEGIS: and,
@@ -434,19 +332,14 @@ export function aurasHeld(player, env) {
   // claimSd, `sd_honours`), held for good; a registered account's alone, as Hourbreaker is
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.sd_honours) & SD_HONOUR_AURA)) held.push('turninghour');
   if (isHoursFirst(player, env) && !held.includes(HOURS_FIRST_AURA)) held.push(HOURS_FIRST_AURA);   // HOURS-FIRST: with the title, by name
-  // EG-E2: the Spire's two auras with their titles' bits (Kynbane's Beaconlight, Wellhead-Walker's The Burning Stair), a
-  // registered account's alone; Firstlight with First of the Spire, by name
-  if (typeof player?.handle === 'string' && player.handle) for (const [t, a] of Object.entries(EG_HONOUR_AURA)) if ((Number(player?.eg_honours) & EG_HONOUR[t]) && !held.includes(a)) held.push(a);
-  if (isSpireFirst(player, env) && !held.includes(EG_FIRST_AURA)) held.push(EG_FIRST_AURA);
   for (const a of insigniaKeys(player?.insignia, 'aura')) if (!held.includes(a)) held.push(a);
   // SERPENT5: THE MAELSTROM - the Old Coil's second grant, laid on the row as Coilbreaker is, held for good
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.serpent_honours) & SERPENT_HONOUR_AURA)) held.push('maelstrom');
   if (typeof player?.handle === 'string' && player.handle) for (const a of festivalKeys(player, 'aura')) if (!held.includes(a)) held.push(a);   // WITCH1: Witchfire, bought
-  for (const a of shopKeys(player, 'aura')) if (!held.includes(a)) held.push(a);   // SHOP: Eternal, bought
   return held;
 }
 
-/** WITCH1 (bible/06-Systems/Witches-Festival.md): THE PROFILE ICONS THIS PLAYER HOLDS - the festival's bought from a Wyrd
+/** WITCH1: THE PROFILE ICONS THIS PLAYER HOLDS - the festival's bought from a Wyrd
  *  Sister (`fest_wares`), and the Soul Cake once the account has taken SOULCAKE_TAKEN cakes from other players' offerings
  *  (`fest_taken`). A registered account's alone. In ICONS's order. */
 export const SOULCAKE_ICON = 'soulcake';
@@ -489,12 +382,11 @@ export function glyphsOf(player, env, nowS) {
   if (isModerator(player, env)) on.push('mod');   // MOD1: the blue shield
   for (const t of Object.keys(TIER_LISTS)) if (holdsTier(t, player, env)) on.push(TIER_GLYPH[t]);   // TITLE-N: each title's own glyph
   if (player?.arena?.champion === true) on.push('laurel');   // ARENA4: the laurel, true of the season's #1 while they hold it
-  for (const g of shopKeys(player, 'glyph')) if (!on.includes(g)) on.push(g);   // SHOP: the Origin, bought - true of the account that paid for it
   return on;
 }
 
-/** GLYPH-WEAR (2026-10-02, Mac: "can we make it where players can also equip/unequip their glyphs"): THE GLYPHS THIS
- *  PLAYER HAS TAKEN OFF - the stored choice (`glyphs_off`, 0068), read against what is true now, so a glyph that has
+/** GLYPH-WEAR: THE GLYPHS THIS
+ *  PLAYER HAS TAKEN OFF - the stored choice (`glyphs_off`), read against what is true now, so a glyph that has
  *  lapsed is not "hidden" and one granted later shows until it is taken off. In glyphsOf's order. */
 export function glyphsHidden(player, env, nowS) {
   const off = typeof player?.glyphs_off === 'string' ? player.glyphs_off.split(' ') : [];

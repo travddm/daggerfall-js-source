@@ -1,5 +1,5 @@
 // @ts-check
-// SD9e (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS REMNANT'S SPOILS
+// SD9e: THE BRASS REMNANT'S SPOILS
 // ON THE ARENA'S FLOOR - the court's burst (scenes/gate/gateCourt.js burst) for the Last Moment. SD_SPEW_AT_MS into its fall
 // (the fight as the page holds it - net/superDungeon/sdFightLink.js), this fighter's spoils (systems/superDungeon/sdSpoils.js, off the receipt the
 // relay signed for them - net/superDungeon/sdReceipt.js `h1`) leave the cage of its chest toward them and come to rest on the arena's

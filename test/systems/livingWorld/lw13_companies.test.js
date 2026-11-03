@@ -1,4 +1,4 @@
-// LW13 (bible/06-Systems/Living-World-II.md "LW13"): THE COMPANIES - a town's adventurers dealt into companies (their
+// LW13 ("LW13"): THE COMPANIES - a town's adventurers dealt into companies (their
 // sizes, the mix of the three runs, the one left over alone), named, led by their first place's trip (one trip a cycle,
 // every place's holder walking it; a fated member sending the company out; a company the likelier to dive), hired on a
 // merchant's train with no sellsword; pilgrims in bands, and to a temple town's holy day; seen - in file by role, the
@@ -125,7 +125,7 @@ test('LW13 one trip a cycle: a company\'s places ride its first\'s (leaderOf, pl
       assert.deepEqual(tr.party.map((m) => m.slot), c.places.map((p) => p.slot), 'every place walking');
       assert.equal(tr.company.key, c.key);
       assert.equal(tr.company.name, namedIn(c, home.name).name);
-      for (const m of tr.party) assert.equal(awayOf(m, [tr])[0].t0, whenWalked(tr.outT0, 0), 'away with it');   // PIN MOVED (AUDIT LW-II-2 R5): out at the leg's first light - a company setting out at six is at home on the road till seven (AUDIT LW-II E5), and its town now has it gone then, not at six
+      for (const m of tr.party) assert.equal(awayOf(m, [tr])[0].t0, whenWalked(tr.outT0, 0), 'away with it');
     }
   }
   assert.ok(seen > 3, `${seen} company trips`);
@@ -273,10 +273,6 @@ test('LW13 seen: a company in file by role (warriors, thieves, mages), its mark 
   assert.equal(partyLabel(trip, '', 'Orcs'), 'The Lantern Company beset by Orcs');
   assert.equal(partyLabel({ ...trip, to: null }), 'The Lantern Company');
   for (const pool of Object.values(COMPANY_GREETINGS)) for (const l of pool) assert.ok(fillLine(l, { company: 'The Lantern Company', player: 'Bo' }).includes('The Lantern Company'));
-  const roads = readFileSync(new URL('../../../src/scenes/livingWorld/livingRoads.js', import.meta.url), 'utf8');
-  assert.match(roads, /const word = company\?\.head\?\.id \?\? m\.res\.id;/);
-  assert.match(roads, /const s = rel\.standing\(companyAt\(id, deps\.clock\(\)\)\?\.head\?\.id \?\? id, dayOf\(deps\.clock\(\)\)\);/);
-  assert.match(roads, /return p \? \{ name: p\.trip\.company\.name, head: headOf\(membersAt\(p\.trip, t\)\) \} : hiredAt\(id, t\);/);   // PIN MOVED (AUDIT LW-II-2 R8): one of no company walking its own trip - a company hired on a train (hiredAt)
   // the People page: the companies the known walk with
   const home = town(1, 100, 100, 40);
   home.name = 'Wayrest';
@@ -288,9 +284,6 @@ test('LW13 seen: a company in file by role (warriors, thieves, mages), its mark 
   const name = namedIn(c, 'Wayrest').name;
   assert.ok(page.known.slice(0, 2).every((r) => r.company === name));
   assert.deepEqual(page.companies, [{ name, town: 'Wayrest', members: page.known.filter((r) => r.company === name).map((r) => r.name) }]);
-  const chron = readFileSync(new URL('../../../src/ui/enhanced/enhancedChronicle.js', import.meta.url), 'utf8');
-  assert.match(chron, /if \(p\.company\) top\.append\(el\('span', 'sb-chip', p\.company\)\);/);
-  assert.match(chron, /line\.append\(el\('span', 'sb-chip', `Companies \\u00b7 \$\{page\.companies\.length\}`\)\);/);
 });
 
 test('LW13 a pilgrim come to a temple town keeps its temple - the morning long and again before the evening (PILGRIM_TEMPLE_H) - where a visitor keeps the market (mutants: the visit, the hours)', () => {

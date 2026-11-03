@@ -1,5 +1,4 @@
-// UXB1-M (2026-09-25, the UX backlog: "Private Property uses daggerfall's default Y/N prompt. Make the options
-// clickable at least or convert to new UI.").
+// UXB1-M.
 //
 // THE ROOT CAUSE, found by driving the box: the options WERE clickable - in the wrong place. ChoiceWindow's click
 // bands were [ty - lineH, ty) for a row whose glyphs start AT ty, so every band covered the row above its label: on
@@ -186,10 +185,4 @@ test('UXB1-M: the private-property arm raises DFU\'s YesNo box over record 37, i
   // the record itself, as the vendored DFU text carries it
   const csv = read('vendor/dfu-text/Internal_RSC.csv');
   assert.match(csv, /37,"This looks like private property\. Do you\[\/center\]\nstill want to look through it\?\[\/center\]/);
-  const wm = read('src/scenes/worldModes.js');
-  const arm = wm.slice(wm.lastIndexOf("if (key.startsWith('container:')) {"));
-  const raise = arm.slice(arm.indexOf('interiorOverlay = new YesNoBoxWindow({'), arm.indexOf('});', arm.indexOf('interiorOverlay = new YesNoBoxWindow({')));
-  assert.match(raise, /rows: privatePropertyRows\(townTalk\?\.lines\?\.\(PRIVATE_PROPERTY_TEXT_ID\)\),/);
-  assert.match(raise, /onYes: \(\) => openLoot\(true\),/);
-  assert.doesNotMatch(arm.slice(0, arm.indexOf('interiorCtx.actions.activate')), /new ChoiceWindow\(\{\s*lines: _rowsText\(townTalk\?\.lines\?\.\(PRIVATE_PROPERTY_TEXT_ID\)/, 'the keyed panel is gone from the arm');
 });

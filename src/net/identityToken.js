@@ -3,7 +3,6 @@
 // ACC1a — THE IDENTITY TOKEN: the one thing the relay is willing to
 // believe about who a player is.
 //
-// Mac (2026-09-21): "the account name would be used for online."
 //
 // THE HOLE THIS CLOSES EXISTS TODAY. The hello is
 // `{ t:'hello', id, secret, name, look, pose }` and THE CLIENT ASSERTS
@@ -71,8 +70,7 @@
 // the people who can be banned" (ACC0's wall) is weaker if a name can
 // be BORROWED for five minutes.
 //
-// MAC DECIDED IT (2026-09-21, asked whether to close replay or accept
-// the five-minute window: "Yes"). A TOKEN IS SPENT ONCE. The relay
+// MAC DECIDED IT. A TOKEN IS SPENT ONCE. The relay
 // keeps the signatures it has seen and refuses a repeat; `e` bounds how
 // long it must remember, so the set sweeps itself.
 //
@@ -89,7 +87,7 @@
 // to be in front of somebody is the second-home shape SLAM13 burned us
 // on.
 //
-// ACC1d BUILT BOTH (2026-09-22), so the paragraphs above describe
+// ACC1d BUILT BOTH, so the paragraphs above describe
 // RUNNING CODE and not an intention. `server/src/index.js` `_named`
 // verifies the token, keeps the signature for as long as `e` says the
 // room must remember it, refuses a repeat, and takes the name out of
@@ -121,7 +119,7 @@
 // is the first module in src/net/ to need it.
 
 import { validStaffEvent, STAFF_EVENT_ID_RE } from './staffEvent/staffEventLaw.js';   // STAFF-EVENT: a staff event order's event
-import { sanitizeName, NAME_MAX, streamsFoes } from './wire.js';
+import { sanitizeName, NAME_MAX } from './wire.js';
 import { GUILD_ID_RE, GUILD_TAG_RE, GUILD_MEMBER_RE } from './guild/guildLaw.js';   // GUILD1c: a guild rides the token - the law's own three shapes
 import { ribbonClaimOk } from './heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon - heraldryLaw.js imports nothing, so the worker's graph stays flat
 import { worksOf } from './siege/siegeRef.js';   // SEAT2b part two (b): a siege's works on its pass - siegeRef.js imports nothing
@@ -169,9 +167,7 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
 
 /* ═══ ACC3: WHAT A PLAYER WEARS, AND WHY IT RIDES THE TOKEN ═══════════
  *
- * Mac (2026-09-22): "Player titles appear above a player name... 1st
- * title is Founder with a gold color, 2nd title is Developer with a red
- * color", and "name glyphs... appear on the right side of the player
+ * and "name glyphs... appear on the right side of the player
  * name".
  *
  * A TITLE A CLIENT COULD ASSERT IS A TITLE EVERY CLIENT HAS. This is
@@ -182,8 +178,7 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
  * - signs it into the token, and the relay reads it OUT of the token
  * exactly as it reads the name.
  *
- * AND IT COSTS NOTHING TO ADD NOW. Mac's own framing: "Next feature
- * before this becomes a live addition." The token module is in the
+ * AND IT COSTS NOTHING TO ADD NOW. The token module is in the
  * relay bundle, so a claim added here bumps RELAY_VERSION and drops
  * every connected player - but the deployed relay is world84 and both
  * world86 (ACC1g) and world87 (this) are still on the branch, so all
@@ -194,44 +189,42 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
 /** The titles that exist. A title is WORN one at a time, so a token
  *  carries at most one. Grants are the service's business (who HOLDS
  *  one); this list is the vocabulary both ends share. */
-export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'shadowfang', 'penitent', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'aegis', 'primarch', 'crystalfist', 'hourbreaker', 'hoursfirst', 'iliacchampion', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'grandmaster', 'coilbreaker', 'spirewalker', 'beaconlighter', 'kynbane', 'unfallen', 'lonebeacon', 'battlemage', 'wellheadwalker', 'mastergallery', 'mastercairn', 'mastershade', 'masterwellhead', 'spirechampion', 'spirefirst', 'wikimaid', 'doorwarden', 'covenbane', 'weirwalker', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'skyfarer', 'nirnrootsage', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane', 'genesis']);   // SHOP (2026-10-28, bible/06-Systems/Shop.md): GENESIS last - the shop's pre-alpha title, bought once (net/shopLaw.js SHOP_WARES; server-account/src/shop.js), held for good;   // HUNTERS-MARK, MARKS-OF-MASTERY (2026-10-27, a player: "Add more horizontal progression please!"; bible/06-Systems/Bounty-Boards.md section 12): THE MARKS OF MASTERY, last - the hunt's four (an account's board clears), a profession's Master each (a living character's track at 100) and the sea's two (the serpents an account helped slay), derived by the service (net/huntLaw.js MASTERY_MARKS; server-account/src/hunts.js);   // NIRNROOT-SAGE (2026-10-26, for Blob-Marley, an Immortal backer: "billowing smoke, circling nirn roots around midsection, small glowing green runes encircling feet"; bible/06-Systems/Accounts-And-Cloud-Saves-Arc.md NIRNROOT-SAGE): NIRNROOT SAGE last - Blob-Marley's own, granted by name with its glyph and Sage's Smoke (server-account/src/titles.js NIRNROOT_SAGE_HANDLES);   // WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S TWO, last (after the Starwarden, when the Starfall's branch took the festival in) - Witchwarden, bought from a Wyrd Sister for Soul Cakes, and Hearthkeeper, an account's Hearth Offerings having given 25 cakes (server-account/src/titles.js, `fest_wares`, `fest_given`), held for good;   // STAR8 (2026-10-20, the owner: "A new seasonal quest line that ties into the event, its functions and the new world event"; bible/11-Multiplayer/Starfall.md section 7): the STARWARDEN last - the Thirteenth of Frostfall's, QL_TITLES' sixth, laid on the row as the questlines' five are;   // QL12 (2026-10-19, the owner: "New questlines tying into and introduced the oblivion gates, abyss dungeons, elite dungeons and elite breaches"; bible/06-Systems/Questlines-Arc.md section 5.3, decision 10.3: a title a questline): THE QUESTLINES' FIVE, last - in QL_TITLES' order (net/questlineClaims.js, the lines' order): the Doorwarden (the Burning Doors), Covenbane (the Covens' Hoard), the Weirwalker (the Weir Road), Witness of the Hour (the Hour That Was Not) and Satakal's Witness (the Old Coil) - each laid on the row by the claim that witnessed its line's last paid step (server-account/src/questlines.js, `ql_titles`), held for good;   // WIKIMAID (2026-10-17, for SylviaBun: "the WikiMaid title and a purple aura with bunnies"; bible/06-Systems/Accounts-And-Cloud-Saves-Arc.md WIKIMAID): WIKIMAID last - SylviaBun's own, granted by name with its glyph and the Lilac Warren (server-account/src/titles.js WIKIMAID_HANDLES);   // EG-E2 (2026-10-12; at the merges of main, after LAMP-KEEPER II's I Love Lamp, KG6's Grandmaster and SERPENT5's Coilbreaker, which main ships first): EG-E2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 19, THE HONOURS): THE SPIRE'S THIRTEEN, last - after the Coilbreaker - Spirewalker (Redoubt 2), Beacon-Lighter (5), Kynbane (10), the Unfallen (10 with no fall from Hall 1), the Lone Beacon (a Court felled alone in a company of four or more), Battlemage of the Spire (15), Wellhead-Walker (20), the four bands' Masters (every feat of a band's lords), Spire Champion (a Descent bracket's top ten, held through the next season) and First of the Spire (by name, as Hour's First) - the service's (server-account/src/egHonours.js, titles.js);   // SERPENT5 (2026-10-15, Mac: "A gilded weapon to the serpent + a rare chance of a title/aura drop"; bible/11-Multiplayer/Sea-Serpent.md section 17): COILBREAKER last - one dealing ship's serpent kill in twenty grants it on its first write (server-account/src/serpents.js), held for good   // LAMP-KEEPER II (2026-10-14, Mac: "Anybody that interacts with the lamp model should earn the 'I Love Lamp' title"): I LOVE LAMP, last - laid on the account's row by its first word with a lamp keeper (server-account/src/lamp.js); CHAP4c (2026-10-08, the Chapters arc, Chapters-Arc.md section 6) and CHAP6e (2026-10-09, section 7): a chapter's Master, its officer, its former Master, its High Master and a Season's Master, last (CHAPTER_TITLES, below) - after CARDS10's, at the merge of main (its relay deployed first); CARDS10 (2026-10-08, Tavern-Cards section 6.4, DECIDED: "a ladder ... with a title for the top of it"): ILIAC CHAMPION, last (after HOURS-FIRST's at the merge) - the season's #1 of Iliac Hand's refereed board, while they hold the top, derived at the mint (server-account/src/iliac.js, the row's `iliac`); HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant them a unique different version of the aura, a title named Hour's First, and each the gilded gun"): HOUR'S FIRST, last - the first group to break an Abyss Dungeon, granted by name (server-account/src/titles.js HOURS_FIRST_HANDLES);   // SD9b (2026-10-07, the Super Dungeons arc): HOURBREAKER, last - one Brass Remnant's kill in four grants it on its first write (server-account/src/sds.js), held for good; CRYSTAL-FIST (2026-10-05, the owner, for Flylighter: "Title: Crystal Fist"): Flylighter's own; PRIMARCH (2026-10-04, GA00250: "the title will be Primarch"): GA00250's own; AEGIS (2026-10-03, the owner: "For the account named Sureme ... a title, glyph and new custom aura for this user. Title: Aegis of Oblivion. Theme: Purple"): Sureme's own, last;   // ARENA4 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title. Being the #1 pvp arena player comes with it's own temporary title/glyph"): the Grand Champion (the ladder's tenth tier's champion beaten, relay-refereed - for good) and the Arena Champion (the season's #1 of the refereed board - while they are #1), both derived at the mint (server-account/src/titles.js, the row's `arena`), last;   // HERALD (2026-10-01, Mac: "Herald doesnt exist ingame yet" - "you'll need to develop the herald title/glyph"): the Patreon tier between Disciple and Hierophant, after the Gatebreaker (the seats' five after it, SEAT1c); TITLE-N (2026-09-24, Mac): the Dungeon Master, and the three Patreon tiers in their order; SHADOW-FANG (2026-09-26, Mac): SirMcMobdon's own; PENITENT (2026-09-29, Mac): Diggleborf's own; WB9g (2026-09-30, Mac: "a brand new title to the broker"): the Gatebreaker, bought with Sigil Stones (net/insignia.js)   // KG6 (2026-10-15, Kings-Gambit.md 10.7): GRANDMASTER last - The King's Gambit's season #1 (server-account/src/gambit.js)
+export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane']);
 
-/** SEAT1c (2026-09-30, Mac: "Finish the seats"; Seats-Arc 7.4): THE SEATS' TITLES - five GENERIC ids, because a town's
+/** SEAT1c: THE SEATS' TITLES - five GENERIC ids, because a town's
  *  or a Season's name cannot be a closed list's word: "Warden of <Town>" (a palace seat's guildmaster), "Protector of
  *  <Kingdom>" (a crown's), "Crowned in Season N", "Keeper of <Town>, Season N" (kept for good, SEASON1) and the Royal
  *  Tourney's champion (CROWN1). Each rides with a bounded claim beside it - `ts`: [the seat key, the Season] - from
- *  which the client words it. Reaching the relay once, here, before the service mints any (the SHADOW-FANG order). */
+ *  which the client words it. Reaching the relay once, here, before the service mints any - a relay that does not know a title refuses the token that carries it. */
 export const SEAT_TITLES = Object.freeze(['warden', 'protector', 'crowned', 'keeper', 'champion']);
 /** SEAT1c: whether `ts` is a seat title's claim - [seat key (a map id, unsigned 32), Season (0-9999)]. */
 export const seatTitleClaimOk = (ts) => Array.isArray(ts) && ts.length === 2 && Number.isSafeInteger(ts[0]) && ts[0] >= 0 && ts[0] <= 0xffffffff
   && Number.isSafeInteger(ts[1]) && ts[1] >= 0 && ts[1] <= 9999;
-/** CHAP4c (2026-10-08, Chapters-Arc 6): A CHAPTER'S SEATS' TITLES - three GENERIC ids, as the seats' are, because a guild's
+/** CHAP4c: A CHAPTER'S SEATS' TITLES - three GENERIC ids, as the seats' are, because a guild's
  *  and a region's name cannot be a closed list's word: its Master (rank 9), an officer (rank 8), and a Master who lost
  *  the seat (for the rest of the Season). Each rides with the seats' bounded claim, `ts`: [the chapter's key - its
  *  guild faction x 100 + its region (net/npcChapterLaw.js chapterTitleKey) - and the Season], from which the client words
  *  it. Reaching the relay before the service mints any: the service mints them only while CHAPTER_TITLES is on.
- *  CHAP6e (2026-10-09, Chapters-Arc 7): and two more - a Master's in its chapter's Ascendancy ("High Master", signed in
+ *  CHAP6e: and two more - a Master's in its chapter's Ascendancy ("High Master", signed in
  *  the Master's place for the Season, never worn on its own) and the Master who held the seat a whole Season's, kept
  *  for good, its claim's Season the one it held. */
 export const CHAPTER_TITLES = Object.freeze(['chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster']);
 /** Whether a title rides with a claim (`ts`): the seats' and the chapters' - every other title rides alone. */
 export const titleClaimed = (t) => SEAT_TITLES.includes(t) || CHAPTER_TITLES.includes(t);
 
-/** WB9g (2026-09-30, Mac: "a new addition (the aura), an animated burning ground aura that circles the ground where
- *  your character stands. These items should be expensive and sought after"): THE AURAS THAT EXIST. An aura is WORN,
+/** WB9g: THE AURAS THAT EXIST. An aura is WORN,
  *  one at a time, as a title is - so a token carries at most one (`au`) - and it is signed for the same reason a title
  *  is: a fire at a player's feet that a client could assert is a fire every client has. Holding one is the service's
- *  business (the Broker's insignia, bought - net/insignia.js; or, since AEGIS, granted by name beside its title -
- *  server-account/src/titles.js TIER_AURA: the Oblivion Ward, since PRIMARCH the Golden Radiance and since SHADOW-CLOAK
- *  the Holo Shadow Cloak and since CRYSTAL-FIST the Crystal Resonance; since SERAPH-WINGS, the developers' Seraph Wings -
- *  titles.js DEVELOPER_AURA); this list is the vocabulary both ends share. */
-export const AURAS = Object.freeze(['dagonfire', 'oblivionward', 'radiance', 'shadowcloak', 'seraphwings', 'resonance', 'turninghour', 'firsthour', 'maelstrom', 'beaconlight', 'burningstair', 'firstlight', 'lilacwarren', 'witchfire', 'sagesmoke', 'eternal']);   // SHOP (2026-10-28): ETERNAL last - a cape of blue-violet fire hung from the shoulders and flowing down the back, the shop's pre-alpha aura, bought once;   // NIRNROOT-SAGE (2026-10-26, for Blob-Marley: "billowing smoke, circling nirn roots around midsection, small glowing green runes encircling feet"): SAGE'S SMOKE last - smoke billowing up about the body, nirnroots circling the waist, green runes glowing round the feet; the Nirnroot Sage's own, granted with its title by name, never sold;   // WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): WITCHFIRE last - a coven's green fire licking round the feet, tallow candles burning in its ring and their motes rising violet; bought from a Wyrd Sister for Soul Cakes (server-account/src/titles.js, `fest_wares`), held for good;   // WIKIMAID (2026-10-17, for SylviaBun: "a purple aura with bunnies"): THE LILAC WARREN last - rabbits hopping round the feet on a ring of lilac light, their prints fading behind them; the WikiMaid's own, granted with its title by name, never sold;   // EG-E2 (2026-10-12, Elite-Gates.md section 19): THE SPIRE'S THREE, last (after SERPENT5's Maelstrom, which main ships first) - Beaconlight (Kynbane's: gold-white motes), The Burning Stair (Wellhead-Walker's: falling embers) and Firstlight (First of the Spire's: a dawn-white ring), each granted with its title, never sold;   // SERPENT5 (2026-10-15, Sea-Serpent.md section 17): THE MAELSTROM last - the Old Coil's whirlpool of tide and foam about the feet, one dealing ship's serpent kill in fifty on its first write (server-account/src/serpents.js), held for good   // HOURS-FIRST (2026-10-08, Mac: "a unique different version of the aura"): THE FIRST HOUR, last - The Turning Hour's wheel in the light of the first dawn, its dial turning forward, the Hour's own mark ablaze; Hour's First's own, granted with the title by name, never rolled or sold;   // SD9c (2026-10-07, the Super Dungeons arc): THE TURNING HOUR, last - the Brass Remnant's wheel of brass gears and gold light, one kill in eight on its first write (server-account/src/sds.js), held for good; CRYSTAL-FIST (2026-10-05, the owner, for Flylighter: "a circle of tiny purple squares going up and down out of the ground"): the Crystal Resonance - the Crystal Fist's own ring of rising and falling purple squares, granted with its title by name, never sold.    // SERAPH-WINGS (2026-10-05, Mac: "I want to build an aura for the developers ... Golden Angel wings that flow"): the Seraph Wings.    // SHADOW-CLOAK (2026-10-04, the owner, for SirMcMobdon: "A holo shadow cloak with red accents"): the Holo Shadow Cloak - the Shadow Fang's own hooded cloak of shadow and crimson light, granted with its title by name, never sold; PRIMARCH (2026-10-04, GA00250: "can the aura be a golden light around the character?"): the Golden Radiance - the Primarch's own column of golden light about the body, granted with its title by name, never sold; AEGIS (2026-10-03): the Oblivion Ward - the Aegis of Oblivion's own ring of runes, granted with its title by name (server-account/src/titles.js TIER_AURA), never sold
+ *  business (the Broker's insignia, bought - net/insignia.js; or the developers' Seraph Wings -
+ *  server-account/src/titles.js DEVELOPER_AURA); this list is the
+ *  vocabulary both ends share. */
+export const AURAS = Object.freeze(['dagonfire', 'seraphwings', 'turninghour', 'firsthour', 'maelstrom', 'witchfire']);
 
 /** The glyphs that exist. A glyph is not worn, it is TRUE of a player -
  *  sprout is "this account is new", dev is "this is a developer", mod is
- *  "this is a moderator" (MOD1, Mac: "a moderator glyph") - so a token
+ *  "this is a moderator" (MOD1) - so a token
  *  may carry several and a player chooses none of them. */
-export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'shadowfang', 'penitent', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'aegis', 'primarch', 'crystalfist', 'wikimaid', 'nirnrootsage', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY', 'origin']);   // NIRNROOT-SAGE: the nirnrootsage - a nirnroot sprig, its leaves and its glowing bud, Blob-Marley's, last;   // WIKIMAID: the wikimaid - a rabbit's head in a maid's frilled headband, SylviaBun's, last;   // CRYSTAL-FIST: the crystal fist - Flylighter's three slashes, last;   // PRIMARCH: the primarch - GA00250's three-barred cross;   // AEGIS: the aegis - three pillars through a ring over the void's tendrils, Sureme's reference, last;   // ARENA4: the laurel - the Arena Champion's wreath, true of the season's #1 while they hold the top, last;   // HERALD: the herald's trumpet and its banner, after the penitent's; SEAT1c (Seats-Arc 7.4): a seat's - `tower` every member of a guild holding a palace seat, a crown in its kingdom's metal every member of a crown's   // TITLE-N: each new title has its own glyph (Mac), true of whoever holds the title; SHADOW-FANG: the wolf's head, and the werewolf's skin rides it; PENITENT: the sword in its lozenge; WW7-3: the provinces' crowns, after every glyph a token already carries (net/townSeatLaw.js SEAT_CROWN_GLYPHS)   // WIKIMAID: the wikimaid - a rabbit's head in a maid's frilled headband, SylviaBun's, last;   // CRYSTAL-FIST: the crystal fist - Flylighter's three slashes, last;   // PRIMARCH: the primarch - GA00250's three-barred cross;   // AEGIS: the aegis - three pillars through a ring over the void's tendrils, Sureme's reference, last;   // ARENA4: the laurel - the Arena Champion's wreath, true of the season's #1 while they hold the top, last;   // HERALD: the herald's trumpet and its banner, after the penitent's; SEAT1c (Seats-Arc 7.4): a seat's - `tower` every member of a guild holding a palace seat, a crown in its kingdom's metal every member of a crown's   // TITLE-N: each new title has its own glyph (Mac), true of whoever holds the title; SHADOW-FANG: the wolf's head, and the werewolf's skin rides it; PENITENT: the sword in its lozenge   // SHOP (2026-10-28): the origin, last - a dragon coiled round on itself, the shop's pre-alpha glyph
+export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY']);
 
 /** The bound on `g`, and it is the vocabulary's own size rather than a
  *  number somebody picked: a token carrying more glyph slots than there
@@ -239,7 +232,7 @@ export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', '
  *  and either way the verifier says no. */
 export const GLYPHS_MAX = GLYPHS.length;
 
-/** WITCH1 (2026-10-20, the owner: "a brand new item (profile icon)"; bible/06-Systems/Witches-Festival.md): THE PROFILE
+/** WITCH1: THE PROFILE
  *  ICONS THAT EXIST. An icon is WORN, one at a time, as a title is - in the profile's portrait well in place of the
  *  character's face (ui/profileIcons.js paints each) - so a token carries at most one (`pi`), and it is signed for the
  *  title's reason: a picture another player's Inspect card shows is one the service vouches for. Holding one is the
@@ -247,9 +240,7 @@ export const GLYPHS_MAX = GLYPHS.length;
  *  the vocabulary both ends share. Appended, never reordered. */
 export const ICONS = Object.freeze(['tallowskull', 'twinmoons', 'wyrdcauldron', 'soulcake']);
 
-/** RENOWN1 (2026-09-24, Mac: "What if the leveling system was something
- *  seperate unique to online but compatible" ... "Plus having their level
- *  appear on the left side of character name"): THE RENOWN'S
+/** RENOWN1: THE RENOWN'S
  *  CAP, and it lives HERE because the level rides the token (`lv`) and
  *  the relay stamps it beside the name, exactly as a title - so the
  *  verifier's bound is the vocabulary both ends share, and the curve that
@@ -336,8 +327,7 @@ export function nameIsIssuable(name) {
  *      absent before its first judged checkpoint and from a service
  *      before INT7. Every referee's clip of a blow between players
  *      (net/siege/siegeRef.js siegeBlowMax, net/arena/arenaLaw.js arenaBlowCap)
- *   hd 1 on a HIDDEN STAFF SPECTATOR's token (STAFF-PANEL5-HIDDEN, mob: "true
- *      invis not lattys invis"), absent on every other: an Admin's or a
+ *   hd 1 on a HIDDEN STAFF SPECTATOR's token (STAFF-PANEL5-HIDDEN), absent on every other: an Admin's or a
  *      Moderator's while they hold a live staff session with Hide me on.
  *      Its `s` is then a subject minted for that session, never the
  *      account's id, so it takes no seat of the account's; the relay
@@ -361,9 +351,9 @@ export const CHARACTER_LEVEL_MIN = 1;
 export const CHARACTER_LEVEL_MAX = 1000;
 /** ARENA4b: a character level a token may carry - a whole number in bounds, never a stand-in. */
 export const characterLevelIssuable = (cl) => Number.isSafeInteger(cl) && cl >= CHARACTER_LEVEL_MIN && cl <= CHARACTER_LEVEL_MAX;
-/** INT7: the most reach a weapon has (net/siege/siegeRef.js ARMS_TOP_MAX - a Daedric Thunderlock's 26 + 6, pinned equal; its own
+/** INT7: the most reach a weapon has (net/siege/siegeRef.js ARMS_TOP_MAX - a Daedric Dai-Katana's 21 + 6, pinned equal; its own
  *  name, ONE MEMBER ONE EXPORT - this leaf imports only the token's). */
-export const TOKEN_ARMS_TOP_MAX = 32;
+export const TOKEN_ARMS_TOP_MAX = 27;
 /** INT7: an arms claim a token may carry - `[reach, bow]`, the reach a whole number 0..TOKEN_ARMS_TOP_MAX, the bow 0 or 1. */
 export const armsIssuable = (wa) => Array.isArray(wa) && wa.length === 2 && Number.isSafeInteger(wa[0]) && wa[0] >= 0 && wa[0] <= TOKEN_ARMS_TOP_MAX && (wa[1] === 0 || wa[1] === 1);
 
@@ -465,9 +455,8 @@ export const TOKEN_MAX_CHARS = 1024;
  *  claim at once was 639 characters of body, so a house (LEGACY7) carried such a token to 739 - minted, and refused at
  *  every hello as 'bad token'. Every claim, a house at its bounds and the realm character (`ci`) are 778; INT7's arms
  *  (`wa`) at their widest, 794. WIKIMAID (world214): 864 - the WikiMaid's glyph took every claim at once to 808, past
- *  800, so a token wearing them all would have been refused whole. SHOP (world274): 896 - the Origin's glyph took them to
- *  867; the whole token at it is about 987 of TOKEN_MAX_CHARS. */
-export const TOKEN_BODY_MAX = 896;
+ *  800, so a token wearing them all would have been refused whole. */
+export const TOKEN_BODY_MAX = 864;
 /** A token's body, the part between its version and its signature. */
 export const tokenBodyOf = (/** @type {string} */ token) => String(token ?? '').split('.')[1] ?? '';
 
@@ -586,7 +575,7 @@ async function openSealed(token, publicKey, { subtle, nowS, skewS, valid }) {
 
 /* ═══ MOD1: THE MUTE ORDER ══════════════════════════════════════════
  *
- * Mac: "moderator chat commands" - /mute and /unmute.
+ * /mute and /unmute.
  *
  * A mute lands in two places. The ACCOUNT ROW is the truth (ACC0's own
  * `muted_until`), and every identity token minted afterwards carries it
@@ -609,7 +598,7 @@ async function openSealed(token, publicKey, { subtle, nowS, skewS, valid }) {
  *  second: 'renown', a character's Renown that ROSE while its player was
  *  already in a room, carried in by that player's own client (the token
  *  that let them in said the Renown they had then). */
-export const ORDER_KINDS = Object.freeze(['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'remains', 'home', 'egopen', 'egadmit', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);   // STAFF-PANEL5-MESSAGE: a staff message stored for account `s` (`mi` its id) - the hub nudges that account's own sockets   // SAFE4: a ban - its end, the service's word that the account may no longer play   // EG-PLAY: an Elite Breach's open and a member's admission   // QUEST-HOME: a town's homes moved, the service's word for every page online   // INT9: a fall's drop, the service's word on what it took   // CARDS10: a ranked seat's deck, vouched for   // GUILD1c: a character's guild now, and a member or a guild gone   // SEAT2a: a battle's pass   // STAFF-PANEL2-FIX: a staff member cut off, the service's word that the account's sockets close   // STAFF-PANEL5-HIDDEN: a hidden staff subject's mark ended (Show myself, the staff session's end) - its sockets closed, never shown   // STAFF-PANEL5-FREEZE: a staff freeze - its end, the service's word that the account may only look around - and a staff line's nudge, the service's word that a staff chat thread has a new line
+export const ORDER_KINDS = Object.freeze(['mute', 'renown', 'guild', 'guildout', 'siege', 'stake', 'deck', 'home', 'ban', 'smsg', 'staffcut', 'hide', 'freeze', 'staffline', 'sevent']);   // STAFF-PANEL5-MESSAGE: a staff message stored for account `s` (`mi` its id) - the hub nudges that account's own sockets   // SAFE4: a ban - its end, the service's word that the account may no longer play   // QUEST-HOME: a town's homes moved, the service's word for every page online   // INT9: a fall's drop, the service's word on what it took   // CARDS10: a ranked seat's deck, vouched for   // GUILD1c: a character's guild now, and a member or a guild gone   // SEAT2a: a battle's pass   // STAFF-PANEL2-FIX: a staff member cut off, the service's word that the account's sockets close   // STAFF-PANEL5-HIDDEN: a hidden staff subject's mark ended (Show myself, the staff session's end) - its sockets closed, never shown   // STAFF-PANEL5-FREEZE: a staff freeze - its end, the service's word that the account may only look around - and a staff line's nudge, the service's word that a staff chat thread has a new line
 /** An order lives a minute - long enough to be carried to every room
  *  the moderator holds, short enough that a leaked one is stale before
  *  anyone could use it for anything but what it already said. */
@@ -646,27 +635,18 @@ export function orderValid(c) {
   // CARDS10: a deck order carries its digest and no other kind's fields; no other kind carries a digest
   if (c.o !== 'deck' && c.dh !== undefined) return false;
   if (c.o === 'deck' && (typeof c.dh !== 'string' || !DECK_DIGEST_RE.test(c.dh) || c.mu !== undefined || c.lv !== undefined || !noGuild || !noSiege || !noStake)) return false;
-  // INT9: a remains order carries its own fields and no other kind's; no other kind carries a remains'
-  const noRemains = REMAINS_FIELDS.every((f) => c[f] === undefined);
-  if (c.o !== 'remains' && !noRemains) return false;
-  if (c.o === 'remains' && (!remainsOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake)) return false;
   // QUEST-HOME: a home order carries its own fields and no other kind's; no other kind carries a home's
   const noHome = HOME_ORDER_FIELDS.every((f) => c[f] === undefined);
   if (c.o !== 'home' && !noHome) return false;
-  if (c.o === 'home' && (!homeOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains)) return false;
-  // EG-PLAY: an Elite Breach's orders carry their own fields and no other kind's; no other kind carries a breach's
-  const noEg = EG_ORDER_FIELDS.every((f) => c[f] === undefined);
-  const isEg = c.o === 'egopen' || c.o === 'egadmit';
-  if (!isEg && !noEg) return false;
-  if (isEg && (!egOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains)) return false;
+  if (c.o === 'home' && (!homeOrderValid(c) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake)) return false;
   // SAFE4: a ban carries its end (`bn`, epoch seconds - 0 lifted) and no other kind's fields; no other kind carries a ban's
   if (c.o !== 'ban' && c.bn !== undefined) return false;
-  if (c.o === 'ban' && (!Number.isSafeInteger(c.bn) || c.bn < 0 || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains || !noHome || !noEg)) return false;
+  if (c.o === 'ban' && (!Number.isSafeInteger(c.bn) || c.bn < 0 || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noHome)) return false;
   // STAFF-PANEL5-MESSAGE: a staff message's order carries its id (`mi`) and no other kind's fields; no other kind carries a `mi`
   if (c.o !== 'smsg' && c.mi !== undefined) return false;
-  if (c.o === 'smsg' && (typeof c.mi !== 'string' || !ID_RE.test(c.mi) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || c.bn !== undefined || !noGuild || !noSiege || !noStake || !noRemains || !noHome || !noEg)) return false;
+  if (c.o === 'smsg' && (typeof c.mi !== 'string' || !ID_RE.test(c.mi) || c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || c.bn !== undefined || !noGuild || !noSiege || !noStake || !noHome)) return false;
   // STAFF-PANEL2-FIX: a staff cut names its account and carries nothing else
-  if (c.o === 'staffcut' && (c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noRemains || !noHome || !noEg)) return false;
+  if (c.o === 'staffcut' && (c.mu !== undefined || c.lv !== undefined || c.dh !== undefined || !noGuild || !noSiege || !noStake || !noHome)) return false;
   // STAFF-PANEL5-HIDDEN: a hide order is `{o:'hide', s, hd: 0, i, e}` - the hidden subject `s` hidden no longer - and carries
   // nothing else; no other kind carries an `hd`
   if (c.o !== 'hide' && c.hd !== undefined) return false;
@@ -696,7 +676,7 @@ function staffEventOrderValid(c) {
   return c.op === 'look' && c.ev === undefined && c.ei === undefined;
 }
 
-/* ═══ QUEST-HOME: THE HOME ORDER (bible/01-Overview/bugs/Field-Bugs-2026-10-14.md QUEST-HOME; Mac, 2026-10-15: "Close both") ══
+/* ═══ QUEST-HOME: THE HOME ORDER (QUEST-HOME) ══
  *
  * A home bought, held or given up must reach every page online at once: a quest picks its residence in towns its player
  * never asked about, off the boot's read of every town's homes (server-account/src/homes.js homeLayouts), and a read at
@@ -725,14 +705,14 @@ export async function mintHomeOrder({ s, bm, bu = [], bd = [] }, privateKey, { s
   return sealClaims(claims, privateKey, subtle);
 }
 
-/* ═══ CARDS6: THE STAKE (bible/11-Multiplayer/Tavern-Cards.md section 23) ═══════════════════════════════════════════
+/* ═══ CARDS6: THE STAKE ═══════════════════════════════════════════
  *
  * Section 5, DECIDED: online stakes are escrowed by the service - sitting moves the buy-in from the character to the
  * table. FACT: the relay has no door to the service. So the service takes the buy-in off the realm character's record
  * and hands the client ITS WORD on it, an order the room checks with the key it already holds:
  * `{o:'stake', s, cj, cr, ct, ca, cb, i, e}` - account `s` has `ca` gold held as stake `cj` for table `ct` of room
  * `cr` at big blind `cb`. The room seats it with `ca` chips and marks `cj` spent (one stake, one seat, ever); what the
- * seat leaves with comes back in the relay's receipt (net/card/cardReceipt.js), which the service pays once.
+ * seat leaves with comes back in the relay's receipt, which the service pays once.
  */
 /** A stake order's fields - no other order kind carries one. */
 export const STAKE_FIELDS = Object.freeze(['cj', 'cr', 'ct', 'ca', 'cb']);
@@ -758,7 +738,7 @@ export async function mintStakeOrder({ s, cj, cr, ct, ca, cb }, privateKey, { su
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** CARDS6: VERIFY A STAKE ORDER WHATEVER ITS AGE - the room's void (net/card/cardReceipt.js): an order past its minute can
+/** CARDS6: VERIFY A STAKE ORDER WHATEVER ITS AGE - the room's void: an order past its minute can
  *  never be sat on, so a stake it names that the room never sat is the player's to have back. The signature and the
  *  claims are checked as ever; only the clock is the order's own. */
 export async function verifyStakeOrderAnyAge(token, publicKey, { subtle }) {
@@ -770,99 +750,7 @@ export async function verifyStakeOrderAnyAge(token, publicKey, { subtle }) {
   return openSealed(token, publicKey, { subtle, nowS: i, skewS: 0, valid: (c) => orderValid(c) && c.o === 'stake' });
 }
 
-/* ═══ INT9: THE REMAINS ORDER (bible/06-Systems/Integrity-Arc.md lane 2) ════════════════════════════════════════════
- *
- * A death in the open zone drops what the ACCOUNT SERVICE took off the fallen character's judged record
- * (server-account/src/wild.js), never what the fallen's own game hands over. The relay has no door to the service, so the
- * service hands the depositor ITS WORD on the drop, an order the room checks with the key it already holds:
- * `{o:'remains', s, wr, wh, wn, wm, wk?, wi?, wg?, we?, i, e}` - account `s`'s fall left remains `wr` holding `wn` records whose
- * list (JSON, as the service answered it) digests to `wh` (hex SHA-256), to be laid in room `wm` alone (AUDIT INT9: an
- * order named no room, so one fall was laid in two); `wk` the killer whose worn piece is the list's record `wi`, theirs
- * alone to take; `wg` the fallen's guild, whose members take nothing of it (PVPDUNGEONS - whoever lays it). The room keeps
- * a deposit only whose records digest to `wh` (net/wild/wildLaw.js), and opens it to takes only then. MAC'S DECISION
- * (2026-10-14, the two-phase handoff): `we` 1 - the killer's piece is held by the service in ESCROW (server-account/src/
- * wild.js), never the room's to hand: the killer's take is a COLLECT the room signs (net/wild/wildReceipt.js `g1`), and the
- * service commits the piece to the killer's record against it.
- */
-/** A remains order's fields - no other order kind carries one. */
-export const REMAINS_FIELDS = Object.freeze(['wr', 'wh', 'wn', 'wm', 'wk', 'wi', 'wg', 'we']);
-/** A remains' id (the relay's twelve hex, or the service's for a death no receipt names), and the most records a
- *  remains holds (net/wire.js WILD_REMAINS_ITEMS_MAX, pinned equal). */
-export const REMAINS_ID_RE = /^[0-9a-f]{12}$/;
-export const REMAINS_RECORDS_MAX = 96;
-/** Whether a claim set's remains fields are a remains'. */
-export function remainsOrderValid(c) {
-  if (typeof c.wr !== 'string' || !REMAINS_ID_RE.test(c.wr) || typeof c.wh !== 'string' || !DECK_DIGEST_RE.test(c.wh)) return false;
-  if (!Number.isSafeInteger(c.wn) || c.wn < 0 || c.wn > REMAINS_RECORDS_MAX) return false;
-  if (typeof c.wm !== 'string' || c.wm.length > 64 || !streamsFoes(c.wm)) return false;
-  if (c.wg !== undefined && !(typeof c.wg === 'string' && GUILD_ID_RE.test(c.wg))) return false;
-  if (c.wk === undefined && c.wi === undefined) return c.we === undefined;   // MAC (2026-10-14): an escrow is the killer's piece's
-  if (c.we !== undefined && c.we !== 1) return false;
-  return typeof c.wk === 'string' && ID_RE.test(c.wk) && c.wk !== c.s && Number.isSafeInteger(c.wi) && c.wi >= 0 && c.wi < c.wn;
-}
-/** INT9: MINT A REMAINS ORDER - the service's word that account `s`'s fall left remains `wr` of `wn` records digesting to
- *  `wh`, for room `wm` (`wk`, `wi`: the killer's worn piece, theirs alone; `wg`: the fallen's guild). */
-export async function mintRemainsOrder({ s, wr, wh, wn, wm, wk = undefined, wi = undefined, wg = undefined, we = undefined }, privateKey, { subtle, nowS, ttlS = ORDER_TTL_S }) {
-  if (!Number.isSafeInteger(nowS)) throw new TypeError('mintRemainsOrder needs an integer epoch-seconds clock');
-  const claims = { o: 'remains', s, wr, wh, wn, wm, ...(wk !== undefined ? { wk, wi } : {}), ...(wg !== undefined ? { wg } : {}), ...(we !== undefined ? { we } : {}), i: nowS, e: nowS + ttlS };
-  if (!orderValid(claims)) throw new TypeError('mintRemainsOrder refused an order it could not verify');
-  return sealClaims(claims, privateKey, subtle);
-}
-/** INT9: a remains' records' digest - hex SHA-256 of their JSON, as the service answers them and the room keeps them. */
-export async function remainsDigest(/** @type {any[]} */ records, { subtle }) {
-  const d = new Uint8Array(await subtle.digest('SHA-256', enc.encode(JSON.stringify(records))));
-  return [...d].map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-/* ═══ EG-PLAY: THE ELITE BREACH'S ORDERS (bible/11-Multiplayer/Elite-Gates.md section 23) ══════════════════════════
- *
- * A breach is a real relay instance, so its door is the service's word, never the client's: `{o:'egopen', s, eb, ez,
- * ew, rh?, ewg?, i, e}` - account `s` has staked a Weir Key (or spent the day's Rehearsal, `rh` 1) for breach `eb` under
- * order `ez`, starting at Redoubt `ew`, under the Wager `ewg` (EG-F: its decrees' numbers); `{o:'egadmit', s, eb, ez,
- * ew, i, e}` - account `s` may enter breach `eb`, which starts at `ew`. The hub opens the breach on the first; its room
- * spends each `ez` once.
- */
-/** An Elite Breach order's fields - no other order kind carries one. */
-export const EG_ORDER_FIELDS = Object.freeze(['eb', 'ez', 'ew', 'rh', 'ewg']);   // EG-F: `ewg` the open's Wager (the page's `wg` is INT9's remains guild - REMAINS_FIELDS - so the order's rides `ewg`)
-/** A breach id, an order id, the deepest start Redoubt an order may name. */
-export const EG_ORDER_BREACH_RE = /^[0-9a-f]{16}$/;
-export const EG_ORDER_ZID_RE = /^[a-z0-9]{16,32}$/;
-export const EG_ORDER_START_MAX = 999;
-/** EG-F: the most decrees an open's Wager carries (net/eliteGates/egStartLaw.js EG_WAGER_MAX, pinned equal). */
-export const EG_ORDER_WAGER_MAX = 3;
-/** Whether a claim set's breach fields are an Elite Breach order's (`rh` an open's alone). */
-export function egOrderValid(c) {
-  if (typeof c.eb !== 'string' || !EG_ORDER_BREACH_RE.test(c.eb) || typeof c.ez !== 'string' || !EG_ORDER_ZID_RE.test(c.ez)) return false;
-  if (!Number.isSafeInteger(c.ew) || c.ew < 0 || c.ew > EG_ORDER_START_MAX) return false;
-  if (c.rh !== undefined && !(c.o === 'egopen' && c.rh === 1)) return false;
-  // EG-F (section 18): THE WAGER on an open alone - one to EG_ORDER_WAGER_MAX decree numbers, distinct (the service
-  // holds their families apart - net/eliteGates/egStartLaw.js egWagerOf); never on a Rehearsal
-  if (c.ewg !== undefined && !(c.o === 'egopen' && c.rh === undefined && Array.isArray(c.ewg) && c.ewg.length >= 1 && c.ewg.length <= EG_ORDER_WAGER_MAX
-    && c.ewg.every((d) => Number.isSafeInteger(d) && d >= 0 && d <= 31) && new Set(c.ewg).size === c.ewg.length)) return false;
-  return true;
-}
-/** EG-ZA (2026-10-12; bible/11-Multiplayer/Elite-Gates.md sections 22 and 23, "A key's loss"): VERIFY AN OPEN ORDER
- *  WHATEVER ITS AGE - a breach's void (`{k:'void', z}`): an open past its minute can never be opened, so a stake it names
- *  that the room never took is the opener's to have back. The signature and the claims are checked as ever; only the
- *  clock is the order's own (verifyStakeOrderAnyAge's way); how old a void may be is the room's (EG_VOID_MAX_S). */
-export async function verifyEgOpenAnyAge(token, publicKey, { subtle }) {
-  if (!(typeof token === 'string' && token.length <= TOKEN_MAX_CHARS)) return { ok: false, why: 'shape' };
-  const raw = bytesFromB64url(token.split('.')[1] ?? '');
-  let i = null;
-  try { i = raw ? JSON.parse(dec.decode(raw))?.i : null; } catch { i = null; }
-  if (!Number.isSafeInteger(i)) return { ok: false, why: 'shape' };
-  return openSealed(token, publicKey, { subtle, nowS: i, skewS: 0, valid: (c) => orderValid(c) && c.o === 'egopen' });
-}
-/** EG-PLAY: MINT AN ELITE BREACH ORDER - `o` 'egopen' (the open: `rh` 1 for a Rehearsal) or 'egadmit' (a member's
- *  admission). */
-export async function mintEgOrder({ o, s, eb, ez, ew = 0, rh = undefined, ewg = undefined }, privateKey, { subtle, nowS, ttlS = ORDER_TTL_S }) {
-  if (!Number.isSafeInteger(nowS)) throw new TypeError('mintEgOrder needs an integer epoch-seconds clock');
-  const claims = { o, s, eb, ez, ew, ...(rh === 1 ? { rh } : {}), ...(Array.isArray(ewg) && ewg.length ? { ewg: [...ewg] } : {}), i: nowS, e: nowS + ttlS };   // EG-F: and the open's Wager
-  if (!orderValid(claims)) throw new TypeError('mintEgOrder refused an order it could not verify');
-  return sealClaims(claims, privateKey, subtle);
-}
-
-/* ═══ CARDS10: THE DECK ORDER (bible/11-Multiplayer/Tavern-Cards.md section 33) ═════════════════════════════════════
+/* ═══ CARDS10: THE DECK ORDER ═════════════════════════════════════
  *
  * Section 6.4, DECIDED: online wins rank a player on a season board. A deck the client names is a deck the client
  * chose - any thirty the law takes, whether its character holds them or not. So a RANKED seat brings the service's word
@@ -887,7 +775,7 @@ export async function mintDeckOrder({ s, dh }, privateKey, { subtle, nowS, ttlS 
   return sealClaims(claims, privateKey, subtle);
 }
 
-/* ═══ SEAT2a: THE SIEGE PASS (bible/11-Multiplayer/Seats-Arc.md 6.2, 6.4, 6.6) ═══════════════════════════════════
+/* ═══ SEAT2a: THE SIEGE PASS (6.2, 6.4, 6.6) ═══════════════════════════════════
  *
  * FACT: the relay has no door to the account service (its receipts ride the players' own clients). So a siege's room
  * cannot ask who signed which side - the service tells it, once a socket, in an order the room checks with the key it
@@ -955,7 +843,7 @@ export async function mintOrder({ s, mu }, privateKey, { subtle, nowS, ttlS = OR
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** SAFE4 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md section 5): MINT A BAN ORDER - account `s` is banned
+/** SAFE4: MINT A BAN ORDER - account `s` is banned
  *  until `bn` (epoch seconds; 0 lifted), signed by the service that wrote the ban. Any socket may carry it, as a mute's:
  *  a room that checks it silences the account's sockets there and tells them (server/src/index.js `_takeOrder`). `bn`,
  *  never `bu`: that word is the home order's (HOME_ORDER_FIELDS). */
@@ -966,7 +854,7 @@ export async function mintBanOrder({ s, bn }, privateKey, { subtle, nowS, ttlS =
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** STAFF-PANEL5-MESSAGE (2026-10-22, mob: Message on screen; design doc "DFO Staff Panel: design"): MINT A STAFF MESSAGE'S
+/** STAFF-PANEL5-MESSAGE: MINT A STAFF MESSAGE'S
  *  ORDER - message `mi`, which the account service stored for account `s` (staff_messages), is waiting. The words never ride
  *  it: the hub hands `s`'s own sockets a nudge (`{t:'smsg', mi}`), and the game reads the message off the service with its
  *  own session (design doc, Weak spots: "the relay only sends a 'new staff message' nudge"). */
@@ -977,7 +865,7 @@ export async function mintStaffMessageOrder({ s, mi }, privateKey, { subtle, now
   return sealClaims(claims, privateKey, subtle);
 }
 
-/** STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use"; net/staffEvent/staffEventLaw.js):
+/** STAFF-EVENT:
  *  MINT A STAFF EVENT ORDER - staff member `s` stages event `ev` (`op` start), ends event `ei` (`end`), calls its boss by
  *  hand (`boss`), or reads the book (`look`). The account service pushes it through the Worker's law door to the hub
  *  (server/src/staffEvents.js), which keeps the book. Never carried by a client. */

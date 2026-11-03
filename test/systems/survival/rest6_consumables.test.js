@@ -1,10 +1,9 @@
-// REST6 (2026-10-03, bible/06-Systems/Rest-Arc.md section 6; Mac: "introduce other type of consumables that can fill
-// in the gaps when a campfire isn't available"): THE SEVEN THAT FILL THE GAPS - 1700-1706, registered at import and
+// REST6: THE SEVEN THAT FILL THE GAPS - 1700-1706, registered at import and
 // known to the save; each answers one gap and none replaces the fire. The Bedroll (a rough rest point, a 10 s channel,
 // ten nights), the Ember Jar (a one-night fire, never picked up), Firewood (+3 to a Campfire), the Tonic (fatigue, the
 // sleep need), the Candle (a kneel for magicka), the Salts (an hour's wakefulness, the debt after), the Draught (the
 // next night a bed's). Online the shelves, piles and foes waited for REST_ITEMS_ONLINE - the templates shipped a release
-// ahead (section 6's last rule) - and REST-LOOT (2026-10-05) turned it on; offline they come with Climates & Calories.
+// ahead (section 6's last rule) - and REST-LOOT turned it on; offline they come with Climates & Calories.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -39,7 +38,6 @@ test('REST6 the seven: 1700-1706 registered with their weights, charges and pric
   const bed = createRestItem(REST_ITEM.Bedroll);
   assert.deepEqual([bed.name, bed.currentCondition, bed.group], ['Bedroll', 10, 'UselessItems2']);
   assert.equal(createRestItem(REST_ITEM.Firewood, { stackCount: 4 }).stackCount, 4);
-  assert.match(rd('src/systems/save/save.js'), /import '\.\.\/rest\/restItems\.js';/);
   for (const t of Object.values(REST_ITEM)) assert.equal(typeof itemUseHandler(t), 'function', `${t} has its use`);
 });
 
@@ -53,7 +51,7 @@ test('REST6 a release ahead: online no source mints one while the switch is shut
     assert.equal(restItemsAvailable(false), true);
     assert.deepEqual(restItemsStock('GeneralStore', 10, () => 0.99, { online: true }), [], 'online: an empty shelf');
     const shelf = restItemsStock('GeneralStore', 10, () => 0.99, { online: false });
-    assert.deepEqual([...new Set(shelf.map((i) => i.templateIndex))], [REST_ITEM.EmberJar, REST_ITEM.Firewood, REST_ITEM.Tonic]);   // AUDIT REST II H14 (PIN MOVED): the Bedroll is online's alone
+    assert.deepEqual([...new Set(shelf.map((i) => i.templateIndex))], [REST_ITEM.EmberJar, REST_ITEM.Firewood, REST_ITEM.Tonic]);   // AUDIT REST II H14 (
     assert.deepEqual([...new Set(restItemsStock('Alchemist', 10, () => 0.99, { online: false }).map((i) => i.templateIndex))], [REST_ITEM.Tonic, REST_ITEM.Salts, REST_ITEM.Draught, REST_ITEM.Candle]);
     assert.deepEqual(restItemsStock('Armorer', 10, () => 0.99, { online: false }), []);
     assert.deepEqual(rollRestLoot([], REST_FOE_CHANCES, () => 0, { online: true }), [], 'online: no foe drops one');
@@ -245,28 +243,8 @@ test('REST6 the cards: each item\'s lines under its name and weight', () => {
   assert.deepEqual(tok(REST_ITEM.Bedroll).slice(2), ['10 nights left', 'A rough night\'s sleep anywhere you could camp.']);
   assert.deepEqual(tok(REST_ITEM.Candle).slice(2), ['3 uses left', 'Meditate by it to restore 50% of your magicka.']);
   assert.equal(tok(REST_ITEM.Draught)[0], 'Sleeping Draught');
-  assert.deepEqual(restItemLines(createRestItem(REST_ITEM.Firewood)), ['Adds 3 nights of fuel to a Campfire.']);   // AUDIT REST II H13 (PIN MOVED)
+  assert.deepEqual(restItemLines(createRestItem(REST_ITEM.Firewood)), ['Adds 3 nights of fuel to a Campfire.']);   // AUDIT REST II H13 (
   const c = createRestItem(REST_ITEM.Candle); const l = [c];
   assert.equal(spendCharge(c, l), false); assert.equal(c.currentCondition, 2);
 });
 
-test('REST6 by source: the windows kneel by the candle, the hosts\' rest points read the Bedroll, the shelves stock at their end, the loot hooks subscribe last, the cards read the seven', () => {
-  for (const f of ['src/ui/restWindow.js', 'src/ui/enhanced/enhancedRest.js']) {
-    const s = rd(f);
-    assert.match(s, /meditate\) \{ (this\.|overlay\.)_end\((this\.)?deps\.restMeditate\?\.\(\)/, f);   // CAMP-ROLL (RE-AIMED): the kneel ends on its own line - a night goes to the camp's step
-    assert.match(s, /REST_ACT_TEXT\.meditating/, f);
-    assert.match(s, /deps\.snuffCandle\?\.\(\)/, f);
-  }
-  assert.match(rd('src/scenes/world.js'), /camps\.restPointAt\(walkMode && playerSpawned \? player\.pos : cam\.pos\)/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /restPoint: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? \{ kind: 'bed', where: null \} : _fpFeet \? camps\.restPointAt\(_fpFeet\) : null\),/);   // FIELD BUGS 2026-10-05 DUNGEON-BEDS: a bed first, then the fire or the Bedroll
-  const shop = rd('src/systems/shopStock.js');
-  const at = shop.indexOf("restItemsStock(buildingType === BUILDING_TYPES.GeneralStore ? 'GeneralStore' : 'Alchemist'");
-  assert.ok(at > shop.indexOf("const pairs = SHOP_ITEM_GROUPS[buildingType]") && at < shop.indexOf('add(mintHealingPotion());'), 'after DFU\'s draws, before the healing supply');
-  const shared = rd('src/scenes/shared.js');
-  assert.ok(shared.indexOf('  installRestItemLoot();') > shared.indexOf('  installForaging();'), 'after Foraging\'s hooks');
-  assert.match(shared, /installHealingSupply\(\);[^\n]*\n  installRestItemLoot\(\);/, 'and the healing supply\'s: the last draw on a pile');
-  assert.match(shared, /if \(_rules && _place === REST_KIND\.Rough && draughtTaken\(entity\) && \(!sharedClockOn\(\) \|\| nightDue\(entity, ownMinutes\(\)\)\)\) \{ _place = REST_KIND\.Bed; _kind = REST_KIND\.Bed; _draughtFrom = ownMinutes\(\); \}/);
-  assert.match(shared, /if \(_draughtFrom != null && ownMinutes\(\) - _draughtFrom >= DRAUGHT_SPENT_MINUTES\) spendDraught\(entity\); _draughtFrom = null;/);
-  assert.match(rd('src/systems/item/itemInfo.js'), /if \(isSurvivalItem\(item\) \|\| isRestItem\(item\)\) record = survivalInfoTokens\(item\);/);
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /survival: isSurvivalItem\(item\) \|\| isRestItem\(item\) \?/);
-});

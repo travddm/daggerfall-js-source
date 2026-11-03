@@ -1,5 +1,4 @@
-// AUDIT MERGE-PLUS, LENS A (2026-09-26, the pre-merge audit of the guild merge - the guilds, Renown and the online
-// homes): WHAT IT FOUND, PINNED. Each fix carries an `AUDIT MERGE-PLUS A<n>` comment beside it. A1: a second "Buy
+// AUDIT MERGE-PLUS, LENS A: WHAT IT FOUND, PINNED. Each fix carries an `AUDIT MERGE-PLUS A<n>` comment beside it. A1: a second "Buy
 // it" pressed while the first claim was out paid 42,000 twice for one house, and once it was bought the door's rows
 // lit "Who may enter" in the buy row's slot, one click from opening the house to the party. A2: a member's leave
 // answered only her own order, which only the page that acted carries, so her other tab stayed in the guild's chat
@@ -249,7 +248,7 @@ test('AUDIT MERGE-PLUS A1 the host: the door\'s buy (worldModes.js buyHomeAt, li
   let gold = 50_000;
   const account = { accountGold: 0 };
   const purse = { totalGold: () => gold, deductGold: (n) => { const take = Math.min(gold, n); gold -= take; return n - take; } };
-  // MARKET-AUDIT (PIN MOVED: the door paid `purse.deductGold`): an online payment answers its undo
+  // MARKET-AUDIT (
   purse.pay = (n, a) => { const short = purse.deductGold(n); if (a) a.accountGold -= short; return () => { gold += n - short; if (a) a.accountGold += short; }; };
   const said = [];
   const cache = createSceneCache();
@@ -312,7 +311,7 @@ test('AUDIT MERGE-PLUS A2 the leave: a member\'s leave answers, beside her own n
   const gi = found.guild.id;
   await call('/v1/guilds/invite', { character: aldric.character, handle: 'Mara' }, aldric.secret);
   const maraRow = rowOf((await call('/v1/guilds/answer', { character: mara.character, guild: gi, accept: true }, mara.secret)).body.guild);
-  // the hub: each of them in their tab, wearing the guild its token was minted with. ONE-SEAT (2026-09-27): each in ONE -
+  // the hub: each of them in their tab, wearing the guild its token was minted with. ONE-SEAT: each in ONE -
   // this pin stood two tabs of each in the hub, and a player's second tab there is now refused (or, claiming, closes the
   // first), so "every tab of hers" is the one she holds the hub from
   const tabs = async (who, gm, ids) => {

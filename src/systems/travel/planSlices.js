@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PLAN-SLICES (2026-10-26, the owner: "No band aids"; bible/06-Systems/Travel-View.md PLAN-SLICES) - A JOURNEY'S PLAN IN
+// PLAN-SLICES - A JOURNEY'S PLAN IN
 // SLICES OF CELLS, NEVER ONE LONG TASK. The Overworld's planner (systems/travel/travelRoute.js planRoute) ran as one call:
 // a plan past the Bay that found no way spent its whole count of cells (up to 300,000, seconds on a loaded machine) inside
 // one frame. Its body is a generator now (planRouteSteps, yielding every PLAN_YIELD_CELLS cells), and a journey the world

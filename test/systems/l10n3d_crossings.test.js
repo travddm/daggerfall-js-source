@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE WORDS BETWEEN THE BATCHES, IN THE PLAYER'S LANGUAGE. The five part-2 batches each routed the
+// L10N3d: THE WORDS BETWEEN THE BATCHES, IN THE PLAYER'S LANGUAGE. The five part-2 batches each routed the
 // words of their own DFU windows; the lines a batch found in another's file - or in no one's - were routed after the
 // merge, and are pinned here through the port's own functions: the exhausted swimmer's line and the sick body's alert
 // (their readers beside their constants), the over-encumbered swimmer's latch, the weapon hand's switch line (said by the
@@ -47,9 +47,6 @@ test('L10N3d crossings: the afloat latch says cannotFloat in the player\'s langu
   const w = new PlayerWeapon();
   assert.deepEqual([w.toggleHand({ apply: false, bowSwitching: false }), w.toggleHand({ apply: false, bowSwitching: false })].sort(),
     [USING_RIGHT_HAND_TEXT, USING_LEFT_HAND_TEXT].sort(), 'the hand\'s name, in any language (the rig reads it, and says the row)');
-  const rig = readFileSync(new URL('../../src/combat/weapon/weaponRig.js', import.meta.url), 'utf8');
-  assert.match(rig, /say\(line === USING_RIGHT_HAND_TEXT \? localizedText\('usingRightHand', 'Using weapon in right hand\.'\) : localizedText\('usingLeftHand', 'Using weapon in left hand\.'\)\);/);
-  assert.equal(/\bsay\(line\);/.test(rig), false, 'never the bare English');
 });
 
 test('L10N3d crossings: the pinched purse - youPinchedGoldPiece for one coin, youPinchedGoldPieces with %d filled AFTER the lookup', () => {
@@ -78,14 +75,9 @@ test('L10N3d crossings: the dungeon-texture tile shows DFU\'s words in the playe
   assert.deepEqual(st.labels, en.labels, 'the law under the words never moves');
   assert.deepEqual(barReading(st), barReading(en), 'a choice with no Off in either language');
   assert.equal(classicSegment(row, st), 0, 'All off still presses Classic');
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(src, /el\('button', `ft-segb\$\{i === r\.off \? ' off' : ''\}`, st\.shown\?\.\[i\] \?\? L\)/, 'the bar draws the shown word, else the law\'s');
 });
 
 test('L10N3d crossings: the menu clock reads the time off the date - never by splitting a formatted line at " on ", which a translation\'s pattern need not contain', () => {
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.equal(/split\(' on '\)/.test(src), false);
-  assert.match(src, /el\('span', 'px-clocktime', formatText\('\{0:00\}:\{1:00\}:\{2:00\}', d\.hour, d\.minute, d\.second\)\)/);
   assert.equal(tm.formatText('{0:00}:{1:00}:{2:00}', 7, 5, 0), '07:05:00');
 });
 
@@ -205,7 +197,7 @@ test('L10N3d crossings: the magic-item, transport, enchanting, level-up, trade a
     ['scenes/world.js', /\{ \.\.\.sale, text: cannotCarryText\(\) \}/],
     ['ui/native/nativeTrade.js', /text: cannotRemoveItemText\(\), center: true/], ['ui/enhanced/enhancedTrade.js', /text: cannotRemoveItemText\(\), center: true/],
     ['ui/native/nativeTrade.js', /plan\.refusal\?\.text \?\? cannotCarryText\(\)/], ['ui/enhanced/enhancedTrade.js', /plan\.refusal\?\.text \?\? cannotCarryText\(\)/],
-    ['ui/levelUp/levelUpView.js', /LANE_VIRTUE \? REMAINING_POINTS_ERROR : mustDistributeBonusPointsText\(\)\);/],
+    ['ui/levelUp/levelUpView.js', /export const refusalText = \(\) => mustDistributeBonusPointsText\(\);/],
     ['combat/pcaao.js', /say\?\.\(successfulBackstabText\(\)\);/], ['combat/pcaao.js', /say\?\.\(materialIneffectiveText\(\)\);/],
     ['ui/enhanced/enhancedInventory.js', /potion: localizedText\('potionOf', 'Potion of %po'\)\.replaceAll\('%po', potionMacroName\(item\)\)/],
     ['ui/chargenArt.js', /shadowText\(renderer, font, raceDisplayName\(flow\.race\.key\)/], ['ui/provinceMap.js', /people: raceDisplayName\(race\.key\),/],

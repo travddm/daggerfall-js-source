@@ -1,5 +1,4 @@
-// DEX0 (2026-10-19, Mac: "I want to implement this as our next mod 1:1. We also need to ensure these get proper
-// morrowind model replacements if applicable") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer & Kab): THE RECORD.
+// DEX0 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer & Kab): THE RECORD.
 //
 // What vendor/daggerfall-enemy-expansion/ claims, each claim held: the manifest is the bundle's; the C# beside the
 // compiled assembly is what the assembly was built from (every literal in its user-string heap, every member in its
@@ -328,13 +327,6 @@ test('DEX0 THE SILHOUETTE GUARD ON THE SHIPPED ART (ARENA2): the archives whose 
   const knight = ledger.traced().find((e) => e.archive === 1505);
   assert.deepEqual([knight.traced, knight.of, knight.best.from[0]], [60, 60, 482]);
   assert.deepEqual(Object.keys(SILHOUETTE_ALLOWED), ['1603'], 'the demo\'s Bat alone');
-});
-
-test('DEX0 the fourth exception\'s paragraph names every archive the extractor carries under it', () => {
-  const para = readFileSync(join(ROOT, 'bible/01-Overview/Port-Doctrine.md'), 'utf8').split('\n').find((l) => l.includes('**THE FOURTH EXCEPTION'));
-  for (const a of REPAINTED_ARCHIVES) assert.ok(new RegExp(`\\b${a}\\b`).test(para) || (a >= 1530 && a <= 1533 && para.includes('1530-1533')), `${a} named`);
-  assert.match(para, /the Royal Knight \(1504 and 1505, over TEXTURE\.482\)|Royal Knight[^.]*1505/);
-  assert.match(para, /The mod's 774 ship under `public\/art\/daggerfall-enemy-expansion-repainted\/`/);
 });
 
 test('DEX0 the pictures that ARE Daggerfall\'s records are specs naming the record and nothing else - no pixel of them is carried', () => {

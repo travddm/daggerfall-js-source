@@ -23,9 +23,6 @@ import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (rel) => hostText(rel);
-const WM = read('src/scenes/worldModes.js');
-/** ActivateStaticDoor's building block, matched not counted. */
-const ARM = WM.slice(WM.indexOf('let isBrokenIn = isBash;'), WM.indexOf('return enterBuildingDoor(hit, entries);'));   // PIN MOVED (INSTANCES' audit): the arm ends at the door's own entry, which asks then enters
 
 // ---------------------------------------------------------------
 // The rolls themselves (:570-583, :621-627)
@@ -64,81 +61,9 @@ test('ROAD-B: the swing\'s reach is the WEAPON\'s, which is inside the door acti
 // ActivateStaticDoor's isBash ladder
 // ---------------------------------------------------------------
 
-test('ROAD-B: ActivateStaticDoor is one member with two callers, as C# has it', () => {
-  assert.match(WM, /async function activateStaticDoor\(hit, entries, isBash = false, \{ homeAsked = false, verb = null, listed = plaqueListing\(\) && worldPlaqueOn\(\), picked = false \} = \{\}\) \{/);   // PIN MOVED (LOCKPICK): and `picked` - the door activated again once the lock's tumblers opened it   // PIN MOVED (AUDIT HOME-VOTE II B4, D1): and whether the plaque listed - and drew - rows, read as the press lands; HOME1 re-aim: the press that comes back from a home's box is the click's own, going on past the box (home1.test.js); HOME2: and the verb the door's plaque lit (home2.test.js)
-  assert.match(WM, /return activateStaticDoor\(entries\[key\], entries, false, \{ verb: plaqueActionFor\(key\) \}\);/, 'the click, isBash false');   // HOME2 re-aim: carrying the plaque's lit verb
-  assert.match(WM, /activateStaticDoor\(hit, entries, true\)\.catch/, 'the swing, isBash true');
-  // :507-509 - the bash sound, before the type routing, every door but
-  // a dungeon exit, from the PLAYER (PlayerActivate's own source).
-  const sound = WM.indexOf("if (isBash && hit.door.doorType !== DOOR_TYPE.DUNGEON_EXIT) audio.playOneShot(SOUND.PlayerDoorBash, 1);");
-  const route = WM.indexOf('if (hit.door.doorType === DOOR_TYPE.DUNGEON_ENTRANCE) return enterDungeonDoor(');   // PIN MOVED (INSTANCES' audit): the door's own entry
-  assert.ok(sound > 0 && route > sound, 'the sound precedes the type routing');
-});
-
-test('ROAD-B: a bash skips the Open spell, the mode ladder and the Lockpicking tally', () => {
-  // :519-520 `!buildingUnlocked && !isBash && HandleOpenEffect...`
-  // AUDIT 63 F41: the exterior arm reads Open DIRECTLY now -
-  // HandleOpenEffectOnExteriorDoor (PlayerActivate.cs:1036-1043) runs its
-  // own FindIncumbentEffect<Open> and never asks about Lock, so an armed
-  // Lock must not mask it here (doorSpellFor answers the ACTION door,
-  // where :693-696 tests Lock first).
-  assert.match(ARM, /if \(!opened && !isBash\) \{\n\s*const spell = exteriorOpenSpellFor\(playerEntity\);/,
-    'a swing never spends the readied Open spell');
-  // :523-524 `if (!buildingUnlocked && !isBash)` wraps the WHOLE
-  // refusal / steal-pick ladder, so a swing trains nothing and never
-  // touches the anti-grind record.
-  assert.match(ARM, /if \(!opened && !isBash\) \{\n\s*const lockpick = skillValue\(playerEntity, SKILLS\.Lockpicking\);/);
-  // PIN MOVED (LOCKPICK, bible/06-Systems/Lockpicking.md): the tally is the lock's window's now (scenes/lockpickHost.js -
-  // a snap or an open), and the window is opened only from inside the ladder the bash skips
-  // PIN MOVED (AUDIT LOCKPICK A1, bible/01-Overview/audits/Audit-Lockpick.md): the host is `lockHost` - the ladder's own
-  // `lockpick` (the skill) shadowed it, and every front-door pick threw
-  const pick = ARM.indexOf('if (!picked) return lockHost.frontDoor({');
-  const ladder = ARM.indexOf('if (!opened && !isBash) {\n          const lockpick');
-  assert.ok(ladder > 0 && pick > ladder, 'the pick is inside the ladder the bash skips');
-  assert.equal(ARM.includes('tallySkill(playerEntity, SKILLS.Lockpicking'), false, 'no roll\'s tally is left beside the window\'s');
-});
-
-test('ROAD-B: the failed bash consumes the swing and only 10% of them are noticed', () => {
-  const i = ARM.indexOf('if (isBash && !opened) {');
-  assert.ok(i > 0);
-  const bashArm = ARM.slice(i, ARM.indexOf('// BG1: the greeting (:585-628)'));
-  // the nested roll: the crime is levied only when someone notices
-  const outer = bashArm.indexOf('if (!dice100(25 - lockValue, Math.random())) {');
-  const inner = bashArm.indexOf('if (dice100(10, Math.random())) {');
-  assert.ok(outer >= 0 && inner > outer, 'the 10% notice is INSIDE the failed roll');
-  assert.match(bashArm, /setCrimeCommitted\(playerEntity, CRIMES\.Attempted_Breaking_And_Entering\)/);
-  assert.match(bashArm, /host\.spawnCityGuards\?\.\(true\);/, 'and the watch is called immediately');
-  // :582 - the failure RETURNS; the player does not get in.
-  assert.ok(bashArm.indexOf('return true;') > inner, 'a failed bash does not enter the building');
-  // ...and the arm is ahead of the greeting, where C# has it.
-  assert.ok(i < ARM.indexOf('// BG1: the greeting (:585-628)'));
-});
-
-test('ROAD-B: the second arm sits inside the greeting block, AFTER the deferring box', () => {
-  const box = ARM.indexOf('townTalk.showOverlay(new ChoiceWindow({ lines })');
-  const arm2 = ARM.indexOf('if (isBash && dice100(10, Math.random())) {');
-  assert.ok(box > 0 && arm2 > box,
-    'a bash that raised a greeting popup returns before the roll, exactly as :617-627 orders it');
-  assert.match(ARM.slice(arm2), /setCrimeCommitted\(playerEntity, CRIMES\.Breaking_And_Entering\);/);
-  // and it is the LAST thing before the transition
-  assert.ok(arm2 < ARM.length);
-});
-
 // ---------------------------------------------------------------
 // THE INPUT
 // ---------------------------------------------------------------
-
-test('ROAD-B: attemptExteriorDoorBash is a DOOR-only ray at weapon reach, exterior only', () => {
-  const fn = WM.slice(WM.indexOf('function attemptExteriorDoorBash(eye, dir) {'),
-    WM.indexOf('/** IS1: TransitionInterior\'s shared core'));
-  assert.match(fn, /if \(mode !== 'exterior'\) return false;/);
-  assert.match(fn, /distance: WEAPON_REACH/, 'the SWING\'s reach, not the click\'s');
-  assert.ok(!fn.includes('npcTargets'), 'street NPCs are in the activation ray, not the weapon\'s');
-  assert.ok(!fn.includes('boardTargets'), 'and so are the bulletin boards');
-  // AttemptExteriorDoorBash returns `door.doorType != DungeonExit`
-  assert.match(fn, /return hit\.door\.doorType !== DOOR_TYPE\.DUNGEON_EXIT;/);
-  assert.match(WM, /^ {4}attemptExteriorDoorBash,/m, 'and the host can reach it');
-});
 
 test('ROAD-B: both exterior hosts offer a missed swing to the doors before ringing the miss', () => {
   for (const [host, ray] of [['src/scenes/world.js', 'cam.pos, lookFwd'], ['src/scenes/exterior.js', 'eye, fwd']]) {

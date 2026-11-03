@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.2): THE HUNT'S BOOK - the character's hunt as the
+// HUNTERS-MARK: THE HUNT'S BOOK - the character's hunt as the
 // account service keeps it (server-account/src/hunts.js), and every paid bounty reported KEPT until the service answers
 // it, as the professions book keeps its acts (net/profBook.js): each account and character its own, kept across a
 // reload, asked again on the pump's beat, let go once the service has answered it or refused it for good.

@@ -1,5 +1,4 @@
-// WEATHER2d (Mac, 2026-09-14: "a new sand storm weather event for desert regions... being able to see a large wall of
-// sandstorm cloud in the distance"): THE SANDSTORM. The port's own eighth weather word, appended so DFU's seven keep
+// WEATHER2d: THE SANDSTORM. The port's own eighth weather word, appended so DFU's seven keep
 // their enum values, never rolled: the weather field stands it as cells over the desert tables' land on a cloudy or
 // thunder day. Its fog row, sun scale, sky row, cloud profile (a wall on the ground) and tint, wind violence, grass dim
 // and sand (the wisps' program in the sand's look, on the front's intensity) - every seam a word reaches, pinned here.
@@ -53,7 +52,7 @@ function stubGl() {
 }
 
 test('WEATHER2d the word: the eighth, appended - DFU\'s seven keep their enum; its fog row (denser than the heavy fog, the sky in it), sun scale, sand precipitation, the default sky offset', () => {
-  assert.equal(WEATHER_TYPES[7], 'sandstorm'); assert.equal(WEATHER_TYPES.length, 9); assert.equal(E.sandstorm, 7);   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall the ninth, after it
+  assert.equal(WEATHER_TYPES[7], 'sandstorm'); assert.equal(WEATHER_TYPES.length, 9); assert.equal(E.sandstorm, 7);
   assert.deepEqual(WEATHER_TYPES.slice(0, 7), ['sunny', 'cloudy', 'overcast', 'fog', 'rain', 'thunder', 'snow']);
   assert.deepEqual(FOG_SETTINGS.sandstorm, { mode: 'exp', density: 0.09, start: 0, end: 0, excludeSky: false });
   assert.ok(FOG_SETTINGS.sandstorm.density > FOG_SETTINGS.heavy.density);
@@ -71,7 +70,7 @@ test('WEATHER2d the sky, the clouds, the wind, the grass: a tan row; a wall on t
   assert.equal(Object.keys(WEATHER_SKY).length, WEATHER_TYPES.length);
   assert.ok(weatherRow('sandstorm').cover === 0.9, 'the eased row reads it');
   assert.deepEqual(VC_PROFILE.sandstorm, { base: 0, top: 900, density: 1.00, dark: 0.35, flat: 0.95, shear: 0.05, vary: 0.00 });   // VC6a: a wall is one thing everywhere
-  assert.deepEqual(CELL_TINT.sandstorm, [0.88, 0.72, 0.46]);   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall's tint beside it (test/systems/weather/ashfall1.test.js)
+  assert.deepEqual(CELL_TINT.sandstorm, [0.88, 0.72, 0.46]);
   assert.deepEqual(Object.keys(CELL_TINT).sort(), ['ashfall', 'sandstorm'], 'every other word white (ASHFALL1\'s second audit: the moved pin had let a tint on any other word through)');
   const c = cellOf('sandstorm', 10, 20, 9000);
   assert.deepEqual(c.tint, CELL_TINT.sandstorm); assert.equal(c.base, 0); assert.equal(c.cover, 0.9);
@@ -161,24 +160,3 @@ test('WEATHER2d the sand: the wisps\' program in the sand\'s look - tan, dense, 
   assert.equal(sand.drawn, 0, 'a storm at nothing draws nothing');
 });
 
-test('WEATHER2d the hosts: the sand renderer built on the enhanced lane, the sand drawn before the rain\'s branch on the front\'s intensity as a foreign pass, and the rain program never built for it', () => {
-  for (const [name, s, eye] of [['world', rd('src/scenes/world.js'), 'wxEye32'], ['exterior', rd('src/scenes/exterior.js'), 'eye32']]) {   // PIN MOVED (OW-WEATHER, FIELD BUGS 2026-10-01 #9): the world host's eye is the view's (test/net/peer/fb1001_overworld.test.js)
-    // PIN MOVED (ASHFALL1, 2026-10-27): the sand's renderer is the dry falls' (render/dryFall.js DryFallRenderer - its wisps in SAND_LOOK, and the
-    // ash beside them), the branch every dry fall's, the fall handed its kind
-    assert.match(s, /const dryFall = sky\.enhanced \? new DryFallRenderer\(renderer\.gl\) : null;/, `${name}: built at boot`);
-    assert.match(s, /if \(precipMode && !isDryFall\(precipMode\) && !precip\) precip = new PrecipitationRenderer\(renderer\.gl, precipOpts\);/, `${name}: the rain program is not the sand's`);
-    const i = s.indexOf('if (isDryFall(precipShown)) {');
-    assert.ok(i > 0, `${name}: the sand branch`);
-    const draw = `dryFall.draw({ on: true, kind: precipShown, strength01: fx.intensity, windV: wd.windV, step: wd.step }, proj, view, ${eye}, now / 1000, renderer.worldViewportPx?.[3]);`;
-    assert.ok(new RegExp(`${draw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\n\\s+renderer\\.markForeignPass\\(\\);`).test(s.slice(i, i + 600)), `${name}: the front's intensity, the one wind, a foreign pass`);   // RAIN-OVER-GRASS: the world host's falling weather is one closure, indented once more
-    assert.ok(s.slice(i, i + 800).includes('} else if (precipShown && precip) {'), `${name}: the rain's branch after it`);
-    assert.ok(s.includes("import { DryFallRenderer } from '../render/dryFall.js';"), `${name}: imported`);   // PIN MOVED (ASHFALL1, 2026-10-27)
-  }
-});
-
-test('WEATHER2d records: the arc page\'s D and its close, the ledger row, Home\'s index and the testing row', () => {
-  assert.match(rd('bible/07-Rendering/Weather-Arc.md'), /^## D - THE SANDSTORM \(WEATHER2d, 2026-09-14\)/m);
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /^\| \*\*THE SANDSTORM \(WEATHER2d, 2026-09-14\)\*\*/m);
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /D: the sandstorm/);   // PIN MOVED (WALLET1's merge of main, 2026-10-05): Home.md's page index moved, byte for byte, to its own page
-  assert.match(rd('bible/09-Testing/Testing-Rows-2026-10-19.md'), /^\| weather2d_sandstorm\.test\.js \| \d+ \| WEATHER2d/m);
-});

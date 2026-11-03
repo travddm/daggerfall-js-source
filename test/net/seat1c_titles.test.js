@@ -1,4 +1,4 @@
-// SEAT1c (2026-09-30, Mac: "Finish the seats"; Seats-Arc 7.4): THE TITLES AND GLYPHS A CHARTER GIVES - the token's
+// SEAT1c: THE TITLES AND GLYPHS A CHARTER GIVES - the token's
 // vocabulary (five generic title ids with a bounded `ts` claim, four glyphs) reaching the relay first; the relay carrying
 // the claim from the signature to every row; the client wording it off its own seats; and the service deriving both at
 // a mint and offering the titles in the wardrobe - a palace seat's guildmaster a Warden, a crown's a Protector, every
@@ -107,7 +107,4 @@ test('SEAT1c THE SERVICE\'S MINT AND WARDROBE: a palace seat\'s guildmaster may 
   const m3 = await mint(gm, 'char-gamal-other');
   assert.deepEqual([m3.title, m3.glyphs.includes('tower')], [null, false], 'the guildmaster\'s other character: neither');
   assert.equal((await svc.call('/v1/account/title', { title: 'warden' }, outsider.secret)).status, 403);
-  // PIN MOVED (CROWN1 part two): the champion's title is the account's own, before the guildmaster's seat titles
-  // PIN MOVED (SEASON1): every title kept for good - a Season's crowned and keeper beside the champion - worn off its own row
-  assert.match(rd('server-account/src/index.js'), /const seatT = KEPT_TITLES\.includes\(wornT\) \? \(kept \? \{ t: wornT, ts: kept\.ts \} : \{\}\)\s*: SEAT_TITLES\.includes\(wornT\) \? \(seatBadge\?\.title === wornT \? \{ t: wornT, ts: seatBadge\.ts \} : \{\}\)\s*: CHAPTER_TITLES\.includes\(wornT\) \? \(chapterT \? \{ t: chapterT\.high \? 'highmaster' : wornT, ts: chapterT\.ts \} : \{\}\) : \(wornT \? \{ t: wornT \} : \{\}\);/);   // PIN MOVED (CHAP4c): and a chapter's seat's title, its claim the named character's own; PIN MOVED (CHAP6e): a Master's in an Ascendancy signed its High Master
 });

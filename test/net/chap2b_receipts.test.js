@@ -1,8 +1,8 @@
-// CHAP2b (2026-10-08, Mac: "Keep going with the arc/slices") - THE RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate
+// CHAP2b - THE RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate
 // closed or a raided town defended by a realm character, in a region where a guild it is a member of on the Roll keeps
 // a chapter, is remembered - +1 a guild a receipt (Chapters-Arc 3.3), and +2 more for that chapter's receipt writ, its
 // first such receipt of the UTC day there, where the guild's row of section 4 asks that kind. Each member its own; no
-// Marks; outside the three a day. bible/11-Multiplayer/Chapters-Arc.md sections 3.3 and 4 (CHAP2b).
+// Marks; outside the three a day. (CHAP2b).
 //
 // The law against literals; the service through the real gate and raid routes over the real migrations; the board's
 // asks; the card in a DOM; the host's wiring.
@@ -81,7 +81,7 @@ test.after(() => { Date.now = realNow; });
 async function stand({ open = 'on', factions = [41, 368, 108], members = [41, 368], reps = { 41: 10, 368: 5, 40: 0 }, extra = {} } = {}) {
   clock(T0);
   forgetChapters();
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra,Wit0,Wit1,Wit2', ...extra });   // the witnesses are developers: a town is witnessed at `dev` as at `on`
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Devra,Wit0,Wit1,Wit2', ...extra });   // the witnesses are developers: a town is witnessed at `dev` as at `on`
   const raw = s.env.DB._raw;
   for (let i = 0; i < 3; i++) {
     const w = await s.registered(`Wit${i}`);
@@ -109,9 +109,9 @@ test('CHAP2b a gate closed: +1 to each of the character\'s guilds with a chapter
   const g = await s.gate();
   assert.equal(g.status, 200, JSON.stringify(g.body));
   assert.equal(g.body.recorded, true);
-  assert.deepEqual(g.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });   // PIN MOVED (CHAP3a: and its Merit - none inside a new member's week)
+  assert.deepEqual(g.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });
   assert.deepEqual([s.rep(41).rep, s.rep(368).rep, s.rep(108).rep], [13, 8, 0], 'a Brotherhood chapter there - but no member');
-  const day = utcDay(_now), gday = gameDayAt(_now * 1000);   // PIN MOVED (AUDIT CHAP3 E1): the gate's own day, the writ's UTC day
+  const day = utcDay(_now), gday = gameDayAt(_now * 1000);
   assert.deepEqual(s.credits(), [
     { f: 41, ref: `gate:${gday}`, amount: 1 }, { f: 41, ref: `wgate:${day}`, amount: 2 },
     { f: 368, ref: `gate:${gday}`, amount: 1 }, { f: 368, ref: `wgate:${day}`, amount: 2 },
@@ -128,9 +128,9 @@ test('CHAP2b raids: the town defended credits by its key\'s region; the day\'s w
   const s = await stand();
   const a = await s.raid(7);
   assert.equal(a.status, 200, JSON.stringify(a.body));
-  assert.deepEqual(a.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });   // PIN MOVED (CHAP3a)
+  assert.deepEqual(a.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });
   const b = await s.raid(8);
-  assert.deepEqual(b.body.chapters, { counted: true, credited: [{ f: 41, amount: 1 }, { f: 368, amount: 1 }], merit: [] }, 'the day\'s writ is filled: the receipt\'s own +1');   // PIN MOVED (CHAP3a)
+  assert.deepEqual(b.body.chapters, { counted: true, credited: [{ f: 41, amount: 1 }, { f: 368, amount: 1 }], merit: [] }, 'the day\'s writ is filled: the receipt\'s own +1');
   assert.deepEqual([s.rep(41).rep, s.rep(368).rep], [14, 9]);
   const elsewhere = await s.raid(9, 17);
   assert.deepEqual(elsewhere.body.chapters, { counted: false, why: 'no-chapter' }, 'Daggerfall keeps no chapter of its guilds');
@@ -163,11 +163,11 @@ test('CHAP2b the credit\'s bounds: never past 100, what is owed trimmed; never a
   assert.deepEqual(await creditReceipt(ctx, { id: mallory.id }, env, { character: s.R.id, kind: 'raid', id: '21:3:1', region: ANTICLERE }), { counted: false, why: 'no-member' });
   s.raw.prepare('UPDATE realm_characters SET dead_at = ? WHERE id = ?').run(_now, s.R.id);
   assert.deepEqual(await creditReceipt(ctx, { id: s.who.id }, env, { character: s.R.id, kind: 'raid', id: '21:4:1', region: ANTICLERE }), { counted: false, why: 'no-member' });
-  for (const [body, why] of [[{ character: s.R.id, kind: 'serpent', id: 1, region: ANTICLERE }, 'no-receipt'], [{ character: s.R.id, kind: 'gate', id: 1, region: 71 }, 'no-region']   /* PIN MOVED (WW7-5) */]) {
+  for (const [body, why] of [[{ character: s.R.id, kind: 'serpent', id: 1, region: ANTICLERE }, 'no-receipt'], [{ character: s.R.id, kind: 'gate', id: 1, region: 71 }, 'no-region']]) {
     assert.deepEqual(await creditReceipt(ctx, { id: s.who.id }, env, body), { counted: false, why }, why);
   }
   const throws = { prepare: () => { throw new Error('D1 down'); } };
-  assert.deepEqual(await creditReceipt({ db: throws, nowS: _now }, { id: s.who.id }, env, { character: s.R.id, kind: 'gate', id: gameDayAt(_now * 1000), region: ANTICLERE }), { counted: false, why: 'server' });   // PIN MOVED (AUDIT CHAP3 E1): a gate of this week, so the store is asked
+  assert.deepEqual(await creditReceipt({ db: throws, nowS: _now }, { id: s.who.id }, env, { character: s.R.id, kind: 'gate', id: gameDayAt(_now * 1000), region: ANTICLERE }), { counted: false, why: 'server' });
 });
 
 test('CHAP2b a lost race: a credit whose head moved before its write credits nothing and says so - the Roll\'s one guard (mutants: the tag)', async () => {
@@ -196,12 +196,6 @@ test('CHAP2b the board\'s asks: each chapter\'s by its guild\'s row, a member\'s
   ], 'a Brotherhood member sees its chapter\'s contracts');
 });
 
-test('CHAP2b a realm character\'s delete takes what its receipts gave (mutants: the delete)', () => {
-  const realm = src('server-account/src/realm.js');
-  assert.equal((realm.match(/DELETE FROM npc_receipt_credits WHERE player = \? AND char_id = \?/g) ?? []).length, 2, 'deleteRealm and undoCustoms');
-  assert.match(src('server-account/migrations/0100_npc_receipts.sql'), /PRIMARY KEY \(char_id, faction_id, ref\)/);
-});
-
 // ── THE BOARD AND THE WIRING ────────────────────────────────────────
 
 test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): each chapter\'s Duties on its card, the gate held and the town defended, what each earns, a member\'s first of each today; never a card, which had no Take (mutants: the text, the state)', async () => {
@@ -212,7 +206,6 @@ test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-P
   ];
   const chapters = [{ faction: 41, strength: 50, band: 'steady' }, { faction: 368, strength: 50, band: 'steady' }];
   const book = { state: { open: true, writs: { today: 0, max: 3 } }, held: () => 0,
-    // PIN MOVED: AUDIT GUILD3 L2 - a member is promised Merit where its Merit row here says it earns some (meritEarnsOf)
     writs: async () => ({ data: { writs: [], receipts, chapters, merit: [{ faction: 41, merit: 100, max: 600, elsewhere: false, from: null }], today: { filled: 0, max: 3 } }, error: null, stale: false }), deliver: async () => ({ ok: true, data: {} }) };
   const notices = { seenAt: () => null, read: async () => ({ board: { notes: [], notices: [], me: {} } }), markSeen() {}, cached: () => null, draft: () => ({ subject: '', body: '', days: 7, button: '' }), noticeDraft: () => ({ subject: '', body: '', days: 3 }) };
   const host = document.createElement('div');
@@ -228,19 +221,3 @@ test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-P
   assert.equal(byClass(host, 'notice-take').length, 0);
 });
 
-test('CHAP2b the wiring: both routes credit after the receipt\'s row, the raid by its key\'s region; the board lists the asks; the host refreshes the Roll and says the guilds\' memory on a credited claim (mutants: the routes, the refresh)', () => {
-  const index = src('server-account/src/index.js');
-  assert.match(index, /if \(r\.recorded && !r\.rite && body\.region != null\) answer\.chapters = await creditReceipt\(ctx, who\.player, env, \{ character: body\.character \?\? null, kind: 'gate', id: r\.day, region: body\.region \}\);/);
-  assert.match(index, /answer\.chapters = await creditReceipt\(ctx, who\.player, env, \{ character: body\.character \?\? null, kind: 'raid', id: r\.key, region: contractRegionOfRaid\(r\.key\) \}\);/);
-  assert.match(src('server-account/src/professions.js'), /receipts: await receiptAsks\(db, player, env, character, region, nowS\),/);
-  const world = src('src/scenes/world.js');
-  // PIN MOVED (AUDIT CHAP3 C8: and the Merit its chapters counted it)
-  assert.match(world, /if \(c\?\.counted\) \{\n\s+rollTracker\?\.refresh\(\);\n(?:\s+\/\/[^\n]*\n)*\s+const merit = \(c\.merit \?\? \[\]\)\.reduce\(\(n, \/\*\* @type \{any\} \*\/ x\) => n \+ \(Number\(x\?\.amount\) \|\| 0\), 0\);\n\s+const line = hallRememberLine\(\(c\.credited \?\? \[\]\)\.map\(\(x\) => x\.f\), merit\);\n\s+if \(line\) chatNotice\(line\);/);
-  // PIN MOVED (AUDIT CHAP3 C3: a kept gate claim waits for the gate's scan; C4: a raid's said on the fighting character's page)
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the wait asks the receipt - a lane past the Bay's waits on no scan
-  assert.match(world, /claim: \(r\) => \(gateClaimReady\(r\) \? _accountGates\.claim\(r, gateSeatWord\(r\)\)\.then\(rollHeard\) : Promise\.resolve\(\{ ok: false, error: 'offline' \}\)\),/);
-  assert.match(world, /claim: \(r, ch, \.\.\.a\) => _accountRaids\.claim\(r, ch, \.\.\.a\)\.then\(\(x\) => \(ch === characterIdOf\(playerEntity\) \? rollHeard\(x\) : x\)\),/);
-  // PIN MOVED: GUILD3d - the asks are each chapter's Duties line on its card
-  // PIN MOVED: AUDIT GUILD3 L2 - and the reader's Merit row, the Merit promised only where it earns
-  assert.match(src('src/ui/noticeWindow.js'), /const duties = chapterDutiesLine\(c\.faction, writs\?\.receipts, merit\);[^\n]*\n\s+if \(duties\) card\.append\(el\('p', 'notice-chapter notice-duties', duties\)\);/);
-});

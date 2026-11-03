@@ -1,6 +1,5 @@
 // @ts-check
-// OUTDOOR-LOOT (2026-10-17, the report: "I can still click on an 'Empty' body and wipe out loot for a party member"; DESIGN.md
-// section 3, DESIGN-REVIEW D-1/R-1/R-2): THE WIRE OF A PEER'S FOE'S BODY - the street's and a building's, one pool
+// OUTDOOR-LOOT: THE WIRE OF A PEER'S FOE'S BODY - the street's and a building's, one pool
 // (scenes/exteriorFoes.js). A foe is its spawner's (WORLD6b); its body is the owner's roll, and everyone else stands a puppet
 // of it that carries none of the reader's. A body used to be taken as a blind grab: a puppet's press asked the owner
 // (`take: 1`) and the owner handed over as much of the WHOLE pile as one frame carries - the clicker chose nothing, the

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW12 (2026-10-09, bible/06-Systems/Living-World-II.md "LW12"): THE HIDEOUT, STOOD - a band's camp off the road
+// LW12: THE HIDEOUT, STOOD - a band's camp off the road
 // (systems/livingWorld/outlaws.js: where, who, which generation) stood live for a player on foot within BAND_LIVE_M of
 // it, and the one standing it (the camps' own election online - the road fights' `owner`; offline always):
 //  - ITS TENTS (survival/camp.js TENT_MODEL, the camps' own, through the host's meshes) about a FIRE (FIRE_FLAT);

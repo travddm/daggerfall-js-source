@@ -1,5 +1,4 @@
-// UI2 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "The hotbar also is missing sprite
-// icons like spells, and you should be able to slot spells and different items") - THE HOTBAR, DRAWN FROM THE REAL
+// UI2 - THE HOTBAR, DRAWN FROM THE REAL
 // ARENA2 AND MEASURED.
 //
 // The REAL enhanced HUD (ui/enhanced/enhancedHud.js drawEnhancedHud) with the hotbar chosen, over the real sheets, its slots

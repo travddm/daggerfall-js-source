@@ -1,9 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // LV3 — THE LEVEL-UP BUTTON'S ONE DOOR (enhanced skin).
 //
-// Dudey, 2026-09-19: "a button to open the levelup screen again once
-// closed - you can't open it again when you level up, so having this
-// screen on a button would be great."
 //
 // THE SHEET IS WHERE A LEVEL IS SPENT (ui/charSheetDoor.js): while
 // `readyToLevelUp` is set the sheet key returns the level-up window, in

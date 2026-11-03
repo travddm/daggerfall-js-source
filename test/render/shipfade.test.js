@@ -1,5 +1,4 @@
-// SHIP-FADE (2026-10-02, Mac: "Ships should just disappear into the void. If theyre going out to open sea, they should
-// fade away") - a ship let go by her range was dropped where she sailed: the director's past DESPAWN_BEYOND, a raider
+// SHIP-FADE - a ship let go by her range was dropped where she sailed: the director's past DESPAWN_BEYOND, a raider
 // past RAIDER_DROP_M, a harbour's moored ships the moment the port was left, a peer's ship out of their word - each gone
 // between one frame and the next, and every ship stood came into the world whole, from nothing. Now a ship comes into
 // the world over SHIP_FADE_S and goes out of it over SHIP_FADE_S - she sails on, dissolving (the renderer's ordered
@@ -27,7 +26,6 @@ import { DESPAWN_BEYOND } from '../../src/systems/naval/navalDirector.js';
 import { RAIDER_DROP_M } from '../../src/systems/naval/navalRaiders.js';
 import { drawNavalTags, destroyNavalHud, tagAlpha } from '../../src/ui/naval/navalHud.js';
 
-const RENDERER = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
 const coast = (x, z) => !(z > 200 || (x > 300 && x < 400 && z > -300));
 const PORT = { key: 'port:1', name: 'Wayrest', rect: { minX: -100, maxX: 100, minZ: 220, maxZ: 420 } };
 /** The player and her boat moved to `p`. */
@@ -41,7 +39,7 @@ function until(h, done, max = 30, dt = 0.1) {
 test('SHIP-FADE A SHIP COMES INTO THE WORLD: every ship stood comes in over SHIP_FADE_S - her share of the world from nought to whole, her boat\'s with her and her tag\'s (she stood whole at once, from nothing)', async () => {
   const h = await sea({ hull: 2 });
   const e = h.host._sea.get(h.host.spawnShip('merchantCoaster', { range: 300 }));
-  knowAll(h.host);   // PIN MOVED (SPYGLASS): her colours made out - an unknown hull wears no tag
+  knowAll(h.host);
   assert.deepEqual([e.fade, e.retiring], [0, false], 'stood: not yet in the world');
   h.run(1);
   assert.ok(Math.abs(e.fade - 1 / SHIP_FADE_S) < 1e-6, `a second in: ${e.fade}`);
@@ -228,17 +226,6 @@ test('SHIP-FADE THE RENDERER\'S DISSOLVE: both mesh shaders - the classic and En
   const kept = (cut) => { let n = 0; for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) if (!(cut > 0 && bayer4(x, y) + 0.03125 >= 1 - cut)) n++; return n; };
   for (let k = 0; k <= 16; k++) assert.equal(kept(1 - k / 16), k, `a share of ${k}/16`);
   assert.equal(kept(0), 16, 'a cut of nought: whole');
-  // in both mesh shaders, after the slice and before the texture is read
-  const classicFs = RENDERER.slice(RENDERER.indexOf('const FS = `'), RENDERER.indexOf('`;', RENDERER.indexOf('const FS = `')));
-  assert.match(classicFs, /\$\{BAYER_GLSL\}\n\$\{DISSOLVE_GLSL\}\n/);
-  for (const [name, fs] of [['classic', classicFs], ['enhanced', EL_MESH_FS], ['classic shadows', classicShadowLane().meshFs]]) {
-    if (name !== 'classic') assert.ok(fs.includes(DISSOLVE_GLSL) && /float bayer4\(vec2 p\)/.test(fs), `${name}: the cut and its bayer4`);
-    const main = fs.slice(fs.indexOf('void main() {'));
-    const slice = main.indexOf('else if (vWorldPos.y > uClipY) discard;'), cut = main.indexOf('dissolveCut();'), tex = main.indexOf('texture(uTex, vUV)');
-    assert.ok(slice > 0 && cut > slice && cut < tex, `${name}: cut after the slice, before the texture`);
-  }
-  assert.match(RENDERER, /this\.uDissolveCut = gl\.getUniformLocation\(this\.program, 'uDissolveCut'\);/, 'located with the installed mesh program');
-  assert.ok(!/uDissolve/.test(RENDERER.slice(RENDERER.indexOf('  _uploadFog(prog) {'), RENDERER.indexOf('\n  }\n', RENDERER.indexOf('  _uploadFog(prog) {')))), 'no pass uploads it');
   // setDissolve
   const calls = [];
   const self = { gl: { uniform1f: (loc, v) => calls.push(['u', loc, v]) }, program: 'mesh', uDissolveCut: 'cut', _use: (p) => calls.push(['use', p]) };

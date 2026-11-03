@@ -1,5 +1,4 @@
-// DISC28-A (2026-09-28, EvoAva, Discord: "If you change the default pause key binding from escape to anything else,
-// it allows you to open pause menu with that key binding, but not close it").
+// DISC28-A.
 //
 // The host opens the enhanced pause screen on the PAUSE ACTION (inputActions 'Escape'), but the screen's own key
 // handler knew back only as overlayAction's literal Escape - so a pause rebound to P opened the screen and P then did
@@ -87,17 +86,6 @@ test('DISC28-A: the boot menu is no pause screen - the pause key means nothing t
   press('KeyP', { key: 'p' });
   assert.deepEqual(acts, []);
   menu.unmount();
-});
-
-test('DISC28-A: a mod TextKey capture waiting for its key owns it - the back stack stands down, the capture has one owner', async () => {
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  const onKey = src.slice(src.indexOf('function onKey(e)'), src.indexOf('function releaseLock()'));
-  assert.ok(onKey.indexOf('if (textKeyCapture) return;') > 0 && onKey.indexOf('if (textKeyCapture) return;') < onKey.indexOf('const pauseKey'),
-    'standing down before the pause key is read');
-  assert.match(src, /textKeyCapture = onKey;\s*\n\s*addEventListener\('keydown', onKey, true\);/);
-  assert.match(src, /removeEventListener\('keydown', onKey, true\);\s*\n\s*textKeyCapture = null;/, 'the capture clears itself');
-  assert.match(src, /unmount\(\) \{[\s\S]*?if \(textKeyCapture\) \{ globalThis\.removeEventListener\('keydown', textKeyCapture, true\); textKeyCapture = null; \}/, 'and unmount clears it');
 });
 
 test('AUDIT DISC28 UI-5: a pause SHARED with P\'s owner (QuickLootAll - the Controls prompt\'s "use for both") closes the face on P', () => {

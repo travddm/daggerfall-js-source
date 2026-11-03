@@ -166,14 +166,20 @@ const zstr = (bytes, s, n) => {
 export { MW_BODY_PARTS, isFirstPersonId } from './mwEsmFile.js';
 import { MW_BODY_PARTS, isFirstPersonId } from './mwEsmFile.js';
 import FACE_TABLE from '../mwFaceTable.json' with { type: 'json' };
-import { GRAPH_ROOT, ACCUM_ROOT_NAMES } from './mwSkin.js';
+import { GRAPH_ROOT } from './mwSkin.js';
 import { transferSkin, sourceSkin, fitLift, liftBatch } from './mwSkinTransfer.js';   // MW-BRIG2: a worn model skinned from the body under it; MW-BRIG3: and fitted onto it
-import { getTextKeyTime, animVelocity, collectTextKeys, normalizeTextKeys, clipGroups, resetClip, parseAnimGroups, extractTracks } from './mwAnim.js';
-import { mat33Mul } from './mwNifMesh.js';   // AUDIT 68 S11-affine-dup: the one row-major 3x3 product
+import { collectTextKeys, normalizeTextKeys, clipGroups, resetClip, parseAnimGroups, extractTracks } from './mwAnim.js';
 import { batchMoves, posePartBatch, nodeAffineAt, nodeClockAt, clockFor } from './mwPartClock.js';   // MW-BOW1: a part's own clock
 import { applyClimbRig } from '../../combat/climbRig.js';   // CLIMB6: the climb's pose on the rig's own bones
 import { applyMirrorRig, limbSkeleton, offWeaponBoneAddon, WEAPON_BONE_LEFT_SOURCE, mirrorBindSources } from '../../combat/twoHands/mirrorRig.js';   // TWO-HANDS: the second hand - an arm, or the body, in the mirror; the left hand's weapon bone   // MIRROR-BIND: the skins it is mirrored by
 import { ownFacePools } from '../../characters/ownModels/ownHeadModels.js';   // MW-HEADS1: the port's own heads and hairs - a race's pools where it has them
+import { MW_WEAPON_TYPE } from './mwWeaponAnim.js';
+export * from './mwWeaponAnim.js';
+import { SKIN_SWEEP_SLOTS, resolveBodyParts } from './mwBodyParts.js';
+export * from './mwBodyParts.js';
+export * from './mwAnimSources.js';   // the animation sources moved out; callers keep importing them from here   // the body-part resolution moved out; callers keep importing it from here   // the weapon animation rules moved out; callers keep importing them from here
+import { pitchNeck } from './mwHeadView.js';
+export * from './mwHeadView.js';   // the camera node and the neck turn moved out; callers keep importing them from here
 
 /** The four parts allowed to fall back to a third-person mesh when the
  *  first-person record is missing (rule 3 / npcanimation.cpp:1217-1253).
@@ -246,646 +252,6 @@ export function raceRecords(bytes) {
   return out;
 }
 
-/**
- * MW-D9: THE WEAPON RECORDS.
- *
- * ESM::Weapon::Type, read off components/esm3/loadweap.hpp - explicit
- * values, every one of them, including the four NEGATIVE pseudo-types
- * that are not items at all. The reverted arc had FOUR weapon classes
- * where the reference has fourteen, so every one-hander was forced onto
- * one group; the whole table is here so that cannot recur by omission.
- */
-export const MW_WEAPON_TYPE = Object.freeze({
-  PickProbe: -4,
-  HandToHand: -3,
-  Spell: -2,
-  None: -1,
-  ShortBladeOneHand: 0,
-  LongBladeOneHand: 1,
-  LongBladeTwoHand: 2,
-  BluntOneHand: 3,
-  BluntTwoClose: 4,
-  BluntTwoWide: 5,
-  SpearTwoWide: 6,
-  AxeOneHand: 7,
-  AxeTwoHand: 8,
-  MarksmanBow: 9,
-  MarksmanCrossbow: 10,
-  MarksmanThrown: 11,
-  Arrow: 12,
-  Bolt: 13,
-});
-
-/** RULE 8's attach-bone column, and RULE 17 is why it is a table rather
- *  than a constant: for PRT_Weapon the generic "Weapon Bone" from the
- *  part table is REPLACED by the equipped type's own mAttachBone when the
- *  actor has that node. The bow is the reason the column exists - it is
- *  the only weapon that goes on the LEFT - and the reverted arc, having
- *  no such table, put every weapon on one bone. */
-export const WEAPON_ATTACH_BONE = Object.freeze({
-  [MW_WEAPON_TYPE.MarksmanBow]: 'Weapon Bone Left',
-  [MW_WEAPON_TYPE.Arrow]: 'Bip01 Arrow',
-  [MW_WEAPON_TYPE.Bolt]: 'ArrowBone',
-});
-/**
- * MW-D12 / RULE 11's ATTACK TYPE, AND THIS ROW IS A PORT DECISION.
- *
- * The two games choose an attack differently and there is no translation
- * between them, only a mapping somebody has to pick:
- *
- *   Morrowind picks by MOVEMENT at the moment of the swing
- *   (getMovementBasedAttackType, character.cpp:2924-2932): forward or
- *   back dominating is "thrust", sideways is "slash", otherwise "chop" -
- *   or, with "always use best attack" on, the type with the highest
- *   damage spread on the WEAP record.
- *
- *   Daggerfall picks by GESTURE: the mouse drag's 15-degree radial
- *   section becomes one of six strikes, and the strike IS the attack.
- *
- * So the port maps Daggerfall's six onto Morrowind's three BY THE SHAPE
- * OF THE MOTION, which is the only honest correspondence available:
- *
- *   StrikeDown, StrikeDownLeft, StrikeDownRight -> chop    (a downward arc)
- *   StrikeLeft, StrikeRight                     -> slash   (a horizontal one)
- *   StrikeUp                                    -> thrust  (the port's own
- *       viewmodel already calls StrikeUp the thrust, Characters-Arc.md)
- *
- * and a BOW's swing is Morrowind's "shoot" whatever direction produced
- * it, because the bow has no directional attacks at all.
- *
- * getBestAttack is NOT ported and is not a gap: it reads the damage
- * spread off a WEAP record to answer a question Daggerfall never asks -
- * the player's gesture has already chosen.
- */
-export const DF_STRIKE_TO_MW_ATTACK = Object.freeze({
-  StrikeDown: 'chop',
-  StrikeDownLeft: 'chop',
-  StrikeDownRight: 'chop',
-  StrikeLeft: 'slash',
-  StrikeRight: 'slash',
-  StrikeUp: 'thrust',
-});
-
-/**
- * MS1 - THE BACKHAND (Mac, 2026-09-12: "classic Daggerfall has a swing
- * animation for left and right while Morrowind only has the animation
- * that swings right to left. Could we insert a mirrored swing so you're
- * able to swing all directions?" - and, of a mirror that changed hands,
- * "There must be a way to keep it correctly in the correct hand.").
- *
- * Morrowind's slash is ONE motion: the weapon hand sweeps from the
- * actor's right across to the left. A mirror would send it the other
- * way, but a mirror swaps hands. What keeps the sword in the right hand
- * and sends it left-to-right is the SAME clip run BACKWARDS: the
- * follow-through reversed is a wind-up that carries the arm across the
- * body to the left, the release reversed sweeps the blade from left to
- * right, and the wind-up reversed settles the arm from its cocked side
- * back to rest. That is a backhand - the stroke a right-hander actually
- * makes to swing left-to-right - on the right arm, with the sword where
- * it is. StrikeLeft is Morrowind's own slash (the blade comes from
- * screen-right and crosses to the left); StrikeRight is the backhand.
- * The chops and the thrust have no side a reversal would honour (a chop
- * backwards is an uppercut), and a shot is one draw.
- */
-export const REVERSED_STRIKES = Object.freeze(['StrikeRight']);
-export const strikeReversed = (strike) => REVERSED_STRIKES.includes(strike);
-
-/** Rule 11's ranged case: every bow swing is "shoot", and the release
- *  key is "shoot release" where a melee blow is "<type> hit". */
-export const MW_SHOOT_ATTACK = 'shoot';
-
-export function mwAttackType(strike, { bow = false } = {}) {
-  if (bow) return MW_SHOOT_ATTACK;
-  return DF_STRIKE_TO_MW_ATTACK[strike] ?? null;
-}
-
-/**
- * RULE 11's KEY NAMES, composed. The attack type never enters the GROUP -
- * it is a prefix on the text keys inside the long group
- * (character.cpp:1663-1718, 1762-1815):
- *
- *   wind-up   "<type> start"        -> "<type> max attack"
- *   release   "<type> max attack"   -> "<type> hit"     ("shoot release")
- *   follow    "<type> <strength> follow start" -> "... follow stop"
- *
- * where strength is small (<0.33), medium (<0.66) or large - and "shoot"
- * has NO strength word at all.
- */
-export function attackKeys(attackType, strength = 0, { reversed = false } = {}) {
-  const shoot = attackType === MW_SHOOT_ATTACK;
-  const hit = shoot ? 'release' : 'hit';
-  const word = strength < 0.33 ? 'small' : strength < 0.66 ? 'medium' : 'large';
-  const windUp = { start: `${attackType} start`, stop: `${attackType} max attack` };
-  const release = { start: `${attackType} max attack`, stop: `${attackType} ${hit}` };
-  const follow = shoot
-    ? { start: `${attackType} follow start`, stop: `${attackType} follow stop` }
-    : { start: `${attackType} ${word} follow start`, stop: `${attackType} ${word} follow stop` };
-  // MS1: THE BACKHAND is the forward sections in reverse order, each
-  // played backwards - the key PAIRS stay in file order (resetClip
-  // wants start before stop) and the clip state carries `reversed`,
-  // which the pose reads as startTime + stopTime - time. A shot never
-  // reverses.
-  const back = reversed && !shoot;
-  return {
-    reversed: back,
-    windUp: back ? follow : windUp,
-    release,
-    follow: back ? windUp : follow,
-    hitKey: `${attackType} ${hit}`,
-    // THE THREE KEYS NOBODY PLAYS, which only ever have their TIMES read
-    // (character.cpp:1241-1242, :1779). They are not clip boundaries -
-    // they are the measuring stick the wind-up strength and the release's
-    // skip-ahead are computed against, and they are named here so the
-    // caller never has to spell one out and get a space wrong.
-    minAttack: `${attackType} min attack`,
-    maxAttack: `${attackType} max attack`,
-    minHit: `${attackType} min hit`,
-  };
-}
-
-/**
- * CharacterController::calculateWindUp, verbatim (character.cpp:1235-1248).
- *
- * How far into the wind-up window the clip got, 0 to 1 - and -1, THE
- * SENTINEL, when the window does not exist. The caller must not read -1
- * as "no charge": prepareHit (:1256-1259) replaces it with a RANDOM
- * `min(1, 0.1 + rollClosedProbability())`, which is a different thing
- * from zero and is why the sentinel is a number rather than a null.
- *
- * @param currentTime   the playhead in the weapon group
- * @param minAttackTime getTextKeyTime("<group>: <type> min attack")
- * @param maxAttackTime getTextKeyTime("<group>: <type> max attack")
- */
-export function calculateWindUp(currentTime, minAttackTime, maxAttackTime) {
-  if (minAttackTime === -1 || minAttackTime >= maxAttackTime) return -1;
-  const f = (currentTime - minAttackTime) / (maxAttackTime - minAttackTime);
-  return Math.min(1, Math.max(0, f));
-}
-
-/**
- * The release's SKIP-AHEAD (character.cpp:1774-1784).
- *
- * A weak blow does not play the whole swing: it starts `1 - strength` of
- * the way through, and that fraction is then RESCALED so it never eats
- * into the part of the clip after the hit - `(minHit - maxAttack) /
- * (hit - maxAttack)` - but ONLY when the file actually orders the three
- * keys that way. Every term is an ordering test, never a sentinel test,
- * which is the recorded caveat on rule 46: a missing `min hit` comes
- * back as -1 and fails `maxAttackTime <= minHitTime` on its own.
- */
-export function releaseStartPoint(strength, { minAttackTime, maxAttackTime, minHitTime, hitTime }) {
-  if (minAttackTime === -1 || minAttackTime >= maxAttackTime) return 0;
-  let startPoint = 1 - strength;
-  if (maxAttackTime <= minHitTime && minHitTime < hitTime) {
-    startPoint *= (minHitTime - maxAttackTime) / (hitTime - maxAttackTime);
-  }
-  return startPoint;
-}
-
-/** Rule 10's draw and sheathe, which are the long group's own keys
- *  (character.cpp:1444-1478 and :1390-1414). */
-export const EQUIP_KEYS = Object.freeze({ start: 'equip start', stop: 'equip stop', attach: 'equip attach' });
-export const UNEQUIP_KEYS = Object.freeze({ start: 'unequip start', stop: 'unequip stop', detach: 'unequip detach' });
-
-/**
- * MW-D12 / RULE 8's OTHER TWO COLUMNS, which the port never carried.
- *
- * `weapontype.cpp` gives every type TWO names and they are not derivable
- * from one another:
- *
- *   mLongGroup  - the animation group for the whole draw/attack/sheathe
- *                 cycle. The attack type is NOT part of it (rule 11).
- *   mShortGroup - a SUFFIX for the stance variants: "idle" + "1h" =
- *                 "idle1h", and the same for movement and jump (rule 9).
- *
- * The table is transcribed, not reasoned about. It deliberately collides:
- * AxeOneHand shares BluntOneHand's pair, AxeTwoHand shares
- * BluntTwoClose's, SpearTwoWide shares BluntTwoWide's - and PickProbe
- * borrows the 1h SHORT group while keeping its own LONG one. The bible
- * records that the reverted arc got this wrong in one direction (four
- * classes for eleven groups) and that MWAUDIT's correction got it wrong
- * in another (moving every two-hander to weapontwowide); both were
- * reasoned rather than read.
- */
-export const WEAPON_SHORT_GROUP = Object.freeze({
-  [MW_WEAPON_TYPE.ShortBladeOneHand]: '1s',
-  [MW_WEAPON_TYPE.LongBladeOneHand]: '1h',
-  [MW_WEAPON_TYPE.BluntOneHand]: '1b',
-  [MW_WEAPON_TYPE.AxeOneHand]: '1b',
-  [MW_WEAPON_TYPE.LongBladeTwoHand]: '2c',
-  [MW_WEAPON_TYPE.AxeTwoHand]: '2b',
-  [MW_WEAPON_TYPE.BluntTwoClose]: '2b',
-  [MW_WEAPON_TYPE.BluntTwoWide]: '2w',
-  [MW_WEAPON_TYPE.SpearTwoWide]: '2w',
-  [MW_WEAPON_TYPE.MarksmanBow]: 'bow',
-  [MW_WEAPON_TYPE.MarksmanCrossbow]: 'crossbow',
-  [MW_WEAPON_TYPE.MarksmanThrown]: '1t',
-  [MW_WEAPON_TYPE.HandToHand]: 'hh',
-  [MW_WEAPON_TYPE.Spell]: 'spell',
-  [MW_WEAPON_TYPE.PickProbe]: '1h',
-  [MW_WEAPON_TYPE.None]: '',
-});
-
-export const WEAPON_LONG_GROUP = Object.freeze({
-  [MW_WEAPON_TYPE.ShortBladeOneHand]: 'shortbladeonehand',
-  [MW_WEAPON_TYPE.LongBladeOneHand]: 'weapononehand',
-  [MW_WEAPON_TYPE.BluntOneHand]: 'bluntonehand',
-  [MW_WEAPON_TYPE.AxeOneHand]: 'bluntonehand',
-  [MW_WEAPON_TYPE.LongBladeTwoHand]: 'weapontwohand',
-  [MW_WEAPON_TYPE.AxeTwoHand]: 'blunttwohand',
-  [MW_WEAPON_TYPE.BluntTwoClose]: 'blunttwohand',
-  [MW_WEAPON_TYPE.BluntTwoWide]: 'weapontwowide',
-  [MW_WEAPON_TYPE.SpearTwoWide]: 'weapontwowide',
-  [MW_WEAPON_TYPE.MarksmanBow]: 'bowandarrow',
-  [MW_WEAPON_TYPE.MarksmanCrossbow]: 'crossbow',
-  [MW_WEAPON_TYPE.MarksmanThrown]: 'throwweapon',
-  [MW_WEAPON_TYPE.HandToHand]: 'handtohand',
-  [MW_WEAPON_TYPE.Spell]: 'spellcast',
-  [MW_WEAPON_TYPE.PickProbe]: 'pickprobe',
-  [MW_WEAPON_TYPE.None]: '',
-});
-
-export const weaponShortGroup = (type) => WEAPON_SHORT_GROUP[type] ?? '';
-export const weaponLongGroup = (type) => WEAPON_LONG_GROUP[type] ?? '';
-
-/**
- * MWMechanics::getAllWeaponTypeShortGroups (weapontype.cpp:422-434):
- * every type First(-4) through Last(13), non-empty short groups only,
- * deduplicated "via a set" - std::set, which also SORTS them. The order
- * is not load-bearing for the one consumer (isLoopingAnimation scans
- * for the LONGEST suffix wherever it sits), but the pin asserts it so a
- * second consumer inherits the reference's answer, not this table's
- * iteration order. Arrow and Bolt sit inside [First, Last] with an
- * empty short group and are dropped by the non-empty test, which is why
- * eleven come out of eighteen.
- */
-export function allWeaponShortGroups() {
-  const set = new Set();
-  for (let type = MW_WEAPON_TYPE.PickProbe; type <= MW_WEAPON_TYPE.Bolt; type++) {
-    const shortGroup = weaponShortGroup(type);
-    if (shortGroup) set.add(shortGroup);
-  }
-  return [...set].sort();
-}
-
-/**
- * THE OTHER TWO COLUMNS OF THE SAME TABLE (weapontype.cpp), which decide
- * every fallback below and which the port had been guessing at with a
- * hand-written list of "two-handed" types.
- *
- * `mWeaponClass` is Melee, Ranged, Thrown or Ammo, and `mFlags` is a
- * bitfield of TwoHanded (0x01) and HasHealth (0x02) (loadweap.hpp:91-105).
- * Transcribed, and the surprises are transcribed with it: SPELL and
- * HAND-TO-HAND BOTH CARRY THE TwoHanded BIT, and both are class Melee -
- * so a test of "TwoHanded" alone would send bare fists to the two-handed
- * ladder. The reference never asks that question alone; every use pairs
- * the bit with the class, and so does isTwoHandedMelee below.
- */
-export const MW_WEAPON_CLASS = Object.freeze({
-  Melee: 0, Ranged: 1, Thrown: 2, Ammo: 3,
-});
-export const MW_TWO_HANDED = 0x01;
-export const MW_HAS_HEALTH = 0x02;
-
-export const WEAPON_CLASS = Object.freeze({
-  [MW_WEAPON_TYPE.None]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.PickProbe]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.Spell]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.HandToHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.ShortBladeOneHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.LongBladeOneHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.BluntOneHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.AxeOneHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.LongBladeTwoHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.AxeTwoHand]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.BluntTwoClose]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.BluntTwoWide]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.SpearTwoWide]: MW_WEAPON_CLASS.Melee,
-  [MW_WEAPON_TYPE.MarksmanBow]: MW_WEAPON_CLASS.Ranged,
-  [MW_WEAPON_TYPE.MarksmanCrossbow]: MW_WEAPON_CLASS.Ranged,
-  [MW_WEAPON_TYPE.MarksmanThrown]: MW_WEAPON_CLASS.Thrown,
-  [MW_WEAPON_TYPE.Arrow]: MW_WEAPON_CLASS.Ammo,
-  [MW_WEAPON_TYPE.Bolt]: MW_WEAPON_CLASS.Ammo,
-});
-
-export const WEAPON_FLAGS = Object.freeze({
-  [MW_WEAPON_TYPE.None]: 0,
-  [MW_WEAPON_TYPE.PickProbe]: 0,
-  [MW_WEAPON_TYPE.Spell]: MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.HandToHand]: MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.ShortBladeOneHand]: MW_HAS_HEALTH,
-  [MW_WEAPON_TYPE.LongBladeOneHand]: MW_HAS_HEALTH,
-  [MW_WEAPON_TYPE.BluntOneHand]: MW_HAS_HEALTH,
-  [MW_WEAPON_TYPE.AxeOneHand]: MW_HAS_HEALTH,
-  [MW_WEAPON_TYPE.LongBladeTwoHand]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.AxeTwoHand]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.BluntTwoClose]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.BluntTwoWide]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.SpearTwoWide]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.MarksmanBow]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.MarksmanCrossbow]: MW_HAS_HEALTH | MW_TWO_HANDED,
-  [MW_WEAPON_TYPE.MarksmanThrown]: 0,
-  [MW_WEAPON_TYPE.Arrow]: 0,
-  [MW_WEAPON_TYPE.Bolt]: 0,
-});
-
-export const weaponClass = (type) => WEAPON_CLASS[type] ?? MW_WEAPON_CLASS.Melee;
-export const weaponFlags = (type) => WEAPON_FLAGS[type] ?? 0;
-
-/**
- * isRealWeapon (character.cpp:316-320), verbatim, and it is the gate on
- * BOTH fallback ladders below:
- *
- *   return weaponType != HandToHand && weaponType != Spell && weaponType != None;
- *
- * PickProbe IS a real weapon by this test, which is the one entry nobody
- * guesses right. The consequence is the rule: bare fists, a readied
- * spell, and an empty sheathed hand DO NOT take a sword's animation when
- * their own is missing - they fall straight to the bare base group, or to
- * nothing at all.
- */
-export function isRealWeapon(type) {
-  return type !== MW_WEAPON_TYPE.HandToHand
-    && type !== MW_WEAPON_TYPE.Spell
-    && type !== MW_WEAPON_TYPE.None;
-}
-
-/** `weapInfo->mFlags & TwoHanded && mWeaponClass == Melee`
- *  (character.cpp:584, :620). BOTH terms: bows are TwoHanded and Ranged,
- *  so they take the ONE-handed ladder, and hand-to-hand is TwoHanded and
- *  Melee but is filtered out before this by isRealWeapon. */
-export function isTwoHandedMelee(type) {
-  return !!(weaponFlags(type) & MW_TWO_HANDED)
-    && weaponClass(type) === MW_WEAPON_CLASS.Melee;
-}
-
-/**
- * RULE 9's FALLBACK, which is a real function and not a guess
- * (`CharacterController::fallbackShortWeaponGroup`, character.cpp:602-637).
- *
- *   0. NOT A REAL WEAPON    -> the BARE base group, at once (:604-611)
- *   1. two-handed MELEE     -> base + "2c"  (LongBladeTwoHand's short)
- *   2. anything else        -> base + "1h"  (LongBladeOneHand's short)
- *   3. still missing        -> the BARE base group (:629-634)
- *
- * Step 0 is the one this port shipped without and it is not a nicety:
- * without it a bare-handed player whose .kf has no "idlehh" idles in
- * "idle1h" - the one-handed SWORD stance, fist raised as if holding a
- * blade - where Morrowind gives them the plain "idle".
- *
- * The blend-mask half of the reference is deliberately absent: steps 0
- * and 3 also narrow the animation to BlendMask_LowerBody, which is a
- * first-person no-op (there is no lower body in shot) and would be a lie
- * to carry as a field nothing reads.
- *
- * The reverted arc invented a different chain ending in "any idle in the
- * file", which is how it drew a plausible wrong animation instead of
- * saying it had none. There is no such tail here.
- *
- * @param base    "idle", "runforward", ... - the group WITHOUT the suffix
- * @param type    an MW_WEAPON_TYPE
- * @param hasGroup(name) -> boolean, the file's own answer
- */
-export function composeStanceGroup(base, type, hasGroup) {
-  const short = weaponShortGroup(type);
-  const asked = short ? `${base}${short}` : base;
-  if (hasGroup(asked)) return { group: asked, fallback: null };
-  if (!isRealWeapon(type)) {
-    return hasGroup(base) ? { group: base, fallback: 'bare' } : { group: null, fallback: null };
-  }
-  const ladder = isTwoHandedMelee(type)
-    ? `${base}${WEAPON_SHORT_GROUP[MW_WEAPON_TYPE.LongBladeTwoHand]}`
-    : `${base}${WEAPON_SHORT_GROUP[MW_WEAPON_TYPE.LongBladeOneHand]}`;
-  if (ladder !== asked && hasGroup(ladder)) return { group: ladder, fallback: 'short' };
-  if (hasGroup(base)) return { group: base, fallback: 'bare' };
-  return { group: null, fallback: null };
-}
-
-/**
- * getWeaponAnimation (character.cpp:573-592), the LONG group, and its
- * ladder is gated the same way - `isRealWeapon(weaponType) &&
- * !hasAnimation(weaponGroup)`.
- *
- * So a missing "handtohand" does NOT become "weapononehand": the
- * reference returns the missing name and the caller finds no animation,
- * which here is a null group and a stance that plays its idle and
- * refuses to swing. That refusal is the correct outcome - an arm that
- * mimes a sword swing with empty hands is worse than one that does not
- * swing.
- *
- * The non-bipedal "attack1" arm (:589-590) is out of scope by
- * construction: the player is bipedal and this module only ever animates
- * the player's own first-person rig.
- */
-/**
- * MW-D26: THE MOVEMENT STATE - refreshCurrentAnims' movestate ladder
- * (character.cpp:2297-2330) minus the swim family (deferred with the
- * port's swim animations; recorded, not faked). The strafe test is the
- * reference's own 2:1 (character.cpp:2085 - mIsStrafing when the side
- * component more than doubles the forward one); sneak beats run beats
- * walk exactly as the nested ternaries order them; and the TURN states
- * exist only for a third-person biped that is not sneaking
- * (character.cpp:2321-2329 - "do not use turning animations in the
- * first-person view and when sneaking"). Returns the base group name
- * ("runforward", "turnleft", ...) or null for standing still.
- */
-export function movementAnimState({
-  forward = 0, strafe = 0, running = false, sneaking = false,
-  turning = 0, thirdPerson = false,
-} = {}) {
-  const prefix = sneaking ? 'sneak' : running ? 'run' : 'walk';
-  const strafing = Math.abs(strafe) > Math.abs(forward) * 2;
-  if (strafing) return strafe > 0 ? `${prefix}right` : `${prefix}left`;
-  if (forward !== 0 || strafe !== 0) return forward >= 0 ? `${prefix}forward` : `${prefix}back`;
-  if (turning && thirdPerson && !sneaking) return turning > 0 ? 'turnright' : 'turnleft';
-  return null;
-}
-
-/**
- * MW-D26: the movement group's WEAPON suffix and its fallbacks
- * (refreshMovementAnims, character.cpp:674-708). The suffix ladder is
- * fallbackShortWeaponGroup's, which composeStanceGroup already IS
- * (asked short, then the 2c/1h fallback for real weapons, then the
- * bare base) - one home, reused. What movement adds on top is the
- * run -> walk swap (character.cpp:697-699) when the composed name has
- * no animation, and a null when even that misses (:701-707 - the
- * movement state RESETS rather than substituting a wrong clip).
- */
-export function composeMovementGroup(base, type, hasGroup) {
-  const short = weaponShortGroup(type);
-  let name = base;
-  if (short && type === MW_WEAPON_TYPE.Spell && (base === 'turnleft' || base === 'turnright')) {
-    // "Spellcasting stance turning is a special case" (character.cpp:676-687):
-    // the short group PREFIXES the movement name - "spellturnleft", never
-    // "turnleftspell", which is a name no .kf carries. A miss falls to
-    // fallbackShortWeaponGroup, and a spell is not a real weapon, so that
-    // hands back the BARE base at once (:604-611) - the suffix ladder is
-    // never asked here. (isTurning's swim states are excluded upstream by
-    // the reference's own swimpos gate.)
-    const prefixed = `${short}${base}`;
-    name = hasGroup(prefixed) ? prefixed : base;
-  } else if (short) {
-    const r = composeStanceGroup(base, type, hasGroup);
-    name = r.group ?? base;
-  }
-  if (!hasGroup(name)) {
-    const walked = name.replace('run', 'walk');
-    if (walked !== name && hasGroup(walked)) return { group: walked, walked: true };
-    return { group: null, walked: false };
-  }
-  return { group: name, walked: false };
-}
-
-/**
- * MW-D39: THE JUMP STATE - update()'s in-air derivation
- * (character.cpp:2195-2296), the ANIMATION half only. The same block's
- * fall damage, Acrobatics progression, knockdown and landing sounds
- * are DFU's own laws in this port (fallwater/footsteps own them; the
- * reference's DefaultLand is NoPlayerLocal anyway - the first-person
- * player never hears their own), so what this derives is exactly what
- * refreshJumpAnims consumes: which of the two jump plays is owed, and
- * whether movement selection is suppressed this frame.
- *
- * The reference's shape, kept:
- *   - mInJump is re-derived EVERY frame from the world, not latched
- *     (:2195-2196 - wasInJump is remembered, mInJump starts false);
- *   - in the air and not swimming, not levitating: InAir, and inJump
- *     (:2206-2212 - the reference's !inwater && !flying && solid gate;
- *     this port has no noclip, so solid is construction);
- *   - THE TAKEOFF FRAME (:2224-2227): a jump STARTING while still
- *     grounded sets mInJump - movement gates off one frame before the
- *     feet leave - but plays nothing yet; the `priorInAir` guard is
- *     the reference's own `mJumpState != JumpState_InAir`, which is
- *     what keeps the LANDING frame (motor's jump latch not yet
- *     cleared) from reading as a fresh takeoff;
- *   - not in a jump, and the jump clip is still playing: Landing
- *     (:2292-2293) - the state that plays the clip's tail once and
- *     clears itself when the clip stops.
- *
- * `jumpQueued` is the port's crossing for `vec.z() > 0`: the motor's
- * own jump latch (AcrobatMotor.Jumping - set at the jump, cleared on
- * the next grounded frame), true on exactly the takeoff frame while
- * grounded. Swim-family jump groups are out with the swim movement
- * family (MW-D26's recorded deferral, one line over).
- *
- * @returns {{ jump: 'inair'|'landing'|null, inJump: boolean }}
- */
-export function jumpAnimState({ grounded = true, swimming = false, levitating = false,
-  jumpQueued = false, priorInAir = false, jumpPlaying = false } = {}) {
-  let inJump = false;
-  let jump = null;
-  if (!swimming && !levitating) {
-    if (!grounded) { inJump = true; jump = 'inair'; }
-    else if (!priorInAir && jumpQueued) inJump = true;   // :2224-2227, the takeoff frame
-  }
-  if (!inJump && jumpPlaying) jump = 'landing';   // :2292-2293
-  return { jump, inJump };
-}
-
-/** character.cpp:750-752 - the animation speeds assumed when a clip
- *  carries no accum-root velocity ("the first person anims don't have
- *  any velocity to calculate a speed multiplier from"), in MW units
- *  per second: sneak, run, walk. */
-export const MOVEMENT_FALLBACK_SPEED = Object.freeze({
-  sneak: 33.5452, run: 222.857, walk: 154.064,
-});
-
-/** character.cpp:2403 - "Vanilla caps the played animation speed." */
-export const MOVEMENT_SPEED_CAP = 10;
-
-/** character.cpp:2396 - the turning animation's own speed law. */
-export const turnAnimSpeed = (yawRatePerSec) =>
-  Math.min(1.5, Math.abs(yawRatePerSec) / Math.PI);
-
-export function composeWeaponGroup(type, hasGroup) {
-  const asked = weaponLongGroup(type);
-  if (asked && hasGroup(asked)) return { group: asked, fallback: null };
-  if (!isRealWeapon(type)) return { group: null, fallback: null };
-  const ladder = isTwoHandedMelee(type)
-    ? WEAPON_LONG_GROUP[MW_WEAPON_TYPE.LongBladeTwoHand]
-    : WEAPON_LONG_GROUP[MW_WEAPON_TYPE.LongBladeOneHand];
-  if (ladder !== asked && hasGroup(ladder)) return { group: ladder, fallback: 'long' };
-  return { group: null, fallback: null };
-}
-
-/**
- * MW-D16 / RULE 8's LAST COLUMN: mAmmoType (weapontype.cpp). Only the two
- * marksman types have one, and MarksmanThrown does NOT - a thrown weapon
- * IS its own ammunition, which is why attachArrow's Thrown branch just
- * shows the weapon again instead of adding a node
- * (weaponanimation.cpp:70-79).
- */
-export const WEAPON_AMMO_TYPE = Object.freeze({
-  [MW_WEAPON_TYPE.MarksmanBow]: MW_WEAPON_TYPE.Arrow,
-  [MW_WEAPON_TYPE.MarksmanCrossbow]: MW_WEAPON_TYPE.Bolt,
-});
-export const ammoTypeFor = (type) => WEAPON_AMMO_TYPE[type] ?? MW_WEAPON_TYPE.None;
-
-/**
- * getArrowBone (npcanimation.cpp:1077-1102): the bone the held round sits
- * on, which is the AMMO type's attach bone - "Bip01 Arrow" for an arrow,
- * "ArrowBone" for a bolt - looked for in the ACTOR's skeleton first, and
- * failing that as a node named "ArrowBone" INSIDE THE WEAPON'S OWN MESH.
- *
- * The fallback is not a nicety: Morrowind's bows carry that node and most
- * skeletons do not carry "Bip01 Arrow", so on retail data the second
- * branch is the one that runs. It also decides the arrow's whole
- * placement, because a node inside the weapon's mesh brings the weapon's
- * transform chain with it - and the weapon's own mirror. A bow hangs on
- * "Weapon Bone Left", so rule 13 negates its X, and THE ARROW INHERITS
- * THAT, because the reference instances it under a node that is already
- * inside the mirrored subtree.
- */
-export const ARROW_FALLBACK_NODE = 'ArrowBone';
-export function arrowAttachBone(weaponType) {
-  const ammo = ammoTypeFor(weaponType);
-  if (ammo === MW_WEAPON_TYPE.None) return null;
-  return WEAPON_ATTACH_BONE[ammo] ?? null;
-}
-
-/**
- * character.cpp:1827-1829, as a condition rather than an `if` buried in a
- * switch:
- *
- *   if (ammunition && mWeaponType == ESM::Weapon::MarksmanCrossbow)
- *       mAnimation->attachArrow();
- *
- * at the end of Equipping, AttackEnd or Casting. A CROSSBOW puts the next
- * bolt on itself; a BOW does not, and waits for the next "shoot attach"
- * key - so a freshly drawn bow is empty-handed until you begin to draw
- * it. That reads as a bug until you see the weapon type in the test.
- *
- * DAGGERFALL HAS NO CROSSBOW, so no row of DF_TO_MW_WEAPON reaches
- * MarksmanCrossbow and this can never be true in the played game. It is
- * here as a FUNCTION, pinned on its own, precisely because of that: a
- * branch that cannot be exercised is not pinned, and a condition that can
- * be is. If a crossbow row is ever added, the arm reloads correctly with
- * nothing to change.
- */
-export const reloadsItself = (type) => type === MW_WEAPON_TYPE.MarksmanCrossbow;
-
-/**
- * character.cpp:1676-1677 - which attacks are "shoot":
- *
- *   if (weapclass == ESM::WeaponType::Ranged || weapclass == ESM::WeaponType::Thrown)
- *       mAttackType = "shoot";
- *
- * A CLASS test, not a bow test, and the two are not the same: a THROWN
- * weapon shoots without being a bow, which is the case the port's own
- * `machine.isBow` would have missed. Daggerfall has no thrown-weapon row
- * either, so like reloadsItself this is a condition the played game
- * cannot reach today and a function that is right when it can.
- */
-export const shootsRatherThanSwings = (type) => {
-  const cls = weaponClass(type);
-  return cls === MW_WEAPON_CLASS.Ranged || cls === MW_WEAPON_CLASS.Thrown;
-};
-
-export const DEFAULT_WEAPON_BONE = 'Weapon Bone';
-
-/** Rules 8 + 17: the bone this weapon type attaches at. The fallback is
- *  the part table's own entry, exactly as the reference's comment says. */
-export const weaponAttachBone = (type) => WEAPON_ATTACH_BONE[type] ?? DEFAULT_WEAPON_BONE;
 
 /**
  * The WEAP records in a player's .esm.
@@ -1500,7 +866,7 @@ export function dfWeaponToMw(item, weaponsTable) {
   return MOD_WEAPON_TO_MW[idx] ?? MW_WEAPON_TYPE.None;   // MW-ASSIGN: a mod's weapon of a classic shape
 }
 
-/** MW-ASSIGN (2026-09-27, Discord: "Some sprites not assigned morrowind skin"): THE WEAPONS A MOD ADDS, by template -
+/** MW-ASSIGN: THE WEAPONS A MOD ADDS, by template -
  *  Roleplay & Realism Items' Archer's Axe (ItemArchersAxe: one-handed, either hand) and Light Flail (ItemLightFlail: a
  *  flail, as the classic one maps). Outside DFU's frozen WEAPONS, so the walk above never met them: in Morrowind first
  *  person they drew EMPTY HANDS, and their icon and a wall's mount stood as the classic picture. */
@@ -1548,72 +914,10 @@ export function pickWeaponRecord(records, type, material = null, { has = null, s
 /** The report the reverted arc never printed: for one race, which
  *  first-person arm records actually exist, and what each one would fall
  *  back to. Answers are about the PLAYER'S data, never about ours. */
-/** MW-D32: sBodyPartMap's slot list (npcanimation.cpp:1187-1197) - the
- *  mesh parts the skin sweep maps to visible slots. NO head, NO hair
- *  (those come off the actor's own record - the chargen face law), NO
- *  clavicle (deliberately never mapped to any PRT slot). */
-export const SKIN_SWEEP_SLOTS = Object.freeze([
-  'neck', 'chest', 'groin', 'hand', 'wrist', 'forearm', 'upperarm',
-  'foot', 'ankle', 'knee', 'upperleg', 'tail',
-]);
-
-const ARM_SLOT_SET = new Set(['hand', 'wrist', 'forearm', 'upperarm']);
-
-/**
- * MW-D32: GETBODYPARTS, WHOLE (npcanimation.cpp:1167-1297). One record
- * sweep in LOAD ORDER over the sBodyPartMap slots, with the reference's
- * exact ladder:
- *  - BPF_NotPlayable skipped, MT_Skin only, race matched - and NO
- *    vampire filter: the sweep never had one (vampire heads live on the
- *    actor's own record path, and head/hair are not in the map at all)
- *  - a first-person HAND slot missing its .1st record falls back to
- *    third-person skins (:1232-1254): same gender fills, same gender
- *    upgrades an other-gender fallback, male fills for a female
- *  - every other slot takes parts of ITS view only (:1258)
- *  - male parts fall back for females: fill when empty, and a male
- *    .1st upgrades a 3P hand fallback (:1261-1280)
- *  - a PROPER match (right view, right gender) OVERWRITES - the LAST
- *    record in load order wins (:1286-1293), which is how an expansion
- *    overrides a base-game body
- * @returns {Map} slot -> chosen record (absent: no record for the slot)
- */
-export function resolveBodyParts(parts, race, female, { firstPerson = false } = {}) {
-  const want = String(race || '').toLowerCase();
-  const isF = !!female;
-  const out = new Map();
-  for (const p of parts ?? []) {
-    if (!p.playable || !p.skin) continue;
-    if (p.race !== want) continue;
-    const slot = p.slot;
-    if (!SKIN_SWEEP_SLOTS.includes(slot)) continue;
-    const isHand = ARM_SLOT_SET.has(slot);
-    const sameGender = !!p.female === isF;
-    if (firstPerson && isHand && !p.firstPerson) {
-      const cur = out.get(slot);
-      if (!cur && sameGender) out.set(slot, p);
-      else if (cur && sameGender && !!cur.female !== isF) out.set(slot, p);
-      else if (!cur && isF) out.set(slot, p);
-      continue;
-    }
-    if (!!p.firstPerson !== !!firstPerson) continue;
-    if (isF && !p.female) {
-      const cur = out.get(slot);
-      if (!cur) out.set(slot, p);
-      else if (isHand && !cur.firstPerson && p.firstPerson) out.set(slot, p);
-      continue;
-    }
-    if (isF !== !!p.female) continue;
-    out.set(slot, p);   // proper match: LAST in load order wins
-  }
-  return out;
-}
-
 export function armReport(parts, race, female) {
   const want = String(race || '').toLowerCase();
-  // MW-D32: the PICKS come from the one reference-whole resolver
-  // (getBodyParts, npcanimation.cpp:1167-1297) - the report keeps its
-  // verdict shape for the card, but no longer carries a second, subtly
-  // different copy of the ladder.
+  // The picks come from resolveBodyParts, the one resolver; the report only
+  // adds the verdict shape the card shows.
   const fpResolved = resolveBodyParts(parts, race, female, { firstPerson: true });
   const tpResolved = resolveBodyParts(parts, race, female, { firstPerson: false });
   const rows = [];
@@ -1731,10 +1035,9 @@ export function curatedAnswersFace(pools, race, female, faceIndex, faceTable = F
 
 export function playerBodyRows(parts, race, female, { beast = false, faceIndex = 0, faceTable = FACE_TABLE, faceMatch = null, vampire = false, walk = null, has = null, ownHeads = false } = {}) {   // MWNPC14: `vampire` the race's vampire head; MWNPC17: `walk` an NPC's { head, hair }; AUDIT MW-HEADS1: `has` the archives' (facePools); MW-HEADS2: `ownHeads` a player's - the port's own heads
   const want = String(race || '').toLowerCase();
-  // MW-D32: the sweep slots resolve through getBodyParts-whole
-  // (npcanimation.cpp:1167-1297 - LAST proper match wins, male-for-
-  // female fallback fills, no vampire filter, playable filtered), and
-  // clavicle is OUT: sBodyPartMap never maps it to a slot.
+  // The sweep slots resolve through resolveBodyParts (mwBodyParts.js): the last
+  // matching record in load order wins, a male record fills a female's empty
+  // slot, there is no vampire filter, and clavicle is not a sweep slot.
   const resolved = resolveBodyParts(parts, race, female, { firstPerson: false });
   const rows = [];
   for (const slot of SKIN_SWEEP_SLOTS) {
@@ -1749,9 +1052,8 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
       counts: { all: forSlot.length },
     });
   }
-  // Head and hair are NOT in the skin sweep (sBodyPartMap has no
-  // MP_Head/MP_Hair rows): the actor's own record names them, and the
-  // player's stand-in is the chargen face law below.
+  // Head and hair are not sweep slots: the actor's own record names them,
+  // and the player's stand-in is the chargen face law below.
   //
   // MW-D33 (parallel arc): THE CURATION TABLE. Mac's report: the
   // derived head and hair do not match the portrait - the modulo walk
@@ -1980,7 +1282,7 @@ export function meshBounds(shapes) {
   return { minX, minY, minZ, maxX, maxY, maxZ };
 }
 
-/** PR-BOW1b (2026-09-24): meshBounds' fold, PIECE BY PIECE - poseAssembly's
+/** PR-BOW1b: meshBounds' fold, PIECE BY PIECE - poseAssembly's
  *  one walk of the posed vertices. Each piece's own box is written onto the
  *  piece (`p.box`: one object the piece owns, living and dying with it and
  *  rewritten every pose, so a frame mints nothing), and the union is
@@ -2165,7 +1467,7 @@ export async function assembleFirstPersonArm({ skeletonBytes, parts, boneSources
       notes.push(`bones: ${src.name}: ${err.message}`);
     }
   }
-  // TWO-HANDS AUDIT (bible/05-Combat/Two-Hands.md): THE LEFT HAND'S WEAPON BONE, asked for by the player's two rigs
+  // TWO-HANDS AUDIT: THE LEFT HAND'S WEAPON BONE, asked for by the player's two rigs
   // (`offWeaponBone`). A skeleton without a "Weapon Bone Left" - every retail one - takes one made by the mirror from
   // its own Weapon Bone (combat/twoHands/mirrorRig.js offWeaponBoneAddon), through the addons' own door and after them (an
   // addon that brings one is the skeleton's), before any part binds and before the mirror's plan is first read. A bow
@@ -2201,7 +1503,7 @@ export async function assembleFirstPersonArm({ skeletonBytes, parts, boneSources
 }
 
 /**
- * MWNPC9 (bible/04-Characters/Morrowind-NPCs.md section 14): A CREATURE, ASSEMBLED. Its model is its skeleton and its
+ * MWNPC9: A CREATURE, ASSEMBLED. Its model is its skeleton and its
  * body at once (one parse: the skeleton's refs ARE the shapes' parent refs), bound by mwCharacter.js
  * bindCreatureModel - the skinned shapes by their bones, each rigid shape riding its own node through the inverse of
  * that node's rest. The pieces are the arm's own shape (slot 'creature'), so the pose, the GPU skin, the upload and the
@@ -2436,8 +1738,7 @@ export function bindPartsInto(assembly, parts) {
             // attitude, no mirror of its own: whatever the arrow ends
             // up wearing, it wears because its PARENT wears it.
             //
-            // MW-D44 (Mac: "the arrow placement in the hand is not
-            // 1:1" - and he was right): SO IT TAKES THE WEAPON'S
+            // MW-D44 (- and he was right): SO IT TAKES THE WEAPON'S
             // OFFSET, THOUGH NEVER ITS OWN. MW-D34 read half the
             // reference correctly and stopped one level too high. That
             // `parent` is getArrowBone(), the ArrowBone node INSIDE the
@@ -2479,7 +1780,6 @@ export function bindPartsInto(assembly, parts) {
                 ? (part.inheritOffsetFrom === 'sheath' ? sheathBoneOffset : null)   // WS1: a bare instance under the scabbard's node
                 : (bound.boneOffset || null),
             uvs: batch.uvs || null, colors: batch.colors || null, material: batch.material || null,
-            shape: batch.name || null,   // SHADOW-FANG (AUDIT F2): the shape's own name - a skinned piece keeps its batch, a rigid one only this (an eye names itself)
             // MW-BOW1: the file and the batch's chain, for a part whose own controllers move it on the weapon clock
             // (formats/morrowind/mwPartClock.js posePartBatch) - the weapon's slots alone, so no other part keeps its parsed
             // file alive; and, for a part instanced under a node of ANOTHER file (the arrow under the bow's
@@ -2569,185 +1869,6 @@ export function bindPartsInto(assembly, parts) {
  *
  * Mutates `assembly` in place and returns it.
  */
-/**
- * RULE 54, VERBATIM: THE FIRST-PERSON CAMERA IS A NODE OF THE RIG.
- *
- *   mAnimation->setViewMode(NpcAnimation::VM_FirstPerson);
- *   mTrackingNode = mAnimation->getNode("Camera");
- *   if (!mTrackingNode) mTrackingNode = mAnimation->getNode("Head");
- *   mHeightScale = 1.f;
- *                            - mwrender/camera.cpp:346-357
- *
- * and the position it yields is that node's world TRANSLATION with no
- * height term at all in first person (calculateTrackedPosition, :87-99:
- * the `res.z() += mHeight * mHeightScale` line is inside
- * `if (mMode != Mode::FirstPerson)`).
- *
- * There is no third fallback. A rig with neither node has no first-person
- * camera, and inventing one is what MW-D8's port mapper did.
- */
-export function firstPersonCameraRef(skeleton) {
-  const byName = skeleton && skeleton.byName;
-  if (!byName) return -1;
-  if (byName.has('camera')) return byName.get('camera');
-  if (byName.has('head')) return byName.get('head');
-  return -1;
-}
-
-/** The node NpcAnimation hangs the first-person RotateController on. */
-export const FP_NECK_BONE = 'bip01 neck';
-
-/**
- * NpcAnimation::runAnimation (:711-723), whole:
- *
- *   if (mAccurateAiming) mAimingFactor = 1.f;
- *   else mAimingFactor = std::max(0.f, mAimingFactor - timepassed * 0.5f);
- *   float rotateFactor = 0.75f + 0.25f * mAimingFactor;
- *
- * MW-D13 CLOSED THE OTHER HALF. The factor is not the constant 0.75 the
- * port shipped: it is 0.75 at rest and rises to 1.0 WHILE AIMING, which
- * is `mUpperBodyState > UpperBodyState::WeaponEquipped`
- * (character.cpp:1894) - every attack section, and nothing else. So the
- * arms lag the look by a quarter of it normally and follow it EXACTLY
- * while you are swinging, which is what makes a blow land where you are
- * looking.
- *
- * The rise is INSTANT and the fall is a 0.5-per-second ramp, so the arms
- * snap onto the aim and drift back off it over two seconds. An
- * implementation that eased both ways, or that decayed per frame instead
- * of per second, would look almost right and be wrong at every frame
- * rate but one.
- *
- * MW-D12's upper-body machine is what makes this reachable at all - with
- * a constant idle there was no aiming state to be in, which is why the
- * constant was honest when it was written and is a gap now.
- */
-export const FP_NECK_ROTATE_FACTOR = 0.75;
-export const FP_AIM_SPAN = 0.25;
-export const FP_AIM_DECAY_PER_SECOND = 0.5;
-
-/** mAimingFactor's own step. `prev` is last frame's value; the caller
- *  keeps it, because it is a decaying state and not a function of the
- *  current frame alone. */
-export function aimingFactor(prev, accurate, dt) {
-  if (accurate) return 1;
-  return Math.max(0, (prev || 0) - dt * FP_AIM_DECAY_PER_SECOND);
-}
-
-/** rotateFactor, which is what multiplies the pitch. */
-export function neckRotateFactor(aim = 0) {
-  return FP_NECK_ROTATE_FACTOR + FP_AIM_SPAN * aim;
-}
-
-const transpose33 = (m) => Float32Array.from([m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]);
-
-/**
- * `matrix.getRotate()` - the ROTATION, with the scale divided out.
- *
- * MW-D15: the skeleton-space 3x3 this module works in is rotation TIMES
- * SCALE (rule 55 folds a NIF's uniform scale into the matrix), and
- * RotateController takes `worldMat.getRotate()`, which is the rotation
- * alone. Conjugating with the scaled matrix gives `s^2 * (R rot R^T)`
- * and translating with its transpose gives `s * offset` - both silently
- * correct at s = 1, which every fixture and most retail rigs are, and
- * both wrong the moment a rig scales its neck chain.
- *
- * NIF scale is a single float, so the columns share one length and one
- * division does it.
- */
-const rotationOf = (m) => {
-  const s = Math.hypot(m[0], m[3], m[6]);
-  if (!(s > 1e-8) || Math.abs(s - 1) < 1e-6) return m;
-  const out = new Float32Array(9);
-  for (let i = 0; i < 9; i++) out[i] = m[i] / s;
-  return out;
-};
-/** Rotation about -X by `rad`, which is the axis the neck controller
- *  takes: `osg::Quat(pitch * rotateFactor, osg::Vec3f(-1, 0, 0))` - and the third person's ranged aim
- *  (combat/spineAim.js, BOW-AIM: `osg::Quat(pitch / 2, osg::Vec3f(-1, 0, 0))`). */
-export const rotNegX = (rad) => {
-  const c = Math.cos(rad); const sn = Math.sin(rad);
-  return Float32Array.from([1, 0, 0, 0, c, sn, 0, -sn, c]);
-};
-
-/**
- * RotateController's turn (mwrender/rotatecontroller.cpp:41-60), the node's new local rotation:
- *
- *   worldOrient = rotation of the node's matrix relative to the object root
- *   orient = worldOrient * mRotate * worldOrient^-1 * matrix.getRotate()
- *
- * i.e. `rotate` is a turn in the OBJECT ROOT's frame, laid on the node's world orientation as the animation left it -
- * the node's world becomes `rotate * world`, its translation untouched.
- *
- * BOW-AIM (bible/01-Overview/bugs/Field-Bugs-2026-10-26c.md): THAT LINE IS OSG's, AND OSG MULTIPLIES ROW VECTORS. Its
- * matrices (and the quaternion product, `q1 * q2` = q1 then q2) are the transposes of this port's: here a world is
- * `parent * local` and a point is `M v` (mwNifMesh.js composeTransform). Written in this port's convention the line is
- *
- *   local' = local * W^T * rotate * W          (W the node's world rotation, its own local inside it)
- *
- * so the world is `parent * local' = rotate * parent * local` - `rotate` in the root's frame. The port had copied the
- * line's letters (`W * rotate * W^T * local`), which turns the world by `rotate` conjugated by parent*W instead: on
- * retail's third-person skeleton a "look down" of 0.3 tipped the chest BACK 0.3, about an axis 3 degrees off the
- * root's X, where the corrected line turns it exactly `rotate`. Measured on the vendored retail biped
- * (test/combat/fb1026c_bowaim.test.js); MW-D20's fixture (a file root turned Rz90) is the same law worked by hand.
- */
-function rootSpaceTurn(local, w, rotate) {
-  return mat33Mul(mat33Mul(mat33Mul(local, transpose33(w)), rotate), w);
-}
-
-/**
- * The first-person neck rotation, applied the way RotateController does it (rootSpaceTurn): the pitch is expressed in
- * the OBJECT ROOT's frame and laid on whatever the animation already put there. Doing it in the node's local frame
- * instead would pitch the head sideways as soon as the neck is not axis-aligned.
- */
-export function applyFirstPersonNeck(skeleton, pose, rootRef, skelMats, pitch, aim = 0, offset = null) {
-  const ref = skeleton && skeleton.byName ? skeleton.byName.get(FP_NECK_BONE) : undefined;
-  const sinking = !!(offset && (offset[0] || offset[1] || offset[2]));
-  if (ref === undefined || (!pitch && !sinking)) return false;
-  const world = skelMats(skeleton, pose, rootRef).get(ref);
-  if (!world) return false;
-  const local = pose.get(ref) ?? skeleton.nodes.get(ref).rest;
-  const w = rotationOf(world.a);
-  const rotate = rotNegX(pitch * neckRotateFactor(aim));
-  const rotation = rootSpaceTurn(local.rotation, w, rotate);
-  // RULE 32(a), and it rides the SAME controller as the pitch because it
-  // is the same line of the same function:
-  //   matrix.setTrans(matrix.getTrans() + worldOrientInverse * mOffset);
-  //                                     (rotatecontroller.cpp:52)
-  // worldOrientInverse turns a vector given in the OBJECT ROOT's space
-  // into the neck's own, which is the transpose of the same world 3x3 the
-  // rotation is turned by (a quaternion applied to a vector is the same
-  // turn in either convention - only the product's order flips). Applying the offset in the neck's local
-  // frame instead would sink the body along whatever way the neck
-  // happens to be pointing.
-  let translation = local.translation;
-  if (sinking) {
-    const inv = transpose33(w);
-    translation = [
-      local.translation[0] + inv[0] * offset[0] + inv[1] * offset[1] + inv[2] * offset[2],
-      local.translation[1] + inv[3] * offset[0] + inv[4] * offset[1] + inv[5] * offset[2],
-      local.translation[2] + inv[6] * offset[0] + inv[7] * offset[1] + inv[8] * offset[2],
-    ];
-  }
-  pose.set(ref, { rotation, translation, scale: local.scale });
-  return true;
-}
-
-/**
- * BOW-AIM (bible/01-Overview/bugs/Field-Bugs-2026-10-26c.md): RotateController's rotation alone on node `ref`
- * (rootSpaceTurn; applyFirstPersonNeck's law with no offset) - `rotate`, a 3x3 in the OBJECT ROOT's space, laid on the
- * node's world rotation as the pose now stands it. Answers false where the skeleton has no such node.
- */
-export function applyRotateController(skeleton, pose, rootRef, skelMats, ref, rotate) {
-  if (ref === undefined || ref === null || !skeleton?.nodes?.has(ref)) return false;
-  const world = skelMats(skeleton, pose, rootRef).get(ref);
-  if (!world) return false;
-  const local = pose.get(ref) ?? skeleton.nodes.get(ref).rest;
-  const w = rotationOf(world.a);
-  pose.set(ref, { rotation: rootSpaceTurn(local.rotation, w, rotate), translation: local.translation, scale: local.scale });
-  return true;
-}
-
 /** MW-BOW1: the slots whose own controllers run on the WEAPON clock - the weapon's (PRT_Weapon takes
  *  mWeaponAnimationTime, npcanimation.cpp) and the arrow instanced under a node of it. Every other part's controllers
  *  run on the lower body's clock in the reference, which this port does not drive. */
@@ -2790,13 +1911,13 @@ export function posePartClocks(assembly, value, { frameTime = value, slots = WEA
 }
 
 export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
-  time = 0, accumRoot = null, neckPitch = 0, neckAim = 0, neckOffset = null, climb = null, skin = true, mirror = null, run = null, hold = null, motion = null, aim = null } = {}) {
+  time = 0, accumRoot = null, neckPitch = 0, neckAim = 0, neckOffset = null, climb = null, skin = true, mirror = null, run = null, motion = null, aim = null } = {}) {
   const { fns, skeleton, pieces } = assembly;
   if (!fns || !skeleton) return assembly;
   // MIRROR-BIND: an arm mirrored across the picture is mirrored by the binds of the skins it wears (mirrorBindsOf)
   if (mirror?.plane && mirror.plane.binds === undefined) mirror.plane.binds = mirrorBindsOf(assembly);
   const pose = fns.poseSkeleton(skeleton, tracks, sampleTrack, time, { accumRoot });
-  // TWO-HANDS (bible/05-Combat/Two-Hands.md): THE SECOND HAND - an arm, or the whole body, as the mirror of another
+  // TWO-HANDS: THE SECOND HAND - an arm, or the whole body, as the mirror of another
   // (combat/twoHands/mirrorRig.js), straight over the clip's pose and under every law that follows it (the neck's look, the
   // climb's hands): a left-hand blow, a second weapon held up. An arm read from ANOTHER clip (`clip`: the idle under a
   // blow) is posed here, on this skeleton, at that clip's own time.
@@ -2809,14 +1930,14 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // coincide exactly when every declared root is the root and the root's
   // transform is identity - true of every fixture, false of retail data,
   // where the difference is a hand floating away from its forearm.
-  applyFirstPersonNeck(skeleton, pose, GRAPH_ROOT, fns.skelMats, neckPitch, neckAim, neckOffset);
+  pitchNeck(skeleton, pose, GRAPH_ROOT, fns.skelMats, neckPitch, neckAim, neckOffset);
   // BOW-AIM (combat/spineAim.js): the third person's ranged aim - the spine controllers over the clip's pose, as the
   // reference's run after its animation (weaponanimation.cpp:175-211), and under the body motion, which keeps the clip's
   // chest while the clip has the arms
   assembly.aimFit = aim ? aim(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   // BODY-MOTION (characters/bodyMotion/bodyMotion.js, the third-person body's): the gait, the carry and a blow's body
-  // solved over the clip's pose - after the mirror (a pair's arm is the layer's to place) and UNDER the run, the climb,
-  // the seat and the long gun's hold, which still win the bones they ask for
+  // solved over the clip's pose - after the mirror (a pair's arm is the layer's to place) and UNDER the run, the climb
+  // and the seat, which still win the bones they ask for
   assembly.motionFit = motion ? motion(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   // TWO-HANDS AUDIT: the running hands' reach (combat/fpArm.js firstRun), by the climb's own solver and UNDER the
   // climb's request - each at its own weight: the climb eases every wrist on from where the run put it, so the two
@@ -2825,9 +1946,6 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // CLIMB6: the climb's pose over the clip's - the hands on the stone, the feet on the wall - solved on THIS skeleton's
   // own bones (combat/climbRig.js) in the same graph space, before any piece is placed on it
   assembly.climbFit = climb ? applyClimbRig(skeleton, pose, GRAPH_ROOT, fns.skelMats, climb) : null;
-  // RIFLE-STANCE: a held long gun's hands (combat/gun/rifleStance.js applyRifleStance) - `hold` solves them on THIS frame's
-  // body, after the clip and the climb's slot (never both: a gun is not held on the stone or a seat), before any piece
-  assembly.holdFit = hold ? hold(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   const mats = fns.skelMats(skeleton, pose, GRAPH_ROOT);
   // MWNPC1: `skin: false` - THE GPU SKIN'S POSE. The skeleton is posed and
   // its matrices kept exactly as below, and the pieces are NOT: the vertex
@@ -2866,7 +1984,7 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   return assembly;
 }
 
-/** MIRROR-BIND (bible/05-Combat/Two-Hands.md): the skins an assembly's picture mirror is read by - the skeleton file's own
+/** MIRROR-BIND: the skins an assembly's picture mirror is read by - the skeleton file's own
  *  (`skinBinds`, kept at assembly) and its skinned pieces' (combat/twoHands/mirrorRig.js mirrorBindSources) - read once
  *  for each set of pieces it holds. */
 function mirrorBindsOf(assembly) {
@@ -3137,7 +2255,7 @@ export function placeAtBone(positions, at, mirror, out = new Float32Array(positi
 }
 
 /**
- * MW-SMOOTH (2026-10-09, Mac: "Can we also enable smooth shading for the morrowind models?"): A RIGID PART'S NORMALS,
+ * MW-SMOOTH: A RIGID PART'S NORMALS,
  * PLACED AS ITS VERTICES ARE (placeAtBone) - mirrored with them (rule 13's X negated: a reflection takes a normal to
  * the reflected surface's normal, so no flip follows) and turned by the bone. Rule 14's offset is a translation and
  * leaves a normal alone. Renormalised, so a bone's uniform scale does not dim the light.
@@ -3222,160 +2340,6 @@ function applyPreNormals(normals, pre) {
  * the listing reports Idle [1.00 -> 0.50], a range that runs backwards,
  * while the clip law reads [1.00 -> 3.00].
  */
-/**
- * MW-D14 / RULE 6 + 18 + the SOURCE LIST, which is not one file.
- *
- * NpcAnimation::updateNpcBase (npcanimation.cpp:499-537) adds TWO
- * animation sources for a first-person actor, in this order:
- *
- *   base            = Settings::models().mXbaseanim1st  ("meshes/xbase_anim.1st.nif")
- *   defaultSkeleton = correctActorModelPath(getActorSkeleton(...))
- *
- *   addAnimSource(base, smodel);
- *   if (defaultSkeleton != base) addAnimSource(defaultSkeleton, smodel);
- *
- * and addAnimSource swaps a .nif extension for .kf and DROPS the source
- * silently when that file is not in the archive
- * (animation.cpp:646-671). For a MALE the two are the same string, so
- * there is one source and the port's single .kf was right; for a FEMALE
- * or a BEAST they differ, and the second one - when the archive carries
- * it - is the LAST inserted and therefore the one that wins
- * (`Look in reverse; last-inserted source has priority`,
- * animation.cpp:918-923).
- *
- * `use additional anim sources` is deliberately absent: it is an OpenMW
- * setting, default false, that scans an `animations/` folder Morrowind
- * does not ship.
- */
-export const FP_BASE_MODEL = 'meshes/xbase_anim.1st.nif';
-
-/** The .kf a model name names (animation.cpp:648-654): swap ONLY when
- *  the extension is exactly "nif". */
-export function animSourceName(model) {
-  const p = String(model || '').toLowerCase();
-  return p.endsWith('.nif') ? `${p.slice(0, -4)}.kf` : p;
-}
-
-/**
- * The ordered source list, in PUSH order - the caller searches it in
- * REVERSE. `exists` is the archive probe; a source the archive lacks is
- * dropped here rather than refused, exactly as addSingleAnimSource does.
- */
-export function fpAnimSources(skeletonPath, exists, { werewolf = false } = {}) {
-  return animSourcesFor(werewolf ? null : FP_BASE_MODEL, skeletonPath, exists);
-}
-
-/** MW-D24: the reference's own unit bridge - constants.hpp:10,
- *  UnitsPerMeter. The camera's distances and the body's world scale
- *  both cross it, so it lives here in the format layer, once. */
-export const MW_UNITS_PER_METER = 69.99125109;
-
-/** MW-D24: the THIRD-PERSON base animation model (settings-default.cfg
- *  [Models] xbaseanim, updateNpcBase's `base` for every non-werewolf -
- *  npcanimation.cpp:506-508). Its .kf sibling is the file that carries
- *  idle/walk/attack for the whole visible body. */
-export const TP_BASE_MODEL = 'meshes/xbase_anim.nif';
-
-/** The third-person source list, same push order and existence filter as
- *  the first-person one: base first (npcanimation.cpp:529-530), then the
- *  actor's own skeleton when it differs (npcanimation.cpp:532-533). The
- *  kf name is the model with its extension swapped and NOTHING else -
- *  no "x" is inserted (animation.cpp:651-654). */
-export function tpAnimSources(skeletonPath, exists, { werewolf = false } = {}) {
-  return animSourcesFor(werewolf ? null : TP_BASE_MODEL, skeletonPath, exists);
-}
-
-/** MWNPC9: A CREATURE'S SOURCES (creatureanimation.cpp, CreatureAnimation's constructor): xbase_anim first for a
- *  BIPEDAL one (`mFlags & Bipedal`), then the model's own .kf - the model being the actor path rule 18 corrected,
- *  the "x" variant, so `xrat.nif` sources `xrat.kf`. Same push order and existence filter as the NPC's. */
-export function creatureAnimSources(modelPath, exists, { bipedal = false } = {}) {
-  return animSourcesFor(bipedal ? TP_BASE_MODEL : null, modelPath, exists);
-}
-
-/** WEREWOLF1: A WEREWOLF HAS ONE SOURCE, ITS OWN. updateNpcBase leaves the
- *  base empty for a werewolf (`if (!isWerewolf)`, npcanimation.cpp:503-510),
- *  so neither xbase_anim.kf nor xbase_anim.1st.kf is added - only the wolf
- *  skeleton's own .kf (:529-533), in both views. `baseModel` null is that. */
-function animSourcesFor(baseModel, skeletonPath, exists) {
-  const out = [];
-  const base = baseModel ? animSourceName(baseModel) : null;
-  if (base && exists(base)) out.push(base);
-  const own = animSourceName(skeletonPath);
-  if (own !== base && exists(own)) out.push(own);
-  return out;
-}
-
-/**
- * play()'s source search (animation.cpp:918-935): walk mAnimSources in
- * REVERSE and take the FIRST source whose text keys give this group a
- * valid range. Not "the first source that mentions the group" - the
- * whole of reset() has to succeed, so a source carrying a start key and
- * no stop key is passed over rather than refused.
- *
- * @param sources ordered as pushed; index 0 is the base
- * @returns {{index:number, source:object, state:object}|null}
- */
-/**
- * MW-D29: ANIMATION::GETTEXTKEYTIME across EVERY source
- * (animation.cpp:840-854): the sources are walked in REVERSE - the
- * last-pushed wins - and the first key that starts with the asked text
- * answers. The port had asked ONE source (the idle pick's), so an
- * equip-attach key living only in the base .kf while a female skeleton's
- * own .kf won the idle went unseen.
- */
-export function sourcesKeyTime(sources, textKey) {
-  for (let i = (sources ? sources.length : 0) - 1; i >= 0; i--) {
-    const t = getTextKeyTime(sources[i].keys, textKey);
-    if (t >= 0) return t;
-  }
-  return -1;
-}
-
-/**
- * MW-D29: ANIMATION::GETVELOCITY's two searches (animation.cpp:1267-1338):
- * first the sources in REVERSE for one that carries the group's start
- * key; that source's accum-root velocity answers - and "if there's no
- * velocity" (the > 1 test, :1301/:1307) the walk CONTINUES through the
- * remaining earlier sources until one yields more. The port had stopped
- * at the single source the clip was picked from.
- */
-/** PX29: ONE source's own velocity for a group - the number that
- *  matches the clip actually playing, which is what the movement rate
- *  divides by after Mac's revert. sourcesVelocity (below) is the
- *  reference's multi-source walk and stays for any consumer that
- *  wants it; nothing in the movement lane does. */
-export function sourceVelocityOf(source, group) {
-  if (!source) return 0;
-  const acc = ACCUM_ROOT_NAMES.find((n) => source.trackMap && source.trackMap.has && source.trackMap.has(n));
-  return acc ? animVelocity(source.keys, source.trackMap.get(acc), group) : 0;
-}
-
-export function sourcesVelocity(sources, group) {
-  const list = sources || [];
-  const velOf = (so) => sourceVelocityOf(so, group);   // AUDIT 68 S11-velof-dup: one source's velocity, one home
-  let i = list.length - 1;
-  for (; i >= 0; i--) {
-    if (getTextKeyTime(list[i].keys, `${group}: start`) >= 0
-      || getTextKeyTime(list[i].keys, `${group}: loop start`) >= 0) break;
-  }
-  if (i < 0) return 0;
-  let velocity = velOf(list[i]);
-  for (let j = i - 1; !(velocity > 1) && j >= 0; j--) velocity = velOf(list[j]);
-  return velocity;
-}
-
-export function pickAnimSource(sources, group, resetClip, opts = {}) {
-  for (let i = (sources?.length ?? 0) - 1; i >= 0; i--) {
-    const state = resetClip(sources[i].keys, group, opts);
-    if (state.ok) return { index: i, source: sources[i], state };
-  }
-  return null;
-}
-
-/** hasAnimation (animation.cpp): ANY source that names the group. */
-export function anySourceHasGroup(sources, group) {
-  return (sources ?? []).some((s) => s.groupSet.has(group));
-}
 
 export async function clipReport({ kfBytes, skeleton = null, group = 'Idle', clipOpts = {} } = {}) {
   const mod = {};

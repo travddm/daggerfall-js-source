@@ -1,5 +1,4 @@
-// ARENA4b (2026-10-03, Arena.md 5: "Records - your bouts: wins, losses, yields, falls, best streak, purses; the last
-// twenty bouts"): THE BOARD'S RECORDS FOR THE RECORDS PAGE - `me.recent` and `me.record` on /v1/arena/board
+// ARENA4b: THE BOARD'S RECORDS FOR THE RECORDS PAGE - `me.recent` and `me.record` on /v1/arena/board
 // (server-account/src/arena.js arenaRecordsOf), counted from the account's own rows over node:sqlite with every migration
 // (test/accountDb.mjs). Another stream renders these, so the shape is pinned key for key.
 import { test } from 'node:test';

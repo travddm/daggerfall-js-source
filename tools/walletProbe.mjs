@@ -1,4 +1,4 @@
-// WALLET-UI (2026-10-07, Mac: "Polish and organize the ingame wallet item for ease of readability"), MEASURED: the real
+// WALLET-UI, MEASURED: the real
 // enhanced pack (ui/inventoryDoor.js - the door the game opens) over the real sheet in Chromium, a character carrying the
 // wallet and everything it holds (test/systems/wallet1.test.js's own pack: the purse's gold, two letters of credit, a stack of
 // Deadlands Embers, the Welkynd Shards), its Valuables page opened and the Wallet picked - at a desktop's width and a

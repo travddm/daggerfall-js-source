@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -18,7 +18,7 @@ export function createTravelViewDungeons(host) {
     _announcedSpawnPixels, _spawnSalt, etherSea, locationIndex, mapDict, params, playerTravelPixel, state,
     tvEtherPlace, tvKnownGen, tvPlaceSummary, tvSpawnAt, tvSpawnGone, provinceQuestPlaces
   } = host;
-  /** TVD-WORLD (2026-10-27, bible/06-Systems/Travel-View.md TVD-WORLD; the audit NO SYSTEM LEFT BEHIND IN THE BAY C4): THE LAIRS
+  /** TVD-WORLD: THE LAIRS
    *  PAST THE BAY (TESA8, the places host's - scenes/tamrielPlacesHost.js), read about the traveller a few new cells a call
    *  (systems/travel/travelLairs.js): past the Bay no lair had a plate, a "?", a find or a model - TV6's dungeons were the
    *  map's rows alone. */

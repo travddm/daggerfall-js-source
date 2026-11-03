@@ -1,4 +1,4 @@
-// SAFARI1 (2026-09-22) - NO REGEX LOOKBEHIND IN ANYTHING A BROWSER LOADS.
+// SAFARI1 - NO REGEX LOOKBEHIND IN ANYTHING A BROWSER LOADS.
 //
 // `(?<=...)` and `(?<!...)` are a PARSE error in Safari before 16.4 -
 // macOS 12 and older, iOS 16.3 and older. Not a wrong answer: the whole

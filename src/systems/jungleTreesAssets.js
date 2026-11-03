@@ -1,5 +1,5 @@
 // @ts-check
-// BANTHA1 (bible/03-World/Bantha-Jungle.md): THE JUNGLE'S TREES IN THE GAME - the owner's five trees through Low Poly
+// BANTHA1: THE JUNGLE'S TREES IN THE GAME - the owner's five trees through Low Poly
 // Trees' own door (systems/lowPolyTreesAssets.js createLowPolyTrees), so a jungle tree is held, drawn near as its 3D
 // tree and far as its own far picture, swayed, felled and given back exactly as a low-poly tree is - one door's code,
 // never a second (THE ONE CONSTRUCTION SEAM). What is the jungle's own:

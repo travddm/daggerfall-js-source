@@ -34,8 +34,7 @@
 // moves. Another player in the home walks on their own client, where their
 // own gate holds the same piece back from them.
 //
-// ROCK-CLEAR (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Apply to rocks
-// too"): and the open world's. A pixel's statics - World of Daggerfall's
+// ROCK-CLEAR (FIELD BUGS 2026-10-19f): and the open world's. A pixel's statics - World of Daggerfall's
 // rocks, mountains scaled by hundreds that reach past their own pixel, the
 // town's models, its mills, the Hold's camp - go into ONE bucket a pixel,
 // part by part as its build runs, each riding the floating origin (a

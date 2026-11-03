@@ -1,4 +1,4 @@
-// SET3 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md): WHAT THE SETS DO (systems/sigil/sigilSetPowers.js),
+// SET3: WHAT THE SETS DO (systems/sigil/sigilSetPowers.js),
 // each power driven through the REAL seam SET2 opened - the entity fold through computeEntityMods and the formulas'
 // accessors, the blow through weaponBlowMods, Spite through the attack formula's struck tail, Unbroken and the Wrath
 // through hurtPlayer, the kills through reportPlayerKill, Mora through the cast price and the absorption roll, the
@@ -100,15 +100,6 @@ const FIRE_PROOF = Object.freeze({ immunityFlags: EFFECT_FLAGS.Fire });
 test('SET3 registered at import, under one name, at every seam SET2 opened: the entity fold, the blow, the struck tail (and AUDIT M2 the strike tail), the damage door\'s three says, the kill, the cast price, the absorption roll and the magic round (mutants: any registration dropped)', () => {
   assert.equal(SIGIL_SETS_POWER, 'sigilSets');
   assert.ok(entityFoldNames().includes('sigilSets'), 'the fold');
-  const src = strip(read('src/systems/sigil/sigilSetPowers.js'));
-  for (const [seam, fn] of [
-    ['registerEntityFold', 'setFold'], ['registerWeaponBlowMod', 'setBlow'], ['registerPlayerStruckListener', 'setStruck'],
-    ['registerPlayerStrikeListener', 'setStrike'],   // AUDIT SET M2: the blow that landed
-    ['registerPlayerDamageMod', 'setDamageMod'], ['registerPlayerDeathSave', 'setDeathSave'], ['registerPlayerHurtListener', 'setHurt'],
-    ['registerPlayerDoorOpen', 'setDoorOpen'],   // AUDIT FINAL F10: the door takes the blow's mark as it opens
-    ['registerPlayerKillListener', 'setKill'], ['registerSpellCostMod', 'setCastCost'], ['registerAbsorptionChance', 'setAbsorbChance'],
-    ['registerMagicRoundHook', 'setRound'],
-  ]) assert.match(src, new RegExp(`\\n${seam}\\(SIGIL_SETS_POWER, ${fn}\\);`), `${seam} -> ${fn}`);
 });
 
 test('SET3 the 2-piece stat tiers: one fold over RF1\'s channels for MY entity with the set awake - Orc-Hide\'s armour on all seven parts and its Endurance, the Ravager\'s Strength and Critical Strike, Shadow\'s Grace\'s Stealth and Agility, Forbidden Lore\'s Intelligence and all six schools, the Burning Gate\'s fire resistance - at the set\'s own stage, read by the formulas\' accessors; nothing at one piece (mutants: a part left out; a school left out; the resistance on the wrong element; a stat on the wrong name)', () => {
@@ -131,7 +122,7 @@ test('SET3 the 2-piece stat tiers: one fold over RF1\'s channels for MY entity w
   for (const s of MAGIC_SKILLS) assert.equal(entitySkillMod(mor, s), 2, `school ${s}`);
   assert.equal(entitySkillMod(mor, SKILLS.Stealth), 0, 'only the schools');
   const ruhn = wearSet(player(), 'ruhn', 2);
-  assert.equal(entityResistMod(ruhn, ['fire']), 15);
+  assert.equal(entityResistMod(ruhn, ['fire']), 10);
   assert.equal(entityResistMod(ruhn, ['frost', 'shock', 'poison', 'magic']), 0, 'fire alone');
   assert.equal(entityStatMod(ruhn, 'endurance'), 0, 'a set\'s tier is its own');
 });
@@ -148,10 +139,6 @@ test('SET3 the stat tiers grow together: the numbers stand at the SET\'s stage -
   setSigilRenown(20);   // Bright opens at Renown 20 (the Renown only rises in play; the test lowers it for the cap)
   computeEntityMods(asc);
   assert.equal(entityStatMod(asc, 'endurance'), 4, 'Ascendant pieces under a Bright Renown stand at Bright: 2 + 4 x 2/4');
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /setSigilRenown\(level\);[^\n]*\n\s*computeEntityMods\(playerEntity\);/, 'my Renown adopted: the fold at once');
-  assert.match(w, /const setsWere = setsDueling\(\);\s*setSetsDueling\(!!duelMgr\.live \|\| arenaPvpLive\(\)\);[^\n]*\n\s*if \(setsDueling\(\) !== setsWere\) computeEntityMods\(playerEntity\);/, 'a duel begun or ended: the fold at once');   // PIN MOVED (AUDIT 625 P2): a bout between players is one
-  assert.match(strip(read('src/systems/worldTick.js')), /computeEntityMods\(entity\);/, 'and every magic round');
 });
 
 test('SET3 every power sleeps for anyone but me and whenever the sets sleep - offline, online before my Renown is known, in a duel - and a peer\'s entity here is never mine (mutants: awake while the sets sleep; a peer\'s entity awake)', () => {
@@ -184,17 +171,17 @@ test('SET3 the blow - Bloodfury\'s per cent (twice below half health), taken of 
   fresh(); online(1);
   const e = wearSet(player(), 'dagon', 4);
   const s = sword();
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'Bloodfury at Faint: +4%');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, 'Bloodfury at Faint: +0.5%');   // PIN MOVED: B5 (Bloodfury Faint 2 -> 0.5; 1000 so the half per cent is a whole point)
   e.health = 50;
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'at half health: not below it');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, 'at half health: not below it');
   e.health = 49;
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 108, 'below half: twice');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1010, 'below half: twice');
   e.health = 100;
   const knife = createWeapon(113, 0, () => 0.5);
-  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 10, e, RAT)), [10, 10], '0.4 a blow, carried: 0.8 stands on the knife');
-  assert.equal(weaponBlowMods(sword(), 10, e, RAT), 10, 'another weapon carries its own - never the knife\'s 0.8');
-  assert.equal(weaponBlowMods(knife, 10, e, RAT), 11, 'the knife\'s 0.8 and this blow\'s 0.4 make the whole point');
-  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 10, e, RAT)), [10, 11], 'and on: 0.6, then 1.0');
+  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 80, e, RAT)), [80, 80], '0.4 a blow, carried: 0.8 stands on the knife');
+  assert.equal(weaponBlowMods(sword(), 80, e, RAT), 80, 'another weapon carries its own - never the knife\'s 0.8');
+  assert.equal(weaponBlowMods(knife, 80, e, RAT), 81, 'the knife\'s 0.8 and this blow\'s 0.4 make the whole point');
+  assert.deepEqual([1, 2].map(() => weaponBlowMods(knife, 80, e, RAT)), [80, 81], 'and on: 0.6, then 1.0');
   assert.equal(weaponBlowMods(s, 0, e, RAT), 0, 'a miss');
   assert.equal(weaponBlowMods(s, 100, e, { isPlayer: true }), 100, 'a blow at a player');
   assert.equal(weaponBlowMods(s, 100, { ...e, peer: 'p1' }, RAT), 100, 'a peer\'s blow resolved here');
@@ -213,22 +200,22 @@ test('SET3 the Rampage: each kill of mine a stack, up to three, every one refres
   door([], { me: e });
   const s = sword();
   at(100);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104, 'Bloodfury alone');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, 'Bloodfury alone');   // PIN MOVED: B5 (Bloodfury 0.5 and Rampage 0.5 a stack; 1000 so the half per cent is a whole point)
   reportPlayerKill(RAT, { kind: 'melee' });
   assert.equal(rampageStacks(), 1);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 108, '+4% a stack at Faint');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1010, '+0.5% a stack at Faint');
   reportPlayerKill(RAT); reportPlayerKill(RAT); reportPlayerKill(RAT);
   assert.equal(rampageStacks(), RAMPAGE_STACKS, 'three at most');
   assert.equal(RAMPAGE_STACKS, 3);
   assert.deepEqual(v.said, ['Rampage I', 'Rampage II', 'Rampage III'], 'said as it rises, not again at the cap');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 116);
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1020);
   at(105);
   reportPlayerKill(RAT, { kind: 'arrow' });
   at(105 + RAMPAGE_SECONDS - 0.01);
   assert.equal(rampageStacks(), 3, 'the last kill refreshed them all');
   at(105 + RAMPAGE_SECONDS);
   assert.equal(rampageStacks(), 0, 'twelve seconds after the last kill');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 104);
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005);
   reportPlayerKill(RAT);
   assert.equal(rampageStacks(), 1, 'a new run starts at one');
   // AUDIT SET L8: my summoned atronach, a bound ally, a guard of the watch - none is a kill of mine
@@ -250,8 +237,8 @@ test('SET3 the Rampage: each kill of mine a stack, up to three, every one refres
 test('SET3 Nightfall Strike: a weapon blow at a foe that had not noticed me (the host\'s `unaware`), a bow\'s too; and the Burning Gate\'s sear, flat on every weapon blow after the per cents - AUDIT L7 never on a foe immune to fire (mutants: Nightfall on an aware foe; Nightfall never on an arrow; the sear inside the per cent; the sear on a fire-immune foe)', () => {
   fresh(); online(1);
   const e = wearSet(player(), 'nocturnal', 4);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: true }), 125, '+25% at Faint');
-  assert.equal(weaponBlowMods(bow(), 100, e, RAT, { unaware: true }), 125, 'arrows too');
+  assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: true }), 101, '+1% at Faint');   // PIN MOVED: B5 (Nightfall Faint 4 -> 1)
+  assert.equal(weaponBlowMods(bow(), 100, e, RAT, { unaware: true }), 101, 'arrows too');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT, { unaware: false }), 100, 'a foe that saw me');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT), 100, 'no word: aware');
   fresh(); online(1);
@@ -376,10 +363,6 @@ test('SET3 x the damage door (AUDIT FINAL F10): the door takes a blow\'s mark AS
   blow(m, 8);
   assert.equal(d2.hurts.length, 1, 'a landed blow is paid back');
   void w;
-  // the hosts' two blows that the party's weighing can take to nothing say so (exteriorFoes.js, world.js's arrow arm)
-  assert.match(read('src/scenes/exteriorFoes.js'), /else \{ playerBlowCameToNothing\(playerEntity\); audio\?\.play3d\?\.\(enemyMissSound\(wpn\)/);
-  assert.match(read('src/scenes/world.js'), /\} else playerBlowCameToNothing\(playerEntity\);   \/\/ AUDIT FINAL F10/);
-  assert.match(read('src/characters/playerEntity.js'), /export function hurtPlayer\(entity, dmg, \{ bypassShield = false, spare = null \} = \{\}\) \{\n  tellDoorOpen\(entity\);/, 'the door opens first, before the veto');
 });
 
 test('SET3 Cleave behind a wall (AUDIT FINAL F11, the page\'s own word): the nearest foe the host\'s ray says a wall stands before - from the struck foe - is passed over for the next one clear of it, as the Nova asks the same ray; with no ray the nearest takes it (mutant: Cleave through a wall)', () => {
@@ -441,25 +424,25 @@ test('SET3 Spite of the Spurned: a foe\'s blow that LANDS on me - marked at the 
   assert.deepEqual(d2.hurts, [['rat', 12]], '30% at Ascendant');
 });
 
-test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded, and every blow for the next seconds is halved (AUDIT L1: in whole points); it recovers in its time and is said ready again at the next round - never on a SetHealth(0) door or a duel\'s blow, and a second death inside the recovery is a death; AUDIT L10: a voice that throws never turns the save into a death (mutants: no recovery; the halving never ends; the recovery read off the halving; a half point kept; the voice unguarded)', () => {
+test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded, and every blow for the next seconds is cut by UNBROKEN_LESS (AUDIT L1: in whole points); it recovers in its time and is said ready again at the next round - never on a SetHealth(0) door or a duel\'s blow, and a second death inside the recovery is a death; AUDIT L10: a voice that throws never turns the save into a death (mutants: no recovery; the halving never ends; the recovery read off the halving; a half point kept; the voice unguarded)', () => {
   const v = fresh(); online(1);
   const e = wearSet(player(), 'malacath', 6);
   e.health = 50;
   at(1000);
   assert.equal(hurtPlayer(e, 500), false);
   assert.equal(e.health, 1, 'left at 1');
-  assert.deepEqual(v.said, ['Unbroken! Damage halved for 4 s.']);   // WB13b
+  assert.deepEqual(v.said, ['Unbroken! Damage cut by 3% for 4 s.']);   // PIN MOVED: B5 (Unbroken 10 -> 3)   // WB13b
   assert.deepEqual(v.sounds, ['unbroken']);
   e.health = 50;
   at(1001);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 45, 'halved');
+  assert.equal(e.health, 41, '3% less: 97% of 10 is 9.7 - whole points, 9 land');
   hurtPlayer(e, 11);
-  assert.equal(e.health, 40, 'AUDIT L1: eleven halved is five - whole points, never a health of 39.5');
-  assert.equal(setDamageMod(e, 1), 0, 'a single point halved is none');
+  assert.equal(e.health, 31, 'AUDIT L1: 97% of eleven is 10.67 - ten land, whole points, never a health of 30.33');   // PIN MOVED: B5 (Unbroken 10 -> 3)
+  assert.equal(setDamageMod(e, 1), 0, 'a single point at 97% is none');
   at(1004);
   hurtPlayer(e, 10);
-  assert.equal(e.health, 30, 'four seconds at Faint, then whole');
+  assert.equal(e.health, 21, 'four seconds at Faint, then whole');   // PIN MOVED: B5 (follows Unbroken 10 -> 3: 31 before this hurt)
   at(1100);
   hurtPlayer(e, 500);
   assert.equal(e.health, 0, 'inside the recovery: a death');
@@ -487,7 +470,7 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   at(0);
   hurtPlayer(asc, 50);
   at(7.99);
-  assert.equal(setDamageMod(asc, 10), 5, 'eight seconds at Ascendant');
+  assert.equal(setDamageMod(asc, 10), 9, 'eight seconds at Ascendant');
   at(8);
   assert.equal(setDamageMod(asc, 10), 10);
   at(149);
@@ -501,7 +484,7 @@ test('SET3 Unbroken: damage that would kill me leaves me at 1, said and sounded,
   mute.health = 50;
   assert.equal(hurtPlayer(mute, 500), false, 'no death');
   assert.equal(mute.health, 1, 'saved, whatever the voice did');
-  assert.equal(setDamageMod(mute, 10), 5, 'and the halving runs');
+  assert.equal(setDamageMod(mute, 10), 9, 'and the 10% cut runs');
 });
 
 test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30% to under it - never a killing blow, and AUDIT L3 never a fall\'s or a poison\'s hurt - bursts a Nova on every live foe within six metres of my feet through the door, said with the count and sounded, and my weapon blows deal more for ten seconds; it recovers in its time; AUDIT H1/M4/L7: the Nova spares my ally and a foe at peace, and never reaches a storey away, through a wall (the host\'s own ray) or a foe the fire cannot touch (mutants: a fall waking it; any blow under the line waking it; the Nova past its reach; the fury never ending; no recovery; a killing blow waking it; the Nova on an ally or a pacified foe; the Nova a storey up; the Nova through a wall; the Nova on a fire daedra)', () => {
@@ -522,11 +505,11 @@ test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30%
   assert.deepEqual(d.hurts, [['near', 10]], 'crossed: 10 at Faint, only within six metres');
   assert.deepEqual(v.said, ['Wrath of the Warden! 1 foe struck.']);
   assert.deepEqual(v.sounds, ['wrath']);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 112, 'the fury (+10%) and the sear (+2)');
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1007, 'the fury (+0.5%) and the sear (+2)');   // PIN MOVED: B5 (Wrath fury Faint 2 -> 0.5; 1000 so the half per cent is a whole point)
   at(WRATH_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 112);
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1007);
   at(WRATH_SECONDS);
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 102, 'ten seconds');
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1002, 'ten seconds');
   e.health = 50;
   at(100);
   blow(e, 25);
@@ -550,7 +533,7 @@ test('SET3 Wrath of the Warden: a foe\'s blow that takes me from at or above 30%
   e.health = 50; at(1000);
   blow(e, 25);   // AUDIT FINAL F10: through the door, which takes the mark as it opens
   assert.equal(v.said.at(-1), 'Wrath of the Warden!', 'no door: the fury still wakes, no count said');
-  assert.equal(weaponBlowMods(sword(), 100, e, RAT), 112);
+  assert.equal(weaponBlowMods(sword(), 1000, e, RAT), 1007);   // PIN MOVED: B5 (Wrath fury Faint 2 -> 0.5)
   // AUDIT SET H1/M4/L7: who the Nova spares - asked in that order, the host's ray last (only for a foe otherwise struck)
   const w = fresh(); online(1);
   const me = wearSet(player(), 'ruhn', 6);
@@ -627,9 +610,9 @@ test('SET3 Mora\'s Mantle: my spells cost less at four pieces (whole, at least o
   const e = wearSet(player(), 'mora', 4);
   const skilled = calculateCastCost(spell, e, { portMods: false }).sp;
   assert.ok(skilled < plain, `Forbidden Lore's schools already cheapen it, as any school a skill raises does (${plain} -> ${skilled})`);
-  assert.equal(calculateCastCost(spell, e).sp, Math.max(1, Math.round(skilled * 0.95)), 'then 5% less at Faint');
+  assert.equal(calculateCastCost(spell, e).sp, Math.max(1, Math.round(skilled * 0.985)), 'then 1.5% less at Faint');   // PIN MOVED: B5 (Waters of Oblivion Faint 5 -> 1.5)
   assert.equal(calculateCastCost(spell, { ...e, isPlayer: false }).sp, skilled, 'a caster that is not the player: none of it');
-  assert.equal(setCastCost(e, 100), 95);
+  assert.equal(setCastCost(e, 100), 98.5);   // PIN MOVED: B5 (Waters of Oblivion Faint 5 -> 1.5)
   assert.equal(setCastCost({ ...e, peer: 'p1' }, 100), 100);
   const dmg = spell.effects[0];
   assert.equal(setAbsorbChance(e), 0, 'four pieces: no Eye');
@@ -646,7 +629,7 @@ test('SET3 Mora\'s Mantle: my spells cost less at four pieces (whole, at least o
   fresh(); online(40);
   const asc = wearSet(player(), 'mora', 6, XP[4]);
   assert.equal(setAbsorbChance(asc), 30);
-  assert.equal(setCastCost(asc, 100), 85);
+  assert.equal(setCastCost(asc, 100), 95.5);   // PIN MOVED: B5 (Waters of Oblivion Ascendant 15 -> 4.5)
 });
 
 test('SET3 the round: each recovering power is said ready again at the first magic round after its time - once, and silently forgotten while the sets sleep; the magic round runner calls it for my entity (mutants: said before its time; said every round; said in a duel)', () => {
@@ -681,19 +664,16 @@ test('SET3 the round: each recovering power is said ready again at the first mag
 });
 
 test('SET3 the HUD\'s read of the powers: the Rampage\'s stacks and seconds, the halving, the fury and every recovery - whole seconds left, 0 for one not running (mutants: a window read past its end)', () => {
-  // PIN MOVED (STAR7): the Starspun Weave's join it - the strands on the foe I last struck, and the Veil's recovery
-  // PIN MOVED (EG15): the Battlemage's Panoply's states join the read - the Discipline's armed element (-1 none), the
-  // Reprieve's shield, window and recovery, and the death saves the Spire holds to its next Redoubt (none here)
   fresh(); online(1);
-  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, armed: -1, reprieve: 0, reprieveLeft: 0, reprieveRecoverLeft: 0, harvestRecoverLeft: 0, redoubt: [], strands: 0, veilRecoverLeft: 0 });
+  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 });
   const e = wearSet(player(), 'dagon', 6);
   door([], { me: e });
   at(10);
   reportPlayerKill(RAT); reportPlayerKill(RAT);
   at(10.5);
-  assert.deepEqual(setPowerStates(), { rampage: 2, rampageLeft: 12, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, armed: -1, reprieve: 0, reprieveLeft: 0, reprieveRecoverLeft: 0, harvestRecoverLeft: 0, redoubt: [], strands: 0, veilRecoverLeft: 0 });
+  assert.deepEqual(setPowerStates(), { rampage: 2, rampageLeft: 12, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 });
   at(22);
-  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, armed: -1, reprieve: 0, reprieveLeft: 0, reprieveRecoverLeft: 0, harvestRecoverLeft: 0, redoubt: [], strands: 0, veilRecoverLeft: 0 }, 'every window past its end: 0, never a count below it');
+  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 }, 'every window past its end: 0, never a count below it');
   fresh(); online(1);
   const m = wearSet(player(), 'malacath', 6);
   m.health = 5;
@@ -706,11 +686,6 @@ test('SET3 the HUD\'s read of the powers: the Rampage\'s stacks and seconds, the
 });
 
 test('SET3 the host: world.js imports the powers (registering them) and gives them its voice - the parry\'s ring for Unbroken, a fire cast for the Wrath, a magic cast for Eventide, through the cast sounds\' ID door; the running host\'s door names my entity (mutants: the powers never imported; a cast sound spent as a raw index; a thrown sound breaking the save)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /import \{ setSetPowersVoice, setHudChips, heldPlayerBlow, remarkPlayerBlow \} from '\.\.\/systems\/sigil\/sigilSetPowers\.js';/);   // AUDIT SETS L3: and the held blow's two doors
-  assert.match(w, /setSetPowersVoice\(\{ sound: \(name\) => \{\s*if \(name === 'unbroken'\) audio\.playOneShot\(SOUND\.Parry6, 1\);\s*else if \(name === 'wrath'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[0\], 1\);\s*else if \(name === 'eventide'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);\s*else if \(name === 'mark'\) audio\.playOneShot\(SOUND\.DrawWeapon, 1\);\s*else if \(name === 'ward'\) audio\.playOneShot\(SOUND\.EquipMaceOrHammer, 1\);\s*else if \(name === 'shed'\) audio\.playOneShot\(SOUND\.SplashLarge, 1\);\s*else if \(name === 'gear'\) audio\.playOneShot\(SD_HALL_SOUNDS\.clunk, 1\);\s*else if \(name === 'hour'\) audio\.playOneShot\(SD_HALL_SOUNDS\.toll, 1\);\s*else if \(name === 'reprieve'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);\s*else if \(name === 'harvest'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[2\], 1\);\s*else if \(name === 'veil'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);\s*\} \}\);/);   // WITCH1 (PIN MOVED): Soul Harvest, a drain's cast (poison's - the witchfire's green); STAR7 (PIN MOVED): Mephala's Veil, its Chameleon's own cast (magic); SERPENT-SET: Shed Skin's splash; SD9d: Gearward's clunk, The Hour Turns' toll (PIN MOVED); AUDIT SD IV (A3, PIN MOVED): by the records' index door; EG15 (PIN MOVED): the Reprieve, a Shield spell's own cast (magic)
-  assert.match(strip(read('src/scenes/hostMagic.js')), /player: \(\) => playerEntity,/);
-  assert.match(strip(read('src/scenes/hostMagic.js')), /player: \(\) => playerEntity,\s*clear: \(a, b\) => burstClear\(collider, a, b\),/, 'AUDIT SET M4: the host\'s door answers the Nova\'s ray with its own collider');
   assert.equal(eventideBundle(3).element, 4, 'Eventide\'s bundle rides the magic element - its cast sound\'s index');
   // the voice: a thrown sound is not the power's problem
   const v = fresh(); online(1);

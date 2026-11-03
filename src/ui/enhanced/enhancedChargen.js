@@ -168,7 +168,7 @@ function mapPane() {
     }
     frame.append(path);
   }
-  // UI-CALM (2026-10-14, a player: "letters overlapping ... the highlighting of words is bad"): THE NAMES ARE THE PAGE'S
+  // UI-CALM: THE NAMES ARE THE PAGE'S
   // OWN WORDS, NOT THE MAP'S. Said in map units inside the SVG, a name was as tall as the dress's type made it - DFO
   // Grimoire's face stands only at its whole sizes (16, 32, 48), so a 6-unit label became a 16-unit one, three times the
   // map's own scale, and High Rock ran into Hammerfell and Valenwood into Elsweyr. Each name is now a small plate laid
@@ -461,7 +461,7 @@ function classQuestionsStage() {
 // clickClassRow is still what a tap calls, double-tap included, so the
 // classic gesture keeps working for anyone who uses it.
 /**
- * UI-CALM (2026-10-14, a player: "Character selection and creation look like placeholders made of text and buttons"):
+ * UI-CALM:
  * THE CLASS IS SHOWN BEFORE IT IS READ ABOUT. Each row says, under its name, the two attributes the class leans on; the
  * list stands in Daggerfall's three ways - its manual's mages, thieves and warriors - each under its own head; and the
  * card beside it is the class's own profile before a word of TEXT.RSC is asked for: its eight attributes as bars, its
@@ -599,10 +599,7 @@ function classStage() {
 // and presses the same applyHit doors the classic screen's rects do.
 //
 // THE REPUTATION WINDOW (CreateCharReputationWindow) IS DRAWN NOW -
-// CC-REP (2026-09-16, Ember on the Discord: "Class creation menu seems
-// to be missing a reputation setting. By default in DFU when making a
-// class you can select how it affects your reputation with various
-// factions"). AUDIT 39 recorded it as the one classic window this view
+// CC-REP. AUDIT 39 recorded it as the one classic window this view
 // did not draw: its only door was `repClick(lx, ly)`, a pixel hit on a
 // 168x189 panel, and this view wanted a control shaped for a thumb.
 // The flow has that door now (`repStep`, customClass.js - the same
@@ -890,7 +887,7 @@ function attrHelp(key) {
 }
 
 // ── UXB1-I: THE DIFFICULTY DAGGER ────────────────────────────────
-// (2026-09-25, the UX backlog: "Restore the difficulty dagger or some other similar visual indicator".) The classic
+// The classic
 // builder slides CUST08I0's dagger up its gauge as the class grows stronger (UpdateDifficulty :500-511); this view
 // showed one bare number. The gauge is DFU's track laid on its side: the dagger stands where daggerY puts it
 // (customClass.js daggerFraction - the same lopsided scale), the band between the two limits is the one Create
@@ -938,7 +935,7 @@ function daggerGlyph() {
 }
 
 // ── UXB1-H: THE CLASS, TO A FILE AND BACK ────────────────────────
-// (2026-09-25, the UX backlog: "Export/Import class from file/clipboard.") The document and every law it is read
+// The document and every law it is read
 // back through are systems/customClass.js's (customClassDoc / parseCustomClassDoc); the flow's one door loads it
 // (ChargenFlow.customImport). This is only the card: the clipboard and a file each way, and a box to paste into
 // where a browser will not let the page read the clipboard.
@@ -1229,8 +1226,7 @@ function statsStage() {
   const pane = el('div', 'stagebody stacked');   // FIELD 2026-09-27: one scrolling column on a phone (enhancedStyle.js)
 
   const list = el('div', 'list');
-  // CHAR1 (2026-09-15, a player through Mac: "show the total dice rolls
-  // in the enhanced character creator"): the roll said out loud. The
+  // CHAR1: the roll said out loud. The
   // eight values and the bonus pool are both rolled, and nothing on
   // either screen ever added them up - so "is this a good roll?" was
   // eight numbers of mental arithmetic before every press of Roll

@@ -1,11 +1,11 @@
 // @ts-check
-// RAID5 (2026-10-25, bible/03-World/Raiding-Parties.md RAID5): A RAIDED TOWN'S PLACES AND PEOPLE - the world host's half
+// RAID5: A RAIDED TOWN'S PLACES AND PEOPLE - the world host's half
 // of the raid's kinds (systems/raidKinds.js, run by systems/raidingParties.js): the town's square (where the Standard is
 // held and the refugees are bound), the way the refugees walk to it (the town's own walk grid - systems/livingWorld/
 // townPaths.js findTownPath, the same cells every client walks), the Standard-Bearer (one of the town's watch, minted
 // at the square - scenes/cityGuards.js standBearer) and a refugee (a townsperson of the street's pool, the player's ally,
 // walking behind the way's guide - characters/enemy/enemyMotor.js `follow`). A module the host wires (HOST-SPLIT,
-// bible/01-Overview/Host-Split.md): the host hands its own doors, as they are, and keeps none of this.
+// ): the host hands its own doors, as they are, and keeps none of this.
 //
 // THE FOUR HOSTS (THE FOUR HOSTS RULE, Home.md): scenes/world.js WIRED - the one host with the Bay's towns, their walk
 // grids and the town watch.

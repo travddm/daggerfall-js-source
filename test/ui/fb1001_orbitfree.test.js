@@ -2,9 +2,9 @@
 // on one axis (X or Y) at a time. The rotation should work for both vertical and horizontal simultaneously."
 //
 // ORBIT-FREE. The held map's solid dungeon sheet is turned by a right-drag (or Shift + left) on the stage
-// (ui/heldMap.js). TURN-STEADY (Mac: "its a bit hard to control") let the first 8 px of a drag pick its axis for the
+// (ui/heldMap.js). TURN-STEADY let the first 8 px of a drag pick its axis for the
 // WHOLE drag - mostly across a turn only, mostly up and down a tilt only - so one that set off sideways never tilted
-// however far it then went down, and the reverse. Asked, Mac: "Unlock on intent". A locked drag keeps what it holds
+// however far it then went down, and the reverse. Asked,. A locked drag keeps what it holds
 // back the other way, less its drift; past 24 px of it the drag turns AND tilts, every move, to its release - and a
 // hand's drift along a turn still never tilts it.
 import { test } from 'node:test';

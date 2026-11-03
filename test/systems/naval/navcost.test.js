@@ -1,5 +1,4 @@
-// NAV-COST (2026-10-12, an allocation profile of a player's live client walking the coast: the sea's captains were
-// 12% of the main thread and some 29% of what it allocated; bible/07-Rendering/Performance-Priority.md NAV-COST) - THE
+// NAV-COST - THE
 // SAME ANSWERS FOR LESS. A captain asks her sight before she asks whether a ship is her enemy, or whether it would
 // take her (`hostile` sizes a quarry up) - never of a ship past it; and the hulls kept apart are measured only where
 // they could touch: past twice their reaches hullOverlap answers null, and two that do stand in each other are still

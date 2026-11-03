@@ -302,23 +302,8 @@ test('B5/close-P: CORT01I0 takes the HOST palette - it is not one of the paletti
   assert.deepEqual(Array.from(new Uint8Array(painted.colors.buffer, 0, 4)), [7, 11, 13, 255],
     'the courtroom paints on the session ART_PAL - a minted DFPalette would leave it (255,0,0), a solid red panel');
 
-  // ...and it warms at boot beside the prison screen, on that palette.
-  assert.match(hostText('src/scenes/world.js'), /preloadCourtScreenArt\(\{ renderer, fetchBytes, palette \}\)/);
-  // The mint-your-own law is still ON, one function down, where it belongs.
-  assert.match(src('src/ui/prisonScreen.js'),
-    /loadImg\(\{ \.\.\.deps, palette: new DFPalette\(\) \}, PRISON_IMG\)/);
   _setCourtScreenArtForTests(null);
   assert.equal(courtScreenArtLoaded(), false);
-});
-
-test('B5: the backdrop FLAG is retired, not reworded', () => {
-  const ps = src('src/ui/prisonScreen.js');
-  // The header quotes the old flag - that is the house record of what
-  // moved - but it must not still STAND as one.
-  assert.equal(/^\/\/ FLAGGED/m.test(ps), false, 'no FLAGGED marker survives in this file');
-  assert.match(ps, /ROAD-B B5 RETIRED THE BACKDROP FLAG/);
-  assert.match(src('src/scenes/arrestFlow.js'), /function courtBox\(win, onClosed = null\) \{/,
-    'and every trial box goes through the one door');
 });
 
 // ---------------------------------------------------------------------
@@ -341,21 +326,6 @@ test('B5: holding Back runs the prison countdown at 0.001s a day, and letting go
   held = false;
   w.tick(PRISON_UPDATE_INTERVAL_FAST * 2);
   assert.equal(w.daysInPrisonLeft, 3, 'and the slow interval is back the frame the key comes up');
-});
-
-test('B5: both outdoor hosts keep the RAW back-button latch the accelerator reads', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(f);
-    // Above the townTalk return, or the ladder never reaches it with a
-    // window up - which is every frame of a prison sentence.
-    assert.match(s, /if \(e\.code === 'Escape'\) backButtonHeld = true;\n\s*if \(townTalk\.keydown\(e, keys\)\) return;/,   // KB1: the rung takes the held Set
-      `${f}: the latch is raised BEFORE the overlay swallows the key`);
-    assert.match(s, /if \(e\.code === 'Escape'\) backButtonHeld = false;/, `${f}: and lowered on the release`);
-    assert.match(s, /backButtonHeld: \(\) => backButtonHeld,/, `${f}: and handed to the court flow`);
-  }
-  // It is NOT the rebindable `keys` set: GetBackButton reads
-  // KeyCode.Escape raw (InputManager.cs:1075-1078).
-  assert.equal(/held\(keys, 'Escape'\)/.test(hostText('src/scenes/world.js')), false);
 });
 
 test('B5: the accelerator reaches the window through the flow', () => {

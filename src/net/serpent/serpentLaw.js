@@ -1,8 +1,6 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "A new world event that requires players with a ship to meet up and take on a large scale
-// sea serpent in the ocean", then "You make the decisions and online only. I trust your instinct. Be as detailed as
-// possible and make this something truly special"): THE SERPENT'S LAW - when Sethrakul rises, which of the world's lanes
-// it rises on, and the words every client says of it. Design: bible/11-Multiplayer/Sea-Serpent.md.
+// SERPENT1: THE SERPENT'S LAW - when Sethrakul rises, which of the world's lanes
+// it rises on, and the words every client says of it. Design:.
 //
 // A FUNCTION OF THE CLOCK, AND NOTHING ELSE - the gate's law (net/gate/gateLaw.js), on the same event clock (WORLD5's
 // shared clock, TimeScale 12: a game day every two real hours). A serpent rises every SERPENT_EVERY_DAYS game days at
@@ -11,7 +9,7 @@
 // the relay compute the same instants with nothing sent.
 //
 // WHERE IS THE CLIENT'S (systems/serpent/serpentSite.js): the lane is rolled here over the world's packet lanes (WW7-12,
-// bible/03-World/World-Wide.md: scenes/naval/worldLanes.js `all` - the Bay's, the ones past it and across its edge, the
+// scenes/naval/worldLanes.js `all` - the Bay's, the ones past it and across its edge, the
 // same list on every game that stands the land past the Bay; a game that does not takes the hub's word of the site the
 // accounts agree on, net/serpent/serpentHerald.js serpentAtWord), the spot along its way by the rolls below. The relay
 // never reads a map file; the fight lives in the cell room the site stands in (net/serpent/serpentBrain.js,
@@ -29,8 +27,7 @@ export const SERPENT_DAY_MINUTES = 1440;
 /** The serpent's day, as the game's clock says it: sighted at 02:00, risen at 05:00, the storm breaking over its waters
  *  at 08:00, sounding at 10:00. On the event clock that is the omen fifteen real minutes before it rises and twenty-five
  *  minutes of fight at most. The gate's day is 17:00 to midnight - the serpent's sounding is seven game hours (35 real
- *  minutes) clear of the gate's omen. SERPENT4 (2026-10-11, the players: "The fact they block ships getting in after a
- *  while is stupid"): the storm closes nothing - its waters stand open to every ship until it dives (serpentAdmits). */
+ *  minutes) clear of the gate's omen. SERPENT4: the storm closes nothing - its waters stand open to every ship until it dives (serpentAdmits). */
 export const SERPENT_OMEN_MINUTE = 2 * 60;
 export const SERPENT_RISE_MINUTE = 5 * 60;
 export const SERPENT_SEAL_MINUTE = 8 * 60;
@@ -110,7 +107,7 @@ export function serpentPhase(t, nowMs, fellAt = null) {
 export const serpentSwims = (phase) => phase === 'rising' || phase === 'hunt' || phase === 'late' || phase === 'slain' || phase === 'sounding';
 /** Does the map mark its waters in this phase (from the sighting until it is gone)? */
 export const serpentMarked = (phase) => phase !== 'quiet' && phase !== 'gone';
-/** May a player join the fight now - from the rising until it dives? SERPENT4 (2026-10-11): a ship sailing in late joins
+/** May a player join the fight now - from the rising until it dives? SERPENT4: a ship sailing in late joins
  *  as any other (the late ship's law: her share at the fraction it stands at - serpentBrain.js joinSerpentFight); the
  *  storm at SERPENT_SEAL_MINUTE closed its waters to her, and to a friend who sailed out to help. */
 export const serpentAdmits = (day, nowMs) => { const t = serpentTimes(day); return isSerpentDay(day) && nowMs >= t.riseAt && nowMs < t.soundAt; };

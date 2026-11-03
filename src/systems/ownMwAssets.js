@@ -1,15 +1,12 @@
 // THE PORT'S OWN MORROWIND ASSETS, shipped with the build.
 //
-// FIELD-GUN-MW2 (2026-09-20). The Dwarven Thunderlock is the port's own
-// weapon and Morrowind has no firearm, so its model cannot come out of
-// a player's archives - it has to come from here. What ships is a real
-// Morrowind 4.0.0.2 NIF and a real DDS, baked from Mac's Blender export
-// by `tools/fbxMesh.mjs` -> `tools/meshUnwrap.mjs` ->
-// `tools/meshTexture.mjs` / `tools/nifWrite.mjs`, so the Morrowind lane
+// A piece Morrowind does not have (the port's own armour) cannot come out
+// of a player's archives - it has to come from here. What ships is a real
+// Morrowind 4.0.0.2 NIF and a real DDS, baked by the tools/bake*.mjs
+// scripts (tools/nifWrite.mjs writes the NIF), so the Morrowind lane
 // reads them through exactly the doors it reads everything else
 // through: `parseNif`, `flattenNif`, `correctTexturePath`,
-// `decodeTextureImage`. Nothing in `src/` knows these two files are
-// special.
+// `decodeTextureImage`. Nothing in `src/` knows these files are special.
 //
 // ═══ THE MOUNT POINT IS THE WHOLE DESIGN ══════════════════════════
 //
@@ -18,8 +15,8 @@
 // vendored scabbards, then every .bsa. This sits in that same list, and
 // its rank says two things on purpose:
 //
-//   AFTER the loose files, so a player who drops their own
-//   `meshes/thunderlock.nif` into the store REPLACES ours, exactly as
+//   AFTER the loose files, so a player who drops their own copy of one
+//   of these meshes into the store REPLACES ours, exactly as
 //   they can replace a scabbard or a retail mesh. Mac painting a
 //   texture is this case: his file wins without a rebuild.
 //
@@ -46,7 +43,7 @@ const FILES = IN_BROWSER
   : {};
 
 /**
- * `../assets/mw/meshes/thunderlock.nif` -> `meshes/thunderlock.nif`.
+ * `../assets/mw/meshes/brigandine_ebony.nif` -> `meshes/brigandine_ebony.nif`.
  *
  * The tree under `src/assets/mw/` IS a Data Files tree - `meshes/`,
  * `textures/` - so the canonical path is simply everything after it,

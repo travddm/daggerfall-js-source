@@ -1,7 +1,7 @@
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"): THE FAITHFUL'S RITE ON THE RELAY - the circle's cell keeps who
+// WB12d: THE FAITHFUL'S RITE ON THE RELAY - the circle's cell keeps who
 // struck the faithful and tells the hub when the Summoner falls; the hub says the broken rite to everyone online, at
 // every hello and to the channel; the breach's room asks it for the day's helpers at the kill - a fighter's receipt
-// carries `r`, one who broke it alone is minted a receipt of the rite alone (bible/11-Multiplayer/World-Bosses.md
+// carries `r`, one who broke it alone is minted a receipt of the rite alone (
 // section 19 D). AUDIT WB12d: each circle kept on its own at the cell and the hub, the hub standing by the gate's agreed
 // site; one tell in flight, its retry armed before it goes and let go when the breach collapses; one fall at a time,
 // the helpers asked ahead of it; a deeper bucket than the client's, and a word in the rite's last moment still heard.
@@ -318,7 +318,6 @@ test('WB12d relay: the kill asks the hub for the day\'s helpers - a fighter who 
     assert.ok(['dealt', 'stood'].includes(mine(fighters[0]).x));
     assert.equal('r' in mine(fighters[1]), false, 'fought, never at the circle: none');
     const hub = world.room(SOCIAL_ROOM);
-    // PIN MOVED (GATE-COURTS, net/gate/gateCourts.js riteOnly): the rite's own receipt is the night's book's, minted once every
     // court is done - here, at the seal (a court still fighting could yet give its helper a receipt of its own)
     await tick(2);
     assert.equal(hub.store.get(gateReceiptKey('acct-peer-0003')), undefined, 'not at the kill');

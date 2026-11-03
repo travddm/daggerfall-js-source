@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-5 (2026-10-14) - THE UV EDITOR'S GEOMETRY: A MESH AS ITS FACES' CORNERS, ITS SEAMS AND ITS ISLANDS.
+// POI-5 - THE UV EDITOR'S GEOMETRY: A MESH AS ITS FACES' CORNERS, ITS SEAMS AND ITS ISLANDS.
 //
-// Mac: "the ability to import models, texture, UV map"; asked what "UV map" covers: "Full UV editor" - select vertices,
-// edges, faces and islands; move, rotate, scale; seams; unwrap; pack (bible/06-Systems/POI-Editor-Arc.md POI-5).
+// asked what "UV map" covers: "Full UV editor" - select vertices,
+// edges, faces and islands; move, rotate, scale; seams; unwrap; pack (POI-5).
 // Pure - no DOM, no GL - so the editor's UV panel (ui/poi/poiUvPanel.js) and the tests read a mesh the same way:
 //
 //   - THE SESSION (`uvSessionOf`): a POI mesh (poi/poiMesh.js) as its triangles, each CORNER with a UV of its own, and

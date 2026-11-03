@@ -1,5 +1,4 @@
-// LIGHT-ID (2026-10-14, Mac: "Engine fix (Recommended)" - FIELD BUGS 2026-10-13e AOE-PERF's follow-up, the gate boss's
-// lights): A LIGHT IS SOMEBODY'S LIGHT. bible/07-Rendering/Enhanced-Lighting-Arc.md LIGHT-ID.
+// LIGHT-ID: A LIGHT IS SOMEBODY'S LIGHT. LIGHT-ID.
 //
 // Pinned: THE ONE CONSTRUCTION SEAM - no light is written into a frame's list but through render/lightId.js (the source
 // swept), each composer's list carrying its records' identities, and the pools that refill in order naming each entry

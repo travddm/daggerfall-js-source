@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOOT19 (2026-10-07) — SCRYING.
+// LOOT19 — SCRYING.
 //
-// The Loot arc II (bible/06-Systems/Loot-II-Arc.md section 11; Mac:
+// The Loot arc II (; Mac:
 // "what could we do to make it even more amazing, while also balancing
 // everyrhing?", then "Lets go all in"). The codex says where an unfound
 // Legendary is said to be - among a FAMILY of foes (LOOT6), whose

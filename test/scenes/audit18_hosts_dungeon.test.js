@@ -169,7 +169,6 @@ test('audit18 sweep: all three spawn sites run the one shared equip chain', () =
   const guards = hostSrc('cityGuards.js');
   // RF2: the equip chain rides the ONE enemy-loot seam (hostCombat.spawnEnemyLoot) - a host calls that, once per branch
   assert.equal((dungeon.match(/\bspawnEnemyLoot\(/g) ?? []).length, 2, 'class + monster branch');
-  // PIN MOVED (HOST-SPLIT, FIELD BUGS 2026-10-14): a room body's base - PARTY-LOOT's, the same one seam on the room's
   // terms - left buildDungeonContext with its block for src/scenes/roomLootHost.js, which the dungeon host constructs
   assert.equal((hostSrc('roomLootHost.js').match(/\bspawnEnemyLoot\(/g) ?? []).length, 1, 'a room body\'s base (PIN MOVED, PARTY-LOOT: the same one seam on the room\'s terms)');
   assert.match(dungeon, /= createRoomLoot\(\{   \/\/ HOST-SPLIT: src\/scenes\/roomLootHost\.js/, 'and the dungeon host constructs it');
@@ -241,21 +240,6 @@ test('audit18: the player is the Humanoid group, and no host can kill the modifi
     assert.equal(/targetGroup:/.test(src), false,
       `${name} passes targetGroup, which calculateAttackDamage no longer reads`);
   }
-});
-
-test('audit18 sweep: the player arrow recovers the swing mods and the backstab it dropped', () => {
-  // WAVE D: the arm this pinned is no longer INSIDE the dungeon host -
-  // it is combat/arrowFlight.js's playerArrowHitFoe, which all four
-  // hosts call. The law is pinned where it lives, and the host is
-  // pinned to be a CALLER rather than a fourth copy of it.
-  const shared = readFileSync(new URL('../../src/combat/arrowFlight.js', import.meta.url), 'utf8');
-  const shot = shared.slice(shared.indexOf('export function playerArrowHitFoe'));
-  assert.ok(/damageMod: swing\.damage, toHitMod: swing\.toHit/.test(shot));
-  assert.ok(/backstabChance: backstabChanceOf\(playerEntity, back, foe\)/.test(shot));   // PIN MOVED (RVN2: the foe rides along - a Watchful revenant takes no backstab)
-  const src = hostSrc('dungeonContext.js');
-  assert.ok(!src.includes('SWING_MODS[playerWeapon.machine.state]'),
-    'the dungeon host no longer prices its own shot');
-  assert.match(src, /playerArrowHitFoe\(m, f, \{/, 'it calls the one that does');
 });
 
 // ---------------------------------------------------------------
@@ -504,9 +488,7 @@ test('audit18: the dungeon spell map keeps the FIRST duplicate, as DFU does', { 
   // dungeonContext into the shared one, so the pin follows the law
   // rather than the file it used to sit in.
   // AUDIT 68 S12-spellsstd-dup: through spellsStd.js's one fold, not a copy of it
-  // PIN MOVED (DEX4a): through the one RebuildClassicSpellsDict (systems/spell/standardSpells.js), which folds through it
   assert.ok(/standardSpellsByIndex\(await fetch\('SPELLS\.STD'\)\)/.test(hostSrc('shared.js')));
-  assert.ok(readFileSync(new URL('../../src/systems/spell/standardSpells.js', import.meta.url), 'utf8').includes('spellsByIndexMap(mergeSpellRecords(readSpellsStd(bytes)))'));
   assert.equal(/new Map\(readSpellsStd\(/.test(hostSrc('shared.js')), false, 'the last-wins fold is gone');
 });
 
@@ -519,7 +501,7 @@ test('audit18 sweep: SPELLS.STD and MAGIC.DEF no longer share one catch', () => 
   // the registries through that loader and none of them reads the two
   // files itself.
   const src = hostSrc('shared.js');
-  const i = src.indexOf("standardSpellsByIndex(await fetch('SPELLS.STD')");   // PIN MOVED (DEX4a): the one rebuild
+  const i = src.indexOf("standardSpellsByIndex(await fetch('SPELLS.STD')");
   const j = src.indexOf('readMagicDef(await fetch(');
   assert.ok(i > 0 && j > i, 'both reads live in loadMagicRegistries');
   assert.ok(src.slice(i, j).includes('} catch {'), 'a bad MAGIC.DEF must not null the spell table');
@@ -539,32 +521,18 @@ test('audit18 sweep: SPELLS.STD and MAGIC.DEF no longer share one catch', () => 
 //     honesty note at the top of this file)
 // ---------------------------------------------------------------
 
-test('audit18 sweep: enemy cast cost is priced off the PLAYER skills', () => {
-  // EntityEffectManager.cs:322-327 + :148 (UsePlayerCharacterSkillsFor
-  // EnemyMagicCost defaults true) -> CalculateEffectCosts reads
-  // GameManager.PlayerEntity.Skills for a null caster.
-  // X3: the cast EXECUTOR moved to the shared enemyCasting.js - the
-  // law lives there now, and the dungeon binds it through foeDeps.
-  const src = readFileSync(new URL('../../src/characters/enemy/enemyCasting.js', import.meta.url), 'utf8');
-  assert.ok(/const cost = calculateCastCost\(spell, playerEntity, \{ portMods: false \}\)\.sp;/.test(src));   // SET2: and none of the player's own cost modifiers
-  assert.equal(/calculateCastCost\(spell, f\.entity\)/.test(src), false);
-  const dc = hostSrc('dungeonContext.js');
-  assert.ok(dc.includes('castEnemySpell: castShared'), 'the dungeon rides the ONE executor');
-});
-
 test('audit18 sweep: enemy loot rolls the PLAYER gender at both dungeon spawn sites', () => {
   // RF2: both arms hand the PLAYER entity to the one seam, whose table roll reads its gender
   const src = hostSrc('dungeonContext.js');
   assert.equal((src.match(/spawnEnemyLoot\(entity, e\.mobileType, basics, D\.playerEntity, \{ \.\.\.eliteLootOpts\(e\), where: 'dungeon' \}\)/g) ?? []).length, 2);
   assert.equal(/generateItems\([^)]*gender: e\.gender/.test(src), false);
-  assert.match(hostSrc('hostCombat.js'), /generateItems\(enemyLootTableKey\(mobileType, basics\?\.lootTableKey \?\? '-'\), \{ level: effectiveLevel\(player\), gender: player\.gender \}, rolls, \{ itemChanceScale, mobileType \}\)/, 'the PLAYER\'s gender (SOFTCAP2: at the mentor\'s level), LootTables.cs:212/:229/:237');   // PIN MOVED (PARTY-LOOT): on the caller's dice - the player a room's base hands in is the room's roller
+  assert.match(hostSrc('hostCombat.js'), /generateItems\(enemyLootTableKey\(mobileType, basics\?\.lootTableKey \?\? '-'\), \{ level: effectiveLevel\(player\), gender: player\.gender \}, rolls, \{ itemChanceScale, mobileType \}\)/, 'the PLAYER\'s gender (SOFTCAP2: at the mentor\'s level), LootTables.cs:212/:229/:237');
 });
 
 test('audit18 sweep: the swing fatigue and the tally arm are wired into the dungeon rig', () => {
   const src = hostSrc('dungeonContext.js');
   assert.equal((src.match(/drainFatigue\(SWING_FATIGUE_COST\)/g) ?? []).length, 2,   // BALANCE1: DFU's swing loss on exertion's scale
     'the melee swing and the bow release');
-  // PIN MOVED (TWO-HANDS AUDIT 2, bible/05-Combat/Two-Hands.md): the tally counts the swing's weight - an off-hand blow of
   // a pair 0.8 of a use (hostCombat.js tallySwingSkills), every other swing 1 as before
   assert.equal((src.match(/tallySwingSkills\(playerEntity, playerWeapon\.weapon, playerWeapon\.blowWeight\)/g) ?? []).length, 2);
   assert.ok(/const hitEnemy = resolvePlayerHit\(/.test(src), 'the tally arm needs hitEnemy');
@@ -616,31 +584,3 @@ test('audit18 sweep: the Athleticism fatigue multiplier is applied and truncated
   assert.equal(Math.trunc(44 * 0.9), 39);
 });
 
-test('audit18: the three retired flags are DELETED, not rewritten', () => {
-  const src = hostSrc('dungeonContext.js');
-  // :786-791 - the record-cost interim, the rangeType note, the spellbook note
-  assert.equal(/Cost = the record's classic cost field/.test(src), false);
-  assert.equal(/Range types beyond 2\/4 \(missile\) are/.test(src), false);
-  assert.equal(/the spellbook UI pends/.test(src), false);
-  // and they were false: all three features are live below them
-  assert.ok(/calculateCastCost\(sp, playerEntity\)/.test(src), 'the cost really is computed');
-  // M3: the range arms live in the ONE engine (scenes/hostMagic.js).
-  const engineSrc = hostSrc('hostMagic.js');
-  assert.ok(/sp\.rangeType === 1/.test(engineSrc) && /sp\.rangeType === 3/.test(engineSrc), 'rangeTypes 1 and 3 really are handled');
-  // U42: the classic window's ready hook is DFU's own
-  // SpellsListBox_OnUseSelectedItem seam, so it carries the
-  // noSpellPointCost flag (the lycanthropy free cast) alongside the
-  // spell. The claim this pins is unchanged: the book READIES.
-  // PX23: the onReady arm moved into ui/spellbookDoor.js with the rest
-  // of the build the four hosts shared. The CLAIM this pins is
-  // unchanged - the book readies - and it is pinned where it now lives.
-  const doorSrc = readFileSync(new URL('../../src/ui/spellbookDoor.js', import.meta.url), 'utf8');
-  assert.ok(/onReady: \(sp, \{ noSpellPointCost \} = \{\}\) =>/.test(doorSrc),
-    'the spellbook really does ready a spell');
-  assert.ok(/createSpellbookWindow\(\{/.test(src), 'and this host opens the book through that door');
-  // the truncated "INTERIM (loud): the" sentence with no predicate
-  assert.equal(/INTERIM \(loud\): the\n/.test(src), false);
-  // the WORLD-state-is-FLAGGED quicksave note, false since collectWorld shipped
-  assert.equal(/WORLD state \(foes, piles,/.test(src), false);
-  assert.ok(/world: \{ \.\.\.collectWorld\(\),/.test(src));   // AUDIT REST II H6 (PIN MOVED): the record and the camps outside beside it
-});

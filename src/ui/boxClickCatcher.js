@@ -1,6 +1,5 @@
 // @ts-check
-// BOX-ON-TOP (2026-10-25, the in-game check of the Identify refund: the "Casting Spells" tutorial page stood over the
-// Identify window, and no click put it away) - A MESSAGE BOX OVER AN ENHANCED WINDOW TAKES THE CLICK.
+// BOX-ON-TOP - A MESSAGE BOX OVER AN ENHANCED WINDOW TAKES THE CLICK.
 //
 // Daggerfall Unity gives input to the top window alone (UserInterfaceManager.cs:54-57, TopWindow). A message box with
 // ClickAnywhereToClose listens on its parent panel, which is the whole screen (DaggerfallMessageBox.cs:264-266), and

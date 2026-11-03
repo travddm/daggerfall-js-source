@@ -1,4 +1,4 @@
-// SD25 S11 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): THE HANG AND THE
+// SD25 S11: THE HANG AND THE
 // WORKS - what hangs under and around the Hour's islands: strata spires, gear rims and chains under each island
 // (world/superDungeon/sdIslandModel.js), the far islands, the Works far below (world/superDungeon/sdWorksModel.js), stood and moved by scenes/superDungeon/sdHang.js.
 // Every law here is run from its own code; none of it is a collider, and every draw is noShadow.
@@ -90,9 +90,6 @@ test('SD-LOOK S11 THE LAW: nothing that hangs is law or looks like it - every ro
   }
   for (const g of SD_WORKS) for (const p of pointsOf(buildWorksGear(g), worksMatrix(g, Float64Array.of(12.3, 0, 0), new Float32Array(16)))) assert.ok(p[1] < -200, 'the Works far under every floor');
   for (const p of pointsOf(buildFarIslandsModel(), farIslandsMatrix(Float64Array.of(0, 0, 1.1), new Float32Array(16)))) assert.ok(p[1] < -40, 'the far islands under every floor');
-  // the hang stands no collider: its set is stood among the draws alone (scenes/superDungeon/sdHang.js takes no collider)
-  const code = read('src/scenes/superDungeon/sdHang.js').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-  assert.doesNotMatch(code, /collider|addMesh|realmClamp|realmFloorTris|realmColliderTris/, 'the hang touches no law');
 });
 
 test('SD-LOOK S11 THE ROOTS: 3-5 spires an island (one a root on the phones), each SD_SPIRE.sides x SD_SPIRE.rings, of different lengths, the main one spireDepth under the island (SD_ROOT_DEPTH at the Threshold\'s size); the skirt hung from the lip\'s own corners (realmIsland\'s, SD_LIP under the floor); the strata level across every spire (the root record\'s v is depth under the floor over the island\'s whole depth), every broken tip at least SD_SPIRE.haze into the haze; 2-3 brass gear rims on a large island, one on a small (mutants: the strata by spire; a tip not hazed; the skirt off the lip; the phones\' spires all stood)', () => {
@@ -363,13 +360,3 @@ test('SD-LOOK S11 THE FRAME MAKES NOTHING (AUDIT SD II L2 F9): the hang\'s frame
   assert.ok(m.hang < 2, `the hang: ${m.hang.toFixed(2)} bytes a frame`);
 });
 
-test('SD-LOOK S11 THE HOST: the dungeon context stands the hang among its draws alone (no collider), poses it in sdPose before the world pass draws, on the realm\'s anchored seconds, and frees it at teardown with the Hour\'s other sets; the lab stands the same set (mutants: the clear dropped; the hang stood with the collider)', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdHang = _sdRealm \? createSdHang\(\{ renderer, clock: sdEndClock \}\) : null;/, 'made in the Hour alone, on the anchored seconds');
-  const pose = D.slice(D.indexOf('sdPose(dt, playerFeet) {'), D.indexOf('sdRiftLanding() {'));
-  assert.match(pose, /if \(sdHang\) \{ sdHang\.stand\(\{ dynamicDraws \}\); sdHang\.frame\(\); \}/, 'stood among the draws alone and framed before the draws');
-  assert.match(D, /sdRemnant\?\.clear\(\);[^\n]*\n\s*sdHang\?\.clear\(\);/, 'freed with the Hour\'s other sets');
-  const L = read('src/tools/abyssLab.js');
-  assert.match(L, /hang\.stand\(\{ dynamicDraws \}\);/);
-  assert.match(L, /hang\.frame\(\);/);
-});

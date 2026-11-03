@@ -1,4 +1,4 @@
-// FOE-SPACING (2026-09-26, SquidKamer on the Discord: "no collision on monsters"; Mac, asked: "Yes, add it").
+// FOE-SPACING.
 //
 // DFU's foes are CharacterControllers: one that walks into another is stopped by it, so a pack spreads round whatever
 // it hunts. The port's foes are not in the collider - nothing stops one at another - so a pack converged on one spot and
@@ -92,8 +92,7 @@ export function spaceFoes(foes, collider, dt, skip = spacingSkips) {
   return moved;
 }
 
-// ---- TACT3 (bible/12-Enhanced-AI/Tactics-Arc.md, Mac: "We need to reduce enemy clumping and also have enemies aware of
-// each other"; "guards blocking doors"; the classic lane too, his call) - THE CROWD AND THE DOOR -----------------------
+// ---- TACT3 (,; "guards blocking doors"; the classic lane too, his call) - THE CROWD AND THE DOOR -----------------------
 
 /** TACT3: push apart bodies of DIFFERENT pools - a watchman and a bandit, the watch called indoors and the building's
  *  own foes - which each pool's own spaceFoes never sees as a pair. The same push, the same collider law, the same

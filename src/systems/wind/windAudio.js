@@ -1,5 +1,4 @@
-// WIND3 (2026-09-14, Mac: "wind audio without being too loud or
-// overbearing") - THE WIND, HEARD.
+// WIND3 - THE WIND, HEARD.
 //
 // Daggerfall's exterior ambience has no wind: WeatherManager.
 // SetAmbientEffects picks rain, storm, a sunny day or a clear night
@@ -13,8 +12,7 @@
 // "not too loud" is a number here, pinned - and the gain is slew-limited
 // so a front's rise is a rise and a gust never pops.
 //
-// FIELD-WIND1 (2026-09-29, the Discord through Mac: "A repetitive moaning
-// sound in the open world"): THE VOICE IS A BED, NOT A CLIP. WIND3 gave
+// FIELD-WIND1: THE VOICE IS A BED, NOT A CLIP. WIND3 gave
 // the loop those DAGGER.SND clips on the riding loop's shape (audio.
 // setLoop: a clip played from its start again each time it ends) - the
 // moan under 0.62 of the strength, the blow above. They are DFU's

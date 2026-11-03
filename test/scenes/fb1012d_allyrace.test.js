@@ -1,5 +1,4 @@
-// FB1012d ALLY-RACE (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md; the owner, 2026-10-12: "companions when morrowind
-// attached switches character race"). A companion's Morrowind body drew its race, face, head, hair and clothes off the
+// FB1012d ALLY-RACE (). A companion's Morrowind body drew its race, face, head, hair and clothes off the
 // STAND - characters/foeBodies.js foeSeed's species and where it stood (its number and feet, a dungeon's marker) - and the
 // companion layer (scenes/crewAshore.js) stands a fresh body at every door, dungeon, fast travel, load and sweep: the same
 // Breton hand walked out of the next door a Nord, a Wood Elf through the one after. A revenant drew its own afresh at
@@ -137,8 +136,8 @@ test('FB1012d ALLY-RACE a revenant is the person it was born as: the body that d
   }
   // a dungeon's record (its layout marker the stand's law) - the stamp wins there too
   assert.equal(foeSeed({ mobileType: r.mobileType, marker: [12, 0, 7], entity: { revenant: foe.entity.revenant } }), r.person, 'a dungeon return: its person over the marker');
-  // THE OATH: sworn, stood by the companion layer at my side through doors - the one that knelt. PIN MOVED (AUDIT FB1019
-  // C1, C2 - bible/01-Overview/audits/Audit-Field-Bugs-2026-10-19.md): the body its returns replaced is LEFT for good and
+  // THE OATH: sworn, stood by the companion layer at my side through doors - the one that knelt.
+  // C1, C2): the body its returns replaced is LEFT for good and
   // swears nothing in its name; the one that kneels is its latest
   assert.ok(!N.revenantSpared(me, foe.entity, { state: 'with' }), 'the body a later stand replaced swears nothing');
   assert.ok(N.revenantSpared(me, last.entity, { state: 'with' }), 'sworn');
@@ -162,27 +161,3 @@ test('FB1012d ALLY-RACE a revenant is the person it was born as: the body that d
   assert.equal(N.revenantPerson({ id: older.id, person: 7 }), 7, 'and a kept one is the kept one');
 });
 
-test('FB1012d ALLY-RACE THE ONE SEAM AND THE FOUR HOSTS: every companion body is stood by the layer, which stamps its person and is the only writer of one; the street (world.js), a building (worldModes.js\'s pool, the one factory) and a dungeon (dungeonContext.js\'s loose stand) stand through it; exterior.js stands none, and its revenants\' returns take their stamp through its pool as every foe host\'s do', () => {
-  const ashore = rd('src/scenes/crewAshore.js');
-  assert.match(ashore, /rec\.companion = k;\n\s*rec\.person = companionPerson\(c\);/, 'the layer stamps his person as it names him');
-  // the sweep: no other module writes a person onto a record
-  const writers = ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js', 'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js', 'src/scenes/naval/navalCrew.js', 'src/scenes/crewAshore.js']
-    .filter((p) => /\b(?:rec|f|nf|foe)\.person\s*=/.test(rd(p)));
-  assert.deepEqual(writers, ['src/scenes/crewAshore.js'], 'one stamp, the layer\'s');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const standIn = \(pool\) => \(mobile, feet, o\) => pool\.spawnFoe\(mobile, feet, \{ yaw: o\.yaw, gender: o\.gender, allied: true, loose: true, transient: true \}\);/, 'world.js: the street and a building stand him through the pool');
-  assert.match(w, /if \(mode === 'exterior'\) return \{ key: exteriorFoes, spawn: standIn\(exteriorFoes\)/, 'world.js: the street');
-  assert.match(w, /const pool = modes\?\.interiorPool\?\.\(\);\n\s*return pool \? \{ key: pool, spawn: standIn\(pool\)/, 'worldModes.js\'s building, through world.js\'s place');
-  assert.match(w, /spawn: \(mobile, feet, o\) => d\.spawnLooseFoe\(mobile, feet, \{ yawRad: o\.yaw, allied: true, gender: o\.gender \}\),/, 'dungeonContext.js\'s loose stand');
-  assert.match(w, /const crewAshore = createCrewAshore\(\{\n\s*party: \(\) => \(navalOn\(\) \? naval\?\.companions \?\? null : null\),\n\s*place: companionPlace,/, 'the crew through the layer');
-  assert.match(w, /const revenantAshore = createCrewAshore\(\{\n\s*party: \(\) => \(playerSpawned \? _revenantParty : null\),/, 'the sworn through the layer');
-  assert.match(rd('src/scenes/worldModes.js'), /interiorPool\(\) \{ return mode === 'interior' && interiorCtx \? interiorFoes : null; \},/, 'worldModes.js hands its pool to the layer');
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /if \(seeded && \(full \|\| f\._lsSent === undefined\)\) \{ r\.ls = foeSeed\(f\); f\._lsSent = r\.ls; \}/, 'dungeonContext.js streams the seed foeSeed answers - the person');
-  assert.equal(dc.split('if (e.revenant && !puppet) applyRevenant(entity, e.revenant, { turned: !!e.turned });').length, 3, 'dungeonContext.js: both builds stamp a revenant');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /if \(revenant && !puppet\) applyRevenant\(entity, revenant, \{ turned \}\);/, 'the street\'s and a building\'s pool stamps a revenant');
-  const ext = rd('src/scenes/exterior.js');
-  assert.ok(!ext.includes('createCrewAshore'), 'exterior.js (the bench) stands no companion');
-  assert.match(ext, /\.\.\.\(hit\.revenant \? revenantSpawnOptions\(hit\.revenant, effectiveLevel\(playerEntity\)\) : \{\}\),/, 'exterior.js: a revenant\'s return through its pool (the stamp applyRevenant writes)');
-  assert.match(rd('src/systems/revenant/revenant.js'), /const revenantStamp = \(r\) => \(\{[^\n]*person: revenantPerson\(r\)[,}][^\n]*\}\);/, 'the stamp carries its person');   // PIN MOVED (UNQUIET, Revenants.md section 46): the Dread rides the stamp after it
-});

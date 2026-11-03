@@ -1,6 +1,5 @@
-// EVENTS1 (2026-10-23, the owner: "Instead of stuffing these in the chat menu, there must be a less obstructive and more
-// detailed way to handle them"): THE EVENT BOARD'S LAW (systems/eventBoard.js) AND ITS DOOR (systems/eventNotices.js).
-// Design: bible/10-UI/Event-Board.md; AUDIT EVENTS1, bible/01-Overview/audits/Audit-Event-Board.md. The fixtures are the
+// EVENTS1: THE EVENT BOARD'S LAW (systems/eventBoard.js) AND ITS DOOR (systems/eventNotices.js).
+// Design:; AUDIT EVENTS1,. The fixtures are the
 // producers' own (TEST THE SHAPE THE PRODUCER MINTS): the stars through starTimerRows, the raids through raidTimerList
 // over a restored day, the gate's and the serpent's rows through eventTimerRows' laws. Mutation list:
 // tools/mutants/events1.json.
@@ -356,9 +355,7 @@ test('EVENTS1 THE JOURNAL HOLDS A LINE ONCE: a line the door filed, said again o
   } finally { _resetEventNotices(); _resetNotifyForTests(); }
 });
 
-// EVENTS2 (2026-10-24, the players on Discord: "Allow us to filter which events we want to show up in the event tracker",
-// "I don't want all this crap cluttering up my interface"; the owner: "No band aids"): EACH KIND THE PLAYER'S OWN.
-// bible/10-UI/Event-Board.md section 8.
+// EVENTS2: EACH KIND THE PLAYER'S OWN.
 
 /** A `shown` that answers for these kinds alone. */
 const only = (...kinds) => (k) => kinds.includes(k);

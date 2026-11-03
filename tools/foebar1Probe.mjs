@@ -1,4 +1,4 @@
-// FOEBAR1 (2026-09-17, Mac, from a friend's two pictures) - THE BLADE
+// FOEBAR1 - THE BLADE
 // FACE, SEEN. The enhanced HUD is drawn over the real module on a phone
 // context, a foe is marked struck at full, half and a tenth of its
 // health, and the target block is screenshotted under both faces (the

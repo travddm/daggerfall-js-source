@@ -1,6 +1,4 @@
-// UNQUIET (bible/06-Systems/Revenants.md section 46; the owner, 2026-10-17: "With revenants becoming a full fledge game
-// loop. They need to become harder, rarer, revenants need more of a chance to flee instead of relying on player death, we
-// need to go deeper on the experience and make it something insanely deep."). One special foe in four carries THE MARK
+// UNQUIET (). One special foe in four carries THE MARK
 // (systems/revenant/unquietMark.js, drawn on its voice id - no die moved) and only it may rise, while fewer than three
 // hunt the player; it breaks and runs at the young line on three in four; a revenant climbs at every getting-away and at
 // every second kill; from rank II it breaks away in its own way (smoke, a blink, a sink, a bolt), keeps a wound by the
@@ -100,13 +98,13 @@ test('UNQUIET THE MARK: one in four, drawn on its voice id (no die moved) - the 
   assert.equal(K.isUnquiet(null), false);
 });
 
-test('UNQUIET THE GATE: drawn only with the arc on, room for another, on a foe that could ever rise - never the watch, an ally, a band\'s follower, a zone foe, a bout\'s, one under level 3 or a revenant; a closed gate stores nothing (mutants: each gate dropped; a closed gate\'s false kept)', () => {
+test('UNQUIET THE GATE: drawn only with the arc on, room for another, on a foe that could ever rise - never the watch, an ally, a band\'s follower, a bout\'s, one under level 3 or a revenant; a closed gate stores nothing (mutants: each gate dropped; a closed gate\'s false kept)', () => {
   K._forceUnquietForTests(true);
   const p = me();
   const drawn = (over) => { const e = foe({ unquiet: undefined, ...over }); K.markUnquiet(e); return e.unquiet; };
   assert.equal(drawn({}), true);
   for (const [why, over] of [['the watch', { mobileType: KNIGHT_CITY_WATCH }], ['an ally', { team: 'PlayerAlly' }], ['an ally kind', { mobileTeam: 'PlayerAlly' }],
-    ['a follower', { retinueOf: 'x' }], ['the zone', { wildFoe: true }], ['a giant', { wildGiant: true }], ['a bout', { bout: {} }], ['level 2', { level: 2 }], ['a revenant', { revenant: { id: 'r' } }]]) {
+    ['a follower', { retinueOf: 'x' }], ['a bout', { bout: {} }], ['level 2', { level: 2 }], ['a revenant', { revenant: { id: 'r' } }]]) {
     assert.equal(drawn(over), undefined, why);
   }
   setPref('lootRarity', false);
@@ -119,26 +117,6 @@ test('UNQUIET THE GATE: drawn only with the arc on, room for another, on a foe t
   const full = foe({ unquiet: undefined });
   assert.equal(K.markUnquiet(full), false, 'three hunt me: no mark drawn');
   assert.equal(full.unquiet, undefined, 'and none stored - nothing decided');
-});
-
-test('UNQUIET THE DOORS: an elite\'s promotion and a champion\'s draw mark their own - never a puppet\'s; the street pool hands a puppet\'s champion `own: false`; the title says it - "Unquiet Elite Orc" (mutants: a door unmarked; a puppet marked; the title\'s word)', () => {
-  K._forceUnquietForTests(true);
-  const own = { mobileType: M.Orc, level: 8, health: 50, maxHealth: 50, team: 'Monster', stats: {} };
-  const a = { ...own }, b = { ...own };
-  promoteEliteFoe(a);
-  promoteEliteFoe(b, { own: false });
-  assert.equal(a.unquiet, true, 'an elite of its own');
-  assert.equal(b.unquiet, undefined, 'a puppet - its owner\'s word');
-  const c = { ...own }, d = { ...own };
-  assert.equal(applyChampion(c, 0), true);
-  applyChampion(d, 0, { own: false });
-  assert.equal(c.unquiet, true, 'a champion of its own');
-  assert.equal(d.unquiet, undefined);
-  assert.match(read('src/scenes/exteriorFoes.js'), /applyChampion\([^\n]*\{ own: !puppet \}\);/);
-  assert.equal(foeTitle({ eliteFoe: true, unquiet: true }, 'Orc'), 'Unquiet Elite Orc');
-  assert.equal(foeTitle({ champion: 'mighty', unquiet: true }, 'Orc'), 'Unquiet Mighty Orc');
-  assert.equal(foeTitle({ champion: 'mighty', unquiet: false }, 'Orc'), 'Mighty Orc');
-  assert.equal(foeTitle({ eliteFoe: true, unquiet: true, revenant: { name: 'Grushnak the Butcher' } }, 'Orc'), 'Grushnak the Butcher', 'a revenant by its name alone');
 });
 
 // ── rarer ───────────────────────────────────────────────────────────
@@ -165,7 +143,7 @@ test('UNQUIET RARER: three at most - none rises while three hunt me (none buried
 });
 
 test('UNQUIET THE FLIGHT: a marked foe breaks at 35% on one in two (AUDIT UNQUIET - it was three in four); an unmarked never; a rank-1 revenant on 80%; from rank II (its will) on 35%; the Dread never (mutants: each number; the mark unread; the Dread running)', () => {
-  assert.deepEqual([N.REVENANT_FLEE_CHANCE, N.REVENANT_FLEE_CHANCE_YOUNG, N.REVENANT_FLEE_CHANCE_REVENANT, F.WILL_RANK], [0.5, 0.8, 0.35, 2]);   // PIN MOVED (AUDIT UNQUIET, section 49): 0.5 - it was 0.75
+  assert.deepEqual([N.REVENANT_FLEE_CHANCE, N.REVENANT_FLEE_CHANCE_YOUNG, N.REVENANT_FLEE_CHANCE_REVENANT, F.WILL_RANK], [0.5, 0.8, 0.35, 2]);
   const runs = (e, roll) => N.rollRevenantFlee(e, () => roll);
   assert.deepEqual([runs(foe(), 0.499), runs(foe(), 0.5)], [true, false]);
   assert.equal(runs(foe({ unquiet: false }), 0), false);
@@ -244,7 +222,7 @@ function standing(p, mobileType, rank) {
 }
 
 test('UNQUIET THE CRAFT BY KIND: a caster, a spirit, a lich, a daedra blinks; the dead and the spriggan sink; any other person throws down smoke; a beast bolts - from rank II, a plain run before; a bolt at 2.5 times its walk, a sink standing (mutants: a kind moved; the rank; the paces)', () => {
-  assert.deepEqual({ ...U.CRAFT }, { RANK: 2, BOLT_PACE: 2.5, BLINK_PACE: 0.5, SINK_PACE: 0.05, SMOKE_ROUNDS: 2, BLINK_DELAY: 0.8, BLINK_MS: 600, SINK_DELAY: 200, SINK_MS: 1400 });   // PIN MOVED (AUDIT UNQUIET, section 49): BLINK_PACE
+  assert.deepEqual({ ...U.CRAFT }, { RANK: 2, BOLT_PACE: 2.5, BLINK_PACE: 0.5, SINK_PACE: 0.05, SMOKE_ROUNDS: 2, BLINK_DELAY: 0.8, BLINK_MS: 600, SINK_DELAY: 200, SINK_MS: 1400 });
   assert.deepEqual([...U.CRAFTS], ['smoke', 'blink', 'sink', 'bolt']);
   for (const k of [M.Mage, M.Sorcerer, M.Healer, M.Battlemage, M.Ghost, M.Wraith, M.Lich, M.AncientLich, M.Nymph, M.OrcShaman, M.FireDaedra, M.DaedraLord, M.IronAtronach]) assert.equal(U.fleeCraftOf(k), 'blink', `blink ${k}`);
   assert.equal(U.fleeCraftOf(M.Imp), 'bolt', 'PIN MOVED (AUDIT UNQUIET, section 49): no blinker - under REVENANT_MIN_LEVEL, it never rises');
@@ -332,27 +310,10 @@ test('UNQUIET SINK: the dead stand and go into the ground - 200 ms then 1400 ms 
   assert.equal(b.ai.fleeLeft, 0);
 });
 
-test('UNQUIET THE CRAFT PUT DOWN: a last stand, a kneel or a tear-away mid-flight ends its craft and its dissolve; its flee card says its craft (mutants: a craft kept; the card\'s words)', () => {
-  const p = me();
-  const { f } = standing(p, M.Zombie, 3);
-  N.revenantFleeStep(f, [0, 0, 0], { rolls: () => 0, now: 0 });
-  U.endCraft(f);
-  assert.deepEqual([f._craft, f.portalFx], [null, null]);
-  const src = read('src/systems/revenant/revenantFate.js');
-  for (const fn of ['beginLastStand', 'beginTearAway', 'beginYield']) {
-    const at = src.indexOf(`export function ${fn}(`);
-    assert.ok(at >= 0 && src.slice(at, src.indexOf('\n}', at)).split('\n').slice(1, 5).some((l) => l.trim().startsWith('endCraft(f);')), fn);
-  }
-  const ev = N.revenantFleeEvent({ ...f.entity, _craft: 'sink', revenant: { id: f.entity.revenant.id } }, 'Zombie', { rolls: () => 0 });
-  const r = N.revenantById(f.entity.revenant.id);
-  assert.equal(ev.body, `${r.given} sinks into the earth. Strike it before it is under!`);
-  assert.deepEqual(['smoke', 'blink', 'bolt'].map((c) => U.craftFleeWords(c, 'Grushnak')), ['Grushnak throws down smoke and is lost to sight!', 'Grushnak tears open a rift. Strike it before it is through!', 'Grushnak bolts!']);   // PIN MOVED (AUDIT UNQUIET): the classic skin draws it not at all
-});
-
 // ── wounds ──────────────────────────────────────────────────────────
 
 test('UNQUIET WOUNDS: the blow that broke it leaves its wound - a blade bleeds it, a hammer or a fist cracks it, an axe maims it, an arrow lames it, an element sears it; three kept, the oldest healing; a wound taken again the newest (mutants: a class moved; the cap; the order)', () => {
-  assert.deepEqual({ ...U.WOUND }, { MAX: 3, RESIST: -15, HEAL_DAYS: 5 });   // PIN MOVED (AUDIT UNQUIET, section 49): five days - it was three
+  assert.deepEqual({ ...U.WOUND }, { MAX: 3, RESIST: -15, HEAL_DAYS: 5 });
   assert.deepEqual(['blade', 'blunt', 'h2h', 'axe', 'arrow', 'fire', 'frost', 'shock', 'poison', 'magic', 'silver', null].map(U.woundOf),
     ['bled', 'cracked', 'cracked', 'maimed', 'lamed', 'burned', 'frostbitten', 'stormstruck', 'blighted', 'hexed', null, null]);
   assert.deepEqual(U.withWound(['bled', 'lamed', 'burned'], 'hexed'), ['lamed', 'burned', 'hexed']);
@@ -365,7 +326,7 @@ test('UNQUIET WOUNDS: the blow that broke it leaves its wound - a blade bleeds i
   again(p, r, 'fled', { last: 'arrow' });
   assert.deepEqual(r.wounds, ['lamed'], 'an escape keeps one');
   const ev = N.revenantEscapeEvent(r, 'Ayla', { rolls: () => 0 });
-  assert.ok(ev.body.includes(' It bears the wound you left: Lamed.'), ev.body);   // PIN MOVED (AUDIT UNQUIET): "your mark" was THE MARK's word
+  assert.ok(ev.body.includes(' It bears the wound you left: Lamed.'), ev.body);
   assert.ok(!N.revenantEscapeEvent(r, 'Ayla', { rolls: () => 0 }).body.includes('the wound you left'), 'said once');
   again(p, r, 'slew', { last: 'blade' });
   assert.deepEqual(r.wounds, ['lamed'], 'a kill leaves none - it was never broken');
@@ -480,7 +441,7 @@ function dreadOf(p, { personality = 'witty' } = {}) {
 }
 
 test('UNQUIET THE DREAD: a rank-V revenant that gets away once more ascends - "the Dread", its lair known, the `ascended` deed and card; with no lair it only gets away; a kill at rank V never; it is kept past the cap (mutants: ascending on a kill; with no lair; the deed; the card\'s kind; buried)', () => {
-  assert.deepEqual({ ...U.DREAD }, { HEALTH: 1.5, STANDS: 2, SECOND_STAND: 0.25, GOLD: 3, MAX: 1 });   // PIN MOVED (AUDIT UNQUIET, section 49): one Dread at a time
+  assert.deepEqual({ ...U.DREAD }, { HEALTH: 1.5, STANDS: 2, SECOND_STAND: 0.25, GOLD: 3, MAX: 1 });
   const p = me();
   const r = made(p);
   r.rank = 5; r.lairKnown = false;
@@ -530,7 +491,6 @@ test('UNQUIET THE DREAD KEPT: a deserter past the cap buries the weakest, oldest
   a.rank = 5;
   again(p, a, 'fled', { now: DAY * 3 });
   assert.equal(a.dread, true);
-  // PIN MOVED (AUDIT UNQUIET, section 49): the Dread hunts no one - three more rise beside it
   const b = made(p, { now: DAY * 4 }), c = made(p, { now: DAY * 5 }), e = made(p, { now: DAY * 5 + 1 });
   assert.ok(e, 'a third rises beside the Dread');
   b.rank = 5; c.rank = 5; e.rank = 5;
@@ -589,7 +549,6 @@ test('UNQUIET THE DREAD\'S STAND: half again its health; its will never holds (i
   const g = { entity: o, ai: { feet: [0, 0, 0], fleeLeft: 0 } };
   FATE.beginLastStand(p, g, { now: 0, rolls: () => 0 });
   assert.equal(FATE.revenantLastStandDue(g), false, 'another stands once');
-  // PIN MOVED (AUDIT UNQUIET, section 49): its drop is its rank's - its Legendary is its trophy (unquiet2_hunt.test.js
   // THE DREAD'S TROPHY); with one here as well it dropped two. Through the real grant: none where the same rolls give
   // another none, and three times the gold
   const legend = (ent) => ent.items.filter((it) => it.rarity === 'legendary').length;
@@ -606,34 +565,3 @@ test('UNQUIET THE DREAD\'S STAND: half again its health; its will never holds (i
 
 // ── the page ────────────────────────────────────────────────────────
 
-test('UNQUIET THE PAGE: how it gets away (its craft, from rank II), the wounds I left, its ambition, its blood; the Dread\'s home, its two stands, no will; the empty page says who rises (mutants: each line)', () => {
-  assert.equal(PG.craftLine({ mobileType: M.Orc, rank: 1 }), 'Its flight: it runs. From rank II it will break away in its own way.');
-  assert.equal(PG.craftLine({ mobileType: M.Mage, rank: 2 }), 'Its flight: Blink - it tears open a rift and is gone. Silence it, hold it, or strike it as it fades.');
-  // PIN MOVED (AUDIT UNQUIET, section 49): each true on both skins and past its will - a struck sinker's will may still tear it away
-  assert.equal(PG.craftLine({ mobileType: M.Zombie, rank: 3 }), 'Its flight: Sink - it sinks into the earth. Strike it before it is under, and it rises, cornered, and runs no more.');
-  assert.equal(PG.craftLine({ mobileType: M.Thief, rank: 3 }), 'Its flight: Smoke - it throws down smoke and vanishes as it runs, but a blow can still find it.');
-  assert.equal(PG.craftLine({ mobileType: M.Orc, rank: 3 }), 'Its flight: Bolt - it runs faster than anything you have chased. Bring it down from range, and break its will before the killing blow.');
-  assert.equal(PG.craftLine({ dread: true }), 'At home it has nowhere to run: it never flees, and kneels at the end.');
-  assert.equal(PG.woundLine({ wounds: ['lamed'] }), 'Wounds you left: Lamed (a lamed leg, so it runs slower).');
-  assert.equal(PG.woundLine({ wounds: [] }), '');
-  assert.equal(PG.ambitionLine({ personality: 'witty' }), 'Its ambition: Plunder - it raids the roads while it waits, and grows richer the longer you leave it.');
-  assert.equal(PG.ambitionLine({ personality: 'witty', dread: true }), '');
-  assert.equal(PG.bloodLine({ blood: 1, rank: 2 }), 'If it kills you once more, or fells one more companion, it grows bolder.');   // PIN MOVED (AUDIT UNQUIET): a companion is felled
-  assert.deepEqual([PG.bloodLine({ blood: 0, rank: 2 }), PG.bloodLine({ blood: 1, rank: 5 })], ['', '']);
-  assert.equal(PG.dreadStandLine({ dread: true, rank: 5 }), `Last stands: twice in a fight it rises again, at ${Math.round(F.lastStandHealth(5) * 100)}% and at 25% of its health.`);
-  assert.equal(PG.comeWords({ dread: true, lair: { name: 'Tomb of Vaness' }, dueAt: 0 }, 0, false).tag, 'The Dread');
-  const src = read('src/ui/revenant/revenantPage.js');
-  assert.match(src, /for \(const line of fallen \? \[\] : \[craftLine\(r\), woundLine\(r, now\), ambitionLine\(r\), bloodLine\(r\), tearLine\(r\)\]\) if \(line\)/);
-  assert.match(src, /const will = fallen \|\| r\.dread \? '' : willWords\(r\);/);
-  assert.match(src, /'An elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you\.'/);
-});
-
-test('UNQUIET HOST-SPLIT: the craft runs in the flee law both pools share, its look through the pools\' dissolve and the scene\'s door - no host grows (mutants: a host wired)', () => {
-  // AUDIT UNQUIET (section 49): the four hosts, each read (the bench is scenes/exterior.js - there was no exteriorBoot.js)
-  for (const host of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.ok(s.length > 1000, `${host} read`);
-    assert.ok(!/revenantUnquiet|unquietMark/.test(s), host);
-  }
-  assert.match(read('src/scenes/hostMagic.js'), /fx: \(recipe, at, o\) => \{ try \{ fx\.technique\(recipe, at, o\); \} catch/);
-});

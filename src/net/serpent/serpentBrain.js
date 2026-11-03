@@ -1,8 +1,7 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a new world event that requires players with a ship to meet up and take on a large scale
-// sea serpent in the ocean"; "make this something truly special"): THE SERPENT'S BRAIN - the whole of what the relay runs
+// SERPENT1: THE SERPENT'S BRAIN - the whole of what the relay runs
 // for Sethrakul's fight, as pure law: its health and who brought it, how it swims, what it does to the ships about it,
-// and what a blow on it is worth. Design: bible/11-Multiplayer/Sea-Serpent.md sections 4-7.
+// and what a blow on it is worth. Design:
 //
 // THE GATE'S LAW AT SEA (net/gate/gateBrain.js - Option B: the relay's Durable Object is the authority over a world boss).
 // The gate could run on the relay because its boss stands on a disc with nothing to path round; the serpent can because
@@ -70,7 +69,7 @@ export const RISE_RING = 160;
 export const STEER_TURN = 0.35;
 export const STEER_STRAIGHT = 0.12;
 export const LEG_MIN_MS = 900;
-/** SERPENT3 (2026-10-05, Mac: "the serpent world boss teleports"): IT NEVER LEAPS - every leg is swum from where the last
+/** SERPENT3: IT NEVER LEAPS - every leg is swum from where the last
  *  left its head. Under the sea it DASHES at DASH_V (the ram's own run) for the place a Rising Maw bursts or a coil
  *  closes; a dash its wind-up cannot cover waits for it (the wind-up stretched, never shortened). Its jumps placed the
  *  whole 168 m body somewhere new in one frame - a breach's a median 195 m, a coil's up to a kilometre, the
@@ -115,7 +114,7 @@ export const SERPENT_HIT_LOOKBACK_MS = Object.freeze([0, 500, 1000]);
 /** AUDIT SERPENT E1: the serpent goes only at what it can reach - a body within this of its waters' heart (m); its head
  *  is aimed within ARENA_R and orbits its mark at ORBIT_R. */
 export const SERPENT_TARGET_R = 600;
-/** AUDIT SHIPS A1 (2026-10-06, Mac: "Audit everything"): IT LEADS ITS MARKS - a Rising Maw, a coil, the ram's lane, a spit
+/** AUDIT SHIPS A1: IT LEADS ITS MARKS - a Rising Maw, a coil, the ram's lane, a spit
  *  and the tail's sweep are aimed where their ship WILL BE at their landing, her way held (serpentWayOf - her velocity
  *  off her own poses), as every hunter aims; and so is its surge when it closes (closeAim). Aimed where she stood, a ship
  *  under SAIL-FREE's full sail had sailed out of every mark before it landed, and a lone galleon won every fight from
@@ -134,7 +133,7 @@ export const SERPENT_WAY_EASE_MS = 500;
 export const SERPENT_WAY_STALE_MS = 3000;
 export const SERPENT_WAY_MAX_V = 60;
 export const SERPENT_TURN_MAX = 0.35;
-/** AUDIT 2 XB8 (2026-10-06): HER CLOCK HELD TO THE RELAY'S - over every SERPENT_CLOCK_SPAN_MS (ms) of the relay's own time
+/** AUDIT 2 XB8: HER CLOCK HELD TO THE RELAY'S - over every SERPENT_CLOCK_SPAN_MS (ms) of the relay's own time
  *  between her new poses, her send times must have kept within SERPENT_CLOCK_SKEW times of it, or her way is no way at
  *  all (she is aimed where she lies). A client stamping true poses with a clock run at an eighth read 20 m/s of way off
  *  a ship making 5 - unseen by anyone, where a forged place is seen where it says - and the Maw led at it burst on an
@@ -144,7 +143,7 @@ export const SERPENT_CLOCK_SKEW = 2;
 
 // ── the clock of the fight ─────────────────────────────────────────────
 export const SERPENT_TICK_MS = 250;
-/** AUDIT 2 XB6 (2026-10-06): THE WORDS THAT LAY WHAT EVERY SCREEN DRAWS - its swim, its ride, an attack, its coil, the
+/** AUDIT 2 XB6: THE WORDS THAT LAY WHAT EVERY SCREEN DRAWS - its swim, its ride, an attack, its coil, the
  *  whirl, a phase's turn, its end. The relay keeps the fight before it says one (server/src/index.js _serpentSay): kept
  *  every SERPENT_CHECKPOINT_MS alone, after its words had gone out, a relay restarted woke it up to 1.25 s before what
  *  its screens held, and the short sleep's law (AUDIT SHIPS B1) kept that track as said - a head snapped 12-24 m on 3
@@ -190,8 +189,7 @@ export const clampHull = (hl) => (Number.isInteger(hl) && hl >= 0 && hl < HULLS 
  *  Carrack's long guns and chasers, the galley's long guns and great guns. */
 export const SHIP_REF = Object.freeze([0, 3.6, 10, 13, 12]);   // AUDIT SERPENT T6: the Large Boat has no crew to its guns (reload x1.4) - 5 overstated what she can deal by two fifths
 export const refOf = (hl) => SHIP_REF[clampHull(hl)] ?? 0;
-/** Seconds of reference broadside the health a ship brings stands for. SERPENT4 (2026-10-11, the players: "the fight is
- *  too slow and boring atm, and the snake is way too strong for the small amount of people who do it"): 180 held a pair
+/** Seconds of reference broadside the health a ship brings stands for. SERPENT4: 180 held a pair
  *  to ten minutes at the measured gunnery and lost a quarter of its fights, three galleons ten and a half - a sixth off
  *  it, where a third off let a lone galleon win eight fights in twelve in a storm's way (tools/serpentFleetSim.mjs; Mac's
  *  call stands: one ship alone can't). */
@@ -206,7 +204,7 @@ export const SERPENT_HIT_CAP_X = 14;
 /** The words of blows an account says a second (its machine gathers a volley's balls into one). */
 export const SERPENT_HIT_HZ_MAX = 6;
 /**
- * SERPENT4 (2026-10-11, the players: "also let players on the ship be able to hurt it"): A HAND'S OWN WEAPONS - a player
+ * SERPENT4: A HAND'S OWN WEAPONS - a player
  * aboard no ship of her own (serpentOnShip: a hand on a friend's deck, or one in the sea) strikes it with her shafts and
  * her harmful missiles (scenes/serpentHost.js handStruck - the `hit` word's `r` 1), judged on a HAND'S PURSE: refilled at
  * SERPENT_BUCKET_RATE_X times SERPENT_HAND_REF a second, as deep and capped a blow as a ship's purse is of hers, from
@@ -242,8 +240,7 @@ export const SERPENT_PHASE_NAMES = Object.freeze(['The Hunt', 'The Coil', 'The M
 //   rings  - between `r0` and `r1` about `tg[0]` (the roar - safe close in under its jaws)
 //   none   - nothing struck (a phase's cry, the maelstrom's forming)
 // A SHIP struck takes `hull` of her whole hull and `base` more, `sail` of her canvas and `crew` men (TOUGHER-SHIPS: her
-// whole is her refits'); `shove` (m/s) throws her off her way. AUDIT SERPENT T1 (2026-10-04, Mac chose the validated
-// rebalance): every blow lighter - a ship it focused was wrecked in 36-80 s, and no fleet of eight won at the measured
+// whole is her refits'); `shove` (m/s) throws her off her way. AUDIT SERPENT T1: every blow lighter - a ship it focused was wrecked in 36-80 s, and no fleet of eight won at the measured
 // gunnery - the ram kept the heaviest, the one blow a helm can sail out of. `pool` is the venom
 // the spit leaves on the water and the decks (players standing in it take `pct` of their health and `base` more a
 // SERPENT_POOL_TICK_MS). `mode` how it holds itself through the wind-up. `phase` the first it comes in, `range` how near its
@@ -316,8 +313,7 @@ export const MAEL_REAR_MS = 6000;
 /** Who earns a receipt: dealt this share of the health their own ship brought, or stood alive at the fight - within
  *  SERPENT_STAND_R of its body - this share of it (a hand aboard another's ship earns so). AUDIT SERPENT E1/E2 (Mac:
  *  "Must be in the fight"): 2% was one volley, and a boat parked at 900 m - where nothing of it reaches - stood.
- *  SERPENT4 (2026-10-11, the players: "it sucks doing damage to the serpent and getting nothing from it if your not near
- *  the snake when it dies ... Rewards based on party or individual damage should be given on death"): the dealer's hoard
+ *  SERPENT4: the dealer's hoard
  *  at SERPENT_RECEIPT_SHARE of her share (it was a tenth - 45 to 72 s of honest fire landing), a stander's for a real
  *  part dealt (SERPENT_PART_SHARE - several volleys landed, never one) or a quarter of the fight stood, and the stand
  *  reaching SERPENT_STAND_R of its greater body. A ship thrown off by its blows (the first to strike it is the one it hates)
@@ -337,11 +333,11 @@ export const SERPENT_ABSENT_RETIRE_MS = 45_000;
 export const SERPENT_SEAT_KEEP_MS = 45_000;
 export const serpentHasPart = (p) => (p.share > 0 && p.dealt >= SERPENT_RECEIPT_SHARE * p.share) || p.stoodMs >= SERPENT_SEAT_KEEP_MS;
 /** AUDIT SERPENT T2/E2/S8: does a fighter's share belong in its health now - not wrecked, not away from the fight past
- *  SERPENT_ABSENT_RETIRE_MS, and (a ship) not silent past SERPENT_IDLE_RETIRE_MS. AUDIT 2 XB4 (2026-10-06): nor a game
+ *  SERPENT_ABSENT_RETIRE_MS, and (a ship) not silent past SERPENT_IDLE_RETIRE_MS. AUDIT 2 XB4: nor a game
  *  told to reload (`stale` - AUDIT SHIPS C2's mark, which the relay neither hears nor goes at): its share stood in the
  *  health and its ship in the count until its absence retired it, 45 s - a pair's survivor eased all that while. */
 export const serpentShareWanted = (p, now) => !p.wreck && !p.stale && p.aboard !== false && now - (p.seenAt ?? p.joinedAt) <= SERPENT_ABSENT_RETIRE_MS && !(p.share > 0 && now - (p.hitAt ?? p.joinedAt) > SERPENT_IDLE_RETIRE_MS);
-/** AUDIT SHIPS C1 (2026-10-06): THE SHIPS FIGHTING IT - the fighters whose share stands in its health now: a warship's
+/** AUDIT SHIPS C1: THE SHIPS FIGHTING IT - the fighters whose share stands in its health now: a warship's
  *  (a rowboat brings none and deals none), afloat, at the fight, her guns heard, and her captain aboard her (every other
  *  share is retired - serpentShareWanted, serpentWreck). The pair's share reads it (systems/serpent/serpentStrike.js fleetShare).
  *  It counted every account at the fight whose hull claim, which only ever grows, was 0 or more: a lone galleon with a
@@ -349,7 +345,7 @@ export const serpentShareWanted = (p, now) => !p.wreck && !p.stale && p.aboard !
  *  thirds of every blow - the lone ship eased that Mac's call rules out - while a true pair with a rowboat by was three,
  *  and lost its share. The count is the health's own now, so two ships eased is two ships' health to fight. */
 export const serpentShipsFighting = (f) => Object.values(f.players).filter((p) => p.share > 0 && !p.retired).length;
-/** AUDIT 2 XC1 (2026-10-06): the count kept where a share changes - a join, a ship changed, a wreck - not only at the
+/** AUDIT 2 XC1: the count kept where a share changes - a join, a ship changed, a wreck - not only at the
  *  beat: the relay's answer to an `in` said the count from before it. */
 const recount = (f) => { f.ships = serpentShipsFighting(f); };
 /** AUDIT SHIPS C1: is she ON A SHIP of her own now - the hull her latest `in` says (`on`), never her share's claim (`hl`,
@@ -387,7 +383,7 @@ export function keepIn(x, z, r = ARENA_R) {
  * AUDIT SHIPS A1: fighter `p`'s WAY on the sea (`vx`, `vz` m/s, the site frame), read off body `b` - each new pose's
  * change over the time its sender kept between them (the pose's own `ts`, net/wire.js poseTsDiff - never the network's
  * timing, and never the beat's). A pose with no `ts` leaves her at rest: she is aimed where she stands, as before. `now`
- * the relay's clock (the beat's): AUDIT 2 XB11 (2026-10-06) - no new pose of hers past SERPENT_WAY_STALE_MS of it and she
+ * the relay's clock (the beat's): AUDIT 2 XB11 - no new pose of hers past SERPENT_WAY_STALE_MS of it and she
  * is at rest (a ship hove to says none for a heartbeat's 20 s, and was led on at her last way all that while); XB8 - her
  * clock held to it (SERPENT_CLOCK_SPAN_MS).
  */
@@ -498,7 +494,7 @@ export function joinSerpentFight(f, sub, name, lv, hl, now, admits, present = nu
     if (typeof name === 'string' && name) known.name = name.slice(0, 24);
     if (f.fell || f.gone) return true;
     const hull = clampHull(hl), ref = refOf(hull);
-    // AUDIT 2 XB9 (2026-10-06): a smaller warship of her own takes her share down to hers, at the fraction it stands at
+    // AUDIT 2 XB9: a smaller warship of her own takes her share down to hers, at the fraction it stands at
     // (her bucket kept, to that ship's own depth - spendPurse): a captain sailing one was no ship of the fight, her share
     // out of its health and its count, and a true pair read as one
     if (ref > known.ref || (ref > 0 && ref < known.ref)) {
@@ -532,7 +528,7 @@ export function joinSerpentFight(f, sub, name, lv, hl, now, admits, present = nu
 /**
  * AUDIT SERPENT T2: a fighter's ship WRECKED (`w` 1) or afloat again (0) - her machine's word. A wreck's share leaves its
  * health and never comes back while she is one; it no longer goes at her; her stood time still counts. AUDIT 2 XC5
- * (2026-10-06): a coil holding her lets her go, said into `out` (`cx`, SERPENT_SAY_AHEAD_MS on - releaseCoil, as a phase's
+ * a coil holding her lets her go, said into `out` (`cx`, SERPENT_SAY_AHEAD_MS on - releaseCoil, as a phase's
  * turn lets go): held on, a wreck was gripped and crushed to the coil's end, the serpent bound to her all that while.
  * @returns {boolean} whether anything changed
  */
@@ -647,7 +643,7 @@ function fall(f, now, out) {
   f.atk = null; f.queue = []; f.pending = null;
   // AUDIT SERPENT M2: its throes said, as every other turn of its body is - AUDIT SHIPS B5: SERPENT_SAY_AHEAD_MS on, as
   // every turn of its swim is (killed mid-dash and said at the beat, a screen 150 ms behind snapped it 3.6 m). AUDIT 2 XB2
-  // (2026-10-06): laid from then alone - the timeline's one rule lets go of what was to come after it, and what was said
+  // laid from then alone - the timeline's one rule lets go of what was to come after it, and what was said
   // to come before it is swum: a blow is judged as it comes, between beats, and the swim held from the blow's moment
   // (B5's holdNow) unsaid a dash said at the last beat that a screen a wire's time behind had begun (3.2 m at 250 ms)
   const go = now + SERPENT_SAY_AHEAD_MS;
@@ -867,7 +863,7 @@ export function dashFits(f, A, now, target) {
 
 /** STEER the head toward `aim` at speed `v`, cruising: a turn of TURN_R begun past STEER_TURN of error, a straight run
  *  within STEER_STRAIGHT, a change of pace said as a leg of its own - no leg cut under LEG_MIN_MS. AUDIT 2 XB1
- *  (2026-10-06): EVERY LEG OF IT SAID SERPENT_SAY_AHEAD_MS ON, judged from where its head will be then - AUDIT SHIPS D2
+ *  EVERY LEG OF IT SAID SERPENT_SAY_AHEAD_MS ON, judged from where its head will be then - AUDIT SHIPS D2
  *  said a change of pace ahead and its turns at the beat, where a screen a wire's time behind drew the head off the
  *  relay's (0.3 m at 150 ms, 2.2 m at 250 ms, closing). */
 function steer(f, now, aim, v, out) {
@@ -1027,7 +1023,7 @@ function closeOrBegin(f, A, now, target, rng, out) {
   closeOn(f, now, target, out);
 }
 /**
- * AUDIT 2 XB1 (2026-10-06): THE SURGE IS SWUM AS ITS DASHES ARE - from where its head will be SERPENT_SAY_AHEAD_MS on, a
+ * AUDIT 2 XB1: THE SURGE IS SWUM AS ITS DASHES ARE - from where its head will be SERPENT_SAY_AHEAD_MS on, a
  * turn of HUNT_TURN_R and a straight at where it meets her (closeAim; wayOnto's turn-and-straight), said whole, at her
  * pace (closeV) - and laid again only when its straight would no longer run at her within STEER_STRAIGHT, or its pace is
  * no longer hers. Steered as it cruises, at 4-6 times the cruise's turn rate and no turn cut under LEG_MIN_MS, the surge
@@ -1098,7 +1094,7 @@ function beginCoil(f, a, now, here, out) {
   if (a.word) out.push(...coilWord(f, a.word.sub, a.word.k, a.i, a.word.x, a.word.z, Math.max(now, f.coil.at)));
 }
 /**
- * AUDIT 2 XC3/XB5 (2026-10-06): ONE CENTRE - its head's round laid again about the coil `c` as it is drawn (its centre,
+ * AUDIT 2 XC3/XB5: ONE CENTRE - its head's round laid again about the coil `c` as it is drawn (its centre,
  * and its bearing gone round at DRIFT_V - serpentBody.js coilAngleAt): from `t0` the head swims straight onto the ring
  * where the coil drawn has gone round to, at DASH_V at most, and round it from there. Never before the coil holds the
  * whole body (its winding on drawn - coilWeight), so its track is out of sight as it moves. Her word (`held`) moves the
@@ -1201,7 +1197,7 @@ export function serpentResume(f, now) {
     return out;
   }
   f.lastTickAt = now;
-  // AUDIT 2 XB5 (2026-10-06): a coil holding a ship keeps its round - an older law's round laid again about it as this
+  // AUDIT 2 XB5: a coil holding a ship keeps its round - an older law's round laid again about it as this
   // law draws it (coilRound): kept, its head went round where that law sent it, up to 78 m off the coil drawn
   if (coilHolds(f, now)) { if (law) coilRound(f, f.coil, now, out); return out; }
   if (f.atk) { f.atk = null; f.target = null; f.nextAt = Math.max(f.nextAt, now + SERPENT_BREATH_MS); }
@@ -1279,7 +1275,7 @@ export function stepSerpentBrain(f, now, bodies, rng) {
   // beat she lies within it; she outsailed it, or is gone, and it chooses again
   if (f.closing) {
     const c = f.closing, A = SERPENT_ATTACK_BY_ID[c.a];
-    // AUDIT 2 XB10 (2026-10-06): and a coil's ship still on a ship of her own (serpentOnShip) - one who stepped onto a
+    // AUDIT 2 XB10: and a coil's ship still on a ship of her own (serpentOnShip) - one who stepped onto a
     // friend's deck while it closed was coiled there, a hand AUDIT SHIPS C1 never coils
     const t = here.find((b) => b.sub === c.s && !f.players[b.sub]?.wreck && (A !== SERPENT_ATTACK_TABLE.coil || serpentOnShip(f.players[b.sub]))) ?? null;
     if (t && now - c.at < SERPENT_CLOSE_MS) { closeOrBegin(f, A, now, t, rng, out); endFrames(f, now, out); return out; }
@@ -1312,7 +1308,7 @@ export function stepSerpentBrain(f, now, bodies, rng) {
 }
 
 function endFrames(f, now, out) { hpFrame(f, now, out); coilHpFrame(f, now, out); stateFrame(f, now, out); }
-/** Its health's word, at most every SERPENT_HP_SEND_MS - AUDIT 2 XC1 (2026-10-06): and the count of the ships fighting it
+/** Its health's word, at most every SERPENT_HP_SEND_MS - AUDIT 2 XC1: and the count of the ships fighting it
  *  (`n`, the pair's share's - systems/serpent/serpentStrike.js fleetShare) whenever that changes: said in the whole state alone,
  *  every SERPENT_STATE_SEND_MS, a pair's survivor was eased and a third ship's joining was not for up to 5 s. */
 function hpFrame(f, now, out) {

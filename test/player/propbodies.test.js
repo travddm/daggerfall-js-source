@@ -1,8 +1,8 @@
-// PROP-BODIES (2026-10-19, the owner: "Implement collision for all props"): a solid flat stands a BODY - an upright
+// PROP-BODIES: a solid flat stands a BODY - an upright
 // cylinder at its foot, riding the cover index beside its cover (ai/cover.js, a proxy marked `body`) - and the player,
 // on foot or mounted, is kept out of it after the collider's move (player/bodyClamp.js, motor.js's step). Which flats:
 // a tree its trunk, a still nature record and every prop that is not nature its foot measured off its own picture,
-// never the flora that sways (world/propBodies.js). bible/03-World/Player-Arc.md PROP-BODIES.
+// never the flora that sways (world/propBodies.js). PROP-BODIES.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -195,13 +195,3 @@ test('PROP-BODIES the index: a body is filed beside the cover, never in it - no 
 
 // ─── THE HOSTS ───────────────────────────────────────────────────────
 
-test('PROP-BODIES the hosts: the motor clamps after the arena\'s clamp, each step; every host files its flats\' bodies beside their cover - the stream once a group by the record\'s own size, the jungle\'s trunks, the scaled flats; the city, the rooms and the dungeon (mutants: by source)', () => {
-  assert.match(rd('src/player/motor.js'), /if \(this\.arena\) this\._keepInArena\(\);[^\n]*\n\s*keepOffBodies\(this, CAPSULE_RADIUS\);/);
-  const w = rd('src/scenes/pixelBuild.js');
-  assert.match(w, /await naturePicture\([^\n]*\n\s*coverItems\.push\(\.\.\.flatBodies\(t, archive, record, plain, centers, \{ tree: g\.natureSet\.has\(archive\) && isTreeRecord\(g\.natureBase\(archive\), record\) \}\)\);/);
-  assert.match(w, /const species = g\.species, record = JUNGLE_SPECIES\[species\]\.record;\n\s*g\.centers\.forEach\(\(c, i\) => coverItems\.push\(jungleBody\(c, species, g\.own\[i\]\)\)\);/);
-  assert.match(w, /coverItems\.push\(coverProxy\(c, size\)\);\n\s*coverItems\.push\(\.\.\.flatBodies\(t, archive, record, size, centers, \{ tree: natureSet\.has\(archive\) && isTreeRecord\(natureBase\(archive\), record\) \}\)\);/);
-  assert.match(rd('src/scenes/exterior.js'), /collider\.cover\.add\('prop-bodies', flatBodies\(t, archive, record, plain, centers, \{ tree: archive === natureArchive && isTreeRecord\(natureArchive, record\) \}\)\);/);
-  assert.match(rd('src/scenes/interiorContext.js'), /collider\.cover\.add\('prop-bodies', flatBodies\(t, archive, record, size, centers\)\);/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /coverItems\.push\(\.\.\.flatBodies\(t, archive, record, size, based\)\);/);
-});

@@ -148,37 +148,16 @@ on:
       - "src/net/arena/arenaReceipt.js"
       - "src/net/arena/arenaLaw.js"
       - "src/net/wire.js"
-      - "src/net/eliteGates/egShape.js"
       - "src/net/siege/siegeRef.js"
       - "src/net/siege/siegeReceipt.js"
       - "src/net/duel/duelReceipt.js"
-      - "src/net/wild/wildReceipt.js"
-      - "src/net/wild/wildLaw.js"
-      - "src/net/sea/seaBountyLaw.js"
       - "src/net/sea/seaSeasonLaw.js"
-      - "src/net/sea/seaPrizeLaw.js"
       - "src/net/crewSignLaw.js"
-      - "src/systems/wild/wildDropLaw.js"
-      - "src/systems/wild/wildInsureLaw.js"
-      - "src/systems/wild/wildStoreLock.js"
-      - "src/systems/wild/wildLeaf.js"
       - "src/systems/item/itemKinds.js"
       - "src/net/gate/gateMods.js"
       - "src/net/insignia.js"
       - "src/net/dice.js"
-      - "src/net/holdemTable.js"
-      - "src/net/card/cardLaw.js"
-      - "src/net/card/cardReceipt.js"
-      - "src/net/iliac/iliacTable.js"
-      - "src/net/iliac/iliacHand.js"
-      - "src/net/iliac/iliacCards.js"
-      - "src/net/iliac/iliacReceipt.js"
-      - "src/net/gambit/gambitTable.js"
-      - "src/net/gambit/gambitStakes.js"
-      - "src/net/gambit/gambitReceipt.js"
-      - "src/net/kingsGambit.js"
       - "src/systems/mathf.js"
-      - "src/net/card/cardWorthLaw.js"
       - "src/net/realm/realmTradeLaw.js"
       - "src/net/appearanceLaw.js"
       - "src/net/bagLaw.js"
@@ -194,40 +173,11 @@ on:
       - "src/systems/potionRecipes.js"
       - "src/characters/itemTemplates.json"
       - "src/net/superDungeon/sdReceipt.js"
-      - "src/net/ketch/ketchReceipt.js"
-      - "src/net/ketch/ketchLaw.js"
-      - "src/net/eliteGates/egReceipt.js"
-      - "src/net/eliteGates/egFeats.js"
-      - "src/net/eliteGates/egLaw.js"
-      - "src/net/eliteGates/egRoute.js"
-      - "src/net/eliteGates/egRouteProof.js"
-      - "src/net/eliteGates/egAscent.js"
-      - "src/net/eliteGates/egRoomLaw.js"
-      - "src/net/eliteGates/egWalkGraph.js"
       - "src/net/superDungeon/sdBrain.js"
-      - "src/net/eliteGates/egSpanLaw.js"
-      - "src/net/eliteGates/egFragLaw.js"
-      - "src/net/eliteGates/egHeroFrags.js"
-      - "src/assets/egfrags/egRefFrag.law.json"
-      - "src/assets/egfrags/egheroOssuary.law.json"
-      - "src/assets/egfrags/egheroMistStair.law.json"
-      - "src/assets/egfrags/egheroGloam.law.json"
-      - "src/assets/egfrags/egheroEclipse.law.json"
-      - "src/assets/egfrags/egheroCaverns.law.json"
-      - "src/assets/egfrags/egheroStacks.law.json"
-      - "src/assets/egfrags/egheroColonnade.law.json"
-      - "src/assets/egfrags/egheroForgeGut.law.json"
-      - "src/assets/egfrags/egheroClanPit.law.json"
-      - "src/assets/egfrags/egheroDeepCaverns.law.json"
-      - "src/net/eliteGates/egPay.js"
-      - "src/net/eliteGates/egStartLaw.js"
       - "src/net/superDungeon/sdMarks.js"
       - "src/net/postLaw.js"
-      - "src/net/shopLaw.js"
       - "src/net/lostLaw.js"
       - "src/systems/superDungeon/sdSpoils.js"
-      - "src/systems/eliteGates/egSpoils.js"
-      - "src/systems/eliteGates/egLordArms.js"
       - "src/net/reportLaw.js"
       - "src/net/hiddenSeen.js"
       - "src/systems/wind/wind.js"
@@ -246,14 +196,12 @@ on:
       - "src/characters/nameHelper.js"
       - "src/characters/paperdoll/paperdoll.js"
       - "src/characters/paperdoll/paperdollArt.js"
-      - "src/characters/thunderlockIds.js"
       - "src/characters/weaponStates.js"
       - "src/characters/weapons.js"
       - "src/combat/clawMetal.js"
       - "src/combat/enemyEquipment.js"
       - "src/combat/enemyGroups.js"
       - "src/combat/formulas.js"
-      - "src/combat/gun/gunFeel.js"
       - "src/formats/blocksFile.js"
       - "src/formats/bsaFile.js"
       - "src/formats/characterRecord.js"
@@ -271,7 +219,6 @@ on:
       - "src/formats/woodsFile.js"
       - "src/formats/worldData/worldDataDoor.js"
       - "src/net/duel/duelSession.js"
-      - "src/net/iliac/iliacCards.js"
       - "src/player/bodyClamp.js"
       - "src/player/classSkins.js"
       - "src/player/climbing.js"
@@ -299,7 +246,6 @@ on:
       - "src/systems/deepWater/deepWatersFishRows.js"
       - "src/systems/effectBroker.js"
       - "src/systems/effects.js"
-      - "src/systems/eliteGates/weirKeyRow.js"
       - "src/systems/enemyExpansion/dexIds.js"
       - "src/systems/enemyExpansion/dexTableText.js"
       - "src/systems/enemyExpansion/mudexTableText.js"
@@ -316,8 +262,6 @@ on:
       - "src/systems/gilded.js"
       - "src/systems/harmMark.js"
       - "src/systems/horse/horseCartLaw.js"
-      - "src/systems/iliac/iliacItems.js"
-      - "src/systems/iliac/iliacCardWords.js"
       - "src/systems/inventory.js"
       - "src/systems/inventorySession.js"
       - "src/systems/item/itemDye.js"
@@ -326,7 +270,6 @@ on:
       - "src/systems/item/itemLaw.js"
       - "src/systems/item/itemIds.js"
       - "src/systems/item/possessedItems.js"
-      - "src/systems/bossCards.js"
       - "src/systems/item/itemLock.js"
       - "src/systems/item/itemTemplates.js"
       - "src/systems/legacy/heirloom.js"
@@ -388,9 +331,7 @@ on:
       - "src/systems/survival/needs.js"
       - "src/systems/survival/switch.js"
       - "src/systems/survival/temperature.js"
-      - "src/systems/pistolet.js"
       - "src/systems/textureReplacement.js"
-      - "src/systems/thunderlock.js"
       - "src/systems/timeScale.js"
       - "src/systems/transport.js"
       - "src/systems/travel/travelPace.js"
@@ -462,7 +403,7 @@ jobs:
 
   deploy:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     defaults:
       run:
         shell: bash
@@ -594,14 +535,14 @@ jobs:
       #
       # `migrations apply` keeps a `d1_migrations` table in the database
       # itself and runs only what is missing, in order. That is the
-      # whole reason it replaced two `d1 execute --file` lines: 0002 is
-      # NOT idempotent - `ALTER TABLE ADD COLUMN` has no IF NOT EXISTS -
+      # whole reason it replaced two `d1 execute --file` lines: a file that
+      # adds a column is NOT idempotent - `ALTER TABLE ADD COLUMN` has no IF NOT EXISTS -
       # so "apply each one exactly once" has to be something a tool
       # knows, not something a comment asks for.
       # SCALE1 (2026-09-30, the scaling audit): THE DATABASE AS IT STOOD
       # BEFORE THEM, written where a person will look. Some migrations are
       # not idempotent and none can be undone by another; D1 Time Travel
-      # can put the whole database back to this bookmark (realm-restore.yml
+      # can put the whole database back to this bookmark (realm-revive.yml
       # reads it the same way). A bookmark that cannot be read is a warning,
       # not a stop - a restore by timestamp still works without it.
       - name: Record the database's bookmark before the migrations
@@ -707,7 +648,7 @@ jobs:
       # `secret put` redeploys the Worker with the binding, so the
       # window is seconds long and nothing is using the service yet.
       #
-      # ═══ AUDIT B1 (SHADOW-FANG, 2026-09-26): AND THE RELAY GOES FIRST ══
+      # ═══ AUDIT B1: AND THE RELAY GOES FIRST ═══════════════════════════
       #
       # THE SERVICE SIGNS WHAT THE RELAY VERIFIES. identityToken.js is in
       # both Workers, and a claim the RUNNING relay does not know - a new
@@ -948,33 +889,6 @@ jobs:
             echo "- webhook secret: $([ -n "${PATREON_WEBHOOK_SECRET}" ] && echo put || echo 'not set - pledges are not followed')"
             echo "- the Patreon client's redirect URI: \`$base/v1/patreon/callback\`"
             echo "- the Patreon webhook's URL: \`$base/v1/patreon/webhook\`"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      # ── 4d. THE SHOP'S TWO STRIPE SECRETS, WHERE THE REPOSITORY HAS THEM ──
-      #
-      # SHOP (bible/06-Systems/Shop.md): Stripe takes the money on its own page, and the service needs the two things only
-      # Stripe and the owner hold - the API's secret key (to open a checkout) and the webhook endpoint's signing secret
-      # (to believe Stripe's word on a payment). Put on EVERY deploy, Patreon's way, through one pipe so neither value is
-      # echoed. An unset one is not an error: the shop stays closed (shop.js shopOn). The summary names the webhook's URL.
-      - name: Put the Stripe secrets, where the repository has them
-        working-directory: server-account
-        env:
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        run: |
-          set -euo pipefail
-          base="${{ steps.deploy.outputs.base }}"
-          if [ -z "${STRIPE_SECRET_KEY}" ] && [ -z "${STRIPE_WEBHOOK_SECRET}" ]; then
-            echo "neither STRIPE_SECRET_KEY nor STRIPE_WEBHOOK_SECRET is set for this repository - the shop stays closed"
-          else
-            jq -n 'env | {STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET} | with_entries(select(.value != null and .value != ""))' | $WRANGLER secret bulk
-          fi
-          {
-            echo "### The shop"
-            echo ""
-            echo "- Stripe secret key: $([ -n "${STRIPE_SECRET_KEY}" ] && echo put || echo 'not set - the shop is closed')"
-            echo "- Stripe webhook secret: $([ -n "${STRIPE_WEBHOOK_SECRET}" ] && echo put || echo 'not set - the shop is closed')"
-            echo "- the Stripe webhook endpoint's URL: \`$base/v1/shop/webhook\` (events: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, charge.dispute.created, charge.dispute.closed)"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # SAFE5 + SAFE8 (bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY HAS TWO SECRETS - the reviewer's
@@ -1364,7 +1278,7 @@ jobs:
           kept() { timeout 60 $WRANGLER d1 execute "$DB_NAME" --remote --command "$1" --json 2>/dev/null | jq -r '.[0].results[0].n // 0' 2>/dev/null || echo 0; }
           n=$(kept "SELECT (SELECT COUNT(*) FROM home_yards_ver) = 0 OR EXISTS (SELECT 1 FROM home_yards y JOIN home_yards_ver v ON v.map_id = y.map_id WHERE y.built = v.ver AND y.shape IS NOT NULL) AS n")
           if [ "$n" != "1" ]; then
-            echo "::error::no town's yards stand built in a shape on D1 - migration 0136's build did not run there"; exit 1
+            echo "::error::no town's yards stand built in a shape on D1 - the yards' build did not run there"; exit 1
           fi
           # AUDIT LEAN-READS 2 D5: a town that stands yards, so the read answers off a row D1 itself built (a town with
           # none answers before it reads any)

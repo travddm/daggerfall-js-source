@@ -1,6 +1,4 @@
-// TOUCH-BUTTONS (2026-09-27, Discord - jessman212, playing on Android: "I haven't been able to remap the android
-// "buttons" on the bottom right of the screen. I would much rather use a button to attack rather than the touchscreen
-// personally."). THE BOTTOM RIGHT IS THE PLAYER'S.
+// TOUCH-BUTTONS. THE BOTTOM RIGHT IS THE PLAYER'S.
 //
 // TI1 fixed that corner at two buttons, Jump and Ready Weapon, and took the sword away in favour of the swipe - the
 // press-hold-and-stroke that is the mouse's own swing (touchGestures.js). Both stay the defaults. What changes is
@@ -24,7 +22,7 @@ export const TOUCH_BUTTON_ACTIONS = Object.freeze([
   { id: 'Jump', label: 'Jump', glyph: '↑↑', kind: 'hold', w: 64 },
   { id: 'ReadyWeapon', label: 'Ready or sheathe weapon', glyph: 'Z', kind: 'hold', w: 52 },
   { id: 'Attack', label: 'Attack', glyph: '⚔', kind: 'attack', w: 64 },
-  // TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife Use"): E, the use key - the professions' start and
+  // TOUCH-HOLD: E, the use key - the professions' start and
   // their hold (the steady hand, the knife's line, the net's haul) and the sea's, held while the finger is
   { id: 'Interact', label: 'Interact (the use key)', glyph: 'E', kind: 'hold', w: 52 },
   { id: 'CastSpell', label: 'Spellbook', glyph: 'Cast', kind: 'tap', w: 60 },
@@ -43,10 +41,10 @@ export const TOUCH_BUTTON_ACTIONS = Object.freeze([
   { id: 'TravelMap', label: 'Travel map', glyph: 'Travel', kind: 'tap', w: 68 },
   { id: 'LogBook', label: 'Journal', glyph: 'Log', kind: 'tap', w: 60 },
   { id: 'Transport', label: 'Transport', glyph: 'Ride', kind: 'tap', w: 60 },
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): the weapon's technique - held while the finger is: an aiming technique
+  // TECH1: the weapon's technique - held while the finger is: an aiming technique
   // aims while it holds (the other finger's drag is the look), and looses as it lifts; a quick tap looses it at the look
   { id: 'WeaponTechnique', label: 'Weapon technique (hold to aim)', glyph: 'Tech', kind: 'hold', w: 60 },
-  // SPYGLASS (bible/03-World/Captains-Sea.md): the captain's glass - a tap raises it aboard, the next lowers it (at a helm
+  // SPYGLASS: the captain's glass - a tap raises it aboard, the next lowers it (at a helm
   // the plate offers its own Glass press too, ui/naval/navalHud.js)
   { id: 'Spyglass', label: 'Spyglass (aboard)', glyph: 'Glass', kind: 'tap', w: 64 },
 ]);

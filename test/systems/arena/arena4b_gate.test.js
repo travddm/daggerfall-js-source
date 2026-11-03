@@ -1,10 +1,10 @@
-// ARENA4b (2026-10-03): THE GATE AND THE CLIMB ONLINE, DRIVEN - the account is the law while the arena online is live:
+// ARENA4b: THE GATE AND THE CLIMB ONLINE, DRIVEN - the account is the law while the arena online is live:
 // the recruiters read and write the ACCOUNT's banner (scenes/arena/arenaGate.js recruiterChoiceOnline / recruiter, scenes/
 // arenaOnline.js team - the service's own words when it refuses, the save's league untouched), the Herald's choice reads
 // the account's climb and banner (arenaGate.heraldChoice, both hosts' Herald), Fight waits for the account's climb and a
 // ladder purse is paid only for the bout the account was owed (arenaOnline.fightLadder / climb / owe, the claims'
 // answers), the pause window's banner and the Keeper of the Hall read the account's and the realm's (arenaGate.joined /
-// hall); offline all of it ARENA3's. Mac, 2026-10-02: "join a team (red and blue) and climb esclating tiers of opponents".
+// hall); offline all of it ARENA3's..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -31,7 +31,7 @@ const boardOf = (me = {}, extra = {}) => ({ season: 5, day: 9, team: { standings
 /** The arena online over a fake session and a fake account service whose answers the test sets. */
 function onlineOf({ board = boardOf(), guest = false, team = null } = {}) {
   const svc = { board, boardCalls: 0, teamCalls: [], claimAnswer: null, claims: [], boardHold: null, claimHold: null };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const said = [];
   const asked = [];
   let t = 0;
@@ -176,7 +176,6 @@ test('ARENA4b the Herald\'s choice online: the account\'s climb - his line its n
     const worn = f === 'src/scenes/world.js' ? /arenaJoined: \(\) => arenaGate\.joined\(\) \|\| !!arenaOnline\?\.inSession\?\.\(\),   \/\/ ARENA4b/ : /arenaJoined: \(\) => arenaGate\.joined\(\),   \/\/ ARENA4b/;
     assert.match(S, worn, `${f}: the modes' banner`);
   }
-  assert.match(rd('src/scenes/worldModes.js'), /if \(!info && pn\?\.arenaRole === 'hallKeeper' && host\.arenaHall\?\.\(\)\) return;/, 'the Keeper asks the host first');
 });
 
 test('ARENA4b the ladder online waits for the account\'s climb and pays only what the account was owed: Fight refused until the board is in (and asked), the account\'s next bout after; a win\'s purse held until the service keeps it - paid then, with the crowd\'s favour; a win out of the climb\'s order not paid, the realm\'s words said, the climb the service answered taken; an answer before the verdict pays too; a win still with the service holds the next Fight, a while at most; a forced ask while one is out asked again (mutants: the empty climb fought; the purse paid at the verdict; a refused win paid; the pending win ignored; the second ask dropped)', async () => {

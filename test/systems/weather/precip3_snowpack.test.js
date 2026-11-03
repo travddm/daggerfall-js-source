@@ -1,10 +1,10 @@
-// PRECIP3 (2026-10-19): THE SNOW THE GROUND KEEPS - systems/weather/snowpack.js. The pack's step (what falls lying, the
+// PRECIP3: THE SNOW THE GROUND KEEPS - systems/weather/snowpack.js. The pack's step (what falls lying, the
 // degree-hours over the step's own sky hours in closed form, the rain's heat), its cover and its snowline (the heights its
 // cover crosses 10, 50 and 90 % - one reading for the shader and the host), the snow year from midsummer on the event
 // clock's step grid with the summer before's survival, and the lattice of pixel corners that integrates a place's history
 // over the weather map: pure in the place and the minute, whoever asks and in whatever company, its skipped steps exact.
-// AUDIT PRECIP (the owner: "Audit this and ensure perfection. No band aids") re-pinned every law PACK-1..10 moved.
-// bible/07-Rendering/Biome-Precipitation.md is the record, bible/01-Overview/audits/Audit-Precip.md the audit's.
+// AUDIT PRECIP re-pinned every law PACK-1..10 moved.
+// is the record, the audit's.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

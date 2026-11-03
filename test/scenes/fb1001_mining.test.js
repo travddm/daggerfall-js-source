@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-01 part four - "minig is broken doesnt work" (#bug-reports), and Mac: "Also mining, the life
-// skill, is broken".
+// FIELD BUGS 2026-10-01 part four - "minig is broken doesnt work" (#bug-reports), and.
 //
 // ACT-TOUCH. Mining's act is struck with Attack: the gathering host reads the frame's SwingWeapon press off the edge
 // ring (scenes/world.js `input().attack`), which only the mouse and the keyboard write. A finger's Attack button or
@@ -187,7 +186,7 @@ test('ACT-TOUCH: Logging\'s chop by a finger - the press as the ring meets the n
 
 test('ACT-TOUCH: the world host hands every hooks press to the act before its gates - the street\'s and, through the same hook, the dungeon\'s and a building\'s (mutants: the hook never calls it; called after the act\'s own refusal)', () => {
   const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = src.indexOf('    attack: (dx, dy, held, o = null) => {');   // PIN MOVED (AUDIT 2026-10-01 part four, PAD-PULSE): the hook hears a held stroke's repeat
+  const at = src.indexOf('    attack: (dx, dy, held, o = null) => {');
   assert.ok(at > 0, 'the hooks object\'s attack');
   const body = src.slice(at, src.indexOf('\n    },', at));
   const strike = body.indexOf('gatherHost?.strike(held, o?.repeat === true)');
@@ -200,7 +199,6 @@ test('ACT-TOUCH: the world host hands every hooks press to the act before its ga
   const tap = src.slice(tapAt, src.indexOf('\n    },', tapAt));
   const [, first = '', second = ''] = tap.split('\n');
   assert.match(first, /^\s*if \(modes\?\.decorFlying\?\.\(\) \|\| yards\?\.flying\(\)\) return;/, `the tap's first line: ${first}`);
-  // PIN MOVED (AUDIT 2026-10-01 part four, STICK-TAP): never the stick's lock-only tap, and after the view's own test (a
   // tap in the docked bar's strip is no tap) - its third line; test/systems/fb1001_audit.test.js
   const third = tap.split('\n')[3] ?? '';
   assert.match(second, /^\s*if \(!ndcFromScreen\(x, y, /, `the tap's second line: ${second}`);

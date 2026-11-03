@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-A (2026-09-28, Mac: "Being able to aim and fire when viewing from the side") - THE GUNNERY: which battery
+// NAV-A - THE GUNNERY: which battery
 // bears for a look, where its volley will fall, the volley itself, and the reload. The port's own; pure - the host
 // hands a ship's pose and the camera's ray, and gets numbers back.
 //
@@ -30,7 +30,7 @@
 // silences the guns while it is held (navalDamage.js BRACE_TAKEN) - and, AUDIT NAV1, stops the reload: a crew holding
 // on is not loading, so the brace is an answer to a broadside, not a stance held for free.
 //
-// SHOT-KINDS (2026-10-17, bible/03-World/Naval-Refit.md SHOT-KINDS): WHAT EACH BATTERY IS LOADED WITH. A deck keeps one
+// SHOT-KINDS: WHAT EACH BATTERY IS LOADED WITH. A deck keeps one
 // load for each of its gun groups (LOAD_GROUPS: the broadsides together, the bow, the stern), each its bore's own
 // (shotKinds.js naturalShot) until the captain changes it. The aim and the volley are laid and flown with the gun as it
 // fires that load (shotKinds.js shotGun: its muzzle speed, its scatter), its reload is the load's, and a change draws a

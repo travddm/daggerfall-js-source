@@ -3,7 +3,6 @@
 // ACC1b — A GUEST'S NAME: drawn from Daggerfall's own name banks, and
 // shaped so a chosen handle can never be mistaken for one.
 //
-// Mac (2026-09-21): "definitely a random name".
 //
 // WHY THE GAME'S OWN BANKS. A guest could be called "Ochre Fox" and
 // nobody would be harmed, but a guest called Theodore Gwynard is an

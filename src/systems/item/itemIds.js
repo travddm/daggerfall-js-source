@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT4 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): A VALUABLE PIECE'S ID. Realm-Arc section 4
+// INT4: A VALUABLE PIECE'S ID. Realm-Arc section 4
 // planned it - "Valuable items get a service-issued id ... The same id in two records freezes both for review" - and
 // the port's items had none ("the port's item IS its UID", inventory.js): a copy and its original were the same record
 // twice, and nothing could tell a piece given away from a piece kept and given.

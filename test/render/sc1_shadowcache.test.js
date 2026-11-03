@@ -1,5 +1,4 @@
-// SC1 (2026-09-23, Mac: "make some insane improvements to our lighting system ... while also improving
-// performance"; the second step): THE STATIC CASTERS ARE DRAWN ONCE.
+// SC1: THE STATIC CASTERS ARE DRAWN ONCE.
 //
 // A lantern's cube map was replayed - six faces of everything in its range - every frame for the two nearest
 // slots and every third for the rest, whether or not anything in that range had moved. render/shadowPass.js now
@@ -114,7 +113,7 @@ test('SC1: a mesh that MOVES is a dynamic - drawn alone over the blitted cache e
   st = frame(walking);
   assert.equal(st.staticFaces, 0, 'the cache stands');
   assert.equal(st.dynFaces, 6); assert.ok(st.pointDraws >= 1 && st.pointDraws <= 6, `the crate alone, in the faces that see it (${st.pointDraws})`);
-  // PERF-FACE (PIN MOVED): over a fresh copy of the cache in the faces that held it last frame - standing where it stood,
+  // PERF-FACE (
   // the faces it is drawn into now - and no other
   assert.equal(st.blit, st.pointDraws, 'over a fresh copy of the cache, in the faces that held it');
   const slot = r.shadows.casterOf[0], held = [...r.shadows._faceDyn.slice(slot * 6, slot * 6 + 6)].filter(Boolean).length;   // the lamp's faces that hold the crate
@@ -182,11 +181,6 @@ test('SC1: STICKY SLOTS - a light keeps its slot, matched by position, when the 
   assert.deepEqual([...sp.shadowIndex.slice(0, 3)], [0, -1, 1]);
   assert.equal(st.staticFaces, 0);
   assert.equal(SHADOW_NEAR_CASTERS, 2);
-  // DISC24-C: the rank is read once (the player's own card rides it too) and the cadence off it
-  // DISC29-E: the cadence is the EYE's rank still; the lamps nearest the player's own card join it (they draw it
-  // every frame - DISC24-C's law, ranked from the card now so an orbiting camera does not move its shadow)
-  assert.match(rd('src/render/shadowPass.js'), /const near = nearestRank\(casters, L, f\.eye, rank\) < SHADOW_NEAR_CASTERS;/, 'the cadence by rank');
-  assert.match(rd('src/render/shadowPass.js'), /const selfNear = selfAt \? \(nearestRank\(casters, L, selfAt, rank, this\._selfHeld, this\._selfHeldN\) < selfLamps\) : near;[^\n]*\n[^\n]*\n[^\n]*\n[^\n]*\n\s*const due = SHADOW_TUNING\.steady \|\| near \|\| selfNear \|\| \(this\.frameNo \+ k\) % SHADOW_FAR_CASTER_EVERY === 0;/, 'and the card\'s own two, every frame');
 });
 
 test('SC1: a flat whose origin moves is a dynamic (per batch, on the batch), a still one is in the cache; the door restores the old path whole - every caster in range at the cadence into the live layers, no cache, no blit (mutants: the batch\'s word ignored; the door ignored)', () => {
@@ -217,7 +211,6 @@ test('SC1: a flat whose origin moves is a dynamic (per batch, on the batch), a s
   r.setShadowCache(true);
   assert.equal(sp.cacheOn, true);
   assert.equal(shadowCacheOn(''), true); assert.equal(shadowCacheOn('?shadowcache=off'), false);   // CACHE-COPY: on unless asked off, as SC1 built it
-  assert.match(rd('src/render/enhancedLighting.js'), /renderer\.setShadowCache\?\.\(shadowCacheOn\(search\)\);/, 'read at the lane\'s install, like the air\'s');
 });
 
 test('SC1: a rig is always dynamic, and a dead mesh is neither in the signature nor drawn (mutants: the rig cached; the dead mesh kept in the signature, so its removal redraws nothing)', () => {

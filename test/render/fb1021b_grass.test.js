@@ -4,7 +4,7 @@
 // FRAME RATE's pace while its cells arrive at the eye's - and at 20 fps a DFU ride fell more than eight cells behind on
 // 13% of its frames (a gallop 25%, a run and a cart 5%), each of them two whole cells. The rim is paced to the eye now
 // (a deadline a cell, GRASS_DUE_AT), a birth inside the frame's time (GRASS_FRAME_MS on the field's own clock), and
-// what a step leaves behind waits for the rest. bible/07-Rendering/Performance-Exterior.md FB1021B.
+// what a step leaves behind waits for the rest. FB1021B.
 // AUDIT FB1021B (the same record's section; FIELD BUGS 2026-10-21c): a cell due now had turned the deadlines off, and
 // a slow machine born on the move never recovered - the pace is spent first now, and the cells due now take the
 // frame's time past it.

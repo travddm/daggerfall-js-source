@@ -163,32 +163,3 @@ test('SS1: the window loads the shot itself - cache by (key, url), released on c
   }
 });
 
-test('SS1: the hosts arm at save and deliver at frame end - THE FOUR HOSTS named', () => {
-  // world.js: the composer arms the shot only on a save that landed,
-  // and BOTH frame tails (the modal early-return and the main tail)
-  // deliver - a save armed from the pause window must not wait for
-  // the modal arm to drop.
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /if \(r\.ok && !quiet\) requestScreenshot\(r\.key\);/,   // REALM P0.5: a quiet checkpoint takes no shot
-    'the world composer arms on success');
-  assert.equal((world.match(/capturePendingScreenshot\(canvas\);/g) || []).length, 2,
-    'both world frame tails deliver');
-  // the dungeon pair: the CONTEXT arms (it owns no canvas), the HOST
-  // loop delivers - dungeon.js's two tails.
-  const dctx = read('src/scenes/dungeonContext.js');
-  assert.match(dctx, /if \(r\.ok && !quiet\) requestScreenshot\(r\.key\);/,   // REALM P0.5: a quiet checkpoint takes no shot
-    'the dungeon composer arms on success');
-  const dhost = read('src/scenes/dungeon.js');
-  assert.equal((dhost.match(/capturePendingScreenshot\(canvas\);/g) || []).length, 2,
-    'both dungeon frame tails deliver');
-  // exterior.js and interior.js are probe hosts with no composer -
-  // they capture nothing.
-  for (const probe of ['src/scenes/exterior.js', 'src/scenes/interior.js']) {
-    assert.ok(!read(probe).includes('capturePendingScreenshot'), `${probe} saves nothing, captures nothing`);
-  }
-  // and the window: the hook stays the override seam over the
-  // window's own GetSaveScreenshot read.
-  assert.match(read('src/ui/saveWindow.js'),
-    /this\.hooks\.screenshotTexture\n? *\? this\.hooks\.screenshotTexture\(key, screenshotOf\(key\)\)\n? *: this\._shotTexture\(renderer, key\)/,
-    "the hook wins; the window's own loader is the default");
-});

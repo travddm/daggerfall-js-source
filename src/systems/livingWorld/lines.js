@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): WHAT THE TOWN SAYS - the words of two or three residents met at
+// LW1: WHAT THE TOWN SAYS - the words of two or three residents met at
 // a spot (meetups.js), of a traveller to the player, of a caravan at its fire. Original to the port, in the crew's own
 // shape (naval/crewLife.js CREW_TALKS: a script of two or three lines, the first speaker first, then each in turn).
 //
@@ -12,7 +12,7 @@
 // trades, the weather, the morning, the day, the evening and the night, the season's holiday - so a smith and a farmer
 // on a wet evening talk of iron, of rain or of the tavern, and every reader of that minute hears the same.
 //
-// LW-TALK (2026-10-06): A SCRIPT IS A DIALOGUE - its opener says its even lines and the others answer in turn
+// LW-TALK: A SCRIPT IS A DIALOGUE - its opener says its even lines and the others answer in turn
 // (meetups.js circleLine), so a third line is the opener's again: "Did you hear about the miller's daughter?" /
 // "Everyone's heard. Twice." / "Well, I hadn't." gave the asker a line that undid the question. The morning's greeting
 // and the day's "Fine day." keep their hours (heard at six in the evening, and by the night watch), and a trade's pool
@@ -513,7 +513,7 @@ export const KIN_NEWS = Object.freeze({
     Object.freeze(['Did you hear? {who} - born to House {house}.', 'The line goes on, then.']),
   ]),
 });
-/** CHAP5b (bible/11-Multiplayer/Chapters-Arc.md 9: "the chapter's lines, keyed by ... its standing"): WHAT THE TOWN SAYS
+/** CHAP5b (9: "the chapter's lines, keyed by ... its standing"): WHAT THE TOWN SAYS
  *  OF ITS GUILDS' CHAPTERS - by a chapter's band off the chapter sheet, `{guild}` the chapter's guild ("the Fighters
  *  Guild"). A Steady chapter is no news. Its Season's event is CHAP6's. AUDIT CHAP4 C4: `{guild}` never a sentence's
  *  first word (it is filled lower-case) nor its subject (an order's name is plural) - the chapter is. */
@@ -558,7 +558,7 @@ export const CHAPTER_EVENT_NEWS = Object.freeze({
   ]),
 });
 
-/** TOWN-ECON TE3 (bible/06-Systems/Town-Economy-Arc.md 5): WHAT THE TOWN SAYS OF ITS TRADE - by its economy's band
+/** TOWN-ECON TE3 (5): WHAT THE TOWN SAYS OF ITS TRADE - by its economy's band
  *  (net/townEconLaw.js townBandOf), lower-case; `{town}` its name, filled by the meeting. A Steady town is no news.
  *  Through the text core (L10N4), read when it is told - each pool kept while the language holds, so a script is its
  *  pool's own. */
@@ -737,7 +737,7 @@ export function pickScript(seed, { jobs = [], weather = null, hour = 12, road = 
 }
 
 /**
- * LW-STIR (2026-10-08, bible/06-Systems/Living-World.md "LW-STIR"): THE STREET'S INCIDENTS - scripts of fixed parts
+ * LW-STIR: THE STREET'S INCIDENTS - scripts of fixed parts
  * (stir.js): `a` the one who begins it (the watchman stopping a stranger, the one with the grievance, the buyer, the
  * beggar), `b` the one it is put to, `g` the watch stepping into a quarrel; a line `loud` is shouted (the HUD's shout).
  * A stranger answers the watch by their humour that day (stir.js humourOf): civil, curt or hostile.

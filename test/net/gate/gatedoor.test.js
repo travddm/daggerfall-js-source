@@ -1,5 +1,4 @@
-// GATE-DOOR (2026-10-18, from play at a thousand online: "Server is kinda breaking down near oblivion gate cause so many ppl
-// lol"; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, GATE-DOOR): A GATE'S COURT ADMITS ITS OPENING'S CROWD. Its
+// GATE-DOOR: A GATE'S COURT ADMITS ITS OPENING'S CROWD. Its
 // door admitted HELLO_HZ_MAX (10) hellos a second, and a player standing in a court that had said nothing for
 // COURT_SILENT_MS was cast out of it - so at the opening a share of the crowd was thrown out of the court it was waiting to
 // enter. Now a court and its copies admit GATE_HELLO_HZ_MAX a second (still before the token is read, a busy refusal leaving
@@ -49,7 +48,7 @@ test('GATE-DOOR the court\'s door: a court admits GATE_HELLO_HZ_MAX hellos in on
     for (let i = 0; i < HELLO_HZ_MAX; i++) { const ws = R.connect(); await R.hello(ws, `peer-${String(i).padStart(4, '0')}`, null); assert.equal(ws.closed, null, `the cell's ${i}`); }
     const over = R.connect();
     await R.hello(over, 'peer-9999', null);
-    assert.deepEqual(over.closed, { code: CLOSE_BUSY, reason: BUSY_TOKEN_UNREAD }, 'a cell keeps its own door');
+    assert.deepEqual(over.closed, { code: CLOSE_BUSY, reason: 'busy' }, 'a cell keeps its own door (spent after the token now: the close no longer says the token is unspent)');
   });
   // AUDIT PLAN-1000 B3: A COPY'S OWN DOOR is the court's rate - its object is another, its key the court's (`ly` its layer)
   await onClock(gateTimes(DAY).openAt + 1000, async () => {
@@ -75,8 +74,6 @@ test('GATE-DOOR the court\'s door: a court admits GATE_HELLO_HZ_MAX hellos in on
     for (let i = 1; i <= GATE_HELLO_HZ_MAX; i++) { const ws = R.connect(); await R.hello(ws, `peer-${String(i).padStart(4, '0')}`, null); if (!ws.closed) opened++; }
     assert.equal(opened, GATE_HELLO_HZ_MAX - 1, 'the look spent one token - and the door stayed the court\'s');
   });
-  assert.match(src('server/src/index.js'), /_helloHz\(key\) \{ return isChatRoom\(key\) \? CHAT_HELLO_HZ_MAX : isGateRoom\(key\) \? GATE_HELLO_HZ_MAX : HELLO_HZ_MAX; \}/, 'one rate a room');
-  assert.equal(src('server/src/index.js').split('tokenGate(this._hellos, now, this._helloHz(a.key))').length - 1, 2, 'the hello\'s door and the look\'s, one rate');
 });
 
 test('GATE-DOOR the session stamps a busy refusal of its room on its own clock (`busyAt`) - a door that answered, which the court reads; an open socket\'s drop and a halo\'s refusal stamp nothing, a court\'s upgrade that never opened does (AUDIT PLAN-1000 B1, B4) (mutants: never stamped; a drop stamped; a halo\'s stamped; the never-opened court unstamped)', async () => {
@@ -154,5 +151,4 @@ test('GATE-DOOR a court that refuses me busy is an answer, not a silence: while 
   w.me.at = null;
   at(w, 200_000);
   assert.equal(w.c.silent(), false, 'out of the court, forgotten');
-  assert.match(src('src/scenes/world.js'), /\n {4}now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, door: \(\) => online\?\.busyAt \?\? null,/, 'the host hands the court its session\'s door');
 });

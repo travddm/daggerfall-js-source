@@ -1,4 +1,4 @@
-// RW1 (2026-10-09): THE REAL WINDOWS, PHOTOGRAPHED ON A REAL GPU (SwiftShader) - no ARENA2.
+// RW1: THE REAL WINDOWS, PHOTOGRAPHED ON A REAL GPU (SwiftShader) - no ARENA2.
 //
 //     node tools/realWindowsProbe.mjs            shots in tools/shots/realwindows-*.png
 //

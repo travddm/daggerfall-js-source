@@ -1,10 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HUB1 (2026-09-25) — EVERY REGION'S MAIN CITY IS ITS HUB.
+// HUB1 — EVERY REGION'S MAIN CITY IS ITS HUB.
 //
-// Mac: "One big thing Im trying to brain storm is giving each region's
-// main city a natural player hub and future ownership for online
-// guilds". Asked, Mac chose the whole arc - exclusive homes, a
+// . Asked, Mac chose the whole arc - exclusive homes, a
 // decorator of our own, guilds, and seat ownership "all out" - and left
 // respawning at a hub out of it ("That'll be a seperate idea"). This
 // slice is the ground the rest stands on: WHICH city is each region's

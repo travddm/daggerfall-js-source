@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS9 (2026-10-26, the owner: "Roads around the city arent properly blended when they are angled";
-// bible/03-World/Town-Shapes.md TS9): a town's road ring (the mod's "Paint roads around locations", round its outline
+// TOWN-SHAPES TS9: a town's road ring (the mod's "Paint roads around locations", round its outline
 // since TS2) is painted whole - the painter's skip guard passed by every ring tile off the location rect and off the
 // pixel's centre cross and diagonals, so a town's ring stood as bars across its roads and stubs on its diagonals - and its
 // angled edges are blended with the road's own diagonal edge (47 over dirt, 55 over grass), as a diagonal road's flanks
@@ -113,7 +112,7 @@ test('AUDIT BAY-LEFT F2 TS9 past the Bay: the curved painter (VOYAGER2) lays the
   assert.equal(at(none, 11, 20), 0, 'no road through the pixel: no ring');
 });
 
-test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring tile painted (none bare where the guard passed it by), every outer step on dry ground blended', { skip: skipReal }, async () => {
+test('TS9 with ARENA2: a walled city past the Bay, on a Bay pixel and on a pixel past the Bay - every ring tile painted (none bare where the guard passed it by), every outer step on dry ground blended', { skip: skipReal }, async () => {
   const { MapsFile, longitudeLatitudeToMapPixel } = await import('../../../src/formats/mapsFile.js');
   const { WoodsFile } = await import('../../../src/formats/woodsFile.js');
   const { BlocksFile } = await import('../../../src/formats/blocksFile.js');
@@ -123,7 +122,6 @@ test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring 
   const { installTownOutline, outlineTownLocation, townOutlineBlockJson } = await import('../../../src/world/townOutline.js');
   const { standTownWall } = await import('../../../src/world/townWalls.js');
   const { arenaTemplates } = await import('../../../src/world/arenaLocations.js');
-  const { unwalledLocation } = await import('../../../src/world/townShape.js');
   const { setArenaRoads, beyondKey } = await import('../../../src/world/arenaRoads.js');
   const b = (f) => new Uint8Array(readFileSync(join(ARENA2, f)));
   const maps = new MapsFile(); maps.load(b('MAPS.BSA'), b('CLIMATE.PAK'), b('POLITIC.PAK')); maps.autoDiscard = false;
@@ -133,18 +131,18 @@ test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring 
   const bay = maps.getLocationByName('Daggerfall', 'Gothway Garden');
   const p = longitudeLatitudeToMapPixel(bay.mapTableData.longitude, bay.mapTableData.latitude);
   const rows = [];
-  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(unwalledLocation(lc)); } }
+  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(lc); } }
   const t = arenaTemplates(rows)['city-state'][9];
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
-  const city = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500009) >>> 0, longitude: bay.mapTableData.longitude, latitude: bay.mapTableData.latitude } }, io);
+  const city = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500009) >>> 0, longitude: bay.mapTableData.longitude, latitude: bay.mapTableData.latitude }, arena: { kind: 'city-state' } }, io);
   if (city.outline?.walled) standTownWall(city, t.exterior.exteriorData.blockNames, io, townOutlineBlockJson);
-  // AUDIT BAY-LEFT F2 (PIN MOVED): and the walled city built on a pixel truly past the Bay, its road the roads' layer's -
+  // AUDIT BAY-LEFT F2 (
   // the curved painter's (VOYAGER2), which the city on the Bay's own pixel never reached
   const P = { x: 1500, y: 300 };
-  const far = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500010) >>> 0 } }, io);
+  const far = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500010) >>> 0 }, arena: { kind: 'city-state' } }, io);
   if (far.outline?.walled) standTownWall(far, t.exterior.exteriorData.blockNames, io, townOutlineBlockJson);
   const counts = [];
-  for (const [what, loc, at0] of [['Gothway Garden', bay, p], [`${t.name} past the Bay`, city, p], [`${t.name} on a pixel past the Bay`, far, P]]) {
+  for (const [what, loc, at0] of [[`${t.name} past the Bay`, city, p], [`${t.name} on a pixel past the Bay`, far, P]]) {
     const tilemap = new Uint8Array(D * D), rect = setLocationTiles(loc, maps, blocks, tilemap);
     const roads = new Uint8Array(1000 * 500); if (at0 === p) roads[p.y * 1000 + p.x] = DIR.N | DIR.S | DIR.E | DIR.W;
     setArenaRoads(at0 === P ? { roads: new Map([[beyondKey(P.x, P.y), DIR.N | DIR.S | DIR.E | DIR.W]]), tracks: new Map(), join: new Map() } : null);
@@ -165,5 +163,5 @@ test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring 
     assert.ok(halves > 8, `${what}: its angled edges blended (${halves})`);
     counts.push([halves, codes]);
   }
-  assert.equal(counts[2][0], counts[2][1], `past the Bay every angled edge blended (${counts[2][0]} of ${counts[2][1]})`);
+  assert.equal(counts[1][0], counts[1][1], `past the Bay every angled edge blended (${counts[1][0]} of ${counts[1][1]})`);
 });

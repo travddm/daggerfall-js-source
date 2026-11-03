@@ -1,4 +1,4 @@
-// STAFF-PANEL-SPEED (2026-10-23, mob: "slow when moving in menus", "The click takes a while before the new page shows
+// STAFF-PANEL-SPEED (2026-10-23,, "The click takes a while before the new page shows
 // (it's waiting on the server)", "it need to not hurt server performance") - THE TRIPS EVERY STAFF CLICK WAITS ON, core:
 // staff.js's session (its lookup and its once-a-minute touch, one trip) and the routes staff.js answers itself - /v1/staff/me,
 // /keys, /mods, /team and /audit - each a read and its audit row in one batch. Counted over the real Worker on
@@ -19,7 +19,7 @@ const b64url = (bytes) => Buffer.from(bytes).toString('base64url');
 async function stand() {
   const pair = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pub = b64url(new Uint8Array(await subtle.exportKey('raw', pair.publicKey)));
-  const s = await standService({ DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
+  const s = await standService({ SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
   await s.registered('SirMcMobdon');
   await s.registered('Asynian');
   const staff = async (path, body = {}, token = null) => {

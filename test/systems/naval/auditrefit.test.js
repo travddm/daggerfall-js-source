@@ -1,5 +1,4 @@
-// AUDIT NAVAL-REFIT (2026-10-17, the owner: "Lets do a comprehensive audit and ensure perfection"; bible/03-World/
-// Naval-Refit.md AUDIT) - what the audit of the refit found, each on the real module it lives in: a near miss searched
+// AUDIT NAVAL-REFIT - what the audit of the refit found, each on the real module it lives in: a near miss searched
 // only past her bounding sphere's reach; a ship another player stands going down blows her magazine on my screen as on
 // hers (her seed's), and is heard going; the flag's cloth remembers a flag that will not paint; a classic record read for its picture through one door, guarded alike for the paint
 // shop and the cabin. tools/mutants/auditrefit.json.

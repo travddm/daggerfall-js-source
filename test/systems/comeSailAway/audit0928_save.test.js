@@ -268,7 +268,6 @@ const FISH = DEEP_WATERS_FISH_TEMPLATES[0].index;
 const fishRows = () => customItemsForGroup(BOAT_ITEM_GROUP).filter((t) => t === FISH);
 const keysFor = () => { const store = IA.createBindings(); IA.resetDefaults(store); setBindings(store); };
 
-// PIN MOVED (SHIPYARDS, 2026-10-11): the boat rows stand on no shelf at all now - a port town's shipyard sells every hull
 // (systems/shipyards.js) - so S4's latch is pinned by the fish rows below, the one home's other mod rows
 test('AUDIT PRE-MERGE 0928 S4 x SHIPYARDS: no shelf stocks a boat row, whatever the switch and however the game loaded it - the shipyard sells the hulls', () => {
   MS._resetModSettings();

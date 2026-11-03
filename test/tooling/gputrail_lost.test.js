@@ -1,5 +1,5 @@
-// GPU-TRAIL-LOST (2026-10-25, app/lib/rendererGone.cjs createGpuGoneWait): the GPU process's own crash.log entry carries
-// the page's lost sample. In the desktop app's crash run (2026-10-25) the GPU's entry was written the moment
+// GPU-TRAIL-LOST: the GPU process's own crash.log entry carries
+// the page's lost sample. In the desktop app's crash run the GPU's entry was written the moment
 // child-process-gone fired, before the page's lost-context sample crossed the bridge, so only a later renderer stop's
 // entry showed it. The hold is driven by execution with a fake clock; the shell's wiring is pinned in
 // gputrail_crashlog.test.js. The restored flag's line is here too.

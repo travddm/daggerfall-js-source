@@ -1,13 +1,10 @@
-// BOARD-SIFT (2026-10-21, feature-feedback: "Definitely need sorting/filtering functions for work writs considering there
-// are thousands of them and you have to scroll through them all to find what you want. The notice board market also
-// doesnt show everything if there are too many weapons/armor/etc listed it stops after a certain number"; "The notice
-// board in general needs some TLC. The writs especially."): THE WORK TAB'S BAR (ui/workSift.js, wired by
+// BOARD-SIFT: THE WORK TAB'S BAR (ui/workSift.js, wired by
 // ui/noticeWindow.js workBody and ui/workTab.js entries) and THE MARKET'S PAGES, SEARCH AND ORDERS (ui/marketTab.js).
-// AUDIT BOARD-SIFT (2026-10-22): every kind of work built in the shape its producer mints (server-account/src/
+// AUDIT BOARD-SIFT: every kind of work built in the shape its producer mints (server-account/src/
 // professions.js writView, writs.js guildWritView and commissionView, contracts.js contractView), each one's fill law and
 // words; the bar's own changes drawing the results alone, a composed word read whole; the market's every change from the
 // first page, a search read as the names the rows wear, a page an act emptied stepping back, a choice drawn at once.
-// The record: bible/06-Systems/Professions-Arc.md 10.13.
+// The record: 10.13.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

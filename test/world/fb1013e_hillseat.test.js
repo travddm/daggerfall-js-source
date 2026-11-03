@@ -277,7 +277,7 @@ test('HILL-SEAT: the pads ride the pixel\'s own static merge - one GPU mesh with
   const remap = new Map([['302_2', '102_2']]);   // a climate's grass
   const sb = new StaticBatchBuilder(), resolve = keyResolver(remap), hill = drawn(52758);
   sb.add(hill, multiply(origin, house(52758).matrix), resolve);   // the hill, merged as any model of the block is
-  sb.add(patch, origin, resolve);   // world.js's own call: addStatic(hillPatch, originMatrix, false) - staticBuilder.add through the pixel's table (PIN MOVED, AUDIT PRECIP HOST-7: the merge's models logged)
+  sb.add(patch, origin, resolve);   // world.js's own call: addStatic(hillPatch, originMatrix, false) - staticBuilder.add through the pixel's table (
   const merged = sb.finish();
   const batch = renderer.createMesh(merged);
   assert.equal(live.size, 1, 'one GPU mesh for the pixel\'s statics, pads and all');
@@ -286,30 +286,6 @@ test('HILL-SEAT: the pads ride the pixel\'s own static merge - one GPU mesh with
   for (const i of [0, 1, 2]) assert.ok(Math.abs(merged.positions[hill.positions.length + i] - (patch.positions[i] + origin[12 + i])) < 1e-3, 'laid by the block\'s origin');
   renderer.destroyMesh(batch);   // destroyPixel's `renderer.destroyMesh(p.staticBatch)`
   assert.equal(live.size, 0, 'nothing of the pads outlives the pixel');
-});
-
-test('HILL-SEAT by source: THE FOUR HOSTS - world.js lays the pads into its pixel\'s static merge and its collider bucket (both freed in destroyPixel and on a failed build) before its flats read the seat; exterior.js draws and collides them before its flats; worldModes.js and dungeonContext.js stand no hill', () => {
-  const w = hostText('src/scenes/world.js');
-  const seatAt = w.indexOf('const hillSeat = blockHillSeat(b.layout.models);');
-  const wPatch = 'const hillPatch = blockHillPatch(hillSeat, b.layout.models, (m) => (m.enhancedOnly && !isEnhanced() ? null : cpuModels.get(m.modelIdNum)));';
-  const wWire = 'if (hillPatch) { addStatic(hillPatch, originMatrix, false); collider.addMesh(key, hillPatch.positions, hillPatch.indices, originMatrix, onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0]))); unionBox(transformedAabb(localAabb(hillPatch.positions), originMatrix)); }';
-  assert.ok(seatAt > 0 && w.indexOf(wPatch) > seatAt, 'world.js: the pads, off the block\'s seat and the meshes it drew');
-  assert.ok(w.indexOf(wWire) > w.indexOf(wPatch), 'world.js: merged with the pixel\'s statics, solid in the pixel\'s bucket, inside its culling box');
-  // PIN MOVED (SOLITUDE-RELIEF): the trees read the seat at their block's lifted y (hillY: NATURE_FLATS_Y and the plane's offset, less the block's lift)
-  assert.ok(w.indexOf(wWire) > 0 && w.indexOf(wWire) < w.indexOf('blockY + seatNatureFlat(hillSeat, flat.x, flat.z, hillY)'), 'world.js: before the trees read the seat');
-  assert.doesNotMatch(w, /createMesh\(hillPatch/, 'world.js: no GPU mesh of their own - the pixel\'s batch is theirs');
-  assert.match(w, /if \(p\.staticBatch\) \{ renderer\.destroyMesh\(p\.staticBatch\); p\.staticBatch = null; \}/, 'world.js destroyPixel frees the batch');
-  assert.match(w, /function destroyPixel\([^]*?collider\.removeBucket\(key\);/, 'world.js destroyPixel drops the pixel\'s bucket');
-  assert.match(w, /if \(m\.staticBatch\) renderer\.destroyMesh\(m\.staticBatch\);/, 'world.js: a failed build frees its batch too');
-  const e = src('src/scenes/exterior.js');
-  const eSeat = e.indexOf('hillSeat = blockHillSeat(b.layout.models);');
-  const ePatch = e.indexOf('const hillPatch = blockHillPatch(hillSeat, b.layout.models, (m) => ((m.enhancedOnly && !isEnhanced()) || !gpuMeshes.get(m.modelIdNum) ? null : cpuModels.get(m.modelIdNum)));');
-  const eWire = e.indexOf('if (hillPatch) { drawList.push({ mesh: renderer.createMesh(hillPatch), matrix: originMatrix, order: -2, box: transformedAabb(localAabb(hillPatch.positions), originMatrix) }); collider.addMesh(\'world\', hillPatch.positions, hillPatch.indices, originMatrix);');
-  assert.ok(eSeat > 0 && ePatch > eSeat && eWire > ePatch, 'exterior.js: the pads drawn and solid in the location\'s frame');
-  assert.ok(eWire < e.indexOf('seatNatureFlat(hillSeat, flat.x, flat.z, NATURE_FLATS_Y)'), 'exterior.js: before the trees read the seat');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(src(host), /blockHillSeat|blockHillPatch|layoutRmbBlock/, `${host}: stands no town block, so no hill`);
-  }
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

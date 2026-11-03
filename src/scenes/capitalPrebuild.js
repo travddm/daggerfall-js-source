@@ -1,12 +1,11 @@
 // @ts-check
-// IC-GRAND's perf pass (bible/03-World/Arena-Provinces.md IC-GRAND, "Off the page's thread") - THE CITY'S WORKER TOLD WHAT
+// IC-GRAND's perf pass (IC-GRAND, "Off the page's thread") - THE CITY'S WORKER TOLD WHAT
 // IS COMING. On the frame (scenes/tamrielSweepsHost.js wires it - HOST-SPLIT), asked only when the player's pixel or the
 // city's moves: within PREBUILD_REACH of the city's centre pixel its worker stands (made once - world/imperialPrebuildClient
 // .js) and is told the slices the stream is about to build - the ones within NEAR_RING of the player's pixel near (the
 // player's own first, then nearest first), the ring past them far; out of reach it is let go, and what it held with it.
 //
-// IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
-// Arena-Provinces.md IC-STUTTER): AHEAD OF THE TRAVELLER, AND NOTHING OF THE CITY MADE ON THE PAGE. At x60 a slice is
+// IC-STUTTER: AHEAD OF THE TRAVELLER, AND NOTHING OF THE CITY MADE ON THE PAGE. At x60 a slice is
 // crossed every two or three seconds, and the worker heard of a slice only on the frame the stream queued it - so the
 // pixel's build met pieces not made yet and made them on the page's thread, each a unit no breath parts. Now:
 //   - AHEAD (`prebuildWanted`'s `heading`): the slices of the next ring that one more crossing the way the traveller is

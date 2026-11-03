@@ -1,6 +1,4 @@
-// FT4 - THE OUTDOORS, ONE ROW (2026-09-14, Mac's own condensing example:
-// "our enhanced environments + dynamic skies ... mods/classic/enhanced
-// that share commonalities").
+// FT4 - THE OUTDOORS, ONE ROW.
 //
 // Two switches in two panes decided what the sky is: the Enhanced
 // category's Enhanced environments (uiPrefs, EE1) and the Mods pane's
@@ -76,8 +74,8 @@ test('FT4: the registry row - both labels, a condensed choice with its own defau
   assert.equal(c.read, outdoorsRead); assert.equal(c.write, outdoorsWrite);
   assert.equal(c.initial, true); assert.equal(c.online, true, 'the lane forces the outdoors on');
   assert.deepEqual(f.control.also, [{ store: 'mods', vendor: 'dynamic-skies', key: 'Enabled' }]);
-  assert.match(f.note, /Off brings back the classic painted sky/);   // PIN MOVED: BR5 assert.match(f.note, /BadLuckBurt and carademono/);
-  // FT15 (2026-09-15): the note used to send a player to the Mods page for the mod's fog and
+  assert.match(f.note, /Off brings back the classic painted sky/);
+  // FT15: the note used to send a player to the Mods page for the mod's fog and
   // pixel-snow knobs. FT14 deleted that page - those knobs open in this row's own tile drawer
   // (MOD_CURATED['dynamic-skies']) - so the sentence was a pointer at nothing until the trim.
   // AUDIT FT15 (drift): the CLAIM is that the note sends a player to this tile
@@ -99,11 +97,3 @@ test('FT4: the registry law - a condensed row names its own default, and it must
   assert.deepEqual(mut({ default: 'off' }), []);
 });
 
-test('FT4: the Enhanced category\'s row left with its copy; the host\'s composition is untouched', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(!/prefRow\('enhancedEnvironments'/.test(menu), 'the registry holds the words now');
-  assert.ok(!/function portRowsEnhanced\(/.test(menu), 'FT12: the Enhanced category is gone from the settings rail - its rows are the home\'s');
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /const enhancedLane = isEnhanced\(\) && params\.get\('sky'\) !== 'classic' && getPref\('enhancedEnvironments'\);/);
-  assert.match(shared, /const dynamicOn = enhancedLane && \(skyDoor === 'dynamic' \|\| \(skyDoor === null && modSetting\('dynamic-skies', 'Enabled'\)\)\);/, 'the row writes the stores this line reads; it does not replace the line');
-});

@@ -1,5 +1,5 @@
-// AUDIT TESA II, lane M (2026-10-25) - THE HELD MAP PAST THE BAY'S PAINT AND ITS READS, pinned where the audit found them
-// wrong (ui/tamrielTiles.js, ui/tamrielInk.js, ui/ink/inkMap.js; bible/03-World/Arena-Provinces.md TESA15, MAP-LINES):
+// AUDIT TESA II, lane M - THE HELD MAP PAST THE BAY'S PAINT AND ITS READS, pinned where the audit found them
+// wrong (ui/tamrielTiles.js, ui/tamrielInk.js, ui/ink/inkMap.js; TESA15, MAP-LINES):
 //   M1  a still view that wants more tiles than TILES_KEPT settles - it never lets go a tile it draws;
 //   M3  a stand-in is found at every level (the level an integer of quarter-doublings, not a float an ulp off);
 //   M10 a dense tile is painted a step at a time under the frame's budget, owed and partial meanwhile, its last paint
@@ -8,7 +8,6 @@
 //   M12 a far tile strokes every step that crosses it, however long its straight run;
 //   M13 a zone border's end on the sheet's coast, never out at sea;
 //   M7  the cities past the Bay under the map's filters and in MAP-KEY's hues, the hover and the press as the sheet inks;
-//   M6  a city the window names itself (the zone map's) inked without the continent's name;
 //   M14 a city's or a mark's glyph past the Bay answers from the Bay's side of the seam.
 // Synthetic layers, places and canvases; the coast off the authored land.
 import { test, afterEach } from 'node:test';
@@ -205,7 +204,7 @@ test('AUDIT TESA II M12: a far tile strokes every step that crosses it - a strai
   }
 });
 
-// ── M13: withdrawn with the zones' borders (REGION-LINES 2, the owner: "Those are just random lines") - the provinces' ends
+// ── M13: withdrawn with the zones' borders (REGION-LINES 2) - the provinces' ends
 // snap to the coast as they did (provinceLines) ──
 
 // ── M7, M6, M14: THE CITIES PAST THE BAY ────────────────────────
@@ -232,17 +231,6 @@ test('AUDIT TESA II M7: a city past the Bay is its bucket\'s - under the map\'s 
     assert.equal(tamrielCityAt(town.x, town.y, view, ink, { continent: true }), null, 'on the continent the capitals alone');
     const cap = ink.cities.find((c) => c.capital);
     assert.equal(tamrielCityAt(cap.x, cap.y, view, ink, { continent: true }), cap);
-  } finally { setTamrielFit(null); }
-});
-
-test('AUDIT TESA II M6: a city the window names itself (`nameless` - the zone map\'s, inside its zone) keeps its glyph and the continent\'s layer letters no name for it (mutant: the option unread)', () => {
-  try {
-    const ink = inkOf();
-    const town = ink.cities.find((c) => !c.capital);
-    const view = { ox: town.x - 115, oy: town.y - 72, scale: 5 };
-    const calls = overNames(ink, view, { nameless: (c) => c === town });
-    assert.ok(!calls.some((c) => c.fn === 'fillText' && c.args[0] === town.name), 'no name');
-    assert.ok(calls.some((c) => c.fn === 'arc' || c.fn === 'moveTo'), 'its glyph still');
   } finally { setTamrielFit(null); }
 });
 

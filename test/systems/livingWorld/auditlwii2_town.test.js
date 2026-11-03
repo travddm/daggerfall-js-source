@@ -1,4 +1,4 @@
-// AUDIT LW-II-2 (2026-10-10), lane "town": the second audit of THE LIVING WORLD II's patrons' client (LW15) and its
+// AUDIT LW-II-2, lane "town": the second audit of THE LIVING WORLD II's patrons' client (LW15) and its
 // word carried (LW16) - systems/livingWorld/livingTown.js (the patrons' word in a day's plans, the buyer by the place),
 // lines.js (a sentence's capital), and the host's seams in scenes/world.js (the region's read, the carried word's last
 // day and its modal frame). Each fix held against the real producers: the census through LivingTown over the synthetic

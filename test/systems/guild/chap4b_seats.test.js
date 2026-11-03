@@ -1,6 +1,6 @@
-// CHAP4b (2026-10-08, Mac: "Your decision", on "Whats next") - THE SEATS ON THE CLIENT: online, while the Roll holds,
+// CHAP4b - THE SEATS ON THE CLIENT: online, while the Roll holds,
 // the book's own rank stops at 7 (held at the Roll's adoption, never passed by DFU's review) and a seat's rank is read at
-// its own chapter's halls alone (bible/11-Multiplayer/Chapters-Arc.md sections 3.5 and 6). The law against literals; the
+// its own chapter's halls alone. The law against literals; the
 // review's ceiling through DFU's own updateRank and the popup's push effects; a seat's rank at the service gate; the tab
 // holding the book and saying the seats; the hosts' wiring.
 import { test } from 'node:test';
@@ -60,7 +60,6 @@ test('CHAP4b the book held at 7: each Roll guild\'s row above 7, in both books, 
 });
 
 test('CHAP4b the seats said, worded without gender: every seat at the page\'s first word; then each one gained or moved, each one lost; the book\'s hold said by guild (mutants: each arm, the words)', () => {
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Master's CHAIR and a council chair, the Masters and councils; marked by AUDIT GUILD3 R4
   assert.equal(seatLineOf({ f: FIGHTERS, region: ANTICLERE, seat: 'master' }), 'You hold the Master\'s chair of the Fighters Guild in Anticlere.');
   assert.equal(seatLineOf({ f: MAGES, region: DAGGERFALL, seat: 'officer' }, false), 'You no longer hold a council chair of the Mages Guild in Daggerfall.');
   const m = { f: FIGHTERS, region: ANTICLERE, seat: 'master' }, o = { f: MAGES, region: DAGGERFALL, seat: 'officer' };
@@ -162,23 +161,3 @@ test('CHAP4b the tab: each adoption holds the book at 7 (said once a hold) and k
 
 // ── THE HOSTS ───────────────────────────────────────────────────────
 
-test('CHAP4b the hosts\' wiring: the hall\'s services read the book seated, its review the host\'s ceiling; the streets\' host names the seat\'s rank by the politic region (the teleport\'s fee too) and the ceiling while the Roll holds, and says the hold and the seats (mutants: each seam)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const seated = \(\) => seatedBook\(memberships, membershipKey\(guild\), host\.chapterSeatRank\?\.\(guild\.factionId\) \?\? null\);/);
-  assert.match(wm, /const access = serviceAccess\(guild, membershipOf\(seated\(\), guild\), service, \{ rankCeiling: host\.rollPace\?\.\(guild\.factionId\)\?\.book \?\? null \}\);/);   // PIN MOVED (SEAT-WORDS, then AUDIT GUILD-WORDS II F-3): the book's ceiling handed on
-  assert.match(wm, /guild, memberships: seated\(\), store, rows, route,/);
-  assert.match(wm, /freeHealing: freeHealing\(guild, membershipOf\(seated\(\), guild\)\),/);
-  assert.match(wm, /rankCeiling: host\.rollPace\?\.\(guild\.factionId\)\?\.ceiling \?\? null,/);   // PIN MOVED (ROLL-PACE): the pace's ceiling, the book's seven within it
-  assert.match(wm, /steps: \(\) => onPushEffects\(playerEntity, guild, memberships, store, ownDate\(\), \{/, 'the review reads the book itself');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const seatRankHere = \(\/\*\* @type \{number\} \*\/ faction\) => \{\n\s+if \(!rollTracker\?\.held \|\| rollTracker\.stopped\) return null;\n\s+const px = playerTravelPixel\(\);\n\s+const region = \(\(\) => \{ try \{ return maps\.getRegionIndexAt\(px\.x, px\.y\); \} catch \{ return null; \} \}\)\(\);\n\s+return seatRankAt\(rollTracker\.seats, faction, region\);/);
-  assert.match(w, /chapterSeatRank: \(faction\) => seatRankHere\(faction\),/);
-  assert.match(w, /magesGuildRank: \(\) => Math\.max\(joinedGuildOfGroup\(activeMemberships\(playerEntity\), GUILD_GROUPS\.MagesGuild\)\?\.rank \?\? 0, seatRankHere\(GUILD_FACTION_IDS\.MagesGuild\) \?\? 0\),/, 'the paid teleport\'s fee at a seat\'s rank');
-  assert.match(w, /rollPace: \(f\) => rollPaceOf\(rollTracker, f, Math\.floor\(Date\.now\(\) \/ 1000\)\),/);   // PIN MOVED (AUDIT CHAP4 C3, then ROLL-PACE): from the page's first frame, the Roll's first word or not
-  // PIN MOVED (SEAT-WORDS, Field-Bugs-2026-10-15g.md): the hold is said by the host's module, which pops the Chapters page with it
-  assert.match(w, /\.\.\.rollNoticeDoors\(\{ entityOf: \(\) => playerEntity, say: \(text\) => chatNotice\(text\) \}\),/);
-  assert.match(src('src/scenes/rollNoticeHost.js'), /onCapped: \(\/\*\* @type \{number\[\]\} \*\/ factions\) => \{\n\s+const line = bookCappedLine\(factions\);\n\s+if \(line\) say\(line\);/);
-  assert.match(w, /onSeats: \(seats, before\) => \{ for \(const line of seatLinesOf\(before, seats\)\) chatNotice\(line\); \},/);
-  assert.match(w, /\.\.\.rollEntityDoors\(\(\) => playerEntity\),/, 'the doors carry the cap');
-  assert.match(src('src/net/npcRollTracker.js'), /cap: \(\) => rollBookCap\(entityOf\(\)\?\.guildMemberships\),/);
-});

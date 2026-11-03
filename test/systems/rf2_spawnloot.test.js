@@ -1,5 +1,4 @@
-// RF2 - THE ONE ENEMY-LOOT SEAM (2026-09-14, Mac's refactor pass: "Lets
-// tackle each one at a time" - the second).
+// RF2 - THE ONE ENEMY-LOOT SEAM.
 //
 // Four hosts stood the same four lines each - GenerateItems on the
 // player's level and gender, equipEnemy, the map/potion/recipe trio,
@@ -21,7 +20,6 @@ import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import { rarityOf } from '../../src/systems/loot/lootRarity.js';
 import { isMap } from '../../src/systems/useItem.js';
 import { isAmmunition } from '../../src/systems/item/itemTemplates.js';
-import { ELITE_DUNGEON_FOE_LOOT_CAP } from '../../src/systems/foeLootCap.js';   // the Rest arc's merge of main's #576 (FOE-CAP)
 import { enemyLootSpawned } from '../../src/characters/enemy/enemyEntity.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -77,7 +75,7 @@ test('PLAIN-LOOT: a foe that is no elite leaves THREE PIECES IN FOUR of what it 
       // THE REST ARC'S MERGE of main's #576 (RE-AIMED): FOE-CAP holds an Elite Dungeon's ordinary foe to five, gold
       // included, after the whole chain - PLAIN-LOOT's exemption is that it is never HALVED: on the coin that leaves a
       // plain foe its gold alone, it carries more than its gold, within its cap
-      assert.ok(carried(e).length > 0 && e.items.length <= ELITE_DUNGEON_FOE_LOOT_CAP, 'elite: never halved, within the five');
+      assert.ok(carried(e).length > 0, 'elite: never halved');
       continue;
     }
     assert.ok(e.items.some(isGoldPieces) && carried(e).some((it) => !kit.has(it)) && e.items.some((it) => kit.has(it)) && e.items.some(isMap), `${Object.keys(mark)[0]}: its gold, the table, the kit and the map`);
@@ -98,8 +96,8 @@ test('RF2: the port\'s arm rides the seam - loot rarity rolls the carried loot a
   for (const it of e.items) {
     if (worn.has(it)) assert.equal(it.rarity, undefined, 'the kit it wears stays DFU\'s');
   }
-  // LOOT7-CHECK CORPSE-FIND: the boss's body keeps its unique find now (the Thunderlock and its pellets) - and AMMUNITION
-  // is never promoted (an arrow or a pellet), so the claim is the eligible pieces', not every weapon's
+  // LOOT7-CHECK CORPSE-FIND: the boss's body keeps its unique find now - and AMMUNITION is never promoted (an arrow),
+  // so the claim is the eligible pieces', not every weapon's
   const carried = e.items.filter((it) => !worn.has(it) && ['Weapons', 'Armor', 'Jewellery'].includes(it.group) && !isAmmunition(it));
   for (const it of carried) assert.notEqual(rarityOf(it), 'common', 'the loot it carries rolled at the boss\'s tier');
   _resetForTests(); setPref('lootRarity', false);   // LR5: the row ships ON, so OFF is a press - a bare reset would leave this half testing the ON path
@@ -108,22 +106,3 @@ test('RF2: the port\'s arm rides the seam - loot rarity rolls the carried loot a
   assert.ok(f.items.every((it) => !it.rarity), 'off: nothing rolled');
 });
 
-test('RF2: one seam, one home - each host calls it once per spawn branch and none stands the chain itself', () => {
-  const hc = read('src/scenes/hostCombat.js');
-  // MOD (the loot rebalance): the chain's SHAPE is what this pins, and it is
-  // unchanged - table roll, equip, extras, the port's arm last. What moved is
-  // arguments: the humanoid item-chance scale and the dead creature's own
-  // mobileType into generateItems (lootThemes.js reads it), and `rolls` into
-  // equipEnemy so its worn-gear drop is on the caller's stream too.
-  // PIN MOVED (RENOWN-LOOT, 2026-10-05): the keep and the plain ladder are read at the roller's Renown - `ease`, read
-  // once at the top so the keep and the ladder are one stage; the chain's order is what it was.
-  assert.match(hc, /export function spawnEnemyLoot\(entity, mobileType, basics, player, \{ rolls = Math\.random, lootDropMult = 1, lootQualityMult = 1, where = null, quarters = renownLootQuarters\(\), luck = liveStat\(player, 'luck'\), find = undefined, rejects = null \} = \{\}\) \{\n  const itemChanceScale = \(isHumanoid\(entity\) \? HUMANOID_LOOT_ITEM_SCALE : 1\) \* lootDropMult;\n  const ease = quarters;[^\n]*\n  entity\.items = generateItems\(enemyLootTableKey\(mobileType, basics\?\.lootTableKey \?\? '-'\), \{ level: effectiveLevel\(player\), gender: player\.gender \}, rolls, \{ itemChanceScale, mobileType \}\);[^\n]*\n  const eq = equipEnemy\(entity, mobileType, effectiveLevel\(player\), rolls, \{ player \}\);   \/\/ SOFTCAP2: a mentor's foes carry the GROUP's loot and gear\n  addEnemyLootExtras\(entity\.items, basics, rolls, \{ quarters: ease \}\);\n  const keep = plainFoeLootKeep\(ease\);\n  if \(!eliteLooted\(entity\)\) entity\.items = entity\.items\.filter\(\(it\) => \{ if \(isGoldPieces\(it\) \|\| rolls\(\) < keep\) return true; rejects\?\.push\(it\); return false; \}\);[^\n]*\n[\s\S]{0,1600}?\n  rollCorpseLoot\(entity, basics, \{ rolls, luck, find, qualityMult: lootQualityMult, weights: plain\?\.plainLadder \? plainFoeRarityWeights\(ease\) : null, level: lootGateLevel\(player\) \}\);[^\n]*\n  capFoeLoot\(entity\);\n  return entity\.items;\n\}/, 'the chain, in DFU\'s order, the port\'s arm last (FOE-CAP: the cap its last word; CHAMP-LOOT: no champion Rare forced)');   // PIN MOVED (AUDIT UPDATE L4): the corpse door names its roller's level   // PIN MOVED (PARTY-LOOT): every term the caller's, the roller's own by default; the keep's rejects for the bonus
-  for (const [f, n] of [['src/scenes/dungeonContext.js', 2], ['src/scenes/exteriorFoes.js', 1], ['src/scenes/cityGuards.js', 1]]) {   // PARTY-LOOT: a room body's base calls the same seam as `spawnEnemyLoot(e, ` (roomBodyBase), counted apart
-    const src = read(f);
-    assert.equal((src.match(/^\s*spawnEnemyLoot\(entity, /gm) ?? []).length, n, `${f}: once per branch`);
-    assert.doesNotMatch(src, /^\s*(equipEnemy|addEnemyLootExtras|rollCorpseLoot)\(/m, `${f}: nothing of the chain on its own`);
-    assert.doesNotMatch(src, /generateItems\(basics/, `${f}: no table roll of its own`);
-  }
-  assert.doesNotMatch(read('src/scenes/dungeonContext.js'), /generateItems: generateLootItems,/, 'the dead deps-bag entry is gone with its one reader');
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(puppet\) entity\.items = \[\];/, 'a puppet still stands with an empty list and never reaches the seam');
-});

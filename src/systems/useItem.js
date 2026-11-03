@@ -42,7 +42,6 @@ import { setLightSource } from './lightSource.js';   // DISC7: the light in hand
 import { localizedStrings } from './textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
 import { hoodCapable, hoodUp } from './survival/temperature.js';   // HOOD-SAID: the one hood law, for toggleHood
 import { sandPotionRefusal } from './arena/arenaKit.js';   // AUDIT ARENA-LADDER: no potion on the sand
-import { spirePotionRefusal, spirePotionDrunk } from './eliteGates/spireKit.js';   // EG-FULL: THE POTION LAW
 
 /** THE ARMS WHOSE DESTINATION WINDOW THE PORT HAS NOT BUILT, named so a use
  *  SAYS something rather than eating itself. Keyed by this module's own result
@@ -112,7 +111,7 @@ export const VARIANT_CHANGEABLE = Object.freeze(new Set([
 /** NextVariant, verbatim: cycle to 0 at TotalVariants, which is the
  *  ITEM TEMPLATE's `variants` column. Returns true when the variant
  *  moved (the caller refreshes the doll or the list). */
-/** Mac (2026-09-18): "hide Use for non-usables". TRUE when the ladder below has an arm for the item that
+/** . TRUE when the ladder below has an arm for the item that
  *  does something - a quest item's watch, food and water and camp gear, a book, a potion, a map, the
  *  spellbook, a drug, a light source, oil, a Used enchantment, a garment with variants to cycle. The catch-all's
  *  "Nothing happens." and the recipe's "cannot use" are the two that are not a use. */
@@ -344,8 +343,6 @@ export function useItem(item, collection, {
 
   // AUDIT ARENA-LADDER: the sand's kit law - no potion in a bout of one's own, and the bottle is kept (systems/arena/arenaKit.js)
   else if (isPotion(item) && sandPotionRefusal()) out = { kind: 'refused', refused: true, text: sandPotionRefusal() };
-  // EG-FULL: THE POTION LAW - two restoring potions a hall in an Elite Breach, and the bottle is kept (systems/eliteGates/spireKit.js)
-  else if (isPotion(item) && spirePotionRefusal(item)) out = { kind: 'refused', refused: true, text: spirePotionRefusal(item) };
 
   else if (isPotion(item)) {
     // DrinkPotion + RemoveOne. AUDIT 22 F5: RemoveOne takes THIS
@@ -362,7 +359,6 @@ export function useItem(item, collection, {
     // bottle naming no recipe is drunk and does nothing, exactly as
     // here.
     const drank = drinkPotion ? drinkPotion(item.potionRecipeKey ?? 0, Number.isInteger(item.potent) ? item.potent : 0) : null;   // PROF12: a Potent potion's share
-    spirePotionDrunk(item);   // EG-FULL: a restoring one counted against the hall's two
     out = drank ? { kind: 'potion', potion: drank } : { kind: 'potion', pending: true };
   }
 

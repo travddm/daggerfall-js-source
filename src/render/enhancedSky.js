@@ -1,7 +1,5 @@
 // @ts-check
-// THE ENHANCED SKY (ES1, 2026-08-27, Mac's call: "for the enhanced
-// version of the game, I want us to develop our own take on the
-// procedural sky system mod from DFU").
+// THE ENHANCED SKY (ES1, 2026-08-27).
 //
 // Daggerfall's sky is 64 painted frames a day (SKY??.DAT) and one
 // painted night (NITE??I0.IMG); DFU's Enhanced Sky mod (Lypyl) replaced
@@ -107,11 +105,10 @@ export const MOONS = Object.freeze({
  *  every game sun is, so it reads at a glance. */
 export const SUN_RADIUS = 0.032;
 
-// THE RETRO PASS IS GONE (FT3, 2026-09-14, Mac: "Remove our version of
-// pixelated sky"). ES1e's angular pixel and posterise, ES1f/ES1g's grid,
+// THE RETRO PASS IS GONE (FT3, 2026-09-14). ES1e's angular pixel and posterise, ES1f/ES1g's grid,
 // PS1's switch and PS2's copy over the other sky passes were removed
 // whole; the dome is the smooth pass only, and there is no `?sky=retro`
-// or `?sky=smooth` door. Record: bible/10-UI/Features-Arc.md FT3.
+// or `?sky=smooth` door. Record: FT3.
 
 /** The pole the star field turns about: north (+Z here, since the sun's
  *  arc is the XZ east-west line), leaned toward the zenith so the field
@@ -269,7 +266,7 @@ export function moonSkyDirection(minuteOfDay, phase, tilt = 0) {
   return rotX(rotZ(sun, -angle), tilt);
 }
 
-/* ── EV5: MOONLIGHT (Mac: "I want sunlight and moonlight to matter") ──
+/* ── EV5: MOONLIGHT ──
    The sky has computed both moons' directions, phases and
    visibilities every frame since ES1 and the world's light consumed
    none of it. The MASSER leads: it is the big moon, and its phase-lit
@@ -339,7 +336,7 @@ export function withMoonAmbient(ambient, moon) {
  *  state should arrive slowly, and nothing about a sky changes in a
  *  frame.)
  *
- *  CLK1 (2026-09-08, Mac: "in sync with the world clock"): the ease
+ *  CLK1: the ease
  *  runs on GAME MINUTES, the clock the sun, the moons and the wind
  *  model already read - not on the wall's seconds the controller used
  *  to keep for itself. Fourteen real seconds at the default TimeScale
@@ -389,8 +386,7 @@ export function skyState({ minuteOfDay, weather = 'sunny', classicMinutes = 0, s
   const cloudLitDay = w.lit, cloudShadeDay = w.shade;
   // By night the clouds are the night's own colour, faintly lit by the moons.
   const nightLit = [0.16, 0.19, 0.25], nightShade = [0.07, 0.09, 0.13];
-  // VC6b (2026-09-18, Mac: "in the evening when the sun is setting and
-  // the sky is golden, clouds arent influenced by the sun"). Three
+  // VC6b. Three
   // numbers here, and the dome's own decks take them with the volumetric
   // field, because they are one palette:
   //  - the twilight ramp reached ONE only at twelve degrees up and was
@@ -619,8 +615,7 @@ void main() {
   // parts go to the shade colour. The lighting fades out at night with
   // the palette's own sun colour, which is black below the horizon.
   float cloud = 0.0;
-  // PERF-EXT30 (2026-09-25; "fps issues in the exterior but fine in the
-  // interior", "me too my friend.. don't know why. I got a RX6600"): NO
+  // PERF-EXT30: NO
   // COVER, NO DECKS. VC3 hands the dome a cover of 0 whenever the
   // volumetric clouds draw over it, and with cover 0 each deck is
   // smoothstep(1, 1 + soft, fbm) - but fbm never reaches 1 (five octaves

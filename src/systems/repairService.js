@@ -38,6 +38,13 @@ import { localizedText } from './textManager.js';   // L10N3d: the refusal, the 
 import { stampLayout, layoutStampOfMapId, recordStands } from './layoutPins.js';   // WD3: a ticket names the smith's town and its layout
 import { spendOwnMends } from './item/foundMark.js';   // RPT1026-LEDGERLAW: a paid repair spends what wear took of a found piece's own mends
 
+/** B4 (tame loot and economy): a repair costs what DFU's formula asks (REPAIR-EASE and REPAIR-RATE had cut it to a third;
+ *  a departure that made gear cheaper to keep than DFU, reverted). The port still turns InstantRepairs off for the price:
+ *  Roleplay & Realism: Items prices an instant repair at 0.9 of the damage against 0.6, which undid the old cut under
+ *  conditionBasedPrices. Instant is the port's default now, not a service bought. */
+export function calculateItemRepairCost(baseItemValue, shopQuality, condition, max, opts = {}) {
+  return dfuItemRepairCost(baseItemValue, shopQuality, condition, max, { ...opts, instantRepairs: false });
+}
 /** CalculateItemRepairCost (:1901-1922): free at full condition; ten
  *  percent of the item's base value floored at 1, through the shop's
  *  CalculateCost (quality + regional adjustment), then the guild
@@ -45,19 +52,6 @@ import { spendOwnMends } from './item/foundMark.js';   // RPT1026-LEDGERLAW: a p
  *  rank scaling; every other guild returns the price unchanged).
  *  NOTE the condition/max pair gates the zero alone - DFU's repair
  *  price does NOT scale with how damaged the item is. */
-/** REPAIR-RATE (2026-10-01, the economy arc - bible/06-Systems/Economy-Arc.md, repairs "exist to limit outings and force
- *  planning. Their function is not to remove money from the economy"): every repair costs a THIRD of what Daggerfall's
- *  formula asks - REPAIR-EASE (2026-09-30, Mac: "nerf repair costs") had it at two thirds - offline and online, every
- *  shop and guild, applied after the guild discount, floored at 1. */
-export const REPAIR_COST_SCALE = 1 / 3;
-/** AUDIT REPAIR-EASE F4: and no instant-repair premium. Roleplay & Realism: Items prices an instant repair at 0.9 of
- *  the damage against 0.6 - 1.5 times - which the port's InstantRepairs-on default turned on for everyone and so
- *  undid the two thirds exactly under conditionBasedPrices. Instant is the port's default now, not a service bought. */
-export function calculateItemRepairCost(baseItemValue, shopQuality, condition, max, opts = {}) {
-  const cost = dfuItemRepairCost(baseItemValue, shopQuality, condition, max, { ...opts, instantRepairs: false });
-  return cost > 0 ? Math.max(1, Math.round(cost * REPAIR_COST_SCALE)) : cost;
-}
-/** DFU's own CalculateItemRepairCost, unscaled. */
 export function dfuItemRepairCost(baseItemValue, shopQuality, condition, max, { reducedRepairCost = null, priceAdjustment = 1000, instantRepairs = getBool('Controls', 'InstantRepairs') } = {}) {
   if (condition === max) return 0;
   // RRI2: the mod's override (RoleplayRealismItemsMod.cs:262-278) scales the
@@ -207,7 +201,7 @@ export function repairWhole(item) {
   return item;
 }
 
-/** UXB1-K (2026-09-25, the UX backlog: "Countdown timer/estimate for repairs when not instant."): WHEN A JOB IS READY.
+/** UXB1-K: WHEN A JOB IS READY.
  *  The done-time repairStatusLabel reads, as numbers a screen can count down: a BOOKED job's committed timeStarted +
  *  repairTime, or - for a job only staged at the counter - now plus the scheduler's own estimate (updateRepairTimes
  *  with commit false, the pass FilterRemoteItems ends with, :725). Null when nothing is owed: an unbooked item at full

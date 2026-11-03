@@ -1,5 +1,4 @@
-// CHAT-FIND (2026-10-11, the owner: "search for a player's name in the chat in every ui"; "put the search bar above the
-// player list for better visibility"): THE CHAT'S SEARCH. BY EXECUTION: the law (net/chat.js) - a piece of a name, case
+// CHAT-FIND: THE CHAT'S SEARCH. BY EXECUTION: the law (net/chat.js) - a piece of a name, case
 // and spaces ignored, or '#' the start of a tag; a line said BY the player or naming them, never a line the game said;
 // every tab's lines, oldest first, a shared line once - and `/search` (net/chatCommands.js); then the panel
 // (ui/chatPanel.js), which is the one chat on the classic skin, the enhanced skin and the touch layer: the field above

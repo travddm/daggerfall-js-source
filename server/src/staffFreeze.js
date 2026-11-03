@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-FREEZE (2026-10-22; design doc "DFO Staff Panel: design", Freeze player, Server load leases, and their weak
-// spots) - FREEZE PLAYER AND THE STAFF CHAT, the relay's half. The account service's half is
+// STAFF-PANEL5-FREEZE - FREEZE PLAYER AND THE STAFF CHAT, the relay's half. The account service's half is
 // server-account/src/staffFreeze.js; index.js holds the few hooks that call in here.
 //
 // THE ORDER: the service pushes a signed `freeze` order (`{o:'freeze', s, fz}`, identityToken.js mintFreezeOrder - `fz` its
@@ -18,7 +17,7 @@
 // shard's own PASS (net/roomLease.js `p`, `busMissed`): a lease a room reads as older than its own last word, so a bus
 // down never leaves every lease room unheard, and a fresh hello's pass lifts nothing the bus's book holds.
 //
-// A FROZEN SOCKET (mob, 03:05Z: "the player can only look around"; design doc: "The relay drops every frame from that
+// A FROZEN SOCKET (; design doc: "The relay drops every frame from that
 // player except the camera and their lines on the staff channel"):
 //   - is heard in nothing but its ping, its lease, its camera - a pose kept where it stood, only its yaw and pitch new -
 //     and its staff channel nudges (`frozenFrame`); a frozen hello in a place stands where its account's socket there stood,
@@ -59,7 +58,7 @@ export const STAFF_NUDGE_HZ_MAX = 8;
 /** The players a staff line joined to their thread that the hub remembers. */
 export const STAFF_IN_MAX = 512;
 /** The directed frames a player aims at another by its peer id (`data.to`, a siege's `to`). */
-const AIMED = new Set(['trade', 'cast', 'duel', 'wild', 'wed', 'siege']);
+const AIMED = new Set(['trade', 'cast', 'duel', 'wed', 'siege']);
 
 /** A token's claims as signed - read only off a hello whose token `_named` verified already. @param {any} tok */
 const claimsOf = (tok) => { try { return JSON.parse(new TextDecoder().decode(_b64url.decode(tokenBodyOf(tok)))); } catch { return null; } };

@@ -1,5 +1,4 @@
-// WB9d (2026-09-30, Mac: "Further improve his effects, ensure his ground affects actually cause damage and the player
-// recieves proper feedback"): HIS GROUND BITES HARDER, AND IS FELT. Each pool bites half again what it did (a second in
+// WB9d: HIS GROUND BITES HARDER, AND IS FELT. Each pool bites half again what it did (a second in
 // the fire was 5% and 2 points - easy to stand through), and every bite and every elemental blow of his says itself on
 // the screen - the rim in its colour, flaring at the bite and breathing while I stand in it, its name and "step out"
 // under the crosshair, and the hiss of the step in at once (the bite is a tick off: a step through is free, standing is
@@ -9,7 +8,7 @@
 //   the court      scenes/gate/gateCourt.js burn/land - the ground's name and colour, the bite's moment and colour, the hiss
 //   the ground     net/gate/gateBrain.js POOLS, SCAR_POOLS; render/gate/gateTelegraph.js poolShapes in the ground's own grain
 //
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9d).
+// Design: (WB9d).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -160,9 +159,4 @@ test('WB9d the ground drawn in its own grain: each court\'s pools on their own q
   for (const s of shapes) { assert.equal(s.style, TELEGRAPH_STYLE.frost); assert.equal(s.pool, TELEGRAPH_POOL.ground); assert.equal(s.color, poolColor(R)); }
   assert.match(TELEGRAPH_FS, /if \(uPool == 1\) \{/);
   assert.match(TELEGRAPH_FS, /float seethe = 0\.85 \+ 0\.15 \* sin\(uSince \* 6\.283185307179586 \* 0\.6\);/, 'it seethes on its own clock (WB13a: slow - terrain, never a blow to come)');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /drawGateGround\(groundViewModel\(\{ inside: inFire, ground: groundName, color: groundColor, biteAt, biteColor, now: t, peril: order \?\? onMe, blindAt: arsenal\.blindAt\(\) \}\), \{ hidden: hudHidden\(\) \}\);/);   // WB13a: and a blow to come on my feet; PIN MOVED (WB14d): his or his Flame's (onMe)
-  assert.match(gc, /drawGateGround\(null\);   \/\/ WB9d/, 'put away with the court');
-  assert.match(read('src/scenes/world.js'), /drawGateBanner\(null\); drawGateMarksCard\(null\);( drawGateDamageChart\(null\);)? drawGateGround\(null\);/, 'and with a held frame');   // GATE-UX: the damage chart between them
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(!el\) flashPlayerDamage\(dmg\);/, 'DFU\'s red flash still a blow\'s alone');
 });

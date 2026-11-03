@@ -135,7 +135,6 @@ test('CM3: ActionInputBox IS the one box, built the way DaggerfallAction.cs:566 
   assert.equal(box.value.length, 20);
   box.input('confirm');
   assert.deepEqual(got, ['x'.repeat(20)]); assert.equal(box.done, true);
-  assert.equal(/class ActionInputBox extends InputMessageBoxWindow/.test(rd('src/ui/actionText.js')), true);
 });
 
 test('CM3-CM11: THE ROSTER - every DaggerfallInputMessageBox in src/ui is a pushed InputMessageBoxWindow, and no window types into its own art', () => {

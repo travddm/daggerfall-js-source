@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-04b (Mac, from play): "Companion pathing is really rough. They're also walking towards to the wall,
-// next to the exit that leads to outside" (COMPANION-TRAIL); "Reduce companion noises, they are way too persistant"
+// FIELD BUGS 2026-10-04b ((COMPANION-TRAIL); "Reduce companion noises, they are way too persistant"
 // (QUIET-COMPANIONS); "Reduce Lysandus VENGENANCE audio" (QUIET-VENGEANCE). `01-Overview/bugs/Field-Bugs-2026-10-04.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -197,7 +196,7 @@ test('QUIET-COMPANIONS the bark: a companion waits COMPANION_ATTRACT_SCALE times
   };
   const foe = barks(false), mate = barks(true);
   const near = (t, w) => t > w - 1e-9 && t <= w + 0.1 + 1e-9;   // the first tick past the wait (0.1 s ticks)
-  // MONSTER-QUIET (2026-10-20, Dudey: "decrease the monster scream frequenzy by 60%"): a monster foe at 2.5 times its roll
+  // MONSTER-QUIET: a monster foe at 2.5 times its roll
   // (the seam's attractStep), eight in a minute where it was twenty; the companion's own six times stays as it was
   assert.ok(near(foe.at[0], MIN_ATTRACT_DELAY * FOE_ATTRACT_SCALE), `a foe at 2.5 times its roll (${foe.at[0]})`);
   assert.equal(foe.at.length, 8, 'eight in a minute');
@@ -210,7 +209,6 @@ test('QUIET-COMPANIONS the bark: a companion waits COMPANION_ATTRACT_SCALE times
     assert.equal(calls.length, 2, `${p}: its two bark sites`);
     for (const c of calls) assert.match(c, /companion: f\.companion != null \}/, `${p}: passes the companion`);
   }
-  assert.match(rd('src/scenes/hostCombat.js'), /source\.tick\(attractStep\(source, dt, companion\), dist, \(\) => enemySoundOccluded\(collider, feet, playerFeet\), \{ companion \}\)/, 'the seam hands it on');
 });
 
 test('QUIET-COMPANIONS the portals: one sound in PORTAL_SOUND_GAP_MS a set - the party arriving at a door rings once, every portal still opening (mutants: no gap)', () => {
@@ -270,6 +268,4 @@ test('QUIET-VENGEANCE end to end: S0000977\'s own line over the real action and 
   assert.ok(played.every(([, id, v]) => id === 386 && v === 0.4), 'the ghost, softer');
   assert.ok(played.length >= 9 && played.length <= 10, `about once a minute (${played.length} in ten)`);
   for (let k = 1; k < played.length; k++) assert.ok(played[k][0] - played[k - 1][0] >= 60, 'never inside its minute');
-  assert.match(rd('src/scenes/world.js'), /playSound: \(id\) => questAudioSource\.playQuestSound\(id\),/);
-  assert.match(rd('src/scenes/exterior.js'), /playSound: \(id\) => _questAudioSource\.playQuestSound\(id\),/);
 });

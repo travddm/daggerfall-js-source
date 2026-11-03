@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac: "implement both of these new ship placement models, UV Map/Texture, and ensure it matches the
-// love we gave the other new ship model we implemented"): THE NEW CARRACK'S OWN ART, MADE AT THE LOAD.
+// SHIPS-2: THE NEW CARRACK'S OWN ART, MADE AT THE LOAD.
 //
 // Mac's export names the galleon's two pictures (Wood.png and floorboards.png) and carries neither, so she is painted
 // here as the galleon is (world/ships/galleonArt.js's law and its tools): pixels and numbers, no renderer and no GL, an atlas

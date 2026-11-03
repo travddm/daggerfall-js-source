@@ -1,4 +1,4 @@
-// CSA-C (2026-09-27) - COME SAIL AWAY'S BOATS PLACED, KEPT AND SAVED:
+// CSA-C - COME SAIL AWAY'S BOATS PLACED, KEPT AND SAVED:
 // world/prefabColliders.js (Physics.Raycast over a prefab's BoxColliders and
 // MeshColliders, the convex ones as their hull) and systems/comeSailAway/comeSailAway.js
 // (StartPlacing .. PlaceBoatAtRayHit's five arms, SetBoatPositionAndDirection,
@@ -672,7 +672,7 @@ test('CSA-C: LateUpdate\'s placing arm (4957) - held by its pause gate and while
   assert.deepEqual([s.rt.AllBoats[0].hull, s.rt.AllBoats[0].variant], [1, 4]);
   assert.deepEqual(s.out.log.slice(0, 2), ['COME SAIL AWAY - ITEM HULL IS 1', 'COME SAIL AWAY - ITEM VARIANT IS 4']);
   assert.equal(s.rt.placing, false);
-  // sailing holds the arm: LateUpdate's `if (IsSailing) ... else if (placing ...)` - PIN MOVED (AUDIT HOLDINGS F1): a
+  // sailing holds the arm: LateUpdate's `if (IsSailing) ... else if (placing ...)`
   // second boat's parts, the first's being refused while she stands (never a second boat of one number)
   s.rt.StartPlacing({ ...parts, UID: 4 }, []);
   s.setTime(20);

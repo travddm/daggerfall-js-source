@@ -1,4 +1,4 @@
-// EL5 - ENHANCED LIGHTING, THE FIELD (2026-09-17): the first report from the
+// EL5 - ENHANCED LIGHTING, THE FIELD: the first report from the
 // game, a town gate at night - "the lights from inside the city are all
 // bleeding through, tanking my framerate too". Four laws, pinned:
 //   - THE BOUNDS AND THE CULL (render/bounds.js): every bundle carries a

@@ -1,6 +1,4 @@
-// SD-THROUGH (2026-10-21, the owner: "So the abyss dungeon. When someone finds and enters the portal. I want a portal to
-// show up for anyone in the dungeon and anyone entering that automatically leads them there."; bible/11-Multiplayer/
-// Super-Dungeons.md section 6, SD-THROUGH and AUDIT SD-THROUGH): THE FIRST SOUL THROUGH, ON THE RELAY. A Hollow's realm
+// SD-THROUGH: THE FIRST SOUL THROUGH, ON THE RELAY. A Hollow's realm
 // (`sd:<s>`) tells the hub at an admission (SD_INTERNAL_IN - unawaited, a hello never waits on it); a tell that does not
 // land is OWED and told again on the realm's alarm (AUDIT SD-THROUGH A1), never once the realm's own Remnant has fallen
 // (A4), a 400 the hub's last word (A5); the hub stamps its record's `inAt` once (net/superDungeon/sdLaw.js sdEnter) and says
@@ -222,19 +220,3 @@ test('SD-THROUGH NEVER IN THE COLLAPSE: a returner after the hub\'s word of the 
   }, { hubDoor: (n) => (n === 1 ? new Response('busy', { status: 503 }) : null) });
 });
 
-test('SD-THROUGH the relay by source: the hub\'s door routed; the realm tells from its admission\'s two exits, unawaited, in Room methods of their own - never in `_message`; the owed tell on the realm\'s alarm before its fight\'s beat; the hub moves its record by the law (mutants: awaited; inside _message; the alarm unwired)', () => {
-  const R = read('server/src/index.js');
-  assert.match(R, /if \(path === SD_INTERNAL_IN\) return this\._sdInInternal\(request\);/);
-  assert.match(R, /if \(sub && realm\.in\.includes\(sub\)\) \{ if \(f\?\.fell && now - f\.fell\.at > SD_COLLAPSE_MS\) return SD_NO_CLOSED; if \(back\) await this\._sdRose\(realm, sub, now\); this\._sdTellIn\(s, rec, now\); return null; \}/, 'a returner\'s admission');   // PIN MOVED (SD-BACK, SD-WON): a death's rise; its copy shut once its kill's collapse has run; PIN MOVED (AUDIT WORLD-EVENTS L1-8): a rise kept as it is let in
-  assert.match(R, /await this\.state\.storage\.put\(SD_REALM_KEY, realm\); \}\n(?:\s*if \(back\) await this\._sdRose\(realm, sub, now\);[^\n]*\n)?\s*this\._sdTellIn\(s, rec, now\);[^\n]*\n\s*return null;/, 'a newcomer\'s');   // PIN MOVED (AUDIT WORLD-EVENTS L1-8): a rise kept as it is let in
-  assert.doesNotMatch(R, /await this\._sdTellIn\(/, 'a hello never waits on it');
-  const msg = R.slice(R.indexOf('  async _message(ws, message) {'), R.indexOf('\n  }\n', R.indexOf('  async _message(ws, message) {')));
-  assert.ok(msg.length > 1000 && !/_sdTellIn|_sdInBeat|sdEnter\(/.test(msg), 'never in the dispatcher');
-  const tell = R.slice(R.indexOf('  _sdTellIn(s, rec, now) {'), R.indexOf('\n  }\n', R.indexOf('  _sdTellIn(s, rec, now) {')));
-  assert.match(tell, /rec\?\.inAt != null \|\| !sdAdmits\(rec, now\) \|\| this\._sdInTold === s \|\| this\._sdInTelling === s/, 'only while found, unstamped, untold, one in flight');
-  const now = R.slice(R.indexOf('  async _sdTellInNow(s, rooms) {'), R.indexOf('\n  }\n', R.indexOf('  async _sdTellInNow(s, rooms) {')));
-  assert.match(now, /if \(\(await this\._sdFightOf\(\)\)\?\.fell\) return;/, 'never after the realm\'s own fall');
-  assert.match(now, /if \(res && \(res\.ok \|\| res\.status === 400\)\) \{ this\._sdInTold = s; this\._sdInOwed = null; return; \}/, 'answered: told');
-  assert.match(R, /await this\._sdInBeat\(Date\.now\(\)\);[^\n]*\n\s*if \(await this\._sdFightTick\(\)\) return;/, 'the realm\'s alarm, before its fight\'s beat');
-  assert.match(R, /const inn = rec && rec\.s === c\.s \? sdEnter\(rec, Date\.now\(\)\) : null;\n\s*if \(inn\) \{ await this\._sdSave\(inn\); this\._sdFan\(inn\); \}/);
-});

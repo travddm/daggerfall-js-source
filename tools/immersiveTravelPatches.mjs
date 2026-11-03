@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// IT1 (2026-10-04): IMMERSIVE TRAVEL'S FOUR GATE BLOCKS, AS WD1 PATCHES.
+// IT1: IMMERSIVE TRAVEL'S FOUR GATE BLOCKS, AS WD1 PATCHES.
 //
 // The mod ships WALLAA08-11.RMB whole, as DFU's World Data Editor writes
 // them - Daggerfall's city-gate blocks with the author's carriage, horses

@@ -1,5 +1,4 @@
-// INT8 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): THE DUEL REFEREED. DUEL1 left every blow to the defender's own machine and every result to the
+// INT8: THE DUEL REFEREED. DUEL1 left every blow to the defender's own machine and every result to the
 // loser's own word - a client that never took damage never fell (the player's report: "no damage"), and one that never
 // said it lost never did. Now the relay that routes a duel holds it (net/duel/duelRef.js): it sets the bout on the start it
 // watched being asked and answered, judges every blow and cast (routed to nobody), holds the ring, ends the bout, and
@@ -15,7 +14,6 @@ import { newDuelRef, duelNote, duelOpen, duelBlow, duelPose, duelForfeit, duelSt
 import { ROYAL_RING, SIEGE_UNITS_PER_M, SIEGE_HIT, siegeVitality, siegeBlowMax, SIEGE_CASTS } from '../../../src/net/siege/siegeRef.js';
 import { mintRoyalReceipt, verifyRoyalReceipt } from '../../../src/net/siege/siegeReceipt.js';
 import { validDuelRefOut, DUEL_REF_RECEIPT_MAX, parseClient } from '../../../src/net/wire.js';
-import { WILD_RECEIPT_MAX } from '../../../src/net/wild/wildReceipt.js';
 import { DUEL_START_WAIT_MS, DUEL_OUT_MS, DUEL_GONE_MS } from '../../../src/net/duel/duelSession.js';
 import { createDuelClaims, duelClaimSettles } from '../../../src/net/siege/siegeClaims.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
@@ -50,7 +48,7 @@ test('INT8 THE RECEIPT: `d1` names the two fighters and the winner\'s place, the
   const unsigned = await mintDuelReceipt({ f: ['acct-aaaa', 'acct-bbbb'], w: 0, n: '0123456789ab' }, null, { subtle, nowS: T });
   assert.equal(readDuelReceipt(unsigned).signed, false);
   assert.equal((await verifyDuelReceipt(unsigned, kp.publicKey, { subtle, nowS: T })).why, 'unsigned');
-  assert.equal(DUEL_REF_RECEIPT_MAX, Math.max(DUEL_RECEIPT_MAX, WILD_RECEIPT_MAX), 'the wire carries the longest one');   // PIN MOVED (SEA-BOUNTY, 2026-10-22): the `wref` word carries a fall's receipt too, the longer now (its room and its killer's character signed)
+  assert.equal(DUEL_REF_RECEIPT_MAX, DUEL_RECEIPT_MAX, 'the wire carries a duel receipt whole');
 });
 
 /** Two fighters' sides for the referee's law, a few metres apart at the ring's centre. */
@@ -98,7 +96,7 @@ test('INT8 THE REFEREE\'S LAW, THE BLOWS: none before the count runs; a strike c
   assert.equal(duelBlow(st, 'acct-a', 'peer-b', { d: 50, held: { w: -1, m: 0 } }, s - 1).why, 'not-live', 'the count');
   const r = duelBlow(st, 'acct-a', 'peer-b', { d: 999, held: { w: 123, m: 9 } }, s);
   assert.deepEqual([r.ok, r.dealt], [true, siegeBlowMax(123, 9)], 'clipped to a Daedric Dai-Katana\'s bucket');
-  const fresh = opened();   // PIN MOVED (BAL8, bible/05-Combat/Balance-Arc.md section 14): a bout of its own - the blow above spent 124 of the 180 the referee's harm ceiling allows in any 5 s
+  const fresh = opened();
   const signed = duelBlow(fresh.st, 'acct-a', 'peer-b', { d: 999, held: { w: 123, m: 9 }, wa: [16, 0] }, fresh.bout.startMs);
   assert.equal(signed.dealt, siegeBlowMax(123, 9, [16, 0]), 'INT7: and the pack\'s signed reach');
   assert.equal(duelBlow(st, 'acct-a', 'peer-c', { d: 10, held: { w: -1, m: 0 } }, s + 600).why, 'not-opponent');
@@ -108,7 +106,7 @@ test('INT8 THE REFEREE\'S LAW, THE BLOWS: none before the count runs; a strike c
   // the fall
   const far = { st, t: s + 10_000 };
   let res;
-  for (let k = 0; k < 40 && !(res?.fell); k++) { far.t += 300; res = duelBlow(st, 'acct-b', 'peer-a', { d: 999, held: { w: -1, m: 0 } }, far.t); }   // PIN MOVED (BAL8): the harm ceiling - more blows to the fall
+  for (let k = 0; k < 40 && !(res?.fell); k++) { far.t += 300; res = duelBlow(st, 'acct-b', 'peer-a', { d: 999, held: { w: -1, m: 0 } }, far.t); }
   assert.equal(res.fell, true);
   assert.equal(bout.a.f.hp, 0);
 });
@@ -267,11 +265,6 @@ test('INT8 THE CLIENT\'S CARRIER: a duel\'s receipt is either fighter\'s to carr
   assert.deepEqual(strangerAsked, [], 'a receipt naming neither fighter it plays: never offered');
   assert.equal(duelClaimSettles({ ok: false, error: 'not-yours' }), true);
   assert.equal(duelClaimSettles({ ok: false, error: 'offline' }), false);
-  const online = rd('src/net/online.js');
-  assert.match(online, /\} else if \(m\.t === 'dref'\) \{[\s\S]*?const g = validDuelRefOut\(m\);\s*\n\s*if \(g\) this\._deliver\('dref', \(\) => this\.onDuelRef\?\.\(g, room\)\);/);
-  assert.equal(/m\.t === 'dref'\) \{[^}]*if \(!primary\) return;/.test(online), false, 'never the primary alone');
-  assert.ok(rd('src/scenes/world.js').includes('send: (d) => online?.sendDuel(d, { room: duelMgr?.duel && _duelRoom ? _duelRoom : null }) === true,'), 'a bout\'s frames to the room that referees it');
-  assert.match(online, /this\.duelOk = relaySupportsDuelRef\(relayV\);/, 'a client duels on a refereeing relay alone');
 });
 
 test('INT8 (AUDIT) THE DUEL\'S CAST PATH IS DORMANT: no caller hands a spell to the target\'s own effects as a duel\'s (`duelCast`) since the referee holds the duel - its floor and its strip in systems/effects.js stand unread, kept as they stand (bible/06-Systems/Integrity-Arc.md 5b) (mutants: a duel opponent\'s spell applied on its target\'s machine)', () => {

@@ -279,7 +279,7 @@ function liftInteriorStands(ctx) {
     getTexture: async () => ({ recordCount: 1000 }), uploadRecord: () => {}, billboardSize: () => ({ w: 1, h: 2 }), drawnFlat: (a, r) => [a, r],
     renderer: { createBillboardBatch: (_a, _r, _size, at) => ({ at: at[0] }) }, rideSceneMarker: () => {},
     templateByIndex, markerScenePosition, siteMarkerSpots, standSpot, MARKER_FLOOR_REACH,
-    buildingStandSpot,   // PIN MOVED (FB1020c CROWD-CLEAR): the building stand's law is sceneMount.js's, the backstop inside it
+    buildingStandSpot,
   };
   return { adapter: new Function(...Object.keys(deps), source)(...Object.values(deps)), questFlats, foes };
 }

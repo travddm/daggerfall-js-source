@@ -1,15 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DOMAIN2 (2026-10-24, the owner: "Allowing the purchase of the actual
-// castle in major cities (cyrodil excluded), using the instancing system";
-// asked, "One owner per castle", "Silver", "Region holder buys it") - A
-// GUILD'S CASTLE, AS THE SERVICE KEEPS IT (bible/11-Multiplayer/Domains.md
+// DOMAIN2 - A
+// GUILD'S CASTLE, AS THE SERVICE KEEPS IT (
 // section 6; the numbers are src/net/castleLaw.js, which the client reads
 // too).
 //
 // ═══ ONE ROW A CASTLE, KEYED BY ITS REGION ══════════════════════════
 //
-// `guild_castles` (migration 0168): a region keeps one castle, so the
+// `guild_castles`: a region keeps one castle, so the
 // region is the row's key and a second buyer finds it taken in the very
 // statement that would write it. The row names the castle's key (its
 // crown seat's - a crown city's castle is its own location's dungeon),

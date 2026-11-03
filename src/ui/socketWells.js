@@ -1,8 +1,7 @@
 // @ts-check
-// GEM3 (2026-10-09) - THE SOCKETS, DRAWN.
+// GEM3 - THE SOCKETS, DRAWN.
 //
-// Gem Sockets (bible/06-Systems/Gem-Sockets.md section 5; Mac: "Id like to have and show weapons with physical gem
-// slots that can be slotted into"). LOOT20 told a socket in words - "Socket: empty", one more line under the affixes -
+// Gem Sockets (). LOOT20 told a socket in words - "Socket: empty", one more line under the affixes -
 // and filled it only at a guild's page. This is the socket as a PLACE on the piece: a row of round wells under the
 // card's picture, one a socket, an empty one sunk and dark and a set one holding its gem's own picture in a ring of its
 // grade's colour; and on every tile of a socketed piece, one pip a socket in the top edge (the corners are the key's,

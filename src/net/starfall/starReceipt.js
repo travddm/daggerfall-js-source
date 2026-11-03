@@ -1,6 +1,6 @@
 // @ts-check
-// STAR1 (2026-10-20): A STAR'S RECEIPT - the relay's signature on a fallen star held, the raid's and the serpent's twin
-// (net/raid/raidReceipt.js, net/serpent/serpentReceipt.js). Design: bible/11-Multiplayer/Starfall.md section 6.
+// STAR1: A STAR'S RECEIPT - the relay's signature on a fallen star held, the raid's and the serpent's twin
+// (net/raid/raidReceipt.js, net/serpent/serpentReceipt.js). Design:
 //
 //     j1.<base64url({ sf, s, c, l, i, e })>.<base64url(64-byte Ed25519 signature)>
 //         sf [the night, the star] (net/starfall/starfallLaw.js starTimes)   s the account (the identity sub)

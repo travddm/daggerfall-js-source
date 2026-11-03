@@ -1,6 +1,5 @@
 // @ts-check
-// TECH-CARD (2026-10-10, the owner, of the card's two technique lines: "it needs its own unique glyph as its own
-// element. Like how set pieces and sigils get their own sections"): THE TECHNIQUE, DRAWN - bible/05-Combat/
+// TECH-CARD: THE TECHNIQUE, DRAWN - bible/05-Combat/
 // Weapon-Techniques.md "The card's block".
 //
 // TECH1 told a technique in words - its line and what a press does, two more lines in the card's tier list in the

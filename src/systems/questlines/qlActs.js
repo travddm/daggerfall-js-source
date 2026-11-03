@@ -1,6 +1,5 @@
 // @ts-check
-// QL11 (2026-10-19, the owner: "Tying all our newly integrated features into quests"; bible/06-Systems/Questlines-Arc.md
-// section 4.5): THE ACTS - what a player did in one of the game's features, said in one line where it happens
+// QL11: THE ACTS - what a player did in one of the game's features, said in one line where it happens
 // (`noteAct('fish-caught')`, as a system tells the Tutorials of a first use - tutorials.js noteFirstUse), and heard by every running stamped
 // quest (systems/questlines/qlLayer.js act). An objective may ask for one ({ "act": "fish-caught", "n": 3 }) and a
 // questline's script may wait on one (`ql act fish-caught 3`, qlActions.js QlAct).
@@ -25,9 +24,6 @@ export const ACT_KINDS = Object.freeze({
   // the loot's own laws
   'gem-socketed': 'loot',   // a gem set in a socket
   'piece-reforged': 'loot',   // a piece reforged
-  // the tavern's tables
-  'gambit-won': 'tavern',   // a game of the King's Gambit won
-  'cards-won': 'tavern',   // a hand of cards won
   // the sea and the road
   'port-reached': 'sea',   // a port reached under sail
   'cargo-delivered': 'sea',   // a cargo delivered
@@ -46,16 +42,10 @@ export const ACT_KINDS = Object.freeze({
   'rite-broken': 'endgame',   // Dagon's Faithful's rite broken before the breach opened
   'breach-closed': 'endgame',   // a Dagon's Breach closed
   'elite-foe-slain': 'endgame',   // an elite foe slain in an Elite Dungeon
-  'redoubt-taken': 'endgame',   // a Redoubt taken in an Elite Breach
-  'valkynaz-felled': 'endgame',   // a Valkynaz's Redoubt taken in an Elite Breach
   'hour-broken': 'endgame',   // the Brass Remnant broken in the Shattered Hour
   'serpent-slain': 'endgame',   // the Sea Serpent slain
   'star-held': 'endgame',   // a fallen star held through its master's fall (the Starfall - STAR8)
   'heart-star-held': 'endgame',   // the Heart-Star held - the Witches' Night's last star; said in the same turn as its `star-held`, so the festival's finds count one deed (festivalClient.js ONE DEED, ONE FIND)
-  // KETCH (bible/11-Multiplayer/Sky-Ketch.md section 13): the sky-ketch's three (the last a receipt the service holds)
-  'ketch-boarded': 'endgame',   // the anchor-lift ridden up to the Sky-Ketch Mzunthar (the mode machine stood me aboard)
-  'ketch-cell-banked': 'endgame',   // an aether cell of mine set in the Starved Engine or a resonator (the ship's room said it)
-  'warden-felled': 'endgame',   // the Tonal Warden felled - its k1 receipt counted once (`recorded`)
 });
 export const ACT_IDS = Object.freeze(Object.keys(ACT_KINDS));
 
@@ -63,7 +53,7 @@ let _sink = null;
 /** The bridge's registration: `fn(kind, n)` hears every act (the layer's act). Null unregisters. */
 export function setActSink(fn) { _sink = typeof fn === 'function' ? fn : null; }
 
-/** WITCH1 (bible/06-Systems/Witches-Festival.md): THE OTHER HEARERS - a feature that answers every act as it is said
+/** WITCH1: THE OTHER HEARERS - a feature that answers every act as it is said
  *  (the Witches' Festival's finds, systems/festival/festivalClient.js), beside the one sink, by name; null unregisters. A
  *  hearer moves no quest and is answered nothing: the count noteAct answers is still the quests'. */
 const _hearers = new Map();

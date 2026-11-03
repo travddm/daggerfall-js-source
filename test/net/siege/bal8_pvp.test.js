@@ -1,4 +1,4 @@
-// BAL8 - THE PVP REFEREE, ONE RULE FOR EVERY STRIKER (2026-10-12; bible/05-Combat/Balance-Arc.md section 14).
+// BAL8 - THE PVP REFEREE, ONE RULE FOR EVERY STRIKER.
 //   - INT10 bounded a caster at 3 casts of 60 in 5 s (180, 36 a second); a blade or a bare hand was bounded at nothing
 //     past 4 blows a second and one blow's bucket, which no measured blow came near: a kitted monk felled a fighter in
 //     8.3 s where the mage's ceiling takes 10.6. Every harm a fighter deals in a duel, a siege or the Wild Zone - blows
@@ -54,16 +54,3 @@ test('BAL8: every harm a fighter deals - blows and casts together - at most the 
   assert.equal(harmRoom(old, now), 180);
 });
 
-test('BAL8: one referee - the duel\'s, the Wild Zone\'s and the siege\'s rooms all judge a blow through refereeBlow, so the ceiling is every lane\'s', () => {
-  for (const f of ['src/net/duel/duelRef.js', 'src/net/wild/wildRef.js']) assert.match(rd(f), /refereeBlow\(/, `${f} judges through refereeBlow`);
-  assert.match(rd('server/src/index.js'), /: refereeBlow\(by, to, \{ from: by\.pose, at: to\.pose, held: siegeHeld\(look, m\.w, m\.m\)/, 'and the siege\'s room');
-});
-
-test('BAL8: the arena\'s rival is never backstabbed - the swing\'s and the shaft\'s doors both hand no facing (mutants: the rival\'s facing read off its yaw 0; the shaft handed my feet)', () => {
-  const ctx = rd('src/scenes/dungeonContext.js');
-  assert.match(ctx, /if \(rival\) \{ rival\._backFacing = false; live\.push\(rival\); \}/, 'the swing: no facing');
-  assert.doesNotMatch(ctx, /rival\._backFacing = foeDeps\.isBackFacing/, 'never the stand-in\'s yaw');
-  assert.match(ctx, /playerArrowHitFoe\(m, rv, \{ playerEntity, playerWeapon, playerFeet: null,/, 'the shaft: no feet to judge a back from');
-  assert.match(rd('src/combat/arrowFlight.js'), /const back = foe\.ai && playerFeet \? isBackFacing\(foe\.ai\.yaw, foe\.ai\.feet, playerFeet\) : false;/, 'the shaft\'s backstab reads the feet it is handed');
-  assert.match(rd('src/scenes/world.js'), /radius: 0\.4, yaw: 0 \};/, 'the stand-in still faces nowhere - which is why it is never asked');
-});

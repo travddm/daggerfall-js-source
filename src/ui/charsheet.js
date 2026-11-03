@@ -37,7 +37,6 @@ import { SKILLS, SKILL_NAMES, skillValue, skillValueText, getSkillRecentlyIncrea
 import { applyLevelUp, bonusPoolFor, LEVELUP_SKILL_SUM_PER_LEVEL } from '../systems/advancement.js';
 import { onlineLevelFraction } from '../systems/levelClimb.js';   // LEVEL-45
 import { refreshOnlineLayer } from '../systems/renownLayer.js';   // AUDIT LEVEL-EVEN L2-2: the rollout's points reach the online floor
-import { usesVirtueLeveling, levelBarProgress, LEVELUP_TOTAL } from '../systems/oblivionLeveling.js';   // ORL1: whose law levels this character
 import { LEVEL_CAP, atLevelCap, releaseCapLatch } from '../systems/levelCap.js';   // LEVEL-45: the Level box at the cap
 import { ActionTextBox } from './actionText.js';   // the mustDistributeBonusPoints refusal, ClickAnywhereToClose
 import { OGHMA_BONUS_POOL } from '../systems/artifactEffects.js';   // AUDIT 39: the sheet's oghmaBonusPool (:44)
@@ -297,14 +296,9 @@ export const NO_AFFILIATIONS_TEXT_ID = 19;
  *  one before its fraction is taken (LEVEL-PCT, 2026-09-28: in a double
  *  36/15's fraction is 0.3999... and the box read 39% where DFU's reads
  *  40%, and 39/15's is 0.6000... and it read 60% where DFU's reads 59% -
- *  two of the fifteen a level spans, AUDIT 28e).
- *  ORL1: a character the mod's law levels is measured on that law's bar.
- *  The skill sum still moves for them (advancement.js raiseSkills) but
- *  levels nothing, so its fraction was a number about a rule they are
- *  not on - the Discord's "93%" here beside "12/100" on the Ascension. */
+ *  two of the fifteen a level spans, AUDIT 28e). */
 export function levelProgressPercent(entity) {
   if (atLevelCap(entity)) return 100;   // LEVEL-45 (systems/levelCap.js): no next level - the box reads it whole
-  if (usesVirtueLeveling(entity)) return Math.trunc((levelBarProgress(entity) * 100) / LEVELUP_TOTAL);
   if (entity?._online === true) return Math.trunc(onlineLevelFraction(entity.startingLevelUpSkillSum ?? 0, entity.currentLevelUpSkillSum ?? 0) * 100);   // LEVEL-45: the online law's bar (systems/levelClimb.js)
   const current = Math.fround(((entity?.currentLevelUpSkillSum ?? 0)
     - (entity?.startingLevelUpSkillSum ?? 0) + 28) / LEVELUP_SKILL_SUM_PER_LEVEL);
@@ -420,15 +414,6 @@ export class CharSheet {
     const e = this.entity;
     releaseCapLatch(e);   // LEVEL-45 (AUDIT FB1026d C2): no pool handed out with no level to go with it
     if (!e?.readyToLevelUp) return;
-    // ORL1: ...and the sheet does NOT level a character who levels by
-    // the mod's law. ui/charSheetDoor.js hands that character
-    // VirtueLevelUpScreen instead, and this guard is the other half of
-    // it: without it, a classic-lane F5 pressed while a virtue level-up
-    // is owed would mount DFU's rollout, take the Level++ and the
-    // health roll at mount (below), and the mod's window would then
-    // find nothing left to award. The Oghma arm is the exception the
-    // door makes too - that pool is Daggerfall's own.
-    if (!e.oghmaLevelUp && usesVirtueLeveling(e)) return;
     this.leveling = true;
     audio.playOneShot(SOUND.LevelUp, 1);   // levelUpSound (:46, :373)
     this.oghma = !!e.oghmaLevelUp;
@@ -663,7 +648,7 @@ export class CharSheet {
       for (let i = 0; i < STAT_KEYS_ORDER.length; i++) {
         if (!inRect([se.x, se.y + se.step * i, se.w, se.h], vx, vy)) continue;
         audio.playOneShot(SOUND.ButtonClick, 1);
-        // ATTRMACRO1 (2026-09-18, Mac: "none of the attribute explanations show actual values"): DFU's line here
+        // ATTRMACRO1: DFU's line here
         // is `SetTextTokens((int)sender.Tag, playerEntity.Stats)` - the record AND a macro source - and the comment
         // above has said so since AUDIT 58 while the code handed the rows straight to the box. So every one of the
         // eight showed `%str`, `%ark`, `%dam`, `%enc` and their siblings as literal tokens. The source is the
@@ -851,7 +836,7 @@ export class CharSheet {
     const showHth = ids.includes(SKILLS.HandToHand);
     const lines = (twoColumn ? Math.ceil(ids.length / 2) : ids.length) + (showHth ? 1 : 0);
     // SCHOOLS1: the Specialisation row under it, while Master Skills is in force and a path is chosen or open
-    // GROWTH4 (bible/10-UI/Growth.md section 7): where the guide opens (the enhanced pause's Growth tab - a document), the
+    // GROWTH4: where the guide opens (the enhanced pause's Growth tab - a document), the
     // row stands whenever this class can ever meet a path: S reads them all, opened or not
     // AUDIT GROWTH LANE3-2: never while the rollout stands (_growth); LANE3-12: a chosen path's row only while it is in
     // force - asleep (Master Skills off), the guide's row says so
@@ -911,7 +896,7 @@ export class CharSheet {
     }
   }
 
-  /** GROWTH4 (bible/10-UI/Growth.md section 7; the owner, asked: the classic skin reaches the Growth tab): THE GUIDE
+  /** GROWTH4 (; the owner, asked: the classic skin reaches the Growth tab): THE GUIDE
    *  FROM THE CLASSIC SHEET - the enhanced pause window on its Specialisations page (the family's), pushed as this
    *  sheet's child: it draws over the sheet, and when it goes the sheet is back. A host with no document (node) has no
    *  hook, and the rows ask in DFU's boxes as before. Answers whether it opened.
@@ -926,7 +911,7 @@ export class CharSheet {
     return true;
   }
 
-  /** MARTIAL1 (bible/05-Combat/Martial-Specialisations.md section 3): the Martial row, classic face - the Specialisation
+  /** MARTIAL1: the Martial row, classic face - the Specialisation
    *  row's own law. A path chosen: DFU's OK box says what it does. None yet: each open path is asked about in DFU's Yes/No
    *  box - chosen on Yes (given up only by SPEC-RESET); No, then W, offers the next (the plate stays behind the box, AUDIT
    *  SCHOOLS L4 H1). */
@@ -945,7 +930,7 @@ export class CharSheet {
     });
   }
 
-  /** SCHOOLS1 (bible/06-Systems/Arcane-Specialisations.md section 3): the Specialisation row, classic face. A path chosen:
+  /** SCHOOLS1: the Specialisation row, classic face. A path chosen:
    *  DFU's OK box says what it does. None yet: each open path is asked about in DFU's Yes/No box - chosen on Yes (given
    *  up only by SPEC-RESET); No, then S, offers the next. */
   _pathPrompt() {

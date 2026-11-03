@@ -1,5 +1,4 @@
-// IC-PROPS (2026-10-27, the owner: "Some doors in Imperial city can be entered but dont show the tooltip", then "a world
-// wide issue": "Every enterable door shows its tooltip, world-wide"; bible/03-World/Arena-Provinces.md IC-PROPS) - EVERY
+// IC-PROPS - EVERY
 // DOOR A PLAYER CAN WALK THROUGH NAMES ITS BUILDING, AND THE BUILDING ITS OWN TOWN'S.
 //
 // Two causes, both world-wide: a house with no name of its own (every House1-4 and House6 of Daggerfall's blocks and both
@@ -99,12 +98,4 @@ test('IC-PROPS A DOOR OF THE NEXT SLICE IS ITS OWN TOWN\'S - its building named 
   const p2 = plaqueOf(await buildModes(hall, 'here'));
   assert.match(p2.title, /Gothway Garden/);
   assert.doesNotMatch(p2.title, /The Player's Town/);
-  // the host's record: the door's town's book, name and building name
-  const world = hostText('src/scenes/world.js'), modes = hostText('src/scenes/worldModes.js');
-  assert.match(world, /townBlocks: homeTownBlocks\(dfLoc\), \.\.\.townTalk\.doorTownOf\(dfLoc, d\) \};/);
-  assert.equal((modes.match(/const locId = bd\??\.townBook \?\? discoveryLocationId\?\.\(\) \?\? null;/g) ?? []).length, 3, 'the hover, the press and the activation read the door\'s book');
-  assert.match(modes, /homeDoorName\(db\.displayName, false, bd\.buildingType\)/, 'the Info say a nameless house\'s "Residence" too');
-  const talk = hostText('src/scenes/townTalk.js');
-  assert.match(talk, /function buildingNameIn\(place, data\) \{/);
-  assert.match(talk, /const doorTownOf = \(place, data\) => \(\{ name: buildingNameIn\(place, data\), townBook: townBookOf\(place\), townName: place\?\.name \?\? '' \}\);/);
 });

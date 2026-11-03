@@ -1,5 +1,4 @@
-// DESYNC-ZERO (2026-10-09, the owner: "ive seen enemies desyncing for players in a party sometimes they only strike the
-// air and on their ends are monsters"): A PUPPET LEADS ITS LAST WORD.
+// DESYNC-ZERO: A PUPPET LEADS ITS LAST WORD.
 //
 // A puppet stood where its owner's last record said - and that record was already a frame old when it left (FOES_MS,
 // 200 ms between deltas), it crossed the relay, and the puppet then EASED toward it (PUPPET_EASE_S). So a running foe
@@ -13,7 +12,7 @@
 //
 // One door, both pools (scenes/exteriorFoes.js and scenes/dungeonContext.js puppetStep).
 //
-// OWNER-CLOCK (2026-10-21, the field's enemy desync): THE OWNER'S CLOCK, NOT MINE. The velocity above was measured on the
+// OWNER-CLOCK: THE OWNER'S CLOCK, NOT MINE. The velocity above was measured on the
 // READER's arrival clock and the lead stopped at LEAD_MAX_S - so a slow owner's foes (a frame of 333 ms at 3 fps, a
 // hitch of a second) stood still past the cap and jumped on the next word, and their speed read whatever the road
 // between did to two frames. A frame now says when its foes were stepped (`tm`, net/ownerClock.js), and the record's door

@@ -1,10 +1,10 @@
-// DS1 (2026-09-25): THE PIECES DETAILED SHIPS BORROWS, STOOD IN BY THE PORT.
+// DS1: THE PIECES DETAILED SHIPS BORROWS, STOOD IN BY THE PORT.
 //
 // Detailed Ships 1.0.0 declares Ninelan's *Daggerfall Expanded Textures*
 // (DET) 1.2.0 a required peer dependency: its two ship records place ten
 // DET models and twenty-seven DET flat records, none of which Daggerfall
 // or Detailed Ships itself carries. DET is not part of this port, and Mac
-// chose (2026-09-25, asked outright) to "build your own": so every one of
+// chose to "build your own": so every one of
 // those pieces is the PORT'S OWN stand-in, made for the place the author
 // put it - never a copy of DET, which the port has never seen.
 //
@@ -33,7 +33,7 @@
 // record sizes itself, except the dolphins, which are the port's own
 // drawing (below), made in code.
 //
-// WD3 (2026-10-01): THE SAME PIECES, READ AGAIN, FOR TWO MODS. Beautiful
+// WD3: THE SAME PIECES, READ AGAIN, FOR TWO MODS. Beautiful
 // Villages and Beautiful Cities place DET's models some 75,000 times - the
 // timbers of every interior's ceiling and fireplace, the chimneys on its
 // roofs, the tapestries on its walls - and the RMB Resource Pack's own

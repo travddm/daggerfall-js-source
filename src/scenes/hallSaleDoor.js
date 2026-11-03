@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD-HALL-SALE (2026-10-06, asked: "Guild houses should be able to be
-// sold, like regular houses") - A HALL SOLD AT ITS DOOR, AS A HOME IS
+// GUILD-HALL-SALE - A HALL SOLD AT ITS DOOR, AS A HOME IS
 // (systems/online/onlineHomes.js hallSellable; bible/06-Systems/
 // Online-Arc.md GUILD-HALL-SALE). The hall's sale stood on the Guild tab
 // alone; its door lists "Sell it" to whom the service lets sell it
@@ -11,7 +10,7 @@
 // service refuses a hall standing anywhere else). No purse moves: the
 // treasury takes the sale.
 //
-// HOST-SPLIT (bible/01-Overview/Host-Split.md, THE HOSTS DO NOT GROW):
+// HOST-SPLIT (, THE HOSTS DO NOT GROW):
 // the interior host (scenes/worldModes.js createWorldModes) builds this
 // once and its door calls the two windows; the plaque's press and Info's
 // prompt stay at the door with the home's own. The other three hosts

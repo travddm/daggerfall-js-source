@@ -1,4 +1,4 @@
-// CLIMB3 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "Take care of the remaining items", "I
+// CLIMB3 (the Enhanced Climbing arc;, "I
 // really want you to go all in on this"): LEAPS, Mac's "Parkour leap, skill-scaled" - "a leap from a hang or a sprint
 // off an edge has its own longer, flatter arc scaled by Jumping; the plain jump is unchanged". From a hold a fresh Jump
 // leaps: with Left or Right to a hand-hold along the wall past where the lip ends, up to a lip over the one held (no
@@ -69,7 +69,7 @@ const hangThen = (input) => (i, m, c) => {
   if (i === c.h + 20) { c.before = m.grip; c.at = [...m.pos]; c.n = [...m._wall.normal]; return input; }
   return {};
 };
-/** AUDIT CLIMB-FIELD J1 (Mac: "You cant jump from a wall"): a press with no hold that way leaps nowhere - it pushes
+/** AUDIT CLIMB-FIELD J1: a press with no hold that way leaps nowhere - it pushes
  *  off: the hands let go of the hang and the body flies out from the wall it hung on. */
 const pushedOff = (r, m) => {
   const after = r.seen.slice(r.seen.indexOf('hang'));

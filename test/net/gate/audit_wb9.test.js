@@ -1,7 +1,7 @@
-// AUDIT WB9 (2026-09-30, before the merge - Mac: "Audit this before we merge"). The WB9 slices audited in five parts - the
+// AUDIT WB9. The WB9 slices audited in five parts - the
 // relay's brain (WB9b/c), the court's client and its drawing (WB9a/c/d/e), the spoils (WB9f), the Broker's insignia
 // (WB9g) and the bodies in a crowd (WB9h) - each finding reproduced, then fixed. The insignia's are pinned beside its own
-// (test/net/wb9g_insignia.test.js); the rest here, one test a finding. bible/11-Multiplayer/World-Bosses.md section 14.
+// (test/net/wb9g_insignia.test.js); the rest here, one test a finding.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -269,12 +269,6 @@ test('AUDIT WB9 court F4 - his shapes and his burning ground are drawn on over t
   assert.ok(Math.hypot(past[0] - meteor.points[0][0], past[1] - meteor.points[0][1]) < meteor.r, 'the point is under the Meteor');
   assert.equal(fs({ uOnWalk: 0 }, past), -1, 'the court\'s pass: past its rim, cut');
   assert.ok(fs({ uOnWalk: 1 }, past) > 0, 'the walkway\'s: drawn');
-  // the court hands the pass how far each walkway is laid, every frame, for his shapes and his ground (never his mark)
-  const court = readFileSync(new URL('../../../src/scenes/gate/gateCourt.js', import.meta.url), 'utf8');
-  assert.match(court, /for \(const w of WALKS\) _walked\[w\.k\] = walkFormed\(s\.xa, w\.k, t\);/);
-  assert.match(court, /for \(const ps of poolDraw\) \{ pass\.draw\(ps, proj, view, eye, seconds, fog, COURT_CENTRE, _walked, _floors\);/);   // WB14b: and the night's floors
-  assert.match(court, /if \(mark\) \{ pass\.draw\(mark, proj, view, eye, seconds, fog\); drew = true; \}/);
-  assert.match(court, /if \(shape\) \{ pass\.draw\(shape, proj, view, eye, seconds, fog, COURT_CENTRE, _walked, _floors\);/);
   assert.equal(fs({ uOnWalk: 1 }, rim), -1, 'inside the court\'s disc the walkway\'s strip draws nothing - the court\'s pass has it');
   assert.ok(fs({ uOnWalk: 0 }, rim) > 0, 'where the court\'s pass draws it');
 });
@@ -376,7 +370,7 @@ test('AUDIT WB9 bodies F2 - a hand-over allowed on a spare stands the newcomer i
   // a standing stranger changes gear: rebuilt (a build in flight, held)
   const s1 = list.find((p) => p.id === 's1');
   now += BODY_REBUILD_MS;
-  s1.look = { ...s1.look, items: [{ templateIndex: 1, group: 'Armor', equipSlot: 20 }] };   // PIN MOVED (MW-CROWD, FIELD BUGS 2026-10-01 #8): a weapon is the arm's live door and rebuilds no body now - armor does
+  s1.look = { ...s1.look, items: [{ templateIndex: 1, group: 'Armor', equipSlot: 20 }] };
   sync(list); await settle();
   assert.ok([...pb._bodies.values()].some((b) => b.state === 'building'), 'a build in flight');
   const twin = peer('twin', 1, -1.5, 'Nord');

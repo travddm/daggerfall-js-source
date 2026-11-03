@@ -1,4 +1,4 @@
-// AUDIT HELM-SIGHT (bible/01-Overview/audits/Audit-Helm-Sight.md): FIELD BUGS 2026-10-27 HELM-SIGHT read cold. The runtime's
+// AUDIT HELM-SIGHT: FIELD BUGS 2026-10-27 HELM-SIGHT read cold. The runtime's
 // halves of its findings, on the real runtime (test/csaScene.mjs, the real SpawnBoat and Animators), each re-anchor
 // moved by the frame's own offset as world.js _teleportToPixel moves it. The world host's halves are
 // test/scenes/audit_helmsight_world.test.js.

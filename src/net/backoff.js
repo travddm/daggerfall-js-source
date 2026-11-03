@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SCALE1 (2026-09-30, the scaling audit): HOW A TAB ASKS AGAIN.
+// SCALE1: HOW A TAB ASKS AGAIN.
 //
 // Every book asked a failed act again after the same fixed waits, so a
 // service that stumbled for everyone at once (a deploy, D1 busy) was

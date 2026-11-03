@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW14 (2026-10-09, bible/06-Systems/Living-World-II.md "LW14"): THE DIVE'S ROUTE - where a company is inside the
-// dungeon it went down into, minute by minute, and what it leaves behind. Mac: "smarter and more dungeon diving npcs".
+// LW14: THE DIVE'S ROUTE - where a company is inside the
+// dungeon it went down into, minute by minute, and what it leaves behind..
 // Pure over the dungeon's own data (its blocks' markers, as the dungeon's build reads them - so only while the player is
 // in it; the trips need none of it) and the dive (trips.js diveTrip): every reader's company works the same rooms in
 // the same order at the same minutes.

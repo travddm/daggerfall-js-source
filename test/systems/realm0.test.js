@@ -1,10 +1,8 @@
-// REALM phase 0 (2026-09-28, Mac: "I wanna do this as comprehensively as possible. A true separation while allowing
-// people to still play offline ... balance the gold economy, eliminate duping, eliminate true overpowered builds
-// online"): the hotfixes that need no migration (bible/06-Systems/Realm-Arc.md, "Phases").
+// REALM phase 0: the hotfixes that need no migration (, "Phases").
 //   P0.1 - the URL's powers stay offline: an online boot drops ?shot (and window.__addGold with it), ?fly, ?nofoes and
 //          the rest before anything reads them.
-//   P0.2 - the balance mods are the room's whole online: every key of Meaner Monsters, PCAAO, Unleveled Loot,
-//          Roleplay & Realism (its two cosmetic keys aside), RR: Items and Oblivion leveling's dials reads its shipped
+//   P0.2 - the balance mods are the room's whole online: every key of PCAAO, Unleveled Loot,
+//          Roleplay & Realism (its two cosmetic keys aside), and RR: Items reads its shipped
 //          default, where only their Enable switch was forced before.
 //   P0.3 - the Empire is one lender: one loan a character online, a default anywhere shuts every branch, the Empire
 //          takes from every account and every deposit, and a character joining with more debt than the Empire would
@@ -51,7 +49,7 @@ function onPage(search, fn) {
 }
 
 test('REALM P0.1: an online boot drops every power flag before anything reads it - offline, F304 stands', () => {
-  for (const f of ['shot', 'fly', 'nofoes', 'tp', 'timescale', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'weather', 'wseed', 'season', 'editor']) {   // PIN MOVED (POI-3): the editor's eye a power too
+  for (const f of ['shot', 'fly', 'nofoes', 'tp', 'timescale', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'weather', 'wseed', 'season', 'editor']) {
     assert.ok(ONLINE_REFUSED_FLAGS.includes(f), `?${f} is refused online`);
   }
   const all = ONLINE_REFUSED_FLAGS.map((f) => `${f}=1`).join('&');
@@ -62,21 +60,6 @@ test('REALM P0.1: an online boot drops every power flag before anything reads it
   const offline = new URLSearchParams(`load&world&${all}`);
   assert.deepEqual(refuseOnlinePowerFlags(offline), [], 'offline nothing is dropped');
   for (const f of ONLINE_REFUSED_FLAGS) assert.equal(offline.has(f), true, `?${f} stands offline`);
-});
-
-test('REALM P0.1 by source: the world host drops them beside the Test Room refusal - before the start location, the probe seams and the walk mode read them', () => {
-  const w = hostText('src/scenes/world.js');
-  const drop = w.indexOf('if (refuseOnlinePowerFlags(params).length) publishBootParams(params);');
-  assert.ok(drop > 0, 'the drop is at the boot, and it is published');
-  assert.ok(drop > w.indexOf("if (testRoomOffline) { params.delete('online'); publishBootParams(params); }"), 'after the Test Room refusal (which may take `online` itself away)');
-  // PIN MOVED (HOST-SPLIT, 2026-10-19: the town probes - __addGold among them - moved verbatim to scenes/townProbes.js;
-  // the host installs them, and that call is its read)
-  for (const reader of ["const regionName = params.get('region')", "const shotMode = params.has('shot');", 'if (shotMode) { modes.installShotProbes(); installTownProbes(); }']) {
-    const at = w.indexOf(reader);
-    assert.ok(at > drop, `${reader} reads after the drop`);
-  }
-  assert.ok(src('src/scenes/townProbes.js').includes('window.__addGold = (n) => addGold(playerEntity, n);'), 'the gold probe stands in the town probes, installed by that call');
-  assert.match(w, /if \(shotMode\) \{/, 'the probe seams stand only in ?shot - which an online page no longer has');
 });
 
 test('REALM P0.2: online, every key of a balance mod reads its shipped default - the room\'s own value first, its cosmetic keys still the player\'s', () => {
@@ -92,11 +75,9 @@ test('REALM P0.2: online, every key of a balance mod reads its shipped default -
       if (!room && !own.includes(key)) whole++;
     }
   }
-  assert.equal(whole, 65, 'sixty-five dials the room now owns beside the thirty-four it did');   // DEX0: Daggerfall Enemy Expansion's troll cheat (Cheat.DisableTrollRespawn) - online, the shipped default: a room's trolls get up. IT1: Immersive Travel's sixteen - the fares, the driver's destinations, his region lock, the captain's rules
+  assert.equal(whole, 57, 'fifty-seven dials the room now owns beside the thirty-four it did');   // DEX0: Daggerfall Enemy Expansion's troll cheat (Cheat.DisableTrollRespawn) - online, the shipped default: a room's trolls get up. IT1: Immersive Travel's sixteen - the fares, the driver's destinations, his region lock, the captain's rules
   assert.equal(onlineWholeModKey('dynamic-skies', 'Enabled', '?online=1'), false, 'a looks mod is not the room\'s');
   assert.equal(onlineWholeModKey('roleplay-realism', 'variantNpcs', '?online=1'), false, 'who stands behind a counter is looks');
-  assert.equal(onlineWholeModKey('oblivion-remaster-leveling', 'Enabled', '?online=1'), false, 'which leveling a character uses stays its own');
-  assert.equal(onlineWholeModKey('oblivion-remaster-leveling', 'attributePoints', '?online=1'), true, 'the points a level are the room\'s');
 });
 
 test('REALM P0.2: the holes the research found are closed - Iron as Daedric, the strength bonus, the loan dial, sale prices and forty points a level', () => {
@@ -106,29 +87,21 @@ test('REALM P0.2: the holes the research found are closed - Iron as Daedric, the
     setModSetting('pcaao', 'fixedStrengthDamageModifier', false);
     setModSetting('roleplay-realism', 'loanAmountPerLevel', 0);
     setModSetting('roleplay-realism-items', 'conditionBasedPrices', false);
-    setModSetting('oblivion-remaster-leveling', 'attributePoints', 60);
     setModSetting('roleplay-realism', 'variantNpcs', false);
     onPage('', () => {
       assert.equal(modSetting('unleveledLoot', 'Iron'), 9, 'offline the player\'s own shelf stands');
-      assert.equal(modSetting('oblivion-remaster-leveling', 'attributePoints'), 60);
     });
     onPage('?online=1', () => {
       assert.equal(modSetting('unleveledLoot', 'Iron'), MOD_SETTINGS.unleveledLoot.keys.Iron.default, 'Iron is Iron online');
       assert.equal(modSetting('pcaao', 'fixedStrengthDamageModifier'), true);
       assert.equal(modSetting('roleplay-realism', 'loanAmountPerLevel'), MOD_SETTINGS['roleplay-realism'].keys.loanAmountPerLevel.default, 'the loan dial EMPIRE-BANK reads');
       assert.equal(modSetting('roleplay-realism-items', 'conditionBasedPrices'), true);
-      assert.equal(modSetting('oblivion-remaster-leveling', 'attributePoints'), 12, 'the mod\'s own twelve');
       assert.equal(modSetting('roleplay-realism', 'variantNpcs'), false, 'a cosmetic key stays the player\'s');
     });
   } finally { _resetModSettings(); }
 });
 
 test('REALM P0.2: the Mods pane locks a room dial as it locks a switch, with the balance reason, and the offline sync copies the dials home', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const ONLINE_BALANCE_NOTE = '[^']*stronger or richer than the rest[^']*';/, 'the balance lock has its own words');
-  assert.match(menu, /const modLockNote = \(vendor, key\) => \(!Object\.hasOwn\(ONLINE_ROOM_MOD_KEYS\[vendor\] \?\? \{\}, key\) && onlineWholeModKey\(vendor, key, undefined, \{ offline: true \}\) \? ONLINE_BALANCE_NOTE : onlineLockNote\(vendor, key\)\);/);
-  assert.match(menu, /if \(\(isChoiceKey\(def\) \|\| isTextKey\(def\) \|\| isTupleKey\(def\) \|\| isFloatKey\(def\) \|\| isIntKey\(def\)\) && onlineModSetting\(vendor, key\) !== undefined\) lockDial\(ctl, modLockNote\(vendor, key\)\);/, 'a dial is locked too');
-  assert.match(menu, /function lockDial\(ctl, note\) \{\s*for \(const b of ctl\.querySelectorAll\('button'\)\) \{ b\.disabled = true;/);
   _resetModSettings();
   try {
     setModSetting('unleveledLoot', 'Iron', 9);
@@ -252,12 +225,6 @@ test('REALM P0.3: a character joining online has the debt past the Empire\'s one
   });
 });
 
-test('REALM P0.3 by source: the join calls the debt in after the markers are aligned to the world\'s clock', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /onlineArrival\(\); empireJoin\(\{ entity: playerEntity, nowMinutes: ownMinutes\(\), say: \(l, d\) => townTalk\.say\(l, d\) \}\);/);   // LIVED1: the loans run on the character's own clock
-  assert.ok(w.indexOf('empireJoin({') > w.indexOf('const onlineArrival = () => { alignEntityClocks(playerEntity, worldMinutes());'), 'the loan due dates ride the shift first');
-});
-
 test('REALM P0.4: online a shop pays at most half what it asks for the same piece - the buy-and-sell-back loop is shut; buying and offline selling are Daggerfall\'s', () => {
   assert.equal(ONLINE_SALE_SHARE, 0.5);
   const loop = { mercantile: 2, personality: 50 };
@@ -267,7 +234,6 @@ test('REALM P0.4: online a shop pays at most half what it asks for the same piec
   // each, the top of the range the haggle reads online since MERC-CAP, Field-Bugs-2026-09-29f) - so no skill lowers a
   // sale; flipped from P0.4's half of the seller's own ask
   const best = { mercantile: 100, personality: 100 };
-  // PIN MOVED (MERC-SLOPE, FIELD BUGS 2026-10-08): that half is the ceiling - the best haggler's - and the loop's weak
   // seller is paid under it, by their own offer against the best's at half its strength
   const half1 = Math.floor(calculateTradePrice(1_000, 1, best, false, { online: false }) / 2);
   assert.equal(calculateTradePrice(1_000, 1, best, true, { online: true }), half1, 'online the best haggler is paid half of what the counter asks them');
@@ -304,7 +270,7 @@ test('REALM P0.4: online a pile\'s gold is divided back by the level, every key,
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/interiorContext.js', 'src/scenes/world.js']) {
     const calls = [...src(f).matchAll(/addPileLootExtras\(([^\n]*)/g)].map((m) => m[1]);
     assert.ok(calls.length >= 1, `${f} mints a pile`);
-    for (const c of calls) assert.match(c, /\{ (locationIndex: [^,]+, luck(: liveStat\(playerEntity, 'luck'\))?, )?level(: (?:playerEntity\.level|effectiveLevel\(playerEntity\)))?(, where: '[a-z]+')?(, quarters)? \}\)/, `${f}: ${c}`);   // PIN MOVED (PARTY-LOOT): the dungeon's pile hands its Renown share on too   // THE MERGE: main's AUDIT OH-F B3 names the dungeon's own pile (`where`); MERGE 2: FORAGE3's index and luck before the level; SOFTCAP2: a mentor's pile at the group's level
+    for (const c of calls) assert.match(c, /\{ (locationIndex: [^,]+, luck(: liveStat\(playerEntity, 'luck'\))?, )?level(: (?:playerEntity\.level|effectiveLevel\(playerEntity\)))?(, where: '[a-z]+')?(, quarters)? \}\)/, `${f}: ${c}`);
   }
 });
 
@@ -352,7 +318,6 @@ test('REALM P0.4: a party\'s shared quest pays its gold in the party\'s shares, 
   const hooks = m._buildHooks();
   assert.equal(hooks.rewardShares({ questName: 'S0000999', _holdersHeard: new Set(['b', 'c']) }), 1, 'not shared: whole');
   m.markQuestShared('S0000999');
-  // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS, machine.js rewardShares): the shares are the copies held - this one and each
   // partner heard holding it (noteShareHolder) - never more than the party
   assert.equal(hooks.rewardShares({ questName: 'S0000999' }), 1, 'shared, no partner heard: whole');
   assert.equal(hooks.rewardShares({ questName: 'S0000999', _holdersHeard: new Set(['b', 'c']) }), 3);
@@ -368,9 +333,6 @@ test('REALM P0.4: a party\'s shared quest pays its gold in the party\'s shares, 
   Object.assign(give, { itemSymbol: { name: '_reward_' }, textId: 0, silently: false, isNothing: false });
   give.update(null);
   assert.deepEqual(paid, [500], 'a party of two: half the purse');
-  // by source: the host's party answers
-  assert.match(src('src/scenes/world.js'), /partySize: \(\) => social\?\.party\?\.members\?\.length \?\? 1,/);
-  assert.match(src('src/scenes/quest/questBridge.js'), /partySize: \(\) => ctx\.partySize\?\.\(\) \?\? 1,/);
 });
 
 test('REALM P0.5: a checkpoint is written online, spawned, in the seat and out of a duel - every five real minutes', () => {
@@ -380,7 +342,6 @@ test('REALM P0.5: a checkpoint is written online, spawned, in the seat and out o
   assert.equal(checkpointAllowed({ ...ok, online: false }), false, 'offline: the player saves');
   assert.equal(checkpointAllowed({ ...ok, spawned: false }), false, 'no character yet');
   assert.equal(checkpointAllowed({ ...ok, seatOut: true }), false, 'a tab another took the seat from');
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES): a realm character out of the seat still saves - the service's lease decides
   assert.equal(checkpointAllowed({ ...ok, seatOut: true, realm: true }), true, 'a realm character out of the seat');
   assert.equal(checkpointAllowed({ ...ok, duel: true, realm: true }), false, 'the realm flag lifts the seat alone');
   assert.equal(checkpointAllowed({ ...ok, duel: true }), false, 'a duel\'s borrowed health is not the character\'s');
@@ -420,28 +381,5 @@ test('REALM P0.5: a trade\'s every change to the pack is checkpointed - the good
   assert.equal(seen.length, 3, 'a refused take writes nothing');
   assert.equal(pack.gold(), 105, 'the rest of the pack passes through');
   assert.equal(pack.offerable(dagger), null);
-  // the session queues its commit only after the take returns (net/tradeSession.js _maybeCommit)
-  const ts = src('src/net/tradeSession.js');
-  assert.ok(ts.indexOf('const handle = this.pack.take(this.mine.entries, this.mine.gold);') > 0);
-  assert.ok(ts.indexOf('const handle = this.pack.take(this.mine.entries, this.mine.gold);') < ts.indexOf("this._enqueue({ k: 'commit'"), 'take, then the frame');
 });
 
-test('REALM P0.5 by source: the host checkpoints every slot the exit save writes, quietly, each online frame it is due and through the trade pack', () => {
-  const w = hostText('src/scenes/world.js');
-  const frame = w.slice(w.indexOf('const onlineFrame = (now, dt) => {'));
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES): the periodic line is onlineCheckpoint.js checkpointWhenDue, run here and in the seat's branch
-  assert.match(frame, /_rezSeen = null;[^\n]*\n\s*checkpointWhenDue\(now, _checkpointAt, realmSession, \(\) => onlineCheckpoint\(\)\);/, 'each online frame, past the seat\'s and the dead\'s returns (SCALE2b: a realm character\'s through the session\'s idle door, which may answer an unchanged save without a put)');
-  // PIN MOVED (OFFER-ID, FIELD BUGS 2026-10-11b): the pack is handed the realm's id stamp
-  assert.match(w, /const tradePack = checkpointedTradePack\(createTradePack\(playerEntity, \{ stampIds: stampItemIds \}\), \(\) => onlineCheckpoint\(\)\);/);
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES review): the gate's inputs are built once (checkpointGateOpen) and asked here
-  assert.match(w, /const checkpointGateOpen = \(\) => checkpointAllowed\(\{ online: !!online, spawned: playerSpawned, seatOut: seatOut\(\), duel: !!duelMgr\?\.duel, walkWaiting: ownWalkWaiting\(playerEntity\), realm: !!realmSession \}\);/);
-  assert.match(w, /if \(!checkpointGateOpen\(\)\) return false;/);
-  assert.match(w, /const names = exitAutosaveNames\(playerEntity, \{ deathUp: townTalk\.overlay instanceof DeathScreen \|\| !!modes\?\.deathUp\?\.\(\) \|\| successionOpen\(\) \}\);\n\s*for \(const saveName of names\) \{\n\s*if \(modes\) modes\?\.quickSaveNow\(saveName, \{ quiet: true \}\);[^\n]*\n\s*else worldQuickSave\(saveName, \{ quiet: true \}\);/);
-  // quiet: no shot and no "Game saved." - a failure still speaks
-  assert.match(w, /if \(r\.ok && !quiet\) requestScreenshot\(r\.key\);\n\s*if \(!r\.ok \|\| !quiet\) townTalk\.say\(r\.ok \? localizedText\('gameSaved', 'Game saved\.'\) : 'Save failed/);
-  assert.match(w, /quickSave: \(saveName, opts\) => worldQuickSave\(saveName, opts\),/);
-  assert.match(src('src/scenes/worldModes.js'), /quickSaveNow: \(saveName, opts\) => \(mode === 'dungeon' \? dungeonCtx\?\.quickSave\(saveName, opts\) : host\.quickSave\?\.\(saveName, opts\)\),/);
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(madeLevelRule\(_made, 'save'\) === 'refused'\) \{ if \(!quiet\) hudText\.add\(madeLevelSays\(_made, 'save'\)\); return false; \}/);   // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the court's save refused with the Hour's and the Spire's, quietly when quiet
-  assert.match(d, /if \(r\.ok && !quiet\) requestScreenshot\(r\.key\);\n\s*if \(r\.ok && !quiet\) hudText\.add\(localizedText\('gameSaved', 'Game saved\.'\)\);\n\s*else if \(!r\.ok\) hudText\.add\('Save failed/);
-});

@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-E (2026-09-27): UNITY'S ANIMATOR, AS COME SAIL AWAY DRIVES IT.
+// CSA-E: UNITY'S ANIMATOR, AS COME SAIL AWAY DRIVES IT.
 //
 // The mod plays every moving part of a boat through Mecanim: each sail's
 // Animator (Stowed, or Unstowed blended by its Wind), the rudder's (the
@@ -360,8 +360,7 @@ export function createAnimator(node, component, animation) {
     if (node0.type === 1) return weights2DDirectional(node0.positions, a.GetFloat(node0.param), a.GetFloat(node0.paramY));
     return weights1D(node0.thresholds, a.GetFloat(node0.param));
   };
-  // PERF-SAILS4 (2026-10-14, the owner's client online in a port: a ship's animators 0.31 ms of the frame, every one of
-  // them standing - her sails stowed, her doors and gunports closed, her rudder home): A CLIP'S CURVES ARE BOUND ONCE,
+  // PERF-SAILS4: A CLIP'S CURVES ARE BOUND ONCE,
   // AND A CLIP THAT DOES NOT MOVE IS POSED ONCE. Each frame asked every curve's property by a string made for it, and
   // posed every clip anew - 129 of the vendored 141 clips hold every component `constant`, so their pose is the same at
   // any time. Its bindings are kept in its curves' order (a later curve on one property is the one that stands, as

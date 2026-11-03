@@ -1,5 +1,4 @@
-// ELTHERIC (2026-10-12, the owner: "Apparently the ocean is suppose to be eltheric not etheric"; bible/03-World/
-// Eltheric-Ocean.md ELTHERIC) - THE SEA PAST THE VEIL IS THE ELTHERIC OCEAN: the lore's, and the name the intro map had
+// ELTHERIC - THE SEA PAST THE VEIL IS THE ELTHERIC OCEAN: the lore's, and the name the intro map had
 // already given the waters west of the Bay. It was "the Etheric Sea", in fourteen literals across eight modules; the word
 // has one home now (world/ethericSea.js ETHER_WORD) and every word a player reads of the sea is made of it. Its code -
 // the ETHER-* arcs, `ethericSea.js`, the ledger's `ether` trade key and every save's `ether` record - keeps its names.

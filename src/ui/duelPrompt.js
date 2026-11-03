@@ -1,4 +1,4 @@
-// DUEL1 (2026-09-24, Mac: "When inspecting a player, they should be able to send an invite to duel"): THE CHALLENGE, AS
+// DUEL1: THE CHALLENGE, AS
 // THE CHALLENGED PLAYER SEES IT - a strip at the top of the screen, the party invitation's own shape (ui/socialPanel.js's
 // toast): who challenges, how long is left to answer, Accept and Decline. The strip takes no pointer but its two buttons,
 // so it never stands between the player and the world; with the pointer held by the game the chat's line says the other

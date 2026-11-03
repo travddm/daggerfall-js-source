@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, AC9 (2026-10-17): A DUNGEON'S SEARCH FIND IS ONE LIST FOR THE SEARCHER'S PARTY. RED PINS, PHASE 1.
+// OUTDOOR-LOOT, AC9: A DUNGEON'S SEARCH FIND IS ONE LIST FOR THE SEARCHER'S PARTY. RED PINS, PHASE 1.
 // A searched object's find (`srch:<i>`, SEARCH1) is shared within the searcher's party (GRAVE-PARTY,
 // scenes/searchRoom.js), and its room word is WORLD4's WHOLE LIST: scenes/dungeonContext.js `function applyLoot(list,
 // from = null)` lands it over the find for every key that is not a room base container (PARTY-LOOT's ROOM_BASE_KINDS is
@@ -356,7 +356,7 @@ test('GRAVE-PARTY (guard - passes today): a stranger\'s search in the same crypt
   for (const p of s.all) assert.deepEqual(names(find(p)), names(s.theFind), `${p.id}: the party's find, untouched by a stranger's word`);
 });
 
-// ═══ SLICE 3 (2026-10-18) - T28-T30's REST: THE FIND IS A CARRIED KIND, JUDGED BY THE DUNGEON'S HOST ═════════════════════
+// ═══ SLICE 3 - T28-T30's REST: THE FIND IS A CARRIED KIND, JUDGED BY THE DUNGEON'S HOST ═════════════════════
 // DESIGN.md section 5 and 8.2 (T28-T30), DESIGN-REVIEW D-1/D-1a and R-3. Outcomes only: where each piece is, for every player,
 // once the relay has been flushed - the way the find is carried (a base, takes, claims) is the build's own.
 const desc = (it) => `${it.name}x${it.stackCount ?? 1}`;
@@ -574,7 +574,7 @@ test('D-2.1 (a re-asked claim, guard): Bob\'s claim on the find is said again af
   for (const p of s.all) assert.equal(find(p).some((it) => it.name === X.name), false, `${p.id}: gone from the find`);
 });
 
-// ═══ AUDIT OUTDOOR-LOOT (2026-10-18, PR #1019's audit) - TWO PARTIES, A SECOND SEARCH, WORLD8 ═════════════════════════════
+// ═══ AUDIT OUTDOOR-LOOT - TWO PARTIES, A SECOND SEARCH, WORLD8 ═════════════════════════════
 // D1: the seat judged every find in the room's ONE state an object, so a stranger's find of the coffin the seat's party had searched
 // was dropped whole (her take lifted and lapsed for good), and a stranger's search first hid the seat's party's own find from the
 // seat. A stranger's find is judged in a state of its own now (roomLootHost.js judgeStrangerFind). D2: only the FIRST word of a

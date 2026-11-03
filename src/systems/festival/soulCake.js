@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S TWO ITEMS - the Soul Cake, the
+// WITCH1: THE WITCHES' FESTIVAL'S TWO ITEMS - the Soul Cake, the
 // festival's treat and its coin, and the Hearth Offering, the bowl of them a home's owner sets out at the door.
 //
 // THE CAKES AND THE BOWLS ARE THE ACCOUNT'S (net/festivalLaw.js; the Weir Key's model, systems/eliteGates/weirKey.js): the

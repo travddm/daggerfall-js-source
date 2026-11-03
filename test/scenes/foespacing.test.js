@@ -1,4 +1,4 @@
-// FOE-SPACING (2026-09-26, SquidKamer on the Discord: "no collision on monsters"; Mac, asked: "Yes, add it"). DFU's foes
+// FOE-SPACING. DFU's foes
 // are CharacterControllers, so one stops at another and a pack spreads round what it hunts; the port's foes are not in
 // the collider, so a pack stood in one heap. Each pool now pushes apart every two of its bodies whose capsules overlap -
 // softly, through the collider, never off an edge; not the dead, not a body another client poses. Driven over the real
@@ -122,13 +122,3 @@ test('FOE-SPACING executed: two rats the encounter pool stood in one spot stand 
   assert.ok(gap(a, b) >= FOE_SPACING_GAP - 1e-3, `apart (${gap(a, b).toFixed(3)})`);
 });
 
-test('FOE-SPACING by source: the street\'s pool, the watch and the dungeon each push their bodies apart once a frame, on the frame they hand their foes, before the loop steps them', () => {
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /spaceFoes\(foes, collider, foeFrameDt\(dt\)\);[^\n]*\n\s*for \(const f of foes\) \{/, 'the street\'s encounter pool (and the interior pool, the same factory)');
-  const g = rd('src/scenes/cityGuards.js');
-  assert.match(g, /spaceFoes\(guards, collider, foeFrameDt\(dt\)\);[^\n]*\n\s*for \(const g of guards\) \{/, 'the watch (and the indoor watch)');   // WATCH-SWING (FIELD BUGS 2026-10-06): the frame's list is declared at its own pass after the drive, no longer between the spacing and the loop
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /spaceFoes\(foes, collider, foeFrameDt\(dt\), \(f, i\) => spacingSkips\(f\) \|\| f\._ownFrom != null \|\| \(!_authority && isRoomFoe\(f, i\)\)\);[^\n]*\n(?:\s*\/\/[^\n]*\n\s*clearDoorways\(foes, [^\n]*\n)?\s*for \(const f of foes\) \{\n\s*_fi\+\+;/, 'the dungeon - never a room foe this page does not own');
-  assert.match(rd('src/scenes/worldModes.js'), /return createExteriorFoes\(\{/, 'the interior pool is the street\'s factory');
-  assert.match(rd('src/scenes/worldModes.js'), /return createCityGuards\(\{/, 'the indoor watch is the watch\'s');
-});

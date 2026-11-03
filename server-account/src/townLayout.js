@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WD3 - A TOWN'S HOMES IN ONE LAYOUT (bible/03-World/Beautiful-Towns.md).
+// WD3 - A TOWN'S HOMES IN ONE LAYOUT.
 //
 // A building key names a building only in one layout of its town, so a
 // town that holds homes keeps the layout its oldest home was bought in,

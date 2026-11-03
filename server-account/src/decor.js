@@ -48,7 +48,7 @@ import { shapeOf, keptPast, KEPT_BOARD_MAX_BYTES } from './keptBoard.js';   // A
  * of what it cost); made a station or changed to another: that station's licence (DECOR_STATION_FEES, never given back);
  * removed: half of what it cost. Answers the gold the record gains (negative: pays) - `delta` - and `ledger`, what
  * records have now paid for the piece as it stands.
- * AUDIT REALM L1-F3: WHAT COMES BACK IS HALF OF WHAT RECORDS PAID (`ledger`, home_decor.paid - migration 0020), never
+ * AUDIT REALM L1-F3: WHAT COMES BACK IS HALF OF WHAT RECORDS PAID (`ledger`, home_decor.paid), never
  * half of a cost a client named: a piece placed before the realm, or through the old lane, carries a `paid` no record
  * ever paid, and customs carries its house in - its removal, its shrinking or its house's sale made gold. A piece a
  * record placed has paid it all (`ledger` = `paid`, the default), and changes exactly as before; a shrink gives back
@@ -92,8 +92,7 @@ async function realmDecorWrite(ctx, player, at, { mapId, buildingKey, delta, wri
   return piece ? { ok: true, piece, gold: delta, realm: { seq: prep.seq } } : { error: 'no-decor' };   // AUDIT REALM L1-F3: the gold the record moved - the client takes it, never its own sum
 }
 
-/** The home is the caller's: map, key, account, character. ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be
- *  account bound, not character bound"): a home is its ACCOUNT's - every character of it owns it, whichever bought it,
+/** The home is the caller's: map, key, account, character. ACCOUNT-HOMES: a home is its ACCOUNT's - every character of it owns it, whichever bought it,
  *  and the character bound is the one acting (whose record pays) - save a deed the realm gave (FIELD BUGS 2026-10-04d
  *  KNIGHT-HOUSE), which stays its knight's: Daggerfall's house in that one save. GUILD1d (Seats-Arc 8.2: "decor in the
  *  hall by Officers"): or it is a guild's hall and the character is one of its keepers (hallLaw.js
@@ -110,12 +109,12 @@ const hallGuildOf = async (db, mapId, buildingKey) => (await db.prepare('SELECT 
 /**
  * SEAT-HALL (Seats-Arc 7.2: "the palace interior is the holder's guild hall ... the Charter Room - the palace's largest
  * room, decorated by Officers with DECOR's catalogue (at most 100 pieces, DECOR's gold a placement)"): A PALACE'S CHARTER
- * ROOM, in a table of its own (`seat_hall_decor`, migration 0065 - `home_decor` stands on a home's row, and a palace is
+ * ROOM, in a table of its own (`seat_hall_decor`; `home_decor` stands on a home's row, and a palace is
  * nobody's home). Its keeper is an Officer of the guild holding the palace seat at `map_id` (the seat's key), a realm
  * character, as a hall's is (HALL_POWERS.decorate); a crown's castle takes no decor (7.2: "no decor" - a crown seat
  * refuses). DECIDED: the building is the palace the keeper's client names (the service holds no town's records), its
  * pieces counted against the cap over the whole seat, so a building named falsely only spends the same hundred; and the
- * room falls with the Charter - the migration's triggers clear it whenever the seat changes hands or lapses (a work's
+ * room falls with the Charter - the schema's triggers clear it whenever the seat changes hands or lapses (a work's
  * building project falls so too), nothing given back.
  */
 const SEAT_OWNS = `EXISTS (SELECT 1 FROM (SELECT ? AS m, ? AS b, ? AS p, ? AS c) k JOIN town_seat_holds h ON h.key = k.m
@@ -184,7 +183,7 @@ const hallBars = (piece, S, out) => (piece.item || (out && S.seat) ? 1 : 0);
 const placeJson = ({ pos, rot, scale, light, storage, paid, station, name }) => JSON.stringify({ pos, rot, scale, light, storage, paid, ...(station ? { station } : {}), ...(name ? { name } : {}) });   // HOME-STATIONS: the craft, when it serves one
 
 /** A stored row as a piece - projected again on the way out, so a row the law would refuse is never handed out.
- *  DECOR2a: `item` (migration 0012) is the owner's own item's descriptor, or NULL. */
+ *  DECOR2a: `item` is the owner's own item's descriptor, or NULL. */
 function pieceOfRow(row) {
   let place = null;
   let item = null;
@@ -299,7 +298,7 @@ export async function yardsOf({ db }, _player, { mapId } = {}) {
   const by = new Map();
   for (const row of results) {
     const p = pieceOfRow(row);
-    if (!p || !decorYardPieceOf(p) || !decorYardHighOk(p)) continue;   // YARD-SWEEP: a tower's piece from before YARD-HEIGHT never served (migration 0109)
+    if (!p || !decorYardPieceOf(p) || !decorYardHighOk(p)) continue;   // YARD-SWEEP: a tower's piece from before YARD-HEIGHT never served
     if (!by.has(row.building_key)) by.set(row.building_key, []);
     by.get(row.building_key).push(p);
   }
@@ -307,11 +306,10 @@ export async function yardsOf({ db }, _player, { mapId } = {}) {
 }
 
 /**
- * YARD-SNAP (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md YARD-SNAP; migration
- * 0136): A TOWN'S YARDS, ONE ROW. 673,882 yards reads on the day read some 1,400 rows each, sorted (9.1% of the
+ * YARD-SNAP: A TOWN'S YARDS, ONE ROW. 673,882 yards reads on the day read some 1,400 rows each, sorted (9.1% of the
  * database's statement time) for an answer that moves only when a yard piece is written. `home_yards` holds each town's
  * rows as this read takes them, built at the version `home_yards_ver` holds - a number the database moves on every yard
- * row written, by a route, a cascade or a sweep alike (the migration's triggers), in a row of its own (AUDIT LEAN-READS 2
+ * row written, by a route, a cascade or a sweep alike (the schema's triggers), in a row of its own (AUDIT LEAN-READS 2
  * B3) - so a read is one row while it is its version's, and the rows as they stand while it is not (never an answer
  * older than the rows). A decor route that moves a yard builds its town again as it answers (settleYards); using a chest does not. The minute's clock builds what
  * anything else left (settleStaleYards) - and (AUDIT LEAN-READS B1) a row built by another deploy's read, of another shape
@@ -329,9 +327,9 @@ const YARD_ROWS_SQL = yardRowsSql('?1');
  *  piece all the same - one index probe, asked only for such a town. */
 export const YARD_SNAP_READ = `SELECT v.ver, y.built, y.shape, y.rows, v.map_id IS NULL AND EXISTS (SELECT map_id FROM home_decor WHERE map_id = ?1 AND yard = 1) AS orphan
   FROM (SELECT ?1 AS m) q LEFT JOIN home_yards_ver v ON v.map_id = q.m LEFT JOIN home_yards y ON y.map_id = q.m`;
-/** YARD-SNAP (AUDIT LEAN-READS B1, 2 B5): the build's shape - its read whole and its bound. Migration 0175 built every
- *  town in today's (YARD-TOWN's bound; its literal is pinned to this), 0136 in the 2,000 bound's before it; a deploy
- *  that changes either reads every town's rows as they stand until the clock builds it again (re-backfill the towns in that change's own migration, as 0136 did, where that is
+/** YARD-SNAP (AUDIT LEAN-READS B1, 2 B5): the build's shape - its read whole and its bound. The table's build covered every
+ *  town in today's (YARD-TOWN's bound; its literal is pinned to this); a deploy
+ *  that changes it reads every town's rows as they stand until the clock builds it again (a backfill of the towns, where that is
  *  too slow). */
 export const YARD_SNAP_SHAPE = shapeOf('yards: [columns...] each, NULL past the bound', yardRowsSql('?'), KEPT_BOARD_MAX_BYTES);
 /** How many stale towns the minute's clock builds a firing. */
@@ -368,7 +366,7 @@ export function yardRowsOf(/** @type {unknown} */ text) {
 }
 
 /**
- * YARD-SHED (2026-10-06, the account service down - "D1_ERROR: D1 DB is overloaded. Requests queued for too long."): A
+ * YARD-SHED: A
  * TOWN'S YARDS, KEPT. The day before, the accounts database answered 17.4 million reads, 3.0 million of them this town's
  * yards (43 rows each - 131 million rows), each behind its caller's session and player rows: 9 million reads for an
  * answer every caller of a town gets alike, and in the outage 577 of the 930 requests the Worker saw in 45 s. So one
@@ -378,8 +376,7 @@ export function yardRowsOf(/** @type {unknown} */ text) {
  */
 export const YARDS_KEPT_S = 30;
 export const YARDS_KEPT_MAX = 4096;
-/** YARDS-REPLICA (2026-10-16, the account database's primary at its ceiling of round trips again - bible/11-Multiplayer/
- *  Scale-Arc.md YARDS-REPLICA): WHERE A TOWN'S YARDS ARE READ - a read replica, never the primary's queue. The isolates are
+/** YARDS-REPLICA: WHERE A TOWN'S YARDS ARE READ - a read replica, never the primary's queue. The isolates are
  *  many enough that YARDS_KEPT_S keeps almost nothing: 488,075 asks on 2026-10-15 cost the primary 506,889 reads of some
  *  1,100 rows each, the most of its statement time of any read but the session's lookup. SEAT-REPLICA's law, a town at a
  *  time: the read after this isolate's own decor write there starts at the primary ('first-primary', so it sees the
@@ -447,7 +444,7 @@ export function forgetYards(mapId) {
 /** Tests: every kept town forgotten. */
 export function _resetYardsKept() { keptYards.clear(); askingYards.clear(); yardWrites.clear(); yardsMark.clear(); yardsWritten.clear(); yardsFloor = null; }
 
-/** BASE-HIDE: what the home's owner took out of the room (migration 0015) - projected on the way out, so a list the law
+/** BASE-HIDE: what the home's owner took out of the room - projected on the way out, so a list the law
  *  would refuse is handed out as none. */
 const hiddenRead = (db, mapId, buildingKey) => db.prepare('SELECT keys FROM home_hidden WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey);
 /** DECOR-BATCH: the list off its row (hiddenRead's, in decorOf's batch). */
@@ -477,7 +474,7 @@ export async function hideDecorBase(ctx, player, { mapId, buildingKey, character
 }
 
 /**
- * PROF4 (bible/06-Systems/Professions-Arc.md 25): A CRAFTED PIECE SET DOWN - its provenance id kept only where the
+ * PROF4 (25): A CRAFTED PIECE SET DOWN - its provenance id kept only where the
  * account service's own `products` row says the piece is this account's and this template's, and its maker's mark
  * written from that row alone (where its name carries one - a Masterwork, a Master Joiner's furniture), never from what
  * the client sent. A piece whose id the row does not bear out stands as the plain piece it is.

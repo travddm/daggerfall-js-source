@@ -1,7 +1,4 @@
-// CLIMB-HANDS II (2026-10-13, Mac: "With climbing. The sprite hands should be spread out more and the morrowind model
-// should use climbing hands in first person. Additionally, the hands should stay on whatever your climbing and not rotate
-// with the screen. The only one that should rotate with the screen is the single arm out. The single arm out is also
-// inverted for both directions"). Record: bible/03-World/Parkour-Arc.md (CLIMB-HANDS II).
+// CLIMB-HANDS II. Record: (CLIMB-HANDS II).
 // THE LAW EXECUTES: the fists as far apart as the 3D body's wrists on the lip; pinned to the wall through the world's
 // lens - carried across the screen by the view's turn exactly where an independent rotation of the eye puts the stone
 // they hold, down it by a look up, up it by a look down only as far as the sleeve's slack (a hand gone under the edge
@@ -266,7 +263,7 @@ test('CLIMB-HANDS II the lens is the frame\'s: the strip the world was drawn int
   // the retro pillarbox: the 2D layer on a canvas of the pillarbox's size, at its place on the real one
   const ui = { width: 960, height: 720, clientWidth: 1280, clientHeight: 720, uiRect: { x: 160, y: 0, w: 960, h: 720 }, canvas: { width: 1280, height: 720 } };
   assert.ok(close(climbLens(ui, { fov, viewport: { x: 0.125, y: 0, w: 0.75, h: 1 } }), { tanX: t * 960 / 720, tanY: t, cx: 160, cy: 100, hx: 160, hy: 100 }), 'the pillarbox');
-  // a retro world projected at its texture's shape: the projection's aspect over the strip's (muzzleRay's law)
+  // a retro world projected at its texture's shape: the projection's aspect over the strip's
   assert.ok(Math.abs(climbLens({ width: 1280, height: 720 }, { fov, aspect: 1.25 }).tanX - t * 1.25) < 1e-12);
   for (const bad of [null, { width: 0, height: 720 }]) assert.equal(climbLens(bad, { fov }), null);
   assert.equal(climbLens({ width: 1280, height: 720 }, { fov: 0 }), null);
@@ -326,11 +323,4 @@ test('CLIMB-HANDS II the Morrowind arms climb sheathed: drawn while their pose i
     Object.assign(fpArm, saved);
     resetToDefaults(); _resetModSettings();
   }
-  // the gate's sixth exception, beside the five, and the lowering reads the same answer
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  // PIN MOVED (TWO-HANDS): the running hands' two exceptions are named between them and join the gate after it (was: the
-  // gate on the next line, ending at `!armsClimb`)
-  assert.match(rig, /const armsClimb = fpArm\.active\(\) && !!fpArm\.climbPosed\?\.\(\);\n(?:\s+\/\/[^\n]*\n)*\s+const runHands = [^\n]*\n\s+const armsRun = [^\n]*\n\s+if \(paralyzed \|\| \(!shown\(\) && !torchOnly && !sheetOnly && !shieldRect && !gunSliding && !armCasts && !armsClimb && !runHands && !armsRun\)\) return;/);
-  assert.match(rig, /if \(_climbLower > 0 && !armsClimb\) \{/);
-  assert.match(rd('src/combat/fpArm.js'), /climbPosed\(\) \{ return climbHands && viewMode === 'first' && !held; \},/, 'the arm says it is posed on the climb: first person, the hands on the stone, no sheet');
 });

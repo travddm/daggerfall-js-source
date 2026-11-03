@@ -1,4 +1,4 @@
-// WD3 (2026-10-01): THE PIECES BEAUTIFUL VILLAGES AND BEAUTIFUL CITIES BORROW, STOOD IN BY THE PORT.
+// WD3: THE PIECES BEAUTIFUL VILLAGES AND BEAUTIFUL CITIES BORROW, STOOD IN BY THE PORT.
 //
 // The two town mods are world data (src/formats/worldData/worldDataPack.js), and their blocks place pieces of five peer mods
 // the port does not carry - Daggerfall Expanded Textures, Diep's Rosy's Resources, New Paintings, the RMB Resource

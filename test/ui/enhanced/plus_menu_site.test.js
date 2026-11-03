@@ -1,6 +1,4 @@
-// PROFILE-MENU, PLUS-MENU, PLUS-SITE (2026-10-07, Mac: "I want to organize and detail the player profile (the top right
-// icon section), give the main menu the enhanced plus UI treatment and do the same thing for our website. A proper
-// detailed overhaul").
+// PROFILE-MENU, PLUS-MENU, PLUS-SITE.
 //
 //   - PROFILE-MENU: the account card the corner portrait opens is a PROFILE signed in - a plate (the portrait, the name
 //     with its Renown, the title and glyphs worn, the character), then the Record (a tile a deed, the duels' share won
@@ -11,7 +9,7 @@
 //   - PLUS-SITE: the website wears the kit's roles in the kit's tones, cut without a picture and injected at serve and
 //     build (ui/enhanced/enhancedFrame.js siteKitCss, scripts/landingHtml.mjs).
 //
-// The record: bible/10-UI/UI-Arc.md PROFILE-MENU / PLUS-MENU / PLUS-SITE, and its AUDIT (the pins it added say so).
+// The record: PROFILE-MENU / PLUS-MENU / PLUS-SITE, and its AUDIT (the pins it added say so).
 // Mutants: tools/mutants/plus_menu_site.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -149,11 +147,11 @@ test('PROFILE-MENU: the plate wears the corner mark\'s portrait - a face handed 
 test('PROFILE-MENU: every class the profile wears is the skin\'s, the title worn has its colour rule per title, the window widens for it and keeps clear of the foot, and a phone gives it the screen (mutants: the plate\'s title colourless; the window\'s width; the short screen\'s height; Close out of reach)', async () => {
   const css = src('src/ui/enhanced/enhancedStyle.js');
   const worn = new Set();
-  // every class, the gradient title's word among them (Shadow Fang's is a gradient), an SVG's too (its class is an
+  // every class, the gradient title's word among them (the Gatebreaker's is a gradient), an SVG's too (its class is an
   // attribute) - each matched WHOLE against the composed sheet's rules (AUDIT P6: a prefix passed for its longer name,
   // `.acctworn` for `.acctworntitle`, and the comments counted)
   const face = { tag: 'canvas', className: '', children: [], get all() { return [face]; } };
-  const card = draw({ face: Promise.resolve(face), wardrobe: { titles: ['shadowfang', 'disciple'], title: 'shadowfang', glyphs: ['sprout'], auras: ['dagonfire'] } });
+  const card = draw({ face: Promise.resolve(face), wardrobe: { titles: ['gatebreaker', 'disciple'], title: 'gatebreaker', glyphs: ['sprout'], auras: ['dagonfire'] } });
   await new Promise((r) => setTimeout(r, 0));   // the face lands: `hasface` is walked too
   for (const n of card.all()) for (const c of [...cls(n), ...String(n.attrs?.class ?? '').split(/\s+/)]) if (c) worn.add(c);
   assert.ok(worn.has('acctglyphart') && worn.has('acctworn') && worn.has('hasface'), 'the walk sees the SVG, the line and the face');
@@ -183,7 +181,7 @@ test('PROFILE-MENU: every class the profile wears is the skin\'s, the title worn
   assert.doesNotMatch(js, /\.style\.|cssText|#[0-9a-fA-F]{6}/);
   // the door hands the card the mark's own character and face
   const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const save = profileCharacter\(\);\n  const card = accountCard\(document, acctFlow, \{/);   // PIN MOVED: AUDIT RECOVERY-SET B1 - the window's flow
+  assert.match(menu, /const save = profileCharacter\(\);\n  const card = accountCard\(document, acctFlow, \{/);
   assert.match(menu, /face: save \? loadFace\(save, \{ scale: 2, copy: true \}\) : null,\n    character: save \? `Playing \$\{characterLine\(save\)\}` : null,/);
 });
 

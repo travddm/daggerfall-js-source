@@ -29,7 +29,7 @@ import { effectCost, effectSchool, TARGET_COST_MULT, CAST_COST_FLOOR } from './s
  *  pinned). */
 export const SPELL_ABSORPTION = Object.freeze({ None: 0, InLight: 1, InDarkness: 2, Always: 4 });
 
-/** ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): THE PORT'S OWN, never DFU's. A
+/** ABSORB-NERF: THE PORT'S OWN, never DFU's. A
  *  100% AbsorbsSpells item (or a 100% crafted Spell Absorption) made its wearer all but immune to casters AND refilled
  *  their magicka off every bolt. Three numbers, one home:
  *   - ABSORB_ENCHANT_CHANCE: the AbsorbsSpells item enchantment is a ROLL of 50%, no longer DFU's flat always;
@@ -75,7 +75,7 @@ export function careerAbsorbs(career, { day = false, inside = true } = {}) {
   return false;
 }
 
-/** SET2 (Mora's Mantle's Eye of Mora, bible/11-Multiplayer/Sigil-Sets.md): THE PORT'S OWN ABSORPTION CHANCES - named
+/** SET2 (Mora's Mantle's Eye of Mora): THE PORT'S OWN ABSORPTION CHANCES - named
  *  sources, `fn(target) -> per cent`, each rolled on its own after the effect's arm and before the career's, under
  *  DFU's own two gates (a Destruction effect, and room in the target's magicka for what it drinks). A source answers 0
  *  for any target it is not about. */
@@ -112,7 +112,7 @@ export function tryAbsorption(effect, targetType, target, { day = false, inside 
     if (c > 0 && Math.floor(rolls() * 100) < c) return drink;
   }
   if (careerAbsorbs(target?.career, { day, inside })) return drink;
-  // ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): the AbsorbsSpells enchantment is
+  // ABSORB-NERF: the AbsorbsSpells enchantment is
   // a 50% roll, no longer DFU's flat always (:1196)
   if (absorbing && Math.floor(rolls() * 100) < ABSORB_ENCHANT_CHANCE) return drink;
   return 0;
@@ -137,6 +137,6 @@ export function spellAbsorptionChance(target) {
     const chance = a.chanceBase == null ? (a.chance ?? 0) : (a.chanceBase ?? 0) + (a.chanceMod ?? 0) * Math.floor((target?.level ?? 1) / per);
     if (chance > best) best = chance;
   }
-  // ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): the effect's chance caps at 50%
+  // ABSORB-NERF: the effect's chance caps at 50%
   return Math.min(SPELL_ABSORPTION_CHANCE_CAP, best);
 }

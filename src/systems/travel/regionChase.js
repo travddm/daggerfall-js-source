@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-CHASE-RANGE (2026-10-19, the owner, of the Overworld's gaps: "4. Fix it"; bible/06-Systems/Travel-View.md
-// OW-CHASE-RANGE): A CHASE SEEN AS FAR AS ITS BAND IS DRAWN.
+// OW-CHASE-RANGE: A CHASE SEEN AS FAR AS ITS BAND IS DRAWN.
 //
 // TV7b said a chase on the chaser's cell foes frame, and the relay fans that frame RANGE_PIXELS (3) about its sender,
 // while the Overworld draws the bands BAND_REACH_PX (6) about the viewer - so a player three to six pixels from a chaser

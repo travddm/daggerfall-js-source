@@ -1,6 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26, the owner: "I want to build a detailed lock picking minigame and introduce a lockpick item";
-// bible/06-Systems/Lockpicking.md section 4): THE LOCK'S WINDOW - the tumblers seen in cross-section, the pick under them
+// LOCKPICK: THE LOCK'S WINDOW - the tumblers seen in cross-section, the pick under them
 // and the tension wrench in the keyway, over the machine (systems/lockpick/lockpickAct.js) its door hands it. A window
 // redesigned on purpose, not one of DFU's (Daggerfall has none - it rolls the chance and says a line): it cites its own
 // design record, Lockpicking.md section 4, under THE NATIVE-WINDOW RULE's SCOPE1 sentence (Home.md).
@@ -19,7 +18,7 @@
 // professions' accessibility choice) the tumblers are shown and only the Auto attempt is offered, and a timing press says
 // so. Every answer has its words (LOCK_WORDS) and its sound (the door's ear).
 //
-// AUDIT LOCKPICK C1-C12 (2026-10-26, the owner: "Also ensure this is enhanced ui plus"): THE KIT'S WINDOW. Its frame,
+// AUDIT LOCKPICK C1-C12: THE KIT'S WINDOW. Its frame,
 // header, well, presses and readouts are the stone-and-brass kit's roles (ui/enhanced/enhancedFrame.js FRAME_ROLES), its
 // layout the Plus sheet's LOCK_CSS, so a Plus colour and the DFO Grimoire dress repaint it; on the classic skin it lays the
 // layout and the kit cut to its own selectors (`lockSkinCss`), the Broker's AUDIT SET U1 way. The pad has an arm of its own

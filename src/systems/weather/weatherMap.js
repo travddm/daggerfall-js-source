@@ -1,7 +1,5 @@
 // @ts-check
-// WEATHER3 slice A (2026-09-22, Mac: "imagine a map, one location its
-// sunny, one is cloudy, one has a rainstorm, etc" ... "A true overhaul
-// within enhanced enviroments"): THE WORLD WEATHER MAP - weather as
+// WEATHER3 slice A: THE WORLD WEATHER MAP - weather as
 // SYSTEMS on the land, the weather at a place a pure function of the
 // place and the minute.
 //
@@ -14,7 +12,7 @@
 // none does, the air is clear. Nothing is rolled per day or per zone,
 // nothing is carried: `weatherAt(x, z, minutes)` answers the same sky
 // for the same place and minute on every client, offline and online.
-// (The bible's record: bible/07-Rendering/Weather-Arc.md, WEATHER3.)
+// (The bible's record:, WEATHER3.)
 //
 // THE LAW, AND WHY IT IS CALIBRATED BY CONSTRUCTION
 //
@@ -83,7 +81,7 @@ const RANK = Object.freeze(Object.fromEntries(PRIORITY.map((w, i) => [w, i])));
  * ([metres a side, game minutes long], sized to the type, so a search
  * walks a handful of nodes whatever the type's reach).
  *
- * WEATHER3g (Mac: "this needs more clarity"): the weather is REGIONAL. A
+ * WEATHER3g: the weather is REGIONAL. A
  * rain system is a FRONT tens of kilometres across, and a thunderstorm is
  * a CELL of a front (`parent`), riding with it - so a storm reads as a
  * rain front mottled with its cells, not a rash of small storms over the
@@ -147,7 +145,7 @@ for (const [front, cell] of Object.entries(CELL_OF)) {
 const TYPE_SALT = Object.freeze({ thunder: 1, rain: 2, snow: 3, sandstorm: 4, fog: 5, overcast: 6, cloudy: 7, ashfall: 8 });
 
 /**
- * THE SHAPE (WEATHER3h, Mac: "they look too much like blobs and blots" -
+ * THE SHAPE (WEATHER3h, -
  * "make them irregular"). A system is not a disc: its outline at bearing
  * theta is its radius times m(theta) = n (1 + sum a_k cos k(theta - phi_k)),
  * k = 2 (the stretch that makes a front a BAND), 3 and 4 (its lobes), the
@@ -166,7 +164,7 @@ export const SHAPE_AMPS = Object.freeze({
 });
 /** The largest m(theta) a type's shape can reach: a search's reach. */
 export const shapeMax = (type) => 1 + SHAPE_AMPS[type].reduce((a, b) => a + b, 0);
-/** A system's shape, from six draws of its generator (taken whatever its fate) - FLOW2 (2026-09-26): the draws are
+/** A system's shape, from six draws of its generator (taken whatever its fate) - FLOW2: the draws are
  *  taken where they always were, and the shape made from them only for a candidate that is kept (the same numbers). */
 function shapeOf(type, u1, u2, u3, u4, u5, u6) {
   const [A2, A3, A4] = SHAPE_AMPS[type];
@@ -231,7 +229,7 @@ export function coreVolume(type) {
 // ---- the calibration: the table's shares to the birth law ------------
 
 /**
- * RAIN-HOURS (Mac, 2026-10-13: "I feel like it rains too much"): THE SHARE OF A WET DAY'S HOURS ITS WORD FALLS. The
+ * RAIN-HOURS: THE SHARE OF A WET DAY'S HOURS ITS WORD FALLS. The
  * Chronicles' odds are a DAY's weather, and DFU wears the day's word for all of it - a rain day rains twenty-four
  * hours. The map took the odds as the share of TIME each word is worn, so a woodland spring was under falling rain 36%
  * of every hour, a swamp's 41% and a jungle's 54%, about a third of it a storm. A wet day is a day it rains, not a day
@@ -512,7 +510,7 @@ function valueNoise(x, z, salt) {
   const a = noiseAt(gx, gz, salt), b = noiseAt(gx + 1, gz, salt), c = noiseAt(gx, gz + 1, salt), d = noiseAt(gx + 1, gz + 1, salt);
   return (a + (b - a) * sx) + ((c + (d - c) * sx) - (a + (b - a) * sx)) * sz;
 }
-/** A lattice corner's value: its seed's first draw. FLOW2 (2026-09-26): no generator made for the one number, no
+/** A lattice corner's value: its seed's first draw. FLOW2: no generator made for the one number, no
  *  closure a call - the same bits, and a wind reading allocates nothing but its answer. */
 const noiseAt = (i, j, salt) => seededFirst((Math.imul(i, 0x27d4eb2d) ^ Math.imul(j, 0x165667b1) ^ Math.imul(salt, 0x9e3779b1) ^ WORLD_SEED) >>> 0);
 /** The wind terms' headings at a place (radians at minute 0) - FLOW2: into one scratch array, read at once by its
@@ -725,7 +723,7 @@ function drawCells(front, climateAt) {
 
 /** Where a born system stands at `minutes` (alive or not): its birthplace
  *  ridden on the wind - a cell, its front's place plus its own offset. */
-/** FLOW2 (2026-09-26): a born system's headings at its birthplace, read once for the system (a system is one frozen
+/** FLOW2: a born system's headings at its birthplace, read once for the system (a system is one frozen
  *  object for as long as the births cache holds it, and its birthplace never moves) - every placing of it read the same
  *  twelve noise corners again. */
 const _hostHeadings = new WeakMap();
@@ -907,7 +905,7 @@ export function systemsAmong(span, minutes) {
  *  front's rain never fell below 0.73: heavy to its very edge.) */
 export const EDGE_INTENSITY = 0.2;
 /**
- * RAIN-HEART (Mac, 2026-10-13: "sometimes instead of downpours it should just sprinkle"): HOW HARD A SYSTEM FALLS AT
+ * RAIN-HEART: HOW HARD A SYSTEM FALLS AT
  * ITS HEART, as a share of the heaviest - a range per type, and each system's strength drawn evenly in it from its own
  * id (`systemStrength`), never from its node's generator, so no other draw moves. WEATHER3b put the place's intensity where
  * WX2's roll per shower had stood, and the envelope is 1 at every grown system's heart: every rain front poured there,
@@ -983,7 +981,7 @@ export function coverAtRadial(s, rad) {
  * them, PACK-10).
  */
 /**
- * OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): WHAT FALLS AMONG SYSTEMS, alone -
+ * OW-HITCH: WHAT FALLS AMONG SYSTEMS, alone -
  * wornAmong's `fall` (the strongest wet band's intensity, each wet word's strongest band, the cloud cover), the same
  * numbers by the same walk, into `out`, with no band, no winner and no answer made. The snowpack asks only the fall, at
  * every point of its window at every step of a year (snowpack.js `_step`), and wornAmong's objects a system were most

@@ -1,7 +1,6 @@
 // @ts-check
-// STEED1 (2026-10-11, the owner: "I want to build the new horse and wagon maintence systems. Horse should have stamina,
-// feeding them grows your bond and improves their stats. Every horse should have different stats.") - HORSE CARE
-// (bible/06-Systems/Horse-Care.md). The law, pure: every horse's four stats, its bond with its owner, its hunger, what it
+// STEED1 - HORSE CARE
+// . The law, pure: every horse's four stats, its bond with its owner, its hunger, what it
 // eats, its breath under a gallop. The runtime that runs it a frame at a time is systems/steedRuntime.js; the item's
 // fields are systems/item/itemFields.js's (`horseBond`, `horseFed`), on DFU's one Horse template alone (systems/item/itemLaw.js).
 //
@@ -20,8 +19,7 @@
 //    the spend; at nought the horse is WINDED and will not gallop again until WINDED_UNTIL of it is back. It comes back
 //    at a walk or standing, half as fast under a rider at the ride's own pace, slower hungry.
 //
-// HORSE-TIERS (2026-10-15, Mac: "Allow turn off. Rework this system to be more in line with how we handle climates and
-// calories boons."): what the horse PAYS is its tier's (systems/upkeep/upkeepTiers.js - Boons, the default: nothing below
+// HORSE-TIERS: what the horse PAYS is its tier's (systems/upkeep/upkeepTiers.js - Boons, the default: nothing below
 // DFU's plain horse; Hard: the system above as it stood). The laws that charge take the tier's rules as an argument -
 // steedStats, stepBreath, steedSpeedScale, teamDraftScale, feedHorse and tendHorses - and a law handed none runs HARD,
 // so every pin written before the tiers still pins it. Everything else here is the world's, in every tier.
@@ -230,7 +228,7 @@ export function tendHorses(items, now, { since = null, where = 'with', stores = 
   if (!Array.isArray(items) || !Number.isFinite(now)) return { changed, ate };
   for (const horse of items.filter(isHorseItem)) {
     if (fedUntil(horse) == null) { horse.horseFed = Math.max(1, Math.round(now + NEW_HORSE_FED)); changed = true; continue; }
-    // AUDIT STEED1 (2026-10-11): a horse grazing or in the stable never starved across the span the keep last ran
+    // AUDIT STEED1: a horse grazing or in the stable never starved across the span the keep last ran
     // before (`since` - an inn's rest, a dungeon: no frame ticks indoors) - only a fade owed BEFORE it is taken; with no
     // span known, all of it to now
     const owedTo = since != null && since < now ? since : now;

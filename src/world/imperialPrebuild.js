@@ -1,6 +1,5 @@
 // @ts-check
-// IC-GRAND's perf pass (2026-10-26, the coordinator: "A DISTRICT'S NINE NEAR SLICES NEVER FINISHED ... make arrival and
-// crossing workable ... off-main-thread work"; bible/03-World/Arena-Provinces.md IC-GRAND, "Off the page's thread") - THE
+// IC-GRAND's perf pass - THE
 // CITY'S OWN, MADE AHEAD ON A WORKER. A near slice's own blocks (their ground, their 4,096 closed cells each asked of the
 // fabric, their trees) and its fabric's models are pure work of their rows and columns - the plan's, the same on every
 // thread: measured in the game with its frame held, a near slice's ~60 blocks (a dozen milliseconds each) and ~60 models
@@ -48,7 +47,7 @@ export function sliceWork(s, near) {
 /** IC-STUTTER: each landmark part's slice (its first, where a long wall's runs stand in several), near and far ids alike. */
 let _partSlices = null;
 /**
- * IC-STUTTER (bible/03-World/Arena-Provinces.md IC-STUTTER): THE SLICE A PIECE IS OF, by its key ('b:<name>' a block,
+ * IC-STUTTER (IC-STUTTER): THE SLICE A PIECE IS OF, by its key ('b:<name>' a block,
  * 'm:<id>' a model) - a cell's block or fabric its cell's slice, a skyline its own, a landmark's part the first slice that
  * stands it; null for a key of none of the city's. The worker pool makes each slice's pieces on one worker
  * (world/imperialPrebuildClient.js ownerOf).

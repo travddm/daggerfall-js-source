@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-21c, the record's Left ("my own boats' Animators ... still stepped every frame") and BOAT-FAR's
-// "what it still pays" (bible/07-Rendering/Performance-Priority.md BOAT-OWN, HELD-DRAW and HELD-FLATS).
+// "what it still pays" (BOAT-OWN, HELD-DRAW and HELD-FLATS).
 //
 // BOAT-OWN: MY OWN BOATS LIVE BY THE FAR LAW. The Come Sail Away runtime stepped every Animator and particle system of
 // every boat the player owns every frame at any range (systems/comeSailAway/comeSailAway.js animate,

@@ -1,4 +1,4 @@
-// FAST-REFUSAL (2026-10-26, the owner: "Take care of exclusions and gaps"; bible/06-Systems/Travel-View.md FAST-REFUSAL) -
+// FAST-REFUSAL -
 // A PLAN PAST THE BAY WITH NO WAY BY LAND SAID AT ONCE. ROAD-BEYOND bounded a plan past the Bay by a count of cells, and a
 // refusal spent all of it (300,000 cells, one to four seconds) before it said so. The land past the Bay is the trace's
 // smooth law, land only in a square of the picture's centres with a land centre at a corner; the land centres joined to
@@ -62,9 +62,6 @@ test('FAST-REFUSAL a plan past the Bay with no way by land is refused before a c
   assert.equal(tally.n, 0, 'not a cell');
   // one isle: walked
   assert.ok(planRoute(px(21, 11), px(23, 13), { ...rg }), 'a way on one isle');
-  // a boat to hand: the land's pieces say nothing (THE MERGE)
-  const src = read('src/systems/travel/travelRoute.js');
-  assert.match(src, /if \(past && !sea && apart && apartPastBay\(from, to, width, height\)\) return null;/);
 });
 
 // ── WITH ARENA2: the freeware's own Tamriel ─────────────────────

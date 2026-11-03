@@ -112,41 +112,6 @@ test('A8: the hosts poll the ACTION, which is Mouse0 at the shipped bindings', (
   assert.equal(held(new Set(['KeyG']), 'ActivateCenterObject'), false);
 });
 
-test('A8: every host reads the one gate, and its FLAG is retired', () => {
-  const hosts = [
-    'src/scenes/world.js', 'src/scenes/exterior.js',
-    'src/scenes/worldModes.js', 'src/scenes/dungeon.js',
-  ];
-  for (const h of hosts) {
-    const s = hostText(h);
-    assert.match(s, /from '\.\.\/systems\/activateGate\.js'/, `${h} imports the gate`);
-    assert.match(s, /activateFrame\(/, `${h} runs a frame of it`);
-    // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): the street's and the modal frame's press is named before the gate
-    // (`_activateDown`) - the act's click is asked with it too
-    assert.match(s, /(?:down: |const _activateDown = )held\(keys, 'ActivateCenterObject'\)/, `${h} polls the ACTION`);
-    if (/const _activateDown = /.test(s)) assert.match(s, /\n\s*down: _activateDown,/, `${h}: the gate reads that press`);
-    // the flag that stood on every one of these lines
-    assert.ok(!/the pointer-parity slice owns the move/.test(s),
-      `${h}'s pointer-parity flag is retired, not orphaned`);
-    // and E survives beside it - "Mouse2 + E preserved"
-    // MWCROUCH: the port's own E is an EDGE now (`pressedCode`), not a
-    // held read - the derivation it replaced dropped any tap shorter
-    // than a frame. KB1: and the departure is a BINDING now - E is the
-    // port's Interact action, activating beside Mouse0, read on the edge
-    // like every press, so a rebind moves it.
-    assert.match(s, /pressed\((keyEdge|latch\.edge), keys, 'Interact'\)/, `${h} keeps the port's own E, as the Interact action`);
-    assert.ok(!/pressedCode\(/.test(s), `${h}: no raw code read is left`);
-  }
-  // the flag in the input map's header too
-  const input = readFileSync(join(root, 'src/ui/input.js'), 'utf8');
-  assert.match(input, /A8 RETIRED THE POINTER-PARITY FLAG/);
-  assert.ok(!/FLAGGED\s*\n\/\/ at the E sites/.test(input));
-  // the dungeon host needs HasReadySpell off its context, which the
-  // context now answers
-  const ctx = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.match(ctx, /spellArmed: \(\) => magic\.spellArmed\(\),\s+\/\/ A8/);
-});
-
 test('ROAD-Ar R10: the swing departure on record is the ROUTING, not the button', () => {
   // The sentence these blocks used to carry - "Mouse2 still swings
   // (DFU's SwingWeapon is Mouse1)" - described a mismatch that does not

@@ -181,7 +181,7 @@ export function buildStatsPage(entity, repaint, opts = {}) {
   def.append(row(localizedText('health', 'Health'), `${Math.round(s.derived.health)} / ${Math.round(s.derived.maxHealth)}`));
   page.append(def);
 
-  // STATS-RESIST (the owner: "Resistances on the stat screen please"): each kind of harm's chance to be shrugged off -
+  // STATS-RESIST: each kind of harm's chance to be shrugged off -
   // the saving throw's own chance before its roll (systems/spellcast.js savingChance: race, career, biography, worn
   // affixes and Willpower), and over it any Resist effect running now, which turns the harm away whole first
   const rs = section('Resistances', 10);
@@ -215,7 +215,7 @@ export function buildStatsPage(entity, repaint, opts = {}) {
   sk.append(row(skillName, `${s.skill}%`), row(SKILL_NAMES[SKILLS.CriticalStrike], `${s.crit.skill}%`), row(SKILL_NAMES[SKILLS.Backstabbing], `${s.backstab.skill}%`), row(SKILL_NAMES[SKILLS.Dodging], `${s.dodging}%`));
   page.append(sk);
 
-  // TEMP-UI (2026-10-12, the owner: "allowing players to see their personal temperature in their inventory"): THE FELT
+  // TEMP-UI: THE FELT
   // TEMPERATURE, part by part - the land, the season, the hour, the weather, a roof or the ground, the resistances, the
   // race, the clothing, the armour, a fire, the wet, the bare skin, a drink to hand, a garment's degrees - adding up to
   // the number (ui/temperatureCard.js temperatureStatRows; none with Climates & Calories Off)

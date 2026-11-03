@@ -1,9 +1,9 @@
-// CSA-I (2026-09-27) - COME SAIL AWAY'S POSITION READING: the map OnGUI draws while the boat's position box has it up
+// CSA-I - COME SAIL AWAY'S POSITION READING: the map OnGUI draws while the boat's position box has it up
 // (ComeSailAway.cs 4113-4170), its markers (5681-5780), the picture it is drawn on, and OnGUI's debug values (4177-4182).
 //
 // THE PICTURE is record 3 of the mod's archive (Start 1077: TryImportTexture(112395, 3, 0)), which is Daggerfall's
 // own travel map - TRAV0I00.IMG's 320x160 interior from row 12 down (DFU's regionPanelOffset) scaled to 1000x500, one
-// texel a map pixel. The port never carries it (bible/03-World/Come-Sail-Away.md "The bundle"): it is rebuilt here
+// texel a map pixel. The port never carries it ("The bundle"): it is rebuilt here
 // from the player's own file, nearest at the texel centres - the sampler the bundle's picture matches best (a mean
 // |RGB| of 7.3 of 765 a pixel, the rest the bundle's DXT1 blocks; bilinear stands at 19.2). The bundle draws it with
 // point filtering, as the host does.
@@ -14,8 +14,7 @@
 //
 // Everything here is the arithmetic of the draw; the runtime (systems/comeSailAway/comeSailAway.js) owns the state it reads.
 //
-// BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions." - its C12, the low one, built with the rest; bible/03-World/Come-Sail-Away.md BAY-LEFT-MAPS): THE READING PAST
+// BAY-LEFT-MAPS: THE READING PAST
 // THE BAY. The mod's picture is the Bay's, so a boat past it had no cross - the reading's red lines ran off the rect. Past
 // the Bay's map the reading is drawn on Daggerfall's own painting of Tamriel (TMAP00I0.IMG - the picture the continent's
 // trace is read off, ui/tamrielTrace.js - rebuilt from the player's own file as record 3 is), its own 320 x 200 at the

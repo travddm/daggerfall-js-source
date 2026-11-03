@@ -48,8 +48,6 @@
 
 import { drawSpellIcon, spellIconsLoaded } from '../spell/spellIcons.js';
 import { statusGlyphColor32 } from './hudStatus.js';   // TELL9: the bleed's own icon, the enhanced widget's glyph
-import { wildHere, WILD_TEXT } from '../../systems/wild/wildZone.js';   // WILD1: the open zone's own icon
-import { zoneSafe, ZONE_SAFE_TEXT } from '../../systems/wild/zoneSafe.js';   // ZONE-SAFE: named safe in a settlement's streets
 import { uiCanvas, toUiPoint } from '../uiScreen.js';   // RETRO-UI: the HUD's own space under the pillarbox
 import { liveBundles, canEndBundle } from '../../systems/mysticism.js';   // BUFF-END: and which the player may end
 import { shownSpellName } from '../../systems/loot/loot.js';   // L10N3e: the bundle's Name, which DFU gave a stock spell in the player's language
@@ -151,26 +149,18 @@ export function activeSpellIcons(entity) {
       bundleId: bundle.bundleId,         // BUFF-END: the bundle a right-click ends...
       endable: canEndBundle(bundle),     // ...when it is the player's to end (ui/hud/hudLarge.js routeSpellIconClick)
     };
-    // SPELL-GIFT (2026-09-27, Tabitha: "the feedback for buffing other players is non-existent"): a GIFT - another
+    // SPELL-GIFT: a GIFT - another
     // player's beneficial spell (ALLY-CAST's bundleAlly, only ever the beneficial families) - is a buff, and sorts with
     // the buffs. DFU's null-caster arm sent it to the debuff row, where only a foe's spell has ever landed in DFU.
     (bundle.selfCast || bundle.ally ? self : other).push(item);
   }
-  // TELL6e (bible/12-Enhanced-AI/Feud-Arc.md 8.2): a sweep's BLEED is no spell's bundle, but it is shown as one, with
+  // TELL6e (8.2): a sweep's BLEED is no spell's bundle, but it is shown as one, with
   // the debuffs, its rounds its ticks left. TELL9: drawn from its own glyph (two drops of blood - ui/hud/hudStatus.js), its
   // index the atlas's first as an iconless bundle's (what a reader of DFU's shape finds)
   const bleed = entity?.bleed;
   if (bleed && bleed.left > 0) other.push({ iconIndex: BLEED_ICON, glyph: BLEED_GLYPH, displayName: 'Bleeding', poolIndex: poolIndex++, expiring: bleed.left < 2, isItem: false, bundleId: null, endable: false });
-  // WILD1 (systems/wild/wildZone.js): the open zone, on the classic row as on the enhanced widget - its own glyph, first of
-  // the warnings, while the player stands in it
-  if (entity === _zoneEntity && wildHere()) other.unshift({ iconIndex: BLEED_ICON, glyph: WILD_GLYPH, displayName: zoneSafe() ? ZONE_SAFE_TEXT.chip : WILD_TEXT.chip, poolIndex: poolIndex++, expiring: false, isItem: false, bundleId: null, endable: false });
   return { self, other };
 }
-/** WILD1: the zone's glyph (ui/hud/hudStatus.js STATUS_GLYPHS), and the one entity it is shown for - the player's (the
- *  world host says which; a foe's row never wears it). */
-export const WILD_GLYPH = 'wild';
-let _zoneEntity = null;
-export function setZoneEntity(entity) { _zoneEntity = entity ?? null; }
 /** TELL6e: the bleed's index - the atlas's first, as an iconless bundle's. */
 export const BLEED_ICON = 0;
 /** TELL9: the bleed's own icon - its glyph on the kit's grid (ui/hud/hudStatus.js STATUS_GLYPHS). */

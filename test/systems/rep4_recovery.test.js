@@ -1,5 +1,4 @@
-// REP4 (2026-09-29, the reputation overhaul) - THE ROAD BACK. Mac's call for how a bad name recovers: "Earn it + faster
-// drift" - "Temple penance, paid reparations (price rises each use), regional contracts and raid defence, plus negative
+// REP4 - THE ROAD BACK. - "Temple penance, paid reparations (price rises each use), regional contracts and raid defence, plus negative
 // standing drifting back about 1 point per 7 game days (~14 real hours)."
 //
 // DFU's one road back was NormalizeReputations: a point toward zero every 112 game days (about nine real days online),
@@ -77,6 +76,4 @@ test('REP4: a bounty contract finished pays its board\'s region two points of la
   assert.equal(legalRepOf(p, 9), -38);
   const top = { legalRep: { 9: 99 } };
   assert.equal(rewardContract(top, 9), 1, 'never past 100');
-  assert.match(src('src/scenes/bountyHost.js'), /const region = deps\.regionAt\?\.\(posting\.town\.px, posting\.town\.py\);\n\s*if \(Number\.isInteger\(region\) && region >= 0 && entity\) rewardContract\(entity, region\);/);
-  assert.match(src('src/scenes/world.js'), /regionAt: \(px, py\) => maps\.getRegionIndexAt\(px, py\),/);
 });

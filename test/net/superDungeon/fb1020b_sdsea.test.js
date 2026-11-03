@@ -1,5 +1,4 @@
-// SD-SEA (FIELD BUGS 2026-10-20b, bible/01-Overview/bugs/Field-Bugs-2026-10-20b.md; the owner: "Abyss Dungeons dont seem to
-// be spawning anymore"): A HOLLOW NEVER RISES WHERE NO TOWN STANDS. The director raised a Hollow in the region whose
+// SD-SEA (FIELD BUGS 2026-10-20b,): A HOLLOW NEVER RISES WHERE NO TOWN STANDS. The director raised a Hollow in the region whose
 // channel held the most accounts (net/superDungeon/sdLaw.js pickSdRegion), and every client stood it by that region's
 // cities (systems/superDungeon/sdSite.js sdCities). The sea is one region to the port - politic 64, every water pixel,
 // reads as High Rock sea coast (formats/mapsFile.js getRegionIndexAt) - and it has no town: a crowd at sea raised a Hollow
@@ -186,7 +185,7 @@ test('SD-SEA on the freeware\'s map: the list is exactly the regions MAPS.BSA gi
   let water = 0;
   for (let y = 0; y < 500; y++) for (let x = 0; x < 1000; x++) if (maps.getPoliticIndex(x, y) === 64) { water++; assert.equal(maps.getRegionIndexAt(x, y), SEA, `pixel ${x},${y}`); }
   assert.ok(water > 100_000, `the sea is the map's widest region (${water} pixels)`);
-  for (let r = -1; r < BAY_REGIONS; r++) {   // PIN MOVED (WW5): the Bay's lane's regions (the census counts every region now - each lane its own)
+  for (let r = -1; r < BAY_REGIONS; r++) {
     if (SD_TOWNLESS_REGIONS.includes(r)) continue;
     for (let s = 1; s <= 3; s++) {
       const rec = { s, r };

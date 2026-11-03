@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WATER-NEXT 2 - THE BED (2026-10-07, Mac: "real translucent water with proper waves and shoreline interactivity
-// completely replacing our current water implementation"): CLEAR WATER MUST HAVE SOMETHING UNDER IT.
+// WATER-NEXT 2 - THE BED: CLEAR WATER MUST HAVE SOMETHING UNDER IT.
 //
 // Daggerfall's water is a tile of the ground: a pond, a river, a moat is the ground itself, painted, at the height the
 // ground stands. WATER1 drew its sheet a hand's breadth over that ground, so nothing could be seen THROUGH it - there
@@ -35,8 +34,7 @@ export const TILE_UNITS = 6.4;
 export { NO_BED_DEPTH, SHEET_NO_BED };
 
 /**
- * BANK-FLUSH (2026-10-12, Dudey's field video: "on the bank you can look under the blue, it's like the whole water
- * texture is flying"): THE GROUND IS CARVED ONLY WHERE NO SHORE CAN SEE IT. The carve lowers grid VERTICES, and the
+ * BANK-FLUSH: THE GROUND IS CARVED ONLY WHERE NO SHORE CAN SEE IT. The carve lowers grid VERTICES, and the
  * sheet stops mid-tile, where its corner table's coverage crosses a half (or where a puddle's art stops). A shore tile
  * runs from a bank vertex (0) to a wet one (a unit deep a cell in), so at the sheet's edge the ground had already fallen
  * half of that: the water's edge hung half a unit over the slope and the eye at the bank looked under it. Every tile
@@ -134,7 +132,7 @@ function flushPuddles(carve, bytes, tileDim, width, height, stride, gx, gz, pad)
 export const BED_HALO_TILES = Math.ceil(BED_RAMP / TILE_UNITS) + 1;
 
 /**
- * AUDIT WATER-NEXT F2 (2026-10-07): THE BED ACROSS A SEAM. Each pixel carved its bed alone - a tile past its edge no
+ * AUDIT WATER-NEXT F2: THE BED ACROSS A SEAM. Each pixel carved its bed alone - a tile past its edge no
  * vote, a bank past its edge unseen - so a vertex on the seam two pixels share was carved to two depths, 4 on one side
  * and 1 or 0 on the other, and a near grid has no skirt: an open crack in the drawn ground under clear water (drawn as
  * the water's own dark body in Full, the frame's clear colour in Simple). The bed now reads BED_HALO_TILES of each
@@ -142,7 +140,7 @@ export const BED_HALO_TILES = Math.ceil(BED_RAMP / TILE_UNITS) + 1;
  * (terrainSampler.js ghostSampler: the neighbour's own kernel) - its index's beach jitter, its latitude, its corners -
  * so both pixels carve a seam vertex from the same tiles, and agree. A neighbour's STAMPED or PAINTED tiles (a town's
  * blocks, a road, a river) are not in its kernel: a bed there may still part at the seam (recorded,
- * bible/01-Overview/audits/Audit-WATER-NEXT.md). Near grids only (stride 1): a strided grid's skirt closes its seams.
+ * ). Near grids only (stride 1): a strided grid's skirt closes its seams.
  * @param {(x: number, z: number) => number} ghost the sample at a coordinate of this pixel's frame, past its edge too
  * @param {number} px @param {number} py the pixel
  * @param {Uint8Array|number[]} [table]
@@ -299,7 +297,7 @@ export function carveBed(positions, normals, depths, gx, gz) {
 }
 
 /**
- * AUDIT WATER-NEXT H2 (2026-10-07): THE SHEET'S DEPTHS - the water's attribute 1, beside the carve's own depths. Where the
+ * AUDIT WATER-NEXT H2: THE SHEET'S DEPTHS - the water's attribute 1, beside the carve's own depths. Where the
  * carve reaches, the bed's: a wet vertex its depth, and a bank vertex beside one 0 (where the shore's foam lies). Where it
  * does not - a one-tile stream in a pixel whose pond was carved: no vertex of it is wet, so nothing under it moved -
  * SHEET_NO_BED, as a pixel with no bed at all draws its every sheet. The sheet had taken the carve's 0 there: a stream

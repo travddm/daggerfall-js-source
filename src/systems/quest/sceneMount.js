@@ -384,8 +384,8 @@ export const BESIDE_FLOOR_M = 0.3;
 
 /**
  * RPT1026-QUESTS QUEST-CROWD: BESIDE, NEVER INSIDE. 215 of the 345 tavern interiors of BLOCKS.BSA and the two town packs
- * hold a single quest spawn marker (15 of those inside a resident's pick box), and the questlines' first steps (QLIT01,
- * QLIW01, QLIR02...) each stand their Person in a `local tavern` - two quests drawn before either ran took the one tavern,
+ * hold a single quest spawn marker (15 of those inside a resident's pick box), and the questlines' first steps (QLIW01,
+ * QLIR02...) each stand their Person in a `local tavern` - two quests drawn before either ran took the one tavern,
  * and with no other spawn marker CROWD-CLEAR left the second on the first, inside it, and the player met neither. Such a
  * Person stands at the first of eight spots about its own (`at`), QUEST_BESIDE_REACH pick boxes out, that stands on the same
  * floor (rayed down from `lift` over it, within BESIDE_FLOOR_M of the floor under `at`), in plain line from `at` (nothing

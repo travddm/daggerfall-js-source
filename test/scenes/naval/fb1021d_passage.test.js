@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-10-21d PASSAGE-HANDS, PASSAGE-IN and PASSAGE-PLATE (Harlander, the Discord's #bug-reports, "Booked
 // ocean passage ...": "You can steer the ship as if it was yours", "Fast travel gets stuck on docks and tries to path up
 // onto land", "The ship control controls appear on top of the fast travel controls", "Boats go at slow time compression
-// for unclear reasons"). The record: bible/01-Overview/bugs/Field-Bugs-2026-10-21d.md.
+// for unclear reasons"). The record:.
 //
 // HANDS: Come Sail Away's real runtime (test/csaScene.mjs) with a booked Large Boat at her helm, her master's hand
 // pressing it (systems/seaHelm.js, as world.js tvSeaSail does), and the mod's input seam lifted out of world.js (its

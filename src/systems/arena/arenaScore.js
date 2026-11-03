@@ -1,5 +1,5 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "extremely detailed and authentic ... AAA grade"): THE ARENA'S MUSIC - a march for the call
+// ARENA2: THE ARENA'S MUSIC - a march for the call
 // and the fight, and a victory fanfare for the verdict, made in code as the Warden's score is (systems/gate/gateScore.js -
 // the precedent and its reasons: MIDI.BSA holds no fight music) and played by the game's own player and FM bank under
 // names of their own (music.registerSong), so a music pack can replace them by name as it replaces any song.

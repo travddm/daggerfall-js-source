@@ -1,6 +1,4 @@
-// AUDIT CLIMB-FIELD (2026-10-01, Mac: "Can you audit our integration of enhanced climbing? You cant mantle the bottom of
-// roofs, you get stuck. You cant jump from a wall, hitting the top of an angled roof at a certain angle can get your
-// character stuck, etc"). The arc had been proven on boxes and a few prisms; the audit climbed Daggerfall's own town
+// AUDIT CLIMB-FIELD. The arc had been proven on boxes and a few prisms; the audit climbed Daggerfall's own town
 // blocks (ARCH3D buildings placed by BLOCKS.BSA, the freeware data) and found what the boxes never had:
 //   - E1/E2 THE EAVE: Daggerfall's roofs stand out from their walls (151 of the 392 building models carry a soffit, the
 //     common one 0.4 m), and the hand-hold read only a lip whose face steps OUT - an eave steps IN. The free climb's head

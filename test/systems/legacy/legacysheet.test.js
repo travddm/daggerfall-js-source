@@ -1,5 +1,4 @@
-// LEGACY-SHEET (2026-10-06, bible/06-Systems/Legacy-Arc.md section 11; Mac: "finish this to 100% completition.
-// EVERYTHING"): THE HOUSE ON THE CHARACTER SHEET - the arc's last "Not built" that was the port's to build (its first
+// LEGACY-SHEET: THE HOUSE ON THE CHARACTER SHEET - the arc's last "Not built" that was the port's to build (its first
 // plan: "the age and the elder's word on the character sheet"; AUDIT LEGACY F2 found it never built). The pause
 // window's Stats page, Character section, draws the one played's house off their own Family card
 // (ui/familyPages.js sheetHouse): the model and the generation, and in an Enduring house the age against the span,

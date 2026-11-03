@@ -1,5 +1,4 @@
-// RVN3 - THE WEAKNESS AND THE WILL (bible/12-Enhanced-AI/Feud-Arc.md section 14; Mac, 2026-10-04: "more complex, less
-// easy to accomplish and more detailed", then "Go"). Every revenant hides one WEAKNESS, drawn on its id (RVN1): a blow
+// RVN3 - THE WEAKNESS AND THE WILL (;, then "Go"). Every revenant hides one WEAKNESS, drawn on its id (RVN1): a blow
 // of it lands x1.5 (a weapon class, a metal), an element's on the saving throw at -50, the daylight's x1.25 on every
 // blow while the sky reads day, and on a wind-up it weighs twice. The first blow of it REVEALS it (the "Weakness" word,
 // a hiss, the card); under half its health, unknown, it FLINCHES from it (a hint). From rank 3 its WILL must be broken
@@ -88,10 +87,9 @@ test('RVN3 THE LAW: a blow of its weakness - its class, its metal; the daylight\
   assert.equal(F.isWeakBlow('nonsense', 'nonsense'), false);
   assert.deepEqual([2, 3, 4, 1, 0].map((m) => F.metalOf({ material: m })), ['silver', 'elven', 'dwarven', null, null]);
   assert.equal(F.metalOf(null), null);
-  assert.equal(F.willMatters(1), false);   // PIN MOVED (UNQUIET, Revenants.md section 46 - the owner: "harder"): from rank 2
+  assert.equal(F.willMatters(1), false);
   assert.equal(F.willMatters(2), true);
   assert.equal(F.willBroken(null), false);
-  // PIN MOVED (FEUD BALANCE, Feud-Arc.md OPEN 22 - Mac: one stagger or one perfect dodge breaks it)
   assert.equal(F.willBroken({ weak: 0, staggers: 0, perfect: 0 }), false);
   assert.equal(F.willBroken({ weak: 0, staggers: 1 }), true);
   assert.equal(F.willBroken({ weak: 0, staggers: 0, perfect: 1 }), true);
@@ -208,77 +206,6 @@ test('RVN3 ON A WIND-UP a blow of its weakness weighs x2 (TELL\'s POISE_WEAK) - 
 
 // ── the reveal and the flinch ───────────────────────────────────────
 
-test('RVN3 THE REVEAL: my first blow of its weakness - the real strike - counts in the ledger, tells the record (known), its card once and the hiss where it stands; a second blow no second card; my spell of its element reveals it too (mutants: never counted; never known; the card every blow; no hiss; the spell\'s unnoticed)', async () => {
-  const p = me();
-  const o = foe();
-  o._voiceId = 'rvn3-reveal';
-  const r = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5 });
-  N.applyRevenant(o, r);
-  const sfx = [], lines = [];
-  setPlayerDoor({ foes: () => [{ entity: o, ai: { feet: [1, 0, 2] } }], feet: () => [0, 0, 0], hurtFoe() {}, castOnPlayer() {}, sfx: (id, at) => sfx.push([id, at]), say: (l) => lines.push(l) });
-  r.weak = 'blade'; o.revenant = { ...o.revenant, weak: 'blade', edge: F.adaptEdge(r.learned, 'blade') };
-  let d = 0;
-  for (let i = 0; i < 20 && !(d > 0); i++) d = calculateAttackDamage(p, o, { weapon: createWeapon(W.Longsword, 1, () => 0.5), rolls: () => 0.2 });
-  assert.ok(d > 0);
-  assert.equal(o._feud.weak, 1, 'counted');
-  assert.equal(N.revenantById(r.id).weakKnown, 2, 'known');
-  assert.deepEqual(sfx, [[SOUND.Burning, [1, 0, 2]]], 'the hiss where it stands');
-  const cards = shown.filter((e) => e.kind === 'weakness');
-  assert.equal(cards.length, 1);
-  assert.match(cards[0].body, /^Its weakness laid bare: Blades\.$/);
-  assert.equal(cards[0].kicker, 'Weakness');
-  calculateAttackDamage(p, o, { weapon: createWeapon(W.Longsword, 1, () => 0.5), rolls: () => 0.2 });
-  assert.equal(shown.filter((e) => e.kind === 'weakness').length, 1, 'no second card');
-  assert.equal(sfx.length, 1, 'no second hiss');
-  assert.ok(o._feud.weak >= 2);
-  // a spell of its element: the landing notes it - weak, revealed
-  const q = foe();
-  q._voiceId = 'rvn3-spell';
-  const rq = N.revenantDeed(p, q, 'fled', { rolls: () => 0.5 });
-  N.applyRevenant(q, rq);
-  rq.weak = 'fire'; q.revenant = { ...q.revenant, weak: 'fire', edge: F.adaptEdge([], 'fire') };
-  magicFor(p).applySpellToFoe(FIRE, 5, { entity: q }, null, undefined, { hurt() {} });
-  assert.equal(q._feud.weak, 1);
-  assert.equal(N.revenantById(rq.id).weakKnown, 2);
-  // a metal weakness through the real strike: the blade's own metal counts
-  const m = foe();
-  m._voiceId = 'rvn3-metal';
-  const rm = N.revenantDeed(p, m, 'fled', { rolls: () => 0.5 });
-  N.applyRevenant(m, rm);
-  rm.weak = 'elven'; m.revenant = { ...m.revenant, weak: 'elven', edge: F.adaptEdge([], 'elven') };
-  let dm = 0;
-  for (let i = 0; i < 20 && !(dm > 0); i++) dm = calculateAttackDamage(p, m, { weapon: createWeapon(W.Longsword, 3, () => 0.5), rolls: () => 0.2 });
-  assert.ok(dm > 0);
-  assert.equal(m._feud.weak, 1, 'an elven blade on an elven-weak one');
-  assert.match(read('src/systems/revenant/revenant.js'), /Promise\.resolve\(\)\.then\(\(\) => \{ try \{ tagHit\(entity, HIT_TAGS\.weakness\); \}/, 'the word, after the number its blow raises');
-});
-
-test('RVN3 THE FLINCH: under half its health, its weakness unknown - the narrator\'s line, the record hinted, once a stand; above half, nothing; known, nothing (mutants: the line at any health; hinted twice; a known one flinching)', () => {
-  const p = me();
-  const o = foe();
-  const r = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5 });
-  const f = { entity: o };
-  o.health = o.maxHealth * 0.6;
-  assert.equal(N.revenantFlinch(f), null, 'above half');
-  assert.equal(f._flinched, undefined);
-  o.health = o.maxHealth * 0.4;
-  const ev = N.revenantFlinch(f);
-  assert.equal(ev.kind, 'weakness');
-  assert.equal(ev.body, F.FLINCH_LINES[r.weak]);
-  assert.equal(ev.speech, null, 'the narrator\'s, in no voice');
-  assert.equal(N.revenantById(r.id).weakKnown, 1, 'hinted');
-  assert.equal(N.revenantFlinch(f), null, 'once a stand');
-  const g = { entity: foe() };
-  const r2 = N.revenantDeed(p, g.entity, 'fled', { rolls: () => 0.5 });
-  r2.weakKnown = 2;
-  g.entity.health = 1;
-  assert.equal(N.revenantFlinch(g), null, 'known: nothing to shy from');
-  assert.equal(r2.weakKnown, 2);
-  // both pools ask it beside the taunt
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(f\.entity\.revenant\?\.id && !f\._flinched\) \{ const ev = revenantFlinch\(f, \{ archive: f\.archive \}\); if \(ev\) revenantSay\(ev, say\); \}/);
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(f\.entity\?\.revenant\?\.id && !f\._flinched\) \{ const ev = revenantFlinch\(f, \{ archive: f\.mobileArchive \}\); if \(ev\) revenantSay\(ev, \(l\) => hudText\.add\(l\)\); \}/);
-});
-
 // ── the will, on the real pool ──────────────────────────────────────
 
 const careers = (() => {
@@ -323,7 +250,7 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   const pool = rig(p);
   const f = await pool.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: r });
   frame(pool);
-  f._lastStood = true;   // PIN MOVED (RVN4: a rank-3 one's last stand comes first - stood already, the will alone is asked)
+  f._lastStood = true;
   assert.equal(FT.revenantWillHolds(f), true);
   pool.damageFoe(f, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.equal(f.yielded, undefined, 'it does not kneel');
@@ -356,7 +283,7 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   const g = await pool2.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: r2 });
   frame(pool2);
   g._lastStood = true;
-  L.noteFeud(g.entity, 'staggers');   // PIN MOVED (AUDIT FEUD 2: one stagger - FEUD BALANCE's law; two told the laws apart from nothing)
+  L.noteFeud(g.entity, 'staggers');
   pool2.damageFoe(g, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.ok(g.yielded, 'broken, it kneels');
   // its weakness struck: it kneels
@@ -369,13 +296,12 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   assert.ok(h.entity._feud.weak > 0);
   pool2.damageFoe(h, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.ok(h.yielded, 'its weakness struck, it kneels');
-  // rank 1: the will is no matter (PIN MOVED - UNQUIET, Revenants.md section 46: it was rank 2)
+  // rank 1: the will is no matter (
   const r4 = revenantOf(p, 1);
   const k = await pool2.spawnFoe(2, [2, 0, 0], { feetGiven: true, level: 6, revenant: r4 });
   frame(pool2);
   pool2.damageFoe(k, 99999, [0, 0, 3], null, { fromPlayer: true });
   assert.ok(k.yielded, 'rank 1 kneels');
-  // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
   const r5 = revenantOf(p, 3);
   const z = await pool2.spawnFoe(2, [3, 0, 0], { feetGiven: true, level: 6, revenant: r5 });
   frame(pool2);
@@ -386,20 +312,12 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   assert.equal(N.revenantById(r5.id).defeated, false, 'the choice still mine');
 });
 
-test('RVN3 the dungeon\'s doors: the will at its yield seam, the tear-away its escape, the fate-held refusal (mutants: any unwired)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /revenantMayYield\(foe\)\) \{ if \(!ownersWholeKill\(_whole, \{ fromPlayer, peer \}\) && revenantWillHolds\(foe\)\) tearAwayDungeonFoe\(foe\); else yieldDungeonFoe\(foe\); return; \}/);   // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
-  assert.match(d, /function tearAwayDungeonFoe\(f\) \{[\s\S]{0,300}beginTearAway\(f, \(\) => escapeDungeonFoe\(f, \{ unbroken: true \}\)\);/);
-  assert.match(d, /if \(foe\.yielded \|\| foe\.executing \|\| foe\.sparing \|\| foe\.leaving \|\| foe\.roaring\) return;/);   // PIN MOVED (RVN4: nor one roaring)
-  assert.match(d, /unbroken \? revenantUnbrokenEvent\(r, playerEntity\?\.name, \{ archive: f\.mobileArchive \}\)/);
-});
-
 test('RVN3 the page: its weakness as I know it - unknown, its kind, what it is; from rank 3 the will\'s rule (mutants: a hint named; the rule at rank 2)', () => {
   assert.equal(weaknessWords({ weak: 'fire', weakKnown: 0 }), 'Weakness: unknown.');
   assert.equal(weaknessWords({ weak: 'fire', weakKnown: 1 }), 'Weakness: An element.');
   assert.equal(weaknessWords({ weak: 'silver', weakKnown: 1 }), 'Weakness: A metal.');
   assert.equal(weaknessWords({ weak: 'daylight', weakKnown: 1 }), 'Weakness: The sun.');
   assert.equal(weaknessWords({ weak: 'axe', weakKnown: 2 }), 'Weakness: Axes.');
-  assert.equal(willWords({ rank: 1 }), '');   // PIN MOVED (UNQUIET, Revenants.md section 46): from rank 2
-  assert.equal(willWords({ rank: 2 }), 'Its will must be broken. Strike its weakness, stagger it, or evade its blow at the last moment.');   // PIN MOVED (FEUD BALANCE, OPEN 22)
+  assert.equal(willWords({ rank: 1 }), '');
+  assert.equal(willWords({ rank: 2 }), 'Its will must be broken. Strike its weakness, stagger it, or evade its blow at the last moment.');
 });

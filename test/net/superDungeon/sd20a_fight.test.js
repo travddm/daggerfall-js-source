@@ -1,4 +1,4 @@
-// SD20a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md "SD20 - AUDIT SD III"): THE FIGHT,
+// SD20a: THE FIGHT,
 // AUDITED A THIRD TIME - its balance and its escapes run by their own scripts, each finding reproduced before it was
 // fixed. The Mantella Pulse had no ceiling: under the Underking's clock a Restless Pulse passed everyone's whole health.
 // A step off the arena's near edge was a fall cast back to the Crumble - out of every blow of the whole arena for the
@@ -95,7 +95,7 @@ test('SD20a THE PULSE\'S CEILING (F1): the Mantella Pulse climbs to three quarte
   assert.deepEqual(v.hits.map((h) => [h.part, h.pct]), [['all', SD_PULSE_MAX]]);
   // the omen says the ceiling
   const restless = SD_OMENS.find((o) => o.id === 'restless');
-  assert.equal(restless.text, 'Each Mantella Pulse climbs twice as fast, to three quarters of your health at most.');   // AUDIT SD III (T13, PIN MOVED): said plainly - "twice as steeply - to three quarters" read garbled
+  assert.equal(restless.text, 'Each Mantella Pulse climbs twice as fast, to three quarters of your health at most.');   // AUDIT SD III (T13
   assert.equal(restless.law.pulseStep, 2 * SD_PULSE_STEP);
 });
 
@@ -200,9 +200,8 @@ test('SD20a A FROZEN PAGE IS ABSENT (F3): a fighter\'s pose in the Hour is stamp
     await cell.pose(mara, doorPose(11));
     assert.equal(cell.room._all().get(mara).pAt, undefined, 'a cell\'s pose: no stamp');
   });
-  // PIN MOVED (INT12): the census as the relay's count has it (net/bossBody.js bodyCensus) - read at the beat's own instant still
-  assert.match(RELAY, /bodies = this\._sdFightBodies\(f, now\), census = \(\) => bodyCensus\(f, bodies, now, line\.body, line\.enforce, \{ lives: raised \}\);/);   // PIN MOVED (AUDIT INT11): the bodies read once a beat, at its own instant still; PIN MOVED (SD-REZ): the raised alone rise
-  assert.match(RELAY, /this\._sdFightFan\(SD_SEAM\.step\(f, now, this\._bodiesBare\(census\(\)\), rand01\)\);/);   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
+  assert.match(RELAY, /bodies = this\._sdFightBodies\(f, now\), census = \(\) => bodyCensus\(f, bodies, now, line\.body, line\.enforce, \{ lives: raised \}\);/);
+  assert.match(RELAY, /this\._sdFightFan\(SD_SEAM\.step\(f, now, this\._bodiesBare\(census\(\)\), rand01\)\);/);
 });
 
 // ── F4: a blow strikes a fighter ───────────────────────────────────────
@@ -353,7 +352,7 @@ test('SD20a THE HOUR\'S COSTS ARE SETBACKS (F10): the void\'s cast-back and the 
       modes: { sdRealmSlot: () => 4 }, sdSay: () => {}, sdDungeonToRealm: () => [0, 0, 0], player: { pos: [hx, 0, hz] }, playerEntity: g,
       inOrreryHall: () => true, SD_FRAY_LASH, hurtPlayer, flashPlayerDamage: () => {}, online: { id: 'peer-me' },
       SD_HALL_TEXT: { snap: 'The Hour snaps back.' }, SD_TURN_WAIT_LINE: 'wait',
-      sdHallNamed, sdSnapLine, peerName: () => null,   // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS): the hall's word named off the roster
+      sdHallNamed, sdSnapLine, peerName: () => null,
     };
     const heard = new Function(...Object.keys(env), `let _sdHall = null;\n${fnOf('sdHallHeard')}\nreturn sdHallHeard;`)(...Object.values(env));
     assert.ok(Math.round(100 * SD_FRAY_LASH) >= 5, 'a lash that would kill');

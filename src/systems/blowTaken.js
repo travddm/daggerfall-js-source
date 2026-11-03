@@ -1,5 +1,5 @@
 // @ts-check
-// TELL1 (bible/12-Enhanced-AI/Feud-Arc.md section 3.2): WHAT A BLOW'S TARGET TAKES - a leaf, importing nothing.
+// TELL1: WHAT A BLOW'S TARGET TAKES - a leaf, importing nothing.
 //
 // `entityMods.registerWeaponBlowMod` scales a WEAPON blow by its striker's lights; nothing scaled a blow by the state
 // of the one it lands on, for hands and spells as for weapons. A staggered foe takes a quarter more (TELL1), an

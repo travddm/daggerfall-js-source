@@ -1,5 +1,4 @@
-// TELL7 - THE TIER AND THE COOLDOWNS (bible/12-Enhanced-AI/Feud-Arc.md section 9; Mac, 2026-10-04: "breath more depth
-// into it", then "Go" on every call). TACT4's tier was level 10 and up, or an elite, each with its family's one or two
+// TELL7 - THE TIER AND THE COOLDOWNS (;, then "Go" on every call). TACT4's tier was level 10 and up, or an elite, each with its family's one or two
 // shapes every 8-15 s. Now a champion and a revenant (at any level) telegraph too; an elite, a champion or a revenant
 // throws its family's WHOLE set (the ring, the charge, the leap as TELL6 brings each - an ordinary foe of the tier
 // keeps its one or two, Mac's call of 2026-10-02); and the cooldown is the tier's: a champion's 7-13, an elite's 6-11,

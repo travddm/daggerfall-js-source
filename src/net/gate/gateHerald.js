@@ -1,7 +1,6 @@
 // @ts-check
-// DISCORD-GATES (2026-09-28): THE GATE'S HERALD - what the relay's hub posts to a Discord channel, and when. The field's
-// player: "add a discord channel that tells the gates in real time itll create hype and make more join"; Mac: "Discord
-// live gates?", then the moments - "Omen (15 min before), Boss slain" - and "Ping an opt-in role" (on the omen alone),
+// DISCORD-GATES: THE GATE'S HERALD - what the relay's hub posts to a Discord channel, and when. The field's
+// player: "add a discord channel that tells the gates in real time itll create hype and make more join";, then the moments - "Omen (15 min before), Boss slain" - and "Ping an opt-in role" (on the omen alone),
 // and for the place, "What do you need for discord": the players' own games say where the gate stands.
 //
 // PURE, and the relay's (server/src/index.js - the hub posts, off its alarm): this imports gateLaw.js and wire.js
@@ -20,7 +19,7 @@
 // - SAFE TO POST: every mention is the one role the operator named (`allowed_mentions` - Discord pings nothing else,
 //   whatever the text holds), and the words a player can reach - the place, a fighter's name - are held to letters,
 //   digits, spaces and a little punctuation, so no markdown, no link and no mention rides them.
-// - HERALD-CARDS (2026-10-22): each post is a card (net/herald/heraldCard.js) - the family Dagon's Breach, the moment's
+// - HERALD-CARDS: each post is a card (net/herald/heraldCard.js) - the family Dagon's Breach, the moment's
 //   title, its facts as fields. The door and the safe words moved there with it, and are said again here for the
 //   heralds and the hub that read them from this file.
 //

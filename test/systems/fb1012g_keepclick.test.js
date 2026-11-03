@@ -2,7 +2,7 @@
 // weapon to Left Click (with mouse activate unbound), but every time I restart the game, Swing Weapon resets to None
 // and Left Click goes to mouse activate" - and Save Controls did not help. The save was sound; the boot's MAC-D1 repair
 // found Activate (mouse) on no key and bound its default, Left Click, through SetBinding - which steals - and wrote the
-// result back. The repair now fills only a free default. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// result back. The repair now fills only a free default..
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

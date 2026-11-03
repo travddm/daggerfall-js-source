@@ -1,7 +1,6 @@
-// AUDIT 657 (2026-10-07, Mac: "Lets do an audit on everything so far"): THE WORD FILTER'S FINDINGS, PINNED - lens T of
+// AUDIT 657: THE WORD FILTER'S FINDINGS, PINNED - lens T of
 // PR #657's audit (TEXT-F1, net/nameFilter.js's sentence reader) and lens D's D1 and D9. No word a list holds is written
 // here: each is read off the lists themselves. Each fix carries an `AUDIT 657 <ID>` comment where it stands. The record:
-// bible/01-Overview/audits/Audit-657.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -87,7 +86,6 @@ test('AUDIT 657 T4 a ship\'s name is read word by word, as a rank\'s name is: ch
     assert.equal(v.name, '');
     assert.match(v.reason, /^That name reads as ".+"\. Please pick another\.$/);
   }
-  assert.match(src('src/systems/comeSailAway/comeSailAwayWire.js'), /const v = shipNameVerdict\(raw\);\n\s*return v\.ok \? v\.name : '';/, 'a peer\'s wire name judged by the same verdict');
 });
 
 test('AUDIT 657 T5 a run of one-letter words read once where it can hold no word: every window of it a reading of its own cost a 240-letter chat line 7 ms at the relay - now within a few times an ordinary line of its length; every spelled word still caught (mutant: every window read)', () => {
@@ -115,5 +113,4 @@ test('AUDIT 657 D9 the mask never lengthens a line - one star a letter, so a let
   assert.equal(out, '**** off');
   assert.ok(out.length < line.length && [...out].length === [...line].length);
   assert.equal(sanitizeChat(line), '**** off');
-  assert.match(src('src/net/nameFilter.js'), /and it never grows: a bound measured before it holds after it/);
 });

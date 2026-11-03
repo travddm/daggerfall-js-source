@@ -1,5 +1,5 @@
 // @ts-check
-// QUAYS (2026-10-03; systems/naval/quays.js, world/quayModel.js) - THE QUAYS THE WORLD HOST STANDS: the pool on the
+// QUAYS - THE QUAYS THE WORLD HOST STANDS: the pool on the
 // runtime pools' shape (scenes/bountyFarms.js, scenes/gate/gatePool.js) - each berth's quay a model of its own, its
 // collider bucket, drawn in the host's world pass, its lanterns lit in the lanterns' hours; and the gangways run out to
 // the player's ships made fast at them.
@@ -194,7 +194,7 @@ export function createQuayPool(deps) {
 
   /** AUDIT HOLDINGS Q9: whether berth `index` of harbour `key` has its quay laid - mesh and collider - for the gangway. */
   const laid = (key, index) => !!quays.get(key)?.berths[index]?.stood;
-  /** SHIPYARDS-FOUND (2026-10-11, Mac: "Everything should show on the map/overworld"): each harbour whose quays stand, as
+  /** SHIPYARDS-FOUND: each harbour whose quays stand, as
    *  an Overworld mark over its first laid quay - "<Town> Docks" (systems/portPlaces.js portPlaceName), its kind the look's
    *  (`yard docks` - ui/travel/travelViewHud.js portGlyph: a bollard) and the Towns switch's. */
   function overworldMarks() {

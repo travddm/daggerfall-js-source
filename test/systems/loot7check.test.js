@@ -1,14 +1,12 @@
-// LOOT7-CHECK - THE CHAMPIONS CHECKED (2026-10-01; bible/06-Systems/Loot-Arc.md section 17). Mac: "I want to check and see
-// if the special enemy types from our recent loot commit is working properly", then "Yes and fix the smaller things.
+// LOOT7-CHECK - THE CHAMPIONS CHECKED., then "Yes and fix the smaller things.
 // Just want this to be as detailed as possible". LOOT7's champions were driven through the real combat formula (the
 // five traits each did what its sentence says) and four things were found and fixed - each pin below failed on the code
 // before it:
-//   - CORPSE-FIND: the corpse door rolled a COPY of the body's carried loot, and the door's unique find (the Dwarven
-//     Thunderlock and its pellets) was pushed onto the copy and thrown away - no body ever kept one, and a champion's
-//     body (its source four tiers up, so always past the find's tier 4) was where it was likeliest.
+//   - CORPSE-FIND: the corpse door rolled a COPY of the body's carried loot, and the door's unique find was pushed
+//     onto the copy and thrown away - no body ever kept one, and a champion's body (its source four tiers up) was where
+//     it was likeliest. Since the guns' removal the door's unique finds are the Ayleid stones (systems/ayleidStones.js).
 //   - CHAMP-HOVER: the World Tooltips plaque never names a HOSTILE foe (the mod's .cs:304-312), so a living champion's
-//     name - its trait - was never on it; a champion was made the mod's one recorded exception. HOVER-PLAIN (2026-10-03,
-//     Mac: "remove the crosshair tooltip. They should only have names/modifiers under their healthbar") retired it.
+//     name - its trait - was never on it; a champion was made the mod's one recorded exception. HOVER-PLAIN retired it.
 //   - CHAMP-SAID: the plaque and the target frame are the ENHANCED skin's, so on the classic skin nothing said a
 //     champion stood until it died, and no screen said what a trait does; the first blow either way now says both on
 //     the line every skin draws (DaggerfallUI.PopupMessage).
@@ -22,8 +20,7 @@ import * as acorn from 'acorn';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import * as CH from '../../src/systems/champions.js';
 import * as LR from '../../src/systems/loot/lootRarity.js';
-import { isThunderlock, isPellet } from '../../src/systems/thunderlock.js';
-import { isPistolet } from '../../src/systems/pistolet.js';   // PISTOLET: the find's second gun   // imported, it registers its unique find
+import { isWelkyndStone, isVarlaStone } from '../../src/systems/ayleidStones.js';   // imported, it registers the stones' unique finds
 import { spawnEnemyLoot } from '../../src/scenes/hostCombat.js';
 import { equipTableOf } from '../../src/systems/equip.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
@@ -42,7 +39,7 @@ import { setValue, resetToDefaults } from '../../src/systems/settings/settings.j
 import { validFoeRecord } from '../../src/net/wire.js';
 import { ROOM_LOOT_OFF } from '../roomLootOff.mjs';   // PARTY-LOOT: the room's seams with no room
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
-import { appliedOwnerTm } from '../../src/net/ownerClock.js';   // PIN MOVED (OWNER-CLOCK): the stream door copies its frame's owner clock beside the feet - a free name of the mount
+import { appliedOwnerTm } from '../../src/net/ownerClock.js';
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
 const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };   // AUDIT WORLD-EVENTS
@@ -56,8 +53,10 @@ const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; r
 const orc = (trait = null) => { const e = makeEnemyEntity(7, ENEMY_BASICS[7], null, 10, lcg(9)); if (trait != null) CH.applyChampion(e, trait); return e; };
 const said = (it) => [it.templateIndex, it.name ?? null, it.rarity ?? null, it.legendary ?? null, it.stackCount ?? null, JSON.stringify(it.affixes ?? null)];
 const player = { level: 10, gender: 'male', stats: { luck: 50 }, activeEffects: [] };
+// The door's unique finds since the guns' removal: the Ayleid stones (late finds, the Welkynd Stone's from tier 6).
+const isStone = (item) => isWelkyndStone(item) || isVarlaStone(item);
 
-test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - the Thunderlock and its pellets (GUNS-UNFOUND: its pellets alone) - as the list door keeps it, seed for seed; through the spawn seam a champion\'s body carries it; off, nothing', () => {
+test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - an Ayleid stone - as the list door keeps it, seed for seed; through the spawn seam a champion\'s body carries it; off, nothing', () => {
   on();
   // THE SAME SEEDS THROUGH BOTH DOORS: a champion orc's body (its source four tiers up and half again its quality)
   // against the list door handed that same source - every piece and every find the list keeps, the body keeps
@@ -69,34 +68,30 @@ test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - the Thunderlock an
     const list = [createWeapon(113, 1)];
     LR.rollLootRarity(list, LR.championSource(src), { rolls: lcg(seed), luck: 50 });   // CHAMP-LOOT: the champion's own source, one home
     assert.deepEqual(body.items.map(said), list.map(said), `seed ${seed}: the body is the list`);
-    // PIN MOVED (PISTOLET, AUDIT PISTOLET C8 D4): the find mints either gun from the draw it always made, so the same
-    // seeds find and the count is either gun's
-    // PIN MOVED (GUNS-UNFOUND, the owner: "it should no longer be able to drop. Ammo should still drop"): the find is its
-    // Pellets alone, from the same draw - the same seeds find, and no body carries a gun
-    assert.ok(!body.items.some((i) => isThunderlock(i) || isPistolet(i)), `seed ${seed}: no gun`);
-    if (body.items.some(isPellet)) finds++;
+    if (body.items.some(isStone)) finds++;
   }
-  assert.ok(finds >= 15, `the find comes to bodies (${finds} in 6,000 - about 5.6 per thousand at tier 16)`);
+  assert.ok(finds >= 15, `the find comes to bodies (${finds} in 6,000)`);
   // A FORCED FIND ON A BODY THAT WEARS ITS KIT: onto the body, the worn pieces untouched; a body with no list gets one
   const kitted = { items: [], level: 21, mobileType: 7 };
   const wornSword = createWeapon(113, 1);
   kitted.items.push(wornSword);
   equipTableOf(kitted)[5] = wornSword;
   LR.rollCorpseLoot(kitted, { level: 21, affinity: 'Daedra' }, { rolls: () => 0.0001, luck: 100 });
-  assert.ok(kitted.items.some(isPellet) && !kitted.items.some(isThunderlock), 'the find on the body - its Pellets, no gun (GUNS-UNFOUND)');
+  assert.ok(kitted.items.some(isStone), 'the find on the body');
   assert.equal(kitted.items[0], wornSword, 'the kit where it was');
   assert.equal(wornSword.rarity, undefined, 'and never rolled (LR4)');
   const bare = { level: 21, mobileType: 7 };
   LR.rollCorpseLoot(bare, { level: 21, affinity: 'Daedra' }, { rolls: () => 0.0001, luck: 100 });
-  assert.ok(Array.isArray(bare.items) && bare.items.some(isPellet), 'a body with no list gets one, its find on it');
-  // THE SPAWN SEAM, end to end: a champion orc's spawn on a stream that finds everything
-  const champ = orc(0);
-  spawnEnemyLoot(champ, 7, ENEMY_BASICS[7], player, { rolls: () => 0.0001 });
-  // PIN MOVED (GUNS-UNFOUND): the champion's body carries the find's Pellets, and no Thunderlock
-  assert.ok(!champ.items.some(isThunderlock), 'no gun on the champion\'s body');
-  const shot = champ.items.find(isPellet);
-  assert.ok(shot, 'its pellets');
-  assert.notEqual(shot.untaken, true, 'ammunition, never counted for the drought (LOOT8)');
+  assert.ok(Array.isArray(bare.items) && bare.items.some(isStone), 'a body with no list gets one, its find on it');
+  // THE SPAWN SEAM, end to end: a champion's spawn on a stream that finds everything.
+  // An Orc Sergeant (mobile type 12), not the orc: an orc champion's source is tier 5, under the Welkynd Stone's 6.
+  const sergeantType = 12;
+  const champ = makeEnemyEntity(sergeantType, ENEMY_BASICS[sergeantType], null, 10, lcg(9));
+  CH.applyChampion(champ, 0);
+  spawnEnemyLoot(champ, sergeantType, ENEMY_BASICS[sergeantType], player, { rolls: () => 0.0001 });
+  const stone = champ.items.find(isStone);
+  assert.ok(stone, 'the champion\'s body carries its find');
+  assert.notEqual(stone.untaken, true, 'not a piece, never counted for the drought (LOOT8)');
   off();
   const offBody = { items: [createWeapon(113, 1)], level: 21, mobileType: 7 };
   LR.rollCorpseLoot(offBody, { level: 21, affinity: 'Daedra' }, { rolls: () => 0.0001, luck: 100 });
@@ -144,8 +139,8 @@ test('LOOT7-CHECK CHAMP-SAID: the first blow either way says a champion on the l
   on();
   // THE ROWS, golden: the name the death line says, then the trait's own sentence
   assert.deepEqual(CH.CHAMPION_TRAITS.map((t, i) => CH.championLines(orc(i))), [
-    ['Mighty Orc stands as a champion.', 'Its blows hit 50% harder.'],
-    ['Stalwart Orc stands as a champion.', 'It has 50% more health, on top of a champion\'s double.'],
+    ['Mighty Orc stands as a champion.', 'Its blows hit 20% harder.'],
+    ['Stalwart Orc stands as a champion.', 'It has 20% more health, on top of a champion\'s.'],
     ['Swift Orc stands as a champion.', 'It has 30 more Speed, so it closes in and attacks sooner.'],
     ['Vampiric Orc stands as a champion.', 'It heals for half the damage it deals you.'],
     ['Thorned Orc stands as a champion.', 'Your hits on it hurt you for a seventh of their damage.'],
@@ -224,10 +219,10 @@ const foeRec = (mobileType = 0, entity = {}) => ({
 function killDoor() {
   const hud = [];
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     foes: [], _authority: true, ARENA_PUPPET_OWNER, feudWeakBlow: () => false, blowClassOf: () => null, opts: {},   // AUDIT FEUD: the hit door asks a blow's weakness (none here)
     lastPlayerFeet: [0, 0, 0], _ecvT: 0, foeDeps: null, playerEntity: { isPlayer: true, items: [] }, audio: {},
-    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, egFindStruck: async () => false, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame,   /* PIN MOVED (EG-E3): the joiner's find door */ markFoeStruck: () => {}, markConcealedHit: () => {},
+    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, egFindStruck: async () => false, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck: () => {}, markConcealedHit: () => {},
     handleAttackFromPlayer: () => {}, damageShieldPool: (e, n) => n, noteFighter: () => {}, PARTY_ME: 'me', _sharedFoe: () => false, partyFoeLoses: (f, n) => n, fightN: () => 1,
     peerSoulTrapOf: () => null, attemptSoulTrap: () => ({ allowDeath: true }), isAzurasStarEquipped: () => false, fillEmptyTrap: () => false,
     hudText: { add: (l) => hud.push(l) }, SOUL_TRAP_TEXT: {}, setEnemyAlert: () => {}, sayEnemyDied, isClassEnemyId,
@@ -240,11 +235,11 @@ function joiner(self) {
   const hud = [];
   const foes = [foeRec(0), foeRec(7, { champion: 'vampiric' })];
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     foes, _layoutFoes: 2, _retyping: new Set(), _authority: false, isClassEnemyId, enemyEntityType, validFoeRecord, ...TRAIT_DOORS, opts: { selfId: () => self },
-    appliedOwnerTm,   // PIN MOVED (OWNER-CLOCK): the stream door's frame clock (net/ownerClock.js) - null outside a frame
+    appliedOwnerTm,
     renownFoeDied: () => {}, reportPlayerKill: () => {}, egFindStruck: async () => false, rollCorpseKit: () => [], addCorpseFood: () => {}, stampWonWeapons: () => {}, capFoeLoot: () => [], liveStat: () => 50,
-    dropFoeCard: () => null,   // PIN MOVED (AUDIT CARDS-6 A3): the copy's own card, drawn at the copy door - not this seam
+    dropFoeCard: () => null,
     playerEntity: { isPlayer: true, items: [] }, setFoeDead: (f, d) => { f.dead = d; }, retypeFoe: async () => false,
     sayEnemyDied, hudText: { add: (l) => hud.push(l) },
   };

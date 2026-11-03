@@ -1,5 +1,4 @@
-// SKILL-SWAP (2026-10-19, Discord #suggestions "With the addition of arcane and martial specialisations...", Brother
-// Frank, through Mac; asked, Mac: "Paid skill swap"): "I'd very much like it if the team considered adding the ability
+// SKILL-SWAP: "I'd very much like it if the team considered adding the ability
 // (if it is possible) to either change one of our skills out or allow some of these specializations to work with just the
 // one weapon skill" - his class held one weapon skill (Blunt Weapon, mastered at 117), so no martial path could ever
 // open. One unmastered class skill is given up for one outside the class, in its group, for SKILL_SWAP_GOLD; the level,

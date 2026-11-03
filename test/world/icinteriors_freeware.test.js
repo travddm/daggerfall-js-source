@@ -1,4 +1,4 @@
-// IC-INTERIORS (2026-10-27; bible/03-World/Arena-Provinces.md IC-INTERIORS) - THE IMPERIAL CITY'S OWN INTERIORS AGAINST THE
+// IC-INTERIORS - THE IMPERIAL CITY'S OWN INTERIORS AGAINST THE
 // FREEWARE (the player's own ARCH3D and BLOCKS.BSA, ARENA2_PATH - tools/fetch-data.sh): every piece Daggerfall's own and
 // measured as the kit's table says, the street door's wall the game's door at the building's door, Daggerfall's every
 // ladder climbed the same by the ladder's own markers, made interiors seen through nowhere and drawn twice nowhere, every

@@ -1,17 +1,15 @@
 // @ts-check
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow, In game: the staff view, and
-// the weak spots "Invisible follow and the in-game view" and "Follow can't learn the target's next room") - THE LAW BOTH
+// STAFF-PANEL5-FOLLOW - THE LAW BOTH
 // ENDS RUN FOR THE WHERE NOTE AND FOR FOLLOWING A PLAYER.
 //
-// THE WHERE NOTE (mob, 05:45Z: "dont we have a note for player postion already?"). It is the party pose
+// THE WHERE NOTE. It is the party pose
 // (net/wire.js validPartyPose), which the hub keeps on the socket for anyone who sends it, party or not. The game now
 // sends it outside a party too, at most one a WHERE_NOTE_MOVING_MS while it changes and one a WHERE_NOTE_STILL_MS while
-// it does not (mob, 06:00Z: "could we do 1 every 5 second moving and one every 60 not"); a party member keeps its once a
+// it does not; a party member keeps its once a
 // second. The hub reads it for staff alone: a staff /tp (server/src/staffTeleport.js) and a follow (below). A note older
 // than NOTE_STALE_MS is no note - a game that stopped sending, or an old build.
 //
-// FOLLOWING (mob, 03:09Z: invisible follow for Admins and Moderators; 07:04Z: "Moderators may follow any player
-// anywhere, as Admins do, and the audit log is the check"). The account service mints a hidden spectator's token naming
+// FOLLOWING. The account service mints a hidden spectator's token naming
 // its target (`fo`, net/identityToken.js) and writes the mint to the audit log (server-account/src/staffFollow.js). The
 // spectator's game holds a hub link on that token, and the hub (the bus, `chat:world`) says to it alone, as `fol`:
 //   on     {sub}                the follow stands - the relay-checked flag the game's follow camera waits for
@@ -24,11 +22,6 @@ import { isWorldRoom, isCellRoom, validPartyPose } from './wire.js';
 import { ID_RE } from './identityToken.js';
 import { privateInteriorOf } from './privateInterior.js';
 
-/** The first relay that speaks the follow law (the staff panel's one relay release - integration renumbers it with
- *  RELAY_VERSION). An older relay knows no `hd` or `fo` and would show a spectator, so the game asks this first. */
-export const FOLLOW_RELAY_MIN = 247;   // world247 (STAFF-PANEL5: world246 is SEA VENTURES')
-/** Does the relay at version `v` follow? */
-export const followSupported = (/** @type {unknown} */ v) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= FOLLOW_RELAY_MIN;
 
 /** The fewest ms between two where notes outside a party while the note changes. */
 export const WHERE_NOTE_MOVING_MS = 5_000;

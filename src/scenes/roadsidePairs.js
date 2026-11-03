@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// JUNGLE-ROADSIDE (bible/03-World/Bantha-Jungle.md, The roadside pairs): A PIXEL'S ROADSIDE PAIRS STOOD - a module the
-// pixel's build wires (scenes/pixelBuild.js; HOST-SPLIT, bible/01-Overview/Host-Split.md). The layout stood the pairs
+// JUNGLE-ROADSIDE (, The roadside pairs): A PIXEL'S ROADSIDE PAIRS STOOD - a module the
+// pixel's build wires (scenes/pixelBuild.js; HOST-SPLIT). The layout stood the pairs
 // beside the flats (world/terrain/jungleNature.js jungleLayout, world/jungle/jungleRoadside.js standPairs); here a pair
 // stands whole or not at all (keptPairs), and never as Logging's - whatever the jungle's door did, so every peer's trees
 // are the same (AUDIT JUNGLE-ROADSIDE GAME-2: a peer whose door had not loaded felled them). Each of its trees:

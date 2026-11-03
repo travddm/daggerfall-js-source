@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE1, SAFE3, SAFE5, SAFE7 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof
-// system"; the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md): A PLAYER'S BLOCK LIST, A REPORT AND ITS CASE,
+// SAFE1, SAFE3, SAFE5, SAFE7: A PLAYER'S BLOCK LIST, A REPORT AND ITS CASE,
 // THE REVIEWER'S FEED IN, AND THE CODE OF CONDUCT AGREED.
 //
 // SAFE1 - THE BLOCK LIST. An account's own list of accounts it no longer hears (`blocks`), kept here so it follows the
@@ -297,7 +296,7 @@ export async function modCase({ db }, actor, env, { target, name, caseId = null 
   return { ok: true, case: caseView(row, c, lines, reports) };
 }
 
-/** STAFF-PANEL-SPEED (mob: "The click takes a while before the new page shows (it's waiting on the server)"): ONE CASE'S
+/** STAFF-PANEL-SPEED: ONE CASE'S
  *  READS - its lines, then its reports - for modCase, or for the staff panel's own batch (staffCases.js), and the case
  *  as a moderator reads it from their rows (caseView). @param {any} db @param {string} caseId */
 export const caseReads = (db, caseId) => [
@@ -316,11 +315,9 @@ export const modDismiss = (ctx, actor, env, { target, name, caseId = null }, { f
   modAct(ctx, actor, env, { act: 'dismiss', target, name, caseId, from: 'in the game' }, { push: (o) => pushLaw(env, fetchFn, o) });
 
 /* ═══ STAFF-PANEL2-FIX - ONE ACT, FROM EVERY DOOR ═══
- * (2026-10-22; design doc "DFO Staff Panel: design", Weak spots "Sanctions, cases and roles" and "Panel Mute and Ban have
- * no route".) A Mute, Ban, Unban or Dismiss is made HERE, whichever door asked - the staff panel (staffCases.js), the
+ * A Mute, Ban, Unban or Dismiss is made HERE, whichever door asked - the staff panel (staffCases.js), the
  * game's moderators (index.js /v1/mod/*), Discord's buttons and /mod (discord.js) - so its rules hold at every door:
- * - ONE CASE, ONE SANCTION ("One case can give two strikes"): a Mute, Ban or Dismiss takes its case first (`act_click`,
- *   migration 0156), in the statement that checks nobody took it - two moderators, two doors or two presses on one case
+ * - ONE CASE, ONE SANCTION ("One case can give two strikes"): a Mute, Ban or Dismiss takes its case first (`act_click`), in the statement that checks nobody took it - two moderators, two doors or two presses on one case
  *   act once, the other refused (`case-acted` while the first is in flight, `case-closed` once it is done). A press's
  *   one-time id (`click`) sent again is answered as the first (`repeat`), never a second strike. A door that names no
  *   case acts on the account's open case modCase shows it (its chat case, else - for a developer - its spawn case).
@@ -334,7 +331,7 @@ export const modDismiss = (ctx, actor, env, { target, name, caseId = null }, { f
  * - THE TAKE IS A LEASE: a refused act and a throw both give the case back; a take older than CASE_ACT_S is any press's.
  * - ONE BATCH: the act, its record (the strike) and the case's close land together or not at all, so no throw and no
  *   Worker cut off mid-act leaves a struck case open for a second strike.
- * - ONE PRESS, ONE STRIKE: a click is UNIQUE in `mod_actions` (mod_actions_click, 0156), so the same press sent twice at
+ * - ONE PRESS, ONE STRIKE: a click is UNIQUE in `mod_actions` (mod_actions_click), so the same press sent twice at
  *   once, with no case to take, strikes once - the second's record refused by the index and answered as the first.
  * - THE AUDIT ROW IS WRITTEN HERE (Weak spots: "Audit rows are written inside the shared act code, so in-game and Discord
  *   acts land in the log too"): one row an act - ok, denied or failed, the door named (`from`) - whichever door asked.

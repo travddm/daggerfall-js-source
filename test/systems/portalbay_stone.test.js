@@ -1,6 +1,4 @@
-// PORTAL-BAY (2026-10-26, bible/06-Systems/Portal-Stone.md PORTAL-BAY; the owner, playing the branch: "attempting to
-// teleport anywhere outside the bay with the portal stone leads to a black screen and a prompt telling you cannot
-// travel", and "it wasnt letting the user teleport to a city either"). A TELEPORT IS NO JOURNEY: AUDIT TESA II P4 put
+// PORTAL-BAY. A TELEPORT IS NO JOURNEY: AUDIT TESA II P4 put
 // TESA-NO-FAST's journey law (systems/travel/pastBayTravel.js pastBayJourney) at the gate every journey passes
 // (scenes/world.js wildTravelGate), and the guild's teleport (teleportTo), the stone's step into it and Recall passed it
 // too - the stone spent at the pick, the screen blacked at the step, then "No road the Bay knows leads there". These pins
@@ -19,8 +17,7 @@ import { hudFade } from '../../src/ui/fadeLayer.js';
 import { playerEntity } from '../../src/characters/playerEntity.js';
 import { portalStones } from '../../src/systems/gate/gateSpoils.js';
 import { PORTAL_TEXT, PORTAL_HOLD_TEXT } from '../../src/systems/portalStone.js';
-import { pastBayJourney, teleportJourney, PAST_BAY_TRAVEL_TEXT } from '../../src/systems/travel/pastBayTravel.js';
-import { wildJourney, wildInside, buildWildMask, WILD_NAME } from '../../src/systems/wild/wildZone.js';
+import { pastBayJourney, PAST_BAY_TRAVEL_TEXT } from '../../src/systems/travel/pastBayTravel.js';
 import { inEther } from '../../src/world/ethericSea.js';
 import { inBay } from '../../src/world/tamriel/tamrielFrame.js';
 import { REPOSITION } from '../../src/systems/ship.js';
@@ -100,9 +97,9 @@ function worldHost(o = {}) {
   const scope = {
     townTalk: { say: (l) => said.push(l), showOverlay: (w) => { scope.overlay = w; } },
     hudFade, console: { warn: () => {}, error: () => {} },
-    etherSea: false, inEther, pastBayJourney, teleportJourney, wildJourney, wildInside, WILD_NAME, ETHER_WILD_TEXT: { teleport: () => 'the sea' },
-    TEST_GODMODE: false, staffPowers: () => ({}), online: { wildOk: false }, wildMapMask: () => null, etherWildRingAt: () => 0,
-    playerEntity: { wildTravelAt: null, anchorPosition: null }, legacyGold: () => 0, deductGoldPieces() {}, WILD_TEXT: { travelPaid: () => '' },
+    etherSea: false, inEther, pastBayJourney,
+    TEST_GODMODE: false, staffPowers: () => ({}), online: {},
+    playerEntity: { anchorPosition: null }, legacyGold: () => 0, deductGoldPieces() {},
     here: { x: 300, y: 300 }, busy: false, _teleporting: false, _recalling: false,
     modes: { forceExitToExterior() {}, mode: 'exterior', insideContext: () => ({ insideBuilding: false, insideDungeon: false, buildingKey: 0 }) },
     REPOSITION, weatherOverride: true, surfacePlayer() {}, getLocalizedLocationName: (_id, n) => n,
@@ -116,9 +113,7 @@ function worldHost(o = {}) {
   scope.worldMoveBusy = () => scope.busy;
   for (const [head, end, name] of [
     ['const veilRefused = (to = null) => {', '\n  };\n', 'veilRefused'],
-    ['const wildTeleportRefused = (to = null) => {', '\n  };\n', 'wildTeleportRefused'],
-    ['const wildTravelGate = (to, spoken = 0, law = pastBayJourney) => {', '\n  };\n', 'wildTravelGate'],
-    ['const wildTravelPaid = (j) => {', '\n  };\n', 'wildTravelPaid'],
+    ['const travelGate = (to) => {', '\n  };\n', 'travelGate'],
     ['  async function teleportTo(pick) {', '\n  }\n', 'teleportTo'],
     ['  async function recallToAnchor() {', '\n  }\n', 'recallToAnchor'],
   ]) scope[name] = mount(scope, cut(W_SRC, head, end), name);
@@ -135,8 +130,7 @@ function stoneHost(W, o = {}) {
     playerTravelPixel: () => W.scope.here, teleportTo: (p) => W.scope.teleportTo(p), townTalk: W.scope.townTalk, walkMode: true,
     worldMoveBusy: () => W.scope.busy, _foesFullAt: 0, inSiegeRoom: () => false, playerSpawned: true, travelOptions: null, travelView: { state: 'off' },
     get _teleporting() { return W.scope._teleporting; },
-    veilRefused: (to) => W.scope.veilRefused(to), wildTeleportRefused: (to) => W.scope.wildTeleportRefused(to),
-    wildTravelGate: (...a) => W.scope.wildTravelGate(...a),
+    veilRefused: (to) => W.scope.veilRefused(to),
     buildTravelMapWindow: (deps) => heldMap(deps),
     ...o,
   };
@@ -200,49 +194,25 @@ test('PORTAL-BAY a Portal Stone to EVERY city past the Bay the stone\'s map offe
       win.dispose?.();
     }
   } finally { blacks.restore(); }
-  // the journeys keep TESA-NO-FAST: the same gate under its default law refuses a journey past the Bay
+  // the journeys keep TESA-NO-FAST: the journey's gate refuses a journey past the Bay, and no teleport asks it
   const W = worldHost();
-  assert.deepEqual(W.scope.wildTravelGate(cities[0].pixel), { ok: false, text: PAST_BAY_TRAVEL_TEXT.refused }, 'a journey (fast travel, a party\'s, a rider\'s) past the Bay is still refused');
+  assert.deepEqual(W.scope.travelGate(cities[0].pixel), { ok: false, text: PAST_BAY_TRAVEL_TEXT.refused }, 'a journey (fast travel, a party\'s, a rider\'s) past the Bay is still refused');
   assert.equal(W.said.at(-1), PAST_BAY_TRAVEL_TEXT.refused);
-  assert.equal(W.scope.wildTravelGate(cities[0].pixel, 0, teleportJourney).ok, true, 'a teleport is not');
+  assert.equal(W.scope.travelGate({ x: 300, y: 300 }).ok, true, 'a journey on the Bay is not');
 });
 
-test('PORTAL-BAY a refused pick never fades and never spends; a refused step is refused BEFORE the black, said, and the screen never blacked; an arrival that does not come lifts the black (mutants: the step\'s gate after the black; the arrival\'s answer unread; teleportTo\'s answer)', async () => {
+test('PORTAL-BAY a refused step is refused BEFORE the black, said, and the screen never blacked; an arrival that does not come lifts the black (mutants: the step\'s gate after the black; the arrival\'s answer unread; teleportTo\'s answer)', async () => {
   skin('enhanced');
   globalThis.document = fakeDocument();
   setCapitalsStanding(true);
   hudFade.hasTarget = true; hudFade.allowFade = true;
   const imperial = capitalsPastBay().find((c) => c.name === 'Imperial City');
-  const ZONE = `You cannot teleport into or out of ${WILD_NAME}. Walk or ride its roads.`;
-  const zone = buildWildMask({ width: 100, height: 100, ox: imperial.pixel.x - 50, oy: imperial.pixel.y - 50, inZone: () => true });
   const blacks = countBlacks();
   try {
-    // THE PICK: online, the open zone's city - refused at the pick, said, nothing spent, nothing blacked
-    let W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
-    let s = stoneHost(W);
-    const pack = [portalStones(2)];
-    playerEntity.health = 50;
-    assert.equal(s.stone.openPortalStone(pack[0], pack), true);
-    let win = W.scope.overlay;
-    hudFade.clearFade(); blacks.n = 0;
-    pressAt(win, imperial.x, imperial.y);
-    win._confirmTeleport(true);
-    closeMap(win);
-    assert.deepEqual([W.said.at(-1), pack[0].stackCount, s.host.portalGates.mine(), blacks.n, hudFade.backgroundColor[3]], [ZONE, 2, null, 0, 0], 'refused at the pick: said, no stone spent, no portal, no black');
-    win.dispose?.();
-    // THE STEP: a portal standing to the zone's city (a peer's, or mine opened before the zone was raised) - refused before
-    // the black, said, never blacked; no arrival
-    W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
-    s = stoneHost(W);
-    s.host.portalGates.open([0, 0, 2], { pixel: imperial.pixel, name: imperial.name });
-    hudFade.clearFade(); blacks.n = 0; W.said.length = 0;
-    s.walkIn();
-    await settle();
-    assert.deepEqual([W.said, blacks.n, hudFade.backgroundColor[3], W.jumps], [[ZONE], 0, 0, []], 'refused before the black: said once, never blacked, no arrival');
-    // the Veil's, the same: the step asks the teleport's whole gate before the black
-    W = worldHost({ etherSea: true });
+    // the Veil: the step asks the teleport's whole gate before the black
+    let W = worldHost({ etherSea: true });
     W.scope.here = { x: 300, y: 300 };
-    s = stoneHost(W);
+    let s = stoneHost(W);
     const veil = { x: 1, y: 1 };
     s.host.portalGates.open([0, 0, 2], { pixel: veil, name: 'Veilhaven' });
     W.scope.inEther = (x, y) => x === veil.x && y === veil.y;
@@ -267,14 +237,12 @@ test('PORTAL-BAY a refused pick never fades and never spends; a refused step is 
     W.scope._teleporting = true;
     assert.equal(await W.scope.teleportTo({ pixel: imperial.pixel, name: imperial.name }), false, 'a teleport under way');
     W.scope._teleporting = false;
-    W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
-    assert.equal(await W.scope.teleportTo({ pixel: imperial.pixel, name: imperial.name }), false, 'into the zone');
     W = worldHost();
     assert.equal(await W.scope.teleportTo({ pixel: imperial.pixel, name: imperial.name }), true, 'arrived');
   } finally { blacks.restore(); }
 });
 
-test('PORTAL-BAY Recall is a teleport too: an anchor set past the Bay is reached by the world\'s own recallToAnchor, never refused as a journey; an anchor in the zone still refused (mutant: Recall\'s law the journey\'s)', async () => {
+test('PORTAL-BAY Recall is a teleport too: an anchor set past the Bay is reached by the world\'s own recallToAnchor, never refused as a journey (mutant: Recall\'s law the journey\'s)', async () => {
   const anchorAt = (pixel) => ({ worldContext: 0, pixel, nativeX: 0, nativeZ: 0, y: 2, yaw: 0, pitch: 0, insideBuilding: false, insideDungeon: false, buildingKey: 0 });
   const solitude = { x: 1728, y: -545 };
   const W = worldHost({ stopAfterJump: true });
@@ -282,25 +250,20 @@ test('PORTAL-BAY Recall is a teleport too: an anchor set past the Bay is reached
   await W.scope.recallToAnchor().catch(() => {});
   assert.deepEqual(W.jumps.map((j) => [j.px, j.py]), [[solitude.x, solitude.y]], 'the anchor past the Bay reached');
   assert.ok(!W.said.includes(PAST_BAY_TRAVEL_TEXT.refused), 'never the journey\'s refusal');
-  const zone = buildWildMask({ width: 100, height: 100, ox: solitude.x - 50, oy: solitude.y - 50, inZone: () => true });
-  const Z = worldHost({ stopAfterJump: true, online: { wildOk: true }, wildMapMask: () => zone });
-  Z.scope.playerEntity.anchorPosition = anchorAt(solitude);
-  await Z.scope.recallToAnchor().catch(() => {});
-  assert.deepEqual([Z.jumps, Z.said], [[], [`You cannot teleport into or out of ${WILD_NAME}. Walk or ride its roads.`]], 'the zone\'s own law stands');
 });
 
 test('PORTAL-BAY the wiring: the world host constructs the stone\'s host where its code stood (HOST-SPLIT), handing it the world\'s own teleport and the teleport\'s gates live; its portals step into that host\'s arrival; teleportTo and Recall ask the gate under the teleport\'s law, a journey under its own (mutant: the gate unhanded)', () => {
   const wiring = cut(W_SRC, 'const { openPortalStone, portalArrive, portalHoldNow } = createPortalStoneHost({', '\n  });\n');
   assert.match(wiring, /\bteleportTo, townTalk,/, 'the world\'s own teleportTo, by value (a function declaration)');
-  for (const name of ['_teleporting', 'veilRefused', 'wildTeleportRefused', 'wildTravelGate']) assert.match(wiring, new RegExp(`get ${name}\\(\\) \\{ return ${name}; \\}`), `${name} read live`);
+  for (const name of ['_teleporting', 'veilRefused']) assert.match(wiring, new RegExp(`get ${name}\\(\\) \\{ return ${name}; \\}`), `${name} read live`);
   assert.match(W_SRC, /onEnter: \(g\) => portalArrive\(g\),/, 'a portal\'s step is the stone host\'s arrival');
   assert.match(W_SRC, /openPortal: \(item, list\) => openPortalStone\(item, list\),/, 'the pack\'s door');
-  assert.match(cut(W_SRC, '  async function teleportTo(pick) {', '\n  }\n'), /const wildTrip = wildTravelGate\(pick\.pixel, 0, teleportJourney\);/);
-  assert.match(cut(W_SRC, '  async function recallToAnchor() {', '\n  }\n'), /: wildTravelGate\(plan\.anchor\.pixel, 0, teleportJourney\);/);
-  assert.match(W_SRC, /const wildTrip = wildTravelGate\(pick\.pixel, computed\?\.piecesCost \?\? 0\);/, 'fast travel: the journey\'s law');
+  assert.doesNotMatch(cut(W_SRC, '  async function teleportTo(pick) {', '\n  }\n'), /travelGate|pastBayJourney/, 'a teleport is no journey');
+  assert.doesNotMatch(cut(W_SRC, '  async function recallToAnchor() {', '\n  }\n'), /travelGate|pastBayJourney/, 'nor is Recall');
+  assert.match(W_SRC, /if \(!travelGate\(pick\.pixel\)\.ok\) \{ hudFade\.clearFade\(\); return false; \}/, 'fast travel: the journey\'s law');
 });
 
-// ── PORTAL-ANYWHERE (2026-10-26; the owner, asked whether the stone should reach any point past the Bay: "Anywhere on land") ──
+// ── PORTAL-ANYWHERE ──
 /** A pixel of bare land past the Bay beside three capitals, off its city's reach (the land's own law, no trace: the
  *  authored shape the suite runs on), and a pixel of sea east of Alinor. */
 const LAND = [{ x: 1734, y: -545, name: 'Skyrim' }, { x: 2359, y: 890, name: 'Imperial Province' }, { x: -223, y: 2006, name: 'Sumurset Isle' }];
@@ -370,10 +333,9 @@ test('PORTAL-ANYWHERE the stone\'s map picks ANY land past the Bay, named by its
   guildMap.activateTeleportationTravel();
   assert.equal(guildMap._pastBayPick(LAND[0].x, LAND[0].y, 'The Haunt').portal, false, 'the guild\'s: TESA13');
   stoneMap.dispose?.(); guildMap.dispose?.();
-  // online, the zone's land: refused at the pick, said, nothing spent
+  // online, Cyrodiil's land is a portal's end like any province's: the pick spends a stone and stands the portal
   const imperial = LAND[1];
-  const zone = buildWildMask({ width: 100, height: 100, ox: imperial.x - 50, oy: imperial.y - 50, inZone: () => true });
-  const W = worldHost({ online: { wildOk: true }, wildMapMask: () => zone });
+  const W = worldHost({ online: {} });
   const { host, stone } = stoneHost(W);
   const pack = [portalStones(2)];
   stone.openPortalStone(pack[0], pack);
@@ -381,7 +343,7 @@ test('PORTAL-ANYWHERE the stone\'s map picks ANY land past the Bay, named by its
   pressAt(win, imperial.x + 0.5, imperial.y + 0.5);
   win._confirmTeleport(true);
   closeMap(win);
-  assert.deepEqual([W.said.at(-1), pack[0].stackCount, host.portalGates.mine()], [`You cannot teleport into or out of ${WILD_NAME}. Walk or ride its roads.`, 2, null], 'the zone\'s land: refused at the pick');
+  assert.deepEqual([pack[0].stackCount, host.portalGates.mine()?.dest.name], [1, imperial.name], 'the Imperial Province: one stone spent, the portal stands there');
   win.dispose?.();
 });
 

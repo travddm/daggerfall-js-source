@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT5 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE WEALTH BUDGET. Realm-Arc section 4's
+// INT5: THE WEALTH BUDGET. Realm-Arc section 4's
 // "budgets per hour of online play the service measured itself", built.
 //
 // THE QUESTION IT ANSWERS. The world runs on the player's own machine (Multiplayer.md's first decision), so a kill, a
@@ -13,7 +13,7 @@
 // a gain no witness explains spends it. A signed win (a gate's, a raid's, a serpent's, an Abyss Dungeon's receipt)
 // fills it by the spoils it pays (spoilsGrant), because those are client-rolled but server-witnessed.
 //
-// MEASURE FIRST (Mac, 2026-10-09: "Measure 7 days, then enforce"). The budget ships with `enforce` off: every gain is
+// MEASURE FIRST. The budget ships with `enforce` off: every gain is
 // recorded by the hour (realm_wealth_hours) and a gain past the bucket is recorded as a `measure` finding - what WOULD
 // have held - and nothing is held. Staff read the hours (/v1/mod/realm-budget, tools/realmReview.mjs), set the line
 // from them and turn `enforce` on; from then a gain past the bucket holds the character's trade ('budget') until play
@@ -69,7 +69,7 @@ const keyOf = (/** @type {any} */ db) => (db && typeof db === 'object' ? db[DB_R
 export async function budgetConfig(/** @type {any} */ db) {
   return budgetKept(db) ?? budgetFrom(db, await budgetRead(db).first());
 }
-/** SAVE-BATCH (2026-10-16): the config this isolate keeps (BUDGET_CONFIG_KEEP_MS), or null - so a checkpoint asks its row
+/** SAVE-BATCH: the config this isolate keeps (BUDGET_CONFIG_KEEP_MS), or null - so a checkpoint asks its row
  *  in the batch that reads the character's record, and only when it has none. */
 export function budgetKept(/** @type {any} */ db) {
   const k = kept.get(keyOf(db) ?? {});
@@ -133,7 +133,7 @@ export function spoilsGrantStatement(db, playerId, pieces = 0, guard = null, ...
   ).bind(playerId, SPOILS_GRANT_BASE, SPOILS_GRANT_PER_LEVEL, SPOILS_GRANT_PIECE * Math.max(0, Math.min(3, Math.trunc(Number(pieces) || 0))), ...binds);   // AUDIT WB14 (WIRE-6): and a portent's pieces
 }
 
-/** LW15 (bible/06-Systems/Living-World-II.md "LW15"): THE SERVICE'S OWN FAUCETS - gold it pays that no player paid (a
+/** LW15 ("LW15"): THE SERVICE'S OWN FAUCETS - gold it pays that no player paid (a
  *  patron's purchase: market.js reckonPatrons) - kept by the hour and kind (realm_faucets) beside the wealth's hours, so
  *  staff read what the living world mints before the budget is enforced (Living World II decision 7). SUMMON-REPAIR: and
  *  staff's own refunds (review.js `repair`) - gold no player paid, named as its own kind. */

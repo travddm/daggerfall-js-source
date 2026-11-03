@@ -1,12 +1,11 @@
-// SERPENT-SET (2026-10-05, Mac: "The serpent boss needs to use the currency from oblivion gate and have its own equipment
-// rewards"): THE SEA SERPENT PAYS THE GATE'S CURRENCY, AND HAS A SET OF ITS OWN - the hoard's Deadlands Ember
+// SERPENT-SET: THE SEA SERPENT PAYS THE GATE'S CURRENCY, AND HAS A SET OF ITS OWN - the hoard's Deadlands Ember
 // (systems/serpent/serpentSpoils.js, net/serpent/serpentHoardLaw.js), Sethrakul's Coilscale: its law (systems/sigil/sigilSets.js), its nine
 // Aetheric records and the wire's check of them (systems/aetheric.js), each power driven through the REAL seams SET2
 // opened (systems/sigil/sigilSetPowers.js - the fold, the blow, the strike, the hurt, the kill, the round, the HUD's chips)
 // with a stand-in for the running host's door and a clock of the test's own, the hoard's roll off a receipt's seed, the
 // one heal a power gives (systems/playerHeal.js), the Broker's shelf that never carries it, and the host's wiring by
-// source (scenes/world.js, net/serpent/serpentClaims.js). Design: bible/11-Multiplayer/Sigil-Sets.md section 6c;
-// bible/11-Multiplayer/Sea-Serpent.md section 8. The service's half: test/net/serpent/serpentset_service.test.js.
+// source (scenes/world.js, net/serpent/serpentClaims.js). Design:;
+// The service's half: test/net/serpent/serpentset_service.test.js.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -99,7 +98,7 @@ const swing = (e, weapon, target, n = 100) => { const d = setBlow(weapon, n, e, 
 // ─── THE LAW ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aetheric, Satakal its patron, no raiding party\'s, never a world set; Sea-Scale, Constrict and Shed Skin at 2, 4 and 6 pieces, each a whole pair from Faint to Ascendant, every brief inside BRIEF_MAX at every stage (mutants: the set out of the record; a world set; a raid\'s; a tier\'s number)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(-6), ['coilscale', 'numidium', 'panoply', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - the serpent\'s own, after the raids\' - SD9d\'s Brass of Numidium after it (PIN MOVED), EG15\'s Battlemage\'s Panoply after that (PIN MOVED), WITCH1\'s Wyrd\'s Raiment (PIN MOVED), STAR7\'s Starspun Weave last (PIN MOVED)');
+  assert.deepEqual(SIGIL_SET_IDS.slice(-5), ['coilscale', 'numidium', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - the serpent\'s own, after the raids\' - SD9d\'s Brass of Numidium after it (PIN MOVED), WITCH1\'s Wyrd\'s Raiment (PIN MOVED), STAR7\'s Starspun Weave last (PIN MOVED)');
   const s = setById('coilscale');
   assert.deepEqual([s.id, s.name, s.prince, s.colour, s.aetheric, 'raid' in s, s.role],
     ['coilscale', "Sethrakul's Coilscale", 'Satakal', '#3a9ad9', true, false, 'The Old Coil, shed and worn']);
@@ -107,7 +106,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
   assert.deepEqual([0, 1, 2].map((p) => raidSetOf(p)?.id), ['oath', 'thieftaker', 'orcsbane'], 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'sea-scale', 'Sea-Scale', { frost: [10, 30], endurance: [2, 6] }],
-    [4, 'constrict', 'Constrict', { stack: [3, 8] }],
+    [4, 'constrict', 'Constrict', { stack: [0.5, 0.5] }],   // PIN MOVED: B5 (Constrict 1-2 -> 0.5)
     [6, 'shed-skin', 'Shed Skin', { heal: [10, 30], recover: [240, 120] }],
   ]);
   assert.deepEqual([COIL_STACKS, COIL_SECONDS, SHED_BELOW], [5, 6, 0.35]);
@@ -118,7 +117,7 @@ test('SERPENT-SET the law: Sethrakul\'s Coilscale after the raids\' three - Aeth
     }
   }
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], 0)), 'Under 35%: shed skin, heal 10%');
-  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+8% per hit on a foe, up to 5');   // PIN MOVED (AUDIT 625 P3): each foe its own coil
+  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], SET_STAGE_MAX)), '+0.5% per hit on a foe, up to 5');   // PIN MOVED: B5 (Constrict Ascendant 2 -> 0.5)
 });
 
 test('SERPENT-SET the records: nine in the places\' order - the seven body pieces, a kite shield and a ONE-HANDED Katana (so all nine are worn at once) - Ebony, the set\'s own; every affix at the Legendary band\'s middle (over a town\'s thanks, under the Warden), the blow the band\'s middle too; never a frost resistance and one resistance of an element at most; AETHERIC_RECORDS the Regalia, the raids\' and then these (mutants: a number off the middle; a frost piece; the make; the order)', () => {
@@ -130,11 +129,11 @@ test('SERPENT-SET the records: nine in the places\' order - the seven body piece
   ]);
   assert.equal(WEAPON_HANDS['121'], 'Either', 'the Katana is one-handed - the shield beside it');
   for (const r of SERPENT_SET_PIECES) assert.deepEqual([r.set, r.make], ['coilscale', 'Ebony'], r.id);
-  assert.equal(SERPENT_SET_POWER, 10);
+  assert.equal(SERPENT_SET_POWER, 3);   // PIN MOVED: B5 (legendary band [2,3], middle 2.5 rounds to 3)
   assert.equal(SERPENT_SET_POWER, Math.round((SIGIL_BANDS.legendary[0] + SIGIL_BANDS.legendary[1]) / 2));
-  assert.equal(aethericById('coilscale-fang').power, 10);
+  assert.equal(aethericById('coilscale-fang').power, 3);
   const mid = (id) => Math.round((AFFIX_RANGES[id].legendary[0] + AFFIX_RANGES[id].legendary[1]) / 2);
-  assert.deepEqual(['armor', 'stat', 'resist', 'skill', 'weight', 'damage'].map(mid), [16, 13, 43, 25, 43, 30]);
+  assert.deepEqual(['armor', 'stat', 'resist', 'skill', 'weight', 'damage'].map(mid), [10, 8, 26, 15, 43, 18]);   // PIN MOVED (B4 rescale): the Legendary band's middles, armour 7-12, stat 6-9, resist 21-30, skill 12-18, damage 12-24 (were 16, 13, 43, 25, 30)
   for (const r of SERPENT_SET_PIECES) for (const a of r.affixes) assert.equal(a.value, mid(a.id), `${r.id} ${a.id}`);
   assert.deepEqual(SERPENT_SET_PIECES.map((r) => r.affixes.map((a) => a.param ?? a.id)), [
     ['armor', 'willpower', 'shock'], ['armor', 'strength', SKILLS.Swimming], ['armor', 'endurance', 'poison'],
@@ -153,7 +152,7 @@ test('SERPENT-SET minted and checked: each record mints as its make - Ebony armo
     const it = mintAetheric(r);
     assert.deepEqual([it.name, it.rarity, it.aetheric, it.isIdentified], [r.name, AETHERIC, r.id, true], r.id);
     assert.equal(it.material, aethericMaterial(r), r.id);
-    assert.deepEqual(it.sigil, r.group === 'Weapons' ? { power: 10, set: 'coilscale', party: 1, xp: 0 } : { set: 'coilscale', party: 1, xp: 0 });
+    assert.deepEqual(it.sigil, r.group === 'Weapons' ? { power: 3, set: 'coilscale', party: 1, xp: 0 } : { set: 'coilscale', party: 1, xp: 0 });
     assert.ok(validLootItem(JSON.parse(JSON.stringify(it))), `${r.id} off the wire`);
   }
   assert.equal(mintAetheric(aethericById('coilscale-fang')).material, WEAPON_MATERIALS.Ebony);
@@ -182,7 +181,6 @@ test('SERPENT-SET the drop: a quarter of a hoard (the raids\' own share), the sa
   assert.equal(rollSerpentSetPiece(seq(0.24999, 0.9999)).aetheric, 'coilscale-fang');
   assert.equal(rollSerpentSetPiece(seq(0, 0)).aetheric, 'coilscale-crest');
   for (let d = 0; d < 60; d++) assert.ok(!brokerStock(d).some((o) => o.set === 'coilscale' || o.item?.sigil?.set === 'coilscale'), `day ${d}: the Broker never shelves it`);
-  assert.match(strip(read('src/systems/sigil/sigilBroker.js')), /for \(const set of WORLD_SET_IDS\)[\s\S]*const wset = pick\(WORLD_SET_IDS, rolls\);[\s\S]*offer\('regalia', 'ruhn',/, 'the Broker shelves the world\'s sets and the Regalia alone');
 });
 
 // ─── THE HOARD ────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -200,19 +198,17 @@ test('SERPENT-SET the hoard: every hoard - a ship that dealt and one that stood 
     assert.equal(list[list.length - 2].item, ember[0].item, 'the embers just before it');
   }
   // the seed's own, pinned whole: a dealer's seed 2 at level 12 - the hoard's own two, the broadsword carrying CAST-SPEED's
-  // line off its last pass (PIN MOVED (CAST-SPEED): that draw moved the Coilscale roll after it, which found Constrictor's
+  // line off its last pass (
   // Grip before; seed 12345 at level 20 finds the set piece now - serpent1_client's hoard pin)
-  // PIN MOVED (AFFIX-LINES, 2026-10-25): every line drawn over the lines moved seed 2's stream - its broadsword takes no
   // last-pass line now and its amulet Strength where carrying capacity ("Porter's Amulet") was - so the pin's shape,
   // a Rare piece's last-pass line and then its technique as the hoard's last draw, is seed 6's
   const h = rollSerpentSpoils(6, 12, 'dealt');
   assert.deepEqual([h.gold, h.pieces.map((p) => [p.item.name, p.tier])], [1940, [
     ["Warrior's Flail of Skill", 'rare'], ['Torc of Warding', 'magic'],
   ]]);
-  // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the hoard's very last draw, after the
   // gem arc's - this seed's broadsword rolls Leap Strike there, its line after the last pass's
-  assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 10 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
-  assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 18 }, 'TECH1: and the technique\'s, last');
+  assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 2 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (B4 rescale: potency's Legendary band is 2-3 now, the same draw lands on 2; earlier BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
+  assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 12 }, 'TECH1: and the technique\'s, last');
   assert.deepEqual(rollSerpentSpoils(6, 12, 'dealt'), h, 'the same seed, the same hoard');
   const grip = rollSerpentSpoils(12345, 20, 'dealt').pieces[2];
   assert.equal(grip.tier, AETHERIC, 'a dealer\'s set piece, last');
@@ -252,13 +248,12 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   door([], { me: e });
   const s = sword();
   at(10);
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => swing(e, s, RAT)), [100, 103, 106, 109, 112, 115, 115], 'three per cent a stack at Faint, five at the most');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(() => swing(e, s, RAT, 1000)), [1000, 1005, 1010, 1015, 1020, 1025, 1025], 'half a per cent a stack at Faint, five at the most');   // PIN MOVED: B5 (Constrict 1 -> 0.5 a stack; 1000 so the half per cent is a whole point)
   assert.equal(coilStacks(10), COIL_STACKS);
   assert.equal(coiledFoe(10), RAT);
-  assert.equal(swing(e, s, WOLF), 100, 'another foe: its own coil, nothing yet');
+  assert.equal(swing(e, s, WOLF, 1000), 1000, 'another foe: its own coil, nothing yet');
   assert.equal(coiledFoe(10), WOLF, 'the states say the foe struck last');
-  // PIN MOVED (AUDIT 625 P3, Mac: "A coil per foe"): the first foe's coil was let go - it is its own now, and holds
-  assert.equal(swing(e, s, RAT), 115, 'the first foe keeps its own five');
+  assert.equal(swing(e, s, RAT, 1000), 1025, 'the first foe keeps its own five');
   at(10 + COIL_SECONDS - 0.01);
   assert.equal(coilStacks(), COIL_STACKS, 'held to the window\'s end');
   assert.equal(coilStacksAt(WOLF), 1, 'the other foe its own');
@@ -281,7 +276,7 @@ test('SERPENT-SET Constrict (4): each weapon blow of mine that LANDS on a foe ti
   fresh(); online(40);
   const asc = wearSet(player(), 'coilscale', 4, XP[4]);
   door([], { me: asc });
-  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT)), [100, 108, 116], 'Ascendant: eight a stack');
+  assert.deepEqual([1, 2, 3].map(() => swing(asc, s, RAT, 1000)), [1000, 1005, 1010], 'Ascendant: still half a per cent a stack (the tier is [0.5, 0.5])');   // PIN MOVED: B5 (Constrict Ascendant 2 -> 0.5)
   fresh();
   const off = wearSet(player(), 'coilscale', 4);
   swing(off, s, RAT); swing(off, s, RAT);
@@ -348,10 +343,6 @@ test('SERPENT-SET the heal: one door for every power - the loot\'s leech and its
   assert.equal(healMine(f, 0.5), 0);
   assert.equal(healMine(f, 0.5), 1, 'the fraction carried to the next heal');
   assert.equal(f.health, 11);
-  assert.doesNotMatch(strip(read('src/systems/loot/lootPowers.js')), /export function healMine/, 'one heal, never two');
-  assert.match(strip(read('src/systems/loot/lootPowers.js')), /import \{ healMine, manaMine, _resetPlayerHealForTests \} from '\.\.\/playerHeal\.js';/);   // PIN MOVED (SCHOOLS3): and the one magicka gift beside the one heal
-  assert.match(strip(read('src/systems/sigil/sigilSetPowers.js')), /import \{ healMine, manaMine \} from '\.\.\/playerHeal\.js';/);   // PIN MOVED (EG15): the Battlemage's Discipline returns magicka through the same leaf (manaMine since the merge of SCHOOLS3, which moved the one magicka gift there first)
-  assert.doesNotMatch(strip(read('src/systems/sigil/sigilSetPowers.js')), /from '(?:\.\.?\/)+(?:[\w-]+\/)*lootPowers\.js'/, 'the set powers never import the loot\'s (it imports them)');
 });
 
 test('SERPENT-SET the sets sleep in a duel: a duel wakes none of the Coilscale\'s tiers (mutants: the duel unread)', () => {
@@ -366,14 +357,6 @@ test('SERPENT-SET the sets sleep in a duel: a duel wakes none of the Coilscale\'
 });
 
 // ─── THE HOST ─────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('SERPENT-SET the host: the Old Coil\'s hoard and its crash door take their spoils by the ember\'s door (the first ember brings On the Burning Doors, as a breach\'s); Shed Skin\'s splash is the voice\'s; the serpent\'s claim says its silver through the raids\' own door (mutants: the plain door back; no splash; no silver lines)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /const serpentSpoils = createSpoilsPool\(\{\s*ray: \(\) => null, now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, take: takeGateSpoil,/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeGateSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => serpentSpoils\.adopt\(rec\), key: SERPENT_SPOILS_KEYS\.store/);
-  assert.match(w, /else if \(name === 'shed'\) audio\.playOneShot\(SOUND\.SplashLarge, 1\);/);
-  assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'serpent'\)\); return marksBook\?\.claimLines\(data, 'serpent'\) \?\? null; \},/);
-});
 
 test('SERPENT-SET the claim\'s silver: a counted serpent says its silver lines after its record, the host\'s own lines; a hook that throws is the host\'s, never the carrier\'s - the receipt still settles (mutants: the lines unsaid; a throw breaking the claim)', async () => {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);

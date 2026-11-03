@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-PATH - HOW THE OVERWORLD'S CLICKS TRAVEL (bible/06-Systems/Travel-View.md).
+// OW-PATH - HOW THE OVERWORLD'S CLICKS TRAVEL.
 //
-// The player's ask (2026-09-29): "it also needs a prefer streets and freewalk button. also when moving near cities it
+// The player's ask: "it also needs a prefer streets and freewalk button. also when moving near cities it
 // always dictates me going right into the city iam not able to fine move around a city on the overworld map."
 //
 // TWO MODES, ONE SWITCH on the Overworld's bar:
@@ -77,8 +77,7 @@ export function pickTakesPlace({ hit, nearby = false, fine = false, mode: m = tr
   return !!hit && travelPathUsesRoads(m) && !nearby && !fine;
 }
 
-/** OW-TOWN-ROUND (2026-10-23, the owner: "Overworld pathing always wants to walk into the middle of the town let the player
- *  always go around it if not clicking vaguely in the middle of the city"): THE TOWN'S JOURNEY IS ASKED AT ITS MIDDLE. A
+/** OW-TOWN-ROUND: THE TOWN'S JOURNEY IS ASKED AT ITS MIDDLE. A
  *  click anywhere in a town's grown rect took the town (and walked to its middle); now only one in the middle of it does
  *  - within PLACE_MIDDLE_SHARE of its half-width each way, never less than PLACE_MIDDLE_MIN (native units, about 75 m: a
  *  hamlet of one block is all middle). Anywhere else on it is the spot, walked round the town (travelRoute.js routeLegs).

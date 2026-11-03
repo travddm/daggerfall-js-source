@@ -1,6 +1,6 @@
-// INTERIOR-DIM (2026-10-11, Mac: "I want to improve interior lighting to be more like this and less bright"): A ROOM
+// INTERIOR-DIM: A ROOM
 // LIT BY DAGGERFALL'S OWN INTERIOR LAMPS ON THE ENHANCED LIGHTING LANE, BEFORE AND AFTER, through the real renderer on
-// SwiftShader (bible/07-Rendering/Enhanced-Lighting-Arc.md INTERIOR-DIM).
+// SwiftShader (INTERIOR-DIM).
 //
 // No game data: the room is boxes under flat synthetic textures (dark green walls, brown floor, wood above), its lamps
 // AddLight's second switch's own (world/interior/interiorLights.js interiorLightProperties) at DaggerfallInterior's ambient. Two

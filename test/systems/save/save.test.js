@@ -29,7 +29,7 @@ test('save: round-trip restores everything; extras carried; deep copies', () => 
   // smallerDungeonsState joined the extras (both hosts already passed
   // them and snapshotPlayer dropped them in silence), so the exact
   // shape grew three keys - null/null/0 when the caller passes none.
-  assert.deepEqual(extras, { position: [1, 2, 3], pose: null, classicMinutes: 77.5, readiedSpellIndex: 97, world, locationKey: 'dungeon:42', quest: null, talk: null, interior: null, dungeon: null, travelMap: null, escortingFaces: null, quickslots: null, spawns: null, smallerDungeonsState: 0, modData: null, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW });   // PIN MOVED (BAY-LEFT-GROUND, D5): and its frame's law   // TERRAIN-SCALE1: the scale its heights stood on   // TTL1: `spawns` is the spawned-dungeon ledger, and `quickslots` is QS1's block, which this name list had never carried (so every save dropped it)   // S12: the world rides the envelope; Q4-v/TK-i: the quest + talk slots (null when the host passed none); IS1: the interior slot (null outside a building)
+  assert.deepEqual(extras, { position: [1, 2, 3], pose: null, classicMinutes: 77.5, readiedSpellIndex: 97, world, locationKey: 'dungeon:42', quest: null, talk: null, interior: null, dungeon: null, travelMap: null, escortingFaces: null, quickslots: null, spawns: null, smallerDungeonsState: 0, modData: null, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW });
   assert.equal(dst.name, 'Mac');
   assert.equal(dst.stats.luck, 60);
   assert.equal(dst.items[0].name, 'Short Bow');
@@ -58,7 +58,7 @@ test('save: F11 pierces the death screen (its hint is true) and no other window 
   assert.ok(routeKey({ key: 'F11', code: 'F11' }, ctx, 'APPLIER'));
   assert.ok(!routeKey({ key: 'F9', code: 'F9' }, ctx));      // save stays gated under overlays
   assert.deepEqual(calls, ['load:string']);
-  // DUPE-LOAD (PIN MOVED: it pierced any overlay): under the pack, a loot window or a counter, F11 is the window's
+  // DUPE-LOAD (
   ctx.overlayWindow = () => ({});
   routeKey({ key: 'F11', code: 'F11' }, ctx, 'APPLIER');
   assert.deepEqual(calls, ['load:string'], 'no load from under any other window');
@@ -93,29 +93,11 @@ test('AUDIT 22 F7/F8: the lit light source and the training clock survive a load
   assert.equal(e2.lightSource, e2.items[1]);
   assert.notEqual(e2.lightSource, torch, 'and it is the restored record, not the old object');
 
-  // E4 / THE ORDER: a PRE-E4 save carries the purse as a Currency
-  // stack INSIDE items, and lightSourceIndex indexes that list. The
-  // absorb must run after the relink, or dropping the stack slides the
-  // torch down one and the restored player carries an unlit torch (or
-  // whatever landed at the old index).
-  const legacy = snapshotPlayer({
-    name: 'B', stats: {}, skills: 30, skillUses: [], activeEffects: [], spells: [],
-    items: [{ group: 'Currency', name: 'Gold pieces', stackCount: 5 }, torch],
-    lightSource: torch,
-  }, {});
-  delete legacy.goldPieces;
-  const e5 = { items: [], stats: {}, activeEffects: [] };
-  restorePlayer(e5, legacy, null);
-  assert.equal(e5.goldPieces, 5, 'the stack was absorbed into the counter');
-  assert.deepEqual(e5.items.map((i) => i.name), ['Torch']);
-  assert.equal(e5.lightSource, e5.items[0], 'and the torch is still the one that is lit');
-
-  // ...and the migration is FOR THAT SAVE ONLY. DFU can put a Currency
-  // stack in PlayerEntity.Items through GivePc's notify/silently arms
-  // (GivePc.cs:179, :186), which call Items.AddItem with no currency
-  // check - unspendable there too, because GetGoldAmount reads
-  // `goldPieces`. A post-E4 save round-trips that quirk instead of
-  // laundering it into the purse.
+  // E4: DFU can put a Currency stack in PlayerEntity.Items through
+  // GivePc's notify/silently arms (GivePc.cs:179, :186), which call
+  // Items.AddItem with no currency check - unspendable there too,
+  // because GetGoldAmount reads `goldPieces`. A save round-trips that
+  // quirk instead of laundering it into the purse.
   const quirk = snapshotPlayer({
     name: 'B', stats: {}, skills: 30, skillUses: [], activeEffects: [], spells: [],
     goldPieces: 5,

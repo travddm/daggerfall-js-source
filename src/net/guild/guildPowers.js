@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD3c (2026-10-11, the owner: "simplifying the player guild and npc guild system from being too overcomplicated.
-// Keeping depth, but making it easier to understand"; bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE
-// PRESS) - WHAT EACH RANK OF A PLAYER'S GUILD MAY DO, IN WORDS.
+// GUILD3c - WHAT EACH RANK OF A PLAYER'S GUILD MAY DO, IN WORDS.
 //
 // The powers live in four tables, each beside the law that asks it - guildLaw.js GUILD_POWERS (guildMay), hallLaw.js
 // HALL_POWERS (hallMay), writLaw.js WRIT_POWERS (writMay), townSeatLaw.js SEAT_POWERS (seatMay) and SEAT_LEVER_RANKS -
@@ -11,7 +9,7 @@
 // off its own table AT THE CALL - a table moved moves the page - and test/net/guild3_plain.test.js sweeps every key of the
 // four tables against it, so a power added with no words fails the suite.
 //
-// AUDIT GUILD3 (bible/01-Overview/audits/Audit-Guild3.md): W3/C6 - what a rank may NOT do is a rank's too (an Officer fills no
+// AUDIT GUILD3: W3/C6 - what a rank may NOT do is a rank's too (an Officer fills no
 // writ of its own guild's and is paid by none of its contracts: writLaw.js writDeliverMay, contractPaidMay), so "Everything
 // a Member may" was false; W4/C6 - the acts the service gives the guildmaster by rank alone (a Sellsword hired, any writ
 // withdrawn) and the town board's call for members were unworded; C4 - the writ budget binds the Officers alone; C5 - the

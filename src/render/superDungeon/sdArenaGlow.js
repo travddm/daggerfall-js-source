@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 9): THE LAST MOMENT'S ARENA, READ - one foreign
+// SD-LOOK: THE LAST MOMENT'S ARENA, READ - one foreign
 // pass over the arena's dark bronze (premultiplied, depth-tested, never written, fogged, the pixel law's cells), drawn
 // by the dungeon arm with the Hour's telegraphs. It tells the fight's clock-blows through the floor, never as a second
 // telegraph:

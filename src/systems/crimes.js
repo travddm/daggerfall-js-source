@@ -1,7 +1,7 @@
 // PlayerEntity.Crimes (PlayerEntity.cs:118-135), verbatim - and a LEAF
 // module on purpose.
 //
-// GUARD1 (2026-09-15): the enum used to live in `court.js`, which
+// GUARD1: the enum used to live in `court.js`, which
 // imports `talk.js` (the region-people lookup), so `talk.js` could not
 // import it back. The pickpocket law needed one member of it and could
 // not reach it, and wrote the STRING 'Pickpocketing' into

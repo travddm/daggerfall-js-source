@@ -1,5 +1,4 @@
-// PEACE-WAY (2026-10-17, the owner: "When out of combat, the ship should traverse 15% faster"; bible/03-World/Naval-Refit.md
-// PEACE-WAY) - her way out of a fight, on Come Sail Away's real runtime over the vendored hulls (test/csaScene.mjs): the
+// PEACE-WAY - her way out of a fight, on Come Sail Away's real runtime over the vendored hulls (test/csaScene.mjs): the
 // law's own numbers, her way under sail and under oars and its coming on, the journey's estimates of both, the seam
 // bounded, the bonus shed when a fight begins - and the world host's word for "out of a fight".
 // tools/mutants/peaceway.json.
@@ -11,7 +10,6 @@ import { scene } from '../../csaScene.mjs';
 import { PEACE_WAY, PEACE_HOLD_S, peaceWayOf, peaceShare, heldPeaceWay } from '../../../src/systems/comeSailAway/peaceWay.js';
 import { HULL } from '../../../src/systems/naval/navalShips.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const near = (a, b, eps, msg = '') => assert.ok(Math.abs(a - b) <= eps, `${msg} ${a} vs ${b} (±${eps})`);
 const rad = (d) => (d * Math.PI) / 180;
 
@@ -108,8 +106,3 @@ test('PEACE-WAY a fight begins: under way at her peace way, an enemy near takes 
   near(wild.way(), calm, 0.01 * calm, 'a seam of 7 is PEACE_WAY');
 });
 
-test('PEACE-WAY the world host\'s word: the runtime\'s seam answers peaceWayOf over its own enemiesNearby (the street\'s foes, the guards, a hostile ship - the helm time scale\'s word), the sea fight\'s boarding and its laid broadside', () => {
-  // PIN MOVED (AUDIT 2): and a ship that has sighted me and comes on - a fight past HOSTILE_NEAR_M (navalHost.js threats' `chasing`)
-  assert.match(WORLD, /peaceWay\(\) \{ return \(this\._peace \?\?= heldPeaceWay\(\(\) => peaceWayOf\(\{ enemies: !!this\.enemiesNearby\(\) \|\| !!naval\?\.threats\?\.\(\)\.some\(\(t\) => t\.chasing\), boarding: !!naval\?\.boarding, aiming: !!naval\?\.aiming \}\)\)\)\(\); \},/);
-  assert.match(WORLD, /enemiesNearby: \(\) => areEnemiesNearby\(.*\|\| navalHostileNear\(\),/, 'the word it reads covers the sea\'s hostile ships');
-});

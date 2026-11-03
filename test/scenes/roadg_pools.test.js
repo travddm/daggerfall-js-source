@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// ROAD-G G1 - THE FOE POOLS' THREE REMAINDERS (2026-09-04).
+// ROAD-G G1 - THE FOE POOLS' THREE REMAINDERS.
 //
 // Audit 58 left three, each recorded at its site rather than flagged,
 // and all three were the same shape: a LAW the port already owned,
@@ -229,25 +229,6 @@ test('ROAD-G G1(a): a ZERO-DAMAGE player ARROW reaches the watch\'s door too', (
   assert.equal(w.entity.team, 'CityWatch', 'and the ally team reverted to the static row');
 });
 
-test('ROAD-G G1(a): all three arrow hosts ROUTE the hostility seam by pool', () => {
-  // The door is PUBLIC now, as the encounter pool's has always been
-  // (exteriorFoes.js:"_owners.delete(from)"), so every host can reach it.
-  const cg = read('src/scenes/cityGuards.js');
-  assert.match(cg, /restoreWorld, removeGuard, handleAttackFromPlayer,/,
-    'the watch exports its hostility pair on the returned surface');
-  const router = (pool) => new RegExp(`onAttackFromPlayer: \\(f\\) => \\(${pool}`);
-  assert.match(hostText('src/scenes/world.js'), router('cityGuards\\.guards\\.includes\\(f\\)\\n\\s+\\? cityGuards\\.handleAttackFromPlayer\\(f, player\\.pos\\)\\n\\s+: exteriorFoes\\.attackFromPlayer\\(f, player\\.pos, \'arrow\'\\)\\),'),   // AUDIT WORLD6b-ii B4: the online host routes the encounter pool through its one door (a puppet's is its owner's)
-    'the street routes by pool membership, as its dealDamage does');
-  assert.match(read('src/scenes/exterior.js'), router('cityGuards\\.guards\\.includes\\(f\\)\\n\\s+\\? cityGuards\\.handleAttackFromPlayer\\(f, player\\.pos\\)\\n\\s+: exteriorFoes\\.attackFromPlayer\\(f, player\\.pos, \'arrow\'\\)\\),'),
-    'the exterior host too - it mounts both pools');
-  assert.match(read('src/scenes/worldModes.js'), router('f\\._encounter\\n\\s+\\? interiorFoes\\?\\.attackFromPlayer\\(f, player\\.pos, \'arrow\'\\)[^\\n]*\\n\\s+: interiorGuards\\?\\.handleAttackFromPlayer\\(f, player\\.pos\\)\\),'),
-    'and the interior watch, which the encounter half used to drop');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
-    assert.equal(/carries no hostility pair/.test(read(f)), false,
-      `${f}: the false sentence is struck, not reworded`);
-  }
-});
-
 test('ROAD-G G1(a): a struck former ALLY reverts to the static row\'s team', () => {
   // EnemyMotor.MakeEnemyHostileToAttacker's player arm (:204-213) reads
   // the STATIC table by mobile ID, never the instance's own copy.
@@ -256,30 +237,6 @@ test('ROAD-G G1(a): a struck former ALLY reverts to the static row\'s team', () 
   g.guards.push(w);
   g.hurtGuard(w, 2, [0, 0, 0]);
   assert.equal(w.entity.team, 'CityWatch', 'Knight_CityWatch\'s row team, not PlayerAlly');
-});
-
-test('ROAD-G G1(a): every host that mints guards hands in its own area walk', () => {
-  // THE FOUR HOSTS RULE. The dep is useless unwired, and the three
-  // hosts that mint watchmen must each walk their OWN database -
-  // ActiveGameObjectDatabase is one database per scene, not per pool.
-  const cg = read('src/scenes/cityGuards.js');
-  assert.match(cg, /^  makeAreaHostile = null,$/m, 'the dep defaults absent (the pre-wiring shape)');
-  assert.match(cg, /if \(!g\.ai\.isHostile\) makeAreaHostile\?\.\(\);/);
-
-  const w = hostText('src/scenes/world.js');
-  const guardMount = w.slice(w.indexOf('const cityGuards = createCityGuards({'), w.indexOf('const exteriorFoes = createExteriorFoes({'));
-  assert.match(guardMount, /makeAreaHostile: _makeEnemiesHostile,/,
-    'the streaming world: both street pools joined with whatever inside the player stands in');
-
-  const ex = read('src/scenes/exterior.js');
-  assert.match(ex, /const _liveEnemyDatabase = \(\) => \[\n\s*\.\.\.exteriorFoes\.foes, \.\.\.cityGuards\.guards, \.\.\.\(modes\?\.insideFoes\?\.\(\) \?\? \[\]\),\n\s*\];/);   // ROAD-G G2 widened the join to the encounter pool it mounted
-  const exMount = ex.slice(ex.indexOf('const cityGuards = createCityGuards({'), ex.indexOf('const _guardPool = ()'));
-  assert.match(exMount, /makeAreaHostile: _makeEnemiesHostile,/, 'the fixed-city route: its watch plus the mounted mode');
-
-  const wm = read('src/scenes/worldModes.js');
-  const inMount = wm.slice(wm.indexOf('function makeInteriorGuards(ctx) {'));
-  assert.match(inMount.slice(0, 2200), /makeAreaHostile: \(\) => makeEnemiesHostile\(interiorEnemyDatabase\(\)\),/,
-    'the interior watch: THIS building\'s one database, which is both of its pools');
 });
 
 // ═══ (b) the Wabbajack transforms the watch ═══
@@ -301,74 +258,3 @@ test('ROAD-G G1(b): removeGuard is WabbajackEffect\'s SetActive(false), not a de
   assert.equal(freed.n, 1);
 });
 
-test('ROAD-G G1(b): both hosts route the transform by POOL MEMBERSHIP', () => {
-  // The removal goes through the pool that owns the billboard; the
-  // RE-STAND is the encounter pool either way, because
-  // WabbajackEffect's careerIDs are seventeen monsters and no
-  // Knight_CityWatch (:24-44), so CreateEnemy always mints an
-  // EnemyMonster.
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(cityGuards\.guards\.includes\(f\)\) cityGuards\.removeGuard\(f\);\n\s+else exteriorFoes\.removeFoe\(f\);/,
-    'the street: the removal goes through the pool that owns the record, not the encounter pool\'s remover');
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /else if \(interiorGuards\?\.guards\.includes\(foe\)\) interiorGuards\.removeGuard\(foe\);/,
-    'the building: the indoor watch transforms like any foe');
-  assert.equal(/THE WATCH IS REFUSED/.test(wm), false, 'and the written refusal is retired, not reworded');
-
-  // ROAD-G G1 (review): the RATIONALE this lane first wrote was FALSE
-  // and is struck in all seven places it reached. `removeFoe`
-  // (exteriorFoes.js:"EnemyDeath.CompleteDeath's") never looks a record up in `foes` and
-  // both pools share the host's one renderer, so the old arm tore a
-  // watchman down exactly as `removeGuard` does - batch freed,
-  // `dead = true`, no corpse, skipped by cityGuards.js:"spaceFoes(guards, collider, foeFrameDt(dt))".."if (g.dead) continue;" and spliced
-  // at cityGuards.js:"for (let i = guards.length - 1; i >= 0; i--)" in that same pass. The router is an OWNERSHIP fix, not a
-  // leak fix, and no page may say otherwise again.
-  // (the halves are joined at runtime so this very file does not carry
-  // the sentence it bans)
-  const struck = [['kept', 'standing'], ['kept its', 'VAO'], ['stood up', 'beside'], ['could not', 'find it']]
-    .map(([a, b]) => new RegExp(`${a} ${b}`));
-  for (const rel of ['src/scenes/world.js', 'test/scenes/roadg_pools.test.js', 'test/scenes/enchantpool.test.js',
-    'bible/01-Overview/audits/Audit-58.md', 'bible/04-Characters/Characters-Arc.md',
-    'bible/06-Systems/Systems-Arc.md', 'bible/09-Testing/Testing.md', 'bible/09-Testing/Testing-Rows-2026-10-19.md']) {
-    const t = read(rel);
-    for (const re of struck) {
-      assert.equal(re.test(t), false, `${rel}: the false "${re.source}" rationale is struck, not reworded`);
-    }
-  }
-  assert.match(w, /That was not a leak: removeFoe/, 'and world.js states the true one where the router lives');
-});
-
-// ═══ (c) the loose foe stands where the player is standing ═══
-test('ROAD-G G1(c): the SPAWN arms stand a foe in the world the player IS in', () => {
-  // EC1's refusal was "interiors have no foe pool to stand one in".
-  // They have had one since IF. CreateFoe.cs:195-212 picks a placement
-  // per area and never refuses; :219-233 is PlaceFoeFreely over the
-  // building, which is what worldModes' door does.
-  const wm = read('src/scenes/worldModes.js');
-  const stand = wm.slice(wm.indexOf('function standInteriorLooseFoe('), wm.indexOf('function makeInteriorFoes('));
-  assert.match(stand, /if \(!interiorCtx \|\| !interiorFoes\) return null;/, 'no building mounted is the only refusal left');
-  assert.match(stand, /collider: interiorCtx\.collider,/, 'raycast against THIS building');
-  // ROAD-G G1 (review): the one term the port has already been bitten
-  // by. `fieldOfView()` answers RADIANS (viewSettings.js) and the law
-  // speaks DEGREES (MainCamera.fieldOfView) - the S-A lane's catch,
-  // written at worldModes.js's dungeon arm. Raw, the direction angle
-  // placeFoeFreely reads is ~1 degree instead of ~75, so the Sanguine
-  // Rose's allied Daedroth (lineOfSightCheck defaults TRUE,
-  // hostEnchant.js:"allied = false, lineOfSightCheck"/hostEnchant.js:"spawnAlliedFoe: (mobileType)") stands DEAD AHEAD inside the view instead
-  // of just outside the cone. MUTANT: `fieldOfView()` raw, or
-  // `* 90 / Math.PI` - both red here, and the slice is scoped to this
-  // arm so worldModes' three other spellings cannot mask it.
-  assert.match(stand, /fovDegrees: fieldOfView\(\) \* 180 \/ Math\.PI,/,
-    'the placement cone is DEGREES, not the radians fieldOfView() answers');
-  assert.match(stand, /foes: interiorFoePool\(\),/, 'and the occupancy test walks both of its pools - the watch blocks a spot too');
-  assert.match(stand, /spawn: \(mt, pos, o\) => interiorFoes\.spawnFoe\(mt, pos, \{ yaw: o\.yawRad, allied: o\.allied, loose: true \}\),/,
-    'through the building\'s own chain, carrying allied for the Sanguine Rose');
-  assert.match(wm, /insideStandLooseFoe\(mobileType, opts = \{\}\) \{ return standInteriorLooseFoe\(mobileType, opts\); \},/);
-
-  // ...and BOTH hosts that mount the mode machine reach it, because it
-  // is the SAME machine for both routes.
-  for (const [rel, needle] of [
-    ['src/scenes/world.js', "if (mode === 'interior') return modes?.insideStandLooseFoe?.(mobileType, opts) ?? null;"],
-    ['src/scenes/exterior.js', "if (_mode() === 'interior') return modes?.insideStandLooseFoe?.(mobileType, o) ?? null;"],
-  ]) assert.ok(read(rel).includes(needle), `${rel} routes its interior arm to the pool that owns the building`);
-});

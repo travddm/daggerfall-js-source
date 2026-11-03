@@ -1,11 +1,10 @@
 // @ts-check
-// WB11c (2026-10-01 - Mac, offered adds in three kinds: "1. All three 2. Your choice 3. Your choice 4. Trial rotation"):
+// WB11c:
 // HIS HOST IN THE COURT, ON THIS SCREEN - the Legion-Lord's Harriers, Sappers and Ward-Bearers where the relay says they
 // stand, doing what it says they do: each one's own sprite at its own size, rising out of the fire, walking, winding up
 // and landing its blow, flinching, falling; each blow's disc on the floor; a Sapper's path to him and a Ward-Bearer's
 // tether while it holds his ward; each blow judged against MY OWN FEET at its landing (co-op's law - the relay never
 // learns who it struck) and landed through the court's own door; the words and the sounds of it. Design:
-// bible/11-Multiplayer/World-Bosses.md section 17.
 //
 // ONE SOURCE: the court's state (net/gate/gateLink.js - the relay's words folded, its `lg`). Nothing here is sent but a blow
 // of mine on one of them (`hit` - the wire's `ahit`, the relay's caps deciding what lands). The court's driver
@@ -326,7 +325,7 @@ export function createGateHost({ renderer = null, getTexture = null, uploadRecor
     /** Their bodies for the host's billboard pass, their lights, their shapes on the floor. */
     batches: () => _batches,
     /**
-     * MWNPC10 (bible/04-Characters/Morrowind-NPCs.md section 15a): EACH SHOWN BODY OFFERED ITS MORROWIND CREATURE on `lane`
+     * MWNPC10: EACH SHOWN BODY OFFERED ITS MORROWIND CREATURE on `lane`
      * (characters/npcBodies.js createPopulationLane) with the billboard it is drawn by - standing (walking, its blow a
      * swing as the relay's attack time changes, a blow on it a recoil) and falling (dead, its fall the death); one its
      * mobile has no match for keeps its sprite.

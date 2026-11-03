@@ -1,4 +1,4 @@
-// AUDIT BAY (2026-10-02, Mac: "Audit this. Must be perfect") - SHIPS OF THE BAY (ea3a7361e) audited, the drawing's lens:
+// AUDIT BAY - SHIPS OF THE BAY (ea3a7361e) audited, the drawing's lens:
 // a ship fading out of the world (SHIP-FADE) took her shadow, her lanterns' light, her far lamps, her fire and smoke,
 // her wake and her colours with her at full - only her hull and her flats faded - and the aside card's state line ran to
 // a second. The real renderer and shadow pass over a recording GL (test/render/el2_shadows.test.js's), Come Sail Away's real
@@ -196,7 +196,6 @@ test('AUDIT BAY A14: HER FIRE, SMOKE, WAKE AND COLOURS GO WITH HER FLATS - under
   const boat = (fade) => ({ fade, flagColor: [1, 0, 0], particleSystems: [ps('WakeMaterial'), ps('Default-Particle'), ps('Flag', 4)] });
   const whole = boat(1), going = boat(FADE_FLATS - 0.01), coming = boat(FADE_FLATS);
   // eslint-disable-next-line no-new-func
-  // PIN MOVED (SHIP-COLOURS): the host's flags in scope - none flown here, so every pennant is drawn
   const lists = new Function('naval', 'csaRuntime', 'CSA_RENDER_MODE', 'CSA_FADE_FLATS', 'shipFlags', `${src}\nreturn csaParticleLists();`)(
     { enabled: true, boats: () => [going, coming] }, { AllBoats: [whole] }, { Mesh: 4 }, FADE_FLATS, { flies: () => false });
   assert.deepEqual([lists.wake.length, lists.drops.length, lists.flags.length], [2, 2, 2], 'mine and the one over FADE_FLATS - never the one under it');

@@ -1,5 +1,4 @@
-// PERF-FACE (2026-10-10, the owner: "Lets do an audit on this. Also keep diving for more performance improvements. I
-// want to go deep"; render/shadowPass.js FACES_ALL, bible/07-Rendering/Performance-Priority.md PERF-FACE): A LIVE FACE
+// PERF-FACE: A LIVE FACE
 // THAT HOLDS THE CACHE IS LEFT.
 //
 // SC1 draws a lantern's movers over a copy of its static cache - and copied all six faces whenever anything moved in

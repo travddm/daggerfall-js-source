@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT RELEASE R2-6 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md) - WHERE A NEW VAMPIRE WAKES: the crypt's
+// AUDIT RELEASE R2-6 - WHERE A NEW VAMPIRE WAKES: the crypt's
 // map pixel the turn's transfer lands on (VampirismInfection's GetRandomCemetery, then the respawn into its dungeon -
 // scenes/world.js transferToCemeteryArm, which this module answers for; HOST-SPLIT: the host asks, the law is here).
 //   - ON THE BAY: DFU's own - a cemetery of the current region's MAPS.BSA rows, drawn (systems/infection.js

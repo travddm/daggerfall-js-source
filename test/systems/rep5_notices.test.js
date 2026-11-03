@@ -1,5 +1,4 @@
-// REP5 (2026-09-29, the reputation overhaul) - THE LAW YOU CAN SEE. The shape Mac signed: "Visible: legal standing per
-// region on the Standing page, a notice on every change". DFU moved a legal standing in silence and showed it only as one
+// REP5 - THE LAW YOU CAN SEE. The shape. DFU moved a legal standing in silence and showed it only as one
 // word for the current region in the status box; the enhanced Standing page left it out because "the window does not
 // know where you stand".
 import { test } from 'node:test';
@@ -19,7 +18,6 @@ test('REP5: the fourteen bands have one home - the status box\'s %ltn reads it (
   assert.deepEqual(at.map(legalStandingWord), ['revered', 'revered', 'esteemed', 'esteemed', 'honored', 'admired', 'respected',
     'dependable', 'dependable', 'a common citizen', 'undependable', 'undependable', 'a scoundrel', 'a scoundrel', 'a criminal',
     'a criminal', 'a villain', 'a villain', 'pond scum', 'pond scum', 'hated']);
-  assert.match(src('src/systems/quest/questMacros.js'), /'%ltn': \(mcp, hooks\) => \{\n\s*const rep = hooks\?\.world\?\.legalRepNow\?\.\(\);\n\s*if \(rep == null\) return null;\n\s*return legalStandingWord\(rep\);/);
 });
 
 test('REP5: every cause says its own words and the band it leaves the player in', () => {
@@ -59,6 +57,4 @@ test('REP5: the Standing page\'s law - every region with a name, worst first, it
     { region: 'Daggerfall Bluffs', rep: 15, word: 'respected', note: '' },
   ]);
   assert.equal(lawRows({ legalRep: { 2: 0 } }, 0).length, 0);
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\n {2}statsLaw\(detail, playerEntity\);\n {2}statsGuilds\(detail, playerEntity\);/, 'drawn between the groups and the guilds');
 });

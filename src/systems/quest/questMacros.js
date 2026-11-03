@@ -225,16 +225,14 @@ export function macroWorld() {
 }
 const isErrorShape = (v, token) => typeof v !== 'string' || v.startsWith(token + '[');
 
-/** MACROS1 (2026-09-20, kurkku on Discord: "%map" and "%pcn / %fon" printed raw): TEXT.RSC ROWS through the value
+/** MACROS1: TEXT.RSC ROWS through the value
  *  expander. A record read through the host's `lines(id)` is `[{ text, center }]` (or bare strings), and the boxes
  *  that show one - an item's use, a guild's join prompt - showed the record verbatim where DFU's MessageBox runs
  *  MacroHelper over it with a context (the map's revealed location, the guild as %fon's provider). The values are the
  *  caller's, as `expandMacroValues` takes them; a row keeps its shape and its `center`. Nothing to expand: the rows
  *  come back as they were. */
 export function expandRowValues(rows, values = null, questLike = null) {
-  // DAEDRA1 (2026-09-21, Dracula/Valentin on Discord: "daedra summoning
-  // is fucked", with the coven's box reading "Today is %dat, the day of
-  // summoning for %dae ... %pcn"): THE CONTEXT RIDES HERE TOO.
+  // DAEDRA1: THE CONTEXT RIDES HERE TOO.
   //
   // This walk took an explicit value map and nothing else, so a caller
   // with no values of its own had no way to ask for the table every
@@ -647,7 +645,7 @@ const HANDLERS = {
   '%vcn': (mcp) => call(mcp, 'vampireNpcClan'),
   '%hrn': (mcp) => call(mcp, 'homeRegion'),
 
-  // ── M-X (2026-08-27): THE REST OF MacroHelper's TABLE ──────────
+  // ── M-X: THE REST OF MacroHelper's TABLE ──────────
   // Every remaining row, in the C# handler's own shape. Three kinds:
   //  1. mcp CALL-THROUGHS - `mcp.GetMacroDataSource().X()` verbatim
   //     as call(mcp, 'x'); a source without the override answers the
@@ -864,7 +862,7 @@ const HANDLERS = {
   '%clm': (mcp) => call(mcp, 'magnitudePerLevel'),
   '%mpw': (mcp) => call(mcp, 'magicPowers'),   // token-level in C#; the string arm until the spell MCP lands (recorded)
 
-  // ── E7 (2026-09-02): THE TABLE'S LAST THIRTY-SIX ROWS ──────────
+  // ── E7: THE TABLE'S LAST THIRTY-SIX ROWS ──────────
   // M-X left thirty-seven of MacroHelper's rows RECORDED at their
   // consumers rather than in the table (test/systems/quest/macrocoverage.test.js's
   // ELSEWHERE map), with its own note: "Consolidating them into the
@@ -1014,7 +1012,7 @@ for (let n = 1; n <= 12; n++) {
 // M-X helper laws
 const str = (v) => (v == null ? null : String(v));
 const signedFmt = (n) => (n > 0 ? `+${n}` : String(n));   // C#'s "+0;-0;0"
-/** ATTRMACRO1 (2026-09-18, Mac: "none of the attribute explanations show actual values"): THESE ARE COMPUTED, NOT
+/** ATTRMACRO1: THESE ARE COMPUTED, NOT
  *  STORED. DaggerfallEntity declares all four as properties over the LIVE stat - DamageModifier is
  *  FormulaHelper.DamageModifier(stats.LiveStrength), ToHitModifier the same over LiveAgility, HitPointsModifier and
  *  HealingRateModifier over LiveEndurance - and this read took them for fields on the entity. Nothing in this port

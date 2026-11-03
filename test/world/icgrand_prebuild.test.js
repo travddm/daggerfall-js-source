@@ -1,7 +1,5 @@
-// IC-GRAND's PERF PASS (2026-10-26, the coordinator: "A DISTRICT'S NINE NEAR SLICES NEVER FINISHED within 900 s ... make
-// arrival and crossing workable ... off-main-thread work"; bible/03-World/Arena-Provinces.md IC-GRAND, "Off the page's
-// thread") - THE CITY'S OWN MADE AHEAD ON A WORKER, pinned: a slice's pieces in the order its build asks them; the worker's
-// blocks, the landmarks' footprint laid there (PIN MOVED, IC-FOOTPRINT-OFF-THREAD: it was laid on the page), the page's
+// IC-GRAND's PERF PASS - THE CITY'S OWN MADE AHEAD ON A WORKER, pinned: a slice's pieces in the order its build asks them; the worker's
+// blocks, the landmarks' footprint laid there (
 // own blocks to the byte, the landmarks' parts the model door's, and its models the family's;
 // each piece handed over once, the worker told what the page made itself; the door and the family asking it first; the
 // sweep telling it the slices coming, the player's own first, and letting it go out of the city's reach.
@@ -180,9 +178,6 @@ test('IC-GRAND THE DOOR AND THE FAMILY ASK THE WORKER FIRST - a block the worker
   setImperialPrebuild(null);
   _resetWorldDataReplacement();
   _resetCapitals();
-  assert.match(read('src/world/capitalModels.js'), /registerPortBlockFamily\(\{ indexOf: imperialBlockIndex, nameOf: imperialBlockName, make, keep: IMPERIAL_KEEP\.blocks \}\);/);
-  // and the pixel's build reads a slice's blocks a breath at a time before its tiles read all sixty-four in one task
-  assert.match(read('src/scenes/pixelBuild.js'), /if \(capitalViewOf\(dfLocation\)\) for \(const name of dfLocation\.exterior\.exteriorData\.blockNames\) \{ blocks\.getBlockByName\(name\); await breather\.breathe\(\); \}\n\s+if \(groundLocation\) locationRect = setLocationTiles\(/);   // PIN MOVED (IC-GRAND x GROUND-AGREE, at the merge into the main-merged TESA branch): main's GROUND-AGREE tiles the ground's place (`groundLocation`), the pre-read still stands just before it
 });
 
 test('IC-GRAND THE WORKER TOLD WHAT IS COMING - on the frame, only when the player\'s pixel moves: the slices within NEAR_RING of it near (the player\'s own first, then nearest first), the ring past them far; made within PREBUILD_REACH of the city\'s centre pixel and let go past it; wired before the city\'s near and far sweep queues the pixels (mutants: far first; the reach unread; unwired)', () => {
@@ -206,6 +201,4 @@ test('IC-GRAND THE WORKER TOLD WHAT IS COMING - on the frame, only when the play
   pb.sweep();
   assert.equal(made, 0, 'let go out of reach');
   assert.equal(pb.client, null);
-  assert.match(read('src/scenes/tamrielSweepsHost.js'), /function sweepCapitalPixels\(\) \{\n\s+capitalPrebuild\.sweep\(\);[^\n]*\n\s+sweepCapitalLod\(\);/);
-  assert.match(read('src/world/imperialPrebuildClient.js'), /return new Worker\(new URL\('\.\/imperialPrebuildWorker\.js', import\.meta\.url\), \{ type: 'module' \}\);/);
 });

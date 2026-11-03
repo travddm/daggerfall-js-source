@@ -1,5 +1,5 @@
-// WISPS-RETURN (2026-09-25, Mac: "I want to return to the original wind wisps before our current design") - THE
-// WISPS ARE STREAKS AGAIN. WIND5 (2026-09-23) had made each wisp a calligraphic flourish: a 40-segment ribbon along an
+// WISPS-RETURN - THE
+// WISPS ARE STREAKS AGAIN. WIND5 had made each wisp a calligraphic flourish: a 40-segment ribbon along an
 // arched or S stroke ending in a tightening curl, swelling and thinning like a pen, soft across like ink, drawn on and
 // off along its path. That design is retired, and a wisp is WIND3's thin quad along the wind again: one straight
 // streak its look's length, the same width end to end, faced to the eye, faint at the tail and brightest toward the

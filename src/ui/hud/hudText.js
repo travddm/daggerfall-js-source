@@ -18,9 +18,7 @@
 // is only that the skill/loot literals here are not yet read from
 // their TEXT.RSC record ids (AUDIT 23 narrowed the stale flag).
 
-// FONT1 (2026-09-16, Mac: "Enhanced mode UI ... Ambient Text mod also
-// doesnt use it. Any enhanced UI or text must be our enhanced
-// version"): THE MODEL IS ONE, THE DRAW IS TWO.
+// FONT1: THE MODEL IS ONE, THE DRAW IS TWO.
 //
 // Everything above this line - the queue, the timer, the rubberband,
 // the notebook tail - is PopupText and stays PopupText whatever skin
@@ -31,8 +29,7 @@
 // this class would have drawn - the same rows, in the same order. The
 // classic arm below is byte for byte what it was.
 //
-// ENH-NOTICE3 (2026-09-21, Mac: "All mods, including climates and
-// calories need to utilize the enhanced notification popup"): THE
+// ENH-NOTICE3: THE
 // ENHANCED FACE IS THE NOTICE STACK. FONT1's face was a DOM column at
 // the top of the screen (ui/enhanced/enhancedHudText.js, retired); that was a
 // second enhanced face beside the notice panel ENH-NOTICE1 gave the
@@ -132,9 +129,7 @@ export class HudText {
   add(text, delayInSeconds = HUD_TEXT_POP_DELAY) {
     const pgText = processGrammar(text);
     if (String(pgText ?? '').trim() === '') return;
-    // NOTICE-SPAM (2026-09-22, Mac: "notification spam with the new
-    // enhanced integration"; DragynDance had a column of the same line
-    // over and over). A TOAST SYSTEM THAT STACKS ONE LINE TEN TIMES IS
+    // NOTICE-SPAM. A TOAST SYSTEM THAT STACKS ONE LINE TEN TIMES IS
     // WRONG WHATEVER POSTED IT. The classic column scrolls, so a repeat
     // there costs a row and passes; the enhanced skin draws a PLATE per
     // row (ENH-NOTICE3), so ten copies of "You are freezing" are ten

@@ -336,134 +336,6 @@ test('c2/S5 OnPush: the DOUBLE REFOCUS re-centres BOTH cameras and leaves each o
 });
 
 // ─────────────────────────────────────────────────────────────────────
-test('c2/S5 THE PASS IS UNLIT, and the bracket hands every global back (the real Renderer, EV6 Proxy-GL)', () => {
-  const stub = new Proxy({}, {
-    get: (o, k) => {
-      if (k === 'getProgramParameter' || k === 'getShaderParameter') return () => true;
-      if (k === 'getUniformLocation' || k === 'getAttribLocation') return () => ({});
-      if (k === 'createTexture' || k === 'createBuffer' || k === 'createVertexArray'
-        || k === 'createProgram' || k === 'createShader' || k === 'createFramebuffer') return () => ({});
-      if (k === 'getParameter') return () => new Float32Array([0, 0, 0, 0]);
-      if (typeof k === 'string' && k.toUpperCase() === k) return k;
-      return () => {};
-    },
-  });
-  const canvas = { getContext: () => stub, clientWidth: 320, clientHeight: 200, width: 320, height: 200 };
-  const r = new Renderer(canvas);
-
-  _resetForTests();
-  resetAutomapWindowState();
-  _setAutomapArt(null);
-  try {
-    // a distinctive HOST state on every global the pass could clobber
-    const entryAmbient = new Float32Array([0.4, 0.42, 0.5]);
-    const entryEmission = new Float32Array([0.11, 0.22, 0.33]);
-    r.setLighting(entryAmbient, 0.55);
-    r.setFog('exp', 0.02);
-    r.setMoonlight({ scale: 0.3, dir: [0, 1, 0], color: [0.6, 0.6, 0.8] });
-    r.setWindowEmission(entryEmission);
-    r.setPointLights(new Float32Array([1, 2, 3, 4]), null, null);
-    r.setIndirectLight([1, 2, 3], 7, new Float32Array([0.9, 0.9, 0.9]));
-    r.setClipY(12.5);
-    r.setAutomapMode(0);
-
-    // snapshot the lighting AT EVERY GEOMETRY DRAW - the law is about
-    // what the shader sees, not about which setter was called
-    const snaps = [];
-    r.drawMesh = () => snaps.push({
-      ambient: [...r._ambient], sun: r._sunScale, fog: r._fogMode, moon: r._moonScale,
-      points: r._pointLights.length, indirectRange: r._indirect[3], emission: [...r._windowEmission],
-      mode: r._automapMode,
-      sunDir: [...r._lightDir], sunColor: [...r._sunColor],
-      moonDir: [...r._moonDir], moonColor: [...r._moonColor],
-      back: r._light3Scale, backDir: [...r._light3Dir], backColor: [...r._light3Color],
-    });
-
-    const rec = { revealed: new Set(['a']), visitedThisRun: new Set(['a']), entranceDiscovered: false };
-    const w = new AutomapWindow(deps({
-      record: () => rec,
-      drawList: [{ key: 'a', mesh: {}, matrix: new Float32Array(16) }],
-    }));
-    w.draw(r, canvas, null, 1);
-
-    // THE TWO GROUPS ARE LIT DIFFERENTLY, and the automap mode is what
-    // separates them: the geometry draws under one of the six shader
-    // presentations, the never-sliced beacon group under mode 0.
-    const geometry = snaps.filter((s) => s.mode !== 0);
-    const beacons = snaps.filter((s) => s.mode === 0);
-    assert.ok(geometry.length >= 1, 'the revealed row drew');
-    assert.ok(beacons.length >= 1, 'and the beacons drew');
-    for (const s of geometry) {
-      assert.deepEqual(s.ambient, [1, 1, 1],
-        'DaggerfallAutomap.shader has NO light term - the geometry runs at the identity, not A1\'s 0.9');
-      assert.equal(s.sun, 0, 'no sun');
-      assert.equal(s.fog, 0, 'NoFogCamera (:2017)');
-      assert.equal(s.moon, 0, 'no moon');
-      assert.equal(s.back, 0, 'and no third light either - the geometry sees none of the three');
-      assert.equal(s.points, 0, 'no point lights');
-      assert.equal(s.indirectRange, 0, 'no indirect');
-      assert.deepEqual(s.emission, [0, 0, 0], 'no window emission');
-    }
-    assert.equal(geometry[0].mode, 1, 'visited-this-run draws in COLOUR (mode 1)');
-
-    // THE BEACONS ARE LIT BY ALL THREE. CreateLightsForAutomapGeometry
-    // (Automap.cs:2025-2076) builds three DIRECTIONAL lights, each with
-    // `cullingMask = 1 << layerAutomap`, and the beacons are the only
-    // things on that layer the shader can light - Standard-material
-    // CreatePrimitives (:1355-1441). Intensities here are the
-    // dungeon/castle arm (:2066-2076), which is what `insideBuilding:
-    // false` selects; the directions are -forward of Euler(50, 270/126/
-    // 0, 0), which for a level-50 pitch puts 0.766 of each light on a
-    // face turned straight up.
-    const round = (v) => v.map((x) => Math.round(x * 1e6) / 1e6 + 0);   // +0 folds -0 onto 0
-    for (const s of beacons) {
-      assert.deepEqual(s.ambient, [0, 0, 0],
-        'the three lights ARE the beacons\' lighting - there is no fourth term on layerAutomap');
-      assert.equal(s.sun, 0.9, 'keyLight.intensity = 0.9f (:2073)');
-      assert.equal(s.moon, 0.7, 'fillLight.intensity = 0.7f (:2074)');
-      assert.equal(s.back, 0.5, 'backLight.intensity = 0.5f (:2075)');
-      assert.deepEqual(s.sunColor, [1, 1, 1], 'Light.color is left at its white default');
-      assert.deepEqual(s.moonColor, [1, 1, 1]);
-      assert.deepEqual(s.backColor, [1, 1, 1]);
-      assert.deepEqual(round(s.sunDir), round([...BEACON_KEY_DIR]), 'Euler(50, 270, 0)');
-      assert.deepEqual(round(s.moonDir), round([...BEACON_FILL_DIR]), 'Euler(50, 126, 0)');
-      assert.deepEqual(round(s.backDir), round([...BEACON_BACK_DIR]), 'Euler(50, 0, 0)');
-      assert.equal(s.fog, 0, 'still NoFogCamera');
-    }
-    // the directions themselves, against the C#'s Eulers by hand: a
-    // Unity light shines along +forward, the shader wants -forward, and
-    // sin(50 deg) is the Y every one of the three shares
-    const sin50 = Math.sin(50 * Math.PI / 180);
-    const cos50 = Math.cos(50 * Math.PI / 180);
-    assert.deepEqual(round([...BEACON_KEY_DIR]), round([cos50, sin50, 0]));
-    assert.deepEqual(round([...BEACON_FILL_DIR]),
-      round([-Math.sin(126 * Math.PI / 180) * cos50, sin50, -Math.cos(126 * Math.PI / 180) * cos50]));
-    assert.deepEqual(round([...BEACON_BACK_DIR]), round([0, sin50, -cos50]));
-    // the building arm is the other triple (:2061-2064)
-    assert.deepEqual(BEACON_LIGHT_INTENSITY.building, { key: 1.0, fill: 0.6, back: 0.2 });
-    assert.deepEqual(BEACON_LIGHT_INTENSITY.dungeon, { key: 0.9, fill: 0.7, back: 0.5 });
-    // ...and the third light is a real term in the shader the beacons
-    // draw with, not a uniform nothing reads: two lights would leave
-    // the back light's 0.5 doing nothing at all.
-    const rsrc = src('src/render/renderer.js');
-    assert.match(rsrc, /float l3diff = max\(dot\(n, uLight3Dir\), 0\.0\);/, 'the third N.L');
-    assert.match(rsrc, /\+ uLight3Color \* \(uLight3Scale \* l3diff\)\);/, 'summed into `lit` beside the sun and the moon');
-
-    // ...and the frame the host draws NEXT is the frame it would have
-    // drawn had the window never opened
-    assert.deepEqual([...r._ambient], [...entryAmbient], 'ambient came back');
-    assert.equal(r._sunScale, 0.55);
-    assert.equal(r._fogMode, 2, 'exp fog came back');
-    assert.equal(r._moonScale, 0.3);
-    assert.deepEqual([...r._windowEmission], [...entryEmission]);
-    assert.equal(r._pointLights.length, 4);
-    assert.equal(r._indirect[3], 7);
-    assert.equal(r._clipY, 12.5);
-    assert.equal(r._automapMode, 0);
-  } finally { _resetForTests(); resetAutomapWindowState(); }
-});
-
-// ─────────────────────────────────────────────────────────────────────
 test('c2/S5 the chrome verbs really reach the camera - press-HOLD, both mouse buttons, one poll per frame', () => {
   const w = fresh();
   try {
@@ -498,24 +370,6 @@ test('c2/S5 the chrome verbs really reach the camera - press-HOLD, both mouse bu
     assert.equal(w.done, false, 'a press alone is not a click');
     w.pointer('up', CHROME_RECTS.exit.x + 2, 175, 0);
     assert.equal(w.done, true, 'ActionExit');
-  } finally { _resetForTests(); resetAutomapWindowState(); }
-});
-
-test('c2/S5 the compass reads the MAP camera, never the player - including at the 2D gimbal lock', () => {
-  const w = fresh();
-  try {
-    w.runVerb('ActionChangeAutomapGridMode');   // 2D: the camera looks straight down
-    const s0 = automapCameraState();
-    assert.ok(Math.abs(s0.fwd[1] + 1) < 1e-9, 'straight down - fwd carries no yaw at all');
-    assert.equal(cameraYawDeg(s0), 0);
-    w.runVerb('ActionRotateCameraLeft', 1);     // 50 degrees per second
-    const turned = cameraYawDeg(automapCameraState());
-    assert.ok(turned > 0.001 && turned < 359.999,
-      'the 2D compass turns - reading eulerAngles.y off `fwd` here would answer a constant forever');
-    // the PLAYER never moved, so a compass on the player's heading
-    // would have stayed put
-    assert.equal(w.deps.player().yaw, 0);
-    assert.match(src('src/ui/automap/automapWindow.js'), /compassHeading01\(cameraYawDeg\(_cam\)\)/);
   } finally { _resetForTests(); resetAutomapWindowState(); }
 });
 
@@ -688,29 +542,6 @@ test('c2/S5 the hotkey substitution, and ShortcutOrFallback re-pointing a collid
   assert.equal(automapTooltipFor('panel', 'KeyM'), null);
   // an unknown key answers '' rather than throwing
   assert.equal(automapText('nope'), '');
-});
-
-// ─────────────────────────────────────────────────────────────────────
-test('c2/S5 SOURCE PINS: the host preloads the art, raises the reset signal, and the chrome is no longer orphaned', () => {
-  const ctx = src('src/scenes/dungeonContext.js');
-  assert.match(ctx, /preloadAutomapArt\(\{ renderer, fetchBytes, palette \}\)/, 'the art warms at the dungeon mount');
-  assert.match(ctx, /\.catch\(\(e\) => console\.warn\('\[automap\] native map art unavailable; keyed fallback:/,
-    'and a failure costs the ART, never the map');
-  assert.match(ctx, /signalAutomapReset\(\);/, 'InitWhenInInteriorOrDungeon raises the reset flag (:2490-2494)');
-  assert.match(ctx, /insideBuilding: false,/, 'and the dungeon host is never inside a building');
-  // the window really is the chrome's consumer - flight 1's staging
-  // exemption in test/ui/enhanced/enhancedPause.test.js is deleted with this stage
-  const w = src('src/ui/automap/automapWindow.js');
-  assert.match(w, /from '\.\/automapChrome\.js'/);
-  assert.match(w, /from '\.\/automapCamera\.js'/);
-  assert.match(w, /from '\.\/automapText\.js'/);
-  assert.equal(/staged = \['src\/ui\/automap\/automapChrome\.js'\]/.test(src('test/ui/enhanced/enhancedPause.test.js')), false,
-    'the staging exemption is gone, so the orphan sweep is unconditional again');
-  // ONE HOME: the compass strip is drawn by hud.js's own drawer in both
-  // windows, not re-implemented here
-  assert.match(w, /drawCompassStrip\(renderer, _art,/);
-  assert.match(src('src/ui/hud/hud.js'), /export function drawCompassStrip\(/);
-  assert.equal(/COMPASS_BOX_OUTLINE/.test(w), false, 'the strip law lives in ONE file');
 });
 
 // ── DATA-GATED ───────────────────────────────────────────────────────

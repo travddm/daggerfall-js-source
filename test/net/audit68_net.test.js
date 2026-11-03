@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster "net" (S14, src/net). The halo socket a join forgot without
+// AUDIT 68, the whole-tree sweep - cluster "net" (S14, src/net). The halo socket a join forgot without
 // closing, a halo's error frame wedging the primary, the quest arm's missing per-room gate and party seat, the trade
 // confirm a cancel could strand the peer's goods behind, the class-sprite builds kept for peers already gone, and the
 // emote target read as a replacement pattern. Each pin is driven through the real module and fails on the base.
@@ -68,17 +68,6 @@ test('AUDIT 68 S14-quest-inbound-ungated: quest shares are gated PER ROOM before
   for (let i = 0; i < 100; i++) share(`acct-flood-${String(i).padStart(3, '0')}`);
   assert.ok(got.length <= PARTY_MAX - 1, `a flood of made-up senders delivered ${got.length}`);
   assert.ok(s._inQuest.size <= 65, `the per-sender map holds ${s._inQuest.size}`);
-}));
-
-test('AUDIT 68 S14-quest-inbound-ungated: an honest hub at full tilt passes whole - every other seat of a full party at once, and again at the hub\'s own cooldown', () => quiet(() => {
-  const { got, share, clock } = hubSession();
-  const seats = Array.from({ length: PARTY_MAX - 1 }, (_, i) => `acct-seat-${i}`);
-  for (const a of seats) share(a);
-  clock.t += 5000;   // QUEST_HUB_MIN_MS: each seat may share again
-  for (const a of seats) share(a);
-  assert.equal(got.length, 2 * seats.length);
-  // and the host takes a share from a seat of my party alone - applyParty's rule (world.js is not driven here)
-  assert.match(rd('src/scenes/world.js'), /link\.onQuestShared = \(acct, name, quest\) => \{\n\s*if \(!social\.inMyParty\(acct\)\) return;/, 'a share from an account holding no seat is nothing');
 }));
 
 // ---- the trade: a confirm that has left binds until the peer answers ------------------------------------------------

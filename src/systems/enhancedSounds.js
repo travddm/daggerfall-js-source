@@ -1,5 +1,4 @@
-// ES1 (2026-09-16, Mac: "lump this in as a new enhanced toggle. Enhanced
-// Sounds, add the wind noise to it"): ONE SWITCH FOR THE PORT'S OWN
+// ES1: ONE SWITCH FOR THE PORT'S OWN
 // SOUNDS - the ones Daggerfall never played and the enhanced skin adds.
 //
 // What rides it:

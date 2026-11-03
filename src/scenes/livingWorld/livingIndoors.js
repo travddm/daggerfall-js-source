@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW8 (2026-10-05, bible/06-Systems/Living-World.md "LW8"): THE DOORS OPEN - the living world's residents inside the
+// LW8: THE DOORS OPEN - the living world's residents inside the
 // building the player is in. Mac: NPCs "dynamically all have tasks ... perform activities". LW2 stood a resident's day
 // in the street and shut the door behind them; this stands what is behind the door.
 //
@@ -23,7 +23,7 @@
 // EVERY ALLOCATION HAS AN OWNER: each body is the sprites' (travellerSprites.js), synced each frame from this list;
 // `clear()` frees them all - the building left, the living world off, the host's teardown.
 //
-// LW8b (2026-10-05, "LW8b"): THE ROOM'S TALK. Mac: NPCs "have conversations with each other ... much like the crew on
+// LW8b: THE ROOM'S TALK. Mac: NPCs "have conversations with each other ... much like the crew on
 // board ships". The room's spots are grouped into TABLES (`tablesOf`: near enough to stand together), and the room fills
 // table by table, so those inside stand in twos and threes, facing one another (one alone faces the room). Each round
 // (the street's: meetups.js ROUND_S) those at a table its whole round meet as the street's circles do (`spotCircles`
@@ -32,27 +32,27 @@
 // palace's, a home's), the town's news among them. A resident not in a circle has the street's word for the player
 // passing close (livingTown.js greetingFor). What is said (`speech`) goes over their heads on the crew's one layer.
 //
-// LW8c (2026-10-05, "LW8c"): THE ROOM ASTIR. Mac: NPCs "perform activities". One in no talking circle now and then
+// LW8c: THE ROOM ASTIR. Mac: NPCs "perform activities". One in no talking circle now and then
 // (INDOOR_STIR_S of real seconds, their own) gets up and crosses the room - to a table where one stands alone, for the
 // company, else to a free place of the room's - within INDOOR_WALK_M, along a line the room's own collider lets them
 // walk (never through a wall or a table), at INDOOR_WALK_SPEED, facing the way they go; the place they make for is
 // theirs from the moment they set out. Between tables they are at none (no circle, no table to face).
 //
-// LW-LODGE (2026-10-06, Mac: NPCs should "use tavern rooms"; "Lodgers in their rooms"): A LODGER HAS A ROOM - one who
+// LW-LODGE: A LODGER HAS A ROOM - one who
 // lodges at a tavern (livingTown.js lodgersAt: a visitor, a ship's hand ashore, one of the town whose home is its rooms)
 // is dealt one of its beds (`bedsOf`: their id and the tavern's draw it, never the bed of the room the player rents), and
 // is seen by it (`bedStand`) while their day has them up in it - before breakfast and after it, before bed (dayPlan.js);
 // at breakfast and at supper they are in the common room with the rest, asleep in none. A lodger in their room is at no
 // table and does not stir.
 //
-// LW-TALK (2026-10-06): A TABLE'S COMPANY MEETS FROM THE MINUTE IT SAT DOWN AS IT IS - its rounds run from then while it
+// LW-TALK: A TABLE'S COMPANY MEETS FROM THE MINUTE IT SAT DOWN AS IT IS - its rounds run from then while it
 // stays the same (the first cut dealt the tables on the street's round, so two who met mid-round stood mute to the next,
 // and every table in the room spoke on the same second); one who comes while an exchange is on waits for its last line;
 // its people stay put while an exchange is on and through their first round together (one in a quiet circle got up
 // mid-talk, and a temple's two parted the moment their talk ended); and one who kept quiet as the player came by
 // speaks when the player stops before them.
 //
-// LW-ROOMS (2026-10-08, Mac: "With living world integration, NPCs still group up in taverns"): THE WHOLE ROOM. The first
+// LW-ROOMS: THE WHOLE ROOM. The first
 // cut sounded twelve ways out to 6.6 m from the way in, at its height - the door's middle: a tavern's every drinker stood
 // within a few strides of its door, one crowd, and in a house or a shop the sounding passed over a table or a counter
 // onto its top (AUDIT LW-ROOMS: 2,705 places in 1,765 of the game's 5,797 houses, 50 in 41 of its 628 shops - in one
@@ -61,7 +61,7 @@
 // TABLE_GAP_M), it holds one to every INDOOR_FLOOR_M2 of floor, and one who stirs makes for a place of their own
 // (`stirPlace`).
 //
-// AUDIT LW-ROOMS (2026-10-08, bible/01-Overview/audits/Audit-LW-Rooms.md): the room measured as its build hung it, the same
+// AUDIT LW-ROOMS: the room measured as its build hung it, the same
 // for every reader - every door shut (`doorsShut`), the building's own people every one, every bed's stand kept clear,
 // the reader's quest's people kept clear only when one is placed; the walk slid along what it meets into a doorway off
 // its lines, over a lip the room's people step over, standing nobody on an edge; one stirring to a place of their own

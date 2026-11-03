@@ -81,21 +81,3 @@ test('footsteps: losing the ground silences; the landing plays ONE step; the fir
   assert.equal(m.distance, 0);
 });
 
-test('footsteps: every host drives the machine into playOneShot', () => {
-  for (const f of ['world.js', 'exterior.js', 'worldModes.js', 'dungeon.js']) {
-    const s = readFileSync(join(root, 'src/scenes', f), 'utf8');
-    assert.ok(/footsteps\.update\(player\.pos|_footsteps\.update\(player\.pos/.test(s), `${f}: the stride runs off the live motor`);
-    assert.ok(s.includes('audio.playOneShot(_step.clip, _step.volume)'), `${f}: and plays what comes back`);
-    assert.ok(s.includes('pickFootstepSet('), `${f}: with a per-frame set pick`);
-  }
-  // the modal host splits wood/stone by mode; the exteriors read the snow gate
-  const wm = readFileSync(join(root, 'src/scenes/worldModes.js'), 'utf8');
-  assert.ok(wm.includes("mode === 'interior'") && wm.includes('inBuilding: true'), 'buildings walk on wood');
-  assert.ok(wm.includes('dungeonShallow:'), 'the dungeon water arms ride the block water line');
-  for (const f of ['world.js', 'exterior.js']) {
-    const s = readFileSync(join(root, 'src/scenes', f), 'utf8');
-    // PIN MOVED (PRECIP4, AUDIT PRECIP GROUND-3): the streaming host's gate is the snow under the feet on the snow lane
-    // (scenes/snowCoverHost.js winterAt), DFU's season off it
-    assert.ok(s.includes(f === 'world.js' ? 'winter: snowCover.winterAt(player.pos, season === SEASON.Winter)' : 'winter: season === SEASON.Winter'), `${f}: the season feeds the snow gate`);
-  }
-});

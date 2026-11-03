@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT DEX C3 (2026-10-20, bible/01-Overview/audits/Audit-DEX.md): ENEMYENTITY.GETENEMYGROUP'S ONE HOME - a leaf,
+// AUDIT DEX C3: ENEMYENTITY.GETENEMYGROUP'S ONE HOME - a leaf,
 // importing nothing. EnemyEntity.GetEnemyGroup (EnemyEntity.cs:486-489) is FormulaHelper.GetEnemyEntityEnemyGroup, and
 // every reader asks it: the to-hit bonus by enemy type (FormulaHelper.cs:1015-1029, combat/formulas.js), PlayerGPS
 // .GetEntityFlags (PlayerGPS.cs:788) and PacifyEffect.IsGroupMatch (PacifyEffect.cs:132) - Detect, Dispel and Pacify,
@@ -22,7 +22,7 @@ const ENEMY_GROUP_BY_CAREER = Object.freeze({
   15: 0, 17: 0, 18: 0, 19: 0, 23: 0, 28: 0, 30: 0, 32: 0, 33: 0,            // Undead (17 "grouped as animal in classic")
   25: 1, 26: 1, 27: 1, 29: 1, 31: 1,                                        // Daedra
 });
-/** DEX4b (bible/04-Characters/Enemy-Expansion.md section 9): A MOD'S GROUP. DFU asks TryGetOverride
+/** DEX4b: A MOD'S GROUP. DFU asks TryGetOverride
  *  ("GetEnemyEntityEnemyGroup") first (:2748-2750); Daggerfall Enemy Expansion's answers its own enemies' row and DFU's
  *  switch for the rest. `fn(careerIndex)` -> a group, or null for DFU's (a mod's enemy's career index is its id). */
 const _groups = [];

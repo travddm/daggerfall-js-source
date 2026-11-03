@@ -1,9 +1,8 @@
-// SC1 (2026-09-23, Mac: "make some insane improvements to our lighting system ... while also improving
-// performance"): THE STATIC SHADOW CACHE ON A REAL GPU - the same picture, and the draws it no longer makes.
+// SC1: THE STATIC SHADOW CACHE ON A REAL GPU - the same picture, and the draws it no longer makes.
 //
 // The pins (test/render/sc1_shadowcache.test.js) prove the cache's laws on the fake GL; what only a GPU can prove is that
 // a COPY of the cached faces into the live layers, with the movers drawn on top, lights the same pixels the full
-// replay lit. CACHE-COPY (2026-10-07): the copy is a draw, a triangle a face (render/shadowPass.js _blitSlot) - it was a
+// replay lit. CACHE-COPY: the copy is a draw, a triangle a face (render/shadowPass.js _blitSlot) - it was a
 // depth blit, which SwiftShader (ANGLE over Vulkan) copies and Direct3D (ANGLE's Blit11::copyDepth, a Texture2D shader
 // handed an array's layer) left to the driver, so this probe never saw the blink. tools/shadowTavernProbe.mjs is the
 // tavern the players described. This probe draws enhancedLightingProbe's room through the real renderer on SwiftShader with a

@@ -1,11 +1,11 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S OWN PICTURES - painted here in code
+// WITCH1: THE WITCHES' FESTIVAL'S OWN PICTURES - painted here in code
 // (Port-Doctrine: A RENDER OF GAME DATA IS GAME DATA - nothing is read from the player's data, nothing ships) through the
 // Hour's paint box (world/superDungeon/sdPixelKit.js): ramps through the ordered dither, the light from the top-left, a dark
 // outline, every texel forced into the picture's own ramps at the end. Daggerfall has no gourd, no straw man and no cake;
 // the festival brings them, painted to stand beside its own candles and skulls.
 //
-// ONE ARCHIVE, FESTIVAL_ARCHIVE (world/eliteGates/pseudoArchives.js registers it), a record each picture
+// ONE ARCHIVE, FESTIVAL_ARCHIVE (world/pseudoArchives.js registers it), a record each picture
 // (FESTIVAL_ART): the Soul Cake's and the Hearth Offering's item pictures, the offering as it stands at a door, and the
 // towns' turnip lantern, straw effigy and ward-staff (world/witchesDecor.js stands them). Each reaches every door a picture
 // does as a STAND-IN of its archive (systems/textureReplacement.js addVendorTextures - `standIn`, `build`), so an item list

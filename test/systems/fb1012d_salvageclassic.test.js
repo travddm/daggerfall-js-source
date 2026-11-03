@@ -1,4 +1,4 @@
-// FB1012d SALVAGE-CLASSIC (FIELD BUGS 2026-10-12b; bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md). Discord bug-reports,
+// FB1012d SALVAGE-CLASSIC (FIELD BUGS 2026-10-12b). Discord bug-reports,
 // "magic item with only cast on use effect cannot be salvaged": "like in the screenshot. it doesn't show up at all in the
 // reforge menu for salvaging" - a card reading "Blazing Holy Dagger of Fireballs", Magic, "Cast when used: Fireball",
 // 0.50 kg, New 100%.

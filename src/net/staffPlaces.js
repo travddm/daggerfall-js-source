@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF-EVENT (2026-10-24, mob: "needs to be bale to select a town or area for these events"; net/staffEvent/
-// staffEventLaw.js, bible/11-Multiplayer/Staff-Events.md) - THE STAFF PANEL'S PLACE PICKER, the game's half. The places
+// STAFF-EVENT - THE STAFF PANEL'S PLACE PICKER, the game's half. The places
 // are the player's own game data (MAPS.BSA), never in the panel nor in this repository, so the panel over the game asks
 // the game: a region's named places (each its location index, name, kind and map pixel), and where the staff member
 // stands now (region, the location they stand in or -1, the map pixel). Read off the maps the game loaded, nothing new.
@@ -61,7 +60,7 @@ export function staffPlaces(maps, r, places = keptPlaces()) {
 }
 
 /**
- * AUDIT RELEASE R2-7 (bible/01-Overview/audits/Audit-Release-R2.md): A PROVINCE'S PLACES PAST THE BAY - the world's
+ * AUDIT RELEASE R2-7: A PROVINCE'S PLACES PAST THE BAY - the world's
  * registry's listed places of its theatre (the capitals, the cities, towns and villages TESA stands), towns first, then
  * by name. WW6 (03-World/World-Wide.md WW6): a TOWN is offered as itself - its `loc` its place's own location index
  * (the registry's `location`, negative: no MAPS.BSA row holds it), as the raids past the Bay key it - for a town's own

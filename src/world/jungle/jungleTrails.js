@@ -1,4 +1,4 @@
-// JUNGLE-TRAILS (2026-10-19, the owner: "Implement procedural dirt pathways that cut through the forest"). The jungle's
+// JUNGLE-TRAILS. The jungle's
 // own trails: dirt worn through its floor, winding, meeting, looping - never the road painter's tracks, which run
 // straight from a pixel's middle to its edge and are the map's (the travel map, the ink map, the landforms, fast
 // travel read them). A trail is where a field on the WORLD's lattice crosses its middle value: two families of them
@@ -17,7 +17,7 @@
 // natureCleared, its outline and four tiles round it, as its trees keep; a rect without an outline its rect). A jungle tree keeps
 // its foot off a trail as VERGE1 keeps it off a road (jungleNature.js withJungle, trailClear). The heights are never
 // moved: a trail is worn into the ground, not cut, so the room's ground is the ground it was.
-// bible/03-World/Bantha-Jungle.md "The trails".
+// "The trails".
 import { ecoHash } from '../ecotone.js';
 import { jungleDepthAt, JUNGLE_EDGE, JUNGLE_WANDER_MAX } from './jungleRegion.js';
 import { TERRAIN_SIZE } from '../terrain/terrainSampler.js';
@@ -158,7 +158,7 @@ export function trailsReach(nine) {
 }
 
 /**
- * AUDIT TESA III E1-5 (TS6, bible/03-World/Town-Shapes.md section 8): WHETHER A CORNER (0..128 a side) IS A TOWN'S - a
+ * AUDIT TESA III E1-5 (TS6): WHETHER A CORNER (0..128 a side) IS A TOWN'S - a
  * corner of any tile of its clearing (natureCleared: within NATURE_CLEARANCE of its outline), so a trail stops where its
  * trees stop, round the town's own ground, and never wears a tile of the clearing; a rect without an outline (a capital,
  * a World of Daggerfall site) its own bounds, corners inclusive, as before. The rect's square had cut a trail short among

@@ -65,7 +65,7 @@ export const TREE_RECORDS = Object.freeze({
 export const isTreeRecord = (baseArchive, record) => !!TREE_RECORDS[baseArchive]?.includes(record);
 
 const outlineDistances = new WeakMap();
-/** TS6 (bible/03-World/Town-Shapes.md): how far each of a pixel's tiles lies from a town's outline (a rect's `shape`,
+/** TS6: how far each of a pixel's tiles lies from a town's outline (a rect's `shape`,
  *  terrainTiles.js locationShapeField's), in tiles - 0 on it; once a shape. */
 export function outlineDistance(shape) {
   let d = outlineDistances.get(shape);
@@ -85,7 +85,7 @@ export function natureCleared(rect, x, y) {
 }
 
 /**
- * PROF1 (bible/06-Systems/Professions-Arc.md 22): WHERE DFU'S OWN NATURE WOULD STAND, asked of ONE tile - the rules
+ * PROF1 (22): WHERE DFU'S OWN NATURE WOULD STAND, asked of ONE tile - the rules
  * layoutNature below applies, without its dice: not steeper than MAX_STEEPNESS, not on water under the beach line, on a
  * tile nature grows on (dirt, grass or stone), and never inside the location's rect widened by the nature clearance - TS6:
  * a town's clearing round its outline (natureCleared) - (always tested here - an herb patch never stands in a town, where
@@ -226,8 +226,7 @@ const landsBorder = (lands) => !!lands?.blend && !!lands.nine && lands.nine.some
 const forestsFor = (forests, archive, climateType) => !!forests && climateType !== CLIMATE_TYPE_DESERT && !!TREE_RECORDS[archive];
 
 /**
- * ECOTONE1 (2026-10-07, Mac: "Making it where bione transitions are insta t and instead fade and transition naturally
- * into each other"): THE BORDER'S TILES. Each tile within reach of an edge whose neighbour's nature differs is owned by
+ * ECOTONE1: THE BORDER'S TILES. Each tile within reach of an edge whose neighbour's nature differs is owned by
  * the climate the ecotone gives its middle (world/ecotone.js ecotoneOwner - the same border the ground draws); a tile
  * the pixel's own climate owns keeps the pixel's own layout, untouched (DFU's sequential scatter still walks every
  * tile, so its stream - and so every flat it stands - is DFU's), and a tile a neighbour's owns is laid by that
@@ -447,11 +446,7 @@ function dfuScatter(heightmapData, tilemapData, opts) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FOREST1 (2026-10-01, the Discord's "Real Forests" thread: "Currently
-// trees are just even spaced around the whole map in temperate areas. It
-// would be more interesting and realistic if the trees crowded closer
-// together into forests, which could hide interesting pois inside.
-// Outside of forests would be rolling plains.") - REAL FORESTS, the
+// FOREST1 - REAL FORESTS, the
 // port's own departure from DefaultTerrainNature, behind the Features
 // row `realForests` (systems/features.js) and nowhere else.
 //
@@ -687,7 +682,7 @@ function forestTiles(heightmapData, tilemapData, opts) {
   };
 }
 
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The growth"): A ZONE'S OWN FLATS - LANDS' `flora` laid by FOREST1's law
+// TESA-LANDS (, "The growth"): A ZONE'S OWN FLATS - LANDS' `flora` laid by FOREST1's law
 // (DFU's tests on the tile, the woods' field, the places' pull, each tile's own dice) with the zone's numbers: its woods'
 // edge at the field's (1 - woods) quantile, a wood's tile one of its `trees` and a plain's one of its `cover` (any
 // climate's, each flat carrying its archive - ECOTONE1's seam), its rates and its ground's shares. Compiled once a recipe.

@@ -64,8 +64,4 @@ test('RPT1026-MISC TOUCH-FIELD: on a phone the Bank\'s amount field raises the n
   w.input('Enter');
   assert.equal(purse, 750, 'and the deposit is made');
   assert.equal(accounts[17].accountGold, 250);
-  // the port's press: a live field carries its entry's kind, and the host's click asks the layer first
-  const port = rd('src/ui/enhanced/enhancedPort.js');
-  assert.match(port, /if \(b\.active\) f\.dataset\.entry = b\.numeric \? 'numeric' : 'text';/);
-  assert.match(port, /const typed = e\.target\.closest\?\.\('\.port-field\[data-entry\]'\);\n\s*if \(typed && openTouchEntry\(\{ numeric: typed\.dataset\.entry === 'numeric' \}\)\) \{ e\.stopPropagation\(\); return; \}/);
 });

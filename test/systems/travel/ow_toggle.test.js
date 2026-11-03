@@ -1,5 +1,4 @@
-// OW-TOGGLE (2026-09-28, Mac: "bring back the original travel option as a toggle. Off by default." - "Travel Options
-// was changed. The normal first person travel accelerated was removed in favor of the overworld travel") - FIRST-PERSON
+// OW-TOGGLE - FIRST-PERSON
 // TRAVEL, A SWITCH. OW-ONLY made every walked trip on the enhanced interface the Overworld's; the port's own key on
 // Travel Options' pane (`GeneralOptions.FirstPersonTravel`, OFF) gives the first-person journey back. On, a pick on the
 // map begins Travel Options' own journey on the ground, the map's Resume is the mod's, the view does not rise with a
@@ -29,7 +28,7 @@ test('OW-TOGGLE THE SWITCH: the port\'s own key on Travel Options\' pane - OFF b
   assert.ok(def, 'declared');
   assert.equal(def.default, false, 'OFF - the Overworld\'s journeys stay the default (Mac: "Off by default")');
   assert.equal(typeof def.default, 'boolean', 'a toggle');
-  // PLAIN-TEXT (2026-10-19): the words a player reads, exactly - "Takes effect at once" kept (AUDIT OW5 T1: read live - the
+  // PLAIN-TEXT: the words a player reads, exactly - "Takes effect at once" kept (AUDIT OW5 T1: read live - the
   // tile's "when the world next loads" is the mod's other keys'); the note that the switch is the port's own is gone
   assert.equal(def.description, 'Makes time accelerated journeys in first person, on the ground. Off, the enhanced interface makes them in the Overworld view. Takes effect at once.');
   const shipped = JSON.parse(read('vendor/travel-options/modsettings.json'));
@@ -83,7 +82,6 @@ function rig({ firstPerson = false, enhanced = true } = {}) {
     areEnemiesNearby: () => false, exteriorFoePool: () => [], wildSeen: (foes) => foes,   // OW-RISE: the raise counts the foes the view's danger does
   };
   const names = Object.keys(env);
-  // PIN MOVED (TO-ROADS): the map's fork asks tvRoutesJourneys (First-Person Travel's roads key, off in this store) -
   // mounted beside the owner it grows from (test/systems/travel/fb0929d_toroads.test.js runs the roads key both ways)
   const body = [fnSource('tvOwnsJourneys'), fnSource('tvRoutesJourneys'), fnSource('tvMapForcesRoads'), fnSource('travelViewResume'), fnSource('beginAcceleratedTravel'), fnSource('tvJourneyUp'),
     `const onLower = ${onLowerSource()};`,

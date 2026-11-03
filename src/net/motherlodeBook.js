@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2b (2026-10-03, Mac: "plus we need to build motherloads") - THE
-// MOTHERLODES ON THIS DEVICE (bible/06-Systems/Professions-Arc.md 6, 38;
+// PROF2b - THE
+// MOTHERLODES ON THIS DEVICE (6, 38;
 // the law is net/motherlodeLaw.js, the service's half
 // server-account/src/motherlodes.js):
 //

@@ -34,17 +34,14 @@ function hostPorts({ flagged = new Set(), dict, names, here, ether = null, arena
   };
   const travelLocationSummaryAt = (d, x, y) => d.get(y * 1000 + x) ?? null;
   // eslint-disable-next-line no-new-func
-  // SEAT2b part two (PIN MOVED): the port test asks hasPortFor - HasPort, or a members' Harbour at a seat (none set here)
-  // PIN MOVED (ETHER-PORTS): past the Veil the port test asks the isle's port (world.js etherPortAt) - with the Eltheric Ocean
+  // SEAT2b part two (
   // off (`etherSea` false: every host but the enhanced and online ones) it never asks; `ether` here is its box's west edge
   // and its ports' pixels
-  // PIN MOVED (TESA6, test/tesa6_ports.test.js): past the Bay the port test asks Arena's ports (world.js arenaPortAt) and
   // the nearest-port finder their list (arenaPorts) - `arena` here: [{ name, bx, by }]
-  // PIN MOVED (WW3, bible/03-World/World-Wide.md): past the Bay the port test asks the world's ports too (worldPorts.js - the
   // registry's, `beyond` here: its provider's port towns, the open sea all about them), and the nearest port is the Bay's
-  // lanes' list's (worldLanes.js bayLanePorts) or one past the Bay. PIN MOVED (AUDIT WW F10, F13): the Bay's ports the
+  // lanes' list's (worldLanes.js bayLanePorts) or one past the Bay.
   // lanes' book's (worldLanes.bayPorts - its list, read once), the compass's words worldPorts.js's. WORLD-WIDE folded into
-  // TESA (#1184): Arena's ports answer first past the Bay, the registry's after. PIN MOVED (AUDIT TESA II P7/P5): TESA's
+  // TESA (#1184): Arena's ports answer first past the Bay, the registry's after.
   // places are the registry's (world/pastBayRows.js) - `arena` here is registered as their rows are, and the port test
   // and the nearest port past the Bay are WW3's over them alone
   const places = createWorldPlaces();
@@ -92,7 +89,7 @@ test('DEED-PORT: the nearest harbour by name and the way to it - map y runs sout
   const p = ids[2];
   assert.deepEqual([at(p, 0, 1).way, at(p, 0, -1).way, at(p, -1, 0).way, at(p, 1, 0).way, at(p, 1, 1).way, at(p, -1, -1).way],
     ['north', 'south', 'east', 'west', 'north-west', 'south-east']);
-  // TESA6: past the Bay the nearest of Arena's ports, the Bay's where it has none. PIN MOVED (AUDIT TESA II P5): the nearest
+  // TESA6: past the Bay the nearest of Arena's ports, the Bay's where it has none.
   // of both by the crow's flight - just past the Bay's edge a Bay port beside it is named, never a port past the Bay a
   // world away (TESA6 named Arena's alone past the Bay)
   const arena = [{ name: 'Solitude', bx: 300, by: -50 }, { name: 'Dawnstar', bx: 600, by: -80 }];
@@ -107,7 +104,6 @@ test('DEED-PORT: the nearest harbour by name and the way to it - map y runs sout
   const beyond = [{ mapId: 9001, name: 'Far Haven', px: -40, py: 120, type: LOCATION_TYPES.TownCity, port: true }];
   const far = hostPorts({ dict, names, here: { x: -40, y: 125 }, beyond }).csaNearestPort();
   assert.deepEqual(far, { name: 'Far Haven', way: 'north' });
-  // PIN MOVED (AUDIT HOLDINGS, the mutants' run): the Fleet host's deps carry the same call (HOLDINGS - Send away names
   // the port), so the pin reads Come Sail Away's own line by its note - either alone no longer stood for both
   assert.match(W, /\n\s*nearestPort: \(\) => csaNearestPort\(\),   \/\/ DEED-PORT: the refusal names where to go\n/, 'Come Sail Away\'s deps carry it');
 });

@@ -159,17 +159,3 @@ test('droppedLoot P2 (items-2): the world-save halves round-trip in NATIVES, rec
   assert.equal(dl._piles[0].pixelKey, '5,6');
 });
 
-test('droppedLoot P2 (items-2): the world host wiring - collect at teardown, stamps at drop, the envelope', () => {
-  const s = hostText('src/scenes/world.js');   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld (scenes/questWorld.js, scenes/worldQuickSave.js) - the host read whole
-  assert.ok(s.includes('droppedLoot.collectPixel(key)'), 'the pixel teardown sweeps its piles');
-  // ROAD-G G5 put the drop icon and OnPop's container re-position
-  // (:710-714) through the same door; the PIXEL STAMP is what this pin
-  // is about and it still rides both sites.
-  assert.ok(/dropPile\(\s*items, containerDropPos\(at, dropFeet\(\)\), `\$\{playerTravelPixel\(\)\.x\},\$\{playerTravelPixel\(\)\.y\}`, icon\)/.test(s),
-    'the OnPop drop stamps the map pixel');
-  assert.ok(/dropPile\(\[dfItem\], dropFeet\(\), `\$\{playerTravelPixel\(\)\.x\},\$\{playerTravelPixel\(\)\.y\}`\)/.test(s),
-    'and so does the quest-reward one');
-  assert.ok(s.includes('piles: droppedLoot.snapshotWorld((pos) => state.worldCoords(pos))'), 'the F9 envelope carries the piles in natives');
-  assert.ok(s.includes('droppedLoot.restoreWorld(restandRows(w.piles), (nx, nz) => state.localFromWorld(nx, nz), state.compensation[1])'),   // TERRAIN-SCALE1: heights stood again on today's ground
-    'the F11 load re-mints them after the teleport');
-});

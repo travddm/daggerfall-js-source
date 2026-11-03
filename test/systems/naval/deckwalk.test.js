@@ -1,6 +1,4 @@
-// DECK-WALK and SHIPMATES (2026-09-29, Mac: "Boarding scenarios should be seamless ... There's an issue where
-// enemies/allys can navigate on the railing of ships" and "Ally crew member's should have green health bars above their
-// head, and not be able to engage in friendly fire"):
+// DECK-WALK and SHIPMATES:
 //
 //   DECK-WALK  - a ship's walkable deck read off her own colliders (systems/naval/navalDeck.js): her main deck's floors
 //                with headroom, no wall through them, off every edge, her open piece alone - the rail's ramp, a mast, a
@@ -218,13 +216,11 @@ const standing = (hull) => { const b = new Boat(hull, 0); spawnBoat(b, ctxFor({ 
 
 test('DECK-WALK THE REAL HULLS: the Small Ship\'s main deck at 6.20 m, the Large Galley\'s at 10.25, the Carrack\'s at 7.81 (PIN MOVED, SHIPS-2: Mac\'s carrack - the mod\'s stood at 3.64) - each cell a floor her own colliders stand under a head\'s height clear (a ray down from DECK_HEADROOM over it meets her deck and nothing first), none on a rail; her open deck alone (the Small Ship\'s great cabin under her castle aft of 10.3 m and the Carrack\'s rooms under her half deck no deck - PIN MOVED, GALLEON 2026-10-01: the Small Ship is the new galleon, her castle\'s roof up its flights her deck as the Carrack\'s forecastle up its stair is hers); sixteen spots all on it, where the box\'s blind rays stood one on the Galleon\'s outer bow (mutants: the frame unread, the pieces kept, the headroom unread)', async () => {
   const p = await pool();
-  // PIN MOVED (AUDIT GALLEON D7, 2026-10-02): her hatchways no deck (a part that opens is no floor of hers) - the
   // galleon's main deck 654 of her 828 cells (79%: her hatchways' 82 out of it), her castle and flights the 174 they
-  // were (21%); the Carrack's 400 of 433 (her cargo hatch out), her forecastle's 33 (8%). PIN MOVED (AUDIT GALLEON
+  // were (21%); the Carrack's 400 of 433 (her cargo hatch out), her forecastle's 33 (8%).
   // D-wall, 2026-10-02): a wall marks a cell with its own height there - the galleon's main deck 664 of 838 (her entry
   // ports and her bow to her side, 10 more), her castle and flights the 174 they were; the Carrack's 465 of 511 (the
   // ground under her half deck's stairs and the room under her forecastle), her forecastle 39 and her stair 7 (9%)
-  // PIN MOVED (SHIPS-2, 2026-10-07): hull 4 is Mac's carrack - her main deck at 7.81 her whole open deck (1087 cells,
   // one level: her houses, her masts' partners and her helm out of it), no raised deck a walk reaches
   for (const [hull, level, aftOf, raised, share] of [[2, 6.2, -10.3, 0.208, 0.792], [3, 10.25, null, 0, 0.8], [4, 7.81, null, 0, 0.99]]) {
     const d = p.deckOf(hull, 0);
@@ -242,14 +238,13 @@ test('DECK-WALK THE REAL HULLS: the Small Ship\'s main deck at 6.20 m, the Large
       const hit = raycastColliders(b.GameObject, [c[0], c[1] + DECK_HEADROOM - 0.05, c[2]], [0, -1, 0], DECK_HEADROOM + 1, { triggers: false, geometry });
       assert.ok(hit && Math.abs(hit.point[1] - c[1]) < 0.12, `hull ${hull} at (${c[0]}, ${c[2]}): her floor under a head's height clear (${hit?.point[1]} for ${c[1]})`);
     }
-    // PIN MOVED (AUDIT NAV2 F34): her forecastle, 2.49 m up her stair, is her deck now - a spot never under her main deck
     // (her hold, her lower deck), and a floor of hers where it stands (GALLEON: the new galleon's castle 4.8 m up)
     for (const s of d.spots(16)) assert.ok(d.walkable(s[0], s[2]) && s[1] > level - DECK_STEP && Math.abs(d.heightAt(s[0], s[2]) - s[1]) < 1e-6, `hull ${hull}: a spot on her deck ${s}`);
     // GALLEON: her hands' and her musters' spots her main deck's alone
     for (const s of d.spots(16, mainLevel(d))) assert.ok(Math.abs(s[1] - mainLevel(d)) <= DECK_STEP, `hull ${hull}: a spot on her main deck ${s}`);
   }
   // HER MESH NODE'S FRAME: her deck's heights are her node's, a ray in the world (her root at the origin) meeting it as
-  // high over the root as her node stands (PIN MOVED, SHIPS-2: hull 1 is Mac's Tiny Ship, her node at her root, where
+  // high over the root as her node stands (
   // the mod's Large Boat's stood 0.1 m up it)
   const boat = p.deckOf(1, 0), lb = standing(1), up = lb.MeshObject.worldMatrix()[13];
   assert.ok(Math.abs(up) < 1e-6, 'her node at her root');
@@ -258,7 +253,6 @@ test('DECK-WALK THE REAL HULLS: the Small Ship\'s main deck at 6.20 m, the Large
     assert.ok(hit && Math.abs(hit.point[1] - (c[1] + up)) < 0.02, `her deck in her node's frame (${hit?.point[1]} for ${c[1]})`);
   }
   // the Carrack's rail at 5 m forward: its top 4.67 m at 6.5 m out, over her deck at 3.64
-  // PIN MOVED (SHIPS-2, 2026-10-07): the Carrack is Mac's carrack - her rail 6 m out abaft her middle house (z -11), her
   // waist inside it, her middle house (over her aft hatchway) no deck
   const carrack = p.deckOf(4, 0);
   assert.equal(carrack.walkable(6.2, -11), false, 'her rail');
@@ -464,10 +458,9 @@ test('SHIPMATES THE CREW\'S BARS: a green bar a crewman - the party\'s one green
   destroyNavalHud();
   // the world's side
   assert.match(WORLD, /navalTags\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewBars\(proj, view, mwv\.eye\);/);
-  assert.match(WORLD, /for \(const f of _mode\(\) === 'exterior' \? exteriorFoes\.foes : _insidePool\(\)\) \{[^\n]*\n\s+const feet = f\.ai\?\.feet;\n\s+if \(!isShipmate\(f\) \|\| !feet \|\| !f\.entity\) continue;/);   // PIN MOVED (CREW-COMPANIONS): indoors and underground, my companions' bars
+  assert.match(WORLD, /for \(const f of _mode\(\) === 'exterior' \? exteriorFoes\.foes : _insidePool\(\)\) \{[^\n]*\n\s+const feet = f\.ai\?\.feet;\n\s+if \(!isShipmate\(f\) \|\| !feet \|\| !f\.entity\) continue;/);
   assert.match(WORLD, /if \(crewSight\.blocked\(player\.collider, eye, key, head\)\) continue;/);
   assert.match(WORLD, /const crewSight = createSightCache\(\);/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S1): the clear lowers the glass after them
   assert.match(WORLD, /drawNavalHud\(null\); drawNavalTags\(\[\]\); drawCrewBars\(\[\]\); drawCrewLines\(\[\]\); lowerGlass\(\); \};/);
 });
 

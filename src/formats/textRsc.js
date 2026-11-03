@@ -153,7 +153,7 @@ function variantRanges(raw) {
   return ranges;
 }
 
-// ─── L10N3a (2026-09-27): A TRANSLATION'S ROW, AS DFU READS IT ─────────────────────────────────────────────────────
+// ─── L10N3a: A TRANSLATION'S ROW, AS DFU READS IT ─────────────────────────────────────────────────────
 // TextProvider.GetRSCTokens (TextProvider.cs:167-188) asks the string table `Internal_RSC` (RuntimeRSCStrings) for the
 // record's id before it opens TEXT.RSC, and a translation pack patches its rows over that table (StringTablePatcher).
 // A row there is TEXT in the importer's markup, not bytes: its letters are any script's, and 'ü' is 0xFC - JustifyLeft's

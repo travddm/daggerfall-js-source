@@ -233,7 +233,7 @@ function createFileStorage(root, { scanTtlMs = 2000, readTtlMs = 1000 } = {}) {
   // the remains waypoint, the claims and the weapon's glyphs each read
   // their key a frame too. Over files every one of those was a
   // readFileSync - 19% of the main thread in a town on the live client
-  // (2026-10-11). A pref or slot file's text is kept here as last read
+  // . A pref or slot file's text is kept here as last read
   // or written, and read from disk again after readTtlMs - so a file
   // edited or copied in by hand is seen within it, and at once by the
   // next enumeration sweep, whose rescan empties this. The screenshot

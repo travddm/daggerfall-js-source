@@ -1,4 +1,4 @@
-// FOES-HOLD (2026-10-21, bible/11-Multiplayer/Scale-Arc.md FOES-HOLD): A ROOM'S FIRST FRAMES WAIT THEIR TURN.
+// FOES-HOLD: A ROOM'S FIRST FRAMES WAIT THEIR TURN.
 //
 // FOES-FIRST put the full frames first on a room's foes budget, and where they alone are more than the budget (a
 // Starfall's crowd: 40 owners of 80 sockets ask 2.4 times it in full frames) it left them first-come and blind to

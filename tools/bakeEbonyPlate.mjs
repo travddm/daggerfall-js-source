@@ -3,10 +3,8 @@
 //     node tools/bakeEbonyPlate.mjs
 //         re-make the shipped NIFs and DDSs from the committed source, its seven paintings and retail's skeleton
 //
-// MW-EBONY1 (2026-10-09, Mac: "This is next 1. The ebony armor set and its textures", with ebony_armor.fbx and seven
-// paintings; asked, Ebony only - Daggerfall's seven classic pieces in Ebony wear it, Mithril and Adamantium keep the
-// Morrowind ebony they wore). The fourth of the port's own Morrowind models and the second SET, made the way the steel
-// plate is made since MW-STEEL4 (tools/bakeSteelPlate.mjs, bible/04-Characters/Steel-Plate.md): each piece read out of
+// MW-EBONY1. The fourth of the port's own Morrowind models and the second SET, made the way the steel
+// plate is made since MW-STEEL4 (tools/bakeSteelPlate.mjs): each piece read out of
 // Mac's scene by its own object and held to the box it was read at, skinned AT BAKE TIME to Morrowind's own Bip01 bones
 // in the pose retail's skins are bound in, and written as a retail piece is - and its machinery is the steel plate's,
 // imported, not copied: the bind (plateBind, the scene stood on it by SCENE_FROM_BIND), the rigs (PLATE_RIG) and the
@@ -25,7 +23,7 @@
 //   THE PAINTINGS, MATCHED BY THEIR ISLANDS. The seven came as attachments with no names; each is the one whose edges
 //   the piece's own UV islands trace (the mean image gradient along each island's border, every piece against every
 //   painting - the breastplate the 512 one, the helm the one with the star, the gauntlets the one with the fingers),
-//   and the set was drawn whole in them and looked at (bible/04-Characters/Ebony-Plate.md).
+//   and the set was drawn whole in them and looked at.
 //
 //   THE BREASTPLATE REACHES THE THIGHS. Its tassets hang to z 62 over the greaves, so below the waist it HANGS OVER its
 //   joints (tools/skinWeights.mjs, a hang's mode 'over'): the spine above, the thighs taking up to 0.7 toward the hem as

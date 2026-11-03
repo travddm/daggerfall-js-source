@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAR-FIELD (2026-10-26, bible/06-Systems/Travel-View.md MID-RING and FAR-FIELD): A FAR CELL'S CLIMATE, READ ON THE
+// FAR-FIELD: A FAR CELL'S CLIMATE, READ ON THE
 // TERRAIN WORKER where the worker reads it as the main thread's reader does - past the Bay, the continent's
 // (world/tamriel/tamrielGround.js groundClimateIndex: its trace installed on the worker by 'tamriel'), outside the
 // Eltheric Ocean's box (whose law the main thread holds: scenes/world.js etherClimateIndex). Everywhere else

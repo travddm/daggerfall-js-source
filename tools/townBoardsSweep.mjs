@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// TOWN-BOARDS (the owner's field report, 2026-10-27, item 3: "Random wooden board placement in smaller towns on the
-// ground"; bible/03-World/Urban-Fabric.md section 9) - THE BOARDS SWEPT: the world's small towns on the player's own data,
+// TOWN-BOARDS () - THE BOARDS SWEPT: the world's small towns on the player's own data,
 // on the Bay and past it. The law test/world/urban/townboards.test.js holds on a sample of the same.
 //
 //   ARENA2_PATH=<the player's arena2> node tools/townBoardsSweep.mjs [--every N] [--land M] [--kinds village,town,city-state]

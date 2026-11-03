@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SD9b (2026-10-07, the Super Dungeons arc) — THE HOURS BROKEN, AS THE SERVICE KEEPS THEM.
+// SD9b — THE HOURS BROKEN, AS THE SERVICE KEEPS THEM.
 //
-// Mac: "Super dungeons are random finds on the world map ... The Super dungeon collapses when the feat is done." The
+// The
 // relay runs the Brass Remnant's fight in the Hollow's realm and, at its fall, signs a receipt for each account that
 // earned it (src/net/superDungeon/sdReceipt.js - `h1`, under the relay's GATE_SIGNING_KEY). This file is where that receipt is
 // honoured: the gate's claim (accounts.js claimGate) rung for rung - and the Hour's two grants rolled on its first write.
-// Design: bible/11-Multiplayer/Super-Dungeons.md section 11.
+// Design:
 //
 // ═══ ONCE, WHATEVER HAPPENS TO IT ══════════════════════════════════
 //
@@ -30,7 +30,7 @@
 import { verifySdReceipt } from '../../src/net/superDungeon/sdReceipt.js';
 import { seededRng } from '../../src/systems/wind/wind.js';
 
-/** The account's grants on its row (`players.sd_honours`, migration 0088), bit by bit. */
+/** The account's grants on its row (`players.sd_honours`), bit by bit. */
 export const SD_HONOUR_TITLE = 1;
 export const SD_HONOUR_AURA = 2;
 /** How often a kill's first write grants each: Hourbreaker one in four, The Turning Hour one in eight. */

@@ -1,7 +1,5 @@
 // @ts-check
-// GATE-ROADS (2026-10-28, the owner: "With cities, roads still do not like up properly with gates and pathways in the
-// town. Gates can lead to a bunch of buildings and it just doesnt make any sense"; bible/03-World/Town-Shapes.md
-// GATE-ROADS, a departure: Port-Ledger A). The road painter brings each road to a walled town's ground and rings it
+// GATE-ROADS. The road painter brings each road to a walled town's ground and rings it
 // (roadPainter.js, Basic Roads' to the byte); the town's gates stand on its wall, its ground between - so no road reached
 // a gate. Each gate's road is laid here, the terrain kernel's, after the painter: from the town's nearest street inside,
 // through the gate, out to the nearest painted road - round every house, never over water or the wall. Pure and the

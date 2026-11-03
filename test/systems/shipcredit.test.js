@@ -1,5 +1,4 @@
-// SHIP-CREDIT WITHDRAWN (2026-10-08, Mac: "Remove ship buying loan from the bank"; bible/03-World/Naval-Combat.md
-// SHIP-CREDIT). It stood from 2026-10-01: a boat the purse fell short of was offered at a shop's counter on the bank's
+// SHIP-CREDIT WITHDRAWN. It stood from 2026-10-01: a boat the purse fell short of was offered at a shop's counter on the bank's
 // credit, the purse a fifth and the shop region's bank the rest. Withdrawn whole: no counter offers it in either trade
 // skin, the host hands the windows no credit hook and its commit pays the whole price from the purse, and the laws that
 // priced it (banking.js creditDecision/takeCredit, tradeModes.js's lot and box rows) are gone. A ship bought on credit

@@ -1,4 +1,4 @@
-// PARTY-LOOT (bible/06-Systems/Online-Arc.md PARTY-LOOT): THE DUNGEON'S ROOM-LOOT SEAMS WITH NO ROOM. A harness that
+// PARTY-LOOT (PARTY-LOOT): THE DUNGEON'S ROOM-LOOT SEAMS WITH NO ROOM. A harness that
 // mounts the dungeon host's foe doors (buildFoeAt, spawnCorpse, setFoeDead, stand, the kill, the stream's death, the
 // restore) out of src/scenes/dungeonContext.js reaches the PARTY-LOOT block's names from them; spread this into its
 // state and they answer as an offline dungeon's do - no room, no room container, nothing born or forgotten, the build's

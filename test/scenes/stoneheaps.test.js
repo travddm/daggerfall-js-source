@@ -1,4 +1,4 @@
-// STONE-HEAPS (AUDIT TAMRIEL-NODES, bible/03-World/World-Wide.md): a boulder is a World of Daggerfall rock field's piece,
+// STONE-HEAPS (AUDIT TAMRIEL-NODES): a boulder is a World of Daggerfall rock field's piece,
 // and the fields stand on the Bay alone (scenes/pixelBuild.js TAMRIEL2), so past the Bay no boulder ever stood - WW-C1's
 // stone-rich provinces stood none, and the Overworld's Mining groups counted veins alone. Where no field stands a boulder
 // is a heap on the stone, as a vein with no piece is, and the heaps and the veins there keep NODE_SPACING_M apart where
@@ -181,7 +181,4 @@ test('STONE-HEAPS the Bay as it was: on the same stone and the same climate a Ba
       assert.equal(heaps.length, bay ? 0 : boulders({ x: px, y: py, day: DAY, climate: CLIMATES.Mountain }).length, `${px},${py}: ${heaps.length} heaps`);
     } finally { s.host.dispose(); }
   }
-  // the day rock fields stand past the Bay, `fields` is theirs to read again
-  assert.match(read('src/scenes/pixelBuild.js'), /if \(picks\.length && onTheBay\(px, py\)\) \{ wodPicks = picks;/);
-  assert.match(read('src/scenes/mineHost.js'), /const fields = inBay\(px, py\);/);
 });

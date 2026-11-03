@@ -1,7 +1,4 @@
-// Mobile touch layer (2026-08-13, Mac-directed mobile test build;
-// TI1 2026-09-05, Mac: "swipe based combat... touch based to
-// interact... touch to lock on to enemy... a button to bring up the
-// radial UI... remove all the unneeded buttons from mobile").
+// Mobile touch layer.
 // One module, zero engine changes in the 1:1 lane: it SPEAKS THE
 // DESKTOP INPUT LANGUAGE instead of adding a second input system.
 //
@@ -54,9 +51,7 @@
 //
 // Activates only when the device reports touch; desktop is untouched.
 //
-// TI2 - THE PHONE IN HAND, TUNED (2026-09-11, Mac: "enhance the mobile
-// element... camera movement, character movement and a more phone
-// built feel where it doesnt seem so non-native"). The same layer, the
+// TI2 - THE PHONE IN HAND, TUNED. The same layer, the
 // same seams, six things done the way a phone game does them - every
 // knob on the port's own prefs shelf (systems/uiPrefs.js, the touch*
 // keys; the Enhanced pane's Touch card sets them):
@@ -98,31 +93,6 @@ const NAV_POLL_MS = 150;        // the classic-overlay nav row's watch
 const FIXED_STICK_REACH = 2.5;  // TI2: a fixed stick answers a finger within this many radii of its centre
 const FIXED_STICK_INSET = 36;   // TI2: the fixed stick's edge distance from the canvas's bottom-left, px, before the safe area
 const GYRO_MAX_DT = 0.1;        // TI2: a motion sample older than this (a backgrounded tab) is not integrated
-
-// EG-ZH (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 27.8 - TOUCH AND THE
-// PAD): IN THE SPIRE the right half is look and Jump a held button in its corner, so a jump with a camera correction needed
-// two right thumbs, and the stick sprinted only past RUN_THROW. Inside an Elite Breach alone (the breach client's word,
-// `setTouchSpire` - scenes/eliteGates/egClient.js; null everywhere else, and the layer is TI2's exactly):
-//   - a JUMP press that keeps sliding becomes look (past TAP_PX, the drag's own law and gain);
-//   - an UPWARD FLICK on the look half - EG_FLICK_PX or more up within EG_FLICK_MS - jumps too (the look it made stands);
-//   - ON SPANS (the Spire's traversal ground) the stick runs at full throw: Run at any throw past the dead zone, and the
-//     analog reading at its whole length.
-/** The flick: at least this far up (px), within this long (ms) of the finger's landing. */
-export const EG_FLICK_PX = 40;
-export const EG_FLICK_MS = 150;
-/** Is a look finger that landed at (`y0`, `t0`) and stands at (`y`, `t`) an upward flick? Pure. */
-export const egTouchFlick = (y0, t0, y, t) => y0 - y >= EG_FLICK_PX && t - t0 <= EG_FLICK_MS;
-/** The analog stick's reading at full throw - its direction kept, its length 1 (none stays none). Pure. */
-export function egFullThrow(a) {
-  const m = Math.hypot(a.x, a.y);
-  return m > 1e-9 ? { x: a.x / m, y: a.y / m } : { x: 0, y: 0 };
-}
-/** @type {() => ({ span?: boolean } | null)} */
-let _touchSpire = () => null;
-/** The breach client's word: `{ span }` while the player stands in an Elite Breach (`span` - on its traversal ground), null
- *  everywhere else. */
-export function setTouchSpire(fn) { _touchSpire = typeof fn === 'function' ? fn : () => null; }
-const touchSpire = () => { try { return _touchSpire() ?? null; } catch { return null; } };
 
 /**
  * RPT1026-MISC TOUCH-FIELD (a private report from a phone: the Bank's amount could not be typed, while the map's name field
@@ -188,16 +158,7 @@ const codesOf = (code) => (code == null ? [] : (getCombo(code) ?? [code]));
 /**
  * Attach the touch layer.
  * @param canvas the game canvas (drag surface)
- * @param hooks { look(dx,dy), attack?(dx,dy,held), tap?(x,y), locked?(), dial?, enhanced?, cycleMode?(), socialInteract?(), overlayActive?(), paused?(), stickRuns?(), aimHold?(), cardTable?(), cardHeld?() }
- *   - cardTable: CARDS-TOUCH (2026-10-09, bible/11-Multiplayer/Tavern-Cards.md section 31) - true while the player sits
- *     at a card table: the finger on the view is the table's (scenes/worldModes.js cardPointerListen reads the hand, the
- *     chips and the cloth), so the layer's look, swing and tap stand down - a tap was the activate press, and seated
- *     the press stands him up (folded out of turn, cashed out), from a tap on his own cards. The stick still walks him
- *     off the seat; the panel's Stand up stands him.
- *   - cardHeld: AUDIT CARDS-6 E1 - true while the card table's own listeners hold a press (the hand, the chips carried):
- *     the finger just put down is theirs (their pointerdown runs before this layer's touchstart), so it is never the
- *     stick, even on the stick's half - the hand reaches over the middle of a phone's screen, and a squeeze pulled down
- *     or a push up from its left edge walked him off the seat.
+ * @param hooks { look(dx,dy), attack?(dx,dy,held), tap?(x,y), locked?(), dial?, enhanced?, cycleMode?(), socialInteract?(), overlayActive?(), paused?(), stickRuns?(), aimHold?() }
  *   - stickRuns: AUDIT PRE-MERGE 0928 U3 - false stands the stick's 80%-throw Run down (the boat's helm); absent, it runs.
  *   - aimHold: NAV-H - true while the attack is a held aim (a helm with guns): the swipe presses it once and the
  *     finger's drag under it is a look - the guns are laid by the view; the lift fires them. Absent, the drag swings.
@@ -218,7 +179,7 @@ export function attachTouch(canvas, hooks = {}) {
 
   const ui = document.createElement('div');
   ui.id = 'touch-ui';
-  // FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our enhanced version"): under the enhanced skin the layer's
+  // FONT1: under the enhanced skin the layer's
   // buttons, entry field and nav are in the pixel face (ui/pixelifyFive.js PIXEL_FONT_CSS - one home); the classic skin
   // keeps the system face it always drew. The skin cannot change without a reload, so the boot-time hook is exact.
   const face = hooks.enhanced ? `${PIXEL_FONT_CSS}font-weight:500;font-size:15px;` : 'font:600 15px system-ui,-apple-system,"Segoe UI",sans-serif';
@@ -301,7 +262,7 @@ export function attachTouch(canvas, hooks = {}) {
   const held = new Set();      // codes currently synthesized DOWN
   const down = (code) => { if (!held.has(code)) { held.add(code); synth('keydown', code); } };
   const up = (code) => { if (held.has(code)) { held.delete(code); synth('keyup', code); } };
-  // ROAD-H H8 (2026-09-07): A MOMENTARY CONTROL NEVER LIFTS A KEY A
+  // ROAD-H H8: A MOMENTARY CONTROL NEVER LIFTS A KEY A
   // HELD CONTROL STILL OWNS. AUDIT 62 F8's review gave the two HELD
   // paths that invariant (`upCode(code, liveNeeds())` - "the held set
   // is the UNION of what the live controls want, and a release
@@ -378,8 +339,7 @@ export function attachTouch(canvas, hooks = {}) {
   // what the live controls want, and a release subtracts only its own.
   // The code is cleared BEFORE the lift so `liveNeeds()` does not count
   // the control that is letting go.
-  // TOUCH-BUTTONS (2026-09-27, Discord: "I haven't been able to remap the android "buttons" on the bottom right of the
-  // screen. I would much rather use a button to attack"): TI1's two - Jump and Ready Weapon (held-style, so the
+  // TOUCH-BUTTONS: TI1's two - Jump and Ready Weapon (held-style, so the
   // per-frame edge reads it) - are the first two of THREE SLOTS the player fills from ui/touch/touchButtons.js's table on
   // the Touch card, Attack among them. A HOLD slot is the action's key down while the finger is; a TAP slot one press
   // of it; the ATTACK slot a swing through the swipe's own seam (a readied spell fires first, as the swipe's press
@@ -406,7 +366,6 @@ export function attachTouch(canvas, hooks = {}) {
       const at = [edge('right', right), edge('bottom', 16), action.w ?? 60];
       if (action.kind === 'hold') {
         b = button(action.glyph, ...at, () => { slotHeld.set(b, downAction(action.id)); }, () => { const c = slotHeld.get(b) ?? null; slotHeld.delete(b); upCode(c, liveNeeds()); });
-        if (action.id === 'Jump') jumpSlides(b);   // EG-ZH: in the Spire a Jump press that keeps sliding becomes look
       } else if (action.kind === 'tap') {
         // AUDIT CAPTAIN'S SEA S2: a SHARE's action (the Spyglass on K beside the road's follow) by the host's own door -
         // its key is its partner's too, and a tapped K followed the road ashore
@@ -434,23 +393,6 @@ export function attachTouch(canvas, hooks = {}) {
     }
     if (modeBtn) placeRight(modeBtn, mode);
     if (socialBtn) placeRight(socialBtn, social);
-  }
-  // EG-ZH (section 27.8): THE JUMP PRESS THAT SLIDES INTO LOOK - in the Spire, the finger that pressed Jump and keeps
-  // moving past TAP_PX looks with what it moves, the drag's own gain and normalisation (the jump stays its press); out of
-  // the Spire the button is TI1's. The pause gate the look carries holds here too.
-  function jumpSlides(b) {
-    let at = null, travel = 0;
-    b.addEventListener('touchstart', (e) => { const t = e.changedTouches?.[0]; at = t ? [t.clientX, t.clientY] : null; travel = 0; }, { passive: false });
-    b.addEventListener('touchmove', (e) => {
-      e.preventDefault?.();
-      const t = e.changedTouches?.[0];
-      if (!t || !at || !touchSpire()) return;
-      const dx = t.clientX - at[0], dy = t.clientY - at[1];
-      at = [t.clientX, t.clientY];
-      travel += Math.hypot(dx, dy);
-      if (travel < TAP_PX || hooks.cardTable?.() || hooks.paused?.()) return;   // inside the tap radius still a press; never at the card table or under a window
-      hooks.look?.(dx * TOUCH_LOOK_GAIN * lookNorm(), dy * TOUCH_LOOK_GAIN * lookNorm());
-    }, { passive: false });
   }
   if (hooks.cycleMode) {
     // T3-touch: NextInteractionMode (Steal > Grab > Info > Talk wrap,
@@ -540,7 +482,7 @@ export function attachTouch(canvas, hooks = {}) {
     const now = e.timeStamp ?? performance.now();
     const dt = gyroT ? (now - gyroT) / 1000 : 0;
     gyroT = now;
-    if (!(dt > 0) || dt > GYRO_MAX_DT || hooks.paused?.() || hooks.cardTable?.()) return;   // CARDS-TOUCH: nor the gyro's turn of the seated head
+    if (!(dt > 0) || dt > GYRO_MAX_DT || hooks.paused?.()) return;
     const d = gyroLookDelta(e.rotationRate, globalThis.screen?.orientation?.type ?? 'landscape-primary', dt, lookScale(), getPref('touchGyroSensitivity'));
     if (d.dx || d.dy) hooks.look?.(d.dx, d.dy);
   };
@@ -564,7 +506,6 @@ export function attachTouch(canvas, hooks = {}) {
   let stickId = null, stickOrigin = null, stickStart = 0, stickTravel = 0;
   let stickX = 0, stickY = 0;   // TI2: the analog reading while engaged (x right +, y forward +)
   let lookId = null;
-  let flick = null;   // EG-ZH: the look finger's landing (`y`, `t`) while it may still be a flick, in the Spire
   const gesture = createGestureRecognizer({ locked: () => !!hooks.locked?.() });
   const local = (tch) => { const r = canvas.getBoundingClientRect(); return [tch.clientX - r.left, tch.clientY - r.top, r.width]; };
 
@@ -600,7 +541,7 @@ export function attachTouch(canvas, hooks = {}) {
     on('MoveBackwards', !dead && dy > 0 && Math.abs(dy) >= Math.abs(dx) * 0.414);
     on('MoveLeft', !dead && dx < 0 && Math.abs(dx) >= Math.abs(dy) * 0.414);
     on('MoveRight', !dead && dx > 0 && Math.abs(dx) >= Math.abs(dy) * 0.414);
-    on('Run', !dead && (mag >= RUN_THROW || !!touchSpire()?.span) && hooks.stickRuns?.() !== false);   // EG-ZH: on the Spire's spans, full throw at any push   // AUDIT PRE-MERGE 0928 U3: the host may stand the throw's Run down - Come Sail Away's helm reads Run + a side key as the strafe, so a full push would never turn the boat
+    on('Run', !dead && mag >= RUN_THROW && hooks.stickRuns?.() !== false);   // AUDIT PRE-MERGE 0928 U3: the host may stand the throw's Run down - Come Sail Away's helm reads Run + a side key as the strafe, so a full push would never turn the boat
   }
 
   // AUDIT 62 F7: THE PAUSE GATE THE MOUSE ARMS ALWAYS CARRIED. The
@@ -629,9 +570,7 @@ export function attachTouch(canvas, hooks = {}) {
   const lookNorm = () => lookNormalisation(canvas.getBoundingClientRect().height, getPref('touchLookSensitivity'));
   function route(events) {
     const paused = !!hooks.paused?.();
-    const table = !!hooks.cardTable?.();   // CARDS-TOUCH: the finger is the table's - a held swing let go, nothing else said
     for (const ev of events) {
-      if (table) { if (ev.type === 'swipe' && swiping) { swiping = false; hooks.attack?.(0, 0, false); } continue; }
       if (ev.type === 'look') {
         if (!paused) hooks.look?.(ev.dx * TOUCH_LOOK_GAIN * lookNorm(), ev.dy * TOUCH_LOOK_GAIN * lookNorm());   // dropped, never accumulated
       } else if (ev.type === 'swipe') {
@@ -665,15 +604,13 @@ export function attachTouch(canvas, hooks = {}) {
       const fixed = fixedStick();
       const fc = fixed ? fixedCentre() : null;
       const onStick = !fixed || Math.hypot(x - fc[0], y - fc[1]) <= STICK_RADIUS * FIXED_STICK_REACH;
-      // AUDIT CARDS-6 E1: a finger the card table took is the table's - never the stick, whichever half it landed on
-      if (x < w / 2 && stickId === null && onStick && !hooks.cardHeld?.()) {
+      if (x < w / 2 && stickId === null && onStick) {
         stickId = t.identifier;
         stickStart = e.timeStamp; stickTravel = 0; stickX = stickY = 0;
         stickOrigin = fixed ? fc : [x, y];
         placeStick(stickOrigin[0], stickOrigin[1]);
       } else if (lookId === null) {
         lookId = t.identifier;
-        flick = touchSpire() ? { y, t: e.timeStamp } : null;   // EG-ZH
         route(gesture.begin(x, y, e.timeStamp));
       }
     }
@@ -692,17 +629,9 @@ export function attachTouch(canvas, hooks = {}) {
         nub.style.transform = `translate(${dx}px,${dy}px)`;
         setStickKeys(dx / STICK_RADIUS, dy / STICK_RADIUS, mag);
         ({ x: stickX, y: stickY } = analogAxes(dx, dy, STICK_RADIUS));   // TI2: the throw, past the dead zone
-        if (touchSpire()?.span && (stickX || stickY)) ({ x: stickX, y: stickY } = egFullThrow({ x: stickX, y: stickY }));   // EG-ZH: on the Spire's spans, full throw
       } else if (t.identifier === lookId) {
         const [x, y] = local(t);
         route(gesture.move(x, y, e.timeStamp));
-        // EG-ZH (section 27.8): AN UPWARD FLICK JUMPS - once a finger, never under a window or at the card table; the Jump
-        // key held two frames so the host's frame reads it (AUDIT TOUCH-BUTTONS A1's lift)
-        if (flick && e.timeStamp - flick.t > EG_FLICK_MS) flick = null;
-        else if (flick && egTouchFlick(flick.y, flick.t, y, e.timeStamp)) {
-          flick = null;
-          if (!hooks.paused?.() && !hooks.cardTable?.()) { const c = downAction('Jump'); afterFrames(() => upCode(c, liveNeeds())); buzz(10); }
-        }
       }
     }
   }, { passive: false });
@@ -719,18 +648,16 @@ export function attachTouch(canvas, hooks = {}) {
         // key (the stick's dead zone) and it is how a foe left of centre
         // gets locked.
         if (e.type !== 'touchcancel' && stickTravel < TAP_PX && (e.timeStamp - stickStart) <= TAP_MS) {
-          // TS1 (2026-09-12, Mac: "walking into the exit door puts you
-          // outside without interaction"): LOCK-ONLY. This tap exists so
+          // TS1: LOCK-ONLY. This tap exists so
           // a foe left of centre can be locked; it went down the hosts'
           // whole activation ladder, so a thumb re-placed on the stick
           // beside a door, a chest or a townsperson opened it - the exit
           // door being the biggest target in any building. The hosts
           // stop after the lock pick when the flag rides the tap.
-          if (!hooks.cardTable?.()) hooks.tap?.(stickOrigin[0], stickOrigin[1], { lockOnly: true });   // CARDS-TOUCH: no lock pick from the seat
+          hooks.tap?.(stickOrigin[0], stickOrigin[1], { lockOnly: true });
         }
       } else if (t.identifier === lookId) {
         lookId = null;
-        flick = null;   // EG-ZH
         route(e.type === 'touchcancel' ? gesture.cancel() : gesture.end(e.timeStamp));
       }
     }

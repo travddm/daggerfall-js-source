@@ -1,10 +1,10 @@
-// ARENA1 (2026-10-02): THE ARENA OF DAGGERFALL STANDS IN THE CITY - the colosseum's block in Daggerfall's grid, the
+// ARENA1: THE ARENA OF DAGGERFALL STANDS IN THE CITY - the colosseum's block in Daggerfall's grid, the
 // city's building list stripped of what the old block drew, the gate's people, and the undercroft below.
 //
-// Mac, 2026-10-02: "This is to be a centerpoint that fits in the middle of Daggerfall city"; asked, the arena takes
+// asked, the arena takes
 // GEMSAL03, the city's centre-east block (cell 4,3 - the same block in Daggerfall's own layout and under Beautiful
 // Cities), "Move them to a new house" for a home that stood there, and Kamer's 32-block dungeon "becomes the arena's
-// undercroft". bible/11-Multiplayer/Arena.md "1. The building" is the design; this module is its law:
+// undercroft". "1. The building" is the design; this module is its law:
 //
 // - THE BLOCK. ARENADAG.RMB is the port's own (vendor/daggerfall-arena/Arena/ARENADAG.RMB.json, cut out of Kamer's
 //   DFARENA.RMB by tools/daggerfallArenaExtract.mjs): his 118 props, his 29 lights, the colosseum (864102), his
@@ -58,7 +58,7 @@ export const UNDERCROFT_MAP_ID = 211207;
 export const inArenaCell = (buildingKey) => buildingKey > 0 && (buildingKey >> 16) === ARENA_CELL[0] && ((buildingKey >> 8) & 0xff) === ARENA_CELL[1];
 /** Whether a location is Daggerfall city. */
 export const isArenaCity = (loc) => loc?.regionIndex === ARENA_REGION && loc?.locationIndex === ARENA_LOCATION;
-/** IC-GRAND (bible/11-Multiplayer/Arena.md "IC-GRAND"): whether a location stands the arena - Daggerfall city, or a place
+/** IC-GRAND ("IC-GRAND"): whether a location stands the arena - Daggerfall city, or a place
  *  whose grid lays the arena's block itself (the Imperial City's Arena District, world/imperialCity.js's ARENA cell):
  *  its 43600 stair the undercroft's door there too. */
 export const standsArena = (loc) => isArenaCity(loc) || !!loc?.exterior?.exteriorData?.blockNames?.includes(ARENA_BLOCK);
@@ -92,7 +92,7 @@ export function arenaGatePersonName(pn, names = ARENA_TEXT.gateNames) {
   return p ? names?.[p.role] ?? null : null;
 }
 
-// ARENA-FIX 3 (2026-10-02): THE PAVING AND THE PLAZAS. Kamer's ground is DFARENA's - a ZLNDFLAT re-saved, grass (record
+// ARENA-FIX 3: THE PAVING AND THE PLAZAS. Kamer's ground is DFARENA's - a ZLNDFLAT re-saved, grass (record
 // 2) round a patch of dirt - and in the city that read as the colosseum standing in a meadow: the gate passage and the
 // courtyard inside the walls were the terrain's own snow, and the four streets that meet the cell (the market's from
 // the north to the gate; ARMRAL02's from the west, CUSTAA02's from the east, LIBRAL03's from the south) ran into snow
@@ -302,7 +302,7 @@ export function installArena({ readBin = null, log = console } = {}) {
 /** Test seam. */
 export function _resetArena() { _installed = null; }
 
-// ARENA-MAP (2026-10-03, the owner, live: "Arena doesn't show on town map"): THE ARENA ON THE TOWN MAP. Both town maps
+// ARENA-MAP: THE ARENA ON THE TOWN MAP. Both town maps
 // draw a cell off its block's own 64 x 64 automap bytes (ui/exteriorAutomapWindow.js buildExteriorLayout; the enhanced
 // sheet's ui/ink/inkTown.js townBytes) and letter only the buildings of the location's list. Kamer's automap draws the
 // colosseum in byte 117 - BuildingTypes.Special1 + 1, "never displayed on automap" (world/buildingNames.js; the show-all

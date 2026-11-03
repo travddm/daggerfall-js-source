@@ -1,10 +1,9 @@
 // ═══════════════════════════════════════════════════════════════════
-// LAMP-KEEPER II (2026-10-14, Mac: "Reimplement an old bug that was previously removed. A chance of finding a vendor
-// NPC as a lamp model. Anybody that interacts with the lamp model should earn the 'I Love Lamp' title"): THE LAMP'S
+// LAMP-KEEPER II: THE LAMP'S
 // TITLE, KEPT ON THE ROW.
 //
 // A shop's keeper stands as a lamp now and then (src/systems/lampKeeper.js - the room's own pick, every client's), and
-// the account that speaks to one is granted I Love Lamp: `players.lamp_title` (migration 0113), laid once and held for
+// the account that speaks to one is granted I Love Lamp: `players.lamp_title`, laid once and held for
 // good, read off the row by titles.js titlesHeld as Hourbreaker is read off `sd_honours`. A guest - no handle - holds
 // no title (FOUNDER's law), so its word is answered `guest` and nothing is written.
 //

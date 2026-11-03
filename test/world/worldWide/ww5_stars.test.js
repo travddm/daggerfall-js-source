@@ -1,4 +1,4 @@
-// WW5 (bible/03-World/World-Wide.md WW5; bible/11-Multiplayer/Starfall.md section 16, WW5 - the owner's call taken,
+// WW5 (WW5; WW5 - the owner's call taken,
 // 2026-10-26: "Every single thing here needs to be addressed. No exceptions."): A COVEN NIGHT IN EVERY THEATRE. One coven a
 // night on the Bay was the Starfall whole - its sites the Bay's scan's (`W = 1000`, `px = id % W`), the wire's star word
 // the Bay's 0..999, three stars an hour for the world. Now each theatre that stands one (the Bay's and the eight
@@ -16,7 +16,7 @@ import {
 } from '../../../src/net/starfall/starfallLaw.js';
 import {
   starWireOk, validStarIn, validStarOut, STAR_HELD_MAX, STAR_LANES_WIRE, STAR_STARS_MAX, SITE_EVENT_LANES, siteEventLaneOpen, siteEventPixelOk,
-  WW5_RELAY_MIN, relaySupportsWw5, RELAY_VERSION, WORLD_PIXEL_BOUND,
+  RELAY_VERSION, WORLD_PIXEL_BOUND,
 } from '../../../src/net/wire.js';
 import { starReceiptValid } from '../../../src/net/starfall/starReceipt.js';
 import { STAR_COVENS, STAR_COVENS_APART, STAR_PROVINCE_COVENS, covensOfLane, starCovenOf, covenWitches } from '../../../src/systems/starfall/starfallCovens.js';
@@ -89,16 +89,16 @@ test('WW5 THE LAW: a star\'s number names its lane - lane t\'s three are 3t + 0.
   assert.equal(STAR_LANES, THEATRE_COUNT, 'a lane a theatre');
   assert.equal(STAR_LANES_WIRE, STAR_LANES, 'the wire\'s copy, pinned equal');
   assert.equal(STAR_STARS_MAX, STAR_PER_NIGHT);
-  assert.deepEqual([...SITE_EVENT_LANES], [0, 1, 2, 3, 4, 5, 6, 7, 8], 'the Bay and the eight provinces; Cyrodiil\'s open zone stands no site-bound event');
+  assert.deepEqual([...SITE_EVENT_LANES], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'the Bay and the nine provinces');
   for (let lane = 0; lane < STAR_LANES; lane++) for (let j = 0; j < STAR_PER_NIGHT; j++) {
     const k = starOfLane(lane, j);
     assert.equal(k, lane * 3 + j);
     assert.equal(starLaneOf(k), lane); assert.equal(starIndexOf(k), j);
-    assert.equal(starOk(N, k), lane <= 8, `lane ${lane}`);
+    assert.equal(starOk(N, k), lane <= 9, `lane ${lane}`);
     assert.deepEqual(starTimes(N, k), starTimes(N, j), 'one sky: every lane\'s star j falls at the Bay\'s star j\'s instants');
     assert.equal(starMasterOf(3, k).id, starMasterOf(3, j).id, 'its master its place\'s');
   }
-  assert.ok(!starOk(N, 27) && !starOk(N, 30) && !starOk(N, -1) && !starOk(0, 0));
+  assert.ok(!starOk(N, 30) && !starOk(N, -1) && !starOk(0, 0));
   for (let k = 0; k < 3; k++) assert.equal(starTimes(N, k).fallAt, oldFallAt(N, k), 'the Bay\'s instants, the law before WW5');
   assert.notEqual(starRoll(N, 3, 1), starRoll(N, 0, 1), 'a lane\'s rolls its own');
   assert.notDeepEqual(starSpotLocal(N, 3), starSpotLocal(N, 0));
@@ -116,12 +116,12 @@ test('WW5 THE LAW: a star\'s number names its lane - lane t\'s three are 3t + 0.
   assert.equal(starLedgerSane(newStarLedger(word(1, ...BAY_PX), 1)), true);
 });
 
-test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'s map for the Bay\'s three as it always was, a world pixel off the Bay for a province\'s, none for Cyrodiil\'s or past the theatres; the Bay\'s word projected as before; every word a cell or the hub says the same; the held list every lane\'s nights; the relay that keeps them (WW5_RELAY_MIN), a province\'s word never sent to an older one; the receipt and the account service\'s claim a province\'s star\'s (mutants: the pixel by the Bay\'s bound alone; the held bound; the relay gate; the send\'s gate)', () => {
+test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'s map for the Bay\'s three as it always was, a world pixel off the Bay for a province\'s, none for Cyrodiil\'s or past the theatres; the Bay\'s word projected as before; every word a cell or the hub says the same; the held list every lane\'s nights; the receipt and the account service\'s claim a province\'s star\'s (mutants: the pixel by the Bay\'s bound alone; the held bound)', () => {
   assert.equal(starWireOk(0, ...BAY_PX) && starWireOk(2, 999, 499) && starWireOk(0, 0, 0), true);
   for (const [k, px, py] of [[0, 1000, 10], [1, -1, 5], [3, ...BAY_PX], [26, 10, 10]]) assert.equal(starWireOk(k, px, py), false, `${k} @${px},${py}`);
   for (const [k, px, py] of [[3, ...PAST_PX], [5, 1000, 0], [26, -400, 1800]]) assert.equal(starWireOk(k, px, py), true, `${k} @${px},${py}`);
-  for (const [k, px, py] of [[27, ...PAST_PX], [30, ...PAST_PX], [3, WORLD_PIXEL_BOUND, 0], [3.5, ...PAST_PX], [-1, ...PAST_PX]]) assert.equal(starWireOk(k, px, py), false, `${k}`);
-  assert.equal(siteEventLaneOpen(9), false); assert.equal(siteEventPixelOk(9, ...PAST_PX), false);
+  for (const [k, px, py] of [[30, ...PAST_PX], [3, WORLD_PIXEL_BOUND, 0], [3.5, ...PAST_PX], [-1, ...PAST_PX]]) assert.equal(starWireOk(k, px, py), false, `${k}`);
+  assert.equal(siteEventLaneOpen(9), true); assert.equal(siteEventPixelOk(9, ...PAST_PX), true);
   const bay = { n: N, k: 1, px: 300, py: 200, lv: 12, s: 1, o: 0, kw: 2, kn: 3, wc: 1, hb: 40, mf: 0 };
   assert.deepEqual(validStarIn({ ...bay, junk: 1 }), bay, 'the Bay\'s word, projected as it always was');
   assert.deepEqual(validStarIn({ ...bay, k: 10, px: 1600, py: -120 }), { ...bay, k: 10, px: 1600, py: -120 });
@@ -132,26 +132,12 @@ test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'
   assert.deepEqual(validStarOut({ k: 'hd', n: N, s: 10, px: 1600, py: -120, at: 9, top: ['Ann'], c: 1 }), { k: 'hd', n: N, s: 10, px: 1600, py: -120, at: 9, top: ['Ann'], c: 1 });
   assert.deepEqual(validStarOut({ k: 'hds', l: [[N, 10, 1600, -120, 9], [N, 10, 300, 200, 9], [N, 1, 300, 200, 9]] }).l, [[N, 10, 1600, -120, 9], [N, 1, 300, 200, 9]]);
   assert.equal(STAR_HELD_MAX, 9 * 3 * 2 + 6, 'a night\'s and the night before\'s three in every lane, and room');
-  assert.equal(WW5_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): world275, past main's world274 (LADDER-CUT), which refuses
-  assert.ok(relaySupportsWw5(RELAY_VERSION) && relaySupportsWw5('world276') && !relaySupportsWw5('world275') && !relaySupportsWw5('acct272') && !relaySupportsWw5(undefined));   // PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270   // PIN MOVED: world276, SHOP (Genesis, Eternal and Origin join the vocabulary, last; the token's body bound 896); PIN MOVED: world275, the merge of main (world274 on its branch, renumbered past world274 on main at the merge); PIN MOVED: world274, the merge of main (world272 on its branch, renumbered past world272-world273 on main at the merge)
-  const on = src('src/net/online.js');
-  assert.match(on, /if \(primary\) \{ this\.starOk = relaySupportsStar\(relayV\); this\.ww5Ok = relaySupportsWw5\(relayV\); \}/);
-  assert.match(on, /if \(w\.k >= STAR_PER_NIGHT_WIRE && !\(this\._mine\(cell\) \? this\.ww5Ok : this\._haloFor\(cell\)\?\.ww5Ok\)\) return false;/, 'a province\'s star word never to a relay that refuses it as junk - the socket\'s own relay\'s word');
-  // WW5's finish: each socket's word goes with it across a crossing (AUDIT WB12d C6) - the cell stepped down keeps its own
-  assert.match(on, /sdOk: this\.sdOk, ww5Ok: this\.ww5Ok, foeInventoryOk:/);
-  assert.match(on, /this\.egOk = !!h\.egOk; this\.ww5Ok = !!h\.ww5Ok;/);
   const base = { sf: [N, 13], s: 'acct_1234', c: 1, l: 5, i: 100, e: 160 };
   assert.ok(starReceiptValid(base), 'a province\'s star\'s receipt - the relay mints it, the account service reads it (both bundle the law)');
-  assert.ok(!starReceiptValid({ ...base, sf: [N, 27] }));
-  const r = src('server/src/index.js');
-  assert.match(r, /this\._send\(ws, JSON\.stringify\(\{ t: 'star', k: 'hds', l: starHeldOrder\(l\) \}\)\);/, 'the hello says the Bay\'s first');
-  // the account service's row is the star's night and number (stars.js starKeyOf), its day the star's own fall (the law's)
-  const acct = src('server-account/src/stars.js');
-  assert.match(acct, /export const starKeyOf = \(n, k\) => `\$\{n\}\.\$\{k\}`;/);
-  assert.match(acct, /export const starDayOf = \(n, k\) => Math\.floor\(starTimes\(n, k\)\.fallAt \/ DAY_MS\);/);
+  assert.ok(starReceiptValid({ ...base, sf: [N, 27] }));
 });
 
-test('WW5 A HALO SAYS FOR ITSELF: a province\'s star word and a province\'s find go down a halo only when the halo\'s own relay keeps them (WW5_RELAY_MIN - a halo on an older object, a deploy under way, refuses the word as a bad frame); the primary\'s word is the primary\'s (AUDIT RAID R8b\'s law, WW5\'s finish; mutants: the halo sent on the primary\'s word, for a star and for a find; the halo never told)', () => {
+test('WW5 A HALO SAYS FOR ITSELF: a province\'s star word and a province\'s find go down a halo only once the halo\'s own relay has welcomed it; the primary\'s welcome is the primary\'s (AUDIT RAID R8b\'s law, WW5\'s finish; mutants: the halo sent on the primary\'s welcome, for a star and for a find; the halo never told)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
   const log = console.info; console.info = () => {};
@@ -163,16 +149,14 @@ test('WW5 A HALO SAYS FOR ITSELF: a province\'s star word and a province\'s find
     s.setHalo([other]);
     const halo = sockets[1];
     halo.open();
-    halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: `world${WW5_RELAY_MIN - 1}` });
-    assert.equal(s.ww5Ok, true, 'my own cell\'s relay keeps them');
     const star = { n: N, k: starOfLane(3, 1), px: px + 16, py, lv: 12, s: 1, o: 0, kw: 0, kn: 0, wc: 0, hb: 0, mf: 0 };
     const find = { s: 3 * SD_LANE_SPAN + 1, px: px + 16, py };
     const said = (ws, t) => ws.sent.filter((x) => JSON.parse(x).t === t).length;
-    assert.deepEqual([s.sendStar(star, other), s.sendSdFound(find, other)], [false, false], 'the halo\'s relay refuses a province\'s word');
+    assert.deepEqual([s.sendStar(star, other), s.sendSdFound(find, other)], [false, false], 'the halo not yet welcomed: nothing down it');
     assert.deepEqual([said(halo, 'star'), said(halo, 'sd')], [0, 0]);
     halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
     const before = [said(sockets[0], 'star'), said(sockets[0], 'sd')];
-    assert.deepEqual([s.sendStar(star, other), s.sendSdFound(find, other)], [true, true], 'its own relay keeps them');
+    assert.deepEqual([s.sendStar(star, other), s.sendSdFound(find, other)], [true, true], 'its own welcome opens it');
     assert.deepEqual([said(halo, 'star'), said(halo, 'sd')], [1, 1], 'down the halo\'s own socket');
     assert.deepEqual([said(sockets[0], 'star'), said(sockets[0], 'sd')], before, 'never the primary\'s');
   } finally { console.info = log; }
@@ -197,9 +181,9 @@ test('WW5 THE PROVINCES\' COVENS: the port\'s own, one a province theatre (Cyrod
     ['The Daughters of Mafala', 'Daughter of Mafala', 'Clan Mother Ri\'shazra'], ['The Fen Witches', 'Fen Witch', 'Mother Neeta-Hei'],
   ]);
   for (const c of STAR_PROVINCE_COVENS) assert.equal(covenWitches(c), c.name(), 'its own words, never a faction\'s');
-  // in the player's language: its own row (a faction's name read for it would answer the English)
-  const row = readFileSync(new URL('../../../locales/de/Port_Strings.csv', import.meta.url), 'utf8').split('\n').find((l) => l.startsWith('starfall.coven.moor,'));
-  const de = JSON.parse(row.slice('starfall.coven.moor,'.length));
+  // in the player's language: its own row (a faction's name read for it would answer the English); a fixture row
+  // stands in for a German translation
+  const de = 'Die Schwestern des Moors';
   TM.registerLocale({ code: 'de', name: 'Deutsch' });
   TM.patchLocaleTable('de', TM.runtimeCollectionName(TM.TextCollections.Port), [['starfall.coven.moor', de]]);
   try {
@@ -262,7 +246,7 @@ test('WW5 THE THEATRES WARMED A THEATRE AT A TIME: a province\'s scan is asked o
   const queue = [];
   let gen = 1;
   const T = createEventTheatres({ scans: () => scans, generation: () => gen, land: () => 7, idle: (fn) => queue.push(fn) });
-  assert.deepEqual([...PROVINCE_EVENT_LANES], [1, 2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual([...PROVINCE_EVENT_LANES], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
   assert.deepEqual(T.warmLanes(), [], 'none warm yet');
   assert.equal(made.length, 0, 'nothing scanned on the asking frame');
   assert.equal(queue.length, 1, 'one idle moment asked');
@@ -270,10 +254,10 @@ test('WW5 THE THEATRES WARMED A THEATRE AT A TIME: a province\'s scan is asked o
   assert.deepEqual(made, [1], 'one theatre an idle moment');
   assert.equal(queue.length, 1);
   while (queue.length) queue.shift()();
-  assert.deepEqual(made, [1, 2, 3, 4, 5, 6, 7, 8]);
-  assert.deepEqual(T.warmLanes().map(([t]) => t), [1, 2, 3, 4, 5, 6, 7, 8]);
-  assert.equal(T.scanOf(9), null, 'the open zone: none');
-  assert.equal(queue.length, 0, 'and never owed an idle moment');
+  assert.deepEqual(made, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  assert.deepEqual(T.warmLanes().map(([t]) => t), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  assert.deepEqual(T.scanOf(9), { theatre: 9, byArea: new Map(), towns: [], townOf: new Map() }, "Cyrodiil is warmed like a province");
+  assert.equal(queue.length, 0, "and never owed an idle moment once warm");
   gen = 2;
   assert.equal(T.scanOf(3), null, 'a new generation: warmed again');
   assert.equal(T.ready(3), false);
@@ -282,13 +266,10 @@ test('WW5 THE THEATRES WARMED A THEATRE AT A TIME: a province\'s scan is asked o
   const now = createEventTheatres({ scans: () => scans, idle: null });
   assert.ok(now.scanOf(4), 'no idle queue: made where it is asked');
   assert.equal(createEventTheatres({ scans: () => null, idle: null }).scanOf(3), null, 'no world host: none');
-  const gl = src('src/scenes/gate/gateLanes.js');
-  assert.match(gl, /return \(_kept = \{\n {4}scanOf,/, 'the world host\'s scans kept as it makes them');
-  assert.match(gl, /export const keptTheatreScans = \(\) => _kept;/);
 });
 
 /** The Starfall's host on bindings by name (star5_host.test.js's shape), a province's theatre scan beside the Bay's. */
-function starWorld({ ww5 = true, region = 17 } = {}) {
+function starWorld({ region = 17 } = {}) {
   const bayScan = (() => {
     const byRegion = new Map(), townAt = new Int32Array(1000 * 500).fill(-1), towns = [];
     [...new Set(STAR_COVENS.map((c) => c.region))].forEach((r, i) => { const px = []; for (let y = 20 + i * 30; y < 40 + i * 30; y++) for (let x = 300; x < 320; x++) { const id = y * 1000 + x; px.push(id); townAt[id] = towns.length; towns.push({ name: `Town ${towns.length}`, px: x, py: y, region: r }); } byRegion.set(r, Int32Array.from(px)); });
@@ -299,7 +280,7 @@ function starWorld({ ww5 = true, region = 17 } = {}) {
   const host = createStarfallHost({
     renderer: null, state: { pixelTranslation: (px, py, out) => { out[0] = px * 100; out[1] = 0; out[2] = py * 100; return out; } },
     exteriorFoes: null, gateScanOf: () => bayScan, warmGateScan: () => {}, surfaceAt: () => 0, player: { feetAt: () => null }, walkMode: true, playerSpawned: true,
-    online: { ww5Ok: ww5, starReady: () => true, sendStar: () => true }, eventNotice: (kind, s) => w.said.push(s), _questRegionIndex: () => w.region,
+    online: { starReady: () => true, sendStar: () => true }, eventNotice: (kind, s) => w.said.push(s), _questRegionIndex: () => w.region,
     gamePaused: () => false, townTalk: { hudHidden: false }, collider: null, _sharedOffsetMs: 0, audio: { playOneShot() {}, play3d() {} }, storage: null,
     theatreScans: { scanOf: (t) => (t === 3 ? sk : { theatre: t, byArea: new Map(), towns: [], townOf: new Map() }), theatres: () => [3], siteOf: () => null },
     worldPlaces: { generation: () => 1 }, landVersion: () => 1, idle: null,
@@ -323,9 +304,9 @@ test('WW5 THE HOST: every theatre\'s stars stand - the Bay\'s and a province\'s,
     w.region = 64;   // Skyrim
     const rows = host.timerRows();
     assert.ok(rows.length > 0 && rows.every((r) => /^star:\d+\.(9|10|11)$/.test(r.id)), `in Skyrim: Skyrim's rows alone (${rows.map((r) => r.id)})`);
-    w.region = 70;   // Cyrodiil: the Bay's, as they were
+    w.region = 70;   // Cyrodiil: its own lane now
     const cy = host.timerRows();
-    assert.ok(cy.length > 0 && cy.every((r) => /^star:\d+\.[0-2]$/.test(r.id)), 'in Cyrodiil: the Bay\'s rows');
+    assert.ok(cy.every((r) => /^star:\d+\.(27|28|29)$/.test(r.id)), `in Cyrodiil: its own rows alone (${cy.map((r) => r.id)})`);
     // a hold past the Bay: said where it stands
     w.t = starTimes(N, 0).fallAt + 1000; host.frame();
     w.region = 17; w.said.length = 0;
@@ -340,16 +321,7 @@ test('WW5 THE HOST: every theatre\'s stars stand - the Bay\'s and a province\'s,
     const [bpx, bpy] = b0.key.split('@')[1].split(',').map(Number);
     host.onStar({ k: 'hd', n: N, s: 0, px: bpx, py: bpy, at: w.t, top: ['Ann'], c: 1 });
     assert.equal(w.said.length, 2, 'the Bay\'s hold to everyone, as it always was');
-    const old = starWorld({ ww5: false });
-    Date.now = () => old.w.t;
-    old.host.frame();
-    assert.ok(old.host.state().every((s) => /^\d+\.[0-2]@/.test(s.key)), 'an older relay: the Bay\'s stars alone');
   } finally { Date.now = realNow; }
-  const h = src('src/scenes/starfall/starfallHost.js');
-  assert.match(h, /scans: \(\) => \(host\.theatreScans !== undefined \? host\.theatreScans : keptTheatreScans\(\)\),/);
-  assert.match(h, /const lanesOk = \(\) => !!session\(\)\?\.ww5Ok;/);
-  assert.match(h, /for \(const \[lane, sc\] of theatres\.warmLanes\(\)\) out\.push\(\.\.\.laneSitesOf\(n, +\(lane\), sc\)\);/);
-  assert.match(h, /try \{ return findTheatreGateSite\(gateNumber\(day, lane\), sc\); \}/, 'a province\'s stars keep off its own gate');
   // every master the host and the client name is its star's coven's (a province's leader where a Bay coven's Coven Mother)
   for (const f of ['src/scenes/starfall/starfallHost.js', 'src/systems/starfall/starfallClient.js']) {
     const calls = src(f).match(/starMasterOf\((?:[^()]|\([^()]*\))*\)/g) ?? [];

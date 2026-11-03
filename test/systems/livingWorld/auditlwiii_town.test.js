@@ -1,4 +1,4 @@
-// AUDIT LW-III (bible/01-Overview/audits/Audit-LivingWorld-III.md, "The town"): WHAT ONE READER ALONE HAS MOVES NOBODY ELSE -
+// AUDIT LW-III (, "The town"): WHAT ONE READER ALONE HAS MOVES NOBODY ELSE -
 // one lent to the watch is dealt still (and left out), the deal's every place is taken, and a circle's one left holds
 // their place, so a lend or a trample in one reader never re-deals another's circles or stands another's alone anew
 // (livingTown.js `_tick`, `_spaceAlone`); one whose walk in has ended early is in the room (`insideAt`); a circle's line

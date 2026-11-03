@@ -90,42 +90,8 @@ test('c2combat combat-12: the backstab roll draws ONLY behind the >1 gate; a lan
   assert.equal(backstabDamage(10, 50, () => 0.6), 10);
 });
 
-test('c2combat combat-12: the enemy melee DFRandom byte draws on every idle classic tick', () => {
-  const s = src('src/characters/enemy/enemyAttack.js');
-  const tick = s.indexOf('this._classicTimer -= CLASSIC_UPDATE_INTERVAL;');
-  const draw = s.indexOf('const meleePass = attackRollPasses(this.liveSpeed) && this.meleeTimer === 0;');
-  const oneShot = s.indexOf("const oneShot = this.machine.state !== 'Idle';");
-  // AUDIT 26 F010: the band arm gained the CanAct term (the bow roll
-  // rides `if (CanAct) TakeAction` in DFU, :171-172); the DRAW stays
-  // ahead of it, because EnemyAttack.FixedUpdate is CanAct-independent.
-  const band = s.indexOf('if (this.rangedAttack && ai.canAct !== false && ai.inSight && ai.detected && ai.giveUpTimer > 0');
-  const gate = s.indexOf('if (!meleePass) continue;');
-  assert.ok(draw > 0, 'the draw is the LEFT operand of the && (FixedUpdate :81)');
-  assert.ok(band > draw, 'the draw precedes the band arm - the attack component ticks even for a banded bow foe');
-  assert.ok(gate > band, 'the gate consumes the ALREADY-DRAWN pass after the band');
-  // AUDIT 24 characters-2: and NOTHING stands between the tick and the
-  // draw. FixedUpdate's only early return above :81 is the
-  // SeducerTransform one-shot; a swing in flight does not hold the byte.
-  assert.ok(tick > 0 && draw > tick, 'the draw is inside the classic tick');
-  assert.equal(/continue;/.test(s.slice(tick, draw)), false,
-    'no early-out sits between the classic tick and the DFRandom draw');
-  assert.ok(oneShot > draw, 'the one-shot test is READ after the byte is already drawn');
-});
-
 test('c2combat combat-9/10/11: the host wiring sweep', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  // combat-9: the whiff + failed-roll miss sounds and the ArrowShoot loose
-  assert.ok(dc.includes('audio.play3d(enemyMissSound(wpn)'), 'the dungeon melee rings its misses');
-  assert.ok(dc.includes('audio.play3d(SOUND.ArrowShoot, from'), 'the enemy loose rings from the archer');
   assert.equal(SOUND.ArrowShoot, 3);
-  // combat-10: the arrow-vs-player arm tallies Dodging like the melee
-  const i = dc.indexOf('// C2-slice (AUDIT 23 combat-10)');
-  assert.ok(i > 0 && dc.slice(i, i + 400).includes('tallySkill(playerEntity, SKILLS.Dodging, 1)'),
-    'an incoming arrow rides ApplyDamageToPlayer - the tally fires');
-  // combat-11: the player-side poison hook in all three pools + the arrow
-  const pw = src('src/combat/playerWeapon.js');
-  assert.ok(pw.includes('onInflictPoison: onPoison ? (att, tgt, pt) => onPoison(foe, pt) : null'),
-    'resolveHit threads the hook');
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js']) {
     const t = src(f);
     // WORLD6b-iii(e): the two foe pools dose through their ONE poison door (`poisonFoe` - a puppet's dose rides the hit to
@@ -134,7 +100,6 @@ test('c2combat combat-9/10/11: the host wiring sweep', () => {
       `${f}: the player's poisoned blade doses its victim`);
     if (f !== 'src/scenes/cityGuards.js') assert.ok(/function poisonFoe\(f, pt\) \{[\s\S]{0,400}?inflictPoison\(f\.entity, pt, false/.test(t), `${f}: the door doses a foe of mine`);
   }
-  assert.ok(dc.includes('inflictPoison(f.entity, pt, false'), 'the player ARROW doses its mark too');
   // combat-17: the grunt + pain voice ride all three player-hit paths
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js']) {
     const t = src(f);

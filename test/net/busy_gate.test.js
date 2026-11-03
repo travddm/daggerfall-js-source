@@ -1,8 +1,8 @@
-// BUSY-GATE (2026-10-13, after HOMES-SHED; the owner: "Build whatever can harden our server"): when the account database
+// BUSY-GATE: when the account database
 // is overloaded, the reads a tab keeps asking stand back - the client's gate (net/accountClient.js `call`) holds them
 // for a wait that doubles while the service keeps saying so, and the service's shed (server-account/src/service.js
 // shedding) answers them a moment without the database for the clients from before the gate. One law between them,
-// net/busyLaw.js. bible/11-Multiplayer/Scale-Arc.md BUSY-GATE.
+// net/busyLaw.js. BUSY-GATE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
@@ -18,23 +18,21 @@ test('BUSY-GATE the law: the reads that stand back are the fourteen display read
     ['/v1/homes/rooms', 'POST'], ['/v1/homes/decor', 'POST'], ['/v1/prof/pixels', 'POST'], ['/v1/seats/list', 'POST'],
     ['/v1/market/vendors', 'POST'], ['/v1/marks/balance', 'POST'], ['/v1/guilds/invites', 'POST'], ['/v1/realm/lineages', 'POST'],
     ['/v1/realm/unions', 'POST'], ['/v1/saves', 'GET'],
-    // PIN MOVED (BUSY-HEART, 2026-10-16): and the heartbeat and the day's motherlodes (test/net/busy_heart.test.js)
     ['/v1/heartbeat', 'POST'], ['/v1/prof/motherlodes', 'POST'],
-    ['/v1/towns/econ', 'POST'],   // PIN MOVED (AUDIT TOWN-ECON 2 CLI-8): and the towns' shares, an isolate's kept read
-    ['/v1/festival/town', 'POST'],   // PIN MOVED (WITCH1): and a town's Hearth Offerings, a replica's read
+    ['/v1/towns/econ', 'POST'],
+    ['/v1/festival/town', 'POST'],
   ]);
   for (const [path, method] of BUSY_READS) {
     assert.ok(ROUTES.has(path), `${path}: a route the service serves`);
-    // PIN MOVED (DISPLAY-REPLICA, 2026-10-13): each was no replica's read; each is one now (service.js REPLICA_ROUTES), and
     // still stands back - without the tab's bookmark its first statement is the primary's
     assert.equal(REPLICA_ROUTES.get(path) === method || ['/v1/homes/yards', '/v1/homes/layouts', '/v1/seats/list', '/v1/towns/econ'].includes(path), true, `${path}: a replica's read, or one an isolate keeps`);
     assert.equal(busyRead(path, method), true);
     assert.equal(busyRead(path, method === 'GET' ? 'POST' : 'GET'), false, `${path}: by its method alone`);
   }
-  for (const act of ['/v1/homes/claim', '/v1/homes/decor/place', '/v1/auth/token', '/v1/market/read', '/v1/chapters/list', '/v1/arena/board']) {   // PIN MOVED (BUSY-HEART): the heartbeat stands back now
+  for (const act of ['/v1/homes/claim', '/v1/homes/decor/place', '/v1/auth/token', '/v1/market/read', '/v1/chapters/list', '/v1/arena/board']) {
     assert.equal(busyRead(act, 'POST'), false, `${act} always goes`);
   }
-  assert.deepEqual([BUSY_RETRY_AFTER_S, BUSY_SHED_MS, BUSY_BASE_MS, BUSY_MAX_MS, BUSY_HOLD_MS], [5, 10_000, 5_000, 60_000, 250]);   // PIN MOVED (SHED-LONG, 2026-10-16): the shed 10 s, where it was 2
+  assert.deepEqual([BUSY_RETRY_AFTER_S, BUSY_SHED_MS, BUSY_BASE_MS, BUSY_MAX_MS, BUSY_HOLD_MS], [5, 10_000, 5_000, 60_000, 250]);
   assert.deepEqual([1, 2, 3, 4, 5, 6, 40].map((n) => busyWaitMs(n, 1)), [5_000, 10_000, 20_000, 40_000, 60_000, 60_000, 60_000]);
   assert.deepEqual([1, 2, 5].map((n) => busyWaitMs(n, 0)), [2_500, 5_000, 30_000], 'the bottom of its spread, half the wait');
   assert.equal(busyWaitMs(3, 0.5), 15_000);
@@ -72,7 +70,7 @@ test('BUSY-GATE the client: an overload answer holds the reads busyLaw names for
   assert.equal(r.busy, true);
   assert.equal(sent.length, 1, 'neither asked');
   assert.deepEqual(held, [BUSY_HOLD_MS, BUSY_HOLD_MS], 'each answered after the hold, never at once');
-  // a write, a sign-in and a read busyLaw leaves out all go (PIN MOVED, BUSY-HEART: the heartbeat no longer among them)
+  // a write, a sign-in and a read busyLaw leaves out all go (
   answer = { status: 200, body: { ok: true }, headers: {} };
   for (const p of ['/v1/homes/claim', '/v1/auth/token', '/v1/chapters/list', '/v1/market/read']) assert.equal((await call(io, p, {})).ok, true, p);
   assert.deepEqual(sent.slice(1), ['/v1/homes/claim', '/v1/auth/token', '/v1/chapters/list', '/v1/market/read']);

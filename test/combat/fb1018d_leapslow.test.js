@@ -10,7 +10,7 @@
 // its own arc (ApplyGravity), landing on its aim on its strike's clock, billing no fall; the glide takes the body again
 // once the flight is over - the ground, a placement, a levitation, a catch and the parkour leap out of it. Driven through
 // the runner's press and release on a REAL PlayerMotor over a real Collider; the spell put on through the real equip door
-// by The Raven's Wings minted from its own Legendary record. bible/05-Combat/Weapon-Techniques.md LEAP-SLOW.
+// by The Raven's Wings minted from its own Legendary record. LEAP-SLOW.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

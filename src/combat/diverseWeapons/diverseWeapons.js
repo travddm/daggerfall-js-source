@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // DW1 - DIVERSE WEAPONS 1.7.3 (RealAKP; script by RealAKP & Kirk.O, MIT)
 //
-// Mac, 2026-09-23, with the mod's zip: "Its a mod integration".
 //
 // THE MOD IS ONE LINE OF CODE AND 12,624 SPRITES. The line is
 //
@@ -141,7 +140,7 @@ export function moddedWeaponFilename(weapon, enchanted = isEnchanted(weapon)) { 
 
 /** DaggerfallUnityItem.IsArtifact - the port's reading, off the same
  *  enchantment list DFU reads (systems/artifactEffects.js, AUDIT WORLD4
- *  B1), with the loot mint's own flag beside it. APPEARANCES-II (bible/04-Characters/Wardrobe.md section 5): a piece
+ *  B1), with the loot mint's own flag beside it. APPEARANCES-II: a piece
  *  drawn in a look is none - it swings the look's own sheet, `<NAME>MAGIC` while enchanted, as it does with the mod off. */
 const isArtifact = (item) => !isLookCopy(item) && (item?.artifact === true || hasArtifactEffect(item));
 

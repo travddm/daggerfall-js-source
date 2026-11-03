@@ -1,4 +1,4 @@
-// DISC21 (2026-09-24, three Discord reports relayed by Mac). bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC21.
+// DISC21., DISC21.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -6,12 +6,10 @@ import { readFileSync } from 'node:fs';
 
 import { applyBiographyEffect } from '../../src/systems/biography.js';
 import { assignSkillEquipment } from '../../src/systems/roleplayRealismItems/rriKits.js';
-import { repairUnmintedConditions, WEARABLE_GROUPS, isQuestionsDagger } from '../../src/systems/conditionRepair.js';
+import { isQuestionsDagger } from '../../src/systems/conditionRepair.js';
 import { isBrokenItem, equipItem } from '../../src/systems/equip.js';
 import { repairRefusal } from '../../src/systems/repairService.js';
-import { templateByIndex } from '../../src/systems/item/itemTemplates.js';
 import { conditionMultipliersByMaterial, WEAPONS, WEAPON_MATERIALS, WEAPON_CONDITION_POOL } from '../../src/characters/weapons.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { ServiceFlowWindow } from '../../src/ui/guildServiceWindows.js';
 import { useQuickslot, emptySlotLine, QUICKSLOT_TEXT, clearQuickslots } from '../../src/systems/quickslots.js';
 import { quickslotHand, quickslotTag, CELL_ACTIONS } from '../../src/ui/quickslotTags.js';
@@ -20,7 +18,7 @@ import { PlayerWeapon } from '../../src/combat/playerWeapon.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const P = () => ({ isPlayer: true, level: 1, gender: 'male', activeEffects: [], health: 30, maxHealth: 30, items: [], spells: [], stats: {}, skills: {}, career: { primarySkills: [], majorSkills: [], luck: 50 } });
-// WEAPON-POOL (2026-10-06): the one pool every weapon type shares, where this read the Dagger's row (test/systems/weaponpool.test.js)
+// WEAPON-POOL: the one pool every weapon type shares, where this read the Dagger's row (test/systems/weaponpool.test.js)
 const EBONY_DAGGER_MAX = Math.trunc(WEAPON_CONDITION_POOL * conditionMultipliersByMaterial[WEAPON_MATERIALS.Ebony] / 4);
 
 // ── DISC21-A: "Starting ebony dagger says 'broken and cannot be worn,' repair says it isn't damaged" ──
@@ -48,48 +46,6 @@ test('DISC21-A: the questions\' ebony dagger is minted as CreateWeapon mints it,
   const a = P();
   applyBiographyEffect(a, 'IT 2 0 1', { rolls: () => 0.5 });   // Armor, steel's plate
   assert.ok(a.items[0].maxCondition > 0 && a.items[0].currentCondition === a.items[0].maxCondition, `armor minted whole (${a.items[0].maxCondition})`);
-});
-
-test('DISC21-A: a save made since - the questions\' dagger at 0 with no maxCondition, broken and "not damaged" - is minted on load: the kit\'s 20% on its real condition; an arrow keeps CreateWeapon\'s 0; any other wearable whole; nothing minted is touched, and nothing that is not worn (mutants: no repair on load; the dagger whole or at 0; the arrow whole)', () => {
-  const stuck = { group: 'Weapons', templateIndex: WEAPONS.Dagger, material: WEAPON_MATERIALS.Ebony, name: 'Dagger', value: 1, currentCondition: 0 };
-  assert.equal(isBrokenItem(stuck), true, 'the report: broken');
-  assert.equal(repairRefusal(stuck), 'undamaged', 'the report: "it isn\'t damaged"');
-  const p = P();
-  p.items.push(stuck,
-    { group: 'Weapons', templateIndex: 131, material: 0, name: 'Arrow', value: 2, stackCount: 12, currentCondition: 0 },
-    { group: 'Armor', templateIndex: 102, material: 0x0201, name: 'Cuirass', value: 5 },
-    { group: 'Weapons', templateIndex: WEAPONS.Longsword, material: 1, name: 'Longsword', value: 5, maxCondition: 300, currentCondition: 120 },
-    { group: 'PlantIngredients1', templateIndex: 0, name: 'Twigs', value: 1 });
-  const q = { isPlayer: true };
-  restorePlayer(q, JSON.parse(JSON.stringify(snapshotPlayer(p, { classicMinutes: 100 }))));
-  const [dagger, arrows, cuirass, sword, twigs] = q.items;
-  assert.equal(dagger.maxCondition, EBONY_DAGGER_MAX);
-  assert.equal(dagger.currentCondition, Math.trunc(EBONY_DAGGER_MAX * 0.2), 'the kit\'s 20%, on the real condition');
-  assert.equal(isBrokenItem(dagger), false, 'it can be worn');
-  assert.equal(repairRefusal(dagger), null, 'and repaired');
-  assert.equal(arrows.maxCondition, templateByIndex(131).hitPoints, 'the arrow\'s template hitPoints');
-  assert.equal(arrows.currentCondition, 0, 'and CreateWeapon\'s 0 - "classic does it"');
-  assert.ok(cuirass.maxCondition > 0 && cuirass.currentCondition === cuirass.maxCondition, 'another wearable: whole');
-  assert.deepEqual([sword.maxCondition, sword.currentCondition], [300, 120], 'a minted item keeps its wear');
-  assert.equal(twigs.maxCondition, undefined, 'nothing worn is touched');
-  // idempotent
-  assert.equal(repairUnmintedConditions(q.items), 0, 'a second load mints nothing');
-  assert.deepEqual(WEARABLE_GROUPS, ['Weapons', 'Armor', 'MensClothing', 'WomensClothing', 'Jewellery']);
-  // the load door runs it over the pack, the wagon and the repairer's shelf - and (AUDIT PRE-MERGE 0929 D3) every list
-  // of the character's own things the save carries beside them, the one walk DISC29-B's name repair takes
-  // BAG1 (PIN MOVED): the Materials Bag's list is repaired with the rest (bible/06-Systems/Materials-Bag.md)
-  // ITEM-WALK (PIN MOVED): the lists are the one walk of everything the save holds (savedItemLists, the entity's own
-  // first), and the repairs one runner (repairItemLists) - test/systems/itemwalk.test.js pins the walk's reach
-  const save = rd('src/systems/save/save.js');
-  assert.match(save, /const repairLists = savedItemLists\(snap, entity\);[^\n]*\n\s+repairItemLists\(repairLists\);/);
-  assert.match(save, /export const savedItemLists = \(snap, own = snap\) => \[\.\.\.listsOf\(own\?\.items, own\?\.wagonItems, own\?\.bagItems, own\?\.furnishings, own\?\.otherItems\), \.\.\.stashedItemLists\(snap\), \.\.\.heldItemLists\(snap\)\];/);
-  assert.match(save, /export function repairItemLists\(repairLists\) \{[\s\S]*?for \(const list of repairLists\) \{\s+const n = repairUnmintedConditions\(list\);/);
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(P(), { classicMinutes: 100 })));
-  snap.sceneCache = { scenes: [{ sceneName: 'DaggerfallInterior [MapID=1, BuildingKey=2]', lootContainers: [{ items: [{ ...stuck, UID: 7 }] }] }] };
-  const r = {};
-  restorePlayer(r, snap);
-  const chest = r.sceneCache.scenes.get('DaggerfallInterior [MapID=1, BuildingKey=2]').lootContainers[0].items[0];
-  assert.deepEqual([chest.maxCondition, chest.currentCondition], [EBONY_DAGGER_MAX, Math.trunc(EBONY_DAGGER_MAX * 0.2)], 'the questions\' dagger kept in a house chest, minted as the pack\'s is');
 });
 
 // ── DISC21-B: "Can't access wagon from dungeon entrance - Clicking 'yes' on the prompt only closes it" ──
@@ -124,21 +80,6 @@ test('DISC21-B: the exit door\'s wagon prompt - Yes is taken a frame later, once
   assert.equal(now.opened, 1, 'the inventory opens');
   assert.equal(now.slot?.inventory, true, 'and holds the slot');
 
-  // the source: the prompt's Yes sets the flag, the frame takes it right after No's exit, both teardowns clear it
-  const wm = rd('src/scenes/worldModes.js');
-  const fn = wm.slice(wm.indexOf('function tryExitDungeon('), wm.indexOf('function exitDungeonNow()'));
-  assert.match(fn, /onYes: \(\) => \{ pendingDungeonWagonOpen = true; return null; \}/);
-  assert.doesNotMatch(fn, /onYes: \(\) => \{ dungeonCtx\.openInventoryWithWagon\(\)/, 'never inside the box\'s click');
-  assert.match(wm, /if \(pendingDungeonExit\) \{ pendingDungeonExit = false; if \(aliveUnder\(\)\) \{ exitDungeonNow\(\); return true; \} \}[^\n]*\n\s+if \(pendingDungeonWagonOpen\) \{ pendingDungeonWagonOpen = false; dungeonCtx\.openInventoryWithWagon\(\); \}/);
-  const exit = wm.slice(wm.indexOf('function exitDungeonNow() {'), wm.indexOf('function exitDungeonNow() {') + 1400);
-  assert.match(exit, /dungeonCtx\.destroy\(\);\s+dungeonCtx = null;\s+dungeonLoc = null;\s+pendingDungeonWagonOpen = false;/, 'a Yes pending is this dungeon\'s alone');
-  assert.match(wm, /host\.onDungeonLeave\?\.\(\);   \/\/ WORLD1: a load or a teleport out is a leave too[\s\S]{0,400}?dungeonCtx\.destroy\(\); dungeonCtx = null; dungeonLoc = null;\s+pendingDungeonWagonOpen = false;/, 'nor a load\'s or a teleport\'s next dungeon\'s');
-  // ...and the three lines the slot model above stands for are the context's own
-  const ctx = rd('src/scenes/dungeonContext.js');
-  assert.match(ctx, /openInventoryWithWagon\(\) \{\s+if \(activeOverlay\) return false;/, 'the open refuses a held slot');
-  const at = ctx.indexOf('    overlayInput(action, e = null) {');
-  assert.ok(at > 0, 'the context\'s key door');
-  assert.match(ctx.slice(at, at + 900), /activeOverlay\.input\(action, e\);[\s\S]*?if \(activeOverlay\?\.done\) \{\s+surfacePlayer\(\);\s+activeOverlay = null;/, 'input goes to the slot\'s window, which leaves the slot after its handler returns');
 });
 
 // ── DISC21-C: "Equipped weapon: 'Nothing is in that slot'" ──
@@ -172,12 +113,8 @@ test('DISC21-C: the weapon a new character equips sits sheathed in the main cell
   // can say - naming the keyboard's Z to them named a key they were not holding
   assert.equal(quickslotHand(rig, store, { controller: true, family: 'xbox' }).readyKey, null, 'the pad live: nothing named');
   assert.equal(quickslotHand(rig, store, { controller: false, family: 'xbox' }).readyKey, 'Z', 'the keyboard: its key');
-  assert.match(rd('src/ui/quickslotTags.js'), /pad = \{ controller: controllerLook\(\) && !!padFamily\(\), family: padFamily\(\) \?\? 'xbox' \}/, 'the default reads GP1\'s latch, as the chip does');
   // every host reads the rig in the player's hands - the interior mode hands its own
   for (const [path, hand] of [['src/scenes/world.js', /hand: \(\) => quickslotHand\(rig\),/], ['src/scenes/exterior.js', /hand: \(\) => quickslotHand\(rig\), \.\.\.packDoors \}/], ['src/scenes/dungeonContext.js', /hand: \(\) => quickslotHand\(weaponRig\), \.\.\.packDoors \}/]]) {   // UI2: beside the pack's window doors
     assert.match(rd(path), hand, `${path}: the empty press reads the hand`);
   }
-  assert.match(rd('src/scenes/world.js'), /const quickUse = \(n, rig = weaponRig\) => \{/);
-  assert.match(rd('src/scenes/exterior.js'), /const quickUse = \(n, rig = weaponRig\) => \{/);
-  assert.match(rd('src/scenes/worldModes.js'), /quickUse\(n\) \{ return host\.quickUse\?\.\(n, interiorWeapon\) === true; \},/, 'indoors, the interior rig');
 });

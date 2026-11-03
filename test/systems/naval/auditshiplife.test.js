@@ -1,4 +1,4 @@
-// AUDIT SHIP-LIFE (2026-09-30, the pre-merge audit of PR #478, Mac: "let's audit everything before we merge") - the
+// AUDIT SHIP-LIFE - the
 // ship-life lens's findings, each pinned on the coast it was found on (systems/naval/shipLife.js).
 import '../../modsOff.js';
 import { test } from 'node:test';

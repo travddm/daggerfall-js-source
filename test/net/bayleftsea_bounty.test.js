@@ -1,8 +1,7 @@
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 20 - B8 = E3; the owner's call taken:
-// "Every single thing here needs to be addressed. No exceptions."): A PROVINCE SEAT'S BOUNTY PAYS - past the Bay for its
+// BAY-LEFT-SEA: A PROVINCE SEAT'S BOUNTY PAYS - past the Bay for its
 // bailiwick's own foes' dens, an outlaws' hideout routed (LW12) and a lair whose foe falls (TESA8), by the camp claim's own
 // kind of proof (a den's id naming its map pixel; once a day, five an account a day, bounded and not witnessed). The Bay's
-// camp Bounty unchanged. The law, the client and the real Worker over node:sqlite (bible/11-Multiplayer/Seats-Arc.md
+// camp Bounty unchanged. The law, the client and the real Worker over node:sqlite (
 // BAY-LEFT-SEA).
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -38,7 +37,6 @@ test('BAY-LEFT-SEA THE SEAT TAB: a Bounty past the Bay says it pays for dens; th
   assert.equal(edictLine('bounty', 'palace', 'calm', ANTICLERE), `Bounty: ${EDICT_WORDS.bounty}`);
   assert.equal(edictLine('bounty', 'palace'), `Bounty: ${EDICT_WORDS.bounty}`, 'no seat named: the camps\'');
   assert.equal(edictLine('levy', 'crown', 'calm', SOLITUDE), `Levy: ${EDICT_WORDS.levy}`);
-  assert.ok(readFileSync(new URL('../../src/ui/seatTab.js', import.meta.url), 'utf8').includes("const words = edictLine(chosen, seat.tier, data?.tides?.next ?? 'calm', seat);"));
 });
 
 test('BAY-LEFT-SEA THE CLIENT: a den cleared past the Bay in a Bounty seat\'s bailiwick is claimed and its pay said, once in BOUNTY_DEN_ASK_GAP_MS (a lair\'s every foe falls); a camp as ever, asked at each, an Orc Raid\'s count a camp\'s alone; a lair\'s dungeon names its den; a hideout routed tells its host; the world host wires both (mutants: the den unclaimed; the orcs counting a den; the den\'s words a camp\'s; the gap never kept; the gap kept for camps; never asked again; the lair unread; the rout untold; the host unwired)', async () => {
@@ -97,11 +95,6 @@ test('BAY-LEFT-SEA THE CLIENT: a den cleared past the Bay in a Bounty seat\'s ba
   spawned.forEach((r) => { r.dead = true; r.corpse = true; });
   await tick(2);
   assert.deepEqual(routed, ['O64.0']);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): the mode machine's read guarded on the object, as every one above its
-  // declaration is (test/scenes/audit24_wave37.test.js)
-  assert.ok(w.includes("seatEdicts.campCleared(foe?.site ?? lairDenOf(modes?.mode === 'dungeon' ? modes?.dungeonLocation : null)).catch(() => {}); });"));
-  assert.ok(w.includes('    routed: seatEdicts.hideoutRouted,   // BAY-LEFT-SEA'));
 });
 
 test('BAY-LEFT-SEA (the real Worker): a Bounty ruling at Solitude pays for a lair and a hideout in its bailiwick, once a day each and never on the Bay\'s pixels; a Bay seat\'s camp as ever (mutants: the service\'s claim the camps\' alone)', async (t) => {

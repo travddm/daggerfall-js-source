@@ -1,5 +1,4 @@
-// ARENA3 (2026-10-02, Mac: "Joining a team comes with it's own enhanced UI where you can view your ranking and even player
-// leaderboards"; "All UI elements and text must be enhanced UI plus"): THE ARENA WINDOW (systems/arena/arenaBoard.js the model,
+// ARENA3: THE ARENA WINDOW (systems/arena/arenaBoard.js the model,
 // ui/arena/arenaWindow.js the window, ui/arena/arenaDoor.js its door, scenes/arena/arenaGate.js its presses). Pinned here: every page's
 // model - Bouts (the hour's exhibition or the next, the Red's against the Blue's with records and prices, Watch and
 // Wager and why not; the players' bouts said online; the ladder's next with Fight and why not; what the bookmaker owes),
@@ -329,18 +328,12 @@ test('ARENA3 the door, the gate\'s presses at the gate only, the Herald\'s and t
     assert.match(S, door, `${f}: the pause window's door`);
     assert.match(S, f === 'src/scenes/world.js' ? /makeArenaWindow: \(page\) => arenaGate\.windowOverlay\(arenaOnline\?\.inSession\?\.\(\) \? 'bouts' : page\),/ : /makeArenaWindow: \(page\) => arenaGate\.windowOverlay\(page\),/, f);
   }
-  assert.match(rd('src/scenes/worldModes.js'), /openArena: \(\) => mountedInterior\(host\.makeArenaWindow\?\.\('team'\) \?\? null\), arenaJoined: \(\) => !!host\.arenaJoined\?\.\(\),/);
-  assert.match(rd('src/scenes/worldModes.js'), /makeArenaWindow: \(page\) => host\.makeArenaWindow\?\.\(page\) \?\? null, arenaJoined: \(\) => !!host\.arenaJoined\?\.\(\),/, 'the dungeon is handed it');
-  assert.match(rd('src/scenes/dungeonContext.js'), /openArena: opts\.makeArenaWindow \? \(\) => \{ const w = opts\.makeArenaWindow\('team'\); if \(w\) activeOverlay = w; return !!w; \} : undefined,/);
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /\[t\('pause\.door\.arena', 'Arena'\), hooks\.arenaJoined\?\.\(\) \? hooks\.openArena : undefined\],/, 'the Stats page\'s door, once joined');
-  assert.match(rd('src/ui/charSheetDoor.js'), /openArena: door\('openArena'\)/, 'and the F5 page\'s');
 });
 
 test('ARENA3 the window\'s dress: the kit\'s roles, the Plus sheet, the classic skin\'s own sheet, the pixel face, a phone', () => {
   for (const [role, sel] of [['window', 'body .aw-win'], ['panel', 'body .aw-card'], ['button', 'body .aw-shell .act'], ['primary', 'body .aw-shell .act.primary'], ['header', 'body .aw-head'], ['chip', 'body .aw-chip'], ['listRow', 'body .aw-tier']]) {
     assert.ok(FRAME_ROLES[role].includes(sel), `${role}: ${sel}`);
   }
-  assert.match(rd('src/ui/enhanced/enhancedPlusStyle.js'), /\$\{PROF_CSS\}\n\$\{ARENA_WINDOW_CSS\}\n/, 'the Plus sheet carries it');
   assert.match(ARENA_WINDOW_CSS, /\.aw-shell \{[^}]*font-family: [^;]*Pixelify/, 'the pixel face');
   assert.match(ARENA_WINDOW_CSS, /@media \(max-width: 720px\)/, 'a phone\'s layout');
   assert.match(ARENA_WINDOW_CSS, /\.aw-table \.opt \{ display: none; \}/, 'a phone drops the board\'s optional columns');

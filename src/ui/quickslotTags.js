@@ -101,7 +101,7 @@ export function actionKeyWord(action, { bindings: store = bindings(), controller
  *  is the mod's key, a swap weapon is QuickSwap, and a shield or an
  *  empty socket has nothing to press. */
 export function quickslotOffTag(kind, opts = {}) {
-  // QS4 (Mac: "The 4th quickslot doesnt have a keybind"): EVERY STATE
+  // QS4: EVERY STATE
   // NAMES A KEY. A swap is the swap's; everything else - a lit torch, a
   // shield, an off-hand weapon, an empty socket - is the off hand's own
   // press, which lights or douses and refuses in the mod's own words

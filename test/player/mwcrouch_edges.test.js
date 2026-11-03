@@ -1,8 +1,6 @@
 // ---------------------------------------------------------------------------
 // MWCROUCH - GetKeyDown AND GetKeyUp, WHICH THE PORT HAD BEEN DERIVING.
 //
-// Mac, 2026-09-17: "When crouching with the morrowind model. you can't
-// uncrouch".
 //
 // The motor is innocent and so is the Morrowind rig. `_heightAction`
 // (player/motor.js) has no view-mode arm, `get height()` has no MW

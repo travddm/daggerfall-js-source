@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-C (2026-09-25): HOW ILIAC PUDDLE NO MORE LOOKS, AS NUMBERS. The
+// DW-C: HOW ILIAC PUDDLE NO MORE LOOKS, AS NUMBERS. The
 // C# that turns the mod's settings, the time of day and the player's
 // water into material values (Iliac Puddle No More 1.2.2, jet082):
 //

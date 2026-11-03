@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // SEAT-HALL and CROWN-HALL, moved out of bootWorld (HOST-SPLIT, DOMAIN2 -
-// bible/11-Multiplayer/Domains.md section 6): A SEAT'S HALLS AS THE MODES
+// ): A SEAT'S HALLS AS THE MODES
 // HOST ASKS THEM (scenes/worldModes.js seatHallsFrame, crownHere) - a
 // palace seat's Charter Room, a crown's throne room - and, DOMAIN2, the
 // guild's own castle the instance door offers (scenes/instanceDoor.js).

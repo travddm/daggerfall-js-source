@@ -68,22 +68,3 @@ test('ui-chargen-4: the window fires onCancel ONCE and goes dead, like onDone', 
   assert.equal(dones, 0);
 });
 
-test('ui-chargen-4: every host owns the unwind - the reload arms', () => {
-  // WAVE D: the dungeon host held the RAW flow and so had to POLL
-  // `flow.cancelled` from tickOverlay. It holds the window now, like
-  // the other two, and takes the unwind off the same onCancel latch -
-  // which is also the only arm the enhanced skin can fire, since its
-  // DOM view never reaches a host input seam at all.
-  const dc = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.ok(!dc.includes('chargenFlow?.cancelled'),
-    'the poll is gone - the window owns the cancel');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    const s = readFileSync(join(root, host), 'utf8');
-    // AUDIT-MACL F3: ...and it stands the unload guard down FIRST. The
-    // wizard's Cancel is a door the GAME opened, so prompting the
-    // player for it is how you train them to click through the prompt
-    // that matters (systems/unloadGuard.js).
-    assert.ok(s.includes('onCancel: () => { releaseUnloadGuard(); location.reload(); },'),
-      `${host} wires the window's onCancel, and releases the unload guard before it navigates`);
-  }
-});

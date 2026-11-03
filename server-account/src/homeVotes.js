@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-VOTE (2026-10-10) - A TOWN'S WORD ON A PLAYER'S HOUSE, KEPT.
+// HOME-VOTE - A TOWN'S WORD ON A PLAYER'S HOUSE, KEPT.
 //
 // The owner: "I want to implement a house voting system within vicinity
 // of player houses. If the house votes run negative, the exterior
 // decorations/interior decorations should not be shown to other players".
 // What a vote is, and what a negative score hides, is src/net/homeVoteLaw.js,
-// which the client reads too; the votes live here (migration 0108), one row
+// which the client reads too; the votes live here, one row
 // an account a home, read out with the town's homes (homes.js homesInTown:
 // each home's `score`, and the caller's own `vote`).
 //

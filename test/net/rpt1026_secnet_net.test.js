@@ -1,4 +1,4 @@
-// RPT1026-SECNET, the relay and the session (bible/11-Multiplayer/Instances.md, Chat-Safety-Arc.md section 2):
+// RPT1026-SECNET, the relay and the session (, Chat-Safety-Arc.md section 2):
 // - ACT WAITS (from a private report, 2026-10-20): a door's act queued while the socket was away went out the frame the
 //   socket opened, ahead of its welcome; a party member's hello at an instance is held while the hub is asked, the room read the act
 //   first - refused by the relay's parseClient - and closed the socket for good. Driven through the REAL Room
@@ -8,8 +8,8 @@
 //   "too many poses", DROP_STRIKES_MAX in a row) and closed the socket for good. The session now hears its line (a
 //   ping's answer) and hands a stalled one no burst - the latest pose waits, a heartbeat's worth meanwhile. Driven
 //   through the real Room, the runtime's own ping answer in front of it, the line held 29 s and let go at once.
-// - and the sends ACT WAITS left skipping the welcome (Online-Arc's latent list): a bout's room (sendDuel), the open
-//   zone's room words (sendWild) and a cell's blow by a kept roster (sendHit), across a reconnect.
+// - and the sends ACT WAITS left skipping the welcome (Online-Arc's latent list): a bout's room (sendDuel) and a cell's
+//   blow by a kept roster (sendHit), across a reconnect.
 // - BLOCK STAMP (from a private report, 2026-10-20), the session's half: a request that names no account (a relay before
 //   the stamp) is heard only while nobody is blocked - a place room's roster names no account to stand in for it (AUDIT
 //   RPT1026 A2, test/net/audit_rpt1026_secnet.test.js). The relay's half is CLIENT-7's (safe_client.test.js), on the
@@ -96,7 +96,7 @@ async function hearing(blocks, peers = []) {
   quiet(() => s.join('world:3,12'));
   const ws = sockets.at(-1);
   ws.open();
-  ws.receive({ t: 'welcome', id: 'me-00001', peers, n: 1 + peers.length, v: 'world268' });
+  ws.receive({ t: 'welcome', id: 'me-00001', peers, n: 1 + peers.length });
   const got = [];
   s.onTrade = (id) => got.push(`trade:${id}`); s.onPage = (id) => got.push(`page:${id}`);
   const fetch = async () => new Response(JSON.stringify({ ok: true, blocks }), { status: 200, headers: { 'content-type': 'application/json' } });
@@ -108,7 +108,6 @@ async function hearing(blocks, peers = []) {
 const ASKS = [['trade', { k: 'ask', to: 'me-00001', s: 'abc123' }], ['page', { to: 'me-00001', page: { head: 'Morndas', lines: ['Meet me'] } }]];
 
 test('RPT1026-SECNET A REQUEST THAT NAMES NO ACCOUNT IS NOT HEARD AS NOBODY\'S: from a relay before the stamp, one no roster names is held back while the list blocks anyone and heard while it blocks nobody; a sender not blocked is heard (mutant: an unknown account heard)', async () => {
-  // PIN MOVED (AUDIT RPT1026 A2): a first case stood here on a welcome whose roster named each peer's account - a roster
   // no producer sends: a place room's names none (MOD1), so the session's fallback to the roster's account has none to
   // ask. Its pin through the real Room is test/net/audit_rpt1026_secnet.test.js A2.
   // nobody named the sender's account: held back while the list blocks anyone
@@ -191,7 +190,6 @@ test('RPT1026-SECNET A STALLED LINE\'S FOES WAIT TOO, AND ITS POSE TO ONE A HEAR
   quiet(() => s.join('world:3,12', POSE));
   const ws = sockets[0];
   ws.open();
-  // PIN MOVED (the merge of main into #1184): a peer in the cell - alone, LONE-SLEEP (net/loneSleep.js) says a pose a
   // LONE_POSE_MS, never a HEARTBEAT_MS, and the heartbeat this pins is the cell's own
   quiet(() => ws.receive({ t: 'welcome', id: 'host-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'host-0001', world: null, v: RELAY_VERSION }));
   const foes = { n: 1, f: [] };
@@ -241,6 +239,8 @@ test('RPT1026-SECNET A HALO\'S STALLED LINE HOLDS ITS POSES TOO: my own cell\'s 
   quiet(() => s.setHalo(halos));
   for (let i = 1; i < sockets.length; i++) welcome(sockets[i]);
   assert.equal(sockets.length, 4, 'a corner: my cell and three halos');
+  // a player far across the last halo keeps the session from being alone, so lone sleep holds none of my poses
+  quiet(() => sockets[3].receive({ t: 'join', id: 'far-0001', name: 'Far', look: null, pose: { x: start.x - 5 * PIXEL_UNITS, y: 0, z: start.z, yaw: 0, pitch: 0, mv: 0 } }));
   t += PING_MS;
   quiet(() => s.tick());
   for (const ws of sockets) assert.equal(ws.sent.at(-1), '{"t":"ping"}', 'every deaf line asked');
@@ -274,7 +274,7 @@ test('RPT1026-SECNET A HALO\'S STALLED LINE HOLDS ITS POSES TOO: my own cell\'s 
   assert.ok(sockets[0].sent.filter((x) => x.startsWith('{"t":"pose"')).length > 140, 'my own cell still hears the walk');
 });
 
-test('RPT1026-SECNET A BOUT\'S ROOM AND THE ZONE\'S ROOM WORDS WAIT FOR THE WELCOME: across a reconnect, the socket open and its hello not yet answered, a duel blow to the bout\'s room and a take to the zone\'s pile go nowhere, nor a cell\'s blow by its kept roster (the relay closes a frame ahead of its hello for good); after the welcome all three go (mutants: sendDuel\'s room path unwelcomed; sendWild unwelcomed; sendHit\'s cell loop unwelcomed)', async () => {
+test('RPT1026-SECNET A BOUT\'S ROOM WORDS WAIT FOR THE WELCOME: across a reconnect, the socket open and its hello not yet answered, a duel blow to the bout\'s room goes nowhere, nor a cell\'s blow by its kept roster (the relay closes a frame ahead of its hello for good); after the welcome all three go (mutants: sendDuel\'s room path unwelcomed; sendWild unwelcomed; sendHit\'s cell loop unwelcomed)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'duel-0001', id: 'duel-0001', secret: 'secret-of-duel-0001', WebSocketImpl: FakeWS, now: () => t, rand: () => 0 });
@@ -282,9 +282,7 @@ test('RPT1026-SECNET A BOUT\'S ROOM AND THE ZONE\'S ROOM WORDS WAIT FOR THE WELC
   const welcome = { t: 'welcome', id: 'duel-0001', peers: [{ id: 'peer-0002', name: 'Bran', p: { x: 2, y: 0, z: 1, yaw: 0 } }], host: 'duel-0001', world: null, v: RELAY_VERSION };
   sockets[0].open();
   quiet(() => sockets[0].receive(welcome));
-  assert.equal(s.duelOk && s.wildOk, true);
   const blow = { to: 'peer-0002', s: 'abc123def0', k: 'strike', n: 1, by: 'melee', p: [100000, 10.5, 200000], d: 5, a: { lv: 30 } };
-  const take = { k: 'take', r: '0123456789ab', i: 0, n: 1 };
   assert.equal(s.sendDuel(blow, { room: s.room }), true, 'welcomed: the bout\'s room hears it');
   // the line blinks, and the session joins again
   quiet(() => sockets[0].drop(1006));
@@ -296,12 +294,10 @@ test('RPT1026-SECNET A BOUT\'S ROOM AND THE ZONE\'S ROOM WORDS WAIT FOR THE WELC
   assert.equal(s.status, 'open');
   assert.equal(s.welcomed, false);
   assert.equal(s.sendDuel(blow, { room: s.room }), false, 'the bout\'s room, before its welcome');
-  assert.equal(s.sendWild(take), false, 'the zone\'s room word, before its welcome');
   assert.equal(s.sendHit({ to: 'peer-0002', i: 0, d: 3 }), false, 'a cell\'s blow at a peer\'s foe the kept roster still names, before its welcome');
   assert.deepEqual(sockets[1].sent.map((f) => JSON.parse(f).t).filter((k) => k !== 'ping'), ['hello'], 'its hello and nothing else');
   quiet(() => sockets[1].receive(welcome));
   t += 1000;
   assert.equal(s.sendDuel(blow, { room: s.room }), true, 'welcomed');
-  assert.equal(s.sendWild(take), true);
   assert.equal(s.sendHit({ to: 'peer-0002', i: 0, d: 3 }), true);
 });

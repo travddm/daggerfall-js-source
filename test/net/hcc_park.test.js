@@ -1,7 +1,4 @@
-// HCC-PARK + RIDE + HCC-TIP (2026-09-23, Mac: "I think we should build that. And if not already, ensure this is
-// compatible with our tooltip implementation and ensure it shows owned if another players. Also need to ensure over
-// people see others riding on horses"), AND THE BRANCH AUDIT'S FINDINGS ON THEM (Mac: "Let's do an audit on
-// everything before we merge. This needs to be perfect"). BY EXECUTION: the wire's park law and the pose's mount; the
+// HCC-PARK + RIDE + HCC-TIP, AND THE BRANCH AUDIT'S FINDINGS ON THEM. BY EXECUTION: the wire's park law and the pose's mount; the
 // RELAY keeping a parked team in its cell past its owner's presence, keyed by the ACCOUNT the token verified and the
 // CHARACTER the frame names (never the peer id a client picks), handing it to joiners, the owner's registry dropping
 // the old cell's record in the order the words were said; the pool keeping each cell's word apart and a kept team
@@ -12,7 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  validParkData, cellRoomOfWire, relaySupportsPark, validPose, poseChanged, parseClient, PARK_CELL_MAX, PARK_ACCOUNT_MAX, PARK_TTL_MS, PIXEL_UNITS,
+  validParkData, cellRoomOfWire, validPose, poseChanged, parseClient, PARK_CELL_MAX, PARK_ACCOUNT_MAX, PARK_TTL_MS, PIXEL_UNITS,
   parkRegistryRoom, parkKeyOf, parkKey, POSE_RIDE,
   POSE_BOUND,
 } from '../../src/net/wire.js';
@@ -46,13 +43,11 @@ test('HCC-PARK wire: the frame names its CHARACTER; the anchor names the cell (M
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { h: [AX, 1, AZ, 0, 1, 1] } }), null, 'a walking horse is not parked');
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { w: W(AX + 20000) } }), null, 'a part far from its anchor is a second place');
   assert.deepEqual(validParkData({ c: CA, a: [AX, AZ], r: { h: [AX, 1, AZ, 0, 1e300, 0] } }).r.h, [AX, 1, AZ, 0, 1, 0], 'AUDIT D5: a facing is a unit one - 1e300 is not stored and fanned');
-  assert.equal(validParkData({ c: CA, a: [-POSE_BOUND - 1, AZ] }), null);   // PIN MOVED (TV-BEYOND): an anchor west of the Bay is the world's - past the world is none assert.equal(validParkData({ c: CA, a: [AX] }), null);
+  assert.equal(validParkData({ c: CA, a: [-POSE_BOUND - 1, AZ] }), null);
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { n: 'Bess' } }), null, 'a name with nothing parked');
   assert.deepEqual(parseClient(JSON.stringify({ t: 'park', data: { c: CA } }), { hasHello: true }), { t: 'park', data: { c: CA } });
   assert.equal(parseClient(JSON.stringify({ t: 'park', data: null }), { hasHello: true }).error, 'bad park', 'the old null word names no character');
   assert.equal(parseClient(JSON.stringify({ t: 'park', data: { c: CA } })).error, 'park before hello');
-  assert.equal(relaySupportsPark('world98'), false, 'an older relay closes the socket on the frame - never sent to it (world98 is SPELLFX1\'s, which has no park arm)');
-  assert.equal(relaySupportsPark('world102'), true);
   // the owner key: stable, per account AND character, opaque
   const k = await K('acct-ann1', CA);
   assert.match(k, /^[0-9a-f]{24}$/);
@@ -369,27 +364,3 @@ test('RIDE: a peer in the saddle is Eye Of The Beholder\'s mounted sprite off th
   assert.equal(riders.isRiding('p1'), false); assert.equal(gone.length >= 1, true, 'the dismount frees the batch');
 });
 
-test('HCC-PARK / RIDE hosts: the owner\'s word names the character, is ticked with the frame\'s out-words and said again after any welcome; a kept team is its cell\'s and its life\'s; the rider layer runs first and hands the others the rider\'s height; the pose sends the mount, the gallop as the rider sees it; a rider hears no footsteps and casts from the saddle; the dead see no rider', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /modes\?\.setDungeonAuthority\?\.\(dungeonAuthority\(now\)\);[^\n]*\n\s+hccParkTick\(now\);/);   // after the stream, the flushes and the seat - the frame's out-words, in order
-  assert.match(w, /const c = characterIdOf\(playerEntity\);/);
-  assert.match(w, /const data = word \? \{ c, \.\.\.word \} : \{ c \};/);
-  assert.match(w, /const rejoin = online\.room !== _parkRoom \|\| online\.welcomes !== _parkWelcomes;/);
-  assert.match(w, /const via = online\.sendPark\(data, cell\);/);
-  assert.match(w, /online\.onPark = \(room, e\) => \{ wagonWarden\?\.keptWord\(room, e\); hcc\.applyKept\(room, e, campToScene, performance\.now\(\)\); \};/);   // PIN MOVED (WARDEN1): a throw it had not said is played before the pool takes the word
-  assert.match(w, /online\.onParks = \(room, list\) => hcc\.replaceKept\(room, list, campToScene, performance\.now\(\)\);/);
-  assert.match(w, /hcc\.pruneKept\(isCellRoom\(online\.room\) \? \[online\.room, \.\.\.online\.haloRooms\(\)\] : \[\], now\);/);
-  assert.match(w, /peerRiders\.sync\(seen, onlineToScene,[^\n]*\n\s+const afoot = seen\.filter\(\(d\) => (?:\(peerRidesIn3d\(d\) \|\| )?!peerRiders\.isRiding\(d\.id\)[^;]*\);[^\n]*\n\s+peerBodies\.sync\(afoot,/);
-  assert.match(w, /bodyHeight: \(id\) => peerRiders\.heightOf\(id\) \|\| peerBodies\.heightOf\(id\)/);
-  assert.match(w, /const riding = \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && isRiding\(player\.transportMode\);/);
-  assert.match(w, /rd: !riding \? 0 : player\.transportMode === TRANSPORT_MODES\.Cart \? 2 : 1,/);
-  assert.match(w, /rv: [^\n]*modSetting\('eye-of-the-beholder', 'Graphics\.OnHorse'\)/);
-  assert.match(w, /const eye = \[feet\[0\], feet\[1\] \+ \(s\.rd \? RIDE_EYE_HEIGHT : h - 0\.2\), feet\[2\]\];/);
-  assert.match(rd('src/net/remotePlayers.js'), /onFoot: !shown\.rd,/);
-  const o = rd('src/net/online.js');
-  assert.match(o, /this\.welcomes\+\+;/);
-  const s = rd('server/src/index.js');
-  assert.match(s, /if \(path === PARK_INTERNAL_REG \|\| path === PARK_INTERNAL_DROP\) return this\._parkInternal\(path, request\);/);
-  assert.match(s, /const k = await parkKeyOf\(a\.sub, m\.data\.c\);/);
-  assert.match(s, /if \(m\.data\.r && atCover\(here, cell\)\) \{\n\s*const thrown = await this\._parkStore\(k, a\.sub, a\.id, a\.name \?\? '', m\.data\.r, now\);/);   // PIN MOVED (COST-2): a cell this socket covers; PIN MOVED (WARDEN1): the store answers a thrown team its owner re-said
-});

@@ -1,4 +1,4 @@
-// PERF9 - THE PERFORMANCE PROBE (2026-09-11). Every PERF slice so far was
+// PERF9 - THE PERFORMANCE PROBE. Every PERF slice so far was
 // read out of the frame, not measured: this session has no GPU and no
 // ARENA2. This boots the real game on a machine that has both and logs
 // the FPS counter's own numbers - frames a second, frame ms and worst,

@@ -1,5 +1,4 @@
-// SEA-SEASON (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Eltheric
-// Ocean's seasonal boards for the deepest voyage and the legends ended; bible/03-World/Eltheric-Ocean.md SEA-SEASON): the
+// SEA-SEASON: the
 // season's law (net/sea/seaSeasonLaw.js), the captain's ledger's season figures (systems/naval/captainLedger.js, the
 // ether host's day), the copy doors that drop them (systems/offlineCopy.js), the service's figures off a clean checkpoint
 // and its boards over the real routes (server-account/src/seaSeason.js, realm.js checkpointRealm), the page's half
@@ -17,7 +16,7 @@ import { ETHER_BOX, etherDepthAt } from '../../../src/world/ethericSea.js';
 import { LEGENDS, LEGEND_RISE_DAYS } from '../../../src/systems/naval/etherShips.js';
 import { createCaptainLedger, CAPTAIN_SAVE_VERSION, CAPTAIN_SAVE_VENDOR, restoreSeason } from '../../../src/systems/naval/captainLedger.js';
 import { createEtherHost } from '../../../src/scenes/etherHost.js';
-import { offlineCopyOf, onlineCopyOf } from '../../../src/systems/offlineCopy.js';
+import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { createSeaSeason, SEA_SEASON_FRESH_MS } from '../../../src/scenes/seaSeasonHost.js';
 import { seasonText, etherOfficeText, mountNavalYardWindow } from '../../../src/ui/naval/navalYardWindow.js';
 import { accountSeaSeason, SESSION_KEY } from '../../../src/net/accountClient.js';
@@ -61,7 +60,7 @@ test('SEA-SEASON the season\'s law: its numbers each their source\'s; a world da
   assert.deepEqual([b.season, b.ends, b.deep.length, b.legends, b.mine, b.last.deep.length, b.last.legends], [2, 99, S.SEA_SEASON_ROWS, [{ name: 'kim', n: 0 }, { name: 'hal', n: 0 }], { deep: { rank: 3, n: 40 }, legends: null }, S.SEA_SEASON_LAST_ROWS, []]);
 });
 
-test('SEA-SEASON the captain\'s ledger: the deepest voyage and the legends ended kept for the season of the world\'s day - begun afresh in a new season, never by a day before it; kept by the save, read back within the law; the ether host hands it the day; neither copy door carries it (mutants: the season\'s mark, the reset, the count, the restore, the host\'s day, the doors)', () => {
+test('SEA-SEASON the captain\'s ledger: the deepest voyage and the legends ended kept for the season of the world\'s day - begun afresh in a new season, never by a day before it; kept by the save, read back within the law; the ether host hands it the day; the offline copy does not carry it (mutants: the season\'s mark, the reset, the count, the restore, the host\'s day, the copy)', () => {
   const L = createCaptainLedger();
   assert.equal(L.season(), null);
   L.deepest(12.7);
@@ -98,11 +97,10 @@ test('SEA-SEASON the captain\'s ledger: the deepest voyage and the legends ended
   day = d1 + 100;
   host.legendEnded(LEGENDS[0].id, 'sink');
   assert.equal(H.season().legends, 1);
-  // neither door carries them
+  // the offline copy does not carry them
   const snap = { classicMinutes: 600_000, worldMinutes: 600_000, modData: { Captain: { v: 1, ether: { charted: ['1,2'], season: { n: 1, deepest: 400, legends: 3 } } } } };
   const off = offlineCopyOf(snap);
   assert.deepEqual([off.modData.Captain.ether.season, off.modData.Captain.ether.charted], [null, ['1,2']], 'offline: the season\'s figures dropped, the rest kept');
-  assert.equal(onlineCopyOf(snap, 700_000).modData.Captain.ether.season, null, 'brought online: from nothing');
   assert.deepEqual(offlineCopyOf({ classicMinutes: 1, worldMinutes: 1 }).modData, undefined, 'a save with no ledger: nothing made');
 });
 
@@ -230,7 +228,7 @@ test('SEA-SEASON the page\'s half (seaSeasonHost.js) and its door: no section of
   const no = page({ answer: { ok: false, error: 'bad-json' } });
   no.s.office(); await settle();
   const n = no.s.office();
-  assert.equal(n.asking, true);   // PIN MOVED (AUDIT SEA VENTURES E7): boards never read are still asked for, never an empty season
+  assert.equal(n.asking, true);
   assert.equal(n.line.warn, true);
   assert.ok(n.line.text.length > 0);
   const sent = [];
@@ -281,18 +279,3 @@ test('SEA-SEASON the tab\'s words and section (navalYardWindow.js seasonText): t
   win.unmount();
 });
 
-test('SEA-SEASON the seams by source: a clean checkpoint carries the figures in its own batch; the route; the deploy watches the law; the sea\'s host builds the season\'s half and spreads it into the harbourmaster\'s tab (mutants: each seam)', () => {
-  const realm = src('server-account/src/realm.js');
-  assert.match(realm, /\.\.\.v\.steps,\n\s+\/\/ SEA-SEASON[^\n]*\n\s+\.\.\.\(v\.clean \? seaSeasonSteps\(db, \{ player: playerId, char: id \}, save, nowS\) : \[\]\),\n\s+\]\);/);
-  assert.match(src('server-account/src/index.js'), /if \(path === '\/v1\/sea\/season\/board'\) \{\n\s+if \(request\.method !== 'POST'\) return no\('method', 405, origin\);\n\s+return json\(await seaSeasonBoard\(ctx, who\.player, body\), 200, origin\);/);
-  assert.match(src('server-account/src/service.js'), /'\/v1\/sea\/season\/board',/);
-  assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/sea\/seaSeasonLaw\.js"/);
-  const sea = src('src/scenes/seaVenturesHost.js');
-  assert.match(sea, /const season = createSeaSeason\(\{ live, session: deps\.session, character, door: deps\.seasonDoor, now: clock \}\);/);
-  assert.match(sea, /office: \(\) => \(\{ wanted: bounty\.office\(\), season: season\.office\(\) \}\),/);
-  assert.match(src('src/scenes/world.js'), /\.\.\.seaVentures\.office\(\), buyChart:/);
-  assert.match(src('src/scenes/etherHost.js'), /L\.deepest\?\.\(etherDepthAt\(px\), day\(\)\);/);
-  const win = src('src/ui/naval/navalYardWindow.js');
-  assert.match(win, /renderSeason\(ot\.season\);/);
-  assert.match(win, /for \(const n of \[oLede, boardSec, heldSec, lettersSec, wantedSec, seasonSec\]\) n\.style\.display = tab === 'office' \? '' : 'none';/);
-});

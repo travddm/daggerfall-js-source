@@ -1,5 +1,4 @@
-// WAGON-UV (2026-10-10, from play: "For the wagon and especially the cart model we need to adjust the texture mapping.
-// The small cart is really off angle. Also, the windows on the wagon arent centered properly"): the cart's pictures laid
+// WAGON-UV: the cart's pictures laid
 // on its level frame (world/wagonModels.js cartLevel), the caravan's sides laid from the body's middle (caravanSideU)
 // and its side window centred between the skirt and the cornice (world/wagonArt.js CARAVAN_SIDE_WINDOW). Read off the
 // built geometry - the faces the pool draws - never off the laws' own numbers.

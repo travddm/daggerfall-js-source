@@ -1,4 +1,4 @@
-// CREW-TRADE's quay (bible/03-World/Captains-Sea.md CREW-TRADE): ship 42 of the player's lying to a port's quay at her
+// CREW-TRADE's quay (CREW-TRADE): ship 42 of the player's lying to a port's quay at her
 // helm over the REAL sea fight (test/navalSea.mjs), the shipwright's window's model the host hands the world
 // (navalHost.js openYard -> deps.openYard), the harbour office the world's - shared by crewtrade.test.js and
 // auditcrewtrade.test.js (AUDIT CREW-TRADE).

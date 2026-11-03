@@ -1,5 +1,5 @@
-// DW-F (2026-09-26) - ILIAC PUDDLE NO MORE 1.2.2's CLOSING AUDIT (jet082), PINNED: the four readers' findings against
-// the assembly, each fixed here or recorded as a Port-Ledger departure (bible/03-World/Deep-Waters.md, "The close").
+// DW-F - ILIAC PUDDLE NO MORE 1.2.2's CLOSING AUDIT (jet082), PINNED: the four readers' findings against
+// the assembly, each fixed here or recorded as a Port-Ledger departure (, "The close").
 // The expectations are the IL's, spelled out here.
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -83,10 +83,7 @@ test('AUDIT DW-F E5-1/E5-4: the view the loot and the guards test is the one the
   // CLIMB4: the frame's lens carries the climb's kick (a leap's), and so does this one - the same lens, kicked or not
   assert.match(view, /const worldAspect = largeHudWorldAspect\(canvas\.clientWidth, canvas\.clientHeight\);[^\n]*\n\s+const P = mirrorProjectionX\(perspective\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), worldAspect, 0\.2, 6000\)\);/, '...through the frame\'s own wide lens (AUDIT CAPTAIN\'S SEA H22: the glass\'s narrowing its own, below)');
   assert.doesNotMatch(view, /renderer\._view|renderer\._proj/, 'not the last pass\'s matrices');
-  // PIN MOVED (SPYGLASS, 2026-10-11): the frame's lens narrowed by the captain's glass while it is up - the spawners keep the
   // wide one, so nothing they place pops into the view the glass comes down from
-  // PIN MOVED (GLASS-CLEAR, 2026-10-11): and its near plane the glass's focus - the eye's own 0.2 while it is down
-  // PIN MOVED (OW-HORIZON, 2026-10-20): through scenes/travelHorizon.js horizonProj - mat4's mirrored perspective, the eye's planes on the ground
   // (WORLD_NEAR's 0.2, WORLD_FAR's 6000) and the travel view's under it
   assert.match(w, /const proj = horizonProj\(glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), worldAspect, spyglass\.near, tvf\);/, 'the frame draws through the same lens - the glass\'s narrowing on it while the glass is up (AUDIT CAPTAIN\'S SEA H22)');
   assert.match(w, /for \(let i = 0; i < 3; i\+\+\) _dwEyeOffset\[i\] = mwv\.eye\[i\] - cam\.pos\[i\];/, 'the camera machine\'s eye, relative (a crossing moves cam.pos, not the offset)');
@@ -98,7 +95,6 @@ test('AUDIT DW-F E5-1/E5-4: the view the loot and the guards test is the one the
 test('AUDIT DW-F E5-5: the port\'s own rebuilds keep the rubble where it lay; an unload and a sweep take it (pins)', () => {
   const w = hostText('src/scenes/world.js');
   assert.match(w, /if \(collectLoose\) for \(const r of \[\.\.\.\(_dwRubble\.get\(p\) \?\? \[\]\)\]\) dwFreeRubble\(r\);[^\n]*\n\s+else if \(_dwRubble\.has\(p\)\) \{ _dwRubbleCarry\.set\(key, _dwRubble\.get\(p\)\); _dwRubble\.delete\(p\); \}/);
-  // PIN MOVED (IC-SWAP-BEHIND): the pixel's own key (`pkey`) - the carry the swap's teardown took, adopted by the entry it stood in
   assert.match(w, /const dwRubbleKept = _dwRubbleCarry\.get\(pkey\);[^\n]*\n\s+if \(dwRubbleKept\) \{ _dwRubbleCarry\.delete\(pkey\); const e = built\.get\(pkey\); for \(const r of dwRubbleKept\) r\.entry = e; _dwRubble\.set\(e, dwRubbleKept\); \}/, 'adopted by the entry that stands next');
   assert.match(w, /for \(const list of _dwRubbleCarry\.values\(\)\) for \(const r of list\) dwFreeRubble\(r\);[^\n]*\n\s+_dwRubbleCarry\.clear\(\);/, 'a sweep carries nothing');
 });
@@ -281,7 +277,7 @@ test('AUDIT DW-F E-1: the renderer hands the column to the flats the host flagge
 test('AUDIT DW-F E-1: the host flags the flats that STAND in a carved column - a foe\'s feet or a pile\'s spot, under the sea\'s line, over a carved point - and draws them flagged (pins)', () => {
   const w = hostText('src/scenes/world.js');
   assert.match(w, /if \(c && dwPlayer && b\._quads === 1\) \{[^\n]*\n\s+const o = b\.origin, x = b\.bounds\[0\] \+ \(o \? o\[0\] : 0\), y = b\.bounds\[1\] \+ \(o \? o\[1\] : 0\), z = b\.bounds\[2\] \+ \(o \? o\[2\] : 0\);\n\s+on = y < c\.seaY && !!dwPlayer\.rawColumnAt\(x, z\);/);
-  assert.match(w, /if \(deepWaters && livePersonBatches\.length\) dwFlagColumnFlats\(livePersonBatches\);[^\n]*\n\s+renderer\.holdBlended\(livePersonBatches\);[^\n]*\n\s+if \(livePersonBatches\.length\) renderer\.drawBillboards\(livePersonBatches, camRight, bbUp\);/);   // PIN MOVED (GRASS-PORTAL, FIELD BUGS 2026-10-12b): flagged, then the blended ones held back for after the grass   // TV1: the flats' up is the view's lean (UP_Y off the view)
+  assert.match(w, /if \(deepWaters && livePersonBatches\.length\) dwFlagColumnFlats\(livePersonBatches\);[^\n]*\n\s+renderer\.holdBlended\(livePersonBatches\);[^\n]*\n\s+if \(livePersonBatches\.length\) renderer\.drawBillboards\(livePersonBatches, camRight, bbUp\);/);
   assert.match(w, /_dwColumnNow = cf\.columnOn && cf\.surfaceTexture \? \{/, 'on while the top is drawn over the sea');
   assert.match(w, /renderer\.setWaterColumn\(_dwColumnNow\);/);
 });

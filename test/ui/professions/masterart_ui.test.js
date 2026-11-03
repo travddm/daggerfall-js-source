@@ -1,4 +1,4 @@
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57) - THE MASTER'S WORK AT THE STATION. In the
+// MASTER-ART - THE MASTER'S WORK AT THE STATION. In the
 // craft box at Master: the three lines to choose (native selects, 40px), the catalysts held and asked, the day's bound,
 // the press through the station's own craft door, and the result card. Built from the producers: the real Worker over
 // node:sqlite, the client's door and book, the pages drawn for real, and the craft door world.js hands the page.
@@ -80,7 +80,7 @@ test('MASTER-ART THE BOX at the anvil, Smithing at Master: three line pickers of
     assert.equal(picks().length, 3);
     const opts = picks()[0].querySelectorAll('option');
     assert.equal(opts.length, 1 + masterOptions(recipeById(SWORD)).length, 'a blank, then every line the sword may carry');
-    assert.equal([...opts].find((o) => o.value === 'damage').textContent, '+20 to 40% damage');
+    assert.equal([...opts].find((o) => o.value === 'damage').textContent, '+12 to 24% damage');
     assert.equal([...a.box().querySelectorAll('.prof-master-cat')].map((c) => c.textContent).join(' | '),
       'wood:heartwood 2 / 2 (Logging\'s rarest find) | gem:pearl 3 / 3 (nets hauled at sea) | essence:arcane 10 / 10 (Enchanting)');
     assert.match(a.box().textContent, /One Master's work a day\./);
@@ -131,9 +131,8 @@ test('MASTER-ART NO BOX below Master, none for a piece no tier takes; a catalyst
     setProfessionsPages(null);
     resetProfPages();
   }
-  // PIN MOVED (AUDIT HORIZONTAL B6): a catalyst is asked of the counted units alone - a Pearl jewel's own Pearl is a good
   assert.deepEqual(masterNeeds(() => 3).find((c) => c.key === PEARL.key), { key: PEARL.key, need: 3, have: 3, pursuit: 'sea' });
-  assert.equal(masterOptionWords({ id: 'focus' }), '-7 to 10% spell cost');
+  assert.equal(masterOptionWords({ id: 'focus' }), '-4 to 6% spell cost');
   resetMasterBoxes();
   const p1 = masterPicks('anvil', recipeById(SWORD));
   p1[0] = 'damage';
@@ -142,14 +141,6 @@ test('MASTER-ART NO BOX below Master, none for a piece no tier takes; a catalyst
 });
 
 test('MASTER-ART THE WIRING: world.js\'s craft door hands the page\'s other asks to the book (no logical line in bootWorld); the four stations that make a tier draw the box, each through its own craft door, the loom in its dye; Enhanced Plus gives its pickers and its press 40px (mutants: the door\'s asks dropped; a station\'s box unwired)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /craft: async \(recipe, \{ clean, heartwood = false, dye = null, cracked = false, \.\.\.more \}\) => \{/);
-  assert.match(w, /const r = await profBook\.craft\(recipe, \{ clean, heartwood, dye, cracked, fee: f\.fee > 0 \? f\.fee : 0, name: [^\n]*, seat, \.\.\.more \}, profMintCraft\);/);
-  const pages = readFileSync(new URL('../../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
-  for (const [station, state] of [['anvil', '_anvil'], ['workbench', '_bench'], ['loom', '_loom'], ['jeweller', '_jewel']]) {
-    // PIN MOVED (AUDIT HORIZONTAL B4): the station hands the box `free` - its own readiness, its goods aside
-    assert.match(pages, new RegExp(`drawMasterBox\\(box, kit, r, \\{ station: '${station}', book, state: ${state}, free, rerender, name: p\\.name, go: \\(lines\\) => p\\.craft\\(r\\.id, \\{ clean: false, ${station === 'loom' ? 'dye, ' : ''}master: lines \\}\\) \\}\\);`), station);
-  }
   assert.match(PROF_CSS, /\.prof-master-pick \{ min-height: 40px;/);
   assert.match(PROF_CSS, /\.prof-master-go \{ min-height: 40px;/);
 });

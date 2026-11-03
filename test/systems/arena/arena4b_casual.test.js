@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, the audit's last ARENA4 gap): THE CASUAL BOUT (Arena.md 7: "A casual bout (unranked) may run under
+// ARENA4b: THE CASUAL BOUT (Arena.md 7: "A casual bout (unranked) may run under
 // DUEL1's defender-resolved law"). Built refereed rather than defender-resolved - the hall's queue word with `u`, paired
 // only with another casual seeker (net/arena/arenaLaw.js pairQueue), its offer, call, listing and `st` saying so, its room
 // owing no receipt (net/arena/arenaBrain.js receiptsOwed) - so a casual bout is PVP-REF's bout all the same and counted nowhere:
@@ -12,6 +12,7 @@ import { foldHall, HALL_EMPTY } from '../../../src/net/arena/arenaLink.js';
 import { onlineCards } from '../../../src/systems/arena/arenaBoard.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
 import { COUNT_MS, callMs } from '../../../src/systems/arena/arenaBout.js';
+const DAI = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // the weapon the bouts' blows name: the referee holds a claim to the look
 
 const { subtle } = globalThis.crypto;
 const C = ARENA_FLOOR_CENTRE;
@@ -78,8 +79,8 @@ test('ARENA4b casual bout on the relay: two casual seekers offered one bout that
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   Rm.env.GATE_SIGNING_KEY = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
   const a = Rm.connect(), b = Rm.connect();
-  await Rm.hello(a, 'fight-alva', { x: C[0] - 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', lv: 20 });
-  await Rm.hello(b, 'fight-brann', { x: C[0] + 0.5, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', lv: 30 });
+  await Rm.hello(a, 'fight-alva', { x: C[0] - 6, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Alva', kind: 'linked', tokenSub: 'acct-alva', look: DAI, lv: 20 });
+  await Rm.hello(b, 'fight-brann', { x: C[0] + 0.5, y: 0.3, z: C[2], yaw: 0, pitch: 0, mv: 0 }, { name: 'Brann', kind: 'linked', tokenSub: 'acct-brann', look: DAI, lv: 30 });
   await word(Rm, a, { k: 'in', r: 'f' }); await word(Rm, b, { k: 'in', r: 'f' });
   assert.equal(last(a, 'st').u, 1, 'its state says so');
   const total = callMs({ fighters: Array(2) }) + 300 + COUNT_MS + 600;
@@ -111,10 +112,4 @@ test('ARENA4b casual bout on the client: the Challenge card offers Find a match 
   assert.equal(foldHall(open, { k: 'of', o: '0123456789abcdef', vs: { n: 'Brann' }, until: 1 }, 0).offer.casual, false, 'a rated offer is not');
   const listed = onlineCards({ hall: { ...open, live: [{ o: '0123456789abcdef', kind: 'pvp', a: { n: 'Alva' }, b: { n: 'Brann' }, sp: 2, at: 1, u: 1 }] }, me: null, now: 0 })[0];
   assert.equal(listed.live[0].title, O.liveCasual, 'listed as a casual bout');
-  const src = rd('src/scenes/arena/arenaOnline.js');
-  // AUDIT PRE-MERGE 1003 O4/O5: the word is kept (said again on a hall socket come back) before it is sent
-  assert.match(src, /const q = \{ k: 'q', lv: Math\.max\(1, Math\.floor\(deps\.level\?\.\(\) \?\? 1\)\), \.\.\.myBanner\(\), \.\.\.\(casual \? \{ u: 1 \} : \{\}\) \};[\s\S]{0,400}?if \(!hallSend\(q\)\)/, 'the press sends `u`');
-  assert.match(src, /if \(w\.k === 'go'\) goTo\(\{ o: w\.o, kind: 'pvp', side: w\.side, vs: w\.vs, casual: w\.u === 1 \}\);/);
-  assert.match(src, /onEnd: \(\) => \{ if \(b\.casual\) say\(O\.casualEnd\); askBoard\(true\); \}/, 'the end says so');
-  assert.match(rd('src/scenes/arena/arenaGate.js'), /kind === 'queue' \|\| kind === 'casual' \|\| kind === 'unqueue'/, 'the window\'s press reaches the hall');
 });

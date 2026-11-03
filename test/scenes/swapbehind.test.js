@@ -1,12 +1,11 @@
-// IC-SWAP-BEHIND (2026-10-26, bible/03-World/Arena-Provinces.md IC-GRAND, "Built behind the view that stands") - every
+// IC-SWAP-BEHIND - every
 // rebuild of a standing pixel built behind its view and swapped in in one step (scenes/swapBehind.js; player/collider.js
 // hold and wake, ai/cover.js, player/lateSolid.js rename; scenes/world.js and scenes/pixelBuild.js wired), pinned by state.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-// IC-SWAP-BEHIND (2026-10-26, the owner walking the Imperial City: "Weird pop in issues in the city when moving"; "No band
-// aids for any of this") - A PIXEL BUILT AGAIN BEHIND THE ONE THAT STANDS (scenes/swapBehind.js): every rebuild of a
+// IC-SWAP-BEHIND - A PIXEL BUILT AGAIN BEHIND THE ONE THAT STANDS (scenes/swapBehind.js): every rebuild of a
 // standing pixel tore it down and then built it, the pixel standing nothing for the build's length; now the view that
 // stands stays until the one built behind it publishes, and the swap is one step.
 test('IC-SWAP-BEHIND THE COLLIDER HOLDS A VIEW BUILT BEHIND - a held key\'s bucket (and its gates\', `key:...`) answers no query, files nowhere, bounds nothing, while the standing view\'s answers; woken, it answers under the pixel\'s own key, its cover and its withheld late parts with it; a key standing there refused; let go, nothing left (mutants: a held bucket queried; the gates not held; the wake not renamed; the cover live)', async () => {

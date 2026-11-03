@@ -1,5 +1,4 @@
-// ELITE x PSCALE1 (2026-09-25, Mac: "Can you ensure our elite mod integration doesnt break with the new party
-// scaling implemented") - the EliteDungeons drop and main's party scaling meet on the same foes. Each holds its own
+// ELITE x PSCALE1 - the EliteDungeons drop and main's party scaling meet on the same foes. Each holds its own
 // half and the two MULTIPLY: elite at the foe's mint and in the blow's own tail, the party at the door where the
 // damage lands. Nothing of either is lost, doubled or applied to the wrong side.
 import { test } from 'node:test';
@@ -33,7 +32,7 @@ test('ELITE x PSCALE1: an elite foe\'s blow on a party is elite\'s double, THEN 
   // the dungeon weighs a shared foe's weapon and arrow hit AROUND the blow the formula returned - elite's tail inside it
   const d = rd('src/scenes/dungeonContext.js');
   assert.match(d, /function _weighHit\(f, dmg\) \{ return f && _sharedFoe\(f\) \? partyFoeHits\(dmg, fightN\(f\), playerEntity\) : dmg; \}/);
-  assert.match(d, /const dmg = (?:blowScaled\(f\.ai, )?_weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the melee hit');
+  assert.match(d, /const dmg = _weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the melee hit');
   assert.match(d, /const dmg = foeDeps && shooter \? _weighHit\(shooter, foeDeps\.calculateAttackDamage\(shooter\.entity, playerEntity, \{/, 'the arrow');
 });
 
@@ -89,7 +88,7 @@ test('ELITE x PSCALE1 outdoors: a camp grows by the party it meets, and CAMP-RIN
   assert.deepEqual(partyGroupMembers([1, 2, 3], 5), [1, 2, 3, 1, 2], 'five together: two more, drawn from its own');
   assert.match(rd('src/scenes/world.js'), /const size = campMembers\(h\.mobileTypes\)\.length;\n\s*if \(size > room\) continue;/);
   assert.match(rd('src/scenes/world.js'), /for \(const mobileType of \(hit\.fixed \? hit\.mobileTypes : campMembers\(hit\.mobileTypes\)\)\) \{/, 'the stand grows it the same way (a camp; BOUNTY1\'s `fixed` pack is the posting\'s count - auditbounty1 B2)');
-  // PVPDUNGEONS: the pool's bound is its encounterCap() now - MAX_ACTIVE_ENCOUNTER_FOES, four times it in the open zone
+  // the pool's bound is its encounterCap() - MAX_ACTIVE_ENCOUNTER_FOES
   assert.match(rd('src/scenes/world.js'), /const campMembers = \(types\) => partyGroupMembers\(types, partySize\(\)\)\.slice\(0, encounterCap\(\)\);/, 'OW6: one home for the growth, bounded by the pool');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /export const encounterCap = \(\) => \(wildHere\(\) \? MAX_ACTIVE_ENCOUNTER_FOES \* WILD_PACK_MULT : MAX_ACTIVE_ENCOUNTER_FOES\);/, 'the pool\'s cap, the open zone\'s four times');
+  assert.match(rd('src/scenes/exteriorFoes.js'), /export const encounterCap = \(\) => MAX_ACTIVE_ENCOUNTER_FOES;/, 'the pool\'s cap');
 });

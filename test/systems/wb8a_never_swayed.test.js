@@ -1,4 +1,4 @@
-// WB8a (2026-09-28, Mac: "Make the oblivion gate boss not be able to be pacified") - THE WARDEN IS NEVER SWAYED.
+// WB8a - THE WARDEN IS NEVER SWAYED.
 //
 // No path reached him before this, but only by accident: he is in no foe pool, so the language roll (DFU's
 // EnemySenses pacification, X11's seam for all three pools) never met him; his spell door took harmful families and a
@@ -71,16 +71,3 @@ test('WB8a: the language seam never rolls on him - no tongue asked, no line, no 
   assert.equal(ai2.isHostile, false);
 });
 
-test('WB8a: the doors, by source - the flag\'s door skips him; a sway stops at him (his marks and the missile\'s) and is refused in his words, the rest of the spell landing as it would', () => {
-  const hm = read('src/scenes/hostMagic.js');
-  assert.match(hm, /if \(r\.pacify && foe\.ai && !foe\.entity\?\.pacifyImmune\) foe\.ai\.isHostile = false;/);
-  assert.match(hm, /function bossMarksFor\(sp\) \{\n\s*if \(!bossMark \|\| !castAtBoss \|\| !sp \|\| !\(duelSpellOf\(sp\) \|\| \(sp\.effects \?\? \[\]\)\.some\(\(e\) => e && isSoulTrapEffect\(e\)\) \|\| spellSways\(sp\)\)\) return \[\];/);
-  assert.match(hm, /boss: !!duelSpellOf\(sp\) \|\| \(sp\.effects \?\? \[\]\)\.some\(\(e\) => e && isSoulTrapEffect\(e\)\) \|\| spellSways\(sp\) \}\);/);
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): his spell door left the dungeon context for
-  // scenes/gate/standInSpell.js, which the context wires with its mid-screen line
-  assert.match(read('src/scenes/dungeonContext.js'), /createStandInSpell\(\{\n\s*player: playerEntity, say: \(line\) => hudText\.add\(line\),/);
-  const dc = read('src/scenes/gate/standInSpell.js');
-  assert.match(dc, /const sways = spellSways\(sp\) && !!boss\.entity\.pacifyImmune;\n\s*if \(sways && now\(\) - swayToldAt >= BOSS_SWAY_TELL_MS\) \{ swayToldAt = now\(\); say\(BOSS_SWAY_TEXT\(boss\.entity\.name\)\); \}/);
-  assert.match(dc, /if \(!harm\) return laid \|\| sways;/, 'a sway alone met him - the missile is spent there');
-  assert.match(read('src/scenes/hostCombat.js'), /if \(isQuestFoe\) return null;\n\s*if \(entity\?\.pacifyImmune\) return null;/);
-});

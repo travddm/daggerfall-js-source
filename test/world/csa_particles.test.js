@@ -1,4 +1,4 @@
-// CSA-F (2026-09-27) - UNITY'S PARTICLE SYSTEM AS COME SAIL AWAY'S PREFABS USE IT: world/unityParticles.js over the
+// CSA-F - UNITY'S PARTICLE SYSTEM AS COME SAIL AWAY'S PREFABS USE IT: world/unityParticles.js over the
 // vendored prefabs' own systems (Models/prefabs.json) - the curves, emission by time, distance and burst, the shapes,
 // Local scaling, the size and force modules, plane collisions and their sub-emitters, Play and Stop. Every expectation
 // is worked out here from the modules' documented behaviour and the serialized values.

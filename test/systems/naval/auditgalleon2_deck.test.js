@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03) - HER DECK AND HER CREW, AGAIN: the second audit's deck lens over the new galleon (hull 2,
+// AUDIT GALLEON-2 - HER DECK AND HER CREW, AGAIN: the second audit's deck lens over the new galleon (hull 2,
 // the Small Ship) and every hull beside her - DK1 a shut cover stood on, DK2 the leash on a piece of two levels, DK3 her
 // doors, DK4 the mod's galleon's count, TS9 a flight climbed square - each pinned over the real code: her deck baked by
 // the real pool (test/navalSea.mjs) off her own colliders, world.js's leash lifted whole (the suites' own way,

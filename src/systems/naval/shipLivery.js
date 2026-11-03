@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-LIVERY (2026-10-17, the owner: "Letting players customize the exterior and interior textures of the ship";
-// bible/03-World/Naval-Refit.md SHIP-LIVERY) - A SHIP'S PAINT: the law, and the painter. The port's own; pure.
+// SHIP-LIVERY - A SHIP'S PAINT: the law, and the painter. The port's own; pure.
 //
 // A LIVERY is four choices, each a paint of SHIP_PAINTS or none (0 - as she was built):
 //   strake - the painted strakes of a port-built hull (world/ships/galleonArt.js and its kin: the galleon's oxblood, the

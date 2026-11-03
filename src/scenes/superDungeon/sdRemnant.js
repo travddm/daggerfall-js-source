@@ -1,5 +1,5 @@
 // @ts-check
-// SD8c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT ON THE
+// SD8c: THE BRASS REMNANT ON THE
 // PAGE - the dungeon host's set for the Last Moment's arena in the Shattered Hour, as scenes/superDungeon/sdHall.js is for its Orrery.
 // The realm runs the fight (SD8b - net/superDungeon/sdRemnant.js its law); this shows what the realm says of it and carries my blows.
 //

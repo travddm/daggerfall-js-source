@@ -1,8 +1,8 @@
-// SEAT-FACTS (2026-10-13, after SEAT-REPLICA; the owner: "1, 2 and 3"; bible/11-Multiplayer/Scale-Arc.md SEAT-FACTS):
+// SEAT-FACTS:
 // every isolate read every seat row of world_witness once a minute and counted the facts over them on every ask - after
 // SEAT-REPLICA some 100 reads of 15,899 rows a minute on the one replica, its p99 from 2 ms to some 60 ms. The minute's
 // clock (server-account/src/cron.js `seat-facts`) now reads the rows once and keeps what they say in one row
-// (migration 0112), and every isolate reads that row: fresh (SEAT_FACTS_FRESH_S) and newer than its own last write, or
+// (`seat_facts_kept`), and every isolate reads that row: fresh (SEAT_FACTS_FRESH_S) and newer than its own last write, or
 // the rows as before. Each pin failed on the build before it. tools/mutants/seat_facts.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,14 +15,14 @@ import { runCron, CRON_MINUTE, MINUTE_JOBS, _resetCronForTests } from '../../ser
 import { standService, T0 } from '../accountDb.mjs';
 
 const DAY = 86400;
-const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
+const ENV = { SEATS_OPEN: 'on' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const ALCAIRE = { key: 3022, name: 'Alcaire', region: 21, tier: 'palace', pixel: [410, 160] };
 const WITNESS_SQL = SEAT_ROWS_SQL;
-const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (PIN MOVED): the rows the law judges by are a read of them
+const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
 const FACTS_SQL = 'SELECT at, facts FROM seat_facts_kept WHERE id = 1';
 const PLAYER = { id: 'p-somebody', handle: 'Somebody', registered_at: T0 - 30 * DAY };
-const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY };
+const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY, staff_admin: 1 };
 
 /** The service with three witnesses agreeing on Anticlere and one on Alcaire; the seat rows' reads (`c.n`) and the kept
  *  row's (`c.f`) counted on a database of the request's. */

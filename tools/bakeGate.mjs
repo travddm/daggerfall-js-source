@@ -3,8 +3,7 @@
 //     node tools/bakeGate.mjs [--fbx=src/assets/gate/source/Oblivion_Gate.fbx] [--out=src/assets/gate/oblivionGate.json]
 //                             [--list]
 //
-// GATE-FBX (2026-10-09, Mac, sending Oblivion_Gate.fbx: "I want to replace the oblivion gate model with this handcrafted
-// model which also needs texturing"). The file is a Blender 5.1.1 export of a whole scene ("Oblivion Models.blend" in its
+// GATE-FBX. The file is a Blender 5.1.1 export of a whole scene ("Oblivion Models.blend" in its
 // header): 1,905 meshes - graves, crypts, crystals, a spiked tower, six lesser arches, a walled yard - and among them THE
 // GATE, one object (`OBJECT`, Cube.1688): two pillars on clawed feet, a flared lintel over them, the opening's top
 // corners cut in, three spines down each pillar's outside. 60 polygons; its two materials split the pillars, the
@@ -18,8 +17,8 @@
 // ITS FRAME (`FRAME`): the gate's own (world/gate/gateModel.js) - metres, the origin on the ground in the middle of the
 // threshold, +y up, the pillars across x, the opening facing +z and -z. Mac's scene is Z up and RIGHT-handed, the
 // world LEFT-handed (world/mat4.js THE HANDEDNESS LAW - x east, y up, z north, as Daggerfall Unity's data is), so a scene
-// point (X, Y, Z) is the gate's ( X - x, Z - ground, Y - y ) times SCALE: a MIRROR in the numbers, which is what keeps
-// his gate his own in the world (AUDIT GATE-FBX G5: the turn this bake first used, ( X, Z, -Y ), stood it mirrored front
+// point (X, Y, Z) is the gate's (X - x, Z - ground, Y - y ) times SCALE: a MIRROR in the numbers, which is what keeps
+// his gate his own in the world (AUDIT GATE-FBX G5: the turn this bake first used, (X, Z, -Y ), stood it mirrored front
 // to back), and every polygon's corners REVERSED on the way through, as tools/shipBake.mjs bakePart reverses a ship's -
 // so each face's (b - a) x (c - a) points out of the stone, as world/gate/gateModel.js faces' do. `x` and `y` are the
 // object's own origin, to the bit - the middle of the cube Mac drew the lintel from (the spines stand 6 cm off it, as

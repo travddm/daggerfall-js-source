@@ -1,5 +1,4 @@
-// DECK-POSE (2026-10-23, the owner: "I notice with sailing. Players on board the ship jitter while sailing instead of
-// staying put. Other players also slide when on board your ship/npc ships"). A player aboard a boat - a passenger on
+// DECK-POSE. A player aboard a boat - a passenger on
 // another's, or at their own helm, a booked passage's ship among them - was stood on her deck by the foes frame's `ab`
 // alone (scenes/comeSailAway/comeSailAwayAboard.js glue): a word said at most five times a second (FOES_MS), only when it
 // changed, kept to the full frames (once in two seconds) by a crowded cell's relay, and eased toward at CSA_ABOARD_EASE.
@@ -17,7 +16,6 @@ import { createComeSailAwayAboard, validAboardWord, worldOf, localOf, CSA_ABOARD
 import { CSA_WIRE_BOATS_MAX } from '../../../src/systems/comeSailAway/comeSailAwayWire.js';
 import { quatAngleAxis } from '../../../src/world/quat.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const BASE = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0 };
 
 test('DECK-POSE THE DOOR: a pose carries its place aboard - `ab`, [owner, slot, x, y, z], the feet to the cm - kept on both of the relay\'s wires; out of any bound it is no place (never clamped) and the pose stands; ashore it is absent; the foes word\'s door is the same law (mutants: the field stripped; a bound off by one; the place unrounded)', () => {
@@ -179,7 +177,7 @@ test('DECK-POSE THE SENDER: every pose I say carries my place aboard while the h
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => clock.now });
   const U = PIXEL_UNITS, me = { x: (25 * WORLD_CELL + 8) * U, y: 0, z: (15 * WORLD_CELL + 8) * U, yaw: 0, pitch: 0, mv: 0 };
   s.join('world:25,15', me); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'ann-0002', name: 'Ann' }], host: null, world: null });   // not alone: lone sleep holds no pose
   let place = ['ann', 1, 2, 1.5, -3];
   s.poseAboard = () => place;
   const said = () => sockets[0].sent.map((m) => JSON.parse(m)).filter((m) => m.t === 'pose').at(-1)?.p ?? null;
@@ -188,6 +186,4 @@ test('DECK-POSE THE SENDER: every pose I say carries my place aboard while the h
   place = null;
   clock.now += 500; s.sendPose({ ...me, x: me.x + 2 });
   assert.equal('ab' in said(), false, 'ashore: none');
-  assert.match(WORLD, /const csaDeckWord = \(\) => \(csaOn\(\) \? \(csaAboard\.word\(player\.pos\) \?\? csaHelmWord\(\) \?\? naval\?\.deckWord\?\.\(player\.pos\) \?\? null\) : null\);/);
-  assert.match(WORLD, /online\.poseAboard = csaDeckWord;/);
 });

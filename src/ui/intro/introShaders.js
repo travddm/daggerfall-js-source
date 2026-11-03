@@ -1,4 +1,4 @@
-// INTRO4 (bible/10-UI/UI-Arc.md INTRO4) - THE FILM'S SHADERS. One morning over the Imperial City and the continent: an
+// INTRO4 (INTRO4) - THE FILM'S SHADERS. One morning over the Imperial City and the continent: an
 // analytic sky (the dawn, the stars, Masser and Secunda), height fog and the lake's mist, a sun with its shadow, and a
 // grade - all of it the port's own, no picture of anyone's. Positions reach the vertex stage in metres in the city's
 // frame (x east, y up, z south) and leave it camera-relative, so the continent's millions of metres keep their precision.

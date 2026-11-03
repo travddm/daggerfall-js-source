@@ -1,6 +1,6 @@
 // @ts-check
-// CROWN1 part two, the client (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): A ROYAL TOURNEY AS THIS
-// CLIENT FIGHTS IT (bible/11-Multiplayer/Seats-Arc.md 7.6) - entered from a crown's Seat tab while its Edict rules: the
+// CROWN1 part two, the client: A ROYAL TOURNEY AS THIS
+// CLIENT FIGHTS IT (7.6) - entered from a crown's Seat tab while its Edict rules: the
 // ring's centre this game derived from the town (systems/siegeField.js royalRingWire, the crown's Palace square) sent for
 // a pass (the service settles the ring once two contenders' agree - until then it asks again), then the tourney's own
 // room joined (`royal:<key>:<week>`, a fresh pass on every hello - net/online.js mintSiegePass), `in` said once a socket
@@ -12,7 +12,7 @@
 //
 // The world is handed in, so the pins drive it with fakes. Not a DFU member. Ledger A (EVERY PALACE A SEAT's row).
 //
-// AUDIT-SEATS (2026-10-01): C1 - the tourney is LEFT as a siege is (net/siege/siegeSession.js): by the player (the HUD's Leave,
+// AUDIT-SEATS: C1 - the tourney is LEFT as a siege is (net/siege/siegeSession.js): by the player (the HUD's Leave,
 // the chat's `/leave`), once away from the crown's city BATTLE_AWAY_MS, when its socket closes for good, and at the
 // week's end - a player who pressed "Watch the Royal Tourney" on a Monday no longer stands in its room all week, the
 // city's peers and its Watch gone; the HUD drawn only in its room. C2 - the one mint slot cleared only while it is this
@@ -28,7 +28,6 @@ export const ROYAL_PASS_RETRY_MS = 5000;
 /** The words. */
 export const ROYAL_SESSION_TEXT = Object.freeze({
   notHere: (town) => `Go to ${town} to enter the Royal Tourney. Its ring stands before the castle.`,
-  old: 'The server does not keep Royal Tourneys yet.',
   entered: (side) => (side === 'watch' ? 'You are watching the Royal Tourney as a spectator.' : 'You have entered the Royal Tourney. Challenge a contender from their card.'),
   left: 'You have left the Royal Tourney.',
   refused: (why) => `The Royal Tourney would not have you: ${why}`,
@@ -41,12 +40,12 @@ export const ROYAL_SESSION_TEXT = Object.freeze({
 /**
  * THE SESSION. `online` (net/online.js), `pass(seat, field, watch)` and the bouts' `claims` (net/siege/siegeClaims.js
  * createRoyalClaims, or null), `hud` (ui/siegeHud.js createSiegeHud, or null), `nowMs()` (AUDIT-SEATS C6: the relay's
- * clock), `movePlayer(pose)` (a wire pose), `say(text)`, `relayOk()` the relay keeps Royal Tourneys, `name(id)` a peer's
+ * clock), `movePlayer(pose)` (a wire pose), `say(text)`, `name(id)` a peer's
  * name; AUDIT-SEATS C1: `here(seat)` whether the player is still at the crown's city.
  * @param {{ online: any, pass: (seat: any, field: any, watch: boolean) => Promise<any>, claims?: any, hud?: any, nowMs?: () => number,
- *   movePlayer?: (p: any) => void, say?: (t: string) => void, relayOk?: () => boolean, name?: (id: string) => string, here?: (seat: any) => boolean }} deps
+ *   movePlayer?: (p: any) => void, say?: (t: string) => void, name?: (id: string) => string, here?: (seat: any) => boolean }} deps
  */
-export function createRoyalSession({ online, pass, claims = null, hud = null, nowMs = () => Date.now(), movePlayer = () => {}, say = () => {}, relayOk = () => true, name = () => '', here = () => true }) {
+export function createRoyalSession({ online, pass, claims = null, hud = null, nowMs = () => Date.now(), movePlayer = () => {}, say = () => {}, name = () => '', here = () => true }) {
   /** @type {null | { seat: any, royal: any, field: any, watch: boolean, room: string, side: string, ends: number, sentIn: boolean, state: any, retryAt: number, joined: boolean, tries: number, mint: any, awayAt: number|null }} */
   let s = null;
   async function ask() {
@@ -82,7 +81,6 @@ export function createRoyalSession({ online, pass, claims = null, hud = null, no
     /** Enter `seat`'s Royal Tourney - `royal` the Seat tab's (its prize and window), `field` the ring's centre this game
      *  derived (null: the player is not in the city), `watch` to spectate. */
     enter(seat, royal, field, { watch = false } = {}) {
-      if (!relayOk()) { say(ROYAL_SESSION_TEXT.old); return false; }
       if (!field) { say(ROYAL_SESSION_TEXT.notHere(seat?.name ?? 'the city')); return false; }
       if (s?.mint && online.mintSiegePass === s.mint) online.mintSiegePass = null;   // AUDIT-SEATS C2: entered afresh - the old pass's mint goes
       s = { seat, royal, field, watch: !!watch, room: '', side: 'watch', ends: 0, sentIn: false, state: ROYAL_STATE_EMPTY, retryAt: 0, joined: false, tries: 0, mint: null, awayAt: null };

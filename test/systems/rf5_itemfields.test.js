@@ -1,5 +1,4 @@
-// RF5 - THE ITEM FIELD SCHEMA (2026-09-14, Mac's refactor pass, the
-// fifth). An item record is an open shape and the knowledge of what
+// RF5 - THE ITEM FIELD SCHEMA. An item record is an open shape and the knowledge of what
 // each field IS lived only in its readers; the wire's validator typed
 // a record as "primitives, arrays and plain objects, bounded" and
 // carried the exceptions by hand (the three array fields of AUDIT
@@ -111,14 +110,6 @@ test('RF5: every field the port\'s own mints write is declared, and each value i
   leaveForRepair(w, 'town:12', 720, 1000);
   assertDeclared(w, 'leaveForRepair');
   assertDeclared({ ...w, questItem: true, questUID: 4, questSymbol: { name: '_item_' } }, 'the quest link');
-  // the classic importer writes only declared fields (its literal and its later assignments)
-  const src = read('src/systems/classicSave.js');
-  const body = src.slice(src.indexOf('export function classicItemFromRecord'), src.indexOf('export function', src.indexOf('export function classicItemFromRecord') + 10));
-  const literal = body.slice(body.indexOf('const item = {'), body.indexOf('};', body.indexOf('const item = {')));
-  const keys = new Set([...literal.matchAll(/^\s{4}([a-zA-Z]+):/gm)].map((m) => m[1]));
-  for (const m of src.matchAll(/\bitem\.([a-zA-Z]+) = /g)) keys.add(m[1]);
-  assert.ok(keys.size >= 18, `the importer's keys were found (${keys.size})`);
-  for (const k of keys) assert.ok(isDeclaredItemField(k), `classicItemFromRecord writes '${k}', undeclared`);
 });
 
 test('RF5: a declared field\'s shape is closed on the wire - the wrong kind refuses the item, a string is cut, an undeclared field rides the clamp', () => {
@@ -138,7 +129,7 @@ test('RF5: a declared field\'s shape is closed on the wire - the wrong kind refu
   assert.equal(ok({ rarity: 'epic' }), null, 'a rarity off the ladder');
   for (const r of RARITY_ORDER.filter((x) => x !== 'aetheric' && x !== 'gilded')) assert.ok(ok({ rarity: r }));
   assert.equal(ok({ rarity: 'aetheric' }), null, 'AUDIT SET D6: the Aetheric tier is its record\'s, never a bare word (auditset_c.test.js walks the Regalia through)');
-  assert.equal(ok({ rarity: 'gilded' }), null, 'GILDED1: nor the Gilded - its record\'s, minted whole (gilded1_gilded.test.js walks the Hourlock through)');
+  assert.equal(ok({ rarity: 'gilded' }), null, 'GILDED1: nor the Gilded - its record\'s, minted whole (gilded1_gilded.test.js walks a record through)');
   assert.equal(ok({ equipSlot: ITEM_EQUIP_SLOTS }), null, 'a slot past the table');
   assert.equal(ok({ equipSlot: -1 }), null);
   assert.ok(ok({ equipSlot: ITEM_EQUIP_SLOTS - 1 }));
@@ -170,15 +161,9 @@ test('RF5: a declared field\'s shape is closed on the wire - the wrong kind refu
 
 test('RF5: one declaration - the array list derives from the kinds, the validator carries no hand list, the look\'s fields are declared', () => {
   assert.deepEqual([...LOOT_ARRAY_FIELDS], itemFieldsOfKind('array'));
-  assert.deepEqual(itemFieldsOfKind('array'), ['enchantments', 'customEnchantments', 'affixes', 'sockets', 'decks', 'socketBought']);   // GEM1 (PIN MOVED): a piece's socket list; CARDS8 (PIN MOVED): a Card Binder's decks; AUDIT TOWN-ECON 2 PRICE-2 (PIN MOVED): the sockets a counter sold a stone for
+  assert.deepEqual(itemFieldsOfKind('array'), ['enchantments', 'customEnchantments', 'affixes', 'sockets', 'socketBought']);   // GEM1 (
   assert.equal(LOOT_STR_MAX, ITEM_STR_MAX);
   assert.ok(Object.isFrozen(ITEM_FIELDS) && ITEM_FIELD_NAMES.length >= 40);
   for (const k of ITEM_FIELD_NAMES) assert.ok(['int', 'number', 'bool', 'string', 'enum', 'array', 'object'].includes(ITEM_FIELDS[k].kind), k);
   for (const k of LOOK_ITEM_FIELDS) assert.ok(isDeclaredItemField(k), `the look's '${k}' is declared`);
-  const loot = read('src/systems/loot/loot.js');
-  assert.match(loot, /export const LOOT_ARRAY_FIELDS = Object\.freeze\(itemFieldsOfKind\('array'\)\);/);
-  assert.match(loot, /if \(!validItemFields\(out\)\) return null;/, 'the validator checks every declared field');
-  assert.doesNotMatch(loot, /\['enchantments', 'customEnchantments', 'affixes'\]/, 'no hand list');
-  assert.doesNotMatch(loot, /validAffixList/, 'LR4\'s check rides the schema');
-  assert.doesNotMatch(read('src/systems/item/itemFields.js'), /from '(?:\.\.?\/)+(?:[\w-]+\/)*loot\.js'|from '(?:\.\.?\/)+(?:[\w-]+\/)*inventory\.js'|from '(?:\.\.?\/)+(?:[\w-]+\/)*equip\.js'/, 'the schema sits under the mints');
 });

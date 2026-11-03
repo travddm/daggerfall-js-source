@@ -1,18 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEARCH1 (2026-10-03, Mac: "can you make those objects interactable?
-// with a 33/33/33 check to spawn either and undead enemy (even undead
-// elites 50%) or when interacted with it you get loot and the quickloot
-// window lets you loot up 1-4 random items 1 of them always gold. the
-// last chance it a message that you found nothing valuable" ... "DONT let
-// the mob spawn when the message opens only when he clicks it away" ...
-// "once interacted with those they should have a cooldown of 5 ingame
-// hours" ... "DUNGEONS ONLY with the exception of Graveyard tombstones
-// 2/3rd of the tombstones should have the message that you found nothing
-// valuable" ... "other items in dungeons like chests that attracts other
-// enemies based on what you find in dungeons. Locked chests/crates should
-// also exist. All those ... should have half of the interact range as
-// doors").
+// SEARCH1.
 //
 // THE PORT'S OWN. Classic Daggerfall searches no coffin, shelf, headstone
 // or crate - every one of these is a static model in DFU, batched into its
@@ -23,7 +11,7 @@
 //   - scenes/world.js + scenes/worldModes.js: the headstones of a
 //     Graveyard-type location above ground (the streaming world);
 //   - scenes/exterior.js (the one-city bench) and the building interiors
-//     stand none - see the record in bible/06-Systems/Searchables.md.
+//     stand none - see the record in.
 //
 // WHICH MODELS. Read off the player's own ARCH3D.BSA and BLOCKS.BSA by the
 // texture archive each model wears (TEXTURE.092 "coffins organ", TEXTURE.073
@@ -158,17 +146,16 @@ export function pickRosterFoe(roster, level = 1, rolls = Math.random) {
 /** "even undead elites 50%": half the foes a search wakes stand as elites (systems/eliteFoes.js - five times the
  *  health, three times the blows, the size and the glow). */
 export const SEARCH_ELITE_CHANCE = 0.5;
-/** SEARCH1-PARTY (Mac: "when enemies spawn it must be 2 per player and if the room is too small then in a floor
- *  connected to the door to the room"): two foes for every player of the party standing there; the first is the one the
+/** SEARCH1-PARTY: two foes for every player of the party standing there; the first is the one the
  *  message names and the only one the elite roll can make an elite, the rest its plain kin. */
 export const SEARCH_FOES_PER_PLAYER = 2;
 /** How far apart two of them stand, and how far off the room's door may be to take the overflow (metres). */
 export const SEARCH_FOE_SPACING = 0.9;
 export const SEARCH_DOOR_REACH_M = 30;
-/** AUDIT BAL (bible/05-Combat/Balance-Arc.md section 10): only where elites stand (eliteFoes.js elitesAllowed - online,
+/** AUDIT BAL: only where elites stand (eliteFoes.js elitesAllowed - online,
  *  or offline under the loot ladder; an elite's drop is the ladder's) - the roll drawn first, so a search's dice are
  *  the same either way. With the ladder off a search woke an elite and its ladder-tier drop, the one door that did.
- *  RENOWN-GATE (bible/06-Systems/Revenants.md section 39): and online only from the searcher's Renown 5
+ *  RENOWN-GATE: and online only from the searcher's Renown 5
  *  (eliteFoes.js eliteRenownOpen) - the foes a search wakes are the searcher's own stands. */
 export const rollSearchElite = (rolls = Math.random) => rolls() < SEARCH_ELITE_CHANCE && elitesAllowed() && eliteRenownOpen();
 
@@ -279,7 +266,7 @@ export const _resetSearchLedgerForTests = () => _ledger.clear();
 
 // ── GRAVE-PARTY: whose search it was ────────────────────────────────
 // (FIELD BUGS 2026-10-16b, "graveyard loot on headstones are able to be looted by others, objects in tombs are un
-// lootable"; Mac, SEARCH1-PARTY: "When one player in the party interacted with it no one else can again for 5 hours".)
+// lootable";.)
 // A search's five hours are its searcher's PARTY's - underground (the room's `srch:<i>` word, scenes/searchRoom.js) and
 // above (the cell's grave stamps, net/overworldLaw.js) alike - and never a stranger's: a stranger's search locks nothing
 // of mine, mine nothing of theirs. Who a searcher is to me is the streaming host's party lens, registered here.

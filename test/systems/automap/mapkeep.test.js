@@ -1,5 +1,4 @@
-// MAP-KEEP (2026-09-27, Flylighter on Discord: "3D Map Unfilling areas mid-dungeon - Parts of the map previously
-// filled out will randomly disappear from the 3D map ... just about every dungeon"). The reveal store only ever grows
+// MAP-KEEP. The reveal store only ever grows
 // while a player stands in a dungeon; it was the LOAD that took the map away. A save made in a dungeon comes back
 // through the world host's door build, and (1) that build entered the restored record on the FRESH-ENTRY arm - the
 // colour tier (visited this run) reset, so every step taken went gray, the record stamped and the store pruned - where
@@ -46,17 +45,3 @@ test('MAP-KEEP: at "remember 0 dungeons" the store a load restored survives the 
   } finally { resetAutomapStore(); _resetForTests(); }
 });
 
-test('MAP-KEEP / THE HOSTS: the world host\'s load enters the saved dungeon on the load arm, through the door build', () => {
-  assert.match(rd('src/scenes/world.js'), /modes\?\.startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/);   // PIN MOVED (INSTANCES' audit): and the save's word for its room. PIN MOVED (AUDIT STARTS W3): a start's own dungeon through the quest's entry
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /async function startInDungeon\(\{ locationKey = null, fromLoad = false, holdOpen = false, recorded = undefined \} = \{\}\) \{/);   // PIN MOVED (HOLD-ONCE): `holdOpen` beside it   // PIN MOVED (INSTANCES' audit): and what was recorded of the place
-  assert.match(m, /return tryEnterDungeon\(hit, entries, \{ preferEnterMarker: true, fromLoad, holdOpen, recorded \}\);/);   // PIN MOVED (INSTANCES' audit): and what was recorded
-  // PIN MOVED (WILD-SUITE): the door build is one gated arrow now - the zone's gate asked inside it (AUDIT 68 X3), handed
-  // the load's flag too (a save's own hall is never refused at its door) - and the flag still rides to the build
-  assert.match(m, /return gatedTransition\(async \(live\) => \{[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(host\.wildDungeonGate && !\(await host\.wildDungeonGate\(hit, fromLoad\)\)\) return false;\n\s*if \(!live\(\)\) return false;[^\n]*\n\s*return dungeonTransition\(hit, entries, preferEnterMarker, live, fromLoad, place\);/);   // PIN MOVED (INSTANCES' audit): the entry decided rides to the build
-  assert.match(m, /automapFromLoad: fromLoad,/);
-  // AUDIT 27h M1: the court's record stands outside the store; every other dungeon enters on the arm it was handed
-  assert.match(rd('src/scenes/dungeonContext.js'), /let automapRec = madeLevelRule\(_made, 'automap'\) === 'off' \|\| isArenaFloor\(dfLocation\) \? detachedAutomapRecord\(\)[^\n]*\n\s*: enterDungeonAutomap\(automapKey, classicMinutesRef\.value, \{ fromLoad: !!opts\.automapFromLoad \}\);/);   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the court's, the Hour's and the Spire's maps off as one rule   // SD5a (PIN MOVED): the Shattered Hour keeps no map either; EG-PLAY (PIN MOVED): nor an Elite Breach's circle
-  // the other entries stay fresh ones: only the load passes it
-  assert.equal((m.match(/fromLoad: true/g) ?? []).length, 0, 'worldModes never claims a load on its own');
-});

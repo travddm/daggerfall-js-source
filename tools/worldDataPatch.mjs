@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// WD1 (2026-09-25): A MOD'S WORLD-DATA FILE, AS A DIFF OF THE CLASSIC BLOCK.
+// WD1: A MOD'S WORLD-DATA FILE, AS A DIFF OF THE CLASSIC BLOCK.
 //
 // Aquatic Sprites, Detailed Ships and Warm Ashes - Ships ship whole
 // blocks and whole building records as DFU's World Data Editor writes

@@ -17,7 +17,7 @@
 // terrain, what dims a character, and what decides whether the sun can
 // throw a shaft are the same number.
 
-/** OW-HORIZON (bible/06-Systems/Travel-View.md): where a told program's map hands over to the far law - the share of
+/** OW-HORIZON: where a told program's map hands over to the far law - the share of
  *  the square's half-side (from its centre) past which the map's shadow eases into the far transmittance, reached at
  *  the square's edge. The square's half-side is 6.55 km: the hand-over runs from 5.24 km out. */
 export const CLOUD_SHADOW_RIM = 0.8;

@@ -1,6 +1,5 @@
 // @ts-check
-// CREW-COMPANIONS (2026-09-30, Mac: take the crew "along as companions in the world that travel with you and can fight
-// by your side" - through every door: "maybe this is a time for a refactor?") - THE COMPANION LAYER. The party
+// CREW-COMPANIONS - THE COMPANION LAYER. The party
 // (systems/naval/crewCompanions.js) says who walks with the player; this stands them in whatever place the player is
 // in, and answers every change back to it. The places keep their own foe pools - the street's and a building's
 // (exteriorFoes.js, one factory), a dungeon's (dungeonContext.js) - and each hands this layer one small ADAPTER
@@ -21,8 +20,7 @@
 //    none of the player's blows can reach (combat/friendlyFire.js), and a `companion` every hostile may fight.
 //  - KNOCKED OUT: the pools' death arms hold a companion at 1 and mark him (`_knockedOut`); here he is taken out and
 //    the party carries him back aboard to rest (crewCompanions.js knock).
-//  - COMPANION-PORTAL (2026-10-02, Mac: "Companions when playing catch up, spawning in, or spawning out should use a
-//    unique portal animation instead of just popping in and out"): a place that can draw one hands its `fx` - a body
+//  - COMPANION-PORTAL: a place that can draw one hands its `fx` - a body
 //    ARRIVES through a portal at its stand, LEAVES through one (sent back, knocked out: it is taken out of the place
 //    only once the portal has closed on it) and JUMPS through a pair (a catch-up: one opens where it was, one where it
 //    stands again). A change of place lifts the party at once - the place it leaves is going.
@@ -51,7 +49,7 @@ export const TRAIL_MAX = 64;
 export const TRAIL_JUMP_M = 8;
 
 export const companionKeyOf = (c) => c.key ?? `${c.boat}:${c.name}`;
-/** FB1012d ALLY-RACE (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): A COMPANION IS ONE PERSON - the seed his body's
+/** FB1012d ALLY-RACE: A COMPANION IS ONE PERSON - the seed his body's
  *  race, face, head, hair and clothes are drawn by (characters/foeBodies.js ownPerson, which foeSeed reads before the
  *  stand's own): a member's own where the party keeps one (a sworn revenant's - its record's, revenantCompanions.js
  *  memberOf), else his party key's - his boat and his name, his for life (shipCrew.js handName) - so every door, every

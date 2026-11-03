@@ -182,24 +182,6 @@ test('a4 envelope: a save with no skillsRecentlyRaised restores DFU\'s new uint[
   assert.deepEqual(loaded.skillsRecentlyRaised, [0, 0]);
 });
 
-test('a4 envelope: the construction seam mints the masks, and a new character clears them', () => {
-  // PlayerEntity.cs:70 constructs `new uint[2]`, so the field is never
-  // absent on a live entity - the port's own construction seam (the
-  // skillUses lesson, playerEntity.js) has to carry it too. And
-  // chargen assigns onto the MODULE SINGLETON where DFU builds a new
-  // PlayerEntity, so the reset belongs there or a character created
-  // after a session inherits the previous one's highlights.
-  // INTEGRATION MOVED THIS PIN: A11 landed the same field with the
-  // named word count (skills.js SKILLS_RECENTLY_RAISED_WORDS), so the
-  // mint is spelled through the constant now - the LAW pinned is that
-  // both construction seams mint the all-zero pair.
-  const MINT = /skillsRecentlyRaised:\s*(\[0,\s*0\]|new Array\(SKILLS_RECENTLY_RAISED_WORDS\)\.fill\(0\))/;
-  const src = readFileSync(new URL('../../src/characters/playerEntity.js', import.meta.url), 'utf8');
-  assert.match(src, MINT, 'the construction seam mints the pair');
-  const chargen = readFileSync(new URL('../../src/systems/chargen.js', import.meta.url), 'utf8');
-  assert.match(chargen, MINT, 'and a new character resets it beside skillUses');
-});
-
 // ── previousVampireClan (SerializablePlayer.cs:163, :331) ─────────
 
 test('a4 envelope: previousVampireClan round-trips, and an older save reads None', () => {

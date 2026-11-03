@@ -13,6 +13,9 @@ handed the shipped zip over on 2026-09-12 to integrate 1:1.
 
 ## What is here
 
+`modsettings.json` is not committed: `sh tools/fetch-vendor.sh` copies it from the author's repository at a pinned
+commit. The repository's manifest is 1.1.1, so the 1.1.2 manifest stays committed here.
+
 - `UnleveledLoot.dfmod.json` - the shipped bundle's manifest (title,
   version 1.1.2, author, contact, DFUnity 1.1.1, GUID, the three files it
   was built from, and two REQUIRED dependencies, roleplayrealism 1.0.0

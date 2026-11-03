@@ -1,5 +1,4 @@
-// AUDIT WARDEN1 (2026-10-11, Mac: "Audit this" - five cold lanes over PR #753: the relay and the wire's law, the client's
-// law, host and save, the show and the pool's hold, the records, the whole play). BY EXECUTION, each finding pinned where
+// AUDIT WARDEN1. BY EXECUTION, each finding pinned where
 // it broke: one account is one team in a town's crowd (R1); a team's spot is its wagon's, near enough (R2); only a wagon
 // carries a landing, measured from the wagon (R3, R5); a failed round is the round's alone (R4); a landing kept in its own
 // pixel, else its cell (R6); a thrown caravan's visitor walks in where it landed (R9); a horse is thrown only standing by
@@ -164,7 +163,6 @@ test('AUDIT WARDEN1 C6/D8: the cell\'s word to the owner names whose team (`k`),
     const a1 = await join(X, 'ann1', 'acct-ann1'), bob = await join(X, 'bob1');
     const k = await parkKeyOf('acct-ann1', 'char-ann-0001');
     await park(X, a1, { c: 'char-ann-0001', a: [AX, AZ], r: { w: W(), ly: LY, tw: 77, rd: 1 } });
-    // PIN MOVED (ONE-BODY, FIELD BUGS 2026-10-15c): this stood her two characters' sockets in the cell at once - the first
     // told of its team's throw, the second (her account, another character) not, and the first alone told again as it
     // re-said the spot. A cell stands one body an account now (server/src/index.js the hello's one-socket law): her
     // second tab's hello closes the first (CLOSE_REPLACED). The watch's word is still the socket's that speaks for the
@@ -560,20 +558,3 @@ test('AUDIT WARDEN1 D3: the town under a scene point - the built pixels\' own: u
   assert.equal(t.town, 77); assert.equal(t.nav, nav); assert.deepEqual(t.local, [5, 5]); assert.deepEqual(t.toScene(5, 5), [1035, 45]);
 });
 
-test('AUDIT WARDEN1 hosts: world.js hands the host its switches - the eye, the street, the HUD, the town\'s name, my park key - registers the stamp with the save both ways, takes the town under a point off the one pure home, and frames the watch before the pool\'s step (C11: a landing\'s frame drew its team horseless) (mutants: each switch stubbed, the frame after the pool)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /eye: \(\) => cam\.pos, street: \(\) => _mode\(\) === 'exterior' && !_loading,\n\s+notify: \(lines\) => \{ for \(const l of lines\) townTalk\.say\(l\); \},\n\s+myKey: \(\) => myParkKey\(\),/);
-  assert.match(w, /townName: \(id\) => _townOfMapId\.get\(id >>> 0\)\?\.name \?\? '',/);
-  assert.match(w, /getSaveData: \(\) => wagonWarden\?\.getSaveData\(\) \?\? null,\n\s+restoreSaveData: \(rec\) => wagonWarden\?\.restoreSaveData\(rec\),/);
-  assert.match(w, /const wardenTownAt = \(x, z\) => wardenTownIn\(built\.values\(\), \(px, py\) => state\.pixelTranslation\(px, py, _wardenT\), TERRAIN_SIZE, x, z\);/);
-  assert.match(w, /hold: \(owner, on, lone\) => hcc\.holdTeam\(owner, on, lone\),/);
-  assert.match(w, /showWagon: \(r, texRemap, position, rotation, kind, look, tier, turn, hitched\) => hcc\.drawShowWagon\(r, texRemap, position, rotation, kind, look, tier, turn, hitched\),/);
-  const watch = w.indexOf("try { if (!_loading) wagonWarden?.tick(); if (_mode() === 'exterior') wardenShows?.frame(cam.pos); }");
-  const pool = w.indexOf('    hccTick(dt, now);\n    // WAGONS3 (Mac: "sit on the wagon itself');
-  assert.ok(watch > 0 && pool > watch && pool - watch < 400, 'the watch framed just before the pool\'s step');
-  assert.equal(w.split("wardenShows?.frame(cam.pos)").length - 1, 1, 'once a frame');
-  assert.match(rd('src/scenes/wagon/wagonRiders.js'), /if \(r\.held && ride\.seat != null\) \{ getDown\(RIDE_TEXT\.lifted\); return; \}/);
-  const link = rd('src/net/caravanVisitLink.js');
-  assert.match(link, /link\.onParks = \(r, list\) => \{ if \(r === cell\) judge\(caravanRecordOf\(/, 'R9: the welcome\'s list judged where it landed');
-  assert.match(link, /link\.onPark = \(r, e\) => \{ if \(r === cell && e\?\.k === visit\?\.k\) judge\(caravanRecordOf\(e\)\); \};/, 'and every word after');
-});

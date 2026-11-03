@@ -1,5 +1,4 @@
-// DECOR-DUNGEON (FIELD BUGS 2026-10-05b, the owner: "There seems to be a lot of missing decor items with house
-// decoration"; asked which, the dungeons' furnishings among them). The catalogue read the town blocks' rooms alone, so
+// DECOR-DUNGEON (FIELD BUGS 2026-10-05b,; asked which, the dungeons' furnishings among them). The catalogue read the town blocks' rooms alone, so
 // nothing Daggerfall stands only in its dungeons - a throne, a cage, a coffin, a statue, chains, a brazier - could be
 // set in a house. A dungeon block has no prop type, so its furnishings are told from the dungeon itself by their family
 // (41000-43999, the furniture and props) and the 37 things Daggerfall's dungeons stand outside them, as measured;
@@ -20,7 +19,7 @@ import { rmb, fakeBlocks } from '../../decorFakes.mjs';
 import { HAS_ARENA2, loadBlocks } from '../../arena1Data.mjs';
 
 const { Model, Flat, Light } = RDB_RESOURCE_TYPES;
-/** THE FREE-STANDING PIECES AS MEASURED (2026-10-05, over the 187 dungeon blocks of BLOCKS.BSA): each one's tag in
+/** THE FREE-STANDING PIECES AS MEASURED: each one's tag in
  *  Daggerfall's dungeon editor and how many times a dungeon stands it doing nothing. */
 const STANDS = Object.freeze({
   60512: ['ST1', 1], 60520: ['ST9', 1], 62317: ['XA2', 3], 62318: ['BM0', 5], 62319: ['BM0', 30], 62321: ['BM1', 12],

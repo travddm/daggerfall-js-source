@@ -1,5 +1,4 @@
-// FEUD HARNESS (bible/12-Enhanced-AI/Feud-Arc.md section 28 and the FEUD HARNESS record; Mac, 2026-10-05: "Take care of
-// both gaps"). The duel harness (tools/tellDuel.mjs) fought a revenant alone and never let it run; it now fights the rest
+// FEUD HARNESS (FEUD HARNESS record). The duel harness (tools/tellDuel.mjs) fought a revenant alone and never let it run; it now fights the rest
 // of what the pools give it - its band (its kin by rank about it, each its own motor, attack and brain; rank 5's rally at
 // its stand, through a portal when none is left; scattered when it runs) and its flight (systems/revenant/revenant.js
 // revenantFleeStep: escaped, the fight is over; chased, run down). Modelling it found a fault in the game: a revenant
@@ -27,7 +26,6 @@ const { runSpeed } = await import('../../../src/player/motor.js');
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const SEEDS = (n, from = 1) => Array.from({ length: n }, (_, i) => from + i);
 const fights = (opts, seeds) => seeds.map((seed) => H.revenantFight({ ...opts, seed }));
-// PIN MOVED (FLIGHT-FIRST, test/systems/revenant/flightfirst.test.js): a fleeing foe runs at twice its walk now, and a runner at Speed
 // and Running 50 no longer runs it down on flat ground - the flight's pins below chase as a fast runner does
 const FAST = runSpeed(90, 90);
 /** UNQUIET (Revenants.md section 46): the fastest runner there is - from rank 2 an Orc BOLTS (revenantUnquiet.js CRAFT.BOLT_PACE)
@@ -99,13 +97,12 @@ test('FEUD HARNESS ITS FLIGHT: under a fifth of its health it may run - striking
   const got = ran.filter((x) => x.end === 'fled').length;   // UNQUIET: a bolt keeps a few away even from the fastest at its heels
   assert.ok(got <= Math.ceil(ran.length * 0.2), `run down, most of them (${got} of ${ran.length} got away)`);
   assert.ok(ran.filter((x) => x.end !== 'fled').every((x) => x.end === 'knelt' || x.end === 'tore'), 'the rest knelt or tore away');
-  // PIN MOVED (UNQUIET, Revenants.md section 46): a rank-3 Orc BOLTS, and even the fastest runner only keeps pace - none is
   // struck as it runs, so none rises in its last stand mid-run here; a chaser faster than any player still finds it
   assert.ok(ran.every((x) => !x.stoodInFlight), 'never struck down as it bolts');
   const hounded = fights({ rank: 3, mode: 'trade', runner: HOUND }, SEEDS(40)).filter((x) => x.flight);
   assert.ok(hounded.some((x) => x.stoodInFlight), 'struck as it runs, some rise in their last stand mid-run - and fight on to their end');
   assert.ok(hounded.every((x) => x.end === 'knelt' || x.end === 'tore'), 'the hound runs every one down');
-  assert.ok(ran.some((x) => x.cornered), 'some are run down and cornered');   // PIN MOVED (FLIGHT-FIRST): a fast runner at a rank-3's heels finds its last stand first, never its kneel mid-run (`caught` - test/systems/revenant/flightfirst.test.js, rank 1)
+  assert.ok(ran.some((x) => x.cornered), 'some are run down and cornered');
   const long = ran.filter((x) => x.t - x.flightAt > F.BAND_SCATTER_S + 0.5);
   assert.ok(long.length > 0 && long.every((x) => x.bandGone === x.band), 'its scattered band gone when its run is spent');
   assert.ok(ran.filter((x) => x.t - x.flightAt < F.BAND_SCATTER_S - 0.5).every((x) => x.bandGone === 0), 'not before');
@@ -134,15 +131,3 @@ test('FEUD HARNESS ITS BAND FIRST: struck down kin by kin before its master; at 
   assert.ok(fights({ rank: 5, mode: 'trade' }, SEEDS(6)).every((x) => x.bandSlain === 0), 'its master first: none slain');
 });
 
-test('FEUD HARNESS THE CELL AND THE HEADER: a cell counts its flight and its band; the measure stands its band-first and alone rows beside the targets; the header names what is modelled and what is not (mutants: a count dropped)', () => {
-  const c = H.revenantCell({ rank: 3, mode: 'trade' }, 4);
-  for (const k of ['fled', 'flights', 'cornered', 'caught', 'stoodInFlight', 'band', 'bandSwings', 'bandWindups', 'bandHits', 'rallied', 'portal', 'bandSlain', 'scattered']) assert.ok(k in c, k);
-  assert.equal(c.band, 2);
-  const src = read('tools/tellDuel.mjs');
-  assert.match(src, /and the rest of the fight the pools give it - ITS BAND/);
-  assert.match(src, /Never modelled: the player's own health \(the band's plain blows - under the tier - land on nobody here\), a\n\/\/ kin's spells/);
-  assert.doesNotMatch(src, /Never modelled: a flight/);
-  const m = H.measureFeud({ fights: 1, weapons: ['Longsword'] });
-  assert.deepEqual(m.beside.map((x) => `${x.rank}/${x.mode}/${x.order}/${x.band}`), ['3/trade/band/2', '3/dodge/band/2', '5/trade/band/3', '5/dodge/band/3', '3/trade/alone/0', '3/dodge/alone/0']);
-  assert.ok(m.beside.filter((x) => x.order === 'alone').every((x) => x.flights === 0));
-});

@@ -1,4 +1,4 @@
-// AUDIT SEATS-2 (2026-10-02, Mac: "Can we do a deep comprehensive audit on everything") - THE RELAY'S LANE: the relay's
+// AUDIT SEATS-2 - THE RELAY'S LANE: the relay's
 // own fighters answer whoever strikes them and are struck from nowhere they could never answer (R1); a work blow's field
 // frame says them where they stand (R2); the Throne's seconds never outrun the wire's bound (R3). Over the real Room and
 // its fake sockets (test/fakeRoom.mjs). `06-Systems/Online-Arc.md` AUDIT SEATS-2.
@@ -58,7 +58,6 @@ test('AUDIT SEATS-2 R1: a shaft from beyond the Captain\'s leash and a blow\'s r
 });
 
 test('AUDIT SEATS-2 R2, R3: a work blow\'s field frame is cut at the blow\'s moment; the Throne\'s seconds are held to its hold, so a late beat\'s last frame still passes the wire (mutants: the frame at the last beat; the clamp)', () => {
-  assert.match(readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8'), /this\._siegeFan\(\[siegeFieldFrame\(b, this\._siegeCounts\(s\), now\)\]\);   \/\/ AUDIT SEATS-2 R2/);
   const b = newBattle({ kind: 'siege', tier: 'crown', startMs: T, endMs: T + 2700_000, field: fieldOf(SF, 'crown') });
   b.throne = SIEGE_THRONE.crown.holdS + 1.5;
   const f = siegeFieldFrame(b, [1, 1, 0], T + 1000);

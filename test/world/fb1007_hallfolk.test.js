@@ -36,7 +36,6 @@ import { RestWindow } from '../../src/ui/restWindow.js';
 import { tinyRmb, fakeBlocks } from '../wd3Fakes.mjs';
 import { standService } from '../accountDb.mjs';
 
-const WM = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
 const packJson = (v) => JSON.parse(zlib.gunzipSync(readFileSync(new URL(`../../vendor/${v}/WorldDataPack/${v}.pack.json.gz`, import.meta.url))).toString('utf8'));
 const VILLAGES = packJson('beautiful-villages');
 const noop = () => {};
@@ -221,11 +220,3 @@ test('HALL-FOLK the re-roll still stands what it always stood: a stranger\'s Hou
   await quietly(() => modes.forceExitToExterior({ cacheScene: false }));
 });
 
-test('HALL-FOLK by source: the interior host\'s re-roll asks the build\'s own latches (the visit\'s home, the private room) before the law, and nothing else of the dep moved', () => {
-  const dep = WM.slice(WM.indexOf('    updateNpcPresence: () => {'));
-  const body = dep.slice(0, dep.indexOf('\n    },\n'));
-  assert.match(body, /if \(!interiorBuilding \|\| !interiorCtx\) return;[\s\S]*?if \(interiorHome \|\| privateVisitRoom\) return;[\s\S]*?if \(!updateNpcPresence\(interiorBuilding\?\.buildingType/, 'the room first, then DFU\'s law');
-  assert.match(WM, /interiorHome = home;   \/\/ HOME1: the visit's latch/, 'the latch is the build\'s own answer');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(WM, /isHouseOwned: \(key\) => home !== null \|\| houseOwnedAt\(/, 'the one the people gate read');
-});

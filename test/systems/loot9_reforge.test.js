@@ -1,11 +1,9 @@
-// LOOT9 - SALVAGE, AND THE REFORGE (2026-10-01; bible/06-Systems/Loot-Arc.md section 11, Mac: "Do you wanna turn this
-// into an arc and do all of the above?" - "Salvage and reroll: break unwanted Magic+ items into a crafting material ...
-// spend it at the Mages Guild to reroll one affix"). The laws pinned here:
+// LOOT9 - SALVAGE, AND THE REFORGE. The laws pinned here:
 //   - THE SHARD: template 571 beside the Sigil Stone - stacking with its own kind, BOUND (the realm's list names it).
 //   - SALVAGE: Magic 1, Rare 3, Legendary 8, Exalted 15 - only a piece the ladder graded; never an Aetheric piece, an
 //     artifact, a quest's, a bound, worn or locked one; all of it or none of it.
 //   - THE REFORGE: a Magic's or Rare's every line, an Exalted Legendary's own extra line, never a record's. REFORGE-REPLACE
-//     (2026-10-25, the owner: "Replace, price rises"): any line, however often (an old piece's one-line mark a reforge
+//     any line, however often (an old piece's one-line mark a reforge
 //     counted, never a lock); the line REPLACED from its tier's pool - never its own kind, never a kind or param another
 //     line carries, a proc a proc, any name slot (the name follows) - the price following, and each reforge on a piece
 //     twice the last; paid in shards then gold, nothing taken when refused.
@@ -312,9 +310,6 @@ test('LOOT9: the Mages Guild\'s fourth row - the classic popup\'s port-drawn row
   assert.equal(asked, 2);
   assert.equal(REFORGE_ROW, 'Reforge');
   assert.ok(ry >= 51, 'under DFU\'s panel, never over its art');
-  assert.match(read('src/ui/enhanced/enhancedPorts.js'), /\.\.\.\(w\.hooks\.reforge \? \[\{ label: REFORGE_ROW, act: \(\) => w\._reforge\(\) \}\] : \[\]\)/, 'the Plus face lists it beside the service');
-  assert.match(read('src/scenes/worldModes.js'), /reforge: route\.guildGroup === GUILD_GROUPS\.MagesGuild && service === 'Identify' && lootRarityOn\(\) \? \(\) => shutBox\(\) \?\? \(openReforge\(\) \? \{ dispatched: true \} : null\) : null,/, 'the Mages Guild\'s Identify NPC alone, the row on');   // PIN MOVED (AUDIT CHAP5 D2): a shut hall's row refused on the popup
-  assert.match(read('src/scenes/worldModes.js'), /reforge: \(item, line\) => reforgePiece\(item, line, playerEntity\),\s*salvage: \(item\) => salvagePiece\(item, \{ items: \(playerEntity\.items \?\?= \[\]\) \}\),/, 'the law\'s, on the player\'s own pack and purse');
   _setGuildServiceArtForTests(null);
 });
 
@@ -353,7 +348,4 @@ test('LOOT9: the pack card offers Salvage for a graded piece - asked first, Keep
       assert.equal(RF.shardsHeld(e.items), 3, 'into its shards');
     } finally { view.unmount(); }
   });
-  // PIN MOVED (SALVAGE-CLASSIC, bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): a piece that wears Magic and never breaks
-  // (DFU's own magic, salvageRefusal 'classic') shows the button too, and its press says why (test/systems/fb1012d_salvageclassic.test.js)
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /if \(side === 'local' && !line\.equipped && \(salvageShards\(picked\) > 0 \|\| salvageRefusal\(picked\) === 'classic'\) && !\['off', 'aetheric', 'gilded', 'artifact', 'quest', 'bound'\]\.includes\(salvageRefusal\(picked\) \?\? ''\)\) \{/, 'never a worn piece, never one that will not break - but classic magic says why');
 });

@@ -1,5 +1,5 @@
 // @ts-check
-// LEFAY1 (2026-10-08): THE MONUMENT'S OWN ART, MADE AT BOOT - the stone of the monument to Julian LeFay
+// LEFAY1: THE MONUMENT'S OWN ART, MADE AT BOOT - the stone of the monument to Julian LeFay
 // (world/lefayMonument.js) is the port's, so it is made here from noise the moment a host asks (world/gate/gateArt.js's
 // law: pictures of the port's own under a pseudo-archive far above any classic one, no renderer and no GL in this
 // file - pixels and numbers).

@@ -1,4 +1,4 @@
-// QL1/QL5-QL10 (bible/06-Systems/Questlines-Arc.md sections 2.5 and 3): THE SHEETS AND THE BRANCHES, HELD TO THEIR
+// QL1/QL5-QL10: THE SHEETS AND THE BRANCHES, HELD TO THEIR
 // SCRIPTS. Every sheet is checked against the quest it names, parsed as the game reads it (test/qlSources.mjs, the pack
 // loader's node twin): a binding of a kind the law reads, a task, item, clock or foe the script holds, a step it logs, a
 // choice task something in it can set (tools/qlSheetLaw.mjs sheetProblems). And the sets are exact: every quest a player can be

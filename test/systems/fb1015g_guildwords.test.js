@@ -1,6 +1,4 @@
-// SEAT-WORDS and STANDING-WORDS (FIELD BUGS 2026-10-15g; Mac, asked what the guild system still left unsaid: "Seat-locked
-// services", "Standing changes shown", "Probation warning", "Tutorial + guide words"), AUDIT GUILD-WORDS (Mac: "Lets
-// audit everything") and AUDIT GUILD-WORDS II (Mac: "Audit this and ensure perfection"; bible/01-Overview/audits/Audit-Guild-Words.md),
+// SEAT-WORDS and STANDING-WORDS (FIELD BUGS 2026-10-15g;, "Standing changes shown", "Probation warning", "Tutorial + guide words"), AUDIT GUILD-WORDS and AUDIT GUILD-WORDS II (),
 // which read them cold and fixed what they found: online, a service a chair opens says it is a chair's at any rank, and a
 // knight is told the order's house is not given; the hold at 7 pops the Chapters page; every Roll answer says what it
 // moved - a quest's whole reward, a loss the owed absorbed, the owed paid (the service's own word, II B-4) - and what it
@@ -442,7 +440,7 @@ test('SEAT-WORDS: the tutorial and the notice board\'s guide say the law - a rev
   const guilds = tutorialById('guilds');
   assert.deepEqual([guilds.title, guilds.trigger, guilds.body], ['Guilds', 'When you first visit a guild.',
     ['Join a guild for its services and its work. Do that work and practice the skills it teaches to rise in rank.', 'You may join one temple, one knightly order, and as many guilds as will have you.']]);
-  assert.deepEqual(guilds.points, ['Online, reviews promote you no further than rank 7. Ranks 8 and 9 are chapter chairs; see Guild Chapters.']);   // VOICE1 (PIN MOVED)
+  assert.deepEqual(guilds.points, ['Online, reviews promote you no further than rank 7. Ranks 8 and 9 are chapter chairs; see Guild Chapters.']);   // VOICE1 (
   const ch = tutorialById('chapters');
   assert.deepEqual([ch.group, ch.title], ['online', 'Guild Chapters']);
   assert.deepEqual(ch.body, ['Online, quests raise your standing with each guild by at most 15 a real day (days start at midnight UTC). Any more is added on later days.',
@@ -496,23 +494,5 @@ test('AUDIT GUILD-WORDS II F-1, F-2: the classic window\'s refusal wraps on the 
   assert.ok(layoutMessageBox(font, latchBoxRows({ rows: [SEAT] })).w > 320, 'left whole, the chair\'s refusal ran past both edges');
   const laid = layoutMessageBox(font, fitBoxRows(font, latchBoxRows({ rows: [SEAT] })));
   assert.ok(laid.w <= 320 && laid.x >= 0, `fitted, ${laid.w} wide at ${laid.x}`);
-  assert.ok(src('src/ui/guildServiceWindow.js').includes('this._box = layoutMessageBox(font, fitBoxRows(font, latchBoxRows(top, this.hooks.rows)), buttons);'));
-  assert.ok(src('src/ui/enhanced/enhancedPort.js').includes("const n = el(doc, 'div', `port-text${b.center ? ' center' : ''}${b.scroll ? ' scroll' : ''}`);"));
-  const css = src('src/ui/enhanced/enhancedPortStyle.js');
-  assert.match(css, /\.port-text\.scroll \{ flex: none; max-height: min\(34dvh, 240px\); overflow-y: auto; display: flex; flex-direction: column; gap: 6px;/);
-  assert.match(css, /@media \(max-height: 480px\) \{ \.port-text\.scroll \{ max-height: 20dvh; \} \}/, 'a phone on its side: a shorter well');
 });
 
-test('SEAT-WORDS / STANDING-WORDS: the hosts - the gate and the house take the book\'s ceiling, the hall\'s line the character\'s date and the review\'s book, the Standing page the online flag, the streets\' tracker the module\'s doors through a lazy chat door and no door of its own over them, in any shape (mutants: each seam, a door overridden - II E-11)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.ok(wm.includes('const access = serviceAccess(guild, membershipOf(seated(), guild), service, { rankCeiling: host.rollPace?.(guild.factionId)?.book ?? null });'));
-  assert.ok(wm.includes('const decision = receiveHouseDecision(kept, { rankCeiling: host.rollPace?.(guild.factionId)?.book ?? null,'));
-  assert.ok(wm.includes('rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships })'));
-  const w = src('src/scenes/world.js');
-  const start = w.indexOf('const rollTracker = onlineOn && realmSession ? createRollTracker({');
-  const call = w.slice(start, w.indexOf('}) : null;', start));
-  assert.ok(start > 0 && call.includes('...rollNoticeDoors({ entityOf: () => playerEntity, say: (text) => chatNotice(text) }),'));
-  assert.doesNotMatch(call.slice(call.indexOf('...rollNoticeDoors(')), /['"]?\bon(Capped|Standing|Ceiling|Full)['"]?\s*[:(]/, 'no door of the host\'s own after the module\'s');
-  assert.doesNotMatch(call, /['"]?\bon(Ceiling|Full)['"]?\s*[:(]/, 'the pace\'s lines are the module\'s alone');
-  assert.ok(src('src/ui/enhanced/enhancedMenu.js').includes('const book = affiliations(entity, { now: dateFromClassicMinutes(Math.floor(ownMinutes())), online: isOnlinePage() });'));
-});

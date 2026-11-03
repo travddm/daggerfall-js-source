@@ -1,4 +1,4 @@
-// AUDIT YARD-LIGHT (2026-10-07, Mac: "audit this"; `06-Systems/Online-Arc.md` AUDIT YARD-LIGHT). Three cold reads and
+// AUDIT YARD-LIGHT. Three cold reads and
 // the author's own over YARD-LIGHT (a yard's TEXTURE.210 flat lights as the town's lantern), each finding fixed here and
 // pinned: L1 a yard lights its first YARD_LAMPS_MAX lamps (the densest Daggerfall block stands eight; sixty round one
 // lot were nine times its brightest ground); L2 no distance cuts a lamp (a cut at 300 m of the yard's origin put its lamps

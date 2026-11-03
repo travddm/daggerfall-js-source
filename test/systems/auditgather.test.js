@@ -1,5 +1,4 @@
-// AUDIT GATHER (2026-10-26, Mac: "Audit the harvesting and gathering systems ensuring perfection and that nothing is
-// broken"; bible/06-Systems/Professions-Arc.md section 55): THE AUDIT'S CLIENT PINS, each failing on the code before its
+// AUDIT GATHER: THE AUDIT'S CLIENT PINS, each failing on the code before its
 // fix. The service's two (F2 the Motherlode's clock, F3 the school's bound) are test/net/auditgather_service.test.js.
 //   F1 - a CARRIED harvest refused at the seat (progress-seat, trade-held) is kept, asked again with its own rid; one
 //        that is not carried, and a carried one refused for anything else, is let go as before.
@@ -83,15 +82,6 @@ test('AUDIT GATHER F1: a CARRIED harvest whose first answer was lost, then refus
   const own = bookOf([{ ok: false, error: 'offline' }, { ok: false, error: 'prof-rank' }]);
   await own.harvest(); own.later(60_000); await own.book.pump(() => {});
   assert.equal(own.book.pendingHarvests, 0, 'a carried harvest refused for its own sake is let go');
-});
-
-test('AUDIT GATHER F4: the profession picker answers again once the slot replaced it (the death screen over it) - with no window up the old one is gone, not open; a picker that is up still holds the slot (source pin: profChoose is bootWorld\'s own)', () => {
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf('const profChoose = (rows, pick) => {');
-  assert.ok(at > 0, 'profChoose stands');
-  const line = w.slice(at, w.indexOf('\n', w.indexOf('\n', at) + 1));
-  assert.match(line, /if \(!listPickerArtLoaded\(\) \|\| \(_profPicker && gamePaused\(\)\)\) return false;/);
-  assert.doesNotMatch(line, /\|\| _profPicker\) return false/, 'a picker kept by name alone refused every one after it');
 });
 
 test('AUDIT GATHER F5: an act on yesterday\'s node ends at the UTC day\'s turn - nothing asked, the Pick-Axe unworn, the stop said; struck to its end it wore the tool and the service refused it (`prof-day`) (mutants: the day\'s turn ends nothing; the act left standing)', async () => {

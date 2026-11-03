@@ -1,5 +1,4 @@
-// FOE-CATCHUP (2026-09-26, SquidKamer on the Discord: "you drop to 1 fps for a few seconds and get jumped by
-// everyone"; Mac, asked: "Yes, add the cap"). A foe's body steps at FIXED_DT for whatever time the frame hands it, and a
+// FOE-CATCHUP. A foe's body steps at FIXED_DT for whatever time the frame hands it, and a
 // step is the port's dearest work (the path check's capsule casts, the sight rays - measured, 84% of a crowd's ray time
 // is ClearPathToPosition's). At 10 fps each foe ran six steps a frame, so under a crowd a hitch made the next frame
 // dearer and that one dearer still. The pools now hand their foes at most three steps' worth a frame

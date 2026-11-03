@@ -1,4 +1,4 @@
-// PEER-HULL-RANGE (2026-10-11) - ANOTHER'S SHIP FAR OFF STANDS NO HULL HERE. Every peer in the room says their sea in
+// PEER-HULL-RANGE - ANOTHER'S SHIP FAR OFF STANDS NO HULL HERE. Every peer in the room says their sea in
 // their word, so a client held every player's ships wherever they sailed, and Come Sail Away's pool walked and baked
 // each one every frame - 30-40 hulls, most of them 80-700 km off, a third of the main thread (scenes/naval/navalHost.js
 // PEER_HULL_NEAR_M). Her record is kept as ever; only her hull waits for the eye to come near. The sea of
@@ -43,7 +43,7 @@ test('PEER-HULL-RANGE another\'s ship within PEER_HULL_NEAR_M of the eye stands 
   assert.deepEqual(h.pool.seaBoats, []);
 });
 
-// AUDIT PEER-HULL-RANGE (2026-10-11, Mac: "Audit it. Ensure it doesnt kill fidelity") - THE PICTURE UNMOVED. The first
+// AUDIT PEER-HULL-RANGE - THE PICTURE UNMOVED. The first
 // cut's edges (3,000 / 3,500 m) stood INSIDE the fog: the enhanced lane's linear fog ends at 2400 x Land View / 3 - 4,000 m
 // at its default 5, 4,800 m at 6 (world/weather.js scaleFogForDistance) - so a ship came into being 75% fogged and went
 // out at 87%. And a hull built AGAIN wore her first hull's past rather than her record: her sails by height, colours and

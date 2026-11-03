@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// IC-TOWNMAP (2026-10-26; the owner: "Curious how the town map will look", and his go-ahead for the city's own map) -
+// IC-TOWNMAP -
 // THE IMPERIAL CITY ON THE HELD MAP: the town sheet of a city twenty kilometres across.
 //
 // A slice of the Imperial City is a location of Daggerfall's shape - eight by eight blocks - and the town sheet
@@ -25,7 +25,7 @@
 // (sx, sy) slices in, so the town sheet's plates and marks need no transform of their own beyond that offset.
 //
 // DFU reference: none - DFU's town map is one location's blocks (ExteriorAutomap.cs); the Imperial City is the port's
-// own (bible/03-World/Arena-Provinces.md IC-GRAND), and so is its map (bible/10-UI/Enhanced-Maps-Arc.md IC-TOWNMAP). The
+// own (IC-GRAND), and so is its map (IC-TOWNMAP). The
 // classic skin's window still draws the slice's blocks, DFU's way.
 // ═══════════════════════════════════════════════════════════════════
 

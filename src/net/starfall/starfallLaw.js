@@ -1,9 +1,7 @@
 // @ts-check
-// STAR1 (2026-10-20, the owner: "A lore accurate world encounter defense mission ... something coming from the sky and
-// crashing into the ground, where people need to defend the objective in a wave based format with a boss topping off
-// the encounter at the end", and "multiple encounters spread throughout the region, not just one"): THE STARFALL'S LAW -
+// STAR1: THE STARFALL'S LAW -
 // when the stars fall, where in its pixel each lands, and the ledger a star's cell keeps while its coven comes for it.
-// Design: bible/11-Multiplayer/Starfall.md sections 1, 4 and 5.
+// Design: 4 and 5.
 //
 // A FUNCTION OF THE WALL CLOCK, AND NOTHING ELSE. The sky turns once a real hour, its midnight on the hour (net/skyLaw.js
 // SKY_SEGMENTS - TimeScale 24, aligned), and a night's three stars fall at fixed instants of that hour. The law reads
@@ -24,7 +22,7 @@ import { gateHash, PIXEL_M, GATE_SPOT_SPREAD_M } from '../gate/gateLaw.js';
 import { festivalOpen } from '../festivalLaw.js';   // the festival's one calendar (a leaf beside the holiday tables)
 
 // ═══ THE WINDOW ══════════════════════════════════════════════════════════════════════════════════════════════════════
-/** THE WITCHES' FESTIVAL'S DAYS - the Starfall is the festival's (bible/06-Systems/Witches-Festival.md), so it runs while
+/** THE WITCHES' FESTIVAL'S DAYS - the Starfall is the festival's, so it runs while
  *  the festival is open on its one calendar (net/festivalLaw.js FESTIVALS, a row a year), read off the clock alike by the
  *  relay, every client and the questline's need - a cell reads no hub, and no word has to be staged for the stars to
  *  fall (section 12). */
@@ -54,7 +52,7 @@ export const STAR_AFTER_MS = 120_000;
  *  (its midnight plus STAR_LIFE_MS) - so the hour's first quarter is the night before's dawn. */
 export const starNightAt = (nowMs) => Math.ceil((nowMs - STAR_LIFE_MS - STAR_FALLS_MS[STAR_PER_NIGHT - 1]) / STAR_HOUR_MS);
 /**
- * WW5 (bible/03-World/World-Wide.md WW5): A COVEN NIGHT IN EVERY THEATRE - the Bay's, and each province's past it that
+ * WW5 (WW5): A COVEN NIGHT IN EVERY THEATRE - the Bay's, and each province's past it that
  * stands (net/wire.js SITE_EVENT_LANES: Cyrodiil's open zone none). One sky turns over the whole of Tamriel, so every
  * theatre's night is the same hour and its three stars fall at the same instants (the gates' stagger would put a star in
  * daylight); each theatre's coven, sites and stars are its own. A star's NUMBER `k` names its lane and its place in the
@@ -141,8 +139,7 @@ export const STAR_KILL_MIN_MS = 2_500;
  *  were 52.5 s however fast they died, an empty crater waited out after a 25 s fight - "the time between waves is too
  *  long" again, for a party. A lone defender's is as it was (4 to 7 foes, 10 to 17.5 s); a party of eight's 7.5 s. */
 export const starClearFloorMs = (wz, nd) => Math.ceil(Math.max(0, wz) / Math.max(1, nd | 0)) * STAR_KILL_MIN_MS;
-/** The coven draws breath this long between waves, and before the master. STAR-TUNE (2026-10-20, the owner, of the first
- *  run: "The time between waves is too long"): 5 s, from 12 - the breath was the least of the wait (the next wave stood
+/** The coven draws breath this long between waves, and before the master. STAR-TUNE: 5 s, from 12 - the breath was the least of the wait (the next wave stood
  *  25 to 35 m out and walked in after it: starfallClient.js STAR_STAND_R), and both are cut. */
 export const STAR_BREATH_MS = 5_000;
 /** The master's fall is believed no sooner than this after it stood (encounter clock). */
@@ -154,7 +151,7 @@ export const STAR_WAVE_MAX = 24;
 /**
  * A wave's size: four for the first defender and two for each beside it, one more each wave on - four to twenty-four.
  * Alone, 4, 5, 6 and 7; two, 6 to 9; four, 10 to 13; eight, 18 to 21; ten or more, the most by the last wave.
- * STAR-TUNE (the owner, of the first run: "the enemies are too few and die too quickly. Does this not have scaling?";
+ * STAR-TUNE (;
  * then "we should go beyond the limit"): it was two and the defenders, one more from the third, to nine - the camps'
  * spawn grant's stand (GRANT_KINDS.site) - a lone defender's 3, 3, 4 and 4 and a party of eight's nine. The star
  * stands under a grant kind of its own now, sized to its law, and each foe is shared by those who fight it besides

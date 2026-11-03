@@ -1,6 +1,6 @@
-// AUDIT PRE-MERGE 0929 (2026-09-29, Mac: "Audit this") - TERMS1's half: the deploy that asks the service as a player
+// AUDIT PRE-MERGE 0929 - TERMS1's half: the deploy that asks the service as a player
 // does, the site that waits for the service its forms ask, a game from before the boxes told the truth, and a keyboard
-// that survives the card's redraw. The record: bible/01-Overview/audits/Audit-PreMerge-0929.md.
+// that survives the card's redraw. The record:.
 //
 // Each test failed on the unfixed tree for its finding's reason: the smoke's guest opened with a label alone (T-CI), a
 // deploy job that published with nothing waited on (T2), a bare request answered `terms-unaccepted` - a word no game
@@ -112,7 +112,6 @@ ${upto ? `seq() { command seq 1 ${upto}; }\n` : ''}${loop}`;
   const never = against(['{"ok":true,"v":"acct19"}'], { upto: 3 });
   assert.equal(never.status, 1, 'a service that never came: the site is not published');
   assert.equal(never.asked.length, 3, 'one ask a turn, and none after the last');
-  // PIN MOVED (DEPLOY-WAIT, 2026-10-17): 90 asks, thirty minutes, gave up on #983's site six minutes before its service
   // came - the service waits up to five and a half hours on the relay. Now as long as that chain may take, and no longer
   // than a job may run.
   const asks = (src, name) => Number(/for i in \$\(seq 1 (\d+)\); do/.exec(runBlock(src, name))?.[1]);

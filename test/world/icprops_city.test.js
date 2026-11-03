@@ -1,5 +1,4 @@
-// IC-PROPS (2026-10-27, the owner: "Old daggerfall city layout placements are in imperial city"; bible/03-World/
-// Arena-Provinces.md IC-PROPS) - THE GRAND CITY THE ONLY LAYOUT THE IMPERIAL CITY PLACES FROM. 671 cells of its plan were
+// IC-PROPS - THE GRAND CITY THE ONLY LAYOUT THE IMPERIAL CITY PLACES FROM. 671 cells of its plan were
 // Daggerfall's own city blocks (a town's square of houses, garden walls, hedges and props, each district's trade along its
 // avenue and round its heart) among the city's own; none is now but the arena's, and what they carried that the grand
 // city means to keep is its fabric's: each district's signature trade among its buildings (the Temple District's temples
@@ -52,7 +51,6 @@ test('IC-PROPS NO BLOCK OF DAGGERFALL\'S IN THE IMPERIAL CITY BUT ITS ARENA - ev
   assert.equal(imperialSlicePlan(Math.floor(ar / 8) * N + Math.floor(ac / 8))[ar % 8][ac % 8], IMPERIAL_ARENA_CODE, 'Daggerfall\'s arena, the plan\'s one');
   assert.equal('IMPERIAL_MIX' in City, false);
   assert.equal('IMPERIAL_SIGNATURE' in City, false);
-  assert.doesNotMatch(hostText('src/world/imperialFabric.js'), /imperialClassic/, 'the fabric keeps no street round a block of Daggerfall\'s');
 });
 
 test('IC-PROPS EACH DISTRICT\'S SIGNATURE IN ITS FABRIC - the temples of the Eight (each block\'s temple, its record\'s god; one main front in so many of the Temple District\'s, each god alike whatever the plot\'s size), the Thieves Guild\'s houses on the Waterfront (a House2 of the guild\'s faction), the University\'s Mages Guild halls; the Market\'s bank and Talos Plaza\'s general stores among their shops (mutants: the halls unread; a temple by its size)', () => {

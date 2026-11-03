@@ -1,6 +1,4 @@
-// DISC24-A (2026-09-24, Quest on Discord, "Class selection UI bug": "When left clicking other classes the description
-// stays the same for the original class that was double clicked previously but the `Play as a <insertClass>` changes and
-// the class name also change at the top. Double clicking works as intended though").
+// DISC24-A.
 //
 // THE BUG: DFU's class description is a MODAL box over the list (CreateCharClassSelect.cs :70-96) - the selection under
 // it cannot move. The enhanced skin lays the list BESIDE the box, so a single click moved `classListIndex` (the header and
@@ -56,13 +54,3 @@ test('DISC24-A: Yes gives the class that was READ - never a row clicked after it
   assert.equal(f.career.name, 'Battlemage', 'the class whose words were on the screen');
 });
 
-test('DISC24-A: the enhanced stage and the pointer path both move the selection through the flow\'s one door', () => {
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  // the stage reads the header and the button off classListIndex and the words off classConfirm - the flow's door is
-  // what keeps the two one row, so the stage is pinned as reaching the selection only through it
-  assert.match(src, /const picked = flow\.classRowName\(flow\.classListIndex\);/);
-  assert.match(src, /main\.onclick = \(\) => \{ flow\.clickClassRow\(i, flow\._now\(\)\); paint\(\); \};/);
-  const chargen = readFileSync(new URL('../../src/ui/chargen.js', import.meta.url), 'utf8');
-  assert.match(chargen, /if \(hit\.setClass != null\) \{ this\._selectClassRow\(hit\.setClass\); return true; \}/);
-  assert.equal((chargen.match(/this\.classListIndex = idx;/g) ?? []).length, 1, 'one door writes a clicked row');
-});

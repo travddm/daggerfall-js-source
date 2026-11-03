@@ -1,5 +1,5 @@
 // @ts-check
-// SNOWFALL1 (2026-10-08): THE SNOW'S MESHES AND PICTURES ON THE GPU - the three tiers systems/snowfallRuntime.js keeps
+// SNOWFALL1: THE SNOW'S MESHES AND PICTURES ON THE GPU - the three tiers systems/snowfallRuntime.js keeps
 // as arrays, uploaded as they change (a track mask by the rectangle its new pixels cover - Texture2D.SetPixel's part;
 // the ring's history at most every 0.1 s, as the mod's HistoryUploadInterval), and drawn through the renderer's snow
 // program (renderer.drawSnow: the ground's own light on the mod's snow). The pictures are the mod's: its albedo

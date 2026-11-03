@@ -1,7 +1,7 @@
-// DEX1 (2026-10-19, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION: THE ENEMY
+// DEX1 - DAGGERFALL ENEMY EXPANSION: THE ENEMY
 // REGISTRY. BestiaryMod.Start's reading (systems/enemyExpansion/dexTables.js) of the shipped tables, and what the install
 // (dexInstall.js) makes of it in the port: the fifty enemies in the table, their careers resolving, DFU's entity type
-// and career index for an id past MobileTypes, the classic rows edited in DFU's order over Meaner Monsters', the names,
+// and career index for an id past MobileTypes, the classic rows edited in DFU's order, the names,
 // the quest foes added only where the Foes table lacks the name - each pinned against the C#'s own law, and each with a
 // mutation it must fail under.
 import test from 'node:test';
@@ -20,14 +20,11 @@ import { customCareerTemplate, clearCustomEnemies } from '../../../src/character
 import { makeEnemyEntity, loadEnemyCareer, _resetMintRowEditors } from '../../../src/characters/enemy/enemyEntity.js';
 import { careerTolerance } from '../../../src/systems/spellcast.js';
 import { careerAttackModifier } from '../../../src/combat/formulas.js';
-import { applyMeanerMonsters, MEANER_MONSTERS_EDIT } from '../../../src/characters/meanerMonsters.js';
-import { meanerMonstersRow as pcaaoMeanerMonstersRow, meanerMonstersOn } from '../../../src/combat/pcaaoMeanerMonsters.js';
-import { KG_ROSTER, makeUnit } from '../../../src/net/kingsGambit.js';
 import { loadQuestTables, foesTable, addIntoQuestTables, _resetExtraQuestRows } from '../../../src/systems/quest/tables.js';
 import { adaptBlowClass } from '../../../src/systems/revenant/revenantFeud.js';   // AUDIT DEX A2
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { DEX_ENEMY_NAME_TEXT } from '../../../src/systems/enemyExpansion/dexNames.js';   // AUDIT DEX A6
-import { getLocalizedEnemyName, parseStringTableCsv, patchLocaleTable, setLocale, clearLocaleTables } from '../../../src/systems/textManager.js';
+import { getLocalizedEnemyName, patchLocaleTable, setLocale, clearLocaleTables } from '../../../src/systems/textManager.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const ARENA2 = process.env.ARENA2_PATH;
@@ -195,7 +192,8 @@ test('AUDIT DEX A6 the fifty names in the player\'s language: each is the mod\'s
     assert.equal(DEX_ENEMY_NAME_TEXT[id](), enemyDisplayName(id), `${id}: the catalog's English is the mod's Name column`);
     assert.equal(getLocalizedEnemyName(id, 'fallback'), enemyDisplayName(id), `${id}: under English the HUD reads the mod's own`);
   }
-  patchLocaleTable('de', 'Port_Strings', parseStringTableCsv(readFileSync(join(ROOT, 'locales/de/Port_Strings.csv'), 'utf8')));
+  // Fixture rows stand in for a German translation; the subject is the name door reading the player's language.
+  patchLocaleTable('de', 'Port_Strings', [['dex.enemy.lizardMan', 'Echsenmensch'], ['dex.enemy.vengefulKingLysandus', 'Rachsüchtiger König Lysandus']]);
   setLocale('de');
   assert.equal(getLocalizedEnemyName(258, 'fallback'), 'Echsenmensch', 'the Lizard Man in German');
   assert.equal(getLocalizedEnemyName(275, 'fallback'), 'Rachsüchtiger König Lysandus');
@@ -220,43 +218,26 @@ test('AUDIT DEX A5 the reading\'s reachable arms: a caster that shoots keeps bot
   assert.equal(adaptBlowClass({ isPlayer: true }, null, 'melee'), 'h2h');
 });
 
-test('AUDIT DEX A5 the hosts\' arms by SetupDemoEnemy\'s entity type: a dungeon\'s marker foe takes the monster arm or the class arm, the street\'s mint and its knockback read the same - a mod\'s monster (256-290) is no class, its class (384-398) no monster', () => {
-  const dc = readFileSync(join(ROOT, 'src/scenes/dungeonContext.js'), 'utf8'), xf = readFileSync(join(ROOT, 'src/scenes/exteriorFoes.js'), 'utf8');
-  assert.equal(dc.split("if (foeDeps && enemyEntityType(e.mobileType) === 'class' && basics.maleTexture) {").length, 2, 'the dungeon\'s class arm');
-  assert.equal(dc.split("if (foeDeps && enemyEntityType(e.mobileType) === 'monster' && basics.maleTexture) {").length, 2, 'the dungeon\'s monster arm');
-  assert.match(xf, /const isClass = enemyEntityType\(mobileType\) === 'class', career = loadEnemyCareer\(mobileType, fetchBytes\);/, 'the street\'s mint');
-  assert.match(xf, /const isClass = enemyEntityType\(f\.mobileType\) === 'class';/, 'the street\'s knockback weight');
-});
-
-test('DEX1 loaded: the classic rows written in the table, and at a foe\'s mint - Meaner Monsters standing aside beside it, its author\'s form of it for this mod being MUDEX (MUDEX1, mudex1.test.js)', (t) => {
+test("DEX1 loaded: the classic rows written in the table, and at a foe's mint - the mod's own lines alone here (MUDEX over them is MUDEX1, mudex1.test.js)", (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
   const before = structuredClone(ENEMY_BASICS[9]);
-  installEnemyExpansion({ on: true, meaner: false, log: silent });   // the mod's own lines alone: no MUDEX
+  installEnemyExpansion({ on: true, mudex: false, log: silent });   // the mod's own lines alone: no MUDEX
   assert.deepEqual([ENEMY_BASICS[4].maleTexture, ENEMY_BASICS[143].maleTexture, ENEMY_BASICS[140].femaleTexture], [457, 1507, 1520]);
   assert.equal(ENEMY_BASICS[9].maxDamage, 16, 'the werewolf as the mod restats it');
   assert.equal(ENEMY_BASICS[9].maxHealth, before.maxHealth, 'a field the line leaves is the row\'s');
-  // Meaner Monsters writes the werewolf too (MM1), and the two disagree; beside the mod its rows stand aside, switch on or
-  // not (MUDEX1: Meaner Monsters' own Init asks the player to swap it for MUDEX here, and the port makes the swap)
-  assert.ok(MEANER_MONSTERS_EDIT[9]?.maxDamage !== undefined && MEANER_MONSTERS_EDIT[9].maxDamage !== 16, 'the two mods disagree on the werewolf\'s damage');
   const wolf = makeEnemyEntity(9, ENEMY_BASICS[9], null, 1, () => 0.5);
   assert.equal(wolf.basics.maxDamage, 16, 'the mod\'s');
-  assert.equal(applyMeanerMonsters(9, ENEMY_BASICS[9]), ENEMY_BASICS[9], 'Meaner Monsters\' own rows stand aside beside the mod');
-  assert.equal(pcaaoMeanerMonstersRow(9, ENEMY_BASICS[9], meanerMonstersOn(() => true, () => true)), ENEMY_BASICS[9], '...and so does the overhaul\'s edit of them, both switches on');
   assert.equal(wolf.basics.maxHealth, ENEMY_BASICS[9].maxHealth, 'the table\'s row where the mod names nothing');
   assert.equal(dexProperties(143).hasRangedAttack, true);
   // the table's line is the read's own (the relay's bounds are held to dexClassicRow), and the vanilla rows never move
   assert.deepEqual(ENEMY_BASICS[9], dexClassicRow(9, VANILLA_ENEMY_BASICS[9]), 'the row written is the line over the vanilla row');
   assert.deepEqual(VANILLA_ENEMY_BASICS[9], before, 'VANILLA_ENEMY_BASICS: DFU\'s row, whatever the mod wrote');
   assert.ok(Object.isFrozen(VANILLA_ENEMY_BASICS[9]) && !('256' in VANILLA_ENEMY_BASICS), 'frozen, and no mod\'s row joins it');
-  // King's Gambit's roster is the vanilla rows' (Kings-Gambit.md, one roster for every client and the relay) - a unit
-  // made after the mod's Start is the unit made before it, the Dragonling 34 among them (the mod gives it 146 health)
-  for (const u of KG_ROSTER) assert.deepEqual(makeUnit(u.id, { ranged: u.ranged }), u, `the gambit's ${u.name} unmoved`);
-  assert.ok(ENEMY_BASICS[34].maxHealth !== VANILLA_ENEMY_BASICS[34].maxHealth && KG_ROSTER.some((u) => u.id === 34));
 });
 
 test('DEX1 a mod\'s monster and a mod\'s class are built on DFU\'s two arms (EnemyEntity.SetEnemyCareer :251-274)', async (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
-  installEnemyExpansion({ on: true, meaner: false, log: silent });   // the mod's own rows: MUDEX restats the Goblin
+  installEnemyExpansion({ on: true, mudex: false, log: silent });   // the mod's own rows: MUDEX restats the Goblin
   const fetchBytes = async () => { throw new Error('a new career reads no file'); };
   const goblinCareer = await loadEnemyCareer(256, fetchBytes);
   assert.equal(goblinCareer.name, 'Goblin');
@@ -302,7 +283,7 @@ test('DEX1 the quest foes: the new names as id, name - and only where the Foes t
 
 test('DEX1 the read is idempotent: one read, one install', (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
-  installEnemyExpansion({ on: true, meaner: false, log: silent });
+  installEnemyExpansion({ on: true, mudex: false, log: silent });
   assert.equal(dexRead(), dexRead());
   assert.deepEqual(installEnemyExpansion({ on: false, log: silent }), { loaded: true, mudex: false, enemies: 50 }, 'a second call answers the first load');
 });

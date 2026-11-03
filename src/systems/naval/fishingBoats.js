@@ -1,5 +1,5 @@
 // @ts-check
-// FISH-BOATS (2026-10-27; bible/03-World/Naval-Combat.md FISH-BOATS) - A PORT'S FISHING BOATS. Pure: a harbour's day's
+// FISH-BOATS - A PORT'S FISHING BOATS. Pure: a harbour's day's
 // fleet, the water each lies and works in, her day's errand and her catch; scenes/naval/fishingFleet.js stands them.
 // The boats are Come Sail Away's Rowboat pulled by two (a Fishing Skiff) and its Large Boat under sail (a Fishing Smack).
 // The fleet is drawn off the harbour's key and the day, so every player in the port sees the same boats. Each lies at

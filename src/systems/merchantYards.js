@@ -1,9 +1,5 @@
 // @ts-check
-// MERCHANT-YARDS (2026-10-10, asked: "I want to add 2 new merchants to each town without removing player's homes or
-// breaking anything. 1. The stable where you can purchase horses 2. Transport merchant where you can purchase
-// transports. These new places should get detailed locations, signs, sprites, etc that set them apart from other
-// places"; and of the wagons: "Transport merchants hold all carts and wagons. The stable holds horses. No longer in
-// general shop"): THE TWO YARDS' TRADE - THE LAW.
+// MERCHANT-YARDS: THE TWO YARDS' TRADE - THE LAW.
 //
 // Every city and town (Daggerfall's TownCity and TownHamlet - systems/travel/travelOptions.js names them "city" and "town";
 // not a village, a farm or a manor) stands two open-air yards the port adds: a STABLE, a fenced paddock with its horses
@@ -27,8 +23,7 @@
 // name bank on a seed of the town's map id and the yard's kind - every client names the same keeper - and the yard is
 // named for them ("Halbrecht's Stables").
 //
-// CARP-YARD (2026-10-12, Mac: "Let's also redesign their buildings like we did with stables, etc", choosing a new
-// Carpenter's Yard, its workbench a Carpentry station): A THIRD YARD, THE JOINERY - a carpenter's open-air workshop, its
+// CARP-YARD: A THIRD YARD, THE JOINERY - a carpenter's open-air workshop, its
 // workbench Carpentry's station at the furnisher's own fee (WORKBENCH_FEE), its carpenter its keeper. It trades nothing
 // over a counter (yardStock answers it none, yardBuysItem nothing): its row is the bench. It is placed AFTER the port's
 // places (CRAFT_YARD_ORDER - scenes/world.js townPlacesFor), and keyed after them (YARD_KEY_SLOT), so no town's Stable,
@@ -92,7 +87,7 @@ const mix3 = (a, b, c) => {
 /** mulberry32: a stream of [0, 1) off a 32-bit seed. */
 const stream = (seed) => () => { seed = (seed + 0x6d2b79f5) >>> 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 /**
- * STEED1 (the owner: "Every horse should have different stats"): THE STABLE'S HORSES ON A DAY - STABLE_HORSES_OFFERED
+ * STEED1: THE STABLE'S HORSES ON A DAY - STABLE_HORSES_OFFERED
  * of them, each born at the yard (horseCoats.js birthHorses on a stream of the town's map id, the world's day and its
  * stall - every client in the town that day sees the same three), so a buyer sees each one's look and stats before they
  * pay. A horse the buyer already owns (its seed in `owned`) is not stood again. `priced`: its price by its born stats
@@ -132,7 +127,7 @@ export function yardBuysItem(kind, item) {
   return false;
 }
 
-/** SHIPYARDS (2026-10-11): a seed of the town and a salt - a yard's kind's own, or another of the town's places'
+/** SHIPYARDS: a seed of the town and a salt - a yard's kind's own, or another of the town's places'
  *  (systems/portPlaces.js portKeeper: the shipmaster's, the crewmaster's, the lightkeeper's). Pure. */
 export const townSeed = (mapId, salt) => (Math.imul((mapId >>> 0) ^ 0x9e3779b9, 0x85ebca6b) ^ (salt >>> 0)) >>> 0;
 /** A seed of the town and the kind. Pure. */
@@ -208,8 +203,7 @@ export const yardRowsFor = (kind) => (validYardKind(kind) === 'carpenter' ? [YAR
 export const CARPENTER_STEAL_TEXT = 'The carpenter never takes an eye off the tools.';
 
 /**
- * YARDS-FOUND (2026-10-10, from play: "The new stable and transport merchant shops dont show on town maps/overworld",
- * "Ensure these locations appear when talking to NPCs"): A YARD IN THE TOWN'S TALK DIRECTORY. The directory is the one
+ * YARDS-FOUND: A YARD IN THE TOWN'S TALK DIRECTORY. The directory is the one
  * list the Where-is page, the compass's "%di of here" (systems/talk/talk.js buildingCompassDirection), the knowledge roll and
  * the map's mark ("Let me just mark %loc here on your map" - systems/discovery.js discoverBuilding) all read a building
  * from, so a yard joins it as a shop's row does and every one of them answers it unchanged.

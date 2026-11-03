@@ -1,7 +1,7 @@
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE ROYAL TOURNEY'S LAW - the room
+// CROWN1 part two: THE ROYAL TOURNEY'S LAW - the room
 // (net/siege/siegeRef.js), the pass (net/identityToken.js's `siege` order with `sn` 'royal'), the wire's royal frames
 // (net/wire.js), the bout's `t1` receipt (net/siege/siegeReceipt.js) and the ladder's own rules, pure.
-// bible/11-Multiplayer/Seats-Arc.md 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two).
+// 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -13,7 +13,7 @@ import {
   settleRing, royalStandings, ROYAL_PAIR_DAY, ROYAL_LADDER_ROWS, ROYAL_WHY, EDICTS, edictForTier, edictCost, edictLine, chronicleLine, seatTitleText,
 } from '../../src/net/townSeatLaw.js';
 import { siegePassValid, siegeFieldValid, siegePassPoints, SIEGE_PASS_SIDES, ROYAL_PASS_SPAN_S, SIEGE_PASS_SPAN_S, orderValid } from '../../src/net/identityToken.js';
-import { validSiegeIn, validSiegeOut, ROYAL_RELAY_MIN, relayRunsRoyal, ROYAL_LADDER_MAX } from '../../src/net/wire.js';
+import { validSiegeIn, validSiegeOut, ROYAL_LADDER_MAX } from '../../src/net/wire.js';
 import {
   mintRoyalReceipt, readRoyalReceipt, verifyRoyalReceipt, royalReceiptValid, ROYAL_RECEIPT_V, mintSiegeReceipt, verifySiegeReceipt, readSiegeReceipt, SIEGE_RECEIPT_TTL_S,
   siegeReceiptValid,
@@ -175,7 +175,6 @@ test('CROWN1 THE WIRE\'S ROYAL FRAMES: a challenge and an accept name the other;
   assert.equal(ROYAL_LADDER_MAX, ROYAL_LADDER_SHOWN, 'pinned equal');
   assert.deepEqual(validSiegeOut({ k: 'won', rc: 't1.abc.def' }), { k: 'won', rc: 't1.abc.def' });
   assert.equal(validSiegeOut({ k: 'won', rc: 's1.abc.def' }), null, 'a bout\'s receipt alone');
-  assert.deepEqual([ROYAL_RELAY_MIN, relayRunsRoyal('world148'), relayRunsRoyal('world147'), relayRunsRoyal('x')], [148, true, false, false]);   // PIN MOVED (main's FRIENDS-SYNC took world142): world146 until that merge   // PIN MOVED (MERGE #519-#523): main's ELITE FOES took world143 - world147 until that merge
 });
 
 test('CROWN1 THE BOUT\'S RECEIPT: `t1` - the winner, the loser, the crown, the week, the bout - signed by the relay\'s key, verified rung for rung, read unsigned by the client; never a siege\'s `s1`, nor it a `t1` (mutants: each field; the TTL; the version; the disjointness)', async () => {

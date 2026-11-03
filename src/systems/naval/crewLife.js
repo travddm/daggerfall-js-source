@@ -1,6 +1,5 @@
 // @ts-check
-// LIVING CREW (2026-09-29, Mac: "Crew members shouldnt be the static sprites and instead the enemy type sprites with
-// multiple animations, they should navigate the deck, talk with each other, blurb, sing chantys, etc") - ONE SHIP'S
+// LIVING CREW - ONE SHIP'S
 // CREW AT THEIR WORK: who stands on her deck, where each walks, who talks to whom, the lines over their heads and the
 // chanty they sing, and - her guns out or a boarding at hand - the rail they muster at. Stepped by its host
 // (scenes/naval/navalCrew.js draws them) on her deck (navalDeck.js), in her deck's frame. Pure: a draw seeded by the ship
@@ -17,7 +16,7 @@
 // STATION - a man who stays at his post, turning and talking but never walking off it. The rest start spread across
 // her deck (`deck.spots`).
 //
-// SHIP-WATCH (2026-10-01, Mac: "Do #3" - life aboard between fights; shipWatch.js): BY NIGHT (`ctx.asleep`) her crew
+// SHIP-WATCH: BY NIGHT (`ctx.asleep`) her crew
 // turns in but its watch (shipWatch.js watchCount - her stations, her lookout, then the roster's first): the rest walk
 // to her HATCH (her main deck's middle) and go below, off her deck but still hers (`below` - never `gone`: the count
 // stands whole and the guns' trim and the mending's restore read them as they were) - at once, never a walk, when she
@@ -68,8 +67,7 @@ export const WORK_SHARE = 0.75;
 /** SHIP-WATCH: how far back from her stem the lookout stands (m). */
 export const LOOKOUT_BACK = 0.75;
 /**
- * HOLDINGS (bible/03-World/Holdings.md, Mac: "Named crew companions should be able to be assigned to certain roles, and
- * be positioned accordingly to their role"): A HAND'S POST BY HIS ROLE (shipCrew.js CREW_ROLES), on her main deck - her
+ * HOLDINGS (): A HAND'S POST BY HIS ROLE (shipCrew.js CREW_ROLES), on her main deck - her
  * First Mate aft by her helm, her Bosun before her mainmast, her Carpenter by her hatch, her Cook forward at her galley's
  * stove, her Gunners at her guns along her waist, starboard and port in turn; her Lookout keeps her bow (SHIP-WATCH), her
  * Deckhands and her Bard go where they will. A second holder of one post stands beside the first.
@@ -143,7 +141,7 @@ export const CREW_BLURBS = Object.freeze({
     'Run out the guns!', 'Fire when ready!', 'Reload! Reload!', 'Keep your heads down!', 'Hold fast!',
     'Coming about!', 'Powder, more powder!', 'Mind the rigging!', 'Put the fire out!', 'Steady, lads, steady!',
   ]),
-  // CREW-MUSTER (FIELD BUGS 2026-10-14, "Crew Attacking Me"; Mac's call, 2026-10-14: "Both"): A MUSTER'S WORDS ARE ITS
+  // CREW-MUSTER (FIELD BUGS 2026-10-14, "Crew Attacking Me"): A MUSTER'S WORDS ARE ITS
   // SIDE OF THE BOARDING (`ctx.way`, step) - the crew going over the rail cries the boarding's, the crew being boarded
   // the repel's. One list said both, so a crew mustered to board a struck ship cried "Here they come!" and "Nobody sets
   // foot on our deck!" at nobody - the player, at her helm, the only one there to come
@@ -257,7 +255,7 @@ const within = (rng, range) => range[0] + rng() * (range[1] - range[0]);
  */
 export function createCrewLife({ deck, roster, seed, places = [], faction = null }) {
   const rng = seededRng(((seed >>> 0) ^ 0x51ce11fe) >>> 0);
-  // GALLEON (2026-10-01): her hands' work her MAIN deck's - a raised deck her walk joins up its flights (the new
+  // GALLEON: her hands' work her MAIN deck's - a raised deck her walk joins up its flights (the new
   // galleon's castle, the Carrack's forecastle) is her officers' and her walk's, never where her hands idle: a muster
   // called from her castle's roof was 20 m of walk from the rail, past her grapples' flight
   const main = deck?.y && deck.count ? mainLevel(deck) : NaN;
@@ -283,7 +281,7 @@ export function createCrewLife({ deck, roster, seed, places = [], faction = null
   let musterKey = '', quiet = false;
   // SHIP-WATCH: her bow (the lookout's post) and her hatch (where the watch below goes down and comes up), off her deck;
   // her lookout; whether her crew is turned in; the work she has (0..1)
-  // GALLEON (2026-10-01): her hatch amidships of her MAIN deck - a raised deck her walk joins (the new galleon's castle
+  // GALLEON: her hatch amidships of her MAIN deck - a raised deck her walk joins (the new galleon's castle
   // up its two flights, the Carrack's forecastle) drew the middle of her whole deck off it, the galleon's onto her
   // mainmast's drum. AUDIT GN-D7: her hatchways are no deck now (their covers open), so the galleon's stands on her
   // deck beside her fore hatchway (1.6 m to port of its middle), never on its cover over the hole - the Carrack's at

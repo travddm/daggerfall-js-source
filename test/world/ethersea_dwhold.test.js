@@ -1,7 +1,6 @@
 // ETHER-HOLD (from play, 2026-10-11): Deep Waters' bathymetry is the Bay's. TAMRIEL2 held the near promote to the
 // Bay, but the pump's deferred builds and a refresh still carved an Eltheric Ocean pixel's floor - a player went over the
 // side onto a seabed under the drawn surface and could neither swim nor float back. The host's one promote holds them all.
-// PIN MOVED (ETHER-DEEP, bible/03-World/Eltheric-Ocean.md): the floor was carved against the Bay's clamped corner, and
 // the sea past the Veil has its own bake now - a host told the Eltheric Ocean stands (`ether`) carves its box by every
 // arm (test/world/deepWater/ether_deep.test.js); this pin is a host told nothing of it, which holds the box with the continent.
 import { test } from 'node:test';

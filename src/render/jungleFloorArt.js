@@ -1,10 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA2 (2026-10-19, the owner, with their "Jungle Preview": "At the ground level, the image shows the flora abundence
-// that should be present in the jungle" - a floor carpeted in grass, ferns and broad leaves under the trees, no ground
-// showing between them): THE JUNGLE FLOOR'S PLANTS, stood as the meadow's sprites are (render/grassMeadow.js MEADOW1 -
+// BANTHA2: THE JUNGLE FLOOR'S PLANTS, stood as the meadow's sprites are (render/grassMeadow.js MEADOW1 -
 // crossed cards at a tuft's own yaw, lit by their faces, swaying their share of the wind) by a grass field of the jungle's
-// own (scenes/jungleFloorHost.js). bible/03-World/Bantha-Jungle.md "The floor" is the record.
+// own (scenes/jungleFloorHost.js). "The floor" is the record.
 //
 // The plants are the rainforest's own low cover - archive 500's ferns, sedge, broad-leaved bush, palmlets and flowering
 // stems, the very pictures BANTHA1's floor storey stands as flats (world/terrain/jungleNature.js) - and the owner's tall
@@ -30,7 +28,7 @@ export const JUNGLE_FLOOR_ARCHIVE = 500;
  * the waist, archive 500's own billboards stand two and three metres); `stiff` its share of its own standing lean and
  * `sway` of the wind's (the meadow's own: grass whole, a woody bush 0.3 and 0.6, fronds between); `grass` whether it is
  * the floor's grass (the tuft and the sedge) or its flora; `judged` its share of the width byte at the poor patch's end
- * and the lush's in the floor the owner judged - JUNGLE_FLOOR_JUDGED plants a square metre (BANTHA2: "a little too much"
+ * and the lush's in the floor
  * at 2.5), the last taking the rest.
  */
 const JUDGED_PLANTS = [
@@ -46,7 +44,7 @@ const JUDGED_PLANTS = [
 /** The floor the owner judged, plants a square metre (BANTHA2: thinned from 2.5 on "Reduce the amount of ground flora. Its
  *  a little too much"). */
 export const JUNGLE_FLOOR_JUDGED = 1.8;
-/** JUNGLE-GRASS (2026-10-19, the owner: "Grass isnt showing within the new jungle region"): THE GRASS THE FLOOR STANDS a
+/** JUNGLE-GRASS: THE GRASS THE FLOOR STANDS a
  *  square metre - the meadow's own (its blades over the lab's measuring span, MEADOW_BLADES_PER_TUFT a tuft: 2.27 at the
  *  grass row's Full), so the jungle's ground carries the grass every other meadow does. The judged floor stood 0.88 tufts and
  *  sedge a square metre between its ferns - two fifths of it - and the meadow's own grass keeps out of the floor (its

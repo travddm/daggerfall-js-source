@@ -1,7 +1,5 @@
 // @ts-check
-// LEGACY4 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 7; Mac: "Upon your current characters death, have a
-// chance to drop a gear item deemed an heirloom. These heirlooms, along with your characters remains can be acquired by
-// completing the death quest on your descendant."): HEIRLOOMS, REMAINS AND THE BLESSING - the law, pure but for the
+// LEGACY4: HEIRLOOMS, REMAINS AND THE BLESSING - the law, pure but for the
 // two folds it registers with the entity (systems/entityMods.js, as the Loot arc's affixes do) and the one item template
 // (the remains), registered at import as the port's own custom items are.
 //

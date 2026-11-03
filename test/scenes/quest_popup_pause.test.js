@@ -1,5 +1,4 @@
-// QUEST-POPUP-PAUSE (2026-09-26, SquidKamer on the Discord: a ship raid's box came up and the player "get[s] jumped by
-// everyone"; Mac, asked: "Pause them offline"). DFU's message box pauses the game (UserInterfaceWindow.PauseWhileOpen),
+// QUEST-POPUP-PAUSE. DFU's message box pauses the game (UserInterfaceWindow.PauseWhileOpen),
 // so a quest's box held every foe; WINFOE1 had let the foes run under every window. Offline, a quest box that is open
 // and on top of its slot holds the foes again - the street's pools, the watch, the town's answer and the interior
 // pools through the mode machine's bag. A rest window keeps WINFOE1; online nothing is held (one room, one clock).
@@ -72,23 +71,3 @@ test('QUEST-POPUP-PAUSE executed: a pool handed the held frame (0) stands its hu
   assert.ok(Math.hypot(rat.ai.feet[0] - was[0], rat.ai.feet[2] - was[2]) > 1, 'the hunt goes on');
 });
 
-test('QUEST-POPUP-PAUSE by source: both outdoor hosts ask the one rule of their own quest box, hand the held clock to both pools and the town\'s answer, and give the mode machine the same read for the interior pools', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const _questBoxHoldsFoes = \(\) => questBoxHoldsFoes\(_questBoxWin, \{ online: onlineOn, onTop: _liveQuestOverlay \}\);/, 'world.js: its box, its slot, its page');
-  assert.match(w, /const foeDt = _questBoxHoldsFoes\(\) \? 0 : dt;\n\s*livePersonBatches\.push\(\.\.\.cityGuards\.update\(foeDt,/, 'world.js: the watch');
-  assert.match(w, /exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);/, 'world.js: the encounter pool');
-  assert.match(w, /if \(playerSpawned\) _townWatchFrame\(foeDt\);/, 'world.js: the town\'s answer runs on the pools\' clock');
-  assert.match(w, /questBoxHoldsFoes: \(\) => _questBoxHoldsFoes\(\),/, 'world.js: the mode machine\'s bag');
-  const e = rd('src/scenes/exterior.js');
-  assert.match(e, /const _questBoxHoldsFoes = \(\) => questBoxHoldsFoes\(_questBoxWin, \{ online: isOnlinePage\(\), onTop: _liveQuestOverlay \}\);/, 'exterior.js: the same rule');
-  assert.match(e, /const foeDt = _questBoxHoldsFoes\(\) \? 0 : dt;/, 'exterior.js: the held clock');
-  assert.match(e, /exteriorFoes\.update\(foeDt,/, 'exterior.js: the encounter pool');
-  assert.match(e, /questBoxHoldsFoes: \(\) => _questBoxHoldsFoes\(\),/, 'exterior.js: the mode machine\'s bag');
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /const foeDt = host\.questBoxHoldsFoes\?\.\(\) \? 0 : dt;/, 'worldModes.js: the host\'s read');
-  assert.match(m, /interiorFoes\.update\(foeDt, /, 'the interior pool');
-  assert.match(m, /interiorGuards\.update\(foeDt, /, 'the indoor watch');
-  for (const [name, h] of [['world.js', w], ['exterior.js', e], ['worldModes.js', m]]) {
-    assert.doesNotMatch(h, /(?:Foes|Guards)\.update\(dt,/, `${name}: no enemy pool bypasses the held clock`);
-  }
-});

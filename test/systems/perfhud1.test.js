@@ -1,5 +1,4 @@
-// PERF-HUD1 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"; PERF-NEXT item 5, bible/07-Rendering/Performance-Online.md): THE MOVABLE HUD SWEEPS ON ONE CLOCK. Its sweep
+// PERF-HUD1: THE MOVABLE HUD SWEEPS ON ONE CLOCK. Its sweep
 // (ui/hud/hudLayout.js sweepHudLayout - 34 querySelectorAll over the page) ran on a 250 ms interval AND from the
 // HUD's frame tick, each on its own clock: about eight sweeps a second where four were meant. The interval is the clock
 // where it runs; the tick starts it, sweeps once at the start, and sweeps on its own clock only where no interval runs (a

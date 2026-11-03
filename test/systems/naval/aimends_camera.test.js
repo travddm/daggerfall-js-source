@@ -1,8 +1,7 @@
-// AIM-ENDS (2026-10-24, Discord - "Aiming front ship cannons impossible": "the camera should move to the front/back
-// accordingly when aiming") - THE AIM CAMERA OVER THE BOW AND THE STERN, alone: scenes/naval/aimCamera.js on a stand-in
+// AIM-ENDS - THE AIM CAMERA OVER THE BOW AND THE STERN, alone: scenes/naval/aimCamera.js on a stand-in
 // boat, so the walk out past her own canvas is pinned on a sail that stands where the eye was asked to (the galleon's
 // and the carrack's stand clear of theirs - test/systems/naval/navaudit_helm.test.js H8 pins the galleon at the helm).
-// The law is bible/03-World/Naval-Combat.md AIM-ENDS.
+// The law is AIM-ENDS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAimCamera, reachAlong, AIM_CAM_AHEAD, AIM_CAM_UP, AIM_CAM_CLEAR, AIM_CAM_OUT, AIM_CAM_TAU } from '../../../src/scenes/naval/aimCamera.js';

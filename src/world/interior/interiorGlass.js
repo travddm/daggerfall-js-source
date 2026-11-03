@@ -1,11 +1,11 @@
 // @ts-check
-// RW1 (2026-10-09, Mac: "...allowing players to see inside/outside of house windows"): WHICH INTERIOR TEXELS ARE GLASS -
+// RW1: WHICH INTERIOR TEXELS ARE GLASS -
 // the data side of the real windows (render/realWindows.js draws them). Inside a building the glass the view out cuts
 // is DFU's own window table drawn indoors (the renderer's GLASS_EXTERIOR kind), the masks a context declares
 // (renderer.uploadGlassMask), and - read here - the window record of a building interior set. Kept off the renderer's
 // boot path: the climate tables are the data pipeline's, not the shader's.
 //
-// GLASS-ALL (2026-10-11, Mac: "Bruh all windows should be see through"): READ OFF THE DATA. RW1 took a record as glass
+// GLASS-ALL: READ OFF THE DATA. RW1 took a record as glass
 // when its bitmap carried the palette's 0xff (the exterior windows' index), a guess it marked unverified; against a real ARENA2
 // (DaggerfallGameFiles, all nine building sets in the four climates an interior is laid out in - 0, 100, 300, 400) it
 // found ONE window, the temple's stained glass, and took eight records of the paperdoll's clothing (TEXTURE.237 and

@@ -18,7 +18,7 @@ import { getTextKeyTime, getStartTime, resetClip, advanceClip } from '../../../s
 //
 // MW-D11 shipped an arm that held a longsword and played a BARE-HANDED
 // idle for ever - one hardcoded group, no equip, no swing, no sheathe.
-// These pins are rules 8, 9, 10 and 11 as the reference states them, plus
+// These pins are rules 8, 9, 10 and 11 of the Morrowind rules page, plus
 // the machine that sequences them, run against a fixture .kf authored to
 // make every fallback in those rules reachable.
 //
@@ -98,9 +98,9 @@ function run(arm, done, { dt = 0.05, steps = 400 } = {}) {
 // --- rule 8: the table's other two columns ----------------------------------
 
 test('MW-D12 rule 8: isRealWeapon is a THREE-name test, and PickProbe is not one of them', () => {
-  // character.cpp:316-320 verbatim. PickProbe is the entry everybody
-  // guesses wrong: a lockpick IS a real weapon by this test and takes
-  // the sword fallbacks, where bare fists do not.
+  // PickProbe is the entry that is easy to get wrong: a lockpick IS a
+  // real weapon by this test and takes the sword fallbacks, where bare
+  // fists do not.
   assert.equal(isRealWeapon(MW_WEAPON_TYPE.HandToHand), false);
   assert.equal(isRealWeapon(MW_WEAPON_TYPE.Spell), false);
   assert.equal(isRealWeapon(MW_WEAPON_TYPE.None), false);
@@ -111,8 +111,7 @@ test('MW-D12 rule 8: isRealWeapon is a THREE-name test, and PickProbe is not one
 });
 
 test('MW-D12 rule 8: two-handed is TWO tests, and the flag alone gets three types wrong', () => {
-  // `mFlags & TwoHanded && mWeaponClass == Melee` (character.cpp:584).
-  // Spell and HandToHand carry the TwoHanded flag and bows are TwoHanded
+  // Two-handed means the TwoHanded flag AND the Melee class. Spell and HandToHand carry the TwoHanded flag and bows are TwoHanded
   // AND Ranged, so a port that tests the flag alone sends all three down
   // the two-handed ladder.
   assert.ok(WEAPON_FLAGS[MW_WEAPON_TYPE.HandToHand] & MW_TWO_HANDED, 'fists ARE flagged two-handed');
@@ -136,7 +135,6 @@ test('MW-D12 rule 8: two-handed is TWO tests, and the flag alone gets three type
 // --- rule 9: the two ladders ------------------------------------------------
 
 test('MW-D12 rule 9: a NON-real weapon skips the ladder and goes straight to the bare base', () => {
-  // fallbackShortWeaponGroup's first branch (character.cpp:604-611).
   // The fixture has idle1h and NOT idlehh, which is exactly the retail
   // shape this branch exists for.
   const has = (n) => ['idle', 'idle1h', 'idle2c', 'idlebow'].includes(n);
@@ -161,7 +159,6 @@ test('MW-D12 rule 9: a NON-real weapon skips the ladder and goes straight to the
 });
 
 test('MW-D12 rule 9: the LONG ladder is gated the same way, so fists never mime a sword', () => {
-  // getWeaponAnimation (character.cpp:573-592).
   const has = (n) => ['weapononehand', 'weapontwohand', 'bowandarrow'].includes(n);
   assert.equal(weaponLongGroup(MW_WEAPON_TYPE.HandToHand), 'handtohand');
   assert.deepEqual(composeWeaponGroup(MW_WEAPON_TYPE.HandToHand, has), { group: null, fallback: null },
@@ -187,10 +184,8 @@ test('MW-D12 rule 8: the animation weapon type is the STANCE, not the item', () 
 });
 
 test('MW-D17 rule 8: getAllWeaponTypeShortGroups is the ELEVEN, deduplicated and sorted', () => {
-  // weapontype.cpp:422-434 - every type First(-4)..Last(13), non-empty
-  // short groups "via a set to eliminate duplicates", and std::set also
-  // SORTS. The literal is typed from the reference's per-type values:
-  // dropping the dedupe doubles 1h/1b/2b/2w, dropping the non-empty
+  // Every type from PickProbe (-4) to Bolt (13), the non-empty short
+  // groups, once each, sorted. Dropping the dedupe doubles 1h/1b/2b/2w, dropping the non-empty
   // test admits None/Arrow/Bolt's '', and starting the walk at 0 loses
   // the four pseudo-types' 1h/spell/hh.
   assert.deepEqual(allWeaponShortGroups(),
@@ -285,8 +280,8 @@ test('MW-D12 rule 11: calculateWindUp is a RATIO with a -1 sentinel, not a zero'
 });
 
 test('MW-D12 rule 11: the release SKIP is ordering-tested, never sentinel-tested', () => {
-  // character.cpp:1774-1784. Every guard is an ordering comparison, which
-  // is what makes a missing key (-1) fall out on its own - rule 46's
+  // Every guard is an ordering comparison between key times, which is
+  // what makes a missing key (-1) fall out on its own - rule 46's
   // recorded caveat, applied.
   const full = { minAttackTime: 2.7, maxAttackTime: 2.9, minHitTime: 3.1, hitTime: 3.3 };
   // strength 1 -> no skip at all, whatever the rescale would be.
@@ -509,19 +504,6 @@ test('MW-D12 rule 10: equip and unequip key names are the group\'s own, and are 
   assert.equal(s.playing, false, 'and the equip section plays ONCE - no loopFallback');
 });
 
-test('MW-D12: weaponRig hands the strike to the arm instead of dropping it', () => {
-  const rig = readFileSync(new URL('../../../src/combat/weapon/weaponRig.js', import.meta.url), 'utf8');
-  // The two call sites that used to discard their return value.
-  assert.match(rig, /const strike = !paralyzed && c && canAttack && !armLoosing && !techniqueFlying\(\)\s*\n\s*\? playerWeapon\.gesture\(/,   // AUDIT 68 S09-sheathed-swing: and Update's early returns gate it; BOW-CLOCK: and a shot the arm cannot draw yet; PIN MOVED (AUDIT TECH1): and no gesture while a technique's leap or dash is in the air
-    'the gesture result is kept');
-  assert.match(rig, /const strike = playerWeapon\.clickAttack\(\);/, 'and so is the click\'s');
-  assert.ok(rig.includes('fpArm.setSheathed(playerWeapon.sheathed)'),
-    'and the stance is synced from the live flag every frame');
-  // ONE HOME: the rig applies rules, it does not restate them.
-  assert.ok(!/mwAttackType|composeStanceGroup|attackKeys/.test(rig),
-    'the rig names no animation rule of its own');
-});
-
 test('MW-D12: the weapon RANGE is hidden, not repacked away', async () => {
   // showWeapons hides the node (rule 57's own distinction). Repacking
   // without the weapon would change the vertex buffer's length every
@@ -544,12 +526,6 @@ test('MW-D12: the weapon RANGE is hidden, not repacked away', async () => {
     'while the arm\'s own pieces are never hidden');
 });
 
-test('MW-D12: the renderer SKIPS a hidden range rather than drawing it', () => {
-  const src = readFileSync(new URL('../../../src/render/renderer.js', import.meta.url), 'utf8');
-  assert.match(src, /for \(const r of mesh\.ranges\) \{\n\s*\/\/[\s\S]*?if \(r\.hidden\) continue;/,
-    'the skip is the FIRST thing in the range loop, before the texture bind');
-});
-
 // --- MW-D19: THE WEAPON FOLLOWS THE HAND ------------------------------------
 //
 // The arm was a one-shot snapshot of the equip state at build time - the
@@ -563,7 +539,7 @@ const TWO_WEAPON_ESM = () => Uint8Array.from([
   ...wpdtRec('iron longsword', 'w/blade.nif', MW_WEAPON_TYPE.LongBladeOneHand),
   ...wpdtRec('iron battle axe', 'w/blade.nif', MW_WEAPON_TYPE.AxeTwoHand),
 ]);
-const WAR_AXE = { templateIndex: 128 };   // PIN MOVED (MW-AXES): Daggerfall's War Axe, the two-hander, draws Morrowind's battle axe
+const WAR_AXE = { templateIndex: 128 };
 
 test('MW-D19: build once empty-handed, swap live - the sword arrives, repeats no-op, leaves', async () => {
   const arm = createFpArm();

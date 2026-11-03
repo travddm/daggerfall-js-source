@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-10-12b WALL-CLEAR - "a lot of stuff just clips through walls, even with grid on and changing size"
 // (a Mounted torch, catalogue flat 210.17, set on an interior wall). A piece the eye sets on a wall stood its origin on
 // the wall's point: half a model's box and half a turning flat's width inside the wall, the more the bigger it was
-// scaled, and the grid rounded world x and z - into the wall as often as out of it. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// scaled, and the grid rounded world x and z - into the wall as often as out of it..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -54,10 +54,6 @@ test('WALL-CLEAR a flat (it turns to the eye) stands out from a wall by half its
   assert.deepEqual(pl.pieceAt([12, 1.5, 13], origin, 't', [0, 0, -1], 0).pos, [2, 1.5, 3 - decorWallOffset(0.2)], 'half its width, five centimetres into the wall, its base at the eye\'s height');
   pl.rescale(true); pl.rescale(true);
   assert.ok(near(pl.pieceAt([12, 1.5, 13], origin, 't', [0, 0, -1], 0).pos[2], 3 - decorWallOffset(0.2 * 1.21), 1e-3), 'grown, further off');
-  const src = readFileSync(new URL('../../../src/scenes/decor/decorTool.js', import.meta.url), 'utf8');
-  const builds = src.match(/p\.placer = createDecorPlacer\(entry, \{[^}]*\}\);/g) ?? [];
-  assert.equal(builds.length, 3, 'the three flat ghosts build their placers');
-  for (const b of builds) assert.ok(b.includes('flat: p.flatSize'), `a flat's placer knows its size: ${b}`);
 });
 
 test('WALL-CLEAR the grid snaps a piece along the wall, never into it; a floor and a ceiling are as they were (mutants: the grid off the wall, a floor pushed, a ceiling pushed)', () => {

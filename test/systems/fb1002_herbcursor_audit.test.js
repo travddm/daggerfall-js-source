@@ -1,9 +1,9 @@
-// AUDIT of HERB-CURSOR (FIELD BUGS 2026-10-02 part four; Mac: "Audit this"). Four lenses over the batch as committed
+// AUDIT of HERB-CURSOR (FIELD BUGS 2026-10-02 part four). Four lenses over the batch as committed
 // (8e5dcbe2), each against the base (1d2e8ce8): A the mouse and the lock in a browser, B the gathering host's acts and
 // the click, C every other minigame, D the records. Every finding was reproduced red here first; world.js's own lines
 // (the pointer seam, the Escape's keyup, the street ladder's act click) are lifted out of the source and run over the
 // real pointerLock.js, activateGate.js and gathering host, as test/systems/fb1001_audit.test.js lifts the ladder.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-02.md, part four's audit.
+// part four's audit.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -297,5 +297,5 @@ test('AUDIT HERB-CURSOR C3: the Basket says to click the glint - "tap the glint"
     s.host.tick(0.016);
     assert.equal(s.label, 'click the glint');
   } finally { s.done(); }
-  assert.match(RETICLE, /hint: \(st, label\) => \(st\.gentle \? t\('prof\.reticle\.basket\.searching', 'searching\.\.\.'\) : label \|\| t\('prof\.reticle\.basket\.glint', 'click the glint'\)\),/);   // PIN MOVED (L10N4): the words through t()
+  assert.match(RETICLE, /hint: \(st, label\) => \(st\.gentle \? t\('prof\.reticle\.basket\.searching', 'searching\.\.\.'\) : label \|\| t\('prof\.reticle\.basket\.glint', 'click the glint'\)\),/);
 });

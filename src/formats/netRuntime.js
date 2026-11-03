@@ -4,7 +4,7 @@
 // knowledge seed (stringHash) and Better Ambience's dungeon fog seed (monoStringHash) - each recorded as its
 // own Ledger A departure. It lives here now and both import it.
 //
-// HAZE1 (2026-10-08): System.Random had the same two homes - scenes/shared.js's NetRandom (DaggerfallSky's stars) and
+// HAZE1: System.Random had the same two homes - scenes/shared.js's NetRandom (DaggerfallSky's stars) and
 // Better Ambience's SystemRandom (Foggy Dungeons' fog) - and Heat Haze's noise and Windfall's gusts each wanted a
 // third. It lives here now; shared.js and betterAmbience.js re-export it under their own names.
 

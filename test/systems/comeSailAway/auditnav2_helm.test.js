@@ -1,4 +1,4 @@
-// AUDIT NAV2 (2026-09-30) - THE HELM, the naval second pass's deep audit: Come Sail Away's helm under the port's Ship
+// AUDIT NAV2 - THE HELM, the naval second pass's deep audit: Come Sail Away's helm under the port's Ship
 // handling, the Overworld's crossing at it, the panel and the sail keys under a journey, the in-irons word, the
 // responsive helm's measured figures, and the guns' hold on the readout's own key. Driven on the real runtime
 // (test/csaScene.mjs), the real naval host (test/navalSea.mjs) and the world's own lines, lifted.
@@ -130,14 +130,12 @@ test('AUDIT NAV2 F15 in irons with the mod\'s own waves (Waves.Enable, its defau
     h.run(CSA.IRONS_TELL_S + 3, () => { t += 0.25; if (told == null && h.s.out.hud.some((x) => /^In irons/.test(x))) told = t; });
     assert.ok(Math.hypot(...h.s.rt.state.velocityCurrent) >= CSA.IRONS_TELL_WAY, `${handling}: the current rides in her velocity (${Math.hypot(...h.s.rt.state.velocityCurrent)} m/s)`);
     if (handling === 'responsive') {
-      // PIN MOVED (SAIL-FREE, 2026-10-05, Mac's "No tacking, Black Flag"): her canvas draws in the wind's eye and drives
       // her up into it - no irons to tell
       assert.ok(h.s.rt.state.MoveVectorCurrent[2] > 10 * CSA.IRONS_TELL_WAY, `responsive: her own way ahead, into the wind (${h.s.rt.state.MoveVectorCurrent[2]})`);
       assert.equal(told, null, 'responsive: nothing told');
       assert.equal(h.s.rt.helmPanelState().inIrons, false, 'responsive: the panel says nothing');
       continue;
     }
-    // PIN MOVED (GALLEON, 2026-10-01): her own way AHEAD nothing - the new galleon's gaff and staysail come aback in the
     // wind's eye (the mod's GetSailPower; her square canvas is stowed there by the default assist - AUDIT GALLEON T6) and
     // drive her astern, where the mod's lateens only stood idle
     assert.ok(h.s.rt.state.MoveVectorCurrent[2] < CSA.IRONS_TELL_WAY, `${handling}: her own way ahead nothing (${h.s.rt.state.MoveVectorCurrent[2]})`);
@@ -184,8 +182,8 @@ test('AUDIT NAV2 F17 a journey holds the helm under the travel view: the helm pa
     csaCall: (f) => f(), csaAboard: { aboard: null }, drawEnhancedHelm: (state) => drawn.push(state), peerName: (x) => x,
     townTalk: { hudCovered: false }, modes: { hudCovered: false }, gamePaused: () => false, hudRenderEnabled: () => true, touch: null,
     cursorActive: () => true, pointerSurfaces: new Set(), csaKeyLabel: () => '', csaHelmHooks: {}, travelView, _travelUIHolder: { ui: null },
-    navalOn: () => true,   // PIN MOVED (SHIP-CREW): the panel's Orders button asks whether the naval arc is on
-    holdsCargo: (hull) => hull > 0,   // PIN MOVED (CARGO-ANYWHERE): and its Hold whether her hull carries one
+    navalOn: () => true,
+    holdsCargo: (hull) => hull > 0,
     passengerCard,   // FIELD BUGS 2026-10-21d PASSAGE-HANDS: the real card law (no charter here)
   };
   const draw = mount(scope, fn('csaDrawHelmPanel'), 'csaDrawHelmPanel');
@@ -209,7 +207,6 @@ test('AUDIT NAV2 F17 the sail keys stand down under the travel view, as the turn
   for (const a of sail) assert.equal(started(a), false, `${a} pressed under the view: the journey's hand sets the sails`);
   assert.equal(started(BOAT_ACTIONS.toggleLight), true, 'the lanterns still the key\'s');
   assert.equal(started(BOAT_ACTIONS.disembark), true, 'leaving the helm still the key\'s');
-  // PIN MOVED (FIELD BUGS 2026-10-21d PASSAGE-HANDS): the journey's tap is its own hand's, read through the seam's wrapper
   const journey = createJourneyHand();
   const seam = passengerHelm({ started, has: () => false, horizontal: () => 0, vertical: () => 0 }, () => null, journey);
   journey.press(BOAT_ACTIONS.toggleSail);   // world.js tvSeaSail: csaJourneyHelm.press(CSA_BOAT_ACTIONS.toggleSail)
@@ -232,7 +229,6 @@ test('AUDIT NAV2 F18 the in-irons word is the helm\'s own: under the mod\'s own 
   for (const handling of ['classic', 'responsive']) {
     const h = helmOn(HULL.SmallShip, { handling, wind: [0, 0, -1.5] });
     h.run(CSA.IRONS_TELL_S + 1);
-    // PIN MOVED (SAIL-FREE, 2026-10-05, Mac's "No tacking, Black Flag"): the responsive helm's word ("put the helm over",
     // IRONS_HELM_TEXT) went with its irons - she sails up into the wind's eye
     assert.equal(h.s.out.hud.filter((x) => /^In irons/.test(x)).at(-1), handling === 'classic' ? CSA.IRONS_TEXT : undefined, `${handling}: told`);
     assert.equal(h.s.rt.helmPanelState().inIrons, handling === 'classic', `${handling}: the panel`);
@@ -253,7 +249,6 @@ test('AUDIT NAV2 F18 the in-irons word is the helm\'s own: under the mod\'s own 
   assert.equal('IRONS_HELM_TEXT' in CSA, false, 'no word left for a helm that lies in no irons');
   const keyOf = (a) => ({ BoatSailUp: 'UP', BoatSailDown: 'DOWN', TurnLeft: 'LEFT', TurnRight: 'RIGHT', MoveForwards: 'W', MoveBackwards: 'S' })[a] ?? '';
   const irons = { hull: 2, hasSails: true, inIrons: true };
-  // PIN MOVED (HELM-LADDER): one rung down strikes the last of her sail and puts her on her oars - its two keys, no row key
   assert.equal(helmHint(irons, { keyOf, mouseFree: true }), 'In irons. Strike sail (S DOWN) and row to turn', 'PIN MOVED (VOICE2): the mod\'s own helm: as it was');
   assert.equal(helmHint(irons, { touch: true }), 'In irons. Strike sail and row to turn', 'PIN MOVED (VOICE2): a finger: the words alone');
 });
@@ -305,7 +300,6 @@ test('AUDIT NAV2 F20 helmWay.js\'s measured figures are the runtime\'s, like-for
     near(r, m.rate, 0.06, `at ${v} m/s`);
     near(c, m.circle, 1, `its circle at ${v} m/s`);
   }
-  // PIN MOVED (SAIL-FREE, 2026-10-05): her full way is the responsive helm's own - SAIL-FREE's, where it was the mod's
   near(vFull, quick.top, 0.05, 'her full way is the one measured');
   const [modFull] = stated(/0\.75 deg\/s at 1 m\/s, ([\d.]+) at her full way/);
   near(modFull, rudder('classic', classic.top).rate, 0.06, 'the mod\'s at her full way');
@@ -326,9 +320,7 @@ test('AUDIT NAV2 F20 helmWay.js\'s measured figures are the runtime\'s, like-for
 
 test('AUDIT NAV2 F31 the frame\'s gate, lifted from the world: while the guns are laid Interact - the readout\'s "E: hold fire" - holds fire as Activate does, spent before a patch or the ladder (whose naval arm grappled a struck ship with a broadside owed on the release); with nothing laid E is the ladder\'s as ever (mutants: E not the hold, the patch taking the hold\'s press)', () => {
   const start = WORLD.indexOf('        // GUN-HOLD: Activate while the guns are laid holds fire');
-  // PIN MOVED (the merge with AUDIT 32 H5: a click mid-act is the act's; AUDIT 2026-10-01 part four CLICK-LIFT: and the
   // click an act took, to its release - `_activateDown` the gate's press, handed in)
-  // PIN MOVED (PROF-MENU: a click a profession node's list took is the list's - `nodeClicked`)
   const ifLine = '        if (((_act.activate && !gatherHost?.acting() && !_actClick && !nodeClicked) || (useEdge && !nodeTook)) && !modes.transitioning && !_holdFire) {';
   const end = WORLD.indexOf(ifLine, start);
   assert.ok(start > 0 && end > start, 'the gate is where it was');

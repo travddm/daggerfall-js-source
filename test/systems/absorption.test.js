@@ -106,7 +106,7 @@ test('S24: an absorbed effect does NOT land, and the points are credited', () =>
   assert.equal(out.damage, 0, 'the damage branch never ran');
   assert.deepEqual(hurt, [], 'and nothing reached the hurt sink');
   assert.ok(out.absorbed > 0, 'the points are reported');
-  // ABSORB-NERF (2026-09-30): the pool is credited HALF the points absorbed, floored (absorption.js absorbRefund)
+  // ABSORB-NERF: the pool is credited HALF the points absorbed, floored (absorption.js absorbRefund)
   assert.equal(target.magicka, Math.floor(out.absorbed / 2), 'and half of them credited to the pool');
   assert.deepEqual(said, [SPELL_ABSORBED_TEXT]);
 });

@@ -1,6 +1,4 @@
-// FAR-LANDMARK and BREATHTAKER2 ON THE HORIZON (2026-10-26, the coordinator: stream A's Imperial City wants a silhouette on
-// the horizon, and stream G's lift past byte 127 was missing from the far layers; bible/06-Systems/Travel-View.md
-// FAR-LANDMARK) - the far ring's cells farthest first, a landmark drawn in that painter's order by its distance (and the
+// FAR-LANDMARK and BREATHTAKER2 ON THE HORIZON - the far ring's cells farthest first, a landmark drawn in that painter's order by its distance (and the
 // middle ring's), and the far ring, the middle ring's eased rim and the far field standing the continent's peaks by G's
 // own law (world/landforms.js byteBeyond). No game data.
 import { test } from 'node:test';
@@ -39,13 +37,13 @@ test('BREATHTAKER2 on the horizon: a pixel\'s macro height is G\'s own law past 
   // the law itself
   assert.equal(ringHeightAt(500, 250, 100, true, 1), ringHeight(100, true, 1), 'on the Bay: no share');
   assert.equal(byteBeyond(1200, 250), 1, 'well past the Bay: the whole share');
-  assert.equal(ringHeightAt(1200, 250, 160, true, 1), nodeGround(160, 1, 1) * STREAMING_TERRAIN_SCALE);   // PIN MOVED (RELIEF-PEAKS): the node's ground - the large map by its law with the byte's term (reliefByteHeight left it out)
+  assert.equal(ringHeightAt(1200, 250, 160, true, 1), nodeGround(160, 1, 1) * STREAMING_TERRAIN_SCALE);
   assert.ok(ringHeightAt(1200, 250, 160, true, 1) > ringHeight(160, true, 1) + 100, 'byte 160 stands its lift past the 7-bit top');
   assert.equal(ringHeightAt(1200, 250, 160, false, 1), ringHeight(160), 'the plain law takes no lift');
   // the far ring's grid past the Bay: the vertex at (1100, 250) on a field of byte 160
   const g = buildFarRingGrid({ heightBytes: new Uint8Array(1000 * 500), mapWidth: 1000, mapHeight: 500, climateAt: () => 231, baseX: 1100, baseY: 250, radius: 2, relief: true, byteAt: () => 160, climatePast: () => 231 });
   const mid = (2 * 5 + 2) * 3 + 1;
-  const want = ringGroundAt(1100, 250, () => 160, true);   // PIN MOVED (RELIEF-PEAKS): the vertex the kernel's mean ground at its pixel's centre - the node's law with the ranges there
+  const want = ringGroundAt(1100, 250, () => 160, true);
   assert.ok(Math.abs(g.positions[mid] - want) < 1e-3, `${g.positions[mid]} against ${want}`);
   assert.ok(want > ringHeight(160, true, 1) + 100, 'the continent\'s lift on it');
   // the far field's height is asked at its cell's centre pixel
@@ -65,7 +63,6 @@ test('BREATHTAKER2 the far ring\'s far field stands its cells by G\'s law at the
   ring.build(inputs, 1100, 250, 5, new Map());
   const { farFieldSide } = await import('../../src/world/terrain/midRingGrid.js');
   const n = farFieldSide() ** 2;
-  // PIN MOVED (RELIEF-PEAKS): the law is the worker's now (world/terrain/midRingGrid.js farFieldCell: the kernel's ground at
   // the vertex's node, test/world/reliefpeaks.test.js) - the ring asks it under the Landforms row and stands each vertex on
   // the ground answered for it
   assert.equal(asks[0].relief, true, 'asked under the Landforms row');

@@ -7,7 +7,7 @@
 // answer's `first` unread. These are the words both say it with: the station pages' boxes (ui/professions/profPages.js) and the
 // craft's word (scenes/world.js's `craft`, one call).
 //
-// CRAFT-HALL (2026-10-26): the client now knows what was made (profState's `made`), so the lines below take `owed`:
+// CRAFT-HALL: the client now knows what was made (profState's `made`), so the lines below take `owed`:
 // true says the bonus is still to earn, false that it is spent, null (an older service) says the rule as before.
 //
 // CRAFT-LIMIT-SAID (FIELD BUGS 2026-10-18f; the Discord, "Smithing stuck at 50": "I have been stuck at level 50 smithing
@@ -19,16 +19,16 @@
 // so at the limit the anvil promised "60 Smithing XP, and 500 more" and the craft paid none, and nothing in the game said
 // why. `pay` is what a station reads off the book (ui/professions/profPages.js craftPayOf): the limit over its track
 // (professionLaw craftLimit, from the service's ten tracks) and the Firmament's percent on its XP.
-// bible/06-Systems/Professions-Arc.md 41.10.
+// 41.10.
 //
-// CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids"): S1 JUDGES THE
+// CLOTH-GEMS: S1 JUDGES THE
 // UNITS. The loom weaves Linen and spins Wool of the world's goods now (net/professionLaw.js WEAVE_RECIPES, SPIN_RECIPES),
 // and a piece made wholly of cloth pays its first where its cloth is the character's own (recipeLaw firstCraftPays's
 // `own`); the Weavers' - bought - never does. So a box says which way its units stand, and the craft's word says what
-// the service decided (its answer's `firstPaid`). bible/06-Systems/Professions-Arc.md 50.
+// the service decided (its answer's `firstPaid`). 50.
 //
 // WOVEN-PAYS (FIELD BUGS 2026-10-26b; fogs, #feature-feedback: "First time XP bonus from the Loom still isn't working";
-// the owner: "Woven cloth pays"): THE WALL IS SILVER. fogs wove Linen of Root Tendrils the service never counted (looted,
+// ): THE WALL IS SILVER. fogs wove Linen of Root Tendrils the service never counted (looted,
 // or bought at a shop): loose cloth, which S1 withheld from. The box read the Stores and the carried count, saw none of
 // the bolts the loom had carried out to the bag, and promised the 511; the craft put one back in loose and paid none,
 // and its word said "only cloth you wove or spun yourself", of cloth fogs had woven. Now a cloth piece's first pays
@@ -37,11 +37,11 @@
 // whatever the units' origins (recipeLaw firstCraftPays). The box reads that count (`silver`: profPages.js silverOf),
 // and every line names the wall as silver.
 //
-// FIRST-BUDGET (SaberGGaming's report, 2026-10-25: Provisioning is slow; the owner, asked: "Match Smithing's pace"): A
+// FIRST-BUDGET (SaberGGaming's report, 2026-10-25: Provisioning is slow): A
 // FIRST-MAKE'S XP IS ITS TRACK'S SHARE (net/recipeLaw.js FIRST_MAKE_SHARE - firstCraftXp, workFirstXp), no longer a flat
 // 500 every track: Smithing's 500, Outfitting's 511, Building's 1,823, Provisioning's 3,155 - each the least that brings
 // its track to Master in Smithing's crafts - and every line below says the recipe's own. The share says how much a first
-// pays, CLOTH-GEMS whether. bible/06-Systems/Professions-Arc.md 52.
+// pays, CLOTH-GEMS whether. 52.
 import { t, intlLocale } from '../systems/textManager.js';
 import { craftXp, firstCraftPays, counterMade, firstCraftXp, workFirstXp, masonXp } from '../net/recipeLaw.js';
 import { creditedXp, professionName, JOURNEYMAN_RANK, CRAFTS_ABOVE_JOURNEYMAN, MASON_RECIPES } from '../net/professionLaw.js';   // FIRST-BUDGET: the bench's two works, each its first's share

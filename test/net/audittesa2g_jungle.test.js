@@ -3,7 +3,7 @@
 // The account service holds no trace to read the zones by, so the client's word that its pixel is a jungle zone's is
 // WITNESSED with the pixel's climate and region (SEAT0 3.2, net/nodeLaw.js pixelReport's `,1`) and stands on confirmed ground
 // alone, where a jungle zone may stand (jungleGroundOk) - one law, the client's stand and the service's bound
-// (nodeSlots, jungleWoods). bible/06-Systems/Professions-Arc.md, bible/03-World/Tamriel-Biomes.md.
+// (nodeSlots, jungleWoods).,.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

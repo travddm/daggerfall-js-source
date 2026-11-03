@@ -1,5 +1,5 @@
 // @ts-check
-// TUT1 (2026-10-11): THE TUTORIALS' WORDS - every page DFO's tutorial can show, grouped as the menu's Tutorials tab
+// TUT1: THE TUTORIALS' WORDS - every page DFO's tutorial can show, grouped as the menu's Tutorials tab
 // lists them. The law that reads them is systems/tutorials.js; the box is ui/tutorialPopup.js; the menu's pane is
 // ui/tutorialsPane.js.
 //
@@ -7,7 +7,7 @@
 // - The game is DFO. A page never names the old game it grew from - not the game, not its capital.
 // - A key is written `{Action}` (an action of systems/inputActions.js) and filled with the key the player has bound
 //   now, never a key's name: a rebound key would make the page lie.
-// - A page is short and plain (TUT1 audit, Mac: "Ensure explanations dont sound AI and arent overloaded"): what the
+// - A page is short and plain (TUT1 audit): what the
 //   player needs to start, in the words a player uses - one or two short paragraphs, at most three points, no
 //   asides and no flourish. The detail lives in the game; the page gets the player to it.
 // - `trigger` says, in words, when the page pops on its own (the menu shows it under the title); a page with no seam
@@ -19,7 +19,6 @@
 import { t } from './textManager.js';   // KG3: a page's words read through the text core when shown
 import { isEnhanced } from './uiSkin.js';   // AUDIT SUGGESTIONS-1019 L6-4: a line only the enhanced skin's Stats page bears out
 import { ROLL_GAIN_DAY_MAX, ROLL_BOOK_RANK_MAX, SEAT_RANK } from '../net/npcChapterLaw.js';   // SEAT-WORDS: the Chapters page's numbers, the law's own
-import { ETHER_WORD } from '../world/ethericSea.js';   // FOE-KEEPS: the open zone's page names the sea by its one home (ELTHERIC)
 
 /** @typedef {{ id: string, group: string, title: string, trigger: string, body: ReadonlyArray<string>, points?: ReadonlyArray<string> }} Tutorial */
 
@@ -61,7 +60,7 @@ export const TUTORIALS = Object.freeze([
   page({
     id: 'welcome', group: 'basics', title: 'Welcome to DFO', trigger: TOUR,
     body: [
-      // START1 (bible/06-Systems/Alternate-Starts-Arc.md): the main story waits on the commission (systems/starts/starts.js) -
+      // START1: the main story waits on the commission (systems/starts/starts.js) -
       // START2: in whichever start the character chose, so the page names none of them. AUDIT STARTS U9: neither "find
       // them" (the commission in hand starts in the pack) nor "begins when you do" (it begins in the city they name)
       "Your story begins with the Emperor's sealed orders, your commission. When you hold them, open them from your pack: they name the city where the main story begins.",
@@ -339,27 +338,6 @@ export const TUTORIALS = Object.freeze([
     ],
   }),
   page({
-    id: 'tavern-cards', group: 'towns', title: 'Card Games', trigger: 'When you first sit at a card table.',
-    body: [
-      'Play Texas Hold\'em, Iliac Hand or The King\'s Gambit against the locals, and the first two against other players too. Online, one table plays for real gold.',
-      'Cards you collect go into your Card Binder, kept under Menu > Holdings > Collections.',
-    ],
-  }),
-  // KG3 (bible/11-Multiplayer/Kings-Gambit.md section 14.5): the third game at the card table - its words through the
-  // text core, read when the page is shown; no number (the panel's guide carries them) and no crown (a page names no
-  // old game, and the game's own crown is its capital's)
-  page({
-    id: 'kings-gambit', group: 'towns',
-    get title() { return t('tutorials.kingsGambit.title', 'The King\'s Gambit'); },
-    get trigger() { return t('tutorials.kingsGambit.trigger', 'When you first sit down to The King\'s Gambit.'); },
-    get body() {
-      return [
-        t('tutorials.kingsGambit.body1', 'A game of armies and kings, played on a board laid across a tavern\'s card table. Choose a regular to play, set down your stake and raise your army.'),
-        t('tutorials.kingsGambit.body2', 'Each turn, move your pieces, strike and drink potions. Bring down the enemy king to win, and guard your own.'),
-      ];
-    },
-  }),
-  page({
     id: 'holdings', group: 'towns', title: 'Houses', trigger: 'When you first look at buying or renting a house.',
     body: [
       'Offline, banks sell houses. Online, you may buy up to three empty houses at their front doors and choose who may enter.',
@@ -381,7 +359,7 @@ export const TUTORIALS = Object.freeze([
       'Many quests must be finished in time. Turning work down costs you nothing, except in the main story.',
     ],
   }),
-  // QL2 (bible/06-Systems/Questlines-Arc.md section 6): what the questlines changed, the first time a quest carries them
+  // QL2: what the questlines changed, the first time a quest carries them
   page({
     id: 'questlines', group: 'quests',
     get title() { return t('tutorials.questlines.title', 'Questlines'); },
@@ -551,18 +529,6 @@ export const TUTORIALS = Object.freeze([
     ],
   }),
   page({
-    id: 'sky-ketch', group: 'challenges',
-    // KETCH: the whole page in the player's language (L10N4), as the guilds' is
-    get title() { return t('tutorials.skyKetch.title', 'The Sky-Ketch'); },
-    get trigger() { return t('tutorials.skyKetch.trigger', 'When you first ride the anchor-lift up to the Sky-Ketch.'); },
-    get body() {
-      return [
-        t('tutorials.skyKetch.body1', 'Every ten hours the Sky-Ketch stays over the fields east of the capital for seven hours. Ride its anchor-lift up with your party, eight players at most.'),
-        t('tutorials.skyKetch.body2', 'Carry aether cells to the engine. A hit makes you drop the cell. Nets catch a fall; only death wakes you in the fields below.'),
-      ];
-    },
-  }),
-  page({
     id: 'ocean-holes', group: 'challenges', title: 'Ocean Holes', trigger: 'When you first dive into an Ocean Hole.',
     body: [
       'Black holes in the seabed beneath purple mist lead down to flooded dungeons. Mind your breath.',
@@ -621,19 +587,6 @@ export const TUTORIALS = Object.freeze([
     body: [
       'Challenge a player from their Inspect card. A duel does not touch your true health: no one dies and no law is broken.',
     ],
-  }),
-  page({
-    id: 'wild-zone', group: 'online', title: 'The Open Zone', trigger: 'When you first enter the open zone.',
-    // FOE-KEEPS; AUDIT FOE-KEEPS O4: the page pops in either zone, the sea's too, and said the bag and cart lost whole at
-    // a kill - a tenth of the gold with them, and any other death there costs the usual tenth. STORE-KEEPS and WILD-INSURE
-    // (2026-10-26): the cart and the companions' packs are kept now, and so is insured gear; through the text core
-    // (L10N4), read when shown; WW-C2: the open zone is Cyrodiil's
-    get body() {
-      return [
-        t('tutorials.wildZone.body1', 'Players may fight one another in Cyrodiil and on the open {word} Ocean, where monsters are tougher and spoils richer.', { word: ETHER_WORD }),
-        t('tutorials.wildZone.body2', 'If another player kills you there, your bag drops with a tenth of your gold, and they may take one worn item. Your cart, companions\' packs and insured gear are kept. Any other death costs the usual tenth.'),
-      ];
-    },
   }),
   // SEAT-WORDS / STANDING-WORDS (Field-Bugs-2026-10-15g): the guilds online - the Roll's pace and the seats - popped at
   // the first word for a member and at the book's hold (scenes/rollNoticeHost.js)

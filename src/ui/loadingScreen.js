@@ -1,5 +1,4 @@
-// LOAD1 (2026-10-05, Mac: "add loading screens where needed for the game in an enhanced UI type fashion, maybe make it
-// where people can also use screenshots for the loading screen and a way to access them in the menu"):
+// LOAD1:
 // THE LOADING SCREEN.
 //
 // The game's loads had no face. The boot from the menu into the world ran behind a bare canvas for seconds (the only

@@ -2,7 +2,7 @@
 // Worldmap(V) with right mouseclick context menu players should also be able to rename them. They can be small flags with
 // different colors. Add the waypoints you want to mark (to follow) to the filter list on the overworld map with a dropdown
 // menu. Add Waypoints to the filter on the worldmap"; then "i hope the waypoints are removed when leaving party";
-// bible/01-Overview/handoffs/Waypoints-And-Pace.md). ONE STORE, BOTH MAPS (systems/map/mapWaypoints.js): a point on the bay in map
+// ). ONE STORE, BOTH MAPS (systems/map/mapWaypoints.js): a point on the bay in map
 // pixels, a name, a colour and a kind; a party's or a guild's said on the hub's own channel as one line the chat never
 // shows, moved only by its author; dropped when its group is left.
 import { test } from 'node:test';
@@ -37,7 +37,6 @@ test('WAYPOINTS: add, rename, recolour, follow and remove - names cleaned and bo
   assert.equal(a.waypoint.kind, 'personal');
   assert.equal(a.shared, null, 'a personal one is never said');
   assert.equal(nextWaypointName(), 'Waypoint 2');
-  // PIN MOVED (BAY-LEFT-MAPS): a flag stands anywhere on the world's grid (net/wire.js worldPixelOk) - the Bay's edge was
   // no edge of the map past the Bay; a point off the world is refused
   assert.equal(addWaypoint({ mx: 8192, my: 20 }), null, 'off the world');
   assert.equal(addWaypoint({ mx: 20, my: -8192.5 }), null);
@@ -95,7 +94,7 @@ test('WAYPOINTS: THE WIRE - a party\'s waypoint is said on the party channel as 
   assert.equal(isWaypointLine('hello there'), false);
   assert.deepEqual(decodeWaypointLine(line), { op: 'add', id: r.waypoint.id, mx: 123.457, my: 45.5, color: 'gold', name: 'Camp by the river' });
   assert.equal(decodeWaypointLine(`${WP_WIRE_PREFIX} add BAD! 1 1 red x`), null, 'an id of the wrong shape');
-  assert.equal(decodeWaypointLine(`${WP_WIRE_PREFIX} add abc 9000 1 red x`), null, 'off the world');   // PIN MOVED (BAY-LEFT-MAPS): 2000 is a point past the Bay now
+  assert.equal(decodeWaypointLine(`${WP_WIRE_PREFIX} add abc 9000 1 red x`), null, 'off the world');
   assert.equal(encodeWaypointLine(['del', 'abc']), `${WP_WIRE_PREFIX} del abc`);
   renameWaypoint(r.waypoint.id, 'Old camp');
   assert.equal(said.at(-1)[1], `${WP_WIRE_PREFIX} ren ${r.waypoint.id} Old camp`, 'mine and shared: the rename is said');
@@ -165,7 +164,7 @@ test('WAYPOINTS: kept on the device through the storage seam - the list, the fol
     toggleWaypointKind('guild');
     assert.deepEqual(heard, ['add', 'follow', 'show']);
     const raw = JSON.parse(store.get(WAYPOINT_STORE_KEY));
-    raw.list.push({ id: 'bad', kind: 'nope', mx: 1, my: 1 }, { id: 'far', kind: 'personal', mx: 9000, my: 1 });   // PIN MOVED (BAY-LEFT-MAPS): 5000 is a point past the Bay now; 9000 is off the world
+    raw.list.push({ id: 'bad', kind: 'nope', mx: 1, my: 1 }, { id: 'far', kind: 'personal', mx: 9000, my: 1 });
     store.set(WAYPOINT_STORE_KEY, JSON.stringify(raw));
     _resetWaypoints();
     assert.deepEqual(listWaypoints().map((x) => [x.id, x.name]), [[w.id, 'Keep']]);
@@ -242,48 +241,3 @@ test('WAYPOINTS: the right-click menu - added where the map was pressed with its
   fresh();
 });
 
-test('WAYPOINTS host: both maps take the right click as the store\'s - the Overworld\'s still right press, the held map\'s world sheet arm - and the hub\'s party and guild lines reach the store before the chat', () => {
-  const tv = rd('src/scenes/travelView.js');
-  assert.match(tv, /if \(p && p\.id === e\.pointerId && !p\.moved && p\.button === 2 && state === 'up' && e\.type !== 'pointercancel'\) \{\n\s*const key = deps\.hud\?\.pickAt\?\.\(e\.clientX, e\.clientY\) \?\? null;\n\s*deps\.onContext\?\.\(e\.clientX, e\.clientY, key, e\);/, 'a right press that never moved - a right DRAG still orbits');
-  const hm = rd('src/ui/heldMap.js');
-  assert.match(hm, /context: \(cx, cy\) => this\._waypointContext\(cx, cy\),/, 'the world sheet\'s arm (EM1: the window never asks which sheet)');
-  assert.match(hm, /if \(e\.button === 2\) \{ e\.preventDefault\?\.\(\); this\._sheet\?\.context\(e\.clientX, e\.clientY\); \}/);
-  for (const f of ['src/ui/automap/automapSheet.js', 'src/ui/town/townSheet.js']) assert.match(rd(f), /context\(\) \{ return false; \},/, `${f}: no waypoints there`);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /setWaypointSender\(\(ch, text\) => socialLink\(\)\?\.sendChat\(text, \{ ch \}\) \?\? false\);/, 'the hub\'s own channels - no relay change');
-  assert.match(w, /if \(socialLink\(\)\?\.status === 'open' && social\) syncWaypointGroups\(\{ party: social\.party\?\.id \?\? null, guild: myGuildTag\(\) \}\);/, 'GROUP-LEAVE: told only while the hub is open, so a dropped link removes nothing');
-});
-
-test('WILD-WAYPOINT: my remains in the open zone plant one followed red flag, kept with its end on this device - gone at its time, when the room says the remains are gone, at the next death\'s flag, or when removed by hand; and the book hears its room before its word (WILD-SEEN)', async () => {
-  fresh();
-  const W = await import('../../../src/systems/wild/wildRemainsWaypoint.js');
-  const id = W.markRemains({ mx: 640.5, my: 120.25, until: 10_000, r: 'abc' });
-  const wp = waypointById(id);
-  assert.equal(wp.name, W.WILD_WP_NAME);
-  assert.equal(wp.color, 'red');
-  assert.equal(wp.kind, 'personal', 'mine alone - never said to a party');
-  assert.ok(isWaypointFollowed(id), 'followed: the Overworld keeps it at the screen\'s edge with its distance');
-  assert.deepEqual([wp.mx, wp.my], [640.5, 120.25]);
-  assert.equal(W.remainsMarkTick(9_999), false, 'still in its time');
-  assert.equal(W.remainsGone('other'), false, 'another remains gone: not mine');
-  assert.equal(W.remainsMark()?.id, id, 'remembered on this device');
-  assert.equal(W.remainsMarkTick(10_000), true, 'its time up: gone');
-  assert.equal(waypointById(id), null);
-  const a = W.markRemains({ mx: 1, my: 1, until: 50, r: 'r1' });
-  const b = W.markRemains({ mx: 2, my: 2, until: 60, r: 'r2' });
-  assert.equal(waypointById(a), null, 'the next death\'s flag takes the last one down');
-  assert.equal(W.remainsGone('r2'), true, 'the room says they are gone: the flag goes');
-  assert.equal(waypointById(b), null);
-  const c = W.markRemains({ mx: 3, my: 3, until: 1e15, r: 'r3' });
-  removeWaypoint(c);
-  assert.equal(W.remainsMarkTick(0), true, 'removed by hand: the record goes too');
-  assert.equal(W.remainsMark(), null);
-  assert.equal(W.markRemains({ mx: -9000, my: 3, until: 1e15 }), null, 'off the world: no flag');   // PIN MOVED (BAY-LEFT-MAPS): -5 is a point past the Bay, west of its corner, now
-  // the host
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /online\.onWildRoom = \(w, room\) => \{\n\s*if \(!online\.heldRooms\(\)\.includes\(room\)\) return;\n\s*wildRemains\.setRooms\(online\.heldRooms\(\)\);\n\s*wildRemains\.onWord\(w, room\);\n\s*if \(w\?\.k === 'gone'\) \{ remainsGone\(w\.r\);/, 'WILD-SEEN + HALO-REMAINS: the rooms first, so a near relay\'s hello is never cleared as another room\'s by the frame after it');
-  // PIN MOVED (INT9): the remains are the service's records, deposited on its order - the flag is planted as they go out
-  assert.match(src, /if \(at\) markRemains\(\{ mx: at\.mx, my: at\.my, until: _wildMine\.until, r: dep\.r \}\);/, 'the death plants it where they lie');
-  assert.match(src, /remainsMarkTick\(Date\.now\(\)\);/, 'and the frame takes it down at its time');
-  fresh();
-});

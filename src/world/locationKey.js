@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" B4; bible/06-Systems/Talk-Arc.md BAY-LEFT-B) -
+// BAY-LEFT-B -
 // A LOCATION'S KEY FROM ITS BUILDINGS.
 //
 // MAPS.BSA's MapTable row carries a KEY (DFU's DFRegion.RegionMapTable.Key) that the talk's regional "Where is" reads

@@ -1,5 +1,4 @@
-// IT1 (2026-10-04, the owner: "Actually lets let this be the next mod we integrate 1:1", after asking how instant
-// travel could come back online "as an option but with a cost"): IMMERSIVE TRAVEL 1.5, by kkgobkk - "Implements
+// IT1: IMMERSIVE TRAVEL 1.5, by kkgobkk - "Implements
 // diegetic fast-travel by adding carriages outside of city gates." (vendor/immersive-travel/README.md).
 //
 // THE MOD, WHOLE. A carriage, two horses and a driver stand outside the gate of every walled city (its four
@@ -25,7 +24,6 @@ import { registerCustomFaction } from '../formats/factionFile.js';
 import { registerMerchantService } from './guild/guildServices.js';
 import { LOCATION_TYPES } from '../formats/mapsFile.js';
 import { CAPITAL_MAP_IDS, LARGE_DOCK_MAP_IDS, DOCK_PIXEL_IDS } from './immersiveTravelTables.js';
-import { isHallMapId } from '../net/wire.js';   // AUDIT WW F1: a zone hall's id masks to no Bay pixel
 import { setFlatFaceOverride } from '../characters/staticNpc.js';   // DRIVER-FACE: FLATS.CFG's dictionary, as Roleplay & Realism writes it
 import { noteFirstUse } from './tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
 
@@ -148,9 +146,8 @@ export function borderingRegionIndex(x, y, politicAt) {
 
 /** MapsFile's pixel-id mask, the mod's `& 1048575` (IL_14d0, IL_1fc8). */
 const PIXEL_MASK = 0xfffff;
-/** The Bay pixel id a map id masks to - AUDIT WW F1: none (-1) for a zone hall's, whose low bits are a world pixel key's
- *  (net/wire.js isHallMapId): no capital, no dock, no large dock's. */
-const pixelIdOf = (mapId) => (isHallMapId(Number(mapId)) ? -1 : (mapId | 0) & PIXEL_MASK);
+/** The Bay pixel id a map id masks to. */
+const pixelIdOf = (mapId) => (mapId | 0) & PIXEL_MASK;
 /** CarriageMap.isCapital(mapID) (IL_14bc-14f1, the lambda IL_1fc7-1fd6): a capital table entry whose pixel id is the
  *  map id's. */
 export const isCapital = (mapId) => CAPITAL_MAP_IDS.some((c) => (c & PIXEL_MASK) === pixelIdOf(mapId));

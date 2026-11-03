@@ -1,5 +1,5 @@
 // @ts-check
-// SD7b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE UNMOORED STEPS, MADE -
+// SD7b: THE UNMOORED STEPS, MADE -
 // the meshes the course's steps are and the triangles they stand in the collider as, and the checkpoints B and C. Pure:
 // the scene (scenes/superDungeon/sdSteps.js) uploads them, stands each step where the law (world/superDungeon/sdSteps.js) puts it, and moves it.
 //
@@ -10,7 +10,7 @@
 //   THE CHECKPOINTS B and C - islands as the first step is (A, world/superDungeon/sdHall.js), at their heights.
 //   THE BREATH'S STREAKS (AUDIT SD II) - brass light blowing across the Crumble, the Warp's breath seen (buildBreathModel).
 //
-// SD-LOOK S9 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 8): EVERY STEP SHOWS WHAT IT WILL DO NEXT.
+// SD-LOOK S9: EVERY STEP SHOWS WHAT IT WILL DO NEXT.
 // Nothing here is larger than the law: every step's mesh stands inside its collider's box (stepBox, stepTris untouched).
 //   THE STEPS bevelled, one atlas a kind (world/superDungeon/sdStepsArt.js) - a chamfer round the top and the foot, the gold line under
 //     the rim, about 36 triangles, one draw; a riser's face set back SD_RACK.out so its rack of eleven brass teeth (like
@@ -368,7 +368,7 @@ export function buildBreathModel(course = SD_COURSE) {   // EG-H3 (EG4): over a 
   const rec = SD_HALL_GLOW_RECORD.brass, UV = [[0, 0], [0, 1], [1, 1], [1, 0]];
   const both = (a, b, c, d) => { f.quad(rec, a, b, c, d, ...UV); f.quad(rec, d, c, b, a, ...UV); };
   for (let k = 0; k < SD_BREATH.n; k++) {
-    const x = C.x + (rnd() * 2 - 1) * SD_BREATH.halfX, z = z0 + rnd() * (z1 - z0);   // about the course's own line (AUDIT KETCH L4-5: the Ketch's runs at x 24, its streaks were drawn about 0)
+    const x = C.x + (rnd() * 2 - 1) * SD_BREATH.halfX, z = z0 + rnd() * (z1 - z0);   // about the course's own line (AUDIT KETCH L4-5: a course off x 0 drew its streaks about 0)
     const y = C.y * (1 - (z - z0) / (z1 - z0)) - 0.4 + rnd() * 2.6;   // about the course's height there
     const half = (SD_BREATH.len * (0.6 + 0.4 * rnd())) / 2, t = SD_BREATH.thick, tail = t * 0.2;
     both([x - half, y - tail, z], [x - half, y + tail, z], [x + half, y + t, z], [x + half, y - t, z]);   // upright

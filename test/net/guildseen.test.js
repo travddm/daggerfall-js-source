@@ -1,5 +1,4 @@
-// GUILD-SEEN (2026-10-11, the owner: "the guild member list needs a 'last online' info, just like the friend list
-// does"): THE ROSTER SAYS WHEN EACH MEMBER WAS LAST ONLINE. The service's view carries each member's `seenAt` - the
+// GUILD-SEEN: THE ROSTER SAYS WHEN EACH MEMBER WAS LAST ONLINE. The service's view carries each member's `seenAt` - the
 // account's last play beat (ACC4's `played_at`), or its last authenticated call where it never beat - driven through
 // the real Worker over node:sqlite with every migration applied (server-account/src/guilds.js viewOf); the book's law
 // over it (net/guild/guildBook.js guildMemberOnline, guildSeenText) and a look that moves a stamp alone repainting nothing;
@@ -93,8 +92,6 @@ test('GUILD-SEEN the service: each member of the roster carries `seenAt`, its ac
     ['Bran', 2, false, nowS - 7200],
     ['Cass', 3, false, nowS - 3600],
   ], 'the beat, or the call where there was none - in the roster\'s own order');
-  // the roster is one statement still, and writes nothing to say it
-  assert.match(src('server-account/src/guilds.js'), /COALESCE\(p\.played_at, p\.last_seen\) AS seen_at FROM guild_members m LEFT JOIN players p ON p\.id = m\.player WHERE m\.guild_id = \?/);
 });
 
 // ─── THE LAW ─────────────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57) - THE LAW OF A MASTER'S WORK, ALONE: which
+// MASTER-ART - THE LAW OF A MASTER'S WORK, ALONE: which
 // recipes take one, the lines a piece may be given, the refusals, the roll in the Legendary band (never past its top -
 // POWER-CEILING), the catalysts' one table, the record's `l`, the mint, the item law and the item maker's refusal.
 import '../chargenDom.mjs';
@@ -89,7 +89,7 @@ test('MASTER-ART THE ROLL: each line in its Legendary band off the seed, in the 
       assert.deepEqual([Math.min(...seen[i]), Math.max(...seen[i])], [lo, hi], `${k} reaches both ends`);
     });
   }
-  assert.deepEqual(masterBand('damage'), [20, 40]);
+  assert.deepEqual(masterBand('damage'), [12, 24]);   // PIN MOVED (B4 rescale): the Legendary damage band was 20-40
   assert.equal(masterSignature([{ id: 'damage', value: 31 }, { id: 'skill', param: 29, value: 22 }]), 'damage::31|skill:29:22');
   assert.equal(masterDayOf(86_400 * 3 + 5), 3);
 });
@@ -190,10 +190,11 @@ test('MASTER-ART THE ITEM LAW holds a Master\'s work to its shape - a made Legen
   const cases = [
     [{}, []],
     [{ affixes: [{ id: 'damage', value: top + 1 }, ...sword.affixes.slice(1)] }, ['affixes', 'shape']],   // past every band: the field's own shape too
-    [{ affixes: [{ id: 'damage', value: 19 }, ...sword.affixes.slice(1)] }, ['affixes']],
+    [{ affixes: [{ id: 'damage', value: 11 }, ...sword.affixes.slice(1)] }, ['affixes']],   // 11: under the band's floor of 12 (19 is in the band now)
     [{ affixes: sword.affixes.slice(0, 2) }, ['legendary']],
-    [{ affixes: [...sword.affixes, { id: 'leech', value: 8 }] }, ['legendary']],
-    [{ affixes: [sword.affixes[0], { id: 'leech', value: 8 }, sword.affixes[2]] }, ['legendary']],
+    // PIN MOVED (B4 rescale): the extra leech line is 5, inside the new Legendary band (4-6; 8 was inside the old 7-10)
+    [{ affixes: [...sword.affixes, { id: 'leech', value: 5 }] }, ['legendary']],
+    [{ affixes: [sword.affixes[0], { id: 'leech', value: 5 }, sword.affixes[2]] }, ['legendary']],
     [{ quality: 3 }, ['legendary']],
     [{ enchantments: [{ type: 1, param: 1 }] }, ['enchantments']],
     [{ exalted: true }, ['legendary']],

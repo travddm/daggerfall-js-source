@@ -1,4 +1,4 @@
-// VIRT (2026-10-16) - THE LONG PACK, DRIVEN IN A BROWSER AND TIMED.
+// VIRT - THE LONG PACK, DRIVEN IN A BROWSER AND TIMED.
 //
 // A container of 700 pieces over 351 kinds (312 pictures), the player's own storage of 700 beside the pack, and a pack
 // page of 700: how long the window takes to open cold and warm, how many times it repaints while its pictures land, how

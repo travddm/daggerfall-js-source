@@ -1,4 +1,4 @@
-// TRADE-VIRT (2026-10-20, a player's audit of the trading windows, handed on by the owner: "Someone also sent this") -
+// TRADE-VIRT -
 // THE TRADE COUNTERS, DRIVEN IN A BROWSER AND TIMED, OVER THE PLAYER'S OWN PICTURES.
 //
 // The enhanced shop counter (ui/enhanced/enhancedTrade.js) and the player-to-player window (ui/enhanced/

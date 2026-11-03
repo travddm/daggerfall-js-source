@@ -151,7 +151,7 @@ function lowestY(model) {
  *  A subrecord with no interior header at all is not known to be empty. IC-INTERIORS: a MADE interior (interiorCast) is
  *  laid from Daggerfall's kit - it holds its models before they are made. */
 export const hasInteriorModels = (sub) => sub?.interior?.made === true || sub?.interior?.header?.num3dObjectRecords !== 0;
-/** IC-INTERIORS (bible/03-World/Arena-Provinces.md IC-INTERIORS): THE RECORD A BUILDING'S CAST IS READ FROM. A MADE
+/** IC-INTERIORS (IC-INTERIORS): THE RECORD A BUILDING'S CAST IS READ FROM. A MADE
  *  interior (world/imperialFabricBuildings.js fabricBuildingInterior - an Imperial City building's own, laid from
  *  Daggerfall's kit) makes its records when one is first read, and names the Daggerfall record its people and its markers
  *  are its own building's from (`cast`): a walk over a town's buildings - the questor pool, a quest's site search, which
@@ -278,8 +278,7 @@ export function layoutInterior(dfBlock, blockIndex, recordIndex, getModel) {
     spawnPoints.push([obj.xPos * GLOBAL_SCALE, -obj.yPos * GLOBAL_SCALE, obj.zPos * GLOBAL_SCALE]);
   }
 
-  // MAC-BUG1 (2026-09-20, Mac: "got locked inside a windmill when i
-  // went inside. not sure if it's all of them that do that") - IT IS
+  // MAC-BUG1 - IT IS
   // ALL OF THEM, AND THE REASON IS THAT AN INTERIOR'S EXIT IS A MODEL.
   //
   // A building's way out is not a record in its own data: it is the

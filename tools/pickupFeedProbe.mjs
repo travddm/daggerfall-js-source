@@ -1,4 +1,4 @@
-// PICKUP-FEED, SEEN (2026-10-01, Mac: "a better center screen notification for pickups") - the take's cards drawn in a
+// PICKUP-FEED, SEEN - the take's cards drawn in a
 // real browser over the real sheets, beside the real plaque under a crosshair and the real enhanced HUD, and
 // photographed.
 //
@@ -14,7 +14,7 @@
 // seen at its real size. The address the real door is asked for is the pack's own (inventoryItemImage) and is pinned in
 // test/systems/pickupfeed.test.js.
 //
-// HAUL-CARDS (2026-10-03): four scenes more - a vein's card bumped and its gem, a raid's three silver cards, the day's
+// HAUL-CARDS: four scenes more - a vein's card bumped and its gem, a raid's three silver cards, the day's
 // cap beside a pickup, a Motherlode's one card - built from answers through ui/haulCards.js and drawn by `showHaul`,
 // held to the same checks (no card over the plaque, the mid-screen line, the HUD's foot, or above the crosshair).
 //

@@ -1,5 +1,5 @@
 // @ts-check
-// RVN-STARS (2026-10-17; bible/06-Systems/Revenants.md section 44) - A SWORN REVENANT'S STARS, LAID OVER THE PAUSE WINDOW
+// RVN-STARS - A SWORN REVENANT'S STARS, LAID OVER THE PAUSE WINDOW
 // (named firmamentOver.js, not *Door.js: it hands no window to a host's slot - it lays a sky OVER a door's page, so
 // CRASH2's slot contract is not its law): the Companions page's Stars, its sky (ui/revenantStarsWindow.js) over the pause
 // window and the page put back on Companions when it closes, on either door that draws the page (ui/pauseDoor.js -
@@ -8,8 +8,8 @@
 // answer Escape twice), and the page put back when the sky closes. Through the ONE lazy-chunk door
 // (ui/enhanced/enhancedChunk.js), so a chunk that will not load says so and the page stays up behind the notice.
 //
-// FIRM1's Firmament had this door first (the Stats page's Firmament button); GROWTH3 (bible/10-UI/Growth.md section 6)
-// draws the Firmament in the pause window's Growth tab, so its door went. The owner, of the revenants' (2026-10-17):
+// FIRM1's Firmament had this door first (the Stats page's Firmament button); GROWTH3
+// draws the Firmament in the pause window's Growth tab, so its door went. The owner, of the revenants':
 // "Keep it on the companion page" - this one stays.
 
 import { mountEnhancedChunk } from './enhanced/enhancedChunk.js';

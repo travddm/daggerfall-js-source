@@ -2,7 +2,7 @@
 // picked again and again up to the ten-row guard, each copy adding its negative cost to the budget. DFU's own rule,
 // ported faithfully: UserTakesDamage and ItemDeteriorates set AllowMultipleSecondaryInstances (UserTakesDamage.cs:35,
 // ItemDeteriorates.cs:37), and the secondary picker leaves a taken setting out only without it
-// (DaggerfallItemMakerWindow.cs:849-855). The owner (2026-10-19): "One copy per setting" - a side effect's setting is
+// (DaggerfallItemMakerWindow.cs:849-855). The owner: "One copy per setting" - a side effect's setting is
 // picked once, two settings of one effect stay allowed; and an effect with no setting left is not listed (DFU lists it
 // and opens an empty chooser: :644/:689, HealthLeech.cs:37). A piece made before keeps its copies - the item law counts
 // by kind (itemLaw.js makerFindings, `many`), so no honest piece is judged forged (MAKER-KEPT's lesson).

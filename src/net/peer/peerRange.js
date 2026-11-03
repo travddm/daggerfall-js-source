@@ -1,6 +1,5 @@
 // @ts-check
-// PEER-RANGE (2026-10-10, the owner: "So for online performance, I believe the rendering of players far out is
-// contributing to poor performance"): THE OTHERS, DRAWN AS FAR AS THEY CAN BE SEEN. A world cell hands the screen every
+// PEER-RANGE: THE OTHERS, DRAWN AS FAR AS THEY CAN BE SEEN. A world cell hands the screen every
 // player within the relay's range - RANGE_PIXELS, three map pixels either way (net/wire.js inRange): 2.5 km pixel to
 // pixel, up to 3.3 km along an axis - and every one of them was drawn: the rider, the walker, the class sprite or the
 // doll stepped and submitted, a lantern hung and swung, an aura's cape posed, a cast's missile flown, a blow's spark

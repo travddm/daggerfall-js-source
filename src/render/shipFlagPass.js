@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-COLOURS (2026-10-17, the owner: "Finally, a fully customizable flag with the option to use your guild insignia";
-// bible/03-World/Naval-Refit.md SHIP-COLOURS) - A SHIP'S FLAG, FLOWN: cloth at her masthead, streaming downwind.
+// SHIP-COLOURS - A SHIP'S FLAG, FLOWN: cloth at her masthead, streaming downwind.
 //
 // The guild's banners (render/bannerPass.js) hang from a wall; a flag flies from a staff. Each is a sheet of
 // FLAG_COLS by FLAG_ROWS quads, its HOIST edge (u 0) nailed at the masthead (her FlagObject - Come Sail Away aims it down

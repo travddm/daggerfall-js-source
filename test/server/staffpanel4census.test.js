@@ -1,5 +1,4 @@
-// STAFF-PANEL4-CENSUS (2026-10-22, mob picked it, 04:13Z; design doc "DFO Staff Panel: design", "Item and gold census",
-// "Server load" and the weak spots "Copies found misses modded dupes..." and "Census rows ride every save...") - THE ITEM
+// STAFF-PANEL4-CENSUS - THE ITEM
 // AND GOLD CENSUS AND THE CONTESTED PIECES (server-account/src/staffCensus.js), driven through the real Worker on the
 // node:sqlite database every account pin stands on (test/accountDb.mjs): the tally a checkpoint takes - on the hour's row
 // and the character's latest, only when it changed, and never the checkpoint's undoing when it fails - a kind's count,
@@ -49,7 +48,7 @@ async function stand() {
   const clock = () => now;
   const mobKey = await extensionKey(clock);
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
   });
   const raw = s.env.DB._raw;
   const staff = async (path, body = {}, token = null) => {
@@ -501,7 +500,7 @@ function planned(db) {
   return { rec, plans };
 }
 
-test('STAFF-PANEL4-CENSUS: THE JUMPS, THE CONTESTED LIST AND HOME STAND ON INDEXES - the jumps on the hours\' index, never the whole of realm_wealth_hours; the list and Home on the listed rows\' own (0154), never a walk of item_dupes, whose drops are in none of them (mutants: the jumps grouped on the bare column; an index lost; the drops indexed)', async () => {
+test('STAFF-PANEL4-CENSUS: THE JUMPS, THE CONTESTED LIST AND HOME STAND ON INDEXES - the jumps on the hours\' index, never the whole of realm_wealth_hours; the list and Home on the listed rows\' own, never a walk of item_dupes, whose drops are in none of them (mutants: the jumps grouped on the bare column; an index lost; the drops indexed)', async () => {
   const db = d1();
   const { rec, plans } = planned(db);
   const nowS = 1_800_000_000;

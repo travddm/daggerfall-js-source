@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-D (2026-09-25): SWIMMING THE CARVED SEA. Iliac Puddle No More
+// DW-D: SWIMMING THE CARVED SEA. Iliac Puddle No More
 // 1.2.2's OutdoorSwimDriver and OutdoorSwimMovementController (jet082),
 // the decisions whole and the host's reads as arguments:
 //

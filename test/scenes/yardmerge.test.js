@@ -1,6 +1,5 @@
-// YARD-MERGE (2026-10-12, a capture standing in Daggerfall: 1,878 draw calls a frame, about 360 of them the yards'
-// pieces, and 185 of their flats): A YARD'S MODELS ARE ONE MESH, AND ITS FLATS OF ONE PICTURE ONE BATCH, ONCE IT
-// SETTLES (bible/07-Rendering/Performance-Priority.md YARD-MERGE).
+// YARD-MERGE: A YARD'S MODELS ARE ONE MESH, AND ITS FLATS OF ONE PICTURE ONE BATCH, ONCE IT
+// SETTLES (YARD-MERGE).
 //
 // ONE: the merge is the pieces' own triangles where each piece's own matrix stood them - PERF4's batch, relative to the
 // pool's origin and drawn back at it - grouped by each sub-mesh's own texture key, unresolved (the host's remap is the

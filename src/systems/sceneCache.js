@@ -132,7 +132,7 @@ const copySceneEntry = (d) => ({
   // writer's own frame), and `terrainScale` the ground an exterior height stood on - absent on an entry written
   // before either was carried, which the restoring host reads as the old raw frame on the prefab's 1.5.
   frame: d.frame ?? null, terrainScale: d.terrainScale ?? null,
-  // BAY-LEFT-GROUND (bible/03-World/Landforms.md, D5): the law of an exterior height's frame (terrainSampler.js
+  // BAY-LEFT-GROUND (, D5): the law of an exterior height's frame (terrainSampler.js
   // GROUND_FRAME_LAW) - absent on an entry written before it, which past the Bay stood the shaped ground
   groundFrame: d.groundFrame ?? null,
   // WD3: the layout of the town an interior was cached in (systems/layoutPins.js) - only where a layout mod changed the
@@ -259,7 +259,7 @@ export function clearSceneCache(cache, { start = true } = {}) {
   cache.scenes = kept;
 }
 
-/** PERMADEATH-HOUSES (bible/06-Systems/Legacy-Arc.md section 10c): A HOUSE'S SCENE HANDED ON - `sceneName`'s entry and
+/** PERMADEATH-HOUSES: A HOUSE'S SCENE HANDED ON - `sceneName`'s entry and
  *  its other layouts' visits (layoutSceneName), out of ANOTHER save's cache (snapshotSceneCache's shape - a dead
  *  member's), into `cache` as permanent scenes: the heir finds the house as its owner left it. Sans corpses, as the
  *  world's own move keeps a permanent scene. Answers how many entries came. */

@@ -1,14 +1,13 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue";
-// "Hurry up") - THE ROYAL TOURNEY, AS THE SERVICE KEEPS IT: who may enter
+// CROWN1 part two - THE ROYAL TOURNEY, AS THE SERVICE KEEPS IT: who may enter
 // (the pass, over the ring the contenders' games agree), the bouts the
 // winners' receipts bring (counted by the room's own ladder rule), the
 // ladder on the Seat tab, and the week's champion named at the Turning -
 // the prize the Edict escrowed paid to its account, the title kept for
 // good.
 //
-// bible/11-Multiplayer/Seats-Arc.md 7.6. The bouts are the relay's
+// 7.6. The bouts are the relay's
 // (net/siege/siegeRef.js royal*); a winner's `t1` receipt is its word that one
 // was won (net/siege/siegeReceipt.js). FACT, as for a siege: the relay has no
 // door to this service, so each receipt rides its winner's own client.

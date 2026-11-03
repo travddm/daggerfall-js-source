@@ -1,5 +1,5 @@
 // @ts-check
-// PROF9 (2026-10-02) - THE PAN, Cooking's act at the fire (bible/06-Systems/Professions-Arc.md 9.4: "The fire: take the pan
+// PROF9 - THE PAN, Cooking's act at the fire (9.4: "The fire: take the pan
 // off in its window (the Skillet's is wider)"). A dish is cooked in recipeLaw panCount pans in turn (three; a feast five),
 // each set on the fire cold: its heat climbs from 0 (raw) to 1 (burnt) in PAN_ACT.burnS x a pace the fire draws for that
 // pan, and the pan is DONE while its heat stands in the window (recipeLaw panWindow - the rank's, the band's, and C&C's

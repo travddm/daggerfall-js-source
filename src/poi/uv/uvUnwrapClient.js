@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT POI M13 (2026-10-15) - THE UNWRAP, OFF THE THREAD THAT DRAWS THE EDITOR.
+// AUDIT POI M13 - THE UNWRAP, OFF THE THREAD THAT DRAWS THE EDITOR.
 //
 // The UV editor's unwrap (poi/uv/uvMesh.js unwrapLscm) of an island at the mesh law's size is seconds of solve - 522,000
 // triangles (the law's 262,144 vertices) eight of them - and it ran on the page's own thread, which stood still: no

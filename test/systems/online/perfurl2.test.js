@@ -1,4 +1,4 @@
-// PERF-URL2 (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for online"):
+// PERF-URL2:
 // THE FORCED-PREF TABLE IS ASKED BEFORE THE PAGE. getPref asks systems/online/onlineLane.js onlineForcedPref on every read -
 // hundreds a frame - and it read `location.search` (a DOM getter, before PERF-URL's memo can answer) to learn whether
 // the page is online, then looked the key up in a table that forces a handful of keys (the mods' switches the features

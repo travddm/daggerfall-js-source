@@ -1,5 +1,5 @@
 // @ts-check
-// START2 (bible/06-Systems/Alternate-Starts-Arc.md section 8): THE STARTS' OWN ROWS OF Quests-Places - one a province's
+// START2: THE STARTS' OWN ROWS OF Quests-Places - one a province's
 // start, laid as a mod lays its own (quest/tables.js addIntoQuestTables, Roleplay & Realism's AddIntoTable; the
 // questlines' rows' shape, questlines/qlActions.js QL_PLACE_ROWS), keyed so each is laid once. A row's p1 is its start's
 // site id (starts.js startSiteId) - no MAPS.BSA place: quest/place.js asks the world for the dungeon it names

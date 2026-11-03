@@ -3,7 +3,7 @@
 //     node tools/meshUnwrap.mjs <in.json> <out.json> [--angle=66]
 //                               [--margin=4] [--size=512]
 //
-// FIELD-GUN-MW2 (2026-09-20). Mac asked for the Thunderlock to be
+// FIELD-GUN-MW2. Mac asked for the Thunderlock to be
 // textured, and the FBX carries a `LayerElementUV` named "UVMap", which
 // looks like an unwrap right up until it is measured:
 //

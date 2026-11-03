@@ -78,8 +78,7 @@ let deleting = null;   // AUDIT 39: DeleteButton's deleteSpellIndex - the row th
  * rest away, which is the same fault the chronicle's flattened date
  * was: the data was already there.
  *
- * SB-FX (2026-10-14, a player on Discord: "shows placeholder values
- * instead of what the spell actually does"): AND IT READ THEM WRONG.
+ * SB-FX: AND IT READ THEM WRONG.
  * It decided a component was there when its field was not zero, and
  * no producer writes a zero there: the Spell Maker inscribes a greyed
  * spinner at its floor of 1 (systems/spell/spellMaker.js blankEffectSettings,
@@ -293,8 +292,7 @@ function paint() {
     onExit();
   };
   acts.append(ready);
-  // HOTSLOT (2026-09-22, a player on Discord: "Cant change Hotslot
-  // spell"): the slot had ONE writer a player could reach - a 350 ms
+  // HOTSLOT: the slot had ONE writer a player could reach - a 350 ms
   // HOLD of the quick-spell key, said nowhere - so from the chair the
   // key was a toggle stuck on the book's first spell, and on a phone
   // the chip that takes the hold was hidden until the slot was filled.

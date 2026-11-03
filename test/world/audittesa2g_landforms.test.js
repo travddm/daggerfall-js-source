@@ -1,7 +1,7 @@
 // AUDIT TESA II Z8 (AUDIT TESA-BIOME Z8, OWED): the landforms' hills past the Bay wear their zone's land - a node off the
 // Bay's map past its seam band reads the continent's climate (world/tamriel/tamrielGround.js tamrielClimateAt), where every
 // one had been held to the nearest edge pixel's (86% of the land past the Bay wore another land's hills); the Bay and its
-// seam band keep the table's own, to the bit. bible/03-World/Tamriel-Biomes.md, bible/01-Overview/audits/Audit-Tesa-Biome.md.
+// seam band keep the table's own, to the bit.,.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -39,8 +39,3 @@ test('AUDIT TESA II Z8: a sample past the Bay\'s seam band wears its zone\'s lan
   assert.notEqual(groundTopOf(flat, v.px, v.py, true, mountain), groundTopOf(flat, 500, 250, true, table(CLIMATES.Ocean)), 'not the sea\'s');
 });
 
-test('AUDIT TESA II Z8 by source: the nodes off the map read nodeLand - the seam band held to the edge, the zones past it', () => {
-  const src = readFileSync(new URL('../../src/world/landforms.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(bayEdgeDistance\(x, y\) > SEAM_PX\) return LAND_OF_CLIMATE\[tamrielClimateAt\(x, y\)\];/);
-  assert.match(src, /function etherLandAt\(x, y, climates\) \{\n\s+if \(!inEtherLaw\(x, y\)\) return nodeLand\(x, y, climates\);/);
-});

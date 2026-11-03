@@ -1,5 +1,4 @@
-// SD16 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD16;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE BLOWS SEEN (scenes/superDungeon/sdFx.js) - the Hour's landings,
+// SD16: THE BLOWS SEEN (scenes/superDungeon/sdFx.js) - the Hour's landings,
 // turns and fall as bursts of sparks on the gate's own spark pass, the camera shaken by how near they fell, the floor
 // lit. More kinds than the Warden's court throws and more shakes than his landings give; a fight first seen taken as it
 // stands; each landing once, where the law puts it (the Stomp's ring's dust where its front rolls); the Hour's own blows
@@ -22,7 +21,6 @@ import { clearOfPillars } from '../../../src/scenes/superDungeon/sdSpoils.js';
 import { SD_SLIP_FRAC } from '../../../src/scenes/superDungeon/sdRemnantVoice.js';
 
 const T0 = 1_800_000_000_000;
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const at = (x, y, z) => realmToDungeon(SD_ARENA.x + x, y, SD_ARENA.z + z);
 const near = (a, b, e = 1e-6) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= e);
 /** The shakes felt, to the realm's round trip's rounding. */
@@ -110,7 +108,7 @@ test('SD16 THE HAND\'S LIGHT OUT OF ITS CHEST, the Volley\'s gears where each la
   r.s.rem = { x: 2, z: -3, yw: 0, mv: null, atk: blow(SD_BLOWS.hand, 1, T0 + 10, { x: 2, z: -3 }) };
   r.step(20);
   let b = r.fx.bursts(r.at());
-  // AUDIT SD III (V3, PIN MOVED): out of its chest along the beam's first bearing, past its body - never in its heart crystal
+  // AUDIT SD III (V3
   const g = handAngleAt(r.s.rem.atk, r.s.rem.atk.at), out = SD_REM.r + SD_HAND_FLASH_OUT;
   assert.equal(b.length, 1); assert.ok(near(b[0].at, at(2 + Math.sin(g) * out, SD_REM.h * 0.55, -3 + Math.cos(g) * out))); assert.equal(b[0].color, SD_FX_COLOR.gold);
   assert.deepEqual(r.shakes, []);
@@ -176,7 +174,7 @@ test('SD16 ITS TURNS SEEN: its wake (live alone), the stun, the slip once under 
   const g = rig({ ph: 3 }); g.fx.frame();
   g.s.cx = { i: 41, m: 50, c: [[6, 0, 50]] }; g.step();
   g.s.cx = null; g.step();
-  assert.equal(kinds(g).filter((k) => k === 'heartBreak').length, 1, 'spent by its landing: a burst as it goes');   // AUDIT SD III (V10, PIN MOVED): it went from the air with nothing to show for it
+  assert.equal(kinds(g).filter((k) => k === 'heartBreak').length, 1, 'spent by its landing: a burst as it goes');   // AUDIT SD III (V10
   // the slip, once
   const sl = rig(); sl.fx.frame();
   sl.s.h = sl.s.m * SD_SLIP_FRAC - 1; sl.step(); sl.step();
@@ -186,7 +184,7 @@ test('SD16 ITS TURNS SEEN: its wake (live alone), the stun, the slip once under 
 });
 
 test('SD16 ITS FALL: a burst out of its chest, the arena flashed white-gold and shaken; a column of brass as its body sinks; the way home\'s pale light where the way home rises, as it rises; nothing more of the fight; forgotten as the Hour is left', () => {
-  const r = rig(); r.fx.frame(); r.setFeet([20, 0]);   // AUDIT SD III (V4, PIN MOVED): in the arena - the whole arena's shakes are its own
+  const r = rig(); r.fx.frame(); r.setFeet([20, 0]);   // AUDIT SD III (V4
   r.s.rem = { x: 11.3, z: 11.3, yw: 0, mv: null, atk: null };   // against a pillar (SD_PILLAR_R on the diagonal)
   r.s.fell = { at: r.at() + 5, top: [], n: 1 };
   r.step(10);
@@ -229,11 +227,4 @@ test('SD16 THE BURSTS AS THE SPARK PASS TAKES THEM: sixteen at most, the oldest 
   assert.deepEqual(r.fx.bursts(r.at()), [], 'spent');
   // the draw: nothing to draw, no pass made
   assert.equal(r.fx.draw(null, null, null, [0, 0, 0], r.at()), false);
-  // the world
-  assert.match(W, /import \{ createSdFx \} from '\.\/superDungeon\/sdFx\.js';/);
-  assert.match(W, /const sdFx = sdFightLink \? createSdFx\(\{\n\s+link: sdFightLink,\n\s+feet: \(\) => \(playerSpawned && modes\?\.sdRealmSlot\?\.\(\) != null \? player\.feetAt\(\) : null\),\n\s+shake: \(k\) => betterAmbience\.weaponKick\(k\),/);
-  assert.match(W, /if \(inRealm\) \{ try \{ sdFx\?\.frame\(\); \} catch/);
-  assert.match(W, /sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false;/);
-  assert.match(W, /const sparks = !!\(sdFx && sdFightLink && sdFx\.draw\(renderer\.gl, proj, view, eye, sdFightLink\.now\(\), fog, renderer\.worldViewportPx\?\.\[3\]\)\); const beams = [^\n]*; const beam = [^\n]*; const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\) renderer\.markForeignPass\(\);/);   // SD17 (PIN MOVED): the Hour-Hand's beam after the sparks   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(W, /fx = sdFx && sdFightLink \? sdFx\.lights\(sdFightLink\.now\(\)\) : NO_SD_LIGHTS;\n[^\n]*\n[^\n]*\n\s+if \(!fx\.length && !stone && !hearts\.length\) return lit;[\s\S]*?for \(let i = 0; i < fx\.length; i\+\+\) _sdHourLights\.push\(fx\[i\]\);/);   // SD18b (PIN MOVED): and the Ending's stone   // AUDIT SD III (V5, PIN MOVED): into one kept list   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
 });

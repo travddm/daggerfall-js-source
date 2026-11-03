@@ -1,5 +1,4 @@
 // TP1 - THE FAST-TRAVEL GUILD DISCOUNT + RAISESKILLS ON ARRIVAL
-// (2026-08-29).
 //
 // travelPopUp.js flagged four things as "idling loudly". Two of them
 // were not idling on anything any more:

@@ -86,7 +86,7 @@ export const BORDER_REGIONS = Object.freeze([
 ]);
 export const BORDERS_PER_REGION = 11;
 
-/** PROVINCE-COURTS (bible/03-World/World-Wide.md): THE BORDERS PAST THE BAY - DFU's table is the Bay's 62 rows, and a
+/** PROVINCE-COURTS: THE BORDERS PAST THE BAY - DFU's table is the Bay's 62 rows, and a
  *  province's region (62..70, WW-R) is no row of it. These are the pairs whose land meets on the politic map past the Bay
  *  (WW-R's groundPoliticIndex, measured on the freeware: every two regions whose pixels touch), each pair both ways:
  *  the provinces with each other (Sumurset Isle meets none), and each across the Bay's edge with the Bay regions it

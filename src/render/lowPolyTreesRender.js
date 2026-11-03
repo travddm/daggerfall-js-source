@@ -1,5 +1,5 @@
 // @ts-check
-// LPT1 (bible/07-Rendering/Low-Poly-Trees.md): THE LOW-POLY TREES' BUFFERS - every mesh of the mod in one vertex buffer
+// LPT1: THE LOW-POLY TREES' BUFFERS - every mesh of the mod in one vertex buffer
 // and one index buffer (uploaded once, ~2 MB), and the frame's instances in a third. The billboard program draws them in
 // its mesh mode (render/renderer.js BB_VS, `_drawLowPolyTrees`), so this module owns buffers and a vertex array, never
 // a program: a tree is lit, fogged and shadowed by the very shader that lights the flats, under either lane.

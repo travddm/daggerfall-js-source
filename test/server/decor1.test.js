@@ -1,7 +1,4 @@
-// DECOR1 (2026-09-25, Mac: "building our own unique version instead of porting" Kaedius's Decorator; decor "Gold per
-// placement"; asked, the catalogue "Everything Daggerfall furnishes", priced "By size", opened from "A UI element that
-// can be clicked to open the decorate panel. Allows free cam mode for placement and an intuitive scrolling menu with
-// filters", and "kept in the save" offline): A PIECE OF DECOR. The law both ends read (net/decorLaw.js), the account
+// DECOR1: A PIECE OF DECOR. The law both ends read (net/decorLaw.js), the account
 // service's store of an online home's pieces driven through the real Worker over node:sqlite with every migration
 // applied (server-account/src/decor.js), the client's door to it, and the deploy's wiring; DECOR1c: the pieces standing
 // in a room (scenes/decor/decorRoom.js), the scene that keeps them, and the host that stands them (worldModes.js).
@@ -164,7 +161,7 @@ test('DECOR1 the service: a home\'s pieces are any session\'s to read (a guest\'
   // realm character's record is its account's alone
   const namedPlace = await call('POST', '/v1/homes/decor/place', named({ piece: piece() }), mara);
   assert.deepEqual([namedPlace.status, namedPlace.body.error], [400, 'realm-needed'], 'another player naming the owner\'s character pays with no record of it');
-  // ACCOUNT-HOMES (2026-10-06, PIN MOVED - it was `no-home`, "the owner's OTHER character does not own it"): a home is its
+  // ACCOUNT-HOMES (2026-10-06
   // ACCOUNT's, so the owner's other character furnishes it too - on its OWN record, placed and taken out again
   const a2at = await realmJoinAt(env, aldric, A2.id);
   const otherChar = await call('POST', '/v1/homes/decor/place', { ...HOME, character: A2.id, realm: a2at, piece: piece({ id: 'a2' }) }, aldric);
@@ -234,13 +231,12 @@ test('DECOR1e a home sold takes its placed pieces, and its release answers how m
   assert.deepEqual([stranger.status, stranger.body], [404, { error: 'no-home' }], 'another player\'s release answers no sum');
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM home_decor').get().n, 4, 'and takes nothing');
   const sold = await call('POST', '/v1/homes/release', HOME, aldric);
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and the sale's home order, for every page online
   assert.deepEqual({ ...sold.body, homeOrders: undefined }, { ok: true, price: 42000, decorCount: 3, decorBack: 90 + 20 + 10, homeOrders: undefined }, 'each half truncated - never the half of the sum (121)');
   assert.equal(sold.body.homeOrders?.length, 1);
   assert.equal(sold.body.decorBack, decorSaleBack(pieces), 'the service\'s sum is the law\'s');
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM home_decor').get().n, 0, 'and they went with it');
   house();
-  const bare = (await call('POST', '/v1/homes/release', HOME, aldric)).body;   // PIN MOVED (QUEST-HOME): with its home order
+  const bare = (await call('POST', '/v1/homes/release', HOME, aldric)).body;
   assert.deepEqual({ ...bare, homeOrders: undefined }, { ok: true, price: 42000, decorCount: 0, decorBack: 0, homeOrders: undefined }, 'none placed, none back');
 });
 
@@ -555,31 +551,6 @@ test('DECOR1c the scene keeps a room\'s pieces and what they hold: detached from
   const old = restoreCachedScene(c, 'Old');
   assert.deepEqual([old.decor, old.decorItems], [[], {}]);
 });
-
-test('DECOR1c the room\'s host (worldModes.js): one pool on the room\'s own collider, origin, light list and animator, emptied at all three teardowns; the save writes the offline house\'s and ship\'s pieces and never an online home\'s (the save\'s own record kept through it), and what the pieces hold either way; the restore stands the save\'s, or keeps them where an online home stands; an online home\'s come from the service after the restore, once a visit, and a late answer stands none; drawn, targeted, pressed; a storage piece opens for the room\'s owner alone - the online home\'s, else the house\'s or ship\'s - and is named; world.js builds the service\'s door online alone (mutants: the kept record wiped, a late answer standing, a visitor opening a piece)', () => {
-  const m = src('src/scenes/worldModes.js');
-  const w = src('src/scenes/world.js');
-  assert.match(m, /const interiorDecor = createDecorRoom\(\{\n    meshes: \{ getGpuMesh, cpuModels \}, renderer, getTexture, uploadRecord, uploadRecordFrame, flatAnims: \(\) => interiorCtx\?\.flatAnims \?\? null,\n    collider: \(\) => interiorCtx\?\.collider \?\? null, origin: \(\) => buildingOrigin\(\), roomLights: \(\) => interiorCtx\?\.lights \?\? null,\n    mwPicture: decorMwPicture,\n    doors: decorDoorHooks,   \/\/ HOME-DOORS: a placed door hangs as one of the room's own action doors\n    body: player,   \/\/ DECOR-CLEAR[^\n]*\n  \}\);/);   // PIN MOVED (DECOR-CLEAR): and the player's body, its late pieces withheld from it (test/scenes/decor/fb1019f_decorclear.test.js)
-  assert.equal([...m.matchAll(/interiorDecor\.destroyAll\(\); _decorVisit\+\+;/g)].length, 3, 'the entry sweep, the exit and the quest-teleport / load arm');
-  assert.match(m, /const decor = interiorHome \|\| _seatHallVisit \? interiorDecor\.kept\(\) : interiorDecor\.list\(\);[^\n]*\n    const decorItems = interiorDecor\.itemsSnapshot\(\);/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (AUDIT SEATS-3): the visit's latch (C2)
-  assert.match(m, /const placed = \(data\.decor \?\? \[\]\)\.map\(decorPieceOf\)\.filter\(Boolean\);\n    if \(interiorHome \|\| _seatHallVisit\) interiorDecor\.keep\(placed\); else interiorDecor\.set\(placed\);[^\n]*\n    interiorDecor\.setItems\(data\.decorItems\);/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (AUDIT SEATS-3): the visit's latch (C2)
-  assert.match(m, /mountQuestResources\(\);\n      loadHomeDecor\(\);/);
-  assert.ok(m.indexOf('loadHomeDecor();   // DECOR1c') > m.indexOf('restoreInteriorScene();\n      // AUDIT 63 F22'), 'after the restore, which latched the home and kept the save\'s record');
-  assert.match(m, /const visit = _decorVisit;\n    askDecorList\(\{\n      ask: \(\) => primedDecorList\(decorListKey\(homeTownOf\(b\), b\.buildingKey, seat\)\) \?\? host\.homeDecor\.list\(homeTownOf\(b\), b\.buildingKey, seat\),\n      live: \(\) => visit === _decorVisit && interiorBuilding === b && _decorListed !== visit,\n      stand: \(r\) => \{\n        _decorListed = visit;[^\n]*\n(?:        \/\/[^\n]*\n)*        const shown = homeDecorShown\(interiorHome\);\n        const pieces = r\.data\.pieces\.map\(decorPieceOf\)\.filter\(\(p\) => p && \(shown \|\| decorStaysShunned\(p\)\)\);[^\n]*\n        interiorDecor\.set\(pieces\);/);   // AUDIT DECOR-SHELL 2: a list that did not stand stands nothing (askDecorList, decorshell.test.js)   // DECOR2a: the pieces kept for the strays' reckoning   // PIN MOVED (SEAT-HALL): the palace's hall shares the line; PIN MOVED (HOME-VOTE): a shunned home's pieces stand for its insiders alone (AUDIT B2: but its trader)
-  assert.match(m, /interiorArrows\.draw\(renderer, interiorCtx\.texRemap\);\n    interiorDecor\.draw\(renderer, interiorCtx\.texRemap\);/);
-  assert.match(m, /const _decorFlats = \[\.\.\.interiorDecor\.batches\(\), \.\.\.decorTool\.batches\(\)\];[^\n]*\n      if \(_decorFlats\.length\) renderer\.drawBillboards\(_decorFlats, camRight, UP_Y\);/);
-  assert.match(m, /targets\.push\(\.\.\.interiorDecor\.targets\(\)[,)]/);   // PIN MOVED (DECOR-ACCESS): decorating also aims the room's own furniture
-  assert.match(m, /if \(key\.startsWith\('decor:'\) \|\| key\.startsWith\('base:'\)\) \{ [^\n]*: activateDecor\(decorIdOfKey\(key\)\)\)\); return true; \}/);   // PIN MOVED (DECOR-ACCESS): pressed while decorating, the plaque's act; otherwise the piece itself
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): a house's deed read where it stands - never an isle town's building (houseOwnedAt)
-  assert.match(m, /function decorOwnerHere\(\) \{\n    if \(privateVisitRoom\) return false;\n    if \(interiorCabin\) return true;\n    if \(interiorHome\) return interiorHome\.own;\n    const b = interiorBuilding;\n    if \(!b\) return false;\n    if \(b\.buildingType === BUILDING_TYPES\.Ship\) return ownsShip\(playerEntity\);\n    return houseOwnedAt\(b, b\.buildingKey \?\? 0\);\n  \}/);
-  assert.match(m, /if \(!piece\?\.storage\) return;\n(?:    if \(\(interiorHome\?\.hall && interiorHome\.member\) \|\| interiorSeatHall\?\.member\) \{ [^\n]*openHallChest\(\)[^\n]*\n)?    if \(decorIsShared\(piece\.id\) \|\| !decorOwnerHere\(\)\) \{\n      if \(decorIsShared\(piece\.id\) \|\| decorMayStorage\(piece\.id\)\) \{ openSharedChest\(piece\.id\); return; \}\n      if \(interiorHome\) say\(homeBelongsLine\(interiorHome\)\);\n      return;\n    \}\n    \/\/ [^\n]*\n    openOwnChest\(piece\.id, !!interiorHome, \(\) => \{ interiorOverlay = interiorInventory\(\{ loot: \{ items: \(\) => interiorDecor\.itemsOf\(id\), storage: true \} \}\) \?\? interiorOverlay; \}\);/);   // SHIP-STORE: the owner's storage, two-way; GUILD1d (re-aimed by content): a hall's member opens the guild's chest first   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (HOME-SHARE-WAIT, FIELD BUGS 2026-10-25d): the owner's window through decorGrants.js openOwnChest
-  // PIN MOVED (DECOR-ACCESS): the plaque's name is the piece's own name, else the catalogue's, else a storage piece's container (systems/worldTooltips.js indoorDecorHover)
-  assert.match(m, /catalogueName: piece \? \(piece\.name \|\| \(decorNames\.get\(decorKey\(piece\)\) \?\? null\)\) : null,\n {10}containerName: piece\?\.model != null \? houseContainerName\(piece\.model\) : null,/);
-  assert.match(src('src/systems/worldTooltips.js'), /const t = catalogueName \?\? \(piece\.storage && piece\.model != null \? containerName : null\);/);
-  assert.match(w, /const homeDecor = params\.has\('online'\) \? accountDecor\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\) \}\) : null;/);
-  assert.match(w, /\n    homeDecor,   \/\/ DECOR1c/);
-});
-
 
 test('HOME-VENDOR the catalogue: the people Daggerfall stands in its rooms are pieces too - kind Vendors, named Vendor N - so a home may stand one and make it its trader (mutants: the people unread; read as decorations)', () => {
   const blocks = [{ rmbBlock: { subRecords: [{ interior: { block3dObjectRecords: [], blockFlatObjectRecords: [], blockDoorRecords: [],

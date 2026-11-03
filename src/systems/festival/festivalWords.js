@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S WORDS, in the player's language -
+// WITCH1: THE WITCHES' FESTIVAL'S WORDS, in the player's language -
 // every line the festival says, through the text core (`t`, Port_Strings), each read when it is shown (never at module
 // load). The law (net/festivalLaw.js) is both ends' and shows no word. Kept short: what a player needs, nothing more.
 //

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// VOYAGER2 (2026-10-26, KPbICA's spec forwarded by the owner: "Add slight curvatures for intersections and turns of the
-// roads to make them more natural"; bible/03-World/Roads.md VOYAGER2) - THE ROADS PAST THE BAY ARE DRAWN AS CURVES.
+// VOYAGER2 - THE ROADS PAST THE BAY ARE DRAWN AS CURVES.
 //
 // A road's or a track's way through a map pixel is its compass byte (ROADS 1's layout, world/road/roadNetwork.js DIR):
 // the edges or corners it leaves by. Basic Roads draws each bit as a straight band from the pixel's centre out to its

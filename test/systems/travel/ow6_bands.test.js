@@ -1,5 +1,4 @@
-// OW6 - THE BANDS VARY AND ROAM MORE, THE SAME FOR EVERY PLAYER (2026-09-29, the player: "Enemies should spawn in varying
-// numbers and roam more often"; "Everything needs that persistence between players in the overworld"). The law
+// OW6 - THE BANDS VARY AND ROAM MORE, THE SAME FOR EVERY PLAYER. The law
 // (systems/travel/travelBands.js: a band's own number and level, the chance and pace), the themed group taking a caller's size
 // (systems/campEncounters.js rollGroupComposition: a band of one may be a solitary kind), and the host's make lifted out
 // of scenes/world.js and RUN: online every player reads one band, whatever their own level.
@@ -16,7 +15,6 @@ import { CLIMATES } from '../../../src/formats/mapsFile.js';
 import { enemyDisplayName } from '../../../src/characters/enemy/enemyBasics.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 import { NATIVE_PER_M } from '../../../src/systems/travel/travelDungeons.js';
-import { WILD_PACK_MULT } from '../../../src/scenes/exteriorFoes.js';
 
 const land = () => true;
 /** Every band a strip of cells holds over `lives` lives - a population to measure. */
@@ -107,12 +105,11 @@ const liftMake = () => {
   const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
   const m = /\n {2}function bandMake\(b\) \{\n[\s\S]*?\n {2}\}\n/.exec(w);
   assert.ok(m, 'bandMake lifted');
-  return (scope) => new Function('s', `const { _bandMake, maps, rollGroupComposition, seededRng, bandMakeSeed, bandLevelOf, bandSizeOf, playerEntity, online, enemyDisplayName, wildBornHere, WILD_PACK_MULT } = s;${m[0]} return bandMake;`)(scope);
+  return (scope) => new Function('s', `const { _bandMake, maps, rollGroupComposition, seededRng, bandMakeSeed, bandLevelOf, bandSizeOf, playerEntity, online, enemyDisplayName } = s;${m[0]} return bandMake;`)(scope);
 };
 const makeScope = (level, online) => ({
   _bandMake: new Map(), maps: { getClimateIndex: () => CLIMATES.Mountain }, rollGroupComposition, seededRng, bandMakeSeed, bandLevelOf, bandSizeOf,
   playerEntity: { level }, online, enemyDisplayName,
-  wildBornHere: () => false, WILD_PACK_MULT,   // PVPDUNGEONS: no band here is born in the open zone (its pack x WILD_PACK_MULT)
 });
 
 test('OW6 host run: ONLINE, ONE BAND FOR EVERY PLAYER - a level-1 and a level-18 player read the same kind and the same number over it (it was each viewer\'s own level); offline the player\'s own, as Daggerfall reads it; its number is its own (mutants: the viewer\'s level online, the size dropped)', () => {

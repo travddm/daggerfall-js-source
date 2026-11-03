@@ -1,11 +1,11 @@
-// PROF8 (2026-09-30, Mac: "Continue the arc"; "XP follows your rank") - FISHING'S LAW: a haul's key in its one spelling;
+// PROF8 - FISHING'S LAW: a haul's key in its one spelling;
 // its fish in PROF0 6's order (the roll, a full net's x1.5, a march, a school's fish - a Netter's two - and a
 // Slaughterfish's weight); its finds (the sea's Pearl and Slaughterfish only at sea on confirmed ground, each spec's
 // multiplier; a trophy anywhere); the rank's own tier for its XP; the act's numbers (Appendix B); the day's two schools;
-// the Pearl a Stores material. bible/06-Systems/Professions-Arc.md 5.2, 6, 30.
+// the Pearl a Stores material. 5.2, 6, 30.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { d1 } from '../accountDb.mjs';
 
 import { haulKey, parseNodeKey, haulYield, haulFinds, haulAtSea, SEA_REGION, schoolSpots, SCHOOL_SPOTS, SCHOOLS_PER_PIXEL, SCHOOL_R, material, MARCH_MULT } from '../../src/net/nodeLaw.js';
 import {
@@ -15,7 +15,6 @@ import {
 import { SEA_REGION as FORAGING_SEA_REGION, FT } from '../../src/systems/foraging/foragingLaw.js';
 import { CLIMATES } from '../../src/formats/mapsTables.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 /** Dice that answer `values` in turn. */
 const seq = (...values) => { let i = 0; return () => values[i++ % values.length]; };
 
@@ -24,7 +23,7 @@ test('PROF8 law: a haul\'s key - `haul:<x>:<y>:<day>:<id>`, twelve hex digits; r
   assert.equal(k, 'haul:412:188:20724:0123456789ab');
   assert.deepEqual(parseNodeKey(k), { kind: 'haul', x: 412, y: 188, day: 20724, id: '0123456789ab' });
   for (const bad of ['haul:0412:188:20724:0123456789ab', 'haul:412:188:020724:0123456789ab', 'haul:412:188:20724:0123456789AB', 'haul:412:188:20724:0123456789a',
-    'haul:8192:188:20724:0123456789ab', 'haul:412:8192:20724:0123456789ab', 'haul:412:188:20724', 'haul:-8192:188:20724:0123456789ab']) {   // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): on the world's grid - a province's sea past the Bay's map is ground
+    'haul:8192:188:20724:0123456789ab', 'haul:412:8192:20724:0123456789ab', 'haul:412:188:20724', 'haul:-8192:188:20724:0123456789ab']) {
     assert.equal(parseNodeKey(bad), null, bad);
   }
 });
@@ -116,9 +115,10 @@ test('PROF8 law: the catch is Raw Fish (tier 1, a Mark); the Pearl is a Stores m
   assert.deepEqual(material(PEARL.key), { key: 'gem:pearl', family: 'gems', tier: 5, value: TIER_VALUES[4], group: 'MiscellaneousIngredients2', templateIndex: 77 });
   assert.ok(MINED_KEYS.includes(PEARL.key));
   assert.equal(FT.FishingNet, 1603);
-  const sql = src('server-account/migrations/0042_fishing.sql');
+  const raw = d1()._raw;
+  const sql = raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('node_harvests').sql;
   assert.match(sql, /kind\s+TEXT NOT NULL CHECK \(kind IN \('herbs', 'food', 'ore', 'stone', 'logs', 'hide', 'fish'\)\)/);
   assert.match(sql, /trophy\s+INTEGER NOT NULL DEFAULT 0 CHECK \(trophy IN \(0, 1\)\)/);
-  assert.match(sql, /CREATE INDEX IF NOT EXISTS idx_node_harvests_today/);
-  assert.match(sql, /CREATE INDEX IF NOT EXISTS idx_node_harvests_account/);
+  const indexes = raw.prepare('PRAGMA index_list(node_harvests)').all().map((i) => i.name);
+  assert.ok(indexes.includes('idx_node_harvests_today') && indexes.includes('idx_node_harvests_account'), indexes.join());
 });

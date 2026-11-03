@@ -1,4 +1,4 @@
-// SKY-ARC (2026-10-19, a player's screenshot, Discord "BY THE RING"; bible/07-Rendering/Volumetric-Clouds-Arc.md SKY-ARC): ONE HARD, SMOOTH ARC ACROSS A DUSK SKY - the
+// SKY-ARC: ONE HARD, SMOOTH ARC ACROSS A DUSK SKY - the
 // player's own deck warm on one side of it and blue-grey on the other, sweeping from high overhead down to the horizon.
 //
 // Reproduced in the game (5 Morning Star 3E405 17:20 at Daggerfall, the map's word cloudy, facing north) and in the sky

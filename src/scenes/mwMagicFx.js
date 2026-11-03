@@ -1,4 +1,4 @@
-// MW-SPELLFX1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): MORROWIND'S
+// MW-SPELLFX1: MORROWIND'S
 // SPELL EFFECTS IN THE WORLD.
 //
 // With Morrowind data attached, a spell is drawn as Morrowind draws it: its casting effects about the caster as the
@@ -145,7 +145,7 @@ export function createMwMagicFx({
       for (const v of [...plan.cast, plan.bolt, ...plan.hit, ...plan.area]) if (v) load(cat, v);
     },
     /** The cast's start: its casting visuals at the caster's feet, one per model; the player's hands glow too. EG-ZG:
-     *  `alpha` its share of itself (another player's during a Spire trial - THE QUIET COMPANY, ui/eliteGates/egAccess.js egAllyLook). */
+     *  `alpha` its share of itself. */
     cast(sp, feet, { player = false, body = null, alpha = 1 } = {}) {
       const cat = catalogNow();
       const plan = cat ? planOf(cat, sp) : null;

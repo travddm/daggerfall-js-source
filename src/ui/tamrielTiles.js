@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA15 (2026-10-24, bible/03-World/Arena-Provinces.md TESA15) - THE LAND PAST THE BAY'S PAINT, KEPT A TILE AT A TIME.
+// TESA15 - THE LAND PAST THE BAY'S PAINT, KEPT A TILE AT A TIME.
 //
 // The held map paints its static ink again on every frame its view moves (heldMap.js: the kept layer's key is the view).
 // Past the Bay that ink is the whole network TESA14 lays - 37,000 road chains and 115,000 track chains on the freeware's
@@ -11,8 +11,7 @@
 // paint's own key (the band, the filters, the hues) - and TILES_KEPT are kept, the one drawn longest ago let go first.
 // A frame paints the tiles nearest the view's middle first until TILE_BUDGET_MS is spent (one at the least); a tile still
 // owed meanwhile shows what is kept of it - its last paint, else the nearest level's within STAND_IN - and the window paints
-// again next frame (takePending). ZOOM-FAST (2026-10-24, the owner: "The map also is slow to load when zooming in and
-// out"): a draw told not to `force` paints none while the view still moves (the window's zoom settling), and a stand-in is
+// again next frame (takePending). ZOOM-FAST: a draw told not to `force` paints none while the view still moves (the window's zoom settling), and a stand-in is
 // sought under the last key too, so crossing a band or the continent's line keeps the roads up while they are painted
 // again. Where a canvas gives no 2D context the view is painted straight onto the sheet, as the
 // window's own kept layer is (heldMap.js: `layer.getContext?.('2d')`).

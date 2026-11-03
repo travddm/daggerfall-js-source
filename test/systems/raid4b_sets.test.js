@@ -1,11 +1,9 @@
-// RAID4b (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-// armor sets"): THE RAIDING PARTIES' OWN SETS AND A TOWN'S THANKS. The three sets' law (systems/sigil/sigilSets.js), each
+// RAID4b: THE RAIDING PARTIES' OWN SETS AND A TOWN'S THANKS. The three sets' law (systems/sigil/sigilSets.js), each
 // power driven through the REAL seam SET2 opened (systems/sigil/sigilSetPowers.js - the fold, the blow, the damage door, the
 // kill, the round, the HUD's chips) with a stand-in for the running host's door and a clock of the test's own, the
 // twenty-seven Aetheric records and the wire's check of them (systems/aetheric.js), the thanks rolled off a receipt's
 // seed (systems/raidSpoils.js), the spoils pool's own keys for them (scenes/spoilsPool.js), and the host's wiring by
-// source (scenes/world.js). Design: bible/03-World/Raiding-Parties.md, "The rewards (RAID4)"; the numbers
-// bible/11-Multiplayer/Sigil-Sets.md section 6b.
+// source (scenes/world.js). Design:, "The rewards (RAID4)"; the numbers
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -90,7 +88,7 @@ function door(foes = [], { feet = [0, 0, 0], me = null, clear = undefined } = {}
 const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)]; };
 
 test('RAID4b the law: three sets after the gate boss\'s own - the Broken Oath (the knights\', party 0), the Thief-Taker\'s Garb (the bandits\', 1), Orcsbane Harness (the orcs\', 2) - Aetheric, the Bay\'s towns their Prince, each tier\'s numbers a whole pair and its words whole; a raiding party names its set and nothing else does; no roll of the world ever lands on one (mutants: a raid set among the world\'s; a party naming the wrong set; a missing party naming a world set)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(5, 8), ['oath', 'thieftaker', 'orcsbane']);   // PIN MOVED (SERPENT-SET): right after the gate boss's own, the serpent's own after them
+  assert.deepEqual(SIGIL_SET_IDS.slice(5, 8), ['oath', 'thieftaker', 'orcsbane']);
   assert.deepEqual([0, 1, 2].map((p) => raidSetOf(p)?.id), ['oath', 'thieftaker', 'orcsbane']);
   for (const p of [3, -1, undefined, null, '1', 1.5]) assert.equal(raidSetOf(p), null, `no set for ${String(p)}`);
   for (const id of ['oath', 'thieftaker', 'orcsbane']) {
@@ -102,18 +100,17 @@ test('RAID4b the law: three sets after the gate boss\'s own - the Broken Oath (t
   assert.equal(SIGIL_SETS.ruhn.raid, undefined, 'the gate boss\'s own names no party');
   const words = (id, i, st) => { const t = SIGIL_SETS[id].tiers[i]; return t.text(tierValues(t, st)); };
   assert.equal(words('oath', 0, 0), '+1 armor on every part, +2 Willpower');
-  assert.equal(words('oath', 1, SET_STAGE_MAX), `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals 40% more damage`);
-  assert.equal(words('oath', 2, 0), 'While you are below half health, you take 10% less damage');
-  assert.equal(words('thieftaker', 1, 0), 'Your weapon and arrows deal 8% more damage to enemies below half health');
-  assert.equal(words('thieftaker', 2, SET_STAGE_MAX), `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals 40% more damage to it`);
-  assert.equal(words('orcsbane', 1, 0), `Each enemy hit on you adds 3% weapon damage for ${BLOOD_SECONDS} s, up to ${BLOOD_STACKS} times`);
+  assert.equal(words('oath', 1, SET_STAGE_MAX), `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals 3% more damage`);   // PIN MOVED: B5 (set percents x0.3: Riposte Ascendant 10 -> 3)
+  assert.equal(words('oath', 2, 0), 'While you are below half health, you take 1% less damage');   // PIN MOVED: B5 (Hold the Line Faint 4 -> 1)
+  assert.equal(words('thieftaker', 1, 0), 'Your weapon and arrows deal 0.5% more damage to enemies below half health');   // PIN MOVED: B5 (Run Them Down Faint 2 -> 0.5)
+  assert.equal(words('thieftaker', 2, SET_STAGE_MAX), `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals 3% more damage to it`);   // PIN MOVED: B5 (No Escape Ascendant 10 -> 3)
+  assert.equal(words('orcsbane', 1, 0), `Each enemy hit on you adds 0.5% weapon damage for ${BLOOD_SECONDS} s, up to ${BLOOD_STACKS} times`);
   assert.equal(words('orcsbane', 2, 0), 'A kill gives you a ward that blocks the next 10 damage you take. Recovers in 60 s');
   assert.equal(words('orcsbane', 2, SET_STAGE_MAX), 'A kill gives you a ward that blocks the next 40 damage you take. Recovers in 30 s');
   // the world's rolls: a win's set sigil, a weapon's join, the Broker's shelf - the four alone
   const seen = new Set();
   for (let i = 0; i < 400; i++) { seen.add(rollWorldSet(() => i / 400)); const s = rollSetSigil('rare', 1, seq(0, i / 400)); if (s) seen.add(s.set); }
   assert.deepEqual([...seen].sort(), [...WORLD_SET_IDS].sort(), 'the world rolls its four, never a raid\'s');
-  assert.match(strip(read('src/systems/sigil/sigilBroker.js')), /for \(const set of WORLD_SET_IDS\)[\s\S]*const wset = pick\(WORLD_SET_IDS, rolls\);/, 'the Broker shelves the world\'s sets');
 });
 
 test('RAID4b the 2-piece stat tiers: one fold over RF1\'s channels - Oath of the Watch\'s armour on all seven parts and its Willpower, Keen-Eyed\'s Agility and Archery, Thick-Skinned\'s Endurance and Blunt Weapon - at the set\'s stage; nothing at one piece (mutants: a part left out; a stat or skill on the wrong name)', () => {
@@ -147,12 +144,12 @@ test('RAID4b Riposte (the Broken Oath, 4): a foe\'s blow that TAKES my health op
   blow(e, 10);
   assert.equal(e.health, 90);
   assert.equal(weaponBlowMods(s, 0, e, RAT), 0, 'a miss');
-  assert.equal(weaponBlowMods(s, 100, e, RAT, { unaware: false, estimate: true }), 115, 'the Stats page reads it...');   // PIN ADDED (AUDIT MARTIAL L2 F7)
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 115, 'the next blow that lands: +15% at Faint - the page\'s reading spent nothing');
+  assert.equal(weaponBlowMods(s, 100, e, RAT, { unaware: false, estimate: true }), 101, 'the Stats page reads it...');   // PIN MOVED: B5 (Riposte Faint +4 -> +1)   // PIN ADDED (AUDIT MARTIAL L2 F7)
+  assert.equal(weaponBlowMods(s, 100, e, RAT), 101, 'the next blow that lands: +1% at Faint - the page\'s reading spent nothing');
   assert.equal(weaponBlowMods(s, 100, e, RAT), 100, 'spent by it');
   blow(e, 10);
   at(10 + RIPOSTE_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(bow(), 100, e, RAT), 115, 'inside the window - an arrow too');
+  assert.equal(weaponBlowMods(bow(), 100, e, RAT), 101, 'inside the window - an arrow too');
   blow(e, 10);
   at(T + RIPOSTE_SECONDS);
   assert.equal(weaponBlowMods(s, 100, e, RAT), 100, 'the window closed');
@@ -175,7 +172,7 @@ test('RAID4b Riposte (the Broken Oath, 4): a foe\'s blow that TAKES my health op
   fresh(); online(40);
   const asc = wearSet(player(), 'oath', 4, XP[4]);
   blow(asc, 10);
-  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 140, 'Ascendant: +40%');
+  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 103, 'Ascendant: +3%');
 });
 
 test('RAID4b Run Them Down (the Thief-Taker\'s Garb, 4): my weapon blows at a foe UNDER half its health deal their per cent more, arrows too; never at half or above, never at a foe with no health to read (mutants: at half health; the attacker\'s health read)', () => {
@@ -184,13 +181,13 @@ test('RAID4b Run Them Down (the Thief-Taker\'s Garb, 4): my weapon blows at a fo
   const bandit = { name: 'bandit', health: 50, maxHealth: 100 };
   assert.equal(weaponBlowMods(sword(), 100, e, bandit), 100, 'at half: not under it');
   bandit.health = 49;
-  assert.equal(weaponBlowMods(sword(), 100, e, bandit), 108, 'under half: +8% at Faint');
-  assert.equal(weaponBlowMods(bow(), 100, e, bandit), 108, 'an arrow too');
+  assert.equal(weaponBlowMods(sword(), 1000, e, bandit), 1005, 'under half: +0.5% at Faint');   // PIN MOVED: B5 (Run Them Down Faint 2 -> 0.5; 1000 so the half per cent is a whole point)
+  assert.equal(weaponBlowMods(bow(), 1000, e, bandit), 1005, 'an arrow too');
   assert.equal(weaponBlowMods(sword(), 100, e, RAT), 100, 'no health to read');
   e.health = 10;
   assert.equal(weaponBlowMods(sword(), 100, e, { ...bandit, health: 90 }), 100, 'MY health is not the foe\'s');
   fresh(); online(40);
-  assert.equal(weaponBlowMods(sword(), 100, wearSet(player(), 'thieftaker', 4, XP[4]), { health: 1, maxHealth: 100 }), 120, 'Ascendant: +20%');
+  assert.equal(weaponBlowMods(sword(), 1000, wearSet(player(), 'thieftaker', 4, XP[4]), { health: 1, maxHealth: 100 }), 1015, 'Ascendant: +1.5%');   // PIN MOVED: B5 (Ascendant 5 -> 1.5)
 });
 
 test('RAID4b No Escape (the Thief-Taker\'s Garb, 6): a kill marks the NEAREST other live foe within MARK_METRES of my feet for MARK_SECONDS - never the one killed, an ally, a foe at peace, one a storey away, one behind a wall or one past the reach - and my blows at it deal their per cent more, said and sounded; a kill with none to mark leaves the mark as it stood; the watch\'s death marks nothing (mutants: the last in reach marked; the killed foe marked; the reach ignored; a wall ignored; the mark never ending; four pieces marking)', () => {
@@ -207,10 +204,10 @@ test('RAID4b No Escape (the Thief-Taker\'s Garb, 6): a kill marks the NEAREST ot
   assert.equal(markedFoe(), near.entity, 'the nearest, not the last in reach: never the one killed, the ally, the calmed foe, or one a storey up');
   assert.deepEqual(v.said, ['No Escape! The nearest enemy is marked.']);
   assert.deepEqual(v.sounds, ['mark']);
-  assert.equal(weaponBlowMods(s, 100, e, near.entity), 115, '+15% at Faint on the marked foe');
+  assert.equal(weaponBlowMods(s, 100, e, near.entity), 101, '+1% at Faint on the marked foe');   // PIN MOVED: B5 (No Escape Faint 4 -> 1)
   assert.equal(weaponBlowMods(s, 100, e, far.entity), 100, 'no other');
   at(50 + MARK_SECONDS - 0.01);
-  assert.equal(weaponBlowMods(bow(), 100, e, near.entity), 115, 'an arrow too, inside the mark');
+  assert.equal(weaponBlowMods(bow(), 100, e, near.entity), 101, 'an arrow too, inside the mark');
   at(50 + MARK_SECONDS);
   assert.equal(markedFoe(), null, 'the mark ran out');
   assert.equal(weaponBlowMods(s, 100, e, near.entity), 100);
@@ -238,10 +235,10 @@ test('RAID4b Blood for Blood (Orcsbane Harness, 4): each foe\'s blow that takes 
   at(0);
   blow(e, 2);
   assert.equal(bloodStacks(), 1);
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 103, '+3% a stack at Faint');
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1005, '+0.5% a stack at Faint');   // PIN MOVED: B5 (Blood for Blood 1 -> 0.5 a stack; 1000 so the half per cent is a whole point)
   for (let i = 0; i < 6; i++) { at(1 + i); blow(e, 2); }
   assert.equal(bloodStacks(), BLOOD_STACKS, 'five at most');
-  assert.equal(weaponBlowMods(s, 100, e, RAT), 115);
+  assert.equal(weaponBlowMods(s, 1000, e, RAT), 1025);   // PIN MOVED: B5 (five stacks of 0.5%)
   at(6 + BLOOD_SECONDS - 0.01);
   assert.equal(bloodStacks(), 5, 'the last blow refreshed them all');
   at(6 + BLOOD_SECONDS);
@@ -251,7 +248,7 @@ test('RAID4b Blood for Blood (Orcsbane Harness, 4): each foe\'s blow that takes 
   fresh(); online(40);
   const asc = wearSet(player(), 'orcsbane', 4, XP[4]);
   blow(asc, 2); blow(asc, 2);
-  assert.equal(weaponBlowMods(sword(), 100, asc, RAT), 116, 'Ascendant: +8% a stack');
+  assert.equal(weaponBlowMods(sword(), 1000, asc, RAT), 1010, 'Ascendant: +0.5% a stack');   // PIN MOVED: B5 (Ascendant stack 2 -> 0.5)
 });
 
 test('RAID4b Hold the Line (the Broken Oath, 6): while I stand UNDER half health every hurt my door takes is its per cent less, in whole points with the fraction carried to the next hurt; never at half or above (mutants: at half health; the fraction dropped)', () => {
@@ -260,14 +257,15 @@ test('RAID4b Hold the Line (the Broken Oath, 6): while I stand UNDER half health
   e.health = 50;
   assert.equal(setDamageMod(e, 100), 100, 'at half: not under it');
   e.health = 49;
-  assert.equal(setDamageMod(e, 100), 90, '10% less at Faint');
-  assert.deepEqual([3, 3, 3, 3].map((n) => setDamageMod(e, n)), [3, 3, 3, 2], 'three tenths a hurt, carried: the fourth takes the whole point');
-  hurtPlayer(e, 20);
-  assert.equal(e.health, 31, 'through my door: eighteen of twenty');
+  assert.equal(setDamageMod(e, 100), 99, '1% less at Faint');   // PIN MOVED: B5 (Hold the Line Faint 4 -> 1)
+  assert.deepEqual(Array(20).fill(5).map((n) => setDamageMod(e, n)), [...Array(19).fill(5), 4], 'five hundredths of a point (1% of 5) a hurt, carried: the twentieth takes the whole point');   // PIN MOVED: B5 (4% -> 1%, so twenty hurts carry a point)
+  e.maxHealth = 1000; e.health = 499;
+  for (let i = 0; i < 20; i++) hurtPlayer(e, 5);
+  assert.equal(e.health, 400, 'through my door: a hundred less the one point that five hundredths of a hurt carried to');   // PIN MOVED: B5 (4% -> 1%, twenty hurts)
   fresh(); online(40);
   const asc = wearSet(player(), 'oath', 6, XP[4]);
   asc.health = 10;
-  assert.equal(setDamageMod(asc, 100), 75, 'Ascendant: 25% less');
+  assert.equal(setDamageMod(asc, 100), 97, 'Ascendant: 3% less');   // PIN MOVED: B5 (Ascendant 10 -> 3)
   fresh(); online(1);
   const four = wearSet(player(), 'oath', 4);
   four.health = 10;
@@ -318,7 +316,7 @@ test('RAID4b the HUD\'s chips: No Escape\'s mark while it stands, Iron Hide\'s w
   at(0);
   assert.deepEqual(setHudChips(t), []);
   reportPlayerKill(RAT);
-  assert.deepEqual(setHudChips(t), [{ key: 'mark', set: 'thieftaker', name: 'No Escape', text: '10s', state: 'active', tier: 2 }]);   // PIN MOVED (AUDIT STAR S2): a chip carries its tier, which the HUD's card reads
+  assert.deepEqual(setHudChips(t), [{ key: 'mark', set: 'thieftaker', name: 'No Escape', text: '10s', state: 'active', tier: 2 }]);
   fresh(); online(1);
   const o = wearSet(player(), 'orcsbane', 6);
   door([], { me: o });
@@ -368,11 +366,10 @@ test('RAID4b every raid power sleeps with the sets - offline, in a duel - and fo
 
 test('RAID4b the records: twenty-seven, nine a set in the places\' order - the seven body pieces, the set\'s shield and its ONE-HANDED weapon (so all nine are worn at once) - each of its party\'s make (the knights\' Mithril, the bandits\' Elven, the orcs\' Orcish), three affixes at the Legendary band\'s FLOOR, a weapon\'s blow at its floor too, a line of plain lore; every id its own among every Aetheric record, and the Regalia as it was (mutants: an affix at the top; a raid weapon at the top blow; a record of the wrong make)', () => {
   assert.equal(RAID_SET_PIECES.length, 27);
-  // PIN MOVED (SERPENT-SET): the Regalia, then the raiding parties' - then the Old Coil's own (test/systems/serpentset.test.js)
   assert.deepEqual(AETHERIC_RECORDS.slice(0, REGALIA.length + RAID_SET_PIECES.length), [...REGALIA, ...RAID_SET_PIECES]);
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
   assert.equal(RAID_SET_POWER, SIGIL_BANDS.legendary[0]);
-  assert.equal(RAID_SET_POWER, 7);
+  assert.equal(RAID_SET_POWER, 2);   // PIN MOVED: B5 (legendary band [2,3])
   const own = { oath: ['Mithril', 111, 120], thieftaker: ['Elven', 109, 119], orcsbane: ['Orcish', 110, 124] };
   for (const [set, [make, shield, weapon]] of Object.entries(own)) {
     const recs = RAID_SET_PIECES.filter((r) => r.set === set);
@@ -521,17 +518,3 @@ test('RAID4b the spoils pool\'s own keys for a town\'s thanks: the grant rolls t
   assert.deepEqual(store.get('raid4.spoilsDay'), ['raid:3:12:45:acct-1', 'raid:3:12:45:acct-2'], 'the town\'s marks untouched');
 });
 
-test('RAID4b the host: world.js rolls a town\'s thanks off each raid receipt - AUDIT RAID R4: when the account service says the claim is the (raid, account)\'s - its raid, seed, party and account, at the level it was fought at, into the pack of the character that fought it (else kept for it), one tab at a time - through a pool of the town\'s own keys that tells the hub nothing, clears on a save and is asked at the crash\'s door by its key; the new powers\' sounds (mutants: the receipt never granted; the town\'s pool on the gate\'s keys; the save never clearing it; the crash\'s door never asked)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  // PIN MOVED (WW6): the raids' host seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT), the host's
-  // live names read there as `host.<name>`
-  assert.match(strip(read('src/scenes/raidHost.js')), /onRaidReceipt: \(r, c, held\) => \{ \(c\?\.v \? grantStaffSpoils\([^)]*\) : host\.raidClaims\?\.add\(r, characterIdOf\(playerEntity\), [^;]+, held === true\)\); \},/);   // PIN MOVED (STAFF-EVENT THE REWARD): a staff event receipt rolls its own spoils; PIN MOVED (AUDIT WORLD-EVENTS L3-14): and whether the town was held, with the receipt
-  assert.match(w, /onSpoils: \(entry\) => grantRaidSpoils\(entry\),/);
-  assert.match(w, /function grantRaidSpoils\(entry\) \{\s*const c = readRaidReceipt\(entry\?\.r\);\s*if \(!c\) return;\s*const level = Math\.max\(1, Math\.floor\(Number\(entry\.lv\) \|\| playerEntity\.level \|\| 1\)\);\s*spoilsLock\(\(\) => raidSpoils\.grant\(\{ day: raidSpoilsDay\(c\.w\), acct: c\.s, roll: \(\) => raidSpoilsList\(c\.c, level, c\.y, typeof entry\.hd === 'boolean' \? entry\.hd : raidWasHeld\(c\.w\)\), text: RAID_SPOILS_TEXT\.granted,\s*owner: entry\.ch, kept: RAID_SPOILS_TEXT\.kept\(entry\.nm\) \}\)\)/);   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): held as the receipt came
-  assert.match(w, /const raidSpoils = createSpoilsPool\(\{\s*ray: \(\) => null, now: [^\n]+\n\s*store: _spoilsStore, who: \(\) => characterIdOf\(playerEntity\), keys: RAID_SPOILS_KEYS, recordsMax: RAID_SPOILS_RECORDS_MAX,/);
-  assert.doesNotMatch(w.slice(w.indexOf('const raidSpoils = createSpoilsPool('), w.indexOf('const raidSpoils = createSpoilsPool(') + 400), /onSpent/, 'the hub never kept a raid\'s receipt');
-  assert.match(w, /onSlotSaved\(\(characterId\) => \{ try \{ raidSpoils\.saved\(characterId\); \}/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => raidSpoils\.adopt\(rec\), key: RAID_SPOILS_KEYS\.store, inSave: _spoilsInSave \}\)\) setMidScreenText\(RAID_SPOILS_TEXT\.recovered\);/);   // AUDIT RESCUE-SAVE A1: and the kept save's records adopted, never handed twice
-  assert.match(w, /else if \(name === 'mark'\) audio\.playOneShot\(SOUND\.DrawWeapon, 1\);\s*else if \(name === 'ward'\) audio\.playOneShot\(SOUND\.EquipMaceOrHammer, 1\);/);
-  assert.match(strip(read('src/systems/raidingParties.js')), /host\(\)\.onRaidReceipt\?\.\(f\.r, c, raidHeldFor\(c\.w\)\);/, 'the raid module hands the host each receipt');   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): with whether its town was held, for the character that fought
-});

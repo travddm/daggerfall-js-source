@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW2 (2026-10-24, bible/03-World/World-Wide.md WW2): THE GATES OF EVERY THEATRE - the world host's omen, a lane at a
+// WW2: THE GATES OF EVERY THEATRE - the world host's omen, a lane at a
 // time. The owner: "we can expand world events to happen more than once at a time since the world will be massive".
 //
 // Out of scenes/world.js (HOST-SPLIT: the host wires it). A LANE is a theatre's (world/worldWide/worldGrid.js - the Iliac
@@ -122,7 +122,7 @@ export function createTheatreGateScans({ places, wet, spawnSalt, land = () => 0,
  *   wholeScan?: (t: number) => (import('../../systems/gate/theatreGateSite.js').TheatreGateScan | null) }} TheatreGateScans */
 /** @type {TheatreGateScans|null} */
 let _kept = null;
-/** WW5 (bible/03-World/World-Wide.md WW5): the world host's theatre scans as it made them (scenes/world.js - online alone),
+/** WW5 (WW5): the world host's theatre scans as it made them (scenes/world.js - online alone),
  *  or null - read by Starfall's and the Hollows' lanes (scenes/eventTheatres.js) as net/staffPlaces.js keptPlaces is: a
  *  theatre's suitable ground is the gate's, scanned once a registry generation and a picture for every event that stands
  *  on it, with no wiring of its own in the host. */

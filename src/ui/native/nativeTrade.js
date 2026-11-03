@@ -81,9 +81,7 @@ const MODE_ACTION_BUTTON = Object.freeze({
   Sell: 'TradeSell', SellMagic: 'TradeSell',
 });
 
-// ── MAC-N2 (2026-09-16, Mac: "Classic inventory issues in shops. Item
-// inventory is very large, scrollbar not working correctly, submenus
-// are completely unclickable"): THE INHERITED HALF OF THE SCREEN.
+// ── MAC-N2: THE INHERITED HALF OF THE SCREEN.
 //
 // DaggerfallTradeWindow EXTENDS DaggerfallInventoryWindow, and its
 // Setup (:193-268) calls the parent's SetupTabPageButtons (:228) and

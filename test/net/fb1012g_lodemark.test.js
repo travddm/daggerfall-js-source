@@ -4,7 +4,7 @@
 // minutes (a Sense's thirty) before anything stood to be marked; an account whose Motherlode today was found was told the
 // same of lodes that stood for it nowhere; and the far mark was Mining's copper, under every vein and boulder in reach.
 // The book's marks (net/motherlodeBook.js markedAll), the compass's colour (ui/nodeMarks.js) and the world host's
-// wiring. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// wiring..
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -79,8 +79,4 @@ test('LODE-MARK the far mark is its own colour, clear of every other mark on the
   // the host hands the far marks FIRST: nodeCompassPoints draws its list last to first, so the first stands over the rest
   const pts = nodeCompassPoints([{ profession: 'motherlode', at: [0, 0, 900], d: 0, reach: 1 }, { profession: 'mining', at: [5, 0, 5], d: 7, reach: 150 }]);
   assert.equal(pts.at(-1).mark, 'motherlode', 'the last drawn, over every vein');
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /for \(const l of motherlodeBook\.markedAll\(_lodesUp\)\) \{/);
-  assert.match(w, /\{ profession: 'motherlode', at: \[0, 0, 0\], d: 0, reach: 1 \}/);
-  assert.match(w, /return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);
 });

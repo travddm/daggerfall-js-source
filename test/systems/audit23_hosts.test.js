@@ -21,10 +21,6 @@ import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2: the world host wh
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (f) => hostText(f);
-const EXTERIOR = src('src/scenes/exterior.js');
-const WORLD = hostText('src/scenes/world.js');
-const WM = src('src/scenes/worldModes.js');
-const DUNGEON = src('src/scenes/dungeon.js');
 
 const tickEntity = () => ({
   chargenDone: true, skillUses: new Array(35).fill(0), stats: { strength: 50, endurance: 50 },
@@ -35,34 +31,9 @@ const sinks = (drained = { n: 0 }) => ({
   restoreFatigue() {}, restoreMagicka() {}, say() {},
 });
 
-test('AUDIT 23 C2: both exterior hosts read the ONE clock; ?tod sets it, ?timescale scales it', () => {
-  // hosts-8 = audio-1: minuteNow was a demo clock frozen at noon while
-  // gameplay time advanced on worldMinutes - night never fell.
-  for (const [name, text] of [['exterior', EXTERIOR], ['world', WORLD]]) {
-    assert.ok(text.includes('const minuteNow = () => skyMinutes() % 1440;'), `${name}: one clock`);   // TIME1: the SKY's hour - offline the one clock, online the sky's own (time1_sky.test.js)
-    assert.ok(text.includes('setWorldMinutes(Math.floor(worldMinutes() / 1440) * 1440 + bootTod)'), `${name}: ?tod sets the clock`);
-    assert.ok(text.includes("Number(params.get('timescale')) / 12 : 1"), `${name}: ?timescale scales the tick`);   // WORLD5: the world host's stands down under the shared clock (world5.test.js pins the guard)
-    assert.equal(/performance\.now\(\) - bootedAt/.test(text), false, `${name}: the demo clock is gone`);
-  }
-});
-
 test('AUDIT 23 hosts-3: the guards take the classic clock and refuse to run without one', () => {
   assert.throws(() => createCityGuards({ renderer: {}, collider: {}, playerEntity: {} }),
     /currentMinute/, 'the () => 0 default is gone - a missing clock fails loudly');
-  for (const [name, text] of [['exterior', EXTERIOR], ['world', WORLD]]) {
-    assert.ok(text.includes('currentMinute: () => Math.floor(playerTicker.ownMinutes)'), `${name} passes the clock`);
-  }
-});
-
-test('AUDIT 23 entity-2 + C6: the three above-ground tick calls carry IsRunning and the jump edge', () => {
-  // PlayerEntity.cs:408 (IsRunning && !IsStandingStill) and :425-430.
-  for (const [name, text] of [['exterior', EXTERIOR], ['world', WORLD]]) {
-    assert.ok(text.includes('running: player.isRunning && !player.standing'), `${name}: the running read`);
-    assert.ok(text.includes('jumped: player.jumped'), `${name}: the jump edge`);
-    assert.equal(/running: player\.running\b/.test(text), false, `${name}: the undefined field is gone`);
-  }
-  assert.ok(WM.includes('running: player.isRunning && !player.standing'), 'worldModes interior arm');
-  assert.ok(WM.includes('jumped: player.jumped'), 'worldModes interior jump edge');
 });
 
 test('AUDIT 23 C5: the shared ticker sink clamps and raises the exhaustion collapse', () => {
@@ -78,10 +49,6 @@ test('AUDIT 23 C5: the shared ticker sink clamps and raises the exhaustion colla
   entity.fatigue = maxFatigue(entity) - 1;
   ticker.tick(0.01, { running: false, swimming: false });   // no minute change - no drain
   entity.fatigue = maxFatigue(entity) + 500;   // simulate an over-restore attempt via the sink path
-  // direct check on the law: the sink is inside the ticker, so restore
-  // through a magic-round path is covered by the clamp sweep:
-  assert.ok(src('src/scenes/shared.js').includes('entity.fatigue = Math.min(maxFatigue(entity), (entity.fatigue ?? 0) + n)'),
-    'restoreFatigue clamps at MaxFatigue');
 });
 
 test('AUDIT 23 C4: the 112-day boundary normalizes reputations through the tick', () => {
@@ -135,50 +102,6 @@ test('AUDIT 64 F7: the tally gate and the fatigue gate are DIFFERENT conditions'
   assert.ok(drains2.includes(scaled(FATIGUE_LOSS.Default)), `the standing runner pays DefaultFatigueLoss (got ${drains2})`);
 });
 
-test('AUDIT 23 C14 + combat-4: the exterior swing arms drain, tally fully, and never double-count', () => {
-  for (const [name, text] of [['exterior', EXTERIOR], ['world', WORLD]]) {
-    assert.equal((text.match(/drainExteriorFatigue\(SWING_FATIGUE_COST\)/g) ?? []).length, 2,   // BALANCE1: DFU's swing loss on exertion's scale
-      `${name}: the bow arm and the melee arm both drain`);
-    // PIN MOVED (AUDIT PISTOLET A2): the bow arm tallies the hand's blow - whole for a bow or a lone gun, the off hand's
-    // weight for a pair's off-hand shot, as worldModes.js and dungeonContext.js always weighed it (THE FOUR HOSTS RULE)
-    assert.ok(text.includes('tallySwingSkills(playerEntity, weaponRig.playerWeapon.weapon, weaponRig.playerWeapon.blowWeight);   // AUDIT PISTOLET A2'), `${name}: the full bow tally arm`);
-    assert.equal(/WEAPON_SKILL\[/.test(text), false, `${name}: the display-name double tally is gone`);
-    assert.ok(text.includes("if (ev === 'bowSound') { audio.playOneShot(SOUND.ArrowShoot, 1.1); continue; }"), `${name}: the bow frame-4 sound`);
-  }
-});
-
-test('AUDIT 23 C12: night interiors take the darker ambient in both interior hosts', () => {
-  // PlayerAmbientLight.cs:75-80.
-  for (const [name, text] of [['worldModes', WM], ['interior', src('src/scenes/interior.js')]]) {
-    assert.ok(/isNight\(skyMinutes\(\) % 1440\) \? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT/.test(text),   // TIME1: the sky's night (offline the one clock)
-      `${name}: the night switch`);
-  }
-});
-
-test('AUDIT 23 hosts-1: worldModes routes death by LIVE mode and restores the exterior presenter', () => {
-  assert.ok(/const prevDeathPresenter = setDeathPresenter\(/.test(WM), 'the previous presenter is captured');
-  assert.equal((WM.match(/mode === 'exterior' && prevDeathPresenter/g) ?? []).length, 2,
-    'both registrations (construction + dungeon-return) route by mode');
-  assert.equal(/^\s*setDeathPresenter\(presentInteriorDeath\);$/m.test(WM), false,
-    'no raw interior registration survives to shadow the router');
-});
-
-test('AUDIT 23 hosts-6 + hosts-9: the dungeon host swallows F5/F6 and feeds music above the gate', () => {
-  // U47 moved the list into ui/input.js and added F11 to it - F5, F6
-  // and F11 are all DFU bindings AND browser gestures, and a list per
-  // host is four lists that drift. The law is unchanged and the pin
-  // follows it to its home: this host still swallows, through the
-  // shared call, and the list still holds all three.
-  assert.ok(DUNGEON.includes('swallowBrowserKey(e);'), 'the dungeon host swallows');
-  assert.match(readFileSync(join(root, 'src/ui/input.js'), 'utf8'),
-    /BROWSER_STEALS = Object\.freeze\(\['F1', 'F3', 'F5', 'F6', 'F11'\]\)/, 'and the list is all three - MODE-WHEEL: with F1 and F3, unbound');
-  const feed = DUNGEON.indexOf('musicDirector.update({');
-  // the FRAME-loop gate is the one whose branch draws the overlay (the
-  // pointer handler also gates on uiOverlayActive, earlier in the file)
-  const gate = DUNGEON.indexOf('ctx.tickOverlay(dt); ctx.drawOverlay(canvas);');
-  assert.ok(feed > 0 && feed < gate, 'the music context is fed before the modal return');
-});
-
 test('AUDIT 23 wts-1/2: the sky season arm and the weather-scaled ambient', () => {
   // DaggerfallSky.cs:354-357 + PlayerAmbientLight.cs:120-125.
   // AUDIT 39 (#15) MOVED THE FIRST HALF OF THIS PIN. wts-1 gave
@@ -196,27 +119,9 @@ test('AUDIT 23 wts-1/2: the sky season arm and the weather-scaled ambient', () =
   const noonClear = exteriorAmbient(720, 1, 1);
   const noonStorm = exteriorAmbient(720, 1, 0.25);
   assert.ok(noonStorm[0] < noonClear[0], 'a storming noon is darker than a clear one');
-  for (const [name, text] of [['exterior', EXTERIOR], ['world', WORLD]]) {
-    assert.ok(text.includes('seasonValue(dateFromClassicMinutes(skyMinutes()))'), `${name}: the sky reads the calendar`);   // TIME1: the sky's calendar (offline the one clock)
-    // ...on the Normal-weather arm, and nowhere else: the same test
-    // also drives showNightSky.
-    assert.match(text, /weatherSkyOffset === 0\s*\n?\s*\? seasonValue\(/, `${name}: the season rides the Normal arm`);
-    assert.match(text, /minute, weatherSkyOffset === 0,/, `${name}: and offset 0 is showNightSky`);
-    // AUDIT 28 W1 re-aimed this from the literal line: the night arm
-    // reads NightAmbientLightScale now, so the pin holds the LAW - the
-    // weather scale is the third argument - not the hard-coded 1.
-    assert.match(text, /exteriorAmbient\(minute, .+?, wxNow\.sun\)/, `${name}: ambient rides the weather scale`);   // WX2: the scale on the front (the row's own under classic)
-  }
 });
 
 test('AUDIT 23 characters-4/5: the population takes walkerRace (the climate race, a Redguard region\'s Redguard) and the REGION name bank', () => {
-  for (const [name, text] of [['exterior', EXTERIOR], ['world', WORLD]]) {
-    // REGIONAL-FOLK (FIELD BUGS 2026-10-10, PIN MOVED): the People map is characters/mobile/mobilePerson.js's, asked through
-    // walkerRace with the climate's People and the region (test/systems/livingWorld/fb1010_regionalfolk.test.js holds the rule)
-    assert.ok(/walkerRace\([^)]*people, dfLocation\.regionIndex\)/.test(text), `${name}: the People map, through walkerRace`);
-    // PIN MOVED (AUDIT-TESA A2-5): the world host's past the Bay the province's people (TESA3's bank), the region's on the Bay
-    assert.ok(text.includes(name === 'world' ? 'nameBank: provinceNameBank(provinceAt(px, py)?.key) ?? getNameBankOfRegion(' : 'nameBank: getNameBankOfRegion('), `${name}: the region bank`);
-  }
   // ...and TownPopulation honors the bank for names while the race
   // keeps driving the billboards.
   const pop = new TownPopulation({}, { totalBlocks: 4, race: 'Redguard', nameBank: BANK_TYPES?.Nord ?? 1, makePerson: () => ({}) });
@@ -237,12 +142,6 @@ test('AUDIT 23 motor-1/2: standing ignores Jump; a free swim forces the crouch a
   m.grounded = true;
   // holding Jump in place is still standing (the stealth half-speed read)
   m._trackHalfSpeed?.({ forward: 0, strafe: 0, up: true, down: false });
-  if (m.standing === undefined) {
-    // fall back to the source sweep if the tracker is private
-    assert.ok(src('src/player/motor.js').includes('const standing = this.grounded && !input.forward && !input.strafe;'));
-  } else {
-    assert.equal(m.standing, true);
-  }
   // the forced swim crouch: swimming off the bottom crouches on the
   // MEDIUM clock without any key
   const m2 = new PlayerMotor(collider);

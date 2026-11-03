@@ -1,5 +1,4 @@
-// MW-BOW1 (FIELD BUGS 2026-10-09g, the owner: "the arrow on the morrowind weapon isnt shown be drawn and shot, or it's
-// misalligned", after MW-D16, MW-D42 and MW-D50 each found the arrow placed by the reference and the report came back):
+// MW-BOW1 (FIELD BUGS 2026-10-09g,, after MW-D16, MW-D42 and MW-D50 each found the arrow placed by the reference and the report came back):
 // A PART THAT MOVES ON ITS OWN CLOCK.
 //
 // A Morrowind bow is not a rigid stick. Its mesh carries the whole BowAndArrow group's motion baked in - the limbs and
@@ -163,7 +162,7 @@ function chainTo(nif, name) {
 }
 
 /**
- * AUDIT MW-NPC (2026-10-10): THE TIME THE NAMED NODE'S CHAIN IS READ AT - the part's clock, or frame time under an
+ * AUDIT MW-NPC: THE TIME THE NAMED NODE'S CHAIN IS READ AT - the part's clock, or frame time under an
  * AutoPlay node - or null when nothing on its chain moves. nodeAffineAt's own choice, answered alone, so a caller can
  * tell a node that stands where the last pose put it (mwFirstPerson.js posePartClocks) without posing it again.
  */

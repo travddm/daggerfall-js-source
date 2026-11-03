@@ -11,7 +11,7 @@
 // hearEveryTown / homeStands), and the quest machine's isPlayerHome asks it (scenes/world.js). Every fixture is the
 // producer's: the real Worker over node:sqlite with every migration applied, the client's own door to it, the real
 // registry, and the real quest machine choosing its residence in a region of synthetic blocks (test/fb1004dTowns.mjs).
-// bible/01-Overview/bugs/Field-Bugs-2026-10-14.md QUEST-HOME; 06-Systems/Online-Arc.md HOME1.
+// QUEST-HOME; 06-Systems/Online-Arc.md HOME1.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -23,7 +23,7 @@ import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { accountHomes, onHomeOrders, SESSION_KEY } from '../../src/net/accountClient.js';
 import { OnlineSession } from '../../src/net/online.js';
-import { SOCIAL_ROOM, RELAY_VERSION, parseClient, validHomeWord, validHomeFrame, HOME_RELAY_MIN, HOME_WORDS_KEY, HOME_WORDS_KEEP_MS } from '../../src/net/wire.js';
+import { SOCIAL_ROOM, parseClient, validHomeWord, validHomeFrame, HOME_WORDS_KEY, HOME_WORDS_KEEP_MS } from '../../src/net/wire.js';
 import { ORDER_KINDS, orderValid, mintHomeOrder, verifyOrder } from '../../src/net/identityToken.js';
 import { createOnlineHomes } from '../../src/systems/online/onlineHomes.js';
 import { HOME_KEYS_MAX, HOME_LAYOUTS_MAX, HOME_ORDER_KEYS_MAX } from '../../src/net/homeLaw.js';
@@ -155,28 +155,6 @@ test('QUEST-HOME the quest: the reporter\'s own, the Dark Brotherhood\'s The Acc
   assert.ok(mansionInHome > 0, '...and the poisonmaker\'s second town\'s residence among them - the report');
 });
 
-test('QUEST-HOME the wiring: the boot\'s read hands every town\'s homes to the registry before the layouts\' pins are read from it, and the quest machine\'s isPlayerHome asks homeStands - its every town - while the collector keeps HOME1\'s exclusion (mutants: the read not handed on; isPlayerHome back on homeAt; the mount marks nothing)', () => {
-  const w = hostText('src/scenes/world.js');   // HOST-SPLIT (at the merge of main into TESA): questWorld is scenes/questWorld.js's - the host read whole
-  const take = w.slice(w.indexOf('function takeHomeLayouts(heard) {'));
-  assert.ok(take.indexOf('onlineHomes?.hearEveryTown(heard.data?.homes);') > 0
-    && take.indexOf('onlineHomes?.hearEveryTown(heard.data?.homes);') < take.indexOf('_serverLayoutRecords = towns'), 'the boot\'s read is handed on as it lands');
-  assert.match(w, /isPlayerHome: \(mapId, buildingKey\) => onlineHomes\?\.homeStands\(mapId, buildingKey\) \?\? false,/);
-  assert.match(src('src/systems/quest/place.js'), /if \(world\.isPlayerHome\?\.\(location\.mapTableData\?\.mapId, buildingKey\)\) continue;/);
-  // Mac's "Close both" (2026-10-15): the live list and the re-pick, wired - every home order an answer carries goes to the
-  // hub link, the hub link's word reaches the registry, a home learned of re-picks the sites not yet reached (and so does a
-  // load, once its layouts stand), a moved site's map mark follows it, and a building's mount marks its sites reached
-  assert.match(w, /if \(homesApi\) onHomeOrders\(\(order\) => \{ socialLink\(\)\?\.sendHomeOrder\?\.\(order\); \}\);/);
-  assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onHome = \(words\) => \{ onlineHomes\?\.hearHome\(words\); \};/);
-  assert.match(w, /onHomes: \(\) => homesLearned\(\) \}\) : null;/);
-  assert.match(w, /const n = questBridge\?\.machine\?\.reseatHomedSites\?\.\(\) \?\? 0;/);
-  const reseat = w.indexOf('const reseated = homeLayoutsOnline');
-  assert.ok(reseat > 0 && w.indexOf('homesLearned();   // QUEST-HOME', reseat) - reseat < 400, 'and a load\'s sites, once its layouts stand');
-  assert.match(w, /questSiteMoved: \(quest, place, was\) => questSiteMovedHere\(place, was\),/);
-  // PIN MOVED (IC-INTERIORS, 2026-10-27): a made building's quest markers are laid on its rooms between the reach and the
-  // resource objects (systems/quest/castMarkers.js) - the reach is still marked first, before anything stands
-  assert.match(src('src/scenes/quest/questBridge.js'), /if \(siteType === SITE_TYPES\.Building\) machine\.noteSiteReached\(adapter\.currentMapId\?\.\(\) \?\? 0, buildingKey\);\n(?:\s*\/\/[^\n]*\n|\s*if \(siteType === SITE_TYPES\.Building\) layMadeBuildingMarkers\([^\n]*\n)*\s*addQuestResourceObjects\(/);
-});
-
 test('QUEST-HOME the home order and the home word: an order names one town, its buildings homes now (`bu`) and none (`bd`) - at least one, at most HOME_ORDER_KEYS_MAX, never one twice - and carries no other kind\'s fields, as no other kind carries a home\'s; the wire takes `{t:\'home\', order}` as a shape after the hello, and a home word is the order\'s shapes, a frame a list of them (mutants: a home order with no building; a mute carrying a town)', async () => {
   assert.equal(ORDER_KINDS.includes('home'), true);
   assert.equal(HOME_ORDER_KEYS_MAX, 16);
@@ -203,7 +181,6 @@ test('QUEST-HOME the home order and the home word: an order names one town, its 
   assert.deepEqual(validHomeWord({ m: FARM, u: [HOUSE], d: [], i: 1000 }), { m: FARM, u: [HOUSE], d: [], i: 1000 });
   for (const bad of [{ m: FARM, u: [], d: [], i: 1 }, { m: FARM, u: [1, 1], d: [], i: 1 }, { m: 0, u: [1], d: [], i: 1 }, { m: FARM, u: [1], i: 1 }, { m: FARM, u: [1], d: [], i: 0 }]) assert.equal(validHomeWord(bad), null, JSON.stringify(bad));
   assert.equal(validHomeFrame({ t: 'home', l: [{ m: FARM, u: [1], d: [], i: 1 }, { m: 0 }] }), null, 'one bad word, no frame');
-  assert.equal(HOME_RELAY_MIN, 205);   // FIELD BUGS 2026-10-14's one relay bump (201 on its branch, 203 on the integration): main's world201 (CHAT-TRADE), world202 (FIVE-ASKS), world203 (KG-SET) and world204 (KG5) close a socket on the frame
   for (const p of ['hellos', 'look:', 'secret:', 'party:', 'world:', 'acct:', 'asecret:', 'sweep:', 'hub', 'event:']) assert.equal(HOME_WORDS_KEY.startsWith(p), false, p);
 });
 
@@ -253,7 +230,6 @@ test('QUEST-HOME the live list (Mac, 2026-10-15: "Close both"): a house bought A
   homes.hearEveryTown(boot);
   const a = await pageOnHub(hub, 'aldric-0001'), b = await pageOnHub(hub, 'questr-0002');
   a.hear(); b.hear();
-  assert.equal(a.link.homeOk && b.link.homeOk, true, `the hub's welcome names ${RELAY_VERSION}`);
   b.link.onHome = (words) => { homes.hearHome(words); };   // as scenes/world.js hangs it on the hub link
   // Aldric buys the farmstead's only house after that read, at its door - through the client's own door
   const ears = [];

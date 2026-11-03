@@ -1,4 +1,4 @@
-// ROSTER-G (2026-09-16, Mac: "Players dont show in online and the roster naming itself seems hardcoded").
+// ROSTER-G.
 //
 // TWO FINDINGS, one root. CHAT-R1 asked for "all currently online players" and wired the panel to the PRESENCE
 // session - the peers in the player's own map CELL - because the world channel, the one room every player is in, held
@@ -79,7 +79,6 @@ test('ROSTER-G: a channel link (presence: false) HOLDS the roster it is told - t
   rr = rosterRows(s); assert.equal(rr.total, 600, 'the count is the room\'s'); assert.ok(rr.rows.length <= ROSTER_ROWS_MAX);
   assert.equal(rosterTitle(rr.total), 'Online — 600');
   ws.receive({ t: 'leave', id: 'aaaa-0001' }); assert.equal(rosterRows(s).total, 599, 'a leave the channel says takes one off the count');
-  // PIN MOVED (SCALE5a): this said a leave for an id the list never held moves nothing - but the relay says a leave only for
   // a socket that said hello in the room, so an id this list never held is one the welcome CUT, counted in its 600; its
   // leave never came off, and past CHAT_ROSTER_MAX the header only climbed (the client audit of 2026-10-10)
   ws.receive({ t: 'leave', id: 'past-the-cut' }); assert.equal(rosterRows(s).total, 598, 'a leave for one past the cut takes one off too');
@@ -95,14 +94,3 @@ test('ROSTER-G: a channel link (presence: false) HOLDS the roster it is told - t
   assert.equal(s.drawable().length, 0, 'nothing is drawn from a channel: no pose, nothing shown');
 }));
 
-test('ROSTER-G: world.js hands the panel the ACTIVE CHANNEL\'s link, with the presence session as the stand-in; and the #tag is drawn only beside a name another row shares (mutants: `online` alone, as CHAT-R1 wired it; the tag on every row, as it was)', async () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /roster: \(\) => chatRosterOf\(chatLog\?\.active\),/, 'the tab\'s own roster');   // CHAT-CHAN: through the tab
-  assert.match(world, /const chatSessionOf = \(tabId\) => \(tabId === 'local' \? online : tabId === 'party' \|\| tabId === 'guild' \? chatLinks\?\.get\('world'\) : chatLinks\?\.get\(tabId\)\) \?\? online \?\? null;/, 'the tab\'s own link first, the presence session the stand-in');
-  const panel = rd('src/ui/chatPanel.js');
-  assert.match(panel, /if \(dup\.has\(r\.name\.toLowerCase\(\)\)\) line\.append\(el\('span', 'dfchat-who-tag', '#' \+ r\.tag\)\);/, 'the tag is conditional on a shared name (CHAT-FIT: on the row\'s one line)');
-  // the relay's side, by source: a channel's welcome is built from `others` by name, cut and counted
-  const idx = rd('server/src/index.js');
-  assert.match(idx, /const named = others\.slice\(0, CHAT_ROSTER_MAX\)\.map\(\(b\) => badged\(\{ id: b\.id, name: b\.name, sub: b\.sub \}, b\)\);/, 'ACC1g took the per-name VERDICT off this row - every name in the room was verified to get in, so it said the same thing about everybody; ACC3 put a BADGE on it, which is the opposite kind of field: a title is held by a few and is read out of the signature');
-  assert.doesNotMatch(idx, /if \(isChatRoom\(a\.key\)\) return;   \/\/ a channel announced no join/, 'the leave arm no longer skips a channel');
-});

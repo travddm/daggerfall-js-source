@@ -15,7 +15,7 @@
 // ═══ ONE STATEMENT DECIDES ═════════════════════════════════════════
 //
 // Every movement is ONE `INSERT ... SELECT ... WHERE` into the ledger
-// (0025_marks.sql), its WHERE holding the payer's balance, the payee's
+// (the `marks` ledger), its WHERE holding the payer's balance, the payee's
 // cap and the day's cap as they stand at that statement; the ledger's own
 // triggers move the balances on the line's insert. So two requests racing
 // never overdraw a balance nor pass a cap, no Mark moves without its line,
@@ -105,7 +105,7 @@ function whoAsks(player, rid, { needRid = true } = {}) {
 }
 /** The switch - asked AFTER the line an act's request may already have made (AUDIT 28 M2). */
 const shut = (player, env) => (marksOpenFor(player, env) ? null : { error: 'marks-closed' });
-/** AUDIT 625 S1 (Mac: "A week old, like witnesses"): SILVER-FINDS' two faucets open to an account a WEEK registered -
+/** AUDIT 625 S1: SILVER-FINDS' two faucets open to an account a WEEK registered -
  *  the witnesses' own age (nodeLaw.js WITNESS.ageS: a pixel's, a seat's, a market's witness). They are bounded, not
  *  witnessed, so every account added is another day's cap: a week's wait is what an alt costs. Asked after the line, as
  *  the switch is - a find made is answered whatever the clock says now. */
@@ -135,15 +135,11 @@ export const raidStrikeRid = (key) => `raid:${key}`;
  *          ?p+1.
  *   star - STAR7: the receipt's stars_held row, stamped with this claim's nonce: its star (`night.star`) at ?p, the nonce
  *          at ?p+1.
- *   eg - EG-E1: the receipt's eg_redoubts row, stamped with this claim's nonce, and PAID (the account's first of that
- *          Redoubt this arena week - egEconomy.js): its breach at ?p, its Redoubt at ?p+1, the nonce at ?p+2. A nonce, never
- *          the gate's second (AUDIT SILVER-WAYS A1: a refused re-claim in the same second passed that).
  */
 const CLAIM_GUARDS = Object.freeze({
   gate: (p) => `EXISTS (SELECT 1 FROM gate_kills WHERE day = ?${p} AND account = ?1 AND at = ?4)`,
   raid: (p) => `EXISTS (SELECT 1 FROM raid_cleanses WHERE raid = ?${p} AND account = ?1 AND nonce = ?${p + 1})`,
   serpent: (p) => `EXISTS (SELECT 1 FROM serpent_kills WHERE day = ?${p} AND account = ?1 AND nonce = ?${p + 1})`,
-  eg: (p) => `EXISTS (SELECT 1 FROM eg_redoubts WHERE b = ?${p} AND account = ?1 AND w = ?${p + 1} AND nonce = ?${p + 2} AND paid = 1)`,
   star: (p) => `EXISTS (SELECT 1 FROM stars_held WHERE star = ?${p} AND account = ?1 AND nonce = ?${p + 1})`,
 });
 
@@ -219,19 +215,6 @@ export async function combatStrikeAnswer({ db, nowS }, player, env, struck, rid)
 export const gateStrikeAnswer = (ctx, player, env, struck, gameDay) => combatStrikeAnswer(ctx, player, env, struck, gateStrikeRid(gameDay));
 /** SERPENT-SET: a serpent's answer (combatStrikeAnswer, under the serpent's line id). */
 export const serpentStrikeAnswer = (ctx, player, env, struck, day) => combatStrikeAnswer(ctx, player, env, struck, serpentStrikeRid(day));
-/** EG-E1 (bible/11-Multiplayer/Elite-Gates.md section 19): a Redoubt's line id - its arena week and its number, under the
- *  service's own `:` - so the ledger's UNIQUE (actor, rid) holds a Redoubt's Marks to once an account a week, whatever
- *  breach took it. */
-export const egStrikeRid = (week, w) => `eg:${week}:${w}`;
-/** EG-E1: a Redoubt's receipt, counted and PAID - 20 silver (MARKS_FAUCETS.eg) under the day's combat cap, in claimEg's
- *  own batch and only while the eg_redoubts row this claim stamped with `nonce` stands paid (CLAIM_GUARDS.eg). Null where
- *  Marks are not this account's. */
-export function egStrikeStatement(ctx, player, env, week, b, w, nonce) {
-  if (!strikesFor(player, env) || !Number.isSafeInteger(week) || !Number.isSafeInteger(w) || typeof b !== 'string' || typeof nonce !== 'string') return null;
-  return combatStrikeStatement(ctx, player, 'eg', egStrikeRid(week, w), [b, w, nonce]);
-}
-/** EG-E1: a Redoubt's answer (combatStrikeAnswer, under its week's line id). */
-export const egStrikeAnswer = (ctx, player, env, struck, week, w) => combatStrikeAnswer(ctx, player, env, struck, egStrikeRid(week, w));
 /** The strike alone (the statement, run, and its answer) - for a gate_kills row this same second already wrote. */
 export async function strikeGateMarks(ctx, player, env, gameDay) {
   const stmt = gateStrikeStatement(ctx, player, env, gameDay);
@@ -241,8 +224,7 @@ export async function strikeGateMarks(ctx, player, env, gameDay) {
 
 // ─── GUILD DEEDS: A GUILD'S ACCOUNTS ON ONE RAID OR GATE ────────────
 
-/** SILVER-WAYS: the deed's event - one raid (its key) or one gate (its game day). EG-E1: or one Redoubt of one breach
- *  (`eg:<breach>:<Redoubt>`). */
+/** SILVER-WAYS: the deed's event - one raid (its key) or one gate (its game day). */
 export const deedEvent = (kind, id) => `${kind}:${id}`;
 /** A deed's line id, under its guild as the actor (so a guild strikes one deed an event, whoever completes it). */
 export const deedRid = (event) => `deed:${event}`;
@@ -255,7 +237,7 @@ export const deedRid = (event) => `deed:${event}`;
  *      AUDIT SILVER-WAYS A1: a gate's guard is its row's second, and a refused re-claim in that second (the same
  *      receipt, another character named) passed it - the mark was once a (guild, event, account), so an account with a
  *      character in each of three guilds marked all three, and its gate struck their deeds. One account, one guild an
- *      event: the migration's unique (event, account), which this INSERT OR IGNORE meets.
+ *      event: the schema's unique (event, account), which this INSERT OR IGNORE meets.
  *   2. THE STRIKE: where that guild now has `members` (3) accounts' marks on the event, 25 silver into its treasury -
  *      once an event a guild (the line's id the deed's, the guild its actor), at most `perDay` (4) a guild a UTC day,
  *      never past MARKS_MAX. A strike the day's cap refused is struck by the next member's COUNTED claim of that event:

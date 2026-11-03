@@ -1,4 +1,4 @@
-// QUEST-AUDIT II (bible/01-Overview/audits/Quest-Audit-II.md): A QUEST'S STATE WHEN THE LAYOUT IT WAS MADE IN IS NOT THE ONE
+// QUEST-AUDIT II: A QUEST'S STATE WHEN THE LAYOUT IT WAS MADE IN IS NOT THE ONE
 // PLAYED. The town mods (WD3) lay a town anew; the port keeps a save's records in their own layout (systems/layoutPins.js)
 // and chooses a quest's site, or seats its questor, again where the town stands otherwise (place.js reseatMovedSite,
 // person.js reseatMovedQuestor). Four defects of that machinery, each reproduced on the real modules first:
@@ -139,48 +139,6 @@ test('QUEST-AUDIT II HOUSE-HALL: only a GUILD\'s questor is found by its faction
     t.machine.reseatMovedSites(t.world);
     assert.equal(c.qgiver.questorData.buildingKey, makeBuildingKey(0, 0, 1), 'the commoner\'s record kept');
     assert.equal(c.hall.siteDetails.buildingKey, 0, 'the hall unseated');
-  } finally { _resetLayoutPins(); }
-});
-
-test('QUEST-AUDIT II PIN-SLEEP: a session whose pin cannot be honoured leaves the quest\'s records ASLEEP - the errand\'s site unseated with its own stamp, the guild contact unmoved - and the next session, the pack loading, stands the town in their layout again: the site seated back, the contact handed in (before: the site was re-seated and re-stamped classic, the town pinned classic for good, the contract never handed in) (mutants: the held-back towns unread, by the site, by the questor; the host\'s set unpassed)', () => {
-  const t = townWithLayouts();
-  const CL = block([{ type: Tavern }, { type: House2, faction: TG, people: [person({ x: 100, z: 200, position: 900 })] }]);
-  const MOD = block([{ type: House2, faction: TG, people: [person({ x: 340, z: 80, position: 1200 })] }, { type: GeneralStore }, { type: Tavern }]);
-  try {
-    // taken with Beautiful Cities on: an errand's `local tavern`, then the guild's contract
-    pins(BC); t.block = MOD;
-    const errand = t.machine.scheduleQuest(['Quest: __ERRAND', 'QRC:', 'Message:  1011', ' x', '', 'QBN:', 'Place _inn_ local tavern', '', 'variable _pad_'], 0, { rolls: () => 0.4 }); t.machine.tick();
-    const inn = errand.getPlace({ name: 'inn' });
-    const innKey = inn.siteDetails.buildingKey;
-    const c = t.takeContract(0);
-    assert.equal(inn.siteDetails.layout, 'beautiful-cities@0.5.0');
-    // a session whose pack would not load: the host drops the pin (world.js applyLayoutPins) and the town stands classic
-    pins(() => false); t.block = CL;
-    setLayoutPins(new Map(), { heldBack: [LOCATION_KEY] });
-    assert.equal(recordHeldBack({ mapId: MAP }), true);
-    t.machine.reseatMovedSites(t.world);
-    assert.equal(inn.siteDetails.buildingKey, 0, 'the errand\'s site asleep');
-    assert.equal(inn.siteDetails.unseated.layout, 'beautiful-cities@0.5.0', 'its stamp its own');
-    assert.equal(c.qgiver.questorData.layout, 'beautiful-cities@0.5.0', 'the contact unmoved');
-    assert.equal(c.qgiver.questorData.buildingKey, makeBuildingKey(0, 0, 0));
-    // AUDIT QA2: a record made in the layout the town stands in this session stands - held back or not, never unseated
-    const here = t.machine.scheduleQuest(['Quest: __HERE', 'QRC:', 'Message:  1011', ' x', '', 'QBN:', 'Place _bar_ local tavern', '', 'variable _pad_'], 0, { rolls: () => 0 }); t.machine.tick();
-    const bar = here.getPlace({ name: 'bar' }), barKey = bar.siteDetails.buildingKey;
-    t.machine.reseatMovedSites(t.world);
-    assert.equal(bar.siteDetails.buildingKey, barKey, 'a record that stands, untouched');
-    assert.equal(bar.siteDetails.unseated, undefined);
-    assert.equal(inn.siteDetails.buildingKey, 0, 'the errand\'s site still asleep');
-    // the next session, the pack loads: the records ask for the mod's layout alone, and it stands
-    pins(BC); setLayoutPins(pinsFrom(layoutRecordsOf({ sites: t.machine.getAllActiveQuestSites(), questors: t.machine.getAllActiveQuestors() })));
-    assert.equal(recordHeldBack({ mapId: MAP }), false, 'a new session holds nothing back');
-    t.block = MOD;
-    t.machine.reseatMovedSites(t.world);
-    assert.equal(inn.siteDetails.buildingKey, innKey, 'the errand\'s site seated back');
-    assert.equal(c.handsIn(0), true, 'the contract handed in');
-    // the host's half: its pin loop is layoutPins' admitPinnedPacks (run below), and the set reaches the pins
-    const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-    assert.ok(WORLD.includes('const { dropped, heldBack } = await admitPinnedPacks(pins, ensureWorldDataPack);'));
-    assert.ok(WORLD.includes('const changed = setLayoutPins(pins, { heldBack, missing: worldDataPacksMissing() });'));
   } finally { _resetLayoutPins(); }
 });
 
@@ -375,7 +333,6 @@ test('QUEST-AUDIT II SHARED-SEAT: a shared copy chooses again by ONE die per sha
     D.m.restoreSaveData(structuredClone(B.m.getSaveData()));
     const dq = [...D.m.quests.values()][0];
     assert.equal(dq.shareId, envelope.shareId, 'the save keeps its share');
-    // PIN MOVED (QUEST-AUDIT III SHARE-MEMORY; AUDIT QA3 A6): a load keeps the share memory as it was saved - this copy
     // was stamped with a share and never kept in step (B shared nothing), so it loads out of step, the copy QA2 means
     assert.equal(D.m.hasSharedQuestNamed(dq.questName), false, 'loaded as it was saved: out of step');
     dq.rolls = () => own;

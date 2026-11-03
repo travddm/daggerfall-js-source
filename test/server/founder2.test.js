@@ -1,11 +1,10 @@
-// FOUNDER2 (2026-09-24, Mac: "I want to grant all current accounts the founder
-// title if they dont have it already"). Founder is DERIVED - held by every
+// FOUNDER2. Founder is DERIVED - held by every
 // account registered on or before FOUNDER_UNTIL (ACC3's design: no row is ever
 // written) - and TITLE-R had closed it at 2026-09-23T00:00Z, so the accounts
 // registered since held nothing. The grant is the cutoff moved to the end of
 // the day it was asked, 2026-09-25T00:00Z: every account registered by then
 // holds and may wear it, and past it the title is closed again. FOUNDER5
-// (2026-10-07, PIN MOVED): the end of the 24th on every clock, 2026-09-25T12:00Z
+// (2026-10-07
 // (founder5.test.js) - later, so every account this pinned still holds it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -17,7 +16,7 @@ test('FOUNDER2: every account registered by the end of 2026-09-24 holds Founder,
   assert.deepEqual(titlesHeld(since, {}), ['founder'], 'registered after TITLE-R closed it: granted now');
   assert.equal(equipRefusal('founder', since, {}), null, 'and it may be worn');
   assert.equal(titleWorn({ ...since, title: 'founder' }, {}), 'founder');
-  const lastSecond = { handle: 'Late', registered_at: Date.UTC(2026, 8, 25, 12) / 1000 };   // FOUNDER5 (PIN MOVED): 00:00Z then
+  const lastSecond = { handle: 'Late', registered_at: Date.UTC(2026, 8, 25, 12) / 1000 };   // FOUNDER5 (
   assert.deepEqual(titlesHeld(lastSecond, {}), ['founder'], 'the cutoff second is inside');
   assert.deepEqual(titlesHeld({ handle: 'After', registered_at: Date.UTC(2026, 8, 25, 12) / 1000 + 1 }, {}), [], 'a second past: closed again');
   assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000);

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HEAL CURSE (2026-10-08, the owner: "Add a button to the temple services under heal disease named heal curse it removes
-// being a werewolv and vampire and also removes their positive effects/negative effects and buffs ofc.")
+// HEAL CURSE
 //
 // The temple's Cure Disease priest offers a second row: the CURSE lifted. What a curse is here:
 //   - VAMPIRISM, turned (systems/vampirism.js cureVampirism - DFU's own CureVampirism: the clan remembered, the racial

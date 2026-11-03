@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK-II (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.4): THE NAMED MARK, THE SAME ON EVERY CLIENT. A week's
+// HUNTERS-MARK-II: THE NAMED MARK, THE SAME ON EVERY CLIENT. A week's
 // mark is a pure function of the week and the tier (net/huntLaw.js huntMarkOf), so a peer's foe reads as one off what its
 // record already carries - its kind and its traits' mask (net/wire.js validFoeRecord `t`, `bt`). A mate sees the hunter's
 // beast under its name, and the wire carries nothing new.

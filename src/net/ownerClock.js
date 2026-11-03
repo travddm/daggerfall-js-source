@@ -1,6 +1,5 @@
 // @ts-check
-// OWNER-CLOCK (2026-10-21, the field: players report enemy desync; a player's profile shows boats, peers, horses and grass
-// each taking a tenth to a quarter of the main thread, so a slow owner is common): A FOES FRAME SAYS WHEN ITS FOES WERE
+// OWNER-CLOCK: A FOES FRAME SAYS WHEN ITS FOES WERE
 // WHERE IT SAYS.
 //
 // A foe is its owner's to step: the owner streams the foes it stepped, every FOES_MS and whole every FOES_FULL_MS, on its

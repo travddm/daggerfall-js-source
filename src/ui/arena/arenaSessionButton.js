@@ -1,6 +1,5 @@
 // @ts-check
-// HOTFIX 1003f (2026-10-03, the owner, live: "the arena button for the host needs to be on the screen. Not inside the
-// pause menu"): THE SESSION'S BUTTON - while a private session holds this screen (ARENA6, scenes/arena/arenaOnline.js
+// HOTFIX 1003f: THE SESSION'S BUTTON - while a private session holds this screen (ARENA6, scenes/arena/arenaOnline.js
 // inSession), a button stands on the screen and the / key (which no game action holds - systems/inputActions.js; the
 // stands took + and -, ui/arena/arenaHud.js) opens the Arena window on its Bouts page: the session's card, its code, its
 // members, Make Red / Make Blue and Start bout. Hidden under any window and with the HUD toggled off. A press on it is

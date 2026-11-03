@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster "worldjs" - src/scenes/world.js.
+// AUDIT 68, cluster "worldjs" - src/scenes/world.js.
 // The whole-tree sweep's pins for the streaming host: every assertion
 // here failed on the base (ad238de0) and passes after the fix. Where the
 // host needs a browser, the host's OWN source text is lifted and run over
@@ -111,7 +111,7 @@ test('AUDIT 68 X4-foe-sink-provenance-dropped: the router hands the provenance t
   inside({ entity: mkEntity() }, false).hurt(6);
   inside({ entity: mkEntity(), _encounter: true }, false).hurt(4);
   inside({ entity: mkEntity() }).hurt(2);
-  assert.deepEqual(seen, [   // PIN MOVED (TELL1: the blow's kind reaches the watch's door too, and whether it is a later round) (RVN3: and an encounter's a kill's whole and a landing's element)
+  assert.deepEqual(seen, [
     { pool: 'watch', n: 6, opts: { fromPlayer: false, kind: 'spell', round: false } },
     { pool: 'encounter', n: 4, opts: { fromPlayer: false, kind: 'spell', whole: false, round: false, element: null } },
     { pool: 'watch', n: 2, opts: { fromPlayer: true, kind: 'spell', round: false } },
@@ -154,9 +154,7 @@ test('AUDIT 68 S22-door-repeated-block-identity: the second instance of a shared
   const resolve = lift(WORLD, '    buildingDataForDoor: (hit) => {', '\n    },');
   // ARENA1: the door's location and exit group are arenaDoorTarget's (the pixel's town, or the arena's undercroft) - lifted too
   const arenaTarget = lift(WORLD, '  function arenaDoorTarget(e) {', '\n  }');
-  // PIN MOVED (IC-GRAND, test/world/icgrand_arena.test.js): the stair asks standsArena (Daggerfall's, or a grid laying its block)
   const { homeTownBlocks } = await import('../../src/systems/online/onlineHomes.js');   // HOME-PRICE: the door's building carries its town's size
-  // PIN MOVED (IC-PROPS): the door's own town - its building's name there, its book, its name - asked of the talk
   // (scenes/townTalk.js doorTownOf, pinned in test/systems/icprops_doors.test.js) with the DOOR'S location, never the
   // player's: the press's and the plaque's one source
   const { townBookOf } = await import('../../src/systems/discovery.js');
@@ -186,10 +184,9 @@ test('AUDIT 68 S22-ship-disembark-compensation: boarded after a highland recente
   const ship = await import('../../src/systems/ship.js');
   const { StreamingWorldState } = await import('../../src/world/streamingWorld.js');
   const { SHIP_TYPES, shipCoords } = await import('../../src/systems/banking.js');
-  const { STREAMING_TERRAIN_SCALE, RECORD_GROUND_STAMP } = await import('../../src/world/terrain/terrainSampler.js');   // PIN MOVED (BAY-LEFT-GROUND, D5): the deck's stamp, its scale and its frame's law
+  const { STREAMING_TERRAIN_SCALE, RECORD_GROUND_STAMP } = await import('../../src/world/terrain/terrainSampler.js');
   // boardOrDisembark's own decision half, lifted: the transition and the landing it hands the teleport
   const arm = lift(WORLD, '    const here = playerTravelPixel();\n    const t = shipTransition(playerEntity, {', ' : null;\n');
-  // PIN MOVED (AUDIT ETHER-OW C2-3, test/systems/audit_etherow.test.js): the board asks the Veil before it is taken - the Bay's
   // dock here, never refused
   const run = (playerEntity, here, feet, state) => new Function('shipTransition', 'shipMemory', 'shipRestorePos', 'REPOSITION', 'playerEntity', 'playerTravelPixel', 'player', 'cam', 'state', 'STREAMING_TERRAIN_SCALE', 'RECORD_GROUND_STAMP', 'groundFrameHeight', 'veilRefused',
     `${arm}\nreturn { t, localPos, legacy: typeof legacy === 'undefined' ? undefined : legacy };`)(
@@ -251,7 +248,7 @@ test('AUDIT 68 S22-teleport-reentry: F11 during a fast travel\'s build is refuse
       const at = WORLD.indexOf(`  ${fn}`);
       assert.ok(at > 0, fn);
       const body = WORLD.slice(WORLD.indexOf('{\n', at) + 2);
-      assert.match(body, /^ {4}if \(worldMoveBusy\(\)\) return( false)?;/, `${fn}: the busy question is the first statement`);   // PIN MOVED (PORTAL-BAY): teleportTo answers whether it arrived
+      assert.match(body, /^ {4}if \(worldMoveBusy\(\)\) return( false)?;/, `${fn}: the busy question is the first statement`);
     }
   });
 });
@@ -283,7 +280,6 @@ test('AUDIT 68 S22-roads-retry-crash: a network that failed to build is not "kno
     assert.equal(w.hasRoads, true);
   } finally { console.warn = warn; }
   // the host's arm, lifted: the second paint without the network is KEPT, and the builder returns it
-  // PIN MOVED (IC-SWAP-BEHIND): the first paint goes back through the swap's mark (scenes/swapBehind.js - behind its view, which
   // stands; the switch off, torn down), the entry read under the pixel's own key
   const arm = lift(WORLD, '    if (!withRoads && terrainGen.hasRoads) {', '    const entry = built.get(pkey);');
   const built = new Map([['3,4', { px: 3, py: 4 }]]);
@@ -353,7 +349,7 @@ test('AUDIT 68 S17-ground-mean-colour: a blade\'s root is the mean of the tile\'
   near(tileMeanColour(t.getColor32(bitmap, 0)), [150 / 255, 125 / 255, 100 / 255]);
   near(tileMeanColour(t.getColor32({ width: 1, height: 1, data: new Uint8Array([7]) }, 0)), [200 / 255, 200 / 255, 200 / 255]);
   // the host's learning, run - with the renderer's tile array ALREADY cached (it outlives the scene), so only the
-  // learning runs. PIN MOVED (OW-HITCH): its home is scenes/groundSets.js (HOST-SPLIT), and it is run there whole, through
+  // learning runs.
   // the door the build asks (loadGroundSet) rather than lifted out of the host's text
   const { createGroundSets } = await import('../../src/scenes/groundSets.js');
   const groundTex = { recordCount: 2, getDFBitmap: (r) => (r === 0 ? bitmap : { width: 1, height: 1, data: new Uint8Array([9]) }), getColor32: (b, a) => t.getColor32(b, a) };

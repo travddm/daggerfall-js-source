@@ -8,7 +8,7 @@
 // FormulaHelper.cs, DaggerfallUnityItem.cs, PlayerActivate.cs
 // (MIT, Daggerfall Workshop).
 
-import { plainFoeLootRule, capFoeLoot, plainFoeRarityWeights, capLootList } from '../systems/foeLootCap.js';   // FOE-CAP: a plain foe's cap and ladder (RENOWN-LOOT: at the roller's Renown)
+import { plainFoeLootRule, capFoeLoot, plainFoeRarityWeights } from '../systems/foeLootCap.js';   // FOE-CAP: a plain foe's cap and ladder (RENOWN-LOOT: at the roller's Renown)
 import { renownLootQuarters, lootEased } from '../systems/renownLoot.js';   // RENOWN-LOOT: LOOT-EASE's buff by the roller's Renown
 import { SKILLS, tallySkill, skillValue, SKILL_NAMES } from '../systems/skills.js';
 import { effectiveLevel, lootGateLevel } from '../systems/mentorMode.js';   // SOFTCAP2: mentor mode - the level the world is built around; MENTOR2: the gate's, the real one
@@ -30,9 +30,8 @@ import { conditionBasedPricesOn, randomConditionLootItems } from '../systems/rol
 import { isHumanoid } from '../systems/survival/loot.js';   // MOD: the same humanoid test SURV2's corpse food already draws its line with
 import { rollCorpseLoot, lootRarityOn, rarityRank, RARITIES, rarityEligible, applyRarity, lastPass, stampWonWeapons } from '../systems/loot/lootRarity.js';   // RF2: and the port's, after it; LOOT7: a champion's guarantee
 import { championOf } from '../systems/champions.js';   // LOOT7: the champions' traits register at import
-import { isGoldPieces, ARROW_TEMPLATE } from '../systems/inventory.js';   // PLAIN-LOOT: a plain foe's gold all of it; PARTY-LOOT: a shaft is never counted under the cap
+import { isGoldPieces } from '../systems/inventory.js';   // PLAIN-LOOT: a plain foe's gold all of it
 import { bonusShare, rollBonusSupplies, ROOM_BASE_QUARTERS } from '../systems/roomLoot.js';   // PARTY-LOOT: a player's own layer over a room's shared base
-import { wildFoeLoot } from '../systems/wild/wildZone.js';   // WILD1: the open zone's gold (wildLootAfter)
 import { liveStat, FATIGUE_DRAIN_SCALE } from '../systems/statMods.js';   // RF2: the player's live luck for the roll   // AUDIT 58: ItemHelper's EquipItem half - a foe's equip table is what DamageEquipment's struck side reads
 import { GLOBAL_SCALE } from '../world/meshReader.js';
 import { swingSoundFor, hitSoundFor, ENEMY_HIT_VOLUME, SOUND } from '../systems/soundClips.js';
@@ -42,7 +41,7 @@ import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';
 import { ATTRACT_RADIUS, ignoreHumanSounds, attractStep } from '../characters/enemy/enemySounds.js';   // AUDIT 24 (wave 41); TELL2: a person's wind-up is a swing, not a voice
 import { enemyDisplayName, ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';   // AUDIT 24 (wave 42); TELL1: the bark a breaking blow wrings out
 import { getLocalizedEnemyName } from '../systems/textManager.js';   // L10N3e: the enemy's name in the player's language
-import { windupHolds, windupStruck, tacticsNow, overreachOpen, poiseTrack, LOCAL_TARGET } from '../ai/tactics.js';   // TELL1: poise and the stagger (bible/12-Enhanced-AI/Feud-Arc.md section 3); TELL2: the cues' clock; TELL4: the punish window
+import { windupHolds, windupStruck, tacticsNow, overreachOpen, poiseTrack, LOCAL_TARGET } from '../ai/tactics.js';   // TELL1: poise and the stagger; TELL2: the cues' clock; TELL4: the punish window
 import { blowK, blowWeight, behind, TELL } from '../ai/tells.js';   // TELL1: a blow's weight on the poise meter; TELL2: the cues' numbers
 import { noteFeud, feudWeakBlow } from '../systems/feudLedger.js';   // RVN1: my staggers and back hits, in a fight's ledger (a leaf); RVN3: a blow of its weakness
 import { BLOW } from '../ai/blowShapes.js';   // TELL6d: the aimed shot's speed
@@ -93,7 +92,7 @@ export const isBowWeapon = (weapon) => attackSkillOf(weapon) === SKILLS.Archery;
 export const hasBowAttack = (basics) =>
   !!basics?.hasRangedAttack1 && (!basics?.castsMagic || !!basics?.hasRangedAttack2);
 
-// ---- RF2: THE ONE ENEMY-LOOT SEAM (2026-09-14, Mac's refactor pass) ----
+// ---- RF2: THE ONE ENEMY-LOOT SEAM ----
 /** EnemyEntity.SetEnemyCareer's whole loot chain, in the order DFU
  *  runs it, for every host that stands a foe: GenerateItems(LootTableKey)
  *  on the PLAYER's level and gender (EnemyEntity.cs:328; LootTables.cs
@@ -124,15 +123,14 @@ export const hasBowAttack = (basics) =>
  *  affinity Human - so an Orc or a Knight is cut and a Zombie or a
  *  Daedra Lord is not. */
 const HUMANOID_LOOT_ITEM_SCALE = 0.25;   // MOD: keep a quarter of the item chance (drop 75%)
-/** PLAIN-LOOT (Mac, 2026-10-02: "reduce the loot dropped by non elite enemies by 50%"): a foe that is no elite leaves
+/** PLAIN-LOOT: a foe that is no elite leaves
  *  PART of what it carries - every piece the chain put on its body (the table's, the worn kit's droppable cut, the trio
  *  and the port's extras) kept on its own coin, after the humanoid cut; its gold all of it, as that cut leaves it.
  *  A coin per piece and not a scale on the table's chance (AUDIT PLAIN-LOOT): DFU's ladder halves its chance at every
  *  step and rolls it truncated to whole percent, so a scaled chance compounded down the ladder and a 1-3% one fell to
  *  0 - the scale had kept 33-50% of the table, and nothing of a level-1 humanoid's. "Elite" is any of the three: an
  *  ELITE FOE (`eliteFoe`), an Elite Dungeon's foe (`elite`), a LOOT7 champion.
- *  LOOT-EASE (2026-10-05, Mac: "I think loot was way overtuned as a nerf. We need to bring their drop rates up" and
- *  "Lets not overture the drop rates, but they definitely need a buff"): THREE PIECES IN FOUR, where PLAIN-LOOT kept
+ *  LOOT-EASE: THREE PIECES IN FOUR, where PLAIN-LOOT kept
  *  one in two. FOE-CAP's cap and plain ladder landed on the half a day later; measured through this chain, a plain
  *  humanoid's body held 0.9 pieces and a third of them nothing but gold (1.9, an eighth bare, before PLAIN-LOOT). Half
  *  the cut given back: 1.3 pieces, a fifth bare. */
@@ -145,7 +143,7 @@ export const plainFoeLootKeep = (quarters = renownLootQuarters()) => lootEased(P
 const eliteLooted = (entity) => !!(entity?.eliteFoe || entity?.elite || championOf(entity));
 // ELITE: `lootDropMult` scales every item category's chance (gold untouched, as the humanoid cut);
 // `lootQualityMult` scales the rarity ladder's odds. Both 1 everywhere but an elite dungeon.
-// PARTY-LOOT (2026-10-14, Mac: "Shared base + personal bonus"): EVERY TERM OF THE ROLL IS AN ARGUMENT. A room's shared
+// PARTY-LOOT: EVERY TERM OF THE ROLL IS AN ARGUMENT. A room's shared
 // base (systems/roomLoot.js) is this chain run on the room's dice and the room's terms - the party's level and gender in
 // `player`, Luck 50, RENOWN-LOOT's first stage - so nothing here may read the roller's page behind the caller's back:
 // the dice reach every draw (the table's, the kit's variant and its poison were Math.random), and `quarters`, `luck` and
@@ -167,26 +165,24 @@ export function spawnEnemyLoot(entity, mobileType, basics, player, { rolls = Mat
   // (above) does not, and a foe's cuirass is worn either way.
   if (conditionBasedPricesOn()) randomConditionLootItems([...new Set([...entity.items, ...(eq?.worn ?? [])])], rolls);
   enemyLootSpawned.raise({ mobileType, lootTableKey: enemyLootTableKey(mobileType, basics?.lootTableKey ?? '-'), items: entity.items, worn: eq?.worn ?? [], where, rolls, roller: player });   // PARTY-LOOT: the roll's dice and roller ride the event, so a subscriber draws on the caller's terms   // OH-E: ...and every other subscriber, in the one list (the worn set is Items' too, as above)
-  // FOE-CAP (systems/foeLootCap.js): a plain foe - no title, no boss - rolls the plain ladder (outside an Elite Dungeon)
-  // and carries at most its cap, gold included; the stamp rides the entity so the death's handlers are capped too
+  // systems/foeLootCap.js: a plain foe - no title, no boss - rolls the plain ladder (outside an Elite Dungeon). A body
+  // carries what its rolls gave it (B4 removed the count cap); the stamp tells the room's bonus to use the plain ladder
   const plain = plainFoeLootRule(entity, basics);
-  if (plain) entity.lootCap = plain.cap;
+  if (plain) entity.plainLadder = plain.plainLadder;
   rollCorpseLoot(entity, basics, { rolls, luck, find, qualityMult: lootQualityMult, weights: plain?.plainLadder ? plainFoeRarityWeights(ease) : null, level: lootGateLevel(player) });   // PARTY-LOOT: the caller's Luck and finders; AUDIT UPDATE L4: and its level (LOOT-GATE) - a scene's first foes are rolled before any host frame; MENTOR2: a mentor's real one
   capFoeLoot(entity);
   return entity.items;
 }
 
-/** WILD1 (systems/wild/wildZone.js, the owner's "twice gold" - WILD2: at its ring's multiplier): a foe of the open zone's coin - after its chain
- *  (spawnEnemyLoot, given wildLootOpts), so the cap, which folds and keeps the gold whole, has had its word. */
-/** PARTY-LOOT (bible/06-Systems/Online-Arc.md PARTY-LOOT; Mac: "Shared base + personal bonus"): A PLAYER'S OWN LAYER OVER
+/** PARTY-LOOT (PARTY-LOOT): A PLAYER'S OWN LAYER OVER
  *  A ROOM'S SHARED BASE, read at their own RENOWN-LOOT stage and their Luck - the knobs' one home, as the base's are
  *  spawnEnemyLoot's - on the dice the caller hands (`rolls`, seeded by the base's name and the character). A BODY's:
  *  each piece PLAIN-LOOT's keep let go at the base's stage (`rejects`) kept at the step between the two keeps
  *  (roomLoot.js bonusShare - the base's keep and the bonus's together the player's own), the supplies' share above the
  *  base's for a foe with a table, then the plain ladder at the player's Luck, finders and stage, the sigils at the
- *  fight's count, and the cap's room above the base (`lootCap` less the base's counted pieces - a shaft never counted).
+ *  fight's count.
  *  A deep PILE's: the supplies' share alone (it has no keep). Answers the pieces, none of them the room's. */
-export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, rejects = [], basics = null, mobileType = null, champion = null, level = 1, lootCap = null, baseItems = [], fighters = 1 }) {
+export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, rejects = [], basics = null, mobileType = null, champion = null, level = 1, plainLadder = false, fighters = 1 }) {
   const own = renownLootQuarters();
   let pieces = [];
   if (!pile) {
@@ -196,19 +192,12 @@ export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, r
     if (key && key !== '-') rollBonusSupplies(pieces, 'enemy', ROOM_BASE_QUARTERS, own, rolls);   // addEnemyLootExtras' own gate: a foe with a table
     if (pieces.length) {
       const body = { items: pieces, level, mobileType, champion };
-      rollCorpseLoot(body, basics, { rolls, luck: liveStat(player, 'luck'), weights: Number.isInteger(lootCap) ? plainFoeRarityWeights(own) : null });
+      rollCorpseLoot(body, basics, { rolls, luck: liveStat(player, 'luck'), weights: plainLadder ? plainFoeRarityWeights(own) : null });
       pieces = body.items;
     }
   } else if (deepPile) rollBonusSupplies(pieces, 'pile', ROOM_BASE_QUARTERS, own, rolls);
   stampWonWeapons(pieces, fighters, { rolls });
-  if (Number.isInteger(lootCap)) capLootList(pieces, Math.max(0, lootCap - baseItems.filter((it) => !(it?.group === 'Weapons' && it.templateIndex === ARROW_TEMPLATE)).length));   // FOE-CAP: the body's cap is the base's and the bonus's together (STUCK-ARROWS: a shaft is never counted)
   return pieces;
-}
-
-export function wildLootAfter(entity) {
-  const m = wildFoeLoot(entity);   // WILD2: its ring's - x1.25 the outer to x2 the heart
-  if (m === 1) return;
-  for (const it of entity?.items ?? []) if (isGoldPieces(it)) it.stackCount = Math.max(1, Math.round(Math.max(1, it.stackCount ?? 1) * m));
 }
 
 // ---- EnemyEntity.SetEnemyCareer, the equipment chain (EnemyEntity.cs:330-347) ----
@@ -296,7 +285,7 @@ export function equipEnemy(entity, mobileType, playerLevel, rolls = Math.random,
 /** "According to DF Chronicles and verified in classic." Spent on
  *  EVERY swing that reaches the hit frame, hit or miss. */
 export const SWING_WEAPON_FATIGUE_LOSS = 11;
-/** BALANCE1 (2026-09-27, Mac: fatigue "drain[s] a little too fast"): what a
+/** BALANCE1: what a
  *  swing CHARGES here - DFU's 11 above, on the port's exertion scale
  *  (statMods FATIGUE_DRAIN_SCALE), truncated as the minute's drain is. */
 export const SWING_FATIGUE_COST = Math.trunc(SWING_WEAPON_FATIGUE_LOSS * FATIGUE_DRAIN_SCALE);
@@ -306,7 +295,7 @@ export const SWING_FATIGUE_COST = Math.trunc(SWING_WEAPON_FATIGUE_LOSS * FATIGUE
  *  once per connecting swing. CriticalStrike was tallied nowhere in the
  *  port, so a skill that feeds every to-hit roll could never advance. */
 export function tallySwingSkills(player, weapon, weight = 1) {
-  // TWO-HANDS (AUDIT 2, bible/05-Combat/Two-Hands.md): `weight` - an off-hand blow is DUAL.OFF_DAMAGE of a swing here too
+  // TWO-HANDS (AUDIT 2): `weight` - an off-hand blow is DUAL.OFF_DAMAGE of a swing here too
   // (PlayerWeapon.blowWeight), its fraction carried on the player to the next swing, so a pair trains as fast a second
   // as its damage edge allows, not its blow rate. A swing of weight 1 - every other - tallies once, as DFU's does.
   const w = Number.isFinite(weight) ? Math.max(0, Math.min(1, weight)) : 1;
@@ -462,7 +451,7 @@ export function playerAttackGrunt(playerEntity, isBow, rolls = Math.random) {
   });
 }
 
-/** CLIMB4 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md): the player's EFFORT on a hard climb - a pull-up
+/** CLIMB4 (the Enhanced Climbing arc): the player's EFFORT on a hard climb - a pull-up
  *  from a hang, a leap's launch, a fall caught, the grip gone - in the attack grunt's own voice: the port's departure
  *  (DFU's climber climbs in silence), so it rides the attack grunt's gates exactly (the CombatVoices switch, a
  *  transformed lycanthrope's silence) and its clip (a vampire's override, else GetRaceGenderAttackSound by race and
@@ -715,7 +704,7 @@ export function applyDamageToNonPlayer(attacker, target, {
   return damage;
 }
 
-// ---- TELL1: THE POISE DOOR (bible/12-Enhanced-AI/Feud-Arc.md section 3) ----
+// ---- TELL1: THE POISE DOOR ----
 /**
  * One law for the three damage doors (exteriorFoes.damageFoe, cityGuards.damageGuard, the dungeon's damageFoe), asked
  * where each writes DFU's knockback. A blow landing on a foe WINDING UP holds: its weight - its damage by its kind
@@ -794,9 +783,9 @@ export function windupFeedback(word, f, { audio = null, hitEffects = null, shake
   }
 }
 
-// ---- TELL2: THE EAR (bible/12-Enhanced-AI/Feud-Arc.md section 4.3) ----
+// ---- TELL2: THE EAR ----
 const NO_CUES = Object.freeze([]);   // AUDIT TELL U9: what a foe with nothing telegraphed plays
-/** RVN11 (bible/12-Enhanced-AI/Feud-Arc.md 22.1): the host's ear for a wind-up at me as it begins (`fn(f, blow)`) - a
+/** RVN11 (22.1): the host's ear for a wind-up at me as it begins (`fn(f, blow)`) - a
  *  Devoted companion's warning of one behind me. */
 let _windupAtMe = null;
 export function setWindupAtMeListener(fn) { _windupAtMe = typeof fn === 'function' ? fn : null; }
@@ -853,7 +842,7 @@ export function tellCues(f, audio, hearing = 1, now = tacticsNow()) {
   return played;
 }
 
-// ---- TELL6e: WHAT A LANDING DOES TO YOU (bible/12-Enhanced-AI/Feud-Arc.md section 8.2) ----
+// ---- TELL6e: WHAT A LANDING DOES TO YOU ----
 /** A foe's blow's damage reached the player (`dmg`, at `playerFeet`): a telegraphed blow that landed there queues what
  *  its shape does (systems/blowEffects.js); anything else - a plain swing, a stale landing, a roll that did nothing -
  *  spends the word and does nothing. Each pool asks it where its blow's damage is decided. */
@@ -874,7 +863,7 @@ export function playerBlowFrame({ motor = null, entity = null, shake = null, hur
   if (entity && hurt) tickBleed(entity, hurt);
 }
 
-// ---- TELL6d: THE AIMED SHOT'S LOOSE (bible/12-Enhanced-AI/Feud-Arc.md section 8.1) ----
+// ---- TELL6d: THE AIMED SHOT'S LOOSE ----
 /** The aimed shot the brain landed on this archer, taken by the loose that spends it (null: a plain shot). */
 export function takeAimedShot(ai) {
   const shot = ai?._blowShot;

@@ -1,5 +1,5 @@
 // @ts-check
-// EL5 (2026-09-17, THE FIELD): THE BOUNDS AND THE CULL - a leaf module shared
+// EL5: THE BOUNDS AND THE CULL - a leaf module shared
 // by the shadow pass (its cascade, face and camera replays), the air pass
 // (its emission replay) and the renderer (which computes a bundle's bounds
 // at upload). Nothing here touches GL.
@@ -72,9 +72,7 @@ export function boundsOf(positions, indices = null, start = 0, count = -1, strid
 export const BOUNDS_RANGE = 8192;
 
 /**
- * PERF-EXT23 (2026-09-25, the players: "fps issues in the exterior but
- * fine in the interior", "me too my friend.. don't know why. I got a
- * RX6600"): boundsOf(positions) over a whole xyz array, CUT IN RANGES - a
+ * PERF-EXT23: boundsOf(positions) over a whole xyz array, CUT IN RANGES - a
  * generator that yields after every `range` vertices of either pass, so a
  * mesh too big for one frame (a city pixel's merged batch, 600k vertices,
  * 8-17 ms a sphere) is measured between frames (StaticBatchBuilder.
@@ -123,7 +121,7 @@ export function transformSphere(m, s, out, o = 0) {
 }
 /** EL5's largest axis scale of an affine matrix (column-major) - the factor a sphere's radius takes through it.
  *
- *  PERF-EXT4 (2026-09-25, the players' "fps issues in the exterior but fine in the interior"): ASKED ONCE A MATRIX.
+ *  PERF-EXT4: ASKED ONCE A MATRIX.
  *  The shadow record's mesh arm put the mesh's sphere and EVERY sub-mesh's through one matrix, and each call took
  *  the three column lengths again - 3 x (1 + sub-meshes) Math.hypot a record, some 1,800 a frame on the cpu lens's
  *  town, at 40 ns apiece where the arithmetic around them is 3. A caller with many spheres under one matrix asks
@@ -221,7 +219,7 @@ export function batchReach(b) {
   return q > r * r * (1 + 1e-6) ? Math.sqrt(q) : r;
 }
 
-/** AUDIT DEEP R-7 (the travel view, bible/06-Systems/Travel-View.md): the flats' LEAN this frame, as sin of its angle
+/** AUDIT DEEP R-7 (the travel view): the flats' LEAN this frame, as sin of its angle
  *  (player/travelCamera.js leanedUp) - 0 upright, every frame but the view's. Anchored at its foot, a leaned flat's top
  *  swings out by h sin(lean) past the upright quad its sphere was sized for, and tree tops popped at the screen's edge.
  *  The host sets it before its culls; a sphere a little large only draws a little more (the shadows' own, upright,
@@ -231,7 +229,7 @@ export function setFlatLean(sinLean) { _flatLean = Number.isFinite(sinLean) && s
 /** THE LIFT's one home (batchSphere says why it is the whole correctness of the sphere): how far above its placement a
  *  batch's quad is centred - half its height, downward for an upside-down flame's negative one.
  *
- *  PERF-EXT (2026-09-25, the review of the shadows; the players' "fps issues in the exterior but fine in the interior"):
+ *  PERF-EXT:
  *  PERF-EXT1's two placement queries below wrote it out again inline, a copy each - GHOST1's ghost campfire was two
  *  copies of this line disagreeing. Every sphere of a flat and every quad of a batch lift by this now.
  *  @param {{ size?: { h: number }|null }} b */
@@ -252,9 +250,7 @@ export function batchVisible(planes, b) {
 }
 
 /**
- * PERF-EXT1 (2026-09-25, two players via Mac: "fps issues in the exterior
- * but fine in the interior", "me too my friend.. don't know why. I got a
- * RX6600"): A FLAT BATCH REACHES A SHADOW BY ITS PLACEMENTS, NOT BY ITS
+ * PERF-EXT1: A FLAT BATCH REACHES A SHADOW BY ITS PLACEMENTS, NOT BY ITS
  * SPHERE.
  *
  * A streamed pixel's flats are ONE batch per (archive, record) across the
@@ -343,7 +339,7 @@ export function placementGrid(centers) {
 export function placementRadius(half, lean) {
   return (half + lean) * (1 + 1e-5) + 1e-3;
 }
-/** PERF-EXT (2026-09-25, the review of the shadows): a placed batch's quad half-diagonal, taken ONCE for the size it
+/** PERF-EXT: a placed batch's quad half-diagonal, taken ONCE for the size it
  *  has. The replays, the lanterns' dynamic scans and the signature walk asked Math.hypot for it at every ask - 230 to
  *  800 a frame on the provers' harnesses, some 50 ns each, and 40 a lamp a frame in the reviewer's room before the
  *  walk there went by the sphere. A batch's size is its host's to rewrite (a walker's is written through every frame),
@@ -376,7 +372,7 @@ export function placementsInCube(b, rad, px, py, pz, far) {
   c[0] = rad; c[1] = px; c[2] = py; c[3] = pz; c[4] = far;
   return placementsInCubeOf(b, c);
 }
-/** PERF-ALLOC2 (2026-10-10): placementsInCube with its cube in a Float64Array - [rad, px, py, pz, far] - the same test
+/** PERF-ALLOC2: placementsInCube with its cube in a Float64Array - [rad, px, py, pz, far] - the same test
  *  from the same doubles (a Float64Array holds a double exactly). A double handed to a call V8 does not inline is a
  *  heap number: the shadow pass's lantern walk (_candidateQuads) asks this once a placed batch a lantern a frame, and its
  *  five numbers were 153 KB of the 1.4 MB the real game's night frame allocated at Knightstale. */
@@ -432,7 +428,7 @@ export function volumeHash(u) {
   return h;
 }
 /**
- * PERF-VOL (2026-10-11, Mac: "Lets do the biggest remaining lever"): the NAME of a replay's six planes, so the answers
+ * PERF-VOL: the NAME of a replay's six planes, so the answers
  * of placementsInVolume can be kept across frames. Measured in the real game (Knightstale by night, the freeware
  * ARENA2, its inputs captured over three frames): 542 asks a frame and every one the frame before's to the bit - the
  * town's eleven swaying placed batches, each asked by the twelve lanterns' six faces again every frame under Steady

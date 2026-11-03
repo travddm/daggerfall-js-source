@@ -1,6 +1,4 @@
-// FIELD-CSA2 (2026-09-29, Discord #general through Mac - ItMustBeMonday: "I can't get my boat to work"; SylviaBun:
-// "people are saying Ports are bugged for player boats"; Mac's own line the night before, 2026-09-28e: "a player is at
-// a port but unable to set sail"). A deed's boat is put in the water near a port, and with Iliac Puddle No More on (the
+// FIELD-CSA2. A deed's boat is put in the water near a port, and with Iliac Puddle No More on (the
 // default) Come Sail Away reads each of a boat's five nodes as water when `Terrain.SampleHeight(node) < 34` - the mod's
 // WaterLevel, the sea's own height over the terrain. The terrain sampler clamps the whole sea to the ocean elevation,
 // 27.2 x 1.25 = 34 m, and Unity holds a heightmap in 16-bit steps (kMaxHeight, 32766 to the terrain's height): the flat
@@ -224,11 +222,9 @@ test('FIELD-CSA2 on the retail data: the open Bay south of Daggerfall (209, 216)
   smoothLocationNeighbourhood(mapDict, woods);   // the boot's own repair (world.js), before any pixel streams
   // world.js's own csaIsPortTown, mounted: Daggerfall (207, 213) is a port by its byte
   const { hasPortFor } = await import('../../../src/systems/travel/travelPorts.js');
-  // PIN MOVED (THE CAPTAIN'S SEA, ETHER-PORTS - found by AUDIT CAPTAIN'S SEA's touched run with the data): an isle's port
   // is a port past the Veil (`etherSea && inEther(x, y)` first), so the sea, its law and an isle's port stand in scope - the
   // sea on, and an isle's port answering every pixel it is asked of, so a Bay pixel that asked it would read a port
   const { inEther } = await import('../../../src/world/ethericSea.js');
-  // PIN MOVED (TESA6, at the merge of main into TESA): past the Bay an Arena port answers (`onTheBay` the Bay's frame,
   // world/tamriel/tamrielFrame.js inBay) - the Bay's pixels ask the Bay's table as before, and a port past it would read one
   const { inBay } = await import('../../../src/world/tamriel/tamrielFrame.js');
   const isPortTown = new Function('travelLocationSummaryAt', 'mapDict', 'maps', 'hasPortFor', 'etherSea', 'inEther', 'etherPortAt', 'onTheBay', 'arenaPortAt', `${constOf('  const csaIsPortTown = (x, y) => {')}\nreturn csaIsPortTown;`)(locationSummaryAt, mapDict, maps, hasPortFor, true, inEther, () => ({}), inBay, () => ({}));

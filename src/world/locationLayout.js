@@ -47,7 +47,7 @@ export function hasCustomLocationPosition(dfLocation) {
  */
 export const layoutLocation = (dfLocation, mapsFile, blocksFile, opts = {}) => stepsDone(layoutLocationSteps(dfLocation, mapsFile, blocksFile, opts));
 /**
- * IC-STUTTER (2026-10-27, bible/03-World/Arena-Provinces.md IC-STUTTER): layoutLocation a block at a time - the same
+ * IC-STUTTER: layoutLocation a block at a time - the same
  * blocks laid out in the same order. A city of sixty-four blocks (a near slice of the Imperial City, every few seconds at
  * x60) was laid out in one task of its pixel's build; the build walks these steps through its breather.
  * @param {any} dfLocation @param {any} mapsFile @param {any} blocksFile @param {{enhanced?:boolean, windmills?:boolean}} [opts]

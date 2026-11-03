@@ -1,8 +1,8 @@
 // @ts-check
-// STAR7 (2026-10-20): STARFALL GLASS - pale glass from a fallen star that still holds some of its light, one to three pieces
+// STAR7: STARFALL GLASS - pale glass from a fallen star that still holds some of its light, one to three pieces
 // in every held star's spoils (the Heart-Star's twice that; systems/starfall/starSpoils.js). Template 576 (starglassRow.js -
 // the leaf the item law reads headless), miscellany, stacked, traded freely, and a good price at any counter: the star's
-// glass is a thing the Mages Guild buys and the covens want back. Design: bible/11-Multiplayer/Starfall.md section 6.
+// glass is a thing the Mages Guild buys and the covens want back. Design:
 //
 // ITS NAME (AUDIT STAR I1): it was "Starglass", the name the Eltheric Ocean's trade good already wore (systems/naval/
 // tradeGoods.js, template 1340 - a ship's cargo), and the harbour's exchange counts by template, so a captain carrying the

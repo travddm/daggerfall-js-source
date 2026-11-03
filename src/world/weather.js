@@ -37,8 +37,7 @@ import { UMRandom } from '../formats/umRandom.js';
 
 export const WEATHER_TYPES = Object.freeze([
   'sunny', 'cloudy', 'overcast', 'fog', 'rain', 'thunder', 'snow',
-  // WEATHER2d (2026-09-14, Mac: "a new sand storm weather event for
-  // desert regions"): the port's own EIGHTH word, APPENDED so DFU's
+  // WEATHER2d: the port's own EIGHTH word, APPENDED so DFU's
   // seven keep their enum values (a save's byte, the classic array's
   // 0x7f mask and 5<->6 swap, WeatherTable.json's seven columns are all
   // untouched). It is never rolled: the weather field (systems/

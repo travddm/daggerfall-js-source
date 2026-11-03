@@ -1,9 +1,8 @@
-// CAMP-ROLL (2026-10-04, the player: "In a party, or with other players. Every player spawns their own enemies when
-// resting"; then "Do it"): ONE ROLL A CAMP. Online, members resting with the party within its 15 m who each press
+// CAMP-ROLL: ONE ROLL A CAMP. Online, members resting with the party within its 15 m who each press
 // Rest elect one roller - the lowest account id among the acts open on a night, read off the pose (`restStartedAt`'s
 // camp marks, `rs`) - and only that night rolls its ambush; the others wait ("Resting with Ada..."), then sleep the
 // roller's night as theirs with no roll of their own, or break with the roller's ambush, or roll their own once the
-// roller leaves or CAMP_WAIT_MS runs out. bible/06-Systems/Rest-Arc.md 2.6 and As built.
+// roller leaves or CAMP_WAIT_MS runs out. 2.6 and As built.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

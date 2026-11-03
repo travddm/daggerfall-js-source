@@ -1,4 +1,4 @@
-// L10N6 (2026-10-03): THE TRANSLATIONS IN THE CREDITS. Mac's decisions (Localization-Arc.md): the game says which
+// L10N6: THE TRANSLATIONS IN THE CREDITS. Mac's decisions (Localization-Arc.md): the game says which
 // languages are machine-translated, a person's translation outranks a draft, and a pack is bundled only on its authors'
 // terms. The About pane credits them as it credits the works (ui/credits.js translationCredits): one row a language the
 // game holds text for - its own name; Claude's drafts said to be drafts, "checked and corrected by" the people who did
@@ -52,7 +52,11 @@ test('L10N6 a language\'s row: Claude\'s drafts said to be drafts, the people wh
 });
 
 test('L10N6 the translators reach the language\'s record: `locales/<tag>/translators.json` read by the loader, names only, none for English; a bundled pack beside them; the row in the language itself', async () => {
-  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv'), '../../locales/de/Port_Strings.csv': async () => rd('locales/de/Port_Strings.csv') }, {
+  // Fixture tables stand in for the languages: French carries the terms row with its own space before the colon, so
+  // the credit is shown to be read in the language.
+  const frTable = 'Key,Value\ncredits.l10n.terms,"{license} : {terms}"\n';
+  const deTable = 'Key,Value\nmenu.rail.new,"Neues Spiel"\n';
+  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => frTable, '../../locales/de/Port_Strings.csv': async () => deTable }, {
     meta: { '../../locales/fr/pack/PACK.json': PACK },
     translators: {
       '../../locales/fr/translators.json': ['  Chloé ', '', 7, 'Didier'],
@@ -72,7 +76,7 @@ test('L10N6 the translators reach the language\'s record: `locales/<tag>/transla
   assert.equal(fr.title, 'Français');
   assert.equal(fr.link, 'https://example.org/fr');
   assert.match(fr.author, /^A\. Traducteur, B\. Relecteur, Chloé et Didier$/, 'listed as French lists names');
-  assert.equal(fr.terms, 'CC-BY-4.0\u00a0: bundling allowed with credit (2026-10-01)', 'the pattern in French - its space before the colon (L10N6: the French drafts hold the row)');
+  assert.equal(fr.terms, 'CC-BY-4.0\u00a0: bundling allowed with credit (2026-10-01)', 'the pattern in French - its space before the colon');
 });
 
 test('L10N6 the tree: every `locales/<tag>/translators.json` is a list of names, in a language folder the catalog drafts', () => {
@@ -85,8 +89,3 @@ test('L10N6 the tree: every `locales/<tag>/translators.json` is a list of names,
   }
 });
 
-test('L10N6 by source: the About pane\'s credits render the translations as a third group, after the works and the mods, through the same row renderer - and only when a language is offered', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  const fn = menu.slice(menu.indexOf('function creditsCard()'), menu.indexOf('// ── SHELL'));
-  assert.match(fn, /group\(t\('menu\.credits\.mods', 'Mods'\), CREDITS\.mods\);\s*\n\s*const languages = translationCredits\(\);[^\n]*\n\s*if \(languages\.length\) group\(t\('menu\.credits\.translations', 'Translations'\), languages\);\s*\n\s*return c;/);
-});

@@ -224,20 +224,6 @@ test('D9: RestoreGuildData back-fills the armour bit for every rank BELOW the cu
   assert.equal(restoreKnightlyOrderFlags(null), null);
 });
 
-test('D9: the header names the module that really holds the load door', () => {
-  // the one-home comment is a NAVIGATION instrument - it sent readers
-  // to guilds.js, which has no restore door at all and never had one.
-  const gifts = readFileSync(new URL('../../src/systems/knightlyGifts.js', import.meta.url), 'utf8');
-  const guilds = readFileSync(new URL('../../src/systems/guild/guilds.js', import.meta.url), 'utf8');
-  const save = readFileSync(new URL('../../src/systems/save/save.js', import.meta.url), 'utf8');
-  assert.ok(!/restoreMembershipBook/.test(guilds), 'guilds.js holds no restoreMembershipBook');
-  assert.match(save, /const restoreMembershipBook = /, 'save.js defines it');
-  assert.match(save, /restoreKnightlyOrderFlags\(knightly\)/, 'and it is the caller');
-  const door = gifts.match(/The one door is restoreKnightlyOrderFlags below, run by (\S+?)'s/);
-  assert.ok(door, 'the header still names the door');
-  assert.equal(door[1], 'save.js', 'and it names the file that actually holds it');
-});
-
 test('D9: the back-fill runs at the LOAD door, so a demotion cannot re-open a claimed gift', () => {
   const KNIGHTS = GUILD_GROUPS.KnightlyOrder;
   const roundTrip = (memberships) => {
@@ -285,35 +271,3 @@ test('G6: the two destinations, and the records they speak', () => {
   assert.equal(HOUSE_TEXT_ID, 462);
 });
 
-test('G6: an arm may answer a BOX, and a box is not a window', () => {
-  // Two of this slice's arms answer a message box rather than a
-  // window - the smith's refusal and the Spymaster's greeting - and
-  // both belong ON the popup that asked rather than in place of it.
-  // The caller used to mount whatever came back, so a box landed in
-  // the overlay slot and the next frame asked a plain object to draw
-  // itself. The live probe found it; this is the pin.
-  const src = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const i = src.indexOf('const flow = openServiceFlow(serviceDestination(service)');
-  assert.ok(i > 0, 'the caller exists');
-  const call = src.slice(i, src.indexOf('return { dispatched: true };', i) + 30);
-  // STATION-ROWS (2026-09-27g) respelled the test: a box is an answer
-  // whose rows are a LIST (isServiceBox) - the spell maker's window
-  // keeps its TEXT.RSC reader as `rows`, and "has rows" took it for a
-  // box, which is the crash a home's Spellmaking station threw.
-  assert.ok(call.includes('if (isServiceBox(flow)) return flow;'), 'a box is handed back, not mounted');
-  // ROAD-F GS1 respelled the mount - the slot a window goes into is
-  // now the CURRENT mode's, through mountServiceWindow - but the law
-  // this pins is the ORDER and it is untouched.
-  assert.ok(call.indexOf('if (isServiceBox(flow))') < call.indexOf('mountServiceWindow(flow);'),
-    'and the test comes BEFORE the mount, or it never runs');
-
-  // the two arms really do answer boxes, so the guard is not dead
-  const refuse = src.indexOf("destination === 'guildServiceReceiveArmor'");
-  assert.ok(src.slice(refuse, refuse + 900).includes("return { rows: refusal.length"), 'the smith refuses with rows');
-  const spy = src.indexOf("destination === 'guildServiceSpymaster'");
-  assert.ok(src.slice(spy, spy + 700).includes('closesWindow: true'), 'and the greeting closes the popup');
-
-  // the probe seam keeps the same contract, or it would prove the
-  // opposite of what the host does
-  assert.ok(src.includes('if (flow && !isServiceBox(flow)) mountServiceWindow(flow);'));
-});

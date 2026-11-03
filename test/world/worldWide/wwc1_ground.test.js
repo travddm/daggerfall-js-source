@@ -1,5 +1,4 @@
-// WW-C1 (2026-10-24, bible/03-World/World-Wide.md WW-C; the owner: "Each region becomes home to their own abundant
-// harvesting resources with other resources sprinkled in. ... Cryodil will be home to all abundent resources") - THE
+// WW-C1 - THE
 // PROVINCES' GROUND: each province past the Bay rich in its own kinds and ore (net/provinceNodes.js), Cyrodiil in every
 // one, on ground the witnesses confirmed; the nodes' law's ground the world's whole grid (net/nodeLaw.js pixelOk), and a
 // province never claimed on the Bay's own map (regionOnPixel). One slot law both ends read (nodeSlots).
@@ -165,10 +164,8 @@ test('WW-C1 both ends: the client stands the pixel\'s region into every kind, th
   assert.match(src('src/scenes/herbHost.js'), /px, py, day, climate: info\.climate, region: info\.region, confirmed, seasonalEye:/);
   assert.match(src('src/scenes/mineHost.js'), /boulders\(\{ x: px, y: py, day, climate, region, confirmed \}\)/);
   const svc = src('server-account/src/professions.js');
-  // PIN MOVED (AUDIT TESA II J5, bible/06-Systems/Professions-Arc.md JUNGLE-WOODS PAST THE BAY): and the witnesses' jungle word
   assert.match(svc, /n\.slot >= nodeSlots\(n\.kind, \{ x: n\.x, y: n\.y, climate, region, confirmed, jungle: fact\?\.jungle === true \}\)\) return \{ error: 'bad-node' \}/);
   assert.match(svc, /!regionOnPixel\(region, n\.x, n\.y\)\) return \{ error: 'prof-pixel' \}/);
-  // PIN MOVED (AUDIT TESA II J5): a tree's call with the witnesses' jungle word
   for (const call of [/tree\(\{ x: n\.x, y: n\.y, day, slot: n\.slot, climate, region, confirmed, jungle: fact\?\.jungle === true \}\)/, /herbPatch\(\{ x: n\.x, y: n\.y, day, slot: n\.slot, climate, region, confirmed,/, /boulder\(\{ x: n\.x, y: n\.y, day, slot: n\.slot, climate, region, confirmed \}\)/]) {
     assert.match(svc, call);
   }

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1b (2026-09-25) - THE GUILD, AS THIS CLIENT HOLDS IT.
+// GUILD1b - THE GUILD, AS THIS CLIENT HOLDS IT.
 //
-// Mac, of the holdings: "future ownership for online guilds"; asked,
+// asked,
 // founding takes "Gold and Renown", a guild is joined "Per character",
 // its ranks are "Four, renamed by the guildmaster", and the treasury is
 // the "Guildmaster only" to take from. GUILD1a built the service
@@ -64,13 +64,12 @@ import { PLAY_GRACE_S } from '../playClock.js';   // GUILD-SEEN: and "Online" by
 /** A look older than this is taken again when the tab opens. */
 export const GUILD_FRESH_MS = 30_000;
 
-/** GUILD-SEEN (2026-10-11, the owner: "the guild member list needs a 'last online' info, just like the friend list
- *  does"): IS A ROSTER MEMBER AT PLAY? The service says each member's `seenAt` - its account's last play beat
+/** GUILD-SEEN: IS A ROSTER MEMBER AT PLAY? The service says each member's `seenAt` - its account's last play beat
  *  (server-account/src/guilds.js viewOf), knocked every PLAY_BEAT_S while a tab is in the world - and a member is online
  *  while that sitting is open by the service's own law: no wider gap since the beat than PLAY_GRACE_S, the gap
  *  accounts.js creditPlay counts as one sitting. The reader's own row is online - they are playing it. Null where the
  *  service said no stamp (a Worker before acct113): the row then says nothing of presence.
- *  AUDIT HIDDEN-UNCOUNTED C1 (the owner, asked: "Last seen when hid"): but not a hidden staff member's own (`hidden`, said
+ *  AUDIT HIDDEN-UNCOUNTED C1: but not a hidden staff member's own (`hidden`, said
  *  of the reader's row alone, server-account/src/guilds.js viewOf) - at play to nobody, their own "N online" included. */
 export function guildMemberOnline(m, nowMs) {
   if (!Number.isSafeInteger(m?.seenAt)) return null;
@@ -246,7 +245,7 @@ export class GuildBook {
       if (r?.ok && typeof r.data?.outOrder === 'string') this._hand({ outOrder: r.data.outOrder });
       // AUDIT2 GUILD2 S2/S7: a refusal's own reason kept - the word the name filter caught (`why`), and when a refused act may
       // come again (`at`, a rename's fortnight) - so the page can say them
-      // GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md): and a leave's or a disbanding's whole list of what holds it
+      // GUILD3c: and a leave's or a disbanding's whole list of what holds it
       return r?.ok ? { ok: true, data: r.data } : { ok: false, error: r?.error ?? 'server', ...(typeof r?.why === 'string' ? { why: r.why } : {}), ...(Number.isSafeInteger(r?.at) ? { at: r.at } : {}),
         ...(Array.isArray(r?.keeps) ? { keeps: [...r.keeps] } : {}) };
     } finally {
@@ -351,7 +350,7 @@ export class GuildBook {
   handOver(member) { return this._act((c) => this.door.handOver(c, member)); }
   disband() { return this._act((c) => this.door.disband(c)); }
 
-  // ═══ GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md) - A NEW NAME, AND THE VAULT ═══════════════════════════════════
+  // ═══ GUILD2 - A NEW NAME, AND THE VAULT ═══════════════════════════════════
 
   /** GUILD2a: A NEW NAME, TAG OR BOTH - the guildmaster's, paid from the treasury on the service (no purse moves). The new
    *  tag rides the answer's order to the rooms (GUILD1c), as a founding's does. */
@@ -456,7 +455,7 @@ export class GuildBook {
     const town = at ? at.mapId : this.guild?.hall?.mapId ?? null;
     return this._hallTold(town, await this._act((c) => (at ? this.door.hallSell(c, at) : this.door.hallSell(c))));
   }
-  /** DOMAIN2 (bible/11-Multiplayer/Domains.md 6): BUY THE CASTLE of `region`, whose crown the guild holds - the Guildmaster's,
+  /** DOMAIN2 (6): BUY THE CASTLE of `region`, whose crown the guild holds - the Guildmaster's,
    *  in silver from the treasury. ONE REQUEST ID A PURCHASE: the same region asked again after an answer that never came
    *  carries the same id, and the service answers it `repeat` rather than burning twice. */
   async buyCastle(region) {

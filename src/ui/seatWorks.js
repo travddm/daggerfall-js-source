@@ -1,6 +1,5 @@
 // @ts-check
-// SEAT2b (2026-10-01, Mac: "Finish the seats"; "We need to do a comprehensive audit on everything and finish the not
-// done"): THE WORKS - the Seat tab's fortifications panel (bible/11-Multiplayer/Seats-Arc.md 7.9: "the stockpile: every
+// SEAT2b: THE WORKS - the Seat tab's fortifications panel (7.9: "the stockpile: every
 // fortification project and what it still needs, each need a writ on the Work tab"; 7.5 the works). Each work the seat
 // may raise, its tier and what it does, the project raising its next tier and what it still wants (or the day it
 // stands); the stockpile; and for the holder's Guildmaster or an Officer, a lever a work - "Raise the Walls to tier 2
@@ -76,7 +75,7 @@ export function drawSeatWorks(host, { forts, seat, port = false, lever = false, 
   return buttons;
 }
 
-// ─── DOMAIN1: A GIFT TO THE TOWN (bible/11-Multiplayer/Domains.md 5) ──────────────────────────────
+// ─── DOMAIN1: A GIFT TO THE TOWN (5) ──────────────────────────────
 
 /** The gift panel's heading, by its place. */
 export const giftHead = (place) => (place === 'camp' ? t('seat.gift.headCamp', 'Give to the Siege Camp') : t('seat.gift.headStockpile', 'Give to the stockpile'));

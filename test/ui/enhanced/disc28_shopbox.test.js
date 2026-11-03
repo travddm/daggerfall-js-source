@@ -1,4 +1,4 @@
-// DISC28-C (2026-09-28, Discord screenshot: the shop's Yes/No box with a column of row markers drawn over it).
+// DISC28-C.
 //
 // The confirm box is a scrim appended inside the counter window after the lists (ui/enhanced/enhancedTrade.js boxScrim), at
 // position absolute and z-index auto. The rows' furniture climbs out of auto - the wear bar at 1 (WEAR-UI), the sigil

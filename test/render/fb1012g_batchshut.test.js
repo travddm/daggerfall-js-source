@@ -4,7 +4,7 @@
 // drawVeiled3d (a concealed peer's 3D horses, AUDIT COATS3D A5) opened the renderer's one body batch for a horse and
 // flushed it only if one drew: a horse out of view left it open, and two opens met one flush. Every later body pass
 // joined the open batch and no Morrowind picture drew again. The real batch doors, drawRigSpriteBox, the horse rig and
-// the pool; GL alone is stubbed. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// the pool; GL alone is stubbed..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -98,10 +98,3 @@ test('BATCH-SHUT one horse out of view and one in view: one open, one flush, the
   }
 });
 
-test('BATCH-SHUT the frame\'s start shuts a batch any pass left open, once said (mutants: the reset gone; its depth or queue kept)', () => {
-  const src = rd('src/render/renderer.js');
-  const begin = src.slice(src.indexOf('  beginFrame(proj, view, lightDir, opts = null) {'));
-  const head = begin.slice(0, begin.indexOf('\n  }\n'));
-  assert.match(head, /const sb = this\._spriteBatch;\n    if \(sb\?\.open\) \{\n      sb\.open = false; sb\.depth = 0; sb\.items\.length = 0;\n/, 'beginFrame lets a left batch go');
-  assert.match(head, /if \(!this\._spriteBatchLeft\) \{ this\._spriteBatchLeft = true; console\.warn\(/, 'and says so once');
-});

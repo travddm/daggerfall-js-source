@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CYRODIIL-WATERS (2026-10-26, bible/03-World/Tamriel.md CYRODIIL-WATERS; KPbICA's spec, forwarded by the owner: "For
-// Cyrodill I would suggest to use this detailed map") - THE RIVERS AND LAKES PAST THE BAY, carved into the land, and THE
+// CYRODIIL-WATERS - THE RIVERS AND LAKES PAST THE BAY, carved into the land, and THE
 // LAW EVERY OTHER SYSTEM ASKS OF THEM.
 //
 // The trace's water (TAMRIEL3) is the picture's: a sea, Lake Rumare's ring, the Niben - fifteen kilometres a pixel, and
@@ -567,7 +566,7 @@ export function riverRaster(x0, y0, w, h) {
 }
 
 /**
- * ROAD-LOOK (bible/03-World/Roads.md ROAD-LOOK): THE LAKES' PIXELS OVER A BOX (Bay pixels x0..x0 + w - 1, y0..y0 + h - 1),
+ * ROAD-LOOK (ROAD-LOOK): THE LAKES' PIXELS OVER A BOX (Bay pixels x0..x0 + w - 1, y0..y0 + h - 1),
  * row-major: 1 where the pixel's middle stands in a lake or within `margin` Bay pixels of its water - the roads' question:
  * a lake is carved inside the kernel, narrower than the bytes say, and the router crossed it as dry ground (its water
  * painted round the road's tiles - a dry strip across Lake Arrius and Lake Poppad).

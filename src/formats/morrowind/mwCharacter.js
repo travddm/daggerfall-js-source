@@ -296,7 +296,7 @@ export function bindPart(skeleton, partNif, opts = {}) {
 export const isTriBip = (name) => String(name || '').toLowerCase().startsWith('tri bip');
 
 /**
- * MWNPC9 (bible/04-Characters/Morrowind-NPCs.md section 14): A CREATURE'S MODEL, BOUND TO ITS OWN SKELETON. A
+ * MWNPC9: A CREATURE'S MODEL, BOUND TO ITS OWN SKELETON. A
  * creature is not dressed: its model IS the object root (setObjectRoot), its skeleton is built from the same file, and
  * each of its shapes is drawn where the file puts it - the skinned ones by their bones (bindPart's rebind, rule 12),
  * and every RIGID one riding the node it hangs under, as the reference's scene graph carries it. A Morrowind skeleton

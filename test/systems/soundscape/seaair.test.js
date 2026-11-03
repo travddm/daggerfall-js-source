@@ -1,4 +1,4 @@
-// SEA-AIR (2026-10-24, the owner: "different music and ambience sounds for sailing"; bible/08-Audio/Audio.md SOUNDSCAPE):
+// SEA-AIR:
 // THE DECK'S AIR AT SEA (systems/soundscape/seaAir.js). The laws: the sea state of the wind and the weather; the swell's
 // clock; the three beds' levels and pitches (the swell's floor and gale, the wash nothing until she has way, the rigging
 // only in a strong wind or a storm); the gulls' weather and gaps; the watch bells - the count each half hour of a
@@ -6,7 +6,7 @@
 // first frame aboard, the gulls only by day in fair weather with land near and nothing else of the deck's own
 // (DECK-QUIET, 2026-10-26: the slaps, creaks, ropes, luffs and spray gone), her bell hers and never the camera's, a
 // pause holding every clock, the bells at the world's own pace only - a half hour crossed (midnight too), never a jump,
-// never at a dial's pace, never twice in a minute of real time. AUDIT SOUNDSCAPE (2026-10-24): S1, S3, S6, S9; every
+// never at a dial's pace, never twice in a minute of real time. AUDIT SOUNDSCAPE: S1, S3, S6, S9; every
 // number the record states pinned to its literal (P6).
 import '../../modsOff.js';
 import { test } from 'node:test';

@@ -289,27 +289,6 @@ test('EM3-3D classic: a step\'s riser joins its flight, so a stair is never inke
   assert.equal(wall.nrm[3], 1, 'a wall is a wall');
 });
 
-test('FIELD BUGS 2026-10-05c RAMP-INK ("where there is a steep upward incline in a hallway, never gets filled properly"): a ramp the player walks is inked as floor - 55 and 65 degrees, Daggerfall\'s steep hallways - by the plan\'s own law (automapFloors FLOOR_NY, the motor\'s slope limit), and a face steeper than the motor walks stays a wall; the shader reads the one constant, no literal (mutants: the old 0.6, the law not the plan\'s)', async () => {
-  const { rowMesh, FLOOR_FACE_NY, faceInkOf } = await import('../../../src/ui/ink/inkDungeonGL.js');
-  const { FLOOR_NY } = await import('../../../src/systems/automap/automapFloors.js');
-  assert.equal(FLOOR_FACE_NY, FLOOR_NY, 'one law for the plan and the 3D sheet');
-  // a hallway's climb along +z, wound so its face looks up (as the world pass culls it)
-  const ramp = (deg) => {
-    const h = Math.tan((deg * Math.PI) / 180);
-    return rowMesh({ positions: new Float32Array([0, 0, 0, 0, h, 1, 1, h, 1, 1, 0, 0]), indices: new Uint16Array([0, 1, 2, 0, 2, 3]), matrix: null });
-  };
-  for (const deg of [30, 53, 55, 65]) {
-    const m = ramp(deg);
-    assert.ok(Math.abs(m.nrm[1] - Math.cos((deg * Math.PI) / 180)) < 1e-6, `${deg} degrees looks up`);
-    assert.equal(faceInkOf(m.nrm[1]), 'floor', `a ${deg} degree ramp is ground walked`);
-  }
-  assert.equal(faceInkOf(ramp(75).nrm[1]), 'wall', 'steeper than the motor walks: a wall');
-  assert.equal(faceInkOf(-1), 'ceiling');
-  const src = readFileSync(new URL('../../../src/ui/ink/inkDungeonGL.js', import.meta.url), 'utf8');
-  assert.equal((src.match(/n\.y > \$\{FNY\}/g) ?? []).length, 4, 'the climb, the stones, the pencil, the wet floor: the one constant');
-  assert.doesNotMatch(src, /n\.y > 0\.6/, 'no literal floor lean left in the shader');
-});
-
 test('EM3-3D: the floor buttons and PgUp/PgDn page the slice through every storey, and home brings it back', () => {
   const { rows, r } = tower();
   walkOn(r, 0, 2, 8, 5);

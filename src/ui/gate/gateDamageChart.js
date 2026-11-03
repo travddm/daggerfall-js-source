@@ -1,6 +1,5 @@
 // @ts-check
-// GATE-UX (2026-10-01, Mac: "Develop a detailed damage chart after the boss kill, showing and ranking everyone's
-// damage"): THE DAMAGE CHART - once the Warden has fallen, every challenger who had a part in the fight, ranked by what
+// GATE-UX: THE DAMAGE CHART - once the Warden has fallen, every challenger who had a part in the fight, ranked by what
 // they dealt: their name and level, a bar of their damage against the most anyone dealt, the number, their share of the
 // court's whole, the blows they landed on him and the heaviest of them, what went into the crystals of Oblivion, and how
 // many times they fell. The relay makes it at the kill (net/gate/gateBrain.js damageChart - every number is its own count,
@@ -15,8 +14,7 @@
 // The first DAMAGE_CHART_ROWS are shown; when I am further down, my own row is shown under them at my rank, and the
 // fighters not shown are counted. `damageChartModel` is pure - the pins' door.
 //
-// GATE-HEAL (2026-10-01, Mac: "Can we add a line on the damage round up showing the amount healed?" - each challenger's;
-// "Like for healers" - allies only): a Healed column, last, whenever anyone in the court healed another - what each
+// GATE-HEAL: a Healed column, last, whenever anyone in the court healed another - what each
 // challenger healed in others (net/gate/gateBrain.js applyHeal: each one healed says it, the caster is credited); on a narrow
 // screen it takes the share's place. The ranking is the damage's still.
 //

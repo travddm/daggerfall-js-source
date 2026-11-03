@@ -1,5 +1,5 @@
 // @ts-check
-// VEIN-CRACKS (GATHER-FEEL II, 2026-10-13, Mac: "Do the not done"; bible/06-Systems/Professions-Arc.md 5.2's Mining
+// VEIN-CRACKS (GATHER-FEEL II, 2026-10-13,; 5.2's Mining
 // row - "It cracks in stages (crack decals) and sheds chunks" - and section 45): A WORKED VEIN CRACKS. A leaf: the GLSL
 // both billboard shaders share (the classic one, render/renderer.js BB_FS, and the Enhanced Lighting lane's,
 // render/enhancedLighting.js EL_BB_FS), and the batch's field - DISSOLVE's shape (systems/dissolve.js).

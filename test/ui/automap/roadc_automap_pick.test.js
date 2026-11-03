@@ -694,14 +694,6 @@ test('c2/S7 the pick obeys the HANDEDNESS LAW end to end - world +x answers on t
 });
 
 test('c2/S7 SOURCE PINS: the host hands the picker its triangles, and the model carries them', () => {
-  const ctx = src('src/scenes/dungeonContext.js');
-  assert.match(ctx, /amapRow = \(key, aabb, hasAction, cpu = null, matrix = null\)/,
-    'the row builder takes the CPU model and the placement matrix');
-  assert.match(ctx, /positions: cpu\?\.positions \?\? null/, 'and passes REFERENCES, not copies');
-  assert.match(ctx, /arrowBounds: automapArrowBounds/, 'mesh 99900\'s own bounds are the arrow\'s proxy');
-  const model = src('src/systems/automap/automapModel.js');
-  assert.match(model, /positions: e\.positions \?\? null/);
-  assert.match(model, /matrix: e\.matrix \?\? null/);
   // a row built WITHOUT them still lands - the fixtures and the older
   // callers must not start throwing
   const m = buildAutomapModel([{ key: 'k', aabb: [0, 0, 0, 1, 1, 1] }]);

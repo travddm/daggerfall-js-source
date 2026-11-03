@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.3): THE HUNTER'S RANK IN WORDS - the rungs' names, the
+// HUNTERS-MARK: THE HUNTER'S RANK IN WORDS - the rungs' names, the
 // bounty board's header line (ui/bounty/bountyWindow.js) and the Standing page's block (ui/enhanced/enhancedMenu.js
 // statsStanding), each read off the hunt's book (net/huntBook.js) - the account service's count, never the save's.
 import { t } from '../../systems/textManager.js';

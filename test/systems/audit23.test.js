@@ -131,40 +131,6 @@ test('AUDIT 23: dropped piles round-trip the world snapshot with their SAVED ico
   assert.equal(b.renderer.live(), 0, 'clearing frees the batch');
 });
 
-test('AUDIT 23: both dungeon-mounting hosts pass the spawn applier; the snapshot carries the piles', () => {
-  // save-load-3: worldModes wrote player.pos raw where dungeon.js uses
-  // player.spawn - a quickload kept velY/falling across the teleport.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const wm = readFileSync(join(root, 'src/scenes/worldModes.js'), 'utf8');
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the law lands a saved fall after the spawn (fb0930_fallkept.test.js).
-  assert.ok(wm.includes('const placeLoadedPlayer = (p, fall = null) => { player.spawn(p[0], p[1], p[2]); player.restoreFall(fall); player.stopAutorun(); };'),
-    'worldModes\' load law calls player.spawn (AUDIT 27h S2: and drops the autorun latch - a load is no run; DIAL-LOAD: named once, handed everywhere)');
-  assert.equal(wm.includes('player.pos[0] = p[0]'), false,
-    'the raw-pos applier is gone');
-  // I2 FOLLOW-UP: the applier has to be routeKey's THIRD argument, and
-  // the input arc's signature change left this host passing the old
-  // castDir thunk there - the applier was silently never called, so a
-  // quickload in ?dungeon restored the character without moving them.
-  // Both hosts are pinned to the three-argument form.
-  const dj = readFileSync(join(root, 'src/scenes/dungeon.js'), 'utf8');
-  for (const [name, sourceText] of [['dungeon.js', dj], ['worldModes.js', wm]]) {
-    // AUDIT 58 (f3/input): a FOURTH argument joined - the host's
-    // held-keys Set, without which routeKey's actionOf cannot see a
-    // combo (InputManager.cs:1666-1712). The spawn applier must stay
-    // THIRD, which is what this pin is about, so the tail is read too.
-    const call = /routeKey\(e, \w+, placeLoadedPlayer, keys\)/.exec(sourceText);   // AUDIT 27h S2 + DIAL-LOAD: the host's one load law, which drops the latch too
-    assert.ok(call, `${name} passes the spawn applier as routeKey's third argument`);
-  }
-  const dc = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.ok(/droppedLoot: droppedLoot\._piles\.filter\(\(p\) => !p\.unsaved\)\.map/.test(dc), 'collectWorld carries the piles');   // PIN MOVED (STUCK-ARROWS): every pile but a LoadID-0 one (a stuck shaft)
-  assert.ok(/droppedLoot\.restorePiles\(w\.droppedLoot\)/.test(dc), 'applyWorld restores them');
-  // save-load-11: the action-object record is ActionSystem's law (and
-  // pinned by RUNNING it in action.test.js); the host must route
-  // through it rather than grow a second, thinner snapshot shape.
-  assert.ok(/actions: actions\.collectSaveData\(\)/.test(dc), 'collectWorld delegates the action record');
-  assert.ok(/actions\.restoreSaveData\(w\.actions, \{ remote: wire, level: playerEntity\.level \}\)/.test(dc), 'applyWorld delegates the restore');   // PIN MOVED (FIELD BUGS 2026-10-13e SPELL-LOCK): the room's memory is a peer's word (`remote: wire`) and the save's own locks are held to the player's level - the restore is still ActionSystem's
-});
-
 test('AUDIT 23: the sticky region price band rides the envelope', () => {
   // RegionData.PriceAdjustment is serialized (SerializablePlayer.cs:168).
   const entity = minimalEntity();

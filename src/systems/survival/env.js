@@ -17,7 +17,7 @@
 // is a registry; a second host in one boot is the dev scenes' case and
 // registers its own).
 //
-// SURV-TIERS (2026-09-23): THE TIER RIDES THE SAME SEAM. The feed hands
+// SURV-TIERS: THE TIER RIDES THE SAME SEAM. The feed hands
 // the minute law the live tier's rules (`deps.rules`, survival/
 // difficulty.js), and the gate is installed on every host but answers
 // only in a tier that refuses a sleep (`restGate` - Hard's alone).
@@ -108,7 +108,7 @@ export function uninstallSurvivalGate(pair, unregister) {
 export const survivalRecordAt = (entity, now) => survivalOf(entity, now);
 
 /**
- * TEMP-UI (2026-10-12): WHERE THE BODY LAST STOOD, AND WHAT IT WOULD FEEL THERE NOW. Every host hands its reader to the
+ * TEMP-UI: WHERE THE BODY LAST STOOD, AND WHAT IT WOULD FEEL THERE NOW. Every host hands its reader to the
  * one feed above, every frame the needs run, so the feed keeps the last environment and the body's context it built
  * for each entity - held weakly, never on the entity, so nothing of it rides a save or the wire. The pack reads it to
  * show the felt temperature as it stands this instant, and as it WOULD stand in other clothes (`worn`, a slot array,

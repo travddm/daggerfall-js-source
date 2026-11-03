@@ -1,6 +1,6 @@
 // @ts-check
 // THE PLAYER IS TOLD WHEN THEIR PROGRESS HAS NOT REACHED THE REALM (FIELD BUGS 2026-10-25, guild standing and quests
-// reset; bible/06-Systems/Realm-Arc.md, SAVES-SAID).
+// reset;, SAVES-SAID).
 //
 // A realm character's checkpoint that the service refuses for a while (its own error, the request rate) or never
 // answers (no network) waits on this device: the session keeps the newest save here and sends it again at the next

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// EXACT-PIECES (2026-10-26, the owner: "No band aids"; bible/06-Systems/Travel-View.md EXACT-PIECES) - THE LAND'S PIECES AT
+// EXACT-PIECES - THE LAND'S PIECES AT
 // THE PIXEL, A REGION AT A TIME. FAST-REFUSAL's pieces are the trace's, and a strait narrower than two of its centres is
 // one piece there: Mournhold to Ebonheart (Ebonheart's ground cut from the mainland's by such water) still spent the
 // planner's whole count before "no way". The roads' regions read every pixel of the land as they are laid

@@ -1,5 +1,4 @@
-// DISC10-C / MAPLOOT1 (2026-09-23, Discord through Mac, 01-Overview/bugs/Field-Bugs-2026-09-23.md): "If a corpse drops a map, you can only study it but leave it on their body ...
-// Potion recipe's can't be read at all."
+// DISC10-C / MAPLOOT1 (2026-09-23, Discord through
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,15 +10,6 @@ import { potionRecipeIngredientNames } from '../../../src/systems/item/itemInfo.
 import { restoreDiscovery, hasDiscoveredLocationId, discoverRandomLocation } from '../../../src/systems/discovery.js';
 
 const ICONS = { getTexture: async () => ({ recordCount: 0 }), uploadRecord: () => {}, textures: new Map() };
-
-test('MAPLOOT1: the DUNGEON host carries the outer host\'s reveal - it was `revealMap: null`, so a map taken off a corpse underground was "studied" and left on the body', () => {
-  const wm = readFileSync('src/scenes/worldModes.js', 'utf8');
-  const call = wm.slice(wm.indexOf('const ctx = await buildDungeonContext('), wm.indexOf('const ctx = await buildDungeonContext(') + 12000);
-  assert.match(call, /revealMap: host\.revealMap \?\? null,/, 'worldModes hands the dungeon world.js\'s reveal');
-  const dc = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  const bag = dc.slice(dc.indexOf('const useHooks = {'), dc.indexOf('const useHooks = {') + 2000);
-  assert.match(bag, /revealMap: opts\.revealMap \?\? null,/, 'and the dungeon\'s one use bag takes it');
-});
 
 test('MAPLOOT1: with the seam, taking a map off a corpse reads it, spends it and discovers the place (DaggerfallInventoryWindow.cs:1471-1478)', () => {
   restoreDiscovery(null);

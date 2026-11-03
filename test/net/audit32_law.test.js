@@ -1,10 +1,9 @@
-// AUDIT 32 (2026-09-30, Mac: "Audit this") - PROF7'S LAW AS THE AUDIT FOUND IT (src/systems/traceAct.js,
+// AUDIT 32 - PROF7'S LAW AS THE AUDIT FOUND IT (src/systems/traceAct.js,
 // src/net/recipeLaw.js): the trace measured every quarter degree of its PROGRESS, its clock from its first move along the
 // line - a press held still on the first point and one flick to the last was a clean pelt, and a hand's score hung on
 // its frame rate (L1); a bearing that is not a number is none, and a chord across the world walks no further than the
-// line (L5); every garment takes a dye - DFU's "unchangeable" shirts are its variant's word (L3). S1 (Mac: "Whatever
-// you think is best"): a recipe made wholly of goods only a counter sells pays no first-craft bonus.
-// bible/06-Systems/Online-Arc.md "AUDIT 32"; bible/06-Systems/Professions-Arc.md 29.
+// line (L5); every garment takes a dye - DFU's "unchangeable" shirts are its variant's word (L3). S1: a recipe made wholly of goods only a counter sells pays no first-craft bonus.
+// "AUDIT 32"; 29.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -110,7 +109,6 @@ test('AUDIT 32 L3: every garment takes a dye - DFU\'s "unchangeable" shirts (178
 });
 
 test('AUDIT 32 S1 (Mac: "Whatever you think is best"): a recipe made wholly of goods only a counter sells - the Weavers\' Linen and Wool, never gathered - pays no first-craft bonus; a boot\'s Cured Leather, Silk, the planks and every gathered good keep 3.2\'s 500', () => {
-  // PIN MOVED (PROF12): and the Apothecaries' sixteen after them (Professions-Arc 4.5, 37) - never gathered either
   assert.deepEqual([...COUNTER_ONLY].slice(0, 2), ['cloth:linen', 'cloth:wool']);
   assert.ok(COUNTER_ONLY.slice(2).length === 16 && COUNTER_ONLY.slice(2).every((k) => k.startsWith('reagent:')));
   // the smith's stock is gathered too (PROF4, PROF7): no counter good but the Weavers' (and PROF12's Apothecaries') is counter-only
@@ -126,6 +124,5 @@ test('AUDIT 32 S1 (Mac: "Whatever you think is best"): a recipe made wholly of g
   assert.equal(firstCraftPays({ inputs: [] }), true, 'a recipe of nothing is no counter\'s');
   // what the counter could buy is what it no longer pays: 152 first crafts, 76,000 XP (Outfitting 87), all bought
   const marks = unpaid.reduce((sum, r) => sum + r.inputs.reduce((m, i) => m + i.n * stockOf(i.key).marks, 0), 0);
-  // PIN MOVED (FIRST-BUDGET): the measure as it was taken, at the flat 500 a first paid then (recipeLaw firstCraftXp since)
   assert.deepEqual([unpaid.length * 500, Math.floor(Math.sqrt((unpaid.length * 500) / 10)), marks], [76_000, 87, 811]);
 });

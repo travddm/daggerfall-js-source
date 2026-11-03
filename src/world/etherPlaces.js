@@ -1,6 +1,5 @@
 // @ts-check
-// ETHER-PLACES (2026-10-11, the owner: "procedural islands with towns, dungeons"; bible/03-World/Eltheric-Ocean.md
-// ETHER-PLACES) - THE ISLES' PLACES: a port isle's town and a ruin isle's dungeon, each a NON-MUTATING CLONE of one of the
+// ETHER-PLACES - THE ISLES' PLACES: a port isle's town and a ruin isle's dungeon, each a NON-MUTATING CLONE of one of the
 // game's own places (spawnedDungeons.js's law - the locations are cached objects the exterior layout shares) standing on
 // its isle's centre pixel under its own id, name and index. Pure: the world host (scenes/world.js `_locationToBuild`)
 // asks it of an isle's pixel as the pixel builds and stands the answer in its index.
@@ -54,7 +53,7 @@ export function etherPlacePixelOfId(id) {
   const isle = isleOfCell(n % CELLS_W, Math.floor(n / CELLS_W));
   return isle && PLACE_KINDS.includes(isle.kind) ? { x: isle.px, y: isle.py } : null;
 }
-/** ETHER-OW (2026-10-13): the isle whose place stands on this pixel - its centre, a port's or a ruin's - or null. Where
+/** ETHER-OW: the isle whose place stands on this pixel - its centre, a port's or a ruin's - or null. Where
  *  the Overworld's bands are never born (the Bay's places' own law, world.js `_bandPlacePixels`) and its plates stand. */
 export function etherPlaceIsle(x, y) {
   const isle = isleAt(x, y);

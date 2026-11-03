@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-D (2026-09-25): THE SWIMMER IN THE CARVED SEA. Iliac Puddle No More
+// DW-D: THE SWIMMER IN THE CARVED SEA. Iliac Puddle No More
 // 1.2.2's OutdoorSwimDriver (jet082) in its own two phases around the
 // port's motor, over the port's own machinery:
 //
@@ -108,7 +108,7 @@ export function createDeepWatersPlayer({ host, locate, seaY, terrainGroundAt, co
   /** TryGetUsableWaterColumn. */
   const usableAt = (x, z) => { const c = columnAt(x, z); return !!c && c.depth >= WATER_CONTACT_MINIMUM_DEPTH; };
   const centreOf = (p) => p.pos[1] + p.height / 2;
-  /** OCEAN-STUCK (2026-09-26, Mac, from the Discord: "someone is stuck in the ocean"): a swimmer the weight holds
+  /** OCEAN-STUCK: a swimmer the weight holds
    *  under - LevitateMotor's first arm (:81-84) drags one past 62.5 kg down and takes the float keys away, levitation
    *  and water walking aside - never reaches the surface the shore exit asks for, and at the carved sea's coast the
    *  floor is the carve's wall. Such a swimmer takes the exit from wherever the weight has put it. */

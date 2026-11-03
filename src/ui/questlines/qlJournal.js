@@ -1,5 +1,5 @@
 // @ts-check
-// QL2 (bible/06-Systems/Questlines-Arc.md section 6, decision 10): THE QUESTS TAB'S QUESTLINE PARTS - one home for the
+// QL2 (decision 10): THE QUESTS TAB'S QUESTLINE PARTS - one home for the
 // two faces that draw quests (the pause window's Quests tab, ui/enhanced/enhancedMenu.js pauseQuests; the chronicle
 // the L key opens, ui/enhanced/enhancedChronicle.js), so they cannot disagree:
 //
@@ -16,7 +16,7 @@
 //     them, the promotions as the rungs, the ones finished struck and the flagship ones marked (qlLadders.js).
 //
 // A window redesigned on purpose (SCOPE1): it cites this record, not DFU - the classic skin keeps DFU's logbook
-// (ui/quest/questJournal.js). Plain words (bible/10-UI/Plain-Words.md): every heading says what it is, a press explains
+// (ui/quest/questJournal.js). Plain words: every heading says what it is, a press explains
 // what a hover would, every number is read off the constant that enforces it (qlRewards.js TIER_FLOORS).
 import { t } from '../../systems/textManager.js';
 import { TIER_FLOORS, REWARD_CHOICES } from '../../systems/questlines/qlRewards.js';
@@ -263,9 +263,8 @@ export function qlLineDetail(doc, line, { titleText = (k) => k } = {}) {
   box.append(list);
   // UI-12: what a witness is, said once on the page (a hover is no press, and a pad has none) - and what "not yet seen" asks
   // AUDIT QUESTLINES VOICE-QL: the places by name, never "an endgame place" (Voice.md rule 3) - the witnesses of
-  // net/questlineClaims.js QL_WITNESS_KINDS: a Dagon's Breach (its rite, its close), an Elite Breach's Redoubts (a
-  // Valkynaz's among them), the Abyss Dungeon's Shattered Hour (the Brass Remnant), the Sea Serpent, a fallen star (STAR8)
-  if ((line.steps ?? []).some((s) => s.witnessed)) box.append(el(doc, 'p', 'px-qline-what', t('ql.journal.stepWitnessedTitle', 'A witnessed step is done in a Dagon’s Breach, an Elite Breach’s Redoubts, the Abyss Dungeon’s Shattered Hour, against the Sea Serpent or at a fallen star. The account service checks it against that place’s own record before it pays.')));   // STAR8: and a fallen star
+  // net/questlineClaims.js QL_WITNESS_KINDS: a Dagon's Breach (its rite, its close), the Abyss Dungeon's Shattered Hour (the Brass Remnant), the Sea Serpent, a fallen star (STAR8)
+  if ((line.steps ?? []).some((s) => s.witnessed)) box.append(el(doc, 'p', 'px-qline-what', t('ql.journal.stepWitnessedTitle', 'A witnessed step is done in a Dagon’s Breach, the Abyss Dungeon’s Shattered Hour, against the Sea Serpent or at a fallen star. The account service checks it against that place’s own record before it pays.')));   // STAR8: and a fallen star
   const unseen = (line.steps ?? []).some((s) => s.unseen);
   if (unseen) box.append(el(doc, 'p', 'px-qobj-reward', t('ql.journal.stepUnseenWhy', 'Not yet seen: the account service has no record of that deed since this questline began. Do it again and it will count.')));
   if (line.outcome) {

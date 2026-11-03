@@ -22,7 +22,7 @@ import { CAPSULE_RADIUS } from '../player/motor.js';   // AUDIT 65 CV-2: the PLA
 
 // ---- DaggerfallMissile constants, verbatim ----
 export const MISSILE_SPEED = 25.0;
-/** BAL-ARCHERY: a shaft flies 35% faster than DaggerfallMissile.MovementSpeed. Spells and a gun's orb stay on MISSILE_SPEED. */
+/** BAL-ARCHERY: a shaft flies 35% faster than DaggerfallMissile.MovementSpeed. Spells stay on MISSILE_SPEED. */
 export const ARROW_FLIGHT_SPEED = MISSILE_SPEED * 1.35;
 export const MISSILE_COLLIDER_RADIUS = 0.45;
 export const MISSILE_LIFESPAN_S = 8;
@@ -100,7 +100,7 @@ export function elementalResistanceChance(target, element) {
 /** LR2/RF1: the effect flags the resistance channel names (lootRarity RESIST_ELEMENTS). */
 const RESIST_NAMES = Object.freeze([[EFFECT_FLAGS.Fire, 'fire'], [EFFECT_FLAGS.Frost, 'frost'], [EFFECT_FLAGS.Shock, 'shock'], [EFFECT_FLAGS.Poison, 'poison'], [EFFECT_FLAGS.Magic, 'magic']]);
 
-/** STATS-RESIST (2026-10-08, the owner: "Resistances on the stat screen please"): the saving throw's chance BEFORE its
+/** STATS-RESIST: the saving throw's chance BEFORE its
  *  roll - `{ immune, chance }`, the chance 5..95 (100 when immune) - the whole of savingThrow's law but the dice, so the
  *  Stats page and the throw can never disagree. The Elemental Resistance effects' own chance (elementalResistanceChance)
  *  is tested ahead of it, apart. */
@@ -153,7 +153,7 @@ export function savingChance(element, effectFlags, target, modifier = 0, pierce 
   // MagicResist = floor(LIVE willpower / 10) - fortify-aware (audit F9).
   // U10: through the FormulaHelper home, not a fourth inline copy.
   saving += magicResist(liveStat(target, 'willpower'));
-  // BAL9 (bible/05-Combat/Balance-Arc.md section 15): the port's PIERCE - points a player's damage spell takes off the
+  // BAL9: the port's PIERCE - points a player's damage spell takes off the
   // throw (systems/spell/spellPower.js spellPierce). After the immunity above, so a foe immune stays immune; DFU's clamp after.
   saving -= Math.max(0, Number.isFinite(pierce) ? pierce : 0);
   saving = Math.max(5, Math.min(95, saving));
@@ -449,47 +449,10 @@ export function playerArrowOrigin(eye, lookDir, flipHorizontal = bowHandFlipped(
   ];
 }
 
-/**
- * FIELD-GUN17 (Mac: "the orb doesnt allign with the barrel when
- * firing. Its above the barrel") - A NAMED DEPARTURE, ahead of the
- * verbatim arm above: the same eye, the same basis, a DIFFERENT
- * offset.
- *
- * `playerArrowOrigin` is GetAimPosition, and GetAimPosition is right
- * about the one ranged weapon Daggerfall has: 0.11 below the eye and
- * 0.15 to the hand is the nock of a DRAWN BOW. The Thunderlock is
- * this port's own weapon and it is not held where a bow is held, so
- * the shaft's offset put its orb well above the barrel. DFU has no
- * answer here because DFU has no gun.
- *
- * `muzzle` is a CAMERA-SPACE offset - {right, up, forward}, already
- * measured off the drawn frame by weaponRig.thunderlockMuzzle - so
- * this only has to turn it into world axes on the same basis the arm
- * above rebuilds. No handedness term: the mirror is a fact about the
- * DRAWN RECT and thunderlockMuzzle has already applied it, where
- * PLAYER_ARROW_SIDE is a bare number that has to be flipped here.
- */
-/** AUDIT FIELD-GUN-MW F2: THE FORK, ONCE. Both arrow spawn seams (combat/arrowFlight.js and the dungeon host's
- *  own missiles) used to restate it: a supplied muzzle wins, nothing supplied keeps GetAimPosition's bow-hand arm.
- *  The Morrowind rig's third-person answer is a WORLD point (`{ world }`, combat/rigMuzzle.js) - behind the body a
- *  lens offset is the wrong shape - and a third arm restated in two places is how the two drift, so the fork lives
- *  here and the seams call it. */
+/** THE FORK, ONCE. Both arrow spawn seams (combat/arrowFlight.js and the dungeon host's own missiles) call it: a
+ *  supplied WORLD point (`{ world }`) wins, nothing supplied keeps GetAimPosition's bow-hand arm. */
 export function playerShotOrigin(eye, lookDir, muzzle) {
   if (muzzle?.world) return [...muzzle.world];
-  return muzzle ? playerMuzzleOrigin(eye, lookDir, muzzle) : playerArrowOrigin(eye, lookDir);
+  return playerArrowOrigin(eye, lookDir);
 }
 
-export function playerMuzzleOrigin(eye, lookDir, muzzle) {
-  const fl = Math.hypot(lookDir[0], lookDir[1], lookDir[2]) || 1;
-  const f = [lookDir[0] / fl, lookDir[1] / fl, lookDir[2] / fl];
-  let rx = f[2], rz = -f[0];
-  const rl = Math.hypot(rx, rz);
-  if (rl < 1e-6) { rx = 1; rz = 0; } else { rx /= rl; rz /= rl; }
-  const ux = f[1] * rz, uy = f[2] * rx - f[0] * rz, uz = -f[1] * rx;
-  const r = muzzle?.right ?? 0, u = muzzle?.up ?? 0, d = muzzle?.forward ?? 0;
-  return [
-    eye[0] + rx * r + ux * u + f[0] * d,
-    eye[1] + uy * u + f[1] * d,
-    eye[2] + rz * r + uz * u + f[2] * d,
-  ];
-}

@@ -1,6 +1,5 @@
 // @ts-check
-// IC-INTERIORS (2026-10-27, the owner's field report, item 5: "Interiors in the Imperial city need to match their exterior
-// with varied layouts"; bible/03-World/Arena-Provinces.md IC-INTERIORS) - A MADE BUILDING'S QUEST MARKERS, WHERE ITS ROOMS
+// IC-INTERIORS - A MADE BUILDING'S QUEST MARKERS, WHERE ITS ROOMS
 // STAND THEM.
 //
 // DFU's law: a building site holds its markers where its interior's record stands them (Place.EnumerateBuildingQuestMarkers

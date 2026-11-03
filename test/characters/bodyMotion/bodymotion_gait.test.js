@@ -1,5 +1,4 @@
-// BODY-MOTION (2026-10-18, Mac: "I want to build improved animations for the morrowind rig (3rd person)" - "Improved
-// running/walking for all races ... No band aids"; bible/04-Characters/Body-Motion.md) - THE GAIT AND THE SOLVE, on the
+// BODY-MOTION - THE GAIT AND THE SOLVE, on the
 // vendored retail biped (test/fixtures/mw/retailRig.mjs - no Morrowind data in hand).
 //
 // What is pinned: Alexander's stride and its cap, the duty factor falling with the pace (a walk's double support, a
@@ -167,7 +166,6 @@ test('BODY-MOTION THE STEER: a strafe turns the hips toward the travel (to the r
 });
 
 test('BODY-MOTION TURNING ON THE SPOT: standing, the feet keep their place in the world while the body turns over them, and once twisted past TURN.step the foot on the turn\'s side steps back under the body first; a cut of more than TURN.snap re-plants both at once (mutants: BODY-MOTION-feet-turn-with-the-body, BODY-MOTION-step-the-wrong-foot)', () => {
-  // PIN MOVED (AUDIT BODY-MOTION GAIT-8 / GAIT-11): each foot stands in the world on its own - a step is a foot's own
   // flight of kind 'step' - and a turn faster than TURN.rate is a cut (a flick, a teleport) that re-plants both, so the
   // small turn is turned at 4 radians a second, not in one frame
   const stepping = (st) => (st.feet.L.swing?.kind === 'step' ? 'L' : st.feet.R.swing?.kind === 'step' ? 'R' : null);

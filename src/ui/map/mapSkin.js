@@ -1,4 +1,4 @@
-// MAP-TOGGLE (2026-09-22, Mac: "Yes needs to be a toggle"): THE ONE
+// MAP-TOGGLE: THE ONE
 // QUESTION the three map doors ask - is the HELD map worn, or the
 // classic windows? Until now the answer was the UI skin alone
 // (ui/automap/automapDoor.js, ui/town/townMapDoor.js, ui/travel/travelMapDoor.js each
@@ -28,9 +28,8 @@ export const heldMapChosen = () => isEnhanced() && enhancedMapOn();
  *  mount it in. */
 export const heldMapWorn = () => heldMapChosen() && typeof document !== 'undefined';
 
-/** EM3-3D (2026-09-27, Mac: "making the map like the og one in 3d again but only handrawn"): the held map's dungeon
+/** EM3-3D: the held map's dungeon
  *  sheet is drawn in the round - turned, tilted and zoomed as DFU's 3D automap is - and V lays it flat as the plan.
- *  Mac: "The dungeon map becomes the new default option, the current 2d enhanced becomes an option, not removed" -
  *  the player's switch (features.js `dungeon-map-3d`, prefs `dungeonMap3d`, on by default) chooses it, and off is
  *  EM3's flat plan. `?dungeonmap=flat` stays the kill door. Both are read where the sheet is built, at each open. */
 const dungeonMapUrlFlat = () => {
@@ -38,7 +37,7 @@ const dungeonMapUrlFlat = () => {
 };
 export const dungeonMap3dOn = () => getPref('dungeonMap3d') !== false && !dungeonMapUrlFlat();
 
-/** TAMRIEL1 (2026-10-08, Mac: "the entirety of tamriel ... seen by players ingame"): the held map's world sheet zooms
+/** TAMRIEL1: the held map's world sheet zooms
  *  out past the Bay onto the whole continent (ui/tamrielInk.js), the Features row `tamriel-map` (prefs `tamrielMap`,
  *  on by default). Read where the window is built, so a change takes the next map opened. `?tamriel=off` is the kill
  *  door. */
@@ -46,7 +45,7 @@ const tamrielUrlOff = () => {
   try { return pageParam('tamriel') === 'off'; } catch { return false; }
 };
 export const tamrielMapOn = () => getPref('tamrielMap') !== false && !tamrielUrlOff();
-/** START3 (bible/06-Systems/Alternate-Starts-Arc.md section 12): does the map the player opens show the land past the
+/** START3: does the map the player opens show the land past the
  *  Bay - the held sheet, its continent on? The classic window's region pages are the Bay's alone. A quest's place past
  *  the Bay is on the player's map exactly then (ui/travel/travelMapWindow.js canFindPlace). */
 export const pastBayOnMap = () => heldMapChosen() && tamrielMapOn();

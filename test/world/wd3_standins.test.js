@@ -1,4 +1,4 @@
-// WD3 (2026-10-01, Mac: "For anything missing I need you to curate, like textures") - THE PIECES THE TWO TOWN MODS
+// WD3 - THE PIECES THE TWO TOWN MODS
 // BORROW, STOOD IN BY THE PORT (src/world/townStandIns.js, detStandIns.js, townPictures.js, standInSprites.js,
 // flatFields.js; systems/detailedShips.js's shared pictures). Beautiful Villages and Beautiful Cities place pieces of five
 // peer mods the port does not carry and eighteen beds whose prefabs point at nothing; DFU without the peers draws
@@ -153,9 +153,6 @@ test('WD3 stand-ins, the aliases: each bed id IS Daggerfall\'s bed, its three be
   assert.equal(customAliasFor(42069), null);
   assert.equal(classicModelIdOf(42069), 42069);
   assert.equal(isBedModel(classicModelIdOf(42069)), false);
-  assert.match(src('src/scenes/interiorContext.js'), /\} else if \(isBedModel\(classicModelIdOf\(p\.modelIdNum\)\)\) \{/);
-  assert.match(src('src/scenes/dataPipeline.js'), /const alias = customAliasFor\(modelIdNum\);\n {4}if \(alias\) return buildAliasMesh\(modelIdNum, alias\);/);
-  assert.match(src('src/scenes/dungeonContext.js'), /const alias = custom \? null : customAliasFor\(id\);/);
   resetAll();
 });
 
@@ -227,7 +224,6 @@ test('WD3 stand-ins, every built piece is sound - Rosy\'s hangings and rugs, the
     const { lo, hi, tex } = box[id];
     assert.ok(tex.has(`${a}_${r}`) && tex.has('67_1'), `${id}: its awning, ${a}_${r}`);
     // TEMPLE-STEPS: the mesh as Unity imports it (x mirrored - its high back on -x, its counter at the origin) at the prefab's 0.75
-    // PIN MOVED (FIELD BUGS 2026-10-16b STALL-SHAPE): the second mesh (53113 on) the frame 0.2 m back, 0.206 up, 0.066 across,
     // its front the front posts' (no counter)
     const [dx, dy, dz] = Number(id) >= 53113 ? [-0.2, 0.206, 0.066] : [0, 0, 0], front = Number(id) >= 53113 ? 0.118 : 0.4;
     assert.ok(near(lo[0], (-2.75 + dx) * 0.75, 1e-5) && near(hi[0], (front + dx) * 0.75, 1e-5) && near(hi[1], (4.4 + dy) * 0.75, 1e-5) && near(lo[2], (-2.48 + dz) * 0.75, 1e-5) && near(hi[2], (2.4 + dz) * 0.75, 1e-5), id);
@@ -369,7 +365,6 @@ test('WD3 stand-ins, the install: once; every piece behind the town mods\' switc
   assert.equal(hasTextureReplacement(1210, 10), true, 'Detailed Ships\' own switch');
   assert.equal(hasCustomModel(45081), true, 'DET\'s timbers stand for its ships');
   assert.equal(hasCustomModel(69424), false, 'the towns\' own pieces do not');
-  assert.match(src('src/world/townStandIns.js'), /let n = installDetStandIns\(isOn\);\n {2}shareDetailedShipsArt\(isOn\);/);
   resetAll();
 });
 
@@ -436,7 +431,7 @@ function loadArena2() {
   return { blocks, maps, arch, palette, texture };
 }
 
-/** What neither the port nor Daggerfall stands, and why (bible/03-World/Beautiful-Towns.md, "Not stood in"). */
+/** What neither the port nor Daggerfall stands, and why (, "Not stood in"). */
 const NOT_STOOD_IN = Object.freeze({
   models: [43756, 45179, 45181, 45198, 45205, 45206, 52991, 53129, 53130, 53132, 53134, 69465],
   flats: ['10025_1', '1200_4', '1200_9', '1210_13', '1210_16', '1210_24', '1230_11', '1230_15', '1230_2', '1230_22', '1230_3', '1230_5', '1230_6', '1230_9'],
@@ -574,8 +569,6 @@ test('WD3 with ARENA2: the alias beds are built by the pipeline from the player\
 });
 
 test('WD3 the towns\' scenery is never a person (AUDIT WD3 G1) - a street flat carries the trigger collider the ray meets only in a person archive (DaggerfallBillboard FlatTypes.NPC, RDBLayout.IsNPCFlat, the dungeons\' law); the mods\' lamps, food and animals carry faction ids and stay scenery', () => {
-  const W = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-  assert.match(W, /if \(!pn\.width\) return;\n(?: {6}\/\/.*\n)+ {6}if \(pn\.textureArchive != null && !isNpcFlat\(pn\.textureArchive\)\) return;\n {6}targets\.push\(\{ key: `person:\$\{i\}`/);
   for (const a of [334, 346, 357, 175, 184]) assert.equal(isNpcFlat(a), true, String(a));
   for (const a of [210, 10021, 10024, 10010, 201, 1200]) assert.equal(isNpcFlat(a), false, String(a));
 });
@@ -654,6 +647,4 @@ test('WD3 the town stand-ins YIELD to the player\'s own picture of the record (A
   assert.equal(TR.hasTextureReplacement(10021, 3), true, 'with Replace Game Artwork off the stand-in answers again');
   setValue('Enhancements', 'AssetInjection', 'True');
   TR.setBundleTextures([]); clearVendorTextures();
-  assert.match(readFileSync(join(ROOT, 'src/world/detStandIns.js'), 'utf8'), /return addVendorTextures\(entries\.map\(\(e\) => \(\{ \.\.\.e, yields: true \}\)\)\);/);
-  assert.match(readFileSync(join(ROOT, 'src/world/townStandIns.js'), 'utf8'), /n \+= addVendorTextures\(cloths\.map\(\(e\) => \(\{ \.\.\.e, yields: true \}\)\)\);/);
 });

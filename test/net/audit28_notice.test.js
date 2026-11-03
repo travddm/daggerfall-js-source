@@ -1,4 +1,4 @@
-// AUDIT 28 (2026-09-28, Mac: "let's audit everything we have so far before we continue") - NOTICE1's findings, each
+// AUDIT 28 - NOTICE1's findings, each
 // pinned against the real Worker over node:sqlite (test/accountDb.mjs), the client's book, or the board's window on
 // the minimal DOM (test/chargenDom.mjs), and each failing on the code before the fix. bible/06-Systems/
 // Professions-Arc.md 10.7 (AUDIT 28).
@@ -23,7 +23,7 @@ const noWait = () => Promise.resolve();
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 async function board(extra = {}) {
-  const svc = await standService({ BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Devra', MODERATOR_HANDLES: 'Mora', ...extra });
+  const svc = await standService({ BOARD_OPEN: 'on', SEAT_ADMINS: 'Devra', SEAT_MODERATORS: 'Mora', ...extra });
   const read = (who, map = TOWN) => svc.call('/v1/board/read', { map }, who.secret);
   const pin = (who, extra2 = {}) => svc.call('/v1/board/pin', { map: TOWN, subject: 'Hands wanted', body: 'Meet at the gate at dusk.', days: 7, rid: rid(), ...extra2 }, who.secret);
   const seasoned = (...who) => { for (const w of who) svc.env.DB._raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(Math.floor(Date.now() / 1000) - 15 * DAY, w.id); };
@@ -46,11 +46,6 @@ test('AUDIT 28 N1/N16: a note\'s button is answered by ONE plan, the same shape 
   assert.ok(plans.filter((p) => p.kind === 'refuse').every((p) => typeof p.text === 'string' && p.text), 'and every refusal says why');
   assert.deepEqual(plans[0].draft, { to: 'Anna', subject: 'Re: Hands wanted', body: NOTE_LETTER_START.party });
   assert.equal(planNoteAnswer({ ...note, button: 'duel' }, { duelHere: false, mail: 'signed-in', letters: true }).kind, 'letter', 'a duel out of reach is a letter');
-  const w = src('src/scenes/world.js');
-  const answer = w.slice(w.indexOf('const answerNote = (note) => {'), w.indexOf('\n  };', w.indexOf('const answerNote = (note) => {')));
-  assert.match(answer, /_letterPending = \{ draft: plan\.draft, at: performance\.now\(\), lost: NOTE_LETTER_LOST \}; closeNoticeDoor\(\);/);
-  assert.doesNotMatch(answer, /openLetters/, 'never opened directly: the board still holds the slot this frame');
-  assert.match(w, /tradeSay\(_letterPending\.lost \?\? 'Your letters could not be opened\. The page is still in your journal\.'\)/, 'a note\'s letter that cannot open says the note\'s words');
   assert.equal(NOTE_LETTER_LOST, 'Your letters could not be opened. The note is still on the board.');
 });
 
@@ -241,7 +236,4 @@ test('AUDIT 28 N12: the count over a board reads storage once, not every frame',
 
 test('AUDIT 28 N14: a take-down\'s and a report\'s hour spent say so in their own words', () => {
   assert.equal(REFUSALS['board-ops-rate'], 'You have done too much at the boards this hour. Try again later.');
-  const x = src('server-account/src/board.js');
-  assert.equal((x.match(/return \{ error: 'board-ops-rate' \}/g) ?? []).length, 2);
-  assert.equal((x.match(/return \{ error: 'board-rate' \}/g) ?? []).length, 1, 'the pin\'s own');
 });

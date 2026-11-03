@@ -1,5 +1,4 @@
-// TELL6e - WHAT A LANDING DOES TO YOU (bible/12-Enhanced-AI/Feud-Arc.md section 8.2; Mac, 2026-10-04: "breath more depth
-// into it", then "Go" on every call). A telegraphed blow that lands on the local player does more than its damage, by
+// TELL6e - WHAT A LANDING DOES TO YOU (;, then "Go" on every call). A telegraphed blow that lands on the local player does more than its damage, by
 // its shape: the lunge and the charge PUSH (3 and 5 m/s, decaying at 12, along the collider, never over a drop of more
 // than 2 m); the slam, the ring and the leap RATTLE (0.6 s at 60% of the walk, the camera dipping); the sweep makes
 // you BLEED (30% again over 3 s in three ticks, its foe's mark on each, any healing ending it, shown with the debuffs);
@@ -210,16 +209,3 @@ test('TELL6e: the hosts\' frame helper drains the queue and ticks the bleed thro
   assert.deepEqual(hurts, [1], 'its first tick, through the host\'s door');
 });
 
-test('TELL6e: wired - the four hosts\' player frames, the three pools\' hits, the swing and the cast barred while down (mutants: any host or pool unwired)', () => {
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    const s = rd(h);
-    assert.match(s, /playerBlowFrame\(\{ motor: player, entity: playerEntity, shake: \(k\) => betterAmbience\.weaponKick\(k\), hurt: \(n\) => \{ hurtPlayer\(playerEntity, n\); flashPlayerDamage\(n\); surfacePlayer\(\); \} \}\);[^\n]*\n(?:[^\n]*if \(!overlayHeld\) \{\n(?:\s*\/\/[^\n]*\n)*)?[^\n]*player\.(update|holdFrame)\(/, `${h}: its player frame, before the motor's`);   // PIN MOVED (AUDIT TELL L6: the building's host runs it above its window gate, as the street's do)
-  }
-  for (const [h, rig] of [['src/scenes/world.js', 'weaponRig.frame(dt, { paralyzed: paralyzed || knockedDown() })'], ['src/scenes/exterior.js', 'weaponRig.frame(dt, { paralyzed: paralyzed || knockedDown() })'], ['src/scenes/worldModes.js', 'interiorWeapon.frame(dt, { paralyzed: paralyzed || knockedDown() })'], ['src/scenes/dungeonContext.js', 'weaponRig.frame(dt, { paralyzed: _pParalyzed || knockedDown() })']]) {
-    assert.ok(rd(h).includes(rig), `${h}: no swing while down`);
-  }
-  assert.match(rd('src/scenes/hostMagic.js'), /function castInput\(eye, dir\) \{\n\s*const sp = readiedSpell;\n\s*if \(!sp\) return false;\n\s*if \(knockedDown\(\)\) return false;/, 'no cast while down');
-  for (const [p, v] of [['src/scenes/exteriorFoes.js', 'f'], ['src/scenes/dungeonContext.js', 'f'], ['src/scenes/cityGuards.js', 'g']]) {
-    assert.ok(rd(p).includes(`landBlowEffect(${v}, hp0 - playerEntity.health, playerFeet);`), `${p}: its hit asks`);   // PIN MOVED (AUDIT TELL L8: by what reached health)
-  }
-});

@@ -1,7 +1,7 @@
-// AUDIT CLIMB2 (2026-10-01, Mac: "Hey audit this and ensure its perfection before we merge"): the enhanced climb's
+// AUDIT CLIMB2: the enhanced climb's
 // second slice - the hang, the shimmy, the grip and the free climb - audited in four lenses: fidelity to the ask and the
 // calls, an adversarial read of the code, the climb against hostile geometry, and the hosts and the records
-// (bible/03-World/Parkour-Arc.md, AUDIT CLIMB2). Every finding below was pinned here RED on the CLIMB2 code before its
+// (, AUDIT CLIMB2). Every finding below was pinned here RED on the CLIMB2 code before its
 // fix. The geometry is boxes; the body's overlap with them is measured EXACTLY (a capsule against an axis-aligned box),
 // never through the collider's own resolve.
 import { test } from 'node:test';

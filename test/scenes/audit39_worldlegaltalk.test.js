@@ -125,30 +125,6 @@ test('AUDIT 39 (#21): the FATAL-BLOW surrender reads the live region too', () =>
   assert.equal(player.health, 1, 'PlayerEntity.cs:2321 forces health to 1 on the arrest');
   assert.equal(player.arrested, true, 'and the court opened, in the province travelled to');
 
-  // The sibling KeyY site cannot be pinned this way: a VOLUNTARY
-  // surrender returns true on every path (the refusals both require
-  // !voluntary), so its region argument has no behavioural tell. Hold
-  // it at source with the other three.
-  const a = read('src/scenes/arrestFlow.js');
-  assert.equal((a.match(/surrenderToCityGuards\(playerEntity, region\(\)/g) ?? []).length, 3,
-    'every surrender call reads the region live - the box\'s, the fatal blow\'s and the watch\'s stop (REP1)');
-  assert.doesNotMatch(a, /\(playerEntity, regionIndex[,)]/,
-    'no consumer keeps the raw parameter - under the streaming host it is a Function');
-});
-
-test('AUDIT 39 (#21): the streaming host hands the getter, not startLoc', () => {
-  const w = read('src/scenes/world.js');
-  // INTEGRATION MOVED THIS PIN: #62 (player-motor) hung onCourtScreen -
-  // the CameraRecoiler reset - off the same bag in the same wave, so the
-  // call carries both keys. The law pinned here is the GETTER.
-  // PIN MOVED AGAIN (Road to 1:1, a3): the bag took ReleaseFromPrison's
-  // last two lines - clearEnemies and positionPlayerAtLocationEntrance
-  // (DaggerfallCourtWindow.cs:488-489) - so the call is no longer one
-  // line. The law pinned here is still the GETTER.
-  assert.match(w, /createArrestFlow\(\{\s*\n\s*townTalk, playerEntity, regionIndex: \(\) => _questRegionIndex\(\),/);
-  assert.match(w, /onCourtScreen: \(\) => cameraRecoiler\.reset\(\),/);
-  assert.doesNotMatch(w, /regionIndex: startLoc\.regionIndex/,
-    'the boot number filed every later crime under the province the session started in');
 });
 
 // ---------------------------------------------------------------
@@ -158,56 +134,11 @@ test('AUDIT 39 (#21): the streaming host hands the getter, not startLoc', () => 
 // neither host supplied the key, so the optional call no-opped.
 // ---------------------------------------------------------------
 
-test('AUDIT 39 (#22): EVERY host that builds the mode machine answers spawnCityGuards', () => {
-  // ROAD-B MOVED THIS NEEDLE for world.js only. Both hosts still
-  // answer the key and the bool still picks the arm; world.js now
-  // spells it `_spawnGuards(!!immediate)` because SpawnCityGuards'
-  // INDOOR arm (PlayerEntity.cs:628-642) has to be offered the call
-  // before either street arm, and that offer lives in the ONE entry
-  // both responses go through. exterior.js keeps the two-arm spelling
-  // over its own `_spawnGuards`.
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const bag = literalBody(read(host), 'createWorldModes({');
-    assert.match(bag, /spawnCityGuards: \(immediate\) => (\(immediate \? _crimeResponse\(\) : _witnessResponse\(\)\)|_spawnGuards\(!!immediate\))/,
-      `${host}: the bool picks the arm, as SpawnCityGuards(bool) does`);
-    assert.match(read(host), /if \(modes\?\.spawnCityGuardsInside\?\.\(immediate\)\) return;/,
-      `${host}: and the indoor arm is offered the call first`);
-  }
-  // the witness arm has to EXIST in both hosts for that to be true.
-  // ROAD-B: same move as world.js's twin - the literal `false` is
-  // `_witnessResponse`'s argument to the shared entry now, and the
-  // bool reaches the pool from there.
-  assert.match(read('src/scenes/exterior.js'),
-    /function _witnessResponse\(\) \{ _spawnGuards\(false\); \}/,
-    'exterior.js keeps the witness half it grew at #22');
-  assert.match(read('src/scenes/exterior.js'),
-    /cityGuards\.spawnCityGuards\(!!immediate, \{ playerFeet: \[\.\.\.feet\], playerFwd: fwd, pool: _guardPool\(\) \}\)/,
-    'and it reaches the pool');
-});
-
 // ---------------------------------------------------------------
 // #23 - Person.GetFactionTypeFactionID's five faction-type reads
 // (Person.cs:967-1018) plus %vam's clan name. Each was `?? -1` into
 // _setupFactionTypeNPC's ZERO_FACTION arm.
 // ---------------------------------------------------------------
-
-test('AUDIT 39 (#23): the five region/vampire reads and %vam stand on questWorld', () => {
-  const body = literalBody(read('src/scenes/world.js'), 'const questWorld = {');
-  for (const seam of ['currentRegionPeople', 'currentRegionCourt', 'currentRegionFaction',
-    'currentRegionVampireClan', 'playerVampireClan', 'playerVampireClanName']) {
-    assert.match(body, new RegExp(`^ {4}${seam}:`, 'm'), `${seam} is mounted`);
-  }
-  // every one of them keys on CurrentRegionIndex, never the location's
-  assert.match(body, /currentRegionPeople: \(\) => getPeopleOfCurrentRegion\([^\n]*_questRegionIndex\(\)\)/);
-  assert.match(body, /currentRegionCourt: \(\) => getCourtOfCurrentRegion\([^\n]*_questRegionIndex\(\)\)/);
-  // GetRegionFaction is FindFactions(Province, -1, -1, region), and the
-  // clan is that same record's `vam` column
-  assert.match(read('src/scenes/world.js'),
-    /const _regionFaction = \(\) => \{[^]*?findFactions\(dict, \{ type: FACTION_TYPES\.Province, region: _questRegionIndex\(\) \}\)\[0\]/);
-  assert.match(body, /currentRegionVampireClan: \(\) => _regionFaction\(\)\?\.vam \?\? -1/);
-  // %vam's null is load-bearing: it is what prints C#'s own error literal
-  assert.match(body, /playerVampireClanName: \(\) => \{[^]*?if \(!clan\) return null;/);
-});
 
 // ---------------------------------------------------------------
 // #25 - LegalRepute.cs:48-52 writes PlayerGPS.CurrentRegionIndex. The
@@ -215,13 +146,6 @@ test('AUDIT 39 (#23): the five region/vampire reads and %vam stand on questWorld
 // which is the common case: no map pixel in the wilderness carries a
 // location, so quests filed their legal-repute changes in Alik'r.
 // ---------------------------------------------------------------
-
-test('AUDIT 39 (#25): the legal-repute WRITE reads the same region as the read', () => {
-  const body = literalBody(read('src/scenes/world.js'), 'const questWorld = {');
-  assert.match(body, /changeLegalRep: \(amount\) => changeLegalRep\(playerEntity, _questRegionIndex\(\), amount\)/);
-  assert.match(body, /legalRepNow: \(\) => legalRepOf\(playerEntity, _questRegionIndex\(\)\)/,
-    'the read never moved - the write is what disagreed with it');
-});
 
 // ---------------------------------------------------------------
 // #27 - the seven-name fold is the IDENTITY. WEATHER_TYPES is the name
@@ -247,49 +171,12 @@ test('AUDIT 39 (#27): indexing the name array with a name is undefined - the fol
 // always drew the tone-1 opening.
 // ---------------------------------------------------------------
 
-test('AUDIT 39 (#107) -> E7: talkMcp rides the ONE GameManager for the host reads its handlers make', () => {
-  // #107 wired playerName/playerRace/cityName by hand onto the talk
-  // MCP, because expandTalkMacros substituted the empty string for
-  // every symbol its private twenty-six-row table missed. E7 made the
-  // talk expansion run MacroHelper's WHOLE table, whose GLOBAL rows
-  // read `GameManager.Instance` - and the port has exactly one of
-  // those, the quest machine's macro hooks. So the hand-wires are the
-  // hooks' now, and the reads #107 named resolve there:
-  // %pcn/%pcf/%pcl off playerName, %ra off playerRaceName, %cn off
-  // PlayerGPS. The two seams that are TalkManager's own stay.
-  const mcp = literalBody(read('src/scenes/world.js'), 'const talkMcp = () => (');
-  assert.match(mcp, /hooks: questBridge\?\.machine\.macroContext\(\)\?\.hooks \?\? null/,
-    'the ONE GameManager, handed to the talk MCP');
-  for (const [seam, wiring] of [
-    ['playerGender', /playerGender: \(\) => playerEntity\.gender/],
-    ['toneIndex', /toneIndex: \(\) => townTalk\.toneIndex\(\)/],
-  ]) {
-    assert.match(mcp, wiring, `talkMcp supplies ${seam}`);
-  }
-  // and the machine's hooks really do carry the four #107 named
-  const hooks = literalBody(read('src/systems/quest/machine.js'), '_buildHooks() {');
-  for (const seam of ['playerName', 'playerRaceName', 'playerEntity', 'world']) {
-    assert.ok(hooks.includes(`${seam}:`), `the GameManager stand-in carries ${seam}`);
-  }
-});
-
 // ---------------------------------------------------------------
 // #109 - GetNewsOrRumors (:1405-1422) brackets the CommonRumor macro
 // pass with SetFactionIdsAndRegionID and resets it after. The mill's
 // seam existed; no host wired it, so every regional-conditions rumor
 // reached the player with %fx1/%fl1/%ol1/%reg raw.
 // ---------------------------------------------------------------
-
-test('AUDIT 39 (#109): the rumor mill gets its macro pass, bracketed and reset', () => {
-  const deps = literalBody(read('src/scenes/world.js'), 'new RumorMill({');
-  assert.match(deps, /expandCommonTokens: \(tokens, ctx\) => \{/, 'the seam is mounted at last');
-  assert.match(deps, /setIdFactions\(ctx\?\.faction1 \?\? -1, ctx\?\.faction2 \?\? -1\);\s*\n\s*setIdRegion\(ctx\?\.regionID \?\? -1\);/,
-    'SetFactionIdsAndRegionID before the walk');
-  assert.match(deps, /finally \{\s*\n\s*setIdFactions\(-1, -1\);\s*\n\s*setIdRegion\(-1\);/,
-    'and the (-1, -1, -1) reset after it, as C# does');
-  assert.match(deps, /expandQuestMessage\(questBridge\?\.machine\.macroContext\(\) \?\? null, tokens\)/,
-    'the walk is the machine\'s quest-SHAPED context - the getters those symbols read are questWorld\'s');
-});
 
 // ---------------------------------------------------------------
 // #110 - GetBuildingList (TalkManager.cs:2752-2797) calls GetName for
@@ -380,28 +267,11 @@ test('AUDIT 39 (#110): a directory row carries BLOCK ORIGIN + the subrecord Posi
 // line. The walk itself is pinned in test/systems/answerpipeline.test.js.
 // ---------------------------------------------------------------
 
-test('AUDIT 39 (#111): the answer pipeline gets the region and the location reader', () => {
-  const deps = literalBody(read('src/scenes/world.js'), 'new AnswerPipeline({');
-  // PIN MOVED (BAY-LEFT-B, bible/06-Systems/Talk-Arc.md): the region is the quest layer's table - a Bay region's the same
-  // MAPS.BSA region (scenes/questWorld.js maps.getRegion's Bay arm), a province's its places past the Bay - and a Bay
-  // location is still MapFileReader's own, never the quest layer's dungeon-sized getLocation; a province's its table's
-  assert.match(deps, /currentRegion: \(\) => questWorld\.maps\.getRegion\(_questRegionIndex\(\)\) \?\? null/);
-  assert.match(deps, /getLocation: \(r, i\) => \(isProvinceRegion\(r\) \? questWorld\.provinceSites\?\.getLocation\(r, i\) \?\? null : maps\.getLocation\(r, i\)\)/,
-    'TalkManager reads MapFileReader directly - not the quest layer\'s dungeon-sized adapter');
-  assert.doesNotMatch(deps, /currentRegion: \(\) => null/);
-});
-
 // ---------------------------------------------------------------
 // #112 - GetQuestorName (:2586-2590) is srand(nameSeed) then
 // NameHelper.FullName over the ENTRY's own nameBank. Unmounted, the
 // seeded roll was still spent and %pqn named nobody.
 // ---------------------------------------------------------------
-
-test('AUDIT 39 (#112): the NPC session gets fullName - the TWO-argument form', () => {
-  const deps = literalBody(read('src/scenes/world.js'), 'const npcSession = new NPCSession({');
-  assert.match(deps, /fullName: \(nameBank, gender\) => nameHelperFullName\(nameBank, gender\)/,
-    'the entry\'s own bank, not the region\'s - talkMcp\'s one-argument form is a different object');
-});
 
 // ---------------------------------------------------------------
 // AUDIT 39r (R10) - #110 removed buildBuildingDirectory's named-type

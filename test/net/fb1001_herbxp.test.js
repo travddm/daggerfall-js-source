@@ -1,4 +1,4 @@
-// HERB-XP (2026-10-01 part four - Mac: "XP follows your rank", the audit's question answered). Herbs stop at tier 3, and
+// HERB-XP. Herbs stop at tier 3, and
 // harvestXp quarters a node more than two tiers under the rank's top: from rank 40 a common herb was worth 3 XP, from 55
 // an uncommon one 7 (11 clean), and past rank 70 every herb a quarter - 3, 11 and 16 - so 70 to 100 took 107 full days
 // on confirmed ground (lane 2's measure). Fishing's haul was given the rank's own tier for the same wall (PROF8, Mac:
@@ -56,7 +56,7 @@ test('HERB-XP law: a herb is picked at the highest tier the rank opens, as a hau
   // the wall, as the herb's own tier reckoned it past rank 70: a quarter of 15, of 45 and of 67
   assert.deepEqual([harvestXp(1, 70, false), harvestXp(2, 70, true), harvestXp(3, 70, true)], [3, 11, 16]);
   // 70 to 100 now, a plain herb a harvest: some 537, nine of the old days of sixty - where it was more than a hundred
-  // days. CAP-OFF (2026-10-07): no day bounds them now, so the pin counts the harvests (the same bound, 480 to 600)
+  // days. CAP-OFF: no day bounds them now, so the pin counts the harvests (the same bound, 480 to 600)
   const plain = (lo, hi) => (xpForRank(hi) - xpForRank(lo)) / harvestXp(herbXpTier(lo), lo, false);
   const harvests = plain(70, 90) + plain(90, 100);
   assert.ok(harvests > 480 && harvests < 600, `${harvests.toFixed(1)} harvests`);

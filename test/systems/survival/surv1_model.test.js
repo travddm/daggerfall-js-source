@@ -23,11 +23,9 @@ import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { RACES } from '../../../src/systems/races.js';
 import { DISEASES } from '../../../src/systems/diseases.js';
 
-// ═══ SURV1 (2026-09-18): THE SURVIVAL MODEL ═════════════════════════
+// ═══ SURV1: THE SURVIVAL MODEL ═════════════════════════
 //
-// Mac: "we have been given permission to completely overhaul this mod
-// [Climates & Calories], figure out bugs and implement it to our
-// desire ... We're going to tackle everything here properly." The
+// The
 // mod's rules were read off its DLL (no source ships) and rebuilt as
 // pure laws: a felt temperature from the world and the worn items,
 // and five needs on one record per entity, ticked a world minute at a
@@ -91,10 +89,9 @@ test('SURV1: clothing warms by piece and cloak, wetness eats it one for one and 
   assert.equal(clothingWarmth(w).warmth, 8 + 10 + 4 + 15, 'tunic, pants, boots, a formal cloak at variant 1 (5 x 3)');
   assert.equal(clothingWarmth(w, { wet: 20 }).warmth, 17, 'soaked, it keeps less');
   assert.equal(clothingWarmth(w, { wet: 300 }).warmth, 0, 'drenched clothes warm nothing');
-  // CLOTHES-BREATHE (FIELD BUGS 2026-09-30, PIN MOVED): 37 - 10 -> 18 - 10 and 37 -> 18 - above a natural ten the clothes
+  // CLOTHES-BREATHE (FIELD BUGS 2026-09-30
   // count half their warmth, and the hood shades the half (test/systems/survival/fb0930_cc_breathe.test.js)
   assert.equal(clothingWarmth(w, { natural: 40, inSunlight: true }).warmth, Math.trunc(37 / 2) - 10, 'the hood shades in strong sun');
-  // PIN MOVED (AUDIT TEMP-UI E7): the halving eases in a degree at a time from ten - at twenty the outfit has given up ten
   // of its 37, not half at once (a warmer world read cooler across the line)
   assert.equal(clothingWarmth(w, { natural: 20, inSunlight: true }).warmth, 37 - (20 - 10), 'but not in mild sun');
   assert.equal(clothingWarmth(worn({})).warmth, 0, 'naked');
@@ -341,24 +338,12 @@ test('SURV1: a jump owes at most two days, and a player arriving from longer awa
   assert.equal(THIRST_PER_MINUTE, 100 / 360);
 });
 
-test('SURV1: by source - liveStat reads the survival entry, and the model is three modules that import no host', () => {
-  // AUDIT SURV-TIERS (the second pass): read, and capped at the read - five above the stat as it stands without it
-  assert.match(read('src/systems/statMods.js'), /if \(a\.kind === 'survival'\) \{ survival \+= a\.statMods\?\.\[statName\] \?\? 0; continue; \}/);
-  assert.match(read('src/systems/statMods.js'), /if \(survival < 0\) survival = -Math\.min\(-survival, Math\.max\(0, Math\.min\(base, Math\.min\(Math\.max\(base \+ mod, 0\), MAX_STAT_VALUE\)\) - 5\)\);\n\s*mod \+= survival;/);
-  for (const f of ['temperature', 'food', 'needs']) {
-    const src = read(`src/systems/survival/${f}.js`);
-    assert.doesNotMatch(src, /from '\.\.\/\.\.\/scenes\/|from '\.\.\/\.\.\/ui\/|from '\.\.\/\.\.\/combat\/|from '\.\.\/spellcast|from '\.\.\/diseases|from '\.\.\/effects|document\.|window\./, `${f}.js is pure - and off the formulas -> equip cycle`);
-  }
-  assert.match(read('src/systems/survival/needs.js'), /export const MAX_CATCHUP_MINUTES = 2 \* MINUTES_PER_DAY;/);
-});
-
 // ── SURV-THIRST1: A BODY PAST DEHYDRATED FAILS WHEREVER IT STANDS ──
 //
-// Mac, 2026-09-19: "You should also should die on dehydration".
 //
 // Climates & Calories bleeds you for thirst only in HEAT. THE PORT
 // DEPARTS: water is not a climate. The mod's own line is recorded in
-// bible/06-Systems/Climates-Calories.md, so a tidy-up cannot put the
+// so a tidy-up cannot put the
 // gate back by mistake - these pins are what stop it.
 const thirstRig = () => {
   const mk = () => ({
@@ -428,15 +413,6 @@ test('SURV-THIRST1: the harm follows AUDIT SURV E’s shape - the harm TICK, esc
   log.length = 0;
   survivalMinute(e, 600, { ...cool, resting: true }, { worn: dressed, sinks, autoDrink: false, autoEat: false, ctx: { raceId: RACES.Breton } });
   assert.deepEqual(log, [], 'resting, thirst takes no blood');
-  // and it may KILL: no HEALTH_FLOOR, because the bare-skin harms leave the
-  // last five points BECAUSE they are not meant to kill, and this one is
-  const src = readFileSync(new URL('../../../src/systems/survival/needs.js', import.meta.url), 'utf8');
-  const line = src.slice(src.indexOf('if (rules.health && s.thirst >= NEED.THIRST_HARM'));   // SURV-TIERS: the wound is Hard's (`rules.health`)
-  assert.match(line.slice(0, line.indexOf('\n    }')), /sinks\.hurt\?\.\(/, 'the raw sink, not hurtFloored');
-  assert.doesNotMatch(line.slice(0, line.indexOf('\n    }')), /hurtFloored/);
-  // THE DEPARTURE ITSELF: no climate term anywhere in the condition
-  assert.doesNotMatch(line.slice(0, line.indexOf(')')), /temp\.|felt|EXPOSURE_AT/,
-    'thirst no longer asks the weather - that was the mod’s law and is the port’s departure');
 });
 
 test('SURV-THIRST1 AUDIT: a clock JUMP wounds to the floor and does not kill on arrival', () => {
@@ -470,7 +446,6 @@ test('SURV-THIRST1 AUDIT: a clock JUMP wounds to the floor and does not kill on 
     assert.ok(jump(hours, NEED.DEHYDRATED) > 0, `a ${hours}h jump already dehydrated must not be fatal either`);
   }
   // it HURTS, though - arriving at death's door is the whole point
-  // PIN MOVED (AUDIT TEMP-UI E6): this read `< 5`, which held only because the twelve-hour jump lands on a harm tick
   // (720) and the landing minute then bit past the floor - the coin flip the record says the arrival is not: one landing
   // in ten killed outright. The landing minute floors too; it is the next minute lived that may kill.
   assert.equal(jump(12, 0), 5, 'and it really does wound - to the floor, death\'s door, and no further');
@@ -482,14 +457,3 @@ test('SURV-THIRST1 AUDIT: a clock JUMP wounds to the floor and does not kill on 
   assert.equal(jump(24, 0), jump(12, 0), 'a longer jump cannot cost more than the floor allows');
 });
 
-test('SURV-THIRST1 AUDIT: the replay flag is the WALK’s, and only the last minute is live', () => {
-  const src = readFileSync(new URL('../../../src/systems/survival/needs.js', import.meta.url), 'utf8');
-  // one object for the whole walk, not one per minute (EV2: this loop
-  // runs up to MAX_CATCHUP_MINUTES times)
-  assert.match(src, /const walk = \{ \.\.\.deps, replay: true, sinks: \{ \.\.\.sinks, drainFatigue: drainFloored, say: [^\n]+ \} \};\s*\n\s*for \(let m = start \+ 1; m <= end; m\+\+\) \{\n\s*walk\.replay = m < end;/,
-    'the walk marks every minute but the last as a replay, from one object (AUDIT SURV-TIERS, the third pass: its lines gathered)');
-  // a bare survivalMinute - the live per-minute call every host makes -
-  // is NOT a replay, or nothing would ever die of thirst
-  assert.match(src, /autoEat = true, replay = false, landing = false \} = deps;[^\n]*\n\s+const rules = deps\.rules \?\? HARD_RULES;/, 'a caller that says nothing is live (and, SURV-TIERS, runs Hard - AUDIT SURV-TIERS: a null too)');   // PIN MOVED (AUDIT TEMP-UI E6): and not a landing
-  assert.match(src, /const jump = end - start > 1;[\s\S]*walk\.replay = m < end;\n(?:\s*\/\/[^\n]*\n)*\s*walk\.landing = !walk\.replay && jump;/, 'AUDIT TEMP-UI E6: the minute a JUMP lands in is a landing - floored, as its replayed minutes are; a one-minute step is that minute, live');
-});

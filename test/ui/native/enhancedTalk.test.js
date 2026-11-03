@@ -1,7 +1,5 @@
-// ET1 - THE ENHANCED TALK PANEL (2026-09-11).
+// ET1 - THE ENHANCED TALK PANEL.
 //
-// Mac: "the talk menu. My goal is to transform it into a rectangular
-// panel akin to Fallout/Skyrim instead of a full screen menu."
 //
 // The panel owns no conversation law: it presses the classic
 // NativeTalkWindow's named buttons and draws that model's state. So

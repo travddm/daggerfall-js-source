@@ -99,7 +99,7 @@ test('X11 Comprehend Languages: an incumbent carrying a frozen chance, renewing 
   // would stand at fresh (5 rolled, 4 standing), never past.
   assert.equal(rounds, 10);
   // a recast with a DIFFERENT chance: AddState merges rounds and
-  // nothing else (ComprehendLanguages.cs:50-53). PIN MOVED (STACK-CAP):
+  // nothing else (ComprehendLanguages.cs:50-53).
   // renewed, never stacked (it added its 5) - and a shorter recast
   // never shortens the incumbent
   cast(e, 44, 255, { durationBase: 4, chanceBase: 90 });
@@ -166,7 +166,6 @@ test('X11 Spell Reflection: it lands as an incumbent whose chance the incoming c
   // being vacuous under red-proof.
   cast(e, 21, 255, { durationBase: 8, chanceBase: 90 }, { ctx: { heldItem: { id: 1 } } });
   assert.equal(e.activeEffects.length, 2, 'the pinned entry stands beside the spell\'s');
-  // PIN MOVED (RPT1026-PROGRESS): FindIncumbentEffect's FIRST match (EEM:666-678) let a weaker entry first in the list mask
   // a stronger one (a mate's gift, a worn item's bundle) - the reader takes the BEST live entry now, still never a sum
   assert.equal(spellReflectionChance(e), 91, 'the better of the two - never 71 + 91');
 });
@@ -257,7 +256,7 @@ test('X11 Light: a duration-only incumbent, renewing rounds like every other buf
   const rounds = e.activeEffects[0].roundsRemaining;
   cast(e, 15, 255, { durationBase: 6 });
   assert.equal(e.activeEffects.length, 1, 'one incumbent');
-  assert.equal(e.activeEffects[0].roundsRemaining, rounds, 'a shorter recast never shortens it');   // PIN MOVED (STACK-CAP): AddState stacked rounds (LightNormal.cs:57-62)
+  assert.equal(e.activeEffects[0].roundsRemaining, rounds, 'a shorter recast never shortens it');
   e.activeEffects[0].roundsRemaining = 1;
   cast(e, 15, 255, { durationBase: 6 });
   assert.equal(e.activeEffects[0].roundsRemaining, 6, 'renewed to its fresh 6 - never 1 + 7');

@@ -1,4 +1,4 @@
-// AUDIT LW-II-2 (2026-10-10, the second audit of THE LIVING WORLD II): THE OUTLAWS, AUDITED AGAIN - LW12's band chest,
+// AUDIT LW-II-2: THE OUTLAWS, AUDITED AGAIN - LW12's band chest,
 // its hideout stood and let go, its election, its origin, and the laws the first audit's pins left unheld. Every fixture
 // the real producers' (test/lwRoads.mjs livingMap with its real fate, outlaws.js's hideouts and bands, hideouts.js's
 // chest over townTrips and the shops' own roll); the host's wiring swept or lifted from world.js. Synthetic: no game data.
@@ -103,12 +103,11 @@ test('AUDIT LW-II-2 C4: a band\'s chest holds none of a general store\'s fixed p
   let counter;
   try { globalThis.location = { search: '?online' }; counter = stockShopShelf({ buildingType: BUILDING_TYPES.GeneralStore, quality: 10 }, PLAYER, { rolls: lwRng(7, 7) }); } finally { globalThis.location = where; }
   const fixed = counter.filter((it) => it.group === 'Transportation' || isBagItem(it) || isSurvivalItem(it));
-  // PIN MOVED (MERCHANT-YARDS, main's #748, at the merge): the General Store sells no horse, cart or wagon any more - the
   // town's Stable and Wagon Yard do (systems/merchantYards.js) - so its fixed pieces are the bag and the provisions; the
   // chest's Transportation guard stands should a store's roll ever carry one again (its mutant recorded equivalent)
   assert.deepEqual(['Transportation', 'bag', 'survival'].map((k) => fixed.some((it) => (k === 'bag' ? isBagItem(it) : k === 'survival' ? isSurvivalItem(it) : it.group === k))), [false, true, true]);
   assert.equal(counter.filter((it) => it.group === 'Transportation').length, 0, 'the horse, the cart and the wagons are the yards\' now');
-  const yards = [...yardStock('stable'), ...yardStock('transport')].filter((it) => it.group === 'Transportation');   // PIN MOVED (STEED1/WAGONS4): the yards sell their upkeep beside them - the oats, the kits
+  const yards = [...yardStock('stable'), ...yardStock('transport')].filter((it) => it.group === 'Transportation');
   assert.ok(yards.length >= 4 && yards.some((it) => it.templateIndex === 94) && yards.some((it) => it.templateIndex === 93), 'the yards mint the horse, the cart and the wagons');
   for (const it of yards) assert.equal(chestPiece(it), false, `${it.name}: never a band's, whoever stocks it`);
   for (const it of fixed) assert.equal(chestPiece(it), false, `${it.name} is the store's, never a band's`);
@@ -152,7 +151,6 @@ test('AUDIT LW-II-2 P5: the real chest (hideouts.js bandChest, world.js livingBa
   assert.match(WORLD, /const livingBandChest = \(band, t\) => bandChest\(band, t, \{\n\s*townOf: \(id\) => livingTownOfId\(id\),\n\s*tripsOf: \(town, at\) => tripsOfTown\(town, at, livingTripWorld, livingTripO\(\)\),\n\s*shelf: \(o\) => stockShopShelf\(\{ buildingType: TALK_BUILDING_TYPES\.GeneralStore, quality: 10 \}, playerEntity, o\),\n\s*gold: \(n\) => goldStack\(n\),\n\s*\}\);/);
   assert.match(WORLD, /\n\s*chest: livingBandChest,\n/);
   assert.match(WORLD, /\n\s*bandAt: \(h, t\) => outlawBandAt\(h, t, livingRouts\(\)\),\n\s*clock: \(\) => skyMinutes\(\),/);
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the towns' AREAS - the regions on the Bay, the same numbers
   assert.match(WORLD, /const livingHideoutsNear = \(x, z\) => \{\n\s*const px = Math\.floor\(x \/ 32768\), py = 499 - Math\.floor\(z \/ 32768\);\n\s*const areas = new Set\(livingTripWorld\.townsNear\(px, py, 8\)\.map\(\(t\) => t\.area \| 0\)\);\n\s*return \[\.\.\.areas\]\.flatMap\(\(a\) => livingHideoutsOf\(a\)\);/);
 });
 

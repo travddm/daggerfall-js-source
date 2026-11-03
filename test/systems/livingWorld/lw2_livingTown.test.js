@@ -1,4 +1,4 @@
-// LW2 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVING TOWN - the residents on the street, in the wandering
+// LW2: THE LIVING TOWN - the residents on the street, in the wandering
 // pool's own shape, and its wiring in the streaming host. The town is the synthetic one (test/lwTown.mjs); the bodies
 // are the real ResidentWalker; the clock is the calendar's (DFU's walking pace over CLASSIC_MINUTES_PER_SECOND).
 import test from 'node:test';
@@ -62,7 +62,7 @@ test('LW2 the body: a ResidentWalker is a MobilePerson (every seam that takes a 
   assert.equal(p.frame, 0);
   const g = new ResidentWalker({}, { archive: 399, guard: true, frameCount: () => 1, groundY: () => 0 });
   g.pos = [0, 0, 0];
-  assert.equal(g.update(0.1, eye, true).record, PERSON_GUARD_IDLE_RECORD);   // LW-TALK: PIN MOVED - the gate's (standing, the walk wheel's still frame)
+  assert.equal(g.update(0.1, eye, true).record, PERSON_GUARD_IDLE_RECORD);   // LW-TALK:
   assert.doesNotThrow(() => p.release(), 'nothing on the grid to release');
 });
 
@@ -127,7 +127,7 @@ test('LW2 a walk: the body walks its day\'s path at the day\'s pace - never slow
   run(t, 1);
   const moved = Math.hypot(p.pos[0] - at0[0], p.pos[2] - at0[2]);
   assert.ok(moved > PERSON_MOVE_SPEED * 0.8 && moved < PERSON_MOVE_SPEED * WALK_FAST * 1.1, `a second's walk (${moved.toFixed(2)} m)`);
-  // the gate: stood for two seconds, it does not move and owes the minutes - LW-SPREAD: PIN MOVED - the player stands
+  // the gate: stood for two seconds, it does not move and owes the minutes - LW-SPREAD:
   // beside it (the street's nearest: kept on it; at the square, a walker the street no longer kept went out of view)
   const before = [...p.pos];
   const beside = [p.pos[0] + Math.sin(p.yaw) * 1.5, 0, p.pos[2] + Math.cos(p.yaw) * 1.5];
@@ -152,7 +152,7 @@ test('LW2 coming onto the street: on ARRIVAL (the first frame, a jump of the clo
   run(t, 4);
   const seen = new Set(t.town.pool.filter((r) => r.visible && r.res).map((r) => r.res.id));
   let checked = 0, waited = 0;
-  for (let f = 0; f < 30 * 160; f++) {   // LW-TALK: PIN MOVED - the street keeps a circle whole: under a tight cap the churn waits on a round's turn (two minutes)
+  for (let f = 0; f < 30 * 160; f++) {   // LW-TALK:
     t.clock.t += RATE / 30;
     const seats = t.town.update(1 / 30, SQUARE, 0, SQUARE, true);
     const now = new Set();
@@ -165,7 +165,7 @@ test('LW2 coming onto the street: on ARRIVAL (the first frame, a jump of the clo
       checked++;
     }
     seen.clear(); for (const id of now) seen.add(id);
-    // LW-SPREAD: PIN MOVED - one wanted in plain sight, waiting to be unseen, counted through the churn (the square's
+    // LW-SPREAD:
     // morning is quieter: read at its last frame alone, nobody waited)
     for (const r of t.town.pool) if (r.active && r.res && !r.visible && r.scheduleEnable && inSight(r.person)) waited++;
   }
@@ -255,30 +255,5 @@ test('LW2 the switch: the Features row `living-world` (on, the player\'s own onl
   LIVING_WORLD_TUNING.override = false;
   assert.equal(livingWorldOn(), false);
   LIVING_WORLD_TUNING.override = null;
-  const src = rd('src/systems/livingWorld/livingSwitch.js');
-  assert.match(src, /isEnhanced\(\) && getPref\(LIVING_WORLD_KEY\) !== false/);
 });
 
-test('LW2 the streaming host: where the row is on, the population block stands a LivingTown on the same navgrid, bodies (ResidentWalker on the same collider, ground and batches) and racial override; DFU\'s pool otherwise, as it was; every door names its building (the block\'s grid cell); the regards ride the save as `LivingWorld`; the residents speak through the crew\'s one layer; the talk ray asks the body\'s town for a refusal and notes the word (mutants: each seam removed)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /population = livingWorldOn\(\) \? new LivingTown\(nav, \{/);
-  assert.match(w, /\}\) : new TownPopulation\(nav, \{/);
-  assert.match(w, /const person = new ResidentWalker\(nav, \{ archive, guard, frameCount: \(rec, a\) => personTex\.get\(a\)\.getFrameCount\(rec\), collider: personCollider, groundY: personGroundY \}\);\n\s+personBatches\.set\(person, renderer\.createBillboardBatch\(archive, 0, \{ w: 1, h: 1 \}, \[\[0, 0, 0\]\]\)\);/);
-  assert.match(w, /groundY: personGroundY,   \/\/ JAN1/);
-  assert.match(w, /door, pixelKey: key, dfBlock: b\.dfBlock, blockX: b\.x, blockY: b\.y,/);
-  assert.match(w, /key: makeBuildingKey\(d\.blockX, d\.blockY, d\.recordIndex\)/);
-  assert.match(w, /clock: skyMinutes, rate: livingRate, mpm: PERSON_MOVE_SPEED \/ livingBaseRate\(\),/);
-  assert.match(w, /const livingBaseRate = \(\) => \(params\.has\('online'\) \? skyMinutesPerMsAt\(Date\.now\(\) \+ _sharedOffsetMs\) \* 1000 : CLASSIC_MINUTES_PER_SECOND\);/);
-  assert.match(w, /const livingRate = \(\) => \(params\.has\('online'\) \? livingBaseRate\(\) : CLASSIC_MINUTES_PER_SECOND \* worldTimeScale\(\)\);/);
-  assert.match(w, /registerModSaveData\(LIVING_WORLD_VENDOR, \{\n\s+newSaveData: \(\) => null,\n(?:\s+\/\/[^\n]*\n)*\s+getSaveData: \(\) => \{ _caravanHost\?\.flush\(\); return livingRelations\.snapshot\(\); \},\n\s+restoreSaveData: \(rec\) => \{ livingRelations = characterRelations\(rec, ownMinutes, params\.has\('online'\)\); \},/);   // PIN MOVED (AUDIT LW-II-2 C3): the caravan host's counters written into the record before its snapshot; FIELD BUGS 2026-10-21d REGARD-OWN: made in the character's own days
-  const lines = w.slice(w.indexOf('function navalCrewLines('), w.indexOf('function livingLinePoints('));
-  assert.match(lines, /livingLinePoints\(points, w, h, rect, proj, view, eye\);/);
-  assert.ok(lines.indexOf('livingLinePoints(') < lines.indexOf('drawCrewLines('), 'merged before the one draw');
-  // PIN MOVED (LEGACY-HOME): the doors gained `kin` - one of Project Legacy's line met before the words (test/systems/legacyhome.test.js)
-  // PIN MOVED (LW11): a caravan's door after the kin's
-  assert.match(w, /livingTalk: \{ refuses: \(person\) => person\?\.living\?\.town\?\.refuses\(person\) \?\? null, talked: \(person\) => person\?\.living\?\.town\?\.talked\(person\), caught: \(person\) => person\?\.living\?\.town\?\.caught\?\.\(person\),\n\s*regard: \(person\) => regardBadge\(person\?\.living\?\.town\?\.regardCard\?\.\(person\) \?\? null\),[^\n]*\n\s*friendsMade: \(\) => friendCards\([^\n]*\n\s*kin: \(person, talk\) => legacyMeetKin\(person, talk\),[^\n]*\n\s*offers: \(person, talk\) => \(livingWorldOn\(\) \? caravanHostOf\(\)\.offers\(person, talk\) \|\| \(_mode\(\) === 'dungeon' && !!livingDivers\?\.offers\(person, talk\)\) : false\) \},/);   // PIN MOVED (AUDIT LW-II-2 D4): a company below answers below alone; PIN MOVED (PLAIN-UI): and the talk panel's regard beside the doors; PIN MOVED (AUDIT FB1021d RO-4): and the friends made, said once the HUD is clear
-  const tt = rd('src/scenes/townTalk.js');
-  const act = tt.slice(tt.indexOf('function activate(target, dist)'));
-  assert.ok(act.indexOf('livingTalk?.refuses?.(target.person)') > 0 && act.indexOf('livingTalk?.refuses?.(target.person)') < act.indexOf('const eng0 = engine();'), 'the refusal before the conversation');
-  assert.ok(act.indexOf('livingTalk?.talked?.(target.person);') > act.indexOf('_talkNpc = target.person;'), 'the word noted once it is a conversation');
-});

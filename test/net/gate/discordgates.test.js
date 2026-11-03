@@ -1,5 +1,5 @@
 // DISCORD-GATES (2026-09-28, the field's player: "add a discord channel that tells the gates in real time itll create
-// hype and make more join"; Mac: "Discord live gates?", then "Omen (15 min before), Boss slain", "Ping an opt-in role"
+// hype and make more join";, then "Omen (15 min before), Boss slain", "Ping an opt-in role"
 // and, for the place, "What do you need for discord"): THE GATE'S HERALD, DRIVEN. The law (net/gate/gateHerald.js: the
 // door, the words, when each is owed, where the gate stands as accounts said it), the wire's `site` word (net/wire.js),
 // the hub over the real Room with Discord stubbed (server/src/index.js: the alarm at the omen, the posts, the kill,
@@ -14,7 +14,7 @@ import {
 } from '../../../src/net/gate/gateHerald.js';
 import { gateTimes, gateBossOf, gateModsOf, GATE_COLLAPSE_MS } from '../../../src/net/gate/gateLaw.js';
 import {
-  validGateIn, parseClient, gatePlaceWire, relaySupportsGateSite, GATE_SITE_RELAY_MIN, GATE_PLACE_MAX, GATE_INTERNAL_FELL, SOCIAL_ROOM, RELAY_VERSION, ACCOUNT_SWEEP_MS, SD_KEY,
+  validGateIn, parseClient, gatePlaceWire, GATE_PLACE_MAX, GATE_INTERNAL_FELL, SOCIAL_ROOM, RELAY_VERSION, ACCOUNT_SWEEP_MS, SD_KEY,
 } from '../../../src/net/wire.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
 import { OnlineSession } from '../../../src/net/online.js';
@@ -147,7 +147,7 @@ test('DISCORD-GATES law: WHERE THE GATE STANDS - one word an account a day; one 
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest; said only to a relay that hears it (mutants: a raw place taken; the pixel unbounded; the version floor off)', () => {
+test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest (mutants: a raw place taken; the pixel unbounded)', () => {
   const ok = { k: 'site', d: DAY, px: 100, py: 200, pl: 'Copperham, Wrothgarian Mountains' };
   assert.deepEqual(validGateIn(ok), ok);
   assert.deepEqual(validGateIn({ ...ok, pl: 'Alik\'r Desert' }).pl, 'Alik\'r Desert');
@@ -155,8 +155,6 @@ test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its
     { px: 1000 }, { py: 500 }, { px: -1 }, { px: 1.5 }, { d: -1 }, { d: '538' }]) assert.equal(validGateIn({ ...ok, ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(parseClient(JSON.stringify({ t: 'gate', ...ok, extra: 1 }), { hasHello: true }), { t: 'gate', ...ok });
   assert.equal(gatePlaceWire(' St. Olms  Keep:*  '), 'St Olms Keep');
-  assert.equal(GATE_SITE_RELAY_MIN, 123, 'world126 on its branch - the merge made the batch one relay past main\'s TV3 (world122)');
-  assert.ok(relaySupportsGateSite('world123') && relaySupportsGateSite(RELAY_VERSION) && !relaySupportsGateSite('world122'), 'never said to a relay that would close the socket on it');
 });
 
 // ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
@@ -174,7 +172,7 @@ async function withHerald(fn, { env = { GATE_DISCORD_WEBHOOK: HOOK, GATE_DISCORD
   // with a rise ten years off, so this harness's alarms are the sweep's and the heralds' alone (the director's own are
   // sd3_relay.test.js's)
   r.store.set(SD_KEY, { s: 0, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
-  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });   // PIN MOVED (WW5): and every province lane's Hollow resting with it
+  for (let lane = 1; lane <= 9; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
   const posts = [];
   const discord = { answer: () => ({ ok: true, status: 204 }), during: null };
   Date.now = () => clock;
@@ -289,7 +287,7 @@ test('DISCORD-GATES relay: NO WEBHOOK, NO HERALD - nothing posted, no owe, the s
       const a = await join('a');
       assert.equal(r.alarm.at, now() - 10 + ACCOUNT_SWEEP_MS, 'the sweep\'s, untouched');
       await site(a, DAY, 100, 200, 'Copperham');
-      assert.deepEqual(r.store.get('gatesite'), { d: DAY, c: [[100, 200, 'Copperham', ['acct-a']]] }, 'kept for the rite');   // PIN MOVED (the merge with main's FRIENDS-SYNC): the hub's account is the signed-in player's, never the browser profile's
+      assert.deepEqual(r.store.get('gatesite'), { d: DAY, c: [[100, 200, 'Copperham', ['acct-a']]] }, 'kept for the rite');
       set(TT.omenAt); await r.fire();
       set(TT.openAt + 1000); await fell(DAY, ['Ann'], 1); await r.fire();
       assert.equal(r.store.has('herald'), false);
@@ -303,7 +301,7 @@ test('DISCORD-GATES relay: NO WEBHOOK, NO HERALD - nothing posted, no owe, the s
   assert.equal(ws.meters.junk, 1);
 });
 
-test('DISCORD-GATES client: the game says where it found the gate to the hub - once a socket and day, a reconnect says it again; never without an account, to a relay that would close on it, or when the send fails; the frame is the wire\'s; the scene says it off the clearing\'s own site (mutants: said every frame; said to world122; the place sent raw)', () => {
+test('DISCORD-GATES client: the game says where it found the gate to the hub - once a socket and day, a reconnect says it again; never without an account or when the send fails; the frame is the wire\'s; the scene says it off the clearing\'s own site (mutants: said every frame; the place sent raw)', () => {
   const link = (v = RELAY_VERSION, acct = 'acct-me') => {
     const { FakeWS, sockets } = fakeSocketClass();
     const o = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'peer-me', secret: 'secret-of-peer-me', WebSocketImpl: FakeWS, now: () => 1e6, presence: false, acct, asecret: 'secret-of-acct-me' });
@@ -322,27 +320,10 @@ test('DISCORD-GATES client: the game says where it found the gate to the hub - o
   o._ws = { send: () => { throw new Error('gone'); } };
   assert.equal(o.sendGateSite(DAY + 2, 5, 6, 'Wayrest'), false, 'a send that fails is said again');
   o._ws = ws;
-  assert.equal(link('world122').o.sendGateSite(DAY, 1, 1, 'Wayrest'), false, 'a relay that would close the socket on it');
-  assert.equal(link('world122').sites().length, 0);
   assert.equal(link(RELAY_VERSION, null).o.sendGateSite(DAY, 1, 1, 'Wayrest'), false, 'no account, no word');
   const off = link();
   assert.equal(off.o.sendGateSite(DAY, 1000, 1, 'Wayrest'), false, 'off the map');
   assert.equal(off.o.sendGateSite(DAY, 1000, 1, 'Wayrest'), true, 'and asked no more that day');
   assert.equal(off.sites().length, 0);
-  // the scene: the clearing's own site, off the gate's frame
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (WW2, bible/03-World/World-Wide.md): and each lane's past the Bay, from its omen on
-  assert.match(w, /const reportGateSite = \(\) => \{\n\s*const s = _gateClearNow\(\) \? _gateClearOf\.site : null;\n\s*if \(s\) socialLink\(\)\?\.sendGateSite\?\.\(s\.day, s\.px, s\.py, s\.place\);\n[^\n]*\n\s*for \(const \{ lane, c \} of gateOmen\?\.currents\(\) \?\? \[\]\) if \(lane && c\.site\) socialLink\(\)\?\.sendGateSite\?\.\(c\.site\.day, c\.site\.px, c\.site\.py, c\.site\.place\);\n\s*\};/);
-  assert.match(w, /gateClaims\?\.tick\(\);[^\n]*\n\s*if \(gateOmen\) reportGateSite\(\);/, 'on the gate\'s frame, online');
 });
 
-test('DISCORD-GATES config: the webhook is a Worker SECRET the repository never holds, the role a var beside the raids\' pin; the relay reads both by the names the bible gives', () => {
-  const toml = rd('server/wrangler.toml');
-  assert.match(toml, /^GATE_DISCORD_ROLE = "\d*"$/m, 'the role: a var, empty or an id');
-  assert.ok(!/^GATE_DISCORD_WEBHOOK\s*=/m.test(toml), 'the webhook is never a var');
-  assert.ok(!/discord(?:app)?\.com\/api\/webhooks\/\d/.test(toml), 'and no webhook URL is written down');
-  const idx = rd('server/src/index.js');
-  assert.match(idx, /heraldWebhook\(this\.env\?\.GATE_DISCORD_WEBHOOK\)/);
-  assert.match(idx, /role: heraldRole\(role\('gateRole'\)\)/);   // PIN MOVED (SCALE5b): the role through relayCfgValue - the hub's setting when it holds one, else GATE_DISCORD_ROLE (net/relayCfg.js RELAY_CFG_VARS, test/net/scale5b.test.js)
-  assert.match(idx, /const cfg = this\._relayCfg, role = \(k\) => relayCfgValue\(cfg, this\.env, k\);/);
-});

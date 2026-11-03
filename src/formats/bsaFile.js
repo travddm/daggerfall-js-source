@@ -5,7 +5,7 @@
 // name field, where DFU's is unbounded (see ReadDirectory below). Unity disk
 // plumbing (FileProxy, RewriteRecord write-back, path extension checks)
 // dropped because our runtime reads immutable byte buffers only.
-// See bible/01-Overview/Port-Doctrine.md.
+// See.
 //
 // Format:
 //   Header (4 bytes): int16 directoryCount, uint16 directoryType. Little-endian.
@@ -147,7 +147,7 @@ export class BsaFile {
   }
 
   /**
-   * REGION-VIEWS (2026-10-20, bible/07-Rendering/Performance-Priority.md REGION-VIEWS): record data as a view into the
+   * REGION-VIEWS: record data as a view into the
    * archive's own bytes - nothing copied - or null if index invalid. For a reader that only ever reads a record (the
    * archive's bytes are held whole for its life): getRecordBytes' copy is DFU's ReadBytes, and the one a reader that
    * edits a record in place (a block's automap, BlocksFile.getBlockAutoMap) is owed.

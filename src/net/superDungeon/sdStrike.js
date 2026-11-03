@@ -1,5 +1,5 @@
 // @ts-check
-// SD8d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT'S BLOWS
+// SD8d: THE BRASS REMNANT'S BLOWS
 // ON ME - judged on the struck player's own machine, as the gate's are (net/gate/gateStrike.js: co-op's law, "an enemy's strike
 // on a client is applied by that client"), from the words the realm says (net/superDungeon/sdFightLink.js) and the geometry the law
 // shares with every screen (net/superDungeon/sdRemnant.js stompRingAt, ringPassed, handSwept, behindPillar). Pure: a blow, where I

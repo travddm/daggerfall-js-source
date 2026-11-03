@@ -1,5 +1,5 @@
 // @ts-check
-// SIGIL-UI (2026-09-26): THE RUNE - the one picture a sigil wears, a leaf with no imports so the stylesheet
+// SIGIL-UI: THE RUNE - the one picture a sigil wears, a leaf with no imports so the stylesheet
 // (ui/enhanced/enhancedPlusStyle.js, which node tests import for its CSS alone) can paint a tile's corner with it without
 // pulling the sigil's law (systems/sigil/sigil.js registers a blow modifier when it loads) into every page that reads CSS.
 /** The rune: an octagonal ring with a four-point star at its heart - drawn on the pixel grid, never scaled past it. */

@@ -1,4 +1,4 @@
-// HCC (2026-09-23): THE HOSTS' WIRING - what world.js, exterior.js, worldModes.js, mountRig.js, the inventory
+// HCC: THE HOSTS' WIRING - what world.js, exterior.js, worldModes.js, mountRig.js, the inventory
 // session, the foe pool and the collider hand Horse Cart and Cargo, pinned by execution where the seam is a
 // function (the inventory's open state and wagon toggle, the activation race, the collider's filtered sphere
 // cast, the pool's threat qualification) and by reading the host source where the seam is a call in a frame.
@@ -122,14 +122,13 @@ test('HCC hosts: world.js - the frame, the draw, the origin, the ray, the plaque
     /ready: \(\) => walkMode && playerSpawned && !_teleporting && !_traveling/,
     /isOnShip: \(\) => isOnShip\(playerEntity, playerEntity\.boardShipPosition \?\? null, playerTravelPixel\(\)\)/,
     /ratio: \(\) => SCENE_MAP_RATIO/, /dungeonId: \(\) => modes\?\.roomIdentity\?\.\(\)\?\.mapId \?\? null/,
-    /wagonWeight: \(\) => totalWeight\(playerEntity\.wagonItems \?\? \[\]\), wagonKgLimit: \(\) => wagonKgFor\(playerEntity\)/,   // PIN MOVED (WAGONS1): the driven wagon's capacity
+    /wagonWeight: \(\) => totalWeight\(playerEntity\.wagonItems \?\? \[\]\), wagonKgLimit: \(\) => wagonKgFor\(playerEntity\)/,
     /travelOptionsActive: \(\) => \(travelOptions \? !!travelOptions\.isTravelActive : null\)/,
     /new InputMessageBoxWindow\(\{ lines: \[\], label, value, maxCharacters/,
     /isQualifyingThreatState\(true, !!f\.ai\.isHostile, f\.entity\?\.team === 'PlayerAlly', isLocalPlayerTarget\(f\.ai\.target\), !!f\.ai\.detected\)/,
     // AUDIT HCC H1: LateUpdate ONCE a frame, in every mode - the modal branch, and the exterior frame before the world pass
     /hcc\.setEnabled\(hccOn\(\)\); if \(hcc\.enabled\) hccPollSettings\(nowMs\); hcc\.frame\(dt, cam\.pos, gamePaused\(\) \? 0 : dt \* (?:worldTimeScale|hccTimeScale)\(\)\);/,   // AUDIT HCC (branch audit): the runtime's Time.deltaTime - held by the pause, scaled with the world
     /hccTick\(dt, now\);[^\n]*\n\s+townTalk\.frame\(dt\);\n\s+renderer\.resolveFrame\(\);[^\n]*\n\s+capturePendingScreenshot\(canvas\);/,   // AUDIT RETRO1 E5: the frame shown before its shot
-    // PIN MOVED (WAGONS3): before the camera, which sits on the bench of the wagon it just stood - and so before the world pass
     /hccTick\(dt, now\);\n(?:\s+\/\/[^\n]*\n)*\s+_driverSeat = walkMode && playerSpawned && player\.transportMode === TRANSPORT_MODES\.Cart && [^\n]*hcc\.driverSeat\(\) : null;\n\s+if \(_driverSeat\) cam\.pos = /,
     /if \(hcc\.enabled && _mode\(\) === 'exterior'\) livePersonBatches\.push\(\.\.\.hcc\.batches\(\)\);/,
     // AUDIT HCC K2/K3: GetKeyDown is the frame's edge ring, behind HandleConfiguredHotkeys' IsPlayingGame / LoadInProgress gate
@@ -137,7 +136,6 @@ test('HCC hosts: world.js - the frame, the draw, the origin, the ray, the plaque
     /const hccActionPressed = \(action\) => !gamePaused\(\) && !pointerSurfaces\.size && !_loading && pressed\(latch\.edge, keys, action\);/,
     // AUDIT HCC U6: the mod's HUD label, where the plaque is not already naming the horse
     /horseNameTooltip\.set\(tipOn \? hcc\.tooltipText\(cam\.pos, /,
-    // PIN MOVED (PERF-WAGON): the tents asked the street's view test too
     /camps\.draw\(renderer, null, yardCull\);[^\n]*\n\s+hcc\.draw\(renderer, null, tvf \? \{ selfGrow: tvf\.grow, grow: peerGrow \} : undefined, yardCull\);/, /camps\.offsetAll\(r\.offset\);[^\n]*\n\s+hcc\.offsetAll\(r\.offset\);/,
     /const _hccPick = pickActivatableHit\(cam\.pos, useFwd, hcc\.targets\(\), collider\);/, /horseCart: _hccPick,/,
     /else if \(_race\.horseCartWins\) \{ hcc\.activate\(_hccPick\.key, _hccPick\.distance, \(l\) => townTalk\.say\(l\), \(\) => setMidScreenText\(tooFarAwayText\(\)\), plaqueActionFor\(_hccPick\.key\)\); \}/,   // ACT-MENU: and the verb the plaque lit
@@ -145,7 +143,7 @@ test('HCC hosts: world.js - the frame, the draw, the origin, the ray, the plaque
     // AUDIT HCC H3: DFU's per-mod slot on every save; OnStartLoad before any await, RestoreSaveData once the place stands
     /modData: \{ \[HCC_VENDOR\]: hccRuntime\.getSaveData\(\), \.\.\.modSaveRecords\(\) \},/,   // WA1: every registered mod's record beside it
     /autoBuildArms\(playerEntity\);[^\n]*\n\s+hccRuntime\.handleStartLoad\(\);/,
-    /const hccRecord = extras\.modData\?\.\[HCC_VENDOR\] \?\? null;\n\s+if \(hccRecord\) hccRuntime\.restoreSaveData\(hccRecord, \{ elsewhere: csaElsewhere \}\);/,   // PIN MOVED (HORSE-WAKE): and the landing's word
+    /const hccRecord = extras\.modData\?\.\[HCC_VENDOR\] \?\? null;\n\s+if \(hccRecord\) hccRuntime\.restoreSaveData\(hccRecord, \{ elsewhere: csaElsewhere \}\);/,
     /horseCartSave: \(\) => hccRuntime\.getSaveData\(\),/, /horseCartLoad: \(rec\) => \{ hccRuntime\.handleStartLoad\(\); upkeep\.reset\(\); if \(rec\) hccRuntime\.restoreSaveData\(rec\); \},/,
     /if \(!_loadedGame\) hccRuntime\.handleNewGame\(\);/, /horseCart: hccRuntimeOn,\s+\/\/ HCC: the runtime's transition handlers/,
     // AUDIT HCC H2: the travel map's journey (the mod's one subscription), and the online respawn treated as one
@@ -173,10 +171,10 @@ test('HCC hosts: exterior.js mirrors the same seams over the fixed city (no stre
     /isOnShip: \(\) => false/,
     /hcc\.setEnabled\(hccOn\(\)\); if \(hcc\.enabled\) hccPollSettings\(nowMs\); hcc\.frame\(dt, cam\.pos, gamePaused\(\) \? 0 : dt \* (?:worldTimeScale|hccTimeScale)\(\)\);/,   // AUDIT HCC (branch audit): the runtime's Time.deltaTime - held by the pause, scaled with the world
     /hccTick\(dt, now\);[^\n]*\n\s+townTalk\.frame\(dt\);/,
-    /hccTick\(dt, now\);\n\s+_driverSeat = walkMode && player\.transportMode === TRANSPORT_MODES\.Cart && [^\n]*hcc\.driverSeat\(\) : null;\n\s+if \(_driverSeat\) cam\.pos = /,   // PIN MOVED (WAGONS3): before the camera
+    /hccTick\(dt, now\);\n\s+_driverSeat = walkMode && player\.transportMode === TRANSPORT_MODES\.Cart && [^\n]*hcc\.driverSeat\(\) : null;\n\s+if \(_driverSeat\) cam\.pos = /,
     /if \(hcc\.enabled\) personBatches\.push\(\.\.\.hcc\.batches\(\)\);/,
     /const hccActionPressed = \(action\) => !gamePaused\(\) && pressed\(latch\.edge, keys, action\);/,
-    /camps\.draw\(renderer, texRemap, streetCull\);[^\n]*\n\s+hcc\.draw\(renderer, texRemap, undefined, streetCull\);/,   // PIN MOVED (PERF-WAGON): the fixed city's tents and wagons asked its own frame's view test (PERF-TEAMS wired the world host alone)
+    /camps\.draw\(renderer, texRemap, streetCull\);[^\n]*\n\s+hcc\.draw\(renderer, texRemap, undefined, streetCull\);/,
     /const _hccPick = pickActivatableHit\(cam\.pos, useFwd, hcc\.targets\(\), collider\);/, /horseCart: _hccPick,/,
     /else if \(_race\.horseCartWins\) \{ hcc\.activate\(_hccPick\.key, _hccPick\.distance, \(l\) => townTalk\.say\(l\), \(\) => setMidScreenText\(tooFarAwayText\(\)\), plaqueActionFor\(_hccPick\.key\)\); \}/,   // ACT-MENU: and the verb the plaque lit
     /\(key\) => hcc\.hoverName\(key\),/, /horseCart: pickActivatableHit\(cam\.pos, _hd, hcc\.targets\(\), collider\),/,

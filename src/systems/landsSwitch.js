@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md): THE LANDS PAST THE BAY'S SWITCH, its own home - the world's hosts read it
+// TESA-LANDS: THE LANDS PAST THE BAY'S SWITCH, its own home - the world's hosts read it
 // (scenes/shared.js re-exports it for them) and so do the far views (render/farRing.js: the far woods and ground wear a
 // zone's own), which import no scene.
 import { pageParam } from './pageQuery.js';

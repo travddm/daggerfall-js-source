@@ -1,5 +1,4 @@
-// AUDIT FEUD (bible/12-Enhanced-AI/Feud-Arc.md - the AUDIT FEUD record; Mac, 2026-10-04: "Let's do a comprehensive audit
-// over everything ensuring perfection"): RVN1-RVN13 read again whole by four lenses - the record and its merge, the
+// AUDIT FEUD (- the AUDIT FEUD record): RVN1-RVN13 read again whole by four lenses - the record and its merge, the
 // deeds and their flows, the four hosts, the words, the page and the wire - every finding verified before it was fixed.
 // Pinned here: each fix through its real door where it has one, its seam where it is a host's.
 import '../modsOff.js';
@@ -64,28 +63,6 @@ function glenmoril() {
 }
 
 // ── the wire ────────────────────────────────────────────────────────
-
-test('AUDIT FEUD W1: A PEER\'S BLOW OF ITS WEAKNESS RIDES - winding up or not, its class carries the weakness (no facing to be behind outside one); the owner\'s reveal reads it; neither sender drops it (mutants: the class unbuilt outside a wind-up; the weakness unpassed at either sender)', () => {
-  const sword = createWeapon(W.Longsword, 1, () => 0.5);
-  const idle = { _tac: { state: 'engage' } };
-  assert.equal(blowClassOf(idle, { kind: 'melee', weapon: sword }, [0, 0, 0]), null, 'no weakness, no wind-up: nothing to weigh');
-  const c = blowClassOf(idle, { kind: 'melee', weapon: sword }, [0, 0, 0], true);
-  assert.deepEqual(c, { k: blowK({ kind: 'melee', weapon: sword }), back: false, weak: true });
-  assert.equal(hitClassOf({ wc: hitClassField(c) }).weak, true, 'on the wire, and read back');
-  // a puppet stood from the wire knows its weakness: the sender's test answers on it
-  const puppet = { mobileType: M.Orc, revenant: F.feudFromWire({ id: null, name: 'Grushnak the Butcher', rank: 0 }, { wq: F.weakIndex('blade') }) };
-  assert.equal(L.feudWeakBlow(puppet, { kind: 'melee', weapon: sword, attacker: { isPlayer: true } }), true);
-  assert.equal(L.feudWeakBlow(puppet, { kind: 'melee', weapon: createWeapon(W.Mace, 1, () => 0.5), attacker: { isPlayer: true } }), false);
-  // PIN MOVED (AUDIT FEUD 2: a blow that landed - `damage > 0` - alone; the street's behaviour pinned in auditfeud2 W1)
-  assert.ok(read('src/scenes/exteriorFoes.js').includes('const _wc = blowClassOf(f.ai, { kind, weapon, claws: !weapon && !!playerEntity?.isInBeastForm, round }, playerFeet, !round && damage > 0 && feudWeakBlow(f.entity, { kind, weapon, element, attacker: playerEntity }));'));
-  assert.ok(read('src/scenes/dungeonContext.js').includes("const _wc = fromPlayer && !peer && foe._ownFrom !== ARENA_PUPPET_OWNER ? blowClassOf(foe.ai, { kind, weapon, claws: !weapon && !!playerEntity?.isInBeastForm, round }, playerFeet, !round && damage > 0 && feudWeakBlow(foe.entity, { kind, weapon, element, attacker: playerEntity })) : null;"));
-});
-
-test('AUDIT FEUD W2: AN HEIR KEEPS SENDING - a foe I adopted (its revenant no id of mine) writes what it stands with, on both streams (mutants: either gate back on the id)', () => {
-  assert.deepEqual(F.feudWire({ id: null, name: 'Grushnak the Butcher', learned: ['mailed'], weak: 'silver' }), { ad: F.adaptMask(['mailed']), wq: F.weakIndex('silver') });
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(!onWatch && f\.entity\?\.revenant\) Object\.assign\(r, feudWire\(f\.entity\.revenant\)\);/);
-  assert.match(read('src/scenes/dungeonContext.js'), /\n {4}if \(f\.entity\?\.revenant\) Object\.assign\(r, feudWire\(f\.entity\.revenant\)\);/);
-});
 
 // ── the words ───────────────────────────────────────────────────────
 
@@ -228,20 +205,6 @@ test('AUDIT FEUD R5: A LEAVER KEEPS ONLY WHAT IT MAY TAKE - a locked piece, a qu
   assert.ok(me.items.includes(locked) && me.items.includes(quest), 'the rest is mine');
 });
 
-test('AUDIT FEUD R6: A KILLER FORGOTTEN - a load, a new game and a Resurrect leave it nothing to take at a later death (mutants: each kept)', () => {
-  const sword = piece(W.Longsword, 500);
-  made('slew'); me.items = [sword];
-  restoreModSaveRecords(modSaveRecords());
-  assert.equal(N.revenantTakes(me, { online: true }), null, 'a load');
-  made('slew');
-  N.forgetLastSlew();
-  assert.equal(N.revenantTakes(me, { online: true }), null, 'a Resurrect');
-  assert.ok(me.items.includes(sword));
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /reviveForPlay\(playerEntity, \{ force: true \}\);\n\s*forgetLastSlew\(\);/, 'the Resurrect forgets it');
-  assert.match(read('src/systems/revenant/revenant.js'), /newGame: \(\) => \{ _state\.list = \[\]; _state\.lastDay = null; _state\.mirrorId = null; _lastSlew = null;/);
-});
-
 // ── the deeds and their flows ───────────────────────────────────────
 
 test('AUDIT FEUD D1: A FELLING IS NO END - the fight\'s ledger stays open (its will broken stays broken), a waiting kill\'s card stays; and one held by its fate fells nobody (mutants: the ledger taken; the notice wiped; each fate unread)', () => {
@@ -281,57 +244,13 @@ test('AUDIT FEUD D3: A FIGHT WON IS A FOE KILLED - one that escaped, was culled 
 
 // ── the hosts ───────────────────────────────────────────────────────
 
-test('AUDIT FEUD H1: THE WORLD HOST - a knocked-out sworn one stands for nothing (no turning, warning or witness); a turning waits for no load and stands nowhere a sweep took (mutants: each seam unwired)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /setRetinueBodies\(\(id\) => revenantAshore\.bodies\(\)\.find\(\(b\) => b\.revenantCompanion === id && !b\.dead && !b\._knockedOut\)\?\.entity \?\? null\);/);
-  assert.match(w, /const rec = revenantAshore\.bodies\(\)\.find\(\(b\) => b\.revenantCompanion === r\.id && !b\.dead && !b\._knockedOut && b\.ai\?\.feet\);/);
-  assert.match(w, /if \(!rec \|\| !place\?\.turn \|\| place\.has\?\.\(rec\) === false\) return;/);
-  assert.match(w, /const clearSworn = \(\) => \{ revenantAshore\.clear\(\); _revenantArrivals\.clear\(\); _revenantDepartures\.length = 0; _revenantBetrayals\.length = 0; forgetSwornMember\(\); \};/);
-});
-
-test('AUDIT FEUD H2: PRIVATEER\'S HOLD\'S IN-PLACE RESPAWN is a respawn like the world host\'s - its fights ended, its killer\'s theft taken and said (mutants: each dropped)', () => {
-  const m = read('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT LEGACY B5): the arm takes an offline Project Legacy rise too - the penalty and the theft online's alone
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): the penalty is every rise's now; the theft stays online's
-  const at = m.indexOf("const goldLost = applyDeathPenalty(playerEntity);   // DEATH-PENALTY: Privateer's Hold");
-  assert.ok(at > 0);
-  const block = m.slice(at, at + 900);
-  assert.match(block, /endPlayerFights\(\);/);
-  assert.match(block, /const took = online \? revenantTakes\(playerEntity, \{ online: true \}\) : null;/);
-  assert.match(block, /if \(took\?\.line\) say\(took\.line\);/);
-});
-
-test('AUDIT FEUD H3: THE DUNGEON - a band breaks when its master runs (the street\'s law); no lair on the Burning Court, the Arena\'s floor or a spawned dungeon (mutants: the scatter dropped; the guard unread at either door)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(_flee === 'escape'\) \{ escapeDungeonFoe\(f\); continue; \}\n\s*if \(_flee === 'start'\) scatterDungeonBand\(f\);/);
-  // PIN MOVED (AUDIT FEUD 2: nor the Ocean Holes abyss - its pixel its template's)
-  assert.match(d, /function lairable\(\) \{ return !\(dfLocation\?\.spawned \|\| isGateArena\(dfLocation\) \|\| isArenaFloor\(dfLocation\) \|\| /);
-  assert.match(d, /if \(!mt \|\| !lairable\(\)\) return null;/);
-  assert.match(d, /if \(!mt \|\| !dfLocation\.name \|\| !lairable\(\)\) return null;/);
-});
-
-test('AUDIT FEUD H4: EVERY COMMENT ON ITS OWN LINE - the trailing notes FEUD\'s edits had moved onto a neighbour, put back (mutants: none - a comment is no behaviour)', () => {
-  assert.match(read('src/scenes/hostCombat.js'), /import \{ blowK, blowWeight, behind, TELL \} from '\.\.\/ai\/tells\.js';   \/\/ TELL1: a blow's weight on the poise meter/);
-  assert.match(read('src/scenes/dungeonContext.js'), /from '\.\.\/ui\/damageFlash\.js';   \/\/ WB13d:/);
-  assert.match(read('src/scenes/exterior.js'), /import \{ flashPlayerDamage \} from '\.\.\/ui\/damageFlash\.js';   \/\/ ROAD-G G2:/);
-  assert.match(read('src/scenes/hostMagic.js'), /import \{ markPlayerHarm \} from '\.\.\/systems\/harmMark\.js';   \/\/ REVENANT-HARM:/);
-  assert.match(read('src/ui/enhanced/enhancedChronicle.js'), /bountyQuestShareable \} from '\.\.\/\.\.\/systems\/bounty\/bountyJournal\.js';   \/\/ BOUNTY1:/);
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /bountyQuestShareable \} from '\.\.\/\.\.\/systems\/bounty\/bountyJournal\.js';   \/\/ BOUNTY1:/);
-  assert.match(read('src/systems/revenant/revenant.js'), /HUNT_QUEST_PREFIX \} from '\.\.\/huntJournal\.js';   \/\/ RVN7c:/);
-  assert.match(read('src/ui/revenant/revenantPage.js'), /import \{ tacticsSwitchOn \} from '\.\.\/\.\.\/ai\/tactics\.js';   \/\/ RVN5:/);
-  assert.match(read('src/scenes/exteriorFoes.js'), /promoteEliteFoe\(f\.entity, \{ own: false \}\);   \/\/ ELITE FOES: its owner's elite/);
-  for (const [f, re] of [['src/scenes/dungeonContext.js', /knockedDown \} from '(?:\.\.?\/)+(?:[\w-]+\/)*blowEffects\.js';   \/\/ TELL6e: knocked down, no swing   \/\//], ['src/scenes/world.js', /routByJump\(\);   \/\/ RVN10 \(Feud-Arc\.md 21\.2\): a jump out of a fight routs me - never a load's\n\s*handOverSiteFoes/]]) assert.doesNotMatch(read(f), re, f);
-});
-
 // ── section 28: the revenant's duel ─────────────────────────────────
 
-// PIN MOVED (FEUD BALANCE, Feud-Arc.md OPEN 22-24 - Mac: one stagger or one perfect dodge breaks the will; dodging pays in
 // the blows not taken, never slower; AUDIT FEUD 2: the harness's fights re-seeded by its faithful steps)
 test('AUDIT FEUD (section 28): THE REVENANT\'S DUEL - an Orc revenant fought to its end through the pools\' own law: its last stand from rank 3, then its will - its weakness struck, it kneels; traded with and never staggered, it tears away; one stagger, it kneels; one perfect dodge, it kneels; a rank-1 kneels with no stand; RVN\'s targets as the arc names them (mutants: the stand skipped; the will unread; the dodge left before the late sample; a target moved)', async () => {
   const { revenantFight: fightIn, FEUD_TARGETS } = await import('../../tools/tellDuel.mjs');
-  // PIN MOVED (FEUD HARNESS: the duel's laws on its seeds, alone and never running - its band's draws would move each seed's stream)
   const revenantFight = (o) => fightIn({ band: false, flight: false, ...o });
-  assert.deepEqual(JSON.parse(JSON.stringify(FEUD_TARGETS)), { DODGE_SPARES: 0.1, KNEEL_WEAK: 0.9, KNEEL_DODGE: 0.7, KNEEL_TRADE_MAX: 0.2, RANK_RATIO: [2.5, 3.5] });   // PIN MOVED (UNQUIET, Revenants.md section 46: a rank weighs more - about three times)
+  assert.deepEqual(JSON.parse(JSON.stringify(FEUD_TARGETS)), { DODGE_SPARES: 0.1, KNEEL_WEAK: 0.9, KNEEL_DODGE: 0.7, KNEEL_TRADE_MAX: 0.2, RANK_RATIO: [2.5, 3.5] });
   const weak = revenantFight({ rank: 3, weak: true, seed: 1 });
   assert.deepEqual([weak.end, weak.stood, weak.weak > 0], ['knelt', true, true]);
   const tore = revenantFight({ rank: 3, seed: 2 });

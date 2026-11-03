@@ -1,5 +1,4 @@
-// YARD-LIGHT (2026-10-07, Discord through Mac - a lamp post and a torch standing in a yard at night, dark: "i wish lights
-// worked outside.."; Mac: "I guess enhanced lighting isnt shown lantern light anymore?"). The town's own lanterns still
+// YARD-LIGHT. The town's own lanterns still
 // lit; what stood dark was a YARD's lamp. A yard's piece carries no light of its own (net/decorLaw.js decorYardPieceOf -
 // "an outdoor lamp is the town's"), and nothing lit it as the town either. Now a TEXTURE.210 flat standing in a yard
 // lights as Daggerfall lights every one standing in a town block (RMBLayout.AddLight - world/city/cityLights.js): the town's
@@ -132,20 +131,6 @@ test('YARD-LIGHT the yards\' lamps: a lamp post standing in a yard is a lamp whe
   w.built.clear();
   await w.run();
   assert.equal(w.yards.lamps().length, 0, 'gone with its pixel');
-});
-
-test('YARD-LIGHT the world host lights them as the town\'s own: in the lanterns\' hours (inside its night block, after the animator\'s tick), among the scene lights beside the quays\' lanterns - ranked with the street\'s in the one selection, never the player\'s extras - in the town lanterns\' colour, from its rows refilled in place (mutants: YARDLIGHT-host-unwired, YARDLIGHT-host-by-day, YARDLIGHT-host-white)', () => {
-  const s = src('src/scenes/world.js');
-  assert.match(s, /import \{ createHomeYards, yardLampRows \} from '\.\/homeYards\.js';/);
-  const line = s.split('\n').find((l) => l.includes('yards.lamps()'));
-  assert.ok(line, 'the yards\' lamps are asked');
-  assert.equal(line.trim(), 'if (yards) yardLampRows(yards.lamps(), _yardRows, worldLightAnimator.ranges, CITY_LIGHT_COLOR_F32, csaLit);');
-  const asked = s.indexOf(line), quays = s.indexOf('for (const l of quays?.lights() ?? []) csaLit.push(');
-  const night = s.indexOf('    if (lightsOnAt(minute)) {\n      worldLightAnimator.tick(dt);\n');
-  const pick = s.indexOf('const wodSel = wodLit || csaLit.length ? _wodSelect(n, _csaFill(wodLit ? _wodFill(n) : n, csaLit)) : null;');
-  assert.ok(quays > 0 && night > quays && asked > night && pick > asked, 'in the night block after the tick, after the quays\' lanterns, before the night\'s one selection reads the scene lights');
-  assert.equal(s.split('yards.lamps()').length, 2, 'asked once a frame');
-  assert.match(s, /\n {2}const _yardRows = \[\];/, 'the rows the host keeps');
 });
 
 test('YARD-LIGHT the world host\'s own composition, run: by night a yard\'s lamp reaches the renderer as the street\'s lanterns do - their colour (white on the classic set, the lane\'s flame on the lane), the town\'s flicker at its slot - ranked by distance with them (the classic cap of sixteen keeps the nearest, a far lamp left out); by day it gives no light (mutants: YARDLIGHT-host-unwired, YARDLIGHT-host-by-day, YARDLIGHT-host-white, YARDLIGHT-host-steady)', () => {

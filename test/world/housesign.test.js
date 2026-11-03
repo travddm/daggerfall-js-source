@@ -1,8 +1,7 @@
-// HOUSE-SIGN (the owner, 2026-10-25: "remove the shop signs outside of buildings when the building is actually a house
-// and not a shop"). A shop's sign (ARCH3D 43700-43799) is a block's misc model that DFU stands tied to no building
+// HOUSE-SIGN. A shop's sign (ARCH3D 43700-43799) is a block's misc model that DFU stands tied to no building
 // (RMBLayout.AddProps), so a block that types a shop's model as a house kept the shop's sign at the house's door. The
 // sign now belongs to the building whose door is nearest it within SIGN_REACH_M, and a house's sign does not stand
-// (world/houseSigns.js; bible/01-Overview/bugs/Field-Bugs-2026-10-09.md SIGN-HOUSE).
+// (world/houseSigns.js; SIGN-HOUSE).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { isHouseSign, signedBuildingOf, isShopSignModel, isHouseType, SIGN_REACH_M } from '../../src/world/houseSigns.js';

@@ -1,5 +1,5 @@
 // @ts-check
-// START2 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md section 8): THE WORLD'S STARTS - where a new character's
+// START2: THE WORLD'S STARTS - where a new character's
 // story begins, in the open world's host (src/scenes/fishHost.js is the shape: a module the host wires, owning its state).
 //
 // The boot of a new game stands the classic start first (world.js's U31 start cell, Privateer's Hold, the character
@@ -15,7 +15,7 @@
 // `then(questName)` is the host's own OnStartGame (world.js questInitAtGameStart: the quests, the welcome tour) - run
 // once the character stands where their story begins, so its first popup is read there.
 //
-// THE WRIT (PASSAGE, bible/03-World/Passage.md "The writ"): a start's commission, opened, carries the Crown's writ of
+// THE WRIT (PASSAGE, "The writ"): a start's commission, opened, carries the Crown's writ of
 // passage to the city of Daggerfall - a friendly master at any harbour sails its bearer there for nothing (`writ`).
 import { BAY_START, HAND_START_QUEST, MAIN_QUEST_OPENER, STARTS, carriesWrit, isStartQuestName, startByKey, startSiteId } from '../systems/starts/starts.js';
 import { gameStartQuests } from './quest/questBridge.js';   // AUDIT STARTS W5: a story never begun, begun at its load
@@ -24,8 +24,6 @@ import { getBool } from '../systems/settings/settings.js';
 import { REPOSITION } from '../systems/ship.js';   // AUDIT STARTS W6: the door's own landing, the death respawn's at a dungeon
 import { longitudeLatitudeToMapPixel, REGION_NAMES } from '../formats/mapsFile.js';
 import { t } from '../systems/textManager.js';
-import { CYRODIIL_THEATRE } from '../systems/wild/cyrodiilZone.js';   // AUDIT STARTS W2: online, the open zone is the Imperial Province
-import { PROVINCE_OF_ID } from '../world/tamriel/tamrielLand.js';
 
 /** How long a province's start waits on the land past the Bay's trace. The trace's promise settles when it lands and
  *  when it fails (world.js arenaTraced), so this bounds only a fetch that hangs; a start that gives up names no dungeon
@@ -47,8 +45,6 @@ const PROVINCE_QUESTS = new Set(STARTS.filter((s) => s.site).map((s) => s.quest.
 export const STARTS_TEXT = Object.freeze({
   /** A province's start that found no dungeon to stand in. */
   get noSite() { return t('start.noSite', 'No way to that province could be found. Your story begins in the Iliac Bay.'); },
-  /** AUDIT STARTS W2: why the page shuts the Imperial Province's start to a character born online - its row's tag. */
-  get openZone() { return t('start.openZone', 'the open zone online'); },
 });
 
 /**
@@ -66,16 +62,8 @@ export const STARTS_TEXT = Object.freeze({
 export function createStartsHost(host) {
   const { params, pastBay, quests, teleport, landReady, talk, machine, ready = () => true, landWaitMs = START_LAND_WAIT_MS } = host;
   let chosen = null;
-  /** AUDIT STARTS W2: online the Imperial Province is the open zone (systems/wild/cyrodiilZone.js, WW-C2), and every
-   *  dungeon in it is sealed but the day's halls (bible/11-Multiplayer/Wild-Zone.md) - a start there wakes in a dungeon
-   *  the character could never enter again once the realm's page reloads online. A character born online is not
-   *  offered it; offline the province is no zone, and the start stands. */
-  const zoneShut = (start) => params.has('online') && !!start?.province && start.province === PROVINCE_OF_ID[CYRODIIL_THEATRE];
-  /** Can the world stand `start`? The Bay's always; a province's where the land past the Bay stands its lairs, and online
-   *  never inside the open zone. */
-  const open = (start) => start === BAY_START || (!!pastBay && !!start?.province && !zoneShut(start));
-  /** Why a start the host cannot stand is shut - the page's tag for it (null: the page's own word). */
-  const why = (start) => (zoneShut(start) ? STARTS_TEXT.openZone : null);
+  /** Can the world stand `start`? The Bay's always; a province's where the land past the Bay stands its lairs. */
+  const open = (start) => start === BAY_START || (!!pastBay && !!start?.province);
   /** The page's answer, else the boot's `?start=` (a dev door for a headless character), else the Bay's. */
   const startNow = () => startByKey(chosen) ?? startByKey(params.get('start')) ?? BAY_START;
   /** The Bay's start is Privateer's Hold's: a character the boot stood anywhere else is handed the commission. */
@@ -185,7 +173,7 @@ export function createStartsHost(host) {
 
   return {
     /** The chargen door's start question (systems/chargenSession.js `startChoice`). */
-    page: Object.freeze({ open, why }),
+    page: Object.freeze({ open }),
     open,
     /** The page's answer (a start's key). */
     choose,

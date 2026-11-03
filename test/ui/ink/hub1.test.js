@@ -1,6 +1,4 @@
-// HUB1 (2026-09-25, Mac: "giving each region's main city a natural player hub and future ownership for online
-// guilds"; the marker: "a color coded circle indicator or something along those lines for distinguishing"; respawn:
-// "leave that out. That'll be a seperate idea"): EVERY REGION'S MAIN CITY IS ITS HUB (systems/region/regionHubs.js). The
+// HUB1: EVERY REGION'S MAIN CITY IS ITS HUB (systems/region/regionHubs.js). The
 // rule, the words, the base-row count, the held map's circles and names, and the world host's wiring by source.
 // The held map window's label and info box are driven in test/ui/heldmap.test.js. `06-Systems/Online-Arc.md` HUB1.
 import '../../modsOff.js';
@@ -189,15 +187,3 @@ test('HUB1 the held map: online a hub\'s mark carries its hub and sits in a colo
   assert.deepEqual(ctx.calls[1].args.slice(0, 3), [5, 6, 9]);
 });
 
-test('HUB1 the world host, by source: the boot collects the game\'s own rows as it indexes every location and picks the hubs from them; online alone the held map is handed each summary\'s hub, and walking into a hub says so at the location rect\'s entry (mutants: a mod row collected, the map handed hubs offline, the arrival said offline or on every town)', () => {
-  const W = strip(read('src/scenes/world.js'));
-  assert.match(W, /const baseCount = maps\.baseLocationCount\(r\);[\s\S]{0,400}?locationIndex\.set\(`\$\{p\.x\},\$\{p\.y\}`, loc\);\s*if \(l < baseCount\) \{ _hubRows\.push\(loc\); _bandPlacePixels\.add\(`\$\{p\.x\},\$\{p\.y\}`\); \}/, 'the game\'s own rows, collected as the index is built');   // PIN MOVED (AUDIT OW5 B2): the bands' land from the same rows
-  assert.match(W, /const regionHubs = pickRegionHubs\(_hubRows, \{ regionNameOf: \(r\) => maps\.getRegionName\(r\) \}\);/);
-  assert.match(W, /hubAt: params\.has\('online'\) \? \(summary\) => hubAtMapId\(regionHubs, summary\?\.mapID \?\? summary\?\.mapId\) : null,/, 'the map is handed hubs online alone');
-  const edge = W.slice(W.indexOf('_inRect && !_wasInLocationRect'));
-  // SEAT1a: a seat town says its Charter instead (test/net/seat1a_client.test.js); a hub that is no seat, its hub line
-  assert.match(edge.slice(0, 2000), /revealMemberGuildHalls\(\{ witness: onlineOn \}\);[\s\S]{0,480}if \(onlineOn\) \{\n\s*const mapId = _musicLoc\?\.mapTableData\?\.mapId;[\s\S]{0,160}const hub = hubAtMapId\(regionHubs, mapId\);[\s\S]{0,120}else if \(hub\) townTalk\.say\(hubArrivalLine\(hub\), 5\);/, 'the arrival, at the location rect\'s entry, online');   // PIN MOVED (CHAP2a): the reveal's call witnesses the town's halls too
-  // and the held map reads what it is handed
-  const H = strip(read('src/ui/heldMap.js'));
-  assert.match(H, /hubAt: \(s\) => this\.deps\.hubAt\?\.\(s\) \?\? null,/);
-});

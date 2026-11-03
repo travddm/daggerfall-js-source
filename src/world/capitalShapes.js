@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10 (bible/03-World/Arena-Provinces.md TESA10) - THE CAPITALS' SHAPES: the pictures' pseudo-archive and the shapes
+// TESA10 (TESA10) - THE CAPITALS' SHAPES: the pictures' pseudo-archive and the shapes
 // every capital's landmarks are built of (world/capitalModels.js the Imperial City's, world/capitalSolitude.js
 // Solitude's), in metres, y up, on the port's MeshBuilder (world/detStandIns.js). No game data.
 import { DOOR_TYPE } from './meshReader.js';   // WW7-4: a castle's door

@@ -1,5 +1,4 @@
-// HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at
-// the waist instead of having to be held"). THE HAND LAW UNDER THE SWITCH.
+// HT-WAIST. THE HAND LAW UNDER THE SWITCH.
 //
 // Handheld Torches' law is that a light NEEDS a free hand: with none free
 // the lit light is stowed (or dropped), the ignite key refuses, the throw's

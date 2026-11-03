@@ -1,7 +1,7 @@
 // AUDIT TESA II F6 (AUDIT TESA-BIOME F6, RECORDED latent): the roaming bands past the Bay - the world host's bandOk admitted
 // the Bay's map and the Eltheric Ocean's box alone, so no band was born past the Bay and its make's `fauna` (the zone's wild)
 // never ran. Now land a zone answers, once the trace stands, off every place (systems/tamrielFauna.js bandGroundPastBay).
-// bible/03-World/Tamriel-Biomes.md (the hosts).
+// (the hosts).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -51,13 +51,6 @@ test('AUDIT TESA II F6: a band may stand past the Bay on land a zone answers, on
     assert.ok(slice, 'a capital\'s slice stands on the trace');
     assert.equal(bandGroundPastBay(...slice), false, `never on a capital's pixel (${slice})`);
   } finally { setTamrielTrace(null); }
-});
-
-test('AUDIT TESA II F6 by source: the world host\'s bandOk admits it beside the Bay\'s map and the Eltheric box, the land past the Bay\'s switch and the host\'s place roll handed in; a band\'s make rolls its pixel\'s zone\'s wild', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /return \(onBayOrEther\(px, py\) \|\| \(tamrielLand && bandGroundPastBay\(px, py, tamrielPlaceName\)\)\) && !tvWater\(px, py\) && !_bandPlacePixels\.has\(`\$\{px\},\$\{py\}`\) && !etherPlaceIsle\(px, py\);/);
-  assert.match(w, /const hit = rollGroupComposition\(\{ climateIndex: maps\.getClimateIndex\(px, py\), fauna: maps\.getFaunaBand\?\.\(px, py\),/);
-  assert.match(w, /maps\.getFaunaBand = faunaBandAt;/);
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

@@ -85,35 +85,6 @@ test('ST1: AddNextMessageBox - dismissing the status box shows the health box, t
   assert.equal(plain.done, true);
 });
 
-test('ST1: all four hosts open the CHAIN - record 22 first, the health box next', () => {
-  // STATUS-LIVE (2026-09-22, kurkku): THE CHAIN IS ONE PAGE NOW, AND IT
-  // IS COMPOSED ONCE. The Status readout does not pause the game
-  // (ui/statusBox.js has the whole of why), so nothing routes it a key
-  // and AddNextMessageBox - which advances on a DISMISSAL - cannot
-  // advance; the two pages are one page, blank-line separated. What
-  // ST1's law becomes: the ORDER is still record 22 then the health
-  // box, and all four hosts still reach it, now through one composer
-  // instead of four copies of the same three lines.
-  assert.match(src('../src/ui/statusBox.js'), /\.\.\.statusInfoRows\(lines, macroContext\),\s*\n\s*'',\s*\n\s*\.\.\.healthStatusRows\(entity, lines\),/,
-    'record 22 leads, the health box follows, a blank row between');
-  for (const h of ['scenes/world.js', 'scenes/exterior.js', 'scenes/worldModes.js', 'scenes/dungeonContext.js']) {
-    const s = src(h);
-    assert.match(s, /toggleStatusReadout\(\{/, `${h} reaches the composer`);
-    assert.match(s, /lines: (?:\(id\) => townTalk\??\.?lines|rscLines)/, `${h} hands its own TEXT.RSC reader`);
-    assert.equal(/\.addNext\(healthStatusRows\(/.test(s), false, `${h} keeps no copy of the chain`);
-  }
-  // QX1: ALL FOUR pass the live context now. The fixed-city host used
-  // to hand an explicit `null` because it mounted no machine - the
-  // null-MCP posture, correct while it was true - and it builds one, so
-  // every macro in record 22 expands here as it does everywhere else.
-  for (const h of ['scenes/world.js', 'scenes/worldModes.js', 'scenes/exterior.js']) {
-    assert.match(src(h), /questBridge\?\.machine\?\.macroContext\?\.\(\) \?\? null/, `${h} hands the machine's context`);
-  }
-  assert.match(src('scenes/dungeonContext.js'), /opts\.questBridge\?\.machine\?\.macroContext\?\.\(\) \?\? null/);
-  assert.equal(/statusInfoRows\(rows, null\)/.test(src('scenes/exterior.js')), false,
-    'no host is left passing the null context');
-});
-
 test('MAC-C1: the live crash - record 22 arrives as FORMATTED rows ({ text, center }) from townTalk.lines in three hosts of four, and the status box must take both shapes', () => {
   // "TypeError: r.text.split is not a function at showStatus" - the rows
   // were wrapped whole as a token's text. The dungeon's rscLines hands

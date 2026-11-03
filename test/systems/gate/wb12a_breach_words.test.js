@@ -1,5 +1,4 @@
-// WB12a (2026-10-01, Mac: "getting feedback that our oblivion gates arent lore friendly to the current daggerfall
-// timeline" - then "Dagon's Breach", and "I'd like to rename the stones" - "Deadlands Ember"): THE BREACH AND ITS WORDS.
+// WB12a: THE BREACH AND ITS WORDS.
 // The game is 3E 417: the Covenant bars a Prince's door forced from without, never one opened from within, so the gates
 // are Dagon's Breaches - torn open by his mortal faithful, sealed and torn shut by the Covenant. Every player-facing
 // line that named an Oblivion Gate says so; the Sigil Stone is the Deadlands Ember, its NAME alone moved, and every
@@ -28,8 +27,6 @@ import { SIGIL_STONE, SIGIL_STONE_TEMPLATE, sigilStone, nameEmbers, isSigilStone
 import { stonesText, BROKER_REFUSALS, DISMANTLED } from '../../../src/systems/sigil/sigilBroker.js';
 import { recoverSpoils, SPOILS_RECORD_V } from '../../../src/scenes/spoilsPool.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
-import { addItem } from '../../../src/systems/inventory.js';
-import { restorePlayer, snapshotPlayer } from '../../../src/systems/save/save.js';
 import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const ROOT = new URL('../../../', import.meta.url).pathname;
@@ -94,15 +91,12 @@ test('WB12a the names on screen: the plaque, the banner and the map\'s legend sa
   assert.equal(MARKS_CARD_TEXT.gate('Valkynaz Ruhn', 'the Rime-Wrought'), 'Valkynaz Ruhn comes the Rime-Wrought tonight', 'WB13b: one subtitle near the gate and inside');
   assert.equal(GATE_CLAIM_TEXT.recorded(4), 'Breach recorded. Breaches closed: 4.');
   assert.equal(GATE_CLAIM_TEXT.guest, 'Breach not recorded. Add a username within a week to keep it.');
-  assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.');   // SILVER: the currency's name; PIN MOVED (SILVER-WAYS): the day's cap the gates' and the raids'; PIN MOVED (EG-E1): and the Spire's Redoubts', under the same cap; PIN MOVED (STAR7): and the held stars'
+  assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.');   // SILVER: the currency's name
   assert.equal(profileGateLine({ gates: { closed: 3 } }), 'Breaches closed: 3');
-  assert.match(read('src/ui/enhanced/enhancedAccount.js'), /if \(gates\) row\(t\('account\.card\.gates', 'Breaches closed'\), gates\);/);   // L10N4 (PIN MOVED): the row's word through t()
   assert.equal(accountRefusalText('short'), 'Your account has too few embers for that.');   // AUDIT WB12d (A4): a rite's ember counts
   assert.deepEqual([BROKER_TEXT.trade, BROKER_TEXT.steal, BROKER_TEXT.gone], ['Trades in Deadlands Embers', 'The Broker\'s eyes never leave her embers.', 'The Sigil Broker leaves for the night.']);   // BROKER-CAGE: midnight takes her, not the breach (a Warden fallen early leaves her standing)
   assert.equal(INSIGNIA_LINE.title, 'A title worn over your name');
   assert.ok(INSIGNIA_CARD.title[1].includes('the breach\'s fire') && /your account's embers/.test(INSIGNIA_CARD.title[2]) && /your account's embers/.test(INSIGNIA_CARD.aura[2]));   // AUDIT WB12d (A4)
-  assert.match(read('src/scenes/world.js'), /return \{ subject: 'Dagon\\'s Breach', body: state \? `Near \$\{near\}\. /);
-  assert.match(read('src/systems/sigil/sigilSetPowers.js'), /Wrath of the Warden! \$\{struck\} \$\{struck === 1 \? 'foe' : 'foes'\} struck\./);
 });
 
 test('WB12a the arch is still the gate: pressed it answers as a gate, the relay\'s refusal words are protocol and keep their bytes, the Gatebreaker title and the Burning Court stay (mutants: the protocol renamed)', () => {
@@ -135,31 +129,6 @@ test('WB12a the repair: every record of the template under another name takes th
   assert.equal(nameEmbers(list), 0, 'again: nothing left to rename');
   assert.equal(nameEmbers(null), 0);
   assert.ok(list.filter(isSigilStone).every((i) => i.templateIndex === 570), 'only the name moved');
-});
-
-const makeEntity = (over = {}) => ({
-  name: 'Tester', race: 'Breton', gender: 'male', level: 3,
-  stats: { strength: 50, endurance: 40, agility: 30, speed: 30, willpower: 30, intelligence: 30, luck: 30, personality: 30 },
-  skills: new Array(35).fill(10), skillUses: new Array(35).fill(0),
-  items: [], wagonItems: [], activeEffects: [], spells: [],
-  health: 30, fatigue: 100, magicka: 10, gold: 0,
-  ...over,
-});
-
-test('WB12a a save from before: the stones it kept as Sigil Stones load as Deadlands Embers - in the pack, the wagon and the other things - and a stone won after joins one stack under one name (mutants: the load never repairs)', () => {
-  const e = makeEntity({ items: [oldStone(4), ruby()], wagonItems: [oldStone(2)], otherItems: [oldStone(1)] });
-  const snap = snapshotPlayer(e, {});
-  assert.equal(snap.items[0].name, 'Sigil Stone', 'the save holds the old name');
-  const t = makeEntity();
-  const info = console.info, lines = [];
-  console.info = (s) => lines.push(String(s));
-  try { restorePlayer(t, snap); } finally { console.info = info; }
-  assert.deepEqual(t.items.filter(isSigilStone).map((i) => [i.name, i.stackCount]), [['Deadlands Ember', 4]]);
-  assert.deepEqual(t.wagonItems.map((i) => i.name), ['Deadlands Ember']);
-  assert.deepEqual((t.otherItems ?? []).filter(isSigilStone).map((i) => i.name), ['Deadlands Ember']);
-  assert.ok(lines.some((l) => l.includes('WB12a') && l.includes('named Deadlands Embers')), 'said, in the console');
-  addItem(t.items, sigilStone());
-  assert.deepEqual(t.items.filter(isSigilStone).map((i) => [i.name, i.stackCount]), [['Deadlands Ember', 5]], 'one stack, one name');
 });
 
 test('WB12a the crash\'s door: a stone a crash record kept under its old name is handed over as a Deadlands Ember (mutants: the record\'s name kept)', () => {

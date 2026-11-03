@@ -2,9 +2,7 @@
 //
 //     node tools/bakeBrigandine.mjs [--fbx=src/assets/mw/source/Brigandine_Steel.fbx] [--sheets]
 //
-// MW-BRIG4 (2026-10-09, Mac: "Also for the integrated brigadine chest piece, we need each of these textures
-// implemented", nine paintings of the same unwrap; asked which metal wears which, he took the map offered - one per
-// metal): the one mesh is baked once and written once PER METAL the Jerkin is a brigandine in (ownArmorModels.js
+// MW-BRIG4: the one mesh is baked once and written once PER METAL the Jerkin is a brigandine in (ownArmorModels.js
 // BRIGANDINE_METALS, Iron to Daedric), each NIF naming its metal's DDS. Steel keeps MW-BRIG1's red; the nine are Mac's,
 // committed under their metals' names (PAINTING) as he sent them - in the order he attached them, 1 Iron (tan, dark
 // rivets), 2 Adamantium (tan, red rivets), 3 Mithril (light blue, teal rivets), 4 Daedric (red, dark rivets),
@@ -13,8 +11,7 @@
 // apart. Each metal's NIF names its material for its metal (AUDIT MW-BRIG4: every one said Steel); Steel's bytes are
 // MW-BRIG1's.
 //
-// MW-BRIG1 (2026-09-29, Mac: "This is for the morrowind model. The steel
-// brigantine"). The second of the port's own Morrowind models, and the
+// MW-BRIG1. The second of the port's own Morrowind models, and the
 // first one that is WORN rather than held: Roleplay & Realism Items'
 // Jerkin in Steel - "Brigandine Jerkin" by its own mint (rriItems.js
 // lightWord) - wore retail's steel_cuirass, and now wears this.
@@ -62,7 +59,7 @@ import { BRIGANDINE_METALS } from '../src/characters/ownModels/ownArmorModels.js
  *  kept under the asset's own name here.) */
 export const SOURCE_FBX = 'src/assets/mw/source/Brigandine_Steel.fbx';
 
-/** MW-BRIG4: each brigandine metal's painting - Steel's the FBX's own (MW-BRIG1), the nine others Mac's (2026-10-09). */
+/** MW-BRIG4: each brigandine metal's painting - Steel's the FBX's own (MW-BRIG1), the nine others Mac's. */
 export const PAINTING = Object.freeze(Object.fromEntries(BRIGANDINE_METALS.map((m) => [m, `src/assets/mw/source/Brigandine_${m}.png`])));
 export const SOURCE_PNG = PAINTING.Steel;
 

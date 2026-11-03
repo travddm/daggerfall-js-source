@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-20h DEX-HIDES ("the new creatures' hides (bats, wolves and the rest)"): Daggerfall Enemy Expansion's
-// animals (#1067, bible/04-Characters/Enemy-Expansion.md) carry ids of their own - its monsters 256-290 - and the knife
+// animals (#1067) carry ids of their own - its monsters 256-290 - and the knife
 // asked its hide of the foe's MobileTypes value alone (net/professionLaw.js hideOfFoe over the ten hides' classic foes),
 // so a DEX Bat, Wolf, Boar or Mudcrab felled by the player's own blow was never stamped, never a node, never a Tracker's
 // mark - and the account service refused its harvest (`prof-foe`). Every DEX row of Animal affinity gives a hide now: the
@@ -8,7 +8,7 @@
 // Every fixture is the real producer's: the mod's rows as the port reads them (dexInstall.js dexRead), the foe stood by
 // the street's pool (scenes/exteriorFoes.js spawnFoe) and felled by its damage door, the stamp the world host's kill
 // listener makes (scenes/huntHost.js), and the harvest through the real Worker (test/accountDb.mjs).
-// bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md DEX-HIDES; bible/06-Systems/Professions-Arc.md 4.4.
+// DEX-HIDES; 4.4.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -86,7 +86,7 @@ test('DEX-HIDES: the three new hides - the Wolf Pelt and the Boar Hide tier 2, a
     [['cure:mudcrab', 'leather:cured', '2 hide:mudcrab'], ['cure:wolf', 'leather:cured', '2 hide:wolf'], ['cure:boar', 'leather:cured', '2 hide:boar']]);
   // a leather's cures stand cheapest first, as a chain plans them - the tier-1 chitin beside the Rat Pelt, the tier-2 furs
   // beside the Bat's and the Bear's
-  assert.deepEqual(producersOf('leather:cured').map((r) => r.id), ['cure:rat', 'cure:mudcrab', 'cure:bat', 'cure:wolf', 'cure:boar', 'cure:bear']);   // PIN MOVED (AUDIT FB1021 L2-1): the Ram Kit's Bear Hide last of its tier
+  assert.deepEqual(producersOf('leather:cured').map((r) => r.id), ['cure:rat', 'cure:mudcrab', 'cure:bat', 'cure:wolf', 'cure:boar', 'cure:bear']);
   assert.deepEqual([...PELTS], ['hide:rat', 'hide:bat', 'hide:bear', 'hide:tiger', 'hide:wolf', 'hide:boar'], 'a fur\'s hide cuts skins; chitin never');
   assert.deepEqual(['skins-244:wolf', 'skins-245:boar'].map((id) => [recipeById(id)?.name, recipeById(id)?.tier]), [['Large Skins (Wolf Pelt)', 2], ['Small Skins (Boar Hide)', 2]]);
 });
@@ -117,7 +117,7 @@ const NOW = TODAY * DAY_MS + 3_600_000;
 
 test('DEX-HIDES: the mod\'s Wolf, Bat and Mudcrab stood by the street\'s pool and felled by the player\'s own blow are stamped at the kill and lie as bodies, each its hide and tier; the knife\'s plan names the foe and its rank; the Tracker marks a living Boar', async (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); _resetExtraQuestRows(); registerPlayerKillListener('dexhides', null); });
-  installEnemyExpansion({ on: true, meaner: false, log: silent });
+  installEnemyExpansion({ on: true, mudex: false, log: silent });
   const stamps = createBodyStamps({ nowMs: () => NOW });
   registerPlayerKillListener('dexhides', (e) => { stamps.stamp(e); });
   const street = pool();
@@ -158,7 +158,7 @@ async function steered(b, fn) {
 test('DEX-HIDES: the account service skins the mod\'s animals - a Wolf\'s Wolf Pelt with its Big Tooth and Raw Meat, a Bat\'s Bat Leather, a Land Dreugh\'s Dreugh Shell counted among the day\'s rare hides - and refuses a Hell Hound\'s body as it refuses any no knife skins', async () => {
   const now = utcDay(T0) * DAY + 12 * 3600;
   Date.now = () => now * 1000;
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
   raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'hunting', ?, NULL, NULL, ?)`).run(mac.id, mac.character, xpForRank(55), now);
@@ -173,7 +173,7 @@ test('DEX-HIDES: the account service skins the mod\'s animals - a Wolf\'s Wolf P
   assert.deepEqual((await s.call('/v1/prof/harvest', skin(264), mac.secret)).body, { error: 'prof-foe' }, 'a Hell Hound is a daedra');
 });
 
-// AUDIT FB1021 (bible/01-Overview/audits/Audit-Field-Bugs-2026-10-21.md), carried onto this slice at the merge: the
+// AUDIT FB1021, carried onto this slice at the merge: the
 // branch for 2026-10-21 had built DEX-HIDES too, and its audit's two findings that held here.
 test('AUDIT FB1021 L2-1 THE RAM KIT\'S HIDE SPENT LAST: a chain for Cured Leather with Bear Hides, Wolf Pelts and Boar Hides held cures the Wolf\'s first and keeps the Bear Hide, the Ram Kit\'s too, to the last of its tier; the Stores count Mudcrab Chitin as a mass, as the Scorpion\'s (mutants: the Bear Hide in the table\'s place; the chitin counted)', () => {
   const held = new Map([['hide:bear', 8], ['hide:wolf', 8], ['hide:boar', 8]]);

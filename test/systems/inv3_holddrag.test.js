@@ -1,4 +1,4 @@
-// INV3 - THE HOLD THAT SOMETIMES DID NOT TAKE (2026-09-17, Mac).
+// INV3 - THE HOLD THAT SOMETIMES DID NOT TAKE.
 //
 // "Hold to drag functionality in inventory sometimes doesnt work."
 //

@@ -1,6 +1,6 @@
 // @ts-check
-// SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE TIDES - the world moving under the
-// war (bible/11-Multiplayer/Seats-Arc.md 9.3). Each seat week rolls one Tide for each of the three kingdoms, one for the
+// SEASON1 part two: THE TIDES - the world moving under the
+// war (9.3). Each seat week rolls one Tide for each of the three kingdoms, one for the
 // Marches (the three regions share it) and one for the Free Lands - a pure function of the week and a salt, as the gate's
 // site is (net/gate/gateLaw.js gateHash), so every client, the service and the relay roll the same Tide with nothing sent.
 // Everyone knows the coming week's Tides at the Turning: the Seat tab says both.

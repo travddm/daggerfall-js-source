@@ -1,8 +1,7 @@
-// OUTDOOR-LOOT (2026-10-17, the field: "I can still click on an "Empty" body and wipe out loot for a party member" -
-// outdoors, a monster that appeared later). RED PINS, PHASE 1: what a party member's press on ANOTHER player's foe's body
+// OUTDOOR-LOOT. RED PINS, PHASE 1: what a party member's press on ANOTHER player's foe's body
 // must do, pinned through the doors the code has today and nothing the fix has yet to name. A foe outdoors is its
 // spawner's (WORLD6b); everyone else stands a PUPPET of it, and its body is the owner's roll taken under the owner's word
-// (WORLD6b-iii(c), bible/06-Systems/Online-Arc.md). Reproduced on the real pools (test-harness/outdoor-loot, and two real
+// (WORLD6b-iii(c)). Reproduced on the real pools (test-harness/outdoor-loot, and two real
 // browsers over the real relay), today:
 //   1. THE PLAQUE - the puppet's contents door answers null (exteriorFoes.js `const hoverContents = (key) =>`), and the
 //      plaque draws "Empty" over a full body (worldHover.js resolveHover).

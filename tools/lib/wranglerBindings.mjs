@@ -1,4 +1,4 @@
-// PURSE-BACK (2026-10-19): THE ACCOUNT SERVICE'S OWN BINDINGS, OVER WRANGLER - D1's and R2's surface as the service's
+// PURSE-BACK: THE ACCOUNT SERVICE'S OWN BINDINGS, OVER WRANGLER - D1's and R2's surface as the service's
 // Worker uses them (env.DB: prepare / bind / first / all / run; env.SAVES: get / delete), answered by `wrangler d1
 // execute` and `wrangler r2 object` with the repository's CLOUDFLARE_API_TOKEN. An operator's run in Actions can then
 // call the service's own functions - server-account/src/review.js reviewAct, its law whole - where the service itself

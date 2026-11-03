@@ -1,7 +1,7 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): THE SERPENT RECEIPTS THIS DEVICE CARRIES TO THE
+// SERPENT1: THE SERPENT RECEIPTS THIS DEVICE CARRIES TO THE
 // ACCOUNT SERVICE, and the serpents slain as the cards say them. The raids' carrier (net/raid/raidClaims.js), rung for rung,
-// on its own key and its own route. Design: bible/11-Multiplayer/Sea-Serpent.md section 8.
+// on its own key and its own route. Design:
 //
 // THE RELAY SIGNS, THE ACCOUNT SERVICE COUNTS AND PAYS, THIS FILE CARRIES. A receipt the serpent's cell hands this socket
 // at the kill (or again at the next `in` while it keeps the fight) is kept on the device (SERPENT_CLAIMS_KEY) WITH THE
@@ -50,7 +50,7 @@ export const SERPENT_CLAIM_TEXT = Object.freeze({
   aura: () => t('serpent.honour.aura', 'The Maelstrom turns about you.'),   // SERPENT5
 });
 
-/** SERPENT5 (2026-10-15, Sea-Serpent.md section 17): the words the Old Coil grants, in the vocabulary's spelling
+/** SERPENT5: the words the Old Coil grants, in the vocabulary's spelling
  *  (net/identityToken.js TITLES / AURAS) - its popup's, as the Hour's are (net/superDungeon/sdClaims.js SD_HONOUR_KEYS). */
 export const SERPENT_HONOUR_KEYS = Object.freeze({ title: 'coilbreaker', aura: 'maelstrom' });
 

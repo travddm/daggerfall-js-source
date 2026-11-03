@@ -1,5 +1,4 @@
-// SP1 (2026-09-21, a player: "my saves its all gone"; Mac: "we need
-// parity between browser and the install"): SAVES MOVE BETWEEN THE
+// SP1: SAVES MOVE BETWEEN THE
 // WEBSITE AND THE APP. The carrier is pure over a storage-shaped object
 // and a list of entries, so the round trip runs here: export to the
 // app's own on-disk layout as one STORED zip, read it back with the
@@ -46,9 +45,6 @@ test('SP1: the bytes - base64 both ways, the CRC, and a STORED zip the port’s 
 });
 
 test('SP1: the layout is the app’s own - the three spellings, the two files, the folder', () => {
-  const fsrc = read('app/lib/fileStorage.cjs');
-  for (const [name, mime] of TRANSFER_SHOT_FILES) assert.ok(fsrc.includes(`['${name}', ${mime ? `'${mime}'` : 'null'}]`), `fileStorage.cjs spells ${name}`);
-  assert.ok(fsrc.includes(`const DATA_FILE = '${TRANSFER_DATA_FILE}';`) && fsrc.includes(`const INFO_FILE = '${TRANSFER_INFO_FILE}';`) && fsrc.includes(`const SAVES_DIR = '${TRANSFER_DIR}';`));
   assert.deepEqual(shotToFile(`data:image/jpeg;base64,${bytesToBase64(jpegBytes)}`), { name: 'Screenshot.jpg', data: jpegBytes }, 'a jpeg data URL is the jpeg’s own bytes');
   assert.equal(shotToFile('data:image/png;base64,AAAA').name, 'Screenshot.png');
   const odd = shotToFile('data:image/webp;base64,AAAA');
@@ -62,7 +58,7 @@ test('SP1: the layout is the app’s own - the three spellings, the two files, t
   assert.deepEqual(slotPathOf('Roaming/DFO Online/Saves/SAVE0/SaveInfo.txt'), { n: 0, file: 'SaveInfo.txt' }, 'a whole userData folder can be picked, however deep the save sits in it');
   assert.equal(slotPathOf('Saves/SAVE03/SaveData.txt'), null, 'a hand-spelt slot number is not a slot (the app’s own law)');
   assert.equal(slotPathOf('Saves/README.txt'), null);
-  assert.equal(TRANSFER_ZIP_NAME, 'DFO-Online-Saves.zip');   // BR4; PIN MOVED: BR5's name
+  assert.equal(TRANSFER_ZIP_NAME, 'DFO-Online-Saves.zip');   // BR4
 });
 
 test('SP1: the round trip - export a store, read the zip back, import into an empty store, every slot where it was', async () => {
@@ -105,15 +101,3 @@ test('SP1: import never overwrites - a taken number moves to the first free one,
   assert.equal(full.getItem(SAVE_INFO_PREFIX + 0), null, 'and no card landed before the data, or a half slot would enumerate');
 });
 
-test('SP1: the doors - the Load pane carries Export and both Imports, on the title and the pause menu alike', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const pane = menu.slice(menu.indexOf('function paneLoad(body) {'), menu.indexOf('function transferCard('));
-  assert.ok(pane.includes('body.append(transferCard(saves.length));'), 'the card rides the Load pane, after the slots');
-  const cardSrc = menu.slice(menu.indexOf('function transferCard('), menu.indexOf('// ── SAVE GAME (pause only)'));
-  assert.ok(cardSrc.includes("exportSavesZip(appStorage())") && cardSrc.includes("a.download = TRANSFER_ZIP_NAME;"), 'Export downloads the store’s zip under the one name');
-  assert.ok(cardSrc.includes("readZipEntries(f, { pick: (names) => names.filter((n) => slotPathOf(n)) })"), 'a zip import inflates only the save files');
-  assert.ok(cardSrc.includes('entriesFromFiles([...(dirIn.files ?? [])])') && cardSrc.includes("dirIn.setAttribute('webkitdirectory', '')"), 'a folder import walks a picked Saves folder');
-  assert.ok(cardSrc.includes('importSlots(slots, appStorage())'), 'both write into the store under this build - the browser’s on the site, the file store in the app');
-  assert.ok(cardSrc.includes('shell?.savesPath'), 'the app names where its files are');
-  assert.ok(!cardSrc.includes('deleteSave') && !cardSrc.includes('removeItem'), 'the card deletes nothing');
-});

@@ -1,22 +1,18 @@
 // @ts-check
-// LOOT-GATE (2026-10-25, Dudey: two streamers found Legendaries at level 1 and 2 and never used another weapon; "early
-// game 1-8/9/10ish swap out between blue gear, then at roughly 10/11ish you start finding yellow gear rarely and then
-// legendaries get a small increase of chance to drop").
+// LOOT-GATE.
 //
 // THE ROLLER'S LEVEL SCALES THE TOP OF THE LADDER. Every rarity roll read its source alone - a Crypt's pile is tier 9
 // whoever opens it - so a level 1 character met a Legendary in about one Crypt in three. Now the Rare and Legendary
 // thresholds are multiplied by a factor of the roller's level before the roll (lootRarity.js rarityChances); Magic is
 // left alone. The source still decides the odds; the level only holds the top tiers back until the character is ready.
 // NOT EVERY DOOR (AUDIT UPDATE L7, AUDIT UPDATE II A6 - LEFT, the owner's call): the world's shared and receipt-seeded
-// spoils pick their tier off rarityChances with no level - the Gate, the Abyss, the raids, the Ketch, the serpent, the
+// spoils pick their tier off rarityChances with no level - the Gate, the Abyss, the raids, the serpent, the
 // starfall, a staff event's, a revenant's trophy - so a young character there meets them as anyone does.
 //
 //   Rare:      x0.15 up to level 7, then up to x1 at level 12
 //   Legendary: x0.05 up to level 9, x0.25 at level 10, then up to x1 at level 15
 //
-// The drought (lootDrought.js) does not count under DROUGHT_FROM, so it never builds a pile of pity that empties on the
-// day the character turns 10 - though a Legendary taken early still empties it (AUDIT UPDATE L6). A Legendary that does
-// drop early is a whole one; a plain piece can be imbued Magic, and a found Magic one Rare, at the Mages Guild's Reforge
+// A Legendary that does drop early is a whole one; a plain piece can be imbued Magic, and a found Magic one Rare, at the Mages Guild's Reforge
 // (reforge.js imbuePiece) - never Legendary.
 //
 // KEPT FROM PLAYERS (Dudey, 2026-10-25): patch notes, release notes, Discord posts and in-game help never state these
@@ -35,9 +31,6 @@
 export const RARE_GATE = Object.freeze({ floor: 0.15, holdTo: 7, fullAt: 12 });
 /** The Legendary factor's floor, the level it holds to, its first step past that, and the level it reaches x1 at. */
 export const LEGENDARY_GATE = Object.freeze({ floor: 0.05, holdTo: 9, step: 0.25, fullAt: 15 });
-/** Under this level the drought does not count. */
-export const DROUGHT_FROM = 10;
-
 const lv = (level) => Math.max(1, Math.floor(Number(level) || 1));
 
 /** The Rare threshold's factor at a level. */
@@ -63,9 +56,6 @@ export function gateLevel(level) {
   const v = Number(level);   // null and '' read 0: no level
   return Number.isFinite(v) && v > 0 ? v : null;
 }
-
-/** Whether the drought is held at this level (null: no level, never held). */
-export const droughtHeld = (level) => gateLevel(level) != null && lv(level) < DROUGHT_FROM;
 
 let _level = null;
 /** AUDIT UPDATE L1: the scope's level (`{ level }`) while withRollerLevel runs, else null. */

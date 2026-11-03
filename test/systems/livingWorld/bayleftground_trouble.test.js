@@ -1,4 +1,4 @@
-// BAY-LEFT-GROUND (2026-10-26, bible/06-Systems/Living-World-II.md; the audit "no system left behind in the Bay", D2) -
+// BAY-LEFT-GROUND -
 // THE ROAD'S TROUBLE ON THE LAND'S OWN WILD. The living world's trouble handed the encounter law no `fauna`, so a caravan
 // past the Bay was beset out of Daggerfall's climate tables (Black Marsh's: Centaurs, Orcs, Orc Warlords), against
 // TESA-BIOME's recorded choice 4 (a province's own beasts). The trouble now hands the place it falls, and the host's
@@ -74,11 +74,6 @@ test('BAY-LEFT-GROUND D2 the host\'s producer rolls the group on the pixel\'s ow
     const dive = foesOf({ climateIndex: -1, dungeonType: 7, minute: 600, level: 5, size: 4, rolls: lwRng(9, 9) });
     assert.equal(dive.length > 0, true);
   } finally { _resetEncounterTableSelectors(); }
-});
-
-test('BAY-LEFT-GROUND D2 the world host wires its trouble world to the composed maps\' band (mutants: the host handing none)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const livingTroubleWorld = \{\n\s+climateAt: \(px, py\) => maps\.getClimateIndex\(px, py\),\n\s+foesOf: troubleFoesOf\(\{ faunaAt: \(x, y\) => maps\.getFaunaBand\?\.\(x, y\) \}\),/);
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

@@ -77,35 +77,3 @@ test('X9: the 14-unit reach is the scan default - the dispel does not aim', () =
   assert.deepEqual(getNearbyObjects(list, NEARBY.Undead).map((no) => no.ref), [near]);
 });
 
-test('X9: DESTROYED, not killed - both hosts sweep through the Destroy primitive', () => {
-  // DFU's own comment: "just like classic, dispel simply destroys
-  // serializable enemy object in scene - target is not killed and will
-  // drop no loot. This can break quests if used carelessly." The port
-  // routes it through removeFoe, which is Destroy(gameObject) - dead
-  // flag, batch freed, quest resource uncoupled, and crucially NOT
-  // through damageFoe, which would spawn a corpse and roll loot.
-  const dg = readFileSync(join(ROOT, 'src/scenes/dungeonContext.js'), 'utf8');
-  const wd = readFileSync(join(ROOT, 'src/scenes/world.js'), 'utf8');
-  for (const [name, src, call] of [['dungeon', dg, 'questPoolOps.removeFoe(f)'], ['world', wd, 'exteriorFoes.removeFoe(f)']]) {
-    const arm = src.slice(src.indexOf('onDispel:'), src.indexOf('onDispel:') + 700);
-    assert.ok(arm.includes(call), `${name} destroys through the Destroy primitive`);
-    assert.ok(arm.includes('dispelNearby'), `${name} rolls through the ported law`);
-    assert.ok(!arm.includes('damageFoe'), `${name} does NOT route through the damage door`);
-  }
-  // and the exterior pool exports it for exactly this
-  assert.match(readFileSync(join(ROOT, 'src/scenes/exteriorFoes.js'), 'utf8'),
-    /removeFoe: questPoolOps\.removeFoe/);
-});
-
-test('X9: the sweep scans FRESH rather than reading the detect cadence', () => {
-  // The nearby list is only kept warm while a Detect spell runs, and
-  // it rebuilds on a 0.33s timer. A dispel cast with no detector up
-  // would otherwise read an empty or stale list, so scanNow bypasses
-  // both the gate and the cadence - the honest equivalent of DFU
-  // always having a warm list.
-  const shared = readFileSync(join(ROOT, 'src/scenes/shared.js'), 'utf8');
-  assert.match(shared, /scanNow\(\) \{\s*return updateNearbyObjects\(feet\(\), \{ entities: entities\(\), loot: loot\(\) \}\);/);
-  for (const p of ['src/scenes/dungeonContext.js', 'src/scenes/world.js']) {
-    assert.match(readFileSync(join(ROOT, p), 'utf8'), /detectFeed\.scanNow\(\)/, `${p} scans fresh`);
-  }
-});

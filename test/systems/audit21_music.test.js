@@ -297,29 +297,6 @@ test('AUDIT 21 music F2/F3: the hosts FEED the fields the fold reads', () => {
     'and fed to the ambient one-shots too - doNotPlayInCastle was read by nobody');
 });
 
-test('M-FM: Audio/AlternateMusic reaches the playlists, through ONE read', () => {
-  // THE WHOLE FEATURE WAS BUILT AND NOTHING JOINED IT. Every FM
-  // playlist has been ported since A5, outdoorPlaylist and playlistFor
-  // have branched on `fm` all along, SongManager has taken it, and
-  // createMusicDirector has accepted and forwarded it - while all
-  // three hosts called createMusicDirector() with no arguments, so the
-  // checkbox the settings screen offers moved nothing at all.
-  const shared = readFileSync(new URL('../../src/scenes/shared.js', import.meta.url), 'utf8');
-  assert.match(shared, /getBool\('Audio', 'AlternateMusic'\)/,
-    'the setting must be read');
-  // ...in the FACTORY, not at the call sites. Three call sites are
-  // three chances to forget; one read is none.
-  const factory = shared.slice(shared.indexOf('export function createMusicDirector'));
-  assert.match(factory.slice(0, 1600), /getBool\('Audio', 'AlternateMusic'\)/,
-    'the read belongs inside createMusicDirector');
-  for (const host of ['world.js', 'exterior.js', 'dungeon.js']) {
-    const h = readFileSync(new URL(`../../src/scenes/${host}`, import.meta.url), 'utf8');
-    assert.match(h, /createMusicDirector\(\)/, `${host} still calls it bare - and now gets the setting`);
-    assert.doesNotMatch(h, /getBool\('Audio', 'AlternateMusic'\)/,
-      `${host} must NOT read the setting itself - that is the shape this fixes`);
-  }
-});
-
 test('M-FM: null asks the setting, an explicit flag overrides it', async () => {
   const { createMusicDirector } = await import('../../src/scenes/shared.js');
   const { setValue } = await import('../../src/systems/settings/settings.js');

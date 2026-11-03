@@ -1,4 +1,4 @@
-// SHORT-TOUCH (2026-09-27): THE FRONT DOOR ON A SHORT LANDSCAPE TOUCH SCREEN, MEASURED.
+// SHORT-TOUCH: THE FRONT DOOR ON A SHORT LANDSCAPE TOUCH SCREEN, MEASURED.
 //
 // Discord, an AYN Thor and an Android phone: "I can login, get to the main screen but I'm unable to select online,
 // load game, anything" - "I luckily have a tiny, tiny space under the title I can use to scroll". The section

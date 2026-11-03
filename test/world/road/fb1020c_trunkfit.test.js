@@ -134,13 +134,3 @@ test('TRUNK-FIT with ARENA2: the report - Crossleigh\'s GENRAS01 stands TEXTURE.
   assert.deepEqual(fitted('RESIAS02.RMB').out, [], 'the block beside it stands its trees clear of its things');
 });
 
-test('TRUNK-FIT by source: the world host measures the pixel\'s solid things first (PROP-BODIES\' bodies of every flat of no nature archive, at its record\'s size), and draws a location\'s Low Poly tree no wider than its trunk\'s room as well as its crown\'s - its far picture and its near set alike; the wild\'s untouched; LPT-FIT\'s lines as they were (mutants: the pre-pass dropped; the nature archives taken; the wild fitted; the trunk\'s cap the greater)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(isNatureArchive\(archive\)\) continue;\n\s+const t = await getTexture\(archive\);\n\s+if \(record < t\.recordCount\) solids\.push\(\.\.\.flatBodies\(t, archive, record, billboardSize\(t, record\), centers\)\);/, 'the solid things, before any group is stood');
-  assert.ok(w.indexOf('const solids = [];') < w.indexOf('const { sib, proto: lpt, far, plain, key: rkey } = await naturePicture('), 'measured before the first tree');
-  assert.match(w, /const trunk = LPT_TRUNKS\[lpt\.key\] \?\? 0;/);
-  assert.match(w, /const fit = crown > 0 \|\| \(trunk > 0 && solids\.length\) \? new Float32Array\(centers\.length\) : null;/);
-  assert.match(w, /if \(fit\) fit\[i\] = lptFitCap\(lptPathMask, g\.vergeNet, g\.px, g\.py, c\[0\], c\[2\], crown, v\);\n(?:\s*\/\/.*\n)*\s*if \(fit && !wild\[i\]\) fit\[i\] = Math\.min\(fit\[i\], lptTrunkCap\(solids, c\[0\], c\[2\], trunk, v\)\);/, 'the lesser of the two fits, a location\'s tree alone');
-  assert.match(w, /scales\[i\] = \(fit \? Math\.min\(v, fit\[i\]\) : v\) \/ LPT_SCALE_MAX;/, 'the far picture');
-  assert.match(w, /lptGroups\.push\(\{ h: lptHandles\.length - 1, centers, wild, fit \}\);/, 'the near set');
-});

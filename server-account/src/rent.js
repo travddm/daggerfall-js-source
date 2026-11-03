@@ -1,11 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-RENT (2026-09-30) - A HOME'S ROOMS, RENTED TO OTHER PLAYERS.
+// HOME-RENT - A HOME'S ROOMS, RENTED TO OTHER PLAYERS.
 //
 // Asked: "For houses with multiple rooms, the owner can choose to rent
 // out to other players and adjust the price as needed". The shapes and
 // bounds are src/net/homeLaw.js (RENT_*), which the client reads too; the
-// table is migrations/0037_home_rooms.sql.
+// table is `home_rooms`.
 //
 // ═══ THE OWNER OFFERS, THE TENANT RENTS, THE OWNER COLLECTS ═════════
 //
@@ -48,7 +48,7 @@ import {
   rentRoomOk, rentPriceOk, rentDaysOk, rentAnchorOf, rentCost, rentUntil, RENT_ANCHOR_MOVED,
 } from '../../src/net/homeLaw.js';
 
-/** The home is the caller's: map, key, account, character - decor.js's own rule. ACCOUNT-HOMES (2026-10-06): the account's,
+/** The home is the caller's: map, key, account, character - decor.js's own rule. ACCOUNT-HOMES: the account's,
  *  any character of it (a deed the realm gave stays its knight's); never a guild's hall, whose row's account is only the
  *  guildmaster's who bought it (the character named it before - a hall's is the guild's mark, which no character is). */
 const OWNS = 'EXISTS (SELECT 1 FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL AND (deed = 0 OR char_id = ?))';
@@ -113,8 +113,7 @@ export async function offerRoom(ctx, player, { mapId, buildingKey, character, ro
   if (!rentRoomOk(room) || !at || !rentPriceOk(price)) return { error: 'bad-room' };
   const owns = await db.prepare(`SELECT 1 AS one WHERE ${OWNS}`).bind(mapId, buildingKey, player.id, character).first();
   if (!owns) return { error: 'no-home' };
-  // a character whose record holds no save yet (a customs whose first save never landed) offers nothing: undone, its home
-  // goes back to the offline character, where rent held on it is no record's to collect (AUDIT)
+  // a character whose record holds no save yet offers nothing: rent held on its home is no record's to collect (AUDIT)
   const rec = await db.prepare('SELECT bytes FROM realm_characters WHERE id = ? AND player = ?').bind(character, player.id).first();
   if (!(Number(rec?.bytes) > 0)) return { error: 'realm-needed' };
   const r = await db.prepare(`INSERT INTO home_rooms (map_id, building_key, room, anchor, price, listed)

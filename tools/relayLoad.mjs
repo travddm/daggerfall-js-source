@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// RELAY-LOAD (2026-10-18, from play: "Server is kinda breaking down near oblivion gate cause so many ppl lol"; the owner,
-// at a thousand online: "We really need to future proof even more and improve our server. Like really deep") - WHAT IS
+// RELAY-LOAD - WHAT IS
 // FILLING THE RELAY, READ BY THE OPERATOR. Every room writes one Analytics Engine point a window it was busy in
 // (server/src/relayScale.js RoomMetrics: its kind, its sockets, hellos, refusals, poses, sends, bytes, drops and peak),
 // and nothing read them back: the question "which room broke at the gate" was answered by arithmetic from the constants.
@@ -73,7 +72,7 @@ const windowHours = (h) => Math.min(loadHours(h), WINDOW_HOURS_MAX);
  *   rows (a gate opens at HH:32:30 UTC every even hour); every row of the span, never cut;
  * - crowds: the forty busiest room-windows by their peak that are not a channel's (`chat` - its buses hold everyone) -
  *   when, which kind, how many it held and what it refused: the site's cell and the court, at a gate's hour;
- * - fulls (FOES-FIRST and FOES-HOLD, 2026-10-21; bible/11-Multiplayer/Scale-Arc.md FOES-HOLD): every kind's foes budget
+ * - fulls (FOES-FIRST and FOES-HOLD, 2026-10-21; FOES-HOLD): every kind's foes budget
  *   read by its blobs - the full frames asked and dropped, the frames held for their turn, sent, and gone unsent, the
  *   mean wait of a held frame sent, the beats said for a held sender, and the blows the hit funnels dropped - over the
  *   points that carry the hold's blobs (`blob6 != ''`: a relay before FOES-HOLD wrote none, and the SQL API's
@@ -82,7 +81,7 @@ const windowHours = (h) => Math.min(loadHours(h), WINDOW_HOURS_MAX);
  *   be reset" on the evening of 2026-10-20, cause not found): the forty room-windows that wrote storage most - when,
  *   which kind, its reads and writes and the sockets it held - so a night of resets is read beside the rooms that were
  *   writing then (the resets themselves are Workers Observability's, not this dataset's);
- * - levels (COST-2 part two, bible/11-Multiplayer/Scale-Arc.md): the cells' objects by their node's level (blob11: 0 a
+ * - levels (COST-2 part two): the cells' objects by their node's level (blob11: 0 a
  *   fine cell, 1-4 a coarse node, '' a relay before COST-2 or a room woken by its alarm alone) - the room-windows each
  *   level was awake (over 12 an hour: its objects awake on the mean), the sockets and the most one held, the sockets
  *   refused full, the poses and the sends - so the seed's before and after are read side by side;

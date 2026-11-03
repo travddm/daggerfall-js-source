@@ -1,4 +1,4 @@
-// CLIMB ON REAL GEOMETRY (2026-10-01, Mac: "Take care of the what is left including a jump catching a ledge"): the
+// CLIMB ON REAL GEOMETRY: the
 // enhanced climb had been proven on boxes, prisms and 12,000 random scenes, never on Daggerfall's own buildings - no
 // session had the game data. This is the measure for when one does: every side of real ARCH3D building models is
 // climbed (Forward held at the foot of the wall: the free climb, its top-out or its hang, and the hang's shimmy) and

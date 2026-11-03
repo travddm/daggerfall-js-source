@@ -1,7 +1,4 @@
-// ENH-NOTICE3 (2026-09-21, Mac: "the new enhanced pop up system isn't
-// working for everything. All mods, including climates and calories
-// need to utilize the enhanced notification popup. This needs a proper
-// detailed audit, maybe a refactor"): THE ONE DOOR EVERY MESSAGE GOES
+// ENH-NOTICE3: THE ONE DOOR EVERY MESSAGE GOES
 // THROUGH.
 //
 // WHAT THE AUDIT FOUND. ENH-NOTICE1/2 gave the enhanced skin its face

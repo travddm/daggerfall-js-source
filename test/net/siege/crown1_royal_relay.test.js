@@ -1,10 +1,10 @@
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE ROYAL TOURNEY IN THE RELAY, pinned
+// CROWN1 part two: THE ROYAL TOURNEY IN THE RELAY, pinned
 // over the real Room and its fake sockets (test/fakeRoom.mjs) - a crown's `royal:` room admits by the service's pass
 // (`sn` 'royal': a contender or a spectator) all the week its Edict rules; a challenge and its accept begin a bout in
 // DUEL1's ring, both whole on their marks; after the countdown the bout's two alone strike each other, every blow the
 // referee's, the ring held by the step; a fall ends it - the winner handed its signed `t1` receipt, the ladder counting
 // it (the same two three times a UTC day); a bout too long a draw, a fighter gone a walkover; the week's end closes it.
-// bible/11-Multiplayer/Seats-Arc.md 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two).
+// 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { royalRoomKey, siegeRoomKey, SIEGE_UNITS_PER_M, ROYAL_RING, ROYAL_PAIR_DAY_MAX, ROYAL_LADDER_SHOWN, ROYAL_RC_KEEP } from '../../../src/net/siege/siegeRef.js';
@@ -23,7 +23,7 @@ const SE = SB + 7 * 86400;
 const T = SB * 1000;
 const at = (x, z = 0) => ({ x: x * M, y: 0, z: z * M, yaw: 0, pitch: 0 });
 const SF = [[100 * M, 50 * M]];   // the ring's centre
-const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // PIN MOVED (AUDIT-SEATS): R8 - the weapon in the right hand (EquipSlots.RightHand 19); slot 0 is an amulet's, and a weapon there is held no more
+const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };
 const sieges = (ws, k) => ws.sent.filter((m) => m.t === 'siege' && (!k || m.k === k));
 const signing = async () => {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -175,8 +175,8 @@ test('CROWN1 THE RING HELD: a bout\'s fighter stepping past the ring and its sla
     await r.pose(wa, { ...p, x: SF[0][0] - (ROYAL_RING.radiusM + ROYAL_RING.outSlackM + 1) * M });
     assert.equal(sieges(wa, 'back').length, steps + 1, 'pulled back');
     assert.deepEqual(r.room._siege.fighters[wa.att.sub].pose, p);
-    await r.pose(wc, at(118, 50));   // PIN MOVED (AUDIT-SEATS): R2 - a pose after a silence earns a second's run and the slack (18.5 m), never the silence's whole; 18 m out is still past the ring's 12 m and its 4 m slack
-    assert.equal(r.room._siege.fighters[wc.att.sub].pose.x, 118 * M, 'free outside a bout');   // PIN MOVED (AUDIT-SEATS): R2, as above
+    await r.pose(wc, at(118, 50));
+    assert.equal(r.room._siege.fighters[wc.att.sub].pose.x, 118 * M, 'free outside a bout');
   });
 });
 

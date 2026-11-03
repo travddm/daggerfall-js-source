@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 (bible/03-World/Bantha-Jungle.md; the owner: "When traveling inside the area there should be a fog-like haze
-// that reduces visability ... not hurt performance. No band aids") - THE JUNGLE'S HAZE: how thick, how high, what
+// BANTHA1 () - THE JUNGLE'S HAZE: how thick, how high, what
 // colour, and what it hides. PURE - the host (scenes/jungleHost.js) hands it the frame's eye, clock and weather and
 // hands its answer to the renderer (render/hazeGlsl.js is the shader's half: hazeTransmittance below is its CPU twin,
 // term for term).

@@ -1,4 +1,4 @@
-// SHIP-NAMES (2026-10-02, Mac: "Enemy and Friendly vessels need a large assortment of generated names") - a ship's
+// SHIP-NAMES - a ship's
 // name was a line of her trade's list: sixteen merchantmen's, eighteen pirates', six a crown's - two hundred ships of a
 // trade met the same sixteen names over and over, and a possessive took an article ("The Dagon's Tooth"). Now each is
 // drawn off her seed from her trade's FORMS over word banks of the Iliac Bay (systems/naval/navalShips.js shipNameOf,

@@ -1,5 +1,4 @@
-// CURSE-SYNC (2026-09-27, the bug-reports channel: "Monsters aren't syncing ... The ghost on daggerfall ... We all had
-// to kill them ... And everyone had to kill thier ow[n]"). S0000977, the Curse of Daggerfall, stands a wraith and a ghost
+// CURSE-SYNC. S0000977, the Curse of Daggerfall, stands a wraith and a ghost
 // at night in Daggerfall's streets for every character the tutorial started it for - and as a quest's foes they rode
 // nowhere (Multiplayer.md's first lock), so each player fought a haunting nobody else could see. A WORLD QUEST'S FOES
 // ARE THE WORLD'S: they ride the cell as an encounter's do, anyone may strike them and be hunted by them, and their
@@ -275,7 +274,7 @@ test('CURSE-SYNC executed: a player who leaves or falls hands the curse\'s foe t
   assert.deepEqual(sent.at(-1).f, ['bob-0002', 'amy-0003'], 'the cell\'s: the ghost to the nearest player, the private quest\'s foe to the party');
   const room = new Function('modes', 'online', 'isWorldRoom', 'peersNear', 'social', 'isPrivateQuestFoe', `return () => ${body('const handOverRoomFoes = () =>')};`)(
     { mode: 'interior', ownHandOverFrame: (heirOf) => ({ f: [heirOf(g), heirOf(own)] }), dropOwnHanded: () => 2 },
-    { room: 'world:bld:7', ownOk: true, sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
+    { room: 'world:bld:7', sendOwnFoes: (f) => { sent.push(f); return true; } }, () => true, () => near, social, isPrivateQuestFoe);
   assert.equal(room(), 2);
   assert.deepEqual(sent.at(-1).f, ['bob-0002', 'amy-0003'], 'and a world room\'s, by the same word');
 });

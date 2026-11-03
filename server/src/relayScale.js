@@ -1,5 +1,5 @@
-// SCALE2b (2026-10-04, Mac: "I definitely want to do all these changes in full. No exceptions"): THE RELAY'S HALF OF
-// THE SCALE ARC (bible/11-Multiplayer/Scale-Arc.md SCALE2b), in the one deploy SCALE's policy asks for - the socket
+// SCALE2b: THE RELAY'S HALF OF
+// THE SCALE ARC (SCALE2b), in the one deploy SCALE's policy asks for - the socket
 // index kept rather than re-walked, the hello's storage moved to memory, a pose's attachment written lazily and its fan
 // selected rather than sorted, the caches bounded without thrashing, every call to another room given a deadline, and
 // the room's counts written to Analytics Engine. Its constants and its one helper live here, not in index.js: a module
@@ -78,7 +78,7 @@ export class Bounded extends Map {
  *
  *  Per kind, sends a pose: SUM(double8) / SUM(double7); storage a hello: SUM(double10 + double11) / SUM(double3).
  *
- *  FOES-FIRST (2026-10-21, bible/11-Multiplayer/Scale-Arc.md FOES-FIRST): the twenty doubles are all spoken for, so the
+ *  FOES-FIRST: the twenty doubles are all spoken for, so the
  *  counts past them are BLOBS, each its count in decimal (a five-minute window's count, well inside 32 bits), read back
  *  as numbers by the SQL API's `toUInt32` - the blows dropped `SUM(_sample_interval * toUInt32(blob3))`, blob4 and blob5
  *  the same way, and a kind's full frames' drop rate their quotient - over `WHERE blob3 != ''`: a point from a relay
@@ -92,7 +92,7 @@ export class RoomMetrics {
   constructor(now = Date.now()) { this.reset(now); }
   reset(now) {
     this.since = now;
-    this.c = { hellos: 0, busy: 0, frames: 0, bytesIn: 0, poses: 0, sends: 0, bytesOut: 0, reads: 0, writes: 0, refusals: 0, full: 0, drops: 0, peak: 0, foes: 0, hits: 0, chats: 0, owed: 0, batches: 0, hitDrops: 0, fullDrops: 0, fulls: 0, held: 0, heldSent: 0, heldGone: 0, heldMs: 0, beats: 0, cellMoves: 0, cellBlocked: 0 };   // SCALE5b: from `full` on; FOES-FIRST: from `hitDrops` on, the blobs; FOES-HOLD: from `held` on; COST-2 part two: the directory's moves
+    this.c = { hellos: 0, busy: 0, frames: 0, bytesIn: 0, poses: 0, sends: 0, bytesOut: 0, reads: 0, writes: 0, refusals: 0, full: 0, drops: 0, peak: 0, foes: 0, hits: 0, chats: 0, owed: 0, batches: 0, hitDrops: 0, fullDrops: 0, fulls: 0, held: 0, heldSent: 0, heldGone: 0, heldMs: 0, beats: 0, cellMoves: 0, cellBlocked: 0, magickaDry: 0 };   // SCALE5b: from `full` on; FOES-FIRST: from `hitDrops` on, the blobs; FOES-HOLD: from `held` on; COST-2 part two: the directory's moves
   }
   /** Anything to say? */
   get busy() { const c = this.c; return c.hellos + c.busy + c.frames + c.sends + c.reads + c.writes + c.refusals + c.full > 0; }   // SCALE5b: a room that only refused a socket for being full has that to say
@@ -103,8 +103,9 @@ export class RoomMetrics {
     if (wrote) {
       try {
         sink.writeDataPoint({
-          indexes: [kind], blobs: [kind, String(version), String(c.hitDrops), String(c.fullDrops), String(c.fulls), String(c.held), String(c.heldSent), String(c.heldGone), String(Math.round(c.heldMs)), String(c.beats), String(level), String(c.cellMoves), String(c.cellBlocked)],   // FOES-FIRST: blob3 to 5, counts - the doubles are all spoken for; FOES-HOLD: blob6 to 10; COST-2: blob11 the node's level; COST-2 part two: blob12 and 13 the directory's moves
-          // SCALE5b (2026-10-10; bible/11-Multiplayer/Scale-Arc.md SCALE5b): WHAT SAYS A ROOM'S LIMIT IS NEAR, from double13 -
+          indexes: [kind], blobs: [kind, String(version), String(c.hitDrops), String(c.fullDrops), String(c.fulls), String(c.held), String(c.heldSent), String(c.heldGone), String(Math.round(c.heldMs)), String(c.beats), String(level), String(c.cellMoves), String(c.cellBlocked), String(c.magickaDry)],   // blob 14: the casts the relay's magicka pool cut short (a build the game allows refused would show here)
+   // FOES-FIRST: blob3 to 5, counts - the doubles are all spoken for; FOES-HOLD: blob6 to 10; COST-2: blob11 the node's level; COST-2 part two: blob12 and 13 the directory's moves
+          // SCALE5b: WHAT SAYS A ROOM'S LIMIT IS NEAR, from double13 -
           // the sockets refused 'room full' (the Worker's door, which counted nothing - AUDIT SCALE II R1-5: a refusal the
           // walk could not get past, its last try's or a room's that does not layer, never a full layer it walked on from),
           // the frames its byte budgets dropped, the most sockets it held in the window, the foes frames (AUDIT SCALE II
@@ -158,7 +159,7 @@ export function countedState(state, metrics) {
   });
 }
 
-/** DO-ASK (2026-10-16): THE WORKER'S ASK OF A ROOM, ONCE MORE WHERE THE RUNTIME SAYS IT MAY BE. A Durable Object stub's
+/** DO-ASK: THE WORKER'S ASK OF A ROOM, ONCE MORE WHERE THE RUNTIME SAYS IT MAY BE. A Durable Object stub's
  *  error carries `retryable` where the object was reset or its connection lost before it ran anything, and `overloaded`
  *  where its queue ran too long - the live relay showed both (a region channel's storage reset, a crowded cell's queue).
  *  Every ask the Worker makes is a socket's upgrade, which nothing has run yet, so a retryable one is asked once more on
@@ -188,7 +189,7 @@ export async function layerWalk(rooms, key, request, start) {
   const page = Object.fromEntries(request.headers);
   delete page[LAYER_ASK_HEADER]; delete page[LAYER_LAST_HEADER];
   // AUDIT SCALE II R3-3: AN ASKED LAYER IS THE PAGE'S ONLY WHILE SOMEONE STANDS IN IT. Every `?ly=` was honoured, so any
-  // page had a private empty copy of any place on demand (in the Wild zone, a hiding place from its fights). The ask
+  // page had a private empty copy of any place on demand. The ask
   // rides the first try alone; an asked layer that holds no socket answers LAYER_EMPTY_HEADER, and the walk starts again
   // at the place, as a page that asked nothing is walked - the empty layer is admitted only when the walk reaches it in
   // turn. A party's layer holds the party; a reconnect's own holds the socket it replaces while the runtime lists it -

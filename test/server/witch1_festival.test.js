@@ -1,5 +1,5 @@
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
-// the REAL migrations (test/accountDb.mjs, migration 0140): the finds the service's own die decides and a day caps, the
+// WITCH1: THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
+// the REAL migrations (test/accountDb.mjs): the finds the service's own die decides and a day caps, the
 // sales under a request id, the Hearth Offerings set out, filled, taken from once a day and taken in, an orphan's cakes
 // sent home, and the festival's wardrobe - the titles, the aura and the profile icon, held only as the rows say.
 import { test, mock } from 'node:test';
@@ -85,7 +85,6 @@ test('WITCH1 A FIND: the service\'s die decides at the source\'s odds; a guest, 
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'foe' }, {}), { error: 'closed' });
   assert.deepEqual(await findFestival(ctx(AFTER_S), player(alice), { source: 'foe' }, ON), { error: 'closed' });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'gold' }, ON), { error: 'source' });
-  // PIN MOVED (CAKE-CAP-SAID, FIELD BUGS 2026-10-21b): each answer says the day's cakes found, this find's with them
   assert.deepEqual(await findFestival(ctx(DAY_S, MISS), player(alice), { source: 'foe' }, ON), { found: 0, cakes: 0, today: 0 });
   assert.deepEqual(await findFestival(ctx(DAY_S, HIT), player(alice), { source: 'foe' }, ON), { found: 1, cakes: 1, today: 1 });
   assert.deepEqual(await findFestival(ctx(DAY_S, HIT), player(alice), { source: 'endgame' }, ON), { found: 4, cakes: 5, today: 5 });
@@ -102,7 +101,7 @@ test('WITCH1 THE DAY\'S CAPS: FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cake
   const { alice, player, ctx, db, row } = await stand();
   const day = utcDay(DAY_S);
   db._raw.prepare('INSERT INTO fest_finds (account, day, asks, found) VALUES (?, ?, ?, ?)').run(alice.id, day, FIND_ASKS_PER_DAY - 1, FIND_CAKES_PER_DAY - 3);
-  // the last ask of the day: the cakes it gives stop at the day's cap - and say it (PIN MOVED, CAKE-CAP-SAID)
+  // the last ask of the day: the cakes it gives stop at the day's cap - and say it (
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'endgame' }, ON), { found: 3, cakes: 3, today: FIND_CAKES_PER_DAY, capped: true });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'foe' }, ON), { error: 'capped', cakes: 3 });
   assert.equal(row(alice.id).fest_cakes, 3);
@@ -136,8 +135,9 @@ test('WITCH1 A SALE: the price taken only while the cakes cover it; an account w
   assert.deepEqual(await buyFestival(ctx(), player(alice), { ware: 'title:witchwarden', rid: 'aaaaaaaaaaab' }, ON), { repeat: true, ware: 'title:witchwarden', cakes: 40, bowls: 0, wares: ['title:witchwarden'] }, 'asked again: answered, nothing moved');
   assert.deepEqual(await buyFestival(ctx(), player(alice), { ware: 'title:witchwarden', rid: 'aaaaaaaaaaac' }, ON), { error: 'owned' });
   // a pack's ware is bought as often as the cakes go round
-  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaad' }, ON)).cakes, 20);
-  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaae' }, ON)).cakes, 0);
+  cakes(alice, 80);
+  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaad' }, ON)).cakes, 40);
+  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaae' }, ON)).cakes, 0);
   assert.equal(row(alice.id).fest_wares, 'title:witchwarden');
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM fest_sales WHERE account = ?').get(alice.id).n, 3);
   // a Hearth Offering is the account's count, as the cakes are - asked twice, one bowl
@@ -146,8 +146,8 @@ test('WITCH1 A SALE: the price taken only while the cakes cover it; an account w
   assert.equal((await buyFestival(ctx(), player(alice), { ware: 'item:offering', rid: 'aaaaaaaaaab0' }, ON)).bowls, 1, 'a repeat counts no second bowl');
   assert.equal(row(alice.id).fest_bowls, 1);
   // the days over: a new sale is closed, a sale asked before it is still answered
-  assert.deepEqual(await buyFestival(ctx(AFTER_S), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaaf' }, ON), { error: 'closed' });
-  assert.equal((await buyFestival(ctx(AFTER_S), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaae' }, ON)).repeat, true);
+  assert.deepEqual(await buyFestival(ctx(AFTER_S), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaaf' }, ON), { error: 'closed' });
+  assert.equal((await buyFestival(ctx(AFTER_S), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaae' }, ON)).repeat, true);
 });
 
 test('WITCH1 THE HEARTH OFFERING: set out only at a home the character owns (never a hall), filled from the owner\'s cakes, taken from once a day by others, taken in with its cakes', async () => {

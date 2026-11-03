@@ -1,6 +1,5 @@
 // @ts-check
-// SD18a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD18a;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MARKS - what each Hollow's Hour keeps. The
+// SD18a: THE HOUR'S MARKS - what each Hollow's Hour keeps. The
 // gate's Warden wears one of 4 aspects and two of 9 trials, a cycle of 144 (net/gate/gateMods.js, net/gate/gateLaw.js marksCycle);
 // the Hour was the same every time.
 //

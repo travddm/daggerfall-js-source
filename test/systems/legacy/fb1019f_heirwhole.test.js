@@ -104,7 +104,7 @@ const groundPool = () => createDroppedLoot({ renderer: renderer(), getTexture: a
 const mem = () => { const m = new Map(); return { get length() { return m.size; }, key: (i) => [...m.keys()][i] ?? null, getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: (k) => { m.delete(k); } }; };
 
 /** A ruin of thirteen blocks (nine interior, four caps) at Ruins of The Hold of Coppering's map id, which the world lays
- *  medium online (bible/11-Multiplayer/Instances.md section 1), on its pixel. */
+ *  medium online, on its pixel. */
 const PIXEL = { x: 300, y: 200 };
 const blocks = [...Array.from({ length: 9 }, (_, i) => ({ blockName: `N000000${i}.RDB`, x: i, z: 0, isStartingBlock: i === 0 })), ...Array.from({ length: 4 }, (_, i) => ({ blockName: `B000000${i}.RDB`, x: i, z: 1, isStartingBlock: false }))];
 const ruinAt = (mapId, locationId = 8008) => ({ name: 'Ruins of The Hold of Coppering', regionName: 'Isle of Balfiera', regionIndex: 23, locationIndex: 12, hasDungeon: true, mapTableData: { mapId, locationType: LOCATION_TYPES.DungeonRuin }, dungeon: { recordElement: { header: { locationId } }, blocks } });
@@ -231,7 +231,6 @@ test('HEIR-WHOLE the report: the fallen dies in another player\'s instance of a 
   const pub = door.d.choose(site);
   await until(() => door.shown.length > n);
   const { win } = door.shown[n];
-  // PIN MOVED (FIELD BUGS 2026-10-26 QUEST-FIRST): the re-laid room stands none of the remains, so it is the LAST row
   assert.deepEqual(win.options.map((o) => o.label), [`1 - ${INSTANCE_TEXT.mine()}`, `2 - ${INSTANCE_TEXT.public()}`, `Esc - ${INSTANCE_TEXT.leave()}`], 'an instance of their own, or Public');
   assert.deepEqual(win.lines, ['Ruins of The Hold of Coppering', INSTANCE_TEXT.line(), INSTANCE_TEXT.questPublic()], 'said before the choice: the quest\'s business is in the instance alone');
   win.input('Digit2');
@@ -268,7 +267,7 @@ test('HEIR-WHOLE the room is the remains\' while they lie: the same room every e
   const t = fallenIn(RUINS, ANN_ENTRY);
   const door = doorOf(t);
   const site = door.d.dungeonSite(RUINS);
-  const first = await take(door, site, 'Digit1');   // PIN MOVED (QUEST-FIRST): the instance is the first row here
+  const first = await take(door, site, 'Digit1');
   assert.deepEqual(await take(door, site, 'Digit1'), first, 'one room, every entry');
   const word = instanceWord(first.instance);
   assert.deepEqual(await door.d.entryFor(site, { ins: word }), first, 'a save made in it: back into it');

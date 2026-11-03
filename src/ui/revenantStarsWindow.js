@@ -1,6 +1,5 @@
 // @ts-check
-// RVN-STARS (2026-10-17, the owner: "develop a firmament style tree for revenants. Just like we did for ships and
-// characters"; bible/06-Systems/Revenants.md section 44) - A SWORN REVENANT'S STARS, DRAWN: its sky
+// RVN-STARS - A SWORN REVENANT'S STARS, DRAWN: its sky
 // (systems/revenant/revenantStars.js) in the one window every sky is drawn in (ui/skyWindow.js - the Firmament's dress, as
 // the captain's stars wear it). Opened from the Companions page (ui/companionRoster.js - a sworn one's Stars) over the pause
 // window (ui/firmamentOver.js revenantStarsOver - the door the Firmament had before GROWTH3 drew it in the Growth tab),

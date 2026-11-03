@@ -1,4 +1,4 @@
-// PADPLUS1 (2026-09-25): THE CONTROLLER, MADE FOR ENHANCED PLUS.
+// PADPLUS1: THE CONTROLLER, MADE FOR ENHANCED PLUS.
 //
 // The report: "chrome detects it as 360xbox controller which is fine but i jump with r1 open the spellbook with l2
 // and all that i cant even use the crossbar ... controller prompts are needed in the enhanced UI plus like r1 and l1
@@ -47,7 +47,7 @@ export const PLUS_PAD_LAYOUT = Object.freeze([
   ['JoystickButton7', 'Escape'],             // Menu - pause
   ['JoystickButton8', 'Run'],                // L3 - toggled by the poller (plusToggleRun)
   ['JoystickButton9', 'Crouch'],             // R3
-  // TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife Use"): LT - E, the professions' start and their
+  // TOUCH-HOLD: LT - E, the professions' start and their
   // hold, and the sea's. Every Plus button held a row, and a trigger holds while the right thumb draws the knife's
   // line; Recast, which it held, is the d-pad's right held (PLUS_DPAD_DEFAULTS)
   ['JoystickAxis9Button0', 'Interact'],      // LT
@@ -179,7 +179,7 @@ export const DPAD_CHOICES = Object.freeze([
   ['CharacterSheet', 'Character sheet'], ['CastSpell', 'Spellbook'], ['RecastSpell', 'Recast spell'], ['Inventory', 'Inventory'],
   ['StealMode', 'Steal mode'], ['GrabMode', 'Grab mode'], ['InfoMode', 'Info mode'], ['TalkMode', 'Talk mode'],
   ['Jump', 'Jump'], ['Crouch', 'Crouch'], ['ReadyWeapon', 'Draw / sheathe'],
-  // Mac: "add mouselook and walk mode to the d-pad's tap and hold too" - the same two registry actions the
+  // the same two registry actions the
   // Controller bindings window already lets you put on a single button (ui/plus/plusPadBinds.js PLUS_BIND_ROWS), now
   // also choosable per d-pad direction and per tap/hold, same as every other entry here.
   ['FreeMouse', 'Mouselook on / off'], ['WalkMode', 'Walk mode on / off'],
@@ -187,10 +187,10 @@ export const DPAD_CHOICES = Object.freeze([
   // options"): the two Windows-group actions the keyboard pane always drew. TravelView ships with no key in either
   // dict, so its d-pad press is the host's own door (gamepadInput.js fireDpad's `padAction`), not a synthetic key.
   ['QuickDial', 'Quick dial'], ['TravelView', 'Overworld'],
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): the weapon's technique - a d-pad's press looses it at the look (a held
+  // TECH1: the weapon's technique - a d-pad's press looses it at the look (a held
   // aim is a button's: the Controller bindings window's row, ui/plus/plusPadBinds.js)
   ['WeaponTechnique', 'Weapon technique'],
-  // SPYGLASS: the captain's glass, raised and lowered aboard (bible/03-World/Captains-Sea.md)
+  // SPYGLASS: the captain's glass, raised and lowered aboard
   ['Spyglass', 'Spyglass (aboard)'],
 ]);
 export const dpadChoiceWord = (a) => DPAD_CHOICES.find(([v]) => v === (a ?? null))?.[1] ?? String(a);
@@ -265,7 +265,7 @@ export const LOOT_DPAD = Object.freeze({
 export const HELM_DPAD = Object.freeze({
   JoystickAxis7Button0: 'up', JoystickAxis7Button1: 'down', JoystickAxis6Button1: 'left', JoystickAxis6Button0: 'right',
 });
-/** AUDIT LOCKPICK C3 (bible/06-Systems/Lockpicking.md section 4): THE LOCK'S ARM - while the lock's window stands
+/** AUDIT LOCKPICK C3: THE LOCK'S ARM - while the lock's window stands
  *  (ui/lockpickWindow.js registers { up(), gentle(), dpad(dir, at) -> [x, y]|null, auto() -> bool }), the d-pad's left
  *  and right move the pick and answer the point of its chamber for the cursor (so A presses that pin), X is the Auto
  *  attempt, and the prompt bar says so. Answers the unregister. */

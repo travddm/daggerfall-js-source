@@ -1,4 +1,4 @@
-// MWNPC5b (2026-10-09, the MW-NPC arc's fifth slice - bible/04-Characters/Morrowind-NPCs.md section 10b): A FOE, READ
+// MWNPC5b: A FOE, READ
 // FOR ITS BODY (characters/foeBodies.js). Pinned on foe records of the shape every foe host keeps: the class foe alone
 // offered; its look - a race and a face off its seed (the same foe the same person; the Bay's mix across many, not one
 // Breton), its own gender, what its equip table holds and the clothes under the armour it has none over, kept while it

@@ -2,11 +2,7 @@
 //
 //     node tools/bakeHorse.mjs [--fbx=src/assets/horse/source/courser.fbx] [--out=src/assets/horse/courser.json] [--report]
 //
-// COATS3D (2026-10-11, the owner, sending walk.fbx, idle.fbx, idle-1.fbx, gallop.fbx, trot.fbx and two pictures: "The
-// first image is for the horse itself and the second is for the tail. These are to be applied to horses for people
-// using morrowind with the character properly rigged when riding. These also need to recieve the same texture treatment
-// we gave the sprites with parity between each"; asked, every horse of the Morrowind lane - the ridden one with its rider
-// astride, other riders, the standing and following horses and the wagon teams - and first person on the 3D horse).
+// COATS3D.
 //
 // THE FIVE FILES ARE ONE RIG SAVED FIVE TIMES (Blender's FBX 7400, a `Courser_Rig` armature): the same two meshes
 // (Horse_Lores_UV2, 943 control points; Alpha_Hair_9_Cards.001, the mane and tail on 9 alpha cards, 120), the same 33

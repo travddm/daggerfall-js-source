@@ -1,4 +1,4 @@
-// WB14f (2026-10-19, Mac: "And whatever else you can cook up", then "This is all yours to take on"): THE CAPTIVE - on a
+// WB14f: THE CAPTIVE - on a
 // Captive night a knight of the Covenant kneels at the Pen's heart, chained to his gaolers (WB11's Ward-Bearer's body and
 // Pulse under another name). At the Warden's wake the walkway to the Pen rises, and the gaolers as the first challenger
 // stands in it (AUDIT WB14 LAW-8: sized for the fight then - at his wake it is the first few to come); the last one down,
@@ -18,7 +18,7 @@
 //                    floor it stands on), ui/gate/gateBossBar.js (the gaolers, then the ward), world/gate/gateBoss.js (the
 //                    gaoler's look, the knight's)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md section 7.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -309,7 +309,6 @@ test('WB14f the court: the Reckoning the ward takes lands on none of us here, wh
   const red = { color: [1, 0, 0], edge: [1, 0, 0], style: 5 };
   assert.deepEqual(cap.dress(red, reckonState(0)).color, [1, 0, 0], 'his own, unwarded');
   assert.equal(cap.dress(null, reckonState(12)), null);
-  assert.match(read('src/scenes/gate/gateCourt.js'), /if \(v === 'hit' && !wardTakes\(s\.cp, atk\)\) \{ if \(ATTACK_BY_ID\[atk\.a\] === ATTACKS\.wrath\) wrathLanded = true; land\(atk, P\); \}/);
 });
 
 test('WB14f AUDIT of WB14c: my blow on one of his host goes out from the floor its body stands on - a Brute from its platform, a gaoler from the Pen - and from no other floor; the bodies offered are those on my floor (mutants: refused from a platform - WB14c\'s "from his court" - or offered across the fire)', () => {

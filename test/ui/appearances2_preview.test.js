@@ -1,4 +1,4 @@
-// APPEARANCES-II (2026-10-27; bible/04-Characters/Wardrobe.md section 4): A PREVIEW BEFORE PAYING. A look's name in the
+// APPEARANCES-II: A PREVIEW BEFORE PAYING. A look's name in the
 // Wardrobe is a press that tries it on: the window shows the character wearing it on the piece picked - the paper doll, or
 // on Enhanced Plus the Morrowind body where the pack shows one - drawn off a stand-in through drawnPiece, and nothing is
 // changed until Wear is paid. The doll is the real compositor over a synthetic art set (no ARENA2: every file one palette

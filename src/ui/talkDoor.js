@@ -1,8 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
-// ET1 - THE TALK WINDOW'S ONE DOOR (2026-09-11).
+// ET1 - THE TALK WINDOW'S ONE DOOR.
 //
-// Mac: "the talk menu. My goal is to transform it into a rectangular
-// panel akin to Fallout/Skyrim instead of a full screen menu."
 //
 // The seventh door of the shape the pause, the pack, the sheet, the
 // spellbook, the chronicle and the travel map already wear: ONE

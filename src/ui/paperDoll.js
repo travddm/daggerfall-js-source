@@ -52,7 +52,6 @@ import { dfmodImgImage, dfmodCifRciImage, dfmodCifRciRect, dfmodGeneration, resa
 import { itemDyeColor, itemDyeTarget } from '../systems/item/itemDye.js';   // DW3: DaggerfallUnityItem.dyeColor, as the port's items carry it
 import { ARTIFACT_MALE_TEXTURE_ARCHIVE, ARTIFACT_FEMALE_TEXTURE_ARCHIVE } from '../systems/loot/loot.js';   // ART-DOLL: an artifact's own doll archive
 import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: a custom class's own archive and record on the doll
-import { ownItemImage } from '../systems/item/itemTemplates.js';   // THUNDERLOCK-ART: a weapon of the port's own wears its own doll layer
 import { clampArmorVariant, armorArchive, HUMAN_MORPHOLOGY, ARMOR_MATERIAL } from '../systems/armorMaterials.js';
 import { raceArt, FACES_PER_RACE, raceByKey } from '../systems/races.js';   // S3c/U9: all eight races
 import { drawnPiece } from '../net/appearanceLaw.js';   // APPEARANCES: a worn piece's look
@@ -135,7 +134,7 @@ export { clampArmorVariant };
 /** GetItemImage(forPaperDoll) resolution: {archive, record, dye,
  *  target} or null for groups with no paperdoll layer. */
 export function paperdollItemImage(worn, { gender = 'male', race = 'Breton' } = {}) {
-  const item = drawnPiece(worn);   // APPEARANCES (bible/04-Characters/Wardrobe.md): a piece wearing a look is drawn as the look - the player's doll and every peer's
+  const item = drawnPiece(worn);   // APPEARANCES: a piece wearing a look is drawn as the look - the player's doll and every peer's
   const morph = raceByKey(race)?.morphologyIndex ?? HUMAN_MORPHOLOGY;
   const t = getTemplate(item.templateIndex);
   if (!t) return null;
@@ -181,9 +180,6 @@ export function paperdollItemImage(worn, { gender = 'male', race = 'Breton' } = 
     return { archive, record, dye, target: DYE_TARGETS.WeaponsAndArmor };
   }
   if (item.group === 'Weapons') {
-    // THUNDERLOCK-ART (systems/item/itemTemplates.js ownItemImage): a weapon of the port's own wears its own doll layer - a Gilded piece's gold one
-    const own = ownItemImage(item, { forPaperDoll: true });
-    if (own) return { archive: own.archive, record: own.record, dye: MATERIAL_DYES[item.material ?? 0] ?? DYE_COLORS.Unchanged, target: DYE_TARGETS.WeaponsAndArmor };
     let record = t.playerTextureRecord;
     // an Either-hand weapon worn RIGHT uses the +1 record
     if (item.equipSlot === EQUIP_SLOTS.RightHand && getItemHands(item) === ITEM_HANDS.Either) record += 1;
@@ -236,8 +232,7 @@ let _ident = null;
 export const paperDollIdentityKey = ({ race = 'Breton', gender = 'male', faceIndex = 0, context = 'town', where = null } = {}) =>
   `${race}|${gender}|${faceIndex}|${context}|${where?.region ?? -1}`;
 
-/** THE ART FOLLOWS THE ENTITY (Mac, 2026-09-16: "Characters face and
- *  gender completely changed after a few hours of playtime").
+/** THE ART FOLLOWS THE ENTITY.
  *
  *  DFU has no art set to keep in step: DaggerfallPaperDoll.Refresh
  *  hands the LIVE PlayerEntity to PaperDollRenderer.Refresh, and
@@ -439,7 +434,7 @@ function blit(out, img, palette, { rows = null, remap = null, atOffset = null, u
 
 /** FIELD-GUN4: THE OTHER KIND OF LAYER. `blit` above is DFU's own -
  *  palette INDICES through the doll's palette, with 0 transparent and
- *  0xff the cloak's cut-out. The port's own art (systems/thunderlock.js)
+ *  0xff the cloak's cut-out. The port's own art (a stand-in texture)
  *  is truecolor and has no index to give, so it composites straight
  *  in on its alpha. No dye and no remap: a dye is a palette-range
  *  rotation and there is no palette here to rotate.
@@ -782,7 +777,7 @@ export function slotAtPaperDoll(px, py) {
 export const paperDollPixels = () => _pixels;
 
 
-/** APPEARANCES-II (bible/04-Characters/Wardrobe.md section 4): THE PLAYER'S DOLL ON A STAND-IN - the Wardrobe's preview
+/** APPEARANCES-II: THE PLAYER'S DOLL ON A STAND-IN - the Wardrobe's preview
  *  of a look not yet worn (systems/appearances.js previewWearer). The inventory's own art set and deps, composed PURE of
  *  the singleton: its composite, click mask and identity are untouched. `{ width, height, rgba }`, or null before a host
  *  has loaded the art; a stand-in of another identity takes the peers' door. */

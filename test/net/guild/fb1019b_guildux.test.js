@@ -1,9 +1,4 @@
-// GUILD-UX (2026-10-19, Discord #suggestions "Guild Hall Storage Improvements", Alkfay, through Mac): "the inability to
-// preview items (e.g. for legendary items that can have different bases you can't tell what base it is, and for rare
-// items you can't see what their mods are... nor is there any way to filter items) ... With the guild stores ... you have
-// to scroll past all of the stored materials to get to the input section, and then you have to manually enter the amount
-// to store ... having an 'transfer all' button that empties your personal store into the guild's store would be
-// wonderful". The vault's rows carry the pack's own card and the stores' own filter; the guild Stores' form comes first,
+// GUILD-UX (2026-10-19, Discord #suggestions "Guild Hall Storage Improvements", Alkfay, through. The vault's rows carry the pack's own card and the stores' own filter; the guild Stores' form comes first,
 // an empty Units is all of it, and Put in all empties the character's Stores into the guild's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -157,7 +152,7 @@ test('GUILD-UX vaultRowAccepts: the record\'s page and rarity and the shown name
   assert.equal(vaultRowAccepts({ rec: HERB, name: HERB.name }, { cat: pageOf(BLADE) }), false, 'a herb is not on it');
 });
 
-// ── AUDIT SUGGESTIONS-1019 L4 (bible/01-Overview/audits/Audit-Suggestions-1019.md) ──
+// ── AUDIT SUGGESTIONS-1019 L4 ──
 
 test('AUDIT L4-1: an empty Units out of the guild Stores asks no more than the room the service counts - gold-bought and loose units fill it too (mutant: the room read off own and bought alone)', async () => {
   const mine = new Map([[OAK, { material: OAK, own: 4000, bought: 0, gold: 900, loose: 50 }]]);

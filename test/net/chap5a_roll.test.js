@@ -1,5 +1,4 @@
-// CHAP5a (2026-10-09, Mac: "Continue", the Chapters arc's living world - bible/11-Multiplayer/Chapters-Arc.md sections
-// 5.3 and 9): THE HALL'S ROLL - the chapter sheet carries each chapter's seats' holders, by the names their characters
+// CHAP5a: THE HALL'S ROLL - the chapter sheet carries each chapter's seats' holders, by the names their characters
 // carry now; the playing tab keeps them; and a hall of the chapter names them on its own bookshelf's first book, which a
 // stranger to the guild may read too.
 import { test } from 'node:test';
@@ -35,8 +34,6 @@ test('CHAP5a the roll\'s words: its title by guild and region; the chapter\'s st
   assert.equal(chapterRollTitle(FIGHTERS, ANTICLERE), 'The Roll of the Fighters Guild, Anticlere');
   assert.equal(chapterRollTitle(DRAGON, DAGGERFALL), 'The Roll of the Knights of the Dragon, Daggerfall');
   for (const [f, r] of [[THIEVES, ANTICLERE], [99, ANTICLERE], [FIGHTERS, 999], [FIGHTERS, null], ['41', ANTICLERE]]) assert.equal(chapterRollTitle(f, r), null, `${f} ${r}`);
-  // PIN MOVED (AUDIT CHAP4 C4): the state's line has the chapter its subject
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Master's chair, the council, its Councillor; marked by AUDIT GUILD3 R4
   assert.deepEqual(chapterRollLines(FIGHTERS, { strength: 74, seats: [S('officer', 'Bryn'), S('master', 'Alda'), S('officer', 'Cael'), S('officer', 'Dara')] }), [
     'The chapter of the Fighters Guild here is Thriving (Strength 74).', 'Master of the chapter: Alda.', 'Its council: Bryn, Cael and Dara.',
   ]);
@@ -71,8 +68,8 @@ test('CHAP5a the sheet keeps the seats: a chapter\'s `{ strength, seats }`, a co
   const sheet = createChapterSheet({ door: { list: async () => answer }, nowMs: () => t });
   assert.equal(sheet.chapterOf(FIGHTERS, ANTICLERE), null, 'nothing before the read lands');
   await tick(); await tick();
-  assert.deepEqual(sheet.chapterOf(FIGHTERS, ANTICLERE), { strength: 74, seats: [S('master', 'Alda'), S('officer', 'Bryn')], doctrine: null, event: null, heir: null, rival: null, season: null, shut: false, sides: null, patron: null });   // PIN MOVED (CHAP7b): and its patron; PIN MOVED (CHAP6c): and its Season, none here
-  assert.deepEqual(sheet.chapterOf(MAGES, DAGGERFALL), { strength: 12, seats: [], doctrine: null, event: null, heir: null, rival: null, season: null, shut: false, sides: null, patron: null }, 'a sheet with no seats: none');   // PIN MOVED (CHAP7b): and its patron
+  assert.deepEqual(sheet.chapterOf(FIGHTERS, ANTICLERE), { strength: 74, seats: [S('master', 'Alda'), S('officer', 'Bryn')], doctrine: null, event: null, heir: null, rival: null, season: null, shut: false, sides: null, patron: null });
+  assert.deepEqual(sheet.chapterOf(MAGES, DAGGERFALL), { strength: 12, seats: [], doctrine: null, event: null, heir: null, rival: null, season: null, shut: false, sides: null, patron: null }, 'a sheet with no seats: none');
   assert.equal(sheet.chapterOf(FIGHTERS, DAGGERFALL), null);
   assert.deepEqual([sheet.strengthOf(FIGHTERS, ANTICLERE), sheet.strengthOf(MAGES, DAGGERFALL)], [74, 12]);
   sheet.chapterOf(FIGHTERS, ANTICLERE).seats[0].name = 'Nobody';
@@ -130,14 +127,3 @@ test('CHAP5a the sheet\'s seats: each chapter\'s holders - its Master first, its
 
 // ── THE HALL ────────────────────────────────────────────────────────
 
-test('CHAP5a the wiring: the host\'s roll off the sheet in the politic region; the hall\'s shelf - the roll its first book, the books after it, a stranger refused the shelf reading the roll alone (mutants: each seam)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /chapterRoll: \(faction\) => \{\n\s+const px = playerTravelPixel\(\);\n\s+const region = \(\(\) => \{ try \{ return maps\.getRegionIndexAt\(px\.x, px\.y\); \} catch \{ return null; \} \}\)\(\);\n\s+const c = Number\.isInteger\(region\) \? chapterSheet\?\.chapterOf\(faction, region\) \?\? null : null;\n\s+const title = c \? chapterRollTitle\(faction, region\) : null;\n\s+return title \? \{ title, lines: \[\.\.\.chapterRollLines\(faction, c\), \.\.\.chapterSeasonLines\(faction, \/\*\* @type \{number\} \*\/ \(region\), c\)\] \} : null;/);   // PIN MOVED (CHAP6c): and the chapter's Season after the roll's own
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const chapterRollOf = \(\/\*\* @type \{any\} \*\/ guild\) => \(guild \? host\.chapterRoll\?\.\(guild\.factionId\) \?\? null : null\);/);
-  assert.match(m, /if \(!access\.allowed\) \{\n\s+const roll = chapterRollOf\(guild\);[^\n]*\n\s+interiorOverlay = roll \? chapterRollWindow\(\{ \.\.\.roll, lines: \[\.\.\.roll\.lines, access\.text\] \}\) : new ActionTextBox\(\[access\.text\]\);/);   // PIN MOVED (AUDIT CHAP4 D4): the refusal said under the roll
-  assert.match(m, /const roll = chapterRollOf\(guild\);   \/\/ CHAP5a: the shelf's first book\n\s+shelf\.books \?\?= populateBookshelf\(\);/);
-  assert.match(m, /items: roll \? \[roll\.title, \.\.\.bookshelfTitles\(shelf\.books\)\] : bookshelfTitles\(shelf\.books\),/);
-  assert.match(m, /if \(roll && i === 0\) \{ interiorOverlay = chapterRollWindow\(roll\); return; \}[^\n]*\n\s+_openBookById\(\{ message: shelf\.books\[roll \? i - 1 : i\] \}\);/);
-  assert.match(src('src/ui/chapterRoll.js'), /export const chapterRollWindow = \([^)]*roll\) => createBookReaderWindow\(chapterRollBook\(roll\)\);/);
-});

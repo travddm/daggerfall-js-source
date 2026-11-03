@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// DOMAIN3 (2026-10-24, the owner: "A transition to tamriel region control
-// instead of just city control"; asked, "Replace seats") - THE REGION'S
+// DOMAIN3 - THE REGION'S
 // CHARTER, as the service learns and reads it (bible/11-Multiplayer/
 // Domains.md section 7).
 //
@@ -22,7 +21,7 @@
 // a key the seats' registry confirms as a seat OF THAT REGION, the crown
 // in a crown's (domainLaw.js domainSeats). The same witnesses as a seat's:
 // a registered account a week old, never one the seats' law ignores, its
-// first answer standing. ITS OWN TABLE (migration 0169), kept small: an
+// first answer standing. ITS OWN TABLE, kept small: an
 // answer that agrees with the region's confirmation is written only while
 // fewer than DOMAIN_AGREEING_KEPT do (AUDIT DOMAINS S3: kept at the bare
 // three, one confirming witness lost - an account deleted, or one the

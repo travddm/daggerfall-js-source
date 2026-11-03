@@ -1,4 +1,4 @@
-// OWS2 (2026-09-28) - THE CROSSING'S SCENE: Come Sail Away's own runtime on open water (csa_sailing's scripted scene,
+// OWS2 - THE CROSSING'S SCENE: Come Sail Away's own runtime on open water (csa_sailing's scripted scene,
 // trimmed), and the Overworld's hand sailing it to a mark through the helm's keys alone (systems/seaHelm.js - the rudder
 // held, the sail key's edge, the autorun's oars), as scenes/world.js tvSeaSail presses them. Moved here whole from
 // test/systems/travel/ows2_crossing.test.js by FB1020c OAR-RUNG, which sails it too (test/systems/comeSailAway/fb1020c_oarrung.test.js):

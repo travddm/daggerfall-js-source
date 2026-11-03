@@ -2,12 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ARENA4 - THE ARENA'S RECORDS, ONLINE.
 //
-// Mac (2026-10-02): "join a team (red and blue) and climb esclating
-// tiers of opponents, or choose to matchmake for a real opponent ...
-// Joining a team comes with it's own enhanced UI where you can view your
-// ranking and even player leaderboards ... Being a top rank PvE fighter
-// comes with it's own title. Being the #1 pvp arena player comes with
-// it's own temporary title/glyph". Design: bible/11-Multiplayer/Arena.md
+// . Design:
 // "7. Online" and "6. Titles and the laurel".
 //
 // ═══ A ROW IS A RECEIPT ════════════════════════════════════════════
@@ -45,7 +40,7 @@ import {
   ARENA_TIERS, ARENA_TIER_BOUTS, ARENA_PAIR_DAY_MAX, ARENA_CHAMPION_MIN_BOUTS, arenaRatingOk, ARENA_ELO_MIN, ARENA_ELO_MAX,
   ARENA_CHAMPION_MIN_FOES, ARENA_PAIR_SEASON_MAX, ARENA_TICKET_RE, arenaNextOf, ARENA_BOUT_ID_RE, ARENA_ATTEMPT_LIFE_S,   // AUDIT ARENA-LADDER
 } from '../../src/net/arena/arenaLaw.js';
-import { boardNamesOf } from './boardNames.js';   // AUDIT CARDS-6 D3: a board's names wear every honour, Iliac Hand's too
+import { boardNamesOf } from './boardNames.js';   // AUDIT CARDS-6 D3: a board's names wear every honour
 import { renownQuestXp } from '../../src/net/renown.js';   // ARENA4b: a bout's Renown, sized as quests are
 import { reportRenownXp, renownTrackOf, renownCharacterOk } from './renownTracks.js';   // ARENA4b: credited through the renown law's own door
 import { shapeOf, keptFits } from './keptBoard.js';   // AUDIT LEAN-READS B1/B10: a kept board's shape, and its bound in bytes
@@ -61,17 +56,17 @@ export const ARENA_HALL_MAX = 20;
 /** How long the season's #1 (the laurel) is kept by a Worker before it is counted again, seconds - a token lives five
  *  minutes, so a laurel is at most six behind the board. */
 export const ARENA_CHAMPION_CACHE_S = 60;
-/** STORM-SHED 2 (2026-10-06, the account database's follow-ups): how long the season's #1 as the service last counted
- *  it (`arena_champions`, migration 0086) is taken as it stands before a reader counts it again, seconds. Every rated
+/** STORM-SHED 2: how long the season's #1 as the service last counted
+ *  it (`arena_champions`) is taken as it stands before a reader counts it again, seconds. Every rated
  *  bout recorded counts it at once (claimArena); this bounds whatever else moves the board (an account deleted). */
 export const ARENA_CHAMPION_STORED_S = 600;
-/** SCALE4b (2026-10-08): the service's clock counts the season's #1 again once the kept word is this old - two minutes
+/** SCALE4b: the service's clock counts the season's #1 again once the kept word is this old - two minutes
  *  inside ARENA_CHAMPION_STORED_S, so a reader (a token's mint, an account, a box's or a board's badges) finds it kept and
  *  counts nothing, and writes nothing. A clock that stops leaves the readers counting it as before. */
 export const ARENA_CHAMPION_CLOCK_S = ARENA_CHAMPION_STORED_S - 120;
 const GRAND_TIER = ARENA_TIERS - 1;
 
-// ═══ ARENA4b (2026-10-03) - A BOUT'S RENOWN ═══════════════════════════════════════════════════════════════════════════
+// ═══ ARENA4b - A BOUT'S RENOWN ═══════════════════════════════════════════════════════════════════════════
 //
 // Arena.md 2: "Purses in gold ... Online, renown too, within the renown law's own hourly cap". A ladder WIN and a rated
 // WIN between players pay Renown to the character the claim names, through the renown law's own door
@@ -86,7 +81,7 @@ const GRAND_TIER = ARENA_TIERS - 1;
 // bout past the Pit pays 195 and the Grand Champion 585 - the ceiling's whole point. The most a claim asks is far under a
 // report's 5,000. A loss, a draw and a bout kept unrated (the pair's day) pay none: two friends trading wins earn
 // nothing on each other. ONCE AN ACCOUNT: a bout between players is one row whoever claims it first, so the winner may
-// claim second - the right to its Renown is its own row (`arena_renown`, migration 0075 - 0071 before the second merge onto main, 0073 before the third), taken before the credit.
+// claim second - the right to its Renown is its own row (`arena_renown`), taken before the credit.
 
 /** A ladder tier's level for its Renown - the design table's top level of each tier (Arena.md 2: 1-3, 3-5, ... 20+). */
 export const ARENA_RENOWN_TIER_LEVEL = (tier) => 2 * Math.max(0, Math.min(ARENA_TIERS - 1, Math.trunc(Number(tier) || 0))) + 3;
@@ -192,7 +187,7 @@ export async function arenaChampionOf({ db }, season) {
   return laurelOfBoard(rows);
 }
 /** STORM-SHED 2: THE SEASON'S #1 COUNTED AND KEPT - the board's top as it stands now, written to `arena_champions`
- *  (migration 0086) for every Worker to read. Answers the #1 (or null). */
+ *  for every Worker to read. Answers the #1 (or null). */
 export async function storeArenaChampion(ctx, season, nowS) {
   const id = await arenaChampionOf(ctx, season);
   await ctx.db.prepare(`INSERT INTO arena_champions (season, player, at) VALUES (?1, ?2, ?3)
@@ -235,8 +230,7 @@ export async function arenaHonoursOf(ctx, player, nowS) {
   const champion = (await championNow(ctx, nowS)) === player.id;
   return { grand: !!g, champion };
 }
-/** SIGN-BATCH (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/Scale-Arc.md
- *  SIGN-BATCH): arenaHonoursOf as its reads - the Grand Champion's row, and the kept #1's where this Worker kept none - and
+/** SIGN-BATCH: arenaHonoursOf as its reads - the Grand Champion's row, and the kept #1's where this Worker kept none - and
  *  its answer from theirs, so the doors that read a badge (honours.js withHonours) ask the three games' honours in ONE
  *  batch. The answer is arenaHonoursOf's: a stale #1 counted again and stored as championNow stores it. */
 export function arenaHonoursPlan(/** @type {any} */ ctx, /** @type {any} */ player, /** @type {number} */ nowS) {
@@ -555,8 +549,7 @@ const FAST_SQL = `SELECT g.player AS player, g.at AS at, (SELECT MIN(at) FROM ar
 const MEMBERS_SQL = 'SELECT banner, COUNT(*) AS n FROM arena_members WHERE banner IS NOT NULL GROUP BY banner';
 
 /**
- * ARENA-BOARD (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md ARENA-BOARD;
- * migration 0139): THE BOARD'S COUNTS, EVERY CALLER'S ALIKE, ONE ROW A SEASON - the Grand Champions, the season's rated
+ * ARENA-BOARD: THE BOARD'S COUNTS, EVERY CALLER'S ALIKE, ONE ROW A SEASON - the Grand Champions, the season's rated
  * board, the climb, the fastest, two seasons' standings, both rosters and the banners' members. Ten aggregates over the
  * arena's whole record on every open (28,586 on the day); now the season's kept row while it is the arena's version's
  * (the database moves it on every bout, void, account gone and banner joined or left) and its shape's (these counts' -
@@ -680,9 +673,8 @@ export async function arenaRecordsOf({ db }, me) {
 }
 
 // ── THE BOARD ────────────────────────────────────────────────────────────────────────────────
-/** The ranked rows cut to the top and the caller's own pinned under them when it is not among them. EG-E2: exported for
- *  the Elite Breach's boards (egHonours.js egBoardOf), and `me` may be a test of a row - a Descent row is a company,
- *  the caller's whichever names them - where every other board's is the caller's id. */
+/** The ranked rows cut to the top and the caller's own pinned under them when it is not among them. `me` is the
+ *  caller's id, or a test of a row. */
 export function topWithMe(rows, me, top = ARENA_BOARD_TOP) {
   rows.forEach((r, i) => { r.rank = i + 1; r.you = typeof me === 'function' ? !!me(r) : r.player === me; });
   const shown = rows.slice(0, top);

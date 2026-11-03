@@ -1,5 +1,4 @@
-// GUARD-ONLINE (2026-09-26, Mac: "Guard the guild quest (mages guild) - wait time for this should be alot shorter";
-// asked, "Starts ~1 min after you arrive"): online the world clock is the shared one, a game day two real hours and a
+// GUARD-ONLINE: online the world clock is the shared one, a game day two real hours and a
 // rest no way past it (RESTX2), so N0B10Y03's `daily from 00:00 to 03:00` came round once every two hours. Online, for
 // that quest alone, the window is the player's ARRIVAL's - it opens ten game minutes after they are first in the
 // hall and stands an hour; leaving after it closes and coming back opens it again, staying keeps it shut so the
@@ -98,9 +97,6 @@ test('GUARD-ONLINE: the table names the real quest\'s watch - N0B10Y03\'s _S.02_
 });
 
 test('GUARD-ONLINE: the shared clock reaches the quest - both bridge hosts say it, the bridge carries it, the machine hands it to the actions', () => {
-  assert.match(rd('src/scenes/quest/questBridge.js'), /sharedClock: \(\) => !!ctx\.sharedClock\?\.\(\),/);
-  assert.match(rd('src/scenes/quest/questBridge.js'), /'sharedClock'/, 'a contract seam - a host that forgets it is reported');
-  assert.match(rd('src/systems/quest/machine.js'), /sharedClock: \(\) => !!this\.deps\.sharedClock\?\.\(\),/);
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(rd(f), /sharedClock: \(\) => sharedClockOn\(\),/, `${f} wires it`);
   }

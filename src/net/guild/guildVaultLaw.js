@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD2b (2026-10-03) — THE GUILD'S VAULT: ITEMS THE GUILD KEEPS, AND WHO
-// MAY PUT IN AND TAKE OUT (bible/11-Multiplayer/Guild-Overhaul.md).
+// GUILD2b — THE GUILD'S VAULT: ITEMS THE GUILD KEEPS, AND WHO
+// MAY PUT IN AND TAKE OUT.
 //
 // Asked: "guild item storage with the leader able to grant and revoke
 // perms". The vault is a guild's shelf of items - any piece a trade

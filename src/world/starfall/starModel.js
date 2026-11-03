@@ -1,7 +1,6 @@
 // @ts-check
-// STAR4 (2026-10-20): THE FALLEN STAR, MADE - its crater and its stone, in code, on the gate's own faces
+// STAR4: THE FALLEN STAR, MADE - its crater and its stone, in code, on the gate's own faces
 // (world/gate/gateModel.js faces) and under the star's own art (world/starfall/starArt.js). Design:
-// bible/11-Multiplayer/Starfall.md section 3.
 //
 // A CRATER THE LAND KEEPS. The land's own triangles are never cut (a pixel's terrain is every client's same mesh, and
 // the port has no hole in it), so the crater is made ON the ground as a burned one reads from a stride away: a scorched

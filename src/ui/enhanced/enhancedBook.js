@@ -1,7 +1,6 @@
-// EB1 - THE ENHANCED BOOK (2026-09-12).
+// EB1 - THE ENHANCED BOOK.
 //
-// Mac: "For the book reader, I was wondering if we could use the
-// animated book in my repo project-raum." Then: "Do it." Then, of
+// Then: "Do it." Then, of
 // the first cut: "This is beautiful. Can we use a more legible text?"
 //
 // So a Daggerfall book is READ IN A BOOK: project-raum's physical
@@ -27,7 +26,7 @@
 // DFU's own layout, not a second layout. The page-turn plays per leaf
 // turned, as DFU plays it per centre-page crossed.
 //
-// ── THE TYPE (EB2, Mac: "a more legible text") ───────────────────
+// ── THE TYPE (EB2) ───────────────────
 //
 // The first cut set the pages in Daggerfall's FNT faces, 7-pixel
 // bitmaps scaled up, which were the least legible thing on the

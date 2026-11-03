@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// L10N6 (2026-10-03): A BUNDLED TRANSLATION PACK, AS THE TREE HOLDS ONE.
+// L10N6: A BUNDLED TRANSLATION PACK, AS THE TREE HOLDS ONE.
 //
 // Mac's first decision (Localization-Arc.md): a player installs any Daggerfall Unity translation pack from their own
 // disk (L10N3b), and the port BUNDLES a pack only when its terms allow it - credited, and kept as separately licensed

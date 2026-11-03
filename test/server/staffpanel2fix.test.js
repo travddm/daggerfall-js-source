@@ -1,5 +1,4 @@
-// STAFF-PANEL2-FIX (2026-10-22; design doc "DFO Staff Panel: design", Weak spots "Sanctions, cases and roles" and "Panel
-// Mute and Ban have no route") - THE CASES' AND SANCTIONS' GAPS, closed in the code every door shares (server-account/src/
+// STAFF-PANEL2-FIX - THE CASES' AND SANCTIONS' GAPS, closed in the code every door shares (server-account/src/
 // safety.js modAct), driven through the real Worker on the node:sqlite database every account pin stands on
 // (test/accountDb.mjs), from each door: the staff panel (/v1/staff/*), the game's moderators (/v1/mod/*) and Discord.
 import { test } from 'node:test';
@@ -36,14 +35,13 @@ async function extensionKey() {
 }
 
 /** The Worker with the panel set up and the relay's door recorded (no other fetch leaves): SirMcMobdon (an Admin and the
- *  owner) and the Moderators Asynian and Tabbyvish signed in to the panel; Devvy (an Admin) and Fang (the Shadow Fang's
- *  title, which moderates) not; Troll and Sylvia, two players. `g` each one's game session. */
+ *  owner) and the Moderators Asynian and Tabbyvish signed in to the panel; Devvy (an Admin) and Fang (a Dungeon Master,
+ *  whose glyph opens the staff's commands) not; Troll and Sylvia, two players. `g` each one's game session. */
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'SirMcMobdon,Devvy', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'SirMcMobdon', SHADOW_FANG_HANDLES: 'Fang',
+    SEAT_ADMINS: 'SirMcMobdon,Devvy', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'SirMcMobdon', DUNGEON_MASTER_HANDLES: 'Fang',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, MOD_AI: 'off',
-    DISCORD_MODERATORS: '111111111111111111:Asynian,222222222222222222:Tabbyvish,333333333333333333:SirMcMobdon',
   });
   const pushed = [];
   const real = globalThis.fetch;
@@ -63,6 +61,10 @@ async function stand() {
   const troll = await s.registered('Troll');
   const sylvia = await s.registered('Sylvia');
   const raw = s.env.DB._raw;
+  // the operator's link (docs/operations/staff-roles.md): a Discord user id bound to the moderator's ACCOUNT
+  for (const [discordId, handle] of [['111111111111111111', 'Asynian'], ['222222222222222222', 'Tabbyvish'], ['333333333333333333', 'SirMcMobdon']]) {
+    raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, (SELECT id FROM players WHERE handle_lc = ?), ?)').run(discordId, handle.toLowerCase(), nowS());
+  }
   raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(nowS() - SPROUT_S - 60, sylvia.id);   // old enough to count
   const mob = (await staff('/v1/staff/login', { handle: 'SirMcMobdon', password: PASSWORD, ...(await mobKey.proof('login', 'SirMcMobdon')) })).body;
   const enrol = async (handle) => {
@@ -346,19 +348,17 @@ test('STAFF-PANEL2-FIX 8: CUTTING OFF A STAFF MEMBER holds at every door - the s
     const devvy = (await s.game('/v1/auth/login', { handle: 'Devvy', password: PASSWORD })).body.secret;
     assert.equal((await s.game('/v1/mod/cases', {}, devvy)).status, 403);
     assert.ok(!(await glyphs(devvy)).includes('dev'));
-    // the title that moderates, cut off: its glyph and its role gone
-    assert.ok((await glyphs(s.g.Fang.secret)).includes('shadowfang'));
-    assert.equal((await s.staff('/v1/staff/cut', { handle: 'Fang' }, s.mob.session)).status, 200);
-    const fang = (await s.game('/v1/auth/login', { handle: 'Fang', password: PASSWORD })).body.secret;
-    assert.equal((await s.game('/v1/mod/cases', {}, fang)).status, 403);
-    assert.ok(!(await glyphs(fang)).includes('shadowfang'));
+    // a Dungeon Master suspended: the dm glyph, which opens the staff's commands, gone with it
+    assert.ok((await glyphs(s.g.Fang.secret)).includes('dm'));
+    s.raw.prepare('UPDATE players SET staff_suspended = 1 WHERE handle = ?').run('Fang');
+    assert.ok(!(await glyphs(s.g.Fang.secret)).includes('dm'));
     // an owner's invite brings a member back
     const inv = await s.staff('/v1/staff/invite', { handle: 'Asynian' }, s.mob.session);
     assert.deepEqual([inv.status, inv.body.role], [200, 'moderator']);
     assert.equal(s.row(asyId).staff_suspended, 0);
     assert.ok(s.raw.prepare("SELECT 1 FROM staff_audit WHERE act = 'invite' AND target = ? AND detail LIKE '%\"restored\":true%'").get(asyId));
     assert.equal((await s.game('/v1/mod/cases', {}, back.body.secret)).status, 200);
-    assert.deepEqual(s.raw.prepare("SELECT act FROM staff_audit WHERE act = 'cut' ORDER BY id").all().map((x) => x.act), ['cut', 'cut', 'cut']);
+    assert.deepEqual(s.raw.prepare("SELECT act FROM staff_audit WHERE act = 'cut' ORDER BY id").all().map((x) => x.act), ['cut', 'cut']);
   } finally { s.restore(); }
 });
 
@@ -375,7 +375,7 @@ test('STAFF-PANEL5-CUT-FIX: THE CUT ORDERS EVERY HIDDEN SOCKET CLOSED, ITS PUSH 
       return c.s;
     };
     const ordersOf = async (kind, at = nowS()) => (await Promise.all(s.pushed.map((o) => verifyOrder(o, s.identityPublic, { subtle, nowS: at, kind })))).filter((r) => r.ok).map((r) => r.claims);
-    // STAFF-HIDE-TOGGLE (migration 0165): Hide me is off until pressed - pressed, it holds on the account for every session after
+    // STAFF-HIDE-TOGGLE (`players.staff_hide_on`): Hide me is off until pressed - pressed, it holds on the account for every session after
     assert.deepEqual((await s.staff('/v1/staff/hide', { on: true }, s.asy.session)).body, { hidden: true });
     // a hidden socket on a session that idled out - its row deleted (openStaff's prune, staffSession's, a new password)
     const gone = await hiddenSub();
@@ -435,8 +435,8 @@ test('STAFF-PANEL2-FIX 8: A NEW PASSWORD ENDS THE STAFF PANEL\'S SESSIONS - chan
     assert.equal((await s.staff('/v1/staff/me', {}, s.asy.session)).status, 200, 'another member\'s untouched');
     // recovered: a code from registering
     const g = await s.guest();
-    s.env.MODERATOR_HANDLES += ',Ravenna';
     const reg = await s.game('/v1/auth/register', { handle: 'Ravenna', password: PASSWORD, ...ACCEPTED, set: true }, g.secret);
+    s.setStaff('Ravenna', 'moderator');
     const code = reg.body.recoveryCodes?.[0] ?? reg.body.recoveryCode;
     assert.ok(code, `registering answers a recovery code: ${JSON.stringify(reg)}`);
     const inv = await s.staff('/v1/staff/invite', { handle: 'Ravenna' }, s.mob.session);

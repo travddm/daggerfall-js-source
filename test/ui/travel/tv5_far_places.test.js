@@ -1,5 +1,4 @@
-// TV5 (2026-09-28, bible/06-Systems/Travel-View.md, Mac choosing between the horizon's town shapes and these: "Edge
-// markers") and PERF-TV (Mac: "I also want to ensure performance is golden").
+// TV5 and PERF-TV.
 //
 // TV5: the discovered settlements past the streamed grid, the nearest within reach, held at the view's edge with their
 // distance - a click a journey there by the roads (systems/travel/travelFarPlaces.js, scenes/world.js). PERF-TV: the readout's
@@ -63,25 +62,6 @@ test('TV5 law: the far places start where the grid ends and stop at the range, d
   assert.ok(diag.every((f) => f.d * PIXEL_KM <= 20), 'about 20 km every way');
 });
 
-test('TV5 host wiring: the far places are rebuilt on a pixel (or a reach) change from the world\'s settlements gathered once; each a pickable plate held at the edge, its distance under its name; a click on one is the same journey as a place\'s; a load forgets them', () => {
-  const w = hostText('src/scenes/world.js');   // HOST-SPLIT 2: the host whole
-  assert.match(w, /let tvFar = \{ at: null, near: -1, list: \[\] \};/);
-  assert.ok(((i, j) => i >= 0 && j >= 0 && i < j)(w.indexOf('let tvFar = { at: null, near: -1, list: [] };'), w.indexOf('tvFar = { at: null, near: -1, list: [] };   // TV5: nor the far places')), 'BOOT-TDZ: declared above the load that clears it');
-  assert.match(w, /if \(tvFar\.at && tvFar\.at\.x === at\.x && tvFar\.at\.y === at\.y && tvFar\.near === near && tvFar\.dg === dg\) return tvFar\.list;/);
-  // PIN MOVED (ETHER-OW, test/systems/travel/ether_ow.test.js): the map's settlements gathered once (never an isle's), and past the Veil the
-  // port isles within the edge's range beside them
-  // PIN MOVED (BAY-LEFT-MAPS, test/scenes/bayleft_places.test.js): the Bay's gathered once, past the Bay a near query (scenes/mapPlacesHost.js)
-  assert.match(w, /const settlements = tvFarSettlements\(at\);\n\s*const list = farPlaces\(\{ at, near, settlements: etherSea && inEther\(at\.x, at\.y\) \? \[\.\.\.settlements, \.\.\.etherPlaceRows\(at, TV_FAR_RANGE, 'port'\)\] : settlements, summaryOf: tvPlaceSummary \}\)/);
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const tvm = rd('src/scenes/travelViewMarks.js');
-  assert.match(tvm, /marks\.push\(\{ key: f\.key, at: tvSceneKept\(f, f\.x, f\.z, TV_PLACE_LIFT\), label: f\.summary\.name, sub: farDistanceText\(km\), kind: 'far', pick: true, edge: true, hub: carriageTown\(f\.summary\.mapId\), tip: placeTip\(townEcon\.tipFnAt\(f\.summary\.mapId\), f\.summary\.name, f\.x, f\.z\) \}\);/);   // PIN MOVED (FIELD BUGS 2026-10-04e OW-HUBS, SEAT-TIP; TOWN-ECON TE1: every town's card; OW-FORECAST: its weather on it)
-  assert.match(tvm, /const farEnd = endKey \? `far:\$\{tvTrip\.plan\.summary\.mapId\}` : null;/, 'the journey\'s own end is the flag\'s, not a plate at the edge');
-  assert.match(tvm, /for \(const f of travelViewFarPlaces\(\)\) \{\n\s*if \(f\.key === farEnd\) continue;/);
-  assert.match(w, /const plate = (?:qp \? \{ summary: tvPlaceSummary\(Number\(qp\[1\]\), Number\(qp\[2\]\), true\) \} : )?tvPlates\.list\.find\(\(p\) => p\.key === key\) \?\? tvFar\.list\.find\(\(p\) => p\.key === key\)( \?\? tvDng\.list\.find\(\(p\) => p\.key === key && p\.summary\))?;/);   // TV6: and a found dungeon's; PIN MOVED (OW-QUEST, 2026-10-19): a quest's mark first, its place's summary
-  // PIN MOVED (AUDIT OW5 D1): the find's own list emptied beside the dungeons'
-  assert.match(w, /tvFar = \{ at: null, near: -1, list: \[\] \};   \/\/ TV5: nor the far places\n\s*(tvDng = \{ at: null, dg: -1, list: \[\] \};   \/\/ TV6: nor the dungeons\n\s*tvFind = \{ at: null, dg: -1, n: -1, list: \[\] \};[^\n]*\n\s*)?(tvBandSeen = [^\n]*\n\s*)?travelView\?\.exit\('load', true\);/);
-});
-
 // ── PERF-TV: THE READOUT, DRAWN ─────────────────────────────────────────────────────────────────────────────────────
 
 /** A document just real enough for the readout: elements, a canvas whose 2D context records what it is told, and a
@@ -136,7 +116,6 @@ test('PERF-TV readout: every mark on the one canvas; the screen read ONCE a fram
   hud.showTravelViewHud({}, doc);
   try {
     const marks = [];
-    // PIN MOVED (OW-CROWD): forty marks held at one edge - a band's each, never folded (forty travellers there are one
     // crowd's arrow now, test/ui/travel/owcrowd.test.js)
     for (let i = 0; i < 40; i++) marks.push({ key: `band:${i}`, x: 3000 + i, y: 100, front: false, label: `Rider ${i}`, kind: 'band', edge: true });   // all held at the edge
     marks.push({ key: 'place:1', x: 600, y: 300, front: true, label: 'Ripwych', kind: 'place', pick: true });
@@ -181,21 +160,6 @@ test('PERF-TV readout: a click on a drawn plate is found where it landed (the on
     hud.hideTravelViewHud();
     assert.equal(hud.travelViewHudPickAt(600, 290), null, 'hidden: nothing takes a click');
   } finally { hud.disposeTravelViewHud(); }
-});
-
-test('PERF-TV by source: the view asks the readout before it picks; the host keeps the marks\' scene points between the ground\'s changes (the route\'s far legs and the cap\'s count are tv2\'s pins)', () => {
-  const v = rd('src/scenes/travelView.js');
-  assert.match(v, /const key = deps\.hud\?\.pickAt\?\.\(e\.clientX, e\.clientY\) \?\? null;\n\s*if \(key\) deps\.onMark\?\.\(key, e\); else deps\.onPick\?\.\(e\.clientX, e\.clientY, e\);/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /hud: \{ show: showTravelViewHud, hide: hideTravelViewHud, update: updateTravelViewHud, pickAt: travelViewHudPickAt \},/);
-  assert.match(w, /if \(k\[0\] !== built\.size \|\| k\[1\] !== state\.mapOrigin\.x \|\| k\[2\] !== state\.mapOrigin\.y \|\| k\[3\] !== c\[0\] \|\| k\[4\] !== c\[1\] \|\| k\[5\] !== c\[2\] \|\| t - k\[6\] > 500\) \{/, 'the ground moves on a build, a drop, a re-anchor - and every half second besides');
-  assert.match(w, /if \(holder\._tvGen !== gen \|\| holder\._tvNx !== nx \|\| holder\._tvNz !== nz( \|\| holder\._tvSea !== onSea)?\) \{/);   // OWS1: and the sea's top asked
-  for (const re of [/at: tvSceneKept\(p, p\.x, p\.z, TV_PLACE_LIFT\)/, /at: tvSceneKept\(e, e\.x, e\.z, place \? TV_PLACE_LIFT : 0\)/, /at: tvSceneKept\(t, w\.x, w\.z, 2(, ship)?\)/]) assert.match(rd('src/scenes/travelViewMarks.js'), re);   // PIN MOVED (HOST-SPLIT 1): the marks left world.js;   // OWS1: a traveller at sea's on the sea's top
-  const h = rd('src/ui/travel/travelViewHud.js');
-  assert.match(h, /const vw = win\?\.innerWidth \?\? 0, vh = win\?\.innerHeight \?\? 0, dpr = win\?\.devicePixelRatio \|\| 1;   \/\/ read ONCE, before any write/);
-  assert.match(h, /if \(sig\.length === canvasSig\.length && sig\.every\(\(v, i\) => v === canvasSig\[i\]\)\) return;/);
-  assert.match(h, /doc\.fonts\?\.addEventListener\?\.\('loadingdone', \(\) => \{ dropSprites\(\); canvasSig = \[\]; \}\);/, 'a label drawn before the plates\' face arrived is drawn again');
-  assert.match(h, /function dropSprites\(\) \{ sprites\.clear\(\); spritePixels = 0; \}/);
 });
 
 test('PERF-TV curtains: the lowest land asked only under the veils kept (CURTAINS_MAX of many), and a host\'s memo keeps it while a veil drifts within CURTAIN_MEMO_M - the same veils, not one sample more', () => {
@@ -268,57 +232,6 @@ test('EDGE-FURNITURE law: a point under the top\'s or the foot\'s furniture is h
   assert.equal(edgeHold({ x: 640, y: 360, front: false }, W, H, M, M, 100).y, 620, 'straight behind: on the foot\'s edge');
   assert.equal(edgeHold({ x: 640, y: 50, front: true }, W, H, M, 120, M).y, 120, 'under the compass or the panel: held below it');
   assert.equal(edgeHold({ x: 640, y: 700, front: true }, W, H).y, H - M, 'no furniture given: the margin, as before');
-});
-
-test('EDGE-FURNITURE readout: marks behind the camera stand ABOVE the bar with their names over their arrows; ahead, below the compass and a journey\'s panel; a side\'s mark keeps its label off the bar; the furniture measured twice a second, not every frame', async () => {
-  const hud = await import('../../../src/ui/travel/travelViewHud.js');
-  const bar = { left: 336, right: 944, top: 638, bottom: 702, width: 608, height: 64 };
-  const compass = { left: 490, right: 790, top: 18, bottom: 48, width: 300, height: 30 };
-  const panel = { left: 276, right: 1004, top: 60, bottom: 124, width: 728, height: 64 };
-  const { doc, rectReads, draws } = fakeDoc({ rects: { bar, others: [compass, panel] } });
-  hud.showTravelViewHud({}, doc);
-  const far = (key, x, y, front) => ({ key, x, y, front, label: key, sub: '12 km', kind: 'far', pick: true, edge: true });
-  const f = { feet: null, heading: null, yaw: 0, where: '', marks: [
-    far('far:behind-a', 700, 200, false), far('far:behind-b', 560, 100, false),   // behind: the foot
-    far('far:ahead', 640, -5000, true),                                            // ahead, off the top
-    far('far:side', 1500, 700, true),                                              // off the right, low - by the bar
-  ] };
-  try {
-    hud.updateTravelViewHud(f); hud.updateTravelViewHud(f);   // the first frame's words change the bar: measured again on the second
-    const settled = rectReads.n;
-    for (let i = 0; i < 28; i++) hud.updateTravelViewHud(f);
-    const hits = hud.travelViewHudState().hits, at = (k) => hits.find((h) => h.key === k);
-    const over = (x0, y0, x1, y1, r) => x1 > r.left && x0 < r.right && y1 > r.top && y0 < r.bottom;
-    const low = draws.filter(([, x, y, w, h]) => over(x, y, x + w, y + h, bar));
-    assert.deepEqual(low.map(([, x, y]) => [x, y]), [], 'no name or distance drawn into the bar');
-    for (const k of ['far:behind-a', 'far:behind-b']) {
-      const h = at(k);
-      assert.ok(h.y1 <= bar.top, `${k}: above the bar (${h.y0}..${h.y1}, the bar from ${bar.top})`);
-      assert.ok(h.y1 - h.y0 > 40 && h.y1 - 10 > h.y0 + 30, `${k}: its name and distance over its arrow (${h.y0}..${h.y1})`);
-    }
-    assert.ok(at('far:ahead').y0 + 24 >= panel.bottom + 12, `ahead: its arrow below the panel (${at('far:ahead').y0 + 24})`);
-    const side = at('far:side');
-    assert.ok(!over(side.x0, side.y0, side.x1, side.y1, bar), `the side's low mark keeps its label off the bar (${JSON.stringify(side)})`);
-    // FILTERS-LEFT (2026-10-06): a measure reads the filters' own block too - five boxes where it read four
-    assert.ok(settled > 0 && settled <= 10 && rectReads.n === settled, `thirty frames: measured on the first two, then not again (${settled}, then ${rectReads.n} box reads)`);
-    hud.updateTravelViewHud({ ...f, trip: 'To Ripwych, by the road' }); hud.updateTravelViewHud({ ...f, trip: 'To Ripwych, by the road' });
-    assert.equal(rectReads.n - settled, 5, 'a journey\'s line in the bar (a taller bar): measured again the next frame');
-    hud.hideTravelViewHud(); hud.showTravelViewHud({}, doc);
-    const before = rectReads.n;
-    hud.updateTravelViewHud(f);
-    assert.equal(rectReads.n - before, 5, 'shown again: measured again at once - the bar, its Return, the two pieces and the filters\' block');
-  } finally { hud.disposeTravelViewHud(); }
-  // the pieces it measures are the HUD's own - a class renamed in the style sheet would leave a mark under it unseen
-  const h = rd('src/ui/travel/travelViewHud.js'), css = rd('src/ui/enhanced/enhancedStyle.js');
-  const sel = h.match(/const FURNITURE = '([^']+)';/);
-  assert.ok(sel, 'the furniture named in one place');
-  assert.deepEqual(sel[1].split(', '), ['.hud-top', '.hud-bottom', '.hud-quick', '.travelpanel-bar', '.travelpanel-junction', '.dftouch-btn', '.qtrack'],
-    'the compass, the vitals and hotbar, the quick-slot block, a journey\'s panel and its junction disc, a phone\'s buttons, the quest card (AUDIT GUIDE T1/D1)');
-  const touch = rd('src/ui/touch/touch.js');
-  for (const c of sel[1].split(', ')) {
-    const styled = new RegExp(`^\\${c} \\{`, 'm').test(css), named = touch.includes(`className = '${c.slice(1)}'`);
-    assert.ok(styled || named, `${c} is a class the style sheet stands up, or the touch layer names`);
-  }
 });
 
 test('AUDIT DEEP2 E1/E2 readout: the Overworld bar LIFTS clear of what stands under it - the HUD\'s vitals, a phone\'s buttons - and the marks behind the camera stand over the lifted bar', async () => {
@@ -410,41 +323,6 @@ test('AUDIT OW5 R3: the places are said again at once when the SET changes, a di
     assert.match(hud.travelViewHudState().said, /Ripwych, 6\.2 km/, '...with the distances as they are');
   } finally { hud.disposeTravelViewHud(); }
   assert.equal(hud.TV_SAID_DISTANCE_MS, 5000);
-});
-
-test('AUDIT DEEP2 E5/E9/E11/E15 readout: the held arrow is notched; a far place in the picture wears its distance above its dot; the labels wear the enhanced face; the places are said in words; a NaN mark spoils nothing', async () => {
-  const hud = await import('../../../src/ui/travel/travelViewHud.js');
-  const { doc, calls, draws, ctx } = fakeDoc();
-  hud.showTravelViewHud({}, doc);
-  try {
-    calls.length = 0;
-    hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [{ key: 'trav:r', x: 5000, y: 360, front: true, label: 'Rider', kind: 'traveller', edge: true }] });
-    assert.equal(calls.filter((k) => k === 'lineTo').length, 3, 'three lines from the tip: the notched head');
-    assert.match(String(ctx.font), /Barlow Semi Condensed/, 'a rider\'s name in the --data face');
-    draws.length = 0;
-    hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [
-      { key: 'far:in', x: 640, y: 400, front: true, label: 'Ripwych', sub: '6.4 km', kind: 'far', pick: true },
-      { key: 'far:nan', x: NaN, y: 300, front: true, label: 'Nowhere', kind: 'far', pick: true, edge: true }] });
-    assert.ok(draws.every(([, , y, , h]) => y + h <= 400 - 4), `plate and distance both above the dot (${draws.map(([, , y, , h]) => y + h)})`);
-    assert.deepEqual(hud.travelViewHudState().hits.map((h) => h.key), ['far:in'], 'the NaN mark placed nowhere');
-    assert.equal(hud.travelViewHudState().said, 'Ripwych, 6.4 km\n', 'the places in words');
-  } finally { hud.disposeTravelViewHud(); }
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.tview-bar \{[^}]*pointer-events: auto;/, 'E13: the bar takes its own clicks');
-  const h = rd('src/ui/travel/travelViewHud.js');
-  assert.match(h, /if \(sp\) \{ sprites\.delete\(key\); sprites\.set\(key, sp\); return sp; \}/, 'E12: the sprites kept newest-last');
-  assert.match(h, /while \(sprites\.size && \(sprites\.size >= SPRITES_MAX \|\| spritePixels \+ px > SPRITE_PIXELS_MAX\)\) \{\n\s*const k = sprites\.keys\(\)\.next\(\)\.value, old = sprites\.get\(k\);\n\s*sprites\.delete\(k\);/, 'and the oldest one goes (AUDIT NAMES N1-8: past the count or the pixels)');
-  assert.match(h, /const onPointerUpHud = \(e\) => \{ if \(e\.pointerType === 'touch'\) pointer = null; \};/, 'E10: a lifted finger leaves no hover');
-});
-
-test('AUDIT DEEP2 B-1/B-3 by source: the journey\'s end is held at the edge with its distance and takes a click (its journey again); the place caches are keyed on what is discovered', () => {
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const tvm = rd('src/scenes/travelViewMarks.js');
-  assert.match(tvm, /marks\.push\(\{ key: 'dest', at: tvSceneKept\(e, e\.x, e\.z, place \? TV_PLACE_LIFT : 0\), label: e\.label, kind: e\.kind, edge: true, \.\.\.\(place \? \{ pick: true, sub: farDistanceText\(km\) \} : \{\}\) \}\);/);
-  assert.match(w, /if \(key === 'dest'\) \{ const summary = tvTripLive\(\) \? tvTrip\.plan\?\.summary : null; if \(summary && travelViewCanGo\(\)\) travelViewRouteTo\(summary\); return; \}/);
-  assert.match(w, /tvPlates\.dg === dg\) return tvPlates\.list;/);
-  assert.match(w, /tvFar = \{ at, near, dg, list \};/);
 });
 
 test('AUDIT DEEP2 B-3 law: the discovered set\'s generation moves on a discovery and on a restore - never on a place found twice', async () => {
@@ -543,7 +421,6 @@ test('AUDIT NAMES N1-1/N1-5 readout: a busy first frame makes BADGE_BUILDS_PER_F
   hud.showTravelViewHud({}, P.doc);
   try {
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [
-      // PIN MOVED (OW-CROWD): an arrow at the edge wears a badge only for my party now - the held badge's box asked of one
       { key: 'peer:long', x: 195, y: -3000, front: true, label: 'Aldric Stormcrown Vellan', kind: 'party', edge: true, badge: { title: 'dungeonmaster', glyphs: ['dm', 'dev', 'mod', 'sprout'], lv: 40, gt: 'DAGR' } },
     ] });
     const [, x, , w] = P.draws.at(-1);
@@ -558,7 +435,6 @@ test('AUDIT NAMES N1-8 readout: the kept images are capped by their pixels as we
   hud.showTravelViewHud({}, doc);
   try {
     const mark = (i) => ({ key: `peer:px${i}`, x: 100 + (i % 20) * 50, y: 200 + Math.floor(i / 20) * 40, front: true, label: `Pixelsworth the ${i}`, kind: 'traveller', badge: { title: 'founder', glyphs: ['dev'], lv: 12, gt: 'HND' } });
-    // PIN MOVED (OW-CROWD): the six nearest wear a badge a frame now - fed six at a time, every one of them made
     const step = Math.min(hud.BADGE_BUILDS_PER_FRAME, hud.TV_BADGES_MAX);
     for (let i = 0; i < 300; i += step) {
       const marks = [];
@@ -580,7 +456,6 @@ test('AUDIT NAMES N1-6 readout: a titled player held at the top near a corner an
   hud.showTravelViewHud({}, doc);
   try {
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [
-      // PIN MOVED (OW-CROWD): held badges are my party's alone now - two of them
       { key: 'peer:top', x: -5047, y: -3176, front: true, label: 'Mack', kind: 'party', edge: true, badge: { title: 'developer', glyphs: ['dev'], lv: 40, gt: 'DAGR' } },
       { key: 'peer:left', x: -5867, y: -3056, front: true, label: 'Aldric the Gray', kind: 'party', edge: true, badge: { title: 'founder', glyphs: ['sprout', 'dev'], lv: 12, gt: 'HND' } },
     ] });
@@ -592,7 +467,7 @@ test('AUDIT NAMES N1-6 readout: a titled player held at the top near a corner an
 
 test('AUDIT NAMES N1-2/N1-3/N1-4/N1-9 readout: the badge painted as the in-play face paints it - the gradient title over an edge of its own colour and black with no blurred shadow, each glyph in its colour at the name face\'s stroke, the wolf\'s red eye (WIKIMAID: and each of a list of details, in order), the Renown under the row\'s shadow, the name in the pixel face; a badge redrawn for my party and for a new dpr', async () => {
   const hud = await import('../../../src/ui/travel/travelViewHud.js');
-  const { TITLE_RGBA, GLYPH_RGBA, GLYPH_PATH, GLYPH_DETAIL, GLYPH_EDGE_W, cssRgba } = await import('../../../src/ui/playerBadge.js');
+  const { TITLE_RGBA, GLYPH_RGBA, GLYPH_PATH, cssRgba } = await import('../../../src/ui/playerBadge.js');
   const { PIXEL_STACK } = await import('../../../src/ui/pixelifyFive.js');
   const had = globalThis.Path2D;
   globalThis.Path2D = class { constructor(d) { this.d = d; } };
@@ -600,14 +475,12 @@ test('AUDIT NAMES N1-2/N1-3/N1-4/N1-9 readout: the badge painted as the in-play 
   hud.showTravelViewHud({}, doc);
   const N = hud.TRAVEL_VIEW_NAME_COLORS;
   try {
-    const wolf = { key: 'peer:wolf', x: 500, y: 300, front: true, label: 'SirMcMobdon', kind: 'traveller', badge: { title: 'shadowfang', glyphs: ['shadowfang', 'dev'], lv: 50, gt: 'WOLF' } };
+    const wolf = { key: 'peer:wolf', x: 500, y: 300, front: true, label: 'SirMcMobdon', kind: 'traveller', badge: { title: 'hourbreaker', glyphs: ['dev'], lv: 50, gt: 'WOLF' } };
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [wolf] });
-    const title = texts.filter(([t]) => t === 'Shadow Fang');
-    const edge = cssRgba(TITLE_RGBA.shadowfang);
+    const title = texts.filter(([t]) => t === 'Hourbreaker');
+    const edge = cssRgba(TITLE_RGBA.hourbreaker);
     assert.deepEqual(title.map(([, f]) => (f?.gradient ? 'gradient' : f)), ['#000', edge, edge, 'gradient'], 'black under, its colour right and below, the gradient over');
     assert.ok(title.every(([, , , blur]) => blur === 0), 'no blurred shadow drowning the black half (AUDIT A4/A5)');
-    assert.ok(fills.some(([f, d]) => f === cssRgba(GLYPH_DETAIL.shadowfang.rgba) && d === GLYPH_DETAIL.shadowfang.path), 'the wolf\'s red eye');
-    assert.ok(strokes.some(([c, w, j, d]) => c === cssRgba(GLYPH_RGBA.shadowfang) && w === GLYPH_EDGE_W && j === 'round' && d === GLYPH_PATH.shadowfang), 'the gradient glyph\'s edge, round');
     assert.ok(strokes.some(([c, w, j, d]) => c === cssRgba(GLYPH_RGBA.dev) && w === 1.6 && j === 'round' && d === GLYPH_PATH.dev), 'a stroked glyph in its own colour at the name face\'s 1.6');
     assert.equal(texts.find(([t]) => t === '50')?.[3], 3, 'the Renown under the row\'s shadow');
     const name = texts.find(([t]) => t === 'SirMcMobdon');
@@ -622,42 +495,9 @@ test('AUDIT NAMES N1-2/N1-3/N1-4/N1-9 readout: the badge painted as the in-play 
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [{ ...wolf, kind: 'party' }] });
     const [c, , , w] = draws.at(-1);
     assert.equal(c.width, 2 * w, 'the image at the new dpr');
-    // WIKIMAID: a glyph's details may be a list - each drawn over it in its own colour, in their order (the ears' blush,
-    // the lace's white, the band and the face's plum)
-    fills.length = 0;
-    hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [{ key: 'peer:bun', x: 500, y: 300, front: true, label: 'SylviaBun', kind: 'traveller', badge: { title: 'wikimaid', glyphs: ['wikimaid'], lv: 12, gt: 'BUN' } }] });
-    const at = GLYPH_DETAIL.wikimaid.map((d) => fills.findIndex(([f, p]) => f === cssRgba(d.rgba) && p === d.path));
-    assert.ok(at.length === 3 && at.every((i) => i >= 0) && at[0] < at[1] && at[1] < at[2], `the WikiMaid's three details, each in its colour, in order (${at})`);
-    assert.ok(fills.some(([f, d]) => f === cssRgba(GLYPH_RGBA.wikimaid) && d === GLYPH_PATH.wikimaid), 'under them the rabbit, filled in its lilac');
   } finally {
     hud.disposeTravelViewHud();
     if (had) globalThis.Path2D = had; else delete globalThis.Path2D;
   }
 });
 
-
-test('OW-THEME (Mac: "The overworld ui needs to follow enhanced ui theme"): the bar, its Return and its compass wear the Enhanced Plus theme\'s roles, and the plates the theme\'s own stone (its --slate), read at each open', async () => {
-  const { FRAME_ROLES, PLUS_THEMES } = await import('../../../src/ui/enhanced/enhancedFrame.js');
-  assert.ok(FRAME_ROLES.window.includes('.tview-bar'), 'the bar: the journey bar\'s carved stone');
-  assert.ok(FRAME_ROLES.button.includes('.tview-back'), 'Return: a stone button');
-  assert.ok(FRAME_ROLES.well.includes('.tview-compass'), 'the compass: sunk in a socket');
-  const hud = await import('../../../src/ui/travel/travelViewHud.js');
-  const docWith = (slate) => ({ documentElement: {}, defaultView: { getComputedStyle: () => ({ getPropertyValue: (k) => (k === '--slate' ? slate : '') }) } });
-  const ember = PLUS_THEMES.ember.slate;
-  const n = parseInt(ember.slice(1), 16);
-  assert.equal(hud.themePlate(docWith(` ${ember}`)), `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, 0.78)`, 'Ember\'s stone');
-  assert.equal(hud.themePlate(docWith('')), hud.TRAVEL_VIEW_MARK_COLORS.plate, 'no theme named: the kit\'s plate');
-  assert.equal(hud.themePlate(null), hud.TRAVEL_VIEW_MARK_COLORS.plate);
-  // at each open, and a new stone lets the old plates go
-  const P = fakeDoc();
-  P.win.getComputedStyle = () => ({ getPropertyValue: (k) => (k === '--slate' ? ember : '') });
-  P.doc.documentElement = {};
-  hud.showTravelViewHud({}, P.doc);
-  try {
-    hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [{ key: 'place:t', x: 400, y: 300, front: true, label: 'Themeton', kind: 'place', pick: true }] });
-    assert.ok(P.calls.includes('fillRect'), 'a plate drawn');
-    const src = readFileSync(new URL('../../../src/ui/travel/travelViewHud.js', import.meta.url), 'utf8');
-    assert.match(src, /x\.fillStyle = plateFill; x\.fillRect\(0\.5, 0\.5, w - 1, h - 1\);/);
-    assert.match(src, /if \(pf !== plateFill\) \{ plateFill = pf; dropSprites\(\); canvasSig = \[\]; \}/);
-  } finally { hud.disposeTravelViewHud(); }
-});

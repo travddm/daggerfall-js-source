@@ -1,5 +1,5 @@
 // @ts-check
-// DS2 (2026-09-08): THE BRIDGE FROM THE MOD'S STATE TO THE PORT'S
+// DS2: THE BRIDGE FROM THE MOD'S STATE TO THE PORT'S
 // READERS - the world's moonlight (DS1) and the volumetric clouds (DS2)
 // both read the port's own state shapes off the mod's material, sun and
 // orbits. One home, importable by the sky lab without dragging the
@@ -30,8 +30,7 @@ export function cloudsStateUnderMod(st, moons, { minuteOfDay, weather, classicMi
   };
 }
 
-/** DSH1 (2026-09-20, Mac: "The far away horizon is still viewable even
- *  though it's cloudy"): THE COLOUR THE DECK FADES INTO IS THE WEATHER'S
+/** DSH1: THE COLOUR THE DECK FADES INTO IS THE WEATHER'S
  *  TOO.
  *
  *  The march's aerial perspective closes every far bank on this one

@@ -1,4 +1,4 @@
-// FIRST-PICK (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord: "I respeced yesterday and
+// FIRST-PICK (FIELD BUGS 2026-10-16b,; the Discord: "I respeced yesterday and
 // have a timer on my 50 lvl smithing, however, when I reached level 100, I can not choose level 100 perk") - a change on
 // its way at one rank (PERK-TRIAL: the week's lock after a paid change now) gates a paid CHANGE, as the service's chooseSpec refuses one (prof-respec-pending), never a rank's
 // first choice nor the merge's free change, which it answers before that refusal. The page greyed every card of the

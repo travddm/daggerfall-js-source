@@ -3,11 +3,13 @@
 **MUDEX** - "Meaner Unleveled Daggerfall Enemy Expansion", version 1.0.1, by
 **Ralzar** (GUID `7241df16-730c-47c9-9afc-3e65d694706f`) - is the author's own
 form of Meaner Monsters for a game with Daggerfall Enemy Expansion loaded.
-Meaner Monsters 1.5.2 (`vendor/meanerMonsters/`, the same author) looks for
+Meaner Monsters 1.5.2 (the same author; this game no longer carries it) looks for
 DEX by its GUID and, finding it, tells the player: "Please switch to MUDEX -
 Meaner Unleveled Daggerfall Enemy Expansion" and "Meaner Monsters and
 Unleveled Mobs is incompatible with DEX." (MeanerMonsters.cs:24, :94,
-:159-164). MUDEX is what it asks for.
+:159-164). MUDEX is what it asks for. This game loads MUDEX whenever Daggerfall Enemy Expansion
+is loaded, and writes its own stat numbers for the classic monsters over the rows the two mods leave
+(`src/systems/enemyExpansion/classic-stat-pass.ts`).
 
 **Source:** `github.com/Ralzar81/MUDEX` @
 `6b6665569ca97bba15990a3510ad43f116ac1041` ("Add files via upload",

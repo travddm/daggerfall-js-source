@@ -453,8 +453,7 @@ export function groundedPoseStep(phys, w, pathPosition, pathForward, dt) {
 
 // ─── WAGON-HITCH: THE WAGON ON ITS SHAFTS (a departure, 2026-10-04) ──────────────────────────────────────────
 
-/** WAGON-HITCH (2026-10-04, Mac: "the wagon when attached to the horse should show in the overworld if attached and
- *  currently it sort of rubberbands and doesn't attach to the horse properly"). The mod lays the moving wagon on a
+/** WAGON-HITCH. The mod lays the moving wagon on a
  *  trail point 2.5 m back (WagonTrail / HorseFollowPath) and then EASES it there at 12 per second
  *  (groundedPoseStep), so the wagon trails its own target by speed / 12: measured on the fake flat world, a cart at
  *  the ride's 7.6 m/s held the wagon 3.07 m behind the rider and sprang it back to 2.5 m inside 0.3 s on every stop;
@@ -507,7 +506,7 @@ export function hitchAxle(from, hitch, length, fallbackForward) {
 
 // ─── WAGONS2: THE FOUR-WHEELER'S TURN (a departure, 2026-10-09) ───────────────────────────────────────────────
 
-/** WAGONS2 (2026-10-09, Mac: "Real wheel movement"): the signed turn (degrees, about +y, Unity's sense - +z toward +x)
+/** WAGONS2: the signed turn (degrees, about +y, Unity's sense - +z toward +x)
  *  from horizontal direction `from` to `to`. `yawed(from, yawBetween(from, to))` points along `to`. Pure. */
 export const yawBetween = (from, to) => (Math.atan2(from[2] * to[0] - from[0] * to[2], from[0] * to[0] + from[2] * to[2]) * 180) / Math.PI;
 /** `v` turned `deg` degrees about +y (quatAngleAxis(deg, up)'s turn, written out). Pure. */

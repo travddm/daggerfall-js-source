@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the quest cluster (S29 + S30, src/systems/quest):
+// AUDIT 68, the quest cluster (S29 + S30, src/systems/quest):
 // the whole-tree sweep's quest lane, each fix pinned by execution through
 // the machine, the share path and the host seams the shipping game wires -
 // the shared quest's items, topics and tombstones, the behaviour registry,

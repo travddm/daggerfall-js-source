@@ -1,4 +1,4 @@
-// AUDIT SEASON-BOOK (bible/01-Overview/audits/Audit-Season-Book.md) P1, S3, S4, U1, U3, P4, P6: THE LAUREL ON THE REAL PAUSE
+// AUDIT SEASON-BOOK P1, S3, S4, U1, U3, P4, P6: THE LAUREL ON THE REAL PAUSE
 // FACE (ui/enhanced/enhancedMenu.js mounted over test/chargenDom.mjs) - pressed open, closed by Close, by Escape and by a tap
 // outside; the focus into the window and back to the laurel; the window shut with its mark gone; the tap's release
 // swallowed; a row's door through the handoff. The source pins in seasonbook.test.js say where; this says that it works.

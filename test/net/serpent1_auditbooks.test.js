@@ -1,5 +1,4 @@
-// AUDIT SERPENT (2026-10-04, Mac: "I definitely want to do a conprehensive audit on this and ensure its absolute
-// perfection"): THE BOOKS LENS'S PINS (D7/D8 - bible/01-Overview/audits/Audit-Sea-Serpent.md). Its auditor wrote 38 more
+// AUDIT SERPENT: THE BOOKS LENS'S PINS (D7/D8). Its auditor wrote 38 more
 // mutants of the serpent's books, rewards and relay paths, and 37 lived under SERPENT1's own pins; each test here was
 // written to fail under them (tools/mutants/serpent1_audit.json, the `D-` records): the service's one row and its hour,
 // the route's claimant, the device's carrier, the world's queue and hoard by source, the brain's level and earning, and
@@ -127,20 +126,6 @@ test('AUDIT-D carrier: the hoard on `spoils: true` alone; one cid a receipt acro
   assert.equal(mk().add(rA, CH, 'Ann', 20), false, 'settled on the device: a reload never keeps it again');
 });
 
-test('AUDIT-D world host by source: the serpent queue\'s own guard, relay clock and store; the hoard\'s owner, lock, keys, crash door, slot save and realm hooks', () => {
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf("const serpentClaims = params.has('online') ? createSerpentClaims({");
-  const q = w.slice(at, w.indexOf('  }) : null;', at));
-  assert.match(q, /nowS: relayNowS,/); assert.match(q, /store: _spoilsStore,/);
-  assert.match(q, /onRecorded: \(data\) => \{\n\s+if \(data\?\.renown\?\.character !== characterIdOf\(playerEntity\)\) return;/);
-  const g = w.slice(w.indexOf('function grantSerpentSpoils(entry) {'), w.indexOf('function grantSerpentSpoils(entry) {') + 1400);
-  assert.match(g, /spoilsLock\(\(\) => serpentSpoils\.grant\(/); assert.match(g, /owner: entry\.ch,/);
-  assert.match(w, /const serpentSpoils = createSpoilsPool\(\{[\s\S]{0,300}keys: SERPENT_SPOILS_KEYS,/);
-  assert.ok(w.includes('onHanded: (rec) => serpentSpoils.adopt(rec), key: SERPENT_SPOILS_KEYS.store'));
-  assert.ok(w.includes('onSlotSaved((characterId) => { try { serpentSpoils.saved(characterId);'));
-  assert.ok(w.includes('...(serpentSpoils?.heldIds?.(who) ?? [])') && w.includes('serpentSpoils?.saved(who, ids)'));
-});
-
 test('AUDIT-D brain: a level is bounded at the join and kept from the first claim; a ship earns `dealt` at SERPENT_RECEIPT_SHARE of its share, and not below it - a stander\'s at SERPENT_PART_SHARE (SERPENT4)', () => {
   const f = newSerpentFight(DAY, 0, 1e9, 'sethrakul', 0, 0, 0);
   joinSerpentFight(f, 's', 'S', 999, 4, 0, true);
@@ -150,8 +135,7 @@ test('AUDIT-D brain: a level is bounded at the join and kept from the first clai
   joinSerpentFight(g, 's', 'S', 40, 4, 10, true);
   assert.equal(g.players.s.lv, 12, 'a later `in` never raises the level the hoard rolls at');
   f.fell = { at: 1000, top: [], n: 1 }; f.liveMs = 1000;
-  // PIN MOVED: SERPENT4 (the players: "Rewards based on party or individual damage") - a dealer's at 6% of what its ship
-  // brought, a stander's at a part of it (AUDIT SERPENT E1, Mac: "Must be in the fight" - several volleys, never one)
+  // brought, a stander's at a part of it (AUDIT SERPENT E1, - several volleys, never one)
   assert.equal(SERPENT_RECEIPT_SHARE, 0.06);
   assert.equal(SERPENT_PART_SHARE, 0.025);
   f.players.s.dealt = SERPENT_PART_SHARE * f.players.s.share * 0.99;
@@ -182,7 +166,6 @@ test('AUDIT-D relay: the kill kept BEFORE the hub is told; a hub that fails is t
     const world = fakeRooms({ now: () => clock });
     const r = world.room(CELL); r.env.GATE_SIGNING_KEY = pkcs8;
     const hub = world.room(SOCIAL_ROOM);
-    // PIN MOVED (SCALE5b): the cell's beat asks the hub for the relay's settings too (RELAY_INTERNAL_CFG) - the hub that
     // fails here fails the tells alone, two of them, as it did before the ask joined the beat
     let fails = 2; const get = world.ROOMS.get;
     world.ROOMS.get = (id) => (id === SOCIAL_ROOM ? { fetch: async (req) => (new URL(req.url).pathname !== RELAY_INTERNAL_CFG && fails-- > 0 ? new Response('{}', { status: 500 }) : get(id).fetch(req)) } : get(id));

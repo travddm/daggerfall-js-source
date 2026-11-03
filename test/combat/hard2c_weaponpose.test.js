@@ -1,4 +1,4 @@
-// HARD2c - THE WEAPON POSE PAIR, EXTRACTED (2026-09-15).
+// HARD2c - THE WEAPON POSE PAIR, EXTRACTED.
 //
 // The third HARD2 seam, and the smallest of the three left open: the
 // sheath and the hand.

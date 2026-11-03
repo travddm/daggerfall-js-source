@@ -1,8 +1,4 @@
-// SPELL-GIFT (2026-09-27, Discord - Tabitha, a cleric: "After testing, a LARGE amount of buffs & spells just don't work
-// when cast on another person, even with touch. Normal regen seems okay, but Regen + Anything, Fortify Attributes,
-// etc. Kinda wonky"; "Allow us to see buff timers or SOME sort of indicator that we have placed a buff on a party
-// teammate"; "Area at Range & Area around Caster don't have good tooltips or UI elements"; "Allow casting of buffs on
-// players outside party", with her whitelist and blacklist; "I think Shield is also hard-coded as a self-only").
+// SPELL-GIFT.
 //
 // The wire lost nothing (every effect of a three-effect gift lands - allycast.test.js). What failed was the aim: a
 // CasterOnly buff - DFU's spellbook, and every spell the maker snaps to CasterOnly for one self-only effect, "Regen +
@@ -195,7 +191,7 @@ test('AUDIT SPELL-GIFT B6: a STRANGER\'s Cure Disease leaves an incubating infec
   assert.deepEqual(p1.activeEffects.filter((a) => a.kind === 'disease').map((a) => !!a.infection), [true], 'the infection alone: a stranger\'s still leaves it');
   const p2 = infected();
   magicRig(p2).magic.applySpellToPlayer(cure, 10, null, { allyCast: true, strangerCast: false });
-  // FIELD BUGS 29h (INFECTION-KEPT; Mac: "Dont worry abour DFU"): PIN MOVED - a mate's cure takes the plain disease
+  // FIELD BUGS 29h (INFECTION-KEPT):
   // first, as every cure does, and the infection when it is all there is
   assert.deepEqual(p2.activeEffects.filter((a) => a.kind === 'disease').map((a) => !!a.infection), [true], 'a mate\'s first cure takes the plain disease');
   magicRig(p2).magic.applySpellToPlayer(cure, 10, null, { allyCast: true, strangerCast: false });

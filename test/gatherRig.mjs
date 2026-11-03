@@ -36,7 +36,7 @@ export const memStorage = () => { const m = new Map(); return { getItem: (k) => 
 export const WOODS = 231, GLENUMBRA = 59, PX = 405;
 export const NOON = 20500 * 86_400 + 43_200;
 /** The rigs' dungeon: nobody has vouched for it, and its first vein on the rig's day is Silver, tier 3 - what Mining 25
- *  works. PIN MOVED (DEEP-OPEN, bible/06-Systems/Professions-Arc.md section 53): such a dungeon draws its whole deep table
+ *  works.
  *  now - every vein was Silver, and 1234's first is no longer - so it is the first from 1234 whose first vein is. */
 export const DEEP_DUNGEON = (() => {
   for (let id = 1234; id < 6000; id++) if (dungeonVeins({ dungeon: id, day: utcDayOfMs(NOON * 1000), climate: WOODS, confirmed: false })[0]?.material === 'metal:silver') return id;

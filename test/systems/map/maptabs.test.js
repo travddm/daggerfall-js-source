@@ -1,6 +1,4 @@
-// EM1 - THE TAB LAW (2026-09-21, Mac: "instead of 3 seperate keybinds,
-// adding a tab toggle on the map itself. So if you open it in a dungeon,
-// the world map would be not accessible, same for the town map").
+// EM1 - THE TAB LAW.
 //
 // Three map windows became one sheet with tabs, and which tabs a place
 // offers is asked in four hosts and answered in one module. These pins

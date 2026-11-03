@@ -1,5 +1,4 @@
-// SD-REACH (2026-10-08, the Super Dungeons arc; the Discord, of an Abyss Dungeon's Rift: "In a place with absolutely no
-// connection to the other blocks... was this done on purpose?"): THE RIFT WHERE A WALK REACHES. A Super dungeon's end is
+// SD-REACH: THE RIFT WHERE A WALK REACHES. A Super dungeon's end is
 // the candidate marker farthest from its way in (world/dungeon/dungeonEnd.js dungeonEndOf, RVN7d's law), and SD4b's candidates
 // counted every block's START markers - which DFU reads off the starting block alone (FindMarkers) and whose first
 // carries its block's water level and castle flag (SetRDBResourceData), set down wherever its maker put the data - and
@@ -10,7 +9,7 @@
 // Hollow's door is gone with it at its end - so with no door found it answered nothing and the player stayed at the
 // dungeon's own coordinates read in the street's frame, the Hour's islands high over the Hollow's pixel; now it lands
 // where the player stood outside as they went in (scenes/worldModes.js dungeonReturn.from, the arena floor's AUDIT
-// PRE-MERGE 1003b C7 law). Design: bible/11-Multiplayer/Super-Dungeons.md sections 6 and 16.
+// PRE-MERGE 1003b C7 law). Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -67,9 +66,8 @@ test('SD-REACH a Rift somewhere, never none: every enemy marker when the interio
 
 test('SD-REACH the host unchanged: the end asked from the way in over the layout\'s enemies and its blocks, each block carrying its name from the dungeon\'s own layout', () => {
   const D = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT SD IV F38): and the floor under each candidate (test/world/sd26_dungeon.test.js). PIN MOVED
   // (LAIR-REACH): asked through the host's one end, which the lair's stand asks too (test/systems/revenant/lair_reach.test.js)
-  assert.match(D, /const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\), reaches\)/);   // PIN MOVED (LAIR-WALK): dungeonEndOf with no walk - the Rift asks none
+  assert.match(D, /const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\), reaches\)/);
   assert.match(D, /const end = dungeonEnd\(\);/);
   const L = readFileSync(new URL('../../src/world/dungeon/dungeonLayout.js', import.meta.url), 'utf8');
   assert.match(L, /blocks\.push\(\{\n\s*name: block\.blockName,\n\s*originX,\n\s*originZ,/);

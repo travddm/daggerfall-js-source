@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF8 (2026-09-30, Mac: "Continue the arc"; "XP follows your rank") -
+// PROF8 -
 // FISHING WITH THE NET IN THE STREAMING WORLD (bible/06-Systems/
 // Professions-Arc.md 5.2, 6, 30). Fishing's KIND in the gathering host
 // (scenes/gatherHost.js):
@@ -80,7 +80,7 @@ export const SCHOOL_MARK = Object.freeze({ w: 4.4, h: 0.8 });
 export const SCHOOL_PICTURE = Object.freeze([211, 9]);
 const schoolPicture = () => { const t = templateByIndex(FT.Fish); return t?.worldTextureArchive ? [t.worldTextureArchive, t.worldTextureRecord ?? 0] : SCHOOL_PICTURE; };
 /** The net's own words where the cast stands but the ground refuses it (the prompt's; the act says Foraging's lines).
- *  ANY-HOUR (2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"): never the
+ *  ANY-HOUR: never the
  *  hour - the fish bite by night as by day (foragingInstall.js foragingActRefusal). */
 export const NET_WHERE = Object.freeze(['inside', 'town']);
 export const NET_WHERE_WORDS = Object.freeze({ inside: 'not in here', town: 'not in a settlement' });
@@ -265,7 +265,7 @@ export function fishKind({ book, host }) {
     /** The day's schools: the fish's own flats, never a target (gone to the look, stood by goneFlatsOf). */
     nodesOf: ({ entry, px, py, day }) => standSchools({ px, py, day, samples: entry.samples, tilemap: entry.tilemap }),
     stood(entry, nodes) { schools.set(pixelKey(entry.px, entry.py), { entry, nodes }); },
-    /** MEM-AUDIT (2026-10-23): A PIXEL TORN DOWN, ITS SCHOOLS FORGOTTEN. Nothing let them go, and each held its pixel's
+    /** MEM-AUDIT: A PIXEL TORN DOWN, ITS SCHOOLS FORGOTTEN. Nothing let them go, and each held its pixel's
      *  whole entry - the ground's samples and normals, its tilemaps, flats and townsfolk, ~2 MB of heap a pixel - so online
      *  (the professions' book stands every built pixel, a bare one too) every pixel a journey streamed stood for the session:
      *  ~26 MB a map pixel travelled. schoolPlaces already passed one the gather host no longer stands. */

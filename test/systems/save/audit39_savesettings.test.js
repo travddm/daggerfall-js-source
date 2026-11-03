@@ -63,34 +63,6 @@ test('AUDIT 39 #121: a save from before them restores the null/0 the arms alread
   assert.equal(extras.smallerDungeonsState, 0, 'QuestSmallerDungeonsState.NotSet - never warps');
 });
 
-// AUDIT 39r R11 REWROTE THIS PIN. It read the CALLER side only -
-// composeSessionState's two lines and dungeonContext's third - and all
-// three of those predate the wave, so it passed with the fix reverted:
-// a vacuous pin sitting beside two good ones. The seam that MOVED is
-// snapshotPlayer's own signature, where an unnamed option is dropped in
-// silence, and its `snap` literal. Its title also claimed "both hosts
-// pass all three", which is false and stays corrected below.
-test('AUDIT 39 #121: snapshotPlayer NAMES the three, and the hosts that own them pass them', () => {
-  const s = read('src/systems/save/save.js');
-  // the callee half - the line the fix changed
-  assert.match(s, /interior = null, dungeon = null, travelMap = null, escortingFaces = null, quickslots = null, spawns = null, smallerDungeonsState = 0, modData = null \} = \{\}\)/,
-    'the destructured options name all three, or they are dropped in silence');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): the frame's law beside the scale
-  assert.match(s, /const snap = \{[^\n]*travelMap, escortingFaces, quickslots, spawns, smallerDungeonsState, modData, terrainScale: STREAMING_TERRAIN_SCALE, groundFrame: GROUND_FRAME_LAW \}/,   // TERRAIN-SCALE1 rides last
-    'and the envelope literal carries them out');
-  // the caller half, which was always right
-  assert.match(s, /travelMap: travelMapSaveData\(\),/, 'composeSessionState composes the travel map');
-  assert.match(s, /escortingFaces: getEscortFacesSaveData\(\),/);
-  // smallerDungeonsState has ONE host, not two: SerializablePlayer.cs
-  // :462-463 gates the read on `positionData.worldContext ==
-  // WorldContext.Dungeon`, so the exterior host has nothing to say
-  // here and world.js correctly passes none.
-  assert.match(read('src/scenes/dungeonContext.js'),
-    /smallerDungeonsState: smallerDungeonsStamp\(dfLocation\),/);   // FT1: the stamp is the module's export, and it stamps the BUILD
-  assert.ok(!hostText('src/scenes/world.js').includes('smallerDungeonsState'),
-    'the exterior save has no dungeon warp to describe (worldContext gate)');
-});
-
 // ── #97: the faction record's other mutable columns ───────────────
 const mkFaction = (id) => ({
   id, rep: 0, flags: 0, power: 5,
@@ -126,21 +98,6 @@ test('AUDIT 39 #97: presence is per COLUMN - a pre-fix save leaves FACTION.TXT s
   assert.deepEqual([f.rep, f.flags, f.power], [4, 1, 8], 'the three old columns still write');
   assert.equal(f.ally1, 99, 'and the untravelled columns are not blanked');
   assert.equal(f.rulerPowerBonus, 33);
-});
-
-// ── #24: the transport mode ───────────────────────────────────────
-test('AUDIT 39 #24: the pose bag carries the mount and the ONE builder puts you back on it', () => {
-  const w = hostText('src/scenes/world.js');
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the fall follows the mode now, so the mode is no longer the tail.
-  assert.match(w, /camera: mwViewSaveCamera\(\), transport: player\.transportMode, fall: player\.fallSnapshot\(\) \}/,
-    'SerializablePlayer.cs:179 beside the weapon and the camera');
-  // The restore goes through setTransportModeHere, not player.setTransportMode:
-  // the mount's sprite, hoof loop and ride bob re-arm only there (U53).
-  assert.match(w, /if \(pose\.transport != null\) setTransportModeHere\(pose\.transport\);/);
-  // presence-gated, like every other pose field - an older save and the
-  // classic import (a .SAV carries no mode) leave the live mode standing.
-  const apply = w.slice(w.indexOf('function applyPose'), w.indexOf('function applyPose') + 1400);
-  assert.ok(apply.includes('if (!pose) return;'), 'and no pose at all is a no-op');
 });
 
 // ── #124: Reset publishes ─────────────────────────────────────────

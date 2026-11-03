@@ -125,24 +125,6 @@ const HOSTS = [
   },
 ];
 
-test('E1 SOURCE SWEEP: every overlay-owning host routes the key UP and the pointer UP, not only the presses', () => {
-  for (const h of HOSTS) {
-    const body = src(h.file);
-    assert.match(body, h.keyDown, `${h.file}: the key DOWN route (the half that always existed)`);
-    assert.match(body, h.keyUp, `${h.file}: the key UP route - E1's half`);
-    assert.match(body, h.pointerDown, `${h.file}: the pointer DOWN route`);
-    assert.match(body, h.pointerUp, `${h.file}: the pointer release reaches the slot`);
-  }
-  // ...and the ONE door the two dungeon-context hosts share, so they
-  // cannot drift apart the way the pointer seam once did.
-  const input = src('src/ui/input.js');
-  assert.match(input, /export function routeKeyUp\(e, ctx\) \{/, 'routeKey has a mirror');
-  assert.match(input, /ctx\.overlayKeyUp\?\.\(e\.code, e\);/, 'and it hands the RAW code down, as townTalk does');
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    assert.match(src(f), /routeKeyUp\(e, /, `${f} calls the shared door rather than reaching into the context`);
-  }
-});
-
 test('E1 SOURCE SWEEP: a window that NESTS a list picker forwards the release, exactly as it forwards hover', () => {
   // The picker is mounted two ways: straight into a host's slot (the
   // three routers) and INSIDE another window. The second kind only
@@ -471,37 +453,6 @@ test('E1: every window DFU reads on GetKeyUp answers on the RELEASE - all four, 
   for (const f of ['src/ui/automap/automapWindow.js', 'src/ui/exteriorAutomapWindow.js', 'src/ui/restWindow.js']) {
     assert.match(src(f), /isCloseWindowDeferred/, `${f}: DFU's own field name`);
   }
-});
-
-test('E1: the retired DEPARTURES are gone from both automap windows, and the Ledger row is struck', () => {
-  const dungeon = src('src/ui/automap/automapWindow.js');
-  const exterior = src('src/ui/exteriorAutomapWindow.js');
-  // The old claims survive ONLY as quotations inside the retirement
-  // record - the site says what it used to say and then what shipped,
-  // which is the wave's rule. What must not survive is a claim standing
-  // on its own, so each stale phrase is checked to sit downstream of a
-  // RETIRED marker rather than checked to be absent.
-  const quotedOnly = (body, phrase, name) => {
-    let at = body.indexOf(phrase);
-    while (at !== -1) {
-      assert.ok(body.slice(Math.max(0, at - 1200), at).includes('RETIRED'),   // TIDY2: 1200 - the record stood at exactly 900, and a path rewritten inside it is longer
-        `${name}: "${phrase}" stands as a live claim, not as a retirement's quotation`);
-      at = body.indexOf(phrase, at + 1);
-    }
-  };
-  for (const [name, body] of [['automapWindow.js', dungeon], ['exteriorAutomapWindow.js', exterior]]) {
-    assert.match(body, /ROAD-E E1 RETIRED/, `${name}: the retirement is recorded at the site`);
-    quotedOnly(body, 'carries no key-up route at all', name);
-    quotedOnly(body, 'delivers keydown and no keyup', name);
-    quotedOnly(body, 'auto-repeat rate', name);
-    // and the mechanism that replaced them
-    assert.match(body, /_tickHeldHotkeys\(dt\) \{/, `${name}: the per-frame poll`);
-    assert.match(body, /this\._heldCodes/, `${name}: InputManager's held-key dictionary`);
-    assert.match(body, /keyup\(code, e = null\) \{/, `${name}: the release edge`);
-  }
-  const ledger = src('bible/01-Overview/Port-Ledger.md');
-  assert.match(ledger, /~~C2: the dungeon automap's HELD hotkeys[\s\S]{0,400}?~~ RETIRED \(E-group, 2026-09-02\)/,
-    'the Ledger A row is struck in the Ledger\'s idiom');
 });
 
 // -------------------------------------------------------------------

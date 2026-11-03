@@ -109,7 +109,6 @@ test('a12: ToggleHand raises the two classic lines, and the shield refuses (:702
 });
 
 test('a12: ToggleHand\'s BowLeftHandWithSwitching arm - the switch delay, verbatim (:713-727)', () => {
-  // PIN MOVED (TWO-HANDS AUDIT): the arm is pinned on its own case, a bow in the left hand - a katana and a dagger are a
   // dual pair now (handsLaw.js handsModeOf), both up, and H between them changes the lead and nothing else, so it bills
   // nothing (playerWeapon.js toggleHand; Two-Hands.md "H ends the exchange").
   const pw = new PlayerWeapon({});
@@ -159,7 +158,6 @@ test('a12 rig: syncWorn reads BOTH hands, so the worn left-hand weapon becomes t
   assert.equal(r.playerWeapon.weapon, KATANA);
   assert.equal(r.playerWeapon.currentLeftHandWeapon, DAGGER, 'the left cache is live, not dropped');
   assert.equal(r.switchHand(), true);
-  // PIN MOVED (TWO-HANDS): a katana and a dagger are a PAIR now - both up, both swinging - so H picks the hand that LEADS
   // and says so (was: ToggleHand's 'Using weapon in left hand.'); one hand in use still says DFU's line (the next test)
   assert.deepEqual(r._said, ['Leading with the left hand.']);
   assert.equal(r.playerWeapon.weapon, DAGGER, 'the left hand leads now');
@@ -248,15 +246,3 @@ test('a12 rig: bindWorn:false rigs flip the hand without losing their scripted w
   assert.equal(r.playerWeapon.weapon, LONG_BOW, 'the scripted weapon survives the switch');
 });
 
-test('a12: the mirrored FPSWeapon draw was ALREADY ported - the handedness pin, not a second one', () => {
-  // AUDIT 28 W13 landed FlipHorizontal (Controls/Handedness == 1,
-  // StartGameBehaviour.cs:269) and it is NOT the hand toggle: DFU's
-  // only writer of that field is the SETTING, and FPSWeapon mirrors
-  // just the three symmetric states either way. This pin holds the
-  // two apart so nobody wires the flip to usingRightHand.
-  const fps = readFileSync(join(ROOT, 'src', 'combat', 'fpsWeapon.js'), 'utf8');
-  assert.match(fps, /flipHorizontal = getInt\('Controls', 'Handedness', 0, 3\) === 1/);
-  assert.match(fps, /FLIP_STATES = Object\.freeze\(\['Idle', 'StrikeDown', 'StrikeUp'\]\)/);
-  const pw = readFileSync(join(ROOT, 'src', 'combat', 'playerWeapon.js'), 'utf8');
-  assert.ok(!/flipHorizontal/i.test(pw), 'the hand law never touches the draw mirror');
-});

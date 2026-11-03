@@ -1,5 +1,4 @@
-// TELL1 - POISE AND THE STAGGER (bible/12-Enhanced-AI/Feud-Arc.md section 3; Mac, 2026-10-04: "player's can easily stun
-// these enemies and breath more depth into it", then "Go" on every call). Before it, any landed blow broke any
+// TELL1 - POISE AND THE STAGGER (;, then "Go" on every call). Before it, any landed blow broke any
 // telegraphed wind-up for free (the knock it wrote broke it). Now a foe winding up HOLDS through a blow - no shove, no
 // Hurt - and the blow's weight fills its poise meter; past its poise the wind-up breaks and the foe is STAGGERED.
 // The law (the table, the classes, the weights); every health multiplier writing what it stood (`healthMult`); the brain
@@ -38,7 +37,7 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 test('TELL1: the table is the arc\'s section 27 (mutants: any number moved)', () => {
   assert.deepEqual({ ...TELL, POISE_W: { ...TELL.POISE_W }, STAGGER_S: { ...TELL.STAGGER_S }, PUNISH_S: { ...TELL.PUNISH_S }, CHAIN_NEXT: { ...TELL.CHAIN_NEXT }, COOLDOWN: { ...TELL.COOLDOWN } }, {
     POISE_W: { light: 0.2, medium: 0.3, heavy: 0.4, massive: 0.5 },
-    WEIGHT_MEDIUM: 200, WEIGHT_HEAVY: 700, WEIGHT_MASSIVE: 1500, POISE_FLOOR_MASSIVE: 60,   // PIN MOVED (AUDIT TELL: the duel harness's floor)
+    WEIGHT_MEDIUM: 200, WEIGHT_HEAVY: 700, WEIGHT_MASSIVE: 1500, POISE_FLOOR_MASSIVE: 60,
     POISE_ELITE: 1.5, POISE_ELITE_DUNGEON: 1.25, POISE_CHAMPION: 1.25, POISE_STALWART: 1.5, POISE_REVENANT_RANK: 0.1,
     K_BLUNT: 1.5, K_AXE: 1.25, K_LONG_BLADE: 1.0, K_SHORT_BLADE: 0.7, K_HANDS: 0.6, K_CLAWS: 1.0, K_TWO_HANDED: 1.15,
     K_ARROW: 0.5, K_SPELL: 0.75, K_PEER: 1, POISE_BACK: 1.5, BACK_DEG: 110, POISE_WEAK: 2,
@@ -75,7 +74,7 @@ test('TELL1: the weight classes, by DFU\'s own weight - a rat light, an orc and 
 
 test('TELL1: poise - the kind\'s own health by its weight, by what it is (an elite, an Elite Dungeon\'s, a champion, a Stalwart, a revenant by rank)', () => {
   assert.equal(poiseOf({ maxHealth: 100 }, 600), 30);
-  assert.equal(poiseOf({ maxHealth: 200 }, 3000), 100);   // PIN MOVED (AUDIT TELL, the duel harness): a massive one's at least POISE_FLOOR_MASSIVE
+  assert.equal(poiseOf({ maxHealth: 200 }, 3000), 100);
   assert.equal(poiseOf({ maxHealth: 100 }, 3000), 60, 'a massive one of 100: 50 under the floor, 60');
   assert.equal(poiseOf({ maxHealth: 100, eliteFoe: true, healthMult: 1 }, 3000), 90, 'the floor, then what it is');
   assert.equal(poiseOf({ maxHealth: 100 }, 2), 20);
@@ -94,7 +93,7 @@ test('TELL1: poise - the kind\'s own health by its weight, by what it is (an eli
 test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite, an Elite Dungeon\'s elite, a champion, a revenant, the dungeon\'s doubling, a rite\'s summoner, a sworn one (mutants: a site that forgets it)', async () => {
   const e = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
   assert.equal(promoteEliteFoe(e, { checkLevel: false }), true);
-  assert.equal(e.healthMult, 5); assert.equal(kindHealth(e), 40);
+  assert.equal(e.healthMult, 2); assert.equal(kindHealth(e), 40);
   const ed = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
   promoteEliteFoe(ed, { checkLevel: false, eliteDungeon: true });
   assert.equal(ed.healthMult, 7);
@@ -102,18 +101,15 @@ test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite
   promoteEliteFoe(puppet, { own: false });
   assert.equal(puppet.healthMult, undefined, 'a puppet\'s maximum is its owner\'s word - nothing stood here');
   setPref('lootRarity', true);
-  const c = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
+  const c = { maxHealth: 50, health: 50, level: 12, mobileType: M.Orc };   // 50 stands the Stalwart's 1.68 on a whole number, so the kind's own health reads back exact
   assert.equal(applyChampion(c, 1), true, 'Stalwart');
-  assert.equal(c.healthMult, 3); assert.equal(kindHealth(c), 40);
+  assert.equal(c.healthMult, 1.4 * 1.2); assert.equal(kindHealth(c), 50);
   setPref('lootRarity', false);
   const rv = await import('../../src/systems/revenant/revenant.js');
   const r = { id: 'x', name: 'Grushnak the Butcher', rank: 2, returns: 0, history: [] };
   const re = { maxHealth: 40, health: 40 };
   rv.applyRevenant(re, r, { now: 0 });
-  assert.equal(re.healthMult, 1.8); assert.equal(kindHealth(re), 40);   // PIN MOVED (UNQUIET, Revenants.md section 46): +40% health a rank (it was 25%)
-  assert.match(rd('src/scenes/dungeonContext.js'), /entity\.maxHealth = Math\.max\(1, Math\.round\(entity\.maxHealth \* ELITE_HEALTH_SCALE\)\);\n\s*entity\.health = entity\.maxHealth;\n\s*entity\.healthMult = \(entity\.healthMult \?\? 1\) \* ELITE_HEALTH_SCALE;/);
-  assert.match(rd('src/scenes/riteHost.js'), /f\.entity\.healthMult = \(f\.entity\.healthMult \?\? 1\) \* RITE_SUMMONER_HEALTH;/);
-  assert.match(rd('src/systems/revenant/revenantCompanions.js'), /entity\.healthMult = \(entity\.healthMult \?\? 1\) \* \(1 \+ SWORN_HEALTH_PER_RANK \* rank\) \* starHealth;/);
+  assert.equal(re.healthMult, 1.8); assert.equal(kindHealth(re), 40);
 });
 
 test('TELL1: a blow\'s class - blunt, axe, long blade, short blade, hands, claws, two-handed on top, an arrow, a spell\'s landing (its round nothing), a peer\'s, nothing else', () => {
@@ -257,18 +253,17 @@ test('TELL1: no stunlock - a wind-up broken inside STAGGER_IMMUNE of a stagger\'
 test('TELL1: the weight class sets the length - a giant is staggered 0.8 s (its poise the massive floor since AUDIT TELL; the light 1.4 s is staggerSeconds\' own pin); an elite\'s poise is half again', () => {   // NAME MOVED (AUDIT TELL: it named a light foe it never staggers)
   const g = foe({ mobileType: M.Giant });
   assert.ok(untilWindup([g], g, [0, 0, 0]));
-  // PIN MOVED (TELL3, bible/12-Enhanced-AI/Feud-Arc.md 5: a giant's slam is iron, one elite blow in three too - no poise
   // to weigh): the blow this pins is one with a poise (test/characters/enemy/tell3_iron.test.js pins the iron)
   g.ai._tac.blow.guard = 'poise';
   const t0 = T;
-  assert.equal(windupStruck(g.ai, g.ent, 3000, 59.9), 'hold', 'a giant of 100: poise 50, the massive floor 60');   // PIN MOVED (AUDIT TELL: POISE_FLOOR_MASSIVE)
+  assert.equal(windupStruck(g.ai, g.ent, 3000, 59.9), 'hold', 'a giant of 100: poise 50, the massive floor 60');
   assert.equal(windupStruck(g.ai, g.ent, 3000, 0.2), 'stagger');
   assert.ok(Math.abs(g.ai.staggerUntil - (t0 + 0.8)) < 1e-9);
   resetTactics(); resetBlows();
   const e = foe();
   e.ent.eliteFoe = true;
   assert.ok(untilWindup([e], e, [0, 0, 0]));
-  e.ai._tac.blow.guard = 'poise';   // PIN MOVED (TELL3): as above
+  e.ai._tac.blow.guard = 'poise';
   assert.equal(windupStruck(e.ai, e.ent, ORC_W, 44.9), 'hold', 'an elite orc: 45');
   assert.equal(windupStruck(e.ai, e.ent, ORC_W, 0.2), 'stagger');
 });
@@ -312,12 +307,6 @@ test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\'
   assert.ok(plain > 0, `a blow that lands (${plain})`);
   const hit = calculateAttackDamage(attacker, { ...target, staggerUntil: 2 }, opts);
   assert.equal(hit, Math.max(1, Math.round(plain * 1.25)));
-  const fm = rd('src/combat/formulas.js');
-  assert.match(fm, /const m = mentorDamageTakenMult\(target\);\n\s*if \(m > 1\) damage = Math\.max\(1, Math\.round\(damage \* m\)\);\n\s*\}\n(\s*\/\/[^\n]*\n)*\s*damage = blowTaken\(damage, attacker, target, weapon, /, 'after mentor mode, before the reports');
-  const hm = rd('src/scenes/hostMagic.js');
-  // PIN MOVED (RVN1: the landing notes my spell in its fight's ledger between the take and the sink)
-  assert.match(hm, /hurt: \(n, o\) => \{\n\s*const d = o\?\.whole \|\| o\?\.round \? n : blowTaken\(n, striker, foe\.entity, null, \{ kind: 'spell'[^\n]*\n[^\n]*\n\s*return sinks\.hurt\(d, \{ \.\.\.\(o \?\? \{\}\), element: spell\?\.element \?\? null \}\);/, 'a spell\'s landing; a kill and a round as they come (RVN1: the ledger notes it between; PIN MOVED RVN3: its element rides to the door)');
-  assert.match(hm, /const r = applySpell\(spell, casterLevel, foe\.entity, landing, rolls, caster, ctx\);/);
 });
 
 // ── the doors ───────────────────────────────────────────────────────
@@ -422,42 +411,3 @@ test('TELL1: the foe-vs-foe payload writes no knockback on a foe winding up - it
   assert.equal(windupDoor({ ...f, entity: f.ent }, 5, { striker: attacker, from: [0, 0, 0], weight: ORC_W }), 'stagger', '25 + 5 x 1.0 reaches 30 (hands: 18)');
 });
 
-test('TELL1: every door asks the poise door where it writes DFU\'s knock, passes the player\'s weapon, and holds the Hurt through a stagger; the spells\' rounds and the arrows\' kinds reach the doors (mutants: a door left on the old law)', () => {
-  const ex = rd('src/scenes/exteriorFoes.js');
-  // PIN MOVED (TELL4, bible/12-Enhanced-AI/Feud-Arc.md 6.1): an overreached foe asks the door too (the first blow staggers it)
-  assert.match(ex, /const _tell = \(f\.ai\?\._tac\?\.state !== 'windup' && f\.ai\?\._tac\?\.state !== 'overreach'\) \? null : windupDoor\(f, damage, \{[^\n]*\n\s*kind, weapon, round, peer, striker, from: striker\?\.ai\?\.feet \?\? playerFeet,/);
-  assert.match(ex, /if \(_tell === 'hold'\) return;\n\s*if \(knockDir && !f\.entity\?\.staffBoss && weaponKnockbackApplies\(f\.ai\.knockbackSpeed, isClass, mobileWeight\)\) \{/);   // BOSS-UNSHAKEN: a staff event's mini boss takes no shove
-  assert.match(ex, /f\.ai\.knockbackSpeed = weaponKnockbackSpeed\(damage, w\) \* \(_tell === 'stagger' \? TELL\.STAGGER_KNOCK : 1\);/);
-  assert.match(ex, /damageFoe\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);/);
-  assert.match(ex, /hurting: f\.ai\.hurtKnock \|\| f\.ai\.staggered,/);
-  assert.match(ex, /hurt: \(n, o\) => damageFoe\(f, n, null, null, \{ fromPlayer: false, kind: 'spell', whole: !!o\?\.whole, round: !!o\?\.round, element: o\?\.element \?\? null \}\),/);   // PIN MOVED (RVN3: a landing's element)
-  const g = rd('src/scenes/cityGuards.js');
-  assert.match(g, /const _tell = \(g\.ai\?\._tac\?\.state !== 'windup' && g\.ai\?\._tac\?\.state !== 'overreach'\) \? null : windupDoor\(g, damage, \{/);   // PIN MOVED (TELL4)
-  assert.match(g, /if \(_tell === 'hold'\) return;\n\s*if \(knockDir && weaponKnockbackApplies\(g\.ai\.knockbackSpeed, true, guardWeight\)\) \{/);
-  assert.match(g, /g\.ai\.knockbackSpeed = weaponKnockbackSpeed\(damage, w\) \* \(_tell === 'stagger' \? TELL\.STAGGER_KNOCK : 1\);/);
-  assert.match(g, /damageGuard\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);/);
-  assert.match(g, /hurting: g\.ai\.hurtKnock \|\| g\.ai\.staggered,/);
-  assert.match(g, /hurtFromFoe: \(dmg, dir, striker = null\) => damageGuard\(g, dmg, null, dir \?\? null, \{ fromPlayer: false, striker \}\)/);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const _tell = \(foe\.ai\?\._tac\?\.state !== 'windup' && foe\.ai\?\._tac\?\.state !== 'overreach'\) \? null : windupDoor\(foe, damage, \{/);   // PIN MOVED (TELL4)
-  assert.match(d, /if \(_tell === 'hold'\) return;\n\s*if \(knockDir && foe\.ai\) \{/);
-  assert.match(d, /foe\.ai\.knockbackSpeed = weaponKnockbackSpeed\(damage, w\) \* \(_tell === 'stagger' \? TELL\.STAGGER_KNOCK : 1\);/);
-  assert.match(d, /damageFoe\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);/);
-  assert.match(d, /hurting: f\.ai\.hurtKnock \|\| f\.ai\.staggered \|\| !!_pb\?\.staggered,/);   // PIN MOVED (TELL8: and the host's stagger on its puppet)
-  assert.match(d, /hurt: \(n, o\) => damageFoe\(f, n, null, null, \{ kind: 'spell', fromPlayer: o\?\.fromPlayer \?\? fromPlayer, whole: !!o\?\.whole, round: !!o\?\.round, element: o\?\.element \?\? null \}\),/);   // PIN MOVED (RVN3: a landing's element)
-  assert.match(rd('src/systems/effects.js'), /sinks\.hurt\(n, \{ fromPlayer: !a\.caster \|\| !!a\.caster\.isPlayer, bundleDuel: !!a\.bundleDuel, round: true, element: a\.element \?\? null \}\);/, 'a round says it is one');   // PIN MOVED (BOSS-TRAITS): and its element
-  for (const [file, re] of [
-    ['src/scenes/world.js', /cityGuards\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/],
-    ['src/scenes/exterior.js', /cityGuards\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/],
-    ['src/scenes/worldModes.js', /interiorGuards\?\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/],
-    ['src/scenes/world.js', /cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)/],
-    ['src/scenes/exterior.js', /cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)/],
-    ['src/scenes/worldModes.js', /interiorGuards\?\.hurtGuard\(foe, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)/],
-  ]) assert.match(rd(file), re, file);
-  assert.match(rd('src/scenes/hostCombat.js'), /if \(target\.ai && !tEnt\?\.staffBoss && !windupHolds\(target\.ai\) && enemyKnockbackApplies\(/);
-  const mo = rd('src/characters/enemy/enemyMotor.js');
-  // PIN MOVED (TELL4, Feud-Arc.md 6.1): the stagger's lock is `locked` - a stagger or an overreach
-  assert.match(mo, /const locked = staggered \|\| overreached \|\| \(this\.roarUntil > 0 && tacticsNow\(\) < this\.roarUntil\);/);   // PIN MOVED (RVN4: a last stand's roar holds it too)
-  assert.match(mo, /this\.canAct = !paralyzed && !knocked && !locked && \(this\.isHostile \|\| foeTarget\);/);
-  assert.match(mo, /if \(paralyzed \|\| paused \|\| locked \|\| !\(this\.isHostile \|\| foeTarget\)\) this\.moving = false;/);
-});

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-22d SEA-GLIDE (bible/01-Overview/bugs/Field-Bugs-2026-10-22d.md, report 3): Dahazed on the Discord's
+// FIELD BUGS 2026-10-22d SEA-GLIDE (, report 3): Dahazed on the Discord's
 // #bug-reports, "huge amount of lag and ship warping during sea boss fight": "lot of time the boss fight turns into dodging
 // friendly ships while they randomly speed up / warp in front of you". Another player's boat (Come Sail Away's, CSA-J) is
 // drawn from the `sa` word on her foes frames: a delta every 200 ms, a full frame every 2 s (net/online.js FOES_FULL_MS) -

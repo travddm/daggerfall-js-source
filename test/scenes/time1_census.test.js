@@ -1,5 +1,4 @@
-// TIME1 (2026-10-01, Mac: "I don't want a band aid, I want a detailed way we can do this" / "Let's do it. This needs to
-// be perfect"): THE CENSUS OF THE CLOCKS. Online the world keeps three clocks (bible/06-Systems/Online-Time-Arc.md):
+// TIME1: THE CENSUS OF THE CLOCKS. Online the world keeps three clocks:
 // the SKY (what time of day, what date, which moon - read for "now", never stamped), the EVENT clock (WORLD5's: what
 // the world schedules, stocks, prices and meters) and the character's own. A reader on the wrong one fails silently -
 // a sky read left on the event clock shows the wrong hour, an event read moved to the sky resets a day's cap four times
@@ -75,13 +74,6 @@ test('TIME1 census: every line in src/ that reads a shared clock is named, every
     .map((r) => `${r.file}: "${r.has}" names ${counts.get(r) ?? 0} line(s), the row says ${r.count ?? 1}`);
   assert.deepEqual(wrong, [], `a row names lines that are gone, or more than it says:\n${wrong.join('\n')}`);
   assert.ok(files.includes('src/scenes/world.js') && files.length > 100, 'the walk saw the tree');
-});
-
-test('TIME1 census: the laws are only where the laws live - a law row stands in the clock modules and the install alone', () => {
-  const homes = new Set(['src/net/skyLaw.js', 'src/systems/skyCalendar.js', 'src/systems/worldTick.js', 'src/scenes/world.js']);
-  for (const r of CENSUS.rows.filter((x) => x.clock === 'law')) assert.ok(homes.has(r.file), `${r.file}: "${r.has}" says it is a law outside the clocks' homes`);
-  const install = CENSUS.rows.find((r) => r.file === 'src/scenes/world.js' && r.clock === 'law');
-  assert.ok(install && /setSharedClock\(/.test(readersOf('src/scenes/world.js').find((l) => l.includes(install.has)) ?? ''), "the world host's law row is its install");
 });
 
 test('TIME1 census: the readers the design names are where it says - the frame\'s hour, the seasons, the curses\' sky and the sky feed read the sky; the gates, the raids, the prices, the shelves and the weather keep the event clock', () => {

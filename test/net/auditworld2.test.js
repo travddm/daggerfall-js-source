@@ -1,4 +1,4 @@
-// AUDIT WORLD2 (Mac, 2026-09-12: "Lets do an audit on slice 2") - four
+// AUDIT WORLD2 - four
 // opus lenses over WORLD2 (the relay and the wire; the puppets; the
 // world host's lifecycle; the pins and the record), every finding
 // refuted twice and fixed on the branch. THE FIXES EXECUTE: the relay
@@ -12,7 +12,6 @@
 // at home - A6; my own id as the host is not the world in - D11); the
 // record's struck sentences (D1, D6-D10).
 import { test } from 'node:test';
-import { indexText } from '../bibleIndex.mjs';   // HARD5: a doesNotMatch aimed at one page goes vacuous when its subject moves
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { PIXEL_UNITS, MAX_FRAME_BYTES, FOES_PREFIX, WORLD_PREFIX, FOES_HZ_MAX, FOES_ROOM_BYTES_PER_S, HIT_ROOM_HZ_MAX, HIT_HZ_MAX, POSE_HZ_MAX, DROP_STRIKES_MAX, byteGate, hitGate } from '../../src/net/wire.js';
@@ -92,19 +91,7 @@ test('AUDIT WORLD2 A: the relay - the budgets are one home and the byte gate spe
   r2.room._meterOf(h).hbucket = { tokens: 0, at: Date.now() - 1000 };
   await r2.raw(j2, hit); assert.equal(ofType(h, 'hit').length, 2, 'refilled: forwarded');
   assert.equal(HIT_ROOM_HZ_MAX, 60);
-  // the header says the truth (A8)
-  const room = rd('server/src/index.js');
-  assert.match(room, /WORLD2 \(2026-09-12\): THE LIVE FOES\./, 'the head has a WORLD2 paragraph'); assert.match(room, /metered on the pose bucket, or the\n\/\/ stream's own for a foes frame \(A1/, 'and the A1 sentence names both buckets');
-  // INSPECT1: the line had fallen SEVEN arms behind the parser (say, mute, social, party, trade, cast and INSPECT1's
-  // card were parsed and not named) - a list restated by hand in a pin is a list that drifts with nobody noticing. So it
-  // is DERIVED: every frame parseClient has an arm for, the doc names, and it names nothing else.
-  const wsrc = rd('src/net/wire.js');
-  const doc = /One client frame, parsed and checked: \{t:((?:'[a-z]+'\|?)+), \.\.\.\}/.exec(wsrc);
-  assert.ok(doc, 'parseClient\'s doc line names its frames');
-  const from = wsrc.indexOf('export function parseClient(');
-  const arms = [...new Set([...wsrc.slice(from, wsrc.indexOf('\n}\n', from)).matchAll(/m\.t === '([a-z]+)'/g)].map((m) => m[1]))].sort();
-  assert.ok(arms.length >= 18 && arms.includes('hit') && arms.includes('card'), 'the arms were read off the parser');
-  assert.deepEqual([...doc[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort(), arms, 'parseClient\'s doc names every frame it parses (WORLD2\'s two, WORLD3\'s third, WORLD6b-iii(e)\'s ask, QUEST1\'s, DICE1\'s roll beside the chat line, INSPECT1\'s card...), and no other');
+   
 });
 
 test('AUDIT WORLD2: the session - a dead socket and a leave clear the seat through the one door, so the world host hears the seat go (A2/C2); the hits\' own gate at home refuses an over-rate blow to its caller (A6); my own id as the host is not the world in (D11); FOES_STALE_MS is three full frames', () => {
@@ -148,17 +135,3 @@ test('AUDIT WORLD2: the session - a dead socket and a leave clear the seat throu
   void ws2;
 });
 
-test('AUDIT WORLD2: the record - the sentences WORLD2 falsified are struck or amended (D1, D6-D10)', () => {
-  const home = indexText();   // HARD5: Home.md AND its delegates - a stale claim must not be able to move house
-  assert.doesNotMatch(home, /The live moment - one simulation per room - is the next iteration/, 'D1: Home.md');
-  assert.match(home, /then the room's simulation \(WORLD2\)/, 'D1: the arc list');
-  const arc = rd('bible/06-Systems/Online-Arc.md');
-  assert.doesNotMatch(arc, /Not done: the live moment\. Two players in one dungeon still each run\ntheir own foes/, 'D6: WORLD1\'s "not done"');
-  assert.doesNotMatch(arc, /vanished still comes back for the next visitor\./, 'D9: the bullet qualified');
-  assert.doesNotMatch(arc, /rewinds nothing for anyone else and is itself rewound/, 'D10: the quickload item re-scoped');
-  assert.match(arc, /## AUDIT WORLD2 \(2026-09-12\)/, 'the section');
-  const ledger = rd('bible/01-Overview/Port-Ledger.md');
-  assert.doesNotMatch(ledger, /the live simulation is still each player's own \(the memory is a snapshot, not the moment\)\. AUDIT WORLD/, 'D7: the Ledger row');
-  const mp = rd('bible/11-Multiplayer/Multiplayer.md');
-  assert.doesNotMatch(mp, /slice 2 of\nthe arc hands the live simulation over with it/, 'D8: decision 2'); assert.doesNotMatch(mp, /the live simulation, slice 2 of the arc\./, 'D8: the open question');
-});

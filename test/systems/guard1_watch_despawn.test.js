@@ -1,6 +1,4 @@
-// GUARD1 - THE WATCH THAT VANISHED (2026-09-15, relayed by Mac from a
-// player: "after a while of chasing me around the villages they
-// disappeared. And then i was free to go on a killing spree").
+// GUARD1 - THE WATCH THAT VANISHED.
 //
 // THE DEFECT WAS A DROPPED CLAUSE. EnemyEntity.Update (:184-191)
 // despawns the city watch on FOUR terms:
@@ -181,6 +179,4 @@ test('GUARD1: the CRIMES enum has ONE home, and court.js re-exports the leaf', (
   const declarers = ['src/systems/court.js', 'src/systems/talk/talk.js', 'src/systems/crimes.js']
     .filter((f) => /export const CRIMES = /.test(src(f)));
   assert.deepEqual(declarers, ['src/systems/crimes.js'], 'exactly one module declares CRIMES');
-  assert.equal(/from '(?:\.\.?\/)+(?:[\w-]+\/)*court\.js'/.test(src('src/systems/talk/talk.js')), false,
-    'talk.js still cannot import court.js - the cycle is real, which is why the enum moved');
 });

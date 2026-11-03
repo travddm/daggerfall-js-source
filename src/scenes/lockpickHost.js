@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LOCKPICK (2026-10-26, the owner: "I want to build a detailed lock picking minigame and introduce a lockpick item";
-// bible/06-Systems/Lockpicking.md) - A LOCK PICKED, ONE HOME. The module a host wires (HOST-SPLIT: fishHost.js's shape):
+// LOCKPICK - A LOCK PICKED, ONE HOME. The module a host wires (HOST-SPLIT: fishHost.js's shape):
 // a host hands it its player, the slot its windows go into and its ear, and calls `begin` where DFU rolled the pick -
 //
 //   scenes/worldModes.js     - a building's front door in Steal mode (PlayerActivate.ActivateStaticDoor's pick, :543-566);

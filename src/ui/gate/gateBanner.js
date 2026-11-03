@@ -1,5 +1,5 @@
 // @ts-check
-// WB2 (2026-09-25): THE GATE'S COUNTDOWN OVER THE SCREEN - "Oblivion Gate - opens in 3:12", standing under the
+// WB2: THE GATE'S COUNTDOWN OVER THE SCREEN - "Oblivion Gate - opens in 3:12", standing under the
 // compass while the player is within GATE_BANNER_M of a gate (scenes/gate/gatePool.js decides the words; this draws them).
 //
 // A READOUT, NOT A WINDOW (the enhanced HUD's own law, ui/enhanced/enhancedHud.js): it takes no click, registers with no
@@ -17,7 +17,7 @@ export const GATE_BANNER_TOP = '64px';
  *  Abyss Dungeon's door), and an Abyss Dungeon's stands in the Hour's brass (`look` 'brass' - ui/superDungeon/sdTitleCard.js's), never
  *  Dagon's red. */
 export const SD_BANNER_BRASS = '#e8c060';
-/** PLUS-DRESS (2026-09-26): the banner's look as a class, so a skin's sheet can dress it (ui/enhanced/enhancedPlusStyle.js). */
+/** PLUS-DRESS: the banner's look as a class, so a skin's sheet can dress it (ui/enhanced/enhancedPlusStyle.js). */
 export const GATE_BANNER_STYLE_ID = 'dagger-gate-banner-style';
 export const GATE_BANNER_CSS = `
 .wb-gate-banner { position: fixed; left: 50%; top: ${GATE_BANNER_TOP}; transform: translateX(-50%); pointer-events: none;

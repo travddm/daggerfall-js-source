@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE EFFECTS BATCH - DFU'S MAGIC, ACTIVATION AND BODY WORDS IN THE PLAYER'S LANGUAGE. Every
+// L10N3d: THE EFFECTS BATCH - DFU'S MAGIC, ACTIVATION AND BODY WORDS IN THE PLAYER'S LANGUAGE. Every
 // literal-key TextManager read in Game/MagicAndEffects/**, PlayerActivate, EnemyDeath, FPSWeapon, EnablePlayerTorch,
 // PlayerEntity, ClimbingMotor and the Sanguine Rose/Skull that the port shows, read where it is shown. Pinned, through
 // the port's own functions: each answers a translation's row in French and its own English, byte for byte, before

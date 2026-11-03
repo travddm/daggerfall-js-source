@@ -1,5 +1,4 @@
-// URBANIZER U3 (2026-10-26; KPbICA's spec, forwarded by the owner: "Inner yards and backyards", "Wide main streets with
-// pathways, alleys, side streets, dead ends"; bible/03-World/Urban-Fabric.md section 4): a town's fabric read off its own
+// URBANIZER U3: a town's fabric read off its own
 // blocks - its main streets along Daggerfall's roads from its gates to its middle with their pavements, its side streets,
 // its alleys, its fenced yards with their gates, its dead ends - and no cell a walker reached before cut off.
 import { test } from 'node:test';
@@ -77,7 +76,6 @@ test('URBANIZER U3 the main streets: from each end to the middle along Daggerfal
   let mains = 0, paves = 0;
   for (let i = 0; i < plan.kind.length; i++) {
     if (plan.kind[i] === K.main) { mains++; assert.ok(dist(i) <= FABRIC.carriage + 1e-9, 'setts within the carriageway'); }
-    // PIN MOVED (TOWN-BOARDS): a pavement is the carriageway's ring by the eight ways, or the carriageway before a house -
     // it had been the band within 3.5 of the walk in straight lines (test/world/urban/townboards.test.js)
     if (plan.kind[i] === K.pave) {
       paves++;
@@ -90,7 +88,7 @@ test('URBANIZER U3 the main streets: from each end to the middle along Daggerfal
   const p0 = plan.paths[0][Math.floor(plan.paths[0].length / 2)], x0 = p0 % W, z0 = Math.floor(p0 / W);
   assert.equal(plan.kind[(z0 + 3) * W + x0], K.pave);
   assert.equal(plan.kind[(z0 + 1) * W + x0], K.main);
-  assert.deepEqual([FABRIC.carriage, FABRIC.kerb, FABRIC.pave], [2.5, 1, 1]);   // PIN MOVED (TOWN-BOARDS): the kerb a ring a cell deep, no longer 3.5 of the walk
+  assert.deepEqual([FABRIC.carriage, FABRIC.kerb, FABRIC.pave], [2.5, 1, 1]);
   // a cell of dirt by a house on wide open ground is open ground, not an alley: a corridor's width is its middle's
   assert.equal(plan.kind[cellOf(0, 0, 25, 15, W)], K.open);
   const village = fabricPlan(g, { ends: [[0, 30], [W, 30]], mains: false });

@@ -202,7 +202,6 @@ test('every hood fix strip sits on its body strip\'s canvas, and decodeLayered l
 test('LAYERED-GEAR: a skin chosen on the profile, not a feature\'s dial - off, female, male or the character\'s own (LAYERED-GEAR-ON: the default), and the look carries the body (mutants: LAYERED-ON-default-off, LAYERED-ON-own-unread)', () => {
   _resetModSettings();
   const V = 'eye-of-the-beholder', key = MOD_SETTINGS[V].keys['Graphics.LayeredGear'];
-  // PIN MOVED (LAYERED-GEAR-ON, the owner 2026-10-19: "Make sure this is on by default"): on, in the character's own body
   assert.equal(key.default, LAYERED_OWN, 'on until Skins is chosen');
   assert.equal(LAYERED_OWN, 3);
   assert.deepEqual([...key.labels], ['Off', 'Female', 'Male', 'Your own body']);

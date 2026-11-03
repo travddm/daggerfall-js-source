@@ -1,7 +1,5 @@
 // @ts-check
-// EVENT-TIP (2026-09-28, Mac, answering how the gate's sealed hours should read: "I also want to add a tooltip to the
-// map for these type of events. I think we should fold in the raid PR in the repo, since it has a new type of world
-// event also"): THE WORLD'S EVENTS ON THE HELD MAP, AND THE CARD EACH ANSWERS A HOVER WITH.
+// EVENT-TIP: THE WORLD'S EVENTS ON THE HELD MAP, AND THE CARD EACH ANSWERS A HOVER WITH.
 //
 // Two kinds stand on the enhanced map: the Oblivion Gate's ring (WB1, ui/gate/gateMapMark.js) and a TOWN UNDER ATTACK
 // (RAID1, systems/raidingParties.js) - a raided town while its raid runs: begun, not withdrawn, not cleansed. Each
@@ -35,7 +33,7 @@ export const TIP_TEXT_MAX = 80;
 /** SEAT-TIP (FIELD BUGS 2026-10-04e): a seat's card says whole sentences - its holder's and its battle's each name two
  *  guilds and run past 80 - so its lines are bounded here instead (the card wraps them in its 320 px). */
 export const SEAT_TIP_TEXT_MAX = 160;
-/** TOWN-ECON (bible/06-Systems/Town-Economy-Arc.md 3): a town's card holds its economy's lines above a held seat's own
+/** TOWN-ECON (3): a town's card holds its economy's lines above a held seat's own
  *  four (net/townEconLaw.js townTipOf: the economy, the prices, one reason, then the guild's lines - AUDIT TOWN-ECON UI-1:
  *  a held seat's Charter line left out, its holder line naming the guild), so it is bounded here. TE3's patrons' line
  *  comes last and only where the card has room for it (townEconLaw.js TOWN_TIP_PATRONS_ROOM - AUDIT TOWN-ECON 2 LIV-3,
@@ -59,7 +57,7 @@ export const raidPartyWord = (type) => { const w = raidTypeName(type); return w[
  * every raid RUNNING now (raidActive: begun, not withdrawn, not cleansed) at its town's pixel, with its label and its
  * tip. The deaths are said only once some are known here (a raid another runner holds counts none on this machine).
  * @param {ReadonlyArray<any>|null|undefined} raids systems/raidingParties.js raidState().raids
- * TIME1 (bible/06-Systems/Online-Time-Arc.md section 7): online a raid's withdrawal is said in this machine's LOCAL time
+ * TIME1: online a raid's withdrawal is said in this machine's LOCAL time
  * (`localTime`: the event clock's minute as "HH:MM", or null) - the raids keep the event clock's schedule and the sky the
  * player sees turns at its own rate, so the event clock's game time would contradict the clock in front of them.
  * Offline, or with no local time to say, the game clock's, as before: offline the sky is the one clock.
@@ -112,10 +110,10 @@ export function readRaidMarks(fn, size = BAY) {
   return readRaidMarksIn(fn, { x0: 0, y0: 0, w: size.width, h: size.height });
 }
 
-/** BAY-LEFT-MAPS (bible/10-UI/Held-Map-Arc.md): the raided towns (and STAR6's stars) over a BOX of map pixels (`box` {x0, y0,
+/** BAY-LEFT-MAPS: the raided towns (and STAR6's stars) over a BOX of map pixels (`box` {x0, y0,
  *  w, h} - the held map's sheet: the continent's frame while it is shown, the Bay's own rectangle else), as the bounties
  *  are read (ui/bounty/bountyMapMark.js readBountyMarksIn): a town past the Bay the host marks is drawn where the Bay's
- *  1000 x 500 dropped it. The Bay's own box is readRaidMarks', to the pixel. WW6 (bible/03-World/World-Wide.md WW6) read
+ *  1000 x 500 dropped it. The Bay's own box is readRaidMarks', to the pixel. WW6 (WW6) read
  *  its raids over the same sheet with a reader of its own; the two met at AUDIT BAY-LEFT's merge, and this is the one.
  *  @param {(() => any) | undefined} fn @param {{x0:number, y0:number, w:number, h:number}} box */
 export function readRaidMarksIn(fn, box) {

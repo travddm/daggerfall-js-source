@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ADMIT-LINE (2026-10-11, Mac: "I think the issue is so many people logging in at once. We need to implement a queue
-// system"): THE SIGN-IN LINE.
+// ADMIT-LINE: THE SIGN-IN LINE.
 //
 // Every deploy that moves the relay drops every player, and every one of them signs in again in the same minute - a
 // guest row or a login, a token mint, the session's read - each a dozen D1 statements, and the database refused as

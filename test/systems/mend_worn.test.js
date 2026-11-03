@@ -1,12 +1,10 @@
-// MEND-WORN (2026-10-07, Mac: "Now we just gotta fix the 'repairs objects' not working"; asked, "Weapons as a classic
-// dagger"). Repairs Objects ran - a point every four rounds, on the FIRST piece below its condition in the whole pack,
+// MEND-WORN. Repairs Objects ran - a point every four rounds, on the FIRST piece below its condition in the whole pack,
 // DFU's law since 2022 (RepairsObjects.cs:86-101). The port's default pack is Roleplay & Realism's: its kit worn to
 // 30-75%, its loot at 20-75%, beside the port's own pieces whose condition is their uses. So every tick went to the
 // oldest worn thing carried and nothing worn was seen to mend, and WEAPON-POOL's pools left a weapon a point a tick.
 // Now: what is worn first, the most worn first, then the pack (the repair kit's order - one export); never what a
 // smith refuses (a quiver, a light's fuel, a supply's doses); a weapon on the pool mends a classic dagger's share, 32.
 // Every piece is minted by its real producer, and the rounds are the pump's.
-// PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): the share is every piece's now - a fiftieth of its own condition
 // (repairsObjectsMend), armour, clothing and uses alike - where MEND-WORN gave it to a pool weapon alone and left the
 // rest DFU's point. test/systems/fb1016b_mendarmour.test.js holds the report.
 import { test } from 'node:test';
@@ -90,7 +88,6 @@ test('MEND-WORN: the field - Roleplay & Realism\'s kit put on, beside its worn l
     tick(p, round, true);
     const moved = p.items.filter((it) => it.currentCondition !== before.get(it));
     assert.deepEqual(moved.map((it) => it.name), [want.name], `round ${round}: one piece, the worn one with the least share left`);
-    // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): the blade by 32 and the rest by DFU's point, then; every piece its fiftieth now
     assert.equal(want.currentCondition - before.get(want), Math.min(repairsObjectsMend(want), want.maxCondition - before.get(want)));
   }
   const mended = (it) => it.currentCondition - start.get(it);
@@ -98,7 +95,6 @@ test('MEND-WORN: the field - Roleplay & Realism\'s kit put on, beside its worn l
   assert.deepEqual(p.items.filter((it) => it.equipSlot == null && mended(it) !== 0).map((it) => it.name), [], 'nothing carried was touched');
 });
 
-// PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): "every other piece DFU's point" - a Daedric weapon 32 (0.25%), an iron
 // cuirass and a shirt 1 - is every piece's fiftieth now; the iron dagger's 32 is the same number.
 test('MEND-WORN: a weapon on the pool mends the share a classic Dagger did - 32 a tick, iron 2% - and since MEND-ARMOUR every piece the same share of its own condition, never under DFU\'s point, and nothing past its condition', () => {
   assert.equal(MEND_SHARE_OF, ITEM_TEMPLATES[WEAPONS.Dagger].hitPoints, 'the Dagger row\'s 50');
@@ -123,7 +119,6 @@ test('MEND-WORN: a weapon on the pool mends the share a classic Dagger did - 32 
   assert.equal(nearly.currentCondition, nearly.maxCondition);
 });
 
-// PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR, then its AUDIT): MEND-ARMOUR gave uses a fiftieth as it gave every piece;
 // the audit found the round runs through every rest too (one 8-hour rest refilled a spent Cast When Used piece: 100 casts),
 // so a charge keeps DFU's point - test/systems/fb1016b_mendarmour.test.js holds the rest.
 test('MEND-WORN: a magic item\'s and an artifact\'s condition is their uses, not the pool - each mends DFU\'s point (MEND-ARMOUR\'s audit: a charge is not wear), and the artifact keeps its own maximum', () => {
@@ -176,7 +171,6 @@ test('MEND-WORN: an enchanted piece mends only under AllowMagicRepairs - the Wal
     assert.equal(getBool('Controls', 'AllowMagicRepairs'), true, 'the port\'s default');
     const [w0, h0] = [wall.currentCondition, helm.currentCondition];
     tick(p, 4, getBool('Controls', 'AllowMagicRepairs'));
-    // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): a point each, then; a fiftieth of each one's own now (2,048 and 2,560)
     assert.deepEqual([wall.currentCondition - w0, helm.currentCondition - h0], [41, 0], '"The gate fell; this did not." - the most worn, itself');
     setValue('Controls', 'AllowMagicRepairs', 'False');
     tick(p, 8, getBool('Controls', 'AllowMagicRepairs'));
@@ -191,7 +185,6 @@ test('MEND-WORN: through the pump every host shares, a worn piece mends once eve
   const p = wearing([cuirass]);
   const from = cuirass.currentCondition;
   assert.equal(runMagicRoundsFor(p, 0, 40, { sinks: {} }), 40);
-  // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): +10, a point a tick, then - the cuirass's fiftieth, 82, a tick now
   assert.equal(cuirass.currentCondition - from, 10 * 82, 'rounds 4, 8 ... 40');
   const foesCuirass = at(armorOfMaterial(CUIRASS, IRON_PLATE), 50);
   const foe = wearing([foesCuirass]);

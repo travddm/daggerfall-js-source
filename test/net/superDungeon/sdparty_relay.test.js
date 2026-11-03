@@ -1,5 +1,4 @@
-// SD-PARTY (2026-10-28, the owner: "we need to make this a party instance ... to stop griefin on the bosses";
-// bible/11-Multiplayer/Super-Dungeons.md SD-PARTY): EACH PARTY ITS OWN SHATTERED HOUR. A realm is `sd:<s>.<owner>`, and
+// SD-PARTY: EACH PARTY ITS OWN SHATTERED HOUR. A realm is `sd:<s>.<owner>`, and
 // its door admits the owner, staff and the owner's party alone - the hub's party word, through the real Room and hub.
 // One life and one win a Hollow hold across every copy: a death in one copy, or a receipt for the slot, shuts the rest.
 // And the page picks its party's copy (scenes/superDungeon/sdCopy.js). SD-BACK: a death keeps its own copy open to it.
@@ -8,6 +7,7 @@
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { mintToken, _b64url } from '../../../src/net/identityToken.js';
 import { fakeRooms } from '../../fakeRoom.mjs';
 import { SD_KEY, SD_INTERNAL_FELL, SOCIAL_ROOM, PIXEL_UNITS, worldRoom, chatRegionRoom, sdReceiptKey } from '../../../src/net/wire.js';
 import { sdRoomKey, isSdRoom, SD_NO_FALLEN, SD_NO_FULL, SD_NO_CLOSED, SD_PUB_SEATS, SD_PUB_MAX, SD_COLLAPSE_MS, sdPubOwner, isSdPubOwner } from '../../../src/net/superDungeon/sdLaw.js';
@@ -138,7 +138,7 @@ test('SD-PARTY ONE WIN A HOLLOW: an account holding this slot\'s receipt is refu
 
 test('SD-PARTY THE HUB\'S DOOR: a realm\'s word is its slot, an account, may or down, and its copy\'s owner - anything else refused (mutants: a bad op believed; the owner unread)', () => {
   const o = '0123456789abcdef';
-  assert.deepEqual(validSdAcct({ s: 4, a: 'acct-peer-ann', op: 'down', o }), { s: 4, a: 'acct-peer-ann', op: 'down', o });   // PIN MOVED (SD-BACK): and the copy
+  assert.deepEqual(validSdAcct({ s: 4, a: 'acct-peer-ann', op: 'down', o }), { s: 4, a: 'acct-peer-ann', op: 'down', o });
   assert.deepEqual(validSdAcct({ s: 4, a: 'acct-peer-ann', op: 'may', o: 'p3' }), { s: 4, a: 'acct-peer-ann', op: 'may', o: 'p3' }, 'a shared Hour');
   for (const bad of [null, [], { s: 0, a: 'acct-peer-ann', op: 'may', o }, { s: 4, a: 'x', op: 'may', o }, { s: 4, a: 'acct-peer-ann', op: 'kill', o }, { s: 4, a: 'acct-peer-ann', op: 'up', o }, { s: 4, a: 'acct-peer-ann', op: 'may' }, { s: 4, a: 'acct-peer-ann', op: 'may', o: 'p99' }]) assert.equal(validSdAcct(bad), null, JSON.stringify(bad));
 });
@@ -158,16 +158,16 @@ test('SD-PARTY THE PAGE PICKS ITS PARTY\'S HOUR: the kept copy while it is this 
   assert.equal(await c.ownerFor(1), D);
   assert.deepEqual(store.get(SD_COPY_KEY), { s: 1, a: me, o: D, p: 'pt1' }, 'kept on the device');
   assert.equal(await createSdCopy({ social: () => null }).ownerFor(1), null, 'no account, no Hour');
-  // PIN MOVED (SD-SOLO): alone, the relay's walk names the shared Hour; no answer, my own
   const asked = [];
-  const solo = (n, party = null) => createSdCopy({ social: () => ({ acct: me, party }), relay: () => 'wss://relay.test/', fetchImpl: async (u) => { asked.push(String(u)); return new Response(JSON.stringify({ n })); } });
+  const solo = (n, party = null) => createSdCopy({ social: () => ({ acct: me, party }), relay: () => 'wss://relay.test/', token: async (room) => `tok-for-${room}`, fetchImpl: async (u, init) => { asked.push(`${u} ${init?.headers?.authorization}`); return new Response(JSON.stringify({ n })); } });
   const M = await instanceOwnerOf(me);
   assert.equal(await solo(3).ownerFor(1), 'p3', 'the walk\'s Hour');
-  assert.deepEqual(asked, [`https://relay.test/sd/open?s=1&o=${M}`]);
+  assert.deepEqual(asked, [`https://relay.test/sd/open?s=1&o=${M} Bearer tok-for-sd:open`], 'with the token');
   assert.equal(await solo(3, { id: 'pt9', leader: me, members: [{ acct: me }] }).ownerFor(1), 'p3', 'a party of one is alone');
   assert.equal(await solo(null).ownerFor(1), M, 'none open: my own');
   assert.equal(await createSdCopy({ social: () => ({ acct: me }), relay: () => 'wss://r.test', fetchImpl: async () => { throw new Error('down'); } }).ownerFor(1), M, 'the relay silent: my own');
   assert.equal(await createSdCopy({ social: () => ({ acct: me }) }).ownerFor(1), M, 'no relay: my own');
+  assert.equal(await createSdCopy({ social: () => ({ acct: me }), relay: () => 'wss://r.test', fetchImpl: async () => { throw new Error('asked'); } }).ownerFor(1), M, 'no token: not asked');
   assert.deepEqual([sdRelayHttp('wss://a.b/'), sdRelayHttp('ws://localhost:8787'), sdRelayHttp('ftp://x'), sdRelayHttp(null)], ['https://a.b', 'http://localhost:8787', null, null]);
 });
 
@@ -193,10 +193,13 @@ test('SD-SOLO A SHARED HOUR: `sd:<s>.p<n>` admits anyone in no party to SD_PUB_S
 
 test('SD-SOLO THE WORKER\'S WALK: the first shared Hour that holds me, else the first open - in order, so the one I am in comes first; a silent one ends it (mutants: the open passed over; the holder passed over; the walk unbounded)', async () => {
   const me = '0123456789abcdef';
+  const kp = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+  const tok = await mintToken({ s: 'acct-walker', n: 'Walker', k: 'guest' }, kp.privateKey, { subtle: crypto.subtle, nowS: Math.floor(Date.now() / 1000) });
+  const who = { ip: '203.0.113.7', tok, key: kp.publicKey };
   const walk = async (rooms) => {
     const asked = [];
     const env = { ROOMS: { idFromName: (n) => n, get: (n) => ({ fetch: async () => { asked.push(n); const r = rooms[asked.length - 1]; return r ? new Response(JSON.stringify(r)) : new Response('{}', { status: 503 }); } }) } };
-    const res = await sdOpenDoor(env, new URL(`https://relay.test/sd/open?s=4&o=${me}`));
+    const res = await sdOpenDoor(env, new URL(`https://relay.test/sd/open?s=4&o=${me}`), who);
     return [(await res.json()).n, asked];
   };
   assert.deepEqual(await walk([{ ok: true, has: false, open: true }]), [0, ['sd:4.p0']]);
@@ -204,10 +207,11 @@ test('SD-SOLO THE WORKER\'S WALK: the first shared Hour that holds me, else the 
   assert.deepEqual((await walk([{ has: false, open: false }, { has: true, open: false }]))[0], 1, 'the one that holds me, full or not');
   assert.deepEqual((await walk([{ has: false, open: false }]))[0], null, 'a silent room ends the walk');
   assert.deepEqual((await walk(Array(SD_PUB_MAX + 5).fill({ has: false, open: false })))[1].length, SD_PUB_MAX, 'bounded');
-  const bad = await sdOpenDoor({ ROOMS: { idFromName: (n) => n, get: () => ({}) } }, new URL('https://relay.test/sd/open?s=4&o=p1'));
+  const bad = await sdOpenDoor({ ROOMS: { idFromName: (n) => n, get: () => ({}) } }, new URL('https://relay.test/sd/open?s=4&o=p1'), who);
   assert.equal(bad.status, 400, 'a digest, never a shared owner');
   const worker = (await import('../../../server/src/index.js')).default;
-  const res = await worker.fetch(new Request(`https://relay.test/sd/open?s=4&o=${me}`), { ROOMS: { idFromName: (n) => n, get: () => ({ fetch: async () => new Response(JSON.stringify({ has: false, open: true })) }) } });
+  const IDENTITY_PUBLIC_KEY = _b64url.encode(new Uint8Array(await crypto.subtle.exportKey('raw', kp.publicKey)));
+  const res = await worker.fetch(new Request(`https://relay.test/sd/open?s=4&o=${me}`, { headers: { authorization: `Bearer ${tok}` } }), { IDENTITY_PUBLIC_KEY, ROOMS: { idFromName: (n) => n, get: () => ({ fetch: async () => new Response(JSON.stringify({ has: false, open: true })) }) } });
   assert.deepEqual([res.status, (await res.json()).n, res.headers.get('access-control-allow-origin')], [200, 0, '*'], 'the Worker\'s door');
 });
 

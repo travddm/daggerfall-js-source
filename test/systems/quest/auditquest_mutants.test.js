@@ -1,4 +1,4 @@
-// AUDIT-QUEST - THE THREE MUTANTS THE WHOLE SUITE LET LIVE (2026-09-15).
+// AUDIT-QUEST - THE THREE MUTANTS THE WHOLE SUITE LET LIVE.
 //
 // The campaign: 77 mutants over the 21 modules of `src/systems/quest`,
 // the file list DERIVED (AUDIT-TALK's harness took a hand-written

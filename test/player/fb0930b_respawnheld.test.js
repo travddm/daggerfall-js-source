@@ -1,6 +1,4 @@
-// RESPAWN-HELD (2026-09-30, FIELD BUGS 2026-09-30b - BrixBlox's "Spawned in the air after dying": "One time I died in a
-// dungeon, and for some reason I respawned high enough in the air to kill me with fall damage"; bible/01-Overview/
-// Field-Bugs-2026-09-30b.md). RESPAWN-GROUND stood the eye on the new pixel and read the right one, and the landing
+// RESPAWN-HELD. RESPAWN-GROUND stood the eye on the new pixel and read the right one, and the landing
 // found the ground - but the FRAMES of the teleport's awaited build still stepped the motor. An outdoor death's screen
 // holds it through the await (townTalk's slot outlives it); a dungeon's went with forceExitToExterior before the await,
 // so the body, stood over the new pixel at the dungeon's own height, fell through the half-built world onto the models'
@@ -34,7 +32,6 @@ const heightCell = TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1);
 /** The host's own ground over `built` (its heightAt, lifted) - one flat pixel at `h` a build. */
 function ground(state) {
   const built = new Map();
-  // PIN MOVED (FLORA-GROUND): the lifted body walks the ground's one law, terrainSurface.js walkGroundAt
   const heightAt = new Function('state', 'built', 'TERRAIN_SIZE', 'HEIGHTMAP_DIMENSION', 'heightCell', 'worldHeight', 'deepWaters', '_htT', 'walkGroundAt', HEIGHT)(
     state, built, TERRAIN_SIZE, HEIGHTMAP_DIMENSION, heightCell, worldHeight, null, [0, 0, 0], walkGroundAt);
   const build = (px, py, h) => built.set(`${px},${py}`, { px, py, samples: new Float32Array(HEIGHTMAP_DIMENSION ** 2).fill(h / worldHeight) });
@@ -119,7 +116,7 @@ test('RESPAWN-HELD the latch: the arrival\'s latch is up from the teleport\'s fi
   assert.equal(new Function('_seasonHoldKey', '_seasonStraightening', '_partyArrivalPending', `return ${HELD[1]};`)(null, false, true), true, 'party validation also holds the motor');
   assert.equal(heldWhile(true), true, 'an arrival holds the motor');
   assert.equal(heldWhile(false), false, 'and nothing else here does');
-  assert.match(W, /if \(_overlayHeld \|\| _seasonHeld \|\| _rideHeld\) player\.holdFrame\(\);/);   // PIN MOVED (WAGONS1): a rider's held motor too
+  assert.match(W, /if \(_overlayHeld \|\| _seasonHeld \|\| _rideHeld\) player\.holdFrame\(\);/);
   assert.match(W, /if \(!_overlayHeld && !_seasonHeld && !_rideHeld\) player\.update\(dt,/);
   assert.match(W, /if \(!_seasonHeld\) applyFallLanding\(playerEntity, player\.landedFallDistance,/);
   // why the dungeon needed it: its death screen is the mode's own, and the exit takes it before the await

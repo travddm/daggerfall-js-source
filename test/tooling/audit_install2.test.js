@@ -1,4 +1,4 @@
-// AUDIT INSTALL, ROUND 2 (2026-09-29, Mac: "Audit this"): PR #429's
+// AUDIT INSTALL, ROUND 2: PR #429's
 // install work read again by five fresh lanes - the launcher's lifecycle,
 // security, the release pipeline and its notes, ARENA2 detection, and the
 // tests, docs and the player's eye - after round 1's fixes had landed.
@@ -6,7 +6,7 @@
 // one of them: L1-5 kept a tag's text out of the build legs' scripts, and
 // in doing so broke the Windows leg. Every finding a lane verified is
 // fixed at its root and pinned here; the record, finding by finding, is
-// bible/01-Overview/audits/Audit-Install.md ("Round 2"). Lane C's notes findings
+// ("Round 2"). Lane C's notes findings
 // (C1, C4, E-48..E-51) pinned the PATCH-NOTES-*.md reader REL6 retired -
 // the notes come off the pull requests now (test/tooling/rel4_release.test.js).
 import { test } from 'node:test';

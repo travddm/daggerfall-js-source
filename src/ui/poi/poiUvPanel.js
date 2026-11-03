@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-5 (2026-10-14) - THE UV EDITOR'S PANEL: ONE MATERIAL'S UVS OVER ITS PICTURE.
+// POI-5 - THE UV EDITOR'S PANEL: ONE MATERIAL'S UVS OVER ITS PICTURE.
 //
-// Mac: "Full UV editor" (bible/06-Systems/POI-Editor-Arc.md POI-5). A dialog over the POI editor, drawn on a canvas -
+// (POI-5). A dialog over the POI editor, drawn on a canvas -
 // the material's picture as it is (u right, v down from its top: poi/uv/uvMesh.js's order), the square's grid, every face
 // of the material, the seams red, the selection lit - over the UV editor's hands (poi/uv/uvEdit.js):
 //

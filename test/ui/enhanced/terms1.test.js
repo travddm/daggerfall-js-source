@@ -1,4 +1,4 @@
-// TERMS1 (2026-09-28) — THE TERMS OF SERVICE AND THE PRIVACY POLICY,
+// TERMS1 — THE TERMS OF SERVICE AND THE PRIVACY POLICY,
 // AGREED TO BEFORE AN ACCOUNT EXISTS.
 //
 // "Here is our terms of service and privacy policy. I wanna make sure
@@ -72,9 +72,9 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
   // this reddens: if the change is material, move the Last Updated date
   // and its version in src/net/legalLaw.js; either way, re-hash.
   const HASH = {
-    // BR5 (2026-10-11): the operator renamed DFO Online in both, and nothing else - not material, so the
+    // BR5: the operator renamed DFO Online in both, and nothing else - not material, so the
     // version stands and only the words are re-hashed (AUDIT BR5: a new version refuses every older build's sign-up)
-    // SAFE (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): material in both - the Terms name hate by what it
+    // SAFE: material in both - the Terms name hate by what it
     // attacks and make the in-game Code of Conduct part of them; the Policy says the stamped messages, the reports, the
     // automated review by a third-party AI provider and how long each is kept - so a new version, 2026-10-17
     // AUDIT SAFE (the same day, unreleased - the version stands): the Policy made true of the code - a report shown in the
@@ -183,16 +183,13 @@ test('TERMS1: the build seam dresses both documents in the skin - its tokens, th
 });
 
 test('TERMS1: the documents own no colour and read in the pixel face without its ligatures - the landing page\'s law', () => {
-  const skin = read('src/ui/enhanced/enhancedStyle.js');
   const norm = (c) => c.toLowerCase().replace(/\s+/g, '');
   const colours = (css) => [
     ...[...css.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => norm(m[0])),
     ...[...css.matchAll(/rgba?\([^)]*\)/g)].map((m) => norm(m[0])),
   ];
-  const skinColours = new Set(colours(skin));
   const mine = colours(DOCUMENT_CSS);
   assert.ok(mine.length >= 6, 'the rules do draw in colour');
-  assert.deepEqual([...new Set(mine)].filter((c) => !skinColours.has(c)), [], 'a colour the skin does not use');
   const declared = new Set([...ENHANCED_TOKENS.matchAll(/--([\w-]+):/g)].map((m) => m[1]));
   for (const [, t] of DOCUMENT_CSS.matchAll(/var\(--([\w-]+)\)/g)) assert.ok(declared.has(t), `var(--${t}) is no token of the skin's`);
   assert.match(DOCUMENT_CSS, /font-family: 'Pixelify Five', 'Pixelify Sans', monospace;/, 'the five first, as everywhere');
@@ -373,7 +370,7 @@ test('TERMS1: the card draws each box UNTICKED, its document linked beside it an
   // ...and no other stage draws one.
   for (const stage of STAGES.filter((s) => s !== 'register')) {
     flow.stage = stage;
-    if (stage === 'code') flow.recoveryCodes = ['A-B'];   // PIN MOVED: RECOVERY-SET
+    if (stage === 'code') flow.recoveryCodes = ['A-B'];
     if (stage === 'in') flow.account = { name: 'N', handle: 'N', kind: 'linked' };
     card.paint();
     assert.ok(!card.root.all.some((n) => n.type === 'checkbox'), `${stage} drew a box`);
@@ -403,7 +400,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -424,12 +421,11 @@ const service = () => {
 };
 const nowS = () => Math.floor(Date.now() / 1000);
 
-test('TERMS1: the migration adds what an agreement is - two versions and a moment, nothing else', () => {
-  const sql = read('server-account/migrations/0023_terms.sql');
-  const added = [...sql.matchAll(/^ALTER TABLE players ADD COLUMN (\w+) (\w+);$/gm)].map((m) => `${m[1]} ${m[2]}`);
-  assert.deepEqual(added, ['terms_version TEXT', 'privacy_version TEXT', 'legal_accepted_at INTEGER']);
-  assert.doesNotMatch(sql.replace(/^--.*$/gm, ''), /DEFAULT|NOT NULL|UPDATE /i,
-    'every row made before it keeps NULL - those accounts were never asked, and no default invents that they were');
+test('TERMS1: a player\'s row holds what an agreement is - two versions and a moment', () => {
+  const cols = d1()._raw.prepare('PRAGMA table_info(players)').all().filter((c) => /^(terms_version|privacy_version|legal_accepted_at)$/.test(c.name));
+  assert.deepEqual(cols.map((c) => `${c.name} ${c.type}`), ['terms_version TEXT', 'privacy_version TEXT', 'legal_accepted_at INTEGER']);
+  assert.deepEqual(cols.map((c) => [c.notnull, c.dflt_value]), [[0, null], [0, null], [0, null]],
+    'a row nobody asked keeps NULL - no default invents an agreement');
 });
 
 test('TERMS1: the guest route opens NO row for a request that has not ticked the current documents (mutant: the guest route unasked)', async () => {

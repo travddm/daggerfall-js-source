@@ -1,8 +1,8 @@
 import { giveNavalItems } from '../../src/systems/naval/navalTransfer.js';
 import { goldStack } from '../../src/systems/inventory.js';
 import { mintStores } from '../../src/systems/naval/navalStores.js';
-// AUDIT WATCH-KIT (2026-10-01, Mac: "Just want to audit this to make sure it's perfection") - the audit of PR #502
-// (SHIP-WATCH, COMPANION-KIT; bible/01-Overview/audits/Audit-Watch-Kit.md). This suite pins the HOSTS' side of the companions
+// AUDIT WATCH-KIT - the audit of PR #502
+// (SHIP-WATCH, COMPANION-KIT). This suite pins the HOSTS' side of the companions
 // (lenses U and P): another player's companion by his own name, the cards off the ship's plate while I sail, the panel
 // online with no account, his pack read by his key, a dungeon's load lifting the party, and a pack never thrown away -
 // his gold into my purse. Each test fails on the code as #502 stood, for its finding's reason.

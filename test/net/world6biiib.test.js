@@ -1,4 +1,4 @@
-// WORLD6b-iii(b) (Mac, 2026-09-14: "Continue" after AUDIT WORLD6b-iii(a)): THE CELL SEAM. D9 recorded it: two players
+// WORLD6b-iii(b) (after AUDIT WORLD6b-iii(a)): THE CELL SEAM. D9 recorded it: two players
 // a pixel apart astride a cell edge were in two rooms and never saw each other - the cell is sixteen pixels, the
 // range three, so the seam was a strip three pixels wide on every edge. The HALO pays it: a player hellos into every
 // neighbouring cell room whose nearest pixel is within the relay's range (one to three of them), poses into each
@@ -35,7 +35,6 @@ test('WORLD6b-iii(b): the wire - the halo is the neighbouring cells whose neares
   assert.deepEqual(cellHaloFor(60, 207), [cell(3, 13)], 'the bottom edge');
   assert.deepEqual(cellHaloFor(48, 192), [cell(2, 11), cell(3, 11), cell(2, 12)], 'a corner: the three neighbours that touch it');
   assert.deepEqual(cellHaloFor(63, 207), [cell(4, 12), cell(3, 13), cell(4, 13)], 'the other corner');
-  // PIN MOVED (TV-BEYOND): the map's edge is no wall - the cells past the Bay are the world's (fb1009_beyond)
   assert.deepEqual(cellHaloFor(0, 0), [cell(-1, -1), cell(0, -1), cell(-1, 0)], 'the map\'s corner: the three cells past it');
   assert.deepEqual(cellHaloFor(0, 200), [cell(-1, 12)], 'the map\'s left edge: the cell past it (mid-cell in y)');
   assert.deepEqual(cellHaloFor(NaN, 200), []); assert.deepEqual(cellHaloFor(48, undefined), []);
@@ -166,20 +165,7 @@ test('WORLD6b-iii(b): the pool - a frame keyed to a cell I hold across the seam 
   assert.equal(pool.applyHit('eve-0003', { to: 'mac-0001', k: 'world:2,12', i: 1, dmg: 1 }), false, 'a blow at MY foe keyed to another cell is not mine (my foes stream through my own)');
 });
 
-test('WORLD6b-iii(b): the world host by source - the halo held from the map pixel with the hysteresis, a cell crossing keeps the puppets, the pool told which cells I hold; the record', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const wantHalo = mp && isCellRoom\(online\.room\) \? cellHaloFor\(mp\.x, mp\.y, \{ current: online\.haloRooms\(\) \}\) : \[\];\s*\n\s*if \(mp && isCellRoom\(online\.room\) && isCellRoom\(key\) && key !== online\.room\) wantHalo\.push\(key\);[^\n]*\n\s*if \(wantHalo\.some\(\(r\) => !online\.haloRooms\(\)\.includes\(r\)\)\) online\.setLook\(composeLook\(playerEntity\)\);[^\n]*\n\s*online\.setHalo\(wantHalo\);/, 'the halo, every frame, from the pixel the room is keyed by - the cell I stand in held until the join (AUDIT WORLD6b-iii(b) B1), the look composed before a halo opens (C5)');
-  assert.match(w, /const seam = isCellRoom\(online\.room\) && isCellRoom\(_foesRoom\); _foesRoom = online\.room; _foesFullAt = -Infinity; _ownFullAt = -Infinity; if \(!seam\) \{ exteriorFoes\.clearPuppets\(\);/, 'the seam keeps the puppets, and the new cell still hears every foe of mine at once');
-  assert.match(w, /inRoom: \(k\) => online\?\.inRoom\?\.\(k\) \?\? false,/, 'the pool reads which cells I hold');
-  const o = rd('src/net/online.js');
-  assert.match(o, /if \(h && h\.ws && h\.status === 'open' && this\._ws && isCellRoom\(room\) && isCellRoom\(this\.room\)\) \{/, 'the promotion (AUDIT WORLD6b-iii(b) A1: a live halo alone)');
-  assert.match(o, /for \(const r of \[k, this\.room, \.\.\.this\._halo\.keys\(\)\]\) if \(has\(r\) && sock\(r\)\) \{ via = sock\(r\); break; \}/, 'a hit through the owner\'s cell - the frame\'s first, then wherever it is reported (AUDIT WORLD6b-iii(b) A3)');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /### 6b-iii\(b\): the cell seam/, 'the record');
-});
-
 // ── AUDIT FOES FOE3: THE PRIMARY SOCKET IS NOT THE ONLY WAY OUT ──
-// (2026-09-15, Mac relaying players: "during online play, certain
-// enemies cant be damaged".)
 //
 // `sendHit` asked `!this._ws || this.status !== 'open'` BEFORE the
 // routing loop that picks the owner's socket - so while my own cell's

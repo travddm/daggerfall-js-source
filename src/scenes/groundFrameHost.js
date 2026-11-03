@@ -1,10 +1,9 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 //
-// BAY-LEFT-GROUND (2026-10-26, bible/03-World/Landforms.md "BAY-LEFT-GROUND"; the audit "no system left behind in the
-// Bay", D5): THE LIFT PAST THE BAY. `landformLiftAt` answered 0 off the Bay's 1000 x 500, so a height a record wrote past
+// BAY-LEFT-GROUND: THE LIFT PAST THE BAY. `landformLiftAt` answered 0 off the Bay's 1000 x 500, so a height a record wrote past
 // the Bay was in the shaped frame, not DFU's - and a save, a scene cache or an anchor loaded with the Landforms row off
 // kept the lift there (AUDIT LANDFORMS C1/B4's own case: a fall of over 100 HP). The lift answers on every pixel of the
 // world's grid now, through the place its build stands (the host's `_liftLocationAt`: past the Bay the build's own
@@ -15,7 +14,7 @@
 // `landformsHere({ before: true })`), then stood again as any record is: the lift is never put on twice. On the Bay a record was DFU's
 // frame already. The law is `recordFrame` (below), run over the lift this host makes.
 //
-// RELIEF-PEAKS (2026-10-27, bible/03-World/Tamriel.md RELIEF-PEAKS; GROUND_FRAME_LAW 3): DFU'S OWN GROUND MOVED PAST THE
+// RELIEF-PEAKS: DFU'S OWN GROUND MOVED PAST THE
 // BAY - its large map is WOODS.WLD's law of the small byte, where it stood a swell about 4.5 (a third of the land's height
 // left out). A record written before it past the Bay is in DFU's frame of its day, so it rides its ground's own move
 // (`movedAt`: world/landforms.js groundMovedField over today's reader and the one it was written on, tamrielGround.js

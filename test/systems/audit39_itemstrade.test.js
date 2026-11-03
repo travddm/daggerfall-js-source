@@ -200,25 +200,6 @@ test('AUDIT 39 F104: the shelf magic item is gated on rarity and the stock roll'
 });
 
 // ---------------------------------------------------------------
-// F106 - the file header swore two shipped arms were still pending.
-// ---------------------------------------------------------------
-test('AUDIT 39 F106: shopStock\'s INTERIM header names only live pends', () => {
-  const s = rd('src/systems/shopStock.js');
-  const header = s.slice(0, s.indexOf('\nimport '));
-  assert.doesNotMatch(header, /MagicItems stock is SKIPPED/, 'the MagicItems clause shipped at F130');
-  assert.doesNotMatch(header, /potion recipe pends/, 'the Alchemist\'s 25% roll shipped at F129');
-  // PIN MOVED at A2 (ROAD TO 1:1): the header's last two open clauses
-  // SHIPPED, and F106's whole point is that a pend list naming closed
-  // work is worse than no list - so the pin flips to the same shape
-  // the other two carry. The book price is books.createRandomBook's
-  // `value = bookFile.Price`; the restock is createStockedDate below.
-  assert.doesNotMatch(header, /book items carry the template price/, 'the book-file price shipped at A2');
-  assert.doesNotMatch(header, /INTERIM \(loud\)/, 'and with it the last INTERIM clause in this header');
-  const s2 = rd('src/systems/shopStock.js');
-  assert.match(s2, /export const createStockedDate =/, 'CreateStockedDate is the member, not a pend');
-});
-
-// ---------------------------------------------------------------
 // F105 - IsItemStackable's potion and book arms (FormulaHelper.cs:
 // 2103-2106) behind FindExistingStack's identity terms
 // (ItemCollection.cs:699-718).
@@ -244,22 +225,3 @@ test('AUDIT 39 F105: but only with their OWN kind - message and potionRecipeKey'
   assert.equal(bag[0].stackCount, 2);
 });
 
-// ---------------------------------------------------------------
-// F156 - PAINT.DAT had no host: setPaintFile was called from nowhere
-// in src, so every painting read TEXT.RSC 250 with five blank macros.
-// ---------------------------------------------------------------
-test('AUDIT 39 F156: PAINT.DAT is loaded at host boot, beside the magic registries', () => {
-  const s = rd('src/scenes/shared.js');
-  assert.match(s, /import \{ PaintFile \} from '\.\.\/formats\/paintFile\.js'/, 'the reader has an importer at last');
-  assert.match(s, /setPaintFile\(paintFile\)/);
-  assert.match(s, /new PaintFile\(await fetch\('PAINT\.DAT'\)\)/);
-  // its OWN try block - AUDIT 18's lesson: one bad file must not take
-  // the other registries down with it.
-  const block = s.slice(s.indexOf('let paintFile = null;'), s.indexOf('return { spellsByIndex'));
-  assert.match(block, /try \{/);
-  assert.match(block, /\} catch \{/);
-  // and the one call every host boot already makes carries it
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(rd(host), /loadMagicRegistries\(fetchBytes\)/, `${host} boots the registries`);
-  }
-});

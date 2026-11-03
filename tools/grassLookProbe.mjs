@@ -1,4 +1,4 @@
-// GRASS-LIT (2026-10-01): THE REAL WORLD'S GRASS, PHOTOGRAPHED. Boots the streaming world (`?world`) headless on
+// GRASS-LIT: THE REAL WORLD'S GRASS, PHOTOGRAPHED. Boots the streaming world (`?world`) headless on
 // SwiftShader at a ONE-square view radius (the shelf's land view and DFU's TerrainDistance, set before the page
 // loads - the default radius streams 121 squares and a software rasteriser never finishes), waits for the shot
 // flag, runs `EVAL` (shot mode's hooks: `__grassSpot(r, skip)` finds a field, `__pose` stands the camera on it),

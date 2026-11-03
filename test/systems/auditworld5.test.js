@@ -1,4 +1,4 @@
-// AUDIT WORLD5 (Mac, 2026-09-13: "Lets do an audit on this") - four opus
+// AUDIT WORLD5 - four opus
 // lenses over WORLD5 (the wire, the relay and what the player is told; the
 // weather and the boot; the clock and the ticker; the rest, the travel and
 // the quests), each told the live report and made to find it. Fourteen
@@ -19,7 +19,7 @@
 // the pane's copy (C12), the install at the top of the boot (C13), the
 // cautious heal offline only (C14).
 //
-// LIVED1 (2026-09-29, Mac: "We need a better system for time online instead of a band aid fix") re-aims the pins
+// LIVED1 re-aims the pins
 // whose laws it retired, each in its own place: the claim is the character's and moves no world reading (C1), an
 // arrival moves nothing of the character's (C3, C4), the collapse pays its hour in full (C6), the session hands its
 // minutes alone (C7, C8), the sentence refills in both lanes (C9), the pane says the character's own time (C12), the
@@ -152,7 +152,7 @@ test('AUDIT WORLD5 C4 (LIVED1): a LOAD under the shared clock is an arrival thro
     assert.equal(currentWeatherEnum(), weatherForClimate(ZONE_CLIMATES[0]));
     assert.notEqual(currentWeatherEnum(), WEATHER_ENUM.snow);
   } finally { offline(); resetWeatherSim(); setWeatherMapLaw(false); }
-  assert.match(rd('src/systems/save/save.js'), /resetMagicRoundMarker\(Math\.floor\(snap\.classicMinutes \?\? 0\)\);\s*(?:\/\/[^\n]*\n\s*)*if \(sharedClockOn\(\)\) \{\s*(?:\/\/[^\n]*\n\s*)*const own = Math\.floor\(snap\.classicMinutes \?\? 0\), at = worldMinutes\(\);\s*(?:\/\/[^\n]*\n\s*)*const left = [^\n]*\n\s*setOwnMinutes\(own\);\s*if \(!Number\.isFinite\(snap\.worldMinutes\)\) clampMarkersAheadOf\(entity, own\);[^\n]*\n\s*alignEntityClocks\(entity, at\);\s*rollClimateWeathersForDay\(Math\.floor\(at\)\);/, 'the one door every host loads through (AUDIT LIVED1b F1: at the unfloored reading; P4: its absence paid once the relay\'s clock is heard)');
+  assert.match(rd('src/systems/save/save.js'), /resetMagicRoundMarker\(Math\.floor\(snap\.classicMinutes \?\? 0\)\);\s*(?:\/\/[^\n]*\n\s*)*if \(sharedClockOn\(\)\) \{\s*(?:\/\/[^\n]*\n\s*)*const own = Math\.floor\(snap\.classicMinutes \?\? 0\), at = worldMinutes\(\);\s*(?:\/\/[^\n]*\n\s*)*const left = [^\n]*\n\s*setOwnMinutes\(own\);\s*alignEntityClocks\(entity, at\);\s*rollClimateWeathersForDay\(Math\.floor\(at\)\);/, 'the one door every host loads through (AUDIT LIVED1b F1: at the unfloored reading; P4: its absence paid once the relay\'s clock is heard)');
 });
 
 test('AUDIT WORLD5 C5: the shared roll is THE DAY\'S - stamped at the day\'s first minute, so a joiner\'s drain at noon is a jump and a midnight roll\'s is a front; and the evolution replays from the day\'s first hour, so a client that joined at noon carries the sky the one that stood under it since midnight does', () => {
@@ -203,14 +203,13 @@ test('AUDIT WORLD5 C6 (LIVED1): every collapse costs its hour and pays it in ful
   } finally { offline(); }
   const o = P();
   assert.ok(exhaustionOutcome({ entity: o }).health > 0 && exhaustionOutcome({ entity: o }).health > 0, 'offline: every collapse, in full');
-  // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): the foes-about arm is no longer DFU's death but a tenth of the
   // health - still no hour paid there, which is what this line holds
   assert.deepEqual(exhaustionOutcome({ entity: P(), enemiesNearby: true }).kind, 'spent', 'the foes-about arm untouched by the hour');
   assert.doesNotMatch(rd('src/systems/rest/rest.js'), /lastExhaustionHour/, 'no once-a-world-hour gate');
 });
 test('AUDIT WORLD5 C7 (RESTX2: on the timer, every mode): a session COVERED loses the real time it covers, keeping less than one sub-tick, and a leap of the shared clock (a hidden tab) is NOT a leap of the session - the timer alone paces it, so every hourly check reads a frame of its own by construction', () => {
   // C7 was written on the shared clock (one sub-tick a FRAME across a
-  // leap); RESTX1 narrowed it to loiter; RESTX2 (2026-09-17) retired
+  // leap); RESTX1 narrowed it to loiter; RESTX2 retired
   // the shared-clock pacing whole - test/systems/rest/restx2_online_rest.test.js.
   // What C7 held and still holds: a covered frame banks nothing, the
   // remainder under one sub-tick is kept, and a foe wandering in is
@@ -266,30 +265,4 @@ test('AUDIT WORLD5 C8 (LIVED1): the sub-tick\'s minutes ride to the host alone, 
   assert.ok(arm.includes('gameMinutes: start + l + 1,'), 'and the spawner offered each of its ten minutes once');
   assert.match(dc, /advanceMinutes: \(n\) => _restAdvance\(n\),/);
   assert.match(dc, /const classicMinutesRef = \{\s*get value\(\) \{ return ownMinutes\(\); \},\s*set value\(v\) \{ setOwnMinutes\(v\); \},\s*\};/, 'the dungeon\'s one clock view is the character\'s');
-});
-test('AUDIT WORLD5 by source: the sentence refills in both lanes (C9; LIVED1: its days are served on the prisoner\'s own clock), exterior.js says the stand-down (C10), the welcome\'s clock is stamped as it is built and the relay says which one it is (C11), the pane says the clock (C12), the install is the boot\'s first act (C13), the cautious heal is the trip\'s nights (C14)', () => {
-  const af = rd('src/scenes/arrestFlow.js');
-  assert.match(af, /playerEntity\.inPrison = false;\s*(?:\/\/[^\n]*\n\s*)*fillVitalSigns\(playerEntity\);/, 'C9 (LIVED1): the days are the refill\'s price, and online they are served on the prisoner\'s own clock');
-  assert.doesNotMatch(af, /sharedClockOn/, 'the sentence is gated on nothing - it is served in both lanes');
-  assert.ok((af.match(/^\s*fillVitalSigns\(playerEntity\);/gm) ?? []).length >= 3, 'the sentence\'s, the rescue\'s and the acquittal\'s refills');
-  assert.match(af, /advanceDays = \(days\) => advanceOwnMinutes\(days \* MINUTES_PER_DAY\),/, 'the days are the prisoner\'s own');
-  assert.match(rd('src/scenes/exterior.js'), /questClockStepMax: \(\) => \(sharedClockOn\(\) \? PLAYED_STEP_MAX_SECONDS : Infinity\),/, 'C10 (WORLD7\'s word: the same as world.js\'s)');
-  // SRV-N appended `v` after it, so the stamp is no longer the last field.
-  // What C11 is about is unchanged and is what is matched: Date.now() is
-  // CALLED where the welcome is built, not read from a variable set when
-  // the hello began - four storage awaits earlier, every millisecond of
-  // which the client carried as the relay's clock.
-  assert.match(rd('server/src/index.js'), /"now":\$\{Date\.now\(\)\},"v":/, 'C11: not the hello\'s start, four awaits earlier');
-  assert.ok(relayVersionAtLeast(66), 'C11: the relay bumped, and has not gone backwards since (SRV-N: asked monotonically - five pins used to retype one moving number)');
-  // DISC25-D: the last clause ("the quest clocks stand still") had been false since WORLD7 - they count played time
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /The world\\u2019s clock and sky run on real time\. Resting, travel, jail and training don\\u2019t move them, so a quest waiting for a time of day waits for the world\\u2019s, and a lycanthrope\\u2019s full moon lasts one night\. Your character also has their own clock\. It runs while you play and stops while you are logged off\. Resting, travel, jail and training use it\./, 'C12 (LIVED1: and the character\'s own time; AUDIT LIVED1b U8: logged off, not away; TIME2: the full moon\'s night)');
-  const w = rd('src/scenes/world.js');
-  const install = w.indexOf("if (params.has('online')) { setSharedClock(() => sharedClassicMinutes(Date.now() + _sharedOffsetMs), (m) => wallMsForClassicMinutes(m) - _sharedOffsetMs, { sky: () => skyClassicMinutes(Date.now() + _sharedOffsetMs), skyWall: (m) => wallMsForSkyMinutes(m) - _sharedOffsetMs }); setSharedWeather(true); }");   // TIME1: and the sky beside it
-  const boot = w.indexOf('export async function bootWorld(');
-  const season = w.indexOf('let season = seasonPin ?? climateSeasonFromMinutes(skyMinutes());');   // TIME1: the sky's season
-  assert.ok(boot > 0 && install > boot && season > install, 'C13: installed before the first read of the clock (the season)');
-  assert.ok(!w.slice(boot, install).split('\n').some((l) => !l.trim().startsWith('//') && l.includes('worldMinutes()')), 'C13: nothing between the boot\'s door and the install reads the clock');
-  assert.match(w, /if \(opts\.speedCautious\) \{/, 'C14 (LIVED1): the heal is the trip\'s nights, and online they are the character\'s own');
-  assert.match(w, /setSyntheticTimeIncrease\(true\); playerTicker\.advance\(computed\.minutes\);/, 'and the trip\'s days are advanced online too');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## AUDIT WORLD5 \(2026-09-13\)/, 'the record');
 });

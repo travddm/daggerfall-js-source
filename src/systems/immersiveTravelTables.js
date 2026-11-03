@@ -1,4 +1,4 @@
-// IT1 (2026-10-04): IMMERSIVE TRAVEL'S THREE HARD-CODED TABLES, verbatim out of the shipped assembly
+// IT1: IMMERSIVE TRAVEL'S THREE HARD-CODED TABLES, verbatim out of the shipped assembly
 // (vendor/immersive-travel/ImmersiveTravel.dll) - the int32 arrays its static constructors fill with
 // RuntimeHelpers.InitializeArray from <PrivateImplementationDetails> field data. The IL dump shows the ldtoken and the
 // size (il/ImmersiveTravel.il.txt, CarriageMap::.cctor IL_15b0-15c2, SeafarersMap::.cctor IL_1957-1983) but not the

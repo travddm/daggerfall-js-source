@@ -1,10 +1,9 @@
-// OW-DUNGEONS (2026-10-08, Mac: "with dungeons on the overworld it doesnt show a dungeon model"; asked where:
-// "Overworld view"; which: "Check it all"; asked the look: "Its own model, enlarged"): EACH DUNGEON'S OWN MODEL,
+// OW-DUNGEONS: EACH DUNGEON'S OWN MODEL,
 // ENLARGED, UNDER THE OVERWORLD - the law (systems/travel/travelDungeonModels.js: the set, the entrance model by DFU's own door
 // law, the grow with the eye's distance, the matrix about its foot), the door law in one home (world/meshReader.js
 // subMeshDoorType, read by dfMeshToModel too), and the world host's list, load and draw (scenes/world.js - since
 // OW-DUNGEON-SIZE moved out to scenes/travelViewDungeonModels.js, read through test/hostText.mjs), lifted and run over
-// stubs. Design: bible/06-Systems/Travel-View.md OW-DUNGEONS and OW-DUNGEON-SIZE.
+// stubs. Design: OW-DUNGEONS and OW-DUNGEON-SIZE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -162,7 +161,6 @@ test('OW-DUNGEONS the host\'s list: TV6\'s own law with nothing left to the grid
   const hollow = { name: 'The Brass Hollow', spawned: true, superTier: 'super' };
   const ruin = { name: 'Old Ruin (12,20)', spawned: true };
   // ETHER-OW: the lists' rows and what stands on them (world.js tvDungeonRowsAt, tvDungeonAt), lifted beside it - the sea off
-  // PIN MOVED (TVD-WORLD, 2026-10-27): the rows, their stand and the found test run through to tvDungeonFound (no places host
   // here: `tvLairs` null, the Bay's rows alone)
   const rows = lift(/\n {2}(const tvDungeonRowsAt = \(at, range = TV_FAR_RANGE\) => \{\n[\s\S]*?\n {2}const tvDungeonFound = [^\n]*;)\n/, 'the rows');
   const make = new Function('d', `const host = d; const { playerTravelPixel, discoveryGeneration, nearDungeons, dungeonRows, mapDict, locationIndex, tvPlaceSummary, spawnedPixels, tvFiledSpawns, tvSpawnKnown, tvSpawnFound, tvSpawnGone, dungeonModelSet } = d; let _tvDungeonRows = null; let _locIndexGen = 0; d._locIndexGen = 0; d.gen = (n) => { _locIndexGen = n; d._locIndexGen = n; };

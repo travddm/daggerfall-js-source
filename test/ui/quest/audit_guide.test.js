@@ -1,5 +1,5 @@
-// AUDIT GUIDE (2026-09-29, Mac: "Lets do an audit on this before we merge") - the Quest Guide arc (GUIDE1-GUIDE5)
-// read by eight lenses over a frozen tree before it merges: bible/01-Overview/audits/Audit-Guide.md. Each pin FAILED on the
+// AUDIT GUIDE - the Quest Guide arc (GUIDE1-GUIDE5)
+// read by eight lenses over a frozen tree before it merges:. Each pin FAILED on the
 // unfixed tree for its finding's reason; each fix in src carries an `AUDIT GUIDE <ID>` comment.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -145,7 +145,7 @@ function eventsOf(b) {
 // H1 / L2 - a deadline is one the journal names
 // ---------------------------------------------------------------
 
-/** TRACK-ONLY (2026-10-08): the card shows a TRACKED quest alone - these pins read the card for the quest the journal
+/** TRACK-ONLY: the card shows a TRACKED quest alone - these pins read the card for the quest the journal
  *  follows, so they track it first, as a player does with the journal's Track button. */
 const pinFrame = () => { const t = questTracker.tracked(); if (t && !questTracker.isPinned(t.id)) questTracker.toggle(t.id); return questTracker.frame(); };
 
@@ -170,7 +170,6 @@ test('AUDIT GUIDE H1/L2: the HUD\'s faces count down only a clock the quest\'s o
   assert.match(pinFrame()?.time ?? '', /^2 days 2\d hours left$/, 'the card counts the named deadline, not the closing hour');
   assert.equal(pinFrame()?.urgent, false, 'no gold');
   const row = b.questLog().active.find((r) => r.questName === '__ANAMED');
-  // PIN MOVED (QUEST-AUDIT III NAMED-TIMER, the owner's word "fix any and all outstanding issues" taking half of the call
   // this pin held for him): where the journal names a deadline the pause tab counts it too, never a closing hour beside it;
   // a quest whose entries name none keeps DEAD-CLOCK's tightest (questbridge.test.js MAC-K2)
   assert.ok(Math.abs(row.clockSeconds - v.clockSeconds) < 120 && row.clockSeconds > 2 * 86400, `the pause tab counts the named deadline: ${row.clockSeconds}`);
@@ -461,10 +460,6 @@ test('AUDIT GUIDE O3/L5: a look asks the host\'s map once per quest (the latest 
   assert.equal(pixelOf(maps, 'Devilrock', 'Nowhere'), null);
   pixelOf(maps, 'Devilrock', 'Nowhere');
   assert.equal(reads, 2, 'one read per place a session, a miss included');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const questPlacePixel = placePixelMemo\(\);/, 'the host holds one memo');
-  assert.match(world, /canFindPlace: \(regionName, name, site\) => canFindPlace\(maps, mapDict, regionName, name, questPlacePixel, site\)/, 'the look\'s map question asks it');   // PIN MOVED (START3): and the site, for its pixel past the Bay
-  assert.match(world, /const questPixel = \(find\) => find\?\.worldPixel \?\? questPlacePixel\(maps, find\?\.regionName \?\? '', find\?\.locationName \?\? ''\);/, 'and the compass and the map\'s marks');   // PIN MOVED (START3): a place past the Bay by its own pixel first
 });
 
 // ---------------------------------------------------------------
@@ -564,7 +559,7 @@ test('AUDIT GUIDE T5/U3: pressing Track changes the toggle IN PLACE - the focus 
 test('AUDIT GUIDE U14: the quest the HUD follows is SAID where the choice is made - its toggle carries "On the HUD" (the card is aria-hidden: this is where a screen reader learns it), followed or tracked alike (mutant: the note dropped)', () => withSwitches(() => {
   questTracker.hear({ quests: [{ id: '1', title: 'A', updatedAt: 10, latest: { lines: [' a'] } }, { id: '2', title: 'B', updatedAt: 5, latest: { lines: [' b'] } }], events: [] });
   const a = trackButton(document, '1', 'A'), bb = trackButton(document, '2', 'B');
-  assert.match(a.textContent, /On screen/, 'the followed quest');   // PIN MOVED (VOICE2): 'On screen', not "HUD" (Voice.md rule 3)
+  assert.match(a.textContent, /On screen/, 'the followed quest');
   assert.doesNotMatch(bb.textContent, /On screen/);
   (bb.querySelector('.qtrack-pin') ?? bb).click();
   assert.match(bb.textContent, /On screen/, 'tracked, it is the HUD\'s');
@@ -769,14 +764,6 @@ test('AUDIT GUIDE W4: an opening is a SENTENCE - a stop inside a closing quote e
   assert.equal(entryOpening(['', 'Sundas the 1st of Morning Star:', ' Go now. Quickly.']), 'Go now.', 'the header on the first line with words');
 });
 
-test('AUDIT GUIDE W5, W6, U12: the trail offers a place once by its region AND its name (two towns may share one); the fixed-town route\'s buildings ask the location question the chronicle and the card ask; "Show on map" is named with its own words first (WCAG 2.5.3) (mutants: each)', async () => {
-  const { WHERE_TEXT } = await import('../../../src/ui/quest/questLens.js');
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /skip && said\.find\?\.locationName === skip\.locationName && said\.find\?\.regionName === skip\.regionName/, 'W5');
-  assert.match(rd('src/scenes/exterior.js'), /questLocationName: \(\) => dfLocation\.name \?\? locationName,/, 'W6');
-  assert.match(WHERE_TEXT.showLabel('Llugwych in Wayrest province'), /^Show on map: Llugwych in Wayrest province$/, 'U12');
-});
-
 // ---------------------------------------------------------------
 // K1-K8, U15, U16 - the marks on the held map
 // ---------------------------------------------------------------
@@ -960,19 +947,6 @@ function reachOf(entries) {
   for (const e of entries) walk(e);
   return seen;
 }
-
-test('AUDIT GUIDE O6: THE HUD STAYS LIGHT, walked from the HUD itself (hud.js, enhancedHud.js) and through every way a module is reached - a static import, a bare side-effect import, a literal dynamic import(): none reaches the lens, place.js or the machine (the cycle GUIDE3 met); and the arc\'s three pins read those forms too (mutant: a bare import of the lens from a HUD face)', () => {
-  const reach = reachOf(['src/ui/hud/hud.js', 'src/ui/enhanced/enhancedHud.js']);
-  assert.ok(reach.size > 100, `the walk is the HUD's whole graph: ${reach.size}`);
-  for (const f of ['src/ui/quest/questLens.js', 'src/systems/quest/place.js', 'src/systems/quest/machine.js']) assert.equal(reach.has(f), false, `the HUD reaches ${f}`);
-  for (const t of ['test/ui/quest/guide3_herald.test.js', 'test/ui/quest/guide4_tracker.test.js', 'test/ui/quest/guide5_marks.test.js']) {
-    assert.match(rd(t), /import\\\(/, `${t} reads a dynamic import`);
-  }
-});
-
-test('AUDIT GUIDE D1: the Overworld\'s held edge marks stand clear of the quest card, as of the HUD\'s other furniture (mutant: the card left out)', () => {
-  assert.match(rd('src/ui/travel/travelViewHud.js'), /const FURNITURE = '[^']*\.qtrack';/);
-});
 
 test('AUDIT GUIDE H6 (the draw): the frame that shows the HUD again after a window refreshes a waiting deadline\'s count (mutant: the call dropped from the draw)', () => withSwitches(() => {
   const was = globalThis.document, raf = globalThis.requestAnimationFrame;

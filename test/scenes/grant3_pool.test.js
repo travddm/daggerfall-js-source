@@ -1,4 +1,4 @@
-// GRANT3-GRANT4 (2026-10-18, Mac: "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections 13 and 14): THE POOL
+// GRANT3-GRANT4: THE POOL
 // STANDS ON GRANTS AND READS THEM - over FOE-FORGE's rig (two real encounter pools), each with its own grants' host
 // (scenes/grantHost.js) and a fake relay that signs real grants with a test key: a turn's stands of a kind are one ask;
 // the grant's marks stand in place of the street's rolls; a record names its grant and member, a frame carries the grant
@@ -9,7 +9,8 @@ import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { WILD_GIANT } from '../../src/systems/wild/wildZone.js';
+import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
+const GIANT = MOBILE_TYPES.Giant;   // a plain Giant: the pool's tallest ordinary foe
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
 import { createGrantHost, grantSpeciesOf } from '../../src/scenes/grantHost.js';
 import { signGrant, grantMarksFor, grantMarksAllow, grantKindOf, validGrant, GRANT_TTL_MS, GRANT_TALLY_MS, GRANT_RENEW_LEAD_MS, GRANT_KINDS, GRANT_MARKLESS, GRANT_OPEN_KINDS } from '../../src/net/grantLaw.js';
@@ -32,7 +33,7 @@ function craftMonsterBsa(records) {
   for (const [name, bytes] of records) { for (let i = 0; i < name.length; i++) out[pos + i] = name.charCodeAt(i); v.setInt32(pos + NAME_FIELD, bytes.length, true); pos += ENTRY; }
   return out;
 }
-const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(WILD_GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
+const bsa = craftMonsterBsa([['ENEMY000.CFG', craftCfg()], [`ENEMY${String(GIANT).padStart(3, '0')}.CFG`, craftCfg()]]);
 const stubTex = { getSize: () => ({ width: 64, height: 100 }), getScale: () => ({ width: 0, height: 0 }), recordCount: 8, getFrameCount: () => 1 };
 const settle = async (n = 8) => { for (let i = 0; i < n; i++) await new Promise((r) => setTimeout(r, 0)); };
 const playerEntity = () => ({ level: 9, reflexes: 2, health: 50, maxHealth: 50, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], stats: { strength: 50, agility: 50, luck: 50, speed: 50, endurance: 50 }, armorValues: new Array(7).fill(100) });
@@ -100,11 +101,11 @@ test('GRANT4 THE KINDS: a stand\'s kind is its caller\'s word or its own shape -
   assert.deepEqual([{ allied: true, questBehaviour: 1 }, { questBehaviour: 1, revenant: {} }, { zoneGiant: 3 }, { revenant: {} }, { revenant: {}, managed: true }, { kept: true, managed: true }, { revenant: {}, kept: true }, { managed: true, loose: true }, { loose: true }, { replacing: true }, { site: 's', placed: true }, { placed: true }, {}].map(grantKindOf),
     ['ally', 'quest', 'giant', 'rev', 'rev', 'kept', 'rev', 'managed', 'loose', 'loose', 'site', 'site', 'band']);
   assert.deepEqual(GRANT_MARKLESS, ['quest', 'ally', 'rev', 'watch', 'kept']);
-  for (const k of GRANT_MARKLESS) assert.deepEqual(grantMarksFor(k, 58, 4, 7), { e: 0, c: [-1, -1, -1, -1] });
+  for (const k of GRANT_MARKLESS) assert.deepEqual(grantMarksFor(k, 434429, 4, 7), { e: 0, c: [-1, -1, -1, -1] });
   const g = { k: 'kept', e: 0, c: [-1, -1] };
   assert.ok(grantMarksAllow(g, 0, { z: 1 }) && grantMarksAllow({ ...g, k: 'rev' }, 1, { cp: 3 }), 'a markless kind\'s marks its own law\'s');
   assert.ok(!grantMarksAllow({ ...g, k: 'enc' }, 0, { z: 1 }) && !grantMarksAllow({ ...g, k: 'loose' }, 1, { cp: 3 }), 'any other\'s only as its grant\'s');
-  assert.notDeepEqual(grantMarksFor('enc', 58, 4, 7), { e: 0, c: [-1, -1, -1, -1] }, 'seed 58 rolls an elite and a champion for an encounter');
+  assert.notDeepEqual(grantMarksFor('enc', 434429, 4, 7), { e: 0, c: [-1, -1, -1, -1] }, 'seed 434429 rolls an elite and a champion for an encounter');
   assert.ok(grantSpeciesOf(231).has(0) && !grantSpeciesOf(232).has(0), 'a rat in 231\'s tables, none in 232\'s');
   assert.equal(grantSpeciesOf(-5), null);
 });
@@ -158,7 +159,7 @@ test('GRANT3 THE OWNER: a turn\'s stands of a kind are one ask; each stands as i
   assert.deepEqual(O.session.asks.filter((a) => a.k === 'free').map((a) => a.gs), [[gr.g]]);
   // a grant naming its champions: each member stands as its grant says, never as the street's own roll would
   O.session.marks = { e: 0, c: [4, 4] };
-  const marked = await Promise.all([0, 1].map((k) => O.pool.spawnFoe(WILD_GIANT, [140 + k, 0, 100], { grantKind: 'enc' })));
+  const marked = await Promise.all([0, 1].map((k) => O.pool.spawnFoe(GIANT, [140 + k, 0, 100], { grantKind: 'enc' })));
   assert.ok(marked.every((f) => (f.entity.level | 0) >= 3), 'a foe a trait may stand on');
   assert.deepEqual(marked.map((f) => f.entity.champion), ['thorned', 'thorned']);
 });

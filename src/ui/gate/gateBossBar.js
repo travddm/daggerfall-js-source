@@ -1,8 +1,8 @@
 // @ts-check
-// WB4 (2026-09-25, Mac: "a large boss arena with an oversized enemy"): THE BOSS'S BAR - his name and title over his
+// WB4: THE BOSS'S BAR - his name and title over his
 // health across the top of the screen, the two phase marks cut in it, the ward's gold over it while he stands
 // shielded, the attack he is winding up said under it in its own colour, and the Wrath's countdown when the gate's
-// midnight nears. Design: bible/11-Multiplayer/World-Bosses.md section 5.
+// midnight nears. Design:
 //
 // A READOUT, NOT A WINDOW (the gate banner's law, ui/gate/gateBanner.js): no click, no overlay stack, one node made on the
 // first word and UPDATED, NOT REBUILT - each part written only when it changes - hidden (never removed) when there is
@@ -10,8 +10,8 @@
 //
 // `bossBarModel` is pure - the court's state and the clock in, what the bar says out; the pins read it.
 //
-// WB13c (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE BAR, HONED -
-// filmed in Chromium in both skins at a desk, a portrait and a landscape phone (bible/11-Multiplayer/World-Bosses.md
+// WB13c: THE BAR, HONED -
+// filmed in Chromium in both skins at a desk, a portrait and a landscape phone (
 // section 20, WB13c): a TRAILING DAMAGE segment (ui/barLoss.js, the vitals' and the foes' own) over a smooth drain; his
 // name on one line and his epithet beneath it; the WARD a state - it fades in, a cage, the fill dimmed under it, and a
 // flash when it fails; a CALLOUT that comes in and goes out, with a line filling to its landing, and Dagon's own on a
@@ -54,7 +54,7 @@ export const BOSS_BAR_TEXT = Object.freeze({
   move: 'Move',   // WB13c: his blow is aimed where I stand
   wrathIn: (left) => `Dagon's Wrath in ${left}`,
   fighters: (n) => (n === 1 ? '1 in the court' : `${n} in the court`),
-  // GATE-UX (2026-10-01, Mac: "Remove the text below each boss health bar that shows phase details"): WBX5's phase line
+  // GATE-UX: WBX5's phase line
   // ("II - The Burning Court") is gone from the foot - the marks cut in his health say where the phases turn, and a
   // turn is still shown over the screen as it comes (scenes/gate/gateCourt.js courtPhaseCard - WB13e: its card)
   // WB9c: DAGON'S RECKONING on the bar - its name, the crystals still standing and the seconds to its landing; the stun
@@ -92,7 +92,7 @@ export function halfState(s, b, now) {
 const css = (c) => `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
 const WARD_CSS = css(WARD_COLOR);
 
-/** PLUS-DRESS (2026-09-26): the bar's own sheet - what was written inline on each part, moved to a class so a skin's
+/** PLUS-DRESS: the bar's own sheet - what was written inline on each part, moved to a class so a skin's
  *  sheet can dress it (the Enhanced Plus sheet does: ui/enhanced/enhancedPlusStyle.js ONLINE_DRESS_CSS). Only what MOVES stays
  *  inline: the fill's and the ghost's width, the callout's colour and line, the marks' places and the bar's fade.
  *  WB13c: the ward, the spent marks, the callout's coming and going, Dagon's plate, the Wrath's last minute and the
@@ -301,7 +301,7 @@ function build(doc) {
     return tick;
   });
   track.append(ward);
-  // WB9a (Mac: "Can we add the modifers below his health bar?"): THE NIGHT'S MARKS UNDER HIS HEALTH - a chip a mark
+  // WB9a: THE NIGHT'S MARKS UNDER HIS HEALTH - a chip a mark
   // (his aspect, then his trials), each its sign and name (WB13c: the line under each gone - the card says what each
   // does); the row hidden for the Warden unmarked
   const marks = part('wb-boss-marks');

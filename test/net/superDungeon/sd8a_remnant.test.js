@@ -1,4 +1,4 @@
-// SD8a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT'S LAW
+// SD8a: THE BRASS REMNANT'S LAW
 // (net/superDungeon/sdRemnant.js) - the numbers; a fighter's share and the gate's belief of a blow; the three phases (the Walking Hour,
 // the Dragon Break's Echoes and their pair, the Last Moment's Reset and its Hearts); the Hour's own blows (the Pulse, the
 // Hour Ends); a lost fight; the geometry every struck screen judges by; and whole fights, simulated: a party at its
@@ -234,7 +234,7 @@ test('SD8a THE DRAGON BREAK: at 70% it steps outside time and two Echoes rise, e
     for (const h of hands) byAt.set(h.at, [...(byAt.get(h.at) ?? []), h]);
     for (const hs of byAt.values()) {
       assert.equal(hs.length, 2, `seed ${seed}: from both at once`);
-      // AUDIT SD II (SD11e, PIN MOVED): L4 F2 - gold the way the bearing grows, silver the other; both at ONE fighter
+      // AUDIT SD II (SD11e
       // beyond the two, silver gold's way (pairWay - the two beams cross it the same way, never a pincer)
       const gh = hs.find((h) => h.b === SD_BODY.gold), sh = hs.find((h) => h.b === SD_BODY.silver);
       const aimed = (h) => ringOf(g, 20).find((b) => { const a = Math.atan2(b.x - h.x, b.z - h.z) - h.yw; return Math.abs(Math.sin(a)) < 0.02 && Math.cos(a) > 0; });

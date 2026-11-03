@@ -1,4 +1,4 @@
-// BAL9 - DESTRUCTION'S CHANNELS (2026-10-12; bible/05-Combat/Balance-Arc.md section 15). The owner: "I think destruction
+// BAL9 - DESTRUCTION'S CHANNELS. The owner: "I think destruction
 // needs a buff. A lot of players saying its lack luster. I want to also introduce some new magic/mage perks to the rarity
 // loot pool since weve done a lot of needing but still dont make it overpowered". The measurement found a Destruction
 // spell's damage had no channel but its caster's level (EntityEffect.GetMagnitude) - the school's skill prices it alone:
@@ -7,7 +7,7 @@
 //     and a foe's spell on me (BAL9a).
 //   - THE SCHOOL PAST 100 BOUGHT ONLY ITS PRICE. Online SPELL-COST-PAST prices those points at 100 / skill while the same
 //     mastery raises the foes (a Destruction at 200: x0.58 the price, a Crypt's foes x1.30 health). Each effective point
-//     past 100 is 1% more damage now, to x1.4 - CLIMB-PAST's law (BAL9b).
+//     past 100 is 0.07% more damage now, to x1.028 - CLIMB-PAST's law (BAL9b).
 //   - THE LADDER PAID A CASTER ONLY IN PRICE AND TEMPO. The potency and wellspring lines, and the arcane three, capped as
 //     every line is (BAL9c).
 // Pinned by execution through the real cast engine's doors (scenes/hostMagic.js), the real applySpell (systems/
@@ -123,15 +123,15 @@ test('BAL9a A SPELL ANSWERS ITS FOE: my spell that reaches a foe, and a foe\'s t
   assert.equal(p._skillChallenge?.tier, 135, 'the Lich that burned me is the fight\'s');
 });
 
-test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 1% a point of Destruction\'s climb past 100 to x1.4, instant and per round; offline, at a player, a peer\'s or a foe\'s cast, a resisted spell, a worn line, while mentoring - nothing more (mutants: offline too; 2% a point; at a player; a peer\'s; the seam skipped; a resisted spell made one; the worn line strikes; while mentoring)', () => {
+test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 0.07% a point of Destruction\'s climb past 100 to x1.028, instant and per round; offline, at a player, a peer\'s or a foe\'s cast, a resisted spell, a worn line, while mentoring - nothing more (mutants: offline too; 1% a point; at a player; a peer\'s; the seam skipped; a resisted spell made one; the worn line strikes; while mentoring)', () => {
   off();
   const at = (raw, online, sp = BOLT(50), target = foe()) => page(online, () => lands(sp, mage(raw), target));
   // DFU's own to 100, and offline where Daggerfall's price term already pays the points past it
   assert.deepEqual([100, 150, 200].map((r) => at(r, false)), [50, 50, 50]);
   assert.deepEqual([100, 150, 200].map((r) => page(true, () => skillValue(mage(r), D))), [100, 117, 140]);
-  assert.deepEqual([100, 150, 200].map((r) => at(r, true)), [50, 59, 70], 'x1, x1.17, x1.4');
-  assert.deepEqual([100, 150, 200].map((r) => page(true, () => SP.schoolPotency(mage(r)))), [1, 1.17, 1.4]);
-  assert.equal(at(200, true, BURN(50)), 70, 'a damage over time\'s first round too (the round\'s own door)');
+  assert.deepEqual([100, 150, 200].map((r) => at(r, true)), [50, 51, 51], 'x1, x1.012, x1.028');   // PIN MOVED: B5 (was [50, 52, 54], x1.034, x1.08)
+  assert.deepEqual([100, 150, 200].map((r) => page(true, () => SP.schoolPotency(mage(r)))), [1, 1.0119, 1.028]);   // PIN MOVED: B5 (was [1, 1.034, 1.08])
+  assert.equal(at(200, true, BURN(50)), 51, /* PIN MOVED: B5 (was 54) */ 'a damage over time\'s first round too (the round\'s own door)');
   // never at a player (a refereed fight's stand-in is one), never a peer's stand-in, never a foe's spell
   assert.equal(at(200, true, BOLT(50), foe({ isPlayer: true, peer: true })), 50, 'a duel\'s stand-in');
   assert.equal(page(true, () => lands(BOLT(50), { ...mage(200), peer: true })), 50, 'a peer\'s');
@@ -142,13 +142,13 @@ test('BAL9b THE SCHOOL PAST 100 IS ITS POTENCY: online, 1% a point of Destructio
   // no harder, and nothing lifts the climb past its effective cap
   on();
   const lifted = mage(100);
-  wear(lifted, legendary('eye-of-magnus'));   // +25 Destruction
-  assert.equal(page(true, () => skillValue(lifted, D)), 125, 'the live value the price reads');
+  wear(lifted, legendary('eye-of-magnus'));   // +15 Destruction (B4 rescale: 25 to 15)
+  assert.equal(page(true, () => skillValue(lifted, D)), 115, 'the live value the price reads');
   assert.equal(page(true, () => lands(BOLT(100), lifted)), 100, 'a school lifted past 100 by a worn line strikes as at 100');
   const capped = mage(200);
   wear(capped, legendary('eye-of-magnus'));
-  assert.equal(page(true, () => skillValue(capped, D)), 165);
-  assert.equal(page(true, () => lands(BOLT(100), capped)), 140, 'x1.4, whatever is worn');
+  assert.equal(page(true, () => skillValue(capped, D)), 155);
+  assert.equal(page(true, () => lands(BOLT(100), capped)), 103, 'x1.028 (102.8), whatever is worn');   // PIN MOVED: B5 (was 108, x1.08)
   off();
   // MENTOR2: mentoring reads the MENTORED climb (spell/spellPower.js fightingClimb) - none beside a level 5, where the edge reads none
   const m200 = mage(200);
@@ -163,15 +163,15 @@ test('BAL9c THE LINES: potency and wellspring - a caster\'s, banded, worth focus
   assert.deepEqual([...well.groups], ['Jewellery']);
   assert.equal(pot.proc, true); assert.equal(well.proc, true);
   assert.equal(pot.params, null); assert.equal(well.params, null);
-  assert.deepEqual(LR.AFFIX_RANGES.potency, { magic: [3, 6], rare: [6, 10], legendary: [10, 15] });
-  assert.deepEqual(LR.AFFIX_RANGES.wellspring, { magic: [2, 4], rare: [4, 7], legendary: [7, 10] });
+  assert.deepEqual(LR.AFFIX_RANGES.potency, { magic: [1, 1], rare: [1, 2], legendary: [2, 3] });   // PIN MOVED: B4 rescale
+  assert.deepEqual(LR.AFFIX_RANGES.wellspring, { magic: [1, 2], rare: [2, 4], legendary: [4, 6] });
   assert.equal(LR.AFFIX_WORTH.potency, 60); assert.equal(LR.AFFIX_WORTH.wellspring, 60);
-  assert.equal(LR.affixLabel({ id: 'potency', value: 8 }), '+8% spell damage');
+  assert.equal(LR.affixLabel({ id: 'potency', value: 3 }), '+3% spell damage');
   assert.equal(LR.affixLabel({ id: 'wellspring', value: 5 }), '5% magicka on a kill');
   assert.deepEqual(['magic', 'rare', 'legendary'].map((t) => LR.affixWord({ id: 'potency', value: 3 }, t)), ["Evoker's", "Battlemage's", "Warlock's"]);
   assert.deepEqual(['magic', 'rare', 'legendary'].map((t) => LR.affixWord({ id: 'wellspring', value: 3 }, t)), ['of the Spring', 'of the Wellspring', 'of the Font']);
-  assert.equal(LR.validAffix({ id: 'potency', value: 16 }), false);
-  assert.equal(LR.validAffix({ id: 'wellspring', value: 11 }), false);
+  assert.equal(LR.validAffix({ id: 'potency', value: 4 }), false);
+  assert.equal(LR.validAffix({ id: 'wellspring', value: 7 }), false);
   assert.equal(LR.validAffix({ id: 'potency', param: 'fire', value: 5 }), false, 'no param');
   // the last pass: a jewel's four (focus, castSpeed, potency, wellspring), a blade's five (... castSpeed, potency), armour none
   const jewel = () => ring([]);
@@ -193,26 +193,26 @@ test('BAL9c THE LINES: potency and wellspring - a caster\'s, banded, worth focus
   off();
 });
 
-test('BAL9c POTENCY: what I wear, summed under 30, the loot\'s all under 50, through the real damage door; Arcane Surge above three quarters of my magicka; never at a player, a peer\'s, with the switch off (mutants: the cap at 40; the whole at 60; the surge always)', () => {
+test('BAL9c POTENCY: what I wear, summed under 3, the loot\'s all under 4, through the real damage door; Arcane Surge above three quarters of my magicka; never at a player, a peer\'s, with the switch off (mutants: the cap at 4; the whole at 5; the surge always)', () => {
   on();
   const me = plain();
   assert.equal(lands(BOLT(100), me), 100);
-  wear(me, ring([{ id: 'potency', value: 10 }], 135));
-  wear(me, ring([{ id: 'potency', value: 15 }], 133));
-  assert.equal(LP.lootSpellPower(me, foe()), 25);
-  assert.equal(lands(BOLT(100), me), 125);
-  wear(me, ring([{ id: 'potency', value: 15 }], 136));
-  assert.equal(LP.POTENCY_CAP, 30);
-  assert.equal(LP.lootSpellPower(me, foe()), 30, 'the lines, never past their cap');
-  assert.equal(lands(BOLT(100), me), 130);
-  // Shalidor's Brand wielded: +25 while my magicka stands above three quarters - and the loot's whole is at most 50
+  wear(me, ring([{ id: 'potency', value: 1 }], 135));   // PIN MOVED: B5 (was 2, 3: the lines sum to 3, the cap)
+  wear(me, ring([{ id: 'potency', value: 2 }], 133));
+  assert.equal(LP.lootSpellPower(me, foe()), 3);
+  assert.equal(lands(BOLT(100), me), 103);
+  // Shalidor's Brand wielded: Arcane Surge's 3 while my magicka stands above three quarters - the loot's whole is at most 4
   wear(me, legendary('shalidors-brand'));
   me.magicka = 160;
-  assert.equal(LP.SPELL_POWER_MOST, 50);
-  assert.equal(LP.lootSpellPower(me, foe()), 50);
-  assert.equal(lands(BOLT(100), me), 150);
+  assert.equal(LP.SPELL_POWER_MOST, 4);   // PIN MOVED: B5 (was 9)
+  assert.equal(LP.lootSpellPower(me, foe()), 4, 'the lines 3 and the surge 3, held at the most');   // PIN MOVED: B5 (was 8, the lines 5 and the surge 3)
+  assert.equal(lands(BOLT(100), me), 104);
   me.magicka = 150;   // three quarters exactly: not above
-  assert.equal(lands(BOLT(100), me), 130);
+  assert.equal(lands(BOLT(100), me), 103);   // PIN MOVED: B5 (was 105)
+  wear(me, ring([{ id: 'potency', value: 3 }], 136));
+  assert.equal(LP.POTENCY_CAP, 3);   // PIN MOVED: B5 (was 6)
+  assert.equal(LP.lootSpellPower(me, foe()), 3, 'the lines, never past their cap (the surge is asleep at three quarters)');
+  assert.equal(lands(BOLT(100), me), 103);   // PIN MOVED: B5 (was 106)
   // never at a player, never a peer's, nothing with the switch off
   assert.equal(lands(BOLT(100), me, foe({ isPlayer: true, peer: true })), 100);
   assert.equal(LP.lootSpellPower({ ...me, peer: true }, foe()), 0);
@@ -224,15 +224,15 @@ test('BAL9c THE CASTER\'S MAGICKA AND ITS THROW: wellspring on a kill under 10; 
   on();
   const me = plain({ magicka: 0, maxMagicka: 200 });
   setPlayerDoor({ foes: () => [], player: () => me, castOnPlayer: () => {} });
-  wear(me, ring([{ id: 'wellspring', value: 7 }], 135));
+  wear(me, ring([{ id: 'wellspring', value: 6 }], 135));
   LP.lootKill(foe());
-  assert.equal(me.magicka, 14, '7% of 200');
-  wear(me, ring([{ id: 'wellspring', value: 7 }], 133));
+  assert.equal(me.magicka, 12, '6% of 200');
+  wear(me, ring([{ id: 'wellspring', value: 6 }], 133));
   assert.equal(LP.WELLSPRING_CAP, 10);
   LP.lootKill(foe());
-  assert.equal(me.magicka, 34, 'never past 10% a kill (20 of 200)');
+  assert.equal(me.magicka, 32, 'never past 10% a kill (20 of 200; two rings at 6 are 12%)');
   LP.lootKill(foe({ team: 'PlayerAlly' }));
-  assert.equal(me.magicka, 34, 'my ally\'s death pays nothing');
+  assert.equal(me.magicka, 32, 'my ally\'s death pays nothing');
   // the Ring of Artaeum, each magic round
   const r = plain({ magicka: 150, maxMagicka: 200 });
   wear(r, legendary('ring-of-artaeum'));

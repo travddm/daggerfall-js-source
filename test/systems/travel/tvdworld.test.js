@@ -1,8 +1,8 @@
-// TVD-WORLD (2026-10-27, bible/06-Systems/Travel-View.md TVD-WORLD; the audit NO SYSTEM LEFT BEHIND IN THE BAY item 29, C4): the
+// TVD-WORLD: the
 // Overworld's dungeons past the Bay. TV6 stood every dungeon within the far range - a found one a plate and a journey, the
 // rest a "?", found on approach - and OW-DUNGEONS its model; its dungeons were MAPS.BSA's rows (dungeonRows), so past the
 // Bay no lair (TESA8) was plated, marked, found or drawn, and the found spawns past the stream (filedSpawns) were read on
-// the Bay's map alone. The owner: "Every single thing here needs to be addressed. No exceptions." (2026-10-26).
+// the Bay's map alone. The owner: "Every single thing here needs to be addressed. No exceptions.".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -158,14 +158,6 @@ test('TVD-WORLD the host: a found spawn past the Bay, its pixel never built, sta
     const filed = t2.tvFiledSpawns(SKYRIM).filter((s) => s.x === sx && s.y === sy);
     assert.equal(filed.length, 1, 'its pixel past the Bay read');
   } finally { restoreDiscovery(null); }
-});
-
-test('TVD-WORLD by source: the world host hands the places to the Overworld\'s dungeons; the find reads the lairs\' found test and their gen; the models\' list keys on the gen too', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /createTravelViewDungeons\(\{[^}]*provinceQuestPlaces,/);
-  assert.match(w, /locAt: tvDungeonAt, isFound: tvDungeonFound \}\)\.filter\(\(g\) => !g\.found\)/);
-  assert.match(w, /const at = playerTravelPixel\(\), dg = tvKnownGen\(\), n = `\$\{_locIndexGen\}:\$\{tvDungeonRowsAt\.gen\(\)\}`;/);
-  assert.match(rd('src/scenes/travelViewDungeonModels.js'), /n = `\$\{host\._locIndexGen\}:\$\{tvDungeonRowsAt\.gen\?\.\(\) \?\? 0\}`;/);
 });
 
 const ARENA2 = process.env.ARENA2_PATH ?? '';

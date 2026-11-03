@@ -1,4 +1,4 @@
-// AUDIT WATCH-KIT (2026-10-01, Mac: "Just want to audit this to make sure it's perfection") - lens M: the magic of
+// AUDIT WATCH-KIT - lens M: the magic of
 // COMPANION-KIT (PR #502, my healing and buffs reaching my crew companions), with lens U's U2(a) (his whole through a
 // door) and lens D's safety net over the same code. Every finding was re-run before its fix and is pinned here by a
 // test that fails on the code as it stood, over the real modules (companionkit.test.js's rig, ALLY-CAST's seams, the
@@ -318,7 +318,6 @@ test('AUDIT WK-M5: THE SAFETY NET\'S THREE HOLES AND ITS FALSE EQUIVALENT - a be
     assert.equal(magic.missileCount(), 1);
     fly(magic);
     assert.equal(h.entity.health, 30, 'in the burst, once');
-    // PIN MOVED (the merge with FIELD BUGS 2026-10-01 part four, AREA-CASTER - Mac: "Include the caster"): a spell of
     // gifts lands on its caster at the cast wherever it bursts - out of the burst, and given it as its caster, once
     assert.equal(p.health, 40, 'me 8 m off: out of the burst, given it as its caster');
     assert.deepEqual(casts(said), ['You cast Healing Burst on Hilda.']);

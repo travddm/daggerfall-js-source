@@ -1,5 +1,4 @@
-// FLORA-GROUND (FIELD BUGS 2026-10-27, the owner: "Plus floating flora and reflective flora can be seen off the ground in
-// first person"; the coordinator: "Prove it across the sample cells on the real data") - THE GROUND'S ONE LAW ON THE
+// FLORA-GROUND (FIELD BUGS 2026-10-27,; the coordinator: "Prove it across the sample cells on the real data") - THE GROUND'S ONE LAW ON THE
 // GAME'S OWN GROUND (ARENA2): five cells built as the stream builds them, every plant on the walk floor
 // (world/terrain/terrainSurface.js walkGroundAt); and FLORA-GROUND, THE RINGS: the same cells built at the far ring's
 // stride with their beds, every plant drawn by the seat on the ground the pixel draws (scenes/floraSeat.js). Its own

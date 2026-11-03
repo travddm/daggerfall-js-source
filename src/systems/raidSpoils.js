@@ -1,7 +1,6 @@
 // @ts-check
-// RAID4b (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-// armor sets"): A TOWN'S THANKS - what one player's defence of a raided town pays, rolled from the relay's receipt.
-// Design: bible/03-World/Raiding-Parties.md, "The rewards (RAID4)".
+// RAID4b: A TOWN'S THANKS - what one player's defence of a raided town pays, rolled from the relay's receipt.
+// Design:, "The rewards (RAID4)".
 //
 // PER PLAYER, AND THE SEED'S OWN. The receipt the relay signs at a town's cleanse for each account that struck a raider
 // and stood in the town (net/raid/raidReceipt.js `w1`) carries a seed (`c`, 32 bits of the relay's CSPRNG) and the raiding
@@ -29,7 +28,7 @@ import { rollRaidSetPiece } from './aetheric.js';
 
 /** Gold a level of the player's, before the seed's variation (0.8 to 1.2 of it) - a third of a boss's. */
 export const RAID_SPOILS_GOLD_PER_LEVEL = 80;
-/** RAID5 (bible/03-World/Raiding-Parties.md RAID5): a town HELD - its leader felled, its standard standing, most of its
+/** RAID5 (RAID5): a town HELD - its leader felled, its standard standing, most of its
  *  refugees saved (systems/raidingParties.js raidHeld) - thanks with this much more gold and one more piece. */
 export const RAID_HELD_GOLD_X = 1.5;
 /** The source the one Magic-or-better piece is laddered at: a treasure pile's, halfway up the ladder, even luck. */

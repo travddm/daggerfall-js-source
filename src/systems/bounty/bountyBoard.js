@@ -1,6 +1,5 @@
 // @ts-check
-// BOUNTY1 (2026-09-28, Mac: "Cities in this game have always 2 Bulletin Boards can we make it so that one of the two
-// when opened gives a quest screen in Enhanced Plus UI look"): THE TOWN'S BOUNTY BOARD - the law, pure.
+// BOUNTY1: THE TOWN'S BOUNTY BOARD - the law, pure.
 //
 // Not a DFU member and not a mod's port: the port's own. Half of a town's bulletin boards (every other one by
 // position, every client picks the same ones - see `questBoardIndices`) post the town's FOUR hunts a day - the same
@@ -29,14 +28,13 @@ export const BOUNTY_VENDOR = 'bountyBoard';
 export const BOUNTIES_PER_DAY = 4;
 /** The most bounties one hunter holds at once. */
 export const BOUNTY_ACTIVE_MAX = 4;
-/** How far from its town a bounty's pixel lies, map pixels (Chebyshev) - Mac, 2026-09-28: "make it 4-10 pixel
- *  around the city" (it was 1-4). The dungeons a board may name are sought in the same ring. */
+/** How far from its town a bounty's pixel lies, map pixels (Chebyshev) (it was 1-4). The dungeons a board may name are sought in the same ring. */
 export const BOUNTY_MIN_PX = 4;
 export const BOUNTY_MAX_PX = 10;
 /** A pack's size, inclusive. */
 export const BOUNTY_PACK_MIN = 4;
 export const BOUNTY_PACK_MAX = 8;
-/** A dungeon's pack is smaller - its halls are close (Mac, 2026-09-28: "the pack must be smaller in dungeons 2-4"). */
+/** A dungeon's pack is smaller - its halls are close. */
 export const BOUNTY_DUNGEON_PACK_MIN = 2;
 export const BOUNTY_DUNGEON_PACK_MAX = 4;
 /** How long a taken bounty stands before it lapses (a game day - gameDate's own MINUTES_PER_DAY, one home). */
@@ -47,7 +45,7 @@ export const BOUNTY_LEVEL_MAX = 99;
 /** The ladder: which beasts a level hunts. Ids are ENEMY_BASICS rows; each list runs weakest to strongest (the
  *  15+ purse reads the rank). The werebeasts are left off - a bounty is not a way to catch a curse. (Beasts that
  *  want a silver-or-better blade stay on: the server runs without that rule - Mac, 2026-09-28.) QUARRY-WORLD
- *  (2026-10-27): a tier's `levels` are its own beasts' (their levels as Daggerfall has them, the strongest tier's open
+ *  a tier's `levels` are its own beasts' (their levels as Daggerfall has them, the strongest tier's open
  *  above) - the band a board hunts the land's own wild in (bountyQuarry); the ladder's beasts are what a board posts
  *  where the land's wild is not known. */
 export const BOUNTY_TIERS = Object.freeze([
@@ -59,7 +57,7 @@ export const BOUNTY_TIERS = Object.freeze([
 ]);
 
 /** A board's words for a pack of each beast, in the player's language, and the kind of trouble it is - which of the
- *  stories below it is told in. QUARRY-WORLD (2026-10-27): every beast the land's own wild holds (the encounter law's
+ *  stories below it is told in. QUARRY-WORLD: every beast the land's own wild holds (the encounter law's
  *  day and night tables - DFU's climates on the Bay, TESA-BIOME's zones past it - with Daggerfall Enemy Expansion's or
  *  without: bountyQuarry), where it was the ladder's nineteen alone; routed through the text core (L10N4), its words
  *  before English-only. No werebeast and no vampire has words: a bounty is not a way to catch a curse. */
@@ -131,8 +129,7 @@ export const bountyFoesWord = (id) => (Object.hasOwn(FOES, id) ? FOES[id][1]() :
 const kindOf = (id) => (Object.hasOwn(FOES, id) ? FOES[id][0] : 'beast');
 
 /**
- * QUARRY-WORLD (2026-10-27, the audit NO SYSTEM LEFT BEHIND IN THE BAY item 37; the owner: "Every single thing here needs to
- * be addressed. No exceptions."): THE BEASTS A TIER HUNTS ABOUT A TOWN - of the land's own wild (`wild`, `[id, level]` pairs:
+ * QUARRY-WORLD: THE BEASTS A TIER HUNTS ABOUT A TOWN - of the land's own wild (`wild`, `[id, level]` pairs:
  * the encounter law's day and night tables at the town, each beast at its level as the game loaded it -
  * systems/bounty/bountyQuarry.js landWildAt), those the board has words for whose level lies in the tier's band (`levels`,
  * its own beasts' - BOUNTY_TIERS); where none does, the land's beasts nearest the band; weakest first (the 15+ purse reads
@@ -160,7 +157,7 @@ export function bountyTierFor(level) {
   return BOUNTY_TIERS.find((t) => l >= t.min && l <= t.max) ?? BOUNTY_TIERS[BOUNTY_TIERS.length - 1];
 }
 
-/** BOUNTY-PURSE (Mac, 2026-09-28: "when the needed kills are only 4 it should give less money"): what a FULL open-ground
+/** BOUNTY-PURSE: what a FULL open-ground
  *  pack of eight pays in each monster tier - Mac's own numbers (50, 75, 90, 100). Each beast short of eight takes a
  *  tenth of it off, so four pay six tenths. The 15+ tier runs 150..200 on its own law below. */
 export const BOUNTY_FULL_PURSE = Object.freeze([50, 75, 90, 100]);
@@ -193,9 +190,7 @@ export function bountyGold(level, count, mobileType, underground = false, foesLi
 }
 
 /**
- * The piece of kit (Mac: "an random item in white for players with medium durabilty lvl 1-3, 4-5 white better
- * durabily and 6-10 full durability then with 11-14 it should start given randomly white and blue items. Not more.
- * And thats it till max level."). `condition` is the share of the piece's maxCondition it arrives with; `magicChance`
+ * The piece of kit. `condition` is the share of the piece's maxCondition it arrives with; `magicChance`
  * the chance it is minted Magic (blue) - never more than Magic, at any level.
  * @param {number} level
  * @returns {{ condition: number, magicChance: number }}
@@ -203,7 +198,7 @@ export function bountyGold(level, count, mobileType, underground = false, foesLi
 export function bountyItemRule(level) {
   const l = clampLevel(level);
   if (l <= 3) return { condition: 0.5, magicChance: 0 };
-  // BOUNTY-BLUE (Mac, 2026-09-28: "let start the blue items 50/50 chance at lvl 4"): the coin for Magic from level 4
+  // BOUNTY-BLUE: the coin for Magic from level 4
   if (l <= 5) return { condition: 0.75, magicChance: 0.5 };
   return { condition: 1, magicChance: 0.5 };
 }
@@ -232,11 +227,10 @@ export const bountyDay = (classicMinutes) => Math.floor(Math.max(0, Number(class
 export const bountySlotKey = (day, px, py, slot) => `${day}.${px}.${py}.${slot}`;
 /** A bounty as TAKEN: its slot and the level it was taken at. The wire's shape (net/wire.js validPartyPose `bq`). */
 export const bountyId = (day, px, py, slot, level) => `${bountySlotKey(day, px, py, slot)}.${clampLevel(level)}`;
-/** LAIR-WORLD (2026-10-26): a town's pixel the world's (net/wire.js worldPixelOk - past the Bay up to four digits, and
+/** LAIR-WORLD: a town's pixel the world's (net/wire.js worldPixelOk - past the Bay up to four digits, and
  *  west or north of the Bay's corner below zero), where it was the Bay's three. A Bay id reads as it always did. */
 export const BOUNTY_ID_RE = /^(\d{1,7})\.(-?\d{1,4})\.(-?\d{1,4})\.([0-3])\.(\d{1,2})$/;
-/** BOUNTY-TIER (Mac, 2026-09-28: "Higher level players cant share their quest with lower level players ONLY when in
- *  the same tier. They should be still able to help"): the monster tier a level hunts in, as its index (0..4). */
+/** BOUNTY-TIER: the monster tier a level hunts in, as its index (0..4). */
 export const bountyTierIndex = (level) => BOUNTY_TIERS.indexOf(bountyTierFor(level));
 /** THE HUNT a bounty is: its slot AND its tier. Two holders of one notice in one tier hunt one pack and are paid
  *  together (whatever their levels inside it); in two tiers they are two hunts - different beasts, different purses. */
@@ -247,8 +241,7 @@ export function bountyHuntKey(id) {
 /** May a hunter of `level` hold this bounty (taken, shared, joined)? Only in its own tier. */
 export const bountyTierFits = (id, level) => { const b = parseBountyId(id); return !!b && bountyTierIndex(b.level) === bountyTierIndex(level); };
 
-/** BOUNTY-TIERLABEL (Mac, 2026-09-28: "can the quests also show which tier they are and what levels are put in the
- *  tier"): "Tier 2 (levels 4-5)", "Tier 5 (levels 15+)" - numbered from 1, as a player counts. */
+/** BOUNTY-TIERLABEL: "Tier 2 (levels 4-5)", "Tier 5 (levels 15+)" - numbered from 1, as a player counts. */
 export function bountyTierLabel(level) {
   const t = bountyTierFor(level);
   const n = BOUNTY_TIERS.indexOf(t) + 1;
@@ -287,8 +280,7 @@ export function bountySites(px, py, siteOk) {
   return out;
 }
 
-/** The most of a day's four postings that send the hunter into a dungeon (Mac, 2026-09-28: "Dungeon bounties
- *  (notices name a nearby dungeon)"). Slot 3 goes underground when one dungeon lies in reach, slot 2 as well when two
+/** The most of a day's four postings that send the hunter into a dungeon. Slot 3 goes underground when one dungeon lies in reach, slot 2 as well when two
  *  do; slots 0 and 1 always hunt the open ground. */
 export const BOUNTY_DUNGEON_SLOTS_MAX = 2;
 /**
@@ -502,8 +494,7 @@ export function rewardStory({ town = 'town', gold, itemName }, h = 0) {
 const boardOrder = (boards) => (Array.isArray(boards) ? boards : []).map((b, i) => [b?.box, i]).filter(([b]) => Array.isArray(b))
   .sort(([a], [b]) => (a[0] - b[0]) || (a[2] - b[2]) || (a[1] - b[1]));
 
-/** Which of a town's boards are bounty boards (Mac, 2026-09-28: "always the half of the bounty boards in every city
- *  should share the same quests"): HALF of them, spread through the town - the boards sorted by position (x, then z,
+/** Which of a town's boards are bounty boards: HALF of them, spread through the town - the boards sorted by position (x, then z,
  *  then y) and every other one taken, starting with the first. Two boards give one, four give two, five give two. A
  *  town with a single board keeps it for its notices. Every bounty board of a town posts the SAME four hunts - a
  *  posting is the town's, never the board's. One answer on every client, whichever order the blocks were laid.
@@ -519,8 +510,8 @@ export function questBoardIndices(boards) {
 
 /** THE RUMOUR BOARD NEAREST THE TOWN'S MIDDLE: of the boards questBoardIndices left, the one nearest `centre` (the
  *  town's middle on the ground, [x, z]), the first by position on a tie or with no centre - the board the siege field
- *  takes for its Market (systems/siegeField.js). ONE-BOARD (2026-10-06) made it the town's one Notice Board online;
- *  ONE-BOARD REVERTED (2026-10-07, Mac: revert "just that change") made every board questBoardIndices left a Notice
+ *  takes for its Market (systems/siegeField.js). ONE-BOARD made it the town's one Notice Board online;
+ *  ONE-BOARD REVERTED made every board questBoardIndices left a Notice
  *  Board again, and this the field's alone. Pure.
  *  @param {Array<{box:number[]}>} boards pixel-local boxes, as questBoardIndices reads them
  *  @param {Set<number>} [bounty] the indices questBoardIndices took

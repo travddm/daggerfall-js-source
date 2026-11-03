@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-B (2026-09-27): COME SAIL AWAY'S BOAT, BUILT - `Boat` (Boat.cs), and
+// CSA-B: COME SAIL AWAY'S BOAT, BUILT - `Boat` (Boat.cs), and
 // ComeSailAway.cs's SpawnBoat (1120-1270), ApplyBoatVariant / ReinitializeBoat
 // / SetBoatVariant (1270-1308), SetupBillboardHelper / AddBillboardLight /
 // SetupModelHelper / SetLights (1344-1526) and GetBoatTransforms (1526-1811),

@@ -81,7 +81,11 @@ const SAVE = {
  *  unmounts through runEnhancedMenu's own resolve. */
 async function toGamePage(page, skin) {
   await page.addInitScript((snap) => {
-    try { localStorage.setItem('dagger.quicksave', JSON.stringify(snap)); } catch { /* storage off */ }
+    try {
+      // One slot in the layout systems/save/saveSlots.js writes: the envelope, then its card.
+      localStorage.setItem('dagger.save.0', JSON.stringify(snap));
+      localStorage.setItem('dagger.saveinfo.0', JSON.stringify({ saveVersion: snap.v, saveName: 'QuickSave', characterName: snap.name, dateAndTime: { gameTime: snap.classicMinutes, realTime: Date.now() } }));
+    } catch { /* storage off */ }
   }, SAVE);
   await page.goto(`${BASE}/play/?skin=${skin}`, { waitUntil: 'networkidle' });
   if (skin === 'enhanced') {

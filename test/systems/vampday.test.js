@@ -1,6 +1,4 @@
-// VAMP-DAY (2026-09-26, Mac: "do vampires have a negative??? seems they have no negative aspect bug or feature???
-// instead of constant damage taken they should get reduced stats in day and get the bonus at night"; asked, "Day -20 /
-// night +20"): THE PORT'S DEPARTURE from VampirismEffect. The sun no longer burns a vampire; the curse's stat
+// VAMP-DAY: THE PORT'S DEPARTURE from VampirismEffect. The sun no longer burns a vampire; the curse's stat
 // advantages are the night's, and from 06:00 to 18:00 - in the sun, never indoors (FIELD BUGS 2026-10-01b) - the same stats are 20 down. A
 // day never zeroes a stat (a live 0 kills - killIfAnyLiveStatZero). The skills' +30, holy ground's burn, the feeding
 // and the rest it gates, and the travel rules stay DFU's.

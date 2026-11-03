@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27): IS A LARGE PICTURE BUILT OUT OF CLASSIC TEXTURES?
+// CSA-A: IS A LARGE PICTURE BUILT OUT OF CLASSIC TEXTURES?
 //
 // Detailed Ships' search (tools/detailedShipsAssets.mjs findClassicSource)
 // asks whether ONE classic record covers a picture of about its own size. A

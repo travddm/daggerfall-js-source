@@ -1,8 +1,7 @@
-// SEA-EASE (2026-10-01, Mac: "too many ships are appearing", "Friendly AI should help the player in combat", "The sea is
-// too dangerous right now") - A QUIETER, SAFER BAY: the traffic's numbers, the pirates' share and temper, the grapple's
+// SEA-EASE - A QUIETER, SAFER BAY: the traffic's numbers, the pirates' share and temper, the grapple's
 // patience and the raiders' cap; THE RELIEF the director sends a lawful player under a pirate's guns; a crown's ship
 // standing by them (the pirate fighting them hers first); and THE STRAY - a ball of theirs on her in the melee forgiven
-// (bible/03-World/Naval-Combat.md SEA-EASE).
+// (SEA-EASE).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

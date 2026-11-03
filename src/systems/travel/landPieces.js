@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAST-REFUSAL (2026-10-26, the owner: "Take care of exclusions and gaps"; bible/06-Systems/Travel-View.md FAST-REFUSAL) -
+// FAST-REFUSAL -
 // THE LAND'S PIECES PAST THE BAY. A plan past the Bay's table with no way by land (Mournhold to Ebonheart: Vvardenfell
 // over the Inner Sea, no boat to hand) spent the planner's whole count of cells before it said so - ROAD-BEYOND's
 // 300,000, one to four seconds. The Bay's own pieces (travelRoute.js routeGround `apart`) are its table's; past it the
@@ -94,7 +94,7 @@ export function apartPastBay(from, to, width, height) {
   return true;
 }
 
-// ── EXACT-PIECES (bible/06-Systems/Travel-View.md EXACT-PIECES): the land's pieces at the pixel ─────────────────────────
+// ── EXACT-PIECES (EXACT-PIECES): the land's pieces at the pixel ─────────────────────────
 // The roads' regions label their cores' dry pixels as they are laid (world/tamrielLandPieces.js, world/tamrielRoads.js
 // regionLand); the world's roads host hands each region's labels here as it lands (scenes/tamrielRoadsHost.js), and each
 // region's pieces are joined to its landed neighbours' where a dry pixel of one stands beside a dry pixel of the other

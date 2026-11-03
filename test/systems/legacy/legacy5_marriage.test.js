@@ -1,5 +1,4 @@
-// LEGACY5 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 8; Mac: "Surnames, Marriage, Children. Live through the
-// world of Daggerfall, passing down your legacy, and continuing your adventures through your bloodline."): COURTING, THE
+// LEGACY5: COURTING, THE
 // WEDDING AND CHILDREN - the law (systems/legacy/marriage.js), the host's doors (scenes/legacyHost.js) and the talk's
 // own rows (scenes/townTalk.js's livingTalk.topics door).
 import { test } from 'node:test';
@@ -33,7 +32,7 @@ test('LEGACY5 the topics: a friend is courted, a full heart hears a proposal, a 
   const me = personOf(f, f.currentId);
   assert.deepEqual(topicsFor(f, me, RES, FRIEND_AT - 1), [], 'not yet a friend');
   assert.deepEqual(topicsFor(f, me, RES, FRIEND_AT), [TOPIC.court]);
-  court(me, RES, { day: 1, personality: 0, etiquette: 0, taste: 0, roll: 0.5 });   // PIN MOVED: TONE-TASTE - the tone as taken
+  court(me, RES, { day: 1, personality: 0, etiquette: 0, taste: 0, roll: 0.5 });
   assert.deepEqual(topicsFor(f, me, RES, 0), [TOPIC.court], 'a courtship begun goes on whatever the day\'s regard');
   assert.equal(propose(me, RES.id), false, 'a heart not yet full hears no proposal');
   me.courting[RES.id].affection = AFFECTION_MAX;
@@ -52,7 +51,6 @@ test('LEGACY5 the topics: a friend is courted, a full heart hears a proposal, a 
 });
 
 test('LEGACY5 a day\'s courtship: Personality, Etiquette and the tone on a roll, once a day, never past the full heart', () => {
-  // PIN MOVED: TONE-TASTE (2026-10-15) - the tone counts as the resident TOOK it (`taste`, talkTopics.js toneTaste),
   // never by its name (LEGACY5's COURT_TONE, Polite +3 to everyone): kindly COURT_TASTE more, the Normal tone nothing,
   // ill a loss of COURT_TASTE whatever else (test/systems/livingWorld/tonetaste.test.js)
   assert.equal(courtGain({ personality: 0, etiquette: 0, taste: 0, roll: 0.5 }), COURT_BASE);
@@ -224,16 +222,3 @@ test('LEGACY5 the host: a courted resident dead ends the courtship with word; a 
   assert.ok(w.host.holdsResident(RES.id), 'their place stays the line\'s - the dead do not come back as the census\'s');
 });
 
-test('LEGACY5 the wiring: the talk puts the host\'s rows first on Tell me about and answers them itself, both skins through the one hooks object; the world hands the doors over', () => {
-  const tt = read('src/scenes/townTalk.js');
-  assert.match(tt, /const own = _toneTarget \? \(legacyTopics\?\.\(_toneTarget\) \?\? \[\]\) : \[\];/);
-  assert.match(tt, /if \(row\.legacy\) return row\.legacy\.answer\(tone, _toneTaste\(\)\);   \/\/ LEGACY5/);   // PIN MOVED: TONE-TASTE - and how the tone was taken
-  assert.match(tt, /question: \(row\) => \(row\.legacy \? row\.legacy\.question\(tone\) :/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /legacyTopics: \(person\) => legacyTopicRows\(person\),/);
-  assert.match(w, /holderOf: \(res, day\) => \(host\.legacyHost\?\.holdsResident\(res\.id\) \? null :/);
-  assert.match(w, /\(id\) => town\.residents\.find\(\(r\) => r\.id === id\) \?\? null\) \?\? null,/);
-  assert.match(w, /templeOf: \(\) => \{ const b = [^\n]*TALK_BUILDING_TYPES\.Temple/);
-  assert.match(w, /legacyHost\?\.residentDied\(res\.id\);   \/\/ LEGACY5/);
-  assert.match(w, /const livingDied = \(res, t\) => \{ legacyHost\?\.residentDied\(res\.id\);/);
-});

@@ -1,10 +1,9 @@
-// AUDIT WB11 (2026-10-01, before the merge - Mac: "Definitely want to perform a comprehensive audit on this and ensure
-// it's perfect"). The WB11 slice - the Legion-Lord's host and the marks' rotation for nine trials - read by six lenses
+// AUDIT WB11. The WB11 slice - the Legion-Lord's host and the marks' rotation for nine trials - read by six lenses
 // over a frozen tree (94d91bdb): the brain (B), the relay and the wire (R), the court's client (C), the player's blows on
 // his host (W), a real browser (U) and the record (D); each finding reproduced by a script against the real modules
 // before anything changed, then fixed. One test a finding - one two lenses found is pinned once, under both names. The
 // modules are read through their namespaces, so on the unfixed tree each test fails for its own finding, never the file
-// for a name it lacks. bible/11-Multiplayer/World-Bosses.md section 17, "AUDIT WB11".
+// for a name it lacks. "AUDIT WB11".
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -94,9 +93,8 @@ test('AUDIT WB11 W1 a Cast When Strikes blade that cut one of his host cast on H
     assert.equal(got[0], a, `${file}: the stand-in through the mount`);
   }
   // the context lands it on the body the stand-in names - one of his host, a crystal, else him
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the router left the context with the spell doors
   // (scenes/gate/standInSpell.js), which the context wires (its enchant door and its api ask spellOnStandIn)
-  assert.match(read('src/scenes/dungeonContext.js'), /const \{ spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival, spellOnStandIn, standInRound \} = createStandInSpell\(\{/);   // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): and the rounds' frame
+  assert.match(read('src/scenes/dungeonContext.js'), /const \{ spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival, spellOnStandIn, standInRound \} = createStandInSpell\(\{/);
   const fn = /function spellOnStandIn\(record, target = null\) \{\n([\s\S]*?)\n {2}\}/.exec(read('src/scenes/gate/standInSpell.js'));
   assert.ok(fn, 'the context routes a strike spell by the stand-in it met');
   const route = new Function('spellOnHost', 'spellOnCrystal', 'spellOnBoss', `return (record, target = null) => {\n${fn[1]}\n};`)((r, i) => `host ${i}`, (r, c) => `crystal ${c}`, () => 'him');

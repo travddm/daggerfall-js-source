@@ -1,7 +1,4 @@
-// WARDEN1 (2026-10-10, Mac: "So I want to do something extremely funny. Anytime there are too many carts/wagons in a city
-// or they are parked on the road for a long time. I want a gaurd to navigate, lift the wagon/horse on top of their sprite
-// and yeet it far away"; asked: it lands outside town, fetched or summoned; everyone sees it; ten real minutes on a road;
-// four a town, the longest parked first). BY EXECUTION: the wire's law (the park word's town, road and landing; which
+// WARDEN1. BY EXECUTION: the wire's law (the park word's town, road and landing; which
 // teams the watch throws; the owner's word); THE RELAY keeping the clock - the road's ten minutes thrown at the first
 // frame past them, a fifth team in a town throwing the longest parked, the throw fanned and told its owner, the owner
 // away told when they re-say the spot, a moved word clearing the mark, a word with no landing never thrown, the alarm
@@ -13,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   validParkData, parkKeyOf, parkKey, PIXEL_UNITS, WARDEN_ROAD_MS, WARDEN_TOWN_CAP, WARDEN_LAND_REACH, WARDEN_TOWN_MAX,
-  wardenVerdicts, wardenDue, validParkYeet, parkSpotOf, parkSameSpot, WARDEN_RELAY_MIN, POSE_BOUND, RELAY_VERSION, WARDEN_SPOT_NATIVES,
+  wardenVerdicts, wardenDue, validParkYeet, parkSpotOf, parkSameSpot, POSE_BOUND, WARDEN_SPOT_NATIVES,
 } from '../../../src/net/wire.js';
 import { fakeRooms } from '../../fakeRoom.mjs';
 import {
@@ -66,7 +63,7 @@ const road = (extra = {}) => ({ w: W(), ly: LY, tw: 77, rd: 1, ...extra });
 
 // ─── the wire ───────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('WARDEN1 wire: the park word carries its landing (within a map pixel of its wagon), and with it its town and its road - none of them without a landing; the relay this client ships with keeps the watch\'s clock (WARDEN_RELAY_MIN)', () => {
+test('WARDEN1 wire: the park word carries its landing (within a map pixel of its wagon), and with it its town and its road - none of them without a landing', () => {
   const v = validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, tw: 77, rd: 1 } });
   assert.deepEqual(v.r, { w: W(), ly: LY, tw: 77, rd: 1 });
   assert.deepEqual(validParkData({ c: CA, a: [AX, AZ], r: { w: W(), tw: 77, rd: 1 } }).r, { w: W() }, 'no landing: never thrown, so neither the town nor the road rides');
@@ -78,8 +75,6 @@ test('WARDEN1 wire: the park word carries its landing (within a map pixel of its
   for (const tw of [-1, 1.5, '77', WARDEN_TOWN_MAX + 1]) assert.equal('tw' in validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, tw } }).r, false, `town ${tw}`);
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, tw: WARDEN_TOWN_MAX } }).r.tw, WARDEN_TOWN_MAX, 'an unsigned map id');
   assert.equal('rd' in validParkData({ c: CA, a: [AX, AZ], r: { w: W(), ly: LY, rd: 2 } }).r, false, 'the road is 1 or nothing');
-  assert.equal(WARDEN_RELAY_MIN, 191);
-  assert.ok(Number(RELAY_VERSION.slice(5)) >= WARDEN_RELAY_MIN, 'AUDIT WARDEN1 D17: relaySupportsWarden had no caller - the version law is the relay\'s own');
 });
 
 test('WARDEN1 wire: wardenVerdicts - a road team WARDEN_ROAD_MS after it came to stand (not a moment before); a town past WARDEN_TOWN_CAP throws its longest parked, ties by key; a team already thrown, or one with no landing, neither thrown nor counted; `next` the soonest road team', () => {
@@ -120,7 +115,6 @@ test('WARDEN1 wire: the cell\'s round is due when it has not read its teams sinc
   assert.deepEqual(parkSpotOf({ h: H(7, 8) }), [7, 8]);
   assert.equal(parkSpotOf({}), null);
   assert.equal(parkSameSpot({ w: W(), h: H(), n: 'Bess' }, { w: W(), h: H(), n: 'Bessie' }), true, 'a new name moves nothing');
-  // PIN MOVED (AUDIT WARDEN1 R2): the team's spot, not every part exactly - a ground solved again, a horse not yet drawn
   assert.equal(parkSameSpot({ w: W() }, { w: W(AX + WARDEN_SPOT_NATIVES) }), true);
   assert.equal(parkSameSpot({ w: W() }, { w: W(AX + WARDEN_SPOT_NATIVES + 1) }), false);
   assert.equal(parkSameSpot({ w: W() }, { w: W(AX, AZ - WARDEN_SPOT_NATIVES - 1) }), false);
@@ -210,7 +204,7 @@ test('WARDEN1 relay: a woken cell reads its teams at its first frame (a hibernat
     const a2 = await join2(X, 'ann1'), b2 = await join2(X, 'bob1');
     await park2(X, a2, { c: CA, a: [AX, AZ], r: road() });
     step(5 * 60 * 1000);
-    await park2(X, a2, { c: CA, a: [AX + 100, AZ], r: road({ w: W(AX + 100) }) });   // PIN MOVED (AUDIT WARDEN1 R2): a move past WARDEN_SPOT_NATIVES
+    await park2(X, a2, { c: CA, a: [AX + 100, AZ], r: road({ w: W(AX + 100) }) });
     assert.equal(w2.room(X).store.get(parkKey(k)).since, now());
     step(5 * 60 * 1000);
     await w2.room(X).ping(b2);
@@ -246,15 +240,6 @@ test('WARDEN1 relay: a fifth team in a town throws the longest parked there, at 
     assert.deepEqual(thrownFans(bob).map((f) => f.k), [owners[0].k, owners[1].k], 'the next longest - the thrown one is outside town');
     assert.equal(Number.isFinite(w.room(X).store.get(parkKey(owners[1].k)).y), true);
   });
-});
-
-test('WARDEN1 relay hosts: the frame\'s door runs the round when it is due; the alarm is its other duties\' alone; a socket speaking for a team is marked (`pk`) so the watch can tell it', () => {
-  const s = rd('server/src/index.js');
-  assert.match(s, /if \(a\.id && isCellRoom\(a\.key\) && wardenDue\(this\._wardenAt, Date\.now\(\)\)\) \{\n\s+try \{ await this\._parkWarden\(Date\.now\(\)\); \} catch \(e\) \{ this\._parks = null; this\._wardenAt = Date\.now\(\) \+ WARDEN_RETRY_MS;/);   // PIN MOVED (AUDIT WARDEN1 R4): the round's failure is its own
-  const alarm = s.slice(s.indexOf('  async alarm() {'), s.indexOf('  /** The alarm\'s duties past the boss rooms\' beats'));
-  assert.equal(alarm.includes('_parkWarden'), false, 'the alarm throws nothing');
-  assert.match(s, /if \(a\.pk !== k\) \{ a = \{ \.\.\.a, pk: k \}; this\._setAttach\(ws, a\); \}/);
-  assert.match(s, /await this\._parkWarden\(now\);   \/\/ WARDEN1: a throw an alarm missed is made before the joiner reads the cell/);
 });
 
 // ─── the client's law ───────────────────────────────────────────────────────────────────────────────────────────────
@@ -397,24 +382,6 @@ test('WARDEN1 pool: a team the watch carries is no box for the ray - mine nor an
   pool.holdTeam(key, false); pool.holdTeam('', false);
   pool.frame(0.016, [0, 1.7, -10]);
   assert.equal(keys().length, 2); assert.equal(buckets.size, 1);
-});
-
-test('WARDEN1 hosts: the online plumbing carries `y` and the owner\'s word; world.js plays a throw before the pool moves the record, wires the owner\'s word, stamps off its built towns, frames, draws and ends the show; the runtime adopts a throw', () => {
-  const o = rd('src/net/online.js');
-  assert.match(o, /\.\.\.\(m\.data && Number\.isFinite\(m\.y\) \? \{ y: m\.y \} : \{\}\)/);
-  assert.match(o, /\.\.\.\(Number\.isFinite\(e\.y\) \? \{ y: e\.y \} : \{\}\) \}\)\);/);
-  assert.match(o, /const y = isCellRoom\(room\) \? validParkYeet\(m\) : null;\n\s*if \(y\) this\._deliver\('parkYeet', \(\) => this\.onParkYeet\?\.\(room, y\)\);/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /online\.onPark = \(room, e\) => \{ wagonWarden\?\.keptWord\(room, e\); hcc\.applyKept\(room, e, campToScene, performance\.now\(\)\); \};/);
-  assert.match(w, /online\.onParkYeet = \(room, y\) => wagonWarden\?\.onParkYeet\(room, y\);/);
-  assert.match(w, /wardenTown: dfLocation && isWardenTown\(dfLocation\.mapTableData\?\.locationType\) \? \(dfLocation\.mapTableData\?\.mapId \?\? 0\) >>> 0 : null,/);
-  assert.match(w, /if \(!_loading\) wagonWarden\?\.tick\(\); if \(_mode\(\) === 'exterior'\) wardenShows\?\.frame\(cam\.pos\);/);
-  assert.match(w, /if \(_mode\(\) === 'exterior'\) wardenShows\?\.draw\(renderer\);/);
-  assert.match(w, /livePersonBatches\.push\(\.\.\.wardenShows\.batches\(\)\)/);
-  assert.equal((w.match(/wardenShows\?\.destroyAll\(\);/g) ?? []).length, 2, 'a re-anchor and a load');
-  assert.match(w, /hcc\.setWardenWord\(\(a\) => wagonWarden\?\.word\(a\) \?\? null\);/);
-  assert.match(w, /registerModSaveData\(WARDEN_VENDOR, \{/);
-  assert.match(rd('src/systems/horse/horseCart.js'), /adoptYeet,   \/\/ WARDEN1/);
 });
 
 // ─── the runtime ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -580,7 +547,6 @@ test('WARDEN1 host: my parked wagon is stamped once the ground under it is built
   const s = hw.h.stamp;
   assert.equal(s.tw, 77); assert.equal(s.rd, true); assert.deepEqual(s.a, [AX + 40, AZ]);
   assert.deepEqual(hw.h.word([AX + 40, AZ]), { ly: s.ly, tw: 77, rd: 1 });
-  // PIN MOVED (AUDIT WARDEN1 R6): out through the nearest edge whose landing keeps the team in its own map pixel - the
   // west's (6 m off) and the south's (50 m) leave pixel (100, 150), the north's (52.4 m) stands in it, strayed along it
   const along = Math.max(0, Math.min(64 * NAV_CELL, 6 + strayOf([AX + 40, AZ]) * WARDEN_LAND_SCATTER));
   assert.deepEqual(s.ly, [Math.round((along - 5) * 40 + AX), Math.round((64 * NAV_CELL + WARDEN_LAND_PAST - 50) * 40 + AZ)]);

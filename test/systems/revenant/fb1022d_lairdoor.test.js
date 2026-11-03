@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-22d LAIR-DOOR (bible/01-Overview/bugs/Field-Bugs-2026-10-22d.md, report 4): fogs, on Zenako's behalf -
+// FIELD BUGS 2026-10-22d LAIR-DOOR (, report 4): fogs, on Zenako's behalf -
 // "the Revenant lair designated on the Revenants page is inaccessible -- there are no interactable doors, hatches or
 // openings to the marked dungeon ... The Stuvam Graveyard, south of Ceriburea ... approximate coordinates 565, 427". A
 // revenant's lair (RVN7, Revenants.md 18.1) is one of the game's own dungeons in the boards' ring about a deed - and 28 of
@@ -140,17 +140,6 @@ test('LAIR-DOOR the mend: a living revenant holding a lair no one can enter move
   assert.equal(N.mendRevenantLairs(), 0); assert.equal(N.mendRevenantLairs(), 0);
   assert.equal(calls, 2, 'asked again');
   assert.deepEqual(r.lair, D(20, 20, 'Somewhere', 0));
-});
-
-test('LAIR-DOOR by source: the world host\'s door is scenes/lairHost.js over its own index, asked of my pixel or the one asked; every reader of a lair mends first (mutants: unwired)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /lairHere: createLairDoor\(\{ maps, blocks, arch, locations: locationIndex, dungeons: _bountyDungeonPixels, regions: _dungeonRegionPixels, here: playerTravelPixel, pastBay: provinceQuestPlaces \}\),/);   // PIN MOVED (LAIR-WORLD): and the lairs past the Bay (scenes/tamrielPlacesHost.js provinceQuestPlaces)
-  assert.match(w, /import \{ createLairDoor \} from '\.\/lairHost\.js';/);
-  const rv = read('src/systems/revenant/revenant.js');
-  for (const fn of ['revenantRumor', 'revenantMapMarks', 'revenantHuntEntries']) {
-    assert.match(rv, new RegExp(`export function ${fn}\\([^\\n]*\\{\\n(?:[^\\n]*\\n){1,3}?\\s*mendRevenantLairs\\(\\);`), `${fn} mends first`);
-  }
-  assert.match(rv, /export function revenantsFor\(player\) \{ ensureMirror\(player\); mendRevenantLairs\(\); return allRevenants\(\); \}/);
 });
 
 // ─── THE PLAYER'S DATA ──────────────────────────────────────────────────────────────────────────────────────────

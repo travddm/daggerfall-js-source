@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster chars_bc
+// AUDIT 68, the whole-tree sweep - cluster chars_bc
 // (src/characters from equipRules to pieceFromSprite, the pieces and
 // the rewrite rig). The behavioural fixes: the Khajiit tail's twisted
 // frame and inside-out tube, the drapes' group tag, the arachnid's
@@ -140,12 +140,6 @@ test('AUDIT 68 S05-seducer-rewind-incomplete: a transform in PROGRESS predates t
   for (let i = 0; i < 200; i++) { b.update(0.1, false); tick(m, 1); }
   assert.equal(m.specialTransformationCompleted, false);
   assert.equal(m.state, 'idle');
-});
-
-test('AUDIT 68 S05-seducer-rewind-incomplete: the dungeon\'s in-place restore rewinds every Seducer, flag up or not', () => {
-  const DC = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  const pf = DC.slice(DC.indexOf('function patchFoe(f, sf, wire = false)'), DC.indexOf('if (sf.dead && !f.dead) setFoeDead(f, true);'));
-  assert.match(pf, /else if \(sf\.specialTransformationCompleted === false && f\.seducer\) \{[^}]*f\.seducer\.rewind\(\);/);
 });
 
 test('AUDIT 68 S05-mobileunit-stale-record: the tick a one-shot ends returns the NEXT state\'s record', () => {

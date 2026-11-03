@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-TOWN-WALK (2026-10-19, the owner: "When in a town, slow down overworld navigation and have it navigate properly
-// on town pathways instead of bumping into buildings"; bible/06-Systems/Travel-View.md OW-TOWN-WALK): A JOURNEY THROUGH
+// OW-TOWN-WALK: A JOURNEY THROUGH
 // A TOWN WALKS ITS STREETS, AT A TOWN'S PACE.
 //
 // Travel Options aims a journey straight at its next point (the mod's autopilot), and the port's steering feels its way
@@ -40,7 +39,7 @@ import { stepsDone } from '../../world/puddleMask.js';   // IC-STUTTER: OW-HITCH
  *  a road). Five times a walk: a town of eight blocks crossed in under a minute, the streets' turns taken at a pace the
  *  motor and the collider meet a frame at a time. */
 export const TOWN_PACE_MAX = 5;
-/** IC-PACE (2026-10-26, the owner: "For the Imperial City specifically, the travel speed should be 60x instead of 5"):
+/** IC-PACE:
  *  the fastest a journey runs in the Imperial City's streets - forty-nine pixels of them (5.7 km across: TS5, bible/03-World/
  *  Town-Shapes.md), which at five times a walk took a quarter of an hour of real time to cross. Its streets are still
  *  walked as a town's (the way, the gates, the steering); only the clock is let run. */
@@ -174,8 +173,7 @@ function* searchSteps(search) {
 
 /** @type {WeakMap<object, Int32Array>} */
 const piecesOf = new WeakMap();
-/** IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
- *  Arena-Provinces.md IC-STUTTER): the cells a flood labels between two steps of componentsSteps - a slice of the Imperial
+/** IC-STUTTER: the cells a flood labels between two steps of componentsSteps - a slice of the Imperial
  *  City is a grid of 512 by 512, flooded in one task by the traveller's first ask of its pace (10-130 ms; at x60 a new
  *  one every slice crossed). The pixel's build floods it a step at a time before it stands (scenes/pixelBuild.js). */
 export const PIECES_CELLS_A_STEP = 16384;
@@ -292,7 +290,7 @@ function nearestIn(nav, label, id, to) {
  * @returns {{ cells: number[][], inside: boolean, reached: boolean } | null}
  */
 export const townWayCells = (nav, from, to, o = {}) => stepsDone(townWayCellsSteps(nav, from, to, o));
-/** IC-STUTTER (2026-10-27, bible/03-World/Arena-Provinces.md IC-STUTTER): townWayCells a few thousand cells at a time -
+/** IC-STUTTER: townWayCells a few thousand cells at a time -
  *  its pieces flooded (componentsSteps) and each search opened WAY_CELLS_A_STEP cells a step (`scratchKey` the scratch it
  *  keeps: systems/livingWorld/townPaths.js townPathSearch); the same search in the same order, the same way. A slice of the
  *  Imperial City is 512 cells a side, and a journey at x60 asked its way at every slice crossed, 10-200 ms of one task.

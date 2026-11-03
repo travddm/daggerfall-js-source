@@ -1,6 +1,4 @@
-// RELIEF-PEAKS (2026-10-27, bible/03-World/Tamriel.md RELIEF-PEAKS; KPbICA on the game's Discord, forwarded by the owner:
-// "No mountains ... Instead we're getting strange looking canyons", "No 'Red Mountain' in Morrowind", "Strange projections
-// above the horizon line"). Pinned here:
+// RELIEF-PEAKS. Pinned here:
 //   - the large map past the Bay is WOODS.WLD's own law of the small byte (it was a swell about 4.5: the continent stood
 //     a third under the Bay's height at the same byte), blended in from the Bay's edge as the bytes are (it handed over at
 //     the seam, a wall of some 600 m along the Wrothgarians);
@@ -192,7 +190,6 @@ test('RELIEF-PEAKS the ranges\' parts: the ridged field 0..1 about RANGE_MEAN (m
   assert.ok(CONTINENT_CEILING <= LANDFORM_CEILING, 'the continent under the world\'s ceiling');
   assert.ok(rangeCeiling() <= MAX_TERRAIN_HEIGHT + reliefLift(127 * 8) + continentLift(CONTINENT_LIFT.top) + 1e-9, 'the ranges\' ceiling the land\'s');
   for (let h = SCALED_OCEAN_ELEVATION; h < rangeCeiling(); h += 37) assert.ok(rangeSwing(h) * (1 - rangeCentre(h)) <= rangeUp() + 1e-9, `the rise's bound at ${h}`);
-  // PIN MOVED (RED-MOUNTAIN, the merge): the cone's profile went with the cone - Red Mountain is test/world/redmountain.test.js's
 });
 
 test('RELIEF-PEAKS the ranges on the land (a relief standing): none with no relief, none on the low ground; centred where the land has room, the crests the land\'s own at the ceiling and never over it; never under the land and the foot, whichever is lower; none by a carved river or a lake; pure in world position; Red Mountain\'s cone at its relief\'s summit, the land inside its rim the cone, the ranges quiet about it; the bound (mutants: the floor; the clip; the waters\' valleys; the cone\'s summit; its foot)', async () => {
@@ -228,7 +225,6 @@ test('RELIEF-PEAKS the ranges on the land (a relief standing): none with no reli
     assert.equal(waterDistance(rx, ry), 0);
     assert.equal(tamrielRangeAt(rx * 128, (MAP_HEIGHT + 1 - ry) * 128, units(2000)), 0, 'the river runs down a valley of the mountains, never a gorge');
     assert.notEqual(tamrielRangeAt((rx + 10) * 128, (MAP_HEIGHT + 1 - ry - 10) * 128, units(2000)), 0, 'the ranges whole past its reach');
-    // PIN MOVED (RED-MOUNTAIN, the merge): no cone of the ranges' own - Red Mountain is RED-MOUNTAIN's
     // (test/world/redmountain.test.js); the bound is the ridges' rise alone, at its summit too
     const land = nodeGround(100, 1, 1), s = redMountainFrame();
     assert.equal(rangeBound(Math.floor(s.bx), Math.floor(s.by), land), Math.min(ceiling, land + rangeUp()));
@@ -268,7 +264,6 @@ test('RELIEF-PEAKS the far views stand on the kernel\'s own ground: the far ring
   await withRelief(() => {
     const woods = new StubWoods(() => 60), g = groundWoods(woods), byteAt = (x, y) => g.getHeightMapValue(x, y), s = redMountainFrame();
     const x = Math.floor(s.bx), y = Math.floor(s.by);
-    // PIN MOVED (RED-MOUNTAIN, the merge): at Red Mountain's summit the far ring adds its smooth cone (ringGroundAt), as the mean ground does
     assert.ok(Math.abs(centreGround(byteAt, x, y) + redMountainLiftAt(x, y) - meanGroundField(g, x, y, true)(64, 64)) * U < 4, 'with the ranges and the cone');
     assert.ok(Math.abs(nodeGroundAt(byteAt, x, y) + redMountainNodeLift(x + 1, y + 1) - meanGroundField(g, x, y, true)(128, 0)) * U < 4, 'and the far field\'s node, the cone at its point');
     assert.ok(groundTopOf(g, x, y, true) >= (meanGroundField(g, x, y, true)(64, 64)), 'the bound over the cone');
@@ -278,7 +273,7 @@ test('RELIEF-PEAKS the far views stand on the kernel\'s own ground: the far ring
 test('RELIEF-PEAKS the far views\' wiring (by source): the far ring\'s grid on ringGroundAt with its nodes\' fades once a node; the far field\'s vertex the worker\'s ground (asked with the Landforms row, kept by it, transferred, assembled, read); the travel view\'s ground past the grid the ring\'s; the shaper lays the ranges under the landforms; the mean ground and the bound count them (mutants: the far field on its highest byte; the ground not transferred)', () => {
   const ring = read('src/render/farRing.js'), worker = read('src/world/terrain/terrainGenWorker.js'), client = read('src/world/terrain/terrainGenClient.js'), lf = read('src/world/landforms.js');
   assert.match(ring, /heights\[j \* hside \+ i\] = ringGroundAt\(baseX - radius - 1 \+ i, baseY - radius - 1 \+ j, gridByte, relief, fadeAt\);/);
-  assert.match(ring, /heightOf: \(byte, x, y, v\) => answer\.ground\[v\] \+ \(inputs\.relief \? redMountainNodeLift\(x, y\) \* STREAMING_TERRAIN_SCALE : 0\),/);   // PIN MOVED (RED-MOUNTAIN, the merge): and the cone at the node
+  assert.match(ring, /heightOf: \(byte, x, y, v\) => answer\.ground\[v\] \+ \(inputs\.relief \? redMountainNodeLift\(x, y\) \* STREAMING_TERRAIN_SCALE : 0\),/);
   assert.match(ring, /farField\?\.\(\{ baseCX, baseCY, radius: FAR_RADIUS, cell: FAR_CELL, seaByte, relief: !!inputs\.relief \}\)/);
   assert.match(worker, /farFieldCell\(woods, cx, cy, m\.cell, m\.seaByte, farCellClimate, !!m\.relief\)/);
   assert.match(worker, /\[high\.buffer, low\.buffer, clim\.buffer, ground\.buffer\]/);
@@ -286,8 +281,8 @@ test('RELIEF-PEAKS the far views\' wiring (by source): the far ring\'s grid on r
   assert.match(read('src/scenes/world.js'), /return \[x, ringGroundAt\(px\.x, px\.y, ground \? \(bx, by\) => woods\.getHeightMapValue\(bx, by\) : \(\) => 0, !!landform\)/);
   assert.match(lf, /const land = macro \+ lift \* fade, r = ranges \? ranges\(gx, gy, land\) : 0;/);
   assert.match(lf, /const c = r \+ tamrielLandformAt\(tl, gx, gy, land \+ r, deepCont\);/);
-  assert.match(lf, /return \(share > 0 \? land \+ share \* tamrielRangeAt\(ox \+ x, oy \+ y, land\) : land\) \+ \(beyond \? redMountainSmooth\(ox \+ x, oy \+ y\) : 0\);/);   // PIN MOVED (RED-MOUNTAIN, the merge): and its smooth cone
-  assert.match(lf, /if \(continentPixel\(px, py\)\) return rangeBound\(px, py, h \+ reliefLift\(lowTop\) \+ continentLift\(lowTop\)\) \+ Math\.max\(hill, TAMRIEL_TOP\) \+ redMountainTopNear\(px, py\);/);   // PIN MOVED (RED-MOUNTAIN, the merge): and the volcano's bound
+  assert.match(lf, /return \(share > 0 \? land \+ share \* tamrielRangeAt\(ox \+ x, oy \+ y, land\) : land\) \+ \(beyond \? redMountainSmooth\(ox \+ x, oy \+ y\) : 0\);/);
+  assert.match(lf, /if \(continentPixel\(px, py\)\) return rangeBound\(px, py, h \+ reliefLift\(lowTop\) \+ continentLift\(lowTop\)\) \+ Math\.max\(hill, TAMRIEL_TOP\) \+ redMountainTopNear\(px, py\);/);
   assert.match(lf, /height: \(x, y\) => nodeGround\(woods\.getHeightMapValue\(x, y\), 1, byteBeyond\(x, y\)\),/);
 });
 
@@ -436,7 +431,6 @@ test('RELIEF-PEAKS with ARENA2: the ranges past the Bay stand as mountains - ove
       n++; if (g > Math.tan(50 * Math.PI / 180)) steep++;
     }
     assert.ok(steep / n < 0.002, `about Bruma ${(100 * steep / n).toFixed(2)}% over 50 degrees`);
-    // PIN MOVED (RED-MOUNTAIN, the merge): Red Mountain's height is test/world/redmountain.test.js's (with ARENA2: its rim over 6.5 km)
     // the Bay's north edge, the Wrothgarians: no step over 120 m between samples 102 m apart (it fell some 600 m in half a pixel)
     let worst = 0, prev = null;
     for (let py = 5; py >= -8; py--) for (let y = 0; y < 128; y += 16) { const h = H(951, py, 64, y); if (prev !== null) worst = Math.max(worst, Math.abs(h - prev)); prev = h; }

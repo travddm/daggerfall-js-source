@@ -132,7 +132,7 @@ function worldOf(w) {
   const names = ['playerTravelPixel', 'maps', 'locationIndex', 'modes', 'walkMode', 'playerSpawned', 'player', 'cam', 'REGION_NAMES', 'state',
     'heightAt', 'floorLanding', 'collider', 'LEGACY_REMAINS_NEAR_DUNGEON', 'LEGACY_REMAINS_NEAR', 'createRemainsStand', 'droppedLoot', 'REMAINS_FLAT',
     'areEnemiesNearby', 'exteriorFoePool', 'exteriorFoes', 'cityGuards', 'groundFrameHeight', 'restandHeight', 'scaleOf', 'STREAMING_TERRAIN_SCALE', 'LEGACY_TEXT',
-    'builtDungeonSize', 'duelEnemyNear', 'navalHostileNear', 'RECORD_GROUND_STAMP'];   // PIN MOVED (BAY-LEFT-GROUND, D5): the scale and the frame's law, stamped together
+    'builtDungeonSize', 'duelEnemyNear', 'navalHostileNear', 'RECORD_GROUND_STAMP'];
   const vals = [() => ({ ...w.pixel }), maps, locationIndex, modes, true, true, player, { pos: [0, 0, 0] }, REGION_NAMES, state,
     heightAt, floorLanding, collider, 6, 2400, createRemainsStand, w.streetPool, REMAINS_FLAT,
     areEnemiesNearby, exteriorFoePool, exteriorFoes, cityGuards, groundFrameHeight, restandHeight, scaleOf, SCALE, LEGACY_TEXT,
@@ -179,7 +179,7 @@ function house() {
 /** The collapse kills - as the dungeon's own onExhausted asks it: exhaustionOutcome over areEnemiesNearby (no foe near,
  *  an hour on the ground; a hostile one that sees her, SPENT-ASHORE's tenth of her health at each drain to nothing,
  *  through the one damage door, until the drains have spent her) - and the line's Succession raises a newborn heir, who
- *  lands through the birth's own door. PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): DFU's OnExhausted SetHealth(0)s
+ *  lands through the birth's own door.
  *  her at the first such collapse (TEXT.RSC 1072), and this helper stood her death on that one; the port's collapse among
  *  foes costs a tenth now, so she dies of the collapses as they come - the same death through the same door, the
  *  Legacy host hearing it as any death. */
@@ -547,7 +547,6 @@ test('REMAINS-STAND: in the open - the body stands at the native spot where she 
   assert.equal(t.w.lifts, 0, 'no lift asked');
   const row = fallAndHeir(t);
   assert.equal(row.place.mode, 'exterior');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): and its frame's law, stamped beside the scale
   assert.deepEqual(row.place.world, { x: 5 * 40 + 1000, z: 7 * 40 + 2000, y: 9 - 3 - liftAt(5, 7), terrainScale: SCALE, groundFrame: 2 }, 'the death\'s place: the native spot and the height she stood at - a record\'s: in DFU\'s frame (the spot\'s own lift off), on the ground it was measured on');
   assert.equal(t.w.lifts, 1, 'the death asked it, once');
   // the heir comes back on the pixel: the body stands on the roof she fell from
@@ -622,7 +621,7 @@ test('LIVE-FIGHT: the remains\' fight is the place the one played stands in - a 
   }
 });
 
-test('REMAINS-STAND: the line and the find - its own mark stands its line with the rarity row off, the open zone\'s word never puts it out; it holds no silver find; the hosts by source (mutants: the mark dropped from lootFinds; one word for every kind; the find rolled)', () => {
+test('REMAINS-STAND: the line and the find - its own mark stands its line with the rarity row off, another word never puts it out; it holds no silver find; the hosts by source (mutants: the mark dropped from lootFinds; one word for every kind; the find rolled)', () => {
   _resetForTests(); setPref('lootRarity', false);
   const pool = groundPool();
   const items = [{ group: 'UselessItems2', templateIndex: 1810, name: 'The remains of X' }];
@@ -638,7 +637,7 @@ test('REMAINS-STAND: the line and the find - its own mark stands its line with t
   const pass = createLootLines(gl);
   const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
   setLootMarksLive(true, 'legacy');
-  setLootMarksLive(false);   // the open zone's word, every frame online: none of mine there
+  setLootMarksLive(false, 'other');   // another word of the marks, every frame: none of mine there
   assert.equal(pass.draw(() => pool.lootFinds(), I, I, [0, 1.6, 0], 1), true, 'the house\'s word keeps the pass: its line stands');
   assert.equal(pass.draw(() => pool.lootFinds(), I, I, [1, 1.6, 31], 1), true, 'seen across a hall: thirty metres off, its line stands (AUDIT FB1013d C8)');
   setLootMarksLive(false, 'legacy');

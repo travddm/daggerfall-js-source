@@ -1,7 +1,4 @@
-// STATUS-LIVE (2026-09-22, kurkku via Mac: "minor thing: would be nice
-// if the info panel that comes up when you press i didn't pause the
-// game, that way you could quickly check your status while walking
-// around"): THE LIVE READOUT'S STATE AND THE LAW THAT YIELDS IT.
+// STATUS-LIVE: THE LIVE READOUT'S STATE AND THE LAW THAT YIELDS IT.
 //
 // The BOX is ui/statusBox.js and its header carries the whole of why.
 // This half is here, a leaf on systems/ with nothing from ui/ in it,

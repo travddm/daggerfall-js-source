@@ -114,8 +114,6 @@ function hostOpenSea({ isWater, width, height, ether = false, inEther = () => fa
   let asked = 0;
   const seaPixel = (x, y) => { asked++; return isWater(x, y); };
   // eslint-disable-next-line no-new-func
-  // PIN MOVED (AUDIT TESA II P12): the picture's lakes (world/arenaPlaces.js pastBayLakeAt) handed, the test's own;
-  // PIN MOVED (RUMARE-WATER): and the Imperial City's lake (world/rumareWaters.js rumareSeaPixel)
   const openSea = new Function('etherSea', 'inEther', 'seaPixel', 'MAP_WIDTH', 'MAP_HEIGHT', 'openSeaOf', 'tamrielLand', 'pastBayLakeAt', 'rumareSeaPixel', `${m[1]}\nreturn openSea;`)(ether, inEther, seaPixel, width, height, openSeaOf, tamriel, lakeAt, rumareAt);
   return { openSea, asked: () => asked };
 }
@@ -159,7 +157,7 @@ function hostPortList({ dict, maps, openSea }) {
   // eslint-disable-next-line no-new-func
   return new Function('mapDict', 'maps', 'PORT_LOCATION_IDS', 'isPortTownType', 'getPixelFromPixelID', 'navalCrownOf', 'navalCapitals', 'seaBears', 'openSea', 'worldPorts',
     `${list[1]}\nreturn navalPortList;`)(dict, maps, PORT_LOCATION_IDS, isPortTownType, getPixelFromPixelID, crownOf, () => [], seaBears, openSea,
-    createWorldPorts({ places: createWorldPlaces(), openSea }))();   // PIN MOVED (WW3): the world's ports past the Bay after the Bay's (none here)
+    createWorldPorts({ places: createWorldPlaces(), openSea }))();
 }
 
 test('INLAND-PORTS THE HOST: the pixel\'s build and the town\'s places ask portOnSea (a port by its data on the open sea), the bearing is read off the open sea, the open sea stands above the stream; the harbour board\'s ports, run, are the towns the open sea bears on - no board in a capital in the hills or by a lake (mutants: the board\'s sea unasked, the host asking the data alone, the bearing off any water)', () => {
@@ -169,7 +167,7 @@ test('INLAND-PORTS THE HOST: the pixel\'s build and the town\'s places ask portO
   assert.match(W, /const bearing = seaBearing\(lp\.x, lp\.y, openSea\);/);
   assert.match(W, /\n {4}_openSea \?\?= openSeaOf\(seaPixel, MAP_WIDTH, MAP_HEIGHT\);\n/);
   // BOOT-TDZ: declared above the stream, as seaPixel is - the boot's first build reads it
-  const decl = W.indexOf('\n  const openSea = (x, y) => {'), places = W.indexOf('\n  async function townPlacesFor(');   // PIN MOVED (IC-STUTTER): awaited, a step at a time
+  const decl = W.indexOf('\n  const openSea = (x, y) => {'), places = W.indexOf('\n  async function townPlacesFor(');
   assert.ok(decl > W.indexOf('\n  const seaPixel = (x, y) =>') && decl < places, 'beside seaPixel, before the towns\' places');
   // the board: three of Travel Options' harbours - a capital, a village by a lake, a hamlet on the sea's shore
   const ids = [...new Set(PORT_LOCATION_IDS)].slice(0, 3);

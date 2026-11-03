@@ -1,6 +1,5 @@
 // @ts-check
-// BLD (2026-10-26, the owner: "no lighting sources like the original layouts"; bible/03-World/Arena-Provinces.md
-// IC-GRAND, BLD) - THE FABRIC'S WINDOWS LIT AT NIGHT, as Daggerfall's are.
+// BLD - THE FABRIC'S WINDOWS LIT AT NIGHT, as Daggerfall's are.
 //
 // DFU's reference: an exterior window's glass glows with the window style after dark - MaterialReader's IsExteriorWindow
 // arm uploads an emission map of the picture's glass (TextureReader GetWindowColors32: the window's texels white, every

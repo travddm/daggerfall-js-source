@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03): THE `cl` CLAIM AT THE MINT - a realm character's own level (server-account/src/realm.js
+// ARENA4b: THE `cl` CLAIM AT THE MINT - a realm character's own level (server-account/src/realm.js
 // realmLevelOf, folded since into realm.js realmMintFacts by SCALE4f - INT7: the level its judge trusts, else its tile's summary), signed into the identity token beside `rc` by /v1/auth/token
 // (server-account/src/index.js), for the relay to read. Driven through the real Worker over node:sqlite
 // (test/accountDb.mjs); the claim's own law in src/net/identityToken.js claimsValid.
@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { seatRealm } from '../realmSeat.mjs';
 import { verifyToken, claimsValid, mintToken } from '../../src/net/identityToken.js';
-import { REALM_LEVEL_CLAIM_MAX, realmMintFacts } from '../../server-account/src/realm.js';   // PIN MOVED (SCALE4f): realmLevelOf is realmMintFacts' `cl`
+import { REALM_LEVEL_CLAIM_MAX, realmMintFacts } from '../../server-account/src/realm.js';
 
 const { subtle } = globalThis.crypto;
 
@@ -25,7 +25,6 @@ test('ARENA4b the mint signs a realm character\'s level as `cl` - INT7: the leve
     return v.claims;
   };
   const tile = (summary) => raw.prepare('UPDATE realm_characters SET summary = ? WHERE id = ?').run(summary == null ? null : JSON.stringify(summary), R.id);
-  // PIN MOVED (INT7, bible/06-Systems/Integrity-Arc.md lane 2): this asserted the tile's level (12) signed whatever the
   // judge made of it - AUDIT PRE-MERGE 1003 S2's "never read against the save". A judged character's `cl` is now the
   // level its judge trusts (`level_seen`: a level no play earned is never signed - the seat's first save claimed 12 at
   // no time played), and the tile's word moves it no more; the tile is read only before any checkpoint was judged.
@@ -48,7 +47,7 @@ test('ARENA4b the mint signs a realm character\'s level as `cl` - INT7: the leve
   tile({ level: 0 });
   assert.equal('cl' in (await claimsOf({ character: R.id })), false, 'a level under one');
   tile({ level: REALM_LEVEL_CLAIM_MAX });
-  assert.equal((await claimsOf({ character: R.id })).cl, REALM_LEVEL_CLAIM_MAX, 'the top of the bound');   // PIN MOVED: LEVEL-45, the bound is the online cap
+  assert.equal((await claimsOf({ character: R.id })).cl, REALM_LEVEL_CLAIM_MAX, 'the top of the bound');
   tile({ level: REALM_LEVEL_CLAIM_MAX + 1 });
   assert.equal('cl' in (await claimsOf({ character: R.id })), false, 'past the bound');
   // the checkpoint's own word moves it

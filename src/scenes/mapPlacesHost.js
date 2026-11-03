@@ -1,10 +1,9 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 //
-// BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/06-Systems/Travel-View.md BAY-LEFT-MAPS) grew it, after the move: a place past the Bay by its summary
+// BAY-LEFT-MAPS grew it, after the move: a place past the Bay by its summary
 // where it was found, or where a quest names it (`named`), whether or not its pixel has built (tvPlaceSummary - the index
 // holds one only once it has; its location stood the first time a journey reads it, pendingSummary); TV5's settlements a
 // near query (tvFarSettlements) where they were a snapshot of the index at the view's first ask; the junction map's dots
@@ -15,11 +14,9 @@ import { etherPlaceIsle } from '../world/etherPlaces.js';
 import { hasCarriageGate } from '../world/immersiveTravelGates.js';
 import { immersiveTravelLoaded } from '../systems/immersiveTravel.js';
 import { inEther } from '../world/ethericSea.js';
-import { isHallMapId, spawnedHallMapId } from '../net/wire.js';
 import { inBay as onTheBay } from '../world/tamriel/tamrielFrame.js';
 import { checkLocationDiscovered as travelCheckDiscovered } from '../ui/travel/travelMapWindow.js';
 import { locationSummaryAt as travelLocationSummaryAt } from '../systems/map/mapDirectory.js';
-import { wildHallAt } from '../systems/wild/wildDungeons.js';
 import { settlementPixels, TV_FAR_RANGE, TV_FAR_TYPES } from '../systems/travel/travelFarPlaces.js';   // BAY-LEFT-MAPS: TV5's towns
 import { pastBayPlacesIn } from '../world/pastBayPlaces.js';   // BAY-LEFT-MAPS: the countryside the roads' regions laid
 import { isCapitalPlaceId } from '../world/capitalLane.js';   // BAY-LEFT-MAPS: a capital once, by its centre
@@ -32,7 +29,7 @@ const BAY_PIXEL_IDS = MAX_MAP_PIXEL_X * MAX_MAP_PIXEL_Y;
 /** @param {any} host */
 export function createMapPlaces(host) {
   const {
-    captainLedger, etherPlaceClone, etherSea, locationIndex, mapDict, wildActiveNow, wildHallStand,
+    captainLedger, etherPlaceClone, etherSea, locationIndex, mapDict,
     provinceQuestPlaces = null, worldPlaces = null,   // BAY-LEFT-MAPS: the places past the Bay as the build stands them, the world's registry
   } = host;
   /** OW-HUBS (FIELD BUGS 2026-10-04e): a town with a carriage at its gate, by its map id - while Immersive Travel is
@@ -43,7 +40,7 @@ export function createMapPlaces(host) {
    *  city past the Bay never showed its wheel, and a countryside id named another pixel's place. */
   const _carriageOf = { gen: -1, of: new Map() };   // HOST-SPLIT: a holder (the generation it was kept at, the answers), so the law moves out whole
   const carriageTown = (mapId) => {
-    if (!immersiveTravelLoaded() || !Number.isFinite(mapId) || isHallMapId(mapId)) return false;   // AUDIT WW F1: a zone hall's id is no Bay town's
+    if (!immersiveTravelLoaded() || !Number.isFinite(mapId)) return false;
     if (_carriageOf.gen !== host._locIndexGen) { _carriageOf.of.clear(); _carriageOf.gen = host._locIndexGen; }
     const id = discoveryKeyOf(mapId);
     let on = _carriageOf.of.get(id);
@@ -58,8 +55,7 @@ export function createMapPlaces(host) {
     const loc = p ? locationIndex.get(`${p.px},${p.py}`) : null;
     return (loc?.mapTableData?.mapId ?? -1) >>> 0 === key ? loc : null;
   };
-  // ETHER-OW (2026-10-13, the owner: "Also allow the player to zoom out into the overworld like in the Iliac Bay for easy
-  // travel"): THE ISLES' PLACES ON THE OVERWORLD. Past the Veil no place is a row of the Bay's dictionary - an isle's town
+  // ETHER-OW: THE ISLES' PLACES ON THE OVERWORLD. Past the Veil no place is a row of the Bay's dictionary - an isle's town
   // or ruin is its own (world/etherPlaces.js), the index's once its pixel has built, else its clone, marked and never
   // stood (etherPlaceClone). KNOWN as the Eltheric knows a place: its isle on the captain's charts (etherHost.js `sight`
   // within three pixels, a harbourmaster's chart, a corsair's papers - the chart's own isles), or the place found.
@@ -77,11 +73,6 @@ export function createMapPlaces(host) {
       const loc = tvEtherPlace(px, py);
       return loc && tvEtherKnown(loc) ? { pixel: { x: px, y: py }, name: loc.name, mapId: loc.mapTableData.mapId, regionIndex: loc.regionIndex, locationIndex: loc.locationIndex, loc } : null;
     }
-    // HALL-JOURNEY (2026-10-08, the owner: "when i want to travel there with begin journey nothing happens"): a zone hall
-    // is no row of the map's dictionary (it is spawned, by the day) - it is its own summary, always known, so the
-    // Overworld walks to its door as to any place's
-    const hall = wildHallAt(wildActiveNow(), px, py) ? wildHallStand(px, py) : null;
-    if (hall) return { pixel: { x: px, y: py }, name: hall.name, mapId: spawnedHallMapId(px, py), regionIndex: hall.regionIndex, locationIndex: -1, loc: hall };
     const loc = locationIndex.get(`${px},${py}`);
     // AUDIT-TESA A2-3: past the Bay a pixel id aliases a Bay row - the place the world stands there is its own summary,
     // known once discovered (entering it discovers it), so the Overworld walks to its door as to a Bay place's

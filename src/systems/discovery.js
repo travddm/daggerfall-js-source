@@ -16,13 +16,11 @@
 
 import { isResidence, BUILDING_TYPES } from '../world/buildingNames.js';   // RMBLayout.IsResidence (:753-760), House1-House4
 import { layoutStampOfTown, layoutsMatch, CLASSIC_LAYOUT } from './layoutPins.js';   // WD3: a town's discoveries keep the layout they were made in
-import { isHallMapId } from '../net/wire.js';   // AUDIT WW F1: a zone hall's id is no Bay pixel's
 import { isProvinceRegion } from '../formats/mapsTables.js';   // BAY-LEFT-MAPS: a province's region
 import { BAY_PIXEL_IDS } from '../world/placeIds.js';   // AUDIT TESA II P6: the Bay's pixel ids, under its 1000 x 500 (BAY-LEFT-B: the leaf's, the deeds' too)
 
 /**
- * BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
- * exceptions."; its C7 = E2; bible/03-World/Arena-Provinces.md BAY-LEFT-MAPS C7): A TOWN'S BOOK OF DISCOVERED BUILDINGS,
+ * BAY-LEFT-MAPS: A TOWN'S BOOK OF DISCOVERED BUILDINGS,
  * BY ITS OWN KEY - the one key-maker every writer and reader of the building half calls (the door, the town map, the
  * talk's reveals, the guild halls' reveals, the lockpick's anti-grind record, the quest re-stamps, a deed's residence). A
  * Bay place keeps the key every save holds, `<regionIndex>:<name>`, byte for byte (DFU's PlayerGPS files the record by
@@ -283,9 +281,6 @@ export function discoveredBuildings(locationId) {
 // HasDiscoveredLocation masks it (:875-882). The guild map reveals
 // write it; the travel map's hidden-dungeon law will read it (its own
 // ledger row).
-// AUDIT WW F1: never a zone hall's - a hall is always known (its door in every map's ink, scenes/world.js
-// wildHallSummaries), stands a day, and its id is the halls' lane (net/wire.js isHallMapId), whose low 20 bits masked
-// would name a Bay place: so a hall is neither filed nor found here.
 // AUDIT TESA II P6: A PLACE OFF THE BAY'S PIXEL IDS BY ITS WHOLE ID. DFU's mask names a Bay place by its pixel (a MapId's
 // low 20 bits are getMapPixelID's, under 1000 x 500); a place the port made past the Bay or past the Veil carries a
 // number of its own there, 500,000 and up (world/arenaLocations.js arenaPlaceId, world/tamrielCountry.js countryPlaceId
@@ -304,7 +299,6 @@ export const discoveryGeneration = () => _locationsGen;
 
 /** DiscoverLocation's store write (:869-890, the summary columns). */
 export function discoverLocation(mapId, info = {}) {
-  if (isHallMapId(mapId)) return false;
   const key = discoveryKeyOf(mapId);   // AUDIT TESA II P6
   if (_locations.has(key)) return false;
   _locations.set(key, { regionName: info.regionName ?? '', locationName: info.locationName ?? '' });
@@ -314,7 +308,7 @@ export function discoverLocation(mapId, info = {}) {
 
 /** HasDiscoveredLocation (:875-882). */
 export function hasDiscoveredLocationId(mapId) {
-  return !isHallMapId(mapId) && _locations.has(discoveryKeyOf(mapId));   // AUDIT TESA II P6
+  return _locations.has(discoveryKeyOf(mapId));   // AUDIT TESA II P6
 }
 
 /** DiscoverRandomLocation (PlayerGPS.cs:892-910), the pure law:

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-D (2026-09-25): ILIAC PUDDLE NO MORE'S SWIM MOVEMENT
+// DW-D: ILIAC PUDDLE NO MORE'S SWIM MOVEMENT
 // (OutdoorSwimMovementController.cs, jet082, 1.2.2) - every frame the
 // player swims ANYWHERE (the carved sea, or a dungeon's water: IsAnySwimming
 // is LevitateMotor.IsSwimming too), and never inside the load grace:

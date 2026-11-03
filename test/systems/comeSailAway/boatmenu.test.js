@@ -1,5 +1,4 @@
-// BOAT-MENU (2026-09-30, Mac: "make the boat interaction like the loot menu. Being able to pick up, view storage,
-// mount, all from a simple menu and button press") - a boat of mine lists its verbs on the plaque under the
+// BOAT-MENU - a boat of mine lists its verbs on the plaque under the
 // crosshair (systems/comeSailAway/csaBoatMenu.js), the box aimed at lighting its own verb first, and the press goes through the
 // mod's own activation on that verb's box.
 import { test } from 'node:test';
@@ -25,7 +24,7 @@ test('BOAT-MENU: EACH HULL LISTS THE BOXES IT CARRIES - the rowboat its helm, it
   const want = [
     ['Take the helm', 'Board', 'Pick up'],
     ['Take the helm', 'Board', 'Open storage', 'Pick up', 'Change style'],
-    // SHIP-PACK (PIN MOVED): the ships pick up as the small boats do - they listed `Pick up (a deed ship stays afloat)`
+    // SHIP-PACK (
     ['Take the helm', 'Board', 'Open storage', 'Pick up', 'Status', 'Position'],
     ['Take the helm', 'Board', 'Open storage', 'Pick up', 'Status'],
     ['Take the helm', 'Board', 'Open storage', 'Pick up'],
@@ -121,12 +120,10 @@ test('BOAT-MENU: A VERB PRESSED GOES THROUGH THE MOD\'S OWN ACTIVATION - "Take t
 });
 
 test('BOAT-MENU: THE WORLD\'S WIRING - my boat\'s plaque lists its verbs (the bed only its name), the box under the crosshair lit first; the press takes the verb the plaque lit before the box\'s own, and where no plaque stands (a tap, the classic skins) a press on the hull opens the verbs as a picker, closed before the verb runs (mutants: the verbs unlisted, the lit verb unread, the picker unasked, the walk kept past a style)', () => {
-  // PIN MOVED (AUDIT BOAT-MENU C1, C4): none at a helm; the hull's list unlit
   assert.match(WORLD, /if \(mine\.part === 'bed' \|\| csaRuntime\?\.isSailing\(\)\) return \{ title \};/);
   assert.match(WORLD, /if \(box == null\) return \{ title, actions: rows, actionsUnlit: true \};/);
   assert.match(WORLD, /const start = boatMenuStart\(box, rows, getInteractionMode\(\)\);\n\s+return start < 0 \? \{ title \} : \{ title, actions: rows, actionsStart: start \};/);
   assert.match(WORLD, /const verb = plaqueActionFor\(pick\?\.key\);\n\s+if \(verb && pick\.boat\) \{ csaBoatVerb\(pick, verb\); return; \}/);
-  // PIN MOVED (AUDIT BOAT-MENU C5, C1): a building's and a dungeon's too; never at a helm
   assert.match(WORLD, /if \(pick\?\.boat && \(!worldPlaqueOn\(\) \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) && !csaRuntime\?\.isSailing\(\) && pick\.distance <= CSA_ACTIVATION_DISTANCE\) csaOpenBoatMenu\(pick\);/);
   assert.match(WORLD, /if \(_csaPicker\) \{ modes\?\.closeWindow\?\.\(_csaPicker\); _csaPicker = null; \}\n\s+csaBoatVerb\(pick, rows\[i\]\?\.id\);/);
   assert.match(WORLD, /const csaStandsOn = \(boat\) => !!player\.grounded && typeof player\.groundKey === 'string' && player\.groundKey\.startsWith\(`csaBoat:\$\{csaBoatId\(boat\)\}:`\);/);

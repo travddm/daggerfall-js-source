@@ -42,7 +42,7 @@ const { frameRateSwitches } = require('./lib/frameRate.cjs');   // FPS-VSYNC: VS
 // door (tools/appShellProbe.mjs writes into a temp dir it can read
 // back), and a portable install's (point it beside the executable).
 //
-// BR1 (2026-09-13): and FAILING THAT, the storage root is PINNED to the
+// BR1: and FAILING THAT, the storage root is PINNED to the
 // folder the shipped versions wrote. Electron derives userData from
 // app.getName(), which prefers package.json's `productName` - so
 // renaming the product (BR1, and again BR4) would have moved
@@ -54,14 +54,14 @@ const { frameRateSwitches } = require('./lib/frameRate.cjs');   // FPS-VSYNC: VS
 if (process.env.DAGGER_USER_DATA) app.setPath('userData', process.env.DAGGER_USER_DATA);
 else app.setPath('userData', path.join(app.getPath('appData'), 'Daggerfall JavaScript'));
 
-// FPS-VSYNC (2026-09-28): the player's saved VSync, read BEFORE the app is ready - Chromium takes its switches at
+// FPS-VSYNC: the player's saved VSync, read BEFORE the app is ready - Chromium takes its switches at
 // launch or never. VSync off lifts the screen's wait, and the page's Frame Rate Cap holds the frames instead
 // (DFU's own law, app/lib/frameRate.cjs). VSync on - DFU's default - changes nothing. Read ONCE: the page is told
 // what this launch runs with (dagger:frames-lifted, below) - its pacer is for a lifted wait only (AUDIT 28e).
 const FRAME_SWITCHES = frameRateSwitches(app.getPath('userData'));
 for (const s of FRAME_SWITCHES) app.commandLine.appendSwitch(s);
 
-// PERF-GPU1 (2026-10-10, a player via Mac: 5 fps in every room "with the graphics all low", playable only at 800x600):
+// PERF-GPU1:
 // THE DISCRETE GPU. On a laptop with two GPUs Chromium draws on whichever the system hands a browser - the integrated
 // one, as often as not - and the game drew there at a fraction of the card's speed, with nothing on screen saying
 // so but the FPS counter's GPU line. Chromium's own switch asks for the high-performance GPU wherever there are two
@@ -69,7 +69,7 @@ for (const s of FRAME_SWITCHES) app.commandLine.appendSwitch(s);
 // build. Before the app is ready, as every switch.
 app.commandLine.appendSwitch('force_high_performance_gpu');
 
-// PERF-GC1 (2026-10-10, Dudey: "big problems are caused by many players causing severe stutter"): THE YOUNG
+// PERF-GC1: THE YOUNG
 // GENERATION'S ROOM. A crowd's frame leaves about a megabyte of short-lived garbage (bible/07-Rendering/
 // Performance-Crowd.md), and V8's default 16 MB semi-space fills - and is swept - several times a second. 32 MB halves
 // the sweeps; a sweep's cost is what survives it, not the room. The peer lab, forty peers, steady frames: the layers'
@@ -77,8 +77,7 @@ app.commandLine.appendSwitch('force_high_performance_gpu');
 // build keeps the browser's own. Before the app is ready, as every switch.
 app.commandLine.appendSwitch('js-flags', '--max-semi-space-size=32');
 
-// GPU-CACHE (2026-10-23, #tech-support: "It happens the 1st time I do anything ... it doesnt do it for that action
-// again until I close the game and restart"; "tested in browser and there has no problem"): THE COMPILED PROGRAMS
+// GPU-CACHE: THE COMPILED PROGRAMS
 // KEPT. Chromium keeps every WebGL program it links - in memory and in <userData>/GPUCache - so a launch links from
 // the kept binary instead of compiling. Both stores are capped at 6 MiB (gpu_preferences.h
 // kDefaultMaxProgramCacheMemoryBytes), and on Windows a binary is ANGLE's D3D11 one: each stage's translated HLSL and
@@ -108,7 +107,7 @@ app.on('second-instance', () => {
   if (w) { if (w.isMinimized()) w.restore(); w.focus(); }
 });
 
-// DA11 (2026-09-30, Mac: "Everytime DFO updates, even with the launcher, it deletes itself"): packaged, the built
+// DA11: packaged, the built
 // site rides INSIDE app.asar (app/package.json `files`) - one file, where it was 18,354 loose ones under
 // resources/dist. A Windows update is electron-builder's silent NSIS: the old uninstaller moves every installed
 // file out, then the new installer unpacks every new one and copies it in, a file at a time with no window up.
@@ -121,8 +120,7 @@ const DIST = app.isPackaged
   : path.join(__dirname, '..', 'dist');
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
 
-// DA13 (2026-10-14, Mac: "B only: per-file channel"; a player, Discord 2026-10-13: "Every update downloads around
-// 130 MB and overwrites the entire game folder"): THE GAME UPDATES ITSELF, A FILE AT A TIME. The site in one archive
+// DA13: THE GAME UPDATES ITSELF, A FILE AT A TIME. The site in one archive
 // (DA11) made every installer update re-download most of it - the archive's compression moves every block after a
 // file that changed size, and the blockmap can reuse only identical blocks. Each release now carries the game as a
 // pack of files compressed one by one, and a manifest of them (lib/gameChannel.cjs); this copy keeps what it has -
@@ -431,8 +429,7 @@ function handleDagger(req) {
 // browser - because unsigned builds cannot auto-update on macOS and
 // nothing here was to apply code silently. REL3 then made every merge
 // a release, and a player was being asked to download and install
-// several times a day. DA7 (Mac: "players dont have to manually
-// install each release" - "Do it"): where the installer CAN replace
+// several times a day. DA7 (- "Do it"): where the installer CAN replace
 // itself, it does. electron-updater reads the release's latest.yml,
 // downloads the new installer in the background and installs it when
 // the app quits; the player does nothing. Which copies can is
@@ -447,8 +444,7 @@ function handleDagger(req) {
 // reports downloading, up-to-date and unreachable alike, because the
 // player asked.
 //
-// DA8 (2026-09-29, Mac: "Is there anyway to send a notification that a
-// new update is available ... A launcher?"): THE LAUNCH CHECK IS THE
+// DA8: THE LAUNCH CHECK IS THE
 // LAUNCHER'S, AND THE PLAYER IS TOLD. Installing on quit meant a player
 // launched into the build before the last one nearly every time - online,
 // a protocol behind the relay - and was never told anything. Now the
@@ -1274,10 +1270,10 @@ function buildMenu() {
           : { role: 'togglefullscreen', accelerator: 'Alt+Enter' },
         // AUDIT ANTICHEAT (Mac's call, 2026-10-17: kept): the installed game keeps
         // DevTools. Its console is how a player hands over a field report's lines
-        // (bible/01-Overview/bugs/Field-Bugs-2026-10-13b.md), and taking it away
+        // , and taking it away
         // shuts no door a cheater needs - the browser build plays online with F12,
         // and this shell honours --remote-debugging-port - so what other players
-        // meet is the servers' to judge (bible/06-Systems/Integrity-Arc.md).
+        // meet is the servers' to judge.
         { role: 'toggleDevTools' },
       ],
     },
@@ -1868,7 +1864,7 @@ ipcMain.on('dagger:user-data-path', (e) => { e.returnValue = app.getPath('userDa
 // FPS-VSYNC (AUDIT 28e): whether this launch lifted Chromium's wait - the page paces its frames by the cap then
 // (src/systems/frameCap.js installFramePacer), since a held frame costs a whole refresh with the wait lifted
 ipcMain.on('dagger:frames-lifted', (e) => { e.returnValue = FRAME_SWITCHES.length > 0; });
-// ESC-LOCK (2026-09-27, Mac: "when you hit esc to leave a menu, your cursor remains on the screen"): Escape is no user
+// ESC-LOCK: Escape is no user
 // activation, and after the player ends a pointer lock the next one needs one - so a menu closed on Escape could not
 // take the look back. The page asks (preload relockPointer) and its own fixed hook runs here as a user gesture.
 ipcMain.on('dagger:relock', (e) => { e.sender.executeJavaScript('globalThis.__daggerRelock?.()', true).catch(() => {}); });

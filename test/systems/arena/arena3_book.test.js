@@ -1,4 +1,4 @@
-// ARENA3 (2026-10-02; bible/11-Multiplayer/Arena.md "1. The gate" - "the bookmaker - wagers on the bout on the floor
+// ARENA3 (2026-10-02; "1. The gate" - "the bookmaker - wagers on the bout on the floor
 // (gold, house edge, odds from the fighters' records)"): THE BOOKMAKER (systems/arena/arenaBook.js, scenes/arena/arenaGate.js).
 // Pinned here: each exhibition fighter's record and strength from the bout's own seed; the chances from the strengths;
 // the price shaded by the house's tenth and rounded DOWN the bookmaker's ladder; the payout in whole gold; the wager's
@@ -235,7 +235,6 @@ test('ARENA3 the driver tells the exhibition\'s verdict; the hosts wire the stal
     // relay's mirrored one (scenes/arena/arenaBouts.js startExhibitionRelay: kind 'relay', its `ex` carried)
     assert.match(W, /const arenaBoutBegun = \(\) => \{ const b = arenaBouts\.bout\(\); return arenaBouts\.hour\(\) != null && !!b && !\['call', 'walk', 'count'\]\.includes\(b\.phase\); \};/, f);
   }
-  assert.match(readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8'), /if \(gateRole === 'bookmaker' && host\.arenaBookmaker\?\.\(\)\) return;/);
 });
 
 test('ARENA3 book save: the book rides the league through save.js - every wager back; a broken one dropped', () => {

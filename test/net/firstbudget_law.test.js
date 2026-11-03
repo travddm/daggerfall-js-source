@@ -1,4 +1,4 @@
-// FIRST-BUDGET (2026-10-25, SaberGGaming's report: "Provisioning is slow"; the owner: "No band aids"), RETUNED (the owner,
+// FIRST-BUDGET, RETUNED (the owner,
 // asked: "Match Smithing's pace") - A FIRST-MAKE PAYS ITS TRACK'S SHARE, SET SO EVERY CRAFTING TRACK REACHES MASTER IN
 // SMITHING'S CRAFTS (net/recipeLaw.js FIRST_MAKE_SHARE, FIRST_MAKE_FLOOR, firstMakesOf, firstMakeXp, firstCraftXp,
 // workFirstXp, brewFirstXp; tools/craftPace.mjs craftPace, firstShares). Every first-make paid a flat 500, every track
@@ -6,7 +6,7 @@
 // share that brings it to Master in Smithing's 172 crafts - derived by the walk, pinned in the law, held equal here - and
 // none under the 500. The share says how much a first pays, CLOTH-GEMS whether. Pinned here: the shares and the floor,
 // each track's count, the keys the service keys a first by, the words that say it, the pace it makes and the derivation
-// that sets it - through the real Worker. bible/06-Systems/Professions-Arc.md 52.
+// that sets it - through the real Worker. 52.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

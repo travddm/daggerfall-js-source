@@ -48,7 +48,7 @@ export const DARK_BROTHERHOOD_TALLY_TARGET = 15;
 
 /** :1282/:1295 - `currentMinutes + 4320`, three classic days. */
 export const CRIME_GUILD_LETTER_DELAY_MINUTES = 4320;
-/** REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12 - TIMEFREE's, restored): online the letter
+/** REST8: online the letter
  *  comes on the quest clocks' short wait - twenty-four of the character's minutes, about two real minutes of play
  *  (quest/clock.js ONLINE_DELAY_SECONDS) - not three days later, a delay like any "come back in three days". The caller
  *  says it is online (the tick, which owns the shared clock's word). */
@@ -176,8 +176,7 @@ const LETTERS = Object.freeze([
   ['darkBrotherhoodRequirementTally', 'timeForDarkBrotherhoodLetter', DARK_BROTHERHOOD_INITIATION_QUEST, DARK_BROTHERHOOD_FACTION_ID],
 ]);
 
-/** DB-LETTER (2026-10-25, a player's level 10 vampire: tally 100, no letter clock, and no Acceptance Test anywhere in
- *  the save): DFU parks the tally and clears the clock BEFORE StartQuest, and StartQuest swallows a parse that fails
+/** DB-LETTER: DFU parks the tally and clears the clock BEFORE StartQuest, and StartQuest swallows a parse that fails
  *  (QuestMachine.ParseQuest's catch, machine.js startQuestByName's null) - so a letter whose quest could not be made
  *  spent the invitation for good, and nothing ever sent another. The port parks only a quest the host STARTED; a start
  *  that answers nothing, or throws, leaves the letter pending, stamped again as a fresh one is (three days offline,

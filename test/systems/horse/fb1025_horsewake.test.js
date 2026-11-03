@@ -4,7 +4,6 @@
 // (world.js ONLINE-UNDERGROUND-LOAD1). The horse stayed at the door, beyond every mount's reach, with the horse still in
 // the pack. A load that lands away from its save now calls the pair to the player (horseCart.js callTeamToLanding).
 // All through the real runtime over test/hccWorld.mjs, the save round-tripped as JSON.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-25e.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { makeWorld } from '../../hccWorld.mjs';

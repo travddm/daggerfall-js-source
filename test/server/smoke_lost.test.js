@@ -1,9 +1,8 @@
-// SMOKE-LOST (2026-10-18, the owner's screenshot of #1004's account deploy: renown/xp -> 000, 503, then 200
-// `"credited":0,"repeat":true`): A WRITE WHOSE ANSWER WAS LOST MAY HAVE LANDED. The smoke's first Renown report hung
+// SMOKE-LOST: A WRITE WHOSE ANSWER WAS LOST MAY HAVE LANDED. The smoke's first Renown report hung
 // 15 s and was credited; its retry was answered, rightly, as that report again - and the smoke, asking `credited` 1 of
 // the answer it got, failed a deploy whose Worker had taken. `ask` now leaves `<out>.lost` when a try went unanswered,
 // and the two calls that write before they are read (the first beat, the first report) take, after a lost try, the
-// answer the landed write gives its retry - never without one. The record: bible/06-Systems/Online-Arc.md, HOME2's
+// answer the landed write gives its retry - never without one. The record:, HOME2's
 // "The deploy's smoke asks again".
 //
 // The step itself runs here, through bash as the runner runs it, against a curl that answers as the service does, up

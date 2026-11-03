@@ -1,4 +1,4 @@
-// BOOT-FREEZE (2026-10-20, bible/07-Rendering/Performance-Priority.md BOOT-FREEZE): the probe's reading of a CPU profile
+// BOOT-FREEZE: the probe's reading of a CPU profile
 // (tools/bootFreezeProbe.mjs longTasks) - the main thread's long tasks off the samples themselves, the first world frame
 // found by its mark, and each task attributed by its stacks. Held on a profile made here: a task is a run of samples
 // that are not (idle), closed by an idle gap longer than IDLE_GAP_MS and joined across a shorter one; the mark is where

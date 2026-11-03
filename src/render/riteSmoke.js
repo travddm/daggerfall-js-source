@@ -1,7 +1,7 @@
 // @ts-check
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"): THE RITE'S SMOKE - a pillar of smoke over the faithful's circle,
+// WB12d: THE RITE'S SMOKE - a pillar of smoke over the faithful's circle,
 // from the omen until the breach opens, seen across the omen's ring: a dark plume rising from the altar's flame,
-// widening and leaning as it climbs, churning upward. Design: bible/11-Multiplayer/World-Bosses.md section 19 D.
+// widening and leaning as it climbs, churning upward. Design: D.
 //
 // The gate's beacon's law (render/gate/gatePass.js): fixed geometry (its column), every placement a uniform, the clock
 // handed wrapped and every rate whole cycles over it - the smoke's noise TILES along the column, and each octave climbs

@@ -1,4 +1,4 @@
-// STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use"; bible/11-Multiplayer/Staff-Events.md) -
+// STAFF-EVENT -
 // THE LAW (net/staffEvent/staffEventLaw.js): an event's shape and bounds, the words each way, the cell's ledger (the cap,
 // the meter's boss once, a hand call one more, the boss's moments from the one who stands it, done), the signed order
 // (identityToken.js 'sevent'), and the place picker's game half (net/staffPlaces.js).
@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import {
   validStaffEvent, staffEventFault, validStaffEventIn, validStaffEventOut, validStaffEventTell, newStaffLedger, staffEventCap, staffBossCall,
   foldStaffWord, staffEventDone, staffLedgerState, staffEventTell, staffEventKey, staffEventIdOf, staffEventLapsed, isAreaEvent,
-  relaySupportsStaffEvents, staffEventKindOk, STAFF_EVENT_KILLS_BURST, STAFF_EVENT_KILL_MS, STAFF_BOSS_HEALTH_DEFAULT,
+  staffEventKindOk, STAFF_EVENT_KILLS_BURST, STAFF_EVENT_KILL_MS, STAFF_BOSS_HEALTH_DEFAULT,
   STAFF_EVENT_ACCOUNTS_MAX, STAFF_EVENT_PRESENT_MS, STAFF_BOSS_HP_MAX,
 } from '../../src/net/staffEvent/staffEventLaw.js';
 import { mintStaffEventOrder, verifyOrder, orderValid, ORDER_KINDS } from '../../src/net/identityToken.js';
@@ -37,12 +37,10 @@ test('STAFF-EVENT: an event is held to its bounds - kinds any monster but the tw
   assert.ok(staffEventLapsed({ ...EV, ue: EV.at + 1000 }, EV.at + 1000) && !staffEventLapsed(EV, EV.at * 2));
   assert.equal(staffEventIdOf(staffEventKey(EV.id)), EV.id);
   assert.equal(staffEventIdOf('raid:17:0:3'), null);
-  assert.ok(relaySupportsStaffEvents('world256') && !relaySupportsStaffEvents('world255') && !relaySupportsStaffEvents(null));
 });
 
 test('STAFF-EVENT: the words each way are projected - a player\'s word, the hub\'s book and end, a cell\'s ledger, a tell', () => {
   assert.deepEqual(validStaffEventIn({ k: 'w', id: EV.id, px: 207, py: 213, n: 4, s: 1, extra: 9 }), { k: 'w', id: EV.id, px: 207, py: 213, n: 4, s: 1, bu: 0, bk: 0, fb: 0, h: 0 });
-  // PIN MOVED (AUDIT RELEASE R2-7): the word's pixel is the world's grid - (1000, 213) is land past the Bay now, 8192 past the wire's
   for (const bad of [{ k: 'x' }, { n: -1 }, { n: 10_000 }, { bu: 2 }, { fb: 100 }, { px: 8192 }]) assert.equal(validStaffEventIn({ k: 'w', id: EV.id, px: 207, py: 213, n: 1, ...bad }), null);
   const book = validStaffEventOut({ k: 'ev', l: [EV, EV, { ...EV, id: 'zz' }, { ...EV, id: 'cc22dd33ee' }] });
   assert.deepEqual(book.l.map((e) => e.id), [EV.id, 'cc22dd33ee'], 'each event once, a bad one dropped');

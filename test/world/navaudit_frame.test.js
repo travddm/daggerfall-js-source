@@ -1,4 +1,4 @@
-// AUDIT NAV1 (2026-09-29) - THE FRAME'S COST (the online audit's #11-#14): what a sea fight costs a frame, and how the
+// AUDIT NAV1 - THE FRAME'S COST (the online audit's #11-#14): what a sea fight costs a frame, and how the
 // port's own machinery carries it - a mover's bucket in the world's collider (player/collider.js), a tree's colliders
 // indexed and asked bounds first (world/prefabColliders.js), a node's matrix kept while it reads the same
 // (world/prefabNode.js), the world's sync carrying a boat's buckets (scenes/world.js csaSyncColliders), the boats culled
@@ -284,7 +284,7 @@ test('AUDIT NAV1 (#12) THE INDEX FOLLOWS THE TREE\'S SHAPE: the stamp moves when
   const c = new PrefabNode('c', { components: [box(1)] }).setParent(b);
   const names = () => collidersOf(root).map((x) => x.node.name);
   assert.deepEqual(names(), ['a', 'c']);
-  // BOAT-STAMP (2026-10-21): the stamp is the tree's own - read off any node of it, its top node's
+  // BOAT-STAMP: the stamp is the tree's own - read off any node of it, its top node's
   let s = prefabShapeStamp(root);
   b.setActive(false); a.localPosition = [5, 0, 0];
   assert.equal(prefabShapeStamp(root), s, 'a switch and a move leave the shape');

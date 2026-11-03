@@ -1,4 +1,4 @@
-// WEATHER3 slice F (2026-09-23): AUDIT WEATHER3 - two independent reads of
+// WEATHER3 slice F: AUDIT WEATHER3 - two independent reads of
 // the five slices, one of the runtime (does it RUN, what did it break) and
 // one of the records (do they say true things). What the runtime read
 // found, each pinned here where it was paid:
@@ -15,8 +15,7 @@
 //   R5 a landing under the same sky kept the old place's thunder on its
 //      way, and thunder due while the frames stopped burst on the first
 //      frame back.
-// DISC17-C (2026-09-24, Mac: "Remove the enhanced map weather enhancements
-// entirely"): the travel map carries no weather now, so R1's map half, R2's
+// DISC17-C: the travel map carries no weather now, so R1's map half, R2's
 // map half and R2a went with it; the laws they rode on stand here.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

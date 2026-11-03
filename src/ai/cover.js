@@ -1,5 +1,5 @@
 // @ts-check
-// TACT1 - COVER (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "Proper line of sight with billboard props";
+// TACT1 - COVER (;;
 // his call: billboards block "Sight and missiles" - real cover, both ways).
 //
 // DFU's flats are billboards: a sprite with no collider, so a foe sees through a tree, a crate or a statue and an arrow
@@ -112,7 +112,7 @@ const _lo = [0, 0, 0];   // AUDIT TACT D11: the ray in a set's frame - one scrat
 /** AUDIT TACT D11: a broad-phase cell's key as a number (no string a cell a ray); cells within +-32768 of the frame's
  *  origin - 131 km at 4 m, past any pixel or room. */
 const cellKey = (gx, gz) => (gx + 32768) * 65536 + (gz + 32768);
-/** MEM-AUDIT (2026-10-23): A CELL IS HELD AT ITS SIZE WHILE IT IS SMALL. The index was the largest thing a streamed world
+/** MEM-AUDIT: A CELL IS HELD AT ITS SIZE WHILE IT IS SMALL. The index was the largest thing a streamed world
  *  kept - ~290 MB of the 1.16 GB live heap at Knightstale's 121 pixels (V8's sampling profile, `fill` and the proxies) -
  *  and most of it air: a cell grown by push from [] has seventeen slots from its first (AUDIT C4), and most cells hold
  *  one to three proxies. Below CELL_EXACT a cell is copied one longer, in the same order, so it holds exactly its own; past it, pushed.

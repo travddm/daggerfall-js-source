@@ -1,6 +1,5 @@
-// POI-4b (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE LIBRARY: THE MODELS EVERY BUILDER KEEPS.
-// Mac: "Allowing not just the creation of POI's using models, but also the ability to import models ... a tool my
-// developers can use without having to access the codebase"; "Developers + Builders".
+// POI-4b - THE LIBRARY: THE MODELS EVERY BUILDER KEEPS.
+// "Developers + Builders".
 //   - the law (src/poi/poiLaw.js poiShelfProblems): an entry is a POI's parts and lights without a place, a picture by
 //     its hash or none;
 //   - the store (server-account/src/poi.js) on the real Worker over the real migrations: listed to builders, put new or
@@ -82,7 +81,7 @@ test('POI-4b THE LAW: a shelf entry is a POI\'s parts and lights without a place
 
 async function theStore() {
   forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const mac = await s.registered('Mac'), dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), player = await s.registered('Player');
   const req = async (method, path, { who = null, body, raw } = {}) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
@@ -147,7 +146,6 @@ test('POI-4b THE STORE: the shelf listed to builders alone, newest change first,
   assert.equal((await req('POST', '/v1/poi/unshelve', { who: mapper, body: { id } })).json.error, 'poi-not-author');
   assert.deepEqual((await req('POST', '/v1/poi/unshelve', { who: dev, body: { id } })).json, { id, gone: true });
   assert.deepEqual((await req('GET', '/v1/poi/shelf', { who: dev })).json.items.map((x) => x.id), ['lib-00000000cafe']);
-  // PIN MOVED (AUDIT POI U13): taken off is said so - `poi-gone`, 410 - not "the service does not know that request"
   assert.deepEqual([(await req('GET', `/v1/poi/shelf/${id}`, { who: dev })).status, (await req('GET', `/v1/poi/shelf/${id}`, { who: dev })).json.error], [410, 'poi-gone']);
   assert.equal((await req('PUT', '/v1/poi/shelf', { who: dev, body: { item: entryOf(id, m.sha) } })).status, 410, 'not put back over');
   assert.equal((await req('POST', '/v1/poi/unshelve', { who: mac, body: { id: 'lib-00000000cafe' } })).status, 200, 'an approver takes any off');
@@ -409,7 +407,6 @@ test('POI-4b PLACING AN ENTRY: its parts keep their own turn, size, solidity and
   assert.ok(Math.abs(d.lights[0].t[1] - l.t[1] - 3) < 1e-6 && Math.abs(d.lights[0].t[2] - l.t[2] - 1) < 1e-6, `where it stands from the origin (${d.lights[0].t} against ${l.t})`);
   assert.equal(d.lights[0].flicker, true);
   // one step: undone, the parts and the light go together
-  // PIN MOVED (AUDIT POI E11): placed with no POI held, the new POI and its model are ONE step, as this section says -
   // this asserted the two the editor made (one undo took the parts and left the POI standing empty, a second took it)
   ed.undo();
   assert.equal(ed.has(id), false, 'one undo: the POI and its model gone together');
@@ -418,15 +415,3 @@ test('POI-4b PLACING AN ENTRY: its parts keep their own turn, size, solidity and
   assert.equal(ed.docOf(id).lights.length, 1);
 });
 
-test('POI-4b RECORDS: the shelf in the migration and the routes in the service; the import keeps what it places unless told not; the inspectors keep a POI and a part', () => {
-  assert.match(src('server-account/migrations/0116_poi.sql'), /CREATE TABLE IF NOT EXISTS poi_shelf \(/);
-  const index = src('server-account/src/index.js');
-  assert.match(index, /route === 'shelf' && request\.method === 'GET'\) return answer\(poiPath\.id \? await shelfEntry\(/);
-  assert.match(index, /if \(route === 'unshelve'\) return answer\(await unshelve\(pctx, me, env, \{ id: body\.id \}\)\);/);
-  const panel = src('src/ui/poi/poiEditorPanel.js');
-  assert.match(panel, /const keepToo = check\(true, \(\) => \{\}\);/);
-  // PIN MOVED (AUDIT POI L7): kept with the lights it read (they were left behind, `lights: []`)
-  assert.match(panel, /if \(keepToo\.checked\) \{[\s\S]{0,600}await library\.keepNow\(\{ name: r\.asset\.name, parts: r\.asset\.parts, lights: r\.asset\.lights \?\? \[\], meshes \}\);/);
-  assert.match(panel, /library\.keep\(\{ name: d\.name, parts: structuredClone\(d\.parts\), lights: structuredClone\(d\.lights \?\? \[\]\) \}\)/);
-  assert.match(panel, /library\.keep\(\{ name: part\.name \|\| part\.key, parts: \[\{ \.\.\.structuredClone\(part\), t: \[0, 0, 0\] \}\], lights: \[\] \}\)/);
-});

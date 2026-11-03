@@ -1,4 +1,4 @@
-// SNDREP1 (2026-09-23): LOOSE SOUND REPLACEMENT - Daggerfall Unity's
+// SNDREP1: LOOSE SOUND REPLACEMENT - Daggerfall Unity's
 // StreamingAssets/Sound/<SoundClips name>.wav, from a pack the PLAYER attaches.
 //
 // DFU's SoundReader looks for a loose WAV named after the SoundClips entry

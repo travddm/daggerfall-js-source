@@ -39,7 +39,7 @@ function arena2DevServer() {
   // /play/arena2/*; the probes' direct imports still fetch /arena2/*.
   // Same handler, both doors - a dev server that answered one and not
   // the other is the mixed-case bug above in a new coat.
-  return {
+  const plugin = {
     name: 'arena2-dev-server',
     configureServer(server) {
       for (const mount of ['/arena2', '/play/arena2']) server.middlewares.use(mount, (req, res, next) => {
@@ -79,6 +79,9 @@ function arena2DevServer() {
       });
     },
   };
+  // `vite preview` serves a built game to the probes (tools/probes/build.mjs): the data is mounted there too
+  plugin.configurePreviewServer = plugin.configureServer;
+  return plugin;
 }
 
 // THE DEPLOY'S OWN NAME, stamped where a verifier can read it without
@@ -141,7 +144,7 @@ export default defineConfig({
     // the problem here is only ever the COUNT." AUDIT-IF F1 then added
     // Immersive Footsteps (123 clips under 4 KB, 250 KB of base64).
     //
-    // INLINE1 (2026-09-20): THAT PREMISE WAS WRONG, AND THE RULE WAS AN
+    // INLINE1: THAT PREMISE WAS WRONG, AND THE RULE WAS AN
     // ENUMERATION. A vendored mod is never "a handful of small files" -
     // it ships in the hundreds - and an allow-list of three folders is a
     // rule enforced by memory: twenty vendor folders landed after it and
@@ -162,7 +165,7 @@ export default defineConfig({
     // that returned `true` would force-inline REGARDLESS of size, the
     // opposite mistake and just as quiet.
     assetsInlineLimit: (filePath) => (/[\\/]vendor[\\/]/.test(filePath) ? false : undefined),
-    // BUILD-LEFTOVERS (2026-10-15): THE CHUNK-SIZE WARNING IS A LINE AGAIN.
+    // BUILD-LEFTOVERS: THE CHUNK-SIZE WARNING IS A LINE AGAIN.
     // At Vite's 500 kB it fired on every build - the world chunk, world.js
     // and all it imports statically, is 2,662 kB - so it said nothing. Set
     // just over today's largest chunk, it speaks when a chunk grows past the
@@ -214,10 +217,7 @@ export default defineConfig({
         viewer: 'viewer.html',
         sky: 'sky.html',   // ES1: the enhanced sky lab
         water: 'water.html', // WATER1: the enhanced water lab (src/tools/waterLab.js)
-        ketch: 'ketch.html', // KETCH: the sky-ketch Mzunthar, made in code, drawn by the game's renderer (src/tools/ketchLab.js)
         abyss: 'abyss.html', // SD-LAB: the Shattered Hour and the Rift, made in code, drawn by the game's renderer (src/tools/abyssLab.js)
-        spire: 'spire.html', // EG-G2: an Elite Breach's circle in its band's dress, made in code (src/tools/spireLab.js) - tools/spireLabProbe.mjs
-        cards: 'cards.html', // CARDS3: the card table lab (src/tools/cardsLab.js) - tools/cardsProbe.mjs
         // MW-D: the Morrowind data inspector. Reads a player's own
         // archives and reports what is IN them; it draws nothing, stores
         // nothing and is wired to nothing the game runs. It exists
@@ -251,17 +251,6 @@ export default defineConfig({
         // the tileset tools/groundProto.mjs writes into
         // public/prototype/ground/.
         grassProto: 'grass-proto.html',
-        // THE GUN LAB (Mac, 2026-09-19): a NEW WEAPON TYPE prototyped
-        // before a line of the game changes. Its own page over our own
-        // art (public/art/gun-*), the classic 320x200 placement law and
-        // nothing else borrowed; combat/fpsWeapon.js is untouched and
-        // nothing the game runs imports src/tools/gunLab.js.
-        gunProto: 'gun-proto.html',
-        // THE PISTOL LAB (2026-10-21): the second new weapon type through
-        // the gun lab's door - a dwarven flintlock pistol, one in either
-        // hand. Our own art (public/art/pistol-frames.png); nothing the
-        // game runs imports src/tools/pistolLab.js.
-        pistolProto: 'pistol-proto.html',
         // LV1: THE ASCENSION LAB - the enhanced level-up window over a
         // made-up character, so the screen a player sees once a level
         // can be opened on demand, at any size, with no ARENA2 on disk.

@@ -1,6 +1,6 @@
 // @ts-check
-// STAR5 (2026-10-20): WHAT THE COVEN SENDS FOR THE STAR - each wave's roster by the defenders' band, the master by band
-// and star, and its circle. Design: bible/11-Multiplayer/Starfall.md section 4.
+// STAR5: WHAT THE COVEN SENDS FOR THE STAR - each wave's roster by the defenders' band, the master by band
+// and star, and its circle. Design:
 //
 // THE BANDS (net/starfall/starfallLaw.js starBandOf - the defenders' median level: to 8, to 15, from 16). Daggerfall's
 // monsters have fixed levels and some want a metal to hurt (ENEMY_BASICS minMetalToHit), so a band stands only foes its

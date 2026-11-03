@@ -64,7 +64,7 @@ export function walkTravelPath(start, end) {
  * calculateTravelTime holds.
  *
  * It carried an enhanced-only ROAD TERM until the road system was
- * removed whole (2026-08-29, Mac's call). With it gone this function
+ * removed whole. With it gone this function
  * is the C# loop body and nothing else - no departure, no optional
  * arm, and the >>8 idiom throughout as the source has it.
  */
@@ -83,7 +83,7 @@ export function travelPixelMinutes(terrain, transportModifier, {
   return thisMove;
 }
 
-/** SEASON1 part two (bible/11-Multiplayer/Seats-Arc.md 9.3: "Storm Season - sea travel slowed"): the factor on a
+/** SEASON1 part two (9.3: "Storm Season - sea travel slowed"): the factor on a
  *  voyage's ocean pixels by where it is bound - `fn(end)` set by the online world (scenes/world.js, the destination's
  *  land's Tide), null offline, where every voyage is DFU's own. Every reckoning reads it (the travel window, the maps,
  *  the quest clock, the party's fare), so the time shown is the time taken. */
@@ -122,7 +122,7 @@ export function playerTravelPosition(player, boardShipPosition, currentPixel) {
  *
  *  It carried two optional deps for the road system - a substitute
  *  pixel `path` and a `roadAt` class lookup - and both went with it
- *  (2026-08-29). What is left is the verbatim port: the classic
+ *  . What is left is the verbatim port: the classic
  *  longest-axis walk, priced pixel by pixel. */
 export function calculateTravelTime(start, end, {
   speedCautious = false, sleepModeInn = false, travelShip = false,

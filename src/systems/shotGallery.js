@@ -1,6 +1,5 @@
 // @ts-check
-// LOAD1 (2026-10-05, Mac: "add loading screens where needed for the game in an enhanced UI type fashion, maybe make it
-// where people can also use screenshots for the loading screen and a way to access them in the menu"): THE GALLERY.
+// LOAD1: THE GALLERY.
 //
 // The PrintScreen key (ui/screenshot.js, KB1) saved a PNG to the player's downloads and kept nothing, so the game had
 // no picture of its own to show. Every shot is now ALSO kept here - a JPEG no longer than FULL_EDGE on its long side

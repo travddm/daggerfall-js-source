@@ -1,4 +1,4 @@
-// AUDIT TESA III E1-1 (2026-10-26, bible/01-Overview/audits/Audit-Tesa-III-E1.md, routed to the roads' stream) - TS2'S ROAD
+// AUDIT TESA III E1-1 - TS2'S ROAD
 // RING ROUND A TOWN'S OUTLINE, PAVED WHOLE AND NEVER OVER THE SEA. TOWN-SHAPES TS2 moved Basic Roads' "paint roads around
 // locations" from the rect's padding to its outline's ring (world/terrain/terrainTiles.js townRoadRing), and the ring runs
 // past the rect - where FAST-SUITE's guard (world/road/roadPainter.js paintRoads) passed every tile off the centre cross,

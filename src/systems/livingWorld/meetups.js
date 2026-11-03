@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE MEETINGS - who talks with whom where the town gathers, and
+// LW1: THE MEETINGS - who talks with whom where the town gathers, and
 // the line being said this moment, so every reader of a minute sees the same two heads together and the same words over
 // them (LW0 decision 2).
 //
@@ -11,8 +11,7 @@
 // crowd mills. A circle says its script a line every CREW_LINE_S (the crew's own beat), the first speaker first, then
 // each in turn.
 //
-// LW-TALK (2026-10-06, Mac: "I want to ensure everything is working with NPCs actually interacting with each other,
-// talking"): A ROUND IS A MEETING. The first cut's forty-second rounds re-dealt a busy square three times a minute (76-92%
+// LW-TALK: A ROUND IS A MEETING. The first cut's forty-second rounds re-dealt a busy square three times a minute (76-92%
 // of its people had a new partner every round, walking up to 30 m to reach them), started every circle's script at the
 // round's first minute - while its people were still walking to one another (22-84% of the lines heard, by hour and
 // town) - and every spot's on the same minute (ten lines in one frame, then half a minute of silence). Now a round is
@@ -23,7 +22,7 @@
 //
 // WHERE THEY STAND (`circleStands`): each circle about a point of the spot - the circles round the spot's centre on
 // the golden angle, outward as they number - its people facing in toward one another; one alone stands at a place of
-// their own about the spot. LW-SPACE (2026-10-06, Mac: "I notice NPCs and walk stuck inside each other"): NONE ON
+// their own about the spot. LW-SPACE: NONE ON
 // ANOTHER - a round's circles at a spot laid together (`circlesStands`), and those alone at it each SPACE_M from every
 // place taken before them (`aloneStands`).
 import { CREW_LINE_S } from '../naval/crewLife.js';   // the crew's beat: one export, read here

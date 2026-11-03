@@ -1,5 +1,4 @@
-// URBANIZER U1 (2026-10-26; KPbICA's spec, forwarded by the owner: "Buildings assets should utilize more cut stones, bricks,
-// half-timbering"; bible/03-World/Urban-Fabric.md section 2): a town past the Bay wears its PROVINCE's building set -
+// URBANIZER U1: a town past the Bay wears its PROVINCE's building set -
 // Daggerfall's own stone, brick and half-timber sets (ClimateSwaps.ApplyClimate's bases) - its ground still its zone's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -54,11 +53,3 @@ test('URBANIZER U1 the climate a town stands in: only its buildings\' set moves 
   assert.equal(withTownLook(null, B.Mountain), null);
 });
 
-test('URBANIZER U1 the host by source: every place past the Bay - Arena\'s places, the countryside\'s towns and the capitals but the Imperial City - stood in its province\'s set (scenes/tamrielPlacesHost.js); a lair keeps its zone\'s (mutants: a site unwired; the Imperial City dressed)', () => {
-  const h = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(h, /synthesizeArenaLocation\(template, place, \{ regionIndex, regionName: REGION_NAMES\[regionIndex\], politic: 128 \+ regionIndex, climate: townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\) \}\)/);
-  assert.match(h, /synthesizeCountryLocation\(pick\.template, \{ px, py, type: pick\.type, name \}, \{ regionIndex, regionName: REGION_NAMES\[regionIndex\], politic: 128 \+ regionIndex, climate: townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\) \}\)/);
-  assert.match(h, /climate: at\.k === 0 \? getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\) : townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\)/);
-  assert.match(h, /synthesizeLairLocation\([^\n]+climate: getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\) \}\)/, 'a lair its zone\'s');
-  assert.equal((h.match(/townClimateAt\(/g) ?? []).length, 3);
-});

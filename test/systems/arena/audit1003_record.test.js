@@ -1,8 +1,8 @@
-// AUDIT PRE-MERGE 1003 (2026-10-03): the arena PR (#545) read again before its merge - its code finding pinned here.
+// AUDIT PRE-MERGE 1003: the arena PR (#545) read again before its merge - its code finding pinned here.
 // D1: a walk to a mark's pace outlived the walk. ARENA-FIX 8's walk in sets the motor's pace (WALK_PACE, 0.7), and the
 // motor put it back only when it arrived itself (WALK_ARRIVE_M); the bout ends every walk in itself (its mark at
 // MARK_ARRIVE_M, or the walk's limit at the count) with `walkGoal = null`, so every exhibition and ladder fighter that
-// walked in fought its whole bout at 0.7 of its speed. The record: bible/11-Multiplayer/Arena.md "ARENA-FIX record" 8.
+// walked in fought its whole bout at 0.7 of its speed. The record: "ARENA-FIX record" 8.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createArenaBouts, WALK_PACE } from '../../../src/scenes/arena/arenaBouts.js';

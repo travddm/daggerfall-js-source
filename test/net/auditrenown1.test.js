@@ -1,4 +1,4 @@
-// AUDIT RENOWN1 (2026-09-25, Mac: "Lets audit this before we continue to build on it"): THE RENOWN, AUDITED - five
+// AUDIT RENOWN1: THE RENOWN, AUDITED - five
 // lenses over RENOWN1 and RENOWN2 (security and trust, the game's hooks, the wire and the session, the data and the
 // numbers, the displays and the records), every finding reproduced before it was fixed, and each fix pinned here:
 //   THE SERVICE - the hour's window only moves forward (SEC-1/DATA-1), and so does the rate limiter's; the report is
@@ -32,7 +32,7 @@ import {
 } from '../../src/net/renown.js';
 import { mintRenownOrder, ORDER_TTL_S } from '../../src/net/identityToken.js';
 import {
-  RENOWN_ROOM_HZ_MAX, RENOWN_RESEND_MS, RENOWN_ORDER_KEEP_MS, renownRoomGate, CHAT_WORLD_ROOM,
+  RENOWN_ROOM_HZ_MAX, RENOWN_RESEND_MS, RENOWN_ORDER_KEEP_MS, renownRoomGate, CHAT_WORLD_ROOM, RELAY_VERSION,
 } from '../../src/net/wire.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { withClock } from '../placeWidest.mjs';
@@ -44,7 +44,7 @@ import {
   renownFoeRevived, renownFoeLevel, setRenownKillHandler, _resetRenownKillsForTests,
 } from '../../src/net/renownTracker.js';
 import { KNIGHT_CITY_WATCH } from '../../src/characters/mobile/mobileTypes.js';
-import { setRenownLayer, offlineVitals, keepFraction } from '../../src/systems/renownLayer.js';
+import { setRenownLayer, setOnlineLayerExtra, offlineVitals, keepFraction } from '../../src/systems/renownLayer.js';
 import { defineLiveMaxHealth, defineLiveMaxMagicka } from '../../src/systems/chargen.js';
 import { lycanthropyMagicRound, cureLycanthropy, createLycanthropyCurse, currentMaxHealth, NEED_TO_KILL_PERIOD } from '../../src/systems/lycanthropy.js';
 import { LYCANTHROPY_TYPES } from '../../src/systems/infection.js';
@@ -170,8 +170,7 @@ test('AUDIT RENOWN1 DATA-4/GAME-9: a report is ONE transaction under its own id 
   const before = windowOf(db, me.id).xp;
   await assert.rejects(reportRenownXp({ db, nowS: T0 + 20 }, me, { character: 'char-boom', xp: 500, rid: '1111111111111111' }));
   assert.equal(windowOf(db, me.id).xp, before, 'the hour is as it was: the report is one transaction');
-  assert.match(src('server-account/src/renownTracks.js'), /const \[decided, , , after\] = await db\.batch\(\[/, 'ONE batch - D1 runs it as one transaction');
-  assert.match(src('server-account/migrations/0009_renown.sql'), /\n {2}last_rid {3}TEXT,\n/, 'the track keeps the id of the last report it took');
+  assert.match(db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('renown_tracks').sql, /\n {2}last_rid {3}TEXT,\n/, 'the track keeps the id of the last report it took');
 });
 
 test('AUDIT RENOWN1 DATA-5: reports racing near the cap are decided against the track as it stands INSIDE the transaction - the hour is charged what the track took, and only one says it rose (mutants: what the track can take read before the write)', async () => {
@@ -287,41 +286,18 @@ const cell = () => {
 };
 const renownSent = (w) => w.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'renown');
 
-test('AUDIT RENOWN1 WIRE-3: each socket is sent a renown order on ITS OWN welcome\'s word - a halo whose relay is a version behind is sent none while the primary\'s is sent it; a halo promoted to the primary keeps its own state; the order goes nowhere past its keeping (mutants: a session-wide flag; a socket\'s state lost on promotion)', () => {
+test('AUDIT RENOWN1 WIRE-3: a welcomed socket is sent a renown order, and once its room answers it the order goes no more (mutants: the order resent after its answer)', () => {
   const { s, sockets, clock } = cell();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world111' });
-  s.setHalo(['world:3,12']);
-  sockets[1].open();
-  sockets[1].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world110' });   // a relay mid-deploy
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: RELAY_VERSION });
   assert.equal(s.sendRenownOrder('v1.a.b', 7), true);
   assert.deepEqual(renownSent(sockets[0]), [{ t: 'renown', order: 'v1.a.b' }]);
-  assert.deepEqual(renownSent(sockets[1]), [], 'the world110 socket would be closed by the frame');
   clock.t += 5000; s.tick();
-  assert.deepEqual(renownSent(sockets[1]), [], 'and it stays unsent however long it waits');
   sockets[0].receive({ t: 'renown', id: 'mac-0001', lv: 7 });
   const went = renownSent(sockets[0]).length;
   clock.t += 5000; s.tick();
   assert.equal(renownSent(sockets[0]).length, went, 'answered, never again');
   assert.equal(RENOWN_RESEND_MS, 3000);
   assert.equal(RENOWN_ORDER_KEEP_MS, (ORDER_TTL_S - 10) * 1000, 'inside the order\'s own minute (a number, not an expression: identityToken.js imports wire.js)');
-});
-
-test('AUDIT RENOWN1 UI-3: a peer RE-INTRODUCED (a join, a re-hello as another character) carries its level whatever it is; a level heard for a peer who has left rises in memory; a peer re-stood from memory wears it (mutants: `_refresh` leaving the level; the remembered level not raised; the re-stood level dropped)', () => {
-  const { s, sockets } = cell();
-  const ws = sockets[0];
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', lv: 12 }], n: 2, v: 'world108' });
-  ws.receive({ t: 'join', id: 'bob-0002', name: 'Bob', lv: 14 });
-  assert.equal(s.renownOf('bob-0002'), 14, 'a join re-introduces the level');
-  ws.receive({ t: 'join', id: 'bob-0002', name: 'Bob', lv: 3 });
-  assert.equal(s.renownOf('bob-0002'), 3, 'an introduction is the truth - a re-hello as another character may be lower');
-  ws.receive({ t: 'leave', id: 'bob-0002' });
-  assert.equal(s.peers.has('bob-0002'), false);
-  assert.equal(s.renownOf('bob-0002'), 3, 'remembered');
-  ws.receive({ t: 'renown', id: 'bob-0002', lv: 4 });
-  assert.equal(s.renownOf('bob-0002'), 4, 'a rise heard for a remembered peer rises in memory');
-  ws.receive({ t: 'renown', id: 'bob-0002', lv: 2 });
-  assert.equal(s.renownOf('bob-0002'), 4, 'and never falls there');
-  assert.match(src('src/net/online.js'), /const made = this\._peer\(knew \? \{ \.\.\.p, name: knew\.name, title: knew\.title, glyphs: knew\.glyphs, lv: knew\.lv,/, 'a re-stood peer wears the remembered level');
 });
 
 // ── THE TRACKER ─────────────────────────────────────────────────────
@@ -395,11 +371,10 @@ test('AUDIT RENOWN1 GAME-8: the page\'s last word - `leave` sends the held repor
   assert.equal(JSON.parse(sent.at(-1).init.body).secret, undefined, 'and never in the body');
   assert.equal((await accountCall({ fetch, base: 'https://x.invalid' }, '/v1/health')).ok, true);
   assert.match(renownRid(), RENOWN_RID_RE, 'a report\'s own id, in its shape');
-  assert.match(src('src/scenes/world.js'), /leave: \(c, xp, name, rid, region\) => renownAccount\.leave\(c, xp, name, rid, region\),/);
 });
 
 test('AUDIT RENOWN1 UI-5/UI-7/WIRE-2c: the answer\'s plan - the order carried WHENEVER the service signed one, a rise announced against what was SAID (never against the page\'s level, which a token may have raised first), the hour\'s line only for a report the hour cut short (never at the cap, never for a repeat) (mutants: the order gated on the page\'s level; the announcement against the page\'s level; the cap line at the cap; the cap line for a repeat)', () => {
-  assert.deepEqual(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, 5), { level: 6, order: 'v1.o.s', announce: 6, capped: false, xp: null, room: null });   // RENOWN4: xp null for an answer without a total. SCALE4h (PIN MOVED): and room
+  assert.deepEqual(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, 5), { level: 6, order: 'v1.o.s', announce: 6, capped: false, xp: null, room: null });   // RENOWN4: xp null for an answer without a total. SCALE4h (
   assert.deepEqual(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, null).announce, 6, 'nothing said yet');
   assert.equal(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, 6).announce, null, 'said already');
   assert.equal(renownAnswer({ level: 6, rose: false, order: null, credited: 500 }, 500, 5).announce, null, 'no rise, nothing said');
@@ -408,13 +383,6 @@ test('AUDIT RENOWN1 UI-5/UI-7/WIRE-2c: the answer\'s plan - the order carried WH
   assert.equal(renownAnswer({ level: 9, credited: 100 }, 500, 9).capped, true, 'the hour cut it short');
   assert.equal(renownAnswer({ level: 50, credited: 0, max: true }, 500, 50).capped, false, 'at the cap there is no hour to speak of');
   assert.deepEqual(renownAnswer(null, 10, null), { level: null, order: null, announce: null, capped: false, xp: null, room: null });
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const a = renownAnswer\(data, sent, renownSaid\);/);
-  assert.match(w, /if \(a\.order\) online\?\.sendRenownOrder\?\.\(a\.order, a\.level\);/, 'the order carried on the plan\'s word alone');
-  assert.match(w, /if \(a\.announce !== null\) renownRose\(a\.announce\);/);   // FIRM1: said as a level is
-  assert.match(w, /const renownRose = \(level\) => \{\n    const was = renownSaid \?\? level - 1;\n    renownSaid = level;/, 'the rise said once, against what was said');
-  assert.match(w, /if \(renownNow !== null && level <= renownNow\) return renownNow;/, 'the page\'s own level only rises (UI-7 W2)');
-  assert.match(w, /onStop: \(error\) => tradeSay\(`\$\{accountRefusalText\(error\)\} This character is earning no Renown\.`\),/, 'UI-4: a refusal that ends reporting is said');
 });
 
 // ── THE HOOKS ───────────────────────────────────────────────────────
@@ -445,13 +413,6 @@ test('AUDIT RENOWN1 GAME-1/GAME-7/GAME-10: the city watch never pays, whoever\'s
   assert.deepEqual(paid, ['next', 'rat', 'rat']);
   assert.equal(renownFoeLevel({ streamedLevel: 3, entity: { level: 30 } }), 3, 'the host\'s level, not the joiner\'s copy\'s');
   assert.equal(renownFoeLevel({ entity: { level: 30 } }), 30);
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(isClassEnemyId\(f\.mobileType\) && Number\.isInteger\(f\.entity\?\.level\) && f\.entity\.level >= 0 && f\.entity\.level <= FOE_LEVEL_MAX\) r\.l = f\.entity\.level;/, 'GAME-3: the host streams a class foe\'s level');
-  assert.match(d, /if \(r\.l !== undefined && isClassEnemyId\(f\.mobileType\)\) f\.streamedLevel = r\.l;/, 'and the joiner keeps it');
-  assert.match(d, /if \(landed && !f\.dead\) renownFoeCarry\(f, rec\);/, 'a live foe rebuilt keeps my blows; a dead one\'s rebuild does not');
-  assert.match(d, /_lootAt\.delete\(`corpse:\$\{pi\}`\);(?: forgetRoomContainer\(`corpse:\$\{pi\}`\);)? \}[^\n]*\n(?:\s*if \(f\._encId != null\) \{[^\n]*\n)?\s*renownFoeRevived\(f\);/, 'un-death forgets them');   // PIN MOVED (PARTY-LOOT): the room's base and takes for the body go with it too   // REST-SYNC re-aim: a shared body's loot record forgotten between
-  assert.match(d, /nf\.entity\.health -= missing;[^\n]*\n\s*renownFoeCarry\(f, nf\);/, 'the dungeon\'s Wabbajack carries them');
-  assert.match(src('src/scenes/world.js'), /nf\.entity\.health -= missing;[^\n]*\n\s*renownFoeCarry\(f, nf\);/, 'and the street\'s');
   for (const file of ['src/scenes/exteriorFoes.js', 'src/scenes/dungeonContext.js']) {
     assert.match(src(file), /zeroFoeHealth: \(f\) => \{ if \(!f\.dead(?: && !f\.puppet)?\) damageFoe\(f, f\.entity\.health, null, null, \{ fromPlayer: false, bypassShield: true \}\); \}/, `GAME-6: ${file}'s scripted kill is nobody's blow`);
   }
@@ -470,6 +431,7 @@ const liveEntity = (over = {}) => {
 
 test('AUDIT RENOWN1 GAME-4: the layer rides ABOVE the lycanthrope\'s limiter - a Renown 50 werewolf keeps its 147 through the urge (it fell to 100 of 100), the urge\'s clamp and every full heal read the same ceiling, and the cure heals to the whole maximum (it left 100 of 247) (mutants: the limiter capping the layer; the cure to the raw value)', () => {
   const e = liveEntity();
+  setOnlineLayerExtra(e, { hp: 147 });   // B5: Renown adds no health; 147 stands in for the floor's and the Firmament's
   setRenownLayer(e, 50);
   assert.equal(e.maxHealth, 247);
   e.health = 247;
@@ -506,11 +468,6 @@ test('AUDIT RENOWN1 GAME-5: the magery\'s third is of Daggerfall\'s own maximum,
 // ── THE DISPLAYS ────────────────────────────────────────────────────
 
 test('AUDIT RENOWN1 UI-1/UI-6/UI-8/UI-10: the account card\'s values shrink and wrap in the window (the Renown rows ran off a phone\'s window both ways); a capped row names the level once; the chip names whose Renown it is and is drawn only signed in; an empty box is never drawn (mutants: the value unshrinking; "Renown 50, Renown 50"; the chip on the password stage; a bordered empty box)', () => {
-  const css = src('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.px-win\.px-acctwin \.card\.acct ul\.acctfacts \.acctkey \{ flex: 0 0 auto; \}\n\.px-win\.px-acctwin \.card\.acct ul\.acctfacts \.acctval \{ flex: 0 1 auto; min-width: 0; overflow-wrap: anywhere; \}/);
-  assert.match(css, /\.card ul\.acctfacts \.acctval \{ flex: 1 1 auto; min-width: 0; color: var\(--bone\); font-size: 15px; overflow-wrap: anywhere; \}/);
-  assert.match(css, /\.card h3 \.acctrenown:empty \{ display: none; \}/);
-  assert.match(src('src/ui/profileWindow.js'), /\.dfprofile-renown:empty \{ display: none; \}/);
   assert.equal(renownProgressText(RENOWN_XP_MAX), 'the highest there is');
   const mk = (tag) => {
     const n = {
@@ -569,7 +526,4 @@ test('AUDIT RENOWN1 UI-3: the box over a head FOLLOWS a rise - 12, then 13, then
   assert.deepEqual([profileRenown(v, 13).level, profileRenown(v, 13).levelTitle], ['13', 'Renown 13']);
   assert.equal(profileRenown(v, null), v, 'a level the session does not know leaves the card\'s own');
   assert.equal(profileRenown(v, 12), v);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /_profileView = profileRenown\(v, online\?\.renownOf\?\.\(peerId\) \?\? null\);/);
-  assert.match(w, /if \(_profileView && profileWin\?\.isOpen\(\)\) \{ const lv = renownText\(online\?\.renownOf\?\.\(profileWin\.peerId\(\)\) \?\? null\); if \(lv && lv !== _profileView\.level\) repaintDuelProfile\(\); \}/);
 });

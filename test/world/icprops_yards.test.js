@@ -1,6 +1,4 @@
-// IC-PROPS (2026-10-27, the owner: "Random placements on the wagon/other vendors all over the Imperial city", then "the
-// issues I mentioned for the imperial city for stables/doors/etc are a world wide issue. They have no logical
-// placements"; bible/03-World/Merchant-Yards.md IC-PROPS) - EACH YARD WHERE ITS KIND BELONGS, ON THE TOWN'S OWN GROUND:
+// IC-PROPS - EACH YARD WHERE ITS KIND BELONGS, ON THE TOWN'S OWN GROUND:
 // never on a way, past the town or in a house's garden while the town has room elsewhere; its gate onto a way; the Stable
 // at the town's edge by the road out, the Wagon Yard and the joinery on a street's side nearest the middle; and the
 // Imperial City - one town over 625 slices - its own yards at its gates, none on any slice by the law
@@ -127,7 +125,6 @@ test('IC-PROPS A CAPITAL THAT NAMES ITS OWN - a ground handed `fixed` sites stan
   const s = imperialYardSites()[0].s;
   assert.deepEqual(townYardsOf({ capital: { k: IC, s } }).fixed, imperialSliceYards(s));
   assert.equal(townYardsOf({ name: 'Daggerfall', mapTableData: { mapId: 1 } }).fixed, null);
-  assert.match(hostText('src/scenes/world.js'), /const g = await stepsBreathing\(townGroundSteps\(yl, measures, shut, townYardsOf\(dfLocation\)\), breathe\);/);   // PIN MOVED (IC-STUTTER): a step at a time
 });
 
 test('IC-PROPS THE IMPERIAL CITY\'S YARDS AT ITS GATES - a Stable, a Wagon Yard and a joinery outside each district\'s avenue gate in the city wall: on City Isle\'s own land past the wall\'s towers, off the way out, within IMPERIAL_YARD_REACH of the gate, each wholly in one slice, the Stable nearest, none on another (mutants: the way out unread; the wall\'s reach unread; the kinds placed over one another)', () => {

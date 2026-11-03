@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT QUESTLINES ACTS-8 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5; CLAUDE.md HOST-SPLIT): THE ELITE
+// AUDIT QUESTLINES ACTS-8: THE ELITE
 // FOE'S ACT, `elite-foe-slain` (systems/questlines/qlActs.js), out of the dungeon host. QL11 wrote its whole condition into
 // buildDungeonContext (scenes/dungeonContext.js), a host that does not grow; the host now hands this module the place it
 // built (`hearEliteFoesIn(dfLocation)`, one line of wiring) and the condition is here, where a pin drives it.

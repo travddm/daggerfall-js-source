@@ -27,11 +27,10 @@ exactly as it is.
 Keep every argument name; translate only the words around them. A lone apostrophe is plain text; write `'{'` for a
 literal brace.
 
-## Machine drafts
+## Reviewed translations only
 
-Where no human translation exists, the text is a draft by Claude, and the game says so: the Language row reads
-"Machine translated", and the About pane's credits name the drafts as Claude's. A person's translation always
-outranks a draft. Once a row is yours, no session and no pipeline run writes over it.
+This repository ships English and translations that a person wrote or reviewed. It does not ship machine drafts. A
+language folder is added with the whole translation reviewed, and the reviewers named in `translators.json`.
 
 ## Fixing a translation
 

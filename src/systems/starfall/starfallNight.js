@@ -1,6 +1,6 @@
 // @ts-check
-// STAR2 (2026-10-20): THE WITCHES' NIGHT - the night of the sky's own 13th of Frostfall, when the night's third star is the
-// Heart-Star. Design: bible/11-Multiplayer/Starfall.md section 1.
+// STAR2: THE WITCHES' NIGHT - the night of the sky's own 13th of Frostfall, when the night's third star is the
+// Heart-Star. Design:
 //
 // Canon, and two tables that never meant to agree: the Witches' Festival is day 283 of the year (systems/holidays.js,
 // DFU's holidayDaysOfYear, its id 43 - TEXT.RSC 8349 + 43, "Today is the 13th of Frostfall, known throughout Tamriel as

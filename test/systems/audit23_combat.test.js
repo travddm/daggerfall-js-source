@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { PlayerWeapon } from '../../src/combat/playerWeapon.js';
 import { CLASSIC_UPDATE_INTERVAL, BOW_SOUND_FRAME, HIT_FRAME_BOW, getBowCooldownTime } from '../../src/characters/weaponStates.js';
 import { SOUND } from '../../src/systems/soundClips.js';
-// SWING-DEFAULT1 (2026-09-22): these pins are the DRAG's law (WeaponSwingMode 0); the port's default is 2 now (click or hold), so the drag is asked for here, once for the file.
+// SWING-DEFAULT1: these pins are the DRAG's law (WeaponSwingMode 0); the port's default is 2 now (click or hold), so the drag is asked for here, once for the file.
 import { setValue as _swingSetValue } from '../../src/systems/settings/settings.js';
 _swingSetValue('Controls', 'WeaponSwingMode', '0');
 

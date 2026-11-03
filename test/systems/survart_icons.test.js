@@ -1,4 +1,4 @@
-// SURV-ART (2026-09-19, Mac: "the sprites aren't showing at all") -
+// SURV-ART -
 // CLIMATES & CALORIES' ART REACHED THE SCREEN AT NEITHER DOOR.
 //
 // The mod's sixteen PNGs were vendored, registered at boot
@@ -173,11 +173,11 @@ test('SURV-ART: both doors keep the arm that reaches the vendored art', () => {
   // that cannot succeed caches the miss first
   const dom = read('src/ui/textureCanvas.js');
   const vendorAt = dom.indexOf('if (isVendorArchive(archive)) {'), classicAt = dom.indexOf('getArchive(archive).then(');
-  assert.ok(vendorAt >= 0 && classicAt >= 0 && vendorAt < classicAt, 'the vendor arm comes first');   // PIN MOVED (AUDIT C&C R21): both lines found - it passed at -1 with the arm gone
+  assert.ok(vendorAt >= 0 && classicAt >= 0 && vendorAt < classicAt, 'the vendor arm comes first');
   assert.match(dom, /const canvas = color32Canvas\(img, \{ scale \}\);/, 'and draws the decoded PNG without a palette');
 });
 
-// SURV-TENT (2026-09-19, Mac handed over the shipped bundle) - THE
+// SURV-TENT - THE
 // TENT'S TWO RESKINS, AND THE KIND OF VENDORED FILE THEY ARE.
 //
 // The camp stands the mod's tent as model 41606 (survival/camp.js

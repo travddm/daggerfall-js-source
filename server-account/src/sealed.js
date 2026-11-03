@@ -1,8 +1,8 @@
 // @ts-check
-// THE SERVICE'S SEALED WORD (lifted out of PATREON-LINK's patreon.js for SHOP, bible/06-Systems/Shop.md): claims sealed
+// THE SERVICE'S SEALED WORD (lifted out of PATREON-LINK's patreon.js): claims sealed
 // with AES-GCM under a key HKDF derives from one of the Worker's secrets, one key a salt and a kind - so a value sealed
 // for one door never opens at another, and a byte changed anywhere opens to nothing. Sealed rather than signed, because
-// what it carries (an account, an order) is nobody's to read on the way past: a browser's history, a provider's logs.
+// what it carries (an account) is nobody's to read on the way past: a browser's history, a provider's logs.
 import { _b64url } from '../../src/net/identityToken.js';
 
 const enc = new TextEncoder();

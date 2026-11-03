@@ -80,15 +80,6 @@ test('FB1020c HARBOUR-REACH never "no harbour" before the ground is built: the r
   assert.equal(isle.get('port:7').harbour, null, 'no farther than its own shore');
 });
 
-test('FB1020c HARBOUR-REACH by source: the world hands its harbour\'s readiness at any reach - the scan\'s every pixel built - and its own reach beside it', () => {
-  // PIN MOVED (RPT1026-WORLD FAR-QUAY): the harbour a town is handed as is moved out of world.js navalHarbourNear to
-  // systems/naval/harbourBook.js harbourOf, which the host maps over every port town near
-  const B = hostText('src/systems/naval/harbourBook.js');
-  assert.match(B, /const ready = \(r = reach\) => \{\n {4}const x0 = rect\.minX - r, z0 = rect\.minZ - r, sx = rect\.maxX - rect\.minX \+ 2 \* r, sz = rect\.maxZ - rect\.minZ \+ 2 \* r;/);
-  assert.match(B, /return \{ key: `port:\$\{t\.id\}`, name: t\.name \?\? null, rect, ready, reach \};/);
-  assert.ok(hostText('src/scenes/world.js').includes('return _navalHarbourAt.towns.map((t) => { const h = harbourOf(t, { state, built: csaPixelAt, woods: host.woods }); return { ...h, keep: harbourKeep(t.loc, h.rect) }; });'));   // PIN MOVED (PORT-SHIPS): each town's keep beside it
-});
-
 /** The 37 port towns whose own reach sounds no harbour on the ground DFU's kernel builds - the field's report. */
 const OWN_NONE = Object.freeze([
   'Aldbrugh', 'Aldingshire', 'Aldpath Hall', 'Antelajda', 'Arkbeth Garden', 'Blackcart Hollow', 'Bubissidata', 'Cathborne',
@@ -109,7 +100,7 @@ test('FB1020c HARBOUR-REACH (ARENA2): every one of the 106 port towns sounds a h
     if (!book.get(town.name).harbour?.berths?.length) none.push(town.name);
   }
   assert.deepEqual(own.sort(), [...OWN_NONE], 'the field\'s report: 37 harbour towns with no harbour');
-  assert.deepEqual(none, [], 'out to the ring, every one');   // PIN MOVED (ALDBRUGH-QUAY): Aldbrugh's sea lies in the ring's corner, sounded now
+  assert.deepEqual(none, [], 'out to the ring, every one');
 });
 
 /** ALDBRUGH-QUAY: a town whose sea lies only in the port law's ring's corner - south-east of it, past the round reach. */

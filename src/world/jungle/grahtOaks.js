@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GRAHT1 (bible/03-World/Graht-Oaks.md; the owner, 2026-10-25: "Vardenfell needs proper super tall low poly tree sprites
-// with branchs/leaves that expand to cover the sky. The current simple skybox method is very low quality and band
-// aided" - the canopy over Valenwood's forest, VALENWOOD-CANOPY's ceiling of leaves) - THE GRAHT-OAKS' LAW: where
+// GRAHT1 (; - the canopy over Valenwood's forest, VALENWOOD-CANOPY's ceiling of leaves) - THE GRAHT-OAKS' LAW: where
 // Valenwood's giant trees stand, and what they stand. PURE and the terrain worker's (its import graph is world/ alone):
 // the jungle's layout (world/terrain/jungleNature.js jungleLayout) stands them first, as the jungle's top storey, and
 // every storey under them keeps off their feet; the pixel's build (scenes/pixelBuild.js) hands them to their host

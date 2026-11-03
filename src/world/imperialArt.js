@@ -1,6 +1,6 @@
 // @ts-check
-// IC-GRAND (bible/03-World/Arena-Provinces.md IC-GRAND) - THE FABRIC'S PICTURES: the Imperial City's street walls (the
-// KPbICA spec the owner forwarded, 2026-10-26: "buildings in cut stone, brick and half-timbering") and their ground
+// IC-GRAND (IC-GRAND) - THE FABRIC'S PICTURES: the Imperial City's street walls (the
+// KPbICA spec) and their ground
 // floors - a storey of each, painted by world/capitalModels.js's own laws (TESA-LORE: a few dozen shades off a material's
 // ramp through the ordered dither, every texel its own grain, masonry laid stone by stone) at vanilla's own wall format:
 // 64 x 128 texels over 1.6 by 3.2 m (TESA-LORE's measure, 40.9 texels a metre), a window a picture. No game data.

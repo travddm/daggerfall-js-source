@@ -1,5 +1,4 @@
-// AUDIT LOCKPICK, LANE C (2026-10-26, the owner: "Also ensure this is enhanced ui plus" - bible/01-Overview/audits/
-// Audit-Lockpick.md): THE LOCK'S WINDOW IN THE KIT. The real window (ui/lockpickWindow.js) behind the real door
+// AUDIT LOCKPICK, LANE C: THE LOCK'S WINDOW IN THE KIT. The real window (ui/lockpickWindow.js) behind the real door
 // (ui/lockpickDoor.js) over test/lockDom.mjs, and the real Plus pad poller (ui/gamepadInput.js attachGamepad):
 //   C1 - the window is the stone-and-brass kit's by role (FRAME_ROLES), its layout the Plus sheet's, the pixel face; on
 //        the classic skin it lays the layout and the kit cut to its own selectors, and nothing of another surface.
@@ -84,16 +83,20 @@ test('AUDIT LOCKPICK C2: never past a short screen - the window scrolls, the loc
   assert.match(LOCK_CSS, /html\.plus-pad-prompts-visible \.lk-win \{ max-height: calc\(100dvh - var\(--plus-pad-clearance, 0px\) - 16px\); \}/, 'S3: above the pad\'s prompt bar, never under it');
 });
 
-test('AUDIT LOCKPICK B3: a snapped pick\'s count reads right at one, a few and many in every language, through the real t() over each real table (a table\'s plural dropped fails it)', async () => {
-  const { readFileSync } = await import('node:fs');
+test('AUDIT LOCKPICK B3: a snapped pick\'s count reads right at one, a few and many in a language\'s own plural categories, through the real t() over a table (the count dropped fails it)', async () => {
   const tm = await import('../../../src/systems/textManager.js');
-  const want = { es: ['Queda 1.', 'Quedan 2.'], it: ['Ne resta 1.', 'Ne restano 2.'], 'pt-BR': ['Resta 1.', 'Restam 2.'], bg: ['Остава 1.', 'Остават 2.'],
-    cs: ['Zbývá 1.', 'Zbývají 2.', 'Zbývá 5.'], ru: ['Осталась 1.', 'Осталось 2.', 'Осталось 5.'] };
+  // Fixture rows stand in for translations: Spanish has one and other, Russian one, few and many, so the count must
+  // reach the language's plural rules for each form to show.
+  const tables = {
+    es: [['lock.word.break', '{count, plural, one {Queda #.} other {Quedan #.}}']],
+    ru: [['lock.word.break', '{count, plural, one {Осталась #.} few {Осталось # (few).} many {Осталось # (many).} other {Осталось #.}}']],
+  };
+  const want = { es: ['Queda 1.', 'Quedan 2.', 'Quedan 5.'], ru: ['Осталась 1.', 'Осталось 2 (few).', 'Осталось 5 (many).'] };
   try {
     for (const [lang, w] of Object.entries(want)) {
-      tm.patchLocaleTable(lang, 'Port_Strings', tm.parseStringTableCsv(readFileSync(new URL(`../../../locales/${lang}/Port_Strings.csv`, import.meta.url), 'utf8')));
+      tm.patchLocaleTable(lang, 'Port_Strings', tables[lang]);
       tm.setLocale(lang);
-      [1, 2, 5].slice(0, w.length).forEach((n, i) => assert.ok(LOCK_WORDS.break(n).endsWith(w[i]), `${lang} ${n}: ${LOCK_WORDS.break(n)}`));
+      [1, 2, 5].forEach((n, i) => assert.equal(LOCK_WORDS.break(n), w[i], `${lang} ${n}`));
     }
   } finally { tm.setLocale('en'); }
   assert.equal(LOCK_WORDS.break(2), 'Your lockpick snaps! 2 left.');

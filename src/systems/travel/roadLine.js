@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ROAD-FOLLOW (2026-10-27, the owner's field report, item 6: "Road travel is not following roads properly in overworld
-// travel"; bible/06-Systems/Travel-View.md ROAD-FOLLOW) - A ROAD PAST THE BAY IS WALKED AND DRAWN ON ITS CURVES.
+// ROAD-FOLLOW - A ROAD PAST THE BAY IS WALKED AND DRAWN ON ITS CURVES.
 //
 // The Overworld's walk (OW-ROAD-TRUE: a road's or a track's leg walks its lane, travelOptions.js routeLane) and its drawn
 // line (travelRoute.js routeDrawPoints) run pixel middle to pixel middle - Basic Roads' own geometry, where every arm of

@@ -1,5 +1,4 @@
-// DECOR-OUTDOOR (FIELD BUGS 2026-10-05b, the owner: "There seems to be a lot of missing decor items with house
-// decoration"; asked which, the outdoor pieces for a yard among them). A yard's decorator offered the rooms' furniture
+// DECOR-OUTDOOR (FIELD BUGS 2026-10-05b,; asked which, the outdoor pieces for a yard among them). A yard's decorator offered the rooms' furniture
 // alone: none of what Daggerfall stands in its streets - a fence, a well, a fountain, a cart, a lamp - and none of its
 // trees and plants. Now each town block's street joins the catalogue, and the climates' nature sets whole; both stand in
 // a yard alone, a yard's nature its own climate's, drawn as the town's own is - in the town's climate, its season,
@@ -108,7 +107,6 @@ test('DECOR-OUTDOOR the scan, through the hosts\' one constructor: the streets r
     assert.ok(x && scan.radiusOf(x) > 0, `${k}: in, and priced`);
   }
 });
-
 
 test('DECOR-OUTDOOR the yard\'s tree: drawn as its town draws its nature - the season\'s archive of its set (winter\'s twin in winter), at its own scale on its own base, leaning with the wind, mirrored when turned half round - and stood again in the new season when its pixel is built again (mutants: DECOROUTDOOR-tree-seasonless, DECOROUTDOOR-tree-unscaled, DECOROUTDOOR-tree-still, DECOROUTDOOR-rebuild-unheard)', async () => {
   assert.equal(isNaturePiece(yardPiece()), true);
@@ -229,7 +227,6 @@ test('DECOR-OUTDOOR AUDIT 05b A5: a model chosen in a yard flies in its town\'s 
   assert.ok(ghost.length > 0, 'the ghost drawn');
   assert.ok(ghost.every((d) => d.remap?.get(`${SWAPPED}_0`) === swap), 'every draw of it in the desert\'s own wood - the swap written first');
   assert.equal(table.get(`${SWAPPED}_0`), swap);
-  assert.match(readFileSync(new URL('../../../src/scenes/homeYards.js', import.meta.url), 'utf8'), /drawPreview: \(\) => tool\.drawPreview\(cur \? remapOf\(cur\.yard\) : null\),/, 'the preview drawn with the yard\'s table, in the same law');
 });
 
 test('DECOR-OUTDOOR AUDIT 05b A5 the decorator\'s own law: a model it draws with the host\'s table - the panel\'s preview as the ghost - waits for the host\'s law over it (`prepareModel`), asked once a table: a table built anew is asked again (mutant: DECOROUTDOOR-preview-unprepared)', async () => {

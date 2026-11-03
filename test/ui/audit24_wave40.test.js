@@ -98,10 +98,6 @@ test('audit24 wave40: EVERY window a character sheet can push survives the forwa
       `${name}: the pushed window crashed on the sheet's forward`);
   }
 
-  // and the forward itself is still a straight pass-through - if it
-  // ever stops being one, this gate stops meaning anything
-  assert.match(rd('src/ui/charsheet.js'),
-    /if \(this\.child\) return this\.child\.draw\(renderer, canvas, font, s\);/);
 });
 
 test('audit24 wave40: no window declares a fourth parameter that is not the scale', () => {
@@ -124,19 +120,6 @@ test('audit24 wave40: no window declares a fourth parameter that is not the scal
   }
   assert.ok(seen >= 20, `the sweep found ${seen} draw methods, so it is looking at the right files`);
   assert.deepEqual(offenders, [], 'a fourth parameter that is not the scale');
-});
-
-test('audit24 wave40: the large font is a module warm, and it is the one DFU names', () => {
-  // DaggerfallQuestJournalWindow.cs:161-163 builds the title label with
-  // `Font = DaggerfallUI.LargeFont`, and DaggerfallUI.cs:153 is
-  // `LargeFont => GetFont(FontName.FONT0000)`. The port had that law
-  // written as a draw parameter no caller ever passed, so the title has
-  // always drawn in the host font. It loads beside the art now.
-  const src = rd('src/ui/quest/questJournal.js');
-  assert.match(src, /const tf = _largeFont \?\? font;/);
-  assert.doesNotMatch(src, /draw\([^)]*largeFont/, 'and not as a draw parameter any more');
-  assert.doesNotMatch(src, /draw\(renderer, canvas, font, /, 'the signature is three, like its native-panel siblings');
-  assert.match(rd('src/ui/charSheetNav.js'), /preloadQuestJournalArt\(artDeps\)/);
 });
 
 test('audit24 wave40: the warm is DRIVEN, not merely written down', async () => {

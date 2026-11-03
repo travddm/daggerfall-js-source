@@ -1,7 +1,4 @@
-// FPS1 - THE FPS COUNTER (2026-09-11, RookieG via Mac: "we need an
-// ingame fps counter"; the same report said "the outside still has
-// optimization issues", and a number is the first thing that work
-// needs). A DOM overlay over the canvas, driven by its own
+// FPS1 - THE FPS COUNTER. A DOM overlay over the canvas, driven by its own
 // requestAnimationFrame so it measures the browser's frame cadence and
 // not any one host's loop - every host, every skin, the menu too.
 //
@@ -15,9 +12,7 @@
 // Settings > Interface takes effect at once and costs nothing while off:
 // the element is hidden and the loop only counts.
 //
-// PERF-SCALE (2026-09-25, two players via Mac: "fps issues in the
-// exterior but fine in the interior ... GPU is NVIDIA GeForce RTX 4060
-// Ti", "me too ... I got a RX6600"): TWO MORE LINES, so one screenshot of
+// PERF-SCALE: TWO MORE LINES, so one screenshot of
 // the counter answers the two questions such a report opens with -
 // WHICH GPU the browser draws on (the renderer reads it once at
 // creation, Renderer.gpuName; a laptop on its integrated chip or a
@@ -122,9 +117,7 @@ export function sizeLine(i) {
 }
 
 /**
- * SCRIPT-SPLIT (2026-09-26, two players via Mac: "script 107.5 ms" of a
- * 104.3 ms frame on a GTX 1650, "script 203.6 ms" of 201.6 on an RTX 4090
- * Laptop - outdoors, every frame, both ANGLE Direct3D11): THE SCRIPT LINE'S
+ * SCRIPT-SPLIT: THE SCRIPT LINE'S
  * THREE PARTS, so one screenshot says whose milliseconds they are. The
  * script time is measured from the rAF's stamp, and Chrome stamps a frame
  * at the display's beat - so a main thread busy with anything else first

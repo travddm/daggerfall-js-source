@@ -2,10 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // TILE1 — THE SAVE TILE.
 //
-// Mac (2026-09-22): "I want [the Online pane] reserved for a detailed
-// tile based design for your saves which will translate to the load
-// character pane also. Basically showing your portrait and character
-// information."
 //
 // ═══ ONE TILE, THREE PANES ═════════════════════════════════════════
 //
@@ -17,8 +13,7 @@
 //
 // ═══ WHAT IS ON IT, AND WHAT IS DELIBERATELY NOT ═══════════════════
 //
-// Mac, on the account card two hours earlier: "Nothing is centered,
-// there's uneeded text explaining what an account is". So a tile
+// . So a tile
 // carries FACTS ABOUT A CHARACTER and no prose at all:
 //
 //   the face        who this is, before any word is read

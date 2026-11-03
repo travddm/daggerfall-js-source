@@ -1,10 +1,10 @@
 // @ts-check
-// SD7b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE STEPS' ART - what the
+// SD7b: THE STEPS' ART - what the
 // Unmoored Steps wear (the realm's own pseudo-archive, world/superDungeon/sdRealm.js SD_REALM_ARCHIVE), made in code: nothing ships,
 // the same pixels every boot. Each `{ albedo, emission }` in the renderer's color32 shape - RGBA rows, row 0 the
 // texture's v 0 (a top's near edge, -z; a side's top edge).
 //
-// SD-LOOK S9 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 8): A DRAW ATLAS A KIND, painted through
+// SD-LOOK S9: A DRAW ATLAS A KIND, painted through
 // the Hour's paint box (world/superDungeon/sdPixelKit.js) from its ramps (world/superDungeon/sdLook.js) - top, sides, the gold line under the rim,
 // the chamfer and the underside in one 128x64 record (SD_STEPS_ATLAS), so each step is one draw - and each kind reads
 // at a glance from across the void:

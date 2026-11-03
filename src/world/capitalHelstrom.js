@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10c (bible/03-World/Arena-Provinces.md TESA10c) - HELSTROM'S LANDMARKS: the port's own models of the city's
+// TESA10c (TESA10c) - HELSTROM'S LANDMARKS: the port's own models of the city's
 // signatures (world/capitalPlans.js HELSTROM says where each stands) - the Great Xanmeer, a stepped pyramid of mossy
 // stone with its stairs and its shrine; the Hist on its isle in the canal, twisted, sap-gilt, its crown of leaves; the
 // boardwalks over the canal; the palisade of sharpened logs round the city with its watchtowers on stilts - in metres,

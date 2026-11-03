@@ -1,7 +1,5 @@
 // @ts-check
-// PARTY-BUFFS (2026-09-27, Discord - Tabitha, playing paladins, clerics and mages: "Allow us to see buff timers or SOME
-// sort of indicator that we have placed a buff on a party teammate [preferably on their party portrait, maybe?] ...
-// the feedback for buffing other players is non-existent ... I'd also like floating Heal numbers").
+// PARTY-BUFFS.
 //
 // A PARTY MATE'S EFFECTS ARE THEIRS TO SAY. Nothing on my side knows what a gift did once it left (the receiver's
 // client applies it - ALLY-CAST), so each member's party pose carries its OWN live spell effects the way its own HUD

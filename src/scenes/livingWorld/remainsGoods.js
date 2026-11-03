@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW6b (2026-10-05, bible/06-Systems/Living-World.md "LW6b"): THE FALLEN IN THE DEEP - WHAT THEY CARRIED. A fallen diver's
+// LW6b: THE FALLEN IN THE DEEP - WHAT THEY CARRIED. A fallen diver's
 // remains laid in a dungeon (scenes/livingWorld/deepRemains.js lays them; the world host's livingRemainsStep asks): their
 // class's corpse picture and their goods, the same each time they are laid. HOST-SPLIT (SEA VENTURES, 2026-10-22): moved
 // verbatim out of scenes/world.js's bootWorld, which read nothing of its own scope for it - the room the sea's wiring
-// takes (bible/01-Overview/Host-Split.md).
+// takes.
 // ═══════════════════════════════════════════════════════════════════
 import { classLookOf } from '../../world/travellerSprites.js';
 import { lwRng, textSeed } from '../../systems/livingWorld/seed.js';

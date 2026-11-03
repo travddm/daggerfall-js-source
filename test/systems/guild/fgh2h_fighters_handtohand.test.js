@@ -1,5 +1,4 @@
-// FGH2H (2026-09-24, Mac: "change the fighter guild requirements where it
-// allows bare handed") - the Fighters Guild counts HandToHand toward joining
+// FGH2H - the Fighters Guild counts HandToHand toward joining
 // and every rank, beside DFU's seven (FightersGuild.cs's guildSkills), and its
 // hall trains it. Giantish stays: the rank law counts skills past a bar, so an
 // added skill only lets a fist-fighter in and turns no member out. A DEPARTURE,

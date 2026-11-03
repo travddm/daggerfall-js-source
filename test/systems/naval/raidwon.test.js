@@ -1,5 +1,5 @@
 // RAID-WON (FIELD BUGS 2026-10-19, the Discord, [IMB]Monday: "If you get boarded.. repel the attackers.. board them..
-// etc. You can use overview as your crew class as enemies"; bible/01-Overview/bugs/Field-Bugs-2026-10-19.md) - A RAID
+// etc. You can use overview as your crew class as enemies") - A RAID
 // WON AT SEA ENDS. The sea fight starts Warm Ashes' raid on a crewed boat (scenes/naval/navalHost.js beginFight): the
 // small raid's waves come with five `_ally_` Warriors in my crew's place. Won - its leader down, or its wave killed and
 // its Leave Ship the sea fight's ('naval') - it ran on: the small raid until its hour, the pirate attack until its
@@ -130,7 +130,7 @@ test('RAID-WON the hosts: the naval host ends a raid its throw-back won - after 
   assert.match(win, /endBoarding\(\);\n\s*wonRaid\(b\.quest\);[^\n]*\n\s*deps\.mid\?\.\(`The boarders are thrown back, but/, 'a legend\'s first wave');   // PIN MOVED (VOICE2, in PLAIN-SWEEP's words): no dash aside (Voice.md rule 5)
   assert.match(win, /entry\.ship\.boarded = false;\n\s*endBoarding\(\);\n\s*wonRaid\(b\.quest\);[^\n]*\n\s*return;\n\s*\}\n\s*$/, 'thrown back');
   const W = hostText('src/scenes/world.js');
-  assert.match(W, /endRaid: \(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n\s*if \(!quest \|\| !questBridge\) return;\n\s*if \(won\) \{ raidAshore\.won\(quest\); return; \}[^\n]*\n\s*if \(crew\) raidAshore\.crew\(quest\);/);   // AUDIT FB1019 D2 (PIN MOVED): and her ship gone, its crew home
+  assert.match(W, /endRaid: \(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n\s*if \(!quest \|\| !questBridge\) return;\n\s*if \(won\) \{ raidAshore\.won\(quest\); return; \}[^\n]*\n\s*if \(crew\) raidAshore\.crew\(quest\);/);   // AUDIT FB1019 D2 (
 });
 
 /**
@@ -300,7 +300,7 @@ test('RAID-WON `crew` and `late`: her ship gone, only the raid\'s own crew withd
   pool.push(late3);
   assert.equal(ashore.late(other, late3), false, 'another quest\'s foe stands');
   assert.ok(pool.includes(late3));
-  const ring = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT, at the merge of main into TESA): questWorld is scenes/questWorld.js's - the host read whole, the ashore host read live through host
+  const ring = hostText('src/scenes/world.js');
   assert.match(ring, /questBehaviour: handle\.behaviour,\n\s*\}\)\)\.then\(\(f\) => host\.raidAshore\.late\(foe\.parentQuest, f\)\)\.catch\(\(e\) => console\.error\('\[quest\] exterior foe stand failed:'/, 'the open ground\'s ring asks it');
   assert.match(ring, /raidLate: \(quest, f\) => raidAshore\.late\(quest, f\),/, 'and hands it below deck');
   assert.match(rd('src/scenes/worldModes.js'), /\}\)\)\.then\(\(f\) => host\.raidLate\?\.\(foe\.parentQuest, f\)\)\.catch\(\(e\) => console\.error\('\[quest\] interior foe stand failed:'/, 'below deck asks it');

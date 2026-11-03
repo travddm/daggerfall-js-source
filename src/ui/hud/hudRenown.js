@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RENOWN4 (2026-09-25) - MY OWN RENOWN, ON MY OWN HUD.
+// RENOWN4 - MY OWN RENOWN, ON MY OWN HUD.
 //
-// Mac: "Also why is there no way to view my renown ingame?" - and "Plus
+// and "Plus
 // XP bar". RENOWN1 put the level in the box beside every name, on the
 // main menu, the profile and Inspect, and the account card's row said
 // how far the track had come; the one face that never showed it was the

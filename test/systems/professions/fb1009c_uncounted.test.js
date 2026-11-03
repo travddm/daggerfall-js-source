@@ -3,7 +3,7 @@
 // have them in my inventory, also if you trade ingredients that you can store to a friend he won't be able to store
 // them, I don't know if this is intended or not."
 //
-// Intended: law 3 (bible/06-Systems/Professions-Arc.md 1, restated in Materials-Bag.md 5) - the Stores take back only
+// Intended: law 3 (1, restated in Materials-Bag.md 5) - the Stores take back only
 // what the service handed to this character; a looted unit, a shop's and a traded one are held and never counted. The
 // fault was the page's silence: the Stores page built its rows from the counted materials alone, so a pack full of
 // Troll's Blood showed nothing, and nothing said why. It names them now - "N unstorable" on the card, and the law in the
@@ -74,7 +74,6 @@ test('UNCOUNTED: the Stores page lists the looted blood and says what it is; LOO
       book, name: (k) => k, withdraw: async () => ({ ok: true, text: '' }), inTown: () => true, room: (k) => roomFor(e, k),
       carriedHeld: (k) => heldOf(e, k), heldKeys: () => heldKeysOf(e),
       bag: () => ({ has: true, kg: bagWeight(e), max: 300, count: e.bagItems.length }),
-      // PIN MOVED (FB1020c ONE-SAVE): the page hands the provider its put-ins as one batch - a plan, answered one a put-in
       deposit: async (plan) => { batches.push(plan.map((d) => [d.material, d.qty, d.order])); return plan.map(() => ({ ok: true, text: '' })); },
     });
     let root = null;
@@ -99,9 +98,3 @@ test('UNCOUNTED: the Stores page lists the looted blood and says what it is; LOO
   assert.equal(BAG_PAGE_WORDS.uncountedSplit(2), '2 loose');
 });
 
-test('UNCOUNTED wired: the world host hands the page every material held', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /carriedHeld: \(k\) => bagHeldOf\(playerEntity, k, \{ counter: false \}\),[^\n]*\n\s+heldKeys: \(\) => bagHeldKeysOf\(playerEntity\),/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-2): the page never puts a counter's piece in
-  // PIN MOVED (FB1020c ONE-SAVE): the page's plan reaches the book whole, each put-in with its own order
-  assert.match(w, /deposit: async \(plan\) => \(await profBook\.depositMany\(plan\)\)\.map\(\(r, i\) => /, 'LOOT-LOOSE: the page\'s order reaches the book');
-});

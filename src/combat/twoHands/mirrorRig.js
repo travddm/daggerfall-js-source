@@ -1,5 +1,5 @@
-// TWO-HANDS (2026-10-16) - THE MORROWIND BODY'S SECOND HAND: an arm, or the whole body, posed as the mirror of another
-// (bible/05-Combat/Two-Hands.md, the Morrowind lane). Morrowind has one weapon hand: its one-handed groups swing the right
+// TWO-HANDS - THE MORROWIND BODY'S SECOND HAND: an arm, or the whole body, posed as the mirror of another
+// (, the Morrowind lane). Morrowind has one weapon hand: its one-handed groups swing the right
 // arm and let the left hang out of the view, its hand-to-hand groups throw each punch with the hand the clip was made
 // for, and there is no clip for a left-hand blow or a second weapon at all. The sprite lane draws its left hand as the
 // right in the mirror (combat/twoHands/twoHands.js); this is the same idea on a skeleton - THE LEFT ARM IS THE RIGHT ARM IN THE
@@ -48,14 +48,12 @@
 //           (node `ref` as the clip poses it, `dx` across) - placed in the graph's space rather than hung from the chest
 //           (pictureMirrorArm; the first-person arms, whose clips do not pose the body about the eye);
 //   dip   - { L, R }: radians each arm is turned DOWN at its shoulder, over the composition (the guard: the arm not
-//           striking lowered while the other strikes - TWO-HANDS AUDIT, Mac: "the other weapon in hand should lower
-//           slightly"). The upper arm turns about its own joint in the upright plane through shoulder and wrist, so the
+//           striking lowered while the other strikes - TWO-HANDS AUDIT). The upper arm turns about its own joint in the upright plane through shoulder and wrist, so the
 //           arm stays on its shoulder and every bone keeps its length; the caller eases the angle (handsLaw.js guardStep).
 //           It is laid INTO the composition (TWO-HANDS AUDIT 2), so the carry starts from the arm as it was drawn, dip and
 //           all: a request that stops asking for it under a new key (the hands taken by a sheet, the stone, a spell)
 //           carries it off the arm as it carries every bone, never dropping it in a frame;
-//   spread - radians both arms are turned OUTWARD (TWO-HANDS SPREAD, the first-person pair - Mac: "spread out the arms a
-//           bit more sense it can make the weapons overlap"): each arm at its top (its clavicle, else its upper arm)
+//   spread - radians both arms are turned OUTWARD (TWO-HANDS SPREAD, the first-person pair): each arm at its top (its clavicle, else its upper arm)
 //           about the upright line through that top's own joint, each its own way out (the plan's `outward`), so a left
 //           arm that was the right's mirror stays its mirror and no joint leaves its parent. Laid into the composition
 //           after the dip; the caller eases the angle and says how far (fpArm.js);
@@ -400,8 +398,7 @@ export function applyMirrorRig(skeleton, pose, root, skelMats, req) {
 }
 
 /**
- * THE ARM MIRRORED ACROSS THE PICTURE (`plane`, the first-person arms - Mac, of the pair in first person: "No left
- * arm"). The law in each bone's frame hangs the mirrored arm from this frame's chest, so it lands where the right one
+ * THE ARM MIRRORED ACROSS THE PICTURE (`plane`, the first-person arms). The law in each bone's frame hangs the mirrored arm from this frame's chest, so it lands where the right one
  * stands only when the chest stands on the eye's own middle. Morrowind's first-person clips pose the body to put the
  * weapon hand in view, not about the eye, and the pair's left arm hung from that body was out of the picture whole while
  * the right stood in it. With a plane, a mirrored arm is placed in the graph's space as the mirror of the other through
@@ -440,8 +437,7 @@ function pictureMirrorArm(skeleton, plan, world, plane, side, from, srcL, clipL,
 
 // ---- MIRROR-BIND: the picture's mirror read off the bind ---------------------------------------------------------
 //
-// TWO-HANDS MIRROR-BIND (2026-10-17, Mac: "adjust the positioning of the morrowind left hand duel wield model on first
-// person, so its properly mirrored. Third person looks good"). The picture law's K(b) was the REST's, Rest(m)^-1 . S .
+// TWO-HANDS MIRROR-BIND. The picture law's K(b) was the REST's, Rest(m)^-1 . S .
 // Rest(b), translation and all - so a mirrored arm moved as its counterpart moved FROM ITS OWN REST, and stood where the
 // right arm stands in the glass only where the rest is its own mirror. Third person's rest nearly is (xbase_anim: hands
 // 1.09 units off each other's mirror); the first person's is a clip's first frame, posed for the weapon hand (retail's

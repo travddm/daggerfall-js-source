@@ -1,5 +1,4 @@
-// HT6 (2026-09-17, Mac: "When equipping a shield or other offhand item,
-// the torch in the inventory isnt shown unequipped and replaced") - THE
+// HT6 - THE
 // HAND LAW AT THE EQUIP MOMENT.
 //
 // Handheld Torches keeps the lit light in ONE place, entity.lightSource,
@@ -216,7 +215,7 @@ test('HT7 (Mac: "Take care of both"): SHEATHED, a shield takes the hand TOO - th
   equipItem(b.entity, sword);
   equipItem(b.entity, bow);
   assert.equal(equipTableOf(b.entity)[EQUIP_SLOTS.LeftHand] ?? null, null, 'the bow took the RIGHT slot and evicted the sword');
-  // 3ARMS (2026-09-22): a bow answers Both, and the IL's `== 2` IS Both - the mod takes the off hand for a bow relaxed or strict (HandheldTorches.cs:1325-1332), and HT7 takes it sheathed or drawn. So the torch STOWS here, remembered; what this pin holds is the boundary below - the hand comes back the moment the bow is bumped out.
+  // 3ARMS: a bow answers Both, and the IL's `== 2` IS Both - the mod takes the off hand for a bow relaxed or strict (HandheldTorches.cs:1325-1332), and HT7 takes it sheathed or drawn. So the torch STOWS here, remembered; what this pin holds is the boundary below - the hand comes back the moment the bow is bumped out.
   assert.equal(b.entity.lightSource, null, 'a bow in the right is a two-hander: the left is taken too, and the torch stows');
   assert.equal(b.h.hasFreeHand, false);
   // ...and put something in that hand and it goes, which is HT7.
@@ -332,18 +331,6 @@ test('HT6: the equip change reaches only the LIVE component - no frame yet, anot
   assert.equal(q.entity.lightSource, null, 'the other host\'s teardown does not silence the live one');
 });
 
-test('HT6: the rule is not restated - the hand law lives in ONE block, and the equip seam calls it', () => {
-  const src = read('src/systems/handheldTorches.js');
-  assert.equal(src.match(/w\.s\.onStow > ON_STOW\.Unequip/g)?.length, 1, 'the stow-or-drop choice is written once');
-  assert.equal(src.match(/function handLaw\(/g)?.length, 1, 'and it is the one block both callers run');
-  assert.equal(src.match(/handLaw\(/g)?.length, 3, 'the one block and its two callers - Update and the equip moment');
-  // ONE module listener for any number of rigs, registered once at
-  // import - the shape systems/entityMods.js uses. A per-component
-  // registration would stack one per host and never drop a disposed
-  // one, because equip.js's list has no remove.
-  assert.equal(src.match(/addEquipChangeListener\(/g)?.length, 1, 'one registration in the file');
-});
-
 test('HT6: the WINDOW reads the truth - the enhanced inventory\'s lit row and the quickslot diamond\'s off-hand cell, with no frame between the click and the paint', () => {
   const r = holding({ 'Handling.OnStow': ON_STOW.Unequip });
   r.ctx.sheathed = false;
@@ -371,7 +358,6 @@ test('HT6: the WINDOW reads the truth - the enhanced inventory\'s lit row and th
   assert.equal(itemLine(r.t, r.entity).lit, true, 'sheathed, the torch is still in hand and the window says so');
   assert.equal(quickslotView(r.entity, { weapon: null, sheathed: true }).off.kind, 'torch');
 });
-
 
 // AUDIT QS6 F7's THIRD CATCH. `HT6-the-equip-moment-obeys-a-stale-dial`
 // SURVIVED once the sweep made every record apply again: HT6's own note

@@ -1,5 +1,4 @@
-// CLIMB4 - THE FEEL: THE CAMERA ON THE CLIMB (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "I
-// reallty want go to go all in with the detai. Liike proer feel to climbing").
+// CLIMB4 - THE FEEL: THE CAMERA ON THE CLIMB (the Enhanced Climbing arc).
 //
 // The motor climbs a body; this is what the eye does about it. A pure law: one instance per host view (beside the
 // HeadBobber), fed the motor's frame - its climb events (motor.js _pkEmit), its hold and its move in flight, its
@@ -317,7 +316,7 @@ export function createClimbFeelHost(player, cam, lookFilter, { audio = null, str
     view(view, firstPerson) {
       this.applied = firstPerson && this.fx ? this.fx : null;
       if (this.applied) applyClimbView(view, this.applied);
-      // TECH-FX (bible/05-Combat/Weapon-Techniques.md THE FEEL): a technique's pitch, roll and eye dip, first person only,
+      // TECH-FX (THE FEEL): a technique's pitch, roll and eye dip, first person only,
       // folded after the climb's - at rest every term is 0 and applyClimbView returns the view untouched
       this.tech = firstPerson ? techniqueView() : null;
       if (this.tech) applyClimbView(view, this.tech);

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// OH-C (2026-09-26): THE ABYSS MIASMA - OceanHoles.CreateSurfaceMiasma's
+// OH-C: THE ABYSS MIASMA - OceanHoles.CreateSurfaceMiasma's
 // ParticleSystem, simulated. What the C# configures, and what a Unity
 // ParticleSystem does with it:
 //

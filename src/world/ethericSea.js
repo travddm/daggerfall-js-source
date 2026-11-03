@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ETHER-SEA (2026-10-11, the owner: "A brand new open sea map that allows you to traverse to the etheric sea. Sail far
-// enough and you are prompted to travel into the open sea. The etheric sea is a infinite procedural oceanscape with
-// procedural islands with towns, dungeons, exotic resources, deadly legendary ships, and whatever more you can add to
-// give meaning to the etheric sea."; bible/03-World/Eltheric-Ocean.md) - THE ELTHERIC OCEAN'S LAW: where it lies, the isles
+// ETHER-SEA - THE ELTHERIC OCEAN'S LAW: where it lies, the isles
 // that stand in it, how deep a captain has gone into it, and the ground the terrain kernel grows there.
 //
 // WHERE IT LIES. A box of the Bay's own pixel grid (ETHER_BOX - 819.2 m a pixel, as every pixel) far north of anything
@@ -40,7 +37,7 @@ import { CLIMATES, MAX_MAP_PIXEL_X, MAX_MAP_PIXEL_Y } from '../formats/mapsTable
  *  (net/wire.js WORLD_PIXEL_BOUND and POSE_BOUND: a pose's z, (499 - y) pixels, within 8192 of them - so y over -7693)
  *  and in positive world units on both axes (world/streamingWorld.js worldCoordToMapPixel truncates). */
 export const ETHER_BOX = Object.freeze({ x0: 64, x1: 8128, y0: -7680, y1: -2688 });
-/** ELTHERIC (2026-10-12, the owner: "Apparently the ocean is suppose to be eltheric not etheric"): THE SEA'S WORD, one
+/** ELTHERIC: THE SEA'S WORD, one
  *  home for every word a player reads of it - the lore's Eltheric Ocean, the name the world already gave the waters west
  *  of the Bay (world/tamriel/tamrielGeography.js SEAS, the intro map's; pinned the same, test/world/eltheric.test.js). It was the
  *  "Etheric Sea", in fourteen literals across eight modules. */
@@ -66,7 +63,7 @@ export const VEIL_X = ETHER_BOX.x1 - VEIL_PX;
 export const inEther = (x, y) => x >= ETHER_BOX.x0 && x < ETHER_BOX.x1 && y >= ETHER_BOX.y0 && y < ETHER_BOX.y1;
 /** ...in the box or its margin - where the law answers the ground. */
 export const inEtherLaw = (x, y) => x >= ETHER_BOX.x0 - ETHER_MARGIN && x < ETHER_BOX.x1 + ETHER_MARGIN && y >= ETHER_BOX.y0 - ETHER_MARGIN && y < ETHER_BOX.y1 + ETHER_MARGIN;
-/** ETHER-OW (2026-10-13): THE GROUND THE WORLD'S SEEDED THINGS STAND ON - the Bay's map, or the Eltheric Ocean's box: the
+/** ETHER-OW: THE GROUND THE WORLD'S SEEDED THINGS STAND ON - the Bay's map, or the Eltheric Ocean's box: the
  *  professions' nodes (net/nodeLaw.js pixelOk - ETHER-NODES) and the Overworld's roaming bands and raiders
  *  (scenes/world.js bandOk, tvRaidOpen, tvRaidSea). Past both, the world streams nothing these are born of. */
 export const onBayOrEther = (x, y) => (x >= 0 && y >= 0 && x < MAX_MAP_PIXEL_X && y < MAX_MAP_PIXEL_Y) || inEther(x, y);

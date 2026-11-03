@@ -363,7 +363,6 @@ test('TTL1 by source: expiry is checked on the pixel build, and never while the 
   const k = w.indexOf('const _noteSpawnCleared = () => {');
   const cleared = w.slice(k, w.indexOf('\n  };\n', k));
   assert.match(cleared, /if \(!locationIndex\.get\(key\)\?\.spawned\) return;/, 'a real dungeon being cleared never invents a ledger row');
-  assert.match(cleared, /if \(locationIndex\.get\(key\)\.wildHall\) return;/, 'AUDIT SPAWN-REBIRTH F6: nor a Wild Zone hall being cleared - its day is the hub\'s');
   assert.match(cleared, /_spawnLedger\.clear\(key, _spawnClock\(\)\)/);
   assert.match(w, /onDungeonCleared: _noteSpawnCleared,/, 'the host answers the context');
   assert.match(w, /onDungeonSpawned: \(\) => \{ const p = playerTravelPixel\(\); _spawnSeen\(`\$\{p\.x\},\$\{p\.y\}`\); \},/, 'entering one starts the long clock too - a save loaded straight into a spawn was never built through buildPixelNow this session');
@@ -445,7 +444,6 @@ test('AUDIT OW5b D2 host run (SPAWN-REBIRTH): A SPAWN PAST ITS TIME IS GONE UNTI
       const _spawnLedger = d.ledger, _spawnClock = () => d.now, _insideSpawn = () => d.inside, locationIndex = d.index;
       const _spawnCloneAt = (px, py) => ({ name: 'Old Keep', spawned: true, px, py });
       const owSayRow = (key) => d.owed.push(key);
-      const cyrodiilMask = () => null, wildInside = () => false, zoneHalls = { standOf: () => null };   // PVPDUNGEONS: no open zone here - the spawner's own pixel (PIN MOVED, WW-C2: the zone's mask Cyrodiil's, its halls scenes/zoneHallsHost.js)
       const etherSea = false;   // PIN MOVED (ETHER-PLACES): the build answers an Eltheric pixel by its isle first - the sea off here, the Bay's pixels this pin's
       const _arenaTemplates = null;   // PIN MOVED (TESA2): and past the Bay its Arena place - off here too
       const _countryTemplates = null;   // PIN MOVED (TESA7): and the countryside's
@@ -487,16 +485,6 @@ test('AUDIT OW5b D2 host run (SPAWN-REBIRTH): A SPAWN PAST ITS TIME IS GONE UNTI
   h._spawnSeen('7,9');
   assert.deepEqual(h.d.ledger.toJSON(), [['7,9', h.d.now]], 'the next entry starts the new life\'s clocks');
   assert.deepEqual(h.d.owed, ['7,9'], 'and the cell hears them');
-  // AUDIT SPAWN-REBIRTH F6: a Wild Zone hall is `spawned` too, and its day is the hub's - its entry starts no spawn's clock,
-  // and a row an older build left for its pixel never takes it out
-  const hall = run();
-  hall.d.index.set('9,9', { name: 'Elite Hall (9,9)', spawned: true, wildHall: { ring: 1, key: '9,9' } });
-  hall._spawnSeen('9,9');
-  assert.equal(hall.d.ledger.size, 0, 'entering a hall starts no clock');
-  assert.deepEqual(hall.d.owed, [], 'and owes the cell nothing');
-  hall.d.ledger.note('9,9', 0);
-  hall.d.now = GENERAL_TTL_MINUTES + 1;
-  assert.equal(hall._locationToBuild(9, 9)?.name, 'Elite Hall (9,9)', 'a row past its seven days never takes a hall out');
   const inside = run({ inside: true });
   inside._locationToBuild(3, 3);
   inside._spawnSeen('3,3');

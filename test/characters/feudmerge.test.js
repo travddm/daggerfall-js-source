@@ -1,4 +1,4 @@
-// FEUD's MERGE OF MAIN (2026-10-05, bible/12-Enhanced-AI/Feud-Arc.md THE MERGE OF MAIN): the laws the merge itself
+// FEUD's MERGE OF MAIN: the laws the merge itself
 // composed, where main's AUDIT ARENA-LADDER and the arc's TELL8 had each taught the brain a new mark - a bout-mate on
 // the sand (judged here, where both fighters run) and a peer it hunts (judged on the peer's own screen). One aim law
 // now (ai/tactics.js targetFeet, judgedHere), and the sand's draw range reaching AUDIT TELL's shards as it reaches the
@@ -60,7 +60,7 @@ test('FEUD merge FM1: a wind-up broken on the sand shatters for the stands - its
   assert.equal(drawableBlows(T + 0.05, [30, 0, 0]).length, 2, 'within the street\'s 40 m: both');
 });
 
-test('FEUD merge FM2: ONE MARK, TWO JUDGES - a bout-mate\'s landing is judged here (its verdict, its weight, `_blowFor` its key) and drawn for the stands; a hunted peer\'s is the peer\'s own (no verdict here) and no sand\'s; what a landing does to ME is mine alone (mutants: a peer judged here; the sand on a peer\'s wind-up; the landing\'s effect for a bout-mate; no `_blowFor` on a judged landing)', () => {
+test('FEUD merge FM2: ONE MARK, TWO JUDGES - a bout-mate\'s landing is judged here (its verdict, `_blowFor` its key) and drawn for the stands; a hunted peer\'s is the peer\'s own (no verdict here) and no sand\'s; what a landing does to ME is mine alone (mutants: a peer judged here; the sand on a peer\'s wind-up; the landing\'s effect for a bout-mate; no `_blowFor` on a judged landing)', () => {
   noteLocalPlayer([40, 0, 40], [0, 0, 1]);   // my player, far off
   // the sand: a fighter at its bout-mate, the mate standing in its shape at the landing
   const a = fighter({ feet: [0, 0, 0], side: 0 }), b = fighter({ feet: [0, 0, 1.6], side: 1 });
@@ -71,7 +71,6 @@ test('FEUD merge FM2: ONE MARK, TWO JUDGES - a bout-mate\'s landing is judged he
   assert.equal(s.blow.sand, true, 'drawn for the stands');
   land(a.ai, b.ai.feet);
   assert.equal(a.ai._blowVerdict, true, 'judged here: the mate stood in its shape');
-  assert.ok(a.ai._blowMult > 1, 'its weight carried to the swing');
   assert.equal(a.ai._blowFor, mate, 'whose verdict it is (AUDIT ARENA-LADDER 2)');
   assert.equal(a.ai._blowFx ?? null, null, 'what a landing does is the local player\'s alone (TELL6e)');
   // the street online: a foe at the peer it hunts, the peer standing in its shape at the owner's view
@@ -84,6 +83,5 @@ test('FEUD merge FM2: ONE MARK, TWO JUDGES - a bout-mate\'s landing is judged he
   assert.equal(s2.blow.sand, undefined, 'a peer\'s mark is no sand\'s');
   land(ai, peer.feet);
   assert.equal(ai._blowVerdict, null, 'the peer judges its own feet (TELL8 10.3): no verdict here');
-  assert.equal(ai._blowMult, undefined);
   assert.equal(ai._blowFor, undefined);
 });

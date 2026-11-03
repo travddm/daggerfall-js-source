@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part four (Mac: "...and also ensure the other professions are sound") - THE GROUND A CLIENT STANDS ITS
+// AUDIT 2026-10-01 part four - THE GROUND A CLIENT STANDS ITS
 // NODES ON. A pixel's (or a dungeon's) witnessed state decides the draw: on ground three week-old accounts confirmed, the
 // nodes come from the wider tiers (a Mountain's Iron becomes Silver to Adamantium, a Woodlands Oak a Cherry, a dungeon's
 // Silver Gold). The service reads the witnesses fresh at every harvest; the client's book read a pixel once a UTC day.
@@ -20,7 +20,7 @@
 // room is the service's count (professionLaw.js storesFullIn). REFUSALS-LEARNED: `prof-cap` and `stores-full` (another
 // device took the day's room) now read the state again; `prof-account-cap` and `prof-deep-cap` (counts the state does
 // not carry) close the craft, or the unvouched dungeons' veins, until the UTC day turns - the host says so instead of
-// offering the act. CAP-OFF (2026-10-07): `prof-cap` and `prof-account-cap` are said no more - the day's cap is gone -
+// offering the act. CAP-OFF: `prof-cap` and `prof-account-cap` are said no more - the day's cap is gone -
 // and an old service's saying them moves nothing; `stores-full` and `prof-deep-cap` stand. RATE-KEPT: `prof-rate` ("Try again later") let the harvest go; it is kept and asked again now.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
@@ -200,7 +200,7 @@ test('GROUND-MIDNIGHT: the confirmed dungeon the player stands in across 00:00 U
   const s = await standService({ PROFESSIONS_OPEN: 'on' });
   const { who, book } = await bookOf(s, 'Mac');
   s.env.DB._raw.prepare('INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at) VALUES (?, ?, ?, ?, ?)').run(who.id, who.character, 'mining', xpForRank(25), _ms / 1000);
-  await witness(s, 'dungeon', String(id), 3, DEEP_WOODS);   // PIN MOVED (DEEP-OPEN): a woodland dungeon, its Moonstone the witnesses' to open
+  await witness(s, 'dungeon', String(id), 3, DEEP_WOODS);
   setForagingHost({ world: () => ({ ...wild(), inside: true, insideDungeon: true }) });
   try {
     const built = new Map([['500,200', { px: 500, py: 200, ...flatPixel(), batches: [], rocks: [] }]]);
@@ -257,7 +257,6 @@ test('REFUSALS-LEARNED: the account\'s unvouched dungeon veins, refused once, cl
   const day = utcDay(_ms / 1000);
   const { book } = stubBook({ answers: [{ ok: false, error: 'prof-account-cap' }, { ok: false, error: 'prof-deep-cap' }, { ok: false, error: 'prof-cap' }, { ok: false, error: 'stores-full' }] });
   assert.equal((await book.refresh()).ok, true);
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): `prof-account-cap` closed Mining for the
   // account until the UTC day turned, and `prof-cap` read the state again - the day's cap they said is gone
   assert.equal((await book.harvest(ore(nodeKey({ kind: 'vein', x: 400, y: 200, day, slot: 0 })))).error, 'prof-account-cap');
   assert.equal(book.closed('account:mining'), false, 'no craft closed for the account');
@@ -297,7 +296,7 @@ test('GROUND-STALE underground, and REFUSALS-LEARNED\'s deep cap: a dungeon vein
   const day = utcDay(_ms / 1000);
   let id = null;
   for (let d = 3000; d < 6000 && id === null; d++) {
-    const c = dungeonVeins({ dungeon: d, day, climate: DEEP_WOODS, confirmed: true });   // PIN MOVED (DEEP-OPEN): a woodland dungeon's
+    const c = dungeonVeins({ dungeon: d, day, climate: DEEP_WOODS, confirmed: true });
     const u = dungeonVeins({ dungeon: d, day, climate: DEEP_WOODS, confirmed: false });
     if (c.map((v) => mineRecord({ what: 'dvein', material: v.material })).sort().join() !== u.map((v) => mineRecord({ what: 'dvein', material: v.material })).sort().join()) id = d;
   }

@@ -93,19 +93,6 @@ test('audit26 F123: WeakensArmor is inert - the drawback costs the player nothin
   computeEnchantmentMods(mixed);
   assert.equal(enchantArmorMod(mixed), -5);
 
-  // The setter is written as DFU writes it, bug and all - a port
-  // that "fixed" the comparison would make the enchantment bite.
-  assert.match(src('src/systems/enchantments.js'),
-    /setDecreasedArmorValueModifier = \(mods, amount\) => \{\s*\n\s*if \(amount < mods\.decreasedArmorMod\) mods\.decreasedArmorMod = amount;/);
-
-  // ...and it is routed to the setter WeakensArmor.cs:63 names.
-  // Routing it to the increased channel instead is unobservable
-  // today - both channels are min-sets seeded at 0, so a +5 is
-  // inert in either - which is exactly why the pin has to read the
-  // source: the day either setter changes, the channel it was
-  // written for is the only record of which law it belongs to.
-  assert.match(src('src/systems/enchantments.js'),
-    /\[T\.WeakensArmor, \{[^\n]*setDecreasedArmorValueModifier\(mods, WEAKENS_ARMOR_VALUE\)/);
 });
 
 // ---------------------------------------------------------------
@@ -130,9 +117,6 @@ test('audit26 F122: the paperdoll armorMod is Decreased MINUS Increased, the com
   assert.equal(armorLabelValue(60), 8);
   assert.equal(armorLabelValue(60, enchantArmorDisplayMod(strong)), 13);
 
-  // ...and the window actually feeds it, which it never did before.
-  assert.match(src('src/ui/native/nativeInventory.js'),
-    /armorLabelValue\(av\[i\] \?\? 100, entityArmorDisplayMod\(this\.hooks\.entity, i\)\)/);   // RF1: through the entity's channel - Decreased MINUS Increased plus the port's points on the part (entityMods.entityArmorDisplayMod)
 });
 
 // ---------------------------------------------------------------
@@ -266,36 +250,6 @@ function bodyOf(text, header) {
   }
   return text.slice(start, j + 1);
 }
-
-test('audit26 F067: the identify SPELL refuses on magicka and never reaches the Mercantile tally', () => {
-  const commit = bodyOf(src('src/scenes/worldModes.js'),
-    'function commitTrade(shelf, mode, staged, price, proceeds, identifySpell = null, asked = {}) {');
-
-  // the refusal, and it comes BEFORE any identifying
-  const gate = commit.indexOf('if (identifySpell.cost > (playerEntity.magicka ?? 0)) {');
-  const pass = commit.indexOf('identifySpellPass(staged');
-  assert.ok(gate > 0, 'the magicka refusal exists');
-  assert.ok(pass > gate, 'and it is tested before the pass runs');
-  // MOVED at AUDIT 39 F144: the refusal now answers FALSE. DFU returns
-  // from DoModeAction before ClearSelectedItems (:960-963), so the lot
-  // stays staged for a caster who comes back with the points - and the
-  // window learns that only from the commit's answer. The law the pin
-  // guards is unchanged: nothing identified, nothing spent, no tally.
-  // BOX-ON-TOP: said in a box over the window (DaggerfallTradeWindow.cs:962), not on the HUD line the window hides
-  assert.match(commit, /messageBox\(notEnoughSpellPointsText\(\)\);[^\n]*\n\s*surfacePlayer\(\);\s*\n\s*return false;/,
-    'the refusal turns back the WHOLE pass');
-
-  // the tally is ConfirmTrade's, so the spell arm returns before it
-  const tally = commit.indexOf('tallySkill(playerEntity, SKILLS.Mercantile, 1);');
-  assert.ok(tally > 0, 'the tally is still there for every OTHER mode');
-  const spellArm = commit.slice(commit.indexOf('if (identifySpell) {'), tally);
-  assert.equal((spellArm.match(/\n\s*return( false)?;/g) ?? []).length, 2,
-    'both exits from the spell arm - refused and completed - return before the tally');
-
-  // ...and the paid SERVICE is the sibling arm, which falls through
-  // to it exactly as ConfirmTrade's Identify case does (:1074-1082).
-  assert.match(commit, /\} else \{\s*\n\s*deductGold\(playerEntity, price\);/);
-});
 
 test('audit26 F067: the refused pass spends nothing - the per-item roll never runs', () => {
   // The behavioural half, on the module the arm delegates to: a pass

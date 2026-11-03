@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-// L10N6 (2026-10-03): THE COVERAGE REPORT, LANGUAGE BY LANGUAGE.
+// L10N6: THE COVERAGE REPORT, LANGUAGE BY LANGUAGE.
 //
-// Mac's second decision (Localization-Arc.md): "The game says which languages are machine translated, and fixes come in
-// through a review file or PRs. A human pack always outranks a draft." This says, for every language the catalog
+// This says, for every language the catalog
 // offers, how much of the game a player reads in it and whose words they are:
 //   - THE PORT'S OWN WORDS (Port_Strings): the English catalog's keys the language has a row for, split into the
 //     machine's (the pipeline's or an in-session draft, recorded in `Port_Strings.meta.json` and unedited since) and a

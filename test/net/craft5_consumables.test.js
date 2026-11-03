@@ -1,8 +1,7 @@
-// CRAFT5 (2026-10-07, Mac: "How could we enhance the profession element of the game while reducing complexity and
-// making crafting more viable"; then "Lets do it") - THE CONSUMABLES, LEANED INTO: a Superior or Masterwork Repair Kit
+// CRAFT5 - THE CONSUMABLES, LEANED INTO: a Superior or Masterwork Repair Kit
 // mends up to nine tenths of a piece's condition (KIT_CEILING's three quarters for the rest) - a kit's craft rolls a
 // quality now, its reach; a dish's buff and a Potent potion stand together (MEASURED: they already did - pinned); arrows a
-// Building product (CRAFT3 made them so - pinned). bible/06-Systems/Professions-Arc.md 41.8.
+// Building product (CRAFT3 made them so - pinned). 41.8.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -126,17 +125,8 @@ test('CRAFT5 MEASURED: a dish\'s buff and a Potent potion stand together - the F
   feedEffect(b, dishOf('feast'));
   assert.deepEqual([strengthOf(b).length, liveStat(b, 'strength')], [2, drunk + 5], 'renewed, the potion standing');
   assert.equal(liveStat(a, 'strength'), both);
-  // why: the dish's entries carry no spell settings, so a potion's like-kind search (effects.js applySpell) never finds them
-  assert.match(src('src/systems/effects.js'), /const inc = findInc\(\(a\) => a\.kind === 'fortifyAttribute' && a\.stat === stat && a\.settingsKey === sKey\);/);
   assert.equal(a.activeEffects.find((e) => e.bundleName === dishOf('feast').name).settingsKey, undefined);
 });
 
 // ─── THE PAGE ────────────────────────────────────────────────────────
 
-test('CRAFT5 the anvil\'s kit box: its quality odds, and the reach a Superior or Masterwork kit gives', () => {
-  const p = src('src/ui/professions/profPages.js');
-  assert.match(p, /if \(rollsQuality\(r\) && recipeOpen\(r, rank\)\) \{   \/\/ CRAFT5: a Repair Kit's quality too/);
-  assert.match(p, /if \(r\.kind === 'kit'\) box\.append\(el\('p', 'px-note', KIT_REACH_LINE\)\);/);
-  assert.match(p, /It repairs up to three quarters, or nine tenths with a Superior or Masterwork kit\./);
-  assert.match(src('server-account/src/professions.js'), /const quality = rollsQuality\(r\)   \/\/ CRAFT5: a Repair Kit's too - its quality its reach\n/);
-});

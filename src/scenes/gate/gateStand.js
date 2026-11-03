@@ -1,5 +1,5 @@
 // @ts-check
-// WB14b (2026-10-19, bible/11-Multiplayer/Breach-Portents.md section 2): THE COURT STOOD INTO ITS CONTEXT - the dungeon
+// WB14b: THE COURT STOOD INTO ITS CONTEXT - the dungeon
 // arm's two court builders (WB3b's standCourt, WB6b's standDeadlands), moved out of scenes/worldModes.js whole (HOST-SPLIT:
 // the host was a line under its ceiling, and a night's portents make the court's build the night's own). The host wires
 // it; nothing here reads the host's scope but the seams it is handed.
@@ -87,7 +87,7 @@ export function createGateStand({ renderer, host }) {
     ctx.collider.addMesh(COURT_BUCKET, tris, idx, identity());
     // GATE-FBX: and NO door of its own - the bridge's membrane is gone; until he falls the court is left by death or the Wrath
     ctx.addActivationNamer((key) => (typeof key === 'string' && key.startsWith('exit:') ? { title: COURT_TEXT.wayHome } : null));   // before the dungeon exit's own namer, so it answers first
-    // WB9f (Mac: "The player should be able to inspect and pick up the ground item, not just walk over it"): HIS SPOILS
+    // WB9f: HIS SPOILS
     // ON THE FLOOR, PRESSED - each resting piece a target the one ray can win (the outer host's pool - scenes/spoilsPool.js
     // targets), named by its own word, its item listed on the plaque (the context's lootContents asks `spoilContents`)
     // and taken by the press (the dungeon arm's `spoil` rung)

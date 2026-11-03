@@ -1,6 +1,5 @@
 // @ts-check
-// RETRO1 (2026-09-24, Mac: "Can we get retro mode from DFU ported
-// over?") - DFU'S RETRO MODE: THE SETTINGS, THE SIZES AND THE RECT.
+// RETRO1 - DFU'S RETRO MODE: THE SETTINGS, THE SIZES AND THE RECT.
 //
 // DFU renders the world camera into a small RenderTexture and presents
 // it to the screen point-sampled (Utility/RetroRenderer.cs,

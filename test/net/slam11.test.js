@@ -1,4 +1,4 @@
-// SLAM11 (2026-09-16, AUDIT SLAM over SLAM1..SLAM7): A FAN LARGER THAN ONE SECOND OF ITS BUDGET COULD NEVER LAND.
+// SLAM11: A FAN LARGER THAN ONE SECOND OF ITS BUDGET COULD NEVER LAND.
 //
 // `byteGate` is a token bucket CAPPED at `rate`. Three arms charge a whole fan - the frame times its listeners - as
 // one indivisible sum against it, and a sum past the cap does not pass slowly: it never passes, however long the
@@ -70,7 +70,6 @@ test('SLAM11: THE MEMORY LANDS - a room past the old cliff is handed the dungeon
   try {
     const n = 64;   // past the cliff: ~110 KiB x 63 = 6.8 MiB against a 4 MiB cap - under the OLD law not one socket is handed it
     const ws = [];
-    // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the host speaks as a live one does - a dungeon room's host silent past
     // FOES_STALE_MS with others there to hear it holds the seat no longer (net/seatLive.js), and its stream goes every
     // FOES_FULL_MS while anyone else is in; here a pose each second the hellos take
     for (let i = 0; i < n; i++) { if (i % 7 === 6) { clock += 1000; await r.pose(ws[0], at(1, 1)); } const s = r.connect(); await r.hello(s, `p${String(i).padStart(4, '0')}`, at(1, 1)); ws.push(s); }
@@ -151,7 +150,6 @@ test('SLAM11: THE ACT LANDS - an act whose fan costs more than a second of ACT_R
   } finally { Date.now = realNow; }
 });
 
-// PIN MOVED (FOES-FIRST, bible/11-Multiplayer/Scale-Arc.md FOES-FIRST): this held every foes frame to "no borrow", and a
 // DELTA still borrows nothing - it stops at FOES_FULL_RESERVE, above empty. A FULL frame now may borrow, as far as the
 // reserve and no further (wire.js floorGate), so its debt is a quarter-second of the rate, never its own fan's cost:
 // test/net/fb1021_foesfirst.test.js holds that bound past a fan bigger than the reserve.

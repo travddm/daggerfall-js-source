@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// AUDIT TELL (bible/12-Enhanced-AI/Feud-Arc.md section 28): THE DUEL HARNESS - the balance targets measured, not
+// AUDIT TELL: THE DUEL HARNESS - the balance targets measured, not
 // guessed. The real brain (ai/tactics.js), the real foe motor and attack component (characters/enemy/enemyMotor.js,
 // characters/enemy/enemyAttack.js) on a real collider's flat floor, the real foe (characters/enemy/enemyEntity.js
 // makeEnemyEntity, systems/eliteFoes.js for an elite), the real damage roll (combat/formulas.js calculateAttackDamage)
@@ -268,7 +268,7 @@ export function measureAll({ fights = 1000, seconds = 30 } = {}) {
 // trader down (BLOW_EFFECT.KNOCKDOWN_S - its swing stands meanwhile, as the rig's `paralyzed` holds it). AUDIT FEUD 2: the
 // pools' own steps besides - a swing whose hit frame finds the foe out of reach misses, every landed blow the poise did not
 // hold shoves the foe (DFU's knockback, C15), the foe's live Speed (phase two's +20), its signature from rank 2, the
-// dodger back in only once the brain has judged the landing. FEUD HARNESS (Mac, 2026-10-05: "Take care of both gaps"):
+// dodger back in only once the brain has judged the landing. FEUD HARNESS:
 // and the rest of the fight the pools give it - ITS BAND (scenes/exteriorFoes.js standBand: its kin by rank, RETINUE's,
 // each its kind's own foe at its own level in the ring out to BAND_SPACING about it, with its own motor, attack and brain
 // - the brain's tokens shared with its master's, a kin of the tier's level telegraphing, its iron landings knocking me
@@ -289,7 +289,7 @@ const { releaseTactics } = await import('../src/ai/tactics.js');
 
 /** Section 28's RVN targets: the telegraphed blows a perfect dodger takes, at most this share of a trader's, its time to
  *  the end no longer (FEUD BALANCE, OPEN 24 - it was its time, at most 0.75 of the trader's); the will's kneels; a rank-5's
- *  time over a rank-1's in this band - about three times (UNQUIET, Revenants.md section 46 - the owner: "harder": each rank
+ *  time over a rank-1's in this band - about three times (UNQUIET, Revenants.md section 46: each rank
  *  weighs more, 3.24 trading and 3.22 dodging measured; it was about 2.5, the band 2 to 3). */
 export const FEUD_TARGETS = Object.freeze({ DODGE_SPARES: 0.1, KNEEL_WEAK: 0.9, KNEEL_DODGE: 0.7, KNEEL_TRADE_MAX: 0.2, RANK_RATIO: Object.freeze([2.5, 3.5]) });
 const WALK = walkSpeed(50);   // player/motor.js: DFU's walk at Speed 50 (4.43 m/s)

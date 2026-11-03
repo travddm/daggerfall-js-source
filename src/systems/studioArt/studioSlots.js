@@ -1,10 +1,10 @@
 // @ts-check
-// STUDIO1 (bible/07-Rendering/Studio-Art.md): THE SLOTS - the pictures of the eight models the studio covers (the
+// STUDIO1: THE SLOTS - the pictures of the eight models the studio covers (the
 // wagons, carts and caravan, the three ships, the towns' hangings, the yards, the port, the LeFay monument), which an
 // artist's picture in the studio takes the place of, named and drawn as painted.
 //
 // These are the pictures trashBattery meant ("the cart textures look strange ... they're not unique textures yet"):
-// painted from numbers at the load under pseudo-archives of the port's own (bible/01-Overview/DF-Art.md), the wagons'
+// painted from numbers at the load under pseudo-archives of the port's own, the wagons'
 // recoloured for each paint. The port paints a few more it has no set for yet (the gate's, the Abyss's - the record's
 // Not yet). Each slot is a key the studio's names use (`38181_1-0`), a name a person reads, the
 // label the templates are saved under (`38181_1-0--cart-side-weathered-oak.png`) and its picture, painted on demand -

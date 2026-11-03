@@ -1,4 +1,4 @@
-// STAFF-FOLLOW-UNLOCK (mob 2026-10-24: "follow needs a unlock button in game"): the follow's bar on the game's screen.
+// STAFF-FOLLOW-UNLOCK: the follow's bar on the game's screen.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createStaffFollowBar } from '../../src/ui/staffFollowBar.js';

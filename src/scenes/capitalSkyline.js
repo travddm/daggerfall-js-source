@@ -1,5 +1,5 @@
 // @ts-check
-// IC-GRAND x FAR-LANDMARK (bible/03-World/Arena-Provinces.md IC-GRAND, bible/06-Systems/Travel-View.md FAR-LANDMARK) -
+// IC-GRAND x FAR-LANDMARK (IC-GRAND, FAR-LANDMARK) -
 // THE IMPERIAL CITY ON THE HORIZON. Twenty kilometres of city outrun the stream; stream B's hook draws a silhouette on the
 // far ring's pass (render/farLandmarks.js) where the stream has not built its pixel. This hands the city in: one landmark
 // a slice (world/imperialImpostor.js imperialLandmarkMesh - its tower, walls and landmarks, its streets as a few masses),

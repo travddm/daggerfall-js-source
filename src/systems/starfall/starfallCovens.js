@@ -1,12 +1,11 @@
 // @ts-check
-// STAR2 (2026-10-20): THE COVENS WHOSE RITE PULLS THE STARS DOWN - one a night, by a shuffle bag. Design:
-// bible/11-Multiplayer/Starfall.md section 2.
+// STAR2: THE COVENS WHOSE RITE PULLS THE STARS DOWN - one a night, by a shuffle bag. Design:
 //
 // The Bay's covens are the game's own (canon): fourteen coven locations in MAPS.BSA, each the home of a FACTION.TXT
 // witches' coven (type 8). Thirteen work Mephala's rite here. The Glenmoril Witches serve Hircine alone (DFU,
 // systems/daedraSummoning.js: "THE GLENMORIL WITCHES always summon HIRCINE") and stand against it in the questline. The
 // Daughters of Wroth were kept apart while the open zone was the Wrothgarian Mountains, where no world event runs; WW-C2
-// (bible/03-World/World-Wide.md WW-C) moved the zone to Cyrodiil, and their coven works the rite again. FACTION.TXT's
+// (WW-C) moved the zone to Cyrodiil, and their coven works the rite again. FACTION.TXT's
 // `region:` field for a coven does not name the MAPS.BSA region it stands in, so each pair is written here by name and
 // held against the player's data by test/systems/starfall/star2_covens.test.js (ARENA2-gated).
 //
@@ -53,7 +52,7 @@ export const STAR_COVENS = Object.freeze([
   coven({ id: 'dust', region: 55, location: 'Coven_of_Dust', place: 'Coven_of_Dust', factionId: 420, witches: 'The_Dust_Witches', member: () => t('starfall.member.dust', 'Dust Witch') }),
 ]);
 /**
- * WW5 (bible/03-World/World-Wide.md WW5; Starfall.md section 2, WW5): THE PROVINCES' COVENS - the port's own, one a
+ * WW5 (WW5; Starfall.md section 2, WW5): THE PROVINCES' COVENS - the port's own, one a
  * province theatre that stands a coven night (net/wire.js SITE_EVENT_LANES: Cyrodiil's open zone none), each named in its
  * province's own lore and worshipping as the rite does, Mephala: the Moor's Breton hedge-witches; the Sand Witches of the
  * Alik'r's far side; the Witches of the Rime, Skyrim's; the Ash Witches under the Dunmer's wise-woman's title; the

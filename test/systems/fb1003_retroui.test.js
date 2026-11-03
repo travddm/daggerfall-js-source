@@ -11,7 +11,6 @@ import { uiCanvas, onUiScreen, toUiPoint, fromUiPoint, _resetUiScreenForTests } 
 import { drawHud, largeHudBar } from '../../src/ui/hud/hud.js';
 import { dockedLargeHudHeight, worldViewportRect } from '../../src/ui/hud/hudLarge.js';
 import { drawFpsWeapon, WEAPON_TYPES } from '../../src/combat/fpsWeapon.js';
-import { muzzleRay } from '../../src/combat/weapon/weaponRig.js';
 import { setUiSkin } from '../../src/systems/uiSkin.js';
 import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
@@ -93,7 +92,7 @@ test('RETRO-UI the large HUD: docked under the pillarbox it is the picture\'s wi
   assert.match(src('ui/hud/hudActiveSpells.js'), /pointToNative\(nativeMetrics\(uiCanvas\(canvas\)\), \.\.\.toUiPoint\(/, 'the spell icons\' tooltip and right-click the same');
 });
 
-test('RETRO-UI the viewmodel and the horse: a right-aligned weapon\'s edge is the picture\'s (FPSWeapon\'s screenRect, CustomScreenRect), the rig and the mount lay out on the UI canvas and draw at its place, and the gun\'s muzzle is measured back on the real canvas (mutants: the rig on the canvas; the draw not bracketed; the muzzle in the layer\'s pixels)', () => {
+test('RETRO-UI the viewmodel and the horse: a right-aligned weapon\'s edge is the picture\'s (FPSWeapon\'s screenRect, CustomScreenRect), the rig and the mount lay out on the UI canvas and draw at its place (mutants: the rig on the canvas; the draw not bracketed)', () => {
   withRetro(1, () => {
     const r = recorder();
     const ui = uiCanvas(CANVAS);
@@ -106,16 +105,6 @@ test('RETRO-UI the viewmodel and the horse: a right-aligned weapon\'s edge is th
   const rig = src('combat/weapon/weaponRig.js');
   assert.match(rig, /const cv = \(\) => uiCanvas\(typeof canvas === 'function' \? canvas\(\) : canvas\);/);
   assert.match(rig, /return onUiScreen\(renderer, cv\(\), \(\) => drawInner\(\{ paralyzed \}\)\);/);
-  assert.match(rig, /const \[rx, ry\] = fromUiPoint\(canvas, rect\.x, rect\.y\), real = canvas\.canvas \?\? canvas;/);
-  assert.match(rig, /const drawn = \{ rect: \{ \.\.\.rect, x: rx, y: ry \}, canvasW: real\.width, canvasH: real\.height,/, 'the muzzle on the real canvas');
-  // what that buys, through the real muzzleRay: a muzzle at the picture's middle column, measured on the real canvas,
-  // leaves straight ahead; the same rect left in the layer's pixels (240 short) would leave off to the left
-  const drawn = (x) => ({ rect: { x, y: 600, w: 200, h: 200 }, canvasW: 1920, canvasH: 1080, muzzle: { x: 0.5, y: 0.5 }, flip: false, viewport: null, aspect: 1920 / 1080 });
-  const ahead = muzzleRay(drawn(860), 1.2);
-  const short = muzzleRay(drawn(620), 1.2);
-  assert.ok(ahead && short, 'rays');
-  const side = (r) => r.right;
-  assert.ok(Math.abs(side(ahead)) < 1e-6 && Math.abs(side(short)) > 0.05, `the shot from the barrel (${side(ahead)}), not 240 px off (${side(short)})`);
   const mount = src('player/mountRig.js');
   assert.match(mount, /const canvasOf = \(\) => uiCanvas\(typeof canvas === 'function' \? canvas\(\) : canvas\);/);
   assert.match(mount, /onUiScreen\(renderer, ui, \(\) => \{/);

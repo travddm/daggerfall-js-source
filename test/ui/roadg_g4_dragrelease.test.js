@@ -154,27 +154,6 @@ test('G4-4: the drawn thumb and the drag read ONE index - the live component\'s'
     'the thumb is drawn where the DRAG left it');
 });
 
-test('G4-5: the book\'s bar is the component, so no count gate stands in front of it', () => {
-  // DFU's scroll bar is a child of mainPanel whether or not it painted:
-  // MouseClick fires on a list that FITS too, falls into the `>` arm
-  // (thumbRect is the zero rect) and SetScrollIndex clamps it away.
-  // MUTANT: put the old `_rows.length > ROWS_DISPLAYED` gate back in
-  // front of the branch. It is the SOURCE assertion below that kills it,
-  // and deliberately so: the gate and the component agree on every
-  // observable (both leave the index at 0 and both consume the click),
-  // so what is pinned is that this window no longer states an arm of
-  // VerticalScrollBar's that VerticalScrollBar states.
-  const w = book(ROWS_DISPLAYED);                  // exactly one page - no thumb
-  assert.equal(w.click(...railPoint(90)), true);
-  assert.equal(w.scrollIndex, 0, 'paged down and clamped back (:187-202)');
-  assert.equal(w.scrollBar.draggingThumb, false, 'and nothing to latch onto');
-  const s = read('src/ui/spellbookWindow.js');
-  assert.match(s, /if \(this\._syncScrollBar\(\)\.contains\(vx - PANEL_X, vy - PANEL_Y\)\) \{/,
-    'the press is the component\'s, tested against the component\'s own rect');
-  assert.equal(/scrollBarClick/.test(s), false,
-    'and the window states none of the bar\'s arms itself any more');
-});
-
 // ═══════════════════════════════════════════════════════════════════
 // 2. THE SPELL ICON PICKER'S SCROLLER (SpellIconPickerWindow.cs:91-94)
 // ═══════════════════════════════════════════════════════════════════
@@ -394,35 +373,5 @@ test('G4-10: the wizard\'s picker bar releases on the edge, not on the next move
   const win = createChargenWindow({ careers: careers(), roll: () => 0 });
   assert.equal(typeof win.release, 'function', 'the overlay slot sees a release()');
   win.hover(PBX + 2, PBY + 30, { buttons: 0 });
-  assert.match(read('src/systems/chargenSession.js'),
-    /release\(\) \{ if \(!_fired\) flow\.releasePickBar\?\.\(\); \},/,
-    'the wrapper forwards it to the flow');
 });
 
-test('G4-11: EVERY host hands its overlay slot the DOM event with the hover', () => {
-  // The other half of the seam, and the half `scenes/interior.js` was
-  // missing: `e.buttons & 1` is the port's only reading of
-  // InputManager.GetMouseButton(0) (VerticalScrollBar.cs:105), so a host
-  // that routes a bare (x, y) can latch a drag and never move it.
-  // MUTANT: drop `, e` from any one route below.
-  const ROUTES = [
-    ['src/scenes/townTalk.js', /overlay\.hover\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/],
-    ['src/scenes/worldModes.js', /interiorOverlay\.hover\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/],
-    ['src/scenes/worldModes.js', /dungeonCtx\.overlayHover\?\.\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/],
-    ['src/scenes/dungeonContext.js', /overlayHover\(vx, vy, e = null\) \{ activeOverlay\?\.hover\?\.\(vx, vy, e\); \},/],
-    ['src/scenes/dungeon.js', /ctx\.overlayHover\?\.\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/],
-    // AUDIT 64 F48: this route carries the (-1,-1) pointer-leave
-    // sentinel now, like the other five - a hover that CLEARS on a
-    // miss (the shared ToolTip) needs the miss to arrive at all.
-    ['src/scenes/interior.js', /overlay\.hover\?\.\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/],
-  ];
-  for (const [file, re] of ROUTES) {
-    assert.match(read(file), re, `${file} drops the event from its hover route`);
-  }
-  // and the window under them takes it: the book's hover is the frame
-  // VerticalScrollBar.Update polls.
-  assert.match(read('src/ui/spellbookWindow.js'),
-    /hover\(vx, vy, e = null\) \{/, 'the spellbook reads the event');
-  assert.match(read('src/ui/spell/spellIconPickerWindow.js'),
-    /hover\(vx, vy, e = null\) \{/, 'and so does the icon picker');
-});

@@ -1,5 +1,4 @@
-// AUDIT HIDDEN-UNCOUNTED C1 (2026-10-25, the owner, asked how a hidden staff member reads in their guild: "Last seen when
-// hid"; bible/01-Overview/audits/Audit-Hidden-Uncounted.md) - THE GUILD'S "N ONLINE" COUNTS NO HIDDEN STAFF MEMBER. The
+// AUDIT HIDDEN-UNCOUNTED C1 - THE GUILD'S "N ONLINE" COUNTS NO HIDDEN STAFF MEMBER. The
 // Members page read each member's play beat (guilds.js viewOf, GUILD-SEEN), which a hidden staff member's game knocks as
 // any game does (the seat, Renown and the play clock read it), so the Members tile said "2 online" and the row "Online" -
 // to the staff member and to every guildmate. Over the real Worker on node:sqlite (test/accountDb.mjs): Hide me pressed
@@ -27,7 +26,7 @@ test('HIDDEN-UNCOUNTED (AUDIT C1): a hidden staff member is at play to nobody in
   const pair = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pub = b64url(new Uint8Array(await subtle.exportKey('raw', pair.publicKey)));
   const proof = async (what, handle) => { const ts = nowS(); return { pub, ts, sig: b64url(new Uint8Array(await subtle.sign({ name: 'Ed25519' }, pair.privateKey, enc.encode(staffWords(what, handle.toLowerCase(), ts))))) }; };
-  const s = await standService({ DEVELOPER_HANDLES: 'SirMcMobdon', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
+  const s = await standService({ SEAT_ADMINS: 'SirMcMobdon', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}` });
   const staff = async (path, body, token) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.1', ...(token ? { [STAFF_SESSION_HEADER]: token } : {}) }, body: JSON.stringify(body) });
     return { status: res.status, body: await res.json().catch(() => null) };

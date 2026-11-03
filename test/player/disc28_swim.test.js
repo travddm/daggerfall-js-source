@@ -1,5 +1,4 @@
-// DISC28-G (2026-09-28, Discord, in Veraten: "the swimming physics persisted after leaving the water ... I rose way up
-// and then fell into the void").
+// DISC28-G.
 //
 // Not a stale swim flag - every dungeon host re-reads it from the player's own block each frame, and DFU's test is
 // height alone against a water plane that covers the whole block. The swimmer TUNNELLED UP THROUGH A CEILING that was

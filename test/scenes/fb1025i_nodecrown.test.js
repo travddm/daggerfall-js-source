@@ -20,7 +20,7 @@
 // lit with the fix, none without).
 // Pinned through the producers: the Low Poly Trees door over the vendored data makes the tree's handle and its frame
 // (the run as the renderer reads it), the billboard program's own vertex stage places the mesh's highest vertex, and the
-// glint pass's draw over a recording GL boxes the node. bible/06-Systems/Professions-Arc.md, NODE-GLINT (NODE-CROWN).
+// glint pass's draw over a recording GL boxes the node., NODE-GLINT (NODE-CROWN).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,6 +1,6 @@
 // FIELD BUGS 2026-10-17f (GROUND-GATE) - "People floating in mid air for some users", a screenshot from the Oblivion Gate
 // in the Alik'r: the crowd drawn tens of metres over the sand. A pose's height is its sender's own ground's, so a copy on
-// an older ground (a macOS or portable desktop copy never updates itself - bible/03-World/Landforms.md C2) drew every
+// an older ground (a macOS or portable desktop copy never updates itself C2) drew every
 // peer in the air. Mac's call: the relay turns such a build away. A ground room's hello says the ground it stands on
 // (net/wire.js GROUND_LAW, `gl`), the relay refuses less or none while `groundGate` is on, and the ground is held to a
 // print recorded under that law, so the law moves whenever the ground does.
@@ -69,7 +69,7 @@ test('GROUND-GATE the relay\'s door, through a real Room: off, an old build is l
       const fetch0 = H.room.fetch.bind(H.room);
       H.room.fetch = (req) => { if (new URL(req.url).pathname === RELAY_INTERNAL_CFG) asked++; return fetch0(req); };
       const B = W.room('world:10,10');
-      const now0 = await join(B, 'new-0001', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW });   // PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): and the loot it reads - one that did not would ask the hub for the loot door. PIN MOVED (GRANT-DOOR, Spawn-Grants section 20): the current build says its spawn grants too - one that did not would ask the hub for the grant door. PIN MOVED (LEASE1, net/roomLease.js): and that it hands its hub's lease on - one that did not would ask the hub for the lease door
+      const now0 = await join(B, 'new-0001', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW });
       assert.equal(now0.closed, null, 'the current build is let in');
       assert.equal(asked, 0, 'and asks the hub nothing');
       const old2 = await join(B, 'old-0003');

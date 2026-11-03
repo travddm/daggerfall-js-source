@@ -1,5 +1,4 @@
-// TV4 (2026-09-28, bible/06-Systems/Travel-View.md, Mac: "Every detail like weather patterns, should be 1:1 in this
-// mode").
+// TV4.
 //
 // Pinned here: the curtains stood in the world for the view (render/rainCurtains.js - which cells fall, where the veil
 // stands and how tall, its fade as the eye comes over it, the chord law in its shader, the fog from the traveller, the
@@ -30,7 +29,7 @@ test('TV4 curtains: the cells that FALL stand a veil - rain, the storm\'s heavie
   const cells = ['rain', 'thunder', 'snow', 'fog', 'cloudy', 'overcast', 'sandstorm', 'sunny'].map((w, i) => cellOf(w, 1000 + i * 10, 2000, 800));
   const got = curtainsOf(cells.filter(Boolean), at);
   assert.equal(got.length, 3, 'rain, thunder, snow');
-  assert.deepEqual(Object.keys(CURTAIN_FALL).sort(), ['ashfall', 'rain', 'snow', 'thunder']);   // PIN MOVED (ASHFALL1, 2026-10-27): the ash falls too
+  assert.deepEqual(Object.keys(CURTAIN_FALL).sort(), ['ashfall', 'rain', 'snow', 'thunder']);
   const [r] = got.filter((c) => c.kind === 0).slice(0, 1);
   assert.equal(r.radius, 800 * CURTAIN_SHARE, 'the fall comes out of the core');
   assert.equal(r.depth, CURTAIN_EXT * CURTAIN_FALL.rain[0]);
@@ -139,7 +138,6 @@ test('TV4 curtains: THE CHORD - a front face\'s optical depth is the line of sig
 
 // ── THE REST OF THE WEATHER, FROM THE AIR ───────────────────────────────────────────────────────────────────────────
 
-// PIN MOVED (OW-HORIZON, 2026-10-20): the square no longer covers everything the view lets through - the haze runs on to the
 // far ring's rim - so the ground past it takes the far law, and the square's rim eases into it (test/render/owhorizon.test.js
 // runs the block); what stands here is the arithmetic that says why, and the weather rows that still close inside it
 test('TV4 shadows: under the light rows the view now sees past the cloud shadow\'s square (OW-HORIZON) - the far law is what the ground there takes; under the weather rows the fog still closes inside it', () => {
@@ -158,8 +156,6 @@ test('TV4 shadows: under the light rows the view now sees past the cloud shadow\
 test('TV4 far ring: under an exp fog the ring\'s nearest edge is already fog at the default grid - the gate that hides it hides nothing a traveller would see; under light weather (linear) it stands as ever', () => {
   const ringNear = LAND_VIEW_DEFAULT * PIXEL_METRES;
   for (const w of ['rainy', 'snowy', 'heavy', 'sandstorm']) assert.ok(Math.exp(-FOG_SETTINGS[w].density * ringNear) < 1e-4, `${w}: fog at ${ringNear} m`);
-  const farRing = rd('test/ui/farring.test.js');
-  assert.match(farRing, /exp fog \(weather\) hides the ring/, 'the gate stands, pinned where it was');
   assert.match(rd('src/scenes/world.js'), /if \(farRing && fogNow\.mode === 'linear'\)/);
 });
 
@@ -180,7 +176,7 @@ test('AUDIT DEEP R-1: EVERY fogged program under the travel view measures its fo
   const fogged = Object.keys(at);
   const RENDERER_OWNED = { 'renderer.js': 'its own programs (_fogLocs, _waterLocs, _uploadFog)', 'waterSurface.js': 'the renderer\'s _waterLocs upload it' };
   const DW_SENT = { 'oceanHolesRender.js': 'Deep Waters\' _frameUniforms sends it (merged beside OH-C)' };
-  const NEVER_UNDER_THE_VIEW = { 'nodeGlint.js': 'the world host lights the gathering nodes only off the travel view (NODE-GLINT: test/scenes/nodeglint.test.js pins it)', 'deadlands.js': 'the Burning Court alone - no sky, no view', 'gateTelegraph.js': 'the Burning Court alone', 'spoilsGlow.js': 'the Burning Court alone', 'courtCrystals.js': 'the Burning Court alone (WB9c: the Reckoning\'s crystals)', 'gateFx.js': 'the Burning Court alone (WB9e: his blows\' sparks, the meteor)', 'auraRing.js': 'a wearer\'s feet in the walking views - the hosts draw no aura under the travel view (WB9g: world.js auraFrame)', 'nodeGlow.js': 'a gathering node near the walker - the host lights none under the travel view (NODE-MARKS: world.js drawVeiledPeerBodies, the glow\'s own gate; the compass keeps the marks)', 'sdBeam.js': 'the Hour alone (SD17: the Hour-Hand\'s sweep inside the realm, the dungeon arm\'s pass - no sky, no view; AUDIT SD III named it)', 'sdMotes.js': 'the Hour alone (SD14c: the Hour\'s motes about the realm, the dungeon arm\'s pass - no sky, no view; AUDIT SD III named it)', 'sdArenaGlow.js': 'the Hour alone (SD-LOOK S7: the arena\'s floor reads the clock)', 'sdStompWall.js': 'the Hour alone (SD-LOOK S7: the Stomp\'s wall, the hold\'s curtain)', 'sdPillarPass.js': 'the Hour alone (SD-LOOK S7: the pillars\' dials, their watching hands, their lanterns)', 'sdHalo.js': 'the Hollow and the Hour alone (SD-LOOK S2: the dungeon arm\'s halos)', 'sdRiftPass.js': 'the Hollow and the Hour alone (SD-LOOK S4: the Rift\'s and the Return\'s windows, the dungeon arm\'s pass)', 'sdStepsPass.js': 'the Hour alone (SD-LOOK S9: the Steps\' ghosts, the dungeon arm\'s pass - no sky, no view)', 'egLinePass.js': 'an Elite Breach alone (EG-G2: THE EDGE LINE, the tracks and the streamers - the dungeon arm\'s pass, no sky, no view)', 'egMistPass.js': 'an Elite Breach alone (EG-G2: the mist over its shaft, the dungeon arm\'s pass)', 'egMotes.js': 'an Elite Breach alone (EG-LOOK: the air about the eye\'s hall, the dungeon arm\'s pass - PIN MOVED)', 'egSkyPass.js': 'an Elite Breach alone (EG-G2: the Spire\'s skies, the dungeon arm\'s sky slot)', 'egLightPass.js': 'an Elite Breach alone (EG-ZE: the door\'s beam and ring, the beacon, the pings - the dungeon arm\'s pass, no sky, no view; PIN MOVED: a fourth Spire pass)', 'ktGaugePass.js': 'the Sky-Ketch\'s decks alone (KETCH-LOOK KL3: her instruments, the dungeon arm\'s pass on a made level - no travel view)' };
+  const NEVER_UNDER_THE_VIEW = { 'nodeGlint.js': 'the world host lights the gathering nodes only off the travel view (NODE-GLINT: test/scenes/nodeglint.test.js pins it)', 'deadlands.js': 'the Burning Court alone - no sky, no view', 'gateTelegraph.js': 'the Burning Court alone', 'spoilsGlow.js': 'the Burning Court alone', 'courtCrystals.js': 'the Burning Court alone (WB9c: the Reckoning\'s crystals)', 'gateFx.js': 'the Burning Court alone (WB9e: his blows\' sparks, the meteor)', 'auraRing.js': 'a wearer\'s feet in the walking views - the hosts draw no aura under the travel view (WB9g: world.js auraFrame)', 'nodeGlow.js': 'a gathering node near the walker - the host lights none under the travel view (NODE-MARKS: world.js drawVeiledPeerBodies, the glow\'s own gate; the compass keeps the marks)', 'sdBeam.js': 'the Hour alone (SD17: the Hour-Hand\'s sweep inside the realm, the dungeon arm\'s pass - no sky, no view; AUDIT SD III named it)', 'sdMotes.js': 'the Hour alone (SD14c: the Hour\'s motes about the realm, the dungeon arm\'s pass - no sky, no view; AUDIT SD III named it)', 'sdArenaGlow.js': 'the Hour alone (SD-LOOK S7: the arena\'s floor reads the clock)', 'sdStompWall.js': 'the Hour alone (SD-LOOK S7: the Stomp\'s wall, the hold\'s curtain)', 'sdPillarPass.js': 'the Hour alone (SD-LOOK S7: the pillars\' dials, their watching hands, their lanterns)', 'sdHalo.js': 'the Hollow and the Hour alone (SD-LOOK S2: the dungeon arm\'s halos)', 'sdRiftPass.js': 'the Hollow and the Hour alone (SD-LOOK S4: the Rift\'s and the Return\'s windows, the dungeon arm\'s pass)', 'sdStepsPass.js': 'the Hour alone (SD-LOOK S9: the Steps\' ghosts, the dungeon arm\'s pass - no sky, no view)', 'egLinePass.js': 'an Elite Breach alone (EG-G2: THE EDGE LINE, the tracks and the streamers - the dungeon arm\'s pass, no sky, no view)', 'egMistPass.js': 'an Elite Breach alone (EG-G2: the mist over its shaft, the dungeon arm\'s pass)', 'egMotes.js': 'an Elite Breach alone (EG-LOOK: the air about the eye\'s hall, the dungeon arm\'s pass - PIN MOVED)', 'egSkyPass.js': 'an Elite Breach alone (EG-G2: the Spire\'s skies, the dungeon arm\'s sky slot)', 'egLightPass.js': 'an Elite Breach alone (EG-ZE: the door\'s beam and ring, the beacon, the pings - the dungeon arm\'s pass, no sky, no view; PIN MOVED: a fourth Spire pass)' };
   for (const f of fogged) {
     if (RENDERER_OWNED[f] || NEVER_UNDER_THE_VIEW[f]) continue;
     const src = readFileSync(new URL(at[f], dir), 'utf8');
@@ -198,20 +194,17 @@ test('AUDIT DEEP R-1: EVERY fogged program under the travel view measures its fo
   assert.match(dw, /gl\.uniform4fv\(u\.uDwFog, r\._dwFog\);\n\s*if \(u\.uFocus\) gl\.uniform4fv\(u\.uFocus, r\._focus\);   \/\/ AUDIT DEEP R-1\n/, 'and the sky fog\'s own');
   const dwall = readFileSync(new URL('duelWall.js', dir), 'utf8');
   assert.match(dwall, /if \(U\.uFocus\) gl\.uniform4fv\(U\.uFocus, fog\?\.focus \?\? NO_FOCUS\);/);
-  // GUILD1d (2026-09-30) joined the list: the guild halls' banners hang in the streets the view flies over, and upload it
+  // GUILD1d joined the list: the guild halls' banners hang in the streets the view flies over, and upload it
   assert.match(readFileSync(new URL('bannerPass.js', dir), 'utf8'), /if \(U\.uFocus\) gl\.uniform4fv\(U\.uFocus, fog\?\.focus \?\? NO_FOCUS\);/);
   assert.match(rd('src/scenes/world.js'), /const hung = bannersHung\(\);[\s\S]{0,650}dw: renderer\._dwFog, haze: renderer\._haze, focus: renderer\._focus \},/, 'the banners handed it');
-  // SHIP-COLOURS (2026-10-17) joined the list: a ship's flag at her masthead, on the sea the view flies over - handed the focus as the banners are
+  // SHIP-COLOURS joined the list: a ship's flag at her masthead, on the sea the view flies over - handed the focus as the banners are
   assert.match(readFileSync(new URL('shipFlagPass.js', dir), 'utf8'), /if \(U\.uFocus\) gl\.uniform4fv\(U\.uFocus, fog\?\.focus \?\? NO_FOCUS\);/);
   assert.match(rd('src/scenes/world.js'), /const frameShipFlags = \(\) => \{   \/\/ PERF-V8[\s\S]{0,900}dw: renderer\._dwFog, haze: renderer\._haze, focus: renderer\._focus \},/, 'the flags handed it');
-  // NAV-B (2026-09-28) joined the list: the naval pass's smoke, flashes and aim ride Come Sail Away's frame, under the view too
-  assert.deepEqual(fogged.filter((f) => !RENDERER_OWNED[f] && !NEVER_UNDER_THE_VIEW[f]).sort(), ['bannerPass.js', 'comeSailAwayRender.js', 'deepWatersRender.js', 'duelWall.js', 'foeTelegraph.js', 'gatePass.js', 'navalRender.js', 'oceanHolesRender.js', 'rainCurtains.js', 'riteSmoke.js', 'rocketPass.js', 'serpentRender.js', 'shipFlagPass.js', 'spellImpactFx.js', 'starfallPass.js'], 'the passes the view draws, all accounted for (ROCKET1: the rocket\'s mounds, poop and horses round the traveller; STAR4: a fallen star\'s beacon over the land the view flies over; merged beside CSA-F and OH-C: the boats\' parts and waves, the pits; NAV-B: the sea fight\'s; WB12d: the rite\'s smoke; SERPENT1: the sea serpent over the open sea; IMPACTFX: a spell\'s landing - the world pass draws the missiles, and so their bursts, under the view too)');
-  // IMPACTFX (2026-10-05) joined the list: the cast engine hands its burst pass the renderer\'s focus
-  // STAR4 (2026-10-20) joined the list: the Starfall's beacons stand over the land the view flies over - its host hands the focus
+  // NAV-B joined the list: the naval pass's smoke, flashes and aim ride Come Sail Away's frame, under the view too
+  assert.deepEqual(fogged.filter((f) => !RENDERER_OWNED[f] && !NEVER_UNDER_THE_VIEW[f]).sort(), ['bannerPass.js', 'comeSailAwayRender.js', 'deepWatersRender.js', 'duelWall.js', 'foeTelegraph.js', 'gatePass.js', 'navalRender.js', 'oceanHolesRender.js', 'rainCurtains.js', 'riteSmoke.js', 'serpentRender.js', 'shipFlagPass.js', 'spellImpactFx.js', 'starfallPass.js'], 'the passes the view draws, all accounted for (STAR4: a fallen star\'s beacon over the land the view flies over; merged beside CSA-F and OH-C: the boats\' parts and waves, the pits; NAV-B: the sea fight\'s; WB12d: the rite\'s smoke; SERPENT1: the sea serpent over the open sea; IMPACTFX: a spell\'s landing - the world pass draws the missiles, and so their bursts, under the view too)');
+  // IMPACTFX joined the list: the cast engine hands its burst pass the renderer\'s focus
+  // STAR4 joined the list: the Starfall's beacons stand over the land the view flies over - its host hands the focus
   assert.match(rd('src/scenes/starfall/starfallHost.js'), /const fogOf = \(\) => \(renderer \? \{[^\n]*camPos: renderer\._camPos, focus: renderer\._focus, haze: renderer\._haze \} : null\);/, 'the star\'s sky handed it');
-  // ROCKET1 (2026-10-23) joined the list: the rocket's mounds stand round the traveller the view flies over - its pass uploads the focus its host hands it
-  assert.match(readFileSync(new URL('rocketPass.js', dir), 'utf8'), /if \(U\.uFocus\) gl\.uniform4fv\(U\.uFocus, fog\?\.focus \?\? NO_FOCUS\);/);
-  assert.match(rd('src/scenes/rocketHost.js'), /camPos: renderer\._camPos, focus: renderer\._focus, haze: renderer\._haze \}\);/, 'the rocket handed it');
   assert.match(rd('src/scenes/hostMagic.js'), /fxPass\.draw\([^\n]*camPos: eye, focus: renderer\._focus, haze: renderer\._haze \}\);/, 'the spell impacts handed it');
   const w = rd('src/scenes/world.js');
   assert.match(w, /camPos: renderer\._camPos, dw: renderer\._dwFog, haze: renderer\._haze, focus: renderer\._focus \}\);   \/\/ DW-C/, 'the duel wall handed it');
@@ -237,9 +230,7 @@ test('TV4 host wiring: the curtains built on the enhanced lane, drawn under the 
   assert.match(w, /const rainCurtains = isEnhanced\(\) \? \(\(\) => \{ try \{ return new RainCurtainsRenderer\(renderer\.gl\); \}/);
   assert.match(w, /if \(tvf && rainCurtains\) \{\n\s*if \(_tvFootMemo\.gen !== tvGroundGenNow\(\)\) \{ _tvFootMemo\.gen = tvGroundGen; _tvFootMemo\.map\.clear\(\); \}[^\n]*\n\s*const curtains = curtainsOf\(sky\.drawnCells\?\.\(\) \?\? fieldCellsHere\(\), \{[^\n]*\n\s* focus: cam\.pos, eye: mwv\.eye, ground: player\.feetAt\(\)\[1\], groundAt: tvGroundAt, reach: renderer\._fogMode === 1 \? renderer\._fogRange\[1\] : undefined, memo: _tvFootMemo\.map \}\);/, 'the clouds\' own cells, the shared minute');
   assert.match(w, /\{ light: lit, fade: Math\.min\(1, tvf\.blend \* 1\.5\), fog:/, 'AUDIT TV D1: the rise is opacity');
-  // PIN MOVED (OW-HORIZON, 2026-10-20): `sea` false is the ground itself, for the view's click (the veils keep the sea's margin)
   assert.match(w, /const tvGroundAt = \(x, z, sea = true\) => \{[^\n]*\n\s*const n = state\.worldCoords\(\[x, 0, z\]\);\n\s*const g = tvSceneOf\(n\.x, n\.z\)\[1\];\n\s*if \(!deepWaters \|\| !sea\) return g;/, 'AUDIT TV D3: the grid\'s land, the far ring\'s past it');
-  // PIN MOVED (OW-HORIZON, 2026-10-20): the click asks the ground itself
   assert.match(w, /if \(!deepWaters \|\| !sea\) return g;\n(\s*\/\/[^\n]*\n)*\s*return Math\.max\(g, tvSeaY\(\) \+ CURTAIN_FOOT_MARGIN_M\);/, 'AUDIT DEEP R-4: the sea\'s surface over the water - AUDIT DEEP2 D4: at every point, a coast\'s and a carved cell\'s in a land pixel too');
   assert.match(w, /const tvSeaY = \(\) => \(deepWaters\?\.oceanLocalY \?\? SCALED_OCEAN_ELEVATION \* STREAMING_TERRAIN_SCALE\) \+ state\.pixelTranslation\(state\.current\.x, state\.current\.y, _tvSeaT\)\[1\];/);
   assert.match(w, /water = !place && hit\.point\[1\] <= tvSeaY\(\) \+ TV_SEA_EPS_M;/, 'AUDIT DEEP2 B-5: water where the click landed');

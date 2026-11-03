@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-G (2026-09-28, Mac: "directly integrate into online mode") - THE WIRE: the sea's ships, their volleys and the
+// NAV-G - THE WIRE: the sea's ships, their volleys and the
 // blows on them, between the players in a cell. The port's own; pure.
 //
 // THE SEA IS THE ROOM'S, STOOD BY ONE. The open bay is cells (net/wire.js isCellRoom) - no host seat, no room memory -
@@ -56,7 +56,7 @@
 //   l - AUDIT BAY A18: the lanes' packets the owner has seen spent (sunk, struck, boarded, taken) - each her
 //       voyage's seed (systems/naval/seaLanes.js), the last NAVAL_WIRE_SPENT - so no player stands her again where she
 //       went down (a player who never saw her go stood her afresh, to every player's sight)
-//   w - SALVAGE (2026-10-03): the wreckage a sunk ship leaves afloat in the owner's sea, each [id, x, y, z, cls] as a
+//   w - SALVAGE: the wreckage a sunk ship leaves afloat in the owner's sea, each [id, x, y, z, cls] as a
 //       cask of `f` (its lot navalPlunder.js SALVAGE_LOT, never one of LOT_KEYS) - hauled in and claimed as a cask is;
 //       at most NAVAL_WIRE_CASKS. A key of its own as `k`, `m` and `l` are: an older build reads none of it, where a lot
 //       past its LOT_KEYS would fail its door and the whole word with it
@@ -64,16 +64,16 @@
 //       hold, her casks and the chart in her papers the deep's on every client (a peer's copy of her was open water's)
 //   e - AUDIT CAPTAIN'S SEA D8: the casks of `f` of a deep ship's (or the Eltheric Ocean's) cargo, each its id - a peer's
 //       haul of one drawn as rich as its owner's (it was DEEP_TIER tiers poorer)
-//   o - SHOT-KINDS (bible/03-World/Naval-Refit.md): the volleys of `v` loaded with other than their bores' own, each
+//   o - SHOT-KINDS: the volleys of `v` loaded with other than their bores' own, each
 //       [id, shot] - the volley's id and its load by SHOT_CODES' row (systems/naval/shotKinds.js), so every client flies
 //       the same grape, chain or heated shot and the victim's client judges the same blow. A volley it does not name
 //       (an older build's word says none) is its bores' own; a pair for no volley of the word reads as nothing
-//   q - AUDIT PASSAGE B5 (bible/03-World/Passage.md): the harbour ships the owner has heard let go of their berths for
+//   q - AUDIT PASSAGE B5: the harbour ships the owner has heard let go of their berths for
 //       good today - a passage booked on her, her boat standing in her place (scenes/naval/passageBerths.js) - each her
 //       seed (navalHost.js harbourFrame's: her port's, the day's, her berth's), the last NAVAL_WIRE_GONE, said on by
 //       every reader: no player stands her at her berth again that day, nor holds a copy of her (an older build's word
 //       says none, and its reader ignores this one)
-//   r - WW7-8 (2026-10-26, the owner: "Same for ships"; bible/03-World/World-Wide.md WW7-8): the ships of `s` named PAST THE
+//   r - WW7-8: the ships of `s` named PAST THE
 //       BAY, each [n, region, area] - her region where it is a province's (WW-R's 62 and up: `s` says the Bay's alone, -1
 //       past it, for an older build's door refuses a whole word with any other), else -1; and the area her names were
 //       drawn in where it is a province's district (world/worldWide/worldGrid.js - her captain and hands a Nord's in
@@ -100,7 +100,7 @@
 // stander's world while all of it happened in another's. AUDIT NAV1 (online #15): the frame with `k` and no hurt is a
 // CASK's - `k` a cask of your sea my boat sailed through, and with `a` 1 your ANSWER, that it is mine: its owner answers
 // the first claim and lets the cask go, the claimer draws its lot only on the answer, so one cask is one haul whoever
-// else reached it. BOARD-MAGNET (2026-10-26): the ram is gone, and with it a ram's foul (`u`, RAM-BOARD's) - an older
+// else reached it. BOARD-MAGNET: the ram is gone, and with it a ram's foul (`u`, RAM-BOARD's) - an older
 // build's blow that still says one is taken as the blow alone. RAM-RETURN (AUDIT, 2026-10-27): the ram back, never the
 // foul - a ram's blow carries `r` 1, and its stander takes it to her own line, never on a ship struck since it was sent.
 

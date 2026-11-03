@@ -1,4 +1,4 @@
-// AUDIT SCALE II (2026-10-11, the audit of SCALE4d-SCALE5d; Mac: "Lets do an audit on everything. Ensure perfection"):
+// AUDIT SCALE II:
 // A D1 BINDING WITH ONE READ REPLICA THAT LAGS THE PRIMARY until told to catch up - D1's Sessions API as its contract
 // says it: withSession(bookmark) may serve its first read from ANY replica at least as new as `bookmark`;
 // 'first-primary' sends the first statement to the primary; 'first-unconstrained' anywhere. A write always goes to the

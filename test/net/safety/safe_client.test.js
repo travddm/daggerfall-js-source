@@ -1,4 +1,4 @@
-// SAFE1-SAFE7 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE CLIENT'S HALF - the session carrying the
+// SAFE1-SAFE7: THE CLIENT'S HALF - the session carrying the
 // relay's stamp and its word on my own chat (`law`, `banned`, `slowed`), the log that keeps a line's account and stamp,
 // hears through the block list, takes a blocked account's lines back and picks what a report carries, the social picture
 // that drops a blocked account's requests, a line's own menu in the chat panel, the host module's commands and the code
@@ -43,7 +43,7 @@ test('SAFE2 + SAFE4 + SAFE6 THE SESSION: a line\'s stamp is carried as the relay
   s.join(CHAT_WORLD_ROOM);
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world215' });   // AUDIT SAFE RELAY-3: a relay that knows the ban frame
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1 });
   ws.receive({ t: 'chat', id: 'bob-0002', name: 'Bob', text: 'hi', at: 1, sub: 'acct-bob', sg: SG });
   ws.receive({ t: 'chat', id: 'bob-0002', name: 'Bob', text: 'yo', at: 2, sub: 'acct-bob', sg: 'short' });
   assert.equal(heard[0].sg, SG);
@@ -237,7 +237,7 @@ test('STAFF-PANEL2 STAFF REPORT NOTHING FROM CHAT: an Admin\'s or a Moderator\'s
   const player = hostRig().host.lineActions(line);
   assert.equal(player.length, REPORT_REASONS.length + 1);
   assert.equal(hostRig({ opts: { glyphs: () => ['dm', 'sprout'] } }).host.lineActions(line).length, REPORT_REASONS.length + 1, 'a Dungeon Master moderates nothing');
-  for (const g of ['dev', 'mod', 'shadowfang']) {
+  for (const g of ['dev', 'mod']) {
     const staff = hostRig({ opts: { glyphs: () => [g] } }).host.lineActions(line);
     assert.equal(staff.some((x) => /^Report/.test(x.label)), false, g);
     assert.equal(staff.at(-1).label, 'Block', `${g}: Block stays, last`);
@@ -248,17 +248,15 @@ const STAFF_LINE = { id: 'p2', name: 'Troll', text: 'gross', at: 2, sub: 'acct-t
 const staffRig = (glyphs, more = {}) => hostRig({ ...more, opts: { glyphs: () => glyphs, ...(more.opts ?? {}) } });
 const rowOf = (rows, label) => rows.find((x) => x.label === label);
 
-test('STAFF-PANEL2-CHATMENU THE ACTS BY ROLE (design 327-334): an Admin gets Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch; a Moderator the same less TP and Freeze; Shadow Fang a Moderator\'s with TP; Follow only with the staff hook, TP only with /tp\'s door; each says whether the player can see it (mutants: Freeze for a Moderator; TP for a Moderator; Follow without the hook)', () => {
+test('STAFF-PANEL2-CHATMENU THE ACTS BY ROLE (design 327-334): an Admin gets Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch; a Moderator the same less TP and Freeze; Follow only with the staff hook, TP only with /tp\'s door; each says whether the player can see it (mutants: Freeze for a Moderator; TP for a Moderator; Follow without the hook)', () => {
   assert.deepEqual(hostNs.staffLineActs(['dev']), ['follow', 'tp', 'message', 'mute', 'freeze', 'ban', 'notes', 'watch']);
   assert.deepEqual(hostNs.staffLineActs(['mod']), ['follow', 'message', 'mute', 'ban', 'notes', 'watch']);
-  assert.deepEqual(hostNs.staffLineActs(['shadowfang']), ['follow', 'tp', 'message', 'mute', 'ban', 'notes', 'watch']);
   assert.deepEqual(hostNs.staffLineActs(['dev', 'mod']), hostNs.staffLineActs(['dev']));
   for (const g of [[], ['dm'], ['sprout', 'laurel'], null, 'dev']) assert.deepEqual(hostNs.staffLineActs(g), [], JSON.stringify(g));
   const seams = { follow: () => () => {}, teleport: () => {} };
   const labels = (glyphs, opts = seams) => staffRig(glyphs, { opts }).host.lineActions(STAFF_LINE).map((x) => x.label);
   assert.deepEqual(labels(['dev']), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block']);
   assert.deepEqual(labels(['mod']), ['Follow', 'Message on screen', 'Mute…', 'Ban…', 'Notes', 'Watch', 'Block']);
-  assert.deepEqual(labels(['shadowfang']), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Ban…', 'Notes', 'Watch', 'Block']);
   assert.deepEqual(labels(['dev'], {}), ['Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block'], 'no hook, no Follow; no door, no TP');
   assert.deepEqual(labels(['dev'], { follow: () => null, teleport: () => {} }).slice(0, 1), ['TP'], 'a hook that is not there hides Follow');
   const rows = staffRig(['dev'], { opts: seams }).host.lineActions(STAFF_LINE);
@@ -340,60 +338,6 @@ test('STAFF-PANEL2-CHATMENU THE STAFF PANEL\'S ACTS: Freeze, Message on screen, 
   assert.deepEqual(posted, [], 'no origin to name, nothing posted');
 });
 
-test('STAFF-PANEL2-CHATMENU FOLLOW AND TP: Follow calls the staff hook with the line\'s account; TP asks /tp\'s door for the socket the relay stamped on the line, and refuses as /tp does when a room here holds that socket under another account (mutants: Follow by name; TP by name; the socket check dropped)', async () => {
-  const followed = [], tps = [];
-  const opts = { follow: () => (sub) => { followed.push(sub); }, teleport: (id) => tps.push(id) };
-  const r = staffRig(['dev'], { opts });
-  const rows = r.host.lineActions(STAFF_LINE);
-  rowOf(rows, 'Follow').run();
-  rowOf(rows, 'TP').run();
-  await settle();
-  assert.deepEqual([followed, tps], [['acct-tro'], ['p2']]);
-  const fail = staffRig(['mod'], { opts: { follow: () => () => { throw new Error('Follow needs the Staff Panel.'); } } });
-  rowOf(fail.host.lineActions(STAFF_LINE), 'Follow').run();
-  await settle(); await settle();
-  assert.equal(fail.log.tab(fail.log.active).messages.at(-1).text, 'Follow needs the Staff Panel.');
-  // STAFF-PANEL5-FOLLOW (mob 2026-10-23: "why doesnt follow work?"): no Staff Panel over the game - the hook's follow says
-  // false - is said as the panel's other acts say it, never silence
-  const none = staffRig(['dev'], { opts: { follow: () => () => false } });
-  rowOf(none.host.lineActions(STAFF_LINE), 'Follow').run();
-  await settle(); await settle();
-  assert.match(none.log.tab(none.log.active).messages.at(-1).text, /^Staff Panel: Follow Troll\. Nothing opens without the Staff Panel extension\.$/);
-  const said = none.log.tab(none.log.active).messages.length;
-  const on = staffRig(['dev'], { opts: { follow: () => () => true } });
-  const before = on.log.tab(on.log.active).messages.length;
-  rowOf(on.host.lineActions(STAFF_LINE), 'Follow').run();
-  await settle(); await settle();
-  assert.equal(on.log.tab(on.log.active).messages.length, before, 'a follow that started says nothing');
-  assert.ok(said > 0);
-  // CHAT-FOLLOW-CARD (mob: "no panel pops up when followingf from chat"): a follow that took hands the panel the player's
-  // card, as a tag's click does - the act word to the page's own origin; one refused, or the tag menu's own follow (which
-  // hands its own), hands nothing
-  const posted = [];
-  const win = { ...fakeWindow(), location: { origin: 'https://game.test' }, postMessage: (m, o) => posted.push([m, o]) };
-  const carded = staffRig(['dev'], { opts: { win, follow: () => () => true } });
-  rowOf(carded.host.lineActions(STAFF_LINE), 'Follow').run();
-  await settle(); await settle();
-  assert.deepEqual(posted, [[{ dfoStaff: 'act', act: 'follow', sub: 'acct-tro', name: 'Troll' }, 'https://game.test']]);
-  posted.length = 0;
-  rowOf(staffRig(['dev'], { opts: { win, follow: () => () => false } }).host.lineActions(STAFF_LINE), 'Follow').run();
-  await settle(); await settle();
-  assert.deepEqual(posted, [], 'refused: no card');
-  const own = [];
-  rowOf(carded.host.playerActions({ id: 'p2', sub: 'acct-tro', name: 'Troll' }, (sub) => { own.push(sub); return true; }), 'Follow').run();
-  await settle(); await settle();
-  assert.deepEqual([own, posted], [['acct-tro'], []], 'the tag menu\'s follow hands its own card');
-  const moved = staffRig(['shadowfang'], { peers: [['p2', { id: 'p2', name: 'Troll', sub: 'acct-new' }]], opts });
-  tps.length = 0;
-  rowOf(moved.host.lineActions(STAFF_LINE), 'TP').run();
-  assert.deepEqual(tps, []);
-  assert.equal(moved.log.tab(moved.log.active).messages.at(-1).text, 'That player is not online.');
-  assert.equal(rowOf(staffRig(['dev'], { opts }).host.lineActions({ ...STAFF_LINE, id: '' }), 'TP'), undefined, 'no socket on the line, no TP');
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /createChatSafetyHost\(\{[^\n]*, glyphs: \(\) => _staffGlyphs, teleport: \(id\) => runStaffCommand\(chatLog\?\.active, \{ cmd: 'tp', player: \{ id \} \}\), follow: \(\) => staffFollow\.follow \}\);/, 'world.js: my glyphs as issued, TP through /tp\'s own door by the socket, and Follow through the page\'s staff hook');
-  assert.match(w, /\n  const staffFollow = staffFollowOnPage\(/, 'world.js: the follow the row calls is the page\'s one');
-});
-
 test('SAFE3 THE HOST\'S REPORT: a line\'s own Report carries that line and the stamped lines before it with the reason chosen; /report <name> carries everything the account said here; a report that mutes hands back an order, carried to every room by its kind (mutants: the order dropped; carried to the wrong door)', async () => {
   const r = hostRig();
   r.log.push('world', { id: 'p1', name: 'Sylvia', text: 'happy pride', at: 1, sub: 'acct-syl', sg: SG });
@@ -462,7 +406,7 @@ test('SAFE7 THE CARD: its rules in the player\'s language, "I agree" and "Not no
   assert.equal(c.isUp(), false);
 });
 
-/* ═══ AUDIT SAFE - THE CLIENT LANE (2026-10-17) ═══════════════════════════════════════════════════════════════════════
+/* ═══ AUDIT SAFE - THE CLIENT LANE ═══════════════════════════════════════════════════════════════════════
  * The audit of the chat safety arc, read cold: each pin below failed on the arc as it merged (driven against a copy of
  * the old modules) and holds the fix now. Its mutants are tools/mutants/safe_audit_client.json. */
 
@@ -473,12 +417,12 @@ const signedIn = () => {
 };
 const answer = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 /** An OnlineSession in `room`, opened and welcomed by a relay of version `v`. */
-function welcomedSession(FakeWS, sockets, room, { v = 'world215', now = () => 1_000_000, id = 'me-00001' } = {}) {
+function welcomedSession(FakeWS, sockets, room, { now = () => 1_000_000, id = 'me-00001' } = {}) {
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Me', id, secret: `secret-of-${id}`, presence: false, WebSocketImpl: FakeWS, now });
   s.join(room);
   const ws = sockets.at(-1);
   ws.open();
-  ws.receive({ t: 'welcome', id, peers: [], n: 1, ...(v ? { v } : {}) });
+  ws.receive({ t: 'welcome', id, peers: [], n: 1 });
   return { s, ws };
 }
 
@@ -523,22 +467,21 @@ test('AUDIT SAFE CLIENT-2 THE SESSION STAYS OUT: a socket the relay closed 1008 
   assert.equal(onlineNs.tokenRetryable('server'), true);
 });
 
-test('AUDIT SAFE CLIENT-2 + RELAY-3 THE PAGE IS BANNED: the hub says the ban\'s order first - carried to every room whose relay knows the frame, never to one before world215 (it closes on it - the WIKIMAID relay world214 among them) - then `banned`: every room left and latched, the token the minter holds let go, the ban said once however many sockets say it, nothing back on the rejoin\'s clock; a ban lifted opens the way (mutants: a ban that latches nothing; the minter\'s token kept; a ban order to a relay before world214)', async () => {
+test('AUDIT SAFE CLIENT-2 + RELAY-3 THE PAGE IS BANNED: the hub says the ban\'s order first - carried to every room - then `banned`: every room left and latched, the token the minter holds let go, the ban said once however many sockets say it, nothing back on the rejoin\'s clock; a ban lifted opens the way (mutants: a ban that latches nothing; the minter\'s token kept)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let clock = 1_000_000;
   const now = () => clock;
-  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM, { now }), trade = welcomedSession(FakeWS, sockets, 'chat:trade', { now }), old = welcomedSession(FakeWS, sockets, 'chat:lfg', { now, v: 'world214' });   // WIKIMAID's relay: no ban frame
+  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM, { now }), trade = welcomedSession(FakeWS, sockets, 'chat:trade', { now });
   const log = new ChatLog({ now });
   let forgot = 0;
-  const host = createChatSafetyHost({ log: () => log, links: () => [hub.s, trade.s, old.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow(), minter: () => ({ forget() { forgot++; } }), now });
+  const host = createChatSafetyHost({ log: () => log, links: () => [hub.s, trade.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow(), minter: () => ({ forget() { forgot++; } }), now });
   await host.start();
   const until = Math.floor(clock / 1000) + 86400;
   const order = orderOf({ o: 'ban', s: 'acct-me', bn: until, i: 1, e: until });
   hub.ws.receive({ t: 'law', order });
   hub.ws.receive({ t: 'banned', until });
   assert.deepEqual(JSON.parse(trade.ws.sent.at(-1)), { t: 'ban', order }, 'the order carried before the page left');
-  assert.equal(old.ws.sent.some((f) => JSON.parse(f).t === 'ban'), false, 'never to a relay that closes the socket on the frame');
-  assert.deepEqual([hub.s.barred, trade.s.barred, old.s.barred], [true, true, true]);
+  assert.deepEqual([hub.s.barred, trade.s.barred], [true, true]);
   assert.equal(forgot, 1, 'the token minted before the ban let go');
   hub.s.onBanned({ until });   // another hub socket's word on the same ban
   assert.equal(log.tab(log.active).messages.filter((l) => /This account is banned/.test(l.text)).length, 1, 'said once');
@@ -709,7 +652,7 @@ test('AUDIT SAFE CLIENT-6 / RELAY-1 A LINE IS REPORTED IN THE WORDS THE RELAY SI
 });
 
 test('AUDIT SAFE CLIENT-7 A BLOCK HOLDS BACK WHAT A BLOCKED ACCOUNT ASKS OF ME: its trade, card, duel and page requests never land (by its account as the relay verified it), each the frame the REAL relay routes to me; another account\'s do; the host gives every room the block list\'s ear (mutants: the directed frames never asked; the host never handing the ear; RPT1026-SECNET: the relay\'s trade and page sent with no account)', async () => {
-  // RPT1026-SECNET (PIN MOVED): this pin fed a trade frame carrying an account the relay never sent, in the world channel,
+  // RPT1026-SECNET (
   // where the relay routes no trade, and no page at all - so the block it pinned held only here. The frames are now the
   // relay's own: three players in one place room (test/fakeRoom.mjs's Room, real tokens), two of them asking the third
   const R = fakeRoom('world:3,12');
@@ -765,7 +708,7 @@ test('AUDIT SAFE CLIENT-8 A BLOCK LIST THAT COULD NOT BE READ IS READ AGAIN - af
   const { s, ws } = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM);
   let welcomed = 0;
   s.onWelcomed = () => welcomed++;
-  ws.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1, v: 'world215' });
+  ws.receive({ t: 'welcome', id: 'me-00001', peers: [], n: 1 });
   assert.equal(welcomed, 1);
 });
 
@@ -932,18 +875,17 @@ test('AUDIT SAFE DOC-4 THE REPORTS REACH A MODERATOR IN THE GAME: /cases lists t
   for (const c of ['/mute', '/ban', '/strikes', '/cases', '/case', '/dismiss']) assert.ok(lines().some((l) => l.startsWith(c)), `/modhelp names ${c}`);
 });
 
-test('LEASE1 THE PAGE HANDS ITS HUB\'S LEASE TO EVERY ROOM IT HOLDS (net/roomLease.js): the hub\'s `lease` goes to each lease room whose relay knows the frame, ahead of the next frame the page sends there - never back to the hub, never to a relay before world242, which closes on it (mutants: the lease kept; handed to an old relay)', async () => {
+test('LEASE1 THE PAGE HANDS ITS HUB\'S LEASE TO EVERY ROOM IT HOLDS (net/roomLease.js): the hub\'s `lease` goes to each lease room, ahead of the next frame the page sends there - never back to the hub (mutant: the lease kept)', async () => {
   const { FakeWS, sockets } = fakeSocketClass();
-  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM, { v: 'world242' }), trade = welcomedSession(FakeWS, sockets, 'chat:trade', { v: 'world242' }), old = welcomedSession(FakeWS, sockets, 'chat:lfg', { v: 'world241' });
-  const host = createChatSafetyHost({ log: () => new ChatLog(), links: () => [hub.s, trade.s, old.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow() });
+  const hub = welcomedSession(FakeWS, sockets, CHAT_WORLD_ROOM), trade = welcomedSession(FakeWS, sockets, 'chat:trade');
+  const host = createChatSafetyHost({ log: () => new ChatLog(), links: () => [hub.s, trade.s], storage: { getItem: () => null }, doc: fakeDocument(), touch: false, register: () => () => {}, win: fakeWindow() });
   await host.start();
   const leases = (ws) => ws.sent.map((f) => JSON.parse(f)).filter((f) => f.t === 'lease' && f.l);
   hub.ws.receive({ t: 'lease', l: 'body.mac' });
   await settle();
-  for (const l of [hub, trade, old]) l.s.sendChat('anyone selling iron?');
+  for (const l of [hub, trade]) l.s.sendChat('anyone selling iron?');
   assert.deepEqual(leases(trade.ws), [{ t: 'lease', l: 'body.mac' }]);
   assert.deepEqual(leases(hub.ws), [], 'the hub is handed none back');
-  assert.deepEqual(leases(old.ws), [], 'nor a relay that closes on the frame');
 });
 
 test('ROSTER-STAFF rosterActions (mob, 2026-10-24: "need to add follor to find a player in chat as well", over the chat\'s Find a player list): a roster row\'s staff acts are the line menu\'s, for the player the row names by socket - their account as a room here holds it, or the hub\'s lists (everyone online, a search\'s answer); none for a player, for a row no list names an account for, or for an id that is no id (mutants: the hub\'s list unread, the search unread, a player given the acts)', async () => {

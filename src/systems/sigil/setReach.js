@@ -1,5 +1,5 @@
 // @ts-check
-// SET-CATCHUP (POWER-CEILING, 2026-10-27, bible/11-Multiplayer/Sigil-Sets.md section 5; the player: "Add more horizontal
+// SET-CATCHUP (POWER-CEILING, 2026-10-27,; the player: "Add more horizontal
 // progression please!"): A SET'S REACH. Mac's "grow together" stands - a set's stage is its lowest worn piece's - but a
 // piece swapped in fresh no longer costs the whole climb again: a piece below the highest stage the set has stood at for
 // this character drinks CATCH_UP_MULT times the XP until it reaches that stage, and never faster past it. The reach is

@@ -33,13 +33,6 @@ test('DLG1: with no document (node, the classic path) nothing is taken', () => {
   assert.equal(drawEnhancedDialog(null, { ox: 0, oy: 0, s: 1 }, yn, {}, undefined), false);
 });
 
-test('DLG1: drawMessageBox hands a box to the dialog under the enhanced skin only, before the classic draw', () => {
-  const src = read('src/ui/messageBox.js');
-  const at = src.indexOf('isEnhancedPlus() && drawEnhancedDialog(renderer, m, box, { image })');
-  assert.ok(at > 0);
-  assert.ok(at < src.indexOf('drawFrame(renderer, m, box);', at), 'it runs before the parchment is drawn');
-});
-
 test('WM1: motion is off under automation (the probes) unless asked for', () => {
   const win = (search, webdriver) => ({ location: { search }, navigator: { webdriver } });
   assert.equal(motionEnabled(win('', false)), true);

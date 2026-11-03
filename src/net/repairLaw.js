@@ -1,5 +1,5 @@
 // @ts-check
-// SUMMON-REPAIR (FIELD BUGS 2026-10-14, bible/01-Overview/bugs/Field-Bugs-2026-10-14.md SUMMON-OFFER; Mac, asked how to mend
+// SUMMON-REPAIR (FIELD BUGS 2026-10-14, SUMMON-OFFER; Mac, asked how to mend
 // the reporter's save: "Operator tool"): A STAFF REPAIR OF ONE REALM CHARACTER - ITS LAW, the one file the account
 // service's review act (server-account/src/review.js `repair`) and the operator's tool (tools/realmReview.mjs) read.
 //
@@ -23,8 +23,7 @@
 // pack cannot carry (systems/tradeModes.js sellProceeds; DaggerfallTradeWindow's sell arm), which is how the honest sale of
 // a lot that big pays. Never a purse of coin: a million coins weigh 2,500 kg (inventory.js GOLD_PIECE_WEIGHT_KG).
 //
-// STAFF-SET-BANK (2026-10-23, mob: "we need a set bank setting"; asked before, "how to i adjust a lpayers bank?", and
-// nothing could): A REALM CHARACTER'S BANK, SET BY STAFF. Online a character keeps ONE account, the Empire's, at
+// STAFF-SET-BANK: A REALM CHARACTER'S BANK, SET BY STAFF. Online a character keeps ONE account, the Empire's, at
 // Daggerfall's index (systems/banking.js EMPIRE-ACCOUNT; realm/realmGoldLaw.js REALM_EMPIRE_ACCOUNT), and the Staff
 // Panel's profile says the bank as one number - every account's gold together (server-account/src/staffPlayers.js
 // saveViewOf `banks`, which reads it by bankTotalOf below). Staff set that number: the record's bank, still the total
@@ -33,8 +32,7 @@
 // the Empire's set (and a count of no number, which no fold moves and the profile counts as none, at nothing too: a set
 // leaves the bank the profile says and nothing beside it). A loan stays where it stands, as the fold leaves it.
 //
-// GUILD-LETTER-FIX (2026-10-25, mob: a player's level 10 vampire never had the Dark Brotherhood's letter - its tally at
-// InviteSent, no letter pending, The Acceptance Test nowhere in the save; "do it"): A CRIME GUILD'S LETTER, SENT AGAIN OR
+// GUILD-LETTER-FIX: A CRIME GUILD'S LETTER, SENT AGAIN OR
 // CALLED OFF BY STAFF. DFU parks the tally before the quest starts (systems/crimeGuilds.js DB-LETTER), so a letter whose
 // quest could not be made spent the invitation for good, and nothing in a save tells that from a test the player failed:
 // staff send the one character's letter again. `send` sets the tally at the guild's target and the letter due, so the
@@ -137,7 +135,7 @@ export function applyPurseMend(save, { was, gold }) {
 /**
  * STAFF-SET-BANK: THE BANK AS THE STAFF PANEL SAYS IT - every account's gold together, a count that is no finite number
  * counted none (server-account/src/staffPlayers.js saveViewOf `banks` reads it here, so the total staff read and the one
- * a set is checked against are one sum). A branch below nothing counts below nothing. REVIEW (2026-10-23): the sum held
+ * a set is checked against are one sum). A branch below nothing counts below nothing. REVIEW: the sum held
  * to the safe integers, as judge.js wealthOf holds the wealth - a bank a modified client wrote past them, or summed past
  * every number (1e308 twice is Infinity, which JSON sends as null), is said at the bound: a total the profile can send,
  * staff can name and the act's row can hold (an int64 past them reads back as no JavaScript number). Two banks past the

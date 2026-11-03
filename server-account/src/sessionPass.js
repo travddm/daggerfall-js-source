@@ -1,6 +1,5 @@
 // @ts-check
-// SESSION-SIGN (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, decision 4 - the owner, at a thousand
-// online: "Make the best call for future proofing"): THE SESSION'S LOOKUP OFF THE HOT ROUTES. Every authenticated request
+// SESSION-SIGN: THE SESSION'S LOOKUP OFF THE HOT ROUTES. Every authenticated request
 // asked the account database who its secret is (accounts.js resolveSession, WHO_SQL) - a round trip each, some 30-74 a
 // second at a thousand online on the one primary and its replicas, and the primary is capped by its trips (PRIMARY-TRIPS).
 // Now a hot route (passRoute: the checkpoint, the heartbeat, a town's homes, the pixels, the chapters' sheet, the seats'
@@ -42,7 +41,7 @@ export const PASS_MAX_CHARS = 1024;
 const PASS_INFO = 'dfo-session-pass-v1';
 
 /** The hot routes, by path: the measured busiest that read nothing of the account but a pass's fields (PRIMARY-TRIPS'
- *  counts; bible/11-Multiplayer/Scale-Arc.md SESSION-SIGN). The progression claims, the mint and every route that changes
+ *  counts; SESSION-SIGN). The progression claims, the mint and every route that changes
  *  an account keep the lookup. */
 export const PASS_PATHS = Object.freeze(['/v1/heartbeat', '/v1/homes/town', '/v1/prof/pixels', '/v1/chapters/list', '/v1/seats/list', '/v1/festival/town']);   // WITCH1: and a town's Hearth Offerings, asked as its homes are
 const PASS_PATH_SET = new Set(PASS_PATHS);
@@ -89,6 +88,9 @@ const intOrNull = (/** @type {any} */ v) => (Number.isSafeInteger(v) ? v : null)
  */
 export async function mintPass(key, who, secret, nowS, subtle) {
   const p = who.player;
+  // A staff role is the account's row, read fresh (titles.js), and a pass carries no role: a staff account is handed none, so
+  // every request of it takes the full lookup and a role taken off applies at once, not when the pass ends.
+  if (p.staff_admin === 1 || p.staff_mod === 1 || p.staff_owner === 1) return null;
   const claims = { p: p.id, s: who.session?.id ?? null, h: typeof p.handle === 'string' ? p.handle : null, r: intOrNull(p.registered_at),
     m: intOrNull(p.muted_until), x: nowS + PASS_TTL_S };
   const body = _b64url.encode(new TextEncoder().encode(JSON.stringify(claims)));

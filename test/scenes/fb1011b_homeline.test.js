@@ -1,6 +1,6 @@
-// HOME-LINE (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; the Discord's "Property Problem" -
+// HOME-LINE (FIELD BUGS 2026-10-11b,; the Discord's "Property Problem" -
 // ShikiX3: "I can't place in front of my door but I can place in front of another's home"; afjiz: "my property line goes a
-// little far into the property beside me"; Mac: "Split at the midline"). A home's lot is its footprint grown YARD_MARGIN
+// little far into the property beside me"). A home's lot is its footprint grown YARD_MARGIN
 // (6 m), never shared, so two houses standing closer than 12 m overlapped and the owner could decorate the step before a
 // neighbour's door (the half refused before the owner's own door was HOME-FOOT's, 2026-10-09). Now no part of a piece may
 // stand nearer another building's ground than the house's own: the ground between two houses is split down its middle,

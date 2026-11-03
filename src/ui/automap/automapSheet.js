@@ -3,8 +3,6 @@
 // EM3 — THE AUTOMAP SHEET: the dungeon's plan, behind the sheet
 // contract, on the same parchment as the Iliac Bay.
 //
-// Mac (2026-09-21): "The automap should become a 2d map and floor based
-// instead of the current 3D implementation, streamlining it."
 //
 // This is the first sheet written to `ui/map/mapStrip.js`'s SHEET_MEMBERS
 // from the outside - no back-reference to the window, no DOM, no
@@ -74,7 +72,7 @@ import {
  *  since EM3 and nothing on the paper said so (tannim: "had the ability to press down to advance the plane"). */
 export const AUTOMAP_HINT = 'drag to pan · scroll to zoom · PgUp/PgDn floors · click a stair to take it · Esc to close';
 /** EM3-3D: ...and the solid map's, which turns and tilts as the classic 3D map does. */
-// EM3-3D fix (Mac: "they key tips are not needed ... you have the buttons on the map"): the solid sheet says nothing
+// EM3-3D fix: the solid sheet says nothing
 // on the foot. Its turn, tilt, plan and home are buttons on the paper, its floors a list to press, and the drag and
 // the wheel are what any map does. (V, which the first line offered, is the TravelMap key and closed the map; the
 // plan is P, and the plan button's own tip says so.)
@@ -169,7 +167,7 @@ export function createAutomapSheet(deps = {}) {
   // next open). The orbit eases toward its goal on the sheet's own clock; `framedAt` is the orbit the window's view
   // was last laid out for, and `reframe` hands the window a new view whenever the two part.
   const solidOn = !!deps.solid;
-  // PLUS-MAP (Mac: "adjust this ui for this map to the enhanced plus standard with buttons"): with `domTools` the
+  // PLUS-MAP: with `domTools` the
   // window draws the 3D map's controls and its floor readout as Enhanced Plus buttons (tools/status/press below), so
   // the paper carries only the map and its compass
   const domTools = !!deps.domTools;
@@ -660,8 +658,7 @@ export function createAutomapSheet(deps = {}) {
     return out;
   }
   /**
-   * TURN-STEADY (Mac: "it sometimes moves the whole map around instead of staying centered when i hold right mouse
-   * button"): WHAT IS UNDER A PAPER POINT, exactly as it is drawn. The pivot was where the paper point met the ground
+   * TURN-STEADY: WHAT IS UNDER A PAPER POINT, exactly as it is drawn. The pivot was where the paper point met the ground
    * plane of the floor being looked at - over empty paper, a wall, or another floor, a point far off the map, and a
    * turn about a point far off the map swings the whole map round it. Now the point is picked on the drawn floors
    * themselves (the revealed rows' up-facing faces, under the cut, as the ink draws them): the highest one under the
@@ -875,7 +872,7 @@ export function createAutomapSheet(deps = {}) {
   }
 
   // ── EM3-3D fix: WHERE THE PLAYER HAS BEEN ──────────────────────
-  // Mac: "it should only uncover where i actually was and not show all floors". The walked trail
+  // . The walked trail
   // (systems/automap/automap.js automapTrailTick) is the one record of that. With it, the strip lists the floors the player
   // has stood on and nothing else, the floor keys step between those, and the solid sheet draws only floor near the
   // trail. A record with no trail point at all (a save older than the trail) or a RevealAll falls back to the reveal.
@@ -1001,7 +998,7 @@ export function createAutomapSheet(deps = {}) {
     lastView = env.view; lastPaper = env.paperW; lastPaperH = env.paperH; lastHands = env.reserveHands ?? null;
     if (!f.sheets.length) { ctx?.clearRect?.(0, 0, env.paperW * (env.dpr ?? 1), env.paperH * (env.dpr ?? 1)); return; }
     const cam = makeCamera(orbitNow(), env.view, groundY());
-    // EM3-3D (Mac: "just make it like the classic dungeon 3d map but in this drawn style"): the dungeon's OWN
+    // EM3-3D: the dungeon's OWN
     // geometry, every revealed model, back faces unseen and sliced over the player's head, as DFU's 3D automap -
     // inked by the GPU. The cell model below stays for a page with no WebGL2 (and for the pins).
     if (glInk === undefined || glInk?.lost?.()) glInk = dungeonInkFor(ctx?.canvas?.ownerDocument ?? null);   // GL-LEAK: the page's one ink, not a context per open (a lost one built anew)
@@ -1023,8 +1020,7 @@ export function createAutomapSheet(deps = {}) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       return;
     }
-    // EM3-3D fix (Mac: "you should still see everything else not only the floor youre in ... the whole map in 3d
-    // only discover where you were"): EVERY floor, at its own height, lowest first so the ones above lie over it -
+    // EM3-3D fix: EVERY floor, at its own height, lowest first so the ones above lie over it -
     // each drawn only where the player has been. Floors over the player's own are drawn a little lighter, so the
     // floor they stand on still reads first.
     const layers = [];
@@ -1034,7 +1030,7 @@ export function createAutomapSheet(deps = {}) {
     }
     void c;
     const dpr = env.dpr ?? 1;
-    // EM3-3D fix (Mac: "when i rotate the map it loses all details thats bad and makes it look cheap"): a turn is
+    // EM3-3D fix: a turn is
     // drawn in full, every frame - the pen, the hatching and the stones as at rest. Only the kept image is skipped
     // (a turn changes every pixel of it).
     if (orbitMoving()) {
@@ -1081,7 +1077,7 @@ export function createAutomapSheet(deps = {}) {
   }
   /** EM3-3D classic: where the slice cuts - over the player's feet, or over the floor that is up. */
   function sliceY() {
-    // ALL-FLOORS (Mac: "a button that shows the full map of what we explored so far"): the slice over the highest
+    // ALL-FLOORS: the slice over the highest
     // explored floor, so every floor walked is drawn at once - the lower ones under it, faded with their depth
     if (fullMap) return Math.max(viewBase(), topExploredY()) + SLICE_ABOVE;
     return viewBase() + SLICE_ABOVE;
@@ -1143,7 +1139,7 @@ export function createAutomapSheet(deps = {}) {
     }
     return { at: at + 1, of: fl.length, you, top: at >= fl.length - 1, bottom: at <= 0 };
   }
-  /** EM3-3D (Mac: "we need going floors up and down buttons"): the slice to the next storey up (+1) or down (-1) -
+  /** EM3-3D: the slice to the next storey up (+1) or down (-1) -
    *  every storey of the level, as the classic map's own up and down do - and the view follows it, so the floor
    *  stays where it was on the paper. False at the top or the bottom. */
   function floorStep(by) {
@@ -1193,7 +1189,7 @@ export function createAutomapSheet(deps = {}) {
     // the classic's beacon: a staff standing up out of the way in
     if (ent) paintBeacon(ctx, paperOf(ent.x, ent.z, ent.y, env.view), paperOf(ent.x, ent.z, ent.y + BEACON_STAFF, env.view), env.pulse ?? 0);
     // the compass, turning with the sheet, under the tab strip
-    // PLUS-MAP (Mac: "make it a bit bigger put it into the upper right"): the compass stands in the paper's upper
+    // PLUS-MAP: the compass stands in the paper's upper
     // right corner, clear of the sheet's title on the left
     const CR = COMPASS_R;
     const [cx, cy] = [env.paperW - CR - 26, (env.reserveTop ?? 0) + CR + 18];
@@ -1221,7 +1217,7 @@ export function createAutomapSheet(deps = {}) {
       ctx.fillText(`Floor ${at + 1} of ${fl.length}${you}`, cx + 22, cy);
       ctx.restore();
     }
-    // EM3-3D fix (Mac: "shouldnt show the floor transitions in the middle of the map"): a stair's glyph and name
+    // EM3-3D fix: a stair's glyph and name
     // only while the pointer is on it - the steps themselves are in the drawing
     if (hoverStair) {
       const [x, y] = paperOf(hoverStair.x, hoverStair.z, hoverStair.y, env.view);
@@ -1274,7 +1270,7 @@ export function createAutomapSheet(deps = {}) {
   }
 
   /**
-   * EM3-3D fix (Mac: "the floors in the top right are very badly clickable"): THE STRIP'S WHOLE ROW IS THE BUTTON.
+   * EM3-3D fix: THE STRIP'S WHOLE ROW IS THE BUTTON.
    * A press was taken only on the word's own ink (and a few pixels round it) - a narrow target on a sheet held in
    * gauntlets. Now the band from a little left of the widest word to the paper's edge is the strip, each row owns the
    * height half-way to its neighbours, and the nearest row takes the press.
@@ -1382,7 +1378,7 @@ export function createAutomapSheet(deps = {}) {
       const f = ensureFrame();
       lastPaper = env.paperW;
       lastView = env.view;
-      // EM3-3D fix (Mac: "the classic mode also didnt have the floor 1,2,3,4 shown in the upper right"): the solid
+      // EM3-3D fix: the solid
       // map is the whole dungeon at once, so it has no floors to page between and no list
       if (solidOn) { strip = null; void f; return; }
       strip = floorStripLayout(listedSheets(), index, {   // EM3-3D fix: only the floors the player has been on
@@ -1423,7 +1419,7 @@ export function createAutomapSheet(deps = {}) {
       }
       const hit = stripAt(px, py);
       if (hit != null) { setFloor(hit); return; }
-      // NOTE-PIN (Mac: "a small clickable waypoint next to the note"): one click on a waypoint - its pin or its words -
+      // NOTE-PIN: one click on a waypoint - its pin or its words -
       // opens it to rename (clear it to take it away)
       if (noteBoxHit(px, py)) { this.mark(px, py); return; }
       // DISC25-A (kurkku: "clicking stairs to move up or down a level is good"): a stair onto another floor turns
@@ -1435,7 +1431,7 @@ export function createAutomapSheet(deps = {}) {
     },
 
     /**
-     * EM3-3D fix (Mac: "those floors there are almost not clickable"): IS THIS POINT ONE OF THE SHEET'S BUTTONS? The
+     * EM3-3D fix: IS THIS POINT ONE OF THE SHEET'S BUTTONS? The
      * window asks on the press: a press on a floor row or an on-paper button is a PRESS, taken whole - it never
      * starts a pan, so a hand that moves a few pixels while it clicks (every hand does) still turns the page. Before
      * this, four pixels of drift made the press a drag of the map, and the floor list read as dead.
@@ -1582,18 +1578,16 @@ export function createAutomapSheet(deps = {}) {
         if (settled && !holding) { pivotW = null; pivotFrom = null; }
         return null;
       }
-      // EM3-3D fix (Mac: "it still doesnt stay centered when hold right click and rotating it"): a turn or a tilt
+      // EM3-3D fix: a turn or a tilt
       // keeps STILL what is in the middle of the paper - the floor being looked at, where the middle of the paper
       // meets it - as the classic map turns about its pivot. The point is fixed in the WORLD when the turn begins
       // and put back at the same paper point every frame, so nothing drifts and nothing jumps near level.
       const y0 = groundY(), yv = viewBase();
       const before = orbitNow(framedAt.yaw, framedAt.pitch), after = orbitNow();
       if (!pivotW) {
-        // TURN-AT-MOUSE (Mac: "it should rotate from where your mouse is starting the rotating with right click when
-        // not centered on the player"): a right-drag turns about the floor under the point it began on; keys, buttons
+        // TURN-AT-MOUSE: a right-drag turns about the floor under the point it began on; keys, buttons
         // and the stick, and a drag begun while the player is in the middle, turn about the middle as before
-        // TURN-CENTRED (Mac: "when rotating the map is still able to move outside of the map window - it should be if
-        // i drag leftclick there but not while rotate"): a turn is ALWAYS about the middle of the paper, and the middle
+        // TURN-CENTRED: a turn is ALWAYS about the middle of the paper, and the middle
         // is always a point on the map - the drawn floor under it, else the plane under it held inside what is drawn,
         // else you, else the middle of everything drawn. What sits in the middle of the window stays there, so a turn
         // can never carry the map out of the window; only a left-drag moves it. (A pivot at the pointer swung
@@ -1601,12 +1595,10 @@ export function createAutomapSheet(deps = {}) {
         const cx = limits.paperW / 2, cy = limits.paperH / 2;
         const me = playerHere();
         const meW = me ? { px: me.x, py: me.z, y: me.y ?? yv } : null;
-        // ME-PIVOT (Mac: "it still tries to always rotate around the player - that should only work when you click
-        // me and dont move the map after it"): the player is the pivot ONLY while the view is still the one Me left
+        // ME-PIVOT: the player is the pivot ONLY while the view is still the one Me left
         // (meLock - any pan or off-centre zoom lets it go). Otherwise: the floor drawn under the middle, else the
         // middle's own point on the floor being looked at. Never the player as a fallback.
-        // TURN-FIXED (Mac: "rotating with right click sometimes causes the 3d map to move around the window - it
-        // should NEVER do that, it needs a fixed rotate point in the middle of the parts you already explored"):
+        // TURN-FIXED:
         // the pivot is ALWAYS the middle of everything explored (drawn), in 3D - the same world point every turn,
         // wherever the view was left - so the model spins in place and never travels across the paper. Only Me's
         // lock (turn about the player) overrides it. The paper-middle pick is gone: it changed with every pan.
@@ -1666,7 +1658,7 @@ export function createAutomapSheet(deps = {}) {
     },
     /** ME-PIVOT: the player moved the view themselves (a pan, a pinch, a zoom off the middle) - turns stop going about
      *  the player until Me is pressed again.
-     *  TURN-STEADY (Mac: "dragging it around while a turn is still easing snaps it back / moves the whole map"): a
+     *  TURN-STEADY: a
      *  turn started with Q/E or a turn button eases over several ticks with the button not held, so a pivot picked
      *  before the drag stays live through it - and reframe() only ever recomputes ox/oy FROM that pivot, so a pan or
      *  a pinch landing between two turn ticks was silently thrown away, and the map snapped back toward the stale

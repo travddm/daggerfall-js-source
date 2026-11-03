@@ -38,7 +38,6 @@ import { stringHash } from '../../formats/netRuntime.js';   // QUEST-AUDIT II SH
 import { getSeed, setSeed } from '../../formats/dfRandom.js';   // AUDIT QA2: a shared re-seat's residence name, seeded and the state put back
 import { seededFirst } from '../wind/wind.js';   // QUEST-AUDIT II SHARED-SEAT: the port's one seeded die (imports nothing)
 import { isMainStoryDungeon } from '../../world/dungeon/dungeonTextures.js';   // KVAR-HOLD: the main story's own dungeons are no random quest's
-import { wildMask, wildInside } from '../wild/wildZone.js';   // RPT1026-QUESTS QUEST-ZONE: the open zone's sealed dungeons are no quest's (WW-C2: the zone the host's, wildMask)
 import { boundWorldDataBlocks } from '../../formats/worldData/worldDataReplacement.js';   // AUDIT QA2: Daggerfall's own blocks (BLOCKS.BSA, past the door) - what the mods took away
 import { startOfSiteId } from '../starts/starts.js';   // START2: a start's own site, named by the world
 import '../starts/startPlaces.js';   // START2: ...and its row in Quests-Places, laid before any Place reads the table
@@ -51,7 +50,7 @@ export const Scopes = Object.freeze({ None: 'none', Local: 'local', Remote: 'rem
 /** SiteTypes (DaggerfallUnityEnums.cs:611) - numeric for save parity. */
 export const SITE_TYPES = Object.freeze({ None: 0, Town: 1, Dungeon: 2, Building: 3 });
 
-/** START3 (bible/06-Systems/Alternate-Starts-Arc.md section 12): A SITE PAST THE BAY KEEPS ITS OWN MAP PIXEL. Every face
+/** START3: A SITE PAST THE BAY KEEPS ITS OWN MAP PIXEL. Every face
  *  finds a Bay site's pixel the way DFU's CanFindPlace does - its region's name lookup in MAPS.BSA, the row's longitude
  *  and latitude - and MAPS.BSA holds no place off the Bay's table (TESA's Arena places, capitals, countryside and lairs,
  *  a province's start). Such a site carries the pixel its location stands on (`worldPixel`, from the same longitude and
@@ -79,8 +78,7 @@ const SPAWN_MARKER_RECORD = 11;
 const ITEM_MARKER_RECORD = 18;
 
 /**
- * QUEST-CAPS (2026-10-14, Dudey: "almost every quest has problems to spawn enemies inside dungeons ... since we have
- * smaller, regular and large dungeons. Quest enemies being placed outside of the rooms and halls"): A RE-LAID DUNGEON'S
+ * QUEST-CAPS: A RE-LAID DUNGEON'S
  * QUEST MARKERS ARE ITS INTERIOR BLOCKS'. A border block (its name begins B - GetRandomBlock's own test) is a cap of
  * rock Daggerfall closes a layout with, set where its one way in meets the dungeon; its other pockets no corridor
  * reaches (SD-REACH, world/superDungeon/sdDungeon.js SD_BORDER_BLOCK_RE). The small plus and the medium size draw their caps at
@@ -360,7 +358,7 @@ export class Place extends QuestResource {
   }
 
   /**
-   * FIELD BUGS 2026-10-14 QUEST-HOME (Mac, 2026-10-15: "Close both" - a Ledger A departure: DFU has one player, and no
+   * FIELD BUGS 2026-10-14 QUEST-HOME (- a Ledger A departure: DFU has one player, and no
    * house it can own is ever a quest's, GetHousesForSale keeping every quest building off the market): A BUILDING SITE
    * THAT BECAME A PLAYER'S HOME BEFORE ITS PLAYER REACHED IT IS CHOSEN AGAIN. Another player may buy a house after this
    * quest chose it - no service can know another page's quests - and the quest would send its player into a stranger's
@@ -422,8 +420,7 @@ export class Place extends QuestResource {
     // KVAR-HOLD's audit: among the few nearest the dungeon it leaves - never this client's own player - so every copy of a
     // shared quest, under its one die (reseatMovedSite's SHARED-SEAT), draws the same site
     const row = world.maps.getRegion(sd.regionIndex)?.mapTable?.find?.((t) => t?.mapId === sd.mapId) ?? null;
-    // RPT1026-QUESTS QUEST-ZONE: and a site the open zone seals (_zoneSeal) is drawn again by the same law
-    if (!isMainStoryDungeon(sd.mapId) && !(row && this._zoneSeal(world)?.(row))) return false;
+    if (!isMainStoryDungeon(sd.mapId)) return false;
     const { p2 } = this.declaredSiteLaw();
     const origin = row ? mapTablePixel(row) : null;
     const site = this._remoteDungeonSite(world, sd.regionIndex, p2, { origin }) ?? this._remoteDungeonSite(world, sd.regionIndex, -1, { origin });
@@ -572,7 +569,7 @@ export class Place extends QuestResource {
     // House-type fallback: there should almost always be a local house - and DFU writes it into the place (Place.cs:735)
     if (houseFallback) this.p2 = -1;
     if (!foundSites.length) {
-      // AUDIT RELEASE R2-5c (the owner: "Take care of exclusions and gaps"): A CAPITAL IS ONE TOWN (WW7-11) - a questor in a
+      // AUDIT RELEASE R2-5c: A CAPITAL IS ONE TOWN (WW7-11) - a questor in a
       // slice with no building of the kind (the Imperial City's centre holds none at all) takes the local site in the
       // city's nearest slice that has one (_citySites); its words name that slice. Not a DFU member: Daggerfall's towns are
       // one location each. Ledger A (R2-5).
@@ -598,7 +595,7 @@ export class Place extends QuestResource {
   }
 
   /**
-   * QUEST-AUDIT II NEAR-SITE (the owner, on the audit's findings: "Rework so quests can work"): A TOWN THE TOWN MODS LAY
+   * QUEST-AUDIT II NEAR-SITE: A TOWN THE TOWN MODS LAY
    * HOLDS FEWER BUILDINGS OF A KIND THAN DAGGERFALL'S QUESTS ASK OF IT. Beautiful Villages keeps one tavern in 121
    * villages and three houses in its Kynareth temples, Beautiful Cities drops the only weaponsmith, pawnshop or apothecary
    * of a city, and a quest whose local sites outnumber them (two taverns - A0C00Y12, A0C01Y13; five houses - A0C00Y16; a
@@ -787,7 +784,7 @@ export class Place extends QuestResource {
   }
 
   /**
-   * QUEST-AUDIT II NEAR-REGION (the owner: "Rework so quests can work"): A REGION THE TOWN MODS LEFT WITHOUT A KIND OF
+   * QUEST-AUDIT II NEAR-REGION: A REGION THE TOWN MODS LEFT WITHOUT A KIND OF
    * BUILDING. Beautiful Cities lays Pothago and Menakat without a weaponsmith, the region's only two, so the Dark
    * Brotherhood's L0B60Y10 (`remote weaponstore`) threw at all four of the region's halls: DFU's remote site is the
    * questor's region's alone (SelectRemoteTownSite), and its 500 darts found none. Where the mods took the kind from the
@@ -920,7 +917,7 @@ export class Place extends QuestResource {
     const regionData = world.maps.getRegion(regionIndex);
     if (!regionData || regionData.locationCount === 0) return null;
 
-    let foundIndices = this._collectDungeonIndicesOfType(regionData, dungeonTypeIndex, false, this._zoneSeal(world));   // QUEST-ZONE
+    let foundIndices = this._collectDungeonIndicesOfType(regionData, dungeonTypeIndex, false);
     if (!foundIndices.length) return null;
     // NEARBY-QUESTS: the dungeons within reach, or the nearest few; KVAR-HOLD's re-seat: the nearest few to `origin`
     const reach = origin ? { origin, pixels: 0 } : this._questReach(world);
@@ -1243,7 +1240,7 @@ export class Place extends QuestResource {
     return location.exterior.buildings.some((b) => b.buildingType === buildingType);
   }
 
-  _collectDungeonIndicesOfType(regionData, dungeonTypeIndex, allowFullRange = false, sealed = null) {
+  _collectDungeonIndicesOfType(regionData, dungeonTypeIndex, allowFullRange = false) {
     const upperLimit = allowFullRange ? 18 : 16;
     const activeQuestSites = this.parentQuest?.hooks?.getAllActiveQuestSites?.() ?? [];
     const parentQuestPlaces = [...(this.parentQuest?.resources.values() ?? [])].filter((r) => r.isPlace && r !== this);
@@ -1256,7 +1253,6 @@ export class Place extends QuestResource {
       // player reaches, his questor hidden, the guild's door shut - and NEARBY-QUESTS' nearest few made it likely beside
       // the classic start. The main story's own Places name them `permanent` and never pass here.
       if (isMainStoryDungeon(regionData.mapTable[i].mapId)) continue;
-      if (sealed?.(regionData.mapTable[i])) continue;   // RPT1026-QUESTS QUEST-ZONE (_zoneSeal): nor one the open zone seals
       if (this._isDungeonAssigned(activeQuestSites, parentQuestPlaces, regionData.mapTable[i].mapId)) continue;
       const type = regionData.mapTable[i].dungeonType;
       if (dungeonTypeIndex === -1) {
@@ -1266,24 +1262,6 @@ export class Place extends QuestResource {
       }
     }
     return found;
-  }
-
-  /**
-   * RPT1026-QUESTS QUEST-ZONE (a private report: a vampire quest's dungeon lay near the middle of the Open World,
-   * unmarked on the map and sealed): ONLINE, A DUNGEON THE OPEN ZONE SEALS IS NO QUEST'S. Every real dungeon inside the
-   * zone is sealed ("The way in is sealed. Only the halls marked on the map are open today." - scenes/world.js
-   * wildDungeonGate; bible/11-Multiplayer/Wild-Zone.md, SPAWNED, NOT CHOSEN), so a quest whose remote dungeon DFU's draw
-   * took there (SelectRemoteDungeonSite, Place.cs:880-935: any of the region's) could never be done. A departure
-   * (Port-Ledger A, beside KVAR-HOLD): online the draw passes over a map-table row whose pixel is inside the zone's mask
-   * (wildZone.js wildMask - the zone the host stands, Cyrodiil's since WW-C2, alike on every client), and a saved quest's
-   * site there is drawn again at the load's re-seat (_reseatStoryDungeon). Offline DFU's draw stands. Answers the test
-   * over a row, or null where nothing is sealed.
-   */
-  _zoneSeal(world) {
-    if (!this.parentQuest?.hooks?.sharedClock?.()) return null;
-    const mask = wildMask();   // the host's zone (WW-C2 - main's wildMaskOf read the Wrothgarian zone off the Bay's maps, gone with it)
-    if (!mask) return null;
-    return (row) => { const p = mapTablePixel(row); return !!p && wildInside(mask, p.x, p.y); };
   }
 
   _isDungeonAssigned(activeQuestSites, parentQuestPlaces, mapId) {
@@ -1666,7 +1644,7 @@ export function townBlockGrid(world, location) {
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const blockName = world.maps.getRmbBlockName(location, x, y);
-      // QUEST-FABRIC (2026-10-26, the owner, asked whether quests may land in BLD-3's buildings: "Let quests use them"):
+      // QUEST-FABRIC:
       // every block is read - a capital's own generated cells too, which BLD-3 gives buildings, doors and Daggerfall's
       // interiors with their quest markers (world/imperialFabricBuildings.js). R2-5f had read those cells as holding none
       // (`noBuildingBlock`), for speed; its sites index (townSitesIndex, kept a slice) keeps a search to the slices that

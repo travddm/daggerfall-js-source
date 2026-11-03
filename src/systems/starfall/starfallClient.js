@@ -1,8 +1,8 @@
 // @ts-check
-// STAR5/STAR6 (2026-10-20): THE STARFALL ON A PLAYER'S SCREEN, AS LAW - what the host (scenes/starfall/starfallHost.js)
+// STAR5/STAR6: THE STARFALL ON A PLAYER'S SCREEN, AS LAW - what the host (scenes/starfall/starfallHost.js)
 // asks of a star before it draws, stands or says anything: where in its life the clock has it, where its coven stands,
 // the word a player at it says to its cell, and the tracker's, the map's, the compass's and the timers' readings of it.
-// Design: bible/11-Multiplayer/Starfall.md sections 3, 4, 5 and 8.
+// Design: 4, 5 and 8.
 //
 // Pure: every input an argument (the star's times, its ledger as the cell said it, this player's own record), every
 // answer a value. Not a DFU member. Ledger A (STARFALL).
@@ -21,7 +21,7 @@ export const STAR_HUD_M = 400;
 /** The ground shakes for a player this near a landing. */
 export const STAR_SHAKE_M = 300;
 /** The coven stands just past the crater's thrown earth (world/starfall/starModel.js STAR_BARE_R, 9.6 m): this far from
- *  the heart, its nearest and its farthest. STAR-TUNE (the owner: "The time between waves is too long"): 14 to 20 m, from
+ *  the heart, its nearest and its farthest. STAR-TUNE: 14 to 20 m, from
  *  25 to 35 - a wave stood that far out spent its first seconds walking in. */
 export const STAR_STAND_R = Object.freeze([14, 20]);
 /** STAR-TUNE: where a stand's rolls begin (starRoll's index): the ring's angle a wave's 32 from here, its radius 32 from
@@ -30,7 +30,7 @@ export const STAR_STAND_R = Object.freeze([14, 20]);
 export const STAR_STAND_ROLLS = 1000;
 /** A word that changed is said once more this long after - the relay's bucket may have dropped it (the rite's). */
 export const STAR_RESAY_MS = 1000;
-/** EVENTS1 (bible/10-UI/Event-Board.md): the next star's town is named this long before it falls - on the Timers row
+/** EVENTS1: the next star's town is named this long before it falls - on the Timers row
  *  and the event board, with its map pixel - where it had been named only from its omen, 90 s before: time enough to
  *  travel there (PanickedTofu, Discord: "I only ever get a notification about them AFTER they've been claimed"). */
 export const STAR_WARN_MS = 10 * 60_000;

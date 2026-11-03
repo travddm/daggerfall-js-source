@@ -1,5 +1,5 @@
 // @ts-check
-// RVN-GEAR (2026-10-17, the owner: "Add gear slots to revnants and the ability to customize with gear (Must be balanced)")
+// RVN-GEAR
 // - A SWORN ONE'S KIT. The player gives a sworn revenant pieces from their own pack, slot by slot, and it wears them
 // at every stand; taken back, a piece goes to the player's pack again. The law is here, a leaf of the record's shape
 // (`companion.gear`: a slot's key -> the item); the acts are the companions' own (systems/revenant/revenantCompanions.js
@@ -27,7 +27,7 @@
 //  - ITS LINES, NOT ITS SPELLS (AUDIT RVN G12): a piece's rarity lines fold as a wearer's do; what DFU casts on a
 //    wearer's equipping (Cast When Held, a curse's drawbacks) and a Legendary's player-only powers (loot/lootPowers.js)
 //    stay the player's - DFU's own foes wear their kit the same way.
-//  - ITS KIT IS INVENTORY: the save's copy says what it wears (revenant.js ensureMirror, as its pack), customs and the
+//  - ITS KIT IS INVENTORY: the save's copy says what it wears (revenant.js ensureMirror, as its pack), the
 //    realm's walks count it (net/realm/realmGoldLaw.js, systems/item/possessedItems.js), a release hands it back, and a
 //    deserter's split weighs it with its pack (revenant.js splitPack). Abroad, its kit goes with it: nothing is given or
 //    taken back (AUDIT RVN F10).

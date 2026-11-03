@@ -1,5 +1,4 @@
-// WD1 (2026-09-25, Mac: "All mods attached are to be compatible and
-// implemented 1:1") - WORLD-DATA PATCHES: a mod's whole-block world data
+// WD1 - WORLD-DATA PATCHES: a mod's whole-block world data
 // carried as the author's EDIT, the block rebuilt from the player's own
 // BLOCKS.BSA; and the three DFU members the sea mods' files need the port
 // to read - RDB blocks out of JSON, RmbBlock3dObjectRecord's scales,

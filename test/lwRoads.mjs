@@ -1,4 +1,4 @@
-// LW3 (bible/06-Systems/Living-World.md): A SYNTHETIC MAP for the roads' pins - towns on a grid of map pixels (the
+// LW3: A SYNTHETIC MAP for the roads' pins - towns on a grid of map pixels (the
 // MAPS row's own columns: mapId, px, py, blocks, people, region, type, port), the planner's way between two as the
 // straight run of pixels between them, and the census's own traveller rosters. No game data.
 import { travellerRoster, mintResident } from '../src/systems/livingWorld/census.js';

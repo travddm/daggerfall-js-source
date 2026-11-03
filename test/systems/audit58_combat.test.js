@@ -188,7 +188,7 @@ test('AUDIT 58: a zero-damage ARROW that CONNECTED still runs HandleAttackFromSo
       playerFeet: [0, 0, 0],
       dealDamage: (f, d) => log.push(['deal', d]),
       onAttackFromPlayer: (f) => log.push(['aggro', f === foe]),
-      say: () => {}, rolls: () => 0.25,   // PIN MOVED (ARROW-LODGE): under ARROW_LODGE_CHANCE, so the shaft survives - the refusal draws nothing either way
+      say: () => {}, rolls: () => 0.25,
     });
   assert.equal(dmg, 0, 'the material refusal is a connecting shot for nothing');
   // MUTANT: put onAttackFromPlayer back inside the `dmg > 0` block and

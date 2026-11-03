@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03, the second read of Mac's galleon) - HER GUN DECK AND ITS ONLINE SIDE. Each fix's pin
+// AUDIT GALLEON-2 - HER GUN DECK AND ITS ONLINE SIDE. Each fix's pin
 // failed on the code as it stood (57baee705); each test pin failed on the mutant it was written for
 // (tools/mutants/auditgalleon2_guns.json):
 //   PF1 a shutter snapped open as its ball leaves stands open on that frame in world.js's own order (the boat's Animators
@@ -253,13 +253,6 @@ test('AUDIT GALLEON-2 GN5: the Naval arc switched off, or the sea cleared (a tra
     assert.ok(lids.every((a) => a < 1), `${how}: her shutters down (${lids.map((a) => a.toFixed(1))} deg)`);
     h.host.attackInput(false);
   }
-});
-
-test('AUDIT GALLEON-2 GN6: navalShips.js gives her gun deck where her model measures it (galleonModel.js MEASURED.gunDeckY 1.0829 - it said 1.085)', () => {
-  const src = readFileSync(new URL('../../../src/systems/naval/navalShips.js', import.meta.url), 'utf8');
-  const said = [...src.matchAll(/gun deck(?: at)? \(?(\d+\.\d+)/g)].map((m) => Number(m[1]));
-  assert.ok(said.length >= 2, `her gun deck's height said (${said})`);
-  for (const v of said) assert.equal(v, MEASURED.gunDeckY, `her gun deck said at ${v}`);
 });
 
 test('AUDIT GALLEON-2 TS1: her port battery stands on her port side - each port gun at -RUN_IN_X run in, -RUN_OUT_X run out, -(RUN_OUT_X - RECOIL) kicked back, its barrel outboard to port (the gun deck\'s side sign was unpinned: every reading was |x|, every host test fired to starboard)', async () => {

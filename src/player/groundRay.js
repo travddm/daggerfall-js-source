@@ -2,7 +2,7 @@
 // THE GROUND ALONG A RAY - a leaf: the terrain the host draws (a collider's surfaceAt / heightAt) met by a ray, beside
 // the collider's own mesh ray. Outdoors the ground is not a mesh: `raycast` never meets it (player/collider.js
 // surfaceHit's own note). Indoors and underground the sampler answers -Infinity, and the floors are meshes.
-// AUDIT TECH1 (2026-10-10) wrote the march for the techniques' looks (combat/techniques.js); AUDIT GROUND-BOLT
+// AUDIT TECH1 wrote the march for the techniques' looks (combat/techniques.js); AUDIT GROUND-BOLT
 // (FIELD BUGS 2026-10-23c) moved it here, a module with no imports, so the cast engine (scenes/hostMagic.js) and a
 // foe's shot (characters/enemy/enemyMotor.js) ask the one march without importing the techniques' whole runner.
 
@@ -46,7 +46,7 @@ export function groundHit(origin, dir, max, collider) {
 /**
  * WHERE A RAY FIRST MEETS THE WORLD, within `max` metres: the nearer of the collider's meshes (`raycast` - a wall, a
  * floor indoors, a building) and the terrain (groundHit), as a distance along the unit `dir`; Infinity when it meets
- * neither. AUDIT TECH1 (2026-10-10): every look a technique casts reads this - a mesh ray alone never met the outdoor
+ * neither. AUDIT TECH1: every look a technique casts reads this - a mesh ray alone never met the outdoor
  * ground, so every Volley and every ground leap outdoors answered "Out of reach".
  * @param {ArrayLike<number>} origin @param {ArrayLike<number>} dir @param {number} max @param {any} collider
  */

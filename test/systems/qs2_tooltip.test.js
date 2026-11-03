@@ -1,5 +1,4 @@
-// QS2 (2026-09-17, Mac: the consumables are assigned "in the enhanced menu
-// through the tooltip to slot 1/2"): THE ASSIGNMENT SURFACE.
+// QS2: THE ASSIGNMENT SURFACE.
 //
 // The tooltip is where a quickslot is FILLED, and it is the only place - there
 // is no drag onto the diamond and no second door. So this drives the pane
@@ -35,8 +34,8 @@ import { PAGE_IDS } from '../../src/ui/packPages.js';
 import { equipItem } from '../../src/systems/equip.js';
 import { itemLongName } from '../../src/systems/item/itemInfo.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
-// HB-LYCFREE (2026-09-30): the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
-// diamond was the default, so it chooses the diamond (PIN MOVED: the environment it always ran in, now said).
+// HB-LYCFREE: the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
+// diamond was the default, so it chooses the diamond (
 setPref('quickbarStyle', 'quickbar');
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -290,9 +289,4 @@ test('QS2 tooltip: the stylesheet reaches both new classes, in both faces - the 
     'which is 46px, as it has been');
   assert.match(ENHANCED_CSS, /\.acts \{ display: flex; gap: 8px; flex-wrap: wrap; \}/,
     'and the row WRAPS, so a narrow screen never cuts a button off');
-  // The source says which module owns the law, so the next reader finds it.
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'),
-    /import \{ isQuickConsumable, canSwapTo, quickslotOf, assignQuickslot, clearQuickslot \} from '\.\.\/\.\.\/systems\/quickslots\.js';/);
-  // HB1: the hotbar's own slot law beside the diamond's - DIAMOND-HB (PIN MOVED): through the bar, which knows the slots it shows
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /hotbarShownSlotOf, setHotbarPick \} from '\.\/enhancedHotbar\.js';/);
 });

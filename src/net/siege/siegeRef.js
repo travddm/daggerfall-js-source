@@ -1,8 +1,7 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// PVP-REF (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and
-// do sieges"; "Continue") - THE REFEREED BLOW AND STEP
-// (bible/11-Multiplayer/Seats-Arc.md 6.1).
+// PVP-REF - THE REFEREED BLOW AND STEP
+// (6.1).
 //
 // FACT: no server sees a blow between players today - a duel's blow is
 // the defender's to judge, on its own machine (DUEL1). A siege cannot be
@@ -70,7 +69,7 @@ export const SIEGE_BLOWS_HZ = 4;
  *  its own (DECIDED here: 6.1 clamped a heal's size and named no rate, and at the frame gate's 8 a second an unbounded heal
  *  is 320 a second - a fighter nobody can fell; the referee has no unbounded verb). */
 export const SIEGE_CASTS = Object.freeze({ max: 3, windowMs: 5000, damageMax: 60, healMax: 40 });
-/** BAL8 (bible/05-Combat/Balance-Arc.md section 14): ONE CEILING FOR EVERY STRIKER. INT10 bounded a caster at 3 casts of
+/** BAL8: ONE CEILING FOR EVERY STRIKER. INT10 bounded a caster at 3 casts of
  *  60 in 5 s - 180, 36 a second - and a striker with a blade or a bare hand at nothing past 4 blows a second and one blow's
  *  bucket, which no measured blow came near (the highest of 40,000 was 54): a kitted monk's 45.8 a second felled a
  *  fighter in 8.3 s, where the mage's ceiling takes 10.6. Every harm a fighter deals - blows and casts together, so a
@@ -95,23 +94,18 @@ export const SIEGE_FIGHTERS_MAX = 48;
 
 // ─── THE BUCKET (6.1: "DFU's own damage range for that weapon at that material, doubled for a critical") ───
 
-/** DFU's weapon templates (characters/weapons.js WEAPONS), and the port's own Thunderlock (its 7-26 span). */
+/** DFU's weapon templates (characters/weapons.js WEAPONS). */
 export const SIEGE_WEAPONS = Object.freeze({
   Dagger: 113, Tanto: 114, Staff: 115, Shortsword: 116, Wakazashi: 117, Broadsword: 118, Saber: 119, Longsword: 120,
   Katana: 121, Claymore: 122, Dai_Katana: 123, Mace: 124, Flail: 125, Warhammer: 126, Battle_Axe: 127, War_Axe: 128,
   Short_Bow: 129, Long_Bow: 130,
 });
 /** FormulaHelper.CalculateWeaponMaxDamage, by template (characters/weapons.js MAX_DAMAGE, pinned equal) - the bows one
- *  higher, BAL-ARCHERY's (bible/05-Combat/Balance-Arc.md section 18). */
+ *  higher, BAL-ARCHERY's. */
 export const SIEGE_WEAPON_MAX = Object.freeze({
   113: 6, 114: 8, 115: 8, 116: 8, 117: 10, 118: 12, 119: 12, 120: 16, 121: 16, 122: 18, 123: 21, 124: 12, 125: 14,
   126: 18, 127: 12, 128: 16, 129: 17, 130: 19,   // BAL-ARCHERY: the bows' tops one past FormulaHelper's
 });
-/** The Thunderlock's template and span (characters/thunderlockIds.js, weapons.js THUNDERLOCK_SPAN - pinned equal). */
-export const SIEGE_THUNDERLOCK = Object.freeze({ template: 560, max: 26 });
-/** PISTOLET: the Dwarven Pistolet's template and span (characters/thunderlockIds.js PISTOLET_SPAN - pinned equal). A gun's
- *  blow is a shot, as the Thunderlock's is (siegeIsBow). */
-export const SIEGE_PISTOLET = Object.freeze({ template: 562, max: 15 });
 /** DaggerfallUnityItem.GetWeaponMaterialModifier by material, Iron to Daedric (characters/weapons.js, pinned equal). */
 export const SIEGE_MATERIAL_MOD = Object.freeze([-1, 0, 0, 1, 2, 3, 3, 4, 5, 6]);
 /** Hand-to-hand's most at the skill's top (combat/formulas.js handToHandMaxDamage(100), pinned equal). */
@@ -140,18 +134,18 @@ export function siegeBlowMax(w, m, wa = null) {
   return Math.max(0, (armsOk(wa) ? Math.min(reach, wa[0]) : reach) + SIEGE_BONUS_MAX) * SIEGE_CRIT_MAX;
 }
 
-// ─── INT7: THE ARMS SIGNED (bible/06-Systems/Integrity-Arc.md, lane 2) ───
+// ─── INT7: THE ARMS SIGNED (, lane 2) ───
 
-/** A weapon's REACH: its top (SIEGE_WEAPON_MAX, the Thunderlock's span) plus its material's modifier (Iron's -1 to
+/** A weapon's REACH: its top (SIEGE_WEAPON_MAX) plus its material's modifier (Iron's -1 to
  *  Daedric's 6) - the one number both referees' caps grow with (arenaLaw.js arenaBlowCap's table is this one, pinned
  *  equal). Null for a template neither names. */
 export function armsTop(w, m) {
-  const top = w === SIEGE_THUNDERLOCK.template ? SIEGE_THUNDERLOCK.max : w === SIEGE_PISTOLET.template ? SIEGE_PISTOLET.max : SIEGE_WEAPON_MAX[/** @type {any} */ (w)];
+  const top = SIEGE_WEAPON_MAX[/** @type {any} */ (w)];
   if (!top) return null;
   return top + (Number.isInteger(m) && m >= 0 && m < SIEGE_MATERIAL_MOD.length ? SIEGE_MATERIAL_MOD[m] : 0);
 }
-/** The most reach a weapon has: a Daedric Thunderlock's (26 + 6) - net/identityToken.js TOKEN_ARMS_TOP_MAX, pinned equal. */
-export const ARMS_TOP_MAX = SIEGE_THUNDERLOCK.max + SIEGE_MATERIAL_MOD[SIEGE_MATERIAL_MOD.length - 1];
+/** The most reach a weapon has: a Daedric Dai-Katana's (21 + 6) - net/identityToken.js TOKEN_ARMS_TOP_MAX, pinned equal. */
+export const ARMS_TOP_MAX = Math.max(...Object.values(SIEGE_WEAPON_MAX)) + SIEGE_MATERIAL_MOD[SIEGE_MATERIAL_MOD.length - 1];
 /** A signed arms claim's shape (identityToken.js `wa`): `[reach, bow]` - the reach a whole number 0..ARMS_TOP_MAX (0: no
  *  weapon), the bow 0 or 1. */
 export const armsOk = (wa) => Array.isArray(wa) && wa.length === 2 && Number.isInteger(wa[0]) && wa[0] >= 0 && wa[0] <= ARMS_TOP_MAX && (wa[1] === 0 || wa[1] === 1);
@@ -177,7 +171,7 @@ export function armsOf(items, lawful) {
   return [reach, bow];
 }
 /** Whether a template is a bow (its blow a shaft's). */
-export const siegeIsBow = (w) => w === SIEGE_WEAPONS.Short_Bow || w === SIEGE_WEAPONS.Long_Bow || w === SIEGE_THUNDERLOCK.template || w === SIEGE_PISTOLET.template;
+export const siegeIsBow = (w) => w === SIEGE_WEAPONS.Short_Bow || w === SIEGE_WEAPONS.Long_Bow;
 /** AUDIT-SEATS R8: THE HANDS - the look's two slots a weapon is wielded from (DFU's EquipSlots RightHand 19 and LeftHand
  *  21: characters/paperdoll/paperdoll.js EQUIP_SLOTS, pinned equal - this leaf imports nothing; net/remotePlayers.js composeLook
  *  writes each item's `equipSlot` off the equip table's own index). */
@@ -267,23 +261,26 @@ export function refereeCast(by, to, { from = null, at = null, d = 0, heal = fals
     by.heals = (by.heals ?? []).filter((t) => now - t < SIEGE_CASTS.windowMs);
     if (by.heals.length >= SIEGE_CASTS.max) return { ok: false, dealt: 0, fell: false, why: 'rate' };
     by.heals.push(now);
-    const got = Math.min(want, SIEGE_CASTS.healMax, to.max - to.hp);
+    const room = magickaRoom(by, now), wanted = Math.min(want, SIEGE_CASTS.healMax, to.max - to.hp), got = Math.min(wanted, room);
+    spendMagicka(by, got, now);
     to.hp += got;
-    return { ok: true, dealt: -got, fell: false, why: null };
+    return { ok: true, dealt: -got, fell: false, why: null, dry: room < wanted };
   }
   if (by === to) return { ok: false, dealt: 0, fell: false, why: 'no-fighter' };
   by.casts = by.casts.filter((t) => now - t < SIEGE_CASTS.windowMs);
   if (by.casts.length >= SIEGE_CASTS.max) return { ok: false, dealt: 0, fell: false, why: 'rate' };
   by.casts.push(now);
   if (now < to.safeTo) return { ok: false, dealt: 0, fell: false, why: 'protected' };
-  const got = Math.min(want, SIEGE_CASTS.damageMax, to.hp, harmRoom(by, now));   // BAL8: the blows' and the casts' one ceiling
+  const room = magickaRoom(by, now), wanted = Math.min(want, SIEGE_CASTS.damageMax, to.hp, harmRoom(by, now));   // BAL8: the blows' and the casts' one ceiling
+  const got = Math.min(wanted, room);   // and the magicka pool's
+  spendMagicka(by, got, now);
   spendHarm(by, now, got);
   by.clipped += want - got;
   by.dealt += got;
   to.hp -= got;
   const fell = to.hp <= 0;
   if (fell) to.down = true;
-  return { ok: true, dealt: got, fell, why: null };
+  return { ok: true, dealt: got, fell, why: null, dry: room < wanted };
 }
 
 /** AUDIT-SEATS R2: the longest a step's allowance runs - a second's run and the slack, however long the silence before. */
@@ -326,8 +323,7 @@ export function siegeRise(f, now) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and
-// do sieges"; "Continue") - THE BATTLEFIELD (Seats-Arc 6.2, 6.5, 6.7, 6.8):
+// SEAT2a - THE BATTLEFIELD (Seats-Arc 6.2, 6.5, 6.7, 6.8):
 // the banners and the Throne, the clock, the no-shows, the result and who
 // earned Honours. Pure, as the referee above: every `now` an argument.
 // ═════════════════════════════════════════════════════════════════════
@@ -391,27 +387,8 @@ const flat = (p, q) => Math.hypot((p.x - q[0]) / SIEGE_UNITS_PER_M, (p.z - q[1])
 /** AUDIT-SEATS R1: how far above or below THE FIELD'S GROUND a fighter may stand and still stand at a point, metres - the
  *  banner's own 8 m, so a point is a sphere about its ground, never a column to the sky. */
 export const SIEGE_HEIGHT_M = 8;
-/**
- * AUDIT-SEATS R1: THE FIELD'S GROUND - the middle height (the median; two middles, their mean) of the sided fighters
- * standing in the room (`fighters` as battleStep takes them), in the room's units, or null with none.
- *
- * DECIDED here: the pass's points are `[x, z]` alone (net/identityToken.js's field - the service signs no height, and
- * the relay holds no ground), and presence was judged flat - a fighter 2,000 m over a banner stood at it, contesting it
- * for ever where no blow reached (a lone floater took two banners and the Throne). A seat town's ground is level (DFU
- * flattens a location's terrain - the camps and points all stand in or at its edge), and the fighters standing on it are
- * the room's honest many, so their middle height is the ground: a floater or a sinker more than SIEGE_HEIGHT_M off it
- * stands at no point. Its limit, recorded: a whole side lying together moves the middle by half - then nobody stands at
- * any point, and a siege's banners keep the holder's (a Tourney's whoever held them). The cure is a height in the
- * field's points, the service's to sign (SEAT2b's to ask).
- */
-export function siegeGround(fighters) {
-  const ys = [];
-  for (const f of fighters) if (!f.down && f.pose && f.here && (f.side === 'attack' || f.side === 'defend') && Number.isFinite(f.pose.y)) ys.push(f.pose.y);
-  if (!ys.length) return null;
-  ys.sort((p, q) => p - q);
-  const h = ys.length >> 1;
-  return ys.length % 2 ? ys[h] : (ys[h - 1] + ys[h]) / 2;
-}
+export { siegeGround, anchoredGround, SIEGE_MAGICKA, SIEGE_GROUND_DRIFT_UNITS } from './siegeCaps.js';   // the ground the clients' heights give, held near its first; the casts' magicka
+import { magickaRoom, spendMagicka, anchoredGround, siegeGround } from './siegeCaps.js';
 /** AUDIT SEATS-3 B1: how far `p` stands above or below the field's `ground` (both in the room's units), metres - 0 where
  *  either is unknown (no ground judges no height). */
 export const siegeOffGround = (ground, p) => (ground == null || !Number.isFinite(ground) || !Number.isFinite(p?.y) ? 0 : Math.abs(p.y - ground) / SIEGE_UNITS_PER_M);
@@ -448,8 +425,7 @@ function presentAt(fighters, point, ground = null) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up
-// 482") - THE WORKS IN BATTLE (Seats-Arc 6.2, 7.5): the Walls' faster
+// SEAT2b part two (b) - THE WORKS IN BATTLE (Seats-Arc 6.2, 7.5): the Walls' faster
 // wave, the Gatehouse that bars the Throne, the Rams that batter it. The
 // numbers are net/fortLaw.js's (GATEHOUSE, RAM, WALLS_WAVE_*), COPIED here
 // and pinned EQUAL by test: this leaf imports nothing. The pass carries the
@@ -538,8 +514,9 @@ export function refereeWorkBlow(by, work, { point = null, size = 0, from = null,
   if (!from || flat(from, point) > SIEGE_REACH.melee + SIEGE_REACH.slack + size) return { ok: false, dealt: 0, broke: false, why: 'reach' };
   if (ground != null && Math.abs(from.y - ground) / SIEGE_UNITS_PER_M > SIEGE_HEIGHT_M) return { ok: false, dealt: 0, broke: false, why: 'reach' };
   const want = Math.max(0, Math.trunc(Number(d) || 0));
-  const got = Math.min(want, siegeBlowMax(held.w, held.m, wa));
+  const got = Math.min(want, siegeBlowMax(held.w, held.m, wa), harmRoom(by, now));   // the striker's harm ceiling holds on a work as on a fighter
   if (got <= 0) return { ok: false, dealt: 0, broke: false, why: 'nothing' };
+  spendHarm(by, now, got);
   by.clipped += want - got;
   by.dealt += got;
   const dealt = Math.min(work.hp, Math.max(1, Math.round(got * share)));
@@ -595,8 +572,7 @@ export function siegeBreach(b) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2b part two (c) (2026-10-01, Mac: "Finish the seats"; "Let's pick up
-// 482") - THE RELAY'S OWN FIGHTERS (Seats-Arc 6.1, 7.5, 7.7): the
+// SEAT2b part two (c) - THE RELAY'S OWN FIGHTERS (Seats-Arc 6.1, 7.5, 7.7): the
 // Barracks' town guards fighting for the holder (2, 4, 6 a tier) and a
 // revolt's Rebel Captain and his 12 rebels at the palace door - "the gate's
 // brain with adds" (World-Bosses.md 17: a body the relay owns, walking at
@@ -819,7 +795,7 @@ export function battleStep(b, fighters, nowMs) {
     f.stood = (f.stood ?? 0) + dt;   // Honours' half (6.8): its seconds in the room since the start
     if (f.side === 'attack') b.attackSeen = true; else b.defendSeen = true;
   }
-  const ground = siegeGround(fighters);   // AUDIT-SEATS R1: the field's ground, this beat
+  const ground = anchoredGround(b, siegeGround(fighters));   // AUDIT-SEATS R1: the field's ground, this beat, held near its first
   b.ground = ground;   // SEAT2b part two (b): kept for a blow on a work between beats (refereeWorkBlow)
   // SEAT2b part two (c): the relay's own fighters' beat - and a guard counted where it stands, as a defender is
   npcStep(b, fighters, nowMs, ground, out);
@@ -953,8 +929,7 @@ export function siegeNextBeat(b, now) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue";
-// "Hurry up") - THE ROYAL TOURNEY (Seats-Arc 7.6): "a duel ladder all week
+// CROWN1 part two - THE ROYAL TOURNEY (Seats-Arc 7.6): "a duel ladder all week
 // in the crown's city, at the castle's entrance square: DUEL1's ring, but
 // every blow refereed by PVP-REF in a siege:-shaped room - a
 // defender-resolved duel cannot award a title - the relay keeping the

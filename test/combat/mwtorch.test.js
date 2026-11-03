@@ -1,6 +1,4 @@
-// MW-D51 + MW-D52 (2026-09-16, Mac: "Morrowind model needs a torch to
-// hold when a torch is equipped" / "Morrowind crouch animation is
-// missing").
+// MW-D51 + MW-D52.
 //
 // MW-D51: THE HELD TORCH. Morrowind's torch is a LIGH record with a
 // mesh, carried at the Shield Bone (Slot_CarriedLeft, the shield's own
@@ -273,7 +271,7 @@ test('AUDIT MW-TORCH F6/F7: a build arriving mid-build is queued and runs (the n
   assert.equal(second.queued, true, 'the second is queued behind the first, not refused');
   assert.equal((await first).ok, true);
   await settle(() => arm.builtFor() && arm.builtFor().faceIndex === 2);
-  assert.deepEqual(arm.builtFor(), { race: 'fprace', female: false, faceIndex: 2, werewolf: false, vampire: false }, 'the queued build ran and its identity stands');   // PIN MOVED (PORTRAIT3D): and the curse's face
+  assert.deepEqual(arm.builtFor(), { race: 'fprace', female: false, faceIndex: 2, werewolf: false, vampire: false }, 'the queued build ran and its identity stands');
   assert.equal(arm.ready(), true);
   // F7
   const inFlight = arm.build({ race: 'fprace', faceIndex: 5, deps });
@@ -291,13 +289,11 @@ test('AUDIT MW-TORCH F6/F7: a build arriving mid-build is queued and runs (the n
 test('MW-D51/52 pins: the rig hands the lit light over per frame and at the build; the arm hides the torch on the carried-left rule, overlays it on both rigs, re-picks it on a view switch; the idle reads the stance (mutant: a door dropped)', () => {
   const rig = rd('src/combat/weapon/weaponRig.js');
   assert.match(rig, /torch: isLitTorch\(entity\.lightSource\),/, 'armBuildOptsOf carries the lit light');
-  // PIN MOVED (TWO-HANDS): the weapon handed over is `armItem` (the right hand's item with both hands up), and the hands'
   // mode and the left hand's weapon ride beside it before the light (was: `fpArm.setWeapon(playerWeapon.weapon, ...)`
   // straight above `fpArm.setTorch`)
   assert.match(rig, /fpArm\.setWeapon\(armItem, \{ hasAmmo: hasAmmoFor\(entity\?\.items, armItem\), ammoCount: ammoCountFor\(entity\?\.items, armItem\) \}\);[^\n]*\n\s*fpArm\.setHands\([^\n]*\n(?:\s*const offItem = [^\n]*\n)?\s*fpArm\.setOffWeapon\([^\n]*\n/, 'the hands\' hand-over');
-  // PIN MOVED (TWO-HANDS AUDIT 2): the hands go through their one door (handArm - the enhanced pack asks it too), and the
   // light is handed over beside its call in the frame
-  assert.match(rig, /const \{ armItem, offItem \} = handArm\(\);\n(?:\s*\/\/[^\n]*\n)*\s*fpArm\.setTorch\(isLitTorch\(entity\?\.lightSource\)\);/, 'the per-frame hand-over, beside the weapon');   // PIN MOVED (TWO-HANDS x WEAPON-GLOW1): the left item named once, its blade and its glow
+  assert.match(rig, /const \{ armItem, offItem \} = handArm\(\);\n(?:\s*\/\/[^\n]*\n)*\s*fpArm\.setTorch\(isLitTorch\(entity\?\.lightSource\)\);/, 'the per-frame hand-over, beside the weapon');
   assert.equal(isLitTorch({ templateIndex: TEMPLATES.Torch }), true);
   assert.equal(isLitTorch({ templateIndex: TEMPLATES.Lantern }), false, 'a lantern is the classic lane’s');
   assert.equal(isLitTorch(null), false);

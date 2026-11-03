@@ -1,6 +1,6 @@
 // @ts-check
-// SEAT2b part two (c) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE RELAY'S OWN FIGHTERS ON THIS SCREEN
-// - the Barracks' town guards and a revolt's Rebel Captain and his rebels (bible/11-Multiplayer/Seats-Arc.md 7.5, 7.7)
+// SEAT2b part two (c): THE RELAY'S OWN FIGHTERS ON THIS SCREEN
+// - the Barracks' town guards and a revolt's Rebel Captain and his rebels (7.5, 7.7)
 // where the siege's field says they stand, doing what it says they do: each Daggerfall's own sprite at its own size
 // (a guard the City Watch, the rebels a Rogue, a Barbarian and a Thief by turns, the Captain a Warrior drawn a fifth
 // taller), walking, winding up and landing its blow, flinching, falling. The gate host's driver's way
@@ -151,7 +151,7 @@ export function createSiegeNpcs({ renderer = null, getTexture = null, uploadReco
     /** Their bodies for the town's billboard pass. */
     batches: () => _batches,
     /**
-     * MWNPC10 (bible/04-Characters/Morrowind-NPCs.md section 15b): THEIR MORROWIND BODIES, before the town's billboard pass
+     * MWNPC10: THEIR MORROWIND BODIES, before the town's billboard pass
      * draws theirs - each shown one its look (the watch in its steel, a rebel in its class's, the captain a fifth again a
      * man as his sprite is), walking as it walks, its blow a swing at the relay's each new attack, hurt a recoil, down dead.
      */

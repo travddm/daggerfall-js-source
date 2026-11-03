@@ -1,4 +1,4 @@
-// INSTANCES (2026-10-15, Mac: "You and your party"; bible/11-Multiplayer/Instances.md): THE RELAY'S DOOR, through the
+// INSTANCES: THE RELAY'S DOOR, through the
 // door a player runs through - a real signed token at the real Room's hello (test/fakeRoom.mjs), the hub a real Room over
 // its own fake storage (fakeRooms). An instance room admits its owner, the owner's party (the hub's word, asked by the
 // owner's digest) and nobody else; the hub silent is busy; the party pose carries the member's instance; an instance
@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fakeRoom, fakeRooms } from '../fakeRoom.mjs';
 import { instanceOwnerOf, instanceRoomOf, INSTANCE_KIN_KEEP_MS, INSTANCE_DOOR_WORD } from '../../src/net/instanceRoom.js';
-import { SOCIAL_ROOM, CLOSE_POLICY, CLOSE_BUSY, INSTANCE_TTL_MS, WORLD_TTL_MS, PARTY_OFFLINE_MS, validPartyPose, wdunRoomKey } from '../../src/net/wire.js';
+import { SOCIAL_ROOM, CLOSE_POLICY, CLOSE_BUSY, INSTANCE_TTL_MS, WORLD_TTL_MS, PARTY_OFFLINE_MS, validPartyPose, seaVaultMapId } from '../../src/net/wire.js';
 
 const refusal = (ws) => ws.sent.find((m) => m.t === 'error')?.m ?? null;
 /** The relay's out-of-door work (a re-check's hub ask and its refusal) let run to its end. */
@@ -173,8 +173,8 @@ test('INSTANCES at the relay (the audit): the hub answers by the party AS IT STA
   } finally { Date.now = realNow; }
 });
 
-test('INSTANCES at the relay (the audit): a zone hall keeps no instance - its PvP, its locks and the hub\'s reset are its public room\'s - refused to everyone, staff and owner alike', async () => {
-  const hall = wdunRoomKey('210,99');
+test('INSTANCES at the relay (the audit): a sea vault isle dungeon keeps no instance - its vault is its public room, a private copy would stand outside the gate - refused to everyone, staff and owner alike', async () => {
+  const hall = `dungeon:m${seaVaultMapId(210, 99)}`;
   const key = instanceRoomOf(hall, { owner: await instanceOwnerOf('acct-alice'), epoch: '89abcdef' });
   assert.ok(key, 'the law keys it (the page never asks one)');
   const r = fakeRoom(key);
@@ -196,5 +196,5 @@ test('INSTANCES at the relay (the audit): the hello gate is BY ACCOUNT, after th
   const pub = fakeRoom('dungeon:m187853213');
   for (let i = 0; i < 30; i++) { const junk = pub.connect(); await pub.hello(junk, `junk${i}`, null, { tok: null }); }
   const carol = pub.connect(); await pub.hello(carol, 'carol');
-  assert.equal(refusal(carol), 'busy', 'a public room\'s bucket is the room\'s, as it was');
+  assert.ok(welcomed(carol), 'a public room gate is by account too: junk at the door spends nobody gate');
 });

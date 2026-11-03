@@ -1,6 +1,5 @@
 // @ts-check
-// WB14d (2026-10-19, Mac: "the boss splitting and players having to split and navigate to beat both sides and then merging at
-// the end for its final stand (chance based encounter modifer)"; bible/11-Multiplayer/Breach-Portents.md sections 5 and 6):
+// WB14d:
 // HIS FLAME ON MY SCREEN - the second body of a Sundering night (the relay's `sd`, net/gate/gateLink.js GateSunder), drawn,
 // heard and judged as he is: its blows on my feet (net/gate/gateStrike.js strikeVerdict; its Brand through an arsenal of its
 // own, scenes/gate/gateArsenal.js), their sounds, bursts and burning ground; its sprite (world/gate/gateBoss.js flameLookOf -

@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// INT8 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): A DUEL'S RESULT, SIGNED BY THE RELAY THAT REFEREED IT.
+// INT8: A DUEL'S RESULT, SIGNED BY THE RELAY THAT REFEREED IT.
 //
 //     d1.<base64url({ f, w, n, i, e })>.<base64url(64-byte Ed25519 signature)>
 //         f the two duellists' accounts [the challenger's, the challenged's]   w the winner's place in `f` (0 or 1)

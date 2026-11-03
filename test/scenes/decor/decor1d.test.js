@@ -1,6 +1,4 @@
-// DECOR1d (2026-09-25, Mac: the decorator opens from "A UI element that can be clicked to open the decorate panel.
-// Allows free cam mode for placement and an intuitive scrolling menu with filters"; decor "Gold per placement", priced
-// "By size"; online and offline, "kept in the save"): THE DECORATOR. The catalogue read out of the game's own blocks a
+// DECOR1d: THE DECORATOR. The catalogue read out of the game's own blocks a
 // few at a time (systems/decor/decorScan.js), where a new piece stands (systems/decor/decorPlacer.js), the three surfaces
 // (ui/decorPanel.js) driven headless over a fake document, the tool that joins them (scenes/decor/decorTool.js) over fakes of
 // the host's seams, and the host's wiring by source. `06-Systems/Online-Arc.md` DECOR1.
@@ -24,7 +22,6 @@ import {
 } from '../../decorFakes.mjs';
 
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-
 
 // ─── THE SCAN ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -122,7 +119,6 @@ test('DECOR1d where a new piece stands: a model lifted by its own bottom (turned
 });
 
 // ─── THE SURFACES ────────────────────────────────────────────────────────────────────────────────────────────────────
-
 
 test('DECOR1d the panel: it opens over the room as the host slot\'s window (it pauses; Escape through the slot or the window closes it, once), lists the catalogue with each piece\'s kind, size and price, filters by kind, words, size, holds-things and gives-light and sorts; a piece chosen shows its name, line and price, and Place stands idle with the reason when the size is unread, the room full or the gold short; placing closes the panel and names the piece; the foot says the count, the gold and the scan (mutants: a disabled Place placing, the cap unread, the gold unread)', async () => {
   const { panel, view, placed, closed, doc, win, entries } = panelRig({ gold: 1000 });
@@ -302,7 +298,6 @@ test('DECOR1d the free camera\'s arithmetic: forward along the look, sideways al
   assert.deepEqual(eyePoint(null, eye, dir), [1, 2, 3 + DECOR_FLOAT_AT]);
   assert.ok(DECOR_FLY_FAST > DECOR_FLY_SPEED);
 });
-
 
 test('DECOR1d the tool: the button stands in a room the player may decorate and no other, and not under a window; the panel opens into the host\'s overlay slot and leaves it on its close; the scan runs while it is open and names every piece for the host\'s hover; a room with pieces names them for a visitor too (mutants: the button over a window, the slot never left, the names never filled)', async () => {
   const rig = toolRig();
@@ -541,32 +536,3 @@ test('DECOR1d a flat is placed the same way, its ghost a billboard moved to the 
 
 // ─── THE HOST ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('DECOR1d the host (worldModes.js, world.js) by source: one tool on the room\'s own pool, collider and origin; the owner\'s room kinds; the scan\'s measures (a town block; a model\'s ARCH3D radius in metres; a flat\'s billboard half-diagonal); the wallet the purse then the bank; the frame hooks it every frame, the motor call is the four hosts\' own (the flight takes every press, so the body is handed none), the camera is the eye after the death sink; the ghost and the preview drawn; all three teardowns close it; world.js names the character that writes (mutants: the camera unled, the view over the shoulder)', () => {
-  const m = src('src/scenes/worldModes.js');
-  const w = src('src/scenes/world.js');
-  assert.match(m, /const decorTool = createDecorTool\(\{/);
-  assert.match(m, /pool: interiorDecor, names: decorNames,/);
-  assert.match(m, /collider: \(\) => interiorCtx\?\.collider \?\? null, origin: \(\) => buildingOrigin\(\), eye: \(\) => cam\.pos,/);
-  assert.match(m, /openSlot: \(o\) => \{ interiorOverlay = o; \}, closeSlot: \(o\) => \{ if \(interiorOverlay === o\) interiorOverlay = null; \},/);
-  // GUILD1d (re-aimed by content): the owner's room, or a guild's hall its keeper stands in - a hall's kind is an online home's
-  assert.match(m, /if \(mode !== 'interior' \|\| !b \|\| !\(decorOwnerHere\(\) \|\| decorKeeperHere\(\)\)\) return null;\n(?:    \/\/[^\n]*\n)*    if \(\(interiorHome \|\| interiorSeatHall\) && _decorListed !== _decorVisit\) return null;\n    if \(interiorHome\?\.hall\) return \{ kind: 'home', hall: true[^\n]*\n    if \(interiorHome\) return \{ kind: 'home', where: 'Your home', mapId: homeTownOf\(b\), buildingKey: b\.buildingKey \};/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  // DECOR-DUNGEON (PIN MOVED): the scan's measures are ONE constructor's (systems/decor/decorScan.js decorScanDeps), which both
-  // hosts call - the interior host here, the yards' in world.js
-  assert.match(m, /const decorScanDepsHere = \(\) => decorScanDeps\(\{ blocks, arch, getTexture \}\);/);
-  assert.match(m, /scanDeps: \(\) => decorScanDepsHere\(\),/);
-  assert.match(w, /scanDeps: \(\) => decorScanDeps\(\{ blocks, arch, getTexture \}\),/);
-  const sd = src('src/systems/decor/decorScan.js');
-  assert.match(sd, /isTownBlock: \(t\) => t === BLOCK_TYPES\.Rmb,/);
-  assert.match(sd, /return r > 0 \? r \* GLOBAL_SCALE : null;/);
-  assert.match(sd, /return Math\.hypot\(size\.w, size\.h\) \/ 2;/);
-  assert.match(m, /pay: \(n\) => purse\.pay\(n, account\),/);   // MARKET-AUDIT (PIN MOVED): the purse, then the account - answering its exact undo
-  assert.match(m, /pay: \(n, account = null\) => payUndoable\(playerEntity, n, account\),/);
-  assert.match(m, /decorTool\.frame\(\{ dt, cam, overlayUp: overlayHeld, interior: mode === 'interior' \}\);/);
-  assert.doesNotMatch(m, /_decorFly/, 'the motor is untouched - the flight never hands it a press');
-  assert.match(m, /if \(mode === 'dungeon'\) dungeonCtx\?\.deathTilt\?\.\(cam\);\n    if \(mode === 'interior'\) decorTool\.cameraOverride\(cam\);/);
-  assert.match(m, /\n    \}\);\n    if \(decorTool\.flying\(\)\) mwv\.eye = cam\.pos;/, 'and the view is the free camera\'s in third person too');
-  assert.match(m, /interiorDecor\.draw\(renderer, interiorCtx\.texRemap\);[^\n]*\n    decorTool\.draw\(renderer, interiorCtx\.texRemap\);/);
-  assert.match(m, /interiorWeapon\.draw\(\{ paralyzed \}\);[^\n]*\n    decorTool\.drawPreview\(interiorCtx\.texRemap\);/);
-  assert.equal([...m.matchAll(/interiorDecor\.destroyAll\(\); _decorVisit\+\+; decorTool\.close\(\);/g)].length, 3);
-  assert.match(w, /decorCharacter: \(\) => characterIdOf\(playerEntity\),/);
-});

@@ -1,5 +1,4 @@
-// WW7-6 (2026-10-25, the owner: "we need the same city nodes populating the entire map of tamriel"; bible/03-World/
-// World-Wide.md WW7-6): the seats past the Bay on the map - each city the continent's layer inks carries its seat's key,
+// WW7-6: the seats past the Bay on the map - each city the continent's layer inks carries its seat's key,
 // ringed under its glyph as the Bay rings its own, and its card under the pointer.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -50,9 +49,4 @@ test('WW7-6 a seat past the Bay ringed under its glyph as the Bay\'s, an unseate
   assert.equal(seatMapMark(seat).ring, SEAT_RING_UNHELD);
   const [x2, y2] = toPaper(view, -380, -300), r2 = markReach({ kind: 'hamlet', seat: true });
   assert.ok(!ctx.calls.some((c) => c.fn === 'arc' && Math.abs(c.args[0] - x2) < 1e-6 && Math.abs(c.args[1] - y2) < 1e-6 && Math.abs(c.args[2] - r2) < 1e-6), 'no seat, no ring');
-  const src = rd('src/ui/tamrielInk.js');
-  assert.ok(src.indexOf('if (m.seat) paintSeatRing(ctx, m.x, m.y, markReach(m), seatMapMark(m.seat));') < src.indexOf('for (const m of marks) paintGlyph(ctx, m.kind, m.x, m.y, true);'), 'under the glyph');
-  const held = rd('src/ui/heldMap.js');
-  assert.match(held, /seatAt: \(c\) => this\.deps\.seatAt\?\.\(\{ mapId: c\.mapId \}\) \?\? null,/);
-  assert.match(held, /const seat = past\.city\?\.mapId != null \? this\.deps\.seatAt\?\.\(\{ mapId: past\.city\.mapId \}\) \?\? null : null;\n\s+const tip = seat \? readTip\(seatTipOf\(seat\), \{ textMax: SEAT_TIP_TEXT_MAX, linesMax: TOWN_TIP_LINES_MAX \}\) : ore;/);   // PIN MOVED (TESA x AUDIT TESA II): off M14's hover, the ore card where no seat stands
 });

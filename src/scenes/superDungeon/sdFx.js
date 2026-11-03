@@ -1,6 +1,5 @@
 // @ts-check
-// SD16 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD16;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE BLOWS SEEN - the Hour's landings, turns and fall
+// SD16: THE BLOWS SEEN - the Hour's landings, turns and fall
 // as bursts of sparks, the camera shaken and the floor lit. The Warden's court throws 12 kinds of burst, shakes the
 // camera under 7 of his landings and lights his (render/gate/gateFx.js, world/gate/gateBoss.js LAND_SHAKE); the Hour threw none.
 //
@@ -17,7 +16,7 @@
 // Read off the fight this page holds, each turn as it happens (a page that comes late takes the fight as it stands - the
 // voice's law, scenes/superDungeon/sdRemnantVoice.js). Not a DFU member. Ledger A (SUPER-DUNGEONS).
 //
-// SD-LOOK S9 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md sections 3 and 8): THE REWIND - where the Hour
+// SD-LOOK S9: THE REWIND - where the Hour
 // casts me back from the Steps' void, a gold burst plays BACKWARDS where I land: its sparks gather up off the stone (and
 // up from under its rim) and converge on me, white-hot as they arrive, its light swelling to them (`SD_FX_REWIND`, a kind
 // of its own beside the blows' - time runs back inside the Hour). No veil, the words as they were (scenes/world.js
@@ -112,7 +111,7 @@ export const SD_HAND_FLASH_OUT = 1.2;
  * (null out of the Hour), `shake(k)` the camera's door, `arrived()` (SD-LOOK S6) told as my feet first stand on the
  * Threshold - the way back's ring turns once - and `ready()` whether the arrival can be seen yet (AUDIT SD V S5: the veil
  * opened - the exhale was spent under it). EG-H3 (EG4): `course` the course whose checkpoints the rewind reads (the Hour's
- * by default - net/eliteGates/egSpanLaw.js courseOf's record).
+ * by default - net/superDungeon/egSpanLaw.js courseOf's record).
  * @param {{ link: any, feet?: () => (number[] | null), shake?: (k: number) => void, arrived?: () => void, ready?: () => boolean, course?: any }} deps
  */
 export function createSdFx({ link, feet = () => null, shake = () => {}, arrived = () => {}, ready = () => true, course = SD_COURSE }) {

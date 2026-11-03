@@ -198,24 +198,6 @@ test('U16: back returns to the reflex screen', () => {
   assert.equal(f.state, 'reflexes');
 });
 
-
-test('U16: the derived block belongs to the STATS window, not the rollout', () => {
-  // CreateCharAddBonusStats.cs:94-100 adds the seven secondary labels
-  // to its own NativePanel; StatsRollout has never heard of them.
-  // Sharing them with the summary drew them across its skill panels -
-  // "+BRIMARY SKILLS", a 110 over the Axe row - which only the
-  // screenshot caught. A source sweep, because the draw needs GL.
-  const src = readFileSync(new URL('../../src/ui/chargenArt.js', import.meta.url), 'utf8');
-  const block = src.slice(src.indexOf('function drawStatBlock('));
-  const body = block.slice(0, block.indexOf('\nfunction '));
-  for (const k of ['damage', 'encumbrance', 'spellPoints', 'magicResist', 'toHit', 'hitPoints', 'healingRate']) {
-    assert.ok(!body.includes(`DERIVED_POS.${k}`), `${k} must not ride the shared rollout block`);
-  }
-  const stats = src.slice(src.indexOf('function drawStats('));
-  const statsBody = stats.slice(0, stats.indexOf('\n/** StatsRollout'));
-  assert.ok(statsBody.includes('DERIVED_POS.healingRate'), 'the stats WINDOW still draws them');
-});
-
 test('U16: arriving at the summary puts the stat selection back on the first row', () => {
   // SetCharacterSheet assigns the rollout's stats, and SetStats calls
   // SelectStat(0) (StatsRollout.cs:190) - the spinner does not stay

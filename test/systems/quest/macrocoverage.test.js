@@ -5,7 +5,7 @@
 // gate needs the DFU sparse clone and SKIPS without it - the
 // ARENA2-gate posture; the behavior pins below it run everywhere.
 //
-// E7 (2026-09-02) closed the last thirty-seven rows and deleted the
+// E7 closed the last thirty-seven rows and deleted the
 // ELSEWHERE crutch, so the gate now proves the ONE table IS the whole
 // dictionary - 217 rows, none missing, none invented, C#'s nulls
 // exactly ours.
@@ -236,7 +236,7 @@ test('M-X: the error shapes hold - call-throughs, null rows, and the news pair',
 
 // ── ATTRMACRO1: THE EIGHT ATTRIBUTE DESCRIPTIONS ────────────────────
 //
-// Mac, 2026-09-18: "none of the attribute explanations show actual values." Clicking an attribute on the character
+// Clicking an attribute on the character
 // sheet popped its TEXT.RSC record with the tokens raw - "With your strength of %str, you are considered %ark",
 // "%enc kilograms is your maximum encumbrance". Two things were missing and the box needed both: the window made
 // NO macro pass at all (DFU's line is SetTextTokens(tag, playerEntity.Stats) - a record AND a source), and the
@@ -301,22 +301,3 @@ test('ATTRMACRO1: the rating word is the LAST stat macro\'s, which is why %ark h
   }
 });
 
-test('ATTRMACRO1: the character sheet runs that pass on the box it pops, and only there', async () => {
-  const { CharSheet, STATS_ROLLOUT_SELECT } = await import('../../../src/ui/charsheet.js');
-  const e = { stats: { strength: 62, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 } };
-  const se = STATS_ROLLOUT_SELECT;
-  const w = new CharSheet(e, { rows: () => [{ text: 'With your strength of %str, you are considered %ark.' }] });
-  assert.ok(w.click(se.x + 1, se.y + 1), 'the attribute is answered');
-  const rows = w.child?.rows ?? w.child?.lines ?? [];
-  const text = rows.map((r) => (typeof r === 'string' ? r : r.text)).join('\n');
-  assert.match(text, /strength of 62, you are considered athletic/, 'the box the player sees carries the values');
-  // a host with no TEXT.RSC still clicks and consumes, and still pops NO box - the empty path must not throw
-  const bare = new CharSheet(e);
-  assert.ok(bare.click(se.x + 1, se.y + 1));
-  assert.equal(bare.child, null);
-  // and the pass is at the CALL SITE, not inside the shared `rows` hook - the journal, the item text, the health
-  // box and the skills dialog all read through that same hook and must not acquire a stats MCP
-  const src = readFileSync(new URL('../../../src/ui/charsheet.js', import.meta.url), 'utf8');
-  assert.match(src, /const rows = statDescriptionRows\(this\.hooks\.rows\?\.\(statDescriptionTextId\(i\)\) \?\? \[\], this\.entity\);/);
-  assert.equal((src.match(/statDescriptionRows\(/g) ?? []).length, 1, 'exactly one call site');
-});

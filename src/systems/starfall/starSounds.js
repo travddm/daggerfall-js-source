@@ -1,6 +1,6 @@
 // @ts-check
-// STAR4 (2026-10-20): THE STARFALL'S SOUNDS - DAGGER.SND's own records, pitched; no new clip (the serpent's law,
-// systems/serpent/serpentSounds.js). Design: bible/11-Multiplayer/Starfall.md section 8. The landing's thunder is the
+// STAR4: THE STARFALL'S SOUNDS - DAGGER.SND's own records, pitched; no new clip (the serpent's law,
+// systems/serpent/serpentSounds.js). Design: The landing's thunder is the
 // storms' own (systems/distantStorms.js thunderOf): a clip by its distance, heard its distance late.
 //
 // A cue with no reach is heard everywhere it is said (the omen's whine, the fall's roar - the sky's); the rest at the

@@ -1,4 +1,4 @@
-// AUDIT RPT1026 C4 (2026-10-27, lane C; bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md, RPT1026-LEDGERLAW STOLEN-SAID):
+// AUDIT RPT1026 C4:
 // A STOLEN PIECE ANOTHER PLAYER OFFERS IN A TRADE SAYS SO. STOLEN-SAID tagged the market's Goods rows and a hired
 // trader's, and left the window two players trade in: a stolen piece the other player held out read like any other,
 // though its theft rides the trade (systems/stolenGoods.js - the counter destroys it at its sale, the court takes it at a

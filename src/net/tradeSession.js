@@ -1,5 +1,5 @@
 // @ts-check
-// TRADE1 (2026-09-21): THE TRADE, AS A STATE MACHINE. Pure - no DOM, no game import: everything the game owns (the pack,
+// TRADE1: THE TRADE, AS A STATE MACHINE. Pure - no DOM, no game import: everything the game owns (the pack,
 // the item law, the socket) is handed in, so test/net/trade_session.test.js drives two of these against each other over a
 // fake wire and pins the law without a browser.
 //
@@ -24,7 +24,7 @@
 //     parties' goods;
 //   - and the goods applied are checked against the offer that was locked: a commit that differs from the offer the
 //     receiver confirmed is a forged trade and is refused.
-// RANGE (2026-09-21): a trade needs the two BODIES within TRADE_RANGE_M (5 m) of each other - metres in the scene, never a
+// RANGE: a trade needs the two BODIES within TRADE_RANGE_M (5 m) of each other - metres in the scene, never a
 // map pixel or a relay room. The host measures (`near`); the session refuses to lock or confirm out of range, and the manager ends a live, still-negotiating trade the frame the
 // peer steps past it (and tells the peer). Once both have confirmed, the exchange is not a range question.
 // The residual failure is a connection dropping in the seconds between the two commits (or under a withdrawn confirm): one
@@ -200,7 +200,7 @@ export class TradeSession {
       wired = this.pack.wire(clean);
       if (!wired) return { ok: false, why: 'That cannot be traded.' };
     } else wired = [];
-    // TRADE-FIT (2026-09-27, the Discord batch): an offer is ONE frame, and a frame over TRADE_FRAME_MAX is never sent
+    // TRADE-FIT: an offer is ONE frame, and a frame over TRADE_FRAME_MAX is never sent
     // (net/online.js sendTrade - the relay would close the socket for it), so the outbox held it until OUTBOX_TTL_MS
     // and the trade ended "timed out" with nobody told why: nine richly enchanted items were enough. Measured here, as
     // the frame the relay will read (the socket's own wrapper around it), and refused in words before anything moves.

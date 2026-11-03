@@ -1,6 +1,5 @@
 // @ts-check
-// BLD (2026-10-26, the owner, having walked the Imperial City: "... no doors/interiors ..."; and "No band aids for any of
-// this"; bible/03-World/Arena-Provinces.md IC-GRAND, BLD) - THE FABRIC'S BUILDINGS ENTERED, as Daggerfall's are.
+// BLD - THE FABRIC'S BUILDINGS ENTERED, as Daggerfall's are.
 //
 // DFU's reference: a city block's building is a SUBRECORD and a BUILDING RECORD of its RMB (RMBLayout: its exterior's
 // models laid at the subrecord's place - a door on a model is that building's door, StaticDoor.recordIndex its record;
@@ -15,7 +14,7 @@
 //     faction (systems/guild/guildFactions.js), a name seed of its own;
 //   - A DONOR: a building of Daggerfall's own blocks of that type (FABRIC_DONORS, read off the freeware: a ground-floor
 //     entrance, its keeper in), the same donor on every client (the record's hash picks it, nearest the building's
-//     footprint in size) - IC-INTERIORS (2026-10-27): its CAST, read from the player's BLOCKS.BSA when the interior is first
+//     footprint in size) - IC-INTERIORS: its CAST, read from the player's BLOCKS.BSA when the interior is first
 //     asked for (its people, its quest, rest and treasure markers, its lights' pictures);
 //   - ITS OWN INTERIOR (IC-INTERIORS, world/interior/fabricInterior.js): laid from Daggerfall's own interior kit to the
 //     building's footprint, its storeys, its kind and its door, its windows where its walls show them, its rooms cut by
@@ -30,7 +29,7 @@
 // The back ranges in the courts (no street reaches them - the walkers' ground is shut there), and a front whose every
 // bay has a way up or a canal before it, keep no door: facades, as before.
 //
-// IC-PROPS (2026-10-27, the owner: "Old daggerfall city layout placements are in imperial city"): the 671 of Daggerfall's
+// IC-PROPS: the 671 of Daggerfall's
 // city blocks the plan laid among the city's own are gone (world/imperialCity.js cellOf), and what they carried that the
 // grand city means to keep is the fabric's now - each district's signature trade among its shops: the Temple District's
 // temples of the Eight (the `temple` donors, each its own god's - the record's faction), Talos Plaza's and the Market's
@@ -483,7 +482,7 @@ function withDonors(block, recs, blocksFile) {
   return block;
 }
 /**
- * QUEST-FABRIC (2026-10-26, the owner: "Let quests use them"; bible/06-Systems/Quest-Arc.md QUEST-FABRIC): A CELL'S
+ * QUEST-FABRIC: A CELL'S
  * BUILDINGS AS A QUEST READS THEM - withFabricBuildings' records, subrecords and donors' interiors over an empty block,
  * without the cell's ground, models, lamps or town-map bytes. A quest's site search reads every block of a town
  * (systems/quest/place.js townBlockGrid); the made block is a cell's whole fabric, some 15 ms, and a temple's remote dart

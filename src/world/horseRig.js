@@ -1,5 +1,5 @@
 // @ts-check
-// COATS3D (bible/06-Systems/Horse-Coats.md, "The 3D horse"): THE 3D HORSE, ITS GL HALF - one per renderer
+// COATS3D (, "The 3D horse"): THE 3D HORSE, ITS GL HALF - one per renderer
 // (`horseRigFor`), shared by every horse the Morrowind lane draws: the player's own under them (player/mwView.js),
 // every other rider's (net/peer/peerBodies.js), and Horse Cart and Cargo's standing, following and pulling horses and the
 // road's teams (scenes/horseCartPool.js).
@@ -162,7 +162,7 @@ export function createHorseRig({ renderer, fetchJson = (u) => fetch(u).then((r) 
    *  where it stands - its feet (the rig's origin on the ground) and its heading (the way it faces, the motor's yaw:
    *  0 down +Z, as every body's). `gallops` false: its rider holds it to a slow ride (HORSE-WALK - horseModel.js
    *  gaitFor); a horse no one rides gallops as its speed says.
-   *  HORSE-VIEW (bible/07-Rendering/Performance-Priority.md): `pose` false steps the gait's clock and places the horse,
+   *  HORSE-VIEW: `pose` false steps the gait's clock and places the horse,
    *  and neither writes its pose nor sends it - it stands in the last pose sent (`stale`) until `pose` catches it up.
    *  The palette is the clock's alone (horseModel.js writeHorsePalette reads the gait and nothing else), so a pose
    *  after skipped frames is the one an every-frame horse shows on that frame. A horse never posed is posed whatever

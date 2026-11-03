@@ -1,8 +1,8 @@
 // @ts-check
-// SD4b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 6): A SUPER DUNGEON'S END -
+// SD4b: A SUPER DUNGEON'S END -
 // THE RIFT AND THE RETURN, stood by the dungeon host (scenes/dungeonContext.js) where world/superDungeon/sdDungeon.js places them.
 //
-//  - THE RIFT: SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 1) - a brass astrolabe stood on its
+//  - THE RIFT: SD-LOOK - a brass astrolabe stood on its
 //    edge, its face square to its hall's long line (world/superDungeon/sdDungeon.js sdRiftFace): the crater, the plinth and its claws
 //    (world/superDungeon/sdRiftModel.js - the one part that casts), the outer gear ticking a tooth forward each second on the
 //    escapement (world/superDungeon/sdLook.js sdTick) on the realm's anchored clock - every screen ticks together - the hour-ring
@@ -20,7 +20,7 @@
 //    jumped, a host held for seconds - never a slow frame, AUDIT SD IV F3) forgets the step.
 //  - THE PRESS: `targets()` stands each in the activation ray (`sdrift:0`, `sdreturn:0`), `hoverName(key)` names it on
 //    the plaque, and `press(key)` hands it to the host as a step does.
-//  - SD10 (2026-10-07): THE WAY HOME in the Shattered Hour (section 11's collapse) - the Return stood alone, later, where
+//  - SD10: THE WAY HOME in the Shattered Hour (section 11's collapse) - the Return stood alone, later, where
 //    the Remnant fell (`standReturn`), under the place's own words (`retTitle`, `retTo` - SD_HOME_TEXT): its step or press
 //    is the host's way out of the Hour to the Hollow's door. AUDIT SD II (L6 F9, F16): PRESSED, NEVER WALKED INTO - it
 //    stands where the Remnant fell, where its spoils land - and it RISES out of the floor (SD_HOME_RISE_MS, the gate's

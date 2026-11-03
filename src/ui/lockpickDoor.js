@@ -1,5 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26; bible/06-Systems/Lockpicking.md section 4): THE LOCK'S DOOR - the one place a host opens a lock's
+// LOCKPICK: THE LOCK'S DOOR - the one place a host opens a lock's
 // window through (THE ONE CONSTRUCTION SEAM), the Broker's door's shape (ui/brokerDoor.js): the window
 // (ui/lockpickWindow.js) in a host of its own, wrapped in the generic overlay shape every host's frame drives, registered
 // with the overlay stack, and handed to the host's slot (townTalk.showOverlay on the street, a building's or a dungeon's

@@ -1,11 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV1 - THE TRAVEL VIEW'S CAMERA, AS LAW (bible/06-Systems/Travel-View.md).
+// TV1 - THE TRAVEL VIEW'S CAMERA, AS LAW.
 //
-// Mac (2026-09-27): "a sort of zoom out to an overworld style that
-// utilizes travel options. Not a large scale zoomout, but something that
-// fits ... Every detail like weather patterns, should be 1:1 in this
-// mode." His call on the height: BELOW THE CLOUDS.
+// His call on the height: BELOW THE CLOUDS.
 //
 // THIS IS A RENDER EYE, NOT A PLAYER. `cam.pos` stays on the traveller's
 // head, because the streaming grid, its vertical re-centre, the weather
@@ -30,8 +27,7 @@ export const TV_HEIGHT_MIN = 150;
 export const TV_HEIGHT_MAX = 450;
 export const TV_HEIGHT_DEFAULT = 260;
 /** The tilt band (radians below the horizon). Past 75 degrees the view is a plan and every standing flat is a
- *  sliver. OW-HORIZON (2026-10-20, the owner: "the overworld map as it stands doesnt allow you to see as far as the eye
- *  can see"): the floor was 30, because under it the horizon took the top of the screen and the grid's edge showed -
+ *  sliver. OW-HORIZON: the floor was 30, because under it the horizon took the top of the screen and the grid's edge showed -
  *  the haze closed 100 m inside the grid. The haze now runs on over the far ring to where its land meets the sky
  *  (scenes/travelHorizon.js), so a drag looks out to the horizon: at 15 (and DFU's 65-degree lens) it stands about
  *  a third of the way down the picture, the traveller still at its centre. */
@@ -47,7 +43,7 @@ export const TV_CLOUD_MARGIN = 60;
 export const TV_HEIGHT_FLOOR = 40;
 /** The eye keeps this clear of the ground under it and of a ridge between it and the traveller. */
 export const TV_GROUND_CLEAR = 25;
-/** OW-BIG (2026-09-28, Mac: "The player sprite needs to appear larger. Like it shouldnt be at the tiny scale"): the
+/** OW-BIG: the
  *  traveller's own sprite under the view is drawn this many times its size - one more for every TV_OWN_GROW_M metres
  *  the eye stands from the feet, so it reads about as tall on the screen at every zoom (a Mount & Blade party's icon,
  *  ~40-50 px at 1080p), never past TV_OWN_GROW_MAX, and 1 near the ground (the rise grows it, the fall shrinks it).

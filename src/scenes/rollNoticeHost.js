@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STANDING-WORDS and SEAT-WORDS (2026-10-16, bible/01-Overview/bugs/Field-Bugs-2026-10-15g.md; Mac, asked what the guild
-// system still left unsaid: "Seat-locked services", "Standing changes shown", "Tutorial + guide words") - WHAT THE
+// STANDING-WORDS and SEAT-WORDS - WHAT THE
 // ROLL'S TRACKER SAYS, as the streaming host wires it (scenes/world.js; the shape is fishHost.js's: the host hands its
 // doors in and spreads what comes back into createRollTracker).
 //

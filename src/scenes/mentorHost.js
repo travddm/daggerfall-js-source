@@ -1,5 +1,5 @@
 // @ts-check
-// MENTOR2 (2026-10-27; bible/06-Systems/Mentor-Mode.md) - MENTOR MODE IN THE STREAMING WORLD. scenes/world.js builds it
+// MENTOR2 - MENTOR MODE IN THE STREAMING WORLD. scenes/world.js builds it
 // once and calls `frame` from its party frame. Each frame it reads the party members whose bodies are drawn in my room
 // (outdoors within MENTOR_NEAR_METRES), steadies them (mentorMode.js createMentorPresence), lays the mentor's and the
 // pupil's profiles on my entity, hands the Firmament its scale and says a start or an end in the chat - once each.

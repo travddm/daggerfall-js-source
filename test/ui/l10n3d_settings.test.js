@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE SETTINGS AND CONTROLS WINDOWS IN THE PLAYER'S LANGUAGE - DFU's own words on them, read
+// L10N3d: THE SETTINGS AND CONTROLS WINDOWS IN THE PLAYER'S LANGUAGE - DFU's own words on them, read
 // through the text core where DFU reads them, each through the port's real function. Pinned, with a French pack's rows
 // laid over English and English checked before French is chosen and after:
 //  - the enum rows DFU words through its tables (DaggerfallAdvancedSettingsWindow's TextSettings lists,

@@ -1,5 +1,4 @@
-// CHAPTERS-ON (2026-10-12, a player on Discord: "The stuff described in the 'The Chapters' update never seems to appear
-// on any noticeboards"; Mac: "Turn them on"; bible/01-Overview/bugs/Field-Bugs-2026-10-12.md). #734's notes told everyone,
+// CHAPTERS-ON. #734's notes told everyone,
 // and production's CHAPTERS_OPEN still read "dev": an ordinary player's witness answered 403 chapters-closed and the
 // board listed no chapter. This stands the service under the toml's OWN vars, so the line itself is what is pinned.
 import { test } from 'node:test';
@@ -22,7 +21,7 @@ test('CHAPTERS-ON: under production\'s own vars a non-developer\'s board carries
   Date.now = () => now * 1000;
   try {
     forgetChapters();
-    const s = await standService(Object.fromEntries(['CHAPTERS_OPEN', 'PROFESSIONS_OPEN', 'MARKS_OPEN', 'DEVELOPER_HANDLES'].map((k) => [k, v(k)])));
+    const s = await standService(Object.fromEntries(['CHAPTERS_OPEN', 'PROFESSIONS_OPEN', 'MARKS_OPEN'].map((k) => [k, v(k)])));
     const raw = s.env.DB._raw;
     const age = (w) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(now - 8 * DAY, w.id);
     for (const h of ['Alice', 'Bob', 'Cara']) {

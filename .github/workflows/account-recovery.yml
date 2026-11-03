@@ -36,7 +36,7 @@ concurrency:
 
 jobs:
   reissue:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     defaults:
       run:
         shell: bash

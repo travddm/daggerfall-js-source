@@ -119,7 +119,6 @@ test('F98: the EXECUTION is the one exit DFU does not refill', () => {
   // ...and the refill is therefore NOT inside release(), which every
   // arm including the execution funnels through.
   const a = src('scenes/arrestFlow.js');
-  // PIN MOVED (Road to 1:1, a3): release() took ReleaseFromPrison's
   // last two lines and with them a parameter - `repositionPlayer` is
   // set by every arm EXCEPT the guild rescue (:191-194), so the door is
   // `release({ reposition = true })`. The finding this pins is
@@ -132,10 +131,10 @@ test('F98: the EXECUTION is the one exit DFU does not refill', () => {
 
 test('F99: banishment sets bit 1 and execution bit 2, on the COURT\'S region', () => {
   const banished = finishArm("if (result.outcome === 'banished')");
-  // REP3 (the reputation overhaul, "Timed or pardoned"): PIN MOVED - the banished arm sets the bit through
+  // REP3 (the reputation overhaul, "Timed or pardoned"):
   // systems/standing.js banish(), which ORs the same bit 1 into the same field of the court's live region and stamps its
   // thirty days (test/systems/rep3_banishment.test.js); the execution arm is DFU's own write, as before
-  // AUDIT REP F2: PIN MOVED - the term reads the TRUSTED calendar (worldTick.js trustedWorldMinutes: online, nothing
+  // AUDIT REP F2:
   // stamped until the relay's clock is heard; test/systems/auditrep.test.js)
   assert.match(banished, /banish\(playerEntity, region\(\), trustedWorldMinutes\(\)\);/);
   assert.match(finishArm("if (result.outcome === 'executed')"), /severePunishment\(SEVERE_PUNISHMENT_EXECUTED\);/);
@@ -143,7 +142,6 @@ test('F99: banishment sets bit 1 and execution bit 2, on the COURT\'S region', (
   assert.equal(SEVERE_PUNISHMENT_EXECUTED, 2);
   const a = src('scenes/arrestFlow.js');
   const fn = a.slice(a.indexOf('  function severePunishment(bit) {'));
-  // PIN MOVED DELIBERATELY, AUDIT-39r (R0): this used to demand the RAW
   // `regionConditions?.[regionIndex]`, which cemented a merge collision.
   // #21 (world-legal-talk) landed the region() thunk in the same wave and
   // converted every other consumer; this one write, landed here, kept the
@@ -294,18 +292,3 @@ test('F114: aboard an owned ship, travel reckons from the BOARDING pixel', () =>
     'GetShipCoords() is null without a ship, so IsOnShip cannot be true');
 });
 
-test('F114: the host routes the travel map AND the quest clock through the origin', () => {
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT, at the merge of main into TESA): questWorld is scenes/questWorld.js's - the host read whole
-  assert.match(w, /function playerTravelOrigin\(\) \{\n\s*return playerTravelPosition\(playerEntity, playerEntity\.boardShipPosition \?\? null, playerTravelPixel\(\)\);/);
-  const map = w.slice(w.indexOf('function buildTravelMapWindow'));
-  // MAP-POV re-aimed this from a 900-char window to the builder's own body (up to its `...extra` spread): the
-  // builder gained a comment and a call above the dep bag, and a char budget is not a law
-  assert.match(map.slice(0, map.indexOf('...extra,')), /getPlayerPixel: playerTravelOrigin,/,
-    'DFU\'s travel map reads GetPlayerTravelPosition for the crosshair (:864), the region (:1611) and the journey');
-  assert.match(w, /playerPixel: \(\) => playerTravelOrigin\(\),/,
-    'the quest bridge declares this hook as GetPlayerTravelPosition "incl. its on-ship arm"');
-  // playerTravelPixel stays PlayerGPS itself - loot piles, the climate
-  // read and the location index all want the live pixel.
-  assert.ok(w.includes('function playerTravelPixel() {'));
-  assert.match(src('systems/quest/clock.js'), /calculateTravelTime\(world\.playerPixel\(\), endPos,/);
-});

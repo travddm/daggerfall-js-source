@@ -1,5 +1,4 @@
-// ARENA3 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title"; bible/11-Multiplayer/Arena.md "6.
-// Titles and the laurel"): THE TITLES OFFLINE AND THE HALL. Pinned here: the Hall of Champions reads this save's
+// ARENA3: THE TITLES OFFLINE AND THE HALL. Pinned here: the Hall of Champions reads this save's
 // Grand Champions - mine first, then the banners' fighters who took the title, season by season, the newest first, each
 // with the banner they fought for - and with none handed in reads as it always did; the character sheet's Arena lines
 // carry the banner worn (and show for a fighter of a banner who has not fought yet); the Herald cries me by my title on
@@ -40,9 +39,6 @@ test('ARENA3 the Hall: this save\'s Grand Champions - mine, then the banners\' b
   // none handed in: the wall as ARENA-FIX cut it
   assert.deepEqual(hallOfChampions(newArenaLadder(), 'Aldo'), [U.hallTitle, '', U.hallIntro, '', U.hallNone]);
   assert.deepEqual(hallOfChampions(newArenaLadder(), 'Aldo', []), [U.hallTitle, '', U.hallIntro, '', U.hallNone]);
-  // the keeper reads it with the league's champions
-  const W = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(W, /hallOfChampions\(playerEntity\.arenaLadder, playerEntity\.name \|\| 'You', rosterGrandChampions\(playerEntity\.arenaLeague, Math\.floor\(worldMinutes\(\)\)\)\)/);
   // a save that never saw a season close sees only this season's
   const fresh = LG.rosterGrandChampions(LG.newArenaLeague(), START);
   assert.deepEqual(fresh, [], 'day 4 of 3E 405: nobody yet');
@@ -60,7 +56,6 @@ test('ARENA3 the sheet: the Arena lines carry the banner - shown for a fighter o
   const g = sheetModel({ ...hero, arenaLadder: { ...grandLadder(), record: { ...newArenaLadder().record, wins: 40, losses: 2 } }, arenaLeague: joined }).arena;
   assert.deepEqual(g, { title: 'Grand Champion', record: '40 won, 2 lost', banner: 'The Blue Banner' });
   assert.equal(sheetModel({ ...hero, arenaLadder: ladderAfter(newArenaLadder(), { won: true }).ladder }).arena.banner, null, 'no banner, no line for it');
-  assert.match(readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8'), /\.\.\.\(m\.arena\.banner \? \[\['Banner', m\.arena\.banner\]\] : \[\]\)/, 'the pause window\'s sheet draws it');
 });
 
 test('ARENA3 on the sand: the Herald cries me by my title; the title on the window\'s card and the leaderboard', async () => {

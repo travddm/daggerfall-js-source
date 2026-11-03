@@ -1,5 +1,4 @@
-// BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" item 32; bible/03-World/Arena-Provinces.md
-// BAY-LEFT-B): HOUSES FOR SALE PAST THE BAY. No house was sold, no deed read and no rank-9 knight's house given in any
+// BAY-LEFT-B: HOUSES FOR SALE PAST THE BAY. No house was sold, no deed read and no rank-9 knight's house given in any
 // Arena town, country place or capital - "until TESA3", when every one answered the clamp's region and a key bought in
 // one would have owned its twin in all of them. The regions are the provinces' now (WW-R), and AUDIT RELEASE R2-9 held a
 // capital's deed to its slice by map id; the law is every place the port made's (systems/banking.js deedHeldIn over
@@ -66,7 +65,6 @@ function currentHousesForSaleOf(dir) {
   const from = W.indexOf('  function currentHousesForSale() {');
   const to = W.indexOf('  /**\n   * H2 - GetHousePrice', from);
   assert.ok(from > 0 && to > from, 'worldModes.js\'s market moved');
-  // PIN MOVED (HOUSES-3): the market leaves the player's own deeds off it (houseOwnedAt, the town buildings' one door)
   const fn = new Function('buildingDirectory', 'isEtherPlaceId', 'housesForSale', 'worldMinutes', 'MINUTES_PER_DAY', 'DAYS_PER_MONTH', 'questBridge', 'houseMeshRadius', 'host', 'houseOwnedAt',
     `${W.slice(from, to)} return currentHousesForSale();`);
   return fn(() => dir, isEtherPlaceId, housesForSale, () => 0, MINUTES_PER_DAY, DAYS_PER_MONTH, null, () => 1, { onlineHomes: null }, () => false);
@@ -125,7 +123,6 @@ test('BAY-LEFT-B HOUSES: the deed\'s readers name the town asking - the building
   assert.match(M, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(playerEntity\.houses \?\? \[\], b\?\.regionIndex \?\? 0, key, homeTownOf\(b\)\);/);
   assert.match(M, /if \(isEtherPlaceId\(dir\.mapId\)\) return \[\];\n\s+return housesForSale\(dir\.buildings, \{/);
   assert.match(W, /return !isEtherPlaceId\(id\) && isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, id\); \},/);
-  // PIN MOVED (HOUSES-3): the bank's resolver over the region's three is banking.js townDeeds
   assert.match(M, /const townHouses = \(\) => townDeeds\(playerEntity\.houses \?\? \[\], bankRegion\(\), buildingDirectory\?\.\(\)\);/);
   assert.match(rd('src/systems/banking.js'), /\.filter\(\(deed\) => deedStands\(deed\) && deedHeldIn\(deed, dir\.mapId\)\)/, 'the bank sells it in its own town');
   // HOME1: the account's deed of a knight's house past the Bay - its region's slot, held to its town's map id

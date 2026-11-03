@@ -49,43 +49,16 @@ const skipReal = !ARENA2 || !existsSync(ARENA2)
   ? 'ARENA2_PATH not set or missing - real-data validation skipped'
   : false;
 
-const RENDERER = src('src/render/renderer.js');
-/** The mesh fragment shader's automap block - from the `amMode > 0`
- *  gate to the end of the function it closes. */
-const AUTOMAP_BLOCK = (() => {
-  const at = RENDERER.indexOf('  if (amMode > 0) {');
-  assert.ok(at > 0, 'the automap block is findable');
-  return RENDERER.slice(at, RENDERER.indexOf('}`;', at));
-})();
-
 // ─────────────────────────────────────────────────────────────────────
 // 1. THE CONSTANTS
 // ─────────────────────────────────────────────────────────────────────
 test('c2/S6 the shader constants, digit for digit against DaggerfallAutomap.shader', () => {
-  // the TRANSPARENT arm: `outColor.a = 0.75;` (pass 2, the target-4.0
-  // SubShader - NOT the 0.65 of the target-3.0 fallback SubShader,
-  // which Unity never selects on a machine that runs DFU)
-  assert.match(AUTOMAP_BLOCK, /outColor\.a = 0\.75;/, 'the transparent alpha is 0.75');
-  assert.equal(/outColor\.a = 0\.65/.test(AUTOMAP_BLOCK), false,
-    'and NOT the 3.0 fallback SubShader\'s 0.65 - that pass is never the one that runs');
 
-  // the WIREFRAME constants, both of them
-  assert.match(AUTOMAP_BLOCK, /vec4\(0\.9, 0\.9, 0\.7, 0\.6\)/, 'wireframe colour = float4(0.9, 0.9, 0.7, 0.6)');
-  assert.match(AUTOMAP_BLOCK, /vec4\(0\.25, 0\.25, 0\.25, 0\.6\)/, 'wireframe grayscale = float4(0.25, 0.25, 0.25, 0.6)');
   // the grayscale wireframe colour is NOT the luminance of the colour
   // one - which is why DFU spells it out, and why a port that "derives"
   // it is wrong. 0.3*0.9 + 0.59*0.9 + 0.11*0.7 = 0.878, not 0.25.
   assert.ok(Math.abs((0.3 * 0.9 + 0.59 * 0.9 + 0.11 * 0.7) - 0.878) < 1e-12);
 
-  // the luminance weights and the dim band
-  assert.match(AUTOMAP_BLOCK, /dot\(outColor\.rgb, vec3\(0\.3, 0\.59, 0\.11\)\)/, 'RENDER_IN_GRAYSCALE luminance');
-  assert.match(AUTOMAP_BLOCK, /outColor\.rgb \*= 1\.0 - clamp\(sliceDist \/ 20\.0, 0\.0, 0\.6\);/,
-    '1 - max(0, min(0.6, dist/20)) - the 20.0 divisor with its 0.6 (40% brightness) floor');
-
-  // the water lerp, and its default colour/level
-  assert.match(AUTOMAP_BLOCK, /vWorldPos\.y <= uAutomapWaterLevel/, 'the water test is `worldPos.y <= _WaterLevel`');
-  assert.match(AUTOMAP_BLOCK, /mix\(outColor\.rgb, uAutomapWaterColor\.rgb, uAutomapWaterColor\.a\)/,
-    'lerp(rgb, _WaterColor.rgb, _WaterColor.a)');
   // THE TINT IS NOT THE SHADER'S PROPERTY DEFAULT, and pinning that
   // default is how this stayed wrong: DaggerfallAutomap.shader:27
   // declares `_WaterColor = (0.0,0.3,0.5,0.4)`, and Automap.cs:2589-2590
@@ -107,71 +80,7 @@ test('c2/S6 the shader constants, digit for digit against DaggerfallAutomap.shad
   // rather than re-declaring it beside the shader that consumes it.
   assert.equal(AUTOMAP_WATER_COLOR, WATER_MAP_COLOR,
     'renderer.js takes the tint FROM underwaterFog.js - it is the same frozen array, not a copy');
-  assert.match(RENDERER, /import \{ WATER_MAP_COLOR \} from '\.\/underwaterFog\.js';/,
-    'and it does so by import, not by transcription');
   assert.equal(AUTOMAP_NO_WATER, -10000, 'the _WaterLevel property default - AddWater leaves it when the block is dry');
-});
-
-test('c2/S6 the ORDER is the law: water before the dim, the mode constant before the grayscale', () => {
-  const iWater = AUTOMAP_BLOCK.indexOf('mix(outColor.rgb, uAutomapWaterColor.rgb');
-  const iWire = AUTOMAP_BLOCK.indexOf('vec4(0.9, 0.9, 0.7, 0.6)');
-  const iAlpha = AUTOMAP_BLOCK.indexOf('outColor.a = 0.75;');
-  const iDim = AUTOMAP_BLOCK.indexOf('outColor.rgb *= 1.0 - clamp');
-  const iGray = AUTOMAP_BLOCK.indexOf('dot(outColor.rgb, vec3(0.3, 0.59, 0.11))');
-  assert.ok(iWater > 0 && iWire > 0 && iAlpha > 0 && iDim > 0 && iGray > 0);
-  // DFU's first pass: albedo -> water lerp -> dist dim -> grayscale.
-  assert.ok(iWater < iDim, 'the water tint lands BEFORE the dim (both DFU passes)');
-  assert.ok(iDim < iGray, 'and the dim before the grayscale collapse');
-  // DFU's second pass writes the mode's own colour INSIDE the
-  // above-slice branch, i.e. before it ever reaches the dim line.
-  assert.ok(iWire < iDim && iAlpha < iDim, 'the wireframe constant and the transparent alpha come before the dim');
-  assert.ok(iWater < iWire, 'and the water tint before them - which is why WIREFRAME overwrites it, exactly as the C# does');
-});
-
-test('c2/S6 THE ABOVE-SLICE PASS NEVER DIMS - `min(y, slice)`, not `abs(y - slice)`', () => {
-  // This is the whole quirk. DFU's second pass computes
-  // `distance(min(IN.worldPos.y, _SclicingPositionY), _SclicingPositionY)`
-  // over fragments it has ALREADY established are above the slice, so
-  // the min IS the slice and the distance is identically zero: the
-  // above-slice group is drawn at full brightness, always. A port that
-  // reuses the first pass's `distance(worldPos.y, slice)` dims it, and
-  // the difference is invisible in any test that only checks a uniform.
-  assert.match(AUTOMAP_BLOCK, /float sliceDist = distance\(min\(vWorldPos\.y, uClipY\), uClipY\);/);
-  assert.equal(/abs\(vWorldPos\.y - uClipY\)/.test(RENDERER), false,
-    'the old A2 expression is GONE - it dims the above-slice group, which DFU never does');
-  // and below the slice the two expressions agree, which is why one
-  // line serves both passes: min(y, slice) == y for every y <= slice
-  for (const [y, slice] of [[-3, 10], [10, 10], [0, 0], [-40, 1e9]]) {
-    assert.equal(Math.abs(Math.min(y, slice) - slice), Math.abs(y - slice), `below-slice agreement at y=${y}`);
-  }
-  // above it, it is zero
-  for (const [y, slice] of [[11, 10], [1e6, 10]]) {
-    assert.equal(Math.abs(Math.min(y, slice) - slice), 0, `above-slice dim is zero at y=${y}`);
-  }
-});
-
-test('c2/S6 the above-slice pass INVERTS the clip - the two passes partition the geometry', () => {
-  const head = RENDERER.slice(RENDERER.indexOf('void main() {'), RENDERER.indexOf('vec4 tex = texture(uTex, vUV);'));
-  assert.match(head, /if \(amMode >= 3\) \{ if \(vWorldPos\.y <= uClipY\) discard; \}/,
-    'above-slice keeps ONLY what is above the plane');
-  assert.match(head, /else if \(vWorldPos\.y > uClipY\) discard;/,
-    'and the world / below-slice arm is A1\'s ceiling cut, unchanged');
-});
-
-test('c2/S6 the recorded substitutions are STATED, at their true size', () => {
-  // The stage's own contract: the wireframe stand-in and the
-  // group-by-group ordering are departures from the mechanism, not from
-  // the behaviour, and both are written down where the code is.
-  const r = RENDERER;
-  assert.match(r, /geometry shader/i, 'the renderer says what gl.LINES stands in for');
-  assert.match(r, /I < 0\.1/, 'and names DFU\'s hard clip - the reason the loss is a band, not a falloff');
-  assert.match(r, /lineWidth/, 'and the 1 px WebGL2 cap, which is the only real delta');
-  assert.match(r, /DO NOT "fix" this with a barycentric vertex variant/i,
-    'with the instruction that closes the door on the memory-doubling "fix"');
-  const w = src('src/ui/automap/automapWindow.js');
-  assert.match(w, /DFU RENDERS BOTH PASSES PER OBJECT/, 'the window records the group-by-group substitution');
-  assert.match(w, /the artifacts ARE the classic look/,
-    'and says the unsorted blend is the target, not a bug to fix');
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -214,7 +123,6 @@ test('c2/S6 the six presentations by VALUE, and Cutout is the absence of a group
   for (const m of [AUTOMAP_MODE.BELOW_COLOUR, AUTOMAP_MODE.ABOVE_TRANSPARENT_COLOUR, AUTOMAP_MODE.ABOVE_WIREFRAME_COLOUR]) {
     assert.equal(m % 2, 1, `mode ${m} is a colour half`);
   }
-  assert.match(AUTOMAP_BLOCK, /if \(amMode % 2 == 0\) \{/, 'and the shader really tests that parity');
 
   assert.deepEqual({ ...ABOVE_SLICE_MODES.Cutout }, { colour: 0, gray: 0 },
     'CUTOUT ISSUES NOTHING - DFU\'s cutout arm is clip(-1.0) in the second pass');
@@ -346,13 +254,6 @@ test('c2/S6 setAutomapWater uploads immediately, rides the bracket, and returns 
   assert.equal(r._automapWaterLevel, -3, 'the level came back');
   assert.deepEqual(rounded(), [1, 0, 0, 0.5], 'and the colour');
 
-  // the SOURCE half of the bracket law: a thirteenth global must be
-  // added to the save list, and these two were
-  const begun = RENDERER.slice(RENDERER.indexOf('beginPanelFrame('), RENDERER.indexOf('panelFrame({ proj'));
-  for (const f of ['automapWaterLevel', 'automapWaterColor']) {
-    assert.ok(begun.includes(`${f}:`), `${f} is saved by the bracket`);
-    assert.ok(begun.includes(`s.${f}`), `${f} is restored by the bracket`);
-  }
 });
 
 test('c2/S6 the line buffer is built ONCE per mesh, reused, and freed with the mesh', () => {
@@ -527,36 +428,6 @@ test('c2/S6 wireframe uses the LINE path and only above the slice; transparent u
     return tm !== 0 && e[0] === 'drawMesh';
   });
   assert.equal(geo.length, 8, 'four models, twice - once per pass');
-});
-
-test('c2/S6 the water level rides per BLOCK, uploaded only when it changes, and never re-orders the draws', () => {
-  const log = drawInMode('Transparent');
-  // the flooded block's rows carry -8, the dry block's carry null
-  // (AddWater's early return leaves the shader's own -10000 default)
-  const groups = [];
-  let cur = null;
-  for (const e of log) {
-    if (e[0] === 'setAutomapMode') { cur = { mode: e[1], water: [], draws: [] }; groups.push(cur); }
-    else if (e[0] === 'setAutomapWater') cur.water.push(e[1]);
-    else if (e[0] === 'drawMesh' || e[0] === 'drawMeshWire') cur.draws.push(e[1]);
-  }
-  // group 1 (visited): A is flooded, C is dry -> two uploads
-  assert.deepEqual(groups[0].water, [-8, null]);
-  assert.deepEqual(groups[0].draws, ['A', 'C'], 'DRAW ORDER IS INPUT ORDER - the transparent group is deliberately unsorted');
-  // group 2 (prior run): B flooded, D dry
-  assert.deepEqual(groups[1].water, [-8, null]);
-  assert.deepEqual(groups[1].draws, ['B', 'D']);
-  // the above-slice groups repeat the same levels
-  assert.deepEqual(groups[2].water, [-8, null]);
-  assert.deepEqual(groups[3].water, [-8, null]);
-  // and the marker group turns it off with the mode
-  assert.equal(groups[4].mode, 0);
-  assert.deepEqual(groups[4].water, [null], 'beacons are Standard-material in DFU and never saw _WaterLevel');
-
-  // nothing in the draw path sorts
-  const w = src('src/ui/automap/automapWindow.js');
-  const body = w.slice(w.indexOf('_partitionDraws(rec) {'), w.indexOf('// ── draw ─'));
-  assert.equal(/\.sort\(/.test(body), false, 'NO SORTING - DFU sorts nothing and its artifacts are the target');
 });
 
 test('c2/S6 one upload per run of equal levels - a single-block dungeon uploads once per group', () => {

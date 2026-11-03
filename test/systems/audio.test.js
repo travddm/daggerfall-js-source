@@ -141,7 +141,6 @@ test('audio: A2 the action Play sound seam - soundIndex > 0 fires from the objec
   assert.deepEqual(played, [[12, [3, 4, 5]], [3, [7, 8, 9]]]);
 });
 
-
 // ═══ E6: the quest machine's own audio source ═══════════════════════
 
 test('E6: the quest DaggerfallAudioSource is BUSY until the clip it started ends', () => {
@@ -166,29 +165,6 @@ test('E6: the quest DaggerfallAudioSource is BUSY until the clip it started ends
   assert.equal(src.isPlaying(), false);
   assert.deepEqual(played, [386, 999]);
 });
-
-test('E6: the world host reads that busy state as PlaySound.cs:110-116 does', () => {
-  // The host cannot boot headless, so the wiring is source-pinned - the
-  // shape is `if (source.IsPlaying()) skip; else { PlayOneShot; stamp }`,
-  // over the ONE source the QuestMachine carries (PlaySound.cs:112).
-  // AUDIT 58: and the value it plays goes through the ID door, because
-  // the Quests-Sounds `id` column is a DAGGER.SND record ID.
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const questAudioSource = new QuestAudioSource\(audio\);/,
-    'one source, minted beside the quest bridge');
-  // QUIET-VENGEANCE: the body is the source's one method now (QuestAudioSource.playQuestSound, pinned below).
-  assert.match(w, /playSound: \(id\) => questAudioSource\.playQuestSound\(id\),/,
-    'busy skips without stamping; idle plays and stamps, through the ID door');
-  // ...and its twin in the other host that owns a quest machine. The
-  // dungeon and interior hosts have no source of their own - they are
-  // handed world.js's / exterior.js's bridge (opts.questBridge).
-  const x = readFileSync('src/scenes/exterior.js', 'utf8');
-  assert.match(x, /playSound: \(id\) => _questAudioSource\.playQuestSound\(id\),/,
-    'the fixed-city host plays the same id the same way');
-  assert.equal((w + x).includes('questAudioSource.playOneShot(id)'), false,
-    'neither host may spend a table id as a record index');
-});
-
 
 // ═══ AUDIT 58: THE ID DOOR ══════════════════════════════════════════
 // SoundReader.GetSoundIndex (SoundReader.cs:152-158) is

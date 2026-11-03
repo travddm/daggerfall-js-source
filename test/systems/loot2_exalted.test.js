@@ -1,6 +1,4 @@
-// LOOT2 - THE ROLL SEEN, AND THE EXALTED (2026-10-01; bible/06-Systems/Loot-Arc.md section 4, Mac: "Do you wanna turn
-// this into an arc and do all of the above?" - "Roll quality and 'Exalted'": show where each affix rolled in its range,
-// and a rare Exalted Legendary with an extra affix at the top of its range). The laws pinned here:
+// LOOT2 - THE ROLL SEEN, AND THE EXALTED. The laws pinned here:
 //   - THE BAND ON THE LINE: a line the ladder ROLLED reads with its band, `+18% damage [10-25]`; a Legendary's record
 //     lines and an Aetheric's carry none (fixed); an Exalted's extra line carries the Legendary band.
 //   - PERFECT: a Rare (never a Magic) whose every line stands at its band's top is a "Perfect Rare" - once its numbers
@@ -66,11 +64,11 @@ test('LOOT2: Perfect - a Rare whose every line is at its band\'s top, once it is
   const m = top(LR.applyRarity(sword(), 'magic', lcg(7)));
   assert.equal(LR.isPerfect(m), false, 'a Magic is never Perfect');
   assert.equal(LR.tierLabel(m), 'Magic');
-  // how rare: over 20,000 seeded Rares, a few at most
+  // how rare: over 20,000 seeded Rares, a few at most. PIN MOVED: B4 rescale narrowed the bands, so Perfect is about one Rare in 400 (50 of 20,000 here) where it was under 1 in 500; the ceiling is 100
   const rolls = lcg(99);
   let n = 0;
   for (let i = 0; i < 20000; i++) { const it = LR.applyRarity(sword(), 'rare', rolls); if (LR.isPerfect(it)) n++; }
-  assert.ok(n < 40, `one Rare in a few thousand or rarer (${n} of 20,000)`);
+  assert.ok(n < 100, `one Rare in a few hundred or rarer (${n} of 20,000)`);
 });
 
 test('LOOT2: exalting a Legendary - one line more, a kind its record does not carry, the top half of the band, once', () => {
@@ -151,7 +149,6 @@ test('LOOT2: the one-in-ten - at the host door, after the piece\'s own draws; ne
 test('LOOT2: last - the gate\'s and a town\'s Legendaries Exalted one in ten, every earlier draw their seed\'s; the Broker never', () => {
   on();
   let gate = 0, gateEx = 0;
-  // PIN MOVED (GILDED2, bible/06-Systems/Gilded.md section 7): the Dragonfire Oath is the gate's very last draw, after the
   // Exalted's - set aside on both sides, as the technique is
   const unGilded = (spoils) => ({ ...spoils, pieces: spoils.pieces.filter((x) => x.tier !== 'gilded') });
   for (let seed = 1; seed <= 4000; seed++) {
@@ -164,7 +161,6 @@ test('LOOT2: last - the gate\'s and a town\'s Legendaries Exalted one in ten, ev
     s.pieces.forEach((p, i) => {
       const q = plain.pieces[i].item;
       assert.equal(p.item.name, q.name, `seed ${seed}: piece ${i}`);
-      // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw, so where
       // an Exalted drew before it the two runs' techniques differ - set aside on both sides; the Exalted's line is the last
       // line before it
       const own = (it) => (it.affixes ?? []).filter((a) => !LR.isTechniqueAffix(a));

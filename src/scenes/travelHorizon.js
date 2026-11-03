@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-HORIZON (2026-10-20, the owner: "the overworld map as it stands doesnt allow you to see as far as the eye can
-// see, this needs to change without impacting performance"; bible/06-Systems/Travel-View.md OW-HORIZON): AS FAR AS
+// OW-HORIZON: AS FAR AS
 // THE EYE CAN SEE, FROM THE AIR.
 //
 // WHY THE VIEW STOPPED SHORT. Three laws, each right for the eye they were made for, met under the Overworld:

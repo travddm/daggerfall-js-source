@@ -1,5 +1,5 @@
 // @ts-check
-// MWBODY1 (2026-09-12, Mac: "knock out the deferred morrowind model"):
+// MWBODY1:
 // THE OTHERS, IN THE MORROWIND BODY. ONLINE1's brief - "if using
 // enhanced, you would see the other person's Morrowind sprite" - was
 // deferred because the rig was read as a singleton. It is not: the
@@ -28,7 +28,7 @@
 // seconds and holds a GPU mesh, so past the cap the rest stand as
 // dolls. Builds run one at a time.
 //
-// AUDIT MWBODY (2026-09-12, the audit before the merge) added the
+// AUDIT MWBODY added the
 // LINGER (a peer leaving the drawable set - out of range, silent, a
 // room change - keeps its body BODY_LINGER_MS before it is released,
 // or a peer flickering at an edge rebuilt its body every flicker and
@@ -39,8 +39,7 @@
 // sprint), and the run bit from the wire in place of a speed guess
 // that sat under every walk.
 //
-// WB9h (2026-09-30, Mac: "Further improve the morrowind model performance
-// as it's unplayable with so many players around"): A CROWD.
+// WB9h: A CROWD.
 // tools/peerCrowdProbe.mjs stood forty players milling round the eye for
 // thirty seconds: 81 bodies BUILT - the first eight, then one torn down
 // and another built every few hundred milliseconds as the nearest eight
@@ -66,7 +65,6 @@
 //     its look and its form - stands in it at once, with no build.
 import { createFpArm } from '../../combat/fpArm.js';
 import { dfWornEquipment } from '../../formats/morrowind/mwItemMap.js';
-import { werewolfSkinOf } from '../../characters/werewolfSkin.js';   // SHADOW-FANG: a peer's wolf in the skin their signed glyphs name
 import { npcHintOf, npcKeyOf, withNpcPicks, npcFaceOf, WARDROBE_BEAST_RACES } from '../../characters/wardrobe.js';   // MWNPC17: an NPC's own garments, head and hair
 import { ownOutfitFor } from '../../characters/ownModels/ownClothingModels.js';   // MW-FOLK1: a townsperson's whole outfit
 import { ARMOR_ENUM } from '../../combat/enemyEquipment.js';
@@ -147,8 +145,7 @@ export const SWAP_MARGIN = 1.25;
 export const BODY_REBUILD_MS = 10000;
 /** A strike the rig refused (an equip in flight, a shot still releasing) is asked again this many frames, then dropped (AUDIT WORLD C3). */
 export const PENDING_FRAMES = 60;
-/** MW-PACE1 (Mac: "Morrowind attack animations don't scale with attack speed/multiple attacks when attack speed is
- *  high"): A PEER'S BLOW, PACED BY ITS OWN GAPS. The wire carries a swing's count and kind, not the sender's Speed - but
+/** MW-PACE1: A PEER'S BLOW, PACED BY ITS OWN GAPS. The wire carries a swing's count and kind, not the sender's Speed - but
  *  a held button keeps swinging (WeaponSwingMode 2), and the sender's machine starts each blow the frame after the last
  *  is done, so the gap between two counts IS the sender's blow. A burst's shortest gap paces its blows (a pause in a
  *  fight only lengthens a gap), its hit two fifths in (the machine's HIT_FRAME_MELEE of MELEE_NUM_FRAMES); a gap past
@@ -167,7 +164,7 @@ export const peerBlow = (pace) => (pace == null ? null
   : { seconds: pace, hitAt: (pace * HIT_FRAME_MELEE) / MELEE_NUM_FRAMES.StrikeDown });
 /** The drawn yaw eases toward the pose's at this rate (a second) - a turn the rig can see every frame, not one that stops between poses. */
 export const YAW_EASE = 12;
-/** PEER-CADENCE (2026-09-22, Mac: "look for ways to improve online performance"): how many frames apart a body's
+/** PEER-CADENCE: how many frames apart a body's
  *  SKIN is re-posed, by its distance from the eye (scene units, metres; the camera that draws it, through its lens -
  *  cadenceD2, HORSE-VIEW's audit) - `[within, every]`, the first row that
  *  holds. The clips advance every frame regardless (the rig's `pose: false`); what waits is poseAssembly, the mesh
@@ -236,7 +233,7 @@ export const cadenceD2 = (at, eye, lens = 1) => ((at[0] - eye[0]) ** 2 + (at[2] 
 /** DISC12: the weapon in the hand the peer USES - the look carries both hands, the pose's `lh` says which one is
  *  drawn (WeaponManager.ApplyWeapon :741-755: the other hand is never on screen). */
 const _stubSlots = new WeakMap();   // MW-CROWD: a look's stand-in's slots, once a look - a look is replaced, never mutated (lookKey's law)
-/** AUDIT HORIZONTAL E1 (bible/04-Characters/Wardrobe.md section 6): WHAT A HAND HOLDS, as its body draws it - the weapon's
+/** AUDIT HORIZONTAL E1: WHAT A HAND HOLDS, as its body draws it - the weapon's
  *  template, metal, hand and the look it wears. A peer re-dressing the weapon in hand (or taking up its twin in another
  *  metal) is a new weapon to the body; the template and the hand alone kept the old one, and its glow went out. */
 export const heldWeaponKey = (/** @type {any} */ it) => (it ? `${it.templateIndex}|${it.material ?? ''}|${it.equipSlot}|${appearanceSig(it)}` : '');
@@ -285,15 +282,15 @@ function wolfLookKey(look) {
 }
 
 /** WEREWOLF1: WHICH BODY A PEER WEARS, as a key - the look's own for a person, unchanged; for a werewolf the wolf, its
- *  race, sex and skin, so a peer who transforms is a different body (built at once, not after BODY_REBUILD_MS) and a
+ *  race and sex, so a peer who transforms is a different body (built at once, not after BODY_REBUILD_MS) and a
  *  wolf refused (no Bloodmoon here) is waited out as a wolf and never as the person. AUDIT E1: NOT the person's look -
  *  the transformation unequips both hands and PROFILE2 says the look again a second later, and a key that read the
  *  equip table tore the standing wolf down and built it again ten seconds on (a second refusal and warning, where it
  *  was refused). */
-export function peerBodyKey(look, shown = null, glyphs = null) {
+export function peerBodyKey(look, shown = null) {
   if (look?.creature) return `crea|${look.creature}${look.flies ? '|flies' : ''}`;   // MWNPC9: a creature is its record - every one of a kind one body, never a person's; AUDIT MW-NPC II K5: one asked to fly another
   if (look?.vampire && !peerIsWolf(shown)) return `vamp|${bodyLookKey(look)}`;   // MWNPC14: a vampire's face is its own body - never a living look's spare
-  return peerIsWolf(shown) ? `wolf|${wolfLookKey(look)}|${werewolfSkinOf(glyphs) ?? ''}` : bodyLookKey(look);   // SHADOW-FANG: and the wolf's skin; MWNPC17: and an NPC's own picks (bodyLookKey) - two people in one outfit are two bodies
+  return peerIsWolf(shown) ? `wolf|${wolfLookKey(look)}` : bodyLookKey(look);   // MWNPC17: and an NPC's own picks (bodyLookKey) - two people in one outfit are two bodies
 }
 
 /** MW-CROWD (FIELD BUGS 2026-10-01 #8): A PERSON'S BODY IS ITS LOOK LESS ITS WEAPONS. The weapon in hand is the arm's
@@ -321,11 +318,10 @@ function bodyLookKey(look) {
 const lookOutfit = (look) => (typeof look?.outfit === 'string' && !WARDROBE_BEAST_RACES.includes(look.race) ? ownOutfitFor(look.outfit) : null);
 export const outfitKeyOf = (look) => { const o = lookOutfit(look); return o ? `|outfit:${o.id}` : ''; };
 
-export function peerBuildOpts(look, shown = null, glyphs = null) {
+export function peerBuildOpts(look, shown = null) {
   if (look?.creature) return { creature: look.creature, reachSweep: false, ...(look.flies ? { flies: true } : {}) };   // MWNPC9: its CREA record (fpArm buildCreatureBody) - nothing worn or held; AUDIT MW-NPC II K5: a flyer's must fly
   const stub = peerStubEntity(look);
   const wolf = peerIsWolf(shown);
-  const skin = wolf ? werewolfSkinOf(glyphs) : null;   // SHADOW-FANG: the glyphs the relay read off the peer's own token
   const npc = wolf ? null : npcHintOf(look);   // MWNPC17: a dressed NPC's seed and rung (characters/wardrobe.js) - a player's look carries none
   const worn = dfWornEquipment(stub.equip.slots, EQUIP_SLOTS, ARMOR_ENUM);
   return {
@@ -337,17 +333,17 @@ export function peerBuildOpts(look, shown = null, glyphs = null) {
     weapon: wolf ? null : stub.equip.slots[shown?.lh ? EQUIP_SLOTS.LeftHand : EQUIP_SLOTS.RightHand] ?? null,
     hasAmmo: false,
     reachSweep: false,   // MWNPC3: a peer is never looked out of - no first-person reach sweep in its build
-    ...(wolf ? { werewolf: true, ...(skin ? { skin } : {}) } : {}),   // WEREWOLF1: Bloodmoon's wolf - its skeleton, head, hair and robe; SHADOW-FANG: its skin
+    ...(wolf ? { werewolf: true } : {}),   // WEREWOLF1: Bloodmoon's wolf - its skeleton, head, hair and robe
     ...(look?.vampire && !wolf ? { vampire: true } : {}),   // MWNPC14: a vampire foe's face (an NPC's look - the wire's never carries it)
     ...(npc ? { npcFace: npcFaceOf(npc) } : {}),   // MWNPC17: its head and hair walked off its seed
   };
 }
 
-/** MW-HEADS2 (the owner: "only the player Britons should recieve the new heads, not npcs"): ANOTHER PLAYER'S BUILD -
+/** MW-HEADS2: ANOTHER PLAYER'S BUILD -
  *  peerBuildOpts, and the port's own heads, as the local player's body wears them (combat/weapon/weaponRig.js
  *  armBuildOptsOf). The peers' PeerBodies takes it (scenes/world.js); the people's lanes take peerBuildOpts, the data's
  *  heads. */
-export const playerBuildOpts = (look, shown = null, glyphs = null) => ({ ...peerBuildOpts(look, shown, glyphs), ownHeads: true });
+export const playerBuildOpts = (look, shown = null) => ({ ...peerBuildOpts(look, shown), ownHeads: true });
 
 /** MW-FOLK1: the worn piece a look's outfit is (mwItemMap.js composeWornArmor's `outfit` kind) - none for a wolf, whose
  *  body is the robe's, nor for an id the table does not hold. */
@@ -515,14 +511,14 @@ export class PeerBodies {
   /** MWNPC10: a body's own scale (the lane's `scaleOf`), 1 without one. */
   _scaleOf(b) { const s = this._cam?.scaleOf ? this._cam.scaleOf(b.id) : 1; return s > 0 ? s : 1; }   // OW-PEERS: a grown body's head, for its name
 
-  /** Why a look has no body - a person's, or (AUDIT E7) a wolf's by the pose and glyphs it is keyed on - or null. */
-  failureOf(look, shown = null, glyphs = null) {
+  /** Why a look has no body - a person's, or (AUDIT E7) a wolf's by the pose it is keyed on - or null. */
+  failureOf(look, shown = null) {
     if (peerIsWolf(shown) && this._wolfRefused) return this._wolfRefused.reason;
-    const f = this._failed.get(peerBodyKey(look, shown, glyphs));
+    const f = this._failed.get(peerBodyKey(look, shown));
     return f ? f.reason : null;
   }
 
-  /** SHADOW-CLOAK: a peer's body's named bones where they stand - { feet, yaw, bones }: the feet and the eased yaw the
+  /** A peer's body's named bones where they stand - { feet, yaw, bones }: the feet and the eased yaw the
    *  body is drawn at and its bones in its own frame (the rig's thirdBones) - or null without a standing body. A body out
    *  of view keeps its last pose, as its skin does. */
   bonesOf(id, names) {
@@ -573,7 +569,7 @@ export class PeerBodies {
     for (const [id, b] of this._bodies) {
       const peer = live.get(id);
       if (!peer) continue;
-      const key = peerBodyKey(peer.look, peer.shown, peer.glyphs);
+      const key = peerBodyKey(peer.look, peer.shown);
       // a new look is a new body (built below) - not oftener than BODY_REBUILD_MS; WEREWOLF1: a new FORM at once - the
       // wolf the moment the peer transforms and the person the moment they turn back, as their own screen shows it
       if (b.key !== key && (!!b.wolf !== peerIsWolf(peer.shown) || now - b.builtAt >= BODY_REBUILD_MS)) {
@@ -615,7 +611,7 @@ export class PeerBodies {
       if (peer.told === false) continue;
       const fw = this._formWait.get(id);   // AUDIT E3
       if (fw != null && now < fw) continue;
-      const fkey = peerBodyKey(peer.look, peer.shown, peer.glyphs);   // WEREWOLF1: a wolf refused is waited out as a wolf
+      const fkey = peerBodyKey(peer.look, peer.shown);   // WEREWOLF1: a wolf refused is waited out as a wolf
       const f = this._failed.get(fkey);
       if (f) { if (now < f.until) continue; this._failed.delete(fkey); }
       const p = toScene(peer.shown);
@@ -628,7 +624,7 @@ export class PeerBodies {
     }
     want.length = n;
     if (this._wantSince.size) for (const [id, s] of this._wantSince) if (s.frame !== this._frame) this._wantSince.delete(id);   // WB9h: one that stopped wanting starts again
-    // AUDIT PARTY8 (2026-09-23): A PARTY MATE BEFORE A STRANGER. The rigs were nearest-first alone, so with seven
+    // AUDIT PARTY8: A PARTY MATE BEFORE A STRANGER. The rigs were nearest-first alone, so with seven
     // companions and one stranger nearer than the farthest of them, the stranger took the eighth body and a party
     // mate stood as a paper doll. `priority` (the host's own `social.isPartyPeer`) sorts a mate first, and a mate
     // may take a stranger's slot outright; a stranger never takes a mate's.
@@ -642,7 +638,7 @@ export class PeerBodies {
       const spare = this._takeSpare(w.key);   // WB9h: a body given up for this one's, built - no build
       // AUDIT WB9 (bodies F3): the look its key names, read NOW - the queue reaches its build later, and a look changed
       // meanwhile was built under the old key (a spare the next wearer of the old look stood in, in the wrong armour)
-      const look = peer.look, shown = peer.shown, glyphs = peer.glyphs;
+      const look = peer.look, shown = peer.shown;
       const b = { id: peer.id, key: w.key, wolf: peerIsWolf(shown), rig: spare ? spare.rig : this._createRig(), state: spare ? 'ok' : 'building', cam: null, feet: null, yaw: peerBodyYaw(shown), speed: 0, goneAt: null, far: false, d2: w.d2, pri: w.pri, builtAt: now, born: now, byForm: this._flipped.delete(peer.id), swing: null, cast: null, pending: null, held: false, ammo: spare ? spare.ammo : null, weapon: spare ? spare.weapon : null,
         posed: false, phase: this._phase++, bank: 0,   // PEER-CADENCE
         posedAt: 0, rank: 0, inView: true, stale: false, owed: false, peer: null,   // WB9h
@@ -652,7 +648,7 @@ export class PeerBodies {
       b.rig.attach(this.renderer, () => b.cam);
       this._place(b, peer, toScene, dt, near);
       if (!spare) {
-        const build = () => this._build(b, look, shown, glyphs);
+        const build = () => this._build(b, look, shown);
         // MWNPC4: through the page's gate when the host gave one - a peer's body, the family's and an NPC's wait their turn
         // on ONE queue, so two lanes never build at once (a build's synchronous spans - the bind, the skin transfer -
         // were one lane's stutter at a time; two lanes doubled it)
@@ -841,7 +837,7 @@ export class PeerBodies {
     } catch (e) { this._fail(b, `update threw: ${e?.message ?? e}`); }
   }
 
-  /** MAC7 #1 (Mac: "no weapons"): the weapon and the swing, off the wire's own bits - the rig's weapon drawn while
+  /** MAC7 #1: the weapon and the swing, off the wire's own bits - the rig's weapon drawn while
    *  the sender's is (setSheathed, the player's own rig's door), a swing once per count and never the count the body
    *  was born with (a late joiner does not replay an old blow), and release() every frame as weaponRig gives its own
    *  rig - a wind-up that is not held lets go on the next frame.
@@ -875,7 +871,7 @@ export class PeerBodies {
     // when the rig took it (a swap refused mid-swap was never retried, and the wrong nock stood until a rebuild)
     const am = shown.am ? 1 : 0;
     if (b.weapon && b.ammo !== am && (b.rig.upperBodyReady?.() ?? true) && b.rig.setWeapon?.(b.weapon, { hasAmmo: !!am }) !== false) b.ammo = am;
-    // WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): the weapon in their hand glows as its owner's card says (the look's
+    // WEAPON-GLOW1: the weapon in their hand glows as its owner's card says (the look's
     // `glow`, net/wire.js LOOK_GLOW_RE) - off the look NOW (a weapon identified or socketed is a new look, the same
     // template in the same hand), when MY switch shows glows; a gatherer's tool, a wolf's claws and a creature carry none
     const heldNow = hands ? (hands.dual ? hands.right : peerWeaponOf(look, shown)) : null;
@@ -888,7 +884,7 @@ export class PeerBodies {
     b.rig.setOffWeaponGlow?.(offNow && weaponGlowOn() ? glowFromWord(offNow.glow) : null, offNow);
     b.rig.setSpellHand?.(!!hands?.spellHand);   // AUDIT SPELL-HAND L4-2: told before the stance, as the local rig tells its own
     b.rig.readySpell?.(!b.wolf && !!shown.sr);   // WEREWOLF1: a werewolf casts nothing (setWerewolf clears the spell stance)
-    // HT-WAIST-NET (2026-09-24): THE LANTERN AT THE WAIST, off the pose's `hl` - the rig's own door, the local body's
+    // HT-WAIST-NET: THE LANTERN AT THE WAIST, off the pose's `hl` - the rig's own door, the local body's
     // (weaponRig hands the player's the same boolean every frame): the fast path one compare, the first lit binds the
     // lantern at this body's pelvis once, a light arriving mid-build is queued. It swings off this body's own camera
     // (peerCamera's `move` and eased yaw, the walk clip's phase), as the local one swings off the motor's. No held
@@ -961,7 +957,7 @@ export class PeerBodies {
     this._release(b.id);
   }
 
-  async _build(b, look, shown = null, glyphs = null) {
+  async _build(b, look, shown = null) {
     if (this._bodies.get(b.id) !== b) return;   // released before its turn: no parse for a body already gone
     // AUDIT MW-NPC B4 (MWNPC11's NO RIG PAST THE RANGE): an NPC lane's body whose actor fell past the cut while it waited
     // its turn on the one queue is let go unbuilt - it would stand as its sprite (a scene's first frame, a hitch's, cut
@@ -969,7 +965,7 @@ export class PeerBodies {
     if (this._buildInRange && b.far) { this._release(b.id); return; }
     let res = null, reason = 'threw';
     // WEREWOLF1: the form it was keyed on rides the build - a wolf's body is built as the wolf
-    try { const opts = this._buildOpts(look, b.wolf ? { ...shown, wb: 1 } : null, glyphs); b.weapon = opts.weapon ?? null; res = await b.rig.build(opts); } catch (e) { res = null; reason = `threw: ${e?.message ?? e}`; }
+    try { const opts = this._buildOpts(look, b.wolf ? { ...shown, wb: 1 } : null); b.weapon = opts.weapon ?? null; res = await b.rig.build(opts); } catch (e) { res = null; reason = `threw: ${e?.message ?? e}`; }
     if (this._bodies.get(b.id) !== b) { try { b.rig.unload(); } catch { /* gone */ } return; }   // released while building
     if (res && res.ok && b.rig.canThirdPerson() && b.rig.setViewMode('third')) { b.state = 'ok'; b.builtAt = this._now(); this._failed.delete(b.key); return; }
     if (res) reason = res.ok ? 'no third-person body' : `${res.stage}: ${res.error}`;
@@ -1000,8 +996,7 @@ export class PeerBodies {
     return this._drawBodies(canvas, proj, view, eye, false, flashOf);
   }
 
-  /** INVIS-LOOK (2026-09-27, Mac: "Give invisibility the same invisibility we give enemies in enhanced AI. That
-   *  transparent look"): THE CONCEALED BODIES, TRANSLUCENT - ECV1's look, the one a concealed foe's sprite takes (the
+  /** INVIS-LOOK: THE CONCEALED BODIES, TRANSLUCENT - ECV1's look, the one a concealed foe's sprite takes (the
    *  shimmer and ripple, a shade's dark silhouette), through the sprite box's own quad. Blended with no depth write,
    *  so a host calls it AFTER its opaque world (the level, the flats, the foes), and it draws with this frame's camera
    *  - the one `draw` was handed. Nothing before the body pass has drawn this frame: nothing. */

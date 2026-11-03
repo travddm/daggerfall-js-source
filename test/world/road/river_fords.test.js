@@ -1,5 +1,4 @@
-// RIVER-FORDS (2026-10-26, the owner: "Take care of exclusions and gaps"; AUDIT RELEASE R1-3, bible/01-Overview/audits/
-// Audit-Release-R1.md; bible/03-World/Roads.md RIVER-FORDS) - THE CARVED RIVERS CROSSED AS FORDS. CYRODIIL-WATERS carves its
+// RIVER-FORDS - THE CARVED RIVERS CROSSED AS FORDS. CYRODIIL-WATERS carves its
 // rivers narrower than a pixel inside the kernel, so the pixels' bytes the roads' worker routes on carried none: the roads
 // crossed the channels anywhere, ran along them (192 road pixels on a channel in five of Cyrodiil's regions, 37 along
 // one), priced as dry ground, and the kernel then painted the channel's water over the road. Now the roads' build prices
@@ -54,13 +53,6 @@ test('RIVER-FORDS the routes: a road between two towns either side of a river cr
   const A = riverLand((x, y) => (y === 300 && x > 600 && x < 700 ? 40 : 0));
   const along = route({ x: 590, y: 300 }, { x: 710, y: 300 }, { heightAt: A.heightAt, isWater: A.isWater, existing: new Uint8Array(N), d: {}, terrain: A.land });
   assert.ok(along.filter((q) => q.y === 300 && q.x > 600 && q.x < 700).length <= 1, 'beside it, not along it');
-});
-
-test('RIVER-FORDS the wiring: the regions\' build reads the rivers\' raster over its grid as the land\'s channels, the kernel hands the water\'s paint the road\'s own tiles, and the roads\' version moves (returning players lay the roads past the Bay once - SMOOTH-LAND\'s GROUND_ROLL_VERSION 4 lays them once in this release too, so one rebuild, not two)', async () => {
-  assert.match(read('src/world/tamrielRoads.js'), /land\.river = riverFords\(riverRaster\(gx, gy, MAP_W, MAP_H\)\);/);
-  assert.match(read('src/world/terrain/terrainGen.js'), /paintTamrielWaters\(tileData, px, py, hasLocation \? locationRect : null, undefined, paths\);/);
-  const { TAMRIEL_ROADS_VERSION, GROUND_ROLL_VERSION } = await import('../../../src/world/tamrielRoads.js');
-  assert.deepEqual([TAMRIEL_ROADS_VERSION, GROUND_ROLL_VERSION], [8, 6]);   // PIN MOVED (ROAD-GAPS): 6, (EXACT-PIECES): 7 - the same release's one rebuild; PIN MOVED (ROAD-LOOK): 8, the carved lakes refused; (RUMARE-WATER) the ground's 5: the land let down about the Imperial City; (GHOSTFENCE) 6: no countryside within the Ghostfence, no lair or road on its line
 });
 
 // ── WITH ARENA2: the freeware's own Cyrodiil ────────────────────

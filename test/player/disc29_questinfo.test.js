@@ -1,4 +1,4 @@
-// DISC29-H (2026-09-28, Triage on Discord: expelled from the Mages Guild in the middle of its guard quest) - INFO MODE
+// DISC29-H - INFO MODE
 // LOOKS AT A QUEST STAND; IT DOES NOT CLICK IT.
 //
 // What expels is N0B20Y02's own script, faithfully run: a click on the sleeping mage is `_S.04_` (-10, and a shielded

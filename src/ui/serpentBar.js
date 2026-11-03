@@ -1,10 +1,10 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): SETHRAKUL'S BAR - the gate's boss bar
+// SERPENT1: SETHRAKUL'S BAR - the gate's boss bar
 // (ui/gate/gateBossBar.js drawGateBossBar: one readout, one node, updated never rebuilt) in the sea's colours, its model made
 // here from the serpent host's (scenes/serpentHost.js bar). Its name over its epithet, its health with the two phase
 // marks cut in it, the ward while it turns a phase, the attack it winds up named in its colour with a line filling to
 // its landing (and MOVE when it is laid on my ship), its stun, the coil's health while one holds a ship, the ships in
-// its waters, and its sounding's countdown - pulsing in its last minute. Design: bible/11-Multiplayer/Sea-Serpent.md
+// its waters, and its sounding's countdown - pulsing in its last minute. Design:
 // section 9.
 //
 // `serpentBarModel` is pure - the host's bar and the clock in, the gate bar's model out. Not a DFU member. Ledger A

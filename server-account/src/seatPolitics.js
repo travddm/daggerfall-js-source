@@ -1,7 +1,7 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// CROWN2 (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up") -
-// CROWN POLITICS: fealty and Pacts (bible/11-Multiplayer/Seats-Arc.md
+// CROWN2 -
+// CROWN POLITICS: fealty and Pacts (
 // 7.8). The law is townSeatLaw.js's (fealtyKingdom, FEALTY, pactUntil,
 // pledgeBarred); what the Turning makes of them is seatTurning.js's.
 //
@@ -217,7 +217,7 @@ export const SEAT_RED_MAX = 20;
 export async function redOf(db, nowS) {
   return redFrom((await redRead(db, nowS).all()).results);
 }
-/** SEAT-BATCH (2026-10-16): redOf's statement and its answer apart, so the seats' list sends it in one batch. */
+/** SEAT-BATCH: redOf's statement and its answer apart, so the seats' list sends it in one batch. */
 export const redRead = (/** @type {any} */ db, /** @type {number} */ nowS) => db.prepare('SELECT seq, text, at FROM (SELECT seq, text, at FROM town_seat_red WHERE at > ? ORDER BY seq DESC LIMIT ?) ORDER BY seq')
   .bind(nowS - SEAT_RED_S, SEAT_RED_MAX);
 export const redFrom = (/** @type {any[]} */ results = []) => results.map((r) => ({ id: Number(r.seq), text: r.text, at: Number(r.at) }));

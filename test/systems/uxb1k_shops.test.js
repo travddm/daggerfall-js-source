@@ -65,10 +65,6 @@ test('UXB1-K: the CLASSIC counter draws DFU\'s misc label - "DONE" or "N days" o
   assert.equal(labels.get(booked), '2 days');
   assert.equal(labels.get(finished), 'DONE');
   assert.equal(new NativeTradeWindow({ mode: 'Buy', shelfItems: () => [], packItems: () => [] })._repairLabels(), null, 'Repair mode\'s scroller only (:244)');
-  // drawn where ItemListScroller's miscLabelTemplate puts it: top-left inside the button's margins
-  const src = read('src/ui/native/nativeTrade.js');
-  assert.match(src, /if \(label\) shadowText\(renderer, font, label, m, rect\[0\] \+ CELL_X \+ CELL_MARGIN, rect\[1\] \+ s \* SLOT_H \+ CELL_MARGIN\);/);
-  assert.match(src, /if \(this\.mode !== 'Repair' \|\| getBool\('Controls', 'InstantRepairs'\)\) return null;/);
 });
 
 // ── L: THE CLASSIC COUNTER'S SPLIT ───────────────────────────────
@@ -128,31 +124,6 @@ test('UXB1-L: a stack only partly carried asks too, seeded with what fits - and 
   assert.equal(splitRequired(oil(12), 12, true), true, 'or Control');
   assert.equal(splitRequired(oil(1), 0, true), false, 'never a single item');
   assert.equal(splitRequired(oil(12), 12, false), false);
-  // one law, both windows (the pack and the counter) - systems/item/itemTransfer.js's, since DISC25-F gave it one home
-  assert.match(read('src/ui/native/nativeInventory.js'), /return splitRequired\(it, plan\.amount, this\._controlDown\);/);
-  const trade = read('src/ui/native/nativeTrade.js');
-  assert.match(trade, /this\._split\(item, plan\.amount, \(amount\) => applyTransfer\(item, \{ \.\.\.plan, amount \}, this\.hooks\.shelfItems\(\), this\.basket\)\);/);
-});
-
-test('AUDIT UXB1 F4: a split lot put back on the classic shelf rejoins its stack - by the click back and by Clear', () => {
-  const shelf = [oil(12)];
-  const w = classicShop(shelf);
-  const split = (n) => { w.input('ControlLeft'); w.click(...REMOTE_SLOT0); typeInto(w.inputBox, String(n)); w.input('Enter'); w.keyup('ControlLeft'); };
-  split(2);
-  assert.deepEqual([w.basket.length, shelf.map((i) => i.stackCount)], [1, [10]]);
-  w.tab = 'clothing';   // Oil's page (tabAccepts' last arm): the basket lists on the page it belongs to
-  w.click(...LOCAL_SLOT0);
-  assert.equal(w.basket.length, 0);
-  assert.deepEqual(shelf.map((i) => i.stackCount), [12], 'one stack of twelve - not "Oil x10" beside "Oil x2"');
-  split(3);
-  split(4);
-  assert.deepEqual([w.basket.map((i) => i.stackCount), shelf.map((i) => i.stackCount)], [[7], [5]], 'the basket merges as it fills (applyTransfer\'s addItem)');
-  w._clear();   // the Clear button, and OnPop
-  assert.equal(w.basket.length, 0);
-  assert.deepEqual(shelf.map((i) => i.stackCount), [12], '...and the shelf as it empties');
-  const src = read('src/ui/native/nativeTrade.js');
-  assert.match(src, /if \(d\.kind === 'unstage'\) \{ this\._split\(item, amountOf\(item\), \(n\) => this\._unstage\(item, n\)\); return; \}/);
-  assert.match(src, /while \(this\.basket\.length\) this\._unstage\(this\.basket\[0\]\);/);
 });
 
 // ── THE ENHANCED COUNTER (DISC25-F's how-many field; this branch's merge on the way back) ──

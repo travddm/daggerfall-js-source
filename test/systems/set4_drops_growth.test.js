@@ -1,5 +1,4 @@
-// SET4 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md sections 4-5; Mac: sets "come from any source, just
-// like weapons", and "Grow together"): WHERE SET PIECES COME FROM, AND HOW THEY GROW. The win: every door SIGIL1 stamps
+// SET4: WHERE SET PIECES COME FROM, AND HOW THEY GROW. The win: every door SIGIL1 stamps
 // at (lootRarity.js stampWonWeapons) now also rolls a set sigil on every Magic-or-better piece of armour and every shield
 // by SIGIL1's own chance law, one of the four sets of the world at even odds, and a fresh weapon sigil joins a set one
 // time in three - after SIGIL1's own draws, so theirs stay what they were. The drink: every worn set piece drinks the
@@ -58,7 +57,7 @@ const piece = (templateIndex, set, xp = 0) => {
   return it;
 };
 const wear = (e, ...items) => { for (const it of items) { e.items.push(it); equipItem(e, it); } return e; };
-const setWeapon = (set, xp = 0, templateIndex = 120) => { const w = createWeapon(templateIndex, 0); w.rarity = 'rare'; w.sigil = set ? { power: 5, set, party: 1, xp } : { power: 5, party: 1, xp }; return w; };
+const setWeapon = (set, xp = 0, templateIndex = 120) => { const w = createWeapon(templateIndex, 0); w.rarity = 'rare'; w.sigil = set ? { power: 3, set, party: 1, xp } : { power: 3, party: 1, xp }; return w; };
 function fresh() { _resetSigilForTests(); _resetSigilSetsForTests(); setPref('lootRarity', true); }
 const online = (renown) => { setSigilOnline(true); setSigilRenown(renown); };
 
@@ -115,7 +114,7 @@ test('SET4 the stamp: a list won online - every Magic-or-better piece of armour 
   setSigilOnline(true);
   const won = list();
   assert.equal(stampWonWeapons(won, 4, { rolls: () => 0 }), 4, 'the sword, the helm, the shield, the cuirass');
-  assert.deepEqual(won[0].sigil, { power: 3, party: 4, xp: 0, set: 'malacath' }, 'the sword\'s blow, and a set');
+  assert.deepEqual(won[0].sigil, { power: 1, party: 4, xp: 0, set: 'malacath' }, 'the sword\'s blow, and a set');
   for (const i of [1, 2, 3]) assert.deepEqual(won[i].sigil, { set: 'malacath', party: 4, xp: 0 }, `piece ${i}`);
   for (const i of [4, 5, 6, 7, 8]) assert.equal(won[i].sigil, undefined, `piece ${i}: never`);
   assert.deepEqual(won[9].sigil, { set: 'mora', party: 2, xp: 900 }, 'one already marked keeps its own');
@@ -223,7 +222,6 @@ test('SET4 the rise: said ONCE FOR A SET when its own rank - its lowest piece\'s
   assert.equal(sigilRank(a.sigil), 2);
   assert.deepEqual(r, { lines: [], rose: false }, 'a and b rose to Bright, c is still Faint: the set did not rise');
   r = drinkWorn(e, null, XP[1] - 10);
-  // PIN MOVED (SET-CATCHUP, Sigil-Sets.md section 5): a and b stand at Bright, so c drinks three times the XP up to it
   assert.equal(sigilRank(c.sigil), 2);
   assert.deepEqual(r, { lines: ['Your Dagon\'s Brand brightens: Bright.'], rose: true }, 'c caught up to Bright: the set rose with it');
   // the weapon in hand, its own set's line said in its place

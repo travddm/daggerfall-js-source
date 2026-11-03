@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW3 (2026-10-24, bible/03-World/World-Wide.md WW3): THE WORLD'S PORTS - the harbours past the Bay, off the world's
+// WW3: THE WORLD'S PORTS - the harbours past the Bay, off the world's
 // registry (world/worldWide/worldPlaces.js), as every sea system reads a port.
 //
 // The Bay's ports are Travel Options' list and Daggerfall's PortTownAndUnknown byte (systems/travel/travelPorts.js,
@@ -16,8 +16,7 @@
 //    directory's, its pixel id: what the lanes and the living world's sailors always filed a Bay port by) on the Bay, and
 //    the world's key past it, PORT_ID_WORLD on (worldGrid.js worldPixelKey - the grid's north-west keys are small, so they
 //    stand past every masked id, which is 20 bits), so a lane's key and seed are its two ports' and never another's.
-// BAY-LEFT-SEA (2026-10-26, the audit "no system left behind in the Bay" item 30, C5; the owner's call taken: "Every
-// single thing here needs to be addressed. No exceptions."): A PORT PAST THE BAY KEEPS THE NEAREST BAY CROWN'S OFFICE
+// BAY-LEFT-SEA: A PORT PAST THE BAY KEEPS THE NEAREST BAY CROWN'S OFFICE
 // (`crownAt`, the host's - systems/naval/navalShips.js crownOf over the three capitals, the very law a Bay port's crown
 // is read by, and the crown whose colours its navy already flies there, WW7-8/WW7-10), so its harbourmaster's board,
 // contracts, letter of marque and Admiralty carrack stand there (scenes/harbourOffice.js) - and its exchange is that

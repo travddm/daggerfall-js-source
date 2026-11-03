@@ -1,4 +1,4 @@
-// LOAD1 (2026-10-05, Mac: "...and a way to access them in the menu"): THE SCREENSHOTS PANE.
+// LOAD1: THE SCREENSHOTS PANE.
 //
 // The gallery (systems/shotGallery.js) on the menu: every screenshot the PrintScreen key kept, newest first, each with
 // where and when it was taken. A tile's picture opens it large; its switch takes it out of (or back into) the loading

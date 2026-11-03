@@ -1,6 +1,4 @@
-// UI3 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "move buffs/debuffs/etc to their own
-// widget space somewhere on the side of the screen, where it doesn't interact with other UI elements, and use square
-// icons with glyphs for each effect (climates and calories included)") - THE STATUS WIDGET, DRAWN WITH THE REAL
+// UI3 - THE STATUS WIDGET, DRAWN WITH THE REAL
 // ARENA2 AND MEASURED.
 //
 // The REAL HUD (ui/enhanced/enhancedHud.js over the real sheets, the enhanced skin) under a character carrying everything the

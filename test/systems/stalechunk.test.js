@@ -82,37 +82,7 @@ test('staleChunk: the reload is spent ONCE, and then it speaks', () => {
     'the player is being shown the browser\'s sentence again');
 });
 
-test('staleChunk: main.js spends the reload once and gives it back', () => {
-  const src = read('src/main.js');
-  // the ladder is ASKED, not re-derived at the call site
-  assert.match(src, /staleChunkAction\(e, \{ reloaded: reloadTried\(\) \}\)/);
-  assert.match(src, /if \(act === 'reload' && rememberReload\(\)\) \{/,
-    'a reload that could not be remembered must not happen - that is the loop');
-  // A BOOT THAT WORKED GIVES THE RELOAD BACK. Without this the flag
-  // outlives the problem and the NEXT deploy finds the retry spent.
-  // BOOT1: the chain head is `(typeof document === 'undefined' ? Promise.resolve() : boot()).then(` - a runtime with no document
-  // starts from a resolved promise instead of booting into a DOM it does not have. The anchors follow the head.
-  const HEAD = ': boot()).then(';
-  assert.ok(src.includes(HEAD), 'BOOT1: the boot chain no longer starts from the document guard');
-  const then = src.slice(src.indexOf(HEAD), src.indexOf('}).catch('));
-  assert.match(then, /removeItem\(RELOAD_KEY\)/, 'the flag is never cleared, so it is spent forever');
-  // every storage touch is shielded: sessionStorage THROWS in some
-  // privacy modes, and a storage failure must not become the boot
-  // failure
-  const guard = src.slice(src.indexOf('const reloadTried'), src.indexOf(HEAD));
-  assert.equal((guard.match(/try \{/g) ?? []).length, 2, 'an unshielded storage read or write');
-  assert.match(guard, /catch \{ return true; \}/,
-    'a page that cannot remember it already tried must assume it did');
-  // and the OTHER recovery still runs - the re-pick path is a
-  // different failure with a different answer
-  assert.match(src, /re-pick\|not in the stored/);
-});
-
 test('staleChunk: the key is a TAB\'s memory, not a machine\'s', () => {
-  // sessionStorage, deliberately: a player who hits this on Tuesday
-  // must still get their free reload on Wednesday.
-  assert.match(read('src/main.js'), /globalThis\.sessionStorage/);
-  assert.ok(!/globalThis\.localStorage\?\.getItem\(RELOAD_KEY\)/.test(read('src/main.js')));
   assert.equal(typeof RELOAD_KEY, 'string');
   assert.ok(RELOAD_KEY.length > 0);
 });

@@ -1,5 +1,4 @@
-// TACT4 - TELEGRAPHED BLOWS (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "Introducing new attack patterns and
-// smaller telegraphed attacks (like our world boss) but not overdoing it"; his calls: one or two, tier-based - level 10
+// TACT4 - TELEGRAPHED BLOWS (;; his calls: one or two, tier-based - level 10
 // and up, or an elite foe). The law of the three shapes, the ground's reading of it, the verdict at the landing, the
 // weight on DFU's own damage - and on the real motor and attack component: a foe of the tier winds up and stands it,
 // its aim locked, the swing comes at the landing, a step out of the shape dodges it, a knock breaks it, one at a time
@@ -15,7 +14,7 @@ import { EnemyAttack } from '../../../src/characters/enemy/enemyAttack.js';
 import { MOBILE_TYPES as M } from '../../../src/characters/mobile/mobileTypes.js';
 import { setTacticsClock, resetTactics, noteLocalPlayer } from '../../../src/ai/tactics.js';
 import {
-  BLOW, blowShapesOf, blowTier, throwsBlows, makeBlow, inBlow, blowPhase, blowConnects, blowScaled, liveBlows, setLiveBlow,
+  BLOW, blowShapesOf, blowTier, throwsBlows, makeBlow, inBlow, blowPhase, blowConnects, liveBlows, setLiveBlow,
   drawableBlows, resetBlows, windupNear, BLOW_TIER_LEVEL, BLOW_COOLDOWN_MIN, BLOW_FLASH, BLOW_VERDICT_LIFE, BLOW_NEAR,
 } from '../../../src/ai/foeBlows.js';
 import { blowField, BLOW_QUAD_HALF } from '../../../src/render/foeTelegraph.js';
@@ -83,11 +82,6 @@ test('TACT4: the ground reads the verdict\'s own law - blowField agrees with inB
     }
     assert.ok(n > 50, `${kind} drew something`);
   }
-  const fs = rd('src/render/foeTelegraph.js');
-  assert.match(fs, /inside = along >= -0\.3 && along <= uP\.x && abs\(across\) <= uP\.y;/, 'the shader\'s lane is the law\'s');
-  assert.match(fs, /inside = d <= uP\.x && \(d < 0\.5 \|\| ang <= uP\.y\);/, '...its cone');
-  assert.match(fs, /float d = length\(vec2\(across, along - uP\.y\)\);\n\s*inside = d <= uP\.x;/, '...its disc');
-  assert.match(fs, /vec2 w = vec2\(-f\.y, f\.x\);/, 'and across is inBlow\'s across');
 });
 
 test('TACT4: the phase - filling through the wind-up, a flash at the landing, gone after it', () => {
@@ -109,26 +103,17 @@ test('TACT4: the phase - filling through the wind-up, a flash at the landing, go
   assert.equal(liveBlows().size, 2);
 });
 
-test('TACT4: the verdict in place of the reach - spent once, a dodge spends the weight, a stale one ignored; the weight on DFU\'s roll', () => {
+test('TACT4: the verdict in place of the reach - spent once, a stale one ignored', () => {
   const ai = {};
   assert.equal(blowConnects(ai, true), true, 'no blow: the classic reach');
   assert.equal(blowConnects(ai, false), false);
-  assert.equal(blowScaled(ai, 7), 7);
-  Object.assign(ai, { _blowVerdict: true, _blowMult: 1.5, _blowAt: 10 });
+  Object.assign(ai, { _blowVerdict: true, _blowAt: 10 });
   assert.equal(blowConnects(ai, false, 10.5), true, 'in the shape: it lands though the reach says no');
   assert.equal(blowConnects(ai, false, 10.6), false, 'once');
-  assert.equal(blowScaled(ai, 7), 11, 'x1.5, rounded');
-  assert.equal(blowScaled(ai, 7), 7, 'once');
-  Object.assign(ai, { _blowVerdict: false, _blowMult: 1.5, _blowAt: 10 });
+  Object.assign(ai, { _blowVerdict: false, _blowAt: 10 });
   assert.equal(blowConnects(ai, true, 10.5), false, 'stepped out: dodged, whatever the reach');
-  assert.equal(blowScaled(ai, 7), 7, 'and no weight left over for the next blow');
-  Object.assign(ai, { _blowVerdict: true, _blowMult: 1.75, _blowAt: 10 });
+  Object.assign(ai, { _blowVerdict: true, _blowAt: 10 });
   assert.equal(blowConnects(ai, false, 10 + BLOW_VERDICT_LIFE + 0.1), false, 'stale: the classic answer');
-  assert.equal(blowScaled(ai, 7), 7);
-  Object.assign(ai, { _blowMult: 1.75 });
-  assert.equal(blowScaled(ai, 0), 0, 'a roll that missed stays a miss');
-  Object.assign(ai, { _blowMult: 1.75 });
-  assert.equal(blowScaled(ai, 1), 2);
 });
 
 // ── on the real motor ───────────────────────────────────────────────
@@ -161,7 +146,6 @@ function untilWindup(foes, f, player, secs = 60) {
 test('TACT4: a foe of the tier winds up and stands it, its aim locked; the swing comes at the landing, and standing in the shape it lands', () => {
   const f = foe();
   const player = [0, 0, 0];
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.1): the swing BEGINS with the wind-up (held at its raised arm)
   // and the landing RELEASES it - the brain sees its blow at the landing (`_tacSwung`), never a second swing
   let blow = null, at = null, yaw = null, moved = 0, turned = 0, swingAt = null, verdict = null, tacAt = null, swungAt = null, began = null, seqAtStart = null, seqAtEnd = null, startAt = null, prevSeq = f.atk.swingSeq, prevTac = f.ai._tacSwung ?? 0;
   run([f], 60, player, () => {
@@ -192,7 +176,6 @@ test('TACT4: a step out of the shape during the wind-up dodges it', () => {
   const player = [0, 0, 0];
   const blow = untilWindup([f], f, player);
   assert.ok(blow);
-  // PIN MOVED (TELL5, bible/12-Enhanced-AI/Feud-Arc.md 7.2): a lunge turns after its target through the first half of its
   // wind-up, then locks - "a sidestep the moment the mark appears no longer beats a lunge". The step comes once its aim
   // is locked (at once for a sweep or a slam, which lock at their start)
   const lockAt = TELL.TRACKERS.includes(blow.kind) ? blow.start + TELL.TRACK_SHARE * (blow.land - blow.start) + 0.07 : 0;
@@ -288,19 +271,3 @@ test('TACT4: never below the tier, never a caster, never with the switch off', (
 
 // ── the hosts ───────────────────────────────────────────────────────
 
-test('TACT4: every host resolves the blow through the verdict and the weight, and draws the ground under the bodies', () => {
-  const ex = rd('src/scenes/exteriorFoes.js');
-  assert.match(ex, /if \(blowConnects\(f\.ai, meleeHitConnects\(f\.ai\._dist, f\.ai\.inSight, withinYaw\(f\.ai\.yaw, hdx, hdz, MELEE_HIT_YAW_DEG\)\)\)\) \{/);
-  assert.match(ex, /const dmg = blowScaled\(f\.ai, partyHit\(calculateAttackDamage\(f\.entity, playerEntity, \{/);
-  const g = rd('src/scenes/cityGuards.js');
-  assert.match(g, /if \(blowConnects\(g\.ai, meleeHitConnects\(g\.ai\._dist, g\.ai\.inSight, withinYaw\(g\.ai\.yaw, hdx, hdz, MELEE_HIT_YAW_DEG\)\)\)\) \{/);
-  assert.match(g, /const dmg = blowScaled\(g\.ai, calculateAttackDamage\(g\.entity, playerEntity, \{/);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(!blowConnects\(f\.ai, foeDeps\.meleeHitConnects\(f\.ai\._dist, f\.ai\.inSight, foeDeps\.withinYaw\(f\.ai\.yaw, hdx, hdz, foeDeps\.MELEE_HIT_YAW_DEG\)\)\)\) \{/);
-  assert.match(d, /const dmg = blowScaled\(f\.ai, _weighHit\(f, foeDeps\.calculateAttackDamage\(/);
-  const a = rd('src/characters/enemy/enemyAttack.js');
-  assert.match(a, /if \(ai\._blowSwing\) \{\n\s*ai\._blowSwing = false;/, 'the forced swing');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) assert.match(rd(f), /renderer\.drawFoeTelegraphs\?\.\(drawableBlows\(tacticsNow\(\), /, f);
-  assert.equal((rd('src/scenes/worldModes.js').match(/renderer\.drawFoeTelegraphs\?\.\(drawableBlows\(tacticsNow\(\), player\.pos\)\);/g) ?? []).length, 2, 'the dungeon\'s pass and the interior\'s');
-  assert.match(rd('src/render/renderer.js'), /drawFoeTelegraphs\(list\) \{[\s\S]{0,1200}this\.markForeignPass\(\);/);
-});

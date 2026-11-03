@@ -1,4 +1,4 @@
-// BREATHTAKER 2/3 and CYRODIIL-WATERS (2026-10-26, bible/03-World/Tamriel.md; KPbICA's spec, forwarded by the owner):
+// BREATHTAKER 2/3 and CYRODIIL-WATERS:
 // the land past the Bay keeps the heightmap's ranges past the Bay's 7-bit top (continentLift, under LANDFORM_CEILING),
 // wears its zone's own landforms below the heightmap's grain (world/tamriel/tamrielLandforms.js) over a smooth large map
 // (tamrielGround.js tamrielLargeMap), and Cyrodiil's rivers and lakes are carved into it, with the law every other
@@ -38,7 +38,6 @@ test('BREATHTAKER2: the lift goes on past the 7-bit top at CONTINENT_LIFT.gain t
   assert.equal(CONTINENT_LIFT.top, 180 * BASE_HEIGHT_SCALE, 'the relief\'s ceiling byte (TAMRIEL-RELIEF CEILING_BYTE)');
   assert.equal(CONTINENT_CEILING, MAX_TERRAIN_HEIGHT + reliefLift(LOW_TOP) + continentLift(CONTINENT_LIFT.top) + TAMRIEL_TOP);
   assert.ok(CONTINENT_CEILING <= LANDFORM_CEILING, `${CONTINENT_CEILING} under ${LANDFORM_CEILING}`);
-  // PIN MOVED (RELIEF-PEAKS): a byte's height is its node's ground (world/landforms.js nodeGround) - the large map by its
   // law with the small term, held as the kernel holds them, where reliefByteHeight left the large map out
   for (let b = 0; b < 256; b++) {
     const low = b * BASE_HEIGHT_SCALE, held = Math.min(MAX_TERRAIN_HEIGHT, Math.max(low + largeOfByte(b) * NOISE_MAP_SCALE, SCALED_OCEAN_ELEVATION));
@@ -171,7 +170,6 @@ test('BREATHTAKER3: every zone the landforms name is one of tamrielBiomes.js\'s,
   assert.equal(zonePalette({ key: 'skyrimPeaks', climate: 0 }, 0)[FAMILIES.indexOf('ridge')], 1);
 });
 
-// PIN MOVED (RELIEF-PEAKS, test/world/reliefpeaks.test.js): the large map past the Bay is no swell about a mean of 4.5 -
 // a third of the ground's height left out of every range - but WOODS.WLD's own law of the small heightmap, read where the
 // kernel reads each cell (tamrielGround.js largeOfByte, tamrielLargeMap). It stays kept and deterministic here.
 test('BREATHTAKER3: the large map past the Bay is deterministic and kept, and within the law\'s own range', () => {
@@ -182,7 +180,6 @@ test('BREATHTAKER3: the large map past the Bay is deterministic and kept, and wi
   for (let cy = -80; cy < -60; cy++) for (let cx = 1400; cx < 1420; cx++) for (const col of tamrielLargeMap(cx, cy)) for (const v of col) assert.ok(v >= 0 && v <= Math.round(top), `${cx},${cy}: ${v}`);
 });
 
-// PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js): CYRODIIL-SHORES' own smooth shore for Cyrodiil's lakes
 // (tamrielGround.js lakeShores, lakeShoreAt) is folded into the land's one smooth law - every coast past the Bay, a
 // lake's as the sea's, every province's border - and pinned there.
 
@@ -264,13 +261,11 @@ test('CYRODIIL-WATERS with ARENA2: no water reaches a capital - no slice of one,
       assert.ok(d > IMPERIAL.lake, `${r.key}'s valley ${d.toFixed(0)} m from the city's middle, inside its lake (${IMPERIAL.lake} m)`);
     }
   }
-  // PIN MOVED (IC-GRAND, bible/03-World/Arena-Provinces.md IC-GRAND): the span's half its own - 12.5 pixels at twenty-five
   // (TS5's 3.5 at seven), the lake's far shore 10 km (12.2 pixels)
   assert.ok(lakeR < TC.capitalDims(TC.CAPITALS.find((c) => c.key === 'imperial-city')).w / 2, 'the city\'s lake inside its span');
   let n = 0;
   for (const key of AP.arenaPixels().byPixel.keys()) { const [x, y] = key.split(',').map(Number); assert.ok(!touched(x, y), `a place's pixel ${key}`); n++; }
   assert.ok(n > 200, `the places stand (${n})`);
-  // PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js; CYRODIIL-SHORES folded into it): a place's pixel and a
   // capital's (and a pixel round one) stand on the ground's land exactly where the land's smooth law has land; a pixel the
   // law gave the land from the picture's water (Lake Rumare's and the Niben's shores) wears the land's climate, never the
   // sea's
@@ -281,7 +276,6 @@ test('CYRODIIL-WATERS with ARENA2: no water reaches a capital - no slice of one,
   const picLand = (x, y) => { const [px, py] = bayToPicture(x + 0.5, y + 0.5); return !!trace.land[Math.floor(py) * trace.w + Math.floor(px)]; };
   const apart = (x, y) => (woods.getHeightMapValue(x, y) > 0) !== lawLand(x, y);
   for (const key of AP.arenaPixels().byPixel.keys()) { const [x, y] = key.split(',').map(Number); assert.ok(!apart(x, y), `a place's pixel ${key} the law's side`); }
-  // PIN MOVED (RUMARE-WATER, test/world/rumarewater.test.js): the Imperial City's span's three pixels the Waterfront's mouth
   // crosses the sea's at the map's scale (world/rumareWaters.js rumareMouthPixel), its province's land to the law - the
   // canal's water laid on into the city
   const { rumareMouthPixel } = await import('../../src/world/rumareWaters.js');

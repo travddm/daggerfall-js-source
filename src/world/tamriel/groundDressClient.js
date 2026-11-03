@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The ground", AUDIT: the dress's cost) - THE PAGE'S SIDE OF THE DRESS'S
+// TESA-LANDS (, "The ground", AUDIT: the dress's cost) - THE PAGE'S SIDE OF THE DRESS'S
 // WORKER (world/tamriel/groundDressWorker.js): a set's layers handed over as copies (the set as drawn stays the page's -
 // its puddles' and its grass's reads), the dressed set handed back. The worker laws the other clients keep
 // (world/imperialPrebuildClient.js, world/tamrielRoadsClient.js): `new Worker(new URL(...))` in exactly that spelling for

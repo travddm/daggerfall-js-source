@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.5): A MOUNTED TROPHY'S PICTURE - a carved shield of dark
+// HUNTERS-MARK: A MOUNTED TROPHY'S PICTURE - a carved shield of dark
 // wood with a brass plate, drawn here in code, and the beast's own front frame from the player's data set on it. Composed at
 // runtime and uploaded under its own key (scenes/decor/decorRoom.js hangs it as a mount): nothing of ARENA2 is kept, as the
 // doctrine's non-negotiables ask (01-Overview/Port-Doctrine.md). Pure but for the loader at the foot.

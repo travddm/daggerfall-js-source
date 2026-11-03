@@ -1,5 +1,5 @@
 // @ts-check
-// QL4/QL5-QL10 (bible/06-Systems/Questlines-Arc.md decision 3, section 2.3): THE FLAGSHIP QUESTS' BRANCHES, AS PATCHES.
+// QL4/QL5-QL10 (decision 3, section 2.3): THE FLAGSHIP QUESTS' BRANCHES, AS PATCHES.
 // A flagship quest (section 3) that has no branch of its own is given one as SHAM-TRAIL gives its entry
 // (systems/quest/questPatches.js applyTextPatches): an exact old text, how many times it must occur, the new - applied as
 // the script is READ, never an edit of the vendored file, and a patch that no longer finds its text throws (here) or

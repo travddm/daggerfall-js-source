@@ -1,5 +1,4 @@
-// OW-CHASE-RANGE (2026-10-19, the owner, of the Overworld's gaps: "4. Fix it"; bible/06-Systems/Travel-View.md
-// OW-CHASE-RANGE): A CHASE SEEN AS FAR AS ITS BAND IS DRAWN. The relay fans a cell's foes frame - TV7b's chase word on it
+// OW-CHASE-RANGE: A CHASE SEEN AS FAR AS ITS BAND IS DRAWN. The relay fans a cell's foes frame - TV7b's chase word on it
 // - RANGE_PIXELS (3) about its sender, and the Overworld draws the bands BAND_REACH_PX (6) about the viewer: a player three
 // to six pixels off saw a chased band at its own wander. The chaser's trav frame (TV3, the region's channel) now carries
 // its chase words BESIDE its mark (world230: `bd` the bands', `sr` the raiders' - AUDIT OW-REVISITED L4-1: as a key of the
@@ -115,13 +114,11 @@ function regionLink(relayV) {
   return { s, out: () => ws.sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'trav') };
 }
 
-test('OW-CHASE-RANGE the session: the words go beside the mark to any relay (an older one reads the mark and drops them - nothing refused); a word the door would refuse goes unsaid, never the mark with it (AUDIT OW-REVISITED L4-9: one bad entry froze the region mark every frame) (mutants: a word inside the mark; a bad word sent; the mark refused for it)', () => {
+test('OW-CHASE-RANGE the session: the words go beside the mark; a word the door would refuse goes unsaid, never the mark with it (AUDIT OW-REVISITED L4-9: one bad entry froze the region mark every frame) (mutants: a word inside the mark; a bad word sent; the mark refused for it)', () => {
   const link = regionLink(RELAY_VERSION);
   assert.equal(link.s.sendTraveller({ ...MARK, bd: BD, sr: SR }), true);
   const sent = link.out().at(-1);
   assert.deepEqual([sent.p, sent.bd, sent.sr], [MARK, BD, SR], 'beside the mark, never in it');
-  const old = regionLink('world223');
-  assert.equal(old.s.sendTraveller({ ...MARK, bd: BD }), true, 'an older relay: the same frame (its door reads the mark alone)');
   const twice = regionLink(RELAY_VERSION);
   assert.equal(twice.s.sendTraveller({ ...MARK, bd: [['b1.2.3', 0, 0, 2], ['b1.2.3', 0, 0, 2]], sr: SR }), true, 'the mark still goes');
   const t2 = twice.out().at(-1);
@@ -187,17 +184,17 @@ test('OW-CHASE-RANGE end to end through the real laws: A, five pixels from B, ch
   assert.deepEqual(regionChaseHeard(heard, { x: 407, y: 107 }), { bd: [], sr: [] }, 'three hundred pixels off: nothing');
 });
 
-test('OW-CHASE-RANGE the host: my mark carries my words beside it; a traveller\'s frame - one heard, a clear, a leave, a welcome - heard through the bands\' and the raiders\' own hearing (a fresh cell word preferred; a welcome row\'s age taken from its hold) and WITHDRAWN when no longer said (AUDIT OW-REVISITED L4-2: a far chase stood drawn 25 s after it ended), nothing heard of one my map hides (L4-3, WILD1) (mutants: the chase never withdrawn; a clear unheard; a leave unheard; the hidden heard; the cell word overridden; the age unread)', () => {
+test('OW-CHASE-RANGE the host: my mark carries my words beside it; a traveller\'s frame - one heard, a clear, a leave, a welcome - heard through the bands\' and the raiders\' own hearing (a fresh cell word preferred; a welcome row\'s age taken from its hold) and WITHDRAWN when no longer said (AUDIT OW-REVISITED L4-2: a far chase stood drawn 25 s after it ended)) (mutants: the chase never withdrawn; a clear unheard; a leave unheard; the cell word overridden; the age unread)', () => {
   const w = hostText('src/scenes/world.js');
   assert.match(w, /if \(mark\) Object\.assign\(mark, regionChaseWords\(bandWordOf\(_bandChase, _bandSpentAt\), raiderWordOf\(seaRaidHeld\(\), tvRaid\.spentAt\), Math\.floor\(bandNowMs\(\) \/ BAND_LIFE_MS\), Math\.floor\(raidNowMs\(\) \/ RAIDER_LIFE_MS\)\)\);[^\n]*\n\s*const due = travellerDue\(travellerSent, \{ now, mark, alone: link\.othersHere === 0, shown, chasing: _bandChase\.size > 0 \|\| tvRaid\.chase\.size > 0 \}\);/);
   assert.match(w, /link\.onTraveller = \(f\) => \{ travellerBook\.put\(f, Date\.now\(\)\); regionChase\.hear\(f\); \};/);
   assert.match(w, /link\.onTravellerLeft = \(id\) => \{ travellerBook\.drop\(id\); regionChase\.hear\(\{ id, p: null \}\); \};/);
   assert.match(w, /link\.onTravellerRoom = \(list\) => \{ travellerBook\.reset\(list, Date\.now\(\)\); travellerSent\.last = null; travellerSent\.at = 0; regionChase\.room\(list\); \};/);
   // HOST-SPLIT: the hearing is scenes/regionChaseHost.js, wired with the host's own hearings and books
-  assert.match(w, /const regionChase = createRegionChaseHearing\(\{ bandHear, seaRaidHear, bands: \(\) => _bandPeer, raids: \(\) => tvRaid\.peer, me: \(\) => playerTravelPixel\(\), wildHides: wildHidesPlayer, social: \(\) => social, guildTag: myGuildTag \}\);/);
+  assert.match(w, /const regionChase = createRegionChaseHearing\(\{ bandHear, seaRaidHear, bands: \(\) => _bandPeer, raids: \(\) => tvRaid\.peer, me: \(\) => playerTravelPixel\(\), social: \(\) => social, guildTag: myGuildTag \}\);/);
   // the host's hearings lifted, the module's run over them and the clock
   const lift = (head) => { const at2 = w.indexOf(head); assert.ok(at2 >= 0, head); return w.slice(at2, w.indexOf('\n  }\n', at2) + 4); };
-  let now = 1000, hidden = false;
+  let now = 1000;
   const env = {
     performance: { now: () => now }, _bandPeer: new Map(), _bandChase: new Map(), _bandSpent: new Set(), validBandWord, bandNearMe: () => true,
     bandPixelOf: (p) => p, playerTravelPixel: () => ({ x: 100, y: 100 }), bandNowMs: () => 0, BAND_LIFE_MS: 1, chaseYields: () => false, online: null, wildBands: { forget() {} }, BAND_WORD_MS,
@@ -205,10 +202,9 @@ test('OW-CHASE-RANGE the host: my mark carries my words beside it; a traveller\'
   };
   const names = Object.keys(env);
   const host = new Function(...names, `${lift('  function bandPeerChase(id) {')}\n${lift('  function bandHear(from, raw, hold = BAND_WORD_MS, aged = 0) {')}\n${lift('  function seaRaidPeerChase(id) {')}\n${lift('  function seaRaidHear(from, raw, hold = RAIDER_WORD_MS, aged = 0) {')}\nreturn { bandPeerChase, bandHear, seaRaidPeerChase, seaRaidHear };`)(...names.map((k) => env[k]));
-  const asked = [];
   const social = { isFriendPeer: (id) => id === 'peer-f', isPartyPeer: (id) => id === 'peer-p' };
   const hearing = createRegionChaseHearing({ bandHear: host.bandHear, seaRaidHear: host.seaRaidHear, bands: () => env._bandPeer, raids: () => env.tvRaid.peer,
-    me: () => ({ x: 100, y: 100 }), wildHides: (who) => { asked.push(who); return hidden; }, social: () => social, guildTag: () => null });
+    me: () => ({ x: 100, y: 100 }), social: () => social, guildTag: () => null });
   const run = { ...host, regionChaseHear: hearing.hear, regionChaseRoom: hearing.room };
   const A = (bd, sr = []) => ({ id: 'peer-a', p: { ...MARK, px: 104, py: 100 }, bd, sr });
   run.regionChaseHear(A([['b1.1.1', 10, 20, 1]], [['r1.1.1', 30, 40, 1]]));
@@ -226,14 +222,6 @@ test('OW-CHASE-RANGE the host: my mark carries my words beside it; a traveller\'
   run.bandHear('peer-c', [['b2.2.2', 1, 2, 1]]);
   run.regionChaseHear(A([['b2.2.2', 50, 60, 1]]));
   assert.equal(run.bandPeerChase('b2.2.2')?.x, 1, 'the cell\'s fresh word kept');
-  // hidden (WILD1): nothing heard
-  hidden = true;
-  run.regionChaseHear(A([['b3.3.3', 10, 20, 1]]));
-  assert.equal(run.bandPeerChase('b3.3.3'), null, 'one my map hides: nothing heard');
-  assert.deepEqual(asked.at(-1).wire, [travellerWorldOf(A([]).p).x, 0, travellerWorldOf(A([]).p).z], 'asked where their mark stands');
-  run.regionChaseHear({ ...A([['b3.3.3', 10, 20, 1]]), id: 'peer-p' });
-  assert.equal(asked.at(-1).party, true, 'my party asked as my party');
-  hidden = false;
   // a welcome: A listed with an aged row; B, heard before, not listed - withdrawn
   run.regionChaseHear({ id: 'peer-b', p: { ...MARK, px: 103, py: 100 }, bd: [['b4.4.4', 1, 1, 1]], sr: [] });
   run.regionChaseRoom([{ ...A([['b5.5.5', 7, 7, 1]]), ag: (TRAV_BAND_HOLD_MS - 2000) / 1000 }]);

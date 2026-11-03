@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): THE HAND-IN BRANCH, MADE EXACT. A flagship quest whose story
+// QL4: THE HAND-IN BRANCH, MADE EXACT. A flagship quest whose story
 // holds no decision of its own is given one where its reward is handed over: the questor asks how the player will be
 // paid, and the two answers end it differently (the sheet's outcomes - its own pay, standing, legal). The kit reads the
 // reward task's text exactly as the game reads the script (the port's patches first - test/qlSources.mjs baseText) and

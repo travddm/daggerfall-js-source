@@ -1,6 +1,4 @@
-// RAID5 (2026-10-25, the owner: "rework town raids to bring them up to par with other world events, implementing
-// mechanics (not the puzzle), different types of structure like wave based, defend, escort, etc"; asked which:
-// "Waves", "Defend", "Escort", "Classic skirmish"; bible/03-World/Raiding-Parties.md RAID5): A RAID'S KIND.
+// RAID5: A RAID'S KIND.
 //
 // Held here: the kind read off the raid's own tuple (no draw - every machine the same, the relay's roll untouched) and
 // the mod's raid on a host with no sites; the assault's plan and where a count stands in it; the words; the objective's
@@ -135,7 +133,7 @@ test('RAID5 THE ASSAULT\'S PLAN: three waves (four past twenty), the target less
   assert.equal(raidLeaderOf(0), 145);
   assert.equal(raidLeaderOf(1), 139);
   assert.equal(raidLeaderOf(2), 24);
-  assert.equal(raidLeaderName(2), 'Orc Warlord');   // PIN MOVED (AUDIT WORLD-EVENTS L5-8): the line's article its own
+  assert.equal(raidLeaderName(2), 'Orc Warlord');
 });
 
 test('RAID5 the ways and the words: a point along a way and its length; what each kind asks; the board\'s detail of each objective; the kinds\' names (mutants: the way\'s end not kept; a detail\'s count off by one)', () => {
@@ -152,9 +150,9 @@ test('RAID5 the ways and the words: a point along a way and its length; what eac
   assert.equal(raidObjectiveDetail('waves', { wave: 3, of: 3 }), 'Their leader');
   assert.equal(raidObjectiveDetail('defend', { pct: 42.4 }), 'Standard 42%');
   assert.equal(raidObjectiveDetail('defend', { pct: 0, fallen: true }), 'Sacked');
-  assert.equal(raidObjectiveDetail('escort', { safe: 1, lost: 1, of: 3 }), 'Refugees: 1 of 3 safe, 1 lost');   // PIN MOVED (AUDIT WORLD-EVENTS L5-13)
+  assert.equal(raidObjectiveDetail('escort', { safe: 1, lost: 1, of: 3 }), 'Refugees: 1 of 3 safe, 1 lost');
   assert.equal(raidObjectiveDetail('classic', { wave: 0 }), '');
-  assert.deepEqual(['classic', 'waves', 'defend', 'escort', 'staff'].map(raidKindName), ['', 'Assault', 'Siege of the Standard', 'Exodus', '']);   // PIN MOVED (AUDIT WORLD-EVENTS L5-15): a classic raid and a staff event name no kind (their words were never shown)
+  assert.deepEqual(['classic', 'waves', 'defend', 'escort', 'staff'].map(raidKindName), ['', 'Assault', 'Siege of the Standard', 'Exodus', '']);
 });
 
 test('RAID5 the objective\'s word (`ro`): [key, kind, a, b] - a kind of a raid with one (never the classic), counts 0..100, each raid once, at most four; junk dropped, never guessed at (mutants: the classic let through; a bound off by one; a duplicate kept)', () => {
@@ -197,7 +195,7 @@ test('RAID5 THE ASSAULT, run: the first wave its size and no more, said with wha
   assert.equal(leader[0].entity.raidLeader?.name, 'Orc Warlord');
   assert.equal(leader[0].entity.bossTraits.length, RAID_LEADER_TRAITS, 'two traits');
   assert.ok(log.said.includes(raidLeaderLine('Orc Warlord', TOWN)));
-  assert.equal(raidLeaderLine('Orc Warlord', TOWN), `The Orc Warlord leads the last charge on ${TOWN}!`);   // PIN MOVED (AUDIT WORLD-EVENTS L5-8)
+  assert.equal(raidLeaderLine('Orc Warlord', TOWN), `The Orc Warlord leads the last charge on ${TOWN}!`);
   kill(leader[0]);
   await run(1);
   const raid = raidState().raids[0];
@@ -271,7 +269,7 @@ test('RAID5 THE EXODUS, run: three refugees stood at the way\'s start; their gui
   c.ai.feet = [30, 0, 0];
   await run(1);
   assert.equal(raidHeld(raid), true, 'two: held');
-  assert.equal(raidTimerList(() => 0)[0].obj, 'Refugees: 2 of 3 safe, 1 lost');   // PIN MOVED (AUDIT WORLD-EVENTS L5-13)
+  assert.equal(raidTimerList(() => 0)[0].obj, 'Refugees: 2 of 3 safe, 1 lost');
   await run(ACTOR_SWEEP_S + 1);
   assert.ok(log.removed.includes(a) && log.removed.includes(c), 'the saved go, out of sight');
   const n = log.raiders.length;
@@ -341,7 +339,7 @@ test('RAID5 a town held, its thanks: the gold half again and one more Magic-or-b
 test('RAID5 the board: a live raid of a kind names it and its objective before the count; a classic raid its count alone (mutants: the detail dropped)', () => {
   const base = { name: TOWN, region: 'Region3', type: 'orcs', startMs: 0, endMs: 9e9, key: KEY, n: 3, tg: 20 };
   const row = (r) => eventBoardModel({ now: 1000, raids: [r] }).rows.find((x) => x.kind === 'raid');
-  assert.equal(row({ ...base, kind: 'Siege of the Standard', obj: 'Standard 40%' }).detail, 'Standard 40% - Raiders down: 3 of 20');   // PIN MOVED (AUDIT WORLD-EVENTS L5-13): the kind in the title
+  assert.equal(row({ ...base, kind: 'Siege of the Standard', obj: 'Standard 40%' }).detail, 'Standard 40% - Raiders down: 3 of 20');
   assert.equal(row({ ...base, kind: 'Siege of the Standard', obj: 'Standard 40%' }).title, `Siege of the Standard: ${TOWN}`);
   assert.equal(row({ ...base, kind: '', obj: '' }).detail, 'Raiders down: 3 of 20');
   assert.equal(row({ ...base, kind: '', obj: '' }).title, `Raid on ${TOWN}`);
@@ -363,7 +361,7 @@ test('RAID5 the sites host on a grid of its own: the square the walkable cell ne
   assert.ok(!blocked.has(cell.join()) && Math.max(Math.abs(cell[0] - 10), Math.abs(cell[1] - 10)) === 1, 'the nearest walkable to the middle');
   const north = sites.way(0), west = sites.way(3);
   assert.deepEqual(north.at(-1), sq, 'to the square');
-  assert.ok(north[0][2] > sq[2] + 5 * NAV_CELL && Math.abs(north[0][0] - sq[0]) < 2 * NAV_CELL, 'from the north edge');   // PIN MOVED (AUDIT WORLD-EVENTS L4-9): north is +z, the grid's far rows - the near ones were called north
+  assert.ok(north[0][2] > sq[2] + 5 * NAV_CELL && Math.abs(north[0][0] - sq[0]) < 2 * NAV_CELL, 'from the north edge');
   assert.ok(west[0][0] < sq[0] - 5 * NAV_CELL, 'from the west');
   const g = await sites.standBearer(SQUARE);
   assert.equal(g.entity.maxHealth, 30 * RAID_BEARER_HEALTH_X);
@@ -384,18 +382,17 @@ test('RAID5 the sites host on a grid of its own: the square the walkable cell ne
 
 test('RAID5 the hosts by source: the world host hands the raids its sites - the town\'s, the watch\'s bearer, the pool\'s refugees - says the objective beside the raid\'s word and hears a peer\'s; the pool names its refugees to every reader as allies; the thanks of a town held are richer (mutants: the sites unwired; the word unsent; the refugees hostile at a reader; the held thanks unread)', () => {
   const w = rd('src/scenes/world.js');
-  assert.match(w, /const raidSites = createRaidSites\(\{ townAt: wardenTownAt, townAtPixel: \(px, py\) => wardenTownOfPixel\(built\.values\(\), \(x, y\) => state\.pixelTranslation\(x, y, _wardenT\), px, py\), feet: enchantFeet, groundAt: surfaceAt, standGuard: cityGuards\.standBearer, spawnFoe: exteriorFoes\.spawnFoe \}\);/);   // PIN MOVED (AUDIT WORLD-EVENTS L4-4): and the raid's own town, off its pixel
-  // PIN MOVED (WW6): the seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT), the host's live names
+  assert.match(w, /const raidSites = createRaidSites\(\{ townAt: wardenTownAt, townAtPixel: \(px, py\) => wardenTownOfPixel\(built\.values\(\), \(x, y\) => state\.pixelTranslation\(x, y, _wardenT\), px, py\), feet: enchantFeet, groundAt: surfaceAt, standGuard: cityGuards\.standBearer, spawnFoe: exteriorFoes\.spawnFoe \}\);/);
   // read there as `host.<name>`
   const rh = rd('src/scenes/raidHost.js');
   const at = rh.indexOf('  setRaidingPartiesHost({');
   assert.match(rh.slice(at, rh.indexOf('\n  });', at)), /sites: \(\) => host\.raidSites,/);
   assert.match(w, /const rk = raidWireWord\(\), ro = raidObjWord\(\); if \(rk\) frame\.rk = rk; if \(ro\) frame\.ro = ro;/);
   assert.match(w, /exteriorFoes\.setOnRaids\(\(from, rk, at, ro\) => raidPeerWord\(from, rk, at, ro\)\);/);
-  assert.match(w, /raidSpoilsList\(c\.c, level, c\.y, typeof entry\.hd === 'boolean' \? entry\.hd : raidWasHeld\(c\.w\)\)/);   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): held as the receipt came, for the character that fought
+  assert.match(w, /raidSpoilsList\(c\.c, level, c\.y, typeof entry\.hd === 'boolean' \? entry\.hd : raidWasHeld\(c\.w\)\)/);
   const x = rd('src/scenes/exteriorFoes.js');
   assert.match(x, /if \(data\.rk !== undefined \|\| data\.ro !== undefined\) _onRaids\?\.\(from, data\.rk, _now\(\), data\.ro\);/);
   assert.match(x, /refugees = validAlliedIds\(data\.rf\)/);
-  assert.match(rd('src/scenes/cityGuards.js'), /standBearer: \(pos, yaw = 0\) => spawnGuardAt\(\[\.\.\.pos\], yaw, null, \{ defender: true, bearer: true \}\)/);   // PIN MOVED (AUDIT WORLD-EVENTS L4-6): and the watch's lifecycle passes him by
+  assert.match(rd('src/scenes/cityGuards.js'), /standBearer: \(pos, yaw = 0\) => spawnGuardAt\(\[\.\.\.pos\], yaw, null, \{ defender: true, bearer: true \}\)/);
   assert.ok(MAX_RAID_ENEMIES >= 3);
 });

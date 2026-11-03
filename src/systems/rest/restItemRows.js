@@ -1,5 +1,5 @@
 // @ts-check
-// INT1 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE REST SUPPLIES' ROWS, A LEAF. They were
+// INT1: THE REST SUPPLIES' ROWS, A LEAF. They were
 // restItems.js's own, and that module pulls the rest's whole world in (the needs, the clock, the loot doors); the item
 // law (systems/item/itemLaw.js) runs on the account service, which loads none of it, and needs only the rows - which
 // templates the port knows, which stack. One home, two readers: restItems.js imports and re-exports every name here and
@@ -9,8 +9,7 @@ import { ICON_TWIGS } from '../../net/professionLaw.js';
 
 /** The block (Rest-Arc.md section 6: 1700-1709, the last three spare). */
 export const REST_ITEM = Object.freeze({ Bedroll: 1700, EmberJar: 1701, Firewood: 1702, Tonic: 1703, Candle: 1704, Salts: 1705, Draught: 1706 });
-/** A rest item (REST6): one of the seven templates - INT9: its home here, so the account Worker reads it (a death in the
- *  zone's drop keeps it - systems/wild/wildDropLaw.js); systems/rest/restItems.js re-exports it. */
+/** A rest item (REST6): one of the seven templates - INT9: its home here, so the account Worker reads it; systems/rest/restItems.js re-exports it. */
 export const isRestItem = (item) => !!item && Object.values(REST_ITEM).includes(item.templateIndex);
 export const REST_ITEM_GROUP = 'UselessItems2';
 export const BEDROLL_NIGHTS = 10;

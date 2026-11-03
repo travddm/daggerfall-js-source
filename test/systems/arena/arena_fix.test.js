@@ -1,9 +1,9 @@
-// ARENA-FIX (2026-10-02): THE ARENA'S QA ROUND - the visual QA pass and the ARENA2 builder's findings, each fixed and
+// ARENA-FIX: THE ARENA'S QA ROUND - the visual QA pass and the ARENA2 builder's findings, each fixed and
 // pinned here: the stairs walkable (ramps over every run, the collider's alone), one submesh a picture, the seams
 // closed, the cell paved and its blind sides furnished, the gate's people by their office, the undercroft as the
 // fighters' hall (no random foe in its reach, its people, its chained beasts, the training pit's practice bout, the Hall of
 // Champions), the fighters' walk to their marks, the misses and the real crits heard, a burning torch carried, the
-// court's nobles at their own scale, the player's sprite turned with a placing. bible/11-Multiplayer/Arena.md
+// court's nobles at their own scale, the player's sprite turned with a placing.
 // "ARENA-FIX record".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -191,12 +191,6 @@ test('ARENA-FIX 2: the gate\'s people named by their office - the plaque, "You s
   assert.ok((W.match(/const display = officeName\(pn\) \?\? npcShownName\(staticNpcData\(pn, staticNpcSceneCtx\(pn\)\)\);/g) ?? []).length >= 3, 'the plaques (the street, the dungeon, the interior)');
 });
 
-test('ARENA-FIX 7: the record says which way the gate faces - north, onto the market (the compass calls +z north)', () => {
-  const A = rd('bible/11-Multiplayer/Arena.md');
-  assert.match(A, /The gate opens onto the market \(cell 4,4\), to the north/);
-  assert.doesNotMatch(A, /cell 4,4, south/);
-});
-
 /** The undercroft's markers: a start, then random markers out along x, one block. */
 function undercroftBlocks(n = 20) {
   const markers = [{ archive: 199, record: 10, x: 0, y: 1, z: 0 }];
@@ -244,13 +238,13 @@ test('ARENA-FIX 4: a chained beast - targets nobody, nobody targets it, and the 
   assert.match(D, /: \(_hallBeasts \? \[\.\.\._hallBeasts, \.\.\.deepFoesOf\(_layoutEnemies, _undercroftHall\.deep\)\] : _layoutEnemies\);/, 'UNDERCROFT-DEEP: the beasts, and the deep cellars\' own foes');
   assert.match(D, /const _layoutFoes = foes\.length;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*for \(const f of foes\) \{\n\s*if \(f\.src\?\.arenaChained == null/, 'the chains tagged after the layout\'s run is measured');
   assert.match(D, /for \(let l = 0; l < n && !\(_undercroftHall && undercroftHallNear\(_undercroftHall, lastPlayerFeet\)\); l\+\+\) \{/, 'no rest broken in the hall (UNDERCROFT-DEEP: the deep cellars are a keep\'s)');
-  assert.match(D, /if \(!_undercroftHall\) markDungeonChampions\(/);
+  assert.match(D, /if \(!_undercroftHall\) markDungeonPromotions\(/);
   assert.match(D, /arenaRole: f\.role \?\? null,/);
 });
 
 test('ARENA-FIX 4: the stair names the undercroft; the Pit Master and the Keeper of the Hall answer by their office', () => {
   const W = rd('src/scenes/worldModes.js');
-  assert.match(W, /if \(entries\[key\]\?\.door\?\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE && entries\[key\]\.dfLocation\?\.arenaUndercroft\) \{\n\s*return staticDoorName\('dungeonEntrance', \{ locationName: ARENA_TEXT\.undercroft\.name \}\);/);   // PIN MOVED (TIER1): no tier over the stair - the plaque names a tier only where the host passes one
+  assert.match(W, /if \(entries\[key\]\?\.door\?\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE && entries\[key\]\.dfLocation\?\.arenaUndercroft\) \{\n\s*return staticDoorName\('dungeonEntrance', \{ locationName: ARENA_TEXT\.undercroft\.name \}\);/);
   assert.equal(ARENA_TEXT.undercroft.name, 'The Arena Undercroft');
   assert.match(W, /if \(!info && pn\?\.arenaRole === 'pitMaster'\) \{ pitMasterChoice\(\); return; \}/);
   assert.match(W, /if \(!info && pn\?\.arenaRole === 'hallKeeper'\) \{ townTalk\?\.showOverlay\?\.\(new ActionTextBox\(hallOfChampions\(/);

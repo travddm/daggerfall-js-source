@@ -1,13 +1,13 @@
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET'S LAW (src/net/marketLaw.js, professionLaw.js, marksLaw.js,
+// PROF5 - THE MARKET'S LAW (src/net/marketLaw.js, professionLaw.js, marksLaw.js,
 // nodeLaw.js): 10.2-10.4's numbers - a listing's hours and the thirty, an order's days and the twenty, the prices, the
 // units, the hour's postings; the listing fee (1%, rounded up, at least 1), the sales tax (5%, rounded down), the Tithe
 // held at nought until SEAT1; the courier (by the load and the road, at least 2) and its time; the road witnessed (a
 // hub's pixel confirmed, else the answer most give, else the asker's own); a piece's wear; the median (the middle
 // unit's price, weighted) and its seven days' line; the catalogue; the Weavers' counter (Linen 2, Wool 3) and Wool Bolt;
-// the ledger's market kinds; the migration's three rebuilds. bible/06-Systems/Professions-Arc.md 26, Appendix B.
+// the ledger's market kinds; the migration's three rebuilds. 26, Appendix B.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { d1 } from '../accountDb.mjs';
 
 import {
   MARKET_LISTING_S, MARKET_ORDER_S, MARKET_LISTINGS_MAX, MARKET_ORDERS_MAX, MARKET_UNITS_MAX, MARKET_PRICE_MAX, MARKET_POSTS_MAX,
@@ -20,7 +20,6 @@ import { WEAVERS_STOCK, FURNISHER_STOCK, STOCKS, stockOf, WOOL, NO_PACK_FORM, wi
 import { MARKS_KINDS } from '../../src/net/marksLaw.js';
 import { material, witnessedFact, pixelReport } from '../../src/net/nodeLaw.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const H = 3600, D = 86_400;
 
 test('PROF5 law: the bounds (10.2, 10.3, section 20) - a listing 72 hours, thirty an account; an order 7 days, twenty; a price 1 to 1,000,000 Marks; 1 to a Stores\' 5,000 units; 60 postings and 120 acts an hour; the views and the crafted families; the switch the three together', () => {
@@ -31,10 +30,8 @@ test('PROF5 law: the bounds (10.2, 10.3, section 20) - a listing 72 hours, thirt
   assert.deepEqual([unitsOk(1), unitsOk(5000), unitsOk(0), unitsOk(5001)], [true, true, false, false]);
   assert.deepEqual([wearOk(1), wearOk(1000), wearOk(0), wearOk(1001)], [true, true, false, false]);
   assert.deepEqual([provenanceOk('0123456789abcdef'), provenanceOk('0123456789ABCDEF'), provenanceOk('0123')], [true, false, false]);
-  // PIN MOVED (FIELD BUGS 2026-10-01, MARKET-ANY): Goods, the pieces listed from packs, after the Auctions
   assert.deepEqual(MARKET_VIEWS.map(([v]) => v), ['materials', 'crafted', 'auctions', 'goods', 'mine', 'orders', 'history']);   // PROF5b: Auctions beside Crafted
   assert.deepEqual(MARKET_VIEWS.map(([, l]) => l), ['Materials', 'Crafted', 'Auctions', 'Goods', 'My listings', 'Orders', 'History'], 'the wireframe\'s row, PROF5b\'s Auctions and MARKET-ANY\'s Goods');
-  // PIN MOVED (PROF11): the mason's bench's stonework lists, as the loom's three
   assert.deepEqual(CRAFTED_FAMILIES.map(([f]) => f), ['weapons', 'armour', 'staves', 'bows', 'tools', 'kits', 'furniture', 'leather', 'clothing', 'furnishings', 'stonework', 'dishes', 'jewellery'], 'arrows and the siege works never list (PROF7 moved it: the loom\'s three list; PIN MOVED (PROF9): the fire\'s dishes; PIN MOVED (PROF10): the jeweller\'s pieces)');
   assert.deepEqual([marketOpen(true, true, true), marketOpen(true, true, false), marketOpen(false, true, true), marketOpen(true, false, true)], [true, false, false, false]);
   assert.deepEqual([MARKET_MEDIAN_DAYS, MARKET_KEEP_DAYS, MARKET_REPORT_MEDIANS], [7, 90, 20]);
@@ -59,14 +56,14 @@ test('PROF5 law: the courier (10.4) - ceil(ceil(units / 20) x (1 + pixels / 25))
 
 test('PROF5 law: the road witnessed (SEAT0 3.2) - a hub\'s report "x,y" on MAPS.BSA\'s 1000 x 500; confirmed by three who agree, else the answer most give, else the asker\'s own; the pixels\' law unchanged', () => {
   assert.equal(hubReport(207, 212), '207,212');
-  assert.deepEqual([parseHubReport('207,212'), parseHubReport('9000,1'), parseHubReport('1,9000'), parseHubReport('x,1'), parseHubReport(null)], [{ x: 207, y: 212 }, null, null, null, null]);   // PIN MOVED (WW7-5): the world's grid (marketLaw.js hubPixelOk)
+  assert.deepEqual([parseHubReport('207,212'), parseHubReport('9000,1'), parseHubReport('1,9000'), parseHubReport('x,1'), parseHubReport(null)], [{ x: 207, y: 212 }, null, null, null, null]);
   const row = (account, report, at) => ({ account, report, at });
   assert.deepEqual(hubPixel([row('a', '10,10', 1), row('b', '10,10', 2), row('c', '10,10', 3), row('d', '20,20', 4)]), { x: 10, y: 10, confirmed: true });
   assert.deepEqual(hubPixel([row('a', '10,10', 1), row('b', '20,20', 2), row('c', '20,20', 3)]), { x: 20, y: 20, confirmed: false }, 'unconfirmed: the answer most give');
   assert.deepEqual(hubPixel([], { x: 7, y: 8 }), { x: 7, y: 8, confirmed: false }, 'none: the asker\'s own');
   assert.deepEqual(hubPixel([row('a', '10,10', 1), row('b', '10,10', 2), row('c', '10,10', 3)], { x: 7, y: 8 }), { x: 10, y: 10, confirmed: true }, 'the witnesses over the asker');
   assert.equal(hubPixel([], null), null);
-  assert.equal(hubPixel([], { x: 9000, y: 1 }), null, 'a pixel off the map is no answer');   // PIN MOVED (WW7-5): off the world's grid
+  assert.equal(hubPixel([], { x: 9000, y: 1 }), null, 'a pixel off the map is no answer');
   assert.deepEqual(hubPixel([row('a', 'bad', 1)], { x: 3, y: 4 }), { x: 3, y: 4, confirmed: false }, 'a report out of shape is no report');
   // the pixels' law, the same function: a pixel's report still read as climate and region
   const px = witnessedFact([row('a', pixelReport(231, 17), 1), row('b', pixelReport(231, 17), 2), row('c', pixelReport(231, 17), 3)]);
@@ -91,13 +88,13 @@ test('PROF5 law: the catalogue - every registered material, the four foods and e
   assert.ok(cat.every((c) => material(c.key)), 'every one a Stores material');
   assert.equal(new Set(cat.map((c) => c.key)).size, cat.length);
   assert.ok(cat.some((c) => c.family === 'herbs') && cat.some((c) => c.key === 'food:apple') && cat.some((c) => c.key === 'ore:mithril') && cat.some((c) => c.key === 'cloth:wool'));
-  assert.deepEqual([...new Set(cat.map((c) => c.family))], ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'siege']);   // SEAT2b part two (PIN MOVED): the Ram Kit, the Siege Works'; PROF12 (PIN MOVED): the Apothecaries' goods and Arcane Essence, the Essences'
+  assert.deepEqual([...new Set(cat.map((c) => c.family))], ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'siege']);   // SEAT2b part two (
   assert.deepEqual({ key: WOOL.key, tier: WOOL.tier, templateIndex: WOOL.templateIndex, name: WOOL.name }, { key: 'cloth:wool', tier: 2, templateIndex: 669, name: 'Wool Bolt' });
   assert.equal(minedMaterial('cloth:wool').family, 'hides');
   assert.deepEqual(WEAVERS_STOCK.map((w) => [w.key, w.marks, w.counter]), [['cloth:linen', 2, 'weavers'], ['cloth:wool', 3, 'weavers']], '4.5\'s own prices');
   assert.deepEqual(FURNISHER_STOCK.map((w) => [w.key, w.marks]), [['cloth:linen', 2]], 'the counters never part');
   assert.equal(stockOf('cloth:wool').marks, 3);
-  assert.equal(STOCKS.length, 7 + 16);   // PIN MOVED (PROF12): the Apothecaries' sixteen after them
+  assert.equal(STOCKS.length, 7 + 16);
   assert.deepEqual([NO_PACK_FORM.includes('cloth:wool'), withdrawable('cloth:wool'), withdrawable('cloth:linen')], [false, true, true]);   // PROF7 moved it: the cloth's templates (668-671)
 });
 
@@ -106,17 +103,18 @@ test('PROF5 law: the ledger\'s market kinds - the fee, the tax and the courier b
     assert.equal(MARKS_KINDS[k], way, k);
   }
   // The faucets are the gate, the writ and the Seats' three (a siege's Honours, an Incursion's second half, a struck
-  // seat's fee given back) - none of them the market's. PIN MOVED (SILVER-WAYS): and a raid's, a guild deed's, a Motherlode's;
-  // PIN MOVED (EG-E1): and a Redoubt's of the Elite Breach; PIN MOVED (STAR7): and a fallen star's
+  // seat's fee given back) - none of them the market's.
   assert.deepEqual(Object.entries(MARKS_KINDS).filter(([, w]) => w === 'mint').map(([k]) => k),
-    ['gate', 'writ', 'siege-honours', 'gate-incursion', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'eg', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the market strikes no Mark');   // PIN MOVED (CRAFT-WRITS): a crafting writ's pay, not the market's; PIN MOVED (DOMAIN2, DOMAIN3): a castle's refunds and a folded Charter's fee, silver home that its purchase or claim burnt
-  const sql = src('server-account/migrations/0032_market.sql');
-  assert.match(sql, /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild', 'escrow'\)\)/);
-  assert.match(sql, /dst_kind TEXT NOT NULL CHECK \(dst_kind IN \('burn', 'account', 'guild', 'escrow'\)\)/);
-  assert.equal((sql.match(/CREATE TRIGGER IF NOT EXISTS marks_line_/g) ?? []).length, 4, 'the four triggers made again');
-  assert.doesNotMatch(sql, /WHEN NEW\.(src|dst)_kind = 'escrow'/, 'an escrow end moves no balance by trigger');
-  assert.match(sql, /kind\s+TEXT NOT NULL CHECK \(kind IN \('pixel', 'dungeon', 'hub'\)\)/);
-  const products = sql.slice(sql.indexOf('CREATE TABLE IF NOT EXISTS products_new'), sql.indexOf('INSERT INTO products_new'));
-  assert.doesNotMatch(products, /REFERENCES players/, 'a piece outlives its owner\'s account');
-  assert.match(sql, /CREATE UNIQUE INDEX IF NOT EXISTS idx_market_piece_open ON market_listings \(provenance\) WHERE state = 'open'/, 'one live listing a piece');
+    ['gate', 'writ', 'siege-honours', 'gate-incursion', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the market strikes no Mark');
+  const raw = d1()._raw;
+  const sqlOf = (name) => raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name).sql;
+  const ledger = sqlOf('marks_ledger');
+  assert.match(ledger, /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild', 'escrow'\)\)/);
+  assert.match(ledger, /dst_kind TEXT NOT NULL CHECK \(dst_kind IN \('burn', 'account', 'guild', 'escrow'\)\)/);
+  const triggers = raw.prepare("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'marks_line_%'").all().map((r) => r.sql);
+  assert.equal(triggers.length, 4, 'four triggers move the balances');
+  assert.ok(triggers.every((t) => !/WHEN NEW\.(src|dst)_kind = 'escrow'/.test(t)), 'an escrow end moves no balance by trigger');
+  assert.match(sqlOf('world_witness'), /kind\s+TEXT NOT NULL CHECK \(kind IN \('pixel', 'dungeon', 'hub'/);
+  assert.doesNotMatch(sqlOf('products'), /REFERENCES players/, 'a piece outlives its owner\'s account');
+  assert.match(sqlOf('idx_market_piece_open'), /CREATE UNIQUE INDEX idx_market_piece_open ON market_listings \(provenance\) WHERE state = 'open'/, 'one live listing a piece');
 });

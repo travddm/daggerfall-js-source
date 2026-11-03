@@ -1,5 +1,4 @@
-// MWHEAD1 (2026-09-25, Mac: "The morrowind's model's head gets cut off in third person view. This is pre exhisting and
-// has happened for awhile"; asked what it looks like: the top sliced flat, the same at every zoom and look).
+// MWHEAD1.
 //
 // The third-person body is a picture: an ortho of the rig along the eye's ray (render/characterSprite.js
 // drawRigSpriteBox), stood upright in the world. Its window was the box's WORLD half-height, but the ray is pitched -

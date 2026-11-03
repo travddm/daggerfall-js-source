@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// ARENA1 (2026-10-02): DAGGERFALL ARENA 1.0 (Kamer) - THE COLOSSEUM AS DATA, OUT OF THE SHIPPED BUNDLE.
+// ARENA1: DAGGERFALL ARENA 1.0 (Kamer) - THE COLOSSEUM AS DATA, OUT OF THE SHIPPED BUNDLE.
 //
 //   node tools/daggerfallArenaExtract.mjs "<path-to>/daggerfall arena.dfmod" [outDir] --arena2 <ARENA2> [--scan]
 //
 // Default outDir is vendor/daggerfall-arena. Mac, 2026-10-02: the arena "is to be a centerpoint that fits in the middle
-// of Daggerfall city" - bible/11-Multiplayer/Arena.md "1. The building". The bundle is read with
+// of Daggerfall city" "1. The building". The bundle is read with
 // tools/lib/unityScene.mjs (Come Sail Away's reader) and what the port carries is written down as data:
 //
 // - `daggerfallarena.dfmod.json` - the mod's manifest, the bundle's own TextAsset byte for byte.
@@ -37,7 +37,7 @@
 //   exterior (DFARENA + WYRSAA44, two map pixels north of the city) is not carried: the arena stands IN the city.
 //
 // NOTHING ELSE. The bundle's two textures (`0-0`, `4-0`) are Daggerfall's terrain water and TEXTURE.002 record 4
-// saved through DXT1 (bible/11-Multiplayer/Arena.md "What the mod is") - game data - and RuntimeMaterials replaces
+// saved through DXT1 ("What the mod is") - game data - and RuntimeMaterials replaces
 // both at Awake, so DFU never shows them either: the tool REFUSES to write any texture, and its 23 materials are
 // editor placeholders. The output is a function of the bundle and the player's ARCH3D.BSA and TEXTURE files alone.
 //
@@ -65,7 +65,7 @@ export const BUNDLE_PATHS = Object.freeze({
   block: 'assets/game/mods/daggerfallarena/worlddata/dfarena.rmb.json',
   location: 'assets/game/mods/daggerfallarena/worlddata/locationnew-daggerfall_arenaofdaggerfall-17.json',
 });
-/** The ARCH3D records `--scan` finds copied into the mesh (2026-10-02): Daggerfall's dungeon corridors and rooms. */
+/** The ARCH3D records `--scan` finds copied into the mesh: Daggerfall's dungeon corridors and rooms. */
 export const PIECE_MODELS = Object.freeze([62009, 62109, 62209, 63000, 63001, 63003, 63004, 63005, 63007, 63024, 63028, 63035, 63100, 63101,
   63103, 63104, 63105, 63107, 63124, 63128, 63135, 63200, 63201, 63203, 63204, 63205, 63207, 63224, 63228, 63235, 72006, 72011, 72012]);
 /** How near two corners must be to be one (metres), and two uvs (texture repeats). */
@@ -156,7 +156,7 @@ export function daggerfallArenaAssets(bundleBytes, arena2, { scan = false } = {}
   const out = {};
   const report = [];
 
-  // ---- refused: every picture the bundle holds is Daggerfall's (bible/11-Multiplayer/Arena.md "What the mod is") ----
+  // ---- refused: every picture the bundle holds is Daggerfall's ("What the mod is") ----
   for (const t of scene.ofClass(UCLASS.Texture2D)) report.push(`texture ${t.v.m_Name} (${t.v.m_Width}x${t.v.m_Height}): Daggerfall's own through DXT1 - not written`);
 
   // ---- the manifest, verbatim ----

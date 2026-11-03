@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV4 - THE CURTAINS, SEEN FROM ABOVE (bible/06-Systems/Travel-View.md).
+// TV4 - THE CURTAINS, SEEN FROM ABOVE.
 //
-// Mac (2026-09-27): "Every detail like weather patterns, should be 1:1
-// in this mode." VC7c hangs a veil under every cell whose weather falls
+// VC7c hangs a veil under every cell whose weather falls
 // (render/volumetricClouds.js CURTAIN_*), and draws it into the SKY MAP
 // - for rays that look up, composited only on far-plane pixels. From a
 // camera 450 m up the ground fills the picture, so a storm three leagues

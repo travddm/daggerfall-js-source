@@ -1,22 +1,21 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-1 (2026-10-14) - THE POI STORE: WHO MAY BUILD, WHO APPROVES, AND WHAT THE WORLD STANDS.
+// POI-1 - THE POI STORE: WHO MAY BUILD, WHO APPROVES, AND WHAT THE WORLD STANDS.
 //
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... a tool my developers can use without having to access the
-// codebase"; asked how a POI reaches players, "I need to be able to approve changes"; asked who uses it, "Developers +
-// Builders" (bible/06-Systems/POI-Editor-Arc.md).
+// asked how a POI reaches players, "I need to be able to approve changes"; asked who uses it, "Developers +
+// Builders".
 //
-// THE ROLES, DERIVED AS EVERY GRANT HERE IS (titles.js): an APPROVER is a handle in APPROVER_HANDLES; a BUILDER is an
-// approver, a developer (DEVELOPER_HANDLES) or a handle in BUILDER_HANDLES. A guest is neither. Read fresh at every call,
+// THE ROLES, DERIVED AS EVERY GRANT HERE IS (titles.js): an APPROVER is an Owner account; a BUILDER is an
+// approver or an Admin account. A guest is neither. Read fresh at every call,
 // so a handle taken off a list loses the door at its next request.
 //
-// THE FLOW (migration 0116): a builder uploads assets (content-addressed: the bytes' sha256 is the name, checked here) and
+// THE FLOW: a builder uploads assets (content-addressed: the bytes' sha256 is the name, checked here) and
 // saves a DRAFT revision of a POI - one open draft per author per POI, saved over until it is SUBMITTED. An approver
 // APPROVES a submitted revision, as the approver saw it (it becomes the POI's live one, its assets readable by anyone
 // while a live revision names them) or REJECTS it with a word. Taking a POI out of the world is a submitted 'retire'
 // revision, approved the same way. A ROLLBACK points the POI at an earlier approved revision, and is a revision of its
 // own. Every approval, rollback and retirement moves the feed's version - the game's one cheap question, "anything new?"
-// (`poiLiveFeed`). AUDIT POI (2026-10-15) held every write here to what it says: a write that changed nothing is never
+// (`poiLiveFeed`). AUDIT POI held every write here to what it says: a write that changed nothing is never
 // answered as one that did, two writes at once meet in the database, and every count is counted where it is written.
 //
 // NOTHING A BUILDER WRITES REACHES A PLAYER BEFORE AN APPROVER SAYS SO: the feed is live revisions only, and an asset no
@@ -31,20 +30,13 @@
 import { poiDocProblems, poiShelfProblems, poiAssetProblems, poiAssetsOf, POI_ID_RE, POI_SHELF_ID_RE, POI_SHA_RE, POI_LIMITS } from '../../src/poi/poiLaw.js';
 import { decodePoiMesh, poiMeshFacts, POI_MESH_LIMITS } from '../../src/poi/poiMesh.js';
 import { poiImageMetaOf, POI_IMAGE_LIMITS, POI_IMAGE_TYPES } from '../../src/poi/poiImage.js';
-import { developerHandles } from './titles.js';
+import { isDeveloper, isOwner } from './titles.js';
 
-/** A handle list from the config, as titles.js reads its own - trimmed, case-folded, empty ones dropped. */
-function handleList(raw) {
-  if (typeof raw !== 'string' || !raw) return new Set();
-  return new Set(raw.split(',').map((h) => h.trim().toLowerCase()).filter(Boolean));
-}
-
-/** What this player may do with POIs - `{ builder, approver }`. @param {any} player @param {any} env */
+/** What this player may do with POIs - `{ builder, approver }`: an Admin builds, an Owner approves (and builds), both off
+ *  the account's role (titles.js, migration 0002) - no name grants either. @param {any} player @param {any} env */
 export function poiRolesOf(player, env) {
-  const h = typeof player?.handle === 'string' && player.handle ? player.handle.toLowerCase() : null;
-  if (!h) return { builder: false, approver: false };
-  const approver = handleList(env?.APPROVER_HANDLES).has(h);
-  const builder = approver || developerHandles(env).has(h) || handleList(env?.BUILDER_HANDLES).has(h);
+  const approver = isOwner(player, env);
+  const builder = approver || isDeveloper(player, env);
   return { builder, approver };
 }
 

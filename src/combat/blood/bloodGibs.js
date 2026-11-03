@@ -1,7 +1,7 @@
 // @ts-check
 // BLOOD1b - THE GIBS: what a warhammer leaves of a body.
 //
-// Read off the assembly (bible/05-Combat/Blood-Arc.md carries the
+// Read off the assembly (carries the
 // decompiled shape). A death the mod marked as explosive throws TEN
 // chunks from the body, each one a sprite quad on a rigidbody:
 //

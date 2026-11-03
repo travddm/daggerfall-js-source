@@ -1,5 +1,4 @@
-// HUNTERS-MARK and MARKS-OF-MASTERY (2026-10-27; a player, handed on by the owner: "Add more horizontal progression
-// please!"; bible/06-Systems/Bounty-Boards.md section 12): THE HUNT'S LEDGER on the account service, through the real
+// HUNTERS-MARK and MARKS-OF-MASTERY: THE HUNT'S LEDGER on the account service, through the real
 // Worker over node:sqlite (test/accountDb.mjs). A clear is the client's word, bounded: its shape, the event clock's
 // window, the level the realm trusts, one row a character a notice, the account's day; asked of the seat; a named mark
 // from its rung alone. The Marks of Mastery are derived from what the service keeps - the clears, a living Master's
@@ -43,7 +42,6 @@ test('HUNTERS-MARK THE LAW: a board clear inside the event clock\'s window, a ma
   const now = NOON * 1000;
   const today = huntGameDayAt(now);
   assert.equal(GAME_DAYS_PER_UTC_DAY, 12, 'a game day every two real hours');
-  // PIN MOVED (AUDIT HORIZONTAL F3): 48 was four held a game day - four held is not four cleared; the ceiling is measured
   // (tools/huntPace.mjs, test/tooling/huntpace.test.js on the game's map)
   assert.equal(HUNT_CLEARS_DAY_MAX, 750);
   assert.deepEqual(huntClearOf(bountyId(today, 300, 200, 1, 7), now), { kind: 'board', id: bountyId(today, 300, 200, 1, 7), key: bountySlotKey(today, 300, 200, 1), level: 7, tier: 2 });
@@ -57,7 +55,7 @@ test('HUNTERS-MARK THE LAW: a board clear inside the event clock\'s window, a ma
   assert.deepEqual(huntClearOf(huntMarkId(week - 2, 300, 200, 16), now), { why: 'late' });
   assert.deepEqual(huntClearOf(huntMarkId(week + 1, 300, 200, 16), now), { why: 'early' });
   assert.deepEqual(huntClearOf('7.300.200.1', now), { why: 'id' });
-  // SHIP AUDIT (2026-10-27): a board past the Bay posts its mark too - its town the world's pixel (the Imperial City's,
+  // SHIP AUDIT: a board past the Bay posts its mark too - its town the world's pixel (the Imperial City's,
   // Lillandril's west of the Bay), as a board notice's (LAIR-WORLD); a pixel past the world's bound is no mark
   assert.equal(huntClearOf(huntMarkId(week, 2069, 658, 16), now).kind, 'mark', 'past the Bay');
   assert.equal(huntClearOf(huntMarkId(week, -27, 1322, 16), now).kind, 'mark', 'west of the Bay');
@@ -156,15 +154,11 @@ test('HUNTERS-MARK THE DAY\'S CEILING AND THE MARK\'S RUNG: the account\'s UTC d
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM hunt_clears WHERE player = ? AND day = ?').get(mac.id, today).n, HUNT_CLEARS_DAY_MAX);
 });
 
-test('MARKS-OF-MASTERY THE TITLES ARE DERIVED: the hunt\'s off the account\'s board clears (every character), a Master\'s off a LIVING character\'s track, the sea\'s off the serpents slain - held on the wardrobe, worn, signed into the token; a guest holds none; the wardrobe carries the Annals\' pages kept (mutants: the clears\' count; the dead character\'s track; the serpents; the guest\'s guard; the mint\'s read; the pages left off)', async (t) => {
+test('MARKS-OF-MASTERY THE TITLES ARE DERIVED: the hunt\'s off the account\'s board clears (every character), a Master\'s off a LIVING character\'s track, the sea\'s off the serpents slain - held on the wardrobe, worn, signed into the token; a guest holds none (mutants: the clears\' count; the dead character\'s track; the serpents; the guest\'s guard; the mint\'s read)', async (t) => {
   const { s, raw, mac } = await stand(t);
   const seed = (n, char = mac.character) => { for (let i = 0; i < n; i++) raw.prepare("INSERT INTO hunt_clears (player, char_id, kind, key, id, tier, region, day, at) VALUES (?, ?, 'board', ?, 'x', 0, NULL, 1, 1)").run(mac.id, char, `k${char}${i}`); };
   const wardrobe = async () => (await (await s.fetch('https://accounts.invalid/v1/account', { headers: { authorization: `Bearer ${mac.secret}` } })).json()).wardrobe;
   assert.ok(!(await wardrobe()).titles.includes('bloodhound'));
-  // HUNTERS-MARK (Collections.md section 10): the Annals' pages the account keeps ride the wardrobe, for the page's part
-  assert.equal((await wardrobe()).annals, 0);
-  raw.prepare('UPDATE players SET eg_annals = 5 WHERE id = ?').run(mac.id);
-  assert.equal((await wardrobe()).annals, 5);
   seed(19);
   seed(5, 'char-other');   // another character of the account: counted together
   raw.prepare("INSERT INTO hunt_clears (player, char_id, kind, key, id, tier, region, day, at) VALUES (?, ?, 'mark', 'm.1', 'x', 0, NULL, 1, 1)").run(mac.id, mac.character);

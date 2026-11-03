@@ -1,4 +1,4 @@
-// COST-2 part two (2026-10-25; bible/11-Multiplayer/Scale-Arc.md COST-2 part two): THE TREE MOVES - its pure law
+// COST-2 part two: THE TREE MOVES - its pure law
 // (src/net/cellTree.js). The directory seeds the tree at a level, then moves it one node at a time: a crowded leaf
 // splits into its four children, four quiet sibling leaves merge into their parent, each after its count has held for a
 // dwell. Every tree a move makes lists only nodes the walk reaches, and its leaves still hold every fine cell once.

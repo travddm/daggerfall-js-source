@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-D (2026-09-28) - THE LAW AT SEA: what the crowns of the Bay make of a captain. The port's own, on DFU's own
+// NAV-D - THE LAW AT SEA: what the crowns of the Bay make of a captain. The port's own, on DFU's own
 // machinery - Daggerfall already names the crime (CRIMES.Piracy, 10, in the court's tables since the classic game),
 // and its legal reputation and factions are the ledger. Pure: the host applies what this answers.
 //
@@ -21,7 +21,7 @@
 // repute +3, the knightly order +3, the temple +1) - scaled to the pirate: a sloop's end is `PIRATE_REWARD.sunk`, a
 // flagship's the quest's own numbers.
 //
-// CAPT-PAY (2026-10-11, bible/03-World/Captains-Sea.md): BOARDERS THROWN BACK are a pirate's end too - the act 'repel'
+// CAPT-PAY: BOARDERS THROWN BACK are a pirate's end too - the act 'repel'
 // (navalHost.js winBoarding), rewarded as a sinking is (`PIRATE_REWARD.repelled`): a raid fought off a captain's own deck
 // had paid nothing - Warm Ashes' small raid declares its `_victory_` and never gives it, and the sea's own party
 // returned before the law was asked.

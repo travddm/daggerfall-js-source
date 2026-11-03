@@ -1,8 +1,7 @@
-// PERF-ON4 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"): THE ONLINE FRAME PROBE - the REAL game online, in headless Chromium over the freeware ARENA2, joined to the
+// PERF-ON4: THE ONLINE FRAME PROBE - the REAL game online, in headless Chromium over the freeware ARENA2, joined to the
 // REAL relay and the REAL account service in local workerd (tools/loadHarness.mjs's own two services), with a crowd of
 // bots round the player - each bot the client's own OnlineSession, as the harness's fleet is. PERF-NEXT measured online
-// in node, over the modules (bible/07-Rendering/Performance-Next.md "Online, measured"); this measures the frame a player
+// in node, over the modules ("Online, measured"); this measures the frame a player
 // online pays, through the frame probe's own three windows (tools/frameProbe.mjs measure): the census of every WebGL
 // call, the CPU profile by sample count, and the sampled heap.
 //

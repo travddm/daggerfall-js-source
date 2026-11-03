@@ -1,6 +1,5 @@
 // @ts-check
-// CLIMB5 - THE CLIMB, SEEN AND HEARD BY THE OTHERS (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "I
-// really want you to go all in on this").
+// CLIMB5 - THE CLIMB, SEEN AND HEARD BY THE OTHERS (the Enhanced Climbing arc).
 //
 // Before it a peer on a wall was a body standing in the air: facing wherever their camera looked (over the shoulder,
 // down the street), posed on the ground, walking in place along a lip as they shimmied, and silent. The pose carries

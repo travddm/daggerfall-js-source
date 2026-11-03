@@ -63,11 +63,11 @@ export const SECRET_BYTES = 32;
  *  year, because a player who opens the game twice a year is still that
  *  player and their friends list is still theirs. */
 export const SESSION_IDLE_S = 365 * 24 * 60 * 60;
-/** SCALE1 (2026-09-30, the scaling audit - Mac: "set the stage for a larger player base"): HOW STALE `last_seen` MAY
+/** SCALE1: HOW STALE `last_seen` MAY
  *  GROW before a request writes it again. Every authenticated call wrote both rows, two of its three D1 writes, and
  *  D1 has one writer for the whole service. Nothing reads the column finer than this: the idle bound is a year, and
- *  the device list orders by it. SCALE4h (2026-10-11, "10k writes"): an hour, not ten minutes - still nothing reads it
- *  finer, and a session's touch is one hot row the plan named (bible/11-Multiplayer/Scale-Arc.md SCALE4h). */
+ *  the device list orders by it. SCALE4h: an hour, not ten minutes - still nothing reads it
+ *  finer, and a session's touch is one hot row the plan named (SCALE4h). */
 export const SESSION_TOUCH_S = 60 * 60;
 
 const b64url = (bytes) => {
@@ -126,10 +126,8 @@ export function accountKind(row) {
 }
 
 /**
- * NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
- * name or character name for ingame use"): WHICH NAME THE ROOM READS - the account's (displayName, above) or the realm
- * character's the token is minted for (wornNameOf, below). The row stores the second alone (`name_as` 'character',
- * migration 0111), so a row that never chose reads as the account, as every player read before.
+ * NAME-AS: WHICH NAME THE ROOM READS - the account's (displayName, above) or the realm
+ * character's the token is minted for (wornNameOf, below). The row stores the second alone (`name_as` 'character'), so a row that never chose reads as the account, as every player read before.
  */
 export const NAME_AS = Object.freeze(['account', 'character']);
 /** NAME-AS: the choice this row holds - 'character', or the account's for anything else (null, a word no build wrote). */
@@ -166,7 +164,7 @@ export function wornNameRefusal(name) {
  * word of the request (test/server/accountworker.test.js: a name in the body never reaches the token). None - no character
  * named, an offline one, another account's, a tombstone - is the account's, and silently: there is nothing to wear.
  *
- * AND NEVER ANOTHER ACCOUNT'S USERNAME. A handle is unique (0001's handle_lc index) and is how an account is found - a
+ * AND NEVER ANOTHER ACCOUNT'S USERNAME. A handle is unique (the handle_lc index) and is how an account is found - a
  * letter, an invitation, a commission are each addressed by username - and handleShape.js keeps the guests' generated
  * names out of that space by their shape alone. A character's name is chosen at chargen, so its shape promises nothing:
  * one that is another account's username would walk every room wearing that account's name. So it is asked here, ONE
@@ -267,11 +265,10 @@ export async function openSession({ db, subtle, rand, nowS }, playerId, deviceLa
   return wrote?.meta?.changes ? { sessionId, secret } : null;
 }
 
-/** SCALE4a (2026-10-08, Mac: "Do 1 2 and 3" - the session and its player were two reads in a row, 4.86 and 4.73 million
- *  of the database's 17.4 million the day before YARD-SHED): THE SESSION'S COLUMNS, named, each read under a `s.` prefix
+/** SCALE4a: THE SESSION'S COLUMNS, named, each read under a `s.` prefix
  *  no column of `players` can carry, so one row holds both without a name in common (`id`, `created_at`, `last_seen`).
- *  The table's own six (0001_accounts.sql; no migration has altered it) - test/server/scale4a.test.js holds this list to the
- *  migrations' table, so a column added there is a pin that fails until it is named here. */
+ *  The table's own six - test/server/scale4a.test.js holds this list to the
+ *  schema's table, so a column added there is a pin that fails until it is named here. */
 export const SESSION_COLUMNS = Object.freeze(['id', 'player_id', 'secret_hash', 'device_label', 'created_at', 'last_seen']);
 /** SCALE4a: the session by its hash and its player beside it, in ONE statement. LEFT, so a session whose player is gone
  *  still comes back (its player's columns NULL) and meets the same exits it met as two reads: the idle one is deleted
@@ -403,10 +400,10 @@ export const isMuted = (row, nowS) => mutedUntil(row) > nowS;
 /**
  * MOD1 - MUTE (or, at `minutes` 0, UNMUTE) ONE ACCOUNT.
  *
- * Mac: "moderator chat commands" - /mute and /unmute.
+ * /mute and /unmute.
  *
  * THE AUTHORITY IS DERIVED, like every grant in titles.js: the actor's
- * handle in MODERATOR_HANDLES or DEVELOPER_HANDLES, read now. Nothing a
+ * account holding the Moderator or Admin role (`staff_mod`, `staff_admin`), read now. Nothing a
  * client says makes it a moderator.
  *
  * A MODERATOR CANNOT MUTE A MODERATOR, NOR THEMSELVES. A mod-on-mod
@@ -426,7 +423,7 @@ export async function muteAccount({ db, nowS }, actor, env, { target, minutes, a
   if (canModerate(row, env)) return { error: 'protected' };
   const until = minutes ? nowS + minutes * 60 : null;
   // STAFF-PANEL2-FIX (design doc, Weak spots: "A Moderator can lift an Admin's ban" - "Store who set each sanction;
-  // lifting an Admin's needs an Admin"): a mute an Admin set (`mute_admin`, 0156) is lifted or cut short by an Admin
+  // lifting an Admin's needs an Admin"): a mute an Admin set (`mute_admin`) is lifted or cut short by an Admin
   // alone, and stays the Admin's when another moderator lengthens it
   const adminHeld = row.mute_admin === 1 && isMuted(row, nowS);
   const admin = isDeveloper(actor, env);
@@ -514,7 +511,7 @@ export async function creditPlay({ db, nowS }, playerId, sessionId = null) {
 export const accountWardrobe = (player, env, nowS) => wardrobeOf(player, env, nowS);
 
 /**
- * EQUIP ONE, or none. Mac: "tap the account icon to equip 1 feature".
+ * EQUIP ONE, or none..
  *
  * The refusal is checked against what the player HOLDS, derived now -
  * so a title that has lapsed cannot go on being worn by a row nobody
@@ -546,7 +543,7 @@ export async function equipAura({ db, nowS }, player, env, aura) {
 }
 
 /**
- * WITCH1 (bible/06-Systems/Witches-Festival.md) - WEAR ONE PROFILE ICON, OR NONE (the character's face): the aura's law,
+ * WITCH1 - WEAR ONE PROFILE ICON, OR NONE (the character's face): the aura's law,
  * in the portrait well. Answers the wardrobe after the write; `not-held` for one the account does not hold.
  */
 export async function equipIcon({ db, nowS }, player, env, icon) {
@@ -557,7 +554,7 @@ export async function equipIcon({ db, nowS }, player, env, icon) {
 }
 
 /**
- * GLYPH-WEAR - SHOW ONE GLYPH, OR HIDE IT. Mac: "players can also equip/unequip their glyphs". Refused for a glyph
+ * GLYPH-WEAR - SHOW ONE GLYPH, OR HIDE IT.. Refused for a glyph
  * that is not true of the player now (`not-held`), as a title is. `on` true shows it, false hides it. The stored
  * list is rewritten from what is hidden now, so a lapsed glyph drops out of it on the next write. Answers the
  * wardrobe after the write.
@@ -572,14 +569,12 @@ export async function equipGlyph({ db, nowS }, player, env, glyph, on) {
   return { ok: true, ...wardrobeOf({ ...player, glyphs_off }, env, nowS) };
 }
 
-/** SERPENT-SET: every ember account ?1's kills paid, in SQL - its gates' rows' `stones` and (migration 0083) its serpents'
- *  (SERPENT_EMBERS a receipt): the gate's currency is a serpent's hoard's too, and the purse below counts both. EG-E1
- *  (bible/11-Multiplayer/Elite-Gates.md section 19): and the Redoubts' the week paid (eg_redoubts `stones` - egEconomy.js),
- *  so the insignia and the Broker's Panoply sink (egEconomy.js egSink) spend the Spire's embers from the one purse. */
-export const EMBERS_EARNED_SQL = '((SELECT COALESCE(SUM(stones), 0) FROM gate_kills WHERE account = ?1) + (SELECT COALESCE(SUM(stones), 0) FROM serpent_kills WHERE account = ?1) + (SELECT COALESCE(SUM(stones), 0) FROM eg_redoubts WHERE account = ?1))';
+/** SERPENT-SET: every ember account ?1's kills paid, in SQL - its gates' rows' `stones` and its serpents'
+ *  (SERPENT_EMBERS a receipt): the gate's currency is a serpent's hoard's too, and the purse below counts both. */
+export const EMBERS_EARNED_SQL = '((SELECT COALESCE(SUM(stones), 0) FROM gate_kills WHERE account = ?1) + (SELECT COALESCE(SUM(stones), 0) FROM serpent_kills WHERE account = ?1))';
 /** WB9g: what the account's own closed gates could still pay for - one Sigil Stone a gate closed (gate_kills, WB5b),
  *  less what its insignia already cost (`insignia_spent`). Never below 0. WB12d: a row's own `stones` - two with the
- *  faithful's rite broken, one for the rite alone (migration 0066). SERPENT-SET: and a serpent's (EMBERS_EARNED_SQL). */
+ *  faithful's rite broken, one for the rite alone. SERPENT-SET: and a serpent's (EMBERS_EARNED_SQL). */
 export async function insigniaPurse({ db }, player) {
   const r = await db.prepare(`SELECT ${EMBERS_EARNED_SQL} AS n`).bind(player.id).first();
   const spent = Number.isSafeInteger(player?.insignia_spent) ? player.insignia_spent : 0;
@@ -747,8 +742,7 @@ export async function overRate({ db, nowS }, key, max = LOGIN_MAX, windowS = LOG
 }
 
 /**
- * ACCT-RATE-MEM (2026-10-04, the login outage - Mac: "You log in and it sends you straight to title screen", "We have
- * 300 people trying to log in at once"): AUDIT-ACC F12's bound, IN THE ISOLATE'S MEMORY AND NOT IN D1.
+ * ACCT-RATE-MEM: AUDIT-ACC F12's bound, IN THE ISOLATE'S MEMORY AND NOT IN D1.
  *
  * F12 asked `overRate` with an `acct:` key on EVERY authenticated request - an upsert, so every read the game makes
  * (a town's yards each minute, a home, a token) was also a WRITE to the one database. D1's own query insights on
@@ -879,7 +873,7 @@ export async function login({ db, subtle, rand, nowS }, { handle, password, devi
   if (!player || !ok) return { error: 'bad-login' };
 
   await clearRate({ db }, `login:${lc}`);
-  // AUDIT SAFE SERVICE-7 (bible/11-Multiplayer/Chat-Safety-Arc.md section 5): A BANNED ACCOUNT IS TOLD SO, and minted no
+  // AUDIT SAFE SERVICE-7: A BANNED ACCOUNT IS TOLD SO, and minted no
   // session - told only once the password is right, so the word says nothing to a stranger guessing at a handle
   if (bannedNow(player, nowS)) return { error: 'banned', until: player.banned_until, reason: player.ban_reason ?? null };
   // The cost of a hash goes up over the years. The only moment the
@@ -1006,8 +1000,7 @@ export async function changePassword({ db, subtle, rand, nowS }, player, session
  * AUDIT RECOVERY-SET A1 - AND ONE OF THE CODES IT REPLACES. With the
  * password alone, whoever STOLE the password could kill the owner's
  * codes and then change the password: the account theirs for good, the
- * one thing a recovery code exists to undo (Mac, asked: "Password + one
- * code"). So a row that holds codes asks for one of them as well, spent
+ * one thing a recovery code exists to undo. So a row that holds codes asks for one of them as well, spent
  * by the same write; a row that holds none asks for the password alone,
  * having nothing to kill. A player who has lost every code is where they
  * were before the set - their password, and RECOVER-OP.
@@ -1047,10 +1040,9 @@ export async function setEmail({ db }, playerId, email) {
   return { email: e };
 }
 
-// ═══ DUEL1 (2026-09-24) - THE DUELLING RECORD ════════════════════════
+// ═══ DUEL1 - THE DUELLING RECORD ════════════════════════
 //
-// Mac: "Add a dueling K/D to the profile menu and player inspect
-// profile", per account. A player's wins are the rows of duel_results
+// per account. A player's wins are the rows of duel_results
 // naming them the winner, and their losses the rows naming them the
 // loser. DUEL1 wrote a row on the LOSER's own report, naming the winner
 // by the account the relay stamped on the winner's frames; INT8 (below)
@@ -1076,10 +1068,9 @@ export async function duelRecordOf({ db }, playerId) {
   return { wins: n(w), losses: n(l) };
 }
 
-// ═══ INT8 (2026-10-09) - A DUEL'S RESULT, THE RELAY'S ═════════════════
+// ═══ INT8 - A DUEL'S RESULT, THE RELAY'S ═════════════════
 //
-// The INTEGRITY arc's lane 2 (bible/06-Systems/Integrity-Arc.md; Mac: "I
-// want to do everything and do it properly"). DUEL1's record was the
+// The INTEGRITY arc's lane 2 (). DUEL1's record was the
 // LOSER's own report - a client that never said it lost never did, and
 // a double knockout was two reports racing. Now the relay that refereed
 // the bout (src/net/duel/duelRef.js) hands BOTH fighters a receipt naming the
@@ -1128,9 +1119,9 @@ export async function claimDuel({ db, nowS, subtle }, player, receipt, publicKey
   return { recorded: false, why, ...(await mine()) };
 }
 
-// ═══ WB5b (2026-09-25) - THE GATES CLOSED ════════════════════════════
+// ═══ WB5b - THE GATES CLOSED ════════════════════════════
 //
-// Mac: "a gate of oblivion which takes place in a large boss arena", and
+// and
 // Option B - the relay's object is the authority over the boss, stamps
 // the kill and signs a receipt for each account that earned it
 // (src/net/gate/gateReceipt.js: dealt its share of the health its own level
@@ -1163,14 +1154,12 @@ export async function gateRecordOf({ db }, playerId) {
  * `struck` beside a Drakes strike), `{ recorded: false, why: 'claimed', stones, closed }` (AUDIT WB12d A1: the row's
  * embers, a fighter's `r` made good), `{ recorded: false, why: 'guest', closed }`, or `{ error }` -
  * `no-gate-key` (this service holds no public half), `receipt` (not a receipt the relay signed, or expired - `why`
- * says which rung), `not-yours` (another account's). AUDIT EG IV (lane3 #16): `weir` the Weir Key's statement for the claims
- * (eg.js egGateWeir), set in the batch directly after the row - the row it answered rides a recorded kill's answer as
- * `weirRow` (null where it rolled nothing); never for the rite alone.
+ * says which rung), `not-yours` (another account's).
  * @param {{ db: any, nowS: number, subtle: SubtleCrypto }} ctx
  * @param {{ id: string, handle?: string|null }} player the session's account
  * @param {unknown} receipt @param {CryptoKey|null} publicKey
  */
-export async function claimGate({ db, nowS, subtle }, player, receipt, publicKey, { strike = null, region = null, deeds = null, weir = null } = {}) {
+export async function claimGate({ db, nowS, subtle }, player, receipt, publicKey, { strike = null, region = null, deeds = null } = {}) {
   if (!publicKey) return { error: 'no-gate-key' };
   const v = await verifyReceipt(receipt, publicKey, { subtle, nowS });
   if (!v.ok) return { error: 'receipt', why: v.why };
@@ -1191,15 +1180,12 @@ export async function claimGate({ db, nowS, subtle }, player, receipt, publicKey
   // SILVER-WAYS: the guild's deed (marks.js deedStatements - its mark and its strike, by the gate_kills row this claim
   // wrote), in the same batch; never for the rite alone, which is no breach closed
   const deed = c.x === 'rite' ? null : deeds?.(c.d) ?? null;
-  // AUDIT EG IV (lane3 #16): the Weir Key's roll directly after the row, in its transaction (eg.js egGateWeir - `changes()`
-  // the row's): never the rite's
-  const roll = c.x === 'rite' ? null : weir?.(c) ?? null;
-  const [r, ...rest] = stmt || deed || roll ? await db.batch([kill, ...(roll ? [roll] : []), ...(stmt ? [stmt] : [db.prepare('SELECT 0')]), ...(deed ?? [])]) : [await kill.run(), null];
-  const w = roll ? rest.shift() : null, [m, ...d] = rest;
+  const [r, ...rest] = stmt || deed ? await db.batch([kill, ...(stmt ? [stmt] : [db.prepare('SELECT 0')]), ...(deed ?? [])]) : [await kill.run(), null];
+  const [m, ...d] = rest;
   const recorded = Number(r?.meta?.changes ?? 0) > 0;
   const struck = !!stmt && Number(m?.meta?.changes ?? 0) > 0;
   const deedStruck = !!deed && Number(d[1]?.meta?.changes ?? 0) > 0;
-  if (recorded) return { recorded, day: c.d, stones: embers, ...(c.p > 0 ? { portent: c.p } : {}), ...(c.x === 'rite' ? { rite: true } : {}), ...(stmt ? { struck } : {}), ...(deed ? { deedStruck } : {}), ...(roll ? { weirRow: w?.results?.[0] ?? null } : {}), ...(await gateRecordOf({ db }, player.id)) };
+  if (recorded) return { recorded, day: c.d, stones: embers, ...(c.p > 0 ? { portent: c.p } : {}), ...(c.x === 'rite' ? { rite: true } : {}), ...(stmt ? { struck } : {}), ...(deed ? { deedStruck } : {}), ...(await gateRecordOf({ db }, player.id)) };
   // AUDIT WB12d (A1): A FIGHTER'S `r` COUNTED AT ONE EMBER - a service from before acct62 took the receipt as a plain one
   // and kept its row - is made good when the receipt is claimed again (the game keeps an `r` receipt until a service
   // that answers its embers has counted it). One row a (day, account), one receipt a kill: the row is this receipt's

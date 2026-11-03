@@ -1,10 +1,10 @@
 // @ts-check
-// SD5b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7): THE SHATTERED HOUR'S SKY -
+// SD5b: THE SHATTERED HOUR'S SKY -
 // "a void of brass light and slow aurorae, the Bay's skylines hanging upside down in it - Daggerfall's towers,
 // Sentinel's domes, Wayrest's bridges - the shards of the endings, turning on the realm's clock; a great clock-face of
 // stars behind the arena whose hands run backwards."
 //
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 5): A PAINTED SKY, in two stages.
+// SD-LOOK: A PAINTED SKY, in two stages.
 //
 //   THE MAP - an octahedral SD_SKY_MAP x SD_SKY_MAP picture of the whole sky, one texel about 0.4 degrees (Daggerfall's
 //     own sky is pi/512 a pixel - render/skyRenderer.js SKY_ANGLE_PER_PIXEL), NEAREST: painted by SD_SKY_PAINT_FS a

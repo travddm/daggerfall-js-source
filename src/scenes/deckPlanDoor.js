@@ -1,5 +1,5 @@
 // @ts-check
-// DECK-PROPS (2026-10-17; bible/03-World/Naval-Refit.md DECK-PROPS) - THE DECK PLAN'S DOOR: the Fleet page's Deck
+// DECK-PROPS - THE DECK PLAN'S DOOR: the Fleet page's Deck
 // (scenes/fleetHost.js `deckPlan`) opens the plan of her deck (ui/deckPlanWindow.js, through the sea's window door) over
 // the world host's runtimes - her hull's deck baked by the boats' pool (scenes/comeSailAway/comeSailAwayPool.js deckOf),
 // each fitting's model asked of the pipeline so its box can be drawn, and the Fleet's act that keeps what is set.

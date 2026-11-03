@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -73,7 +73,7 @@ export function createTamrielSweeps(host) {
     swap.rebuild(again);   // IC-SWAP-BEHIND: behind its view
     console.log(`[capitals] ${again.length} pixel(s) beyond the Bay built again for the capitals`);
   }
-  /** IC-GRAND (bible/03-World/Arena-Provinces.md IC-GRAND): THE IMPERIAL CITY NEAR AND FAR - its slices within NEAR_RING of
+  /** IC-GRAND (IC-GRAND): THE IMPERIAL CITY NEAR AND FAR - its slices within NEAR_RING of
    *  the player's pixel built near (their blocks, their fabric, their walkers), the rest far (world/tamrielCapitals.js
    *  capitalBuildView: their skylines' masses, no collider, no walker); a near one kept near NEAR_SLACK further, so a walk
    *  along a pixel's edge builds nothing twice. Asked on the frame, but walked only when the player's pixel or the built set
@@ -101,7 +101,7 @@ export function createTamrielSweeps(host) {
       if (want !== p.capitalLod) (want === 'near' ? near : far).push({ px: p.px, py: p.py });
     }
     if (!near.length && !far.length) return;
-    // IC-SWAP-BEHIND (the owner: "Weird pop in issues in the city when moving"): each slice built again behind the view
+    // IC-SWAP-BEHIND: each slice built again behind the view
     // that stands until its new one is published - the ones coming near first at the queue's head, the ones going far at
     // its tail
     swap.rebuild(far);

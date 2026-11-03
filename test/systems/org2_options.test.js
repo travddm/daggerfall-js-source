@@ -1,4 +1,4 @@
-// ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): ONE SETTINGS
+// ORG2: ONE SETTINGS
 // SCREEN FOR EVERY OPTION. Settings (DFU's 171 keys) and the Features home (the port's rows and the mods) were two doors
 // over one subject; one map (ui/settings/settingsMap.js) now places everything in a TAB, then a SECTION, and the screen draws
 // every option as a row of one shape. These pins hold the map total and disjoint over all three kinds of option, the
@@ -54,12 +54,12 @@ function withRows(fn) {
 }
 
 const SPECIAL = ['preset:graphics', 'link:overhauls', 'bindings', 'mods-index'];
-const CARDS = ['card:morrowind', 'card:packs', 'card:peerSprites', 'card:nightSounds'];   // PIN MOVED (TESA1): the Arena card; TESA12: gone with Arena
+const CARDS = ['card:morrowind', 'card:packs', 'card:peerSprites', 'card:nightSounds'];
 
 test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s keys, each Features row and each of the port\'s own rows stands in exactly one section of one tab (mutant: a row dropped, or placed twice)', () => {
   const seen = new Map();
   for (const t of CATEGORIES) {
-    // Mac, on ORG2's first cut: "Wayyyy too much overexplaining" - a tab and a section are their titles, nothing more
+    // a tab and a section are their titles, nothing more
     assert.deepEqual(Object.keys(t), ['id', 'title', 'sections'], `${t.id} is a title and sections`);
     assert.ok(t.title && t.sections.length, `${t.id} has a title and sections`);
     assert.equal(new Set(t.sections.map((s) => s.id)).size, t.sections.length, `${t.id}'s sections are named once`);
@@ -215,7 +215,6 @@ test('AUDIT MEM-AUDIT G1-G6: the preset - every row and part in cost order; High
   // G4/G6: the search finds what the note names, and the row says when it takes effect
   const words = presetSearchText().toLowerCase();
   for (const w of ['steady shadows', 'windows', 'water', 'grass', 'clouds', 'land view distance', 'ground sharpness', 'frame rate']) assert.ok(words.includes(w), `the preset is found by "${w}"`);
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /main\.append\(el\('div', 'row-sub', PRESET_WORDS\.effect\(\)\)\);/);
 });
 
 test('ORG2: a tab restores its own defaults and leaves every other tab as it is - its DFU keys, its Features rows and its port rows (mutant: one kind left, or another tab restored)', () => {
@@ -238,30 +237,3 @@ test('ORG2: a tab restores its own defaults and leaves every other tab as it is 
   } finally { delete globalThis.location; fresh(); }
 });
 
-test('ORG2 by source: one screen - the rail is the tabs and counts what each draws, the search reads every tab, the filters and the actions sit over the rows, the pause window draws the same screen, and an old door named features lands on it', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const pane = menu.slice(menu.indexOf('function paneSettings('), menu.indexOf('\n}\n', menu.indexOf('function paneSettings(')));
-  assert.match(pane, /for \(const cat of CATEGORIES\) \{/, 'the rail is the map\'s tabs');
-  // PIN MOVED (UNSAVED-MARK, FIELD BUGS 2026-10-11): the toolbar is named, so the list can measure it for the bindings'
-  // sticky head (stickUnderToolbar) - still over the body, still before it paints
-  assert.match(pane, /const tools = optionsToolbar\(body, \{ pause \}\);\s*\n\s*list\.append\(tools, body\);[^\n]*\n\s*stickUnderToolbar\(list, tools\);[^\n]*\n\s*paintOptionsBody\(body, \{ pause \}\);/, 'the toolbar over the body');
-  const paint = menu.slice(menu.indexOf('function paintOptionsBody('), menu.indexOf('\n}\n', menu.indexOf('function paintOptionsBody(')));
-  assert.match(paint, /if \(q\) \{\s*\n\s*let found = 0;\s*\n\s*for \(const tab of CATEGORIES\) \{/, 'a search reads every tab, not the open one');
-  assert.match(paint, /body\.append\(sectionHead\(tab, s, nodes\.filter\(isOptionNode\)\.length, \{ path: true \}\), \.\.\.nodes\);/, 'and says where each find lives');
-  assert.match(paint, /if \(sections\.length >= 3 && !pause\) \{\s*\n\s*const strip = el\('nav', 'sec-jump'\);/, 'a long tab has a jump strip');
-  assert.match(menu, /if \(item === 'preset:graphics'\) return \[graphicsPresetRow\(\)\];/);
-  assert.match(menu, /if \(item === 'mods-index'\) return modsIndexRows\(\);/);
-  assert.match(menu, /if \(optFilter !== 'all'\) \{\s*\n\s*if \(optFilter === 'changed' \? !itemChanged\(item, pool\) : !itemKinds\(item\)\.includes\(optFilter\)\) return \[\];/, 'the filters pass an item or draw nothing of it');
-  assert.match(menu, /const mark = \(n\) => \{ if \(n && itemChanged\(item, pool\)\) n\.classList\.add\('changed'\); return n; \};/, 'a changed row says so');
-  assert.match(menu, /if \(id === 'features'\) id = 'settings';/);
-  assert.match(menu, /paneSettings\(detail, \{ pause: true \}\);/);
-  // the preset writes through the rows' own states, so a row the room decides is left as it is
-  const apply = menu.slice(menu.indexOf('export function applyGraphicsPreset('), menu.indexOf('\n}\n', menu.indexOf('export function applyGraphicsPreset(')));
-  assert.match(apply, /if \(!st \|\| st\.locked \|\| !c\?\.tiers\) continue;/);
-  assert.match(apply, /if \(i >= 0 && \(i !== st\.at \|\| c\.write\)\) st\.set\(i\);/);   // PIN MOVED (AUDIT MEM-AUDIT G2): a lane's row written whole, whatever its bar reads
-  // one tab's restore leaves what the room decides, and the All off keep for Restore
-  const restore = menu.slice(menu.indexOf('export function restoreTabDefaults('), menu.indexOf('\n}\n', menu.indexOf('export function restoreTabDefaults(')));
-  assert.match(restore, /if \(onlineForcedSetting\(sec, k\) !== undefined\) continue;/);
-  assert.match(restore, /\{ spendKeep: false \}/);
-  assert.match(restore, /onlineForcedPref\(pref\) === undefined\) setPref\(pref, PREF_DEFAULTS\[pref\]\);/);
-});

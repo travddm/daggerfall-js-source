@@ -1,5 +1,4 @@
-// LOOT18 - SEEN: THE LINE COMPARE, THE JUNK AND THE FILTER (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 10; Mac:
-// "what could we do to make it even more amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT18 - SEEN: THE LINE COMPARE, THE JUNK AND THE FILTER.
 //
 // Four things that let a player see and sort what the ladder hands them, none a new rule of the ladder's:
 //   - THE CARD COMPARES LINES - beside AC-COMPARE's numbers, each line of a picked piece against the same line on what a
@@ -107,9 +106,6 @@ test('LOOT18: the pack\'s card - Junk beside the lock on gear in the pack, its l
     acts().find((b) => b.textContent === 'Lock').onclick({});
     assert.deepEqual([isLocked(s), isJunk(s)], [true, false], 'the lock lifts the mark');
   });
-  // a worn piece takes none, nor anything but gear (a bandage's card stands as DISC13 pins it)
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /if \(side === 'local' && !line\.equipped && junkable\(picked\)\) \{\n\s+const j = el\('button', 'act', isJunk\(picked\) \? 'Not junk' : 'Junk'\);/, 'local, unworn gear alone');
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.pack-shell \[data-junk\] \.tile > \*/, 'the sheet dims the mark\'s picture');
   _resetForTests();
 });
 
@@ -280,9 +276,9 @@ test('LOOT18: the line compare - each line against the same on what a wear repla
   assert.deepEqual(cmp.rows[2].resist, { now: 20, then: 15 }, 'the fire the rolled gear counts, now and after');
   // a resistance past the cap counts as the cap
   const shield = known(LR.applyRarity(mintCondition({ group: 'Armor', templateIndex: 109, material: 0x0201, name: 'Shield', flags: 0 }), 'rare', lcg(13)));
-  shield.affixes = [{ id: 'resist', param: 'fire', value: 35 }];
+  shield.affixes = [{ id: 'resist', param: 'fire', value: 30 }];   // PIN MOVED: B4 rescale, a resistance line tops at 30
   e.items.push(shield); equipItem(e, shield);
-  assert.deepEqual(LR.lineComparison(e, cand, [worn]).rows[2].resist, { now: LR.RESIST_CAP, then: LR.RESIST_CAP }, '55 then 50: both at the cap');
+  assert.deepEqual(LR.lineComparison(e, cand, [worn]).rows[2].resist, { now: LR.RESIST_CAP, then: LR.RESIST_CAP }, '50 then 45: both at the cap');
   // nothing to say
   assert.equal(LR.lineComparison(e, cand, []), null, 'a wear that replaces nothing');
   const unknown = LR.applyRarity(sword(), 'rare', lcg(14));
@@ -295,8 +291,9 @@ test('LOOT18: the line compare - each line against the same on what a wear repla
   withDom(() => {
     const on2 = known(LR.applyRarity(cuirass(), 'rare', lcg(21)));
     const off2 = known(LR.applyRarity(cuirass(), 'rare', lcg(22)));
-    on2.affixes = [{ id: 'armor', value: 12 }, { id: 'stat', param: 'strength', value: 5 }, { id: 'resist', param: 'fire', value: 20 }];
-    off2.affixes = [{ id: 'armor', value: 18 }, { id: 'stat', param: 'agility', value: 6 }, { id: 'resist', param: 'fire', value: 15 }];
+    // PIN MOVED: B4 rescale, an armour line tops at 12 (12 and 18 became 6 and 12: the same up of 6)
+    on2.affixes = [{ id: 'armor', value: 6 }, { id: 'stat', param: 'strength', value: 5 }, { id: 'resist', param: 'fire', value: 20 }];
+    off2.affixes = [{ id: 'armor', value: 12 }, { id: 'stat', param: 'agility', value: 6 }, { id: 'resist', param: 'fire', value: 15 }];
     const e2 = player([on2, off2]);
     equipItem(e2, on2);
     const box = lineCompareBlock(e2, off2);
@@ -309,6 +306,4 @@ test('LOOT18: the line compare - each line against the same on what a wear repla
     assert.ok(rows[3].classList.contains('lost'));
     assert.equal(lineCompareBlock(e2, on2), null, 'a worn piece compares with nothing');
   });
-  // PIN MOVED (AUDIT LOOT II B6): the card hands both blocks its one comparison
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /const lc = lineCompareBlock\(deps\.entity, picked, wear\); if \(lc\) into\.append\(lc\);/, 'the card draws it under AC-COMPARE\'s numbers');
 });

@@ -1,5 +1,4 @@
-// BLD (2026-10-26, the owner, having walked the Imperial City: "... no doors/interiors ..."; "No band aids for any of
-// this"; bible/03-World/Arena-Provinces.md IC-GRAND, BLD) - THE FABRIC'S BUILDINGS ENTERED AS DAGGERFALL'S ARE, pinned:
+// BLD - THE FABRIC'S BUILDINGS ENTERED AS DAGGERFALL'S ARE, pinned:
 // a record and a door for every street-front building its street lets one stand at; the door the game's own building
 // door, laid by RMBLayout's own law where the building's door is; its interior a donor's from Daggerfall's own blocks of
 // its type, laid so the landing is just inside that door; its name its own, never a classic building's draw; and against
@@ -39,7 +38,7 @@ function sampleCell(x, z, n = 8) {
 }
 const CELLS = [...IMPERIAL_SECTORS.flatMap(([, b]) => [[b + 22.5, 3000], [b + 37.5, 5300]]), [170, 7300]].map(([b, r]) => sampleCell(...polar(b, r))).filter(Boolean);
 const DEPS = { portBlockJson, miscModelAt, startMarkerAt, footprintOf: () => null, anchorMarkers: [], noGround: 255, rim: () => false };
-/** A BLOCKS.BSA stand-in: every block's every record an interior that names where it was read from - PIN MOVED
+/** A BLOCKS.BSA stand-in: every block's every record an interior that names where it was read from
  *  (IC-INTERIORS): on its one person, the cast a fabric building's own interior takes from its donor. */
 const FAKE_BLOCKS = { getBlockByName: (name) => ({ rmbBlock: { subRecords: Array.from({ length: 40 }, (_, k) => ({ interior: { header: { num3dObjectRecords: 1 }, from: `${name}#${k}`, blockPeopleRecords: [{ xPos: 0, yPos: 0, zPos: 0, textureArchive: 182, textureRecord: k % 30, factionID: 0, flags: 0, from: `${name}#${k}` }], blockFlatObjectRecords: [] } })) } }) };
 const ownBlock = (r, c, blocks = FAKE_BLOCKS) => { _resetFabricInteriors(); const name = imperialOwnName(r, c); return withFabricBuildings(imperialBlockJson(name, DEPS), name, blocks); };
@@ -60,16 +59,15 @@ test('BLD EVERY STREET-FRONT BUILDING ITS RECORD AND ITS DOOR - each building of
       assert.equal(x.pool, d.pool);
       const [lo, hi] = DISTRICT_QUALITY[district];
       assert.ok(x.quality >= lo && x.quality <= hi, `quality ${x.quality} in ${district}`);
-      assert.equal(x.factionId, x.pool === 'mages' ? GUILD_FACTION_IDS.MagesGuild : x.pool === 'fighters' ? GUILD_FACTION_IDS.FightersGuild : x.pool === 'thieves' ? GUILD_FACTION_IDS.ThievesGuild : d.faction);   // PIN MOVED (IC-PROPS): the Thieves Guild's house its guild's, a temple its god's (its donor's record's)
+      assert.equal(x.factionId, x.pool === 'mages' ? GUILD_FACTION_IDS.MagesGuild : x.pool === 'fighters' ? GUILD_FACTION_IDS.FightersGuild : x.pool === 'thieves' ? GUILD_FACTION_IDS.ThievesGuild : d.faction);
       if (d.type === BUILDING_TYPES.GuildHall) assert.equal(DISTRICT_TRADE[district].guild, x.pool, 'a guild keeps house where its district says');
-      if (isNamedBuildingType(x.type) && x.type !== BUILDING_TYPES.Tavern && d.type !== BUILDING_TYPES.GuildHall) { shops++; assert.ok(DISTRICT_TRADE[district].shops.includes(x.pool) || DISTRICT_TRADE[district].halls?.some(([pool]) => pool === x.pool), `${x.pool} in ${district}`); }   // PIN MOVED (IC-PROPS): or its signature halls'
+      if (isNamedBuildingType(x.type) && x.type !== BUILDING_TYPES.Tavern && d.type !== BUILDING_TYPES.GuildHall) { shops++; assert.ok(DISTRICT_TRADE[district].shops.includes(x.pool) || DISTRICT_TRADE[district].halls?.some(([pool]) => pool === x.pool), `${x.pool} in ${district}`); }
       assert.ok(x.nameSeed >= 1 && x.nameSeed <= 65535);
       // the door: a bay's middle on its edge, the street open a hand and two metres out
       const a = p.q[x.door.edge], b = p.q[(x.door.edge + 1) & 3], len = Math.hypot(b[0] - a[0], b[1] - a[1]), bays = Math.max(1, Math.round(len / BAY));
       const s = ((x.door.at[0] - a[0]) * (b[0] - a[0]) + (x.door.at[1] - a[1]) * (b[1] - a[1])) / len, k = s / (len / bays) - 0.5;
       assert.ok(Math.abs(k - Math.round(k)) < 1e-6 && Math.round(k) >= 0 && Math.round(k) < bays, 'a bay\'s middle');
       assert.deepEqual(x.door.n, outwardOf(p.q, x.door.edge));
-      // PIN MOVED (IC-STAIRS): the street under a stair's upper flights (GROUND.under, a door's height clear over it) is open too
       for (const out of [0.8, 2]) assert.ok([GROUND.street, GROUND.square, GROUND.under].includes(fabricGroundIn(L, x.door.at[0] + x.door.n[0] * out, x.door.at[1] + x.door.n[1] * out)), 'the street open before the door');
     }
     assert.deepEqual(fabricCellBuildings(r, c), list, 'kept, the same');
@@ -116,7 +114,6 @@ test('BLD THE DOOR IS THE GAME\'S DOOR - a cell\'s block carries each building a
       const at = doorWorldPosition(doors[0]), n = doorWorldNormal(doors[0]), [bx, bz] = blockLocal(r, c, x.door.at[0], x.door.at[1]);
       assert.ok(Math.hypot(at[0] - (bx + x.door.n[0] * FABRIC_DOOR.proud), at[2] - (bz - x.door.n[1] * FABRIC_DOOR.proud)) < 0.04, `building ${m.recordIndex}'s door where it stands`);
       assert.ok(Math.hypot(n[0] - x.door.n[0], n[2] + x.door.n[1]) < 0.01, 'facing its street');
-      // PIN MOVED (IC-INTERIORS): the interior is the building's own (world/interior/fabricInterior.js), its cast its donor's
       assert.equal(block.rmbBlock.subRecords[m.recordIndex].interior.blockPeopleRecords[0].from, `${d.block}#${d.record}`, 'its donor\'s cast');
     }
     // the town map: the footprint's automap bytes its type's (still shut to the walkers)

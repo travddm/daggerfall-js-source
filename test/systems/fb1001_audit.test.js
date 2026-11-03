@@ -1,5 +1,4 @@
-// AUDIT 2026-10-01 part four (Mac: "let's do a comprehensive audit on this and also ensure the other professions are
-// sound") - what the adversarial re-read of part four found in its own fixes, each pinned red on the code before it.
+// AUDIT 2026-10-01 part four - what the adversarial re-read of part four found in its own fixes, each pinned red on the code before it.
 //
 // NODE-SHUT. CLIMB-NODE's hold reads the gathering host's target (scenes/world.js `hold`), and the host's frame returned
 // early while the professions were shut - its act ended, its prompt gone, its target LEFT: a node under the look when the
@@ -284,7 +283,6 @@ test('REFUSALS-LEARNED at the host, CAP-OFF (2026-10-07, Mac: "Remove the cap on
   try {
     s.face(s.vein);
     assert.match(s.prompt?.rest ?? '', /^Mining 100/, 'open: ready');
-    // PIN MOVED (CAP-OFF): the account's Mining day closed, the prompt said "120 today across your characters", E passed
     // on and said it, and nothing started
     s.book.closed = (k) => k === 'account:mining';
     s.host.tick(0.016);

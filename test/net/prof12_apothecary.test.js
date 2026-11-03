@@ -1,10 +1,10 @@
-// PROF12 (2026-10-02, Mac: "2 and 4"; "lets just finish out everything before merge") - THE APOTHECARY OPENED: a seat's
+// PROF12 - THE APOTHECARY OPENED: a seat's
 // Apothecary (Seats-Arc 7.5: "members in Alchemy, Cooking, Jewelcrafting here: +1 step" a tier) raised now its three
 // professions' stations stand (fortLaw APOTHECARY_OPEN - AUDIT SEATS-2 L5's gate), and its step a tier for the holder's
 // members crafting in its town, each profession's own: a piece of jewellery a quality step (the Forge's and the Workshop's
 // law), a dish its XP half again (a dish takes no quality - recipeLaw cookXp), a brew its Potent chance +10 (alchemyLaw
 // potentChance). Nobody else, nowhere else, and no other hall's. Driven through the real Worker over node:sqlite with every
-// migration applied (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md 7.5; Professions-Arc.md 37.
+// migration applied (test/accountDb.mjs). 7.5; Professions-Arc.md 37.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
@@ -105,15 +105,15 @@ test('PROF12 APOTHECARY: a dish takes no quality - DECIDED, its step is the clea
   const stranger = await s.svc.seated('Stranger');
   const first = await s.craft(cook, 'stew:north', null);
   assert.deepEqual([first.xp, first.quality], [20 + firstCraftXp(recipeById('stew:north')), -1], 'the first: 20 and Provisioning\'s first-make share, no quality');   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp), no longer a flat 500
-  s.setXp(cook, 'provisioning', 0);   // PIN MOVED (FIRST-BUDGET): the first's 3,155 lifts the cook to rank 17 (a dish XP follows the rank) - set back to a Novice, so the halves below read at tier 1 as they did
+  s.setXp(cook, 'provisioning', 0);
   assert.equal((await s.craft(cook, 'stew:north', ANTICLERE.key)).xp, 20, 'no Apothecary standing: the plain dish');
   s.work('apothecary', 1);
   assert.equal((await s.craft(cook, 'stew:north', ANTICLERE.key)).xp, 30, 'tier 1: half again');
   s.work('apothecary', 2);
   const best = await s.craft(cook, 'stew:north', ANTICLERE.key, { clean: true });
   assert.deepEqual([best.xp, best.quality], [50, -1], 'a clean pan at tier 2: (2 + 1 + 2) halves');
-  assert.equal((await s.craft(stranger, 'stew:north', ANTICLERE.key)).xp, 20 + firstCraftXp(recipeById('stew:north')), 'a stranger: the plain dish (and its own first)');   // PIN MOVED (FIRST-BUDGET)
-  s.setXp(cook, 'provisioning', 0);   // PIN MOVED (FIRST-BUDGET): the clean pan's 50 at tier 1 still a Novice's
+  assert.equal((await s.craft(stranger, 'stew:north', ANTICLERE.key)).xp, 20 + firstCraftXp(recipeById('stew:north')), 'a stranger: the plain dish (and its own first)');
+  s.setXp(cook, 'provisioning', 0);
   assert.equal((await s.craft(cook, 'stew:north', ASHFIELD.key)).xp, 20, 'another town: the plain dish');
 });
 

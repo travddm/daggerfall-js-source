@@ -1,5 +1,4 @@
-// DECOR-MODFLATS (2026-09-27, Discord: "Above #49 decorations stopped working. Most sprites decorations are invisable
-// above this number").
+// DECOR-MODFLATS.
 //
 // "DECORATION 49" ONWARD WERE THE MODS' FLATS. The catalogue is read out of the world's own blocks, and the ships
 // Detailed Ships lays in them carry its own flats (archives 1210 and 1230) and the DET flats the port stands in (10009

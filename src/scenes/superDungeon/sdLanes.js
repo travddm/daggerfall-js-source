@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW5 (2026-10-26, bible/03-World/World-Wide.md WW5 - the owner's call taken: "Every single thing here needs to be
-// addressed. No exceptions."): A HOLLOW IN EVERY THEATRE, ON THIS SCREEN - the world host's Abyss Dungeons, a lane at a
+// WW5: A HOLLOW IN EVERY THEATRE, ON THIS SCREEN - the world host's Abyss Dungeons, a lane at a
 // time (net/superDungeon/sdLaw.js: the Bay's lane and each province's, Cyrodiil's open zone none).
 //
 // THE BAY'S LANE IS THE HOST IT ALWAYS WAS (scenes/superDungeon/sdHost.js, the world host's own seams, the Bay's scan, its

@@ -1,4 +1,4 @@
-// STAFF-PANEL-SPEED (2026-10-23, mob: "slow when moving in menus", "The click takes a while before the new page shows
+// STAFF-PANEL-SPEED (2026-10-23,, "The click takes a while before the new page shows
 // (it's waiting on the server)") - THE REPORTS' DOORS (server-account/src/staffCases.js) PINNED TO THEIR D1 ROUND TRIPS:
 // what a click waits on is each statement awaited after the last, times the network to D1, so the reads a door makes
 // together share one trip (a batch, a Promise.all) and the audit row lands in the batch of its page's last statements.
@@ -38,7 +38,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY,
   });
   const real = globalThis.fetch;

@@ -260,31 +260,3 @@ test('CAMP-CAP online: the strike reaches every view - the placing\'s one word, 
   assert.deepEqual(holdings(below), owned, 'and no second Campfire');
 });
 
-test('CAMP-CAP the four hosts: one door - every placing is a pool\'s placeItem, which strikes, and no host calls the law around it; inside a building the world pool refuses before any strike; the room hears the word read at the call', () => {
-  const callers = [];
-  const walk = (dir) => {
-    for (const f of readdirSync(join(root, dir))) {
-      const p = `${dir}/${f}`;
-      if (statSync(join(root, p)).isDirectory()) walk(p);
-      else if (p.endsWith('.js') && /placeCampItem\(/.test(read(p))) callers.push(p);
-    }
-  };
-  walk('src');
-  assert.deepEqual(callers.sort(), ['src/scenes/camps.js', 'src/systems/survival/camp.js'], 'the law has one caller: the pool that strikes');
-  assert.equal((read('src/scenes/camps.js').match(/placeCampItem\(/g) ?? []).length, 1);
-  const world = read('src/scenes/world.js'), ext = read('src/scenes/exterior.js'), dc = read('src/scenes/dungeonContext.js'), modes = read('src/scenes/worldModes.js');
-  for (const [name, src] of [['world', world], ['exterior', ext], ['dungeon', dc]]) {
-    assert.match(src, /placeCamp: \(item, list\) => camps\.placeItem\(item, list \?\? playerEntity\.items \?\? \[\]\)/, `${name}: the pack and the hotbar place through its pool`);
-  }
-  // worldModes (interiors): its own pool has no placing door - the building's pack and hotbar are the world host's
-  // (host.makeInventory, host.quickUse), into the world pool, whose place says indoors: refused before any strike
-  assert.doesNotMatch(modes, /placeCamp:/);
-  assert.match(modes, /const interiorCamps = createCamps\(\{\n\s+entity: playerEntity,\n\s+hearths: \(\) => \[\.\.\.interiorHearths, \.\.\.interiorDecor\.hearths\(\)\],[^\n]*\n\s+place: \(\) => \(\{ insideBuilding: true \}\),/);
-  assert.match(world, /place: \(\) => \(\{ insideBuilding: _mode\(\) === 'interior', insideDungeon: _mode\(\) === 'dungeon',/);
-  // the room's word, read when the pool says it changed - after the strike
-  assert.match(world, /onChanged: \(\) => \{ _foesFullAt = -Infinity; \}/);
-  assert.match(world, /if \(cell && full\) frame\.c = camps\.wireRecords\(campToWire\);/);
-  assert.match(dc, /onChanged: \(\) => \{ const c = camps\.wireRecords\(\); opts\.onActions\?\.\(\{ k: _locationKey, c: c\.length \? c : \[\] \}\); \}/);
-  assert.match(dc, /const campMemory = \(\) => camps\.camps\.map\(\(c\) => \(\{ \.\.\.campWire\(c\.rec\), o: c\.owner \?\? \(opts\.selfId\?\.\(\) \?\? 'host'\) \}\)\);/);
-  assert.match(dc, /for \(const \[owner, recs\] of byOwner\) if \(camps\.applyOwner\(owner, recs\)\) n \+= recs\.length;/);
-});

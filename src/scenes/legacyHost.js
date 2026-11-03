@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY1-LEGACY4 (2026-10-05, bible/06-Systems/Legacy-Arc.md): PROJECT LEGACY IN THE WORLD - the host's half.
+// LEGACY1-LEGACY4: PROJECT LEGACY IN THE WORLD - the host's half.
 //
 // The law is systems/legacy/ (family.js the record and its inheritance, age.js the span and the toll, store.js where a
 // family lives and the birth's handoff, places.js the town an heir is born in, heirloom.js the heirloom, the remains
@@ -47,9 +47,7 @@ import { legacySettings } from '../systems/legacy/settings.js';
 import { registerModSaveData } from '../systems/modSaveData.js';
 import { REALM_ACT_TRANSIENT } from '../systems/realmSaves.js';   // REZ-BLOODLINE AUDIT R1: a Resurrect's ask the realm never heard
 import { t } from '../systems/textManager.js';   // REZ-BLOODLINE AUDIT R1: the fallen told in their own language (L10N4)
-import { repairItemLists } from '../systems/save/save.js';   // ITEM-WALK B: the load's item repairs, on what leaves the line's record
 import { rollStats, rollSkills, spendPoolLowest, STAT_KEYS_ORDER } from '../systems/chargen.js';
-import { LEVELING_CLASSIC } from '../systems/oblivionLeveling.js';
 import { pickHeirloom, markHeirloom, mintRemainsItem, isRemainsItem, isHeirloom, attuneHeirloom, blessingOf, blessedIn, remainsGoldOf, REMAINS_LIST, BLESSING_POINTS } from '../systems/legacy/heirloom.js';
 import { SKILL_NAMES } from '../systems/skills.js';
 import { syncHouses, householdOf, residentOf, familyResOf, kinGreeting, setFamilyHome, familyHome, sameHouse, deedsDue, houseKeyOf } from '../systems/legacy/household.js';
@@ -325,7 +323,7 @@ export function createLegacyHost(deps) {
     newSaveData: () => null,
     getSaveData: () => {
       if (!family) return null;
-      // STORM-SHED 2 (2026-10-06, the account database's follow-ups): A SAVE THAT CHANGES NOTHING LEAVES THE LINE AS IT
+      // STORM-SHED 2: A SAVE THAT CHANGES NOTHING LEAVES THE LINE AS IT
       // WAS. Every save stamped the played member (`savedAt`, `lived` - the clock's) and moved the line's rev, so the
       // record was never the one the realm held: online, every two-minute checkpoint wrote the line again
       // (/v1/realm/lineage, up to 128 KiB), and the checkpoint itself - which carries the record - was never idle
@@ -397,11 +395,11 @@ export function createLegacyHost(deps) {
     if (family || past || !deps.on() || !deps.entity?.chargenDone) return family;
     const known = familyOfCharacter(cidOf());
     if (known) { adopt(known); return family; }   // the store knows this character's house - never a second
-    // LEGACY-CHOICE (Mac: "the option that skips the liniage system entirely"): the character's own answer, kept on them -
+    // LEGACY-CHOICE: the character's own answer, kept on them -
     // one who answered no lineage founds no house, at their birth or at any load, in either lane
     const chose = model ?? deps.entity?.legacyChoice ?? null;
     if (chose === NO_LINEAGE) return null;
-    // LEGACY-CHOICE (Mac: "Current characters already created start without this system and requires a new game"):
+    // LEGACY-CHOICE:
     // ONLINE A HOUSE IS FOUNDED AT A CHARACTER'S BIRTH ALONE - one made before the question was put online, or copied in
     // from the offline lane, plays without one (it was founded Enduring at its first load: AUDIT LEGACY B4's law, gone
     // with it). Offline an older character is founded at its first load as ever (D9).
@@ -431,12 +429,8 @@ export function createLegacyHost(deps) {
     touch(family);
     if (due) { deps.payEstate?.(due); deps.say(LEGACY_TEXT.estate(due)); }
     if (pieces.length) {
-      // ITEM-WALK B (2026-10-07): A BEQUEST IS REPAIRED AS IT IS PAID. It reaches its heir from the line's record, by no
-      // load - at the heir's birth, or on their first days played - and that record may be the device's copy, never the
-      // save's (mergeFamily). So the load's item repairs (systems/save/save.js repairItemLists) run on the pieces paid, as a
-      // load runs them on every list a save holds; the line's record keeps its own, paid once.
+      // The heir is given copies: the line's record keeps its own pieces, paid once.
       const given = pieces.map((it) => JSON.parse(JSON.stringify(it)));
-      repairItemLists([given]);
       deps.giveItems?.(given);
       for (const it of given) deps.say(LEGACY_TEXT.bequest(it.heirloom?.base ?? it.name ?? 'an heirloom'));
     }
@@ -444,8 +438,7 @@ export function createLegacyHost(deps) {
   }
 
   /**
-   * PERMADEATH-HOUSES (2026-10-09, the owner: "what happens to houses owned by dead permadeath characters" - the heir
-   * inherits): THE DEAD'S DEEDS TAKEN UP by the one who carries the line (household.js deedsDue) - the Succession's heir
+   * PERMADEATH-HOUSES: THE DEAD'S DEEDS TAKEN UP by the one who carries the line (household.js deedsDue) - the Succession's heir
    * once they land, or the one played when one of the line dies in the street - each handed to the world
    * (`inheritHouse`: offline the bank's deed and the house's things out of the dead's own save, online the account
    * service's home and its cupboards out of the dead's realm record):
@@ -813,13 +806,10 @@ export function createLegacyHost(deps) {
   }
   /** FB1013d REMAINS-STAND: A LIST MADE READY TO BE TAKEN FROM where it lies - by its own window, or by its body (the
    *  world's stand, remainsToStand). It wears its remains' mark (AUDIT LEGACY II H4: the bones go back into it, and into
-   *  nothing that is not the character's own keeping - systems/item/itemTransfer.js planStore); the load's item repairs run
-   *  on it once (ITEM-WALK B: whichever copy it came from) before its claim's mark; and, nobody's, it is noted as it
-   *  stands before them - a change from here is a claim (claimTouched). */
-  const repairedLists = new WeakSet();
+   *  nothing that is not the character's own keeping - systems/item/itemTransfer.js planStore); and, nobody's, it is noted
+   *  as it stands before them - a change from here is a claim (claimTouched). */
   function readyList(r) {
     Object.defineProperty(r.items, REMAINS_LIST, { value: r.of, configurable: true, writable: true, enumerable: false });
-    if (!repairedLists.has(r.items)) { repairItemLists([r.items]); repairedLists.add(r.items); }
     if (r.by == null && !openedSig.has(r.id)) openedSig.set(r.id, itemsSig(r.items));
   }
   const bonesOf = (r) => (it) => isRemainsItem(it) && it.legacyRemains.line === family.id && it.legacyRemains.of === r.of;
@@ -1101,7 +1091,6 @@ export function createLegacyHost(deps) {
       careerIndex: p.careerIndex, career, stats: values.stats, skills: values.skills, isCustom: custom, customReps: null,
       biographyEffects: [], reflexes: BORN_REFLEXES, factionDict,
       backStory: [`${parent ? `Child of ${fullNameOf(parent.given, parent.surname)}, of` : 'Of'} the house${houseWord(family.surname) ? ` of ${houseWord(family.surname)}` : ''}.`],   // LEGACY-NAME
-      levelingSystem: p.leveling ?? LEVELING_CLASSIC,
     };
   }
 

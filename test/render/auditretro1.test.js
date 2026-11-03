@@ -1,4 +1,4 @@
-// AUDIT RETRO1 (2026-09-24, Mac: "Audit this") - the five-lens audit of
+// AUDIT RETRO1 - the five-lens audit of
 // RETRO1, DFU's retro mode. Each pin below is one confirmed finding and
 // fails with its fix reverted (tools/mutants/auditretro1.json):
 //
@@ -145,7 +145,6 @@ test('AUDIT RETRO1 A4: a replacement texture (TryImportTexture) keeps its mip ch
     r.drawScreenQuad(null, { x: 0, y: 0, w: 1, h: 1 });
   } finally { setFrameTarget(null); }
   const dp = src('scenes/dataPipeline.js');
-  // PIN MOVED (AUDIT GALLEON-2 PF5, 2026-10-03): but for a stand-in the port paints as a hull's classic art (the new
   // galleon's), which Retro Mode caps as it caps ARENA2's (test/world/ships/auditgalleon2_prefab.test.js PF5)
   assert.match(dp, /const replacement = !!swap && !classicArt\.has\(Number\(archive\)\);/, 'the pipeline flags TryImportTexture\'s');
   assert.match(dp, /renderer\.uploadEmissionTexture\(archive, record, t\.getWindowColors32\(bitmap\), \{ replacement, window: true \}\);/);   // RW1: and the window flag beside it (render/realWindows.js)
@@ -307,7 +306,7 @@ test('AUDIT RETRO1 C1: Shift-F11 under an open window loads nothing - it is the 
   assert.equal(retroToggleKey(ev(true)), true);
   assert.equal(retroToggleKey(ev(false)), false, 'F11 alone is QuickLoad\'s');
   let loads = 0;
-  const ctx = { uiOverlayActive: true, overlayIsNative: false, overlayInput() {}, overlayWindow: () => ({ loadsUnder: true }), quickLoad: () => { loads++; } };   // PIN MOVED (DUPE-LOAD): the death screen, the one window F11 loads from under
+  const ctx = { uiOverlayActive: true, overlayIsNative: false, overlayInput() {}, overlayWindow: () => ({ loadsUnder: true }), quickLoad: () => { loads++; } };
   _resetRetroPostprocessing();
   routeKey(ev(true), ctx, null, new Set(['ShiftLeft']));
   assert.equal(loads, 0, 'Shift-F11 under a window: no load');

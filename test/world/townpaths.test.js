@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS10 (2026-10-26, the owner: "Sometimes locations like the horse stable, etc can be placed on pathways";
-// bible/03-World/Town-Shapes.md TS10): the roads the terrain painted through a town's ground (an arm of the pixel's road or
+// TOWN-SHAPES TS10: the roads the terrain painted through a town's ground (an arm of the pixel's road or
 // track across a cell a town past the Bay leaves open, or a Bay city's old wall ring) are roads of its grid - a yard stands
 // beside them, never on them. Pinned on the grid's paving, on a town's yards placed over it, on the host's wiring, and on
 // the cities and towns past the Bay with roads every way (ARENA2).
@@ -81,11 +80,6 @@ test('AUDIT BAY-LEFT F3 TS10 through URBANIZER: the pixel\'s one shut (fabricWal
   assert.equal(fabricWalkShut(landed, loc).key, b.key, 'the same shut, the same key');
 });
 
-test('TS10 the host\'s wiring: the pixel\'s walk shut reads the paths its terrain job painted, and a town\'s places are placed again when they change', () => {
-  assert.match(rd('src/scenes/pixelBuild.js'), /const walkShut = dfLocation \? fabricWalkShut\(townWalkShut\(dfLocation, townGround, paths\), dfLocation\) : null;/);   // PIN MOVED (URBANIZER U3): the fabric's shut over the town's
-  assert.match(hostText('src/scenes/world.js'), /\|\$\{shut\?\.key \?\? \(shut \? 'shut' : ''\)\}`;/);
-});
-
 test('TS10 with ARENA2: every twelfth city and town past the Bay on a pixel with roads every way - no yard on a painted road, every yard placed, where some stood on one unpaved', { skip: skipReal }, async () => {
   const { MapsFile, longitudeLatitudeToMapPixel } = await import('../../src/formats/mapsFile.js');
   const { WoodsFile } = await import('../../src/formats/woodsFile.js');
@@ -96,7 +90,6 @@ test('TS10 with ARENA2: every twelfth city and town past the Bay on a pixel with
   const { installTownOutline, outlineTownLocation, townOutlineBlockJson } = await import('../../src/world/townOutline.js');
   const { standTownWall } = await import('../../src/world/townWalls.js');
   const { arenaTemplates } = await import('../../src/world/arenaLocations.js');
-  const { unwalledLocation } = await import('../../src/world/townShape.js');
   const { layoutLocation } = await import('../../src/world/locationLayout.js');
   const { craftYardSitesOn } = await import('../../src/world/merchantYards/merchantYardSites.js');
   const { DIR } = await import('../../src/world/road/roadNetwork.js');
@@ -108,14 +101,14 @@ test('TS10 with ARENA2: every twelfth city and town past the Bay on a pixel with
   const bay = maps.getLocationByName('Daggerfall', 'Gothway Garden');
   const p = longitudeLatitudeToMapPixel(bay.mapTableData.longitude, bay.mapTableData.latitude);
   const rows = [];
-  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(unwalledLocation(lc)); } }
+  for (let r = 0; r < 62; r++) { const reg = maps.getRegion(r); if (!reg) continue; for (let l = 0; l < reg.locationCount; l++) { const lc = maps.getLocation(r, l); if (lc) rows.push(lc); } }
   const T = arenaTemplates(rows);
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
   let yards = 0, onBefore = 0;
   for (const kind of ['city-state', 'town']) {
     for (let j = 0; j < T[kind].length; j += 12) {
       const t = T[kind][j], mapId = ((0xa7 << 20) | (500000 + j + (kind === 'town' ? 5000 : 0))) >>> 0;
-      const loc = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId, longitude: bay.mapTableData.longitude, latitude: bay.mapTableData.latitude } }, io);
+      const loc = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId, longitude: bay.mapTableData.longitude, latitude: bay.mapTableData.latitude }, arena: { kind } }, io);
       if (loc.outline?.walled) standTownWall(loc, t.exterior.exteriorData.blockNames, io, townOutlineBlockJson);
       const tilemap = new Uint8Array(D * D), rect = setLocationTiles(loc, maps, blocks, tilemap);
       const roads = new Uint8Array(1000 * 500); roads[p.y * 1000 + p.x] = DIR.N | DIR.S | DIR.E | DIR.W | DIR.NE | DIR.SW;

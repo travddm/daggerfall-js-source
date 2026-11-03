@@ -3,8 +3,7 @@
 // EM3-3D — THE DUNGEON IN THE ROUND: the automap sheet's plan, lifted
 // back into three dimensions and drawn by the same hand.
 //
-// Mac (2026-09-27): "the enhanced dungeon map doesnt work in 2d ... making
-// the map like the og one in 3d again but only handrawn", with a pencil
+// with a pencil
 // sketch of an isometric dungeon for the look: floors as slabs with a
 // ragged, hatched underside, thick walls cut at a height, flagstones,
 // stairs as steps; and "you need to zoom in rotate it and all that what
@@ -62,7 +61,7 @@ export const SOLID = Object.freeze({
   trailRise: 1.5,    // ...and a trail point marks the floor within this height of its feet
   cutRise: 0.75,     // EM3-3D fix: a wall standing between the eye and the floor behind it is cut down to this - low
                      // enough to see the room over, high enough that a doorway still reads as a gap in a wall
-  wallThick: 0.35,   // EM3-3D fix (Mac: "the walls dont need to be that thick"): a wall is drawn this thick, against its floor
+  wallThick: 0.35,   // EM3-3D fix: a wall is drawn this thick, against its floor
   cutFacing: 0.15,   // ...when that floor lies this far (0..1, of a step straight away from the eye) behind it
 });
 
@@ -73,7 +72,7 @@ export const STEP_RISE = 0.25;
 export const ORBIT = Object.freeze({
   yawRest: -0.62,
   pitchRest: 1.12,   // EM3-3D classic: steep enough to look down into a room over the wall in front of it
-  // Mac: "rotate it up and down as far as classic" - and then "sometimes iam able to rotate under the map that
+  // and then "sometimes iam able to rotate under the map that
   // shouldnt happen": at level (0) the eye is ON the floor's plane - the floors, one-sided, vanish edge-on and what
   // shows is the level's underside. The lowest tilt now always looks down on the floor, a little over 11 degrees.
   pitchMin: 0.2,
@@ -109,7 +108,7 @@ const DIRS = Object.freeze([[0, -1], [1, 0], [0, 1], [-1, 0]]);   // N E S W on 
  */
 export function buildSolid(field, storeys, opts = {}) {
   if (!field) return null;
-  // EM3-3D fix (Mac: "when the walls disappear everytime it happens it lags"): the expensive half - which surface is
+  // EM3-3D fix: the expensive half - which surface is
   // floor, what the player has seen, where the walls stand - does not depend on the turn, so a caller that keeps
   // `model.classified` hands it back as `opts.classified` and only the cutaway and the shapes are made again.
   const cls = opts.classified ?? classifySolid(field, storeys, opts);
@@ -189,7 +188,7 @@ export function classifySolid(field, storeys, opts = {}) {
     }
   }
 
-  // WHAT THE PLAYER HAS SEEN. EM3-3D fix (Mac: "it stopped rendering walls here"): the first cut drew floor within a
+  // WHAT THE PLAYER HAS SEEN. EM3-3D fix: the first cut drew floor within a
   // WALK of the trail, so a hall wider than twice that walk was cut off mid-floor, its far walls never drawn. Now each
   // spot stood on looks out along SOLID.rays sight lines across the floor, SOLID.sight metres, stopping at the first
   // cell that is not floor (a wall, a pillar, the drop to another storey) or a rise no stair makes. So a room is
@@ -309,8 +308,7 @@ function shapeSolid(field, cls, opts = {}) {
       if (sy < 0) fy1[i] = T; else if (sy > 0) fy0[i] = cell - T;
     }
   }
-  // THE CUTAWAY (Mac, with a shot of DFU's own 3D automap: "it doesnt show the wall that hides the floor ground,
-  // thats a good mechanic to make the 3d map more visible"). Seen from `cutYaw`, a wall with floor BEHIND it - on
+  // THE CUTAWAY. Seen from `cutYaw`, a wall with floor BEHIND it - on
   // the far side from the eye - is cut down to a kerb, so the room it would hide lies open; a wall with its floor in
   // front of it (the far wall of a room, facing the eye) stands whole and gives the room its shape. The camera's own
   // law: plan direction (x, y) runs away from the eye by x*sin(yaw) + y*cos(yaw) (makeCamera's `depth`, negated).
@@ -595,7 +593,7 @@ export function paintSolidStatic(ctx, layers, cam, opts) {
     if (wash) { ctx.fillStyle = wash; ctx.fill(); }
   };
 
-  /** EM3-3D fix (Mac: "the stairs can just be ramps like in the classic mode"): a flight's cell is a RAMP - one
+  /** EM3-3D fix: a flight's cell is a RAMP - one
    *  sloped face from its low edge (the neighbour it climbs from) up to its own height, so a run of such cells is
    *  one smooth slope, as DFU's 3D automap draws Daggerfall's stairs. */
   const rampH = (c, px, pz) => {
@@ -782,7 +780,7 @@ export function paintSolidStatic(ctx, layers, cam, opts) {
 }
 
 /**
- * EM3-3D fix (Mac: "it loses alot of frames"): THE QUICK SKETCH, while the sheet is turning. The full drawing cuts
+ * EM3-3D fix: THE QUICK SKETCH, while the sheet is turning. The full drawing cuts
  * every face out of what is behind it, in depth order - tens of thousands of fills on a big dungeon, far too many to
  * redraw every frame of a turn. While it turns, each floor is a handful of batched strokes instead: the floor washed,
  * the walls' faces washed, the walls' tops and the floor's edges inked. The full drawing comes back when it stops.

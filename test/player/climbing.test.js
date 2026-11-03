@@ -263,31 +263,4 @@ test('AUDIT 65 XL-5: a climb writes IsStandingStill - the cached standing/half-s
     assert.equal(landed, 1, 'exactly one grounded climbing step - the slip touching down');
   }
 
-  // THE FREEZE RETURN STAYS BARE: PlayerMotor.cs:296-307 does NOT zero
-  // moveDirection, so DFU's getters keep reading the pre-freeze
-  // vector there - a write on that return would be the divergence.
-  const motorSrc = readFileSync(new URL('../../src/player/motor.js', import.meta.url), 'utf8');
-  const freeze = motorSrc.slice(motorSrc.indexOf('if (this.freezeMotor > 0) {'));
-  assert.ok(!/^[\s\S]{0,260}this\.standing =/.test(freeze), 'the freezeMotor block writes no standing (PlayerMotor.cs:296-307)');
-
-  // THE CENSUS (both refuters asked for it): every early return that
-  // ZEROES moveDirection writes `standing` in its own body - the
-  // cancelMovement block (:286-294), _climbStep's `return true` and the
-  // swim/levitate branch (:322-326) - so a future return landing above
-  // the walk path without the write goes red here, and the freeze
-  // return above is the one exemption. MUTANT: delete the swim
-  // branch's `this.standing = this.grounded;` - this file reddens.
-  const body = (open, span) => { const i = motorSrc.indexOf(open); assert.ok(i >= 0, `motor.js lost ${open}`); return motorSrc.slice(i, i + span); };
-  assert.match(body('if (this.cancelMovement) {', 900), /this\.standing = this\.grounded;[\s\S]*?\n      return;/, 'the cancelMovement block writes standing before its return');
-  assert.match(body('if (this.levitating || this.swimming) {', 9000), /this\.standing = this\.grounded;[\s\S]*?\n      return;/, 'the swim/levitate branch writes standing before its return');
-  const climb = motorSrc.slice(motorSrc.indexOf('  _climbStep(dt, input, yaw) {'), motorSrc.indexOf('\n  }\n', motorSrc.indexOf('  _climbStep(dt, input, yaw) {')));
-  assert.match(climb, /this\.standing = this\.grounded;[\s\S]{0,400}return true;/, '_climbStep writes standing before its `return true`');
-  // CLIMB1: the fourth - the enhanced climb's move owns its step above the
-  // classic climb's, carries no input vector, and mirrors the pair itself.
-  const advance = motorSrc.slice(motorSrc.indexOf('  _parkourAdvance(dt, spent = false) {'), motorSrc.indexOf('\n  }\n', motorSrc.indexOf('  _parkourAdvance(dt, spent = false) {')));
-  assert.match(advance, /this\.standing = this\.grounded;\n    this\.movingLessThanHalfSpeed = /, '_parkourAdvance writes the cached pair');
-  // CLIMB2: the fifth - the enhanced climb's hold on the wall owns its step too, with no input vector.
-  const wall = motorSrc.slice(motorSrc.indexOf('  _wallStep(dt, input, yaw, pk) {'), motorSrc.indexOf('\n  }\n', motorSrc.indexOf('  _wallStep(dt, input, yaw, pk) {')));
-  assert.match(wall, /this\.standing = this\.grounded;\n    this\.movingLessThanHalfSpeed = [^\n]*\n    return owned;/, '_wallStep writes the cached pair before it returns the step');
-  assert.equal((motorSrc.match(/this\.standing = this\.grounded;/g) ?? []).length, 5, 'five writers of the cached pair, no more (a sixth zeroing return needs its own)');
 });

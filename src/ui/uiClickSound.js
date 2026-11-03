@@ -38,7 +38,7 @@ const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Da
 
 let installed = false;
 
-/** SND2 (Dudey: "give the main menu button presses the same sound as ingame"): THE FRONT DOOR'S CLICK. Only a game host
+/** SND2: THE FRONT DOOR'S CLICK. Only a game host
  *  boots the sound engine (scenes/shared.js ensureAudio), so on the main menu every press above was silent - the bank
  *  was never read. The front door (main.js) hands its data gate's reader in, and the bank is read from the player's own
  *  stored data and the engine booted with it - but only when the bank is THERE: a boot on a missing file would leave the

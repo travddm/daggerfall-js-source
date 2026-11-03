@@ -1,5 +1,4 @@
-// RVN12b - THE PAGE AND THE CARD (bible/12-Enhanced-AI/Feud-Arc.md section 24; Mac, 2026-10-04: "more complex, less
-// easy to accomplish and more detailed", then "Go"). The Revenants page, for the living: what it learned as chips, each
+// RVN12b - THE PAGE AND THE CARD (;, then "Go"). The Revenants page, for the living: what it learned as chips, each
 // with its effect; what it took; its festering as three pips - beside RVN3-RVN7's weakness, will, last stand,
 // signature, band and lair. For the sworn: its loyalty. For the fallen: "escaped unbroken" among its deeds. The card:
 // FEUD's edges - a last stand blood with an ember rim, a signature iron red, a theft amber, a betrayal black.
@@ -74,7 +73,7 @@ test('RVN12b AN ESCAPE UNBROKEN: the deed remembers it (through the save), the p
   assert.equal(PG.historyWords({ deed: 'fled', at: 1 }), 'escaped');
   assert.equal(made('fled', { now: 70 }).history.at(-1).unbroken, undefined);
   for (const [file, arch] of [['src/scenes/exteriorFoes.js', 'f.archive'], ['src/scenes/dungeonContext.js', 'f.mobileArchive']]) {
-    assert.ok(read(file).includes(`revenantDeed(playerEntity, f.entity, 'fled', { mobileType: f.mobileType, gender: f.gender, rec: f, archive: ${arch}, unbroken, slip });`), file);   // PIN MOVED (AUDIT UNQUIET, Revenants.md section 49): and a slip, which never ascends
+    assert.ok(read(file).includes(`revenantDeed(playerEntity, f.entity, 'fled', { mobileType: f.mobileType, gender: f.gender, rec: f, archive: ${arch}, unbroken, slip });`), file);
   }
 });
 

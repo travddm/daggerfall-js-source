@@ -1,5 +1,5 @@
 // @ts-check
-// TELL6e (bible/12-Enhanced-AI/Feud-Arc.md section 8.2; Mac, 2026-10-04: "breath more depth into it", then "Go"):
+// TELL6e (;, then "Go"):
 // WHAT A LANDING DOES TO YOU. A telegraphed blow that lands on the local player (a dodged one does nothing; a peer's
 // own client applies its own, TELL8) does more than its damage, by its shape:
 //   PUSH      the lunge 3 m/s, the charge 5 m/s, decaying at 12 m/s/s along the collider - never over an edge of

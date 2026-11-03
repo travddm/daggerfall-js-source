@@ -67,7 +67,6 @@ test('MERC-CAP: online the haggle reads 0..100 - a sale never falls with a skill
           assert.ok(a >= least, `${at}: asks ${a}, under the best haggler's ${least}`);
           assert.ok(s <= Math.floor(a * ONLINE_SALE_SHARE), `${at}: pays ${s} against an ask of ${a}`);
           // past either end the haggle reads the end; inside the range it is Daggerfall's, under MERC-RISE's half -
-          // PIN MOVED (MERC-SLOPE, FIELD BUGS 2026-10-08): where the seller's own offer stands against the best haggler's,
           // at half its strength, under that half and never over Daggerfall's own offer
           assert.equal(a, ask(cost, q, mm, pp, false), at);
           const off = sale(cost, q, mm, pp, false), top = sale(cost, q, 100, 100, false);
@@ -111,7 +110,7 @@ test('MERC-CAP: the purchases the haggle prices past the counter - a room, a cur
       assert.equal(cure(m), cure(100), `the cure at Mercantile ${m}`);
     }
     assert.ok(room(100) > 0 && cure(100) > 0, `${room(100)} and ${cure(100)}`);
-    // ESSENTIALS-HALF (2026-09-30): online a cure costs half the best haggler's own price (shopStock.js essentialPrice)
+    // ESSENTIALS-HALF: online a cure costs half the best haggler's own price (shopStock.js essentialPrice)
     assert.equal(cure(100), essentialPrice(calculateTradePrice(calculateCost(250, 10), 10, skills(100), false, { online: false }), { online: true }), 'the best haggler\'s own price, halved - inside the range nothing else moves');
   });
 });

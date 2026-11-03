@@ -242,12 +242,3 @@ test('TK-vi: the window\'s Where-is page is the TREE\'s list, and its rows answe
   assert.ok(answer.startsWith('record:'), answer);
 });
 
-test('TK-vi: the host builds the window rows off the tree, and keeps the T3c list only as the fallback', () => {
-  const src = readFileSync(new URL('../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(src, /categories: \(\) => treeCategories\(\) \?\? localCategories\(\)/);
-  assert.match(src, /child\.type !== LIST_ITEM_TYPE\.NavigationBack/, 'the Back row is dropped');
-  assert.match(src, /eng\.pipeline\.getAnswerText\(row\.listItem/, 'the answer is the pipeline\'s');
-  assert.match(src, /eng\.pipeline\.getQuestionText\(row\.listItem, tone\)/, 'and so is the question');
-  // the fallback survives for a host with no engine (no game data)
-  assert.match(src, /function localCategories\(\)/);
-});

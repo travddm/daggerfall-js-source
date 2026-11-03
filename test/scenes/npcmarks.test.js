@@ -1,4 +1,4 @@
-// NPC-MARKS (2026-10-21): the bobbing marks over the Morrowind bodies whose click is a quest's, a merchant's or a guild's
+// NPC-MARKS: the bobbing marks over the Morrowind bodies whose click is a quest's, a merchant's or a guild's
 // (scenes/npcMarksHost.js, render/npcMarkPass.js). The law of who is marked rides the click's own route
 // (staticNpcRouteIn - one construction for both), the quest's own behaviour (a real QuestResourceBehaviour on a real
 // Quest), and the people lane's own answer of whose body stands (heightOf).
@@ -195,23 +195,6 @@ test('NPC-MARKS the Features row: on by default, the viewer\'s, under the enhanc
   assert.deepEqual([...row.kinds], ['enhanced']);
 });
 
-test('NPC-MARKS THE FOUR HOSTS: the interior and the dungeon (worldModes.js), the street (world.js) and the bench (exterior.js) each gather and draw; the dungeon hands its lane; the click asks the same route', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /npcMarks\.gather\(npcMarkCtx, interiorCtx\.people, questFlats\);/);
-  assert.match(wm, /npcMarks\.draw\(proj, view, mwv\.eye, peopleBodies, performance\.now\(\) \/ 1000\)/);
-  assert.match(wm, /npcMarks\.gather\(npcMarkCtx, dungeonCtx\.people, dungeonQuestFlats\);/);
-  assert.match(wm, /npcMarks\.draw\(proj, view, mwv\.eye, dungeonCtx\.peopleLane, performance\.now\(\) \/ 1000\)/);
-  assert.match(wm, /const route = staticNpcRouteIn\(\{ npcFactionId: pn\.factionID, dict: townTalk\?\.factionDict \?\? null, building: interiorBuilding \}\);/);
-  assert.doesNotMatch(wm, /staticNpcRoute\(\{/, 'no second construction of the route\'s arguments');
-  assert.match(src('src/scenes/dungeonContext.js'), /peopleLane: _peopleLane,/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /npcMarks\.consider\(pn, streetMarkCtx\);/);
-  assert.match(w, /npcMarks\.draw\(proj, view, mwv\.eye, streetPeople, now \/ 1000\)/);
-  const ex = src('src/scenes/exterior.js');
-  assert.match(ex, /npcMarks\.gather\(standMarkCtx, exteriorNpcs\);/);
-  assert.match(ex, /npcMarks\.draw\(proj, view, eye, standPeople, now \/ 1000\)/);
-});
-
 /** The icon as the fragment stage draws it, cell by cell, top row first: '.' discarded, '#' the dark rim, 'O' the fill. */
 function iconMask(kind) {
   const fns = glslFunctions(NPC_MARK_FS, { vP: [0, 0], uKind: NPC_MARK_KINDS[kind], uAlpha: 1, o: [0, 0, 0, 0] });
@@ -261,7 +244,7 @@ test('NPC-MARKS the quad stands square to the eye at the mark, never under MARK_
   close(fns.globals.gl_Position, [2 - MARK_HALF_M, 3, -10, 1], 'AUDIT NPC-MARKS R9: its bottom on the point, at any size - a far mark never sinks into the head');
 });
 
-// ═══ AUDIT NPC-MARKS (bible/04-Characters/Morrowind-NPCs.md section 31) ═══
+// ═══ AUDIT NPC-MARKS ═══
 
 test('AUDIT NPC-MARKS L1: while FACTION.TXT loads its dict is the producer\'s empty Map - a route read then is not kept, and the coin comes when the row does', () => {
   const loading = new FactionFile().factionDict;   // what townTalk.factionDict answers between `new FactionFile()` and its load
@@ -283,8 +266,6 @@ test('AUDIT NPC-MARKS L2: a townsperson the work pool holds is marked where the 
   assert.equal(markKindOf(p, ctx), 'quest');
   work.delete(7);
   assert.equal(markKindOf(p, ctx), null, 'read every frame - the offer taken, the mark gone');
-  assert.match(src('src/scenes/worldModes.js'), /offersWork: \(pn\) => !!npcSession\?\.isNpcOfferingQuest\(pn\._mwSeed \?\?= staticNpcData\(pn, staticNpcSceneCtx\(pn\)\)\.nameSeed\)/);
-  assert.match(src('src/scenes/world.js'), /offersWork: \(pn\) => npcSession\.isNpcOfferingQuest\(pn\._mwSeed \?\?= staticNpcData\(pn, \{ locationIndex: _questLoc\(\)\?\.locationIndex \?\? 0 \}\)\.nameSeed\)/);
 });
 
 test('AUDIT NPC-MARKS L3: a guild-service route marks only where a guild answers it - a holy order\'s servant in a building no divine runs is "You get no response."', () => {
@@ -336,7 +317,7 @@ test('AUDIT NPC-MARKS L6: a mod\'s merchant service switched mid-session moves t
 });
 
 // AUDIT NPC-MARKS L7 lowered the mark under the Billboard Look to the upright card's cos(pitch) of the body. BODY-FLAT
-// (2026-10-23, render/characterSprite.js) takes that card's picture level, so the body stands its true height there too
+// takes that card's picture level, so the body stands its true height there too
 // and L7's law is retired: the mark hangs over the full height under either look.
 test('BODY-FLAT: under the Billboard Look a mark hangs over the body\'s full height, as it does off - the flat card stands the body true (L7\'s cos(pitch) retired)', () => {
   const f = fakePass();

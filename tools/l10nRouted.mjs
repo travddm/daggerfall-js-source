@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE DFU WORDS THE PORT ROUTES, READ OFF THE SOURCE.
+// L10N3d: THE DFU WORDS THE PORT ROUTES, READ OFF THE SOURCE.
 //
 // DFU shows its interface words through TextManager.GetLocalizedText(key); the port holds them as constants and reads
 // each through the text core where it is shown. This reads every such word in src/ - each `localizedText('key', ...)`

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-FOES - THE BANDS, SEEN (bible/06-Systems/Travel-View.md).
+// OW-FOES - THE BANDS, SEEN.
 //
-// The player's ask (2026-09-29): "when you go near the encounters let the sprites slowly show up the same the players
+// The player's ask: "when you go near the encounters let the sprites slowly show up the same the players
 // sprite is on the map". A roaming band (systems/travel/travelBands.js) was a dot and a label on the Overworld; near enough,
 // it now stands as its lead monster - the enemy's own animated, eight-way sprite (characters/mobile/mobileUnit.js, the same
 // MobileUnit a monster-skinned player wears, net/remotePlayers.js) - grown as the traveller's own sprite is

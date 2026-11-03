@@ -1,6 +1,6 @@
 // @ts-check
 // GUIDE8 (the delve arc, 2026-10-05 - the player, on the dungeon blocks: "removing the esoteric nature of dungeons";
-// bible/06-Systems/Quest-Guide-Arc.md GUIDE8, DECISIONS 3: "a player who cannot read a dungeon should be able to ask
+// GUIDE8, DECISIONS 3: "a player who cannot read a dungeon should be able to ask
 // for it"): THE GUIDANCE TIERS, and the Exact tier's marks underground.
 //
 // Journal is GUIDE5's law, and the default: a quest is marked only where the player's map already holds its place, and

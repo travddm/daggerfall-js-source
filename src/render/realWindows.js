@@ -1,6 +1,5 @@
 // @ts-check
-// RW1 (2026-10-09, Mac: "The implementation of the real window overhaul, allowing players to see inside/outside of
-// house windows"): REAL WINDOWS - the law, the shader text and the view out's arithmetic, in one home.
+// RW1: REAL WINDOWS - the law, the shader text and the view out's arithmetic, in one home.
 //
 // FROM THE STREET, A ROOM. Every exterior window's glass - DFU's own table (climateSwaps.isExteriorWindow), its texels
 // the palette's 0xff (getWindowColors32), the mask the R2 emission already uploads - shows a ROOM behind it: interior

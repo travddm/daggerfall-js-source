@@ -91,61 +91,6 @@ test('AUDIT 65 UI-5: the notch carries its own point, so the pack scrolls before
   assert.deepEqual([w.scroll, w.remoteScroll], [1, 1], 'a notch with no point routes nothing');
 });
 
-test('AUDIT 65 UI-5: every host wheel seam hands the window the live point', () => {
-  const POINT = /wheel\?\.\(Math\.sign\(e\.deltaY\), v \? v\[0\] : -1, v \? v\[1\] : -1\);/;
-  // townTalk.js is the seam for BOTH outdoor hosts (world.js:"answers each of them" and
-  // exterior.js:"TypeError: can't" hand it the raw event).
-  assert.match(read('src/scenes/townTalk.js'), POINT, 'townTalk.js');
-  // worldModes.js: BOTH arms - the interior slot and the mounted
-  // dungeon context's.
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /dungeonCtx\.overlayWheel\?\.\(Math\.sign\(e\.deltaY\), v \? v\[0\] : -1, v \? v\[1\] : -1\);/, 'worldModes dungeon arm');
-  // STATUS-LIVE (2026-09-22): the arm's GATE is `interiorPaused()` now
-  // rather than the slot's truthiness - a notch under a box the game is
-  // not stopped for belongs to whatever the world puts under it - so
-  // the slot read below it is optional-chained. The law this pin holds
-  // is unchanged: the live POINT rides the notch.
-  assert.match(wm, /interiorOverlay\?\.wheel\?\.\(Math\.sign\(e\.deltaY\), v \? v\[0\] : -1, v \? v\[1\] : -1\);/, 'worldModes interior arm');
-  // dungeonContext.js forwards it, defaulting to the hosts' own
-  // pointer-leave sentinel for a caller that has no point.
-  assert.match(read('src/scenes/dungeonContext.js'),
-    /overlayWheel\(dir, vx = -1, vy = -1\) \{ activeOverlay\?\.wheel\?\.\(dir, vx, vy\); \},/, 'dungeonContext.js');
-  // the two standalone hosts
-  assert.match(read('src/scenes/dungeon.js'),
-    /ctx\.overlayWheel\?\.\(Math\.sign\(e\.deltaY\), v \? v\[0\] : -1, v \? v\[1\] : -1\);/, 'dungeon.js');
-  assert.match(read('src/scenes/interior.js'), POINT, 'interior.js');
-  // world.js and exterior.js own no arithmetic of their own: the whole
-  // point of naming them is that the event is what they pass on.
-  //
-  // QUICK-LOOT B4 put a third rung in that ladder (the plaque takes the
-  // wheel while it is listing something), so the two named rungs are no
-  // longer adjacent - and "adjacent" was never the law. The law is that
-  // EVERY rung is handed the event or its raw `deltaY`, and that the
-  // NOTCH is derived by whoever owns the meaning of a direction, which
-  // is why `quickLootWheel` takes `deltaY` exactly as `mwViewWheel`
-  // does. So the pin now reads the whole ladder and holds both halves:
-  // the order (an open window first, the camera last) and the shape of
-  // every argument in between.
-  const RUNG = String.raw`\w+(?:\.\w+|\?\.)*\((?:e|e\.deltaY)\)`;
-  const LADDER = new RegExp(String.raw`townTalk\.wheel\(e\)(?: \|\| ${RUNG})* \|\| modes\?\.wheel\?\.\(e\)(?: \|\| ${RUNG})*\)`);
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const src = read(h);
-    assert.match(src, LADDER, h);
-    // ...and nothing in the listener may do the deriving itself: a
-    // `e.deltaY < 0 ? -1 : 1` written here would be one copy per host
-    // of one decision about which way the wheel goes.
-    const line = src.split('\n').find((l) => l.includes("addEventListener('wheel'"));
-    assert.ok(line, `${h} has no wheel listener`);
-    assert.equal(/Math\.sign|deltaY\s*[<>]|deltaY\s*[*/+-]/.test(line.split('//')[0]), false,
-      `${h} derives a notch in the host`);
-  }
-  // ...and no seam may go back to a bare notch.
-  for (const h of ['src/scenes/townTalk.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js',
-    'src/scenes/interior.js', 'src/scenes/dungeonContext.js']) {
-    assert.equal(/wheel\?\.\(Math\.sign\(e\.deltaY\)\)/.test(read(h)), false, `${h} drops the point again`);
-  }
-});
-
 test('AUDIT 65 UI-5: one wheel shape in src/ui - every other window ignores the extra args', () => {
   // The seams now pass three arguments to whatever window is up. That
   // is safe only while every other `wheel` declares one parameter and

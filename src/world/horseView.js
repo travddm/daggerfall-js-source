@@ -1,5 +1,5 @@
 // @ts-check
-// HORSE-VIEW (2026-10-21; bible/07-Rendering/Performance-Priority.md HORSE-VIEW and HORSE-VIEW II) - A 3D HORSE IS POSED
+// HORSE-VIEW - A 3D HORSE IS POSED
 // WHERE IT IS SEEN, ONE LAW.
 //
 // A horse stepped with `pose: false` (world/horseRig.js step) runs its gait's clock every frame and stands in the last

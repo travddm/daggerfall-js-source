@@ -1,5 +1,5 @@
 // @ts-check
-// LW2 (2026-10-04, bible/06-Systems/Living-World.md): THE RESIDENT'S BODY - a living-world townsperson on the street.
+// LW2: THE RESIDENT'S BODY - a living-world townsperson on the street.
 // DFU's walker (mobilePerson.js MobilePerson, verbatim) both chooses its steps and wears them; a resident's steps are
 // its day's (systems/livingWorld/livingTown.js lays it where its day says it is, every frame), so this keeps the
 // walker's BODY and nothing of its feet: the same billboard - MoveAnims records 0-4 on the mirrored 8-way wheel at 4
@@ -12,12 +12,12 @@
 // class's sprite instead - the enemy's own eight-way MobileUnit (characters/mobile/mobileUnit.js, the band's and the crew's
 // body) on its class archive - and their own outfit again when the walk is done.
 //
-// LW-LOOKS (2026-10-06, "Class looks + still flats"): IN TOWN TOO - one whose calling is a class's walks the town in its
+// LW-LOOKS: IN TOWN TOO - one whose calling is a class's walks the town in its
 // sprite (`arm` with their town class, systems/livingWorld/looks.js townClassOf; `cls` the one worn), and one keeping their
 // place alone stands as Daggerfall's still picture of their kind (`still`: an NPC flat's record, its frames animated on
 // the game's own billboard clock, render/flatAnimation.js FlatAnim) - themselves again when they go on.
 //
-// LW-TALK (2026-10-06, Mac: asked how two who talk should stand, "Turn them"): STANDING, A RESIDENT KEEPS THE WAY THEY
+// LW-TALK: STANDING, A RESIDENT KEEPS THE WAY THEY
 // FACE - the walk wheel's record for their yaw against the camera, held on its STAND_FRAME. DFU's idle record is one
 // front view: every talker in a circle faced the camera, never the one they talked to (88,358 of 88,358 standing
 // frames), and the watch's post the street, never the road. The idle record is the politeness gate's alone - DFU's own

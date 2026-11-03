@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2b (2026-10-03, Mac: "plus we need to build motherloads") - THE
-// MOTHERLODES' LAW, both ends (bible/06-Systems/Professions-Arc.md 6, 38):
+// PROF2b - THE
+// MOTHERLODES' LAW, both ends (6, 38):
 // the contested veins. Three a UTC day rise server-wide, each a tier-6 vein
 // that yields to the first MOTHERLODE_STRIKERS characters to strike it, each
 // finding MOTHERLODE_SILVER silver besides the ore; an account finds one a

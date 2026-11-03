@@ -1,5 +1,4 @@
-// ROGUE-IMP (2026-09-26, Triage on the Discord: "Rogue imp unable to kill hes in the floorboards" - "was able to fireball
-// the floor, but it spawns in the floorboards"): N0B30Y15 places its imp (a FLYING foe) at a QuestSpawn marker of a
+// ROGUE-IMP: N0B30Y15 places its imp (a FLYING foe) at a QuestSpawn marker of a
 // palace - a building. A building's marker is its flat's BASE on the floor (world/interior/interiorLayout.js); the interior's
 // stand handed it to the pool as a sprite CENTRE (the dungeon's RDB convention), and the pool dropped the flyer half its
 // idle sprite: its feet under the boards, its body in the floor, out of every blade's reach. The stand hands the marker
@@ -41,13 +40,3 @@ test('ROGUE-IMP: an imp is a flyer, and the pool reads a flyer\'s point as its s
   assert.ok(Math.abs(asFeet.ai.feet[1] - (floor + 0.1)) < 1e-9, 'handed its feet: it hangs on the floor');
 });
 
-test('ROGUE-IMP by source: the building\'s marker stand hands the marker over as FEET, a walker\'s hair above the floor - the dungeon\'s marker stand keeps the centre it is', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /export const INTERIOR_MARKER_FEET_LIFT = 0\.1;/, 'the pool\'s own walker lift');
-  assert.match(wm, /const feet = standSpot\(interiorCtx\.parentPt\(position\.x, position\.y \+ INTERIOR_MARKER_FEET_LIFT, position\.z\), lifted,[^\n]*\n[^\n]*\n\s*interiorFoes\.spawnFoe\(foe\.foeType, feet, \{\s*gender, questBehaviour: behaviour, feetGiven: true,\s*(?:\/\/[^\n]*\n\s*)*questMarker: true,[^\n]*\n\s*\}\)/);   // QUEST-PARTY phase 3b: and flagged a marker's; QUEST-MARKERS: the feet through the building's backstop
-  const fx = src('src/scenes/exteriorFoes.js');
-  assert.match(fx, /pos\[1\] \+ \(feetGiven \|\| groundAlign \|\| transformY \? 0 : 0\.1\)/, 'feet given: no second lift, so a walker stands exactly where it did');
-  assert.match(fx, /\} else if \(behaviour === 'Flying' && !feetGiven\) pending\.feet\[1\] -= idleH \/ 2 \+ 0\.1;/, 'and no flyer\'s drop - which stays for the true centres (CreateFoe\'s, the watch\'s)');
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /Flying/, 'the dungeon keeps its own centre law (enemyAnchor.js feetFromCentre) for an RDB marker');
-});

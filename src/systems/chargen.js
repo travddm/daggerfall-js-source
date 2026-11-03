@@ -3,7 +3,7 @@ import { spellPointsFor } from '../combat/formulas.js';   // U10
 import { mintCharacterId } from './characterId.js';   // CHARID1
 import { CLASSIC_GAME_START_TIME } from './gameDate.js';   // AUDIT 23: the skill-check anchor
 import { liveStat, STAT_KEYS_ORDER, FATIGUE_MULTIPLIER } from './statMods.js';   // wave 28: MaxMagicka reads LiveIntelligence
-import { renownHpOf, renownMpOf, foldMpOf, spireHpOf } from './renownLayer.js';   // RENOWN1: Renown's online health and magicka, on top of both live maximums; EG15: and the folds' magicka; EG-ZR: and the Spire's Stoneskin
+import { renownHpOf, renownMpOf, foldMpOf } from './renownLayer.js';   // RENOWN1: Renown's online health and magicka, on top of both live maximums; and the folds' magicka
 
 // Character creation (Systems S3). Verbatim ports from DFU
 // StatsRollout.cs / SkillsRollout.cs / DaggerfallSkills.cs /
@@ -63,8 +63,7 @@ export function rollStats(career, rolls = Math.random) {
   return { stats, bonusPool };
 }
 
-// CHAR1 (2026-09-15, a player through Mac: "show the total dice rolls
-// in the enhanced character creator"): WHAT THE DICE ACTUALLY GAVE.
+// CHAR1: WHAT THE DICE ACTUALLY GAVE.
 // Neither screen ever said it. Eight values are rolled - a career
 // floor plus 0..10 each - and a bonus pool of 6..14 is rolled beside
 // them, and the only way to know whether a roll was a good one was to
@@ -111,7 +110,7 @@ export const STARTING_SPELL_SETS = Object.freeze({
   6: [37],                 // Bard
 });
 
-/** HEAL1 (2026-09-23, co-op): THE HEALER'S SECOND HEAL - the class
+/** HEAL1: THE HEALER'S SECOND HEAL - the class
  *  starts able to heal ANOTHER player, not only itself. It is Balyna's
  *  Balm (SPELLS.STD 97, the self heal the Healer set already carries)
  *  with its effects copied field for field and the range turned from
@@ -322,7 +321,7 @@ export function defineLiveMaxHealth(entity) {
       // rides above whatever Daggerfall allows ("On top").
       const limiter = this.maxHealthLimiter;
       const own = limiter >= 1 && limiter < stored ? limiter : stored;   // "Limiter must be 1 or greater"
-      return own + renownHpOf(this) + spireHpOf(this);   // EG-ZR: and the Spire's Stoneskin, on the same terms
+      return own + renownHpOf(this);
     },
     set(v) { stored = v; },
   });
@@ -373,7 +372,7 @@ export function defineLiveMaxMagicka(entity) {
         : stored;
       // RENOWN1: and Renown's online magicka, a term of the sum the magic round never rewrites
       // (systems/renownLayer.js) - inside the floor, so a magery that makes the character unable still leaves 0.
-      // EG15: and the folds' magicka beside it (entityMods.js's channel - the Battlemage's Bearing), on the same terms
+      // And the folds' magicka beside it (entityMods.js's channel), on the same terms.
       const effective = raw + (this.maxMagickaModifier ?? 0) + renownMpOf(this) + foldMpOf(this);
       return effective < 0 ? 0 : effective;
     },

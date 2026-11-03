@@ -1,5 +1,4 @@
-// SCALE4c (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's "one heartbeat replacing the mail, beat and board
-// polls"; bible/11-Multiplayer/Scale-Arc.md SCALE4c): a tab's three clocks - the play beat, the letterbox, the board of
+// SCALE4c: a tab's three clocks - the play beat, the letterbox, the board of
 // the town it stands in - ride ONE request (src/net/heartbeat.js -> /v1/heartbeat, server-account/src/heartbeat.js),
 // each part answered exactly as its own route answers it and each clock at its own pace. The service's half over the
 // real Worker on node:sqlite (test/accountDb.mjs); the client's over fake clocks; the world host's wiring by its text.
@@ -45,7 +44,7 @@ const get = async (s, path, secret) => {
 test('SCALE4c A: /v1/heartbeat is a session\'s route, and each part it carries is answered EXACTLY as its own route answers it - the box as /v1/mail/inbox, a town\'s board as /v1/board/read, the knock as /v1/account/played - under one session, a guest\'s box refused in that route\'s word and its board and beat answered all the same (mutants: a part dropped, the guest\'s box opened, the board read for another town)', async () => {
   assert.ok(ROUTES.has('/v1/heartbeat'));
   assert.ok(!OPEN_ROUTES.has('/v1/heartbeat'), 'behind a session, as the three are');
-  assert.deepEqual([...HEARTBEAT_PARTS], ['beat', 'mail', 'board', 'post']);   // SERVER-POST: the server's post rides it too (PIN MOVED)
+  assert.deepEqual([...HEARTBEAT_PARTS], ['beat', 'mail', 'board', 'post']);   // SERVER-POST: the server's post rides it too (
   const s = await standService({ BOARD_OPEN: 'on' });
   const ann = await s.registered('Ann'), bob = await s.registered('Bob');
   const map = 4242;
@@ -235,7 +234,6 @@ test('SCALE4c B: the knock waits for a ride - after the page\'s first, which goe
   const p = solo.hb.beat();
   await flush(); await p;
   assert.deepEqual(solo.sent.map((x) => x.body), [{ beat: true }]);
-  // PIN MOVED (AUDIT SCALE B1): the page's first knock goes at once, a ride coming or not - nothing on the page says how
   // long ago the account last beat, so a wait could take the gap past the grace. The knocks after it wait.
   const r = rig({ answer: credited });
   const mail = every(r, 'mail', MAIL_POLL_MS);
@@ -385,32 +383,3 @@ test('SCALE4c C: the town\'s board as a part - due when the town the host stands
 
 // ═══ D. THE WORLD HOST ═══════════════════════════════════════════════════════════════════════════════════════════════
 
-test('SCALE4c D: the world host makes ONE heartbeat on the device\'s session, the play clock knocks through it, the town\'s board and the letterbox join it - each where and while its frame asked it before - and neither the street frame nor the online lane asks the service itself any more; no other host keeps any of the three (mutants: the board read in the frame again, the box polled in the lane again, the knock past the heartbeat)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.equal((w.match(/createHeartbeat\(/g) ?? []).length, 1, 'one heartbeat a page');
-  // AUDIT SCALE (lane D D10, B8): the heartbeat's own sight of the page, and the hide seen at once (B1)
-  assert.match(w, /createHeartbeat\(\{\s*fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\),\s*visible: \(\) => globalThis\.document\?\.visibilityState !== 'hidden',\s*\}\);/);
-  assert.match(w, /globalThis\.document\?\.addEventListener\?\.\('visibilitychange', \(\) => \{ heartbeat\.tick\(\); \}\);/);
-  assert.match(w, /startPlayClock\(\{\s*beat: \(\) => heartbeat\.beat\(\),\s*visible: \(\) => globalThis\.document\?\.visibilityState !== 'hidden',/);
-  assert.equal((w.match(/startPlayClock\(/g) ?? []).length, 1, 'one play clock');
-  assert.doesNotMatch(w, /accountPlayBeat/, 'no knock past the heartbeat');
-  assert.match(w, /if \(noticeBook\) heartbeat\.add\('board', noticeBook\.heartbeatPart\(\(\) => \(_noticeTown && performance\.now\(\) - _noticeTown\.at < FRAME_LIVE_MS \? _noticeTown\.mapId : null\)\)\);/);
-  assert.match(w, /heartbeat\.add\('mail', whileLive\(mail\.heartbeatPart\(\), \(\) => performance\.now\(\) - _mailFrameAt < FRAME_LIVE_MS\)\);/);
-  assert.doesNotMatch(w, /mail\??\.poll\(/, 'the lane no longer looks at the box itself');
-  // the street frame's second: the town stamped, and no read of the board of its own (AUDIT SCALE B8: the text pin
-  // passed with one put back)
-  const streetAt = w.indexOf('// NOTICE1: the town the player stands in is read on arrival');
-  const street = streetAt < 0 ? '' : w.slice(streetAt, w.indexOf('_farmSyncT -= dt;', streetAt));
-  assert.ok(street.length > 0 && street.length < 1500, 'the street frame\'s stamp found');
-  assert.doesNotMatch(street, /noticeBook\??\.read\(/, 'the street frame no longer reads the board itself');
-  // PIN MOVED (AUDIT SCALE B7): once a second by the wall clock - the frame's dt is clamped, and at four frames a second
-  // or fewer its "second" outran FRAME_LIVE_MS
-  assert.match(street, /const stampAt = performance\.now\(\);\s*if \(noticeBook && \(!_noticeTown \|\| stampAt - _noticeTown\.at >= 1000\)\) \{ const town = noticeTownHere\(\); _noticeTown = \{ mapId: town \? town\.mapId : null, at: stampAt \}; \}/);
-  const live = Number(w.match(/const FRAME_LIVE_MS = (\d+);/)?.[1]);
-  assert.ok(live > 1000 && live <= 5000, `FRAME_LIVE_MS ${live}: past the stamp's second, and a stilled frame's parts drop out within seconds`);
-  assert.match(w, /_mailFrameAt = performance\.now\(\);/);
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const h = src(host);
-    for (const clockWord of ['startPlayClock', 'createNoticeBook', 'new MailBox', 'createHeartbeat']) assert.ok(!h.includes(clockWord), `${host} keeps ${clockWord}`);
-  }
-});

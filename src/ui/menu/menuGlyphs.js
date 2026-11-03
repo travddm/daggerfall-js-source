@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MENU-ORDER (2026-10-12) — THE MENUS' PICTURES: the decorator's, and the Stores page's stations.
+// MENU-ORDER — THE MENUS' PICTURES: the decorator's, and the Stores page's stations.
 //
 // The owner, of the decorator, the shops and the stations: "I just feel like text lists are too much. Why cant you try
 // something else". So a kind of piece and a press each wear a picture before their words: a 12x12 pixel glyph, drawn

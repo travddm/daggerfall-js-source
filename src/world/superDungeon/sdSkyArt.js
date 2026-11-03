@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 5): WHAT THE HOUR'S SKY DRAWS IN STARS - the
+// SD-LOOK: WHAT THE HOUR'S SKY DRAWS IN STARS - the
 // six Endings' signs (world/superDungeon/sdHallArt.js SD_SIGNS, the stones' own: one law, the lion, the sun, the ship, the tusk, the
 // crown of bone, the dragon) sampled on a coarse grid into one small strip the sky's paint reads (render/sdSkyMap.js),
 // so each sign becomes a constellation on the clock-face's inner ring; and the Roman numerals its twelve hours are

@@ -1,4 +1,4 @@
-// AUDIT GALLEON P6 (2026-10-02, Mac: "Audit this. It must be perfect"): THE GUNPORT SHUTTERS' FIT, MEASURED OFF THE BAKE.
+// AUDIT GALLEON P6: THE GUNPORT SHUTTERS' FIT, MEASURED OFF THE BAKE.
 //
 // A shut shutter lies on her side: its inner face follows her outer planking at LID_ROWS' heights (the hinge on the
 // lintel, the knuckle her side breaks at, the port's sill, the shutter's foot) and LID_COLS' stations across it, the

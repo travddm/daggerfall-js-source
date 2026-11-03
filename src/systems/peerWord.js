@@ -1,5 +1,5 @@
 // @ts-check
-// HACKED-GOLD (2026-10-12, bible/01-Overview/bugs/Field-Bugs-2026-10-12f.md; 06-Systems/Integrity-Arc.md, Progress):
+// HACKED-GOLD:
 // WHAT A PEER'S WORD MAY HAND ANOTHER PLAYER.
 //
 // A peer's word - a room's record of a container it has opened (WORLD4, WORLD6a), a body's grant (WORLD6b-iii(c)), a

@@ -1,4 +1,4 @@
-// MW-CAST1 (2026-10-07): AN ARM THAT CAN CAST. No committed fixture .kf carries Morrowind's spellcast group, so the
+// MW-CAST1: AN ARM THAT CAN CAST. No committed fixture .kf carries Morrowind's spellcast group, so the
 // cast lane (fpArm.castSpell, MW-D39) was pinned by its source alone and its keys were never crossed in a test. This
 // is armfpweapon.kf - its every record written back by tools/nifWrite.mjs, which reproduces the file byte for byte -
 // with the spellcast group and its idle appended after the file's last key: the three ranges' start / release / stop,

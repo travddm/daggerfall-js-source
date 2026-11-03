@@ -1,0 +1,189 @@
+name: probes
+
+# The end-to-end game probes (docs/testing/game-probes.md): the running game is booted in a browser and driven through
+# chargen, a dungeon, a town, a shop, fast travel, a save and load, the pause menu, and two clients online. The suite
+# tests modules; these catch what a refactor of the host files (world.js, worldModes.js, the relay's Room) breaks in
+# the wiring.
+#
+# They run on pull requests that touch the game, the relay or the account service, one runner per probe so that the
+# slowest probe (online) sets the wall time. They are not part of the `check` job: ARENA2 comes from a download, and
+# a probe that finds a bug in the game should not hide behind the suite's green. Chromium renders on SwiftShader here.
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'server/**'
+      - 'server-account/**'
+      - 'tools/probes/**'
+      - 'tools/loadHarness.mjs'
+      - 'tools/frameProbe.mjs'
+      - 'tools/onlineFrameProbe.mjs'
+      - 'vite.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/probes.yml'
+  # A manual run repeats one probe, to tell a flaky probe from a real fault: `gh workflow run probes --ref <branch>
+  # -f probe=save -f repeat=10`. Leave `probe` empty for one run of every probe.
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: 'One probe to repeat (empty: every probe once)'
+        required: false
+        default: ''
+      repeat:
+        description: 'How many runs of that probe'
+        required: false
+        default: '5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: probes-${{ github.event_name }}-${{ inputs.probe }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: plan
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - id: plan
+        env:
+          PROBE: ${{ inputs.probe }}
+          REPEAT: ${{ inputs.repeat }}
+        run: |
+          # run 0: a plain run, whose job keeps the name "probe <name>"; 1..N: the repeats of a manual run
+          include=""
+          if [ -n "$PROBE" ]; then
+            for i in $(seq 1 "$REPEAT"); do include="$include{\"probe\":\"$PROBE\",\"run\":$i},"; done
+          else
+            for p in boot dungeon town travel rest save pause online; do include="$include{\"probe\":\"$p\",\"run\":0},"; done
+          fi
+          echo "matrix={\"include\":[${include%,}]}" >> "$GITHUB_OUTPUT"
+
+  # The game is built once and every probe serves the build with `vite preview` (tools/probes/build.mjs). A dev server
+  # transformed thousands of modules on each probe's first page load; that was 5 to 9 minutes for each start of the
+  # game world. The online probe edits the source in memory and keeps the dev server, so it ignores the build.
+  build:
+    name: build
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cached dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
+      - name: Build the game
+        run: node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist"
+      # One archive: the build is 30,000 small files, which the artifact service handles slowly one by one
+      - name: Pack the build
+        run: tar -czf "$RUNNER_TEMP/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-dist
+          path: ${{ runner.temp }}/probe-dist.tgz
+          compression-level: 0
+          retention-days: 1
+
+  probe:
+    needs: [plan, build]
+    name: "probe ${{ matrix.probe }}${{ matrix.run > 0 && format(' #{0}', matrix.run) || '' }}"
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 40
+    strategy:
+      # every probe reports, so one red run shows every broken part
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cached dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Install the relay's tools (wrangler)
+        if: matrix.probe == 'online'
+        run: npm ci --prefix server
+      - name: Install Chromium
+        if: ${{ runner.environment == 'github-hosted' }}
+        run: npx playwright install --with-deps chromium
+      # The self-hosted image carries Chromium and its system libraries (docs/ci/self-hosted-runner.md). The job user
+      # has no sudo, so --with-deps cannot run there; this downloads only if the image's revision is not the lockfile's.
+      - name: Chromium from the runner image
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: npx playwright install chromium
+      - name: Cached game data (ARENA2)
+        id: arena
+        if: ${{ runner.environment == 'github-hosted' }}
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/arena-data
+          key: arena2-freeware-v1
+      - name: Fetch ARENA2 (freeware Daggerfall data, never in the repository)
+        if: ${{ runner.environment == 'github-hosted' && steps.arena.outputs.cache-hit != 'true' }}
+        run: sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
+      # The runner's host keeps ARENA2 and mounts it read-only; a runner without the mount downloads it as above.
+      - name: ARENA2 from the runner's own cache
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/arena-data"
+          if [ -d /opt/dfo-cache/arena2 ]; then
+            ln -s /opt/dfo-cache/arena2 "$RUNNER_TEMP/arena-data/arena2"
+          else
+            sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
+          fi
+      - name: Download the build
+        if: matrix.probe != 'online'
+        uses: actions/download-artifact@v4
+        with:
+          name: probe-dist
+          path: ${{ runner.temp }}/probe-dist-pack
+      - name: Unpack the build
+        if: matrix.probe != 'online'
+        run: |
+          mkdir -p "$RUNNER_TEMP/probe-dist"
+          tar -xzf "$RUNNER_TEMP/probe-dist-pack/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist"
+      - name: Probe ${{ matrix.probe }}
+        env:
+          # the world streams a small grid (tools/probes/lib/harness.mjs): software GL is what makes the probes slow
+          PROBE_LIGHT: '1'
+          PROBE_DIST: ${{ matrix.probe != 'online' && format('{0}/probe-dist', runner.temp) || '' }}
+          ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
+          SHOT_DIR: ${{ runner.temp }}/probe-shots
+        run: npm run probes -- ${{ matrix.probe }}
+      - name: Keep the screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: probe-shots-${{ matrix.probe }}-${{ matrix.run }}
+          path: ${{ runner.temp }}/probe-shots
+          retention-days: 7
+          if-no-files-found: ignore

@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // GUILD1 - THE GUILDS, AS THE SERVICE KEEPS THEM.
 //
-// Mac, of the holdings: "future ownership for online guilds"; asked,
+// asked,
 // founding takes "Gold and Renown", a guild is joined "Per character",
 // its ranks are "Four, renamed by the guildmaster", and the treasury is
 // the "Guildmaster only" to take from. What a guild is - its shapes,
@@ -40,7 +40,7 @@
 // A join lands only while the guild holds fewer than its cap and the
 // invitation still stands (one INSERT ... WHERE), a treasury moves only
 // by what it holds (one UPDATE ... WHERE treasury >= n), and the ledger
-// line is the schema's own trigger on that UPDATE (0013_guilds.sql) - so
+// line is the schema's own trigger on that UPDATE - so
 // two members racing never overdraw it, no line is written for gold that
 // did not move, and no gold moves without one. A rank is changed only
 // from the rank it was read at, so two officers racing move a member
@@ -102,7 +102,7 @@ async function memberRow(db, playerId, charId) {
   return db.prepare('SELECT rowid AS rid, * FROM guild_members WHERE player = ? AND char_id = ?').bind(playerId, charId).first();
 }
 
-/** SCALE4f part two (2026-10-10; bible/11-Multiplayer/Scale-Arc.md SCALE4f): THE NAMED CHARACTER'S MEMBERSHIP AS THE
+/** SCALE4f part two: THE NAMED CHARACTER'S MEMBERSHIP AS THE
  *  MINT READS IT, ONCE - its member row (its rowid, its guild, its rank, when it joined) and its guild's (id, tag and
  *  heraldry; null where the guild's row is gone) - which guildBadgeOf, seatTurning.js seatBadgeOf and seatRibbons.js
  *  ribbonOf each read again for themselves, three statements of one row. Each takes it as `member` and keeps its own
@@ -129,7 +129,7 @@ const badgeOfRow = (me, tag) => ({ gi: me.guild_id, gt: tag, gm: `m${me.rid}` })
 /** A guild whose guildmaster is gone is given one: its highest rank's longest-standing member. A guild that has one
  *  finds its guildmaster first in that order, and is left unwritten. */
 async function succeed(db, guildId) {
-  // SCALE4b (2026-10-08): ASKED BEFORE IT IS WRITTEN - the update went on every guild read and write, and a guild with
+  // SCALE4b: ASKED BEFORE IT IS WRITTEN - the update went on every guild read and write, and a guild with
   // its master changes nothing; the same first member is read, and only one that is not the master is written (the
   // update's own guard still stands, so a race that crowned someone meanwhile leaves it nothing to change)
   const first = await db.prepare('SELECT rank FROM guild_members WHERE guild_id = ? ORDER BY rank, joined_at, rowid LIMIT 1').bind(guildId).first();
@@ -178,7 +178,7 @@ async function viewOf(db, guildId, me, nowS, marksOpen = false, env = null) {
   const members = await db.prepare(`SELECT m.rowid AS rid, m.name, m.rank, m.joined_at, m.player, m.char_id, m.vault_level, m.vault_limit, m.vault_day, m.vault_taken, p.staff_hide_on AS hide_on,
     COALESCE(p.played_at, p.last_seen) AS seen_at FROM guild_members m LEFT JOIN players p ON p.id = m.player WHERE m.guild_id = ? ORDER BY m.rank, m.joined_at, m.rowid`)
     .bind(guildId).all();
-  // AUDIT HIDDEN-UNCOUNTED C1 (the owner, asked: "Last seen when hid"): a member hidden from every player (Hide me) is at
+  // AUDIT HIDDEN-UNCOUNTED C1: a member hidden from every player (Hide me) is at
   // play to nobody - last online the moment they hid (staffHidden.js hiddenSince), in every member's view and in their
   // own, where the reader's row reads online no more (`hidden`, guildBook.js guildMemberOnline). Asked of an account
   // whose switch is on alone - a staff member's - so a guild of players reads nothing more.
@@ -201,7 +201,7 @@ async function viewOf(db, guildId, me, nowS, marksOpen = false, env = null) {
       .bind(guildId, nowS - GUILD_INVITE_TTL_S).all()
     : { results: [] };
   const ledger = await db.prepare('SELECT at, who, kind, amount, balance FROM guild_ledger WHERE guild_id = ? ORDER BY seq DESC LIMIT ?').bind(guildId, GUILD_LEDGER_SHOWN).all();
-  // MARKS1: the Marks treasury beside the gold one, and its latest lines (0025_marks.sql - the one ledger)
+  // MARKS1: the Marks treasury beside the gold one, and its latest lines (the one ledger)
   const marks = marksOpen ? await db.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').bind(guildId).first() : null;
   const marksLines = marksOpen ? await db.prepare(`SELECT at, who, kind, amount, src_kind, src_id FROM marks_ledger
     WHERE (dst_kind = 'guild' AND dst_id = ?1) OR (src_kind = 'guild' AND src_id = ?1) ORDER BY seq DESC LIMIT ?2`).bind(guildId, MARKS_LEDGER_SHOWN).all() : null;
@@ -209,8 +209,7 @@ async function viewOf(db, guildId, me, nowS, marksOpen = false, env = null) {
   try { ranks = guildRankNamesOf(JSON.parse(g.ranks)) ?? GUILD_RANK_NAMES; } catch { /* the defaults */ }
   return {
     id: g.id, name: g.name, tag: g.tag, ranks: [...ranks], treasury: g.treasury, foundedAt: g.founded_at, rank: me.rank,
-    // HALL-GOLD (FIELD BUGS 2026-10-03): what of the treasury buys a hall - the gold realm characters put in (`realm_gold`,
-    // 0020_realm_audit.sql), the one the hall's buy spends (halls.js buyHall) - never shown, so a guild could not tell
+    // HALL-GOLD (FIELD BUGS 2026-10-03): what of the treasury buys a hall - the gold realm characters put in (`realm_gold`), the one the hall's buy spends (halls.js buyHall) - never shown, so a guild could not tell
     // why a treasury that held the price was refused
     hallGold: Number(g.realm_gold ?? 0),
     // GUILD1d (Seats-Arc 8): the hall (null for none) and the heraldry (null until chosen), every member's to read
@@ -240,7 +239,7 @@ async function viewOf(db, guildId, me, nowS, marksOpen = false, env = null) {
     ...(marksOpen ? {
       marks: Number(marks?.balance ?? 0),
       // AUDIT GUILD1d R5: a heraldry changed is its own line (the treasury paid it), never a deposit. GUILD3b
-      // (bible/11-Multiplayer/Guilds-Made-Plain.md): and every line its own kind (`raw`) and which way it went (`out`: it
+      // : and every line its own kind (`raw`) and which way it went (`out`: it
       // left this treasury) - the `kind` above read every line it had no word for as a deposit, so a Tribute, an upkeep, a
       // claim fee or a patron's bid said "put in"; `kind` stands as it was for a client from before
       marksLedger: (marksLines?.results ?? []).map((l) => ({ at: l.at, who: l.who, kind: GUILD_MARKS_LINE_KIND[l.kind] ?? 'deposit', raw: String(l.kind),
@@ -297,7 +296,7 @@ export function guildWordRefusal(name, tag) {
 export const guildWordsOk = (name, tag) => guildWordRefusal(name, tag) == null;
 
 /**
- * GUILD2a (bible/11-Multiplayer/Guild-Overhaul.md; asked: "A way to change your guild name for a price"): A NEW NAME - the
+ * GUILD2a (; asked: "A way to change your guild name for a price"): A NEW NAME - the
  * guildmaster's: a name, a tag, or both (`name`/`tag` absent or the same keep the one standing), through the law's shapes
  * and the name filter, free of every other guild's (a guild nobody is left in gives its own up, as at a founding), paid
  * GUILD_RENAME_GOLD from the treasury - from the gold realm characters put in (`realm_gold`, the part a hall is bought
@@ -554,7 +553,7 @@ export const GUILD_HOLDS_SQL = `SELECT (SELECT treasury FROM guilds WHERE id = ?
       ${GUILD_HOLDS.map(([, sql], n) => `${sql('?1')} AS h${n}`).join(',\n      ')},
       COALESCE((SELECT balance FROM guild_marks WHERE guild_id = ?1), 0) > 0
         AND COALESCE((SELECT balance FROM guild_marks WHERE guild_id = ?1), 0) + COALESCE((SELECT balance FROM marks WHERE account = ?2), 0) > ${MARKS_MAX} AS marks_full`;
-/** GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE PRESS): EVERYTHING THAT HOLDS GUILD `guildId`
+/** GUILD3c (, EVERY RULE BEFORE THE PRESS): EVERYTHING THAT HOLDS GUILD `guildId`
  *  FROM GOING but its members - its gold, its guild Stores or writs (PROF6), a contract (SILVER-WAYS), its hall (GUILD1d),
  *  its vault (GUILD2b), a Charter or a battle (SEAT1c), a patron's bid (AUDIT CHAP5 E4) - as refusal codes in this order,
  *  in ONE statement (guildKeepsSql's own reads, each on its guild's index). The guildmaster's view carries it, so the
@@ -646,7 +645,7 @@ export async function renameGuildRanks(ctx, player, { character, ranks } = {}) {
   if (!guildMay(a.me.rank, 'renameRanks')) return { error: 'guild-rank' };
   const names = guildRankNamesOf(ranks);
   if (!names) return { error: 'bad-ranks' };
-  // TEXT-F1 (2026-10-07): a rank's name is a name the guild's members wear - its words read as a name's, the word caught
+  // TEXT-F1: a rank's name is a name the guild's members wear - its words read as a name's, the word caught
   // said (AUDIT2 GUILD2 S2's own shape)
   const caught = names.map(textCaught).find(Boolean);
   if (caught) return { error: 'guild-rank-word', word: caught };
@@ -670,7 +669,7 @@ async function moveTreasury(db, me, who, kind, gold, nowS) {
  *  wallet's own order, `region`'s account last) or is paid (a withdrawal, to the purse - GUILD-LETTER: or, `letter`, as
  *  a letter of credit), and the treasury moves by what it holds, each guarded; both or neither. Answers the balance and
  *  the record's new sequence.
- *  AUDIT REALM L1-F3: A RECORD IS PAID ONLY WHAT RECORDS PAID IN. `realm_gold` (migration 0020) is the part of the
+ *  AUDIT REALM L1-F3: A RECORD IS PAID ONLY WHAT RECORDS PAID IN. `realm_gold` is the part of the
  *  treasury realm records deposited, and a realm withdrawal takes from it alone: the rest came in on a client's word -
  *  before the realm, or through the old lane any other character still has (a million deposited by a character no
  *  record stands behind, then taken out by the guildmaster's record, was a million made). */
@@ -714,7 +713,7 @@ export async function depositToGuild(ctx, player, { character, gold, realm = nul
   return treasury == null ? { error: 'guild-treasury-full' } : { ok: true, treasury };
 }
 
-/** TAKE GOLD OUT - the guildmaster's alone (Mac: "Guildmaster only"), never more than the treasury holds. A realm
+/** TAKE GOLD OUT - the guildmaster's alone, never more than the treasury holds. A realm
  *  character's record takes it here, with the treasury (REALM P2.2).
  *  GUILD-LETTER (FIELD BUGS 2026-09-30): `letter` true, the record takes it as a letter of credit, not as coin - the
  *  client weighed the coin against what its pack can carry (net/guild/guildBook.js withdraw) and writes the same letter

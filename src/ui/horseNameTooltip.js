@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT HCC U6 (2026-09-23, Mac: "any new notifications or UI elements are enhancified"): HORSE CART AND CARGO'S
+// AUDIT HCC U6: HORSE CART AND CARGO'S
 // HorseNameTooltipController - the horse's name under the crosshair, on BOTH skins.
 //
 // The mod adds ONE TextLabel to the HUD's NativePanel (EnsureBound [IL_2fe1]: DaggerfallUI.AddTextLabel with the

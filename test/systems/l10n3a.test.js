@@ -1,4 +1,4 @@
-// L10N3a (2026-09-27): TEXT.RSC IN A TRANSLATION'S OWN WORDS. DFU asks the string table Internal_RSC for a record's id
+// L10N3a: TEXT.RSC IN A TRANSLATION'S OWN WORDS. DFU asks the string table Internal_RSC for a record's id
 // before it opens TEXT.RSC (TextProvider.GetRSCTokens), and a pack patches its rows over that table. A row is text in
 // the importer's markup, which no byte shape can hold ('ü' is JustifyLeft's 0xFC), so it is read as DFU reads it -
 // into tokens (ConvertStringToRSCTokens) - and every reader answers from them by its byte arm's own law. Pinned: the

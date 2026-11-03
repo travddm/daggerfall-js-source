@@ -1,13 +1,13 @@
-// AUDIT CHAP (2026-10-07, Mac: "Lets do a deep audit on everything so far before we continue"): CHAP0's record and
+// AUDIT CHAP: CHAP0's record and
 // CHAP1's Roll read by five lenses - the service (S), the playing tab (C), Daggerfall's law (D), the record (R) and the
-// pins (T) - at 1100fec1. bible/01-Overview/audits/Audit-Chapters.md holds every finding; these pins hold every fix, each
+// pins (T) - at 1100fec1. holds every finding; these pins hold every fix, each
 // named by its finding's ID, and tools/mutants/audit_chap1.json is their mutants.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  ROLL_EPOCH_S, ROLL_EVENTS_KEEP_S, ROLL_RETRY_MS, ROLL_RETRY_MAX_MS, ROLL_CLAIM_MS, ROLL_KEPT_VENDOR,
+  ROLL_EVENTS_KEEP_S, ROLL_RETRY_MS, ROLL_RETRY_MAX_MS, ROLL_CLAIM_MS, ROLL_KEPT_VENDOR,
   rollCredit, rollDrain, rollSeedOf, rollSeedOk, rollRankCapOf, rollDeltasOf, rollAdopt, rollKeptOf, rollMembersKey,
 } from '../../src/net/npcChapterLaw.js';
 import { createRollTracker, rollEntityDoors, rollRid, ROLL_STOPS } from '../../src/net/npcRollTracker.js';
@@ -22,12 +22,11 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const DAY = 86_400;
 const DAYN = Math.floor(T0 / DAY);
 
-async function stand({ origin = null, createdAt = ROLL_EPOCH_S + DAY } = {}) {
+async function stand() {
   const svc = await standService({ CHAPTERS_OPEN: 'on' });
   const who = await svc.registered('Audra');
   const R = await seatRealm(svc.env, who.secret, 'Audra');
   const raw = svc.env.DB._raw;
-  raw.prepare('UPDATE realm_characters SET created_at = ?, origin_id = ? WHERE id = ?').run(createdAt, origin, R.id);
   const ctx = (nowS, db = svc.env.DB) => ({ db, nowS });
   const body = (extra = {}) => ({ character: R.id, lease: R.lease, ...extra });
   const rep = (f) => raw.prepare('SELECT rep, owed FROM npc_roll WHERE char_id = ? AND faction_id = ?').get(R.id, f);
@@ -43,7 +42,7 @@ test('AUDIT CHAP S1: a claim sent twice at once is credited once - the twin that
   await readRoll(s.ctx(T0), s.player, s.body({ seed: { factions: { 40: 10, 41: 0 }, members: [] } }));
   const claim = s.body({ rid: 'twin-000001', deltas: { 40: 5, 41: -20 }, members: [] });
   let twin = null;
-  // the twin lands between this one's read and its write - PIN MOVED (PRIMARY-FOLD part three, AUDIT PLAN-1000 D1): the
+  // the twin lands between this one's read and its write
   // claim's first batch is its reads now, so the twin lands before the second, the one that writes
   let batches = 0;
   const racing = { prepare: (sql) => s.env.DB.prepare(sql), batch: async (list) => { if (++batches === 2) twin ??= await claimRoll(s.ctx(T0), s.player, claim); return s.env.DB.batch(list); } };
@@ -67,21 +66,12 @@ test('AUDIT CHAP S4: a lease another tab took, or a death, between a claim\'s re
   }
 });
 
-test('AUDIT CHAP S3: no Roll before the realm holds a save (no-data, 404); a customs undone takes its Roll (mutants: the landed-save check, the undo\'s delete)', async () => {
-  const s = await stand();
-  s.raw.prepare('UPDATE realm_characters SET bytes = 0 WHERE id = ?').run(s.R.id);
-  const r = await s.call('/v1/chapters/roll', s.body({ seed: { factions: {}, members: [] } }), s.who.secret);
-  assert.deepEqual([r.status, r.body.error], [404, 'no-data']);
-  assert.match(src('server-account/src/realm.js'), /async function undoCustoms[\s\S]{0,900}DELETE FROM npc_roll WHERE player = \? AND char_id = \?[\s\S]{0,200}DELETE FROM npc_roll_heads[\s\S]{0,200}DELETE FROM npc_rep_events/);
-});
-
-test('AUDIT CHAP S5 + D1: a customs seed keeps a member\'s rank its reputation (the cap never under its rank\'s need), and the Roll never records a rank past what its own reputation allows (mutants: the member floor, the rank cap)', async () => {
+test('AUDIT CHAP S5 + D1: a seed is taken whole, and the Roll never records a rank past what its own reputation allows (mutants: the rank cap)', async () => {
   assert.deepEqual([rollRankCapOf(-5), rollRankCapOf(0), rollRankCapOf(39), rollRankCapOf(40), rollRankCapOf(95)], [0, 0, 3, 4, 9]);
-  const s = await stand({ origin: 'off-audra' });
+  const s = await stand();
   const r = await readRoll(s.ctx(T0), s.player, s.body({ seed: { factions: { 40: 95, 41: 95, 42: 0 }, members: [{ f: 40, rank: 9 }, { f: 42, rank: 9 }] } }));
-  assert.equal(r.roll.factions[40], 79, 'a rank-9 member keeps 79 (PIN MOVED, AUDIT CHAP2 E6, Mac: "You can decide whatever is best": never a seat\'s 80 off an offline grind)');
-  assert.equal(r.roll.factions[41], 40, 'no member: the customs cap');
-  assert.deepEqual(r.roll.members.map((m) => [m.f, m.rank]), [[40, 7], [42, 0]], 'rank 9 claimed with 0 reputation is recorded at 0 - and at 79, rank 7 (PIN MOVED, E6)');
+  assert.deepEqual([r.roll.factions[40], r.roll.factions[41]], [95, 95], 'every faction seeded as the save held it');
+  assert.deepEqual(r.roll.members.map((m) => [m.f, m.rank]), [[40, 7], [42, 0]], 'rank 9 claimed with 0 reputation is recorded at 0 - and with 95, below the seat\'s line at rank 7');
   const c = await claimRoll(s.ctx(T0 + 60), s.player, s.body({ rid: 'rank-000001', deltas: {}, members: [{ f: 40, rank: 9 }, { f: 42, rank: 7 }] }));
   assert.equal(c.roll.members.find((m) => m.f === 42).rank, 0);
 });
@@ -134,7 +124,6 @@ test('AUDIT CHAP T13: the route - a GET is 405, a lost race is 409, a tombstone 
   assert.equal(get.status, 405);
   await s.call('/v1/chapters/roll', s.body({ seed: { factions: {}, members: [] } }), s.who.secret);
   const real = s.env.DB.batch.bind(s.env.DB);
-  // PIN MOVED (PRIMARY-FOLD, Scale-Arc.md THE PLAN PAST 1,000): the claim reads its head, rows and record in a batch of
   // their own first - the race is laid between those reads and the batch that writes, the claim's second
   let batches = 0;
   s.env.DB.batch = async (list) => { if (++batches < 2) return real(list); s.env.DB.batch = real; s.raw.prepare('UPDATE npc_roll_heads SET seq = seq + 1 WHERE char_id = ?').run(s.R.id); return real(list); };
@@ -158,7 +147,6 @@ test('AUDIT CHAP D2/D3: a reward past the day\'s pace is owed, not lost - paid a
   const c = await claimRoll(s.ctx(T0), s.player, s.body({ rid: 'worms-00001', deltas: { 21: 100 }, members: [] }));   // S0000106's +100
   assert.deepEqual([c.credited[21], c.roll.factions[21], c.roll.owed[21]], [15, 15, 85]);
   const next = await readRoll(s.ctx(T0 + DAY), s.player, s.body());
-  // PIN MOVED (AUDIT CHAP2 C1): the answer's sequence is the CLAIM sequence - owed paid is the service's own credit
   assert.deepEqual([next.from, next.roll.seq, next.roll.factions[21], next.roll.owed[21]], [1, 1, 30, 70], 'the next day\'s read pays 15');
   const later = await claimRoll(s.ctx(T0 + 2 * DAY), s.player, s.body({ rid: 'worms-00002', deltas: { 40: 1 }, members: [] }));
   assert.deepEqual([later.roll.factions[21], later.roll.owed[21]], [45, 55], 'and a claim on any line pays it too');
@@ -283,7 +271,6 @@ test('AUDIT CHAP T6/T10: a promotion alone is claimed; an uncut claim says nothi
   p.h[40] += 5;
   p.at(ROLL_CLAIM_MS); p.tracker.tick(); await p.settle();
   assert.deepEqual(p.box.said, [[40]], 'a repeat said nothing more');
-  // PIN MOVED (AUDIT GUILD-WORDS II B-3, C-4): the pace's words are rollNoticeHost.js's, with what is owed - test/systems/fb1015g_guildwords.test.js
 });
 
 test('AUDIT CHAP T8/T9: the wait doubles from 30 seconds to 15 minutes and resets on an answer; no Roll found reads again; a read with no Roll is a stop (mutants: the doubling, the cap, the reset, the unseeded reset)', async () => {
@@ -356,11 +343,11 @@ test('AUDIT CHAP T1: the realm session\'s lease is read while it plays, and null
 
 // ── T2: THE DOOR, END TO END ────────────────────────────────────────
 
-test('AUDIT CHAP T2: the real tab through the real door to the real service - a customs seed capped and adopted, a claim cut and owed, a repeat answered (mutants: the door\'s paths and its seed)', async () => {
-  const s = await stand({ origin: 'off-audra' });
+test('AUDIT CHAP T2: the real tab through the real door to the real service - a seed adopted, a claim cut and owed, a repeat answered (mutants: the door\'s paths and its seed)', async () => {
+  const s = await stand();
   const io = accountRoll({ fetch: s.fetch, storage: sessionStorageOf(SESSION_KEY, s.who) });
   let t = 1_000_000;
-  const held = { 40: 90, 41: 0 };
+  const held = { 40: 50, 41: 0 };
   const said = [];
   let kept = null;
   const tracker = createRollTracker({
@@ -369,11 +356,11 @@ test('AUDIT CHAP T2: the real tab through the real door to the real service - a 
   });
   const settle = async () => { for (let i = 0; i < 20; i++) await new Promise((r) => setTimeout(r, 0)); };
   tracker.tick(); await settle();
-  assert.equal(held[40], 40, 'the service capped the crossing\'s seed, and the tab holds the service\'s word');
+  assert.equal(held[40], 50, 'the tab holds the service\'s word');
   assert.deepEqual(kept?.seq, 0);
   held[40] += 25;
   t += ROLL_CLAIM_MS; tracker.tick(); await settle();
-  assert.equal(held[40], 55, 'fifteen of twenty-five today');
+  assert.equal(held[40], 65, 'fifteen of twenty-five today');
   assert.deepEqual(said, [[40]]);
   assert.equal(s.rep(40).owed, 10, 'the rest owed');
   assert.equal(accountRefusalText('roll-busy'), REFUSALS['roll-busy']);

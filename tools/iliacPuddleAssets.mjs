@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// DW-E3 (2026-09-25): ILIAC PUDDLE NO MORE 1.2.2 (jet082) - THE FISH'S
+// DW-E3: ILIAC PUDDLE NO MORE 1.2.2 (jet082) - THE FISH'S
 // VENDORED FILES, OUT OF THE SHIPPED BUNDLE.
 //
 //   node tools/iliacPuddleAssets.mjs "<path-to>/iliac puddle no more.dfmod" [outDir]

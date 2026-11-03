@@ -125,7 +125,7 @@ export function makeAnchor({
     nativeX, nativeZ, y,
     // TERRAIN-SCALE1: the terrain scale `y` stood on; null on an anchor from before the stamp (the prefab's 1.5)
     terrainScale: terrainScale > 0 ? terrainScale : null,
-    // BAY-LEFT-GROUND (bible/03-World/Landforms.md, D5): the law of `y`'s frame (terrainSampler.js GROUND_FRAME_LAW); null on an
+    // BAY-LEFT-GROUND (, D5): the law of `y`'s frame (terrainSampler.js GROUND_FRAME_LAW); null on an
     // anchor from before it, which past the Bay stood the shaped ground
     groundFrame: groundFrame > 0 ? groundFrame : null,
     local: local ? [...local] : null,

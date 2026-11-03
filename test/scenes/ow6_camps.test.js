@@ -1,5 +1,4 @@
-// OW6 - CAMPS ON THE OVERWORLD, THE SAME FOR EVERY PLAYER (2026-09-29, the player: "If a camp is spawned, it should show
-// in the overworld"; "Everything needs that persistence between players in the overworld"). The law (world/campShared.js:
+// OW6 - CAMPS ON THE OVERWORLD, THE SAME FOR EVERY PLAYER. The law (world/campShared.js:
 // the tags, the groups, the words); two real foe pools over their real frames - a camp stood by one player is a camp at
 // the other, marked from its puppets by the host's own grouping (lifted out of scenes/world.js and run); and the handover
 // - a camp taken over by an heir stays ONE camp, with its sight and its alert radius; and the host's and the HUD's wiring.
@@ -171,7 +170,6 @@ test('OW6 camps wiring: the host stands each group under the pool\'s one counter
   assert.match(W, /f\.campId = campId; f\.campAlertRadius = hit\.alertRadius;\n\s*f\.campKind = hit\.kind \?\? 'pack';/);
   assert.match(W, /_standCampEncounter\(\{ kind: 'band', mobileTypes: mk\.mobileTypes,/);
   assert.match(W, /\n\s+handOverWalkedAway\(performance\.now\(\)\);   \/\/ OW6/, 'the walk-away handover runs every exterior frame');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
   const tvm = readFileSync(new URL('../../src/scenes/travelViewMarks.js', import.meta.url), 'utf8');
   assert.match(tvm, /for \(const c of travelViewCamps\(\)\) marks\.push\(\{ key: `camp:\$\{c\.key\}`, at: \[c\.at\[0\], c\.at\[1\] \+ 2, c\.at\[2\]\], label: wildCamps\.has\(c\.key\) \? `\$\{WILD_MARK\} \$\{c\.label\}` : c\.label, kind: 'camp', pick: true \}\);/);   // WILD-ALERT: an alerted camp's mark wears the "!"   // OW-ATTACK: pressable
   assert.equal(TRAVEL_VIEW_MARK_COLORS.camp, '#d9622b');

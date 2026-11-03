@@ -28,7 +28,7 @@
 // their handler's own reach beside it, so :503, :688, :852, :872 and
 // :940 are spoken too. Two stay silent on purpose: :330, the quest
 // resource, is a RECORDED delta (scenes/worldModes.js's own note and
-// bible/06-Systems/Quest-Arc.md), and an action RECORD is not a
+// ), and an action RECORD is not a
 // refusal at all in C# either (:380-383 gates in the Update ladder
 // with no else and no line).
 //
@@ -42,8 +42,7 @@
 // of the four hosts speaks to the same surface without a sink threaded
 // through it.
 
-// FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our
-// enhanced version"): THE LABEL IS THE SKIN'S, THE TIMER IS DFU'S.
+// FONT1: THE LABEL IS THE SKIN'S, THE TIMER IS DFU'S.
 // Everything below - the sentinel, the 1.5 s delay, the large-HUD lift
 // - is DaggerfallHUD and stays it on both skins; only `draw` branches,
 // handing the live line to ui/enhanced/enhancedHudText.js's DOM label. The

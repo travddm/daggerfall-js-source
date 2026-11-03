@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RENOWN1 (2026-09-24) — WHAT A CHARACTER EARNS ONLINE, kept until the
+// RENOWN1 — WHAT A CHARACTER EARNS ONLINE, kept until the
 // account service has it.
 //
-// Mac: "What if the leveling system was something seperate unique to
-// online but compatible" - and offline play earns "No" Renown XP.
+// and offline play earns "No" Renown XP.
 // net/renown.js holds the numbers; this file decides WHEN a character
 // has earned some and carries it to the service.
 //
@@ -154,7 +153,7 @@ export function renownAnswer(data, sent, said = null) {
 }
 
 /**
- * SCALE4h (2026-10-11, the plan's "10k writes"; bible/11-Multiplayer/Scale-Arc.md SCALE4h): IS THE NEXT REPORT'S
+ * SCALE4h: IS THE NEXT REPORT'S
  * ANSWER ONE THE PAGE NEEDS SOON? Then it goes at the minute's pace (RENOWN_REPORT_MS), as every report did; else what
  * is earned waits RENOWN_COALESCE_MS, drawn meanwhile as the bar's ghost (ui/hud/hudRenown.js). Soon, when:
  *   - the hour's bound is spent (`capped`): what is earned in it is said within it, credited nothing, as before;

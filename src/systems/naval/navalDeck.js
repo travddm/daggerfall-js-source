@@ -1,5 +1,5 @@
 // @ts-check
-// DECK-WALK (2026-09-29, Mac: "There's an issue where enemies/allys can navigate on the railing of ships") - A SHIP'S
+// DECK-WALK - A SHIP'S
 // WALKABLE DECK, read off her own colliders: where a body may stand, walk and be put.
 //
 // WHY THEY WALKED THE RAIL. A hull's collider is its whole visual mesh, and a Come Sail Away bulwark is a ramp: the
@@ -38,12 +38,12 @@
 // it (`more`: her poop, her cabins, the room under her forecastle - `heightAt`, `pieceAt` and `clamp` answer per
 // piece), so a body stays on the piece it stands on. Under her main deck (her lower deck, her hold, a galley's rowers)
 // nothing is deck. And every floor of hers whatever its level (`floors`) is what standing aboard her is (`under`).
-// AUDIT GALLEON (2026-10-02): a part of hers that opens and shuts - a hatch's cover, a door (`moves`) - is a wall of
+// AUDIT GALLEON: a part of hers that opens and shuts - a hatch's cover, a door (`moves`) - is a wall of
 // hers as it stands shut and never a floor, so her hatchways are holes in her deck; and a body put aboard her comes
 // down on her main deck's own floor across from where it stood, or on the floor of hers it already stands on (`land`).
 // A wall marks a cell with its own height there, never its whole triangle's - her deck is the same however her faces
 // are cut (D-wall); a floor to stand aboard on looks up; and her open deck is one walk.
-// AUDIT GALLEON-2 (2026-10-03): the floors her parts that open stand over or in - a shut cover's top, a doorway a door's
+// AUDIT GALLEON-2: the floors her parts that open stand over or in - a shut cover's top, a doorway a door's
 // leaf alone walls, the margin either side - are baked beside her deck (`ajar`): what standing aboard reads and the
 // leash lets a body stand on (DK1, DK3), never her walk; and the leash keeps a body to its piece's floor nearest the one
 // it last stood on (`keep`, DK2: her open piece holds two levels in a cell since D-wall).
@@ -61,11 +61,11 @@ export const DECK_JOIN = STEP_OFFSET;
 /** AUDIT NAV2 F32: a bench's top over the floor it stands on (m) - a seat, under a body's hip (the Large Boat's
  *  thwarts stand 0.6 to 0.72 m): a deck is kept off her walls and her open side, never off one. */
 export const DECK_BENCH = 0.9;
-/** GALLEON (2026-10-01): a raised deck's least rise over her main deck (m) and its least size (cells) - a floor the
+/** GALLEON: a raised deck's least rise over her main deck (m) and its least size (cells) - a floor the
  *  inset may not cut off from her open deck when only its margin parts them (a narrow stair's flight, `keepFlights`). */
 export const FLIGHT_OVER = 1;
 export const FLIGHT_CELLS = 24;
-/** GALLEON (2026-10-01): the most two floors a cell apart may differ and still join over a tread between them - two
+/** GALLEON: the most two floors a cell apart may differ and still join over a tread between them - two
  *  of the motors' steps (`linked`). */
 export const FLIGHT_JOIN = 2 * DECK_JOIN;
 /** AUDIT GN-D2: how far a cell's floor may stand off her main level and be her main deck's own floor (m) - half a
@@ -135,7 +135,7 @@ export function buildDeck(meshes, extent, { cell = DECK_CELL, inset = DECK_INSET
   const leaves = Array.from({ length: nx * nz }, () => []);
   /** @type {number[][]} AUDIT GN2-DK1: such a part's faces looking up, as it stands shut (a hatch's cover, a cargo door) */
   const lids = Array.from({ length: nx * nz }, () => []);
-  /** @type {number[][]} GALLEON (2026-10-01): the flat faces' heights at the midpoint of the side each cell shares with
+  /** @type {number[][]} GALLEON: the flat faces' heights at the midpoint of the side each cell shares with
    *  its +x neighbour (`midX`) and its +z neighbour (`midZ`) - the tread between two cells' centres (`linked`) */
   const midX = Array.from({ length: nx * nz }, () => []), midZ = Array.from({ length: nx * nz }, () => []);
   /** A flat face's height at every grid point `(ox, oz)` cells off each cell's corner within it (`ni` x `nk` of them),
@@ -257,7 +257,7 @@ export function buildDeck(meshes, extent, { cell = DECK_CELL, inset = DECK_INSET
       }
     }
   }
-  // GALLEON (2026-10-01): A FLIGHT FINER THAN A CELL. Her floors join cell to cell within DECK_JOIN, read at the cells'
+  // GALLEON: A FLIGHT FINER THAN A CELL. Her floors join cell to cell within DECK_JOIN, read at the cells'
   // centres - and a stair whose treads run shallower than a cell (the new galleon's castle flights: 0.385 m treads on
   // 0.19-0.29 m risers) puts two risers between two centres at some of their gaps: AUDIT GN-D10, measured - four of a
   // flight's fourteen tread-to-tread gaps (0.50-0.51 m), three past the motors' step, and each flight stood cut three
@@ -384,7 +384,7 @@ export function buildDeck(meshes, extent, { cell = DECK_CELL, inset = DECK_INSET
     for (let p = 0; p < sizes.length; p++) if (open < 0 || sizes[p] > sizes[open]) open = p;
     return { live, piece, open, count: open < 0 ? 0 : sizes[open] };
   };
-  // GALLEON (2026-10-01): A FLIGHT KEPT. The inset never takes a raised deck's way up: a stair narrower than its
+  // GALLEON: A FLIGHT KEPT. The inset never takes a raised deck's way up: a stair narrower than its
   // margin - the new galleon's two 1.4 m flights up her castle (AUDIT GN-D10: a cell clear between the port well's
   // walls, two between the starboard's, the cells either side the walls') - went whole, and her castle with her helm
   // on it stood apart from her open deck, out of every boarder's and every hand's walk. Where a floor of hers
@@ -921,7 +921,7 @@ export function deckOf(g) {
           spotCells[q] = j; spotX[q] = minX + (i + 0.5) * cell; spotZ[q] = minZ + (k + 0.5) * cell; q++;
         }
       }
-      // GALLEON (2026-10-01): `level` asked, her cells within DECK_STEP of it alone - her main deck's, her hands' work
+      // GALLEON: `level` asked, her cells within DECK_STEP of it alone - her main deck's, her hands' work
       // (crewLife.js), never her castle's roof up its flights; every cell of hers within it, her whole deck's spots
       let cells = spotCells, xs = spotX, zs = spotZ, m = count;
       if (level != null) {

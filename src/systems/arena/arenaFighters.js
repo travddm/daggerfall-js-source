@@ -1,7 +1,7 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "Fighters from all around dagger come with the hopes of claiming the ultimate prize"): WHO
+// ARENA2: WHO
 // FIGHTS - each AI fighter's name, home and epithet, drawn from the bout's seed, and how they stand on the sand. Design:
-// bible/11-Multiplayer/Arena.md "2. The fights" ("Names from Daggerfall's own name generator by race; an epithet and a
+// "2. The fights" ("Names from Daggerfall's own name generator by race; an epithet and a
 // home town from the bout's seed - Gorlak gro-Mazgul of Wayrest, the Unbroken").
 //
 // THE NAME is DFU's NameHelper.FullName (characters/nameHelper.js) over the bank of the fighter's home (a Breton of High

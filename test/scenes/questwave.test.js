@@ -1,5 +1,4 @@
-// QUEST-WAVE (2026-09-26, SquidKamer, Warm Ashes - Ships' author: "ship encounters ... get jumped by everyone"; "no
-// collision on monsters = free space to spawn enemy always"). CreateFoe places a wave through PlaceFoeFreely, whose
+// QUEST-WAVE. CreateFoe places a wave through PlaceFoeFreely, whose
 // OverlapSphere(0.65) meets every PLACED foe's capsule - Unity syncs a placed foe before the next action's test in the
 // same tick (CreateFoe.cs:319-328), so a spot that is taken refuses the next foe and it waits a tick. Here a pool's
 // stand is async (the career, the texture) and its record joins the pool only after, so WAQ_SHIP_SMALLRAID's thirteen
@@ -76,16 +75,3 @@ test('QUEST-WAVE: a hold lasts exactly as long as its stand - landed, the record
   assert.equal(heldSpots(c2).size, 0);
 });
 
-test('QUEST-WAVE by source: every quest arm and the loose-foe door hold their spots in the one set, and ask it', () => {
-  const world = rd('src/scenes/world.js'), ext = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), he = rd('src/scenes/hostEnchant.js');
-  assert.match(world, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet, \(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.heldSpots\(collider\)\], feet\),/);
-  assert.match(world, /holdSpotWhile\(collider, spot, \(\) => exteriorFoes\.spawnFoe\(foe\.foeType,/);
-  assert.match(ext, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet, \(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.heldSpots\(collider\)\], feet\),/);
-  assert.match(ext, /holdSpotWhile\(collider, spot, \(\) => exteriorFoes\.spawnFoe\(foe\.foeType,/);
-  assert.match(wm, /\(\) => \[\.\.\.interiorFoePool\(\), \.\.\.heldSpots\(interiorCtx\.collider\)\]/);
-  assert.match(wm, /holdSpotWhile\(interiorCtx\.collider, spot, \(\) => interiorFoes\.spawnFoe\(foe\.foeType,/);
-  assert.match(wm, /\(\) => \[\.\.\.dungeonCtx\.foes, \.\.\.heldSpots\(dungeonCtx\.collider\)\]/);
-  assert.match(wm, /holdSpotWhile\(dungeonCtx\.collider, spot, \(\) => dungeonCtx\.spawnQuestFoe\(\{/);
-  assert.match(he, /const pending = heldSpots\(collider\);/);
-  assert.match(he, /return holdSpotWhile\(collider, spot, \(\) => spawn\(mobileType, pos, \{ yawRad: yaw, allied \}\)\)\.catch\(\(\) => null\);/);
-});

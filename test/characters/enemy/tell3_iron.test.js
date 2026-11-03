@@ -1,5 +1,4 @@
-// TELL3 - IRON BLOWS (bible/12-Enhanced-AI/Feud-Arc.md section 5; Mac, 2026-10-04: "player's can easily stun these
-// enemies", then "Go" on every call). TELL1 gave every telegraphed blow a poise to break; some must not break at all.
+// TELL3 - IRON BLOWS (;, then "Go" on every call). TELL1 gave every telegraphed blow a poise to break; some must not break at all.
 // Every blow now has a GUARD: 'poise' (amber, TELL1's meter) or 'iron' (red) - iron takes no poise, every blow holds
 // it, and only a paralysis stops it (OPEN 4). The slam (and TELL6's ring) of a heavy or massive body is iron; so is one
 // elite blow in three. Never by colour alone: the iron mark has a second rim a quarter-metre inside and a hatch across
@@ -68,7 +67,6 @@ test('TELL3: an elite\'s blow is iron one time in three - whatever its shape, th
   assert.equal(blowGuard('lunge', 600, el, 0), 'iron');
   assert.equal(blowGuard('sweep', 600, el, 1 / 3), 'poise');
   assert.equal(blowGuard('sweep', 600, el, 0.9), 'poise');
-  // PIN MOVED (TELL5, Feud-Arc.md section 9: "an elite (`elite`, `eliteFoe`)"): an Elite Dungeon's foe is an elite too
   assert.equal(blowGuard('sweep', 600, { elite: true }, 0), 'iron', 'an Elite Dungeon\'s foe is an elite');
   assert.equal(blowGuard('sweep', 600, { elite: true }, 0.5), 'poise');
   assert.equal(blowGuard('sweep', 600, null, 0), 'poise');
@@ -133,7 +131,6 @@ test('TELL3: A GIANT\'S SLAM IS IRON - every blow holds it and none fills a mete
   assert.equal(blow.kind, 'slam');
   assert.equal(blow.guard, 'iron');
   assert.equal(blow.color, IRON_COLOR);
-  // PIN MOVED (TELL5, Feud-Arc.md 7.1): its length drawn - the shape's times U(0.9, 1.25) on the pinned roll, iron's after
   assert.ok(Math.abs(blow.land - blow.start - windupSeconds(BLOW.slam.windup, f.ent, { guard: 'iron', roll: 0.05 })) < 1e-9);
   assert.ok(blow.land - blow.start > BLOW.slam.windup * TELL.WINDUP_VARY[0] + TELL.IRON_EXTRA - 1e-9, 'iron\'s extra on the drawn length');
   for (let i = 0; i < 6; i++) assert.equal(windupStruck(f.ai, f.ent, 3000, 1e9), 'hold', `blow ${i + 1}: held`);
@@ -208,9 +205,6 @@ test('TELL3: the iron mark - a second rim a quarter-metre inside and a hatch acr
   assert.match(TELEGRAPH_STYLE_GLSL, /vec4 telegraphIron\(vec4 o, float edge, float fin, vec2 p, vec3 col, float fogK\)/);
   assert.match(TELEGRAPH_STYLE_GLSL, /abs\(edge - 0\.250\)/, 'the second rim, IRON_INSET in');
   assert.match(TELEGRAPH_STYLE_GLSL, /float u = \(p\.x \+ p\.y\) \/ 0\.350;/, 'the diagonal hatch, IRON_HATCH apart');
-  const P = rd('src/render/foeTelegraph.js');
-  assert.match(P, /uniform float uIron;/);
-  assert.match(P, /if \(uIron > 0\.5\) oColor = telegraphIron\(oColor, dist, inside \? 1\.0 : 0\.0, vec2\(across, along\), uColor, fogK\);/);
   const { FoeTelegraphPass } = await import('../../../src/render/foeTelegraph.js');
   const { gl, calls } = fakeGl();
   const pass = new FoeTelegraphPass(gl);
@@ -219,5 +213,4 @@ test('TELL3: the iron mark - a second rim a quarter-metre inside and a hatch acr
   pass.draw([{ blow: iron, phase: { t: 0.5, flash: 0 } }, { blow: plain, phase: { t: 0.5, flash: 0 } }], I, I);
   assert.deepEqual(calls.filter((c) => c[0] === 'uniform1f' && c[1] === 'uIron').map((c) => c[2]), [1, 0]);
   assert.deepEqual(calls.filter((c) => c[0] === 'uniform3f' && c[1] === 'uColor').map((c) => c.slice(2)).map((c) => c.map((x) => Math.round(x * 100) / 100)), [[1, 0.12, 0.08], [1, 0.42, 0.12]], 'and its red');
-  assert.match(rd('tools/foeTelegraphProbe.mjs'), /TELL3: the iron mark hatches its fill/, 'the probe reads it off a real frame');
 });

@@ -1,5 +1,4 @@
-// BODY-LEAN (2026-10-12, the owner: "Theres an issue that when using morrowind models, depending on your camera position
-// other sprites can shrink or grow, same goes for the horse"): every Morrowind body and 3D horse is a picture taken down
+// BODY-LEAN: every Morrowind body and 3D horse is a picture taken down
 // the eye's pitched ray (render/characterSprite.js drawRigSpriteBox) - already the figure as that eye sees it - and was
 // pasted on an UPRIGHT quad, which the same eye foreshortened a second time: a figure stood cos(pitch) of its height,
 // 0.97 from a level third-person eye, 0.64 from a camera 50 degrees above it, 0.34 at 70. The quad now leans by the

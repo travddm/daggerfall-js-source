@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OH-C (2026-09-26): THE PIT'S LOOK - There's a Hole in the Bottom of the
+// OH-C: THE PIT'S LOOK - There's a Hole in the Bottom of the
 // Ocean's CreateMaterials and BuildPit, drawn. Three discs of the one
 // 48-segment mesh CreateDiscMesh builds (each wedge wound both ways, so it
 // shows from either side), on Unity's Unlit/Color: the flat colour, the

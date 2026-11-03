@@ -1,4 +1,4 @@
-// AUDIT SEATS-3 (2026-10-02, Mac: "Audit everything") - THE CLIENT'S LANE: the claims
+// AUDIT SEATS-3 - THE CLIENT'S LANE: the claims
 // signed by the receipt's own account (C1), a palace's Charter Room never cached as the save's when its hall lapses
 // mid-visit (C2), a battle's sweeps reading the room's bodies once (C3), the frame's banner and tower lists kept (C4), a
 // failed first seats read asked again (C5), the Tithe's cap words (C6), a board's own listings cap (D2), the Tithe named
@@ -139,7 +139,7 @@ test('AUDIT SEATS-3 C4: the Watchtowers\' seats filtered once a list read and gu
   assert.equal(b[0].top[0], top0[0] + 100, 'its top where the scene has it now');
 
   const w = hostText('src/scenes/world.js');
-  const hungSrc = w.slice(w.indexOf('  const _hung = [];'), w.indexOf('  const yards = homeDecor'));   // PIN MOVED (CHAP7b): a patron's banners on the same pass - none here (chapterBanners null)
+  const hungSrc = w.slice(w.indexOf('  const _hung = [];'), w.indexOf('  const yards = homeDecor'));
   const mk = (n, x) => Array.from({ length: n }, (_, i) => ({ id: `${x}${i}`, top: [i * (x === 'h' ? 1 : 2), 0, 0] }));
   let halls = mk(2, 'h'), seatsB = mk(1, 's');
   const run = new Function('S', `const { BANNERS_MAX, cam } = S; const hallBanners = { list: () => S.halls() }; const seatBanners = { list: () => S.seats() }; const chapterBanners = null;\n${hungSrc}\n return bannersHung;`);
@@ -237,11 +237,11 @@ test('AUDIT SEATS-3 D2: the market read names its board, the book keeps the list
   t.book.state.counts = { listings: 37, orders: 0 };
   await mine(t);
   assert.equal(buttons(t.root).find((b) => b.textContent === 'List').disabled, true);
-  assert.match(t.root.textContent, /You have 37 listings up, the most allowed here\./);   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the words cut
+  assert.match(t.root.textContent, /You have 37 listings up, the most allowed here\./);   // AUDIT 657 D7: BOARD-UI (
   t.book.state.listingsMax = null;
   t.book.state.counts = { listings: MARKET_LISTINGS_MAX, orders: 0 };
   await mine(t);
-  assert.match(t.root.textContent, new RegExp(`You have ${MARKET_LISTINGS_MAX} listings up`), 'a service that says none: the old cap');   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the words cut
+  assert.match(t.root.textContent, new RegExp(`You have ${MARKET_LISTINGS_MAX} listings up`), 'a service that says none: the old cap');   // AUDIT 657 D7: BOARD-UI (
   assert.match(accountRefusalText('market-listings-max'), /as many listings up as this board allows/);
 });
 
@@ -258,7 +258,7 @@ test('AUDIT SEATS-3 D3: a board\'s Tithe as the seats\' list says it (its bailiw
   assert.equal(boardTithePct(seats, 40, [0, 0]), 0, 'a region with no seat');
   assert.equal(boardTithePct(null, 17, null), 0);
 
-  // BOARD-UI (PIN MOVED): the terms one line - what reaches the seller, after the tax and the Tithe where its rate is known
+  // BOARD-UI (
   for (const [pct, want] of [[8, `you get ${sellerGets(1, 8)} silver, after ${saleTax(100)}% tax and the 8% Tithe\\.`],
     [0, `you get \\d+ silver, after ${saleTax(100)}% tax\\.`], [null, 'you get \\d+ silver, after 5% tax, before any Tithe\\.']]) {
     const t = tabOver({ mine: { rows: [], orders: [] } }, { m: { tithe: () => pct } });
@@ -269,7 +269,7 @@ test('AUDIT SEATS-3 D3: a board\'s Tithe as the seats\' list says it (its bailiw
   }
   const w = hostText('src/scenes/world.js');
   assert.match(w, /tithe: \(\) => \(seatBook\?\.open === true \? boardTithePct\(seatBook\.data\?\.seats \?\? \[\], region, \[town\.px, town\.py\]\) : null\),/);
-  assert.match(src('src/ui/marketTab.js'), /You get the top bid, less \$\{less\}\$\{pct == null \? ' and any Tithe' : ''\}\./);   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the terms one line
+  assert.match(src('src/ui/marketTab.js'), /You get the top bid, less \$\{less\}\$\{pct == null \? ' and any Tithe' : ''\}\./);   // AUDIT 657 D7: BOARD-UI (
 });
 
 test('AUDIT SEATS-3 D6: at a crown the holder\'s Officer is told its Saturday slot, whatever the window, and offered no window lever; a palace\'s lever as ever (mutants: the default\'s Wednesday at a crown; the lever shown)', async () => {

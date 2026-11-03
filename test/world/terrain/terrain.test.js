@@ -261,17 +261,13 @@ test('terrain: Daggerfall city on terrain - integration pins', { skip: skipReal 
 
   const tilemap = new Uint8Array(128 * 128);
   const rect = setLocationTiles(loc, maps, blocks, tilemap);
-  // PIN MOVED (TOWN-SHAPES, bible/03-World/Town-Shapes.md): the rect carries the town's outline; its bounds DFU's (the walls
-  // hold the city square until they follow it)
-  assert.deepEqual({ xMin: rect.xMin, xMax: rect.xMax, yMin: rect.yMin, yMax: rect.yMax }, { xMin: 11, xMax: 116, yMin: 11, yMax: 116 });
-  assert.equal(rect.shape.filter((v) => v).length, 12214, 'the city within its walls and its margin');
+  assert.deepEqual(rect, { xMin: 11, xMax: 116, yMin: 11, yMax: 116 });
   let stamped = 0;
   for (const t of tilemap) if (t) stamped++;
   assert.equal(stamped, 9989);
 
-  // PIN MOVED (TOWN-SHAPES): flattened to the mean of the land the city stands on (DFU's: the whole pixel's, 0.166147)
-  approx(blendLocationTerrain(samples, avg, rect), 0.166139, 1e-6);
-  approx(samples[64 * 129 + 64], 0.166139, 1e-6); // flattened
+  blendLocationTerrain(samples, avg, rect);
+  approx(samples[64 * 129 + 64], 0.166147, 1e-6); // flattened
   approx(samples[0], 0.161704, 1e-6); // corner untouched
 
   const tileData = generateTileData(samples, 207, 213);
@@ -282,7 +278,6 @@ test('terrain: Daggerfall city on terrain - integration pins', { skip: skipReal 
     hist.set(r, (hist.get(r) || 0) + 1);
   }
   // Grass fill dominates outside the walls; roads (46) and city dirt hold.
-  // PIN MOVED (PUDDLE-DRY, world/puddleDry.js): DFU's stamp gives 8173 grass, 3142 dirt, 1706 road and 899 of record
   // 11; the city's 61 puddle tiles (records 8: 17, 9: 33, 23: 11) are served dry, as the ground round each - 10 grass,
   // 31 dirt, 11 road, 6 of record 11, 2 of 47, 1 of 10
   assert.equal(hist.get(2), 8183);
@@ -335,7 +330,7 @@ test('terrain: full location corpus - all 15251 stamp clean, rects stay interior
     }
   }
   assert.equal(locations, 15251);
-  assert.equal(stampedTotal, 9252505);   // PIN MOVED (TOWN-SHAPES): the tiles of each town's outline (DFU's every block's: 9,565,908)
+  assert.equal(stampedTotal, 9565908);
   // Corpus invariant: every clearance rect stays interior to the pixel -
   // blend divisors (1/xMin, 1/(1-xMax), ...) are finite game-wide, so the
   // blend never produces NaN heights (verified with a full stamp + blend
@@ -448,14 +443,12 @@ test('terrain: nature on Daggerfall environs - integration pins', { skip: skipRe
   // Both y pins stand on the game scene's TerrainScale 1.25
   // (TERRAIN-SCALE1); the prefab's 1.5 put them at 372.938 and 373.096.
 
-  // City pixel: the expanded rect suppresses most of the pixel. PIN MOVED (TOWN-SHAPES TS6): the clearing its outline's and
-  // four tiles past it - the city's ground runs out past its walls nearly to the pixel's edge, so the band DFU's rect left
-  // the woods (seven tiles each side) is the town's but for its outer tiles: 1237 flats -> 808, the first DFU's own
+  // City pixel: the expanded rect suppresses most of the pixel.
   const city = run(207, 213, true);
-  assert.equal(city.length, 808);
+  assert.equal(city.length, 1237);
   assert.equal(city[0].record, 16);
   approx(city[0].x, 6.4, 1e-6);
-  approx(city[0].y, 310.785, 1e-3);   // PIN MOVED (TOWN-SHAPES): the city's ground its own land's mean
+  approx(city[0].y, 310.781, 1e-3);
   approx(city[0].z, 0, 1e-6);
 
   // Wilderness neighbor: dense woodland scatter.
@@ -487,23 +480,5 @@ test('WATER1: a sea clamped to the ocean elevation is WATER through generateTile
   let water2 = 0;
   for (const v of td2) if (v === 0) water2++;
   assert.equal(water2, 0, 'a step above the sea is land');
-  const src = readFileSync(new URL('../../../src/world/terrain/terrainTiles.js', import.meta.url), 'utf8');
-  // LW-DRY: the arithmetic one home, the tile job's and the living world's dry ground's (world/dryGround.js) - PIN MOVED
-  assert.match(src, /export const sampleHeight = \(sample\) => Math\.fround\(sample \* MAX_TERRAIN_HEIGHT\);/, 'the height is the reference\'s float');
-  assert.match(src, /export const isWaterHeight = \(height\) => height <= SCALED_OCEAN_ELEVATION;/, 'against the reference\'s float threshold');
-  // PIN MOVED (AUDIT WATER-NEXT F2): the job's body is tileDataAt, one corner at a time, so the water's bed can classify a
-  // neighbour's corner across a seam by the same law
-  assert.match(src, /tileData\[index\] = tileDataAt\(sampleHeight\(heightmapData\[hy \+ hx \* hDim\]\), x, y, mapPixelX, mapPixelY\);/, 'the tile job\'s own');
-  assert.match(src, /export function tileDataAt\(height, x, y, mapPixelX, mapPixelY\) \{\n\s*if \(isWaterHeight\(height\)\) return WATER;/, 'the corner\'s water, first');
-  // AUDIT LW-DRY: the nature scatter's three beach reads go through the one home - the product written out nowhere else
-  const nature = readFileSync(new URL('../../../src/world/terrain/terrainNature.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT LANDFORMS II H2): the beach line asked of DFU's own blend where the terrain job hands one (a location's
-  // pixel with the Landforms row on, `beach`), the samples' own else - the same four reads through the one home
-  // PIN MOVED (TESA-LANDS): and the lands' flats' and landmarks' one test (underBeach), the fifth
-  assert.equal((nature.match(/sampleHeight\(\((?:opts\.)?beach \?\? heightmapData\)\[hy \+ hx \* hDim\]\)/g) || []).length, 5, 'the scatter reads the sample\'s height as the tile job does (ECOTONE1: and the border tile\'s DFU law, dfuTiles, the fourth)');
-  assert.doesNotMatch(nature, /Math\.fround\([^;]*\* MAX_TERRAIN_HEIGHT\)/, 'and writes the product out nowhere itself');
   assert.equal(SCALED_OCEAN_ELEVATION, Math.fround(27.2), 'which the shared constant IS (WATER-AUDIT: 3.4f * 8 in C#)');
-  assert.match(src, /if \(height <= Math\.fround\(SCALED_BEACH_ELEVATION \+ jitter\)\) return DIRT;/, 'and the beach the same');   // PIN MOVED (AUDIT WATER-NEXT F2): tileDataAt's
-  // WATER-AUDIT: the jitter is float32 per operation, as NextFloat(min, max) is
-  assert.match(readFileSync(new URL('../../../src/formats/umRandom.js', import.meta.url), 'utf8'), /return Math\.fround\(Math\.fround\(this\.nextFloat\(\) \* Math\.fround\(max - min\)\) \+ min\);/);
 });

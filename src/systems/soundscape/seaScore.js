@@ -1,5 +1,5 @@
 // @ts-check
-// SEA-SCORE (2026-10-24, the owner: "different music and ambience sounds for sailing"): THE SEA'S MUSIC - six songs for
+// SEA-SCORE: THE SEA'S MUSIC - six songs for
 // a helm, made in code as the Warden's, the Hour's and the arena's are (systems/gate/gateScore.js - the precedent and its
 // reasons), and the law of which plays. Daggerfall has no sea music: SongManager plays the overland weather songs on a
 // deck as on a road (DaggerfallSongManager's playlists know a dungeon, a building and the sky, never a ship), so a

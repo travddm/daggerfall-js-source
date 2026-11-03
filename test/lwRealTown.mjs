@@ -1,4 +1,4 @@
-// LW-WALLS / LW-SPACE (bible/06-Systems/Living-World.md): THE GAME'S OWN TOWNS, AS THE STREAMING HOST BUILDS THEM - a town
+// LW-WALLS / LW-SPACE: THE GAME'S OWN TOWNS, AS THE STREAMING HOST BUILDS THEM - a town
 // of ARENA2 replayed in Node with the host's own producers (scenes/world.js's population block, pinned word for word by
 // test/systems/livingWorld/lwwalls_city.test.js): its location laid out (`layoutLocation`, on the enhanced skin with its water and its
 // mills - the living world's lane, each on by default), its navgrid off each block's automap and ground, every model's

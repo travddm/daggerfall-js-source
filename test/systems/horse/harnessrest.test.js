@@ -1,6 +1,4 @@
-// HARNESS-REST (2026-10-11, a profile of a player's live client in a town: 4.0% of the main thread - eleven parked
-// teams' harnesses stepped, laid and sent to the GPU every frame, their ends never moving; bible/07-Rendering/
-// Performance-Priority.md HARNESS-REST) - A HARNESS WHOSE ENDS STAND STILL COMES TO REST. Over a real pool's real driven
+// HARNESS-REST - A HARNESS WHOSE ENDS STAND STILL COMES TO REST. Over a real pool's real driven
 // harness (perfwagon.test.js's world): still for HARNESS_REST_S it is neither stepped, laid nor sent again, and hangs as
 // last drawn; an end that moves wakes it in that frame; an end creeping under HARNESS_STILL_M a frame wakes it too, once
 // the creep from where it came to rest is past it.

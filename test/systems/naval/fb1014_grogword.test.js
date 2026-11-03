@@ -3,7 +3,6 @@
 // The yard sells one round a port day (AUDIT CC-D5), and its row wants none once the day's is drunk - the same `missing`
 // 0 as a crew at the top, and the window read only that: "Her crew's spirits are as high as they go", "No need", over a
 // crew the helm called low (the reload under 50 slower). Read through the yard's own offer and the window's own words.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-14.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { provisionOffer } from '../../../src/systems/naval/navalYard.js';

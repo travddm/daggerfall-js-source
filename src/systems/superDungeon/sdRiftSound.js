@@ -1,5 +1,5 @@
 // @ts-check
-// SD4b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 6): THE RIFT'S SOUND - "a bell
+// SD4b: THE RIFT'S SOUND - "a bell
 // heard under water". Built at runtime out of the player's own archive (`audio.samplesOf`) and registered on the engine
 // (`audio.registerSamples`, the wind's door), as ARENA2's crowd is (systems/arena/arenaSound.js, whose mixer it borrows):
 // nothing new ships, and nothing of Daggerfall's is written into the tree.

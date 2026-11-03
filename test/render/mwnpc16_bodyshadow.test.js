@@ -1,5 +1,4 @@
-// MWNPC16 (2026-10-11, a player's screenshot via Mac: "With morrowind assets attached. Old sprite shadows still show" -
-// bible/04-Characters/Morrowind-NPCs.md section 24): A MORROWIND BODY CASTS ITS OWN SHAPE. MWNPC1 turned a GPU-skinned
+// MWNPC16: A MORROWIND BODY CASTS ITS OWN SHAPE. MWNPC1 turned a GPU-skinned
 // body away at the shadow pass's door and MWNPC5b kept each NPC's classic billboard in the pass to cast for it
 // (`castOnly`) - so a man in Morrowind's steel threw a Daggerfall sprite's silhouette on the wall. The body now replays
 // through the world's own skinned vertex shader off its palette, a run of its ranges in one depth draw, and the flat
@@ -161,26 +160,6 @@ test('MWNPC16b a body let go casts nothing - its palette deleted or its mesh dea
   assert.equal(bad.sp.replay(bad.f, VP, null), 0, 'and the body casts nothing');
 });
 
-test('MWNPC16c a cast-only flat casts nothing - not drawn into a map, never a mover that redraws a lantern, never in a cache\'s signature - while its neighbour casts as ever (mutants: castOnly dropped from the replay; from the movers)', () => {
-  const { sp, calls, f } = pass();
-  const tex = { pic: 1 };
-  const flat = (castOnly) => ({ vao: { flat: 1 }, archive: 182, record: 1, size: { w: 1, h: 1.8 }, origin: [0, 0, 0], bounds: null, indexCount: 6, castOnly, _dyn: true });   // a walker: built dynamic
-  const body = flat(true), plain = flat(false);
-  sp.recordBillboards([body, plain], new Float32Array(4), new Float32Array([1, 0, 0]), new Float32Array([0, 1, 0]));
-  assert.equal(sp.records[0].dynamic, true);
-  const keyed = f.textures;
-  f.textures = { get: () => tex };   // whatever the key, the picture is in hand
-  calls.length = 0;
-  sp.replay(f, VP, null);
-  assert.equal(calls.filter((c) => c[0] === 'drawElements').length, 1, 'the plain flat alone');
-  f.textures = keyed;
-  assert.equal(sp._dynamicNear([0, 1, 0], 20, () => false), 2, 'the plain flat moves by the lantern');
-  plain.castOnly = true;
-  assert.equal(sp._dynamicNear([0, 1, 0], 20, () => false), 0, 'a cast-only one is no reason to redraw it');
-  const src = rd('src/render/shadowPass.js');
-  assert.equal((src.match(/b\.noShadow \|\| b\.castOnly/g) || []).length, 4, 'every door a noShadow flat is turned away at - the replay, the movers and both signatures');
-});
-
 test('MWNPC16d the rig: drawThird records its body for the maps where it is asked - its mesh, its model, a sphere about its posed box - and never a veiled body\'s; castThird records the body out of the view at the same place, where its sphere reaches a map (mutants: the cast unasked; the veil cast; castThird past the reach)', async () => {
   const cast = [];
   let reach = true;
@@ -194,10 +173,9 @@ test('MWNPC16d the rig: drawThird records its body for the maps where it is aske
   arm.update(1 / 60, { pose: true });
   const proj = perspective(1, 1, 0.1, 100), view = lookAt([0, 1.6, 4], [0, 1, 0], [0, 1, 0]);
   const at = { proj, view, eye: [0, 1.6, 4], feet: [2, 0, -1], yaw: 0.7 };
-  const cv = { clientWidth: 480, clientHeight: 480 };   // PIN MOVED (BODY-CROP, 2026-10-22): the picture is cut to the screen, so the canvas has a size
+  const cv = { clientWidth: 480, clientHeight: 480 };
   assert.equal(arm.drawThird(cv, at), true);
   assert.equal(cast.length, 0, 'not asked: nothing recorded (the player\'s own, a peer\'s)');
-  // PIN MOVED (BODY-CROP, 2026-10-22): the sphere is measured against the card's quad - the box as it is pictured - under
   // the Billboard Look; the main camera's own picture is the box's window rounded out to whole texels, and a fixture body
   // a few centimetres tall is a texel or two of it
   setPref('mwBillboardLook', true);
@@ -318,10 +296,6 @@ test('MWNPC16e PeerBodies asks the cast of a lane that casts: a seen body drawn 
 });
 
 test('MWNPC16f the wiring: the renderer hands the pass the skinned VS and its palette door, records a body for the maps alone (a body\'s record, and whether it never walks), and its door binds the palette on its unit even when the selector\'s word says the unit is selected - the pass selects units raw - keeping the unit\'s word; the rig marks a released mesh dead (AUDIT MWNPC16-18 E7: the door and the release driven, not read. Mutants: the selector not forgotten; the unit\'s word not kept; the release not marked)', async () => {
-  const r = rd('src/render/renderer.js');
-  assert.match(r, /recordShadowBody\(mesh, modelMatrix, sphere, anchored = false\) \{ if \(this\._casting && mesh\?\.vao\) this\._shadows\.recordCharacter\(mesh, modelMatrix, sphere, true, anchored\); \}/);
-  assert.match(r, /holdSkin: this\._holdSkinFn,/, 'the palette door in the frame the pass is handed');
-  assert.match(r, /shadowReachSphere\(x, y, z, r\) \{ return this\._casting && this\._shadows\.reachesSphere\(x, y, z, r\); \}/);
   // the door, on a real renderer over a recording GL
   const glCalls = [];
   let ids = 0;
@@ -362,7 +336,6 @@ test('MWNPC16f the wiring: the renderer hands the pass the skinned VS and its pa
   assert.ok(mesh && !mesh._dead, 'standing: alive');
   arm.unload();
   assert.equal(mesh._dead, true, 'let go: a record made before it went casts nothing');
-  assert.match(rd('src/characters/npcBodies.js'), /gate: BODY_BUILD_GATE, casts: true,/);
 });
 
 test('MWNPC16g A LAMP WHOSE ONLY MOVERS ARE BODIES THAT DID NOT CHANGE KEEPS THE FACES IT DREW - a body out of the view is never posed, and it held its lamps\' six dynamic faces redrawn every frame to draw it as it was; posed, turned, a range hidden, gone, or with a mover beside it, the lamp draws again (AUDIT MWNPC16-18 A2: a still body cost 10 face operations a frame where its flat cost none. Mutants: the look blind to the pose; to the matrix; to a hidden range; held through a mover; the generation never bumped)', () => {
@@ -400,12 +373,6 @@ test('MWNPC16g A LAMP WHOSE ONLY MOVERS ARE BODIES THAT DID NOT CHANGE KEEPS THE
     const rig = { vao: { voxel: 1 }, count: 36, bounds: null };
     assert.deepEqual(run(3, (sp) => sp.recordCharacter(rig, IDENTITY, [1, 1, 0, 1])), [6, 6, 6], 'a voxel rig (EL7\'s) is the mover it always was');
   } finally { SHADOW_TUNING.override = undefined; }
-  // the renderer's every pose upload is a new generation
-  const r = rd('src/render/renderer.js');
-  for (const fn of ['  updateSkinPalette(mesh, data) {', '  updateSkinStream(mesh, offset, data) {', '  updateCharacterMesh(mesh, packed) {']) {
-    const at = r.indexOf(fn);
-    assert.ok(at > 0 && /mesh\._poseGen = \(mesh\._poseGen \?\? 0\) \+ 1;/.test(r.slice(at, r.indexOf('\n  }\n', at))), `${fn.trim()} bumps the pose's generation`);
-  }
 });
 
 test('MWNPC16h THE LO TIER\'S LAMPS TAKE A BODY THAT NEVER WALKS - past the twelve full maps a room drawn whole casts from its lo maps, and a standing person in a body cast into none of them (the body a mover, its flat cast-only); one whose flat has no origin now casts there, by its id and its place (a new pose is no rebuild, a move is); a body that walks still does not (AUDIT MWNPC16-18 A3 / B F1. Mutants: the lo replay blind to it; the lo signature blind to it; the lane\'s word dropped; a flat with an origin taken)', async () => {

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-ECON TE2 (2026-10-18, Mac: "Everything"; bible/06-Systems/Town-Economy-Arc.md section 4) - THE PLAYERS' SHARE
+// TOWN-ECON TE2 - THE PLAYERS' SHARE
 // OF A TOWN'S ECONOMY, as this service counts it.
 //
 // WITNESSED ACTS ONLY (TE0 decision 3): a town is raised by what this service saw happen there, never by gold -

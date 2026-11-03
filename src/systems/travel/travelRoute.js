@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV2 - THE ROAD PLANNER (bible/06-Systems/Travel-View.md).
+// TV2 - THE ROAD PLANNER.
 //
 // Mac's call: a click on a town or a marker is reached BY THE ROADS. The
 // roads are Hazelnut's - Basic Roads' four arrays, one byte a map pixel,
@@ -26,8 +26,7 @@
 // `routeLegs`, which folds a straight run of steps into one leg so the
 // autopilot aims down the road rather than at every pixel's middle.
 //
-// OWS2 (2026-09-28, the player's ask: "You should transition to your boat
-// if traveling across water then back onto land when hitting land"): THE
+// OWS2: THE
 // CROSSING. Given `sea` - the traveller has a boat (at its helm, moored in
 // reach, or packed in the pack) - the search walks three layers of the
 // grid: ashore with the boat to hand, afloat, and ashore with it left
@@ -58,7 +57,7 @@ export const ROUTE_COST = Object.freeze({ road: 1, track: 1.6, open: 3.5 });
 export const SEA_COST = Object.freeze({ sea: 1.2, coast: 1.5, shore: 6 });
 /** OWS2: the kinds a crossing's steps are. */
 export const SEA_KINDS = Object.freeze(['sea', 'embark', 'landfall']);
-/** PASSAGE (AUDIT PASSAGE A1, bible/03-World/Passage.md): a booked voyage (`sea.voyage`) comes ashore only this near its
+/** PASSAGE (AUDIT PASSAGE A1): a booked voyage (`sea.voyage`) comes ashore only this near its
  *  goal (map pixels, the longest axis) - the port's own roadstead, as far as SEA-LANES finds one from its town
  *  (systems/naval/seaLanes.js ROADSTEAD_PX, pinned equal) - so a coast road is never the cheaper way to the port a passenger
  *  paid to sail to. */
@@ -66,8 +65,7 @@ export const VOYAGE_LANDFALL_PX = 3;
 /** OWS2: the search's layers - ashore with the boat to hand, afloat, ashore with it left behind (the one layer without
  *  `sea` is the last's law: no launch). */
 const ASHORE = 0, AFLOAT = 1, LEFT = 2;
-/** OW-MOUNTAINS (2026-09-28, Mac: "Bumping into a mountain can cause insane lag and cause you to take character damage. You
- *  shouldnt be able to navigate mountains"): the open ground a journey never crosses - a pixel of the Mountain climate
+/** OW-MOUNTAINS: the open ground a journey never crosses - a pixel of the Mountain climate
  *  (MapsFile.Climates.Mountain), or a step whose ground rises or falls more than TV_STEEP_RISE between two pixels (the
  *  small heightmap's own units, world/road/roadNetwork.js's ROAD_DIALS scale). A road or a track goes where it goes: the
  *  roads were laid over the passes. */
@@ -96,7 +94,7 @@ export function openStepBlocked(climateAt, heightAt, ax, ay, bx, by, leaving = f
  * it said so, ~70-380 ms; the pieces the step law joins (stepKind, folded once a session and per road network, ~0.15 s,
  * the first time a pick misses its first box) say it at once. `climateAt`/`heightAt` the host's reads; `waterByte` the
  * heightmap's shore (world/roadsProducer.js WATER_BYTE).
- * TV-BEYOND (2026-10-09): `beyond(x, y)` - the host's - answers whether a pixel PAST the table is dry ground (TAMRIEL2's
+ * TV-BEYOND: `beyond(x, y)` - the host's - answers whether a pixel PAST the table is dry ground (TAMRIEL2's
  * land beyond the Bay, where the world streams it); without it, off the table is the sea, DFU's empty edge of the world.
  * Its answers are kept (BEYOND_CACHE_MAX, dropped whole): the ground past the Bay costs a province test a pixel.
  * @param {(x:number, y:number) => number} climateAt
@@ -438,7 +436,7 @@ export function* planRouteSteps(from, to, opts = {}) {
   const beyond = roads || tracks ? pathsBeyond : null;
   if (!from || !to) return null;
   if (from.x === to.x && from.y === to.y && !(sea && (sea.start === 'sea') !== (sea.goal === 'sea'))) return { pixels: [{ x: from.x, y: from.y }], cost: 0, kinds: [] };
-  // LONG-VOYAGE (START2, bible/06-Systems/Travel-View.md "LONG-VOYAGE"): A CROSSING FROM A HELM WITH AN END PAST THE BAY'S
+  // LONG-VOYAGE (START2, "LONG-VOYAGE"): A CROSSING FROM A HELM WITH AN END PAST THE BAY'S
   // TABLE SAILS THE SEA LANES (planSeaLanes) - the box below never leaves the map and its two ends, and a port past the
   // Bay lies round a province from the Bay's: Winterhold's way to Daggerfall is round all of High Rock. AUDIT STARTS V6:
   // any helm's crossing, not a booked voyage's alone - the box's ladder took 2 to 17 s to sail one the lanes sail in a
@@ -463,8 +461,7 @@ export function* planRouteSteps(from, to, opts = {}) {
   // about an end past the map (the lanes' landfall: the shore beyond a port's own row and column)
   const padOf = (p) => (offTable(p) ? endPad : 0);
   const bounds = { x0: Math.min(0, from.x - padOf(from), to.x - padOf(to)), x1: Math.max(width - 1, from.x + padOf(from), to.x + padOf(to)), y0: Math.min(0, from.y - padOf(from), to.y - padOf(to)), y1: Math.max(height - 1, from.y + padOf(from), to.y + padOf(to)) };
-  // ROAD-BEYOND (2026-10-26, the owner: "road travel in the overworld needs to work properly outside of tamriel"; Travel-View.md
-  // ROAD-BEYOND): A PLAN WITH AN END PAST THE BAY'S TABLE. (1) By the roads first, where it is handed them (`beyond`, the
+  // ROAD-BEYOND: A PLAN WITH AN END PAST THE BAY'S TABLE. (1) By the roads first, where it is handed them (`beyond`, the
   // layer past the Bay - VOYAGER2.1) and walks the land: the search over the roads and tracks alone, the open ground only
   // about its two ends (searchByRoad) - bounded by its own count of cells, never the plane's every field (the ladder's
   // A* priced a road a step under the field's 3.5, so a plan of 700 pixels past the Bay flooded ~200 000 cells a rung
@@ -550,8 +547,7 @@ export const ROAD_END_SLACK = 2;
 export const ROAD_PIECE_CAP = 8192;
 
 /**
- * ROAD-FOLLOW (2026-10-27, the owner: "Road travel is not following roads properly in overworld travel", then "No band aids
- * or half assed work"): A PLAN BY THE ROADS WALKS THE ROADS WHEREVER THEY JOIN ITS TWO ENDS, AND THE OPEN GROUND ONLY ON
+ * ROAD-FOLLOW: A PLAN BY THE ROADS WALKS THE ROADS WHEREVER THEY JOIN ITS TWO ENDS, AND THE OPEN GROUND ONLY ON
  * EACH END'S OWN LEG AND ACROSS A GAP IN THEM. Each end's own leg: none about an end on a road or a track (its pixel
  * carries one - the journey starts or ends on it), out to ROAD_END_SLACK rings past the nearest about an end off them.
  * The roads are then flooded from both ends' legs at once, ROAD_PIECE_CAP pixels a side at most. A side whose flood runs
@@ -995,8 +991,7 @@ function* searchSteps(from, to, { roads, tracks, isWater, width, height, bounds,
  * it walks on (the host's speed: a road leg reckless, the rest cautious - Travel Options' own two multipliers).
  * OW-TOWN-RING: `ringAt(x, y, from, to)` - the host's - answers the points of a town's border ring a route through
  * pixel (x, y) walks (from the side toward the pixel before to the side toward the pixel after), or null for none.
- * OW-TOWN-ROUND (2026-10-23, the owner: "Overworld pathing always wants to walk into the middle of the town let the player
- * always go around it"): a spot journey's `start` and `end` (native {x, z}) are asked of `ringAt` too (travelOptions.js
+ * OW-TOWN-ROUND: a spot journey's `start` and `end` (native {x, z}) are asked of `ringAt` too (travelOptions.js
  * ringPassPoints) - a traveller beside a town walks round it, a spot beyond one is reached round it - and the spot's leg
  * carries the spot (`at`), so no road's lane is laid from the ring back to the town's middle (travelOptions.js routeLane).
  * ROAD-FOLLOW (roadLine.js roadLineLegs): a leg that turns on a curve of the roads past the Bay carries `line`, the painted
@@ -1063,7 +1058,7 @@ export function routeLegs(pixels, kinds = [], { ringAt = null, start: start0 = n
 }
 
 /**
- * OW-ROADSIDE (2026-09-28, Mac: "Sometimes routes do follow roads, but appear traveling alongside it"): WHERE A TRAVELLER
+ * OW-ROADSIDE: WHERE A TRAVELLER
  * OFF THE ROAD JOINS IT. The first leg ran from wherever in the start pixel the traveller stood (up to 400 m off the road)
  * straight to the far end of the road's first straight run - beside the road all the way. The join is the nearest point
  * of that run's line - from the start pixel's middle to the first leg's (the road's own lane, travelPaths.js) - to the

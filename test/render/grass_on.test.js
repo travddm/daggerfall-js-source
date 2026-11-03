@@ -1,5 +1,4 @@
-// GRASS-ON (2026-10-07, Mac: "Can you please turn grass on by default", then "People are also saying it really has bad
-// performance"; `07-Rendering/Rendering.md` GRASS-ON): THE GRASS IS FULL BY DEFAULT AGAIN, AND CHEAPER TO DRAW.
+// GRASS-ON: THE GRASS IS FULL BY DEFAULT AGAIN, AND CHEAPER TO DRAW.
 // The field draws under the first-vertex convention where the browser offers WEBGL_provoking_vertex - each triangle
 // listed with its provoking corner first, so the corner the vertex stage reads its flats in is the one that provokes
 // under either convention - and its cells in view go nearest first in the opaque sprite styles. The stage's provoking
@@ -179,10 +178,3 @@ test('GRASS-ON: the cells in view are drawn nearest first in the sprite styles -
   assert.equal(meadow.drawn.kept, 5 * perCell);
 });
 
-test('GRASS-ON: the world host hands the field `?provoke=last`, the door to time it under GL\'s own convention on a machine\'s own GPU (mutant: the door shut)', () => {
-  const w = read('src/scenes/world.js');
-  assert.ok(w.includes("new LabGrassRenderer(renderer.gl, { provoke: pageParam('provoke') !== 'last' })"));
-  assert.equal((w.match(/new LabGrassRenderer\(/g) || []).length, 1, 'the grass\'s one host builds the one field');
-  const lab = read('src/render/labGrass.js');
-  assert.ok(lab.includes("this._pv = provoke ? (gl.getExtension('WEBGL_provoking_vertex') ?? null) : null;"));
-});

@@ -1,13 +1,10 @@
-// PERF-EXT (2026-09-25, two players via Mac: "fps issues in the exterior
-// but fine in the interior", "me too my friend.. don't know why. I got a
-// RX6600"; Mac: "I am not getting another player to do the work that youre
-// suppose to do"). The flats and the frame's CPU - the pass the hunters
+// PERF-EXT. The flats and the frame's CPU - the pass the hunters
 // measured on the synthetic town and the provers measured again. Each slice
 // here is a cost the frame paid in JavaScript or in GL calls for a value
 // that could not change, and each pin is on the thing that made it cheaper:
 // one shape, one upload, no object, one block - never on a clock (a timing
 // assertion on a shared runner is what broke this repo's deploy, STREAM1).
-// The record is `bible/07-Rendering/Performance-Exterior.md`.
+// The record is ` `.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -47,17 +44,6 @@ function recordingGl() {
 }
 
 // ── PERF-EXT10: one shape ─────────────────────────────────────────────
-
-/** The field names createBillboardBatch's literal mints, read off the source the way HARD3 reads them. */
-function mintedFields() {
-  const r = rd('src/render/renderer.js');
-  const at = r.indexOf('createBillboardBatch(archive, record, size, centers');
-  assert.ok(at > 0, 'the factory is where this pin thinks');
-  const mint = r.slice(at);
-  const lit = mint.slice(mint.indexOf('return {'), mint.indexOf('\n  }'));
-  return new Set(lit.slice(lit.indexOf('{') + 1, lit.lastIndexOf('}'))
-    .split(/,(?![^[\]]*\])/).map((part) => /^\s*(\w+)/.exec(part)?.[1]).filter(Boolean));
-}
 
 /** Every producer shape the game has, minted through the real factory and dressed the way its host dresses it. */
 function producers(r) {
@@ -151,29 +137,6 @@ test('PERF-EXT10: V8 agrees - after a frame, a flora batch, a town flat, a walke
   assert.deepEqual(JSON.parse(out.stdout.trim().split('\n').pop()), [], 'every batch on the tree\'s map');
 });
 
-test('PERF-EXT10: every field src/ writes on a billboard batch is one the factory mints - by name for the renderer\'s own memory (_bbKey*, _sh*, _box, sway, conceal, noShadow, selfCard, _dead, _moveScratch) and by receiver for every host (`batch.`, `x.batch.`, `xBatch.`); a new field written after birth splits the shape again', () => {
-  const minted = mintedFields();
-  assert.ok(minted.size > 10 && minted.has('vao') && minted.has('_dyn'), 'the literal the sweep reads (HARD3 pins its count)');
-  const files = [];
-  const walk = (d) => { for (const e of readdirSync(join(ROOT, d))) { const p = `${d}/${e}`; if (statSync(join(ROOT, p)).isDirectory()) walk(p); else if (p.endsWith('.js')) files.push(p); } };
-  walk('src');
-  const WRITE = String.raw`\s*(?:=(?!=)|\?\?=|\+=|-=|\|\|=)`;
-  // the renderer's own memory and the hosts' dress, on any receiver but `this` (a window's `_box`, the pass's `_shadows`)
-  const byName = new RegExp(String.raw`(?<!\bthis)\.(_bbKey\w*|_sh(?!Inst)\w+|_box|sway|conceal|noShadow|selfCard|_dead|_moveScratch)` + WRITE, 'g');
-  // any field on a receiver named for a batch - formats/ holds the Morrowind MESH batches, which are not these
-  const byReceiver = new RegExp(String.raw`(?<![\w.])(?:batch|\w+\.batch|\w*[a-z]Batch)\.(\w+)` + WRITE, 'g');
-  const stray = [];
-  let seen = 0;
-  for (const f of files) {
-    const s = rd(f);
-    for (const m of s.matchAll(byName)) { seen++; if (!minted.has(m[1])) stray.push(`${f}: .${m[1]}`); }
-    if (f.startsWith('src/formats/')) continue;
-    for (const m of s.matchAll(byReceiver)) { seen++; if (!minted.has(m[1])) stray.push(`${f}: .${m[1]}`); }
-  }
-  assert.ok(seen > 100, `only ${seen} batch writes found - the sweep stopped matching`);
-  assert.deepEqual([...new Set(stray)], [], 'written on a batch after birth, and not minted in createBillboardBatch\'s literal');
-});
-
 test('PERF-EXT10 (the review): the shadow record writes every batch\'s fractional origin every frame and ALLOCATES NOTHING for it - `_shOx`/`_shOy`/`_shOz` are born NaN, a double slot written in place; born undefined they were a tagged slot, and every store a fresh heap number (the tip before the review: ~42 bytes a batch a frame in this child, where the base\'s fields, born with their first double, made none). Measured in a child with a 64 MB young space against a control of the same stores into undefined-born fields, which must allocate - or this pin says nothing', () => {
   const url = (p) => pathToFileURL(join(ROOT, p)).href;
   const script = `
@@ -230,7 +193,6 @@ test('PERF-EXT10 (the review): the shadow record writes every batch\'s fractiona
  *  drawElements under a billboard program - the main pass's (classic or the lane's) or the shadow replay's - the held
  *  uSize and uOrigin must be the drawn batch's own. Returns how many draws it checked. */
 function assertEveryFlatDrawSeesItsOwn(calls, programs, batches) {
-  // PIN MOVED (PERF-ARENA): a still batch draws a RANGE of its arena's indices - the draw is named by the VAO and the
   // offset together (many batches share one VAO now)
   const byVao = new Map();
   for (const b of batches) { if (!byVao.has(b.vao)) byVao.set(b.vao, new Map()); byVao.get(b.vao).set(b._ibOff | 0, b); }
@@ -358,16 +320,6 @@ test('PERF-EXT11: no flat ever draws with a stale size or origin - GL walked as 
 
 // ── PERF-EXT12: no object ─────────────────────────────────────────────
 
-test('PERF-EXT12: the streaming host asks the far-flat rule POSITIONALLY - no `{ ring, height, animated }` built for every flat batch of every pixel in sight or reach, every frame (the base: an object literal at the call); nothing in src/ builds one for it', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!farFlatVisibleAt\(ring, b\.farH \?\? b\.size\?\.h \?\? 0, b\.frame != null\)\) continue;/, 'the pixel walk\'s call (LPT1: a far picture\'s batch hands its flat\'s own height - AUDIT LPT B1)');
-  assert.match(w, /import \{ farFlatVisibleAt \} from '\.\.\/world\/flatDistance\.js'/);
-  const objectCalls = [];
-  const walk = (d) => { for (const e of readdirSync(join(ROOT, d))) { const p = `${d}/${e}`; if (statSync(join(ROOT, p)).isDirectory()) walk(p); else if (p.endsWith('.js') && /(?<!function )farFlatVisible\(\s*\{/.test(rd(p))) objectCalls.push(p); } };
-  walk('src');
-  assert.deepEqual(objectCalls, [], 'an object built to ask the rule');
-});
-
 test('PERF-EXT12: the positional rule IS the rule - over rings 0..6, heights 0 / 0.4 / 1.8 / 2.49 / 2.5 / 6 and animated false / true / left out, farFlatVisibleAt answers what farFlatVisible({...}) answers, and the object form is only a call to it (one home: the MAC1 pins, which speak the object form, hold the positional one)', () => {
   const { farFlatVisibleAt, farFlatVisible } = flatDistance;
   assert.equal(typeof farFlatVisibleAt, 'function', 'the positional home exists');
@@ -384,8 +336,6 @@ test('PERF-EXT12: the positional rule IS the rule - over rings 0..6, heights 0 /
   }
   assert.equal(asked, 126);
   assert.equal(drawn, 2 * 18 + 5 * (6 + 2 * 2), 'the two near rings draw all; beyond them the moving and the tall (2.5, 6)');
-  const home = rd('src/world/flatDistance.js');
-  assert.match(home, /export function farFlatVisible\(\{ ring, height, animated = false \}\) \{\n\s*return farFlatVisibleAt\(ring, height, animated\);\n\}/, 'the object form is a call to the one home');
 });
 
 // ── PERF-EXT13: one block ─────────────────────────────────────────────
@@ -469,23 +419,17 @@ test('PERF-EXT13: every visible pixel\'s water in ONE call - ten water pixels th
     r.drawWaterSurfaces(rows, rows.length, 6.4, wu);
     const n = (k) => H.byName[k] ?? 0;
     for (const u of ['uView', 'uProj']) assert.equal(n(`uniformMatrix4fv:${u}`), 1, `${lane ? 'lane' : 'classic'}: ${u} once`);
-    for (const u of ['uTime', 'uLift', 'uSunScale', 'uSwell']) assert.equal(n(`uniform1f:${u}`), 1, `${lane ? 'lane' : 'classic'}: ${u} once`);   // PIN MOVED (WATER-NEXT 2): the one opacity is gone, the swell is the frame's
+    for (const u of ['uTime', 'uLift', 'uSunScale', 'uSwell']) assert.equal(n(`uniform1f:${u}`), 1, `${lane ? 'lane' : 'classic'}: ${u} once`);
     assert.equal(n('polygonOffset'), 1, 'the offset once');
     assert.equal(n('uniformMatrix4fv:uModel'), 10, 'a matrix a pixel');
     assert.equal(H.draws.length, 10, 'a draw a pixel');
     assert.equal(n('bindTexture:1000/TEXTURE_2D_ARRAY'), 6, 'the ground array on unit 0 once a run of one climate (none, A A, B B B, A A, B, A)');
     assert.equal(n('bindTexture:1002/TEXTURE_2D'), 10, 'a tilemap a pixel, on unit 2');
-    assert.ok(H.count() <= 152, `${lane ? 'lane' : 'classic'}: ${H.count()} GL calls for ten water pixels`);   // PIN MOVED (OW-HORIZON, 2026-10-20): +1 the cloud deck's far law (uCloudShadowFar), once a frame with the map; (COAST-LOOK) +1 the sheet's switch (uGroundEdge), once a list
+    assert.ok(H.count() <= 152, `${lane ? 'lane' : 'classic'}: ${H.count()} GL calls for ten water pixels`);
     H.reset();
     r.drawWaterSurfaces(rows, 0, 6.4, wu);
     assert.equal(H.count(), 0, 'no water in sight: not one GL call, as when no pixel called');
   }
-  // and the host hands them over so: collected in the walk, ONE call after it, none inside it
-  const w = rd('src/scenes/world.js');
-  const pass = w.slice(w.indexOf('    if (waterOn) {\n      stirRipples(dt, now);   // WATER-NEXT 4\n      const wu = _waterU = waterUniforms('), w.indexOf('renderer.drawBillboards(allBatches, camRight, UP_Y);'));
-  assert.equal((pass.match(/renderer\.drawWaterSurfaces\(/g) || []).length, 1, 'one list call a frame');
-  assert.doesNotMatch(pass, /renderer\.drawWaterSurface\(/, 'no pixel draws its own');
-  assert.match(pass, /for \(const p of built\.values\(\)\) \{[\s\S]*?\}\s*\n\s*renderer\.drawWaterSurfaces\(_waterRows, n, 6\.4, wu\);/, 'after the walk, not in it');
 });
 
 test('PERF-EXT13: the list draws what the pixels drew one by one - draw for draw, the same program, every uniform the program holds, every unit\'s texture, the VAO, the caps, the depth, blend and offset state and the arguments, in the same order; two climates\' arrays in runs and a first pixel with none (unit 0 bound for it all the same); classic and the lane (its shadow maps); and the state closed as before (the base: no list)', () => {

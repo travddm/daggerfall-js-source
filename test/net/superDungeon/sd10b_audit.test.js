@@ -1,4 +1,4 @@
-// SD10b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's AUDIT SD): THE ARC'S
+// SD10b: THE ARC'S
 // AUDIT - four lenses over SD0-SD10a (the page, the relay, the law, the docs), each finding verified before it was fixed.
 // The page: the hub's hand of my Hour receipt heard; a receipt kept for a burst that never came granted out of the realm;
 // a fresh fight's blows judged as its own (a blow's number begins again in every fight); the next Hour's fall and End
@@ -140,7 +140,7 @@ function homeHost() {
   const said = [];
   const env = {
     sdFightLink: { state: () => state, now: () => now }, SD_REM_SINK_MS, clearOfPillars, sdRealmToDungeon: realmToDungeon, SD_ARENA,
-    sdSay: (t) => said.push(t), SD_HOME_SAY_MS, SD_HOME_TEXT,   // AUDIT SD II (SD11f, L6 F16, PIN MOVED): said as it rises
+    sdSay: (t) => said.push(t), SD_HOME_SAY_MS, SD_HOME_TEXT,   // AUDIT SD II (SD11f, L6 F16
   };
   const body = `let _sdHome = null;\n${constOf('sdHomeAt')}\n${constOf('sdHomeAge')}\nreturn { sdHomeAt, sdHomeAge };`;
   const { sdHomeAt, sdHomeAge } = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -175,10 +175,10 @@ function riftHost({ rec = null, entered = true, s = 7 } = {}) {
   };
   const env = {
     sdHost: { record: () => rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 }, INTERIOR_SEASON: 3, isSdRealm,
-    SD_REALM_TEXT: { lost: 'lost' }, setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async () => log.push('pixel'), _sdEntered: new Set(), _sdFallen: new Set(),   // SD-ONELIFE (PIN MOVED)
-    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d, PIN MOVED): the Hour's lines through its voice
+    SD_REALM_TEXT: { lost: 'lost' }, setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async () => log.push('pixel'), _sdEntered: new Set(), _sdFallen: new Set(),   // SD-ONELIFE (
+    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d
     sdVeilCentre: () => null, standBeforeHollowDoor: () => true,   // SD-LOOK S5: the veil's centre; AUDIT SD IV (F40): before its door
-    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (PIN MOVED): my party's own Hour
+    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (
   };
   const body = `${constOf('sdRiftOf')}\n${fnOf('sdEnterRealm')}\nreturn { sdRiftOf, sdEnterRealm };`;
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -226,7 +226,7 @@ function receiptHost() {
 test('AUDIT SD MY HOUR RECEIPT, WHEREVER IT COMES: the hub\'s hand of it (at the kill, when I stood outside the realm; at my hello) is heard by the hub\'s own link - the chat tab\'s, the one in chat:world - to the account service and the spoils, as the realm\'s is; one my realm handed me, kept for a burst that never came (I left before it - the way back, a death, the Hour\'s end), is its spoils straight into the pack as I am out of the realm, once (mutants: the hub\'s hand unheard; the kept receipt left for a week; granted every frame)', async () => {
   const w = strip(W);
   assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onSdReceipt = \(r, room\) => \{ sdClaims\?\.add\(r\); sdSpoilsReceipt\(r, room\); \};/);
-  assert.match(w, /if \(!inRealm && _sdReceipts\.size\) sdReceiptsLeft\(\);\s*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}/, 'before the floor is gathered and the fight forgotten');   // AUDIT SD II (L5 F5, PIN MOVED): and a checkpoint asked
+  assert.match(w, /if \(!inRealm && _sdReceipts\.size\) sdReceiptsLeft\(\);\s*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}/, 'before the floor is gathered and the fight forgotten');   // AUDIT SD II (L5 F5
   const h = receiptHost();
   h.at(7);
   const r = await receiptFor(7);
@@ -290,7 +290,7 @@ test('AUDIT SD CLEAR OF THE PILLARS: a place on the arena\'s floor inside a pill
 /** A renderer that keeps what it is asked to make (SD4b's). */
 
 test('AUDIT SD NOTHING MADE A FRAME FOR NOTHING: the Rift\'s and the Return\'s batches one list frame after frame, made again only as a portal stands or goes - the Hour\'s way home stood alone among them, the Return gone out of them, none once cleared; the Orrery\'s hands drawn where the stones are at the first word, and a hand at rest keeps its matrix; the Steps\' places into one scratch (mutants: a portal stood unlisted; a gone one still listed; the list kept past the clear; a hand drawn at its start; a matrix made every frame; a step\'s place made every frame)', () => {
-  // SD-LOOK (PIN MOVED): no batches now - the Rift's parts and the Return's stand among the host's dynamic draws, each
+  // SD-LOOK (
   // with one matrix kept frame after frame, gone out of them as each goes, every mesh freed at the clear
   const r = { made: [], freed: [], uploadTexture() {}, uploadEmissionTexture() {}, createMesh: (m) => { const g = { m }; r.made.push(g); return g; }, destroyMesh: (g) => r.freed.push(g) };
   const end = createSdEnd({ renderer: r });
@@ -367,11 +367,11 @@ test('AUDIT SD GEARWARD ANSWERS THE BRASS REMNANT: a world boss\'s blow lands th
   door(e);
   at(10);
   setBossStruck(); hurtPlayer(e, 3);
-  assert.deepEqual([e.health, v.sounds], [97, []], 'a cut of nothing: 15% of 3 is no whole point - landed whole, the gear still wound');
+  assert.deepEqual([e.health, v.sounds], [97, []], 'a cut of nothing: 2% of 3 is no whole point - landed whole, the gear still wound');
   hurtPlayer(e, 40);
   assert.equal(e.health, 57, 'the mark was that hurt\'s alone: a hurt after it in the same instant is no boss\'s blow');
   setBossStruck(); hurtPlayer(e, 40);
-  assert.deepEqual([e.health, v.sounds], [23, ['gear']], 'the boss\'s blow: 6 of 40 turned');
+  assert.deepEqual([e.health, v.sounds], [18, ['gear']], 'the boss\'s blow: Gearward 2% at renown 1 turns 1 of 40');   // PIN MOVED: B5 (Gearward Faint 6 -> 2)
   assert.equal(setPowerStates(10).gearLeft, 18, 'winding again');
   // a mark nobody took in its window is nobody's
   fresh();
@@ -425,7 +425,7 @@ test('AUDIT SD THE BODY\'S BLOWS ALONE: through the Remnant\'s own driver, a bod
   r.across(T0 + 29_900, T0 + 32_000);
   const d = r.struck.at(-1).dmg;
   assert.equal(d, strikeDamage(S.pct, 100, S.base));
-  assert.deepEqual([e.health, v.sounds], [100 - (d - Math.round((d * 15) / 100)), ['gear']], 'the Remnant\'s: lighter');
+  assert.deepEqual([e.health, v.sounds], [100 - (d - Math.round((d * 2) / 100)), ['gear']], 'the Remnant\'s: lighter');   // PIN MOVED: B5 (Gearward Faint 6 -> 2)
   // an Echo's, once the gear has wound again
   at(10 + 18);
   e.health = 100;
@@ -435,7 +435,7 @@ test('AUDIT SD THE BODY\'S BLOWS ALONE: through the Remnant\'s own driver, a bod
   r.word({ k: 'atk', b: SD_BODY.gold, i: 6, a: S.id, at: T0 + 40_000, x: 0, z: 8, yw: 0, tg: [] });
   r.across(T0 + 39_900, T0 + 42_000);
   const d2 = r.struck.at(-1).dmg;
-  assert.deepEqual([e.health, v.sounds], [100 - (d2 - Math.round((d2 * 15) / 100)), ['gear', 'gear']], 'an Echo\'s: lighter');
+  assert.deepEqual([e.health, v.sounds], [100 - (d2 - Math.round((d2 * 2) / 100)), ['gear', 'gear']], 'an Echo\'s: lighter');
   // the Reset: the Remnant's body casts it, and it is the Hour's magic all the same
   at(10 + 18 + 18);
   e.health = 100;
@@ -496,7 +496,7 @@ async function withRealm(fn, { concord = true } = {}) {
   const realNow = Date.now;
   let clock = T0;
   Date.now = () => clock;
-  const world = fakeRooms({ now: () => clock, vars: { SD_COLLAPSE: 'on' } });   // SD-PARTY (PIN MOVED): the first kill's collapse for all, the hub's setting on
+  const world = fakeRooms({ now: () => clock, vars: { SD_COLLAPSE: 'on' } });   // SD-PARTY (
   const hub = world.room(SOCIAL_ROOM);
   try {
     await quiet(async () => {
@@ -529,7 +529,7 @@ test('AUDIT SD A HUB THAT DOES NOT ANSWER IS NO CLOSED HOUR: a realm\'s ask of t
     assert.deepEqual(ann.closed, { code: CLOSE_BUSY, reason: 'busy' }, 'busy: try again');
     assert.ok(!ann.sent.some((m) => m.t === 'error' && m.m === SD_NO_CLOSED));
     down(false);
-    // AUDIT SD II (PIN MOVED, L3 F2): a miss is not asked again for SD_LIVE_MISS_MS (2 s - the page's own busy back-off is
+    // AUDIT SD II (
     // longer) - inside it the next hello is busy unasked; past it, asked, and in at once: the non-answer is never kept
     const asked = realm.room._sdLive;
     const early = realm.connect(); await realm.hello(early, 'peer-ann', inArenaAt(0, -12), { name: 'Ann' });

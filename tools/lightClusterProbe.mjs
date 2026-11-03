@@ -1,5 +1,4 @@
-// LC1 (2026-09-23, Mac: "make some insane improvements to our lighting system ... while also improving
-// performance"): THE CLUSTERED LOOP ON A REAL GPU - is it the SAME PICTURE, and how much less does it walk.
+// LC1: THE CLUSTERED LOOP ON A REAL GPU - is it the SAME PICTURE, and how much less does it walk.
 //
 // The pins (test/render/lc1_clusters.test.js) prove the grid's laws on the CPU and the shader's text; what only a GPU
 // can prove is that the shader READS the grid the CPU wrote and lights the same pixels the plain loop lit. This

@@ -1,4 +1,4 @@
-// SAFE2, SAFE4, SAFE5, SAFE6 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE RELAY'S HALF, driven through a
+// SAFE2, SAFE4, SAFE5, SAFE6: THE RELAY'S HALF, driven through a
 // REAL Room over a REAL Ed25519 key - the stamp on every line it relays, a new voice's pace in a public channel, the
 // reviewer's feed, and a ban order taken at both doors it comes in by: a carrier's frame, and the account service's push
 // through the Worker (which checks the signature before the hub is woken).

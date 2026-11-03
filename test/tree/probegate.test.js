@@ -1,4 +1,4 @@
-// AUDIT ANTICHEAT A2 (2026-10-17; #955 picked up) - A PROBE'S SEAM SITS BEHIND THE SHOT GATE.
+// AUDIT ANTICHEAT A2 - A PROBE'S SEAM SITS BEHIND THE SHOT GATE.
 //
 // #955 published the live entity on a `?shot` boot alone and said every other probe seam already stood behind
 // `shotMode`. The audit read all 285 install sites in src/ and found three that did not: world.js's `__readyRanged`

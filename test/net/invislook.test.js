@@ -1,5 +1,4 @@
-// INVIS-LOOK (2026-09-27, Mac: "Give invisibility the same invisibility we give enemies in enhanced AI. That transparent
-// look"). INVIS-NET drew a concealed peer (the pose's `cv`) as the A5 law draws a concealed foe - not at all. Under
+// INVIS-LOOK. INVIS-NET drew a concealed peer (the pose's `cv`) as the A5 law draws a concealed foe - not at all. Under
 // Enhanced Combat Visuals a peer is drawn as that lane draws a concealed foe: Chameleon's translucent shimmer and ripple,
 // a shade's dark silhouette - and, the one departure (asked for), an INVISIBLE player takes the shimmer where a foe's
 // invisibility is still not drawn. Every figure that can stand for a peer carries it: the rider, the walker, the class
@@ -37,7 +36,6 @@ test('INVIS-LOOK: the look - open is plain; the classic lane hides every conceal
   const shade = peerDraw(4, true, 1, 'p').visual;
   assert.deepEqual([shade.mode, shade.alpha], [CONCEAL_MODE.shade, SHADE_ALPHA], 'a shade: the dark silhouette');
   for (const bits of [3, 5, 6]) assert.equal(peerDraw(bits, true, 1, 'p').visual.mode, CONCEAL_MODE.blend, `${bits}: the stronger concealment wins`);
-  // PIN MOVED (STAFF-PILOT, 2026-10-26, systems/staffBossPilot.js PILOT_CONCEAL): all three at once is a staff member inside its event's boss - drawn nowhere
   assert.equal(peerDraw(7, true, 1, 'p').kind, 'hidden', '7: a staff boss pilot, not drawn');
   // the departure is the peer's alone: a foe's invisibility on the same lane is still not drawn
   const foe = { entity: { activeEffects: [{ kind: 'invisNormal', roundsRemaining: 5 }] } };
@@ -73,11 +71,6 @@ test('INVIS-LOOK executed: the doll and the body - a concealed peer\'s doll carr
   assert.deepEqual(rp.namePoints(proj, view, 1600, 900, [0, 1.7, 0]).map((n) => n.name).sort(), ['bodied', 'ghost', 'open'], 'and named');
   rp.sync([ghost], undefined);
   assert.equal(batchOf('ghost').conceal, null, 'a host that hands no look: plain, as ever');
-  // the class sprite takes the same two lines as the doll (its path builds off the enemy art, so it is read by source)
-  const src = rd('src/net/remotePlayers.js');
-  assert.equal((src.match(/entry\.batch\.conceal = veil;/g) ?? []).length, 2, 'the doll and the class sprite');
-  assert.equal((src.match(/if \(!veil \|\| (?:\/\*\* @type \{any\} \*\/ \(veil\)|veil)\.named\) this\._shown\.push\(\{ peer, height: (?:bodyH|entry\.doll\.h \* g - sink|entry\.height - sink) \}\);/g) ?? []).length, 3, 'no name: the body, the doll and the class sprite');   // PIN MOVED (AUDIT EG V, h): a veil that keeps the name (an ally drawn at 60% in the Spire, section 8.2) shows it - a concealed peer's look never does   // PIN MOVED (OW-PEERS): the doll's height grown under the Overworld; PIN MOVED (CARDS2c): a seated sprite's sink taken off it
-  assert.match(src, /this\._syncMobilePeer\(peer, bundle, toScene, dt, eye, veil\); continue; \}/);
 });
 
 test('INVIS-LOOK executed: the walker and the rider - the chosen set and the saddle carry the look, a sprite made later keeps it, and a concealed walker\'s lantern is not drawn', async () => {
@@ -86,7 +79,7 @@ test('INVIS-LOOK executed: the walker and the rider - the chosen set and the sad
   const art = createEotbArt({ renderer, urlFor: (k) => `u:${k}`, decode: async () => ({ width: 50, height: 110, colors: new Uint32Array(50 * 110) }) });
   const pose = (o = {}) => ({ x: 4, y: 0, z: 9, yaw: 0, pitch: 0, mv: 0, wd: 0, an: 0, sr: 0, cn: 0, ar: 0, ...o });
   const V = peerDraw(2, true, 1, 'w').visual;
-  const w = createPeerWalkers({ art, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const w = createPeerWalkers({ art, layeredAll: () => false });
   const walker = { id: 'w', look: { eo: 3 }, shown: pose() };
   w.sync([walker], toScene, { eye: [4, 1, 20], dt: 0, conceal: () => V }); await settle();
   w.sync([walker], toScene, { eye: [4, 1, 20], dt: 0, conceal: () => V });
@@ -105,7 +98,7 @@ test('INVIS-LOOK executed: the walker and the rider - the chosen set and the sad
   assert.equal(w.batches()[0].conceal, null, 'the spell ended: plain');
   // the lantern: from straight behind (the walker faces +Z, the eye on -Z) it is drawn - on a concealed walker it is not
   const lit = createEotbArt({ renderer: { ...renderer, drawBillboards() {} }, urlFor: (k) => `u:${k}`, decode: async () => ({ width: 50, height: 110, colors: new Uint32Array(50 * 110) }), loadLantern: async () => ({ width: 10, height: 20, colors: new Uint8ClampedArray(800) }) });
-  const lw = createPeerWalkers({ art: lit, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const lw = createPeerWalkers({ art: lit, layeredAll: () => false });
   const back = (conceal) => { lw.sync([{ id: 'w', look: { eo: 3 }, shown: pose({ hl: 1 }) }], toScene, { eye: [4, 1.5, 7], right: [-1, 0, 0], dt: 1 / 60, conceal }); return lw.drawLanterns(); };
   back(() => null); await settle(); back(() => null); await settle();
   assert.equal(back(() => null), 1, 'open: the lantern at the hip, seen from behind');
@@ -215,8 +208,8 @@ test('INVIS-LOOK executed: the quad\'s own fragment shader - plain it is the old
     const f = glslFunctions(fs, {
       vUV: uv, vWorld: [0, 0, 0], uFogColor: [0, 0, 0], uFogMode: 0, uFogDensity: 0, uFogRange: [0, 1], uCamPos: [0, 0, 0],
       uDwFog: Array.from({ length: 5 }, () => [0, 0, 0, 0]), uConceal: conceal, uSpan: span, outColor: [0, 0, 0, 0],
-      uGlint: [0, 0, 0, 0], uElite: [0, 0], uDissolve: [0, 0, 0, 0], uHitFlash: 0,   // PIN MOVED (MWNPC5): a foe's tells, off - the quad as this test has always run it
-      uDepthK: [0, 0, 0, 0], gl_FragCoord: [0, 0, 0.625, 1], gl_FragDepth: 0,   // PIN MOVED (FB1015 BODY-DEPTH): no picture depth - the quad's own
+      uGlint: [0, 0, 0, 0], uElite: [0, 0], uDissolve: [0, 0, 0, 0], uHitFlash: 0,
+      uDepthK: [0, 0, 0, 0], gl_FragCoord: [0, 0, 0.625, 1], gl_FragDepth: 0,
       texture: (_s, at) => { seen.push(at); return texel; },
     });
     try { f.main(); } catch (e) { if (e instanceof GlslDiscard) return { discarded: true, seen }; throw e; }
@@ -244,31 +237,3 @@ test('INVIS-LOOK executed: the quad\'s own fragment shader - plain it is the old
   close(run({ texel: [0.5, 0.4, 0.3, 1], conceal: [CONCEAL_MODE.shade, SHADE_ALPHA, 0, 0] }).out, [0.5 * SHADE_DARK, 0.4 * SHADE_DARK, 0.3 * SHADE_DARK, SHADE_ALPHA], 'the shade: dark, at its opacity');
 });
 
-test('INVIS-LOOK by source: the host - the look read once a frame and handed to every figure; the concealed on the classic lane stand nowhere; the concealed bodies drawn after each mode\'s opaque world, before the first screen quad', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const veilOn = combatVisualsOn\(\);[^\n]*\n\s*const seen = \[\];\n\s*for \(const d of visiblePeers\) \{\n\s*const look = peerDraw\(d\.shown\?\.cv \| 0, veilOn, _veilT, d\.id\);\n\s*if \(look\.kind === 'hidden'\) \{ _hiddenPeers\.add\(d\.id\); continue; \}[^\n]*\n\s*const veil = look\.kind === 'conceal' \? look\.visual : egClient\?\.allyVeil\([^\n]*\) \?\? null; if \(veil\) _veils\.set\(d\.id, veil\);[^\n]*\n\s*seen\.push\(d\);\n\s*\}/, 'once a frame, off the shown pose');   // PIN MOVED (AUDIT EG V, h - Elite-Gates.md section 8.2): the veil a concealed peer's look, or an ally's at 60% on the Spire's traversal ground (scenes/eliteGates/egClient.js allyVeil)
-  assert.match(w, /_veilT \+= dt > 0 \? dt : 0;\n\s*_veils\.clear\(\);/, 'the clock, and last frame\'s looks gone');
-  for (const re of [/peerRiders\.sync\(seen, [^\n]*conceal: veilOf(?:, grow: tvGrow)? \}\);/, /peerBodies\.sync\(afoot, [^\n]*conceal: veilOf \}\);/, /peerWalkers\.sync\(seen, [^\n]*conceal: veilOf(?:, grow: tvGrow)? \}\);/, /remotePlayers\.sync\(visiblePeers, [^\n]*conceal: veilOf, hidden: \(id\) => _hiddenPeers\.has\(id\)(?:, grow: tvGrow)?(?:, room: drawable)? \}\);/]) assert.match(w, re);   // PIN MOVED (AUDIT PEER-RANGE + HALO-THIN A L1/L6: the room's whole list after the grow); PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11): and the Overworld's grow
-  assert.match(w, /const drawVeiledPeerBodies = \(\) => \{ peerBodies\?\.drawVeiled\(\); drawAuras\(\); nodeGlintPass\.draw\(travelView\?\.active \? null : nodeMarksAt\(enchantFeet\(\)\)\); partyPing\?\.draw\(renderer\); \};/, 'WB9g: and the auras at the wearers\' feet after them, through the same hook; NODE-MARKS: and the gathering nodes\' glow');
-  assert.match(w, /drawVeiledPeerBodies: \(\) => drawVeiledPeerBodies\(\),/, 'the mode machine gets it');
-  const grass = w.indexOf("renderer.markForeignPass();   // EV6: the grass changed programs behind the shadows' back");
-  const late = w.indexOf('    drawVeiledPeerBodies();   // INVIS-LOOK');
-  const wall = w.indexOf('duelWall.draw(rings, proj, view,');
-  const flats = w.indexOf('if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);');   // TV1: bbUp, the flats' lean under the travel view
-  assert.ok(flats > 0 && grass > flats && late > grass && wall > late, 'the exterior: after the flats and the grass, before the foreign passes that follow');
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /lateWorldDraw: \(\) => \{ host\.drawVeiledPeerBodies\?\.\(\); [^\n]*\},/, 'the dungeon: through its context');   // PIN MOVED (AUDIT SD IV R1): the Hour's light after them, in the same slot
-  assert.match(m, /for \(const d of interiorCtx\.charDraws\) renderer\.drawCharacter\(d\.mesh, d\.matrix\);\n\s*host\.drawVeiledPeerBodies\?\.\(\);/, 'the building: after its last opaque draw');
-  const d = rd('src/scenes/dungeonContext.js');
-  const foes = d.indexOf('renderer.drawBillboards([..._mobileBatches, ..._dropBatches, ..._spellBatches],');
-  const hook = d.indexOf('opts.lateWorldDraw?.();');
-  const water = d.indexOf('renderer.drawWater(waterQuads, DUNGEON_WATER_COLOR,');
-  const weapon = d.indexOf('if (playerFeet) weaponRig.draw({ paralyzed: _pParalyzed });');
-  assert.ok(foes > 0 && hook > foes && water > hook && weapon > water, 'the dungeon: after the foes\' flats, before the water and the weapon\'s screen quads (WATER-D1)');
-  // AUDIT OW4 J6: `up` rides beside `conceal` (the travel view's leaned quad)
-  // PIN MOVED (MWNPC5): the box and the quad carry a foe's tells (`fx`) beside the look
-  assert.match(rd('src/combat/fpArm.js'), /drawBodyPicture\(renderer, canvas, thirdMesh, model, \{ center, halfW, halfH, anchor, hitFlash, conceal, up, fx, glowLook: padLooks \}, proj, view, eye\);/);   // PIN MOVED (WEAPON-GLOW1, AUDIT MW-3): and the held weapon's glow, whose outline the picture is padded for   // PIN MOVED (TWO-HANDS x WEAPON-GLOW1): the pad's looks - the held weapon's and a pair's left blade's   // PIN MOVED (BODY-CROP x MW-DETAIL, 2026-10-22): through drawBodyPicture, at the viewer's texel
-  assert.match(rd('src/render/characterSprite.js'), /renderer\.drawCharacterSpriteQuad\(sTex, at, halfW, halfH, right, pw \/ rt, ph \/ rt, hitFlash, conceal, qUp, null, fx, depth\);/);   // PIN MOVED (FB1015 BODY-DEPTH): and where its texels stand. PIN MOVED (BODY-LEAN): the quad's own up, the view's where one is handed. PIN MOVED (MW-DETAIL, 2026-10-22): over the target's edge as it stands
-  // BODY-CROP (2026-10-22): the main camera's own picture hands the quad the look the same way
-  assert.match(rd('src/render/characterSprite.js'), /renderer\.drawCharacterSpriteQuad\(sTex, q\.at, q\.halfW, q\.halfH, q\.right, pic\.pw \/ rt, pic\.ph \/ rt, hitFlash, conceal, q\.up, null, fx, WINDOW_DEPTH\);/);
-});

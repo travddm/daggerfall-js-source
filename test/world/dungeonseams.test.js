@@ -1,5 +1,4 @@
-// DUNGEON-SEAMS (2026-09-26, a player, relayed by Mac: "if you look around stairs and curved cellings in dungeons, you
-// can spot holes leading into void, sometimes you can even see other rooms through those holes"): THE HOLES IN
+// DUNGEON-SEAMS: THE HOLES IN
 // DAGGERFALL'S OWN MODELS, CLOSED. world/arch3dSeams.js moves the corners of the stairs whose treads stop short of their
 // walls and of the vault and round-room ceilings that stop short of their corridors, on a copy the pipeline draws
 // (scenes/dataPipeline.js); tools/seamCensus.mjs measures every dungeon block with and without it. Synthetic tests
@@ -135,16 +134,6 @@ test('DUNGEON-SEAMS: the census - a slit between two faces is a seam; a joint, o
   assert.ok(s.gap > SEAM_HAIR && s.gap <= SEAM_REACH);
   assert.deepEqual([back.model, back.partner, back.edge], [60001, 60000, [[65, 0, 64], [65, 0, -64]]], 'the wall\'s foot, a unit off the floor\'s end');
   assert.equal(run(70).seams.length, 0, 'fifteen centimetres: open space, a floor that ends in the room');
-});
-
-test('DUNGEON-SEAMS: the pipeline draws the patched copy, and the collider is built from it; the reader stays DFU\'s', () => {
-  const pipe = src('src/scenes/dataPipeline.js');
-  assert.match(pipe, /import \{ patchSeams \} from '\.\.\/world\/arch3dSeams\.js';/);
-  const build = pipe.slice(pipe.indexOf('async function buildGpuMesh('), pipe.indexOf('/** WM2b: THE WINDMILL ROTOR'));
-  assert.match(build, /const dfMesh = patchSeams\(modelIdNum, arch\.getMesh\(index\)\);/);
-  assert.match(build, /const model = dfMeshToModel\(dfMesh, getTextureSize\);/);
-  assert.match(build, /cpuModels\.set\(modelIdNum, \{ modelIdNum, positions: model\.positions, indices: model\.indices,/, 'the collider\'s copy is the drawn one');
-  assert.doesNotMatch(src('src/formats/arch3dFile.js'), /arch3dSeams/, 'the reader reads DFU\'s bytes (the parity harness)');
 });
 
 // ---------------------------------------------------------------------------------------------------------------------

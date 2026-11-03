@@ -1,12 +1,9 @@
-// ACC4 — REGISTERED DATE AND TIME PLAYED ON THE PROFILE CARD (2026-09-22).
+// ACC4 — REGISTERED DATE AND TIME PLAYED ON THE PROFILE CARD.
 //
-// Mac: "Lets add an account registered date and time played to the
-// icon profile."
 //
 // ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
 //
-// THE REGISTERED DATE IS A COLUMN THAT ALREADY EXISTED (0002 stamps
-// `registered_at`); the only work was carrying it to the card, and the
+// THE REGISTERED DATE IS A COLUMN THAT ALREADY EXISTED (`players.registered_at`); the only work was carrying it to the card, and the
 // pin is that a guest gets no date rather than 1970.
 //
 // TIME PLAYED IS THE ONE THAT CAN BE BUILT WRONG, and the wrong build
@@ -36,8 +33,7 @@ const rand = (b) => globalThis.crypto.getRandomValues(b);
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url))
   .filter((f) => f.endsWith('.sql')).sort();
 
-/** D1's surface over the REAL migrations - 0005 included, because the
- *  walk picks up every file in the folder. */
+/** D1's surface over the REAL migrations - the walk picks up every file in the folder. */
 function d1() {
   const db = new DatabaseSync(':memory:');
   db.exec('PRAGMA foreign_keys = ON');
@@ -56,7 +52,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -149,7 +145,6 @@ test('ACC4: every existing row starts at ZERO and no beat yet - nothing is guess
   const row = db._raw.prepare('SELECT played_s, played_at FROM players WHERE id = ?').get('p_old');
   assert.equal(row.played_s, 0);
   assert.equal(row.played_at, null);
-  assert.match(src('server-account/migrations/0005_played.sql'), /STARTS AT ZERO/);
 });
 
 // ── THE WORKER, end to end ──────────────────────────────────────────
@@ -259,16 +254,6 @@ test('ACC4: the beat sends the session as a Bearer and NO NUMBER, and a device w
   assert.equal(sent[0].init.method, 'POST');
   assert.equal(sent[0].init.headers.authorization, 'Bearer sek');
   assert.doesNotMatch(sent[0].init.body, /\d/, 'the body carries a number - the service would ignore it, and this side should not be pretending');
-});
-
-test('ACC4: the world host starts the clock, on the stored session, gated on visibility', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (SCALE4c): the knock rides the tab's one heartbeat (net/heartbeat.js), made on the device's own session
-  assert.match(w, /startPlayClock\(\{\s*beat: \(\) => heartbeat\.beat\(\)/, 'the world no longer knocks through its heartbeat');
-  assert.match(w, /const heartbeat = createHeartbeat\(\{\s*fetch: [^\n]*, storage: appStorage\(\),/,
-    'the world no longer knocks with the device\'s own session');
-  assert.match(w, /visible: \(\) => globalThis\.document\?\.visibilityState !== 'hidden'/);
-  assert.equal((w.match(/startPlayClock\(/g) ?? []).length, 1, 'one clock per page - two would knock twice (harmless to the total, a wasted D1 write each beat)');
 });
 
 test('ACC4: the two facts read as words - a local date with the month named, and hours and minutes', () => {

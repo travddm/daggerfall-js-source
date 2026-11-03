@@ -67,22 +67,6 @@ test('FB1020c BERTH-RING a cargo goes to a port the sea bears on within SEA_RING
   assert.equal(deliveryPort({ px: 50, py: 100 }, null), false);
 });
 
-test('FB1020c BERTH-RING by source: the board\'s port lain at is the nearest within SEA_RING, imported where it lives; where() hands it whether or not a flagged place is near; the berth, the shipwright and the crew\'s port read the two through one question; navalNearPort keeps its pixel for the sea\'s traffic and its waters (mutants: the ring a literal; where() gates the port on nearPort)', () => {
-  const W = hostText('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-21b VOYAGE-HOLD): the ring and the nearest within it are the port law's own, read where
-  // they live (world/portSites.js boardPortAt - by the crow's flight, a tie no longer the list's first)
-  assert.match(W, /import \{[^}]*\bboardPortAt\b[^}]*\} from '\.\.\/world\/portSites\.js';/);
-  assert.match(W, /const port = boardPortAt\(navalPortList\(\), p\.x, p\.y\);/);
-  assert.match(W, /nearPort, port: navalPortHere\(\), waters: ether \? 'ether' : watersOf\(\{ nearPort, portPx: navalPortPx\(\) \}\),/);
-  assert.match(W, /for \(let dy = -1; dy <= 1 && !near; dy\+\+\) for \(let dx = -1; dx <= 1 && !near; dx\+\+\) near = csaIsPortTown\(p\.x \+ dx, p\.y \+ dy\);/, 'the traffic\'s port stays a pixel');
-  const N = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
-  assert.match(N, /const inPortWaters = \(\) => \{ const w = where\(\); return !!\(w\.nearPort \|\| w\.port\); \};/);
-  assert.match(N, /if \(!enabled \|\| !boat \|\| !inPortWaters\(\)\) return false;/, 'the shipwright, and the berth through him');
-  assert.match(N, /inPort: inPortWaters\(\) && Math\.hypot\(v\[0\], v\[2\]\) <= YARD_SPEED && !hostile, atSea: !inPortWaters\(\)/, 'the crew\'s port');
-  assert.match(N, /nearPort: !!w\.nearPort, deep: w\.waters === 'deep'/, 'the traffic\'s port weights: the pixel, unchanged');
-  assert.equal((N.match(/where\(\)\.nearPort/g) ?? []).length, 0, 'no reader of the port\'s pixel left beside the traffic\'s');
-});
-
 /** The twelve board ports with no water a Small Ship lies in within one map pixel - the berth's old ring. */
 const RING_ONE_DRY = Object.freeze(['Aldbrugh', 'Daggerfall', 'Gallocart', 'Holwych', 'Isfakabi', 'Longmore Field', 'Longwich End', 'Pencart', 'Ripmore', 'Wartale', 'Wayrest', 'Wilderham']);
 

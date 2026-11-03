@@ -1,5 +1,4 @@
-// AUDIT TECH1 (2026-10-10, the owner: "Audit this and ensure perfection"; bible/05-Combat/Weapon-Techniques.md AUDIT
-// TECH1): the findings of the four lanes of the audit, each pinned on the real classes where the game has one - the
+// AUDIT TECH1: the findings of the four lanes of the audit, each pinned on the real classes where the game has one - the
 // Shadowstep that turned away from its foe, the leap that met a ceiling, the click that threw a landing strike away, the
 // all-round reach that widened DFU's protected fallback, the paralysis that leaked a plain shot, the strike that skipped
 // the swing's gate, the window that did not hold the key, the bow the Volley's shafts forgot, the shafts born inside walls,

@@ -1,5 +1,4 @@
-// WEATHER3 slice A (2026-09-22, Mac: "imagine a map, one location its
-// sunny, one is cloudy, one has a rainstorm, etc"): THE WORLD WEATHER
+// WEATHER3 slice A: THE WORLD WEATHER
 // MAP - systems/weather/weatherMap.js. Weather as systems born on the land,
 // drifting, growing and dying; the weather at a place a pure function of
 // the place and the minute; the table's odds held by construction.
@@ -63,7 +62,7 @@ test('WEATHER3a: THE LAW SOLVES THE TABLE - every climate and season, averaged o
       const got = dayShares({ core, rings: law.rings }, season);
       const want = targetShares(table, season);
       for (const w of PRIORITY) assert.ok(Math.abs(got[w] - want[w]) < 1e-4, `${name} season ${season} ${w}: ${got[w]} vs ${want[w]}`);
-      // RAIN-HOURS (2026-10-13): the solve, made by the module's own law, must be the table by the real one - with the
+      // RAIN-HOURS: the solve, made by the module's own law, must be the table by the real one - with the
       // storms halved, the sampled gate's 2.6 points no longer told a linear cell law (nu c for nu (1 - e^-c), the
       // solve then 1.5 points off) from the true one, and WEATHER3g-cells-linear survived it
       const cox = coxShares(core, law.rings, season);
@@ -80,7 +79,7 @@ test('WEATHER3a: THE LAW SOLVES THE TABLE - every climate and season, averaged o
 });
 
 test('WEATHER3a: a tight row THINS the fronts\' rings instead of missing the table (the woodlands\' summer: a twentieth overcast; the desert: none)', () => {
-  // RAIN-HOURS (2026-10-13) re-aimed this pin: the swamp's spring it named thinned nothing once WEATHER3g's fronts
+  // RAIN-HOURS re-aimed this pin: the swamp's spring it named thinned nothing once WEATHER3g's fronts
   // stood - its rain front's cloud skirt read 0.9999999999999993 of its share, a rounding residue the pin passed on -
   // and with the falling words worn for half their odds the swamp has room for every ring. The rows that thin are the
   // ones whose deck is too thin for every front's ring of it.
@@ -135,7 +134,7 @@ test('WEATHER3a: THE CALIBRATION GATE - the sampled map holds each worn word to 
       if (w === 'sandstorm') w = 'cloudy';   // the Chronicles' cloudy it was drawn from
       count[w] = (count[w] ?? 0) + 1;
     }
-    // RAIN-HOURS (2026-10-13): the row as the map wears it - rain and thunder for WET_HOURS of their odds, the hours
+    // RAIN-HOURS: the row as the map wears it - rain and thunder for WET_HOURS of their odds, the hours
     // they give up the dry words' (test/systems/weather/rainhours.test.js holds that law to the Chronicles' digits); clear air is the
     // share nothing paints, and a sandstorm counts as the cloudy it was drawn from
     const t = targetShares(WEATHER_TABLE[name], season);
@@ -219,7 +218,7 @@ test('WEATHER3a: PRIORITY - where systems overlap the worn word is the highest, 
   let checked = 0;
   for (let i = 0; i < 400 && checked < 30; i++) {
     const x = 120000 + i * 1733, z = 80000 + i * 911, m = YEAR + 120 * 1440 + i * 37;
-    // RAIN-HOURS (2026-10-13): each system read in its OWN measure (radialOf, WEATHER3h), as the law reads it - this
+    // RAIN-HOURS: each system read in its OWN measure (radialOf, WEATHER3h), as the law reads it - this
     // oracle read the centre's distance, a disc, and passed only while no probe fell where a shape turns a band; on the
     // map the calibration moved, five of its thirty probes did, and in each the shaped read agreed with the worn word
     const painted = systemsNear(x, z, m, at, 0).filter((s) => insideClip(s, x, z)).map((s) => bandAt(s, radialOf(s, x, z))).filter(Boolean);
@@ -230,7 +229,7 @@ test('WEATHER3a: PRIORITY - where systems overlap the worn word is the highest, 
   }
   assert.ok(checked >= 10, 'overlaps exist and were checked');
   const snowGround = (w) => (w === 'rain' || w === 'thunder' ? 'snow' : w);
-  // RAIN-HOURS (2026-10-13): only probes the map rains on can show the ground turning a drop - this line of 200 at one
+  // RAIN-HOURS: only probes the map rains on can show the ground turning a drop - this line of 200 at one
   // minute fell under some rain while a jungle spring rained 52% of the time, and under none at 26%, and the ground law
   // dropped whole (WEATHER3a-ground-after-priority) survived it. Each probe is now a place the bare map rains on.
   let wet = 0;
@@ -380,7 +379,6 @@ test('WEATHER3a: THE FORECAST reads the same law ahead', () => {
 });
 
 test('WEATHER3a: the land under a birth - off the map is its edge\'s climate, and each climate births its own weather', () => {
-  // PIN MOVED (AUDIT TESA-BIOME Z8): a map that has nothing off it (-1, MapsFile's own) is read at its edge, every time
   const calls = [];
   const inMap = (px, py) => px >= 0 && py >= 0 && px < 1000 && py < 500;
   const probe = (px, py) => { calls.push([px, py]); return inMap(px, py) ? CLIMATES.Desert : -1; };
@@ -393,7 +391,6 @@ test('WEATHER3a: the land under a birth - off the map is its edge\'s climate, an
   let rained = 0;
   for (let i = 0; i < 200; i++) if (weatherAt(-300000 - i * 3001, -150000, YEAR + 190 * 1440 + i * 13, beyond).word === 'rain') rained++;
   assert.ok(rained > 10, `past the Bay its own land's weather (${rained} of 200 rained)`);
-  // PIN MOVED (BAY-LEFT-SEA, the audit's D4): the sea off the map is the sea's own - a storm born over the Sea of Ghosts,
   // the Topal Bay or the Padomaic the Ocean's (DFU's Swamp table: a summer's rain the desert edge never has), where it had
   // read the nearest Bay edge's; a map with nothing off it answers -1 there, never the Ocean, and reads the edge, as ever
   const sea = (px, py) => (inMap(px, py) ? CLIMATES.Desert : CLIMATES.Ocean), landOff = (px, py) => (inMap(px, py) ? CLIMATES.Desert : -1);
@@ -407,7 +404,7 @@ test('WEATHER3a: the land under a birth - off the map is its edge\'s climate, an
   weatherAt(-500000, -500000, YEAR, (px, py) => { seaCalls.push([px, py]); return sea(px, py); });
   assert.ok(seaCalls.length > 0 && seaCalls.every(([px, py]) => !inMap(px, py)), 'the sea answered off the map: its edge never asked');
   // WEATHER3g: past the edge is the edge's own climate - a system born there is the land's weather, not the sea's
-  const edge = (px, py) => (!inMap(px, py) ? -1 : px === 0 || py === 0 ? CLIMATES.Mountain : CLIMATES.Swamp);   // a map with nothing past its edge (PIN MOVED, Z8)
+  const edge = (px, py) => (!inMap(px, py) ? -1 : px === 0 || py === 0 ? CLIMATES.Mountain : CLIMATES.Swamp);   // a map with nothing past its edge (
   let snowed = 0;
   for (let i = 0; i < 200; i++) if (weatherAt(-200000 - i * 3001, -150000, YEAR + 20 * 1440 + i * 13, edge).word === 'snow') snowed++;
   assert.ok(snowed > 30, `past the mountains' edge it snows as the mountains do (${snowed} of 200)`);

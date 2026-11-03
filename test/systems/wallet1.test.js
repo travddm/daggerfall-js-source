@@ -1,16 +1,15 @@
-// WALLET1 (2026-10-05, Mac: "We need to develop a wallet item that holds forms of currency and sits in the inventory"):
+// WALLET1:
 // THE WALLET - a bound, weightless, pack-only piece every character carries, holding its currencies: the letters of
 // credit, the Deadlands Embers and the Welkynd Shards out of the enhanced pack's pages and into its own sheet, beside the
 // purse's gold and the account's silver; on the classic skin, DFU's four tabs as they were and the wallet's Use its box.
 // An organizer, never a second list: every piece stays in `entity.items`, where every spender reads it.
-// bible/06-Systems/Wallet.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  WALLET_TEMPLATE, WALLET_ROW, WALLET_HOLDS, WALLET_CARD_LINES, WALLET_GIFT, isWalletItem, hasWallet, walletHolds, mintWallet,
-  giveWallet, giveWalletGift, setWalletSilver, walletSilver, refreshWalletSilver, walletContents, walletLines, _resetWalletForTests,
+  WALLET_TEMPLATE, WALLET_ROW, WALLET_HOLDS, WALLET_CARD_LINES, isWalletItem, hasWallet, walletHolds, mintWallet,
+  giveWallet, setWalletSilver, walletSilver, refreshWalletSilver, walletContents, walletLines, _resetWalletForTests,
 } from '../../src/systems/walletItem.js';
 import { assignStartingGear, addSurvivalProvisions } from '../../src/systems/startingGear.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
@@ -73,7 +72,7 @@ test('WALLET1 the piece: template 580 on its own row - DFU\'s Small Sack\'s pict
   assert.equal(isBound(w), true);
 });
 
-test('WALLET1 the gift: a new character\'s kit holds one - DFU\'s kit and a mod\'s alike, the port\'s own tail; a character from before the wallet is given one as its save is restored, ONCE (PORTAL-GIFT\'s mark), and a round trip gives none (mutants: given twice; the mark unread; the kit ungiven)', () => {
+test('WALLET1 the gift: a new character\'s kit holds one - DFU\'s kit and a mod\'s alike, the port\'s own tail, and a load gives none (mutants: the load gives one; the kit ungiven)', () => {
   const e = { items: [] };
   assert.equal(giveWallet(e), 1);
   assert.equal(giveWallet(e), 0, 'one is carried');
@@ -87,19 +86,10 @@ test('WALLET1 the gift: a new character\'s kit holds one - DFU\'s kit and a mod\
   const modKid = { items: [] };
   addSurvivalProvisions(modKid);
   assert.equal(modKid.items.filter(isWalletItem).length, 1, 'the port\'s tail, which a mod\'s kit rides');
-  // a save from before the wallet: given once; a round trip after: none
-  const old = snapshotPlayer({ items: [], stats: {}, skills: [] });
-  delete old.walletGift;
-  const back = {};
-  restorePlayer(back, old);
-  assert.deepEqual([back.items.filter(isWalletItem).length, back.walletGift], [1, WALLET_GIFT], 'given, and marked');
-  const again = {};
-  restorePlayer(again, snapshotPlayer(back));
-  assert.equal(again.items.filter(isWalletItem).length, 1, 'never given twice');
+  // the kit holds the wallet; a load gives none
   const born = {};
   restorePlayer(born, snapshotPlayer({ items: [], stats: {}, skills: [] }));
-  assert.deepEqual([born.items.length, born.walletGift], [0, WALLET_GIFT], 'a character born after the wallet has its kit\'s - the load gives none');
-  assert.equal(giveWalletGift({ walletGift: WALLET_GIFT, items: [] }), 0);
+  assert.equal(born.items.length, 0, 'a load gives no wallet');
 });
 
 test('WALLET1 it never leaves the pack: bound - never dropped, traded or sold - and pack-only: not the wagon nor the player\'s own storage, where a bound ember still goes; the realm\'s service binds its row too; both skins refuse it in its own words (mutants: the pack-only unread; the service blind; either skin\'s refusal unsaid)', () => {
@@ -149,7 +139,6 @@ test('WALLET1 what it holds: DFU\'s letters of credit, the Deadlands Embers and 
   const worn = Object.assign(sigilStone(), { stackCount: 3, equipSlot: 6 });
   e.items.push(worn);
   const c = walletContents(e.items, e, { silver: 35 });
-  // PIN MOVED (AUDIT 625 W5): and why no figure is counted - none to say for a counted one. PIN MOVED (WALLET-WEIGHT): and
   // what each holding weighs, and all of them (test/systems/wallet_weight.test.js pins the weights)
   assert.deepEqual({ ...c, held: undefined }, { gold: 1240, silver: 35, silverWhy: null, letters: { count: 2, gold: 12000 }, embers: 12, shards: 40,
     weights: { letters: 0.5, embers: 3, shards: 4 }, weight: 7.5, held: undefined });
@@ -204,7 +193,6 @@ test('WALLET1 the sheet: the wallet picked says its currencies, and each piece i
     press(/Wallet/);
     const sheet = host.querySelector('.walletsheet');
     assert.ok(sheet, 'the sheet');
-    // PIN MOVED (WALLET-UI): the sheet is the ledger - each part under its name, a row a currency with its label and its
     // figure apart, a letter's worth under its count (it read the classic box's lines, one paragraph each)
     assert.deepEqual(sheet.querySelectorAll('.wallet-head').map((h) => h.textContent), ['Coin', 'In the wallet']);
     assert.deepEqual(sheet.querySelectorAll('.wallet-row').map((r) => [r.dataset.key, ...r.children.map((c) => c.textContent)]),
@@ -250,8 +238,6 @@ test('WALLET1 the sheet\'s silver: asked afresh of the host once a mount, as the
         return { host, view, press, sheet: () => host.querySelector('.walletsheet') };
       };
       const first = open();
-      // PIN MOVED (AUDIT 625 W5): online and not known yet, the page is ASKING - the offline words were the wrong ones
-      // PIN MOVED (WALLET-UI): the silver is the ledger's own row - its figure, or why there is none
       assert.equal(silverOf(first.sheet()), 'checking your account', 'not known yet');
       assert.equal(asked, 1, 'asked as the sheet first shows');
       answer(); await flush();
@@ -303,9 +289,3 @@ test('WALLET1 the Use: the wallet\'s use is its own kind - the classic window sh
   for (const line of WALLET_CARD_LINES) assert.ok(rows.some((t) => String(t).includes(line)), line);
 });
 
-test('WALLET1 the hosts: the streaming host tells the wallet the account\'s silver (the marks book\'s balance, refreshed as the sheet opens) - online alone; THE FOUR HOSTS read no door of their own (mutants: the reader unregistered; registered offline)', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (AUDIT 625 W5): an account that holds none answers false (the wallet says none), never null (the wait)
-  assert.match(w, /if \(marksBook\) setWalletSilver\(\(\) => \(marksBook\.state\.open === false \? false : marksBook\.state\.balance\), \(\) => marksBook\.refresh\(\)\);/);
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(src(f), /setWalletSilver/, f);
-});

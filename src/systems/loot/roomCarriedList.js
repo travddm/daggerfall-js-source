@@ -1,5 +1,5 @@
 // @ts-check
-// GOLD-WIRE (FIELD BUGS 2026-10-25b, bible/01-Overview/bugs/Field-Bugs-2026-10-25b.md): THE LISTS THE ROOM'S WORD CARRIES.
+// GOLD-WIRE (FIELD BUGS 2026-10-25b): THE LISTS THE ROOM'S WORD CARRIES.
 //
 // A room's container - a dungeon's (scenes/roomLootHost.js) and a building's cupboard (world/interior/interiorRoomLoot.js) -
 // is composed in place into the list its window shows, and that list alone is read for the takes and the puts the room

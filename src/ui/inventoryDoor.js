@@ -73,7 +73,7 @@ export function createInventoryWindow(deps = {}) {
   // the line is said and no window is built - the caller mounts nothing.
   // REVENANT-FATE: a beaten revenant's choice is the loot window's fate side on the enhanced skin; the classic's canvas
   // window has no room for one, so there it is a keyed box - its name, its plea, K kill, S spare, Esc leave it
-  // AUDIT (2026-10-02): before the beast's refusal - it refuses the pack, never the judgement (the classic box always
+  // AUDIT: before the beast's refusal - it refuses the pack, never the judgement (the classic box always
   // came first; the enhanced skin's loot window was refused in beast form)
   if (deps.fate) { noteFirstUse('revenants'); noteFirstUse('companions'); }   // TUT1: a beaten revenant's judgement - and the oath a spared one swears
   if (deps.fate) return isEnhanced() && typeof document !== 'undefined' ? enhancedInventoryOverlay(deps) : classicFateWindow(deps.fate);
@@ -98,7 +98,7 @@ export function createInventoryWindow(deps = {}) {
 
 /** REVENANT-FATE on the classic skin: the choice as a keyed box (talkWindow.js ChoiceWindow). */
 function classicFateWindow(fate) {
-  // AUDIT (2026-10-02): the details ride the box's wrapped lines (an option's label is never wrapped - a Spare's whole
+  // AUDIT: the details ride the box's wrapped lines (an option's label is never wrapped - a Spare's whole
   // sentence ran off the screen), and a choice it cannot take says why instead of vanishing
   const lines = [fate.name, fate.sub ?? '', '', fate.plea?.speech ? `"${fate.plea.speech}"` : (fate.plea?.body ?? ''), '',
     ...fate.options.map((o) => `${o.label}: ${o.detail}`)].filter((l, i, a) => l !== '' || (i > 0 && a[i - 1] !== ''));
@@ -124,7 +124,7 @@ function enhancedInventoryOverlay(deps) {
   host.id = 'enhanced-inventory';
   // z-index 13, the depth every in-game enhanced screen shares: they
   // are peers and are never stacked on each other.
-  // PX17c (Mac: "IT SHOULD BE TRANSPARENT LIKE THE REFERENCE"): the
+  // PX17c: the
   // pack's own scrims carry the tone now (PX16b/c) and the reference's
   // ground is THE GAME - this opaque slab was the pause door's pre-PX4
   // shape, one door over, and it blacked out every scrim behind it.

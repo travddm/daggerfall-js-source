@@ -1,6 +1,5 @@
 // @ts-check
-// BLOOD2b - THE PORT'S OWN BLOOD ART, GENERATED AT BOOT (2026-09-21,
-// Mac: "make it even more visceral and detailed").
+// BLOOD2b - THE PORT'S OWN BLOOD ART, GENERATED AT BOOT.
 //
 // BLOOD1a chose to wear the splash animation's settled frame for every
 // mark, so the port shipped no blood picture. It still ships none: what
@@ -33,9 +32,7 @@
  *  collide with ARENA2 art. */
 export const BLOOD_ATLAS_ARCHIVE = 38001;
 export const BLOOD_ATLAS_RECORD = 'marks';
-// BLOOD4 (2026-09-22, Mac, with a shot of a room's wall: "youll notice
-// in the screen shot the repetition of the wall splatter. I think we
-// should introduce more variations").
+// BLOOD4.
 //
 // FOUR VARIANTS IS WHY. A wall mark is always the `drip` kind and
 // always `turn: 0` - it has to be, because a run has to run DOWNWARD
@@ -73,8 +70,7 @@ export const ATLAS_KINDS = Object.freeze(['pool', 'spatter', 'streak', 'drip', '
  *  both real colours, both under one on every channel - which is also
  *  what keeps the lane's decode honest, since decode(ink) x decode(tint)
  *  is decode(ink x tint) only while both stay inside the curve. */
-/** BLOOD4 (2026-09-22, Mac from a lit interior: "blood could be a tad
- *  bit darker"). The old colour was [0.58, 0.05, 0.04]; this is that
+/** BLOOD4. The old colour was [0.58, 0.05, 0.04]; this is that
  *  colour times 0.81 on ALL THREE CHANNELS, which is a pure darkening
  *  and not a new red - G/R stays 0.085 where it was 0.086, so every
  *  law downstream that reads the hue (freshShade's factor, the dried
@@ -126,9 +122,6 @@ function wobble(rng, n = 12, amount = 0.2) {
 }
 
 // ── BLOOD5: THE SHAPES ARE GROWN, NOT STAMPED ────────────────────
-// (2026-09-30, Mac, with a shot of a corpse ringed by a perfect
-// starburst: "the blood splatter is too perfect of a circle ... more
-// variety, and less perfect patterns ... AAA grade").
 //
 // BLOOD2b's pool was a circle with a twelve-sample wobble on its
 // radius and its spatter the same circle with dots scattered on a
@@ -560,7 +553,7 @@ export const BLOOD_PREWARM_WAIT_MS = 250;
  *  (the browser's requestIdleCallback); without one this does nothing
  *  and the first mark builds it, as before. Answers whether it started.
  *
- *  OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): A PAGE THAT NEVER IDLES STILL
+ *  OW-HITCH: A PAGE THAT NEVER IDLES STILL
  *  GETS ITS SHEET. An idle callback runs only when a frame leaves time before the next - and a world frame that spends
  *  its whole interval (a slow machine, the stream building, an uncapped rate) leaves none, so the sheet waited for the
  *  first blow and was built whole inside that frame's HUD: forty cells of noise, the real game's longest frame of a
@@ -645,7 +638,6 @@ export function bloodMarkKind({ pool = false, wall = false, print = false, stret
 }
 
 // ── BLOOD3: THE MARK IS A FILM, NOT A STICKER ────────────────────
-// (2026-09-21, Mac: "I think the blood is too shiny and flat.")
 //
 // BOTH faults were one line of the decal shader each.
 //

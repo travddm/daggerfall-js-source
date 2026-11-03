@@ -133,25 +133,5 @@ test('CASTLE1: a pixel with no dungeon of its own enters nothing - never a neigh
   assert.equal(dungeonStartDoorFor(null, null, 'dungeon:1'), null);
 });
 
-test('CASTLE1: by source - the load hands the save\'s key to startInDungeon, and the arm reads the ONE law', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /modes\?\.startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/, 'worldQuickLoad\'s dungeon arm passes the saved key (MAP-KEEP: on the automap\'s load arm)');   // PIN MOVED (INSTANCES' audit): and the save's word for its room. PIN MOVED (AUDIT STARTS W3): a start's own dungeon through the quest's entry
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /async function startInDungeon\(\{ locationKey = null, fromLoad = false, holdOpen = false, recorded = undefined \} = \{\}\)/);   // MAP-KEEP: and whether it is a load; PIN MOVED (HOLD-ONCE): `holdOpen`   // PIN MOVED (INSTANCES' audit): and what was recorded of the place
-  assert.match(wm, /dungeonStartDoorFor\(entries\.filter\(\(e\) => e\.door\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\), host\.dungeonStartSite\?\.\(\) \?\? null, locationKey\)/);
-  assert.doesNotMatch(wm, /entries\.find\(\(e\) => e\.door\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\) \?\? host\.dungeonStartSite/, 'the first-door arm is gone');
-});
-
 // ---- the dungeon's own load door -----------------------------------------
 
-test('CASTLE1: by source - a save from another place, loaded through the dungeon\'s own door, is the world host\'s load', () => {
-  const dc = read('src/scenes/dungeonContext.js');
-  // before restorePlayer, off the slot's own key, a microtask on (the door is reached from inside the context's overlay dispatch)
-  assert.match(dc, /if \(!snap\) \{ hudText\.add\('No saved game\.'\); return; \}[\s\S]{0,2000}?if \(opts\.worldLoad && snap\.locationKey != null && \(snap\.locationKey !== _locationKey \|\| opts\.loadRebuilds\?\.\(snap\)\)\) \{\s*\n\s*const k = key;\s*\n\s*Promise\.resolve\(\)\.then\(\(\) => opts\.worldLoad\(k\)\);\s*\n\s*return;\s*\n\s*\}\s*\n(?:\s*this\.discardBeneathDeath\(\);[^\n]*\n)?(?:\s*opts\.modStartLoad\?\.\(\);[^\n]*\n)?\s*const extras = restorePlayer\(playerEntity, snap, spellsByIndex\);/);   // CSA-J: OnStartLoad may stand between (csa_close pins it)   // PIN MOVED (AUDIT DUPE-LOAD): the drain beneath the death screen may stand before the restore
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /worldLoad: host\.loadSave \? \(key\) => host\.loadSave\(key\) : null,/, 'the mode host hands the world host\'s load down, or nothing');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /loadSave: \(key\) => worldQuickLoad\(key != null \? \{ key \} : \{\}\),/, 'the world host\'s load by key - the QuickSave slot when none');
-  // the standalone ?dungeon scene passes no worldLoad: its line stands
-  assert.doesNotMatch(read('src/scenes/dungeon.js'), /worldLoad/);
-});

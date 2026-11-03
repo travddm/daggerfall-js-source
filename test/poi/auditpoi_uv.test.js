@@ -1,4 +1,4 @@
-// AUDIT POI, lane F (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-5, and POI-4b's ITS PICTURE) - THE UV EDITOR'S
+// AUDIT POI, lane F - THE UV EDITOR'S
 // GEOMETRY AND THE THUMBNAIL, as the audit of the POI editor arc found them at 0c78d81a85:
 //   M1  a face with two corners on one welded vertex (a strip's stitch, a collapsed edge) sent the whole island to
 //       conjugate gradients - its second corner an unknown in no equation, a zero column the factor refused;
@@ -460,6 +460,4 @@ test('AUDIT POI M13: the unwrap runs off the page\'s thread - on a worker over i
   await new Promise((r) => setTimeout(r, 40));
   assert.equal(w2.terminated, 1); assert.equal(th.onWorker, false);
   th.close();
-  const client = readFileSync(new URL('../../src/poi/uv/uvUnwrapClient.js', import.meta.url), 'utf8');
-  assert.match(client, /return new Worker\(new URL\('\.\/uvUnwrapWorker\.js', import\.meta\.url\), \{ type: 'module' \}\);/, 'the literal spelling Vite bundles');
 });

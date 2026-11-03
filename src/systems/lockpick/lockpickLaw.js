@@ -1,6 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26, the owner: "I want to build a detailed lock picking minigame and introduce a lockpick item";
-// bible/06-Systems/Lockpicking.md): THE TUMBLERS' LAW - what a lock is made of and how hard each part of it is, pure.
+// LOCKPICK: THE TUMBLERS' LAW - what a lock is made of and how hard each part of it is, pure.
 //
 // DFU's own chance is the backbone (world/actionSystem.js interiorLockpickingChance for a door or a chest underground -
 // FormulaHelper.CalculateInteriorLockpickingChance, 5 x (level - lock) + Lockpicking, 5..95 - and

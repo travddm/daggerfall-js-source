@@ -1,7 +1,6 @@
 // @ts-check
-// RAID4 (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-// armor sets"): THE RAID RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the towns defended as the cards say
-// them. The gate's carrier's twin (net/gate/gateClaims.js), rung for rung. Design: bible/03-World/Raiding-Parties.md,
+// RAID4: THE RAID RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the towns defended as the cards say
+// them. The gate's carrier's twin (net/gate/gateClaims.js), rung for rung. Design:,
 // "The rewards (RAID4)".
 //
 // THE RELAY SIGNS, THE ACCOUNT SERVICE COUNTS AND PAYS, THIS FILE CARRIES. A receipt the relay hands this socket at a
@@ -18,7 +17,7 @@
 //
 // THE DEVICE IS NOT THE ACCOUNT (AUDIT WB A9's law): only the signed-in account's receipts are offered (`me`).
 //
-// AUDIT RAID R4 (2026-09-28): A TOWN'S THANKS ARE THE SERVICE'S WORD. They were rolled the moment a receipt came, once
+// AUDIT RAID R4: A TOWN'S THANKS ARE THE SERVICE'S WORD. They were rolled the moment a receipt came, once
 // a receipt and DEVICE - and the relay hands an account's receipt to every socket of it (the hub now to every hello
 // for a day), so a second browser or a phone rolled them again. Each kept receipt carries this device's claim id
 // (`cid`) and the level and character that fought it; the service writes the (raid, account)'s thanks row for the

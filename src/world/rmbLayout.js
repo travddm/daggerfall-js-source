@@ -15,7 +15,7 @@
 //     GroundOffset (-1)
 //     to minimise depth-fighting, tile size 256, 16x16 tiles.
 // Flats/billboards live in rmbFlats.js (milestone 3). Interiors and people
-// records are later features of this arc; see bible/03-World/World-Arc.md.
+// records are later features of this arc; see.
 
 import { ROTATION_DIVISOR, RMB_DIMENSION } from '../formats/blocksFile.js';
 import { PLACEMENTS as WINDMILL_PLACEMENTS } from './windmillMesh.js';   // WM2d: the mills Daggerfall does not stand

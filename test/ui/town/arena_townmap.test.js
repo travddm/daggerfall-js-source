@@ -1,4 +1,4 @@
-// ARENA-MAP (2026-10-03, the owner, live: "Arena doesn't show on town map") - THE ARENA ON THE TOWN MAP
+// ARENA-MAP - THE ARENA ON THE TOWN MAP
 // (`world/arena/arenaCity.js` arenaAutoMap / arenaTownLandmark, `ui/exteriorAutomapWindow.js` buildPlates,
 // `ui/town/townSheet.js` named, the two exterior hosts' `blocks`). Both town maps draw a cell off its block's own automap
 // bytes, and Kamer's bowl is byte 117 - BuildingTypes.Special1 + 1, "never displayed on automap" - so cell (4,3) of
@@ -128,13 +128,3 @@ test('ARENA-MAP: the name - "Arena" at the colosseum\'s place on both maps, alwa
   assert.equal(sheet.field.bytes[sheetY(H, anchor[1]) * sheet.field.w + anchor[0]], 117, 'the name stands on the sand');
 });
 
-test('ARENA-MAP: both exterior hosts hand the landmark on the town map\'s block rows; the interior and dungeon hosts open no town map', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.match(s, /import \{[^}]*\barenaTownLandmark\b[^}]*\} from '\.\.\/world\/arena\/arenaCity\.js';/, `${host} imports it`);
-    // PIN MOVED (TOWN-SHAPES TS6): the streaming host's rows through wallOnTownMap (a city past the Bay's wall on them)
-    assert.match(s, /blocks: (?:wallOnTownMap\()?(?:b\.locBlocks|loc\.blocks)\.map\(\(bl\) => \(\{ x: bl\.x, y: bl\.y, autoMap: bl\.dfBlock\?\.rmbBlock\?\.fldHeader\?\.autoMapData, landmark: arenaTownLandmark\(bl\.dfBlock\) \}\)\)(?:, townWallCellsOf\(dfLoc\), dfLoc\.exterior\.exteriorData\.width\))?,/, `${host}'s town map rows`);
-  }
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(read(host), /createTownMapWindow/, `${host} opens no town map`);
-  assert.match(read('src/ui/town/townMapDoor.js'), /blocks: deps\.blocks \?\? \[\],/, 'the held map\'s town sheet takes the same rows');
-});

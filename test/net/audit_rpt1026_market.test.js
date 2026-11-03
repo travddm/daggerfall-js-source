@@ -1,5 +1,5 @@
 // AUDIT RPT1026 (lane D, MARKET) - the market group of FIELD BUGS 2026-10-26r read cold
-// (bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md, RPT1026-MARKET). What the market sends a character reaches its pack
+// (, RPT1026-MARKET). What the market sends a character reaches its pack
 // on its own (net/marketArrivals.js, the sweep), and these are the doors the audit found it still missed:
 //   D1 - a press's `soon` asked while a sweep was under way was cancelled by that sweep's own clock: its road had been read
 //        before the press, so the piece the press said "will reach it on its own" waited for the next join;

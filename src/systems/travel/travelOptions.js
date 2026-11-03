@@ -27,7 +27,7 @@
 // `update()` takes the frame's numbers rather than asking for them.
 //
 // FOUR THINGS THE MOD DOES THAT THE PORT CANNOT, each recorded rather
-// than silently dropped (bible/06-Systems/Travel-Options.md):
+// than silently dropped:
 //   - Hidden Map Locations (:284-293, :1264-1266) - a mod the port
 //     does not have; its discovery set and its "reveal ports" arm.
 //   - Real Grass (:1227, :1258) - likewise, a `SendModMessage` toggle.
@@ -65,7 +65,7 @@ export const TRAVEL_OPTIONS_VENDOR = 'travel-options';
 /** RATE-LAW: the route legs whose ground is a road - a road, or a track (travelRoute.js roadShare's own pair). */
 export const ROAD_LEG_KINDS = Object.freeze(['road', 'track']);
 
-/** ROAD-BRIDGE (2026-10-12, Mac's video: "sometimes your multiplier slows down randomly without an enemy nearby"): a
+/** ROAD-BRIDGE: a
  *  road's route can step off its painted pixels for ONE pixel - a bend the network draws as a diagonal gap, a crossing
  *  whose cell holds no road bit - and that single open leg, a road leg on each side, dropped the clock from x100 to x60
  *  and back within a second or two. The traveller never left the road; the route's pixels did (AUDIT OW-REVISITED L2,
@@ -126,10 +126,7 @@ export const CLIMATE_OCEAN = CLIMATES.Ocean;
  *  Basic Roads is `roads-hazelnut`, and its `RiversAndStreams` key is
  *  the same one the mod reads at :307 for the waterways arms.
  *
- *  TO-LIVE (2026-10-02, Discord: "Whether or not I have the first setting
- *  for the Travel Options mod switched on or off, both cautious and
- *  reckless travel initiate time accelerated travel ... this requires a
- *  relog"): `boot` is the bag read at the world's load. Handed in, the
+ *  TO-LIVE: `boot` is the bag read at the world's load. Handed in, the
  *  restart half (TRAVEL_OPTIONS_RESTART_KEYS) is carried from it and the
  *  rest read afresh - DFU re-runs LoadSettings on every change of the
  *  mod's settings (mod.LoadSettingsCallback), so its keys are live there
@@ -299,7 +296,7 @@ export function locBorderCornerRects(locationRect, locationBorderRect) {
   };
 }
 
-/** OW-TOWN-RING (2026-09-29, Mac: "Pathing doesnt follow the road around cities"): A ROUTE THROUGH A TOWN'S PIXEL WALKS
+/** OW-TOWN-RING: A ROUTE THROUGH A TOWN'S PIXEL WALKS
  *  ITS BORDER RING. Basic Roads' bytes meet at the hub of a location's pixel - a road "through" a town is two edge bits
  *  joined at the pixel middle, inside the walls - while the painter stops those arms at the town and paves the ring
  *  round it (world/road/roadPainter.js, "paint roads around locations"). The mod never walks a road into a town either: a
@@ -315,8 +312,7 @@ export function ringSideOf(dx, dy) {
   const sx = Math.sign(dx), sy = Math.sign(dy);
   return (sy < 0 ? 'n' : sy > 0 ? 's' : '') + (sx > 0 ? 'e' : sx < 0 ? 'w' : '');
 }
-/** OW-TOWN-ROUND (2026-10-23, the owner: "Overworld pathing always wants to walk into the middle of the town let the player
- *  always go around it if not clicking vaguely in the middle of the city"): the side of a town's ring a POINT stands on -
+/** OW-TOWN-ROUND: the side of a town's ring a POINT stands on -
  *  read off the town's own rect, as the ring's bands lie (west of it 'w', north and east of it 'ne'), '' inside it. */
 export function ringSideAt(locationRect, p) {
   const L = locationRect;
@@ -633,8 +629,7 @@ export function createTravelOptions(deps = {}) {
     initTravelUI();
   }
 
-  // ── TV2 (2026-09-28, bible/06-Systems/Travel-View.md, Mac: "Even adding the option to tap/click to move to a
-  // specific location"; his call: "Both, by target"): THE PORT'S OWN TWO JOURNEYS, begun from the travel view's click.
+  // ── TV2: THE PORT'S OWN TWO JOURNEYS, begun from the travel view's click.
   // Neither is the mod's - Travel Options walks to a map pixel's MIDDLE (BeginTravelToCoords) or follows the road the
   // player already stands on (the follow key) - so both are a Ledger A row, and both are built from the mod's own
   // parts: its autopilot, its legs reused one after another (BeginPathTravel's InitTargetRect, :711), its panel, its
@@ -889,7 +884,7 @@ export function createTravelOptions(deps = {}) {
     return beginTravelAlongRoute({ legs: [], point, name }, speedCautious, { quiet });
   }
 
-  /** RATE-LAW (2026-10-04, Mac: "Roads now travel at x100 and non roads at x60"): IS THE JOURNEY ON A ROAD? A planned
+  /** RATE-LAW: IS THE JOURNEY ON A ROAD? A planned
    *  route's leg says by its kind - a road or a track (ROAD_LEG_KINDS) - and the walk back to the road after a stop
    *  (AUDIT OW3 J3's `join`) is the open ground's (the last stretch to a spot, and a route of no legs, the host's lanes); the follow key walks a road or a track by definition, and a town's
    *  ring is paved (world/road/roadPainter.js); the mod's straight journeys - to a place or to bare coordinates - ask the
@@ -1005,8 +1000,7 @@ export function createTravelOptions(deps = {}) {
     }
     // :658-664 - in the border ring of a town: walk around it
     if (!inLoc && st.locationBorderRect && rectContains(st.locationBorderRect, p.x, p.z)) {
-      // ROAD-CRASH (2026-09-23, Discord through Mac: "crashes while
-      // traveling on roads with travel options"): THE RING WALK IS A
+      // ROAD-CRASH: THE RING WALK IS A
       // FOLLOWED PATH, and forgets the named destination as the two path
       // arms above do. The mod's arm does not - and an interrupt "leaves
       // current destination active" (:1273), so a ring walked after one
@@ -1233,8 +1227,7 @@ export function createTravelOptions(deps = {}) {
     return false;
   }
 
-  /** AUDIT OW5b E1 (Mac, 2026-09-28: "Need to get pullout of fast travel little sooner for encounters. U run thru
-   *  them"): THE ENEMIES STOP, ASKED BY THE ENCOUNTER THAT MEETS THE TRAVELLER - the Update sweep's own arm, the frame
+  /** AUDIT OW5b E1: THE ENEMIES STOP, ASKED BY THE ENCOUNTER THAT MEETS THE TRAVELLER - the Update sweep's own arm, the frame
    *  the host knows an encounter has met a walking journey (the Overworld's band at its contact, a wanderer the spawner
    *  has placed), never a frame later. The sweep asks the FOES (AreEnemiesNearby: seen, or inside the classic spawn
    *  band), and in the port they answer late: they stand after their career and sprites load, and they sense on their
@@ -1313,7 +1306,7 @@ export function createTravelOptions(deps = {}) {
       const k = deps.townKey(pos());
       if (k !== st.route.townAt) { st.route.townAt = k; if (k) { startRouteLeg(); applyRate(); } else st.route.streetFor = null; }   // AUDIT OW-REVISITED L1-9: left, the town is asked again if walked back into
     }
-    // IC-STUTTER (bible/03-World/Arena-Provinces.md IC-STUTTER): A TOWN'S WAY STILL IN THE MAKING (scenes/townWalkHost.js:
+    // IC-STUTTER (IC-STUTTER): A TOWN'S WAY STILL IN THE MAKING (scenes/townWalkHost.js:
     // a search of a city's grid a few thousand cells a frame, never one task) asked again until it is found
     if (st.autopilot && st.route?.streetWait && !st.route.street) { st.route.streetWait = false; startRouteLeg(); applyRate(); }
     // AUDIT FB1021d PS-1: A SAILED LEG AIMED AGAIN once its pixel's ground is built - aimed before it was, at its middle
@@ -1370,7 +1363,7 @@ export function createTravelOptions(deps = {}) {
           locationTypeString(loc?.locationType, deps.locationTypeName?.() ?? ''), deps.localizedCurrentLocationName?.() ?? ''));
         return { drive, handled: true, stopped: 'location' };
       }
-      // :1402-1407 - the sea. OWS2 (the port's own, bible/06-Systems/Travel-View.md "OWS - the sea"): not for a traveller
+      // :1402-1407 - the sea. OWS2 (the port's own, "OWS - the sea"): not for a traveller
       // afloat - the mod's stop is for one who walked into it ("maybe you should travel on a ship"), and one at a helm is
       // on one; the Overworld's crossing sails its sea legs
       if ((deps.climateIndex?.() ?? 0) === CLIMATE_OCEAN && !deps.atSea?.()) { stopTravelWithMessage(T.MsgOcean); return { drive, handled: true, stopped: 'ocean' }; }

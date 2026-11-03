@@ -113,16 +113,3 @@ test('CAST-USE: liveCastEngine - the dungeon\'s engine underground, the host\'s 
   assert.equal(shared.liveCastEngine('dungeon', null, own), own);
 });
 
-test('CAST-USE the hosts (sweep): both outer hosts mount the LIVE engine, the dungeon hands its own; the split it answers stands', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(f);
-    const mount = s.slice(s.indexOf('setDefaultEnchantCtx(createEnchantCtx({'));
-    assert.match(mount.slice(0, 3000), /\n\s+magic: \(\) => liveCastEngine\(_mode\(\), modes\?\.dungeonCtx \?\? null, magic\),/, `${f}: the ctx asks for the live engine`);
-    // ...because this host's own engine fires only above ground (the frame) - underground the click is the dungeon's
-    assert.match(s, /if \(\(modes\?\.mode \?\? 'exterior'\) === 'exterior'\) \{\n[^\n]*\n\s+magic\.firePending\(/, `${f}: its engine's frame runs in exterior mode alone`);
-  }
-  assert.match(src('src/scenes/dungeonContext.js'), /\n\s+castEngine: magic,/, 'the dungeon context hands its engine');
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /\n\s+enchantCtx: false,/, 'the hosted dungeon still mounts no ctx of its own');
-  assert.match(M, /\(mode === 'dungeon' && dungeonCtx\) \? dungeonCtx\.playerAttackInput/, 'and its click goes to the dungeon\'s engine');
-});

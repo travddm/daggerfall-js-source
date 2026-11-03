@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// L10N4 (2026-09-28): THE PORT'S OWN STRINGS, DRAFTED IN-SESSION, WRITTEN WHERE THE GAME READS THEM.
+// L10N4: THE PORT'S OWN STRINGS, DRAFTED IN-SESSION, WRITTEN WHERE THE GAME READS THEM.
 //
 // Mac's third decision: the port's own strings are translated in-session (the game's text goes through
 // tools/translate.mjs on his key). Every language the catalog marks machine-made covers the English catalog exactly

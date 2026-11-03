@@ -1,7 +1,7 @@
 // @ts-check
-// MWNPC1 (2026-10-09, Mac: "I wanna do everything and ensure that performance isnt affected"): THE SKIN ON THE
+// MWNPC1: THE SKIN ON THE
 // GPU. Every Morrowind body in the world - the player's third-person body, every other player's, the family's, the
-// card table's, and the NPCs the MW-NPC arc stands after it (bible/04-Characters/Morrowind-NPCs.md) - was skinned
+// card table's, and the NPCs the MW-NPC arc stands after it - was skinned
 // on the CPU per body per posed frame: poseAssembly blended every vertex of every skinned piece and placed every
 // rigid one (mwSkin.js skinBatch, mwFirstPerson.js placeAtBone), packFpArm de-indexed the whole stream with a cross
 // product per face, and updateCharacterMesh re-uploaded all of it. PERF-RIG1 costed that at ~0.3 ms a body at

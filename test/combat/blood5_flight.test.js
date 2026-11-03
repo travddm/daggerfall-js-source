@@ -1,6 +1,4 @@
-// BLOOD5 (2026-09-30, Mac, with a shot of a corpse ringed by a starburst: "the blood splatter is too perfect of a
-// circle ... more variety, and less perfect patterns ... make it where blood droplets emit and fall on the exact
-// locations where the texture will be"). The drops fly - each lands on the very point its mark is laid at - the spray
+// BLOOD5. The drops fly - each lands on the very point its mark is laid at - the spray
 // falls in lobes rather than on an even turn, and the atlas's shapes are grown from noise at 128 texels a cell.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

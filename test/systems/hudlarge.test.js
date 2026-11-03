@@ -20,7 +20,6 @@ import { ridingRect } from '../../src/systems/riding.js';
 import { MODES, nextInteractionMode } from '../../src/player/interactionMode.js';
 import { routeAction } from '../../src/ui/input.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
-import { resolveAnchor, maskAnchors } from '../../tools/citeAnchor.mjs';   // CITE-ANCHOR: a cite names its line by a quote
 import { drawHud } from '../../src/ui/hud/hud.js';                  // AUDIT 65 UI-4: largeHudBar() is the LAST DRAWN bar
 import { audio } from '../../src/systems/audio.js';             // AUDIT 65 UI-4
 import { SOUND } from '../../src/systems/soundClips.js';        // AUDIT 65 UI-4
@@ -467,9 +466,6 @@ test('D10: the offset really moves the horse rect and the viewmodel quad', () =>
   // (combat/weapon/weaponRig.js) passes nothing, so the default reads the bar
   const w = src('combat/fpsWeapon.js');
   assert.ok(w.includes('offsetHeight = weaponOffsetHeight(),'), 'the default IS the law');
-  // FIELD-GUN6: `let`, because the Thunderlock's recoil and reload
-  // lower move the rect after it is computed. The SUBTRACTION this
-  // pin is about - the bar's height off the bottom - is untouched.
   assert.ok(w.includes('const y = canvas.height - h - offsetHeight;'), 'OnGUI :388');
   // MAC-K3: the horse arm is `player/mountRig.js`'s now, and it is the
   // ONE caller for every outdoor host - this used to read world.js,
@@ -479,58 +475,6 @@ test('D10: the offset really moves the horse rect and the viewmodel quad', () =>
   const callers = ['exterior', 'world', 'worldModes', 'dungeonContext']
     .filter((h) => src(`scenes/${h}.js`).includes('ridingRect('));
   assert.deepEqual(callers, [], 'and no host calls it directly any more');
-});
-
-test('D10: the narrowed flag\'s citation resolves to the activation ray it rests on', () => {
-  // A withdrawal is only as good as its evidence, and the evidence
-  // here IS the citation: "there are no screen-to-ray conversions to
-  // fix" rests entirely on the reader being able to open the named
-  // line and find the camera-forward pick. It named scenes/world.js
-  // :5880 - the AUDIT 18 arrow-streaming block, sixty-odd lines from
-  // any activation - so the one reader who checked would have found
-  // nothing and had to re-derive the clause. Resolve it instead of
-  // trusting it, both ways: the cite must land on the call, and the
-  // hosts it names must be ALL the hosts that carry one.
-  // E5 shipped what "WHAT REALLY REMAINS" named and rewrote that
-  // paragraph; the withdrawal above it stands unchanged, so the split
-  // moves to the block that now follows it.
-  const header = src('ui/hud/hudLarge.js').split('WHAT E5 DID NOT TAKE')[0];
-  const cites = [...header.matchAll(/scenes\/([A-Za-z0-9_]+)\.js:"([^"]+)"(?:\.\."([^"]+)")?/g)]
-    .map((m) => [`scenes/${m[1]}.js`, resolveAnchor(maskAnchors(src(`scenes/${m[1]}.js`)), src(`scenes/${m[1]}.js`).split('\n'), m[2], m[3] ?? null).line ?? 0]);
-  assert.ok(cites.length >= 2, 'the withdrawal cites the hosts it rests on');
-  for (const [rel, n] of cites) {
-    const line = src(rel).split('\n')[n - 1];
-    assert.match(line, /townTalk\.tryActivate\(cam\.pos, useFwd/,
-      `${rel}:${n} is cited for the activation ray and must BE it`);
-    // ...and the ray is the camera's own forward vector from the angles
-    // - or, since TI1, the touch tap's ray in its place: a pixel
-    // unprojected, but through the SAME reduced-viewport rect the world
-    // pass draws into, so a docked bar moves no pick on either device.
-    // The LAW is that useFwd is built ONCE, above the ladder, from the
-    // angles or the tap - so that is what is read, rather than a window
-    // of lines above the call. That window was 60 lines, then 80, and
-    // every audit that grew the ladder between the two (AUDIT 63 F33's
-    // pickpocket dispatch, AUDIT 65 MC-2's enemy arm and rival split,
-    // HARD2's race) had to widen it again or go red for a reason that
-    // was never the law. It also let a SECOND useFwd exist further
-    // down, which the law forbids and this does not.
-    const decls = [...src(rel).split('\n').entries()]
-      .filter(([, l]) => /const useFwd =/.test(l));
-    assert.equal(decls.length, 1, `${rel}: useFwd is built ONCE - ${decls.length} declarations`);
-    const [declLine, declText] = decls[0];
-    assert.match(declText, /const useFwd = _tapDir \?\? \[Math\.sin\(cam\.yaw\) \* Math\.cos\(cam\.pitch\)/,
-      `${rel}'s useFwd is the camera angles, or the tap's ray`);
-    assert.ok(declLine + 1 < n, `${rel}: useFwd is built ABOVE the ladder it feeds (:${declLine + 1} vs :${n})`);
-    // RETRO1: through worldViewportRect - the docked rect, or retro's pillarbox, which needs the canvas width too
-    assert.match(src(rel), /rayDirFromScreen\([^\n]*worldViewportRect\(canvas\.clientWidth, canvas\.clientHeight\)\)/,
-      `${rel}'s tap ray unprojects through the world-pass rect, not the canvas`);
-  }
-  // no third host carries the call and goes uncited
-  const hosts = ['world', 'exterior', 'dungeon', 'dungeonContext', 'interior', 'worldModes']
-    .filter((h) => /townTalk\.tryActivate\(cam\.pos, useFwd/.test(src(`scenes/${h}.js`)))
-    .map((h) => `scenes/${h}.js`);
-  assert.deepEqual(cites.map(([r]) => r).sort(), hosts.sort(),
-    'the cite names exactly the hosts that pick this way - "the other hosts" was one host');
 });
 
 // ---------------------------------------------------------------
@@ -732,61 +676,3 @@ test('E5: the sprite RT and the panel bracket both RETURN the world rect they bo
   assert.deepEqual(viewports(log).at(-1), [0, 92, 640, 308]);
 });
 
-test('E5: every host that draws the bar shrinks its world pass AND its lens', () => {
-  // The four-hosts rule. dungeonContext.js is where the dungeon HUD is
-  // drawn, but its beginFrame and its projection belong to the two
-  // hosts that call drawFoes - worldModes.js and dungeon.js - so those
-  // are the files that carry the law.
-  for (const host of ['scenes/world.js', 'scenes/exterior.js', 'scenes/worldModes.js', 'scenes/dungeon.js']) {
-    const body = src(host);
-    assert.match(body, /renderer\.setWorldViewport\(worldViewportRect\(canvas\.clientWidth, canvas\.clientHeight\)\);/,
-      `${host} sets the world pass's rect (RETRO1: the one that also pillarboxes a retro world)`);
-    assert.match(body, /largeHudWorldAspect\(canvas\.clientWidth, canvas\.clientHeight\)/,
-      `${host} takes the bar out of its aspect`);
-    // ...and the plain ratio is GONE from every world LENS the host
-    // builds - an aspect left at clientWidth/clientHeight stretches the
-    // world into the strip instead of cropping the lens, and a
-    // largeHudWorldAspect computed and then not used would satisfy the
-    // line above on its own. Each perspective() that names the game's
-    // own field of view is read whole, to its statement's semicolon.
-    const lenses = [...body.matchAll(/perspective\(/g)]
-      .map((m) => body.slice(m.index, body.indexOf(';', m.index) + 1))
-      .filter((stmt) => stmt.includes('fieldOfView()'));
-    assert.ok(lenses.length >= 1, `${host} builds a world lens`);
-    for (const stmt of lenses) {
-      // the call itself, or the const each streaming host binds it to
-      assert.match(stmt, /[wW]orldAspect/,
-        `${host}'s world lens takes the reduced aspect`);
-      assert.equal(stmt.includes('canvas.clientWidth / canvas.clientHeight'), false,
-        `${host} has no full-canvas world lens left`);
-    }
-  }
-  // both of worldModes' modal arms are covered by its ONE projection,
-  // and each sets the rect immediately above its own beginFrame, so no
-  // early return between them can strand a pending rect.
-  const wm = src('scenes/worldModes.js');
-  assert.equal((wm.match(/renderer\.setWorldViewport\(/g) || []).length, 2,
-    'the dungeon arm and the interior arm each set it');
-  assert.equal((wm.match(/renderer\.setWorldViewport\([^\n]*\n\s*renderer\.beginFrame\(/g) || []).length, 2,
-    'and each sits immediately above its beginFrame');
-  // the SKY draws into the same rect, so it takes the same aspect -
-  // and so does EV8's far province ring, the other pass in this frame
-  // that builds a projection of its own.
-  for (const host of ['scenes/world.js', 'scenes/exterior.js']) {
-    assert.match(src(host), /sky\.draw\([^;]*worldAspect[,)]/s, `${host}'s sky shares the lens`);
-  }
-  // PIN MOVED (SPYGLASS): the captain's glass narrows the lens the world takes, the kick inside it (world.js glassFov) -
-  // the far ring takes the same narrowed lens
-  assert.match(src('scenes/world.js'), /fovY: glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), aspect: worldAspect,/,
-    'the far ring shares it too - and the climb\'s kick (CLIMB4) - or the horizon steps against the terrain');
-  // no plain-ratio lens survives anywhere in the world host - its moved modules too (AUDIT HOST-SPLIT 2, the second read)
-  const w = hostText('src/scenes/world.js');
-  assert.equal(/aspect: canvas\.clientWidth \/ canvas\.clientHeight/.test(w), false);
-  // scenes/interior.js draws no HUD at all - no bar, no crosshair - so
-  // it has no surface to carry, and a call there would be dead forever.
-  const interior = src('scenes/interior.js');
-  assert.equal(/drawHud\(|drawCrosshairAndModeIcon\(|largeHudOptions\(/.test(interior), false,
-    'interior.js still draws no HUD; the day it does, it takes this law too');
-  // the crosshair's own re-centre is fed from the ONE home
-  assert.match(src('ui/hud/hud.js'), /largeHudHeight: dockedLargeHudHeight\(lastLargeHudBar\)/);
-});

@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-A (2026-09-28, Mac: "introduce actual sailing ships to the world that players can encounter and pillage") -
+// NAV-A -
 // THE SHIPS: what each of Come Sail Away's five hulls carries into a fight, and the classes the Iliac Bay's
 // captains sail them as. The port's own numbers - DFU has no cannon, and the mod's hulls none either.
 //
@@ -44,7 +44,7 @@ export const HULL = Object.freeze({ Rowboat: 0, LargeBoat: 1, SmallShip: 2, Larg
  * seconds with a full crew; `yawSpread`/`pitchSpread` degrees; `radius` the ball's (m, for the hit's sweep and the
  * draw); `hull`/`sail`/`crew` the damage one ball does to each. A barrel has no flight: it floats.
  *
- * AUDIT NAV1 (2026-09-29, the guns): the carriages DEPRESS as a gun deck's quoins let them - a long gun to -8, the
+ * AUDIT NAV1: the carriages DEPRESS as a gun deck's quoins let them - a long gun to -8, the
  * great and chase guns to -6, a swivel on its crutch to -10 - so a sloop come alongside to grapple is under a
  * broadside's fire and a Large Boat under a galley's (the audit measured none of them hit inside 25-60 m at -2 and
  * -3); and the galley's great guns are HEAVY - a fuller charge, 68 m/s, the carriage to 15 - so they outrange the
@@ -69,7 +69,7 @@ export const SIDE_DIR = Object.freeze({ starboard: Object.freeze([1, 0, 0]), por
  * Each hull's fighting build, measured off its prefab. `broadside` lists the STARBOARD muzzles (the port side is
  * their mirror); `bow` and `stern` their own. `hullHp`, `sailHp` and `crew` are what the PLAYER's boat of that hull
  * stands with; a class scales them. `deck` is the height boarders stand on, `beam` the half beam at it, `ram` a bow
- * built to ram (the galley's - RAM-RETURN, systems/naval/navalRam.js GALLEY_SHARE). AUDIT NAV1 (2026-09-29): `bowZ`,
+ * built to ram (the galley's - RAM-RETURN, systems/naval/navalRam.js GALLEY_SHARE). AUDIT NAV1: `bowZ`,
  * `aftZ` and `halfWidth` are the hull's own MeshCollider bounds in the root's frame (its stem, its stern and its widest
  * half beam - measured off the vendored prefabs through the real pool): what a captain steers clear of, the length its
  * turning circle is scaled by, the stem a ram strikes with, and - BOARD-MAGNET - where two hulls lie side by side
@@ -88,7 +88,7 @@ export const SIDE_DIR = Object.freeze({ starboard: Object.freeze([1, 0, 0]), por
  * acceleration modifier (Come Sail Away's modifierMoveAccelerationSail) - the rate her way comes and goes under sail
  * and off it, the player's and the captains' alike (navalAI.js helm).
  *
- * TOUGHER-SHIPS (2026-10-03, Mac: "buff health of ships"): every ship stands SHIP_TOUGHNESS times the punishment she
+ * TOUGHER-SHIPS: every ship stands SHIP_TOUGHNESS times the punishment she
  * first did - her hull and canvas that many times the points she was built with (`tough`), and her crew that many times
  * the balls and the fire to thin (navalDamage.js shotDamage and FIRE_CREW_S: a ball's men are its gun's over the
  * toughness, on the ball's own roll) - the player's boats and the captains' classes alike (a class scales its hull's
@@ -99,7 +99,7 @@ export const SIDE_DIR = Object.freeze({ starboard: Object.freeze([1, 0, 0]), por
  */
 export const SHIP_TOUGHNESS = 1.6;
 /**
- * CREW-HOLD (2026-10-06, Mac: "Crew depletes too fast"): A PLAYER'S CREW STANDS TWICE WHAT A CAPTAIN'S DOES. The men a
+ * CREW-HOLD: A PLAYER'S CREW STANDS TWICE WHAT A CAPTAIN'S DOES. The men a
  * blow takes are its men over her crew's toughness (navalDamage.js ballMen), and at SHIP_TOUGHNESS a player's crew went
  * before her hull under every gun - measured on navalAI.js strikeTime's own terms, a galleon's 24 men in 146 s of a
  * Pirate Brigantine's fire against 176 s for her hull, a Carrack's 30 in 182 s against 234 (1.21 and 1.29 times
@@ -139,7 +139,7 @@ export const HULL_BUILDS = Object.freeze([
     hullHp: tough(60), sailHp: tough(0), crew: 0, deck: 0.1, beam: 1.0, ram: false, bowZ: 2.94, aftZ: -2.14, halfWidth: 1.08, keel: -0.23, top: 0.78, sailWay: 1,
     rig: Object.freeze([]),
   }),
-  // SHIPS-2 (2026-10-07): hull 1 is Mac's Tiny Ship now (world/ships/largeBoatModel.js) and every number here is hers, off her
+  // SHIPS-2: hull 1 is Mac's Tiny Ship now (world/ships/largeBoatModel.js) and every number here is hers, off her
   // own model (test/world/ships/ships2_largeboat.test.js pins each to it): a swivel's muzzle at each of her six swivels on her
   // gunwale's cap and the one on the cap at her port bow (the galleon's chaser, its barrel's end); her box her hull's and
   // her stern rail's MeshCollider's bounds; her deck and her half beam inside her ceiling at it. HER RIG IS HER PLAN'S:
@@ -179,7 +179,7 @@ export const HULL_BUILDS = Object.freeze([
       onBoom(1, [-0.0171, 8.8, -0.5993], [-1.77, 7.22, -0.42], [1.73, 8.87, -0.04], 1, 6),     // the small square topsail
     ),
   }),
-  // GALLEON (2026-10-01, Mac: "ensuring cannon fire shoots from the cannon holes properly"): hull 2 is Mac's galleon now
+  // GALLEON: hull 2 is Mac's galleon now
   // (world/ships/galleonModel.js) and every number here is hers, off her own model (test/world/ships/galleon_model.test.js pins each to
   // it): a gun at each of her ten gunports, its muzzle a hair outside her planking at the port's middle - the ports
   // 1.56 to 2.93 m over the sea, her gun deck at 1.0829 - so a broadside leaves her through the holes it is fired from;
@@ -217,8 +217,7 @@ export const HULL_BUILDS = Object.freeze([
     hullHp: tough(520), sailHp: tough(90), crew: 60, deck: 10.25, beam: 8.8, ram: true, bowZ: 51.27, aftZ: -41.89, halfWidth: 11.17, keel: -2.46, top: 14.09, sailWay: 0.5,
     rig: rigOf([[-25, 17, 12.5], [25, 36.9, 17]]),
   }),
-  // SHIPS-2 (2026-10-07, Mac: "implement both of these new ship placement models ... ensure it matches the love we gave
-  // the other new ship model"): hull 4 is Mac's carrack now (world/ships/carrackModel.js) and every number here is hers, off
+  // SHIPS-2: hull 4 is Mac's carrack now (world/ships/carrackModel.js) and every number here is hers, off
   // her own model (test/systems/naval/ships2_carrack.test.js pins each to it), as hull 2's are the galleon's: a gun at each of her ten
   // gunports, its muzzle 9 cm outside her planking in the port - her ports 3.07 to 4.06 m over the sea, her guns on
   // platforms a step (0.38 m) over her gun deck's 1.9576 m, their axis 0.43 m over the sills - two chasers on swivels on her bow's
@@ -350,7 +349,7 @@ export function batteryOf(hull, side) {
   return k ? { side, gun: k.gun, muzzles: k.muzzles.map((m) => [...m]) } : null;
 }
 /**
- * GALLEON-WEIGHT (2026-10-06, Mac: "The galleon has less cannons, so it needs a buff to account for that"): A PLAYER'S
+ * GALLEON-WEIGHT: A PLAYER'S
  * GALLEON THROWS THE WEIGHT OF SIX GUNS FROM HER FIVE PORTS. Mac's galleon has a gun at each of her ten gunports
  * (GALLEON, HULL_BUILDS) where the galleon Come Sail Away shipped carried six a side (MOD_SMALL_SHIP_BUILD) - a sixth of
  * her broadside went with the model. So each ball of her broadside strikes MOD_SMALL_SHIP_BUILD's count over hers as
@@ -367,7 +366,7 @@ export function batteryOf(hull, side) {
 export const playerBatteryWeight = (hull, side) => (MOD_BUILDS[hull] && (side === 'starboard' || side === 'port')
   ? MOD_BUILDS[hull].broadside.length / Math.max(1, hullBuild(hull).broadside.length) : 1);
 /**
- * SHIPS-2 (2026-10-07): THE BROADSIDE EVERY TUNED DUEL WAS MEASURED WITH, A CAPTAIN'S TOO. A captain's galleon keeps her
+ * SHIPS-2: THE BROADSIDE EVERY TUNED DUEL WAS MEASURED WITH, A CAPTAIN'S TOO. A captain's galleon keeps her
  * five guns' weight (GALLEON-WEIGHT: the duels were measured with them - AUDIT NAV2 F25, Mac's bar); a captain's carrack
  * - the Pirate Flagship, the Merchant Carrack - throws the mod's carrack's seven from Mac's carrack's five, as a
  * player's does (playerBatteryWeight's 7/5), for her duels were measured with the mod's seven: at her five guns' weight
@@ -422,7 +421,7 @@ export const SHIP_CLASSES = Object.freeze([
   cls('merchantCarrack', 'merchant', HULL.Carrack, 'Merchant Carrack', { hullHp: 0.9, sailHp: 0.9, crew: 18, speed: 5.4, turn: 5, skill: 0.3, range: 120, cargo: 4, minLevel: 5, weight: 2, boarders: 11 }),
   cls('navyCutter', 'navy', HULL.SmallShip, 'Navy Cutter', { hullHp: 1, sailHp: 1, crew: 26, speed: 8.0, turn: 10, skill: 0.75, range: 90, cargo: 2, minLevel: 1, weight: 3, boarders: 14 }),
   cls('navyGalley', 'navy', HULL.LargeGalley, 'War Galley', { hullHp: 1, sailHp: 1, crew: 60, speed: 6.8, turn: 9, skill: 0.7, range: 70, cargo: 2, minLevel: 6, weight: 2, boarders: 18, tactic: 'bow' }),
-  // ETHER-LEGENDS (bible/03-World/Eltheric-Ocean.md): the Eltheric Ocean's six legends, each her own class - never drawn
+  // ETHER-LEGENDS: the Eltheric Ocean's six legends, each her own class - never drawn
   // (LEGEND_LEVEL past any captain's, no weight): launched by name in her haunt (systems/naval/etherShips.js LEGENDS)
   cls('legendWake', 'pirate', HULL.SmallShip, 'Legendary Brigantine', { hullHp: 1.8, sailHp: 1.4, crew: 34, speed: 9.4, turn: 12, skill: 0.85, range: 95, cargo: 4, minLevel: LEGEND_LEVEL, weight: 0, boarders: 22, legend: true }),
   cls('legendQueen', 'pirate', HULL.Carrack, 'Legendary Carrack', { hullHp: 2.4, sailHp: 1.3, crew: 48, speed: 6.6, turn: 6, skill: 0.8, range: 115, cargo: 4, minLevel: LEGEND_LEVEL, weight: 0, boarders: 30, legend: true }),
@@ -430,7 +429,7 @@ export const SHIP_CLASSES = Object.freeze([
   cls('legendLantern', 'pirate', HULL.SmallShip, 'Legendary Brigantine', { hullHp: 2, sailHp: 1.5, crew: 40, speed: 8.8, turn: 11, skill: 0.9, range: 100, cargo: 4, minLevel: LEGEND_LEVEL, weight: 0, boarders: 26, legend: true }),
   cls('legendRegent', 'pirate', HULL.Carrack, 'Legendary Carrack', { hullHp: 3.2, sailHp: 1.6, crew: 60, speed: 6.8, turn: 6, skill: 0.95, range: 125, cargo: 4, minLevel: LEGEND_LEVEL, weight: 0, boarders: 36, legend: true }),
   cls('legendStarless', 'pirate', HULL.Carrack, 'Legendary Carrack', { hullHp: 3.6, sailHp: 1.8, crew: 70, speed: 7.4, turn: 7, skill: 0.92, range: 120, cargo: 4, minLevel: LEGEND_LEVEL, weight: 0, boarders: 40, legend: true }),
-  // FISH-BOATS (bible/03-World/Naval-Combat.md, FISH-BOATS): a port's fishing boats, last so the wire's class rows stand.
+  // FISH-BOATS (, FISH-BOATS): a port's fishing boats, last so the wire's class rows stand.
   // Lawful merchantmen to the law and the captains; never drawn by level or weight - the port's fleet launches them by id
   cls('fishingSkiff', 'merchant', HULL.Rowboat, () => t('naval.class.fishingSkiff', 'Fishing Skiff'), { hullHp: 0.8, sailHp: 1, crew: 2, speed: FISH_OAR_MPS, turn: 24, skill: 0.1, range: 50, cargo: 1, minLevel: FISHER_LEVEL, weight: 0, boarders: 2, fisher: true }),
   cls('fishingSmack', 'merchant', HULL.LargeBoat, () => t('naval.class.fishingSmack', 'Fishing Smack'), { hullHp: 0.8, sailHp: 0.9, crew: 4, speed: 3.6, turn: 14, skill: 0.15, range: 50, cargo: 1, minLevel: FISHER_LEVEL, weight: 0, boarders: 3, fisher: true }),
@@ -481,7 +480,7 @@ export const MERCHANT_NAMES = Object.freeze([
   'Menevian Rose', 'Kambria Barley', 'Satakalaam Silk', 'Fair Winds of Tulune',
 ]);
 
-// SHIP-NAMES (2026-10-02, Mac: "Enemy and Friendly vessels need a large assortment of generated names") - every
+// SHIP-NAMES - every
 // ship's name is drawn off her seed from a trade's own forms, word banks of the Iliac Bay's crowns, divines, princes,
 // ports and goods: a crown's ship by her crown's royals and martial words (Wayrest's are not Sentinel's), a merchantman
 // by her port, her cargo and her fortune, a pirate by her dark beasts, her Daedric patron and her deeds - thousands a
@@ -652,7 +651,7 @@ export function shipNames(shipClass, seed, { regionIndex = 17, crown: crownIn = 
 }
 
 /**
- * CAPT-MARQUE (2026-10-11, bible/03-World/Captains-Sea.md) - A SHIP'S COLOURS: the crown whose flag she flies, which a
+ * CAPT-MARQUE - A SHIP'S COLOURS: the crown whose flag she flies, which a
  * letter of marque reads (navalHost.js chargePlayer) and the glass makes out (SPYGLASS). A crown's ship flies her
  * crown's; a merchantman her home port's - FLAG_HOME_SHARE of them the crown her names' region is (a packet's home port,
  * SEA-LANES), the rest one of the three by her seed on its own stream (FLAG_SALT, so her names and every other draw are

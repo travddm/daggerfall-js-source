@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FAR-FLORA (2026-10-26, the owner: "on top of distant view, no flora/trees show. Its just a plain green flat texture.
-// No band aids for any of this"; bible/06-Systems/Travel-View.md FAR-FLORA): THE CANOPY'S ART - the colour and the size
+// FAR-FLORA: THE CANOPY'S ART - the colour and the size
 // of a climate's Trees as the game draws them near, read off the player's own pictures, for the far views' woods.
 //
 // A climate's Trees are its summer nature archive's Tree records (world/terrain/terrainNature.js TREE_RECORDS - the

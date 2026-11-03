@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// L10N6b (2026-09-27, Mac: "Both" - the port's own strings translated in-session, and the game's text through a
-// pipeline on the Claude API that he runs with his key): THE TRANSLATION PIPELINE. It drafts a language's string
+// L10N6b: THE TRANSLATION PIPELINE. It drafts a language's string
 // table from its English source, a batch of rows a request, and writes it where the game reads it -
 // `locales/<tag>/<table>.csv`, DFU's own string-table format, so a draft and a DFU translation pack are the same kind
 // of file (scenes/localeData.js loads both).

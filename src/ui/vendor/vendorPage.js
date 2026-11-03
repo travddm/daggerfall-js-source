@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-VENDOR (net/vendorLaw.js) - THE VENDOR PAGE (Mac: "add a Vendor tab under professions (not in) that manages your
-// vendor what youve sold etc and the search of other vendors to check the set waypoints and so on"). A page of its own on
+// HOME-VENDOR (net/vendorLaw.js) - THE VENDOR PAGE. A page of its own on
 // the pause window's Character rail, directly under the Professions (ui/enhanced/enhancedMenu.js statsSections; the Stores are the Holdings rail's),
 // shown while the market is this account's and its character trades in gold.
 //

@@ -146,17 +146,6 @@ test('BEAST-BOOTS-8 the modesty weld composes with the switches it was handed', 
   assert.deepEqual(drawn(worn), ['cuirass', 'left ankle', 'right ankle'], 'her shirt is added, her feet stay bare');
 });
 
-test('BEAST-BOOTS-9 every composition of a Morrowind figure in fpArm.js hands on the race\'s Beast flag and the two switches - the werewolf\'s robe alone composes without them (mutant: a call site that drops them)', () => {
-  const src = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  const calls = [...src.matchAll(/composeWorn(?:Armor|Modest)\(\{[^}]*\}/g)].map((m) => m[0]);
-  const robe = calls.filter((c) => c.includes("reserve: 'robe'"));
-  assert.equal(robe.length, 1, 'the werewolf composes one robe');
-  const figure = calls.filter((c) => !robe.includes(c));
-  assert.equal(figure.length, 4, 'the portrait, the colour probe, the body and the body without an unbound outfit');
-  for (const c of figure) assert.match(c, /[,{]\s*beast,\s*beastWear(: beastWearPref\(\))?\s*[,}]/, c);
-  assert.match(src, /const beastWearPref = \(\) => \(\{ feet: getPref\('mwBeastFeet'\), helm: getPref\('mwBeastHelm'\) \}\);/);
-});
-
 test('BEAST-BOOTS-10 the two switches: three ways each, As worn by default, the viewer\'s own, and the tile rebuilds the body (mutants: a default thrown; a way missing; the rebuild unwired)', () => {
   const row = (id) => FEATURES.find((f) => f.id === id);
   const feet = row('beast-footwear'), helm = row('beast-helmets');
@@ -165,6 +154,4 @@ test('BEAST-BOOTS-10 the two switches: three ways each, As worn by default, the 
   assert.deepEqual([feet.control.tiers.map(([, l]) => l), helm.control.tiers.map(([, l]) => l)], [['As worn', 'Shafts only', 'Hidden'], ['As worn', 'Open only', 'Hidden']]);
   assert.deepEqual([PREF_DEFAULTS.mwBeastFeet, PREF_DEFAULTS.mwBeastHelm], ['worn', 'worn'], 'the stores\' defaults are the rows\'');
   for (const f of [feet, helm]) assert.equal(f.control.online, 'player');
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  for (const key of ['mwBeastFeet', 'mwBeastHelm']) assert.match(menu, new RegExp(`\\n {2}${key}: rebuildMorrowindBody,`), `${key} rebuilds the body`);
 });

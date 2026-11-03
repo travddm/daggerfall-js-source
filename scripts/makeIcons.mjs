@@ -1,4 +1,4 @@
-// TI2 (2026-09-11): the home-screen icons, drawn here and committed
+// TI2: the home-screen icons, drawn here and committed
 // under public/icons/ so the manifest has something to point at. No
 // image library - a PNG is a zlib stream of filtered rows and a CRC,
 // and Node has both. The mark is the landing page's night: the

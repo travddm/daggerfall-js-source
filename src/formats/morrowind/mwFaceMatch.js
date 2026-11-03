@@ -97,11 +97,10 @@ export function portraitFeatures(bitmap, palette) {
  * Head node's frame a head looks -Y, so the FRONT vertices (the least y)
  * are the face, the lower front vertices the chin, and each vertex's UV
  * says exactly which texel is its skin. Layout-agnostic by construction.
- * MW-HEADS2 (2026-10-15): this read +Y as the front ("Morrowind's
+ * MW-HEADS2: this read +Y as the front ("Morrowind's
  * forward" - the actor's, not the Head node's frame), never seen on a
  * retail head; the port's own heads, baked looking +Y in that frame, hung
- * backwards on the body in game (the owner: "some of the ingame heads are
- * backwards on the body") - so every head the match measured was read off
+ * backwards on the body in game - so every head the match measured was read off
  * the back of the skull.
  * `geometry` is [{positions, uvs}] from flattenNif; with no UVs the
  * old band read stands, named as such by the caller.

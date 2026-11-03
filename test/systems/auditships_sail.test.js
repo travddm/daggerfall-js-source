@@ -1,4 +1,4 @@
-// AUDIT SHIPS (2026-10-06, Mac: "Audit everything" - PR #634's SAIL-FREE and SERPENT3; bible/01-Overview/audits/Audit-Ships.md):
+// AUDIT SHIPS:
 // THE SAILING HALF. Each pin is one finding, fixed at its root: A2 the Overworld journey keeps her off land at her way - it
 // looks as far as her way needs and keeps the reach it saw land at, along her whole beam and the mark's own lane, and
 // never turns her back onto what she turned off; A3 her way off beside a ship (BOARD-MAGNET: the grapples' haul); A4 the journey
@@ -301,7 +301,7 @@ test('AUDIT SHIPS A6/D1 under the responsive helm her trim is the helm\'s own - 
   r.run(2);
   near(r.s.rt.state.MoveVectorTarget[2], drive, 1e-9, 'the trim keys move nothing');
   assert.deepEqual(r.boat.Booms.map((b) => [...b.localRotation]), booms, 'her booms as the assist trims them');
-  // AUDIT 2 XD6 (2026-10-06): the assist's own trim, in the same wind - read as unmoved alone, booms never trimmed at all
+  // AUDIT 2 XD6: the assist's own trim, in the same wind - read as unmoved alone, booms never trimmed at all
   // passed too (in this wind they turn about 30 degrees off their spawn)
   for (const wind of [90, 150]) {
     const resp = helmOn(HULL.SmallShip, { off: wind, settings: off }), assist = helmOn(HULL.SmallShip, { off: wind, handling: 'classic' });
@@ -360,7 +360,6 @@ test('AUDIT SHIPS A7 another player\'s boat snaps - and carries nobody - past wh
     const end = peers.boatAt(id, 0);
     return snapped || end !== before || Math.abs(end.GameObject.position[0] - x) > v * 1 + 1;
   };
-  // PIN MOVED (FIELD BUGS 2026-10-22d SEA-GLIDE): a word's way now leads her CSA_PEER_LEAD_MAX (4 s), so a 2.5 s hitch is
   // led whole and no snap law is asked - the hitch outlasts the lead by 2 s (her way x 2 off: past a fixed 20 m at every
   // way here, inside her own snap). AUDIT FB1022d C5: the take after it is the bounded catch, so the run goes on until she
   // has taken it up, and she ends within a second of her way of her word, as the pin always asked

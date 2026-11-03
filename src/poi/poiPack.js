@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-6 (2026-10-14) - A POI PACK: POIS, LIBRARY ENTRIES AND EVERY ASSET THEY NAME, IN ONE FILE.
+// POI-6 - A POI PACK: POIS, LIBRARY ENTRIES AND EVERY ASSET THEY NAME, IN ONE FILE.
 //
-// Mac: "a tool my developers can use without having to access the codebase" (bible/06-Systems/POI-Editor-Arc.md
 // POI-6). A builder takes work from one realm to another, hands it to another builder, or keeps it safe, as one .zip:
 //
 //   pack.json            { v: 1, kind: 'poi-pack', pois: [document, ...], shelf: [entry, ...] }

@@ -1,8 +1,8 @@
 // @ts-check
-// CROWN1 part two, the client (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): WHAT THE CLIENT HOLDS OF A
+// CROWN1 part two, the client: WHAT THE CLIENT HOLDS OF A
 // ROYAL TOURNEY - the room's words (net/wire.js validSiegeOut's royal kinds) folded into one state: every contender's
 // vitality, the bout in the ring, the ladder, the challenges standing at this player and the last bout's end; and the
-// HUD's words for it, in the siege HUD's own shape (ui/siegeHud.js draws either) - bible/11-Multiplayer/Seats-Arc.md 7.6.
+// HUD's words for it, in the siege HUD's own shape (ui/siegeHud.js draws either) 7.6.
 //
 // PURE: a state and a word in, the next state out (`foldRoyal`); the words from a state, the tourney (its seat, prize and
 // end) and how to name a peer. The session around it (net/royalSession.js) keeps the state.

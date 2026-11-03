@@ -2,7 +2,7 @@
 // replaces U65's incompatible column-renderer / orthographic-map pair.
 // Geometry and texture are generated once; every moving frame stays on the GPU.
 //
-// INTRO4 (bible/10-UI/UI-Arc.md INTRO4): the landscape is the Imperial City and the continent. Two scales in one frame:
+// INTRO4 (INTRO4): the landscape is the Imperial City and the continent. Two scales in one frame:
 // THE CONTINENT (introTamriel.js's field on a grid, its sea, its painted clouds) drawn first with its own near plane,
 // then the depth cleared and THE CITY (introCity.js: its ground and lake, the landmarks TESA built, the houses on its
 // plan, its trees, a flock about the Tower, the cloud deck) drawn over it, its ground fading at the rim into the

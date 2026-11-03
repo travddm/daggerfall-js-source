@@ -1,5 +1,5 @@
-// GUILD1e (2026-09-30, Mac: "Finish the seats"): A GUILD'S OWN BOARD, AS THE SERVICE KEEPS IT - driven through the
-// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md 8.2
+// GUILD1e: A GUILD'S OWN BOARD, AS THE SERVICE KEEPS IT - driven through the
+// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). 8.2
 // ("a private guild board (the board's Guilds tab, members only)"); `06-Systems/Online-Arc.md` GUILD1e.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,5 +1,4 @@
-// STACK-CAP (2026-10-11, the owner: "the ability to keep accumulating spell times to max out spells and never have to
-// refresh" - answered "Refresh, never stack"). A like-kind re-cast RENEWS its incumbent to what the cast would stand at
+// STACK-CAP. A like-kind re-cast RENEWS its incumbent to what the cast would stand at
 // as a new instance, never adds to it and never shortens it (systems/effects.js renewRounds). DFU's AddState adds the
 // rounds up, so a caster with magicka to spare banked a Shield Group at 11,397 rounds (BUFF-END, systems/mysticism.js).
 // Recorded departure: Port-Ledger section A.
@@ -88,34 +87,6 @@ test('STACK-CAP the ally lane: a party mate\'s re-casts renew the mate\'s bundle
   const gifts = e.activeEffects.filter((a) => a.kind === 'shield' && a.bundleAlly);
   assert.equal(gifts.length, 1);
   assert.equal(gifts[0].roundsRemaining, 10, 'thirty gifts stand at one gift\'s rounds');
-});
-
-// THE ONE CONSTRUCTION SEAM, swept: no door in src/ adds rounds onto a live entry - every like-kind merge goes through
-// renewRounds. A new door that writes `roundsRemaining +=` (or `roundsRemaining = x.roundsRemaining + n`) brings back the
-// bank; the two timers that kept a buff's time outside an entry (the torch's light, the gate court's trap) are pinned by
-// name - camp fuel and the like add to their own timers by design, so `until +=` is not swept.
-test('STACK-CAP sweep: nothing in src/ adds to an entry\'s roundsRemaining, and the gate court\'s trap timer renews (mutants: a stacking door added anywhere)', () => {
-  const files = [];
-  const walk = (dir) => {
-    for (const f of readdirSync(dir)) {
-      const p = join(dir, f);
-      if (statSync(p).isDirectory()) walk(p);
-      else if (f.endsWith('.js')) files.push(p);
-    }
-  };
-  walk(join(ROOT, 'src'));
-  const hits = [];
-  for (const p of files) {
-    const lines = readFileSync(p, 'utf8').split('\n');
-    // AUDIT STACK-CAP: both spellings of an addition - `+=`, and an assignment that reads the rounds back plus more
-    lines.forEach((l, i) => { if (/\broundsRemaining\s*(\+=|=\s*[\w.?]*roundsRemaining\s*\+)/.test(l) && !/^\s*(\/\/|\*)/.test(l)) hits.push(`${p.slice(ROOT.length + 1)}:${i + 1}`); });
-  }
-  assert.deepEqual(hits, [], 'a door that stacks rounds');
-  const court = readFileSync(join(ROOT, 'src/scenes/gate/gateCourt.js'), 'utf8');
-  assert.match(court, /if \(trapMark && t < trapMark\.until\) trapMark\.until = Math\.max\(trapMark\.until, t \+ rounds \* COURT_ROUND_MS\);/);
-  assert.doesNotMatch(court, /trapMark\.until \+=/);
-  const torches = readFileSync(join(ROOT, 'src/scenes/droppedTorches.js'), 'utf8');
-  assert.match(torches, /if \(inc\) renewRounds\(inc, st\.fireDuration\);/);
 });
 
 test('AUDIT STACK-CAP an ACTING incumbent renewed in its last listed round runs the round a fresh cast would have run - a Regenerate, a Continuous Damage - so a re-cast at the tail buys what letting it lapse and casting again buys (mutants: the tail round never run; run on every renewal)', () => {

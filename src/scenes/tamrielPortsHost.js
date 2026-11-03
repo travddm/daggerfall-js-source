@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -10,7 +10,7 @@ export function createTamrielPorts(host) {
   const {
     _arenaTemplates
   } = host;
-  /** TESA6 (bible/03-World/Arena-Provinces.md): ARENA'S PORTS - a coastal city of Arena on its shore past the Bay
+  /** TESA6: ARENA'S PORTS - a coastal city of Arena on its shore past the Bay
    *  (world/arenaPlaces.js standArenaPixels: `port`), where this host stands Arena's places; within a pixel, the nearest -
    *  the harbour book's town (scenes/world.js navalHarbourNear). AUDIT TESA II P7: the port test, the port here, the
    *  nearest port and the waters' distance past the Bay are the world's ports' (world/worldWide/worldPorts.js - TESA's

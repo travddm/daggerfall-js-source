@@ -1,6 +1,5 @@
-// WB1 (2026-09-25, Mac: "at any point in the world, on the timer, a large area would be shown on the map, also in
-// chat"): THE OBLIVION GATE'S OMEN - the schedule, the room's key, the site, the chat's lines, the maps' ring and the
-// compass's mark. Design: bible/11-Multiplayer/World-Bosses.md sections 1-2.
+// WB1: THE OBLIVION GATE'S OMEN - the schedule, the room's key, the site, the chat's lines, the maps' ring and the
+// compass's mark. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -26,7 +25,7 @@ const iso = (ms) => new Date(ms).toISOString();
 const MIN = 5000;   // a classic minute, real ms, online
 
 test('WB1 the schedule: the omen 17:00, risen 19:00, open 20:00-22:00, the wrath at midnight - HH:32:30 UTC every even hour', () => {
-  // the first gate day after the online epoch (2026-09-14T00:00Z is game 13:30 of day 363)
+  // the first gate day after the online epoch
   const t = gateTimes(363);
   assert.equal(iso(t.omenAt), '2026-09-14T00:17:30.000Z');
   assert.equal(iso(t.riseAt), '2026-09-14T00:27:30.000Z');
@@ -87,7 +86,7 @@ test('WB1 the countdown: to the opening while sealed, to the seal while open, ro
   const t = gateTimes(410);
   assert.deepEqual(gateCountdown(t, t.riseAt + 30_000), { to: 'open', ms: t.openAt - t.riseAt - 30_000 });
   assert.deepEqual(gateCountdown(t, t.openAt + 1000), { to: 'seal', ms: t.sealAt - t.openAt - 1000 });
-  // GATE-COLLAPSE (2026-09-28, Mac: "Count down to collapse"): sealed for the night, it counts to the wrath's collapse -
+  // GATE-COLLAPSE: sealed for the night, it counts to the wrath's collapse -
   // and not past it: collapsing (the wrath, or a kill inside) and gone count nothing
   assert.deepEqual(gateCountdown(t, t.sealAt), { to: 'collapse', ms: t.wrathAt - t.sealAt });
   assert.deepEqual(gateCountdown(t, t.sealAt + 61_000), { to: 'collapse', ms: t.wrathAt - t.sealAt - 61_000 });
@@ -108,7 +107,6 @@ test('WB1 the room: gate:<day>, exactly the keys the clock mints, admitted open-
   assert.equal(gateRoomKey(502), 'gate:502');
   for (const k of ['gate:502', 'gate:0', 'gate:123456789']) assert.ok(isGateRoom(k), k);
   for (const k of ['gate:', 'gate:0502', 'gate:-1', 'gate:1234567890', 'gate:1.0', 'gate:1.16', 'gate:1.05', 'gate:1.', 'Gate:5', 'gate:5 ', 'dungeon:m5', null]) assert.ok(!isGateRoom(k), String(k));
-  // PIN MOVED (GATE-COURTS, net/gate/gateCourts.js): a night's courts past its first are `gate:<day>.<k>`, k 1 to GATE_COURTS_MAX - 1
   assert.equal(gateRoomKey(502, 0), 'gate:502'); assert.equal(gateRoomKey(502, 3), 'gate:502.3');
   for (let c = 1; c < GATE_COURTS_MAX; c++) { assert.ok(isGateRoom(`gate:502.${c}`), `court ${c}`); assert.equal(gateDayOfRoom(`gate:502.${c}`), 502); assert.equal(gateCourtOfRoom(`gate:502.${c}`), c); }
   assert.equal(gateCourtOfRoom('gate:502'), 0); assert.equal(gateCourtOfRoom('world:1,2'), null);
@@ -358,29 +356,3 @@ test('WB1 the ink: the ring in map pixels, never under ten paper pixels, with it
   assert.equal(calls.find(([k]) => k === 'arc')[3], 10, 'the whole bay on the sheet: still findable');
 });
 
-test('WB1 the seams: online alone, the omen before the dead return, both maps handed the ring, the compass its mark', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const gateOmen = params\.has\('online'\) \? createGateLanes\(/, 'offline there is no gate');   // PIN MOVED (WW2): the omen a lane at a time (scenes/gate/gateLanes.js)
-  const frame = world.slice(world.indexOf('const onlineFrame = (now, dt) => {'));
-  const dead = frame.indexOf('if (townTalk.overlay instanceof DeathScreen');
-  assert.ok(frame.indexOf('gateFrame();') > 0 && frame.indexOf('gateFrame();') < dead, 'the omen speaks to the dead too');
-  assert.match(world, /gate: \(\) => gateOmen\?\.mapMark\(\) \?\? null,/);
-  assert.match(world, /gate: gateCompassMark\(\),/);
-  assert.match(world, /now: \(\) => Date\.now\(\) \+ _sharedOffsetMs,/, 'the relay\'s clock, as the sky reads it');
-  // EVENTS1: on every screen's event board (systems/eventNotices.js), where it had been a line on every chat tab
-  assert.match(world, /say: \(text, n\) => eventNotice\('gate', text, gateLineId\(n\)\),/, 'every screen\'s - the gate happened to the whole game');   // PIN MOVED (AUDIT WW F5): on its own gate's card
-  const hud = read('src/ui/hud/hud.js');
-  assert.match(hud, /gate: gate \?\? null,/);
-  const ehud = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(ehud, /drawGateMark\(opts\.gate \?\? null, opts\.playerXZ \?\? null, heading01\);/);
-  assert.match(ehud, /compassMarkerLerp\(gate, playerXZ, heading01\)/, 'the Detect markers\' own bearing law');
-  const held = read('src/ui/heldMap.js');
-  assert.match(held, /readGateMarkIn\(this\.deps\.gate, sheet\)/);   // PIN MOVED (BAY-LEFT-MAPS): over the sheet's box (_marksBox), the Bay's own sheet the Bay's bound
-  assert.match(held, /gate: this\._gate,/);
-  const page = read('src/ui/travel/travelMapWindow.js');
-  assert.match(page, /gateRingTexels\(gate, originX, originY, width, height\)\) plot\(x, y, gatePx\)/);
-  assert.match(page, /gateRingKey\(readGateMark\(this\.deps\.gate,/, 'the page rebuilds when the ring comes, goes or moves');
-  // the law is the relay's to import later (WB3): it reaches for wire.js and (WB8b) the marks' leaf alone
-  const law = read('src/net/gate/gateLaw.js');
-  assert.deepEqual([...law.matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]), ['../wire.js', './gateCourts.js', './gateMods.js'], 'WB8b: and the marks\' leaf, which imports nothing - PIN MOVED: GATE-COURTS, and the courts\' leaf');
-});

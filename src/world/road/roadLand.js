@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// VOYAGER1 (2026-10-26, bible/03-World/Roads.md VOYAGER1) - THE LAND'S LAW, the routes past the Bay's: what a step costs
+// VOYAGER1 - THE LAND'S LAW, the routes past the Bay's: what a step costs
 // on the land past the Bay (the grade, the height, the shore, a ford, the land's grain) and the land it is read off. The
 // builder (world/road/roadNetwork.js) takes it as its `terrain` - landForRoutes' answer, its own `step` - and never
 // imports it: the Bay's build is the Bay's dials alone, and the account Worker, which bundles the builder, carries none
@@ -9,9 +9,7 @@
 import { DIR_DELTA, MAP_W as MAP_WIDTH } from './roadNetwork.js';
 
 /**
- * VOYAGER1 (2026-10-26, KPbICA's spec: "Roads should rely on landscape and should not be just 100km straights. Roads
- * should circle around rivers, on the shoreline, around tall mountains and not through all this"; bible/03-World/Roads.md
- * VOYAGER1): THE LAND'S LAW, the routes past the Bay's (world/tamrielRoads.js hands it as `terrain`). The Bay's build
+ * VOYAGER1: THE LAND'S LAW, the routes past the Bay's (world/tamrielRoads.js hands it as `terrain`). The Bay's build
  * never takes it - its dials above, its bytes to the hash. Every step of a route pays:
  *  - its length (1, or the square root of 2 on a diagonal);
  *  - THE GRADE, squared: 1 + gradeCost x (rise per pixel)^2 on the land's height smoothed over SMOOTH_R pixels about
@@ -56,7 +54,7 @@ function grainHash(ix, iy) {
  * ground: the woods, the fens, the broken ground a road-builder goes round on a plain. ROUGH PATCHES: a smooth field
  * (the lattice's hashes every GRAIN_PX pixels, eased between - value noise) taken where it runs over GRAIN_EDGE's first
  * and eased in to whole at its second - patches some kilometres across, whole over a quarter of the land and nought over
- * half. Measured on a plain (2026-10-26, routes 50 to 115 km): an even field of any strength leaves a least-cost road
+ * half. Measured on a plain: an even field of any strength leaves a least-cost road
  * ruler-straight (sinuosity 1.06, 80% of its length in straight stretches of 25 km and more, the longest 106 km - the
  * cheapest way through an even field is straight at any scale), where patches it goes round bend it (grainCost 2.5:
  * sinuosity 1.14, 40%, the longest 61 km). Only ever a cost, so no route is drawn cheaper than its length.
@@ -130,7 +128,7 @@ export function landForRoutes(heights, water, keep, W, H, dials = VOYAGER_DIALS,
   return { height, shore, ford, grain, river: /** @type {?Float32Array} */ (null), d, step: landStep };
 }
 
-/** RIVER-FORDS (AUDIT RELEASE R1-3, the owner: "Take care of exclusions and gaps"; `03-World/Roads.md` RIVER-FORDS): A CARVED
+/** RIVER-FORDS (AUDIT RELEASE R1-3,; `03-World/Roads.md` RIVER-FORDS): A CARVED
  *  RIVER'S CHANNEL IS A FORD. CYRODIIL-WATERS carves its rivers narrower than a pixel inside the kernel, so the pixels'
  *  bytes carry none and the roads crossed them anywhere, along them too, priced as dry ground. Now a step onto a channel's
  *  pixel (world/tamriel/tamrielWaters.js riverRaster, the router's question) - or a diagonal between two, through the

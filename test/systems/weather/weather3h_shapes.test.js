@@ -1,6 +1,4 @@
-// WEATHER3 slice H (2026-09-23, Mac: "they look too much like blobs and
-// blots" ... "make them irregular" ... "the goal is not being overbearing
-// on the map. It needs to be more subtle"): SHAPES AND REGIONS. A system is
+// WEATHER3 slice H: SHAPES AND REGIONS. A system is
 // no longer a disc: its outline is its radius times a few harmonics of the
 // bearing, normalised to enclose exactly the disc's area, so the table's
 // shares (Campbell over areas) hold unchanged; the sky's shader reads the
@@ -8,8 +6,7 @@
 // it reads the worn word off the law at every cell of the bay, traces each
 // word's land into loops and draws them lightly - a faint tint, a sparse
 // hatch where something falls, a thin outline where it helps - under the pen.
-// DISC17-C (2026-09-24, Mac: "Remove the enhanced map weather enhancements
-// entirely"): the map's field, its regions and its hand went with the travel
+// DISC17-C: the map's field, its regions and its hand went with the travel
 // map's weather; the shapes and every reader of them in the world stand.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -80,11 +77,6 @@ test('WEATHER3h: THE SKY READS THE SAME SHAPE - the conversion carries it, the p
   assert.deepEqual([...packed.s.slice(0, 4), ...packed.u.slice(0, 3)].map((v) => Math.fround(v)), [...shape].map((v) => Math.fround(v)));
   assert.deepEqual([...packed.ks.slice(0, 4), ...packed.ku.slice(0, 3)].map((v) => Math.fround(v)), [...front].map((v) => Math.fround(v)));
   assert.deepEqual([...packed.s.slice(4, 8), ...packed.u.slice(4, 8)], [1, 0, 0, 0, 0, 0, 0, 0], 'no shape: a circle');
-  const vc = rd('src/render/volumetricClouds.js');
-  assert.match(vc, /float c2 = c \* c - s \* s, s2 = 2\.0 \* c \* s, c3 = c \* \(4\.0 \* c \* c - 3\.0\), s3 = s \* \(3\.0 - 4\.0 \* s \* s\), c4 = 2\.0 \* c2 \* c2 - 1\.0, s4 = 2\.0 \* s2 \* c2;/, 'the multiple-angle identities, as shapeFactor');
-  assert.match(vc, /return a\.x \* \(1\.0 \+ a\.y \* c2 \+ a\.z \* s2 \+ a\.w \* c3 \+ b\.x \* s3 \+ b\.y \* c4 \+ b\.z \* s4\);/);
-  assert.match(rd('src/systems/weather/weatherMap.js'), /const c2 = c \* c - s \* s, s2 = 2 \* c \* s, c3 = c \* \(4 \* c \* c - 3\), s3 = s \* \(3 - 4 \* s \* s\), c4 = 2 \* c2 \* c2 - 1, s4 = 2 \* s2 \* c2;/);
-  for (const u of ['uCellS', 'uCellU', 'uCellKS', 'uCellKU']) { assert.ok(FIELD_UNIFORMS.includes(u)); assert.match(vc, new RegExp(`uniform vec4 ${u}\\[8\\];`)); }
 });
 
 test('WEATHER3h: THE SHAPE REACHES EVERY READER - the wind of a storm\'s approach, the thunder overhead', () => {

@@ -1,9 +1,5 @@
-// SERPENT4 (2026-10-11, the players' thread "Serpent boss fight" in feature-feedback - "too slow and boring", "the snake
-// is way too strong for the small amount of people who do it", "make the wind go crazy where the serpent stands", "let
-// players on the ship be able to hurt it", "make it huge", "The fact they block ships getting in after a while is
-// stupid", "the game just pushed me away from the snake ... like sailing through molasse", "ships need some kind of
-// larger invisible box aura", "Rewards based on party or individual damage should be given on death"): THE SERPENT
-// REWORKED (bible/11-Multiplayer/Sea-Serpent.md section 16). Its waters open until it dives; a sixth off its health; its
+// SERPENT4: THE SERPENT
+// REWORKED. Its waters open until it dives; a sixth off its health; its
 // throws and the canvas they tear halved; its girth SERPENT_GIRTH times; a part dealt earns, a quarter of the fight
 // stood earns, and a party shares a dealer's kill; its gale; the ships' bumpers (retired by HULL-PASS - the pin below); a hand's own weapons on its hide. Each
 // pin failed on the build before it. tools/mutants/serpent4.json.
@@ -144,8 +140,6 @@ test('SERPENT4 a party shares its kill ("Rewards based on party or individual da
     assert.equal(hub.store.has(`${SERPENT_RC_PREFIX}acct-lone`), false, 'no party, no share');
     assert.ok(kin.sent.some((m) => m.t === 'serpent' && m.k === 'rcpt' && readSerpentReceipt(m.r)?.s === 'acct-peer-0007'), 'handed to her socket');
   } finally { Date.now = realNow; }
-  // the cell says its kin with the kill
-  assert.ok(readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8').includes('kin: serpentBrain.serpentKinOf(f)'));
 });
 
 // ═══ ITS GALE ═════════════════════════════════════════════════════════════════════════════════════
@@ -244,8 +238,6 @@ test('SERPENT4 a hand\'s own weapons ("also let players on the ship be able to h
   assert.deepEqual(validSerpentIn({ k: 'hit', d: 12, z: 0, r: 1 }), { k: 'hit', d: 12, z: 0, r: 1 });
   assert.deepEqual(validSerpentIn({ k: 'hit', d: 12, z: 0 }), { k: 'hit', d: 12, z: 0 });
   assert.equal(validSerpentIn({ k: 'hit', d: 12, z: 0, r: 2 }), null);
-  assert.ok(src('../server/src/index.js').includes('SERPENT_SEAM.hit(f, a.sub, m.d, m.r, pose, now, null, { z: m.z })'), 'the relay hears its `r`');   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
-  assert.ok(src('../src/net/bossSeam.js').includes('applySerpentHit(f, sub, d, o.z, pose, now, r === 1)'), 'the seam hands the brain the word\'s `r` 1 as a hand\'s own weapons');
 });
 
 test('SERPENT4 a hand\'s weapons on the client: its segments are a hand\'s marks only while no ship of my own is under me; a blow of mine on one is gathered into its own word of its zone (`r` 1), never into the guns\'; a shaft of mine whose step passes through a box stops in it and is handed to the host - an enemy\'s is not; a harmful missile of mine meets a box mark (mutants: the marks to a captain; the hand\'s word without its `r`; the shaft flying through; an enemy shaft handed)', () => {
@@ -274,7 +266,7 @@ test('SERPENT4 a hand\'s weapons on the client: its segments are a hand\'s marks
   const magic = src('scenes/hostMagic.js');
   assert.ok(/if \(m\.duel\) \{\n {8}const hitBox = boxMarksFor\(m\.spell\)\.find\(\(q\) => missileInBox\(m\.pos, q\.box\)\);/.test(magic));
   const world = src('scenes/world.js');
-  for (const wired of ['boxMarks: () => serpentHost?.handBoxes?.() ?? null,', 'castAtBox: (sp, q, caster) => serpentSpell.cast(sp, q, caster),', 'boxTargets: serpentHost?.handBoxes?.() ?? null,', 'onPlayerArrowHitBox: (m, t) => serpentArrowOn(m, t),']) assert.ok(world.includes(wired), wired);   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper, for the paths' riders; PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): the door in scenes/gate/standInSpell.js createSerpentSpell
+  for (const wired of ['boxMarks: () => serpentHost?.handBoxes?.() ?? null,', 'castAtBox: (sp, q, caster) => serpentSpell.cast(sp, q, caster),', 'boxTargets: serpentHost?.handBoxes?.() ?? null,', 'onPlayerArrowHitBox: (m, t) => serpentArrowOn(m, t),']) assert.ok(world.includes(wired), wired);
 });
 
 // ═══ the client rig ═══════════════════════════════════════════════════════════════════════════════

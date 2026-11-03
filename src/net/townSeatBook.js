@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEAT1a (2026-09-30, Mac: "Finish the seats") — THIS DEVICE'S SEATS:
+// SEAT1a — THIS DEVICE'S SEATS:
 // whether the seats are open to this account (the service's SEATS_OPEN),
 // the seats the witnesses confirmed as the service last said them, and
 // the seat this client stands in reported once a UTC day
-// (bible/11-Multiplayer/Seats-Arc.md 3.2: "A client standing in a seat
+// (3.2: "A client standing in a seat
 // town online reports {key, name, region, tier, pixel} once a day").
 //
 // A seat is DRAWN off the client's own derivation (systems/town/townSeats.js):
@@ -52,7 +52,7 @@ export const SEAT_WATCH_KEY = 'seat1.watch';
 export const SEAT_WATCH_HELD_MAX = 60;
 /** SEAT1b: the longest a held receipt waits before the kept ones are claimed, ms. */
 export const SEAT_WATCH_CLAIM_EVERY_MS = 10 * 60_000;
-/** STORM-SHED (2026-10-06 evening, the account service overloaded a second time - "D1 DB is overloaded"): HOW LONG A
+/** STORM-SHED: HOW LONG A
  *  WATCH CLAIM THAT FAILED WAITS BEFORE THE NEXT, ms - doubling with each failure in a row to SEAT_WATCH_CLAIM_EVERY_MS,
  *  jittered (net/backoff.js), and an answer lets it go. The claim is asked each frame and keeps its receipts through a
  *  failure, so the frame after a failed answer claimed again: in the outage's two hours /v1/seats/watch was asked 5,587
@@ -63,7 +63,7 @@ export const SEAT_RED_SEEN_KEY = 'crown2.redSeen';
 export const SEAT_RED_SEEN_MAX = 100;
 /** CROWN2: how often an online client reads the seats' list again for the server's red lines, ms. */
 export const SEAT_RED_READ_MS = 15 * 60_000;
-/** D1-LOAD (2026-10-11, the service slow after SEAT-LEASE): THE TURNING'S READ SPREAD - each client asks its list once the
+/** D1-LOAD: THE TURNING'S READ SPREAD - each client asks its list once the
  *  seat week turns (AUDIT FESTIVAL S1), and every client online asked it in the same second; each now waits its own
  *  share of this window, drawn once a book, so the reads arrive over two minutes. */
 export const SEAT_TURN_READ_SPREAD_MS = 120_000;
@@ -526,7 +526,7 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (r.data?.repeat) return { ok: true, text: `Work on the ${name} at ${seat.name} was already begun.`, forts };
       return { ok: true, text: `Work on the ${name} at ${seat.name} is begun toward grade ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} silver from the treasury. Seat writs deliver what they need.`, forts };
     },
-    /** DOMAIN1 (bible/11-Multiplayer/Domains.md 5): WHERE THIS CHARACTER'S GUILD GIVES in `region` (`/v1/seats/gifts`) -
+    /** DOMAIN1 (5): WHERE THIS CHARACTER'S GUILD GIVES in `region` (`/v1/seats/gifts`) -
      *  `{ data: { place, key, contents, recent }, error }`, `place` 'stockpile' (the seat it holds), 'camp' (the seat it
      *  pledged this week) or null (neither). Read afresh each time the tab is: a gift, a delivery or the Levy moves it. */
     async gifts(region) {

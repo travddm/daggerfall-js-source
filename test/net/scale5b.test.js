@@ -1,5 +1,4 @@
-// SCALE5b (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance", then "I wanna do every single slice"; bible/11-Multiplayer/Scale-Arc.md SCALE5b): THE
+// SCALE5b: THE
 // RELAY'S HYGIENE AND THE WIRE'S SECOND FORM. Part one, the second wire's poses: a socket whose hello says `w2` hears
 // the room's poses batched (wire.js POSE_BATCH_MS) and slim (wire.js slimPose); a socket that says nothing hears every
 // pose as it always has, byte for byte. Held here over the real Room on the pins' fake object (test/fakeRoom.mjs) and
@@ -311,14 +310,6 @@ test('SCALE5b the client: a frame batch is read frame by frame as if each came a
   });
 });
 
-test('SCALE5b the world host asks the second wire on every socket the page holds - the presence session (its halo with it) and each chat link (mutants: the presence session\'s; a link\'s)', () => {
-  const world = src('src/scenes/world.js');
-  const links = world.match(/new OnlineSession\(\{[^\n]*presence: false[^\n]*\}\)/g) ?? [];
-  assert.ok(links.length >= 2, 'the chat links and the hall');
-  for (const l of links) assert.match(l, /wire2: true/, l.slice(0, 80));
-  assert.match(world, /wave: pageWave,[^\n]*\n\s+wire2: true,/, 'the presence session');
-});
-
 // ═══ PART THREE: THE RELAY'S HYGIENE ════════════════════════════════════════════════════════════════════════════════
 
 /** A story of a room's sockets - hellos, a reconnect replacing its own id, closes said and unsaid, wakes, the clock past
@@ -472,10 +463,8 @@ test('SCALE5b the foes fan, a method of its own with the budget asked before its
         await R.hello(ws, `f-${String(i).padStart(4, '0')}`, { x: (BX + far + rnd()) * PIXEL_UNITS, y: 0, z: (499 - BY + rnd()) * PIXEL_UNITS, yaw: 0, pitch: 0 });
         socks.push(ws);
       }
-      // PIN MOVED (FOES-FIRST, Scale-Arc.md FOES-FIRST): every frame here is FULL and comes a second or more after its
       // sender's last, so it goes first - its floor is minus FOES_FULL_RESERVE, and the bucket stands that far lower
       // (it read byteGate's law, the floor at 0, for every frame alike). test/net/fb1021_foesfirst.test.js holds the rest.
-      // PIN MOVED (FOES-HOLD, Scale-Arc.md FOES-HOLD): a full frame the budget refuses is HELD for its turn, not dropped -
       // each round here starts with an empty hold (the turns are test/net/fb1021b_foeshold.test.js's), and a refusal is
       // counted held.
       const { floorGate, inRange, FOES_ROOM_BYTES_PER_S, FOES_FULL_RESERVE } = relay;
@@ -582,8 +571,8 @@ test('SCALE5b the metrics point: a socket refused \'room full\' is counted - the
 
 test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most RELAY_CFG_VALUE_MAX, or null (handed back to the var); the one in force is the hub\'s, else the var; a developer alone may set one; /relay\'s words (mutants: a name not a setting\'s; the bound unasked; null refused; the var over the hub\'s; a Dungeon Master let in)', async () => {
   const C = await import('../../src/net/relayCfg.js');
-  assert.deepEqual(C.RELAY_CFG_KEYS, ['bossBody', 'gateRole', 'serpentRole', 'sdRole', 'gateThread', 'serpentThread', 'sdThread', 'egThread', 'ktRole', 'ktThread', 'egDrain', 'groundGate', 'grantMode', 'grantRoll', 'grantStrip', 'grantDoor', 'cellSeed', 'leaseDoor', 'lootDoor', 'sdCollapse']);   // PIN MOVED (SD-PARTY, world275: sdCollapse - on, a party's win collapses the Hour for everyone); PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor - a loot room refuses a build that reads less loot, off until the site serves it); PIN MOVED (COST-2 part two, world262: cellSeed - the level the cell directory seeds its tree at, off until the site serves the build that says cv); PIN MOVED (KETCH, world253: the Sky-Ketch's herald's role and thread); PIN MOVED (HERALD-CARDS, net/herald/heraldCard.js: the four heralds' threads, beside the roles); PIN MOVED (LEASE1, net/roomLease.js: leaseDoor - a lease room refuses a build that hands on no lease, off until the site serves it); PIN MOVED (GRANT-DOOR, Spawn-Grants.md section 20: grantDoor); PIN MOVED (GRANT8-GRANT9, Spawn-Grants.md section 16: grantRoll and grantStrip, each off until a developer sets it); PIN MOVED (GRANT2, bible/11-Multiplayer/Spawn-Grants.md section 12: grantMode, the spawn grants' law); PIN MOVED (GROUND-GATE, bible/01-Overview/bugs/Field-Bugs-2026-10-17f.md): the old ground's door - a ground room refuses a build on an older ground while it is on; PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 22): THE DRAIN's switch - the Spire's road shut while a deploy drains it
-  assert.deepEqual(Object.values(C.RELAY_CFG_VARS), ['BOSS_BODY', 'GATE_DISCORD_ROLE', 'SERPENT_DISCORD_ROLE', 'SD_DISCORD_ROLE', 'GATE_DISCORD_THREAD', 'SERPENT_DISCORD_THREAD', 'SD_DISCORD_THREAD', 'EG_DISCORD_THREAD', 'KT_DISCORD_ROLE', 'KT_DISCORD_THREAD', 'EG_DRAIN', 'GROUND_GATE', 'GRANT_MODE', 'GRANT_ROLL', 'GRANT_STRIP', 'GRANT_DOOR', 'CELL_SEED', 'LEASE_DOOR', 'LOOT_DOOR', 'SD_COLLAPSE']);   // PIN MOVED (SD-PARTY): sdCollapse's var; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): lootDoor's var; PIN MOVED (COST-2 part two): its var; PIN MOVED (KETCH): their vars; PIN MOVED (HERALD-CARDS): their vars; PIN MOVED (LEASE1): its var; PIN MOVED (GRANT-DOOR): its var; PIN MOVED (GRANT8-GRANT9): their vars; PIN MOVED (GRANT2): GRANT_MODE, the spawn grants' law; PIN MOVED (GROUND-GATE): the old ground's door's var
+  assert.deepEqual(C.RELAY_CFG_KEYS, ['bossBody', 'gateRole', 'serpentRole', 'sdRole', 'gateThread', 'serpentThread', 'sdThread', 'groundGate', 'grantMode', 'grantRoll', 'grantStrip', 'grantDoor', 'cellSeed', 'leaseDoor', 'lootDoor', 'sdCollapse']);
+  assert.deepEqual(Object.values(C.RELAY_CFG_VARS), ['BOSS_BODY', 'GATE_DISCORD_ROLE', 'SERPENT_DISCORD_ROLE', 'SD_DISCORD_ROLE', 'GATE_DISCORD_THREAD', 'SERPENT_DISCORD_THREAD', 'SD_DISCORD_THREAD', 'GROUND_GATE', 'GRANT_MODE', 'GRANT_ROLL', 'GRANT_STRIP', 'GRANT_DOOR', 'CELL_SEED', 'LEASE_DOOR', 'LOOT_DOOR', 'SD_COLLAPSE']);
   assert.deepEqual(C.validRelayCfgIn({ k: 'gateRole', v: '1555589839825670258' }), { k: 'gateRole', v: '1555589839825670258' });
   assert.deepEqual(C.validRelayCfgIn({ k: 'bossBody', v: null }), { k: 'bossBody', v: null });
   assert.deepEqual(C.validRelayCfgIn({ k: 'bossBody', v: 'x'.repeat(C.RELAY_CFG_VALUE_MAX) })?.v.length, C.RELAY_CFG_VALUE_MAX);
@@ -597,8 +586,7 @@ test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most
   assert.equal(C.relayCfgValue(null, env, 'gateRole'), '1');
   assert.equal(C.relayCfgValue([], {}, 'sdRole'), undefined);
   assert.equal(C.mayRelayCfg(['dev']), true);
-  for (const g of [['dm'], ['shadowfang'], ['mod'], [], null, 'dev']) assert.equal(C.mayRelayCfg(g), false, String(g));
-  assert.equal(C.relayCfgSupported('world191'), false, 'main\'s WARDEN1 relay takes none (PIN MOVED: world192 at the merge)'); assert.equal(C.relayCfgSupported('world192'), true); assert.equal(C.relayCfgSupported('x'), false);
+  for (const g of [['dm'], ['herald'], ['mod'], [], null, 'dev']) assert.equal(C.mayRelayCfg(g), false, String(g));
   const { parseStaffCommand, STAFF_HELP_LINES } = await import('../../src/net/staffCommands.js');
   assert.deepEqual(parseStaffCommand('/relay'), { cmd: 'relay' });
   assert.deepEqual(parseStaffCommand('/relay bossbody {"enforce": true}'), { cmd: 'relay', k: 'bossBody', v: '{"enforce": true}' });
@@ -608,71 +596,7 @@ test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most
   assert.ok(STAFF_HELP_LINES.some((l) => l.startsWith('/relay')));
 });
 
-test('SCALE5b the hub keeps a developer\'s setting - in its storage, in force for its herald at once - answers what is now in force, and refuses anyone else in words; outside the hub the frame is junk; a boss\'s room reads the hub\'s at its beat, at most every RELAY_CFG_TTL_MS, and its count runs by it (mutants: the glyph unasked; the setting unkept; the herald kept; the hand-back ignored; the room never asking; asking every beat)', async () => {
-  const C = await import('../../src/net/relayCfg.js');
-  const realNow = Date.now;
-  let clock = 1_800_000_000_000;
-  Date.now = () => clock;
-  try {
-    await quiet(async () => {
-      const W = (await import('../fakeRoom.mjs')).fakeRooms({ now: () => clock });
-      const H = W.room('chat:world');
-      H.env.GATE_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/123456789/abcDEF_-x';
-      H.env.GATE_DISCORD_ROLE = '111111111111111111';
-      H.env.BOSS_BODY = '';
-      const join = async (id, glyphs) => { const ws = H.connect(); clock += 300; await H.hello(ws, id, null, glyphs ? { glyphs } : {}); assert.equal(ws.closed, null); ws.sent.length = 0; return ws; };
-      const dev = await join('dev-0001', ['dev']);
-      const dm = await join('dm-0001', ['dm']);
-      assert.equal(H.room._heraldOf().role, '111111111111111111', 'the var, while the hub holds nothing');
-      const say = async (ws, k, v) => { clock += 5000; await H.raw(ws, JSON.stringify({ t: 'cfg', k, v })); return ws.sent.filter((f) => f.t === 'cfg').at(-1); };
-      assert.deepEqual(await say(dm, 'gateRole', '222222222222222222'), { t: 'cfg', k: 'gateRole', error: 'only a developer may change the relay\'s settings' });
-      assert.equal(dm.closed, null, 'and nobody struck');
-      assert.deepEqual(await say(dev, 'gateRole', '222222222222222222'), { t: 'cfg', k: 'gateRole', v: '222222222222222222' });
-      assert.deepEqual(await H.state.storage.get('relaycfg'), { gateRole: '222222222222222222' }, 'kept in the hub\'s storage');
-      assert.equal(H.room._heraldOf().role, '222222222222222222', 'the herald\'s at once');
-      assert.equal(H.room._heraldOf().serpentRole, '222222222222222222', 'and the roles that fall back to it');
-      H.wake();
-      assert.equal(H.room._heraldOf().role, '111111111111111111', 'a woken hub, its settings not yet read: the var');
-      await H.room._relayCfgOf();
-      assert.equal(H.room._heraldOf().role, '222222222222222222', 'a woken hub reads it back - and its herald with it');
-      const body = JSON.stringify({ enforce: true, body: { depth: 0.5, perS: 0.02 } });
-      const dev2 = await join('dev-0002', ['dev']);
-      assert.deepEqual(await say(dev2, 'bossBody', body), { t: 'cfg', k: 'bossBody', v: body });
-      // a boss's room: the hub's line at its beat, asked again only past RELAY_CFG_TTL_MS
-      const G = W.room('world:9,9');
-      G.env.BOSS_BODY = '';
-      assert.equal(G.room._bodyLine().enforce, false, 'the var\'s line before it asks');
-      let asked = 0;
-      const hub = W.made.get('chat:world');
-      const fetch0 = hub.room.fetch.bind(hub.room);
-      hub.room.fetch = (req) => { if (new URL(req.url).pathname === C.RELAY_INTERNAL_CFG) asked++; return fetch0(req); };
-      await G.room._relayCfgFresh(clock);
-      assert.equal(asked, 1);
-      assert.equal(G.room._bodyLine().enforce, true, 'the hub\'s line, from its beat on');
-      assert.equal(G.room._bodyLine().body.depth, 0.5);
-      await G.room._relayCfgFresh(clock + C.RELAY_CFG_TTL_MS - 1);
-      assert.equal(asked, 1, 'not again inside RELAY_CFG_TTL_MS');
-      assert.deepEqual(await say(dev2, 'bossBody', null), { t: 'cfg', k: 'bossBody', v: '' }, 'handed back to the var - which is empty');
-      await G.room._relayCfgFresh(clock + C.RELAY_CFG_TTL_MS);
-      assert.equal(asked, 2);
-      assert.equal(G.room._bodyLine().enforce, false, 'the var\'s again');
-      // outside the hub the frame is junk
-      const ws = G.connect(); clock += 300; await G.hello(ws, 'dev-0003', null, { glyphs: ['dev'] });
-      await G.raw(ws, JSON.stringify({ t: 'cfg', k: 'gateRole', v: '1' }));
-      assert.equal(G.room._meterOf(ws).junk, 1);
-      assert.equal(await G.state.storage.get('relaycfg'), undefined);
-      // every boss's beat asks before it judges: the gate's court, an Abyss realm's Remnant, a serpent's cell
-      const relay = src('server/src/index.js');
-      for (const tick of ['async _gateTick() {', 'async _sdFightTick() {', 'async _serpentTick() {']) {
-        const body = relay.slice(relay.indexOf(tick), relay.indexOf('\n  }\n', relay.indexOf(tick)));
-        // PIN MOVED (AUDIT SCALE II R1-2): asked, never awaited - a slow hub froze the beat (test/net/auditscale2_relay.test.js)
-        assert.match(body, /const now = Date\.now\(\);\n\s+void this\._relayCfgFresh\(now\);/, `${tick} asks the hub at its beat`);
-      }
-    });
-  } finally { Date.now = realNow; }
-});
-
-test('SCALE5b the client: a session sends a relay setting only on the hub\'s link to a relay that takes one, reads the hub\'s answer from the hub alone; the world host runs /relay for a developer alone and hands the answer to the tab that asked (mutants: the version unasked; the answer from any room; the developer unasked)', async () => {
+test('SCALE5b the client: a session sends a relay setting only on the hub\'s link, reads the hub\'s answer from the hub alone; the world host runs /relay for a developer alone and hands the answer to the tab that asked (mutants: the answer from any room; the developer unasked)', async () => {
   await quiet(() => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000, rand: () => 0, presence: false });
@@ -680,41 +604,32 @@ test('SCALE5b the client: a session sends a relay setting only on the hub\'s lin
     s.onRelayCfg = (m) => heard.push(m);
     s.join('chat:world');
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world191', now: 1_000_000 });
-    assert.equal(s.sendRelayCfg({ k: 'gateRole', v: '1' }), false, 'a relay before it takes none - main\'s WARDEN1 world191 among them (PIN MOVED: world192 at the merge)');
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world192', now: 1_000_000 });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, now: 1_000_000 });
     assert.equal(s.sendRelayCfg({ k: 'gateRole', v: '1' }), true);
     assert.equal(s.sendRelayCfg({ k: 'nope', v: '1' }), false);
     assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'cfg', k: 'gateRole', v: '1' });
     sockets[0].receive({ t: 'cfg', k: 'gateRole', v: '1' });
     assert.deepEqual(heard, [{ k: 'gateRole', v: '1' }]);
   });
-  const world = src('src/scenes/world.js');
-  assert.match(world, /if \(c\.cmd === 'relay'\) \{[\s\S]{0,300}if \(!mayRelayCfg\(staffGlyphs\(\)\)\) \{ say\('Only a developer may change the relay\\'s settings\.'\); return; \}/);
-  assert.match(world, /relayCfgTab = tabId;\s*if \(!relayCfgLink\?\.sendRelayCfg\(\{ k: c\.k, v: c\.v \}\)\)/);
-  assert.match(world, /if \(tab\.room === SOCIAL_ROOM\) \{\s*relayCfgLink = link;[^\n]*\n\s*link\.onRelayCfg = \(m\) => chatLog\.push\(relayCfgTab \?\? tab\.id,/);
 });
 
 // ═══ PART FIVE: THE RELAY'S WORD OF ITS REFEREES, FOR A HALO ═════════════════════════════════════════════════════════
 
-test('SCALE5b the relay\'s referee word: a cell that judges the poses reaching it - a duel, the Wild zone, a serpent\'s fight - says so in its welcome (`rf`), and when that moves says it to the second wire\'s sockets, once (mutants: the welcome\'s word unsaid; the change unsaid; said every pose; said to the first wire)', async () => {
-  const { newWildRef } = await import('../../src/net/wild/wildRef.js');
+test('SCALE5b the relay\'s referee word: a cell that judges the poses reaching it - a duel, a serpent\'s fight - says so in its welcome (`rf`), and when that moves says it to the second wire\'s sockets, once (mutants: the welcome\'s word unsaid; the change unsaid; said every pose; said to the first wire)', async () => {
   await cell(async ({ R, w2, w2b, old, said, speak, rnd }) => {
     const rf = (ws) => ws.sent.filter((f) => f.t === 'rf');
     await speak(said[0], drawn(rnd));
     assert.equal(rf(w2).length, 0, 'nothing to say while nothing judges');
-    R.room._wildRef = newWildRef();
-    R.room._wildRef.fighters.set('acct-nobody', { id: 'nobody' });
+    R.room._serpents = new Map([['s0', { players: {} }]]);
     await speak(said[0], drawn(rnd));
     await speak(said[1], drawn(rnd));
     for (const ws of [w2, w2b]) assert.deepEqual(rf(ws), [{ t: 'rf', on: 1 }], 'said once, as it began');
     assert.deepEqual(rf(old), [], 'never to the first wire');
     const ws = R.connect(); await R.hello(ws, 'late-0001', drawn(rnd), { w2: 1 });
     assert.equal(ws.sent.find((f) => f.t === 'welcome').rf, 1, 'a newcomer\'s welcome says it');
-    R.room._wildRef.fighters.clear();
     R.room._serpents = new Map([['s1', { players: {} }]]);
     await speak(said[2], drawn(rnd));
-    assert.equal(rf(w2).length, 1, 'a serpent\'s fight judges as the zone did - nothing moved');
+    assert.equal(rf(w2).length, 1, 'a serpent\'s fight judges the same - nothing moved');
     R.room._serpents = new Map();
     await speak(said[2], drawn(rnd));
     assert.deepEqual(rf(w2).at(-1), { t: 'rf', on: 0 }, 'and said as it ended');
@@ -734,8 +649,8 @@ test('SCALE5b the session hears the relay\'s referee word: a halo whose cell say
       s.setHalo([`world:${Math.floor(BX / 16) + 1},${Math.floor(BY / 16)}`]);
       for (const ws of sockets) ws.open();
       const [cellWs, haloWs] = sockets;
-      cellWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world192', now: t });
-      haloWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], v: 'world192', now: t, ...(rf ? { rf: 1 } : {}) });
+      cellWs.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'ann-0002', name: 'Ann' }], now: t });   // not alone: lone sleep holds no pose
+      haloWs.receive({ t: 'welcome', id: 'mac-0001', peers: [], now: t, ...(rf ? { rf: 1 } : {}) });
       const sentPoses = (ws) => ws.sent.filter((x) => x.startsWith('{"t":"pose"')).length;
       const c0 = sentPoses(cellWs), h0 = sentPoses(haloWs);
       const heard = [];

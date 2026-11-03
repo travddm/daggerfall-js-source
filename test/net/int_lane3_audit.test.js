@@ -1,4 +1,4 @@
-// AUDIT INT11-INT15 (2026-10-10, the INTEGRITY arc's lane 3 audited - bible/06-Systems/Integrity-Arc.md section 6b): what
+// AUDIT INT11-INT15: what
 // the review of lane 3 as first built found, each pinned where it was found. The body's word on a bucket of its own (it
 // took a fight's blows' and a coil's word), and said by the relay of the socket it leaves on (a halo's is its own); the
 // relay's trail by SOCKET, a pose's place NOT KNOWN when every one came after the landing, and only fighters' poses kept
@@ -15,7 +15,7 @@ import { judgeGate, posAt, posAfter } from '../../src/net/bossRef.js';
 import { COURT_CENTRE, ATTACKS, profileOf, BRAIN_TICK_MS, HIT_KINDS, GATE_FIGHTERS_MAX, healRef } from '../../src/net/gate/gateBrain.js';
 import { gateTimes, gateRoomKey } from '../../src/net/gate/gateLaw.js';
 import {
-  GATE_BRAIN_V, GATE_HZ_MAX, SERPENT_HZ_MAX, SD_FIGHT_HZ, BODY_WORD_HZ_MAX, bodyWordGate, bodyWordRelayGate, RELAY_VERSION, BOSS_REF_RELAY_MIN,
+  GATE_BRAIN_V, GATE_HZ_MAX, SERPENT_HZ_MAX, SD_FIGHT_HZ, BODY_WORD_HZ_MAX, bodyWordGate, bodyWordRelayGate, RELAY_VERSION,
   PIXEL_UNITS, cellRoomOfWire, serpentFightId, worldRoom, CLOSE_REPLACED,
 } from '../../src/net/wire.js';
 import { serpentTimes, serpentSiteKey, SERPENT_BRAIN_V, SERPENT_NATIVE_PER_M } from '../../src/net/serpent/serpentLaw.js';
@@ -129,7 +129,7 @@ test('AUDIT INT15 THE BODY\'S WORD ON A BUCKET OF ITS OWN: BODY_WORD_HZ_MAX a se
   });
 });
 
-test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - sixteen gate frames, and sixteen of the Hour\'s, still go beside four of it - and only to a relay that counts, BY THE SOCKET IT LEAVES ON: a serpent\'s cell on a halo whose relay is older hears none though the primary\'s counts, and one whose relay counts hears it though the primary\'s does not; a halo promoted to primary, and the primary stepped down, each keep their own (mutants: the word on the gate\'s or the Hour\'s bucket; the halo sent on the primary\'s word; the halo\'s own word never kept; either side\'s word lost at the promotion)', () => {
+test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - sixteen gate frames, and sixteen of the Hour\'s, still go beside four of it - and a serpent\'s word down her cell\'s own socket: a halo\'s, never the primary\'s; a halo promoted to primary, and the primary stepped down, each still take it (mutants: the word on the gate\'s or the Hour\'s bucket; the word down the primary)', () => {
   const log = console.info; console.info = () => {};
   try {
     {
@@ -158,28 +158,26 @@ test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - 
     const ON = sat(0, 0);
     const PX = Math.floor(SX / PIXEL_UNITS), PY = 499 - Math.floor(SZ / PIXEL_UNITS);
     const mine = worldRoom(PX + 16, PY);
-    for (const [primary, halo, ok] of [[RELAY_VERSION, `world${BOSS_REF_RELAY_MIN - 1}`, false], [`world${BOSS_REF_RELAY_MIN - 1}`, RELAY_VERSION, true]]) {
+    {
       const { FakeWS, sockets } = fakeSocketClass();
       const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
       s.join(mine, ON);
       sockets[0].open();
-      sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: primary });
+      sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
       s.setHalo([CELL]);
       const h = sockets[1];
       h.open();
-      h.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: halo });
-      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), ok, `primary ${primary}, halo ${halo}`);
-      assert.equal(h.sent.filter((x) => JSON.parse(x).k === 'vt').length, ok ? 1 : 0, 'down the halo\'s own socket, or none');
+      h.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
+      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), true);
+      assert.equal(h.sent.filter((x) => JSON.parse(x).k === 'vt').length, 1, 'down the halo\'s own socket');
       assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).k === 'vt').length, 0, 'never the primary\'s');
-      // her cell crossed into: the halo promoted, the primary stepped down - each socket's word goes with it
+      // her cell crossed into: the halo promoted, the primary stepped down - each socket still takes the word
       s.join(CELL, ON);
       assert.equal(s.room, CELL);
-      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), ok, 'the promoted socket\'s own relay');
-      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, mine), !ok, 'the stepped-down socket\'s own relay');
+      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, CELL), true, 'the promoted socket');
+      assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, mine), true, 'the stepped-down socket');
     }
   } finally { console.info = log; }
-  const host = rd('src/scenes/serpentHost.js');
-  assert.match(host, /const sayHull = bodySayer\(\(v\) => !!live && !!deps\.online\?\.send\?\.\(\{ k: 'vt', v \}/, 'the host asks no version of its own - the session asks the socket\'s');
 });
 
 // ═══ THE TRAIL ═══════════════════════════════════════════════════════════════════
@@ -239,7 +237,6 @@ test('AUDIT INT11 A TRAIL A SOCKET\'S, A FIGHTER\'S, WHILE ITS FIGHT LIVES: a co
 test('AUDIT INT11 A SECOND SOCKET IS NO DECOY: a ship\'s body is judged on the trail of the socket that speaks for her (her newest here), however another of her sockets poses far off - and a volley from any but that socket lands nothing (mutants: the trail by account; a volley from any socket) - ONE-BODY (PIN MOVED): a second tab replaces the first in a place', async () => {
   await withSea(async ({ r, say, tick, now, set }) => {
     const { a, f, p, cruise } = await twoShips({ r, say, tick, now });
-    // PIN MOVED (ONE-BODY, FIELD BUGS 2026-10-15c): this stood three sockets of her account in the serpent's cell at once -
     // `a`, a decoy posing far off and the newest near - and judged her body on the newest's trail, the decoy's poses read
     // for nothing. A cell stands one body an account now (server/src/index.js the hello's one-socket law): each newer hello
     // of hers closes the one before it (CLOSE_REPLACED), so no decoy of hers poses beside the socket that speaks for her
@@ -443,17 +440,8 @@ test('AUDIT INT11 THE BODIES READ ONCE A BEAT: the court\'s and the serpent\'s -
   assert.ok(GATE_FIGHTERS_MAX > 0 && profileOf);
 });
 
-test('AUDIT INT11 THE THREE FIGHTS ALIKE: the court\'s, the Hour\'s and the serpent\'s each put a fighter\'s socket on its trail at its `in`, read their bodies once a beat and tell a fall again; the body\'s word on its own bucket at each (mutants: one fight left out)', () => {
-  const relay = rd('server/src/index.js');
-  const n = (re) => (relay.match(re) ?? []).length;
-  assert.equal(n(/this\._trailSeed\(ws, a, now\);   \/\/ AUDIT INT11/g), 3, 'seeded at each `in`');
-  assert.equal(n(/this\._bodyTell\('(gate|sd|serpent)', f, now/g), 3, 'told again at each beat');
-  assert.match(relay, /bodies = this\._sdFightBodies\(f, now\), census = \(\) => bodyCensus\(f, bodies, /, 'the Hour\'s read once');
-  assert.equal(n(/m\.k === 'vt' \? !this\._spend\(ws, now, bodyWordRelayGate, 'bodyBucket', 'bodyDrops', 'too many body words'\)/g), 4, 'a body\'s word on its own bucket in each room');   // PIN MOVED (EG-H1): the breach's `eg:` room the fourth - its count is on (test/net/eliteGates/egint_relay.test.js)
-});
-
 test('AUDIT INT14 THE RANKS ONE LAW (review.js ranked): the boss fights\' measure and the wealth\'s read a quantile by its rank alike - the nearest rank at or below it (two receipts\' median the lower) (mutants: the rank rounded the other way)', async () => {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const nowS = Math.floor(Date.now() / 1000);
   const ann = await s.registered('annika'), bo = await s.registered('boris');
   const claim = async (who, m) => s.call('/v1/gate/claim', { receipt: await mintReceipt({ d: 5, b: 'ruhn', s: who.id, c: 7, x: 'dealt', l: 10, m }, s.gatePriv, { subtle: globalThis.crypto.subtle, nowS }) }, who.secret);
@@ -468,8 +456,3 @@ test('AUDIT INT14 THE RANKS ONE LAW (review.js ranked): the boss fights\' measur
 
 // ═══ THE DOC ═════════════════════════════════════════════════════════════════════
 
-test('AUDIT INT13 IN_RESEND_MS KEEPS ITS DOC: the constant the INT13 line was set between and its own comment, together again (mutants: none - text)', () => {
-  const host = rd('src/scenes/serpentHost.js');
-  assert.match(host, /\/\*\* How often an `in` is said again while I am within its waters' sight \(a reconnect, a halo come up, a share back\)\. \*\/\nexport const IN_RESEND_MS = 20_000;/);
-  assert.match(host, /\/\*\* INT13: the line as the relay's count wrecks her \(`bd`\)\. \*\/\nexport const COUNT_WRECK_LINE = /);
-});

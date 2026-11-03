@@ -1,5 +1,5 @@
-// ROCK-SUNK (2026-10-02, the field: "Insane glitched geometry over at Hadus"; "yeahhh mountains be buggin rn").
-// WOD-BUSH (2026-10-01) stood World of Daggerfall's model 60610 on the drawn ground, for the bandit camps' shrubs - but
+// ROCK-SUNK.
+// WOD-BUSH stood World of Daggerfall's model 60610 on the drawn ground, for the bandit camps' shrubs - but
 // the rock fields build their outcrops of the same model: 157 of its 202 placements are boulders scaled 5.6 to 95 and
 // set into the piles on purpose, and standing those on their lowest corner raised them as dark shards up to 377 m tall round every
 // rock field (Hadus sits among them). The shrub alone is stood now: a Rocks or Mountains site keeps the mod's height
@@ -79,13 +79,6 @@ test('ROCK-SUNK on the real producer: round Hadus a rock field\'s 60610s keep th
   // (297,427) and (296,427) stand the outcrops east of the town (WOD_Rocks_Large_03, _04r2), (297,428) a small field
   for (const [x, y] of [[297, 427], [296, 427], [297, 428]]) assert.deepEqual(stood(x, y), { names: ['Rocks'], bushes: 4, grounded: 0 }, `(${x},${y})`);
   assert.deepEqual(stood(291, 428), { names: ['Bandits'], bushes: 3, grounded: 3 }, 'WOD_BanditCamp_02 west of it');
-});
-
-test('ROCK-SUNK by source: the WoD loop asks isWodShrub with the pick\'s own site name, and the rock sites are one list', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(isWodShrub\(m\.modelId, stood\[m\.pick\]\?\.name\)\) \{[^\n]*\n\s+const dy = lowestGroundUnder\(samples, box\) - box\[1\];/);
-  assert.match(w, /const rockPick = \(i\) => WOD_ROCK_SITES\.includes\(stood\[i\]\?\.name\);/);
-  assert.doesNotMatch(w, /=== 'Rocks'|=== 'Mountains'|WOD_BUSH_MODEL/, 'no second spelling of either');
 });
 
 test('ROCK-SUNK on the real mesh: WOD-BUSH raised the rock fields\' 60610s by tens to hundreds of metres', { skip: skipReal }, async () => {

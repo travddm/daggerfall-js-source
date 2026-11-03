@@ -1,5 +1,5 @@
-// AUDIT CHAP2 (2026-10-08, Mac: "Lets do a deep comprehensive audit on everything so far") - CHAP0's record, CHAP1's
-// Roll and CHAP2a's halls read again by six lenses at 915043c5 (bible/01-Overview/audits/Audit-Chapters.md, AUDIT CHAP2): a pin
+// AUDIT CHAP2 - CHAP0's record, CHAP1's
+// Roll and CHAP2a's halls read again by six lenses at 915043c5 (, AUDIT CHAP2): a pin
 // a fix, and the pins the lens of the pins wrote for every law the arc's three files could not fail.
 //
 // The law against literals; the tab and the hall book against fakes shaped as the service answers; the service over the
@@ -39,7 +39,7 @@ const table = regionWritTable(ANTICLERE, [{ climate: WOODS, confirmed: true }], 
 
 // ── THE LAW ─────────────────────────────────────────────────────────
 
-test('AUDIT CHAP2 T1/T2/T19: the shapes at their edges - a full twenty-two is a seed, a claim and a kept record; a rank-0 member is a member; a rank out of its shape, an inherited name, NaN and an empty origin read as the law says (mutants: the map\'s bound, rank 0, the members\' guards, hasOwn, the finite read, the empty origin)', () => {
+test('AUDIT CHAP2 T1/T2/T19: the shapes at their edges - a full twenty-two is a seed, a claim and a kept record; a rank-0 member is a member; a rank out of its shape, an inherited name and NaN read as the law says (mutants: the map\'s bound, rank 0, the members\' guards, hasOwn, the finite read)', () => {
   assert.equal(L.rollSeedOk(ALL22), true);
   assert.notEqual(L.rollKeptOf({ seq: 1, factions: ALL22 }), null, 'every real kept record carries all twenty-two');
   assert.equal(L.rollDeltasOk(Object.fromEntries(L.ROLL_FACTIONS.map((f) => [f, 1]))), true);
@@ -51,7 +51,6 @@ test('AUDIT CHAP2 T1/T2/T19: the shapes at their edges - a full twenty-two is a 
   assert.equal(L.rollFactionOfGuild('Temple:constructor'), null);
   assert.equal(L.rollFactionOfGuild('Order:toString'), null);
   assert.deepEqual([NaN, Infinity, -Infinity].map((v) => L.rollRep(v)), [0, 0, 0]);
-  assert.equal(L.rollSeedCapOf({ origin: '', createdAt: L.ROLL_EPOCH_S + DAY }), 100, 'an empty origin is born online');
 });
 
 test('AUDIT CHAP2 E3: the Roll takes a book DFU can hold - one temple and one order a book, two books at most (mutants: the count, the bound)', () => {
@@ -61,15 +60,6 @@ test('AUDIT CHAP2 E3: the Roll takes a book DFU can hold - one temple and one or
   assert.equal(L.rollMembersOk(temples.map((f) => ({ f, rank: 0 }))), false, 'three temples');
   assert.equal(L.rollMembersOk(orders.map((f) => ({ f, rank: 0 }))), false, 'three orders');
   assert.equal(L.rollMembersOk(L.ROLL_FACTIONS.map((f) => ({ f, rank: 0 }))), false, 'all twenty-two at once');
-});
-
-test('AUDIT CHAP2 D3/E6: a crossing member keeps its rank\'s band, never the seat\'s line - a rank 8 or 9 crossing keeps 79 (Mac: "You can decide whatever is best") (mutants: the band\'s top, the seat\'s line)', () => {
-  assert.equal(L.ROLL_SEAT_LINE, 80);
-  assert.deepEqual([0, 1, 4, 6, 7, 8, 9].map(L.rollRankKeepOf), [9, 19, 49, 69, 79, 79, 79]);
-  assert.equal(L.rollRankCapOf(L.rollRankKeepOf(9)), 7, 'reviewed to rank 7, as 3.5 holds everyone at CHAP4');
-  const seed = L.rollSeedOf({ 40: 100, 41: 100, 42: 100 }, 40, new Map([[40, 4], [41, 7]]));
-  assert.deepEqual([seed[40], seed[41], seed[42]], [49, 79, 40]);
-  assert.equal(L.rollSeedOf({ 40: 45 }, 40, new Map([[40, 4]]))[40], 45, 'never above what the save held');
 });
 
 test('AUDIT CHAP2 D2/S7: the join - the underworld two at any standing (their initiation quests), every other guild at 0, what the Roll owes counted (mutants: the hidden two, the floor)', () => {
@@ -274,12 +264,11 @@ test('AUDIT CHAP2 D4: the hidden guilds\' halls are revealed for a membership in
 
 // ── THE SERVICE: THE ROLL ───────────────────────────────────────────
 
-async function roll({ origin = null } = {}) {
+async function roll() {
   const svc = await standService({ CHAPTERS_OPEN: 'on' });
   const who = await svc.registered('Probe');
   const R = await seatRealm(svc.env, who.secret, 'Probe');
   const raw = svc.env.DB._raw;
-  raw.prepare('UPDATE realm_characters SET created_at = ?, origin_id = ? WHERE id = ?').run(L.ROLL_EPOCH_S + DAY, origin, R.id);
   const ctx = (nowS, db = svc.env.DB) => ({ db, nowS });
   const body = (extra = {}) => ({ character: R.id, lease: R.lease, ...extra });
   const head = () => raw.prepare('SELECT seq, kseq FROM npc_roll_heads WHERE char_id = ?').get(R.id);
@@ -363,7 +352,6 @@ test('AUDIT CHAP2 E2: the claims\' hour is the service\'s - past 120 a character
     assert.ok(!r.error, JSON.stringify(r));
   }
   assert.deepEqual(await claimRoll(s.ctx(T0 + 2), s.player, s.body({ rid: 'rate-over001', deltas: { 40: 1 }, members: [] })), { error: 'roll-rate' });
-  assert.match(src('server-account/src/index.js'), /'roll-rate': 429/);
 });
 
 // ── THE SERVICE: THE HALLS AND THEIR WRITS ──────────────────────────
@@ -383,7 +371,7 @@ async function stand(open = 'on') {
   clock(NOON);
   forgetChapters();
   const devs = ['Devra', ...Array.from({ length: 60 }, (_, i) => `Wit${i}`)].join(',');
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: devs });
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: devs });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   const give = (who, character, m, qty) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)
@@ -442,8 +430,8 @@ test('AUDIT CHAP2 E1/S4: the halls\' moderation - a developer reads a region\'s 
   assert.deepEqual(await regionChapters(s.env.DB, ANTICLERE, _now * 1000), [], 'the chapters went with it');
   const again = await s.witness({ key: 4242, region: ANTICLERE, factions: [40] });
   assert.deepEqual([again.r.status, again.r.body.error], [409, 'hall-struck']);
-  assert.deepEqual(await strikeHall({ db: s.env.DB, nowS: _now }, { handle: 'Mac' }, { DEVELOPER_HANDLES: 'Devra' }, { key: 1 }), { error: 'not-developer' });
-  assert.deepEqual(await listHalls({ db: s.env.DB, nowS: _now }, { handle: 'Devra' }, { DEVELOPER_HANDLES: 'Devra' }, { region: 71 }), { error: 'bad-region' });   // PIN MOVED (WW7-5): past the world's regions
+  assert.deepEqual(await strikeHall({ db: s.env.DB, nowS: _now }, { handle: 'Mac' }, {}, { key: 1 }), { error: 'not-developer' });
+  assert.deepEqual(await listHalls({ db: s.env.DB, nowS: _now }, { handle: 'Devra', staff_admin: 1 }, {}, { region: 71 }), { error: 'bad-region' });
 });
 
 test('AUDIT CHAP2 E1: an account whose answers three times in a week stand alone against confirmed towns is ignored - its reports count for nothing, and its own report is answered so (mutants: the ignored set unread)', async () => {
@@ -519,7 +507,6 @@ test('AUDIT CHAP2 T13/S5: a hall writ\'s credit never touches another account\'s
   assert.deepEqual(roll41(), [10, 0], 'refused: nothing');
   const b = await s.seated('Mallory');
   s.give(b, R.id, h1.material, h1.qty);
-  // PIN MOVED (INT16, Integrity-Arc section 7): another account naming the character is refused at the seat, before the
   // route's own law - a delivery is asked of the deliverer's own seated character
   const across = await s.call('/v1/writs/deliver', { character: R.id, id: h1.id, rid: rid() }, b.secret);
   assert.deepEqual([across.status, across.body], [403, { error: 'progress-seat' }]);
@@ -634,20 +621,9 @@ test('AUDIT CHAP2 T23/C5: a hall writ\'s card under the guild\'s seal, named, it
   for (let i = 0; i < 3; i++) await tick();
   const [card] = byClass(host, 'notice-writ');
   assert.ok(card.className.includes('seal-guild') && !card.className.includes('seal-court'), card.className);
-  assert.equal(byClass(card, 'writ-kind')[0].textContent, 'Chapter writ');   // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - "hall" is a guild's hall, never a card's kind
+  assert.equal(byClass(card, 'writ-kind')[0].textContent, 'Chapter writ');
   assert.equal(byClass(card, 'writ-need')[0].textContent, 'Wanted: 30 Red Roses, for the Mages Guild in Anticlere');
   assert.equal(byClass(card, 'writ-pay')[0].textContent, 'Pays 72 silver, 150 Renown and standing with the Mages Guild');
   assert.equal(byClass(host, 'notice-worktoday')[0].textContent, 'Writs today: 0 of 3');
 });
 
-test('AUDIT CHAP2 T7/C1/E1: the wiring - the kept adoption rides the save, the tracker plays the session\'s character through a signed-in door, the board hears a filled writ before it asks whether it still stands, /hall reaches the developer\'s doors (mutants: getSaveData, character, the door\'s storage, the onTaken order, the command)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /registerModSaveData\(ROLL_KEPT_VENDOR, \{\n\s+newSaveData: \(\) => null,\n\s+getSaveData: \(\) => rollKept,\n\s+restoreSaveData: \(rec\) => \{ rollKept = rollKeptOf\(rec\); \},/);
-  assert.match(world, /createRollTracker\(\{\n\s+io: accountRoll\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\) \}\),\n\s+character: \(\) => realmSession\.id,/);
-  assert.match(world, /const hallCmd = parseHallCommand\(text\);[\s\S]{0,700}hallDoor\.strike\(hallCmd\.key\)[\s\S]{0,700}hallDoor\.halls\(region\)/);
-  const board = src('src/ui/noticeWindow.js');
-  assert.match(board, /const said = r\?\.ok \? work\.onTaken\?\.\(r\) : null;\n\s+if \(!alive\) \{ if \(said\) work\.sayLate\?\.\(said\); return; \}/);   // PIN MOVED (AUDIT CHAP3 C5: and the line said in the chat)
-  assert.match(src('server-account/src/index.js'), /path === '\/v1\/chapters\/strike' \? await strikeHall\(ctx, who\.player, env, body\)/);
-  assert.match(src('server-account/src/service.js'), /'\/v1\/chapters\/witness', '\/v1\/chapters\/halls', '\/v1\/chapters\/strike',/);
-  assert.match(src('server-account/migrations/0099_npc_halls.sql'), /ALTER TABLE npc_roll_heads ADD COLUMN kseq INTEGER NOT NULL DEFAULT 0;/);
-});

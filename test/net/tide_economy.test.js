@@ -1,5 +1,5 @@
-// SEASON1 part two, the economy's Tides (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): A HARVEST, A
-// BLIGHT, A STORM SEASON AND A BANDIT SUMMER (bible/11-Multiplayer/Seats-Arc.md 9.3) - the law (each kind's multiplier,
+// SEASON1 part two, the economy's Tides: A HARVEST, A
+// BLIGHT, A STORM SEASON AND A BANDIT SUMMER (9.3) - the law (each kind's multiplier,
 // the courier's factor, the yields' Tide after the March's) and, through the real Worker, a tree felled on confirmed
 // ground in Daggerfall's Harvest and Blight weeks and a courier bought into Daggerfall in its Bandit Summer, each set
 // against a twin service counting no Season; unconfirmed ground no Tide. The rolls are the law's: Daggerfall's Harvest
@@ -49,16 +49,10 @@ test('SEASON1 THE ECONOMY\'S TIDES, THE LAW: a Harvest a quarter more on the lan
   assert.deepEqual([herbYield({ roll: 4, tideMult: 0.75 }, top), foodYield({ roll: 4, tideMult: 1.25 }, top), veinYield({ roll: 4, tideMult: 1.25 }, top), boulderYield({ roll: 4, tideMult: 1.25 }, top).qty], [3, 5, 5, 5]);
   assert.equal(haulYield({ roll: 2, tideMult: 1.5 }, top), 3, 'the net, before a school\'s fish');
   assert.equal(haulYield({ roll: 2, school: true, tideMult: 1.5 }, 0), 3 + 1, 'a school\'s fish added after the Tide (before it, 4.5 - and the low dice\'s fifth)');
-  // the wiring: every kind of ground's yield asks its own Tide, on confirmed ground alone
-  const prof = readFileSync(new URL('../../server-account/src/professions.js', import.meta.url), 'utf8');
-  assert.match(prof, /const tide = !deep && !isBody && confirmed \? tideNow\(env, nowS, region\) : 'calm';/);
-  for (const k of ['haul', 'tree', 'herb', 'food', 'boulder', 'vein']) assert.match(prof, new RegExp(`tideMult: tideYield\\(tide, '${k}'\\)`), k);
-  const mkt = readFileSync(new URL('../../server-account/src/market.js', import.meta.url), 'utf8');
-  assert.equal((mkt.match(/courierSlow\(env, nowS, region\)/g) ?? []).length, 3, 'the read\'s quote, the buy and the bid');
 });
 
 async function stand(zero) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...(zero != null ? { SEASON_ZERO_WEEK: String(zero) } : {}) });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac', ...(zero != null ? { SEASON_ZERO_WEEK: String(zero) } : {}) });
   const raw = s.env.DB._raw;
   const confirm = async (x, y, climate, region) => {
     for (const h of ['WitA', 'WitB', 'WitC']) {

@@ -1,6 +1,5 @@
 // @ts-check
-// WIND3 (2026-09-14, Mac: "World space wisps that indicate the direction
-// of wind") - THE WISPS: the wind, seen.
+// WIND3 - THE WISPS: the wind, seen.
 //
 // A wisp is a faint streak of air riding the wind: a thin quad stretched
 // along the wind's own velocity, born and gone over a couple of seconds
@@ -24,9 +23,8 @@
 // on the Features home, the pref `windWisps`, the player's own online);
 // `?wisps=off` is the kill door.
 //
-// WISPS-RETURN (2026-09-25, Mac: "I want to return to the original wind
-// wisps before our current design"): the streak is back. WIND5
-// (2026-09-23) had made each wisp a calligraphic flourish - a 40-segment
+// WISPS-RETURN: the streak is back. WIND5
+// had made each wisp a calligraphic flourish - a 40-segment
 // ribbon along an arched or S stroke that ended in a tightening curl,
 // drawn on and off along its path. That design is retired whole (the
 // path, the pen, the ink, the ribbon and the curl uniform), and a wisp is
@@ -116,20 +114,19 @@ void main(){
 export const WISP_BOX = 90;
 /** The most wisps the field draws, at a gale.
  *
- *  WIND4 (2026-09-15, Mac: "the wind wisps are far too many and the
- *  amount should be reduced"). This was 2400 in a 90 m box - about one
+ *  WIND4. This was 2400 in a 90 m box - about one
  *  wisp per three cubic metres of the air in front of you at a gale,
  *  which reads as a fog of streaks rather than as wind. The field's
  *  job is to make the DIRECTION legible, and that is carried by a few
  *  streaks moving together, not by filling the box: 650 at a gale,
  *  and a calm that is nearly clear.
  *
- *  WIND5 (2026-09-23, Mac: "lets reduce the amount of wind streaks"): 240, each wisp then a flourish; a calm 19.
+ *  WIND5: 240, each wisp then a flourish; a calm 19.
  *
- *  DISC17-A (2026-09-24, Mac: "I really want to give the wisps more opacity and reduce the amount of wind wisps"):
+ *  DISC17-A:
  *  120, half - fewer marks, each one twice as dark (WISP_LOOK's alpha); a calm keeps 10.
  *
- *  WISPS-RETURN (2026-09-25): the streak is back and this number stays. Mac asked for fewer twice, as the amount,
+ *  WISPS-RETURN: the streak is back and this number stays. Mac asked for fewer twice, as the amount,
  *  and the return was to the design. */
 export const WISP_MAX = 120;
 /** The share of WISP_MAX drawn in a dead calm - the floor that keeps
@@ -140,7 +137,7 @@ export const WISP_FLOOR = 0.08;
 /** WEATHER2d: A LOOK - the program in a dress. The wisps' own, and the
  *  sandstorm's: tan, dense, short streaks in a lower box, no floor (no
  *  sand without a storm), the front's intensity its strength. */
-export const WISP_LOOK = Object.freeze({ color: Object.freeze([0.86, 0.89, 0.94]), alpha: Object.freeze([0.09, 0.11]), len: Object.freeze([1.2, 1.8]), count: WISP_MAX, floor: WISP_FLOOR, box: WISP_BOX });   // SWAY-SOFT (2026-10-21, Mac: "the wind effect more subtle and transparent"): the alpha under half DISC17-A's 0.20, 0.24 (a gale's streak peaks at 0.20 where it was 0.44, a calm's at 0.09 where it was 0.20) and the streak three quarters of WIND3's 1.6, 2.4
+export const WISP_LOOK = Object.freeze({ color: Object.freeze([0.86, 0.89, 0.94]), alpha: Object.freeze([0.09, 0.11]), len: Object.freeze([1.2, 1.8]), count: WISP_MAX, floor: WISP_FLOOR, box: WISP_BOX });   // SWAY-SOFT: the alpha under half DISC17-A's 0.20, 0.24 (a gale's streak peaks at 0.20 where it was 0.44, a calm's at 0.09 where it was 0.20) and the streak three quarters of WIND3's 1.6, 2.4
 export const SAND_LOOK = Object.freeze({ color: Object.freeze([0.80, 0.64, 0.40]), alpha: Object.freeze([0.28, 0.30]), len: Object.freeze([0.8, 1.2]), count: 7000, floor: 0, box: 70 });
 
 /** How many wisps a wind of `strength01` draws: the floor plus the rest

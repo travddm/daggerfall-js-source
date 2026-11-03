@@ -1,4 +1,4 @@
-// AUDIT SHIPS (2026-10-06, Mac: "Audit everything" - PR #634's SAIL-FREE and SERPENT3; bible/01-Overview/audits/Audit-Ships.md):
+// AUDIT SHIPS:
 // THE SERPENT'S HALF. Each pin is one finding, fixed at its root: A1 it leads its marks and never closes slower than the
 // ship it closes on, so at SAIL-FREE's ways one ship alone still can't win and two can (Mac's call); C1 the ships fighting
 // it are the shares in its health, and a ship is the hull a fighter says she is on now; C2 a game told to reload is not
@@ -141,7 +141,7 @@ test('AUDIT SHIPS A1 it closes on a ship no slower than CLOSE_GAIN_V over her wa
   const f = fightOf([HULL.Carrack]);
   const at = (vz) => { f.players.s1.vx = 0; f.players.s1.vz = vz; return closeV(f, { sub: 's1' }); };
   assert.equal(at(0), CLOSE_V, 'a ship lying still: CLOSE_V');
-  // AUDIT 2 XD6 (2026-10-06): the law's own figures - read off CLOSE_GAIN_V itself, a gain of 6 passed as well as 8
+  // AUDIT 2 XD6: the law's own figures - read off CLOSE_GAIN_V itself, a gain of 6 passed as well as 8
   near(at(17.7), 25.7, 1e-9, 'a galleon at full sail in a 2 m/s wind');
   assert.equal(at(30), DASH_V, 'never past its dash');
   assert.equal(closeV(f, null), CLOSE_V);
@@ -247,7 +247,6 @@ test('AUDIT SHIPS C1 on the client: the `in` is said again AT ONCE when the ship
   assert.deepEqual(ins(), [HULL.Carrack], 'said once');
   R.step(100);
   assert.deepEqual(ins(), [HULL.Carrack], 'not again while nothing changes');
-  // PIN MOVED (AUDIT 2 XC7, 2026-10-06): at once - but never sooner than IN_CHANGE_MS after the last (a hull flapping each
   // frame said sixty a second and the cell's bucket dropped my volleys)
   R.board(null); R.step(100);
   assert.deepEqual(ins(), [HULL.Carrack], 'off her deck 200 ms after the last: held');
@@ -421,7 +420,7 @@ test('AUDIT SHIPS B4 a Rising Maw at a ship close ahead bursts on its mark: a wa
 /** Whole fights - two ships circling at `v` m/s and firing, on the beat and between beats (a blow is judged as it comes),
  *  on the coil while it holds (its head a seventh of the time), the coiled ship's word at the landing on her own machine,
  *  slain or sounding - folded by a client at each of `lags` (ms late): how far each drew its head from the relay's at the
- *  same moment, every 10 ms, and its whole body (its depth and its coil with it) every 50 ms. PIN MOVED (AUDIT 2 XB1/XD5,
+ *  same moment, every 10 ms, and its whole body (its depth and its coil with it) every 50 ms.
  *  2026-10-06): its step against the relay's own step in a 50 ms frame, at 150 ms and 13 m/s ships, read 0.028 m while
  *  the head was drawn 0.15 m off - a sideways snap keeps its step's length, and a frame dilutes it. */
 function laggedFights(lags, { seeds = 6, v = 26.5 } = {}) {
@@ -537,7 +536,7 @@ test('AUDIT SHIPS C3 the pair\'s share is carried blow to blow (shipHurt/crushHu
     for (let i = 0; i < n; i++) { const h = shipHurt(A, whole, k, carry); sum.hull += h.hull; sum.sail += h.sail; sum.crew += h.crew; }
     assert.equal(sum.crew, men, `${n} ${A.key}s: ${men} men`);
     near(sum.hull, n * (A.hull * whole.maxHull + A.base) * k, 0.5, `${A.key}: its hull`);
-    near(sum.sail, n * A.sail * SERPENT_CANVAS_X * whole.maxSail * k, 0.5, `${A.key}: its canvas`);   // PIN MOVED: SERPENT4 - the canvas a blow tears halved
+    near(sum.sail, n * A.sail * SERPENT_CANVAS_X * whole.maxSail * k, 0.5, `${A.key}: its canvas`);
   }
   const carry = { hull: 0, sail: 0, crew: 0 };
   assert.deepEqual(shipHurt(T.spit, whole, 1, carry), shipHurt(T.spit, whole), 'the whole as it was');

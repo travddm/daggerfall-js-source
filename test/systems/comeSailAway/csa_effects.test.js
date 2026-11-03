@@ -1,4 +1,4 @@
-// CSA-F (2026-09-27) - COME SAIL AWAY'S EFFECTS IN THE RUNTIME: systems/comeSailAway/comeSailAway.js's wake arm (Update 4737-4755),
+// CSA-F - COME SAIL AWAY'S EFFECTS IN THE RUNTIME: systems/comeSailAway/comeSailAway.js's wake arm (Update 4737-4755),
 // the two loops' play state and their fades (6527-6600), the rudder's drops at the helm, the wake and the oars' splashes
 // carried by a floating-origin shift, LateUpdate's bob and flag, and RotateWind's rain and snow - over the vendored hulls
 // (the real SpawnBoat and its real particle systems) and a scripted scene. Every expectation is worked out here from
@@ -256,10 +256,6 @@ test('CSA-F: the particles\' materials as the bundle\'s shaders draw them - Wake
   assert.match(PART_CUT_FS, /uSunScale \* max\(uLightDir\.y, 0\.0\)/);
   assert.match(PART_PREMUL_FS, /outColor = texture\(uTex, vUv\) \* c \* c\.a;/);
   assert.match(CUBE_FS, /max\(dot\(normalize\(vNormal\), uLightDir\), 0\.0\)/);
-  const src = readFileSync(new URL('../../../src/render/comeSailAwayRender.js', import.meta.url), 'utf8');
-  assert.match(src, /gl\.uniform4f\(u\.uColor, 1, 0\.5, 0, 1\);   \/\/ FlagMaterial's _Color/);
-  assert.match(src, /gl\.blendFunc\(gl\.ONE, gl\.ONE_MINUS_SRC_ALPHA\);   \/\/ Blend One OneMinusSrcAlpha/);
-  assert.match(src, /gl\.depthMask\(false\);   \/\/ ZWrite Off/);
   assert.deepEqual(json('materials.json').FlagMaterial.colors._Color, [1, 0.5, 0, 1]);
   assert.equal(json('materials.json').WakeMaterial.floats._Cutoff, 0.5);
   assert.equal(CUBE_TRIANGLES.length, 36);

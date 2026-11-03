@@ -1,10 +1,10 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT1c (2026-09-30, Mac: "Finish the seats") - THE TURNING: the week
+// SEAT1c - THE TURNING: the week
 // settled, the Charters claimed, the Contested seats and the Rights of
 // Siege named, the Legacy carried.
 //
-// bible/11-Multiplayer/Seats-Arc.md 5.2: "The Turning is never a job that
+// 5.2: "The Turning is never a job that
 // runs. The account service settles week N the first time anything asks
 // about any seat after N's boundary (settleWeek(N), one D1 transaction,
 // idempotent on town_seat_weeks.week - a second reader finds it
@@ -486,8 +486,7 @@ async function guildmastersOf(db, guilds) {
 /** THE SEATS AS THE MAP AND THE ARRIVAL NEED THEM: each listed seat with its holder and this week's battle at it (a
  *  Contested seat's Tourney, a held seat's siege), or null. SEAT1d: the holder with the Edict that rules this week (the
  *  client's shops, its arrival and its Festival read it), or null. And the day's red lines (seatPolitics.js redOf).
- *  SEAT-BATCH (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/
- *  Scale-Arc.md SEAT-BATCH): the six reads in ONE batch, where each was a round trip of its own - every list asked the
+ *  SEAT-BATCH: the six reads in ONE batch, where each was a round trip of its own - every list asked the
  *  primary seven times past its session's lookup, and the primary's ceiling is its round trips, not its rows. Answers
  *  `{ seats, red }`. */
 export async function seatsBoard(db, seats, nowS) {

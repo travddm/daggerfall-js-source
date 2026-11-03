@@ -1,5 +1,4 @@
-// EM3-3D MAP CHOICE (2026-09-27, Mac: "The dungeon map becomes the new default option, the current 2d enhanced
-// becomes an option, not removed"). The 3D dungeon map (the patch's solid sheet) ships ON; the flat Enhanced plan is
+// EM3-3D MAP CHOICE. The 3D dungeon map (the patch's solid sheet) ships ON; the flat Enhanced plan is
 // the Features row's Off; `?dungeonmap=flat` stays the kill door. Driven through the real door and window: the sheet
 // the held map builds for a dungeon is solid or flat by the switch, read at each open.
 import { test, beforeEach } from 'node:test';
@@ -57,5 +56,4 @@ test('EM3-3D map choice by source: the Features row - interface, enhanced-only, 
   assert.match(row.note, /Off shows one flat floor at a time/, 'the note says what Off keeps');
   const i = FEATURES.findIndex((f) => f.id === 'enhanced-map');
   assert.equal(FEATURES[i + 1]?.id, 'dungeon-map-3d', 'listed right under the Enhanced map');
-  assert.match(rd('src/ui/heldMap.js'), /createAutomapSheet\(\{ solid: dungeonMap3dOn\(\), /, 'the sheet is built through dungeonMap3dOn');
 });

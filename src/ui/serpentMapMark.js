@@ -1,10 +1,9 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): THE SERPENT'S RING ON THE HELD MAP - the gate's
+// SERPENT1: THE SERPENT'S RING ON THE HELD MAP - the gate's
 // ring's twin (ui/gate/gateMapMark.js), read by its own reader (readGateMark - the same `{day, cx, cy, r, label, phase, tip}`
 // from systems/serpent/serpentOmen.js mapMark()) and painted by its own painter (ui/ink/inkMap.js paintGateRing) in the sea's colours.
 // The host hands the held map `serpent: () => mark|null`; the classic region page draws no serpent (a province's sheet
 // shows little of the open sea it hunts) - the held map, the chat and the compass say where it is. Design:
-// bible/11-Multiplayer/Sea-Serpent.md section 2.
 //
 // Not a DFU member. Ledger A (SERPENT1).
 

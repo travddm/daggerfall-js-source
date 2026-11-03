@@ -1,5 +1,4 @@
-// DEX6 (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 12; Mac, 2026-10-19: "I want to implement this as our
-// next mod 1:1") - THE EQUIPMENT. BestiaryMod.Start takes EnemyEntity.AssignEnemyEquipment over (BestiaryMod.cs:194,
+// DEX6 - THE EQUIPMENT. BestiaryMod.Start takes EnemyEntity.AssignEnemyEquipment over (BestiaryMod.cs:194,
 // :2121-2131): while Roleplay & Realism: Items' realisticEnemyEquipment is on (read at the mod's start,
 // DEX_RRICompat.OnStart) the mod's own copy of RRI's class arm kits a foe (DEX_RRICompat.cs), and otherwise ItemHelper's
 // arm does. Start runs after every mod's Init - RRI writes the delegate in its Awake - so the mod's is the one that

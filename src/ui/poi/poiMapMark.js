@@ -1,5 +1,5 @@
 // @ts-check
-// POI-2 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md): A POI'S MARK ON BOTH WORLD MAPS - every approved POI whose
+// POI-2: A POI'S MARK ON BOTH WORLD MAPS - every approved POI whose
 // document asks for one (`marker.show`), a circle on its pixel with its label, from the moment an approver lets it into
 // the world; a builder's own draft on the builder's own maps (POI-3).
 //

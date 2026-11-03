@@ -132,10 +132,9 @@ const inRect = ([rx, ry, rw, rh], x, y) => x >= rx + BANK_PANEL_X && y >= ry + B
  *                    token verbatim
  *   ownsHouse(), ownsShip(), housesForSale(), isPortTown(), houseSellPrice()
  *   ownedHouseResolved() -> AUDIT 64 F26: GetBuildingSummary's bool
- *   crossedDeed(kind) -> RESTORE: the bank's words for a deed that came through customs, or null
  *   housesFull()   -> HOUSES-3: the region holds its three houses (Buy House refuses)
- *   houseOffers()  -> HOUSES-3: the region's houses the bank buys back in this town, each { price, crossed } (crossed:
- *                    the customs' words, or null), offered in turn; sellHouse(i) sells the i-th. A host with none
+ *   houseOffers()  -> HOUSES-3: the region's houses the bank buys back in this town, each { price }, offered in
+ *                    turn; sellHouse(i) sells the i-th. A host with none
  *                    offers the one house the four hooks above name (Daggerfall's one house a region)
  *   openPurchase()  -> H2: mounts the purchase window; false if it cannot
  *   onClose()
@@ -354,29 +353,23 @@ export class BankWindow {
       return;
     }
     if (name === 'sellShip') {
-      const crossed = this.hooks.crossedDeed?.('ship');   // RESTORE: nor a ship
-      if (crossed) { this._lines(crossed); return; }
       const ship = this.hooks.ownedShip?.() ?? -1;
       const d = sellDecision('ship', { owns: ship >= 0, price: shipSellPrice(ship) });
       if (d.kind === 'offer') this._popup(d.result, d.price);
     }
   }
 
-  /** The house a host of Daggerfall's one house a region names, as an offer list: RESTORE's crossed words, else DFU's three
-   *  nested conditions (AUDIT 64 F26) - owned, a directory, the key resolved in it - or none. */
+  /** The house a host of Daggerfall's one house a region names, as an offer list: DFU's three nested conditions
+   *  (AUDIT 64 F26) - owned, a directory, the key resolved in it - or none. */
   _oneHouseOffer() {
-    const crossed = this.hooks.crossedDeed?.('house');
-    if (crossed) return [{ crossed }];
     const resolved = this.hooks.ownedHouseResolved?.() === true;
-    return this.hooks.ownsHouse?.() && resolved ? [{ price: this.hooks.houseSellPrice?.() ?? 0, crossed: null }] : [];
+    return this.hooks.ownsHouse?.() && resolved ? [{ price: this.hooks.houseSellPrice?.() ?? 0 }] : [];
   }
 
   /** HOUSES-3: THE TOWN'S HOUSES, OFFERED IN TURN from `from` - Yes sells the one offered (sellHouse(i)), No offers the next.
-   *  One the bank does not buy back is passed by (RESTORE: online, what came through customs), and said only where it
-   *  was all there was to offer; none at all is Daggerfall's silence (:443-451 has no else). */
+   *  None at all is Daggerfall's silence (:443-451 has no else). */
   _offerHouse(offers, from = 0) {
     for (let i = from; i < offers.length; i++) {
-      if (offers[i].crossed) continue;
       const d = sellDecision('house', { owns: true, price: offers[i].price ?? 0 });
       this._popup(d.result, d.price);
       if (offers.length > 1) this.box.rows = [...this.box.rows, { text: houseOfferText(i + 1, offers.length), center: true }];
@@ -384,8 +377,6 @@ export class BankWindow {
       this.box.onNo = () => this._offerHouse(offers, i + 1);
       return;
     }
-    const crossed = from === 0 ? offers.find((o) => o.crossed)?.crossed : null;
-    if (crossed) this._lines(crossed);
   }
 
   _dismissBox(button = null) {

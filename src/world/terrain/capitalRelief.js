@@ -1,6 +1,5 @@
 // @ts-check
-// SOLITUDE-RELIEF (2026-10-27, bible/03-World/Arena-Provinces.md; a departure from DFU's BlendLocationTerrain, as
-// RUMARE-WATER's capitalSea.js is) - A CAPITAL ON A RELIEF OF ITS OWN (CAPITAL_RELIEFS: Solitude's world/solitudeRelief.js).
+// SOLITUDE-RELIEF - A CAPITAL ON A RELIEF OF ITS OWN (CAPITAL_RELIEFS: Solitude's world/solitudeRelief.js).
 // Its blocks stand on its streets' level (`flat`, terrainGen.js's flatten) and every vertex of its pixel on the relief:
 // the sea's where the relief is at the sea - its blocks lay their water there alone (solitudeGroundTile), a Daggerfall
 // block's pond stays on its tier (read as the sea, it sank a 46 m pit into the Well District) - else the relief's height;

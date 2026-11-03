@@ -1,4 +1,4 @@
-// STUDIO1 (2026-10-17, bible/07-Rendering/Studio-Art.md): THE STUDIO'S FOLDER - what an artist may drop in, what the
+// STUDIO1: THE STUDIO'S FOLDER - what an artist may drop in, what the
 // game is served, and what they are handed to start from.
 //
 //   F1  the folder as it stands passes its own check - the gate every pull request that brings a picture runs - and

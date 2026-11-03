@@ -1,6 +1,6 @@
 // @ts-check
 // FIELD BUGS 2026-10-21d PASSAGE-HANDS (Harlander, the Discord's #bug-reports, "Booked ocean passage ...": "You can steer
-// the ship as if it was yours"). A booked ship is her master's, never the player's (bible/03-World/Passage.md, "What she
+// the ship as if it was yours"). A booked ship is her master's, never the player's (, "What she
 // is not") - but Come Sail Away sails only the boat at whose helm the player stands, so the passage puts its passenger
 // there (`passageHost.js` book: StartSailing) and her master is the Overworld crossing's hand on that helm (OWS2,
 // `systems/seaHelm.js`). The mod's one input seam (`world.js`'s `input`) ORed the player's keys, the helm panel's buttons

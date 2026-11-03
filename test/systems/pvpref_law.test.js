@@ -1,24 +1,23 @@
-// PVP-REF (2026-10-01, Mac: "Finish the seats"; "Continue"): THE REFEREE'S LAW (net/siege/siegeRef.js) - its copied tables
+// PVP-REF: THE REFEREE'S LAW (net/siege/siegeRef.js) - its copied tables
 // pinned EQUAL to DFU's own (characters/weapons.js, combat/formulas.js, combat/playerWeapon.js - the leaf's law: the
 // relay bundles every byte it imports, so the tables are copied, never imported), 6.1's buckets against DFU's damage
 // ranges for every weapon and material, and every refusal of a blow, a cast and a step.
-// bible/11-Multiplayer/Seats-Arc.md 6.1; `06-Systems/Online-Arc.md` PVP-REF.
+// 6.1; `06-Systems/Online-Arc.md` PVP-REF.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   SIEGE_ROOM, siegeRoomKey, isSiegeRoom, siegeOfRoom, SIEGE_VITALITY, siegeVitality, SIEGE_UNITS_PER_M, SIEGE_REACH, SIEGE_HIT, SIEGE_BLOWS_HZ,
-  SIEGE_CASTS, SIEGE_SPEED, SIEGE_WAVE_MS, SIEGE_PROTECT_MS, SIEGE_FIGHTERS_MAX, SIEGE_WEAPONS, SIEGE_WEAPON_MAX, SIEGE_THUNDERLOCK,
+  SIEGE_CASTS, SIEGE_SPEED, SIEGE_WAVE_MS, SIEGE_PROTECT_MS, SIEGE_FIGHTERS_MAX, SIEGE_WEAPONS, SIEGE_WEAPON_MAX,
   SIEGE_MATERIAL_MOD, SIEGE_FIST_MAX, SIEGE_BONUS, SIEGE_BONUS_MAX, SIEGE_CRIT_MAX, siegeBlowMax, siegeIsBow, siegeHeld, newFighter,
   refereeBlow, refereeCast, refereeStep, siegeNextWave, siegeRise,
 } from '../../src/net/siege/siegeRef.js';
 import { WEAPONS, WEAPON_MATERIALS, weaponMaxDamage, weaponMaterialModifier } from '../../src/characters/weapons.js';
-import { THUNDERLOCK_TEMPLATE } from '../../src/characters/thunderlockIds.js';
 import { damageModifier, handToHandMaxDamage } from '../../src/combat/formulas.js';
 import { pcaaoDamageModifier } from '../../src/combat/pcaao.js';
 import { rrDamageModifierClassic } from '../../src/systems/roleplayRealism/rrRealism.js';
 import { WEAPON_REACH, SWING_MODS } from '../../src/combat/playerWeapon.js';
 import { NATIVES_PER_M } from '../../src/net/duel/duelSession.js';
-import { validSiegeIn, SIEGE_KINDS, SIEGE_OUT_KINDS, SIEGE_DMG_WIRE_MAX, SIEGE_HZ_MAX, relaySupportsSiege, parseClient } from '../../src/net/wire.js';
+import { validSiegeIn, SIEGE_KINDS, SIEGE_OUT_KINDS, SIEGE_DMG_WIRE_MAX, SIEGE_HZ_MAX, parseClient } from '../../src/net/wire.js';
 import { RENOWN_MAX } from '../../src/net/identityToken.js';
 import { runSpeed } from '../../src/player/motor.js';
 import { MAX_STAT_VALUE } from '../../src/systems/statMods.js';
@@ -32,7 +31,6 @@ test('PVP-REF THE TABLES ARE DFU\'S: every weapon template\'s top and every mate
   const ids = Object.entries(WEAPONS).filter(([k]) => k !== 'Arrow');
   assert.deepEqual(Object.entries(SIEGE_WEAPONS), ids, 'the same templates, by name');
   for (const [, w] of ids) assert.equal(SIEGE_WEAPON_MAX[w], weaponMaxDamage(w), `template ${w}`);
-  assert.deepEqual([SIEGE_THUNDERLOCK.template, SIEGE_THUNDERLOCK.max], [THUNDERLOCK_TEMPLATE, weaponMaxDamage(THUNDERLOCK_TEMPLATE)]);
   assert.deepEqual([...SIEGE_MATERIAL_MOD], Object.values(WEAPON_MATERIALS).filter((m) => m >= 0).map(weaponMaterialModifier));
   assert.equal(SIEGE_FIST_MAX, handToHandMaxDamage(100));
   assert.equal(SIEGE_BONUS.strength, Math.floor((100 - 50) / 5), 'FormulaHelper.DamageModifier(100), stock');
@@ -49,10 +47,10 @@ test('PVP-REF THE BUCKETS (6.1: "DFU\'s own damage range for that weapon at that
   for (const [, w] of Object.entries(SIEGE_WEAPONS)) {
     for (let m = 0; m <= 9; m++) assert.equal(siegeBlowMax(w, m), (weaponMaxDamage(w) + weaponMaterialModifier(m) + SIEGE_BONUS_MAX) * SIEGE_CRIT_MAX, `${w}/${m}`);
   }
-  assert.deepEqual([siegeBlowMax(123, 9), siegeBlowMax(113, 0), siegeBlowMax(-1, 0), siegeBlowMax(null, 0), siegeBlowMax(9999, 0), siegeBlowMax(560, 9)], [124, 80, 112, 112, 0, 134]);
+  assert.deepEqual([siegeBlowMax(123, 9), siegeBlowMax(113, 0), siegeBlowMax(-1, 0), siegeBlowMax(null, 0), siegeBlowMax(9999, 0)], [124, 80, 112, 112, 0]);
   assert.equal(siegeBlowMax(113, 42), (6 + 0 + 35) * 2, 'a material past the table: no modifier');
-  assert.deepEqual([siegeIsBow(129), siegeIsBow(130), siegeIsBow(560), siegeIsBow(123), siegeIsBow(-1)], [true, true, true, false, false]);
-  const look = { items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }, { templateIndex: 102, group: 'Armor', equipSlot: 21, material: 9 }] };   // PIN MOVED (AUDIT-SEATS): R8 - held is in a hand (the right's 19; the armour in the left's 21 is still no weapon)
+  assert.deepEqual([siegeIsBow(129), siegeIsBow(130), siegeIsBow(123), siegeIsBow(-1)], [true, true, false, false]);
+  const look = { items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }, { templateIndex: 102, group: 'Armor', equipSlot: 21, material: 9 }] };
   assert.deepEqual(siegeHeld(look, 123, 9), { w: 123, m: 9 });
   assert.equal(siegeHeld(look, 123, 8), null, 'another material than the one held');
   assert.equal(siegeHeld(look, 102, 9), null, 'armour is no weapon');
@@ -65,8 +63,8 @@ test('PVP-REF THE ROOM AND VITALITY: `siege:<seat>:<week>`; 300 + 2 x Renown, th
   assert.equal(siegeOfRoom('nope'), null);
   assert.ok(SIEGE_ROOM.test('siege:0:0'));
   assert.deepEqual([siegeVitality(1), siegeVitality(50), siegeVitality(99), siegeVitality(0), siegeVitality(undefined), siegeVitality(12.9), siegeVitality(-5)], [302, 400, 400, 302, 302, 324, 302]);
-  assert.deepEqual([...SIEGE_KINDS], ['in', 'blow', 'cast', 'ask', 'yes']);   // CROWN1 part two: a Royal Tourney's challenge and accept (PIN MOVED)
-  assert.deepEqual([...SIEGE_OUT_KINDS], ['st', 'hp', 'fell', 'up', 'back', 'no', 'f', 'end', 'ask', 'bout', 'bend', 'lad', 'won']);   // SEAT2a: the battle's field and its end (PIN MOVED); CROWN1 part two: a Royal Tourney's (PIN MOVED)
+  assert.deepEqual([...SIEGE_KINDS], ['in', 'blow', 'cast', 'ask', 'yes']);   // CROWN1 part two: a Royal Tourney's challenge and accept (
+  assert.deepEqual([...SIEGE_OUT_KINDS], ['st', 'hp', 'fell', 'up', 'back', 'no', 'f', 'end', 'ask', 'bout', 'bend', 'lad', 'won']);   // SEAT2a: the battle's field and its end (
   assert.deepEqual(validSiegeIn({ k: 'in', junk: 1 }), { k: 'in' });
   assert.deepEqual(validSiegeIn({ k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 40, r: 0, x: 1 }), { k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 40, r: 0 });
   assert.deepEqual(validSiegeIn({ k: 'blow', to: 'peer-0002', w: -1, m: 0, d: 4, r: 1 }), { k: 'blow', to: 'peer-0002', w: -1, m: 0, d: 4, r: 1 });
@@ -82,7 +80,6 @@ test('PVP-REF THE ROOM AND VITALITY: `siege:<seat>:<week>`; 300 + 2 x Renown, th
   assert.deepEqual(parseClient(JSON.stringify({ t: 'siege', k: 'in' }), { hasHello: true }), { t: 'siege', k: 'in' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'siege', k: 'in' })), { error: 'siege before hello' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'siege', k: 'heal' }), { hasHello: true }), { error: 'bad siege' });
-  assert.deepEqual([relaySupportsSiege('world145'), relaySupportsSiege('world148')], [false, true]);
 });
 
 test('PVP-REF THE BLOW: both standing, the weapon the look holds, its kind its own (a bow a shaft), the reach (2.5 m and 3 of slack; a shaft 60), four a second (one second deep, spent first), a fighter just risen untouched; the damage clipped to the bucket and the vitality left; a fall at none (mutants: each refusal; the clip; the fall; the rate\'s refill)', () => {
@@ -108,7 +105,7 @@ test('PVP-REF THE BLOW: both standing, the weapon the look holds, its kind its o
   now += 1000;
   assert.equal(refereeBlow(a, b, { from: null, at: at(2), held: dk, d: 1 }, now).why, 'reach', 'a striker with no pose');
   assert.equal(refereeBlow(a, a, { from: at(0), at: at(0), held: dk, d: 1 }, now).why, 'no-fighter');
-  now += 5000;   // PIN MOVED (BAL8, bible/05-Combat/Balance-Arc.md section 14): past the referee's 5 s harm window - the blows above spent its 180
+  now += 5000;
   b.hp = 30;
   const kill = blow({ d: 60 });
   assert.deepEqual([kill.dealt, kill.fell, b.hp, b.down], [30, true, 0, true], 'never past what is left');
@@ -144,7 +141,7 @@ test('PVP-REF THE CAST AND THE STEP: three damaging casts a 5 s, each to 60; a h
   now += SIEGE_CASTS.windowMs;
   assert.equal(cast({}).ok, true, 'the window passed');
   assert.equal(b.hp, 302 - 240);
-  assert.deepEqual(cast({ heal: true }), { ok: true, dealt: -40, fell: false, why: null }, 'a heal, 40 at most');
+  assert.deepEqual(cast({ heal: true }), { ok: true, dealt: -40, fell: false, why: null, dry: false }, 'a heal, 40 at most');
   assert.equal(b.hp, 102);
   a.hp = 290;
   assert.equal(refereeCast(a, a, { from: at(0), at: at(0), d: 100, heal: true }, now).dealt, -12, 'never past whole, on oneself');

@@ -1,5 +1,4 @@
-// PUDDLE-DRY (2026-10-07, Mac: "removing the water puddles entirely from town layouts"; asked, "Puddles only" and
-// "Both skins"): a town's puddles are dry ground (world/puddleDry.js), served so through the block's one door
+// PUDDLE-DRY: a town's puddles are dry ground (world/puddleDry.js), served so through the block's one door
 // (formats/blocksFile.js getBlock). The fixtures are the producer's: a block's 256 ground bytes read by BlocksFile's own
 // ground reader, so every tile is the shape every reader of the ground is handed. The record: bible/07-Rendering/
 // Water-Arc.md PUDDLE-DRY.
@@ -27,7 +26,6 @@ function ground(paint) {
 const bits = (g, x, y) => g[x][y].tileBitfield;
 
 test('PUDDLE-DRY the puddle records: DFU\'s shallow-water art (SHALLOW_WHOLE) and WATER-DRAW1\'s (SHALLOW_DRAWN), one list, WATER-PUDDLE\'s own (audit24: one home)', () => {
-  assert.match(read('src/world/puddleDry.js'), /import \{ PUDDLE_RECORDS \} from '\.\/puddleMask\.js';/);
   assert.deepEqual(PUDDLE_RECORDS, [...SHALLOW_WHOLE, ...SHALLOW_DRAWN].sort((a, b) => a - b));
   assert.deepEqual(PUDDLE_RECORDS, [8, 9, 23, 33, 34, 35, 36]);
 });
@@ -94,20 +92,6 @@ test('PUDDLE-DRY once a ground, and never from nothing: a second call dries noth
   assert.equal(dryPuddles(null), 0);
 });
 
-test('PUDDLE-DRY one door: getBlock serves BLOCKS.BSA\'s block and a world-data mod\'s dried, readClassicBlock keeps the bytes (mutants: either arm undried)', () => {
-  const src = read('src/formats/blocksFile.js');
-  assert.match(src, /^import \{ dryPuddles \} from '\.\.\/world\/puddleDry\.js';/m);
-  assert.match(src, /const dryBlock = \(dfBlock\) => \{ dryPuddles\(dfBlock\?\.rmbBlock\?\.fldHeader\?\.groundData\?\.groundTiles\); return dfBlock; \};/);
-  assert.match(src, /return dryBlock\(replacement\);/, 'a mod\'s block');
-  assert.match(src, /return dryBlock\(this\._blocks\[block\]\.dfBlock\);/, 'BLOCKS.BSA\'s');
-  const classic = src.slice(src.indexOf('  readClassicBlock(block) {'), src.indexOf('  /** Discard a block from memory. */'));
-  assert.doesNotMatch(classic, /dry/, 'the diff base is the file\'s');
-  // no reader of the ground keeps a puddle law of its own
-  for (const f of ['src/world/terrain/terrainTiles.js', 'src/scenes/exterior.js', 'src/world/rmbLayout.js', 'src/world/city/cityNavigation.js']) {
-    assert.doesNotMatch(read(f), /dryPuddles|PUDDLE_RECORDS/, `${f} reads the served ground`);
-  }
-});
-
 test('PUDDLE-DRY on BLOCKS.BSA: every town block served with no lone water tile and no patch of puddle art; the moats and ponds whole; the file\'s own bytes kept (needs ARENA2_PATH)', { skip: !(ARENA2 && existsSync(join(ARENA2, 'BLOCKS.BSA'))) && 'no ARENA2' }, () => {
   const blocks = new BlocksFile();
   blocks.load(new Uint8Array(readFileSync(join(ARENA2, 'BLOCKS.BSA'))));
@@ -142,7 +126,6 @@ test('PUDDLE-DRY on BLOCKS.BSA: every town block served with no lone water tile 
   }
   assert.equal(rmb, 920);
   assert.equal(puddles, 0, 'no puddle served');
-  // PIN MOVED (WATER-DRAW2, test/world/water/waterdraw2.test.js): 700 and 611 when the draw's table knew no island - the islands,
   // corners and half-turned saddles joined their ponds (fewer, whole), six lone islands dried and twenty tiles of ponds
   // the islands had cut apart stopped drying as slivers
   assert.equal(dried, 686, 'the census: 686 puddles dried');

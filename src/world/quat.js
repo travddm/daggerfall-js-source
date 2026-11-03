@@ -1,5 +1,5 @@
 // @ts-check
-// HCC (2026-09-23): THE QUATERNION, as Unity spells it - [x, y, z, w].
+// HCC: THE QUATERNION, as Unity spells it - [x, y, z, w].
 //
 // Horse Cart and Cargo poses its wagon with Quaternion.LookRotation over
 // the ground's normal, slerps it toward the next pose, turns each wheel

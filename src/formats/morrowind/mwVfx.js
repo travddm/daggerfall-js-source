@@ -1,4 +1,4 @@
-// MW-SPELLFX1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): A MORROWIND
+// MW-SPELLFX1: A MORROWIND
 // EFFECT MESH, RUNNING.
 //
 // Morrowind draws its magic with records that name meshes - an MGEF's casting, bolt, hit and area visuals, and

@@ -1,4 +1,4 @@
-// GP2 (2026-09-11): THE JOYSTICK CONTROLS WINDOW against
+// GP2: THE JOYSTICK CONTROLS WINDOW against
 // DaggerfallJoystickControlsWindow.cs, and the ORDERING that makes it
 // work (its staging is the grid's, saved at the grid's close).
 import { test } from 'node:test';

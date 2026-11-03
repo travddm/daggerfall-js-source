@@ -1,6 +1,4 @@
-// AUDIT MERGE-PLUS, LENS C (2026-09-26, the pre-merge audit of the Enhanced Plus patch - the pack's wear bars,
-// DBLEQUIP's double-click, LOCK1's lock and the hotbar's frames - walked in Chromium with a mouse and on a 430x860
-// phone). Eight findings, each fixed in the merge and each pinned here by DRIVING it: the pack is MOUNTED on the fake
+// AUDIT MERGE-PLUS, LENS C. Eight findings, each fixed in the merge and each pinned here by DRIVING it: the pack is MOUNTED on the fake
 // document (test/invdrag.mjs) and clicked with the browser's own `timeStamp` and `detail`, dragged by pointer, its
 // clock run by node's mock timers; the classic pack and counter are clicked through their own pick arms; the hotbar
 // is mounted on its dock and drawn frame by frame.
@@ -429,7 +427,7 @@ test('AUDIT MERGE-PLUS C8 the hotbar repaints a slot when its frame changes: Loo
       frame();
       assert.equal(slot().dataset.rarity, 'rare', 'and on again');
       assert.equal(slot().dataset.sigil, undefined);
-      sword.sigil = { power: 7, party: 1, xp: 0 };
+      sword.sigil = { power: 3, party: 1, xp: 0 };
       frame();
       assert.equal(slot().dataset.sigil, '', 'a sigil come to the piece: the rune');
       assert.equal(slot().title, 'Iron Longsword', 'nothing else the slot shows moved');

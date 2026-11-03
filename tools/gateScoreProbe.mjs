@@ -123,10 +123,9 @@ try {
   for (const key of ['war1', 'war2', 'war3', 'fell']) check(`${key}: never clipping, even at the highest MusicVolume`, db(r[key].peak) <= -6.03, `peak ${db(r[key].peak).toFixed(1)} dBFS here, ${(db(r[key].peak) + 6.02).toFixed(1)} at full volume`);
   // WB10a: and under its own ceiling (SCORE_PRESS: the dBFS it may reach at the highest MusicVolume)
   for (const key of ['war1', 'war2', 'war3', 'fell']) check(`${key}: under its ceiling of ${r[key].ceiling} dBFS at the highest MusicVolume`, db(r[key].peak) + 6.02 <= r[key].ceiling + 0.05, `${(db(r[key].peak) + 6.02).toFixed(2)} dBFS at full volume`);
-  // WBX9 (Mac: "The music needs to be louder and more intense"): over the game's own songs, which the same player renders
+  // WBX9: over the game's own songs, which the same player renders
   // at -28.7 (GDAY___D) to -41 dBFS (the dungeon's) - measured beside them when this was written; the score read
-  // -34.5 / -29.7 / -28.4 / -30.9 then, -25.6 / -22.1 / -21.5 / -22.9 after WBX9. WB10a (Mac: "make it more loud, just
-  // feel like its too quite"): pressed, -15.8 / -15.4 / -14.2 / -15.6 now (the drums' noise moves a peak ~0.4 dB a run)
+  // -34.5 / -29.7 / -28.4 / -30.9 then, -25.6 / -22.1 / -21.5 / -22.9 after WBX9. WB10a: pressed, -15.8 / -15.4 / -14.2 / -15.6 now (the drums' noise moves a peak ~0.4 dB a run)
   for (const [key, floor] of [['war1', -17], ['war2', -16.5], ['war3', -15.5], ['fell', -17]]) check(`${key}: loud - at least ${floor} dBFS`, r[key].meanDb >= floor, `${r[key].meanDb.toFixed(1)} dBFS`);
   check('the war grows with his phases', r.war2.meanDb > r.war1.meanDb && r.war3.meanDb > r.war2.meanDb - 0.5, `${r.war1.meanDb.toFixed(1)} / ${r.war2.meanDb.toFixed(1)} / ${r.war3.meanDb.toFixed(1)} dBFS`);
   // the law gives the fall SCORE_STING_MS (12.5 s): by then it has rung out

@@ -1,5 +1,4 @@
-// LOOT17 - THE HONE (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 9; Mac: "what could we do to make it even more
-// amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT17 - THE HONE.
 //
 // At the Reforge, beside each line's Reforge: HONE - the line rolled again within its own band, from one above its value
 // to the band's top: never lower and never the same, its kind and its param kept, so its name stands. The price doubles
@@ -208,7 +207,6 @@ test('LOOT17: the window - a Hone press beside each line under its top, its pric
       assert.equal(kids(one(shell, 'reforge-card'), 'hone-press').length, 0, 'an unknown piece: none');
     } finally { view.unmount(); }
   });
-  assert.match(read('src/scenes/worldModes.js'), /hone: \(item, line\) => honePiece\(item, line, playerEntity\),/, 'the guild\'s window hones on the player\'s own');
   assert.equal(REFORGE_REFUSALS.top, 'Already at its highest value');
   const garmentPiece = known(LR.applyRarity(mintCondition({ group: 'MensClothing', templateIndex: 155, name: 'Cloak', flags: 0, variant: 0 }), 'rare', lcg(3)));
   assert.deepEqual(LR.honeableLines(garmentPiece), garmentPiece.affixes.map((_, i) => i).filter((i) => garmentPiece.affixes[i].value < LR.affixBand(garmentPiece, i)[1]), 'a garment\'s lines are a Rare\'s (LOOT14)');

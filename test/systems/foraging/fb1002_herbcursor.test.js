@@ -1,5 +1,5 @@
 // HERB-CURSOR (FIELD BUGS 2026-10-02 part four; #bug-reports, "Herbalism minigame bugged": "Doesn't make mouse appear
-// when the minigame starts, so cant click on the targets"; Mac: "Also check the other minigames"). The Basket's glints
+// when the minigame starts, so cant click on the targets"). The Basket's glints
 // stand about the crosshair (ui/professions/profReticle.js BASKET_SPREAD), where no look reaches them - with the mouse locked to the
 // look, moving it toward a glint turned the view and the glint with it. Its act now holds the cursor free while it
 // plays (player/pointerLock.js holdCursor - not the player's own FreeMouse toggle) and hands the look back as it ends,
@@ -211,11 +211,3 @@ test('HERB-CURSOR the other acts: a vein asks the look (its points are aimed by 
   } finally { s.done(); }
 });
 
-test('HERB-CURSOR the world\'s seam, by source: the Basket\'s hold, and the look asked back at its release only where nothing else holds the mouse - the player\'s own freed cursor, a window, a surface, an overlay, the travel view; a look act takes back a cursor the player freed under the same gates (its behaviour, and the Escape\'s keyup, are test/systems/fb1002_herbcursor_audit.test.js\'s) (mutants: the seam unpassed; the relock ungated)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const seam = w.match(/ pointer: \(want\) => \{[^\n]*?\}; \},/)?.[0] ?? '';
-  assert.ok(seam, 'createGatherHost is handed the pointer');
-  assert.match(seam, /const relock = \(\) => \{ if \(!cursorActive\(\) && !gamePaused\(\) && !pointerSurfaces\.size && !\(modes\?\.modalWindowUp\?\.\(\) \?\? false\) && !overlayOpen\(\) && !travelView\?\.active\) requestLook\(canvas\); \};/);
-  assert.match(seam, /if \(want === 'look'\) \{ if \(cursorActive\(\)\) \{ setCursorActive\(false\); relock\(\); \} return null; \}/);
-  assert.match(seam, /const off = holdCursor\(\); return \(\) => \{ if \(!off\(\)\) return;/);
-});

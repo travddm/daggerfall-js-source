@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-27 HELM-SIGHT (bible/01-Overview/bugs/Field-Bugs-2026-10-27.md; the Discord's #bug-reports,
+// FIELD BUGS 2026-10-27 HELM-SIGHT (; the Discord's #bug-reports,
 // "Sailing Vessels Sometimes Have No Propulsion"): a party's journey holds the helm until its landing is sure
 // (scenes/world.js fastTravelTo), so the world re-anchored under a held helm. Her boat was hidden for the far pixel and
 // shown again on the way back, her sails' Animators started over stowed, and the helm still read them set: no way under

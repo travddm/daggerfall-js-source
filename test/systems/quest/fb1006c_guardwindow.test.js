@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-06c GUARD-WINDOW (bible/01-Overview/bugs/Field-Bugs-2026-10-06c.md; Aru on Discord: "So I picked up the
+// FIELD BUGS 2026-10-06c GUARD-WINDOW (; Aru on Discord: "So I picked up the
 // quest, the three hours passed, the mage disappeared, but no enemies showed up, so now I can't complete it ... I even
 // wondered around to check if the assassins would spawn"). N0B20Y02, "Protect an Honored Mage": `until _S.12_
 // performed: pc at _magesguild_ set _S.01_`, and `_S.01_` sends the three Nightblades once, at a random point in their

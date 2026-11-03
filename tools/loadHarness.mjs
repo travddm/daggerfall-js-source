@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// SCALE3 (2026-10-08, Mac: "Do 1 2 and 3"): THE LOAD HARNESS - a fleet of bots against the REAL relay and the REAL account
-// service, both in local workerd, at the real client's own rates, measured (bible/11-Multiplayer/Scale-Arc.md SCALE3).
+// SCALE3: THE LOAD HARNESS - a fleet of bots against the REAL relay and the REAL account
+// service, both in local workerd, at the real client's own rates, measured (SCALE3).
 //
 //   npm run load                                    50 bots, three minutes standing play
 //   node tools/loadHarness.mjs --bots 200 --minutes 5
@@ -205,7 +205,7 @@ export function localFetch({ port, ip = null, note = null, request = httpRequest
   };
 }
 
-/** AUDIT SCALE II L5 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): ONE FRAME THE ROOM SAID,
+/** AUDIT SCALE II L5: ONE FRAME THE ROOM SAID,
  *  TALLIED - its kind in `saidByType`, a pose's age from its sender's stamp, a refusal by its word and a welcome to its
  *  bot. A second-wire batch (SCALE5b) is opened as the client opens it (net/online.js _poses, _batch): each `poses` entry
  *  `[id, slim pose]` is one pose, aged by its `ts` where it carries one, and each frame of a frame batch (`fb`) is its
@@ -500,7 +500,7 @@ export function makeBot(n, o, ctx) {
   return bot;
 }
 
-/** AUDIT SCALE II L3 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): how many times a bot asks
+/** AUDIT SCALE II L3: how many times a bot asks
  *  for its guest at the sign-in line before its setup fails - each after the wait the line told (ADMIT-LINE,
  *  server-account/src/admit.js: never under a second), so a bot stands in the line at least half a minute. */
 export const LINE_ASKS_MAX = 30;

@@ -54,7 +54,6 @@ const blocksFile = () => {
 
 test('audit18: ruler-title table is the whole GetRulerTitle switch', () => {
   // MacroHelper.cs:368-399, case for case.
-  // PIN MOVED (PROVINCE-COURTS, bible/03-World/World-Wide.md): the port's four titles after DFU's twelve (High King,
   // High Queen, Emperor, Empress - the provinces' rulers past the Bay); the switch's twelve and its default unchanged
   assert.deepEqual({ ...RULER_TITLES }, {
     1: 'King', 2: 'Queen', 3: 'Duke', 4: 'Duchess', 5: 'Marquis',
@@ -65,7 +64,7 @@ test('audit18: ruler-title table is the whole GetRulerTitle switch', () => {
   // the wrong "fix" of flipping the default to Lady.
   assert.equal(rulerTitle(12), 'Lady');
   assert.equal(rulerTitle(11), 'Lord');
-  assert.equal(rulerTitle(17), 'Lord');   // PIN MOVED (PROVINCE-COURTS): past the port's four, 13 the High King's
+  assert.equal(rulerTitle(17), 'Lord');
   assert.equal(rulerTitle(0), 'Lord');
 });
 
@@ -382,19 +381,5 @@ test('audit18: GetNameBankOfRegion ships, so no doc may call it unported', () =>
   assert.equal(getNameBankOfRegion(-1), BANK_TYPES.Breton);
   assert.equal(getNameBankOfRegion(0), BANK_TYPES.Redguard);   // REGION_RACES[0] === 1
   assert.equal(getNameBankOfRegion(17), BANK_TYPES.Breton);
-  // ... and it is LIVE.
-  const townTalk = readFileSync(join(ROOT, 'src/scenes/townTalk.js'), 'utf8');
-  assert.ok(townTalk.includes('getNameBankOfRegion('));
 
-  // ... therefore no "Not ported" sentence may still name it.
-  const arc = readFileSync(join(ROOT, 'bible/02-Formats/Readers-Arc.md'), 'utf8');
-  const maps = readFileSync(join(ROOT, 'src/formats/mapsFile.js'), 'utf8');
-  const header = maps.slice(0, maps.indexOf('import '));
-  for (const [name, text] of [['Readers-Arc.md', arc], ['mapsFile.js header', header]]) {
-    for (const m of text.matchAll(/Not ported[^.]*\./g)) {
-      assert.ok(!/GetNameBankOfRegion/i.test(m[0]),
-        `${name}: a "Not ported" sentence still lists GetNameBankOfRegion, ` +
-        'which ships in characters/nameHelper.js and is called by scenes/townTalk.js');
-    }
-  }
 });

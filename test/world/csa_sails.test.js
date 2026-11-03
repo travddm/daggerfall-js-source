@@ -1,4 +1,4 @@
-// CSA-B (2026-09-27) - COME SAIL AWAY'S SAILS, BAKED (world/skinnedBake.js):
+// CSA-B - COME SAIL AWAY'S SAILS, BAKED (world/skinnedBake.js):
 // FixDeformations' tenth-of-a-second timer in Unity's floats, BakeMesh (one
 // bone per vertex, the renderer's position and rotation undone and its scale
 // kept) and RecalculateNormals (Unity's cross(b - a, c - a), summed per index

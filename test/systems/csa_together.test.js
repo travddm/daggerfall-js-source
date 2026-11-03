@@ -1,4 +1,4 @@
-// CSA-K / CSA-L (2026-09-28) - SAILING TOGETHER, AND THE HELM ON SCREEN (the player's ask: "I want people to be able to
+// CSA-K / CSA-L - SAILING TOGETHER, AND THE HELM ON SCREEN (the player's ask: "I want people to be able to
 // sail together, to walk on board as it moves ... instead of an overuse of keybinds, is there a way we can instead
 // develop enhanced plus UI elements?"). The boat under way says its way (systems/comeSailAway/comeSailAwayWire.js `m`) and its
 // readers lead it (scenes/comeSailAway/comeSailAwayPeers.js); another player's boat is boarded, stood on, carried by and left
@@ -107,7 +107,6 @@ test('CSA-K: a word under way LEADS the boat - carried on by its way every frame
   const peers = createComeSailAwayPeers({ pool, selfId: () => 'me' });
   peers.applyOwner('ann', { b: [word({ x: 10 })], m: [[5, 0, 0]] }, (p) => p, 0);
   const xs = [];
-  // PIN MOVED (FIELD BUGS 2026-10-22d SEA-GLIDE): the lead is two full frames' spacing, 4 s (it was 0.6), so the frames run past it
   const frames = Math.round(CSA_PEER_LEAD_MAX / 0.1) + 6;
   for (let i = 0; i < frames; i++) { peers.frame(0.1); xs.push(pool.peerBoats[0].GameObject.position[0]); }
   const steps = xs.slice(1).map((x, i) => x - xs[i]);
@@ -396,24 +395,21 @@ function mount(scope, code, name) {
 
 test('CSA-K: the host - another\'s boat stands in MY collider beside my boats, aboard it or not (FIELD BUGS 2026-10-01b); the peers are posed once a frame after the mod\'s step and its colliders, before the eye; the carry is the motor\'s carryBy and the look\'s yaw; the gate is online, walking, outdoors, alive and the mod on', () => {
   const sync = cut(WORLD, 'function csaSyncColliders() {', '\n  }\n');
-  // THE MERGE with NAV-H (2026-09-28): MY boats are csaColliderBoats() - mine, and the sea's ships near enough to board
+  // THE MERGE with NAV-H: MY boats are csaColliderBoats() - mine, and the sea's ships near enough to board
   // and to ram (test/systems/naval/nav_h_host.test.js pins its body) - and every peer's boat joins them on the street, aboard it or not
   // (FIELD BUGS 2026-10-01b: test/scenes/fb1001b_peerboats.test.js runs it) - and below deck in a ship's cabin, where the street's
   // collider keeps the whole fleet (CABIN-HULL, FIELD BUGS 2026-10-03b: test/systems/comeSailAway/fb1003b_cabinhull.test.js runs it)
-  assert.match(sync, /const peers = \(modes\?\.mode \?\? 'exterior'\) === 'exterior' \|\| modes\?\.sailingCabin \? csa\.peerBoats : \[\];[^\n]*\n\s+for \(const boat of hullsStood\(peers\.length \? \[\.\.\.csaColliderBoats\(\), \.\.\.peers\] : csaColliderBoats\(\), /);   // PIN MOVED (AUDIT FB1026d D1): less the players' hulls passing through the deck I stand on (comeSailAway/peerHulls.js)
+  assert.match(sync, /const peers = \(modes\?\.mode \?\? 'exterior'\) === 'exterior' \|\| modes\?\.sailingCabin \? csa\.peerBoats : \[\];[^\n]*\n\s+for \(const boat of hullsStood\(peers\.length \? \[\.\.\.csaColliderBoats\(\), \.\.\.peers\] : csaColliderBoats\(\), /);
   const upd = cut(WORLD, 'function csaUpdate(dt) {', '\n  }\n');
   assert.match(upd, /csaSyncColliders\(\);\n\s+csaPeersFrame\(dt\);[^\n]*\n\s+if \(_csaMovedPlayer\) cam\.pos = player\.eyeAt\(\);/, 'after the colliders, before the eye');
   const peersFrame = cut(WORLD, 'function csaPeersFrame(dt) {', '\n  }\n');
   assert.match(peersFrame, /if \(_csaPeersPosed\) return;\n\s+_csaPeersPosed = true;/, 'once a frame');
-  // PIN MOVED (SEA-DECK, test/scenes/naval/seadeck.test.js): the gate, the ground and the carry hoisted beside the frame - one answer
   // for another player's boat and the sea's own ships (world.js deckMayCarry, deckGround, deckCarry)
   assert.match(peersFrame, /allowed: csaOn\(\) && !!online && deckMayCarry\(\),/);
   assert.match(peersFrame, /ground: deckGround,/);
   assert.match(peersFrame, /carry: deckCarry,/);
   assert.match(WORLD, /const deckMayCarry = \(\) => walkMode && playerSpawned && !_teleporting && !_traveling && \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && !\(playerEntity\.health <= 0 \|\| modes\?\.deathUp\?\.\(\)\);/);
-  // PIN MOVED (AUDIT FB1026d D1): in the air, a hull passing through my deck is no deck to land on
   assert.match(WORLD, /const deckGround = \(b\) => \(!player\.grounded \? \(hullPassesMyDeck\(b\) \? 'other' : null\) : typeof player\.groundKey === 'string' && player\.groundKey\.startsWith\(`csaBoat:\$\{csaBoatId\(b\)\}:`\) \? 'boat' : 'other'\);/, 'its own buckets are the boat\'s ground');
-  // PIN MOVED (AUDIT BODY-MOTION RIG-6): the deck's turn handed to the motor too (carryTurn), so the body's legs ride it
   assert.match(WORLD, /const deckCarry = \(d, yawDeg\) => \{ player\.carryBy\(d\[0\], d\[1\], d\[2\]\); cam\.yaw \+= \(yawDeg \* Math\.PI\) \/ 180; player\.carryTurn\?\.\(\(yawDeg \* Math\.PI\) \/ 180\); _csaMovedPlayer = true; \};/);
   assert.match(peersFrame, /if \(boat \|\| _csaBuckets\.size\) csaSyncColliders\(\);/, 'the boats where they stand now');
   const pool = cut(WORLD, 'function csaPoolFrame(dt) {', '\n  }\n');
@@ -427,7 +423,7 @@ test('CSA-K: the host - my place aboard rides my foes frame as `ab` (a changed w
   const scope = {
     online: { status: 'open', room: 'world:3,12', isHost: () => false, sendFoes: (f) => { sent.push(f); return true; } },
     isCellRoom: (r) => /^world:/.test(r), isWorldRoom: () => false, FOES_MS: 200, FOES_FULL_MS: 2000, _foesSentAt: -Infinity, _foesFullAt: -Infinity, modes: { mode: 'exterior' },
-    _foesQuiet: quietFoesGate(),   // SCALE2c (PIN MOVED): the host's memory of what its cell last heard - a full frame that says nothing, said once
+    _foesQuiet: quietFoesGate(),   // SCALE2c (
     exteriorFoes: { foesFrame: (full, force) => (full || force ? { n: 1, k: 'world:3,12', full: full ? 1 : 0, f: [] } : null) },
     _hccDirty: false, camps: { wireRecords: () => [] }, hcc: { wireRecord: () => null }, duelRingWord: () => {}, campToWire: (p) => p,
     portalWord: () => {},   // PORTAL1: no portal standing on this deck
@@ -439,7 +435,7 @@ test('CSA-K: the host - my place aboard rides my foes frame as `ab` (a changed w
     navalWord: () => false,   // THE MERGE with NAV-G: the sea's word rides beside it - no sea here, this pin is the aboard word's
     seaRaidWord: () => false,   // OW6: nor raider chases
   };
-  scope.csaDeckWord = mount(scope, cut(WORLD, 'const csaDeckWord = () =>', '\n'), 'csaDeckWord');   // PIN MOVED (DECK-POSE): the one place the foes word and the pose both say
+  scope.csaDeckWord = mount(scope, cut(WORLD, 'const csaDeckWord = () =>', '\n'), 'csaDeckWord');
   scope.csaAboardWord = mount(scope, cut(WORLD, 'function csaAboardWord(frame, full) {', '\n  }\n'), 'csaAboardWord');
   const foesStream = mount(scope, cut(WORLD, 'const foesStream = (now) => {', '\n  };\n'), 'foesStream');
   foesStream(0);
@@ -472,7 +468,6 @@ test('CSA-K: the host - my place aboard rides my foes frame as `ab` (a changed w
   assert.equal((foes.match(/_onCsaClear\?\.\(\);[^\n]*\n\s+_onCsaAboardClear\?\.\(\);/g) ?? []).length, 2, 'the teardown and the room change take theirs');
   assert.match(WORLD, /exteriorFoes\.setOnCsaAboard\(\(from, ab, at\) => csaAboard\.applyRider\(from, ab, at\), \(\) => csaAboard\.clearRiders\(\)\);/);
   assert.match(WORLD, /if \(isCellRoom\(online\.room\)\) \{ const ids = ownerIds\(\); if \(ids\) csaAboard\.sweepRiders\(ids, now, FOES_STALE_MS\); \}/);
-  // PIN MOVED (SEA-DECK): a place aboard a ship of the sea's is stood on her deck a frame ahead (navalHost.js deckAhead)
   assert.match(WORLD, /const drawable = isCellRoom\(online\.room\) && csaOn\(\) \? csaAboard\.glue\(staffFollow\.drawable\(\), \{ poseOf: \(o, i\) => csaPoseAhead\(o, i, dt\) \?\? naval\?\.deckAhead\?\.\(o, gamePaused\(\) \? 0 : dt \* worldTimeScale\(\)\) \?\? null, toWire: campToWire, dt \}\) : staffFollow\.drawable\(\);/);
   // my own boat, a frame ahead: the helm's move of this frame made before the mod's LateUpdate makes it
   const boat = { GameObject: { activeSelf: true, position: [10, 34, 20], rotation: [0, 0, 0, 1] } };
@@ -509,10 +504,8 @@ test('CSA-K: the host - another\'s boat is pressed only where none of mine is un
   assert.match(board, /const deck = raycastColliders\(pick\.boat\.GameObject, o, \[0, -1, 0\], 3, \{ triggers: true, geometry: csaColliderMesh \}\);/, 'set down on THEIR deck within 3 m');
   assert.match(board, /if \(csaAboard\.board\(pick\.boat, CSA_ABOARD_GRACE\)\) csaSyncColliders\(\);/);
   const hover = cut(WORLD, 'const csaHoverName = (key) => {', '\n  };\n');
-  // PIN MOVED (HOLDINGS, bible/03-World/Holdings.md): the plaque names her by her captain's name where she has one (her hull's under
   // it), else her hull's - and its owner, as ever
   assert.match(hover, /const hullName = CSA_HULL_NAMES\[boat\.hull\] \?\? 'Boat', named = csaPeers\.nameAt\?\.\(peer\[1\], Number\(peer\[2\]\)\) \?\? '';[^\n]*\n\s*return \{ title: named \|\| hullName, subs: \[\.\.\.\(named \? \[hullName\] : \[\]\), ownedLine\(peerName\(peer\[1\]\)\)\] \};/);
-  // PIN MOVED (VEIL-PARTY): the count may leave riders out (`skip` - the crossing's, her captain's party)
   assert.match(WORLD, /const csaPassengersOn = \(boat, skip = null\) => \{ const i = csaRuntime\?\.AllBoats\.filter\(\(b\) => b\.GameObject\?\.activeSelf\)\.indexOf\(boat\) \?\? -1; return i < 0 \|\| !online\?\.id \? 0 : csaAboard\.passengersOn\(online\.id, i, skip\); \};/);
   assert.match(WORLD, /passengersAboard: csaPassengersOn,/, 'OWS2: named, the landfall\'s pack reads it too');
 });
@@ -555,7 +548,6 @@ test('CSA-L: the helm\'s buttons for the mod\'s state - the sails (their label t
   assert.deepEqual(acts(H({ manualTrim: true, hasSquare: true, squareOnly: true })), ['sails', 'trimLeft', 'trimRight', 'light', 'slower', 'normal', 'faster', 'position', 'leave'], 'a square rig alone trims with the bare brackets');
   const by = (h, act) => helmButtons(h).find((b) => b.act === act);
   assert.deepEqual([by(H(), 'sails').label, by(H({ sailsUp: true }), 'sails').label], ['Raise sails', 'Stow sails']);
-  // PIN MOVED (HELM-LADDER): the sails' button is the mod's own toggle, raising or striking all her canvas from any rung -
   // the arrows climb her oars first now
   assert.deepEqual([by(H(), 'sails').action, by(H({ sailsUp: true }), 'sails').action, by(H({ sailsUp: true, squareToggle: true }), 'sails').action], ['BoatToggleSail', 'BoatToggleSail', 'BoatToggleSail']);
   assert.deepEqual([by(H({ squareToggle: true }), 'square').label, by(H({ squareToggle: true, squareUp: true }), 'square').label], ['Raise square sails', 'Stow square sails']);
@@ -737,7 +729,7 @@ test('CSA-L: the host\'s helm seam - the panel\'s and the pad\'s presses reach t
   const keys = new Set(), latch = { edge: { downFrame: new Set() } };
   let atHelm = false;   // HELM-KEYS: whether the turn keys are the rudder's (scenes/world.js helmTurnKeys)
   Object.assign(scope, { ...api, keys, latch, held: (k, a) => k.has(a), pressed: (e, k, a) => e.downFrame.has(a), HELM_RUDDER_ACTIONS, helmTurnKeys: () => atHelm });
-  const input = cut(WORLD, '      has: (action) => held(keys, action) ||', '\n') + cut(WORLD, '      started: (action) => !(travelView?.active &&', '\n');   // PIN MOVED (AUDIT NAV2 F17): the sail keys' press gated by the travel view (test/systems/comeSailAway/auditnav2_helm.test.js)
+  const input = cut(WORLD, '      has: (action) => held(keys, action) ||', '\n') + cut(WORLD, '      started: (action) => !(travelView?.active &&', '\n');
   const { has, started } = mount(scope, `const __i = { ${input} };`, '__i');
   api.csaHelmPress('BoatToggleSail', 'BoatTrimModifier');
   assert.equal(started('BoatToggleSail'), true, 'the tap is the action\'s edge');
@@ -774,6 +766,6 @@ test('CSA-L: the host\'s helm seam - the panel\'s and the pad\'s presses reach t
   assert.match(WORLD, /csaDrawHelmPanel\(\);[^\n]*\n\s+spoilsRecoverFrame\(\);[^\n]*\n\s+if \(onlineOn && playerSpawned\) \{ if \(!online\) onlineStart\(\); onlineFrame\(now, dt\); \}/);
   const draw = cut(WORLD, 'function csaDrawHelmPanel() {', '\n  }\n');
   assert.match(draw, /if \(!csaRuntime \|\| !csaOn\(\) \|\| !isEnhancedPlus\(\) \|\| typeof document === 'undefined' \|\| !walkMode\) \{ if \(enhancedHelmMounted\(\)\) hideEnhancedHelm\(\); csaHelmInput\.held\.clear\(\); return; \}/);
-  assert.match(draw, /covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \|\| !hudRenderEnabled\(\) \|\| !!travelView\?\.active \|\| !!_travelUIHolder\.ui\?\.isShowing,/);   // PIN MOVED (AUDIT NAV2 F17): under overhead and first-person journey controls, where a journey holds the helm
+  assert.match(draw, /covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \|\| !hudRenderEnabled\(\) \|\| !!travelView\?\.active \|\| !!_travelUIHolder\.ui\?\.isShowing,/);
   assert.match(WORLD, /up: \(\) => !!\(csaRuntime\?\.isSailing\(\) && csaOn\(\) && isEnhancedPlus\(\)\),\n\s+gesture: \(dir, kind\) => \{ let r = false; csaCall\(\(\) => \{ r = helmPadGesture\(dir, kind, csaRuntime\?\.helmPanelState\(\) \?\? null, \{ press: csaHelmPress, hold: csaHelmHold \}\); \}\); return r; \},/);
 });

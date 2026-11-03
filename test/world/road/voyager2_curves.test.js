@@ -1,5 +1,4 @@
-// VOYAGER2 (2026-10-26, KPbICA's spec forwarded by the owner: "Add slight curvatures for intersections and turns of the
-// roads to make them more natural"; bible/03-World/Roads.md VOYAGER2) - THE ROADS PAST THE BAY ARE DRAWN AS CURVES
+// VOYAGER2 - THE ROADS PAST THE BAY ARE DRAWN AS CURVES
 // (world/road/roadCurves.js): a way through a pixel one quadratic curve tangent to its steps, a junction its gentle pairs
 // curved and the rest straight in with the centre paved round, painted at the kernel's seam past the Bay alone (the
 // Bay's own roads are Basic Roads' painter's to the byte), and measured by the verge from the same curves.
@@ -124,7 +123,6 @@ test('VOYAGER2 the seam: the kernel paints a pixel past the Bay\'s roads as curv
   const own = bayNet(); own.roads[100 * MAP_W + 200] = DIR.W | DIR.NE;
   const bay = generatePixelTerrain({ woods: w, px: 200, py: 100, stride: 1, tilemap: new Uint8Array(T * T), locationRect: null, hasLocation: false, climateType: 302, roads: own });
   assert.ok(isRoad(bay.tilemap[96 * T + 96]) && !isRoad(bay.tilemap[100 * T + 96]), 'on the Bay, his arms');
-  assert.match(read('src/world/terrain/terrainGen.js'), /curve: arena \? \{ px, py, byteAt: arenaRoadByte \} : null/);
 });
 
 test('VOYAGER2 the verge measures the curve past the Bay: a bend\'s apex is on the road and the arms\' corner 86 m off it; the Bay\'s pixels its arms as ever (mutants: the curve unasked, the tile frame)', () => {

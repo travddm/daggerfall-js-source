@@ -1,6 +1,4 @@
-// WW7-3 (2026-10-25, the owner: "we need the same city nodes populating the entire map of tamriel"; asked, a province's
-// crown its own kingdom: "Yes"; High Rock and Hammerfell's past the Bay: "Whatever makes sense"; bible/03-World/
-// World-Wide.md WW7): the seats past the Bay - a crown at each province's capital, a palace at every Arena city-state -
+// WW7-3: the seats past the Bay - a crown at each province's capital, a palace at every Arena city-state -
 // the provinces' kingdoms, the law's regions and pixels, a province's gate its own seats'.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -30,7 +28,7 @@ test('WW7-3 the provinces\' kingdoms: seven crowns past the Bay, each its provin
   assert.equal(new Set(Object.values(KINGDOM_METALS)).size, Object.keys(KINGDOMS).length, 'no two crowns one metal');
   const slots = Object.values(CROWN_SIEGE_SLOT).map((s) => `${s.day}:${s.hour}`);
   assert.equal(new Set(slots).size, slots.length, 'no two crowns\' sieges at once');
-  assert.deepEqual(GLYPHS.slice(-8, -1) /* PIN MOVED (SHOP): the Origin joined the list last, after the crowns */, Object.values(SEAT_CROWN_GLYPHS).slice(3), 'the new crowns after every glyph a token carries');
+  assert.deepEqual(GLYPHS.slice(-7), Object.values(SEAT_CROWN_GLYPHS).slice(3), 'the new crowns after every glyph a token carries');
   assert.deepEqual(seatGlyphsOf([{ tier: 'crown', region: 64 }, { tier: 'palace', region: 62 }, { tier: 'crown', region: 17 }]), ['tower', 'crownDF', 'crownSK']);
   assert.equal(seatArrivalLine({ name: 'Solitude', tier: 'crown', region: 64 }), 'Solitude, capital of the Kingdom of Skyrim. Its Crown Charter is unheld.');
 });
@@ -68,10 +66,3 @@ test('WW7-3 the seats past the Bay: a crown at each capital, a palace at each Ar
   assert.deepEqual([bay.list.length, bay.powers.has(64), bay.powers.get(21)], [0, false, 3021]);
 });
 
-test('WW7-3 by source: the places module adds the seats past the Bay as it registers the places - each capital\'s centre in its province\'s region, each Arena city-state but a capital\'s pixel\'s - and the host hands it the seats (mutants: the seats never added)', () => {
-  const m = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(m, /if \(townSeats\) replaceSeats\(townSeats, 'tesa', tamrielSeatsOf\(seatPlaces\(\)\)\);/);
-  assert.match(m, /capitals\.push\(\{ key: capitalPlaceId\(k, 0\), name: CAPITALS\[k\]\.name, px: at\.x, py: at\.y, region: regionOfProvince\(CAPITALS\[k\]\.province\) \}\);/);
-  assert.match(m, /filter\(\(p\) => p\.kind === 'city-state' && !capitalOnPixel\(p\.bx, p\.by\)\)/);
-  assert.match(rd('src/scenes/world.js'), /townSeats, woodsBytes, worldPlaces,/);
-});

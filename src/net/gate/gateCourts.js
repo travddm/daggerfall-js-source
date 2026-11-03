@@ -1,8 +1,5 @@
 // @ts-check
-// GATE-COURTS (2026-10-26, the owner: "We need to develop instances for oblivion gate. The player counts are becoming
-// too large for one instance"; asked, the owner chose fifty fighters a court, placed automatically with the party kept
-// together, the gate in the world standing until every court's fight is over, and each court's kill said in the chat
-// with the night said once on Discord - bible/11-Multiplayer/World-Bosses.md section 29): A NIGHT'S BURNING COURTS.
+// GATE-COURTS: A NIGHT'S BURNING COURTS.
 //
 // A gate's night was ONE fight in one object (`gate:<day>`, GATE_FIGHTERS_MAX 256 seats, SCALE5d part two's copies past
 // its sockets around that one fight). Now a night holds up to GATE_COURTS_MAX courts, each a fight of its own - its own

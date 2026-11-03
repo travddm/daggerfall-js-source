@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE TOWN'S WAYS - a resident's walk from one place to another,
+// LW1: THE TOWN'S WAYS - a resident's walk from one place to another,
 // on the town's own CityNavigation grid (world/city/cityNavigation.js, DFU's navgrid: 1.6 m cells, a building's footprint
 // weight 0, the ground's weight by its tile). DFU's walkers never path - they seek a neighbour by weight - so this is
 // the port's: an A* over the same grid, four neighbours as the walkers step, each step's cost the tile's weight read

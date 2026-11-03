@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// ECOTONE1 (2026-10-07, Mac: "Making it where bione transitions are
-// insta t and instead fade and transition naturally into each other") -
+// ECOTONE1 -
 // THE ECOTONE: where two climates meet, one wandering, patchy border in
 // place of the map pixel's straight edge.
 //

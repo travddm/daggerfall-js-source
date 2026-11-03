@@ -1,5 +1,4 @@
-// INLINE1 (2026-09-20, Mac: "Want to talk about overall performance
-// improvements"): NOTHING UNDER vendor/ IS EVER INLINED AS BASE64, AND THE
+// INLINE1: NOTHING UNDER vendor/ IS EVER INLINED AS BASE64, AND THE
 // PIN IS GENERATIVE. The rule that preceded this was an allow-list of three
 // vendor folders, and the pins that held it named the folders it held OUT
 // ("every other vendor asset keeps the default"). That is a rule enforced

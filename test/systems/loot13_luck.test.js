@@ -1,5 +1,4 @@
-// LOOT13 - LUCK IS A NUDGE, NEVER THE SOURCE (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 5; Mac: "what could we
-// do to make it even more amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT13 - LUCK IS A NUDGE, NEVER THE SOURCE.
 //
 // Luck was a flat 2 per mille a point over 50 ADDED to every threshold (LR1). On Magic's hundred-and-more that was a
 // nudge; on Legendary's one to forty-five it was the whole roll: measured through the real rarityChances, a level-1 rat

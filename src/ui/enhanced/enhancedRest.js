@@ -1,5 +1,4 @@
-// ENHANCED REST WINDOW (2026-09-20, per-request: "modernize the resting
-// window based on the inventory style... don't touch classic mode") —
+// ENHANCED REST WINDOW —
 // the SAME card/panel language ui/enhanced/enhancedInventory.js's own screens use
 // (`.card`, `.acts`, `.meter`), driving the SAME systems/rest/restSession.js
 // engine ui/restWindow.js drives: this file owns no game rule at all,
@@ -29,9 +28,7 @@ const el = (tag, cls, text) => {
   return n;
 };
 
-// PARTY-REST1d (2026-09-20, per-request: "only the one who initiated the
-// rest is prob able to press ok and then the others are [not]" - the bug
-// this closed): the SAME releaseLock() every other enhanced DOM window
+// PARTY-REST1d: the SAME releaseLock() every other enhanced DOM window
 // already carries (enhancedInventory.js, enhancedMenu.js,
 // enhancedChargen.js, ui/heldMap.js), missing here entirely. A player who
 // personally opened this window had almost certainly already dropped
@@ -89,7 +86,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
     else if (!ambushNight()) overlay._pendingEnemySpawn = true;   // AUDIT REST-PARTY A2: the act's night is restAct.js's own session, run in one call - a quest foe stood inside it breaks it there
   };
   const isTop = () => (deps.topWindow ? deps.topWindow() === overlay : true);
-  // REST1 (bible/06-Systems/Rest-Arc.md): online the card opens on the ACT - restWindow.js's own law, the same three
+  // REST1: online the card opens on the ACT - restWindow.js's own law, the same three
   // deps (restAct, restNight, restShort): refused, or the channel held, then the night or the short rest, then the
   // ordinary wake card. Offline restAct is null and the card is the one it always was.
   const act = deps.restAct?.() ?? null;
@@ -110,7 +107,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
   // PARTY-REST1: the follower mirror's own entry point (world.js calls this exactly where it used to call the
   // classic window's own _start) - kept as the SAME name so neither caller has to know which skin it got.
   overlay._start = (mode, hours) => startFixed(mode, hours);
-  // AUDIT PARTY-REST (2026-09-23): THREE INTERIOR HOOKS THE CLASSIC WINDOW CALLS AND THIS ONE NEVER DID - the deps
+  // AUDIT PARTY-REST: THREE INTERIOR HOOKS THE CLASSIC WINDOW CALLS AND THIS ONE NEVER DID - the deps
   // are the same bag in every host (worldModes.js supplies all three), so on the enhanced skin a rented room's
   // sleeper rested standing where they stood (moveToBed), an expired room was announced and never removed
   // (onRentExpired), and shopkeepers hidden before the nap stayed hidden until the player left and came back
@@ -127,7 +124,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
     render();
   };
 
-  // AUDIT PARTY-REST (2026-09-23): classic's TimedRestPrompt_OnGotUserInput, arm for arm (restWindow.js) - this
+  // AUDIT PARTY-REST: classic's TimedRestPrompt_OnGotUserInput, arm for arm (restWindow.js) - this
   // skin clamped every mode to 99 and floored at 1, so a 99-hour LOITER in a town street went through where classic
   // refuses anything over loiterLimitHours() (3-12), a rest over 99 was silently cut to 99 where classic shows
   // TEXT.RSC 26, and an empty field started an hour's rest where classic returns to the selection page. The refusal
@@ -152,9 +149,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
     if (mode === 'timed') moveToBed();
   };
 
-  /** RESTFIX3 (2026-09-21, per-request: "normaly when you start resting it asks you if you really want to rest
-   *  cause its not allowed and when you press yes the guards come. This message is missing entirely now" - the
-   *  bug this closed): ui/restWindow.js's own `_restButton`/`_canRest`, ported - this skin's selection screen was
+  /** RESTFIX3: ui/restWindow.js's own `_restButton`/`_canRest`, ported - this skin's selection screen was
    *  skipping the whole illegal-rest law entirely, going straight from a click to the hours picker or a started
    *  session. Two pieces, same as classic: the CONFIRM box (illegalRestWarning() - a settings preference - and
    *  only when `deps.restPlace()?.inTownOutside`, i.e. camping in the open street of a town, never anywhere
@@ -193,7 +188,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
   /** REST1: the act's open - the town's refusal, no rest point, a building's own law (canRest), then the channel. */
   function openAct() {
     if (act.meditate) { overlay.mode = 'act'; overlay.state = 'channel'; return; }   // REST6: a candle's kneel - anywhere a rest may begin
-    // LOITER-ANYWHERE (2026-10-04, Discord: "the new rest system ... has no loiter"): every refusal of the act offers
+    // LOITER-ANYWHERE: every refusal of the act offers
     // Loiter in its place, as restWindow.js's - DFU's loiter is never gated by a bed, a camp or the town
     overlay._loiterOffer = true;
     const place = deps.restPlace?.();
@@ -349,9 +344,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
     return c;
   }
 
-  // RESTFIX1 (2026-09-21, per-request: "the initiator and the one who rests with him both cant cancel the
-  // resting! the button is not working and doesnt cancel it... waiting and healing to full cant be canceled
-  // by both sides prob loitering too" - the bug this closed): `render()` used to run on EVERY tick while
+  // RESTFIX1: `render()` used to run on EVERY tick while
   // resting (the countdown has to move every frame with no input at all), and `render()` rebuilds the whole
   // card from scratch - `host.innerHTML = ''` then fresh elements, the Stop button included. A real click is
   // mousedown-THEN-mouseup, two separate browser events spanning however many animation frames land between
@@ -378,8 +371,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
     track.append(fill);
     meter.append(track);
     c.append(meter);
-    // REST-VITALS1 (2026-09-20, per-request: "while healing fully you dont see your magica and health and
-    // fatigue so you dont know when its somewhat full you need to still track it"): restWindow.js's own
+    // REST-VITALS1: restWindow.js's own
     // resting page already shows this exact line (restingLines()/its native counter draw, both read the SAME
     // deps.vitals()) - it just never made it into this skin's screen at all. Most load-bearing for FullRest,
     // which has no fixed hour countdown to watch at all - health/fatigue/magicka are the ONLY progress a
@@ -494,9 +486,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
     host = null;
     deps.updateNpcPresence?.();   // AUDIT PARTY-REST: restWindow.js's _close re-rolls who is standing in the room after the nap
     deps.onClose?.();
-    // ENHANCED-REST-DISPOSE1 (2026-09-22, per-request: "the resting window was fully classic ui even in
-    // enhanced and online mode. Now that we use Enhanced ui for th resting screen maybe this couldve broke
-    // something" - the bug this closes): every ordinary way this window ends - OK, Cancel, Stop, dismissing
+    // ENHANCED-REST-DISPOSE1: every ordinary way this window ends - OK, Cancel, Stop, dismissing
     // the ended message - calls THIS function directly, never `overlay.dispose()`. restDoor.js's
     // `enhancedRestOverlay` wraps `overlay.dispose` specifically to `unregister()` this window from the
     // PX28 stack (ui/enhanced/enhancedOverlays.js) it registered itself on when it opened - and chatPanel's own
@@ -520,7 +510,7 @@ export function mountEnhancedRest(hostEl, deps, ignoreAllocatedBed = false) {
   // Merged onto the SAME object the callers above already read `.session`/`.mode`/`.state`/`._start`/`._end` off
   // of, so a caller holding `townTalk.overlay` (world.js's PARTY-REST1/2, worldModes.js's/dungeonContext.js's own
   // restState getters) never has to know or care which skin built the window it is looking at.
-  // AUDIT PARTY-REST (2026-09-23): THE KEYS. `overlay.input` was a no-op, so Escape and the Rest key did nothing over
+  // AUDIT PARTY-REST: THE KEYS. `overlay.input` was a no-op, so Escape and the Rest key did nothing over
   // this window where classic's keyup arms (restWindow.js) stop a running rest, close the selection page and
   // dismiss the ended one; and the PX28 stack's Tab close went to `dispose` -> close(), which ended a running rest
   // with no wake box, no skill raise (onRestFinished) and, for a mirror, no cancel request (onManualStop) - so the

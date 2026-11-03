@@ -1,4 +1,4 @@
-// CRASH1 - THE OVERLAY CONTRACT, DERIVED (2026-09-15).
+// CRASH1 - THE OVERLAY CONTRACT, DERIVED.
 //
 // Reported from live play, by someone who had just tried the deployed
 // build: "had a lot of javascript issues with regards to menu

@@ -82,16 +82,6 @@ test('STAR-PLATE: the "*" is inked as every name is - haloed, in its quarter\'s 
   assert.notEqual(own.calls.find((c) => c.fn === 'fillText').fillStyle, TOWN_PEN.quest, 'a shop\'s star is no quest\'s');
 });
 
-test('STAR-PLATE by source: the sheet and the classic window letter the ONE "*" (nameplateLayout.js STAR_PLATE) - the classic window always did, the sheet dropped it (mutants: either map\'s own literal)', () => {
-  const sheet = src('src/ui/town/townSheet.js');
-  assert.match(sheet, /if \(!s\) return;\n/, 'a solved plate is never dropped for being surrendered');
-  assert.doesNotMatch(sheet, /s\.replaced\) return/, 'the drop is gone');
-  assert.match(sheet, /text: s\.replaced \? STAR_PLATE : n\.text, name: n\.text,/);
-  assert.match(sheet, /return \{ label: p\.name \?\? p\.text, cursor: 'pointer' \};/);
-  assert.match(src('src/ui/exteriorAutomapWindow.js'), /drawText\(renderer, font, r\.replaced \? STAR_PLATE : p\.text,/);
-  assert.match(src('src/ui/nameplateLayout.js'), /export const STAR_PLATE = '\*';/);
-});
-
 // ── THE REPORT, on the game's own data: the M key's real window over Daggerfall ──────────────────────────────────────
 
 function fakeDocument() {

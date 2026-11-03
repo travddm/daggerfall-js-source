@@ -1,7 +1,5 @@
 // @ts-check
-// HARD2 - THE ACTIVATION RACE, ONE HOME (2026-09-14, Mac: "make
-// everything clean, hardened and not spaghetti ... refactor where
-// absolutely needed").
+// HARD2 - THE ACTIVATION RACE, ONE HOME.
 //
 // DFU fires ONE ray on an activation (PlayerActivate.cs:314) and the
 // NEAREST thing it strikes is the hit. Everything that can be struck
@@ -41,7 +39,7 @@
 //     measures against everything, the townsfolk included.
 //   - AUDIT 66 F7: the torch races the door, not just the corpse and
 //     the pile.
-//   - PR-WAGON1 (2026-09-24, Mac: "Others' wagons don't block"): a pick
+//   - PR-WAGON1: a pick
 //     that YIELDS - another player's wagon or horse - wins only when no
 //     other family met anything, and is never a rival. The law is
 //     player/activate.js's `firmFirst`, read here, not restated.
@@ -137,7 +135,7 @@ export function raceActivation({
 
   // ── ONE PRECEDENCE, AND IT IS `raceWinner`'S ─────────────────────
   //
-  // AUDIT-WH H1 (Mac's call, 2026-09-21: "b"). This function used to
+  // AUDIT-WH H1. This function used to
   // answer six independent booleans, each its own `<= Math.min(...)`,
   // and the four custom activations compared themselves against
   // `doorDistance` while the BODY and the PILE did not. The hosts'

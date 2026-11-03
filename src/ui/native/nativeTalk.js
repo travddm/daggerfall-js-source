@@ -400,7 +400,7 @@ export function setNpcPortrait(archive, recordId, { picture = null } = {}) {
   });
 }
 
-/** PORTRAIT3D (2026-10-15, the owner: "#2 is exactly I wanted. Which also affects the talk window for npcs"): THE NPC'S
+/** PORTRAIT3D: THE NPC'S
  *  FACE AS THE MORROWIND HEAD ITS BODY WEARS. `picture(renderer)` answers it (characters/headPortraits.js npcHeadImage)
  *  or null; while it renders the record above stands, and a session it is no longer for takes nothing. It takes the
  *  record's place under a key of its own, so the enhanced panel - which repaints when the key moves - paints it too;

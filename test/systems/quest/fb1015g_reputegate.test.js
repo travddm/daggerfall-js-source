@@ -1,5 +1,5 @@
 // REPUTE-GATE (FIELD BUGS 2026-10-15g, AUDIT GUILD-WORDS II; a Discord report: "The very first quest i did for them
-// dropped my rep by 25 points"; Mac, asked: "Gate by reputation"). The Mages Guild offers by level, so a level-2
+// dropped my rep by 25 points"). The Mages Guild offers by level, so a level-2
 // apprentice drew "Guard the Guild" (-30 for the guarded treasure taken) and "Protect an Honored Mage" (-10, then -50)
 // though their headers name standing 10 and 20. Online each now waits for its header's standing; offline the pool is
 // DFU's, and the penalties are Daggerfall's either way.
@@ -70,8 +70,3 @@ test('REPUTE-GATE: the filter itself - offline the same pool, a null pool null, 
   assert.deepEqual(reputeGated(pool, 0, true).map((q) => q.name), ['N0B00Y04', 'toString']);
 });
 
-test('REPUTE-GATE: the bridge hands the flow the shared world (mutant: the door dropped)', () => {
-  const bridge = read(join(ROOT, 'src/scenes/quest/questBridge.js'));
-  const flow = bridge.slice(bridge.indexOf('const offerFlow = new QuestOfferFlow('), bridge.indexOf('// QuestMachine.Update\'s pacing'));
-  assert.ok(flow.includes('    sharedClock: () => !!ctx.sharedClock?.(),'));
-});

@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-6 (2026-10-14) - A POI BACK OUT AS glTF 2.0: THE ROUND TRIP TO A BUILDER'S OWN MODELLING TOOL.
+// POI-6 - A POI BACK OUT AS glTF 2.0: THE ROUND TRIP TO A BUILDER'S OWN MODELLING TOOL.
 //
-// Mac: "Allowing not just the creation of POI's using models, but also the ability to import models, texture, UV map"
-// (bible/06-Systems/POI-Editor-Arc.md POI-6). What the editor imports (poi/gltfImport.js) it can write back: a POI's
+// (POI-6). What the editor imports (poi/gltfImport.js) it can write back: a POI's
 // parts - or a library entry's - as one .glb a builder opens in Blender, changes, and imports again.
 //
 //   - THE FRAME, TURNED BACK: the game is Unity's left-handed frame (+Y up, +Z forward); glTF is right-handed, its asset

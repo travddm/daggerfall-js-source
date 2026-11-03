@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT DELVE C8 (bible/01-Overview/audits/Audit-Delve.md): THE EIGHT WAYS IN THE SCENE'S FRAME, ONE HOME. The angler's word
+// AUDIT DELVE C8: THE EIGHT WAYS IN THE SCENE'S FRAME, ONE HOME. The angler's word
 // for a school (scenes/fishHost.js bearingWord) and the dungeon's echo (systems/dungeon/dungeonEcho.js) were one law written
 // twice - the same words, the same +x-east +z-north frame, the same rounding. The bounty board's map pixels (y south)
 // and the fleet's terrain cells keep their own frames (systems/bounty/bountyBoard.js compassWord, scenes/fleetHost.js).

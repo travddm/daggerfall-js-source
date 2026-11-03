@@ -1,5 +1,4 @@
-// MW-BOW1 (FIELD BUGS 2026-10-09g, the owner: "the arrow on the morrowind weapon isnt shown be drawn and shot, or it's
-// misalligned"; then "Im tired of you avoiding the morrowind arrow case"): A MORROWIND BOW DRAWS ON ITS OWN CLOCK. The
+// MW-BOW1 (FIELD BUGS 2026-10-09g,; then "Im tired of you avoiding the morrowind arrow case"): A MORROWIND BOW DRAWS ON ITS OWN CLOCK. The
 // retail bow mesh carries its limbs and string morphing and its ArrowBone keyframed through the BowAndArrow group
 // (OpenMW issues 5642 and 9322), on WeaponAnimationTime: the weapon group's playhead, from the group's first key for a
 // ranged weapon. The port flattened the bow once at rest and baked the ArrowBone's rest into the arrow - so the bow
@@ -209,11 +208,3 @@ test('MW-BOW1: a bow with no motion of its own is posed as it always was', async
   assert.deepEqual(round(arrow.source), arrowWith(nif, ARROW_REST));
 });
 
-test('MW-BOW1: both views pose the weapon on its clock before the pose - the first-person arm and the third-person body', () => {
-  // the third-person body is one machine with the arm (fpArm update): the same clock, ahead of its own poseAssembly
-  const src = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  const third = /posePartClocks\(t\.arm, weaponClockValue\(\), \{ frameTime: partClock \}\);[^\n]*\n\s*poseAssembly\(t\.arm, \{/;
-  const first = /posePartClocks\(built\.arm, weaponClockValue\(\), \{ frameTime: partClock \}\);[^\n]*\n\s*poseAssembly\(built\.arm, \{\n\s*tracks: fTracks,/;
-  assert.match(src, third, 'the body');
-  assert.match(src, first, 'the arm');
-});

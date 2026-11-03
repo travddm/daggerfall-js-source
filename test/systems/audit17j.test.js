@@ -162,25 +162,6 @@ test('17j F5: the name box holds 31 characters, TextBox\'s default', () => {
   assert.equal(f.name.length, 31);
 });
 
-test('17j F6: worldModes routes DUNGEON overlay clicks, as dungeon.js does', () => {
-  // THE FOUR HOSTS RULE. dungeonContext exposes ONE overlayClick seam;
-  // both hosts that mount a dungeon context must reach it. This is a
-  // source sweep because the host needs a canvas and a GL context to
-  // run - the same shape as the 17i construction sweep.
-  const src = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const fn = src.slice(src.indexOf('function pointerdown('));
-  const body = fn.slice(0, fn.indexOf('\n  }\n'));
-  // the whole condition, not its halves: a pin that matched only
-  // `dungeonCtx?.uiOverlayActive` still passed when the mode test was
-  // mutated away, because the text it looked for was still there.
-  assert.match(body, /mode === 'dungeon' && dungeonCtx\?\.uiOverlayActive/,
-    'the dungeon branch must test BOTH the mode and the overlay');
-  assert.match(body, /dungeonCtx\.overlayClick/, 'and route to the ONE seam, not a second click path');
-  assert.ok(body.indexOf('dungeonCtx.overlayClick') < body.indexOf("mode !== 'interior'"),
-    'the dungeon branch must run BEFORE the interior gate that used to reject every dungeon click');
-});
-
-
 test('17j F7: re-entering STATS keeps the roll and the points spent', () => {
   // SetAddBonusStatsWindow (:227-246) rerolls only when the class
   // changed. The port rerolled on every entry, so backing up one

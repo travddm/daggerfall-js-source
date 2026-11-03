@@ -1,6 +1,5 @@
-// REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12, option A): QUEST WAITS ONLINE -
-// TIMEFREE's DELAY HALF, restored on QCLOCK-WORLD's clock. TIMEFREE (2026-10-02, test/timefree.test.js, DELETED by
-// QCLOCK-WORLD) read every clock off its script as a deadline or a delay, froze the deadlines and cut the delays; this
+// REST8: QUEST WAITS ONLINE -
+// TIMEFREE's DELAY HALF, restored on QCLOCK-WORLD's clock. TIMEFREE read every clock off its script as a deadline or a delay, froze the deadlines and cut the delays; this
 // is its file, re-aimed: the reading, the hand table and the split come back (the split moved by REST8 R1's two
 // deadlines, K0C00Y02's gold and S0000502's tower, test/systems/quest/rest8_audit_timefree.test.js - and since by AUDIT REST-PARTY's
 // two and AUDIT REST II's three, test/systems/quest/auditrestparty_quests.test.js, test/systems/quest/auditrest2_quests.test.js); the freeze assertions become "runs
@@ -209,7 +208,7 @@ test('REST8: the journal walk skips a DELAY online and keeps a DEADLINE\'s "Time
   const src = rd('src/scenes/quest/questBridge.js');
   const body = src.slice(src.indexOf('    questLog({ windows = true } = {}) {'), src.indexOf('\n    },', src.indexOf('    questLog({ windows = true } = {}) {')) + 6);
   assert.ok(body.includes('if (r.waitsShort) continue;'), 'the slice really is the walk');
-  const questLog = new Function('machine', 'notebook', 'clockCounts', `const isShelved = (q) => q?.shelvedAt != null; const questlines = { rowOf: () => null, lineRows: () => [] }; const quietText = () => ''; const questlinesOn = () => false; const ladderRows = () => []; const clocksNamed = () => new Set(); const o = { ${body} }; return o.questLog();`);   // QUEST-AUDIT III NAMED-TIMER (PIN MOVED): these entries name no clock - the tightest stands   // QUEST-SHELF (PIN MOVED): the walk files a quest set aside apart; QL1/QL12 (PIN MOVED): its rows' objectives and the questlines' rows, none here (the switch off)
+  const questLog = new Function('machine', 'notebook', 'clockCounts', `const isShelved = (q) => q?.shelvedAt != null; const questlines = { rowOf: () => null, lineRows: () => [] }; const quietText = () => ''; const questlinesOn = () => false; const ladderRows = () => []; const clocksNamed = () => new Set(); const o = { ${body} }; return o.questLog();`);   // QUEST-AUDIT III NAMED-TIMER (
   const walk = (online, { deadline = true } = {}) => {
     const now = { s: 1_000_000, raised: 0 };
     const q = parse('S0000500', online, now);

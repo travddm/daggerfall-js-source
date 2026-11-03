@@ -18,7 +18,7 @@ export const SD_REZ_PAGE_SLACK_MS = 10_000;
  *  over: each tab wrote its own boot-time copy back over the other's. A read the store has not changed is not parsed
  *  again.
  *  `me()` the signed-in account's id (null: none), `storage()` the store (systems/appStorage.js's).
- *  SD-REZ (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed"): and a slot let go again - `rise(s)`, the body a friend
+ *  SD-REZ (EVENT-RULES, 2026-10-25): and a slot let go again - `rise(s)`, the body a friend
  *  raised in the Hour it fell in, inside the realm's window (`mayRise(s)`: the last add of `s`, SD_REZ_MS less the page's
  *  slack ago at most; a slot never added, or none, may always).
  * @param {string} key @param {() => string|null|undefined} me @param {() => any} [storage] @param {() => number} [clock]

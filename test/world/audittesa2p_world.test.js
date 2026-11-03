@@ -1,4 +1,4 @@
-// AUDIT TESA II, lane P (2026-10-25; bible/03-World/Arena-Provinces.md, bible/03-World/World-Wide.md) - THE PLACES PAST
+// AUDIT TESA II, lane P - THE PLACES PAST
 // THE BAY ON THE WORLD'S REGISTRY AND THEIR SHORES: a live list on the registry (P7), the rows the places past the Bay
 // stand (world/pastBayRows.js - P7, P13), a port's dry shore (P8), the picture's lakes (P12) and the names every client
 // draws alike (P10) - on hand-made traces, and on the freeware's own where the law reads it.
@@ -89,18 +89,16 @@ test('AUDIT TESA II P7/P13 (ARENA2) THE ROWS PAST THE BAY on the freeware\'s tra
   const rows = pastBayPlaceRows({ pixels: px, templateOf: (p) => arenaTemplateOf(t, p), capitals: true });
   const slices = CAPITALS.reduce((n, c) => n + capitalSpan(c) ** 2, 0);
   const pinned = px.stood.filter((p) => p.pinned).length;
-  assert.deepEqual([rows.length, slices, pinned], [px.stood.length - pinned + slices, 631, 7], 'the slices, and the stood places but the pinned');   // PIN MOVED (TS5): the Imperial City seven pixels a side; PIN MOVED (IC-GRAND): twenty-five (625 and the other six capitals' six)
+  assert.deepEqual([rows.length, slices, pinned], [px.stood.length - pinned + slices, 631, 7], 'the slices, and the stood places but the pinned');
   const ic = CAPITALS.findIndex((c) => c.name === 'Imperial City'), at = capitalPin({ name: CAPITALS[ic].name, province: CAPITALS[ic].province });
   const icRows = rows.filter((r) => isCapitalPlaceId(r.mapId) && (r.mapId & 0x7ffff) % 16 === ic);   // capitalPlaceId: k + 16 a slice
   assert.equal(icRows.find((r) => r.px === at.px && r.py === at.py)?.mapId, capitalPlaceId(ic, 0), 'the centre its capital\'s own id');
-  const span = capitalSpan(CAPITALS[ic]), h = (span - 1) / 2;   // PIN MOVED (TS5): seven a side; PIN MOVED (IC-GRAND): twenty-five
+  const span = capitalSpan(CAPITALS[ic]), h = (span - 1) / 2;
   assert.equal(icRows.length, 625, 'the Imperial City\'s six hundred and twenty-five');
   assert.deepEqual(icRows.map((r) => [r.px - at.px, r.py - at.py]).sort(), Array.from({ length: span * span }, (_, s) => [s % span - h, Math.floor(s / span) - h]).sort());
   assert.ok(icRows.every((r) => r.type === LOCATION_TYPES.TownCity && r.w === 8 && r.h === 8));
   for (const p of px.stood.filter((q) => q.pinned)) assert.ok(!rows.some((r) => r.mapId === arenaPlaceId(p)), `${p.name} stands as its capital alone`);
-  // PIN MOVED (NIBEN-SEA): 29 - the Imperial City's Waterfront a port, its canal through to the lake's arm
   assert.equal(rows.filter((r) => r.port).length, 29, 'the lore\'s ports, a pinned one its capital\'s centre, and the Imperial City\'s Waterfront');
-  // PIN MOVED (RUMARE-WATER): the Waterfront's own slice, row 22 - its quay and its piers' ends, the lake the sea's - where
   // it was the south edge's
   assert.deepEqual(icRows.filter((r) => r.port).map((r) => [r.px - at.px, r.py - at.py]), [[0, 22 - h]], 'the Imperial City\'s port its Waterfront\'s slice');
   assert.equal(pastBayPlaceRows({ pixels: px, templateOf: () => null, capitals: true }).length, slices, 'no clone, no place');
@@ -168,7 +166,7 @@ test('AUDIT TESA II P12 (ARENA2): the freeware\'s picture holds two lakes (PIN M
   }
   assert.deepEqual(sizes.sort((a, b) => b - a), [20, 15], 'Hammerfell\'s two');   // PIN MOVED (NIBEN-SEA): [115, 49, 20, 15, 11] - the Niben and Lake Rumare's two pieces joined to the sea
   // Lake Rumare: the water on the picture within six picture pixels of the Imperial City's pin (the city's isle is four
-  // across) - PIN MOVED (NIBEN-SEA): every such cell the open sea's, joined to the Topal Bay down the Niben
+  // across)
   const ic = CAPITALS.find((c) => c.name === 'Imperial City'), at = capitalPin({ name: ic.name, province: ic.province });
   const [cx, cy] = bayToPicture(at.px + 0.5, at.py + 0.5).map(Math.floor);
   let water = 0;

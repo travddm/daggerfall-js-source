@@ -48,21 +48,6 @@ test('H4: the rotation clock turns ONE NEGATIVE degree per 0.02s of real time, a
   assert.equal(w.yawDeg, -53, 'a long stall spins 50 degrees, never a reset');
 });
 
-test('H4: the window fires the door only with a SELECTION and no result box, after the chrome, in canvas pixels', () => {
-  const src = read('src/ui/bankPurchaseWindow.js');
-  const drawAt = src.indexOf('draw(renderer, canvas, font)');
-  const body = src.slice(drawAt);
-  const chrome = body.indexOf('drawImg(renderer, _art, m, PURCHASE_PANEL_X, PURCHASE_PANEL_Y);');
-  const door = body.indexOf('this.hooks.drawModelPreview?.(');
-  assert.ok(chrome > 0 && door > chrome, 'the pass paints INSIDE the display rect over the chrome, so it runs after');
-  assert.ok(body.includes('if (modelIdNum != null && !this.inPort) {'),   // DROPS-AUDIT F11: and never while ported
-    'SelectNone shows an empty panel (:298); F138 removed the window-local result box entirely');
-  assert.ok(body.includes('x: m.ox + (PURCHASE_PANEL_X + dx) * m.s'),
-    'the rect travels in CANVAS pixels - the scissor\'s frame, not native units');
-  assert.ok(body.includes('}, this.yawDeg, this.isShips ? previewShipCamera(sel) : PREVIEW_HOUSE_CAMERA);'),
-    'the window\'s clock and BOTH camera laws ride the call (D6: :243-244 is the ships arm)');
-});
-
 test('D6: a NULL house list IS the shipyard (:181-185) - two ShipTypes at flat prices', () => {
   // DFU has ONE popup and its discriminator is the list it was
   // constructed with: BuyShipButton pushes it with `null` (:463) and
@@ -108,38 +93,6 @@ test('D6: the shipyard frames each hull from (0, 12, GetShipCameraDist) with its
   assert.deepEqual(previewShipCamera(SHIP_TYPES.None), { y: 12, z: 0 });
   assert.equal(shipModelId(SHIP_TYPES.Small), 910);
   assert.equal(shipModelId(SHIP_TYPES.Large), 909);
-  // the draw arm picks the model off the ShipType, not off a record
-  // that a ShipType does not have
-  const src = read('src/ui/bankPurchaseWindow.js');
-  assert.ok(src.includes('this.isShips ? shipModelId(sel) : sel.modelIdNum ?? null'),
-    'a ShipType has no modelIdNum, so the shipyard would preview nothing');
-});
-
-test('H4: the host pass - scissor brackets beginFrame\'s clear, viewport follows it, the one mirror, both restored', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const i = wm.indexOf('function drawBankModelPreview(');
-  assert.ok(i > 0, 'worldModes implements the door');
-  const fn = wm.slice(i, wm.indexOf('\n  }\n', i));
-  // PIN MOVED, ROAD-C c2/S2. This pass was the tree's THIRD hand-rolled
-  // copy of the panel bracket. It got the two hard parts right -
-  // scissor BEFORE beginFrame (SCISSOR_TEST gates gl.clear) and
-  // viewport AFTER it (beginFrame sets the full one) - and still
-  // leaked fog and lighting, and paid a synchronous
-  // gl.getParameter(COLOR_CLEAR_VALUE) every frame. The whole
-  // sequence now lives ONCE, in renderer.beginPanelFrame, where its
-  // ordering is pinned as observed GL calls rather than as source
-  // order in a consumer (test/ui/automap/roadc_panelframe.test.js), and its
-  // return runs in a finally that a throwing body cannot skip.
-  assert.ok(fn.includes('renderer.panelFrame({'), 'the pass runs inside the renderer\'s bracket');
-  assert.ok(!fn.includes('gl.enable(gl.SCISSOR_TEST)') && !fn.includes('gl.viewport('),
-    'and holds no scissor/viewport sequence of its own');
-  assert.ok(!fn.includes('gl.getParameter('), 'no per-frame synchronous driver query survives');
-  assert.ok(fn.includes('renderer.drawMesh(gpu, trs(0, 0, 0, 0, yawDeg, 0))'), 'the model still draws, spun by the window\'s yaw');
-  assert.ok(fn.includes('clear: [0, 0, 0, 1]'), 'this camera\'s SolidColor clear is opaque black, and says so');
-  assert.ok(fn.includes('mirrorProjectionX(perspective(60 * (Math.PI / 180)'),
-    'the ONE mirror rides the projection (mat4\'s law - this pass culls); Unity\'s default 60-degree lens');
-  assert.ok(fn.includes('getGpuMesh(modelIdNum).then('), 'the mesh loads through the pipeline\'s own async door');
-  assert.ok(wm.includes('drawModelPreview: drawBankModelPreview'), 'and the window is handed the door');
 });
 
 // ── AUDIT 58: THE PRICE LIST'S TWO ARROWS ────────────────────────

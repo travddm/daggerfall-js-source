@@ -501,7 +501,6 @@ test('the questor door stays SHUT for an NPC already questoring an active quest'
 // ═══ MAC-K2: THE QUEST WALK, WHERE IT NOW LIVES ═══════════════════
 
 test('MAC-K2: the bridge’s questLog is the ONE walk - and it is the arithmetic three hosts each kept a copy of', () => {
-  // Mac, 2026-09-15: "Logbook not reflecting quests."
   //
   // The L key opens the chronicle, and the chronicle had no quest
   // section - it was handed `questMessages` by all four hosts and
@@ -553,10 +552,7 @@ test('MAC-K2: the bridge’s questLog is the ONE walk - and it is the arithmetic
   const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', '../src/scenes/quest/questBridge.js'), 'utf8');
   const body = src.slice(src.indexOf('    questLog({ windows = true } = {}) {'), src.indexOf('\n    },', src.indexOf('    questLog({ windows = true } = {}) {')) + 6);
   assert.ok(body.includes('remainingTimeInSeconds'), 'the slice really is the walk');
-  // PIN MOVED (QL1/QL12): the walk asks the questlines' layer for each row's `ql`, and hands the lines and the ladders -
   // a DFU-only layer here (no row of its own, the switch off), so what is under test stays these lines' arithmetic
-  // PIN MOVED (QUEST-AUDIT III NAMED-TIMER): the lifted questLog reads the lens's clocksNamed too
-  // PIN MOVED (RPT1026-QUESTS ABANDON-ALWAYS): and machine.js's holdsQuestorDoor - a quest with no entry that holds its
   // questor's door is a row (these fixtures hold none, so the rows below stand)
   const questLog = new Function('machine', 'notebook', 'clockCounts', 'questlines', 'quietText', 'questlinesOn', 'ladderRows', 'clocksNamed', 'holdsQuestorDoor',   // DEAD-CLOCK: whether a clock's end changes anything; QUEST-AUDIT III NAMED-TIMER: the clocks an entry names
     `const isShelved = (q) => q?.shelvedAt != null;   // QUEST-SHELF (PIN MOVED): the walk files a quest set aside apart
@@ -573,7 +569,7 @@ test('MAC-K2: the bridge’s questLog is the ONE walk - and it is the arithmetic
   assert.deepEqual(log.active[0].messages, [{ id: 1010 }, { id: 1020 }], 'resolved, in the machine’s own order');
   assert.deepEqual(log.active[0].steps, [{ stepID: 0, messageID: 1010, time: 50 }, { stepID: 1, messageID: 1020, time: 40 }],
     'GUIDE1: each message beside the step it was written at - a step whose message is gone goes with it, so steps[i] is messages[i]\'s');
-  assert.deepEqual(log.ended, [{ id: '9', name: 'Paid', questName: 'M0B00Y02', success: true, ql: null }, { id: '10', name: null, questName: 'M0B00Y03', success: false, ql: null }]);   // PIN MOVED (QL1): `ql`, null for DFU's quest
+  assert.deepEqual(log.ended, [{ id: '9', name: 'Paid', questName: 'M0B00Y02', success: true, ql: null }, { id: '10', name: null, questName: 'M0B00Y03', success: false, ql: null }]);
   assert.equal(log.active[0].clockSeconds, 120,
     'the SHORTEST live clock, by its LIVE read (clock_b\'s field says 130) - a finished one and a disabled one are not timers');
   assert.deepEqual(log.finished, ['a finished one']);
@@ -582,7 +578,7 @@ test('MAC-K2: the bridge’s questLog is the ONE walk - and it is the arithmetic
   assert.equal(dead.active[0].clockSeconds, 600, 'clock_b counts for nothing: clock_a\'s ten minutes are the deadline');
 
   // a host whose notebook has not been built yet is not a crash
-  assert.deepEqual(questLog({ quests: new Map() }, null, undefined, ...layerOff), { active: [], finished: [], ended: [], hidden: [], shelved: [], unlogged: [], lines: [], ladders: [] });   // QUEST-SHELF (PIN MOVED): and none set aside; QL2/QL12 (PIN MOVED): no quest before its first entry, no line, no ladder
+  assert.deepEqual(questLog({ quests: new Map() }, null, undefined, ...layerOff), { active: [], finished: [], ended: [], hidden: [], shelved: [], unlogged: [], lines: [], ladders: [] });   // QUEST-SHELF (
 
   // AND NO HOST WALKS IT ITSELF ANY MORE. Derived: the clock field is
   // the walk's own vocabulary, so a host that spells it has grown a

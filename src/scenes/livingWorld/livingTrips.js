@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW3 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVING WORLD'S ROADS - THE TRIPS' WORLD. The trips are pure
+// LW3: THE LIVING WORLD'S ROADS - THE TRIPS' WORLD. The trips are pure
 // (systems/livingWorld/trips.js); their world is the world host's: the towns - the game's OWN rows (a mod's addition stands
 // on one client and not another), the populated types, each as its MAPS row says it (its blocks, its climate's people, its
 // region, its port) - and the way between two, the Travel Options planner's on Hazelnut's roads (the follow key's and the
@@ -9,8 +9,7 @@
 // it has made. WW1: the towns and the dungeons are the world's registry's (scenes/livingWorld/livingIndex.js) - the Bay's
 // rows, and whatever a provider past the Bay stands - filed by the world's own key, grouped by AREA (the region on the Bay).
 //
-// WW7-7 (2026-10-26, the owner: "Yes travellers to need to travel everywhere. Same for ships."; bible/03-World/World-Wide.md
-// WW7-7): out of scenes/world.js (HOST-SPLIT: the host wires it - its index, its ways, its trips' world and their memo,
+// WW7-7: out of scenes/world.js (HOST-SPLIT: the host wires it - its index, its ways, its trips' world and their memo,
 // 33 logical lines out of bootWorld), and the land past the Bay lived in:
 //  - THE LAND PAST THE BAY'S WORD (`epoch`): the roads past the Bay (scenes/tamrielRoadsHost.js, `pastTheBay` - TESA14: a
 //    region at a time on the roads' workers, the nearest the player first) laid WHOLE - none of their regions still to land
@@ -30,8 +29,7 @@
 //    table and its two ends), and a pair past the Bay is the window planner's. The land past the Bay's dry ground is the
 //    composed continent's height over the beach line (`isTamrielGround`: the land standing).
 //
-// WW7-9 (2026-10-26, the coordinator: the owner's "travellers need to travel everywhere", across the Bay's edge and region
-// by region; bible/03-World/World-Wide.md WW7-9):
+// WW7-9:
 //  - REGION BY REGION. The land past the Bay's word is TESA14's host's own now (`pastTheBay` - `build` its build's number,
 //    `landedIn` whether every region whose layer and places reach a box has landed, `onRegion` each region's grid as it
 //    lands): a place WAITS while the land past the Bay within LIVING_WAKE_PX of it is still being laid (`waiting` - its
@@ -47,8 +45,7 @@
 //    `pastTheBay`, and its Bay is the Bay it always was, to the byte - a Bay town by the edge waits while the land past
 //    it is laid, so no client walks it otherwise once both have laid it.
 //
-// WW7-11 (2026-10-26, the owner on passages past the Bay being rare: "Make them longer"; bible/03-World/World-Wide.md
-// WW7-11): where the land past the Bay stands (`longPassages`) a port's traveller's passage on a far lane takes as many of
+// WW7-11: where the land past the Bay stands (`longPassages`) a port's traveller's passage on a far lane takes as many of
 // its cycles as it needs (systems/livingWorld/trips.js voyageBlock); a capital is one town, its centre (livingIndex.js
 // capitalStreet - its streets send no traveller).
 // ═══════════════════════════════════════════════════════════════════

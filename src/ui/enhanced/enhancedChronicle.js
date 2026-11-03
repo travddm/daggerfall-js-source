@@ -1,6 +1,5 @@
 // PX24 - THE CHRONICLE.
 //
-// Mac: "with the logbook and history, I want them as one detailed UI."
 //
 // One window over three sections, because what the logbook and the
 // history hold is one subject - THE THINGS WRITTEN DOWN ABOUT YOU:
@@ -52,7 +51,7 @@ let sharing = null;
 let shareWord = '';
 let bountyArmed = null;   // BOUNTY1: the bounty whose Abandon was pressed once
 let shelfWord = '';   // QUEST-SHELF-MAIN: what the last Abandon said ("Abandoned: ..." or why not), above the quests
-// MAC-F (Mac: "Quests and their tabs should be able to be minimized").
+// MAC-F.
 // WHICH CARDS THE PLAYER HAS SHUT, as `section:index`. A quest's whole
 // trail is its body and twelve of them is a wall of text; the classic
 // logbook answers that with four-lines-and-a-Next-button, this window
@@ -66,7 +65,7 @@ const folded = new Set();
 let clockTimer = null;
 const clockSpans = new Map();   // quest id -> its timer span, this render's
 
-// MAC-K2 (Mac: "Logbook not reflecting quests"). QUESTS GOES FIRST,
+// MAC-K2. QUESTS GOES FIRST,
 // and it is the section this window was missing entirely. The L key
 // (`LogBook`, InputManager's own name for it) opens this window; the
 // three sections it had were Notes, Messages and History, none of
@@ -80,7 +79,7 @@ const clockSpans = new Map();   // quest id -> its timer span, this render's
 export const CHRONICLE_SECTIONS = Object.freeze([
   ['quests', 'Quests'], ['notes', 'Notes'], ['messages', 'Messages'], ['history', 'History'],
 ]);
-// LW7c (bible/06-Systems/Living-World.md "LW7c", Mac: "make friends or enemies"): THE PEOPLE WHO KNOW YOU - the living
+// LW7c ("LW7c"): THE PEOPLE WHO KNOW YOU - the living
 // world's residents the character has met (systems/livingWorld/people.js peoplePage), a section of its own where the
 // host hands the page over (`people`): the friends, the enemies, the known - the last of the things written down about
 // you, by the people who wrote it.
@@ -592,7 +591,7 @@ function paint() {
           };
           top.append(ab);
         }
-        // RVN7c (bible/12-Enhanced-AI/Feud-Arc.md 18.3): a hunt's Abandon (twice), its lair forgotten - never a share
+        // RVN7c (18.3): a hunt's Abandon (twice), its lair forgotten - never a share
         if (section === 'quests' && isHuntQuestId(e.uid)) {
           const armed = bountyArmed === e.uid;
           const ab = el('button', 'cr-rm cr-share', armed ? 'Click again' : 'Abandon');
@@ -606,7 +605,7 @@ function paint() {
           };
           top.append(ab);
         }
-        // QUEST-SHELF-MAIN (2026-10-13, Dudey: "an Abandon button for all quests except main quest"): every other running
+        // QUEST-SHELF-MAIN: every other running
         // quest's Abandon (twice, BOUNTY1's arming) - QUEST-SHELF's own door (scenes/quest/questBridge.js journalClean.abandon:
         // set aside, kept, reclaimed from the pause window's Quests tab), drawn where it may be (`canAbandon` - never the
         // main story's, a raid the sea runs, or one ending). A bounty's and a hunt's keep their own above.

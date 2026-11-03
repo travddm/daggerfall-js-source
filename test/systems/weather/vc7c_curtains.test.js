@@ -1,5 +1,4 @@
-// VC7c - THE RAIN CURTAINS (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive" - rain
-// shafts, one of the four chosen; then "Whatever is the most visually detailed and immersive").
+// VC7c - THE RAIN CURTAINS.
 //   - a cell whose weather falls hangs a veil from its base to the ground: a cylinder of CURTAIN_SHARE of its
 //     radius, rain's own extinction (Koschmieder's 3.0 over five kilometres), thinning to its rim, reaching up into
 //     its cell and thinning to nothing there;
@@ -46,7 +45,7 @@ test('VC7c: the constants - rain\'s own extinction, and what falls under which w
   // integral of the core's declared profile; the first chord took its axis weight all the way, and read a twentieth)
   const T = veils(marchFns([{ ...cellOf('thunder', 0, 0, 6000), dark: 0 }], FLAT), [-20000, 0, 0], unit([1, 0.02, 0])).front[3];
   assert.ok(T > 0.05 && T < 0.12, `a storm's core passes ${T.toFixed(3)}`);
-  assert.deepEqual(CURTAIN_FALL, { rain: [1, 0], thunder: [1.3, 0], snow: [0.7, 1], ashfall: [0.9, 0] });   // PIN MOVED (ASHFALL1, 2026-10-27): the ash's veil
+  assert.deepEqual(CURTAIN_FALL, { rain: [1, 0], thunder: [1.3, 0], snow: [0.7, 1], ashfall: [0.9, 0] });
   assert.ok(Object.isFrozen(CURTAIN_FALL) && Object.values(CURTAIN_FALL).every(Object.isFrozen));
 });
 
@@ -243,12 +242,12 @@ test('VC7c: THE SLAB\'S START CUTS THE VEIL - before it in front of everything, 
   // the march: the back goes in before the first LIT sample past it, or behind everything; the front last of all
   const main = MARCH_FS.slice(MARCH_FS.indexOf('void main() {', MARCH_FS.indexOf('vec4 cirrus(')));
   assert.ok(main.includes('curtains(cam, dir, t0, front, back, tBack);') && main.includes('bool veiled = back.a >= 1.0;'), 'cut where the slab begins');
-  const lit0 = main.indexOf('    if (!veiled && tBack <= t) { col += T * back.rgb; T *= back.a; veiled = true; }');   // SLAB-SPAN; SKY-ARC; AUDIT PRECIP SKY-5 (PIN MOVED): each of its samples in its own aerial perspective already (veilPiece)
+  const lit0 = main.indexOf('    if (!veiled && tBack <= t) { col += T * back.rgb; T *= back.a; veiled = true; }');   // SLAB-SPAN; SKY-ARC; AUDIT PRECIP SKY-5 (
   assert.ok(lit0 > main.indexOf('if (strode) { t -= coarse;') && lit0 < main.indexOf('float tau = lightDepth(p);'), 'at a lit sample, after a stride is backed out - only a lit sample has an order to keep');
-  const after = main.indexOf('  if (!veiled) { col += T * back.rgb; T *= back.a; }');   // AUDIT PRECIP SKY-5 (PIN MOVED)
+  const after = main.indexOf('  if (!veiled) { col += T * back.rgb; T *= back.a; }');   // AUDIT PRECIP SKY-5 (
   assert.ok(after > lit0 && after < main.indexOf('vec4 ice = cirrus(cam, dir);'), 'behind every lit sample, and under the slab\'s own aerial perspective (SLAB-SPAN: the last span\'s)');
   const exits = main.match(/outColor = [^;]*;/g);
-  // AUDIT PRECIP SKY-1 (PIN MOVED): the far early-out lays the slab it never walks by its length (farA) - the march's own law
+  // AUDIT PRECIP SKY-1 (
   assert.deepEqual(exits, ['outColor = underCurtains(uHorizonColor, 0.0, cam, dir);', 'outColor = underCurtains(uHorizonColor * a, 1.0 - a, cam, dir);', 'outColor = vec4(front.rgb + front.a * col, T * front.a);'], 'the rows with no slab to cut take all of it in front; the march\'s end lays the front over everything');
   const under = fnBody(MARCH_FS, 'vec4 underCurtains(vec3 col, float T, vec3 cam, vec3 dir)');
   assert.ok(under.includes('curtains(cam, dir, 1e9, front, back, tBack);') && under.includes('return vec4(front.rgb + front.a * col, T * front.a);'));

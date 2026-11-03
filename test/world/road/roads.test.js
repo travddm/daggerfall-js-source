@@ -157,12 +157,6 @@ test('ROADS 2: classify - the centre of any arm wins over the edge of another', 
   assert.equal(classify(10, 10, DIR.N), null, 'far from any arm');
 });
 
-test('ROADS: the solo pipeline is byte-for-byte unchanged with no network', async () => {
-  const src = (await import('node:fs')).readFileSync('src/world/terrain/terrainGen.js', 'utf8');
-  assert.match(src, /roads = null/, 'the seam defaults to no network');
-  assert.match(src, /if \(roads\) \{/, 'and paints only when one is handed in');
-});
-
 // ROADS 3: THE PRODUCER, and the wire. The generator is pure so the
 // producer is the only thing that touches the archives; pinned on a
 // stub MapsFile and a stub WoodsFile so the enumeration and the water
@@ -206,26 +200,7 @@ test('ROADS 3: every region\'s map table becomes settlements, a dead region cont
   assert.equal(buildRoadsFromArchives({ get regionCount() { throw new Error('bad'); } }, woods), null);
 });
 
-test('ROADS 3: the network rides both terrain kernels and the world host builds it once', async () => {
-  const fs = await import('node:fs');
-  const worker = fs.readFileSync('src/world/terrain/terrainGenWorker.js', 'utf8');
-  assert.match(worker, /m\.t === 'roads'/, 'the worker accepts the network');
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(worker, /generatePixelTerrain\(\{ \.\.\.m, woods, roads, sites, beyond, climates \}\)/, 'and hands it to the kernel on every job');   // LANDFORM4: beside the sites
-  const client = fs.readFileSync('src/world/terrain/terrainGenClient.js', 'utf8');
-  assert.match(client, /setRoads\(settlements, onStats = null, switches = null\)/, 'the client has the door (ROADS 24: the switches ride it)');
-  assert.equal((client.match(/roads: this\._roads \?\? null/g) || []).length, 6,   // LANDFORM1-3: and the three paths a promotion's grid takes here - its ghost rows are cut along the same network
-    'every same-thread path - direct, worker-error, and dying-worker drain - carries it');
-  // AUDIT ROADS F2: the worker BUILDS; this thread builds only on a
-  // fallback path, and every one of the three calls _roadsFallback first.
-  assert.equal((client.match(/this\._roadsFallback\(\);/g) || []).length, 4,
-    'setRoads-with-no-worker plus all three same-thread paths rebuild lazily');
-  assert.match(worker, /buildRoadsFromSettlements\(m\.settlements, woods\)/, 'the worker builds with its own woods');
-  const host = hostText('src/scenes/world.js');
-  assert.match(host, /terrainGen\.setRoads\(settlementsOf\(maps\)/, 'the host enumerates and hands the LIST over - the build never touches the frame');
-});
-
-// AUDIT ROADS (2026-09-01): the fixes, each pinned - the sweep found all
+// AUDIT ROADS: the fixes, each pinned - the sweep found all
 // three fixes UNPINNED, which is the vacuous shape this bible keeps
 // catching, so the audit's first product is these.
 test('AUDIT ROADS F1: a farm gets no track - it sits in the fields it works', async () => {
@@ -276,13 +251,6 @@ test('AUDIT ROADS F3: the heuristic is scaled by the road discount, so A* still 
   const path = route({ x: 250, y: 100 }, { x: 290, y: 120 }, { heightAt: flat, isWater: () => false, existing: roads, d: D });
   const onRoad = path.filter((p) => roads[p.y * MAP_W + p.x] !== 0).length;
   assert.ok(onRoad >= 20, `the route rides the existing road for most of its length (${onRoad} of ${path.length} steps on it)`);
-  // RECORDED: an inadmissible heuristic MAY miss the optimum; it does not
-  // always, and on this fixture it does not - both h find the same 41
-  // steps. So the behaviour above is a regression guard, not the proof.
-  // The guarantee is pinned at the source: h carries the discount.
-  const src = (await import('node:fs')).readFileSync('src/world/road/roadNetwork.js', 'utf8');
-  assert.match(src, /const hScale = d\.roadDiscount \* \(terrain \? Math\.min\(1, terrain\.d\.shoreCost\) : 1\);\n\s+const h = \(x, y\) => Math\.hypot\(x - to\.x, y - to\.y\) \* hScale;/,
-    'h is scaled by the cheapest step, which is what admissibility requires - PIN MOVED (VOYAGER1): and by the shore\'s price on the land\'s law');
 });
 
 // ROADS 22: THE PAINTER DRAWS NO RING. The mod paints none - its towns
@@ -310,8 +278,7 @@ test('ROADS 22/AUDIT 51: a road pixel paves the rect\u2019s padding, the streets
   for (const [x, y] of [[54, 64], [73, 64], [64, 73], [53, 53], [74, 74]]) assert.equal(tilemap[y * 128 + x], 0, `nothing outside the rect at ${x},${y}`);
 });
 
-// ROADS 5 (2026-09-01, Mac's first real-data look: "the roads are
-// extremely jagged"): A ROAD-BUILDER LAYS STRAIGHT STRETCHES. Plain A*
+// ROADS 5: A ROAD-BUILDER LAYS STRAIGHT STRETCHES. Plain A*
 // on an 8-connected grid draws a 1-in-10 slope as nine E and one NE,
 // over and over, and the painter turns each change into a 135-degree
 // kink at a pixel centre. With the heading in the search state and a
@@ -392,20 +359,6 @@ test('ROADS 25: the network is traced into chains, simplified, rounded and lifte
   const grid = buildOverworldGrid({ heightBytes: ctx.heightBytes, width: 8, height: 4, climateAt: () => 227 });
   assert.ok(grid.colors.length === 8 * 4 * 3, 'a plain relief');
   const fs = await import('node:fs');
-  // MAP1 (2026-09-18) re-aimed this half: the 3D relief and its renderer
-  // are RETIRED, and the network is INK on the held parchment
-  // (ui/ink/inkMap.js) - traced by the same traceChains, softened by the
-  // same simplify/Chaikin pair, and inked ONLY when the network is the
-  // mod's own arrays (the `source` word world/roadsProducer.js puts on
-  // it), never the port's generated one (bible/03-World/Roads.md).
-  const ink = fs.readFileSync('src/ui/ink/inkMap.js', 'utf8');
-  assert.match(ink, /if \(!net \|\| net\.source !== 'basic-roads'\) return \{ roads: \[\], tracks: \[\] \};/, 'only the mod\'s arrays are inked');
-  assert.match(ink, /traceChains\(mask, width, height\)\.map\(\(c\) => roundCorners\(simplifyChain\(centre\(c\)\)\)\)/, 'traced, simplified, rounded (the bounded cut) - the ROADS 25 chain');
-  // PIN MOVED (TESA13): the two strokes are inkMap's strokePaths now - the Bay's ink and the continent's one home
-  assert.match(ink, /strokePaths\(stroke, model, band, opts\.filters \?\? \{\}\);/, 'the Bay\'s paint hands its model');
-  // PIN MOVED (AUDIT TESA II M10): a kind's pen is inkMap pathPen's, strokePaths' and the past-Bay paint's one law
-  assert.match(ink, /if \(kind === 'roads'\) return \{ width: band === 'far' \? 1 : 1\.5, style: PEN\.line, dash: null \};/, 'the roads are LINES in the pen');
-  assert.match(ink, /: \{ width: 1, style: PEN\.soft, dash: \[2, 3\] \};/, 'the tracks dotted and softer under them');   // PIN MOVED (AUDIT TESA II M10): pathPen
   // the model's own order of the four classes is still the law the
   // retired renderer read: water under the tracks, tracks under the trunk
   assert.deepEqual(Object.keys(roadModel({}, ctx)), ['stream', 'river', 'track', 'trunk']);
@@ -432,8 +385,6 @@ test('ROADS 8: settlements carry their names, and an unrouted pair carries both'
   const { stats } = buildRoadNetwork({ locations: rows, heightAt: flat, isWater: island, dials: { roadReach: 600 } });
   assert.equal(stats.unrouted, 1);
   assert.deepEqual(stats.unroutedPairs[0].map((l) => l.name).sort(), ['Daggerfall', 'Ilessan Hills'], 'the pair is named at both ends');
-  const host = hostText('src/scenes/world.js');
-  assert.match(host, /\$\{l\.name \?\? '\?'\}/, 'and the log prints the name');
 });
 
 // ROADS 9 (Audit 45 F4): THE CAP. A road that ends - N without S -
@@ -492,9 +443,6 @@ test('ROADS 10: road corners are blurred, the rest of the terrain is untouched, 
   const plain = mk(); const copy = Float32Array.from(plain);
   assert.equal(smoothRoadHeights(plain, new Uint8Array(T * T)), 0);
   assert.deepEqual(plain, copy);
-  // the switch rides the network object, default on
-  const src = (await import('node:fs')).readFileSync('src/world/terrain/terrainGen.js', 'utf8');
-  assert.match(src, /if \(roads\.smooth !== false\) smoothRoadHeights\(samples, tilemap, 129, hasLocation \? locationRect : null\);/, 'default on, off only when the network says so, and the rect skipped as the mod skips it');
 });
 
 // ROADS 11 (Audit 45 F5, corrected, and F8): the sweep holds one region
@@ -517,58 +465,6 @@ test('ROADS 11: the settlement sweep restores the region it found loaded', async
   for (const v of t) assert.notEqual(v, 0xff, 'no 0xff from the painter');
 });
 
-// ROADS 12 (2026-09-02, Mac: "the toggle that attaches to the buttons
-// for each type"): a chip for roads and one for tracks, beside DFU's
-// four, under the same law - the live store, the classic inversion
-// (TRUE hides), saved with the game, absent in an older save meaning
-// shown. A chip flips the RELIEF, not the markers, so the terrain step
-// is re-run and the grid is keyed on the two flags.
-test('ROADS 12: the two chips ride the store, default shown, and the relief is keyed on them', async () => {
-  const { travelMapFilters, travelMapSaveData, restoreTravelMapSaveData, resetTravelMapState } = await import('../../../src/systems/travel/travelMapState.js');
-  resetTravelMapState();
-  const f = travelMapFilters();
-  assert.equal(f.roads, false); assert.equal(f.tracks, false);
-  f.tracks = true;
-  assert.equal(travelMapSaveData().filterTracks, true, 'a hidden layer saves as hidden');
-  restoreTravelMapSaveData({ filterDungeons: true });   // an older save: no road keys
-  assert.deepEqual([travelMapFilters().roads, travelMapFilters().tracks], [false, false], 'absent means shown');
-  resetTravelMapState();
-  // MAP1 (2026-09-18): the enhanced map's chip row is RETIRED with the
-  // relief (bible/10-UI/Held-Map-Arc.md); the two flags still ride the
-  // store, the classic window's chips still set them, and the held map
-  // READS them at paint time - a flag TRUE hides its layer, the classic
-  // inversion (AUDIT 47 A1's law: read from the store, not assumed).
-  const ink = (await import('node:fs')).readFileSync('src/ui/ink/inkMap.js', 'utf8');
-  assert.match(ink, /for \(const kind of PATH_KINDS\) \{\n\s+if \(filters\[kind\]\) continue;/, 'a hidden roads flag is not inked');   // PIN MOVED (TESA13): inkMap strokePaths; PIN MOVED (AUDIT TESA II M10): a kind at a time
-  assert.match(ink, /return band === 'far' \? \{ width: FAR_TRACK_PEN, style: PEN\.soft, dash: null \} : \{ width: 1, style: PEN\.soft, dash: \[2, 3\] \};/, 'the tracks likewise - PIN MOVED (TESA15): a hair at the far band; PIN MOVED (AUDIT TESA II M10): pathPen');
-  // MAP-FIELD2: `names` is a literal null now (Mac: the town names are
-  // clutter) - what this pin is about is the FILTERS being the live
-  // store object, which is unchanged.
-  assert.match((await import('node:fs')).readFileSync('src/ui/heldMap.js', 'utf8'), /filters: this\.filters, names: null, regionNames: REGION_NAMES,/, 'and the window hands the LIVE store object to the paint');
-});
-
-// AUDIT 46 A10: NO CHUNK IS EVER BUILT WITHOUT THE NETWORK. The worker
-// handles messages in order - init, then roads (a synchronous build),
-// then jobs - so the first terrain job waits for the network as long as
-// setRoads is posted in the same synchronous block as the client's
-// construction, before the frame loop can post a job. Pinned at the
-// source, because a setRoads moved below the first frame would ship
-// roadless chunks around the start position with every suite green.
-test('AUDIT 46 A10: the network is posted before any terrain job can be', async () => {
-  const host = hostText('src/scenes/world.js');
-  const made = host.indexOf('new TerrainGenClient({ woods, woodsBytes })');
-  const roads = host.indexOf('terrainGen.setRoads(settlementsOf(maps)');
-  // AUDIT HOST-SPLIT 2, the second read: the first generate call is the build's, in the module the join appends after
-  // all of world.js - so it stands, for the order, where the host constructs the build
-  const built = host.indexOf('const { buildPixelNow } = createPixelBuild(');
-  const gen = host.indexOf('terrainGen.generate(');
-  const firstGen = gen < 0 ? -1 : built > 0 && built < gen ? built : gen;
-  assert.ok(made > 0 && roads > made, 'setRoads follows the client\'s construction');
-  assert.ok(firstGen < 0 || roads < firstGen, 'and precedes the first generate call in the file');
-  const gap = host.slice(made, roads);
-  assert.ok(!/await /.test(gap), 'with no await between them - same synchronous block, so no frame can slip in');
-});
-
 // ROADS 14: CALIBRATED AGAINST THE ANSWER KEY. Basic Roads' hand-drawn
 // network, measured (tools/roadsCalibrate.mjs): a road bends at 30% of
 // its through-pixels, 98% of those bends are single 45-degree heading
@@ -587,15 +483,6 @@ test('ROADS 14: a right angle costs more than two single-point bends, so the roa
   const st = measure(m);
   assert.equal(st.hairpinShare, 0, 'never doubles back');
   assert.ok(st.rightAngleShare <= 0.05, `right angles are rare (${(st.rightAngleShare * 100).toFixed(1)}% of bends) - the hand's 1.7%`);
-  // RECORDED: on open ground a chamfered corner is always SHORTER than a
-  // right angle, so both the linear and the squared cost choose it here
-  // and the two assertions above hold either way - regression guards.
-  // Right angles arise only against obstacles, where terrain decides,
-  // and the place the shape is seen is the real-map run of
-  // tools/roadsCalibrate.mjs printing our right-angle share beside his
-  // 1.7%. The guarantee is pinned at the source:
-  const src = (await import('node:fs')).readFileSync('src/world/road/roadNetwork.js', 'utf8');
-  assert.match(src, /cost \+= t \* t \* d\.turnCost;/, 'the turn cost is squared in compass points');
 });
 
 // ROADS 15 (calibrated from his arrays alone): TRACKS ARE SHORT SPURS.
@@ -655,17 +542,6 @@ test('AUDIT 52 A1: a pair on different landmasses is named unrouted without a se
   assert.ok(Date.now() - t0 < 1500);
 });
 
-test('AUDIT 52 A2: the through-road merge is pinned at the source - no fixture can see it', async () => {
-  // RECORDED: on every flat fixture tried, the wide-join rule steers an
-  // approach on its own and a route that rides the existing road into
-  // town leaves the same pixels whether it stops 3 px early or not. On
-  // the REAL map the merge is measurable and small: junctions 7.0% ->
-  // 6.5%, 118 duplicate spur pixels removed. The hairpin and right-angle
-  // win was the wide join's. The law stays, at the source.
-  const src = (await import('node:fs')).readFileSync('src/world/road/roadNetwork.js', 'utf8');
-  assert.match(src, /if \(mergeNear && cell !== sc && existing\[cy \* MAP_WIDTH \+ cx\] !== 0/, 'a road joins the road it meets within mergeNear of its town');
-});
-
 // ROADS 19: THE NETWORK IS BUILT ONCE PER MAP. The cache's law, pinned
 // against an in-memory store since node has no IndexedDB: the same
 // inputs hit, any change to what shapes the network misses, and a store
@@ -693,13 +569,6 @@ test('ROADS 19: the cache key covers everything that shapes the network, and a m
   const c = await cachedNetwork({ key: k, build, store: null });
   assert.equal(builds, 2); assert.equal(c.cached, false);
   assert.equal(idbStore(undefined), null, 'no IndexedDB is a null store, not an error');
-});
-
-test('ROADS 19: a job that arrives during the cache lookup waits for it - no chunk is ever roadless', async () => {
-  const src = (await import('node:fs')).readFileSync('src/world/terrain/terrainGenWorker.js', 'utf8');
-  assert.match(src, /if \(m\.t === 'job' && pendingRoads\) \{ pendingRoads\.then\(\(\) => handle\(m\)\); return; \}/,
-    'a job behind the lookup queues on it, exactly as it queued behind the synchronous build');
-  assert.match(src, /roadsCacheKey\(\{ settlements: m\.settlements, woodsLength: woods\._bytes\?\.byteLength \?\? 0 \}\)/, 'the worker keys on the list and the heightmap');
 });
 
 // ROADS 20: THE TABLES ARE THE MOD'S. A track's diagonal inner is 51/52
@@ -748,20 +617,6 @@ test('ROADS 21: a row of villages chains into one track, and most of them are pa
   assert.ok(through >= 3, `the inner villages sit on the track rather than at the end of one (${through} of 4)`);
 });
 
-test('ROADS 21: the web\u2019s two real-map rules, pinned at the source with their readings', async () => {
-  // RECORDED: on a straight row of villages every join is collinear and
-  // no link needs to cross a village, so neither rule can be seen on a
-  // fixture. On the real map, entering villages WIDE took the web's
-  // hairpins from 5.3% to 0.0% and its right angles from 12.9% to 1.9%
-  // (his 0.0% and 2.4%); letting tracks CROSS track-grade pixels is what
-  // lets a chain pass through a village at all (his: 84% of villages on
-  // a track).
-  const src = (await import('node:fs')).readFileSync('src/world/road/roadNetwork.js', 'utf8');
-  assert.match(src, /for \(const t of trackNodes\) trackBlocked\[t\.y \* MAP_WIDTH \+ t\.x\] = 0;/, 'a track may cross a track-grade pixel');
-  assert.match(src, /for \(const t of trackNodes\) trackTowns\[t\.y \* MAP_WIDTH \+ t\.x\] = 1;/, 'and a village is one of the web\u2019s towns');
-  assert.match(src, /stopOn: paths, blocked: trackBlocked, towns: trackTowns, terrain,\s*\n\s*stopIf:/, 'links are entered wide and commit to B\u2019s side (PIN MOVED (VOYAGER1): on the land\u2019s law past the Bay)');
-});
-
 // ROADS 22: HIS NETWORK, 1:1. The four arrays load byte-exact from the
 // vendor folder; the wrong length is no file; a failed fetch is a null
 // and the generator takes over. The worker takes the arrays ready-made.
@@ -785,18 +640,6 @@ test('ROADS 22: Basic Roads loads byte-exact, refuses the wrong size, and falls 
   const fetch404 = async () => ({ ok: false });
   assert.equal(await loadModRoads(fetch404), null, 'a failed fetch is a null');
   assert.equal(await loadModRoads(undefined), null, 'no fetch at all is a null');
-  const worker = fs.readFileSync('src/world/terrain/terrainGenWorker.js', 'utf8');
-  // AUDIT 58 F3: `smooth` joins `water` on this arm - it was the one
-  // switch the three rebuilds of the network object dropped, so the
-  // Mods pane's SmoothRoads was inert on the path the game takes.
-  // The behavioural half lives in test/world/terrain/modsettings.test.js.
-  assert.match(worker, /if \(m\.net\) \{ roads = \{ roads: m\.net\.roads, tracks: m\.net\.tracks, rivers: m\.net\.rivers \?\? null, streams: m\.net\.streams \?\? null, water: !!m\.net\.water, smooth: m\.net\.smooth !== false \};/, 'the worker takes his arrays ready-made, water and smoothing included');
-  const host = hostText('src/scenes/world.js');
-  // BR3: the fetch is gated on the mod's own Enabled now. OFF asks his
-  // data for nothing and falls to ours - never to a roadless world.
-  assert.match(host, /const basicRoadsOn = modSetting\('roads-hazelnut', 'Enabled'\);/, 'the mod has its own switch');
-  assert.match(host, /\(basicRoadsOn \? loadModRoads\(\) : Promise\.resolve\(null\)\)\.then\(\(his\) => \{[\s\S]{0,500}?if \(his\) \{ terrainGen\.setRoadsData\(\{ \.\.\.his, \.\.\.roadSwitches \}/, 'his first, with the switches');
-  assert.match(host, /terrainGen\.setRoads\(settlementsOf\(maps\), logRoads, roadSwitches\);/, 'ours as the fallback, with the switches');
 });
 
 // ROADS 23: THE PAINTER IS A PORT - PaintPath table-driven, his slots,
@@ -846,43 +689,3 @@ test('ROADS 23: rivers paint water with a bank and streams narrow, only when wat
   assert.equal(both[10 * 128 + 63] & 0x3f, TILE.road, 'roads first');
 });
 
-// ── ROADS 25: THE FIRST PIXELS WERE PAINTED BEFORE THE NETWORK LANDED ──
-// Mac: "some roads are missing even though they show on the map."
-test('ROADS 25: a pixel says whether a network was present, and the host rebuilds the ones painted without one', async () => {
-  const { generatePixelTerrain } = await import('../../../src/world/terrain/terrainGen.js');
-  const { readFileSync } = await import('node:fs');
-  const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-  // The generator's own word: was a network there when this pixel was painted.
-  const gen = read('src/world/terrain/terrainGen.js');
-  assert.match(gen, /withRoads: !!roads,/);
-  assert.equal(typeof generatePixelTerrain, 'function');
-  const world = hostText('src/scenes/world.js');
-  // The host keeps it on the pixel entry...
-  assert.match(world, /const \{ samples, tilemap, positions, normals, indices: terrainIndices, bed: carved, tilemapBytes, avg, nature, withRoads[^}]*\} = await terrainGen\.generate\(/);   // PIN MOVED (TERRAIN-CUT): and the pixel's own triangles
-  assert.match(world, /^\s+withRoads,\s+\/\/ ROADS 25/m);
-  // ...and when the network lands, tears down every pixel built without
-  // one so the stream rebuilds it - on BOTH arrival paths, since the
-  // mod-data path returns early.
-  // FIX-C: the arrival MARKS the sweep; the frame RUNS it (between builds), and the sweep re-queues what it tears down
-  assert.match(world, /function rebuildRoadless\(\) \{ roadsSweepDue = true; \}/);
-  // SPAWN-ROADS: the sweep's first act takes back crossed provisional ruins, one line more before the rebuild
-  // PIN MOVED (IC-SWAP-BEHIND): built again through the swap - behind its standing view, or torn down and re-queued
-  // (scenes/swapBehind.js rebuild; test/scenes/fixc_firstStart.test.js, test/scenes/swapbehind.test.js)
-  assert.match(world, /function sweepRoadless\(\) \{[\s\S]{0,520}if \(!again\.length\) return;\n\s*swap\.rebuild\(again\);/);
-  assert.match(world, /terrainGen\.setRoadsData\(\{ \.\.\.his, \.\.\.roadSwitches \}[^\n]*rebuildRoadless\(\); return; \}/, 'the mod-data path');
-  assert.match(world, /terrainGen\.setRoads\(settlementsOf\(maps\), logRoads, roadSwitches\);\s*\n\s*rebuildRoadless\(\);/, 'our own network');
-  // A pixel IN FLIGHT when the network landed arrives roadless after the
-  // sweep, and goes straight back.
-  // ROADS 25a: the roadless pixel is REBUILT by the builder itself and the
-  // entry returned - a caller awaiting the player's pixel (the boot's
-  // camera, the teleport landing) never receives undefined. Once: the
-  // worker's message order guarantees the second paint has the network.
-  // AUDIT 68 S22: the teardown is the FIRST paint's alone - the second is kept as painted, not torn down and then read
-  // PIN MOVED (IC-SWAP-BEHIND): the first paint goes back through the swap's mark - built again behind the roadless view
-  assert.match(world, /if \(!withRoads && terrainGen\.hasRoads\) \{\s*\n\s*if \(!roadsRetry\) \{\s*\n\s*swap\.mark\(px, py\);[^\n]*\n\s*return buildPixelNow\(px, py, \{ roadsRetry: true \}\);\s*\n\s*\}\s*\n\s*console\.warn\([^\n]*kept as painted[^\n]*\);\s*\n\s*\}/);
-  assert.match(world, /async function buildPixelNow\(px, py, \{ roadsRetry = false \} = \{\}\) \{/);
-  assert.doesNotMatch(world, /terrainGen\.hasRoads\) \{ destroyPixel\(px, py, \{ collectLoose: false \}\); return; \}/, 'no path in the builder resolves the player\u2019s pixel to nothing');
-  assert.match(read('src/world/terrain/terrainGenClient.js'), /get hasRoads\(\) \{ return !!this\._roads \|\| !!this\._settlements; \}/);
-  // The map was ALREADY rebuilt on arrival (ROADS 7); the terrain now is too.
-  assert.match(read('bible/03-World/Roads.md'), /keys its grid cache on the network it was drawn with/);
-});

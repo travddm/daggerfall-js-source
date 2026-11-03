@@ -1,4 +1,4 @@
-// MWNPC14 (2026-10-10, the MW-NPC arc's fourteenth slice - bible/04-Characters/Morrowind-NPCs.md section 19): THE
+// MWNPC14: THE
 // VAMPIRES, AS MORROWIND'S ARE - PEOPLE WITH A VAMPIRE'S FACE. A BODY record's second BYDT byte marks a vampire's part;
 // OpenMW's getVampireHead (npcanimation.cpp, 0.48.0) takes the last such head of the race and sex, NotPlayable or not,
 // and the NPC wears it over its own (its hair its own). The port now reads that byte, finds that head

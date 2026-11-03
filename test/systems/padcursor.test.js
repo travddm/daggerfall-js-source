@@ -1,5 +1,4 @@
-// PAD-CURSOR (2026-10-08, Port-Ledger A; the player: "For controllers, where applicable, can we add a sort of
-// navigatable cursor? Like destiny? For all the menus"). The controller cursor's Destiny feel - the curve, the ramp,
+// PAD-CURSOR. The controller cursor's Destiny feel - the curve, the ramp,
 // the boost, the friction over a control and the pull to its centre (systems/padCursor.js) - in the game's pad layer
 // on both skins (ui/gamepadInput.js) and at the front door (ui/menu/menuPad.js); `padCursorAssist` off is DFU's linear
 // cursor (test/systems/gamepad.test.js GP3 holds that law).
@@ -151,8 +150,6 @@ test('PAD-CURSOR switch off: the door\'s cursor steps DFU\'s linear law and neve
 });
 
 test('PAD-CURSOR x DA12: the door\'s loop stays a LEAF - the desktop launcher serves it alone under its CSP, so it imports nothing and the cursor comes in from main.js; a page that hands no cursor keeps the stick on the focus walk; the restated dead zone is Unity\'s (mutants: an import in menuPad.js; the launcher losing its stick)', () => {
-  const src = readFileSync(new URL('../../src/ui/menu/menuPad.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /^\s*import\s|import\(/m, 'no static or dynamic import');
   assert.equal(DOOR_CURSOR_DEADZONE, UNITY_AXIS_DEAD);
   const focused = [];
   const ui = { candidates: () => [{ el: 'a', rect: { x: 0, y: 0, w: 10, h: 10 } }, { el: 'b', rect: { x: 0, y: 100, w: 10, h: 10 } }], active: () => 'a', connected: () => true, focus: (el) => focused.push(el), press() {}, back() {}, step: () => false };

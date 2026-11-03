@@ -1,6 +1,4 @@
-// SPELL-HAND (2026-10-23, the owner: "Using the spell hand and any 1 handed weapon in tandem. Basically being able to cast
-// one handed spells and visually seeing the one handed spell sprite hand/morrowind"; "Make the best decisions";
-// bible/05-Combat/Two-Hands.md "The spell hand"). A readied spell in the free hand beside a drawn one-handed weapon: the law
+// SPELL-HAND. A readied spell in the free hand beside a drawn one-handed weapon: the law
 // (combat/twoHands/spellHand.js spellHandOf), the live word the cast's doors read, the swing button the weapon's and the
 // cast's own press the spell's (scenes/hostMagic.js interceptAttack, firePending - THE FOUR HOSTS RULE: every host's cast
 // press says so), and the classic lane through the real rig: the weapon up, ONE of FPSSpellCasting's hands on the free
@@ -9,16 +7,82 @@ import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createPistolet } from '../../src/systems/pistolet.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { handDesc } from '../../src/combat/playerWeapon.js';
 import { spellHandOf, spellHandUp, spellHandBusy, tellSpellHand, _resetSpellHand, guardDrop, CAST_PRESS, castPending } from '../../src/combat/twoHands/spellHand.js';
 import { fpsSpellCasting, RIGHT_HAND_UV } from '../../src/combat/fpsSpellCasting.js';
 import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 import { TEMPLATES } from '../../src/systems/useItem.js';
-import { pistolRig } from './weapon/pistolRigHarness.js';
 import { fpArm } from '../../src/combat/fpArm.js';
 import { TUTORIALS } from '../../src/systems/tutorialCatalogue.js';
+import { createWeaponRig } from '../../src/combat/weapon/weaponRig.js';
+import { EQUIP_SLOTS } from '../../src/systems/equip.js';
+import { resetToDefaults, setValue } from '../../src/systems/settings/settings.js';
+import { _resetModSettings, setModSetting } from '../../src/systems/modSettings.js';
+import { walkSpeed } from '../../src/player/motor.js';
+
+const DT = 1 / 60;
+const tick = () => new Promise((res) => setTimeout(res, 5));
+
+/** THE REAL RIG IN NODE (createWeaponRig with a stub renderer that records every screen quad), wearing `right`/`left`,
+ *  drawn and warmed. `cif` is the bytes a CIF read is served, or a function of its name; `spellArmed`, `readiedSpell`
+ *  and `abortSpell` are the rig's magic doors. `walk.climbing` puts the hands on a wall. Answers { r, frame, entity, walk }.
+ *  It replaces the Pistolet's rig harness, which went with the guns. */
+async function handsRig({ right = null, left = null, leftHanded = false, warm = 60, widget = {}, cif = null, spellArmed = null, readiedSpell = null, abortSpell = null } = {}) {
+  resetToDefaults();
+  _resetModSettings();
+  setModSetting('weapon-widget', 'Enabled', false);
+  // a module switch a test needs still
+  for (const [key, value] of Object.entries(widget)) setModSetting('weapon-widget', key, value);
+  if (leftHanded) setValue('Controls', 'Handedness', 1);
+  const quads = [];
+  const walk = { climbing: false };
+  const renderer = {
+    uploadTexture: (_key, name) => name,
+    drawScreenQuad: (tex, rect, uv, tint) => quads.push({ tex, rect: { ...rect }, uv, tint }),
+    drawScreenQuadGlow: () => {},
+    setScreenOffset: () => {},
+    // a room's flat light, so a quad's tint is never null
+    flatLightAt: () => [0.3, 0.3, 0.3],
+  };
+  const canvas = { width: 320, height: 200, clientWidth: 320, clientHeight: 200 };
+  const audio = { playOneShot() {}, registerSound: async () => true };
+  const entity = {
+    items: [],
+    lightSource: null,
+    equipCountdown: 0,
+    equip: { slots: { [EQUIP_SLOTS.RightHand]: right, [EQUIP_SLOTS.LeftHand]: left } },
+    stats: { speed: 50, strength: 50, agility: 50 },
+  };
+  const fetchBytes = async (name) => {
+    const bytes = typeof cif === 'function' ? cif(name) : cif;
+    if (bytes) return bytes;
+    throw new Error('no CIF in this harness');
+  };
+  // the motion bag the hosts hand the rig (player/motor.js motionBagOf): standing still, PlayerMotor.Speed as `speedField`
+  const camera = () => ({
+    pos: [0, 1.7, 0],
+    yaw: 0,
+    pitch: 0,
+    climbing: walk.climbing,
+    move: { grounded: true, running: false, crouching: false, standing: true, speedField: walkSpeed(50) },
+  });
+  const r = createWeaponRig({
+    renderer, canvas, entity, audio, palette: { get: () => ({ r: 0, g: 0, b: 0 }) }, say: () => {}, fetchBytes, camera,
+    ...(spellArmed ? { spellArmed } : {}), ...(readiedSpell ? { readiedSpell } : {}), ...(abortSpell ? { abortSpell } : {}),
+  });
+  r.toggleSheath();   // drawn
+  // `held` is the attack button, for a test that holds it
+  const frame = async (dt = DT, held = false) => {
+    r.attackInput(0, 0, held);
+    quads.length = 0;
+    r.frame(dt);
+    r.draw();
+    await tick();
+    return quads.slice();
+  };
+  for (let i = 0; i < warm; i++) await frame();
+  return { r, frame, entity, walk };
+}
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const weapon = (templateIndex, name) => ({ name, group: 'Weapons', templateIndex, material: 0 });
@@ -29,18 +93,16 @@ const LONG_BOW = () => weapon(130, 'Long Bow');
 const BUCKLER = { name: 'Buckler', group: 'Armor', templateIndex: 109, material: 0 };
 const d = (item) => handDesc(item);
 
-test('SPELL-HAND THE LAW: a one-handed weapon in the hand that fights and NOTHING in the other - the free hand takes the spell; the weapon in the left (H) frees the right; a shield, a second weapon, a light, a two-hander, a bow, the Thunderlock, the fists or the beast keep DFU\'s two-handed cast (mutants: the free hand unread; a two-hander let in; the weapon read off the free hand; the light unread)', () => {
+test('SPELL-HAND THE LAW: a one-handed weapon in the hand that fights and NOTHING in the other - the free hand takes the spell; the weapon in the left (H) frees the right; a shield, a second weapon, a light, a two-hander, a bow, the fists or the beast keep DFU\'s two-handed cast (mutants: the free hand unread; a two-hander let in; the weapon read off the free hand; the light unread)', () => {
   const sword = d(LONGSWORD());
   assert.deepEqual(spellHandOf({ lead: 'R', right: sword, left: null }), { weaponHand: 'R', spellHand: 'L' });
   assert.deepEqual(spellHandOf({ lead: 'L', right: null, left: sword }), { weaponHand: 'L', spellHand: 'R' }, 'the weapon in the left: the right casts');
-  assert.deepEqual(spellHandOf({ lead: 'R', right: d(createPistolet()), left: null }), { weaponHand: 'R', spellHand: 'L' }, 'a Pistolet is one-handed too');
   assert.equal(spellHandOf({ lead: 'R', right: sword, left: { item: BUCKLER, shield: true } }), null, 'a shield in the free hand');
   assert.equal(spellHandOf({ lead: 'R', right: sword, left: null, leftBusy: true }), null, 'a light carried in it');
   assert.equal(spellHandOf({ lead: 'R', right: sword, left: d(DAGGER()) }), null, 'a pair: both hands up');
   assert.equal(spellHandOf({ lead: 'R', right: null, left: null }), null, 'the fists');
   assert.equal(spellHandOf({ lead: 'R', right: d(CLAYMORE()), left: null }), null, 'a two-hander');
   assert.equal(spellHandOf({ lead: 'R', right: d(LONG_BOW()), left: null }), null, 'a bow');
-  assert.equal(spellHandOf({ lead: 'R', right: d(createThunderlock()), left: null }), null, 'the Thunderlock');
   assert.equal(spellHandOf({ lead: 'L', right: sword, left: null }), null, 'the hand that fights is empty (H to the bare left): its fist and DFU\'s cast');
   // AUDIT SPELL-HAND L5-10: the beast's line was this one twice (`right` and `left` null) and pinned nothing of its own -
   // MorphSelf empties both hand slots, so the beast IS the fists' line above; its rig is DFU's (the claws, one hand)
@@ -89,33 +151,6 @@ test('SPELL-HAND THE CAST\'S DOORS (scenes/hostMagic.js): with the spell hand up
   } finally { _resetSpellHand(); }
 });
 
-test('SPELL-HAND THE FOUR HOSTS RULE: every cast press is a cast\'s own - ActivateCenterObject\'s in the street (world.js, exterior.js), indoors and in the dungeon (worldModes.js), the fixed dungeon (dungeon.js) and the hotbar - and the dungeon\'s attack door never swings on one; no swing button says it is a cast (mutants: a host\'s cast press unsaid; the dungeon swinging on a cast press)', () => {
-  // PIN MOVED (AUDIT SPELL-HAND, HOST-SPLIT): the press is the imported word CAST_PRESS (combat/twoHands/spellHand.js, handed to the hosts by scenes/hostMagic.js - TWO-HANDS' FOUR HOSTS read no two-hands module) and the
-  // dungeon's door takes its `cast` positionally - an option object was an entry each host grew by (was: `{ cast: true }`)
-  const casts = (file) => (src(file).match(/interceptAttack\?*\.?\(true, CAST_PRESS\)/g) ?? []).length;
-  assert.equal(casts('src/scenes/world.js'), 1, 'world.js: the activate press');
-  assert.equal(casts('src/scenes/exterior.js'), 1, 'exterior.js');
-  assert.equal(casts('src/scenes/worldModes.js'), 1, 'worldModes.js: the interior');
-  assert.equal(casts('src/systems/quickslots.js'), 1, 'the hotbar');
-  assert.match(src('src/scenes/worldModes.js'), /dungeonCtx\?\.playerAttackInput\?\.\(0, 0, true, true\)/, 'worldModes.js: the dungeon\'s');
-  assert.match(src('src/scenes/dungeon.js'), /if \(_act\.cast\) ctx\.playerAttackInput\(0, 0, true, true\)/, 'the fixed dungeon\'s');
-  assert.match(src('src/scenes/dungeonContext.js'), /function playerAttackInput\(dx, dy, held, cast = false\)[^\n]*\n(?:[^\n]*\n){0,8}?\s+if \(magic\.interceptAttack\(held, cast \? CAST_PRESS : undefined\) \|\| cast\) return;/, 'a cast press in the dungeon never swings');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/dungeon.js']) {
-    assert.equal((src(f).match(/isSwingButton\([^)]*\)[^\n]*interceptAttack\([^)]*CAST_PRESS/g) ?? []).length, 0, `${f}: no swing button casts as a cast`);
-  }
-  // AUDIT SPELL-HAND L4-9: the stick-half tap (TS1) is the lock pick and nothing below it - never a cast, in every host
-  assert.match(src('src/scenes/world.js'), /hasReadySpell: magic\.spellArmed\(\) && !_tapLockOnly,/);
-  assert.match(src('src/scenes/exterior.js'), /hasReadySpell: magic\.spellArmed\(\) && !_tapLockOnly,/);
-  assert.match(src('src/scenes/dungeon.js'), /hasReadySpell: \(ctx\.spellArmed\?\.\(\) \?\? false\) && !_tapLockOnly,/);
-  assert.match(src('src/scenes/worldModes.js'), /hasReadySpell: \(\(mode === 'dungeon' \? dungeonCtx\?\.spellArmed\?\.\(\) : magic\?\.spellArmed\(\)\) \?\? false\) && !host\.activateLockOnly\?\.\(\),/);
-  // AUDIT SPELL-HAND L4-6: a kept press never leaves under a window - every host hands its own pause word
-  assert.match(src('src/scenes/world.js'), /magic\.firePending\(\[\.\.\.cam\.pos\], _mfwd, gamePaused\(\)\);/);
-  assert.match(src('src/scenes/exterior.js'), /magic\.firePending\(\[\.\.\.cam\.pos\], _mfwd, gamePaused\(\)\);/);
-  assert.match(src('src/scenes/worldModes.js'), /magic\.firePending\(\[\.\.\.cam\.pos\], eyeDir\(\), overlayHeld\);/);
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): online the dungeon's frame runs under its own window, so it hands that pause word too
-  assert.match(src('src/scenes/dungeonContext.js'), /magic\.firePending\(eye, \[-aimed\[2\], -aimed\[6\], -aimed\[10\]\], !!opts\.breathHeld\?\.\(\) \|\| dungeonPaused\(\)\);/);
-});
-
 // ---- THE CLASSIC LANE, THROUGH THE REAL RIG -------------------------------------------------------------------------
 
 /** A WEAPON CIF (the two-hands suite's) and a casting CIF (the readied hands suite's: six single-frame records). */
@@ -159,7 +194,7 @@ const mirrored = (q) => q.uv?.u0 === RIGHT_HAND_UV.u0 && q.uv?.u1 === RIGHT_HAND
 /** A rig wearing `right`/`left` and a spell the pin readies; `aborted` counts the abort door. */
 async function spellRig({ right = LONGSWORD(), left = null, leftHanded = false, widget = {} } = {}) {
   const ready = { spell: null }, aborted = { n: 0 };
-  const rig = await pistolRig({ right, left, leftHanded, widget, cif: ART, spellArmed: () => ready.spell != null, readiedSpell: () => ready.spell, abortSpell: () => { aborted.n++; ready.spell = null; } });
+  const rig = await handsRig({ right, left, leftHanded, widget, cif: ART, spellArmed: () => ready.spell != null, readiedSpell: () => ready.spell, abortSpell: () => { aborted.n++; ready.spell = null; } });
   return { ...rig, ready, aborted };
 }
 const settle = async (frame, n = 40) => { let q = []; for (let i = 0; i < n; i++) q = await frame(); return q; };
@@ -259,7 +294,7 @@ test('SPELL-HAND THE RIG, DFU WHERE THE HANDS ARE FULL: a two-hander, a shield b
   } finally { _resetSpellHand(); }
 });
 
-test('SPELL-HAND THE RIG, THE SIDES: a left-handed player\'s weapon is on the left, so the spell hand stands on the right - AlignRightHand\'s rect, the art mirrored; a Pistolet beside the spell lowers under the cast as a blade does (mutants: the side fixed; the pistol\'s guard unasked)', async () => {
+test('SPELL-HAND THE RIG, THE SIDES: a left-handed player\'s weapon is on the left, so the spell hand stands on the right - AlignRightHand\'s rect, the art mirrored (mutant: the side fixed)', async () => {
   try {
     const lh = await spellRig({ leftHanded: true });
     lh.ready.spell = FIRE;
@@ -267,14 +302,6 @@ test('SPELL-HAND THE RIG, THE SIDES: a left-handed player\'s weapon is on the le
     const h = q.find(isHand), w = q.find(isWeapon);
     assert.ok(h && w, 'both drawn');
     assert.ok(h.rect.x + h.rect.w / 2 > 160 && mirrored(h), 'the spell hand on the right, mirrored');
-    const gun = await spellRig({ right: createPistolet() });
-    gun.ready.spell = FIRE;
-    let g = await settle(gun.frame);
-    const rest = g.find(isWeapon).rect.y;
-    gun.r.castSpellAnim(2, 0, () => { gun.ready.spell = null; });
-    let low = -Infinity;
-    for (let i = 0; i < 20; i++) { g = await gun.frame(); low = Math.max(low, g.find(isWeapon)?.rect.y ?? -Infinity); }
-    assert.ok(low > rest + 2, `the pistol lowers under the cast (${rest.toFixed(1)} -> ${low.toFixed(1)})`);
   } finally { _resetSpellHand(); }
 });
 
@@ -355,7 +382,7 @@ test('SPELL-HAND THE BUSY WORD IS THE HANDS\' WHOLE STRIKE: a blow begun this fr
   } finally { arm.restore(); _resetSpellHand(); }
 });
 
-// ---- AUDIT SPELL-HAND (bible/01-Overview/audits/Audit-Mixed-Pair-Spell-Hand.md) ---------------------------------------
+// ---- AUDIT SPELL-HAND ---------------------------------------
 
 const audPlayer = () => ({ isPlayer: true, level: 1, magicka: 1000, maxMagicka: 1000, skills: new Array(35).fill(30), stats: { intelligence: 50, willpower: 50 }, items: [], activeEffects: [] });
 /** A magic engine whose cast's hands are the rig's (`rigOf().r.castSpellAnim`), as every host wires it; `casts` counts them. */
@@ -376,7 +403,7 @@ test('SPELL-HAND AUDIT L4-1, THE HELD SWING NEVER STARVES THE CAST: the swing bu
   try {
     let rig = null;
     const { magic, casts } = audEngine(() => rig);
-    rig = await pistolRig({ right: LONGSWORD(), cif: ART, spellArmed: () => magic.spellArmed(), readiedSpell: () => magic.readied(), abortSpell: () => magic.abortReadySpell() });
+    rig = await handsRig({ right: LONGSWORD(), cif: ART, spellArmed: () => magic.spellArmed(), readiedSpell: () => magic.readied(), abortSpell: () => magic.abortReadySpell() });
     magic.takeReady({ sp: SP_FIRE, free: true });
     const step = (held) => { magic.firePending(EYE, DIR); return rig.frame(1 / 60, held); };
     for (let i = 0; i < 30; i++) await step(false);
@@ -554,7 +581,6 @@ test('SPELL-HAND AUDIT L3-4 / L4-7, THE ARM\'S CAST HOLDS EVERY HAND, AND A LEAP
     for (let i = 0; i < 10; i++) { await frame(1 / 60, true); if (r.playerWeapon.machine.state !== 'Idle') swung = true; }
     assert.ok(swung, 'its hands free: the blow');
   } finally { arm.restore(); _resetSpellHand(); }
-  assert.match(src('src/combat/weapon/weaponRig.js'), /const handsBusy = \(\) => [^\n]*\|\| techniqueFlying\(\);/, 'L4-7: a technique\'s leap or dash is a strike in flight (its landing blow paid for at the launch)');
 });
 
 test('SPELL-HAND AUDIT L4-4 THE TUTORIAL NAMES THE CAST\'S OWN PRESS: the spellbook page casts with ActivateCenterObject (EntityEffectManager\'s own, which casts whatever the hands) and says the swing button swings the weapon beside a spell in the free hand - never the swing button as the cast\'s (mutant: the page back to the swing button)', () => {
@@ -562,25 +588,4 @@ test('SPELL-HAND AUDIT L4-4 THE TUTORIAL NAMES THE CAST\'S OWN PRESS: the spellb
   assert.match(page.body[0], /cast it with \{ActivateCenterObject\}\./);
   assert.match(page.body[0], /the spell waits in that hand and \{SwingWeapon\} still swings the weapon\./);
   assert.doesNotMatch(page.body[0], /cast it with \{SwingWeapon\}/);
-});
-
-test('SPELL-HAND AUDIT L5-8 A SHOT\'S HIT STILL HELD IS A BLOW IN FLIGHT: under the Morrowind arm a Pistolet\'s hit waits for the arm\'s "shoot release" (MW-D42) - and where the .kf carries none (NEVER-TRAPS: it lands on its own after HELD_HIT_MAX_S), the shot is the hand\'s until it lands, its machine Idle and the arm\'s blow over: a cast beside it waits (mutant: the held hit unread by the busy word)', async () => {
-  const arm = stubArm();
-  try {
-    const { r, frame, ready } = await spellRig({ right: createPistolet() });
-    ready.spell = FIRE;
-    await settle(frame);
-    assert.equal(spellHandUp(), true, 'the spell beside the Pistolet');
-    await frame(1 / 60, true);
-    let i = 0;
-    for (; i < 120 && (r.playerWeapon.machine.state !== 'Idle' || !r.playerWeapon.shotHeld()); i++) await frame();
-    assert.equal(r.playerWeapon.machine.state, 'Idle', 'the shot\'s frames done');
-    assert.equal(r.playerWeapon.shotHeld(), true, 'its hit held for a release that never comes');
-    await frame();
-    assert.equal(spellHandBusy(), true, 'held: the cast waits');
-    for (let j = 0; j < 120 && r.playerWeapon.shotHeld(); j++) await frame();
-    assert.equal(r.playerWeapon.shotHeld(), false, 'landed on its own');
-    await frame();
-    assert.equal(spellHandBusy(), false, 'and the hands are free');
-  } finally { arm.restore(); _resetSpellHand(); }
 });

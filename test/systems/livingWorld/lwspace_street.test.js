@@ -1,5 +1,4 @@
-// LW-SPACE (2026-10-06, bible/06-Systems/Living-World.md "LW-SPACE"; Mac: "I notice NPCs and walk stuck inside each
-// other"): NOBODY ON THE STREET STANDS OR WALKS INSIDE ANOTHER. DFU's walkers keep off one another by the tiles they claim
+// LW-SPACE: NOBODY ON THE STREET STANDS OR WALKS INSIDE ANOTHER. DFU's walkers keep off one another by the tiles they claim
 // (mobilePerson.js `_setTarget`, CityNavigation's Occupied flag); a resident claims none - its day lays its walk - and
 // on the game's own towns 15-44% of the bodies in view at midday and in the evening stood inside another (Ripmarket at
 // six: 30.5%). Three causes, each its own law here: those ALONE at a spot stood at places drawn off their ids (a bearing
@@ -142,7 +141,7 @@ test('LW-SPACE the town: at every spot through the day, each one alone stands SP
   for (let m = 16 * 60; m < 19 * 60; m += 0.5) {
     const t = day * DAY_MIN + m;
     a.town._now = t; a.town._tick([a.town.places.square.x, 0, a.town.places.square.z], 0);
-    // LW-STIR: PIN MOVED - an incident's two are the round's laying too (stir.js: the round through, the one who comes
+    // LW-STIR:
     // before the one who keeps their stand - laid with those alone, `aloneStands`' `beside`)
     const rounds = new Map([...[...a.town._inCircle.values()].map((c) => [c.spot.key, `${c.circle.start}`]), ...[...a.town._inStir.values()].map((c) => [c.spot.key, `${c.pair.start}`])]);
     /** @type {Map<string, Map<string, { x: number, z: number }>>} */
@@ -417,7 +416,7 @@ test('LW-SPACE the game\'s own cities (ARENA2): Ripmarket, Wayrest and Daggerfal
   const all = cities();
   for (const name of ['Ripmarket', 'Wayrest', 'Daggerfall']) {
     const h = hostTown(/** @type {any} */ (all.find((c) => c.name === name)));
-    for (const hour of [13, 19]) {   // LW-SPREAD: PIN MOVED - the evening out at seven (from six to a quarter past seven now)
+    for (const hour of [13, 19]) {   // LW-SPREAD:
       const m = streetAt(h, hour, 20);
       assert.ok(m.seen > 20, `${name} at ${hour}:00: a street in view (${m.seen.toFixed(1)})`);
       assert.ok(m.share < 0.04, `${name} at ${hour}:00: ${(100 * m.share).toFixed(1)}% of the body-frames inside another`);

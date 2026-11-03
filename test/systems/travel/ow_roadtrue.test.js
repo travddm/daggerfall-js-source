@@ -1,5 +1,4 @@
-// OW-ROAD-TRUE (2026-10-19, the owner: "Routes should always follow the road if planned, it should never offset";
-// bible/06-Systems/Travel-View.md OW-ROAD-TRUE): A ROUTED LEG ON A ROAD WALKS THE ROAD'S LINE. The mod's autopilot aims a
+// OW-ROAD-TRUE: A ROUTED LEG ON A ROAD WALKS THE ROAD'S LINE. The mod's autopilot aims a
 // leg once a map pixel (PlayerAutoPilot.cs Update re-aims only on a pixel change), so a body knocked off the road kept its
 // bearing beside it for up to a pixel; a road or a track leg now pursues its lane every frame
 // (systems/travel/travelAutopilot.js lanePursuit), arrived where the lane ends. Pinned on the law, on a walk flown over the
@@ -146,7 +145,6 @@ test('OW-ROAD-TRUE the legs: a road or a track leg walks the line from its last 
   s.to.beginTravelAlongRoute({ legs: [{ x: 501, y: 250, kind: 'road' }, { x: 502, y: 250, kind: 'road', at: mid(502, 250), ring: true }, { x: 503, y: 250, kind: 'road' }], point: { pixel: { x: 503, y: 250 }, ...mid(503, 250) } }, false, { quiet: true });
   assert.equal(s.to.state.autopilot.path, null, 'the first leg: no leg behind it');
   s.go(501, 250); s.go(501, 250);
-  // PIN MOVED (AUDIT OW-REVISITED L2-3): the road INTO a town's ring is laned to the ring's point (ringPassPoints puts it
   // on the road's own line), and the road out of it from the ring's last point
   assert.deepEqual(s.to.state.autopilot.path, ln([501, 250], [502, 250]), 'the road into the ring: to the ring\'s point');
   s.go(502, 250); s.go(502, 250);

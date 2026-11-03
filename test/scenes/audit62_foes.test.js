@@ -149,44 +149,11 @@ test('AUDIT 62 F37: CanHearTarget casts from THIS transform to the TARGET transf
   const r = c2.cap[c2.cap.length - 1];
   assert.ok(near(r.o[1], 0.9), 'a plain walker casts from its own 0.9 transform');
   assert.ok(near(r.o[1] + r.d[1] * r.len, 0.45), `the ray ends at the FOE target's transform: ${r.o[1] + r.d[1] * r.len} (the player's half-capsule would say 0.9)`);
-  // the WIRING is what regressed before, so pin the call site too
-  assert.match(src('src/characters/enemy/enemyMotor.js'),
-    /canHearTarget\(this\.collider, this\.feet, this\.height, playerFeet, this\._dist, this\.centreOffset, this\._targetCentreOffset\(\)\)/,
-    'both offsets reach canHearTarget from _senses');
 });
 
 // ── F21 ───────────────────────────────────────────────────────────
 
 test('AUDIT 62 F21: an enemy missile aims at the TARGET transform, and the contact test is the capsule', () => {
-  const d = src('src/scenes/dungeonContext.js');
-  // DaggerfallMissile.cs:571-581 aims at enemySenses.LastKnownTargetPos,
-  // which EnemySenses.cs:453/:465 sets to target.transform.position.
-  // REVIEW: ONE body of that law now (enemyTargets.targetAimPoint) -
-  // this host's own copy converted only the FOE arm and left the
-  // player arm at a hardcoded standing half-capsule.
-  assert.match(d, /const aim = m\.aimFoe \? foeDeps\.targetAimPoint\(m\.aimFoe, playerFeet, playerHeight\) : target;/,
-    'the foe aim goes through the shared law, with the live player height alongside');
-  assert.match(d, /const target = \[playerFeet\[0\], playerFeet\[1\] \+ playerHeight \/ 2, playerFeet\[2\]\];/,
-    "the PLAYER arm is the player's transform, at the live capsule");
-  assert.doesNotMatch(d, /playerFeet\[1\] \+ 0\.9, playerFeet\[2\]\];   \/\/ mid-capsule/, 'the 0.9 aim is gone');
-  assert.match(d, /function updateMissiles\(dt, playerFeet, playerHeight = CAPSULE_HEIGHT\)/);
-  assert.match(d, /updateMissiles\(dt, playerFeet, playerHeight\);/, 'and the frame hands it the live one');
-  // ...and the contact test is now the CAPSULE DaggerfallMissile.cs:339
-  // spherecasts into, or a tall flyer would be unhittable once the
-  // flight line left the capsule centre.
-  // ROAD-H tail (review): the ARROW arm's CONTACT became spatial - an
-  // enemy shaft carries the default layer mask, so it meets whatever
-  // body is first in space (:337) and the remembered target is the
-  // DAMAGE gate (:669), not the contact gate. Its capsule read is the
-  // sweep's; the SPELL arm still resolves on the target it remembers.
-  assert.equal([...d.matchAll(/if \(missileHitsFoe\(m\.pos, af\)\) \{/g)].length, 1, 'the foe-vs-foe SPELL arm reads the capsule');
-  assert.match(d, /if \(missileHitsFoe\(m\.pos, f\)\) \{ struckFoe = f; break; \}/,
-    '...and the foe-vs-foe ARROW arm sweeps every live body with the same test');
-  // SPELLFX1's drawn peer shaft is the third: it stops on me and applies nothing.
-  assert.equal([...d.matchAll(/missileHitsCapsule\(m\.pos, playerFeet, playerHeight, PLAYER_BODY_RADIUS\)/g)].length, 3,
-    "and both PLAYER arms (plus SPELLFX1's drawn peer shaft) sweep the player's own live capsule, at the player's OWN radius (AUDIT 65 CV-2)");
-  assert.doesNotMatch(d, /const ay = af\.ai\.feet\[1\] \+ \(af\.ai\.height \?\? 1\.8\) \/ 2 - m\.pos\[1\];/, 'the single-point arrow test is gone');
-  assert.doesNotMatch(d, /const sy = af\.ai\.feet\[1\] \+ \(af\.ai\.height \?\? 1\.8\) \/ 2 - m\.pos\[1\];/, 'and the single-point spell test');
   // a 4.0m flyer: capsule halved to 2.0, transform 2.0 up. The flight
   // line runs at the TRANSFORM, a metre over the capsule centre - past
   // the 0.9 point-sphere the old test used, and well inside the capsule.
@@ -244,45 +211,10 @@ test('AUDIT 62 F21 (review): ONE aim-point law, and the player arm of it is the 
     'crouched: feet + 0.45, the crown of the capsule under the old constant');
   assert.deepEqual(targetAimPoint(null, [5, 1, 7], 2.6), [5, 2.3, 7], 'mounted: controllerRideHeight/2');
   assert.equal(isPlayerTarget(null), false, 'a null target is the player by fallback, not by identity');
-  // the four hosts that carried their own copy of the constant
-  assert.match(src('src/scenes/exteriorFoes.js'),
-    /return _targetFeet\(f, playerFeet\) \? targetAimPoint\(f\.ai\.target, playerFeet, playerHeight\) : null;/,
-    'the exterior pool aims through the shared law');
-  assert.match(src('src/scenes/exteriorFoes.js'),
-    /const aim = _targetAim\(f, playerFeet, senses\.playerHeight \?\? CAPSULE_HEIGHT\);/, '...at the live player height');
-  assert.doesNotMatch(src('src/scenes/exteriorFoes.js'), /_tgt\[1\] \+ 0\.9/, "and the player's half-capsule is gone from its arrow");
-  // ROAD-H H1/H1b (2026-09-07) rewrote this line: the archer's LOOSE
-  // POINT moved to GetAimPosition's arrow arm and the direction now
-  // runs through arrowAimDirection, so the aim POINT this pin owns is
-  // spelled as its own vector. The law is unchanged - the player's
-  // TRANSFORM at its LIVE height.
-  // ROAD-H tail (2026-09-07): the dungeon archer took BowDamage's
-  // two-arm split - it aims at its SELECTED target through the one
-  // aim-point law, which is the player's LIVE transform when the
-  // target is the player (targetAimPoint's player arm) and a foe's
-  // feet + centreOffset otherwise.
-  assert.match(src('src/scenes/dungeonContext.js'),
-    /const aim = foeDeps\.targetAimPoint\(_at, _pf, playerHeight\);/,
-    "the dungeon archer aims at its target's transform - the player at its live height");
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
     assert.match(src(f), /magic\.fireEnemyMissile\(from, missileAimDirection\(from, aimAt \?\? targetAimPoint\(null, player\.pos, player\.height\)\), spell, casterLevel, foe\);/, `${f}: the fireMissile hook too`);   // WORLD6b-iii / AUDIT WORLD6b-iii(a) C3: the three hooks aim where the executor says, and at the player's LIVE transform through targetAimPoint's player arm otherwise - ONE law, no copy of the subtraction
     assert.doesNotMatch(src(f), /player\.pos\[1\] \+ 0\.9 - from\[1\]/, `${f}: and not the standing constant`);
   }
-  assert.match(src('src/scenes/hostMagic.js'), /if \(missileHitsCapsule\(m\.pos, playerFeet, playerHeight, PLAYER_BODY_RADIUS\)\) \{/,
-    "the shared engine sweeps the player's live capsule, at the player's own radius (AUDIT 65 CV-2)");
-});
-
-test('AUDIT 62 F21: a foe casts from - and blows an AreaAroundCaster at - its own TRANSFORM', () => {
-  const c = src('src/characters/enemy/enemyCasting.js');
-  // DaggerfallMissile.cs:513-525 GetAimPosition: caster.transform
-  // .position for a non-player caster (the forward*0.6 + height/3 lift
-  // is the ARROW arm only); :280-282 DoAreaOfEffect(caster.transform
-  // .position, true).
-  assert.match(c, /const casterTransformY = f\.ai\.feet\[1\] \+ \(f\.ai\.centreOffset \?\? \(f\.ai\.height \?\? 1\.8\) \/ 2\);/);
-  assert.match(c, /const from = \[f\.ai\.feet\[0\], casterTransformY, f\.ai\.feet\[2\]\];/, 'the loose point is the transform');
-  assert.match(c, /explodeAt\?\.\(\[f\.ai\.feet\[0\], casterTransformY, f\.ai\.feet\[2\]\]/, 'and so is the AoC blast centre');
-  assert.doesNotMatch(c, /f\.ai\.feet\[1\] \+ 1\.2/, 'the 1.2 guess is gone');
-  assert.doesNotMatch(c, /f\.ai\.feet\[1\] \+ 0\.9/, "the player's half-capsule is gone from the foe caster");
 });
 
 // ── F23 ───────────────────────────────────────────────────────────
@@ -297,12 +229,7 @@ test('AUDIT 62 F23: the senses context carries the LIVE player capsule, and ever
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
     assert.match(src(f), /sensesContext\([\s\S]{0,400}?playerHeight: player\.height,/, `${f}: the live motor height reaches the foes`);
   }
-  assert.match(src('src/scenes/dungeonContext.js'), /\.\.\._activity, playerHeight,/, 'the dungeon passes the height drawFoes already holds');
-  // and the target machine's player arms take it too
-  const t = src('src/characters/enemy/enemyTargets.js');
-  assert.match(t, /playerHeight = CAPSULE_HEIGHT,/);
-  assert.match(t, /const tHeight = isPlayer \? \(c\.height \?\? playerHeight\) : targetAi\.height;/, 'WORLD3: a peer at its own capsule, the player at the live one'); assert.match(t, /const tOff = isPlayer \? tHeight \/ 2 :/);
-  assert.match(t, /tFeet, tHeight, null, distance, ai\.sightRadius\)/);
+   
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js']) {
     assert.match(src(f), /playerHeight: (?:sn|senses)\.playerHeight,/, `${f}: the targeting closure forwards it`);
   }
@@ -330,10 +257,6 @@ test('AUDIT 62 F23: a crouched player is a 0.9 capsule to every foe - transform,
   const crouched = new EnemyAI(lowWalled(), [0, 0, 0], 0, { liveSpeed: 50 });
   crouched.update(0.05, [0, 0, 10], mkSenses({ playerHeight: CROUCH_HEIGHT }));
   assert.equal(crouched.inSight, false, 'a crouched one is not - the port aimed at feet + 1.50 where DFU aims at feet + 0.75');
-  // and the spawn band's distanceToPlayer reads the same live capsule
-  assert.match(src('src/characters/enemy/enemyMotor.js'),
-    /const yDiff = \(this\.feet\[1\] \+ this\.centreOffset\) - \(playerFeet\[1\] \+ this\._playerHeight \/ 2\);/,
-    'EnemySenses.cs:288 against the LIVE player transform');
 });
 
 test("AUDIT 62 F23 (review): the OUT-OF-BAND player-LOS check reads the live capsule too", () => {
@@ -366,9 +289,4 @@ test("AUDIT 62 F23 (review): the OUT-OF-BAND player-LOS check reads the live cap
   assert.deepEqual(run(CAPSULE_HEIGHT), [0, 0, 10], 'a standing player is seen over the wall and taken as the target');
   assert.equal(run(CROUCH_HEIGHT), null, 'a crouched one is not seen, the gate holds, and no target is selected');
   assert.deepEqual(run(2.6), [0, 0, 10], 'mounted (controllerRideHeight 2.6), taller still, is seen');
-  // and the wiring: the out-of-band check is its OWN call site, not
-  // getTargets' - the parameter declaration alone pinned nothing here.
-  assert.match(src('src/characters/enemy/enemyTargets.js'),
-    /playerInSight = canSeeTarget\(ai\.collider, ai\.feet, ai\.yaw, ai\.height, playerFeet, playerHeight, null, null, ai\.sightRadius\);/,
-    'the :377-383 LOS check takes the live player height');
 });

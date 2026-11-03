@@ -1,6 +1,5 @@
 // @ts-check
-// SPYGLASS (2026-10-11, the owner: "a spyglass option where you can aim and view to observe other ships, their
-// allegiance, cargo, etc." - bible/03-World/Captains-Sea.md) - THE GLASS'S WINDOW. While the glass is up the world is
+// SPYGLASS - THE GLASS'S WINDOW. While the glass is up the world is
 // seen through it: the view narrowed to its magnification (scenes/world.js glassFov), the edge of the view the dark of
 // its tube, a reticle at its heart - and under the reticle, the card of the ship it holds (scenes/naval/navalHost.js glass:
 // systems/naval/shipKnowledge.js glassCard), her name toned by what she is to me, her rows as far as she is made out,
@@ -65,7 +64,7 @@ export const glassFov = (fov, lens) => (lens > 1 ? 2 * Math.atan(Math.tan(fov / 
 export const glassLookScale = (lens) => 1 / Math.max(1, lens);
 
 /**
- * GLASS-CLEAR (2026-10-11, the owner: "the ship blocks your view most of the time when using your spyglass"): THE GLASS
+ * GLASS-CLEAR: THE GLASS
  * FOCUSES PAST HER. Raised at a helm the view is the head's (mwViewHoldFirst), behind the ship's own masts, sails, wheel
  * and hands, and through a glass at x4 the nearest of them fill it. A glass shows nothing nearer than it is focused: as
  * the lens comes to its magnification the world's near plane stands out from the eye's own GLASS_NEAR_MIN to just past

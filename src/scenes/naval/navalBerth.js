@@ -1,5 +1,5 @@
 // @ts-check
-// FIELD BUGS 2026-10-21b VOYAGE-HOLD (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md; the Discord's #bug-reports,
+// FIELD BUGS 2026-10-21b VOYAGE-HOLD (; the Discord's #bug-reports,
 // grayhatharry: "I bought a boat, sailed from one port town to another just a shy journey down the coast ... he informed me
 // I hadn't sailed at all") - THE BERTH, as the naval host tells the harbour office (scenes/harbourOffice.js event).
 //

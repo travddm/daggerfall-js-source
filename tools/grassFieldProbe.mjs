@@ -1,5 +1,4 @@
-// GRASS2 (2026-09-18, Mac: "improve grass, improve grass performance, and
-// also have it be seen at long ranges"): THE FIELD ON A REAL GPU.
+// GRASS2: THE FIELD ON A REAL GPU.
 //
 // Every grass pin runs on a fake GL that compiles anything and draws
 // nothing, and this container has no ARENA2, so the real exterior cannot
@@ -129,7 +128,7 @@ const out = await page.evaluate(async () => {
   const storm = { ...light, dim: 0.46, sunScale: 0.3 };
   const stormSmooth = frame(200, 'smooth', { lit: storm }), stormPixel = frame(200, 'pixel', { lit: storm });
   const dithered = frame(60, 'pixel'), undithered = frame(300, 'pixel');
-  // GRASS-PX4 (Mac: "have grass have larger pixels"): the OLD 16x32
+  // GRASS-PX4: the OLD 16x32
   // sheet beside the shipped one, same field, same style, so the
   // change is measured rather than described. A tuft's texel is the
   // thing the eye reads as a pixel; the shipped sheet has a quarter as

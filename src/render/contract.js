@@ -1,5 +1,5 @@
 // @ts-check
-// HARD3 - THE RENDERER'S CONTRACT, WRITTEN DOWN (2026-09-14).
+// HARD3 - THE RENDERER'S CONTRACT, WRITTEN DOWN.
 //
 // The third slice of `01-Overview/Hardening.md`, and the boundary it
 // names first. The Weapon Widget crash was a SHAPE mismatch here, and
@@ -29,7 +29,7 @@
  * optional and why they are written down: eight files outside `render/`
  * set them, and until now nothing said what they were.
  *
- * PERF-EXT10 (2026-09-25): and every field below is MINTED at birth, the
+ * PERF-EXT10: and every field below is MINTED at birth, the
  * ones nobody has written yet as undefined, so a batch has one hidden
  * class for life (renderer.js createBillboardBatch says why) - all but
  * the shadow record's origin, `_shOx`/`_shOy`/`_shOz`, born NaN (the

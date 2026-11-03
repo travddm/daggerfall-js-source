@@ -1,4 +1,4 @@
-// L10N1b (2026-09-27): THE LOCALES' TEXT IN THE BUILD, AND THE LANGUAGE THE GAME STARTS IN.
+// L10N1b: THE LOCALES' TEXT IN THE BUILD, AND THE LANGUAGE THE GAME STARTS IN.
 //
 // Every `locales/<tag>/<table>.csv` is one lazy chunk - a DFU string-table CSV (StringTableCSVParser's format, so a
 // DFU pack's own files drop in beside the port's) patched into its locale's table of the same name. Only the chosen

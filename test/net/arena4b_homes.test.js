@@ -1,7 +1,7 @@
-// ARENA4b (2026-10-03, Mac: "Move them to a new house"): AN ONLINE HOME THE ARENA DISPLACED, MOVED BY THE ACCOUNT
+// ARENA4b: AN ONLINE HOME THE ARENA DISPLACED, MOVED BY THE ACCOUNT
 // SERVICE - driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). The rows
 // in Daggerfall's cell (4,3) are laid by hand, as they stand from before the arena (no route can buy one there now - the
-// claim's and the hall's guard, pinned here too). Design: bible/11-Multiplayer/Arena.md, the ARENA1 record's "ARENA4 -
+// claim's and the hall's guard, pinned here too). Design:, the ARENA1 record's "ARENA4 -
 // the online homes' migration"; server-account/src/homes.js arenaMoveHome.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -59,7 +59,7 @@ test('ARENA4b the arena\'s cell is one law at both ends: Daggerfall\'s map id an
   assert.equal(homeInArenaCell(DF, OLD + 2 ** 32), false, 'a key whose low bits name the cell is still out of shape');
   const S = await standService();
   const cols = S.env.DB._raw.prepare('PRAGMA table_info(homes)').all().map((c) => c.name).filter((c) => !['map_id', 'building_key', 'guild_id', 'score'].includes(c));
-  assert.deepEqual([...HOME_MOVE_CARRIED].sort(), cols.sort(), 'every column of a home\'s row is carried (the key moves, the guild is set after)');   // PIN MOVED: AUDIT HOME-VOTE A2 - the score the database keeps with the votes, which go with the old row (migration 0107)
+  assert.deepEqual([...HOME_MOVE_CARRIED].sort(), cols.sort(), 'every column of a home\'s row is carried (the key moves, the guild is set after)');   // PIN MOVED: AUDIT HOME-VOTE A2 - the score the database keeps with the votes, which go with the old row
 });
 
 test('ARENA4b a home MOVED: the row whole at the new key, the old gone; the catalogue\'s and the yard\'s pieces refunded WHOLE onto the record\'s Daggerfall account in the move\'s batch; every piece, the furniture\'s list and the offered rooms gone; a running tenancy carried unlisted and pointless; once (mutants: the old row deleted before the tenancy moves; the refund halved; an item piece refunded; a column not carried; the tenancy kept listed)', async (t) => {
@@ -69,7 +69,6 @@ test('ARENA4b a home MOVED: the row whole at the new key, the old gone; the cata
   const at = R.at();
   const r = await move(owner, { realm: at });
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and the move's one home order, for every page online
   assert.deepEqual({ ...r.body, realm: undefined, homeOrders: undefined }, { ok: true, mapId: DF, from: OLD, to: NEW, refund: 700, pieces: 2, items: 1, tenancies: 1, withdrawn: 2, hidden: true, realm: undefined, homeOrders: undefined });
   assert.equal(r.body.homeOrders?.length, 1, 'one town, the old house and the new');
   assert.equal(r.body.realm.seq, at.seq + 1, 'the record moved one on - a realm act');

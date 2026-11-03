@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - TAMRIEL ON THE HELD MAP: the continent inked round the Bay.
+// TAMRIEL1 - TAMRIEL ON THE HELD MAP: the continent inked round the Bay.
 //
-// Mac: "the entirety of tamriel that connects accurately to Daggerfall. Not actually traversalable but used and
-// connected as a gigantic map ... seen by players ingame", and "Performance should also not be affected".
+// and "Performance should also not be affected".
 //
 // The held map's world sheet (ui/heldMap.js) draws the Iliac Bay from the data; this layer draws the rest of Tamriel
 // round it from the authored geography (world/tamriel/tamrielGeography.js), in the same hand - the pen, the wash, the carets
@@ -53,10 +52,9 @@ import { HUB_CAPITALS } from '../systems/region/regionHubs.js';   // REGION-LINE
 import { simplifyChain } from './overworldModel.js';   // TAMRIEL3: the coast's chain thinned as the overworld's are
 import { stampSquare, coveragePixels, clearCoverage, penRgb } from './inkRaster.js';   // MAP-WHOLE: the continent's dots rasterised by hand
 import { labelPoint } from './provinceMap.js';   // TAMRIEL3: a province's name hangs where the chargen's map hangs it
-import { cyrodiilMask, zoneLineSteps } from '../systems/wild/cyrodiilZone.js';   // ZONE-LINE: Cyrodiil's outline is the zone's law's to draw
 import { watersInk, watersInkVersion } from '../world/tamriel/watersInk.js';   // MAP-WATERS: stream G's rivers and lakes past the Bay (the worker's copy), inked
 import { bridgesOf, inkBridgeLaw } from '../world/road/roadBridges.js';   // ROAD-LOOK: the bridges where the roads cross those rivers, marked
-import { lawLines, linkSteps, segKey, drain } from '../world/tamriel/tamrielLines.js';   // SMOOTH-LAND: the land's own lines
+import { lawLines, linkSteps, drain } from '../world/tamriel/tamrielLines.js';   // SMOOTH-LAND: the land's own lines
 
 /** @typedef {{ x: number, y: number }} Pt */
 /** TESA13: the host's atlas's answer (world/tamrielAtlas.js placesIn) - the places on a rectangle's pixels. */
@@ -82,8 +80,7 @@ export const CONTINENT_BELOW = 0.85;
 export const CITY_HIT_PX = 9;
 /** TESA1: a place's kind, as the hover says it. */
 export const ARENA_KIND_WORDS = Object.freeze({ 'city-state': 'city-state', town: 'town', village: 'village' });
-/** TESA1: a place's glyph, the Bay's own kinds - a capital is the city glyph whatever its kind. REGION-LINES (2026-10-25,
- *  the owner: "daggerfall's clustered icons need to be fixed amd standardized across tamriel"): one glyph a kind across
+/** TESA1: a place's glyph, the Bay's own kinds - a capital is the city glyph whatever its kind. REGION-LINES: one glyph a kind across
  *  Tamriel - Arena's city-state is a city as the Bay's TownCity is, its town a hamlet, its village a village. AUDIT TESA II
  *  M7: the kind's location type, the Bay's own - its classic bucket is its glyph, its filter and its hue (travelMapWindow
  *  getPixelColorIndex, inkMap markKind); the map's filters hid the Bay's towns and the countryside's past it, and not these. */
@@ -382,38 +379,34 @@ export function chaikinCapped(chain, passes = SMOOTH_PASSES, maxCut = Infinity) 
 }
 
 /** TAMRIEL3: the picture's coast and borders as chains in Bay coordinates, and each province's name at its clearest
- *  point (provinceMap labelPoint). SMOOTH-LAND (2026-10-26, bible/03-World/Tamriel.md SMOOTH-LAND; the owner: "Whatever is
- *  most detailed"): the coast and the borders are the land's own smooth law's lines (world/tamriel/tamrielLines.js
+ *  point (provinceMap labelPoint). SMOOTH-LAND: the coast and the borders are the land's own smooth law's lines (world/tamriel/tamrielLines.js
  *  lawLines - where its label changes between two map pixels' centres, at the map's own pixel), thinned by INK_THIN map
- *  pixels with their ends kept; Cyrodiil's outline is the zone's line (systems/wild/cyrodiilZone.js zoneLineOf - the same
- *  crossings, its runs in place of the province's own pieces there, `keys`), so a neighbour's coast and border end on it.
+ *  pixels with their ends kept.
  *  TAMRIEL4's picture contour (contourSegments, chaikinCapped) and its staircase borders are no longer drawn.
  *  @param {{ w: number, h: number, land: Uint8Array, province: Uint8Array }} trace */
 export function tracedChains(trace) {
   return drain(tracedSteps(trace));
 }
-/** AUDIT RELEASE R4-7: the traced chains a trace, its fit, its land's version and the zone's mask made them for - one, so
- *  the held map's open takes what the idle job made. @type {WeakMap<object, { key: string, mask: any, value: any }>} */
+/** AUDIT RELEASE R4-7: the traced chains a trace, its fit and its land's version made them for - one, so
+ *  the held map's open takes what the idle job made. @type {WeakMap<object, { key: string, value: any }>} */
 const _traced = new WeakMap();
 /**
- * tracedChains as steps (AUDIT RELEASE R4-7): the law's walk a picture square a step (tamrielLines.js steps), the zone's
- * line (cyrodiilZone.js zoneLineSteps), the linking (linkSteps), a chain's thinning and a province's label a step each -
+ * tracedChains as steps (AUDIT RELEASE R4-7): the law's walk a picture square a step (tamrielLines.js steps), the linking (linkSteps), a chain's thinning and a province's label a step each -
  * the same chains, kept for the trace (`_traced`), whether walked whole or a budget at a time.
  * @param {{ w: number, h: number, land: Uint8Array, province: Uint8Array }} trace
  * @returns {Generator<undefined, { coast: Pt[][], borders: Pt[][], labels: Array<{ key: string, px: number, py: number }> }, unknown>}
  */
 export function* tracedSteps(trace) {
-  const f = tamrielFit(), key = `${f.ox}:${f.oy}:${f.ppu}:${tamrielLandVersion()}`, zoneMask = cyrodiilMask();
+  const f = tamrielFit(), key = `${f.ox}:${f.oy}:${f.ppu}:${tamrielLandVersion()}`;
   const kept = _traced.get(trace);
-  if (kept && kept.key === key && kept.mask === zoneMask) return kept.value;
+  if (kept && kept.key === key) return kept.value;
   const { w, h, land, province } = trace;
   const lines = lawLines(trace);
   yield* lines.steps();
-  const zone = zoneMask ? yield* zoneLineSteps(trace, zoneMask) : null;
   const { segs } = lines.all();
   /** @param {'coast'|'border'} kind */
   const own = function* (kind) {
-    const chains = yield* linkSteps(segs.filter((s) => s.kind === kind && !zone?.keys.has(segKey(s))), lines.points);
+    const chains = yield* linkSteps(segs.filter((s) => s.kind === kind), lines.points);
     const out = [];
     for (const c of chains) { out.push(simplifyChain(c, INK_THIN)); if (c.length > 256) yield; }
     return out;
@@ -429,8 +422,8 @@ export function* tracedSteps(trace) {
     labels.push({ key: pkey, px: lx, py: ly });
     yield;
   }
-  const value = { coast: zone ? coast.concat(zone.coast) : coast, borders: zone ? borders.concat(zone.borders) : borders, labels };
-  _traced.set(trace, { key, mask: zoneMask, value });
+  const value = { coast, borders, labels };
+  _traced.set(trace, { key, value });
   return value;
 }
 
@@ -633,7 +626,7 @@ export function arenaRoadsIn(x0, y0, x1, y1) {
  *  one chain, from the pixel that starts it to the one it ends on - a stroke a run, not a step. */
 const FORWARD = /** @type {Set<number>} */ (new Set([DIR.E, DIR.SE, DIR.S, DIR.SW]));
 const OPPOSITE_BIT = new Map(DIR_DELTA.map(([bit], k) => [bit, DIR_DELTA[(k + 4) % 8][0]]));
-/** ZOOM-FAST (2026-10-24, the owner: "The map also is slow to load when zooming in and out"): EACH ROAD TILE'S RUNS AND
+/** ZOOM-FAST: EACH ROAD TILE'S RUNS AND
  *  DOTS, KEPT - the far painters read eight of the layer's bits a pixel over a tile and its rim at every tile's paint (three
  *  parts in four of a far tile's time, measured); now a road tile's runs (the steps that start on it) and its pixels' dots
  *  are walked once and kept until the roads' layer moves (a run reaches its neighbours' bits, so any install drops them
@@ -1179,12 +1172,10 @@ function provinceLines(ctx, view, paperW, paperH, chains) {
  * TESA15: off the window's kept tiles (`tiles`, at its `dpr`) where it keeps them.
  * @param {{ paperW: number, paperH: number, continent?: boolean, bayFit?: number, band?: string, filters?: any,
  *   inks?: any, placesIn?: ?PlacesIn, tiles?: ?ReturnType<typeof import('./tamrielTiles.js').createTamrielTiles>, dpr?: number,
- *   under?: () => void, part?: 'under' | 'roads' | 'over', settling?: boolean, seatAt?: (city: any) => any, nameless?: ?((c: any) => boolean),
+ *   part?: 'under' | 'roads' | 'over', settling?: boolean, seatAt?: (city: any) => any,
  *   portsOnly?: boolean }} opts -
- *   AUDIT TESA II M6: `nameless` a city whose name the window letters itself (the zone map's, inside its zone); `under` painted over the land, the
- *   roads and the borders and under the cities and the names. ZOOM-FAST: `part` paints one third alone - the land under the
- *   roads (the shore, the high ground, the rivers), the roads' tiles, or what stands over them (the borders, the window's
- *   `under`, the Bay's frame, the cities, the names) - so the window keeps the first and the last on layers of their own and
+ *   ZOOM-FAST: `part` paints one third alone - the land under the
+ *   roads (the shore, the high ground, the rivers), the roads' tiles, or what stands over them (the borders, the Bay's frame, the cities, the names) - so the window keeps the first and the last on layers of their own and
  *   a frame that only paints the roads' owed tiles is three drawImages; `settling` (the view's scale still moving) paints no
  *   tile, only the kept ones and their stand-ins. WW7-6: `seatAt` the seat a city is (its `mapId`, the seat's key), or
  *   null - ringed under its glyph. BAY-LEFT-MAPS (C11): `portsOnly` the travel map's Ports filter - a port alone inked, as
@@ -1230,16 +1221,12 @@ export function paintTamrielInk(ctx, view, ink, opts) {
     else paintPastBay(ctx, view, past);
   }
   if (part && part !== 'over') { ctx.restore(); return true; }
-  // REGION-LINES (the owner: "Theres no visible region lines", then a map of Tamriel each province cleanly parted: "This is
+  // REGION-LINES (, then a map of Tamriel each province cleanly parted: "This is
   // what I mean by region lines. Each region distinctly separated"): the provinces' borders - the regions past the Bay
   // (WW-R) - solid on a halo (PROVINCE_PEN), OVER the roads' web (under it, in the tracks' own pen, a border read as one
   // more track). High Rock and Hammerfell need none on the Bay: its water and the Bjoulsae part them on Daggerfall's own
-  // map. The 43 biome zones' borders stood here a day and were withdrawn (2026-10-25, the owner: "Those are just random
-  // lines"): unnamed, wandering through the land, they told a player nothing
+  // map. The 43 biome zones' borders stood here a day and were withdrawn: unnamed, wandering through the land, they told a player nothing
   provinceLines(ctx, view, paperW, paperH, ink.borders);
-  // ZONE-NAMES-OVER: what the window lays over the land and under its names (the open zone's fog and red line - WILD1
-  // had them under the place marks; laid after this layer, the fog's 0.78 hid Cyrodiil's every name)
-  opts.under?.();
   // the Bay's own edge: a faint dotted frame, so the player sees where the data's ground ends
   const bay = [{ x: 0, y: 0 }, { x: BAY_W, y: 0 }, { x: BAY_W, y: BAY_H }, { x: 0, y: BAY_H }, { x: 0, y: 0 }];
   stroke([bay], 1, PEN.wash, [2, 4]);
@@ -1262,7 +1249,7 @@ export function paintTamrielInk(ctx, view, ink, opts) {
     const glyph = markKind(bucket);
     const [x, y] = toPaper(view, c.x, c.y);
     marks.push({ kind: glyph, seat: c.mapId != null ? opts.seatAt?.(c) ?? null : null, x, y, port: all && !!c.port });   // WW7-6: its seat's ring under its glyph
-    if (!opts.nameless?.(c)) named.push([c, x, y]);   // AUDIT TESA II M6: a name the window letters itself (the zone map's)
+    named.push([c, x, y]);
   }
   // WW7-6: a seat's ring past the Bay as the Bay rings its own (inkMap paintSeatRing, Seats-Arc 3.3) - under the glyph
   for (const m of marks) if (m.seat) paintSeatRing(ctx, m.x, m.y, markReach(m), seatMapMark(m.seat));

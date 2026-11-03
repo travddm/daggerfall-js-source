@@ -34,7 +34,7 @@
 //               with nothing to build behind it, so the walk to the door
 //               is the mint's time)
 //
-// AUDIT (2026-10-16, A2): THE MARGIN IS THE DOOR'S OWN. One margin of
+// AUDIT: THE MARGIN IS THE DOOR'S OWN. One margin of
 // 20 s at every door (TOKEN_AHEAD_MS) minted whenever the held token
 // was 40-60 s old, though the next socket asks within a frame (out) or
 // a build (in) and the held token would still have opened it: twice the

@@ -272,7 +272,6 @@ test('rest: the grounded check has ONE home, and every rest host feeds the dispa
     // still DFU's ladder read top to bottom.
     assert.deepEqual(d.keys, ['enemiesNearby', 'swimming', 'grounded', 'preventedMessage', 'racialOverrideBlocks'],
       `${h} asks DFU's five questions and asks nothing about the scene`);
-    // PIN MOVED (ROAD review-p): the registry is handed over as the
     // PRODUCER. DFU reads it inside the third `else` (:667-669), after
     // the enemy and swimming/grounded arms have returned, so a host
     // that polls it eagerly runs the caller's conditions on presses
@@ -409,7 +408,7 @@ test('rest: the ?town page is the FOURTH host, and it runs the SAME laws as the 
   // The crime rides the verdict rather than being named by the host:
   // canRest mints it, the host relays whatever it was handed.
   assert.match(ed.value('commitCrime'), /setCrimeCommitted\(playerEntity, crime\);/);   // V4: through the one setter (SuppressCrime)
-  // WATCH-KNOWS: PIN MOVED - standing.js names the crime among the minor offences the living watch warns a first offender
+  // WATCH-KNOWS:
   // for (WARNABLE_CRIMES): a reading of the crime CanRest minted, never a charge of its own
   assert.deepEqual(modulesMatching(/CRIMES\.Vagrancy/).filter((f) => f !== 'systems/standing.js'), [],
     'no host names the crime itself - CanRest answers it');
@@ -476,7 +475,7 @@ test('rest: the world host carries the ENCOUNTER roll through a rested night', (
   assert.ok(wd.value('advanceMinutes').indexOf('playerTicker.advance(n)')
     < wd.value('advanceMinutes').indexOf('runEncounterTick('),
     'the minutes pass before the roll asks how many passed');
-  // ROAD-G TAIL (2026-09-05): the ?town page HAS the pool now (ROAD-G G2
+  // ROAD-G TAIL: the ?town page HAS the pool now (ROAD-G G2
   // mounted it) and carries the same loop - the catch-up has TWO homes,
   // one per streaming host, each riding its own rest advance.
   const ed = scan(src('scenes/exterior.js'), 'createRestDeps(playerEntity, {');

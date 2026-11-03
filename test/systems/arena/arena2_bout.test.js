@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02, Mac: "Players can choose to watch AI fights ... and climb esclating tiers of opponents"): THE BOUT
+// ARENA2: THE BOUT
 // LAW, DRIVEN (systems/arena/arenaBout.js) - every phase in order and on its clock, every way a bout ends (a yield by choice
 // and by temper, a fall at the floor, a ring-out past the slack, the time limit and the judges' three counts), every
 // event the crowd and the Herald hear, the refusals (a blow outside the fight, a yield above the line, a teammate's

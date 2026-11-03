@@ -1,4 +1,4 @@
-// AUDIT WATCH-KIT (2026-10-01, Mac: "Just want to audit this to make sure it's perfection") - LENS W, THE CREW'S LIFE
+// AUDIT WATCH-KIT - LENS W, THE CREW'S LIFE
 // ABOARD: SHIP-WATCH's crew (systems/naval/crewLife.js) and its host (scenes/naval/navalCrew.js), with lens D's D5 and its
 // safety net on the same two files. Every pin drives the real modules and fails on the code as it stood:
 //
@@ -312,7 +312,6 @@ test('AUDIT WK-W8 OUT OF HER HATCH ONE AT A TIME: the morning brings her sleeper
       assert.ok(flat(r.pos, life.hatch) < 2.7, 'at her hatch or beside it');
       for (const o of life.members) if (o !== r && !o.gone) assert.ok(flat(o.pos, r.pos) > 0.3, `#${r.i} and #${o.i} on one point`);
     }
-    // PIN MOVED (AUDIT GALLEON D7, 2026-10-02): her hatch stands beside her hatchway now, never on its cover - her
     // risers come up on her deck beside the hole and file off it one behind another (AUDIT NAV2 F41's yield), the
     // last off at a run 1.30 s after the alarm on the galleon and 1.55 s on the Carrack (seed 5; on her cover it was
     // 0.45 and 0.60 - and 1.85 s on the Carrack's seed 11): each off at a run within two seconds
@@ -506,8 +505,7 @@ test('AUDIT WK-SN HER HATCH AND HER BOW: her hatch at her main deck\'s middle, h
   const pool = await readyPool();
   for (const deck of [plainDeck(), pool.deckOf(HULL.SmallShip, 0), pool.deckOf(HULL.LargeGalley, 0), pool.deckOf(HULL.Carrack, 0)]) {
     const life = createCrewLife({ deck, roster: crewRoster({ hull: 3, seed: 4, shipClass: pirate }), seed: 4 });
-    // PIN MOVED (GALLEON, 2026-10-01): her MAIN deck's middle, as said - the new galleon's castle (and the Carrack's
-    // forecastle) up their flights her deck too, never where her hatch is. PIN MOVED (AUDIT GALLEON D4 and D7,
+    // forecastle) up their flights her deck too, never where her hatch is.
     // 2026-10-02): her bow LOOKOUT_BACK from her MAIN deck's stem, a cell of it (the Carrack's ran up her forecastle's
     // stair: her lookout watched up there 1460 s of 1740) - and her hatch the cell of her main deck nearest its middle:
     // her hatchways no deck now, so beside one where one lies there (the galleon's 1.6 m to port of her fore
@@ -515,7 +513,6 @@ test('AUDIT WK-SN HER HATCH AND HER BOW: her hatch at her main deck\'s middle, h
     const lv = mainLevel(deck), main = deckExtentZ(deck, lv), mid = (main[0] + main[1]) / 2;
     assert.deepEqual(life.hatch, deck.nearest(0, mid, lv), 'her hatch the cell of her main deck nearest her middle');
     assert.ok(Math.abs(life.hatch[2] - mid) < (deck === pool.deckOf(HULL.Carrack, 0) ? 2.6 : 1.5), `her hatch amidships: ${life.hatch[2]} in ${main}`);
-    // PIN MOVED (SHIPS-2, 2026-10-07): the Carrack is Mac's carrack now - her fore mast's partner (2.5 m across, 0.78
     // m over her deck) stands on her main deck's stem, and her bow is the cell nearest it on her centre line, abaft the
     // partner (1.25 m further aft than LOOKOUT_BACK); every other deck's LOOKOUT_BACK from her stem as it was
     const reach = deck === pool.deckOf(HULL.Carrack, 0) ? 1.3 : deck.cell;

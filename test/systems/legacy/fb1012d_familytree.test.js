@@ -184,7 +184,7 @@ async function frontDoor(choice, legacyBirth = null) {
   return booted;
 }
 /** world.js's start, as the host constructs it: the location the boot stands the world at, over a start cell holding
- *  Privateer's Hold and a named place. PIN MOVED (BAY-LEFT-B): the start is scenes/bootStartHost.js createBootStart now
+ *  Privateer's Hold and a named place.
  *  (HOST-SPLIT), run whole where this pin ran world.js's text; the host's own names still off world.js's text. */
 function startOf(params) {
   const names = /const regionName = ([^;\n]+);\n\s*const locationName = ([^;\n]+);/.exec(W);
@@ -242,7 +242,6 @@ test('SEAT-HOME: the seat moves to a place where the house holds a home of its o
   const sib = f.people.find((p) => p.id !== w.host.current().id);
   w.here = GOTHWAY;
   assert.equal(w.host.switchTo(sib.id).ok, true);
-  // PIN MOVED (BAY-LEFT-B): the birth's address carries the seat's map id too (`seat`, places.js birthSearch) - the boot
   // stands a seat past the Bay by it
   assert.match(w.booted.at(-1), new RegExp(`legacyborn=${sib.id}&region=Daggerfall&loc=Ashfield\\+Farm&seat=7707$`), 'born in the seat: the farm');
 });
@@ -258,7 +257,7 @@ test('SEAT-HOME: a member met at a home of the house\'s own is born there, and t
   w.here = FARM;   // met in the hovel (LEGACY-HOME: the never-played live in the family home)
   assert.equal(w.host.switchTo(sib.id, { here: true }).ok, true);
   assert.equal(f.seat.loc, 'Gothway Garden', 'the seat stands where it was');
-  assert.match(w.booted.at(-1), /region=Daggerfall&loc=Ashfield\+Farm&seat=7707$/, 'born where they were met - the farm, not the seat');   // PIN MOVED (BAY-LEFT-B): and its map id
+  assert.match(w.booted.at(-1), /region=Daggerfall&loc=Ashfield\+Farm&seat=7707$/, 'born where they were met - the farm, not the seat');
   const b = readBirth(w.tab, sib.id);
   assert.equal(b.loc, 'Ashfield Farm');
   // the page bearing them, in the farm the boot stood: their first day names it

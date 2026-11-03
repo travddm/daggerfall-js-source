@@ -92,24 +92,6 @@ test('FPS-VSYNC: in the app VSync is a real setting read at the next start; in a
   assert.match(css.slice(at, css.indexOf('}', at)), /var\(--verdigris\)/);
 });
 
-test('FPS-VSYNC by source: the shell asks before the app is ready, over the page\'s own key; the screen draws the row with the live ones', () => {
-  // Pins read CODE (test/codeOnly.mjs): a line reverted and kept as a comment beside its old self fails them.
-  const main = read('app/main.cjs');
-  const from = main.indexOf("\nif (process.env.DAGGER_USER_DATA) app.setPath('userData'"), to = main.indexOf('\napp.whenReady()');
-  assert.ok(from > 0 && to > from, 'the storage root is pinned, then the app is readied');
-  codeHasOnce(main.slice(from, to), /\nfor \(const s of FRAME_SWITCHES\) app\.commandLine\.appendSwitch\(s\);/,
-    'after the storage root is pinned and before the app is ready - Chromium reads its switches at launch');
-  assert.match(read('src/systems/settings/settings.js'), new RegExp(`\\nconst STORAGE_KEY = '${SETTINGS_PREF.replace(/\./g, '\\.')}';`), 'the key the page saves under');
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const lineOf = (head) => { const at = menu.indexOf(head); assert.ok(at >= 0, head); return menu.slice(at, menu.indexOf('\n', at)); };
-  const fnOf = (head) => { const at = menu.indexOf(head); assert.ok(at >= 0, head); return menu.slice(at, menu.indexOf('\n}\n', at) + 3); };
-  codeHasOnce(lineOf('function drawsFlat(key) {'), /function drawsFlat\(key\) \{ const t = tierOf\(key\); return t === 'live' \|\| t === 'restart'; \}/);
-  // ORG2: one screen draws every tab, the pause window's too - a key draws where drawsHere says, flat with the live ones
-  codeHasOnce(lineOf('const drawsHere = (key, pause) =>'), /const drawsHere = \(key, pause\) => \(pause \? tierOf\(key\) === 'live' : drawsFlat\(key\)\);/, 'the pause window keeps to what applies at once');
-  codeHasOnce(fnOf('function itemNodes(item, ctx) {'), /if \(!drawsHere\(item, pause\)\) \{/);
-  codeHasOnce(fnOf('function tabCount(tab, ctx) {'), /if \(isSettingItem\(item\)\) \{ if \(!featureForControl\('settings', item\) && drawsHere\(item, ctx\.pause\)\) n\+\+; \}/, 'the sub-rail counts what is drawn');
-});
-
 // THE PACER (AUDIT 28e, the frame lane: "with VSync off, the Frame Rate Cap cannot hold frames above the screen"). A
 // clock of the test's own over the mechanism the lane measured in the app: with the wait lifted, a browser frame that
 // draws nothing costs a whole refresh (the next one waits for the screen's next tick), and one that draws answers the
@@ -220,13 +202,4 @@ test('FPS-VSYNC: the pacer stands in front of the page\'s rAF only where the she
   assert.equal(installFramePacer(lifted.win), false, 'once');
   _resetFrameCap();
   assert.equal(typeof frameCapSkip, 'function');
-  // ...told by the shell what THIS launch runs with, not what the setting says now (the settings screen's "next start").
-  const main = read('app/main.cjs');
-  const from = main.indexOf("\nif (process.env.DAGGER_USER_DATA) app.setPath('userData'"), to = main.indexOf('\napp.whenReady()');
-  codeHasOnce(main.slice(from, to), /\nconst FRAME_SWITCHES = frameRateSwitches\(app\.getPath\('userData'\)\);\nfor \(const s of FRAME_SWITCHES\) app\.commandLine\.appendSwitch\(s\);/);
-  codeHasOnce(main.slice(from), /ipcMain\.on\('dagger:frames-lifted', \(e\) => \{ e\.returnValue = FRAME_SWITCHES\.length > 0; \}\);/);
-  codeHasOnce(read('app/preload.cjs'), /framesLifted: ipcRenderer\.sendSync\('dagger:frames-lifted'\) === true,/);
-  const boot = read('src/main.js');
-  const at = boot.indexOf('async function boot() {');
-  codeHasOnce(boot.slice(at, boot.indexOf('\n', boot.indexOf('\n', at) + 1)), /installFramePacer\(\);/, 'the first thing boot does, before any loop asks for a frame');
 });

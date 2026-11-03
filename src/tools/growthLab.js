@@ -1,4 +1,4 @@
-// GROWTH (bible/10-UI/Growth.md) - THE GROWTH LAB: the pause window on its Growth tab, with a made-up character, a
+// GROWTH - THE GROWTH LAB: the pause window on its Growth tab, with a made-up character, a
 // made-up Firmament book and a made-up captain - no service and no game data - so the tab can be judged on a real
 // screen at real sizes and driven by a probe (tools/growthProbe.mjs). Everything but the character, the book and the
 // captain is the SHIPPING code: the window, the tab, the guide, the stage and the three windows drawn on it.
@@ -29,7 +29,7 @@ const e = {
   skills: new Array(35).fill(0).map((_, i) => 8 + ((i * 7 + 13) % 46)),
   skillsRecentlyRaised: [0, 0],
   health: 96, maxHealth: 118, magicka: 40, maxMagicka: 80, fatigue: 64 * 104,
-  startingLevelUpSkillSum: 180, currentLevelUpSkillSum: 254, levelProgress: 38, levelRollUp: 6,
+  startingLevelUpSkillSum: 180, currentLevelUpSkillSum: 254,
   equipment: {}, items: [],
 };
 e.readyToLevelUp = q.get('owed') === '1';

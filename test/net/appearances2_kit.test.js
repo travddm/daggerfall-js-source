@@ -1,4 +1,4 @@
-// APPEARANCES-II (2026-10-27; bible/04-Characters/Wardrobe.md section 6): A SWORN ONE'S KIT CARRIES ITS LOOK. A piece the
+// APPEARANCES-II: A SWORN ONE'S KIT CARRIES ITS LOOK. A piece the
 // player dressed at the Wardrobe and gave a sworn revenant is drawn in its look on the owner's screen (net/remotePlayers.js
 // composeLook's `ap`); its foe record's kit now carries that look too (`la` beside `lw`, characters/foeBodies.js), the
 // wire keeps it only of its piece's kind (net/wire.js validFoeRecord), and every other screen draws it through drawnPiece.

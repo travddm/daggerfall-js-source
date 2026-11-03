@@ -1,6 +1,5 @@
 // @ts-check
-// DUEL1 (2026-09-24, Mac: "Add a dueling K/D to the profile menu and player inspect profile"; asked where it lives:
-// per account, on the main menu's account card): THE DUELLING RECORD, AS WORDS AND AS ASKS. Pure - the account service
+// DUEL1: THE DUELLING RECORD, AS WORDS AND AS ASKS. Pure - the account service
 // is handed in - so the pins drive it without a network.
 //
 // WHOSE WORD IT IS. The account service's (server-account/src/accounts.js claimDuel) - INT8: off the receipt the relay

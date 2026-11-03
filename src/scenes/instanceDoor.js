@@ -1,5 +1,4 @@
-// INSTANCES (2026-10-15, Mac: "The player approaches, should be met with an enhanced UI popup that lets them select
-// public or instanced (if applicable)"; bible/11-Multiplayer/Instances.md): THE DOOR - the page's half of an instance.
+// INSTANCES: THE DOOR - the page's half of an instance.
 // The law is systems/instancePlaces.js's (what the door offers, where a quest's things stand) and net/instanceRoom.js's
 // (the room); this module holds what a page must: the account's digest (async, worked out once), the popup
 // (ui/talkWindow.js ChoiceWindow - the enhanced dialog on the Plus skin, the panel on the classic one), and the one rule
@@ -24,21 +23,20 @@
 // quest's place where nothing was recorded. It lives as long as the page: a reload inside records the room in the save,
 // a reload outside forgets it.
 //
-// deps: online() - the page is online; instanceOk() - its relay admits instances (net/instanceRoom.js
-// relaySupportsInstances, the welcome's word); account(), character() - the verified account and the character's id
+// deps: online() - the page is online; instanceOk() - a relay link is held that admits the instance; account(), character() - the verified account and the character's id
 // (the private rooms' own: social.acct, realmSession.id); members() - the party's other members, each with its party
 // pose `p` (net/social.js); questMachine(); openOverlay(window, onClosed) - the window laid over whatever is open
-// (townTalk.pushOverlay), true when it went up; say(line); wild() - the player stands in the open zone (WILD1), where
-// nothing keeps an instance: its real dungeons are sealed and its halls the relay refuses one; remains() - HEIR-WHOLE:
+// (townTalk.pushOverlay), true when it went up; say(line); wild() - the player stands in the open sea (SEA-VAULTS), where
+// nothing keeps an instance (the relay refuses one); remains() - HEIR-WHOLE:
 // where the line's remains lie (scenes/legacyHost.js remainsWhere), whose death quest's place a dungeon whole is.
-// DOMAIN2 (bible/11-Multiplayer/Domains.md 6): castle(site) - my guild's own castle at this dungeon, `{ guild, epoch }`
+// DOMAIN2 (6): castle(site) - my guild's own castle at this dungeon, `{ guild, epoch }`
 // (scenes/seatHallHost.js castleAt), or null - a guild's instance, offered at its castle's door and kept by a save there.
 import { ChoiceWindow } from '../ui/talkWindow.js';
 import { t, getLocalizedLocationName } from '../systems/textManager.js';
 import { SITE_TYPES } from '../systems/quest/place.js';
 import { instanceOwnerOf, instanceGuildOwnerOf, holdEpochOf, instanceOf, instanceOfWord, isInstanceRoom, INSTANCE_DOOR_WORD } from '../net/instanceRoom.js';
 import { roomKeyFor } from '../net/online.js';
-import { wdunHallOfRoom, seaRoomCell } from '../net/wire.js';
+import { seaRoomCell } from '../net/wire.js';
 import { openerQuestOf, partnerInstances, instanceOffer, questDungeonWhole, questsAtSite, questInstanceEpoch, remainsWholeAt, remainsInstanceEpoch } from '../systems/instancePlaces.js';
 import { isPrivateersHold } from '../systems/startDungeon.js';   // HOLD-ONCE: online the Hold's public room is entered once - its instance any time
 import { builtSizeFor } from '../world/smallerDungeons.js';   // QUEST-ELSEWHERE: the size the world builds a dungeon's public room at
@@ -80,9 +78,8 @@ export const buildingSite = (mapId, building, { layout = null, home = false } = 
 /** The place's public room - the room an instance of it stands beside (net/instanceRoom.js): a dungeon whole, a building
  *  in its town's layout. Null for a place no room keys. */
 export const siteBase = (site) => roomKeyFor({ host: 'world', mode: site?.siteType === SITE_TYPES.Building ? 'interior' : 'dungeon', mapId: site?.mapId ?? 0, buildingKey: site?.buildingKey ?? 0, layout: site?.layout ?? null });
-/** A place that keeps no instance: a home (its owner's room), a zone hall (net/wire.js wdunHallOfRoom - the relay refuses
- *  one), an isle's dungeon (SEA-VAULTS: seaRoomCell - the open sea keeps none, the relay refuses one), a place no room keys. */
-const keepsNone = (site) => { const base = siteBase(site); return !base || !!site.home || wdunHallOfRoom(base) != null || seaRoomCell(base) != null; };
+/** A place that keeps no instance: a home (its owner's room), an isle's dungeon (SEA-VAULTS: seaRoomCell - the open sea keeps none, the relay refuses one), a place no room keys. */
+const keepsNone = (site) => { const base = siteBase(site); return !base || !!site.home || seaRoomCell(base) != null; };
 
 export function createInstanceDoor(deps) {
   let ownerFor = null, owner = null;   // the account the owner digest is of, and the digest

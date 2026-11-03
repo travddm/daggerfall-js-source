@@ -1,8 +1,5 @@
 // @ts-check
-// WARDEN1 (2026-10-10, Mac: "Anytime there are too many carts/wagons in a city or they are parked on the road for a long
-// time. I want a gaurd to navigate, lift the wagon/horse on top of their sprite and yeet it far away"; asked: it lands
-// outside town, fetched or summoned; everyone sees it; ten real minutes on a road; four a town, the longest parked
-// first): THE TOWN WATCH'S LAW, ON THE CLIENT. Pure.
+// WARDEN1: THE TOWN WATCH'S LAW, ON THE CLIENT. Pure.
 //
 // The cell keeps the clock and the count (net/wire.js WARDEN1, wardenVerdicts). The owner says what the cell cannot know,
 // read off the town's layout as the team parks - THE STAMP (wardenStamp): where the wagon stands (its anchor, the save's

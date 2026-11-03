@@ -20,11 +20,9 @@ import { createSceneCache, cacheScene, restoreCachedScene } from '../../../src/s
 import { POSE_BOUND } from '../../../src/net/wire.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2: the world host whole
 
-// ═══ SURV3 (2026-09-18): THE CAMPS ══════════════════════════════════
+// ═══ SURV3: THE CAMPS ══════════════════════════════════
 //
-// Mac: "For tents, they are shared world objects ... Campfires in
-// dungeons/outside + beds should act as the go-to rest options +
-// adding a new campfire item players can buy and place." The pure law
+// The pure law
 // (systems/survival/camp.js), the pool a host stands (scenes/camps.js)
 // on the dropped torches' shape, the inventory's hand-off, the race,
 // the three host mounts, the scene cache, the wire.
@@ -132,7 +130,7 @@ test('SURV3: by the fire - within four of a LIT fire, anyone\'s; the eye\'s word
   assert.equal(campInfoText(lit, FIRE_MINUTES, true), CAMP_TEXT.seeEmbers);
   assert.deepEqual(campMenu(lit, 10, true).map((r) => r.key), ['rest', 'cook', 'pack']);
   assert.deepEqual(campMenu(lit, 10, false).map((r) => r.key), ['rest', 'cook'], 'another\'s fire is not yours to put out');
-  // AUDIT C&C I11 (PIN MOVED): a cold fire offers no Cook - the cooking list only refused at it
+  // AUDIT C&C I11 (
   assert.deepEqual(campMenu(cold, 10, true).map((r) => r.key), ['rest', 'stoke', 'pack'], 'a cold tent offers its fire, and no cooking on its embers');
   assert.equal(campMenu(cold, 10, true)[2].text, CAMP_TEXT.menuPack); assert.equal(campMenu(lit, 10, true)[2].text, CAMP_TEXT.menuPickUp, 'REST2: your Campfire is picked up, not stamped out');
 });

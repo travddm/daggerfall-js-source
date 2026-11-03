@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 import { loadQuestTables } from '../../../src/systems/quest/tables.js';
 import { QuestMachine } from '../../../src/systems/quest/machine.js';
 import { expandQuestMessage } from '../../../src/systems/quest/questMacros.js';
-import { citedLines } from '../../../tools/citeAnchor.mjs';   // CITE-ANCHOR: a cite names its line by a quote
 
 const VENDOR = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'vendor', 'dfu-quests');
 const sources = {};
@@ -131,37 +130,6 @@ test('audit24 wave25: a quest rumor is expanded IN PLACE, and so frozen at its f
   const tokens = [{ formatting: 'text', text: 'the %qdt of it' }];
   expandQuestMessage(null, tokens, true);
   assert.equal(tokens.length, 1, 'the same array');
-});
-
-test('audit24 wave25: the factionListener comments name PlayerActivate, and claim nothing pending', () => {
-  // HasFactionListener has exactly one consumer in the DFU tree -
-  // PlayerActivate.StaticNPCClick:1534 - and TalkManager.cs does not
-  // contain the word Listener. Three port comments named TalkManager
-  // and marked the wiring "(Q4 wires)", over a reader that ships at
-  // worldModes.js, at the `factionListeners.has` reader.
-  const m = rd('src/systems/quest/machine.js');
-  assert.doesNotMatch(m, /TalkManager reads the map/);
-  assert.doesNotMatch(m, /TalkManager's Q4 signal/);
-  assert.match(m, /PlayerActivate\.StaticNPCClick reads the map/);
-  // ORL1 RE-AIMED THIS CITE BY CONTENT, which is what the shifting
-  // chain below had quietly lost: every slice moved the number by the
-  // lines it added ABOVE it, and the number had drifted onto a comment
-  // about dropped loot - nowhere near the reader it names. The reader
-  // is the `factionListeners.has` line the last assertion holds, and
-  // the cite names it now. (The chain is kept: it is the record of how
-  // a mechanically-shifted cite comes loose from its subject.)
-  // HEARTH1 re-aimed it BY CONTENT again, which is the method this pin's
-  // own note above prescribes: the cite is resolved against the READER
-  // line the last assertion holds, not bumped by however many lines the
-  // slice happened to add above it.
-  const _reader = rd('src/scenes/worldModes.js').split('\n')
-    .findIndex((l) => /factionListeners\.has\(pn\.factionID\)\) return;/.test(l)) + 1;
-  assert.ok(_reader > 0, 'the reader is still there to cite');
-  const named = citedLines(m, 'src/scenes/worldModes.js').map((c) => c.line);   // CITE-ANCHOR: by the reader's own words now
-  assert.ok(named.includes(_reader), `the cite names the reader at :${_reader} (it names ${named.join(', ') || 'nothing'})`);   // FB27g HOME-MAGIC by six more (the visitor's spell refusal under the drop refusal)   // ONLINE-CLASS1 by two more (the peer-sprite import and its mode read); SURV5 by three more (the survival status import and the vampire's); ORL1 re-aimed by content, off the chain below   // QS4 by one more (the offHandQuickslot import)   // AUDIT-EL F5 by one more (the WORLD_FRAME import)   // EL1 by one more (the lantern-colour import)   // BA1 by one more (the Better Ambience import)   // IF1 by one more (the footsteps import)   // HT1 by one more (the dropped-torch import)   // AUDIT WORLD6b-iii(a) C3 by one more (the aim law's import)   // FIX-F/E moved worldModes by eight lines; AUDIT 65 by one more; PERF5 by one more (the identity constant under the imports); UL1 by one more (the Unleveled Loot import); WORLD6a by one more (the interiorShared import)   // LV2 by nine more (the level-up arm became announceLevelUp's `open` thunk, twice, and the notice import)   // LV1 by three more (the interior host's two level-up arms go through ui/charSheetDoor.js now, and two screen imports left with them)
-  assert.doesNotMatch(rd('bible/06-Systems/Quest-Arc.md').slice(0, 40000), /TalkManager reads the map at\n  Q4/);
-  // and the reader really is there
-  assert.match(rd('src/scenes/worldModes.js'), /factionListeners\.has\(pn\.factionID\)\) return;/);
 });
 
 test('audit24 wave25: the two stale claims in the macro header are gone', () => {

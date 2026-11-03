@@ -1,5 +1,5 @@
-// AUDIT TESA II lane R (2026-10-25) - THE ROADS PAST THE BAY, pinned where the audit found them wrong
-// (bible/03-World/Arena-Provinces.md TESA14 and TESA15, AUDIT TESA II's lines): the builder a step at a time and the page's
+// AUDIT TESA II lane R - THE ROADS PAST THE BAY, pinned where the audit found them wrong
+// (TESA14 and TESA15, AUDIT TESA II's lines): the builder a step at a time and the page's
 // own thread's build when no worker can (R8); a gate a neighbouring region routes to, stepped (R7); the crossings' runs
 // held (R9); the print reading every height byte and relief cell, and the laws' own version beside it (R6); the cache's
 // hits landing a budget a task (R3); the workers let go when idle (R4); a dead worker's region, its replacement (R8); one

@@ -1,4 +1,4 @@
-// AUDIT UPDATE II (2026-10-25, bible/01-Overview/audits/Audit-Update-II-2026-10-25.md): the second cold read of the update
+// AUDIT UPDATE II: the second cold read of the update
 // as the first audit left it - lane A's laws (a set's sigil imbued, a scene's first elites and revenants, a conjured
 // piece, a second Imbue's worth, the scope and the Imbue's put-back) and the words' own gate: no machine row of any
 // language stands on an English that has moved (A4 - seven languages told their players the odds never read the level).

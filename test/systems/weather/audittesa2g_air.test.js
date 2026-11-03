@@ -2,7 +2,7 @@
 // zones' stamp moves (the trace and the relief landing after the boot, a fit) the air's ground drops its kept fields and
 // tops (systems/weather/airGround.js lawAirGround) and the snowpack its points and systems (snowpack.js SnowpackLattice
 // fresh), as the air's tiles already did. A summit read before the relief landed had kept the authored ground's 255 m for
-// its 1,785 for the session. bible/07-Rendering/Biome-Precipitation.md, bible/01-Overview/audits/Audit-Tesa-Biome.md.
+// its 1,785 for the session.,.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

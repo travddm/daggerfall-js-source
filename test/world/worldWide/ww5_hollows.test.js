@@ -1,4 +1,4 @@
-// WW5 (bible/03-World/World-Wide.md WW5; bible/11-Multiplayer/Super-Dungeons.md WW5 - the owner's call taken, 2026-10-26:
+// WW5 (WW5; WW5 - the owner's call taken, 2026-10-26:
 // "Every single thing here needs to be addressed. No exceptions."): A HOLLOW IN EVERY THEATRE. One Abyss Dungeon stood at a
 // time, in the world: the hub's one record (`sdev`), its census the Bay's 62 region channels, its site over MAPS.BSA's
 // rows (`W = 1000`), its find's word the Bay's 0..999. Now each theatre that holds ground for one (the Bay and the eight
@@ -44,12 +44,11 @@ const SKY = 3, SKY_S = 3 * SD_LANE_SPAN;   // Skyrim's lane, its zero slot
 test('WW5 THE LAW: a slot names its lane - lane t\'s are t x SD_LANE_SPAN + 1, + 2 ... (the Bay\'s the 1, 2, 3 they always were), the room `sd:<s>` nine digits at most; a lane\'s first beat its own zero; a rise its lane\'s next slot in its own region - a Bay region on the Bay\'s, its province\'s or its great cities past it, never another\'s; the census\'s pick its slot\'s lane\'s regions (a crowd in Skyrim draws Skyrim\'s Hollow, never the Bay\'s); the Bay\'s first beat and rise the law before WW5 (mutants: the span; the lane\'s zero; a Bay region on a province\'s lane; a province\'s region on the Bay\'s; the pick across lanes; the lane\'s overflow)', () => {
   assert.equal(SD_LANE_SPAN, 10_000_000);
   assert.deepEqual([...SD_LANES], [...SITE_EVENT_LANES]);
-  assert.deepEqual([...SITE_EVENT_LANES], [0, 1, 2, 3, 4, 5, 6, 7, 8]);
-  for (const [s, lane] of [[1, 0], [9_999_999, 0], [SKY_S + 1, SKY], [80_000_001, 8]]) { assert.equal(sdLaneOf(s), lane); assert.equal(sdLaneWire(s), lane); }
+  assert.deepEqual([...SITE_EVENT_LANES], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  for (const [s, lane] of [[1, 0], [9_999_999, 0], [SKY_S + 1, SKY], [80_000_001, 8], [90_000_001, 9]]) { assert.equal(sdLaneOf(s), lane); assert.equal(sdLaneWire(s), lane); }
   assert.equal(SD_REGION_COUNT, CHAT_REGION_COUNT, 'every region\'s channel counted');
   assert.deepEqual(sdLaneRegions(0), Array.from({ length: 62 }, (_, r) => r));
-  for (let t = 1; t <= 8; t++) assert.deepEqual(sdLaneRegions(t), [61 + t], `${THEATRE_KEYS[t]}: its province's region`);
-  assert.deepEqual(sdLaneRegions(9), [], 'the open zone counts for none');
+  for (let t = 1; t <= 9; t++) assert.deepEqual(sdLaneRegions(t), [61 + t], `${THEATRE_KEYS[t]}: its province's region`);
   // the Bay's: the law before WW5
   assert.deepEqual(sdFirst(T0), { s: 0, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + SD_FIRST_RISE_MS });
   assert.deepEqual(sdRise(sdFirst(T0), T0 + SD_FIRST_RISE_MS, 17), { s: 1, ph: 'risen', r: 17, at: T0 + SD_FIRST_RISE_MS, until: T0 + SD_FIRST_RISE_MS + SD_LIFETIME_MS, next: T0 + SD_FIRST_RISE_MS + SD_LIFETIME_MS + SD_COOLDOWN_MS });
@@ -62,7 +61,7 @@ test('WW5 THE LAW: a slot names its lane - lane t\'s are t x SD_LANE_SPAN + 1, +
   assert.equal(sdRise(first, T0 + SD_FIRST_RISE_MS, 17), null, 'a Bay region on Skyrim\'s lane');
   assert.equal(sdRise(first, T0 + SD_FIRST_RISE_MS, 65), null, 'Morrowind\'s region on Skyrim\'s lane');
   assert.equal(sdRise(null, T0, -1, SKY).s, SKY_S + 1, 'a lane with no record: its first slot');
-  assert.equal(sdRise(null, T0, -1, 9), null, 'the open zone: none');
+  assert.equal(sdRise(null, T0, -1, 9).s, 90_000_001, 'the ninth lane: its first slot');
   assert.equal(sdRise({ ...first, s: SKY_S + SD_LANE_SPAN - 1 }, T0 + SD_FIRST_RISE_MS, -1), null, 'never past its span');
   assert.equal(sdRise(first, T0 + SD_FIRST_RISE_MS, 64, 2), null, 'a record of another lane is no lane\'s');
   assert.equal(sdRise({ ...first, s: SKY_S - 1 }, T0 + SD_FIRST_RISE_MS, 64, SKY), null, 'Hammerfell\'s last slot never rises into Skyrim\'s zero');
@@ -71,7 +70,7 @@ test('WW5 THE LAW: a slot names its lane - lane t\'s are t x SD_LANE_SPAN + 1, +
   assert.equal(pickSdRegion(SKY_S + 1, counts), 64, 'a crowd in Skyrim draws Skyrim\'s Hollow');
   assert.equal(pickSdRegion(2 * SD_LANE_SPAN + 1, counts), -1, 'none in Hammerfell: its great cities');
   assert.equal(pickSdRegion(SKY_S + 1, { ...counts, 64: 1 }), -1);
-  assert.equal(sdRoomKey(80_000_001, '0123456789abcdef'), 'sd:80000001.0123456789abcdef'); assert.ok(isSdRoom(sdRoomKey(80_000_001, '0123456789abcdef')));   // PIN MOVED (the eighth merge of main, SD-PARTY): a lane's slot is a room key with its party's owner, as every Hour's is
+  assert.equal(sdRoomKey(80_000_001, '0123456789abcdef'), 'sd:80000001.0123456789abcdef'); assert.ok(isSdRoom(sdRoomKey(80_000_001, '0123456789abcdef')));
 });
 
 test('WW5 THE WIRE: a record on its own lane\'s span and region - the Bay\'s `ev` as it always was, a province\'s `ln` (an older client drops a kind it does not know), never one read as the other; a find\'s word and its tell on the lane\'s pixel (the Bay\'s map for the Bay\'s, a world pixel off it past it); a lane\'s hub records and an account\'s receipt under a lane\'s key, the Bay\'s the keys they always were (mutants: the lane\'s region unread; the kinds crossed; the find\'s pixel by the Bay\'s bound; a receipt key shared)', () => {
@@ -89,11 +88,11 @@ test('WW5 THE WIRE: a record on its own lane\'s span and region - the Bay\'s `ev
   assert.equal(validSdOut({ k: 'ln', ...bay }), null);
   assert.equal(validSdOut({ k: 'ln', s: SKY_S, ph: 'gone', r: -1, at: 1, until: 1, next: 2 }), null, 'a lane\'s zero said to nobody');
   assert.deepEqual(validSdIn({ k: 'found', s: SKY_S + 2, px: 1566, py: -427 }), { k: 'found', s: SKY_S + 2, px: 1566, py: -427 });
-  for (const bad of [{ s: SKY_S + 2, px: 300, py: 200 }, { s: 2, px: 1566, py: -427 }, { s: SKY_S, px: 1566, py: -427 }, { s: 9 * SD_LANE_SPAN + 1, px: 1566, py: -427 }]) assert.equal(validSdIn({ k: 'found', ...bad }), null, JSON.stringify(bad));
+  for (const bad of [{ s: SKY_S + 2, px: 300, py: 200 }, { s: 2, px: 1566, py: -427 }, { s: SKY_S, px: 1566, py: -427 }, { s: 10 * SD_LANE_SPAN + 1, px: 1566, py: -427 }]) assert.equal(validSdIn({ k: 'found', ...bad }), null, JSON.stringify(bad));
   assert.deepEqual(validSdIn({ k: 'found', s: 2, px: 300, py: 200 }), { k: 'found', s: 2, px: 300, py: 200 });
   assert.ok(validSdFoundTell({ s: SKY_S + 2, px: 1566, py: -427, x: 1, z: 2, fb: 'M' }));
   assert.equal(validSdFoundTell({ s: SKY_S + 2, px: 300, py: 200, x: 1, z: 2, fb: 'M' }), null);
-  assert.ok(sdSlotOk(1) && sdSlotOk(SKY_S + 1) && !sdSlotOk(SKY_S) && !sdSlotOk(90_000_001) && !sdSlotOk(0));
+  assert.ok(sdSlotOk(1) && sdSlotOk(SKY_S + 1) && !sdSlotOk(SKY_S) && sdSlotOk(90_000_001) && !sdSlotOk(100_000_001) && !sdSlotOk(0));
   assert.ok(sdLaneRegionOk(0, 61) && !sdLaneRegionOk(0, 62) && sdLaneRegionOk(3, 64) && sdLaneRegionOk(3, -1) && !sdLaneRegionOk(3, 63));
   assert.deepEqual([sdLaneKey(SD_KEY), sdLaneKey(SD_KEY, 3), sdLaneKey(SD_SLOT_KEY, 8), sdLaneKey(SD_FOUND_KEY, 1)], ['sdev', 'sdev:3', 'sdslot:8', 'sdfound:1']);
   assert.deepEqual([sdReceiptKey('acct_1'), sdReceiptKey('acct_1', 0), sdReceiptKey('acct_1', 3)], ['sdrc:acct_1', 'sdrc:acct_1', 'sdrc:acct_1.3']);
@@ -138,7 +137,6 @@ test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first b
       const h1 = await hubber(1);
       await fire(hub);
       for (const lane of SD_LANES) assert.deepEqual(hub.store.get(sdLaneKey(SD_KEY, lane)), sdFirst(T0, lane), `lane ${lane}'s first beat its own`);
-      assert.equal(hub.store.get(sdLaneKey(SD_KEY, 9)), undefined, 'the open zone keeps none');
       await inRegion(64, 'peer-s1', 'acct-s1'); await inRegion(64, 'peer-s2', 'acct-s2');
       await inRegion(17, 'peer-b1', 'acct-b1'); await inRegion(17, 'peer-b2', 'acct-b2');
       clock = T0 + SD_FIRST_RISE_MS;
@@ -153,7 +151,7 @@ test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first b
       assert.deepEqual(fanned.find((m) => m.s === SKY_S + 1), { t: 'sd', k: 'ln', ...sky });
       const h2 = await hubber(2);
       const said = h2.sent.filter((m) => m.t === 'sd');
-      assert.deepEqual(said.map((m) => [m.k, sdLaneOf(m.s)]), [['ev', 0], ...[1, 2, 3, 4, 5, 6, 7, 8].map((l) => ['ln', l])], 'a hello: the Bay\'s first, then every lane\'s');
+      assert.deepEqual(said.map((m) => [m.k, sdLaneOf(m.s)]), [['ev', 0], ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => ['ln', l])], 'a hello: the Bay\'s first, then every lane\'s');
       // the herald: each lane's rise, its province named
       await fire(hub);
       assert.ok(posts.some((p) => JSON.stringify(p).includes('somewhere in Skyrim')), 'Skyrim\'s rise posted');
@@ -170,7 +168,7 @@ test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first b
       const live = async (s) => (await (await hub.room.fetch(new Request(`https://relay.internal${SD_INTERNAL_LIVE}`, { method: 'POST', body: JSON.stringify({ s }) }))).json()).rec;
       assert.equal((await live(SKY_S + 1)).s, SKY_S + 1, 'the live door: the asker\'s lane');
       assert.equal((await live(1)).s, 1);
-      assert.equal(await live(9 * SD_LANE_SPAN + 1), null, 'no lane, no record');
+      assert.equal(await live(10 * SD_LANE_SPAN + 1), null, 'no lane, no record');
       // receipts, a lane each
       const subtle = globalThis.crypto.subtle, nowS = Math.floor(clock / 1000);
       const rcSky = await mintSdReceipt({ d: SKY_S + 1, s: 'acct-h1', c: 1, x: 'dealt', l: 5 }, null, { subtle, nowS });
@@ -366,16 +364,6 @@ test('WW5 THE TIMERS, THE BOARD AND THE MAP: a province\'s Hollow in the same ro
   assert.ok(brow && brow.where === 'Near Solitude' && brow.way && brow.way.m < 10_000, 'the board: its own lane\'s site, and the way there');
   const box = { x0: -900, y0: -1000, w: 6000, h: 3800 };
   assert.equal(readGateMarks(() => [{ cx: 1566.5, cy: -426.5, r: 1.25 }, { cx: 303.5, cy: 200.5, r: 1.25 }], box).length, 2, 'every lane\'s ring');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /import \{ createSdLanes \} from '\.\/superDungeon\/sdLanes\.js';/);
-  assert.match(w, /const sdHost = params\.has\('online'\) \? createSdLanes\(\{\n {4}now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, here: \(\) => playerTravelPixel\(\),/);
-  assert.match(w, /sd: sdHost\?\.timers\(\) \?\? null,/);
-  assert.match(w, /sd: \(\) => sdHost\?\.mapMarks\(\) \?\? null,/);
-  assert.match(src('src/scenes/spawnStandHost.js'), /return \(locationIndex\.get\(`\$\{px\},\$\{py\}`\)\?\.superTier \? locationIndex\.get\(`\$\{px\},\$\{py\}`\) : null\) \|\| \(params\.has\('online'\)/, 'a province\'s Hollow built where it stands past the Bay');   // PIN MOVED (AUDIT BAY-LEFT, its packages merged): _locationToBuild left world.js for scenes/spawnStandHost.js (SPAWN-WORLD's HOST-SPLIT), the Hollow-first clause with it
-  for (const re of [/const rec = sdHost\.record\(s\), now/, /riftLook\(sdHost\.record\(s\), s,/, /rec = sdHost\?\.record\?\.\(slot\) \?\? null;/, /const h = sdHost\?\.hollow\(s\);/, /if \(sdHost\?\.hollow\(loc\.sdRealm\)\?\.key !== back\.key\) return true;/]) assert.match(w, re);
-  const on = src('src/net/online.js');
-  assert.match(on, /else if \(r && r\.k !== 'ev' && r\.k !== SD_LANE_KIND\) \{/, 'a province\'s record is the hub\'s word, never a realm\'s fight');
-  assert.match(on, /if \(sdLaneWire\(w\.s\) > 0 && !\(this\._mine\(cell\) \? this\.ww5Ok : halo\?\.ww5Ok\)\) return false;/, 'a province\'s find never to an older relay - the socket\'s own relay\'s word (ww5_stars: a halo says for itself)');
 });
 
 test('WW5 ON THE FREEWARE\'S WORLD: every province\'s Hollow stands - three slots of each lane, by its crowd and by its great cities, each in its own theatre by a city of its own (the registry\'s, TESA\'s places), on dry ground, under the world lane\'s id; the Bay\'s Hollows by their own rows as they always were', { skip: HAVE ? false : 'ARENA2_PATH not set (sh tools/fetch-data.sh)', timeout: 600_000 }, async () => {

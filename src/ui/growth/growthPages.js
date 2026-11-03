@@ -1,5 +1,5 @@
 // @ts-check
-// GROWTH1 (bible/10-UI/Growth.md section 3) - THE GROWTH TAB'S PAGES, a leaf: the boot doors (ui/pauseDoor.js) ask
+// GROWTH1 - THE GROWTH TAB'S PAGES, a leaf: the boot doors (ui/pauseDoor.js) ask
 // whether a landing is one of them without loading the tab (ui/growth/growthTab.js, the pause window's lazy chunk's),
 // whose guide reads the spellbook's own words.
 

@@ -1,6 +1,6 @@
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE WORKS IN BATTLE, THEIR LAW - the
+// SEAT2b part two (b): THE WORKS IN BATTLE, THEIR LAW - the
 // Walls' quicker wave, the Gatehouse that bars the Throne, the Rams that batter it and the blows that break them
-// (bible/11-Multiplayer/Seats-Arc.md 6.2, 7.5; net/siege/siegeRef.js, its numbers pinned equal to net/fortLaw.js's); the
+// (6.2, 7.5; net/siege/siegeRef.js, its numbers pinned equal to net/fortLaw.js's); the
 // pass's works (net/identityToken.js `sx`) and the wire's words for them (net/wire.js). `06-Systems/Online-Arc.md`
 // SEAT2b part two (b).
 import { test } from 'node:test';

@@ -1,4 +1,4 @@
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): EVERY RENDERER READS IT. The paperdoll's layer, the Morrowind
+// APPEARANCES: EVERY RENDERER READS IT. The paperdoll's layer, the Morrowind
 // body's worn armour, Layered Gearing's outfit and the Morrowind arms' held weapon each draw a piece wearing a look as the
 // look; the classic first-person sheet, the Weapon Widget's clone and the head's helm read it through the same door. The
 // pack's own pictures stay the piece's: what it IS, while the body shows what it looks like.

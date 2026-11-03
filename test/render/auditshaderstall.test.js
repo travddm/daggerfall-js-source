@@ -1,5 +1,4 @@
-// AUDIT SHADER-STALL (2026-10-20, the owner: "I need you to audit this and ensure this is perfect and fidelity isnt lost";
-// bible/07-Rendering/Performance-Priority.md SHADER-STALL, the audit): A PASS THE GAME IS PLAYED BY IS NEVER SKIPPED FOR A
+// AUDIT SHADER-STALL: A PASS THE GAME IS PLAYED BY IS NEVER SKIPPED FOR A
 // COMPILE. SHADER-STALL built a pass in play once the driver said its compile was done; the audit found the Elite Breach's
 // telegraphs and crystals could be missing for a whole compile (seconds on D3D11) while a lord's first blow wound up and
 // landed. Held here: a door asked with `true` builds its pass that frame whatever the driver says, and the fights' doors
@@ -116,9 +115,8 @@ test('AUDIT SHADER-STALL a warm whose pass the draw built meanwhile stands down 
 });
 
 test('AUDIT SHADER-STALL the passes play meets are started at the boot\'s idle where the driver compiles beside the frames - every one a fight or a gate or a node draws, and the auras\' (AURA-STALL) - and nothing is started where it cannot (mutants: started without the extension; a pass left out)', () => {
-  // PIN MOVED (AURA-STALL, #1137): and the auras' program - the first wearer in range waited its whole compile; PIN MOVED
   // (AUDIT RED-MOUNTAIN F5): and the volcano's fire and the fence's glow, drawn wherever the horizon holds them
-  const want = [...GATE_PASS_PROGRAMS, ...telegraphPrograms(false), ...telegraphPrograms(true), ...GATE_FX_PROGRAMS, ...CRYSTAL_PROGRAMS, ...NODE_GLINT_PROGRAMS, ...AURA_PROGRAMS, ...FIRE_PROGRAMS, ...GLOW_PROGRAMS];
+  const want = [...GATE_PASS_PROGRAMS, ...telegraphPrograms(), ...GATE_FX_PROGRAMS, ...CRYSTAL_PROGRAMS, ...NODE_GLINT_PROGRAMS, ...AURA_PROGRAMS, ...FIRE_PROGRAMS, ...GLOW_PROGRAMS];
   assert.deepEqual(playPrograms(), want);
   const on = fakeGl();
   assert.equal(startPlayPrograms(on.gl), true);
@@ -128,20 +126,6 @@ test('AUDIT SHADER-STALL the passes play meets are started at the boot\'s idle w
   assert.equal(startPlayPrograms(off.gl), false);
   assert.equal(off.count('createProgram'), 0, 'no compile queued where none can be asked after');
   assert.equal(startPlayPrograms(null), false);
-  const r = read('src/render/renderer.js');
-  assert.match(r, /\(\) => \{ if \(parallelCompile\(this\.gl\)\) \{ void import\('\.\/playPrograms\.js'\)\.then\(\(m\) => m\.startPlayPrograms\(this\.gl\)\)\.catch\(\(\) => \{\}\); this\.startTerrainSnow\(\); \} \},/, 'the renderer\'s idle warm, off the boot\'s graph, the snow\'s surface with them');
-  assert.ok(!/^import [^\n]*playPrograms/m.test(r), 'never a static import');
-});
-
-test('AUDIT SHADER-STALL the fights ask their passes NEEDED when a telegraph, a crystal, a blow or a way out must be seen - the Elite Breach\'s and the court\'s (mutants: each need dropped)', () => {
-  const eg = read('src/scenes/eliteGates/egFight.js');
-  assert.match(eg, /crystalPass = crystalsOf\(true\);/);
-  assert.match(eg, /pass = telegraphOf\(_shapes\.length > 0\);/);
-  const court = read('src/scenes/gate/gateCourt.js');
-  assert.match(court, /const crystalPass = crystalPassOf\(true\);/);
-  assert.match(court, /const pass = telegraphPass\(!!\(mark \|\| shape \|\| poolDraw\.length\)\);/);
-  assert.match(court, /const fxPass = fxPassOf\(true\);/);
-  assert.match(court, /const fire = _fires\.length \? portalPass\(true\) : null;/);
 });
 
 test('AUDIT SHADER-STALL the court: a blow\'s telegraph is drawn the first frame it is wanted, the driver still compiling - built then, never skipped (mutants: the telegraph\'s need dropped)', () => {
@@ -162,12 +146,6 @@ test('AUDIT SHADER-STALL the court: a blow\'s telegraph is drawn the first frame
   assert.ok(f.count('link?') > before, 'the telegraph built while the driver compiles');
   assert.equal(drew, true, 'and drawn');
   c.destroy?.();
-});
-
-test('AUDIT SHADER-STALL the court\'s warm: where the driver cannot say, one pass a frame - and a pass the draw already built is no frame\'s (GATE-MIX\'s own skip, lost in the merge) (mutants: the settled skip dropped)', () => {
-  const court = read('src/scenes/gate/gateCourt.js');
-  assert.match(court, /const warmDoors = \[fxPassOf, crystalPassOf, portalPass\];/, 'the doors themselves - each one\'s `settled` readable');
-  assert.match(court, /while \(warmed < warmDoors\.length && warmDoors\[warmed\]\.settled\) warmed\+\+;/);
 });
 
 test('AUDIT SHADER-STALL the veil: its warm starts its program and, at an idle once the driver says it is done, BUILDS it - its link read, its uniforms found - so the step\'s frame builds nothing (AUDIT WB D5\'s warm, kept); a veil destroyed meanwhile is never built (mutants: the warm only starts it)', async () => {

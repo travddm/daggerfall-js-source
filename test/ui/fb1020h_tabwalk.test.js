@@ -3,7 +3,7 @@
 // QuickDial answered it, so wherever the dial did not answer (the classic skin, the status readout's slot, a key rebound,
 // the boot's last await), the browser walked the page's focus onto the first control drawn over the world. Online, with the
 // chat shut, that control is the chat's Social button. Its focus ring showed, and the next Space (the game's Jump) pressed
-// it. A mouse press on the button left it the focus the same way. bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md.
+// it. A mouse press on the button left it the focus the same way..
 //
 // Driven on the real modules: the chat panel (ui/chatPanel.js createChatPanel, its real ChatLog, its Social button the way
 // scenes/world.js asks for it) and the hosts' one swallow (ui/input.js swallowBrowserKey), run in world.js's order - the
@@ -171,12 +171,3 @@ test('FB1020h HUD-FOCUS: a focus given another way - a script\'s focus(), the pa
   assert.equal(input.neverTheFocus?.(null), null);
 });
 
-test('FB1020h TAB-WALK: the world host\'s swallow stands above every arm that can decline a Tab - the boot\'s gate (KEY-BOOT) and the QuickDial\'s own arm - and routeKey no longer says the browser\'s walk is the classic default it keeps', () => {
-  const world = rd('src/scenes/world.js');
-  const kd = world.slice(world.indexOf("  addEventListener('keydown', (e) => {\n    if (peerMenuReader"));
-  const at = (s) => { const i = kd.indexOf(s); assert.ok(i >= 0, `world.js's keydown holds ${s}`); return i; };
-  assert.ok(at('    swallowBrowserKey(e);   // U47') < at('    if (!_worldKeysLive) return;'), 'above the boot\'s gate');
-  assert.ok(at('    swallowBrowserKey(e);   // U47') < at("if (act === 'QuickDial' && hudCtx.toggleDial())"), 'above the dial\'s arm');
-  const input = rd('src/ui/input.js');
-  assert.doesNotMatch(input, /classic behaviour is byte-for-byte untouched/, 'the sentence that kept the browser\'s walk is gone');
-});

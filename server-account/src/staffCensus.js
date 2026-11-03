@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL4-CENSUS (2026-10-22, mob picked it, 04:13Z; design doc "DFO Staff Panel: design", "Item and gold census",
-// "Built on the save judge", "Server load" and the weak spots "Copies found misses modded dupes..." and "Census rows ride
-// every save...") - THE ITEM AND GOLD CENSUS, AND THE CONTESTED PIECES. Admin only (mob, 03:03Z: a Moderator gets the chat
+// STAFF-PANEL4-CENSUS - THE ITEM AND GOLD CENSUS, AND THE CONTESTED PIECES. Admin only (mob, 03:03Z: a Moderator gets the chat
 // reports, Mute and Ban, and the few things named for them - not this).
 //
 // ═══ THE TALLY RIDES THE JUDGE, NEVER A SAVE OF ITS OWN ═════════════
@@ -32,7 +30,7 @@
 // found - and whether a staff member has checked its trail. A Remove of a contested piece needs that check (trail_at);
 // the Remove itself is the realm builder's. Copies and census jumps are how dupes are hunted; neither proves one.
 //
-// EVERY LIST PAGES (mob, 19:25Z: "put inf scroll in anything that pull lists"): `from`, answered as `next`.
+// EVERY LIST PAGES: `from`, answered as `next`.
 // ═══════════════════════════════════════════════════════════════════
 
 import { displayName } from './accounts.js';
@@ -117,7 +115,7 @@ export function censusTally(save) {
   let banks = 0;
   for (const a of Array.isArray(save.bankAccounts) ? save.bankAccounts : []) banks += goldOf(a?.accountGold);
   const gold = goldOf(save.goldPieces) + banks;
-  // ECON-WORTH (mob, 2026-10-25: "hover break down on gold held bank held and item total"): the banks' share of `g` as
+  // ECON-WORTH: the banks' share of `g` as
   // well, so the economy tells a purse from a bank - never a kind of its own (censusDay and the reads ask `g` and `t`s)
   /** @type {Record<string, number>} */
   const out = { g: Math.min(Number.MAX_SAFE_INTEGER, gold), b: Math.min(Number.MAX_SAFE_INTEGER, banks) };
@@ -227,7 +225,7 @@ const DELIVERY_T = "COALESCE(p.template, CAST(json_extract(d.item, '$.templateIn
 const DELIVERY_N = "SUM(CASE WHEN d.item IS NULL THEN 1 ELSE MAX(1, COALESCE(json_extract(d.item, '$.stackCount'), 1)) END)";
 const DELIVERIES = 'FROM market_deliveries d LEFT JOIN products p ON p.provenance = d.provenance WHERE d.collected = 0';
 /** Marks the market holds: the ledger's escrow end, what went in less what came out - open orders' and standing bids'
- *  alike (marks.js marksReport's measure, the economy screen's, on 0153's covering index). */
+ *  alike (marks.js marksReport's measure, the economy screen's, on the covering index). */
 const MARKS_ESCROW = `SELECT COALESCE(SUM(CASE WHEN dst_kind = 'escrow' THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN src_kind = 'escrow' THEN amount ELSE 0 END), 0) AS n
   FROM marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'`;
 
@@ -339,7 +337,7 @@ const recordOf = (/** @type {any} */ d, /** @type {string} */ p, /** @type {unkn
   : null);
 
 /** A listed row: a death's dropped piece (`drop`) is the ledger's own bookkeeping, never listed - and in none of the
- *  list's indexes (0154 item_dupes_at, item_dupes_open, item_dupes_open_at), so no read here walks the drops. */
+ *  list's indexes (item_dupes_at, item_dupes_open, item_dupes_open_at), so no read here walks the drops. */
 const LISTED = "(d.kind IS NULL OR d.kind != 'drop')";
 /** Unchecked contested pieces on the copy holder's character - the count that makes a row high (item_dupes_open). */
 const OPEN_SQL = "(SELECT COUNT(*) FROM item_dupes x WHERE x.char_id = d.char_id AND x.trail_at IS NULL AND (x.kind IS NULL OR x.kind != 'drop'))";

@@ -1,5 +1,4 @@
-// AUDIT SD III, SD20f (2026-10-08, Mac: "a deep comprehensive audit over everything, ensuring absolute polish and
-// perfection"; bible/11-Multiplayer/Super-Dungeons.md "AUDIT SD III"): THE HOSTS AND THE LIFECYCLE - the lens's findings,
+// AUDIT SD III, SD20f: THE HOSTS AND THE LIFECYCLE - the lens's findings,
 // each reproduced and pinned here, run from the hosts' own text where the fix is theirs: one life a Hollow is the
 // account's and every tab's (H1); the cast-out once a stay, not once a slot (H4); the way out's words said after the
 // Hour is left (H5); a Rift step under another step's veil not spent (H6); the veil built ahead for a Hollow (H9); and
@@ -28,7 +27,7 @@ const M = 60_000, H = 3_600_000, T0 = 1_800_000_000_000;
 const fnIn = (src, name) => { const at = src.indexOf(`\n  function ${name}(`); assert.ok(at > 0, name); return src.slice(at + 1, src.indexOf('\n  }\n', at) + 4); };
 /** A property of world.js's Hollow host (createSdHost's own arguments), its arrow's text - one line, or a block. */
 function hostProp(name) {
-  const from = W.indexOf('const sdHost = params.has(\'online\') ? createSdLanes({');   // PIN MOVED (WW5): the Hollow host a lane at a time (scenes/superDungeon/sdLanes.js) - the Bay's lane's host takes these same arguments
+  const from = W.indexOf('const sdHost = params.has(\'online\') ? createSdLanes({');
   assert.ok(from > 0, 'the Hollow host');
   const at = W.indexOf(`\n    ${name}: `, from);
   assert.ok(at > 0, name);
@@ -41,7 +40,7 @@ const evalIn = (expr, env) => new Function(...Object.keys(env), `return (${expr}
 
 // ── H1: one life a Hollow, the account's and every tab's ─────────────
 
-/** The kept slots (systems/superDungeon/sdSlots.js - PIN MOVED (WITCH1): out of world.js whole) over one store, for the account `me()` names. */
+/** The kept slots (systems/superDungeon/sdSlots.js */
 function keptOf(store, me) {
   assert.match(W, /const _sdFallen = sdSlotsKept\(SD_FALLEN_KEY, \(\) => _accountSds\.me\(\)\);/, 'the world host keeps it by the signed-in account');
   return (key) => sdSlotsKept(key, me, () => store);
@@ -77,7 +76,7 @@ test('SD20f ONE LIFE A HOLLOW IS THE ACCOUNT\'S, AND EVERY TAB\'S (H1): the slot
   const mine = keptOf(refusing, () => 'acct-a')(SD_FALLEN_KEY);
   mine.add(11);
   assert.equal(mine.has(11), true, 'this session holds it');
-  assert.match(read('src/systems/superDungeon/sdSlots.js'), /const keyNow = \(\) => \{ const id = me\(\); return id \? `\$\{key\}:\$\{id\}` : key; \};/);   // PIN MOVED (WITCH1): out of world.js whole, the account handed in
+  assert.match(read('src/systems/superDungeon/sdSlots.js'), /const keyNow = \(\) => \{ const id = me\(\); return id \? `\$\{key\}:\$\{id\}` : key; \};/);
 });
 
 // ── H4: the cast-out once a stay ──────────────────────────────────────
@@ -231,12 +230,10 @@ test('SD20f THE VEIL AHEAD, AND /unstuck IN THE HOUR (H9, H10): a Hollow stood b
   const at = W.indexOf('        if (/^\\/unstuck(\\s+cancel)?$/i.test(text.trim())) {');   // PVPUNSTUCK (the Wrothgarian zone's merge): the command takes a cancel too
   assert.ok(at > 0, 'the /unstuck command');
   const block = W.slice(at, W.indexOf('          return true;\n        }', at) + '          return true;\n        }'.length);
-  // PIN MOVED (UNSTUCK-OUT, FIELD BUGS 2026-10-08): outdoors - the door refusing - the body stands on open ground
   const run = (hour, wayHome, unstuck, outdoors = 'none') => {
     const log = [];
     const env = {
       modes: { sdRealmSlot: () => (hour ? 4 : null), unstuck: () => { log.push('unstuck'); return unstuck; } },
-      // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the made level's /unstuck - the Hour's row is its way home
       madeRuleHere: (rule) => madeLevelRule(hour ? 'hour' : null, rule), madeSaysHere: (rule) => madeLevelSays(hour ? 'hour' : null, rule),
       sdWayHome: () => { log.push('wayHome'); return wayHome; }, chatLog: { push: (tab, m) => log.push(m.text) }, tabId: 'world', text: '/unstuck',
       // PVPUNSTUCK: the zone's own laws, quiet out of it - no wait standing, no zone, no cooldown, no stranger near

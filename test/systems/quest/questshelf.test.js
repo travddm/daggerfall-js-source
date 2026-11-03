@@ -1,5 +1,4 @@
-// QUEST-SHELF (2026-10-08, Mac: "All quests should be able to be abandoned and reclaimed"; bible/06-Systems/Quest-Arc.md
-// QUEST-SHELF). Abandon SETS A QUEST ASIDE, KEPT WHOLE (quest/machine.js shelveQuest): it stops running, its clocks stop,
+// QUEST-SHELF. Abandon SETS A QUEST ASIDE, KEPT WHOLE (quest/machine.js shelveQuest): it stops running, its clocks stop,
 // its questor's door opens, its site links are set aside by Place, a named NPC it held is home, a shared copy leaves the
 // party's step - and it is never tombstoned (its items, topics and journal stay its own). Reclaim brings it back as it
 // was (reclaimQuest): its own clock's stamps moved on by the time it was away (TIME3's law), its links standing again.
@@ -179,7 +178,7 @@ test('QUEST-SHELF in the world: its questor\'s door opens and a click on them is
   assert.equal(r.m.updateSharedQuest(r.q.questName, step), null, 'no step taken');
   assert.equal(isShelved(r.q), true, 'still set aside');
   assert.match(src('src/scenes/world.js'), /if \(result\.reason === 'shelved' && quest\.data\?\.sync === 1\) return;/, 'a sync said nothing');
-  assert.equal(shareRefusalText({ reason: 'shelved' }), 'have abandoned it. Reclaim it from the Quests tab of the pause menu to take it up again.', 'a deliberate share is answered');   // PIN MOVED (QUEST-AUDIT III SHELF-WORDS): the door named where it is
+  assert.equal(shareRefusalText({ reason: 'shelved' }), 'have abandoned it. Reclaim it from the Quests tab of the pause menu to take it up again.', 'a deliberate share is answered');
   // reclaimed: running again, its share once more possible
   assert.equal(r.m.reclaimQuest(r.q.uid).ok, true);
   assert.ok(r.m.getShareableQuestData(r.q.uid), 'shareable again');
@@ -204,9 +203,9 @@ test('QUEST-SHELF the journal: the walk hands the quests set aside, their clocks
   assert.match(bridge, /if \(!q \|\| q\.questComplete \|\| isShelved\(q\)\) questTracker\.pinned = null;/, 'the tracker lets it go');
   const menu = src('src/ui/enhanced/enhancedMenu.js');
   assert.match(menu, /if \(shelved\.length\) section\(t\('pause\.journal\.abandoned', 'Abandoned'\), shelved, ' done'\);/);
-  assert.match(menu, /const ab = el\('button', 'act', armed \? t\('pause\.journal\.abandonArmed', 'Click again to abandon'\) : t\('pause\.journal\.abandonQuest', 'Abandon quest'\)\);/);   // PIN MOVED (QUEST-AUDIT III SHELF-WORDS): the player's language
-  // AUDIT QUESTLINES UI-8 (PIN MOVED): a row with no journal entry yet (unloggedRail) offered no Abandon - set aside, it was
-  // no row at all, and no Reclaim could reach it. PIN MOVED (RPT1026-QUESTS ABANDON-ALWAYS): such a row has its Abandon
+  assert.match(menu, /const ab = el\('button', 'act', armed \? t\('pause\.journal\.abandonArmed', 'Click again to abandon'\) : t\('pause\.journal\.abandonQuest', 'Abandon quest'\)\);/);
+  // AUDIT QUESTLINES UI-8 (
+  // no row at all, and no Reclaim could reach it.
   // again, and set aside it is an Abandoned row (scenes/quest/questBridge.js questLog), so its Reclaim stands
   assert.match(menu, /} else if \(sel\.entries && sel\.id != null && clean\.abandon && clean\.canAbandon\?\.\(sel\.id\)\) \{/);
   assert.match(menu, /const rc = el\('button', 'act', t\('pause\.journal\.reclaim', 'Reclaim quest'\)\);/);

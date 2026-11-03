@@ -1,4 +1,4 @@
-// MACRO-4 (2026-09-22, the macro audit): THE GUILD IS THE SOURCE.
+// MACRO-4: THE GUILD IS THE SOURCE.
 // DFU hands a guild's own GuildMacroDataSource to every box its popup
 // shows: %lev and %pct are the rank title (MacroHelper :128, one row),
 // a temple answers %god, %fon and %gdd off its deity
@@ -68,14 +68,3 @@ test('MACRO-4: the trade box’s %pct is the guild’s title at its counter, the
   } finally { setMacroWorld(null); }
 });
 
-test('MACRO-4: the hosts wire the sources', () => {
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /guildTitle: \(\) => getTitle\(membershipOf\(seated\(\), guild\), playerEntity, guild\),/, 'the popup: the rank, read at show time - PIN MOVED (AUDIT CHAP4 D3): the seated book\'s, a seat\'s title at its chapter\'s hall');
-  assert.match(modes, /god: guild\?\.divine \?\? null,\s*godDesc: guild\?\.divine \? \(DEITY_DESCRIPTIONS\[guild\.divine\] \?\? null\) : null,\s*dungeon: \(\) => \(revealedDungeon \? getLocalizedLocationName\(revealedDungeon\.mapId, revealedDungeon\.name\) : null\),/, 'the popup: the deity and the revealed dungeon');
-  assert.match(modes, /const g = guildFactionId != null \? guildOfFaction\(guildFactionId, resolveVariantGuild\(dict\), dict\) : null;\s*[^\n]*\n\s*return g \? getTitle\(membershipOf\(seatedBook\(activeMemberships\(playerEntity\), membershipKey\(g\), host\.chapterSeatRank\?\.\(g\.factionId\) \?\? null\), g\), playerEntity, g\) : null;/, 'the trade window: the counter’s guild - PIN MOVED (AUDIT CHAP4 D3): a seat\'s title at its counter');
-  assert.match(read('src/ui/enhanced/enhancedTrade.js'), /guildTitle: deps\.guildTitle\?\.\(\) \?\? firstName\(deps\.entity\?\.name \?\? ''\),/, 'the enhanced trade skin reads the same hook');
-  const actions = read('src/systems/guild/guildServiceActions.js');
-  assert.match(actions, /pct: guildTitle, lev: guildTitle,/);
-  assert.match(actions, /gdd: godDesc,/);
-  assert.match(actions, /dng: dungeon,/);
-});

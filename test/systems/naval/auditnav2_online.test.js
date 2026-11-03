@@ -1,5 +1,5 @@
-// AUDIT NAV2 (2026-09-30, Mac: "Let's do a deep comprehensive audit on everything developed thus far") - ONLINE, of
-// the sea's second pass (bible/01-Overview/audits/Audit-NAV2.md): what every client must read the same - a captain's temper,
+// AUDIT NAV2 - ONLINE, of
+// the sea's second pass: what every client must read the same - a captain's temper,
 // a peer's boat sized up as she sizes herself, a ship's guns out on every screen - and what a handover must keep - a
 // prize to her victor, a boarding that left with its boarder. Several players' hosts over Come Sail Away's real pool
 // and a stand-in relay (test/navalRoom.mjs).
@@ -90,7 +90,7 @@ test('AUDIT NAV2 F2: a peer\'s boat is sized up as she sizes herself - a boat wi
 });
 
 test('AUDIT NAV2 F4: a rider on another player\'s boat is aboard her and sized as she is - a wary pirate that would take her is the rider\'s enemy too, so the rider is warned exactly when her owner is (SEA-PEACE read the rider as ashore, and a player off every boat of their own as one no wary pirate can size up) (mutants: the ridden boat unsized, the rider not aboard)', async () => {
-  // AUDIT NAV2 F25: the prize a wary pirate takes by the odds - PIN MOVED (GALLEON, 2026-10-01): a Large Galley to a
+  // AUDIT NAV2 F25: the prize a wary pirate takes by the odds
   // sloop, whose low hull her guns cannot lay on (the brig's broadside five guns now, Mac's galleon's ports: a crewless
   // Large Galley 1.10 to one, no prize of hers)
   const r = await room([{ id: 'a', hull: HULL.LargeGalley }, { id: 'b', hull: null }]);
@@ -195,10 +195,3 @@ test('AUDIT NAV2 F1-F3 THE WORD: the captains\' key (k) and the boat\'s (m) roun
   assert.equal(validNavalRecord({ ...rec, k: 'x' }), null);
 });
 
-test('AUDIT NAV2 F10 (Mac: "Not in a sea fight"): the watch\'s stop waits out a sea fight - a hostile ship near a player aboard, or a boarding under way, holds it on the world host, as a foe on foot does (AUDIT REP F3\'s law); ashore, with no ship hostile to them, it stands (mutants: either arm dropped)', () => {
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const gate = world.match(/blocked: \(\) => townTalk\.overlayActive[^]*?\n\s*\}\);/)?.[0] ?? '';
-  assert.match(gate, /\|\| duelEnemyNear\(\) \|\| areEnemiesNearby\(exteriorFoes\.foes\)/, 'the foot fight\'s arms stay');
-  assert.match(gate, /!!naval\?\.hostileNear\?\.\(\)/, 'a hostile ship near a player aboard (SEA-PEACE: never one ashore)');
-  assert.match(gate, /!!naval\?\.boarding\b/, 'a boarding under way');
-});

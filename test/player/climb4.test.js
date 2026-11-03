@@ -1,5 +1,4 @@
-// CLIMB4 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "I reallty want go to go all in with the
-// detai. Liike proer feel to climbing"): THE FEEL. The motor's climb events (motor.js _pkEmit), the camera's law over
+// CLIMB4 (the Enhanced Climbing arc): THE FEEL. The motor's climb events (motor.js _pkEmit), the camera's law over
 // them (player/climb/climbFeel.js - the catch's dip, the sway, the shimmy's and the free climb's rhythm, the pull-up's look,
 // the lower's and the corner's and the eject's turn, the leap's kick, the grip's tremble), its view half
 // (applyClimbView), the look filter's turn, and every host that draws a first-person view applying it. And THE
@@ -203,11 +202,9 @@ test('CLIMB4 F8: every host that draws a first-person view frames the feel after
   assert.ok(w.indexOf('climbFeel.frame(dt') > w.lastIndexOf('cam.pos = player.eyeAt();', w.indexOf('climbFeel.frame(dt')), 'world: framed after the eye');
   assert.match(w, /const view = betterAmbience\.view\(lookAt\(mwv\.eye[^\n]*\n\s*climbFeel\.view\(view, !tvf && !mwv\.thirdPerson\);/, 'world: the view half, first person, never the travel view');
   assert.match(w, /perspective\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), worldAspect/, 'world: the kick on the lens');
-  // PIN MOVED (SPYGLASS): the captain's glass narrows the world's lens past the kick - the sky and the far ring take the
   // same narrowed lens the world does (world.js glassFov), the kick still inside it
   assert.match(w, /sky\.draw\([^;]*cam\.pitch \+ climbFeel\.pitch\(\), glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\)/, 'world: the sky takes the pitch and the kick');
   assert.match(w, /fovY: glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\)/, 'world: so does the far ring');
-  // PIN MOVED (FOLLOW-INDOORS): the one handle, a staff follow's camera taken before its frame (scenes/staffFollowHost.js indoors)
   assert.match(w, /createWorldModes\(\{\n\s*climbFeel: staffFollow\.indoors\(climbFeel, /, 'world: the modal frames take the one handle');
   const wm = read('worldModes');
   assert.match(wm, /host\.climbFeel\?\.frame\(dt, overlayHeld\);/, 'worldModes: framed (PIN MOVED, AUDIT CLIMB-ARC F2: held while the motor is)');

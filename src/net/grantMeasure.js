@@ -1,5 +1,5 @@
 // @ts-check
-// GRANT2 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md sections 7 and 12): THE GRANTS'
+// GRANT2: THE GRANTS'
 // MEASURE - what each cell's asks were, carried from the relay to the account service, which `node tools/realmReview.mjs
 // grants` reads (GRANT5: seven days, then the buckets and the ceiling are set from it).
 //
@@ -7,11 +7,10 @@
 // the gate would have refused - the account's bucket, the cell's ceiling - and the most granted hostile members the cell
 // held live at once. It posts the batch once GRANT_MEASURE_ROWS accounts and kinds wait, at the first fold after the
 // window is GRANT_MEASURE_MS old (grantMeasureDue), and when the cell's last socket leaves.
-// GRANT-SLEEP (2026-10-25, bible/11-Multiplayer/Spawn-Grants.md section 22): NO TIMER HOLDS THE WINDOW. A ten-minute
+// GRANT-SLEEP: NO TIMER HOLDS THE WINDOW. A ten-minute
 // setTimeout armed at a window's first fold kept the cell from hibernating - a pending timer does - so a room a player
 // asked a grant in was billed awake long after they left: on the live relay 7,033 interiors were awake under a minute of
-// the day (2026-10-15), and after GRANT2's deploy 916, none between one minute and two, and 648 dungeons exactly ten
-// (2026-10-20, Cloudflare's per-object active time).
+// the day, and after GRANT2's deploy 916, none between one minute and two, and 648 dungeons exactly ten
 // THE DOOR IS THE CHAT FEED'S (net/safety/chatFeed.js), kept as narrow:
 //   - ONE WAY. The relay posts; nothing the relay does waits on the answer. A post that fails is dropped: a measure is a
 //     sample, and a cell that sleeps before its post loses its window.
@@ -50,7 +49,7 @@ const ROOM_RE = /^[A-Za-z0-9_.,:+-]{1,80}$/;   // net/wire.js roomOf's own
 
 /** @typedef {{ a: string, k: string, asks: number, members: number, bucket: number, ceiling: number }} GrantMeasureRow */
 /** @typedef {{ a: string, b: string, r: string, n: number, e?: { t: number, k: number, mx: number } }} GrantTallyRow */
-/** FOE-BOUNDS (bible/11-Multiplayer/Spawn-Grants.md section 19): THE RELAY AS A READER - the tally of what the relay
+/** FOE-BOUNDS: THE RELAY AS A READER - the tally of what the relay
  *  itself stripped (GRANT9's switch on: a record no builder could give, server/src/index.js _grantStripped), in the batch
  *  the relay signs. Never an account's id (net/identityToken.js ID_RE refuses its `~`), so no reader's tally is its; the
  *  service opens a case on it alone (server-account/src/grants.js) - the relay saw the sender's own frame. */

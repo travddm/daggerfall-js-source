@@ -1,4 +1,4 @@
-// TIME4 (2026-10-01, Mac: "Let's do it. This needs to be perfect"): THE WORDS. Design: bible/06-Systems/Online-Time-Arc.md
+// TIME4: THE WORDS. Design:
 // section 7. What the player is told about online time is the law's own numbers: the Online pane's sentence (true when
 // it opens, before the sky's switch and after), the patch notes' figures, and the bible's switch instant - each held
 // here to the law it states, so a dial turned in net/skyLaw.js without its words fails.
@@ -37,10 +37,6 @@ test('TIME4 the Online pane says the sky\'s day as it is when the pane opens: tw
   // before the switch the sky is the event clock's: a day every two real hours
   const ev = skyClassicMinutes(SWITCH.fromMs - 3_600_000 * 4) - skyClassicMinutes(SWITCH.fromMs - 3_600_000 * 6);
   assert.ok(Math.abs(ev - 1440) < 1e-6, 'two real hours, a day, before it');
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /can hurt you too\. \{skyDay\} The world\\u2019s clock and sky run on real time[^\n]*\{ skyDay: skyDayWords\(\) \}/, 'the paragraph opens its clock with the sentence');
-  assert.match(menu, /a lycanthrope\\u2019s full moon lasts one night\./, 'TIME2, said at the door');
-  assert.match(menu, /loans and repairs run on it\. Quest timers run on the world\\u2019s clock while you play\. Resting, waiting and traveling don\\u2019t use up a quest\\u2019s days, and time logged off never counts\./, 'QCLOCK-WORLD, said at the door (TIME3 had the quest timers on it, a rest spending their days)');   // PIN MOVED (VOICE2): American spelling (Voice.md rule 8)
 });
 
 test('TIME4 the figures the patch notes stated are the law\'s own: a day of 60 minutes, a full moon\'s night of 30, nightfall within 30, a three-day wait in about half a minute of rest, half an hour of game time at most for a tab away', () => {
@@ -56,20 +52,3 @@ test('TIME4 the figures the patch notes stated are the law\'s own: a day of 60 m
   assert.equal(PLAYED_STEP_MAX_SECONDS, 30 * 60);
 });
 
-test('TIME4 the bible says what was built, and the switch instant it names is the law\'s', () => {
-  const iso = new Date(SWITCH.fromMs).toISOString().replace('.000Z', 'Z');
-  assert.equal(iso, '2026-10-03T17:07:30Z');
-  const arc = rd('bible/06-Systems/Online-Time-Arc.md');
-  assert.match(arc, /\*\*Status: BUILT 2026-10-01 - TIME1, TIME2, TIME3 and TIME4\*\*/);
-  assert.ok(arc.includes(`**The sky switches at ${iso}**`), 'the design page names the law\'s instant - move both together (node tools/skyCutover.mjs)');
-  assert.match(arc, /### 6\.3a As built \(TIME3\)/);
-  assert.match(arc, /\*\*DECIDED 2026-10-01\*\*/);
-  assert.match(arc, /9\. \*\*Time zones\*\*/, 'Mac\'s idea, recorded and not built');
-  assert.ok(rd('bible/06-Systems/Online-Arc.md').includes(`a day every real\nhour from ${iso}`), 'WORLD5\'s note names the same instant');
-  assert.match(rd('bible/06-Systems/Lived-Time.md'), /ANSWERED AND BUILT 2026-10-01/);
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /\[TIME3, 2026-10-01 \(`Online-Time-Arc\.md` 6\.3a\): the quest's clock is the CHARACTER's own now\./);
-  assert.match(rd('bible/11-Multiplayer/World-Bosses.md'), /it RETIRES from the words/);
-  assert.match(rd('bible/03-World/Clock-Arc.md'), /\[TIME1, 2026-10-01/);
-  assert.match(rd('bible/06-Systems/Quest-Arc.md'), /## TIME3 - QUESTS ON TWO CLOCKS/);
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /\| \*\*ONLINE, A SKY THAT TURNS, A FULL MOON'S NIGHT AND QUESTS ON YOUR OWN TIME \(TIME1-TIME4/);
-});

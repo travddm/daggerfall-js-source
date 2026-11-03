@@ -318,7 +318,7 @@ test('RR2 the trample and the charge on the hosts: the contacts each frame, the 
   assert.match(inst, /setCanRunOverride\(\(mode\) => \(rrRidingOn\(\)\s*\? rrCanRunRiding\(\{ mode, riding: !!_host\.riding\?\.\(\), inTown: !!_host\.inTown\?\.\(\), gallopingInTowns: rrRidingSetting\('GallopingInTowns'\) === true \}\)\s*: null\)\);/);
   assert.match(inst, /setAxisLimitsProvider\(\(\) => \(rrRidingOn\(\) && rrRidingSetting\('RealisticMovement'\) === true\s*\? rrRidingInputLimits\(\{ riding: !!_host\.riding\?\.\(\), mode: _host\.transportMode\?\.\(\) \?\? 'Foot' \}\)\s*: null\)\);/);
   assert.match(inst, /installRoleplayRealismArt\(\);/);
-  assert.match(rd('src/systems/transport.js'), /export const canRunUnlessRiding = \(mode\) => \{\n\s*const mods = _canRun\?\.\(mode\) \?\? null;\n\s*return _gallop\?\.\(mode, mods\) \?\? mods \?\? !isRiding\(mode\);/);   // PIN MOVED (STEED1): horse care's word after the mod's
+  assert.match(rd('src/systems/transport.js'), /export const canRunUnlessRiding = \(mode\) => \{\n\s*const mods = _canRun\?\.\(mode\) \?\? null;\n\s*return _gallop\?\.\(mode, mods\) \?\? mods \?\? !isRiding\(mode\);/);
   assert.match(rd('src/player/lookFilter.js'), /Math\.max\(-pitchFloor\(\), Math\.min\(PITCH_LIMIT, cam\.pitch \+ this\.residualPitch\)\)/);
   assert.ok(typeof rrHostSeams().spawnFoe !== 'undefined');
   // the walker leaves the street at once and its slot is free

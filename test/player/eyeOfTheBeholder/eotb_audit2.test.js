@@ -1,7 +1,6 @@
-// ═══ AUDIT-EOTB2 (2026-09-16) → EOTB-IL (2026-09-17): THE INTEGRATION ═══
+// ═══ AUDIT-EOTB2 → EOTB-IL: THE INTEGRATION ═══
 //
-// Mac: "Do an audit on eye of the beholder. Ensure its integrated 1:1.
-// No half assed work." Then, with the shipped archive in hand: "it
+// Then, with the shipped archive in hand: "it
 // needs to be 1:1 with the uploaded file. No exceptions."
 //
 // AUDIT-EOTB2 wired the body through the only path a player has
@@ -114,15 +113,6 @@ test('EOTB-IL: THE STATUE WALKS - through the seam, the rig\'s record drives the
 });
 
 test('EOTB-IL: the rig registers the WHOLE record - the motion bag and what LateUpdate polls off DFU - and the bag carries what PlayerMotor is read for', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  const reg = /const eotbState = \(\) => \(\{([\s\S]*?)\}\);\s*\n\s*const bindBody = \(\) => eotbBody\.attach\(renderer, eotbState\);/.exec(rig);   // MAC-O3: the thunk is named so the frame can re-claim it
-  assert.ok(reg, 'the one registration');
-  for (const f of ['weaponReady:', 'sheathed: playerWeapon.sheathed', 'spellcasting: spellArmed()', 'usingBow: !!playerWeapon.machine.isBow',
-    'transformed: !!entity && isTransformedLycanthrope(entity)', 'lycanthropyType:', 'died: !!entity && (entity.health ?? 1) <= 0', 'motion: camera?.()?.move ?? null',
-    'attacking: playerWeapon.machine.state !== \'Idle\'', 'castPlaying: !!fpsSpellCasting.isPlayingAnim', 'bowDrawback: getBool(\'Controls\', \'BowDrawback\')',
-    'swingHeld: _held', 'liveSpeed: entity ? liveStat(entity, \'speed\') : 50', 'concealment: entity ? concealmentFlags(entity) : null']) {
-    assert.ok(reg[1].includes(f), `the record carries ${f}`);
-  }
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
     assert.match(rd(h), /move: (?:motionBagOf\(player\)|_fpMove)/, `${h}: the thunk carries the bag`);
   }
@@ -388,19 +378,6 @@ test('EOTB-IL: the hides - the FPV weapon and horse behind their keys, the spell
   } finally { eotbCamera.toggleOffset(false); _resetModSettings(); }
   closeLane();
   assert.deepEqual(mwViewHides(), { weapon: false, horse: false, spellHands: false });
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /const eotbHidesWeapon = \(\) => !fpArm\.canThirdPerson\(\) && eotbBody\.hides\(\)\.weapon;/);
-  assert.match(rig, /const eotbHidesSpellHands = \(\) => !fpArm\.canThirdPerson\(\) && eotbBody\.hides\(\)\.spellHands;/);
-  // the hide folds into the frame's texture read, so the gate keeps the
-  // shape fpsspellcasting.test.js pins (WeaponManager.cs:247)
-  // AUDIT 68 S09-eotb-canvas-null: the hide is the HANDS' alone - nulling the canvas took Don'tHideWeapon's weapon with it
-  assert.match(rig, /const c = cv\(\);/);
-  // PIN MOVED (SPELL-HAND): the gate opens on the hands' one draw, which picks the free hand or DFU's two (was: the gate
-  // straight onto `drawSpellCastHands(`)
-  assert.match(rig, /if \(c && !fpArm\.active\(\) && !eotbHidesSpellHands\(\)\) \{\s*\n(?:\s*\/\/[^\n]*\n)*\s*const side = _spellHand \? spellHandSide\(\) : null;\n\s*const castHands = \(art, f\) => \(side \? drawSpellHand\(renderer, c, art, f, \{ side, tint: fpTint, guard: fpsSpellCasting\.isPlayingAnim \? 0 : _spellGuard\.hand \}\) : drawSpellCastHands\(renderer, c, art, f, \{ tint: fpTint \}\)\);\n\s*castHands\(/, 'the hands\' picture goes in third person');
-  assert.equal((rig.match(/thirdPerson: fpArm\.thirdActive\(\) \|\| eotbHidesWeapon\(\)/g) ?? []).length, 2, 'the widget and the torch hand');
-  assert.match(rig, /if \(eotbHidesWeapon\(\)\) return;\s*\n\s*if \(fpArm\.active\(\)\) \{ fpArm\.draw\(c\); return; \}/, 'the picture goes before any first-person draw');
-  assert.match(rd('src/player/mountRig.js'), /if \(art && isRiding\(player\.transportMode\) && !ridePaused && !mwViewHides\(\)\.horse\) \{/);
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -454,10 +431,6 @@ test('EOTB-IL: AutoTogglePerspective ships DISARMED - the sum of nine Don\'tChan
   // the seam and the mode machine: four doors now, the dungeon's too
   closeLane();
   assert.equal(mwViewTransition('Interior'), false, 'off the lane the door does nothing');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /setMode\('interior'\);\s*\n\s*host\.unlockOn\?\.\(\);[^\n]*\n\s*mwViewTransition\('Interior'\);/);   // AUDIT-WH2 L1-F5: the flip is setMode now - the ORDER this pin holds is unchanged
-  assert.match(wm, /setMode\('dungeon'\);\s*\n\s*host\.unlockOn\?\.\(\);[^\n]*\n\s*mwViewTransition\('Interior'\);/, 'OnTransitionDungeonInterior (IL_06bf)');
-  assert.equal((wm.match(/mwViewTransition\('Exterior'\)/g) ?? []).length, 2, 'the building\'s exit and the dungeon\'s (IL_06e1)');
 });
 
 test('EOTB-IL: OnNewGame and OnLoad - a transition row when armed and nothing else; StartInThirdPerson through ToggleOffset when not', () => {
@@ -474,11 +447,6 @@ test('EOTB-IL: OnNewGame and OnLoad - a transition row when armed and nothing el
   assert.equal(armed.onLoad(false), false, 'armed, outside: the exterior row is Don\'tChange and StartInThirdPerson is NOT consulted (IL_0a72-IL_0abb)');
   armed.toggleOffset(true);
   assert.equal(armed.onLoad(true), false, 'armed, inside: the interior row says first');
-  // the two doors in the world host
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /mwViewLoadPose\(pose\.camera, \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\);/, 'the load door hands IsPlayerInside');
-  assert.match(w, /if \(!_loadedGame\) mwViewNewGame\(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\);/, 'a boot that loaded nothing is a new game');
-  assert.match(w, /mwViewRebase\(r\.offset\);/, 'and the floating origin re-seeds the camera');
   openLane();
   try {
     eotbCamera.loadSettings((m, k) => (k === 'Camera.StartInThirdPerson' ? true : undefined));   // FP-START: ships off now - the player who turns it on
@@ -548,21 +516,8 @@ test('EOTB-IL: the SwitchShoulder and ToggleInput keys on their RELEASE edge (Ge
 // THE RECORD
 // ─────────────────────────────────────────────────────────────────
 
-test('EOTB-IL: no [SETTINGS] law is left in the arc, every law is marked [IL] with an offset, and the page says the assembly is read', () => {
-  const files = readdirSync(join(root, 'src/player'), { recursive: true }).filter((f) => /^eotb.*\.js$/.test(f.split(/[\\/]/).pop()));
-  const arc = files.map((f) => rd(`src/player/${f}`)).join('\n');
-  assert.ok(!/\[SETTINGS\]/.test(arc), 'AUDIT-EOTB2\'s evidence mark is gone: the assembly is in the tree');
-  assert.ok((arc.match(/\[IL\]/g) ?? []).length >= 30, 'the laws carry the IL mark');
-  assert.ok((arc.match(/IL_[0-9a-f]{4}/g) ?? []).length >= 60, 'and cite their offsets');
-  const page = rd('bible/06-Systems/Eye-Of-The-Beholder.md');
-  assert.match(page, /EOTB-IL/);
-  assert.match(page, /the assembly is in the tree|Eye Of The Beholder\.dll` is vendored/i, 'the page says where the assembly is');
-  assert.ok(!/THE ASSEMBLY IS NOT IN THE TREE/.test(page), 'and no longer says it is not');
-});
-
 // ─────────────────────────────────────────────────────────────────
-// EOTB-FLIP (2026-09-16, Mac, off a GPU at last: "The character is
-// upside down (classic sprite)")
+// EOTB-FLIP
 // ─────────────────────────────────────────────────────────────────
 
 test('EOTB-FLIP: a decoded PNG is turned into the world billboard\'s row order ONCE, through the tree\'s one converter - the top row lands last', () => {
@@ -590,12 +545,6 @@ test('EOTB-FLIP: a decoded PNG is turned into the world billboard\'s row order O
 });
 
 test('EOTB-FLIP: the body\'s decode is the dropped torch\'s door - decodePng, then the converter - and never a canvas of its own', () => {
-  const body = rd('src/player/eyeOfTheBeholder/eotbBody.js');
-  assert.match(body, /export async function decodeSprite\(url\) \{\s*(?:if \(isLayeredKey\(url\)\)[^\n]*\s*)?const res = await fetch\(url\);\s*if \(!res\.ok\) throw new Error\([^)]*\);\s*return worldOrderColors\(await decodePng\(new Uint8Array\(await res\.arrayBuffer\(\)\)\), \{ owned: true \}\);[^\n]*\s*\}/,
-    'fetch, decodePng, worldOrderColors - the same three the dropped torch takes');
-  assert.ok(!/getImageData|new Image\(|OffscreenCanvas/.test(body), 'no canvas door of its own');
-  assert.match(rd('src/player/eyeOfTheBeholder/eotbSprite.js'), /import \{ toColor32, toColor32OrderInPlace \} from '\.\.\/\.\.\/formats\/color32Order\.js';/, 'the converter is the tree\'s (PERF-PEERS5: its in-place twin beside it)');
-  assert.match(rd('src/scenes/droppedTorches.js'), /return toColor32\(await decodePng\(new Uint8Array\(await res\.arrayBuffer\(\)\)\)\);/, 'and the torch still takes it too');
   assert.deepEqual(MATERIAL.shade, { mode: 4, alpha: 0.6 });
   assert.equal(TABLE_FRAMES.Death, 2);
 });

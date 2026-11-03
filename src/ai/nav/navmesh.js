@@ -8,12 +8,12 @@
 //        snap verts onto the surface + a surfaceY-query height layer, since we keep the surface source).
 //   4.4 (done): locate endpoints -> poly-graph A* -> funnel (string-pull) the corridor into taut waypoints.
 //   4.5+: enemies path via findPath + repath + local avoidance.
-// ENHANCED AI 1 (2026-09-02): THIS IS project-final's navmesh.js, PORTED WHOLE.
+// ENHANCED AI 1: THIS IS project-final's navmesh.js, PORTED WHOLE.
 // Mac's own code, brought across byte-for-byte but for two lines, so that
 // everything proven there - the pipeline, the funnel, the obstacles, the
 // bake - is what runs here. Do not re-derive; a change is made in both
 // repos and said in both.
-// AUDIT 62 F1 (2026-09-07): THE FIRST CHANGE TO THE BODY, and it is said
+// AUDIT 62 F1: THE FIRST CHANGE TO THE BODY, and it is said
 // here for project-final to take: the poly-mesh weld, the lattice cut's
 // height, the bake's vertex heights, the level-aware locate and heights
 // (grep AUDIT 62). test/ai/nav/enhancedAI.test.js pins the body by digest; a
@@ -37,7 +37,7 @@ function surfaceY(c, x, z) {
   return c.yLo + (c.yHi - c.yLo) * t;
 }
 
-// LAIR-WALK (2026-10-19, bible/01-Overview/bugs/Field-Bugs-2026-10-19.md; AUDIT FB1019 B1, B2): THE PORT'S OWN QUERY,
+// LAIR-WALK: THE PORT'S OWN QUERY,
 // here above the body and outside its digest (test/ai/nav/enhancedAI.test.js) - it calls the body's own locate and
 // heights and changes none of them, so the body stays project-final's. A path search per candidate walked the whole of
 // the way in's floor for each one that failed; this floods it ONCE.
@@ -605,7 +605,7 @@ export function buildPolyMesh(chf, opts = {}) {
   const maxArea2 = 2 * ((opts.maxArea ?? 12) / (chf.cs * chf.cs)); // twice-area poly cap in grid units² (opts.maxArea = world m²). The Slice-9 overlay blocks WHOLE polys, so poly size is every obstacle's blast radius: open rooms baked as mega-polys (a 144 m² dig-face floor) and one boss disc severed the arena - alert adds with no path stood still. The cap bounds any block's reach; corridors/ledges (already small) are untouched.
   const contours = chf.contours || [];
 
-  // global vertex dedupe by (x,z) - AUDIT 62 F1 (2026-09-07): WITH A HEIGHT TERM. project-final's arenas
+  // global vertex dedupe by (x,z) - AUDIT 62 F1: WITH A HEIGHT TERM. project-final's arenas
   // had no stacked floors and welded on (x,z) alone; a Daggerfall dungeon is stacked by construction (a
   // mezzanine over a hall, a bridge, a room under a room), and welding a lower floor's vertex to the
   // upper floor's at the same (x,z) gave every lattice edge under the overlap 3-4 owners, which
@@ -897,7 +897,7 @@ function polyRefY(mesh, pi) {
   return py[pi];
 }
 
-// AUDIT 68 (2026-09-24): the height layer's collider index, made HERE FIRST and owed to project-final. surfH
+// AUDIT 68: the height layer's collider index, made HERE FIRST and owed to project-final. surfH
 // and surfHNear scanned EVERY collider per query - a triangle-soup bake holds 66k-400k boxes, so each findPath
 // waypoint cost O(colliders) and buildPolyMeshDetail O(verts x colliders), ~70% of a bake. A uniform grid over
 // the footprints, built once per collider array (the set is fixed once the nav holds it; a changed length

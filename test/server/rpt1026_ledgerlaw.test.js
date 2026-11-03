@@ -1,10 +1,10 @@
-// RPT1026-LEDGERLAW (2026-10-26, the private report inbox - bible/06-Systems/Integrity-Arc.md, RPT1026-LEDGERLAW): the account
+// RPT1026-LEDGERLAW: the account
 // service's ledger and law, driven through the real Worker over node:sqlite with every migration applied and R2 beside it
 // (test/accountDb.mjs, test/realmSeat.mjs).
 //   - A CRAFTED PIECE TRADED AWAY STAYS WITH ITS BUYER: the ledger settled a contested claim on a crafted piece for
 //     the account `products.owner` names, and a realm trade, a market delivery, a vault and a chest move no owner - so a
 //     maker who traded a piece away and wrote it back into its save won it back past the grace, and its buyer's was
-//     locked as the copy (server-account/src/ledger.js CRAFT_RECORD_SQL, `products.handed_to`, migration 0178).
+//     locked as the copy (server-account/src/ledger.js CRAFT_RECORD_SQL, `products.handed_to`).
 //   - STAFF'S CLEAR EXCUSES THE STATE IT READ: the law's signature names a character finding by its code alone, so a
 //     cleared negative purse excused every purse after it (verdict.js lawExcused, judge.js lawValuesOf).
 import '../chargenDom.mjs';
@@ -37,7 +37,7 @@ const noWait = () => Promise.resolve();
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Lattymoy' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Lattymoy' });
   const raw = s.env.DB._raw;
   /** A checkpoint of `who`'s tab: its save as a fresh character's, holding `items`, its purse `gold`. */
   const put = async (who, items, gold = 100, extra = {}) => {

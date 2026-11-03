@@ -95,29 +95,3 @@ test('x3 executor: the three release arms - self, at-caster AoC excluding the ca
   assert.equal(c3.fired[0][2], 4, 'the caster level rides the missile');
 });
 
-test('x3 wiring: the pool spawns casters, the decision drives the shared executor, the engine flies enemy missiles', () => {
-  const xf = src('src/scenes/exteriorFoes.js');
-  assert.ok(xf.includes('assignEnemySpells(entity, sbi)'), 'exterior spawns assign the S16 lists');
-  assert.ok(xf.includes('new EnemyCaster(entity, rolls)'), 'a listed caster gets the shared decision driver');
-  // MT-ii: the decision aims at the SELECTED target, and reads that
-  // target's own entity - a foe duelling another foe no longer picks
-  // its school off the player's effects, nor releases at them.
-  assert.ok(xf.includes('f.caster.update(foeFrameDt(dt), f.ai, f.attack, _tgt, _castTargetEntity);'), 'the decision rides beside the attack machine (AUDIT pre-merge P5: on its capped clock)');   // AUDIT WORLD6b-iii(a) C10: anchored at the call's end - a sixth argument would read as playerEntity
-  assert.ok(xf.includes('if (dec) castSpellFrom(f, dec.spell, playerFeet, false, { aimAt: castAimAt(f, playerFeet) });'), 'and releases through the ONE executor, AT the target');   // WORLD6b-iii: a peer target aims the missile at the peer
-  // wave 30: the deps of that executor are bound ONCE for this pool - the
-  // decision and the spider/scorpion paralyze rider share the binding.
-  assert.ok(xf.includes('function castSpellFrom(f, spell, playerFeet, noSpellPointCost = false, { aimAt = null } = {}) {'), 'the pool binds the executor once');
-  assert.equal(xf.split('castEnemySpell(f,').length - 1, 1, 'exactly one call to the shared executor in this file');
-  assert.ok(xf.includes('casting: !!f._castPending'), 'the sprite Spell one-shot rides the cast edge');
-  const w = src('src/scenes/world.js');
-  assert.ok(w.includes('spellsByIndex: () => spellsByIndex'), 'the world hands the SPELLS.STD map');
-  assert.ok(w.includes('magic.fireEnemyMissile(from,'), 'enemy missiles release through the engine');
-  const hm = src('src/scenes/hostMagic.js');
-  assert.ok(hm.includes('fireEnemyMissile(from, dir, spell, casterLevel, casterFoe)'), 'the engine grew the enemy fire seam');
-  const i = hm.indexOf('if (m.fromPlayer === false)');
-  assert.ok(i > 0, 'the engine flies enemy missiles');
-  const arm = hm.slice(i, i + 700);
-  assert.ok(arm.includes('applySpellToPlayer(m.spell, m.casterLevel'), 'the impact applies at the CASTER level');
-  assert.ok(arm.includes('const mCaster = missileCaster(m);'), 'the caster wrapper carries the transfer heal-back sinks');   // AUDIT WORLD6b-iii(a) A1: through the ONE wrapper the wall arm shares
-  assert.ok(hm.includes("const missileCaster = (m) => (m.fromPlayer === false ? (m.casterFoe ? { entity: m.casterFoe.entity, sinks: foeSinks(m.casterFoe), foe: m.casterFoe } : null) : playerCaster(m.cast ?? null));"), 'the wrapper - SHIPMATES: and its foe, whose blast passes the player when he is a shipmate');   // PIN MOVED (AUDIT SCHOOLS): my missile's wrapper carries its cast's token
-});

@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S7 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 9): THE PILLARS' WATCH - one foreign pass
+// SD-LOOK S7: THE PILLARS' WATCH - one foreign pass
 // over the arena's four clock-towers (world/superDungeon/sdPillarModel.js), drawn by the world host with the arena's reads:
 //
 //   THE DIALS - a small clock on each face of each capital (sixteen), laid a hair out of the stone on the pixel law's

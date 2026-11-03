@@ -3,8 +3,7 @@
 //     node tools/bakeLargeBoat.mjs [--fbx=src/assets/ships/source/Tiny_Ship.fbx]
 //                                  [--out=src/assets/ships/largeBoat.json] [--list]
 //
-// SHIPS-2 (2026-10-07, Mac, sending Tiny_Ship.fbx with New Ship 2: "implement both of these new ship placement models,
-// UV Map/Texture, and ensure it matches the love we gave the other new ship model we implemented"): the TINY SHIP, which
+// SHIPS-2: the TINY SHIP, which
 // stands in for Come Sail Away's hull 1, the Large Boat (the mod's `OldSkiffHull` - world/ships/largeBoatModel.js). The scene
 // and why this file is the one committed: tools/bakeCarrack.mjs's header.
 //

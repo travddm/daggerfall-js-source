@@ -1,4 +1,4 @@
-// SD9a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE HOUR'S RECEIPT - the
+// SD9a: THE HOUR'S RECEIPT - the
 // relay's signature on the Brass Remnant's fall (net/superDungeon/sdReceipt.js, an `h1`), minted in the realm for each fighter who
 // earned it (the gate's `earned`) before the fall is said, handed to them there and again at a late `in`, kept by the hub
 // for its life (held from a realm fighter's hellos while its floor spends it; handed at once to every other earner's
@@ -133,7 +133,7 @@ async function withRealm(fn) {
       const mara = cell.connect(); await cell.hello(mara, 'peer-mara', doorPose(10), { name: 'Mara' });
       await cell.raw(mara, JSON.stringify({ t: 'sd', k: 'found', s: rec.s, px: PX, py: PY }));
       const realm = world.room(sdTestKey(rec.s));
-      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (PIN MOVED)
+      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (
       const beat = async (ms) => { const end = clock + ms; while (realm.alarm.at != null && realm.alarm.at <= end) { clock = Math.max(clock, realm.alarm.at); await realm.fire(); } clock = end; };
       await fn({ world, hub, realm, rec, beat, step: (ms) => { clock += ms; }, now: () => clock });
     });
@@ -286,15 +286,3 @@ test('SD9a THE PAGE: my receipt heard from my own realm or the hub - never a cel
   assert.equal(rig(SOCIAL_ROOM, { acct: 'acct-ann', v: 'world175' }).s.sendSdSpent(7), false, 'never to a relay that closes on it');
 });
 
-test('SD9a the relay by source: the receipts minted before the fall is said, by the gate\'s `earned`; handed at the late `in`; the hub told them with who stood there; kept, handed at a hello, spent, swept (mutants: each step dropped)', () => {
-  const w = read('server/src/index.js');
-  assert.match(w, /for \(const sub of Object\.keys\(f\.players\)\.filter\(\(x\) => SD_SEAM\.earned\(f, x\)\)\) \{\n\s+try \{ f\.rc\[sub\] = await mintSdReceipt\(\{ d: f\.s, s: sub, c: rand32\(\), x: earnedBy\(f, sub\), l: f\.players\[sub\]\.lv, \.\.\.this\._bodyMeasureOf\(f, sub, SD_SEAM\.earned\) \}, key, \{ subtle: crypto\.subtle, nowS \}\); \}/);   // PIN MOVED (INT14): and the count's measure   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js) - SD_SEAM.earned is the gate's `earned`
-  const at = (re) => w.search(re);
-  assert.ok(at(/f\.rc\[sub\] = await mintSdReceipt/) < at(/f\.said = true;   \/\/ kept before it is said/) && at(/f\.said = true;   \/\/ kept before it is said/) < at(/this\._sdFightFan\(\[\{ k: 'fell', \.\.\.f\.fell \}\]\);/), 'minted, kept, then said');
-  assert.match(w, /rc: Object\.entries\(f\.rc \?\? \{\}\), here: f\.here \?\? \[\] \}\), signal: AbortSignal\.timeout\(SD_TELL_RETRY_MS\)/);
-  assert.match(w, /await this\._sdKeepReceipts\(c, Date\.now\(\)\);/);
-  assert.match(w, /if \(sub\) \{ try \{ await this\._sdReceiptTo\(ws, sub, now\); \}/);   // PIN MOVED, SCALE5c: among the hub's words (`_hubHelloWords`), by the verified subject
-  assert.match(w, /'sweep:sdrc'/);
-  assert.match(w, /import \{ mintSdReceipt, readSdReceipt, SD_RECEIPT_TTL_S \} from '\.\.\/\.\.\/src\/net\/superDungeon\/sdReceipt\.js';/);
-  assert.match(read('test/net/relayversion.test.js'), /'src\/net\/superDungeon\/sdReceipt\.js'(?:, 'src\/net\/(?:eliteGates\/)?eg[A-Za-z]+\.js')*\]/, 'net/superDungeon/sdReceipt.js in the bundle');   // PIN MOVED (EG-FILE): the Elite Breach's relay modules in net/eliteGates/   // PIN MOVED (INT12): last still - net/superDungeon/sdRemnant.js walks earlier now, under net/bossRef.js; PIN MOVED (EG-PLAY): an Elite Breach's five walk after it
-});

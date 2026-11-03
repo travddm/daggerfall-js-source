@@ -1,7 +1,6 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "climb esclating tiers of opponents"; "Being a top rank PvE fighter comes with it's own
-// title"): THE LADDER - ten tiers of Daggerfall's own class enemies and monsters, offline, and the exhibitions the city
-// floor holds on the hour. Design: bible/11-Multiplayer/Arena.md "2. The fights" (the tier table is its own, row for
+// ARENA2: THE LADDER - ten tiers of Daggerfall's own class enemies and monsters, offline, and the exhibitions the city
+// floor holds on the hour. Design: "2. The fights" (the tier table is its own, row for
 // row) and "6. Titles".
 //
 // A FIXED MOUNTAIN. A tier is three bouts; a fourth, its CHAMPION, opens when three are won; the champion beaten moves
@@ -110,7 +109,7 @@ export function nextLadderBout(L) {
 /**
  * A LADDER BOUT'S END on the ladder: a win counts the bout (the champion beaten moves the tier up and gives its
  * title; the last one is the Grand Champion); a loss - a draw at the judges is one - BREAKS THE TIER'S RUN: back to its
- * first bout, three to win again before its champion (AUDIT ARENA-LADDER, the owner's call: "Lose the tier's run" - a
+ * first bout, three to win again before its champion (AUDIT ARENA-LADDER, - a
  * loss had cost only the purse, so the mountain was climbed by retrying each step until it fell). A champion already
  * beaten stays beaten. `how` the bout's ending for the player ('yield', 'fall', 'ringout', 'judges', 'draw').
  * Answers `{ ladder, title, tierUp, grand, runLost }` - a new ladder; `runLost` when a run of wins went.

@@ -1,4 +1,4 @@
-// APPEARANCES-II (2026-10-27; bible/04-Characters/Wardrobe.md section 5): DIVERSE WEAPONS DRAWS THE LOOK, AND THE CLASSIC
+// APPEARANCES-II: DIVERSE WEAPONS DRAWS THE LOOK, AND THE CLASSIC
 // INFO BOX SAYS IT. Under Diverse Weapons a weapon's first-person sheet is its template's own, an artifact's its own by
 // its enchantment - so an artifact wearing a look swung its own art. The copy drawnPiece makes is no artifact now (it
 // swings the look's sheet, MAGIC while enchanted, as with the mod off), and the doll's replacement is asked in the look's

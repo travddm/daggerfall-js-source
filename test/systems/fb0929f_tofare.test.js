@@ -1,4 +1,4 @@
-// TO-FARE (FIELD BUGS 2026-09-29f, found on MERC-CAP's way; Mac: "Fix the separate bug"). Travel Options' scaled fare
+// TO-FARE (FIELD BUGS 2026-09-29f, found on MERC-CAP's way). Travel Options' scaled fare
 // haggles through FormulaHelper.CalculateTradePrice (TravelTimeCalculatorTO.CalculateTripCost:
 // `CalculateTradePrice(piecesCost, 10, false)`, and the same for the passage), which reads the traveller's live
 // Mercantile SKILL (GetLiveSkillValue, FormulaHelper.cs:1992/1998). The port read `liveStat(e, 'mercantile')` - a stat

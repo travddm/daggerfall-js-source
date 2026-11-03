@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2 (2026-09-28, Mac: "Go") - MINING AND QUARRYING IN THE STREAMING
+// PROF2 - MINING AND QUARRYING IN THE STREAMING
 // WORLD, a kind in the gathering host (scenes/gatherHost.js; bible/
 // 06-Systems/Professions-Arc.md 5.2, 6, 23; FORAGE0 14):
 //
@@ -22,7 +22,7 @@
 //   is systems/mineAct.js; the hand draws DFU's Warhammer (template 126),
 //   its StrikeDown frames on each swing.
 //
-// PROF2b (2026-10-03, Mac: "plus we need to build motherloads"): A
+// PROF2b: A
 // MOTHERLODE stands here too - on the pixel the service picked, at the rock
 // piece nearest the pixel's heart (else its stone, else where nature stands),
 // while it stands for this account (net/motherlodeBook.js): its ore's
@@ -51,8 +51,7 @@ import { noteAct } from '../systems/questlines/qlActs.js';   // QL11: the featur
 /** The item flats' archive; a picture a new ore has none of its own borrows Lodestone's (PROF0 4.8). */
 export const ORE_FLAT_ARCHIVE = 254;
 export const LODESTONE_RECORD = 66;
-/** VEIN-WASH (2026-10-11, from play: "Many ore veins look the same. Copper/lodestone/moonstone/ebony and others all have
- *  the same basic texture so its very hard to tell the difference when looking for them"): THE WASH AN ORE'S FLATS WEAR
+/** VEIN-WASH: THE WASH AN ORE'S FLATS WEAR
  *  (render/renderer.js uBatchTint - ARENA5's batch wash, multiplied into the lit flat), PROF0 4.8's "DFU Lodestone, tinted
  *  per ore" kept at last. DFU gives five metals a picture of their own (Mercury 61, Gold 62, Iron 63, Tin 64, Sulphur 67)
  *  and two to the rest: Lead, Silver and Platinum share record 65, Copper and Lodestone record 66 - and every new ore

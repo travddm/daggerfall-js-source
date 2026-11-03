@@ -1,5 +1,4 @@
-// STAFF-PANEL5-MESSAGE (2026-10-22, mob, 04:14Z: a message in the middle of one player's screen; design doc "DFO Staff
-// Panel: design", Message on screen) - THE ACCOUNT SERVICE'S HALF (server-account/src/staffMessage.js), driven through the
+// STAFF-PANEL5-MESSAGE - THE ACCOUNT SERVICE'S HALF (server-account/src/staffMessage.js), driven through the
 // real Worker on the node:sqlite database every account pin stands on (test/accountDb.mjs): a message sent by account id,
 // bounded, paced, stored first and audited, its signed order posted to the relay's door, each one's state read back, and
 // the game's own two doors - the messages waiting, and the OK.
@@ -40,7 +39,7 @@ async function extensionKey() {
 async function stand(extra = {}) {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, ...extra,
   });
   const door = { pushed: [], say: [200, { ok: true, n: 1, old: 0 }] };

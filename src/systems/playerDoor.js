@@ -1,5 +1,5 @@
 // @ts-check
-// SET2 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md): THE PLAYER'S DOOR TO THE LIVE SCENE.
+// SET2: THE PLAYER'S DOOR TO THE LIVE SCENE.
 //
 // A set's power sometimes reaches past the one blow the formula resolves: Malacath's Spite strikes the foe that struck
 // me, Ruhn's Cleave the next foe beside the one I struck, the Warden's Nova every foe around me, and Nocturnal's
@@ -53,7 +53,7 @@ export function takeOwed(entity) {
   return n;
 }
 
-/** BAL5 (bible/05-Combat/Balance-Arc.md section 11): what a blow PAID BACK may take from foe record `f` - `n`, but never
+/** BAL5: what a blow PAID BACK may take from foe record `f` - `n`, but never
  *  its last point. A foe's own blow turned back on it (the loot's thorns, Spite of the Spurned) wounds and never kills:
  *  the kill is the player's to take, so standing still is no way to win a fight. A whole point is left whatever the
  *  host's door divides it by (a shared foe's toughness only lessens it); a record that carries no health is taken at

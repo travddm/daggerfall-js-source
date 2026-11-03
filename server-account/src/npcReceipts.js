@@ -1,13 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP2b (2026-10-08, Mac: "Keep going with the arc/slices") — THE
+// CHAP2b — THE
 // RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate closed or a raided town
 // defended, by a realm character in a region where a guild it is a member
 // of keeps a chapter, is remembered on its Roll - RECEIPT_REP a guild a
 // receipt (Chapters-Arc 3.3), and HALL_WRIT_REP more for the chapter's
 // receipt writ, its first such receipt of the UTC day there (section 4).
 // The law is src/net/npcChapterLaw.js (receiptCreditsOf); the record is
-// migration 0100_npc_receipts.
+// the `npc_receipts` table.
 //
 // AFTER THE RECEIPT, NEVER INSTEAD OF IT. The claim's own row is written
 // first (accounts.js claimGate, raids.js claimRaid) and its answer stands

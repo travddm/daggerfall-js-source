@@ -1,10 +1,9 @@
-// HOUSE-SIGN (the owner, 2026-10-25: "remove the shop signs outside of buildings when the building is actually a house
-// and not a shop"): a shop's sign that hangs at a house's door does not stand.
+// HOUSE-SIGN: a shop's sign that hangs at a house's door does not stand.
 //
 // WHAT DFU DOES. A shop's sign is one of a block's misc models (ARCH3D 43700-43799), and RMBLayout.AddProps stands every
 // misc model where the block places it, tied to no building. A block whose building list types a shop's model as a
 // house therefore keeps the shop's sign at the house's door: TVRNAM00 record 0 is a tavern's model and sign typed House2
-// (bible/01-Overview/bugs/Field-Bugs-2026-10-09.md, SIGN-HOUSE). The departure: here a sign is tied to a building, and
+// (, SIGN-HOUSE). The departure: here a sign is tied to a building, and
 // a house's sign is left out.
 //
 // THE TIE. A sign belongs to the building whose door is nearest it, seen from above, within SIGN_REACH_M. The door is

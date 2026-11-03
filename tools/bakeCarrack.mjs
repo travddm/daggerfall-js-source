@@ -3,9 +3,7 @@
 //     node tools/bakeCarrack.mjs [--fbx=src/assets/ships/source/Tiny_Ship.fbx]
 //                                [--out=src/assets/ships/carrack.json] [--list]
 //
-// SHIPS-2 (2026-10-07, Mac, sending Tiny_Ship.fbx, New_Ship_2.fbx and New_Ship_2_Shutter.fbx: "implement both of these
-// new ship placement models, UV Map/Texture, and ensure it matches the love we gave the other new ship model we
-// implemented"). Two ships come in the three files: NEW SHIP 2, the three-masted ship this bake reads, which stands in
+// SHIPS-2. Two ships come in the three files: NEW SHIP 2, the three-masted ship this bake reads, which stands in
 // for Come Sail Away's hull 4, the Carrack (world/ships/carrackModel.js); and the Tiny Ship, hull 1's (tools/bakeLargeBoat.mjs).
 //
 // THE THREE FILES ARE ONE SCENE SAVED THREE TIMES, each a Blender 5.1.1 export of the scene the galleon came out of

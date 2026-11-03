@@ -1,5 +1,4 @@
-// SOC5 (2026-09-16, Mac: "Players should be able to interact with others in the world upon encountering them by
-// pressing F on their body, which should show options to add as a friend or invite to a party"): THE MENU ON A BODY -
+// SOC5: THE MENU ON A BODY -
 // a small DOM card near the middle of the screen, over the player the ray struck.
 //
 // WHAT IT IS. Three buttons and a name (and, where the host offers them, Inspect first, a page they hold out after it, and Trade after the rest - INSPECT1, JOURNAL1, TRADE1). `show({ name, peerId, actions })` draws it; `actions` is
@@ -35,7 +34,7 @@ export const SOCIAL_MENU_STYLE_ID = 'dagger-peermenu-style';
 /** The card's sheet: the enhanced tokens (ui/enhanced/enhancedStyle.js) where the skin's sheet is loaded, a fallback where it
  *  is not - the same pairing ui/chatPanel.js uses, so the two surfaces are one skin.
  *
- *  FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our enhanced version"): the face is the skin's pixel
+ *  FONT1: the face is the skin's pixel
  *  stack rather than `--data`, the menu's; ui/chatPanel.js's CHAT_CSS header carries the whole reading. The five's
  *  @font-face (FIX-D) rides this sheet as it rides the other three.
  *
@@ -108,7 +107,7 @@ export function socialMenuRows({ peerId, canFriend = false, canInvite = false, w
   // already asked, the same row reads 'Accept trade' (`tradeLabel`): there is no separate panel to stand under a window.
   if (canTrade !== undefined) rows.push({ key: 'trade', label: tradeLabel || 'Trade', enabled: !!canTrade, why: canTrade ? null : (whyNotTrade ?? null), act: { k: 'trade.request', peer: peerId } });
   // DUEL1: the duel's rows are present ONLY while there is something to answer - the challenge itself is the Inspect
-  // card's (Mac: "When inspecting a player, they should be able to send an invite to duel"). A challenge from them
+  // card's. A challenge from them
   // waiting reads 'Accept duel' (`duelRow` { label, k, enabled, why }, the host's duel law) with 'Decline duel' beside it
   // (`canDeclineDuel`); a duel with them live reads 'Yield the duel'. Not hub acts: the host routes them to the duel.
   if (duelRow && typeof duelRow.label === 'string' && typeof duelRow.k === 'string') rows.push({ key: 'duel', label: duelRow.label, enabled: !!duelRow.enabled, why: duelRow.enabled ? null : (duelRow.why ?? null), act: { k: duelRow.k, peer: peerId } });
@@ -130,7 +129,7 @@ export function socialMenuRows({ peerId, canFriend = false, canInvite = false, w
  * `() => false`.
  */
 /**
- * ACT-MENU (DISC7, 2026-09-23, Mac: "reuse the loot scroll menu to select options"): THE CARD'S ROWS, AS THE WORLD
+ * ACT-MENU (DISC7, 2026-09-23): THE CARD'S ROWS, AS THE WORLD
  * TOOLTIPS PLAQUE LISTS THEM - one source for both surfaces, so the words, the order and the reasons cannot drift. Every
  * act the card offers is a row (`id` its key); a refused one carries its reason (AUDIT DISC7 A4: the card said why, and
  * the plaque must too - worldHover.js puts it in the row's name). The Cancel row is the card's own and has no act.

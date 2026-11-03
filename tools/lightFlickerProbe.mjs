@@ -1,5 +1,4 @@
-// LIGHT-AUDIT (2026-09-26, Mac: "a deep audit on the enhanced lighting system, look for flickering issues, performance
-// improvements"): THE FLICKER, MEASURED IN THE REAL GAME. DISC15's lesson ("Opus seemingly always considers it solved.
+// LIGHT-AUDIT: THE FLICKER, MEASURED IN THE REAL GAME. DISC15's lesson ("Opus seemingly always considers it solved.
 // Its not solved") is that a flicker is a number or it is a guess. This drives the WORLD host - the one players run -
 // over the user's own ARENA2 in headless Chromium (ANGLE over SwiftShader), walks into a tavern, a dungeon and a night
 // street, and reads EVERY FRAME back while the camera stands still, walks and turns on a script:
@@ -144,7 +143,7 @@ async function dismiss() { for (let i = 0; i < 40; i++) { const t = await ev(() 
 /** Run one scripted pass: `plan` is a page-side function body (k) => void; returns the rows. */
 async function run(name, planSrc, frames, { keepIf = 0.02 } = {}) {
   console.log(`run ${name} (${frames} frames)`);
-  // LA-AUDIT D (2026-09-27): THE BLIP WAS THE HUD'S. Lens D found the one-frame blips of the LA runs were BLOOD2e's bleed
+  // LA-AUDIT D: THE BLIP WAS THE HUD'S. Lens D found the one-frame blips of the LA runs were BLOOD2e's bleed
   // flash - a full-screen red quad at 0.05 a drip, drawn while the player stands under half health - a character the
   // night street had mauled; the flash is the same in every tree. Each pass starts whole, and the verdict refuses a pass
   // the HUD flashed in (a blow's or a bleed's): what it moved was not the lighting.

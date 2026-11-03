@@ -1,4 +1,4 @@
-// RE1 - THE RANDOM ENCOUNTER STANDS WHERE DFU STANDS IT (2026-08-29).
+// RE1 - THE RANDOM ENCOUNTER STANDS WHERE DFU STANDS IT.
 //
 // Every random-spawn arm in PlayerEntity goes out through
 // GameObjectHelper.CreateFoeSpawner, which is FoeSpawner.PlaceFoeFreely:
@@ -107,7 +107,6 @@ test('RE1: the dungeon host stands its rest interruption the same way, with its 
   const dc = read('src/scenes/dungeonContext.js');
   assert.equal(/const landed = foeDeps\.floorLanding\(collider, \[x, feet\[1\] \+ 1\.5, z\]\);/.test(dc), false,
     'the eight-point ring is gone');
-  // PIN MOVED (RVN7d: a rest's revenant rides the same door - its record and its lair)
   assert.match(dc, /async function _spawnEncounter\(\{ mobileType, minDistance, maxDistance, lineOfSightCheck \}, \{ feet = lastPlayerFeet, yaw = _motorYaw, shared = false, asked = null, revenant = null, lairStand = false \} = \{\}\)/,
     'the whole band arrives from the roll (REST-SYNC re-aim: by the resting player\'s feet and look - a joiner\'s, when the host stands its ask; AUDIT III E1 re-aim: and the spot its placement found)');
   assert.match(dc, /spot = placeFoeFreely\(env, \{ minDistance, maxDistance, lineOfSightCheck \}\);/);
@@ -120,7 +119,7 @@ test('RE1: the dungeon host stands its rest interruption the same way, with its 
   assert.match(dc, /y: fly \? spot\.y \+ 1\.5 : spot\.y,/, 'the flier lift rides into the build record');
   // the NT2 gender law survived the rewrite - it is the reason this
   // call passes 'unspecified' rather than rolling one here
-  assert.match(dc, /gender: so\?\.gender \?\? 'unspecified',/);   // PIN MOVED (RVN7d: a returning person's own gender)
+  assert.match(dc, /gender: so\?\.gender \?\? 'unspecified',/);
   assert.match(dc, /no ad-hoc roll - buildFoeAt resolves an unspecified/);
 });
 
@@ -137,7 +136,7 @@ test('RE1: both hosts bound the retry, and neither invented a second law', () =>
   }
 });
 
-// AUDIT OW5b E1 (Mac, 2026-09-28: "Need to get pullout of fast travel little sooner for encounters. U run thru them"):
+// AUDIT OW5b E1:
 // the wanderer placed beside a walking traveller stops the journey THEN - the foe's loads and its real-time classic tick
 // came after twenty to a hundred times DFU's ground at the journey's scale. Lifted out of world.js and run.
 test('AUDIT OW5b E1: a wanderer PLACED beside the traveller asks the walking journey at once (after the stand is sent); nothing placed - the pool full, no spot - asks nothing; WILD-ALERT: a FAST traveller is asked only if the wanderer notices them on its first stealth check, and the foe stands alerted or checked accordingly (mutants: the roll skipped, the journey asked unnoticed)', async () => {

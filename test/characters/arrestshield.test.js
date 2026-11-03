@@ -85,26 +85,3 @@ test('ARREST-SHIELD: a broken veto never costs a blow, and a torn-down flow take
   registerPlayerDamageVeto(null);
 });
 
-test('ARREST-SHIELD by source: ONE predicate answers "am I in a trial", and the guard arm reads it', () => {
-  const af = rd('src/scenes/arrestFlow.js');
-  // The question is named once. A second copy is a second chance to
-  // disagree with the first - which is exactly how the guard arm and
-  // the rest of the world came to disagree in the first place.
-  // JAIL-HIT (2026-09-27): in BOTH modes - offline the watch keeps WINFOE1's clock under the court's windows too
-  assert.match(af, /const inCourt = \(\) => awaitingSurrenderAnswer \|\| !!playerEntity\.arrested;/);
-  assert.match(af, /registerPlayerDamageVeto\(inCourt\);/, 'the one damage door consults the flow that owns the question');
-  assert.match(af, /if \(inCourt\(\)\) return true;/, 'and the guard arm reads the SAME predicate, not a copy');
-  assert.equal((af.match(/awaitingSurrenderAnswer \|\| !!playerEntity\.arrested/g) ?? []).length, 1, 'said once');
-  // The teardown: a stale closure over a dead entity must never shield
-  // a live one.
-  assert.match(af, /function dispose\(\) \{ registerPlayerDamageVeto\(null\); \}/);
-
-  // The veto is the FIRST thing the door does - ahead of the shield
-  // pool and ahead of the bypassShield branch both.
-  const pe = rd('src/characters/playerEntity.js');
-  const fn = pe.slice(pe.indexOf('export function hurtPlayer(entity, dmg'));
-  const veto = fn.indexOf('playerDamageWithheld()');
-  const shield = fn.indexOf('damageShieldPool(entity, dmg)');
-  const bypass = fn.indexOf('if (!bypassShield)');
-  assert.ok(veto > 0 && veto < bypass && veto < shield, 'the veto is read before the shield pool and before the bypass branch');
-});

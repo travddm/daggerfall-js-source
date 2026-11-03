@@ -5,8 +5,7 @@
 // `/play/index.html`, so `art/held-map.png` asked for
 // `/play/art/held-map.png`, the host answered with the page itself,
 // the decode failed and the map window stood with no parchment: ink on
-// black (MAP-FIELD, 2026-09-18, Mac: "The sprite I gave to be used is
-// nowhere to be seen at all"). The build's `base` is './', so there is
+// black (MAP-FIELD, 2026-09-18). The build's `base` is './', so there is
 // no absolute path to hardcode either.
 //
 // AUDIT-THUNDERLOCK F7: the port's own weapon walked into the same
@@ -17,8 +16,7 @@
 // 700-line window module that nothing in combat/ can afford to import.
 // ui/heldMap.js re-exports it and reads the same as it always did.
 
-/** MAP-FIELD (2026-09-18, Mac: "The sprite I gave to be used is nowhere
- *  to be seen at all"): THE SITE ROOT, READ OFF THIS MODULE.
+/** MAP-FIELD: THE SITE ROOT, READ OFF THIS MODULE.
  *
  *  The sprite lives in `public/`, so it is served at `<root>/art/held-map.png`.
  *  A bare relative `art/held-map.png` is resolved against the DOCUMENT,

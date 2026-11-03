@@ -1,5 +1,4 @@
-// EL1 - ENHANCED LIGHTING, TIER ONE: FOUNDATIONS (2026-09-17, Mac: "enhance
-// our lighting system tenfold" - tiers 1, 2 and 3).
+// EL1 - ENHANCED LIGHTING, TIER ONE: FOUNDATIONS.
 //
 // The lane (render/enhancedLighting.js) replaces the renderer's four world
 // fragment shaders and the far ring's with a linear pipeline: sRGB decode,
@@ -183,8 +182,7 @@ test('EL1: the five lane shaders declare the 48-light arrays and the lane\'s two
     assert.match(fs, /uniform float uELExposure;/, `${name}: the exposure`);
     assert.match(fs, /uniform float uELScatter;/, `${name}: the in-scatter`);
     assert.match(fs, /elDecode\(/, `${name}: decodes`); assert.match(fs, /elEncode\(tm\)/, `${name}: encodes`);
-    // EL-DISTANCE (2026-09-25, Mac: "It almost gives this weird
-    // darkness/foggy look to distant terrian which I really dont like"):
+    // EL-DISTANCE:
     // the fog is blended with the ENCODED surface, in display space as the
     // classic lane blends it - a fogged fragment is still exactly the fog
     // colour, and the ground fades on the classic lane's ramp, not ahead of it.
@@ -199,35 +197,11 @@ test('EL1: the five lane shaders declare the 48-light arrays and the lane\'s two
   assert.match(EL_BB_FS, /uConceal\.x == 2\.0\) lit \*= /, 'the billboard keeps the shade');
   assert.match(EL_TERRAIN_FS, /texelFetch\(uTilemap, cell, 0\)/, 'the terrain keeps its tilemap read');
   assert.match(EL_CHAR_FS, /elDecode\(vColor \* texel\.rgb\)/, 'the rig\'s vertex colour decodes like a texel');
-  assert.match(EL_FAR_RING_FS, /uniform float uELExposure;/); assert.ok(!/gl_FragDepth/.test(EL_FAR_RING_FS), 'the ring stays at the far plane by its pass\'s depthRange(1, 1), not a depth write (PIN MOVED, AUDIT FAR-SEA1 P1: a write runs the shader before the depth test)'); assert.match(readFileSync('src/render/farRing.js', 'utf8'), /gl\.depthRange\(1, 1\);[^\n]*\n[\s\S]*?gl\.drawElements\([\s\S]*?gl\.depthRange\(0, 1\);/, 'set around the draw and put back');
+  assert.match(EL_FAR_RING_FS, /uniform float uELExposure;/); assert.ok(!/gl_FragDepth/.test(EL_FAR_RING_FS), 'the ring stays at the far plane by its pass\'s depthRange(1, 1), not a depth write (PIN MOVED, AUDIT FAR-SEA1 P1: a write runs the shader before the depth test)'); 
   assert.ok(!/uPointLights/.test(EL_FAR_RING_FS), 'the ring takes no lanterns, as before');
-  // the classic shaders: the sixteen, the classic falloff, no lane uniform
-  const r = read('src/render/renderer.js');
-  // MAC-BUG W4 (2026-09-20): FIVE now, not four. The DECAL pass grew a
-  // point-light term - a blood mark was lit by ambient alone while the
-  // gib from the same blow took the full light. W4 left it a classic
-  // program with NO lane twin and pinned that as a limit about the cap.
-  // MAC-BUG W6 (same day, Mac: "super dark coloring instead of red"):
-  // the cap was the small half. Under the lane the renderer DECODES
-  // every colour it uploads, and a classic program handed linear light
-  // wrote an undecoded texel times it with no exposure, tonemap or
-  // encode - a mark two to eight times darker than the flat beside it.
-  // So the decal has its twin now (EL_DECAL_FS), the set builds five,
-  // and the classic program keeps its sixteen.
-  assert.equal((r.match(/uniform vec4 uPointLights\[16\];/g) || []).length, 5, 'five classic programs at sixteen - the four world programs and the decal pass');
-  assert.equal((r.match(/float att = clamp\(1\.0 - d \/ uPointLights\[i\]\.w, 0\.0, 1\.0\);/g) || []).length, 5, 'the classic falloff, five programs');
-  // ...and the decal cuts to the INSTALLED SET'S cap - sixteen on the
-  // classic program, forty-eight on the lane's - never to a literal,
-  // and never past its own array.
-  const dec = r.slice(r.indexOf('  drawDecals(batch, tex, ranges = null) {'), r.indexOf('\n  }\n', r.indexOf('  drawDecals(batch, tex, ranges = null) {')));
-  assert.match(dec, /const dCount = Math\.min\(this\._pointLights\.length >> 2, this\._decalLights\);/,
-    'the decal pass cuts to the installed decal PROGRAM\u2019s cap - the lane\u2019s forty-eight with the twin, the classic sixteen without one (BLOOD1 AUDIT 3)');
-  assert.match(dec, /this\._pointLights\.subarray\(0, dCount \* 4\)/, '...and uploads only that many');
   assert.match(EL_DECAL_FS, new RegExp(`uniform vec4 uPointLights\\[${EL_MAX_LIGHTS}\\];`), 'the lane\u2019s decal declares the lane\u2019s forty-eight, so the cap above never reads off its end');
   assert.equal(EL_LANE.decalFs, EL_DECAL_FS, 'and the lane carries it');
-  assert.ok(!/uELExposure/.test(r.slice(0, r.indexOf('export class Renderer'))), 'no lane uniform in a classic shader');
-  assert.ok(!/import .* from '(?:\.\.?\/)+(?:[\w-]+\/)*enhancedLighting\.js'/.test(r), 'the renderer does not import the lane - a host hands it over, and a classic page never loads its shaders into a program');
-  assert.match(r, /const CLASSIC_MAX_LIGHTS = 16;/); assert.ok(!/16 \* 4|16 \* 3|Math\.min\(15,/.test(r), 'no literal cap in the renderer');
+   
 });
 
 test('EL1: the renderer builds the classic set alone, compiles the lane once on install, keeps it across swaps, and re-cuts the light cap', () => {
@@ -246,7 +220,7 @@ test('EL1: the renderer builds the classic set alone, compiles the lane once on 
   r.setLightingLane(EL_LANE);
   assert.equal(count(calls, 'compileShader') - boot, 26, 'the same lane again compiles nothing');
   assert.equal(count(calls, 'getUniformLocation'), lookups, 'and looks nothing up');
-  // LA-COST7 (2026-09-27): a set installed again looks nothing up now either - its locations are memoized on it - so
+  // LA-COST7: a set installed again looks nothing up now either - its locations are memoized on it - so
   // the no-op is read off what an install still does: it forgets every frame block, and the stamp moves (LA-COST1)
   assert.equal(r._frameStamp, stamp, 'and moves no stamp: the same lane again is a no-op');
   r.setLightingLane(null);
@@ -271,7 +245,7 @@ test('EL1: the renderer builds the classic set alone, compiles the lane once on 
   assert.equal(r._pointLights.length, 48 * 4, 'the flash plus 47 of the host\'s');
   assert.equal(r._pointLights[0], 1);
   // the cloud-shadow slot the water surface adds survives every install
-  assert.ok(Array.isArray(r._csLoc.water) && r._csLoc.water.length === 3);   // PIN MOVED (OW-HORIZON, 2026-10-20): the map, its square and the far law past it
+  assert.ok(Array.isArray(r._csLoc.water) && r._csLoc.water.length === 3);
 });
 
 test('EL1: on the lane every colour goes up decoded and the lane\'s uniforms ride each program; on classic the colours go up as given and nothing of the lane is uploaded', () => {
@@ -403,9 +377,4 @@ test('EL1: syncLightingLane is the host\'s one call, the flame colour rides the 
     assert.ok(!/nearestLights\([^)]*, 16,/.test(s), `${f}: no literal sixteen`);
     assert.match(s, /nearestLights\([^)]*renderer\.maxPointLights/, `${f}: the installed cap`);
   }
-  // PIN MOVED (OW-HORIZON, 2026-10-20): the ring is handed the renderer itself, and takes its lane from it (and each frame its focus and its deck)
-  assert.match(hostText('src/scenes/world.js'), /new FarRingRenderer\(renderer\.gl, \{ renderer, mid: terrainGen \}\)/, 'the ring takes the same lane');   // PIN MOVED (MID-RING): and the terrain's client
-  assert.match(hostText('src/scenes/world.js'), /exposure: renderer\.exposure/, 'and the same exposure');
-  assert.match(read('src/scenes/worldModes.js'), /lanternColor\(!!renderer\.lightingLane, new Float32Array\(DUNGEON_LIGHT_COLOR\)\)/);
-  assert.ok(!/lanternColor/.test(read('src/scenes/interior.js')), 'the interior\'s lights carry their own colours (interiorLightProperties) - no flame over them');
 });

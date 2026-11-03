@@ -1,5 +1,5 @@
 // @ts-check
-// SHIP-WATCH (2026-10-01, Mac: "Do #3" - life aboard between fights: "crew sleep below at night, and a lookout up the
+// SHIP-WATCH (2026-10-01, - life aboard between fights: "crew sleep below at night, and a lookout up the
 // mast calls 'Sail ho!'. The crew swab decks, haul lines and patch damage after a fight"; "If not already, ships at
 // night should use their lanterns (AI)"; "I also want to keep improving the AI") - THE SEA BY NIGHT AND THE WATCH
 // KEPT. The port's own; pure - the hour, the ships about and their lanterns in, the laws out.

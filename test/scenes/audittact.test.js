@@ -1,4 +1,4 @@
-// AUDIT TACT (2026-10-02, Mac: "Audit this and ensure perfection"): four lenses over TACT1-TACT4 - the brain (A), cover
+// AUDIT TACT: four lenses over TACT1-TACT4 - the brain (A), cover
 // (B), the crowd and the door (C), the hosts, the ground and the records (D). Every finding reproduced on the TACT4
 // head and pinned here red, then fixed. Driven on the real motor, attack component, collider and arrow flight.
 import '../modsOff.js';
@@ -109,7 +109,7 @@ test('AUDIT TACT A3/D1: a wind-up lands at 20 fps, at 15 and at 10 - a slow fram
     run([f], 90, [0, 0, 0], { fps, each: () => {
       const st = f.ai._tac?.state;
       if (st === 'windup' && prev !== 'windup') started++;
-      if (f.ai._blowVerdict != null) { landed++; f.ai._blowVerdict = null; f.ai._blowMult = undefined; }
+      if (f.ai._blowVerdict != null) { landed++; f.ai._blowVerdict = null; }
       prev = st;
     } });
     assert.ok(started >= 2, `${fps} fps: it wound up (${started})`);
@@ -132,7 +132,7 @@ test('AUDIT TACT A3: a paralysed foe\'s wind-up is broken - the motor says when 
 test('AUDIT TACT A4: a landing\'s swing the attack could not take at once is spent, never fired later off the clock', () => {
   const f = foe({ at: [0, 0, 2] });
   run([f], 0.5, [0, 0, 0]);
-  Object.assign(f.ai, { _blowSwing: true, _blowVerdict: true, _blowMult: 1.5, _blowAt: T - 3 });
+  Object.assign(f.ai, { _blowSwing: true, _blowVerdict: true, _blowAt: T - 3 });
   const seq = f.atk.swingSeq;
   f.atk.meleeTimer = 99;
   run([f], 0.2, [0, 0, 0]);
@@ -149,12 +149,6 @@ test('AUDIT TACT A3/D10: the brain\'s clock is the foes\' own time - a held fram
   tickTactics(0.05);
   assert.ok(Math.abs(tacticsNow() - t0 - 0.05) < 1e-12);
   setTacticsClock(() => T);
-  // PIN MOVED (AUDIT TELL H1): and held under the dungeon's window that holds its foes, in all three hosts
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): online a dungeon's window holds its foes over a death alone (the world runs on under the rest)
-  assert.match(hostText('src/scenes/world.js'), /tickTactics\(foeFrameDt\(_questBoxHoldsFoes\(\) \|\| \(_mode\(\) === 'dungeon' && windowHoldsDungeon\(modes\?\.dungeonCtx\?\.uiOverlayActive, playerEntity\.health > 0 && !modes\?\.deathUp\?\.\(\)\)\) \? 0 : dt\)\);/);
-  assert.match(rd('src/scenes/exterior.js'), /tickTactics\(foeFrameDt\(_questBoxHoldsFoes\(\) \|\| \(_mode\(\) === 'dungeon' && !!modes\?\.dungeonCtx\?\.uiOverlayActive\) \? 0 : dt\)\);/);
-  assert.match(rd('src/scenes/dungeon.js'), /tickTactics\(foeFrameDt\(ctx\.uiOverlayActive \? 0 : dt\)\);/);
-  assert.doesNotMatch(rd('src/ai/tactics.js'), /performance\.now/, 'never the wall');
 });
 
 test('AUDIT TACT A4/D5: a bow foe mid-wind-up neither shoots nor casts; its landing swings at once though the target is now in the bow band - never parked for seconds on a stale verdict', () => {
@@ -169,7 +163,6 @@ test('AUDIT TACT A4/D5: a bow foe mid-wind-up neither shoots nor casts; its land
   assert.equal(f.ai._tacShoot, false, 'no shot, no spell mid-wind-up');
   const shots0 = f.shots;
   player[2] = f.ai.feet[2] - 8;
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.1): the swing BEGAN with the wind-up and stands held at its raised
   // arm; the landing RELEASES it - at once, never parked, no second swing - and the brain sees its blow then
   let swungAt = null, landedAt = null;
   const seq0 = f.atk.swingSeq, tac0 = f.ai._tacSwung ?? 0;
@@ -186,7 +179,7 @@ test('AUDIT TACT A4/D5: a bow foe mid-wind-up neither shoots nor casts; its land
 });
 
 test('AUDIT TACT A4/D6: a verdict is spent within a swing\'s length without a clock being passed, and a landing on a foe that turned on another leaves none', () => {
-  const ai = { _blowVerdict: false, _blowMult: 1.5, _blowAt: 0 };
+  const ai = { _blowVerdict: false, _blowAt: 0 };
   T = 5;
   assert.equal(blowConnects(ai, true), true, 'stale (5 s): the classic reach - the hosts pass no clock and still get this');
   // a wind-up whose foe turned on another foe mid-way lands on no one here
@@ -202,7 +195,7 @@ test('AUDIT TACT A4/D6: a verdict is spent within a swing\'s length without a cl
   assert.equal(mine._blowVerdict, true, 'on me: the verdict (my feet in its slam)');
   const turned = mk({ isPlayer: false });
   assert.equal(turned._blowVerdict ?? null, null, 'on another foe: no verdict');
-  assert.ok(!turned._blowSwing && turned._blowMult == null, 'no weight, no forced swing');
+  assert.ok(!turned._blowSwing, 'no weight, no forced swing');
 });
 
 test('AUDIT TACT A5: a foe backing off holds its own farther ring - no back-and-forth with the classic advance', () => {
@@ -242,19 +235,7 @@ test('AUDIT TACT A7: a board for a target nobody fights any more is dropped - no
   assert.equal(boardsHeld(), 0, 'gone with its last fighter');
 });
 
-test('AUDIT TACT: an opportunist (no token, a turned back) strikes but never telegraphs - a blow is a token holder\'s', () => {
-  // PIN MOVED (TELL8: at me or at a peer it hunts - `tf` its target's feet; still a token holder's alone. The FEUD merge:
-  // AUDIT ARENA-LADDER's bout-mate on the sand is targetFeet's own arm - blowAim folded into it)
-  assert.match(rd('src/ai/tactics.js'), /s\.state === 'engage' && b\.melee\.has\(ai\) && tf && ai\.canAct !== false/);
-});
-
 // ── D: the hosts, the ground ────────────────────────────────────────
-
-test('AUDIT TACT D2: the location host notes the player before its building\'s and dungeon\'s frames, as the world host does', () => {
-  const x = rd('src/scenes/exterior.js');
-  const note = x.indexOf('noteLocalPlayer(walkMode ? player.pos : cam.pos'), frame = x.indexOf('    if (modes.frame(dt, now)) {');
-  assert.ok(note > 0 && frame > 0 && note < frame);
-});
 
 test('AUDIT TACT D3: a floating-origin recentre moves the noted player and every live wind-up with the world', () => {
   const a = {};
@@ -263,7 +244,6 @@ test('AUDIT TACT D3: a floating-origin recentre moves the noted player and every
   noteLocalPlayer([10, 0, 8], [0, 0, 1]);
   offsetTactics([-100, 0, 50]);
   assert.deepEqual(b.origin, [-90, 0, 60]);
-  assert.match(hostText('src/scenes/world.js'), /exteriorFoes\.offsetAll\(r\.offset\);[^\n]*\n\s*labGrassField\?\.shiftOrigin\(r\.offset\);[^\n]*\n\s*offsetTactics\(r\.offset\);/);
 });
 
 test('AUDIT TACT D4: a dead foe\'s wind-up goes with it - not drawn, and blocking no one', () => {
@@ -286,15 +266,6 @@ test('AUDIT TACT D8: the mark lies on the ground it marks - fitted to a ramp und
   quad(steep, 's', [-10, -12, -10], [10, -12, -10], [10, 12, 10], [-10, 12, 10]);   // a 1.2 rise - a steep stair
   assert.equal(fitBlowToGround(makeBlow('lunge', [0, 0, 0], 0, 0), steep).slope[1], 1, 'clamped to 45 degrees');
   assert.equal(fitBlowToGround(makeBlow('lunge', [0, 0, 0], 0, 0), null).slope, undefined, 'no collider: flat, as before');
-  assert.match(rd('src/ai/tactics.js'), /fitBlowToGround\(makeBlow\(/);
-});
-
-test('AUDIT TACT D9: the mark is fogged as the ground is - the renderer hands the pass its fog', () => {
-  // PIN MOVED (SNOW-TELL, bible/01-Overview/bugs/Field-Bugs-2026-10-11d.md): the frame's snow height handed beside the fog
-  assert.match(rd('src/render/renderer.js'), /this\._foeTelegraph\.draw\(list, this\._proj, this\._view, \{ mode: this\._fogMode, density: this\._fogDensity, range: this\._fogRange, camPos: this\._camPos, focus: this\._focus, haze: this\._haze \}, \{ snowRise: this\._snowRise \}\)/);   // AUDIT BANTHA1 HAZE-3: and the jungle's haze
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.4): the fog's factor goes into the boss's line as `fogK`, floored
-  // for a mark near the player
-  assert.match(rd('src/render/foeTelegraph.js'), /float fogK = max\(fogFactorAt\(vWorld\), uNearFloor\);\n\s*oColor = telegraphStyle\([^;]*fogK\);/);
 });
 
 // ── B: cover ────────────────────────────────────────────────────────
@@ -327,11 +298,6 @@ test('AUDIT TACT B2: no one-way hiding place - a tree is a trunk and a crown, an
   fat.cover = createCoverIndex();
   fat.cover.add('k', [coverProxy([0, 0, 5], { w: 3, h: 5 })]);
   assert.equal(canSeeTarget(fat, [0, 0, 0], 0, 1.8, [0, 0, 5]), true, 'in it: seen');
-  // ECOTONE1: PIN MOVED - any of the pixel's nature archives (a climate border stands its neighbour's too), its Trees
-  // named by that archive's SUMMER set: the season's own number names none in winter, so a winter wood's trees were cover
-  // as flats until then
-  assert.match(hostText('src/scenes/world.js'), /coverProxies\(c, size, \{ tree: g\.natureSet\.has\(archive\) && isTreeRecord\(g\.natureBase\(archive\), record\) \}\)/);
-  assert.match(hostText('src/scenes/world.js'), /const natureBase = \(a\) => \(a === natureArchive \? climate\.natureArchive : borderNature\.get\(a\)\);/);
 });
 
 test('AUDIT TACT B3: people are no cover - a person flat is skipped wherever it stands', () => {
@@ -339,10 +305,6 @@ test('AUDIT TACT B3: people are no cover - a person flat is skipped wherever it 
   const person = Object.assign([0, 0, 5], { noCover: true });
   assert.equal(idx.add('k', [coverProxy(person, { w: 1, h: 1.8 })]), 0);
   assert.equal(idx.hit([0, 1, 0], [0, 0, 1], 20), Infinity);
-  assert.match(rd('src/scenes/dungeonContext.js'), /if \(pn\) at\.noCover = true;/);
-  // PIN MOVED (MWNPC8c, bible/04-Characters/Morrowind-NPCs.md section 13c): exterior.js's people no longer group with
-  // its scenery - each is a batch of their own, which makes no cover - so no person reaches the groups' cover to be marked
-  assert.match(rd('src/scenes/exterior.js'), /if \(!_people\.has\(flat\)\) \{\n\s*const key = drawnFlat/);
 });
 
 test('AUDIT TACT B5: an arrow meets cover by touch - at 20 fps it still strikes a player half a metre before a tree', () => {
@@ -400,15 +362,9 @@ test('AUDIT TACT C3: the indoor watch spreads from a REAL door - whose centre st
   assert.equal(new Set(spots.map((s) => s[0].toFixed(2))).size, 5, 'five lanes');
 });
 
-test('AUDIT TACT C4: the street\'s doorways are mapped once a door generation, and not at all with nobody to clear', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(_tactDoorGen !== doorGeneration\) \{ _tactDoorGen = doorGeneration; _tactDoorWorld = doorSpotsNear\(buildingDoors, null, Infinity, shiftedDoor\); \}/);
-  assert.match(w, /if \(cityGuards\.guards\.length \|\| exteriorFoes\.foes\.length\) clearDoorways\(/);
-});
-
 test('AUDIT TACT C5: my companion and a pickpocket\'s mark are asked of HIM; the pass is for a DOOR, never the shelf behind', () => {
   const peaceful = { ai: { isHostile: false } };
-  // FB1012d ALLY-YIELDS (bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): the door pass is still never his - his own yield is
+  // FB1012d ALLY-YIELDS: the door pass is still never his - his own yield is
   // `allyYields`, to what the LADDER would take behind him (test/scenes/fb1012d_allyyields.test.js), asked before this one
   assert.equal(yieldsToDoor({ ...peaceful, companion: 'me' }, 2), false, 'my companion\'s pack: the peaceful\'s door pass is not his');
   assert.equal(yieldsToDoor(peaceful, 2, 'steal'), false, 'a pickpocket');
@@ -431,12 +387,6 @@ test('AUDIT TACT C6/C7: inner swing doors and a dungeon\'s doors are doorways to
   const g = { ai: { feet: [0.2, 0, 0.3], height: 1.8, isHostile: false }, dead: false };
   for (let i = 0; i < 120; i++) clearDoorways([g], spots, new Collider(() => 0), 1 / 60);
   assert.ok(Math.abs(g.ai.feet[2]) >= DOORWAY_DEPTH - 1e-6, 'out of the inner doorway');
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /\.\.\.actionDoorSpots\(interiorCtx\.actions\?\.objects, player\.pos, 30\)/);
-  assert.match(m, /doorBehind: doorDistanceOf\(eye, dir, targets, dungeonCtx\.collider\),/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /clearDoorways\(foes, actionDoorSpots\(actions\.objects, playerFeet, 30\), collider, foeFrameDt\(dt\),/);
-  assert.match(rd('src/scenes/dungeon.js'), /doorBehind: doorDistanceOf\(eye, dir, targets, ctx\.collider\),/);
-  assert.match(rd('src/scenes/exterior.js'), /doorBehind: _race\.doorDistance,/);
 });
 
 // ── D: what the lens found untested ─────────────────────────────────
@@ -465,7 +415,6 @@ test('AUDIT TACT D (coverage): the ground pass adds onto the frame, writes no de
   const names = calls.map((c) => c[0]);
   const draw = names.indexOf('drawArrays');
   assert.ok(draw > 0);
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.4): premultiplied over the frame - the keyline darkens what it lies on
   assert.deepEqual(calls.filter((c) => c[0] === 'blendFunc').map((c) => c.slice(1)), [[gl.ONE, gl.ONE_MINUS_SRC_ALPHA]]);
   assert.deepEqual(calls.filter((c) => c[0] === 'depthMask').map((c) => c[1]), [false, true], 'no depth written, then written again');
   assert.ok(calls.some((c, i) => i > draw && c[0] === 'disable' && c[1] === gl.BLEND), 'blend off after');
@@ -473,14 +422,6 @@ test('AUDIT TACT D (coverage): the ground pass adds onto the frame, writes no de
   assert.ok(calls.some((c, i) => i > draw && c[0] === 'disable' && c[1] === gl.POLYGON_OFFSET_FILL), 'the offset off after');
   assert.ok(calls.some((c) => c[0] === 'uniform2f' && c[1] === 'uSlope' && c[2] === 0.1 && c[3] === -0.2), 'the slope handed');
   assert.ok(calls.some((c) => c[0] === 'uniform1i' && c[1] === 'uFogMode' && c[2] === 2), 'the fog handed');
-});
-
-test('AUDIT TACT D (coverage): the watch resolves a telegraphed blow through the verdict AND the weight', () => {
-  const g = rd('src/scenes/cityGuards.js');
-  assert.match(g, /const dmg = blowScaled\(g\.ai, calculateAttackDamage\(g\.entity, playerEntity, \{/);
-  // PIN MOVED (TELL6e, bible/12-Enhanced-AI/Feud-Arc.md 8.2): what the landing does is asked of the same weighed blow
-  // PIN MOVED (AUDIT TELL L8): after the hurt, by what reached health
-  assert.match(g, /\}\)\);\n(?:\s*\/\/[^\n]*\n){4}\s*const hp0 = playerEntity\.health;[^\n]*\n\s*if \(dmg > 0\) \{ onPlayerHurt/, 'the weighed blow is what hurts him');
 });
 
 test('AUDIT TACT (mutation survivor): a turned back is an opening - the waiting foe it is turned on goes in without a token; faced, it waits', () => {

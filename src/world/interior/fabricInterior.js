@@ -1,13 +1,11 @@
 // @ts-check
-// IC-INTERIORS (2026-10-27, the owner's field report, item 5: "Interiors in the Imperial city need to match their exterior
-// with varied layouts"; and on all of it, "No band aids or half assed work"; bible/03-World/Arena-Provinces.md
-// IC-INTERIORS) - A FABRIC BUILDING'S OWN INTERIOR, laid from Daggerfall's own kit to its footprint, its storeys, its kind,
+// IC-INTERIORS - A FABRIC BUILDING'S OWN INTERIOR, laid from Daggerfall's own kit to its footprint, its storeys, its kind,
 // its door and its windows.
 //
 // DFU's reference: a building's interior is its block's SUBRECORD's interior record - the models, flats, people, doors and
 // spawn points its RMB's author laid (DaggerfallInterior.AddModels, AddFlats, AddPeople, AddActionDoors, AddSpawnPoints),
 // in the frame of the building model its door is on; its storeys joined by Daggerfall's stair (31x23) or its ladder
-// between a LadderBottom and a LadderTop marker (DaggerfallLadder). BLD (2026-10-26) gave each fabric building a DONOR's
+// between a LadderBottom and a LadderTop marker (DaggerfallLadder). BLD gave each fabric building a DONOR's
 // record whole - one of 53 of Daggerfall's own buildings, picked by its pool and its footprint's area - so a long shop
 // held a square room, a narrow house a wide one, every house of a size the same three rooms, a five-storey house one
 // storey, none of it where the street's windows were.

@@ -1,7 +1,4 @@
-// CHARGEN-REFLEX (2026-09-22, Fay on Discord, desktop build 0.1.3612:
-// "The Continue button on the Reflex page is not clickable. Tried all
-// the different reflex options, but I can only click the Back
-// button."). A character could not be created at all.
+// CHARGEN-REFLEX. A character could not be created at all.
 //
 // THE BUTTON WAS NEVER DISABLED AND THE FLOW WAS NEVER STUCK - both
 // were the first two guesses and both were wrong, which is why they

@@ -1,5 +1,4 @@
-// TESA-LANDS' audit (bible/03-World/Tamriel-Biomes.md, "The air a body feels"; the owner: "Definitely fix any bugs you
-// encounter") - THE AIR A BODY FEELS past the Bay. TESA-BIOME gave Morrowind's zones their ground's climate (the grey
+// TESA-LANDS' audit (, "The air a body feels") - THE AIR A BODY FEELS past the Bay. TESA-BIOME gave Morrowind's zones their ground's climate (the grey
 // volcanic sets) and their air's (`air` - the air law's map, systems/weather/airGround.js), and the survival law read the
 // ground's: the Ashlands felt the Mountains' -40 under the Dak'fron's air, -45 and Freezing at noon in Frostfall, and the
 // headless probe's character froze to death in a walk across it. world/tamriel/tamrielGround.js feltClimateIndex is the

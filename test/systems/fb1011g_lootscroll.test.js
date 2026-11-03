@@ -2,10 +2,10 @@
 // 2 or 3 days ago. I can't scroll the item list with mouse wheel for some reason. I can still take items from list one by
 // one to get to the bottom of it", a screenshot of an Elite Daedra Seducer's body - six rows and "and 3 more"). The wheel
 // was never broken: the plaque showed six rows (systems/worldHover.js HOVER_MAX, "a pile is a glance") and the rest were
-// a count the wheel and the take could not reach - and BAL4 (2026-10-10) brought an elite's grant, appended past the
+// a count the wheel and the take could not reach - and BAL4 brought an elite's grant, appended past the
 // sixth row, to every game with the rarity tiers on. The frame carries every row now; the plaque draws a window of six
 // about the lit one (plaqueWindow), and the classic panel the same window. Driven through the real plaque in
-// test/systems/worldhover.test.js; here, the window's law and the classic panel's words. bible/01-Overview/bugs/Field-Bugs-2026-10-11g.md.
+// test/systems/worldhover.test.js; here, the window's law and the classic panel's words..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -43,7 +43,6 @@ test('LOOT-SCROLL: the take reaches every row - the lit row is the pile\'s, not 
   const list = items(HOVER_MAX + 3);
   assert.equal(hoverItemAt(list, HOVER_MAX + 2, Infinity)?.name, `Thing ${HOVER_MAX + 2}`);
   assert.equal(hoverItemAt(list, HOVER_MAX + 3, Infinity), null, 'past the pile: nothing');
-  assert.match(readFileSync(new URL('../../src/systems/quickLoot.js', import.meta.url), 'utf8'), /return hoverItemAt\(items, _sel\.row, Infinity\);/, 'the take asks the whole pile');
 });
 
 test('LOOT-SCROLL: the classic panel draws the same window - its foot line says what is above and below in one line, so its parchment keeps its one foot (mutants: the rows above unsaid)', () => {

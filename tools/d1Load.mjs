@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// D1-LOAD (2026-10-11, from play: the account service stayed slow after SEAT-CAP and SEAT-LEASE - "So it works, but it
-// takes forever to load"; the owner: "do whatever is the most detailed. I dont want band aid fixes") - WHAT IS FILLING
+// D1-LOAD - WHAT IS FILLING
 // THE ONE DATABASE, READ BY THE OPERATOR. Every request and every cron firing writes one point to Workers Analytics
 // Engine (server-account/src/metrics.js: the route, its wall ms, its D1 statements, its D1 WAIT, its rows read and
 // written), and nothing ever read them back but a person with the SQL API at hand. This builds the questions, and

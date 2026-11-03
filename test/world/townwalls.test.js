@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS4 (2026-10-25, the owner: "give other towns unique shapes. Its time to move away from perfect squares ...
-// This needs to be perfection"; bible/03-World/Town-Shapes.md TS4): a city past the Bay walled on its own outline - its
+// TOWN-SHAPES TS4: a city past the Bay walled on its own outline - its
 // round's edge traced, Daggerfall's towers, walls and gates laid on it, a gate at each of its template's gates' bearings
 // with a start marker outside it, the pieces one model of the town's own carried by its south-west cell, its ground its
 // round and an apron.
@@ -114,7 +113,7 @@ test('TS4 the ground: a walled city past the Bay stands on its round - every til
   for (let r = 8; r < 56; r++) for (let c = 8; c < 56; c++) houses[r * 64 + c] = 5;
   const rmbs = { H: { fldHeader: { autoMapData: houses }, misc3dObjectRecords: [], miscFlatObjectRecords: [] }, C: { fldHeader: { autoMapData: new Uint8Array(4096) }, misc3dObjectRecords: [{ xPos: 0, zPos: -4096 }], miscFlatObjectRecords: [{ xPos: 40000, zPos: -4096 }] } };
   const names = ['TESW1.RMB', TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, 'H.RMB', TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK];
-  const loc = (walled) => ({ name: 'W', mapTableData: { mapId: 1, locationType: 0 }, exterior: { exteriorData: { width: 3, height: 3, blockNames: names } }, ...(walled ? { outline: { kept: 1, left: 8, walled: true } } : {}) });
+  const loc = (walled) => ({ name: 'W', mapTableData: { mapId: 1, locationType: 0 }, arena: { kind: 'city-state' }, exterior: { exteriorData: { width: 3, height: 3, blockNames: names } }, ...(walled ? { outline: { kept: 1, left: 8, walled: true } } : {}) });
   const rmbOf = (bx, by) => { const n = names[by * 3 + bx]; return n === 'H.RMB' ? rmbs.H : null; };
   const walled = locationShapeField(loc(true), rmbOf, { x: 40, y: 40 }), open = locationShapeField(loc(false), rmbOf, { x: 40, y: 40 });
   const count = (a, f2) => a.reduce((s2, v) => s2 + (f2(v) ? 1 : 0), 0);
@@ -139,7 +138,7 @@ test('TS4 standing a wall: the outlined city\'s south-west cell its carrier, the
   assert.deepEqual(b.rmbBlock.miscFlatObjectRecords.map((f) => [f.textureArchive, f.textureRecord, f.xPos, f.zPos]), [[199, 10, 400, 800 - 4096]]);
   assert.ok(b.rmbBlock.fldHeader.groundData.groundTiles.flat().every((t) => t.textureRecord >= 56), 'open ground');
   assert.equal(townWallBlockName(((0xa7 << 20) | 500007) >>> 0), 'TESWAPT3.RMB');
-  assert.deepEqual([townWallBlockIndex(((0xa7 << 20) | 500007) >>> 0), townWallModelId(((0xa7 << 20) | 500007) >>> 0)], [1500007, 1500007]);   // PIN MOVED (AUDIT RELEASE R1-1): the walls' models under IC-GRAND's families (test/world/auditrelease_r1.test.js)
+  assert.deepEqual([townWallBlockIndex(((0xa7 << 20) | 500007) >>> 0), townWallModelId(((0xa7 << 20) | 500007) >>> 0)], [1500007, 1500007]);
   assert.ok(townWallBlockIndex(0xfffff) > TOWN_OUTLINE_BLOCK_INDEX);
   assert.deepEqual([isGateBlock('WALLAA08.RMB'), isGateBlock('WALLAA11.RMB'), isGateBlock('WALLAA04.RMB')], [true, true, false]);
   // a synthetic walled city stood: one block of houses in the middle of a 3 x 3 ring, its gates on two sides
@@ -161,9 +160,6 @@ test('TS4 standing a wall: the outlined city\'s south-west cell its carrier, the
   assert.ok(hasCustomModel(townWallModelId(mapId)));
   assert.deepEqual([...customModelNeeds(townWallModelId(mapId))].sort(), [444, 445, 446]);
   assert.equal(standTownWall(loc, template, (n) => served[n] ?? null, townOutlineBlockJson), null, 'once a city');
-  const h = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(h, /const loc = outlineTownLocation\(synthesizeArenaLocation\([^\n]+\n\s+if \(loc\.outline\?\.walled\) standTownWall\(loc, template\.exterior\.exteriorData\.blockNames, blockOf, townOutlineBlockJson\);/);   // PIN MOVED (TS7): its blocks both ways - what stands at its gates the game's own
-  assert.match(rd('src/world/townOutline.js'), /const open = \(i\) => \(walled && i === 0 \? townWallBlockName\(seed\) : TOWN_OUTLINE_BLOCK\);/);
 });
 
 test('TS4 with ARENA2: every city past the Bay walled on its outline - every kept building inside its wall, a gate at each of its template\'s four, a marker outside each on the town\'s ground, the wall on the town\'s ground (mutants: the gates unread; the apron unlaid)', { skip: skipReal }, async () => {

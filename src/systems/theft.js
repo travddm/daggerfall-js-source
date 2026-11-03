@@ -39,7 +39,7 @@
 // question from the same two facts. Putting one of your OWN items into
 // the container does not enter it either way (DFU's RemoveItem finds
 // nothing to remove; the diff sees a gain, not a loss). STOLEN-GOODS
-// AUDIT S1 (2026-10-16): nearly - DFU's basket holds the half a SPLIT
+// AUDIT S1: nearly - DFU's basket holds the half a SPLIT
 // minted too, which a diff of the list never sees (the stack still
 // stands); the snapshot is the owner's keeping now, which the take grows
 // by that half (theftBasket below), and the shelf arm reads it too.
@@ -60,7 +60,7 @@ import { totalWeight } from './inventory.js';
  *  when the window opened, `after` when it closed; the answer is what
  *  left. Identity is by REFERENCE, which is the port's item identity
  *  everywhere else - two Iron Daggers are two objects.
- *  STOLEN-GOODS AUDIT S1 (2026-10-16): `before` is THE OWNER'S KEEPING,
+ *  STOLEN-GOODS AUDIT S1: `before` is THE OWNER'S KEEPING,
  *  the Set the host takes as the window opens and hands the window as
  *  `loot.stolenFrom` - which the take grows by the half a split mints
  *  off the owner's stack (systems/stolenGoods.js takenFromKeeping). So
@@ -140,7 +140,7 @@ export function shopliftAttempt({ basket, pickpocketSkill = 0, shopQuality = 0, 
 
 /** The shop-shelf arm (:681-687): a Thieves Guild tally when the shut
  *  shelf gave up anything of the shop's. STOLEN-GOODS AUDIT S1
- *  (2026-10-16), a departure: DFU compares the shelf's COUNT with what
+ *  a departure: DFU compares the shelf's COUNT with what
  *  it held when the window opened, so a piece of your own put down hid
  *  the shop's piece taken, and a handful off a stack was no theft - while
  *  the mark (systems/stolenGoods.js) marked both. The shelf reads the

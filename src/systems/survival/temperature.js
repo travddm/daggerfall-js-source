@@ -1,5 +1,4 @@
-// SURV1 (2026-09-18, Mac: "we have been given permission to completely
-// overhaul this mod ... tackle everything here properly") - THE FELT
+// SURV1 - THE FELT
 // TEMPERATURE. An ORIGINAL SYSTEM, designed from Ralzar's Climates &
 // Calories 1.7.1 (the shipped DLL read off its IL - there is no source
 // in the bundle; the reading is in Systems-Arc SURV) and rebuilt to the
@@ -32,7 +31,7 @@ export const FLAG_FIRE = 8;
 export const FLAG_FROST = 16;
 
 /** The climate's own temperature. Desert2 is the Dak'fron interior, the
- *  hottest; Mountain the coldest. AUDIT C&C (2026-10-12, E4): OCEAN IS THE
+ *  hottest; Mountain the coldest. AUDIT C&C: OCEAN IS THE
  *  SEA, AT NOUGHT. SURV1's +20 was a beach (a classic player met a few
  *  pixels of it at the coast); the port sails the whole Bay over it (the
  *  one water law, ui/overworldModel.js isWaterPixel: every Ocean pixel is
@@ -59,7 +58,7 @@ export const NIGHT_MULT = Object.freeze({ [CLIMATES.Desert]: 3, [CLIMATES.Desert
 export const WEATHER_TEMP = Object.freeze({
   sunny: 0, cloudy: 0, overcast: -8, fog: -5, rain: -10, thunder: -15, snow: -10, sandstorm: 5, ashfall: -5,
 });
-/** AUDIT C&C T2 (2026-10-12): rain and snow are the mod's own (Climates.cs Weather(), every published revision) - rain
+/** AUDIT C&C T2: rain and snow are the mod's own (Climates.cs Weather(), every published revision) - rain
  *  soaks three a minute bare, one under a cloak and none under its hood; snow one bare and none under any cloak. SURV1's
  *  reading of the IL had the two rows swapped: a cloak kept every drop of rain off, hood down, and snow soaked a bare
  *  body three times as fast as rain. Fog's is the port's own (the mod's Weather() has no fog). */
@@ -115,7 +114,7 @@ export const HOODED_CLOAK_VARIANTS = Object.freeze(new Set([1, 2, 5]));
 export const HOODED_ROBES = Object.freeze(new Set([163, 200]));   // variant 1 is the hood up
 /** What covers the chest so the sun cannot heat the armour under it: what the doll draws OVER the cuirass - the plain
  *  robes, the priest's and the priestess's robes (drawOrder 80 to the cuirass's 50; a cloak's 90 covers too -
- *  armorWarmth). AUDIT C&C T1 (2026-10-12): SURV1's reading of the IL had the Anticlere Surcoat and the Challenger
+ *  armorWarmth). AUDIT C&C T1: SURV1's reading of the IL had the Anticlere Surcoat and the Challenger
  *  Straps beside the robes, so a strap shaded a cuirass. The mod's own list (Climates.cs ArmorCovered, the published
  *  source) is the robes and the three long gowns - the evening gown, the day gown and the casual dress; the gowns are
  *  drawn under the cuirass like every other chest garment (drawOrder 40), so the metal the player sees in the sun is
@@ -189,7 +188,7 @@ export function hourTemperature(hour, climateIndex) {
   return -20 * m;   // 20:00 - 03:59
 }
 
-/** AUDIT C&C (2026-10-12): THE SUN'S ONE LAW - outdoors, between DFU's dawn and dusk (DaggerfallDateTime.IsDay: 6:00 to
+/** AUDIT C&C: THE SUN'S ONE LAW - outdoors, between DFU's dawn and dusk (DaggerfallDateTime.IsDay: 6:00 to
  *  17:59), under a sky the sun comes through (sunny or cloudy), and not under a pitched tent's canvas. The exterior
  *  hosts' readers ask it for their minute, and a jump's replay for each of its own (needs.js runSurvivalMinutes): a
  *  replayed minute had its own hour and month but the frame's sun, so a jump set out at noon met the sun at 01:00. */
@@ -198,7 +197,7 @@ export function sunlit({ hour = 12, weather = 'sunny', insideBuilding = false, i
   return !insideBuilding && !insideDungeon && !sheltered && h >= DAWN_HOUR && h < DUSK_HOUR && (weather === 'sunny' || weather === 'cloudy');
 }
 
-/** TEMP-UI (2026-10-12): the hour's band by NAME - the bands hourTemperature reads, said for the breakdown ('day' its
+/** TEMP-UI: the hour's band by NAME - the bands hourTemperature reads, said for the breakdown ('day' its
  *  zero, 'evening' and 'dawn' its -10 x the night multiplier, 'night' its -20 x; test/systems/survival/tempui.test.js holds the two to
  *  one another over every minute of the day). */
 export function hourBand(hour) {
@@ -247,7 +246,7 @@ export function weatherWetGain(weather, { cloak = false, hood = false, insideBui
   return k * (cloak ? (hood ? row[2] : row[1]) : row[0]);
 }
 
-/** LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): the most of the weather's soaking a wardrobe's
+/** LOOT14 (the Loot arc II): the most of the weather's soaking a wardrobe's
  *  weatherproofing turns aside (%) - a river, a wade and a dive soak you whatever you wear. */
 export const GEAR_DRY_MOST = 75;
 /** LOOT14/LOOT15: what the loot ladder's fold put on the wearer (`entity._mods` - empty with the ladder off), as the
@@ -430,7 +429,7 @@ export function feltTemperature(env = {}, worn = null, ctx = {}) {
   const unwatered = felt;   // TEMP-UI: before the drink to hand
   if (felt > 9 && ctx.hasWater && !ctx.vampire) felt = Math.max(felt - WATER_COOLS, 9);   // AUDIT TEMP-UI E8: never under where the cooling starts - a reading of 10 fell to 0 and 19 to 9, a warmer day reading cooler
   const watered = felt;   // TEMP-UI: before a Legendary garment's degrees
-  // LOOT15 (bible/06-Systems/Loot-II-Arc.md section 7): a Legendary garment's degrees - the cold felt so much less, or the
+  // LOOT15: a Legendary garment's degrees - the cold felt so much less, or the
   // heat - toward comfortable and never past it, each on its own side alone (AUDIT LOOT II A2)
   const coldLess = Math.max(0, Number(ctx.coldDegrees) || 0), heatLess = Math.max(0, Number(ctx.heatDegrees) || 0);
   if (felt < 0) felt = Math.min(felt + coldLess, 0);
@@ -459,7 +458,7 @@ export function temperatureWord(felt) {
   return 'deadly cold';
 }
 
-/** TEMP-UI (2026-10-12): the climates as the temperature's breakdown names them. */
+/** TEMP-UI: the climates as the temperature's breakdown names them. */
 export const CLIMATE_NAMES = Object.freeze({
   [CLIMATES.Ocean]: 'Sea', [CLIMATES.Desert]: 'Desert', [CLIMATES.Desert2]: 'Deep desert', [CLIMATES.Mountain]: 'Mountains',
   [CLIMATES.Rainforest]: 'Rainforest', [CLIMATES.Swamp]: 'Swamp', [CLIMATES.Subtropical]: 'Subtropics',
@@ -473,8 +472,7 @@ export const WEATHER_NAMES = Object.freeze({
 export const HOUR_NAMES = Object.freeze({ day: 'Daytime', evening: 'Evening', dawn: 'Dawn', night: 'Night' });
 
 /**
- * TEMP-UI (2026-10-12, the owner: "add a temperature widget to the UI including allowing players to see their personal
- * temperature in their inventory"): WHAT MAKES THE FELT TEMPERATURE, AS ROWS THAT ADD UP TO IT. `env` is the one the
+ * TEMP-UI: WHAT MAKES THE FELT TEMPERATURE, AS ROWS THAT ADD UP TO IT. `env` is the one the
  * reading was taken in and `temp` feltTemperature's answer for it. Each row is { key, label, value, note? }: the
  * climate always, then every part that moved the number - the season, the hour, the weather, a roof, the ground, the
  * resistances (on the air - AUDIT TEMP-UI E1: the body's own warmth is not resisted), the race, the clothing (with what it would be dry,

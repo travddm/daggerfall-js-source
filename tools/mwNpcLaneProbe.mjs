@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
-// THE NPC LANES PROBE (MWNPC11, 2026-10-10 - bible/04-Characters/Morrowind-NPCs.md section 16; the arc's law 5,
-// MEASURED). Mac: "I wanna do everything and ensure that performance isnt affected".
+// THE NPC LANES PROBE (MWNPC11, 2026-10-10; the arc's law 5,
+// MEASURED)..
 //
 // Every population stands its NPCs in Morrowind bodies on a lane of its own (characters/npcBodies.js), each under its
 // own caps - and a busy place runs many at once: a port's street in a siege with a party on the road has the foes', the

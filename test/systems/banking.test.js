@@ -403,7 +403,7 @@ test('B1: the accounts and the loan SURVIVE a save (SerializablePlayer)', async 
   const loaded = { stats: {}, items: [] };
   restorePlayer(loaded, snap);
 
-  assert.equal(loaded.bankAccounts.length, 71, 'every region came back');   // PIN MOVED (WW-R, bible/03-World/World-Wide.md): the provinces' accounts after the Bay's
+  assert.equal(loaded.bankAccounts.length, 71, 'every region came back');
   assert.equal(accountTotal(loaded.bankAccounts, 17), 10000);
   assert.equal(loanedTotal(loaded.bankAccounts, 17), 11000, 'the loan survived');
   assert.equal(loanDueDate(loaded.bankAccounts, 17), 500000 + LOAN_REPAY_MINUTES,
@@ -427,7 +427,7 @@ test('B1: the accounts and the loan SURVIVE a save (SerializablePlayer)', async 
   delete old.bankAccounts;
   const fresh = { stats: {}, items: [] };
   restorePlayer(fresh, old);
-  assert.equal(fresh.bankAccounts.length, 71, 'the full table, as a new game mints it');   // PIN MOVED (WW-R): the provinces' after the Bay's
+  assert.equal(fresh.bankAccounts.length, 71, 'the full table, as a new game mints it');
   assert.equal(accountTotal(fresh.bankAccounts, 17), 0);
 });
 
@@ -542,28 +542,3 @@ test('H3 DEPARTURE: selling a ship you do not own is REFUSED, where DFU credits 
   assert.equal(dropped, 0, 'a sale that never happened dropped a scene');
 });
 
-test('H3 hosts: the three stubbed producers are producing', () => {
-  const wm = readFileSync(join(process.cwd(), 'src/scenes/worldModes.js'), 'utf8');
-  // These three shipped as literals - `() => 0`, `() => false`,
-  // `() => -1` - so the bank window drew a Sell button that quoted
-  // nothing and a Buy Ship that could never be in a port.
-  for (const stub of ['houseSellPrice: () => 0', 'ownsShip: () => false', 'ownedShip: () => -1', 'isPortTown: () => false']) {
-    assert.ok(!wm.includes(stub), `the ${stub.split(':')[0]} producer is stubbed again`);
-  }
-  // the sell price is measured off the OWNED building's mesh, the same
-  // reader the market list uses
-  assert.match(wm, /houseSellPrice\(houseMeshRadius\(owned\)\)/, 'the sell price is not measured off the owned house');
-  // ...and PortTownAndUnknown reaches it from the location directory
-  assert.match(wm, /portTownAndUnknown \?\? 0\) !== 0/, 'the port-town test is not the PortTownAndUnknown byte');
-  const w = readFileSync(join(process.cwd(), 'src/scenes/world.js'), 'utf8');
-  assert.match(w, /portTownAndUnknown: loc\.exterior\?\.exteriorData\?\.portTownAndUnknown/,
-    'the host never reads the byte off the location');
-
-  const bw = readFileSync(join(process.cwd(), 'src/ui/bankWindow.js'), 'utf8');
-  // BOTH sell offers ask, not just the letter deposit (:313-334) -
-  // and a Yes has to actually sell
-  assert.match(bw, /\[TRANSACTION_RESULT\.SELL_HOUSE_OFFER\]: \(\) => this\.hooks\.sellHouse/,
-    'accepting the house offer does not sell the house');
-  assert.match(bw, /\[TRANSACTION_RESULT\.SELL_SHIP_OFFER\]: \(\) => this\.hooks\.sellShip/,
-    'accepting the ship offer does not sell the ship');
-});

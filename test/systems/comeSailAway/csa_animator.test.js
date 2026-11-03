@@ -1,4 +1,4 @@
-// CSA-E (2026-09-27) - UNITY'S ANIMATOR AS COME SAIL AWAY DRIVES IT (world/unityAnimator.js): the clip's curves
+// CSA-E - UNITY'S ANIMATOR AS COME SAIL AWAY DRIVES IT (world/unityAnimator.js): the clip's curves
 // (constant, streamed Hermite, dense), the binding hash, Quaternion.Euler's order, the two blend trees the mod's
 // controllers use, the pose blend, the state machine's clock, its transitions and the script's CrossFade - and, on the
 // vendored data, a sail stowed and raised and the rudder's oars rowing.

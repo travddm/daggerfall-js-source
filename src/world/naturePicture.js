@@ -59,7 +59,7 @@ export async function naturePicture({ door = null, seasons = null, renderer, upl
 }
 
 /**
- * BANTHA1 (bible/03-World/Bantha-Jungle.md): THE PICTURE A JUNGLE TREE STANDS AS - the jungle door's far picture of
+ * BANTHA1: THE PICTURE A JUNGLE TREE STANDS AS - the jungle door's far picture of
  * `species` (systems/jungleTreesAssets.js createJungleTrees - proto, farPicture; the door already loaded) as
  * `{ proto, far }` (the far picture not yet held), or null where it would not stand - the host stands the Tree record the
  * flat carries, as the choice above stands the classic record. A jungle tree has no classic flat and no season of its
@@ -73,7 +73,7 @@ export async function junglePicture(door, species) {
 }
 
 /**
- * JUNGLE-ROADSIDE (bible/03-World/Bantha-Jungle.md, The roadside pairs): THE NEAR TREE A ROADSIDE PAIR'S HALF STANDS AS -
+ * JUNGLE-ROADSIDE (, The roadside pairs): THE NEAR TREE A ROADSIDE PAIR'S HALF STANDS AS -
  * the jungle door's near-only prototype of pair `kind`'s half `side` (world/jungle/jungleRoadside.js JUNGLE_PAIRS's index;
  * 0 its first tree and the lianas on its side, 1 its second) and its handle, `{ proto, far }` (`far` a handle for the near
  * set alone: no far picture - the tree stands as its species' own far off), or null where it would not stand - the host

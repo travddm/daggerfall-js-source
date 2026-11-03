@@ -1,4 +1,4 @@
-// L10N3e/L10N3g (2026-09-28): THE QUEST'S NAMES AND ITS GRAMMAR, IN THE PLAYER'S LANGUAGE - the quest batch. DFU writes
+// L10N3e/L10N3g: THE QUEST'S NAMES AND ITS GRAMMAR, IN THE PLAYER'S LANGUAGE - the quest batch. DFU writes
 // a quest resource's name in the language when it makes it (Foe.cs:276 GetLocalizedEnemyName, Person.cs:617 and every
 // other faction name through GetFactionData, PersistentFactionData.cs:176) and a quest message's finished text goes
 // through the language's grammar processor (QuestMacroHelper.cs:158), with the NPC's gender handed over by

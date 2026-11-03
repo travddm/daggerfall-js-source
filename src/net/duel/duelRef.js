@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// INT8 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): THE DUEL REFEREED - "a duel is the Royal Tourney's ring without its title".
+// INT8: THE DUEL REFEREED - "a duel is the Royal Tourney's ring without its title".
 //
 // DUEL1 left every blow to the defender's own machine and every result to the loser's own word: a client that never
 // took damage never fell, and one that never said it lost never did. Now the relay that routes the duel holds it:

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT2-INT5 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; its audit the same day): THE VERDICT ON
+// INT2-INT5: THE VERDICT ON
 // A CHECKPOINT - what the judge found (judge.js), what the ledger says (INT4, ledger.js), what the budget says (INT5,
 // budget.js), the level the realm trusts, and the hold they come to - as the statements realm.js checkpointRealm lays in
 // the SAME BATCH that moves the character's row to the new save. One batch, so a checkpoint that loses its race (a
@@ -23,10 +23,10 @@
 //              whose values were cut (C5).
 //   - 'budget' (only once staff turn `enforce` on) a gain past the bucket. Cleared when play refills it.
 //
-// A COPY HOLDS NO CHARACTER (AUTO-HOLD, 2026-10-16 - Mac: "I dont want to have to manually review"). The ledger locks
+// A COPY HOLDS NO CHARACTER (AUTO-HOLD, 2026-10-16). The ledger locks
 // the copied PIECE (ledger.js item_dupes - it moves by no route) and the checkpoint's answer names it; the character
 // trades on. 'dupe' - DUPES_FOR_HOLD copies, staff alone to lift - is retired: no verdict writes it, a row still holding
-// it is lifted by its next checkpoint, and migration 0120 lifted every one standing.
+// it is lifted by its next checkpoint, and the schema's start has none standing.
 //
 // ═══ WHAT A VERDICT WRITES OVER ════════════════════════════════════
 //
@@ -37,27 +37,27 @@
 //
 // ═══ THE FIRST JUDGEMENT ═══════════════════════════════════════════
 //
-// Mac's call at the cutover: "Items judged, wealth baselined". The baseline is what the realm ALREADY HELD for the
+// . The baseline is what the realm ALREADY HELD for the
 // character - its stored record, read once - never the save the first judged checkpoint brings: that save is charged
 // for what it adds like any other (AUDIT INT: the first judged save could hold anything, and was the baseline). A new
-// character's baseline is a newborn's purse (REALM_BIRTH_WEALTH_MAX); one through customs, its level's allowance.
+// character's baseline is a newborn's purse (REALM_BIRTH_WEALTH_MAX).
 // ═══════════════════════════════════════════════════════════════════
 
 import { judgeSave, judgeProducts, STRIKES_FOR_TIMED, JUDGE_VERSION, FINDINGS_KEPT, WEALTH_VERSION, goodsOf, lawValuesOf, LAW_VALUES_CUT } from './judge.js';
 import { ledgerStep, chargeSteps } from './ledger.js';
 import { budgetConfig, bandOf, stepBudget } from './budget.js';
-import { customsAllowance } from '../../src/net/realm/realmGoldLaw.js';
+import { levelWealthCeiling } from '../../src/net/realm/realmGoldLaw.js';
 import { censusStep } from './staffCensus.js';   // STAFF-PANEL4-CENSUS: the census's tally, on the hour's row and the character's latest
 
-/** INT2's cutover (Mac: "Items judged, wealth baselined"): a character whose first judged wealth stands past this many
- *  of its level's customs allowance (realmGoldLaw.js customsAllowance) is flagged for staff - flagged, never held. */
+/** INT2's cutover: a character whose first judged wealth stands past this many
+ *  of its level's wealth ceiling (realmGoldLaw.js levelWealthCeiling) is flagged for staff - flagged, never held. */
 export const OUTLIER_ALLOWANCES = 10;
 /** The fewest seconds of play a level takes to rise, as the realm trusts it (the budget's band, a win's spoils) - the
  *  save's own level stands, and lane 4 judges it (Integrity-Arc). Generous: no honest level comes faster. */
 export const LEVEL_RISE_S = 300;
 const HOUR_S = 3600;
 const DAY_S = 24 * HOUR_S;
-/** AUTO-HOLD (2026-10-16, Mac's call): the law's timed hold - the first a week, each after it a month - and how long with
+/** AUTO-HOLD: the law's timed hold - the first a week, each after it a month - and how long with
  *  nothing found before the strikes and the timed holds served are forgotten. */
 export const LAW_HOLD_S = 7 * DAY_S;
 export const LAW_HOLD_REPEAT_S = 30 * DAY_S;
@@ -192,7 +192,7 @@ export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, s
   const count = lawCountOf({ strikes: row.strikes ?? null, served: row.law_holds ?? null, until: row.held_until ?? null, at: row.law_at ?? null }, { rising, holding: lawHolds > 0, nowS });
   const held = holdOf({ prev: row.held ?? null, law: lawHolds, until: count.until, nowS, over: budget.over, enforce: config.enforce });
   // the cutover's outlier: a first judgement far past its level's line is flagged for staff, and holds nothing
-  const outlier = first && judged.wealth > OUTLIER_ALLOWANCES * customsAllowance(lv.level);
+  const outlier = first && judged.wealth > OUTLIER_ALLOWANCES * levelWealthCeiling(lv.level);
   const clean = law === 0 && fresh === 0;
   /** @type {any[]} */
   const after = [...ledger.steps];
@@ -214,7 +214,7 @@ export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, s
   // nothing new (the hold, under `enforce`, stands until it is paid)
   // STAFF-PANEL3-REALM (design doc weak spots: "split gold from item worth"): and the goods of that wealth (judge.js
   // goodsOf - its pieces that are not gold, at the wealth's own worth), so staff read gold - the rest of it, the debt off
-  // it - apart from goods in one measure (FLAW REVIEW: customs' gold beside it, the loan never off it, made the goods short)
+  // it - apart from goods in one measure (FLAW REVIEW: the liquid gold beside it, the loan never off it, made the goods short)
   // - asked only when this finding is written
   if (budget.over > 0 && gain > 0) finding(config.enforce ? 'budget' : 'measure', { gain, over: budget.over, level: lv.level, played: dPlayed, wealth: judged.wealth, goods: goodsOf(save), ...(first ? { first: true } : {}) });
   if (outlier) finding('outlier', { wealth: judged.wealth, level: lv.level });

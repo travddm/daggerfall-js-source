@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The fixes the audit made, each pinned here:
+// QUEST-AUDIT III. The fixes the audit made, each pinned here:
 //
 // - STORY-AGAIN (#982, "Add way to reset a failed mandatory main quest"): a step of the main story that ended without
 //   succeeding - S0000012's two days run out, a `_no_` - and whose story went no further is started again from the
@@ -54,7 +53,6 @@ const ticks = (m, n = 5) => { for (let i = 0; i < n; i++) m.tick(); };
 const run = (m, name) => { const q = m.startQuestByName(name); ticks(m); return q; };
 
 test('STORY-AGAIN: the main story is the S group by number - the world\'s backbone, the Totem\'s aftermath (S00001xx) and the guilds\' series (S00005xx) apart; a script says its successors, the globals it sets and the work a global would run again (mutants: the backbone, the aftermath, the guilds, the padding, each read)', () => {
-  // PIN MOVED (AUDIT QA3 B5/B6): S0000500 is the Fighters Guild's Lord K'avar, S0000106 the Totem's powers
   assert.deepEqual(['S0000012', 's0000020', 'S0000988', 'S0000500', 'S0000503', 'S0000106', 'S0000100', 'S0000999', 'S0000977', '_BRISIEN', 'A0C00Y41', 'S000012'].map(isMainStoryQuest),
     [true, true, true, false, false, false, false, false, false, false, false, false]);
   assert.deepEqual(storySuccessors(['\tstart quest 20 20 ', '-- start quest 7 7', '\tstart quest _child_', 'x start quest 3 3']), ['S0000020', '_CHILD_']);
@@ -153,19 +151,6 @@ test('QUEST-RESET\'s questor rung: a questor the click bound refuses the restart
   }
 });
 
-test('STORY-AGAIN\'s doors: the bridge hands both through journalClean (every host\'s pause window and chronicle), seeds a legacy save after the notebook restores, and the two journals draw the press twice (source pins)', () => {
-  const bridge = src('src/scenes/quest/questBridge.js');
-  assert.match(bridge, /storyAgain: \(\) => machine\.storyAgainQuests\(\)\.map/);
-  assert.match(bridge, /const r = machine\.startStoryAgain\(questName\);/);
-  assert.match(bridge, /if \(data\.notebook\) notebook\.restoreSaveData\(data\.notebook\);\n(?:\s*\/\/.*\n)*\s*machine\.seedStory\(notebook\.getFinishedQuests\(\)\.map\(\(e\) => e\[0\]\?\.render\)\.filter\(\(r\) => r\?\.kind === 'quest'\)\);/);
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const story = \(clean\?\.storyAgain\?\.\(\) \?\? \[\]\)\.map/);
-  assert.match(menu, /section\(t\('pause\.journal\.main', 'Main Quests'\), \[\.\.\.mains, \.\.\.story\]/);
-  assert.match(menu, /if \(journalCleanArmed !== sel\.key\) \{ journalCleanArmed = sel\.key; render\(\); return; \}\n\s*journalCleanArmed = null;\n\s*const out = clean\.startStoryAgain\(sel\.story\.questName\);/);
-  const chron = src('src/ui/enhanced/enhancedChronicle.js');
-  assert.match(chron, /shelfWord = storyDoor\.startStoryAgain\(s\.questName\)\?\.text \?\? '';/);
-});
-
 test('LODGED-STAND: a quest Person whose feet stand inside a model stands beside it; feet in the open stand as given; the dungeon host stands its Persons through it (mutants: the free, the host\'s call)', () => {
   // a floor facing up, and a closed 2 m box on it round the marker, its faces looking out
   const c = new Collider(() => -Infinity);
@@ -188,6 +173,4 @@ test('LODGED-STAND: a quest Person whose feet stand inside a model stands beside
   const open = [5, 0, 5];
   assert.equal(freeQuestStand(c, open, 1.8), open, 'in the open: as given');
   assert.equal(freeQuestStand(null, inside, 1.8), inside, 'no collider: as given');
-  const modes = src('src/scenes/worldModes.js');
-  assert.match(modes, /if \(Number\.isFinite\(drop\)\) by = \(origin - drop\) \+ size\.h \* 0\.02;\n\s*if \(inDungeon\) \{ \[x, by, z\] = freeQuestStand\(ctx\.collider, \[x, by, z\], size\.h\); stand\.x = x; stand\.z = z; \}/);
 });

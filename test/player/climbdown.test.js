@@ -1,4 +1,4 @@
-// CLIMB-DOWN (2026-10-01, Mac: "So plsyers can get stuck on the very top of roofs"): the enhanced climb took players
+// CLIMB-DOWN: the enhanced climb took players
 // up every wall, and nothing brought them back down. A free climb tops out over a roof's parapet onto the roof inside -
 // and from there the vault and the clamber refuse the parapet (the drop past it would hurt), the plain jump cannot clear
 // it, and a press against it starts a free climb of its inner face that can only stand up again: walled in on the roof

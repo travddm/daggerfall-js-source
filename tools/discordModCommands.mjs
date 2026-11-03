@@ -1,4 +1,4 @@
-// SAFE8 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 9): THE BOT'S COMMANDS,
+// SAFE8: THE BOT'S COMMANDS,
 // REGISTERED WITH DISCORD. The account service answers them (server-account/src/discord.js onCommand); Discord has to be
 // told they exist. DISCORD-CODE moved their declaration to server-account/src/discordCommands.js, beside the service that
 // answers them; this tool writes that list to Discord, and nothing here declares a command.
@@ -8,7 +8,7 @@
 //
 // The token is read from the environment and never printed.
 //
-// DISCORD-SETUP (2026-10-17, Mac: "Can you set the discord end up for me"): THE WHOLE DISCORD END, FROM THE TOKEN ALONE -
+// DISCORD-SETUP: THE WHOLE DISCORD END, FROM THE TOKEN ALONE -
 // what the deploy runs (account-deploy.yml, "Point Discord at the service"), so the bot's token never leaves the
 // repository's secrets and no id is typed twice:
 //
@@ -22,7 +22,7 @@
 // application's is said before Discord is asked anything of it: every press would be refused as a bad signature, and
 // Discord's own refusal of the URL would not say why.
 //
-// DISCORD-CODE (2026-10-17, Mac: "Do it"): THE WHOLE LIST, AND THE BOT'S HANDS CHECKED. Every command in
+// DISCORD-CODE: THE WHOLE LIST, AND THE BOT'S HANDS CHECKED. Every command in
 // DISCORD_COMMANDS is written, so the server holds exactly the declared list. Then the bot's permissions in the
 // moderators' channel are computed the way Discord computes them (channelPermissions: @everyone and the bot's roles,
 // Administrator, then the channel's overwrites - @everyone's, its roles', its own) against what the cards need
@@ -90,7 +90,7 @@ export async function discordSetup({ token, channel, publicKey, url, commands = 
   if (String(app.verify_key ?? '').toLowerCase() !== publicKey.toLowerCase()) {
     throw new Error(`DISCORD_PUBLIC_KEY is not this application's public key - set it to ${app.verify_key} in server-account/wrangler.toml`);
   }
-  // DISCORD-CODE: the first live run's refusal (2026-10-17) - a 404 is no channel at all, where a channel the bot cannot
+  // DISCORD-CODE: the first live run's refusal - a 404 is no channel at all, where a channel the bot cannot
   // see is a 403: the id copied was another thing's (a server's, a user's, the application's look the same)
   const read = await call('reading the moderators\' channel (is the bot in the server, with View Channel there?)', `/channels/${channel}`);
   if (read.status === 404) throw new Error(`reading the moderators' channel: Discord knows no channel ${channel} (404) - DISCORD_MOD_CHANNEL is likely a server's, a user's or the application's id; with Developer Mode on (User Settings, Advanced), right-click the channel itself and Copy Channel ID`);

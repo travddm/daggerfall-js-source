@@ -1,6 +1,4 @@
-// INSPECT1 (2026-09-23, the community arc - kurkku: "a profile page that you can bring up when you're near them"; Mac:
-// "For the profile suggestion. I think we develop a new enhanced UI element for the player inspect interaction.
-// Showing their glyph, name, title, stats and worn gear"): THE PROFILE - a card in the middle of the screen for the
+// INSPECT1: THE PROFILE - a card in the middle of the screen for the
 // player the F key found, opened from the F-menu's Inspect row.
 //
 // WHAT IT SAYS, AND WHOSE WORD EACH PART IS:
@@ -71,7 +69,7 @@ export const GEAR_ROWS = Object.freeze([
   [EQUIP_SLOTS.Crystal0, 'Crystal'], [EQUIP_SLOTS.Crystal1, 'Crystal'],
 ]);
 
-/** PROFILE-UI (2026-10-07, Mac: "Lets only organize and polish the player profile. Its a mess"): WHAT THEY WEAR IN ITS
+/** PROFILE-UI: WHAT THEY WEAR IN ITS
  *  PARTS, in the order a reader looks for them - what is in their hands (a shield with the sword), their armour, their
  *  clothes, their jewellery - each piece by its own group (net/wire.js LOOK_GROUPS: every piece the look carries names
  *  one), a hand's piece in hand whatever it is. */
@@ -111,7 +109,7 @@ export function gearGroups(rows) {
 }
 
 /** The states a profile can stand in: waiting on their card, drawn from it, or drawn without one - because they did not
- *  answer, or because the relay cannot carry a card (net/wire.js relaySupportsCard). */
+ *  answer, or because no relay can carry a card (offline). */
 export const PROFILE_STATES = Object.freeze(['asking', 'answered', 'silent', 'unsupported']);
 /** The line under the card for each state - the one place its words live. */
 export function profileNote(state, who = 'They') {
@@ -160,17 +158,9 @@ export function profileStarLine(record) {
   const n = record && typeof record === 'object' ? record.stars?.held : null;
   return Number.isSafeInteger(n) && n > 0 ? t('starfall.card.profile', 'Stars held: {n}', { n }) : null;
 }
-/** KETCH (bible/11-Multiplayer/Sky-Ketch.md section 9): the voyages they sailed to the Tonal Warden's fall - each a receipt the
- *  relay signed and the service counted once a voyage (server-account/src/ketch.js ketchRecordOf) - off the same record,
- *  said only once there is one. */
-export function profileKetchLine(record) {
-  const n = record && typeof record === 'object' ? record.ketch?.sailed : null;
-  return Number.isSafeInteger(n) && n > 0 ? t('ketch.card.profile', 'Voyages sailed: {n}', { n }) : null;
-}
-/** KETCH: the account service's record as the Inspect card's lines - the gates closed, the towns defended, the serpents
- *  slain, the Hours broken, the stars held, the voyages sailed - one door, so the world host lays them all (it laid the
- *  stars none before it). */
-export const profileRecordLines = (record) => ({ gates: profileGateLine(record), raids: profileRaidLine(record), serpents: profileSerpentLine(record), hours: profileSdLine(record), stars: profileStarLine(record), voyages: profileKetchLine(record) });
+/** The account service's record as the Inspect card's lines - the gates closed, the towns defended, the serpents slain,
+ *  the Hours broken, the stars held - one door, so the world host lays them all (it laid the stars none before it). */
+export const profileRecordLines = (record) => ({ gates: profileGateLine(record), raids: profileRaidLine(record), serpents: profileSerpentLine(record), hours: profileSdLine(record), stars: profileStarLine(record) });
 /** AUDIT RENOWN1 UI-3: a view with the peer's Renown as the session knows it NOW - the level rises on a renown frame
  *  while the card stands open, and the card showed the level it was opened with. A level the session does not know
  *  leaves the view's own. */
@@ -184,7 +174,7 @@ export function profileView({ name = null, peer = null, look = null, card = null
   const worn = card?.look ?? look ?? null;
   const race = typeof worn?.race === 'string' ? raceDisplayName(worn.race) : null;
   const klass = typeof worn?.class === 'string' ? worn.class : null;
-  // RENOWN1 (Mac: "having their level appear on the left side of character name and ... ingame profile"): the level the
+  // RENOWN1: the level the
   // relay stamped off their signed token - never the card's own word (the card's "Level" is their Daggerfall level)
   const lv = Number.isSafeInteger(peer?.lv) ? peer.lv : null;
   return {
@@ -202,7 +192,7 @@ export function profileView({ name = null, peer = null, look = null, card = null
     gear: gearRows(worn),
     note: profileNote(PROFILE_STATES.includes(state) ? state : 'silent', who),
     state,
-    // DUEL1 (Mac: "When inspecting a player, they should be able to send an invite to duel"; "Add a dueling K/D to the
+    // DUEL1 (; "Add a dueling K/D to the
     // ... player inspect profile"): the Challenge button's state as the host's duel law says it ({ label, enabled, why }
     // - null: no button, offline or on a relay that cannot carry a duel), and their record's line - the account
     // service's count, read by the account the relay stamped on their card (net/duel/duelRecord.js), never the card's word
@@ -215,7 +205,6 @@ export function profileView({ name = null, peer = null, look = null, card = null
     serpents: profileSerpentLine(record),   // AUDIT SERPENT D4
     hours: profileSdLine(record),   // SD9b
     stars: profileStarLine(record),   // STAR7
-    voyages: profileKetchLine(record),   // KETCH
   };
 }
 
@@ -234,7 +223,7 @@ ${PIXELIFY_FIVE_FACE}
 .dfprofile-head { text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--iron, #2b323b); }
 .dfprofile-icon { display: block; margin: 0 auto 6px; width: 56px; height: 56px; }   /* WITCH1 */
 .dfprofile-title { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4;
-  width: fit-content; max-width: 100%; margin-inline: auto; }   /* SHADOW-FANG (AUDIT A1): the word's own width - a gradient title's stops span the word, not the card */
+  width: fit-content; max-width: 100%; margin-inline: auto; }   /* AUDIT A1: the word's own width - a gradient title's stops span the word, not the card */
 /* PROFILE-UI: where the Renown, the name and the tag will not stand on one line, the line breaks BETWEEN them - the tag
    under the name, never the name in two */
 .dfprofile-name { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 6px; font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
@@ -321,14 +310,14 @@ export function createProfileWindow({ canOpen = () => true, onOpen = null, onClo
     const head = el('div', 'dfprofile-head');
     const icon = v.icon ? profileIconNode(doc, v.icon, 'dfprofile-icon', 56) : null;   // WITCH1: the icon they wear, over the name
     if (icon) head.append(icon);
-    if (v.title) head.append(paintTitle(el('div', 'dfprofile-title', v.title.text), v.title));   // SHADOW-FANG: its colour, or its gradient
+    if (v.title) head.append(paintTitle(el('div', 'dfprofile-title', v.title.text), v.title));   // its colour, or its gradient
     const nm = el('div', 'dfprofile-name');
     nm.id = 'dfprofile-name-node';
     if (v.level) { const lv = el('span', 'dfprofile-renown', v.level); if (v.levelTitle) lv.title = v.levelTitle; nm.append(lv); }   // RENOWN1: left of the name
     nm.append(el('span', 'dfprofile-nametext', v.name));
     if (v.guild) nm.append(el('span', 'dfprofile-guild', v.guild));   // GUILD1c: right of the name
     head.append(nm);
-    // PROFILE-UI (Mac: "Its a mess"): the glyphs on a row of their own under the name, wrapping - beside it, a player's
+    // PROFILE-UI: the glyphs on a row of their own under the name, wrapping - beside it, a player's
     // eighteen squeezed the name to a letter a line
     if (v.glyphs.length) {
       const glyphs = el('div', 'dfprofile-glyphs');
@@ -339,7 +328,7 @@ export function createProfileWindow({ canOpen = () => true, onOpen = null, onClo
     if (v.line) head.append(el('div', 'dfprofile-line', v.line));
     // PROFILE-UI: their record - the duels (DUEL1), the gates closed (WB5b), the towns defended (RAID4), the serpents slain
     // (AUDIT SERPENT D4) - a row of plaques, each its own words, where four dim lines stood one under another
-    const facts = [['dfprofile-duels', v.duels], ['dfprofile-gates', v.gates], ['dfprofile-raids', v.raids], ['dfprofile-serpents', v.serpents], ['dfprofile-hours', v.hours], ['dfprofile-stars', v.stars], ['dfprofile-voyages', v.voyages]].filter(([, t]) => t);   // STAR7: and the fallen stars held; KETCH: and the voyages sailed
+    const facts = [['dfprofile-duels', v.duels], ['dfprofile-gates', v.gates], ['dfprofile-raids', v.raids], ['dfprofile-serpents', v.serpents], ['dfprofile-hours', v.hours], ['dfprofile-stars', v.stars]].filter(([, t]) => t);   // STAR7: and the fallen stars held
     if (facts.length) {
       const record = el('div', 'dfprofile-facts');
       for (const [cls, t] of facts) record.append(el('div', `dfprofile-fact ${cls}`, t));

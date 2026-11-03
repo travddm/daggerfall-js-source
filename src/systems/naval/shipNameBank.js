@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW3 (2026-10-24, bible/03-World/World-Wide.md WW3): THE WATERS' PEOPLE - the name bank a ship's captain and hands are
+// WW3: THE WATERS' PEOPLE - the name bank a ship's captain and hands are
 // named from: past the Bay the waters' area's province's (characters/areaNameBank.js nameBankOfArea - a Nord's in
 // Skyrim's waters), on the Bay her region's as always (17, Daggerfall's, for none). The naming laws
 // (systems/naval/navalShips.js shipNames, shipCrew.js handName) take the bank this answers: they are the account

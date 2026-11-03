@@ -28,7 +28,7 @@
 //    Compared per sender against the value seen when THIS rest began, the same law `restEnemyAt` already keeps.
 import { optionPath } from '../../ui/settings/settingsMap.js';   // ORG2: the rest message names the switch where the map puts it
 
-/** PARTY-REST2b, per-request (2026-09-22, "make this 60 seconds"): how long a vote stands - long enough to coordinate
+/** PARTY-REST2b, per-request: how long a vote stands - long enough to coordinate
  *  a round, short enough that a stale yes from an earlier attempt cannot approve a later one. Lived in world.js;
  *  here so the wire's reader and the voter's own expiry read ONE number. */
 export const PARTY_READY_TIMEOUT_MS = 60_000;
@@ -101,7 +101,7 @@ export function mirrorKey(row) {
   const at = row?.p?.restStartedAt;
   return Number.isFinite(at) && at > 0 ? `${row.acct}:${at}` : null;
 }
-/** PARTY-REST29 (2026-09-23, the party-rest fixes of the friendly-spells drop, on this law): THE STAMP THE START
+/** PARTY-REST29: THE STAMP THE START
  *  COOLDOWN READS - the latest `restStartedAt` among the members standing here and `mine`, with two stamps that no
  *  longer mean "a rest just happened":
  *  - a MEMBER's stamp their own newer `voteAt` supersedes: a leader whose rest window closed with no rest chosen and
@@ -120,7 +120,7 @@ export function cooldownStamp(members, mine, now) {
   return latest;
 }
 
-/** REST-OPT (2026-09-27, Discord - Tabitha: "Allow party members to choose not to rest with their party"): a member
+/** REST-OPT: a member
  *  who rests ALONE - their pose says `nr` (their own "Rest with my party" switch is off). They are no voter, nobody
  *  the leader must gather, and no rest to mirror: the party's night goes on without them, and theirs is their own. */
 export function restsAlone(m) {
@@ -153,7 +153,7 @@ export function restAloneText(mineOn) {
     : `You rest on your own. Turn on "Rest with my party" (${optionPath('card:peerSprites')}) to rest with them.`;   // ORG2: where the map puts it
 }
 
-// AUDIT REST-PARTY (2026-10-03, the party rest under REST5): THE PARTY'S NIGHT, the pure half of world.js's
+// AUDIT REST-PARTY: THE PARTY'S NIGHT, the pure half of world.js's
 // carryPartyNight - lifted here as AUDIT PARTY-REST lifted the vote, because REST5 shipped it as a closure pinned only
 // by regexes over world.js, and three of its laws were wrong in ways no regex could fail:
 //  - IT CARRIED INTO A TAVERN, A TEMPLE AND A GUILD HALL. TAVERN-REST1/GUILD-REST1 (per-request: "every member can rest
@@ -258,8 +258,7 @@ export function carriedRestKind(own, theirs) {
   return t > o ? theirs : own;
 }
 
-// CAMP-ROLL (2026-10-04, the player: "In a party, or with other players. Every player spawns their own enemies when
-// resting", then "Do it"): ONE ROLL A CAMP. REST5 retired the vote online, and with it the one door that let a single
+// CAMP-ROLL: ONE ROLL A CAMP. REST5 retired the vote online, and with it the one door that let a single
 // real rest run at a time, so a party that walks up to a fire and presses Rest together opened one act each - and each
 // act's night rolled its own ambush (world.js runEncounterTick: a rest is always its rester's own roll, AUDIT PSCALE1
 // COUNT-1), each hit standing a pack already sized for the whole party (partyExtraFoes). Four sleepers, up to four

@@ -1,6 +1,4 @@
-// SOLITUDE-RELIEF (2026-10-27, the owner, with Skyrim's Solitude over the Karth: "I really want to transform solitude to
-// match this as close to 1:1 as possible", then "when it comes to cities they are all flat and solitude is the first city
-// where I want to really explore varied depths of terrain"; bible/03-World/Arena-Provinces.md SOLITUDE-RELIEF) - SOLITUDE
+// SOLITUDE-RELIEF - SOLITUDE
 // ON ITS ROCK, pinned: its relief's heights (world/solitudeRelief.js), its pixel's ground on them (world/terrain/
 // capitalRelief.js), its tiles, its blocks' tiers (world/tamrielCapitals.js capitalBlockLift), its markers, every landmark at
 // its height (world/capitalSolitude.js), its walkers kept to their tiers (world/townWalls.js shutRelief), its fabric and

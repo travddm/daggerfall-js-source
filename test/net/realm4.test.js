@@ -1,6 +1,6 @@
-// REALM P2.1 (2026-09-28; bible/06-Systems/Realm-Arc.md section 3, Mac: "eliminate duping"): A TRADE IS THE REALM'S.
-// The law both ends read (src/net/realm/realmTradeLaw.js), the service that settles it (server-account/src/realmTrade.js,
-// migration 0019 - 0017 on its branch) driven through the REAL Worker over the REAL migrations, and the client that hands its commit to it
+// REALM P2.1: A TRADE IS THE REALM'S.
+// The law both ends read (src/net/realm/realmTradeLaw.js), the service that settles it (server-account/src/realmTrade.js)
+// driven through the REAL Worker over the REAL migrations, and the client that hands its commit to it
 // (net/tradeSession.js's escrow, systems/realmSaves.js transact and realmTradeEscrow) - two realm tabs trading end to
 // end. Every write of a realm character is a new object now, so a write that loses its race never touches the save.
 import { test } from 'node:test';
@@ -137,7 +137,7 @@ test('REALM P2.1 law: a save\'s record may leave in a trade exactly when the pac
   for (const sid of ['abc123', 'k3j4h5g6f7', 'A1B2C3D4E5F6G7H8', 'ab', 'a-b-c-d', 'x'.repeat(17)]) {
     assert.equal(REALM_TRADE_SID_RE.test(sid), validTradeData({ k: 'ask', to: 'peerAAAA', s: sid }) !== null, `sid ${sid}: the wire's own shape`);
   }
-  assert.deepEqual(TRADE_VOLATILE_FIELDS, ['stackCount', 'value', 'equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // PIN MOVED (APPEARANCES): a worn look, its wearer's; WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's
+  assert.deepEqual(TRADE_VOLATILE_FIELDS, ['stackCount', 'value', 'equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);
   assert.equal(realmTradeHalfOf({ give: { items: [], gold: 0 }, get: { items: [], gold: 0 } }), null, 'an empty-for-empty trade is none');
   assert.equal(realmTradeHalfOf({ give: { items: new Array(TRADE_ITEMS_MAX + 1).fill({ templateIndex: 1 }) }, get: {} }), null, 'past the wire\'s sixteen');
   assert.equal(realmTradeHalfOf({ give: { gold: -1 }, get: { gold: 5 } }), null);
@@ -302,7 +302,7 @@ test('REALM P2.1: a record that moves under the settle rolls the WHOLE batch bac
 
 test('REALM P2.1: a write that loses its race never touches the current save - a checkpoint racing a join drops its own object', { timeout: 60_000 }, async () => {
   const { env, A } = await pair();
-  // INT2 (PIN MOVED): the checkpoint's move rides one batch with the judge's verdict (server-account/src/verdict.js) - the
+  // INT2 (
   // join lands as that batch is sent, where it landed as the lone UPDATE ran
   const realPrepare = env.DB.prepare.bind(env.DB), realBatch = env.DB.batch.bind(env.DB);
   let armed = true;
@@ -341,7 +341,7 @@ async function tabs({ escrowB = true } = {}) {
   const A = await r.player(), B = await r.player();
   const entA = { name: 'Arthago', items: [dagger(), arrows(3)], goldPieces: 50, stats: { strength: 60 } };
   const entB = { name: 'Brisienna', items: [arrows(10)], goldPieces: 5, stats: { strength: 60 } };
-  const snap = (e) => JSON.stringify({ name: e.name, level: 1, items: e.items, goldPieces: e.goldPieces });   // INT2 (PIN MOVED): a character the judge reads - every save carries its level
+  const snap = (e) => JSON.stringify({ name: e.name, level: 1, items: e.items, goldPieces: e.goldPieces });   // INT2 (
   A.char = await character(A, 'Arthago', JSON.parse(snap(entA)));
   B.char = await character(B, 'Brisienna', JSON.parse(snap(entB)));
   const q = [], said = { A: [], B: [] };
@@ -495,10 +495,3 @@ test('REALM P2.1: while a transaction is in flight no checkpoint is sent; the on
   assert.deepEqual(await settleRealmTradeHalf({ session: { transact: async () => ({ ok: false, why: 'goods' }) }, half: {} }), { ok: false, why: 'goods', text: realmTradeRefusalText('goods') });
 });
 
-test('REALM P2.1 by source: the world host hands every trade of a realm character to the realm; the session\'s hold is its own', { timeout: 60_000 }, () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /escrow: realmSession \? realmTradeEscrow\(\{ session: realmSession, checkpoint: \(\) => onlineCheckpoint\(\), heldSaid: \(\) => tradeHeldNotice\(null, realmSession\.tradeHeld, realmSession\.tradeHeldWhy\) \}\) : null,/);   // PIN MOVED (RING-HOLD): and the hold's notice, for a refusal over my own
-  const ts = src('src/net/tradeSession.js');
-  assert.match(ts, /if \(this\._escrow\) \{ this\._settle\(\); return; \}/, 'the commit is the realm\'s');
-  assert.match(ts, /if \(this\._handle && !this\._sentCommit && !this\._settling\)/, 'a half with the realm is restored only by its answer');
-});

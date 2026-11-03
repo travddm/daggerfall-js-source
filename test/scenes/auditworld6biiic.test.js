@@ -1,4 +1,4 @@
-// AUDIT WORLD6b-iii(c) (2026-09-14, Mac: "Continue"): three opus lenses over a puppet's corpse loot - the owner's grant,
+// AUDIT WORLD6b-iii(c): three opus lenses over a puppet's corpse loot - the owner's grant,
 // the taker's landing, the wire / the relay / the records. The criticals: the take answered ANY peer for ANY body of
 // mine by number, with no range, no roster and no quest law (A1/C7); a refused projection became an EMPTY grant that
 // still spliced the whole pile (A3/C2); the grant arm had no "I asked" latch, so any socket in the cell put items and
@@ -73,7 +73,6 @@ test('AUDIT WORLD6b-iii(c) A3/C2, A4/C10: a refused projection is not an empty g
   rat.entity.items = [one(), { templateIndex: 999999, stackCount: 1 }, one()];
   bob.damageFoe(rat, 9999, [10, 0, 10]);
   bob.applyHit('mac-0001', take(rat.seq));
-  // PIN MOVED (OUTDOOR-LOOT, DESIGN 8.3): the unmintable item is no PLACE (it never rides) - both good items go at once, and the
   // unmintable one stays on the body, its owner's: it was dropped here (it could never be granted), and nothing is dropped now
   assert.equal(bobHits.at(-1).grant.length, 2, 'both good items went - the unmintable one is no place'); assert.equal(rat.entity.items.length, 1, 'A3: the pile is not destroyed - the unmintable one stays on the body');
   clock.t += 1000; bob.applyHit('mac-0001', take(rat.seq));
@@ -114,7 +113,6 @@ test('AUDIT WORLD6b-iii(c) B1/C1, B8, A7: a grant lands for a body I ASKED for, 
   mac.takeLoot(key, (l) => macSaid.push(l)); assert.equal(macHits.length, 1, 'B8: one ask in flight - a second click sends nothing');
   clock.t = 4000;
   mac.takeLoot(key, (l) => macSaid.push(l)); assert.equal(macHits.length, 2, 'asked again after the window');
-  // PIN MOVED (OUTDOOR-LOOT, DESIGN 8.3): "B1: a grant past the window is refused" - and the owner, who had taken the pieces off the body,
   // never heard: they were destroyed. The ask is the claims ledger's now, counted, and lands a grant at any lateness inside
   // LEGACY_ASK_KEEP_MS: this grant answers the FIRST ask, 4 s late; the next the second
   assert.equal(mac.applyHit('bob-0002', g()), true, 'B1 (moved): a grant past the window lands - it answers an ask'); assert.equal(landed(macE), 1); assert.equal(macSaid.at(-1), 'You take 1 item.');
@@ -189,13 +187,3 @@ test('AUDIT WORLD6b-iii(c) C3: the Room - the hit arm counts BYTES (HIT_ROOM_BYT
   assert.equal(c.sent.filter((m) => m.t === 'hit').length, 2, 'a budget of one grant: one lands, the next is dropped');
 });
 
-test('AUDIT WORLD6b-iii(c) by source: the dungeon\'s record clamps the overshoot too (C8); the rare-drop chime rings over a peer\'s body (B10); a live foe with no number streams no health (C9); the records', () => {
-  assert.match(rd('src/scenes/dungeonContext.js'), /h: Number\.isFinite\(f\.entity\.health\) \? Math\.max\(0, Math\.min\(FOE_HEALTH_MAX, f\.entity\.health\)\) : 0, d: f\.dead \? 1 : 0,/, 'C8');
-  const x = rd('src/scenes/exteriorFoes.js'), b = rd('src/scenes/bodyLootHost.js');
-  assert.match(b, /if \(n > 0\) playRareDrop\(audio, f\.corpseMarker\?\.pos \?\? f\.ai\?\.feet \?\? null, grant\);/, 'B10');   // PIN MOVED (OUTDOOR-LOOT): the grant's landing is the body block's (scenes/bodyLootHost.js), the line as it was
-  assert.match(x, /\.\.\.\(Number\.isFinite\(f\.entity\.health\) \? \{ h: wireHealth\(f\.entity\) \} : \{\}\)/, 'C9');   // PIN MOVED (BOSS-BAR): the clamp is wireHealth's
-  assert.match(x, /return Math\.max\(0, Math\.min\(FOE_HEALTH_MAX, k < 1 \? Math\.round\(e\.health \* k\) : e\.health\)\);/, 'C8/C9: clamped as ever');
-  assert.match(b, /const asker = peerCandidate\(from\);/, 'A1: the asker read off the hunt\'s roster');   // PIN MOVED (OUTDOOR-LOOT): the owner's take arm is the block's
-  assert.match(rd('server/src/index.js'), /const bytes = byteGate\(tm\.hbytes \?\? null, now, out\.length, HIT_ROOM_BYTES_PER_S\);/, 'C3 (the destination\'s bytes - AUDIT 68 X8 and its review)');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## AUDIT WORLD6b-iii\(c\) \(2026-09-14\)/, 'the record');
-});

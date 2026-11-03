@@ -1,6 +1,5 @@
 // @ts-check
-// REST-CHANNEL-HEAL (2026-10-04, from play: "the loading bar you see also heals you so you dont wake up with 1% stamina
-// bar ... when it gets canceled half way through"; "not only stamina all other magicka and health aswell"): the rest
+// REST-CHANNEL-HEAL: the rest
 // channel's bar raises health, fatigue and magicka as it fills, toward the rest's own yield, and keeps what it paid.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';

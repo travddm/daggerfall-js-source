@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac, sending Tiny_Ship.fbx: "implement both of these new ship placement models, UV Map/Texture,
-// and ensure it matches the love we gave the other new ship model we implemented"): THE NEW LARGE BOAT - Mac's Tiny Ship,
+// SHIPS-2: THE NEW LARGE BOAT - Mac's Tiny Ship,
 // built as Come Sail Away builds a hull, as the galleon (world/ships/galleonModel.js) and the carrack (world/ships/carrackModel.js)
 // are.
 //

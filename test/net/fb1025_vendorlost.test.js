@@ -4,7 +4,7 @@
 // piece a delivery - and its answer was lost. realmGoldAct asked again from where the record stood and the service said
 // `seq` before it looked the sale up, so the session ended ("The realm did not answer about a trade in progress") and the
 // piece waited uncollected: only the Market tab's settle asked the kept buy again, and it never collected what it bought.
-// Record: bible/01-Overview/bugs/Field-Bugs-2026-10-25g.md. The service half through the real Worker over node:sqlite
+// Record:. The service half through the real Worker over node:sqlite
 // with every migration applied and R2 beside it (test/accountDb.mjs, test/realmSeat.mjs); the book over the real
 // realmGoldAct; the stall over the DOM shim.
 import '../chargenDom.mjs';

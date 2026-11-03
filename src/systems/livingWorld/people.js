@@ -1,8 +1,7 @@
 // @ts-check
-// LW7c (2026-10-05, bible/06-Systems/Living-World.md "LW7c"): THE PEOPLE WHO KNOW YOU - the character's regards
+// LW7c: THE PEOPLE WHO KNOW YOU - the character's regards
 // (relations.js) as a page of the chronicle: each resident the player has met, by NAME and TOWN, their standing, and how
-// long since they were last seen - or that they are dead by the player's hand or at their side. Mac: "make friends or
-// enemies"; a friendship nobody can see is not one the player can keep.
+// long since they were last seen - or that they are dead by the player's hand or at their side.; a friendship nobody can see is not one the player can keep.
 //
 // NOTHING NEW IS SAVED. A resident's id names their town, their roll, their slot and their generation
 // (census.js: `L<map>.<slot>` a household's, `L<map>.t<slot>` a traveller's, `L<map>.w<slot>` the watch's, `~<gen>` a
@@ -97,7 +96,7 @@ export function personWords(p) {
   return `${said} ${seen}`;
 }
 
-/** PLAIN-UI (bible/10-UI/Plain-Words.md; a player: "Where's the UI for relationship in the talk window?"): each standing's
+/** PLAIN-UI (; a player: "Where's the UI for relationship in the talk window?"): each standing's
  *  name on the talk panel's badge. */
 export const STANDING_NAMES = Object.freeze({ friend: 'Friend', neutral: 'Known', enemy: 'Enemy', hostile: 'Hostile' });   // the Chronicle's People page's words
 /**

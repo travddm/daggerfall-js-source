@@ -153,7 +153,7 @@ export function rentalDecision(input, { room = null, nowMinutes = 0, date, quali
   return {
     kind: 'offer',
     days,
-    // ESSENTIALS-HALF (2026-09-30, Discord: "things are way too expensive rn for money to be nerfed so heavily... cut the cost of most essential items by half"): online the room costs half (shopStock.js essentialPrice)
+    // ESSENTIALS-HALF: online the room costs half (shopStock.js essentialPrice)
     price: essentialPrice(calculateTradePrice(cost, quality, skills, false), { online }),
     heartsDay: freeForHeartsDay,
   };
@@ -170,7 +170,7 @@ export function rentRoom(rooms, { room, days, nowMinutes, mapId, buildingKey, na
   if (sceneCache) {
     addPermanentScene(sceneCache, interiorSceneName(mapId ?? room?.mapId, buildingKey ?? room?.buildingKey));
   }
-  // AUDIT REST II P6 (bible/06-Systems/Rest-Arc.md section 5, OPEN 10): online a room counts NIGHTS - the days rented,
+  // AUDIT REST II P6 (OPEN 10): online a room counts NIGHTS - the days rented,
   // and an extension's days on top (restAct.js spendRoomNight spends them; the expiry is still the days lived, DFU's).
   // Offline nothing reads the count: DFU's rest window counts the hours down, as it always has.
   if (room) {
@@ -222,7 +222,7 @@ export function eatOrDrink(index, { gold = 0, gameMinutes = 0, online = undefine
     if (price === 0) price = 1;
   }
   const newLife = holiday === HOLIDAYS.New_Life;
-  // ESSENTIALS-HALF (2026-09-30, Discord: "things are way too expensive rn for money to be nerfed so heavily... cut the cost of most essential items by half"): online the meal costs half (shopStock.js essentialPrice) - and heals as the menu's price, never less
+  // ESSENTIALS-HALF: online the meal costs half (shopStock.js essentialPrice) - and heals as the menu's price, never less
   const cost = essentialPrice(price, { online });
   if (!newLife && gold < cost) return { kind: 'poor' };
   return { kind: 'ate', spend: newLife ? 0 : cost, heal: 2 * price };

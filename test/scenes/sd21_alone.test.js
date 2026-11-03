@@ -1,17 +1,15 @@
-// SD-ALONE (2026-10-08, the Super Dungeons arc; Mac: "We need to make sure companions dont enter the rift"): NO
+// SD-ALONE: NO
 // COMPANION THROUGH THE RIFT. The court's law (GATE-ALONE, test/systems/gatecrowd.test.js) for the Shattered Hour: the place the
 // companion layer asks for (scenes/world.js companionPlace) is none while the player stands in the Hour, so the layer
 // (scenes/crewAshore.js) lifts the crew's hands and the sworn as the player steps through the Rift and stands them
 // behind the player again out of it; the party panel draws no card for them there (partyCompanions); and the Hour says
 // so once as a player steps in with any at their side (sdAloneFrame, through the Hour's own voice). Design:
-// bible/11-Multiplayer/Super-Dungeons.md sections 7 and 16.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { SD_REALM_TEXT } from '../../src/world/superDungeon/sdRealm.js';
 import { madeLevelRule } from '../../src/systems/madeLevel.js';   // EG-H2: the made level's law the world host's doors ask
-/** PIN MOVED (EG-H2): the made level as the mode machine answers it (worldModes `madeLevel`) off the stub's own accessors. */
 const madeOf = (m) => (m?.gateArenaDay?.() != null ? 'court' : m?.sdRealmSlot?.() != null ? 'hour' : m?.egHallBreach?.() != null ? 'spire' : null);
 import { createCrewAshore } from '../../src/scenes/crewAshore.js';
 import { createCompanions } from '../../src/systems/naval/crewCompanions.js';
@@ -33,7 +31,7 @@ function placeOf(slot, { day = null, mode = 'dungeon' } = {}) {
     navalOn: () => true, walkMode: true, playerSpawned: true, _loading: false, travelView: null, csaRuntime: null,
     modes: { transitioning: false, gateArenaDay: () => day, sdRealmSlot: () => slot, interiorPool: () => street, interiorCollider: null }, _mode: () => mode,
     exteriorFoes: street, collider: null, revenantSpawnOptions: () => ({}), effectiveLevel: () => 1, playerEntity: {}, _dungeonPool: () => pool,
-    madeRuleHere: (rule) => madeLevelRule(madeOf({ gateArenaDay: () => day, sdRealmSlot: () => slot }), rule),   // PIN MOVED (EG-H2): the world host's word on the made level
+    madeRuleHere: (rule) => madeLevelRule(madeOf({ gateArenaDay: () => day, sdRealmSlot: () => slot }), rule),
   });
 }
 
@@ -97,7 +95,7 @@ test('SD-ALONE the party panel: no card for a companion in the Hour, the crew\'s
   assert.ok(at > 0, 'partyCompanions');
   const body = WORLD.slice(WORLD.indexOf('{', at) + 1, WORLD.indexOf('\n  }\n', at));
   const cardsOf = new Function('navalOn', 'csaRuntime', 'naval', 'crewAshore', 'composePartyFx', 'swornCards', 'modes', 'madeRuleHere', body);
-  const cards = (...a) => cardsOf(...a, (rule) => madeLevelRule(madeOf(a[6]), rule));   // PIN MOVED (EG-H2): the made level's law, off the stub's mode machine
+  const cards = (...a) => cardsOf(...a, (rule) => madeLevelRule(madeOf(a[6]), rule));
   const naval = { companions: { party: [{ boat: 42, name: 'Hilda', role: 'Bosun', health: 20, maxHealth: 60 }] } };
   const none = { bodies: () => [] };
   const sworn = () => [{ key: 'rv:9', name: 'Ysolde', role: 'Sworn', h: 30, hm: 30, fx: [] }];
@@ -116,7 +114,7 @@ test('SD-ALONE the word: said once, through the Hour\'s voice, as a player steps
     modes: { sdRealmSlot: () => s.slot, get transitioning() { return s.transitioning; } },
     gateVeil: { get busy() { return s.busy; } }, gamePaused: () => s.paused, companionsWithYou: () => s.companions,
     sdSay: (text, ...rest) => { said.push([text, ...rest]); return true; }, SD_REALM_TEXT,
-    online: { get welcomed() { return s.welcomed; }, peers: new Map() }, sdCopyLine: () => null,   // PIN MOVED (SD-SOLO): after the Hour's welcome, and its copy's line (sdparty_relay.test.js)
+    online: { get welcomed() { return s.welcomed; }, peers: new Map() }, sdCopyLine: () => null,
   });
   frame();
   assert.equal(said.length, 0, 'out of the Hour: nothing');

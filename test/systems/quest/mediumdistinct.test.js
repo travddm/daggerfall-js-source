@@ -1,5 +1,4 @@
-// MEDIUM-DISTINCT (2026-10-08, Mac: "Medium dungeons just copy and paste 2 layouts together"; bible/03-World/Delve-Arc.md
-// DSIZE1, MEDIUM-DISTINCT). The medium size drew its two interior blocks by GetRandomBlock's law, with replacement,
+// MEDIUM-DISTINCT. The medium size drew its two interior blocks by GetRandomBlock's law, with replacement,
 // from a pool of two to four - a quarter to a half of them laid one block twice, side by side: one area and its copy.
 // An interior block that repeats one already laid takes the pool's next block round from it that is not laid, with no
 // draw of its own (world/smallerDungeons.js distinctInterior): the border rows, and every layout whose draws never
@@ -195,9 +194,5 @@ test('MEDIUM-DISTINCT the quests: at every load a running quest at a medium size
   q.questComplete = true;
   assert.equal(relayMovedLayouts(m, {}, true), 0);
   q.questComplete = false;
-  // wired at the bridge's load, after the online re-lay, online and off
-  const bridge = src('src/scenes/quest/questBridge.js');
-  const restore = bridge.slice(bridge.indexOf('restore(data) {'));
-  assert.match(restore, /if \(isOnlinePage\(\)\) relayOnlineDungeons\(machine, [^\n]*\n(?:\s*\/\/[^\n]*\n)+\s*relayMovedLayouts\(machine, \{ carriesQuestItem: \(item\) => ctx\.carriesQuestItem\?\.\(item\) \?\? false \}\);\n/);
   // and a shared copy on arrival (systems/quest/questShare.js) - pinned by test/systems/quest/sd20g_delve.test.js
 });

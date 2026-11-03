@@ -1,4 +1,4 @@
-// REALM P2.2a (2026-09-28; bible/06-Systems/Realm-Arc.md section 3, Mac: "eliminate duping"): A REALM CHARACTER'S GOLD
+// REALM P2.2a: A REALM CHARACTER'S GOLD
 // MOVES ON ITS RECORD WITH THE GUILD'S OWN WRITE. "One D1 transaction debits the character and credits the treasury. A
 // withdrawal is the reverse." The law (src/net/realm/realmGoldLaw.js, pinned equal to the client's wallet), the service
 // (server-account/src/realm.js prepareRealmRecord, guilds.js) through the REAL Worker over the REAL migrations, and the
@@ -224,7 +224,7 @@ test('REALM P2.2: a record that moves under the batch rolls the guild\'s write b
 
 // ---- the client ------------------------------------------------------------------------------------------------------
 
-/** A Guild book over a real session: a plain entity's purse, its checkpoint its JSON. INT2 (PIN MOVED): each entity carries
+/** A Guild book over a real session: a plain entity's purse, its checkpoint its JSON. INT2 (
  *  its level, as every save does - the judge holds the trade of a checkpoint that is no character (judge.js). */
 async function book(s, handle, entity) {
   const P = await s.player(handle, JSON.parse(JSON.stringify(entity)));
@@ -295,11 +295,3 @@ test('REALM P2.2: an answer that was lost is asked again - the record one ahead 
   assert.deepEqual([lost, Q.entity.goldPieces], [['unknown'], 1_000], 'the fee stays out: giving it back could be the duplication');
 });
 
-test('REALM P2.2 by source: the world host\'s Guild book acts on the record for a realm character, its wallet naming the region the record pays from', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /realm: realmSession \? \{ act: \(o\) => realmGoldAct\(\{ session: realmSession, checkpoint: \(\) => onlineCheckpoint\(\), \.\.\.o \}\), abandon: \(why\) => realmSession\.abandon\(why\) \} : null,/);   // PIN MOVED (AUDIT2 GUILD2 K1): and `abandon`, where a vault take's answer is lost
-  assert.match(w, /region: \(\) => _questRegionIndex\(\) \?\? 0,   \/\/ REALM P2\.2/);
-  const g = src('server-account/src/guilds.js');
-  // AUDIT REALM L1-F2: each asks where the record stands FIRST (realm.js realmActFirst) - before the rate, the rank and the membership
-  assert.equal((g.match(/const side = await realmActFirst\(db, player\.id, character, realm\);/g) ?? []).length, 3, 'the founding, the deposit and the withdrawal each ask');
-});

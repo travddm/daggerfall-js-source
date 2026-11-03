@@ -1,5 +1,5 @@
 // @ts-check
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The pictures"): THE LANDMARKS' PICTURES, painted - the port's own, every
+// TESA-LANDS (, "The pictures"): THE LANDMARKS' PICTURES, painted - the port's own, every
 // texel a function of its seed, at the game's own scale (a handful of shades, nearest-sampled; grahtOakArt.js's noise and
 // mip chain). Most are GREY grain a look tints (landProps.js LAND_LOOKS: its colour over the picture's mean); the reeds
 // and the vines' are in their own colours. Every picture tiles; a card is cut by its alpha. Pure: RGBA bytes top-down.

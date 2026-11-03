@@ -1,5 +1,4 @@
-// PASSAGE (2026-10-19; the owner: "Add the ability to buy and ride a friendly boat (if one is docked) at any port. You
-// can have the ability to choose where you want to sail. A new form of immersive travel"; bible/03-World/Passage.md) -
+// PASSAGE -
 // THE LAW (systems/naval/passage.js). Pinned here:
 //   - THE HULLS: a sail to cross a sea - the Large Boat, the Small Ship, the Carrack; never the Rowboat or the galley.
 //   - THE FARE: Daggerfall's ship (travel.js calculateTripCost's travelShip arm) over every pixel of the voyage - 25 gold

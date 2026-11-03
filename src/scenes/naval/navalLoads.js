@@ -1,6 +1,5 @@
 // @ts-check
-// SHOT-KINDS (2026-10-17, the owner: "Different cannon shot types, for example a grape shot to thin out crew, Chain to try
-// to take down their sail, etc"; bible/03-World/Naval-Refit.md SHOT-KINDS) - THE CAPTAIN'S CHOICE OF LOAD, at the helm.
+// SHOT-KINDS - THE CAPTAIN'S CHOICE OF LOAD, at the helm.
 // The port's own. The law of the loads is systems/naval/shotKinds.js and the deck's own (navalGunnery.js createGunDeck
 // `setLoad`); this is the helm's side of it, wired by the naval host (navalHost.js createNavalHost `loads`):
 //

@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11; asked where the shipyard and the lighthouse stand, Mac chose "Town's seaward edge - both on the
-// town's own open ground at the edge nearest the sea, placed off the town's layout like the Stables"): WHERE A PORT
+// SHIPYARDS: WHERE A PORT
 // TOWN'S SHIPYARD AND LIGHTHOUSE STAND - read off its layout and the map's own data alone, so every client stands each
 // on one spot (world/merchantYards/merchantYardSites.js's law for the Stable and the Wagon Yard, which this places after, on what they
 // left).

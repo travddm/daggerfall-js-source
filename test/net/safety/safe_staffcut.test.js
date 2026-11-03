@@ -1,5 +1,4 @@
-// STAFF-PANEL2-FIX (2026-10-22; design doc "DFO Staff Panel: design", Weak spots: "Cutting off a staff member misses most
-// doors" - "the cut also ends the person's game sessions and pushes a relay order that strips their staff glyphs"): THE
+// STAFF-PANEL2-FIX: THE
 // STAFF CUT'S ORDER AT THE RELAY. The service's door (SAFE_LAW_PATH) hands the hub a signed `{o:'staffcut', s, i, e}`
 // (net/identityToken.js mintStaffCutOrder, server-account/src/staff.js /v1/staff/cut), and the hub closes each of the
 // account's sockets whose token was minted before it - CLOSE_POLICY 'staff-cut' - so the staff glyphs that token carried

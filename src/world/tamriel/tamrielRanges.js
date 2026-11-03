@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RELIEF-PEAKS (2026-10-27, bible/03-World/Tamriel.md RELIEF-PEAKS; KPbICA on the game's Discord, forwarded by the owner:
-// "No mountains ... Instead we're getting strange looking canyons", "No 'Red Mountain' in Morrowind") - THE RANGES PAST THE
+// RELIEF-PEAKS - THE RANGES PAST THE
 // BAY STAND AS MOUNTAINS (RED MOUNTAIN: RED-MOUNTAIN'S VOLCANO).
 //
 // THE RELIEF HAS NOTHING UNDER ITS GRAIN. The owner's heightmap is a cell every 6.3 km (TAMRIEL-RELIEF: two a picture
@@ -30,7 +29,7 @@
 //   - THE WATERS' VALLEYS: none within WATER of a carved river's course or a lake's shore (world/tamriel/tamrielWaters.js
 //     CARVED_RIVERS, LAKES - their static courses, never the compiled law, which reads the ground), whole past it - a river
 //     runs down a valley of the mountains, never through a gorge it would have to cut.
-//   - RED MOUNTAIN is RED-MOUNTAIN's volcano (world/tamriel/redMountain.js, bible/03-World/Red-Mountain.md), stood in the
+//   - RED MOUNTAIN is RED-MOUNTAIN's volcano (world/tamriel/redMountain.js), stood in the
 //     shaper beside the ranges. This slice's own cone (3,250 m) was retired for it at the merge (the owner's call,
 //     2026-10-27): the ranges stand no cone of their own, and the volcano's flank stills them up its slopes.
 //

@@ -20,13 +20,12 @@ import { idbStore } from '../../world/roadsCache.js';
 /** Bumped BY HAND whenever the bake's output for the same input changes
  *  (roadsCache.js's GENERATOR_VERSION rule) - a cached bake under an old
  *  version is a wrong bake served forever per dungeon. AUDIT 62 F3: 1 had
- *  outlived the y-anchor fix (2026-09-03) and now the stacked-floor weld
+ *  outlived the y-anchor fix and now the stacked-floor weld
  *  and the serialised vertex heights (F1). 3: DUNGEON-SEAMS moved the
  *  corners of 32 dungeon models (world/arch3dSeams.js) under the collider
  *  a bake reads - same triangle count, and in most dungeons the same
  *  height bounds, so the key could not tell a bake of the old corners.
- *  4 (2026-09-27, the soup bake whole - its branch's 3, renumbered when
- *  main's 3 met it at the merge): the soup bake's own cell and agent, doors
+ *  4: the soup bake's own cell and agent, doors
  *  out, flat floors kept, the anchor union - every earlier bake is a coarse
  *  one that sealed its doorways, and a v3 of either change lacks the other. */
 export const NAV_BAKE_VERSION = 4;
@@ -147,7 +146,7 @@ export class NavClient {
       const m = await this._ask({ t: 'bake', floor: input.minY - 10, anchor, anchors, agent }, input).catch((e) => { failed = e; return null; });   // AUDIT PRE-MERGE 0928 N4: the worker's own word is kept for the console
       if (m) result = m;   // its boxes packed, as they landed (INDOOR-WATCH AUDIT W2: unpacking them was the landing's hitch)
     }
-    // A WORKER THAT DIED IS NOT A REASON TO FREEZE THE PAGE (2026-09-27). The soup bake keeps its own cell now, so a
+    // A WORKER THAT DIED IS NOT A REASON TO FREEZE THE PAGE. The soup bake keeps its own cell now, so a
     // large dungeon is 5-11 s and up to ~1.3 GB (the corpus's largest) - AUDIT 59 F1's main-thread freeze, several
     // times over. Here the bake runs only where there never was a worker (node, a test) or the soup is small; a worker
     // that failed on a large one leaves the classic motor standing, which is where a degenerate bake left it too.
@@ -157,9 +156,7 @@ export class NavClient {
     }
     if (!result && this._hadWorker) console.warn(`[enhanced-ai] the nav worker failed - baking ${input.tris} triangles on the main thread (the worker: ${workerWord(failed)})`);   // AUDIT PRE-MERGE 0928 N4: a small soup's fallback says so
     if (!result) result = bakeHere(input, anchor, agent, anchors);
-    // DEGENERATE-BAKE GUARD (2026-09-20, Mac's patch - a report of foes
-    // standing idle across most of a dungeon, with the console showing a
-    // CACHED bake of 11 polys against 17,450 collision triangles).
+    // DEGENERATE-BAKE GUARD.
     //
     // `buildRegions` keeps ONLY the component the anchor's foot reaches and
     // culls every other region as unreachable - right when that is true, but
@@ -183,9 +180,6 @@ export class NavClient {
     // non-walkable wall geometry with the floor area the polys are actually
     // drawn from. Gated on a genuinely large input too, so a real small
     // dungeon - few triangles, honestly few polys - is never touched.
-    // (2026-09-27: the field bake that raised it - 11 polys from 17,592 -
-    // was the bake's own cell, erosion, flat floors and single anchor, not
-    // luck; navBake.js bakeSoup has the four. The guard stays as the net.)
     const polys = result.stats?.polys ?? 0;
     if (input.tris >= DEGENERATE_MIN_TRIS && (polys < DEGENERATE_MIN_POLYS || polys < input.tris * DEGENERATE_POLY_SHARE)) {
       console.warn(`[enhanced-ai] navmesh bake looks degenerate (${polys} polys from ${input.tris} triangles) - not caching, so the next entry gets a fresh retry instead of being stuck with this one`);

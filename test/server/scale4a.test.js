@@ -1,7 +1,7 @@
-// SCALE4a (2026-10-08, Mac: "Do 1 2 and 3" - of PERF-NEXT's follow-up list, the account service's reads halved): every
+// SCALE4a: every
 // authenticated request resolved its secret in TWO statements one after the other - the session by its hash, then its
 // player by id - and the day before YARD-SHED those two were 4.86 and 4.73 million of the database's 17.4 million reads
-// (bible/06-Systems/Online-Arc.md YARD-SHED). One statement now (server-account/src/accounts.js resolveSession,
+// (YARD-SHED). One statement now (server-account/src/accounts.js resolveSession,
 // WHO_SQL): the session's six columns under a prefix beside `p.*`, LEFT JOINed so every exit the two reads had - the idle
 // session deleted, the orphan refused, the stale touch - is met in the same order. The old two reads are the oracle.
 // tools/mutants/scale4a.json.
@@ -104,7 +104,7 @@ test('SCALE4a: a session whose player is gone is refused as the two reads refuse
   const base = d1();
   const a = await createGuest(ctx(base), {});
   const b = await createGuest(ctx(base), {});
-  // an orphan cannot be made through the cascade (0001's FOREIGN KEY ... ON DELETE CASCADE) - the old code checked for it
+  // an orphan cannot be made through the cascade (the schema's FOREIGN KEY ... ON DELETE CASCADE) - the old code checked for it
   // because "cannot happen" is how a null reaches a caller, and so does this one: made here with the keys off
   base._raw.exec('PRAGMA foreign_keys = OFF');
   base._raw.prepare('DELETE FROM players WHERE id IN (?, ?)').run(a.id, b.id);

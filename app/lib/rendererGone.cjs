@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b RENDERER-GONE (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md, BLACK-SCREEN; the Discord's
+// FIELD BUGS 2026-10-21b RENDERER-GONE (, BLACK-SCREEN; the Discord's
 // #bug-reports: "Crashing every minute" - "No message just black", "when I enter dungeons or traveling overworld"): THE
 // GAME'S PAGE STOPPED, AND THE SHELL SAID SO.
 //
@@ -73,7 +73,7 @@ function logWith(text, line) {
   return out;
 }
 
-// GPU-TRAIL (2026-10-24, src/render/gpuTrail.js): THE GPU'S LAST SAMPLES, UNDER THE STOP'S LINE. "It ran out of memory"
+// GPU-TRAIL: THE GPU'S LAST SAMPLES, UNDER THE STOP'S LINE. "It ran out of memory"
 // is only Electron's reason; one reporter's kernel log showed the GPU hang and reset instead. The game's page hands the
 // shell its trail with every sample (app/preload.cjs gpuTrail), the shell keeps the newest, and a process gone writes it
 // under its own line. What the page hands is read field by field - known numbers, three flags, a short GPU name, the
@@ -120,7 +120,7 @@ function trailLines(trail) {
   return out;
 }
 
-// GPU-TRAIL-LOST (2026-10-25): THE GPU'S OWN ENTRY WAITS FOR THE PAGE'S LOST SAMPLE. The GPU process's death reaches the
+// GPU-TRAIL-LOST: THE GPU'S OWN ENTRY WAITS FOR THE PAGE'S LOST SAMPLE. The GPU process's death reaches the
 // shell (child-process-gone) before the page's lost-context sample crosses the bridge, so an entry written at once never
 // held the moment the GPU went - only a later renderer stop's entry did. The entry now waits until a trail lands whose
 // newest sample is lost, or GPU_GONE_WAIT_MS at most; a renderer stop or a quit in the meantime writes it first. Its

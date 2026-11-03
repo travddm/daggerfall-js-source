@@ -1,8 +1,5 @@
 // SURV4 - THE REST LAW: where you sleep decides what the sleep is
-// worth, PURE. Mac's brief (2026-09-18): "Campfires in dungeons/outside
-// + beds should act as the go-to rest options ... Resting toggle both
-// offline/online should always be a last resort option that comes
-// with a cost."
+// worth, PURE.
 //
 // THREE KINDS. A BED (a rented room, your own house, your ship) and a
 // CAMP (within BY_FIRE_REACH of a lit fire - survival/camp.js) are the
@@ -27,7 +24,7 @@
 // (restSession.js) - installed by the host that knows the felt
 // temperature (SURV7's env feed), never here.
 //
-// SURV-TIERS (2026-09-23): THE KIND IS WHERE YOU SLEEP, THE COST IS THE
+// SURV-TIERS: THE KIND IS WHERE YOU SLEEP, THE COST IS THE
 // TIER'S. A bed and a camp cost nothing in any tier. The rough night's
 // price is the tier's rules' `roughRest` (survival/difficulty.js): Hard's
 // is the half hour, the second ask and the stiff morning above; Casual's

@@ -1,6 +1,5 @@
 // @ts-check
-// SD17 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD17;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE BODY MOVED - the Brass Remnant and its Echoes
+// SD17: THE BODY MOVED - the Brass Remnant and its Echoes
 // stood as seven parts (two legs, the torso with its cage and heart, the head, two arms - world/superDungeon/sdRemnantModel.js
 // buildRemnantParts), each turned about its own joint by a pure law of the fight this page holds; the Volley's gears in
 // flight and the Hour-Hand's beam in the air. The Warden is a sprite of 10 states (world/gate/gateBoss.js); the Remnant stood

@@ -1,5 +1,5 @@
-// AUDIT WATCH-KIT (2026-10-01, Mac: "Just want to audit this to make sure it's perfection") - THE SAFETY NET, the
-// lead's share (bible/01-Overview/audits/Audit-Watch-Kit.md, lens D's fresh mutants): behaviour #502 shipped with no pin that
+// AUDIT WATCH-KIT - THE SAFETY NET, the
+// lead's share (, lens D's fresh mutants): behaviour #502 shipped with no pin that
 // could fail on it - the captains' night hold and their flee by flashes, the lurk's night hub, her work off her hurts,
 // the lookout's cry cleared with the sea, a pack stowed only when there is one, a fallen hand's pack not lost, and the
 // world's wiring of the companions' cards and pack door. Each test kills its mutant (tools/mutants/auditwatchkit_net.json).
@@ -132,7 +132,6 @@ test('AUDIT WK-SN the world: the cards drawn every frame of the layer; a card\'s
   const at = WORLD.indexOf('function partyCompanions() {');
   const body = WORLD.slice(WORLD.indexOf('{', at) + 1, WORLD.indexOf('\n  }\n', at));
   const cardsOf = new Function('navalOn', 'csaRuntime', 'naval', 'crewAshore', 'composePartyFx', 'swornCards', 'modes', 'madeRuleHere', body);   // REVENANT-COMPANION: the sworn's cards (none here); GATE-ALONE: the mode machine, for a gate's court
-  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the door asks the made level's law - the world host's word, off the stub's court
   const cards = (...a) => cardsOf(...a.slice(0, 7), ...Array(Math.max(0, 7 - a.length)).fill(undefined), (rule) => madeLevelRule(a[6]?.gateArenaDay?.() != null ? 'court' : null, rule));
   const party = [{ boat: 42, name: 'Hilda', role: 'Bosun', health: 20, maxHealth: 60 }];
   const naval = { companions: { party } };

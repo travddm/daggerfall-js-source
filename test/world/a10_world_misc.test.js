@@ -210,7 +210,6 @@ test('A10: SetAnchor carries the CONTEXT and, in a building, the way back in (:1
   assert.equal(crypt.interior, null, 'a dungeon anchor carries no building record');
   assert.equal(crypt.buildingKey, 0);
   assert.deepEqual(crypt.local, [1, 2, 3]);
-  // PIN MOVED (ROAD-Ar, R2): this used to assert that makeAnchor stored
   // `worldCompensationY` off the interior arm. It did - and nothing in
   // the port ever read it back, so the pin passed while the law it
   // named (RestoreWorldCompensationHeight, :137-143) had no port at
@@ -277,7 +276,6 @@ test('A10: "cache scene before departing" is the three-way arm (:145-151)', () =
 });
 
 test('ROAD-Ar (R2): the compensation restore is an ENCODING here, not a plan field (:137-143)', () => {
-  // PIN MOVED (ROAD-Ar, R2). What stood here asserted
   // `teleportPlan(shop, outside).worldCompensationY === 31` - the
   // payload of RestoreWorldCompensationHeight on the plan object. The
   // plan is consumed by exactly one host (recallToAnchor, the only
@@ -303,7 +301,6 @@ test('ROAD-Ar (R2): the compensation restore is an ENCODING here, not a plan fie
   // row's lift off, and anchorLanding's restandHeight puts it back on
   assert.match(world, /y: groundFrameHeight\(pf\[1\] - state\.compensation\[1\], pf\[0\], pf\[2\]\),/,
     'the anchor height must be stored compensation-free');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): and the anchor's frame's law handed to the re-stand beside its scale
   assert.match(world, /return \[lx, restandHeight\(a\.y \?\? 2, lx, lz, scaleOf\(a\.terrainScale\), a\.groundFrame\) \+ state\.compensation\[1\], lz\];/,
     'and anchorLanding must re-add the LIVE compensation (TERRAIN-SCALE1: to the height stood again on today\'s ground)');
   assert.equal(world.includes('worldCompensationY'), false,

@@ -1,8 +1,8 @@
-// ALLOC-RACE (2026-10-14) - THE ALLOCATION MEASURE CANNOT RACE THE COMPILER.
+// ALLOC-RACE - THE ALLOCATION MEASURE CANNOT RACE THE COMPILER.
 // test/allocChild.mjs carries the flags every allocation-measuring child is
 // spawned with, and test/allocSettle.mjs the settle they preload; this suite
 // holds the settle to its purpose and the suites to the flags
-// (bible/09-Testing/Testing.md, ALLOC-RACE).
+// (, ALLOC-RACE).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

@@ -1,4 +1,4 @@
-// DISC10 (2026-09-23): a minimal DOM, enough to mount the enhanced chargen wizard and drive it as a browser does -
+// DISC10: a minimal DOM, enough to mount the enhanced chargen wizard and drive it as a browser does -
 // window capture listeners first, then the focused element's own handler. Imported for its side effect (globals).
 class Node_ {
   constructor(tag) { this.tagName = String(tag).toUpperCase(); this.children = []; this.parentNode = null; this.style = { setProperty() {} }; this.attrs = {}; this.listeners = {}; this._text = ''; this.className = ''; this.scrollTop = 0; this.scrollLeft = 0; this.disabled = false; this.value = ''; }

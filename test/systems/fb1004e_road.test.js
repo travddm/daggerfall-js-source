@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-04e - WILD-ROAD (bible/01-Overview/bugs/Field-Bugs-2026-10-04e.md, report 4; its HUNT-ROAD went with
+// FIELD BUGS 2026-10-04e - WILD-ROAD (, report 4; its HUNT-ROAD went with
 // HUNT-OUT's text hunt, removed on main).
 //
 // Discord (Private Joker, "Wilderness Encounter Chances"): "perhaps encounters can be scaled with player level or some
@@ -17,7 +17,6 @@ import { SOLITARY_TYPES } from '../../src/characters/mobile/mobileFactions.js';
 import { amGroupRollOwner } from '../../src/systems/campEncounters.js';
 import { partyExtraFoes } from '../../src/systems/party/partyScale.js';
 import { FEATURES } from '../../src/systems/features.js';
-import { WILD_GIANT } from '../../src/systems/wild/wildZone.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
@@ -69,7 +68,7 @@ function stands(over = {}) {
     SOLITARY_TYPES, partyExtraFoes, partySize: () => 1, effectiveLevel: (e) => e?.level ?? 1,
     _standEncounterFoe: (hit) => out.push(hit.mobileType), playerFeet: [0, 0, 0],
     revenantToReturn: () => null, now: 0, sharedClockOn: () => false, worldMinutes: () => 0, spawns: true,
-    wildHere: () => false, WILD_GIANT,   // WILD3/ZONE-GIANTS: not in the open zone here (the slice's own two names - test/systems/auditpscale1.test.js)
+
     getPref: (k) => (k === 'roadEncounters' ? over.pref : undefined), onTheRoad: () => !!over.road, trivialOnRoad, roadCompany, wandererCount,
     Math: Object.create(Math, { random: { value: () => over.roll ?? 0.99 } }),
     ...over.scope,

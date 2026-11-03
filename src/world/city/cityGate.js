@@ -30,8 +30,7 @@
 // mesh.ApplyCurrentClimate(). The hosts supply that swap; this leaf owns
 // the state.
 //
-// OL5 (2026-09-20, Mac: "Town gates online... should all be open at night time
-// online mode"). A closed gate is not decoration - SetOpen swaps the
+// OL5. A closed gate is not decoration - SetOpen swaps the
 // MeshCollider with the mesh (:246-250), so 447 is a wall. Offline that is
 // classic and the player sleeps to morning; online the clock is the world's,
 // nobody can move it, and a shut gate is a walled city sealed for two real

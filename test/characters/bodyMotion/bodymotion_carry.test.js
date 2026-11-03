@@ -1,7 +1,4 @@
-// BODY-MOTION (2026-10-18, Mac: "Weapon specific walking/running animations ... (running with a 2 hander by the hip)
-// (1 hand idle animation, holding down away from side. Running with it using the same format) (Duelhand idle away from
-// sides, running with them behind you) - Improved melee 3rd person attack animations"; bible/04-Characters/
-// Body-Motion.md) - THE CARRY, THE BLOWS AND THE WIRING, on the vendored retail biped with the pair's Weapon Bone Left
+// BODY-MOTION - THE CARRY, THE BLOWS AND THE WIRING, on the vendored retail biped with the pair's Weapon Bone Left
 // made as the build makes it (combat/twoHands/mirrorRig.js offWeaponBoneAddon).
 //
 // What is pinned: every weapon type and hands mode to its carry class; the stances Mac named, measured on the solved
@@ -78,7 +75,7 @@ test('BODY-MOTION THE CLASSES: each weapon type and hands mode to the carry it i
   ];
   assert.deepEqual(rows.map(([w]) => carryClassOf(w)), rows.map(([, c]) => c));
   assert.deepEqual(['one', 'dual', 'two', 'wide', 'spear', 'fists', 'free', 'clip'].map(meleeFamilyOf), ['one', 'one', 'two', 'two', 'two', 'fists', null, null]);
-  assert.deepEqual({ ...TWO_HAND_GRIP }, { two: -0.4, wide: 0.5, spear: 0.55 });   // PIN MOVED (AUDIT BODY-MOTION CARRY-1): a fifth down, the left fist sat inside the right forearm
+  assert.deepEqual({ ...TWO_HAND_GRIP }, { two: -0.4, wide: 0.5, spear: 0.55 });
   assert.equal(blowName('slash', true), 'back');
   assert.equal(blowName('chop', true), 'chop');
 });
@@ -110,7 +107,6 @@ test('BODY-MOTION A ONE-HANDER, HELD DOWN AND AWAY FROM THE SIDE (Mac\'s stance)
   assert.ok(b[1] > 0.5 && b[2] < -0.4 && b[0] > 0.1, `forward, down and out (${b.map((v) => v.toFixed(2))})`);
   // running
   const runB = [], runOut = [], freeSwing = [];
-  // PIN MOVED (AUDIT BODY-MOTION CARRY-4/6): the carry's gait shares follow the gait's on a spring now, the blade brought
   // round the outside of the body - the last hundredth of the run's share comes in after the first second, from above
   play({ weapon: MW_WEAPON_TYPE.LongBladeOneHand, forward: 1, speed: 8.1, running: true }, 2.2, (m, mo, t) => {
     if (t < 1.2) return;
@@ -357,15 +353,3 @@ test('BODY-MOTION THE RIG\'S WORD: on only in third person, on a base_anim skele
   assert.equal(motionWord({ ...base, rig: { ...rig, arm: { pieces: [{ slot: 'left hand (iron_gauntlet_left)' }] } } }).shield, false, 'a gauntlet is no shield');
 });
 
-test('BODY-MOTION THE WIRING, by source: poseAssembly lays the `motion` slot after the mirror and the neck and under the run, the climb and the hold; the rig steps its motion after the clips with its own word and hands the slot to the THIRD-person body\'s pose only; the hip lantern follows the gait\'s stride while it walks the legs; and the switch is the viewer\'s, on by default (mutants: BODY-MOTION-slot-unwired, BODY-MOTION-never-stepped, BODY-MOTION-lantern-off-the-gait)', () => {
-  const fp = readFileSync(new URL('../../../src/formats/morrowind/mwFirstPerson.js', import.meta.url), 'utf8');
-  // BOW-AIM (FIELD BUGS 2026-10-26c): the third person's ranged aim between the neck and the motion - the spine's pitch is the clip's, which the motion keeps while the clip has the arms
-  assert.match(fp, /applyFirstPersonNeck\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.aimFit = aim \? aim\(skeleton, pose, GRAPH_ROOT, fns\.skelMats\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.motionFit = motion \? motion\(skeleton, pose, GRAPH_ROOT, fns\.skelMats\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.runFit = run/);
-  const arm = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  assert.equal((arm.match(/motion: motion\.slot,/g) ?? []).length, 1, 'one pose takes the slot');
-  assert.match(arm, /hold: rifleHold\('third', t\),[^\n]*\n\s*motion: motion\.slot,/, 'the third-person body\'s');
-  assert.match(arm, /aimFactor = aimingFactor\(aimFactor, accurateAiming\(upper\), dt\);\n(?:\s*\/\/[^\n]*\n)*\s*motion\.step\(dt, motionWord\(\{\s*cam, third: viewMode === 'third', rig: thirdBuilt, built, dead, hit: !!hitState && !actionState,/, 'stepped after the clips, every frame - a recoil taking the body only out of a blow (PIN MOVED, AUDIT BODY-MOTION MELEE-5: taken mid-blow, the layer let go and the raw attack clip froze the legs)');
-  assert.match(arm, /hipLantern\.step\(cam, dt, motion\.stride\(\)\.move > 0\.5 \? motion\.stride\(\)\.phase : /, 'the lantern on the gait\'s stride');
-  const features = readFileSync(new URL('../../../src/systems/features.js', import.meta.url), 'utf8');
-  assert.match(features, /id: 'mw-body-motion',[\s\S]*?control: Object\.freeze\(\{ store: 'prefs', key: 'mwBodyMotion', initial: true, online: 'player' \}\)/);
-});

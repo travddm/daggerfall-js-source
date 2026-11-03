@@ -1,4 +1,4 @@
-// POWER-CEILING (2026-10-27, bible/05-Combat/Power-Ceiling.md; the owner: "No exceptions and no band aids"): THE CEILING
+// POWER-CEILING: THE CEILING
 // HOLDS, WALKED. No line of any piece past the Legendary band's top; the ladder the seven rungs it has; every number a
 // power or a set carries at or under today's strongest of its kind. Pinned against every fixed record the game keeps and
 // every item its honest producers mint (test/honestItems.mjs), so a record added above the ceiling fails here, named.
@@ -10,9 +10,8 @@ import {
   RARITY_ORDER, RARITIES, ROLLED_TIERS, AFFIX_RANGES, AFFIX_KINDS, validAffix, allLegendaries, applyRarity, exaltLegendary,
   legendariesFor, GEM_GRADE_LINES, gemPieceCap, rarityEligible, rarityOf, kindParams,
 } from '../../src/systems/loot/lootRarity.js';
-import '../../src/systems/thunderlock.js';   // The Last Lock, a registered Legendary
 import { AETHERIC_RECORDS, mintAetheric } from '../../src/systems/aetheric.js';
-import { GILDED_RECORDS, GILDED_ERAS, mintGilded } from '../../src/systems/gilded.js';
+import { GILDED_RECORDS, mintGilded } from '../../src/systems/gilded.js';
 import { SIGIL_BANDS, SIGIL_POWER_MAX } from '../../src/systems/sigil/sigil.js';
 import { SIGIL_SETS, tierValues, SET_STAGE_MAX } from '../../src/systems/sigil/sigilSets.js';
 import { TECHNIQUE_BANDS } from '../../src/combat/technique/techniqueRoster.js';
@@ -37,8 +36,8 @@ const past = (where, item) => { const p = linesPastCeiling(item); assert.deepEqu
 
 /** THE LEGENDARY BAND'S TOPS, every kind - the ceiling of every line in the game. */
 const TOPS = Object.freeze({
-  damage: 40, armor: 20, stat: 15, resist: 50, skill: 30, weight: 50, elemental: 10, leech: 10, thorns: 10, focus: 10, slayer: 30,
-  standing: 8, warmth: 10, dry: 50, castSpeed: 15, potency: 15, wellspring: 10, technique: 50,
+  damage: 24, armor: 12, stat: 9, resist: 30, skill: 18, weight: 50, elemental: 6, leech: 6, thorns: 6, focus: 6, slayer: 3,
+  standing: 8, warmth: 10, dry: 50, castSpeed: 9, potency: 3, wellspring: 6, technique: 30,
 });
 
 test('POWER-CEILING THE LADDER: seven rungs in their order, three rolled bands and none above the Legendary, the Legendary band\'s tops and the sigil\'s, all literal (mutants: a rung added; a top raised; a band above the Legendary)', () => {
@@ -49,9 +48,9 @@ test('POWER-CEILING THE LADDER: seven rungs in their order, three rolled bands a
   for (const [id, bands] of Object.entries(AFFIX_RANGES)) assert.deepEqual(Object.keys(bands), ROLLED_TIERS, `${id}: a band for each rolled tier and no other - ${RULE}`);
   assert.deepEqual(Object.fromEntries(Object.keys(AFFIX_RANGES).map((id) => [id, AFFIX_RANGES[id].legendary[1]])), TOPS, `the Legendary tops - ${RULE}`);
   assert.deepEqual(Object.keys(SIGIL_BANDS), ROLLED_TIERS);
-  assert.equal(SIGIL_POWER_MAX, 12, 'the sigil\'s top: the Legendary band\'s 12');
+  assert.equal(SIGIL_POWER_MAX, 3, 'the sigil\'s top: the Legendary band\'s 3 (B5; was 4 at B1, 12 before)');
   assert.equal(SIGIL_POWER_MAX, SIGIL_BANDS.legendary[1]);
-  assert.deepEqual(TECHNIQUE_BANDS.legendary, [30, 50]);
+  assert.deepEqual(TECHNIQUE_BANDS.legendary, [20, 30]);
 });
 
 test('POWER-CEILING THE LINE LAW: a line at its kind\'s top is lawful and one past it is refused - the wire\'s own check (lootRarity.js validAffix) and the walk\'s, every kind (mutants: validAffix reading the Rare band; the walk\'s top one high)', () => {
@@ -67,9 +66,8 @@ test('POWER-CEILING THE LINE LAW: a line at its kind\'s top is lawful and one pa
   assert.equal(linesPastCeiling({ affixes: [{ id: 'nope', value: 1 }] }).length, 1, 'a line of no kind is past every ceiling');
 });
 
-test('POWER-CEILING THE RECORDS: every Legendary record (the thirty, the wardrobe\'s, the arcane three, a registered one), every Aetheric and Gilded record and era, its lines and its blow - and each as its producer mints it, an Exalted Legendary too (mutants: a Regalia line at the top plus one; the Hourlock\'s damage at 41)', () => {
+test('POWER-CEILING THE RECORDS: every Legendary record (the thirty, the wardrobe\'s, the arcane three), every Aetheric and Gilded record, its lines and its blow - and each as its producer mints it, an Exalted Legendary too (mutant: a Regalia line at the top plus one)', () => {
   setPref('lootRarity', true);
-  assert.ok(allLegendaries().some((r) => r.id === 'the-last-lock'), 'the registered record walked too');
   for (const r of allLegendaries()) {
     past(`Legendary ${r.id}`, r);
     for (const base of legendaryBases(r)) {
@@ -86,7 +84,7 @@ test('POWER-CEILING THE RECORDS: every Legendary record (the thirty, the wardrob
     past(`Aetheric ${r.id} minted`, it);
     assert.equal(it.rarity, 'aetheric');
   }
-  for (const r of [...GILDED_RECORDS, ...GILDED_ERAS]) {
+  for (const r of GILDED_RECORDS) {
     past(`Gilded ${r.id}`, r);
     const it = mintGilded(r);
     past(`Gilded ${r.id} minted`, it);
@@ -143,11 +141,12 @@ test('POWER-CEILING THE GEMS: every gem\'s line at every grade under its kind\'s
 test('POWER-CEILING THE SETS AND THE POWERS: every number at Ascendant and in every power has a role; a line\'s under the Legendary band\'s top of its kind; every other at or under today\'s strongest of its role (mutants: Ruhn\'s fire past 50; Bound in Silk past 140; a recovery made shorter than any today)', () => {
   // today's strongest of each role - a record past one moves it, and fails here with its name
   const STRONGEST = {
-    above: 75, below: 33, blow: 140, buff: 20, burst: 40, cadence: 3, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
-    gold: 5, guard: 30, heal: 30, hitCap: 25, magicka: 30, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
-    rounds: 4, seconds: 8, shield: 40, ship: 30, spell: 25, splash: 60, stacks: 5, thorns: 30, ward: 40,
+    // most frequent (lower is stronger)
+    above: 75, below: 33, blow: 3, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
+    gold: 5, guard: 3, heal: 30, hitCap: 25, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
+    rounds: 4, seconds: 8, ship: 30, spell: 3, splash: 60, stacks: 5, thorns: 30, ward: 40,
   };
-  holdRoles(powerNumbers(), 149, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
+  holdRoles(powerNumbers(), 135, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
 });
 /** THE ROLES HELD: every number has a role; a line's under its kind's Legendary top; every other at or under today's
  *  strongest of its role (`strongest`, as written down - a lower one is lowered there and in the page). */
@@ -172,19 +171,19 @@ function holdRoles(numbers, least, strongest, lower, table) {
 test('POWER-CEILING THE PATHS AND THE SKY (AUDIT HORIZONTAL D8): every number of every martial and arcane path has a role, a line\'s under the Legendary band\'s top, every other at or under today\'s strongest path number of its role; every channel the sky can carry at or under today\'s cap - a new path, star or channel fails until it is measured (mutants: Prismatic Ward past 40; Opening Strike past 30; Absolution sooner; a path number with no role; a weapon channel raised; the blow\'s whole raised)', () => {
   // the paths keep their shares as fractions, so their strongest are their own (the loot's chance is 30, Prismatic Ward's 40)
   const PATH_STRONGEST = {
-    below: 0.5, blow: 30, blowStack: 3, castSpeed: 20, chance: 40, cost: 20, extra: 0.5, fatigue: 15, foes: 3, guard: 30, heal: 25,
+    below: 0.5, blow: 3, blowStack: 0.5, castSpeed: 20, chance: 40, cost: 20, extra: 0.5, fatigue: 15, foes: 3, guard: 2, heal: 25,
     killHeal: 5, killMana: 20, leech: 10, leechShare: 0.5, manaShare: 0.25, oneIn: 3, pace: 20, perMissing: 2, pierce: 20, reach: 8,
-    recover: 120, refund: 1 / 3, regen: 2, rounds: 8, seconds: 30, shieldCap: 20, spell: 25, spellStack: 3, stacks: 5, times: 2,
+    recover: 120, refund: 1 / 3, regen: 2, rounds: 8, seconds: 30, shieldCap: 20, spell: 5, spellStack: 3, stacks: 5, times: 2,
   };
   holdRoles(pathNumbers(), 100, PATH_STRONGEST, PATH_LOWER_IS_STRONGER, 'PATH_FIELD_ROLES');
   // the sky's channels, each at its cap: the most the whole tree gives, whatever its stars add up to
   const SKY_STRONGEST = {
-    absorb: 15, 'act:life': 40, armor: 10, attribute: 15, axeDmg: 30, beastDmg: 30, blowCap: 30, blowTaken: 15, blowTotal: 50, bluntDmg: 30,
-    bowDmg: 30, carry: 40, castCost: 25, 'castCost:combat': 20, castCostCap: 25, castSpeed: 15, coldDegrees: 10, daedraDmg: 30, dry: 40,
-    evade: 10, fallLess: 40, fatigueLess: 40, fistDmg: 30, heatDegrees: 10, hp: 75, hpPct: 15, hpRegen: 10, killHeal: 6, killMana: 6,
-    longDmg: 30, meleeDmg: 30, mp: 75, mpPct: 15, mpRegen: 10, 'pct:combat': 15, 'pct:life': 15, rageDmg: 25, 'resist:combat': 20,
-    sailSpeed: 15, shortDmg: 30, 'skill:combat': 15, 'skill:life': 20, 'skillPct:combat': 20, 'skillPct:life': 25, spellPierce: 10,
-    spellPower: 30, spellTaken: 15, standing: 10, unawareDmg: 40, undeadDmg: 30, warmth: 6, weaponDmg: 30, 'xp:life': 35, 'yield:life': 30,
+    absorb: 15, 'act:life': 40, armor: 10, attribute: 15, axeDmg: 6, beastDmg: 6, blowCap: 5, blowTaken: 3, blowTotal: 6, bluntDmg: 6,
+    bowDmg: 7, carry: 40, castCost: 25, 'castCost:combat': 20, castCostCap: 25, castSpeed: 15, coldDegrees: 10, daedraDmg: 6, dry: 40,
+    evade: 10, fallLess: 40, fatigueLess: 40, fistDmg: 6, heatDegrees: 10, hp: 15, hpPct: 8, hpRegen: 10, killHeal: 6, killMana: 6,
+    longDmg: 6, meleeDmg: 7, mp: 75, mpPct: 15, mpRegen: 10, 'pct:combat': 15, 'pct:life': 15, rageDmg: 5, 'resist:combat': 20,
+    sailSpeed: 15, shortDmg: 6, 'skill:combat': 15, 'skill:life': 20, 'skillPct:combat': 20, 'skillPct:life': 25, spellPierce: 10,
+    spellPower: 6, spellTaken: 3, standing: 10, unawareDmg: 8, undeadDmg: 6, warmth: 6, weaponDmg: 6, 'xp:life': 35, 'yield:life': 30,
   };
   holdRoles(skyNumbers(), 130, SKY_STRONGEST, [], 'skyNumbers');
 });

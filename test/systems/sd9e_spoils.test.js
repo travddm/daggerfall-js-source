@@ -1,4 +1,4 @@
-// SD9e (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS REMNANT'S SPOILS -
+// SD9e: THE BRASS REMNANT'S SPOILS -
 // the roll off the relay's receipt (systems/superDungeon/sdSpoils.js: section 11's table, the Brass of Numidium last), thrown from
 // where it fell by the spoils pool under keys of its own (scenes/superDungeon/sdSpoils.js - the court's burst for the arena: its
 // moment, its place, kept on the arena's floor over the realm's REAL collider), granted straight into the pack outside
@@ -19,7 +19,7 @@ import { spoilsBase } from '../../src/systems/gate/gateSpoils.js';
 import { applyRarity, rarityChances, lastPass, socketPass, weaponSocketPass, techniquePass } from '../../src/systems/loot/lootRarity.js';
 import { bossGems } from '../../src/systems/gems.js';   // GEM2: the Remnant's gems
 import { rollNumidiumPiece, NUMIDIUM_SET_CHANCE, AETHERIC } from '../../src/systems/aetheric.js';
-import { rollHourlock, GILDED_CHANCE, GILDED } from '../../src/systems/gilded.js';
+import { GILDED } from '../../src/systems/gilded.js';
 import { seededRng } from '../../src/systems/wind/wind.js';
 import { RANDOM_TREASURE_ICONS, validLootItem } from '../../src/systems/loot/loot.js';
 import { mintSdReceipt } from '../../src/net/superDungeon/sdReceipt.js';
@@ -30,7 +30,6 @@ import { SD_ARENA, realmToDungeon } from '../../src/net/superDungeon/sdBrain.js'
 import { remnantPose } from '../../src/scenes/superDungeon/sdRemnant.js';
 import { realmColliderTris } from '../../src/world/superDungeon/sdRealm.js';
 import { Collider } from '../../src/player/collider.js';
-import { bossCardRoll } from '../../src/systems/bossCards.js';   // CARDS9: the Remnant's card, the hoard's last draw
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
@@ -39,14 +38,14 @@ const T0 = 1_000_000;
 
 // ── the roll ──────────────────────────────────────────────────────────
 
-test('SD9e THE ROLL: section 11\'s table - gold 400 a level, a fifth either way; a first piece Legendary a quarter of the time, else Rare; two Rare or better at a boss past the ladder\'s top tier with a lucky hand; every piece known, wearable and never under Rare; the Brass of Numidium a third of the time, after them; the Hourlock one in fifty, last of all (GILDED1); the same seed the same spoils (mutants: the gold; the share; a Magic piece; the source)', () => {
+test('SD9e THE ROLL: section 11\'s table - gold 400 a level, a fifth either way; a first piece Legendary a quarter of the time, else Rare; two Rare or better at a boss past the ladder\'s top tier with a lucky hand; every piece known, wearable and never under Rare; the Brass of Numidium a third of the time, after them, last of all (the Hourlock after it went with the guns); the same seed the same spoils (mutants: the gold; the share; a Magic piece; the source)', () => {
   assert.deepEqual([SD_SPOILS_GOLD_PER_LEVEL, SD_SPOILS_LEGENDARY, { ...SD_SPOILS_SOURCE }], [400, 0.25, { boss: true, tier: 24, luck: 70 }]);
-  let brass = 0, hour = 0, firstLeg = 0;
+  let brass = 0, firstLeg = 0;
   const N = 1500;
   for (let seed = 1; seed <= N; seed++) {
     const s = rollSdSpoils(seed * 2654435761, 20);
     assert.ok(s.gold >= 400 * 20 * 0.8 && s.gold <= 400 * 20 * 1.2 && Number.isInteger(s.gold), `seed ${seed}: ${s.gold} gold`);
-    const plain = s.pieces.filter((p) => p.tier !== AETHERIC && p.tier !== GILDED);
+    const plain = s.pieces.filter((p) => p.tier !== AETHERIC);
     assert.equal(plain.length, 3, `seed ${seed}: three pieces`);
     for (const p of plain) {
       assert.ok(RANK[p.tier] >= RANK.rare, `seed ${seed}: ${p.tier}`);
@@ -54,15 +53,14 @@ test('SD9e THE ROLL: section 11\'s table - gold 400 a level, a fifth either way;
       assert.equal(p.item.rarity, p.tier);
     }
     if (plain[0].tier === 'legendary') firstLeg++;
-    // (GILDED1) after the three: the Brass when it drops, then the Hourlock when it does - nothing else, in that order
-    const after = s.pieces.slice(3), b = after.find((p) => p.tier === AETHERIC), h = after.find((p) => p.tier === GILDED);
+    // after the three: the Brass when it drops - nothing else; no Gilded piece, since the Hourlock went with the guns
+    const after = s.pieces.slice(3), b = after.find((p) => p.tier === AETHERIC);
     if (b) { brass++; assert.equal(b.item.sigil.set, 'numidium', `seed ${seed}: the Brass's alone`); }
-    if (h) { hour++; assert.equal(h.item.gilded, 'the-hourlock', `seed ${seed}: the Hourlock`); assert.equal(after.at(-1), h, `seed ${seed}: the Hourlock after the Brass`); }
-    assert.equal(after.length, (b ? 1 : 0) + (h ? 1 : 0), `seed ${seed}: nothing else after the three`);
-    assert.ok(s.pieces.slice(0, 3).every((p) => p.tier !== AETHERIC && p.tier !== GILDED), 'the Brass and the Hourlock last, or not at all');
+    assert.equal(after.length, b ? 1 : 0, `seed ${seed}: nothing else after the three`);
+    assert.ok(s.pieces.every((p) => p.tier !== GILDED), `seed ${seed}: no Gilded piece`);
+    assert.ok(s.pieces.slice(0, 3).every((p) => p.tier !== AETHERIC), 'the Brass last, or not at all');
   }
   assert.ok(Math.abs(brass / N - NUMIDIUM_SET_CHANCE) < 0.04, `the Brass ${brass} of ${N}`);
-  assert.ok(hour > 0 && Math.abs(hour / N - GILDED_CHANCE) < 0.015, `the Hourlock ${hour} of ${N}`);
   assert.ok(firstLeg / N <= SD_SPOILS_LEGENDARY + 0.03 && firstLeg / N > 0.1, `a first Legendary ${firstLeg} of ${N} (a kind with no record falls to Rare)`);
   assert.deepEqual(JSON.parse(JSON.stringify(rollSdSpoils(77, 9))), JSON.parse(JSON.stringify(rollSdSpoils(77, 9))), 'the same seed, the same spoils');
   assert.equal(rollSdSpoils(77, 0).gold, rollSdSpoils(77, 1).gold, 'a level under 1 is 1');
@@ -73,7 +71,7 @@ test('SD9e THE ROLL: section 11\'s table - gold 400 a level, a fifth either way;
   assert.equal(rareOrBetter(() => (c.legendary / c.rare) * 1.001), 'rare');
 });
 
-test('SD9e THE ORDER: the roll is its law\'s stream, read in order - the gold, the first piece, the two Rare or better, the ladder\'s last pass, the Brass of Numidium, and the Hourlock LAST (GILDED1), so no roll before it moves (an oracle off the same makers, over 300 seeds; mutants: the Brass before the last pass; the two before the first; the Hourlock before the Brass)', () => {
+test('SD9e THE ORDER: the roll is its law\'s stream, read in order - the gold, the first piece, the two Rare or better, the ladder\'s last pass, the Brass of Numidium, then the Hourlock\'s spent draw, so no roll before it moves (an oracle off the same makers, over 300 seeds; mutants: the Brass before the last pass; the two before the first)', () => {
   const oracle = (seed, level) => {
     const rolls = seededRng(seed >>> 0);
     const gold = Math.round(400 * level * (0.8 + 0.4 * rolls()));
@@ -83,15 +81,13 @@ test('SD9e THE ORDER: the roll is its law\'s stream, read in order - the gold, t
     lastPass(pieces.map((p) => p.item), rolls);
     const brass = rollNumidiumPiece(rolls);
     if (brass) pieces.push({ item: brass, tier: brass.rarity });
-    const hour = rollHourlock(rolls);
-    if (hour) pieces.push({ item: hour, tier: hour.rarity });
-    const card = bossCardRoll('abyss', rolls);   // PIN MOVED (CARDS9): the Brass Remnant's own card, one draw after the Hourlock's
-    // PIN MOVED (GEM1/GEM2, bible/06-Systems/Gem-Sockets.md): the sockets' passes over the pieces, then its two gems - last
+    rolls();   // the draw the Hourlock's roll took before the guns were removed, kept so every later draw is what it was
+    rolls();   // the draw the Brass Remnant's card took, kept so every later draw is what it was
     socketPass(pieces.map((p) => p.item), rolls);
     weaponSocketPass(pieces.map((p) => p.item), rolls);
     const gems = bossGems('abyss', rolls);
-    techniquePass(pieces.map((p) => p.item), rolls);   // PIN MOVED (TECH1): a weapon's technique, the door's draw after the gems' (Loot-II law 9)
-    return { gold, pieces, card, gems };
+    techniquePass(pieces.map((p) => p.item), rolls);
+    return { gold, pieces, gems };
   };
   for (let seed = 1; seed <= 300; seed++) {
     const k = (seed * 40503) >>> 0;
@@ -102,20 +98,15 @@ test('SD9e THE ORDER: the roll is its law\'s stream, read in order - the gold, t
 test('SD9e THE LIST: the pieces as the pool throws them - each item with its tier, then the gold, each dressed in the treasure flat its own look-stream chooses; every item the loot\'s validator admits off the wire (mutants: the gold first; a piece undressed)', () => {
   for (const seed of [3, 99, 123456, 0xfffffff0]) {
     const s = rollSdSpoils(seed, 12), list = sdSpoilsList(seed, 12);
-    // PIN MOVED (CARDS9): the Remnant's card after the pieces, before the gold, when it drops; PIN MOVED (GEM2): its two
-    // gems after the card
     assert.equal(s.gems.length, 2);
-    assert.deepEqual(list.map((p) => p.kind), [...s.pieces.map(() => 'item'), ...(s.card ? ['item'] : []), 'item', 'item', 'gold']);
-    assert.deepEqual(list.slice(0, -1).map((p) => p.tier), [...s.pieces.map((p) => p.tier), ...(s.card ? ['aetheric'] : []), 'common', 'common']);
-    if (s.card) assert.equal(list[s.pieces.length].item.card, 'brass-remnant');
+    assert.deepEqual(list.map((p) => p.kind), [...s.pieces.map(() => 'item'), 'item', 'item', 'gold']);
+    assert.deepEqual(list.slice(0, -1).map((p) => p.tier), [...s.pieces.map((p) => p.tier), 'common', 'common']);
     assert.deepEqual(list.slice(-3, -1).map((p) => p.item), s.gems);
     assert.deepEqual(list.at(-1), { kind: 'gold', gold: s.gold, tier: 'common', record: list.at(-1).record });
     const look = seededRng(((seed >>> 0) ^ 0x5eed) >>> 0);
-    // PIN MOVED (AUDIT CARDS-6 A8): the look-stream draws the pieces', then the gold's, then the card's LAST - the gold
-    // pile's picture what the seed gave it before CARDS9 (test/systems/auditcards6_a.test.js holds every hoard to it)
-    // PIN MOVED (GEM2): and the gems' after the card's
+    // the look-stream draws the pieces', then the gold's
     const gem = (_, i) => i === list.length - 3 || i === list.length - 2;
-    const drawn = [...list.filter((p, i) => p.item?.templateIndex !== 581 && !gem(p, i)), ...list.filter((p) => p.item?.templateIndex === 581), ...list.filter(gem)];
+    const drawn = [...list.filter((p, i) => !gem(p, i)), ...list.filter(gem)];
     for (const p of drawn) assert.equal(p.record, RANDOM_TREASURE_ICONS[Math.floor(look() * RANDOM_TREASURE_ICONS.length)]);
     for (const p of list.slice(0, -1)) assert.ok(validLootItem(JSON.parse(JSON.stringify(p.item))), `seed ${seed}: ${p.item.name} off the wire`);
   }
@@ -246,30 +237,3 @@ test('SD9e ON THE ARENA\'S FLOOR: over the realm\'s REAL collider (its floors an
 
 // ── the host ──────────────────────────────────────────────────────────
 
-test('SD9e THE HOST: world.js keeps the Hour\'s pool under its own keys - the dungeon\'s ray, the pack\'s take, each piece\'s own picture, its words - says a spent receipt to the hub as its slot, keeps my realm\'s receipt for the burst and grants one that came outside it, hands the pool to the saves, the loads and the crash\'s door; the realm stands its pieces to the ray and the press, lights them and draws their lines (mutants: the gate\'s keys; spent unsaid; the burst\'s receipt granted; no crash door; the realm\'s targets unstood)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /const sdSpoilsPool = createSpoilsPool\(\{[\s\S]*?keys: SD_SPOILS_KEYS, recordsMax: SD_SPOILS_RECORDS_MAX,[\s\S]*?\}\);/);
-  assert.match(w, /onSpent: \(day\) => \{ const s = sdSpoilsSlot\(day\); return s == null \|\| socialLink\(\)\?\.sendSdSpent\?\.\(s\) === true; \}/);   // AUDIT SD II (L5 F4, PIN MOVED): whether it went - a word that did not is owed
-  assert.doesNotMatch(/const sdSpoilsPool = createSpoilsPool\(\{[\s\S]*?\n {2}\}\);/.exec(w)[0], /feet:/, 'the press is its one hand (GATE-UX): no feet');
-  assert.match(/const sdSpoilsPool = createSpoilsPool\(\{[\s\S]*?\n {2}\}\);/.exec(w)[0], /take: takeSpoil, [\s\S]*gathered: SD_SPOILS_TEXT\.gathered,/, 'the pack\'s plain take - no embers here - and its own words');
-  assert.match(w, /online\.onSdReceipt = \(r, room\) => \{ sdClaims\?\.add\(r\); sdSpoilsReceipt\(r, room\); \};/);
-  assert.match(w, /function sdSpoilsReceipt\(r, room\) \{[\s\S]*?if \(modes\?\.sdRealmSlot\?\.\(\) === c\.d\) \{ _sdReceipts\.set\(c\.d, r\); return; \}[\s\S]*?sdSpoilsPool\.grant\(\{ day: sdSpoilsDay\(c\.d\), acct: c\.s, roll: \(\) => sdSpoilsList\(c\.c, level\), text: SD_SPOILS_TEXT\.granted \}\)/);
-  assert.match(w, /onSlotSaved\(\(characterId\) => \{ try \{ sdSpoilsPool\.saved\(characterId\); \}/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => sdSpoilsPool\.adopt\(rec\), key: SD_SPOILS_KEYS\.store, inSave: _spoilsInSave \}\)/);
-  assert.match(w, /sdSpoilsPool\.loaded\(characterId\);/);
-  assert.match(w, /sdSpoilsPool\?\.heldIds\?\.\(who\)/);
-  assert.match(w, /try \{ sdSpoilsPool\?\.saved\(who, ids\); \}/);
-  assert.match(w, /const sdSpoilsBurst = sdFightLink \? createSdSpoils\(\{/);
-  assert.match(w, /if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}[^\n]*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\);/, 'gathered before the fight is forgotten');   // AUDIT SD II (L5 F5, PIN MOVED): and a checkpoint asked
-  assert.match(w, /if \(inRealm\) \{ try \{ sdSpoilsBurst\?\.frame\(\); \}/);
-  // PIN MOVED (EG-E, Elite-Gates.md section 19): the Spire's Redoubts throw into the Hour's pool too - the two are never stood in at once
-  assert.match(w, /const floorPool = \(\) => \(modes\?\.ktShip\?\.\(\) != null && ketch \? ketch\.spoils : modes\?\.sdRealmSlot\?\.\(\) != null \|\| modes\?\.egHallBreach\?\.\(\) != null \? sdSpoilsPool : spoilsPool\);/);   // PIN MOVED (AUDIT KETCH L2-3: the Ketchmaster's hold its own pool, ahead of the Hour's) PIN MOVED (KETCH): and the Ketchmaster's hold
-  assert.match(w, /spoilTargets: \(\) => floorPool\(\)\?\.targets\(\) \?\? null,/);
-  assert.match(w, /takeSpoil: \(key\) => !!floorPool\(\)\?\.pick\(key\),/);
-  const m = strip(read('src/scenes/worldModes.js'));
-  assert.match(m, /function standSdRealm\(ctx\) \{[\s\S]*?ctx\.addActivationTargets\(\(\) => \(host\.spoilTargets\?\.\(\) \?\? NO_TARGETS\)\);\n\s*ctx\.addActivationNamer\(\(key\) => \(\(typeof key === 'string' && key\.startsWith\('spoil'\)\) \? host\.spoilName\?\.\(key\) \?\? null : null\)\);\n  \}/);
-  assert.match(w, /sdRealmLights: \(\) => \{\s+const lit = sdSpoilsPool\?\.lights\(\) \?\? NO_SD_LIGHTS, fx = [^\n]*;\n[^\n]*\n\s+const hearts = [^\n]*\n\s+if \(!fx\.length && !stone && !hearts\.length\) return lit;\n[^\n]*\n\s+_sdHourLights\.length = 0;\n\s+for \(let i = 0; i < hearts\.length; i\+\+\) _sdHourLights\.push\(hearts\[i\]\);\n\s+for \(let i = 0; i < lit\.length; i\+\+\) _sdHourLights\.push\(lit\[i\]\);/);   // AUDIT SD III (V5, PIN MOVED): the spoils' light first, into one kept list   // SD16 (PIN MOVED): the spoils' light first, the landings' flashes after   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(w, /\.\.\.\(gateCourt\?\.batches\(\) \?\? \[\]\), \.\.\.\(sdSpoilsPool\?\.batches\(\) \?\? \[\]\),/);
-  assert.match(w, /lines = !!sdSpoilsPool\?\.drawPass\(proj, view, eye, t, fog\); const motes = [^\n]*; const sparks = [^\n]*; const beams = [^\n]*; const beam = [^\n]*; const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\) renderer\.markForeignPass\(\);/);   // SD14c (PIN MOVED): the Hour's motes in the same pass   // SD16 (PIN MOVED): its sparks   // SD17 (PIN MOVED): the Hour-Hand's beam after the sparks   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(m, /realmLightsWith\(_dgLit, host\.sdRealmLights\?\.\(\) \?\? NO_LIGHTS, cam\.pos, host\.sdLampDim\?\.\(\) \?\? null\)/);   // AUDIT SD II (L2 F9 - PIN MOVED): the spoils' light before the lamps, into the realm's own arrays; PIN MOVED (SD-LOOK S7): and the Reset's dimming after the eye
-});

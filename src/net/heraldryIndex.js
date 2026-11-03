@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work") —
+// HERALDRY-SHOWN —
 // EVERY GUILD'S HERALDRY THE CLIENT HAS BEEN TOLD, BY ITS TAG.
 //
 // Seats-Arc 8.1: the heraldry is drawn on the guild tag's frame, the

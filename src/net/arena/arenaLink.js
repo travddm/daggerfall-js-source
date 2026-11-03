@@ -1,9 +1,9 @@
 // @ts-check
-// ARENA4 (2026-10-02): WHAT THE CLIENT HOLDS OF THE ARENA ONLINE - the relay's words (net/arena/arenaLaw.js validArenaOut)
+// ARENA4: WHAT THE CLIENT HOLDS OF THE ARENA ONLINE - the relay's words (net/arena/arenaLaw.js validArenaOut)
 // folded into two states: THE HALL (my place in the queue and its band, an offer and its clock, the bout I am sent to,
 // the bouts to watch) and THE BOUT (a mirror of the relay's bout, in the bout law's own shape - systems/arena/arenaBout.js - so
 // the HUD, the crowd and the Herald read a bout the relay runs as they read one this screen runs). Design:
-// bible/11-Multiplayer/Arena.md "7. Online".
+// "7. Online".
 //
 // PURE: a state and a word in, the next state out (the hall), or a mirror moved in place and the events to hear handed
 // back (the bout) - the pins drive both as the host does.

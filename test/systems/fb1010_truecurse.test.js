@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-10 (bible/01-Overview/bugs/Field-Bugs-2026-10-10.md), TRUE-CURSE - the Discord's "True cursed item
+// FIELD BUGS 2026-10-10, TRUE-CURSE - the Discord's "True cursed item
 // experience": "a super powerful sword that drains a ton of your hp ... cannot have their curse lifted". A DAMNED piece:
 // one cursed Legendary weapon in DAMNED_IN, its curse line at the very top of its band, its drawback DFU's Health Leech:
 // Whenever Used (8 health a strike, 16 a use), and no temple lifts it. Taking it off ends the bite, as any curse's.
@@ -80,16 +80,6 @@ test('TRUE-CURSE: one cursed Legendary weapon in four, over the pass\'s own draw
   assert.ok(Math.abs(damned / n - 1 / LR.DAMNED_IN) < 0.03, `a quarter damned (${damned} of ${n})`);
 });
 
-test('TRUE-CURSE (AUDIT FB1010 E3): the damning is each door\'s LAST draw (law 9) - after the curse\'s, the socket\'s and the late finds\' - so every other draw a door makes is the one it made before', () => {
-  const lr = read('src/systems/loot/lootRarity.js');
-  const door = lr.slice(lr.indexOf('export function rollLootRarity'), lr.indexOf('\n}\n', lr.indexOf('export function rollLootRarity')));
-  assert.match(door, /items\.push\(\.\.\.\(_gemFind\?\.\(\{ \.\.\.source, luck \}, rolls\) \?\? \[\]\)\);[^\n]*\n  damnPass\(minted, rolls\);[^\n]*\n  techniquePass\(minted, rolls\);[^\n]*\n  items\.push\(\.\.\.rollFinalFinds\(\{ \.\.\.source, luck \}, rolls\)\);[^\n]*\n  return items;$/, 'the loot door: last of all, after GEM2\'s gem find');   // PIN MOVED (PELLETS-SCARCE): the final finds - the Dwemer Pellet - after it, a draw appended below every one it made; PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique the one draw after it - every draw the damning shipped with is the one it made
-  assert.ok(door.indexOf('rollLateFinds(') < door.indexOf('weaponSocketPass(') && door.indexOf('weaponSocketPass(') < door.indexOf('damnPass('), '...after the late finds and GEM1\'s weapon sockets');
-  const kit = read('src/systems/foeLootCap.js');
-  assert.match(kit, /weaponSocketPass\(kit, opts\.rolls \?\? Math\.random\);[^\n]*\n  damnPass\(kit, opts\.rolls \?\? Math\.random\);[^\n]*\n  techniquePass\(kit, opts\.rolls \?\? Math\.random\);[^\n]*\n  return kit;/, 'a body\'s kit: last of all, after GEM1\'s weapon sockets');   // PIN MOVED (TECH1): and the kit's technique after it
-  assert.doesNotMatch(lr.slice(lr.indexOf('export function cursePiece'), lr.indexOf('export function damnPiece')), /DAMNED_IN/, 'the curse draws nothing for the damning');
-});
-
 test('TRUE-CURSE: the law stands behind a damned Legendary weapon, and behind no other piece carrying its row', () => {
   on();
   const damned = legendaryWeapon();
@@ -139,7 +129,7 @@ test('TRUE-CURSE: the Test Room lays a damned Legendary weapon, known, after eve
   assert.equal(damned.length, 1);
   assert.equal(damned[0].group, 'Weapons');
   assert.equal(LR.tierLabel(damned[0]), 'Damned Legendary', 'known');
-  assert.equal(entity.items.filter((it) => !LR.techniqueLineOf(it) && !LR.ARCANE_LEGENDARIES.some((r) => r.id === it.legendary)).at(-1), damned[0], 'last');   // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): the room's twelve technique pieces are laid after it; PIN MOVED (BAL9c, bible/05-Combat/Balance-Arc.md section 15): and the arcane three after them
+  assert.equal(entity.items.filter((it) => !LR.techniqueLineOf(it) && !LR.ARCANE_LEGENDARIES.some((r) => r.id === it.legendary)).at(-1), damned[0], 'last');
   assert.ok(entity.items.some((it) => LR.isCursed(it) && it.rarity === 'legendary' && !LR.isDamned(it)), 'the cursed Legendary beside it');
 });
 

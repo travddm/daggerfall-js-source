@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FLOW3 (2026-09-26, Mac: "is there a way to really ensure we have a faster workflow with the same standards?"): THE
+// FLOW3: THE
 // TESTS A CHANGE CAN MOVE, AND NO OTHERS - the loop while working. The whole suite is ~6 minutes; a change to one module
 // is pinned by a few dozen files (a change to spoilsPool.js: ten, two seconds). A test file is chosen when
 //   - it changed itself,
@@ -37,7 +37,7 @@ export function importsOf(file, text, root = ROOT) {
     const spec = m[1] ?? m[2] ?? m[3];
     if (!spec || !spec.startsWith('.')) continue;
     const base = normalize(join(dirname(file), spec));
-    for (const cand of [base, `${base}.js`, `${base}.mjs`, join(base, 'index.js')]) {
+    for (const cand of [base, `${base}.js`, `${base}.mjs`, `${base}.ts`, join(base, 'index.js'), join(base, 'index.ts')]) {
       const abs = join(root, cand);
       if (existsSync(abs) && statSync(abs).isFile()) { out.push(relative(root, abs).split('\\').join('/')); break; }
     }

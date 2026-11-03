@@ -1,5 +1,4 @@
-// TOWN-MARKS (2026-09-29, Mac: "For the notice boards in town. Can we physically mark them on the town map, and also mark
-// owned player housing"; bible/10-UI/Enhanced-Maps-Arc.md TOWN-MARKS): THE TOWN MAP'S TWO NEW MARKS, as DATA - which boards and
+// TOWN-MARKS: THE TOWN MAP'S TWO NEW MARKS, as DATA - which boards and
 // which houses, and what each is called. The ink is ui/ink/inkTown.js's (paintBoardMark, paintHomeMark); the sheet
 // (ui/town/townSheet.js) carries them into sheet space and answers them under the pointer; the host (scenes/exteriorAutomapToggle.js
 // townHere) hands them in through the door (ui/town/townMapDoor.js). The enhanced town map only - the classic

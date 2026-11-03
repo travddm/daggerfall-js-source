@@ -1,6 +1,5 @@
 // @ts-check
-// CARGO-ANYWHERE (2026-10-17, the owner: "Cargo should be able to be accessed at any time. Currently it cannot be";
-// bible/03-World/Naval-Refit.md CARGO-ANYWHERE) - THE HOLD'S DOOR: a ship of the player's opened from wherever they are.
+// CARGO-ANYWHERE - THE HOLD'S DOOR: a ship of the player's opened from wherever they are.
 //
 // Come Sail Away opens a hold one way: a press on the boat's cargo box (trigger 112402), within the mod's 3.2 m of it
 // (comeSailAway.js OpenBoatCargo -> OpenCargo -> the host's openCargo). BOAT-MENU's "Open storage" row presses that same
@@ -38,7 +37,6 @@
 
 import { cargoLootTarget } from '../systems/comeSailAway/comeSailAwayItems.js';
 import { CARGO_CONTAINER_IMAGE } from '../systems/comeSailAway/comeSailAwayBoat.js';
-import { seaHoldShut, seaHoldShutText } from '../systems/naval/seaHoldGuard.js';   // AUDIT SEA VENTURES B3: a wrecked ship's hold shut while she may be boarded
 import { t } from '../systems/textManager.js';
 import { fleetShips, titleOf as titleDeedOf } from '../systems/fleet.js';
 
@@ -77,7 +75,6 @@ export function createHoldDoor(deps) {
   function openBoat(boat) {
     if (!boat?.Cargo) return said(false, t('naval.hold.none', 'There\'s no hold here.'));
     if (!opens(boat.hull, boat.Cargo.Items)) return said(false, t('naval.hold.rowboat', 'Rowboats have no hold.'));
-    if (seaHoldShut(boat.uid)) return said(false, seaHoldShutText());
     return !!deps.openHold?.({ ...cargoLootTarget(boat.Cargo), title: titleOf(boat.uid) });
   }
 

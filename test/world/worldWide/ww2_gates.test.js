@@ -1,4 +1,4 @@
-// WW2 (2026-10-24, bible/03-World/World-Wide.md WW2): THE GATES OF EVERY THEATRE - a gate a game day on every lane (the
+// WW2: THE GATES OF EVERY THEATRE - a gate a game day on every lane (the
 // Iliac Bay's, and each province's beyond it), the Bay's lane the gate it always was. The owner: "we can expand world
 // events to happen more than once at a time since the world will be massive".
 import test from 'node:test';
@@ -13,11 +13,11 @@ import {
 } from '../../../src/net/gate/gateLaw.js';
 import { heraldOmenDue, gateSiteDayOk } from '../../../src/net/gate/gateHerald.js';
 import {
-  sharedClassicMinutes, wallMsForClassicMinutes, gateReceiptKey, gateLaneKey, gatePixelOk, gateLaneWire, relaySupportsGateLanes,
-  validGateIn, validRiteIn, validRiteOut, GATE_LANES_WIRE, GATE_LANE_SPAN_WIRE, GATE_LANES_RELAY_MIN, RELAY_VERSION, WORLD_PIXEL_BOUND,
-  gateLanePixelOk, WORLD_WIDE_RELAY_MIN,
+  sharedClassicMinutes, wallMsForClassicMinutes, gateReceiptKey, gateLaneKey, gatePixelOk, gateLaneWire,
+  validGateIn, validRiteIn, validRiteOut, GATE_LANES_WIRE, GATE_LANE_SPAN_WIRE, WORLD_PIXEL_BOUND,
+  gateLanePixelOk,
 } from '../../../src/net/wire.js';
-import { CYRODIIL_THEATRE } from '../../../src/systems/wild/cyrodiilZone.js';
+import { IMPERIAL_ID } from '../../../src/world/tamriel/tamrielLand.js';
 import { scanGatePixels, findGateSite, gateRegions, gateSeaPixel, politicClaimed, GATE_TOWN_MIN_PX, GATE_TOWN_MAX_PX } from '../../../src/systems/gate/gateSite.js';
 import { scanTheatreGate, findTheatreGateSite, theatreGateAreas } from '../../../src/systems/gate/theatreGateSite.js';
 import { createGateLanes, createTheatreGateScans } from '../../../src/scenes/gate/gateLanes.js';
@@ -181,9 +181,8 @@ test('WW2 the hub\'s records a lane: the Bay\'s keys the ones they always were, 
   assert.equal(gateSiteDayOk(gateNumber(bayNow, GATE_LANES), NOW), false, 'a lane the world has not');
 });
 
-test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it always was, and a pixel of the world on a lane past it - the site word, the rite\'s word in and out; the lanes ride a relay that keeps them (mutants: the Bay\'s last column, the world\'s pixel refused, the lanes\' relay)', () => {
+test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it always was, and a pixel of the world on a lane past it - the site word, the rite\'s word in and out (mutants: the Bay\'s last column, the world\'s pixel refused)', () => {
   const lane1 = gateNumber(900, 1);
-  // PIN MOVED (WW-GATES-EVERYWHERE): lane 1 stands now, so the lane that does not stand is Cyrodiil's (9) - its world
   // pixel a lane's pixel, and no word heard on it
   const lane9 = gateNumber(900, 9);
   for (const [d, px, py, ok] of [[900, 0, 0, true], [900, 999, 499, true], [900, 1000, 0, false], [900, -1, 5, false], [900, 5, 500, false],
@@ -197,9 +196,9 @@ test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it alw
     assert.equal(!!validRiteIn({ d, px, py, s: 0, f: 0 }), heard);
     assert.equal(!!validRiteOut({ k: 'cl', d, px, py, at: 5 }), heard);
   }
-  // AUDIT WW F2, F3: the lanes that stand - the Bay's; Cyrodiil's never (the open zone stands no gate); a spent word on
+  // AUDIT WW F2, F3: the lanes that stand - the Bay's and every province's, Cyrodiil's among them; a spent word on
   // no lane that stands names no receipt
-  assert.ok(GATE_LANES_OPEN.includes(0) && !GATE_LANES_OPEN.includes(CYRODIIL_THEATRE));
+  assert.ok(GATE_LANES_OPEN.includes(0) && GATE_LANES_OPEN.includes(IMPERIAL_ID));
   assert.ok(GATE_LANES_OPEN.every((l) => Number.isSafeInteger(l) && l >= 0 && l < GATE_LANES));
   for (const lane of [0, 1, 8, 9, 10, 4000]) {
     const d = gateNumber(900, lane);
@@ -207,16 +206,6 @@ test('WW2 the wire: a gate\'s pixel the Bay\'s map on the Bay\'s lane, as it alw
     assert.equal(gateAdmits(d, gateTimes(d).openAt + 1), gateLaneOpen(lane), `admits on lane ${lane}`);
     assert.equal(gateHolds(d, gateTimes(d).openAt + 1), gateLaneOpen(lane), `holds on lane ${lane}`);
   }
-  // PIN MOVED (AUDIT TESA II Z2): 256 (world254 on WORLD-WIDE's branch, renumbered past AUDIT FOE-KEEPS's world254 and AUDIT
-  // TESA-BIOME's world255), then 260 at the merge with main - and the literal pinned at 256 while main's world256-world259
-  // read no lane. One number now, the world-wide relay's (test/net/audittesa2z_worldwide.test.js ties it to its LAW row)
-  assert.equal(GATE_LANES_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
-  assert.equal(relaySupportsGateLanes(RELAY_VERSION), true, 'this relay keeps them');
-  assert.equal(relaySupportsGateLanes(`world${WORLD_WIDE_RELAY_MIN - 1}`), false, 'the relay before the world-wide one keeps no lane');
-  // WW-GATES-EVERYWHERE: and no relay before it at all (WW2-the-lanes-relay lived on world259, between WW2's own and this)
-  for (let v = 200; v < WORLD_WIDE_RELAY_MIN; v++) assert.equal(relaySupportsGateLanes(`world${v}`), false, `world${v} keeps no lane`);
-  assert.equal(relaySupportsGateLanes(`world${WORLD_WIDE_RELAY_MIN}`), true);
-  assert.equal(relaySupportsGateLanes(null), false);
 });
 
 // ─── the site past the Bay ───────────────────────────────────────────────────────────────────────
@@ -359,7 +348,7 @@ test('WW2 a theatre past the Bay: its gate\'s ground the law\'s - its own theatr
   for (let d = 900; d < 960; d++) {
     const n = gateNumber(d, skyrim), s = findTheatreGateSite(n, scan);
     assert.ok(s);
-    assert.deepEqual([s.day, s.region, s.town.region, s.theatre], [n, 64, 64, skyrim]);   // PIN MOVED (WW-GATES-EVERYWHERE): its province's region (WW-R's 64, Skyrim's) - the court is laid in it, the seats' word names it; null before
+    assert.deepEqual([s.day, s.region, s.town.region, s.theatre], [n, 64, 64, skyrim]);
     assert.ok(areas.includes(s.area));
     assert.ok([...(scan.byArea.get(s.area) ?? [])].includes(worldPixelKey(s.px, s.py)));
     assert.equal(s.place, `${s.town.name}, ${areaName(s.area)}`);
@@ -377,7 +366,7 @@ test('WW2 the theatres\' scans: a lane past the Bay for each theatre whose liste
   const places = createWorldPlaces();
   places.register('bay', [{ mapId: 1, name: 'Daggerfall', px: 210, py: 340, type: LOCATION_TYPES.TownCity, region: 17 }]);
   let land = 0;
-  const scans = createTheatreGateScans({ places, wet: () => false, land: () => land, open: () => true });   // PIN MOVED (AUDIT TESA II P7): the lanes opened, as the host's gates test opens one
+  const scans = createTheatreGateScans({ places, wet: () => false, land: () => land, open: () => true });
   assert.deepEqual(scans.theatres(), [], 'nothing past the Bay: no lane past it');
   assert.equal(scans.siteOf(gateNumber(900, 0)), null, 'the Bay\'s lane is the Bay scan\'s');
   places.register('beyond', provinceTowns('Skyrim'));
@@ -431,7 +420,7 @@ test('WW2 the host\'s gates: one omen a lane, each saying its own lines with its
   assert.equal(gates.cageSite().day, skyN);
   here = null;
   assert.equal(gates.nearCurrent().t.day, bayN, 'nowhere: the Bay\'s');
-  // the relay that does not keep the lanes: the Bay's alone
+  // no link to the relay: the Bay's alone
   ok = false;
   assert.deepEqual(gates.lanes(), [0]);
   assert.deepEqual(gates.currents().map((x) => x.lane), [0]);
@@ -447,27 +436,3 @@ test('WW2 the host\'s gates: one omen a lane, each saying its own lines with its
 
 // ─── the wiring ──────────────────────────────────────────────────────────────────────────────────
 
-test('WW2 the wiring: the world host stands the lanes off the registry (its gate lanes, its theatres\' scans, the relay\'s word on both links), says each lane\'s site past the Bay, and keeps a seat\'s gate the Bay\'s; the client says a site a gate, and none past the Bay to a relay that would close on it; the hub keeps a fall, a site, a herald and a rite a lane and hands a receipt a lane; the account service keeps a gate past the Bay out of a seat (mutants: the lanes\' links, the site said per gate, the hub\'s lane keys, the seat\'s lane)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /const theatreGates = params\.has\('online'\) \? createTheatreGateScans\(\{\s*places: worldPlaces,/);
-  assert.match(world, /const gateOmen = params\.has\('online'\) \? createGateLanes\(\{/);
-  assert.match(world, /scans: theatreGates, lanesOk: \(\) => !!online\?\.gateLanesOk && !!socialLink\(\)\?\.gateLanesOk, here: \(\) => playerTravelPixel\(\)/);
-  assert.match(world, /for \(const \{ lane, c \} of gateOmen\?\.currents\(\) \?\? \[\]\) if \(lane && c\.site\) socialLink\(\)\?\.sendGateSite\?\.\(c\.site\.day, c\.site\.px, c\.site\.py, c\.site\.place\)/);
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): a lane past the Bay's kill names its province's region (scenes/gate/gateSeat.js) - the
-  // Bay's lane's its scan's, as before
-  assert.match(world, /try \{ region = c \? gateSeatRegion\(c\.d, _gateScan\) : null; \} catch \{ region = null; \}/);
-  const online = src('src/net/online.js');
-  assert.match(online, /this\.gateLanesOk = relaySupportsGateLanes\(relayV\)/);
-  assert.match(online, /if \(gateLaneWire\(day\) !== 0 && !this\.gateLanesOk\) return false;/);
-  assert.match(online, /if \(said\.has\(day\)\) return true;/);
-  const relay = src('server/src/index.js');
-  for (const k of ['gatefell', 'gatesite', 'herald']) assert.match(relay, new RegExp(`gateLaneKey\\('${k}', lane\\)`), `the hub's ${k} a lane`);
-  assert.match(relay, /gateLaneKey\(RITE_KEY, lane\)/);
-  assert.match(relay, /for \(const lane of GATE_LANES_OPEN\) await this\._heraldLaneBeat\(h, lane, now\);/);
-  assert.match(relay, /const keys = GATE_LANES_OPEN\.map\(\(lane\) => gateReceiptKey\(sub, lane\)\);/);
-  assert.match(relay, /const k = gateReceiptKey\(sub, gateLaneOf\(day\)\);/);
-  // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): a province's gate its own province's seats' (net/townSeatLaw.js gateRegionOk), no other's
-  assert.match(src('server-account/src/accounts.js'), /c\.x !== 'rite' && gateRegionOk\(c\.d, region\) \? region : null/);
-  // PIN MOVED (WW-GATES-EVERYWHERE): the refusal named for what it is - a region not the gate's lane's ('beyond-the-bay' before)
-  assert.match(src('server-account/src/seatInfluence.js'), /if \(!gateRegionOk\(day, region\)\) return \{ counted: false, why: 'not-its-region' \};/);
-});

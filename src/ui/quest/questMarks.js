@@ -1,8 +1,5 @@
 // @ts-check
-// GUIDE5 (2026-09-29, Mac: "How can we set the foundation and improve the
-// quest system substantially? Like really modernize it, make it more
-// accessible", then, of the Quest Guide arc: "This is your baby. Take
-// your time"): THE MARKS - where a quest points, on the held map and the
+// GUIDE5: THE MARKS - where a quest points, on the held map and the
 // enhanced compass.
 //
 // ONLY WHAT THE PLAYER'S MAP ALREADY KNOWS. A mark stands exactly where

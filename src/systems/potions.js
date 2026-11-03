@@ -37,7 +37,7 @@
 //    refuses. The ingredients are consumed either way.
 
 import { templateByIndex } from './item/itemTemplates.js';
-// PROF12 (bible/06-Systems/Professions-Arc.md 9.3, 37): THE TWENTY
+// PROF12 (9.3, 37): THE TWENTY
 // RECIPES AND THEIR KEY moved, verbatim, to a leaf of their own
 // (systems/potionRecipes.js) - the account service runs DFU's own
 // recipe law on a brew (law 1, "ONE DFU MEMBER, ONE EXPORT":

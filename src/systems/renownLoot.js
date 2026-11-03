@@ -1,7 +1,6 @@
 // @ts-check
-// RENOWN-LOOT (2026-10-05, Mac: "Instead of a flat loot increase, lets also tie it to renoun level"; asked, Mac chose
-// "Half → all → half again", "The roller's own" Renown, and offline "Keep this PR's numbers"): LOOT-EASE'S BUFF,
-// GROWN WITH RENOWN. Design and record: bible/06-Systems/Loot-Arc.md section 20.
+// RENOWN-LOOT: LOOT-EASE'S BUFF,
+// GROWN WITH RENOWN. Design and record:
 //
 // LOOT-EASE (section 19) gave every plain foe and every deep pile the same buff over the loot the live game had: three
 // pieces in four kept where PLAIN-LOOT kept two, the plain ladder a quarter bluer and half again yellower, healing

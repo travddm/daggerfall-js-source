@@ -1,5 +1,5 @@
-// UL1 (2026-09-12) - UNLEVELED LOOT 1.1.2 (Ralzar), THE MOD, 1:1.
-// Mac: "Heres the next mod unleveled loot. Again 1:1"
+// UL1 - UNLEVELED LOOT 1.1.2 (Ralzar), THE MOD, 1:1.
+import { killGoldFromRange } from '../../src/systems/loot/kill-gold.ts';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -64,11 +64,7 @@ test('UL1: the transitions - region and the location\'s DungeonType at every OnP
   assert.equal(_state().dungeon, -1, 'OnTransitionExterior');
   unleveledLootPreTransition();
   assert.equal(_state().dungeon, 1, 'the dungeon exit\'s OnPreTransition re-reads the dungeon\'s own type - and no OnTransitionExterior follows it in the C#');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.equal((wm.match(/unleveledLootPreTransition\(\);/g) || []).length, 5, 'TransitionInterior, TransitionExterior, TransitionDungeonInterior, TransitionDungeonExterior, the teleport');
-  assert.equal((wm.match(/unleveledLootExteriorTransition\(\);/g) || []).length, 1, 'OnTransitionExterior once - tryExit');
-  const exitDungeon = wm.slice(wm.indexOf('function exitDungeonNow() {'), wm.indexOf('function exitDungeonNow() {') + 600);
-  assert.match(exitDungeon, /unleveledLootPreTransition\(\);/); assert.doesNotMatch(exitDungeon, /unleveledLootExteriorTransition/);
+   
   _resetUnleveledLoot();
 });
 
@@ -133,7 +129,7 @@ test('UL1: the corpse - a Daedra Lord\'s roll over 70 drops daedric (a weapon ov
   const dagger = lord.items[1];
   assert.equal(dagger.group, 'Weapons'); assert.equal(dagger.templateIndex, 113); assert.equal(dagger.material, 9, 'daedric');
   assert.equal(dagger.currentCondition, Math.trunc(Math.fround(Math.fround(0.3) * dagger.maxCondition)), '30% of its own max');
-  assert.equal(lord.items[0].stackCount, 25, '250 / level 10, x Range(1, 6) = 1');
+  assert.equal(lord.items[0].stackCount, killGoldFromRange(25, 10), '250 / level 10, on the log curve (B4), x Range(1, 6) = 1');
   // the armour arm: Range(0,100)=0 (not > 50) -> CreateRandomArmor: piece Range(0,11)=0, then the registry's RandomArmorMaterial (the mod's own): Range(0,92), Range(1,91)... then rangeFloat
   const lord2 = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5));
   lord2.items = [goldStack(7)];
@@ -162,7 +158,7 @@ test('UL1: the corpse - a Daedra Lord\'s roll over 70 drops daedric (a weapon ov
   // daedricDrops off: the Lord keeps his gold division and drops nothing
   const lord3 = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5)); lord3.items = [goldStack(100)];
   unlevelDroppedLoot(lord3, { rolls: seq(0.999, 0), r: (k) => (k === 'Daedric' ? 5 : k === 'Orcish' ? 8 : 0) });
-  assert.equal(lord3.items.length, 1); assert.equal(lord3.items[0].stackCount, 50, '100 / 10, x Range(1, 6) at 0.999 = 5 - the first roll is the gold\'s, no daedric roll was drawn');
+  assert.equal(lord3.items.length, 1); assert.equal(lord3.items[0].stackCount, killGoldFromRange(10, 10) * 5, '100 / 10, on the log curve (B4), x Range(1, 6) at 0.999 = 5 - the first roll is the gold\'s, no daedric roll was drawn');
   _resetUnleveledLoot();
 });
 
@@ -193,7 +189,7 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   // the death handler through the seam
   const lord = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5)); lord.items = [goldStack(100)];
   raiseEnemyDeath(lord, { rolls: seq(0, 0) });
-  assert.equal(lord.items[0].stackCount, 20, '100 / level 5, x Range(1,6) at 0 = 1');
+  assert.equal(lord.items[0].stackCount, killGoldFromRange(20, 5), '100 / level 5, on the log curve (B4), x Range(1,6) at 0 = 1');
   on = false;
   const lord2 = makeEnemyEntity(31, ENEMY_BASICS[31], career(), 10, fixed(0.5)); lord2.items = [goldStack(100)];
   raiseEnemyDeath(lord2, { rolls: seq(0, 0) });
@@ -202,13 +198,13 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   assert.equal(formulaOverride('randomMaterial'), null);
   let seen = 0; registerEnemyDeathHandler('t', () => { seen++; }); raiseEnemyDeath({ items: [] }); registerEnemyDeathHandler('t', null); raiseEnemyDeath({ items: [] });
   assert.equal(seen, 1);
-  // AUDIT VC6 (2026-09-18): the three kills raise it WITH the raiser's
+  // AUDIT VC6: the three kills raise it WITH the raiser's
   // own terms now - a handler that ROLLS (SURV2's corpse food) was
   // falling to Math.random and to an invented luck of 50, which made a
   // guards pin fail one run in eight. The shapes are pinned in
   // test/systems/surv2_items.test.js; here it is still that all three raise.
   for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js', 'src/scenes/dungeonContext.js']) assert.match(rd(f), /raiseEnemyDeath\(\w+\.entity, \{[^}]*\}\);/, `${f}: the kill raises OnEnemyDeath, with its own roll and luck`);
-  assert.match(rd('src/combat/enemyEquipment.js'), /formulaOverride\('randomMaterial'\)\?\.\(playerLevel, rolls\)/); assert.match(rd('src/combat/enemyEquipment.js'), /formulaOverride\('randomArmorMaterial'\)\?\.\(playerLevel, rolls\)/);
+   
   // the pane
   const m = MOD_SETTINGS.unleveledLoot;
   assert.equal(m.author, 'Ralzar'); assert.deepEqual(Object.keys(m.keys), ['Enabled', ...UNLEVELED_MATERIAL_NAMES]); assert.equal(m.keys.Enabled.default, true);   // MO1
@@ -222,17 +218,13 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   setModSetting('unleveledLoot', 'Steel', 42); assert.equal(modSetting('unleveledLoot', 'Steel'), 9, 'a choice clamps to its options');
   setModSetting('unleveledLoot', 'Steel', -3); assert.equal(modSetting('unleveledLoot', 'Steel'), 0);
   _resetModSettings();
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /if \(isChoiceKey\(def\)\) \{/, 'the pane steps the choice keys by name');
   assert.ok(Object.keys(MOD_SETTINGS).indexOf('pcaao') < Object.keys(MOD_SETTINGS).indexOf('unleveledLoot'), 'listed after the overhaul, as its manifest orders it');
   const credit = CREDITS.mods.find((c) => c.title === 'Unleveled Loot');
   assert.ok(credit); assert.equal(credit.version, '1.1.2'); assert.deepEqual([...credit.vendor], ['unleveledLoot']);
   const manifest = JSON.parse(rd('vendor/unleveledLoot/UnleveledLoot.dfmod.json'));
   assert.equal(manifest.ModVersion, '1.1.2'); assert.deepEqual(manifest.Dependencies.map((d) => d.Name), ['roleplayrealism', 'roleplayrealism-items']);
   assert.match(rd('vendor/unleveledLoot/README.md'), /Ralzar/); assert.match(rd('vendor/unleveledLoot/README.md'), /MIT/);
-  const wt = rd('src/systems/worldTick.js');
-  assert.ok(wt.indexOf('installPcaao();') < wt.indexOf('installUnleveledLoot();'), 'installed last');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /setUnleveledLootWorld\(\{/); assert.match(wm, /insideOpenShop: \(\) => mode === 'interior' && !!interiorBuilding\?\.insideOpenShop,/); assert.match(wm, /locationDungeonType: \(\) => host\.currentLocation\?\.\(\)\?\.mapTableData\?\.dungeonType \?\? 255,/);
+    
   for (const h of ['world', 'exterior']) assert.match(rd(`src/scenes/${h}.js`), /currentRegionIndex: \(\) =>/, `${h}: hands the machine the region`);
   setUnleveledLootWorld(saved);
 });

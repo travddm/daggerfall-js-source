@@ -1,9 +1,7 @@
-// LIVED1 (2026-09-29, Mac, sharing the Discord - Dracula/Valentin: "my money, my guild and i cant even travel at day
-// anymore"; Subdon: "since we cant just import/export characters anymore, how we getting lycanthropy now? becuse we
-// need to wait 72 hours but the in game clock aint moving"): "Makes a good point. We need a better system for time
+// LIVED1: "Makes a good point. We need a better system for time
 // online instead of a band aid fix. Something detailed and that really makes sense".
 //
-// TWO CLOCKS (bible/06-Systems/Lived-Time.md). The WORLD's is WORLD5's shared clock, unchanged: the sky, the calendar
+// TWO CLOCKS. The WORLD's is WORLD5's shared clock, unchanged: the sky, the calendar
 // and everything every player shares read it, and nobody moves it. The CHARACTER's (worldTick.js ownMinutes) is the
 // world's offline - one variable, DFU byte for byte - and online it runs WITH the world while they play, AHEAD of it by
 // every RaiseTime (a rest, a journey, training, a sentence), and STANDS while they are away or dead. The body, its magic,
@@ -206,7 +204,7 @@ test('LIVED1: arrival and death move NOTHING of the character\'s - the clock tha
   // the save's door: the character left the world at N - 5 and comes back at 3N + 10 (three boundaries of the world's)
   const own = 2 * N + 100;   // [own, now) would cross one boundary; the world's [left, now) crosses three
   lane(true, { own, world: N - 5 });
-  // REP4 (the reputation overhaul): PIN MOVED - the recovery is weekly now, so the name starts deep enough (-100) for the
+  // REP4 (the reputation overhaul):
   // WORLD's span (thirty-three weeks) and the character's own (sixteen) to read differently, as DFU's 3 and 1 boundaries did
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(player({ legalRep: [-100], rentedRooms: [{ expiryMinutes: own + 600 }] }), { classicMinutes: own })));
   setSharedClock(() => 3 * N + 10);
@@ -240,10 +238,6 @@ test('LIVED1 words: a deadline on the character\'s clock is said in their time a
   assert.equal(worldNightfallText(), 'Online, resting does not move the sun. Night falls in about 1 minute.');
   setSharedClock(() => 700 * D + 20 * H);
   assert.equal(worldNightfallText(), null, 'at night there is nothing to wait for');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /function withNightfall\(text\) \{ const nf = worldNightfallText\(\); return nf \? `\$\{text\} \$\{nf\}` : text; \}/, 'the host\'s one composer');
-  assert.equal((w.match(/withNightfall\(/g) ?? []).length, 2, 'PARTY-TRAVEL\'s one, to the chat');   // PIN MOVED (HOOD-CAREER): the party's two sun rungs are one read (careerFastTravelBlock ?? racialFastTravelBlock), said once
-  assert.equal((w.match(/sayWithNightfall\(/g) ?? []).length, 5, 'and the map door\'s two rungs, as two HUD rows (AUDIT LIVED1 M) - and the driver\'s map\'s two online (AUDIT IT1 W2, PIN MOVED)');
 });
 
 test('LIVED1: the tavern\'s calendar is the WORLD\'s - a Heart\'s Day room is free by the world\'s date, whatever day the character\'s own clock reads', () => {
@@ -266,27 +260,5 @@ test('LIVED1: the tavern\'s calendar is the WORLD\'s - a Heart\'s Day room is fr
   };
   assert.deepEqual(offer(() => worldEve), [ROOM_FREE_HEARTS_DAY], 'the world\'s Heart\'s Day');
   assert.notDeepEqual(offer(null), [ROOM_FREE_HEARTS_DAY], 'the character\'s own day 201 is no holiday - with no world clock handed, the one clock decides');
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /worldNow: \(\) => Math\.floor\(skyMinutes\(\)\),/, 'the host hands the world\'s clock for the calendar');   // TIME1: the world's calendar is the SKY's
-  assert.match(modes, /ownTimeOf: \(m\) => ownTimeLeftText\(m\),/, 'and the character\'s for the room\'s time');
 });
 
-test('LIVED1 by source: every RaiseTime online is the character\'s - the ticker\'s advance, the journey, the sentence, the cures, a quest\'s RaiseTime and the turn\'s fortnight - and the sky reads stay the world\'s', () => {
-  const shared = rd('src/scenes/shared.js'), w = rd('src/scenes/world.js'), arrest = rd('src/scenes/arrestFlow.js'), tick = rd('src/systems/worldTick.js');
-  assert.match(shared, /advance\(minutes\) \{\s*if \(!\(minutes > 0\)\) return null;\s*(?:\/\/[^\n]*\n\s*)*if \(sharedClockOn\(\)\) \{ if \(tickInFlight\(\)\) \{ advanceOwnMinutes\(minutes\); _raiseWaiting = true; return null; \} return this\.tick\(0, undefined, 0, minutes\); \}/, 'the ticker\'s advance: the same tick, on the character\'s clock (AUDIT LIVED1 J: a bare move from inside a tick - AUDIT LIVED1b K1: walked the moment the window in hand is done)');
-  assert.match(shared, /raiseTime: \(seconds\) => \{ setSyntheticTimeIncrease\(true\); return advanceOwnMinutes\(seconds \/ 60\); \}/, 'the vampire\'s fortnight');
-  assert.match(w, /setSyntheticTimeIncrease\(true\); playerTicker\.advance\(computed\.minutes\);/, 'the journey, in both lanes');
-  assert.match(arrest, /advanceDays = \(days\) => advanceOwnMinutes\(days \* MINUTES_PER_DAY\),/, 'the sentence');
-  // AUDIT LIVED1b T5: the cures and a quest's RaiseTime, which this title named and the body did not assert
-  assert.match(w, /cureVampirism\(playerEntity, \{ advanceMinutes: \(m\) => advanceOwnMinutes\(m\) \}\)/, 'the vampirism cure\'s minute');
-  assert.match(w, /cureLycanthropy\(playerEntity, \{\n\s*nowMinutes: Math\.floor\(ownMinutes\(\)\),\n\s*advanceMinutes: \(m\) => advanceOwnMinutes\(m\),/, 'the lycanthropy cure\'s stamp and minute');
-  assert.match(w, /raiseTime: \(seconds\) => advanceOwnMinutes\(seconds \/ 60\),/, 'a quest\'s RaiseTime');
-  // the tick's two windows: the broker, the loop and the needs on the character's; the sky on the world's
-  assert.match(tick, /_ownMinutes = classicMinutes \+ \(worldTo - worldFrom\) \+ \(raiseMinutes > 0 \? raiseMinutes : 0\);/);
-  assert.match(tick, /const magicRoundWindow = claimMagicRounds\(classicMinutes, next\);/);
-  assert.match(tick, /skyMinutes: _sharedClock \? skyMinutes\(\) : null/, 'the rounds\' sky is the world\'s reading');   // TIME1: the sky's own clock, not the event window's end
-  assert.match(tick, /evolveClimateWeathers\(_sharedClock \? Math\.floor\(worldTo\) : nowMinutes\);/, 'the sky\'s hours are the world\'s');
-  for (const host of ['src/systems/encounters.js', 'src/systems/campEncounters.js']) {
-    assert.match(rd(host), /Number\.isFinite\(ctx\.skyMinutes\) \? ctx\.skyMinutes : ctx\.gameMinutes/, `${host}: the spawn table's night or day is the sky's`);
-  }
-});

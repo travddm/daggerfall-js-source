@@ -1,4 +1,4 @@
-// CLIMB1 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md): THE
+// CLIMB1 (the Enhanced Climbing arc): THE
 // LEDGE SENSOR, THE MANTLE AND THE VAULT. The laws (player/parkour.js), the
 // sensor against a real Collider's boxes, the motor living them (a jump that
 // mantles, a held jump that catches, a run that vaults, a classic climb that

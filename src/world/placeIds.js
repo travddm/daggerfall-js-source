@@ -1,5 +1,5 @@
 // @ts-check
-// BAY-LEFT-B (2026-10-27, bible/03-World/Arena-Provinces.md BAY-LEFT-B) - A PLACE THE PORT MADE, BY ITS MAP ID ALONE. A
+// BAY-LEFT-B - A PLACE THE PORT MADE, BY ITS MAP ID ALONE. A
 // leaf (a reader that keys by a map id - systems/banking.js's deeds, systems/discovery.js's store - asks it without the
 // places' plans).
 //

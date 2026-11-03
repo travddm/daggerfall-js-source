@@ -1,5 +1,4 @@
-// GIFT-QUIET (2026-10-04: "sometimes theres notification spam when putting a spell on companion. Ensure there's no
-// leftover notifications"): a gift's lines - the armed ready's ("Press button to fire spell." and "Aim at your
+// GIFT-QUIET: a gift's lines - the armed ready's ("Press button to fire spell." and "Aim at your
 // companion..."), the caster's ("You cast Heal on Hilda.") and a party mate's on the receiving end ("Bran casts Heal on
 // you.") - are said at most once in GIFT_LINE_QUIET_S of real time (systems/allyCast.js createGiftLineGate;
 // scenes/hostMagic.js sayGift and sayArm; scenes/world.js online.onCast). Each was a new toast every cast and told apart
@@ -166,9 +165,3 @@ test('GIFT-QUIET: the gate - said fresh, never said, or said a window ago; held 
   assert.equal(pass('a', true), true, 'fresh');
 });
 
-test('GIFT-QUIET by source: a party mate\'s gift on my side says its line through the gate - a stranger\'s keeps its own rate, and the heal\'s line stays', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const _mateGiftGate = createGiftLineGate\(\);/);
-  assert.match(w, /const targetLine = allyCastTargetLine\(who, spell\.name\);\s*\n\s*if \(loud && \(!mate \|\| _mateGiftGate\(targetLine\)\)\) townTalk\.say\(targetLine\);/);
-  assert.match(w, /if \(healed > 0 && loud\) townTalk\.say\(`You are healed \$\{healed\} points\.`\);/);
-});

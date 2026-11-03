@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// OH-D / OH-E (2026-09-26): THE ABYSS - There's a Hole in the Bottom of the
+// OH-D / OH-E: THE ABYSS - There's a Hole in the Bottom of the
 // Ocean's dungeon half (jet082's OceanHoles, 1.1.0). A swimmer touching a
 // pit's entrance is taken down (TryEnterPit): a dungeon borrowed by hash
 // (TryFindTemplate), cloned and renamed (CloneDungeon, BuildDungeonName), the

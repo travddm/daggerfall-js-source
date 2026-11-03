@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part five (Mac: "audit this") - FRIENDS-SYNC, the hub's account the signed-in player (relay world142).
+// AUDIT 2026-10-01 part five - FRIENDS-SYNC, the hub's account the signed-in player (relay world142).
 // The lane drove the real Room over test/fakeRoom.mjs with PRODUCTION-shaped hellos - the token's subject is the player,
 // the hello's `acct` the browser profile's id - where the older hub pins sign each hello for its own account. Five
 // findings, each red on the branch as committed:

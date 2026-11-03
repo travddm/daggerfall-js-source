@@ -82,7 +82,7 @@ export const CONDITION_VALUE_MAX = Object.freeze([
   0x14, 0x14, 0x01, 0x01, 0x01, 0x64, 0x14, 0x14, 0x01, 0x01, 0x01, 0x1E, 0x01,
 ]);
 
-/** PlayerEntity.regionData.Length (:99) - one record per region. WW-R (bible/03-World/World-Wide.md WW-R): and the
+/** PlayerEntity.regionData.Length (:99) - one record per region. WW-R (WW-R): and the
  *  provinces' past the Bay after the Bay's 62 (formats/mapsTables.js REGION_NAMES) - DFU's array is the Bay's; a save's
  *  shorter store is padded on its restore (restoreRegionConditions). */
 export const REGION_COUNT = REGION_NAMES.length;

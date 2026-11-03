@@ -1,5 +1,4 @@
-// SD14a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD14a;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE BRASS REMNANT'S VOICE (scenes/superDungeon/sdRemnantVoice.js) -
+// SD14a: THE BRASS REMNANT'S VOICE (scenes/superDungeon/sdRemnantVoice.js) -
 // its body and its Echoes heard off the fight this page holds. A fight first seen is taken as it stands; its wake and
 // its fall heard live alone; its turns to the Dragon Break and the Last Moment; out of time and back; stunned and up
 // again; a grunt for each share of its health lost, spaced, and a heal moving the count; the gears slipping once under
@@ -42,7 +41,7 @@ test('SD14a ITS VOICE IS THE IRON ATRONACH\'S, for a colossus: Daggerfall\'s own
   assert.deepEqual([iron.moveSound, iron.barkSound, iron.attackSound], [SD_IRON.move, SD_IRON.bark, SD_IRON.attack]);
   const C = SD_VOICE_CUES;
   const flat = Object.values(C).flatMap((c) => (Array.isArray(c) ? c : c.clip !== undefined ? [c] : Object.values(c)));
-  assert.equal(flat.length, 32);   // AUDIT SD III (A2, PIN MOVED): and the End's knell; PIN MOVED (AUDIT SD IV A4): and no quake - it was the Stomp's landing twice
+  assert.equal(flat.length, 32);   // AUDIT SD III (A2
   assert.ok(SD_VOICE_CUES.knell.clip === SD_VOICE_CUES.release.end.clip && SD_VOICE_CUES.knell.volume < SD_VOICE_CUES.release.end.volume / 2, 'the End struck again: its own toll, softer');
   assert.ok(flat.every((c) => Number.isInteger(c.clip) && c.pitch > 0 && c.pitch < 3 && c.volume > 0 && c.reach > 0));
   assert.ok(C.step.pitch < C.echoStep[0].pitch && C.echoStep[0].pitch < C.echoStep[1].pitch, 'the Remnant under gold under silver');
@@ -145,7 +144,7 @@ test('SD14a ITS STRIDES AND ITS GROWL: a step heard for each SD_STRIDE_M it walk
   // a growl due as a blow begins: held for the blow
   const d = rig();
   d.v.frame();
-  for (let ms = 0; ms < SD_GROWL_MS - 20; ms += 100) d.step(Math.min(100, SD_GROWL_MS - 20 - ms));   // AUDIT SD III (A6, PIN MOVED): framed - one step this long is a page away, taken again in silence
+  for (let ms = 0; ms < SD_GROWL_MS - 20; ms += 100) d.step(Math.min(100, SD_GROWL_MS - 20 - ms));   // AUDIT SD III (A6
   assert.equal(count(d.heard, SD_VOICE_CUES.growl), 0);
   d.s.rem.atk = { i: 50, a: SD_BLOWS.hand.id, at: d.at() + 1600, x: 0, z: 0, yw: 0, tg: [] };
   d.step(40);
@@ -189,7 +188,6 @@ test('SD14a EACH BLOW\'S RELEASE, AND A VOLLEY AIMED AT ME: SD_RELEASE_MS before
   assert.equal(count(r.heard, SD_VOICE_CUES.release.stomp), 1, 'its release');
   r.step(100); r.step(100);
   assert.equal(count(r.heard, SD_VOICE_CUES.release.stomp), 1, 'once');
-  // PIN MOVED (AUDIT SD IV A4): no quake - the ground's shock under the Stomp is its landing (the blows'), and the
   // quake was the same thud a second time in the same frame (sd26_audio)
   r.step(200);
   assert.equal(SD_VOICE_CUES.quake, undefined);
@@ -223,6 +221,6 @@ test('SD14a FORGOTTEN AS THE HOUR IS LEFT, and the world host\'s: made beside th
   r.step(300);
   assert.equal(count(r.heard, SD_VOICE_CUES.wake), 0, 'left: the next fight seen is taken as it stands');
   assert.match(W, /const sdRemVoice = sdFightLink \? createSdRemnantVoice\(\{ audio, link: sdFightLink, feet: \(\) => \(playerSpawned && modes\?\.sdRealmSlot\?\.\(\) != null \? player\.feetAt\(\) : null\) \}\) : null;/);
-  assert.match(W, /if \(inRealm && playerEntity\.health > 0\) \{ try \{ sdRemVoice\?\.frame\(\); \} catch \(e\) \{ console\.warn\('\[sd\] voice', e\?\.message \?\? e\); \} \}/);   // AUDIT SD III (A5, PIN MOVED): never by the dead
-  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);   // SD16 (PIN MOVED): its sparks forgotten with it
+  assert.match(W, /if \(inRealm && playerEntity\.health > 0\) \{ try \{ sdRemVoice\?\.frame\(\); \} catch \(e\) \{ console\.warn\('\[sd\] voice', e\?\.message \?\? e\); \} \}/);   // AUDIT SD III (A5
+  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);   // SD16 (
 });

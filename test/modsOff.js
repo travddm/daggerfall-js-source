@@ -1,4 +1,4 @@
-// MO1 (2026-09-12, Mac: "All mods should be enabled by default"). Every
+// MO1. Every
 // vendored mod's `Enabled` defaults TRUE now, and a suite that pins
 // Daggerfall Unity's OWN numbers - FormulaHelper's, ItemBuilder's,
 // EnemyEntity's - is a suite about the game WITHOUT its mods, which DFU

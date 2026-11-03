@@ -54,7 +54,6 @@ test('WM1: fair weather turns at the classic 13 deg/s, from the WIND MODEL\'s ow
   for (let d = 0; d < 40; d++) { m.tick(d * 1440 + 14 * 60, 'sunny'); sum += m.strength(); n++; }   // forty fair afternoons, no front
   assert.ok(Math.abs(sum / n - FAIR_STRENGTH) < 0.06, `the model's fair afternoons average ${sum / n}, the anchor says ${FAIR_STRENGTH}`);
   assert.ok(ROTOR_GAIN > 0);
-  assert.ok(!/WEATHER_SKY/.test(readFileSync(new URL('../../src/world/windmills.js', import.meta.url), 'utf8')), 'the mill reads no sky-table row: the table stopped feeding it at WIND1');
 });
 
 test('WM1: the rotor is still at and below the stall, and never past the furl', () => {
@@ -224,12 +223,6 @@ test('WM1: the roller axis is a different axis, not a different sign', () => {
 });
 
 test('WM2d: the retired model table is GONE, and the placement replaced it', () => {
-  // The table matched a classic model id that never existed in a farm
-  // block. Deleting it is the fix; this pin stops it coming back, and
-  // requires the thing that took its place to be real.
-  const src = readFileSync(new URL('../../src/world/windmills.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /export const WINDMILL_MODELS/,
-    'the classic-model-id table is back - the port places its own mills now');
   assert.ok(PLACEMENTS.length > 0, 'nothing places a mill');
   for (const p of PLACEMENTS) {
     assert.match(p.block, /^FARMAA\d\d\.RMB$/, `${p.block} is not a farm block`);

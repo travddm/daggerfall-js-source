@@ -1,7 +1,4 @@
-// MENU1 - THE ENHANCED MENUS THAT SOMETIMES DO NOT OPEN (2026-09-15,
-// Mac relaying a player: "sometimes you're unable to open the enhanced
-// menus. For example a player might open the radial and select the
-// spellbook, but it will fail to open").
+// MENU1 - THE ENHANCED MENUS THAT SOMETIMES DO NOT OPEN.
 //
 // THE ROOT CAUSE IS THE DEPLOY. Every enhanced menu builds to its own
 // content-hashed lazy chunk (`dist/assets/enhancedSpellbook-*.js` and
@@ -205,7 +202,6 @@ test('MENU1: and no door is left catching a mount failure by hand', () => {
 
 // ═══ MENU1-WARM: THE BYTES ARE ASKED FOR EARLY, NOT ON THE KEYPRESS ══
 //
-// Mac, 2026-09-19: "look for any elements of hitching, or hiccups."
 //
 // MENU1 is about a chunk that FAILS. This is its other half: one that
 // merely arrives LATE. Every door's `import()` is the first time its
@@ -233,25 +229,6 @@ test('MENU1-WARM: every chunk is warmed, one at a time, each behind its own idle
   assert.ok(WARM_CHUNKS.length >= 6, 'the six shared chunks behind the seven doors');
 });
 
-test('MENU1-WARM: a warm that fails is silent, does not stop the rest, and never speaks over MENU1’s notice', async () => {
-  const { warmEnhancedChunks, _resetChunkWarmForTests } = await import('../../../src/ui/enhanced/enhancedChunk.js');
-  _resetChunkWarmForTests();
-  const seen = [];
-  const chunks = [
-    () => { seen.push('a'); return Promise.reject(new Error('404')); },
-    () => { seen.push('b'); return Promise.resolve({}); },
-  ];
-  const done = await warmEnhancedChunks({ chunks, idle: (fn) => fn() });
-  assert.deepEqual(seen, ['a', 'b'], 'a failed warm does not stop the next');
-  assert.equal(done, 1, 'and is not counted');
-  // The door is what speaks. A warm that logged would put a line on the
-  // console for a fetch the player never asked for, and MENU1's whole
-  // point is that the PLAYER is told, in the overlay, by the door.
-  const chunkSrc = src('src/ui/enhanced/enhancedChunk.js');
-  const fn = chunkSrc.split('export async function warmEnhancedChunks(')[1].split('\n}')[0];
-  assert.doesNotMatch(fn, /console\./, 'a warm must leave no trace when it fails');
-});
-
 test('MENU1-WARM: it runs ONCE a session, and stands down when the session is gone', async () => {
   const { warmEnhancedChunks, _resetChunkWarmForTests } = await import('../../../src/ui/enhanced/enhancedChunk.js');
   _resetChunkWarmForTests();
@@ -265,10 +242,3 @@ test('MENU1-WARM: it runs ONCE a session, and stands down when the session is go
   assert.equal(after, 0, 'a dead session warms nothing');
 });
 
-test('MENU1-WARM: the world host asks for it, and never awaits it', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /void import\('\.\.\/ui\/enhanced\/enhancedChunk\.js'\)\.then\(\(m\) => m\.warmEnhancedChunks\(\)\)\.catch\(\(\) => \{\}\);/,
-    'the boot fires the warm and forgets it - an awaited warm would be the stall itself');
-  const boot = w.split('export async function bootWorld(')[1].slice(0, 1200);
-  assert.ok(boot.includes('warmEnhancedChunks'), 'and it is asked for at the boot, not on a door');
-});

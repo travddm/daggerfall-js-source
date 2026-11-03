@@ -1,5 +1,5 @@
 // @ts-check
-// PROF11 (2026-10-01) - THE CHISEL, Masonry's act at the mason's bench (bible/06-Systems/Professions-Arc.md 9.4: "strikes
+// PROF11 - THE CHISEL, Masonry's act at the mason's bench (9.4: "strikes
 // on marked lines that the glint's rule moves"). The stone is scored with CHISEL_ACT.lines lines; one is MARKED at a time,
 // for chiselMarkS (1.2 s, 2.0 s at Master, x the band) and then the mark moves to another line - and it moves after every
 // strike too: the Pick-Axe's glint's rule (systems/mineAct.js), a line for a point. The chisel is set on a line (the

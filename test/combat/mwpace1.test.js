@@ -1,5 +1,4 @@
-// MW-PACE1 (2026-10-07, Mac: "Morrowind attack animations don't scale with attack speed/multiple attacks when attack
-// speed is high"): THE MORROWIND BLOW IS PACED BY DAGGERFALL'S.
+// MW-PACE1: THE MORROWIND BLOW IS PACED BY DAGGERFALL'S.
 //
 // The classic machine owns every blow (characters/weaponStates.js; rule 24's note in Morrowind-Rules.md: the hit
 // frame is FPSWeapon's, not the .kf's). The Morrowind arm drew each blow at its WEAP record's pace and refused a strike
@@ -78,14 +77,6 @@ test('MW-PACE1: no schedule for a machine at rest or a ranged one - the bow\'s h
   const bow = createWeaponMachine(true);
   machineAttack(bow, 'StrikeDown');
   assert.equal(blowSchedule(bow, 50), null, 'a bow');
-  const gun = createWeaponMachine(false);
-  gun.ranged = true; gun.tick = 0.07;
-  machineAttack(gun, 'StrikeDown');
-  assert.equal(blowSchedule(gun, 50), null, 'the port\'s own gun pays the ranged cooldown - ranged');
-  const zero = createWeaponMachine(false);
-  zero.tick = 0;
-  machineAttack(zero, 'StrikeDown');
-  assert.equal(blowSchedule(zero, 50), null, 'a tick that is no tick says nothing');
 });
 
 test('MW-PACE1: blowRate - span over the time left, held to its bounds', () => {

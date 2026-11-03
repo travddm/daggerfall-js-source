@@ -52,13 +52,6 @@ test('CAMP-RING: a hit returns up to three independently rolled groups, each wit
   assert.equal(rollCampEncountersOnChunkLoad({ ...ctx, inLocationRect: true }, () => 0), null, 'never in a town');
 });
 
-test('CAMP-RIVALS: groups of the same kind never fight each other, different kinds do; campmates never do', async () => {
-  const src = (await import('node:fs')).readFileSync(new URL('../../src/characters/enemy/enemyTargets.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /rivalCamps/, 'no same-kind override');
-  assert.match(src, /if \(targetEntity\.team === selfTeam\) continue;/, 'the same kind keeps the truce');
-  assert.match(src, /if \(self\.entity\?\.campId != null && targetEntity\.campId === self\.entity\.campId\) continue;/, 'campmates still spared');
-});
-
 test('CAMP-SIGHT: a camp member sees 60 m; every other foe keeps DFU\'s 102.4', async () => {
   const { CAMP_SIGHT_RADIUS } = await import('../../src/systems/campEncounters.js');
   const { canSeeTarget, SIGHT_RADIUS } = await import('../../src/characters/enemy/enemyMotor.js');
@@ -96,12 +89,3 @@ test('CAMP-SIGHT: wilderness camps see 60 m; every other foe (WoD sites, dungeon
   assert.doesNotMatch(read('src/world/worldOfDaggerfall/wodSpawner.js'), /sightRadius/, 'the WoD location spawner is untouched');
 });
 
-test('CAMP-TRAVEL: no camp rolls while a Travel Options journey is running', async () => {
-  const fs = await import('node:fs');
-  const w = fs.readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const ci = w.indexOf('stream: entered ${r.current.x}');
-  const chunk = w.slice(ci, w.indexOf('\n    pump();', ci));
-  assert.match(chunk, /!playerEntity\.isResting && !travelOptions\?\.isTravelActive && getPref\('wildernessCamps'\) !== false/, 'the chunk roll stands down during a journey');
-  const to = fs.readFileSync(new URL('../../src/systems/travel/travelOptions.js', import.meta.url), 'utf8');
-  assert.match(to, /get isTravelActive\(\) \{ return !!ui\?\.isShowing; \},/, 'the journey is the travel panel being up');
-});

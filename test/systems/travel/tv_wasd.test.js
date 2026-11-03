@@ -1,6 +1,6 @@
-// TV-WASD (2026-09-28, Mac: "Also need to add the ability to travel faster with WASD") - THE OVERWORLD'S KEYS TRAVEL.
+// TV-WASD - THE OVERWORLD'S KEYS TRAVEL.
 // Under the travel view the movement keys walked the traveller at walking pace (TV1); now, while the view is up and no
-// journey drives, a held movement key runs the world's clock at the travel speed - RATE-LAW (2026-10-04): the ground's,
+// journey drives, a held movement key runs the world's clock at the travel speed - RATE-LAW: the ground's,
 // x100 on a road or a track and x60 off it (it was the Travel Options spinner's) - held by TV2's load governor, and x1
 // again the moment the keys are let go, a journey begins or the view comes down.
 //
@@ -17,7 +17,7 @@ import { foePaced, foeRate } from '../../../src/systems/travel/travelThreat.js';
 import { travelDriveForward } from '../../../src/systems/travel/travelAutopilot.js';
 import { StreamingWorldState } from '../../../src/world/streamingWorld.js';   // ETHER-OW: the governor's ground is the stream's own law
 import { setPaceGround, setTravelPace, _resetTravelPace } from '../../../src/systems/travel/travelPace.js';   // PACE-DIALS: the road's x100 is the player's dial
-/** PACE-DIALS (2026-10-06): x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
+/** PACE-DIALS: x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
  *  leaving a road takes it back to x60: test/systems/travel/pacedials.test.js). These pins hold the LANES' law at the dial's top. */
 const dialAtTop = () => { _resetTravelPace(); setPaceGround(true); setTravelPace('speed', 100); };
 
@@ -43,7 +43,6 @@ test('TV-WASD: the bar says the speed, and the load governor\'s hold beside it',
   assert.equal(TRAVEL_VIEW_TEXT.travelling(10), 'Traveling at ×10');
   assert.equal(TRAVEL_VIEW_TEXT.travelling(10, 5), 'Traveling at ×5 of ×10');
   assert.equal(TRAVEL_VIEW_TEXT.travelling(10, 10), 'Traveling at ×10', 'a hold at the full speed is no hold');
-  // PIN MOVED (AUDIT OW5 G3): the keys' speed first - it runs only with no journey driving, and a stopped route kept for the Resume hid it
   assert.match(WORLD, /trip: \(\) => \(tvWalking \? TRAVEL_VIEW_TEXT\.travelling\(tvWalking, tvHeld\) : tvTripLive\(\) \? tvTrip\.line : ''\),/, 'the keys\' speed, else a journey\'s own line');
 });
 
@@ -72,7 +71,6 @@ function rig({ onRoad = false } = {}) {
     setWorldTimeScale: setTimeScale, worldTimeScale: timeScale, resetTimeScale,
     travelAsked: 20, csaHoldsTimeScale: () => false,
     travellerPace, travelGovernor: createLoadGovernor({ max: MAX_TIME_SCALE }),
-    // PIN MOVED (LOAD-OWED, test/systems/travel/ow_loadowed.test.js): the count asks the stream's own books - every pixel of this grid is
     // on them (`loaded`), so the rig's `unbuilt` are owed, as a stream still building them owes them
     // OW-LEAD: the feet in the middle of pixel (100, 200), native (streamingWorld.js worldCoordToMapPixel's law)
     state: { terrainDistance: 3, loaded: { has: () => true }, worldCoords: () => ({ x: 100.5 * 32768, z: (499 - 200 + 0.5) * 32768 }) }, playerTravelPixel: () => ({ x: 100, y: 200 }), tvGroundGenNow: () => w.unbuilt.size,
@@ -131,7 +129,6 @@ test('TV-WASD host: the load governor holds the keys\' travel to what the land r
   const { w, g } = rig({ onRoad: true });
   w.keys.add('MoveLeft');
   w.unbuilt.add('101,200');   // a pixel of the ring the view can see, not yet raised
-  // PIN MOVED (OW-LEAD, test/systems/travel/ow_lead.test.js): held by how near the hole is, from the first frame - its edge half a
   // pixel off (409.6 m) at 5 m/s takes the TV_GOV_LEAD_S four seconds at x20.48: x20 (it ran x100 a quarter second, then halved)
   g.govern(0.1);
   assert.equal(timeScale(), 20, 'the hole half a pixel off: x20');

@@ -1,6 +1,5 @@
 // @ts-check
-// TIMERS1 (2026-10-02, Mac: "we need to create a new unique UI element for reset times like the Sunday wars, oblivion
-// gates, town raids, and anything else so the player can keep track of when things are and watch countdowns").
+// TIMERS1.
 //
 // THE SCHEDULE, AS ROWS. Every shared moment of the online world is already a pure function of the relay's clock in
 // its own law - the gate's day (net/gate/gateLaw.js), the seat week's Reckoning and Turning (net/townSeatLaw.js), a game
@@ -14,22 +13,16 @@
 //          window lists it, the event board leaves it out
 //   at     the moment the countdown runs to (ms, relay clock): the start of a coming row, the end of a live one
 //   until  a live row's end; null on a coming row
-//   door   EG-ZM: on an Elite row where the host hands the boards' door (`doors.board`) - 'board', the window's button
 //
-// TIMERS2 (2026-10-22, the owner: "organize the timer system in the pause menu"): THE ROWS IN GROUPS. One list sorted by
+// TIMERS2: THE ROWS IN GROUPS. One list sorted by
 // time put a gate beside a raid beside the UTC day, sixteen rows deep on a busy evening; the window now lays them out by
-// what they are (TIMER_GROUPS: the world's events, the Battlespire, the raids, the seats and their battles, the resets),
+// what they are (TIMER_GROUPS: the world's events, the raids, the seats and their battles, the resets),
 // each group in the list's own order, and a player can show one group alone (ui/enhanced/enhancedTimers.js).
 import { gateAt, gateTimes, gatePhase, GATE_EVERY_DAYS, gameDayAt, GATE_DAY_MINUTES } from '../net/gate/gateLaw.js';
 import { wallMsForClassicMinutes } from '../net/wire.js';
 import { seatWeekOf, seatWeekStartMs, seatPhaseOf, SEAT_RECKONING_MS, seasonOf, seatSeasonName, battleLengthMs, SIGN_CLOSES_MS, guildWords } from '../net/townSeatLaw.js';
 import { serpentAt, serpentTimes, serpentPhase, serpentBossOf, SERPENT_EVERY_DAYS } from '../net/serpent/serpentLaw.js';   // SERPENT-TIMERS: the sea serpent's day
 import { sdPhase, SD_COLLAPSE_MS } from '../net/superDungeon/sdLaw.js';   // SD2c: the Super dungeon's record, once it is news
-import { egTimes } from '../net/eliteGates/egLaw.js';   // EG-F: an Elite Breach's clock - the company's own row
-import { arenaSeasonOf, arenaSeasonEndsS } from '../net/arena/arenaLaw.js';   // EG-ZM: the Spire's boards keep the arena's season
-import { ketchVoyageAt } from '../net/ketch/ketchLaw.js';   // KETCH: the Sky-Ketch's voyage - the clock's alone
-import { ketchStationHere, ketchStationsStanding } from '../scenes/ketch/ketchStanding.js';   // KETCH-EVERYWHERE: the station of the province I stand in
-import { ketchCity } from './ketch/ketchWords.js';
 import { t, getLocalizedRegionName } from './textManager.js';
 import { regionOfTheatre } from '../formats/mapsTables.js';   // WW5: a province lane's region, its name in the player's language
 
@@ -37,8 +30,7 @@ const DAY_MS = 86_400_000;
 
 /** TIMERS2: the window's groups, in the order it draws them - each row's kind belongs to one. */
 export const TIMER_GROUPS = Object.freeze([
-  Object.freeze({ id: 'world', kinds: Object.freeze(['gate', 'serpent', 'super', 'star', 'ketch']) }),
-  Object.freeze({ id: 'spire', kinds: Object.freeze(['elite']) }),
+  Object.freeze({ id: 'world', kinds: Object.freeze(['gate', 'serpent', 'super', 'star']) }),
   Object.freeze({ id: 'raids', kinds: Object.freeze(['raid']) }),
   Object.freeze({ id: 'seats', kinds: Object.freeze(['seat', 'battle']) }),
   Object.freeze({ id: 'resets', kinds: Object.freeze(['reset']) }),
@@ -67,19 +59,9 @@ const capital = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 /** A gate's event id - its row's here, and AUDIT WW F5 every line of its own (its omen, its fall, its rite broken: the
  *  event board's card is one gate's, never the Bay's and a lane's merged), by its number; null for none. */
 export const gateEventId = (n) => (Number.isSafeInteger(n) && n >= 0 ? `gate:${n}` : null);
-/** KETCH (bible/11-Multiplayer/Sky-Ketch.md section 2): THE SKY-KETCH'S ROW - one a voyage, the host handing nothing: she is
- *  sighted, arrives, keeps station and weighs anchor at the same instants for everyone, over the same fields. Its words
- *  through the text core as the row is laid (L10N4). */
-function ketchRows(now, coming, live, theatre = 0) {
-  const kv = ketchVoyageAt(now, theatre), kWhere = theatre ? t('ketch.timers.whereAt', 'Over {city}', { city: ketchCity(theatre) }) : t('ketch.timers.where', 'Over Daggerfall');
-  if (kv.phase === 'away') coming(`ketch:${kv.n}`, 'ketch', t('ketch.timers.sighted', 'The Sky-Ketch is sighted'), kv.sightAt, kWhere, t('ketch.timers.sightedSub', 'It stays east of the city for seven hours'));
-  else if (kv.phase === 'sighted') coming(`ketch:${kv.n}`, 'ketch', t('ketch.timers.arrives', 'The Sky-Ketch arrives'), kv.at, kWhere, t('ketch.timers.arrivesSub', 'Its anchor-lift comes down when this runs out'));
-  else if (kv.phase === 'docked') live(`ketch:${kv.n}`, 'ketch', t('ketch.timers.station', 'The Sky-Ketch keeps station'), kv.departAt, kWhere, t('ketch.timers.stationSub', 'Its anchor-lift is down in the fields east of the city until this runs out'));
-  else live(`ketch:${kv.n}`, 'ketch', t('ketch.timers.departing', 'The Sky-Ketch weighs anchor'), kv.endAt, kWhere, t('ketch.timers.departingSub', 'The crews aboard have until this runs out'));
-}
 
 /**
- * WW5 (bible/03-World/World-Wide.md WW5): EVERY PROVINCE'S HOLLOW (`sd.lanes` - scenes/superDungeon/sdLanes.js timers), each
+ * WW5 (WW5): EVERY PROVINCE'S HOLLOW (`sd.lanes` - scenes/superDungeon/sdLanes.js timers), each
  * its own lane's record, in the Bay's rows' shape: found or collapsing, news to every screen, by its city (else its
  * province); its next rise its own province's players' alone (`mine` - the theatre I stand in): eight coming with no place
  * would bury the Bay's. Its words the player's language's, the province by the region list's own name.
@@ -106,15 +88,13 @@ function sdLaneRows(src, now, live, coming, rows) {
  *           sd?: { rec: any, name?: string|null, place?: string|null, site?: { cityName?: string, px?: number, py?: number } | null,
  *                  lanes?: Array<{ rec: any, lane: number, province: string, mine?: boolean, name?: string|null, site?: { cityName?: string, px?: number, py?: number } | null }> } | null,
  *           stars?: Array<{ id: string, kind: string, title: string, where: string|null, detail: string|null, live: boolean, at: number, until: number|null }> | null,
- *           elite?: { op: number, rh?: number, h?: number, until?: number|null, end?: string|null } | null,
- *           doors?: { board?: () => any } | null,
  *           seatsOpen?: boolean, seats?: Array<any> | null, zero?: number | null, region?: string | null,
  *           raids?: Array<{ name: string, region?: string, type?: string, startMs: number, endMs: number, done?: boolean, home?: boolean }> | null }} src
  */
 export function eventTimerRows(src) {
   const now = Number(src?.now);
   if (!Number.isFinite(now)) return [];
-  /** @type {Array<{id: string, kind: string, title: string, where: string|null, detail: string|null, live: boolean, at: number, until: number|null, door?: string, shut?: boolean}>} */
+  /** @type {Array<{id: string, kind: string, title: string, where: string|null, detail: string|null, live: boolean, at: number, until: number|null, shut?: boolean}>} */
   const rows = [];
   const coming = (id, kind, title, at, where = null, detail = null) => rows.push({ id, kind, title, where, detail, live: false, at, until: null });
   const live = (id, kind, title, until, where = null, detail = null) => rows.push({ id, kind, title, where, detail, live: true, at: until, until });
@@ -135,7 +115,7 @@ export function eventTimerRows(src) {
   else gateRows(t, phase, place);
   // ...and the gate after it, once this one is under way
   if (phase !== 'quiet') coming(gateEventId(t.day + GATE_EVERY_DAYS), 'gate', 'Next Dagon\'s Breach opens', gateTimes(t.day + GATE_EVERY_DAYS).openAt);
-  // WW2 (bible/03-World/World-Wide.md): AND EVERY LANE'S PAST THE BAY that has found its site (`gates` - the host's), from
+  // WW2: AND EVERY LANE'S PAST THE BAY that has found its site (`gates` - the host's), from
   // its omen to its collapse, named where it stands - a province's gate has no row before its omen (nine of them coming,
   // each with no place to go, would bury the Bay's)
   for (const g of src?.gates ?? []) {
@@ -145,8 +125,7 @@ export function eventTimerRows(src) {
   }
 
   // ── THE SEA SERPENT (serpentLaw: every other game day at the dawn watch - every four real hours: the bells, the
-  // rising, its dive) ── SERPENT-TIMERS (2026-10-04, the owner: "This needs to happen" -
-  // the serpent was the one shared event the window did not count). Where it lies is said from its bells on, as the
+  // rising, its dive) ── SERPENT-TIMERS. Where it lies is said from its bells on, as the
   // chat says it; the next serpent's rising stands beside it once this one is under way.
   const s = serpentAt(now);
   const sPhase = serpentPhase(s, now, src?.serpent?.fellAt?.(s.day) ?? null);
@@ -154,7 +133,7 @@ export function eventTimerRows(src) {
   const off = src?.serpent?.place ? `Off ${src.serpent.place}` : null;
   if (sPhase === 'quiet') coming(`serpent:${s.day}`, 'serpent', `${sName} rises`, s.riseAt, null, 'The harbor bells ring 15 minutes before');
   else if (sPhase === 'omen') coming(`serpent:${s.day}`, 'serpent', `${sName} rises`, s.riseAt, off, 'The harbor bells are ringing. Its waters are circled on your map');
-  // SERPENT4 (2026-10-11): its waters stand open until it dives - one row from its rising to its dive, the storm's breaking
+  // SERPENT4: its waters stand open until it dives - one row from its rising to its dive, the storm's breaking
   // no instant a ship sails against
   else if (sPhase === 'rising' || sPhase === 'hunt' || sPhase === 'late') live(`serpent:${s.day}`, 'serpent', `${sName} hunts`, s.soundAt, off, 'It dives when this runs out. Sail out to join the hunt');
   if (sPhase !== 'quiet') {
@@ -162,7 +141,7 @@ export function eventTimerRows(src) {
     coming(`serpent:${nextDay}`, 'serpent', 'Next sea serpent rises', serpentTimes(nextDay).riseAt);
   }
 
-  // ── THE SUPER DUNGEON (net/superDungeon/sdLaw.js: the hub's one record) ── SD2c (bible/11-Multiplayer/Super-Dungeons.md section
+  // ── THE SUPER DUNGEON (net/superDungeon/sdLaw.js: the hub's one record) ── SD2c (section
   // 4): a row once it is FOUND - news, by the finder's word - and none before (a Hollow that has only risen is a find:
   // its omen in the sky and a word in its city's taverns, never a countdown that says one stands); its fading unbeaten
   // while it stands, its collapse after the kill. Where it stands is the host's (`place`, its city), and its name.
@@ -175,7 +154,7 @@ export function eventTimerRows(src) {
   else if (sdNow === 'fell') { live(`sd:${sdRec.s}`, 'super', `${sdName} collapses`, sdRec.fellAt + SD_COLLAPSE_MS, sdWhere, 'Its Hour is broken. It collapses when this runs out'); rows[rows.length - 1].shut = true; }   // AUDIT EVENTS1 A6
   // SD19: the next one's rise, once this one is gone - never where (a Hollow risen is a find), only not before when
   else if (sdNow === 'gone' && Number.isFinite(sdRec?.next) && sdRec.next > now) coming(`sd:${(sdRec.s ?? 0) + 1}`, 'super', 'An Abyss Dungeon rises', sdRec.next, null, 'Not before this. Watch the Bay for its brass omen');
-  // WW5 (bible/03-World/World-Wide.md WW5): AND EVERY PROVINCE'S HOLLOW (sdLaneRows)
+  // WW5 (WW5): AND EVERY PROVINCE'S HOLLOW (sdLaneRows)
   sdLaneRows(src, now, live, coming, rows);
 
   // ── THE STARFALL (net/starfall/starfallLaw.js: three stars a night while the Witches' Festival runs) ── STAR6 (bible/11-Multiplayer/
@@ -183,34 +162,6 @@ export function eventTimerRows(src) {
   // fallen star still undecided, to its deadline; the next fall, with the night's coven - handed in whole by the host, the
   // one that knows where the night's stars fall and which of them are held.
   for (const r of src?.stars ?? []) if (r?.kind === 'star' && typeof r.id === 'string' && Number.isFinite(r.at)) rows.push(r);
-
-  // ── THE SKY-KETCH (net/ketch/ketchLaw.js: a voyage every real Saturday, the clock's alone) ── KETCH: ketchRows
-  ketchRows(now, coming, live);
-  // KETCH-EVERYWHERE (bible/11-Multiplayer/Sky-Ketch.md section 22): and the station of the province I stand in, while this
-  // screen stands the stations past the Bay - its rows the same words over its own city (eight more would bury the Bay's)
-  const kHere = ketchStationsStanding() && src?.pixel ? ketchStationHere(src.pixel.x, src.pixel.y) : null;
-  if (kHere) ketchRows(now, coming, live, kHere);
-
-  // ── AN ELITE BREACH (net/eliteGates/egLaw.js egTimes: the call's opening, the open window, THE COUNT) ── EG-F (bible/11-Multiplayer/
-  // Elite-Gates.md section 2, the Timers row): the company's alone (the host hands it only the call it holds) - a new kind
-  // beside the gate's and the Abyss Dungeon's: "Elite Breach opens 4:12" while the arch stands sealed, then the window to
-  // answer, then the hall the company stands in and what is left on the count (`until` its end, held or running).
-  const el = src?.elite ?? null;
-  if (el && Number.isFinite(el.op) && !el.end) {
-    const T = egTimes({ openedAt: el.op }), what = el.rh ? 'Rehearsal' : 'Elite Breach';
-    if ((el.h ?? 0) > 0 && Number.isFinite(el.until)) live(`elite:${el.op}`, 'elite', `Hall ${el.h}`, /** @type {number} */ (el.until), null, 'Time left');
-    else if (now < T.openAt) coming(`elite:${el.op}`, 'elite', `${what} opens`, T.openAt, null, 'Your company is called');
-    else if (now < T.admitUntil) live(`elite:${el.op}`, 'elite', `${what} open`, T.admitUntil, null, 'Answer the call before this runs out');
-  }
-  // EG-ZM (Elite-Gates.md section 20, THE BOARD WINDOW - "reached from the Timers row"): where the host hands the boards'
-  // door, every Elite row carries it, and the boards' own season - the arena's eight weeks (net/arena/arenaLaw.js) - stands as an
-  // Elite row of its own, so the door is there with no breach of mine: its end, when each Descent bracket's top ten are kept
-  // as Spire Champions through the next season (AUDIT EG III: its words, section 20's own).
-  if (typeof src?.doors?.board === 'function') {
-    const season = arenaSeasonOf(Math.floor(now / 1000));
-    coming(`elite:season:${season}`, 'elite', `The Spire's season ${season} ends`, arenaSeasonEndsS(season) * 1000, null, 'Each Descent bracket\'s top ten hold the title Spire Champion through the next season');
-    for (const r of rows) if (r.kind === 'elite') r.door = 'board';
-  }
 
   // ── THE TOWN RAIDS (the mod's day: each town's raid a two-hour classic window) ──
   // AUDIT TIMERS1 D3: the day rolls about twenty-two across the Iliac Bay - the window held them all, twenty-seven rows.

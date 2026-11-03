@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY3 (2026-10-05, bible/06-Systems/Legacy-Arc.md sections 6 and 11): THE SUCCESSION - who carries the line on.
+// LEGACY3: THE SUCCESSION - who carries the line on.
 //
 // Project Legacy's death said one of two lines in a message box ("You died. Your descendant will take your place." /
 // "You died without a descendant") and chose for the player: a random new child, every time. The port asks: at a

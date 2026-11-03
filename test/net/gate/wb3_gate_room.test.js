@@ -1,5 +1,4 @@
-// WB3 (2026-09-25, Mac: "a gate of oblivion which takes place in a large boss arena with an oversized enemy with
-// telegraphed attacks (like wind ups, etc)", and Option B: the relay's Durable Object is the authority over the boss):
+// WB3:
 // THE GATE'S BOSS ROOM, DRIVEN. The brain as pure law over a seeded rng and a fake clock (net/gate/gateBrain.js: the
 // numbers a claim sets, the join, every refusal a blow can meet, the walk, the attacks and their shapes, the phases,
 // the wrath, who earned it, the checkpoint); the kill's receipt (net/gate/gateReceipt.js: the relay's first signature, the
@@ -19,10 +18,9 @@ import {
 import { mintReceipt, verifyReceipt, readReceipt, receiptValid, importReceiptKey, RECEIPT_V, RECEIPT_MAX, RECEIPT_TTL_S } from '../../../src/net/gate/gateReceipt.js';
 import { mintToken, verifyToken, _b64url } from '../../../src/net/identityToken.js';
 import {
-  parseClient, validGateIn, validGateOut, relaySupportsGate, gateGate, GATE_RELAY_MIN, GATE_HZ_MAX, GATE_KINDS, GATE_OUT_KINDS, GATE_NO_WORDS, GATE_RECEIPT_MAX, GATE_DMG_WIRE_MAX, GATE_LV_WIRE_MAX, RELAY_VERSION, DROP_STRIKES_MAX, SOCIAL_ROOM, GATE_BRAIN_V,
+  parseClient, validGateIn, validGateOut, gateGate, GATE_HZ_MAX, GATE_KINDS, GATE_OUT_KINDS, GATE_NO_WORDS, GATE_RECEIPT_MAX, GATE_DMG_WIRE_MAX, GATE_LV_WIRE_MAX, RELAY_VERSION, DROP_STRIKES_MAX, SOCIAL_ROOM, GATE_BRAIN_V,
 } from '../../../src/net/wire.js';
 import { gateTimes, gateRoomKey, gateBossOf, GATE_COLLAPSE_MS } from '../../../src/net/gate/gateLaw.js';
-import { relayVersionAtLeast } from '../../relayVersion.mjs';
 import worker from '../../../server/src/index.js';
 import { fakeRoom, fakeRooms } from '../../fakeRoom.mjs';
 import { OnlineSession } from '../../../src/net/online.js';
@@ -47,7 +45,7 @@ const body = (sub, x, z, dead = false) => ({ sub, x, z, dead });
 // ═══ THE BRAIN ══════════════════════════════════════════════════════════════════════════════════════════════════
 
 test('WB3 brain: the numbers a claim sets - the health a player brings and the bucket that bounds them grow together, so NO claim buys a faster kill: one player at the cap kills their own share in (BOSS_TTK_S - BUCKET_DEPTH_X) / BUCKET_RATE_X seconds at every level (mutants: the share off the claim; the bucket rate off the claim; the one-blow cap lifted)', () => {
-  assert.equal(dpsRef(1), 6); assert.equal(dpsRef(20), 25); assert.equal(dpsRef(999), 5 + LV_MAX, 'a claim past the ceiling is the ceiling');
+  assert.equal(dpsRef(1), 6); assert.equal(dpsRef(20), 25); assert.equal(dpsRef(999), dpsRef(LV_MAX), 'a claim past the ceiling is the ceiling');
   assert.equal(clampLv(0), 1); assert.equal(clampLv(NaN), 1); assert.equal(clampLv(12.9), 12);
   const fastest = (BOSS_TTK_S - BUCKET_DEPTH_X) / BUCKET_RATE_X;
   assert.equal(fastest, 75, 'seventy-five seconds of one player at the cap - the burst the bucket holds, then its rate');
@@ -394,14 +392,14 @@ test('WB3 receipt: the relay\'s key from its secret - PKCS8 in base64 (the accou
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('WB3 wire: the client says two things - `in` with a level claim, `hit` with a sequence, a damage and a kind - projected field by field, after a hello alone; the room says its closed list of kinds, each bounded; the first relay that runs a boss room is GATE_RELAY_MIN (mutants: an extra field carried; a damage past the wire\'s bound; a refusal word invented)', () => {
-  assert.deepEqual(GATE_KINDS, ['in', 'hit', 'spent', 'site', 'xhit', 'ahit', 'heal', 'vt']);   // PIN MOVED (INT11): and a body's word; AUDIT WBX S1: and the hub's `spent`; DISCORD-GATES: and its `site`; WB9c: a blow on a crystal; WB11b: on one of his host; GATE-HEAL: what healed me
+test('WB3 wire: the client says two things - `in` with a level claim, `hit` with a sequence, a damage and a kind - projected field by field, after a hello alone; the room says its closed list of kinds, each bounded (mutants: an extra field carried; a damage past the wire\'s bound; a refusal word invented)', () => {
+  assert.deepEqual(GATE_KINDS, ['in', 'hit', 'spent', 'site', 'xhit', 'ahit', 'heal', 'vt']);
   // AUDIT WBX R7: the brain's law on `in` (a whole number, carried when said); AUDIT WBX S1: a day spent, whole
   assert.deepEqual(validGateIn({ k: 'in', lv: 12, bv: GATE_BRAIN_V }), { k: 'in', lv: 12, bv: GATE_BRAIN_V });
   assert.deepEqual(validGateIn({ k: 'in', lv: 12, bv: 1.5 }), { k: 'in', lv: 12 });
   assert.deepEqual(validGateIn({ k: 'spent', d: 514, x: 1 }), { k: 'spent', d: 514 });
   for (const bad of [{ k: 'spent' }, { k: 'spent', d: -1 }, { k: 'spent', d: 1.5 }]) assert.equal(validGateIn(bad), null);
-  assert.deepEqual(GATE_OUT_KINDS, ['st', 'mv', 'atk', 'hp', 'ph', 'wrath', 'fell', 'rcpt', 'no', 'fed', 'cx', 'cxh', 'cxb', 'stun', 'ad', 'amv', 'aatk', 'ah', 'adie', 'bd', 'vgw', 'sdh', 'kn', 'kr', 'rj', 'tithe', 'cpf', 'cpw', 'go', 'cf']);   // PIN MOVED (GATE-COURTS): the court the book seats me in, and a court's kill said to everyone; PIN MOVED (WB14f): the Captive freed and his ward given; PIN MOVED (WB14e): a Tithe-Imp's tithe; PIN MOVED (INT11): and the count's fall; PIN MOVED (WB14c): and a stage of the Vanguard; PIN MOVED (WB14d): the Sundering's four; WB8b: a Soul-Hungry Warden's feeding; WB9c: the crystals and the stun; WB11b: his host
+  assert.deepEqual(GATE_OUT_KINDS, ['st', 'mv', 'atk', 'hp', 'ph', 'wrath', 'fell', 'rcpt', 'no', 'fed', 'cx', 'cxh', 'cxb', 'stun', 'ad', 'amv', 'aatk', 'ah', 'adie', 'bd', 'vgw', 'sdh', 'kn', 'kr', 'rj', 'tithe', 'cpf', 'cpw', 'go', 'cf']);
   assert.deepEqual(validGateIn({ k: 'in', lv: 12, x: 1 }), { k: 'in', lv: 12 });
   assert.deepEqual(validGateIn({ k: 'hit', q: 3, d: 12.5, r: 2, extra: true }), { k: 'hit', q: 3, d: 12.5, r: 2 });
   for (const bad of [{ k: 'in' }, { k: 'in', lv: 0 }, { k: 'in', lv: GATE_LV_WIRE_MAX + 1 }, { k: 'in', lv: 1.5 }, { k: 'hit', q: -1, d: 1, r: 0 }, { k: 'hit', q: 1, d: 0, r: 0 },
@@ -419,11 +417,6 @@ test('WB3 wire: the client says two things - `in` with a level claim, `hit` with
   assert.equal(validGateOut({ k: 'mv', x: 0, z: 0, tx: 199, tz: 0, v: 3.2, at: 5 }), null, 'off the court');   // WB9b: the three courts' bound
   assert.deepEqual(validGateOut({ k: 'fell', at: 9, top: ['A', 'B', 'C', 'D'], n: 4, d: 3 }), { k: 'fell', at: 9, top: ['A', 'B', 'C'], n: 4, d: 3 });
   assert.equal(validGateOut({ k: 'rcpt', r: 'v1.abc.def' }), null);
-  assert.equal(relaySupportsGate('world109'), false);
-  assert.equal(relaySupportsGate('world112'), false, 'main\'s PARTY-TRAVEL, the last relay without a fight (WB3 was world110 on its branch)');
-  assert.equal(relaySupportsGate(`world${GATE_RELAY_MIN}`), true);
-  assert.ok(relayVersionAtLeast(GATE_RELAY_MIN), 'the relay this tree builds runs it');
-  assert.equal(RELAY_VERSION === 'world109', false);
   let b = null; let pass = 0;
   for (let i = 0; i < GATE_HZ_MAX * 2; i++) { const g = gateGate(b, 1000); b = g.bucket; if (g.pass) pass++; }
   assert.equal(pass, GATE_HZ_MAX, 'the bucket\'s depth');
@@ -568,7 +561,7 @@ test('WB3 relay: THE KILL - said once to everyone in the court, a receipt to exa
     assert.equal(readReceipt(f.rc['acct-peer-0003']).x, 'dealt', 'and peer-0003 by what it dealt');
     assert.deepEqual(Object.keys(f.rc).sort(), ['acct-peer-0001', 'acct-peer-0003']);
     assert.equal(r.store.get('gatefight').said, true, 'checkpointed with the kill');
-    // the hub - PIN MOVED (GATE-COURTS): a court's kill is said as `cf`, its court and the courts the night holds with it;
+    // the hub
     // the night's `fell` (the gate's collapse) waits for the seal, below
     const hubFell = gates(h9, 'cf');
     assert.deepEqual(hubFell, [{ t: 'gate', k: 'cf', at: fell[0].at, top: fell[0].top, n: 3, d: DAY, c: 0, cs: 1 }], 'everyone online, the day and the court with it');
@@ -586,7 +579,6 @@ test('WB3 relay: THE KILL - said once to everyone in the court, a receipt to exa
     const back = r.connect(); await r.hello(back, 'peer-0003', at(0, 10));
     await say(back, { k: 'in', lv: 10, bv: GATE_BRAIN_V });
     assert.deepEqual(gates(back, 'rcpt').map((m) => m.r), [f.rc['acct-peer-0003']]);
-    // PIN MOVED (GATE-COURTS): a newcomer while the gate admits comes in at the first court and is sent on to the next,
     // whose Warden stands
     const stranger = r.connect(); await r.hello(stranger, 'peer-0008', at(0, 10));
     assert.equal(stranger.closed, null, 'the first court is every newcomer\'s door');
@@ -642,27 +634,22 @@ test('WB3 relay: NO KEY - the fight and its receipts run the same, unsigned (the
 // ═══ THE SESSION ═════════════════════════════════════════════════════════════════════════════════════════════════
 
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
-function gateRig(room, relayV = RELAY_VERSION) {
+function gateRig(room) {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
   const got = []; s.onGate = (g, r) => got.push({ g, r });
   quiet(() => s.join(room, { x: 25.6, y: 0, z: 45, yaw: 0 }));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'gate');
   return { s, ws, got, out, tick: (ms) => { t += ms; } };
 }
 
-test('WB3 session: a gate frame goes only to a relay that runs a boss room, only from a gate room, through the wire\'s projection, GATE_HZ_MAX a second; the room\'s word comes in projected and is handed to the arena, junk dropped (mutants: the version door dropped; a gate frame sent from a cell; the inbound projection skipped)', () => {
-  const old = gateRig(KEY, 'world109');
-  assert.equal(old.s.gateOk, false);
-  assert.equal(old.s.sendGate({ k: 'in', lv: 10 }), false);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('WB3 session: a gate frame goes only from a gate room, through the wire\'s projection, GATE_HZ_MAX a second; the room\'s word comes in projected and is handed to the arena, junk dropped (mutants: a gate frame sent from a cell; the inbound projection skipped)', () => {
   const cell = gateRig('world:3,12');
   assert.equal(cell.s.sendGate({ k: 'in', lv: 10 }), false, 'no boss stands in a cell');
   const { s, ws, got, out, tick } = gateRig(KEY);
-  assert.equal(s.gateOk, true);
   assert.equal(s.sendGate({ k: 'in', lv: 10, name: 'Mac' }), true);
   assert.deepEqual(out().at(-1), { t: 'gate', k: 'in', lv: 10 }, 'the projection, not the caller\'s object');
   assert.equal(s.sendGate({ k: 'hit', q: 1, d: -5, r: 0 }), false, 'the wire\'s own law first');

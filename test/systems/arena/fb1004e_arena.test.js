@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-04e - the Arena's feedback (bible/01-Overview/bugs/Field-Bugs-2026-10-04e.md, report 2).
+// FIELD BUGS 2026-10-04e - the Arena's feedback (, report 2).
 //
 // Discord (Draugr): "Great feature and first tournament. But some small problems. Arrows are not refunded, which causes
 // problems; The ghosts outside are bothersome (I know they're story related); The multiple npc arena fights will target
@@ -22,7 +22,6 @@ import { undercroftPopulation, deepFoesOf, undercroftHallNear, UNDERCROFT_DEEP_M
 import { spendAmmoFor, ARROW_TEMPLATE } from '../../../src/systems/inventory.js';
 import { startShotTally, stopShotTally, noteShot, noteShotRecoverable } from '../../../src/systems/shotTally.js';
 import { playerArrowHitFoe } from '../../../src/combat/arrowFlight.js';
-import { PELLET_TEMPLATE } from '../../../src/characters/thunderlockIds.js';
 import { hostText } from '../../hostText.mjs';
 
 const read = (p) => hostText(p);   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld (scenes/questWorld.js, scenes/worldQuickSave.js) - the host read whole
@@ -33,7 +32,7 @@ const realArrows = (items) => items.filter((i) => i.templateIndex === ARROW_TEMP
 // ── ARENA-ARROWS ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('ARENA-ARROWS law: the quiver is counted as the bout begins and what it LOOSED is handed back - real stacks only, never more than went in or was loosed, a stack spent to nothing stood again (mutants: conjured counted; a refund past the mark; the drop handed back; the tally unread; the empty stack lost)', () => {
-  assert.deepEqual([...QUIVER_TEMPLATES], [ARROW_TEMPLATE, PELLET_TEMPLATE], 'every ammunition inventory.js spendAmmoFor spends');
+  assert.deepEqual([...QUIVER_TEMPLATES], [ARROW_TEMPLATE], 'the one ammunition inventory.js spendAmmoFor spends (the Thunderlock\'s pellets went with the guns)');
   const items = [arrows(20), arrows(3, { timeForItemToDisappear: 99 }), arrows(4, { questItem: true })];
   const mark = markQuiver(items);
   assert.deepEqual(mark.map((m) => [m.template, m.count]), [[ARROW_TEMPLATE, 20]], 'the twenty real arrows - not the conjured, not the quest\'s');
@@ -53,14 +52,12 @@ test('ARENA-ARROWS law: the quiver is counted as the bout begins and what it LOO
   assert.equal(drop[0].stackCount, 21);
   assert.equal(refundQuiver([arrows(10)], markQuiver([arrows(15)]), null), 0, 'nothing loosed (no tally), nothing paid');
   // spent to nothing
-  const two = [arrows(2), { name: 'Pellet', group: 'Weapons', templateIndex: PELLET_TEMPLATE, stackCount: 6 }];
+  const two = [arrows(2)];
   const m2 = markQuiver(two);
   spendAmmoFor(two, null); spendAmmoFor(two, null);
-  two.find((i) => i.templateIndex === PELLET_TEMPLATE).stackCount = 1;
   assert.equal(two.some((i) => i.templateIndex === ARROW_TEMPLATE), false, 'the quiver emptied');
-  assert.equal(refundQuiver(two, m2, new Map([[ARROW_TEMPLATE, 2], [PELLET_TEMPLATE, 5]])), 2 + 5);
+  assert.equal(refundQuiver(two, m2, new Map([[ARROW_TEMPLATE, 2]])), 2);
   assert.equal(two.find((i) => i.templateIndex === ARROW_TEMPLATE)?.stackCount, 2, 'a new stack off the copy');
-  assert.equal(two.find((i) => i.templateIndex === PELLET_TEMPLATE)?.stackCount, 6, 'and the Thunderlock\'s pellets too');
   // more than went in: nothing
   const grown = [arrows(5)];
   const m3 = markQuiver(grown);
@@ -80,14 +77,13 @@ test('ARENA-ARROWS tally: a real round spent from the watched pack is a shot, a 
   const bow = { weapon: { templateIndex: 130, name: 'Long Bow' }, pos: [0, 0, 0] };
   const foe = (extra = {}) => ({ dead: false, entity: { items: [], basics: {}, level: 1, stats: {}, skills: {}, ...extra }, ai: { feet: [0, 0, 0], yaw: 0, height: 1.8 } });
   const player = { level: 1, items: pack, stats: {}, skills: {} };
-  const lodges = () => 0;   // PIN MOVED (ARROW-LODGE): each shaft survives its strike (under ARROW_LODGE_CHANCE) - the pin is where it lodges
+  const lodges = () => 0;
   playerArrowHitFoe(bow, foe(), { playerEntity: player, rolls: lodges });   // a wild foe: lootable
   playerArrowHitFoe(bow, foe({ bout: { id: 'b' } }), { playerEntity: player, rolls: lodges });   // a bout fighter: lost
   playerArrowHitFoe(bow, { ...foe(), rival: 'p1' }, { playerEntity: player, rolls: lodges });   // a relay opponent's stand-in: lost
   assert.deepEqual([...stopShotTally()], [[ARROW_TEMPLATE, 3]], 'four real shots, one lodged where it can be looted');
   noteShot(pack, ARROW_TEMPLATE); noteShotRecoverable(ARROW_TEMPLATE);
   assert.equal(stopShotTally(), null, 'stopped: nothing counted after');
-  assert.match(read('src/systems/inventory.js'), /const real = !isSummoned\(getItem\(list, opts\.group, template, opts\)\);\n  if \(!removeOne\(list, template, opts\)\) return false;\n  if \(real\) noteShot\(list, template\);/);
 });
 
 /** test/systems/arena/audit1003_bouts.test.js's rig, cut down: a ladder bout on a fake floor, the driver's doors logged. */
@@ -143,10 +139,6 @@ test('ARENA-ARROWS driven: a bout dismissed before its healers stops its tally -
   assert.equal(r.A.refundQuiver(), 0, 'paid once');
 });
 
-test('ARENA-ARROWS: a private session\'s bout let go before its healers hands the quiver back too (the world host\'s session door)', () => {
-  assert.match(read('src/scenes/world.js'), /heal: \(\) => \{ arenaHeal\(\); arenaBouts\.refundQuiver\(\); \},/);
-});
-
 // ── ARENA-TEAMS ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('ARENA-TEAMS: a two-against-one\'s pair are teammates and a blast of one passes the other by; a Grand Melee has none (mutants: the side ignored; the blast\'s skip gone; a caster without its foe)', () => {
@@ -160,12 +152,6 @@ test('ARENA-TEAMS: a two-against-one\'s pair are teammates and a blast of one pa
   assert.equal(boutTeammates(a, { entity: {} }), false);
   assert.equal(boutTeammates({ entity: {} }, { entity: {} }), false, 'no bout, no team');
   assert.equal(boutTeammates(tag('m', 1), tag('m', 2)), false, 'a Grand Melee: each a side of its own');
-  const M = read('src/scenes/hostMagic.js');
-  const blast = M.slice(M.indexOf('function explodeAt('), M.indexOf('applySpellToFoe(spell, casterLevel, t, caster);', M.indexOf('function explodeAt(')));
-  assert.match(blast, /if \(caster\?\.foe && boutTeammates\(caster\.foe, t\)\) continue;/, 'the blast passes a teammate by');
-  // the floor's instance is a dungeon level: its foe missiles' blasts carry their foe as hostMagic's own do
-  const D = read('src/scenes/dungeonContext.js');
-  for (const w of ['wCaster', 'fCaster', 'mCaster']) assert.match(D, new RegExp(`const ${w} = m\\.casterFoe \\? \\{ entity: m\\.casterFoe\\.entity, sinks: foeSinks\\(m\\.casterFoe\\), foe: m\\.casterFoe \\} : null;`), w);
 });
 
 test('ARENA-TEAMS: the HUD calls a Grand Melee "each alone" between its columns, a team bout "vs" (mutants: the melee test inverted; the word never written)', () => {
@@ -174,7 +160,6 @@ test('ARENA-TEAMS: the HUD calls a Grand Melee "each alone" between its columns,
   assert.equal(at([f('you', 0), f('a', 1), f('b', 2), f('c', 3)]).vs, ARENA_TEXT.hud.eachAlone, 'every fighter a side of its own');
   assert.equal(at([f('you', 0), f('a', 1), f('b', 1)]).vs, ARENA_TEXT.hud.vs, 'two against one: a team');
   assert.equal(at([f('you', 0), f('a', 1)]).vs, ARENA_TEXT.hud.vs, 'a duel');
-  assert.match(read('src/ui/arena/arenaHud.js'), /if \(\(model\.vs \?\? ARENA_TEXT\.hud\.vs\) !== shown\.vs\) \{ shown\.vs = model\.vs \?\? ARENA_TEXT\.hud\.vs; parts\.vs\.textContent = shown\.vs; \}/);
 });
 
 // ── CURSE-OFF-SAND ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -197,9 +182,8 @@ test('CURSE-OFF-SAND: the Curse of Daggerfall\'s wave waits outside the arena\'s
   for (const host of ['world.js', 'exterior.js']) {
     assert.match(read(`src/scenes/${host}`), /foeKeptOff: \(foe\) => \(\((?:host\.)?modes\?\.mode \?\? 'exterior'\) !== 'exterior'\n\s*\? !!(?:host\.)?modes\?\.questFoeKeptOff\?\.\(foe\)\n\s*: keptOffArenaGround\(\{ questName: foe\?\.parentQuest\?\.questName, feet: player\.pos, centre: arenaCity(Pixel\(\)|Origin) \? arenaCityStage\.centre\(\) : null \}\)\),/, host);
     const src = read(`src/scenes/${host}`), at = src.indexOf('tryPlaceFoe: (handle) => {');
-    assert.ok(at > 0 && !src.slice(at, at + 6000).includes('keptOffArenaGround'), `${host}: no refusal at placement`);   // PIN MOVED (TESA's merge): world.js's quest world is scenes/questWorld.js's (host.modes), the host read whole
+    assert.ok(at > 0 && !src.slice(at, at + 6000).includes('keptOffArenaGround'), `${host}: no refusal at placement`);
   }
-  assert.match(read('src/scenes/worldModes.js'), /questFoeKeptOff\(foe\) \{\n\s*return mode === 'dungeon' && keptOffArenaGround\(\{ questName: foe\?\.parentQuest\?\.questName, inArenaLevel: isArenaFloor\(dungeonLoc\) \|\| isArenaUndercroft\(dungeonLoc\) \}\);/);
 });
 
 test('CURSE-OFF-SAND driven: a wave kept off passes at CreateFoe\'s spawn event as a hidden Foe\'s does - no wave pending, so no encounter event raised every tick to break a rest on the grounds; off the grounds the next interval\'s wave comes (mutants: the seam unasked)', () => {

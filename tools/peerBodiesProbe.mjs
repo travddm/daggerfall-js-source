@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// THE PEER BODIES PROBE (2026-09-22). Mac: "look for ways to improve
-// online performance."
+// THE PEER BODIES PROBE.
 //
 // PERF-ON2 measured the online frame - the session, the names, the
 // billboard draw - and found each cheap (tools/onlinePerfProbe.mjs).

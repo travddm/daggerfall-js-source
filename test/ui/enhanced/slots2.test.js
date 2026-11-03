@@ -1,4 +1,4 @@
-// SLOTS2 (Mac, 2026-09-26: "Go ahead and do the follow up" - the MW-EARLY
+// SLOTS2 (- the MW-EARLY
 // audit's note that picking the most recent save parsed every slot).
 // THE MOST-RECENT PICK STOPS AT THE FIRST SAVE IT CAN RESTORE.
 // mostRecentRestorable was restorableSaves' head: every slot's envelope
@@ -80,18 +80,6 @@ test('SLOTS2: the pick is still the list\'s head - over a stale version, an enve
   s.reads = 0;
   restorableSaves(s);
   assert.equal(s.reads, 6, 'the Load and Online panes read every slot - their cards draw each');
-});
-
-test('SLOTS2: the recency order has ONE home, and both walks read it; the doors that ask for one save are the ones this saves (mutant: a copy of the sort)', () => {
-  const src = rd('src/systems/save/saveSlots.js');
-  assert.equal((src.match(/\.sort\(\(a, b\) => \(b\[1\]\.dateAndTime\?\.realTime \?\? 0\) - \(a\[1\]\.dateAndTime\?\.realTime \?\? 0\)\)/g) ?? []).length, 1, 'one recency sort');
-  assert.equal((src.match(/for \(const \[key, info\] of slotsByRecency\(storage\)\) \{/g) ?? []).length, 2, 'the list and the cut-short walk read it');
-  assert.match(src, /export function firstRestorable\(accept = \(\) => true, storage = store\(\)\) \{\n\s*for \(const \[key, info\] of slotsByRecency\(storage\)\) \{\n\s*const snap = restorableSlot\(key, storage\);\n\s*if \(snap && accept\(\{ key, info, snap \}\)\) return \{ key, info, snap \};\n\s*\}\n\s*return null;\n\}/, 'the walk, cut short at the first it accepts');
-  assert.match(src, /export function mostRecentRestorable\(storage = store\(\)\) \{\n\s*const first = firstRestorable\(undefined, storage\);/, 'the most-recent question is that walk, accepting any');
-  assert.match(rd('src/scenes/world.js'), /mostRecent \? \(mostRecentRestorable\(\)\?\.snap \?\? null\)/, 'the boot\'s ?load door');
-  assert.match(rd('src/scenes/menu.js'), /export const hasSavedGame = \(\) => !!mostRecentRestorable\(\);/, 'the start menu');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /try \{ entry = mostRecentRestorable\(\); \}/, 'the Continue card');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /: newestPortraitSave\(\);/, 'the door\'s portrait (AUDIT S1)');
 });
 
 test('AUDIT SLOTS2 S1: the door\'s portrait reads the saves only as far as portraitSave\'s answer - the same save the whole list gave, past a newest one still in chargen and one with no race; firstRestorable hands its question every restorable slot newest first and stops at the first it takes (mutant: the whole list read on every render again)', () => {

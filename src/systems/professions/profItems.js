@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") - A STORES MATERIAL AS DFU'S OWN
+// PROF1 - A STORES MATERIAL AS DFU'S OWN
 // ITEM: its name, and the items a withdrawal mints into the pack
-// (bible/06-Systems/Professions-Arc.md 7, 22; law 3 - the Stores are
+// (7, 22; law 3 - the Stores are
 // one way: nothing here puts an item back in).
 //
 // AN HERB is a plant template in its group - PlantIngredients1 or 2, as

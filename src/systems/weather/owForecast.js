@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-FORECAST (2026-10-19, the owner, of "a weather forecast from the air": "I like this idea, but do it right";
-// bible/06-Systems/Travel-View.md OW-FORECAST): THE WEATHER AHEAD, ON THE OVERWORLD.
+// OW-FORECAST: THE WEATHER AHEAD, ON THE OVERWORLD.
 //
 // The world's weather is a map (WEATHER3, systems/weather/weatherMap.js): systems born on the land, drifting, growing and
 // dying, the weather at any place and minute a pure function of both - so it can be asked of a place and a minute that

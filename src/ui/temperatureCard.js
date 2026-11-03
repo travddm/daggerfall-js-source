@@ -1,5 +1,4 @@
-// TEMP-UI (2026-10-12, the owner: "add a tempurature widget to the UI including allowing players to see their personal
-// tempurature in their inventory") - THE PACK'S TEMPERATURE (enhanced pack only; the classic window keeps DFU's own
+// TEMP-UI - THE PACK'S TEMPERATURE (enhanced pack only; the classic window keeps DFU's own
 // window untouched - THE NATIVE-WINDOW RULE - and says the number on the Status page, survival/status.js).
 //
 // Three places, one reading:

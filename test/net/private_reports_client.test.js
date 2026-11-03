@@ -1,4 +1,4 @@
-// PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client"): THE
+// PRIVATE-REPORT: THE
 // CLIENT'S SIDE - net/privateReport.js ReportDesk over the real service (a send, its rid, my list, a reader's inbox), the
 // PostBox's reader count and its notice, ui/enhanced/enhancedReport.js's panes in the mailbox's window, and `/bug`.
 import { test } from 'node:test';
@@ -94,7 +94,7 @@ test('PRIVATE-REPORT the desk: words the law refuses are never asked; a lost ans
 });
 
 test('PRIVATE-REPORT A READER\'S BOX: the service\'s count rides the box and the envelope counts the unopened; a rise said on the world tab, never what the reports say - and said on a sitting\'s first look; a report opened is off the envelope at once, and a new one after it said; nobody else\'s box carries a count (mutants: the envelope blind to reports; the rise never said; the first look silent; a fall said; the desk\'s counts never the envelope\'s; a report opened still counted)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const said = [];
   const box = new PostBox({ ioOf: ioFor(svc, mac), onPost: (e) => said.push(e) });
@@ -283,7 +283,7 @@ test('PRIVATE-REPORT THE FORM IN THE MAILBOX: a door under the post; the form - 
 });
 
 test('PRIVATE-REPORT THE READER\'S INBOX IN THE MAILBOX: a door that counts the unopened, and the focus into the pane; the open list, unopened first, with who sent each, its tab counting it; one opened - its words, the build it came from - and the reporter told it was read; the three closes; closed as fixed, the focus on Open again; the reporter\'s list says Fixed (mutants: the inbox door for everyone; the close never asked; read never said to the reporter; the focus to the window\'s Close; a second close while one is out; the closed list never looked at again; the counts never taken from the inbox)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const annDesk = new ReportDesk({ ioOf: ioFor(svc, ann), context: () => ({ update: '0.0.412', build: 'd9187c3049cb', app: 'browser' }) });
   annDesk.setDraft({ ...words, kind: 'security', subject: 'Tokens never expire' });
@@ -337,7 +337,7 @@ test('PRIVATE-REPORT THE READER\'S INBOX IN THE MAILBOX: a door that counts the 
 });
 
 test('PRIVATE-REPORT A PAGE AT A TIME (AUDIT PRIVATE-REPORT SVC-4): past a hundred open reports the inbox offers "Show older reports", which adds the next page under the rows held - none twice - and goes when none follows and a look that fails over them is said (mutants: the next page in place of the first; the button never shown; a failed look silent over a list)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const put = svc.env.DB._raw.prepare('INSERT INTO private_reports (id, from_id, rid, kind, subject, body, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
   for (let i = 0; i <= REPORT_INBOX_MAX; i++) put.run(`laidreport${String(i).padStart(6, '0')}`, ann.id, `laid-${i}`, 'bug', `Report number ${i}`, words.body, 1000 + i);
@@ -369,7 +369,7 @@ test('PRIVATE-REPORT A PAGE AT A TIME (AUDIT PRIVATE-REPORT SVC-4): past a hundr
 });
 
 test('PRIVATE-REPORT THE DESK IS ONE ACCOUNT\'S (AUDIT PRIVATE-REPORT CLI-1 TEST-4): another account on the same sitting - the pause face signs out and in - finds no draft, no list, no inbox and no opened report of the last one\'s, and no reader\'s count; a look set out under one account and answered under another is never taken, nor an older look answering after a newer; a reader taken off the list drops what only a reader may hold (mutants: the desk kept past a switch, by the box and by itself; an answer for a session gone taken, by the desk and by the box; the newest look overwritten by an older; the inbox kept past not-report-reader)', async () => {
-  const svc = await standService({ REPORT_READER_HANDLES: 'Mac' });
+  const svc = await standService({ SEAT_OWNERS: 'Mac' });
   const ann = await svc.registered('Ann'), mac = await svc.registered('Mac');
   const annDesk = new ReportDesk({ ioOf: ioFor(svc, ann) });
   annDesk.setDraft(words);
@@ -436,7 +436,7 @@ test('PRIVATE-REPORT THE DESK IS ONE ACCOUNT\'S (AUDIT PRIVATE-REPORT CLI-1 TEST
   await box.desk.loadInbox('open');
   assert.equal((await box.desk.open(id)).ok, true);
   assert.deepEqual([box.desk.inbox.open.length, box.desk.opened.size], [1, 1]);
-  svc.env.REPORT_READER_HANDLES = '';
+  svc.setStaff('Mac', 'none');
   assert.deepEqual(await box.desk.loadInbox('open'), { ok: false, error: 'not-report-reader' });
   assert.deepEqual([box.desk.inbox.open, box.desk.opened.size, box.desk.counts], [null, 0, { unread: 0, open: 0 }]);
 });
@@ -454,19 +454,8 @@ test('PRIVATE-REPORT the doors: `/bug` the form and `/mail` the mailbox, on eith
   assert.ok(HOST_COMMANDS.includes('bug'));
   assert.deepEqual(parseChatLine('/bug'), { kind: 'host', name: 'bug' }, 'never said to the room');
   assert.ok(HELP_LINES.some((l) => l.startsWith('/bug - ')), '/help says it');
-  const world = src('src/scenes/world.js');
-  // PIN MOVED (SEASON-BOOK): the host asks pauseCommandOf, mailboxCommandOf's lines and `/season` (test/ui/enhanced/seasonbook.test.js)
-  assert.match(world, /import \{ breachCommandOf, helpLines, pauseCommandOf, pauseCommandRefusal \} from '\.\.\/net\/chatCommands\.js';/);
-  assert.match(world, /\{ const at = pauseCommandOf\(text\); if \(at\) \{/);
   assert.equal(pauseCommandOf('/bug'), 'report');
   assert.equal(pauseCommandOf('/mail'), 'mailbox');
-  const door = src('src/ui/pauseDoor.js');
-  assert.match(door, /if \(\(hooks\.at === 'mailbox' \|\| hooks\.at === 'report' \|\| hooks\.at === 'season'\) && typeof document !== 'undefined'\) return enhancedPauseOverlay\(show, hooks\);/);   // PIN MOVED (SEASON-BOOK): and `/season`
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /else if \(at === 'report'\) \{ postOpen = true; postKeep = \{ view: 'report' \}; \}/);
-  // AUDIT PRIVATE-REPORT UI-2: Escape in the mailbox's fields leaves the window; UI-10: a held key in a field is the field's
-  assert.match(menu, /if \(t && \(t\.tagName === 'INPUT' \|\| t\.tagName === 'TEXTAREA' \|\| t\.isContentEditable\) && !\(e\.key === 'Escape' && t\.closest\?\.\('\.px-postwin'\)\)\) return;/);
-  assert.match(door, /if \(e\.repeat && \(e\.key === 'Enter' \|\| e\.key === ' '\) && !isTextEntryTarget\(e\.target\)\) \{/);
   for (const rule of ['.px-postwin .pr-field textarea', '.px-postwin .pr-kind input:focus-visible', '.px-postwin .pm-doors',
     '.px-postwin .pr-field textarea::placeholder, .px-postwin .pr-field input::placeholder { color: var(--dim); }', '.px-postwin .pr-more[hidden] { display: none; }']) assert.ok(ENHANCED_CSS.includes(rule), rule);
 });

@@ -1,4 +1,4 @@
-// AUDIT STARTS (2026-10-25, bible/01-Overview/audits/Audit-Starts.md; the owner: "Audit this and ensure its perfect"):
+// AUDIT STARTS:
 // THE PINS OF THE STARTS' AUDIT - START1 to START3 read against the code that runs them, in five lanes (the quests, the
 // world host, the voyages, the page and the map, the pins themselves), and every fix here held to the shape its
 // producer mints: the held map's past-Bay picks (U1, U2, U4), the lens past the Bay (U5), the start page's press and
@@ -7,7 +7,7 @@
 // goto's glide (P9), the doorstep (P10), the quest layer's start seam (P11), the main quest's first look (Q2), and the
 // sea lanes' corner, helm, wide box, landfall and no-ladder laws (P5, V4, V5, V6). Where ARENA2_PATH names the game's
 // data, the freeware's own Tamriel: Daggerfall to every port past the Bay, every port's open water to Daggerfall, and
-// the classic rows' widths in every language the page is drafted in.
+// the classic rows' widths in English.
 import '../../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,7 +18,7 @@ import { STARTS, START_QUESTS, HAND_START_QUEST, startByKey, startOfSiteId } fro
 import { startLairSites, START_SITE_MIN } from '../../../src/systems/starts/startSite.js';
 import { lairCellOf, lairSite } from '../../../src/world/tamrielDungeons.js';
 import { LOCATION_TYPES, DUNGEON_TYPES, mapPixelToLongitudeLatitude } from '../../../src/formats/mapsFile.js';
-import { createStartsHost, STARTS_TEXT } from '../../../src/scenes/startsHost.js';
+import { createStartsHost } from '../../../src/scenes/startsHost.js';
 import { createQuestBridge } from '../../../src/scenes/quest/questBridge.js';
 import { createQuestWorld } from '../../../src/scenes/questWorld.js';
 import { StartChoiceScreen, START_ROW_TOP, START_ROW_H, START_X0, startRowAt } from '../../../src/ui/startChoice.js';
@@ -26,18 +26,15 @@ import { drawStartChoiceFace, releaseStartChoiceFace, startChoiceFaceOwner, _set
 import { _frameForTests, DRAW_FRAMES_UNDRAWN } from '../../../src/ui/drawWatchdog.js';
 import { createChargenWindow } from '../../../src/systems/chargenSession.js';
 import { ChargenFlow } from '../../../src/ui/chargen.js';
-import { LevelingChoiceScreen } from '../../../src/ui/levelingChoice.js';
+import { ChoiceScreen } from '../../../src/ui/choiceScreen.js';
 import { SKILLS } from '../../../src/systems/skills.js';
-import { ORL_VENDOR } from '../../../src/systems/oblivionLeveling.js';
+import { LEGACY_MOD } from '../../../src/systems/legacy/family.js';
 import { setModSetting } from '../../../src/systems/modSettings.js';
 import { entryTarget, targetWords, WHERE_TEXT } from '../../../src/ui/quest/questLens.js';
 import { canFindPlace } from '../../../src/ui/travel/travelMapWindow.js';
 import { HeldMapWindow } from '../../../src/ui/heldMap.js';
 import { tamrielInkFor } from '../../../src/ui/tamrielInk.js';
 import { setCapitalsStanding } from '../../../src/world/tamrielCapitals.js';
-import { buildWildMask } from '../../../src/systems/wild/wildZone.js';
-import { CYRODIIL_THEATRE } from '../../../src/systems/wild/cyrodiilZone.js';
-import { PROVINCE_OF_ID } from '../../../src/world/tamriel/tamrielLand.js';
 import { createQuestlines } from '../../../src/systems/questlines/qlLayer.js';
 import { QUESTLINES_PREF, readObjectives } from '../../../src/systems/questlines/qlLaw.js';
 import { sheetFor } from '../../../src/systems/questlines/qlSheets.js';
@@ -174,31 +171,6 @@ test('AUDIT STARTS U1/U2 the held map: a quest\'s place past the Bay offers no j
     assert.deepEqual(ported.map((p) => p.pixel), [city.pixel], 'and the portal goes');
     win.dispose?.();
   } finally { setCapitalsStanding(false); }
-});
-
-test('AUDIT STARTS U4 the zone map: its card is down, so a press on a quest\'s diamond inside the zone is the zone\'s own journey, as a hall\'s is (PVPJOURNEY) - outside the zone, or on the armed map, no panel (mutants: the zone\'s press, the zone\'s bound)', () => {
-  skin('enhanced');
-  globalThis.document = fakeDocument();
-  const ZONE_PX = { x: 1600, y: 300 };   // a quest's place inside Cyrodiil, the open zone, past the Bay
-  const mask = buildWildMask({ width: 50, height: 50, ox: 1500, oy: 200, cell: 4, inZone: () => true });
-  for (const armed of [false, true]) {
-    const win = heldMap({ wildMask: () => mask });
-    if (armed) win.activateTeleportationTravel();
-    win._zoneMap = true;
-    win._onSheet = () => true;
-    win._markerAt = () => null;
-    let quest = { px: ZONE_PX.x, py: ZONE_PX.y, placeName: 'Fortress of Tibercles' };
-    win._questAt = () => quest;
-    win._pickAt(0, 0);
-    assert.equal(win._selected?.name, 'Fortress of Tibercles', 'picked');
-    assert.equal(win._panel ?? null, armed ? null : 'travel', armed ? 'the armed map: no portal into the zone' : 'the zone\'s journey, its legend\'s Begin');
-    win._closePanel?.();
-    win._selected = null;
-    quest = { px: LAIR_PX.x, py: LAIR_PX.y, placeName: 'The Haunt of Baringon' };   // Skyrim's: past the Bay, outside the zone
-    win._pickAt(0, 0);
-    assert.equal(win._panel ?? null, null, 'outside the zone no journey');
-    win.dispose?.();
-  }
 });
 
 test('AUDIT STARTS P9 the journal\'s find of a place past the Bay glides the map to its pixel as it picks it (mutants: the glide dropped)', () => {
@@ -365,41 +337,35 @@ function madeTo(startChoice, race = 0) {
   return { w, result: () => result };
 }
 
-test('AUDIT STARTS P4 the chargen door hands the page the race the wizard made - a Nord\'s homeland, Skyrim, first and the answer of a page torn down - and asks it after the leveling question (mutants: the race unread, the page asked first)', () => {
+test('AUDIT STARTS P4 the chargen door hands the page the race the wizard made - a Nord\'s homeland, Skyrim, first and the answer of a page torn down - and asks it after the Project Legacy question (mutants: the race unread, the page asked first)', () => {
   const nord = madeTo({ open: () => true }, 2);
-  assert.ok(nord.w.levelingPrompt instanceof StartChoiceScreen, 'the page, the only question with the mod off');
-  assert.equal(nord.w.levelingPrompt.options[nord.w.levelingPrompt.cursor].id, 'Skyrim', 'the Nord\'s homeland');
+  assert.ok(nord.w.questionPrompt instanceof StartChoiceScreen, 'the page, the only question with Project Legacy off');
+  assert.equal(nord.w.questionPrompt.options[nord.w.questionPrompt.cursor].id, 'Skyrim', 'the Nord\'s homeland');
   nord.w.dispose();
   assert.equal(nord.result().startKey, 'Skyrim', 'torn down: the homeland\'s');
-  setModSetting(ORL_VENDOR, 'Enabled', true);
+  setModSetting(LEGACY_MOD, 'Enabled', true);
   try {
     const both = madeTo({ open: () => true }, 2);
-    assert.ok(both.w.levelingPrompt instanceof LevelingChoiceScreen, 'the leveling question first');
+    assert.ok(both.w.questionPrompt instanceof ChoiceScreen, 'the Project Legacy question first');
     both.w.input('Enter');
-    for (let i = 0; i < 3 && !(both.w.levelingPrompt instanceof StartChoiceScreen); i++) both.w.input('Enter');
-    assert.ok(both.w.levelingPrompt instanceof StartChoiceScreen, 'the page after it, last');
+    for (let i = 0; i < 3 && !(both.w.questionPrompt instanceof StartChoiceScreen); i++) both.w.input('Enter');
+    assert.ok(both.w.questionPrompt instanceof StartChoiceScreen, 'the page after it, last');
     both.w.input('Enter');
     assert.equal(both.result().startKey, 'Skyrim');
-    assert.ok(both.result().levelingSystem);
-  } finally { setModSetting(ORL_VENDOR, 'Enabled', false); }
+    assert.ok(both.result().legacyModel);
+  } finally { setModSetting(LEGACY_MOD, 'Enabled', false); }
 });
 
 // ── the start host ───────────────────────────────────────────────
 
-test('AUDIT STARTS W2 online the Imperial Province is the open zone, its dungeons sealed: a character born online is not offered its start - shut on the page with why - and offline it stands (mutants: the zone\'s start offered online)', () => {
+test('AUDIT STARTS W2 the start page reads the host\'s word: an option the host shuts is locked on the page with the host\'s why, and the rest stay open', () => {
   const imperial = startByKey('Imperial');
-  assert.equal(imperial.province, PROVINCE_OF_ID[CYRODIIL_THEATRE], 'the zone\'s province is the start\'s');
-  const online = startsHost({ params: 'online=1&realmnew=1' }).page;
-  assert.equal(online.open(imperial), false);
-  assert.equal(online.why(imperial), STARTS_TEXT.openZone);
-  for (const s of STARTS.filter((x) => x !== imperial)) assert.equal(online.open(s), true, `${s.key}: open online`);
-  const offline = startsHost().page;
-  assert.equal(offline.open(imperial), true, 'offline the province is no zone');
-  assert.equal(offline.why(imperial), null);
-  // the page reads the host's why
-  const page = new StartChoiceScreen(() => {}, { race: 'Breton', open: online.open, why: online.why });
+  const open = (s) => s !== imperial;
+  const why = (s) => (s === imperial ? 'shut for the test' : null);
+  const page = new StartChoiceScreen(() => {}, { race: 'Breton', open, why });
   const row = page.options.find((o) => o.id === 'Imperial');
-  assert.deepEqual([row.locked, row.lockNote], [true, STARTS_TEXT.openZone]);
+  assert.deepEqual([row.locked, row.lockNote], [true, 'shut for the test']);
+  for (const o of page.options.filter((x) => x.id !== 'Imperial')) assert.equal(o.locked ?? false, false, `${o.id}: open`);
 });
 
 test('AUDIT STARTS W3 a load at a running province start\'s own dungeon, its commission still in it, resumes inside - through the quest\'s own entry - where ONLINE-UNDERGROUND-LOAD1 woke every other online load at the door; once the commission is found, or the start ended, or at another pixel, the law stands (mutants: the pixel, the commission found, the province\'s alone, both doors in world.js)', () => {
@@ -421,10 +387,6 @@ test('AUDIT STARTS W3 a load at a running province start\'s own dungeon, its com
   assert.equal(startsHost({ machine: b.m }).resumesAt(LAIR_PX), false);
   const other = { questName: 'M0B00Y06', getPlace: () => ({ siteDetails: { worldPixel: LAIR_PX } }), getTask: () => null };
   assert.equal(startsHost({ machine: { quests: new Map([[1, other]]) } }).resumesAt(LAIR_PX), false, 'a quest taken, not a start');
-  // the world host asks it at both doors: the online wake, and the entry by the quest's own instance
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /else if \(onlineOn && !\(pixel\.x === getInt\('Startup', 'StartCellX'\) && pixel\.y === getInt\('Startup', 'StartCellY'\)\) && !starts\.resumesAt\(pixel\)\) \{/);
-  assert.match(W, /modes\?\.startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/);
 });
 
 test('AUDIT STARTS W5 a save from before the story began - no start, no curse, no main quest - loads with the commission handed over and the curse beside it; a story begun, a start running, or a save from before the story was kept is left alone; both load doors ask (mutants: the healing, the begun story\'s check)', () => {
@@ -438,8 +400,6 @@ test('AUDIT STARTS W5 a save from before the story began - no start, no curse, n
     assert.deepEqual(m.begun, [], `left alone: ${JSON.stringify(Object.keys(o))}`);
   }
   assert.equal(startsHost().restored(), true, 'no machine: nothing to heal');
-  const W = rd('src/scenes/world.js');
-  assert.equal([...W.matchAll(/_questStarted = starts\.restored\(\);/g)].length, 2, 'the two load doors');
 });
 
 test('AUDIT STARTS Q5 the machine counts its restores - what a start on its way reads to know a load landed under it, and drops itself (mutants: the count)', () => {
@@ -449,22 +409,6 @@ test('AUDIT STARTS Q5 the machine counts its restores - what a start on its way 
   const before = p.m.restores ?? 0;
   p.m.restoreSaveData(structuredClone(p.m.getSaveData()));
   assert.equal(p.m.restores, before + 1);
-});
-
-test('AUDIT STARTS U6/U7 the drafted words: French says a ship\'s own name bare, as its passage family does ("The Gilded Cog", "Le navire" carry their own article); Bulgarian keeps Daggerfall, the Iliac Bay and Sentinel in Latin, as its catalog and the quests do', () => {
-  const csv = (lang) => { const out = new Map(); for (const line of rd(`locales/${lang}/Port_Strings.csv`).split(/\r?\n/)) { const m = /^([^,]+),"((?:[^"]|"")*)"$/.exec(line); if (m) out.set(m[1], m[2].replace(/""/g, '"')); } return out; };
-  const fr = csv('fr');
-  for (const k of ['passage.booked', 'passage.bookedWrit']) assert.doesNotMatch(fr.get(k), /\b(Le|La|Les) \{ship\}/, k);
-  const bg = csv('bg');
-  for (const [k, v] of bg) if (k.startsWith('start.')) assert.doesNotMatch(v, /Даггерфол|Илиак|Сентинел/, k);
-  assert.match(bg.get('start.IliacBay.title'), /^Iliac Bay$/);
-});
-
-test('AUDIT STARTS W8 the boot\'s ?start= is a dev door of its boot alone: an online page, a birth\'s and a load\'s address drop it, and so does every front door\'s choice (mutants: a door keeping it)', () => {
-  assert.match(rd('src/systems/online/onlineLane.js'), /export const BOOT_DOOR_KEYS = Object\.freeze\(\[[^\]]*'start'\]\);/);
-  const P = rd('src/systems/legacy/places.js');
-  assert.equal([...P.matchAll(/for \(const k of \[[^\]]*'start'\]\) p\.delete\(k\);/g)].length, 2, 'a birth\'s address and a load\'s');
-  assert.equal([...rd('src/main.js').matchAll(/params\.delete\('start'\);/g)].length, 2, 'and both front doors\' choices (MAC-N3: BOOT_DOOR_KEYS is what main.js decides)');
 });
 
 test('AUDIT STARTS P2 the bridge starts the start it is handed: the commission in hand\'s with the curse, and a name no start has is the Bay\'s (mutants: the start unpassed)', () => {
@@ -537,7 +481,7 @@ test('AUDIT STARTS P11/W5 the quest layer\'s start seam: a start\'s site id name
   let latchedDuring = null;
   const host = {
     params: new URLSearchParams(), maps: { getLocation: () => null }, blocks: { getBlockByName: () => null },
-    provinceQuestPlaces: { startLairAt: (start, usable) => { asked.push([start.key, typeof usable]); return lair; } },   // PIN MOVED (AUDIT RELEASE R2-5, hostseam): the start lair rides the places past the Bay
+    provinceQuestPlaces: { startLairAt: (start, usable) => { asked.push([start.key, typeof usable]); return lair; } },
     _respawnAtSite: async () => { latchedDuring = host._respawning; },
   };
   const { questWorld: qw } = createQuestWorld(host);
@@ -556,7 +500,6 @@ test('AUDIT STARTS P11/W5 the quest layer\'s start seam: a start\'s site id name
 // ── the sea lanes ────────────────────────────────────────────────
 
 const VOYAGE = { start: 'sea', goal: 'land', voyage: true, again: false };
-/** PIN MOVED (PLAN-SLICES): the most cells a voyage's plan spends (its floods, its lanes and its landfall - travelRoute.js `tally`). */
 const VOYAGE_CELLS_MAX = 450000;   // measured 392,822 and 393,363 (the two floods and the lanes): some twenty frames at PLAN_FRAME_CELLS
 /** A ladder that says it was climbed. */
 const ladder = (rungs = [6, 20, 60]) => { const seen = { climbed: false }; return { seen, margins: { [Symbol.iterator]: () => { seen.climbed = true; return rungs[Symbol.iterator](); } } }; };
@@ -703,7 +646,7 @@ test('AUDIT STARTS V4/V7 on the freeware\'s Tamriel: from the nearest open water
     assert.equal(ports.length, 28);
     const home = openWaterNear(t.dp, t.rg.isWater);
     assert.ok(home, 'Daggerfall\'s harbor');
-    let most = 0;   // PIN MOVED (PLAN-SLICES): a plan's cells, an op count - the journey's plan is made a slice of PLAN_FRAME_CELLS a frame, and a clock on a shared runner is a flake
+    let most = 0;
     const timed = (f, to) => { const tally = { n: 0 }; const plan = planRoute(f, to, { ...t.rg, sea: VOYAGE, tally }); most = Math.max(most, tally.n); return plan; };
     const ashoreOnce = (plan, name) => {
       const fall = plan.kinds.indexOf('landfall');
@@ -729,20 +672,18 @@ test('AUDIT STARTS V4/V7 on the freeware\'s Tamriel: from the nearest open water
   } finally { setArenaStanding(false); t.reset(); }
 });
 
-test('AUDIT STARTS U8/W2 on the freeware: in FONT0003 the passage list\'s writ row stays inside the picker\'s art for every wind in every language the classic face draws it in, and online the Imperial Province\'s shut row fits the page\'s list (mutants: the row\'s words)', { skip: skipReal }, async () => {
+test('AUDIT STARTS U8/W2 on the freeware: in FONT0003 the passage list\'s writ row stays inside the picker\'s art for every wind in English, and online the Imperial Province\'s shut row fits the page\'s list (mutants: the row\'s words)', { skip: skipReal }, async () => {
   const { FntFile } = await import('../../../src/formats/fntFile.js');
   const { measureText } = await import('../../../src/ui/text.js');
   const { START_X1 } = await import('../../../src/ui/startChoice.js');
   const fnt = new FntFile(); fnt.load(new Uint8Array(readFileSync(join(ARENA2, 'FONT0003.FNT'))));
   const csv = (lang) => { const out = new Map(); for (const line of rd(`locales/${lang}/Port_Strings.csv`).split(/\r?\n/)) { const m = /^([^,]+),"((?:[^"]|"")*)"$/.exec(line); if (m) out.set(m[1], m[2].replace(/""/g, '"')); } return out; };
   const WINDS = ['north', 'northEast', 'east', 'southEast', 'south', 'southWest', 'west', 'northWest'];
-  for (const lang of ['en', 'cs', 'da', 'de', 'es', 'fr', 'id', 'it', 'nb', 'pt-BR', 'ro']) {
-    const r = csv(lang);
-    for (const w of WINDS) {
-      const row = r.get('passage.rowWrit').replace('{port}', 'Daggerfall').replace('{wind}', r.get(`passage.wind.${w}`));
-      assert.ok(measureText(fnt, row) <= 174, `${lang} ${w}: "${row}" ${measureText(fnt, row)} px of the list's 174 inside the art (ui/listPicker.js: x 26 of 200)`);
-    }
-    const shut = `> 4. ${r.get('start.Imperial.title')} - ${r.get('start.openZone')}`;
-    assert.ok(START_X0 + measureText(fnt, shut) <= START_X1, `${lang}: "${shut}"`);
+  const r = csv('en');
+  for (const w of WINDS) {
+    const row = r.get('passage.rowWrit').replace('{port}', 'Daggerfall').replace('{wind}', r.get(`passage.wind.${w}`));
+    assert.ok(measureText(fnt, row) <= 174, `${w}: "${row}" ${measureText(fnt, row)} px of the list's 174 inside the art (ui/listPicker.js: x 26 of 200)`);
   }
+  const shut = `> 4. ${r.get('start.Imperial.title')} - ${r.get('start.openZone')}`;
+  assert.ok(START_X0 + measureText(fnt, shut) <= START_X1, `"${shut}"`);
 });

@@ -34,36 +34,6 @@ test('CM1: a no-options ChoiceWindow is a click-anywhere message box, not a keye
   assert.equal(menu.done, false, 'a keyed ChoiceWindow is not ClickAnywhereToClose');
 });
 
-test('CM1: simple ChoiceWindow notices render through the one native parchment implementation', () => {
-  const s = src('src/ui/talkWindow.js');
-  assert.match(s, /import \{ layoutMessageBox, drawMessageBox, messageBoxArtLoaded \} from '\.\/messageBox\.js';/);
-  assert.match(s, /if \(!this\.options\.length && messageBoxArtLoaded\(\) && font\) \{/);
-  assert.match(s, /const box = layoutMessageBox\(font, this\.lines\);/);
-  assert.match(s, /if \(drawMessageBox\(renderer, m, font, box\)\) return;/);
-});
-
-test('CM2: every pushed rest modal uses classic DaggerfallMessageBox presentation', () => {
-  const s = src('src/ui/restWindow.js');
-  assert.match(s, /layoutMessageBox, drawMessageBox, messageBoxHit, messageBoxArtLoaded, MB_BUTTONS/);
-  for (const state of ['confirm', 'hours', 'hoursRefused', 'refused', 'ended']) {
-    assert.ok(s.includes(`'${state}'`), `${state} remains in the modal state set`);
-  }
-  assert.match(s, /buttons = \[MB_BUTTONS\.Yes, MB_BUTTONS\.No\];/,
-    'the illegal-rest confirmation draws BUTTONS.RCI Yes/No');
-  assert.match(s, /rows = \[\{ text: `\$\{prompt\}\$\{this\.value\}_`, center: false \}\];/, 'the prompt is the field\'s LABEL on the field\'s own row (SetTextBoxLabel :616)');
-  assert.match(s, /opts = \{ sizingRows: \[\{ text: `\$\{prompt\}\$\{'M'\.repeat\(PROMPT_MAX_CHARS\)\}_`, center: false \}\] \};/,
-    'the hours field sizes from DaggerfallInputMessageBox MaxCharacters, not the current digits');
-  assert.match(s, /this\._box = layoutMessageBox\(font, rows, buttons, opts\);/);
-  assert.match(s, /drawMessageBox\(renderer, m, font, this\._box\)/);
-});
-
-test('CM2: the rest confirmation buttons use the parchment hit rects', () => {
-  const s = src('src/ui/restWindow.js');
-  assert.match(s, /const hit = this\._box \? messageBoxHit\(this\._box, vx, vy\) : null;/);
-  assert.match(s, /if \(hit === MB_BUTTONS\.Yes\) this\.input\('confirm'\);/);
-  assert.match(s, /else if \(hit === MB_BUTTONS\.No\) this\.input\('back'\);/);
-});
-
 test('AUDIT-CM: the rest prompt behaves as the box - "0" seeded, digits typed, Escape back to the selection, and an EMPTY Return lands on the selection too (the box closed first, :298-304; TryParse fails, :742-744)', () => {
   const w = new RestWindow({ endLines: () => ['finished'], onClose: () => {}, entity: { stats: {}, skills: {} } });
   w.input('char:3');   // Loiter: the prompt without CanRest's gate

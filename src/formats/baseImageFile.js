@@ -10,8 +10,7 @@
 //   - GetSpectralEmissionColors32 + SetSpectral ported (Rendering's
 //     spectral row, classic-visuals direction): the gray remap, the
 //     eye patch, and the V^1.9 emission lerp are verbatim below.
-//     GetFireWallColors32 ported by EG-ZH (2026-10-12, the Elite Gates
-//     arc's fire falls its first consumer - Elite-Gates.md section 11.6):
+//     GetFireWallColors32 ported by EG-ZH:
 //     Unity's Color32.Lerp and its Color -> Color32 conversion, verbatim,
 //     in single precision (unityColor32, unityColor32Lerp).
 //   - File-path plumbing dropped; loaders take byte buffers.

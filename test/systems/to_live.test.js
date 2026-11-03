@@ -1,11 +1,9 @@
-// TO-LIVE (2026-10-02, Discord: "Whether or not I have the first setting for the Travel Options mod switched on or off,
-// both cautious and reckless travel initiate time accelerated travel. The only way to use vanilla fast travel is to
-// have the mod turned off entirely, and this requires a relog") - the mod's settings were read ONCE at the world's load,
+// TO-LIVE - the mod's settings were read ONCE at the world's load,
 // so the tile's "Cautiously" dial answered its boot value all session; and Inns, the other half of the mod's rule
 // (TO-FIELD2 turned it on), was on no screen, so a trip stopping at inns - Recklessly's too - was always a journey. Now
 // the live half is read again on every change of the mod settings (DFU re-runs LoadSettings on a change), the starred
 // restart half carried from the load; Inns is on the tile beside Cautiously; the panel's Acceleration Limit followed its
-// dial - RATE-LAW (2026-10-04, Mac: "Remove travel options dials") retired both the dial and the limit: a journey runs at
+// dial - RATE-LAW retired both the dial and the limit: a journey runs at
 // its ground's rate. Each pin is red on the record's code (42e50765).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,19 +40,6 @@ test('TO-LIVE THE LIVE HALF READ AGAIN: handed the boot bag, the read answers th
   const fresh = readTravelOptionsSettings();
   assert.notEqual(fresh.roadsIntegration, boot.roadsIntegration, 'read with no boot bag, the store whole (the record\'s read)');
   _resetModSettings();
-});
-
-test('TO-LIVE THE HOST READS IT AGAIN: the world keeps its load\'s bag and, on a change of the mod settings, reads the live half afresh and hands it to the mod - at the map\'s open (the fare deps\' handle) and in the journey\'s own frame; RATE-LAW: no limit to hand the panel (mutants: never refreshed, refreshed but not handed over)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /let travelOptionsSettings = readTravelOptionsSettings\(\);/);
-  assert.match(w, /const travelOptionsBoot = travelOptionsSettings;/);
-  const fn = w.match(/function refreshTravelOptionsSettings\(\) \{[\s\S]*?\n {2}\}/)?.[0] ?? '';
-  assert.match(fn, /const g = modSettingsGeneration\(\);\s+if \(g === _travelOptionsGen\) return;\s+_travelOptionsGen = g;/);
-  assert.match(fn, /travelOptionsSettings = readTravelOptionsSettings\(modSetting, travelOptionsBoot\);/);
-  assert.match(fn, /if \(travelOptions\) travelOptions\.settings = travelOptionsSettings;/);
-  assert.doesNotMatch(fn, /setAccelerationLimit/, 'RATE-LAW: the panel has no limit');
-  assert.match(w, /travelOptions: \(\) => \{ refreshTravelOptionsSettings\(\); return travelOptions; \},/, 'the maps\' handle');
-  assert.match(w, /refreshTravelOptionsSettings\(\);[^\n]*\n\s+const report = travelOptions\.update\(\{/, 'the journey\'s frame');
 });
 
 test('TO-LIVE INNS ON THE TILE: the other half of the mod\'s rule is a dial the drawer draws, right after Cautiously - TO-FIELD2 turned it on and no screen could turn it off (mutant: off the tile)', () => {

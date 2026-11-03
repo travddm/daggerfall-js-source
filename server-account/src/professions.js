@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") - THE PROFESSIONS, AS THE SERVICE
+// PROF1 - THE PROFESSIONS, AS THE SERVICE
 // KEEPS THEM: a character's tracks and Stores, the day's harvests, the
 // witnessed pixels, withdrawals to the pack, and the Court writs
-// (bible/06-Systems/Professions-Arc.md, PROF0 3, 6, 7, 11 and 22; the
+// (, PROF0 3, 6, 7, 11 and 22; the
 // numbers are src/net/professionLaw.js and src/net/nodeLaw.js, which
 // the client reads too).
 //
@@ -135,7 +135,7 @@ export const shut = (player, env) => (profOpenFor(player, env) ? null : { error:
 
 /** A track as the tabs read it: its XP and rank, the specialisations it stands under now, a change on its way. CRAFT3: a
  *  discipline's is its craft's track (`profession` the craft's - 'jewelcrafting' answers 'smithing'), and `free` the
- *  ranks a change is free at, once - the merge's (0088's `free_respec`: 1 the choice at 50, 2 at 100), said only where
+ *  ranks a change is free at, once - the merge's (`free_respec`: 1 the choice at 50, 2 at 100), said only where
  *  there is one. PERK-TRIAL: `trial` each rank whose choice is still on trial and until when (`{ 50: at }`), and `lock`
  *  the second the track's next paid change opens - each said only where there is one. `respec`, a change on its way, is
  *  never one now (AUDIT PERK-TRIAL P8: a change written as waiting stands at once - specsAt) and is said empty for the
@@ -148,7 +148,7 @@ export function trackView(row, profession, nowS) {
   const lock = respecLockUntil(row, nowS);
   return { profession: trackOf(profession), xp, rank: rankOfXp(xp), specs, respec: null, ...(free.length ? { free } : {}), ...(Object.keys(trial).length ? { trial } : {}), ...(lock ? { lock } : {}) };
 }
-/** CRAFT3: a rank's bit in a track's `free_respec` (0088) - 1 the choice at 50, 2 at 100. */
+/** CRAFT3: a rank's bit in a track's `free_respec` - 1 the choice at 50, 2 at 100. */
 export const freeBit = (rank) => (rank === 50 ? 1 : rank === 100 ? 2 : 0);
 /** GATHER-SPEED: a track's row as a statement, for a batch (trackRow asks it alone). */
 const trackStatement = (db, player, character, profession) =>
@@ -172,9 +172,8 @@ export async function storeOf(db, player, character, key) {
   // answer of it reads the loom's first-time line afresh
   return JUDGED_CLOTH.includes(key) ? { ...out, silver: await silverOf(db, player, character, key) } : out;
 }
-/** WOVEN-PAYS (AUDIT WOVEN-PAYS; the owner: "Woven cloth pays"): A CLOTH'S SILVER COUNT in SQL - the bolts of it (recipeLaw
- *  JUDGED_CLOTH) the character bought with silver that its stations have not used since (`prof_silver_cloth`, migration
- *  0177). While it stands, the bolts a craft uses are those, and a piece made wholly of cloth lays no first on (AUDIT 32
+/** WOVEN-PAYS (AUDIT WOVEN-PAYS): A CLOTH'S SILVER COUNT in SQL - the bolts of it (recipeLaw
+ *  JUDGED_CLOTH) the character bought with silver that its stations have not used since (`prof_silver_cloth`). While it stands, the bolts a craft uses are those, and a piece made wholly of cloth lays no first on (AUDIT 32
  *  S1 - recipeLaw firstCraftPays). `p`, `c` and `m` the player's, the character's and the material's SQL. */
 const silverSql = (p, c, m) => `COALESCE((SELECT qty FROM prof_silver_cloth WHERE player = ${p} AND char_id = ${c} AND material = ${m}), 0)`;
 const silverOf = async (db, player, character, key) => Number((await db.prepare(`SELECT ${silverSql('?1', '?2', '?3')} AS n`).bind(player, character, key).first())?.n ?? 0);
@@ -213,7 +212,7 @@ export async function carriedOf(db, player, character, key) {
  *  CLAMP_ORDER (gold's first, own last), each cutting what the total still stands over the held count, read afresh so
  *  the cuts before it count; the rows left at 0 deleted. Never raised: a pack holding more than the count adds nothing.
  *  The unbruised count follows the own units it counts (unbruisedClamp).
- *  AUDIT BAG1 B2 (bible/06-Systems/Materials-Bag.md, the audit): ONLY WHERE THE CLIENT'S `held` IS CURRENT. A held count
+ *  AUDIT BAG1 B2 (, the audit): ONLY WHERE THE CLIENT'S `held` IS CURRENT. A held count
  *  is read against the count the client last heard (`seen`, the total of every origin); when the service's count has moved
  *  since - a kept harvest or a withdrawal whose answer was lost, an act of a second request in flight - the pack does not
  *  yet hold units the count already has, and cutting to it lost them for good (the auditors' repro: three herbs gathered
@@ -276,7 +275,7 @@ const writsToday = async (db, player, day) => Number((await writsStatement(db, p
  * kept harvest asked again is given, and only that answer mints its items - swept at two days, a harvest whose answer was
  * lost (or heard under another character) was refused `prof-day` and its counted units never came. `limit` of each kind
  * at once, answering how many went.
- * SCALE4b (2026-10-08): THE SERVICE'S CLOCK'S (server-account/src/cron.js, each hour), never the state's read - which swept
+ * SCALE4b: THE SERVICE'S CLOCK'S (server-account/src/cron.js, each hour), never the state's read - which swept
  * first on every ask: two writes on the professions' busiest read, and every reader racing every other to run them. The bounds are the read's own, so a row lives no shorter; the state reads today alone.
  */
 export async function sweepHarvests(db, nowS, limit = 500) {
@@ -417,7 +416,7 @@ export async function profPixels({ db }, player, env, { character, pixels, dunge
 // ─── A HARVEST ───────────────────────────────────────────────────────
 
 /**
- * GATHER-SPEED (2026-10-11, Mac: "look at gathering minigame performance and how the server affects it/slows down"):
+ * GATHER-SPEED:
  * WHAT A HARVEST'S ANSWER READS, AS STATEMENTS - its track, the character's day, each Stores (or BAG1: carried) count it
  * moved, the account's hides or hauls today and (SILVER-FINDS) its find's line, the day's finds and the balance. They
  * were read one round trip each, after the harvest's own batch and its read-back: nine to fifteen trips to the
@@ -531,7 +530,7 @@ const huntStatement = (db, player, day) => db.prepare(`SELECT COALESCE(SUM(qty),
 const huntFrom = (r) => ({ hides: Number(r?.n ?? 0), high: Number(r?.high ?? 0) });
 /** PROF8 - the account's hauls today (CAP-OFF: said, no longer bounded), every character's together - the rows, a haul each. */
 const haulsStatement = (db, player, day) => db.prepare("SELECT COUNT(*) AS n FROM node_harvests WHERE player = ?1 AND profession = 'fishing' AND day = ?2").bind(player, day);
-/** AUDIT LOCKPICK D2: an account's hauls a day whose school counted (migration 0176's `school`). */
+/** AUDIT LOCKPICK D2: an account's hauls a day whose school counted (the `school` column). */
 const schoolsStatement = (db, player, day) => db.prepare("SELECT COUNT(*) AS n FROM node_harvests WHERE player = ?1 AND profession = 'fishing' AND day = ?2 AND school = 1").bind(player, day);
 
 /** PROF8 - a net's report, bounded (PROF0 5.1): a full net is the clean act; a school, the cast's landing within one of
@@ -555,10 +554,10 @@ function cutsOf(act, tier, lumberjack) {
  * `{ finds }` for the Basket, `{ glints, clean }` for the Pick-Axe, `{ cuts, clean }` for the Wood-Axe - PROF4's `logs`
  * at a tree), the act's end on the shared clock (epoch seconds)
  * and the request's id. The id must be today's and real by the law; `at` at most ten minutes past, at any hour (ANY-HOUR,
- * 2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"); the ground as the witnesses confirmed it, or taken at the claim's word at the least it is worth (a
+ * 2026-10-01); the ground as the witnesses confirmed it, or taken at the claim's word at the least it is worth (a
  * pixel's tiers 1-2 - its veins' 1-3, UNWITNESSED-ORE (nodeLaw UNCONFIRMED_VEIN_TIER) - and no march or signature; a
  * dungeon's tier 3 and no gem); the tier inside the rank; the Stores'
- * room decided in the harvest's own INSERT - CAP-OFF (2026-10-07, Mac: "Remove the cap on life skills"): no day's cap.
+ * room decided in the harvest's own INSERT - CAP-OFF: no day's cap.
  * The yield, and a gem, are the service's dice.
  *
  * PROF7: A BODY (`body:<day>:<id>`, kind `hide`, `foe` the DFU MobileTypes of the body the client says its own blow
@@ -595,7 +594,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
   if (n.day !== day) return { error: 'prof-day' };   // PROF0 19: a node whose UTC day has ended lapses
   if (!Number.isSafeInteger(at) || at < nowS - HARVEST_LATE_S || at > nowS + HARVEST_EARLY_S || utcDay(at) !== day) return { error: 'prof-late' };
   const deep = n.kind === 'dvein';
-  // ANY-HOUR (2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"): no node keeps
+  // ANY-HOUR: no node keeps
   // hours - the wilderness kept Foraging's day (FORAGE0 14.3) and refused the night with `prof-night`; a dungeon vein and
   // Hunting never kept any
   // AUDIT 32 S4: a body's foe is the request's shape, refused before the hour's acts are spent (as a craft's dye is)
@@ -648,7 +647,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
   let tier, key2, qty, clean, gem = null, extra = null, extraQty = 1, trophy = 0, schooled = 0;
   let xpTier = /** @type {number|null} */ (null);   // HERB-XP: the tier the XP is reckoned at, where it is not the node's
   if (isHaul) {
-    // PROF8: THE NET - a haul's Raw Fish, worked at the rank's own tier (Mac: "XP follows your rank"); a full net x1.5
+    // PROF8: THE NET - a haul's Raw Fish, worked at the rank's own tier; a full net x1.5
     // (the act's bound); a school's fish; at sea on confirmed ground a Pearl and a Slaughterfish; a trophy anywhere
     tier = haulTier(rank);
     const net = netOf(act);
@@ -660,7 +659,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
     trophy = finds.trophy ? 1 : 0;
     // AUDIT GATHER F3: a school's fish on the account's first SCHOOL_HAULS_DAY SCHOOLS of the day - the client's word,
     // bounded as section 30 bound it (the day's forty), never on every haul. AUDIT LOCKPICK D2: the schools counted, never
-    // the hauls - an honest angler's first school after forty plain hauls earned nothing (migration 0176: its row says so)
+    // the hauls - an honest angler's first school after forty plain hauls earned nothing (its row says so)
     const school = net.school && Number((await schoolsStatement(db, player.id, day).first())?.n ?? 0) < SCHOOL_HAULS_DAY;
     schooled = school ? 1 : 0;
     qty = haulYield({ roll: roll(HAUL_YIELD[0], HAUL_YIELD[1]), clean, march, school, netter: specs[50] === 'netter', slaughterfish: !!finds.scales, tideMult: tideYield(tide, 'haul') }, dice(rand));
@@ -700,7 +699,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
     if (kind === 'herbs') {
       tier = patch.tier;
       if (!tierOpen(rank, tier)) return { error: 'prof-rank' };
-      xpTier = herbXpTier(rank);   // HERB-XP (Mac: "XP follows your rank"): picked at the rank's own tier, as a haul is worked
+      xpTier = herbXpTier(rank);   // HERB-XP: picked at the rank's own tier, as a haul is worked
       key2 = herbKey(patch.herb, region);
       const common = tier === 1;
       // the steady hand's report, bounded: an uncommon or rare herb unbruised is the clean act; a bruised one yields one
@@ -748,7 +747,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
     }
   }
   if (!key2) return { error: 'bad-node' };
-  // FIRM1 (bible/06-Systems/Firmament.md): THE FIRMAMENT'S HAND - the character's tree, as this service keeps it, on the
+  // FIRM1: THE FIRMAMENT'S HAND - the character's tree, as this service keeps it, on the
   // yield (the service's own die for the fraction) and the XP of the profession worked; after every draw above, so each
   // of them is what it was
   const firm = firmStatsFrom(firmRows?.[0], player, env);
@@ -760,7 +759,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
   // goes to the seat's stockpile; the gatherer keeps at least one (its seat asked above, beside the ground).
   const levy = levyKey == null ? 0 : Math.max(0, Math.min(levyOf(qty, dice(rand)), qty - 1));
   const kept = qty - levy;
-  // SILVER-FINDS (2026-10-05, Mac: "Silver should be more accessible in more forms of interactions like foraging"): A
+  // SILVER-FINDS: A
   // HARVEST'S FIND - the service's dice, after every draw above so each of them is what it was; struck in this batch, by
   // THIS harvest's row alone, under the day's `gather` silver (marks.js gatherStrikeStatement). Bounded, not witnessed:
   // a harvest is the client's word on its node, as a hide is, so the day is the bound (marksLaw.js SILVER-FINDS).
@@ -1119,8 +1118,7 @@ export async function withdrawStores(ctx, player, env, { character, material: ke
  * `order` which origins move first: `all` (the Stores page - gold's, bought, own) or `spend` (a writ's or the market's
  * shortfall, put in just before it spends - bought, own, never gold's). Refused `carried-short` past what the count holds after
  * the cut, `stores-full` past the Stores' 5,000.
- * BAG-CRAFT (FIELD BUGS 2026-10-09d, Mac: "I just want players to also be able to craft from their inventory, not just
- * the store"): `work` - a station's shortfall - moves `spend`'s counted units and then units the count does not hold, as
+ * BAG-CRAFT (FIELD BUGS 2026-10-09d): `work` - a station's shortfall - moves `spend`'s counted units and then units the count does not hold, as
  * many as `held` names past the count once cut (bagLaw.js looseOrder), into the Stores as loose (LOOSE_ORIGIN - AUDIT
  * BAG-CRAFT A1: a station's alone); the count is not touched for them. Its row's `loose` says them.
  */
@@ -1209,12 +1207,12 @@ export async function depositStores(ctx, player, env, { character, material: key
  * asked (`prof-rank` - workOpen); `clean` the chisel's report, read only for a work that has the act; its XP Masonry's,
  * 20 x the rank's tier a unit (recipeLaw masonXp - XP follows the rank), half again for a clean chisel, and the first
  * time the character does it Building's first-make share (FIRST-BUDGET, recipeLaw workFirstXp) - read in the
- * decision, as a craft's is, and kept with the row (`first`, `clean`: 0060).
+ * decision, as a craft's is, and kept with the row (`first`, `clean`).
  *
- * DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53; PROF0 4.1): THE DAEDRIC INGOT - an Ebony Ingot, a Daedra's
+ * DAEDRIC-SMELT (; PROF0 4.1): THE DAEDRIC INGOT - an Ebony Ingot, a Daedra's
  * Heart and a Deadlands Ember a unit (professionLaw SMELT_RECIPES, DAEDRIC_EMBERS). The ember is spent out of the ACCOUNT'S
- * PURSE, as the Sigil Broker spends it (accounts.js buyInsignia, insigniaPurse; egEconomy.js egSink): the decision asks
- * that the account's gates, serpents and Redoubts earned the embers its insignia, the Panoply and the forge have not yet
+ * PURSE, as the Sigil Broker spends it (accounts.js buyInsignia, insigniaPurse): the decision asks
+ * that the account's gates and serpents earned the embers its insignia and the forge have not yet
  * taken, and the same batch adds them to `insignia_spent` - so two smelts pressed at once never spend one ember twice;
  * refused `prof-embers` where the inputs are held and the purse is short (the answer of a smelt made says the purse
  * left, `purse`; a refusal is its word alone, as every route's - index.js). The heart is a CATALYST:
@@ -1288,7 +1286,7 @@ export async function smeltAtForge(ctx, player, env, { character, recipe: id, co
   const most = (list) => (list.length > 1 ? `MAX(${list.join(', ')})` : list[0]);
   const bought = most(boughtOf), loose = most(looseOf);   // `bought` the products loose or bought, `loose` the loose ones
   // DAEDRIC-SMELT: the embers the work spends, and the purse that must hold them - the Broker's own reading (accounts.js
-  // buyInsignia: what the account's kills earned less what its insignia, the Panoply and the forge already took)
+  // buyInsignia: what the account's kills earned less what its insignia and the forge already took)
   const embers = workEmbers(r, count);
   if (embers > 0) {
     binds.push(embers);
@@ -1361,8 +1359,8 @@ async function craftAnswer(db, player, row, nowS, extra = {}) {
   return {
     ok: true, ...extra, recipe: row.recipe, quality: Number(row.quality), count: Number(row.count), seed: Number(row.seed),
     maker: by.get(row.provenance)?.maker ?? null, marked: Number(by.get(row.provenance)?.marked ?? 0) === 1, xp: Number(row.xp), first: Number(row.first) === 1,
-    // CLOTH-GEMS: whether that first laid its share on (AUDIT 32 S1) - WOVEN-PAYS: the decision's own word (`first_paid`,
-    // migration 0177); AUDIT WOVEN-PAYS A4: a row from before it read as the decision reads it (`patternMade`) - a judged
+    // CLOTH-GEMS: whether that first laid its share on (AUDIT 32 S1) - WOVEN-PAYS: the decision's own word (`first_paid`);
+    // AUDIT WOVEN-PAYS A4: a row from before it read as the decision reads it (`patternMade`) - a judged
     // first laid its share on where its XP holds it, every other first did
     firstPaid: row.first_paid == null ? Number(row.first) === 1 && (!counterMade(r) || Number(row.xp) >= FIRST_MAKE_FLOOR) : Number(row.first_paid) === 1,
     heartwood: Number(row.heartwood) === 1, dye: row.dye == null ? null : Number(row.dye),   // PROF7: a garment's dye
@@ -1395,11 +1393,10 @@ async function craftAnswer(db, player, row, nowS, extra = {}) {
  * furniture among the home's things; a character not standing as a Sculptor at 100 is refused (`prof-sculptor`).
  * PROF9: or the fire's dishes (recipeLaw COOKING_RECIPES) - no quality (-1), each serving its own piece (a Cook's two:
  * craftCount), its XP the rank's tier's (cookXp - XP follows the rank), half again for a clean pan, and the cook's hand
- * at 100 (dishHand: a Chef's feast, a Provisioner's dish) signed into the record (`f`) and kept on the piece (`hand`,
- * 0069). The service cannot see the fire (as it cannot see the anvil): the inputs are the Stores' and their units the bound.
+ * at 100 (dishHand: a Chef's feast, a Provisioner's dish) signed into the record (`f`) and kept on the piece (`hand`). The service cannot see the fire (as it cannot see the anvil): the inputs are the Stores' and their units the bound.
  * PROF10: or the jeweller's bench's pieces (recipeLaw JEWELCRAFTING_RECIPES) - DFU's jewellery at a quality, a Master
  * Jeweller's Masterwork points (masterworkSpec), the jeweller's hand at 50 (jewelHand: a Goldsmith's Silver, a Gemcutter's
- * gem) signed into the record (`f`) and kept on the piece (`hand`, 0069's column - no migration); `cracked` a Siege-cracked
+ * gem) signed into the record (`f`) and kept on the piece (`hand`, a column of its own); `cracked` a Siege-cracked
  * Gem for the piece's gem, a Lapidary's alone (`prof-lapidary`, 403) and only in a piece that sets one.
  */
 /**
@@ -1485,8 +1482,7 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   const kin = firstCraftKin(r);
   const madeBefore = `recipe IN (SELECT value FROM json_each(?${binds.length + 1}))`;
   binds.push(JSON.stringify(kin));
-  // WOVEN-PAYS (FIELD BUGS 2026-10-26b): A PATTERN S1 JUDGES IS MADE BY THE CRAFT THAT LAID ITS FIRST ON (`first_paid`,
-  // migration 0177) - a craft of silver-bought cloth before it lays none on and takes nothing, so the first is still owed
+  // WOVEN-PAYS (FIELD BUGS 2026-10-26b): A PATTERN S1 JUDGES IS MADE BY THE CRAFT THAT LAID ITS FIRST ON (`first_paid`) - a craft of silver-bought cloth before it lays none on and takes nothing, so the first is still owed
   // to the next craft of it that can pay. A row from before the column (`first_paid` NULL) laid it on where it was the
   // first and its XP holds the share (FIRST_MAKE_FLOOR: no share is under it, and no judged craft's own XP reaches it -
   // tiers 1-2, pinned). Every other recipe's pattern is made by any craft of it, as before (FACT, pinned: no pattern at a
@@ -1503,13 +1499,12 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   // gold alone, never Drakes, no Drakes commission or auction - law 3); a Ram Kit of them is loose, a station's alone
   const anySql = (/** @type {number} */ at, /** @type {string} */ origin) => `${inputs.map((_, i) => `COALESCE((SELECT qty FROM prof_stores WHERE player = ?1 AND char_id = ?2 AND material = ?${at + i} AND origin = '${origin}'), 0) > 0`).join(' OR ') || '0'}`;
   const boughtWith = `CASE WHEN ${anySql(13, LOOSE_ORIGIN)} THEN 'gold' WHEN ${anySql(13, 'bought')} THEN 'marks' END`;
-  // FB1020h ESSENCE-LOOSE: and the piece says that its gold wall is its goods', never a purchase (products.loose,
-  // migration 0142) - so its disenchant's Essence is loose, a station's, as a smelt's products of loose goods are, and
+  // FB1020h ESSENCE-LOOSE: and the piece says that its gold wall is its goods', never a purchase (products.loose) - so its disenchant's Essence is loose, a station's, as a smelt's products of loose goods are, and
   // never "bought with gold"
   const looseWall = `CASE WHEN ${anySql(13, LOOSE_ORIGIN)} THEN 1 ELSE 0 END`;
   // AUDIT 32 S1 (CLOTH-GEMS, Professions-Arc 50): a recipe wholly of the goods a counter sells without end (recipeLaw
   // counterMade - Linen and Wool) lays its first's share on (FIRST-BUDGET) only where no bolt it uses counts as bought with
-  // silver - WOVEN-PAYS (FIELD BUGS 2026-10-26b, the owner: "Woven cloth pays"; AUDIT WOVEN-PAYS): the cloth's silver count
+  // silver - WOVEN-PAYS (FIELD BUGS 2026-10-26b,; AUDIT WOVEN-PAYS): the cloth's silver count
   // nought (`silverSql`, the inputs' keys at ?17 on), whatever its units' origins - the loom's own cloth of looted, shop-
   // or market-bought goods pays, a guildmate's pays, and a Weavers' bolt set down and picked up again still counts. Every
   // other recipe's first pays (firstCraftPays)
@@ -1534,7 +1529,7 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
       ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = prof_stores.qty + excluded.qty`).bind(player.id, character, rid, RAM_KIT.key, nonce, ...inputs.map((inp) => inp.key))]
       : provs.map((p, i) => db.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at, marked, dye, hand, bought_with, loose)
         SELECT ?4, ?1, ?2, ?6, ?7, ?8, ?9, quality, seed, ?10, at, ?11, dye, ?12, ${boughtWith}, ${looseWall} FROM prof_crafts WHERE player = ?1 AND rid = ?3 AND n = ?5`)
-        .bind(player.id, character, rid, p, nonce, maker, r.id, r.templateIndex, r.material, records[i], marked, hand, ...inputs.map((inp) => inp.key)))),   // PROF9: a dish's hand (0069)
+        .bind(player.id, character, rid, p, nonce, maker, r.id, r.templateIndex, r.material, records[i], marked, hand, ...inputs.map((inp) => inp.key)))),   // PROF9: a dish's hand
     // the inputs out, each bought first - AUDIT BAG-CRAFT A1: its loose units before them
     ...inputs.flatMap((inp) => workStatements(db, {
       player: player.id, character, materialSql: '?3', qtySql: '?4', guard: decided, binds: [inp.key, inp.n, rid, nonce],
@@ -1883,7 +1878,7 @@ export async function listWrits({ db, nowS }, player, env, { character, region }
   await postMemberWrits(db, day, region, nowS, character, members, zero);
   // CHAP3a: a member's own writ to its owner alone - never another's, never another character's of the account - and only
   // while it is the guild's member (or once it filled it)
-  // WRIT-BOARD (migration 0138): the two owners each sought to its region on idx_writs_owner - `+kind` keeps the table's UNIQUE index
+  // WRIT-BOARD: the two owners each sought to its region on idx_writs_owner - `+kind` keeps the table's UNIQUE index
   // from being chosen for its order, which walked every member's own writs of the region's day to keep the caller's
   const { results = [] } = await db.prepare("SELECT * FROM writs WHERE day = ?1 AND region = ?2 AND owner IN ('', ?3) ORDER BY +kind, faction, slot")
     .bind(day, region, character).all();

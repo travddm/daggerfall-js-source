@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF4 (2026-09-28, Mac: "Continue") - LOGGING IN THE STREAMING WORLD
-// (bible/06-Systems/Professions-Arc.md 4.2, 5.2, 6, 25): Logging's KIND
+// PROF4 - LOGGING IN THE STREAMING WORLD
+// (4.2, 5.2, 6, 25): Logging's KIND
 // in the one gathering host (scenes/gatherHost.js).
 //
 //   THE TREES ARE THE FOREST'S. A built pixel keeps its tree flats -
@@ -119,7 +119,7 @@ export function standTrees({ px, py, day, climate, region = null, confirmed = fa
   return out;
 }
 
-/** LPT1 (bible/07-Rendering/Low-Poly-Trees.md): counts every sinking and standing of a wood's flats, so the near set of
+/** LPT1: counts every sinking and standing of a wood's flats, so the near set of
  *  3D trees (systems/lowPolyTreesAssets.js `frame`'s `stamp`) is gathered again the frame a tree goes or comes back. */
 export const FOREST_STAMP = { n: 0 };
 

@@ -1,5 +1,4 @@
-// CARD-FIT (2026-09-28, Discord - Cruor, "New sigil items descriptor is a bit long!": "all the buttons on it's pop-up
-// card are.. off the screen, because it's got a bit much on it!") - THE ITEM CARD, DRAWN AND MEASURED.
+// CARD-FIT - THE ITEM CARD, DRAWN AND MEASURED.
 //
 // A pin can say the card pins its buttons and the sheet bounds its height; only a layout engine can say a player can
 // PRESS them. So the REAL pack (ui/inventoryDoor.js createInventoryWindow, the enhanced skin) is drawn over the real

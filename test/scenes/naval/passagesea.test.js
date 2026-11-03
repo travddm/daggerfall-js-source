@@ -1,4 +1,4 @@
-// PASSAGE (2026-10-19; bible/03-World/Passage.md) - THE SHIP AT HER BERTH (scenes/naval/navalHost.js passageShip,
+// PASSAGE - THE SHIP AT HER BERTH (scenes/naval/navalHost.js passageShip,
 // charter, charterSailed), over the real host and Come Sail Away's real pool (test/navalSea.mjs): a harbour's own
 // friendly ship, moored, on foot within reach and the look on her, takes Activate and asks the passage door; her boat is
 // placed at her berth from a deed of her hull, the voyage written on it, and she lies there still until the voyage is

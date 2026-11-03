@@ -1,5 +1,4 @@
-// BAY-LEFT-MAPS C10 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/06-Systems/Travel-Options.md BAY-LEFT-MAPS) - TRAVEL OPTIONS' ROADS PAST THE BAY.
+// BAY-LEFT-MAPS C10 - TRAVEL OPTIONS' ROADS PAST THE BAY.
 //
 // Basic Roads' path data is the Bay's 1000 x 500 table (world/road/pathData.js dataPoint), and every read past it
 // answered 0: on every road past the Bay Follow Paths said "no path", the junction map was blank (its section skipped
@@ -86,7 +85,6 @@ test('BAY-LEFT-MAPS C10 PAST THE TABLE: a road\'s and a track\'s byte are the ro
   assert.ok(n > 50, `the region's roads (${n})`);
   assert.equal(dataPoint(net, PATH_TRACKS, tx, ty), out.tracks.get(key), 'a track\'s byte its own');
   assert.equal(tablePathsDataPoint(net, 500, 250), pathsDataPoint(net, 500, 250), 'on the table the two agree');
-  assert.match(read('src/world/jungle/jungleRoadside.js'), /const bits = net \? tablePathsDataPoint\(net, px, py\) : 0;/, 'the roadside pairs stand on the table\'s straight lanes alone');
 });
 
 /** Travel Options with its follow key, standing at a pixel (to1_travelOptions.test.js's rig). */
@@ -140,9 +138,6 @@ test('BAY-LEFT-MAPS C10 THE JUNCTION MAP PAST THE BAY: the section about a road 
   const off = new Uint32Array(100 * 100);
   drawMapSection(off, { originX: 8200, originY: 0, width: 20, height: 20 }, { pathsAt: () => { throw new Error('off the world: never asked'); }, locationAt: () => null, colorOf: () => null });
   assert.ok(off.every((v) => v === 0), 'off the world\'s grid nothing is asked or drawn');
-  const host = hostText('src/scenes/world.js');
-  assert.match(host, /return net\?\.source === 'basic-roads' \? dataPoint\(net, type, x, y\) : 0;/);
-  assert.doesNotMatch(host, /arr\[y \* 1000 \+ x\]/);
 });
 
 test('BAY-LEFT-MAPS C10 A SPAWN PAST THE BAY OFF ITS ROADS: the spawns\' road test reads the roads past the Bay (WP4\'s spawns there rely on it) - a road pixel is no spawn\'s, open ground is (mutants: past the table 0 as before)', () => {

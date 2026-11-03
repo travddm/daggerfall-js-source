@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 3): THE STEP THROUGH THE HOUR - the Shattered
+// SD-LOOK: THE STEP THROUGH THE HOUR - the Shattered
 // Hour's own veil, chosen by theme in ui/gate/gateVeil.js beside Dagon's fire (render/gate/gateVeil.js keeps its program and its
 // law: `veilAt` times this one too). One triangle over the veil's own canvas, as the fire's.
 //

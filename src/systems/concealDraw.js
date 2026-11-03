@@ -1,4 +1,4 @@
-// ECV1 - THE CONCEALED FOE'S DRAW CONSTANTS (2026-09-07), split out of
+// ECV1 - THE CONCEALED FOE'S DRAW CONSTANTS, split out of
 // systems/combatVisuals.js by AUDIT 65 PN-3.
 //
 // A LEAF: this module imports nothing, on purpose. render/renderer.js

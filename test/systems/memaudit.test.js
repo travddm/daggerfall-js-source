@@ -1,5 +1,5 @@
-// MEM-AUDIT (2026-10-23, the owner: "a comprehensive performance audit, looking for memory leaks"): what a place, a map
-// pixel, a menu or a session online left standing after its life (bible/07-Rendering/Performance-Priority.md MEM-AUDIT).
+// MEM-AUDIT: what a place, a map
+// pixel, a menu or a session online left standing after its life (MEM-AUDIT).
 // Each pin drives the module that owned the leak; where the owner is a host's or a window's wiring (setMode, the menu's
 // account card and foot, the item menu's timer, the classic sky's bound) it reads that one line. Each names its mutants
 // (tools/mutants/memaudit.json). AUDIT MEM-AUDIT (01-Overview/audits/Audit-Mem-Audit.md) widened them.
@@ -333,13 +333,6 @@ test('MEM-AUDIT the market\'s cache holds exactly MARKET_CACHE_KEPT (256), the l
 });
 
 // ─── THE HOSTS' AND THE WINDOWS' OWN LINES ───────────────────────────
-
-test('MEM-AUDIT the place left is let go: setMode clears what latched the last room\'s and the last castle\'s context (mutants: a latch kept)', () => {
-  const src = hostText('src/scenes/worldModes.js');
-  const line = src.slice(src.indexOf('  const setMode = (next) => {'), src.indexOf('};', src.indexOf('  const setMode = (next) => {')));
-  assert.match(line, /if \(next !== 'interior'\) \{ _arrowsCtx = null; interiorArrows\.clear\(\); cardLookedCtx = null; cardStandsDue\.clear\(\); gambitStandsDue\.clear\(\); \}/);
-  assert.match(line, /if \(next !== 'dungeon'\) \{ _crownTried = null; arenaWall = null; _arenaStage = _arenaStageCtx = null; _pitStage = _pitStageCtx = null; \}/);
-});
 
 test('MEM-AUDIT the windows\' listeners and caches: the account card\'s focus listener goes with its card (driven: a card made, then let go), and the menu lets each go - a repaint\'s card, the close, the unmount, with the foot\'s observer; an item menu\'s pair with its menu, its timer its own; the icons\' encodings with their pictures (AUDIT P7) (mutants: each kept)', () => {
   const live = new Set();

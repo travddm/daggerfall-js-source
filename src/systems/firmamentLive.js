@@ -1,5 +1,5 @@
 // @ts-check
-// FIRM1 (2026-10-13; bible/06-Systems/Firmament.md) - THE FIRMAMENT IN FORCE: the one place this page holds the tree it
+// FIRM1 - THE FIRMAMENT IN FORCE: the one place this page holds the tree it
 // plays under, and whether it plays online. A LEAF beside the law (it imports nothing else), so the gathering acts
 // (herbAct.js, fishAct.js), the sail (comeSailAway.js) and the powers (firmamentPowers.js) all read the same tree
 // without any of them reaching the others' graphs.
@@ -7,7 +7,7 @@
 // The tree is the ACCOUNT SERVICE's (server-account/src/firmament.js) - the host hands in what its book last heard
 // (net/firmament/firmamentBook.js) - and it is in force ONLINE ALONE: offline the character is the save's, Daggerfall's, with no
 // sky at all, as Renown's layer is (systems/renownLayer.js). The combat channels sleep further still (in a refereed fight
-// - firmamentPowers.js awake). MENTOR2 (bible/06-Systems/Mentor-Mode.md): while mentoring the combat stars act at the
+// - firmamentPowers.js awake). MENTOR2: while mentoring the combat stars act at the
 // mentor's power scale and the life stars act whole - it had put the whole sky to sleep (AUDIT UICALM-FIRM1 L1 L2).
 
 import { treeStats, statDef, EMPTY_TREE } from '../net/firmament/firmamentLaw.js';

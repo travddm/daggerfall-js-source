@@ -1,7 +1,7 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): THE OLD COIL'S HOARD - what one player's share in
+// SERPENT1: THE OLD COIL'S HOARD - what one player's share in
 // Sethrakul's kill pays, rolled from the relay's receipt. The gate's spoils' and the raid's thanks' twin
-// (systems/gate/gateSpoils.js, systems/raidSpoils.js). Design: bible/11-Multiplayer/Sea-Serpent.md section 8.
+// (systems/gate/gateSpoils.js, systems/raidSpoils.js). Design:
 //
 // PER PLAYER, AND THE SEED'S OWN. The receipt the relay signs at the kill (net/serpent/serpentReceipt.js `l1`) carries a seed
 // (`c`, 32 bits of the relay's CSPRNG) and how it was earned (`x`: 'dealt' - a ship whose guns did their share of the
@@ -15,8 +15,7 @@
 // SERPENT_SPOILS_SOURCE; for one that STOOD, the Magic-or-better piece alone. Every piece KNOWN, the ladder's last pass
 // last of all (LOOT2).
 //
-// SERPENT-SET (2026-10-05, Mac: "The serpent boss needs to use the currency from oblivion gate and have its own
-// equipment rewards"): THE GATE'S CURRENCY AND THE SERPENT'S OWN SET. Every hoard carries SERPENT_EMBERS Deadlands Embers
+// SERPENT-SET: THE GATE'S CURRENCY AND THE SERPENT'S OWN SET. Every hoard carries SERPENT_EMBERS Deadlands Embers
 // (net/serpent/serpentHoardLaw.js - a ship that dealt and one that stood alike, the gate's own law: an ember a receipt), minted as the
 // gate mints them (systems/gate/gateSpoils.js sigilStone) and counted on the kill's row by the account service, so the Broker
 // and the insignia take them as a breach's. A ship that DEALT finds a piece of Sethrakul's Coilscale SERPENT_SET_CHANCE
@@ -35,7 +34,6 @@ import { applyRarity, lastPass, socketPass, weaponSocketPass, techniquePass } fr
 import { bossGems } from '../gems.js';   // GEM2: the Old Coil's gem
 import { rollSerpentSetPiece } from '../aetheric.js';   // SERPENT-SET: the Old Coil's own
 import { SERPENT_EMBERS } from '../../net/serpent/serpentHoardLaw.js';   // SERPENT-SET: the gate's currency
-import { bossCardRoll } from '../bossCards.js';   // CARDS9: Sethrakul's own card, the hoard's last draw
 import { rollSunkenSovereign } from '../gilded.js';   // GILDED2: the Sunken Sovereign - a dealer's hoard's very last draw
 
 /** Gold a level of the player's, before the seed's variation (0.8 to 1.2 of it) - two thirds of a gate boss's. */
@@ -75,7 +73,7 @@ export function serpentEmbers() {
 }
 
 /**
- * THE HOARD for one player: `{ gold, pieces: [{ item, tier }], embers, card, gems }` - the Rare-or-better piece first, SERPENT-SET's
+ * THE HOARD for one player: `{ gold, pieces: [{ item, tier }], embers, gems }` - the Rare-or-better piece first, SERPENT-SET's
  * Coilscale piece (when one drops) after them, GILDED2's Sunken Sovereign (when it drops) last; `embers` the stack of the gate's currency every hoard carries. The same seed,
  * level, earning and world answer the same hoard.
  * @param {number} seed the receipt's `c` @param {number} level the level it fought at @param {string} earned the receipt's `x`
@@ -92,20 +90,20 @@ export function rollSerpentSpoils(seed, level, earned = 'dealt') {
   // SERPENT-SET: the Old Coil's own set, a dealer's alone - rolled LAST, so every hoard before it is what it was
   const coil = dealt ? rollSerpentSetPiece(rolls) : null;
   if (coil) pieces.push({ item: coil, tier: coil.rarity });
-  // CARDS9 (Tavern-Cards section 32): SETHRAKUL'S OWN CARD - a dealer's alone, one draw more after the set piece's, so
-  // every hoard before it is what it was; kept beside the pieces
-  const card = dealt ? bossCardRoll('serpent', rolls) : null;
-  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md section 4): the sockets' passes over the pieces, then the Old Coil's gem -
-  // a dealer's alone - LAST of all (after the card), so every hoard before them is what it was for its seed
+  // Sethrakul's card was a dealer's draw here before the card games were removed: its draw is still taken, so every
+  // hoard after it is what it was for its seed
+  if (dealt) rolls();
+  // GEM1/GEM2: the sockets' passes over the pieces, then the Old Coil's gem -
+  // a dealer's alone - LAST of all, so every hoard before them is what it was for its seed
   socketPass(pieces.map((p) => p.item), rolls);
   weaponSocketPass(pieces.map((p) => p.item), rolls);
   const gems = dealt ? bossGems('serpent', rolls) : [];
   techniquePass(pieces.map((p) => p.item), rolls);   // TECH1: a weapon's technique - after even the Old Coil's gem (law 9); a set piece takes none
-  // GILDED2 (bible/06-Systems/Gilded.md section 7): THE SUNKEN SOVEREIGN - a dealer's alone, one draw more, LAST of all
+  // GILDED2: THE SUNKEN SOVEREIGN - a dealer's alone, one draw more, LAST of all
   // (after even the technique pass), so every hoard before it is what it was for its seed; a static roll, no pass reaches it
   const sovereign = dealt ? rollSunkenSovereign(rolls) : null;
   if (sovereign) pieces.push({ item: sovereign, tier: sovereign.rarity });
-  return { gold, pieces, embers: serpentEmbers(), card, gems };
+  return { gold, pieces, embers: serpentEmbers(), gems };
 }
 
 /** The hoard as the spoils pool hands it over (scenes/spoilsPool.js's pieces): each item, then (SERPENT-SET) the embers,
@@ -115,8 +113,7 @@ export function serpentSpoilsList(seed, level, earned) {
   const s = rollSerpentSpoils(seed, level, earned);
   return [
     ...s.pieces.map((p) => ({ kind: 'item', item: p.item, tier: p.tier })),
-    ...(s.card ? [{ kind: 'item', item: s.card, tier: 'aetheric' }] : []),   // CARDS9: the Old Coil's card, after the pieces
-    ...s.gems.map((g) => ({ kind: 'item', item: g, tier: 'common' })),   // GEM2: the Old Coil's gem, after the card
+    ...s.gems.map((g) => ({ kind: 'item', item: g, tier: 'common' })),   // GEM2: the Old Coil's gem, after the pieces
     ...(s.embers ? [{ kind: 'item', item: s.embers, tier: 'artifact' }] : []),
     { kind: 'gold', gold: s.gold, tier: 'common' },
   ];

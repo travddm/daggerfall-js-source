@@ -1,7 +1,7 @@
 // @ts-check
-// VC2 (2026-09-07): THE CLOUD NOISE, GENERATED ON THE GPU.
+// VC2: THE CLOUD NOISE, GENERATED ON THE GPU.
 //
-// Volumetric clouds (bible/07-Rendering/Volumetric-Clouds-Arc.md) are
+// Volumetric clouds are
 // a density field read off two tiling 3D noise volumes, the shape the
 // Nubis/Schneider recipe made standard: a SHAPE volume (128^3, RGBA -
 // R a Perlin-Worley, G/B/A three Worley octaves at rising frequency,

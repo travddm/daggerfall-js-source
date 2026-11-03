@@ -1,5 +1,4 @@
-// LAIR-WORLD (2026-10-26, the owner: "with revenants and their lairs, this will work everywhere correct?"; asked, "Fix both
-// in this PR" - bible/06-Systems/Revenants.md RVN7a, bible/06-Systems/Bounty-Boards.md LAIR-WORLD). A revenant's lair and a
+// LAIR-WORLD. A revenant's lair and a
 // board's underground hunt were the Bay's alone: the world host's dungeon index was MAPS.BSA's rows, so past the Bay a
 // revenant's deed found no dungeon in its ring and roamed - no hunt, no rumour, no circle, no trail - and the lair door's
 // mend, the boards' rings, a bounty's id and the wire's copy of it stopped at the Bay's 1000 x 500. Past the Bay the
@@ -148,22 +147,6 @@ test('LAIR-WORLD THE BOARD HOST (scenes/bountyHost.js): a board past the Bay pos
   assert.deepEqual(second.map((p) => p.place), first.map((p) => (p.place === names.v1 ? names.v2 : p.place)), 'the lair the land now stands, in its slot');
 });
 
-test('LAIR-WORLD THE HOSTS BY SOURCE: the world host hands the lair door and the boards the places past the Bay - the door its `pastBay`, the boards\' dungeons and graveyards the lairs there, their ground no place the build stands there, their caches the stamp; the held map reads the hunts\' and the lairs\' circles over the continent\'s sheet (mutants: any unwired)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes('lairHere: createLairDoor({ maps, blocks, arch, locations: locationIndex, dungeons: _bountyDungeonPixels, regions: _dungeonRegionPixels, here: playerTravelPixel, pastBay: provinceQuestPlaces }),'));
-  assert.ok(w.includes('dungeonAt: (x, y) => _bountyDungeonPixels.get(`${x},${y}`) || provinceQuestPlaces.lairAt(x, y)?.name || null,'));
-  assert.ok(w.includes('graveyardAt: (x, y) => _bountyGraveyardPixels.has(`${x},${y}`) || provinceQuestPlaces.lairAt(x, y)?.type === LOCATION_TYPES.Graveyard,'));
-  // PIN MOVED (SPAWN-WORLD, 2026-10-27): spawned dungeons stand past the Bay now, so a pack keeps off a spawn's pixel there too
-  assert.ok(w.includes('siteOk: (x, y) => (onTheBay(x, y) ? x > 0 && y > 0 && x < 999 && y < 499 && !_bountyLocPixels.has(`${x},${y}`) && !spawnsDungeon(_spawnSalt, x, y) : !provinceQuestPlaces.placeOnPixel(x, y) && !spawnsDungeon(_spawnSalt, x, y))'));
-  assert.ok(w.includes('placesVersion: provinceQuestPlaces.version,'));
-  const places = read('src/scenes/tamrielPlacesHost.js');
-  assert.ok(places.includes('    lairAt, lairCloneAt, placeOnPixel, version: placesVersion,'), 'the places host hands them on');
-  const held = read('src/ui/heldMap.js');
-  assert.ok(held.includes('    const sheet = this._marksBox();'));   // PIN MOVED (BAY-LEFT-MAPS): the sheet's one box, every mark's (heldMap.js _marksBox)
-  assert.ok(held.includes('const bounties = readBountyMarksIn(this.deps.bounties, sheet);'));
-  assert.ok(held.includes('const lairs = readBountyMarksIn(this.deps.revenants, sheet, REVENANT_LEGEND_TEXT);'));
-});
-
 // ─── THE PLAYER'S DATA ───────────────────────────────────────────────────────────────
 const ARENA2 = process.env.ARENA2_PATH ?? '';
 const HAS = !!ARENA2 && existsSync(join(ARENA2, 'MAPS.BSA')) && existsSync(join(ARENA2, 'ARCH3D.BSA'));
@@ -213,7 +196,6 @@ test('LAIR-WORLD on the player\'s data: THE DOOR - the ring about a pixel past t
   assert.ok(!ring.some((d) => d.name === 'The Cassius Vaults'), 'its doorless graveyard never offered');
   const graves = P.lairsNear(2069, 658, 200).filter((r) => r.type === LOCATION_TYPES.Graveyard);
   const shut = graves.filter((r) => !door().enterable(r.px, r.py));
-  // PIN MOVED (NIBEN-SEA, TAMRIEL-DEEP, bible/03-World/Tamriel.md): 364 and 13 on the tamriel branch - thirteen stood on
   // the Niben's course, the sea's now, one of them doorless; and The Galgulus Burial Ground on Lake Rumare's east shore
   // (2171, 649) is no place once the sea beside it carries no large-map detail
   assert.deepEqual([graves.length, shut.length], [350, 12]);

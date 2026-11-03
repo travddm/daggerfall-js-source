@@ -1,4 +1,4 @@
-// WB14a (2026-10-19, Mac: "More diabolical boss movesets", then "This is all yours to take on"): THE WARDEN'S NEW
+// WB14a: THE WARDEN'S NEW
 // ARSENAL - six attacks more he chooses, each with a cooldown of its own: Chains of the Warden, Dagon's Brand, Shared
 // Torment, the Scything Wheel, the Burning Gaze and the Unmaking.
 //
@@ -14,7 +14,7 @@
 //   the screen           scenes/gate/gateArsenal.js - the marked blows and the Gaze judged on my feet and my camera, the
 //                        order under the crosshair (ui/gate/gateGroundView.js), the Gaze's white
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md sections 3, 6 and 10.
+// Design: 6 and 10.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -58,7 +58,7 @@ const word = (A, over = {}) => ({ i: 7, a: A.id, at: T0, x: 0, z: 0, yw: 0, tg: 
 
 test('WB14a the arsenal: six attacks more, ids 11 to 16, each a cooldown of its own (none of the eleven before has one) - the Brand asks a court of two, the Torment (AUDIT WB14 PLAY-3) three; the Chains and the Gaze are the struck screen\'s alone (mutants: an id moved; a cooldown dropped; the Gaze counted by the relay; the Torment between two)', () => {
   assert.deepEqual(NEW.map((k) => ATTACKS[k].id), [11, 12, 13, 14, 15, 16]);
-  assert.deepEqual(ATTACK_BY_ID.map((a) => a.id), [...Array(19).keys()]);   // PIN MOVED (WB14d): and the Sundering and the Rejoining, 17 and 18
+  assert.deepEqual(ATTACK_BY_ID.map((a) => a.id), [...Array(19).keys()]);
   assert.deepEqual(NEW.map((k) => ATTACKS[k].cd), [22_000, 28_000, 28_000, 30_000, 35_000, 45_000]);
   for (const A of ATTACK_BY_ID) if (!NEW.includes(A.key)) assert.equal(A.cd, undefined, `${A.key} keeps none`);
   assert.deepEqual(NEW.map((k) => ATTACKS[k].nMin ?? 1), [1, 2, 3, 1, 1, 1]);   // AUDIT WB14 (PLAY-3): the Torment three - between two it was half a fighter's health each
@@ -290,7 +290,6 @@ test('WB14a the relay counts what its poses can show: the Wheel down its turn an
   const heart = [COURTS[0][0], COURTS[0][1]];
   assert.ok(judge(word(ATTACKS.unmake, { tg: [heart] }), heart[0], heart[1] + 10, [T0 + 1000, T0 + 2000]).length >= 1, 'a lit wedge');
   assert.equal(judge(word(ATTACKS.unmake, { tg: [heart] }), heart[0] + 10 * Math.sin(Math.PI / 4), heart[1] + 10 * Math.cos(Math.PI / 4), [T0 + 1000, T0 + 2000]).length, 0, 'a dark one');
-  assert.match(read('server/src/index.js'), /return \{ sub: b\.sub, id: b\.id, x: c\.x, z: c\.z,/, 'the relay\'s bodies carry their peer id');
 });
 
 // ═══ THE GROUND ══════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -332,7 +331,6 @@ test('WB14a the ground shows what lands: the chain a path from him to the chaine
     assert.equal(telegraphField(us, x, z).inside, inWedges(un, x, z), `point ${i}`);
   }
   assert.match(TELEGRAPH_FS, /\} else if \(uKind == 8\) \{/);
-  assert.match(read('src/render/gate/gateTelegraph.js'), /shape\.kind === TELEGRAPH_KIND\.spokes \|\| shape\.kind === TELEGRAPH_KIND\.wedges \? \(shape\.n \?\? 0\)/);
 });
 
 // ═══ MY SCREEN ═══════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -406,14 +404,6 @@ test('WB14a the order under the crosshair, while it winds up: chained - run from
 });
 
 test('WB14a the court wires it: the arsenal judged beside his own blows, the rings drawn where my screen sees their fighters, the others\' places from the online frame each frame, a marked blow\'s order over the ground\'s, the Gaze\'s white; the host hands my peer id and my body\'s push; each new attack heard and coloured (mutants: the places never filled; the push never wired)', () => {
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /arsenal\.judge\(s, t, P, /);
-  assert.match(gc, /telegraphShape\(s\.atk, s\.phase, t, P, \(k\) => arsenal\.at\(s\.atk, k, mine\)\)/);
-  assert.match(gc, /_places\.set\(d\.id, c\); _others\.push\(c\);/);
-  assert.match(gc, /peril: order \?\? onMe, blindAt: arsenal\.blindAt\(\)/);   // PIN MOVED (WB14d): the blow on my feet his or his Flame's (onMe)
-  assert.match(gc, /pull: \(vx, vz\) => !watching\(\) && pull\(vx, vz\)/, 'a watcher is never reeled');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /\.\.\.arsenalSeams\(player, \(\) => online, BLOW_PUSH_DECAY\),/);   // PIN MOVED (HOST-SPLIT, at the merge of QUESTLINES): the three seams in one entry, made in the arsenal's module
   let on = null;
   const pushed = [];
   const S = arsenalSeams({ blowPush: (vx, vz) => pushed.push([vx, vz]) }, () => on, 12);

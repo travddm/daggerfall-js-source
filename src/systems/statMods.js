@@ -214,9 +214,7 @@ export const FATIGUE_LOSS = Object.freeze({
   Default: 11, Climbing: 22, Running: 88, Swimming: 44, Jumping: 11,
 });
 
-/** BALANCE 2026-09-27 (Mac: "I want to adjust fatigue drain and durability
- *  drain. Just needs some balancing. Currently things drain a little too
- *  fast"): EXERTION COSTS A QUARTER LESS. The losses above stay DFU's
+/** BALANCE 2026-09-27: EXERTION COSTS A QUARTER LESS. The losses above stay DFU's
  *  verbatim, and measured as DFU's (a full bar at STR/END 50 walks 48.5
  *  real minutes and runs 6.1); this is the port's scale on what exertion
  *  CHARGES - the minute's walk, climb, run and failed swim, a jump, a

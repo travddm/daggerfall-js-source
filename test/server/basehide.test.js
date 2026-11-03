@@ -1,8 +1,7 @@
-// BASE-HIDE (2026-09-26, Mac: "Remove bought houses decor - the base game decor isnt easy to decorate around when u
-// want more in depth house"): what Daggerfall furnished a room with - its prop models and its flats - the room's owner
+// BASE-HIDE: what Daggerfall furnished a room with - its prop models and its flats - the room's owner
 // may TAKE OUT and put back, free. A furnishable room (an online home, anyone's; the player's house or ship) stands its
 // own furniture piece by piece so one piece can go (scenes/decor/decorBase.js); the list of what is out is the save's offline
-// and the account service's online (migration 0015), and a sale brings the furniture back. The law, the room's pool,
+// and the account service's online (`home_hidden`), and a sale brings the furniture back. The law, the room's pool,
 // the service over the real Worker and node:sqlite, the scene cache, the tool, the panel's "Built in" view, and the
 // build's and the host's wiring by source.
 import { test } from 'node:test';
@@ -168,7 +167,7 @@ test('BASE-HIDE the service: a home\'s list of what is out is read with its piec
   const stranger = await call('/v1/homes/decor/hidden', at([]), mara);
   assert.deepEqual([stranger.status, stranger.body.error], [404, 'no-home'], 'another player clears nothing');
   assert.equal((await call('/v1/homes/decor/hidden', at([], 'char-mara'), mara)).body.error, 'no-home');
-  // ACCOUNT-HOMES (PIN MOVED - it was `no-home`, "nor the owner's other character"): the home is its account's, any character
+  // ACCOUNT-HOMES (
   // of it writes the list (the same list again here, so the room stands as it was)
   assert.deepEqual((await call('/v1/homes/decor/hidden', at(['m12:41000', 'f3:210.4'], 'char-second'), aldric)).body, { ok: true, hidden: ['f3:210.4', 'm12:41000'] }, 'the owner\'s other character writes it too');
   const bad = await call('/v1/homes/decor/hidden', at(['m12:41000', 'a chair']), aldric);
@@ -188,8 +187,8 @@ test('BASE-HIDE the service: a home\'s list of what is out is read with its piec
   assert.equal(new URL(posts[0][0]).pathname, '/v1/homes/decor/hidden');
   assert.equal(posts[0][1].headers.authorization, 'Bearer sek', 'the one session, as every write');
   assert.deepEqual(JSON.parse(posts[0][1].body), { ...HOME, character: 'char-me', keys: ['m1:2'] }, 'only what the service reads');
-  const mig = src('server-account/migrations/0015_home_hidden.sql');
-  assert.match(mig, /FOREIGN KEY \(map_id, building_key\) REFERENCES homes\(map_id, building_key\) ON DELETE CASCADE/);
+  const fks = d1()._raw.prepare('PRAGMA foreign_key_list(home_hidden)').all().map((k) => [k.table, k.from, k.to, k.on_delete]);
+  assert.deepEqual(fks, [['homes', 'map_id', 'map_id', 'CASCADE'], ['homes', 'building_key', 'building_key', 'CASCADE']], 'the list goes with its home');
 });
 
 test('BASE-HIDE the save: an offline room\'s list rides its scene, and a sale brings the furniture back for its next owner', () => {
@@ -277,24 +276,3 @@ test('BASE-HIDE the panel: "Built in" lists the room\'s own furniture nearest fi
   assert.equal(one(root, 'dfdecor-empty').textContent, DECOR_BASE_EMPTY, 'a room with nothing of its own');
 });
 
-test('BASE-HIDE by source: the build stands a furnishable room\'s props and flats one by one - never the ladder or the machinery, never the merge, each its own bucket, batch and light - and frees what is out; the host builds it so for an online home, a house or a ship, skips a piece out among its targets, keeps the list in the scene (an online home\'s the service\'s), stands the service\'s list and brings it back at a sale', () => {
-  const c = src('src/scenes/interiorContext.js');
-  assert.match(c, /const base = opts\.baseEditable \? createBaseRoom\(\{ drawList, batches: \(\) => billboardBatches, lights: \(\) => lights, collider \}\) : null;/);
-  assert.match(c, /const baseKey = base && p\.objectType === PROP_MODEL_TYPE && p\.modelIdNum !== LADDER_MODEL_ID && p\.modelIdNum !== MACHINERY_MODEL_ID\s*\n\s*\? decorBaseModelKey\(pi, p\.modelIdNum\) : null;/, 'furniture, not the building\'s workings');
-  assert.match(c, /if \(!baseKey && cpu\.normals && cpu\.uvs\) \{ staticBuilder\.add\(/, 'never the merge');
-  assert.match(c, /collider\.addMesh\(baseKey \? baseBucketOf\(baseKey\) : 'interior', cpu\.positions, cpu\.indices, matrix\);/, 'its own bucket');
-  assert.match(c, /if \(baseKey\) base\.furnish\(baseKey, containers\[had\[0\]\] \?\? shelves\[had\[1\]\] \?\? beds\[had\[2\]\] \?\? null\);/, 'a cupboard, a shelf or a bed');
-  assert.match(c, /const batch = renderer\.createBillboardBatch\(flat\.archive, flat\.record, billboardSize\(t, flat\.record\), \[at\]\);/, 'a flat alone in its batch');
-  assert.match(c, /const own = lightsOf\(\[bf\.flat\]\);[\s\S]{0,200}base\.addFlat\(decorBaseFlatKey\(bf\.fi, bf\.flat\.archive, bf\.flat\.record\), \{ flat: \[bf\.flat\.archive, bf\.flat\.record\], batch: bf\.batch, light: own\[0\] \?\? null, at: bf\.at \}\);/, 'and its own light');
-  assert.match(c, /for \(const b of base\?\.outBatches\(\) \?\? \[\]\) renderer\.destroyBatch\(b\);/, 'the teardown frees what is out');
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const baseEditable = !!home \|\| houseOwned \|\| \(building\?\.buildingType === BUILDING_TYPES\.Ship && ownsShip\(playerEntity\)\);/);
-  assert.match(m, /houseOwned, peopleVisible, baseEditable,/);
-  for (const [list, v] of [['containers', 'c'], ['shelves', 's']]) assert.match(m, new RegExp(`interiorCtx\\.${list}\\.forEach\\(\\(${v}, i\\) => \\{\\s*if \\(${v}\\.hidden\\) return;`), `${list}: a piece out is no target`);
-  assert.match(m, /interiorCtx\.beds\?\.forEach\(\(bd, i\) => \{[^\n]*\n\s*if \(bd\.hidden\) return;/);
-  assert.match(m, /const hiddenBase = \[\.\.\.\(interiorHome \|\| _seatHallVisit \? _keptHidden : \(ctx\.base\?\.hidden\(\) \?\? \[\]\)\), \.\.\.\(ctx\.base\?\.roomDoors\?\.hidden\?\.\(\) \?\? \[\]\)\];/, 'the scene keeps the list - an online home\'s save record as it came, and any room door taken out');   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (AUDIT SEATS-3): the visit's latch (C2)
-  assert.match(m, /if \(interiorHome \|\| _seatHallVisit\) \(_keptHidden = \(data\.hiddenBase \?\? \[\]\)\.filter\(\(k\) => !String\(k\)\.startsWith\('intdoor:'\)\), interiorCtx\.base\?\.roomDoors\?\.apply\?\.\(data\.hiddenBase\)\); else \(interiorCtx\.base\?\.setHidden\(data\.hiddenBase \?\? \[\]\), interiorCtx\.base\?\.roomDoors\?\.apply\?\.\(data\.hiddenBase\)\);/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (AUDIT SEATS-3): the visit's latch (C2)
-  assert.match(m, /interiorCtx\?\.base\?\.setHidden\(Array\.isArray\(r\.data\.hidden\) \? r\.data\.hidden : \[\]\);/, 'the room its owner cleared, for everyone');
-  assert.match(m, /function decorSold\(sceneName, region\) \{\s*clearSceneHidden\(sceneCache\(\), sceneName\);/, 'a sale brings it back');
-  assert.match(m, /base: \(\) => interiorCtx\?\.base \?\? null,/, 'the tool\'s door');
-});

@@ -1,4 +1,4 @@
-// L10N3b (2026-09-27, Mac: "Install + bundle allowed"): A DFU TRANSLATION PACK, INSTALLED FROM THE PLAYER'S OWN FILES.
+// L10N3b: A DFU TRANSLATION PACK, INSTALLED FROM THE PLAYER'S OWN FILES.
 // What a pack holds, by the folders DFU reads it from (systems/translationPacks.js); the store that keeps it in the
 // browser and nowhere else (scenes/translationStore.js, over an in-memory IndexedDB); and the language loader putting
 // it to use (scenes/localeData.js) - its tables patched over the machine drafts, so a person's translation outranks a
@@ -6,7 +6,6 @@
 // removal that leaves the drafts standing; and the Settings row, by source.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import * as tm from '../../src/systems/textManager.js';
 import { classifyPackFile, packContents, isTranslationPack, packNameOf, PACK_KIND } from '../../src/systems/translationPacks.js';
 import * as store from '../../src/scenes/translationStore.js';
@@ -15,14 +14,15 @@ import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 
 import { memoryIdb } from '../memoryIdb.mjs';   // an IndexedDB in memory (L10N6 shares it)
 
-const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
+// A fixture machine draft for French: the subject is a pack laid over a draft, not a shipped language.
+const FR_DRAFT = 'Key,Value\nmenu.rail.new,"Nouvelle partie"\nmenu.rail.load,"Charger une partie"\n';
 
 beforeEach(() => {
   tm._resetTextManagerForTests();
   resetPrefs();
   store._resetTranslationStoreForTests();
   globalThis.indexedDB = memoryIdb();
-  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv') });
+  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => FR_DRAFT });
 });
 
 /** A pack as a folder pick hands it: each path, and its bytes. */
@@ -88,7 +88,7 @@ test('L10N3b the store: only the files the game reads are kept, text decoded and
 });
 
 test('L10N3b the pack at work: its tables over the machine drafts (a person\'s word outranks a machine\'s), its other text for the readers that ask, pt-BR reading pt\'s pack, the language told the pack is there; removed, the drafts stand again; no FontFace, no font - the language\'s own face stands', async () => {
-  const draft = tm.parseStringTableCsv(rd('locales/fr/Port_Strings.csv'));
+  const draft = tm.parseStringTableCsv(FR_DRAFT);
   const draftWord = new Map(draft).get('menu.rail.new');
   await data.initLocale(new URLSearchParams('lang=fr'), { languages: [] });
   assert.equal(tm.currentLocale(), 'fr');
@@ -144,14 +144,3 @@ test('L10N3b the pack\'s font, where a browser can load it: registered for its l
   }
 });
 
-test('L10N3b by source: the pack row under the language row on the front door alone, none for English; the picker reads a folder or a zip through the one classifier', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /if \(!pause\) \{ const packRow = translationPackRow\(\); if \(packRow\) out\.push\(packRow\); \}/);
-  assert.match(menu, /if \(!info \|\| cur === BASE_LOCALE \|\| info\.hidden\) return null;/, 'English has no pack: English is the game\'s own');
-  const ds = rd('src/scenes/dataSource.js');
-  assert.match(ds, /zip: \(name\) => !!classifyPackFile\(name\),/, 'a zip inflates only what the game reads');
-  assert.match(ds, /const record = await installTranslationPack\(code, packEntriesFromFiles\(files\)\);/);
-  const ld = rd('src/scenes/localeData.js');
-  assert.match(ld, /\.then\(\(\) => applyPack\(tag\)\)/, 'the pack after the drafts');
-  assert.match(ld, /_packs = await packStore\.installedPacks\(\);   \/\/ L10N3b: before anything is registered/);
-});

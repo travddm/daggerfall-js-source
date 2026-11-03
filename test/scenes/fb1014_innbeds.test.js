@@ -4,7 +4,6 @@
 // (DaggerfallInterior.cs:500); Roleplay Realism's BedActivation is keyed on the model id alone (RoleplayRealism.cs:126-128)
 // and DFU stands a custom-activation model on its own whatever its ObjectType. A bed written as scenery (ObjectType 0 or
 // 4 - 38 of the 39 bed placements in the vendored world data) was never a click target. Driven through the real builder.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-14.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildInteriorContext } from '../../src/scenes/interiorContext.js';

@@ -37,7 +37,6 @@ import { STORAGE_CONTEXT } from './horse/horseCartLaw.js';   // HCC: the storage
 import { localizedText, t } from './textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
 import { BAG_CAPACITY, BAG_WORDS, hasBag } from '../net/bagLaw.js';   // BAG1: the Materials Bag, a second list as the wagon is
 import { activeWagonItem } from './wagon/wagonKinds.js';   // CART-SLOT: the Cart cell shows the wagon driven
-import { wildStoreRefusal } from './wild/wildStoreLock.js';   // AUDIT PVP-EASE L2-1: the combat lock on storing (a leaf - the account Worker bundles this law)
 
 /** ItemGroups.Transportation.Small_cart's template index. */
 export const SMALL_CART_TEMPLATE = 93;
@@ -197,8 +196,7 @@ export function remoteTarget(deps = {}, state = {}) {
 // handlers (:2104-2146) and OnPop's icon arm (:689-712) are law here.
 // ═══════════════════════════════════════════════════════════════════
 
-/** HOUSE-DROP (2026-09-27, Mac relaying reports: "In houses, players can drop items and the owner cannot see them";
- *  asked, "Block visitor drops"): the host's word against a drop, asked only when the destination IS the ground - the
+/** HOUSE-DROP: the host's word against a drop, asked only when the destination IS the ground - the
  *  session's dropped list, or a pile the player dropped before (DaggerfallLoot.playerOwned) - never a wagon, a chest, a
  *  corpse or a merchant. Null: the ground takes it. */
 export function groundRefusalOf(deps = {}, state = {}) {
@@ -207,16 +205,16 @@ export function groundRefusalOf(deps = {}, state = {}) {
   return deps.dropRefusal?.() ?? null;
 }
 
-/** AUDIT PVP-EASE L2-1 (the owner chose "Combat lock"): the word against STORING, asked only when the destination is
- *  storage no death in the open zone takes - the wagon, or a list the host marks `storage` (a companion's pack, a ship's
- *  hold, a chest) - never the ground, a corpse, a merchant or a choose-one list; the host's own word if it has one, else
- *  the zone's combat lock (systems/wild/wildStoreLock.js wildStoreRefusal). Taking out is never asked. Null: stored. */
+/** The host's word against STORING, asked only when the destination is
+ *  storage - the wagon, or a list the host marks `storage` (a companion's pack, a ship's hold, a chest) - never the
+ *  ground, a corpse, a merchant or a choose-one list; the host's own word if it has one, else none. Taking out is never
+ *  asked. Null: stored. */
 export function storeRefusalOf(deps = {}, state = {}) {
   if (state.chooseOne || (!state.usingWagon && deps.loot?.storage !== true)) return null;
-  return deps.storeRefusal ? deps.storeRefusal() ?? null : wildStoreRefusal();
+  return deps.storeRefusal?.() ?? null;
 }
 
-/** COMPANION-WEIGHT (2026-10-01): the destination's own weight limit when it is a storage with one - a companion's pack
+/** COMPANION-WEIGHT: the destination's own weight limit when it is a storage with one - a companion's pack
  *  carries what a person of his strength can (the host's `loot.capacity`) - asked only when the remote list IS that
  *  storage, never the wagon (WagonCanHoldAmount's own 750), the ground or a choose-one list. Null: no limit.
  *  `{ kg, name }` - the limit, and whose it is for the refusal's words. */

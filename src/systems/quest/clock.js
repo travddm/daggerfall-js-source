@@ -90,14 +90,14 @@ export function matchTimeValue(text) {
   return getTimeInSeconds(days, hours, minutes);
 }
 
-/** WORLD7 (Mac: "quests dont seem to work in online"): the most world seconds ONE played frame charges a quest clock
+/** WORLD7: the most world seconds ONE played frame charges a quest clock
  *  online - thirty world minutes, two and a half real minutes under the shared clock's twelve-to-one; a frame never
  *  spans it. A gap past it is time AWAY (the tab closed or hidden - a hidden tab runs no frames and charges one step
  *  when it comes back - the character off the world, a window held) and is forgiven. Offline there is no bound: a rest or a trip charges its whole span, DFU's own. */
 export const PLAYED_STEP_MAX_SECONDS = 30 * 60;
 
 /**
- * DEAD-CLOCK (2026-09-26, KimNix on the Discord: "the quest keeps resting its time"): WHETHER A CLOCK'S END CAN CHANGE
+ * DEAD-CLOCK: WHETHER A CLOCK'S END CAN CHANGE
  * ANYTHING. A finished clock sets the task of its own name (`_triggerTask`); that task runs actions, or a `when` reads
  * it, or an `until ... performed` waits on it. A clock none of that names is a script's leftover - N0B20Y02's
  * `_oneday_` (`Clock _oneday_ 1.03:00`, `variable _oneday_`, read by nothing) - and the journal's "Time remains",
@@ -117,8 +117,8 @@ export function clockCounts(quest, clock) {
 }
 
 /**
- * REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12, option A): QUEST WAITS ONLINE - TIMEFREE's
- * DELAY HALF, back on QCLOCK-WORLD's clock. TIMEFREE (2026-10-02, `Online-Time-Arc.md` 6.3b) read every clock off its
+ * REST8: QUEST WAITS ONLINE - TIMEFREE's
+ * DELAY HALF, back on QCLOCK-WORLD's clock. TIMEFREE read every clock off its
  * script as a deadline or a delay, froze the deadlines and cut the delays; QCLOCK-WORLD (6.3c) reverted it whole and put
  * every clock on played world time, and its audit measured what that cost the waits (121 of them: median 0.3 h of play,
  * p90 24.3, the main quest's letters 20-26 h each). This brings back the reading and the cut, and NOT the freeze:
@@ -301,8 +301,7 @@ export function clockIsDeadline(quest, clock) {
   return readsAsDeadline(quest, name) && !closes(quest, name);
 }
 
-/** WAVE-WAIT (2026-10-07, bible/06-Systems/Online-Waits.md WAIT2; Mac: "Take care of this", over the sweep of the waits
- *  still long online): A WAVE THE QUEST WAITS ON. A wave (`create foe` / `send ... every N minutes`) runs on played
+/** WAVE-WAIT: A WAVE THE QUEST WAITS ON. A wave (`create foe` / `send ... every N minutes`) runs on played
  *  time online (WORLD7's step, QCLOCK-WORLD's lived charge - a rest spends none of it), and REST8 left its interval
  *  whole as pacing. Pacing it is, for a wave that harasses: its gap is the player's breathing space, and the corpus's
  *  long ones are nearly all of that kind - K'avar's archers (2000 minutes), the knights on the totem (1300), the Sx100
@@ -523,9 +522,7 @@ export class Clock extends QuestResource {
    *  liveRemainingSeconds reads it - so a reader can never disagree with the charge.
    *  TIME3: online the quest's clock is the character's own (LIVED1), and the gap has two parts: the time RAISED since
    *  the sample (a rest, a loiter, a journey, a sentence - the session's count, raisedSeconds) and the time lived with
-   *  the world, the event clock's own movement while they play. QCLOCK-WORLD (2026-10-02, Mac: "go back to the quest
-   *  timer tied to the online world clock"; asked, "Shared world clock" - resting, waiting and travel spend no quest
-   *  days): online only the lived part is charged, one played step at most (WORLD7's law: the rest is time away,
+   *  the world, the event clock's own movement while they play. QCLOCK-WORLD: online only the lived part is charged, one played step at most (WORLD7's law: the rest is time away,
    *  forgiven), and a raise never. [SUPERSEDES TIME3's raise charged whole, and TIMEFREE's quests without time.]
    *  Offline the one clock's raw gap stands, DFU's own arithmetic. Never more than the clock moved, never less than
    *  nothing. */
@@ -538,7 +535,7 @@ export class Clock extends QuestResource {
     return Math.trunc(Math.min(Math.max(raw - raised, 0), step));   // QCLOCK-WORLD: the lived step, never the raise
   }
 
-  /** QT-LIVE1 (Mac, 2026-09-21: "The time doesn't print out live?"): the remainder AS OF NOW. The machine ticks off
+  /** QT-LIVE1: the remainder AS OF NOW. The machine ticks off
    *  the frame loop and every host holds that tick under the pause gate, so `remainingTimeInSeconds` is the remainder
    *  as of the last tick BEFORE the menu opened - and online the world runs on under the menu, so a journal reading
    *  the field showed a number the next tick would already have moved past. This is that next tick's answer without
@@ -555,8 +552,7 @@ export class Clock extends QuestResource {
     const now = wholeSeconds(caller);
     // WORLD7: online a clock charges PLAYED time - the frame's world time, never more than one played step (the
     // hosts' word through the quest: PLAYED_STEP_MAX_SECONDS under the shared clock, no bound offline). A gap past the
-    // step is time away and is forgiven, the sample moved. WORLD5 stood every clock down instead (Mac, WORLD1: "time
-    // limits on quest ... naturally disabled while online"), and a Daggerfall clock is a DELAY as often as a limit:
+    // step is time away and is forgiven, the sample moved. WORLD5 stood every clock down instead, and a Daggerfall clock is a DELAY as often as a limit:
     // Brisienna's letter (7-14 days), the tutorial's pages, every "come back in three days" never came, and the main
     // quest never began online. A limit still stands, in hours played; none expires while away.
     // AUDIT WORLD7/8 A1-A2: online the sample can sit AHEAD of the world - an offline save is game-weeks past the shared

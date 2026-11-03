@@ -1,6 +1,5 @@
 // @ts-check
-// LEGACY3 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 11; Mac: "implement it into the pause menu as a new
-// tab"): THE FAMILY TAB's own pages - Project Legacy's `FamilyLegacyWindow` and `FamilyLegacyInformationPanel`,
+// LEGACY3: THE FAMILY TAB's own pages - Project Legacy's `FamilyLegacyWindow` and `FamilyLegacyInformationPanel`,
 // rebuilt in the Enhanced Plus window as the Holdings tab's pages are (ui/holdingsPages.js): a rail of pages in the
 // pause window (ui/enhanced/enhancedMenu.js pauseFamily), each drawn here over a PROVIDER the world host sets
 // (setFamilyProvider), so this file touches no runtime.
@@ -38,7 +37,7 @@ import { capturePointer } from './pointerCapture.js';   // RPT1026-CLIENT: a pad
 
 export const FAMILY_PAGE_SECTIONS = Object.freeze([
   Object.freeze(['tree', 'Family Tree']), Object.freeze(['house', 'The House']), Object.freeze(['hall', 'Hall of Ancestors']),
-  Object.freeze(['guide', 'How it works']),   // PLAIN-UI (bible/10-UI/Plain-Words.md): the whole of it, in words
+  Object.freeze(['guide', 'How it works']),   // PLAIN-UI: the whole of it, in words
 ]);
 export const FAMILY_STYLE_ID = 'family-pages-css';
 /** AUDIT PLAIN-UI U8: the tree's way to How it works. */
@@ -220,7 +219,7 @@ export const SHEET_HOUSE_TEXT = Object.freeze({
 });
 
 /**
- * THE HOUSE ON THE CHARACTER SHEET (bible/06-Systems/Legacy-Arc.md section 11 - the arc's first plan: "the age and the
+ * THE HOUSE ON THE CHARACTER SHEET (- the arc's first plan: "the age and the
  * elder's word on the character sheet"; AUDIT LEGACY F2 found it never built). The one played's house as their card
  * says it: the model and their generation, and in an Enduring house their age against their span, Arkay's toll and the
  * elder's word (ui/enhanced/enhancedMenu.js statsCharacter draws it). Null with no house to show: Project Legacy off, no family,
@@ -581,7 +580,7 @@ export const noFamilyLine = (prov) => (!prov ? 'Open this from a game to see you
         : 'Your family is founded when your character is made, or the first time an older character is loaded.');
 
 /**
- * PLAIN-UI (bible/10-UI/Plain-Words.md; a player: "Same issues with the project legacy system"): HOW IT WORKS - the
+ * PLAIN-UI (; a player: "Same issues with the project legacy system"): HOW IT WORKS - the
  * family's whole law in words, `[name, words]`, for the house's model (both, where none is founded yet), its numbers
  * the law's own (systems/legacy/*.js) and the toll the Features tile chose (`tollShare`). Pure.
  * @param {string|null} model MODELS' (null: no house yet) @param {number} tollShare

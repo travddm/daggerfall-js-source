@@ -1,5 +1,4 @@
-// INT7 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): THE ARMS AND THE LEVEL SIGNED. Every referee of a blow between players clipped it to the weapon the
+// INT7: THE ARMS AND THE LEVEL SIGNED. Every referee of a blow between players clipped it to the weapon the
 // striker's own word named (the arena) or its own look carried (a siege, a Royal Tourney) - a client's claim either way,
 // so a Daedric Dai-Katana struck as one from a pack that never held it. Now each checkpoint's judge reads the most reach
 // of the pack's LAWFUL weapons and whether a lawful bow is among them (net/siege/siegeRef.js armsOf), the identity mint signs
@@ -9,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  armsTop, armsOf, armsOk, ARMS_TOP_MAX, siegeBlowMax, refereeBlow, newFighter, SIEGE_HIT, SIEGE_THUNDERLOCK, SIEGE_WEAPON_MAX,
+  armsTop, armsOf, armsOk, ARMS_TOP_MAX, siegeBlowMax, refereeBlow, newFighter, SIEGE_HIT, SIEGE_WEAPON_MAX,
   SIEGE_BONUS_MAX, SIEGE_CRIT_MAX, siegeRoomKey, SIEGE_UNITS_PER_M,
 } from '../../../src/net/siege/siegeRef.js';
 import { arenaBlowCap, arenaArmsOk, ARENA_ARMS_TOP_MAX, ARENA_HIT, ARENA_MOD_MAX, ARENA_TICK_MS, ARENA_FLOOR_CENTRE } from '../../../src/net/arena/arenaLaw.js';
@@ -21,21 +20,20 @@ import { createWeapon } from '../../../src/combat/enemyEquipment.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 import { standService, T0 } from '../../accountDb.mjs';
 import { seatRealm } from '../../realmSeat.mjs';
-import { realmMintFacts } from '../../../server-account/src/realm.js';   // PIN MOVED (SCALE4f): realmArmsOf is realmMintFacts' `wa`
+import { realmMintFacts } from '../../../server-account/src/realm.js';
 import { fakeRoom } from '../../fakeRoom.mjs';
 
 const { subtle } = globalThis.crypto;
 const lawful = () => true;
 const weapon = (t, m) => createWeapon(t, m, seededRng(t * 16 + m));
 
-test('INT7 THE LAW: a weapon\'s reach is its DFU top and its material\'s modifier (every template, every material, the Thunderlock - pinned to characters/weapons.js); the arms are the most reach of the pack\'s LAWFUL weapons and a lawful bow, a refused piece arming nobody; the bound one number at all three ends (mutants: the material left out; a refused piece counted; the bow unread; the most not the most)', () => {
+test('INT7 THE LAW: a weapon\'s reach is its DFU top and its material\'s modifier (every template, every material - pinned to characters/weapons.js); the arms are the most reach of the pack\'s LAWFUL weapons and a lawful bow, a refused piece arming nobody; the bound one number at all three ends (mutants: the material left out; a refused piece counted; the bow unread; the most not the most)', () => {
   for (const t of Object.keys(SIEGE_WEAPON_MAX).map(Number)) {
     for (let m = 0; m <= 9; m++) assert.equal(armsTop(t, m), weaponMaxDamage(t) + weaponMaterialModifier(m), `${t}/${m}`);
   }
-  assert.equal(armsTop(SIEGE_THUNDERLOCK.template, 9), weaponMaxDamage(SIEGE_THUNDERLOCK.template) + weaponMaterialModifier(9));
   assert.equal(armsTop(9999, 0), null, 'no weapon this table names');
-  assert.deepEqual([ARMS_TOP_MAX, TOKEN_ARMS_TOP_MAX, ARENA_ARMS_TOP_MAX], [32, 32, 32], 'one bound, at the token, the siege and the arena');
-  assert.equal(ARMS_TOP_MAX, Math.max(...Object.keys(SIEGE_WEAPON_MAX).map((t) => armsTop(Number(t), 9)), armsTop(SIEGE_THUNDERLOCK.template, 9)));
+  assert.deepEqual([ARMS_TOP_MAX, TOKEN_ARMS_TOP_MAX, ARENA_ARMS_TOP_MAX], [27, 27, 27], 'one bound, at the token, the siege and the arena');
+  assert.equal(ARMS_TOP_MAX, Math.max(...Object.keys(SIEGE_WEAPON_MAX).map((t) => armsTop(Number(t), 9))));
   const dai = { group: 'Weapons', templateIndex: 123, material: 9 };
   const dagger = { group: 'Weapons', templateIndex: 113, material: 0 };
   const bow = { group: 'Weapons', templateIndex: 130, material: 1 };
@@ -48,7 +46,7 @@ test('INT7 THE LAW: a weapon\'s reach is its DFU top and its material\'s modifie
   for (const ok of [armsOk, arenaArmsOk, armsIssuable]) {
     assert.equal(ok([27, 1]), true);
     assert.equal(ok([0, 0]), true, 'a fist alone is a claim');
-    for (const bad of [null, [27], [27, 1, 0], [33, 0], [-1, 0], [1.5, 0], [27, 2], ['27', 1], { 0: 27, 1: 1, length: 2 }]) assert.equal(ok(bad), false, JSON.stringify(bad));
+    for (const bad of [null, [27], [27, 1, 0], [28, 0], [-1, 0], [1.5, 0], [27, 2], ['27', 1], { 0: 27, 1: 1, length: 2 }]) assert.equal(ok(bad), false, JSON.stringify(bad));
   }
 });
 

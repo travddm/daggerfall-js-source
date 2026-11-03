@@ -1,13 +1,12 @@
 // @ts-check
-// RVN-STARS (2026-10-17, the owner: "develop a firmament style tree for revenants. Just like we did for ships and
-// characters"; bible/06-Systems/Revenants.md section 44) - A SWORN REVENANT'S STARS. The port's own; pure.
+// RVN-STARS - A SWORN REVENANT'S STARS. The port's own; pure.
 //
 // EACH SWORN ONE GROWS ITS OWN SKY. Its level is earned at the player's side and kept on its oath (`companion.xp` - a
 // fight won beside the player, by the foe's level; an errand come home, by its days and its danger, while it is under
 // RVN_XP.ERRAND_LEVEL_MOST), up a curve to RVN_LEVEL_MAX (`rvnLevelOf`). A POINT A LEVEL past the first, and one for each
 // rank past the first it was sworn at (a rank V revenant - one that rose four times - comes to the oath with four), buys
 // a star on its sky - the Firmament's shape
-// (bible/06-Systems/Firmament.md) as CAPTAIN-TREE made it a sky of its own (systems/naval/captainTree.js): a start in the
+//  as CAPTAIN-TREE made it a sky of its own (systems/naval/captainTree.js): a start in the
 // middle, paths of small stars to notables and keystones, a star bought only beside one held.
 //
 // THE OATH in the middle (held by every sworn one), and three aspects about it:

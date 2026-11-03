@@ -1,5 +1,5 @@
 // @ts-check
-// LW5 (2026-10-05, bible/06-Systems/Living-World.md): THE BAY'S SAILORS - a port town's sailors (census.js: a port's
+// LW5: THE BAY'S SAILORS - a port town's sailors (census.js: a port's
 // own, two to six) are the crews of the Bay's packets that call there (naval/seaLanes.js: every lane between the map's
 // ports runs its packets out and back on the shared clock). Mac: NPCs "link with the ship AI at ports".
 //

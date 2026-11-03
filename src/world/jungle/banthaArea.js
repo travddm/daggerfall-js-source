@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA2 (2026-10-19, bible/03-World/Bantha-Jungle.md "Where the jungle is"): WHERE BANTHA IS. The owner, with a map of
+// BANTHA2: WHERE BANTHA IS. The owner, with a map of
 // the Iliac Bay and an area of its south-eastern shore painted red: "The area is red in bantha and should be the jungle
 // biome". Their red, read into map pixels by tools/banthaArea.mjs (the drawing at its own resolution, smoothed; on
 // Hammerfell's land; run on up to the coast; the water it closes round) - the Hammerfell shore from Tigonus' tip to the

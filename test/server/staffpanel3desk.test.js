@@ -1,5 +1,4 @@
-// STAFF-PANEL3-DESK (2026-10-22, mob picked these at 04:13Z, Moderators' share at 06:28Z; design doc "DFO Staff Panel:
-// design") - THE PANEL'S DESK (server-account/src/staffDesk.js), driven through the real Worker on the node:sqlite database
+// STAFF-PANEL3-DESK - THE PANEL'S DESK (server-account/src/staffDesk.js), driven through the real Worker on the node:sqlite database
 // every account pin stands on (test/accountDb.mjs): staff notes, each member's own watchlist and its events, Your settings,
 // and the Admins' server notice, AI check scorecard and reported board notes and market listings.
 import { test } from 'node:test';
@@ -36,7 +35,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, BOARD_OPEN: 'on',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, BOARD_OPEN: 'on',
   });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {

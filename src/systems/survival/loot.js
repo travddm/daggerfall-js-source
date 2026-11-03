@@ -23,7 +23,7 @@ export const DEFAULT_ANIMAL_MEAT = Object.freeze([1, 2]);
 export const HUMANOID_FOOD_ABOVE = 17;
 export const HUMANOID_SECOND_ABOVE = 19;
 
-// AUDIT VC6 (2026-09-18): THE LUCK READER IS GONE, because it was never
+// AUDIT VC6: THE LUCK READER IS GONE, because it was never
 // set. `setSurvivalPlayerReader` had no caller anywhere in the tree, so
 // `_player()` answered null at every kill and the luck modifier read 50
 // for every player in the game - the whole of Climates & Calories' luck

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT TESA II P7 (2026-10-25, bible/03-World/World-Wide.md "Folded into TESA"; bible/03-World/Arena-Provinces.md) - THE
+// AUDIT TESA II P7 - THE
 // PLACES PAST THE BAY AS THE WORLD'S REGISTRY'S ROWS.
 //
 // WORLD-WIDE built the registry (world/worldWide/worldPlaces.js) as the seam TESA's places plug into - "a provider
@@ -64,7 +64,7 @@ export function pastBayPlaceRows({ pixels, templateOf, capitals }) {
 }
 
 /**
- * BAY-LEFT-GROUND (the audit "no system left behind in the Bay", D1; bible/03-World/Landforms.md "BAY-LEFT-GROUND"): THE
+ * BAY-LEFT-GROUND (the audit "no system left behind in the Bay", D1; "BAY-LEFT-GROUND"): THE
  * PLACES PAST THE BAY AS THE LANDFORMS' SITES (world/landforms.js landformSitesBeyond), as landformSites reads the Bay's
  * own rows - `{ px, py, loc }`, `loc` what a site's footprint reads (terrainTiles.js locationFootprintRect: its block
  * grid and its type), the template a place clones (the game's own rows as MAPS.BSA holds them: a town pack's grid is never

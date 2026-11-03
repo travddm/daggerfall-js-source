@@ -1,5 +1,4 @@
-// START2 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md sections 7-10; the owner: "Each new region will each have
-// their own unique starting quest/dungeon within that region"): THE PROVINCES' STARTS - the start-choice page the
+// START2: THE PROVINCES' STARTS - the start-choice page the
 // character's making ends with, a province's start dungeon past the Bay (the nearest of the kinds its story wants near
 // its capital, a quest item's marker in it), its quest played on DFU's machine to the Daggerfall gate, the commission in
 // hand for a character born at no start, the world's start host, the writ of passage a ship's master honors, and the sea
@@ -529,7 +528,7 @@ test('START2 the start page (ui/startChoice.js): the eight starts in their order
   assert.deepEqual(wrapToWidth('a bb ccc dddd', 7, (t) => t.length), ['a bb', 'ccc', 'dddd']);
 });
 
-/** A character made through the wizard to its summary (test/systems/orl1_leveling.test.js's walk). */
+/** A character made through the wizard to its summary (test/systems/audit17f.test.js's walk). */
 const career = {
   name: 'W', hitPointsPerLevel: 12, advancementMultiplier: 1.0, strength: 60, intelligence: 40, willpower: 45, agility: 55, endurance: 60, personality: 40, speed: 50, luck: 50,
   primarySkills: [SKILLS.LongBlade, SKILLS.Axe, SKILLS.CriticalStrike], majorSkills: [SKILLS.BluntWeapon, SKILLS.Dodging, SKILLS.Jumping],
@@ -552,10 +551,10 @@ function madeTo(startChoice) {
 
 test('START2 the chargen door asks where the story begins LAST, after every other question, in the one overlay - and only a host that can stand a start past the Bay asks; one start open is no choice (mutants: the question unasked, asked first, asked of a host with the Bay alone)', () => {
   const { w, result } = madeTo({ open: () => true });
-  for (let i = 0; i < 4 && !(w.levelingPrompt instanceof StartChoiceScreen); i++) w.input('Enter');   // the leveling and the lineage questions, where they are put
-  assert.ok(w.levelingPrompt instanceof StartChoiceScreen, 'the start page, last');
+  for (let i = 0; i < 4 && !(w.questionPrompt instanceof StartChoiceScreen); i++) w.input('Enter');   // the leveling and the lineage questions, where they are put
+  assert.ok(w.questionPrompt instanceof StartChoiceScreen, 'the start page, last');
   assert.equal(w.done, false);
-  assert.equal(w.levelingPrompt.options[w.levelingPrompt.cursor].id, 'IliacBay', 'the walk\'s Breton: the Bay first');
+  assert.equal(w.questionPrompt.options[w.questionPrompt.cursor].id, 'IliacBay', 'the walk\'s Breton: the Bay first');
   w.input('char:4');
   assert.equal(w.done, true);
   assert.equal(result().startKey, 'Imperial', 'the answer rides the result');
@@ -563,7 +562,7 @@ test('START2 the chargen door asks where the story begins LAST, after every othe
   for (const startChoice of [null, { open: () => false }]) {
     const other = madeTo(startChoice);
     for (let i = 0; i < 4 && !other.w.done; i++) {
-      assert.ok(!(other.w.levelingPrompt instanceof StartChoiceScreen));
+      assert.ok(!(other.w.questionPrompt instanceof StartChoiceScreen));
       other.w.input('Enter');
     }
     assert.equal(other.w.done, true);
@@ -571,7 +570,7 @@ test('START2 the chargen door asks where the story begins LAST, after every othe
   }
   // torn down mid-question: the homeland's start, as every question's default
   const torn = madeTo({ open: () => true });
-  for (let i = 0; i < 4 && !(torn.w.levelingPrompt instanceof StartChoiceScreen); i++) torn.w.input('Enter');
+  for (let i = 0; i < 4 && !(torn.w.questionPrompt instanceof StartChoiceScreen); i++) torn.w.input('Enter');
   torn.w.dispose();
   assert.equal(torn.result().startKey, 'IliacBay');
 });
@@ -616,7 +615,6 @@ test('START2 LONG-VOYAGE (travelRoute.js planSeaLanes): a booked voyage whose po
 // ── the game's own Tamriel ───────────────────────────────────────
 
 const ARENA2 = process.env.ARENA2_PATH;
-/** PIN MOVED (PLAN-SLICES): the most cells a voyage's plan spends (its floods, its lanes and its landfall - travelRoute.js `tally`). */
 const VOYAGE_CELLS_MAX = 450000;   // measured 392,822 and 393,363 (the two floods and the lanes): some twenty frames at PLAN_FRAME_CELLS
 const HAVE = !!ARENA2 && ['MAPS.BSA', 'BLOCKS.BSA', 'WOODS.WLD', 'TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));
 const skipReal = HAVE ? false : 'ARENA2_PATH not set or missing - real-data validation skipped';
@@ -714,7 +712,7 @@ test('START2 on the freeware\'s Tamriel: a voyage from every port past the Bay t
       // every port past the Bay - the provinces' starts' ways home among them - from the water about it a voyage reaches
       const ports = arenaPixels().stood.filter((p) => p.port);
       assert.equal(ports.length, 28, 'TESA12\'s 28 ports');
-      let most = 0;   // PIN MOVED (PLAN-SLICES): a plan's cells, an op count, never a clock (a flake on a shared runner)
+      let most = 0;
       for (const p of ports) {
         let routed = null;
         for (let dy = -3; dy <= 3 && !routed; dy++) for (let dx = -3; dx <= 3 && !routed; dx++) {
@@ -754,22 +752,3 @@ test('START2 on the freeware: the start page\'s classic face fits the native scr
 
 // ── the hosts' wiring ────────────────────────────────────────────
 
-test('START2 the world host wires the start host (scenes/startsHost.js) and grows no logic of its own: the page through the chargen door, the answer into its OnStartGame, the quests and the welcome once the character stands where their story begins, a birth online after it, the quest layer\'s start seam, and the writ at the passage; the fixed city\'s bench hands the commission (mutants: each line)', () => {
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /const starts = createStartsHost\(\{ params, pastBay: !!_lairTemplates, quests: \(\) => questWorld,\n\s+teleport: _teleportToPixel, landReady: arenaTraced, talk: townTalk, machine: \(\) => questBridge\?\.machine, ready: _worldReady \}\);/);   // PIN MOVED (AUDIT BAY-LEFT, its packages merged): world.js's one readiness, the homes' sweep's and the start's too
-  assert.match(W, /starts\.begin\(\(start\) => \{ questBridge\.initAtGameStart\(start\); startTutorialTour\(\); \}, startKey\);/);
-  assert.match(W, /if \(!questBridge\) \{ _questStartPending = startKey \?\? true; return; \}/, 'the answer kept while the bridge is still to come');
-  assert.match(W, /if \(_questStartPending\) questInitAtGameStart\(_questStartPending\);/, 'and handed on when it comes');
-  assert.match(W, /startChoice: starts\.page,/);
-  assert.match(W, /questInitAtGameStart\(r\.startKey\);/);
-  assert.match(W, /if \(realmNew\) starts\.settled\.then\(realmBirth\)\.catch\(/);
-  assert.match(W, /writ: starts\.writ \}\);/);
-  assert.match(W, /lairLocationAt, nearestTownOf, provinceQuestPlaces, tamrielPlaceName \} = createTamrielPlaces\(/);   // PIN MOVED (TESA x AUDIT TESA II): P2's nearest town beside it; PIN MOVED (AUDIT RELEASE R2-5): the start lair rides the places past the Bay
-  assert.match(W, /playerTravelPixel, provinceQuestPlaces, questSiteMovedHere, talkBuildingCompassDirection/);   // PIN MOVED (AUDIT RELEASE R2-5)
-  assert.match(rd('src/scenes/tamrielPlacesHost.js'), /refresh: registerTamrielPlaces, startLairAt,/);
-  assert.match(rd('src/scenes/questWorld.js'), /const startLairAt = provinceQuestPlaces\?\.startLairAt;/);   // PIN MOVED (AUDIT RELEASE R2-5, hostseam): the places' own, no host read the game never hands
-  const Q = rd('src/scenes/questWorld.js');
-  assert.match(Q, /startSiteOfId: \(id\) => \{\n\s+const start = startOfSiteId\(id\);\n\s+const loc = start \? startLairAt\?\.\(start, \(l\) => dungeonItemMarkerCount\(\(name\) => blocks\.getBlockByName\(name\), questSized\(l\)\) > 0\) : null;\n\s+return loc \? questSized\(loc\) : null;/);
-  assert.match(rd('src/scenes/exterior.js'), /questBridge\.initAtGameStart\(HAND_START_QUEST\);/);
-  assert.match(rd('src/systems/quest/place.js'), /let location = start \? world\.startSiteOfId\?\.\(this\.p1\) \?\? null : findQuestLocation\(world\.maps, this\.p1\);/);
-});

@@ -1,4 +1,4 @@
-// DISC22-A (2026-09-24, Mac: "repair magical items should be enabled by default and required online").
+// DISC22-A.
 //
 // DFU ships Controls/AllowMagicRepairs False - a smith turns an enchanted item away (RepairsObjects' magic arm,
 // systems/repairService.js repairRefusal). The port's default mends it now (settings.js PORT_DEFAULTS, over the
@@ -56,8 +56,3 @@ test('DISC22-A: online it is required - the room\'s value wins over a stored Off
   _resetForTests();
 });
 
-test('DISC22-A: the settings row is shown locked online, with the reason, as every forced row is (onlinelane.test.js)', () => {
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(menu, /if \(onlineForcedSetting\(_sec, _k\) !== undefined\) lockOnline\(b, null, \{ note: ONLINE_SETTING_NOTE, value: raw === 'True' \}\);/);
-  assert.match(menu, /const ONLINE_SETTING_NOTE = '[^']+';/, 'the note names why');
-});

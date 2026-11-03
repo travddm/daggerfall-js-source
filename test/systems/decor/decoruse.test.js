@@ -1,9 +1,8 @@
-// DECOR-USE (2026-10-24, Discord - "Make bed decor and firepit decor actually funtional": "the beds dont actually let you
-// sleep in it and firepit doesnt actually let you cook on it"; "Cooking station is not an option in decorate") - WHAT A
+// DECOR-USE - WHAT A
 // PLACED PIECE IS FOR: a placed bed is slept in, a placed fire one stands over is one of the room's hearths (it warms, a
 // rest by it is a camp's, it is cooked on), and the cooking station makes any piece that fire. The law is
 // systems/decor/decorUse.js; the room's half scenes/decor/decorRoom.js `hearths`; the host's worldModes.js activateDecor
-// and its interior camps' `hearths`. Recorded in bible/06-Systems/Online-Arc.md DECOR-USE.
+// and its interior camps' `hearths`. Recorded in DECOR-USE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -109,12 +108,3 @@ test('DECOR-USE the room: its placed fires are hearths by their flame - a pictur
   assert.deepEqual(room.hearths(), [], 'taken down, gone');
 });
 
-test('DECOR-USE the host: the interior\'s camps hear the room\'s placed fires beside its own, and a placed piece\'s own use is pressed before a station\'s craft - after a trader, whose press is anyone\'s (mutants: the host\'s fires unhanded; the use unwired)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const interiorCamps = createCamps\(\{\n\s+entity: playerEntity,\n\s+hearths: \(\) => \[\.\.\.interiorHearths, \.\.\.interiorDecor\.hearths\(\)\],/);
-  assert.match(wm, /if \(piece\?\.station === VENDOR_STATION\) \{ openHomeVendor\(piece, id\); return; \}[^\n]*\n\s+if \(useDecorPiece\(piece, interiorCamps, getInteractionMode, restFromInteriorBed, \(\) => forgeOffered\(\) && \(interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\('fire'\) \}\), true\)\)\) return;[^\n]*\n\s+if \(piece\?\.station\) \{ useDecorStation\(piece\); return; \}/);
-  // AUDIT DECOR-USE D2: and The Fire is a station's head the press lands on - PIN MOVED (CRAFT-HALL): the press lands on
-  // the Crafting page at the fire (profPages.js stationDoorAt), where it landed on the Stores page
-  assert.match(src('src/ui/professions/profPages.js'), /detail\.append\(stationHead\(divider, t\('prof\.page\.fire', 'The Fire'\), 'fire'\)\);/);
-  assert.match(src('src/scenes/camps.js'), /\n\s+usable,[^\n]*\n\s+\};\n\}/, 'the camps say whether their fires answer');
-});

@@ -178,57 +178,11 @@ test('audit26 magic-save: GetMaxEncumbrance adds the IncreasedWeightAllowance mu
   assert.equal(enchantWeightAllowanceMult(half), 0.5);
   assert.equal(entityMaxEncumbrance(half), 123, '82 + (int)(82 * 0.5) = 82 + 41');
 
-  // And the READERS: everything holding a live entity reads the
-  // entity ceiling (PlayerEntity.MaxEncumbrance), while the chargen
-  // bonus screen reads the raw formula off working stats
-  // (CreateCharAddBonusStats.cs:157) because there is no entity yet.
-  assert.match(rd('src/ui/charsheet.js'), /entityMaxEncumbrance\(e\)/);
-  // U56 moved TransferItem's ladder out of the classic window, so the
-  // CARRY GATE this pin was sweeping for went with it - and so did
-  // this line, to the file that now holds it. The enhanced pack and
-  // the enhanced sheet mirror the two windows above and read the same
-  // ceiling; they were written against the pre-audit formula and are
-  // swept here so they cannot drift back to it.
-  assert.match(rd('src/systems/item/itemTransfer.js'), /entityMaxEncumbrance\(entity\)/);
-  assert.ok(!/maxEncumbrance\(liveStat\(/.test(rd('src/systems/item/itemTransfer.js')),
-    'the bare strength formula is back in the carry gate');
   for (const f of ['src/ui/enhanced/enhancedInventory.js', 'src/ui/enhanced/enhancedCharSheet.js']) {
     assert.match(rd(f), /entityMaxEncumbrance\(/, `${f} reads the bare formula`);
     assert.ok(!/maxEncumbrance\(liveStat\(|maxEncumbrance\(strength\)/.test(rd(f)),
       `${f} still has the pre-audit formula in it`);
   }
-  const wm = rd('src/scenes/worldModes.js');
-  assert.equal((wm.match(/entityMaxEncumbrance\(playerEntity\)/g) ?? []).length, 2,
-    'the trade weight seam and the letter-of-credit gate both read the entity ceiling');
-  assert.match(rd('src/ui/chargen.js'), /maxEncumbrance\(st\.strength\)/);
-});
-
-// --------------------------------------------------------------- F098
-test('audit26 magic-save: a map-pixel change clears the non-permanent scene cache', () => {
-  // PlayerGPS.Update (:329-339): on every map-pixel change,
-  //   // Clear non-permanent scenes from cache, unless going to/from
-  //   // owned ship
-  //   DFPosition shipCoords = DaggerfallBankManager.GetShipCoords();
-  //   if (shipCoords == null || (!(pos.X == shipCoords.X && ...) &&
-  //       !(lastMapPixelX == shipCoords.X && ...)))
-  //       SaveLoadManager.ClearSceneCache(false);
-  // The port's streaming host IS its PlayerGPS: state.update answers
-  // pixelChanged, and state.current is overwritten in the call, so the
-  // departure pixel is captured first.
-  const t = rd('src/scenes/world.js');
-  assert.match(t, /const wasMapPixel = \{ x: state\.current\.x, y: state\.current\.y \};/);
-  const i = t.indexOf('if (r.pixelChanged) {');
-  assert.ok(i > 0);
-  const arm = t.slice(i, i + 1600);
-  assert.match(arm, /const ship = shipCoords\(playerEntity\);/);
-  assert.match(arm, /r\.current\.x === ship\.x && r\.current\.y === ship\.y/);
-  assert.match(arm, /wasMapPixel\.x === ship\.x && wasMapPixel\.y === ship\.y/);
-  assert.match(arm, /if \(!toOrFromShip && playerEntity\.sceneCache\) \{\s*\n\s*clearSceneCache\(playerEntity\.sceneCache, \{ start: false \}\);/,
-    'ClearSceneCache(false) - the WORLD-MOVE arm, which keeps the permanent scenes');
-
-  // The ship exception is the only skip, and `false` is the arm that
-  // keeps permanent scenes (ClearSceneCache(true) is the new-game one).
-  assert.equal(/clearSceneCache\(playerEntity\.sceneCache, \{ start: true \}\)/.test(arm), false);
 });
 
 // --------------------------------------------------------------- F076

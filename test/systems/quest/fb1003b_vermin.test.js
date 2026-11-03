@@ -110,7 +110,7 @@ const makeSeam = new Function('d', `const { questShareTag, questPrivateTag, part
 /** world.js's two partner calls - the open air's and the room's - each its own argument list, verbatim. */
 const callOf = (re) => { const m = re.exec(W); assert.ok(m, `world.js carries ${re}`); return m[1]; };
 const OUTDOOR = callOf(/\n {6}if \(partnerStandsQuestFoes\((\{[^\n]*\})\)\) return true;/);
-const INDOOR = callOf(/isWorldRoom\((?:host\.)?online\.room\) && partnerStandsQuestFoes\((\{[^\n]*\})\)\) return true;/);
+const INDOOR = callOf(/isWorldRoom\((?:host\.)?online[?]?[.]room\) && partnerStandsQuestFoes\((\{[^\n]*\})\)\) return true;/);
 const defers = new Function('d', `const { partnerStandsQuestFoes, handle, _liveSharer, social, peersNear, player, feet, exteriorFoes, modes } = d;
   const host = d;   // TESA's merge (HOST-SPLIT): the calls are scenes/questWorld.js's, its live names read off \`host\`
   return { outdoor: partnerStandsQuestFoes(${OUTDOOR}), indoor: partnerStandsQuestFoes(${INDOOR}) };`);

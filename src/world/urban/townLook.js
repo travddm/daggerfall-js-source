@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// URBANIZER U1 (2026-10-26; KPbICA's spec, forwarded by the owner: "Buildings assets should utilize more cut stones,
-// bricks, half-timbering"; bible/03-World/Urban-Fabric.md section 2) - A PROVINCE'S TOWNS IN THEIR OWN STONE.
+// URBANIZER U1 - A PROVINCE'S TOWNS IN THEIR OWN STONE.
 //
 // Daggerfall dresses a town's buildings in its location's climate (DaggerfallLocation's ClimateUse.UseLocation:
 // ClimateSwaps.ApplyClimate rebases every exterior set - CityA, CityB, the merchants' homes, the villages, the manors,

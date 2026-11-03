@@ -1,4 +1,4 @@
-// FE1 - THE HUD ESCORTING NPC FACES (2026-08-28). Port of
+// FE1 - THE HUD ESCORTING NPC FACES. Port of
 // HUDEscortingNPCFaces.cs (EscortingNPCFacePanel, MIT, Daggerfall
 // Workshop) - the portrait column quest escorts pin to the top-left
 // of the screen. The quest actions (AddFace/DropFace, actions.js) have
@@ -153,7 +153,7 @@ export const ESCORT_TOUCH_AIR = 8;
 export const ESCORT_MEASURE_EVERY = 30;
 
 /**
- * ESCORT-TOUCH-ROW (2026-10-25, the phone pass of QUEST-SHELF-FACES): where the column starts, in the classic's own
+ * ESCORT-TOUCH-ROW: where the column starts, in the classic's own
  * 320x200 units. DFU's startY (36) unless the touch layer's top row reaches lower: `clearPx` is that row's bottom edge
  * plus ESCORT_TOUCH_AIR, in canvas pixels (0 with no row), and `scale` is the HUD's. At scale 1 on a phone the dial and
  * the menu button (16 to 64 CSS px down) stood over the face at 36; at the iPad's scale 3 the face starts at 108 and
@@ -193,7 +193,7 @@ function touchRowClearPx(canvas, scale) {
 
 // ---- the one panel's state ----
 let _deps = null;     // { fetchBytes, palette, renderer, getFactionData }
-/** PORTRAIT3D (2026-10-15, the owner: "5. Do this" - the escorts' faces among those still Daggerfall's): with
+/** PORTRAIT3D: with
  *  Morrowind's data attached an adult's face of the race's heads is the Morrowind head of their own race and sex at
  *  that face (characters/headPortraits.js playerHeadImage - the portrait's head, as a chargen face's, among the data's
  *  heads: an NPC's, never the port's own - MW-HEADS2; every race, where the classic drew only Redguards and Bretons), at
@@ -321,7 +321,7 @@ export function clearEscortFaces() {
 }
 
 /**
- * QUEST-SHELF-FACES (2026-10-25, a player: abandoned the Acolyte's escort and "stuck with the Oracle's portrait"): A
+ * QUEST-SHELF-FACES: A
  * QUEST SET ASIDE SHOWS NO FACES. DFU has no abandon - its faces leave by DropFace or by the quest-end sweep above, and
  * QUEST-SHELF's Abandon is neither, so the face stood for as long as the quest was away. Its faces are KEPT, not
  * dropped: a reclaim restores the quest from its own envelope and never runs its `add face` again, so a dropped face

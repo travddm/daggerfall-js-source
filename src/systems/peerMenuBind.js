@@ -1,4 +1,4 @@
-// PEERMENU1 (2026-09-26): THE PLAYER MENU OPENS ON A BIND, NOT ON A LOOK - online only.
+// PEERMENU1: THE PLAYER MENU OPENS ON A BIND, NOT ON A LOOK - online only.
 //
 // The player: "change how the social interaction (trading, invite to party, inspect etc) menu pops up, quicklooting
 // can stay the same. Give it a new bind in the options ... and also allow hold buttons (keyboard and controller). When

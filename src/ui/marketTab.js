@@ -1,5 +1,5 @@
 // @ts-check
-// PROF5 (2026-09-29, Mac: "Continue"): THE MARKET TAB of the Notice Board (bible/06-Systems/Professions-Arc.md 10.1,
+// PROF5: THE MARKET TAB of the Notice Board (10.1,
 // 10.2, 21's wireframe, 26) - drawn inside the board's window (ui/noticeWindow.js), beside Notices and Work.
 //
 // FIVE VIEWS, in the wireframe's row: MATERIALS (the Bay's listings of a material - search, family, tier - cheapest
@@ -33,8 +33,7 @@
 // material or a piece - gold's units its own and those gold bought, never Drakes'; under My listings, the gold the sales
 // hold and its Collect into the bank here. Any other character sees the Drakes' market alone, as before.
 //
-// BOARD-UI (2026-10-06, Mac: "Enhance organization of the market"; "Enhance the speed at which the notice board and
-// market loads"; "Reduce overusage of bloated text"): the views in two parts - BUY (Materials, Crafted, Auctions, Goods)
+// BOARD-UI: the views in two parts - BUY (Materials, Crafted, Auctions, Goods)
 // and SELL (the buy orders to fill, and My listings) - then History; Your silver at the top, not under the last row; a
 // row of column names over the listings; the suppliers' counters folded away under one line (the sixteen measures of
 // the Apothecaries' counter stood under every Materials read); My listings in named parts (the List form, your
@@ -48,21 +47,18 @@
 // service says each may list (`ways` - a piece whose maker's record names another lists from the pack). A piece from a
 // pack that arrives - bought, or come back - is collected into the record as a crafted one is minted.
 //
-// BOARD-SIFT (2026-10-21, feature-feedback: "The notice board market also doesnt show everything if there are too many
-// weapons/armor/etc listed it stops after a certain number"): Crafted, Goods, Auctions and Orders TURN PAGES - a view
+// BOARD-SIFT: Crafted, Goods, Auctions and Orders TURN PAGES - a view
 // showed its first hundred rows and nothing past them - under the rows, "Page 2 of 7 · 643 in all"; Crafted and
 // Auctions take a SEARCH of the pieces' names, Crafted a LEAST QUALITY, and Crafted, Goods and Auctions an ORDER
 // (cheapest, dearest, newest, best quality, ending soonest) - each read by the service, so a page holds what matches
-// (net/marketLaw.js MARKET_PAGED_VIEWS, MARKET_SORTS, recipesNamed; bible/06-Systems/Professions-Arc.md 10.13).
+// (net/marketLaw.js MARKET_PAGED_VIEWS, MARKET_SORTS, recipesNamed; 10.13).
 //
-// AUDIT BOARD-SIFT (2026-10-22, the owner: "Audit this"): a search reads the names the rows wear, not the recipes' alone
+// AUDIT BOARD-SIFT: a search reads the names the rows wear, not the recipes' alone
 // (recipeShownName: a Pine Staff is an "Iron Staff" on its row) and is sent as the recipes it names; the currency's switch
 // reads from the first page as every other change does; a page an act emptied steps back to the last that stands; a
 // choice made in a list draws its answer at once; the pages keep the keyboard's focus.
 //
-// PACK-PICK (2026-10-26, feature-feedback "SELLING ITEMS ON THE MARKET IS A PAIN!": "a dropdown with just the name of the
-// item.. no description or icon, you gotta memorize the item names"; the owner: "This needs a comprehensive detailed
-// overhaul"): the List form's kinds are presses (the pack's first for a realm character, its form opening there, and the
+// PACK-PICK: the List form's kinds are presses (the pack's first for a realm character, its form opening there, and the
 // kind pressed kept for the session); a piece from the pack, a crafted piece and a Masterwork are chosen from pictured
 // tiles, sifted as the pack's own stores are, the refused folded under them with why (ui/packPicker.js); the piece chosen
 // is looked at - its rows and magic (systems/item/itemLook.js) - beside its price; and the Goods view holds the way to
@@ -140,7 +136,7 @@ const KIND_KEPT = new WeakMap();
 const MOVED = MARKET_MOVED;
 /** AUDIT PROF-541 R2-C7: why a spoiled dish of your own make does not list. */
 export const SPOILED_DISH_WHY = 'spoiled. Only fresh dishes you made can be sold';
-/** AUDIT MAKER-RARE B2 (bible/01-Overview/bugs/Field-Bugs-2026-10-26.md): a piece of your own make changed since its mint -
+/** AUDIT MAKER-RARE B2: a piece of your own make changed since its mint -
  *  enchanted at the item maker (a Masterwork, MAKER-RARE), reforged, honed - is no crafted piece the market lists (its record
  *  mints it again as it was made: smithItems.js asMinted), nor an auction's, and no pack good: said so, never "list it as a
  *  crafted piece". */
@@ -262,7 +258,7 @@ export function medianLineNode(line) {
  *   Apothecaries' counter's sixteen (PROF0 4.5)
  *   SEAT1d: `board` the board's town pixel - a listing's, an auction's and a buy's courier's Tithe is its seat's;
  *   AUDIT SEATS-3 D3: `tithe()` that seat's Tithe in whole percents (0: unheld), or null while the seats' list is unread;
- *   MARKET-BAG (bible/06-Systems/Materials-Bag.md 6): `carried()` what the bag and the pack hold of each material that may go into
+ *   MARKET-BAG (6): `carried()` what the bag and the pack hold of each material that may go into
  *   the Stores (profBook carriedUsable), `putIn(key, n)` the Stores' shortfall of `n` put in from them (profBook ensureInStores)
  * @param {{ busy: () => boolean, run: (start: () => Promise<any>) => Promise<void>, rerender: () => void, nowS: () => number,
  *   alive: () => boolean, hush?: () => void }} ui the window's (`hush` - MARKET-AUDIT U6: the last act's word let go)
@@ -326,7 +322,7 @@ export function createMarketTab(m, ui) {
   let seq = 0;
   async function load(force = false, { underAct = false } = {}) {
     const mine = ++seq;
-    // MARKET-SPEED (2026-10-11): a read the minute's cache answers is drawn once, with its answer - it drew "Reading the
+    // MARKET-SPEED: a read the minute's cache answers is drawn once, with its answer - it drew "Reading the
     // market..." first, a whole window rebuilt for a frame; and a read an act asks (`underAct`) draws its waiting with the
     // act's own end (the window's `run` draws it), never a rebuild of its own under the act's. AUDIT GATHER-SPEED G7: only
     // that read - a view chosen while some other act runs draws its wait, or the press looked unheard
@@ -388,7 +384,7 @@ export function createMarketTab(m, ui) {
     prefetchFailed = false;
     await Promise.all([load(again), settling]);
   }
-  /** BOARD-UI (Mac: "Enhance the speed at which the notice board and market loads"): the first view read as the board
+  /** BOARD-UI: the first view read as the board
    *  opens, before its tab is pressed - the book's minute's cache answers the press, or joins the read under way. Draws
    *  nothing. */
   let prefetchFailed = false;

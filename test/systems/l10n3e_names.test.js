@@ -1,4 +1,4 @@
-// L10N3e (2026-09-27): THE NAMES OF THINGS, IN THE PLAYER'S LANGUAGE. DFU names a place, a region, an enemy, a spell,
+// L10N3e: THE NAMES OF THINGS, IN THE PLAYER'S LANGUAGE. DFU names a place, a region, an enemy, a spell,
 // an item, a magic item and a faction through TextManager's name lookups - GetLocalized*Name, a pack's table by the
 // thing's own id, the game's canonical name where the language has none - and only where the name is SHOWN: the
 // canonical name stays the key discovery, saves and quests read. The port's sites are read off the source by
@@ -56,7 +56,6 @@ const NAMED = {
   'src/systems/worldTick.js': 1,
   'src/ui/bankWindow.js': 1,
   'src/ui/collections/gatheredPart.js': 1,   // HUNTERS-MARK: a fish's name on the Collections page's Fish part
-  'src/ui/gambitTableWords.js': 1,   // KG3: a unit's name at The King's Gambit's table, through DFU's own list (Kings-Gambit.md 14.6)
   'src/ui/native/nativeInventory.js': 1,
   'src/ui/quest/questJournal.js': 2,
   'src/ui/travel/travelMapWindow.js': 5,

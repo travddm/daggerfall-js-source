@@ -1,6 +1,5 @@
 // @ts-check
-// FEUD, Part B - RVN (bible/12-Enhanced-AI/Feud-Arc.md sections 12-26; Mac, 2026-10-04: "I want to improve the revenant
-// system to be more complex, less easy to accomplish and more detailed", then "Go" on every call): A REVENANT WITH A
+// FEUD, Part B - RVN (;, then "Go" on every call): A REVENANT WITH A
 // MEMORY. systems/revenant/revenant.js keeps the record and its deeds; this sibling keeps what FEUD adds to it - every RVN number
 // in one place, the law of every new field (its validator, and the value an older record derives from its id), the
 // scars a fight leaves (the ledger is systems/feudLedger.js, a leaf), and the draws a revenant is born with: its
@@ -51,7 +50,7 @@ export const ADAPT = Object.freeze({
 });
 /** RVN3: from this rank its will must be broken; this many staggers break it - FEUD BALANCE (Feud-Arc.md OPEN 22, Mac,
  *  2026-10-05): one, and a perfect dodge of its blow counts as one (the duel harness: two came one rank-3 fight in nine).
- *  UNQUIET (bible/06-Systems/Revenants.md section 46; the owner: "harder"): from rank 2 - it was 3; a rank-1 revenant's
+ *  UNQUIET (): from rank 2 - it was 3; a rank-1 revenant's
  *  flight (FLIGHT-FIRST's young line) is the only one left without a will. */
 export const WILL_RANK = 2;
 export const WILL_STAGGERS = 1;
@@ -78,12 +77,11 @@ export const PHASE_TWO = Object.freeze({
 });
 /** RVN5: from this rank a revenant has a signature blow. */
 export const SIG_RANK = 2;
-/** RVN5 (section 16.1): its signature blow - x2.0, its own cooldown (s), iron from IRON_RANK, drawn in the revenant's
+/** RVN5 (section 16.1): its signature blow - its own cooldown (s), iron from IRON_RANK, drawn in the revenant's
  *  ember (between TELL's amber and its iron red; the hatch only where it IS iron - TELL3's word for "no stagger", and a
  *  rank-2 signature staggers), its WIND deeper. The pyre's blast (a spell of its element): its Damage Health per DFU's GetMagnitude -
- *  base PYRE_BASE, plus PYRE_PER a level - doubled with the rest. */
+ *  base PYRE_BASE, plus PYRE_PER a level */
 export const SIG = Object.freeze({
-  MULT: 2.0,
   COOLDOWN: Object.freeze([12, 18]),
   IRON_RANK: 3,
   COLOR: Object.freeze([0.95, 0.25, 0.04]),
@@ -333,19 +331,18 @@ export function signatureName(r) {
   return r.given ? `${possessive(r.given)} ${noun}` : noun;   // a record has its given name; none, the noun alone
 }
 /** RVN5: its signature as its stand carries it (`entity.revenant.sigBlow` - the brain reads it; null under SIG_RANK or
- *  with none): its shape, iron from IRON_RANK, x MULT, its cooldown, its colour and its WIND, its name and its noun. */
+ *  with none): its shape, iron from IRON_RANK, its cooldown, its colour and its WIND, its name and its noun. */
 export function signatureStamp(r) {
   if (!r || (r.rank | 0) < SIG_RANK || !isSignature(r.sig)) return null;
-  return Object.freeze({ kind: r.sig, iron: (r.rank | 0) >= SIG.IRON_RANK, mult: SIG.MULT, cooldown: SIG.COOLDOWN, color: SIG.COLOR, windPitch: SIG.WIND_PITCH, name: signatureName(r), noun: signatureNoun(r), element: pyreElement(r.mobileType) });
+  return Object.freeze({ kind: r.sig, iron: (r.rank | 0) >= SIG.IRON_RANK, cooldown: SIG.COOLDOWN, color: SIG.COLOR, windPitch: SIG.WIND_PITCH, name: signatureName(r), noun: signatureNoun(r), element: pyreElement(r.mobileType) });
 }
 /** RVN5 (16.1): THE PYRE'S BLAST - a strike spell of its element (Damage Health, DFU's GetMagnitude: SIG.PYRE_BASE plus
- *  SIG.PYRE_PER a level, both x `mult`), cast at the player through the host's own door so the saving throw answers it. */
-export function pyreSpell(name, element, mult = SIG.MULT) {
+ *  SIG.PYRE_PER a level), cast at the player through the host's own door so the saving throw answers it. */
+export function pyreSpell(name, element) {
   const e = (type, subType, o = {}) => ({ type, subType, magnitudeBaseLow: 0, magnitudeBaseHigh: 0, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1, durationBase: 0, durationMod: 0, durationPerLevel: 1, chanceBase: 100, chanceMod: 0, chancePerLevel: 1, ...o });
-  const m = mult > 0 ? mult : 1;
   return Object.freeze({
     name: name ?? 'Pyre', index: -1, element: Number.isInteger(element) ? element : 4, rangeType: 2, icon: 0,   // at range, at its target: never CasterOnly - the save answers it
-    effects: [e(4, 0, { magnitudeBaseLow: Math.round(SIG.PYRE_BASE[0] * m), magnitudeBaseHigh: Math.round(SIG.PYRE_BASE[1] * m), magnitudeLevelBase: Math.round(SIG.PYRE_PER * m), magnitudeLevelHigh: Math.round(SIG.PYRE_PER * m) }), { type: -1, subType: -1 }, { type: -1, subType: -1 }],
+    effects: [e(4, 0, { magnitudeBaseLow: SIG.PYRE_BASE[0], magnitudeBaseHigh: SIG.PYRE_BASE[1], magnitudeLevelBase: SIG.PYRE_PER, magnitudeLevelHigh: SIG.PYRE_PER }), { type: -1, subType: -1 }, { type: -1, subType: -1 }],
   });
 }
 /** RVN5: its signature, drawn on its id from the shapes past its family's ordinary set; no family, the pyre. */

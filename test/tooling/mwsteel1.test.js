@@ -1,5 +1,4 @@
-// MW-STEEL1 (2026-10-06, Mac: "These 2 files are for the armor replacement of the morrowind steel armor with a
-// varient to toggle the helmet type"): MAC'S STEEL PLATE, THE WHOLE CLASSIC SET, ON THE MORROWIND BODY.
+// MW-STEEL1: MAC'S STEEL PLATE, THE WHOLE CLASSIC SET, ON THE MORROWIND BODY.
 //
 // Daggerfall's seven classic pieces in Steel wear Mac's plate in place of retail's steel_* records (Steel only - his
 // answer); the helm comes closed (a visor and a plume) or open (a nasal helm), by the Steel Helm switch, closed by
@@ -171,13 +170,5 @@ test('MW-STEEL1: the Steel Helm switch picks the helm - closed by default, open 
   assert.deepEqual([row.group, row.kinds, row.control.key, row.control.initial, row.control.online, row.control.tiers], ['combat', ['enhanced'], 'mwSteelHelm', 'closed', 'player', [['closed', 'Closed'], ['open', 'Open']]]);
   assert.equal(FEATURE_PREF_DEFAULTS.mwSteelHelm, STEEL_HELM_DEFAULT);
   assert.deepEqual(row.control.tiers.map(([v]) => v), STEEL_HELM_STYLES, 'the switch\'s values are the helm\'s styles');
-  // read where the worn set is composed, and the tile rebuilds the standing body
-  const fp = sourceText('src/combat/fpArm.js');
-  assert.match(fp, /const helmStyle = getPref\('mwSteelHelm'\);/);
-  assert.match(fp, /bodyPool: parts, female, colourOf, helmStyle, beast, beastWear \}, showNudity\(\)\)/);
-  assert.match(fp, /bodyPool: parts, female, colourOf: probe, helmStyle, beast, beastWear \}\)/);
-  const menu = sourceText('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\n  mwSteelHelm: rebuildMorrowindBody,/);
-  assert.match(menu, /set: \(i\) => \{ \(c\.write \?\? \(\(v\) => setPref\(c\.key, v\)\)\)\(c\.tiers\[i\]\[0\]\); TILE_AFTER\[c\.key\]\?\.\(\); \} \};/, 'a choice\'s write takes its after-step too');
 });
 

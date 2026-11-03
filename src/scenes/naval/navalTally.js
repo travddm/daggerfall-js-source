@@ -1,6 +1,6 @@
 // @ts-check
 // AUDIT NAV1 (the guns) G17 - MY VOLLEY'S TALLY, a module the naval host wires (scenes/naval/navalHost.js; HOST-SPLIT,
-// bible/01-Overview/Host-Split.md - AUDIT 2026-10-17 moved it out of createNavalHost, where COMBAT-FEEL's CARD-CREW had
+// AUDIT 2026-10-17 moved it out of createNavalHost, where COMBAT-FEEL's CARD-CREW had
 // grown it): each volley of mine counted as its balls come down - how many struck her, how many below her waterline, how
 // many through her rigging, and (CARD-CREW) how many of her men went down - and the last one down kept for the readout
 // (navalHost.js hudModel shows it TALLY_S). The port's own: Daggerfall has no sea.

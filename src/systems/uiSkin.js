@@ -57,11 +57,11 @@ export function uiSkin(search) {
 /** The predicate every mount site should call. */
 export const isEnhanced = (search) => uiSkin(search) === 'enhanced';
 
-/** PLUS1 (2026-09-25): ENHANCED PLUS - the enhanced skin with the refreshed dress over it (the stone-and-brass kit,
+/** PLUS1: ENHANCED PLUS - the enhanced skin with the refreshed dress over it (the stone-and-brass kit,
  *  the Yes/No dialogs, the ported service windows, the vitals' lost chunk, the fading HUD lines, the one-frame rest
  *  window, the Ascend clicks). It is NOT a third skin: every mount site keeps asking isEnhanced(), and the refresh's
  *  own seams ask isEnhancedPlus() - kept by that name so a reader can still find everything the refresh dresses.
- *  PLUS-ONLY (2026-09-26, Mac: "I want to depricate the old enhanced UI entirely in favor of the new enhanced plus"):
+ *  PLUS-ONLY:
  *  PLAIN ENHANCED IS RETIRED. Plus is the only dress the enhanced skin wears, so the seam answers exactly what
  *  isEnhanced() answers - no shelf key (uiPrefs' `enhancedPlus` is read by nothing now, and a player who had stored
  *  `false` comes back in Plus), no `?plus=` override, no option on the UI Overhaul panel. Classic is untouched: every
@@ -74,7 +74,7 @@ export const isEnhancedPlus = (search) => isEnhanced(search);
  *  inert and the diamond is the quickbar, as ever. Here, beside the skin, so the input ladder can read it without
  *  the quickslot model's import ring. */
 export const hotbarInForce = () => isEnhanced() && HOTBAR_STYLES.includes(getPref('quickbarStyle'));
-/** DIAMOND-HB (2026-10-18): the styles that use the hotbar - 'hotbar' (ten slots in a row) and 'diamond' (slots 1-4
+/** DIAMOND-HB: the styles that use the hotbar - 'hotbar' (ten slots in a row) and 'diamond' (slots 1-4
  *  drawn as a diamond, ui/enhanced/enhancedHotbar.js). 'quickbar' is the old QS diamond, now only used by Off. */
 export const HOTBAR_STYLES = Object.freeze(['hotbar', 'diamond']);
 
@@ -84,8 +84,7 @@ export const HOTBAR_STYLES = Object.freeze(['hotbar', 'diamond']);
  *  URL override is up - the caller that wants to know decides. */
 export function setUiSkin(skin) {
   if (!clean(skin)) return clean(getPref('skin')) ?? DEFAULT_SKIN;
-  // SKIN-CARRY (2026-09-16, a report: "the classic toggle starts the
-  // game in enhanced"): the choice's ONLY carrier across the reload
+  // SKIN-CARRY: the choice's ONLY carrier across the reload
   // was this write, and its failure was swallowed - savePrefs warned
   // and answered false, setPref dropped the answer, this returned the
   // skin as if stored, and switchSkin reloaded with nothing carrying

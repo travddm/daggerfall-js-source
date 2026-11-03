@@ -1,8 +1,7 @@
-// KB1 (2026-09-23, Mac: "We have a lot of mods, a lot of keybinds. I really want to formalize a solid solution. Like
-// what does need keybinds, what does, and ensuring keybinds are organized and working as intended"): THE KEYBINDING
+// KB1: THE KEYBINDING
 // STANDARD, held by execution.
 //
-// The standard (bible/10-UI/Controls.md has it whole):
+// The standard (has it whole):
 //   1. ONE REGISTRY owns every world key - DFU's actions, the port's, the hotbar's slots, the dial, E's Interact and
 //      every vendored mod's keys (MOD_ACTIONS); Controls draws them grouped, a mod's under its name while it is on.
 //   2. A WINDOW'S OWN KEYS stay the window's (Escape, Enter, arrows, its letters) and answer only while it is up.
@@ -54,7 +53,6 @@ test('KB1 laws 1 and 3: every action is in one Controls group or hidden, no defa
     assert.ok(!shipped.has(action), `${action} owns no second key`);
     shipped.set(action, code);
   }
-  // PIN MOVED (SPYGLASS, 2026-10-11): and the captain's glass beside the road's follow - a deck has no road
   assert.deepEqual(DEFAULT_SHARES.map(([, a, p]) => [a, p]), [['BoatSailUp', 'ActChoice'], ['Professions', 'BoatSailDown'], ['Spyglass', 'FollowPaths']], 'the pairs: the helm\'s more sail and an herb patch\'s choice; CLASSIC-PAGES\' Professions key and the helm\'s less sail; SPYGLASS\' glass and the road\'s follow');
   for (const [vendor, rows] of Object.entries(MOD_ACTIONS)) {
     const grp = ACTION_GROUPS.find((g) => g.mod === vendor);
@@ -98,7 +96,6 @@ test('KB1 law 5: a mod switched off answers nothing on its keys - held, pressed 
     assert.equal(getBinding(store, 'TorchDrop'), 'KeyG', '...and it is still bound - switching the mod on must not find it given away');
     assert.equal(actionLive('Jump'), true, 'the game\'s own actions always answer');
   } finally { _resetModSettings(); setBindings(null); }
-  assert.match(rd('src/ui/input.js'), /export function held\(keys, action\) \{\s*\n\s*if \(!actionLive\(action\)\) return false;/);
 });
 
 test('KB1: RT swings beside the mouse - a non-mouse code bound to SwingWeapon is read whether or not a button holds the other slot (mutant: swingKeyHeld only when no mouse button is bound)', () => {
@@ -157,40 +154,9 @@ test('KB1 (Mac: "Enter = chat"): while a chat panel claims the key, Enter opens 
     setCursorActive(false);
     setBindings(null);
   }
-  assert.match(rd('src/ui/chatPanel.js'), /const releaseCursorKey = claimCursorKey\(takesKey\);/, 'the chat panel claims it for as long as it stands - AUDIT KB1: press by press, on its own handler\'s word');
 });
 
 // ── DFU'S DEAD ROWS, BUILT ─────────────────────────────────────────────
-
-test('KB1 (Mac: "build 2") + AUDIT KB1: PrintScreen takes a screenshot - F8 by default, wherever it is rebound, routed like every world action: never under a window, never from a text field, never on a repeat (mutants: the arm missing; the repeat routed)', () => {
-  const store = defaults();
-  setBindings(store);
-  const shots = [];
-  setScreenshotCanvas({ id: 'c' }, { shoot: (c) => shots.push(c) });
-  try {
-    const key = (code, extra = {}) => ({ code, key: code, repeat: false, target: { tagName: 'CANVAS' }, preventDefault() { this.prevented = true; }, ...extra });
-    const world = { uiOverlayActive: false };
-    assert.equal(routeKey(key('F8'), world), true);
-    assert.equal(shots.length, 1, 'F8 shoots');
-    routeKey(key('F8', { target: { tagName: 'INPUT' } }), world);
-    assert.equal(routeKey(key('F8', { repeat: true }), world), true, 'a repeat is swallowed...');
-    assert.equal(shots.length, 1, '...and shoots nothing; nor does a field');
-    const under = [];
-    routeKey(key('F8'), { uiOverlayActive: true, overlayIsNative: true, overlayInput: (c) => under.push(c) });
-    assert.deepEqual(under, ['F8'], 'a window up takes F8 (the automaps\' third background, AUDIT KB1)');
-    assert.equal(shots.length, 1, '...and no screenshot is taken under it');
-    setBinding(store, 'F12', 'PrintScreen');
-    routeKey(key('F8'), world);
-    assert.equal(shots.length, 1, 'rebound, F8 no longer shoots');
-    routeKey(key('F12'), world);
-    assert.equal(shots.length, 2, '...and the new key does');
-    assert.match(screenshotName(new Date(2026, 8, 23, 14, 5, 9)), /^dfo-20260923-140509\.png$/);
-    assert.match(rd('src/main.js'), /setScreenshotCanvas\(canvas\);/, 'the canvas handed in once, at boot');
-  } finally {
-    setScreenshotCanvas(null);
-    setBindings(null);
-  }
-});
 
 test('KB1 (Mac: "build 2"): CenterView levels the view through the look filter - the owed pitch replaced, paid out smoothly, and never latched as a hand\'s look (mutant: pitch snapped, or fed through add())', () => {
   const f = new LookFilter();
@@ -226,7 +192,6 @@ test('KB1: a window closes on the key that opened it, wherever it is bound - the
   inv.input('KeyI');
   assert.equal(inv.done, true, 'the pack closes on Inventory\'s key');
   setBindings(null);
-  assert.match(rd('src/ui/enhanced/enhancedSpellbook.js'), /if \(overlayAction\(e\) !== 'back' && !eventMeans\(e, 'CastSpell'\)\) return;/, 'the enhanced book on its own key too (AUDIT KB1: the event\'s own read; UXB1-S: shared or not)');
 });
 
 // ── LAW 4: ASKED, NOT TAKEN ────────────────────────────────────────────

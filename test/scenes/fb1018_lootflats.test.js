@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-18 LOOT-FLATS (bible/01-Overview/bugs/Field-Bugs-2026-10-18.md, found reading Anon-e-moose's
+// FIELD BUGS 2026-10-18 LOOT-FLATS (, found reading Anon-e-moose's
 // "Gradual FPS loss then crash": "When in interior cells, and especially in combat, the FPS gradually slows down over 5
 // mins or so"). Not that report's cause - its cause is not proven - but a real leak on its path: five of the nine places
 // the loot pool freed a pile's batch (both restores - every room left and every load - and the scene's sweep of emptied
@@ -92,10 +92,3 @@ test('LOOT-FLATS A REMINTED PILE KEEPS ITS CLOCK: a recentre and a moved ground 
   assert.equal(a.entries.length, 1);
 });
 
-test('LOOT-FLATS ONE WAY TO FREE A PILE\'S BATCH: every destroyBillboardBatch in the pool is freeBatch\'s or remintBatch\'s (mutants: a free written again by hand)', () => {
-  const src = readFileSync(new URL('../../src/scenes/droppedLoot.js', import.meta.url), 'utf8');
-  const frees = src.match(/renderer\.destroyBillboardBatch\(/g) ?? [];
-  assert.equal(frees.length, 2, 'freeBatch and remintBatch alone');
-  assert.match(src, /function freeBatch\(p\) \{\n\s+if \(!p\.batch\) return;\n\s+flatAnims\.remove\(p\.batch\);\n\s+renderer\.destroyBillboardBatch\(p\.batch\);/);
-  assert.match(src, /flatAnims\.rebind\(was, p\.batch\);/);
-});

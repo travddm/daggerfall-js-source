@@ -1,5 +1,4 @@
-// RVN9 - FESTERING (bible/12-Enhanced-AI/Feud-Arc.md section 20; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). The character's day against the store's `lastDay`, whole days caught up
+// RVN9 - FESTERING (;, then "Go"). The character's day against the store's `lastDay`, whole days caught up
 // (seven at most): a living, unsworn, not-out revenant three days past its due day gains a wrath, and another every
 // three days more - health +10% and blows +5% a wrath at its stand, and facing it clears it. At three it ranks up on its
 // own (the `festered` deed, a new epithet, "Grushnak grows bolder. It has waited too long.") and its wrath goes back to
@@ -85,7 +84,6 @@ test('RVN9 THE DAYS: the first count only sets the day; then each whole day caug
   assert.equal(q.wrath, 1, 'counted by the notice\'s step');
 });
 
-// PIN MOVED (AUDIT FEUD: a clock behind the last counted day - a reload of an older save - counts nothing and moves nothing
 // back; the mirror counted those days, and none counts twice)
 test('RVN9 THE CATCH-UP: a long absence counts seven days at most; a clock wound back counts nothing until it passes the last counted day; the switch off, nothing (mutants: no cap; the cap moved; the wound clock counted)', () => {
   const p = me();

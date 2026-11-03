@@ -1,4 +1,4 @@
-// SD-PARTY (bible/11-Multiplayer/Super-Dungeons.md SD-PARTY): the rig's one party. A realm is a party's own Hour,
+// SD-PARTY (SD-PARTY): the rig's one party. A realm is a party's own Hour,
 // `sd:<s>.<owner>` (net/superDungeon/sdLaw.js sdRoomKey), and its door admits the owner's party alone - the hub's word
 // (server/src/index.js _instanceKinOf). The pins written before SD-PARTY play many fighters in one Hour; they stand them
 // all in the one party here. The door itself is pinned against a real hub in sdparty_relay.test.js.

@@ -1,5 +1,5 @@
 // @ts-check
-// SET2 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md): THE PLAYER'S OWN KILLS, TOLD.
+// SET2: THE PLAYER'S OWN KILLS, TOLD.
 //
 // A foe's death is known in one place per pool - its damage door (scenes/exteriorFoes.js damageFoe,
 // scenes/dungeonContext.js damageFoe, scenes/cityGuards.js damageGuard), where the blow's provenance (`fromPlayer`,

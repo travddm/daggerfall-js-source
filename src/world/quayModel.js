@@ -1,11 +1,11 @@
 // @ts-check
-// QUAYS (2026-10-03; systems/naval/quays.js) - A BERTH'S QUAY AS A MODEL: the plan's deck, jetty and ramp, its piles,
+// QUAYS - A BERTH'S QUAY AS A MODEL: the plan's deck, jetty and ramp, its piles,
 // its kerb, the jetty's rails, the bollards, the lantern posts and their lanterns, and the cargo, built in the berth's
 // frame (metres, y over the sea's top) by the port's MeshBuilder (world/detStandIns.js) and dressed in CLASSIC textures
 // - the very planking and ironwork a classic ship wears (67_0, 67_8, 0_79, 0_10, 0_77), out of the player's own ARENA2
 // like every other model. The gangway is a model of its own, a metre long along +z, stretched to its length.
 //
-// THE PIER'S DRESS (SHIPYARDS, 2026-10-11, Mac: "a detailed overhaul to piers"; systems/naval/quays.js pierDress): the
+// THE PIER'S DRESS (SHIPYARDS, 2026-10-11,; systems/naval/quays.js pierDress): the
 // joists under every deck and the stringers along its edges, the piles' braces, the face's fender piles and ladders, the
 // cleats, the coils of rope (the rigging's own 0_77), the first berth's cargo crane and the jetty's lamp posts. The
 // timbers under the decks (the joists, the stringers, the braces) and the deck's small fittings (the cleats, the coils)

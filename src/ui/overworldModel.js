@@ -312,8 +312,7 @@ export function reliefPoint(px, py, { heightBytes, width, height }, lift = 0) {
  * because the reason for a lift is the ground, not its neighbours: a
  * line at zero z-fights the surface it is drawn on.
  */
-/** ROADS 25 (Mac: "use the first iteration's design instead of the
- *  smeared dirt look"): the FIRST road drawing on this map - R1-RH1,
+/** ROADS 25: the FIRST road drawing on this map - R1-RH1,
  *  removed whole in RX - drew the network as LINES lifted over the
  *  relief, one chain per run between junctions, simplified so the grid
  *  stairs go and rounded so the corners do. Restored here for four

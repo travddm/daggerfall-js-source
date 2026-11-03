@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WAYPOINTS (2026-10-06): THE RIGHT-CLICK MENU - one box for both maps (the Overworld, scenes/world.js; the held map,
+// WAYPOINTS: THE RIGHT-CLICK MENU - one box for both maps (the Overworld, scenes/world.js; the held map,
 // ui/heldMap.js). On the land or the sheet it ADDS a waypoint there: a name (the next "Waypoint N" offered, selected),
 // its kind (Personal, Party, Guild) and its flag's colour. On a flag it EDITS that waypoint: rename, recolour, follow
 // or stop following, travel there (where the map can), share it again (one of mine for a party or a guild), remove.
@@ -70,7 +70,7 @@ export const waypointMenuOpen = () => !!open;
 export function closeWaypointMenu(owner = null) {
   const o = open;
   if (!o || (owner != null && o.owner !== owner)) return;
-  open = null;   // the slot emptied before the occupant is told (bible/Home.md)
+  open = null;   // the slot emptied before the occupant is told
   o.win?.removeEventListener?.('keydown', o.key, true);
   o.win?.removeEventListener?.('pointerdown', o.away, true);
   o.el.remove?.();

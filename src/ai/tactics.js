@@ -1,6 +1,5 @@
 // @ts-check
-// TACT2 - THE TACTICS BRAIN (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "enemy tactics like backing off and
-// knowing when to strike"; "have enemies aware of each other"; his calls: 2 melee + 2 ranged attack tokens; animals
+// TACT2 - THE TACTICS BRAIN (;; "have enemies aware of each other"; his calls: 2 melee + 2 ranged attack tokens; animals
 // and the cowardly human classes break and run, undead, daedra, constructs and guards never).
 //
 // A thin decision layer over the classic motor, read with the Enhanced AI switch on (this module is the switch's
@@ -17,14 +16,13 @@
 //     the tokens say - nobody waits forever. A target whose back is turned on a waiting foe within reach is open: it
 //     strikes.
 //   - BACKING OFF. A foe that loses a share of its health in a short window backs out of reach and circles before it
-//     comes back. A coward (an animal, a thief's kind of class) at low health runs (DFU's flee).
+//     comes back. A coward (a thief's kind of human class; never a beast) at low health runs.
 //   - KITING. A shooter backs away from a target closing inside its stand-off band - one burst, then it fights.
-//   - FEEDBACK (2026-10-02, lumin: "New monster AI is painful... a little too hard. The archers that just keep kiting you
-//     in a circle"; maya: "They keep walking backwards"): nobody backpedals after a target that presses it. A waiting
+//   - FEEDBACK: nobody backpedals after a target that presses it. A waiting
 //     foe the target walks up to fights; the step back after a blow is a hop; a hurt foe or a kiting archer turns and
 //     WALKS away (a foe walks the way it faces), at most once a cooldown; a shooter without a token stands off, never
 //     circles.
-//   - TELL1 (bible/12-Enhanced-AI/Feud-Arc.md section 3): POISE. A foe winding up holds through a blow - the doors write
+//   - TELL1: POISE. A foe winding up holds through a blow - the doors write
 //     no knockback - and the blow's weight fills its poise meter; at its poise the wind-up breaks and the foe is
 //     STAGGERED (a held Hurt, nothing decided, a quarter more taken). Before it, any landed hit broke any wind-up.
 //
@@ -34,11 +32,11 @@ import { getPref } from '../systems/uiPrefs.js';
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';
 import { MOBILE_TYPES } from '../characters/mobile/mobileTypes.js';
 import { throwsBlows, blowShapesOf, blowFamily, makeBlow, fitBlowToGround, inBlow, setLiveBlow, shatterBlow, windupNear, offsetBlows, BLOW, BLOW_CHANCE, BLOW_COLOR, IRON_COLOR, BLOW_VERDICT_LIFE, BLOW_STALE, setBlowTargetOf } from './foeBlows.js';   // TACT4; TELL3: iron; TELL5: the family, the shapes' lengths
+import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a staggered foe takes more - the leaf the formulas read
 import { coverDistance } from './cover.js';   // TELL6: a charge's lane must be free of cover
 import { GRAVITY } from '../player/motor.js';   // TELL6c: a leap's hop on the motor's own gravity
 import { tacticsNow, setTacticsClock, tickTactics } from './tacticsClock.js';   // AUDIT TACT D10/A3
-import { TELL, poiseOf, staggerSeconds, glintStrength, blowGuard, punishSeconds, windupSeconds, feints, chains, chainShape, trackYaw, blowCooldown, wholeSet, feintChance, trackShare, chainMax } from './tells.js';   // TELL1: poise and the stagger (bible/12-Enhanced-AI/Feud-Arc.md section 3); TELL3: a blow's guard; TELL4: the punish window; TELL5: patterns; TELL7: the cooldowns
-import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a staggered foe takes more - the leaf the formulas read
+import { TELL, poiseOf, staggerSeconds, glintStrength, blowGuard, punishSeconds, windupSeconds, feints, chains, chainShape, trackYaw, blowCooldown, wholeSet, feintChance, trackShare, chainMax } from './tells.js';   // TELL1: poise and the stagger; TELL3: a blow's guard; TELL4: the punish window; TELL5: patterns; TELL7: the cooldowns
 import { noteFeud } from '../systems/feudLedger.js';   // RVN1: a blow of its I dodged, in its fight's ledger (a leaf - the brain brings no revenant system)
 
 export const tacticsSwitchOn = () => getPref('enhancedAI') === true;
@@ -80,11 +78,10 @@ export const TACT = Object.freeze({
 
 /** The cowardly human classes (Mac's call): the ones who live by not being hit. */
 export const COWARD_CLASSES = Object.freeze(new Set(['Mage', 'Sorcerer', 'Healer', 'Bard', 'Burglar', 'Acrobat', 'Thief'].map((n) => MOBILE_TYPES[n])));
-/** Does this kind break and run when badly hurt? Animals and the cowardly classes; undead, daedra, constructs and
- *  guards never (the watch is a Human-affinity class outside the list). */
+/** Does this kind break and run when badly hurt? Only the cowardly human classes (F1): animals, undead, daedra,
+ *  constructs and guards never (the watch is a Human-affinity class outside the list). DFU has no flee at all. */
 export function isCoward(mobileId) {
-  if (COWARD_CLASSES.has(mobileId)) return true;
-  return ENEMY_BASICS[mobileId]?.affinity === 'Animal';
+  return COWARD_CLASSES.has(mobileId);
 }
 
 // AUDIT TACT (D10/A3): the foes' own time, ticked by the hosts (ai/tacticsClock.js) - never the wall's
@@ -119,9 +116,8 @@ const LOCAL = Object.freeze({ local: true });
 export const PUPPET_HELD_UNTIL = 1e9;
 /**
  * THE MARK - the feet a telegraphed blow is aimed at: mine for the local player's key (TACT4's law); TELL8
- * (bible/12-Enhanced-AI/Feud-Arc.md 10.2, OPEN 9) a PEER's the foe hunts (its candidate's, refreshed each frame in this
- * frame's coordinates); and AUDIT ARENA-LADDER (the owner, 2026-10-05: "Ensure AI enemies sometimes receive telegraphed
- * attacks") on the arena's sand a BOUT-MATE's: a fighter of the same live bout on another side (the pair
+ * (10.2, OPEN 9) a PEER's the foe hunts (its candidate's, refreshed each frame in this
+ * frame's coordinates); and AUDIT ARENA-LADDER on the arena's sand a BOUT-MATE's: a fighter of the same live bout on another side (the pair
  * characters/enemy/enemyTargets.js boutGate keeps, read off the two entities' own tags), so an exhibition's fighters, a Grand
  * Melee's and a two-against-one's wind up at each other as they wind up at the player. Null for any other target
  * (street infighting, a peer's foe, a peer with no pose). Each client judges its own feet at the landing (10.3) - and a
@@ -167,7 +163,7 @@ export function releaseTactics(ai) {
   ai._tacDir = null; ai._tacStrike = undefined; ai._tacShoot = undefined;
   ai._aimReady = false; ai._wantAimed = false; ai._blowShot = null;   // AUDIT TELL B4: an archer's aimed shot goes too (DFU's bow roll, whole again)
 }
-/** AUDIT TELL B1/B2 (bible/12-Enhanced-AI/Feud-Arc.md, the AUDIT TELL record): a wind-up, a charge's run or a chain's
+/** AUDIT TELL B1/B2 (, the AUDIT TELL record): a wind-up, a charge's run or a chain's
  *  gap BROKEN where the brain was not asked - a paralysis or a Calm (the motor's CanAct), a flight, a pool not stepped
  *  (an interior visit, a held window): the mark gone, the held swing dropped, the cooldown begun, no verdict for any
  *  later swing. A blow is told or it is nothing. Answers whether there was one to break. */
@@ -186,13 +182,12 @@ export function breakWindup(ai) {
  *  its frames (ai/puppetBlows.js). */
 const unseen = (s, now) => s?.seen != null && now - s.seen > BLOW_STALE;
 /** AUDIT TACT A4/D5/D6: a blow's landing state, spent - no verdict, weight or forced swing left for a later swing. */
-function clearBlowState(ai) { ai._blowVerdict = null; ai._blowMult = undefined; ai._blowSwing = false; ai._blowFor = undefined; }
+function clearBlowState(ai) { ai._blowVerdict = null; ai._blowSwing = false; ai._blowFor = undefined; }
 /** TELL2: a wind-up's held swing dropped (its wind-up broke, a paralysis, its place gone) - the sprite and the attack
  *  component let it go and strike nothing (characters/mobile/mobileUnit.js, characters/enemy/enemyAttack.js). */
 function dropSwing(ai) { ai._blowHold = 'cancel'; ai._blowWind = false; }
 
-// ── TELL1: POISE AND THE STAGGER (bible/12-Enhanced-AI/Feud-Arc.md section 3; Mac: "player's can easily stun these
-// enemies") ───────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── TELL1: POISE AND THE STAGGER () ───────────────────────────────────────────────────────────────────────────────────────────────────────
 /** Does a blow landing on this foe land on a wind-up? Then it HOLDS - the door writes no knockback and plays no Hurt -
  *  and its weight goes on the poise meter (`windupStruck`). The switch off, never. */
 export function windupHolds(ai) {
@@ -210,7 +205,7 @@ export function windupHolds(ai) {
  * Answers null (no wind-up here: DFU's knockback, as ever), 'hold', 'break' or 'stagger'.
  */
 export function windupStruck(ai, ent, weight, v) {
-  if (ent?.staffBoss) return overreachOpen(ai) || windupHolds(ai) ? 'hold' : null;   // BOSS-UNSHAKEN (mob 2026-10-25: "lets stop him from getting stunned"): a staff event's mini boss is never staggered
+  if (ent?.staffBoss) return overreachOpen(ai) || windupHolds(ai) ? 'hold' : null;   // BOSS-UNSHAKEN: a staff event's mini boss is never staggered
   if (overreachOpen(ai)) return punishStruck(ai, ent, weight);   // TELL4: an overreached foe - the first blow staggers it
   if (!windupHolds(ai)) return null;
   const s = ai._tac, b = s.blow, now = clock();
@@ -275,7 +270,7 @@ export const staggeredNow = (ent, now = clock()) => Number.isFinite(ent?.stagger
 // TELL1: a staggered foe takes a quarter more from every blow - the formulas' tail and a spell's landing read this
 registerBlowTakenMod('tell-stagger', (attacker, target) => (staggeredNow(target) ? TELL.STAGGER_TAKEN : 1));
 
-// ── TELL4: THE PUNISH WINDOW (bible/12-Enhanced-AI/Feud-Arc.md section 6) ──────────────────────────────────────────
+// ── TELL4: THE PUNISH WINDOW ──────────────────────────────────────────
 /** Is this foe OVERREACHED now - its telegraphed blow landed on no feet, and it stands spent, open to an answer? */
 export function overreachOpen(ai) {
   const s = ai?._tac;
@@ -527,7 +522,7 @@ export function tacticsStep(ai, dx, dz) {
     // AUDIT TELL B7: aimed at its TARGET's feet - the motor's (dx, dz) is its destination, a detour's point or a search's
     const tdx = tf[0] - ai.feet[0], tdz = tf[2] - ai.feet[2];
     const near = dist <= reach + 0.5;
-    // RVN5 (bible/12-Enhanced-AI/Feud-Arc.md 16.1): ITS SIGNATURE - a revenant's own blow, ahead of any other whenever its
+    // RVN5 (16.1): ITS SIGNATURE - a revenant's own blow, ahead of any other whenever its
     // own cooldown is spent and its shape reaches (its stand's `revenant.sigBlow`)
     const sig = ent?.revenant?.sigBlow;
     if (sig && now >= (s.sigReady ?? 0) && !windupNear(tf, now, ai) && signatureReaches(ai, ent, sig.kind, dist, near, tdx, tdz) && Math.random() < BLOW_CHANCE) {
@@ -576,8 +571,8 @@ function beginWindup(ai, s, ent, shape, dx, dz, now, chain = 0, sig = null) {
   if (shape === 'leap') { b.ahead = Math.min(BLOW.leap.range, Math.hypot(dx, dz)); b.jumpAt = b.land - BLOW.leap.arc; fitBlowToGround(b, ai.collider); }   // TELL6c: its point - my feet now, locked
   if (shape === 'aimed') b.ahead = Math.hypot(dx, dz);   // TELL6d: its line to me, locked
   if (shape === 'pyre') b.ahead = Math.min(BLOW.pyre.range, Math.hypot(dx, dz));   // RVN5: its disc at my feet, locked
-  if (sig) {   // RVN5: its signature - x2.0, its own cooldown, a deeper WIND, called out (the pools say it once a stand)
-    b.sig = true; b.mult = sig.mult; b.windPitch = sig.windPitch;
+  if (sig) {   // RVN5: its signature - its own cooldown, a deeper WIND, called out (the pools say it once a stand)
+    b.sig = true; b.windPitch = sig.windPitch;
     const [lo, hi] = sig.cooldown;
     s.sigReady = now + lo + (hi - lo) * Math.random();
     ai._sigCall = now;
@@ -593,7 +588,7 @@ function beginWindup(ai, s, ent, shape, dx, dz, now, chain = 0, sig = null) {
   const swings = shape !== 'aimed' && shape !== 'pyre';   // TELL6d: a shot draws no held swing - its landing looses it (ai._blowShot); RVN5: nor a pyre - its landing is a spell
   ai._blowHold = swings; ai._blowWind = swings;   // TELL2: the swing begins now and stands at its raised arm until the landing
 }
-/** RVN4 (bible/12-Enhanced-AI/Feud-Arc.md 15.2): ITS LAST STAND'S ROAR - an iron ring about its feet wound up for
+/** RVN4 (15.2): ITS LAST STAND'S ROAR - an iron ring about its feet wound up for
  *  `seconds` and landing as the roar ends (TELL6a's shape; TELL6e's rattle and, iron, its knockdown), whatever its kind's shapes. Its
  *  wind-up before is dropped. The switch off, a puppet, or no brain yet: nothing (the pool holds the motor - the roar
  *  alone). Answers whether it was wound. */
@@ -657,7 +652,7 @@ function windupTurn(ai, s, now, skipped) {
     ai._blowLandedAt = now; s.landed = { blow: b0, at: now };
     const hit = !!tf && inBlow(b0, tf[0], tf[2]);
     s.blow = null; s.blowReady = cooled;
-    if (atMe && hit) ai._blowPyre = { at: now, mult: b0.mult };
+    if (atMe && hit) ai._blowPyre = { at: now };
     if (tf && !hit) { beginOverreach(ai, s, b0, now, b0.lateIn === true, atMe); return true; }   // TELL4: missed - it stands spent
     s.state = 'wait';   // the aimed shot's law: its landing was its blow - no swing, no spell on top
     return false;
@@ -691,7 +686,7 @@ function resolveLanding(ai, s, b, verdict, now, cooled, atMe = true, judged = at
   ai._blowLandedAt = now;
   s.landed = { blow: b, at: now };   // AUDIT TELL O2: its landing, said to the peers for WIRE_LANDED_S (ai/puppetBlows.js)
   ai._blowVerdict = judged ? verdict : null;
-  ai._blowMult = judged ? b.mult : undefined; ai._blowAt = now; ai._blowSwing = true;
+  ai._blowAt = now; ai._blowSwing = true;
   ai._blowFor = judged ? (b.key ?? targetKey(ai)) : undefined;   // AUDIT ARENA-LADDER 2: whose verdict it is
   ai._blowFx = atMe && verdict ? { kind: b.kind, iron: b.guard === 'iron', at: now } : null;   // TELL6e: what it does where its damage lands (scenes/hostCombat.js landBlowEffect)
   ai._blowHold = false;   // TELL2: the held swing strikes on its next frame
@@ -718,7 +713,7 @@ function resolveLanding(ai, s, b, verdict, now, cooled, atMe = true, judged = at
   return false;
 }
 
-// ── TELL6: THE GAP-CLOSERS (bible/12-Enhanced-AI/Feud-Arc.md section 8.1) ────────────────────────────────────────────
+// ── TELL6: THE GAP-CLOSERS ────────────────────────────────────────────
 /** TELL6: the shapes this foe may wind up from here - `near` (in reach) its blows of reach; out of reach the
  *  gap-closers whose lanes are free. TELL7: from its whole set. */
 export function blowPool(ai, ent, dist, near, dx, dz) {
@@ -730,8 +725,6 @@ export function blowPool(ai, ent, dist, near, dx, dz) {
 export function aimsShots(ai, ent) {
   return !!ent && wholeSet(ent) && !!ai?.hasBowAttack && isClassEnemyId(ent.mobileType);
 }
-// TELL6d: an aimed shot that strikes weighs x BLOW.aimed.mult - the arrow says so at contact (formulas' blowInfo)
-registerBlowTakenMod('tell-aimed', (attacker, target, weapon, info) => (info?.aimed ? BLOW.aimed.mult : 1));
 /** The shapes begun out of reach. */
 export const GAP_CLOSERS = Object.freeze(['charge', 'leap']);
 /** RVN5 (16.1): does its signature's shape reach its target now - a gap-closer out of reach with its lane free, the pyre

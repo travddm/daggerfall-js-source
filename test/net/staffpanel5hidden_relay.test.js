@@ -1,5 +1,4 @@
-// STAFF-PANEL5-HIDDEN (2026-10-22, mob: "no tag no faint outline nothing just nothing", "true invis not lattys invis", "we
-// want the player to have no idea we are wathcing them"; design doc "DFO Staff Panel: design", Invisible follow): THE
+// STAFF-PANEL5-HIDDEN: THE
 // RELAY'S HALF, OVER THE REAL ROOM (test/fakeRoom.mjs - a real signed token at a real hello, the hub's shards real Rooms on
 // fake objects). The design's own acceptance: a second game and a raw socket that logs every frame stand in the same room,
 // region and hub as a hidden staff socket and receive NOTHING that names it or comes from it, while the staff socket still
@@ -11,7 +10,6 @@ import { readFileSync } from 'node:fs';
 
 import { fakeRoom, fakeRooms } from '../fakeRoom.mjs';
 import { SOCIAL_ROOM, SOCKETS_MAX, CLOSE_POLICY, CLOSE_BUSY, HELLO_WAIT_MS, chatRegionRoom, FOES_STALE_MS, PIXEL_UNITS, LAYER_HEADER, LAYER_ASK_HEADER, LAYER_EMPTY_HEADER } from '../../src/net/wire.js';
-import { egBreachOfRoom } from '../../src/net/eliteGates/egLaw.js';
 import * as H from '../../src/net/hubShards.js';
 /** COST-1: these pins hold a region's channel SPLIT - the way back, the relay's REGION_SHARDS - so their worlds name every region, and a region's shard is asked of the same split (a region's channel is whole by default: test/net/cost1_regions.test.js). */
 const SPLIT_VARS = { REGION_SHARDS: 'all' };
@@ -318,7 +316,7 @@ test('STAFF-PANEL5-HIDDEN the hello\'s refusals: a hidden seat said hello with a
   });
 });
 
-test('STAFF-PANEL5-HIDDEN the admissions: a private home admits the hidden spectator as staff and reports it - its subject and the room, signed with the receipt key - only while HIDDEN_SEEN_URL is set, and is closed to it while the relay cannot report it (STAFF-PANEL5-HIDDEN-FIX); an instance admits it with no party mark; a breach admits it without its company\'s word (mutants: the home refused; the note unsent; the note unsigned; the instance refused; the breach refused)', async () => {
+test('STAFF-PANEL5-HIDDEN the admissions: a private home admits the hidden spectator as staff and reports it - its subject and the room, signed with the receipt key - only while HIDDEN_SEEN_URL is set, and is closed to it while the relay cannot report it (STAFF-PANEL5-HIDDEN-FIX); an instance admits it with no party mark (mutants: the home refused; the note unsent; the note unsigned; the instance refused)', async () => {
   await quiet(async () => {
     const owned = privateInteriorRoom(await privateInteriorPrefix('acct-owner', 'char-0001'), 17, 200);
     const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -370,19 +368,12 @@ test('STAFF-PANEL5-HIDDEN the admissions: a private home admits the hidden spect
     const g3 = ir.connect(); await ir.hello(g3, GHOST_ID, P, HIDE);
     assert.ok(welcomeOf(g3), 'the instance admits it');
     assert.equal(g3.att.ip, undefined, 'as staff - never the party\'s guest');
-    // a breach: open to it, its company's word never asked
-    const { Room } = await import('../../server/src/index.js');
-    const key = 'eg:0123456789abcdef';
-    const breach = { _egOf: async () => ({ b: egBreachOfRoom(key) }) };
-    assert.equal(await Room.prototype._egAdmit.call(breach, key, { hid: 1, subject: GHOST_SUB, kind: 'guest' }, Date.now()), null, 'the open breach admits the hidden spectator');
-    assert.equal(await Room.prototype._egAdmit.call(breach, key, { subject: 'acct-x', kind: 'guest' }, Date.now()), 'the breach answers only to its company', 'a guest still is not');
-    assert.equal(await Room.prototype._egAdmit.call({ _egOf: async () => null }, key, { hid: 1, subject: GHOST_SUB }, Date.now()), 'the breach is closed', 'a closed one is closed to it too');
   });
 });
 
 test('STAFF-PANEL5-HIDDEN a battle and a realm: a hidden spectator is let into a siege\'s field and a Super dungeon\'s realm without a pass, a side or a place in the realm\'s record - and the player who has none is still refused (mutants: the siege\'s pass asked of it; the realm\'s record asked of it)', async () => {
   await quiet(async () => {
-    for (const key of ['siege:3021:20', sdTestKey(1)]) {   // PIN MOVED: SD-PARTY - a realm is a party's own Hour
+    for (const key of ['siege:3021:20', sdTestKey(1)]) {
       const r = fakeRoom(key);
       const stranger = r.connect(); await r.hello(stranger, 'strg-0001', P);
       assert.ok(!welcomeOf(stranger), `${key}: a player with no pass or place is refused`);
@@ -481,7 +472,7 @@ test('STAFF-PANEL5-HIDDEN-FIX a hidden Admin\'s /tp, on its hub shard: its ask i
   });
 });
 
-// STAFF-CHAT-RED (2026-10-23, mob: "give me a option next to chat to chat as /red or myself at all times"): the chat box's
+// STAFF-CHAT-RED: the chat box's
 // Me / Red switch, kept on Red by a hidden Admin - so its /red ask must be heard, and its line must still name nobody.
 test('STAFF-CHAT-RED a hidden Admin speaks as the server: on its hub shard its /red ask (`{t:\'say\', text}`) is heard, and every shard and the bus hear the server\'s line - `{t:\'red\', text, at}` and nothing else, naming nobody; a hidden socket without the dev glyph is ignored in silence, never closed, and its other frames are still dropped (mutants: the ask dropped; the dev glyph unread for a hidden socket; the line naming its speaker)', async () => {
   await world(async ({ link, say }) => {

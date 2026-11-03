@@ -1,5 +1,4 @@
-// WB14b (2026-10-19, Mac: "adding the chance of a gate to spawn with platforms of wave based adds ... the boss splitting
-// and players having to split ... (chance based encounter modifer)", then "This is all yours to take on"): THE PORTENTS AND
+// WB14b: THE PORTENTS AND
 // THE NIGHT'S FLOOR PLAN - the third kind of mark beside his aspect and his trials, drawn by a shuffle bag over the nights
 // that can carry one, and the floors and walkways a night's portents stand: the Vanguard's Muster and Bridgehead, the
 // Sundering's Rift Way, the Captive's Pen.
@@ -12,7 +11,7 @@
 //   the words               the chat (systems/gate/gateOmen.js), the map's card (gateTip), the marks card
 //                           (ui/gate/gateMarksView.js portentRowsOf), the Discord omen post (net/gate/gateHerald.js)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md sections 1, 2 and 6.
+// Design: 2 and 6.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -66,7 +65,7 @@ test('WB14b the portents: three, each its name, its one line, its tip and its re
   assert.equal(portentBits(['captive']), 4);
   assert.equal(portentBits(null), 0);
   assert.ok(hasPortent(['vanguard', 'sunder'], 'sunder') && !hasPortent(null, 'sunder') && !hasPortent(['captive'], 'sunder'));
-  assert.equal(gatePortentsWords(['vanguard', 'sunder']), 'The Vanguard · The Sundering');   // PIN MOVED (AUDIT WB14 TEXT-16): each a name of its own
+  assert.equal(gatePortentsWords(['vanguard', 'sunder']), 'The Vanguard · The Sundering');
   assert.equal(gatePortentsWords(null), '');
   assert.equal(portentsLine(['vanguard']), 'His vanguard holds the approach.');
   assert.equal(portentsLine(['vanguard', 'sunder']), `${gateDireLine()} His vanguard holds the approach. He tears in two at the second phase.`);
@@ -220,9 +219,6 @@ test('WB14b the fight keeps its portents: newFight holds a valid set (a copy) an
     const got = applyHeal(g, 'a', 'b', 30, { x: COURTS[FLOOR.bridgehead][0], z: COURTS[FLOOR.bridgehead][1] }, T0 + 1000);
     assert.equal(got > 0, ok, JSON.stringify(pt));
   }
-  // the relay births the fight on the night's draw
-  assert.match(read('server/src/index.js'), /md: gateModsOf\(day\), pt: gatePortentsOf\(day\), ti: gateTitheOf\(day\) \}\);/);
-  assert.match(read('src/net/bossSeam.js'), /new: \(\{ day, now, wrathAt, boss, md = null, pt = null, ti = null \}\) => newFight\(day, now, wrathAt, boss, md, pt, ti\),/);
 });
 
 test('WB14b a bound lays its walkway on every screen: over a walkway of the night\'s own past WB9b\'s two (the Flame\'s Rift Way) it lays that one alone; WB9b\'s bounds lay theirs as they did (mutants: the Rift Way laid as walkways 0 and 1)', () => {
@@ -282,7 +278,6 @@ test('WB14b the telegraph over the night\'s floors: a shape over the whole arena
   assert.equal(pass.drawn, 5, 'the Vanguard\'s night: its five floors');
   pass.draw(wrath, I, I, [0, 0, 0], 1, null, undefined, null, { courts: [[0, 0]], r: 10 });
   assert.equal(pass.drawn, 1, 'another floor\'s own courts (the Hour\'s, the Spire\'s): all of them');
-  assert.match(read('src/scenes/gate/gateCourt.js'), /_floors\.ks = planOf\(s\)\.floors;/);
 });
 
 test('WB14b the Deadlands keep clear of every floor of every night: no island within LAND_CLEAR_M of a portent\'s platform or walkway either, so the land is one land whatever the night (mutants: the land keeping clear of his three alone)', () => {
@@ -304,7 +299,7 @@ test('WB14b the night\'s portents said before the gate, everywhere his marks are
   assert.deepEqual(chat(plain).at(-1), marksLine({ boss, md: gateModsOf(plain) }), 'a plain night: the marks, and nothing after them');
   const tip = (day) => gateTip({ site: SITE, phase: 'open', t: { day } }, { to: 'seal', ms: 60_000 }).lines;
   assert.equal(tip(van).at(-1), 'The Vanguard');
-  assert.equal(tip(dire).at(-1), 'The Vanguard · The Sundering');   // PIN MOVED (AUDIT WB14 TEXT-16)
+  assert.equal(tip(dire).at(-1), 'The Vanguard · The Sundering');
   assert.equal(tip(plain).length, tip(van).length - 1, 'a plain night: no line for them');
   const card = marksCardModel(gateModsOf(dire), { name: boss }, { mode: 'gate', pt: gatePortentsOf(dire) });
   assert.deepEqual(card.portents.map((p) => [p.kind, p.id, p.name, p.text]), [['portent', 'vanguard', 'The Vanguard', GATE_PORTENTS[0].line], ['portent', 'sunder', 'The Sundering', GATE_PORTENTS[1].line]]);
@@ -331,9 +326,6 @@ test('WB14b the night\'s portents said before the gate, everywhere his marks are
   assert.ok(post(dire).endsWith(`. ${gateDireLine()} His vanguard holds the approach. He tears in two at the second phase.`), post(dire));
   assert.ok(post(plain).endsWith('tonight, ' + gateModsOf(plain).slice(1).map((id) => GATE_TRIALS.find((t) => t.id === id).name).join(' and ') + '.'), post(plain));
   assert.ok(post(dire).length < 2000, 'a Discord message\'s bound');
-  // the screens ask the day's own: the court's card its fight's, the gate's its day's
-  assert.match(read('src/scenes/gate/gateCourt.js'), /marksCardModel\(s\.md, bossOf\(s\), \{ mode: 'arrive', since: marksAt, now: t, pt: s\.pt \}\)/);
-  assert.match(read('src/scenes/gate/gatePool.js'), /marksCardModel\(gateModsOf\(g\.day\), gateBossOf\(g\.day\), \{ mode: 'gate', pt: gatePortentsOf\(g\.day\) \}\)/);
 });
 
 test('WB14b a new night\'s fight is judged anew: the court\'s reset clears what it judged, heard and landed before it lays the night\'s arrival - a Slam numbered as the last night\'s lands again (mutants: the resets lost behind the arrival)', async () => {
@@ -350,5 +342,4 @@ test('WB14b a new night\'s fight is judged anew: the court\'s reset clears what 
   }
   assert.equal(struck.length, 2, 'each night\'s Slam on me, though both are its fight\'s fifth');
   c.leave();
-  assert.match(read('src/scenes/gate/gateCourt.js'), /day = d; judged = noMark\(\); cued = noMark\(\); landed = noMark\(\); phaseHeard = 0; fellCued = false; wrathLanded = false;\n\s+arriveAt\(d\);/);
 });

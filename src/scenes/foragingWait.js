@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// FORAGE4 (2026-09-28, Mac: "Continue! Remember, this is your baby"):
+// FORAGE4:
 // FORAGING'S ONLINE WAIT, COMPOSED FOR A HOST - bible/06-Systems/
 // Foraging.md 13.1. Online the shared clock is nobody's to move
 // (WORLD5), so Quest Actions Extension's `raise time by H:MM` is a wait

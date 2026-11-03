@@ -1,6 +1,5 @@
 // @ts-check
-// BOAT-MENU (2026-09-30, Mac: "make the boat interaction like the loot menu. Being able to pick up, view storage,
-// mount, all from a simple menu and button press") - THE LAW of a boat's verbs, pure.
+// BOAT-MENU - THE LAW of a boat's verbs, pure.
 //
 // Come Sail Away answers a press on one of its seven boxes (systems/comeSailAway/comeSailAway.js activate) - the helm's box takes
 // the helm, or packs the boat in Steal mode; the ladder's boards; the chest's opens the cargo; the flag's and the
@@ -19,7 +18,7 @@
 //    over as it did (boatMenuStart's -1).
 //  - A row the mod would refuse is listed with its reason (the plaque's refused rows, AUDIT DISC7 A4) and the
 //    press says the mod's own words (boatMenuRefusal).
-//  - SHIP-PACK (2026-10-01): every hull lists "Pick up" - a ship's refused while her deed is not in the pack.
+//  - SHIP-PACK: every hull lists "Pick up" - a ship's refused while her deed is not in the pack.
 //  - HOLD-WEIGHT (FIELD BUGS 2026-10-05c): and any boat's while her parts, her hold on them, would outweigh the bearer's most.
 
 /** The verbs, by row id. */

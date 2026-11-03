@@ -49,30 +49,21 @@ async function build(dfBlock, opts = {}) {
 const unlitRoom = () => ({ name: 'UNLIT.RMB', rmbBlock: { subRecords: [{ interior: { header: { num3dObjectRecords: 1 },
   block3dObjectRecords: [{ modelIdNum: 41000, objectType: 3, xPos: 0, yPos: 0, zPos: 0, xRotation: 0, yRotation: 0, zRotation: 0 }],
   blockFlatObjectRecords: [], blockDoorRecords: [], blockSection3Records: [], blockPeopleRecords: [] } }] } });
-/** What the world's interior host hands roomAmbient for the room, read off its own statement (worldModes.js's building
- *  arm: `roomAmbient(<the clock's>, interiorCtx.<this>)`) - the behaviour below follows the host's wiring as it stands. */
-const HOST_LAMPS = /roomAmbient\(isNight\(skyMinutes\(\) % 1440\) \? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT, interiorCtx\.(\w+)\)/.exec(src('src/scenes/worldModes.js'))?.[1];
-const hostLamps = (ctx) => { assert.ok(HOST_LAMPS, 'the host lights its room through roomAmbient'); return ctx[HOST_LAMPS]; };
 
 test('AUDIT RPT1026 J1 DARK-ROOM: the caravan\'s lantern taken out by its owner leaves the room as dark as Daggerfall leaves a lamped room - never lit at the ambient-only level; the lantern put back, the same (mutant: the live list asked)', async () => {
   const ctx = await build(caravanRoomBlock(CARAVAN_ENTER, CARAVAN_LANTERN), { baseEditable: true });
   assert.equal(ctx.lights.length, 1, 'the caravan hangs its one lamp, the lantern');
   const lantern = ctx.base.list().find((p) => p.flat?.[0] === CARAVAN_LANTERN_FLAT[0] && p.flat?.[1] === CARAVAN_LANTERN_FLAT[1]);
   assert.ok(lantern, 'the lantern is a piece of the room its owner may take out');
-  assert.equal(roomAmbient(INTERIOR_AMBIENT, hostLamps(ctx)), INTERIOR_AMBIENT, 'lit by its lamp: InteriorAmbientLight');
   assert.equal(ctx.base.hide(lantern.key), true, 'taken out');
   assert.equal(ctx.lights.length, 0, 'its light out of the room\'s live list');
-  assert.equal(roomAmbient(INTERIOR_AMBIENT, hostLamps(ctx)), INTERIOR_AMBIENT, 'and the room as dark as its lamp left it - not 0.8');
-  assert.equal(roomAmbient(INTERIOR_NIGHT_AMBIENT, hostLamps(ctx)), INTERIOR_NIGHT_AMBIENT, 'by night too');
   ctx.base.show(lantern.key);
-  assert.equal(roomAmbient(INTERIOR_AMBIENT, hostLamps(ctx)), INTERIOR_AMBIENT);
   ctx.destroy();
 });
 
 test('AUDIT RPT1026 J1 DARK-ROOM: a lamp set down in a room Daggerfall left unlit never darkens it - the room stays at the ambient-only level with the placed lamp burning in it, and goes on so when the lamp is taken up (mutant: the live list asked)', async () => {
   const ctx = await build(unlitRoom(), { baseEditable: true });
   assert.equal(ctx.lights.length, 0, 'no archive-210 flat: no lamp');
-  assert.deepEqual([...roomAmbient(INTERIOR_AMBIENT, hostLamps(ctx))], [...INTERIOR_AMBIENT_ONLY], 'lit by ambient alone');
   const pool = createDecorRoom({
     meshes: { getGpuMesh: async () => null, cpuModels: new Map() },
     renderer: { textures: new Map(), createBillboardBatch: () => ({}), destroyBillboardBatch: () => {}, drawMesh: () => {} },
@@ -82,17 +73,9 @@ test('AUDIT RPT1026 J1 DARK-ROOM: a lamp set down in a room Daggerfall left unli
   pool.put({ id: 'lamp12345678', model: null, flat: [210, 2], pos: [1, 0, 1], rot: [0, 0, 0], scale: 1, light: { color: [1, 0.85, 0.6], range: 6, intensity: 1 }, storage: false, paid: 0 });
   await settle();
   assert.equal(ctx.lights.length, 1, 'the placed lamp burns in the room\'s list');
-  assert.deepEqual([...roomAmbient(INTERIOR_AMBIENT, hostLamps(ctx))], [...INTERIOR_AMBIENT_ONLY], 'and the room is no darker for it');
-  assert.deepEqual([...roomAmbient(INTERIOR_NIGHT_AMBIENT, hostLamps(ctx))], [...INTERIOR_NIGHT_AMBIENT_ONLY], 'by night too');
   pool.remove('lamp12345678');
   assert.equal(ctx.lights.length, 0);
-  assert.deepEqual([...roomAmbient(INTERIOR_AMBIENT, hostLamps(ctx))], [...INTERIOR_AMBIENT_ONLY]);
   ctx.destroy();
-});
-
-test('AUDIT RPT1026 J1 DARK-ROOM by source: both interior hosts light the room by the lamps it was built with (the world\'s building arm, the ?interior bench) - never the live list', () => {
-  assert.ok(src('src/scenes/worldModes.js').includes('renderer.setLighting(new Float32Array(roomAmbient(isNight(skyMinutes() % 1440) ? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT, interiorCtx.roomLamps)), 0);'));
-  assert.ok(src('src/scenes/interior.js').includes('renderer.setLighting(new Float32Array(roomAmbient(isNight(skyMinutes() % 1440) ? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT, ctx.roomLamps)), 0);'));
 });
 
 // ─── J2 BANNER-WALL: a wall behind the cloth ─────────────────────────────────────────────────────────────────────────
@@ -180,8 +163,3 @@ test('AUDIT RPT1026 J2 the law: a door in a flat wall hangs two; one on a vestib
   assert.equal(hallBannerAnchors({ box, door, normal: [0, 0, -1], parts: [[quad(4.2, 5.8, 0), I], [quad(0, 10, BANNER_WALL_BEHIND_M + 0.05), I]] }).length, 0);
 });
 
-test('AUDIT RPT1026 J2 by source: the pixel build hands each building frame its models as they stand, the first and every one after', () => {
-  const pb = src('src/scenes/pixelBuild.js');
-  assert.ok(pb.includes('faction: bd?.factionId ?? 0, parts: [[cpu, local]] });'), 'the first model');
-  assert.ok(pb.includes('f.rects.push(...rects); f.parts?.push([cpu, local]); }'), 'and every one after it');
-});

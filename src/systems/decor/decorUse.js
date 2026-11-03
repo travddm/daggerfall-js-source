@@ -1,7 +1,5 @@
 // @ts-check
-// DECOR-USE (2026-10-24, Discord - "Make bed decor and firepit decor actually funtional": "Was hyped to get a caravan for
-// a mini house until i saw the beds dont actually let you sleep in it and firepit doesnt actually let you cook on it";
-// "Cooking station is not an option in decorate"; bible/06-Systems/Online-Arc.md DECOR-USE) - WHAT A PLACED PIECE IS
+// DECOR-USE - WHAT A PLACED PIECE IS
 // FOR, past what it holds and the craft it serves. The port's own; DFU places no furniture.
 //
 //   A BED     a placed piece that is one of Daggerfall's beds (rrRealism.js BED_MODELS, a town mod's coloured bed read

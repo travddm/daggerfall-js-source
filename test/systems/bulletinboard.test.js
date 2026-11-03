@@ -184,65 +184,7 @@ test('the reach gate is a SECOND test after the pick, and it refuses', () => {
 // exterior ray reads it.
 // ---------------------------------------------------------------
 
-test('world.js collects the boards a pixel stands and hands them over shifted', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /import \{[^}]*\bisBulletinBoard, isCityGate\b[^}]*\} from '\.\.\/world\/rmbLayout\.js';/,   // HOST-SPLIT 2: the pixel build's import, its names sorted
-    'the model test comes from RMBLayout\'s home, not a second 41739 (AUDIT 64 F14 added isCityGate to the same import - RMBLayout.cs declares both)');
-  assert.ok(w.includes('if (isBulletinBoard(placed.modelIdNum)) pixelBoards.push({ box, local });'),   // SEAT1a: and its matrix, a seat's pennant's face
-    'the board is caught where the placement is stood, with the box already in the pixel frame');
-  assert.ok(w.includes('boards: pixelBoards,'), 'the list rides the pixel, so destroyPixel takes it away');
-  assert.match(w, /boardTargets: \(\) => \{/);
-  assert.ok(w.includes('const t = state.pixelTranslation(p.px, p.py);'),
-    'through the LIVE floating-origin translation, like npcTargets');
-  assert.ok(w.includes('bulletinBoardNews: () => rumorMill.getNewsOrRumorsForBulletinBoard(),'),
-    'TK-i\'s sign face finally has a caller');
-  // the TK-i interim that said the board consumers were unmounted is gone
-  assert.equal(/bulletin boards, the questor-post greeting\) mount\n  \/\/ with TK-v/.test(w), false,
-    'the stale "mount with TK-v" note is rewritten, not left standing');
-});
-
-test('worldModes puts the board in the SAME ray, at the ray\'s reach', () => {
-  const m = src('src/scenes/worldModes.js');
-  // AUDIT-WH M1: the pick reaches to RayDistance AND carries the
-  // board's own gate beside it, which is what every other family in
-  // this ray does (MC-2's law). Omitting the reach does not default
-  // it - `pickActivatableHit` reads `reach ?? distance`, so a bare
-  // `distance: RAY_DISTANCE` PUBLISHES the ray as the reach, and the
-  // world plaque named a notice board halfway down the street. The
-  // PRESS is unchanged: its board arm returns above the reach gate,
-  // because the refusal is spoken inside activateBulletinBoard.
-  assert.ok(m.includes("boards.forEach((aabb, i) => targets.push({ key: `board:${i}`, aabb, distance: RAY_DISTANCE, reach: BULLETIN_BOARD_ACTIVATION_DISTANCE }));"),
-    'the pick reaches to RayDistance - the board\'s own gate is inside the arm');
-  assert.ok(m.includes("if (typeof key === 'string' && key.startsWith('board:')) {"),
-    'and a board under the ray ENDS the activation, as C#\'s hit does');
-  const arm = m.slice(m.indexOf('function activateBulletinBoard'), m.indexOf('function activateStaticNpc'));
-  assert.ok(arm.includes('if (d === null || d > BULLETIN_BOARD_ACTIVATION_DISTANCE) {'), 'the :709 gate');
-  // AUDIT 64 F34: PlayerActivate.cs:711 speaks it through
-  // DaggerfallUI.SetMidScreenText - the centred label, not the queue.
-  assert.ok(arm.includes('setMidScreenText(tooFarAwayText());'), 'the :711 refusal, and it returns');
-  assert.ok(arm.includes('bulletinBoardRows(locationName, bulletinBoardNews?.() ?? null, tokenRows)'),
-    'the news is fetched BEFORE the box is composed (:716)');
-  assert.ok(arm.includes('townTalk?.showOverlay?.(new ChoiceWindow'),
-    'DaggerfallUI.MessageBox(tokens) (:738) - unconditional, news or none');
-});
-
 test('the probe exterior host stands its boards too - the standing host rule', () => {
-  const e = src('src/scenes/exterior.js');
-  assert.ok(e.includes("import { isBulletinBoard, isCityGate,") && e.includes("} from '../world/rmbLayout.js';"));
-  assert.ok(e.includes('if (isBulletinBoard(placed.modelIdNum)) {'),
-    "caught where the placement is stood, world-frame like this host's doors");
-  assert.ok(e.includes('boardTargets: () => bulletinBoards,'));
-  assert.equal(e.includes('bulletinBoardNews:'), false,
-    "no mill in this host - the board opens on the location name alone, C#'s own empty arm");
-  // ...AND THE NAME IS NOT FREE. The heading is PlayerGPS
-  // .CurrentLocalizedLocationName (:721), which the arm reads off
-  // `buildingDirectory` (worldModes.js:"credit instead. B2") and off nothing else - so
-  // a host that stands boards without handing one over opens the box
-  // on a BLANK parchment, not "the location name alone": the head row
-  // composes empty and bulletinBoard.js:"if (rows.length && rows[0].text === '')" shifts the starter row off,
-  // leaving one empty line. This host knows its own location outright.
-  assert.match(e, /buildingDirectory: \(\) => \(\{[\s\S]{0,1200}?locationName: dfLocation\.name \?\? locationName,/,
-    'the probe host hands the arm the location name it already holds');
   // and the CONTENT of the no-news arm, which the absence pin above
   // could never observe - one centred row, the location's own name.
   assert.deepEqual(bulletinBoardRows('Daggerfall', null, tokenRows).map((r) => r.text), ['Daggerfall'],

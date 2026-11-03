@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CSA-F (2026-09-27): COME SAIL AWAY'S WAVES, DRAWN - the wave object's
+// CSA-F: COME SAIL AWAY'S WAVES, DRAWN - the wave object's
 // mesh (systems/comeSailAway/comeSailAwayWaves.js) on the bundle's CurrentMaterial, its
 // shader Daggerfall/Dither/Wave as the bundle's compiled program has it:
 //
@@ -260,7 +260,7 @@ export const CUBE_TRIANGLES = (() => {
   return out;
 })();
 /**
- * NAV-B (2026-09-28): the flags in RUNS OF ONE COLOUR, in the order each colour first flies - a sea ship's flag
+ * NAV-B: the flags in RUNS OF ONE COLOUR, in the order each colour first flies - a sea ship's flag
  * particle carries her faction's `color` (systems/naval/navalShips.js NAVAL_FACTIONS' `flag`: the pirates' black, a
  * merchantman's gold, a navy's red), a player's boat none (FlagMaterial's own orange, the mod's). One upload, one draw a run.
  * @param {any[]} flags

@@ -1,6 +1,6 @@
 // @ts-check
-// SEA-AIR (2026-10-24, the owner: "different music and ambience sounds for sailing"): WHAT A DECK SOUNDS LIKE AT SEA.
-// Design: bible/08-Audio/Audio.md SOUNDSCAPE.
+// SEA-AIR: WHAT A DECK SOUNDS LIKE AT SEA.
+// Design: SOUNDSCAPE.
 //
 // Come Sail Away plays its own two hull loops while a boat is placed (systems/comeSailAway/comeSailAway.js
 // UpdateAudioSource - SmallShipAmbience at rest, ShipExteriorAmbience2 under way) and the oars' strokes; the sea fight
@@ -15,7 +15,7 @@
 //   THE EVENTS: GULLS by day in fair weather while land is near (systems/soundscape/soundscapeSfx.js); and the WATCH
 //     BELLS each half hour of the world's clock, struck in pairs - one bell at the half hour after a watch begins,
 //     eight at its end (`watchBells`) - on Daggerfall's own bell (DAGGER.SND 107).
-//   DECK-QUIET (2026-10-26, the owner: "Remove all deck at sea"): the deck's own one-shots - a wave slapping the hull,
+//   DECK-QUIET: the deck's own one-shots - a wave slapping the hull,
 //     the timbers and the ropes creaking, the canvas luffing, the spray over the bow - are gone, and their clips with
 //     them.
 //

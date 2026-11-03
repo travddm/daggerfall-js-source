@@ -1,8 +1,8 @@
-// RPT1026-WORLD (2026-10-27), two private reports of a ship at the helm that would not make way - capped far under her
+// RPT1026-WORLD, two private reports of a ship at the helm that would not make way - capped far under her
 // speed after the sailing patch of 2026-10-23, and frozen in fights with pirates and beside the navy's cutters. Driven
 // on the real naval host over Come Sail Away's real pool (test/navalSea.mjs): the host's three holds on my way - the
 // grapples' haul (BOARD-MAGNET's `brake` and `wayScale`), her hurts, and the quay's warp - hold her only while their
-// cause stands. A GUARD, not a fix: no hold was found left on after a fight or beside a cutter. bible/03-World/Naval-Refit.md
+// cause stands. A GUARD, not a fix: no hold was found left on after a fight or beside a cutter.
 // BOARD-MAGNET, the record's RPT1026-WORLD paragraph.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

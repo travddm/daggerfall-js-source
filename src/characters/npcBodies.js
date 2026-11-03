@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC4 (2026-10-09, the MW-NPC arc's fourth slice - bible/04-Characters/Morrowind-NPCs.md section 9): THE NPC LANE.
+// MWNPC4: THE NPC LANE.
 //
 // Every living actor the arc stands in a Morrowind body - a foe, the watch, a townsperson, a person in a building - is
 // drawn the way an online peer already is (net/peer/peerBodies.js): a `createFpArm()` rig built from a LOOK, posed off a
@@ -44,7 +44,7 @@ export const WATCH_BODY_TIERS = Object.freeze({
 /** The tier a player who never chose stands under. */
 export const NPC_BODIES_DEFAULT = 'near';
 
-/** MWNPC11 (bible/04-Characters/Morrowind-NPCs.md section 16): EVERY NPC LANE'S ONE FRAME, by the same tier - the most
+/** MWNPC11: EVERY NPC LANE'S ONE FRAME, by the same tier - the most
  *  bodies standing (stepped, skinned on their cadence, drawn) across every population's lane, nearest first, and the
  *  most skins a frame among them. Below what MWNPC7 stated for the three lanes it summed (the foes', the watch's and the
  *  walkers': 28 bodies and 10 skins at Near, 56 and 20 at All), so no lane wired since adds a body or a skin to a frame -

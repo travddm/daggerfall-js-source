@@ -1,4 +1,4 @@
-// PERF-NAMES1 bench (2026-10-10): THE NAME LAYER UNDER A CROWD, on the main thread's clock.
+// PERF-NAMES1 bench: THE NAME LAYER UNDER A CROWD, on the main thread's clock.
 //
 // PERF-ON4 measured the browser's own (native) time growing from 4.8 ms a frame alone to 18-20 with company and named
 // the name layer's per-frame writes as the next measurement. This stands the REAL layer (ui/nameLayer.js

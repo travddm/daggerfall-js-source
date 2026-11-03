@@ -675,7 +675,7 @@ export class NPCSession {
    *    it never enters the pool;
    *  - selectedNpcWorkKey is left pointing at the LAST NPC added, so
    *    a pool build silently reselects the questor. */
-  // QP1 (2026-08-28) FED IT: townTalk's rebuildDirectory - the port's
+  // QP1 FED IT: townTalk's rebuildDirectory - the port's
   // GetBuildingList - hands in talkTopics.questorCandidateBuildings,
   // the per-building people walk over the same block correlation the
   // directory rides, each person through the one SetLayoutData law.

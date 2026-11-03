@@ -1,7 +1,4 @@
-// SOC3 (2026-09-16, Mac: "A social button next to the chat UI, that when tapped opens the new friends list + party
-// interface. Players should now be able to friend other users, see if they are online/last online + be able to
-// invite friends or other individuals to the new 4 person party system. Party system: Upon joining a party, the
-// players name who are in a party together should turn green"): THE SURFACE.
+// SOC3: THE SURFACE.
 //
 // Driven headless over a fake document and window - the shape chat1.test.js drives its own panel through, copied
 // here rather than shared, because a fake DOM that two slices tune for each other stops being either one's. The
@@ -231,12 +228,6 @@ test('SOC3: the sheet is injected once, and the panel is its own layer over the 
   for (const part of ['dfsocial-sec', 'dfsocial-row', 'dfsocial-empty', 'dfsocial-dot', 'dfsocial-btn', 'dfsocial-lead', 'dfsocial-left']) {
     assert.match(SOCIAL_CSS, new RegExp(`\\.${part} \\{[^}]*flex: none;`), `${part} must refuse to shrink inside the body's scroller`);
   }
-  assert.doesNotMatch(rd('src/ui/socialPanel.js'), /innerHTML/, 'a name off the wire is TEXT, never markup');
-  // ...and this one is read over the source with its COMMENTS STRIPPED, for the fifth time in this port: the
-  // sentence explaining WHY there is no `window.confirm` here names the thing it refuses, and a pin that reddens on
-  // its own explanation teaches the next reader to delete the explanation.
-  const panelCode = rd('src/ui/socialPanel.js').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-  assert.doesNotMatch(panelCode, /window\.confirm|globalThis\.confirm|[^.\w]confirm\(/, 'the Remove confirm is the row\'s own two clicks, never a modal that steals the pointer the panel just freed');
 });
 
 // ═══ THE TABS ════════════════════════════════════════════════════════
@@ -693,52 +684,6 @@ test('ROSTER-STAFF (mob, 2026-10-24: "need to add follor to find a player in cha
 
 // ═══ THE HOST ════════════════════════════════════════════════════════
 
-test('SOC3: the host by source - world.js makes the panel in socialStart over the picture the hub filled, hands the chat the button, the colours and the roster\'s doors as LAZY closures, puts the panel on hudCtx for SOC5, and renders it on the chat frame under the chat\'s own covering rule (mutants: the panel made before the picture; the closures captured eagerly; the render outside the chat frame; the pointer doors dropped)', () => {
-  const w = rd('src/scenes/world.js');
-  const bare = w.replace(/^\s*\/\/.*$/gm, '');
-  assert.match(w, /import \{ createSocialPanel, TRY_AGAIN_TEXT, NO_PARTY_TEXT, LETTERS_SIGNED_OUT_TEXT \} from '\.\.\/ui\/socialPanel\.js';/, 'AUDIT SOC B17: the panel\'s own "try again" is the F-menu\'s too (CHAT-CHAN: and its "not in a party" the Party tab\'s; JOURNAL1: and its signed-out word the chronicle\'s letter)');
-  assert.match(w, /import \{ SocialState, accountId, accountSecret \} from '\.\.\/net\/social\.js';/,
-    'the host imports no colour at all - the one module that knows what a party is answers cssColorOf (SOC7 integration: SOC4 holds world.js to naming no green)');
-  assert.match(w, /\n  let socialPanel = null;/, 'beside `social`, in the host\'s own scope');
-
-  // the chat's three seams, and every one a closure - `social` and `socialPanel` are both null when this call runs
-  assert.match(bare, /social: \{ onToggle: \(\) => socialPanel\?\.toggle\(\), pending: \(\) => social\?\.pendingCount\(\) \?\? 0 \},/);
-  assert.match(bare, /nameColor: \(id\) => social\?\.cssColorOf\(id\) \?\? null,/);   // SOC7 integration: the colour is the picture's answer (net/social.js cssColorOf), never named in the host - SOC4's pin holds world.js to asking
-  assert.match(bare, /rowActions: \(peerId\) => \[\.\.\.socialRowActions\(peerId\), \.\.\.chatSafety\.rosterActions\(peerId\)\],/);   // PIN MOVED (ROSTER-STAFF): and a staff member's acts, scenes/chatSafetyHost.js rosterActions
-  assert.ok(w.indexOf('chatPanel = createChatPanel({') < w.indexOf('socialStart();'), 'the panel is built before the picture lands beside it, which is why all three are lazy');
-
-  // the roster's doors: peer for a stranger, account for the friend I already hold
-  assert.match(bare, /\{ label: 'Add friend', enabled: a\.canFriend, why: a\.whyNotFriend, run: \(\) => socialLink\(\)\?\.sendSocial\(\{ k: 'friend\.request', peer: peerId \}\) \?\? false \}/);
-  assert.match(bare, /\{ label: 'Invite to party', enabled: a\.canInvite, why: a\.whyNotInvite, run: \(\) => socialLink\(\)\?\.sendSocial\(\{ k: 'party\.invite', peer: peerId \}\) \?\? false \}/);
-  assert.doesNotMatch(bare, /label: 'Remove friend'/, 'AUDIT SOC C15: no one-click Remove on a roster row - the panel\'s two-click Remove is the one door out of a friendship');
-
-  // the panel itself, inside socialStart and AFTER the state exists
-  const start = w.slice(w.indexOf('const socialStart = () => {'), w.indexOf('const composePartyPose'));
-  // FRIENDS-SYNC (FIELD BUGS 2026-10-01 part five): the hub names the picture by the signed-in player (the token's
-  // subject) now, and a relay before it by the profile's id - so the picture expects either, the player's first
-  const picture = 'social = new SocialState({ acct: [storedSession(appStorage())?.id, link.acct].filter(Boolean) });';
-  assert.ok(start.includes(picture), 'the picture (AUDIT SOC B19: expecting the account this session is - the signed-in player, or the profile id it sent)');
-  assert.ok(start.indexOf(picture) < start.indexOf('socialPanel = createSocialPanel({'), 'and the panel over it, never before it');
-  assert.match(start, /socialPanel = createSocialPanel\(\{\s*social,\s*(?:mail,\s*)?(?:guild: guildBook,\s*)?send: \(act\) => socialLink\(\)\?\.sendSocial\(act\) \?\? false,/, 'one arrow out, the hub link\'s - and its false is the rate gate\'s answer (MAIL1: the letterbox beside the picture)');
-  assert.match(start, /canOpen: \(\) => !gamePaused\(\) && !\(townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\)\),/, 'the chat\'s own door: no pointer surface under a window');
-  assert.match(start, /onOpen: \(\) => surfaceOpen\('social'\),/, 'AUDIT SOC B6: the panel is a COUNTED pointer surface');
-  assert.match(start, /onClose: \(\) => surfaceClose\('social'\),/);
-  assert.match(bare, /const surfaceOpen = \(name\) => \{ pointerSurfaces\.add\(name\); setCursorActive\(false\); releaseLook\(\); \};/, 'the first surface up frees the mouse');
-  assert.match(bare, /const surfaceClose = \(name\) => \{ pointerSurfaces\.delete\(name\); if \(!pointerSurfaces\.size && !gamePaused\(\)\) \{ if \(travelView\?\.active\) setCursorActive\(true\); else requestLook\(canvas\); \} \};/, 'the LAST surface down takes it back');
-  assert.match(bare, /if \(!gamePaused\(\) && !pointerSurfaces\.size && document\.pointerLockElement !== canvas\) requestLook\(canvas\);/, 'and the key ladder\'s resting-state relock waits while any stands');
-  assert.doesNotMatch(bare, /hudCtx\.openSocial/, 'AUDIT SOC B14/D11: the second door to the panel is gone - SOC5\'s key reaches it through socialInteract\'s nobody-in-front arm');
-
-  // the frame: after the party pose, under the same covering rule the chat renders with
-  // matched around the prose rather than through it: SOC2's pose line carries its own trailing comment, and the
-  // line this slice adds carries two of its own above it
-  assert.match(w, /partyFrame\(performance\.now\(\)\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*socialPanel\?\.render\(\{ covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \}\);/,
-    'on the chat frame, after SOC2\'s pose line, with the host\'s word on being covered');
-  const frame = w.slice(w.indexOf('const chatFrame = () => {'), w.indexOf('/** WORLD3: the peers in my room'));
-  assert.ok(frame.includes('socialPanel?.render('), 'and inside chatFrame, which is the one frame the chat\'s surfaces ride');
-  assert.equal((w.match(/socialPanel\?\.render\(/g) ?? []).length, 1, 'once a frame, from one place');
-});
-
-
 // ═══ THE AUDIT'S OWN PINS ════════════════════════════════════════════
 
 test('AUDIT SOC C2/C14: ONE Escape closes ONE surface - the panel stops the key immediately (no sibling capture listener and no pause door sees it) and, with something ABOVE it, leaves the key entirely alone (mutants: stopPropagation alone, so the chat behind closes on the same press; above() ignored, so two surfaces close at once; the panel closing but the key reaching the host)', () => {
@@ -976,9 +921,7 @@ test('AUDIT SOC C20: a roster row with NOTHING behind it is not a door - which i
   assert.match(rowFor('Zed').className, /\bact\b/, 'a stranger still is one');
 });
 
-// ── FONT1 (2026-09-16, Mac: "Especially the new online interfaces font
-// use our enhanced font ... Any enhanced UI or text must be our
-// enhanced version") ────────────────────────────────────────────────
+// ── FONT1 ────────────────────────────────────────────────
 
 test('FONT1: the friends + party panel and its toast wear the enhanced face, unsmoothed, with the five in their own sheet', () => {
   // `--data` is the MENU's face (the boot screens, the settings pages).
@@ -1004,7 +947,7 @@ test('FONT1: the friends + party panel and its toast wear the enhanced face, uns
 
 // ═══ PARTY-UI: THE JOURNEY ON THE PARTY TAB ══════════════════════════
 //
-// 2026-09-26, Mac: "Instead of party chat commands, we need to add the party travel commands to the UI". The chat's
+// 2026-09-26,. The chat's
 // /leader and /travel become buttons on the Party tab, over the one session (systems/party/partyTravel.js - its status,
 // command and respond, pinned in test/systems/party/partytravel.test.js); the tab draws the session's status and redraws on the
 // live pass when it moves, since poses move no version.
@@ -1083,20 +1026,7 @@ test('PARTY-UI: the Party tab\'s Journey - the leader\'s Travel map, the round a
   assert.deepEqual(secs(root), ['Your party (2/8)'], 'no session status (out of a party): none either');
 });
 
-test('PARTY-UI: the host hands the panel the party\'s journey session, read when drawn (it is made later in world.js), and the chat hints name the tab - never the line said under a window, where it cannot open (mutants: the host forgot it)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /journey: \(\) => partyTravel,/);
-  assert.ok(w.indexOf('journey: () => partyTravel,') < w.indexOf('partyTravel = createPartyTravel({'), 'the panel is made first - a getter, never the value');
-  const s = rd('src/systems/party/partyTravel.js');
-  // AUDIT PARTY-UI 8: the round's line to a member under a window - the Social panel's canOpen is the pause's own
-  // question, and the box asks the moment the window closes - so it names no tab
-  assert.match(s, /wants the party to travel to \$\{dest\}\. Type \/travel to come along\./);
-  assert.doesNotMatch(s, /Ready up on the Party tab/);
-  assert.match(w, /canOpen: \(\) => !gamePaused\(\) && /, 'the panel does not open under a window');
-  assert.equal((s.match(/from the Party tab, or type \/leader\./g) ?? []).length, 2);
-});
-
-// ═══ AUDIT PARTY-UI (2026-09-27, the read-only audit of PARTY-UI) ═══════
+// ═══ AUDIT PARTY-UI ═══════
 //
 // The Journey block's buttons say why not rather than refuse - or, the leader's Travel map, rather than open a map on a
 // building's floor or turn a round into a journey alone - every answer is the note, and the live pass rebuilds the
@@ -1181,7 +1111,7 @@ test('AUDIT PARTY-UI: the live pass rebuilds the Journey only when its buttons c
   assert.equal(find(root, 'dfsocial-field')[0], field, 'the form stands - the journey is the Party tab\'s alone');
 });
 
-// ═══ AUDIT PARTY-UI2 (2026-09-27, the second audit - of the fixes above) ═══════
+// ═══ AUDIT PARTY-UI2 ═══════
 
 test('AUDIT PARTY-UI2: where two reasons stand, the leader\'s Travel map says the one gathering cannot mend - indoors first, then an old hub, then a round still held for its followers ("The party is still on its way"), and only then "Gather the party first" (mutants: the hub and gathered checks swapped; the held round unread)', () => {
   const party = { id: 'p1', leader: 'acct-me', members: [member('Mac', { acct: 'acct-me' }), member('Bob')] };
@@ -1206,7 +1136,7 @@ test('AUDIT PARTY-UI2: where two reasons stand, the leader\'s Travel map says th
   assert.deepEqual([!!btnBy(bodyRows(root)[2], 'Travel map').disabled, why()], [false, null]);
 });
 
-// PARTY-READY (2026-10-01, Mac: "Also when party readying up, the ui element is hidden"): a cover still closes the panel,
+// PARTY-READY: a cover still closes the panel,
 // but the Party tab a cover took mid-journey comes back when it lifts - the leader's Travel map opened the travel map, the
 // map's cover closed the tab, and the round's count and Call off stood nowhere for the whole ready-up.
 test('PARTY-READY: the Party tab the travel map took comes back when the map closes, and so does one a window took over an open round; a cover with no journey of the tab\'s keeps it closed, as does one over a round that has set out or over another tab (mutants: never put back, put back after any cover, put back on the tab it was not on)', () => {

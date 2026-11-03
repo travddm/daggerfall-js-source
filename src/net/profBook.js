@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") — THIS DEVICE'S PROFESSIONS: the
+// PROF1 — THIS DEVICE'S PROFESSIONS: the
 // character's tracks, Stores and day as the account service last said
 // them, its streamed pixels' witnessed states, the harvests on their way,
 // the withdrawals to the pack, the region's Court writs and a delivery.
@@ -26,7 +26,7 @@
 // for the act's row - every refusal but the network's, the service's own
 // fault, the account's rate and a missing session.
 //
-// BAG1 (bible/06-Systems/Materials-Bag.md): A CARRYING BOOK - one handed
+// BAG1: A CARRYING BOOK - one handed
 // `carry`, the host's hands on the Materials Bag and the pack (systems/
 // materialsBag.js) - asks every harvest and withdrawal as carried: the
 // units are the service's count, and the items are minted into the bag
@@ -37,7 +37,7 @@
 // and given back on a refusal), so the station's own route spends the
 // Stores as it always has.
 //
-// AUDIT BAG1 (bible/06-Systems/Materials-Bag.md, the audit): WHAT THE
+// AUDIT BAG1 (, the audit): WHAT THE
 // PACK HOLDS IS SAID WHEN THE ACT IS ASKED, never when it was kept -
 // `held` read at the send, with the units of every deposit still out (the
 // pack gave them up; the count holds them until the deposit lands), beside
@@ -147,7 +147,7 @@ const dayOf = (ms) => Math.floor(ms / 86_400_000);
  *   units the service handed over, every one minted (what finds no room into the pack past its weight - B5's law);
  *   `stamped`/`unstamp`/`stamps` a deposit's stamp in the save (takeCarried's `stamp` - its id, material, units and
  *   order); `flush` a checkpoint that LANDED (the save holding the take is the realm's before the deposit is asked).
- *   DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): `embers` the pack's Deadlands Embers - how many it
+ *   DAEDRIC-SMELT: `embers` the pack's Deadlands Embers - how many it
  *   holds unlocked, and a take of them with its undo (systems/sigil/sigilBroker.js emberHands) - the pack's half of a
  *   work that spends them, as the Broker's sale takes its price.
  */
@@ -219,7 +219,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     try { storage?.setItem?.(PROF_KEPT_KEY, JSON.stringify(t)); _memory = null; } catch { _memory = t; }
     _wrote += 1;   // GATHER-SPEED: the pump's idle read is stale
   };
-  /** GATHER-SPEED (2026-10-11, Mac: "look at gathering minigame performance"): THE KEPT TABLE AS LAST PARSED, for the
+  /** GATHER-SPEED: THE KEPT TABLE AS LAST PARSED, for the
    *  readers that only look - the prompt's `counting` (every plan, every frame) and the pump's due check (every frame).
    *  Each parsed the whole table out of storage again, every frame. The text is read still (another tab may write it),
    *  and parsed only when it changed; what this answers is never written to - a writer reads its own copy (keptOf). */
@@ -491,8 +491,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       const s = this.store(material);
       return (s.gold | 0) + (s[LOOSE_ORIGIN] | 0) + (carry ? Math.max(0, heldAll(material) - this.carriedUsable(material)) : 0);   // AUDIT TOWN-ECON 2 PRICE-2: a counter's pieces too
     },
-    /** BAG-CRAFT (FIELD BUGS 2026-10-09d, Mac: "I just want players to also be able to craft from their inventory, not
-     *  just the store"): WHAT A STATION MAY WORK OF IT - a craft, a brew, a smelt, a temper: the Stores' and everything the
+    /** BAG-CRAFT (FIELD BUGS 2026-10-09d): WHAT A STATION MAY WORK OF IT - a craft, a brew, a smelt, a temper: the Stores' and everything the
      *  bag, the pack and the wagon hold of it, counted or not, but gold's (bagLaw.js carriedWorkable) - the shortfall put
      *  in first (`ensureInStores` with `work`). */
     workable(material) { return this.storesWorkable(material) + this.carriedWorkable(material); },
@@ -505,7 +504,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     /** BAG1: whether this book carries (a host handed it the bag and the pack) - every harvest and withdrawal is then
      *  the bag's or the pack's, never the Stores'. */
     carrying() { return !!carry; },
-    /** DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): the Deadlands Embers the pack holds unlocked - what a
+    /** DAEDRIC-SMELT: the Deadlands Embers the pack holds unlocked - what a
      *  work that spends them may take (`carry`'s embers) - or null where this book holds no pack (the Forge bounds by the
      *  service's purse alone, its refusal `prof-embers`). */
     embers() { return carry?.embers ? carry.embers.held() : null; },
@@ -849,7 +848,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
      * so a lost answer is asked again (the same id, the same pieces) and `mint` makes them on the answer, once: the tab
      * that lets the craft go mints it (AUDIT 29 C5's law). One at a time. AUDIT 30 C4: `fee` the station's gold, kept with
      * the craft and handed to `mint` with it - the tab that mints the pieces pays it, whenever the answer comes.
-     * CRAFT1 (bible/06-Systems/Professions-Arc.md 41): THE CHAIN - inputs the Stores and what is carried lack are made
+     * CRAFT1 (41): THE CHAIN - inputs the Stores and what is carried lack are made
      * first by the works chainLaw plans from what is held, each the service's own smelt kept in the Stores (`stay`), in
      * the plan's order; a plan that cannot cover them asks no work (the craft is asked as before - the book's view of the
      * Stores is not the service's, and the service says what is short), and a work refused stops the craft with the
@@ -1094,7 +1093,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       return p;
     },
 
-    /** CRAFT-WRITS (bible/06-Systems/Professions-Arc.md section 49): A CRAFTING WRIT FILLED - its goods out of the realm
+    /** CRAFT-WRITS: A CRAFTING WRIT FILLED - its goods out of the realm
      *  record where it stands (`realm`, the host's realm act: systems/realmSaves.js realmGoldAct asks again itself, so this
      *  asks once), `pieces` a dish or kit writ's provenance ids. The id is the writ's own until an answer comes, so a press
      *  after a lost answer is the same delivery. Answers the service's answer; the track and the Work list moved with it -
@@ -1150,7 +1149,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       m.promise = (async () => {
         // BAG1: the work's inputs the Stores lack, from the bag and the pack first
         const work = smeltRecipe(recipe);
-        // DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): THE EMBERS A WORK SPENDS - the pack's half (`carry`'s
+        // DAEDRIC-SMELT: THE EMBERS A WORK SPENDS - the pack's half (`carry`'s
         // embers, the insignia's own law: systems/sigil/sigilBroker.js insigniaSale), the account's purse the service's.
         // Asked before anything moves: a pack short of them puts nothing in the Stores
         const embers = workEmbers(work, count), pack = carry?.embers ?? null;

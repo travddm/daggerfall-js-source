@@ -101,16 +101,6 @@ export const CREDITS = Object.freeze({
   ]),
   mods: Object.freeze([
     Object.freeze({
-      title: 'Meaner Monsters',
-      version: '1.5.2',
-      author: 'Ralzar',
-      get what() { return t('credits.meanerMonsters.what', 'Twenty monsters made tougher, with new damage, health, level and armor. Rats, bats and zombies are gentler. Werewolves and wereboars are a fifth larger, and the dragonling is two and a half times its size. Based on version 1.5.2. With the combat overhaul on, Kirk.O\u2019s version of these numbers is used instead.'); },
-      get terms() { return t('credits.meanerMonsters.terms', 'Used with permission under its MIT License (Copyright (C) 2020 Ralzar; Author: Hazelnut & Ralzar).'); },
-      get contact() { return t('credits.contact.manifest', '{contact}', { contact: 'forums.dfworkshop.com' }); },
-      vendor: Object.freeze(['meanerMonsters']),
-      link: 'https://github.com/Ralzar81/Meaner-Monsters',
-    }),
-    Object.freeze({
       title: 'Unleveled Loot',
       version: '1.1.2',
       author: 'Ralzar',
@@ -347,21 +337,6 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['better-ambience']),
     }),
     Object.freeze({
-      title: 'Oblivion Remaster Like Leveling',
-      version: '0.5.3',
-      // THE ONE ROW ON THIS SCREEN WHOSE AUTHOR IS NOT KNOWN. Nothing
-      // in the shipped archive names them - no licence file, no script
-      // header, an empty author field in the `.omwaddon` - so the
-      // screen says so and names the page the mod comes from, rather
-      // than crediting a guess. The record is open in
-      // vendor/oblivion-remaster-leveling/README.md and in the
-      // registry row, and it is filled in the moment Mac has the name.
-      get author() { return t('credits.author.unnamed', 'Unnamed ({source})', { source: 'Nexus Morrowind 56569' }); },
-      get what() { return t('credits.oblivionLeveling.what', 'Another way to level, offered when you create a character. Raising skills fills a 100-point bar instead of Daggerfall’s skill total: primary and major skills fill it fastest, minor skills next and the rest slowest, and any overflow carries into the next level. Each level up gives you points to spend on a few attributes, with Luck costing more. You can set the points, how many attributes, and Luck’s cost on the mod’s tile. Originally an OpenMW Lua mod for Morrowind.'); },
-      get terms() { return t('credits.oblivionLeveling.terms', 'Used with the author\u2019s permission, on Mac\u2019s word. The archive states no license and names no author.'); },
-      vendor: Object.freeze(['oblivion-remaster-leveling']),
-    }),
-    Object.freeze({
       title: 'Horse Cart and Cargo',
       version: '1.0.0-rc12',
       author: 'demifiend000',
@@ -526,8 +501,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['physical-items']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/1411',
     }),
-    // HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1 (2026-10-08, Mac: "We have permission to use and
-    // implement everything into the codebase"): the four environment mods, handed over together.
+    // HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1: the four environment mods, handed over together.
     Object.freeze({
       title: 'Heat Haze',
       version: '1.0.1',
@@ -567,17 +541,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['sands-of-the-alikr']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/1390',
     }),
-    // KG3 (bible/11-Multiplayer/Kings-Gambit.md section 10.7): the bundle names no author - the credits' own unnamed form
-    // until the owner names them (CR1 asks every row for an author; AUDIT KG C17)
-    Object.freeze({
-      get title() { return t('credits.kingsGambit.title', 'The King\u2019s Gambit'); },   // the game's name as its table says it (L10N4)
-      version: '1',
-      get author() { return t('credits.author.unnamed', 'Unnamed ({source})', { source: 'thekingsgambit.dfmod' }); },
-      get what() { return t('credits.kingsGambit.what', 'A battle of armies and kings, played at a tavern\u2019s card table against the regulars, or online against another player. Its units use the Iliac Hand cards\u2019 pictures, and its kings the Bay deck\u2019s.'); },
-      get terms() { return t('credits.kingsGambit.terms', 'Used with permission, on Mac\u2019s word. The bundle names no author.'); },
-      vendor: Object.freeze(['kings-gambit']),
-    }),
-    // DEX0 (bible/04-Characters/Enemy-Expansion.md): Kamer & Kab's fifty enemies and their encounter tables.
+    // DEX0: Kamer & Kab's fifty enemies and their encounter tables.
     Object.freeze({
       get title() { return t('credits.dex.title', 'Daggerfall Enemy Expansion'); },   // the mod's name as its manifest says it (L10N4)
       version: '1.3.4',
@@ -588,7 +552,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['daggerfall-enemy-expansion']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/372',
     }),
-    // MUDEX1 (bible/04-Characters/Enemy-Expansion.md, MUDEX): Meaner Monsters' own form beside DEX, by its author.
+    // MUDEX1 (, MUDEX): Meaner Monsters' own form beside DEX, by its author.
     Object.freeze({
       title: 'MUDEX',
       version: '1.0.1',

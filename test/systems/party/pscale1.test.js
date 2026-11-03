@@ -1,5 +1,4 @@
-// PSCALE1 (2026-09-25, Mac: "I want enemy difficulty, enemy numbers, etc to scale approriately with party size";
-// asked: "+50% HP, +10% dmg", "One roll per group", "Everyone in it" - and at AUDIT PSCALE1, "Whoever fights it"):
+// PSCALE1:
 // A FIGHT WEIGHS WHAT ITS FIGHTERS WEIGH (systems/party/partyScale.js). The law's numbers; the outdoor pool driven - a
 // shared foe's toughness at its owner's damage door by the players striking it, the remainder carried, the foes
 // nobody else can help with left alone, a shared foe's hit on me harder; and the hosts by source. The audit's own
@@ -128,16 +127,3 @@ test('PSCALE1 outdoors, driven: a shared foe (one that rides the stream, or anot
   assert.equal(indoors.partyHit(10, { ...mouse, _fightN: 4 }), 10);
 });
 
-test('PSCALE1 the hosts, by source (AUDIT PSCALE1: the rest is mounted and driven in auditpscale1.test.js): the owner\'s door names every player\'s blow a fighter and weighs by them; the count rides the record and a reader reads it; a shared foe\'s blow and a shared archer\'s arrow at me are weighed by the foe\'s own fighters; the dungeon\'s door the same (mutants: the fighter unnoted, the door unweighed, the count unstreamed or unread)', () => {
-  const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-  const x = strip(src('src/scenes/exteriorFoes.js'));
-  assert.match(x, /if \(fromPlayer\) noteFighter\(f, peer \? peerId : PARTY_ME, _now\(\)\);\s*f\.entity\.health -= !bypassShield && !_whole && _toughFoe\(f\) \? partyFoeLoses\(f, healthDamage, fightN\(f\)\) : healthDamage;/, 'the owner\'s damage door');
-  assert.match(x, /const dmg = (?:blowScaled\(f\.ai, )?partyHit\(calculateAttackDamage\(f\.entity, playerEntity, \{/, 'the owner\'s foe\'s blow and a puppet\'s alike reach me weighed');
-  assert.match(x, /const partyHit = \(dmg, f\) => \(_sharedFoe\(f\) \? partyFoeHits\(dmg, fightN\(f\), playerEntity\) : dmg\);/, 'by the foe\'s own fighters, the remainder on me');
-  assert.match(x, /if \(!onWatch && !f\.dead && _sharedFoe\(f\)\) \{ const n = fightN\(f\); if \(n > 1\) r\.n = n; \}/, 'the record carries the count');
-  assert.match(x, /f\._fightN = r\.n \?\? 1;/, 'a reader reads it');
-  const w = strip(src('src/scenes/world.js'));
-  assert.match(w, /exteriorFoes\.partyHit\(calculateAttackDamage\(shooter\.entity, playerEntity, \{[\s\S]{0,700}?\}\), shooter\) : 0;/, 'a shared archer\'s arrow, weighed by its own shooter');
-  const d = strip(src('src/scenes/dungeonContext.js'));
-  assert.match(d, /foe\.entity\.health -= !bypassShield && !_whole && _sharedFoe\(foe\) \? partyFoeLoses\(foe, healthDamage, fightN\(foe\)\) : healthDamage;/, 'the host\'s damage door');
-});

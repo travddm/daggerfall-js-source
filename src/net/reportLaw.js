@@ -1,5 +1,5 @@
 // @ts-check
-// PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client"): A
+// PRIVATE-REPORT: A
 // PLAYER'S PRIVATE REPORT TO THE DEVELOPERS - ITS LAW, the one file the service (server-account/src/reports.js) and the
 // client (net/privateReport.js, ui/enhanced/enhancedReport.js) both read.
 //

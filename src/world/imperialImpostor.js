@@ -1,5 +1,5 @@
 // @ts-check
-// IC-GRAND (bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY FROM AFAR: twenty kilometres of city outrun the
+// IC-GRAND (IC-GRAND) - THE IMPERIAL CITY FROM AFAR: twenty kilometres of city outrun the
 // stream (its land view a few pixels each way, the world's far plane 6 km), so from the city wall the White-Gold Tower,
 // 8.4 pixels off, stood nowhere. The city's silhouette stands where nothing of the stream does: one landmark a slice
 // handed to the far ring (render/farLandmarks.js FAR-LANDMARK, stream B's hook - its pass draws it in its painter's order,

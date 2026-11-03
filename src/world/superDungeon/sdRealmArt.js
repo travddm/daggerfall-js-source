@@ -1,10 +1,10 @@
 // @ts-check
-// SD5a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7): THE SHATTERED HOUR'S ART -
+// SD5a: THE SHATTERED HOUR'S ART -
 // the textures its floors wear (pseudo-archive SD_REALM_ARCHIVE, world/superDungeon/sdRealm.js), made here in code as the court's are
 // (world/gate/gateArt.js): nothing ships, the same pixels every boot. Each `{ albedo, emission }`, the renderer's color32 shape
 // (RGBA rows), the emission its own light.
 //
-// SD-LOOK (2026-10-08; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): REPAINTED through the Hour's paint box
+// SD-LOOK: REPAINTED through the Hour's paint box
 // (world/superDungeon/sdPixelKit.js) from its ramps (world/superDungeon/sdLook.js SD_RAMP), in Daggerfall's own pixel art: 1-px bevels lit from the
 // top-left, dark joints, ordered dither between a ramp's steps and every texel forced into the ramps at the end. Stone
 // and metal are structure and do not glow - the brass joints that were the floors' neon grid (0.18 of their colour),

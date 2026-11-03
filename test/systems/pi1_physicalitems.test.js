@@ -1,8 +1,6 @@
-// PI1 (2026-10-07, Mac: "This is the next mod I would like to integrate (permission has been granted). This should work
-// for both morrowind and the sprite system, and should also included the rarity treatment (like we do for the world
-// boss)"): PHYSICAL ITEMS 0.1.29, by demifiend000 - a body's items thrown out round it, a shift-drop laid ahead of the
+// PI1: PHYSICAL ITEMS 0.1.29, by demifiend000 - a body's items thrown out round it, a shift-drop laid ahead of the
 // player, each item its own picture, taken on a press. The port's law is the shipped assembly's IL
-// (vendor/physical-items/il); every pin names the offsets it holds the port to (bible/06-Systems/Physical-Items.md).
+// (vendor/physical-items/il); every pin names the offsets it holds the port to.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -48,7 +46,7 @@ test('PI1 the record: the manifest verbatim, and every key the port reads restat
   const keys = MOD_SETTINGS[PHYSICAL_ITEMS_VENDOR].keys;
   const shipped = SHIPPED.Sections.filter((s) => s.Name !== 'Interaction').flatMap((s) => s.Keys.map((k) => [`${s.Name}.${k.Name}`, k]));
   assert.deepEqual(Object.keys(keys).filter((k) => k !== 'Enabled'), shipped.map(([n]) => n));
-  // PLAIN-TEXT (2026-10-19): the author's lines spoke of artwork dimensions, detection volumes and a slider's midpoint; each is said plainly for a player - their words, exactly
+  // PLAIN-TEXT: the author's lines spoke of artwork dimensions, detection volumes and a slider's midpoint; each is said plainly for a player - their words, exactly
   const PLAIN = {
     'Enemy Loot.Physical Enemy Drops': 'Shows a fallen enemy’s loot on the ground around it, for the kinds of item turned on below. What the body holds stays the same.',
     'Enemy Loot.Impulse Strength': 'How hard a fallen enemy’s loot is thrown out, in percent. 400 is twice the default, and at 0 the items just fall. Your own throws are not affected.',

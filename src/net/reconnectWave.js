@@ -1,6 +1,5 @@
 // @ts-check
-// SCALE2c (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE2c): A RELAY DEPLOY'S RECONNECT, SPREAD BY THE ROOM'S
+// SCALE2c: A RELAY DEPLOY'S RECONNECT, SPREAD BY THE ROOM'S
 // OWN COUNT. A relay deploy closes every socket of every player at once, and each page's first retry was uniform over
 // [1 s, 2 s] - so every player online asked the account service for a token inside the same second or two. #755's own
 // deploy measured what that does at about 500 online: the one D1 primary overloaded 23 s in (SCALE4e). A page that sees

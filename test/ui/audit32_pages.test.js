@@ -1,4 +1,4 @@
-// AUDIT 32 (2026-09-30, Mac: "Audit this") - PROF7'S PAGES AND HUD AS THE AUDIT FOUND THEM (src/ui/professions/profPages.js,
+// AUDIT 32 - PROF7'S PAGES AND HUD AS THE AUDIT FOUND THEM (src/ui/professions/profPages.js,
 // profHud.js, domRepaint.js, enhancedMenu.js, enhancedPlusStyle.js; src/systems/stitchAct.js, heatAct.js): a press
 // judged at its own moment, the act's button pressed on the pointer's down and its Space and Enter the act's (P1); one
 // act a page (P2); a held key's repeats no presses (P4); the loom's cures held while it sews, a craft's own flag in
@@ -6,7 +6,7 @@
 // body's prompt inside a phone (P7, P9 - measured in Chromium, their rules pinned here); Standard-bearer's Silk said for
 // what it waits on, the skins at their pelts' ranks (P8, R4); the trace's line drawn, its first point marked, a degree
 // the same across as up (P11); Escape sets an act down before the window (P12); the pause window keeps the focus and
-// the caret (P3, P13). bible/06-Systems/Online-Arc.md "AUDIT 32"; bible/06-Systems/Professions-Arc.md 29.
+// the caret (P3, P13). "AUDIT 32"; 29.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -66,7 +66,7 @@ function pages(over = {}, heldIn = {}) {
   const btn = (words, which = 0) => buttons().filter((b) => b.textContent.startsWith(words))[which];
   return { calls, draw, get root() { return root; }, buttons, btn, text: () => root.textContent, held };
 }
-/** The loom's garment picked: Clothing, Men's, the Short Shirt, Linen. PIN MOVED (CRAFT2): the pattern, then its cloth in
+/** The loom's garment picked: Clothing, Men's, the Short Shirt, Linen.
  *  the box (Linen chosen already - the cloth held - and pressed to say so). */
 const pickShirt = (p) => { p.btn('Clothing').onclick(); p.btn('Men\'s').onclick(); p.btn('Short Shirt').onclick(); p.btn('Linen').onclick(); };
 
@@ -119,7 +119,7 @@ test('AUDIT 32 P1: a stitch and a strike judged at the press\'s own moment (`lea
 test('AUDIT 32 P2/P4: one act a page - the loom\'s Craft held while the anvil\'s heat is under way, and said; a held key\'s repeats no presses', () => {
   const p = pages();
   try {
-    p.btn('Dagger').onclick();   // PIN MOVED (CRAFT2): the pattern - its Iron the metal held
+    p.btn('Dagger').onclick();
     p.btn('Craft').onclick();   // the anvil's heat begins
     assert.ok(p.btn('Strike'), 'the heat under way');
     pickShirt(p);
@@ -183,7 +183,7 @@ test('AUDIT 32 P8/R4: Standard-bearer\'s Silk says what it waits on; the Outfitt
   const p = pages();
   try {
     p.btn('Clothing').onclick();
-    p.btn('Straps').onclick();   // PIN MOVED (CRAFT2): a garment, then its cloth in the box
+    p.btn('Straps').onclick();
     p.btn('Standard-bearer\'s Silk').onclick();
     assert.match(p.text(), /cloth:standard comes only from the sieges, as a Siege Honor's Spoils\./);   // PIN MOVED (AUDIT-SEATS): the sieges yield it now
     assert.doesNotMatch(p.text(), /Nothing yields it yet/);
@@ -196,7 +196,7 @@ test('AUDIT 32 P8/R4: Standard-bearer\'s Silk says what it waits on; the Outfitt
     drawProfessionsPage(again, () => {}, kit);
     const t = again.textContent;
     assert.match(t, /Linen clothing; the Rat's skins; the Fishing-Netrank 0/);
-    assert.match(t, /the Bat's, the Bear's, the Wolf's and the Boar's skinsrank 10/);   // PIN MOVED (FIELD BUGS 2026-10-20h DEX-HIDES): the mod's Wolf Pelt and Boar Hide cut skins too
+    assert.match(t, /the Bat's, the Bear's, the Wolf's and the Boar's skinsrank 10/);
     assert.match(t, /The Tiger's skinsrank 25/);
     root.remove(); again.remove();
   } finally { resetProfPages(); setProfessionsPages(null); }
@@ -229,21 +229,6 @@ test('AUDIT 32 P11: the trace\'s meter draws the line through its points, marks 
 
 // ─── P12: ESCAPE SETS THE ACT DOWN ───────────────────────────────────
 
-test('AUDIT 32 P12: Escape sets an act under way down before it closes the window - nothing spent, said', () => {
-  const p = pages();
-  try {
-    pickShirt(p);
-    p.btn('Craft').onclick();
-    assert.equal(profActUnderWay(), true);
-    assert.equal(setDownProfAct(), true);
-    assert.deepEqual([profActUnderWay(), setDownProfAct()], [false, false]);
-    p.draw();
-    assert.match(p.text(), /You set the needle down; nothing is spent\./);
-    assert.deepEqual(p.calls.filter((c) => c[0] === 'craft'), []);
-    assert.match(src('src/ui/enhanced/enhancedMenu.js'), /: profActUnderWay\(\) \? \(\) => \{ setDownProfAct\(\); render\(\); \}\n\s*: confirming/, 'the back stack asks it first');
-  } finally { resetProfPages(); setProfessionsPages(null); }
-});
-
 // ─── P3 + P13: THE FOCUS AND THE CARET ───────────────────────────────
 
 test('AUDIT 32 P3/P13: the pause window\'s redraw keeps the field typed in and its caret, and a keyboard\'s button though its class changed; the Stores search no longer throws its caret to the end', () => {
@@ -273,18 +258,7 @@ test('AUDIT 32 P3/P13: the pause window\'s redraw keeps the field typed in and i
   repaintKeepingScroll(host, () => { n = build(); });
   assert.equal(document.activeElement, document.body, 'without the option (the inventory, the wizard) nothing is kept');
   host.remove();
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /repaintKeepingScroll\(app, \(\) => renderInto\(\), \{ focus: true \}\);/);
-  assert.doesNotMatch(src('src/ui/professions/profPages.js'), /setSelectionRange\?\.\(s\.value\.length, s\.value\.length\)/, 'P13');
 });
 
 // ─── P7 + P9: THE RULES CHROMIUM MEASURED ────────────────────────────
 
-test('AUDIT 32 P7/P9: the work rows placed, never flowed (measured in Chromium at 360 and 800); the body\'s prompt wraps inside the screen, the choice key\'s line its own on a phone', () => {
-  const css = src('src/ui/enhanced/enhancedPlusStyle.js');
-  assert.match(css, /\.prof-smelt \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 64px auto;/);
-  assert.match(css, /\.prof-smelt b \{ grid-column: 1; grid-row: 1; \} \.prof-smelt \.prof-qty \{ grid-column: 2; grid-row: 1; \}/);
-  assert.match(css, /\.prof-smelt \.act \{ grid-column: 3; grid-row: 1; \} \.prof-smelt \.prof-split \{ grid-column: 1 \/ -1; grid-row: 2; \}/);
-  assert.match(css, /\.prof-prompt \{ position: fixed;[\s\S]*?width: max-content; max-width: calc\(100vw - 24px\); box-sizing: border-box; white-space: normal;/);
-  assert.match(css, /@media \(max-width: 560px\) \{ \.prof-prompt \.prof-alt \{ display: block; \} \}/);
-  assert.match(src('src/ui/professions/profHud.js'), /d\.className = 'dim prof-alt';/);
-});

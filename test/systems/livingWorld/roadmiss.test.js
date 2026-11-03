@@ -1,4 +1,4 @@
-// ROADS-MISS (2026-10-13, a player's Firefox profile walking out of a house): a day whose roads' word is not ready yet
+// ROADS-MISS: a day whose roads' word is not ready yet
 // is asked of the host once a tick, not once for every resident the tick plans - and asked again the next tick.
 import test from 'node:test';
 import assert from 'node:assert/strict';

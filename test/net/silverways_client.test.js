@@ -1,4 +1,4 @@
-// SILVER-WAYS (2026-10-03, Mac: "Do it"): SILVER OUTSIDE THE CRAFTS, AS THE GAME SAYS IT - a counted claim's silver lines
+// SILVER-WAYS: SILVER OUTSIDE THE CRAFTS, AS THE GAME SAYS IT - a counted claim's silver lines
 // in the book's own words (net/marksBook.js claimLines: a raid's or a gate's strike, the day's cap named, a guild deed,
 // a contract's pay); the raid's and the gate's carriers saying every line (net/raid/raidClaims.js, net/gate/gateClaims.js); the
 // Work tab's guild contracts (ui/workTab.js: a card under its guild, what it pays, the posters told they are not paid,
@@ -47,11 +47,9 @@ test('SILVER-WAYS the lines: a counted claim says its strike, a guild deed it co
     'A deed for The Hound: three of its members fought together. 25 silver added to its treasury.',
     'The Silver Hand pays you 38 silver under its contract.',
   ]);
-  // PIN MOVED (EG-E1): the cap's lines name the Spire's Redoubts, which strike under it too - and a Redoubt's names the Redoubt
-  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'raid'), ['No silver for this town. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.']);
-  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'gate'), ['No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.']);
-  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'serpent'), ['No silver for this serpent. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.'], 'SERPENT-SET: a serpent\'s capped line names the serpent');
-  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'eg'), ['No silver for this Redoubt. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.'], 'EG-E1: a Redoubt\'s capped line names the Redoubt - PIN MOVED (STAR7): the cap names the fallen stars');
+  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'raid'), ['No silver for this town. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.']);
+  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'gate'), ['No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.']);
+  assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'serpent'), ['No silver for this serpent. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.'], 'SERPENT-SET: a serpent\'s capped line names the serpent');
   assert.deepEqual(b.claimLines({ marks: { struck: 0, balance: 150, why: 'cap' } }, 'star'), ['No silver for this star. You\'ve reached today\'s limit of 150 silver.'], 'STAR7: a held star\'s capped line names the star - PIN MOVED (AUDIT STAR W2): the cap\'s number handed to the language, no explaining');
   assert.deepEqual(b.claimLines({ marks: { struck: 50, balance: 50 }, deed: null }), ['50 silver added to your account. You now hold 50 silver.']);
   assert.deepEqual(b.claimLines({ recorded: true }), [], 'a service from before them');
@@ -59,7 +57,6 @@ test('SILVER-WAYS the lines: a counted claim says its strike, a guild deed it co
   assert.equal(b.state.balance, 50, 'the balance the last strike answered');
   b.claimLines({ marks: { struck: 30, balance: 80, combat: { earned: 130, max: 150 } } }, 'raid');
   assert.deepEqual([b.state.today.combat, b.state.today.combatMax], [130, 150], 'the day\'s combat silver as the strike said it');
-  assert.match(src('src/ui/enhanced/enhancedPorts.js'), /\['From gates, raids, serpents and the Spire today', `\$\{\(w\.hooks\.marks\.today\(\)\?\.combat \?\? 0\)\} of \$\{w\.hooks\.marks\.today\(\)\?\.combatMax \?\? MARKS_COMBAT\.perDay\}`\],/, 'the Bank\'s card says it (PIN MOVED, SERPENT-SET: the serpents\' under the same cap, named; PIN MOVED, EG-E1: and the Spire\'s Redoubts\')');
   assert.equal(MARKS_TEXT.contract(12, null), 'A guild pays you 12 silver under its contract.');
 });
 
@@ -157,7 +154,6 @@ test('SILVER-WAYS the Work tab\'s contracts: each a card under its guild - what 
   await ticks();
   const cards = byClass(host, 'notice-writ');
   assert.equal(cards.length, 2);
-  // PIN MOVED (BOARD-SIFT): the work ends soonest first - C2's two days before C1's five
   const [c2, c1] = cards;
   assert.match(c1.textContent, /Guild contractThe Silver Hand \[SH\] pays the defenders of Daggerfall's towns against raiders/);
   assert.match(c1.textContent, /40 silver each - 7 defenders left of 10/);
@@ -200,19 +196,5 @@ test('SILVER-WAYS the Work tab\'s contracts: each a card under its guild - what 
 test('SILVER-WAYS the Guild tab\'s treasury lines: a deed, a contract put up and what came home each in its own words, never a deposit; the service\'s kinds map to them (mutants: a kind left a deposit)', () => {
   assert.deepEqual([GUILD_MARKS_LEDGER_WORDS.deed, GUILD_MARKS_LEDGER_WORDS.contract, GUILD_MARKS_LEDGER_WORDS['contract-return']],
     ['completed a guild deed:', 'put up a contract of', 'came home with']);
-  const g = src('server-account/src/guilds.js');
-  assert.match(g, /'guild-withdraw': 'withdraw', heraldry: 'heraldry', 'guild-deed': 'deed', 'contract-escrow': 'contract', 'contract-return': 'contract-return',/);
-  assert.match(g, /kind: GUILD_MARKS_LINE_KIND\[l\.kind\] \?\? 'deposit'/);
 });
 
-test('SILVER-WAYS the world host by source: the raid claims say the book\'s silver lines; the gate claim carries the claiming character whether or not the scan found the region; a guild with a contract standing is kept from going (mutants: each seam)', () => {
-  const w = src('src/scenes/world.js');
-  // HAUL-CARDS (PIN MOVED): the silver as cards too (ui/haulCards.js claimHauls), the book's lines said as ever
-  assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'raid'\)\); return marksBook\?\.claimLines\(data, 'raid'\) \?\? null; \},/);
-  assert.match(w, /onMarks: \(marks, data\) => \{ showHaul\(claimHauls\(data \?\? \{ marks \}, 'gate'\)\); return marksBook\?\.claimLines\(data \?\? \{ marks \}, 'gate'\) \?\? null; \},/);
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the region its own word (scenes/gate/gateSeat.js gateSeatRegion - a lane past the Bay's its province's)
-  assert.match(w, /return region != null \? \{ region, character \} : character \? \{ character \} : null;/);
-  // PIN MOVED: AUDIT GUILD3 T1 - one list of holds, the gate's and the view's: a contract standing, or a closed one's escrow not yet home
-  assert.match(src('server-account/src/guilds.js'), /\['guild-contracts', \(\/\*\* @type \{string\} \*\/ p\) => `EXISTS \(SELECT 1 FROM guild_contracts WHERE guild_id = \$\{p\} AND state = 'open'\)`\]/);
-  assert.match(src('server-account/src/guilds.js'), /\['guild-writ-escrow', \(\/\*\* @type \{string\} \*\/ p\) => `EXISTS \(SELECT 1 FROM guild_contracts WHERE guild_id = \$\{p\} AND state IN \('filled', 'withdrawn', 'expired'\) AND \+returned = 0 AND escrow > 0\)`\]/);
-});

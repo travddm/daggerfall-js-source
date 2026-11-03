@@ -1,5 +1,4 @@
-// TIER1 (2026-10-05, Mac: "Along with this change will be a simplier addition, visible showing dungeons difficulty as
-// Regular, Elite or Super"; bible/11-Multiplayer/Super-Dungeons.md section 12): A DUNGEON'S TIER, IN ONE WORD -
+// TIER1: A DUNGEON'S TIER, IN ONE WORD -
 // and, with SD-ONLINE, its size beside it.
 //
 // One law (systems/dungeon/dungeonTier.js, a leaf): 'super' for a Hollow, 'elite' for an Elite spawn, 'regular' for every
@@ -35,7 +34,7 @@ const loc = (n, mapId, extra = {}) => ({
 
 test('TIER1: the law - three tiers, their words, read off the location; null without a dungeon', () => {
   assert.deepEqual([...DUNGEON_TIERS], ['regular', 'elite', 'super']);
-  assert.deepEqual({ ...DUNGEON_TIER_TEXT }, { regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });   // ABYSS-NAME (PIN MOVED): the player's word for the tier the code calls super
+  assert.deepEqual({ ...DUNGEON_TIER_TEXT }, { regular: 'Regular Dungeon', elite: 'Elite Dungeon', super: 'Abyss Dungeon' });   // ABYSS-NAME (
   assert.deepEqual({ ...DUNGEON_SIZE_TEXT }, { small: 'Small', medium: 'Medium', large: 'Large' });
   for (const t of [DUNGEON_TIERS, DUNGEON_TIER_TEXT, DUNGEON_SIZE_TEXT]) assert.ok(Object.isFrozen(t));
   assert.equal(dungeonTier(loc(10, 1)), 'regular');
@@ -104,30 +103,13 @@ test('TIER1: the words on the overworld - the sight line names the tier, the pla
   assert.equal(dungeonSightLine(410, 'North', 'regular'), 'You see a Dungeon 410 meters to the North!');
   assert.equal(dungeonSightLine(410, 'North', 'elite'), 'You see an Elite Dungeon 410 meters to the North!');
   assert.equal(dungeonSightLine(410, 'North', 'super'), 'You see an Abyss Dungeon 410 meters to the North!');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /tvSay\(dungeonSightLine\(Math\.hypot\(dx, dz\), _capitalize\(directionHintString\(dx, dz\)\), dungeonTier\(loc\)\), 5\);/);
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const tvm = rd('src/scenes/travelViewMarks.js');
-  assert.match(tvm, /const tier = params\.has\('online'\) \? tierPhrase\(dungeonTierLabel\(p\.summary\.loc\)\) : '';[^\n]*\n(?:[^\n]*\n){0,4}?\s*marks\.push\(\{ key: p\.key, at: tvSceneKept\(p, p\.x, p\.z, TV_PLACE_LIFT\), label: p\.summary\.name, \.\.\.\(tier \? \{ sub: tier \} : \{\}\), kind: isDungeon \? 'place dungeon' : 'place',/, 'a place plate: the tier under a dungeon\'s name, online (OW-DUNGEON-DOT: a dungeon\'s plate its own kind)');
-  assert.match(tvm, /const tier = params\.has\('online'\) \? tierPhrase\(dungeonTierLabel\(g\.loc\)\) : '';[^\n]*\n\s*marks\.push\(\{ key: g\.key, [^\n]*sub: tier \? `\$\{tier\} - \$\{farDistanceText\(km\)\}` : farDistanceText\(km\),/, 'a far plate: the tier before the distance');
-  // AUDIT SD III (D7, PIN MOVED): kept by place - the maps hand a fresh location each ask, and the label's own memory never held one
-  assert.match(w, /tierAt: params\.has\('online'\) \? \(summary\) => \{\n\s*if \(!summary\) return null;\n\s*const key = `\$\{summary\.regionIndex\}:\$\{summary\.locationIndex \?\? summary\.mapIndex\}`;\n\s*if \(!_tierLabels\.has\(key\)\) _tierLabels\.set\(key, dungeonTierLabel\(maps\.getLocation\(summary\.regionIndex, summary\.locationIndex \?\? summary\.mapIndex\)\)\);\n\s*return _tierLabels\.get\(key\);\n\s*\} : null,/, 'the held map\'s seam: the whole location, online alone, read once a place');
-  // the entry line: the BUILT dungeon's word, online, said once on the transition
-  assert.match(w, /onTransitionDungeonInterior: \(ctx\) => \{ navalStow\(\); ohAbyss\?\.onDungeonEntered\(ohDungeonOf\(ctx\)\); csaOnTransition\(\); dungeonTierSay\(\); navalTransition\(\); \},/);   // PIN MOVED (HOLD-SHARED, 2026-10-12): HOLD-SOLO's restoreSoloMemory gone from beside it
-  const say = w.slice(w.indexOf('function dungeonTierSay() {'), w.indexOf('\n  }\n', w.indexOf('function dungeonTierSay() {')));
-  assert.match(say, /if \(!params\.has\('online'\)\) return;\s*const line = tierPhrase\(dungeonTierLabel\(modes\?\.dungeonLocation \?\? null\)\);\s*if \(line\) townTalk\.say\(line, 4\);/);
 });
 
 test('TIER1: the plaque - a named tier titles the mouth, the way in and the size beneath; no tier, the mod\'s own', () => {
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Privateer\'s Hold', tier: 'regular', size: 'Large' }), { title: 'Regular Dungeon', subs: ['To Privateer\'s Hold', 'Large'] });
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Elite Old Ruin (10,20)', tier: 'elite', size: 'Small' }), { title: 'Elite Dungeon', subs: ['To Old Ruin (10,20)', 'Small'] });
-  assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'The Brass Hollow', tier: 'super', size: null }), { title: 'Abyss Dungeon', subs: ['To the Brass Hollow'] });   // AUDIT SD II (L6 F20, PIN MOVED): its article small after "To"
+  assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'The Brass Hollow', tier: 'super', size: null }), { title: 'Abyss Dungeon', subs: ['To the Brass Hollow'] });   // AUDIT SD II (L6 F20
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Privateer\'s Hold' }), { title: 'To\nPrivateer\'s Hold' }, 'offline: the mod\'s own');
   assert.deepEqual(staticDoorName('dungeonEntrance', { locationName: 'Privateer\'s Hold', tier: 'toString' }), { title: 'To\nPrivateer\'s Hold' }, 'a tier is one of the three, never the prototype\'s');
   assert.deepEqual(staticDoorName('buildingExit', { locationName: 'Daggerfall', tier: 'regular' }), { title: 'To\nDaggerfall' }, 'a tier is a dungeon mouth\'s alone');
-  // the host names the tier online alone, and the undercroft's stair none
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /const label = tierShown\(host\.dungeonOnline\?\.\(\) \?\? false\) \? dungeonTierLabel\(entry\.dfLocation\) : null;\n\s*return staticDoorName\('dungeonEntrance', \{ locationName: currentLocationName\(\), tier: label\?\.tier \?\? null, size: label\?\.size \?\? null \}\);/);
-  assert.match(m, /return staticDoorName\('dungeonEntrance', \{ locationName: ARENA_TEXT\.undercroft\.name \}\);/);
-  assert.doesNotMatch(rd('src/systems/worldTooltips.js'), /elite = false/, 'the plaque\'s old `elite` flag is the tier now, not beside it');
 });

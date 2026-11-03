@@ -1,5 +1,4 @@
-// OW-TOWN-WALK (2026-10-19, the owner: "When in a town, slow down overworld navigation and have it navigate properly on
-// town pathways instead of bumping into buildings"; bible/06-Systems/Travel-View.md OW-TOWN-WALK): THE TOWN THE
+// OW-TOWN-WALK: THE TOWN THE
 // TRAVELLER STANDS IN, AND ITS WAY - the streaming host's half of systems/travel/townWalk.js. A town's grid is the one
 // its townsfolk walk (scenes/pixelBuild.js builds a CityNavigation for every populated place - DFU's seven location
 // types - and keeps it on the pixel's `population`), in the LOCATION frame: from the location's origin (`locOrigin`,
@@ -30,8 +29,7 @@ import { capitalOnPixel } from '../world/tamrielCapitals.js';   // IC-PACE: the 
  *  City's own on every one of its slices (world/tamrielCapitals.js capitalOnPixel). */
 export const paceAt = (x, y) => (capitalOnPixel(x, y)?.cap.key === 'imperial-city' ? IMPERIAL_PACE_MAX : TOWN_PACE_MAX);
 
-/** IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
- *  Arena-Provinces.md IC-STUTTER): how many steps of a way's search (systems/travel/townWalk.js townWayCellsSteps: a few
+/** IC-STUTTER: how many steps of a way's search (systems/travel/townWalk.js townWayCellsSteps: a few
  *  thousand cells each) one ask walks - a way not found by then answers `pending` and is walked on at the next ask (the
  *  journey asks again every frame, systems/travel/travelOptions.js streetWait). A slice of the Imperial City is a grid of
  *  512 by 512 cells, and its way, asked at every slice a journey at x60 crosses, was 10-200 ms of one task. */

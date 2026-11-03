@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SCALE4c (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's "one heartbeat replacing the mail, beat and board
-// polls", bible/11-Multiplayer/Scale-Arc.md): A TAB'S THREE CLOCKS, ONE REQUEST.
+// SCALE4c: A TAB'S THREE CLOCKS, ONE REQUEST.
 //
 // A tab at play asked the account service on three clocks of its own - the play beat every PLAY_BEAT_S (net/playClock.js),
 // the letterbox every MAIL_POLL_MS (net/mail.js), and the board of the town it stands in every BOARD_CACHE_MS (net/

@@ -1,4 +1,4 @@
-// GRANT3 (2026-10-18, Mac: "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections 4.3, 4.8 and 13): THE ASKS
+// GRANT3: THE ASKS
 // PAST THE MINT - a renewal, a free, a carry into another cell, a member handed on, a reader's tally - their law (net/
 // grantLaw.js) and the relay's answer over real Rooms (test/fakeRoom.mjs): each grant signed again only for its own
 // socket, a carry only of this relay's own signature, an heir only to a socket in the cell, a tally folded into the
@@ -58,7 +58,7 @@ test('GRANT3 THE ASKS\' LAW: a renewal and a carry only signed grants (AUDIT GRA
   assert.equal(validGrantAsk({ k: 'carry', id: 1, grs: [S] }).grs[0].sg, sg);
   assert.deepEqual(validGrantAsk({ k: 'heir', id: 2, hs: [hand({ ...S, h: 1 }, 1), hand(S, 2, 'sock-zed-01')] })?.hs.map((x) => [x.i, x.to]), [[1, 'sock-ann-01'], [2, 'sock-zed-01']], 'a handed grant handed on again, its own member; two heirs in one ask');
   assert.deepEqual(validGrantAsk({ k: 'tally', id: 3, rows: [{ o: 'sock-ann-01', r: 'marks', n: 2, x: 1 }] }), { k: 'tally', id: 3, rows: [{ o: 'sock-ann-01', r: 'marks', n: 2 }] });
-  assert.deepEqual(GRANT_READER_REFUSALS, ['unsigned', 'sender', 'cell', 'expired', 'member', 'marks', 'dice', 'twice', 'ungranted', 'stats']);   // PIN MOVED (FOE-BOUNDS, Spawn-Grants section 19): `stats`, a record whose health no builder could give it
+  assert.deepEqual(GRANT_READER_REFUSALS, ['unsigned', 'sender', 'cell', 'expired', 'member', 'marks', 'dice', 'twice', 'ungranted', 'stats']);
   assert.deepEqual(validGrantOut({ k: 'carry', id: 4, grs: [S, null] }).grs.map((g) => g && g.g), [41, null]);
   assert.equal(validGrantOut({ k: 'renew', id: 4, grs: [{ g: 1 }] }), null);
   assert.equal(validGrantOut({ k: 'heir', id: 4, gr: S }).gr.g, 41);
@@ -163,7 +163,6 @@ test('GRANT3 A READER\'S TALLY: folded into the cell\'s window under the reader\
   assert.deepEqual([...c0.room._grants.w.tallies.values()], [{ a: 'acct-sock-ann-01', b: 'acct-sock-mac-01', r: 'marks', n: 4 }], 'a sender here alone, never the reader itself; one tally a window');
   W.tick(GRANT_TALLY_MS);
   await ann.ask({ k: 'tally', rows: [{ o: 'sock-mac-01', r: 'unsigned', n: 1 }] });
-  // PIN MOVED (GRANT-SLEEP, bible/11-Multiplayer/Spawn-Grants.md section 22): the window GRANT_MEASURE_MS old, the
   // fold that finds it so posts it - no timer does
   for (let i = 0; i < 200 && !W.posts.length; i++) await new Promise((r) => setImmediate(r));
   assert.equal(W.posts.length, 1, 'the next window\'s tally folded, and the window posted by that fold');

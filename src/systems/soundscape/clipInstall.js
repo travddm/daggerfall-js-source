@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT SOUNDSCAPE S7 + H2 + H6 (2026-10-24): THE PORT'S CLIPS, LOADED - one loader for the soundscape's (soundscapeSfx.js)
+// AUDIT SOUNDSCAPE S7 + H2 + H6: THE PORT'S CLIPS, LOADED - one loader for the soundscape's (soundscapeSfx.js)
 // and the horse's (systems/horse/horseVoice.js), where each had its own and each was wrong a different way: the
 // soundscape's asked once and a first load that failed left every slap, creak and gull silent for the session; the
 // horse's asked again every 2 s for as long as the game ran - 450 requests a minute for a file the server refused - from

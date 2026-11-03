@@ -1,7 +1,6 @@
 // @ts-check
-// STAR7 (2026-10-20): THE STAR RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the stars held as the cards say them.
+// STAR7: THE STAR RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the stars held as the cards say them.
 // The sea serpent's carrier (net/serpent/serpentClaims.js), rung for rung, on its own key and its own route. Design:
-// bible/11-Multiplayer/Starfall.md section 6.
 //
 // THE RELAY SIGNS, THE ACCOUNT SERVICE COUNTS AND PAYS, THIS FILE CARRIES. A receipt a star's cell hands this socket at the
 // master's fall (or the hub again at the next hello) is kept on the device (STAR_CLAIMS_KEY) WITH THE CHARACTER THAT HELD

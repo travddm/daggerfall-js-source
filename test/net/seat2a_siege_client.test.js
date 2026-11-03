@@ -1,7 +1,7 @@
-// SEAT2a part three (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE LAW
+// SEAT2a part three: THE LAW
 // THE SERVICE AND THE CLIENT SHARE OF A BATTLE'S END - the field settled from the fighters' games, the pass's door and
 // window, the winner, what the Turning remembers, Honours and the Spoils, the Chronicle's rows, the refusals in words, and
-// the book's two calls. bible/11-Multiplayer/Seats-Arc.md 6.2, 6.5-6.8; `06-Systems/Online-Arc.md` SEAT2a (part three).
+// the book's two calls. 6.2, 6.5-6.8; `06-Systems/Online-Arc.md` SEAT2a (part three).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -57,7 +57,7 @@ test('SEAT2a part three THE WINNER AND THE AFTERMATH: a taken seat the attackers
 
 test('SEAT2a part three HONOURS AND THE SPOILS: 50 Marks and 2,000 Renown XP to the winners, 25 and 1,000 to the losers; a fighter\'s roll its own and the same however asked, between the ingot and the silk (the Siege-cracked Gem waits for its template); the Chronicle\'s rows; the refusals in the board\'s words (mutants: the sizes; the roll; the rows; the words)', () => {
   assert.deepEqual(SIEGE_HONOURS, { win: { marks: 50, xp: 2000 }, lose: { marks: 25, xp: 1000 } });
-  assert.deepEqual([...SIEGE_SPOILS], ['ingot:warforged', STANDARD_SILK.key, 'gem:siege']);   // PIN MOVED (AUDIT-SEATS): the Siege-cracked Gem has its template (678)
+  assert.deepEqual([...SIEGE_SPOILS], ['ingot:warforged', STANDARD_SILK.key, 'gem:siege']);
   const rolls = new Set();
   for (let i = 0; i < 40; i++) rolls.add(spoilsOf(20, 3021, `acct-${i}`));
   assert.deepEqual([...rolls].sort(), [...SIEGE_SPOILS].sort(), 'all three fall');

@@ -1,4 +1,4 @@
-// RARE-BREAK1 (2026-09-25): THE LADDER'S ROLLED TIERS, AS A LEAF.
+// RARE-BREAK1: THE LADDER'S ROLLED TIERS, AS A LEAF.
 //
 // The rarity ladder (systems/loot/lootRarity.js, LR1) stamps a piece that rolled a tier with
 // `item.rarity` - one of these three. The names live here, alone, so a reader that must not

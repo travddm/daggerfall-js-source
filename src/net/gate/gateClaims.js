@@ -1,7 +1,6 @@
 // @ts-check
-// WB5b (2026-09-25, Mac, Option B: the relay "issues a signed kill record the account service honours"): THE RECEIPTS
+// WB5b: THE RECEIPTS
 // THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the gates closed as the cards say them. Design:
-// bible/11-Multiplayer/World-Bosses.md section 6.
 //
 // THE RELAY SIGNS, THE ACCOUNT SERVICE COUNTS, THIS FILE CARRIES. A receipt the relay hands this socket
 // (net/gate/gateLink.js `onReceipt` - the same one again after a reconnect, and from the hub) is kept on the device

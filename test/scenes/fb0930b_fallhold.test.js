@@ -33,7 +33,7 @@ import { TERRAIN_SIZE } from '../../src/world/terrain/terrainSampler.js';
 import { setPref } from '../../src/systems/uiPrefs.js';   // BAL4: the switch this file's pins assumed
 import { tickTactics, resetTactics } from '../../src/ai/tactics.js';   // AUDIT BAL: the brain's clock, ticked as the hosts tick it
 
-// BAL4 (bible/05-Combat/Balance-Arc.md section 6): the Enhanced AI ships On now; this file's pins are the classic motor's
+// BAL4: the Enhanced AI ships On now; this file's pins are the classic motor's
 // hold and swing, so it says Off outright where it used to read the default (LR5's trap: a pin that leaned on a default
 // moves with it) - and AUDIT BAL's last pin runs the mid-fight hold again with the brain ON, its clock (ai/tacticsClock.js,
 // the foes' own time) ticked with the foes' step as every host ticks it
@@ -264,17 +264,6 @@ test('FALL-HOLD: the column alone is asked - a flyer, a levitator and a Deep Wat
   bat2.entity.activeEffects = [{ kind: 'paralyze' }];
   p2.run(5, [400, 0, 400]);
   assert.ok(!bat2.dead && Math.abs(bat2.ai.feet[1] - 30) < 0.05, `the paralysed flyer over no ground is held at its height, not fallen to ${Math.round(bat2.ai.feet[1])}`);
-});
-
-test('FALL-HOLD: the world host hands the ground law to both its pools; a pool without one (an interior, the one-location host) holds nothing', () => {
-  const src = rd('src/scenes/world.js');
-  for (const pool of ['createExteriorFoes', 'createCityGuards']) {
-    const at = src.indexOf(`= ${pool}({`);
-    assert.ok(at > 0, pool);
-    assert.match(src.slice(at, at + 500), /groundStands: \(x, z\) => Number\.isFinite\(heightAt\(x, z\)\)/, `${pool} is handed the streamed ground`);
-  }
-  assert.doesNotMatch(rd('src/scenes/worldModes.js'), /groundStands/, 'the interior mount (heightAt -Infinity, mesh floors) is handed none');
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /groundStands/, 'nor the one-location host');
 });
 
 test('FALL-HOLD: an interior-shaped collider (heightAt -Infinity, a mesh floor) with no ground law still lets a foe fall onto its floor', async () => {

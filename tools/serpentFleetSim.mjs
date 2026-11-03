@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-// AUDIT SHIPS (2026-10-06, Mac: "Audit everything", of PR #634's SAIL-FREE + SERPENT3): THE SERPENT'S FIGHT, SIMULATED
+// AUDIT SHIPS: THE SERPENT'S FIGHT, SIMULATED
 // AGAINST THE RELAY'S OWN BRAIN - a fleet of galleons circling its waters and firing, every attack word judged on each
 // ship by the struck machine's own law (systems/serpent/serpentStrike.js shapeMeets and shipHurt, the coil held, gripped and
 // crushed or broken, a wreck retiring her share), the pair's share read off the brain's own count as a client reads it.
-// SERPENT3's balance figures (bible/11-Multiplayer/Sea-Serpent.md sections 5 and 15) were measured with a scratch copy of
+// SERPENT3's balance figures were measured with a scratch copy of
 // this harness that never reached the tree, at 8 and 13 m/s - below the ways SAIL-FREE gives a ship circling under full
 // sail (0.819 of her best: a galleon 13.3 m/s at the rated wind and 17.7 at 2 m/s, a Carrack 15.9 and 21.2), where its
 // lone galleon won (AUDIT SHIPS A1). The harness is the tree's now, so every figure the record quotes is a command away.
-// AUDIT SHIPS 2 XD2 (2026-10-06): each fleet flies its own hull - her hull and canvas, her length and beam as the strike
+// AUDIT SHIPS 2 XD2: each fleet flies its own hull - her hull and canvas, her length and beam as the strike
 // tests her, her reference broadside (navalShips.js hullBuild, serpentBrain.js SHIP_REF) - and each ship carries her own
 // remainder of the pair's share blow to blow, as her client does (AUDIT SHIPS C3). Every fleet flew a galleon's body, so
 // the record's "Carrack" figures were a galleon at a Carrack's way.
@@ -20,7 +20,7 @@
 //
 // `--hit` is the share of a ship's reference broadside that strikes (the audit's measured gunnery is 0.38); `--v` the
 // way she circles at (m/s), slowed as her canvas is torn. Each fight is seeded, so a run is the same run every time.
-// AUDIT SHIPS 2 XB3 (2026-10-06): `--react <ms>` gives her A HELM - a heading turned at most `--turn` deg/s (8.5, the
+// AUDIT SHIPS 2 XB3: `--react <ms>` gives her A HELM - a heading turned at most `--turn` deg/s (8.5, the
 // record's rudder at full way), her round sailed as the circling ships sail it, and every mark drawn at her (named hers,
 // or its shape within 90 m of her) answered `react` ms after its word by steering away from it until it lands - the
 // telegraph's use; `--lag <ms>` hands the brain her pose as it was that long ago. Circling ships never answer a mark,

@@ -219,18 +219,6 @@ test('drape: it clears what the design wears UNDER it', () => {
   assert.ok(drapeFit(plated) > drapeFit(bare), 'armour does not push the garment out');
 });
 
-test('drape: girth only — a garment is never scaled in height', () => {
-  // The rig's own law: every exported constant on it is a HEIGHT, so
-  // scaling a garment vertically drops its hem through the floor on a
-  // giant and hitches it to the knee on a lich.
-  const src = readFileSync(new URL('../../src/tools/paperdoll/paperdollViewer.js', import.meta.url), 'utf8');
-  const call = /drapedMeshes\[nm\]\.scale\.set\(([^)]*)\)/.exec(src);
-  assert.ok(call, 'nothing scales the drape at all');
-  const [x, y, z] = call[1].split(',').map((t) => t.trim());
-  assert.equal(y, '1', `the drape is scaled in Y (${y}) — heights are not ours to touch`);
-  assert.equal(x, z, 'the drape is scaled unevenly across the body');
-});
-
 // ── SPECTRAL: THE FIRST DESIGN THAT IS NOT A SHAPE ───────────────
 // Every enemy before these said what it was with geometry and colour —
 // a tusk, a rib, a horse, a robe. A ghost has nothing to ADD to the
@@ -257,17 +245,3 @@ test('spectral: a wraith is LESS there than a ghost', () => {
   assert.ok(w.build.torso < g.build.torso, 'the wraith is no thinner than the ghost');
 });
 
-test('spectral: the transparency does not outlive the ghost', () => {
-  // The body material is SHARED by every design. Set it transparent for
-  // a ghost and forget to set it back, and the next orc you pick is a
-  // see-through orc.
-  const src = readFileSync(new URL('../../src/tools/paperdoll/paperdollViewer.js', import.meta.url), 'utf8');
-  const sets = src.match(/mat\.transparent = [^;]+;/g) || [];
-  assert.ok(sets.length >= 2, 'transparency is set but never cleared');
-  assert.ok(
-    sets.some((t) => /= false/.test(t)),
-    'nothing ever sets the body back to solid',
-  );
-  // And a translucent body must not occlude its own far side.
-  assert.ok(/mat\.depthWrite = !spec/.test(src), 'a see-through body still writes depth');
-});

@@ -1,4 +1,4 @@
-// AUDIT RELEASE R4-4 (bible/01-Overview/audits/Audit-Release-R4.md; the owner: "Take care of exclusions and gaps"): the
+// AUDIT RELEASE R4-4 (): the
 // boot's continent - the trace, its relief and the Bay's fit - kept in IndexedDB under its inputs' print, so a returning
 // boot takes them (world/tamriel/tamrielBootCache.js, ui/tamrielTrace.js preloadTamrielTrace, tamrielLand.js
 // fitBayToPicture). A record that does not answer to its key, sizes or checksum is none; no store, the boot as before;

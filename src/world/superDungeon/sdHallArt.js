@@ -1,11 +1,11 @@
 // @ts-check
-// SD6c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 8): THE ORRERY'S ART - what
+// SD6c: THE ORRERY'S ART - what
 // the hall's stones, lecterns and lights wear (the realm's own pseudo-archive, world/superDungeon/sdRealm.js SD_REALM_ARCHIVE, records
 // 5 to 20, after the Hour's five), made here in code as the Hour's are (world/superDungeon/sdRealmArt.js): nothing ships, the same
 // pixels every boot. Each `{ albedo, emission }` in the renderer's color32 shape - RGBA rows, row 0 the texture's v 0, the
 // BOTTOM of a face as world/superDungeon/sdHall.js lays it, so every picture here is drawn with y up.
 //
-// SD-LOOK S10 (2026-10-09; bible/11-Multiplayer/Super-Dungeons-Look.md section 7): REPAINTED through the Hour's paint box
+// SD-LOOK S10: REPAINTED through the Hour's paint box
 // (world/superDungeon/sdPixelKit.js) from its ramps (world/superDungeon/sdLook.js SD_RAMP) - and the hall's sixteen pictures are ONE ATLAS now
 // (SD_HALL_ATLAS, 256 x 256): the stones' dressed basalt and their plinths, each Ending's heraldry in relief (SD_SIGNS,
 // the signs unchanged - brass, the Underking's crown in bone), six banners in their kingdoms' colours, the lecterns' open

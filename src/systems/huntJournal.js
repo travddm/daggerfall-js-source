@@ -1,5 +1,5 @@
 // @ts-check
-// RVN7c (bible/12-Enhanced-AI/Feud-Arc.md 18.3): A REVENANT'S HUNT IN THE QUEST LOG, AND ITS ONE PRESS THERE.
+// RVN7c (18.3): A REVENANT'S HUNT IN THE QUEST LOG, AND ITS ONE PRESS THERE.
 //
 // A revenant whose lair the player has heard of rides the quest log every journal face reads (scenes/quest/questBridge.js
 // questLog, wrapped by the world host - scenes/world.js) as an active side quest whose id is `hunt:<revenant id>` -

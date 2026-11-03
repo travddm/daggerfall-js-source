@@ -1,7 +1,5 @@
 // @ts-check
-// ARENA4b (2026-10-03, the audit of ARENA4 against bible/11-Multiplayer/Arena.md 2 - "Exhibition - online: yes - the
-// relay runs it, every client sees one bout"; the ARENA2 record - "ARENA4's relay runs the schedule on the shared
-// clock"): THE HOUR'S EXHIBITION AS LAW - the one home of the schedule the game runs offline (systems/arena/arenaLadder.js
+// ARENA4b: THE HOUR'S EXHIBITION AS LAW - the one home of the schedule the game runs offline (systems/arena/arenaLadder.js
 // re-exports it, so every reader there reads it as it always did) and the relay runs online (net/arena/arenaBrain.js openBout,
 // server/src/index.js `arena:x<hour>`): the hours, the window, the draw of the hour's pair, the bout's id.
 //

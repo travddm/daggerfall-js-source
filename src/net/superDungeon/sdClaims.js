@@ -1,5 +1,5 @@
 // @ts-check
-// SD9b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE HOUR'S RECEIPTS THIS
+// SD9b: THE HOUR'S RECEIPTS THIS
 // DEVICE CARRIES TO THE ACCOUNT SERVICE, and the Hours broken as the cards say them - the gate's book (net/gate/gateClaims.js)
 // rung for rung, without its rite or its embers.
 //
@@ -40,7 +40,7 @@ export const SD_CLAIM_TEXT = Object.freeze({
   guest: 'Hour not recorded. Add a username within a week to keep it.',
 });
 
-/** HONOUR-BANNER (2026-10-14, Mac: "The title/aura in the abyss dungeon should also have a loot popup"): the words
+/** HONOUR-BANNER: the words
  *  the Hour grants, in the vocabulary's spelling (net/identityToken.js TITLES / AURAS) - its popup's. */
 export const SD_HONOUR_KEYS = Object.freeze({ title: 'hourbreaker', aura: 'turninghour' });
 

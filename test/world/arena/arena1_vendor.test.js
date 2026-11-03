@@ -1,4 +1,4 @@
-// ARENA1 (2026-10-02): KAMER'S DAGGERFALL ARENA 1.0, AS THE PORT CARRIES IT (vendor/daggerfall-arena/). The files
+// ARENA1: KAMER'S DAGGERFALL ARENA 1.0, AS THE PORT CARRIES IT (vendor/daggerfall-arena/). The files
 // are the extraction tool's (tools/daggerfallArenaExtract.mjs; test/tooling/arena1_extract.test.js re-runs it on the bundle);
 // these pins hold what the files SAY - the manifest's words, the listing, no picture, the model's shape and table,
 // the block's contents and none of ZLNDFLAT's leftovers, the undercroft's 32 blocks - with no game data needed.

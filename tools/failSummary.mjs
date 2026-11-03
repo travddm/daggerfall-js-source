@@ -1,4 +1,4 @@
-// CI-FAST (2026-10-19, Mac: "Do both and whatever else could speed up everything"): THE FAILURES, NAMED WHERE THEY ARE
+// CI-FAST: THE FAILURES, NAMED WHERE THEY ARE
 // LOOKED FOR. A red shard's log was TAP from first to last: its tail said "# fail 2" and nothing else, and the failing
 // test stood somewhere in tens of thousands of lines - found only by running the shard again locally, ten minutes a
 // round. This is a second reporter beside the runner's own (tools/testShards.mjs runTests hands both to every runner):
@@ -9,7 +9,7 @@
 //   - on GitHub Actions, one `::error` annotation a failure (each on the check's own page, at its file and line), and
 //     the same list in the job's summary ($GITHUB_STEP_SUMMARY).
 // A run with no failure writes nothing. It changes no test and no verdict: the runner's exit status is its own.
-// CI-TIMES (2026-10-19): and where TEST_TIMES_RECORD names a file, it adds each file's wall time in this run to it
+// CI-TIMES: and where TEST_TIMES_RECORD names a file, it adds each file's wall time in this run to it
 // (tools/fileTimes.mjs) - a CI shard's record, the next run's balance.
 import { appendFileSync } from 'node:fs';
 import { relative } from 'node:path';

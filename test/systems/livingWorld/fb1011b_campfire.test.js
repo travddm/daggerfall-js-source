@@ -1,4 +1,4 @@
-// CAMP-FIRE (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; the Discord's "The Morrowind Model For a
+// CAMP-FIRE (FIELD BUGS 2026-10-11b,; the Discord's "The Morrowind Model For a
 // Caravan Campfire is a Dead Dude"): a road camp's fire is its flame, never one of the fallen. The roads' layer hands the
 // sprites its camp's fire as a still flat nobody talks to (LW9) - the shape MWNPC10c reads as the fallen - so with the
 // Morrowind bodies on, the fire stood as a dead Breton and its flame drew its shadow alone. The fire says it is nobody's

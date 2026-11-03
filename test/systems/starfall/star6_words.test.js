@@ -1,4 +1,4 @@
-// STAR6 (bible/11-Multiplayer/Starfall.md section 8): WHAT A PLAYER SEES AND HEARS SAID - every line the Starfall says
+// STAR6: WHAT A PLAYER SEES AND HEARS SAID - every line the Starfall says
 // held to WB13b's style; the tracker's reading through a star's life; the map's cards; the Timers window's rows through
 // the window's own law; the master's bar on the gate's; and the tracker's plate, made once and written only where it
 // changed. tools/mutants/star6.json.
@@ -66,11 +66,11 @@ test('STAR6 THE STYLE, WB13b\'s law over every line: each a string with words in
     if (/\{|\}/.test(s)) bad.push(`${where}: an unfilled argument - ${s}`);
   }
   assert.deepEqual(bad, []);
-  // the shapes the design's table says (bible/11-Multiplayer/Starfall.md section 8)
+  // the shapes the design's table says
   assert.equal(STAR_REGION_TEXT.omen('Gothway Garden', 'The Daggerfall Witches'), 'A star is falling toward Gothway Garden. The Daggerfall Witches are at their rite.');
   assert.equal(STAR_REGION_TEXT.fell('Gothway Garden'), 'A star has fallen near Gothway Garden.');
   assert.equal(STAR_REGION_TEXT.held('Gothway Garden', ['Ann', 'Bran'], 4), 'The star near Gothway Garden is held by Ann, Bran and 2 others.');
-  assert.equal(STAR_MASTERS.mother.circle(), 'The Coven Mother calls her circle. Break it!');   // PIN MOVED (AUDIT STAR W1): the master's own line, never a name dropped into a shared one
+  assert.equal(STAR_MASTERS.mother.circle(), 'The Coven Mother calls her circle. Break it!');
   assert.equal(STAR_AT_TEXT.circleBroken(false), 'Its circle is broken.');
   assert.equal(STAR_CARD_TEXT.circle(2, true), '2 of her circle stand');
   assert.equal(STAR_CARD_TEXT.circle(1, false), '1 of its circle stands');
@@ -180,7 +180,6 @@ test('STAR6 THE TIMERS WINDOW\'S ROWS: a fallen star still undecided counts down
   assert.ok(!rows.some((r) => r.id === 'y'), 'only the star\'s kind');
   assert.equal(rows.findIndex((r) => r.id === `star:${N}.0`) < rows.findIndex((r) => !r.live), true, 'live first');
   assert.ok(TIMER_KINDS.includes('star'));
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.px-timerswin \.tm-star \{ --tm-kind: \$\{STAR_VIOLET_CSS\}; \}/);
 });
 
 test('STAR6 THE MASTER\'S BAR: the gate\'s bar in the star\'s theme - its name and title (the Heart-Star\'s its own), its health, its circle\'s two calls as marks spent as it falls past them, warded and the circle counted while it stands, the defenders; fallen, it holds and fades (mutants: the marks, the ward, the fade)', () => {
@@ -199,7 +198,6 @@ test('STAR6 THE MASTER\'S BAR: the gate\'s bar in the star\'s theme - its name a
   assert.equal(m.warded, true);
   assert.deepEqual([m.wardedText, m.fallenText], ['Warded', 'Felled'], 'AUDIT STAR U3: its own words, through the text core - the gate\'s were English alone');
   assert.deepEqual([m.wardedText, m.fallenText], [STAR_CARD_TEXT.warded(), STAR_CARD_TEXT.felled()]);
-  assert.match(read('src/ui/gate/gateBossBar.js'), /model\.warded \? model\.wardedText \?\? BOSS_BAR_TEXT\.warded/, 'the bar says the model\'s ward');
   assert.equal(m.host, '3 of her circle stand');
   assert.equal(m.fightersLine, '4 defenders');
   const open = starBarModel({ ...b, circle: 0 }, 0);
@@ -210,7 +208,6 @@ test('STAR6 THE MASTER\'S BAR: the gate\'s bar in the star\'s theme - its name a
   assert.equal(starBarModel({ ...b, fellAt: 1000 }, 1000 + STAR_BAR_FELL_HOLD_MS + STAR_BAR_FELL_FADE_MS / 2).alpha, 0.5);
   assert.equal(starBarModel({ ...b, fellAt: 1000 }, 1000 + STAR_BAR_FELL_HOLD_MS + STAR_BAR_FELL_FADE_MS).alpha, 0);
   assert.equal(starBarModel({ ...b, max: 0 }, 0).frac, 1);
-  assert.match(read('src/ui/gate/gateBossBar.js'), /\.wb-boss-bar\.star/, 'the bar dressed in the star\'s theme');
 });
 
 /** A page the tracker writes into: its nodes, their text and style, and how often each was written. */
@@ -241,7 +238,7 @@ test('STAR6 THE TRACKER\'S PLATE: made once, its parts in their order, each writ
   assert.equal(doc.body.children.length, 0, 'nothing made for nothing');
   drawStarTracker(model, { doc });
   const root = doc.body.children[0];
-  assert.equal(root.className, 'star-hud on');   // PIN MOVED (AUDIT STAR U1): `on` while it stands - the party list steps under it
+  assert.equal(root.className, 'star-hud on');
   assert.deepEqual(root.children.map((c) => c.className), ['star-hud-title', 'star-hud-near', 'star-hud-coven', 'star-hud-phase', 'star-hud-light', 'star-hud-left']);
   assert.deepEqual(STAR_TRACKER_KEYS.map((k) => root.children.find((c) => c.className === `star-hud-${k}`).textContent), [model.title, model.near, model.coven, model.phase, model.left]);
   const fill = all(root).find((n) => n.className === 'star-hud-fill');

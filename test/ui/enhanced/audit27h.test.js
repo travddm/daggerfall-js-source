@@ -1,7 +1,7 @@
-// AUDIT 27h (2026-09-28, Mac: "Lets audit before merging"): the 2026-09-27h Discord batch read again on the tree merged
+// AUDIT 27h: the 2026-09-27h Discord batch read again on the tree merged
 // with main (#412), five lanes - the F5 page's doors, the sea and the shield, the map and the list tile, ending a spell,
 // the spell maker's hold and field - every finding checked against the code (and the port's in Chromium) before it
-// moved. Recorded in bible/01-Overview/bugs/Field-Bugs-2026-09-27h.md ## AUDIT, with what stands and why.
+// moved. Recorded in ## AUDIT, with what stands and why.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -124,7 +124,6 @@ test('AUDIT 27h A4: a door that opened nothing RESUMES - the page gone and nothi
   // the Stats page's door, as written, over the pause door's own act law
   const menu = rd('src/ui/enhanced/enhancedMenu.js');
   const at = menu.indexOf('function pauseStats(body)');
-  // PIN MOVED (AUDIT SEASON-BOOK S3): the door through the menu's one handoff - and the pause door's close UNMOUNTS the face,
   // whose unmount empties `onAction`, as the real one does (this test's close had never unmounted, so a resume asked of
   // the emptied handler passed here and did nothing in play)
   const onclick = /b\.onclick = (\(\) => \{ handoff\(fn\); \});/.exec(menu.slice(at, menu.indexOf('\nfunction ', at + 10)));
@@ -155,14 +154,14 @@ test('AUDIT 27h S2: no way back from death comes up running - the Resurrect, the
   const w = rd('src/scenes/world.js');
   const rez = w.slice(w.indexOf('function resurrectInPlace(rez) {'), w.indexOf('function closeDeathScreen() {'));
   assert.match(rez, /^\s*player\.stopAutorun\(\);/m, 'a party member\'s Resurrect');
-  const load = w.slice(w.indexOf('async function worldQuickLoad('), w.indexOf('async function worldQuickLoad(') + 8000);   // PIN MOVED (DUPE-LOAD): 6000 -> 8000, the windows closed before the save is read stand above it now
+  const load = w.slice(w.indexOf('async function worldQuickLoad('), w.indexOf('async function worldQuickLoad(') + 8000);
   assert.match(load, /cameraRecoiler\.reset\(\);\n\s*resetVitalsDetector\(\);[^\n]*\n\s*player\.stopAutorun\(\);/, 'a load (F11 off the death screen) - the incoming character inherits no latch, as it inherits no reel');
   const m = rd('src/scenes/worldModes.js');
   assert.match(m, /player\.spawn\(spawn\[0\], spawn\[1\], spawn\[2\]\);\n\s*player\.stopAutorun\(\);/, 'the Privateer\'s Hold rise');
   // the dungeons' loads: each host's ONE load law (DIAL-LOAD - every load its context runs lands by it), RUN out of
   // the live source, where this pin used to count copies of an applier's text
   const placed = [];
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): worldModes' law lands a saved fall after the spawn - none is handed
+  // FALL-KEPT (FIELD BUGS 2026-09-30
   // here, and fb0930_fallkept.test.js runs it on the real motor.
   const motor = { spawn: (...p) => placed.push(['spawn', ...p]), stopAutorun: () => placed.push(['stop']), restoreFall: () => {} };
   constOf(m, 'placeLoadedPlayer', { player: motor })([1, 2, 3]);

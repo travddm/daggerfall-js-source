@@ -42,7 +42,7 @@ export function toColor32Order(image) {
 }
 
 /**
- * PERF-PEERS5 (2026-10-10): THE SAME ROWS REVERSED, IN THE RASTER'S OWN BYTES - for a caller that owns a raster no one
+ * PERF-PEERS5: THE SAME ROWS REVERSED, IN THE RASTER'S OWN BYTES - for a caller that owns a raster no one
  * else reads (a PNG it has just decoded and will only upload). toColor32Order's answer, byte for byte, without the
  * second raster a picture: one row of scratch, the rows swapped end for end.
  * @param {{width:number,height:number,data:Uint8Array}} image - its `data` is rewritten
@@ -78,8 +78,7 @@ export function toColor32(image) {
 }
 
 /**
- * HT3 (2026-09-15, Mac: "the player held torch mod shows the sprite
- * upside down when held") - THE SHAPE, WITH THE ROWS LEFT ALONE.
+ * HT3 - THE SHAPE, WITH THE ROWS LEFT ALONE.
  *
  * `toColor32` above is a FLIP, and a flip is right for a Unity texture
  * because Unity stores its rows bottom-up: flipped, row 0 becomes the
@@ -112,7 +111,7 @@ export function toScreenOrder(image) {
 }
 
 /**
- * BOOT2 (2026-09-20): THE THIRD DOOR, AND WHY IT IS HERE. A classic
+ * BOOT2: THE THIRD DOOR, AND WHY IT IS HERE. A classic
  * indexed bitmap (an IMG/CIF record + ART_PAL.COL) becomes color32 through
  * this - `{ width, height, colors }`, GetColor32's own shape and its own
  * `alphaIndex` parameter: classic IMG UI art keys index 0 transparent (the

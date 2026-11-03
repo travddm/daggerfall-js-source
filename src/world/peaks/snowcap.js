@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PEAKS1 (2026-10-26, the owner: "The world of daggerfall mountains need to be completely redesigned from the ground up
-// with more integration into the terrian, snow capped, and properly place throughout tamriel"; bible/03-World/Peaks.md) -
+// PEAKS1 -
 // THE SNOW THAT NEVER MELTS: the perennial snowline, a height in metres above the sea at every place, set by the land's
 // climate and, past the Bay, by its zone (world/tamriel/tamrielBiomes.js): low in Skyrim, the Jerall and the
 // Wrothgarians, higher in Cyrodiil's and Morrowind's uplands, none in the deserts, the jungles, the marshes and on Red

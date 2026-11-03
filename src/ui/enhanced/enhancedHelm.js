@@ -1,6 +1,5 @@
 // @ts-check
-// CSA-L - THE HELM PANEL (2026-09-28, the player's ask: "instead of an overuse of keybinds, is there a way we can
-// instead develop enhanced plus UI elements?"). Come Sail Away's helm is nine keys - the sails, the trim and its
+// CSA-L - THE HELM PANEL. Come Sail Away's helm is nine keys - the sails, the trim and its
 // modifier, the lanterns, the time scale's three and leaving - and a player at the wheel had to know every one of
 // them; a phone and a pad reached none (AUDIT PRE-MERGE 0928 U4). This is the helm on screen, in Enhanced Plus:
 //
@@ -21,7 +20,7 @@
 //
 // Enhanced Plus only: the classic skin keeps the mod's keys as the mod drew them (no panel of its own).
 // UPDATED, NOT REBUILT (the HUD's third law): the buttons are made again only when the set of them changes.
-// MOVABLE (HUD-HELM, 2026-10-15, Mac: "Yes, same branch" - the saddle panel's twin, HUD-SADDLE): the bar is a HUD-MOVE
+// MOVABLE (HUD-HELM, 2026-10-15, - the saddle panel's twin, HUD-SADDLE): the bar is a HUD-MOVE
 // piece (ui/hud/hudLayout.js HUD_PIECES 'helm') - moved, sized and turned off as every other piece is, placed where the
 // player put it the moment it is built (the leaf, ui/hud/hudPlacer.js), and stood as a preview while the HUD is unlocked and
 // nobody is at a helm (buildHelmPreview). The sea's target card stands under the bar wherever it is moved
@@ -148,7 +147,7 @@ export function helmButtons(h) {
 }
 /** The helm left - the mod's disembark (its key, the d-pad's down held). */
 const leaveButton = () => ({ act: 'leave', label: 'Leave the helm', kind: 'tap', action: A.disembark });
-/** The time dial's three. HELM-TIME-ONLINE (2026-10-04, Mac: "Remove the time dial from ships online"): only where it
+/** The time dial's three. HELM-TIME-ONLINE: only where it
  *  turns. @param {{ timeDial?: boolean, timeScale?: number, timeScaleIndex?: number, timeScaleMax?: number }} h */
 function dialButtons(h) {
   if (h.timeDial === false) return [];
@@ -387,12 +386,11 @@ export function buildHelmPreview(doc) {
 }
 
 /**
- * HELM-KEYS (2026-09-29, the player: "make the ship controls more intuitive instead of a bunch of buttons and key
- * binds"): the bar's line under its name - in irons, how she comes out (the key that strikes sail and the one that
+ * HELM-KEYS: the bar's line under its name - in irons, how she comes out (the key that strikes sail and the one that
  * rows - the mod's helm alone lies in irons, SAIL-FREE); else, on a keyboard, the helm's whole
  * hand at a glance - the sails on the arrows, the rudder on the turn keys - and while the look holds the mouse, how to
  * free it for the buttons. A finger reads the buttons themselves. Every key is the one bound now (`keyOf`); one bound
- * to nothing is left out. HELM-LADDER (2026-10-04): the hand is the ladder's now - W, S and the up and down arrows her
+ * to nothing is left out. HELM-LADDER: the hand is the ladder's now - W, S and the up and down arrows her
  * oars and her sails, A, D and the side arrows her rudder; in irons, one rung down strikes sail and puts her on her oars.
  * @param {any} h - helmPanelState() @param {{ touch?: boolean, mouseFree?: boolean, freeKey?: string, keyOf?: (a: string) => string }} state
  */
@@ -411,7 +409,7 @@ export function helmHint(h, state = {}) {
   return parts.filter(Boolean).join(' · ');
 }
 
-/** HELM-SPEED (2026-10-06, Mac: "add a speed indicator for when you're sailing"): knots in a metre a second. */
+/** HELM-SPEED: knots in a metre a second. */
 export const KNOTS_PER_MPS = 3600 / 1852;
 /** Her way (m/s, helmPanelState's `way`) as the helm reads it - in knots, to a tenth; '' with none known. */
 export const helmSpeedText = (way) => (Number.isFinite(way) ? `${(Math.max(0, way) * KNOTS_PER_MPS).toFixed(1)} knots` : '');

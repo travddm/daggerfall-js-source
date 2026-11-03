@@ -127,8 +127,7 @@ test('HELD-OUT holds only the counter\'s own player\'s goods, and never a Buy ba
 // RARE-KEPT - a private report: a two-handed Wyrmbane worn to nothing in a hard dungeon, and gone from the pack after.
 // Wyrmbane's own enchantment is DFU's Cast When Strikes (lootRarity.js LEGENDARIES), which bills
 // DURABILITY_LOSS_ON_STRIKE a blow through LowerCondition's collection arm - and that arm DESTROYS a broken enchanted piece
-// wherever Allow Magic Repairs is off (DaggerfallUnityItem.LowerCondition). RARE-BREAK1's law (the owner: "Rarity loot
-// breaks, not destroyed") held for the overhaul's fading alone. Driven through the real payload dispatcher over the
+// wherever Allow Magic Repairs is off (DaggerfallUnityItem.LowerCondition). RARE-BREAK1's law held for the overhaul's fading alone. Driven through the real payload dispatcher over the
 // ladder's own Wyrmbane on a Battle Axe, beside DFU's own magic axe (MAGIC.DEF's row, createRegularMagicItem), which keeps
 // DFU's law.
 

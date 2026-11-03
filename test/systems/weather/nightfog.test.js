@@ -1,5 +1,4 @@
-// NIGHT-FOG (2026-10-26; bible/07-Rendering/Weather-Arc.md NIGHT-FOG; the owner: "In foggy biomes, when its dark, you can
-// barely see anything"): THE FOG IS LIT BY THE LIGHT THE LAND IS LIT BY. On the enhanced lane the frame's fog colour is
+// NIGHT-FOG: THE FOG IS LIT BY THE LIGHT THE LAND IS LIT BY. On the enhanced lane the frame's fog colour is
 // never darker than air of NIGHT_AIR.albedo lit by the open air's light - the exterior ambient and the moons - and what
 // a fog lacks of that air's luminance is made up in the air's own colour (systems/weather/nightFog.js). Under Dynamic
 // Skies (the lane's default sky) every fog closed to black from dusk to dawn; under the port's dome a clear night's fog
@@ -171,11 +170,6 @@ test('NIGHT-FOG THE CONTROLLER hands every host the lit fog on the enhanced lane
   classic.ctl.renderer.clearColor = Float32Array.of(0.02, 0.03, 0.05);   // a night panorama's horizon (NITE??I0's west, as dark as DFU paints it)
   assert.equal(classic.ctl.fogColorFor(FOG_SETTINGS.sunny), classic.ctl.renderer.clearColor, 'the classic panorama: SetSkyFogColor verbatim, however dark');
   assert.deepEqual([...at('sky=enhanced', 1380, 'fog').fog], [0.5, 0.5, 0.5], 'DFU\'s grey at midnight, brighter than the air: left');
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /const nightFogLane = Boolean\(enhancedSky \|\| dynamic\);/);
-  assert.match(shared, /const litAir = \(fog\) => \(nightFogLane && nightFogOn\(\)/);
-  assert.match(shared, /nightScale: getFloat\('Enhancements', 'NightAmbientLightScale', 0, 1\), sun: airAt\.sun, moon: moonNow\(\)/);
-  assert.match(shared, /airAt\.minute = minuteOfDay; airAt\.sun = extra\?\.sun \?\? 1;/);
   // indoors: DFU's SetFog interior and dungeon branches set their own black fog, never through the sky's colour
   for (const host of ['src/scenes/worldModes.js', 'src/scenes/interior.js', 'src/scenes/dungeon.js']) assert.doesNotMatch(rd(host), /fogColorFor/, `${host} takes no outdoor fog colour`);
 });

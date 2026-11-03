@@ -1,12 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP1 (2026-10-07, Mac: "how could we split away from DFU, completely
-// overhaul the NPC guild system and reputation system"; "This is mostly
-// with online in mind"; his call, "Server-owned"; and on the rest, "You
-// make the best decisions") — THE ROLL: a realm character's standing with
+// CHAP1 — THE ROLL: a realm character's standing with
 // Daggerfall's own guilds, kept by the account service. The record is
-// bible/11-Multiplayer/Chapters-Arc.md, section 3 (CHAP0), and its audit
-// bible/01-Overview/audits/Audit-Chapters.md (AUDIT CHAP).
+// section 3 (CHAP0), and its audit
+// (AUDIT CHAP).
 //
 // WHAT IT HOLDS. A realm character's reputation with the twenty-two guild
 // factions - the four guilds, the eight temples, the ten knightly orders
@@ -34,18 +31,9 @@
 //     So the ceiling is a PACE: a lie is paid no faster than an honest
 //     claim, and an honest reward arrives whole.
 //   - A SEED, ONCE. The first contact carries the character's standing as
-//     its save holds it - the client's word, like every claim. A
-//     character brought in through customs from ROLL_EPOCH_S is seeded
-//     with each faction capped at ROLL_CUSTOMS_CAP (CALL 3) - except a
-//     guild it is a member of, which keeps what its rank needs
-//     (RANK_REQ_REPUTATION; AUDIT CHAP D1: a cap that demoted the member
-//     at its next review took the rank the arc promised it keeps) and the
-//     band above it up to its next rank's line (AUDIT CHAP2 D3: seeded on
-//     the line, DFU's own 112-day drift demoted it at the review after),
-//     never past ROLL_SEAT_LINE - 1 (CALL 3: the grind buys no seat - a
-//     rank 8 or 9 crossing keeps 79, E6). Every
-//     other realm character - born online, or brought in before the epoch
-//     - earned its standing online, and is seeded whole (C3).
+//     its save holds it - the client's word, like every claim. Every realm
+//     character is born online and earned its standing there, so it is
+//     seeded whole (C3).
 // A seat (CHAP4) is decided by witnessed Merit (Seats-Arc law 3); what a
 // claim can reach is the gate before it - a membership, its tenure, a
 // standing - each bounded here.
@@ -84,10 +72,6 @@ export const isRollFaction = (/** @type {unknown} */ id) => typeof id === 'numbe
 
 /** The most a faction's reputation may RISE, net, in one UTC day for one character - three quests at DFU's +5. */
 export const ROLL_GAIN_DAY_MAX = 15;
-/** A character brought in through customs from the epoch is seeded capped here: rank 4's need (RANK_REQ_REPUTATION). */
-export const ROLL_CUSTOMS_CAP = 40;
-/** CHAP1's arrival, 2026-10-08 00:00 UTC: a customs crossing before it is seeded whole. Never moved once shipped. */
-export const ROLL_EPOCH_S = 1_791_417_600;
 /** The largest change one faction's line of a claim may carry - the whole span. */
 export const ROLL_DELTA_MAX = MAX_REPUTATION - MIN_REPUTATION;
 /** A rank as the Roll records it: Guild.cs's ten rows, 0 to 9. */
@@ -126,14 +110,6 @@ export function rollRankCapOf(/** @type {unknown} */ rep) {
   return rank;
 }
 
-/** THE CAP A SEED IS TAKEN UNDER, from the realm character's own row: `origin` the offline id customs brought it from
- *  (null for one born online), `createdAt` when the realm made it. Only a customs crossing from the epoch is capped. */
-export function rollSeedCapOf(/** @type {{ origin?: unknown, createdAt?: unknown }} */ row) {
-  const crossed = typeof row?.origin === 'string' && row.origin !== '';
-  const at = row?.createdAt;
-  return crossed && !(typeof at === 'number' && Number.isSafeInteger(at) && at < ROLL_EPOCH_S) ? ROLL_CUSTOMS_CAP : MAX_REPUTATION;
-}
-
 /** A map a claim or a seed may carry: a plain object, every key one of the twenty-two (as its decimal), every value a
  *  safe integer `ok` accepts, at most twenty-two lines. */
 function factionMapOk(/** @type {unknown} */ v, /** @type {(n: number) => boolean} */ ok, min = 0) {
@@ -156,24 +132,11 @@ export const rollDeltasOk = (/** @type {unknown} */ v) => factionMapOk(v, (x) =>
 /** THE SEAT'S LINE: the reputation rank 8 needs - CHAP4's seats begin here, and nothing the Roll takes on a client's word
  *  alone carries a member past the line below it (CALL 3). */
 export const ROLL_SEAT_LINE = RANK_REQ_REPUTATION[8];
-/** What a member's rank keeps through the seed's cap (AUDIT CHAP D1, AUDIT CHAP2 D3): its rank's band up to the next
- *  rank's line, so DFU's own drift does not demote it at the review after - and never past the seat's line less one
- *  (AUDIT CHAP2 E6, Mac: "You can decide whatever is best"): a rank 8 or 9 crossing keeps 79 and is reviewed to rank 7,
- *  as section 3.5 holds everyone at CHAP4 - an offline grind buys no seat's reputation (CALL 3). */
-export function rollRankKeepOf(/** @type {unknown} */ rank) {
-  const r = Math.min(ROLL_RANK_MAX, Math.max(0, whole(rank)));
-  const top = r < ROLL_RANK_MAX ? RANK_REQ_REPUTATION[r + 1] - 1 : MAX_REPUTATION;
-  return Math.min(ROLL_SEAT_LINE - 1, Math.max(RANK_REQ_REPUTATION[r], top));
-}
-/** THE SEED: every one of the twenty-two, as the save held it, under `cap` - and a guild the character is a member of
- *  (`ranks`, faction -> rank) keeps what its rank keeps (rollRankKeepOf). */
-export function rollSeedOf(/** @type {Record<string, number>} */ values, cap = MAX_REPUTATION, /** @type {Map<number, number>} */ ranks = new Map()) {
+/** THE SEED: every one of the twenty-two, as the save held it, inside DFU's bounds. */
+export function rollSeedOf(/** @type {Record<string, number>} */ values) {
   /** @type {Record<number, number>} */
   const out = {};
-  for (const f of ROLL_FACTIONS) {
-    const need = ranks.has(f) ? rollRankKeepOf(ranks.get(f)) : MIN_REPUTATION;
-    out[f] = rollRep(values?.[f], Math.max(cap, need));
-  }
+  for (const f of ROLL_FACTIONS) out[f] = rollRep(values?.[f]);
   return out;
 }
 
@@ -471,7 +434,7 @@ export function receiptCreditsOf({ kind, id, day, members, chapters }) {
   return out;
 }
 
-/** GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): a duty in words. */
+/** GUILD3d: a duty in words. */
 const DUTY_WORDS = Object.freeze({ gate: 'hold a gate', raid: 'defend a raided town' });
 /**
  * GUILD3d: A CHAPTER'S DUTIES, the line its card on the board says - what its guild asks of its members in the region
@@ -574,7 +537,7 @@ export function parseHallReport(/** @type {unknown} */ text) {
   return h && hallReportText(h) === text ? h : null;
 }
 
-/** THE JOIN THE SERVICE RECORDS (AUDIT CHAP R1's line; Mac: "Approved"): a new membership only where the Roll's
+/** THE JOIN THE SERVICE RECORDS (AUDIT CHAP R1's line): a new membership only where the Roll's
  *  standing with the guild meets DFU's join (Guild.cs IsEligibleToJoin: rank 0's need, 0) - `rep` the reputation and
  *  what the Roll owes it (AUDIT CHAP2 S7: an initiation's own reward the day's pace cut is the Roll's already). AUDIT
  *  CHAP2 D2: the Thieves Guild and the Dark Brotherhood join by their initiation quests at ANY standing
@@ -690,7 +653,7 @@ export function strengthAfter(prev, merit, target) {
 /** A Season's end (Seats-Arc 9.1's soft reset): halfway back toward 50, rounded toward 50. */
 export const strengthSeasonEnd = (/** @type {number} */ s) => STRENGTH_START + Math.trunc((Number(s) - STRENGTH_START) / 2);
 /** THE BANDS (5.2's table), each from its floor: Failing 0-19, Steady 20-69, Thriving 70-89, Ascendant 90-100.
- *  GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md): Ascendant is its own - a fifth off, where it stood at Thriving's
+ *  GUILD3e: Ascendant is its own - a fifth off, where it stood at Thriving's
  *  tenth and the Season's Ascendancy event said the rest (the event folded into the band it repeated). */
 export const CHAPTER_BANDS = Object.freeze([
   Object.freeze({ band: 'failing', name: 'Failing', from: 0, price: 1.25, writs: 0.5, shelf: -4 }),
@@ -814,7 +777,7 @@ export const ROLL_BOOK_RANK_MAX = 7;
 export const rollBookRankOf = (/** @type {unknown} */ reported, /** @type {unknown} */ rep) => Math.max(0, Math.min(whole(reported), rollRankCapOf(rep), ROLL_BOOK_RANK_MAX));
 
 // ROLL-PACE (FIELD BUGS 2026-10-15f, a Discord report: "exploit where you do easy quests for a guild and then ask to join
-// it to farm 100 rep in 1 minute"; Mac, asked of four shapes: "Pace ranks from joining"). PROMO-NOW took DFU's 28 days
+// it to farm 100 rep in 1 minute"). PROMO-NOW took DFU's 28 days
 // off an online promotion on the word that the Roll's paced reputation paces the ranks - it paces the REPUTATION, and a
 // stranger's quests (DFU's +5 to the guild's faction, a member or not: Quest.cs EndQuest, GuildManager.GetGuildFactionId)
 // banked it before the membership began, so the hall's first review turned a week's standing into seven ranks at once.
@@ -1127,7 +1090,7 @@ export function chapterRollLines(/** @type {unknown} */ faction, /** @type {any}
 // end shuts its halls for the next, a Rivalry races two chapters of one region on the Season's Merit and the winner takes
 // 10 Strength from the loser. The Schism's and the Succession's choices are CHAP6b's; what the client shows of every
 // event CHAP6c's. No Season counted, no event: every chapter is Calm, as every land's Tide is.
-// GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md, CUT A DUPLICATE, NEVER DEPTH): five events, where there were seven -
+// GUILD3e (, CUT A DUPLICATE, NEVER DEPTH): five events, where there were seven -
 // the Decline (2 Strength a week) said what the Failing band says, and the Ascendancy (a tenth off, a High Master) what
 // the Ascendant band should; the Ascendant band carries both now (CHAPTER_BANDS, chapterTitlesOf's `high`).
 

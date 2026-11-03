@@ -1,7 +1,5 @@
-// CLIMB1 (2026-09-30, the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md):
-// THE LEDGE SENSOR, THE MANTLE, THE CLAMBER AND THE VAULT. Mac: "a proper and
-// detailed climbing system... Being able to latch, mantle, jump from one
-// location to another ledge. Almost parkour like", after Assassin's Creed and
+// CLIMB1:
+// THE LEDGE SENSOR, THE MANTLE, THE CLAMBER AND THE VAULT., after Assassin's Creed and
 // Dying Light. The four calls: JUMP IS THE GRAB, THE SKILL SCALES IT (it gates
 // no move), SHEER WALLS FREE-CLIMB ON GRIP, and LEAPS OF THEIR OWN scaled by
 // Jumping.
@@ -68,8 +66,7 @@ export const PARKOUR_FACING_DOT = Math.cos((50 * Math.PI) / 180);
 /** A face is a wall while its normal's y is at most this (60 degrees from
  *  level or steeper); anything flatter is a slope the body walks. */
 export const PARKOUR_FACE_MAX_NY = 0.5;
-/** A top pitched past 50 degrees is a roof the body would slide off. AUDIT CLIMB-FIELD R1 (Mac: "You cant mantle the
- *  bottom of roofs"): it was 45, and Daggerfall's own steep roofs are not 45 - their vertices are whole units, and of
+/** A top pitched past 50 degrees is a roof the body would slide off. AUDIT CLIMB-FIELD R1: it was 45, and Daggerfall's own steep roofs are not 45 - their vertices are whole units, and of
  *  the town blocks' 392 building models the 45-degree family runs 45.1 to 48.7 (157 models, ~2,500 placements, every
  *  one refused at its eave: no hang, no mantle, the free climb stalled under it). 50 takes all of them and stays inside
  *  what the probes were built for: the face scan's lean (a 50-degree roof's rung stands 0.084 back, past the 0.08 lean,
@@ -171,8 +168,7 @@ export const PARKOUR_PATH_STEP = 0.08;
  *  proves the whole path at up to ten tries (1.4 ms on a railing), and held
  *  Jump would otherwise ask it every step. 50 ms is a few centimetres of fall. */
 export const PARKOUR_QUIET_STEPS = 3;
-/** THE TAP CATCH (Mac, 2026-10-01: "Take care of what is left including a
- *  jump catching a ledge" - his "Jump near a ledge catches"): a fresh press of
+/** THE TAP CATCH (- his "Jump near a ledge catches"): a fresh press of
  *  Jump arms the air catch for the jump it makes, as if the key were still
  *  held, until the body is down again. A press on the ground that leaves it
  *  no jump (the grounded gate's) lapses after this long - the jump it would
@@ -480,7 +476,7 @@ function topProfile(collider, face, into, lipY) {
   }
 }
 
-// ---- CLIMB-CREST (2026-10-26, the owner: "Pre existing issue where walls cant be climbed over") ---------------------
+// ---- CLIMB-CREST ---------------------
 //
 // Daggerfall's city wall (ARCH3D 445, measured on the freeware: 9.6 m thick, its faces to 8.05 m) has no top to stand on:
 // each face rises to a knife edge, and from it the coping's back falls 76 degrees, 1.6 m in 0.4, to the wall walk. The
@@ -965,7 +961,7 @@ function plainGrip(collider, face, normal, lipY, opts, fit, seen) {
   return { lipY: y, normal: n, face: [fx, y, fz], feet, key: (flat ? top.key : null) ?? under.key ?? null };
 }
 
-// ---- AUDIT CLIMB-FIELD E1: THE EAVE (Mac: "You cant mantle the bottom of roofs, you get stuck") -----------------------
+// ---- AUDIT CLIMB-FIELD E1: THE EAVE -----------------------
 //
 // Daggerfall's roofs stand OUT from their walls: of the town blocks' 392 building models, 151 carry a soffit, the common
 // one a 0.4 m overhang whose roof rises from a knife edge (ARCH3D 201: wall to 3.22, soffit 3.22 out to 0.4, the roof
@@ -1154,7 +1150,7 @@ export function carryHold(pos, hold, was, now) {
   carryLip(hold, pos[1] - y0, was, now);
 }
 
-// ---- CLIMB-DOWN: the way down (Mac: "So plsyers can get stuck on the very top of roofs") ----------------------------
+// ---- CLIMB-DOWN: the way down ----------------------------
 //
 // The climb took players up every wall, and only a fall brought them down: a roof's parapet walled a climber in for
 // good (the vault and the clamber refuse its drop, the plain jump cannot clear it), and every other top asked the jump

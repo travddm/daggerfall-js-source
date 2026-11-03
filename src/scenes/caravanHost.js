@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW11 (2026-10-09, bible/06-Systems/Living-World-II.md "LW11"): THE CARAVAN'S DOOR, HOSTED - the windows a party on the
+// LW11: THE CARAVAN'S DOOR, HOSTED - the windows a party on the
 // road opens to the player and the deeds against it, over the pure law (systems/livingWorld/caravanDoor.js) and the
-// character's own records (relations.js `wares`, `reports`, `escort`). Mac: "caravans ... that can be assaulted,
-// protected or traded with".
+// character's own records (relations.js `wares`, `reports`, `escort`)..
 //
 //  - THE DOOR (`offers`): one who keeps a counter on the road (a caravan's merchant, a pedlar, a carter) or offers the
 //    road (a merchant setting out) asks what the player wants before the words - Trade, Hire on, Travel on with them,

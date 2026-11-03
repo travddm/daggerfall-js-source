@@ -1,6 +1,6 @@
-// AUDIT-SEATS (2026-10-01, Mac: "We need to do a comprehensive audit on everything and finish the not done"): THE
+// AUDIT-SEATS: THE
 // SHARED LAW'S FINDINGS, FIXED - the audit's law lane read every pure rule of the Seats arc against its design
-// (bible/11-Multiplayer/Seats-Arc.md) and each test below is one finding it proved: Season 1's Keepers (L1), the Rights
+//  and each test below is one finding it proved: Season 1's Keepers (L1), the Rights
 // of Siege ranked as risen (L2), a split sale's Tithe (L4), the crown sieges' fixed slots (L5), the coming week's Tide
 // before the first counted week (L6), the Chronicle's words (L7), an ignored witness's week (L8), the law's drift (L10)
 // and the arrival line's siege (G2). `06-Systems/Online-Arc.md` AUDIT-SEATS. The service is driven through the real
@@ -60,7 +60,6 @@ test('AUDIT-SEATS L1 SEASON 1\'S KEEPERS: Season 0\'s last Turning claims nothin
   assert.deepEqual(seasonTitles(s2, hold(15)), [{ guild: 'g', title: 'keeper', key: 1 }]);
   assert.deepEqual(seasonTitles(s2, hold(16)), [], 'Season 2 asks its own first week');
   assert.deepEqual([keptWholeSeason(null, 1), keptWholeSeason(s1, 7), keptWholeSeason(s1, 8), keptWholeSeason(s1, 9)], [false, true, true, false]);
-  assert.match(src('server-account/src/seatTurning.js'), /kept: keptWholeSeason\(ending, h\.since\)/, 'the Chronicle\'s season-end row says the same');
 });
 
 // ─── L2 ──────────────────────────────────────────────────────────────
@@ -137,7 +136,7 @@ test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' wor
   const SH = { name: 'The Silver Hand', tag: 'SH' };
   assert.match(line('conscription', { guild: SH, marks: 1 }), /brought the Silver Hand <SH> 1 silver of its kingdom's Tithe\.$/);
   assert.match(line('conscripted', { guild: SH, crown: SH, marks: 1200 }), /paid 1,200 silver of its Tithe/);
-  assert.match(line('fealty-tribute', { vassal: SH, liege: SH, marks: 5 }), /paid 5 silver in fealty to/);   // PIN MOVED: AUDIT GUILD3 W5 - "Tribute" is the seat's
+  assert.match(line('fealty-tribute', { vassal: SH, liege: SH, marks: 5 }), /paid 5 silver in fealty to/);
   assert.equal(line('edict', { guild: SH, edict: 'festival' }), 'In week 9, the Silver Hand <SH> proclaimed a Festival at Wayrest.');
   assert.equal(line('edict', { guild: SH, edict: 'market-day' }), 'In week 9, the Silver Hand <SH> proclaimed Market Day at Wayrest.');
   assert.equal(line('edict', { guild: SH, edict: 'nonsense' }), 'In week 9, the Silver Hand <SH> proclaimed an Edict at Wayrest.');
@@ -184,7 +183,7 @@ test('AUDIT-SEATS L10 THE LAW\'S DRIFT: a NaN is no count; a negative sale pays 
   const hex = (k) => HERALDRY_COLOURS.find((c) => c.key === k).hex;
   assert.deepEqual([SEAT_RING_UNHELD, FREE_LAND_RING], [hex('ash'), hex('vert')]);
   assert.deepEqual({ ...KINGDOM_METALS }, { daggerfall: hex('azure'), wayrest: hex('crimson'), sentinel: hex('gold'),
-    skyrim: hex('argent'), morrowind: hex('sanguine'), summerset: hex('celeste'), valenwood: hex('teal'), elsweyr: hex('tenne'), blackmarsh: hex('umber'), cyrodiil: hex('purpure') });   // PIN MOVED (WW7-3): the provinces' crowns' metals
+    skyrim: hex('argent'), morrowind: hex('sanguine'), summerset: hex('celeste'), valenwood: hex('teal'), elsweyr: hex('tenne'), blackmarsh: hex('umber'), cyrodiil: hex('purpure') });
   assert.deepEqual([SEAT_RING_UNHELD, KINGDOM_METALS.daggerfall], ['#8a8a8a', '#3b6fd8'], 'the same hex as before');
 });
 

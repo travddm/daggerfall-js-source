@@ -1,5 +1,5 @@
 // @ts-check
-// INTRO4 (2026-10-26, the owner: "Utilize the imperial city we have built for this"; bible/10-UI/UI-Arc.md INTRO4) - THE
+// INTRO4 - THE
 // IMPERIAL CITY, AS THE FILM DRAWS IT. Everything here is the city TESA built (world/imperialCity.js, its canon wheel on
 // City Isle in Lake Rumare at TS5's seven pixels; world/capitalImperial.js, its landmarks): the White-Gold Tower, the
 // palace wall and the emperors' tombs, the city wall and its watch towers, the walls between the districts, the
@@ -9,7 +9,7 @@
 // (IMPERIAL_CITY_PLAN) lays one of Daggerfall's blocks by its trade, the film stands houses of that trade's size on that
 // cell; where it lays a garden, trees. The ground is the city's own tile law (imperialTile) and its trees its own
 // (imperialTree). Pure: built in the intro's worker (introBuildWorker.js), or here on a page without one.
-// The merge of main into TESA (2026-10-27): the city the film was shot on, kept as shot (./set/ - the game's grew to
+// The merge of main into TESA: the city the film was shot on, kept as shot (./set/ - the game's grew to
 // IC-GRAND's twenty-five pixels and retired the Colosseum)
 import { IMPERIAL, IMPERIAL_CELLS, IMPERIAL_CITY_PLAN, imperialDistrictAt, imperialTile, imperialTree } from './set/imperialCity.js';
 import {

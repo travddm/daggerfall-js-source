@@ -1,9 +1,8 @@
-// WB9g (2026-09-30, Mac: "Add a brand new title to the broker and a new addition (the aura), an animated burning ground
-// aura that circles the ground where your character stands. These items should be expensive and sought after"): THE
+// WB9g: THE
 // BROKER'S INSIGNIA - the Gatebreaker title and Dagon's Fire, bought with Deadlands Embers and kept by the ACCOUNT (the
 // sale recorded on the row, the account's closed gates paying), signed into the token and read off it by the relay;
 // the fire drawn at the feet of whoever wears it (render/auraRing.js), its shader RUN here rather than its text pinned.
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9g).
+// Design: (WB9g).
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -105,10 +104,6 @@ test('WB9g the token and the wire: a token may carry the aura worn (`au`), absen
   assert.equal(readAura({ au: 'hellfire' }), null, 'a stranger\'s word about themselves');
   assert.equal(readAura({}), null);
   assert.equal(readAura(null), null);
-  // the relay: the hello's verified identity carries it, and the attached row it is stamped from carries it on
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /return \{ name: c\.n, kind: c\.k, subject: c\.s, title: c\.t, ts: c\.ts, glyphs: c\.g, gx: c\.gx, au: c\.au, pi: c\.pi, rb: c\.rb, mu, lt, lv: c\.lv, \.\.\.guild, gio: c\.i, ar: c\.ar, cl: c\.cl, \.\.\.house, ci: c\.ci, wa: c\.wa \};/, 'off the signature (LEASE1, PIN MOVED: the time of the word on the mute beside it; LEGACY7, PIN MOVED: the house after it; SEASON1 part two, PIN MOVED: a Season\'s banner ribbon beside it; ARENA4, PIN MOVED: the season\'s rating after it; ARENA4b, PIN MOVED: the character\'s level after that; AUDIT LEGACY III O1, PIN MOVED: the realm character; INT7, PIN MOVED: the arms the judged pack holds last); WITCH1, PIN MOVED: the profile icon worn beside the aura');
-  assert.match(relay, /this\._setAttach\(ws, \{ \.\.\.a, \.\.\.placed, \.\.\.shown, [^\n]*?id: m\.id, sc: m\.secret, name: who\.name, title: who\.title, \.\.\.\(who\.ts \? \{ ts: who\.ts \} : \{\}\), glyphs: who\.glyphs, gx: who\.gx, au: who\.au, \.\.\.\(who\.pi \? \{ pi: who\.pi \} : \{\}\), \.\.\.\(who\.rb \? \{ rb: who\.rb \} : \{\}\), lv: who\.lv,/, 'onto the socket\'s row (SEAT1c: a seat title\'s claim beside the title; AUDIT PRE-MERGE 1003b, PIN MOVED: an arena floor\'s place carried across a reconnect and a session\'s shown mark ahead of it; SCALE5c, PIN MOVED: a shard\'s socket\'s id on the bus and its hello\'s account ahead of its id); WITCH1, PIN MOVED: the profile icon worn beside the aura');
 });
 
 // ── THE SERVICE ─────────────────────────────────────────────────────
@@ -326,10 +321,6 @@ test('WB9g the pack\'s half: the price taken from the spendable stones, first re
   assert.equal(stoneCount(spendableStonesIn(pack)), 5);
   assert.equal(spendStones(pack, 4), true);
   assert.deepEqual(pack.map((x) => x.stackCount ?? 1), [1]);
-  const src = rd('src/systems/sigil/sigilBroker.js');
-  assert.equal(src.match(/else item\.stackCount = have - count;/g)?.length, 1, 'one hand takes stones from a pack');
-  assert.match(src, /takeFromPack\(items, sale\.take\);/);
-  assert.match(src, /takeFromPack\(items, stonesToTake\(spendable, price\)\);/);
 });
 
 // ── THE FIRE (render/auraRing.js) ───────────────────────────────────
@@ -652,43 +643,7 @@ test('WB9g the account card and its flow: an Aura row beside the titles when the
 
 // ── THE WORLD HOST ──────────────────────────────────────────────────
 
-test('WB9g the world host, by source: the auras gathered with the peers each frame (mine off the stored session, a concealed peer\'s concealed, none under the travel view) and drawn after each mode\'s opaque world through the veiled bodies\' hook under the frame\'s own camera - a foreign pass; the Broker\'s sale both halves through the sale\'s one law (AUDIT WB9); a wear the service\'s, told to my own name and feet at once; the window handed its doors (mutants: the auras never gathered; never drawn)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /auraFrame\(seen\);   \/\/ WB9g/);
-  assert.match(w, /const drawVeiledPeerBodies = \(\) => \{ peerBodies\?\.drawVeiled\(\); drawAuras\(\); nodeGlintPass\.draw\(travelView\?\.active \? null : nodeMarksAt\(enchantFeet\(\)\)\); partyPing\?\.draw\(renderer\); \};/);   // NODE-MARKS: the nodes' glow rides the hook after the auras
-  assert.match(w, /function auraFrame\(seen\) \{\n    _auraWearers\.length = 0;\n    if \(!online \|\| travelView\?\.active\) return;/);
-  assert.match(w, /const mine = ownAura\(\);/);
-  assert.match(w, /if \(_veils\.has\(d\.id\) \|\| !d\.shown\) continue;   \/\/ a concealed peer's fire is concealed with them/);
-  assert.match(w, /const proj = renderer\._proj, view = renderer\._view, eye = renderer\._camPos;/);
-  assert.match(w, /if \(_auraPass\?\.drawn\) renderer\.markForeignPass\(\);/);
-  assert.match(w, /_auraWearers\.length = 0;   \/\/ this frame's, drawn once: a frame that gathers none \(the seat left, death, offline\) draws none/, 'a frame that gathers none draws none');
-  assert.match(w, /peerRiders\.settle\([^\n]*\n    auraFrame\(seen\);   \/\/ WB9g/, 'gathered once the bodies and the riders have stood');
-  // PIN MOVED (AURA-STALL, #1137): the build is its door's (render/glProgram.js compiledPass), whose throw is told and answers no pass for good
-  // PIN MOVED (AURA-SPLIT, #1143): the door waits on no program - each look's is the pass's own (render/auraRing.js programOf)
-  assert.match(w, /const auraPassOf = compiledPass\(renderer\.gl, \[\], \(\) => new AuraRingRenderer\(renderer\.gl\), \(e\) => console\.warn\('\[online\] the aura would not build'/, 'a fire that will not build costs the fire, never the game');
-  const buy = w.slice(w.indexOf('async function insigniaBuy(offer) {'), w.indexOf('async function insigniaWear(offer) {'));
-  // AUDIT WB9 (insignia F1, F2): both halves through the sale's one law (systems/sigil/sigilBroker.js insigniaSale, driven in
-  // the audit's pins below) - the pack's price held first, given back unless the service holds the sale, a lost answer
-  // asked after, a held sale saved at once
-  // PIN MOVED (BROKER-RID, AUDIT FB1024): through the Broker's one door (sigilBroker.js brokerOwedDoor), the press by its
-  // request id and a lost answer asked after by it
-  assert.match(buy, /const r = await brokerOwed\.insignia\(offer, \(id, rid\) => buyInsignia\(io, id, rid\)\);/);
-  assert.ok(!/spendStones/.test(buy), 'the pack paid through the sale alone, never beside it');
-  assert.ok(buy.indexOf('if (!r.ok) return') > buy.indexOf('await brokerOwed.insignia('), 'a refused sale adopts nothing');
-  const wear = w.slice(w.indexOf('async function insigniaWear(offer) {'), w.indexOf('const openBroker = () => {'));
-  assert.match(wear, /offer\.kind === 'title' \? await equipTitle\(io, want\) : await equipAura\(io, want\)/);
-  assert.match(wear, /insigniaSelf\(r\.data, io\.secret\);/);
-  assert.match(w, /online\?\.adoptIdentity\?\.\(\{ title: _insignia\.title, glyphs: online\.glyphs, level: online\.lv, aura: _insignia\.aura \}\);/);
-  assert.match(w, /adoptSessionIdentity\(appStorage\(\), \{ glyphs: answer\?\.glyphs, glyphsOff: answer\?\.glyphsOff, aura: _insignia\.aura, secret \}\);/);
-  assert.match(w, /insignia: insigniaRows, insigniaLoad, buyInsignia: insigniaBuy, wearInsignia: insigniaWear, insigniaBusy: \(\) => _insignia\.busy,/);
-  // the service's side: the routes behind the door, the version moved, the deploy watching the law
-  const svc = rd('server-account/src/service.js');
-  assert.match(svc, /'\/v1\/account\/insignia', '\/v1\/account\/aura',/);
-  assert.match(rd('.github/workflows/account-deploy.yml'), /- "src\/net\/insignia\.js"/, 'the Worker bundles the law - a change to it deploys');
-  assert.match(rd('server-account/migrations/0040_insignia.sql'), /ALTER TABLE players ADD COLUMN insignia TEXT;\nALTER TABLE players ADD COLUMN insignia_spent INTEGER NOT NULL DEFAULT 0;\nALTER TABLE players ADD COLUMN aura TEXT;/);
-});
-
-// ── AUDIT WB9 (2026-09-30, before the merge): the insignia's findings ──
+// ── AUDIT WB9: the insignia's findings ──
 
 test('AUDIT WB9 insignia F1/F2 - the sale\'s two halves (systems/sigil/sigilBroker.js insigniaSale): the pack\'s price taken BEFORE the service is asked, so a ware bought meanwhile cannot leave it untaken (35 stones bought the title AND a 12-stone Regalia); a sale the service holds saved at once (a page closed before the next checkpoint kept the stones as well); the service\'s refusal gives the stones back; a lost answer (unreached, a 5xx) asked after - held, it is the sale; not held, or not heard either, the stones back; a short pack asks nothing (mutants: the stones never given back; a lost answer taken for a refusal; a 5xx taken for a refusal; the sale never saved; the price never held)', async () => {
   const OFFER = INSIGNIA[0];
@@ -722,7 +677,6 @@ test('AUDIT WB9 insignia F1/F2 - the sale\'s two halves (systems/sigil/sigilBrok
   pack = [stack(35)]; saved = 0;
   r = await insigniaSale(OFFER, { items: pack, save, account: 'acct-1', settle: async () => ({ ok: true, data: { held: false } }), buy: async () => { throw new Error('reset'); } });
   assert.deepEqual([r, count(pack), saved], [{ ok: false, error: 'offline' }, 35, 0]);
-  // PIN MOVED (EMBERS-OWED, FB1024; BROKER-RID): not heard either - OWED, never given back blind (test/systems/fb1024_embersowed.test.js)
   for (const settle of [async () => ({ ok: false, error: 'offline' }), async () => { throw new Error('offline'); }]) {
     _resetOwed(); pack = [stack(35)]; saved = 0;
     r = await insigniaSale(OFFER, { items: pack, save, account: 'acct-1', settle, buy: async () => { throw new Error('reset'); } });

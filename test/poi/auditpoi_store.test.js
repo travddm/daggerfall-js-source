@@ -1,5 +1,5 @@
-// AUDIT POI, LANE A (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-1, POI-4b) - THE STORE AND THE SHARED LAW, HELD
-// TO WHAT THEY SAY. Mac: "Audit everything. Ensure perfection." Seven reviewers read the POI arc at 0c78d81a85; these
+// AUDIT POI, LANE A - THE STORE AND THE SHARED LAW, HELD
+// TO WHAT THEY SAY. Seven reviewers read the POI arc at 0c78d81a85; these
 // are the store's and the law's findings, each pinned on the real Worker over the real migrations (test/accountDb.mjs)
 // or on the law itself:
 //   S1  a submission approved only as the approver saw it - its document named (`docSha`), the assets made public the
@@ -50,7 +50,7 @@ const entryOf = (id, meshSha, extra = {}) => ({ v: 1, id, name: 'Lantern post', 
 
 async function theStore() {
   poi.forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const mac = await s.registered('Mac'), dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), player = await s.registered('Player');
   const req = async (method, path, { who = null, body, raw, headers = {} } = {}) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {

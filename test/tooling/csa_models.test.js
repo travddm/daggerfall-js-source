@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27) - COME SAIL AWAY'S BOATS AS DATA (vendor/come-sail-away/Models/),
+// CSA-A - COME SAIL AWAY'S BOATS AS DATA (vendor/come-sail-away/Models/),
 // what tools/comeSailAwayExtract.mjs read out of the bundle through
 // tools/lib/unityScene.mjs: the twelve prefabs the assembly asks DFU for as
 // the trees its C# walks by name, the meshes, the materials and the

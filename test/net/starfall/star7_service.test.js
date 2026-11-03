@@ -1,4 +1,4 @@
-// STAR7 (bible/11-Multiplayer/Starfall.md section 6): THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM - a star's `j1`
+// STAR7: THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM - a star's `j1`
 // receipt counted once a (star, account), nine a UTC day of its fall, paid in Renown to the character that fought it and
 // in silver under the day's combat cap, its spoils given once a device, a guest thanked and never counted, the cards'
 // count. The real Worker over node:sqlite with every migration applied (test/accountDb.mjs). tools/mutants/star7.json.
@@ -114,13 +114,13 @@ test('STAR7 THE DAY\'S BOUND AND THE CAP: nine stars counted on the day they fel
   assert.equal(s.balance(bo), 0, 'no row, no silver');
 });
 
-test('STAR7 THE MIGRATION AND THE DEPLOY: stars_held and star_spoils, one row a (star, account), cascading with their account; the route declared beside the raid\'s; the account Worker\'s deploy watches the star\'s law and receipt (mutants: the key; the cascade)', async () => {
-  const sql = src('server-account/migrations/0141_stars_held.sql');
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS stars_held \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
-  assert.match(sql, /\n {2}cid {5}TEXT,\n {2}PRIMARY KEY \(star, account\)/, 'AUDIT STARFALL B3: the claim id that wrote the row');
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS star_spoils \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
+test('STAR7 THE SCHEMA AND THE DEPLOY: stars_held and star_spoils, one row a (star, account), cascading with their account; the route declared beside the raid\'s; the account Worker\'s deploy watches the star\'s law and receipt (mutants: the key; the cascade)', async () => {
   clock(T0);
   const s = await stand();
+  const sqlOf = (name) => s.raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name).sql;
+  assert.match(sqlOf('stars_held'), /CREATE TABLE stars_held \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
+  assert.match(sqlOf('stars_held'), /\n {2}cid {5}TEXT,\n {2}PRIMARY KEY \(star, account\)/, 'AUDIT STARFALL B3: the claim id that wrote the row');
+  assert.match(sqlOf('star_spoils'), /CREATE TABLE star_spoils \([\s\S]*PRIMARY KEY \(star, account\),\s*FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
   const ann = await s.registered('Anna', { character: CH });
   await s.star(ann, [N, 0], { cid: CID });
   s.raw.prepare('DELETE FROM players WHERE id = ?').run(ann.id);
@@ -168,7 +168,4 @@ test('AUDIT STARFALL B3: AN ANSWER LOST AFTER THE BATCH - the fill (INT5) rides 
   for (let i = 0; i < STAR_CLAIMS_DAY_MAX; i++) s.raw.prepare('INSERT INTO stars_held (star, account, day, char_id, xp, nonce, at) VALUES (?, ?, ?, ?, 0, ?, ?)').run(`${N - 100 + i}.0`, cy.id, starDayOf(N, 0), CH, `n${i}`, T0);
   assert.equal((await s.star(cy, [N, 0], { cid: CID })).body.why, 'day-full');
   assert.equal(s.raw.prepare('SELECT allowance FROM realm_characters WHERE id = ?').get('rc-cyra').allowance, 700, 'no row, no fill');
-  const svc = src('server-account/src/index.js');
-  const route = svc.slice(svc.indexOf("if (path === '/v1/star/claim'"), svc.indexOf("if (path === '/v1/serpent/claim'"));
-  assert.ok(route.length > 0 && !route.includes('grantSpoils('), 'no fill after the batch');
 });

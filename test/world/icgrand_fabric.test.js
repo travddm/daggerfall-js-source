@@ -1,7 +1,4 @@
-// IC-GRAND (2026-10-26, the owner: "Each district needs to be distinct with more varying layouts. Its time we also develop
-// proper city-like scapes with parkouring opprotunities"; the KPbICA spec he forwarded: "buildings in cut stone, brick and
-// half-timbering; inner yards and backyards; a street hierarchy - wide main streets with pathways, side streets, alleys and
-// dead ends"; bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY'S FABRIC, pinned: its rooftops laid to the
+// IC-GRAND - THE IMPERIAL CITY'S FABRIC, pinned: its rooftops laid to the
 // player's movement's own numbers, each district its own streets and buildings and each neighbourhood its own frame, the
 // street hierarchy, the yards, the dead ends, the ways up and the bridges, the park's statues, the canals, and its walls'
 // pictures at vanilla's format.
@@ -42,7 +39,6 @@ test('IC-GRAND THE ROOFTOPS ARE A WAY - the fabric laid to the movement\'s own n
   assert.ok(ROOF_STEP <= FABRIC_LAWS.stepReach - 0.05 && ROOF_STEP === STOREY / 2, 'a half storey, under the reach less a hand\'s breadth');
   assert.ok(ALLEY + 0.6 <= FABRIC_LAWS.leapMin && FABRIC_LAWS.leapMin === PARKOUR_RUNLEAP_DIST_MIN, 'an alley leapt with a stride to spare');
   assert.ok(PARAPET < PARKOUR_VAULT_MAX && PARAPET > 0.5, 'a parapet vaulted, over a knee');
-  // PIN MOVED (IC-STAIRS): the ways up are built stairs now - a riser the motor steps, a tread a foot's (test/world/icstairs.test.js
   // holds their every law); the crates' 1.2 m steps under a vault are gone
   assert.ok(2 * STAIR.rise < STEP_OFFSET && STAIR.tread >= 0.28, 'a way up\'s risers stepped, a foot\'s room on each');
   assert.ok(LEDGE_Y <= PARKOUR_WALLRUN_MIN + PARKOUR_REACH_MIN + PARKOUR_AIR_REACH - 0.04, 'a ledge in a wall run\'s reach');
@@ -71,7 +67,7 @@ test('IC-GRAND THE HEIGHT WALK - in every district a building beside a building 
 });
 
 test('IC-GRAND EACH DISTRICT ITS OWN - its frame of streets, its blocks\' sizes, its walls\' and roofs\' pictures; and inside it each neighbourhood its own frame off its own seed - five rings out by half, the heart\'s its landmark\'s (mutants: one frame for all; one neighbourhood a district)', () => {
-  assert.equal(Object.keys(IMPERIAL_STYLES).length, 8);   // PIN MOVED (IC-PROPS): the Arcane University's halls a district's fabric of their own (test/world/icprops_city.test.js)
+  assert.equal(Object.keys(IMPERIAL_STYLES).length, 8);
   const looks = new Set(Object.values(IMPERIAL_STYLES).map((st) => `${st.frame}|${st.walls[0]}|${st.roof}|${st.P}|${st.Q}`));
   assert.equal(looks.size, 8, 'no two districts alike');
   assert.deepEqual(new Set(Object.values(IMPERIAL_STYLES).map((st) => st.frame)), new Set(['grid', 'polar', 'park', 'axial', 'organic', 'docks']));
@@ -130,7 +126,7 @@ test('IC-GRAND THE URBAN FABRIC - courts parted into backyards by garden walls w
   assert.ok(statues > 0, 'the Arboretum\'s statues');
   assert.ok(canals > 0, 'the Elven Gardens\' canals');
   for (const w of ['facadeStone', 'facadeBrick', 'facadeTimber']) assert.ok(walls.has(w), `${w} stands`);
-  // every way up's head at its roof's edge (PIN MOVED, IC-STAIRS: a built stair's head landing at the roof, not the crates' last
+  // every way up's head at its roof's edge (
   // step a vault under it); every bridge over a street too wide to leap, to a roof within a step
   _resetFabric();
   for (const [d, b] of DISTRICTS) for (const L of samples(d, b)) {
@@ -139,7 +135,7 @@ test('IC-GRAND THE URBAN FABRIC - courts parted into backyards by garden walls w
   }
 });
 
-// IC-GRAND x THE COORDINATOR'S REVIEW OF THE RENDERS (2026-10-26): "BLOCK INTERIORS and VOIDS ... Courtyards should be
+// IC-GRAND x THE COORDINATOR'S REVIEW OF THE RENDERS: "BLOCK INTERIORS and VOIDS ... Courtyards should be
 // courtyard-sized (yards, gardens, sheds, wells, trees), streets and plazas paved, and large empty lots either built,
 // planted (gardens, orchards in the Elven Gardens/Arboretum) or made squares with something in them".
 test('IC-GRAND COURTS COURTYARD-SIZED - a court BACK.min or more across both ways stands a back range in its middle (no street front, BACK.gap in from the ring all round, lower than the ring), the garden walls from the ring to its faces and never through a building; a well in a yard (closed), a square\'s fountain at its middle (closed); trees in the stone yards, orchards in rows in the Arboretum\'s park and the Elven Gardens\' garden courts (mutants: no back range; the walls through it; no well; no fountain; the orchards unordered)', () => {

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1d (2026-09-30, Mac: "Lets do this") — A GUILD'S HERALDRY: TWO
-// COLOURS AND A DEVICE (bible/11-Multiplayer/Seats-Arc.md 8.1).
+// GUILD1d — A GUILD'S HERALDRY: TWO
+// COLOURS AND A DEVICE (8.1).
 //
 // The record's decision, Mac's instruction ("I want you to make the
 // decisions"): two colours from a fixed palette of sixteen, readable
@@ -47,7 +47,7 @@ export const HERALDRY_COLOURS = Object.freeze([
 /** The unheld ring's colour (Seats-Arc 3.4): a guild's border only, never its field. */
 export const HERALDRY_UNHELD = 'ash';
 /** The devices, in the record's order - each a silhouette of ui/heraldryArt.js: GUILD1d's twenty-four, then GUILD2c's
- *  sixteen (bible/11-Multiplayer/Guild-Overhaul.md) - the guilds' own trades and creeds: the thieves' key and dagger, the
+ *  sixteen - the guilds' own trades and creeds: the thieves' key and dagger, the
  *  sailors' anchor and ship, the mages' book and flame, the knights' horse and crossed swords, the smiths' anvil. */
 export const HERALDRY_DEVICES = Object.freeze([
   'wolf', 'bear', 'boar', 'stag', 'lion', 'eagle', 'raven', 'dragon', 'serpent', 'fish', 'tower', 'gate',
@@ -141,7 +141,7 @@ export function heraldryKey(raw) {
   return h.division || h.charge ? `${base}|${h.division ?? 'plain'}|${h.field2 ?? ''}|${h.charge ?? ''}` : base;
 }
 
-// ─── SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE BANNER RIBBON ─────────────
+// ─── SEASON1 part two: THE BANNER RIBBON ─────────────
 // Seats-Arc 9.1: "a thin band in the guild's colours under their name tag for the next Season". The token carries it as
 // two indexes of HERALDRY_COLOURS - [field, border] - so it costs a few bytes and every face reads it off the signature.
 

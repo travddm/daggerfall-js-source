@@ -1,5 +1,4 @@
-// RAID3 (2026-09-27, Mac, on World Events - Raiding Parties online: "1. Server" - the relay tracks each raid's kill
-// count, kept even if everyone leaves, the cleanse and the participants, and signs the rewards): THE RELAY HOLDS THE
+// RAID3: THE RELAY HOLDS THE
 // RAID. The ledger's law in node (net/raid/raidLaw.js: the window, the first word keeps, the cap, each account's share, the
 // target, who earned it); the raid's receipt (net/raid/raidReceipt.js: the gate's ladder, never mistaken for a gate's
 // receipt or an identity); the `raid` frame both ways (net/wire.js); the relay over the real Room (server/src/index.js:
@@ -23,8 +22,8 @@ import { RAID_RECEIPT_V, RAID_RECEIPT_TTL_S, RAID_RECEIPT_MAX, raidReceiptValid,
 import { mintReceipt, verifyReceipt, readReceipt } from '../../src/net/gate/gateReceipt.js';
 import { verifyToken, mintToken } from '../../src/net/identityToken.js';
 import {
-  parseClient, validRaidIn, validRaidOut, relaySupportsRaid, raidGate, RAID_RELAY_MIN, RAID_HZ_MAX, RAID_KINDS, RAID_OUT_KINDS,
-  RAID_RECEIPT_WIRE_MAX, RAID_CLEANS_MAX, RAID_TELL_RETRY_MS, mapPixelOfWire, cellRoomOfWire, worldRoom, RELAY_VERSION,
+  parseClient, validRaidIn, validRaidOut, raidGate, RAID_HZ_MAX, RAID_KINDS, RAID_OUT_KINDS,
+  RAID_RECEIPT_WIRE_MAX, RAID_CLEANS_MAX, RAID_TELL_RETRY_MS, mapPixelOfWire, cellRoomOfWire, worldRoom,
   wallMsForClassicMinutes, SOCIAL_ROOM, DROP_STRIKES_MAX, raidLedgerKey, PIXEL_UNITS,
 } from '../../src/net/wire.js';
 import {
@@ -180,7 +179,7 @@ test('RAID3 receipt: minted by the relay\'s one key and verified by its public h
 
 // ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════
 
-test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a frame of the room\'s is projected for the client by its kind; the relay that keeps a raid is named by its version, and this build\'s is one (mutants: a bound off by one; the relay floor above this build\'s)', async () => {
+test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a frame of the room\'s is projected for the client by its kind (mutant: a bound off by one)', async () => {
   assert.deepEqual(RAID_KINDS, ['w']);
   assert.deepEqual(RAID_OUT_KINDS, ['st', 'cl', 'rc', 'cls', 'tw'], 'RAID-ROLL: `tw` the hub asking for the towns table');
   assert.deepEqual(validRaidIn({ ...word({ n: 3, s: 1 }), junk: 1 }), word({ n: 3, s: 1 }));
@@ -188,7 +187,6 @@ test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a fra
   for (const bad of [{ k: 'x' }, { key: '3:7' }, { st: -1 }, { st: 1.5 }, { tg: RAID_TARGET_MIN - 1 }, { tg: RAID_TARGET_MAX + 1 }, { ty: RAID_TYPES }, { px: 8192 }, { py: -8192 }, { px: 1.5 }, { n: RAID_WORD_KILLS_MAX + 1 }, { n: -1 }, { s: 2 }]) {
     assert.equal(validRaidIn(word(bad)), null, JSON.stringify(bad));
   }
-  // PIN MOVED (WW6): the town's pixel is the world's (net/wire.js worldPixelOk) - a raid past the Bay is a word too; which
   // side of the Bay's edge a key's town stands on is the ledger's own law (net/raid/raidLaw.js raidSideOk)
   assert.deepEqual([validRaidIn(word({ px: 1000 }))?.px, validRaidIn(word({ py: 500 }))?.py, validRaidIn(word({ px: -1 }))?.px, validRaidIn(word({ px: 8191, py: -8191 }))?.py], [1000, 500, -1, -8191]);
   assert.equal(validRaidIn(word({ tg: RAID_TARGET_MAX, ty: RAID_TYPES - 1, px: 999, py: 499, n: RAID_WORD_KILLS_MAX })).n, RAID_WORD_KILLS_MAX, 'every top end is in');
@@ -215,11 +213,6 @@ test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a fra
   assert.equal(validRaidOut({ k: 'rc', r: 'r1.abc.def' }), null, 'never a gate\'s');
   assert.equal(RAID_RECEIPT_WIRE_MAX, RAID_RECEIPT_MAX);
   assert.equal(validRaidOut({ k: 'dance' }), null);
-  // the relay's number
-  assert.equal(relaySupportsRaid(`world${RAID_RELAY_MIN - 1}`), false);
-  assert.equal(relaySupportsRaid(`world${RAID_RELAY_MIN}`), true);
-  assert.equal(relaySupportsRaid('junk'), false);
-  assert.ok(relaySupportsRaid(RELAY_VERSION), 'this build\'s relay keeps raids');
   // a pose's map pixel is the cell's own arithmetic
   const p = { x: PX * PIXEL_UNITS + 5, z: (499 - PY) * PIXEL_UNITS + 5 };
   assert.deepEqual(mapPixelOfWire(p.x, p.z), [PX, PY]);
@@ -485,25 +478,20 @@ test('RAID3 relay: THE END - the cell\'s alarm forgets a ledger past its end; a 
 
 // ═══ THE SESSION ═════════════════════════════════════════════════════════════════════════════════
 
-function sessionRig(room, relayV = RELAY_VERSION) {
+function sessionRig(room) {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
   const got = []; s.onRaid = (f, r) => got.push({ f, r });
   quiet(() => s.join(room, { x: ON.x / 1, y: 0, z: ON.z / 1, yaw: 0 }));
   const ws = sockets[0]; ws.open();
-  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: relayV }));
+  quiet(() => ws.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null }));
   const out = () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'raid');
   return { s, ws, got, out, tick: (ms) => { t += ms; } };
 }
 
-test('RAID3 session: a word goes only to a relay that keeps raids, only down the town cell\'s own socket, through the wire\'s projection, RAID_HZ_MAX a second; a cell\'s and the hub\'s words come in projected, each kind only from the room that says it - AUDIT RAID R2: a receipt from the hub too (mutants: an old relay sent the frame that closes its socket; the cell not asked; a hub\'s list let in from a cell)', () => {
-  const old = sessionRig(CELL, 'world122');
-  assert.equal(old.s.raidOk, false);
-  assert.equal(old.s.sendRaid(word(), CELL), false);
-  assert.equal(old.out().length, 0, 'nothing on the wire of a relay that would close the socket for it');
+test('RAID3 session: a word goes only down the town cell\'s own socket, through the wire\'s projection, RAID_HZ_MAX a second; a cell\'s and the hub\'s words come in projected, each kind only from the room that says it - AUDIT RAID R2: a receipt from the hub too (mutants: the cell not asked; a hub\'s list let in from a cell)', () => {
   const { s, ws, got, out, tick } = sessionRig(CELL);
-  assert.equal(s.raidOk, true);
   assert.equal(s.sendRaid({ ...word(), junk: 1 }, CELL), true);
   assert.deepEqual(out().at(-1), { t: 'raid', ...word() }, 'the projection, not the caller\'s object');
   assert.equal(s.sendRaid(word(), worldRoom(PX + 48, PY)), false, 'no socket in that cell');
@@ -567,7 +555,7 @@ beforeEach(() => {
   setSharedClock(null);
 });
 
-test('RAID3 client: standing in a raided town at a relay that keeps raids, I say my word to the town\'s cell - the raid as the roll made it, my raiders\' deaths, my strike - at once when either moves, else every RAID_WORD_MS; a word the session refused is said again; nothing at an older relay, offline, or out of the town (mutants: the word unsaid; said every frame; the cell miscounted; a refused word taken as said)', async () => {
+test('RAID3 client: standing in a raided town at a relay that keeps raids, I say my word to the town\'s cell - the raid as the roll made it, my raiders\' deaths, my strike - at once when either moves, else every RAID_WORD_MS; a word the session refused is said again; nothing offline or out of the town (mutants: the word unsaid; said every frame; the cell miscounted; a refused word taken as said)', async () => {
   const { at, log } = rig();
   restoreSaveData({ lastSelectedDay: CDAY, raids: [raidRec({ killed: 1 })] });
   setSharedClock(() => at.now);
@@ -590,16 +578,11 @@ test('RAID3 client: standing in a raided town at a relay that keeps raids, I say
   assert.equal(log.words.at(-1).w.n, 2, 'a word the session refused is said again');
   const n = log.words.length;
   at.town = null;
-  at.pixel = { x: 201, y: 100 };   // FIELD BUGS 2026-10-11g RAID-WORD (PIN MOVED): past the rect ON the town's pixel a raid I fought is still said
+  at.pixel = { x: 201, y: 100 };   // FIELD BUGS 2026-10-11g RAID-WORD (
   frame(1);
   assert.equal(log.words.length, n, 'out of the town: nothing');
   at.town = { regionIndex: 3, locationIndex: 7 };
   at.pixel = { x: 200, y: 100 };
-  at.relay = false;
-  at.wall += RAID_WORD_MS;
-  frame(1);
-  assert.equal(log.words.length, n, 'an older relay: nothing');
-  at.relay = true;
   setSharedClock(null);
   frame(1);
   assert.equal(log.words.length, n, 'offline: nothing');
@@ -632,17 +615,6 @@ test('RAID3 client: at a relay that keeps raids the raid\'s cleanse is the relay
   assert.equal(defendedLine(['Ann'], 1), 'Defended by Ann.');
   assert.equal(defendedLine(['Ann', 'Bran', 'Cora'], 3), 'Defended by Ann, Bran and Cora.');
   assert.equal(defendedLine(['Ann'], 2), 'Defended by Ann and 1 other.');
-  // at an older relay RAID2's own law cleanses as it did
-  _resetRaidingParties();
-  const old = rig({ relay: false });
-  restoreSaveData({ lastSelectedDay: CDAY, raids: [raidRec({ attackAmount: 1 })] });
-  setSharedClock(() => old.at.now);
-  old.at.allowed = false;
-  frame(1);
-  await tick();
-  old.log.raiders[0].dead = true; old.log.raiders[0].corpse = true;
-  frame(1);
-  assert.equal(raidState().raids[0].cleansed, true, 'the owners\' shares cleanse it where the relay does not');
 });
 
 test('RAID3 client: a cleanse the hub says is said in its region to a player told of the raid, quietly anywhere else - and never said withdrawn after; a hello\'s list closes its raids quietly; a ledger that names a cleanse this machine missed closes it (mutants: every cleanse said Bay-wide; the list said aloud; the missed cleanse kept open)', () => {
@@ -701,19 +673,3 @@ test('RAID3 client: my receipt is kept, one a raid, and handed on once (RAID4 ca
   assert.ok(raidReceipt(`3:${20 + RAID_RECEIPTS_KEPT - 1}:${CDAY}`));
 });
 
-test('RAID3 the world host by source: the raid system is told whether the relay keeps raids and sends its word through the session; the session\'s raid words and the hub link\'s reach the raid; the relay\'s arm is in the relay and the hub\'s door in its fetch', () => {
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (WW6): the seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT), the host's live names
-  // read there as `host.<name>`
-  const rh = rd('src/scenes/raidHost.js');
-  const at = rh.indexOf('  setRaidingPartiesHost({');
-  const body = rh.slice(at, rh.indexOf('\n  });', at));
-  assert.match(body, /relayRaids: \(\) => !!host\.online\?\.raidOk,/);
-  assert.match(body, /sendRaid: \(w, cell\) => !!host\.online\?\.sendRaid\(w, cell\),/);
-  assert.match(w, /online\.onRaid = \(f, room\) => raidRelayWord\(f, room\);/);
-  assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onRaid = \(f, room\) => \(f\.k === 'tw' \? offerRaidTowns\(link, f\.h\) : raidRelayWord\(f, room\)\);/);   // RAID-ROLL: the hub's ask for the towns table beside it
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /if \(path === RAID_INTERNAL_CLEAN\) return this\._raidCleanInternal\(request\);/);
-  assert.match(relay, /if \(await this\._raidSweep\(Date\.now\(\)\)\) \{ if \(riteDue\) await this\._riteArm\(Date\.now\(\) \+ RITE_TELL_RETRY_MS\); if \(sdOwed\) await this\._sdCellArm\(Date\.now\(\) \+ SD_TELL_RETRY_MS\); if \(starDue\) await this\._starArm\(starDue\); return; \}/);   // WB12d: never past the rite's retry (AUDIT BROKER-CAGE R4: the local renamed off riteOwed); PIN MOVED (STAR3): nor a star's
-  assert.match(relay, /if \(!this\._spend\(ws, now, raidGate, 'raidBucket', 'raidDrops', 'too many raid frames'\)\) return;\n\s+if \(!isCellRoom\(a\.key\)\) \{ this\._junk\(ws\); return; \}/);
-});

@@ -1,8 +1,7 @@
 // @ts-check
-// BLOOD2c - A WOUNDED BODY BLEEDS, AND A DEAD ONE BLEEDS OUT (2026-09-21,
-// Mac: "make it even more visceral and detailed").
+// BLOOD2c - A WOUNDED BODY BLEEDS, AND A DEAD ONE BLEEDS OUT.
 //
-// The reference (bible/05-Combat/Blood-Arc.md, "Player bleeding") bleeds
+// The reference (, "Player bleeding") bleeds
 // the PLAYER: below a health threshold, every 2..5 seconds, a spawn whose
 // particle count ramps from nothing at the threshold to MaxParticles at
 // one percent. This port turns that shape on the FOES, because a foe you
@@ -46,7 +45,7 @@ export const BLEED_DROPS_MAX = 6;
 export const BLEED_RADIUS = 0.35;
 export const BLEED_RATE = GIB_SPLASH_RATE;
 
-/** AUDIT TELL (bible/12-Enhanced-AI/Feud-Arc.md 8.2, built at last): A WOUND - a sweep's bleed on the player
+/** AUDIT TELL (8.2, built at last): A WOUND - a sweep's bleed on the player
  *  (systems/blowEffects.js, the view's `wound`) - drips whatever the health: at least WOUND_SHARE of the drops, every
  *  WOUND_WAIT seconds (its ticks' cadence) for as long as it runs. */
 export const WOUND_SHARE = 0.5;

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WITCH1 (2026-10-20, the owner: "With Halloween on the horizon. I think its fair to develop our first live event.
-// Daggerfall lore style"; bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, AS THE SERVICE KEEPS IT -
+// WITCH1: THE WITCHES' FESTIVAL, AS THE SERVICE KEEPS IT -
 // an account's Soul Cakes, the day's finds, the Wyrd Sister's sales, and the Hearth Offerings set out at homes' doors.
 // The numbers are src/net/festivalLaw.js, which the client reads too.
 //
@@ -9,7 +8,7 @@
 //
 // No relay sees an ordinary kill, so a find is the account's word that it killed (or fished, or won) - and that word is
 // BOUNDED here, never believed: the service's own die decides each ask at its source's odds, and a UTC day takes at most
-// FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cakes (a Weir Key's find's law, eg.js findEg). A forged client finds no
+// FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cakes. A forged client finds no
 // more than an honest one who played the whole day. Everything the cakes buy is the service's to sell: a sale is one
 // guarded UPDATE that takes the price only while the count covers it.
 //
@@ -51,7 +50,7 @@ import {
 export const FEST_OPS_MAX = 900;
 export const FEST_OPS_WINDOW_S = 3600;
 
-/** FESTIVAL_OPEN: 'off', 'dev' (the DEVELOPER_HANDLES alone) or 'on'; anything else is off. */
+/** FESTIVAL_OPEN: 'off', 'dev' (the Admins alone) or 'on'; anything else is off. */
 export const festivalSwitchOf = (/** @type {unknown} */ v) => (v === 'on' || v === 'dev' ? v : 'off');
 export function festivalOpenFor(/** @type {any} */ player, /** @type {any} */ env) {
   const s = festivalSwitchOf(env?.FESTIVAL_OPEN);

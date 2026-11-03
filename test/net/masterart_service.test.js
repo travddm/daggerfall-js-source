@@ -1,4 +1,4 @@
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57) - A MASTER'S WORK THROUGH THE REAL WORKER. The
+// MASTER-ART - A MASTER'S WORK THROUGH THE REAL WORKER. The
 // player's feedback ("Add more horizontal progression please!") and the decision: a Master in a craft makes a Legendary
 // piece of its kinds, its three lines chosen, their values the service's roll in the Legendary band, for its recipe's
 // goods and catalysts from three pursuits, one a character a UTC day. Built from the producers: the Worker over
@@ -62,7 +62,7 @@ test('MASTER-ART DONE WHEN: a Smith at Master makes a Daedric Longsword her own 
   const d = r.data;
   assert.deepEqual([d.master, d.quality, d.xp, d.first, d.chosen], [true, MASTERWORK, 0, false, LINES]);
   assert.deepEqual(d.lines, rollMasterLines(recipeById(SWORD), LINES, d.seed), 'the lines at the values its seed rolls');
-  for (const a of d.lines) assert.ok(a.value >= [20, 10, 6][LINES.indexOf(a.param ? `${a.id}:${a.param}` : a.id)], 'in the Legendary band');
+  for (const a of d.lines) assert.ok(a.value >= [12, 6, 4][LINES.indexOf(a.param ? `${a.id}:${a.param}` : a.id)], 'in the Legendary band');
   // the record: signed, Masterwork, the master's version and its lines
   const v = await verifyProductRecord(d.pieces[0].record, m.s.identityPublic, { subtle });
   assert.equal(v.ok, true, JSON.stringify(v));
@@ -83,7 +83,7 @@ test('MASTER-ART DONE WHEN: a Smith at Master makes a Daedric Longsword her own 
   assert.deepEqual(judged.findings, []);
   assert.equal((await judgeProducts(m.s.env.DB, judged.provenances)).findings.length, 0, 'and its record agrees, line for line');
   // a piece carrying other values than its record's is no Master's work of it
-  const forged = { ...sword, affixes: sword.affixes.map((a, i) => (i === 0 ? { ...a, value: a.value === 40 ? 39 : 40 } : a)) };
+  const forged = { ...sword, affixes: sword.affixes.map((a, i) => (i === 0 ? { ...a, value: a.value === 24 ? 23 : 24 } : a)) };
   assert.deepEqual(itemFindings(forged), [], 'in the band, the law alone cannot tell');
   const fj = judgeSave({ level: 10, goldPieces: 0, items: [forged] });
   assert.deepEqual((await judgeProducts(m.s.env.DB, fj.provenances)).findings.map((f) => f.code), ['provenance'], 'the judge holds it to its record');
@@ -208,7 +208,8 @@ test('AUDIT HORIZONTAL B2 A PLAIN CRAFT IS NO MASTER\'S WORK: a Smith at 90\'s M
   assert.equal(readProductRecord(made.body.pieces[0].record).l, undefined, 'a plain craft\'s record names no lines');
   const [plain] = mintPieces(made.body);
   assert.deepEqual((await judgeProducts(m.s.env.DB, judgeSave({ level: 10, goldPieces: 0, items: [plain] }).provenances)).findings, [], 'the dagger as made is lawful');
-  const forged = { ...plain, rarity: 'legendary', affixes: [{ id: 'damage', value: 40 }, { id: 'stat', param: 'strength', value: 15 }, { id: 'elemental', param: 'fire', value: 10 }], enchantments: [], name: 'Dagger' };
+  // PIN MOVED (B4 rescale): the Legendary tops, damage 24, Strength 9, fire 6 (were 40, 15, 10)
+  const forged = { ...plain, rarity: 'legendary', affixes: [{ id: 'damage', value: 24 }, { id: 'stat', param: 'strength', value: 9 }, { id: 'elemental', param: 'fire', value: 6 }], enchantments: [], name: 'Dagger' };
   for (const k of ['reforged', 'reforges', 'honed', 'imprint']) delete forged[k];
   assert.deepEqual(itemFindings(forged), [], 'a Masterwork, three lines in the band: the item law cannot tell');
   const j = judgeSave({ level: 10, goldPieces: 0, items: [forged] });

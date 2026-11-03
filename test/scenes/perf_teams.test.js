@@ -1,4 +1,4 @@
-// PERF-TEAMS (2026-10-10, the owner: 40 fps by a populated town, 165 forty pixels out): ANOTHER PLAYER'S TEAM IS CULLED.
+// PERF-TEAMS: ANOTHER PLAYER'S TEAM IS CULLED.
 // HCC-PARK keeps up to PARK_CELL_MAX parked teams a cell for PARK_TTL_MS, owner online or not, and the pool stepped and
 // drew every one of them every frame across the whole sixteen-pixel cell - behind the eye and past the far plane alike.
 // BY EXECUTION: past PEER_TEAM_DRAW_M a team keeps its word and its ease and draws nothing (with a hysteresis); my own

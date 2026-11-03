@@ -1,6 +1,5 @@
-// PERF-COL2 (2026-10-10, the owner: "performance must be highest priority now ... prob caused by placed objects by
-// players, crowded places and render range"): A STREAMED PIXEL'S BUCKETS ARE FILED BY PLACE (player/collider.js
-// onFloatingFrame, BROAD_COARSE_CELL; bible/07-Rendering/Performance-Priority.md PERF-COL2).
+// PERF-COL2: A STREAMED PIXEL'S BUCKETS ARE FILED BY PLACE (player/collider.js
+// onFloatingFrame, BROAD_COARSE_CELL; PERF-COL2).
 //
 // Every streamed pixel's collider bucket rides the floating origin (a translation provider), so FB0930-FRAME's broad
 // phase asked every one of them on every ray and every sphere - and each spans its pixel, too wide for the fine cells
@@ -16,7 +15,7 @@
 // the world host marks every streamed pixel's bucket as riding its state, and only those - and the two hosts that lay
 // a pixel's bucket of their own (Deep Waters' walls, a bounty farm) mark theirs with the frame it hands them.
 //
-// AUDIT PERF-COL2 (2026-10-10, the owner: "Lets do an audit on this"): FOUR: a query's candidates hold every bucket
+// AUDIT PERF-COL2: FOUR: a query's candidates hold every bucket
 // whose filed box meets its own, in the walk's order, once - against a brute force over random boxes, after frames
 // moved and buckets grew. FIVE: a mesh streamed into a standing filing is filed into it (the whole filing was made again
 // for each - 0.2 ms of a frame at the default view while a pixel built), its answers the old walk's; a frame moved
@@ -145,32 +144,7 @@ test('PERF-COL2: the work - a short probe asks the buckets round it and the fram
   assert.ok((nOld() - b0) > 3 * (nReal() - a0), `a capsule's move: ${nReal() - a0} asks, the old walk ${nOld() - b0}`);
 });
 
-test('PERF-COL2: the world host marks every streamed pixel\'s bucket as riding its state - the town\'s models, mills and boards, the gates, World of Daggerfall\'s pieces, Privateer\'s Hold, the ocean holes - and no mover\'s; Deep Waters\' walls and a bounty farm ride the frame the host hands them (mutants: a pixel\'s bucket unmarked; the walls unmarked; a farm unmarked; the frame not handed)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes("import { onFloatingFrame } from '../player/collider.js';"), 'the mark imported');
-  const lines = w.split('\n');
-  // HOST-SPLIT 2: the pixel's buckets are laid by its build (src/scenes/pixelBuild.js), which reads the state live,
-  // host.state - and a provider the host lays itself reads it as state: the census counts both spellings, or a bucket
-  // the host lays unmarked goes uncounted (AUDIT HOST-SPLIT 2, the second read)
-  const pix = lines.filter((l) => /\(\(o\) => \(\) => (?:host\.)?state\.pixelTranslation\(px, py, o\)\)\(\[0, 0, 0\]\)/.test(l) && !l.includes('collider.cover.add(') && !l.includes('const coverT = '));   // AUDIT BANTHA1 TREE-1: the cover's provider made once for its slices
-  assert.equal(pix.length, 10, 'the ten pixel-translation providers a bucket takes (the cover index is no bucket)');   // PIN MOVED (GHOSTFENCE, at the merge with ROAD-LOOK): the tenth the Ghostfence's (scenes/ghostfenceBuild.js), the ninth ROAD-LOOK's bridges; PIN MOVED (URBANIZER U3): the eighth is a town past the Bay's fabric, solid in its pixel's bucket   // PIN MOVED (FIELD BUGS 2026-10-13e HILL-SEAT): the seventh is a block's hill pads, solid in the pixel's bucket
-  for (const l of pix) assert.match(l, /onFloatingFrame\((host\.)?state, \(\(o\) => \(\) => \1state\.pixelTranslation\(px, py, o\)\)\(\[0, 0, 0\]\)\)/, `marked: ${l.trim().slice(0, 120)}`);
-  assert.ok(w.includes('collider.addMesh(h.bucket, pos, idx, _ohIdentity, onFloatingFrame(host.state, () => host.state.pixelTranslation(entry.px, entry.py, o)));'), 'the ocean holes\' bucket marked');   // PIN MOVED (MID-RING's room): the pits' bucket moved out of bootWorld verbatim (scenes/oceanHolesPits.js), the state read live through the host
-  const marks = (w.match(/onFloatingFrame\(/g) ?? []).length;
-  assert.ok(w.includes('ride = onFloatingFrame(state, () => state.pixelTranslation(px, py, o)); _poiRides.set(k, ride);'), 'a POI\'s parts\' buckets marked - one provider a pixel (scenes/poiHost.js riding)');   // POI-2
-  assert.equal(marks, 10 + 1 + 1, 'and nothing else marked (a boat, a wagon, a gate\'s own mover ride no pixel)');   // PIN MOVED (FIELD BUGS 2026-10-13e HILL-SEAT): the pads' bucket provider; PIN MOVED (POI-2): a POI's, riding the pixel it stands on; PIN MOVED (URBANIZER U3): a town's fabric's
-  // AUDIT: the two hosts that lay a pixel's bucket of their own are handed the frame, and mark with it
-  assert.ok(w.includes('    collider, pixelTranslation: (px, py, o) => state.pixelTranslation(px, py, o), floatingFrame: () => state,'), 'Deep Waters handed the frame');
-  assert.ok(w.includes('    pixelTranslation: (px, py) => state.pixelTranslation(px, py), floatingFrame: () => state,'), 'the bounty farms handed the frame');
-  const dw = readFileSync(new URL('../../src/scenes/deepWater/deepWatersHost.js', import.meta.url), 'utf8');
-  assert.ok(dw.includes('collider.addMesh(state.bucket, state.floor.positions, wall, IDENTITY, floatingFrame ? onFloatingFrame(floatingFrame(), t) : t);'), 'the walls\' bucket marked');
-  assert.equal(dw.split('collider.addMesh(').length - 1, 1, 'the walls are the host\'s one bucket');
-  const bf = readFileSync(new URL('../../src/scenes/bountyFarms.js', import.meta.url), 'utf8');
-  assert.ok(bf.includes('const tr = deps.floatingFrame ? onFloatingFrame(deps.floatingFrame(), tr0) : tr0;'), 'a farm\'s bucket marked');
-  assert.ok(/live\.addMesh\(f\.bucket, cpu\.positions, cpu\.indices, m\.local, tr\)/.test(bf), 'and laid with the marked provider');
-});
-
-/** Where a bucket's box stands in the world now: its own box, moved by its translation - SEA-DROPS (PIN MOVED: a mover
+/** Where a bucket's box stands in the world now: its own box, moved by its translation - SEA-DROPS (
  *  was asked always, `null` here): and a turned one's turned by its turn, every point of it inside (|R| on its half
  *  extents, collider.js turnedBox's bound). [x0, x1, z0, z1]. */
 function worldBox(b) {

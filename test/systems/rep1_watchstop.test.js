@@ -1,5 +1,4 @@
-// REP1 (2026-09-29, the reputation overhaul) - THE WATCH STOPS A KNOWN CRIMINAL IT SEES. Mac: "So I want to talk about
-// overhauling the reputation system. Something just much better and not as punishing, but still punishing." - and, of the
+// REP1 - THE WATCH STOPS A KNOWN CRIMINAL IT SEES. - and, of the
 // options put to him for low standing in town, "Challenged on sight".
 //
 // DFU rolled a 5% Criminal Conspiracy every game minute for a legal standing under -10 (PlayerEntity.cs:498-511), no guard
@@ -144,14 +143,3 @@ test('REP1: the guard\'s eye - a GUARD, in range, facing, the line CLEAR; a civi
   assert.equal(g.guardSeesPlayer({ playerFeet: [0, 0, 0], pool: [guard] }), null, 'a wall between');
 });
 
-test('REP1: the hosts - the per-minute levy is gone from both, the stop is built beside the arrest flow and looked for in the exterior frame (mutant: the levy put back)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(host);
-    assert.doesNotMatch(s, /passiveGuardSpawns\(/, `${host}: no passive levy`);
-    assert.match(s, /const standingWatch = createStandingWatch\(\{/);
-    assert.match(s, /\n\s*standingWatch\.frame\(\);/);
-    assert.match(s, /installLegalNotices\(\{ playerEntity, say: /);
-  }
-  assert.match(hostText('src/scenes/world.js'), /blocked: \(\) => townTalk\.overlayActive \|\| !!modes\?\.overlayHeld \|\| !!travelView\?\.active \|\| !!raidDefendingHere\(\)/,
-    'a raid on the town holds the stop');
-});

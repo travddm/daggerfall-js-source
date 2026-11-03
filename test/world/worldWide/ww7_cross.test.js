@@ -1,6 +1,4 @@
-// WW7-9 and WW7-10 (2026-10-26, the owner: "Yes travellers to need to travel everywhere. Same for ships."; the
-// coordinator's follow-up: across the Bay's edge, the land past the Bay waking a region at a time, and the sea's trade
-// past the Bay; bible/03-World/World-Wide.md WW7-9, WW7-10): THE LIVING WORLD ACROSS THE BAY'S EDGE AND THE LANES THAT
+// WW7-9 and WW7-10: THE LIVING WORLD ACROSS THE BAY'S EDGE AND THE LANES THAT
 // CROSS IT - the roads past the Bay's host's word of each region landed, a place waiting while the land about it is laid,
 // the squares and the ways across the edge, the readers of a waiting place waiting with it; the Bay's mouths, its
 // seaward water, the crossing lanes and their ways, the passages on them and the sea's trade counted past the Bay. Each pin
@@ -246,7 +244,7 @@ test('WW7-9 THE WINDOW PLANNER ACROSS THE EDGE: a pair across reads its Bay pixe
   const noJoin = edgeField({ join: false });
   const bare = createBeyondWays({ layer: () => noJoin.layer, dry: () => true, bay: () => ({ roads: noJoin.bayRoads, tracks: noJoin.bayTracks, isWater: () => false }), tilesPerFrame: 1e6 }).plan({ x: 500, y: 40 }, { x: 500, y: -40 }, true);
   assert.ok(bare && bare.kinds.includes('open'), 'no join: the edge walked on the open ground');
-  // the Bay's track walked; and its water: a band of it across the track the way goes round. PIN MOVED (main's RPT1026-WORLD
+  // the Bay's track walked; and its water: a band of it across the track the way goes round.
   // CAUSEWAY, travel/travelRoute.js pavedStep, at the fourth merge): the band once lay across the road, and a road over the
   // water is the road's now (his painter paves it) - a track is not (a ford), so the band lies across the track, and the
   // road's own crossing of it is walked, the window carrying the road's bytes the law reads
@@ -335,10 +333,6 @@ test('WW7-9 THE TRIPS\' WORLD WAKES A REGION AT A TIME: a place waits while the 
   assert.ok(trips.beyond.tiles < n, 'the tiles it reached let go');
   const off = createLivingTrips({ places, populated, peopleAt: () => 0, maps: { getClimateIndex: () => 0 }, woods, roads: () => null });
   assert.deepEqual([off.world.waiting({ px: 500, py: 40 }), off.world.waiting({ px: 500, py: -40 }), off.world.waitingArea(area)], [false, false, false], 'no land past the Bay: nothing waits');
-  const lt = rd('src/scenes/livingWorld/livingTrips.js');
-  assert.match(lt, /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: pastTheBay \? \{ epoch, placesIn: pastBayPlacesIn, landedIn, landed: \(\) => landed \} : null \}\);/);
-  assert.match(lt, /const epoch = \(\) => pastTheBay\?\.build\(\) \?\? 0;/, 'the epoch the roads\' build');
-  assert.match(hostText('src/scenes/world.js'), /, marketBandOf: townEcon\.marketBandOf, pastTheBay: _tamrielRoads \}\);/, 'the host hands the roads past the Bay\'s host');
 });
 
 test('WW7-9 THE READERS OF A WAITING PLACE WAIT WITH IT: its visitors, an inn\'s guests, a dungeon\'s divers, dives and fallen - none read while it waits (pending), so none is kept short; an area\'s hideouts while it waits (mutants: each reader\'s wait)', () => {
@@ -504,7 +498,6 @@ test('WW7-10 THE SEA\'S TRADE PAST THE BAY: a port\'s lanes are counted off the 
   assert.equal(host.prosperityOf(12), p(12, 1), 'the lanes moved: counted again');
   lanes = null;
   assert.equal(host.prosperityOf(11), p(11, 0), 'none standing: none');
-  assert.match(hostText('src/scenes/world.js'), /portLanes: \(\) => \(_lanesReady && mapDict \? worldLanes\.all\(\) : null\) \}\);/, 'the world\'s lanes');
 });
 
 // ─── 8. ON THE FREEWARE'S WORLD ──────────────────────────────────

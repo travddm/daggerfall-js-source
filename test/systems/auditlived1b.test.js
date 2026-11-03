@@ -1,5 +1,5 @@
-// AUDIT LIVED1b (2026-09-29, Mac: "Lets do a comprehensive audit on this") - the second audit of LIVED1 (your own time
-// online) and of the first audit's fixes: eleven lanes over the frozen tree 322b1735 (bible/01-Overview/audits/Audit-Lived1b.md).
+// AUDIT LIVED1b - the second audit of LIVED1 (your own time
+// online) and of the first audit's fixes: eleven lanes over the frozen tree 322b1735.
 // Each test pins one fix, driving the real modules the way the lane that found it reproduced it; each fix is also
 // mutation-proven (tools/mutants/auditlived1b.json).
 import { test, afterEach } from 'node:test';
@@ -14,7 +14,7 @@ import {
 } from '../../src/systems/worldTick.js';
 import * as WT from '../../src/systems/worldTick.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
-import { offlineCopyOf, onlineCopyOf, saneSaveClock, SAVE_CLOCK_MAX, RAID_RECORD_VENDOR } from '../../src/systems/offlineCopy.js';
+import { offlineCopyOf, saneSaveClock, SAVE_CLOCK_MAX, RAID_RECORD_VENDOR } from '../../src/systems/offlineCopy.js';
 import { checkpointAllowed } from '../../src/systems/online/onlineCheckpoint.js';
 import { createQuestBridge, QUEST_CTX_CONTRACT } from '../../src/scenes/quest/questBridge.js';
 import { TrainPc } from '../../src/systems/quest/actions.js';
@@ -137,13 +137,9 @@ test('AUDIT LIVED1b S1 (F2, K2): an online checkpoint waits while a raise waits 
   setWorldMinutes(1000);
   e.lastGameMinutes = 500;
   assert.equal(ownWalkWaiting(e), false, 'offline, never: the host saves on its own, as before');
-  // each gate by its own line - AUDIT C&C (the list's run): the zone's death checkpoint (WILD1) copied the gate, and one
-  // pattern held either copy, so the realm checkpoint's could lose its walk under a pin that still passed
   const world = rd('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES review): the two copies are one gate now (checkpointGateOpen), which carries the walk, asked at both doors
   assert.match(world, /const checkpointGateOpen = \(\) => checkpointAllowed\(\{ online: !!online, spawned: playerSpawned, seatOut: seatOut\(\), duel: !!duelMgr\?\.duel, walkWaiting: ownWalkWaiting\(playerEntity\), realm: !!realmSession \}\);/, 'the gate carries the walk');
   assert.match(world, /if \(!checkpointGateOpen\(\)\) return false;/, 'the host asks');
-  assert.match(world, /const allowed = checkpointGateOpen\(\);/, 'and the zone\'s death checkpoint, the same gate');
 });
 
 test('AUDIT LIVED1b P3 (A4, K3): the world\'s arms walk what no walk covered - a fast machine clock at the boot, a correction forward then back: every lived world minute once, none twice', () => {
@@ -237,7 +233,7 @@ test('AUDIT LIVED1b P4: the absence is measured on the relay\'s clock - a machin
   assert.equal(snapshotPlayer(e, { classicMinutes: Math.floor(ownMinutes()) }).worldMinutes, left, '...the composer\'s stamp');
   t.offset = 0;   // the welcome: the relay's offset
   hearSharedClock();
-  // REP4 (the reputation overhaul): PIN MOVED - the recovery is weekly, so the true 112 days away are sixteen points
+  // REP4 (the reputation overhaul):
   // (DFU's one boundary: -79); a machine clock months fast still buys nothing
   assert.equal(e.legalRep[0], -64, 'the true span\'s sixteen weeks, paid on the relay\'s clock');
   assert.equal(worldMinutesToSave(), Math.floor(worldMinutes()), 'and the save stamps the world\'s now');
@@ -247,20 +243,6 @@ test('AUDIT LIVED1b P4: the absence is measured on the relay\'s clock - a machin
   payAbsenceWhenHeard(left, () => { paid++; });
   assert.equal(paid, 1, 'a load after the welcome pays at once');
   assert.match(rd('src/scenes/world.js'), /online\.onClock = \(offsetMs\) => \{[^\n]*onlineArrival\(\); hearSharedClock\(\); \};/, 'the host hears it');
-});
-
-test('AUDIT LIVED1b P2: a copy Bring online made joins fresh - its stamp is this machine\'s clock at the click, and an OS clock set a year back there buys no pardon', () => {
-  const own = 400 * D, world = 5500 * D;
-  setSharedClock(null);
-  const offlineSave = { v: 1, classicMinutes: own, legalRep: [-80] };
-  const copy = onlineCopyOf(offlineSave, world - 365 * 12 * D);   // the menu's reading, a year back
-  assert.equal(copy.joinFresh, true);
-  setSharedClock(() => world);
-  const e = player();
-  restorePlayer(e, { ...JSON.parse(JSON.stringify(snapshotPlayer(player({ legalRep: [-80] }), { classicMinutes: own }))), worldMinutes: copy.worldMinutes, joinFresh: true });
-  hearSharedClock();
-  assert.equal(e.legalRep[0], -80, 'no absence paid for a character that was never away');
-  assert.equal(offlineCopyOf(copy).joinFresh, undefined, 'the flag is the first join\'s alone - the offline door drops it');
 });
 
 test('AUDIT LIVED1b F1: an online load re-anchors at the world\'s reading itself, not its whole minute - the first frame bills the play, not the absence\'s last minute', () => {
@@ -342,17 +324,14 @@ test('AUDIT LIVED1b R1 (A2, O3, S3): Copy to offline leaves the world\'s raid sc
   assert.equal(offlineCopyOf(offlineEnv).modData[RAIDING_PARTIES_VENDOR].lastSelectedDay, 550, 'an offline envelope\'s is its own');
 });
 
-test('AUDIT LIVED1b R3 (O2): a journal step\'s date crosses both doors with its quest - %qdt stays two days after the start', () => {
+test('AUDIT LIVED1b R3 (O2): a journal step\'s date crosses to offline with its quest - %qdt stays two days after the start', () => {
   const env = { v: 1, classicMinutes: 911 * D, worldMinutes: 1063 * D, quest: { quests: [{ questStartTime: 1063 * D * 60, activeLogMessages: [{ stepID: 1, time: 1065 * D * 60 }, { stepID: 2, time: 0 }] }] } };
   const off = offlineCopyOf(env).quest.quests[0];
   assert.equal(off.activeLogMessages[0].time - off.questStartTime, 2 * D * 60, 'two days apart, as online');
   assert.equal(off.activeLogMessages[1].time, 0, 'a zero stays');
-  const on = onlineCopyOf({ v: 1, classicMinutes: 911 * D, quest: { quests: [off] } }, 563 * D).quest.quests[0];
-  assert.equal(on.activeLogMessages[0].time - on.questStartTime, 2 * D * 60);
-  assert.equal(on.questStartTime, 563 * D * 60, 'the quest on the world\'s clock, and its step with it');
 });
 
-test('AUDIT LIVED1b D2 (R2, O4, S3): a cached building\'s stock days cross both doors by whole days - a shelf stocked today is stocked today on the new calendar, and restocks tomorrow', () => {
+test('AUDIT LIVED1b D2 (R2, O4, S3): a cached building\'s stock days cross to offline by whole days - a shelf stocked today is stocked today on the new calendar, and restocks tomorrow', () => {
   const stock = (m) => createStockedDate(dateFromClassicMinutes(m));
   const own = 550 * D + 1400, world = 700 * D + 60;   // 23:20 on the character's day, 01:00 on the world's: whole days, not the minutes' round
   const env = { v: 1, classicMinutes: own, worldMinutes: world, sceneCache: { scenes: [{ sceneName: 'shop', lootContainers: [{ stockedDate: stock(world), openedOn: stock(world) }, { stockedDate: 0, openedOn: 0 }, { stockedDate: 1 }] }] } };
@@ -362,11 +341,11 @@ test('AUDIT LIVED1b D2 (R2, O4, S3): a cached building\'s stock days cross both 
   assert.equal(needsRestock(shelf, stock(own)), false);
   assert.equal(needsRestock(shelf, stock(own + D)), true, 'and tomorrow it restocks');
   assert.deepEqual([never.stockedDate, owned.stockedDate], [0, 1], '"never stocked" and an owned house\'s latch stay');
-  // across a year's end, and back online
+  // across a year's end
   const late = 404 * 360 * D + 359 * D;   // the calendar's last day of a year
-  const env2 = { v: 1, classicMinutes: late, sceneCache: { scenes: [{ lootContainers: [{ stockedDate: stock(late) }] }] } };
-  const on = onlineCopyOf(env2, late + 2 * D);
-  assert.equal(on.sceneCache.scenes[0].lootContainers[0].stockedDate, stock(late + 2 * D), 'two days on, over the year\'s turn');
+  const env2 = { v: 1, classicMinutes: late + 2 * D, worldMinutes: late, sceneCache: { scenes: [{ lootContainers: [{ stockedDate: stock(late) }] }] } };
+  const moved = offlineCopyOf(env2);
+  assert.equal(moved.sceneCache.scenes[0].lootContainers[0].stockedDate, stock(late + 2 * D), 'two days on, over the year\'s turn');
 });
 
 test('AUDIT LIVED1b A3: a backward step of the world\'s clock re-rolls no raid day and restocks no bought-out guild shelf online; offline nothing reads differently', async () => {
@@ -486,7 +465,7 @@ test('AUDIT LIVED1b P1: a party mirror\'s night walks the follower\'s own watch 
   try {
     let watched = 0, asks = 0, burst = 0;
     for (let r = 0; r < 20; r++) { const o = night('mirror', 1000 + r); if (o.watch > 0) watched++; asks += o.spawnAsks; burst += o.burst; }
-    // REP1 (the reputation overhaul, "Challenged on sight"): PIN MOVED - the minute loop rolls no conspiracy any more, so
+    // REP1 (the reputation overhaul, "Challenged on sight"):
     // a hated member's night is not watched, mirrored or alone (the watch stops a known criminal a guard SEES, on the
     // street - scenes/standingHost.js); the night's other two laws stand, the burst now read off the loop's own asks
     assert.equal(watched, 0, 'no night of a hated member draws the old levy');

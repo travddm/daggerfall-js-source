@@ -26,8 +26,7 @@ import { transformPoint } from '../mat4.js';
 export { RDB_SIDE };
 
 /**
- * CRUX-DOOR (2026-09-27, Discord: in the Mantellan Crux "when reaching entrance to the Fire Skull Room after touching
- * the big crystal, it will not go there, instead it leads back to outside"). A block's `exitDoors` is DFU's own
+ * CRUX-DOOR. A block's `exitDoors` is DFU's own
  * misnomer (RDBLayout.cs:37): EVERY door face of every model the block places - building (74), dungeon-entrance
  * (56/331) and dungeon-exit (95) alike. Only a DungeonExit door leaves a dungeon (PlayerActivate.cs:649; an entrance
  * door wants the player outside, :640, and a building door's TransitionExterior finds no interior, :634), and only

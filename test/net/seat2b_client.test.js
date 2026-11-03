@@ -1,6 +1,5 @@
-// SEAT2b (2026-10-01, Mac: "Finish the seats"; "We need to do a comprehensive audit on everything and finish the not
-// done"): THE WORKS ON THE SEAT TAB - each work the seat may raise, its tier and what it does, the project and what it
-// still wants (or its day), the stockpile, and the holder's lever a work (bible/11-Multiplayer/Seats-Arc.md 7.5, 7.9;
+// SEAT2b: THE WORKS ON THE SEAT TAB - each work the seat may raise, its tier and what it does, the project and what it
+// still wants (or its day), the stockpile, and the holder's lever a work (7.5, 7.9;
 // src/ui/seatWorks.js, src/net/fortLaw.js fortWorkLine). `06-Systems/Online-Arc.md` SEAT2b.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

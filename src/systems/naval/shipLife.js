@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-LIFE (2026-09-30, Mac's item 1 of the six-part sea ask: ships that berth at ports, depart, voyage and keep
-// their own errands; `01-Overview/handoffs/Handoff-Naval-Crew-and-Ship-Life.md` slice E) - A SHIP GOING SOMEWHERE. The port's
+// SHIP-LIFE - A SHIP GOING SOMEWHERE. The port's
 // own; pure - the host hands the water, a town's footprint and the ships' clocks, and gets back berths, paths and the
 // plan a captain sails by when no fight is hers.
 //
@@ -29,13 +28,12 @@
 // A fight comes first (navalAI.js stepCaptain: an enemy, a threat, a prize, the guns heard) - a navy at her berth
 // answers a pirate, a merchantman flees one - and the errand is taken up again after it with a way planned anew.
 //
-// SHIP-WATCH (2026-10-01, Mac: "I also want to keep improving the AI") - THE NIGHT (`ctx.night`, the lanterns' hours):
+// SHIP-WATCH - THE NIGHT (`ctx.night`, the lanterns' hours):
 // a merchantman's dwell spent after dark keeps her at her berth till morning (no master puts out into a night sea
 // with a hold to lose), and a pirate's lurk closes on the harbour's mouth to NIGHT_LURK_K of its reach - under cover
 // of the dark, where the last ships in of the evening pass.
 //
-// PORT-SHIPS (2026-10-27, the owner's field report, item 8: "I went to solitude and the ships at works were inside town
-// walls"; the owner: "No band aids") - A BERTH STANDS WHERE A SHIP CAN (`berthStands`). A berth was kept on three lines
+// PORT-SHIPS - A BERTH STANDS WHERE A SHIP CAN (`berthStands`). A berth was kept on three lines
 // of her footprint, a station every eighth of her length, asked of the water alone - and the water says nothing of what
 // stands on it, nor of the ground under it:
 //   - THE TOWN (`keep`, systems/naval/harbourKeep.js): a town's walls, its piers, a sea stack stand in the water. A
@@ -344,7 +342,7 @@ export function findHarbour({ rect, isWater: own, hull = BERTH_HULL, deep = deep
   let berths = pick(cands);
   if (!berths.length) return null;
   let mouth = mouthOf(berths);
-  // SHIP AUDIT (2026-10-27, Lillandril on the freeware since RELIEF-PEAKS): the berths nearest the town lay in an inlet
+  // SHIP AUDIT: the berths nearest the town lay in an inlet
   // along its side with no way out, the open sea past its other side, and the whole harbour was none - taken again from
   // the shores whose own way out meets open water
   if (!mouth) {

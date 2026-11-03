@@ -1,6 +1,5 @@
 // @ts-check
-// ALLY-CAST (2026-09-23, Mac: "Can we implement the use of spells on players? For example healing and other buffs?
-// ... some sort of ally targeting system") - A SPELL CAST ON A PARTY MATE.
+// ALLY-CAST - A SPELL CAST ON A PARTY MATE.
 //
 // DFU has no other players, so its five target types (spellcast.js TARGET_TYPES) only ever land on the caster, a
 // foe or nothing. The port's law online is that a player's vitals and live effects are THEIR OWN client's: nothing
@@ -56,7 +55,7 @@ export function allyCastable(spell) {
   return fx.length > 0 && fx.every(allyEffect);
 }
 
-/** AUDIT WK-M4 (2026-10-01): WHAT MY COMPANION CAN USE. He is a body this scene simulates, not a player, and three of the
+/** AUDIT WK-M4: WHAT MY COMPANION CAN USE. He is a body this scene simulates, not a player, and three of the
  *  families a mate may be given are read off the PLAYER alone: Light (15 - the magic candle burns for the player's own
  *  effect, scenes/hostMagic.js `candle`), Detect (39 - the compass's markers, systems/nearbyObjects.js detectedMarkers
  *  over the player's entity) and Comprehend Languages (44 - the pacification roll, scenes/hostCombat.js, reads the
@@ -72,8 +71,7 @@ export function companionCastable(spell) {
   return allyCastable(spell) && spell.effects.some(companionEffect);
 }
 
-/** SPELL-GIFT (2026-09-27, Discord - Tabitha, a cleric: "a LARGE amount of buffs & spells just don't work when cast on
- *  another person, even with touch. Normal regen seems okay, but Regen + Anything, Fortify Attributes, etc."). A
+/** SPELL-GIFT. A
  *  CASTERONLY GIFT ARMS WHILE A MATE STANDS NEAR. Most of the buffs a healer casts are CasterOnly - DFU's spellbook
  *  is, and the spell maker snaps a spell to CasterOnly the moment it holds one self-only effect (Light, Levitate,
  *  Slowfall, Detect: spellMaker.js enforceSelected), so "Regen + anything" usually is one. A1 armed such a spell for
@@ -87,7 +85,7 @@ export const ALLY_ARM_RADIUS = 10;
 export const ALLY_ARMED_LINE = 'Aim at a party member to cast it on them, or anywhere else to cast it on yourself.';
 /** COMPANION-KIT: ...and the same word with my companion near (scenes/hostMagic.js companionNear). */
 export const COMPANION_ARMED_LINE = 'Aim at your companion to cast it on them, or anywhere else to cast it on yourself.';
-/** GIFT-QUIET (2026-10-04: "sometimes theres notification spam when putting a spell on companion"): a gift's lines - the
+/** GIFT-QUIET: a gift's lines - the
  *  armed ready's ("Press button to fire spell." and the line above it), the caster's ("You cast Heal on Hilda.") and a
  *  party mate's on the receiving end ("Bran casts Heal on you.") - are said at most once in this many seconds of real
  *  time. Each was a new toast every cast, and told apart from the line before it, so the notice stack's repeat guard

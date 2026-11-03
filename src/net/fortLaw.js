@@ -1,6 +1,5 @@
 // @ts-check
-// SEAT2b (2026-10-01, Mac: "Finish the seats"; "We need to do a comprehensive audit on everything and finish the not
-// done"): A SEAT'S FORTIFICATIONS, ITS SIEGE WORKS AND ITS REVOLT - the law both ends read (bible/11-Multiplayer/
+// SEAT2b: A SEAT'S FORTIFICATIONS, ITS SIEGE WORKS AND ITS REVOLT - the law both ends read (bible/11-Multiplayer/
 // Seats-Arc.md 6.2, 7.5, 7.7, 4.2's Siege Camp; Appendix B). Fortifications belong to the SEAT, not the guild: a
 // project on the seat's board, its materials delivered by writs to the stockpile and its Marks paid from the
 // treasury, standing 2, 4 or 7 days after its last delivery; each drops a tier when the seat changes hands and at a
@@ -65,7 +64,7 @@ export const fortTierRow = (id, t) => (Number.isSafeInteger(t) && t >= 1 ? fortW
  * Harbour at a coastal seat; the rest anywhere.
  */
 /** AUDIT SEATS-2 L5: the Apothecary's steps wait on Alchemy's, Cooking's and Jewelcrafting's stations - until they stand
- *  it is raised by no one (a holder's Drakes and stone paid for nothing). PROF12 (Mac: "2 and 4"): OPENED - the three
+ *  it is raised by no one (a holder's Drakes and stone paid for nothing). PROF12: OPENED - the three
  *  stand (PROF9 the fire, PROF10 the jeweller's bench, PROF12 the alchemy station), and a step a tier is each one's
  *  (STATION_PROFESSIONS): a Jewelcrafting piece's quality step, a dish's XP half again (recipeLaw cookXp), a brew's Potent
  *  chance +10 (alchemyLaw potentChance). */

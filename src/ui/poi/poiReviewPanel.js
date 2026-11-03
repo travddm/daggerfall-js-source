@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-6 (2026-10-14) - THE APPROVER'S QUEUE AND A POI'S HISTORY, IN THE EDITOR.
+// POI-6 - THE APPROVER'S QUEUE AND A POI'S HISTORY, IN THE EDITOR.
 //
-// Mac: "I need to be able to approve changes" (bible/06-Systems/POI-Editor-Arc.md POI-6). Two dialogs over the POI
+// (POI-6). Two dialogs over the POI
 // editor's panel (ui/poi/poiEditorPanel.js):
 //
 //   - APPROVALS (an approver's; the bar's button): every submission, oldest first - its name, who sent it and when,

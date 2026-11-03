@@ -53,7 +53,7 @@ async function run(label, opts) {
     check(`${label}: the ${want.toLowerCase()} door is on the rail`, doors.includes(want), doors.join(' / '));
   }
 
-  // MENU-TOGGLE (2026-09-26): the door's Enhanced/Classic pair is retired - the interface is the Overhauls page's -
+  // MENU-TOGGLE: the door's Enhanced/Classic pair is retired - the interface is the Overhauls page's -
   // so the foot is build on the left and About on the right, and nothing between them
   const foot = await page.evaluate(() => {
     const about = document.querySelector('.px-foot .px-about:not(.px-shots)');
@@ -68,7 +68,7 @@ async function run(label, opts) {
   //    should hold - it is exactly what the U29/U30 split bought.
   await page.locator('.px-menu button').filter({ hasText: /Settings/ }).first().click();
   await page.waitForSelector('#enhanced-menu .row');
-  // SO1 (2026-09-11) put the Enhanced category first, and FT8 (2026-09-14)
+  // SO1 put the Enhanced category first, and FT8
   // emptied it of switches (they are the Features home's now) - the rows
   // this step reads and the one it presses are the GAME category's (ORG2: the Gameplay tab's).
   await page.locator('#enhanced-menu .subbtn').filter({ hasText: /^Gameplay/ }).first().click();
@@ -106,8 +106,8 @@ async function run(label, opts) {
   //     that a press PERSISTS.
   //
   //     This rode the ROADS switch until the road system was removed
-  //     whole (2026-08-29, Mac's call), then the procedural sky in the
-  //     Enhanced pane; FT4 (2026-09-14) condensed that switch with
+  //     whole, then the procedural sky in the
+  //     Enhanced pane; FT4 condensed that switch with
   //     Dynamic Skies' into the Features home's three-way outdoors row,
   //     and the home is where every enhanceable feature lives now. The
   //     checks are about the HOME and its switch machinery
@@ -121,7 +121,7 @@ async function run(label, opts) {
   //     is a SEGMENTED BAR now, not one cycling button, so a tier is
   //     pressed by name rather than stepped into.
   //
-  //     ORG2 (2026-10-09): the Features home is the Settings screen's tabs - the outdoors row is on Graphics, the tab
+  //     ORG2: the Features home is the Settings screen's tabs - the outdoors row is on Graphics, the tab
   //     Settings opens on.
   await page.goto(`${BASE}/play/?nointro`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.px-menu', { timeout: 60000 });

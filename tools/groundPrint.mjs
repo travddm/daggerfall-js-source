@@ -1,5 +1,5 @@
 // @ts-check
-// GROUND-GATE (FIELD BUGS 2026-10-17f; bible/01-Overview/bugs/Field-Bugs-2026-10-17f.md): THE GROUND'S PRINT. The relay
+// GROUND-GATE (FIELD BUGS 2026-10-17f): THE GROUND'S PRINT. The relay
 // refuses a ground room's hello from a build on an older ground (net/wire.js GROUND_LAW), so the law has to move every
 // time the ground does - and a number beside a comment asking politely is forgotten (SLAM8's lesson, RELAY_VERSION's).
 // The print is the shaped ground as online stands it (world/terrain/terrainGen.js generatePixelTerrain, landforms on)
@@ -8,7 +8,7 @@
 // test/net/fb1017f_groundgate.test.js holds the ground to the print recorded under the law this tree names: a move past
 // GROUND_PRINT_TOLERANCE_M anywhere is a new ground, and the law moves with it. Inside it is a float's noise.
 //
-// BAY-LEFT-GROUND (bible/03-World/Landforms.md "BAY-LEFT-GROUND"): AND PAST THE BAY - the print read the Bay's synthetic
+// BAY-LEFT-GROUND ("BAY-LEFT-GROUND"): AND PAST THE BAY - the print read the Bay's synthetic
 // pixels alone, so a ground that moved past the Bay (its towns' sites, D1) moved under GROUND_LAW unseen. It reads two
 // pixels of the continent composed round the synthetic world too (world/tamriel/tamrielGround.js groundWoods on the
 // authored shape - no trace, no game data): a town past the Bay by its site, and its neighbour the site pulls.

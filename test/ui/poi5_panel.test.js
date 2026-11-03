@@ -1,4 +1,4 @@
-// POI-5 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE MATERIAL EDITOR AND THE UV EDITOR'S PANEL.
+// POI-5 - THE MATERIAL EDITOR AND THE UV EDITOR'S PANEL.
 // Mac, asked what "UV map" covers: "Full UV editor".
 //   - the material editor (src/ui/poi/poiEditorPanel.js): a picture taken from a file - read by its header, refused in words
 //     when it is not one, uploaded by its name and worn as one step; the glow's colour and strength; where the picture

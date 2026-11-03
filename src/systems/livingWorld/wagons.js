@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW10 (2026-10-09, bible/06-Systems/Living-World-II.md "LW10"): THE WAGON TRAIN - the horses and wagons the road's
-// parties travel with, and where each stands at any minute. Mac: "actual caravans utilizing horses and wagons". Pure,
+// LW10: THE WAGON TRAIN - the horses and wagons the road's
+// parties travel with, and where each stands at any minute.. Pure,
 // like the trips they ride on (LW0 decision 2): the team is the trip's, its place the party's place on its way - every
 // reader's caravan has the same wagon at the same bend, its wheels at the same spoke.
 //

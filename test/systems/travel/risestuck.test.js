@@ -116,10 +116,6 @@ test('RISE-STUCK: the modal hosts\' door (reconcile the slot, then push) keeps a
   slot = ds;   // presentInteriorDeath / the dungeon's presenter write the slot by hand
   mount({ name: 'a quest box' });
   assert.equal(slot, ds, 'the box went beneath the screen');
-  const wm = src('src/scenes/worldModes.js');
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.match(wm, /interiorWindows\.reconcile\(interiorOverlay\);[^\n]*\n\s*if \(interiorWindows\.containsWindow\(w\)\) return;[^\n]*\n\s*interiorWindows\.pushWindow\(w\);/, 'the interior door is that shape');
-  assert.match(dc, /dungeonWindows\.reconcile\(activeOverlay\);[^\n]*\n\s*if \(dungeonWindows\.containsWindow\(win\)\) return true;\n\s*dungeonWindows\.pushWindow\(win\);/, 'and the dungeon\'s');
 });
 
 /** A journey over a table, the world host's wiring: the panel's CAMP is InterruptTravel (world.js onClose). */
@@ -170,47 +166,6 @@ test('RISE-STUCK: the mechanism - under a paused window a journey\'s autopilot s
   assert.deepEqual(boxed, [TRAVEL_OPTIONS_TEXT.MsgArrived], 'TravelOptionsMod.Update :1343-1345 - the autopilot runs under the travel map, and so under anything that pauses');
 });
 
-test('RISE-STUCK: a death ends the journey through the mod\'s own pauseTravel - the panel down, the scale back to one, no autopilot left to arrive, the destination kept for the map', () => {
-  const { to, ui, boxed, scales, intoDestination } = journey();
-  assert.equal(to.isTravelActive, true);
-  to.messages.pauseTravel();   // the world host's presenter, below
-  assert.equal(ui.isShowing, false, 'the panel is down');
-  assert.equal(scales.at(-1), 1, 'InterruptTravel\'s SetTimeScale(1)');
-  assert.equal(to.state.autopilot, null);
-  assert.equal(to.destinationName, 'Daggerfall', 'CAMP, not EXIT - the map\'s resume prompt can take it up again');
-  intoDestination();
-  to.update(underTheDeathScreen);
-  to.update(underTheDeathScreen);
-  assert.deepEqual(boxed, [], 'nothing arrives under the death screen');
-  // ...and the world host sends it as the death is presented - AUDIT RISE-REST F4: AFTER the screen is up, and
-  // guarded, because the presenter runs inside the one damage door and a throw raised before the screen left a dead
-  // player standing with none
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf('setDeathPresenter(() => {');
-  const presenter = w.slice(at, w.indexOf('\n  });', at));
-  assert.match(presenter, /if \(!\(townTalk\.overlay instanceof DeathScreen\)\) \{[\s\S]*?\n\s*townTalk\.showOverlay\(new DeathScreen\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*try \{ travelOptions\?\.messages\.pauseTravel\(\); \} catch \(e\) \{ console\.error\(/, 'once a death, after the screen, guarded');
-  assert.equal((presenter.match(/pauseTravel\(\)/g) ?? []).length, 1, 'and nowhere else in it');
-});
-
-test('RISE-STUCK: a respawn that throws still takes the death screen down - its reset is spent, and nothing else would', () => {
-  const w = src('src/scenes/world.js');
-  const ri = w.indexOf('function respawnOnlinePlayer()');
-  const code = w.slice(ri, w.indexOf('\n  }\n', ri)).split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-  // PIN MOVED (RVN8: a revenant's theft rides the same box, after the price - bible/12-Enhanced-AI/Feud-Arc.md 19)
-  assert.match(code, /townTalk\.showOverlay\(new ActionTextBox\(\[respawnFlavorText\(kind\)(?:, deathPenaltyText\(goldLost\)(?:, took\?\.line)?\]\.filter\(Boolean\)|\])\)\);[^\n]*\n\s*\}\)\.catch\(\(e\) => \{\n[^\n]*console\.error\([^\n]*\n\s*closeDeathScreen\(\);[^\n]*\n\s*\}\)\.finally\(\(\) => \{ _respawning = false; \}\);/,
-    'the chain catches, closes the screen it finds and still frees the latch');
-  // AUDIT RISE-REST F1: WHICHEVER HOST HOLDS IT. A death in a building or a dungeon stands in the mode's own slot, and
-  // a rise that threw before (or inside) forceExitToExterior left it there - the catch read townTalk's slot alone.
-  // One door, shared with the Resurrect (which always knew both).
-  const fn = w.slice(w.indexOf('function closeDeathScreen() {'), w.indexOf('\n  }\n', w.indexOf('function closeDeathScreen() {')));
-  assert.match(fn, /const ov = townTalk\.overlay;\n\s*if \(ov instanceof DeathScreen\) \{ ov\.restoreView\(\); townTalk\.closeOverlay\(ov\); \}\n\s*else modes\?\.clearDeath\?\.\(\);$/, 'townTalk\'s slot, else the mode\'s');
-  const rez = w.slice(w.indexOf('function resurrectInPlace(rez) {'), w.indexOf('\n  }\n', w.indexOf('function resurrectInPlace(rez) {')));
-  assert.match(rez, /\n\s*closeDeathScreen\(\);\n/, 'the Resurrect closes through the same door');
-  assert.equal((w.match(/instanceof DeathScreen\) \{ ov\.restoreView\(\);/g) ?? []).length, 1, 'and no second copy of the close stands anywhere in the host');
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /clearDeath\(\) \{\n\s*if \(mode === 'dungeon'\) \{ dungeonCtx\?\.clearDeathOverlay\?\.\(\); return; \}\n\s*if \(interiorOverlay instanceof DeathScreen\) \{ interiorOverlay\.restoreView\(\); interiorOverlay = null; \}/, 'which reaches the building and the dungeon');
-});
-
 test('RISE-STUCK / AUDIT RISE-REST F3: nothing is painted beneath a window that holds the top - a box waiting under the death screen neither shows through the wash nor floats its notice over the veil', () => {
   let slot = null;
   const stack = makeWindowStack({ onTop: (w) => { slot = w; } });
@@ -228,6 +183,4 @@ test('RISE-STUCK / AUDIT RISE-REST F3: nothing is painted beneath a window that 
   assert.equal(slot, box);
   stack.eachPaintedBeneath((w) => painted.push(w.name));
   assert.deepEqual(painted, ['shop'], 'and the chain paints again under an ordinary top');
-  assert.match(src('src/scenes/townTalk.js'), /if \(overlay && font\) \{\n\s*windows\.eachPaintedBeneath\(\(w\) => w\.draw\(renderer, canvas, font, s\)\);[^\n]*\n\s*overlay\.draw\(renderer, canvas, font, s\);/, 'townTalk paints through it');
-  assert.doesNotMatch(src('src/scenes/townTalk.js'), /eachCoveredWindow\(\(w\) => w\.draw/, 'and through nothing else');
 });

@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10c (bible/03-World/Arena-Provinces.md TESA10c) - ALINOR'S LANDMARKS: the port's own models of the city's
+// TESA10c (TESA10c) - ALINOR'S LANDMARKS: the port's own models of the city's
 // signatures (world/capitalPlans.js ALINOR says where each stands) - the Royal Palace of white stone with its gilt
 // spires, TESA-LORE on its height (three terraces and their grand stair: the city "built on mountain slopes", the palace
 // at their top); the bridges over the river through the city's south; the harbour's quay and piers; the white walls with

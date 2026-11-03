@@ -1,5 +1,4 @@
-// AUDIT SERPENT (2026-10-04, Mac: "I definitely want to do a conprehensive audit on this and ensure its absolute
-// perfection"): the pins of the audit's findings ON THE RELAY (bible/01-Overview/audits/Audit-Sea-Serpent.md) - each a law that
+// AUDIT SERPENT: the pins of the audit's findings ON THE RELAY - each a law that
 // failed before its fix, over the real Room in a real cell and the real hub. ONE FIGHT A SITE (S1: a forged site stands
 // its own fight, unheard by an honest client, its kill said for its own site; at most SERPENT_SITES_MAX a day, one an
 // account), the receipt of a fighter away from its cell at the kill (S5), the refused shooter not junked (S7), the slain
@@ -119,7 +118,7 @@ test('AUDIT SERPENT S1: a ship refused a seat, between two fights, watches the o
     const a = r.connect(), x = r.connect();
     await r.hello(a, 'peer-0001', at(A, 120, 0)); await r.hello(x, 'peer-0005', at(B, 120, 0));
     await say(a, IN(A)); await say(x, IN(B));
-    fillFight(fightAt(r, A), fightAt(r, A).players['acct-peer-0001']);   // PIN MOVED: SERPENT4 - its waters full, never closed
+    fillFight(fightAt(r, A), fightAt(r, A).players['acct-peer-0001']);
     const late = r.connect();
     await r.hello(late, 'peer-0007', at(A, -1000, 0));   // 1000 m off the true site, toward the forged one
     assert.ok(1000 < ADMIT_R && Math.hypot(A.sx - B.sx, 0) / SERPENT_NATIVE_PER_M - 1000 < FAN_R, 'about both');
@@ -167,7 +166,7 @@ test('AUDIT SERPENT S1: AT MOST SERPENT_SITES_MAX SITES A DAY, ONE AN ACCOUNT - 
     assert.equal(fightAt(r, site(2)), null);
     assert.equal(r.store.has(`${SERPENT_FIGHT_KEY}:${idOf(site(2))}`), false, 'and forgotten in storage');
     assert.deepEqual(r.store.get(SERPENT_FIGHTS_KEY).sort(), [0, 1, 3].map((k) => idOf(site(k))).sort());
-    // a site after it has dived stands nothing (PIN MOVED: SERPENT4 - once the storm closed its waters; they are open
+    // a site after it has dived stands nothing (
     // until it dives now)
     r.room._serpents.delete(idOf(site(0)));
     const g = r.connect(); await r.hello(g, 'peer-0008', at(site(5), 0, 40));
@@ -277,7 +276,7 @@ test('AUDIT SERPENT S7/B8/S9/E4/S8/T2: the relay\'s smaller laws - a refused sho
     assert.ok(Math.abs(f.max - (max - share)) < 1e-6, 'her share out');
     await say(free, { k: 'wr', w: 0 });
     assert.ok(Math.abs(f.max - max) < 1e-6, 'and back');
-    // S7: a ship refused a seat goes on firing - not heard, never junk (PIN MOVED: SERPENT4 - refused a full fight's seat;
+    // S7: a ship refused a seat goes on firing - not heard, never junk (
     // after the seal she joins)
     set(TT.sealAt + 1);
     const late = r.connect(); await r.hello(late, 'peer-0003', at(A, 150, 0));

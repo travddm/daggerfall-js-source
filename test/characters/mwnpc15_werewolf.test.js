@@ -1,4 +1,4 @@
-// MWNPC15 (2026-10-10, the MW-NPC arc's fifteenth slice - bible/04-Characters/Morrowind-NPCs.md section 20): THE
+// MWNPC15: THE
 // WEREWOLF FOE IN BLOODMOON'S WOLF. The player's werewolf (WEREWOLF1) and a peer's already stand in it, PeerBodies
 // building the wolf for a pose whose `wb` bit says so and refusing it - once, for the data - where Bloodmoon is not
 // attached. A werewolf foe is a person in its beast form: its look says `wolf`, the lane hands PeerBodies the wire's own

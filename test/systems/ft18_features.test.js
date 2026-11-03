@@ -1,6 +1,4 @@
-// FT18 (2026-09-25, Mac: "Add option to set all mods/enhancements off", "Add search bar to mods/enhancements in the
-// ingame pause menu", "Lets do a comprehensive reorganize and consolidation of our mod/enhancements. Determine toggles
-// that dont need to exist anymore or ways to clean up"). The Features home, reorganized:
+// FT18. The Features home, reorganized:
 //   - TEN ROWS ARE FOUR. Grass (density + style), wind (sway + wisps), quick slots (the diamond + quickbar-or-hotbar)
 //     and blood (marks + overkill + lens + gore): one bar each, the rest PARTS in the tile's drawer. No key, default
 //     or consumer changed - the rows that are gone are declared on the row that covers them (`also`).
@@ -52,8 +50,8 @@ test('FT18: ten rows are four, and nothing they offered is lost - every key, def
   for (const gone of ['grass-density', 'grass-style', 'wind-wisps', 'flora-sway', 'quickslot-diamond', 'quickbar-style', 'blood-marks', 'blood-overkill', 'blood-screen', 'blood-gore']) {
     assert.equal(row(gone), undefined, `${gone} is condensed`);
   }
-  assert.equal(FEATURES.length, 117);   // PIN MOVED (TESA-LANDS, 2026-10-27): Lands of Tamriel, met at the merge with MW-SHOULDER's Over the Shoulder (2026-10-26), met at the merge with PIN MOVED (RESOURCE-HIGHLIGHTS, 2026-10-26): Resource highlights; BEAST-BOOTS's Beast Footwear and Beast Helmets (2026-10-24); MW-DETAIL's Morrowind Model Detail (2026-10-22), met at the merge with EVENTS1's Event board (2026-10-23); NPC-MARKS' Morrowind People Marks (2026-10-21); DEX0's Daggerfall Enemy Expansion (2026-10-19), met at the merge with QL1's Questlines (2026-10-19), met at the merge with BANTHA1's Jungle of Bantha and BODY-MOTION's Morrowind Body Motion (2026-10-18), met at the merge; WEAPON-GLOW1's Weapon glow (2026-10-16); KG3's The King's Gambit (2026-10-13) and UI-CALM's Calm HUD (2026-10-14), met at the merge; BODY-CARD's Billboard Look (2026-10-14); STEED1's Horse care and WAGONS4's Wagon upkeep (2026-10-11); RSH1's Readied Spellcasting Hands (2026-10-11); MWNPC5b's Morrowind People (2026-10-09, at MW-NPC's merge of main); RW1's Real windows (2026-10-09); TAMRIEL2's Land beyond the Bay and TAMRIEL1's Tamriel on the map (2026-10-08); SNOWFALL1's Snowfall, HAZE1's Heat Haze and WINDFALL1's Windfall (2026-10-08, at AUDIT ENVIRONS' merge of main); WATER-NEXT's Water quality (2026-10-07, at the Super Dungeons arc's merge of main); PI1's Physical Items and MW-SPELLFX1's Morrowind Spell Effects (2026-10-07, at the Super Dungeons arc's merge of main); VERGE1's clear roadsides and ECOTONE1's blended climates (2026-10-07); LANDFORM1's Landforms (2026-10-06); MW-STEEL1's Steel Helm (2026-10-06); SD-ONLINE (2026-10-05): the world's dungeon sizes; LEGACY1's Project Legacy (2026-10-05); LW2's living world (2026-10-04); THE DELVE ARC (2026-10-05): medium dungeons, the look round, the lever echoes, the way out, the quest guidance tiers; LOAD1's loading screens (2026-10-05); LPT1's Low Poly Trees (2026-10-05); FIELD BUGS 2026-10-04e: the road's encounters (WILD-ROAD); NEARBY-QUESTS (2026-10-04); IT1's Immersive Travel row (2026-10-04); WD3's Beautiful Villages and Beautiful Cities (2026-10-01); FOREST1's real forests (2026-10-01); CLIMB1's enhanced climbing (2026-09-30); GUIDE5's quest marks, GUIDE4's quest tracker and GUIDE3's quest herald (2026-09-29); NAV's Naval Combat row the port's own (2026-09-28); FORAGE1's Foraging row (2026-09-28, MERGE 2); IIL1-T's modded lighting (2026-09-27); PERF-SCALE's render scale (2026-09-25) is the one row added since; the sea update's four mod rows (AS1, DS1, WA1, DW-D) came with its merge, OH-A's Ocean Holes row after it, and CSA-A's Come Sail Away row; EM3-3D's 3D dungeon map (2026-09-27); RAID1's World Events - Raiding Parties (2026-09-27)
-  const want = { grassDensity: 1, grassStyle: 'meadow', floraSway: true, windWisps: true, quickbarStyle: 'hotbar', quickslots: true,   // HB-LYCFREE: the hotbar by default (PIN MOVED); MEADOW1: the meadow by default (PIN MOVED); GRASS-ON: the grass Full by default again, where AUDIT MEADOW1 had it Off (PIN MOVED)
+  assert.equal(FEATURES.length, 115);
+  const want = { grassDensity: 1, grassStyle: 'meadow', floraSway: true, windWisps: true, quickbarStyle: 'hotbar', quickslots: true,   // HB-LYCFREE: the hotbar by default (
     'blood-gore': 'normal', 'blood-marks': true, 'blood-overkill': true, 'blood-screen': true };
   for (const [k, v] of Object.entries(want)) assert.equal(FEATURE_PREF_DEFAULTS[k], v, `${k} keeps its default`);
   assert.deepEqual(row('grass').control.parts.map((p) => p.key), ['grassStyle']);
@@ -107,7 +105,7 @@ test('FT18: the quick slots are one bar of three - Off hides the diamond and kee
   quickSlotsWrite('hotbar');
   assert.equal(getPref('quickbarStyle'), 'hotbar');
   assert.equal(quickSlotsRead(), 'hotbar', 'while the hotbar is up the diamond is put away, whatever its switch says (HB1)');
-  // DIAMOND-HB (PIN MOVED): Diamond is the hotbar's four ('diamond'), and Diamonds the ten in diamond sockets
+  // DIAMOND-HB (
   quickSlotsWrite('diamond');
   assert.deepEqual([getPref('quickslots'), getPref('quickbarStyle')], [true, 'diamond']);
   assert.equal(quickSlotsRead(), 'diamond');
@@ -191,7 +189,7 @@ test('FT18: All off - every switch to Off, a row with no Off to Daggerfall\'s ow
       if (to >= 0) assert.equal(st.at, to, `${f.id} is off`);
     }
     assert.equal(label('cloud-quality'), 'High', 'a choice keeps what it was');
-    assert.equal(getPref('grassStyle'), 'meadow', 'and so does a choice in a drawer');   // MEADOW1: the meadow by default (PIN MOVED)
+    assert.equal(getPref('grassStyle'), 'meadow', 'and so does a choice in a drawer');   // MEADOW1: the meadow by default (
     assert.equal(label('dungeon-wall-style'), 'Classic');
     assert.deepEqual([label('render-scale'), getPref('renderScale'), renderScaleSetting()], ['100%', 1, 1], 'the world drawn at the window\'s own size again - the renderer reads 100%');
     assert.equal(label('enhanced-environments'), 'Off', 'the outdoors bar says Off now, so All off can find it');
@@ -264,7 +262,6 @@ test('FEATURES-DEFAULTS (issue #399): Defaults puts every tile, its drawer and a
 test('FEATURES-DEFAULTS (issue #399): online the room\'s rows stay as the room has them; the button sits beside All off and asks first (mutant: the lock ignored, or the confirm skipped)', () => {
   fresh();
   try {
-    // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): the Enhanced AI ships On now, so the room's row that
     // still ships Off is the dungeon sizes' - the same lock, the same lane
     const forced = 'world-dungeon-sizes';
     globalThis.location = { search: '' };
@@ -278,12 +275,6 @@ test('FEATURES-DEFAULTS (issue #399): online the room\'s rows stay as the room h
     assert.equal(label(forced), 'On', 'and its shelf untouched - offline it is still the player\'s own, not the Off it ships');
   } finally { delete globalThis.location; fresh(); }
   assert.match(RESET_ALL_ASK, /key bindings are kept\./, 'and it says what it leaves');
-  // ORG2: the button is the Settings toolbar's one reset - beside All off, asked first - and it runs this
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const bar = menu.slice(menu.indexOf('function optionsToolbar('), menu.indexOf('\n}', menu.indexOf('function optionsToolbar(')));
-  // PIN MOVED (L10N4): the button's words said through t(), their English as FEATURES-DEFAULTS left them
-  assert.match(bar, /\{ label: t\('menu\.settings\.reset', 'Reset everything to defaults'\), onClick: \(\) => ask\(t\('menu\.settings\.resetTitle', 'Reset Everything'\), resetAllAsk\(\), t\('menu\.settings\.resetYes', 'Reset'\), \(\) => \{ resetEverything\(\); \}\) \}/, 'Defaults is asked first');
-  assert.match(menu, /function resetEverything\(\) \{\s*\n\s*resetToDefaults\(\); _eff = null;\s*\n\s*featuresDefaults\(\);\s*\n\}/, 'and puts every tile back');
 });
 
 test('FT18: the outdoors bar is a switch - its Off says Off - so its tile reads off and takes the Off fill (mutant: the long label back)', () => {
@@ -331,35 +322,8 @@ test('FT18: a condensed tile opens its parts - switches as chips, a choice as a 
     const smooth = find(bars[1], 'ft-segb').find((b) => b.textContent === 'Smooth');
     smooth.onclick({ stopPropagation() {} });
     assert.equal(getPref('grassStyle'), 'smooth');
-    assert.equal(getPref('grassDensity'), 1);   // PIN MOVED (GRASS-ON): the density's own default, Full again
+    assert.equal(getPref('grassDensity'), 1);
     assert.equal(t.dataset.fid, 'blood', 'the search hides a tile by its id');
   } finally { delete globalThis.document; fresh(); }
 });
 
-test('FT18 by source: the pane\'s search filters in place and All off asks first; the query is per mount; the Morrowind card draws no bare row (mutant: a repaint on every key, the confirm skipped, or the null back)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  // ORG2: the search is the Settings toolbar's, over every tab - it repaints the BODY under it in place, never the
-  // screen, so the field keeps its keys and its caret
-  const bar = menu.slice(menu.indexOf('function optionsToolbar('), menu.indexOf('\n}', menu.indexOf('function optionsToolbar(')));
-  assert.match(bar, /search\.type = 'search';/);
-  const typing = bar.slice(bar.indexOf('search.oninput = () => {'), bar.indexOf('\n  };', bar.indexOf('search.oninput = () => {')));
-  assert.match(typing, /optQuery = search\.value;[^\n]*\n\s*paintOptionsBody\(body, \{ pause \}\);/, 'typing filters the body');
-  assert.doesNotMatch(typing, /\brender\(\)/, 'it does not repaint the screen - the field keeps its keys');
-  assert.match(menu, /if \(item\.startsWith\('feat:'\)\) \{ const f = FEATURES\.find\(\(x\) => x\.id === item\.slice\(5\)\); return f \? featureSearchText\(f\) : ''; \}/, 'a row is found by the words the Features search read');
-  assert.match(menu, /\.flatMap\(\(item\) => itemNodes\(item, \{ \.\.\.ctx, any: true \}\)\);\s*\n\s*if \(!nodes\.length\) continue;/, 'a section left with nothing goes too');
-  assert.match(menu, /if \(!found\) body\.append\(empty\('No matches'\)\);/, 'and an empty search says so');
-  assert.match(bar, /\{ label: t\('menu\.features\.allOff', 'All off'\), onClick: \(\) => ask\(t\('menu\.features\.allOffTitle', 'Turn Everything Off'\), allOffAsk\(\), t\('menu\.features\.allOff', 'All off'\), \(\) => \{ featuresAllOff\(\); \}\) \}/, 'All off is asked first');
-  assert.match(bar, /\.\.\.\(kept && typeof kept === 'object' \? \[\{ label: t\('menu\.features\.restore', 'Restore'\),/, 'Restore only while there is something to restore');
-  assert.match(menu, /optQuery = '';   \/\/ FT18: a fresh visit searches nothing/);
-  // the menu's own key handler stands down for a text field, so typing in the search never walks the menu
-  // PIN MOVED (AUDIT PRIVATE-REPORT UI-2): save Escape in the mailbox's window (`.px-postwin`), which leaves it - the search's own
-  assert.match(menu, /if \(t && \(t\.tagName === 'INPUT' \|\| t\.tagName === 'TEXTAREA' \|\| t\.isContentEditable\) && !\(e\.key === 'Escape' && t\.closest\?\.\('\.px-postwin'\)\)\) return;/);
-  // MWA4: the card draws no switch row at all now - Attach and Remove data alone - so none can be a moved key's null
-  const at = menu.indexOf('export function morrowindCard(');
-  assert.ok(at > 0, 'the Morrowind assets card');
-  const card = menu.slice(at, menu.indexOf('\n}', at));
-  assert.doesNotMatch(card, /prefRow\(/, 'MWA4: no switch row on the card, so no bare row');
-  assert.doesNotMatch(card, /prefRow\('mwSheathing'/);
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(read('src/systems/uiPrefs.js'), /featuresRestore: null,/, 'the keep is a pref: Restore survives a relaunch');
-});

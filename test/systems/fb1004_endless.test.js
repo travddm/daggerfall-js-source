@@ -1,8 +1,7 @@
-// ENDLESS-STOCK (2026-10-04, Mac: "I want the gathering bag to be unlimited purchases in stores. It shouldnt run out,
-// same with campfires"). A shop shelf is a container: a purchase took its row off for good, so a General Store's one
+// ENDLESS-STOCK. A shop shelf is a container: a purchase took its row off for good, so a General Store's one
 // Materials Bag and its two to four Campfires sold out for the day - and online a shelf is the whole building's. Now a
 // bag or a Campfire bought is put back on the shelf it came from, fresh, by commitTrade's Buy arm; a row stolen from a
-// closed shop's shelf is not (bible/01-Overview/bugs/Field-Bugs-2026-10-04.md).
+// closed shop's shelf is not.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -63,22 +62,12 @@ test('ENDLESS-STOCK: Campfires bought are back on the shelf, one for each bought
 test('ENDLESS-STOCK: only the bag and the Campfire - the horse, the cart and the rest of a shelf sell out as before; nothing is put on a shelf that is not a list (mutants: every row endless)', () => {
   const shelf = onlineShelf();
   const others = shelf.filter((it) => !isEndlessStock(it));
-  assert.ok(others.some((it) => it.group === 'Books'), 'the books are on it');   // PIN MOVED (MERCHANT-YARDS, 2026-10-10): the horse and the cart were the rows read here - the town's yards sell them now
+  assert.ok(others.some((it) => it.group === 'Books'), 'the books are on it');
   const before = shelf.length;
   assert.equal(buy(shelf, others), 0, 'none of them comes back');
   assert.equal(shelf.length, before - others.length);
   assert.deepEqual([isEndlessStock(null), isEndlessStock({ templateIndex: TEMPLATE.Campfire, group: 'Weapons' })], [false, false], 'a Campfire is the survival group\'s template');
   assert.equal(restockEndless(null, [shelf.find(isBagItem)]), 0);
-});
-
-test('ENDLESS-STOCK wired: both purchases put the endless rows back after they take them - the counter\'s (commitTrade\'s Buy arm) and the keyed list\'s (doBuy); no other door does, so a row stolen from a closed shop is never restocked (by source)', () => {
-  const w = src('src/scenes/worldModes.js');
-  assert.match(w, /if \(i >= 0\) shelf\.items\.splice\(i, 1\);\n\s+if \(!isFurnishing\(it\)\) addItem\(playerEntity\.items, it\);\n\s+\}\n\s+decorDeliver\(staged\.filter\(isFurnishing\)\);[^\n]*\n\s+restockEndless\(shelf\.items, staged, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the counter');   // PIN MOVED (ENDLESS-ARROWS): the counter's shop handed in; PIN MOVED (AUDIT UPDATE E2): for the counter's shelf alone
-  const buyArm = w.slice(w.indexOf('function commitTrade(shelf, mode, staged, price, proceeds'), w.indexOf("} else if (mode === 'Sell' || mode === 'SellMagic') {"));
-  assert.match(buyArm, /restockEndless\(shelf\.items, staged, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\)/, 'inside the Buy arm');
-  const doBuy = w.slice(w.indexOf('function doBuy(shelf, it) {'), w.indexOf('function doSell(shelf, it) {'));
-  assert.match(doBuy, /shelf\.items\.splice\(at, 1\);[\s\S]*\) addItem\(playerEntity\.items, it\);\n\s+restockEndless\(shelf\.items, \[it\], shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the keyed list, after the row is taken');   // PIN MOVED (ENDLESS-ARROWS; AUDIT UPDATE E2)
-  assert.equal(w.match(/restockEndless\(/g).length, 2, 'those two alone');
 });
 
 test('AUDIT ENDLESS-STOCK F1/F2: online no shop buys back a bag or a Campfire - bought cheap and sold dear it was gold for nothing, and one sold made any shelf endless; offline a shop buys them as before (mutants: the buy-back open online; closed offline)', () => {

@@ -1,7 +1,6 @@
-// CRAFT-WRITS (2026-10-22) - THE LAW OF THE GUILDS' ASKS OF A CRAFTER (src/net/craftWritLaw.js): what a writ may ask and
+// CRAFT-WRITS - THE LAW OF THE GUILDS' ASKS OF A CRAFTER (src/net/craftWritLaw.js): what a writ may ask and
 // who asks it, the day's three drawn within a character's ranks, the pay its goods' cost earns, the goods a pack gives
 // (the plain bottles before the Potent, a crafted piece by its provenance) and the card's words.
-// bible/06-Systems/Professions-Arc.md section 49.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

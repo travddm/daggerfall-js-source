@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-3 (2026-10-14) - THE EDITOR IN THE WORLD: THE EYE, THE CURSOR, THE HANDLES.
+// POI-3 - THE EDITOR IN THE WORLD: THE EYE, THE CURSOR, THE HANDLES.
 //
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... even placement onto our actual map ... a tool my developers
-// can use without having to access the codebase" (bible/06-Systems/POI-Editor-Arc.md POI-3). The editor stands in the
+// (POI-3). The editor stands in the
 // real streamed world (scenes/world.js, `?editor`), over the game's own frame, and this is its host - DOM-free: the
 // world hands it the events it captured and the frame it drew, and asks it for the camera and the lines.
 //
@@ -24,7 +23,7 @@
 //   - THE DRAFTS ON SCREEN: the working set laid over the live POIs (poiFeed.js setOverlay) whenever it moves - the drag
 //     is drawn as it is made; a draft's colliders wait for the drag to end (poiHost.js collideDrafts).
 //
-// THE FOUR HOSTS (bible/Home.md): scenes/world.js - WIRED (`?editor`, a builder's alone - mountPoiEditor: the motor held
+// THE FOUR HOSTS: scenes/world.js - WIRED (`?editor`, a builder's alone - mountPoiEditor: the motor held
 // and the eye the frame's while it is open, its drafts laid over the feed before the POI host's frame, its lines after the
 // translucent pass, leaving back to the body or onto what is under the eye; refused online with the other powers,
 // systems/online/onlineLane.js). scenes/worldModes.js - its interiors stand no POI: the editor opens outdoors alone.

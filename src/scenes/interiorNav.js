@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // FIELD BUGS 2026-10-16b INDOOR-WATCH - ENHANCED AI 5's INTERIOR HALF
-// (bible/12-Enhanced-AI/Enhanced-AI-Arc.md; the Discord: "If you just sit
+// (; the Discord: "If you just sit
 // near the wall between the shelves, when you fail to steal something, the
 // guard will come running, but they simply can't reach you because they run
 // into the wall instead of going through the door. And you can sit like that

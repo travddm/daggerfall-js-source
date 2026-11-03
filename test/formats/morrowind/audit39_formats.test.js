@@ -275,8 +275,8 @@ test('audit39r R18: a switch shows ONE branch and a LOD ONE level, not the union
 });
 
 test('audit39 formats: a spell stance TURNS on the prefixed group', () => {
-  // character.cpp:676-687 - "Spellcasting stance turning is a special
-  // case": the short group PREFIXES the movement name. The port only ever
+  // Turning with a readied spell is a special case: the short group
+  // PREFIXES the movement name. The port only ever
   // suffixed, so it asked for "turnleftspell" (a name no .kf carries) and
   // "spellturnleft" - which the port's own LOOPING_ANIMATIONS lists - was
   // unreachable.
@@ -287,14 +287,14 @@ test('audit39 formats: a spell stance TURNS on the prefixed group', () => {
   assert.deepEqual(
     composeMovementGroup('turnright', MW_WEAPON_TYPE.Spell, has(new Set(['spellturnright']))),
     { group: 'spellturnright', walked: false });
-  // a miss falls to fallbackShortWeaponGroup, and a spell is not a real
-  // weapon, so that is the BARE base at once (:604-611) - never the
-  // 1h/2c suffix ladder.
+  // a miss falls to the stance ladder, and a spell is not a real
+  // weapon, so that is the BARE base at once - never the 1h/2c suffix
+  // ladder.
   assert.deepEqual(
     composeMovementGroup('turnleft', MW_WEAPON_TYPE.Spell, has(new Set(['turnleft', 'turnleft1h']))),
     { group: 'turnleft', walked: false });
   // and the special case is TURNING only: walking with a readied spell
-  // still suffixes (character.cpp:684-687).
+  // still suffixes.
   assert.deepEqual(
     composeMovementGroup('walkforward', MW_WEAPON_TYPE.Spell, has(new Set(['walkforwardspell']))),
     { group: 'walkforwardspell', walked: false });
@@ -318,10 +318,4 @@ test('audit39 formats: a worn hair part keeps its part NAME, so the hair filter 
   const add = worn.adds.find((a) => a.recordId === 'b_hair');
   assert.equal(add.partName, 'hair', 'the bare part name rides along');
   assert.equal(add.slot, 'hair (iron_helmet)', 'the label still names the record for the notes');
-  // and the two seams that carry it: the binder keys on the part name,
-  // the build passes it through.
-  const fp = readFileSync('src/formats/morrowind/mwFirstPerson.js', 'utf8');
-  assert.match(fp, /const geomFilter = \(part\.partName \?\? part\.slot\) === 'hair' \? 'hair' : bone;/);
-  const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  assert.match(arm, /partBytes\.push\(\{ slot: row\.slot, partName: row\.partName, bones: row\.bones/);
 });

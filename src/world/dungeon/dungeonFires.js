@@ -1,5 +1,4 @@
-// REST3 (2026-10-03, bible/06-Systems/Rest-Arc.md section 4; Mac: "Dungeon layouts now recieve multiple strategic
-// placements for campfires"): THE DUNGEON'S OWN FIRES. A pure law over the layout's own data - its markers, its block
+// REST3: THE DUNGEON'S OWN FIRES. A pure law over the layout's own data - its markers, its block
 // grid, its water and its doors - with the collider's answers handed in, so every client of the dungeon stands the
 // same fires and nothing rides the wire (the shape of PROF2's veins, scenes/dungeonContext.js profVeinWall). A placed
 // fire is permanent: never cold, never picked up, a rest point and a hearth like any brazier the layout already has.
@@ -349,7 +348,7 @@ export const inFireWard = (fires, spot) => !!spot && (fires ?? []).some((q) => S
 /**
  * The whole law in one call, for the scene: `blocks` the layout's, `probe` the collider's answers, `doors` the
  * dungeon's door positions, `existing` its own fires, `seed` its locationId, `elite` an elite copy, `cold` a Super
- * dungeon (SD4a, bible/11-Multiplayer/Super-Dungeons.md section 5 - none, and the layout's own brazier by the door is
+ * dungeon (SD4a, - none, and the layout's own brazier by the door is
  * no campfire of the law's). An arena stands none (the caller says so); a palace none (AUDIT REST II F2,
  * layoutFireCount). Returns `{ fires, doorFire, candidates,
  * valid }`: the fires placed ([[x, y, z], ...], in pick order), the layout fire adopted as the entrance's or null (F5),

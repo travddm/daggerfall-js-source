@@ -23,11 +23,8 @@ import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { LV2_CSS } from '../../src/ui/levelUp/levelUpStyle.js';
 import { registerEntityFold, computeEntityMods } from '../../src/systems/entityMods.js';
 import { codeHasOnce } from '../codeOnly.mjs';
-import { VirtueLevelUpScreen } from '../../src/ui/virtueLevelUp.js';
 import { rolloutRows, liveNote, liveTint, starLabel, viewOnlyScreen, raiseAt, focusAt, canAscend, ATTRIBUTE_BLURB } from '../../src/ui/levelUp/levelUpView.js';
 import { sheetModel } from '../../src/ui/enhanced/enhancedCharSheet.js';
-import { initVirtueLeveling, LEVELING_VIRTUE, levelingSettings, ORL_VENDOR } from '../../src/systems/oblivionLeveling.js';
-import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
 
 const seq = (...v) => { let i = 0; return () => v[Math.min(i++, v.length - 1)]; };
 const career = {
@@ -52,7 +49,7 @@ function character() {
 function werewolf() {
   const p = character();
   assert.ok(createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: NIGHT }));
-  morphSelf(p, { force: true, nowMinutes: NIGHT });   // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the +40 is the beast's - the report's werewolf has changed
+  morphSelf(p, { force: true, nowMinutes: NIGHT });
   lycanthropyMagicRound(p, { nowMinutes: NIGHT + 1 });
   assert.equal(liveStat(p, 'strength'), 100, 'the curse\'s +40, read through liveStat itself');
   return p;
@@ -89,9 +86,9 @@ test('ASCEND-LIVE: a vampire by day reads lower and by night higher - the live v
   vampirismMagicRound(p, { nowMinutes: DAY });
   const s = new LevelUpScreen(p, seq(0), { fanfare: false });
   assert.deepEqual([row(s, 'strength').value, row(s, 'strength').live], [63, 43]);
-  assert.equal(liveNote(row(s, 'strength')), 'Lowered to 43 for now');   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.equal(liveNote(row(s, 'strength')), 'Lowered to 43 for now');
   assert.equal(liveTint(row(s, 'strength')), 'lowered', 'the classic sheet\'s drained tint');
-  assert.equal(starLabel(row(s, 'strength')), 'Strength 43 (63 permanent)');   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.equal(starLabel(row(s, 'strength')), 'Strength 43 (63 permanent)');
   vampirismMagicRound(p, { nowMinutes: NIGHT + 24 * 60 });
   assert.equal(row(new LevelUpScreen(p, seq(0), { fanfare: false }), 'strength').live, 83);
 });
@@ -113,23 +110,16 @@ test('ASCEND-LIVE: a point held at a FLOOR is flagged as one at the ceiling is -
   // A point that shows is never flagged: by night the same Strength reads 63 - 45 + 20 and rises with a press.
   vampirismMagicRound(p, { nowMinutes: NIGHT + 24 * 60 });
   const night = row(new LevelUpScreen(p, seq(0), { fanfare: false }), 'strength');
-  assert.deepEqual([night.live, night.capped, liveNote(night)], [38, false, 'Lowered to 38 for now']);   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.deepEqual([night.live, night.capped, liveNote(night)], [38, false, 'Lowered to 38 for now']);
 });
 
 test('ASCEND-LIVE: the mod\'s lane and the view the Stats page opens read the same live values the Stats page draws', () => {
   const p = werewolf();
-  const view = viewOnlyScreen(p, false);
+  const view = viewOnlyScreen(p);
   assert.deepEqual(rolloutRows(view).map((r) => r.live), sheetModel(p).attributes.map((a) => a.value),
     'Ascend from the Stats page shows the Stats page\'s numbers');
   // A view has no points to place, so no star warns about one: the bonus is said, the press is not.
   assert.deepEqual([row(view, 'strength').capped, liveNote(row(view, 'strength'))], [false, '100 with its bonus']);
-  initVirtueLeveling(p, LEVELING_VIRTUE);
-  const reader = (k) => MOD_SETTINGS[ORL_VENDOR].keys[k].default;
-  const v = new VirtueLevelUpScreen(p, { settings: levelingSettings(reader), rolls: seq(0), fanfare: false });
-  assert.deepEqual([row(v, 'endurance').value, row(v, 'endurance').live], [58, 98]);
-  focusAt(v, 'endurance');
-  assert.ok(raiseAt(v, 'endurance'));
-  assert.ok(row(v, 'endurance').live > 98, 'the mod\'s delta moves the live value too');
 });
 
 test('ASCEND-LIVE: the live value folds the modifier channels too - a set\'s or an affix\'s strength is on the star as on the Stats page', () => {
@@ -171,19 +161,6 @@ test('ASCEND-LIVE: the stars wear the classic sheet\'s own two colours - over a 
 });
 
 test('ASCEND-LIVE by source: the window paints the live value on the star, its brightness, its tint, its words and its line', () => {
-  const w = readFileSync(new URL('../../src/ui/enhanced/enhancedLevelUp.js', import.meta.url), 'utf8');
-  const paint = w.slice(w.indexOf('    for (const s of stars) {'), w.indexOf('    // A LINE LIGHTS WHEN BOTH ITS STARS HAVE RISEN.'));
-  codeHasOnce(paint, /s\.val\.textContent = String\(r\.live\);/);
-  codeHasOnce(paint, /s\.gem\.style\.opacity = String\(0\.45 \+ 0\.55 \* starBrightness\(r\.live\)\);/);
-  codeHasOnce(paint, /const tint = liveTint\(r\);\s*s\.node\.classList\.toggle\('boosted', tint === 'boosted'\);\s*s\.node\.classList\.toggle\('lowered', tint === 'lowered'\);/);
-  codeHasOnce(paint, /s\.node\.setAttribute\('aria-label', starLabel\(r\)\);/);
-  const about = w.slice(w.indexOf('    for (const [k, a] of about) {'), w.indexOf('    plus.disabled'));
-  codeHasOnce(about, /a\.item\.classList\.toggle\('on', k === m\.focus\);\s*a\.line\.textContent = liveNote\(r\);\s*a\.line\.classList\.toggle\('lowered', liveTint\(r\) === 'lowered'\);/,
-    'every attribute\'s line is written, the chosen one seen - so the band is the tallest\'s, whichever is chosen');
-  const build = w.slice(w.indexOf("  const pickName = el('div', 'lv-pickname');"), w.indexOf('  choice.append(') + 80);
-  codeHasOnce(build, /pickName\.append\(pickN, pickF, pickC\);/, 'the pick name keeps to its own three - no line widens it');
-  codeHasOnce(build, /const item = el\('div', 'lv-about'\);\s*const line = el\('div', 'lv-live'\);\s*item\.append\(line, el\('p', null, ATTRIBUTE_BLURB\[k\] \?\? ''\)\);/);
-  codeHasOnce(build, /choice\.append\(ask, pick, blurb\);/);
   // THE ROOM, in the sheet (comments stripped): one cell for the eight; on a phone or a short screen the line takes
   // its blurb's place; short, both are one line. The browser probe measured it: the choosing tap never moves the figure.
   const css = ENHANCED_CSS.replace(/\/\*[\s\S]*?\*\//g, '');

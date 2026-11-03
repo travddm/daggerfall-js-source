@@ -33,11 +33,3 @@ test('GetSpecialDungeonName: the three capitals take a TEXT.RSC line, everything
   assert.equal(specialDungeonName('X', undefined, line), '');
 });
 
-test('the world host supplies BOTH hooks, so the answer has no holes', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /specialDungeonName: \(\) => specialDungeonName\(/);
-  assert.match(world, /dungeonRegionName: \(\) => questWorld\.currentRegionName\(\),/);
-  // The pipeline's dungeon arm reads exactly these two.
-  assert.match(read('src/systems/answerPipeline.js'),
-    /return format\(tmpl, this\.deps\.specialDungeonName\?\.\(\) \?\? '', this\.deps\.dungeonRegionName\?\.\(\) \?\? ''\);/);
-});

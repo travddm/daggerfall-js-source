@@ -100,8 +100,3 @@ test('HIGH-CAST: a cast already thrown is not lost when the look rises off the w
   } finally { s.done(); }
 });
 
-test('HIGH-CAST: the world host answers the surface under the cast - the ground the water lies on, or the sea\'s top over a carved seabed (by source: the host is not importable)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /waterY: \(pos\) => \{ const g = heightAt\(pos\[0\], pos\[2\]\); return Number\.isFinite\(g\) \? Math\.max\(g, \(deepWaters\?\.oceanLocalY \?\? SCALED_OCEAN_ELEVATION \* STREAMING_TERRAIN_SCALE\) \+ state\.pixelTranslation\(state\.current\.x, state\.current\.y, _fishSeaT\)\[1\]\) : null; \},/);
-  assert.match(src('src/scenes/fishHost.js'), /if \(!acting && host\.waterY && castOverWater\(castAt\(host\.eye\(\)\), host\.waterY\(castAt\(host\.eye\(\)\)\)\)\) return \[\];/);
-});

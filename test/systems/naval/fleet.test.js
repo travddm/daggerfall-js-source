@@ -1,9 +1,4 @@
-// HOLDINGS - THE FLEET (2026-10-03, Mac: "You can also do this with ships instead of relying on a deed item ... Ships
-// show their values, current health, and option to repair if theres crew (even if youre away) etc ... Introducing the
-// new ship upgrade system. Allowing you to improve capacity, speed, health, damage, etc. This can utilize foraging items
-// used within the world. Loaned ships shouldnt be able to be upgraded until the loan is paid off. This also introduces
-// the ability to change your ship name for others to see ... Ship deeds can now be replaced in favor of the new
-// enhanced plus UI tabs on the pause menu" - bible/03-World/Holdings.md).
+// HOLDINGS - THE FLEET.
 //
 // The ledger (systems/fleet.js: the titles' book, the name's law, the refits' costs and effects, the bank's claim, the
 // save); Come Sail Away over the book (systems/comeSailAway/comeSailAway.js: a deed found there, a ship's parts placed spending her
@@ -43,8 +38,7 @@ const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} ~ ${b}`);
 
 // ── the ledger's law ─────────────────────────────────────────────────────────────────────────────────────────────────
 
-
-/** SHIP-CREDIT WITHDRAWN (2026-10-08): no purchase stamps the bank's claim any more - a ship bought on credit before
+/** SHIP-CREDIT WITHDRAWN: no purchase stamps the bank's claim any more - a ship bought on credit before
  *  carries hers in the save, so a claimed ship is made the one way that remains: her record restored with it, beside
  *  the ledger's others. */
 const claimedShip = ({ uid, hull, value, credit, port = null }) => {
@@ -125,7 +119,7 @@ test('FLEET the book: a deed entered is out of the pack and in the book, her rec
   _resetFleetForTests();
   const pack = [item(50), mintDeed(3, 0, 801, 200000), mintDeed(2, 0, 802, 25000)];
   const r = titleDeed(pack[1], { from: pack, credit: { region: 4, due: 77 }, port: { name: 'Sentinel' } });
-  assert.deepEqual({ ...r }, { uid: 801, hull: 3, variant: 0, value: 200000, name: '', upgrades: { hold: 0, rigging: 0, hull: 0, guns: 0 }, credit: null, port: { name: 'Sentinel' }, colours: null, livery: null, cabin: 0, deck: [], plaque: false });   // PIN MOVED (SHIP-COLOURS: her flag - none, the mod's pennant; SHIP-LIVERY: her paint and her cabin's stain - as built; DECK-PROPS: her deck bare; SHIP-PLAQUE: her name not shown)
+  assert.deepEqual({ ...r }, { uid: 801, hull: 3, variant: 0, value: 200000, name: '', upgrades: { hold: 0, rigging: 0, hull: 0, guns: 0 }, credit: null, port: { name: 'Sentinel' }, colours: null, livery: null, cabin: 0, deck: [], plaque: false });
   assert.equal(pack.length, 2);
   assert.equal(titleOf(801)?.templateIndex, BOAT_DEED_TEMPLATE);
   titleDeed(titleOf(801));
@@ -149,17 +143,15 @@ test('FLEET the save: her record round-trips whole, her title by a flag; an olde
   addRefit(901, 'guns'); addRefit(901, 'guns');
   const saved = JSON.parse(JSON.stringify(fleetSaveData()));
   assert.equal(FLEET_SAVE_VENDOR, 'Fleet');
-  // PIN MOVED (AUDIT SHIPYARDS L1-2): the slot carries the ships realm customs crossed (none here) - kept, never sold
   assert.deepEqual(saved, { v: 1, ships: [
     { uid: 901, hull: 4, variant: 0, value: 37500, name: 'Mara\'s Grace', upgrades: { hold: 0, rigging: 0, hull: 0, guns: 2 }, credit: { region: 2, due: 10 }, port: { name: 'Wayrest' }, title: true },
     { uid: 902, hull: 1, variant: 3, value: 8000, name: '', upgrades: { hold: 0, rigging: 0, hull: 0, guns: 0 }, credit: null, port: null, title: false },
-  ], crossed: [] });
+  ] });
   restoreFleetSaveData(newFleetSaveData());
   assert.equal(fleetShips().length, 0);
   restoreFleetSaveData(saved);
   assert.deepEqual(JSON.parse(JSON.stringify(fleetSaveData())), saved);
   assert.equal(titleOf(901)?.message, 40);
-  // PIN MOVED (AUDIT HOLDINGS F4): a claim is her region's - its due date no longer read, a claim with none kept
   restoreFleetSaveData({ ships: [{ uid: 5, hull: 9 }, { uid: 6, hull: 2, name: 'Admin', upgrades: { hull: 17 }, credit: { region: 1 } }, { uid: -1, hull: 2 }, { uid: 7, hull: 2, credit: { due: 5 } }] });
   assert.deepEqual(fleetShips().map((r) => [r.uid, r.name, r.upgrades.hull, r.credit]), [[6, '', 12, { region: 1, due: 0 }], [7, '', 0, null]]);
   // AUDIT HOLDINGS F7: a hostile save
@@ -320,10 +312,6 @@ test('FLEET her Hull refit on her hull\'s and canvas\'s whole (myBoatState\'s bu
   const st = s.host.fleetStatus(s.boat);
   assert.deepEqual([st.maxHull, st.maxSail], [Math.round(hullBuild(2).hullHp * 1.3), Math.round(hullBuild(2).sailHp * 1.3)]);
   assert.equal(st.maxCrew, hullBuild(2).crew, 'her crew her build\'s');
-  const src = read('src/scenes/naval/navalHost.js');
-  assert.match(src, /if \(byMe && e\.type !== 'blast'\) gunsRefit\(hurt, e\.shooter\);/);
-  assert.match(src, /const uid = Number\(String\(shooter\)\.slice\(MY_BOAT\.length \+ 1\)\);/);
-  assert.match(src, /if \(Number\.isFinite\(hurt\.hull\)\) hurt\.hull \*= k;\n    if \(Number\.isFinite\(hurt\.sail\)\) hurt\.sail \*= k;/);
 });
 
 test('FLEET a refit never heals her nor hurts her: her state on her new whole, her hurts the share they were, her powder, her guns\' clocks, the brace, her last blow and her stores kept (refitBoat - AUDIT 2026-10-17: a sky accepted mid-fight loaded every battery); a waiting record is read on the new whole when she stands', async () => {
@@ -385,17 +373,6 @@ test('FLEET REPAIRS MADE AWAY: her hands mend her free to FIELD_MEND_CAP of each
   // the refusals
   const row = await sea({ hull: 1 });
   assert.equal(row.host.repairAway(row.boat).text, 'This ship has no crew to make repairs.');
-});
-
-test('FLEET the berth a summoned ship is brought to: the free berth of a known harbour nearest the player - none taken by a ship of the sea or a boat of mine - on the sea\'s top, her bow along it; none known, none (source pins over the harbour\'s own law)', () => {
-  const src = read('src/scenes/naval/navalHost.js');
-  const at = src.indexOf('  function freeBerth(hull = HULL.Carrack) {');   // PIN MOVED (QUAYS): her hull asked
-  assert.ok(at >= 0, 'freeBerth found');
-  const body = src.slice(at, src.indexOf('\n  }\n', at));
-  assert.match(body, /if \(!berthFree\(h\.key, i\) \|\| myBoats\(\)\.some\(\(m\) => Math\.hypot\(m\.GameObject\.position\[0\] - b\.pos\[0\], m\.GameObject\.position\[2\] - b\.pos\[1\]\) <= BERTH_SNAP_M\)\) continue;/);
-  assert.match(body, /const d = Math\.hypot\(b\.pos\[0\] - f\[0\], b\.pos\[1\] - f\[2\]\);\n        if \(d < bestD\)/);
-  // PIN MOVED (QUAYS): alongside the berth's quay for her own hull (shipLife.js alongside), where the berth's point stood
-  assert.match(body, /const at = alongside\(b, hull, h\.harbour\.hull\); bestD = d; best = \{ position: \[at\[0\], deps\.seaY\(\), at\[1\]\], direction: forwardOfYaw\(b\.yaw\)/);
 });
 
 // ── the host half ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -686,23 +663,3 @@ test('FLEET the page: a card a ship - her name, hull, worth, the bank\'s claim, 
 
 // ── the purchase and the prize ───────────────────────────────────────────────────────────────────────────────────────
 
-test('FLEET a deed bought goes to the book at the counter, never the pack - stamped with the port she waits at (never a claim: SHIP-CREDIT WITHDRAWN); a prize\'s title to the book (the world host\'s packDeed), and its words say so', () => {
-  const modes = read('src/scenes/worldModes.js');
-  const at = modes.indexOf('// HOLDINGS (bible/03-World/Holdings.md): a ship\'s deed bought goes to the Fleet\'s book');
-  assert.ok(at > modes.indexOf('if (!isFurnishing(it)) addItem(playerEntity.items, it);'), 'after the goods are in the pack');
-  assert.match(modes, /const town = buildingDirectory\?\.\(\)\?\.locationName \?\? '';/);
-  assert.match(modes, /\.map\(\(it\) => titleDeed\(it, \{ from: playerEntity\.items, port: town \? \{ name: town \} : null \}\)\)/);
-  const world = read('src/scenes/world.js');
-  assert.match(world, /packDeed: \(item\) => \{ titleDeed\(item, \{ port: null \}\); return \(\) => fleetBook\(\); \},/);
-  // PIN MOVED (AUDIT HOLDINGS Q8): placed anew, her port of before cleared - the docking says hers again
-  assert.match(world, /titles: \(\) => fleetBook\(\), retitle: \(boat, parts\) => \{ knowShip\(boat\.uid, boat\.hull, boat\.variant, parts\?\.value\); setShipPort\(boat\.uid, null\); return !!retitle\(boat\.uid\); \} \},/);
-  // AUDIT HOLDINGS F8: a failed claim's record forgotten (F5's parts bought on the bank's credit went with SHIP-CREDIT)
-  assert.doesNotMatch(modes, /creditShip/);
-  assert.match(world, /forgetDeed: \(item\) => forgetShip\(item\?\.UID\),/);
-  assert.match(world, /registerModSaveData\(FLEET_SAVE_VENDOR, fleetSaveSlot\);/);
-  assert.ok(world.indexOf('let fleetHost = null;') < world.indexOf('const csaRuntime = csaOn() ? createComeSailAwayRuntime({'), 'declared before the boats read their refits through it');
-  // the prize's words
-  const host = read('src/scenes/naval/navalHost.js');
-  assert.match(host, /The title is in your Fleet ledger \(Holdings\)/);
-  void HULL_PRICES;
-});

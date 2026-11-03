@@ -1,5 +1,4 @@
-// PERF1 - THE FRAME CLOCK (2026-09-11, RookieG via Mac: "its like 45fps
-// on the outside"). The FPS counter measures the browser's cadence;
+// PERF1 - THE FRAME CLOCK. The FPS counter measures the browser's cadence;
 // this measures the MAIN THREAD's share of it - the milliseconds
 // between a host's frame callback starting and its last statement -
 // so the two numbers side by side say which side the frame is

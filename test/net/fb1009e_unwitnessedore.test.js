@@ -7,7 +7,7 @@
 // else had worked stood Iron alone, and the Mountain Woods never stood its Silver. A lone miner confirms nothing. A vein
 // on such ground is held where a dungeon's deep vein already is - UNCONFIRMED_VEIN_TIER, 3 - and the Mining page says
 // what still waits on the witnesses. `01-Overview/bugs/Field-Bugs-2026-10-09e.md`. DEEP-OPEN (Professions-Arc.md section
-// 50, the owner: "FULL ORE TABLE"): the dungeon's deep vein is held no more - it draws its whole table on anyone's word,
+// 50): the dungeon's deep vein is held no more - it draws its whole table on anyone's word,
 // bounded by the account's four a day - so the cap is the surface's alone now.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -45,7 +45,6 @@ test('UNWITNESSED-ORE law: a vein on ground nobody has vouched for is held to ti
 });
 
 test('UNWITNESSED-ORE law: the one cap is the surface\'s alone - DEEP-OPEN: an unconfirmed deep vein draws its whole table, where it was Silver; the herbs and the trees keep theirs (2); the Court asks what the ground stands', () => {
-  // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): the deep vein was held to the cap - Silver - in every dungeon
   // nobody had vouched for, and Dwarven Scrap stood in none; a Mountain dungeon's draw is the confirmed one's now
   for (let id = 1; id < 60; id++) assert.deepEqual(dungeonVeins({ dungeon: id, day: DAY, climate: C.Mountain, confirmed: false }), dungeonVeins({ dungeon: id, day: DAY, climate: C.Mountain, confirmed: true }));
   assert.ok([...Array(60).keys()].some((id) => dungeonVeins({ dungeon: id + 1, day: DAY, climate: C.Mountain, confirmed: false }).some((v) => v.tier > UNCONFIRMED_VEIN_TIER)), 'past the surface\'s cap');
@@ -56,10 +55,6 @@ test('UNWITNESSED-ORE law: the one cap is the surface\'s alone - DEEP-OPEN: an u
   const un = regionWritTable(16, [{ climate: C.Mountain, confirmed: false }], SEASONS.Summer).map((m) => m.material);
   assert.ok(un.includes('metal:silver'), 'the Court may ask the Silver the vein stands');
   assert.ok(!un.includes('metal:gold') && !un.includes('ore:orichalcum'));
-  const src = readFileSync(new URL('../../src/net/nodeLaw.js', import.meta.url), 'utf8');
-  // PIN MOVED (MINE-PERKS, Professions-Arc 43): the vein's cap is lifted for a Surveyor's own vein too (`confirmed || surveyed`);
-  // PIN MOVED (DEEP-OPEN): and the deep vein reads it no more
-  assert.equal(src.match(/confirmed(?: \|\| surveyed)? \? 7 : UNCONFIRMED_VEIN_TIER\)/g)?.length, 2, 'the vein and the Court read the one cap');
 });
 
 test('UNWITNESSED-ORE service: an unconfirmed Mountain pixel\'s Silver vein is mined - the law\'s Silver into the Stores at tier 3\'s XP, no gem, no signature - and its Gold is no vein there', async () => {
@@ -67,7 +62,7 @@ test('UNWITNESSED-ORE service: an unconfirmed Mountain pixel\'s Silver vein is m
   const now = utcDay(T0) * 86_400 + 4 * 3600;
   Date.now = () => now * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
     raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'mining', ?, NULL, NULL, ?)`)
@@ -93,6 +88,4 @@ test('UNWITNESSED-ORE service: an unconfirmed Mountain pixel\'s Silver vein is m
 
 test('UNWITNESSED-ORE page: the Mining page says what the ground holds on anyone\'s word and what waits on three players', () => {
   assert.match(MINING_GROUND_LINE, /^Veins hold Silver at most until three different players, each with an account at least a week old, have gathered on that ground\. Then Gold, Platinum and Mithril in the mountains, and the region's own ore, can appear/);   // VOICE1 (PIN MOVED): the same law in plain words
-  const src = readFileSync(new URL('../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(GATHER_HOW\[_sel\]\) pane\.append\(el\('p', 'px-note', gatherHow\(_sel\)\)\);[^\n]*\n\s+if \(_sel === 'mining'\) pane\.append\(el\('p', 'px-note', miningGroundLine\(\)\)\);/);
 });

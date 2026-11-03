@@ -1,6 +1,5 @@
-// AUDIT NAV1 (2026-09-29, Mac: "Lets do a deep comprehensive audit and ensure this is perfection. I want ship movement
-// and combat to flow perfectly, just like assisins creed black flag"; of the arc: "directly integrate into online mode")
-// - ONLINE, the audit's sixth lens (bible/03-World/Naval-Combat.md "Online"): several players' hosts over Come Sail
+// AUDIT NAV1
+// - ONLINE, the audit's sixth lens ("Online"): several players' hosts over Come Sail
 // Away's real pool and a stand-in relay (test/navalRoom.mjs) - the sea handed on when its stander goes, a ship another
 // stands boarded in one world, no twins, a ship's names the same to everyone, another's ship sailing on between words.
 import { test } from 'node:test';
@@ -80,7 +79,7 @@ test('AUDIT NAV1 (online #2) THE SEA HANDED ON: a stander gone from the cell too
   qa.present = false;
   q.run(OWNER_SWEEP_S + 0.6);
   assert.ok(loneC.orphan != null && loneC.owner === 'a', 'c holds her for the heir');
-  q.run(ORPHAN_S + SHIP_FADE_S + 0.5);   // SHIP-FADE (2026-10-02) PIN MOVED: let go, she fades
+  q.run(ORPHAN_S + SHIP_FADE_S + 0.5);   // SHIP-FADE
   assert.ok(bySeed(qc, lone.ship.seed) === null, 'no word claimed her: let go');
   assert.ok(bySeed(qb, lone.ship.seed)?.owner === null, 'the heir has her, all the same');
 });
@@ -456,7 +455,7 @@ test('AUDIT NAV1 (online) ANOTHER PLAYER\'S BOAT STOPS A SHIP\'S BALL on the sta
   moor(A, [0, 0, -700]);
   moor(B, [0, 0, 250]);
   const brig = stand(A, 'pirateBrig', [300, 0, 600]);
-  for (const sail of B.s.boat.Sails) stowSail(animatorOf(sail), false);   // PIN MOVED (AUDIT GALLEON-2 RG3): her canvas set - furled, no box stands
+  for (const sail of B.s.boat.Sails) stowSail(animatorOf(sail), false);
   r.run(0.5);
   const c = hullBoxOf(B.s.boat, A.s.pool.models).c, canvas = rigBoxesOf(B.s.boat)[0].c;
   const shots = A.s.host._shots;

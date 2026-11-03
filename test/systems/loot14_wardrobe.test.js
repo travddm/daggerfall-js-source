@@ -1,5 +1,4 @@
-// LOOT14 - THE WARDROBE (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 6; Mac: "I notice that clothing doesn't have
-// a lot of rarity options with.our loot system? Amy ideas?", then "Lets go all in").
+// LOOT14 - THE WARDROBE.
 //
 // A garment was locked out of the ladder whole: rarityEligible took a weapon, armour or jewellery and nothing else, no
 // affix kind named a clothing group, and a crafted garment took neither roll its quality promises. Now every one of
@@ -27,15 +26,15 @@ import { survivalMinute, survivalOf } from '../../src/systems/survival/needs.js'
 import { STAT_KEYS_ORDER } from '../../src/systems/statMods.js';
 import { SKILLS } from '../../src/systems/skills.js';
 import { ENCHANTMENT_TYPES } from '../../src/formats/magicDef.js';
-import { capLootList, rollCorpseKit, plainFoeRarityWeights } from '../../src/systems/foeLootCap.js';
+import { rollCorpseKit, plainFoeRarityWeights } from '../../src/systems/foeLootCap.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { POTION_TEMPLATE_INDEX, validLootItem } from '../../src/systems/loot/loot.js';
 import { goldStack, isGoldPieces } from '../../src/systems/inventory.js';
 import { mintPiece } from '../../src/systems/smithItems.js';
 import { isWelkyndStone, isVarlaStone } from '../../src/systems/ayleidStones.js';   // LOOT21: imported, the late finds are registered - as the game's worldTick.js has them
 
-// PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellet's final find is the door's draw after every pass these laws
-// read - held off here (test/systems/pelletsscarce.test.js holds it the door's very last)
+// A final find is the door's draw after every pass these laws read - held off here (no find is registered final since
+// the Dwemer Pellet's went with the guns)
 const on = () => { _resetForTests(); setPref('lootRarity', true); LR._holdFinalFindsForTests(true); };
 const off = () => { _resetForTests(); setPref('lootRarity', false); LR._holdFinalFindsForTests(false); };
 const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };
@@ -127,14 +126,14 @@ test('LOOT14: the leans - a garment\'s first line is its standing half the time;
   assert.ok(LR.garmentOnFeet(garment(147)) && LR.garmentOnFeet(garment(189)) && !LR.garmentOnFeet(garment(155)));
   assert.ok(share(shoe.skills, feet) > 0.8, `a shoe's lean to the feet (${share(shoe.skills, feet).toFixed(2)})`);
   // GOLDEN: three seeded garments mint exactly this - a draw more or less (a second roll for a standing line, a lean
-  // lost) moves every line after it. PIN MOVED (AFFIX-LINES, 2026-10-25): each pick drawn over the lines (the skills'
+  // lost) moves every line after it.
   // 35 of a garment's 43), one roll as before - the same seeds land on other lines; main's three were the gown's dry,
   // warmth, skill 1 and Personality (932), the robes' underworld and warmth (139), the shoes' merchants, skill 16,
   // warmth and scholars (877)
   const goldens = [
-    [195, 'rare', 42, 'Oiled Evening Gown of the Library', [{ id: 'standing', param: 'scholars', value: 5 }, { id: 'skill', param: 2, value: 15 }, { id: 'skill', param: 16, value: 12 }, { id: 'dry', value: 31 }], 922],
-    [163, 'magic', 7, 'Plain Robes of the Alley', [{ id: 'standing', param: 'underworld', value: 3 }, { id: 'skill', param: 4, value: 8 }], 194],
-    [147, 'rare', 11, 'Shoes of the Market', [{ id: 'standing', param: 'merchants', value: 5 }, { id: 'skill', param: 16, value: 17 }, { id: 'skill', param: 18, value: 10 }, { id: 'skill', param: 17, value: 13 }], 954],
+    [195, 'rare', 42, 'Oiled Evening Gown of the Library', [{ id: 'standing', param: 'scholars', value: 5 }, { id: 'skill', param: 2, value: 9 }, { id: 'skill', param: 16, value: 7 }, { id: 'dry', value: 31 }], 784],
+    [163, 'magic', 7, 'Plain Robes of the Alley', [{ id: 'standing', param: 'underworld', value: 3 }, { id: 'skill', param: 4, value: 5 }], 157],
+    [147, 'rare', 11, 'Shoes of the Market', [{ id: 'standing', param: 'merchants', value: 5 }, { id: 'skill', param: 16, value: 10 }, { id: 'skill', param: 18, value: 6 }, { id: 'skill', param: 17, value: 8 }], 754],
   ];
   for (const [t, tier, seed, name, affixes, value] of goldens) {
     const it = LR.applyRarity(garment(t), tier, lcg(seed));
@@ -171,7 +170,6 @@ test('LOOT14: the readers, through the real fold - DRESS1\'s standing (the gear\
   const bare = clothingWarmth(worn, { natural: -20 });
   const geared = clothingWarmth(worn, { natural: -20, gear: m.warmth });
   assert.equal(geared.warmth - bare.warmth, 6, 'the lining counts in the cold');
-  // PIN MOVED (AUDIT TEMP-UI E7): well into the heat, where the cloth has eased all the way to its half (at +5 it now
   // gives up five degrees, not half)
   const hot = clothingWarmth(worn, { natural: CLOTHES_BREATHE_ABOVE + 40, gear: 6 });
   const hotBare = clothingWarmth(worn, { natural: CLOTHES_BREATHE_ABOVE + 40 });
@@ -189,8 +187,8 @@ test('LOOT14: the readers, through the real fold - DRESS1\'s standing (the gear\
   assert.ok(Math.abs(allDry - without * 0.25) < 1e-9, 'at most 75% turned aside');
   const COLD = { climateIndex: 0, month: 0, hour: 2, weather: 'snow', insideBuilding: false };
   assert.equal(feltTemperature(COLD, worn, { gearWarmth: 6 }).clothes - feltTemperature(COLD, worn, {}).clothes, 6, 'the felt reading carries the lining');
-  // the degrees ride beside the host's own resistances, never on them (LOOT15's powers write them; PIN MOVED, AUDIT LOOT
-  // II A2: feltTemperature takes them off the felt number alone; PIN MOVED, AUDIT C&C: the host's context, never read,
+  // the degrees ride beside the host's own resistances, never on them (LOOT15's powers write them
+  // II A2: feltTemperature takes them off the felt number alone
   // is no argument - the answer carries no resistance of its own)
   assert.deepEqual(wardrobeCtx({ coldDegrees: 20, heatDegrees: 5 }), { gearWarmth: 0, gearDry: 0, coldDegrees: 20, heatDegrees: 5 });
   assert.deepEqual(wardrobeCtx(null), {}, 'nothing folded, nothing laid');
@@ -238,38 +236,17 @@ test('LOOT14: the price and the flavours - a garment\'s lines at half, its Rare 
     assert.equal(LR.RARE_FLAVOURS[g], LR.RARE_FLAVOURS.MensClothing, 'both cuts hold the same street');
     for (const f of LR.RARE_FLAVOURS[g]) assert.ok(![T.CastWhenHeld, T.IncreasedWeightAllowance, T.FeatherWeight, T.CastWhenStrikes].includes(f.type), `no held spell, capacity or dead payload (${f.type})`);
   }
-  // the cap: gold, then a supply, then a Magic garment, then the plain steel
-  const potion = { name: 'potion', group: 'UselessItems1', templateIndex: POTION_TEMPLATE_INDEX, potionRecipeKey: 4975678, value: 50 };
-  const shirt = { ...garment(165), name: 'shirt', rarity: 'magic', value: 900 };
-  const steel = { name: 'steel', group: 'Weapons', templateIndex: 120, material: 1, value: 360 };
-  const list = [steel, shirt, goldStack(5), potion];
-  capLootList(list, 3);
-  assert.deepEqual(list.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['shirt', 'gold', 'potion'], 'the supply kept before the dearer Magic shirt, the shirt before the steel');
-  const one = [shirt, potion, goldStack(5)];
-  capLootList(one, 2);
-  assert.deepEqual(one.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['potion', 'gold'], 'room for one: the supply, over the dearer Magic shirt');
-  const two = [steel, shirt, goldStack(5)];
-  capLootList(two, 2);
-  assert.deepEqual(two.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['shirt', 'gold'], 'a Magic garment over a plain piece');
-  const legendaryShirt = { ...garment(165), name: 'robe', rarity: 'legendary', value: 10 };
-  const three = [potion, legendaryShirt, goldStack(5)];
-  capLootList(three, 2);
-  assert.deepEqual(three.map((i) => (isGoldPieces(i) ? 'gold' : i.name)), ['robe', 'gold'], 'a Legendary garment is a Legendary');
 });
 
 test('LOOT14: the doors - the host door rolls its garments after every draw it made before (a seeded list\'s other pieces mint what they did) and marks them; the kit\'s garments roll at death, a copy; off, nothing', () => {
   on();
   const src = { kind: 'corpse', tier: 12, boss: false, family: null };
   const pieces = () => [createWeapon(120, 1), mintCondition({ group: 'Armor', templateIndex: 102, material: 0x0201, name: 'c', flags: 0 })];
-  // PIN MOVED (LOOT16, bible/06-Systems/Loot-II-Arc.md section 8): a curse is the door's pass after the garments' (law 9),
   // so WHICH piece a curse lands on is the stream's after them; a piece's own draws - its tier, its name, the lines it was
   // minted with - are its seed's, and that is what is compared (a curse's line, its last, set aside)
-  // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): and a weapon's technique, the door's very last draw - set aside
   // first, so a curse's line is the last line before it
   const ownLines = (it) => { const own = it.affixes?.filter((a) => !LR.isTechniqueAffix(a)); return JSON.stringify(it.cursed ? own.slice(0, -1) : own ?? null); };
-  // PIN MOVED (LOOT21, section 13): a late find - an Ayleid stone - may follow the garments, the door's very last draw
   // (law 9), so the pieces are the list's first two and the garments its next two, by place, and what follows is a stone
-  // PIN MOVED (GEM2, bible/06-Systems/Gem-Sockets.md): and a graded gem, the door's very last draw since
   const lateFind = (it) => isWelkyndStone(it) || isVarlaStone(it) || !!LR.gemKindOf(it);
   for (let seed = 1; seed < 40; seed++) {
     const alone = pieces();

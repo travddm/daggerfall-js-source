@@ -1,5 +1,5 @@
 // @ts-check
-// RUMARE-WATER (2026-10-26, bible/03-World/Tamriel.md RUMARE-WATER): THE BLOCK'S SIDE AND THE ONE MIX, A LEAF. Their home
+// RUMARE-WATER: THE BLOCK'S SIDE AND THE ONE MIX, A LEAF. Their home
 // was world/spawnedDungeons.js, which reads the clock (systems/gameDate.js) and the road network (systems/travel/
 // travelPaths.js); the Imperial City's plan (world/imperialCity.js) reads these two, and the terrain worker and the Deep
 // Waters worker now read the plan (world/rumareWaters.js, the city's water law) - so they live here, and spawnedDungeons.js

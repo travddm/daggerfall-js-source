@@ -1,5 +1,5 @@
 // @ts-check
-// MASTER-ART (2026-10-27, bible/06-Systems/Professions-Arc.md section 57): A MASTER'S WORK. A Master in a craft makes a
+// MASTER-ART: A MASTER'S WORK. A Master in a craft makes a
 // Legendary piece of its kinds: the crafter chooses its three lines, the service rolls their values in the Legendary
 // band (never past its top - POWER-CEILING), for catalysts from three pursuits besides the recipe's goods, one a
 // character a UTC day. No Legendary power, no enchantment: the build you want, not a higher number (a player: "Add more

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW5 (2026-10-26, bible/03-World/World-Wide.md WW5): THE THEATRES A STAR NIGHT AND A HOLLOW STAND IN - the ground past the
+// WW5: THE THEATRES A STAR NIGHT AND A HOLLOW STAND IN - the ground past the
 // Bay each of WW5's lanes reads (net/wire.js SITE_EVENT_LANES: the eight provinces; Cyrodiil's open zone none), off the
 // gate's own theatre scans (scenes/gate/gateLanes.js keptTheatreScans - one walk of a theatre's rings a registry
 // generation and a picture, whichever event asks first), WARMED A THEATRE AT A TIME in the browser's idle moments: with

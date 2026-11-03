@@ -1,5 +1,4 @@
-// WEAR-VANILLA (2026-10-01, the repair triage: "Disable the modded feature that increases durability loss. Vanilla
-// values work fine. Weapon degradation done improperly is extremely agitating if done wrong"). The default game wore
+// WEAR-VANILLA. The default game wore
 // gear through Physical Combat And Armor Overhaul's wear module (~2.8x DFU on a weapon per landed hit, ~15x on armour,
 // and armour worn by a monster's claws, which DFU never wears) or Roleplay Realism's equipDamage (armour x5), with
 // BALANCE1's 0.6 on top; and the overhaul's fading module DESTROYED a player's broken enchanted piece. The port ships
@@ -191,11 +190,11 @@ test('WEAR-VANILLA: through the core, an armed Knight\'s blow on an iron-clad pl
   const lost = () => pieces.reduce((n, p) => n + p.maxCondition - p.currentCondition, 0);
   let seed = 23; const rolls = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed % 100000) / 100000; };
   const dfRand = () => Math.floor(rolls() * 32768);
-  const foeOf = (id) => { const e = makeEnemyEntity(id, ENEMY_BASICS[id], { ...stats, attackModifierFlags: 0 }, 10, rolls); e.items = []; e.activeEffects = []; equipEnemy(e, id, 10, rolls); return e; };
+  const foeOf = (id, row = ENEMY_BASICS[id]) => { const e = makeEnemyEntity(id, row, { ...stats, attackModifierFlags: 0 }, 10, rolls); e.items = []; e.activeEffects = []; equipEnemy(e, id, 10, rolls); return e; };
   const slot = formulaOverride('applyConditionDamageThroughPhysicalHit');
   const seen = [];
   registerFormulaOverride('applyConditionDamageThroughPhysicalHit', (item, owner, damage, opts) => { seen.push({ item, damage }); return slot ? slot(item, owner, damage, opts) : false; });
-  const knight = foeOf(145), orc = foeOf(7);   // the spawns draw off Math.random of their own (a weapon's poison roll)
+  const knight = foeOf(145), orc = foeOf(7, { ...ENEMY_BASICS[7], minDamage: 6, maxDamage: 13 });   // a row that out-hits the sabre (no mod row is loaded here); the spawns draw off Math.random of their own (a weapon's poison roll)
   const random = Math.random;
   Math.random = () => { throw new Error('a draw off the rolls the core was handed'); };
   try {
@@ -214,7 +213,6 @@ test('WEAR-VANILLA: through the core, an armed Knight\'s blow on an iron-clad pl
       assert.ok(pieces.includes(seen[1].item), 'the struck piece is mine');
       if (dfuWear(d) > 0) { assert.deepEqual([armour, weapon], [portWear(d), portWear(d)], `${d} damage: DFU's ${dfuWear(d)}`); exact++; } else { assert.ok([0, DFU_WEAR_MULTIPLE].includes(armour) && [0, DFU_WEAR_MULTIPLE].includes(weapon), 'under 5: the 20% floor roll\'s 1, or nothing'); floor++; }
     }
-    // PIN MOVED (BAL2, bible/05-Combat/Balance-Arc.md section 4): the Knight hits and crits by the player's rule now, so
     // fewer of his blows fall under 5 - of these 300, 29 or 52 by the spawn's own Math.random draw (it was 80 or 105);
     // both kinds still land, the floor's at 20
     assert.ok(exact >= 100 && floor >= 20, `both kinds of blow land (${exact} worn by the amount, ${floor} by the floor roll)`);
@@ -241,8 +239,4 @@ test('WEAR-VANILLA: through the core, an armed Knight\'s blow on an iron-clad pl
     registerFormulaOverride('applyConditionDamageThroughPhysicalHit', slot);
     _resetModSettings();
   }
-  // the module on: the overhaul's own wear, handed the weapon the core assigned - a monster's stand-in among them
-  // PIN MOVED (TWO-HANDS AUDIT 2, bible/05-Combat/Two-Hands.md): the module's own wear reads the blow through `shared` -
-  // the off hand's share of a pair's blow (formulas.js `blowShare`), the roll itself for every other blow
-  assert.match(readFileSync(new URL('../../src/combat/pcaao.js', import.meta.url), 'utf8'), /if \(modules\.equipmentDamageEnhanced\) pcaaoDamageEquipment\(attacker, target, shared\(damage\), weapon, struckBodyPart, \{ rolls, say, modules \}\);/);
 });

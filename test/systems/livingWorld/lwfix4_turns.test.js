@@ -1,4 +1,4 @@
-// LW-FIX4 (2026-10-05, bible/06-Systems/Living-World.md "LW-FIX4"): THE TURNS' ELEVEN - the deep audit found the
+// LW-FIX4: THE TURNS' ELEVEN - the deep audit found the
 // character's turns re-rolling the pure world (a spare took a trip off the road, moved its fight, met its company again
 // below), a won fight stood twice, a fated ally fighting beside the player never spared and their body drawn beside
 // them, one struck down drawing on the player again a second later, the fight's election centred on each player, a peer's
@@ -105,7 +105,7 @@ test('LW-FIX4 a fight ENDED here is never stood again (a re-read halt running pa
   rig.fights.frame([{ trip, at }], here, 1001);
   await settle();
   const foes = rig.spawned.filter((r) => !r.o.allied), allies = rig.spawned.filter((r) => r.o.allied);
-  allies[1].dead = true; allies[1].corpse = true;   // PIN MOVED (AUDIT LW-III): killed as the pool kills - dead, a corpse
+  allies[1].dead = true; allies[1].corpse = true;
   rig.fights.frame([], here, 1004);
   assert.deepEqual(rig.died, [['L9.t5', 1004]], 'died at the player\'s side, at that minute');
   for (const f of foes) { f.dead = true; f.corpse = true; }
@@ -171,7 +171,7 @@ test('LW-FIX4 one struck down on the road is never stood again (the roads\' part
   stands.frame(cands, { x: 0, z: 0 }, 5000);
   return Promise.resolve().then(() => {
     assert.equal(spawned, 1, 'drew on the player');
-    stands.stands()[0].rec.dead = true; stands.stands()[0].rec.corpse = true; stands.stands()[0].rec.killedBy = 'player';   // PIN MOVED (AUDIT LW-III): killed, a corpse; PIN MOVED (AUDIT FB1025i D2): by the player's hand
+    stands.stands()[0].rec.dead = true; stands.stands()[0].rec.corpse = true; stands.stands()[0].rec.killedBy = 'player';
     stands.frame(cands, { x: 0, z: 0 }, 5001);
     assert.ok(slain.has(res.id), 'struck down');
     stands.frame(cands, { x: 0, z: 0 }, 5001.1);
@@ -196,8 +196,6 @@ test('LW-FIX4 the streaming host: the trips\' fate the dice\'s (`fated`, the tro
   assert.equal((w.match(/died: livingDied,/g) ?? []).length, 3, 'the stands\', the fights\' and the dives\'');
   assert.match(w, /slay: livingRoadSlay, killed: livingKilled, died: livingDied,[^\n]*\n\s*deadAt: livingDeadAt,/, 'the stands ask the hands\' dead');   // PIN MOVED (LW11): the road's slay, its report beside the turn
   assert.match(w, /owner: \(feet\) => amGroupRollOwner\(online\?\.id \?\? null, player\.feetAt\(\), \(peersNear\(\) \?\? \[\]\)\.filter\(\(p\) => Math\.hypot\(p\.feet\[0\] - feet\[0\], p\.feet\[2\] - feet\[2\]\) <= LIVE_M\), Infinity\),/);
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): and the world's places' generation - a provider's places come or go
-  // PIN MOVED (WW7-7): the memo and its freshness scenes/livingWorld/livingTrips.js's, the host's names its own
   assert.match(rd('src/scenes/livingWorld/livingTrips.js'), /memoFresh: \(\) => \{ if \(memo\.size > 40000 \|\| ways\.generation !== waysSeen \|\| index\.generation\(\) !== placesSeen\) \{ memo\.clear\(\); waysSeen = ways\.generation; placesSeen = index\.generation\(\); \} \},/);
   assert.match(w, /const \{ index: livingIndex, ways: livingWays, world: livingTripWorld, memo: _livingTripMemo, memoFresh: livingMemoFresh \} = createLivingTrips\(\{/);
   assert.equal((w.match(/livingMemoFresh\(\);/g) ?? []).length, 6, 'the towns\', the roads\' frame, the rooms\' frame (AUDIT-E2), the divers\', the remains\' and the carried word\'s (LW16: PIN MOVED)');

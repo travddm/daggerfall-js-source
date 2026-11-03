@@ -1,5 +1,5 @@
-// AUDIT POI, LANE G (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-4b, POI-6) - PACKS, THE DIFF, THE SHELF ENTRY.
-// Mac: "Audit everything. Ensure perfection." What the audit of the POI arc found in its packs, its approver's diff and
+// AUDIT POI, LANE G - PACKS, THE DIFF, THE SHELF ENTRY.
+// What the audit of the POI arc found in its packs, its approver's diff and
 // its library entry, each pinned red on the code it found and green on the fix:
 //   - P1 a turn read against itself (src/poi/poiDiff.js quatAngleDeg: the quaternions taken as unit ones);
 //   - P12 a part's move read in its POI's frame, not the world's; T2 every change the diff names, each asked;
@@ -106,7 +106,7 @@ test('AUDIT POI T2 + P12 WHAT IT CHANGES, EVERY WAY: a part turned, resized and 
   after.place.s = 1;
   const d = poiDiff(before, after);
   assert.deepEqual(d.map((c) => c.code), ['about', 'tags', 'sized', 'part-changed', 'part-changed', 'part-changed', 'part-changed']);
-  assert.deepEqual(d.find((c) => c.code === 'tags').tags, ['stone', 'ruin']);   // PIN MOVED (AUDIT POI, the lead's join): the tags themselves, listed in the reader's language by diffText
+  assert.deepEqual(d.find((c) => c.code === 'tags').tags, ['stone', 'ruin']);
   assert.deepEqual([d.find((c) => c.code === 'sized').from, d.find((c) => c.code === 'sized').to], [2, 1], 'shrunk');
   assert.deepEqual(d.filter((c) => c.code === 'part-changed').map((c) => [c.name, c.what]), [['tower', ['turned']], ['door', ['sized']], ['gate', ['solidity']], ['flag', ['solidity']]]);
   // a part grown on one side and shrunk on another
@@ -276,7 +276,6 @@ function fakeShelf(items = new Map(), gone = new Set()) {
   const calls = [];
   return {
     items, calls,
-    // PIN MOVED (AUDIT POI U13, lane A): an entry taken off answers 'poi-gone', as the store now does
     shelfEntry: async (id) => { calls.push(['ask', id]); return gone.has(id) ? { ok: false, error: 'poi-gone' } : items.has(id) ? { ok: true, data: { id, item: structuredClone(items.get(id)) } } : { ok: false, error: 'not-found' }; },
     shelve: async (item) => { calls.push(['put', item.id]); if (gone.has(item.id)) return { ok: false, error: 'poi-gone' }; items.set(item.id, structuredClone(item)); return { ok: true, data: { id: item.id } }; },
   };
@@ -342,7 +341,7 @@ test('AUDIT POI P4 AN ENTRY INTO THE SHELF, NEVER OVER ANOTHER: its id free, put
 
 test('AUDIT POI P4 ON THE REAL WORKER: a builder\'s entry changed since the pack was made is left as it is - another builder\'s import puts one copy however often it runs, and the approver\'s finds that copy (the approver\'s import put the pack\'s older copy over the builder\'s current one; another builder\'s made a copy each time)', async () => {
   forgetPoiFeed();
-  const s = await standService({ DEVELOPER_HANDLES: 'Dev', BUILDER_HANDLES: 'Mapper', APPROVER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Dev,Mapper', SEAT_OWNERS: 'Mac' });
   const dev = await s.registered('Dev'), mapper = await s.registered('Mapper'), mac = await s.registered('Mac');
   const ioOf = (who) => ({ fetch: s.fetch, base: 'https://accounts.invalid', secret: who.secret });
   const io = (who) => ({ putAsset: (b, k) => poiPutAsset(ioOf(who), b, k), history: (id) => poiHistory(ioOf(who), id), shelfEntry: (id) => poiShelfEntry(ioOf(who), id), shelve: (it) => poiShelve(ioOf(who), it), rand: (b) => crypto.getRandomValues(b) });

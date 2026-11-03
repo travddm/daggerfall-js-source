@@ -1,6 +1,5 @@
 // @ts-check
-// WAGONS4 (2026-10-11, the owner: "Wagons have durability and require upkeep to keep from breaking down and becoming
-// unusable.") - WAGON UPKEEP (bible/06-Systems/Wagon-Upkeep.md). The law, pure: a wagon's soundness, what wears it,
+// WAGONS4 - WAGON UPKEEP. The law, pure: a wagon's soundness, what wears it,
 // and what it costs to mend. The wagon's durability is the condition every
 // wagon has always carried (DFU's Small Cart, template 93: 1400 of 1400 - itemTemplates.js mintCondition), so a wagon
 // owned before WAGONS4 is a sound one, and the item card's Condition and a sale's condition price (RRI's
@@ -11,14 +10,13 @@
 //    (LOAD_WEAR at full); a bigger wagon is built heavier and wears slower (KIND_WEAR). A journey on the travel map it
 //    goes on wears it by the day (JOURNEY_WEAR_A_DAY, JOURNEY_WEAR_MAX a journey at most). The watch carrying it off
 //    (scenes/wagonWarden.js) knocks THROWN_WEAR off. No wear takes it under WEAR_FLOOR.
-//  - SOUNDNESS (WAGON_STATES): Sound, Worn, Rickety (its pace 0.85), Failing (0.7) - and no lower. WAGON-MEND (2026-10-12,
-//    the owner: "wagons shouldnt entirely break down to become unusable"): WAGONS4's Broken, at nought, which no team
+//  - SOUNDNESS (WAGON_STATES): Sound, Worn, Rickety (its pace 0.85), Failing (0.7) - and no lower. WAGON-MEND: WAGONS4's Broken, at nought, which no team
 //    pulled, is retired - a wagon worn to its last point is Failing, slow, and still goes where its owner goes. A wagon a
 //    save holds at nought from before is Failing too.
 //  - MENDING: a Wagon Yard mends it whole for MEND_SHARE of its kind's value at most, by what it lacks - MEND_FETCH more
 //    to send a wright to where it stands; a Wagon Repair Kit (systems/upkeep/upkeepItemRows.js) mends KIT_MEND of it in the
 //    field over KIT_MINUTES, to WAGON_KIT_CEILING at most.
-//  - WAGON-TIERS (2026-10-15, Mac: "Yes, same tiers"): WHAT WEAR COSTS is its tier's (systems/upkeep/upkeepTiers.js - Boons,
+//  - WAGON-TIERS: WHAT WEAR COSTS is its tier's (systems/upkeep/upkeepTiers.js - Boons,
 //    the default: nothing, never worse than DFU's plain wagon; Hard: the system as it stood). The laws below that charge
 //    take the tier's rules as an argument, and one handed none runs Hard.
 

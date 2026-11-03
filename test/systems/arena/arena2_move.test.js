@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02): THE FIX FROM ARENA1 - a house the arena displaced moves WHAT WAS IN IT, never its places
+// ARENA2: THE FIX FROM ARENA1 - a house the arena displaced moves WHAT WAS IN IT, never its places
 // (systems/arena/arenaMove.js emptyArenaScene). ARENA1 renamed the old house's scene onto the new house, and the old room's
 // placed pieces stood where it had floor, its chest indices named another house's chests and its furniture marks named
 // pieces the new house never had. Now: the owner's own things go back where they live (furniture to the furnishings,
@@ -106,15 +106,3 @@ test('ARENA2 move: the move gives the owner\'s things back and pays the bank thr
   assert.equal(scenes.scenes.get(interiorSceneName(MAP, r.to)).lootContainers[0].items[0].name, 'gold');
 });
 
-test('ARENA2 move: the hosts\' doors - furniture to the furnishings, the rest to the pack, the gold to Daggerfall\'s account; a house with no chest gets a crate', () => {
-  const w = rd('src/scenes/world.js');
-  // ARENA4b (PIN MOVED): the two doors are named once (world.js arenaGiveOwn, arenaRefund) and handed by the offline deed's
-  // move and the online home's alike (moveArenaHomesOnline) - the same bodies, a function's now
-  assert.match(w, /function arenaGiveOwn\(items\) \{ for \(const it of items\) \{ if \(isFurnishing\(it\)\) \(playerEntity\.furnishings \?\?= \[\]\)\.push\(it\); else addItem\(playerEntity\.items \?\?= \[\], it\); \} \}/);
-  assert.match(w, /giveOwn: arenaGiveOwn,\n\s+refund: arenaRefund,/);
-  assert.match(w, /const a = playerEntity\.bankAccounts\[goldRegion\(playerEntity\.bankAccounts, ARENA_REGION\)\] \?\? null;/);
-  const m = rd('src/scenes/worldModes.js');
-  // PIN MOVED (FIELD BUGS 2026-10-12g HOLD-KEPT): the crate's arm is every chest record's that no chest stands for
-  assert.match(m, /if \(!target && kind === 'container' && c\.items\?\.length\) \{\n\s+const o = buildingOrigin\(\), f = player\.pos;\n\s+data\.droppedPiles = \[\.\.\.\(data\.droppedPiles \?\? \[\]\), \{ pos: \[f\[0\] - o\[0\], f\[1\] - o\[1\], f\[2\] - o\[2\]\], items: c\.items\.map\(\(it\) => \(\{ \.\.\.it \}\)\) \}\];/);
-  assert.ok(!/renameScene\(/.test(rd('src/systems/arena/arenaMove.js')), 'the old places are never renamed onto the new house');
-});

@@ -1,4 +1,4 @@
-// LW-PERF (2026-10-05, Mac: "how is performance after we integrate this?"; bible/06-Systems/Living-World.md "LW-PERF"):
+// LW-PERF:
 // THE LIVING WORLD'S OWN COST, MEASURED - the script time it adds to a frame, on the engine the game runs on (V8), with
 // no GPU and no ARENA2: the synthetic towns and map the tests stand (test/lwTown.mjs, test/lwRoads.mjs) and Hazelnut's
 // own road bytes (vendor/roads-hazelnut). What a frame pays for:
@@ -17,7 +17,7 @@
 //   tens of milliseconds, not the noise)
 //   every resident near on the city's street                  within 2.5 s of the way in
 //   the roads' layer, any frame                               <= 6 ms
-// Measured before LW-PERF (2026-10-05, this probe's own rows): the city's worst frame 36-120 ms, its way in 275-420 ms,
+// Measured before LW-PERF: the city's worst frame 36-120 ms, its way in 275-420 ms,
 // the roads' read 5-10 ms once a second; after: see the bible's LW-PERF table.
 //
 // Usage: node tools/livingPerfProbe.mjs        (prints the table; exits 1 on a blown budget)

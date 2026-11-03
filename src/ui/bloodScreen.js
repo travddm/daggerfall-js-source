@@ -1,6 +1,5 @@
 // @ts-check
-// BLOOD2e - BLOOD ON THE LENS (2026-09-21, Mac: "make it even more
-// visceral and detailed").
+// BLOOD2e - BLOOD ON THE LENS.
 //
 // A blow that takes a real share of the player's health in ONE FRAME
 // throws a few drops onto the screen: the port's own spatter cells (the

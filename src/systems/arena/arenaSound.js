@@ -1,6 +1,6 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "During fights, the crowd is present and can cheer/boo you"): THE CROWD, HEARD. Design:
-// bible/11-Multiplayer/Arena.md "4. The crowd" ("Sound").
+// ARENA2: THE CROWD, HEARD. Design:
+// "4. The crowd" ("Sound").
 //
 // DAGGER.SND has no cheer, no boo and no applause - its "Arena" clips are TES I's monsters - but it has ten recordings
 // of people (AmbientPeople1-10, records 441-450, unused anywhere until now): several voices at once, partly voiced,

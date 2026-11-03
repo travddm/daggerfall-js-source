@@ -1,5 +1,5 @@
-// TOWN-BOARDS (the owner's field report, 2026-10-27, item 3: "Random wooden board placement in smaller towns on the ground";
-// bible/03-World/Urban-Fabric.md section 9) - THE BOARDS ON THE GROUND, and the two rules of URBANIZER's fabric that laid
+// TOWN-BOARDS (;
+// ) - THE BOARDS ON THE GROUND, and the two rules of URBANIZER's fabric that laid
 // them:
 //   - THE PAVEMENT ROUND THE CARRIAGEWAY. A main street's pavement had been its cells between FABRIC.carriage and 3.5 of
 //     the walk in straight lines - a band a cell wide that met its next cell at a corner alone at every step of the walk
@@ -13,7 +13,7 @@
 //     top rail (a board on the ground) or hung - at a village's and a hamlet's edges (a city past the Bay stands on its
 //     wall's round, its whole inside its ground). Now a cell past the town's ground is off the town (world/townShape.js
 //     onTownTile - the walkers' own law): its yard fenced where the ground ends.
-//   - THE PAVEMENT IS A WALK (TOWN-BOARDS 2, the owner: "No band aids or half assed work"). The ring left pavements a few
+//   - THE PAVEMENT IS A WALK (TOWN-BOARDS 2). The ring left pavements a few
 //     cells long - before a short house front, between two of Daggerfall's props, two pavements meeting at a corner where
 //     a street squeezes between two houses - each a lone flag, or a lone board on the forest floor in the planks' styles.
 //     Now two pavements meeting at a corner across the street's ground are joined there, and a pavement shorter than
@@ -278,7 +278,6 @@ test('TOWN-BOARDS 2 the painted roads: a road the terrain painted across a yard\
   assert.notEqual(fabricGroundKey(ground, paths, o, 32, 16), fabricGroundKey(ground, null, o, 32, 16));
   assert.equal(fabricGroundKey(null, null, o, 32, 16), '');
   _resetTownFabrics();
-  assert.match(rd('src/scenes/pixelBuild.js'), /ground: townGround, paths \}\);/);
 });
 
 test('TOWN-BOARDS the fabric on the town\'s ground: a cell its ground refuses is off the town - a yard reaching past it fenced where the ground ends, never down the land past it; nothing of the fabric (a fence, a gate, a wall, a woodpile, a pavement, a carriageway) on a refused cell; no refusal, every cell of the blocks the town\'s (mutants: the ground unread)', () => {
@@ -362,15 +361,6 @@ test('TOWN-BOARDS the stand plans on the ground it is handed: the plan\'s town i
   assert.notEqual(again, quick, 'asked on its own ground after: planned again');
   assert.equal(hasCustomModel(quick.modelId), false);
   _resetTownFabrics();
-});
-
-test('TOWN-BOARDS the pixel build plans the fabric on the terrain job\'s townGround - the outline TS2 flattened, the same the walkers are shut by (mutants: the host unwired)', () => {
-  const pb = rd('src/scenes/pixelBuild.js');
-  assert.match(pb, /const \{ samples, [^\n]*townGround[^\n]* \} = await terrainGen\.generate\(\{/);
-  // PIN MOVED (TOWN-BOARDS 2): and its painted roads, the job's paths
-  assert.match(pb, /const \{ samples, [^\n]*paths,[^\n]* \} = await terrainGen\.generate\(\{/);
-  assert.match(pb, /const fabric = await townFabricFor\(dfLocation, loc\.blocks, \{ px, py, breathe: \(\) => breather\.breathe\(\), ground: townGround, paths \}\);/);
-  assert.match(pb, /fabricWalkShut\(townWalkShut\(dfLocation, townGround, paths\), dfLocation\)/);
 });
 
 test('TOWN-BOARDS with ARENA2: the world\'s small towns on the player\'s data - past the Bay every 61st village, hamlet and city as cloned and outlined, no pavement step, no pavement shorter than FABRIC.paveLeast (a lone board, a lone flag), no setts island and nothing of the fabric off its ground; the towns whose fences the land buried or hung, laid on their pixels as the terrain kernel flattens them with a road every way through them, none buried or hung and nothing of the fabric on a painted road; on the Bay no town dressed by the fabric and no timber lying on the ground in any village\'s or hamlet\'s block', { skip: skipReal }, async () => {

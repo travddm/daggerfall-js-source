@@ -1,6 +1,5 @@
 // MAC-K3 - THE MOUNT, ONE HOME.
 //
-// Mac, 2026-09-15: "T to mount not working outside interiors."
 //
 // It was not a missing key. `KeyT` resolves to `Transport`
 // (systems/inputActions.js) and `ui/input.js` routes that to
@@ -123,8 +122,7 @@ export function createMountRig({
 
   /**
    * THE ONE PLACE THE MODE CHANGES (U53), and HC1's lesson with it
-   * (2026-09-14, Mac: "audit the horse and cart ... the sprites
-   * actually show"): the mount's art loads HERE, not on the T-key pick
+   * the mount's art loads HERE, not on the T-key pick
    * alone. Three other paths set the mode and used to leave the art
    * null for good - a loaded save on horseback, the Test Room's ride
    * out, and the ship's landing - and a rider from any of them had the
@@ -264,7 +262,7 @@ export function createMountRig({
         const ui = canvasOf();
         const rect = ridingRect(ui, art, horseOffsetHeight());
         const lift = enhanced ? liftForLook(rect, art, enhanced) : null;   // RR2: EnhancedRiding.OnGUI - the sprite rides the look
-        // HORSE-LIT (2026-10-16, Mac: "Horses in first person should be affected by lighting"): THE ROOM'S LIGHT ON THE
+        // HORSE-LIT: THE ROOM'S LIGHT ON THE
         // MOUNT. TransportManager.OnGUI (:285-318) draws the ridingTexture white, and so did this - a bright horse's neck
         // under a weapon MAC-I darkens, at night and in the dark. It takes the weapon's tint now (combat/weapon/weaponRig.js
         // fpTint): `flatLightAt` at the camera, under the same switch. The 3D horse (mwViewDrawSaddle, above) is drawn

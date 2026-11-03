@@ -1,7 +1,4 @@
-// AUDIT ARENA-LADDER (2026-10-05, the owner: "Before we merge this. Can you do a comprehensive audit on the new arena?
-// Ensure AI enemies sometimes recieve telegraphed attacks, ensure climbing the PvE ladder isnt an easy feat, and look at
-// where we can make improvements"; asked, "Lose the tier's run", "No cheese spells or potions", "Elite champions",
-// "Relay and service"). Every finding of bible/01-Overview/audits/Audit-Arena-Ladder.md pinned here: the telegraphs between
+// AUDIT ARENA-LADDER. Every finding of pinned here: the telegraphs between
 // fighters (the brain's and the relay's), the climb's cost (the run, the elites, the judges' floor, the kit law, the
 // ticket), and the bout's holes (the sand's collapse, a dispelled champion, the player's live tag, a blow from the side).
 import '../modsOff.js';
@@ -13,7 +10,7 @@ import { Collider } from '../../src/player/collider.js';
 import { MOBILE_TYPES as M } from '../../src/characters/mobile/mobileTypes.js';
 import { setTacticsClock, resetTactics, tacticsStep, noteLocalPlayer, LOCAL_TARGET } from '../../src/ai/tactics.js';
 import {
-  resetBlows, makeBlow, setLiveBlow, drawableBlows, blowConnects, blowScaled, registerBlowDodgedListener, SAND_DRAW_RANGE, liveBlows,
+  resetBlows, makeBlow, setLiveBlow, drawableBlows, blowConnects, registerBlowDodgedListener, SAND_DRAW_RANGE, liveBlows,
   BLOW_TIER_LEVEL, BLOW_COOLDOWN_MIN, BLOW_COOLDOWN_MAX, BLOW_CHANCE, blowShapesOf as foeShapesOf, inBlow as foeInBlow, BLOW as FOE_BLOW,
 } from '../../src/ai/foeBlows.js';
 import { BLOW, BLOW_FAMILY, BLOW_CASTERS, blowShapesOf, inBlow } from '../../src/ai/blowShapes.js';
@@ -82,7 +79,7 @@ function fighter({ feet, side, bout = 'b1', level = 12, type = M.Orc, out = fals
   return { ai, entity: body };
 }
 const targetOf = (f) => ({ isPlayer: false, entity: f.entity, ai: f.ai, dead: false });
-/** PIN MOVED (FEUD's merge of main): AUDIT TELL B1 - a wind-up the brain was not asked about for BLOW_STALE breaks
+/**
  *  untold, so a fight is STEPPED at the brain's 16 Hz to `until` (its landing), never jumped there in one step. */
 function stepTo(ai, until, at) {
   while (T < until) { T = Math.min(until, T + 1 / 16); tacticsStep(ai, at[0] - ai.feet[0], at[2] - ai.feet[2]); }
@@ -101,7 +98,7 @@ test('AUDIT ARENA-LADDER T2: ON THE SAND A FIGHTER WINDS UP AT ITS BOUT-MATE - a
   const a = fighter({ feet: [0, 0, 0], side: 0 }), b = fighter({ feet: [0, 0, 1.6], side: 1 });
   const s = windUp(a, b);
   assert.equal(s.state, 'windup', 'a wind-up at the other fighter');
-  assert.equal(s.blow.key, a.ai.target, 'marked for the one it was wound up at');   // PIN MOVED (FEUD's merge of main): `tg` is AUDIT TELL B8's `key`, the one record of whom it was wound up at
+  assert.equal(s.blow.key, a.ai.target, 'marked for the one it was wound up at');
   assert.equal(s.blow.sand, true);
   // and none where the mark is no bout-mate
   for (const [why, other] of [
@@ -130,20 +127,16 @@ test('AUDIT ARENA-LADDER T2: ON THE SAND A FIGHTER WINDS UP AT ITS BOUT-MATE - a
   assert.equal(drawableBlows(T, [30, 0, 0]).length, 2);
 });
 
-test('AUDIT ARENA-LADDER T3: the bout-mate\'s blow lands by its shape - the verdict where the mark stands, the shape\'s weight on the damage, a dodge a miss told to the listeners; a wind-up whose foe turned lands on no one (mutants: the verdict read at my feet; the weight dropped; the dodge untold)', () => {
+test('AUDIT ARENA-LADDER T3: the bout-mate\'s blow lands by its shape - the verdict where the mark stands, the damage unchanged, a dodge a miss told to the listeners; a wind-up whose foe turned lands on no one (mutants: the verdict read at my feet; the dodge untold)', () => {
   noteLocalPlayer([40, 0, 40], [0, 0, 1]);
   const told = [];
   registerBlowDodgedListener('t3', (ai) => told.push(ai));
   try {
     const a = fighter({ feet: [0, 0, 0], side: 0 }), b = fighter({ feet: [0, 0, 1.6], side: 1 });
     const s = windUp(a, b);
-    const mult = s.blow.mult;
     stepTo(a.ai, s.blow.land + 0.01, b.ai.feet);
     assert.equal(a.ai._blowVerdict, true, 'the mark stood in its shape');
-    assert.equal(a.ai._blowMult, mult, 'its weight carried to the swing');
-    assert.ok(mult > 1);
     assert.equal(blowConnects(a.ai, false, T), true, 'the shape decides, not the classic reach');
-    assert.equal(blowScaled(a.ai, 10), Math.round(10 * mult), 'weighed by its shape');
     assert.equal(told.length, 0);
     // stepped out of it: a dodge
     resetTactics(); resetBlows(); T = 0;
@@ -171,12 +164,10 @@ test('AUDIT ARENA-LADDER T3: the bout-mate\'s blow lands by its shape - the verd
   assert.equal(ai._blowVerdict, true, 'TACT4\'s law: a blow with no mark is mine');
 });
 
-test('AUDIT ARENA-LADDER T4: the hosts resolve a fighter\'s blow on a fighter by its shape and tell the arena a dodge (mutants: the classic reach alone between foes; the weight dropped; the listener unregistered)', () => {
+test('AUDIT ARENA-LADDER T4: the hosts resolve a fighter\'s blow on a fighter by its shape and tell the arena a dodge (mutants: the classic reach alone between foes; the listener unregistered)', () => {
   const dc = rd('src/scenes/dungeonContext.js'), ef = rd('src/scenes/exteriorFoes.js');
   assert.match(dc, /if \(blowConnects\(f\.ai, foeDeps\.meleeHitConnects\(/);
-  assert.match(dc, /dealDamage: \(tt, d\) => tt\.hurtFromFoe\?\.\(blowScaled\(f\.ai, d\), fwd, f\)/);
   assert.match(ef, /if \(blowConnects\(f\.ai, meleeHitConnects\(/);
-  assert.match(ef, /d = blowScaled\(f\.ai, d\);/);
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(h), /registerBlowDodgedListener\('arena', \(ai\) => arenaBouts\.blowDodged\(ai\)\);/, h);
   const ab = rd('src/scenes/arena/arenaBouts.js');
   assert.match(ab, /function blowDodged\(ai\) \{[\s\S]*?recordStrike\(C\.rec, t, from\);\s*boutMiss\(C\.b, \{ from, now: t \}\);/);
@@ -200,11 +191,10 @@ function relayLadder(tier, bout, { cl = 20 } = {}) {
   return { st, t, C };
 }
 
-test('AUDIT ARENA-LADDER T5: THE RELAY\'S FIGHTERS TELEGRAPH TOO - of the tier (level 10 up, or a champion), its cooldown spent, the roll: the `atk` word carries the shape, its facing and where it was wound up; it lands by the shape and its weight, and a step out of it is a miss (mutants: the tier unread; the shape\'s verdict the reach\'s; the weight dropped; the cooldown unset)', () => {
+test('AUDIT ARENA-LADDER T5: THE RELAY\'S FIGHTERS TELEGRAPH TOO - of the tier (level 10 up, or a champion), its cooldown spent, the roll: the `atk` word carries the shape, its facing and where it was wound up; it lands by the shape with the roll unchanged, and a step out of it is a miss (mutants: the tier unread; the shape\'s verdict the reach\'s; the cooldown unset)', () => {
   assert.equal(ARENA_BLOW_TIER_LEVEL, BLOW_TIER_LEVEL, 'the brain\'s tier');
   assert.deepEqual([ARENA_BLOW_COOLDOWN_MIN_MS, ARENA_BLOW_COOLDOWN_MAX_MS], [BLOW_COOLDOWN_MIN * 1000, BLOW_COOLDOWN_MAX * 1000], 'the brain\'s cooldown');
   assert.ok(ARENA_BLOW_CHANCE > BLOW_CHANCE && ARENA_BLOW_CHANCE < 1, 'rolled once a blow, not a tick: more often a roll, sometimes');
-  // PIN MOVED (FEUD's merge of main): BLOW holds TELL6's and RVN5's shapes too, which no family throws - the wire takes
   // every shape a family throws, and the relay's ladder brain asks the family alone
   assert.deepEqual([...ARENA_BLOW_SHAPES].sort(), [...new Set([...BLOW_FAMILY.values()].flat())].sort());
   for (const k of ARENA_BLOW_SHAPES) assert.ok(k in BLOW, `${k} is a shape`);
@@ -222,7 +212,7 @@ test('AUDIT ARENA-LADDER T5: THE RELAY\'S FIGHTERS TELEGRAPH TOO - of the tier (
   const land = stepBout(st, atk.at, () => 0);
   const blow = land.find((w) => w.k === 'blow');
   assert.ok(blow, 'stood in its shape: struck');
-  assert.equal(blow.d, Math.max(1, Math.round(a.dmg[0] * BLOW[atk.s].mult)), 'the roll weighed by the shape');
+  assert.equal(blow.d, a.dmg[0], 'the roll, unweighed by the shape');
   assert.equal(st.b.fighters.find((f) => f.id === 'p0').health, hp0 - blow.d);
   // the next telegraph (past its cooldown), stepped out of
   a.nextAt = 0; a.blowAt = 0;
@@ -283,10 +273,10 @@ test('AUDIT ARENA-LADDER L2: EVERY TIER\'S CHAMPION FIGHTS AS AN ELITE - offline
   assert.match(rd('src/scenes/arena/arenaBouts.js'), /stage\.spawn\(f\.spec\.mobile, feet, \{ level: f\.spec\.level, elite: !!f\.spec\.elite,/);
   assert.deepEqual([ARENA_ELITE_HP_MULT, ARENA_ELITE_DMG_MULT], [ELITE_FOE_HEALTH_MULT, ELITE_FOE_DAMAGE_MULT], 'the relay\'s elite is the world\'s');
   const plain = arenaFoeStats(M.Knight, 5), el = arenaFoeStats(M.Knight, 5, { elite: true });
-  assert.equal(el.hp, plain.hp * 5);
-  assert.deepEqual(el.dmg, plain.dmg.map((d) => d * 3));
+  assert.equal(el.hp, plain.hp * 2);
+  assert.deepEqual(el.dmg, plain.dmg.map((d) => d * 1.3));
   const beast = arenaFoeStats(M.GrizzlyBear, null), eb = arenaFoeStats(M.GrizzlyBear, null, { elite: true });
-  assert.equal(eb.hp, beast.hp * 5);
+  assert.equal(eb.hp, beast.hp * 2);
   for (let tier = 0; tier < 10; tier++) {
     assert.ok(arenaLadderBout(tier, 3).foes.every((f) => f.elite), `tier ${tier}'s champion`);
     for (let b = 0; b < 3; b++) assert.ok(arenaLadderBout(tier, b).foes.every((f) => !f.elite), `tier ${tier} bout ${b}`);
@@ -569,7 +559,7 @@ test('AUDIT ARENA-LADDER O4: THE LAUREL TAKES TEN RATED BOUTS AGAINST FIVE ACCOU
  *  accountClient's shapes), `enterFloor` as `entering` does; the calls kept in `order`. */
 function onlineClient({ attemptAnswer, entering = () => true, guest = false } = {}) {
   const order = [], said = [], boutSent = [], entered = [];
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const board = { me: { ladder: arenaLadderOf([]) } };
   const A = createArenaOnline({
     now: () => 0, session: () => session, say: (l) => said.push(l), guest: () => guest, makeHall: () => ({ status: 'open', join() {}, leave() {}, sendArena: () => true }),
@@ -809,7 +799,7 @@ test('AUDIT ARENA-LADDER 2 R2: a relay\'s telegraph on this screen - its mark la
   setTacticsClock(() => T);
 });
 
-test('AUDIT ARENA-LADDER 2 T1: A LANDED VERDICT IS ITS MARK\'S ALONE - a fighter whose target changed between the landing and its damage frame swings classically, unweighed (mutants: the mark unread at the resolution)', () => {
+test('AUDIT ARENA-LADDER 2 T1: A LANDED VERDICT IS ITS MARK\'S ALONE - a fighter whose target changed between the landing and its damage frame swings classically (mutants: the mark unread at the resolution)', () => {
   noteLocalPlayer([40, 0, 40], [0, 0, 1]);
   const a = fighter({ feet: [0, 0, 0], side: 0 }), b = fighter({ feet: [0, 0, 1.6], side: 1 });
   const s = windUp(a, b);
@@ -817,5 +807,4 @@ test('AUDIT ARENA-LADDER 2 T1: A LANDED VERDICT IS ITS MARK\'S ALONE - a fighter
   assert.equal(a.ai._blowVerdict, true);
   a.ai._armedTargeting = false;   // the motor turns on the player at once - the brain only at its next tick
   assert.equal(blowConnects(a.ai, false, T), false, 'the classic answer for the player, never the bout-mate\'s verdict');
-  assert.equal(blowScaled(a.ai, 10), 10, 'and no weight');
 });

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b SAIL-WIND (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md; src/systems/comeSailAway/csaLoadWind.js):
+// FIELD BUGS 2026-10-21b SAIL-WIND (; src/systems/comeSailAway/csaLoadWind.js):
 // "Sailing Vessels Sometimes Have No Propulsion" - "This is only with sails. Oars work fine." A save made below ground keeps
 // the indoors' wind (none), and a load that lands outdoors - online a dungeon save wakes at a temple or town - restored it
 // on the open sea: under sail a Small Ship crept 0.12 knots and a Large Boat made nothing, while her oars rowed as ever, until

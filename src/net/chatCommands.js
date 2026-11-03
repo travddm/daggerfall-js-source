@@ -1,5 +1,5 @@
 // @ts-check
-// CHAT-CHAN (2026-09-23, the community arc): THE CHAT'S SLASH COMMANDS - one grammar, pure, DOM-free.
+// CHAT-CHAN: THE CHAT'S SLASH COMMANDS - one grammar, pure, DOM-free.
 //
 // Before this slice the host's onSend (scenes/world.js) tested a handful of commands by regex and sent EVERYTHING else
 // to the room, so a mistyped `/pary hi` was said to everyone online, literally. Now a line that starts with `/` is a
@@ -9,7 +9,7 @@
 //   /party /p <text>        your party                 /local /l /say /s     those near enough to hear you
 //   /guild /gu <text>       your guild (GUILD1c)
 //   /lc <text>              your language channel (CHAT-LANG)   /lang [code|off]  choose it; alone, the list
-//   /ooc <text>             a Local aside out of character - the line wrapped in (( ))
+//   /ooc <text>             a Local aside out of character - the line wrapped in (())
 //   /rp <text>              a line of roleplay on the active tab - wrapped in *asterisks*, drawn green and leaning (CHAT-RP)
 //   /trade /tr <text>       the Trade channel      /lfg <text>  the LFG channel (CHAT-TRADE) - each joined by choice:
 //   /join <trade|lfg>       on the bar and in the channel      /leave <trade|lfg>  off it (a bare /leave is a battle's)
@@ -32,7 +32,7 @@ import { parseRollSpec, ROLL_DICE_MAX, ROLL_SIDES_MAX } from './dice.js';   // D
 import { LIVE_EVENTS, CHAT_LANGS } from './wire.js';   // EVENT1: the live events a dev may stage; CHAT-LANG: the language channels
 import { HUB_FIND_MAX } from './hubShards.js';   // SCALE5c: a search's bound
 import { rpText } from './chat.js';   // CHAT-RP: the roleplay mark
-import { t } from '../systems/textManager.js';   // CHAT-TRADE: the new rows' words in the player's language, each read when /help is asked; AUDIT EG V (c, L7-21): and /help's line for /breach
+import { t } from '../systems/textManager.js';   // CHAT-TRADE: the new rows' words in the player's language, each read when /help is asked
 
 /** The channel commands: each names the tab its text is said on. `wrap` is what the text becomes first. */
 export const CHANNEL_COMMANDS = Object.freeze([
@@ -52,12 +52,12 @@ export const JOIN_CHANNELS = Object.freeze(['trade', 'lfg']);
 /** CHAT-TRADE: a /join or /leave that names none of them - through the text core (AUDIT CHAT-TRADE A4). */
 export const badJoinText = (name) => t('net.chat.badJoin', '/{cmd} takes trade or lfg: /{cmd} trade.', { cmd: name });
 /**
- * EMOTE1 (2026-09-23, Addison Knox: "Emotes, be it emojis or additional animations"): THE GESTURES. Each is an ACTION
+ * EMOTE1: THE GESTURES. Each is an ACTION
  * line said on the Local tab - a gesture is the body's, and the bodies near enough to see it are the ones Local
  * reaches - in the third person the chat draws it in ("Bran waves."), with a name after the command making it a
  * gesture AT someone ("/wave Ann" - "Bran waves at Ann."). Words only: the port's bodies have no clip to play for a
  * wave or a bow (the Morrowind rig's base animations are the idles, the moves, the attacks, the casts, a knockdown and
- * the deaths - bible/06-Systems/Community-Arc.md EMOTE1), and a gesture drawn with the wrong one would be a lie.
+ * the deaths EMOTE1), and a gesture drawn with the wrong one would be a lie.
  */
 export const EMOTES = Object.freeze({
   wave: ['waves.', 'waves at {t}.'],
@@ -162,7 +162,7 @@ export const SHORTCODES = Object.freeze(Object.fromEntries(SHORTCODE_LIST));
 /** EMOTE1: every `:code:` the table knows, its emoji - the rest as typed. */
 export const expandShortcodes = (text) => String(text ?? '').replace(/:([a-z0-9_+-]{1,20}):/gi, (all, code) => SHORTCODES[code.toLowerCase()] ?? all);
 /** The commands the host handles itself, before this parser is asked (their own slices pin their grammar). */
-export const HOST_COMMANDS = Object.freeze(['unstuck', 'red', 'dm', 'mute', 'unmute', 'ready', 'leader', 'travel', 'event', 'note', 'mentor', 'mail', 'mailbox', 'bug', 'season', 'seasons', 'breach', 'block', 'unblock', 'blocked', 'report', 'conduct', 'rules', 'ban', 'unban', 'strikes', 'cases', 'case', 'dismiss', 'modhelp']);   // SAFE1-SAFE7: the chat safety commands (net/safety/safetyLaw.js SAFETY_COMMANDS, which a pin holds to these) - AUDIT SAFE DOC-4: and the moderators' look at the reports   // AUDIT EG V (c, L7-1): /breach, the Elite Breach's (breachCommandOf)   // SERVER-POST: /mail (and /mailbox), the mailbox   // SOFTCAP1: /mentor   // TITLE-N: /dm, the Dungeon Master's line   // PARTY-TRAVEL: /leader and /travel   // EVENT1: /event, a dev's live event   // PRIVATE-REPORT: /bug, the mailbox's private report form (mailboxCommandOf) - /report is the chat safety's, a player to the moderators   // SEASON-BOOK: /season (and /seasons), the laurel's window (pauseCommandOf)
+export const HOST_COMMANDS = Object.freeze(['unstuck', 'red', 'dm', 'mute', 'unmute', 'ready', 'leader', 'travel', 'event', 'note', 'mentor', 'mail', 'mailbox', 'bug', 'season', 'seasons', 'block', 'unblock', 'blocked', 'report', 'conduct', 'rules', 'ban', 'unban', 'strikes', 'cases', 'case', 'dismiss', 'modhelp']);   // SAFE1-SAFE7: the chat safety commands (net/safety/safetyLaw.js SAFETY_COMMANDS, which a pin holds to these) - AUDIT SAFE DOC-4: and the moderators' look at the reports   // SERVER-POST: /mail (and /mailbox), the mailbox   // SOFTCAP1: /mentor   // TITLE-N: /dm, the Dungeon Master's line   // PARTY-TRAVEL: /leader and /travel   // EVENT1: /event, a dev's live event   // PRIVATE-REPORT: /bug, the mailbox's private report form (mailboxCommandOf) - /report is the chat safety's, a player to the moderators   // SEASON-BOOK: /season (and /seasons), the laurel's window (pauseCommandOf)
 /** SERVER-POST, PRIVATE-REPORT: the pause page a mailbox line opens - `/mail` and `/mailbox` the mailbox, `/bug` the
  *  mailbox's private report form (ui/enhanced/enhancedReport.js) - or null for any other line. Local, never sent. (`/report`
  *  is SAFE3's: a player's lines to the moderators, net/safety/safetyLaw.js.) */
@@ -196,8 +196,7 @@ export function parseEventCommand(text) {
   if (words.length > 2 || !LIVE_EVENTS.includes(name) || (sw !== 'on' && sw !== 'off')) return { error: `Usage: /event <${LIVE_EVENTS.join('|')}> [on|off], or /event off.` };
   return { kind: sw === 'on' ? name : '' };
 }
-/** CHAT-HELP (2026-09-23, Mac: "a non-intrusive greeting message that says something along the lines of (use /help
- *  for commands)"): the line the chat greets the player with each time they go online - theirs alone, never counted
+/** CHAT-HELP: the line the chat greets the player with each time they go online - theirs alone, never counted
  *  unread (net/chat.js push's `quiet`), so /help is found without being announced. */
 export const CHAT_GREETING_TEXT = 'Welcome! Type /help for chat commands.';
 /** CHAT-TRADE: a list whose rows may be READ WHEN THEY ARE READ - a function row is a getter (the text core's
@@ -235,21 +234,8 @@ export const HELP_LINES = lazyLines([
   '//text - a line that starts with a slash',
 ]);
 
-/** AUDIT EG V (c, L7-21): /help's own line for the Elite Breach's words (the host answers `/breach` before this parser is
- *  asked - breachCommandOf), in the player's language; and /help's lines whole. */
-export const breachHelpLine = () => t('chat.help.breach', '/breach - the Elite Breach: answer your company\'s call or open the start window (/breach help lists its commands)');
-export const helpLines = () => [...HELP_LINES.slice(0, -1), breachHelpLine(), HELP_LINES[HELP_LINES.length - 1]];
-/**
- * AUDIT EG V (c, L7-1): THE ELITE BREACH'S DOOR IN THE CHAT - what `/breach` was given: its words after it, whole (`pick 2`,
- * `vote yes`, `buy tonic`, `ping danger`, `annals 3`, `surplus reroll`, `bequest 1`), '' for `/breach` alone, null for any
- * other line. The host (scenes/world.js onSend) hands them to the breach client (scenes/eliteGates/egClient.js command) and sends
- * nothing; a one-word door read every two-word command as no command at all. Pure.
- * @param {string} text
- */
-export function breachCommandOf(text) {
-  const m = /^\/breach(?:\s+([\s\S]*))?$/i.exec(String(text ?? '').trim());
-  return m ? (m[1] ?? '').trim() : null;
-}
+/** /help's lines whole, in the player's language. */
+export const helpLines = () => [...HELP_LINES];
 
 /**
  * What a typed line IS:
@@ -331,9 +317,6 @@ export function foundText({ q, l, busy } = {}) {
 }
 /** SCALE5c: `/find` with no hub to ask. */
 export const FIND_OFFLINE_TEXT = 'Search needs the World channel to be connected.';
-/** AUDIT SCALE II C-1: `/find` on a hub whose relay answers no search (one before the shards, world192) - said here and
- *  never sent, since that relay closes the hub link on it. */
-export const FIND_RELAY_TEXT = 'Search is not available on this server yet.';
 
 /** CHAT-LANG: what `/lang` says - the channels, code and name, and how to choose one. */
 export const LANG_LINES = Object.freeze(['Language channels (/lang <code> joins one, /lang off leaves it):',

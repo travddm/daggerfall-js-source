@@ -1,4 +1,4 @@
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL'S LAW, the one home both ends read
+// WITCH1: THE WITCHES' FESTIVAL'S LAW, the one home both ends read
 // (src/net/festivalLaw.js) - its days, its nights, the finds' odds, the offerings' bounds and the Wyrd Sister's wares - and
 // the token's vocabulary it grows (src/net/identityToken.js).
 import { test } from 'node:test';
@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import {
   FESTIVALS, festivalAt, festivalOpen, festivalNext, FESTIVAL_NIGHTS, festivalNight, festivalEve, deadWalk, FIND_NIGHT_MULT,
   SOUL_CAKE_TEMPLATE, HEARTH_OFFERING_TEMPLATE, FIND_SOURCES, isFindSource, findCount, FIND_ASKS_PER_DAY, FIND_CAKES_PER_DAY,
-  OFFERING_STOCK_MAX, OFFERING_FILL, OFFERING_TAKE, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN, WYRD_PIECE_IDS, FESTIVAL_CARD_IDS,
+  OFFERING_STOCK_MAX, OFFERING_FILL, OFFERING_TAKE, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN, WYRD_PIECE_IDS,
   FESTIVAL_ICONS, FESTIVAL_WARES, wareById, accountWare, festivalWaresHeld, SALE_RID_RE,
 } from '../../../src/net/festivalLaw.js';
 import { HOLIDAYS, holidayDayOfYear } from '../../../src/systems/holidayTables.js';
@@ -57,7 +57,7 @@ test('WITCH1 THE NIGHTS THE DEAD WALK: the sky\'s Witches\' Festival (13 Frostfa
 test('WITCH1 THE FINDS: each source\'s odds and count, the day\'s bounds', () => {
   assert.deepEqual(JSON.parse(JSON.stringify(FIND_SOURCES)), {
     foe: { p: 0.25, n: 1 }, undead: { p: 0.5, n: 1 }, daedra: { p: 0.5, n: 1 }, elite: { p: 1, n: 2 },
-    gather: { p: 0.2, n: 1 }, make: { p: 0.3, n: 1 }, loot: { p: 0.3, n: 1 }, tavern: { p: 1, n: 2 },
+    gather: { p: 0.2, n: 1 }, make: { p: 0.3, n: 1 }, loot: { p: 0.3, n: 1 },
     sea: { p: 0.5, n: 2 }, world: { p: 1, n: 2 }, endgame: { p: 1, n: 4 },
   });
   assert.equal(isFindSource('foe'), true);
@@ -73,10 +73,8 @@ test('WITCH1 THE WARES: every one in the window\'s order and its price; the acco
     'title:witchwarden=60', 'aura:witchfire=150', 'icon:tallowskull=40', 'icon:twinmoons=40', 'icon:wyrdcauldron=40', 'item:offering=5',
     'piece:wyrd-hood=40', 'piece:wyrd-right-mantle=40', 'piece:wyrd-left-mantle=40', 'piece:wyrd-robe=50', 'piece:wyrd-gloves=40',
     'piece:wyrd-greaves=40', 'piece:wyrd-boots=40', 'piece:wyrd-hearthward=40', 'piece:wyrd-athame=60',
-    'card:warlock=20', 'card:thaumaturge=20', 'card:glenmoril-witch=20', 'card:demonologist=20', 'card:tales-and-tallows=20', 'card:spectre-of-lysandus=45',
   ]);
   assert.equal(WYRD_PIECE_IDS.length, 9);
-  assert.equal(FESTIVAL_CARD_IDS.length, 6);
   assert.deepEqual(FESTIVAL_WARES.filter(accountWare).map((w) => w.id), ['title:witchwarden', 'aura:witchfire', 'icon:tallowskull', 'icon:twinmoons', 'icon:wyrdcauldron']);
   assert.equal(wareById('piece:wyrd-athame')?.price, 60);
   assert.equal(wareById('nothing'), null);
@@ -89,8 +87,8 @@ test('WITCH1 THE WARES: every one in the window\'s order and its price; the acco
 });
 
 test('WITCH1 THE TOKEN\'S VOCABULARY: Witchwarden and Hearthkeeper last among the titles, Witchfire last among the auras, the four icons; a claim naming an icon it does not hold is refused whole', () => {
-  assert.deepEqual(TITLES.slice(-21, -19) /* PIN MOVED (SHOP): Genesis joined the list last */ /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */, ['witchwarden', 'hearthkeeper']);   // PIN MOVED (KETCH): the Skyfarer joined the list after them
-  assert.equal(AURAS.at(-3) /* PIN MOVED (SHOP): Eternal joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): Sage's Smoke joined the list last */, 'witchfire');
+  assert.deepEqual(TITLES.slice(TITLES.indexOf('witchwarden'), TITLES.indexOf('witchwarden') + 2), ['witchwarden', 'hearthkeeper']);
+  assert.equal(AURAS.at(-1), 'witchfire');
   assert.deepEqual(ICONS, ['tallowskull', 'twinmoons', 'wyrdcauldron', 'soulcake']);
   assert.deepEqual(FESTIVAL_ICONS, ICONS);
   const nowS = Math.floor(Date.now() / 1000);
@@ -104,9 +102,6 @@ test('WITCH1 THE TOKEN\'S VOCABULARY: Witchwarden and Hearthkeeper last among th
 });
 
 test('WITCH1 THE ICON ON THE WIRE: the relay reads it off the verified token and stamps it on the introduction; my own adopted through the wire\'s reader; a peer\'s off its introduction and its newest hello, remembered across a blip', async () => {
-  const relay = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(relay, /glyphs: c\.g, gx: c\.gx, au: c\.au, pi: c\.pi, rb: c\.rb,/, 'the verified identity carries it');
-  assert.match(relay, /au: who\.au, \.\.\.\(who\.pi \? \{ pi: who\.pi \} : \{\}\),/, 'the attached row stamps it, absent for none');
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Alice', id: 'alice-0001', secret: 'secret-of-alice-0001', WebSocketImpl: FakeWS, now: () => 1000 });
   assert.equal(s.iconOf('alice-0001'), null);

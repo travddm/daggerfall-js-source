@@ -1,5 +1,5 @@
 // @ts-check
-// TESA3 (2026-10-12, bible/03-World/Arena-Provinces.md TESA3) - THE PROVINCE'S PEOPLE: whose names a province past the Bay
+// TESA3 - THE PROVINCE'S PEOPLE: whose names a province past the Bay
 // gives its townsfolk, its strangers and its quest people. DFU's own name banks (characters/nameHelper.js BANK_TYPES, its
 // NameGen.txt verbatim) by the province's race (world/tamriel/tamrielGeography.js PROVINCES) through MacroHelper.GetNameBank's
 // own law (getNameBank: an Argonian takes the IMPERIAL bank, "Imperial names appear where one would expect Argonian

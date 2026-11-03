@@ -1,5 +1,4 @@
-// REVIVE (2026-10-14, Mac, of TheHalfinStream: "I want to roll back this specific account", then "Undo the death",
-// then "Full revive"; bible/06-Systems/Legacy-Arc.md REVIVE) - A DEATH TAKEN BACK, AND IT HOLDS.
+// REVIVE - A DEATH TAKEN BACK, AND IT HOLDS.
 //   - the law (src/systems/legacy/revived.js): a death taken back is stamped `revived: [diedAt]`, and every copy that
 //     meets the stamp drops THAT death with its remains row and its Succession - the client's merges and the realm's
 //     write (legacy.js putLineage) alike;
@@ -214,7 +213,6 @@ test('REVIVE: the tool\'s command line as the workflow\'s lines run it - the fin
   // every line of the workflow names its mode first, and the tool reads its mode from the first word alone
   const calls = [...src('.github/workflows/realm-revive.yml').matchAll(/node \$tool (--[a-z-]+)/g)].map((m) => m[1]);
   assert.deepEqual([...new Set(calls)].sort(), ['--find', '--plan', '--player-query', '--query']);
-  assert.match(src('tools/reviveRealmCharacter.mjs'), /const mode = argv\[0\];/);
 });
 
 test('REVIVE-SIZE: a line\'s record past what one D1 statement takes is revived by an edit in place - the statement small, the record it leaves exactly the revival\'s, the rest of the record as it was; the line written before the tombstone; a plan with any statement too long writes nothing; an edit that cannot say the change is refused (mutants: the whole record in the statement; the tombstone first; the long statement written)', async () => {

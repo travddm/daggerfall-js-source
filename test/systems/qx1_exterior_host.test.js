@@ -756,7 +756,7 @@ test('QX1: every surface that recorded "no quest bridge" reads the machine now',
   // this is the pin that stops any being reverted alone.
   assert.match(SRC, /tickQuests: \(\) => questBridge\?\.machine\?\.tick\?\.\(\),/, 'TickRest :379');
   assert.match(SRC, /getQuest: \(uid\) => questBridge\?\.machine\?\.getQuest\?\.\(uid\) \?\? null,/, 'the quest letter\'s name');
-  // STATUS-LIVE (2026-09-22): this host hands the macro context to the
+  // STATUS-LIVE: this host hands the macro context to the
   // ONE composer (ui/statusBox.js) instead of calling statusInfoRows
   // itself. The law QX1 holds is that it passes the LIVE context and
   // not the `null` the fixed-city host used to - that is still here.
@@ -851,7 +851,6 @@ function mountRecall({ anchorContext, insideContext, mode = 'exterior', startInD
     'ANCHOR_MUST_BE_SET', 'ActionTextBox', 'plainLines', 'STREAMING_TERRAIN_SCALE',
     'dfLocation', 'locationName', '_locPixel', 'walkMode', 'player', 'cam', 'playerEntity',
     'townTalk', 'surfacePlayer', 'ChoiceWindow', 'modes', 'arenaBouts', 'ARENA_TEXT',
-    // PIN MOVED (RVN10, bible/12-Enhanced-AI/Feud-Arc.md 21.2): a Recall out of a mode's fight routs its engaged specials
     // first - none engaged here
     'revenantRoutSweep', 'revenantSay', 'revenantRoutedEvent',
     `${body} return { setRecallAnchor, recallToAnchor, teleportPrompt, anchorLanding };`,

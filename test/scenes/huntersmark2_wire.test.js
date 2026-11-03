@@ -1,4 +1,4 @@
-// HUNTERS-MARK-II (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.4, 12.8): THE NAMED MARK ON A MATE'S SCREEN. The law
+// HUNTERS-MARK-II: THE NAMED MARK ON A MATE'S SCREEN. The law
 // that reads a peer's foe as the week's mark off its kind and its traits' mask (systems/hunt/namedMark.js), then the
 // whole way between two real pools (scenes/exteriorFoes.js - auditwe_wire's rig): the hunter's real bounty host stands
 // and crowns its mark, its frame goes, and the mate's pool stands it under its name with its two traits. Only the hunter

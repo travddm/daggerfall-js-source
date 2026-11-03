@@ -3,7 +3,7 @@
 //     node tools/nifWrite.mjs <mesh.json> <out.nif> [--texture=NAME.dds]
 //                             [--node=NAME] [--keep-v]
 //
-// FIELD-GUN-MW2 (2026-09-20). FIELD-GUN-MW1 baked Mac's FBX into the
+// FIELD-GUN-MW2. FIELD-GUN-MW1 baked Mac's FBX into the
 // batch shape `flattenNif` emits, and then stopped, because a batch is
 // not where the Morrowind lane takes a part:
 //

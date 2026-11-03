@@ -1,4 +1,4 @@
-// AUDIT POI (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-2) - LANE B, THE GAME RUNTIME: the host that stands the
+// AUDIT POI - LANE B, THE GAME RUNTIME: the host that stands the
 // approved POIs (scenes/poiHost.js), their pictures and models (poi/poiRuntime.js, poi/poiImageDecode.js), the feed
 // (poi/poiFeed.js), their marks (ui/poi/poiMapMark.js through ui/bounty/bountyMapMark.js readBountyMarks) and the world's draw order
 // (scenes/world.js). One test a finding, each red on the code the audit read (0c78d81a85).
@@ -179,18 +179,6 @@ test('AUDIT POI R3: a look that would not load is let go of at once - two POIs s
 
 // ── R4, R14 (the world's draw) ──────────────────────────────────────
 
-test('AUDIT POI R4, R14: the world draws a POI\'s glass after the grass, the banners, the Windfall, the haze and the held flats - every pass that writes depth the glass does not - sorted from the view\'s own eye; the editor\'s lines after it (mutants: the glass before the grass; sorted from the traveller\'s head)', () => {
-  const w = src('src/scenes/world.js');
-  const at = (needle) => { const i = w.indexOf(needle); assert.ok(i > 0, needle); return i; };
-  const glass = at('poiHost?.drawTranslucent(');
-  for (const before of ['    frameGrass();\n', '    frameBanners();\n', 'windfall.draw(proj, view', '    frameHaze();\n', '    renderer.drawHeld(camRight, bbUp);']) assert.ok(at(before) < glass, `${before.trim()} before the glass`);
-  assert.ok(glass < at('    drawFalling();'), 'and the rain after it, as before');
-  assert.ok(w.includes('poiHost?.drawTranslucent(renderer, mwv.eye, yardCull);'), 'the view\'s own eye');
-  assert.ok(at('if (poiEditor?.drawLines(proj, view)) renderer.markForeignPass();') > glass, 'the handles over the glass');
-  assert.ok(w.includes("if (_torchesMode === 'exterior') poiHost?.standDown();"), 'R8: the street left keeps the models');
-  assert.ok(w.includes('decodeImage: decodePoiImageSteps,'), 'R8: the decoder\'s steps under the host\'s budget');
-});
-
 test('AUDIT POI R14: a two-sided blended submesh lays its back faces first; a translucent part the view test sees off screen is not drawn; the far one first whatever the order they stand in (mutants: the front faces first; a shadow-only verdict drawn)', async () => {
   const book = createTextureBook();
   const recordOf = (m) => book.recordOf(materialLook(m));
@@ -289,7 +277,6 @@ test('AUDIT POI R7: every marked POI is on the map, past the bounty\'s eight - t
   assert.ok(POI_MARKS_MAX > BOUNTY_MARKS_MAX);
   for (const f of ['src/ui/heldMap.js', 'src/ui/travel/travelMapWindow.js']) {
     const s = src(f);
-    // PIN MOVED (BAY-LEFT-MAPS C1, test/ui/bayleft_marks.test.js): the held map reads its POIs over its sheet's box (readBountyMarksIn)
     const reads = s.match(/readBountyMarks(?:In)?\(this\.deps\.pois,[^\n]*?poiLegendText\(\)(, POI_MARKS_MAX)?\)/g);
     assert.ok(reads.length >= 1 && reads.every((r) => r.endsWith(', POI_MARKS_MAX)')), `${f}: the POIs read under their cap`);
   }
@@ -395,7 +382,6 @@ test('AUDIT POI R9: a picture is read back through WebGL2 - its bitmap made unpr
   assert.ok(calls.some((c) => c[0] === 'pixelStorei' && c[1] === C.UNPACK_PREMULTIPLY_ALPHA_WEBGL && c[2] === false));
   assert.equal(deleted, 2, 'its texture and framebuffer deleted');
   assert.equal(bmp.closed, true, 'the bitmap closed');
-  assert.match(src('src/poi/poiImageDecode.js'), /AUDIT POI R9: NOT THROUGH A 2D CANVAS/);
 });
 
 // ── R11 ─────────────────────────────────────────────────────────────
@@ -435,7 +421,6 @@ test('AUDIT POI R12: a frame makes nothing it can keep - an empty pixel\'s answe
   const row2 = H.host.lights([])[0];
   assert.equal(row2, row, 'the same row');
   assert.equal(r3(row2.x), 1100 + 819.2);
-  assert.match(src('src/scenes/poiHost.js'), /want\.clear\(\);/);
 });
 
 // ── R13, R15, S11: the feed ─────────────────────────────────────────

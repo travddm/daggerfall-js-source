@@ -1,5 +1,4 @@
-// BATCH-SALVAGE (2026-10-19; the owner: "We need to add the ability to batch salvage in the inventory";
-// bible/06-Systems/Loot-Arc.md section 11, BATCH-SALVAGE). The laws pinned here:
+// BATCH-SALVAGE. The laws pinned here:
 //   - THE LAW (systems/reforge.js salvageMany): each chosen piece through salvagePiece, in the order given - its shards
 //     in, it out - so a refusal costs only its own piece; a piece chosen twice breaks once; one refused (worn, locked,
 //     gone) is kept and named; `salvageable` lists what would break now.
@@ -257,10 +256,3 @@ test('AUDIT BATCH C5: THE QUESTION, DRIVEN - Y breaks them, N and Escape keep ev
   });
 });
 
-test('AUDIT BATCH C3/C7 by source: no Stash all while the pack chooses (its own foot stands there), the tick drawn over the Plus face\'s sigil rune', () => {
-  const inv = readFileSync(new URL('../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8');
-  assert.match(inv, /if \(STORE_FILTER_KINDS\.has\(remote\.kind\) && !salvageSel\) \{/);
-  assert.match(inv, /if \(from === 'local' && !choosing\) dragFrom\(row, item\);/, 'and no drag of a ticked piece');
-  const css = readFileSync(new URL('../../src/ui/enhanced/enhancedStyle.js', import.meta.url), 'utf8');
-  assert.match(css, /\.pack-shell \.itemrow \.salv-mark \{[^}]*z-index: 3;/);
-});

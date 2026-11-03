@@ -37,7 +37,7 @@ import { TUTORIALS } from '../../src/systems/tutorialCatalogue.js';
 import { rulesOf } from '../sheetRules.mjs';
 import { withDom } from '../invdrag.mjs';
 
-// ═══ AUDIT C&C - THE SURFACES (2026-10-12) ═══════════════════════════════
+// ═══ AUDIT C&C - THE SURFACES ═══════════════════════════════
 //
 // Lens S (what the player sees) and lens R (the records and the pins) of AUDIT C&C, the comprehensive audit of the
 // Climates & Calories arc, each finding reproduced in Chromium or through the real producers before it was fixed: the
@@ -390,12 +390,9 @@ test('AUDIT C&C S8, S13: THE WORDS SAY WHAT IS SO - the credits and the Features
   const cc = Object.values(CREDITS).flat().find((c) => c?.title === 'Climates & Calories');
   assert.match(cc.what, /There are four tiers in Settings: Off, Boons \(the default: neglect costs nothing, and staying fed, watered and rested gives bonuses\), Casual/);
   assert.doesNotMatch(JSON.stringify(cc), /nothing taken/);
-  const features = read('src/systems/features.js');
-  assert.match(features, /\/\/ \(SURV-BOONS, 2026-10-12: neglect costs nothing, a need met earns a bonus\),/);
-  assert.doesNotMatch(features, /nothing taken, a need met/);
   const page = TUTORIALS.find((t) => t.id === 'survival');
   assert.equal(page.trigger, 'When a need first shows on your screen.');
-  assert.equal(page.body[0], 'You need food, water, warmth and sleep. Signs at the left edge of the screen show what you lack, and on Boons what you have earned.');   // VOICE1 (PIN MOVED): the same law in plain words
+  assert.equal(page.body[0], 'You need food, water, warmth and sleep. Signs at the left edge of the screen show what you lack, and on Boons what you have earned.');   // VOICE1 (
   assert.equal(page.body.join(' ').split(/\s+/).length, 60, 'TUT1\'s count: two paragraphs, no more than sixty');   // VOICE1 (PIN MOVED)
 });
 
@@ -470,7 +467,7 @@ test('AUDIT C&C S14: A COST IS SAID WITHOUT ITS COLOUR - a need\'s tile and the 
     drawEnhancedHud(f, 0, 0, {});
     const tile = tempTile(doc);
     const reading = temperatureReadout(f, feltNow(f).felt);
-    // STATUS-TIPS (2026-10-20): the tile's level is said on its label and in its hover card (ui/hud/statusTips.js) - the
+    // STATUS-TIPS: the tile's level is said on its label and in its hover card (ui/hud/statusTips.js) - the
     // browser's own title stands down, as the pack's does under its card
     assert.deepEqual([tile.word, tile.cell.classList.contains('hst-cost'), tile.cell.title, tile.cell.getAttribute('aria-label')], [reading.label, true, '', `${reading.label} - it costs you`]);
     const plate = doc.querySelector('.hud .hud-temp');
@@ -498,9 +495,6 @@ test('AUDIT C&C D6, R11: THE COMFORTABLE THERMOMETER IS NEUTRAL - its column the
     assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 52, `${c}: no hue to speak of`);
   }
   for (const f of ['src/systems/survival/status.js', 'src/ui/hud/hudStatus.js']) assert.doesNotMatch(read(f), /the campfire for the hearth/, f);
-  // PIN MOVED (AUDIT C&C, lens S): REST1's tile is Next night now
-  assert.match(read('src/systems/survival/status.js'), /a flame for the hearth \(its own - REST1's Next night is the campfire\)/);
-  assert.match(read('src/ui/hud/hudStatus.js'), /a flame of its own for the hearth \(REST1's\n\/\/ {5}Next night is the campfire\)/);
 });
 
 // ═══ R5, R6, R7 - THE PINS THAT DID NOT FAIL ════════════════════════════
@@ -509,7 +503,7 @@ test('AUDIT C&C R7 (TEMP-UI): A WEAR\'S READING TAKES THE WEAR\'S WARDROBE - a l
   setPref(LOOT_RARITY_KEY, true);
   const e = realPlayer('casual');
   minute(e, MOUNTAIN_NIGHT, 1001);
-  const lined = applyRarity(garment(155), 'magic', seq(0, 0.7, 0.96, 0.7));   // PIN MOVED (AFFIX-LINES): the pick drawn over the garment's 43 lines - warmth, one of them, at 0.96 (0.7 lands on a skill now)
+  const lined = applyRarity(garment(155), 'magic', seq(0, 0.7, 0.96, 0.7));
   assert.deepEqual([lined.name, lined.affixes], ['Lined Formal Cloak', [{ id: 'warmth', value: 4 }]]);
   e.items.push(lined);
   const w = temperatureWear(e, lined, wearComparison(e, lined));

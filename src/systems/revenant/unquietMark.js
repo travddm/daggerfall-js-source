@@ -1,6 +1,5 @@
 // @ts-check
-// UNQUIET (bible/06-Systems/Revenants.md section 46; the owner, 2026-10-17: "They need to become harder, rarer, revenants
-// need more of a chance to flee instead of relying on player death"): THE MARK - the one thing that lets a special foe
+// UNQUIET (): THE MARK - the one thing that lets a special foe
 // become a revenant. Every elite and every LOOT7 champion was one before (a kill by any of them made one); now one special
 // foe in four carries the mark - "Unquiet" before its title (systems/foeTitle.js) - and only a marked foe, or a revenant
 // already, may rise (systems/revenant/revenant.js revenantCandidate). The rest die where they fall, whatever they do.
@@ -52,8 +51,8 @@ export function markUnquiet(entity) {
   entity.unquiet = _force ?? unquietId(entity._voiceId);
   return entity.unquiet;
 }
-/** Does this foe carry the mark? Never one of the open zone's (`wildFoe`, `wildGiant`) or the sand's (`bout`). */
-export const isUnquiet = (entity) => entity?.unquiet === true && !entity.wildFoe && !entity.wildGiant && !entity.bout;
+/** Does this foe carry the mark? Never one of the sand's (`bout`). */
+export const isUnquiet = (entity) => entity?.unquiet === true && !entity.bout;
 /** Tests only: every draw answers `v` (true, false), or the id's own again (null) - a real pool's foe marked at will. */
 let _force = null;
 export function _forceUnquietForTests(v = null) { _force = v == null ? null : !!v; }

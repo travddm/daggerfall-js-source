@@ -1,6 +1,6 @@
 // @ts-check
-// STAR6 (2026-10-20): EVERY WORD THE STARFALL SAYS - to the region, at the star, on its tracker, its bar and its map
-// card. Design: bible/11-Multiplayer/Starfall.md section 8. WB13b's rules hold every line (World-Bosses.md section 20):
+// STAR6: EVERY WORD THE STARFALL SAYS - to the region, at the star, on its tracker, its bar and its map
+// card. Design: WB13b's rules hold every line (World-Bosses.md section 20):
 // the event, then what to do, and stop; no "X, not Y"; no dash asides; numbers as numerals; at most one exclamation.
 // test/systems/starfall/star6_words.test.js reads them all.
 //

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// DEX0 (2026-10-19, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
+// DEX0 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
 // Kab), EVERY VENDORED FILE, OUT OF THE SHIPPED BUNDLE AND THE PLAYER'S OWN ARENA2.
 //
 //   node tools/dexExtract.mjs <arena2> "<path to>/daggerfall enemy expansion.dfmod" [--write]

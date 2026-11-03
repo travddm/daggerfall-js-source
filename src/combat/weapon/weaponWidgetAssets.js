@@ -118,8 +118,7 @@ export async function weaponWidgetBundle() {
  *  or null when neither the bundle nor a loose PNG carries it. Cached
  *  per name, misses included.
  *
- *  WW3 (2026-09-14, Mac's live crash: `TypeError: can't access property
- *  "buffer"` out of `asBytes`, from `uploadTexture`, from this chunk):
+ *  WW3:
  *  this door answered `toColor32Order`'s `{ width, height, data }` and
  *  weaponWidget.js handed it straight to `uploadTexture`, which reads
  *  `color32.colors` - undefined, and `asBytes` threw on the first frame

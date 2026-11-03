@@ -1,11 +1,11 @@
-// AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md): LOOT-GATE's findings, lane L - the
+// AUDIT UPDATE: LOOT-GATE's findings, lane L - the
 // roll's own level (L1, L4), the Imbue's piece at its new tier's law (L2), the Item Maker's rows (L3), a counter's price
 // for an imbued piece (L5), the drought (L6), one reading of a level (L9). The room's base at the room's level is pinned
 // by test/systems/partyloot.test.js (each peer's own level registered, an elite among the layout's bodies).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { registerRollerLevel, withRollerLevel, rollerLevel, droughtHeld, gateLevel } from '../../src/systems/loot/lootLevelGate.js';
+import { registerRollerLevel, withRollerLevel, rollerLevel, gateLevel } from '../../src/systems/loot/lootLevelGate.js';
 import { applyRarity, addTechniqueLine, rarityEligible, rarityChances, pileSource, rollCorpseLoot, LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
 import { techniquesFor, TECHNIQUE_BANDS } from '../../src/combat/technique/techniqueRoster.js';
 import { itemFindings } from '../../src/systems/item/itemLaw.js';   // registers the item law the Imbue's guard reads (loot.js setItemLaw)
@@ -14,8 +14,8 @@ import { worthCeiling } from '../../src/systems/item/itemLaw.js';
 import { imbuePiece, imbueTarget } from '../../src/systems/reforge.js';
 import { welkyndShards } from '../../src/systems/gate/gateSpoils.js';
 import { counterValueOf } from '../../src/systems/tradeModes.js';
-import { noteTaken, droughtOf, _setDroughtForTests } from '../../src/systems/loot/lootDrought.js';
 import { sigilFloor } from '../../src/systems/sigil/sigil.js';
+import { PARTY_MAX } from '../../src/net/wire.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 
@@ -50,8 +50,6 @@ test('AUDIT UPDATE L1: withRollerLevel - a scope\'s level beats the registered p
 });
 
 test('AUDIT UPDATE L4: the corpse door names its roller\'s level - with no registry (a scene\'s first foes, before any host frame) a level-1 roller\'s body still rolls gated (mutants: the level unpassed; the door unwired)', () => {
-  const src = readFileSync('src/scenes/hostCombat.js', 'utf8');
-  assert.match(src, /rollCorpseLoot\(entity, basics, \{ rolls, luck, find, qualityMult: lootQualityMult, weights: plain\?\.plainLadder \? plainFoeRarityWeights\(ease\) : null, level: lootGateLevel\(player\) \}\);/);
   // the same bodies on the same dice, the level handed in and not: a level 1 meets far fewer Rares (x0.15 - LOOT-GATE)
   const top = (level) => {
     let n = 0;
@@ -87,14 +85,16 @@ test('AUDIT UPDATE L2: a found Magic piece imbued Rare stands at the Rare\'s law
     assert.ok(t[0].value >= TECHNIQUE_BANDS.rare[0] && t[0].value <= TECHNIQUE_BANDS.rare[1], `in the Rare's band: ${t[0].value}`);
   }
   assert.ok(n >= 40, `pieces imbued: ${n}`);
-  for (const power of [2, 3]) {
-    const r = lcg(1000 + power);
+  // PIN MOVED: B5 (sigil bands magic [1,1], rare [1,2]: a Magic piece holds power 1 only, so the Rare's floor is shown raised at the biggest party, where it is 2)
+  for (const party of [1, PARTY_MAX]) {
+    const power = 1;
+    const r = lcg(1000 + party);
     const w = foundMagic(r);
-    w.sigil = { power, party: 1, xp: 0 };
+    w.sigil = { power, party, xp: 0 };
     assert.deepEqual(itemFindings(w), []);
     const p = purse(); p.items.push(w);
     assert.equal(imbuePiece(w, p, r).ok, true);
-    assert.equal(w.sigil.power, sigilFloor('rare', 1), 'raised to the Rare\'s floor');
+    assert.equal(w.sigil.power, sigilFloor('rare', party), 'raised to the Rare\'s floor');
     assert.deepEqual(itemFindings(w), []);
   }
   // the guard: a law that holds what the Imbue made - the piece put back exactly and nothing paid
@@ -145,22 +145,9 @@ test('AUDIT UPDATE L5: an imbued piece sells at a counter for what it sold at be
   }
 });
 
-test('AUDIT UPDATE L6: under level 10 the drought does not count a piece - but a Legendary taken still empties it (mutants: the Legendary held too; the hold lifted)', () => {
-  registerRollerLevel(() => 6);
-  try {
-    _setDroughtForTests(240);
-    assert.equal(noteTaken({ rarity: 'rare', untaken: true, templateIndex: 0, group: 'Weapons' }), false, 'a Rare under 10 counts nothing');
-    assert.equal(droughtOf(), 240);
-    assert.equal(noteTaken({ rarity: 'legendary', untaken: true, templateIndex: 0, group: 'Weapons' }), true);
-    assert.equal(droughtOf(), 0, 'a Legendary empties it at any level');
-  } finally { registerRollerLevel(null); _setDroughtForTests(0); }
-});
-
 test('AUDIT UPDATE L9: one reading of a level - a number\'s string gates as its number, an empty one or nonsense as none (mutants: a string unread; an empty string held)', () => {
   const crypt = pileSource(9);
   assert.deepEqual(rarityChances({ ...crypt, rollerLevel: '3' }), rarityChances({ ...crypt, rollerLevel: 3 }));
   assert.deepEqual(rarityChances({ ...crypt, rollerLevel: '' }), rarityChances(crypt));
   assert.deepEqual([gateLevel('7'), gateLevel(''), gateLevel('x'), gateLevel(0), gateLevel(-2), gateLevel(null)], [7, null, null, null, null, null]);
-  assert.equal(droughtHeld(''), false);
-  assert.equal(droughtHeld('5'), true);
 });

@@ -1,4 +1,4 @@
-// SHIP-CLUTTER (2026-10-02, Discord: "The sea screen shows an overabundance of ship text on the high seas") - off a
+// SHIP-CLUTTER - off a
 // harbour every ship's tag stood on its own spar with nothing between them, and every one within TAG_DETAIL_M read its
 // second line: five names and five "Wayrest Navy Cutter - patrolling off Joyous Light of Akatosh" through each other.
 // Now (ui/naval/navalHud.js layoutNavalTags): one second line - the card's ship's, else the tag nearest the crosshair within

@@ -1,6 +1,5 @@
 // @ts-check
-// UXB1-E (2026-09-25, the UX backlog: "Add a 'sync from server' option so players can ensure their offline play
-// matches the host they prefer to play on if they want."): THE ROOM'S RULES, COPIED HOME.
+// UXB1-E: THE ROOM'S RULES, COPIED HOME.
 //
 // Online, a switch the room owns reads the room's value and the player's own store is never written (onlineLane.js,
 // the four read paths). Offline the player's values stand again - so a player who wanted to play offline by the

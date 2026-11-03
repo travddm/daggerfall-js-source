@@ -253,7 +253,6 @@ test('DW-C: the renderer carries the fog as a FRAME\'s - beginFrame clears it, a
   assert.match(r, /sf = this\._fogMode;\n\s*const sw = this\._dwFog\[0\];[^\n]*\n[\s\S]{0,400}this\._fogMode = 0; this\._dwFog\[0\] = 0;[\s\S]*?this\._fogMode = sf; this\._dwFog\[0\] = sw;/, 'the sprite bracket borrows it off and back');   // AUDIT 39 F47 keeps the scene's own borrow its own statement
   assert.equal((r.match(/outColor = vec4\(dwWaterFog\(/g) || []).length, 7, 'the seven classic world programs');
   assert.match(rd('src/render/enhancedLighting.js'), /return dwWaterFog\(col, wp\) \+ \(bayer4/, 'the lane: on the display colour (EL-DISTANCE: col is already encoded), before the dither');
-  // PIN MOVED (AUDIT WATER-NEXT G1): the water's own light takes the sea's fog at its share, premultiplied (an affine fog: the
   // added share through dwWaterFogAdd, the constant through dwWaterFog of nothing); the scene's copy, fogged when drawn, none
   const ws = rd('src/render/waterSurface.js');
   assert.match(ws, /fogged = dwWaterFogAdd\(fogged, vWorldPos\) \+ dwWaterFog\(vec3\(0\.0\), vWorldPos\) \* ownShare;/);
@@ -281,7 +280,6 @@ test('DW-C: the world host - the fog\'s presentation drives the surfaces\' _Deep
   assert.ok(skyFog > ring && skyFog < w.indexOf('const wu = _waterU = waterUniforms({'), 'after the ring, before the first blend');
   assert.match(w, /if \(wisps && wd\.on && wispsOn\(\) && !_dwAirOff\) \{/);
   assert.match(w, /if \(boltsGl && boltFrame\.bolts\.length && !_dwAirOff\) \{/);
-  // PIN MOVED (PUDDLE-RAIN, FIELD BUGS 2026-10-01 #1): DW-D's swimmer arm is gone - the water over the eye alone hides
   // what falls (test/player/fb1001_puddlerain.test.js)
   assert.match(w, /const _dwPrecipOff = _dwAirOff;/);
 });

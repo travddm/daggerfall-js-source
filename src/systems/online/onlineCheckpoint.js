@@ -1,5 +1,5 @@
 // @ts-check
-// REALM P0.5 (2026-09-28, Mac: "eliminate duping"; bible/06-Systems/Realm-Arc.md, "a periodic online autosave"):
+// REALM P0.5:
 // THE CHARACTER IS SAVED AS IT PLAYS ONLINE, not only as it leaves.
 //
 // Until phase 1 moves an online character's truth to the account service, its save is this browser's, and the exit
@@ -13,15 +13,14 @@
 // checkpointAllowed below; the death screen, where exitAutosaveNames answers no slot) and while a duel is in play (its
 // borrowed health and spells are not the character's). Offline nothing changes.
 //
-// PROF-SAVE (2026-09-29, Mac's choice: "Board now, rest after fixes" - the fix before Marks and the professions open):
+// PROF-SAVE:
 // AND A PROFESSIONS ACT THAT CHANGES THE SAVE IS SAVED AT ONCE, as a trade is. A withdrawal from the Stores, a craft's
 // pieces and its fee, a smelt's fee, a market piece bought, collected, listed, put back or settled away, and the Bank's
 // Marks sold for gold all change the character's save on the service's answer; they waited for the two-minute
 // checkpoint or the exit save, and a crash between lost what the service had already moved (the Stores spent, the Marks
 // paid). `createSaveSoon` gathers every change of one task into ONE checkpoint on the next (MERGE 2 open question 2).
 
-/** Real milliseconds between two periodic checkpoints. CHECKPOINT-5 (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE
- *  PLAN PAST 1,000, decision 6 - the owner: "Make the best call for future proofing"): five minutes, where it was two. The
+/** Real milliseconds between two periodic checkpoints. CHECKPOINT-5: five minutes, where it was two. The
  *  realm checkpoint was the account primary's busiest writer (PRIMARY-TRIPS: some 69 of its 200 statements a second at the
  *  evening's peak, a player's save moving every two minutes it walks), and what the periodic one guards is a crash alone:
  *  a trade, a craft, every professions act and every act the service settles save at once (createSaveSoon), and a page put

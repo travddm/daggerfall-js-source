@@ -1,4 +1,4 @@
-// AUDIT SCALE5a D10 (2026-10-10): THE HUB'S RECONNECT WAVE, MODELLED - how many hellos the hub's gate refuses busy when a
+// AUDIT SCALE5a D10: THE HUB'S RECONNECT WAVE, MODELLED - how many hellos the hub's gate refuses busy when a
 // relay deploy drops N players at once, and how long they wait to be welcomed. Before SCALE5a each busy refusal was one
 // more token mint (a dozen reads against the account database); since, none is. A MODEL, not a measurement: the
 // client's own retry ladder (net/online.js `_scheduleRetry` and its busy floor) against the hub's own gate (net/wire.js
@@ -13,12 +13,12 @@
 //   SPREAD=1 node tools/hubWaveModel.mjs        SCALE2c: each page first waits its one offset in the wave's spread
 //   N=256 RATE=10 ARRIVE_S=5 node tools/hubWaveModel.mjs   GATE-DOOR: a crowd walking into a room whose door is RATE
 //
-// GATE-DOOR (2026-10-18; AUDIT PLAN-1000 B5, its figures re-run here): RATE is the door's hellos a second (burst the same;
+// GATE-DOOR: RATE is the door's hellos a second (burst the same;
 // CHAT_HELLO_HZ_MAX unless said - a gate's court is net/wire.js GATE_HELLO_HZ_MAX, every other room HELLO_HZ_MAX), and
 // ARRIVE_S, when set, puts each player's first hello uniform over that many seconds - a crowd arriving, not a drop - with
 // the same busy ladder after it. The refusals are said as the seeds' min / median / mean / max.
 //
-// SCALE2c (2026-10-10): it also counts the MINTS - a page's first hello after the drop is its one mint (its sockets
+// SCALE2c: it also counts the MINTS - a page's first hello after the drop is its one mint (its sockets
 // share it, TOKEN_REUSE_MS) - and says the busiest second's, the figure the account database feels. With SPREAD=1 the
 // drop's retry waits for the page's slot (net/reconnectWave.js: uniform over waveSpreadMs(n)), as a page that sees the
 // wave does; the busy ladder after it is unchanged.

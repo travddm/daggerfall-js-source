@@ -1,7 +1,5 @@
-// FB0929 (2026-09-29, the Discord's #bug-reports, SylviaBun, through Mac): "New Overworld map lags when fast-traveling
-// to a distant location. I can use the Overworld map just fine, no lag even when moving at high speeds when just
-// clicking around. The moment I go to my Travel Map and select a far away destination, the game drops to sub-10 FPS."
-// (bible/06-Systems/Travel-View.md, FB0929.)
+// FB0929 (2026-09-29, the Discord's #bug-reports, SylviaBun, through
+// (, FB0929.)
 //
 // THE FAR JOURNEY'S LINE. TV2's route line is an SVG path through every projected point of the journey - four a leg -
 // dashed over a dark casing (ui/enhanced/enhancedStyle.js .tview-route-line). A click in the view is a few legs, all on the
@@ -20,7 +18,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { planRoute, routeLegs, routeDrawPoints } from '../../src/systems/travel/travelRoute.js';
-import { drawRouteRuns, drawOwnRun } from '../../src/systems/travel/roadLine.js';   // PIN MOVED (ROAD-FOLLOW): the host's line drawn along the painted road
+import { drawRouteRuns, drawOwnRun } from '../../src/systems/travel/roadLine.js';
 import { createTravelView, ROUTE_DOT_PX, ROUTE_DOTS_MAX } from '../../src/scenes/travelView.js';
 import { forwardOf, TV_RISE_S } from '../../src/player/travelCamera.js';
 import { projectToScreen } from '../../src/player/tapRay.js';
@@ -75,7 +73,7 @@ function journey(goal, spot = null) {
     // the scene point of a native one, on flat ground (CI has no ARENA2 heights): world.js tvSceneOf's own placement
     tvSceneOf: (nx, nz, lift = 0) => { const [x, z] = state.localFromWorld(nx, nz); return [x, lift, z]; },
     deepWaters: null, tvSeaY: () => 0, tvGroundGenNow: () => 1,
-    drawRouteRuns, drawOwnRun,   // PIN MOVED (ROAD-FOLLOW): the host's two imports its line draws through
+    drawRouteRuns, drawOwnRun,
   };
   const travelViewRoute = new Function('d', `const { ${Object.keys(d).join(', ')} } = d;\n${src.route}\nreturn travelViewRoute;`)(d);
   const n1 = d.tvTrip.natives[1], [ax, az] = state.localFromWorld(n1[0], n1[1]);

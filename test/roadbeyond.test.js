@@ -1,4 +1,4 @@
-// ROAD-BEYOND (2026-10-12, found building TESA's roads; bible/03-World/Roads.md ROAD-BEYOND) - THE BAY'S NETWORK STAYS
+// ROAD-BEYOND - THE BAY'S NETWORK STAYS
 // ON THE BAY, pinned. The road arrays are the Bay's 1000 x 500; TAMRIEL2 streams the land past it, and the kernel read a
 // pixel there at `py * MAP_W + px` - the next or last row's own Bay pixel, so a Bay road's fragment was painted on the
 // continent where no road runs (2712 pixels of Basic Roads' road and track in a 60-pixel strip either side). The corner

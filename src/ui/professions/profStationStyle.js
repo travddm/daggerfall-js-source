@@ -1,5 +1,5 @@
 // @ts-check
-// PROF-STATIONS (2026-10-01, Mac: the stations kept simple - "leave them as the plain bars they were, only restyled"):
+// PROF-STATIONS:
 // THE STATIONS' ACTS, DRESSED - the heat at the anvil, the stitch's beat at the loom (both the heat's bar) and the plane
 // at the workbench, on the Stores page, in the world plaque's own frame (ui/enhanced/enhancedStyle.js .wplaque: the ink ground,
 // the 2px stone border) and the kit's tones (enhancedFrame.js FRAME_TONES): the bar a carved well, the band and the

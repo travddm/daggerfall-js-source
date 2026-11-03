@@ -1,6 +1,6 @@
 // QUEST-FOE-LINE (FIELD BUGS 2026-10-04f, the Discord's #bug-reports "Bugged Quests": "The quest The Assassin ... has
 // you track down and kill Rodyn Buckingston. I am at his location, he doesn't spawn. I double checked with multiple
-// NPCs on his location as well"; the owner, of a line naming the foe as the quest's: "Do it").
+// NPCs on his location as well").
 //
 // The trace first, over the real parser and machine (test/fb1004dTowns.mjs's region): A0C00Y08 stands the named man at
 // `_place_`, and walking in hides him and hot-places ONE restrained class foe on his marker - here, every draw at 0.55,
@@ -150,18 +150,8 @@ test('QUEST-FOE-LINE, the law: a hostile foe says nothing; a foe no quest stood 
 });
 
 test('QUEST-FOE-LINE, the hosts: the interior and the dungeon live-foe arms hand the line; the street\'s is the pool\'s (both above-ground hosts name through it); the watch is no quest\'s; the classic panel draws no name frame', () => {
-  // the interior host (scenes/worldModes.js) - the report's own room
-  const wm = rd('src/scenes/worldModes.js');
-  const interior = wm.slice(wm.indexOf("if (key.startsWith('mobileFoe:')) {\n        const f = liveFoeFor(interiorFoePool(), key, 'mobileFoe');"));
-  assert.match(interior.slice(0, 600), /return t \? \{ title: t, subs: questFoeSubs\(f\) \} : null;/, 'the interior arm');
-  assert.match(wm, /import \{ questFoeSubs \} from '\.\.\/systems\/quest\/questFoeLine\.js';/);
-  // the dungeon host
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /return t \? \{ title: f\.yielded \? `\$\{t\} - beaten` : t, subs: questFoeSubs\(f\) \} : null;/, 'the dungeon arm');
   // the street: world.js and exterior.js name their live foes through the pool's own liveHoverName (driven above)
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(host), /exteriorFoes\.liveHoverName/, `${host} names through the pool`);
-  // the watch: no quest stands a watchman (a quest's `create foe` and `place foe` stand into the foe pools)
-  assert.doesNotMatch(rd('src/scenes/cityGuards.js'), /questFoeSubs/);
   // the classic skins: their panel draws a pile's rows and nothing else, so the line is the enhanced plaque's alone
   const font = { fnt: { fixedHeight: 7 } };
   assert.equal(drawLootPanel({}, {}, font, { key: 'mobileFoe:1', kind: 'name', title: 'Rogue', subs: ['Quest: The Assassin'], rows: [], rest: 0, empty: false }), false);

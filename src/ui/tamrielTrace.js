@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL3 (2026-10-08, bible/03-World/Tamriel.md) - THE TRACE: Daggerfall's own map of Tamriel, read off the player's
+// TAMRIEL3 - THE TRACE: Daggerfall's own map of Tamriel, read off the player's
 // two files the way the chargen's province map reads them (ui/provinceMap.js, OVH-era: the picker traced at runtime).
 //
 //   TAMRIEL2.IMG - the race picker: its palette index at a pixel IS the race, and the race names the province
@@ -18,7 +18,7 @@
 // ships: the trace is made on the player's machine from the player's files, as the chargen's map is, and a render of
 // it never leaves the session.
 //
-// THE FIRST SIGHT OF A REAL ARENA2 (2026-10-08, the same night): the law this module shipped with read the sea as blue
+// THE FIRST SIGHT OF A REAL ARENA2: the law this module shipped with read the sea as blue
 // (provinceMap's seaIndices, written before any ARENA2 was in reach) and the Imperial Province as provinceMap's
 // inlandRemainder - on the real picture the sea is parchment and only the coastline is blue, so the first trace was
 // the eight masks as islands with 280 pixels of Imperial Province. The law above is what the picture actually says.
@@ -162,8 +162,7 @@ export function fillSpecks(land, province, w, h, maxPx = HOLE_PX) {
 }
 
 /**
- * NIBEN-SEA (2026-10-26, bible/03-World/Tamriel.md NIBEN-SEA; the owner, with the lore map: "the ocean that connects to
- * the imperial city is missing from our map") - THE NIBEN, JOINED TO THE SEA. The painting draws Lake Rumare as a ring
+ * NIBEN-SEA - THE NIBEN, JOINED TO THE SEA. The painting draws Lake Rumare as a ring
  * round the Imperial City and the Niben from it down to the Topal Bay, and the trace read four waters nothing joined:
  * the ring's two pieces (49 and 11 pixels - its lower arc and its outlet lie under the painting's own label, IMPERIAL
  * PROVINCE), the Niben's bay (115), and, below the bay, the river's painted line - a pixel of the coastline's blue the

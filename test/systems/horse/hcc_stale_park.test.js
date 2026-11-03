@@ -1,4 +1,4 @@
-// STALE-PARK (2026-10-22; bible/06-Systems/Horse-Cart-And-Cargo.md STALE-PARK): A DISMOUNT NEVER PARKS THE WAGON WHERE
+// STALE-PARK: A DISMOUNT NEVER PARKS THE WAGON WHERE
 // IT USED TO TRAIL. The runtime caches the trailing wagon's pose every frame it is drawn, and a dismount parks from that
 // cache (CaptureBestAvailableDeploymentPose). The cache outlived the drawn wagon: through a stretch the host is not ready
 // (a teleport, a fast travel) and while a driven wagon is not drawn (ShowTrailingWagon turned off mid-drive), and the

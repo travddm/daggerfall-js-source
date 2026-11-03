@@ -1,6 +1,6 @@
 // @ts-check
 // CAPT-LOG / CAPTAIN-TREE - THE CAPTAIN PAGE'S HOST HALF (HOST-SPLIT, 2026-10-17: out of scenes/world.js bootWorld, whose
-// ceiling the ship's livery's wiring needed the room of; bible/03-World/Captains-Sea.md CAPT-LOG, Naval-Refit.md
+// ceiling the ship's livery's wiring needed the room of; CAPT-LOG, Naval-Refit.md
 // CAPTAIN-TREE). The Captain page (ui/captainPage.js) reads a model and opens the captain's stars; this builds the one
 // and opens the other over the world host's runtimes - the captain's ledger (systems/naval/captainLedger.js), the sea
 // fight's notoriety, the harbour office's contracts and charts.
@@ -41,7 +41,7 @@ export function createCaptainPageHost(deps) {
     if (w) deps.show(w);
     return !!w;
   }
-  /** GROWTH3 (bible/10-UI/Growth.md section 6): what the captain's stars want drawn in the pause window's Growth tab -
+  /** GROWTH3: what the captain's stars want drawn in the pause window's Growth tab -
    *  the ledger they are set on and the word that a sky was accepted (ui/captainTreeWindow.js's own deps). */
   const stars = () => ({ ledger: deps.ledger, changed: deps.changed });
   return { model, openStars, stars };

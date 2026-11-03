@@ -1,5 +1,4 @@
-// SD11f (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's AUDIT SD II, sections
-// 5, 6 and 11) - THE ARC'S SECOND AUDIT, ITS SCENES' LAST FINDINGS AND ITS DOCS, each fix as it stands
+// SD11f - THE ARC'S SECOND AUDIT, ITS SCENES' LAST FINDINGS AND ITS DOCS, each fix as it stands
 // (scenes/superDungeon/sdEnd.js, systems/superDungeon/sdRiftSound.js, world/superDungeon/sdDungeon.js, render/auraRing.js, the hosts). The way home is pressed,
 // never walked into - it stands where the spoils land (L6 F9, the gate's SS3); it rises out of the floor with the Rift's
 // bell tolled once, a fourth higher, and the Hour says it stands open - said and tolled as it rises, never to a page
@@ -13,7 +12,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createSdEnd, SD_HOME_TEXT, SD_HOME_RISE_MS, SD_HOME_SAY_MS, SD_HOME_ASSEMBLY, SD_RETURN_KEY, SD_RIFT_KEY } from '../../src/scenes/superDungeon/sdEnd.js';
 import { tollRiftBell, SD_HOME_TOLL, RIFT_BELL_KEY, RIFT_BELL_RECORDS } from '../../src/systems/superDungeon/sdRiftSound.js';
-import { sdRiftCount, SD_RETURN_SIZE, SD_END_TEXT } from '../../src/world/superDungeon/sdDungeon.js';   // AUDIT SD III (T6, PIN MOVED): no long count of its own - the Timers' words
+import { sdRiftCount, SD_RETURN_SIZE, SD_END_TEXT } from '../../src/world/superDungeon/sdDungeon.js';   // AUDIT SD III (T6
 import { sdRise, sdFirst, sdFind, sdFell, SD_COLLAPSE_MS } from '../../src/net/superDungeon/sdLaw.js';
 import { SD_ARENA, realmToDungeon } from '../../src/net/superDungeon/sdBrain.js';
 import { SD_REM_SINK_MS } from '../../src/scenes/superDungeon/sdRemnant.js';
@@ -72,7 +71,7 @@ test('SD11f THE WAY HOME RISES, TOLLED (L6 F16): it stands up out of the floor o
   const tolls = () => audio.log.filter((x) => x[0] === 'toll');
   assert.equal(tolls().length, 0, 'the Rift loops; nothing tolled yet');
   e.standReturn([10, 2, 20], 0);
-  // SD-LOOK (PIN MOVED): its foot as its arch is stood, a mesh now (it was a billboard's origin). PIN MOVED (SD-LOOK
+  // SD-LOOK (
   // S6): it assembles - its foot its jambs', rising out of the floor through their share of the rise (SD_HOME_ASSEMBLY)
   assert.ok(Math.abs(e.ret.foot - (2 - SD_RETURN_SIZE.h * 0.7)) < 1e-6, 'under the floor as it begins');
   clock += (SD_HOME_RISE_MS * SD_HOME_ASSEMBLY.jambs[1]) / 2; e.frame(null);
@@ -138,7 +137,7 @@ test('SD11f THE WAY HOME SAID AS IT RISES (L6 F16), the world host from its own 
   h.set(null, T0);
   assert.equal(h.sdHomeAge(), null);
   const D = read('src/scenes/dungeonContext.js'), M2 = read('src/scenes/worldModes.js');
-  assert.match(D, /if \(home && !sdEnd\.hasRet\) sdEnd\.standReturn\(home, opts\.sdHomeAge\?\.\(\) \?\? Infinity, \{ dynamicDraws \}\);/);   // PIN MOVED (AUDIT SD V P1): the end asked `hasRet`, its look off the host's look door
+  assert.match(D, /if \(home && !sdEnd\.hasRet\) sdEnd\.standReturn\(home, opts\.sdHomeAge\?\.\(\) \?\? Infinity, \{ dynamicDraws \}\);/);
   assert.match(M2, /sdHomeAge: \(\) => host\.sdHomeAge\?\.\(\) \?\? null,/);
   assert.match(W, /sdHomeAge: \(\) => sdHomeAge\(\),/);
 });
@@ -147,7 +146,7 @@ test('SD11f THE WAY HOME SAID AS IT RISES (L6 F16), the world host from its own 
 
 test('SD11f THE RIFT COUNTS ITS HOUR (L6 F5): its plaque\'s second row - found or risen, the fade by the hour and minute ("Fades in 46h 12m"), its last hour by the minute and second (the gate\'s countdown words, never 0:00 while time is left); in its collapse "Collapses in 2:31"; nothing for another slot\'s record, none, or one gone; the plaque shows it under the Rift\'s own row; the hosts hand it through (mutants: no count on the plaque; the hours by the second; the collapse uncounted; another slot counted)', () => {
   const r = sdRise(sdFirst(T0 - 3 * H), T0 - 10 * M, 0);
-  // AUDIT SD III (T6, PIN MOVED): the Timers' own words (systems/eventTimers.js timerText), as its banner, its card and the
+  // AUDIT SD III (T6
   // Timers row say it - it counted "46h 12m" beside their "1d 22h"
   assert.equal(sdRiftCount(r, r.s, r.until - 47 * H), 'Fades in 1d 23h', 'risen: by the day and hour');
   assert.equal(sdRiftCount(r, r.s, r.until - 46.2 * H), 'Fades in 1d 22h');
@@ -174,7 +173,7 @@ test('SD11f THE RIFT COUNTS ITS HOUR (L6 F5): its plaque\'s second row - found o
   assert.deepEqual(createSdEnd({}).hoverName(SD_RIFT_KEY), null);
   // the hosts: the Hollow's Rift asks the world host's word for it; the Hour's own Rift counts nothing (its readouts do)
   const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdEnd = _superTier \? createSdEnd\(\{ renderer, audio, onRift: \(\) => sdRiftStep\(\), onReturn: \(\) => sdReturnStep\(\), riftCount: \(\) => sdEndWord\(\)\?\.count \?\? null, look: sdRiftLookNow, clock: sdEndClock \}\)/);   // PIN MOVED (AUDIT SD V P1): the end asked `hasRet`, its look off the host's look door   // AUDIT SD-THROUGH (PIN MOVED, C13): the Rift's look one named closure, the Way Through's too (test/scenes/sd27_audit.test.js pins its body)
+  assert.match(D, /const sdEnd = _superTier \? createSdEnd\(\{ renderer, audio, onRift: \(\) => sdRiftStep\(\), onReturn: \(\) => sdReturnStep\(\), riftCount: \(\) => sdEndWord\(\)\?\.count \?\? null, look: sdRiftLookNow, clock: sdEndClock \}\)/);
   assert.match(W, /count: sdRiftCount\(rec, s, now\), look: riftLook\(rec, s, now, seen\), enter: \(\) => sdEnterRealm\(s\) \};/);
 });
 

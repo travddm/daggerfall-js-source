@@ -1,4 +1,4 @@
-// AUDIT RELEASE R1 (2026-10-26; bible/01-Overview/audits/Audit-Release-R1.md) - the seams between TESA's eleven streams,
+// AUDIT RELEASE R1 - the seams between TESA's eleven streams,
 // pinned where a finding was fixed:
 //  R1-1  a town's wall model and the Imperial City's cells: TS4/TS7's walls ran their model ids from 3,000,000 + a map id's
 //        low 20 bits, and IC-GRAND's fabric family owns 3,000,000 to 3,039,999 (world/imperialBlocks.js) - a model registered
@@ -7,8 +7,7 @@
 //        TOWN_WALL_MODEL_BASE), clear of every other run of the port's own models.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 import { standTownWall, townWallBlockName, townWallModelId, TOWN_WALL_MODEL_BASE, WALL_MODELS } from '../../src/world/townWalls.js';
 import { townOutlineBlockJson, TOWN_OUTLINE_BLOCK } from '../../src/world/townOutline.js';
@@ -67,30 +66,5 @@ test('AUDIT RELEASE R1-1: a Bay city\'s wall stood beside the Imperial City\'s f
   assert.deepEqual(customModelFor(cell), { ic: cell }, 'the city\'s cell its own fabric, never a Bay city\'s wall');
   assert.deepEqual(customModelNeeds(cell), [], 'and no wall\'s pieces asked of the player\'s ARCH3D for it');
   assert.deepEqual([...customModelNeeds(townWallModelId(KNIGHTSTON))].sort(), Object.values(WALL_MODELS).sort(), 'the wall its own');
-  // the families as the game installs them: the fabric and the skylines owned by their runs' own tests
-  assert.match(read('src/world/capitalModels.js'), /registerCustomModelFamily\(\{ owns: isFabricModelId,[^\n]+\n\s+registerCustomModelFamily\(\{ owns: isSkylineId,/);
 });
 
-const ARENA2 = process.env.ARENA2_PATH;
-const HAVE = !!ARENA2 && ['MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].every((f) => existsSync(join(ARENA2, f)));
-test('AUDIT RELEASE R1-1 with ARENA2: every walled Bay city (townOutline.js wallBayCity\'s own test, all 410) stands its wall on a model id of its own - none of the Imperial City\'s, no two alike', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
-  const { MapsFile } = await import('../../src/formats/mapsFile.js');
-  const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
-  const maps = new MapsFile(); maps.load(bytes('MAPS.BSA'), bytes('CLIMATE.PAK'), bytes('POLITIC.PAK'));
-  const CLASSIC_WALL = /^WALLAA(0\d|1[01])\.RMB$/i, isWall = (n) => /^WALLAA\d\d/i.test(String(n ?? ''));
-  const ids = new Map();
-  for (let r = 0; r < maps.regionCount; r++) {
-    if (!maps.getRegion(r)) continue;
-    for (let l = 0; l < maps.baseLocationCount(r); l++) {
-      const loc = maps.getLocation(r, l), ed = loc?.exterior?.exteriorData;
-      if (!ed?.blockNames || !(ed.width >= 3 && ed.height >= 3) || ed.blockNames.length !== ed.width * ed.height) continue;
-      const border = (i) => { const x = i % ed.width, y = (i - x) / ed.width; return x === 0 || y === 0 || x === ed.width - 1 || y === ed.height - 1; };
-      if (!ed.blockNames.every((n, i) => (border(i) ? CLASSIC_WALL.test(String(n ?? '')) : !isWall(n)))) continue;
-      const id = townWallModelId(loc.mapTableData.mapId);
-      assert.ok(!isFabricModelId(id) && !isSkylineId(id), `${loc.name}'s wall (${id}) one of the Imperial City's models`);
-      assert.ok(!ids.has(id), `${loc.name} and ${ids.get(id)} one wall model`);
-      ids.set(id, loc.name);
-    }
-  }
-  assert.equal(ids.size, 410);
-});

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-FILTER - WHAT THE OVERWORLD SHOWS (bible/06-Systems/Travel-View.md).
+// OW-FILTER - WHAT THE OVERWORLD SHOWS.
 //
-// The player's ask (2026-09-29): "all the locations show cause a lot of clutters add a filers to the bottom right
+// The player's ask: "all the locations show cause a lot of clutters add a filers to the bottom right
 // segments". Five groups, each a switch in the view's corner (ui/travel/travelViewHud.js), kept on the device as the path
 // mode is:
 //   towns      - the places in the grid, their plates (kind 'place'); YARDS-FOUND: and the towns' Stables and Wagon Yards
@@ -93,8 +93,7 @@ export function toggleTravelViewFilter(group) {
   return next[group];
 }
 
-/** MAP-PLAYERS (2026-10-20, Dudey: "add a filter button on the Worldmap not overworld map ... to show and not show
- *  players"): are other players drawn at all - the Overworld's Travellers switch, one store, so both maps answer alike. */
+/** MAP-PLAYERS: are other players drawn at all - the Overworld's Travellers switch, one store, so both maps answer alike. */
 export const playersOnMaps = (f = travelViewFilters()) => f.travellers !== false;
 
 /** Hear a change; returns the way to stop hearing it. */

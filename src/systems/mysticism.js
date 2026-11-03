@@ -59,8 +59,7 @@
 // contexts that own an ActionSystem, dungeonContext.js and
 // interiorContext.js. Neither exterior host owns doors. That is the
 // next slice, and those are its seams.
-// PVPFIX (the owner: "Undeniable Access/lockpicking should actually
-// work on locked crates"): ONE host call - dungeonContext.js's crate
+// PVPFIX: ONE host call - dungeonContext.js's crate
 // search (activateSearchable) fires an armed Open on a crate's own lock;
 // a crate is no ActionSystem door. Lock stays a door's alone.
 import { EFFECT_FLAGS } from './spellcast.js';
@@ -303,11 +302,8 @@ export function dispelBundle(entity, bundleId, { selfCast = false, roll01 = 0, c
 }
 
 /**
- * BUFF-END (2026-09-27, Leafen on Discord: "Could there be a way to dispel magic for non-magic users? It's a bit of a
- * buzzkill just having something on me that will take irl months of game time to wear off" - a Shield Group at 11397
- * rounds, casts stacked the way DFU's Shield.AddState stacks them; Zerofyre: "An option to right click cancel buffs on
- * yourself like most RPGs"). NEVER DFU'S: its one way off is Dispel Magic, a spell a warrior has none of. STACK-CAP
- * (2026-10-11) has since retired the stacking itself - a re-cast renews its incumbent and never adds to it
+ * BUFF-END. NEVER DFU'S: its one way off is Dispel Magic, a spell a warrior has none of. STACK-CAP
+ * has since retired the stacking itself - a re-cast renews its incumbent and never adds to it
  * (effects.js renewRounds) - and ending one stays the player's own choice.
  *
  * What may be ended is a SPELL of the kinds that only help: never a held item's magic (it is back the moment the item
@@ -517,7 +513,7 @@ export function attemptSoulTrap(target, soulType, items, roll01, { azurasStarOnl
   return { allowDeath: false, alert: 'trapNoneEmpty', filled: null };
 }
 
-/** STRIKE-SHARED (2026-09-29): the running soul trap on `target` when ANOTHER PLAYER cast it - online, a peer's Cast
+/** STRIKE-SHARED: the running soul trap on `target` when ANOTHER PLAYER cast it - online, a peer's Cast
  *  When Strikes lands on the foe's owner (hostMagic applySpellToFoe, `ctx.peerCaster`), which marks the new trap with
  *  its caster (`by`). Its soul is that caster's, not the owner's: the owner's kill door reads no gem of its own for it
  *  and names the caster on the dead foe's record (`j`, `q`), where the caster rolls the trap against its own pack as

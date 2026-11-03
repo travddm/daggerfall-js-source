@@ -1,6 +1,5 @@
-// AUDIT NAV1 (2026-09-29, Mac: "Lets do a deep comprehensive audit and ensure this is perfection. I want ship movement
-// and combat to flow perfectly, just like assisins creed black flag") - BOARDING, the audit's fourth slice
-// (bible/03-World/Naval-Combat.md "Boarding"): Warm Ashes' raid on the open sea, the pirate flagship's raid that could
+// AUDIT NAV1 - BOARDING, the audit's fourth slice
+// ("Boarding"): Warm Ashes' raid on the open sea, the pirate flagship's raid that could
 // hang for ever, a raid let go of ending with its boarders, a crewed boat's hands in every repel - the laws, the real
 // quest parser, the world host's own code lifted and run, and the host through real frames over Come Sail Away's real
 // pool (test/navalSea.mjs).
@@ -193,7 +192,7 @@ test('AUDIT NAV1 (B5) a raid WON the moment its winning task fires - the flagshi
   assert.equal(h.host.boarding, null, 'won');
   assert.ok(h.log.mid.includes('The boarders are thrown back!'));
   assert.equal(p.ship.boarded, false);
-  assert.deepEqual(h.log.ended, [[quest, { won: true }]], 'a won raid ends with its win');   // PIN MOVED (RAID-WON, test/systems/naval/raidwon.test.js): it ran on - its `_ally_` stood on my deck after it, counted as enemies near
+  assert.deepEqual(h.log.ended, [[quest, { won: true }]], 'a won raid ends with its win');
   assert.equal(h.host.leaveShipGate(quest), 'naval');
 });
 
@@ -236,7 +235,7 @@ test('AUDIT NAV1 (B6, B7) a raid\'s own hour run out, my deck left to them, the 
 });
 
 test('AUDIT NAV1 (B6) the world host\'s endRaid, run: its living boarders withdrawn (the quest\'s own foes, alive), then the quest tombstoned through the machine; a quest already over only withdrawn (mutants: the dead or another quest\'s foes removed, a tombstoned quest ended twice)', () => {
-  const m = /\n {6}endRaid: (\(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n[\s\S]*?\n {6}\}),\n/.exec(WORLD);   // PIN MOVED (RAID-WON): and a won raid's arm, and her ship gone, its crew's
+  const m = /\n {6}endRaid: (\(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n[\s\S]*?\n {6}\}),\n/.exec(WORLD);
   assert.ok(m, 'endRaid lifted');
   const mine = (uid, dead = false) => ({ dead, questBehaviour: { questUID: uid } });
   const foes = [mine(7), mine(7, true), mine(8), { dead: false }, mine(7)];
@@ -268,7 +267,7 @@ test('AUDIT NAV1 (B6) the world host\'s endRaid, run: its living boarders withdr
 // ── the prize, the fire, the founder (B3, B4) ──────────────────────────────────────────────────────────────────
 
 /** A blow on a ship I stand, landed through the host's own strike - `from` the striker ('local': mine). */
-/** A peer's blow - PIN MOVED (TOUGHER-SHIPS): one past a hit's most (navalWire.js NAVAL_HIT_MAX, a broadside's worth) lands
+/** A peer's blow
  *  as several, her fire and her men with the first; a toughened hull outweighs one hit. The pieces after one that strikes
  *  her are the same volley's (STRUCK_GRACE_S: floored at 1) - a blow meant to take her from afloat straight under is
  *  two blows a grace apart, never one. */
@@ -373,7 +372,7 @@ test('AUDIT NAV1 (B4, B6) a raider\'s ship gone under her boarders: they fight o
   h.host._sea.delete(p.id);   // she is gone (sunk and dropped)
   h.run(0.2);
   assert.equal(h.host.boarding, null);
-  assert.deepEqual(h.log.ended, [[quest, { withdraw: false, crew: true }]], 'her raid ends; her boarders stand');   // PIN MOVED (RAID-WON, AUDIT FB1019 D2): and its crew goes home (test/systems/naval/raidwon.test.js)
+  assert.deepEqual(h.log.ended, [[quest, { withdraw: false, crew: true }]], 'her raid ends; her boarders stand');
   assert.deepEqual(h.host.getSaveData().raids, []);
 });
 

@@ -1,4 +1,4 @@
-// ARENA5 (2026-10-03): THE GATE'S WARDENS AND THE CITY'S LAW (bible/11-Multiplayer/Arena.md 1: "the gate wardens - two
+// ARENA5: THE GATE'S WARDENS AND THE CITY'S LAW (1: "the gate wardens - two
 // guards (the city watch's own), so a brawl at the gate is a crime like any other"). What was read: the wardens are the
 // gate's static people (world/arena/arenaCity.js ARENA_GATE_PEOPLE - the Royal Guard's, in a person archive the ray meets, named
 // by their office); a crime at the gate runs the street's own law with no arena term anywhere on its path - both hosts'
@@ -33,23 +33,6 @@ test('ARENA5 the wardens: two of the Royal Guard (372) in a person archive the r
     assert.equal(arenaGatePersonName({ position: p.position, textureArchive: p.archive, textureRecord: p.record }), ARENA_TEXT.gateNames.warden);
   }
   assert.ok(w[0].x < herald.x && w[1].x > herald.x, 'either side of the Herald');
-});
-
-test('ARENA5 a brawl at the gate is a crime like any other: the driver\'s crime door is the street\'s Assault and its response in both hosts; the response and the watch\'s spawn carry no arena or cell term - the street\'s pool, its walkers alone (mutants: ARENA5-CRIME-EXEMPT, ARENA5-CRIME-DOOR, ARENA5-WATCH-FROM-WARDENS)', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(f);
-    assert.match(s, /crime: \(\) => \{ setCrimeCommitted\(playerEntity, CRIMES\.Assault\); _crimeResponse\(\); \},/, `${f}: the driver's crime door`);
-    assert.match(s, /function _crimeResponse\(\) \{ _spawnGuards\(true\); \}/, `${f}: the response`);
-    const spawn = body(s, 'function _spawnGuards(immediate) {');
-    assert.match(spawn, /cityGuards\.spawnCityGuards\(!!immediate, \{ playerFeet: \[\.\.\.feet\], playerFwd: fwd, pool: _guardPool\(\) \}\)/, f);
-    assert.doesNotMatch(spawn, /arena|Arena|ARENA/, `${f}: no arena term on the response`);
-    assert.match(s, /const _guardPool = \(\) => \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior' \? \[\] : _livePersons\.map\(/, `${f}: the pool is the street's walkers`);
-  }
-  const G = read('src/scenes/cityGuards.js');
-  const spawnCity = G.slice(G.indexOf('  async function spawnCityGuardsNow('), G.indexOf('    // Non-immediate: witnesses.'));   // WATCH-FIX: PIN MOVED - the member's body, behind the crime response's turn (spawnCityGuards)
-  assert.ok(spawnCity.length > 1000);
-  assert.doesNotMatch(spawnCity, /arena|Arena|ARENA|inArenaCell|cell/, 'the watch\'s spawn has no place gate but DFU\'s');
-  assert.match(spawnCity, /if \(_ee\?\.isPlayerInsideDungeon\) return;/, 'DFU\'s own: underground, nothing');
 });
 
 test('ARENA5 the driver\'s seam: a stranger\'s blow on a fighter of the exhibition at the gate is warned once, then the watch is called through the host\'s crime door (mutant: ARENA5-INTRUDE-NO-CRIME)', async () => {

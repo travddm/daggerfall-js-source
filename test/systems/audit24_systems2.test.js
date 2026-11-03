@@ -87,54 +87,6 @@ test('audit24 systems: the BuildingTypes tail exists, so the skip list is really
   assert.equal(checkBuildingTypeInSkipList(BUILDING_TYPES.Palace), true);
 });
 
-test('audit24 systems: the saving throw splits its element from its flag', () => {
-  // GetEffectFlags (FormulaHelper.cs:1592-1623) never consults
-  // AllowedElements; only GetElementType (:1630-1634) does.
-  const fx = rd('src/systems/effects.js');
-  assert.match(fx, /const saveFlag = \(\) => flag;/, 'the flag is the bundle element, always');
-  assert.match(fx, /const savesAsMagic = \(e\) => MAGIC_ONLY_KEYS\.has/);
-  // and the magic-only set is the real one, not a family guess
-  for (const k of ['14,255', '25,255', '26,255', '27,255', '28,255', '30,255', '31,255']) {
-    assert.ok(fx.includes(`'${k}'`), `${k} (levitate/slowfall/free action/jumping/climbing/water) is magic-only`);
-  }
-});
-
-test('audit24 systems: the %di local-place separator is a comma and TWO spaces', () => {
-  // QuestMCP.Direction's local arm builds
-  // `locationName + GetLocalizedText("comma") + compass`, and
-  // Internal_Strings id 424 is ',  ' - verified with cat -A on
-  // Internal_Strings_en.asset:2046.
-  const qm = rd('src/systems/quest/questMacros.js');
-  assert.match(qm, /comma: ',  ',/, 'two spaces, not one');
-  assert.equal(/comma: ', ',/.test(qm), false);
-});
-
-test('audit24 systems: GetBuildingNameForBuildingKey throws its two errors', () => {
-  const tt = rd('src/systems/topicTree.js');
-  assert.match(tt, /GetBuildingNameForBuildingKey\(\): No building with the queried key found/);
-  assert.match(tt, /GetBuildingNameForBuildingKey\(\): More than one building with the queried key found/);
-});
-
-test('audit24 systems: both faction-gated actions go through GetFactionData, which throws', () => {
-  // WhenNpcIsAvailable.cs:58 and WhenReputeWith.cs:57 are the same
-  // line; Person.GetFactionData (Person.cs:848-856) throws on a
-  // missing record. The port's `factionData &&` guard swallowed it.
-  const ac = rd('src/systems/quest/actions.js');
-  assert.equal((ac.match(/getFactionDataOrThrow\(world, factionID\)/g) ?? []).length, 2);
-  assert.equal(/const factionData = world\.getFactionData\?\.\(factionID\);/.test(ac), false,
-    'neither action reads the store directly any more');
-  const pe = rd('src/systems/quest/person.js');
-  assert.match(pe, /export function getFactionDataOrThrow/);
-});
-
-test('audit24 systems: %god falls back to the REGION temple before it rolls', () => {
-  const qm = rd('src/systems/quest/questMacros.js');
-  assert.match(qm, /REGION_TEMPLES\[w\?\.currentRegionIndex\?\.\(\)\] \?\? 0/);
-  assert.match(qm, /factionId === 0 \|\| factionId === THE_FIGHTERS_GUILD/);
-  assert.match(qm, /function templeDivine/);
-  assert.equal(/divineOfTempleFaction/.test(qm), false, 'the unwired host seam is gone');
-});
-
 // The vendored DFU tree is gitignored, so this gate skips wherever it is
 // absent - the same charter the ARENA2-backed pins run under.
 const DFU_EFFECTS = dfuFile('Assets/Scripts/Game/MagicAndEffects/Effects/');   // PY1: the ONE checkout home

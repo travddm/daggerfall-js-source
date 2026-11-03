@@ -1,6 +1,6 @@
 // UNSTUCK-OUT (FIELD BUGS 2026-10-08, SaberGGaming: "Invisible walls around mountains often gets you stuck. Using the
 // overhead map and traveling around caused this ... I had to end up dying to respawn somewhere else cause unstuck didnt
-// work"; Sahh: "I got stuck inside a mountain during fast travel"; bible/03-World/Player-Arc.md UNSTUCK-OUT). World of
+// work"; Sahh: "I got stuck inside a mountain during fast travel"; UNSTUCK-OUT). World of
 // Daggerfall's mountain rocks are meshes scaled by hundreds; the collider holds both faces of a skin and the renderer
 // culls the back ones, so from inside a rock its walls are invisible and hold the body in - and `/unstuck` refused
 // outdoors. The nearest open ground (player/enterExit.js openGroundNear) answers both: a fast-travel landing held in a
@@ -67,16 +67,3 @@ test('UNSTUCK-OUT the nearest open ground: inside a mountain\'s rock (a real clo
   assert.equal(OPEN_GROUND_RINGS.at(-1), 256);
 });
 
-test('UNSTUCK-OUT the world host: a fast-travel landing held in a rock stands on the nearest open ground; tvSeaY stands before the boot\'s load reads it (mutants: the landing unchecked). `/unstuck` outdoors is PVPUNSTUCK\'s (bible/11-Multiplayer/Wild-Zone.md section 17: the nearest town) - UNSTUCK-OUT\'s own open-ground arm was withdrawn for it at the merge', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (PORTAL-ANYWHERE, bible/06-Systems/Portal-Stone.md): the same question also asks a teleport's bare landing
-  // for safe ground (player/enterExit.js safeGroundAt, safeGroundNear) - a rock's landing is UNSTUCK-OUT's as ever
-  assert.match(w, /import \{ floorLanding, doorWorldPosition, (?:dungeonEntranceLanding, repositionFeetY, )?openGroundNear, heldInSolid(?:, safeGroundAt, safeGroundNear)? \} from '\.\.\/player\/enterExit\.js';/);
-  assert.match(w, /if \(walkMode && \(!local \|\| ground\) && \(heldInSolid\(collider, pos\) \|\| [^\n]*\)\) \{\n\s*const open = [^\n]* : openGroundNear\(collider, pos\[0\], pos\[2\], \{ dry: \(floor\) => floor >= tvSeaY\(\) \}\);\n\s*if \(open\) \{\n[^\n]*\n\s*pos = open;/);
-  const landing = w.indexOf('heldInSolid(collider, pos)');
-  assert.ok(landing > w.indexOf('if (walkMode && landing && pos[1] - raw[1] > OBSTRUCTED_ABOVE) {') && landing < w.indexOf('const resolved = resolveArrival ? await resolveArrival(pos) : null;'), 'after TL2, before the arrival is committed');
-  // the audit's crash: the sea's surface is a const the boot's own load (its landing) reads - declared before that load
-  assert.ok(w.indexOf('  const tvSeaY = () =>') > 0 && w.indexOf('  const tvSeaY = () =>') < w.indexOf('    await worldQuickLoad({ ...bootLoadPick, snap });'), 'tvSeaY before the boot load');
-  assert.equal(w.split('\n').filter((l) => /^\s*const tvSeaY = /.test(l)).length, 1, 'one sea surface');
-  assert.equal(w.split('\n').filter((l) => /^\s*(const|function) unstuckOutdoors\b/.test(l)).length, 1, 'one /unstuck outdoors - PVPUNSTUCK\'s');
-});

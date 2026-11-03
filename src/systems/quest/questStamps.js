@@ -1,6 +1,6 @@
 // @ts-check
-// TIME3 (2026-10-01, Mac: "people have to wait insanely long" / "This needs to be perfect"): A QUEST'S STAMPS AND THE
-// CLOCKS THEY STAND ON. Design: bible/06-Systems/Online-Time-Arc.md section 6.3.
+// TIME3: A QUEST'S STAMPS AND THE
+// CLOCKS THEY STAND ON. Design:
 //
 // Online a quest reads three clocks where DFU's reads one (the machine's deps, quest/machine.js):
 //   - THE CHARACTER'S (nowSeconds - LIVED1's own clock): every countdown and every interval. A Clock's sample, a
@@ -63,22 +63,6 @@ export function markOwnClock(node, ownSeconds) {
   };
   walk(node);
   return node;
-}
-
-/**
- * TIME3: a save's quest block on the clock it is loaded on. An online envelope (`worldMinutes` beside the character's
- * `classicMinutes`) whose quests were taken before TIME3 kept their countdowns on the world's clock; they move onto
- * the character's by the distance between the two at the save, once - a quest's three days stay three days - and are
- * marked. A TIME3 envelope, and any offline one (one clock), is already there. A copy; the snap is untouched.
- * @param {{ quest?: any, classicMinutes?: number, worldMinutes?: number } | null} snap
- */
-export function questBlockOnOwnClock(snap) {
-  const block = snap?.quest ?? null;
-  const own = snap?.classicMinutes, world = snap?.worldMinutes;
-  if (!block || typeof block !== 'object' || !Number.isFinite(own) || !Number.isFinite(world)) return block;
-  const copy = JSON.parse(JSON.stringify(block));
-  shiftQuestStamps(copy, (Math.floor(Number(own)) - Math.floor(Number(world))) * 60, { own: 'legacy' });
-  return markOwnClock(copy, Math.floor(Number(own)) * 60);
 }
 
 /**

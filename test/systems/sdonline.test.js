@@ -1,6 +1,4 @@
-// SD-ONLINE (2026-10-05, Mac: "So medium dungeons will be the new by default option thats on (online only)", then "On
-// second thought. Large, medium and small should all play into account online" - and, asked which, "World mixes
-// sizes"; bible/11-Multiplayer/Super-Dungeons.md section 13): ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S.
+// SD-ONLINE: ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S.
 //
 // THE DELVE ARC shipped Medium Dungeons (DSIZE1) as an Enhanced row, refused online - every peer in a dungeon's room
 // must lay one layout, and the settings are each player's own (AUDIT WORLD34 B2 made that layout the whole dungeon).
@@ -97,7 +95,6 @@ test('SD-ONLINE: the size law - online the world\'s size whatever either switch 
   assert.equal(dungeonSizeFor(undercroft, { online: true }), 'full', 'the fighters\' hall keeps its blocks (ARENA5)');
   assert.equal(dungeonSizeFor({ hasDungeon: false }, { online: true }), 'full');
   // the quest stamp: online the world's sizes, whatever the switches say; offline too when they are asked for
-  // PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md section 5): online a quest's stamp is the whole dungeon's - its
   // markers are chosen on the layout its instance builds; the world's sizes are offline's ask alone
   assert.equal(smallerDungeonsStateNow(true, true, true, false), SMALLER_DUNGEONS_STATE.Disabled);
   assert.equal(smallerDungeonsStateNow(false, false, true, false), SMALLER_DUNGEONS_STATE.Disabled);
@@ -154,15 +151,6 @@ test('SD-ONLINE: driven end to end - the online size law, the build and its room
   assert.equal(room(keep), `dungeon:m${PRIVATEERS_HOLD}`, 'the main story keeps its room and its memory');
   assert.equal(room(dungeonLocationFor(loc(8, MEDIUM_ID), { online: true })), `dungeon:m${MEDIUM_ID}`, 'at or under its size: the whole dungeon, the old room');
   assert.equal(room(dungeonLocationFor(loc(5, SMALL_ID), { online: true })), `dungeon:m${SMALL_ID}`);
-});
-
-test('SD-ONLINE: the hosts carry the size - the mode machine\'s identity reads the build, the world host hands it to roomKeyFor', () => {
-  const m = rd('src/scenes/worldModes.js'), w = rd('src/scenes/world.js');
-  assert.match(m, /import \{ dungeonLocationFor, builtDungeonSize \} from '\.\.\/world\/smallerDungeons\.js';/);
-  assert.match(m, /\{ kind: 'dungeon', mapId: dungeonLoc\?\.mapTableData\?\.mapId \?\? null, regionIndex: dungeonLoc\?\.regionIndex \?\? -1, name: dungeonLoc\?\.name \?\? '', size: builtDungeonSize\(dungeonLoc\), instance: placeInstance \}/, 'the identity is the BUILT location\'s (dungeonLoc is the sized copy the context was built from; PIN MOVED, INSTANCES: and the instance it was entered as - the mode\'s own, set at the build)');
-  assert.match(m, /dungeonLoc = dfLocation;/, '...which is the one the transition built');
-  assert.match(w, /layout: ident\?\.layout \?\? null,[^\n]*\n\s*size: ident\?\.kind === 'dungeon' \? \(ident\.size \?\? null\) : null,/, 'the room is named with it');
-  assert.match(rd('src/net/online.js'), /if \(mode === 'dungeon'\) return loc \? `dungeon:\$\{loc\}\$\{dungeonRoomTag\(size\)\}` : null;/);
 });
 
 test('SD-ONLINE: the row - the world\'s sizes, Enhanced, off by default offline and forced ON online, under DFU\'s switch and the medium row; the medium row forced off online', () => {

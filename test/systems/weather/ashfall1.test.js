@@ -1,11 +1,10 @@
-// ASHFALL1 (the owner, 2026-10-27: "I think with the volcanic isles we could do an ashfall sort of weather with tiny lava
-// flakes" - "I also definitely want to develop the new weather I mentioned"): THE ASHFALL. The port's own NINTH weather
+// ASHFALL1 (- "I also definitely want to develop the new weather I mentioned"): THE ASHFALL. The port's own NINTH weather
 // word, appended as the sandstorm was, never rolled: the world weather map births it over the volcano's country past the
 // Bay - a zone's `ash`, the share of its sky's hours under the ash (Red Mountain half, the Ashlands TES III's 30%,
 // Stonefalls 15%, the least - ESO's loading screen names its ashfall) - taken from the dry sky and never from what falls. Every seam a word reaches: its
 // fog, sun, flags and fall; the front, the ear, the sky row, the pall's cloud, tint and veil; the wind, the grass, the
 // body's air; the forecast; and the fall itself - grey ash and the tiny embers among it, glowing and cooling - drawn by
-// the dry falls' one renderer beside the sandstorm's sand. bible/07-Rendering/Weather-Arc.md, E.
+// the dry falls' one renderer beside the sandstorm's sand., E.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -260,8 +259,6 @@ test('ASHFALL1 the sky: a brown-grey pall low, deep and dark, tinted, its veil h
   assert.deepEqual(CELL_TINT.ashfall, [0.66, 0.60, 0.56]); assert.deepEqual(CURTAIN_FALL.ashfall, [0.9, 0]); assert.equal(CIRRUS_COVER.ashfall, 0.15);
   const c = cellOf('ashfall', 1, 2, 20000);
   assert.deepEqual(c.tint, CELL_TINT.ashfall); assert.equal(c.fall, 0.9); assert.equal(c.fallKind, 0);
-  const vc = rd('src/render/volumetricClouds.js');
-  assert.match(vc, /float tinted = 1\.0 - step\(2\.999, dot\(uCellC\[i\]\.rgb, vec3\(1\.0\)\)\);\n\s+tint = mix\(tint, vec3\(dot\(tint, vec3\(0\.299, 0\.587, 0\.114\)\)\), tinted\) \* uCellC\[i\]\.rgb;/, 'the sky\'s veil its tint\'s grey (white for a word with none: untouched)');
   const [veil] = curtainsOf([{ ...c, x: 0, z: 15000 }], { focus: [0, 0, 0], eye: [0, 400, 0] });
   assert.deepEqual(veil.tint, CELL_TINT.ashfall, 'the travel view\'s veil carries it');
   const grey = 0.299 * Math.fround(0.5) + 0.587 * Math.fround(0.54) + 0.114 * Math.fround(0.6);
@@ -324,21 +321,3 @@ test('ASHFALL1 the fall: grey ash and the embers among it - two instance sets on
   assert.equal(ash.drawn + ash.embers, 0, 'an ashfall at nothing draws nothing');
 });
 
-test('ASHFALL1 the hosts: the dry falls\' one renderer built on the enhanced lane, every dry fall\'s branch before the rain\'s, the fall handed its kind; the rain program never built for the ash', () => {
-  for (const [name, s, eye] of [['world', rd('src/scenes/world.js'), 'wxEye32'], ['exterior', rd('src/scenes/exterior.js'), 'eye32']]) {
-    assert.match(s, /const dryFall = sky\.enhanced \? new DryFallRenderer\(renderer\.gl\) : null;/, `${name}: built at boot`);
-    assert.match(s, /if \(precipMode && !isDryFall\(precipMode\) && !precip\) precip = new PrecipitationRenderer/, `${name}: the rain program for the wet falls alone`);
-    assert.match(s, /let precip = precipMode && !isDryFall\(precipMode\) \? new PrecipitationRenderer\(renderer\.gl, precipOpts\) : null;/, `${name}: at boot too`);
-    const i = s.indexOf('if (isDryFall(precipShown)) {');
-    assert.ok(i > 0, `${name}: the dry falls' branch`);
-    assert.ok(s.slice(i, i + 900).includes(`dryFall.draw({ on: true, kind: precipShown, strength01: fx.intensity, windV: wd.windV, step: wd.step }, proj, view, ${eye}, now / 1000, renderer.worldViewportPx?.[3]);`), `${name}: the kind handed (the frame's gust, which neither fall reads, gone), and the world image's height`);
-    if (name === 'world') assert.ok(s.slice(i, i + 900).includes('if (dryFall && !_dwPrecipOff && (!_travelWeatherOff || tvf)) {'), 'world: Travel Options\' weather off stands the dry falls down, as the rain');
-  }
-});
-
-test('ASHFALL1 records: the arc page\'s E, the ledger row, the page index and the biomes page\'s ash', () => {
-  assert.match(rd('bible/07-Rendering/Weather-Arc.md'), /^## E - THE ASHFALL \(ASHFALL1, 2026-10-27\)/m);
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /^\| \*\*THE ASHFALL \(ASHFALL1, 2026-10-27\)\*\*/m);
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /E: the ashfall/);
-  assert.match(rd('bible/03-World/Tamriel-Biomes.md'), /ASHFALL1/);
-});

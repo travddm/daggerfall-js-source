@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FEEDS (2026-10-22, design doc "DFO Staff Panel: design": Network bursts, Monster watch, Bot check and
-// Server load) - THE RELAY'S TWO STAFF FEEDS, THEIR LAW: what a batch is, how the relay signs it and how the account
+// STAFF-PANEL5-FEEDS - THE RELAY'S TWO STAFF FEEDS, THEIR LAW: what a batch is, how the relay signs it and how the account
 // service opens it. Pure; the relay (server/src/staffFeeds.js) and the service (server-account/src/staffNet.js,
 // staffReactions.js) import it, and nothing under src/ changes for it (mob, 04:47Z: the bot check is nothing the player's
 // game can tell).
@@ -21,7 +20,7 @@
 //          many ...","w"?:the last close's words}...],
 //   "foe":[{"a","o":live monsters outdoors,"h":live monsters it hosts indoors,"r","e","bo","s":`o` as regular, elite,
 //          boss and sea,"x":records the relay stripped}...]}
-// `ms` 1: the monsters were measured. STAFF-PANEL5-MONSTERS (2026-10-23): from world249 the relay counts them whatever
+// `ms` 1: the monsters were measured. STAFF-PANEL5-MONSTERS: from world249 the relay counts them whatever
 // grantStrip says and always says 1; an older relay counted them only while grantStrip was on, and said 0 while it was off
 // (design doc, Weak spots: "show 'not measured' while grantStrip is off"), which the service still reads as "not measured".
 //

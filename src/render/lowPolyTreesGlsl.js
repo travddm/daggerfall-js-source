@@ -1,5 +1,5 @@
 // @ts-check
-// LPT1 (bible/07-Rendering/Low-Poly-Trees.md): THE BILLBOARD PROGRAM'S FRAGMENT HALF OF A LOW-POLY TREE - one home for
+// LPT1: THE BILLBOARD PROGRAM'S FRAGMENT HALF OF A LOW-POLY TREE - one home for
 // both lanes' billboard shaders (render/renderer.js BB_FS, render/enhancedLighting.js EL_BB_FS), which the vertex
 // shader's mesh mode feeds (renderer.js BB_VS: vShade, vAlpha, vFade - 1, 1 and 1 on every flat, so a flat's texel is
 // what it was).

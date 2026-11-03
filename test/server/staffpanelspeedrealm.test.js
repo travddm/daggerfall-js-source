@@ -1,4 +1,4 @@
-// STAFF-PANEL-SPEED (2026-10-23, mob: "slow when moving in menus", "The click takes a while before the new page shows
+// STAFF-PANEL-SPEED (2026-10-23,, "The click takes a while before the new page shows
 // (it's waiting on the server)") - THE REALM'S, THE ECONOMY'S, THE CENSUS'S, STATUS'S AND THE FEEDS' READ PAGES PINNED TO
 // THEIR D1 ROUND TRIPS (server-account/src/staffRealm.js, staffEconomy.js, staffCensus.js, staffStatus.js,
 // staffMonsters.js, staffReactions.js, staffNet.js): what a click waits on is each statement awaited after the last, times
@@ -110,7 +110,7 @@ function fill(raw, t) {
 async function stand() {
   for (const reset of [_forgetCensusForTests, _resetStatusForTests, _resetReactionsForTests]) reset();
   const mobKey = await extensionKey();
-  const s = await standService({ DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
+  const s = await standService({ SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.1', ...(token ? { [STAFF_SESSION_HEADER]: token } : {}) }, body: JSON.stringify(body),

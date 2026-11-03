@@ -1,10 +1,10 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) - by hand, as
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld - by hand, as
 // tools/hostMove.mjs refuses this group (its `let startLoc` is written by the statements after it, which declare no name
 // to group them by). The host constructs it where the code stood. What it reads of the host's scope comes through
 // `host`: the settled names by value at construction (`_worldReady` the host's own readiness, asked at each look), every
 // live one (`arenaTraced`, `townTalk`, declared below the construction) asked at its use.
 //
-// BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" B1; bible/06-Systems/Legacy-Arc.md BAY-LEFT-B):
+// BAY-LEFT-B:
 // A START PAST THE BAY. The named start (`?region=&loc=`) read MAPS.BSA alone, so a Project Legacy birth whose family seat
 // is past the Bay (`?region=Skyrim&loc=Solitude` - the seat is the first town the house stands in, and TESA's places
 // stand in the location index as they build) threw "location not found" and the page never booted, a reload neither.

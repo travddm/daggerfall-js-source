@@ -1,5 +1,4 @@
-// BAL6-GAUNTLETS (bible/05-Combat/Balance-Arc.md section 12; the owner, 2026-10-12: "based on your equipped gauntlets it
-// would affect your attacks as a wereboar/werewolf. Like scaling without being overpowered"; asked, "Metal's damage
+// BAL6-GAUNTLETS (;; asked, "Metal's damage
 // bonus"): A DEPARTURE - THE BEAST'S CLAWS TAKE THE METAL ON ITS HANDS.
 //
 // DFU's claws are the bare hand: CalculateHandToHandAttackDamage rolls the skill's span and adds the swing and Strength -

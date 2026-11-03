@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-6 (2026-10-14) - WHAT A SUBMISSION CHANGES: A REVISION AGAINST THE ONE LIVE IN THE WORLD.
+// POI-6 - WHAT A SUBMISSION CHANGES: A REVISION AGAINST THE ONE LIVE IN THE WORLD.
 //
-// Mac: "I need to be able to approve changes" (bible/06-Systems/POI-Editor-Arc.md POI-6). The approver reads, before
+// (POI-6). The approver reads, before
 // looking, what a submission would change - the place moved, turned or resized, a part added, taken away or changed (and
 // how), the lights, the mark, the words - each a CODE with the numbers it turns on (`{ code, ...args }`), said in the
 // approver's language by poi/poiText.js diffText. A POI never approved is `new`; a retirement is `retire`. Parts are

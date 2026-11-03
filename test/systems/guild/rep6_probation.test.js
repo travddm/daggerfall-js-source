@@ -1,5 +1,4 @@
-// REP6 (2026-09-29, the reputation overhaul) - PROBATION BEFORE EXPULSION. The shape Mac signed: "Guilds: probation below
-// 0, and expulsion only below -10, with a warning first." DFU expels at the first review that finds a member below zero -
+// REP6 - PROBATION BEFORE EXPULSION. The shape DFU expels at the first review that finds a member below zero -
 // one failed quest's -2 from zero ("i got expelled from the mages... it says i dont have reputation", FIELD BUGS
 // 2026-09-21), a timeout's -22 with Roleplay Realism's death squad behind it.
 import { test } from 'node:test';

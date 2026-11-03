@@ -1,5 +1,5 @@
 // @ts-check
-// A DRAINED ROOM LEAVES NOTHING ARMED (bible/11-Multiplayer/Scale-Arc.md, COST-1). Cloudflare bills an object's duration
+// A DRAINED ROOM LEAVES NOTHING ARMED (, COST-1). Cloudflare bills an object's duration
 // while it runs or sits in memory unable to hibernate, and a pending timer keeps it from hibernating. A cell arms three
 // windows that wait up to ten minutes before they post - the spawn grant's measure (index.js _grantFold,
 // _grantRelayTally: GRANT_MEASURE_MS), the staff traffic feed (staffFeeds.js netArm: the end of the NET_FEED_MS window)

@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow; the weak spot "Follow can't
-// learn the target's next room": "Measure the bus cost first") - WHAT THE WHERE NOTE AND A FOLLOW COST THE BUS, measured
+// STAFF-PANEL5-FOLLOW - WHAT THE WHERE NOTE AND A FOLLOW COST THE BUS, measured
 // on the fake hub (test/fakeRoom.mjs) through the bus's own party arm, end to end. A bench on this machine, not live:
 // the numbers print, and the bounds asserted are loose (the machine is shared).
 import { test } from 'node:test';
@@ -87,8 +86,7 @@ test('STAFF-PANEL5-FEEDS-FIX bench: a pose read by open episodes and a quiet foe
   assert.ok(usPose < 50 && usFoes < 50, line);
 });
 
-// STAFF-PANEL5-MONSTERS (2026-10-23; mob wants all three feed pages working with grantStrip off, and "it need to not hurt
-// server performance") - WHAT COUNTING MONSTERS WITH grantStrip OFF COSTS A FOES FRAME: staffFoesSeen on every fanned
+// STAFF-PANEL5-MONSTERS - WHAT COUNTING MONSTERS WITH grantStrip OFF COSTS A FOES FRAME: staffFoesSeen on every fanned
 // frame (the feed's URL unset, one compare; set, a delta two; a full frame one pass over its records), against the fan it
 // rides - a full cell's frame to 31 listeners through the Room's own _foesFan, its parse included, every send a no-op (so
 // the fan is cheaper than live and the share an upper bound). A bench on this machine, not live: the numbers print, the
@@ -159,7 +157,7 @@ test('STAFF-PANEL5-MONSTERS bench: the monster count on every fanned foes frame 
   } finally { Date.now = realNow; }
 });
 
-// STAFF-PANEL5-MONSTERS REVIEW (2026-10-23) - THE ONE LANE WITHOUT A RECORD CAP: a world room's host `foes` frame is held
+// STAFF-PANEL5-MONSTERS REVIEW - THE ONE LANE WITHOUT A RECORD CAP: a world room's host `foes` frame is held
 // by FOES_FRAME_MAX bytes alone (a cell's and the own lane's by CELL_FRAME_RECORDS_MAX), so at the door's cap it carries
 // about 6,000 records and the count's walk of it costs about what the frame's own parse does. So the count walks one full
 // frame each FOES_FIRST_MS on a sender's lane. Timed here: one walk of the host's frame at the cap, against its parse and

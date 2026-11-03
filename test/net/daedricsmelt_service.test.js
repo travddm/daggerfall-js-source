@@ -1,4 +1,4 @@
-// DAEDRIC-SMELT (2026-10-25; bible/06-Systems/Professions-Arc.md section 53) - THE DAEDRIC SMELT AS THE ACCOUNT SERVICE
+// DAEDRIC-SMELT - THE DAEDRIC SMELT AS THE ACCOUNT SERVICE
 // KEEPS IT: a looted heart into the Stores by a station's put-in alone, loose (never by the Stores page's counted order,
 // never onto the market); the smelt's decision asks the account's purse for the ember (its gates', serpents' and
 // Redoubts' embers less what its insignia, the Panoply and the forge took - accounts.js insigniaPurse) and spends it in
@@ -25,7 +25,7 @@ const HUBS = { [DF]: [207, 212], [WR]: [590, 166] };
 const HEART = DAEDRA_HEART.key;
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac,Sab' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac,Sab' });
   const raw = s.env.DB._raw;
   const stores = (who, m) => raw.prepare('SELECT origin, qty FROM prof_stores WHERE player = ? AND char_id = ? AND material = ? ORDER BY origin').all(who.id, who.character, m).map((r) => [r.origin, Number(r.qty)]);
   const give = (who, m, origin, qty) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, ?, ?)

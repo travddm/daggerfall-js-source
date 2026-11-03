@@ -1,5 +1,5 @@
 // @ts-check
-// TESA2 (2026-10-12, the owner: "Continue building"; bible/03-World/Arena-Provinces.md TESA2) - THE PLACES PAST THE BAY
+// TESA2 - THE PLACES PAST THE BAY
 // STAND (TESA12: the port's own - world/tamrielPlaces.js - where TESA2 stood Arena's). Each named place beyond the Bay
 // stands on its Bay pixel (world/arenaPlaces.js standArenaPixels) as a NON-MUTATING
 // CLONE of one of Daggerfall's own places - the Etheric Sea's and the spawned dungeons' law (world/etherPlaces.js,
@@ -23,7 +23,6 @@ import { mapPixelToLongitudeLatitude, LOCATION_TYPES } from '../formats/mapsFile
 import { hash32 } from './spawnedDungeons.js';
 import { PLACES_PER_PROVINCE } from './tamrielPlaces.js';   // TESA12: a province's slots
 import { ROAD_TYPES, TRACK_TYPES } from './road/roadNetwork.js';
-import { unwalledLocation } from './townShape.js';   // TS7: a Bay city cloned as it was read, its ring and gates and all
 
 /** The places' lane in the id's high 12 bits, and the first low number a place takes. */
 export const ARENA_PLACE_SALT = 0xa7;
@@ -74,7 +73,7 @@ const idOf = (l) => (l?.mapTableData?.mapId ?? 0) >>> 0;
  * @param {Iterable<any>} rows @param {(mapId: number) => boolean} [isMain]
  */
 export function arenaTemplates(rows, isMain = () => false) {
-  const list = [...(rows ?? [])].map(unwalledLocation).filter((l) => l?.exterior?.exteriorData && !l.spawned && !l.ether && !l.arena && !isMain(idOf(l)));   // TS7
+  const list = [...(rows ?? [])].filter((l) => l?.exterior?.exteriorData && !l.spawned && !l.ether && !l.arena && !isMain(idOf(l)));
   const out = {};
   for (const [kind, { type }] of Object.entries(ARENA_TEMPLATE_KINDS)) {
     out[kind] = list.filter((l) => l.mapTableData?.locationType === type && !l.hasDungeon).sort((a, b) => idOf(a) - idOf(b));

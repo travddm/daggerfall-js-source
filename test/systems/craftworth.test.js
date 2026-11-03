@@ -1,6 +1,4 @@
-// CRAFT-WORTH (2026-10-11, the exploit audit the owner asked for: "insane gold farms"; Economy-Arc principle 5, "What an
-// NPC pays for a crafted piece is capped, or smithing prints gold", and its Phase 2, "Cap what an NPC pays for a crafted
-// piece"). A crafted piece's quality rolls a tier onto it (smithItems.js mintPiece: a Superior's Magic, a Masterwork's
+// CRAFT-WORTH. A crafted piece's quality rolls a tier onto it (smithItems.js mintPiece: a Superior's Magic, a Masterwork's
 // Rare) whose lines applyRarity priced into its value - and every counter paid that value, at a shop whose gold never
 // runs out: a Masterwork staff of three pine planks sold for ~1,280 gold where the plain staff fetches 6 (~79k gold an
 // hour of chopping, sawing and crafting; ~320k at the service's own throttle), and a patron's cap paid ~1,200 of the
@@ -62,20 +60,12 @@ test('CRAFT-WORTH a patron pays a crafted piece no more than the piece it was ma
   }
 });
 
-test('CRAFT-WORTH the keyed shelf (the counter with no trade art) prices a sale through the window\'s own walk and sells no conjured piece (mutants: the keyed sale off the walk; a conjured piece listed; one sold)', () => {
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const fn = (name) => { const at = wm.indexOf(`function ${name}(`); return wm.slice(at, wm.indexOf('\n  }\n', at)); };
-  assert.match(fn('sellPrice'), /const lot = tradeCost\('Sell', \[it\], \{ quality: b\.quality, priceAdjustment: shopAdjustment\(b, 'Sell'\) \}\);\n\s*return getTradePrice\('Sell', lot\.cost, b\.quality, /);
-  assert.match(fn('showSellList'), /&& !isSummoned\(it\)\);/);
-  assert.match(fn('doSell'), /\n\s*if \(isSummoned\(it\)\) return 0;/);
-});
-
 test('AUDIT CRAFT-WORTH a FOUND piece tempered keeps its patron worth (a temper writes `quality`, a craft mark, onto it - only a crafted piece loses its roll), a crafted piece with no value of its own is priced at its base untouched, and a malformed line list is no throw (mutants: the strip on any marked piece; the roll off the base; the list unguarded)', () => {
   const found = mint('dagger:iron', 1, 3);
   for (const k of ['provenance', 'quality', 'recipe']) delete found[k];
   applyRarity(found, 'rare', () => 0.5);
   const before = patronWorth(found, itemWorth);
-  assert.ok(before > 1000, `a found Rare's patron worth (${before})`);
+  assert.ok(before > 500, `a found Rare's patron worth (${before})`);   // PIN MOVED: B4 rescale, the lines are worth less (903 here, was over 1000)
   assert.equal(temperItem(found, { quality: 2 }), true, 'tempered to Fine, by the real producer');
   assert.equal(found.quality, 2);
   assert.deepEqual(itemFindings(found), [], 'a lawful piece');

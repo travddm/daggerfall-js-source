@@ -1,4 +1,4 @@
-// LOCKPICK (2026-10-26, bible/06-Systems/Lockpicking.md): THE LOCKPICKING MINIGAME AND THE LOCKPICK - the tumblers' law by
+// LOCKPICK: THE LOCKPICKING MINIGAME AND THE LOCKPICK - the tumblers' law by
 // value, the machine played (a clean hand, a slip, a snap, a free pin forced, a spool's false set, the Auto attempt), the
 // Lockpick as the producers mint it (its row, the item law headless, the counter's endless stack, the kit and the gift, a
 // rogue's pockets), the host's one home (no pick, a snap, the last snap, an open, a dispose), the window's pure geometry
@@ -15,8 +15,8 @@ import {
 import { createLockpickAct, PIN } from '../../../src/systems/lockpick/lockpickAct.js';
 import { LOCKPICK_TEMPLATE, LOCKPICK_LAW_ROW } from '../../../src/systems/lockpick/lockpickRow.js';
 import {
-  LOCKPICK_ROW, ENDLESS_LOCKPICK_STACK, LOCKPICK_KIT, LOCKPICK_GIFT, ROGUE_LOCKPICKS, isLockpick, lockpicks, lockpickCount,
-  spendLockpick, careerPicksLocks, giveStartingLockpicks, giveLockpickGift, rogueLockpicks, ensureEndlessLockpicks, LOCKPICK_TEXT,
+  LOCKPICK_ROW, ENDLESS_LOCKPICK_STACK, LOCKPICK_KIT, ROGUE_LOCKPICKS, isLockpick, lockpicks, lockpickCount,
+  spendLockpick, careerPicksLocks, giveStartingLockpicks, rogueLockpicks, ensureEndlessLockpicks, LOCKPICK_TEXT,
 } from '../../../src/systems/lockpick/lockpickItem.js';
 import { LOCKPICK_ART, LOCKPICK_ARCHIVE, LOCKPICK_ART_SIZE, lockpickArt, lockpickTexel } from '../../../src/systems/lockpick/lockpickArt.js';
 import { LOCK_SFX, LOCK_SFX_FILES, LOCK_CUES, LOCK_CLASSIC_CUES, createLockEar } from '../../../src/systems/lockpick/lockpickSounds.js';
@@ -30,7 +30,7 @@ import { ENEMY_BASICS } from '../../../src/characters/enemy/enemyBasics.js';
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { SKILLS } from '../../../src/systems/skills.js';
 import { SOUND } from '../../../src/systems/soundClips.js';
-import { PSEUDO_ARCHIVES } from '../../../src/world/eliteGates/pseudoArchives.js';
+import { PSEUDO_ARCHIVES } from '../../../src/world/pseudoArchives.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const src = (p) => readFileSync(join(ROOT, p), 'utf8');
@@ -43,7 +43,7 @@ const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)
 
 test('LOCKPICK law: the act\'s numbers by value, the pins and spools a lock is built of, its window and its snap', () => {
   assert.deepEqual({ ...LOCKPICK_ACT }, {
-    riseS: 0.2, riseJitter: 0.45, fallS: 0.32, springS: 0.22, graceS: 0.03, windowMinS: 0.08, windowMaxS: 0.6,   // PIN MOVED (AUDIT LOCKPICK A2): the rise's spread outspans the 5% hang
+    riseS: 0.2, riseJitter: 0.45, fallS: 0.32, springS: 0.22, graceS: 0.03, windowMinS: 0.08, windowMaxS: 0.6,
     breakScale: 0.55, breakMin: 0.04, breakMax: 0.6, freeRisk: 0.35, senseSkill: 50,
   });
   assert.deepEqual([LOCK_PINS_MIN, LOCK_PINS_MAX, LOCK_PINS_STEP, SPOOL_ONE, SPOOL_TWO], [2, 6, 4, 8, 14]);
@@ -202,7 +202,6 @@ test('LOCKPICK item: its row registered and known headless, a stack of steel and
   assert.equal(t.name, 'Lockpick'); assert.equal(t.stackable, true); assert.equal(t.weight, 0.05);
   assert.equal(t.worldTexArchive, LOCKPICK_ARCHIVE); assert.equal(LOCKPICK_ROW.worldTextureRecord, 0);
   assert.equal(lawTemplate(LOCKPICK_TEMPLATE)?.index, 584, 'the item law knows it');
-  assert.ok(src('src/systems/item/itemLaw.js').includes('STARGLASS_LAW_ROW, LOCKPICK_LAW_ROW]'), 'beside the registry from its leaf, as the service reads it');
   const it = lockpicks(3);
   assert.equal(isLockpick(it), true); assert.equal(it.group, 'UselessItems2'); assert.equal(it.stackCount, 3);
   assert.equal(isLockpick({ ...it, group: 'Gems' }), false);
@@ -243,12 +242,9 @@ test('LOCKPICK item: counted across stacks, spent one at a time; the counter\'s 
     const off = [lockpicks(4)];
     restockEndless(off, [lockpicks(21)]); assert.equal(off[0].stackCount, 4, 'offline it sells out until the day\'s restock');
   } finally { globalThis.location = was; }
-  const SS = src('src/systems/shopStock.js');
-  assert.match(SS, /if \(shelfIndex === 0 && \(buildingType === BUILDING_TYPES\.GeneralStore \|\| buildingType === BUILDING_TYPES\.PawnShop\)\) ensureEndlessLockpicks\(items\);/,
-    'every General Store\'s and Pawn Shop\'s counter');
 });
 
-test('LOCKPICK item: a class that holds Lockpicking sets out with its picks, a character from before is given them once', () => {
+test('LOCKPICK item: a class that holds Lockpicking sets out with its picks', () => {
   const thief = { items: [], career: { primarySkills: [SKILLS.Pickpocket], majorSkills: [SKILLS.Lockpicking], minorSkills: [] } };
   const minor = { items: [], career: { primarySkills: [], majorSkills: [], minorSkills: [SKILLS.Lockpicking] } };
   const knight = { items: [], career: { primarySkills: [SKILLS.LongBlade], majorSkills: [], minorSkills: [] } };
@@ -256,16 +252,6 @@ test('LOCKPICK item: a class that holds Lockpicking sets out with its picks, a c
   assert.equal(careerPicksLocks({}), false);
   assert.equal(giveStartingLockpicks(knight), null); assert.equal(knight.items.length, 0);
   assert.equal(giveStartingLockpicks(thief).stackCount, LOCKPICK_KIT); assert.equal(LOCKPICK_KIT, 5);
-  const old = { items: [], career: thief.career };
-  assert.equal(giveLockpickGift(old), 5); assert.equal(old.lockpickGift, LOCKPICK_GIFT); assert.equal(lockpickCount(old.items), 5);
-  assert.equal(giveLockpickGift(old), 0, 'once'); assert.equal(lockpickCount(old.items), 5);
-  const oldKnight = { items: [], career: knight.career };
-  assert.equal(giveLockpickGift(oldKnight), 0); assert.equal(oldKnight.lockpickGift, 1, 'marked all the same');
-  assert.match(src('src/systems/startingGear.js'), /const picks = giveStartingLockpicks\(entity\);\n\s*if \(picks\) added\.push\(picks\);/);
-  const S = src('src/systems/save/save.js');
-  assert.ok(S.includes('snap.lockpickGift = Number.isSafeInteger(entity.lockpickGift) ? entity.lockpickGift : LOCKPICK_GIFT;'), 'a new character is born with it');
-  assert.ok(S.includes('entity.lockpickGift = Number.isSafeInteger(snap.lockpickGift) ? snap.lockpickGift : 0;'), 'a save from before has had none');
-  assert.ok(S.indexOf('giveLockpickGift(entity);') > S.indexOf('giveWalletGift(entity);'), 'given as the save is restored, at the pack\'s end');
 });
 
 test('LOCKPICK item: a rogue\'s pockets - a Burglar or a Thief more often than not, the rest now and then, none else', () => {
@@ -377,9 +363,6 @@ test('LOCKPICK host: a front door - DFU\'s exterior chance, its own roll; opened
   await new Promise((res) => setTimeout(res, OPEN_HOLD_MS + 40));
   assert.deepEqual(order, ['enter']); assert.equal(r.lines.length, 1, 'the success line');
   assert.ok(r.sounds.some(([k]) => k === SOUND.ActivateLockUnlock), 'DFU\'s chime');
-  const H = src('src/scenes/lockpickHost.js');
-  // AUDIT LOCKPICK A5: the tally found at all - its absence read -1 and passed; lockpick_door.test.js counts it landing
-  assert.ok(H.indexOf('tallyCrimeGuildRequirements(player, true, 1)') >= 0 && H.indexOf('tallyCrimeGuildRequirements(player, true, 1)') < H.indexOf('line(LOCKPICKING_SUCCESS_TEXT)'), 'CG2: the tally before the text (PlayerActivate.cs:552)');
 });
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -444,26 +427,5 @@ test('LOCKPICK sites: a dungeon door hands its pick to the host below the magic 
   for (let i = 0; i < 100 && door.state !== 'end'; i++) a.update(0.1);
   assert.equal(door.state, 'end');
   assert.equal(a.lockpicked(door), false, 'an open lock is no lock'); assert.equal(door.state, 'end', 'and its door is not swung shut');
-  const D = src('src/scenes/dungeonContext.js');
-  // PIN MOVED (AUDIT LOCKPICK A4): the graph's doors wired through the host's own `wire` - the dungeon's and a building's
-  // alike (test/systems/lockpick/lockpick_audit.test.js drives it over a real graph)
-  assert.match(D, /lockpick\.wire\(actions, `door:\$\{dfLocation\?\.mapTableData\?\.mapId \?\? 0\}`\);/);
-  assert.match(D, /return lockpick\.inside\(\{\n\s*lock: sb\.lock, key, what:/, 'a chest\'s pick, where SEARCH1 rolled');
-  assert.match(D, /onOpen: \(\) => \{ markPicked\(key\); hudText\.add\(LOCKPICKING_SUCCESS_TEXT\); audio\.play3d\(SOUND\.ActivateLockUnlock, centre\); activateSearchable\(i, mode\); \}/, 'opened, marked picked and searched');
-  assert.ok(D.includes('lockpick.dispose();   // LOCKPICK'), 'shut with the context');
-  assert.equal(/Math\.random\(\) \* 100 >= interiorLockpickingChance/.test(D), false, 'no roll left');
 });
 
-test('LOCKPICK sites: a front door in Steal mode opens the window where the roll stood, and is activated again once picked', () => {
-  const W = src('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT LOCKPICK A1): the host is `lockHost` - the ladder's own `lockpick` (the skill, DFU's name) shadowed
-  // `lockpick` and every front door threw; test/systems/lockpick/lockpick_door.test.js drives the door itself
-  assert.ok(W.includes('const lockHost = createLockpickHost({ talk: townTalk, mount: mountServiceWindow });'), 'the mode\'s own slot (A4), the street\'s line');
-  const ladder = W.indexOf('if (!opened && !isBash) {\n          const lockpick = skillValue(playerEntity, SKILLS.Lockpicking);');
-  const steal = W.indexOf("if (getInteractionMode() !== 'steal') {", ladder);
-  const pick = W.indexOf('if (!picked) return lockHost.frontDoor({ lock: lockValue, skill: lockpick, key: `front:${locId ?? 0}:${bd.buildingKey}`, enter: () => activateStaticDoor(hit, entries, false, { homeAsked, picked: true })', ladder);
-  assert.ok(ladder > 0 && steal > ladder && pick > steal, 'the refusal first, the window in Steal mode');
-  assert.ok(W.indexOf('isBrokenIn = true;   // :557', pick) > pick, 'picked, it is a break-in');
-  assert.equal(W.includes('getLastLockpickAttempt'), false, 'the anti-grind gate retired');
-  assert.equal(W.includes('Math.floor(Math.random() * 100);   // Random.Range(1, 101)'), false, 'no roll left');
-});

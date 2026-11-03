@@ -1,5 +1,4 @@
-// SCALE4f part two (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while
-// also increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE4f): THE CHARACTER'S MEMBERSHIP, READ ONCE BY THE
+// SCALE4f part two: THE CHARACTER'S MEMBERSHIP, READ ONCE BY THE
 // MINT. The guild's badge (guilds.js guildBadgeOf), the seat badge (seatTurning.js seatBadgeOf) and the Season's ribbon
 // (seatRibbons.js ribbonOf) each read the named character's guild_members row for itself - three statements of one row
 // on every mint. The mint now reads it once (guilds.js mintMemberOf) and hands it to each, which keeps its own law over

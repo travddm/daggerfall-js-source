@@ -13,8 +13,7 @@
 // (`w_LONGSWORD.CIF_0-0_Iron`) and the inventory and paper-doll icons
 // in the same metals (`233_5-0_Elven`).
 //
-// DW2 (Mac, 2026-09-23: "this needs to be in the codebase, not an
-// attachable file"): THE SPRITES SHIP WITH THE PORT, under
+// DW2: THE SPRITES SHIP WITH THE PORT, under
 // public/art/diverse-weapons/, by the name DFU asks for -
 // TextureReplacement.GetNameCifRci's spelling (TextureReplacement.cs
 // :783-801), `<prefix><FILE>_<record>-<frame>[_<Metal>]` - the way

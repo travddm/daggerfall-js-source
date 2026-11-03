@@ -1,5 +1,5 @@
 // @ts-check
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): THE WARDROBE'S DOOR - the Reforge's door's shape
+// APPEARANCES: THE WARDROBE'S DOOR - the Reforge's door's shape
 // (ui/reforgeDoor.js): the window (ui/wardrobe/wardrobeWindow.js) a lazy chunk mounted through the one home
 // (ui/enhanced/enhancedChunk.js), in a host of its own, wrapped in the overlay shape every host's frame drives - `done`
 // once it is shut, `dispose` to shut it - and registered with the overlay stack, so the QuickDial key puts it away.

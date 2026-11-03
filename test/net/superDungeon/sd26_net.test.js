@@ -1,4 +1,4 @@
-// SD26 - AUDIT SD IV, the net lifecycle, the fight's laws and the relay lens (bible/11-Multiplayer/Super-Dungeons.md).
+// SD26 - AUDIT SD IV, the net lifecycle, the fight's laws and the relay lens.
 // SD-HELLO held `_send` and the realm's own words behind the welcome, and the rest of the page's senders wrote their
 // socket directly: a look, every directed frame (`_socketFor`: trade, cast, card, page, duel, wed), a `who` and the
 // parked team's word went down a realm socket before its welcome - each a frame before hello, refused for good, and the
@@ -46,7 +46,6 @@ test('AUDIT SD IV (0): A REALM SOCKET BLINKS, AND ITS RETRY SAYS NOTHING PAST IT
     sockets[0].receive({ t: 'welcome', id: 'mac-0001', v: RELAY_VERSION, peers: [{ id: 'bob-0001', name: 'Bob', look: LOOK, pose: pose(3) }] });
     sockets[0].receive({ t: 'pose', id: 'zed-0001', p: pose(4) });   // a stranger stood by its pose, not yet introduced
   });
-  assert.equal(s.lookOk && s.castOk && s.cardOk, true, 'the first welcome said this relay knows each frame');
   sockets[0].drop(1006);   // the blink: the roster kept on purpose (SLAM12)
   clock.now += 10_000; quiet(() => s.tick(clock.now));
   const ws = sockets[1];
@@ -76,7 +75,6 @@ test('AUDIT SD IV (0): THE PARKED TEAM\'S WORD IS SAID IN EVERY ROOM JOINED, AND
     sockets[0].open();
     sockets[0].receive({ t: 'welcome', id: 'mac-0001', v: RELAY_VERSION, peers: [] });
   });
-  assert.equal(s.parkOk, true);
   // a halo opening on the next cell: its hello said, its welcome not yet come
   quiet(() => s.setHalo(['world:101,200']));
   const halo = sockets[1]; halo.open();

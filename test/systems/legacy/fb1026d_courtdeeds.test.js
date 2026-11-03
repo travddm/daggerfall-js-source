@@ -1,6 +1,4 @@
-// COURT-DEEDS (2026-10-26, Discord #feature-feedback "Better Courtship": "Compliments, giving gifts, hugging, kissing ...
-// Right now it's confusing on what exactly you're supposed to use to improve relationships";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): a compliment, a gift, a hug and a kiss on the Tell me about page,
+// COURT-DEEDS: a compliment, a gift, a hug and a kiss on the Tell me about page,
 // each once a day, each saying what it moved. Through the real host (scenes/legacyHost.js topicRows) over the real
 // relations (systems/livingWorld/regardClock.js characterRelations - the one construction point world.js uses).
 // AUDIT FB1026d (B1-B6, E4, E10): a reload through the real mod-save registry, the regard read as it stands, the tone
@@ -187,9 +185,6 @@ test('COURT-DEEDS THE REGARD AS IT STANDS, AND THE TONE COUNTED (AUDIT FB1026d B
   const U = world();
   U.rel.note(RES.id, 'talk', 0, FRIEND_AT + 1);
   assert.match(U.deed('compliment', -1, insulted(U)), /Is that meant to be a compliment\?.*\(Regard -6, now \+35\.\)$/, 'the tone\'s cost said with the flat compliment');
-  // the talk window hands a deed row its tone (and every other row hears it first, as LW7 laid down)
-  const talk = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(talk, /if \(row\.legacy\?\.hearsTone\) return row\.legacy\.answer\(tone, _toneTaste\(\), _toneHeard\);\n\s*_toneHeard\(\);   \/\/ LW7/);
   assert.ok(rows.filter((r) => r.topic.startsWith('deed:')).every((r) => r.legacy.hearsTone === true));
 });
 

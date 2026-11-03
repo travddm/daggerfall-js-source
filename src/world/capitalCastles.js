@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
-// WW7-4 (2026-10-25, the owner: "The tower in the middle needs an
-// interior, ensure all castles have interiors") - EVERY CAPITAL'S CASTLE
-// HAS ITS HALLS (bible/04-World/World-Wide.md WW7-4).
+// WW7-4 - EVERY CAPITAL'S CASTLE
+// HAS ITS HALLS (WW7-4).
 //
 // DFU's reference: a crown city's castle is that location's own dungeon
 // (MAPS.BSA: Daggerfall's S0000160, Sentinel's S0000040-41, Wayrest's
@@ -89,7 +88,7 @@ const CASTLE_FOLK = Object.freeze(new Set([0, 511, 512, 514]));
 /** The quest markers (archive 199): a quest's item (11) and its person (18) - the Bay's quests', none here. */
 const QUEST_MARKERS = Object.freeze(new Set([11, 18]));
 
-/** PROVINCE-COURTS (bible/03-World/World-Wide.md): THE CASTLE'S COURT, THE CAPITAL'S OWN. A province has its court now
+/** PROVINCE-COURTS: THE CASTLE'S COURT, THE CAPITAL'S OWN. A province has its court now
  *  (systems/faction/provinceFactions.js), so the Bay court's people are re-seated in the copy rather than stood down -
  *  under DFU's own generic factions, which a person's talk and work read as the region's court (npcSession.js
  *  getStaticNPCFactionData: Random_Ruler, Random_Noble and Random_Knight -> courtOfCurrentRegion; in the Blue Palace the

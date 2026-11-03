@@ -3,7 +3,7 @@
 //     node tools/meshTexture.mjs <mesh.json> <out.dds> [--size=512]
 //                                [--rays=64] [--preview=out.png]
 //
-// FIELD-GUN-MW2 (2026-09-20). Mac asked for "texturing and rigging", and
+// FIELD-GUN-MW2. Mac asked for "texturing and rigging", and
 // the FBX he sent carries a UV unwrap and NO Material, Texture or Video
 // record at all - so there is nothing to bake FROM and no image to ship.
 // Painting one by hand into a 1024x1024 atlas, sight unseen, is guessing
@@ -73,7 +73,7 @@ export const BANDS = [
   { at: 0.50, name: 'receiver', colour: [0.205, 0.112, 0.034], rough: 0.50 },   // the same alloy, cast
   { at: 0.76, name: 'grip',     colour: [0.055, 0.034, 0.022], rough: 0.95 },   // dark, matte
 ];
-/** GILDED1 (2026-10-07): THE HOURLOCK'S GOLD LEAF, the same four bands. The barrel and the receiver gilt and polished
+/** GILDED1: THE HOURLOCK'S GOLD LEAF, the same four bands. The barrel and the receiver gilt and polished
  *  (a third of the bronze's roughness), the muzzle a scorched gilt, the grip a dark enamel - a gilded gun is gilt where
  *  the eye goes and dark where the hand does. Linear, as the bronze's are (0.80 encodes to sRGB 0.91). */
 export const GILDED_BANDS = [

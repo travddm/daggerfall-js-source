@@ -1,8 +1,5 @@
 // @ts-check
-// SOC2 (2026-09-16, Mac: "A social button next to the chat UI, that when tapped opens the new friends list + party
-// interface. Players should now be able to friend other users, see if they are online/last online + be able to
-// invite friends or other individuals to the new 4 person party system. Party system: Upon joining a party, the
-// players name who are in a party together should turn green"): THE CLIENT'S PICTURE - pure, DOM-free.
+// SOC2: THE CLIENT'S PICTURE - pure, DOM-free.
 //
 // THE SHAPE. The hub (server/src/index.js, SOC1) is the one authority: it keeps the accounts, the friendships, the
 // parties, and it says what it knows in six frames (net/wire.js validSocialFrame - state, presence, party, invite,
@@ -30,7 +27,7 @@ import { NOTE_CODES, INVITE_TTL_MS, PARTY_MAX, PENDING_MAX } from './wire.js';
 import { keptToken } from './online.js';
 import { appStorage } from '../systems/appStorage.js';   // the app's own storage - localStorage in a browser, the shell's file store on the desktop
 
-/** SOC2 (Mac: "friend other users"): THE ACCOUNT - the id a FRIEND is. A peer id is a tab's (TABS1, net/online.js
+/** SOC2: THE ACCOUNT - the id a FRIEND is. A peer id is a tab's (TABS1, net/online.js
  *  peerId) and dies with it, which is exactly wrong for a friend list: a friend is a person, and here a person is a
  *  browser profile. So this one is minted once in the APP'S OWN storage (systems/appStorage.js appStorage - the seam
  *  the saves and the settings use) and kept for the life of the profile; every tab of the profile carries it, so two
@@ -120,7 +117,7 @@ export class SocialState {
     this.onChange = null;
     /** The last refusal, for a panel that shows it beside the button; null once anything else happens. */
     this.lastError = null;
-    /** SAFE1 (bible/11-Multiplayer/Chat-Safety-Arc.md): whether the player hears an account - (acct) => boolean, the host's
+    /** SAFE1: whether the player hears an account - (acct) => boolean, the host's
      *  from the block list; null hears everyone. A blocked account's friend request, party invite and notes never land. */
     this.hears = null;
     this._now = now;
@@ -219,7 +216,7 @@ export class SocialState {
   /** SAFE1: whether an account is heard (the host's block list) - an account named by nobody always is. */
   _hears(acct) { return typeof acct !== 'string' || !acct || !this.hears || this.hears(acct); }
 
-  /** AUDIT SAFE CLIENT-11 (2026-10-17): THE PICTURE HEARS THROUGH A BLOCK MADE NOW - a friend request and a party invite
+  /** AUDIT SAFE CLIENT-11: THE PICTURE HEARS THROUGH A BLOCK MADE NOW - a friend request and a party invite
    *  that already stood when the account was blocked are taken back, as a block takes back the lines already heard
    *  (net/chat.js forgetSpeaker): they were filtered only as they arrived. Answers how many went; a change repaints. */
   refilter() {

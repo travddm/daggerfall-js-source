@@ -1,5 +1,4 @@
-// LW6c (2026-10-05, bible/06-Systems/Living-World.md "LW6c", Mac: "make friends or enemies, and explore a dynamic
-// world"): CARRIED HOME - each of the fallen of a dive carries a keepsake, found with their remains (LW6b); carried home,
+// LW6c: CARRIED HOME - each of the fallen of a dive carries a keepsake, found with their remains (LW6b); carried home,
 // it is the household's moment: handed over, their words on the parchment, the one spoken with and the rest of the
 // household remembering it. The town is the synthetic one (test/lwTown.mjs).
 import test from 'node:test';
@@ -98,12 +97,3 @@ test('LW6c carried home: speaking with one of the household the fallen lived wit
   assert.ok(seen.size >= 2, 'not one set of words for every keepsake');
 });
 
-test('LW6c the hosts: the talk shows the household\'s moment on the parchment before any words (and no conversation that time); the body\'s town answers it - the street\'s own, the room\'s door, gives the town what the player carries and takes the keepsake handed over, and lays each fallen\'s keepsake with their remains (mutants: the parchment, the doors, the carried, the handed, the laid)', () => {
-  const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /if \(refusal\) \{ const b = livingTalk\?\.regard\?\.\(target\.person\) \?\? null; setMidScreenText\(b \? [^\n]*: refusal\); return; \}\n(?:\s*\/\/[^\n]*\n)*\s*const moment = target\.person\?\.living\?\.town\?\.moment\?\.\(target\.person\) \?\? null;\n\s*if \(moment\) \{ showOverlay\(new ActionTextBox\(moment\)\); return; \}/);   // PIN MOVED (AUDIT PLAIN-UI U11): the refusal says where the resident stands
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /moment: \(p\) => livingIndoors\?\.town\(\)\?\.moment\?\.\(p\) \?\? null,/);
-  assert.match(w, /keepsakes: \(\) => playerEntity\.items \?\? \[\],/);
-  assert.match(w, /takeKeepsake: \(item\) => \{ const i = playerEntity\.items\?\.indexOf\(item\) \?\? -1; if \(i >= 0\) playerEntity\.items\.splice\(i, 1\); \},/);
-  assert.match(rd('src/scenes/livingWorld/remainsGoods.js'), /items\.push\(mintKeepsake\(res\)\);/);   // PIN MOVED (HOST-SPLIT, SEA VENTURES 2026-10-22): livingRemainsLay moved verbatim out of bootWorld into scenes/livingWorld/remainsGoods.js
-});

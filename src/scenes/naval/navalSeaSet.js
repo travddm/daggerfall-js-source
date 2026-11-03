@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-SET (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SEA-SET) - THE ELTHERIC TIDEMAIL AT SEA, the naval host's two asks of it: the Captain's Due on a ball's
+// SEA-SET - THE ELTHERIC TIDEMAIL AT SEA, the naval host's two asks of it: the Captain's Due on a ball's
 // hurt on a boat of mine, and a legend's piece when she ends. AUDIT SEA VENTURES D12 (HOST-SPLIT): out of createNavalHost,
 // where SEA VENTURES had grown them - the naval host calls them, and keeps no state of theirs.
 // ═══════════════════════════════════════════════════════════════════

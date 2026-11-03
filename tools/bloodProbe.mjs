@@ -1,7 +1,6 @@
 // MAC-BUG4 IN A REAL GL CONTEXT: is a blood splash black because of the
 // RENDERER, or because of the texture it is handed?
 //
-// Mac, 2026-09-20: "Also blood is black."
 //
 // The splash is TEXTURE.380 through scenes/hitEffects.js - a one-shot
 // animated billboard - and this container has no ARENA2, so the real
@@ -377,7 +376,7 @@ const out = await page.evaluate(async () => {
     leave();
   }
 
-  // ── MAC-BUG W6 (Mac: "super dark coloring instead of red") ──────
+  // ── MAC-BUG W6 ──────
   // EVERYTHING ABOVE RAN ON THE CLASSIC SET, and the port ships with the
   // Enhanced Lighting lane ON. Under the lane the renderer decodes every
   // colour it uploads to linear and the lane's shaders encode at the
@@ -400,7 +399,7 @@ const out = await page.evaluate(async () => {
   }
   r.setLightingLane(null);
 
-  // WEAPON-MOUNT (2026-09-26, Mac: "weapons dont show in houses properly"): the decorator hangs a weapon or armour on
+  // WEAPON-MOUNT: the decorator hangs a weapon or armour on
   // THIS pass as its pack picture, under a white tint - and the pass read the texel's red as a blood film's thickness
   // and painted the tint through it, so the picture came out a pale silhouette of itself. A GREEN picture,
   // at noon, both sets: drawDecalPicture gives the green back; drawDecals (a mark) does not, and must not.
@@ -522,7 +521,7 @@ for (const lane of ['classic', 'lane']) {
   // BLOOD2f: the wet sheen - the lane's glint, the classic set's nothing
   const wT = at('fresh WET, dungeon + torch'), wN = at('fresh WET at noon');
   if (lane === 'lane') {
-    // BLOOD3 (Mac: "the blood is too shiny and flat"): THE SHEEN IS AN
+    // BLOOD3: THE SHEEN IS AN
     // ANGLE NOW. It used to be nine tenths of the light wherever the
     // half-vector lined up, at ANY angle - the look of wet plastic. A
     // liquid film is Schlick: about two per cent head-on, most of the

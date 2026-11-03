@@ -1,5 +1,4 @@
-// PERF-RELAY1 (2026-10-09, Mac: "Yes and audit everything", of PERF-NEXT item 15 - bible/07-Rendering/Performance-Next.md;
-// bible/11-Multiplayer/Scale-Arc.md PERF-RELAY1): THE RELAY'S POSE PATH, FASTER AND THE SAME.
+// PERF-RELAY1: THE RELAY'S POSE PATH, FASTER AND THE SAME.
 //
 // ONE: `inRangeOf(key, from)` answers inRange(key, from, to) for every `to` - over keys of every kind and poses of every
 // shape the wire can carry (absent, empty, NaN, an exact pixel edge, a negative coordinate), so the relay's fan asks the

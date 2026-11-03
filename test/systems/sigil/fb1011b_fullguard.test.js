@@ -1,5 +1,5 @@
-// FULL-GUARD (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; the Discord's "One shot bug" -
-// YeetMaster64: "I get one hit killed several times a day"; Mac: "No kill from full health"). BAL2 gave every striker the
+// FULL-GUARD (FIELD BUGS 2026-10-11b,; the Discord's "One shot bug" -
+// YeetMaster64: "I get one hit killed several times a day"). BAL2 gave every striker the
 // player's crit, BAL4 put the elites (x3) and the Enhanced AI's telegraphed slams (x1.75) in the offline game by default,
 // and nothing capped the stack: a level-12 elite's slam killed a 110-health player from full in about one landed slam in
 // ten. Now a foe's one blow never takes a player at full health to dead - the damage door leaves them at 1, and no death

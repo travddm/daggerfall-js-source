@@ -1,5 +1,4 @@
-// ADMIT-LINE (2026-10-11, Mac: "I think the issue is so many people logging in at once. We need to implement a queue
-// system"): THE SIGN-IN LINE (server-account/src/admit.js). The doors a sign-in knocks at take a place in one line the
+// ADMIT-LINE: THE SIGN-IN LINE (server-account/src/admit.js). The doors a sign-in knocks at take a place in one line the
 // whole service shares, let in ADMIT_RATE a second, first come first served; the rest are told their place and when to
 // ask again (503 `queue`), and never touch the database. By execution over the real line and the real Worker.
 import { test } from 'node:test';

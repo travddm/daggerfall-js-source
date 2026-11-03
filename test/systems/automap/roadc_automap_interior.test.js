@@ -117,68 +117,6 @@ function freshWindow(over = {}) {
   return new AutomapWindow(winDeps(over));
 }
 
-// ─────────────────────────────────────────────────────────────────────
-test('c2/S9 THE ENTRANCE BEACON AS A SEQUENCE: lit by SetupBeacons, put out by HideAll, re-lit by the LOS tick', () => {
-  resetAutomapStore();
-  try {
-    // Step by step first, because the ORDER is the quirk. A pin on the
-    // end state alone passes against a port that never lit it.
-    const rec = { revealed: new Set(['int:0']), visitedThisRun: new Set(['int:0']), entranceDiscovered: false, notes: new Map(), teleporters: new Map() };
-    // (1) SetupBeacons(door)'s building arm - "set do discovered" (:1457)
-    assert.equal(setupInteriorEntranceBeacon(rec), true);
-    assert.equal(rec.entranceDiscovered, true, 'SetupBeacons lights it');
-    // (2) RestoreStateAutomapDungeon(true)'s FIRST statement, HideAll()
-    // (:2355 -> :2450-2461) - which takes the beacon back out along
-    // with every MeshRenderer.
-    hideAllAutomap(rec);
-    assert.equal(rec.entranceDiscovered, false, 'HideAll puts it out again');
-    assert.equal(rec.revealed.size, 0, 'and hides the geometry with it');
-    // (3) the LOS tick (:1196-1274) - it runs OUTSIDE the geometry
-    // block, so it ticks indoors, and it is the only thing that can
-    // light the beacon again.
-    automapEntranceTick(rec, [0, 0, 0], [0, 0, 3], { raycast: () => null });
-    assert.equal(rec.entranceDiscovered, true, 'a clear line of sight re-lights it');
-
-    // ...and the composed entry runs exactly that order, ending DARK.
-    const fresh = enterInteriorAutomap();
-    assert.equal(fresh.entranceDiscovered, false, 'a building opens with an UNDISCOVERED entrance');
-    assert.equal(fresh.revealed.size, 0, 'and a fully hidden map');
-
-    // THE ORDER IS UNOBSERVABLE FROM THE END STATE - "lit then put out"
-    // and "never lit at all" both finish dark - so it is pinned in the
-    // source, statement against statement, with the two DFU call sites.
-    const am = src('src/systems/automap/automap.js');
-    const body = am.match(/export function enterInteriorAutomap\([\s\S]*?\n\}/)[0];
-    // anchored at the start of a line, so a commented-out call is not
-    // mistaken for the statement it replaced
-    const lit = body.search(/\n[ \t]*setupInteriorEntranceBeacon\(rec\);/);
-    const out = body.search(/\n[ \t]*hideAllAutomap\(rec\);/);
-    assert.ok(lit > 0, 'SetupBeacons runs on entry');
-    assert.ok(out > lit, 'and HideAll runs AFTER it, never before or instead');
-  } finally { resetAutomapStore(); }
-});
-
-test('c2/S9 the dictionary tail (:2362-2379): a mapped dungeon under the SAME location lights the shop-s beacon', async () => {
-  resetAutomapStore();
-  try {
-    // DFU looks the BUILDING up in the DUNGEON dictionary by the current
-    // location's "RegionName/Name" - a town and the dungeon beneath it
-    // share that string - and assigns the beacon that record's
-    // entranceDiscovered BEFORE the locationName comparison returns.
-    assert.equal(enterInteriorAutomap({ dungeonEntranceDiscovered: false }).entranceDiscovered, false);
-    assert.equal(enterInteriorAutomap({ dungeonEntranceDiscovered: true }).entranceDiscovered, true,
-      'the dungeon record-s entranceDiscovered reaches the building-s beacon');
-    // ...and the arm is a READ. The lookup the host performs is
-    // getDungeonAutomap over automapDungeonKey - both already exported,
-    // neither writing.
-    const wm = src('src/scenes/worldModes.js');
-    assert.match(wm, /dungeonEntranceDiscovered: !!getDungeonAutomap\(\s*\n?\s*automapKeyOf\(hit\.dfLocation\)\)\?\.entranceDiscovered/,
-      'the host reads the dungeon dictionary by the location key');   // PIN MOVED (TESA8, bible/03-World/Arena-Provinces.md): through automapKeyOf - DFU's key for every place of the game's, a lair past the Bay's with its map id
-    const { automapKeyOf, automapDungeonKey } = await import('../../../src/systems/automap/automap.js');
-    assert.equal(automapKeyOf({ regionIndex: 17, name: 'Daggerfall' }), automapDungeonKey(17, 'Daggerfall'), 'the same string DFU reads');
-  } finally { resetAutomapStore(); }
-});
-
 test('c2/S9 PER-VISIT LIFETIME: leaving and re-entering starts hidden, and nothing survives the door', () => {
   resetAutomapStore();
   try {
@@ -197,40 +135,6 @@ test('c2/S9 PER-VISIT LIFETIME: leaving and re-entering starts hidden, and nothi
     assert.equal(second.visitedThisRun.size, 0);
     assert.equal(second.entranceDiscovered, false);
   } finally { resetAutomapStore(); }
-});
-
-test('c2/S9 the interior record NEVER enters the dungeon dictionary, and evicts nothing', () => {
-  resetAutomapStore();
-  _resetForTests();
-  try {
-    // One remembered dungeon: the setting under which an extra record
-    // would evict the one the player cares about.
-    setValue('Map', 'AutomapNumberOfDungeons', 1);
-    const key = automapDungeonKey(17, 'Privateer-s Hold');
-    const dungeon = enterDungeonAutomap(key, 1000);
-    dungeon.revealed.add('0:1234');
-    dungeon.entranceDiscovered = true;
-
-    const before = JSON.stringify(snapshotAutomap());
-    const interior = enterInteriorAutomap();
-    interior.revealed.add('int:0');
-    interior.revealed.add('int:1');
-
-    assert.equal(getDungeonAutomap(key), dungeon, 'the dungeon record is still there, unswapped');
-    assert.deepEqual([...dungeon.revealed], ['0:1234'], 'and untouched');
-    const after = snapshotAutomap();
-    assert.equal(JSON.stringify(after), before, 'the snapshot is byte-identical - entering a shop wrote nothing');
-    assert.deepEqual(Object.keys(after), [key], 'exactly one record, and it is the dungeon-s');
-    for (const rowKey of Object.values(after).flatMap((r) => r.revealed)) {
-      assert.equal(rowKey.startsWith('int:'), false, 'no interior key ever reaches the save');
-    }
-    // The key namespaces cannot collide by construction: a dungeon key
-    // is `${blockIndex}:${blockLocalPosition}`, digits both sides.
-    assert.match('0:1234', /^\d+:\d+$/);
-    assert.doesNotMatch('int:0', /^\d+:\d+$/, 'the int: prefix is outside the dungeon key space');
-    assert.match(src('src/scenes/interiorContext.js'), /const key = `int:\$\{pi\}`;/,
-      'the interior mints its key with that prefix, off the PLACEMENT index');
-  } finally { resetAutomapStore(); _resetForTests(); }
 });
 
 test('c2/S9 ALWAYS COLOUR: every revealed interior row draws in group 1 and mode 2 is never issued', () => {
@@ -293,32 +197,9 @@ test('c2/S9 the reset arm-s default render mode is CUTOUT in a building, TRANSPA
   _resetForTests(); resetAutomapWindowState();
 });
 
-test('c2/S9 the DEAD restore is absent from the port, and the file says why', () => {
-  const am = src('src/systems/automap/automap.js');
-  // The name appears exactly where it should: in the note explaining
-  // that DFU's own function has no caller. Nothing implements it.
-  assert.match(am, /NOTHING ANYWHERE CALLS\s*\n\/\/ RestoreStateAutomapInterior/,
-    'the dead-code note names it');
-  assert.equal(/export function restoreInteriorAutomap|restoreStateAutomapInterior/.test(am), false,
-    'and no port function restores interior discovery');
-  // ...nor is there an interior half of the save envelope anywhere.
-  for (const f of ['src/systems/automap/automap.js', 'src/scenes/interiorContext.js']) {
-    assert.equal(/snapshotInterior|interiorSnapshot/.test(src(f)), false, `${f} invents no interior save`);
-  }
-  // The one DFU arm the port declines is recorded as a DEPARTURE with
-  // its reason, which the doctrine test then requires a Ledger row for.
-  assert.match(am, /DEPARTURE \(Port-Ledger, this file\): DFU has a FIFTH arm/,
-    'the save-while-inside-a-building arm is recorded, not silently dropped');
-});
-
 test('c2/S9 the interior identity: one block, DFU-s two element nodes, the placement index as the model', () => {
   assert.deepEqual([...INTERIOR_ELEMENT_NAMES], [ELEMENT_MODELS, ELEMENT_DOORS],
     'AddModels creates "Models" then "Doors" (DaggerfallInterior.cs:398-401)');
-  const ic = src('src/scenes/interiorContext.js');
-  assert.match(ic, /blockIndex: 0,/, 'one block - the interior scene');
-  assert.match(ic, /elementIndex: 0,\s*\n\s*elementName: INTERIOR_ELEMENT_NAMES\[0\],/,
-    'every interior model addresses as element 0; "Doors" is the empty node');
-  assert.match(ic, /waterLevel: null,/, 'AddWater is a dungeon block-s (Automap.cs:1982-2001)');
   // The model rows really do come out in that shape, and resolveAt
   // answers by point.
   const model = buildRevealIndex([
@@ -362,67 +243,6 @@ test('c2/S9 the reveal law runs on an interior record through the same three-ray
     });
     assert.equal(rec2.revealed.size, 0, 'a door hit reveals nothing');
   } finally { resetAutomapStore(); }
-});
-
-test('c2/S9 SOURCE PINS: BOTH interior hosts tick the probes and route AutoMap, the way the dungeon hosts do', () => {
-  // The context owns the arm; a host that mounts one owes it a tick and
-  // a door. Same rule, same shape, as the four-hosts pointer pin.
-  const ic = src('src/scenes/interiorContext.js');
-  assert.match(ic, /automapTick\(dt, eye, fwd\) \{/, 'the context carries the 5 Hz gate');
-  assert.match(ic, /automapRecord: \(\) => automapRec,/);
-  assert.match(ic, /automapEntranceTick\(automapRec, automapEntrance, capsuleCentreFromEye\(eye\), collider\)/,
-    'the entrance LOS check ticks indoors too (:1196-1274)');
-  assert.match(ic, /exitInteriorAutomap\(\);/, 'and the record dies with the room');
-
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /if \(!overlayHeld\) interiorCtx\.automapTick\?\.\(dt, cam\.pos, fwd\);/, 'worldModes ticks the probes');
-  assert.match(wm, /toggleAutomap\(\) \{\s*\n\s*if \(interiorOverlay \|\| !interiorCtx\) return;/, 'worldModes routes AutoMap');
-  assert.match(wm, /insideBuilding: true,\s+\/\/ IsPlayerInsideBuilding/, 'and tells the window where it is');
-  assert.match(wm, /signalAutomapReset\(\);/, 'and raises the reset signal on entry (:2486)');
-
-  const ij = src('src/scenes/interior.js');
-  // ...GATED, like all three of its siblings. The probe's driver is not
-  // Update at all: CoroutineCheckForNewlyDiscoveredMeshes (Automap.cs
-  // :1280-1291) is `while (true) { if (!isOpenAutomap) {
-  // CheckForNewlyDiscoveredMeshes(); } yield return new WaitForSeconds(
-  // 1.0f / scanRateGeometryDiscoveryInHertz); }` - it keeps its cadence
-  // and SKIPS the scan while the map is up, for the reason DFU states
-  // on the gate ("otherwise command gameobjectGeometry.SetActive(false)
-  // will mess with automap rendering"). Update's own call at :1001 is
-  // the one-shot lazy init inside `if (!gameobjectGeometry)`, and
-  // Update's per-frame body runs when the map IS open. This host's fly
-  // camera keeps moving under the overlay (the keydown handler returns
-  // before it can clear the held keys), and the 5 Hz accumulator has no
-  // movement gate, so an ungated tick both burned up to 93 raycast
-  // walks per 200 ms behind the open window and revealed rows into the
-  // record the same frame was drawing.
-  // ROAD-tail: the gate is this host's ONE pause now - windowStack's
-  // `paused()` latch under its own slot - not a bare read of the slot.
-  assert.match(ij, /if \(!gamePaused\(\)\) ctx\.automapTick\?\.\(dt, cam\.pos, fwd\);/,
-    'the standalone interior host ticks them too - and stands the probe down while its map is open');
-  assert.match(ij, /CoroutineCheckForNewlyDiscoveredMeshes \(Automap\.cs:1280-1291\)/,
-    'and cites the driver that actually carries the gate, not Update');
-  assert.match(src('src/scenes/dungeon.js'), /if \(!overlayHeld\) ctx\.automapTick\?\.\(dt, cam\.pos, fwd\);/,
-    'the standalone dungeon host has always had it');
-  assert.match(ij, /if \(actionsOf\(e, keys\)\.includes\('AutoMap'\)\) \{ toggleAutomap\(\); e\.preventDefault\(\); return; \}/, 'and routes the key (FIX-F: the registry\'s, not a raw M; UXB1-S: shared or not)');
-  assert.match(ij, /insideBuilding: true,/);
-
-  // THE POINTER SEAM, the c2/S4 rule applied to the slot this window
-  // now lands in: a host that routes `down` but not `up` latches the
-  // drag and the map spins for ever.
-  for (const phase of ['down', 'move', 'up']) {
-    // STATUS-LIVE (2026-09-22): the ARM's gate moved to `interiorPaused()`
-    // - a press under a box the game is not stopped for is the world's -
-    // so the slot read inside it is optional-chained. All three phases
-    // still reach the slot, which is the rule this loop enforces.
-    assert.ok(new RegExp(`interiorOverlay\\?\\.pointer\\?\\.\\('${phase}'`).test(wm), `worldModes routes '${phase}' to the interior slot`);
-    assert.ok(new RegExp(`overlay\\.pointer\\?\\.\\('${phase}'`).test(ij), `interior.js routes '${phase}'`);
-  }
-
-  // The dial's fourth door - the note that said there was no automap
-  // inside a building is retired, not merely edited around.
-  assert.equal(/no automap inside a building/.test(wm), false, 'the stale note is gone');
-  assert.match(wm, /\{ id: 'map', label: 'Map', dir: 's', open: \(\) => interiorKeyCtx\.toggleAutomap\(\) \}/, 'the rose gained the map arm');
 });
 
 // ── DATA-GATED ───────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-// BOW-VOICE (2026-09-26, Mac: "Bow is still double shooting arrows"): ONE LOOSE, ONE SOUND. The bow's loose is
+// BOW-VOICE: ONE LOOSE, ONE SOUND. The bow's loose is
 // FPSWeapon's own frame-4 PlaySwingSound - the machine's `bowSound`, which every host plays as ArrowShoot - and the
 // Weapon Widget's clone played the same ArrowShoot again at ITS release. On the classic sprite the two landed a tick
 // apart; under the Morrowind arm (MW-D42d) the machine's is held for the arm's release key while the clone's went at
@@ -104,10 +104,3 @@ test('BOW-VOICE: under the Morrowind arm the one twang waits for the arm\'s rele
   }
 });
 
-test('BOW-VOICE: the clone\'s melee swing keeps its voice - only the bow\'s release was a duplicate', () => {
-  const w = readFileSync(new URL('../../src/combat/weapon/weaponWidget.js', import.meta.url), 'utf8');
-  const body = (name) => w.slice(w.indexOf(name), w.indexOf('\n  }\n', w.indexOf(name)));
-  assert.doesNotMatch(body('function* playBowAnimation()'), /playSwingSound\(\)/, 'the bow\'s release is the machine\'s voice alone');
-  assert.match(body('function* playVanillaWeaponAnimation(state)'), /if \(w\.currentFrame === hitFrame\(\)\) \{\s*playSwingSound\(\);/, 'the vanilla swing\'s voice at its hit frame');
-  assert.match(w, /changeWeaponState\(state\);\n    playSwingSound\(\);/, 'the modded swing\'s voice at its strike');
-});

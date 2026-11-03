@@ -1,5 +1,5 @@
 // @ts-check
-// INTRO4's SET (the merge of main into TESA, 2026-10-27; bible/10-UI/UI-Arc.md INTRO4): THE CITY THE FILM WAS SHOT ON,
+// INTRO4's SET (the merge of main into TESA, 2026-10-27; INTRO4): THE CITY THE FILM WAS SHOT ON,
 // KEPT AS SHOT. INTRO4 took world/imperialCity.js byte for byte from TESA (#1184 at 4d8200b01, the Imperial City at seven
 // pixels a side) and tuned the film to it - its camera path, its fog and lake, the Colosseum it dives past. TESA's
 // IC-GRAND has since grown the game's city to twenty-five pixels (its wall 6,900 m out where it was 1,950) and retired
@@ -7,9 +7,7 @@
 // Unchanged but for this header, its imports' paths and its exports, listed at the end (the names stay the module's
 // own: test/systems/talk/audit24_onehome.test.js counts declarations, and this set's are the film's, not the game's).
 // Re-shooting the film on the grand city is its own slice.
-// TESA11 (2026-10-13, the owner: "the imperial city needs to be much larger and be split into distinct districts with the
-// tower very large. The entire city also needs to be lore accurate to daggerfall"; asked, "3x3 pixels" and "Canon layout,
-// DF era"; bible/03-World/Arena-Provinces.md TESA11) - THE IMPERIAL CITY OVER NINE PIXELS. Daggerfall's engine stands one
+// TESA11 - THE IMPERIAL CITY OVER NINE PIXELS. Daggerfall's engine stands one
 // location on a pixel, eight blocks a side at most; the city stands on nine (`IMPERIAL_SPAN` a side, 2.46 km across), each
 // pixel's eight-by-eight slice of one plan its own location, named for its district (`IMPERIAL_SLICE_NAMES`), and every
 // slice flattened to the centre's ground (world/terrain/terrainGen.js flattenAt) so they meet level.
@@ -50,7 +48,7 @@ const SALT = 0x1c11;
  *  a third larger (the Temple of the One as it stood), the White-Gold Tower twice its height and girth; the lake a round
  *  ring past the isle, the land past it its own. */
 const IMPERIAL = Object.freeze({
-  /** The White-Gold Tower: an octagon throughout - TS5 (the owner: "Tower needs to be massive"): twice TESA11's every way,
+  /** The White-Gold Tower: an octagon throughout - TS5: twice TESA11's every way,
    *  1360 m to its spire's tip, its plinth 344 m across, its fins out to 208 m; its door a man's as it was. */
   tower: Object.freeze({ plinthR: 172, plinthH: 44, shaftR0: 112, shaftR1: 76, shaftTop: 940, band: 120, galleryR: 124, galleryTop: 988, crownR0: 72, crownR1: 54, crownTop: 1096, spireTop: 1360, finR: 208, finTop: 680, finThick: 12, door: 8 }),
   /** The tower's plaza of stone (TS5: wide enough round its plinth), Green Emperor Way's ring road, and the emperors' tombs
@@ -101,7 +99,7 @@ const IMPERIAL_MIX = Object.freeze({
   'Waterfront District': Object.freeze(['RESI', 'RESI', 'TVRN', 'PAWN', 'THIE', 'GENR']),
   'Arcane University': Object.freeze(['MAGE', 'LIBR', 'MAGE']),
 });
-/** TS5 (the owner: "with the outskirt locations being circular also"): how far from the city's centre pixel, Bay pixels, a
+/** TS5: how far from the city's centre pixel, Bay pixels, a
  *  town past the Bay is of its outskirts - laid round (world/townOutline.js ROUND_OUTLINE): the city's own seven, and
  *  as far again on every side. */
 const IMPERIAL_OUTSKIRTS = 2 * IMPERIAL_SPAN;

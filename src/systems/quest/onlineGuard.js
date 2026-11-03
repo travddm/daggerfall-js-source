@@ -1,7 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// GUARD-ONLINE (2026-09-26, Mac: "Guard the guild quest (mages guild) -
-// wait time for this should be alot shorter"; asked, the window "Starts
-// ~1 min after you arrive" and stands one game hour, online only).
+// GUARD-ONLINE.
 //
 // N0B10Y03 "Guard the Guild" watches the hall `daily from 00:00 to
 // 03:00` (its _S.02_), and pays only once that window has closed again
@@ -23,7 +21,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 /** questName -> the place the watch is kept at (the script's own Place symbol, without its underscores) and the
- *  window, in seconds of the quest's clock - TIME3: the character's own (bible/06-Systems/Online-Time-Arc.md 6.3a),
+ *  window, in seconds of the quest's clock - TIME3: the character's own (6.3a),
  *  which runs with the world while they stand watch: ten game minutes is fifty real seconds, an hour five minutes. */
 export const ONLINE_GUARD_WINDOWS = Object.freeze({
   N0B10Y03: Object.freeze({ place: 'magesguild', delaySeconds: 10 * 60, lengthSeconds: 60 * 60 }),

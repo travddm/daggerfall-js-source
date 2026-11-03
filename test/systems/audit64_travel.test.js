@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// AUDIT 64 - THE TRAVEL LANE (2026-09-08).
+// AUDIT 64 - THE TRAVEL LANE.
 //
 // Seven findings against the fast-travel / teleport arc, all of them
 // clauses DFU spells and the port did not:
@@ -217,9 +217,9 @@ test('AUDIT 64 F20: the arrival clamp\'s SECOND arm is the CAREER flag', () => {
   // The PRODUCER, at the one caller of arrivalClampMinutes: DFU's
   // disjunction, the same one the per-round burn spelled until VAMP-DAY
   // took its racial arm (passiveSpecials.js:"sinks?.hurt?.(SUN_DAMAGE_AMOUNT)" reads the career alone;
-  // the travel rules still read both). VAMP-HOOD (2026-09-29): the racial
+  // the travel rules still read both). VAMP-HOOD: the racial
   // arm is the flag under a bare head - vampirism.js racialSunAverse -
-  // and HOOD-CAREER (2026-10-07, PIN MOVED) the career's beside it too:
+  // and HOOD-CAREER (2026-10-07
   // passiveSpecials.js careerSunAverse, the bit under a bare head (a
   // bare entity carries no equip, so it reads the bit).
   assert.equal(careerSunAverse({ career }), true, 'bare-headed: the bit');
@@ -237,7 +237,7 @@ test('AUDIT 64 F21: the travel map door refuses a career sun-damaged class by da
   const career = sunCareer();
   assert.equal(racialFastTravelBlock({ career }, 12 * 60), null,
     'CheckFastTravel is the RACIAL rung and never reads the career');
-  // HOOD-CAREER (2026-10-07, PIN MOVED): the career rung is
+  // HOOD-CAREER (2026-10-07
   // vampirism.js careerFastTravelBlock, the racial rung's shape - DFU's
   // box by day, bare-headed, and the hood's way out after it.
   assert.deepEqual(careerFastTravelBlock({ career }, 12 * 60), { text: SUNLIGHT_TRAVEL_TEXT, hint: VAMPIRE_HOOD_TEXT }, 'noon: refused');
@@ -299,7 +299,7 @@ test('AUDIT 64 F24: the sunlightDamageFastTravelDay refusal is DFU\'s own line',
   // DFU's as `hint`, said after it - never in its place.
   assert.deepEqual(racialFastTravelBlock({ racialOverride: { sunDamage: true } }, 12 * 60),
     { text: SUNLIGHT_TRAVEL_TEXT, hint: VAMPIRE_HOOD_TEXT });
-  // HOOD-CAREER (PIN MOVED): the career box speaks it through its own
+  // HOOD-CAREER (
   // rung, careerFastTravelBlock, as the racial one does.
   assert.deepEqual(careerFastTravelBlock({ career: sunCareer() }, 12 * 60),
     { text: SUNLIGHT_TRAVEL_TEXT, hint: VAMPIRE_HOOD_TEXT }, 'and the career box shows the same constant');

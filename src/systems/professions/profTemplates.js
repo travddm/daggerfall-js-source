@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2 (2026-09-28, Mac: "Go") - THE NEW MATERIALS AS ITEMS: the ores
+// PROF2 - THE NEW MATERIALS AS ITEMS: the ores
 // (610-615), the ingots (620-630) and the stone (673-674) - and PROF4's
 // logs, planks, Charcoal, Resin and Heartwood (635-654) - registered as
 // custom templates in the professions' reserved range (PROF0 4.8, law
@@ -27,7 +27,7 @@
 // registration, so a shop's shelf and a pile never mint one - the Stores
 // are the one door (law 3).
 //
-// PROF7 (2026-09-29, Mac: "Do it"; Professions-Arc.md 29): THE HIDES,
+// PROF7: THE HIDES,
 // THE LEATHERS AND THE CLOTH (655-671) the same way - and THE SKINNING
 // KNIFE (603), the one row here a shop shelves: a tool the player buys,
 // as Foraging's six are, ONLINE ONLY (FORAGE0 14.2: nothing offline uses

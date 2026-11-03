@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-// L10N6 (2026-10-03): THE REVIEW FILE - how a person who reads a language fixes its machine draft without a code editor.
+// L10N6: THE REVIEW FILE - how a person who reads a language fixes its machine draft without a code editor.
 //
-// Mac's second decision (Localization-Arc.md): "fixes come in through a review file or PRs. A human pack always
-// outranks a draft." A pull request that edits `locales/<tag>/Port_Strings.csv` is one door (the pipeline already sees
+// A pull request that edits `locales/<tag>/Port_Strings.csv` is one door (the pipeline already sees
 // the edit and keeps the row the person's). This is the other: a language's rows exported as a spreadsheet - the key,
 // the English, the current translation, whose it is, and an empty `fix` column - and the filled sheet imported back.
 // Each fix is held to the pipeline's own placeholder law (tools/translate.mjs checkDraft: every `{argument}` the

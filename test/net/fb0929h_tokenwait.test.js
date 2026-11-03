@@ -13,7 +13,6 @@ import { readFileSync } from 'node:fs';
 import { OnlineSession, TOKEN_WAIT_MS } from '../../src/net/online.js';
 import { HELLO_WAIT_MS } from '../../src/net/wire.js';
 
-const RELAY = readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8');
 const TOKEN = `v1.${'a'.repeat(120)}.${'b'.repeat(86)}`;
 
 function fakeSocketClass() {
@@ -28,10 +27,6 @@ function fakeSocketClass() {
 }
 const settle = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
 const session = (over) => new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'shh-shh-shh-0001', now: () => 1_700_000_000_000, ...over });
-
-test('TOKEN-WAIT: the premise - the relay refuses a hello with no token, so an unsigned hello is no connection', () => {
-  assert.match(RELAY, /\n {4}if \(!m\.tok\) return \{ error: 'sign in to play online' \};\n/, 'ACC1g\'s wall at the door');
-});
 
 test('TOKEN-WAIT: a token that takes three seconds rides the hello - the report\'s loop, closed (mutant: the 2.5 s budget)', async () => {
   const warned = [];

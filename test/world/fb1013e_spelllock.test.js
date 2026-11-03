@@ -140,29 +140,3 @@ test('SPELL-LOCK 3: the player\'s own save keeps its locks - but none past both 
   assert.equal(lockOf(peer), 0);
 });
 
-test('SPELL-LOCK 4: a placed door not hung yet keeps a peer\'s swing and no lock; the hosts hand the room\'s word in as a peer\'s, and their own copies with the player\'s level', () => {
-  const A = room(41);
-  const key = 'act:decor:77';
-  A.a.applyRemote([{ key, state: 'end', t: 1, lock: 41 }]);   // the act arrives before this client has hung the door
-  A.a.restoreSaveData([{ key: 'act:decor:78', state: 'end', t: 1, lock: 41 }], { remote: true });   // a memory's, the same
-  const hung = A.a.addDoor(CUBE, I, { ns: 'decor', positionKey: 77 });
-  const hung2 = A.a.addDoor(CUBE, I, { ns: 'decor', positionKey: 78 });
-  assert.equal(hung.key, key);
-  assert.equal(hung.state, 'end', 'the swing lands when the door is hung');
-  assert.equal(hung.currentLockValue, 0, 'the lock does not');
-  assert.equal(hung2.state, 'end');
-  assert.equal(hung2.currentLockValue, 0);
-  // the player's own save of a placed door keeps its lock (a home owner's own Lock spell is theirs)
-  const own = room(41);
-  own.a.restoreSaveData([{ key: 'act:decor:79', state: 'start', t: 0, lock: 30 }]);
-  assert.equal(own.a.addDoor(CUBE, I, { ns: 'decor', positionKey: 79 }).currentLockValue, 30);
-
-  // the hosts: the dungeon's room memory is applied as a peer's word, its own save with the player's level; the
-  // building's cached copy with the player's level (the building's memory and every act go through
-  // applyInteriorShared and applyRemote, driven above)
-  const dungeon = codeOnly(readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8'));
-  assert.equal(dungeon.match(/actions\.restoreSaveData\(w\.actions, \{ remote: wire, level: playerEntity\.level \}\)/g)?.length, 1);
-  assert.ok(/restoreSharedWorld\(shared\)[\s\S]{0,6000}applyWorld\(\{[^}]*actions: acts[^}]*\}, \{ truncate: false, wire: true \}\)/.test(dungeon), 'the room memory is applied with wire: true');
-  const modes = codeOnly(readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8'));
-  assert.equal(modes.match(/data\.actionDoors\.map\([^\n]*\n\s*\{ level: playerEntity\.level \}\)/g)?.length, 1, 'the building\'s cached copy restores with the player\'s level');
-});

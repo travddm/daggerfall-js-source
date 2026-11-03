@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW-C1 (2026-10-24, bible/03-World/World-Wide.md WW-C) - THE PROVINCES' GROUND: what each province past the Bay is
+// WW-C1 - THE PROVINCES' GROUND: what each province past the Bay is
 // rich in.
 //
 // The owner: "Each region becomes home to their own abundant harvesting resources with other resources sprinkled in.

@@ -1,4 +1,4 @@
-// L10N3c (2026-09-27): A QUEST IN A TRANSLATION'S OWN WORDS. DFU keeps a translation's quest text in a "-LOC" file
+// L10N3c: A QUEST IN A TRANSLATION'S OWN WORDS. DFU keeps a translation's quest text in a "-LOC" file
 // beside the quest's own - `S0000977-LOC.txt`, the quest's header and its QRC messages, no logic - and reads it three
 // times:
 //   - ParseQuest (QuestMachine.cs:670-687): ParseLocalizedQuestText (:1648-1730) parses the -LOC file with the cut-down

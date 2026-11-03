@@ -1,7 +1,7 @@
 // @ts-check
-// WB6b (2026-09-25, Mac: "the arena needs to be an oblivion masterpiece ... Whole thing needs to feel alive"): THE LAND
+// WB6b: THE LAND
 // OUT IN THE FIRE - what stands between the court and the Deadlands' painted horizon, so the world has a middle
-// distance and the eye has parallax. Design: bible/11-Multiplayer/World-Bosses.md section 4 ("The Deadlands").
+// distance and the eye has parallax. Design: ("The Deadlands").
 //
 // THE ISLANDS: rock rising out of the sea of fire in a ring round the court, ISLAND_NEAR to ISLAND_FAR out - a jagged
 // mound and a cluster of black spires leaning out of it, the tallest standing well over the court's floor, the fog

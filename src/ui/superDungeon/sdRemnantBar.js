@@ -1,5 +1,5 @@
 // @ts-check
-// SD8c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT'S BAR -
+// SD8c: THE BRASS REMNANT'S BAR -
 // the gate's boss bar (ui/gate/gateBossBar.js drawGateBossBar: one readout, one node, updated never rebuilt) in the Hour's
 // brass, its model made here from the fight as the page holds it (net/superDungeon/sdFightLink.js). Its name over the phase it fights
 // in, its health with the two turns cut in it (70% and 35% - the marks follow the model), the ward while it cannot be

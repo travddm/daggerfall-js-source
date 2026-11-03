@@ -8,7 +8,7 @@
 // arms, which had stood open since E1 and are answered here: the two
 // readers below are wired into the enchant ctx at world.js:"V2c filled inSunlight/inHolyPlace"
 // off the host seam that worldModes.js:"now: () => Math.floor(skyMinutes())" and dungeonContext.js:"const _prevPassiveHost"
-// register (bible/01-Overview/Port-Ledger.md:882 strikes the pair
+// register (:881 strikes the pair
 // through as closed, V2c 2026-08-27).
 //
 // THE TWO FLAGS ARE SMALL LAWS, verbatim:
@@ -37,7 +37,7 @@
 
 import { isDayFromMinutes } from './gameDate.js';
 import { SPECIAL_ABILITY_BITS, REGENERATION_FLAGS } from './specialAdvantages.js';
-import { onlineMpOf } from './renownLayer.js';   // AUDIT RENOWN1 GAME-5: the magery's third is of Daggerfall's own maximum, never the online layer (EG15: nor the folds' magicka)
+import { onlineMpOf } from './renownLayer.js';   // AUDIT RENOWN1 GAME-5: the magery's third is of Daggerfall's own maximum, never the online layer (nor the folds' magicka)
 import { regenShare } from './courtRules.js';   // WBX6 / EVENT-RULES: a made level holds regeneration
 import { cloakState } from './survival/temperature.js';   // HOOD-CAREER: the ONE "is the hood up" - the felt temperature's, never a second list
 
@@ -83,8 +83,7 @@ export const playerInHolyPlace = () => !!(_host?.isHolyPlace?.() ?? false);
 // ── THE CAREER READS (the CFG bitfields the port's careers carry) ─
 const bitfield = (career) => career?.abilityFlagsAndSpellPointsBitfield ?? 0;
 export const careerSunDamage = (career) => !!(bitfield(career) & SPECIAL_ABILITY_BITS.sunDamage);
-/** HOOD-CAREER (2026-10-07, Mac: "Wearing a hood should protect you from the disadvantage of being damaged by
- *  sunlight"): whether the sun reaches the career's Damage from Sunlight - its CFG bit, UNLESS the wearer's hood is
+/** HOOD-CAREER: whether the sun reaches the career's Damage from Sunlight - its CFG bit, UNLESS the wearer's hood is
  *  up (survival/temperature.js cloakState, the one hood law VAMP-HOOD's racial arm reads: vampirism.js
  *  racialSunAverse). THE PORT'S DEPARTURE from DFU, which reads the bit bare: every rule the bit keys asks this -
  *  the burn below, the travel map's door and the arrival clamp (world.js). A hood in the pack shields nothing. */
@@ -164,7 +163,7 @@ export function passiveSpecialsMagicRound(entity, { nowMinutes = 0, clockMinutes
   // thirds of itself online, and a save (offlineVitals, which takes off the whole layer) came back at about 6% of the
   // magicka it had. Taken off here by subtraction, and safely: with the modifier zeroed the accessor's floor cannot
   // bite (the spell points are never below 0), so what it answers is exactly the raw value plus the layer.
-  const raw = Math.max(0, (entity.maxMagicka ?? 0) - onlineMpOf(entity));   // EG15: Renown's and the folds' (the Battlemage's Bearing) - both above the floor
+  const raw = Math.max(0, (entity.maxMagicka ?? 0) - onlineMpOf(entity));   // Renown's and the folds' - both above the floor
   entity.maxMagickaModifier = _mod;
   const dark = !isDay || (_host?.isInside?.() ?? false);
   if (dark) {

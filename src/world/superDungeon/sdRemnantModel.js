@@ -1,5 +1,5 @@
 // @ts-check
-// SD8c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT, MADE -
+// SD8c: THE BRASS REMNANT, MADE -
 // what the Warp kept of the Numidium, and its Echoes, and the Reset's Hearts: meshes in their OWN frames (feet at the
 // origin, facing +z, y up - a facing of 0 is +z, as net/superDungeon/sdRemnant.js's `yw` is), stood on the page by a matrix
 // (remnantMatrix) at each body's place, facing and size. Pure: the scene (scenes/superDungeon/sdRemnant.js) uploads and stands them.

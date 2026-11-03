@@ -76,7 +76,7 @@ export function expandGuildMacros(text, { amount = null, gold = null, god = null
     // U40: MacroHelper.cs:69 `{ "%cpn", ShopName }` - the CURRENT
     // SHOP's name, which the trade records quote back at the player.
     cpn: shopName,
-    // MACROS1 (2026-09-20, kurkku on Discord: "%fon always has room for a skillful knight..."): MacroHelper.cs
+    // MACROS1: MacroHelper.cs
     // `{ "%fon", FactionOrderName }` and `{ "%kno", FactionOrderName }` - the guild's own faction name off
     // FACTION.TXT, which the knightly orders' invitation (and every guild record with the guild's name in it) quotes.
     // DFU's GuildServicePopupWindow hands ITSELF to MacroHelper for every box it shows; the port's join flow handed
@@ -278,7 +278,7 @@ export function cureDiseaseOffer(entity, guild, membership, {
     mercantile: skillValue(entity, SKILLS.Mercantile),
     personality: entity.stats?.personality == null ? 50 : liveStat(entity, 'personality'),
   }, false);
-  // ESSENTIALS-HALF (2026-09-30, Discord: "cut the cost of most essential items by half"): online the cure costs half
+  // ESSENTIALS-HALF: online the cure costs half
   // (shopStock.js essentialPrice). The priest's haggle line still reads the haggle itself, not the half.
   const cost = essentialPrice(haggled, { online });
   return {

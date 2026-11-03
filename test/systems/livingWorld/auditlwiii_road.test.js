@@ -1,4 +1,4 @@
-// AUDIT LW-III (bible/01-Overview/audits/Audit-LivingWorld-III.md): THE ROAD'S TIMELINE AND THE TRADERS' READ - a party halted
+// AUDIT LW-III: THE ROAD'S TIMELINE AND THE TRADERS' READ - a party halted
 // across nightfall walks on to its night's stop from where it stood, never as far on as the halt's minutes would have
 // walked it (trips.js partyAt's `walked`, `held`); a town's patron sales read on its town index's hour, never the whole
 // kept history (market.js patronsTold). Pure, synthetic and the account service's own schema: no game data.

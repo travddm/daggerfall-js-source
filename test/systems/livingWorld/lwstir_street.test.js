@@ -1,6 +1,4 @@
-// LW-STIR (2026-10-08, bible/06-Systems/Living-World.md "LW-STIR"; Mac: "I say we improve the living world and go deeper.
-// Having spontaneous interactions, like a traveller being hostile with a guard and other smaller details that make the
-// world feel more alive"): THE STREET STIRS. The street's people only ever stood alone or talked in circles: the watch
+// LW-STIR: THE STREET STIRS. The street's people only ever stood alone or talked in circles: the watch
 // never spoke to a stranger, nobody fell out, nobody haggled, and the street had no voice of its own. Now the watch at a
 // gate questions a stranger come in by it (halted there by the plans: stir.js gateHalt, dayPlan.js `gate`) and on its
 // rounds stops one standing where it stops, the stranger answering by their humour - civil, curt or hostile; two of the

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OWS2 - THE JOURNEY'S HAND ON THE HELM (bible/06-Systems/Travel-View.md,
+// OWS2 - THE JOURNEY'S HAND ON THE HELM (,
 // "OWS - the sea"). The player's ask: "You should transition to your boat
 // if traveling across water then back onto land when hitting land".
 //
@@ -34,7 +34,6 @@
 //     boat beats up on a tack, `noGo` off the eye, and goes about when
 //     the mark's bearing has swung `laneDeg` past the eye to the other
 //     side, so it zig-zags up a lane about the wind's line - SAIL-FREE
-//     (2026-10-05, Mac's "No tacking, Black Flag"; systems/helmWay.js):
 //     under the responsive helm (`free`) she makes the most of her way
 //     sailing straight for it, so there is no cone and no tack;
 //   - land close ahead turns the boat to the freer side (the host's
@@ -79,7 +78,7 @@ export const SEA_HELM = Object.freeze({
   rowInM: 120,
   /** Land this near ahead on a leg that does not land there (m): the oars, and the rudder to the freer side. */
   avoidM: 120,
-  /** AUDIT SHIPS A2 (2026-10-06): ...or as near as the way she makes in this long (s), if nearer than her reach: at
+  /** AUDIT SHIPS A2: ...or as near as the way she makes in this long (s), if nearer than her reach: at
    *  SAIL-FREE's 16 m/s a galleon struck 120 m off an islet coasted onto it under oars (seaHelmReach). */
   avoidS: 13,
   /** The heading more than this off the course (degrees): the oars turn the boat onto it, the sails wait. */

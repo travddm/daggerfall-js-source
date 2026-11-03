@@ -1,4 +1,4 @@
-// WD2 (2026-09-25): A MOD'S SPRITE THAT IS A CLASSIC RECORD, OR ONE WITH
+// WD2: A MOD'S SPRITE THAT IS A CLASSIC RECORD, OR ONE WITH
 // THE AUTHOR'S EDITS ON IT - REBUILT FROM THE PLAYER'S OWN ART.
 //
 // Detailed Ships (Cliffworms) ships thirteen pictures under two archives
@@ -110,7 +110,7 @@ export function deriveSpec(from, picture, src, at = [0, 0]) {
 }
 
 /**
- * CSA-A (2026-09-27): A PICTURE THAT IS A CLASSIC RECORD TILED UNDER THE
+ * CSA-A: A PICTURE THAT IS A CLASSIC RECORD TILED UNDER THE
  * AUTHOR'S PAINT. Come Sail Away's thirty-two wave frames (archive 112395,
  * record 2, 640x640) are the author's wave shapes and dark troughs laid over
  * Daggerfall's own snow, TEXTURE.303 record 1, repeated across the frame:

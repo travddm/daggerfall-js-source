@@ -1,5 +1,5 @@
 // @ts-check
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57): THE MASTER'S WORK, IN A STATION'S CRAFT BOX.
+// MASTER-ART: THE MASTER'S WORK, IN A STATION'S CRAFT BOX.
 // At Master in the recipe's craft: the three lines to choose (native selects - a keyboard's and a touch's), the
 // catalysts held and asked, the day's bound, and the last work's card. The service decides (masterWork.js); this asks
 // through the station's own craft door, so the fee, the chain and the kept act are a craft's.

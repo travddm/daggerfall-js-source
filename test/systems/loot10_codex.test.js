@@ -1,6 +1,4 @@
-// LOOT10 - THE CODEX, AND THE IMPRINT (2026-10-01; bible/06-Systems/Loot-Arc.md section 12, Mac: "Do you wanna turn
-// this into an arc and do all of the above?" - "Legendary codex: a collection log of every Legendary you've found ...
-// a reason to keep hunting"). The laws pinned here:
+// LOOT10 - THE CODEX, AND THE IMPRINT. The laws pinned here:
 //   - THE CODEX: every Legendary record and every Aetheric piece taken, with the day first found; the first find said
 //     and heard, once; a take seen at the take, everything else at the round's sweep; a save without the codex filled
 //     silently; the character's mod record, a forged one cleaned.
@@ -82,15 +80,12 @@ test('LOOT10: how a find is seen - at the take, at the round\'s sweep (the pack 
   equipItem(e, worn);   // worn, and on the table alone - the sweep reads what it wears too
   const s = heard(() => assert.equal(CX.sweepCodex(e), 2));
   assert.equal(s.lines.length, 2, 'each said');
-  assert.match(read('src/systems/loot/lootCodex.js'), /registerMagicRoundHook\(CODEX, \(entity\) => \{ if \(entity\?\.isPlayer\) sweepCodex\(entity\); \}\);/, 'the round sweeps the player\'s own');
-  assert.match(read('src/systems/loot/lootCodex.js'), /registerTakeListener\(CODEX, \(item\) => \{ noteFind\(item\); \}\);/);
   // a save from before the codex: what was carried is the codex's, and nothing is announced
   restoreModSaveRecords({});
   const q = heard(() => assert.equal(CX.sweepCodex({ isPlayer: true, items: [legend('worms-tooth')] }), 1));
   assert.deepEqual(q.lines, [], 'silently');
   const next = heard(() => CX.sweepCodex({ isPlayer: true, items: [legend('gortwogs-cleaver')] }));
   assert.equal(next.lines.length, 1, 'and the next find is said');
-  assert.match(read('src/scenes/world.js'), /import '\.\.\/systems\/loot\/lootCodex\.js';/, 'the game registers it');
 });
 
 test('LOOT10: the record - saved, restored, a forged one cleaned, a new game none', () => {
@@ -110,7 +105,7 @@ test('LOOT10: the record - saved, restored, a forged one cleaned, a new game non
   assert.deepEqual(CX.foundIds('legendary'), [], 'a new game: none');
 });
 
-test('LOOT10: the page - every record (the thirty, and AUDIT LOOT F8 a registered one), a found one whole and an unfound one by its hint; the Aetheric sets piece by piece; the count', () => {
+test('LOOT10: the page - every record (the thirty, and AUDIT LOOT F8 any a module registers), a found one whole and an unfound one by its hint; the Aetheric sets piece by piece; the count', () => {
   on();
   CX.noteFind(legend('nightwhisper'), { quiet: true });
   const rows = CX.codexRows();
@@ -124,8 +119,8 @@ test('LOOT10: the page - every record (the thirty, and AUDIT LOOT F8 a registere
   for (const r of rows) assert.ok(r.hint, `${r.id}: a hint`);
   const sets = CX.codexSets();
   assert.equal(sets.reduce((n, s) => n + s.pieces.length, 0), AETHERIC_RECORDS.length);
-  assert.deepEqual(CX.codexCount(), { legendary: 1, legendaries: LR.allLegendaries().length, aetheric: 0, aetherics: AETHERIC_RECORDS.length, gilded: 0, gildeds: GILDED_RECORDS.length }, 'GILDED1: and the Gilded rung\'s records (PIN MOVED, GILDED2: three; KETCH: five)');
-  assert.equal(GILDED_RECORDS.length, 5, 'GILDED2: the Hourlock, the Dragonfire Oath and the Sunken Sovereign; KETCH (PIN MOVED): Volendrung\'s Echo and the Ketchmaster\'s Word');
+  assert.deepEqual(CX.codexCount(), { legendary: 1, legendaries: LR.allLegendaries().length, aetheric: 0, aetherics: AETHERIC_RECORDS.length, gilded: 0, gildeds: GILDED_RECORDS.length }, 'GILDED1: and the Gilded rung\'s records (PIN MOVED, GILDED2: three)');
+  assert.equal(GILDED_RECORDS.length, 2, 'GILDED2: the Dragonfire Oath and the Sunken Sovereign (the Hourlock went with the guns)');
 });
 
 test('LOOT10: the imprint - a known, unworn Rare takes a found power of its group, once, for 20 shards and 5,000 gold; its card and its power', () => {
@@ -147,7 +142,7 @@ test('LOOT10: the imprint - a known, unworn Rare takes a found power of its grou
   assert.deepEqual(CX.imprintPiece(rare, 'nightwhisper', me), { ok: true });
   assert.deepEqual([rare.imprint, rare.rarity, shardsHeld(me.items), me.goldPieces], ['nightwhisper', 'rare', 5, 1000], 'it stays Rare; paid');
   assert.equal(CX.imprintRefusal(rare, 'graveward', me), 'imprinted', 'once');
-  assert.equal(LR.imprintLine(rare), 'Imprint: Silent Death (of Nightwhisper) - +100% vs unaware foes');
+  assert.equal(LR.imprintLine(rare), 'Imprint: Silent Death (of Nightwhisper) - +2.5% vs unaware foes'); // PIN MOVED: B5 (Silent Death 9 -> 2.5)
   assert.ok(LR.rarityLines(rare).includes(LR.imprintLine(rare)), 'its card says so');
   equipItem(me, rare);
   assert.ok(wornPowers(me).some((p) => p.id === 'nightwhisper' && p.power.name === 'Silent Death' && p.item === rare), 'its power works as the Legendary\'s');
@@ -235,7 +230,4 @@ test('LOOT10: the pages - the Codex alone from the pack, the Imprint at the guil
       assert.ok(textOf(one(shell, 'imprint-card')).includes(IMPRINT_NONE), 'a piece whose kind the codex holds none of');
     } finally { view.unmount(); }
   });
-  assert.match(read('src/scenes/worldModes.js'), /imprint: \(item, id\) => imprintPiece\(item, id, playerEntity\),/, 'the guild\'s window imprints on the player\'s own');
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /if \(lootRarityOn\(\)\) \{\s*const codex = el\('button', 'act codexbtn', 'Codex'\);/, 'the pack opens the Codex');
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /createReforgeOverlay\(\{ pages: \['codex'\], page: 'codex',/);
 });

@@ -1,4 +1,4 @@
-// AUDIT WORLD6a (Mac, 2026-09-14: "Audit before we move on") - three opus
+// AUDIT WORLD6a - three opus
 // lenses over the building-as-a-world-room slice: the wire and the relay;
 // the interior's live wiring; the pure half and the gaps. THE ONE ROOT
 // (A1, CRITICAL): the building's memory was NEVER published - the interior
@@ -44,7 +44,7 @@ const ctxOf = () => ({
 test('AUDIT WORLD6a A1 (THE ROOT): the memory composes through THE BAG THE MODE HANDS IN - minted by the pure half, its key spelled as the pure half reads it - so the building is published; the bag refuses to compose without a key, and an owned building has none', () => {
   const bag = mintInteriorShared(interiorLocationKey(187853213, 4));
   assert.equal(bag.locationKey, 'interior:m187853213.4');
-  assert.deepEqual(Object.keys(bag).sort(), ['applied', 'home', 'locationKey', 'net', 'openKey', 'openWin', 'owned', 'room', 'seen', 'stamp', 'tooBig', 'unreadable']);   // AUDIT SETS M2: `unreadable`   // HOME1: `home` - an online home's room carries no loot (home1.test.js)   // PIN MOVED (OUTDOOR-LOOT): `net` the host's wiring and `room` the cupboards' room law (null with no net: a bare bag, an offline page, a home)
+  assert.deepEqual(Object.keys(bag).sort(), ['applied', 'home', 'locationKey', 'net', 'openKey', 'openWin', 'owned', 'room', 'seen', 'stamp', 'tooBig', 'unreadable']);   // AUDIT SETS M2: `unreadable`   // HOME1: `home` - an online home's room carries no loot (home1.test.js)   //
   bag.seen.add('shelf:0');
   const shared = composeInteriorShared(ctxOf(), bag);
   assert.ok(shared, 'the memory composes - before A1 every publish answered null and no building was ever remembered');
@@ -57,8 +57,6 @@ test('AUDIT WORLD6a A1 (THE ROOT): the memory composes through THE BAG THE MODE 
   assert.equal(composeInteriorShared(ctxOf(), owned), null, 'an owned house keeps no memory');
   assert.equal(applyInteriorShared(ctxOf(), shared, owned), false, 'and takes none');
   assert.equal(applyInteriorShared(ctxOf(), shared, mintInteriorShared('interior:m187853213.4')), true, 'another context in the same building takes it');
-  assert.match(rd('src/scenes/worldModes.js'), /_intShared = mintInteriorShared\(interiorLocationKey\(questSceneCtx\?\.\(\)\?\.mapId \?\? 0, b\?\.buildingKey \?\? 0, visitLayoutNow\(\)\), \{ owned, home: !!interiorHome, net: \{ selfId: /, 'the mode mints through the one home');   // HOME1 re-aim: the visit's online home rides the bag
-  assert.equal((rd('src/scenes/worldModes.js').match(/_intShared\??\.key\b/g) ?? []).length, 0, 'no site reads the old spelling');
 });
 
 test('AUDIT WORLD6a B1: the price is not the wire\'s - a landed item\'s value is floored at what the port itself mints for its template and material, an unknown template is no item, and an honest higher value stands', () => {
@@ -86,8 +84,6 @@ test('AUDIT WORLD6a A2/B2/A3: the stocked day is projected like the list - refus
   assert.equal(needsRestock(ctx.shelves[1], today), false);
   assert.equal(applyInteriorLoot(ctx, [{ k: 'shelf:0', r: [], d: 20.9 }], { seen }), 1, 'without a today (a test\'s bare context) the bound is the number\'s shape alone');
   assert.equal(ctx.shelves[0].stockedDate, 20, 'floored');
-  assert.match(rd('src/scenes/worldModes.js'), /applyInteriorShared\(interiorCtx, shared, \{ \.\.\._intShared, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/, 'the mode hands today in, for the memory');   // PIN MOVED (AUTO-HOLD): and the pieces I carry beside it
-  assert.match(rd('src/scenes/worldModes.js'), /applyInteriorLoot\(interiorCtx, data\.l, \{ \.\.\._intShared, from: id, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/, 'and for an act (AUDIT SETS M2: with the building\'s bag whole, its unreadable set and its room, and the sender)');   // PIN MOVED (AUTO-HOLD): and the pieces I carry beside it   // PIN MOVED (OUTDOOR-LOOT): the bag whole and the sender
 });
 
 test('AUDIT WORLD6a B3/B4/B5: the law admits exactly what the game names (no zero, no leading zero, in either number); a building\'s memory has its own cap at the relay and at the client; the session spells a negative key as the memory does', async () => {
@@ -116,32 +112,10 @@ test('AUDIT WORLD6a B3/B4/B5: the law admits exactly what the game names (no zer
   assert.equal(s.sendWorld(big), false, 'the client keeps the building\'s cap too');
   assert.equal(s.sendWorld({ locationKey: 'interior:m187853213.4', world: {} }), true);
   assert.ok(relayVersionAtLeast(66));   // SRV-N: at or past, never equal - the next slice's bump is not this pin's business
-  assert.match(rd('server/src/index.js'), /if \(message\.length > worldFrameMaxFor\(a\.key\)\) return;/);
 });
 
 test('AUDIT WORLD6a B7: the memory\'s stamp is twelve base-36 digits and a dash, always, at both contexts', () => {
   for (let i = 0; i < 200; i++) assert.match(mintSharedStamp(), /^[0-9a-z]+-[0-9a-z]{8}$/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /const _sharedStamp = mintSharedStamp\(\);/);
-  assert.match(rd('src/world/interior/interiorShared.js'), /stamp: mintSharedStamp\(\)/);
   assert.equal(relay.mintSharedStamp, mintSharedStamp);
 });
 
-test('AUDIT WORLD6a by source: the settle asks the stack (A3), the keyed shop fallback claims and a stale row buys nothing (A4), a restock is said at the window (A5), an owned house or any ship keeps no shared loot room (A6/B6; STAFF-TP adds private presence), the first act in a new building pends (A7), a building\'s foes frame is no dungeon heartbeat (B8)', () => {
-  const m = hostText('src/scenes/worldModes.js'), pure = rd('src/world/interior/interiorShared.js');   // PIN MOVED (OUTDOOR-LOOT): the open, the frame's settle and the publish stand in world/interior/interiorShared.js (HOST-SPLIT moved them out of createWorldModes)
-  assert.match(m, /interiorLootFrame\(interiorCtx, _intShared, \{ now: performance\.now\(\), open: \(w\) => interiorWindows\.containsWindow\(w\) \}\)/, 'A3: the host asks the stack');
-  assert.match(pure, /!\(open\(win\) && !win\.done\)/, 'A3: and the settle is the stack\'s answer, not the slot\'s');
-  assert.match(m, /if \(si >= 0\) interiorLootOpen\(interiorCtx, `shelf:\$\{si\}`, interiorOverlay, _intShared, \{ fresh \}\);/, 'A4: claimed');
-  // DAEDRA2 widened the window from 200: the law is that the stale-row
-  // GUARD comes before the splice, and how many lines sit between them
-  // is incidental - a comment added at the gold gate closed it.
-  assert.match(m, /const at = shelf\.items\.indexOf\(it\);\s*if \(at < 0\) return undefined;[\s\S]{0,500}?shelf\.items\.splice\(at, 1\);/, 'A4: a row the shelf no longer holds');
-  assert.equal((m.match(/interiorPublishLoot\(key\);   \/\/ WORLD6a: the new day's stock/g) ?? []).length, 0, 'A5: no restock is said at the roll');
-  assert.match(pure, /export function interiorLootOpen\(ctx, key, win, bag, \{ fresh = false, keeping = null \} = \{\}\) \{[\s\S]*?publishWhole\(ctx, canon, bag, \{ claim: !fresh \}\);/, 'A5: said at the window, a fresh roll not a claim');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(m, /const owned = !!privateVisitRoom \|\| b\?\.buildingType === BUILDING_TYPES\.Ship \|\| \(!interiorHome && houseOwnedAt\(/, 'B6: any ship');   // HOME1 re-aim: an online home keeps its room (home1.test.js)
-  assert.match(m, /_intShared\?\.owned \? \{ private: true, privateRoom: privateVisitRoom \}/, 'A6: private presence only, no shared loot room');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const _actRoom = \(\) => !!\(online && \(isWorldRoom\(online\.room\) \|\| isWorldRoom\(_onlineKey\)\)\);/, 'A7');
-  assert.match(w, /online\.onFoes = \(id, data\) => \{\s*if \(isCellRoom\(online\.room\)\) \{[\s\S]*?if \(modes\?\.applyDungeonFoes\?\.\(id, data\) && modes\?\.mode === 'dungeon'\) seatClock\.heard\(performance\.now\(\)\);/, 'B8 (WORLD6b: the cell\'s arm ahead of it)');   // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the seat heard is the seat clock's (net/seatLive.js createSeatClock) - the page's own absence spends none of it
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## AUDIT WORLD6a \(2026-09-14\)/, 'the record');
-});

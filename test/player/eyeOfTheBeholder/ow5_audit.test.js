@@ -1,6 +1,5 @@
-// AUDIT OW5 (2026-09-29, Mac: "Before we merge. Can we do a comprehensive audit on the overworld, just want to make sure
-// it's perfect.") - the Overworld audited again before the merge, seven lenses, each finding verified before it was
-// fixed (bible/06-Systems/Travel-View.md, AUDIT OW5). Pinned here, each on the host's own source where it can be run:
+// AUDIT OW5 - the Overworld audited again before the merge, seven lenses, each finding verified before it was
+// fixed (, AUDIT OW5). Pinned here, each on the host's own source where it can be run:
 // the find's own uncapped list (D1), the raiders held under a window (R1), the ocean stop stood down for the crossing
 // alone (S1), a jump stopping a route's walk (J2), the Overworld's lines held at the clock's scale (G2), a lock granted
 // after the cursor was freed let go (V1), the head's activation keys never pressed from under the view (V2), and a door's
@@ -13,13 +12,11 @@ import { nearDungeons, dungeonToFind, dungeonApproach, pixelBox, NATIVE_PER_M, T
 import { chaseStep as raiderChaseStep, RAIDER_CONTACT_M, RAIDER_CONTACT_PLAY_M, NATIVE_PIXEL as RAID_NATIVE_PIXEL } from '../../../src/systems/seaRaiders.js';
 import { AUTO_TOGGLE } from '../../../src/player/eyeOfTheBeholder/eotbBillboard.js';
 import { planRoute, routeLegs, crossesWater } from '../../../src/systems/travel/travelRoute.js';
-import { planJourney } from '../../../src/systems/travel/planSlices.js';   // PIN MOVED (PLAN-SLICES): the walk runs through the slicer
-import { tvMooredDry } from '../../../src/systems/travel/seaAsk.js';   // PIN MOVED (PLAN-SLICES): out of the host
+import { planJourney } from '../../../src/systems/travel/planSlices.js';
+import { tvMooredDry } from '../../../src/systems/travel/seaAsk.js';
 
 const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-// PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
 const TVM = readFileSync(new URL('../../../src/scenes/travelViewMarks.js', import.meta.url), 'utf8');
-// PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): the Overworld's dungeon rows and their stand left world.js for
 // scenes/travelViewDungeonsHost.js (its live `let`s read through `host`)
 const TVD = readFileSync(new URL('../../../src/scenes/travelViewDungeonsHost.js', import.meta.url), 'utf8');
 
@@ -54,7 +51,6 @@ test('AUDIT OW5 D1: the find asks every unfound dungeon in reach - a dozen found
     locationWorldRect: (l, x, y) => ({ minX: x * 32768, maxX: x * 32768 + 4096, minZ: y * 32768, maxZ: y * 32768 + 4096 }),
   };
   // ETHER-OW: the lists' rows and their stand (world.js tvDungeonRowsAt, tvDungeonAt), lifted beside it - the sea off here
-  // PIN MOVED (TVD-WORLD, 2026-10-27): the rows, their stand and the found test run through to tvDungeonFound (the lairs past the
   // Bay with them - none here: `tvLairs` null), and the find keys on their gen
   const rowsOf = /\n {2}(const tvDungeonRowsAt = \(at, range = TV_FAR_RANGE\) => \{\n[\s\S]*?\n {2}const tvDungeonFound = [^\n]*;)\n/.exec(TVD);
   assert.ok(rowsOf, 'the rows lifted');
@@ -206,7 +202,7 @@ test('AUDIT OW5 V3: a door\'s POV row that DECIDES (armed, first or third person
 });
 
 test('AUDIT OW5 P6: my party on the Overworld wherever they are - from the party\'s own poses, as the held map draws them - never twice (a member already marked by a body or the region\'s mark stands as that)', () => {
-  const m = /\n( {4}for \(const m of host\.social\?\.others\(\) \?\? \[\]\) \{\n[\s\S]*?\n {4}\}\n)/.exec(TVM);   // PIN MOVED (HOST-SPLIT 1)
+  const m = /\n( {4}for \(const m of host\.social\?\.others\(\) \?\? \[\]\) \{\n[\s\S]*?\n {4}\}\n)/.exec(TVM);
   assert.ok(m, 'the party\'s block');
   const marks = [];
   const env = {
@@ -263,7 +259,7 @@ function walkRig({ sea = () => false, means = null } = {}) {
     tvSeaMeans: () => means, dryLine: (a, b, w) => !w(b.x, b.y) && !w(a.x, a.y), tvSeaAsk: (m, goal) => (m ? { start: m.start, again: m.again, goal } : null),
     tvSeaBegin: (m, kinds) => armed.push([m?.how ?? null, crossesWater(kinds)]), tvSeaNoWay: () => said.push('no way'), crossesWater,
     travelPathUsesRoads: () => true, TRAVEL_PATH_TEXT: { fellBack: 'fell back' },   // OW-PATH: the Roads mode, the default
-    planJourney, tvMooredDry,   // PIN MOVED (PLAN-SLICES): the walk's runner, and the moored law out of the host (systems/travel/seaAsk.js)
+    planJourney, tvMooredDry,
   };
   const host = mount(env, `${fnSource('travelViewWalkTo')}\nreturn travelViewWalkTo;`);
   return { walkTo: host, begun, armed, said };

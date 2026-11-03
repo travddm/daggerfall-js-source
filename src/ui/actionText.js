@@ -7,7 +7,7 @@
 // frame, so ShowText draws as the REAL classic popup - SPOP.RCI's
 // nine-slice with the verbatim sizing law; the flat panel below is
 // its art-less fallback. ShowTextWithInput is the exception, and
-// AUDIT-CM (2026-09-21) found the first cut drawing it wrong: DFU
+// AUDIT-CM found the first cut drawing it wrong: DFU
 // builds that box with useParchmentBackGround = false and
 // showAtTopOfScreen = true (DaggerfallAction.cs:566), so it is bare
 // text at the TOP of the screen, no frame. The overlay seam holds the

@@ -1,10 +1,9 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// NOTICE1 (2026-09-28) - THE NOTICE BOARD'S SERVICE: a town's notes, who
+// NOTICE1 - THE NOTICE BOARD'S SERVICE: a town's notes, who
 // may pin one, and the server's notices.
 //
-// Mac: "The new notice board should be a physical object that houses
-// quests, the player auction house, etc" (bible/06-Systems/
+// (bible/06-Systems/
 // Professions-Arc.md 10, PROF0). What a note is - its words, its days,
 // its button, every bound - is src/net/boardLaw.js, which the client's
 // window reads too; this file is who may do what with one.
@@ -32,8 +31,8 @@
 // author until a moderator either removes it (the row goes) or restores
 // it (reports no longer hide it). Its author still sees it, marked, and
 // may take it down (AUDIT 28 N2: hidden from them too, it held one of
-// their places for up to a week with nothing to take down). Moderators - MODERATOR_HANDLES
-// and DEVELOPER_HANDLES, titles.js canModerate - see hidden notes, with
+// their places for up to a week with nothing to take down). Moderators - the Moderator role
+// and Admins, titles.js canModerate - see hidden notes, with
 // their count, and may remove any note. The developers post the server's
 // notices (the red seal), on every board.
 //
@@ -41,10 +40,7 @@
 // ═════════════════════════════════════════════════════════════════════
 import { mintId, accountKind, displayName, isMuted, overRate } from './accounts.js';
 import { isDeveloper, canModerate, titleWorn, glyphsShown, SPROUT_S } from './titles.js';
-import { withIliacHonoursAll } from './iliac.js';   // CARDS10: and Iliac Hand's season #1's title
-import { withGambitHonoursAll } from './gambit.js';   // KG6: and The King's Gambit's GRANDMASTER
 import { withArenaHonoursAll } from './arena.js';   // AUDIT PRE-MERGE 1003 S8: the arena's honours on an author's badge
-import { withEgHonoursAll } from './egHonours.js';   // EG-E2: and the Spire Champions
 import { withMasteryMarksAll } from './hunts.js';   // AUDIT HORIZONTAL F5: and the Marks of Mastery
 import { guildActorOf } from './guilds.js';
 import { heraldryOfRow } from './halls.js';   // GUILD1e: a recruitment note's guild's banner
@@ -65,7 +61,7 @@ export function boardOpenFor(player, env) {
 const badgeOf = (row, env, nowS) => (row ? { title: titleWorn(row, env) ?? null, glyphs: glyphsShown(row, env, nowS) } : { title: null, glyphs: [] });
 
 /** The expired rows, gone (PROF0 20: "notes deleted on expiry") - `limit` of each table at once, answering how many went.
- *  SCALE4b (2026-10-08): THE SERVICE'S CLOCK'S, never a read's - every board read swept first, two writes on the
+ *  SCALE4b: THE SERVICE'S CLOCK'S, never a read's - every board read swept first, two writes on the
  *  busiest read the board has, and every reader racing every other to run them; server-account/src/cron.js runs it each
  *  hour. Nothing a read answers waits on it: every read of a note or a notice asks `expires_at > now` itself. */
 export async function sweepBoard(db, nowS, limit = 200) {
@@ -89,7 +85,7 @@ function noteView(n, row, env, nowS, { mine = false, mod = false, reports = 0 } 
     // by name (scenes/world.js answerNote); an account id is what every chat line already carries
     id: n.id, from: n.author_name, by: n.author, ...badgeOf(row, env, nowS), subject: maskText(n.subject), body: maskText(n.body),
     // a recruitment note whose guild is gone - or whose author can no longer invite to it - keeps its words and loses
-    // its button and its seal (0026_board.sql)
+    // its button and its seal
     button: n.button === 'guild' && !guildOk ? null : (n.button ?? null),
     // GUILD1e: and its banner - the Guilds tab hangs a recruitment note as its guild's poster (PROF0 10.1)
     ...(guildOk ? { guild: { name: n.guild_name, tag: n.guild_tag, heraldry: heraldryOfRow(n.guild_heraldry) } } : {}),
@@ -131,9 +127,7 @@ export async function readBoard({ db, nowS, primary = db }, reader, env, map) { 
     const { results: found = [] } = await db.prepare(`SELECT * FROM players WHERE id IN (${authors.map(() => '?').join(', ')})`).bind(...authors).all();
     // SCALE4g: ON THE BINDING - a #1 found stale is counted again and STORED (arena.js championNow), never off a replica
     // (AUDIT SCALE4d A1's law, where the heartbeat's session reads the rest)
-    for (const p of await withIliacHonoursAll({ db: primary }, await withArenaHonoursAll({ db: primary }, found, nowS), nowS)) rows.set(p.id, p);   // AUDIT PRE-MERGE 1003 S8: the Grand Champion's title, the #1's laurel
-    for (const p of await withEgHonoursAll({ db: primary }, [...rows.values()], nowS)) rows.set(p.id, p);   // EG-E2: and Spire Champion (egHonours.js)
-    for (const p of await withGambitHonoursAll({ db: primary }, [...rows.values()], nowS)) rows.set(p.id, p);   // KG6: and The King's Gambit's GRANDMASTER
+    for (const p of await withArenaHonoursAll({ db: primary }, found, nowS)) rows.set(p.id, p);   // AUDIT PRE-MERGE 1003 S8: the Grand Champion's title, the #1's laurel
     for (const p of await withMasteryMarksAll({ db }, [...rows.values()])) rows.set(p.id, p);   // AUDIT HORIZONTAL F5: a worn Mark of Mastery (reads alone)
   }
   const live = await liveCount(db, reader.id, nowS);

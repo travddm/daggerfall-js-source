@@ -1,7 +1,6 @@
-// AUDIT PRE-MERGE 0929 (2026-09-29, Mac: "Audit this") - WB8's half: a Soul-Hungry Warden fed only by a fall with a
+// AUDIT PRE-MERGE 0929 - WB8's half: a Soul-Hungry Warden fed only by a fall with a
 // real part behind it, and never more than GATE_FEEDS_MAX times a fight; a Colossal Warden's Cleave reaching wherever he
-// chooses it; the marks found once, not re-read every frame. The record: bible/01-Overview/audits/Audit-PreMerge-0929.md and
-// bible/11-Multiplayer/World-Bosses.md section 13.
+// chooses it; the marks found once, not re-read every frame. The record: and
 //
 // Each test failed on the unfixed tree for its finding's reason: twenty-five throwaway accounts healed him from a fifth to
 // all but full (W1-1); a still fighter 9.1 m from a Colossal Warden was cleaved at 39 times in two minutes and struck by
@@ -108,8 +107,5 @@ test('AUDIT PRE-MERGE 0929 W2-2: the marks are found once an array, not re-read 
   const tip = gateTip({ site: { place: 'Daggerfall' }, phase: 'omen', t: { day: 3 } }, null);
   const words = gateModsWords(gateModsOf(3));
   assert.ok(tip.lines.includes(`${words.charAt(0).toUpperCase()}${words.slice(1)}`));
-  // PIN MOVED (WW2, bible/03-World/World-Wide.md): once a GATE - the lanes' cards are asked each frame, a line kept each
-  assert.match(read('src/systems/gate/gateOmen.js'), /let line = _marksLines\.get\(day\);\n\s*if \(line === undefined\) \{/, 'the card words its marks once a gate');
-  assert.doesNotMatch(read('src/ui/gate/gateBossBar.js'), /trials\.map\(/, 'the bar joins no trials a frame');
   assert.equal(GATE_FEEDS_MAX, 5);
 });

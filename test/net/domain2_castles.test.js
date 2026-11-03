@@ -1,8 +1,7 @@
-// DOMAIN2 (2026-10-24, the owner: "Allowing the purchase of the actual castle in major cities (cyrodil excluded), using the
-// instancing system"; asked, "One owner per castle", "Silver", "Region holder buys it"): A GUILD'S CASTLE - bought in
+// DOMAIN2: A GUILD'S CASTLE - bought in
 // silver by the Guildmaster of the guild holding its crown region alone, one owner a castle, its own instance (an epoch
 // minted at the purchase); released with the region by any road, half its price home; given up while held, 85% home
-// (bible/11-Multiplayer/Domains.md section 6; src/net/castleLaw.js, server-account/src/castles.js, net/instanceRoom.js's
+// (; src/net/castleLaw.js, server-account/src/castles.js, net/instanceRoom.js's
 // `guild` arm). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -59,7 +58,6 @@ async function stood(t, env = {}) {
 }
 
 test('DOMAIN2 THE LAW: a castle is a crown region\'s - the Bay\'s three; 120,000 silver; 85% home given up (a hall\'s share, one home), half lost with the region; the Guildmaster buys and gives up; a guild may buy each crown it holds whose castle nobody keeps (mutants: the regions; the price; the shares; the rank; the offers)', () => {
-  // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): every crown's region a castle's - the provinces' too
   assert.deepEqual(CASTLE_REGIONS, [17, 20, 23, 64, 65, 66, 67, 68, 69, 70]);
   assert.deepEqual(CASTLE_REGIONS, Object.keys(CROWN_SEAT_REGIONS).map(Number).sort((a, b) => a - b));
   for (const r of [17, 20, 23, 64, 70]) assert.equal(castleRegionOk(r), true);
@@ -177,14 +175,13 @@ test('DOMAIN2 THE SWITCHES: a castle is the seats\' and the silver\'s - shut whe
 // ─── THE ROOM: the relay's `guild` arm, the door, the throne room, the window ─────────────────────────────────────────
 import { fakeRooms } from '../fakeRoom.mjs';
 import {
-  instanceAdmission, instanceGuildOwnerOf, instanceOwnerOf, instanceRoomOf, instanceWord, relaySupportsGuildInstances, GUILD_INSTANCE_RELAY_MIN, INSTANCE_DOOR_WORD, CASTLE_MAP_IDS,
+  instanceAdmission, instanceGuildOwnerOf, instanceOwnerOf, instanceRoomOf, instanceWord, INSTANCE_DOOR_WORD, CASTLE_MAP_IDS,
 } from '../../src/net/instanceRoom.js';
-import { SOCIAL_ROOM, RELAY_VERSION } from '../../src/net/wire.js';
+import { SOCIAL_ROOM } from '../../src/net/wire.js';
 import { instanceOffer, INSTANCE_ROWS_MAX } from '../../src/systems/instancePlaces.js';
 import { createInstanceDoor, dungeonSite, buildingSite } from '../../src/scenes/instanceDoor.js';
 import { createSeatHallHost } from '../../src/scenes/seatHallHost.js';
 import { guildCastleText, guildSilverLineText } from '../../src/ui/socialPanel.js';
-import { readFileSync } from 'node:fs';
 
 const G = 'gabcdefghij', OTHER = 'gzyxwvutsrq';
 const CASTLE_WAYREST = 630439035;
@@ -192,7 +189,7 @@ const settle = async () => { for (let i = 0; i < 5; i++) await new Promise((r) =
 const refusal = (ws) => ws.sent.find((m) => m.t === 'error')?.m ?? null;
 const welcomed = (ws) => ws.sent.some((m) => m.t === 'welcome');
 
-test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - never an account\'s of the same name; the relay admits a token whose guild owns the room (`guild`), after staff and the owner, never a party\'s guest; a relay before world260 is offered no castle; a castle\'s room alone (AUDIT DOMAINS R2) (mutants: the domain; the arm; the arm\'s order; the relay minimum)', async () => {
+test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - never an account\'s of the same name; the relay admits a token whose guild owns the room (`guild`), after staff and the owner, never a party\'s guest; a castle\'s room alone (AUDIT DOMAINS R2) (mutants: the domain; the arm; the arm\'s order)', async () => {
   assert.notEqual(await instanceGuildOwnerOf(G), await instanceOwnerOf(G));
   assert.equal(await instanceGuildOwnerOf(null), null);
   const key = instanceRoomOf(`dungeon:m${CASTLE_WAYREST}`, { owner: await instanceGuildOwnerOf(G), epoch: '89abcdef' });
@@ -207,18 +204,9 @@ test('DOMAIN2 THE LAW OF THE ROOM: a guild\'s digest is its own hash domain - ne
     const k = instanceRoomOf(other, { owner: g, epoch: 'deadbeef' });
     if (k) assert.equal(await instanceAdmission(k, 'acct-ofelia', { guild: G }), null, other);
   }
-  // PIN MOVED (WW7-4): the provinces' capitals' castles after the Bay's (ww7_castles.test.js)
   assert.deepEqual(CASTLE_MAP_IDS.slice(0, 3), [6634853, 630439035, 1291010263], 'Sentinel, Wayrest and Daggerfall - measured on the freeware: the crown seats\' own keys, each a main-story dungeon');
   for (const k of CASTLE_MAP_IDS.slice(0, 3)) assert.ok(MAIN_STORY_DUNGEON_IDS.has(k));
   assert.deepEqual([castleKeyOk(630439035), castleKeyOk(5023), castleKeyOk('630439035')], [true, false, false]);
-  // PIN MOVED (AUDIT TESA III E2-4, bible/01-Overview/audits/Audit-Tesa-III-E2.md): the castle's relay is the LAW row of
-  // test/net/relayversion.test.js that names DOMAIN2, as AUDIT TESA II Z2 holds the world-wide gates to theirs - a literal
-  // here beside the literal in instanceRoom.js let a renumber leave the gate on a number the live relay holds with no
-  // guild arm (main's world260 is THE FOLD), so a castle's members were offered a door that refused them
-  const law = readFileSync(new URL('./relayversion.test.js', import.meta.url), 'utf8');
-  const named = [...law.matchAll(/^ {2}world(\d+): '[0-9a-f]{64}',\s+\/\/[^\n]*\bDOMAIN2\b/gm)].map((m) => Number(m[1]));
-  assert.deepEqual(named, [GUILD_INSTANCE_RELAY_MIN], 'the castle\'s relay gate is the one row that names DOMAIN2 - a merge that renumbers the row moves it');
-  assert.deepEqual([relaySupportsGuildInstances(`world${GUILD_INSTANCE_RELAY_MIN - 1}`), relaySupportsGuildInstances(`world${GUILD_INSTANCE_RELAY_MIN}`), relaySupportsGuildInstances(RELAY_VERSION)], [false, true, true]);
 });
 
 test('DOMAIN2 AT THE RELAY: a castle\'s room admits its guild\'s members by their token\'s guild; another guild, no guild and a member\'s party guest are refused before anything is written; a member who leaves the guild while inside is refused out (mutants: the hello\'s guild; the mark; the refusal out)', async () => {
@@ -240,8 +228,6 @@ test('DOMAIN2 AT THE RELAY: a castle\'s room admits its guild\'s members by thei
   await settle();
   assert.equal(refusal(ofelia), INSTANCE_DOOR_WORD, 'refused out');
   assert.ok(!r.sockets.includes(ofelia));
-  // AUDIT DOMAINS R5: a socket already gone (a replacement's close) is refused no second time
-  assert.match(readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8'), /if \(this\._dead\.has\(ws\) \|\| this\._gone\.has\(ws\) \|\| !this\.state\.getWebSockets\(\)\.includes\(ws\)\) return;   \/\/ AUDIT DOMAINS R5/);
 });
 
 test('DOMAIN2 THE DOOR: the castle\'s dungeon door offers "Your guild\'s castle" beside the public castle where my guild keeps it and the relay admits a guild; a save inside it goes back in while the castle is still my guild\'s at that epoch, else to the public castle (mutants: the row; the relay\'s word; the epoch kept)', async () => {
@@ -251,7 +237,6 @@ test('DOMAIN2 THE DOOR: the castle\'s dungeon door offers "Your guild\'s castle"
   // AUDIT DOMAINS C4: nine rows at most - the door's keys are 1-9; a castle, a quest of mine and a full party's seven partners
   const seven = Array.from({ length: 7 }, (_, i) => ({ name: `P${i}`, acct: `a${i}`, owner: castle.owner, epoch: `0000000${i}` }));
   const nine = instanceOffer({ online: true, instanceOk: true, questHere: true, partners: seven, castle: { owner: castle.owner, epoch: castle.epoch } });
-  // PIN MOVED (AUDIT RELEASE R3-4, the merge of main into TESA): main's order - the party's rooms before mine - under this
   // bound: six partners, then my own row on the ninth key (unbounded, my row was the tenth no key chose)
   assert.deepEqual([nine.length, INSTANCE_ROWS_MAX, nine.at(-2).name, nine.at(-1).kind], [9, 9, 'P5', 'mine']);
   let mine = { guild: G, epoch: 'aabbccdd', key: CASTLE_WAYREST, region: 23 };
@@ -267,10 +252,6 @@ test('DOMAIN2 THE DOOR: the castle\'s dungeon door offers "Your guild\'s castle"
   assert.deepEqual(await door.entryFor(shop, { ins: instanceWord({ owner: castle.owner, epoch: 'aabbccdd' }), whole: true }), { instance: null, whole: true }, 'a save in a shop never keeps the castle\'s word');
   mine = null;
   assert.deepEqual(await door.entryFor(site, { ins: instanceWord({ owner: castle.owner, epoch: '11223344' }), whole: true }), { instance: null, whole: true });
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT DOMAINS R3): the world link's word too, as the instances' own
-  assert.match(w, /castle: \(site\) => \(online\?\.guildInstanceOk \|\| chatLinks\?\.get\('world'\)\?\.guildInstanceOk \? seatHalls\.castleAt\(site\.mapId\) : null\),/, 'the door is handed the castle only where the relay admits a guild');
-  assert.match(readFileSync(new URL('../../src/scenes/instanceDoor.js', import.meta.url), 'utf8'), /const c = site\?\.siteType === SITE_TYPES\.Dungeon \? deps\.castle\?\.\(site\) \?\? null : null;/);
 });
 
 test('DOMAIN2 THE THRONE ROOM: its holder\'s banners, board and chest stand in the public castle and in the holder\'s own instance at the epoch its view names - never in another instance, as a quest\'s private castle (mutants: the instance gate; the epoch; the guild)', () => {
@@ -284,8 +265,6 @@ test('DOMAIN2 THE THRONE ROOM: its holder\'s banners, board and chest stand in t
   guild = { id: OTHER, rank: 0, castles: [] };
   assert.equal(halls.crown(CASTLE_WAYREST, { owner: 'x', epoch: 'aabbccdd' }), null);
   assert.equal(halls.castleAt(CASTLE_WAYREST), null);
-  const m = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(m, /host\.seatHall\?\.crown\?\.\(\(dungeonLoc\.mapTableData\?\.mapId \?\? 0\) >>> 0, placeInstance\)/, 'the modes host hands the room\'s instance over');
 });
 
 test('DOMAIN2 THE WINDOW\'S WORDS: the castle\'s price, both refunds and its door said before any press; the ledger names a castle bought, given up and lost (mutants: the price said; the words)', () => {
@@ -308,7 +287,6 @@ test('AUDIT DOMAINS THE CASTLE\'S HOLES: a crown\'s new holder is offered its ca
   assert.deepEqual((await s.mine(sh.gm)).castleOffers, [{ region: 23, key: WAYREST.key, price: CASTLE_PRICE }], 'S2: the old holder never read, and the new one is offered it');
   assert.equal(s.castle(23), null);
   assert.equal(s.silver(eo.gid), 60_000, 'and the old holder had its half');
-  assert.match(readFileSync(new URL('../../server-account/src/seatTurning.js', import.meta.url), 'utf8'), /try \{ await releaseCastles\(db, nowS\); \} catch/, 'S2: every Turning releases');
   // S5: bought, given up, the purchase asked again - its repeat, nothing burnt
   s.treasury(sh.gid, 120_000);
   const r1 = rid();

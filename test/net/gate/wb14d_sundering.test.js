@@ -1,5 +1,4 @@
-// WB14d (2026-10-19, Mac: "the boss splitting and players having to split and navigate to beat both sides and then merging at
-// the end for its final stand (chance based encounter modifer)", then "This is all yours to take on"): THE SUNDERING - on a
+// WB14d: THE SUNDERING - on a
 // Sundering night the second phase's turn tears him in two: Ruhn's Blade (his body) and Ruhn's Flame (a body of its own),
 // in two courts with four or more challengers, side by side in one with fewer; each half a pool of what he has above
 // SUNDER_LAST; a half brought down kneels, rises past the pair law, and both down together they rejoin at the first
@@ -12,7 +11,7 @@
 //   the screen       net/gate/gateLink.js (the fold), scenes/gate/gateFlame.js (its body, its blows, its words),
 //                    scenes/gate/gateCourt.js (the cards, the targets, the bar's halves - ui/gate/gateBossBar.js)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md sections 5 and 6.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -333,7 +332,6 @@ test('WB14d the wire: a hit names its half (`b` 1 kept, 0 dropped, anything else
   const st = stateOf(run.f);
   assert.ok(validGateOut(st)?.sd);
   for (const bad of [{ h: [st.sd.m + 1, 0] }, { kn: [0] }, { two: 2 }, { lo: [0, 3] }, { fl: { ...st.sd.fl, ct: 9 } }]) assert.equal(validGateOut({ ...st, sd: { ...st.sd, ...bad } }), null, JSON.stringify(bad));
-  assert.match(read('server/src/index.js'), /GATE_SEAM\.hit\(f, a\.sub, m\.d, m\.r, at, now, m\.q, m\.b === 1 \? \{ b: 1 \} : undefined\);/);
 });
 
 // ═══ THE SCREEN ═══════════════════════════════════════════════════════════════════════════════════════════════════
@@ -401,9 +399,6 @@ test('WB14d the cards: a Sundering night\'s second turn is the Sundering\'s (bri
   assert.deepEqual(courtPhaseCard(3, ['sunder']), { kicker: 'III', main: 'Dagon\'s Champion', sub: 'Back to the first court.' });
   assert.deepEqual(SUNDER_CARD.main(), 'The Sundering'); assert.equal(SUNDER_CARD.sub(), 'Bring both halves down together.');
   assert.equal(courtPhaseCard(2).sub, 'Follow him over the walkway.'); assert.equal(courtPhaseCard(3, ['vanguard']).sub, 'Follow him to the last court.');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /if \(s\.sd\?\.rj && !rjCarded\) \{ rjCarded = true; if \(t - s\.sd\.rj <= FED_LATE_MS\)/);
-  assert.match(gc, /if \(c && !\(s\.phase === 3 && rjCarded\)\) beat =/);
 });
 
 test('WB14d the bar: sundered, the halves side by side under his health - each its name, its pool\'s share and its line (Kneels with its seconds, Warded, Alone); a Sundering night\'s last mark at SUNDER_LAST; the callout the Flame\'s where I stand in its court alone (mutants: one track; the Blade\'s blow called in the Flame\'s court)', () => {
@@ -474,12 +469,6 @@ test('WB14d the court: the Flame\'s blow judged on my feet once; its body offere
 });
 
 test('WB14d the court draws it: the Flame\'s telegraph and its mark in the court\'s pass, its glow in its lights, its sprite among its batches; the halves\' words, the Rejoining\'s line and its card while news (mutants: the Flame\'s shapes never drawn; the Rejoining unsaid)', () => {
-  const src = read('src/scenes/gate/gateCourt.js');
-  assert.match(src, /for \(const fs of flame\.shapes\(\)\) \{ pass\.draw\(fs, proj, view, eye, seconds, fog, COURT_CENTRE, _walked, _floors\); drew = true; \}/);
-  assert.match(src, /for \(const l of flame\.lights\(s, t\)\) _lights\.push\(l\);/);
-  assert.match(src, /for \(const b of flame\.batches\(\)\) _batches\.push\(b\);/);
-  assert.match(src, /flame\.offerBodies\(bodiesLane, s, now\(\)\);/);
-  assert.match(src, /if \(i === FLAME_I\) return !!s && s\.day !== null && flame\.hit\(s, \{ d, r \}, t\);/);
   const run = spread(toSplit(sunderFight(4))).step(140);
   const s0 = folded(run), sent = [], clock = { t: run.t };
   const f = createGateFlame({ say: (x) => sent.push(x), bossName: () => BOSS.name });

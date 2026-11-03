@@ -1,4 +1,4 @@
-// ARENA4 (2026-10-02): THE ARENA ONLINE ON THE CLIENT, DRIVEN - the hall's fold, the mirror of a relay's bout
+// ARENA4: THE ARENA ONLINE ON THE CLIENT, DRIVEN - the hall's fold, the mirror of a relay's bout
 // (net/arena/arenaLink.js), the receipts carried (net/arena/arenaClaims.js), the window's online model (systems/arena/arenaBoard.js), the
 // bout driver standing a relay's bout over a fake stage (scenes/arena/arenaBouts.js startRelay / relayWord - its puppets, its
 // HUD, the verdict, my health the relay's, my yield and my misses told) and the host's glue (scenes/arena/arenaOnline.js - the
@@ -142,7 +142,7 @@ test('ARENA4 the window online: the Bouts page carries the bouts on the sand (Wa
   assert.equal(players.live[0].watching, ARENA_TEXT.online.watching(4));
   assert.deepEqual(players.live[0].acts.map((a) => a.act), ['spectate']);
   const ch = (mm) => mm.bouts.cards.find((c) => c.kind === 'challenge');
-  assert.deepEqual(ch(m).acts.map((a) => [a.act, a.why]), [['queue', null], ['casual', null]]);   // ARENA4b (PIN MOVED): Casual bout beside Find a match (test/systems/arena/arena4b_casual.test.js)
+  assert.deepEqual(ch(m).acts.map((a) => [a.act, a.why]), [['queue', null], ['casual', null]]);   // ARENA4b (
   assert.deepEqual(ch(at({ status: 'open', queue: 'queued', band: 300, n: 4, live: [] })).acts.map((a) => a.act), ['unqueue']);
   const off = ch(at({ status: 'open', queue: 'offer', offer: { o: O, vs: { n: 'Brann', r: 1040 }, until: 18_000 }, live: [] }));
   assert.deepEqual(off.acts.map((a) => a.act), ['accept', 'decline']);
@@ -253,7 +253,7 @@ test('ARENA4 the driver on a relay\'s ladder bout: the relay\'s fighter stood as
 test('ARENA4 the host\'s glue: the window queues in the hall, a call sends me to the sand on my side, my `in` is said once I stand in the bout\'s room (a ladder\'s with its tier, its bout, my level and my health), its receipt carried, my blows claimed (mutants: the `in` before the room; the rival\'s side as the first\'s; the receipt dropped; the ladder\'s step lost from its `in`)', async () => {
   const hallSent = [], boutSent = [];
   const hallLink = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const asked = [], entered = [], claimed = [];
   const bouts = { ask: (p) => asked.push(p), relayWord: () => true, dismiss() {}, holds: () => false };
   const board = { me: { ladder: arenaLadderOf([{ tier: 0, bout: 0 }]) } };

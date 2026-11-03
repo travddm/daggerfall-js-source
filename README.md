@@ -22,13 +22,10 @@ The site is `index.html` (what it is, how to play, credits); the game is
 Pages. The landing page takes its palette and fonts from the enhanced skin
 at build (`scripts/landingHtml.mjs`) and carries no game data or imagery.
 
-Docs live in `bible/` - start at `bible/Home.md`.
+Docs live in `docs/` - start at `docs/README.md`.
 
 Original game data (ARENA2) is required and never committed. Point tests at it
-with `ARENA2_PATH`. The player's own copy of The Elder Scrolls: Arena is
-optional - its places stand on the map of Tamriel (`bible/03-World/Arena-Provinces.md`;
-its reader translated from OpenTESArena, MIT) - and is never committed either;
-point tests at it with `ARENA_PATH`.
+with `ARENA2_PATH`.
 
 ## Support development
 
@@ -37,9 +34,9 @@ costs about **$600 per month** to sustain across development tooling,
 multiplayer infrastructure, testing, builds, releases, and mod compatibility
 work.
 
-Support on Patreon: https://www.patreon.com/c/dfenhanced
+Support on Patreon: <https://www.patreon.com/c/dfenhanced>
 
-Support on Ko-fi: https://ko-fi.com/daggerfallonline
+Support on Ko-fi: <https://ko-fi.com/daggerfallonline>
 
 The monthly goal, suggested support levels, and funding breakdown are in
 [`SUPPORT.md`](SUPPORT.md). Sponsorship does not lock gameplay, source code,
@@ -53,14 +50,15 @@ they are fixed.
 
 ## Scripts
 
-Node 20.19+ or 22.12+ (Vite 8's floor; CI runs 22).
+Node 22.18+ (the first 22 release that runs `.ts` files; CI runs 22).
 
 - `npm run dev` - Vite dev server
 - `npm test` - Node test runner
 - `npm run build` - production build
 - `npm run lint` - eslint over `src/` (no-undef, no-dupe-keys, ...)
 - `npm run check` - lint + test + build (pre-push gate)
-- `npm run cites [-- --apply | -- --check]` - write a line number cited into our code as an anchor, `file.js:"the line's text"`, and resolve every anchor (tools/citeAnchor.mjs)
+- `npm run cites [-- --apply | -- --check]` - write a line number cited into our code as an anchor,
+  `file.js:"the line's text"`, and resolve every anchor (tools/citeAnchor.mjs)
 - `npm run shot [out.png]` - headless render proof (needs ARENA2_PATH + provisioned Chromium)
 - `node tools/landingProbe.mjs` - the landing page and `/play/` in a real browser, no ARENA2 needed
 - `node tools/verify-deploy.mjs` - after a push: proves the live `/play/` serves your commit
@@ -69,8 +67,8 @@ Node 20.19+ or 22.12+ (Vite 8's floor; CI runs 22).
 
 `app/` is the downloadable build: an Electron shell that loads the
 same `dist/` the website deploys and adds what a browser can't -
-**saves as real files** (DFU's own layout: `Saves/SAVE<n>/SaveData.txt`
-+ `SaveInfo.txt` + `Screenshot.jpg`, settings under `Prefs/`) and
+**saves as real files** (DFU's own layout: `Saves/SAVE<n>/SaveData.txt` +
+`SaveInfo.txt` + `Screenshot.jpg`, settings under `Prefs/`) and
 **ARENA2 read straight from your folder on disk** (found for you on
 first run, or picked once - no ingest, no diet, full sky sets). The browser build
 is unchanged; the storage seam is `src/systems/appStorage.js`.
@@ -103,7 +101,7 @@ their names, so `releases/latest/download/DFO-Online-win-x64-setup.exe`
 (and `-mac-arm64.dmg`, `-linux-x86_64.AppImage`) is always the newest,
 and the landing page links each directly. Pushing a tag shaped `app-v*`
 cuts one by hand. Details
-in `bible/01-Overview/Desktop-App.md`; headless proof:
+in `docs/operations/desktop-release.md`; headless proof:
 `xvfb-run -a node tools/appShellProbe.mjs` (point `DAGGER_SHELL_EXE`
 at a packaged binary to prove an installer's payload). The packaged
 app bundles NO game data - same doctrine as the site.

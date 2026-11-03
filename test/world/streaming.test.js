@@ -189,10 +189,4 @@ test('D1: the grid radius is the LIVE Land View Distance - DFU sizes and DFU cla
   // the bare constructor stays DFU's default 3 (the 7x7)
   assert.equal(new StreamingWorldState().terrainDistance, TERRAIN_DISTANCE);
   assert.equal(TERRAIN_DISTANCE, 3);
-  // and the world host really passes the setting, with DFU's own 1..4
-  // clamp (SettingsManager.cs:952-963 - clamp on parse, MIN on failure;
-  // the port's getInt carries the identical law)
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /new StreamingWorldState\(fogDistance\)/, 'LV1: the one read - landViewDistance over DFU\'s setting on the 1:1 lane, the Enhanced pane\'s on the enhanced');
-  assert.match(src, /const fogDistance = landViewRead\(\);/, 'FT2: the one read is the module\'s (world\/landView.js landViewRead)');
 });

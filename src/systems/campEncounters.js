@@ -58,10 +58,7 @@ import { CLASSIC_MINUTES_PER_SECOND } from './worldTick.js';   // real-seconds -
 // always was.
 const MAX_SEED_ATTEMPTS = 4;
 
-// CAMP-FAR (2026-09-24, Mac: "when stepping into a new chunk, enemy camps
-// spawn immediately behind the player, which is far too sudden and
-// overwhelming ... enemies should spawn at a distance of 100-150 meters
-// away"). The band WAS 14-26 - a lone wanderer's own reach, doubled -
+// CAMP-FAR. The band WAS 14-26 - a lone wanderer's own reach, doubled -
 // and a group of five stood there on the frame of a pixel crossing is
 // on top of the player before they have turned round. A camp is a
 // thing you come across, so it is stood well out: a hundred to a
@@ -110,7 +107,7 @@ export function campAnchorSpot({ feet, yawRad, fovDegrees, groundAt, minDistance
   return { x, y, z };
 }
 
-// CAMP-SIGHT (2026-09-25, Mac: "reduce the sight radius to 60"): a wilderness camp's members see
+// CAMP-SIGHT: a wilderness camp's members see
 // 60 metres, not DFU's 102.4 - so a group stood 100-150 m out never spots the player on the frame
 // it appears, and a camp can be approached before it notices. Every other foe keeps SIGHT_RADIUS.
 export const CAMP_SIGHT_RADIUS = 60;
@@ -122,7 +119,7 @@ export const PACK_SPACING = 6;     // metres between members - loose, a group in
 export const CAMP_ALERT_RADIUS = CAMP_SPACING * 3;
 export const PACK_ALERT_RADIUS = PACK_SPACING * 2;
 
-// Mac (2026-09-17): "every 15 minutes so it doesn't feel so empty" - REAL
+// REAL
 // minutes of actual play, not the game clock's own hour: the game clock
 // only advances 12 minutes per real minute (CLASSIC_MINUTES_PER_SECOND,
 // classic Daggerfall's own compression, ported verbatim), so a window
@@ -132,8 +129,7 @@ export const CAMP_WINDOW_REAL_MINUTES = 15;
 export const CAMP_WINDOW_MINUTES = CAMP_WINDOW_REAL_MINUTES * 60 * CLASSIC_MINUTES_PER_SECOND;   // 180
 export const campWindowOpen = (gameMinutes) => Math.floor(gameMinutes) % CAMP_WINDOW_MINUTES === 0;
 
-// Mac (2026-09-17): "every 15 minutes guaranteed the rest based on
-// chance... like 5% chance" - a CHECK on a reliable real-time cadence,
+// a CHECK on a reliable real-time cadence,
 // not a guaranteed spawn: every 15 real minutes of actual play (180
 // game-minutes - CAMP_WINDOW_REAL_MINUTES's own math, below), a 5%
 // roll decides whether a group actually appears. A flat check cadence
@@ -141,8 +137,7 @@ export const campWindowOpen = (gameMinutes) => Math.floor(gameMinutes) % CAMP_WI
 // rare-roll, so the frequency is exactly what it reads as: about one
 // group appears per (15 / 0.05) = 300 real minutes of play on average,
 // not buried under a second, harder-to-reason-about layer of odds.
-// Mac (2026-09-17): "every 15 minutes it should happen guaranteed
-// additionally" - the timer check is no longer a chance at all, it's the
+// the timer check is no longer a chance at all, it's the
 // FLOOR: a group is guaranteed every 15 real minutes, on top of the
 // separate 15%-per-chunk roll above. CAMP_CHANCE/rollCampChance are kept
 // (still exported, still correct) for anything that wants a lower-than-
@@ -151,18 +146,16 @@ export const CAMP_CHANCE = 0.05;
 export const rollCampChance = (roll01 = Math.random()) => roll01 < CAMP_CHANCE;
 export const rollCampKind = (roll01 = Math.random()) => (roll01 < 0.5 ? 'camp' : 'pack');
 
-// Mac (2026-09-17): "this should always happen when loading world chunks
-// if it works like that" - it does: scenes/world.js's floating-origin
+// it does: scenes/world.js's floating-origin
 // streaming fires a `pixelChanged` event each time the player crosses
 // into a new map pixel (819.2 scene units on a side - world/streamingWorld.js's
 // own header), which is this port's nearest thing to "a new chunk
 // loaded". A player who explores gets a roll every new pixel entered.
 //
-// CAMP-NOTIMER (2026-09-19, Lost's package): scenes/world.js - the real
+// CAMP-NOTIMER: scenes/world.js - the real
 // streaming open world - dropped the 15-real-minute guaranteed timer
 // trigger entirely, so this chunk-load roll is now that host's ONLY
-// camp/pack trigger. The rate stays where Mac set it (2026-09-17: "set
-// the camp encounter chance to 15% per chunk") rather than dropping to
+// camp/pack trigger. The rate stays where) rather than dropping to
 // match the timer's 5%: a chunk is entered far less often than a
 // background timer ticks, so carrying the whole load alone at the
 // higher figure is what keeps the frequency the host had before.
@@ -172,7 +165,7 @@ export const rollCampKind = (roll01 = Math.random()) => (roll01 < 0.5 ? 'camp' :
 // chunk streaming to hang a roll off, so the timer below is the only
 // trigger it can have, and it still calls it.
 //
-// CAMP-RING (2026-09-25): the chance is 50% per chunk entered, and a hit stands THREE groups at
+// CAMP-RING: the chance is 50% per chunk entered, and a hit stands THREE groups at
 // once, spread round the player a hundred to a hundred and fifty metres out (campGroupBearings).
 export const CAMP_CHANCE_ON_CHUNK_LOAD = 0.50;   // 50% per chunk entered
 export const rollCampChanceOnChunkLoad = (roll01 = Math.random()) => roll01 < CAMP_CHANCE_ON_CHUNK_LOAD;
@@ -181,7 +174,7 @@ export const CAMP_GROUPS_ON_CHUNK_LOAD = 3;
 
 /**
  * CAMP-RING: bearings (degrees off the player's facing, clockwise from above - Unity's yaw) for
- * the groups of one hit. Mac, 2026-09-25: "one in front of me, one right and one left" - so the
+ * the groups of one hit. - so the
  * three stand ahead, to the right and to the left, 90 degrees apart. Ahead is IN view: at 100-150
  * metres that group is seen standing there, which is the point. More than three groups continue
  * round the circle evenly; `fovDegrees` is kept for the call shape and not read.

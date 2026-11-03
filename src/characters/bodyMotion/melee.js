@@ -1,5 +1,5 @@
 // @ts-check
-// BODY-MOTION (2026-10-18; bible/04-Characters/Body-Motion.md) - THE BLOWS. A third-person melee strike as a whole
+// BODY-MOTION - THE BLOWS. A third-person melee strike as a whole
 // body: the blade's path through the air, the trunk winding against it and unwinding through it, the hips leading the
 // chest, the weight driven onto the lead foot and a step taken with it - in place of Morrowind's clip, which in third
 // person took every bone (the legs froze mid-stride and slid: the recorded gap of Morrowind-Rules.md's rule 26).
@@ -116,8 +116,7 @@ export const MELEE = Object.freeze({
     ],
     thrust: [
       k(0, STANCE_TWO),
-      // THRUST-CHAMBER (feature-feedback via Mac, 2026-10-26: "Two-handed sword (claymore) forward pierce attack animation
-      // causes character's hands to clip through his back"): chambered BEFORE the right hip, the point raised at the target -
+      // THRUST-CHAMBER (feature-feedback via): chambered BEFORE the right hip, the point raised at the target -
       // the draw is the trunk's coil, not the hands'. Drawn back beside the hip (grip -0.2 forward), the left hand closed on
       // the hilt toward the pommel 0.31 to 0.38 of an arm behind the shoulders, and the left arm crossed behind the back.
       k(0.3, { grip: [0.37, 0.57, -0.4], blade: [-0.2, 0.96, 0.2], edge: [0, 0, -1], chest: [-24, 0, -2], hip: -12, shift: -0.06, drop: 0.02, step: 0 }),

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW13 (2026-10-09, bible/06-Systems/Living-World-II.md "LW13"): THE COMPANIES - a town's adventurers in parties of
-// their own, travelling and diving together. Mac: "groups of npcs forming parties and traveling". Pure, like the
+// LW13: THE COMPANIES - a town's adventurers in parties of
+// their own, travelling and diving together.. Pure, like the
 // census they are dealt from (LW0 decision 2): a company is its PLACES (the roster's slots), as a caravan's contract is
 // its sellswords' - whoever holds a place that cycle walks with it (lives.js unchanged: a member the road takes leaves
 // the place empty, then the newcomer holds it and belongs to the company).

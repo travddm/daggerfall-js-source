@@ -20,7 +20,7 @@ const ROW_LEAD = 2;
 const TEXT = [0.86, 0.82, 0.68, 1];
 const DIM = [0.55, 0.52, 0.45, 1];
 
-// L10N2 (2026-09-27): WHERE A LINE MAY BREAK. A space, as ever; and Chinese and Japanese put no spaces between their
+// L10N2: WHERE A LINE MAY BREAK. A space, as ever; and Chinese and Japanese put no spaces between their
 // words, so between two of their characters as well - UAX #14's ideographic class, the line breaking every reader of
 // those scripts knows - except that a closing mark or a small kana never starts a line and an opening mark never ends
 // one (kinsoku). DFU's TextLabel does the crude half of it, cutting a spaceless row at the glyph that overflows
@@ -85,7 +85,7 @@ export class ChoiceWindow {
 
   input(code) {
     // PLEA-LOOP (FIELD BUGS 2026-10-13b): a box is answered ONCE, however many doors reach it - the occupant's half of
-    // THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD (bible/Home.md). The court's plea, answered under the tutorial
+    // THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD. The court's plea, answered under the tutorial
     // page and left painted in the stack, pleaded again on every press: each plea halved the term and took the fine.
     if (this.done) return;
     if (!this.options.length && (code === 'back' || code === 'confirm' || code === 'Escape' || code === 'Enter' || code === 'KeyE')) {

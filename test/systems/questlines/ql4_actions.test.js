@@ -1,4 +1,4 @@
-// QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): THE QUESTLINES' FIVE ACTIONS - `ask` (a choice in the player's
+// QL4: THE QUESTLINES' FIVE ACTIONS - `ask` (a choice in the player's
 // own words), `outcome` (where a script decides how it ended), `ql act` (a trigger on what the player did, QL11), `ql
 // paid` (the quest paid, without GivePc's box) and `ql name` (a giver by their own name, QL12). They are registered by
 // the quest bridge after DFU's 82: a first-match scan, so the pins here are that no DFU template claims a questlines

@@ -1,6 +1,6 @@
-// SEAT1b (2026-09-30, Mac: "Finish the seats"): INFLUENCE, AS THE SERVICE KEEPS IT - the pledge, the Watch's receipts,
+// SEAT1b: INFLUENCE, AS THE SERVICE KEEPS IT - the pledge, the Watch's receipts,
 // a gate kill's region, Renown's region, members' homes, Tribute, and the standings that sum them - driven through the
-// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md
+// real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 // 4.1-4.2; `06-Systems/Online-Arc.md` SEAT1b.
 import { test } from 'node:test';
 import { SEAT_ROWS_KEPT_S } from '../../server-account/src/townSeats.js';   // D1-LOAD: the kept rows' minute
@@ -68,7 +68,6 @@ test('SEAT1b THE PLEDGE: an Officer\'s or the guildmaster\'s, a confirmed seat, 
   member(mem, gid, { rank: 2 });
   assert.equal((await pledge(gm, ANTICLERE.key)).body.error, 'seat-unconfirmed', 'a seat the witnesses have not confirmed is no pledge');
   confirm(ANTICLERE); confirm(ALT); confirm(WAYREST);
-  // PIN MOVED (D1-LOAD): a pledge reads the isolate's kept witness rows (townSeats.js confirmedSeats) - a seat confirmed
   // by witnesses another isolate took is pledgeable within the minute, the seats' list's own bound
   assert.equal((await pledge(gm, ANTICLERE.key)).body.error, 'seat-unconfirmed', 'within the minute: the rows as this isolate kept them');
   now += SEAT_ROWS_KEPT_S;
@@ -83,7 +82,7 @@ test('SEAT1b THE PLEDGE: an Officer\'s or the guildmaster\'s, a confirmed seat, 
   const more = [[7001, 'Glenpoint', 18, [200, 100]], [7002, 'Tulune', 58, [150, 120]], [7003, 'Kambria', 37, [700, 90]], [7004, 'Ykalon', 40, [720, 80]]]
     .map(([key, name, region, pixel]) => ({ key, name, region, tier: 'palace', pixel }));
   for (const s of more) confirm(s);
-  now += SEAT_ROWS_KEPT_S;   // PIN MOVED (D1-LOAD): read here within the minute
+  now += SEAT_ROWS_KEPT_S;
   for (const s of more.slice(0, 3)) assert.equal((await pledge(gm, s.key)).status, 200, `${s.name} pledged`);
   const full = await pledge(gm, more[3].key);
   assert.deepEqual([full.status, full.body.error], [409, 'seat-pledges-full'], `a guild's reach is ${SEAT_PLEDGE_REGIONS_MAX} regions`);
@@ -150,7 +149,6 @@ test('SEAT1b PER-ACCOUNT WAR: the first guild an account\'s character contribute
   confirm(ANTICLERE);
   const a = await svc.seated('Adala', { renown: 12 });
   const b = await svc.seated('Bodil', { renown: 12 });
-  // PIN MOVED (INT16, Integrity-Arc section 7): Renown and the Watch are asked of the account's SEATED realm character
   // (progress.js progressRefusal) - so Bodil's second character is a realm character of its own (the one it was seated
   // as; the founding below seats the Ebon Oath's founder), taken up (a join) before it claims, where an offline
   // 'bodil-alt' is refused 'progress-seat' before the seats' law reads it
@@ -200,14 +198,12 @@ test('SEAT1b GATE KILLS: a claim names its region; a kill counts 300 for the war
   await kill(others[1], days[0], 21);
   assert.equal((await standings(gm)).standings[0].influence, 300, 'three agree: 300');
   // a day whose claims tie at the top - three for 21, three for 30 - agrees on neither
-  // PIN MOVED (AUDIT-SEATS): another account's claim stands in the tie where the guildmaster's stood - the week's cap is now
   // three gate claims an account, every seat together, asked in the write (S7, 4.2: "(three receipts)"), so the
   // guildmaster's unagreed claim here would spend one of its three and the four agreed below would not reach 900
   await kill(await svc.seated('Fenna'), days[1], 21);
   await kill(others[0], days[1], 21); await kill(others[1], days[1], 21);
   for (const o of others.slice(2, 5)) await kill(o, days[1], 30);
   assert.equal((await standings(gm)).standings[0].influence, 300, 'a level top agrees on nothing');
-  // PIN MOVED (AUDIT SEATS-3 F2): the tie's claims are none of the Hand's, so the standing above holds either way - the
   // day's agreement itself is asked
   assert.equal((await agreedGateRegions(svc.env.DB, [days[1]])).has(days[1]), false, 'a level top agrees on nothing');
   assert.equal((await agreedGateRegions(svc.env.DB, [days[0]])).get(days[0]), 21);
@@ -315,10 +311,10 @@ test('SEAT1b THE ACCOUNT\'S CAP AND THE STANDINGS\' SHAPE: 2,000 an account a se
   }
   const s = await standings(gm);
   assert.equal(s.standings[0].influence, ACCOUNT_SEAT_WEEK_CAP, 'one account, 2,000 a seat a week');
-  assert.deepEqual(Object.keys(s).sort(), ['battle', 'chronicle', 'defence', 'fight', 'holder', 'mine', 'phase', 'reckoningAt', 'royal', 'season', 'seat', 'standings', 'tides', 'turningAt', 'week']);   // SEAT1c: the holder, its defence, the week's battle, the Chronicle; SEAT2a (PIN MOVED): the battle placed and its sides (`fight`, null where none); CROWN1 part two (PIN MOVED): a crown's Royal Tourney (`royal`, null where none); SEASON1 (PIN MOVED): the Season counted (`season`, null where none); SEASON1 part two (PIN MOVED): the Tides (`tides`, null where no Season is counted)
+  assert.deepEqual(Object.keys(s).sort(), ['battle', 'chronicle', 'defence', 'fight', 'holder', 'mine', 'phase', 'reckoningAt', 'royal', 'season', 'seat', 'standings', 'tides', 'turningAt', 'week']);   // SEAT1c: the holder, its defence, the week's battle, the Chronicle; SEAT2a (
   assert.deepEqual([s.phase, s.week, s.seat.key], ['muster', week, ANTICLERE.key]);
   assert.deepEqual(s.standings[0].guild, { id: gid, name: 'Silver Hand', tag: 'SH', heraldry: null });
-  // CROWN2 (PIN MOVED): the guild's crown politics ride `mine` too
+  // CROWN2 (
   assert.deepEqual(s.mine, { guild: gid, rank: 0, seasoned: true, bound: gid, pledges: [{ region: 21, key: ANTICLERE.key, by: 'Gamal', at: T0 }], influence: ACCOUNT_SEAT_WEEK_CAP, tributeRoom: 5000, politics: { fealty: [], pacts: [] } });
   assert.equal((await svc.call('/v1/seats/standings', { key: 999 }, gm.secret)).body.error, 'seat-unconfirmed');
 });

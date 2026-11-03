@@ -1,4 +1,4 @@
-// WD3 (2026-10-01): THE PICTURES THE STAND-INS WEAR THAT DAGGERFALL HAS NONE OF - drawn by the port, in code.
+// WD3: THE PICTURES THE STAND-INS WEAR THAT DAGGERFALL HAS NONE OF - drawn by the port, in code.
 //
 // Daggerfall Expanded Textures hangs tapestries and banners - a region's, a god's, a pattern's - and Rosy's
 // Resources lays rugs; Beautiful Villages and Beautiful Cities place them by the hundred, and Detailed Ships flies

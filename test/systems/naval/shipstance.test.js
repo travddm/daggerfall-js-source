@@ -1,5 +1,4 @@
-// SHIP-STANCE and SHIP-TAGS (2026-10-02, Mac: "Improve the enemy and friendly UI substationally" and "Friendly ships
-// should have green Healthbars unless provoked") - a ship's tag and card said one thing of how she stood: hostile, or
+// SHIP-STANCE and SHIP-TAGS - a ship's tag and card said one thing of how she stood: hostile, or
 // nothing. Every bar was an enemy's red - the merchantman sailing by, the crown's cutter keeping the passage, the
 // pirate closing - and nothing said what a ship was or where she went. Now:
 //   SHIP-STANCE - a ship flying a lawful flag (a merchantman, a crown's ship) that is not after me is FRIENDLY: her tag's
@@ -38,7 +37,7 @@ test('SHIP-STANCE FRIENDLY UNTIL PROVOKED, by the real host: a merchantman and a
   const n = stand(h, 'navyCutter', 400, 0);
   const p = stand(h, 'pirateBrig', 500, Math.PI);
   const w = stand(h, 'pirateSloop', 650, -Math.PI / 2, 'wary');   // a wary sloop: my boat no prize of hers
-  knowAll(h.host);   // PIN MOVED (SPYGLASS): their colours made out - an unknown hull wears no tag, and her card says nothing of her stance
+  knowAll(h.host);
   h.run(1.5);
   for (const e of [m, n, p, w]) assert.ok(tagOf(h, e), `${e.ship.cls.id} tagged`);
   const stance = (e) => { const t = tagOf(h, e); return [t.hostile, t.friendly]; };
@@ -147,7 +146,7 @@ test('SHIP-TAGS THE WORDS, by the real host: her class line (a crown\'s by her c
   n.relief = true;
   assert.equal(bound(null), 'coming to your aid');
   n.relief = false;
-  // AUDIT BAY A9 PIN MOVED: a packet's ports by key and name, and lying off her port by her leg's end (LINER_PORT_M)
+  // AUDIT BAY A9
   const SENT = { key: 'port:7', name: 'Sentinel' }, WAYR = { key: PORT.key, name: 'Wayrest' };
   const leg = [[n.ship.pos[0], n.ship.pos[2] - 3000], [n.ship.pos[0], n.ship.pos[2] + 2000]];
   n.liner = { id: 'L1-2.0.1', seed: 1, phase: 'sail', to: SENT, from: WAYR, port: null, leg, way: leg, dest: SENT };

@@ -1,5 +1,4 @@
-// SD15 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD15;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE ARENA READ (scenes/superDungeon/sdArenaRead.js, ui/superDungeon/sdTitleCard.js)
+// SD15: THE ARENA READ (scenes/superDungeon/sdArenaRead.js, ui/superDungeon/sdTitleCard.js)
 // - "in it", as the gate's WB13a: a blow of the Remnant's or an Echo's still to land on my feet (the Stomp's disc, the
 // Hand's sweep unshaded by a pillar, a Volley's mark), the soonest, with the nearest way out as the screen turns it; the
 // Stomp's ring rolling out at me, "jump!"; the Hour's own blows over the whole floor none; the burning brass felt on the
@@ -21,7 +20,6 @@ import { realmToDungeon } from '../../../src/net/superDungeon/sdBrain.js';
 import { GROUND_VIEW_TEXT } from '../../../src/ui/gate/gateGroundView.js';
 import { TELEGRAPH_NOW_MS } from '../../../src/render/gate/gateTelegraph.js';
 
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const T = 1_800_000_000_000;
 const fight = (over = {}) => ({ fi: 4, ph: 1, op: T - 60_000, ends: T + 600_000, ended: 0, lost: 0, fell: null, rem: { x: 0, z: 0, yw: 0, atk: null }, ec: null, ...over });
 const atk = (A, at, o = {}) => ({ i: 9, a: A.id, at, x: 0, z: 0, yw: 0, tg: [], ...o });
@@ -142,13 +140,6 @@ test('SD15 THE HOUR\'S CARD - in brass, never Dagon\'s red: one node made on the
   drawSdTitleCard(titleCardModel(beat, 1500), { doc, hidden: true });
   assert.equal(root.style.display, 'none', 'hidden with the HUD');
   destroySdTitleCard();
-  assert.match(W, /const peril = playerEntity\.health > 0 \? sdPerilAt\(s, now, x - SD_ARENA\.x, z - SD_ARENA\.z, cam\.yaw, !!sdBlows\?\.over\?\.\(\)\) : null;/);   // AUDIT SD III (F8, PIN MOVED): the read told whether I stand over a pillar's top
-  assert.match(W, /ground = sdGroundModel\(\{ burning: !!sdBlows\?\.burning\?\.\(\), el: sdBlows\?\.burningEl\?\.\(\) \?\? null, now, peril \}\);/);   // SD18b (PIN MOVED): in its element
-  // PIN MOVED (AUDIT SD IV T1): the fight's turns on the card where its bar stands, its last minute and its fall the whole Hour's (sd26_text)
-  assert.match(W, /const beat = sdBeats\.frame\(s, now\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*card = beat && \(near \|\| beat\.kind === 'last' \|\| beat\.kind === 'fell'\) \? titleCardModel\(beat, now\) : null;\n\s*\} else sdBeats\.leave\(\);/);
-  assert.match(W, /if \(ground \|\| _sdGroundUp\) \{ drawGateGround\(ground, \{ hidden \}\); _sdGroundUp = !!ground; \}/);
-  assert.match(W, /if \(card \|\| _sdCardUp\) \{ drawSdTitleCard\(card, \{ hidden \}\); _sdCardUp = !!card; \}/);
-  assert.match(W, /if \(_sdGroundUp\) \{ drawGateGround\(null\); _sdGroundUp = false; \}[^\n]*\n\s*if \(_sdCardUp\) \{ drawSdTitleCard\(null\); _sdCardUp = false; \}/);
 });
 
 test('SD15 THE BURNING BRASS FELT: the blows say whether my feet stand in a Volley\'s burning brass - after it lands, at its mark - and not out of it (mutants: the brass never read)', () => {

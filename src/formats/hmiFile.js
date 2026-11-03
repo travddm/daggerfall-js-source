@@ -68,7 +68,7 @@
 //   is 0x2F (end of track). There is NO tempo meta - tempo lives in the song
 //   header, so a song has exactly one tempo for its whole length.
 //
-// THE CLOCK (2026-08-27, Mac: "music continuously loops with short tracks")
+// THE CLOCK
 //   This reader first took the u16 at 0x0D2 (480) for ticks-per-quarter and
 //   the u16 at 0x0D4 (120) for BPM, giving 1/960 s per tick - and every song
 //   played EIGHT TIMES too fast: DUNGEON.HMI in 28 seconds, D1 in 28, then

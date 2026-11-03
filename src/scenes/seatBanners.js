@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEAT1a (2026-09-30, Mac: "Finish the seats") — A SEAT TOWN'S BANNERS
-// (bible/11-Multiplayer/Seats-Arc.md 3.4).
+// SEAT1a — A SEAT TOWN'S BANNERS
+// (3.4).
 //
 // The anchors, derived from the town's own layout, at most
 // SEAT_BANNERS_MAX (8) a town, in this order:
@@ -14,7 +14,7 @@
 //   3. one pennant above each Notice Board - a town's RUMOUR boards, every
 //      board BOUNTY1 did not take (systems/bounty/bountyBoard.js
 //      questBoardIndices).
-// and CASTLE-GATE (2026-10-02): a crown seat's two more flanking its
+// and CASTLE-GATE: a crown seat's two more flanking its
 // castle's entrance in the city - the lowest of the pixel's dungeon-
 // entrance doors (systems/siegeField.js castleEntranceOf), after the
 // palace's two. A town that is no seat, or whose seats are not open to
@@ -25,7 +25,7 @@
 // Land's nothing (net/townSeatLaw.js seatPlainBanner). SEAT1c: a held
 // seat hangs its holder's own heraldry in its place (seatBannerOf). The
 // cloth is GUILD1d's own pass
-// (render/bannerPass.js). FESTIVAL-STAGE (2026-10-02): while a Festival
+// (render/bannerPass.js). FESTIVAL-STAGE: while a Festival
 // rules, its own more after them (scenes/seatFestival.js).
 //
 // Online alone. Four hosts: world.js WIRED (the streets); worldModes.js

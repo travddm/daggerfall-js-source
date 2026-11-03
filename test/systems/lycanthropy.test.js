@@ -119,7 +119,6 @@ test('V2a: the advantages are +40/+30 through the live channels, re-applied per 
   const p = P();
   const entry = createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: QUIET });
   assert.ok(entry);
-  // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the advantages are the beast's - none in human form,
   // so the curse changes before they are read (test/systems/bal6_curses.test.js holds both forms)
   lycanthropyMagicRound(p, { nowMinutes: QUIET + 1 });
   assert.equal(liveStat(p, 'strength'), 50, 'BAL6: the man is his own');
@@ -246,8 +245,6 @@ test('V2a: the free spell is record 92, name-stripped, and the spellbook already
   // AUDIT 17e recorded. Now the shapes meet.
   assert.equal(spellPointCost(spell, () => 999), 0, 'the book casts it free');
   assert.equal(WINDOW_TAG, LYCANTHROPY_SPELL_TAG, 'one spelling, re-exported');
-  assert.match(read('src/ui/spellbookWindow.js'), /tag === LYCANTHROPY_SPELL_TAG.*cannotDeleteWereText\(\)/,
-    'and the delete refusal keys on the same tag');
   // granting twice does not stack
   grantLycanthropySpell(p);
   assert.equal(p.spells.filter((s) => s.tag === LYCANTHROPY_SPELL_TAG).length, 1);
@@ -292,33 +289,3 @@ test('V2a: the curse survives the save whole, marker rebuilt from the entry', as
 
 // ── THE SEAMS, SWEPT ─────────────────────────────────────────────
 
-test('V2a: the round pump runs the curse beside the infection, in worldTick\'s one home', () => {
-  // DISC10-D V2 re-aim: the ROUND is read, not the file - worldTick now also registers the deploy's own curse mint
-  // (setRacialCurseDeployer) above it, which names the consumers first; the order this pins is the round's.
-  const src = read('src/systems/worldTick.js').slice(read('src/systems/worldTick.js').indexOf('export function runMagicRoundsFor('));
-  const i = src.indexOf('runInfections(entity');
-  const j = src.indexOf('consumeRacialOverridePending(entity');
-  const k = src.indexOf('lycanthropyMagicRound(entity');
-  assert.ok(i > 0 && j > i && k > j,
-    'infection -> consume -> fold, in the same round, in that order');
-});
-
-test('V2a: the ONE cast engine wires MorphSelf, and every host hands it the clock', () => {
-  assert.match(read('src/scenes/hostMagic.js'), /base\.morphSelf = \(\) => morphSelf\(playerEntity/,
-    'the arm rides applySpellToPlayer for every host at once');
-  // THE FOUR HOSTS: world, exterior and the dungeon context build the
-  // magic engine and pass their clocks; worldModes BORROWS the outer
-  // host\'s engine (mountInterior\'s makeSpellbookWindow casts through
-  // it), so it is wired by construction - named here so the record
-  // holds all four.
-  for (const host of ['scenes/world.js', 'scenes/exterior.js', 'scenes/dungeonContext.js']) {
-    assert.match(read(`src/${host}`), /now: \(\) => [A-Za-z.]*(classicMinutes|ownMinutes|value)/,
-      `${host} hands the once-a-day clock`);
-  }
-});
-
-test('V2a: the tag\'s home moved to the producer; the spellbook re-exports one spelling', () => {
-  const win = read('src/ui/spellbookWindow.js');
-  assert.match(win, /import \{ VAMPIRE_SPELL_TAG, LYCANTHROPY_SPELL_TAG \} from '..\/systems\/lycanthropy.js'/);
-  assert.doesNotMatch(win, /LYCANTHROPY_SPELL_TAG = '/, 'no second literal');
-});

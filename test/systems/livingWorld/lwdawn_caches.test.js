@@ -1,5 +1,4 @@
-// LW-DAWN (2026-10-07, a screenshot in Daggerfall - 1 fps, "script 6179.8 ms" - and the ask: "Something is killing CPU
-// performance"; bible/06-Systems/Living-World.md "LW-DAWN"): A DAY'S CACHE KEEPS THE DAY BESIDE IT. The town's plans,
+// LW-DAWN: A DAY'S CACHE KEEPS THE DAY BESIDE IT. The town's plans,
 // the roads' word, its people and its walks by their door each kept one day; from the day's turn at four a reader asks
 // two (WATCH-DAY's morning walk leaves before the turn, and a company's file is read off the day it leaves in; a walker
 // owing minutes reads the day they are behind in), and each change of day threw the other away - the whole town planned

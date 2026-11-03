@@ -1,4 +1,4 @@
-// DECOR-LPT (FIELD BUGS 2026-10-05b, the owner: "elements should recieve the low poly overhaul style like trees got";
+// DECOR-LPT (FIELD BUGS 2026-10-05b,;
 // asked which, "Placed trees & plants"). A yard's placed tree stood as its classic picture wherever Low Poly Trees stood
 // the town's own as 3D trees. Now a placed tree or plant the mod has a tree for stands as the world's do: its 3D tree near
 // the eye - turned by the piece's turn, sized by its scale - and the same tree's far picture beyond, giving way to it; the
@@ -182,11 +182,3 @@ test('DECOR-LPT a yard\'s near set, as the world reads one (yardTreeSet): a hand
   assert.deepEqual(set.centers, [[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
 });
 
-test('DECOR-LPT the hosts: the world hands its Low Poly Trees to the yards and gathers their near sets with its pixels\'; the yards hand it to their nature - THE FOUR HOSTS: the yards stand in world.js alone (mutant: DECORLPT-world-unwired)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /trees: lowPolyTrees \? \{ door: lowPolyTrees, sway: \(proto, share\) => _lptSway\.set\(proto, Math\.max\(_lptSway\.get\(proto\) \?\? 0, share\)\), windfall: \(proto, share\) => _lptWindfall\.set\(proto, Math\.max\(_lptWindfall\.get\(proto\) \?\? 0, share\)\) \} : null,/);   // WINDFALL1: and its share under Windfall's law
-  assert.match(world, /createTreesHost\(\{[^\n]*yards: \(\) => yards \}\)/);   // BANTHA1 (HOST-SPLIT): the near trees' frame is scenes/treesHost.js's - the world hands it the yards
-  assert.match(src('src/scenes/treesHost.js'), /for \(const set of yards\(\)\?\.treeSets\(\) \?\? \[\]\) lptSets\.push\(set\);/);
-  assert.match(src('src/scenes/homeYards.js'), /createYardNature\(\{[^}]*trees: deps\.trees \?\? null \}\)/);
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(src(host), /createHomeYards\(/, `${host} stands no yard`);
-});

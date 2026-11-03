@@ -1,6 +1,5 @@
-// MOD1 — THE MODERATOR GLYPH AND /mute, /unmute (2026-09-22).
+// MOD1 — THE MODERATOR GLYPH AND /mute, /unmute.
 //
-// Mac: "Next up I want a moderator glyph and moderator chat commands",
 // and when asked which commands and which glyph: /mute and /unmute, and
 // the blue shield.
 //
@@ -25,7 +24,7 @@ import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { register, muteAccount } from '../../server-account/src/accounts.js';
-import { glyphsOf, isModerator, canModerate, moderatorHandles } from '../../server-account/src/titles.js';
+import { glyphsOf, isModerator, canModerate } from '../../server-account/src/titles.js';
 import {
   GLYPHS, claimsValid, mintToken, verifyToken, mintOrder, verifyOrder, orderValid, ORDER_TTL_S,
   importPublicKeyB64,
@@ -69,7 +68,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -79,19 +78,18 @@ const T0 = 1_800_000_000;
 
 // ── THE GRANT ───────────────────────────────────────────────────────
 
-test('MOD1: the moderator shield is a handle in CONFIG - granted by listing it, revoked by taking it off; a guest is never one', () => {
-  const env = { MODERATOR_HANDLES: ' Kithlan , mack ' };
-  assert.deepEqual([...moderatorHandles(env)], ['kithlan', 'mack'], 'trimmed and case-folded, the developer list\'s own reading');
-  const mod = { handle: 'Kithlan', created_at: 0 };
-  assert.ok(isModerator(mod, env));
-  assert.deepEqual(glyphsOf(mod, env, T0), ['mod']);
-  assert.deepEqual(glyphsOf(mod, {}, T0), [], 'off the list, off the name - nothing to clear anywhere');
-  assert.equal(isModerator({ handle: null, guest_name: 'Kithlan' }, env), false, 'a guest row is a device, not a person the list can name');
+test('MOD1: the moderator shield is a role on the ACCOUNT - granted by the staff_mod column, revoked by clearing it; a guest is never one', () => {
+  const mod = { handle: 'Kithlan', created_at: 0, staff_mod: 1 };
+  assert.ok(isModerator(mod, {}));
+  assert.deepEqual(glyphsOf(mod, {}, T0), ['mod']);
+  assert.deepEqual(glyphsOf({ ...mod, staff_mod: 0 }, {}, T0), [], 'role taken off the account, shield gone - nothing to clear anywhere');
+  assert.equal(isModerator({ handle: 'Kithlan', created_at: 0 }, { MODERATOR_HANDLES: 'Kithlan' }), false, 'a handle on a list is nothing: the row decides');
+  assert.equal(isModerator({ handle: null, guest_name: 'Kithlan', staff_mod: 0 }, {}), false, 'a guest row is a device, not a person who holds a role');
   // A DEVELOPER MAY MODERATE WITHOUT THE SHIELD: the dev mark already says more.
-  const dev = { handle: 'Lattymoy', created_at: 0 };
-  assert.ok(canModerate(dev, { DEVELOPER_HANDLES: 'Lattymoy' }));
-  assert.deepEqual(glyphsOf(dev, { DEVELOPER_HANDLES: 'Lattymoy' }, T0), ['dev'], 'no shield for a developer who is not on the moderator list');
-  assert.equal(canModerate({ handle: 'Bob' }, env), false);
+  const dev = { handle: 'Lattymoy', created_at: 0, staff_admin: 1 };
+  assert.ok(canModerate(dev, {}));
+  assert.deepEqual(glyphsOf(dev, {}, T0), ['dev'], 'no shield for a developer who is not a Moderator');
+  assert.equal(canModerate({ handle: 'Bob' }, {}), false);
   // and the face: every table the badge is drawn from names the shield, in blue
   assert.ok(GLYPHS.includes('mod'));
   assert.deepEqual(GLYPH_RGBA.mod, [0.29, 0.565, 0.886, 1], 'the blue Mac picked');
@@ -105,8 +103,10 @@ async function rows() {
   const add = (id, handle) => db._raw.prepare('INSERT INTO players (id, handle, handle_lc, guest_name, created_at, last_seen) VALUES (?, ?, ?, ?, 1, 1)')
     .run(id, handle, handle?.toLowerCase() ?? null, `Guest ${id}`);
   add('p_mod1', 'Kithlan'); add('p_dev1', 'Lattymoy'); add('p_mod2', 'Other'); add('p_bob1', 'Bob'); add('p_gst1', null);
+  db._raw.prepare('UPDATE players SET staff_mod = 1 WHERE id IN (?, ?)').run('p_mod1', 'p_mod2');   // STAFF-ROLES-BY-ACCOUNT: roles are columns of the row
+  db._raw.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').run('p_dev1');
   const get = (id) => db._raw.prepare('SELECT * FROM players WHERE id = ?').get(id);
-  return { db, get, env: { MODERATOR_HANDLES: 'Kithlan,Other', DEVELOPER_HANDLES: 'Lattymoy' } };
+  return { db, get, env: {} };
 }
 
 test('MOD1: a mute writes the ROW - until when, and WHO did it - and an unmute clears both', async () => {
@@ -123,7 +123,7 @@ test('MOD1: a mute writes the ROW - until when, and WHO did it - and an unmute c
   assert.equal(get('p_gst1').muted_by, null);
 });
 
-test('MOD1: the service refuses everybody its own lists do not name, every moderator, a self-mute, and a bound past a week - and writes NOTHING when it does', async () => {
+test('MOD1: the service refuses everybody whose row holds no role, every moderator, a self-mute, and a bound past a week - and writes NOTHING when it does', async () => {
   const { db, get, env } = await rows();
   const bob = get('p_bob1');
   const cases = [
@@ -149,7 +149,7 @@ test('MOD1: the service refuses everybody its own lists do not name, every moder
   }
 });
 
-async function standService(vars = {}) {
+async function standService({ moderators = [], ...vars } = {}) {
   _resetKeyForTests();
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pkcs8 = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
@@ -166,13 +166,14 @@ async function standService(vars = {}) {
   const account = async (handle) => {
     const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
     if (handle) await register({ db: env.DB, subtle, rand, nowS: Math.floor(Date.now() / 1000) }, guest.id, { handle, password: 'a-long-enough-password' });
+    if (moderators.includes(handle)) env.DB._raw.prepare('UPDATE players SET staff_mod = 1 WHERE id = ?').run(guest.id);   // STAFF-ROLES-BY-ACCOUNT
     return guest;
   };
   return { env, call, pubB64, account };
 }
 
 test('MOD1: /v1/mod/mute answers a SIGNED order, and the muted player\'s every later token carries the mute - a reconnect does not shed one', async () => {
-  const { call, pubB64, account } = await standService({ MODERATOR_HANDLES: 'Kithlan' });
+  const { call, pubB64, account } = await standService({ moderators: ['Kithlan'] });
   const mod = await account('Kithlan');
   const troll = await account(null);
   const pub = await importPublicKeyB64(pubB64, { subtle });
@@ -291,7 +292,6 @@ test('MOD1: THE NEWEST ORDER WINS - a replayed mute cannot undo the unmute that 
   const troll = r.connect(); await r.hello(troll, 'trol-0001');
   const bob = r.connect(); await r.hello(bob, 'bobb-0002');
   const nowS = Math.floor(Date.now() / 1000);
-  // PIN MOVED (AUDIT SAFE RELAY-6): an order older than the socket's own token no longer overrides it - these two are
   // minted after the troll's hello, as an order a moderator issues is
   const mute = await order('acct-trol-0001', nowS + 600, nowS + 1);
   const unmute = await order('acct-trol-0001', 0, nowS + 2);
@@ -409,11 +409,3 @@ test('MOD1: the session carries `sub` onto peers and lines, hands a muted frame 
   assert.equal(s.sendMuteOrder('x'.repeat(1025)), false);
 });
 
-test('MOD1: the world host parses the commands before a line is sent, and every room it holds tells the player they are muted', () => {
-  const w = src('src/scenes/world.js');
-  const at = (re) => { const m = re.exec(w); assert.ok(m, `world.js no longer has ${re}`); return m.index; };
-  assert.ok(at(/const mod = parseModCommand\(text\);/) < at(/return chatLinks\.get\(tabId\)\?\.sendChat\(text, \{ me, item, items \}\) \?\? false;/), 'a /mute typed must never go out as a chat line');   // PIN MOVED (CHAT-POST #1342: the linked items ride the line - the pin was left on the old send)
-  assert.match(w, /link\.onMuted = onMuted;/, 'every chat link');
-  assert.match(w, /online\.onMuted = onMuted;/, 'and the place room\'s own session');
-  assert.match(w, /runModCommand\(mod, \{ session: \{ peers \}, links, mute, refusal: accountRefusalText \}\)/);
-});

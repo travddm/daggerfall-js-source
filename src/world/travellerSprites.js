@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW3 - THE ROAD'S PEOPLE, SEEN (bible/06-Systems/Living-World.md).
+// LW3 - THE ROAD'S PEOPLE, SEEN.
 //
 // Each member of a party on the road (systems/livingWorld/trips.js) as a billboard: one walking ARMED (an adventurer, a
 // caravan's sellsword, a courier - LW0 decision 5) in their class's eight-way sprite, the enemy's own MobileUnit on the
@@ -20,7 +20,7 @@
 // and a talk target in the street's shape as any resident is (the fallen, `talk: false`, none); its frames animated on
 // the game's own billboard clock (render/flatAnimation.js FlatAnim) as Daggerfall's still people are.
 //
-// MWNPC10c (bible/04-Characters/Morrowind-NPCs.md section 15c): EACH BODY ON THE GROUND IN ITS MORROWIND BODY, on a lane
+// MWNPC10c: EACH BODY ON THE GROUND IN ITS MORROWIND BODY, on a lane
 // of the host's own (`laneName`: the roads', a room's) - dressed as its sprite shows it (characters/rosterBodies.js
 // residentLook: a class's sprite its class's look and blade, a still picture its kind's garments, the rest their own
 // outfit), walking as it walks, each strike begun a blow, the fallen dead; offered by `drawBodies` before the host's

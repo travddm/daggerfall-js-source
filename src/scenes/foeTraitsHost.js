@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT WORLD-EVENTS (2026-10-25, the owner: "Audit this. Ensure perfection"; bible/01-Overview/audits/Audit-World-Events.md,
-// bible/05-Combat/Boss-Traits.md): THE FOE POOLS' BOSS TRAITS, out of the hosts' bodies (HOST-SPLIT, bible/01-Overview/
+// AUDIT WORLD-EVENTS: THE FOE POOLS' BOSS TRAITS, out of the hosts' bodies (HOST-SPLIT, bible/01-Overview/
 // Host-Split.md - scenes/dungeonContext.js wires each in one call, scenes/exteriorFoes.js the striker's door):
 //   - L2-13: my blow's floating number told again where a trait resisted it (the door decides after the formula reports);
 //   - L2-3: the room's record carries a copy's WRATH (`bw`) and its WARD's share (`bv`) to every joiner, and an own lane's

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use" - net/staffEvent/staffEventLaw.js,
-// bible/11-Multiplayer/Staff-Events.md) - A STAFF EVENT, THE RELAY'S HALF. The account service's half is
+// STAFF-EVENT - A STAFF EVENT, THE RELAY'S HALF. The account service's half is
 // server-account/src/staffEvents.js; index.js holds the few hooks that call in here.
 //
 // THE HUB KEEPS THE BOOK: the events live (STAFF_EVENTS_MAX), in storage of its own (STAFF_EVENTS_KEY), each staged by a
@@ -24,7 +23,7 @@
 // own machine's word (co-op's law - the relay has no world to see it in). A forged word can bring a boss early; it can
 // never stage, end or move an event, which only a signed order does.
 //
-// THE REWARD (section 9 of the page; mob: "something like dagons leaderboard", "but not his ghear"): at the first boss's
+// THE REWARD (section 9 of the page;, "but not his ghear"): at the first boss's
 // fall the cell pays once - each earner's receipt minted with the relay's key (net/staffEvent/staffEventReceipt.js `e1`,
 // a seed and its rank) and kept WITH the ledger before a word is said (the raid's cleanse's law), the BOARD said to the
 // place (`{t:'sev', k:'bd', id, top}`) and carried to the hub on the tell (staff read it), and each earner's receipt to

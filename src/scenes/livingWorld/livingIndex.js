@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW1 (2026-10-24, bible/03-World/World-Wide.md): THE LIVING WORLD'S TOWNS AND DUNGEONS, wherever the world's places
+// WW1: THE LIVING WORLD'S TOWNS AND DUNGEONS, wherever the world's places
 // stand. Out of scenes/world.js (HOST-SPLIT: the host wires it), where LW3's and LW6's two indices walked the game's own
 // MAPS.BSA rows and filed each place by `y * 1000 + x` - the Bay's pixel id, one key for two pixels a thousand apart
 // past the Bay. The index reads the world's registry (world/worldWide/worldPlaces.js) instead: the Bay's rows are its
@@ -16,7 +16,7 @@
 //  - A DUNGEON is a place of a diver's kind (LW6: a labyrinth, a keep, a ruin, a graveyard).
 //  - NEAR is a square of pixels about one (Chebyshev), sorted by map id - kept by (pixel, reach) as OW-HITCH kept it,
 //    under the world's key.
-//  - WW7-7 (2026-10-26, the owner: "Yes travellers to need to travel everywhere. Same for ships."): TWO SIDES OF THE
+//  - WW7-7: TWO SIDES OF THE
 //    BAY'S EDGE (`livingSide`). Near, a town's travellers' ends, an area's bands: each the asker's own side's - the Bay's
 //    places for a pixel of the Bay, the land past the Bay's for a pixel past it. The Bay is every client's, the land past
 //    it only the clients that stand it (TAMRIEL2's switch is a player's own, online too): a Bay town that sent its people
@@ -30,16 +30,14 @@
 //    walk's answer, place for place (pinned with ARENA2), a hundred times cheaper. So a square past the Bay is asked only
 //    once the roads past the Bay are whole (`beyond.epoch()`: 0 while a region is still to land, and none is near), and its
 //    books are made again whenever they are laid again (the epoch moves; the generation with it).
-//  - WW7-9 (2026-10-26, the coordinator: "travellers need to travel everywhere" - across the Bay's edge too, and the land
-//    past the Bay waking region by region): A SQUARE IS KNOWN ONCE THE LAND PAST THE BAY UNDER IT IS LAID (`beyond.landedIn`
+//  - WW7-9: A SQUARE IS KNOWN ONCE THE LAND PAST THE BAY UNDER IT IS LAID (`beyond.landedIn`
 //    - every region of the roads past the Bay whose layer and places reach it landed: TESA14's host); the epoch is the
 //    roads' build (it moves as they are laid again), and a region landing makes the squares and the areas asked again
 //    (`beyond.landed()` - a count that moves) without moving the generation: a square known stays what it was. AND ACROSS
 //    THE EDGE: a square that holds both sides holds both sides' places - a Bay town by the edge has the towns past it near,
 //    a town past the edge the Bay's - once the land past the Bay under it is laid, on a client that stands that land (none
 //    stands it: no `beyond`, and the Bay's squares are the Bay's alone, to the byte).
-//  - WW7-11 (2026-10-26, the coordinator at IC-GRAND's merge: the Imperial City's 625 slices are places - "keep your near
-//    lists and wake bounded over them"): A CAPITAL IS ONE TOWN TO THE LIVING WORLD - its centre's (world/pastBayRows.js:
+//  - WW7-11: A CAPITAL IS ONE TOWN TO THE LIVING WORLD - its centre's (world/pastBayRows.js:
 //    the capital's own name, map id and port). Its other slices are its STREETS (`capitalStreet`): no square, no area and
 //    no town's list past the Bay names one, so a town near the Imperial City has one more town near it, never 625, and a
 //    traveller bound for the city walks to its centre; a street's own record still stands for a reader on it (`townAt`).

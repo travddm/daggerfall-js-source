@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW11 (2026-10-09, bible/06-Systems/Living-World-II.md "LW11"): THE CARAVAN'S DOOR - what a party on the road offers
-// the player, and what a deed against it costs. Mac: "caravans ... that can be assaulted, protected or traded with".
+// LW11: THE CARAVAN'S DOOR - what a party on the road offers
+// the player, and what a deed against it costs..
 // Pure: the trip's own data and the clock in, the law out; the host (scenes/world.js) opens the windows and keeps the
 // character's records (relations.js `wares`, `reports`, `escort`).
 //

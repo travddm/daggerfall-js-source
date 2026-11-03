@@ -1,8 +1,8 @@
 // @ts-check
-// WB4 (2026-09-25, Mac: "a large boss arena with an oversized enemy with telegraphed attacks (like wind ups, etc)"):
+// WB4:
 // THE BOSS AS HE IS SEEN AND HEARD - where he stands and what he is doing at a moment of the relay's clock, the frame
 // of Daggerfall's own sprite that shows it, the glow on him and the words of his voice. Design:
-// bible/11-Multiplayer/World-Bosses.md section 5 ("On him: the sprite holds its attack frame's first half through the
+// ("On him: the sprite holds its attack frame's first half through the
 // wind-up, glows the attack's colour, and his voice gives the wind-up's cue; at the landing the attack frames play out").
 //
 // PURE. The court's state (net/gate/gateLink.js, the relay's words folded) and a clock in; a pose, a light, a cue out. The
@@ -17,7 +17,6 @@
 // Not a DFU member. Ledger A (WB).
 import { ATTACK_BY_ID, ATTACKS, BOSS_H, LEAP_AIR_MS, CROSS_AIR_MS, airOf, leapAt, profileOf, isDagons, HOST, HOST_KINDS, HOST_RISE_MS, hostAt, HALF } from '../../net/gate/gateBrain.js';
 import { HIT_CAP_X, dpsRef, LV_MAX } from '../../net/gate/gateBrain.js';   // STAND-IN-WHOLE: the most one blow lands, the relay's own law
-import { EG_BUCKET_X_MAX } from '../../net/eliteGates/egVestige.js';   // STAND-IN-WHOLE: and the most an Elite Breach's bucket grows by
 import { bossAt } from '../../net/gate/gateLink.js';
 import { telegraphAt, chargeHead, hostTelegraphAt } from '../../net/gate/gateStrike.js';
 import {
@@ -37,7 +36,7 @@ import { fxBurstOf } from '../../render/gate/gateFx.js';   // WB13d: a landing w
  *  size he stands (BOSS_H is the body the blows are measured against - three Daedra Lords tall). */
 export const BOSS_LOOKS = Object.freeze({ ruhn: Object.freeze({ mobile: 31, scale: 3 }) });
 export const bossLookOf = (id) => BOSS_LOOKS[id] ?? BOSS_LOOKS.ruhn;
-/** WB14d (bible/11-Multiplayer/Breach-Portents.md section 5): HIS FLAME, SEEN - his aspect's Atronach (the Fire, the Ice,
+/** WB14d: HIS FLAME, SEEN - his aspect's Atronach (the Fire, the Ice,
  *  the Iron under the storm, the Flesh under the venom - the Sapper's own sprites, enemyBasics.js 35-38) at his own scale,
  *  its profile's size three quarters of his: a second body across the fire, never his own sprite twice. */
 export const FLAME_LOOKS = Object.freeze({ burning: 35, rime: 38, storm: 36, venom: 37 });
@@ -69,9 +68,6 @@ export const halfName = (b, P, name) => {
  * FIELD BUGS 2026-10-18f RELAY-SHARE: `share` - its owner's reader of the relay's own word of this body's health (a share,
  * 0..1, or null where none is heard; combat/healthShare.js wordShare builds one): what every "under its health" power
  * reads of it (combat/healthShare.js healthShare). Without one the share is unknown, as before.
- * FIELD BUGS 2026-10-19f STAND-IN-WHOLE: `blowX` - its owner's reader of the factor its relay grows my bucket by (an Elite
- * Breach's: my Vestiges' declared factor, net/eliteGates/egVestige.js egDeclaredX); none, the gate's own 1. What one blow of
- * mine can land on it reads it (standInBlowCap).
  */
 export const BOSS_ARMOR = 60;
 /**
@@ -81,29 +77,24 @@ export const BOSS_ARMOR = 60;
  * lands on it through counting sinks - scenes/gate/standInSpell.js), so one law alone reads its whole: a Disintegrate
  * deals its target what health it has left (systems/effects.js - DFU's Disintegrate.MagicRound, SetHealth(0)). It stood
  * at 1e9, and a claim of 1e9 is past every wire's ceiling - the gate's hit, ahit and xhit and the Abyss's
- * (net/wire.js GATE_DMG_WIRE_MAX, 100,000), an Elite Breach's (validEgIn, 1e6) and a refereed bout's
+ * (net/wire.js GATE_DMG_WIRE_MAX, 100,000) and a refereed bout's
  * (net/arena/arenaLaw.js validArenaIn, 10,000) - so every relay refused the whole cast: the number rose, nothing landed.
- * It stands at the most one blow lands at any relay - HIT_CAP_X times the reference at LV_MAX, grown by the most an Elite
- * Breach's bucket grows (EG_BUCKET_X_MAX): 975, over the serpent's (net/serpent/serpentBrain.js, SERPENT_HIT_CAP_X of a
+ * It stands at the most one blow lands at any relay - HIT_CAP_X times the reference at LV_MAX: 1,680, over the serpent's (net/serpent/serpentBrain.js, SERPENT_HIT_CAP_X of a
  * galley's reference) and a bout's (arenaBlowCap) - so a Disintegrate counts whole and the relay's own caps clip it, as
  * a duel's stand-in counts at the wire's vital ceiling (combat/duelCombat.js DUEL_STAND_IN); and under the least ceiling
  * nobody clamps (the bout's 10,000), with the rest of a spell's room beside it. Pinned against the real constants and
  * every validator (test/net/gate/fb1019f_standinwhole.test.js).
  */
-export const STAND_IN_WHOLE = HIT_CAP_X * dpsRef(LV_MAX) * EG_BUCKET_X_MAX;
+export const STAND_IN_WHOLE = HIT_CAP_X * dpsRef(LV_MAX);
 /**
  * STAND-IN-WHOLE: WHAT ONE BLOW OF MINE AT LEVEL `lv` CAN LAND ON STAND-IN `e` - the relay's one-blow cap (net/gate/
- * gateBrain.js applyHit and spendPurse: HIT_CAP_X times the reference at my level), grown by the factor its owner says my
- * bucket grows by (`relayBlowX` - an Elite Breach's, at most EG_BUCKET_X_MAX; 1 where none is said or it says no number).
- * Never past STAND_IN_WHOLE. The number a spell on it says (scenes/gate/standInSpell.js). Pure.
+ * gateBrain.js applyHit and spendPurse: HIT_CAP_X times the reference at my level). Never past STAND_IN_WHOLE. The number a spell on it says (scenes/gate/standInSpell.js). Pure.
  * @param {any} e @param {number} lv
  */
 export function standInBlowCap(e, lv) {
-  let bx = 1;
-  try { bx = typeof e?.relayBlowX === 'function' ? Number(e.relayBlowX()) : 1; } catch { bx = 1; }
-  return HIT_CAP_X * dpsRef(lv) * (Number.isFinite(bx) ? Math.max(1, Math.min(EG_BUCKET_X_MAX, bx)) : 1);
+  return HIT_CAP_X * dpsRef(lv);
 }
-export function bossStandIn(look, name, share = null, blowX = null) {
+export function bossStandIn(look, name, share = null) {
   const e = makeEnemyEntity(look.mobile, ENEMY_BASICS[look.mobile], null, 1, () => 0.5);
   e.minMetalToHit = 0;
   e.armor = BOSS_ARMOR;
@@ -111,11 +102,10 @@ export function bossStandIn(look, name, share = null, blowX = null) {
   e.maxHealth = e.health = STAND_IN_WHOLE;   // FIELD BUGS 2026-10-19f STAND-IN-WHOLE: a count the wire carries, never 1e9
   e.relayHealth = true;   // AUDIT MARTIAL L3 F2: the relay's to know - a share of the whole here is no word (systems/weaponMastery.js), nor is a blow's share of it (combat/blood/bloodDecals.js bloodHit)
   e.relayShare = typeof share === 'function' ? share : null;   // FIELD BUGS 2026-10-18f RELAY-SHARE: the relay's word of it, its owner's reader
-  e.relayBlowX = typeof blowX === 'function' ? blowX : null;   // FIELD BUGS 2026-10-19f STAND-IN-WHOLE: the factor its relay grows my bucket by, its owner's reader
   e.name = name;
   e.spareGear = true;   // WBX6: a blow on him wears no weapon (combat/formulas.js damageEquipment)
   e.mobileType ??= look.mobile;   // WBX7: a soul trap reads the target's mobile (systems/effects.js) - his is a Daedra Lord's, no humanoid
-  // WB8a (2026-09-28, Mac: "Make the oblivion gate boss not be able to be pacified"): NEVER SWAYED. No path reached him
+  // WB8a: NEVER SWAYED. No path reached him
   // before this, but only by accident - he is in no foe pool, so the language roll never met him, and his spell door
   // took harmful families alone - and a Pacify Daedra on a Daedra Lord's stand-in matches. Now it is his own word: the
   // language seam (scenes/hostCombat.js), the Pacify/Charm arm (systems/effects.js) and the flag's door
@@ -131,8 +121,8 @@ export function bossStandIn(look, name, share = null, blowX = null) {
  */
 export const CRYSTAL_ARMOR = 100;
 export const CRYSTAL_NAME = 'Crystal of Oblivion';
-export function crystalStandIn(look, c = null, share = null, blowX = null) {   // FIELD BUGS 2026-10-18f RELAY-SHARE: `share` its own word's reader (bossStandIn); 2026-10-19f STAND-IN-WHOLE: `blowX` its relay's bucket's
-  const e = bossStandIn(look, CRYSTAL_NAME, share, blowX);
+export function crystalStandIn(look, c = null, share = null) {   // FIELD BUGS 2026-10-18f RELAY-SHARE: `share` its own word's reader (bossStandIn)
+  const e = bossStandIn(look, CRYSTAL_NAME, share);
   e.armor = CRYSTAL_ARMOR;
   e.armorValues = new Array(7).fill(CRYSTAL_ARMOR);
   e.skills = 0;
@@ -171,7 +161,7 @@ export const FLINCH_MS = 450;
 export const STUN_ANIM_SPEED = 3;
 /** The fall: the hurt frames played slowly this long, and then he is gone (WB5's spoils spill at the fall). */
 export const FALL_MS = 2400;
-/** WB13d (2026-10-01, Mac: "AAA grade polish"): HIS FIRE IS CAST, NOT SWUNG - the Daedra Lord's own spell frames
+/** WB13d: HIS FIRE IS CAST, NOT SWUNG - the Daedra Lord's own spell frames
  *  (characters/enemy/enemyBasics.js spellAnimFrames, [1, 1, 3, 3]): his attack's frame CAST_RAISE_FRAME held through a fire's
  *  wind-up, CAST_LOOSE_FRAME as it is loosed. His blade and his weight keep the swing (frames 0, 1, then 2-4). */
 export const CAST_RAISE_FRAME = 1;
@@ -189,7 +179,7 @@ export const GATE_FLASH_SHARE = 0.003;
 export const gateHitFlash = (mineAt, courtAt, now) => Math.max(hitFlashStrength((now - mineAt) / 1000), GATE_FLASH_COURT * hitFlashStrength((now - courtAt) / 1000));
 /** WB13d: a landing's light stands this high over the floor it lands on. */
 export const LANDING_LIGHT_Y = 0.6;
-/** WB13e (2026-10-01, Mac: "AAA grade polish"): HIS FALL, AN EVENT - his body meets the floor THUD_AT_MS into it, then
+/** WB13e: HIS FALL, AN EVENT - his body meets the floor THUD_AT_MS into it, then
  *  sinks FALL_SINK_M into the stone over the rest of FALL_MS, in a column of embers, and leaves his corpse there at
  *  CORPSE_SCALE (his mobile's own, characters/enemy/enemyBasics.js corpseTexture). */
 export const FALL_SINK_M = 1.5;
@@ -345,7 +335,7 @@ export function bossFrame(act, yaw, feet, cam, frameCount) {
 }
 
 /** The light's chest height on him, and its reaches: at rest, through a wind-up, and at a landing. */
-/** AUDIT EG-FALL (L2-9): the share of his height his chest stands at, named (scenes/eliteGates/egLordFall.js reads it); and his
+/** AUDIT EG-FALL (L2-9): the share of his height his chest stands at, named; and his
  *  glow's brightness as he falls, from this to nothing over FALL_MS. */
 export const GLOW_UP_SHARE = 0.55;
 export const FALL_GLOW_K = 2.2;
@@ -359,7 +349,7 @@ export const GLOW_RANGE = Object.freeze({ ember: 7, windup: 12, landing: 18 });
  * stands higher) and in his aspect's colours. WB13d: the landing's flare on the floor where it lands, LANDING_LIGHT_Y
  * over it - at his feet for his own; a landing that falls away from him (its burst carries its own light,
  * render/gate/gateFx.js FX_KINDS) leaves his ember.
- * LIGHT-ID (2026-10-14): `out`, a kept record, is refilled in place and answered (the court's own - his glow is ONE light
+ * LIGHT-ID: `out`, a kept record, is refilled in place and answered (the court's own - his glow is ONE light
  * that follows him, and the shadow pass knows it moved by the record: render/lightId.js); none, a new record.
  */
 export function bossGlow(s, now, out = null) {
@@ -497,7 +487,7 @@ export const BOSS_CUES = Object.freeze({
   }),
   roar: voice(B.barkSound, 0.5, 1.8),
   fall: voice(B.barkSound, 0.4, 1.8),
-  // WB7 (Mac: "Proper boss audio during the boss fight"): HIS BODY. A stride's weight on the stone as he walks and
+  // WB7: HIS BODY. A stride's weight on the stone as he walks and
   // charges; a growl now and then while he is not striking; a grunt when he is hurt; the ground's shock under his
   // heavy landings; thunder over his roar when a phase turns; and his body meeting the floor, a moment into his fall.
   // The clips are Daggerfall's own - a body's fall and the storm's roll, pitched down for his size.
@@ -519,7 +509,7 @@ export const BOSS_CUES = Object.freeze({
   // WB13e: a Meteor or a Leap aimed where I stand, at its word - the parry's ring, high and sharp, at my feet
   sting: Object.freeze({ clip: CRYSTAL_CLIPS.hit, pitch: 2.2, volume: 1.3, reach: 20, at: 'point' }),
 });
-/** GATE-MIX (2026-10-20, the owner: "the game hitches, audio becomes super loud and even distorts"): A CUE AT ITS
+/** GATE-MIX: A CUE AT ITS
  *  TARGETS, THINNED. A cue `at: 'targets'` played one copy at every target - a Hellfire on five players was five of the
  *  fire's full-scale cast in one frame, ten in his third phase (its second volley within 3 m of the first), and over a
  *  reach of 40 to 80 m with a linear fall every copy near a group came in at nearly its whole level, so the copies
@@ -591,7 +581,6 @@ export const THUD_AT_MS = 1500;
 
 // ═══ WB11c: HIS HOST, SEEN AND HEARD ═══════════════════════════════════════════════════════════════════════════
 //
-// (2026-10-01, Mac: "1. All three ... 4. Trial rotation" - the Legion-Lord's host; bible World-Bosses.md section 17.)
 // The relay knows bodies (net/gate/gateBrain.js HOST_KINDS); WHO each one is, by his aspect, is the screen's: Daggerfall's
 // own sprites at their own size, on their own tables - an Imp for every Harrier; the Atronach of his element for a
 // Sapper; for a Ward-Bearer the Daedra nearest it (the Seducer in her winged form for the storm - her change is not
@@ -648,8 +637,8 @@ export function knightAct(freed, now) {
  *  bites, a knight's plate for armour, a health nothing here can empty - the relay holds its real one, never swayed),
  *  named for the lines a blow says. AUDIT WB11 W1: one a BODY, naming it (`hostI`) - a Cast When Strikes spell on it is
  *  that body's (scenes/hostEnchant.js asks the stand-in it met), where one shared by a look sent it to HIM. */
-export function hostStandIn(look, i = null, share = null, blowX = null) {   // FIELD BUGS 2026-10-18f RELAY-SHARE: `share` its own word's reader (bossStandIn); 2026-10-19f STAND-IN-WHOLE: `blowX` its relay's bucket's
-  const e = bossStandIn({ mobile: look.mobile }, look.name, share, blowX);
+export function hostStandIn(look, i = null, share = null) {   // FIELD BUGS 2026-10-18f RELAY-SHARE: `share` its own word's reader (bossStandIn)
+  const e = bossStandIn({ mobile: look.mobile }, look.name, share);
   if (i !== null) e.hostI = i;
   return e;
 }

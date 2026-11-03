@@ -1,10 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - THE FRAME: one grid that holds the whole of Tamriel, with
+// TAMRIEL1 - THE FRAME: one grid that holds the whole of Tamriel, with
 // Daggerfall's own 1000 x 500 map standing in it at the map's own scale, unchanged.
 //
-// Mac: "building the entirety of tamriel that connects accurately to Daggerfall. Not actually traversalable but used
-// and connected as a gigantic map that can be used for later use and be seen by players ingame."
 //
 // THE ONE LAW. A Daggerfall map pixel is 819.2 m of ground (MapsFile: 32768 world units a pixel, 40 a metre -
 // net/wire.js PIXEL_UNITS), and a Tamriel pixel is the SAME 819.2 m: the continent is not a picture scaled to fit a

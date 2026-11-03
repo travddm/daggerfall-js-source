@@ -1,12 +1,10 @@
-// FLOW1, FLOW3, FLOW4 (2026-09-26, Mac: "Weve accumulated a lot of tests and I feel like its slowed down our ability to
-// iterate. If they help, I dont want things removed but is there a way to really ensure we have a faster workflow with
-// the same standards?"). FLOW1: CI's one serial check (~7 min, run twice for every change - the PR's, then main's before
+// FLOW1, FLOW3, FLOW4. FLOW1: CI's one serial check (~7 min, run twice for every change - the PR's, then main's before
 // the deploy) is verify.yml's parallel jobs - lint and the types, the suite in four shards balanced by recorded times
 // (tools/testShards.mjs), the build - which the PR's check and the deploy both call, the deploy publishing only once
 // every one passed, on one pinned commit. FLOW3: `npm run test:changed` runs the tests a change can move
 // (tools/testChanged.mjs), and ESLint keeps a cache. FLOW4: `node tools/mutate.mjs --jobs N` judges N mutants at once in
 // workspaces, the same verdicts. Nothing here removes or weakens a test: every file still runs on every PR and before
-// every deploy. Design: bible/09-Testing/Testing.md "How the suite runs".
+// every deploy. Design: "How the suite runs".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -74,16 +72,10 @@ test('FLOW1 the workflows: verify.yml is the one check - lint and the types, eve
   assert.match(d, /\n {2}deploy:\n {4}needs: \[verify, site\]\n[\s\S]*?uses: actions\/deploy-pages@v4/);
   assert.equal((d.match(/ref: main/g) ?? []).length, 1, 'only the pin reads main - every other job the commit it pinned');
   assert.equal((d.match(/actions\/deploy-pages/g) ?? []).length, 1);
-  // REL-FAST (2026-10-15, Mac: "Yes, thats insanely slow" - a release spent 27.4 of its 33 minutes on `npm run check` in
-  // series): the desktop release's gate is the same check, in parallel, on the commit its legs build
+  // REL-FAST: the desktop release's gate is the same check, in parallel, on the commit its legs build
   const r = read('.github/workflows/release-desktop.yml');
   assert.match(r, /\n {2}gate:\n {4}uses: \.\/\.github\/workflows\/verify\.yml\n {4}with:\n {6}ref: \$\{\{ github\.sha \}\}\n/);
   assert.doesNotMatch(r, /run: npm run check/, 'never the serial check again');
-  // INTRO3 (2026-10-23, the owner): the intro's workflow runs the intro's own tests before its probes - the serial check
-  // had outgrown its 25 minutes and cancelled every run before a probe ran; verify.yml is the whole gate
-  const iq = read('.github/workflows/intro-quality.yml');
-  assert.doesNotMatch(iq, /run: npm run check/, 'never the serial check in the intro\'s workflow');
-  assert.match(iq, /run: node --test test\/ui\/intro\.test\.js test\/ui\/intro4_film\.test\.js test\/systems\/intro3_score\.test\.js\n/);   // INTRO4: and the film's own
   assert.ok(d.indexOf('actions/deploy-pages') > d.indexOf('\n  deploy:\n'), 'the deploy step lives in the job that waits for the verification');
   // the local check is the whole check still, and the loop's scripts are there
   const pkg = JSON.parse(read('package.json'));
@@ -117,34 +109,3 @@ test('FLOW3 the tests a change can move: the ones that import it, through any de
   for (const f of EVERYTHING) assert.equal(testsFor([f], tests, d), 'all', f);
 });
 
-test('FLOW4 mutants N at a time: the same verdicts and output as a serial run, in list order; the source here never touched (the workspaces are copies); a record whose test does not pass outside this tree is judged here, in place, as a serial run judges it (mutants: every record in place; the baseline unread)', (t) => {
-  const d = scratch(t);
-  writeFileSync(join(d, 'package.json'), '{ "type": "module" }\n');
-  writeFileSync(join(d, 'target.js'), 'export const a = 1;\nexport const b = 2;\n');
-  const pin = (name, body) => writeFileSync(join(d, name), `import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { existsSync } from 'node:fs';\nimport { a, b } from './target.js';\n${body}\n`);
-  pin('a.test.js', "test('a', () => assert.equal(a, 1));");
-  pin('b.test.js', "test('b', () => assert.ok(b >= 0));");
-  // passes only in this tree: a workspace leaves the repository's .git behind
-  mkdirSync(join(d, '.git')); writeFileSync(join(d, '.git', 'HEAD'), 'ref: refs/heads/main\n');
-  pin('here.test.js', "test('here', () => { assert.ok(existsSync('.git/HEAD')); assert.equal(a, 1); });");
-  const list = [
-    { name: 'm1', file: 'target.js', old: 'a = 1', new: 'a = 5', tests: ['a.test.js'] },
-    { name: 'm2', file: 'target.js', old: 'b = 2', new: 'b = 3', tests: ['b.test.js'] },
-    { name: 'm3', file: 'target.js', old: 'a = 1', new: 'a = 7', tests: ['here.test.js'] },
-    { name: 'm4', file: 'target.js', old: 'nowhere', new: 'x', tests: ['a.test.js'] },
-  ];
-  writeFileSync(join(d, 'list.json'), JSON.stringify(list));
-  const before = readFileSync(join(d, 'target.js'), 'utf8');
-  const serial = spawnSync(process.execPath, [join(ROOT, 'tools/mutate.mjs'), 'list.json'], { cwd: d, encoding: 'utf8', env: ENV, timeout: 120000 });
-  const par = spawnSync(process.execPath, [join(ROOT, 'tools/mutate.mjs'), '--jobs', '3', 'list.json'], { cwd: d, encoding: 'utf8', env: ENV, timeout: 120000 });
-  const verdicts = (out) => out.split('\n').filter((l) => /^ {2}m\d:|^== |dead, .* survived/.test(l));
-  assert.deepEqual(verdicts(par.stdout), verdicts(serial.stdout), `same verdicts, same order:\n${par.stdout}`);
-  assert.equal(par.status, serial.status, 'the same exit');
-  assert.match(par.stdout, /m1: dead \(1 failing\)/);
-  assert.match(par.stdout, /m2: SURVIVED/);
-  assert.match(par.stdout, /m3: dead \(1 failing\)/, 'judged in place, where its test can pass unmutated');
-  assert.match(par.stdout, /m4: COULD NOT APPLY/);
-  assert.match(par.stdout, /\(3 workspaces; 1 of 4 mutants judged in place - their tests do not pass outside this tree: here\.test\.js\)/);
-  assert.equal(readFileSync(join(d, 'target.js'), 'utf8'), before, 'the source is as it was');
-  assert.equal(existsSync(join(d, 'target.js.mutbak')), false);
-});

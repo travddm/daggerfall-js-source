@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF6 (2026-09-29, Mac: "continue") - GUILD WRITS, THE GUILD STORES AND
-// COMMISSIONS, AS THE SERVICE KEEPS THEM (bible/06-Systems/Professions-Arc.md
+// PROF6 - GUILD WRITS, THE GUILD STORES AND
+// COMMISSIONS, AS THE SERVICE KEEPS THEM (
 // 7, 11 and 28; the numbers are src/net/writLaw.js, which the client reads
 // too). The Court's writs stay professions.js's: they mint; these move
 // Marks a guild or a player already holds.
@@ -188,7 +188,7 @@ export async function closeGuildWrits(ctx) {
  *  it, so a crafter's Yours never shows one open that cannot be filled - those whose crafter is gone declined, and the
  *  escrow of each closed one it posted (not filled) back, under the Marks cap. */
 async function settleCommissions({ db, nowS }, me) {
-  // SCALE4b (2026-10-08): ASKED BEFORE IT IS WRITTEN - both updates went on every Work read, nearly always changing
+  // SCALE4b: ASKED BEFORE IT IS WRITTEN - both updates went on every Work read, nearly always changing
   // nothing; one read says whether either has a row to move, and only then do the same two go (market.js settle's law)
   const due = await db.prepare(`SELECT EXISTS (SELECT 1 FROM commissions WHERE (poster = ?1 OR crafter = ?1) AND state = 'open' AND expires_at <= ?2)
       OR EXISTS (SELECT 1 FROM commissions WHERE poster = ?1 AND state = 'open' AND crafter IS NULL) AS due`).bind(me, nowS).first();

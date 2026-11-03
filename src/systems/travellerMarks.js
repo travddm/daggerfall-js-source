@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV3 - THE TRAVELLERS, REGION-WIDE: THE CLIENT'S HALF (bible/06-Systems/Travel-View.md).
+// TV3 - THE TRAVELLERS, REGION-WIDE: THE CLIENT'S HALF.
 //
-// Mac (2026-09-27): "being able to see other players traveling also";
 // his call: "Region-wide from the start". The wire's law - the mark's
 // shape, the gates, the relay that keeps and fans it - is net/wire.js
 // (validTravellerMark, TRAV_*); what is here is the client's own:
@@ -30,7 +29,7 @@ const NATIVE_PIXEL = 32768;
 /** The mark's fraction step, native units: a 256th of a pixel (128 units, 3.2 m). */
 export const TRAV_FRACTION = NATIVE_PIXEL / 256;
 
-/** OWS1 (2026-09-28, the player's ask: "being able to see other players sailing in the overworld"): the mark's way at
+/** OWS1: the mark's way at
  *  sea - TRAV_MODES' ship, the one the frame always carried and nothing sent. A traveller at a helm, or aboard a boat,
  *  sends it (the world host's `csaBoatUnderMe`). */
 export const TRAV_SHIP = TRAV_MODES.indexOf('ship');
@@ -54,7 +53,7 @@ export const yawOfHeading = (h) => (h / 256) * 2 * Math.PI;
 /**
  * THE MARK OF ME: native `x`/`z` (world units, the pixel's south-west corner at mapPixelToWorldCoords), the yaw, the
  * way and the journey. The pixel is worldCoordToMapPixel's own (y counts south: 499 - z / pixel) on the Bay; TV-BEYOND
- * (2026-10-09): past it the mark is the world's too (net/wire.js WORLD_PIXEL_BOUND) - it was clamped onto the Bay, a
+ * past it the mark is the world's too (net/wire.js WORLD_PIXEL_BOUND) - it was clamped onto the Bay, a
  * traveller beyond it marked at the edge - its pixel floored there, so its 256ths stay 0..255 either side of the corner.
  * @returns {{px:number, py:number, fx:number, fy:number, h:number, m:number, tv:number}}
  */
@@ -73,7 +72,7 @@ export function travellerWorldOf(p) {
   return { x: p.px * NATIVE_PIXEL + (p.fx + 0.5) * TRAV_FRACTION, z: zRow * NATIVE_PIXEL + (p.fy + 0.5) * TRAV_FRACTION };
 }
 
-/** OW-CHASE-RANGE (bible/06-Systems/Travel-View.md): while a chase of me runs, my mark is said again this often - the
+/** OW-CHASE-RANGE: while a chase of me runs, my mark is said again this often - the
  *  session's own floor (TRAV_SEND_MIN_MS), so the region sees the band where it runs, a refresh at a time. */
 export const TRAV_CHASE_REFRESH_MS = TRAV_SEND_MIN_MS;
 /** OW-CHASE-RANGE: what a mark's chase words (`bd`, `sr`, beside it) say that a mark must go again for - who chases me and

@@ -1,8 +1,5 @@
 // @ts-check
-// WAGONS2-VISIT (2026-10-09, Mac: "People should be able to use the interior just like houses, like crafting and such";
-// asked who may come into a player's caravan online, "Like an online home" - its owner sets private, party, guild or
-// public, the rules an online home's door keeps, and visitors cannot take from its storage; they come in "to craft,
-// rest, look around"): A VISIT TO ANOTHER PLAYER'S CARAVAN - THE LAW.
+// WAGONS2-VISIT: A VISIT TO ANOTHER PLAYER'S CARAVAN - THE LAW.
 //
 // WHO MAY ENTER is the caravan's own, so it rides the caravan item beside its paint (systems/wagon/wagonKinds.js's item,
 // systems/wagon/wagonLooks.js's `wagonLook`): `wagonEntry`, one of an online home's entries (net/homeLaw.js HOME_ENTRIES -
@@ -20,8 +17,7 @@
 // the room's pieces, `{ v, p }`, each through the decor law (net/decorLaw.js decorPieceOf) and kept as the save keeps
 // them - unturned (systems/caravanRoom.js turnCaravanScene) - and only as many as fit the small frame
 // (CARAVAN_DECOR_BYTES). Nothing a piece holds rides it: a visitor sees the pieces, never what the storage keeps.
-// WAGONS2-BASE (2026-10-12, from play: "it keeps the overhead lighting for visitors ... if it's taken out ... that
-// others don't still see it"): beside them, `h`, the room's own pieces its owner took out (scenes/decor/decorBase.js's keys -
+// WAGONS2-BASE: beside them, `h`, the room's own pieces its owner took out (scenes/decor/decorBase.js's keys -
 // the lantern and its light among them), as an online home's room hands out its `hidden` list; an older document
 // carries none, and an older client reads past it.
 //

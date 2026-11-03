@@ -1,5 +1,5 @@
 // @ts-check
-// RED-MOUNTAIN (bible/03-World/Red-Mountain.md): the volcano's fire - the lava lake on its crater's floor, lava down the
+// RED-MOUNTAIN: the volcano's fire - the lava lake on its crater's floor, lava down the
 // upper foyada, and the ash plume whose foot the fire lights. The lava lies at the levels the kernel lays the land to
 // (redMountainGround), so it lies on the ground near and far. Drawn in the far ring's pass, twice: by the world's lens
 // nearer than its far plane, and past it by its own lens at the far plane. Where no depth stands (past the far plane, and

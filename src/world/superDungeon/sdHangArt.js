@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S11 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): THE HANG'S
+// SD-LOOK S11: THE HANG'S
 // ART - the two pictures what hangs under the islands wears that the realm's own do not (the roots wear its strata strip,
 // the gear rims its brass, the far islands its flags): painted through the Hour's paint box (world/superDungeon/sdPixelKit.js) from its
 // ramps (world/superDungeon/sdLook.js SD_RAMP), records of the realm's archive (world/superDungeon/sdRealm.js SD_REALM_ARCHIVE) beside its own.

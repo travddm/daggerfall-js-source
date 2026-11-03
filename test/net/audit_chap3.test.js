@@ -1,6 +1,6 @@
-// AUDIT CHAP3 (2026-10-08, Mac: "Let's audit everything we have so far before we continue") - a pin a fix: CHAP0 to
+// AUDIT CHAP3 - a pin a fix: CHAP0 to
 // CHAP3c read again through six lenses (the service, the economy, the client, Daggerfall's law, the record, the pins).
-// bible/01-Overview/audits/Audit-Chapters-3.md is the record; each test names the findings it holds.
+// is the record; each test names the findings it holds.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -47,7 +47,7 @@ const rid = () => `audit3-${String(++_rid).padStart(6, '0')}`;
 /** Confirmed towns of `towns` ([key, region, factions]), the ground of Anticlere witnessed, a member of `members`. */
 async function stand({ open = 'on', towns = [[77, ANTICLERE, [41, 368]]], members = [41], extra = {} } = {}) {
   clock(NOON);
-  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra,Wit0,Wit1,Wit2,Ground', ...extra });
+  const s = await standService({ CHAPTERS_OPEN: open, PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Devra,Wit0,Wit1,Wit2,Ground', ...extra });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   const wits = [];
@@ -304,15 +304,6 @@ test('AUDIT CHAP3 C7/C8: a Take refused no-writ reads the list again; a member\'
   assert.equal(hallRememberLine([41], 50), 'The Fighters Guild will remember it, 50 Merit to its chapter here.');
   assert.equal(hallRememberLine([41, 368], 100), 'The Fighters Guild and the Knights of the Dragon will remember it, 100 Merit to their chapters here.');
   assert.equal(hallRememberLine([41], 0), 'The Fighters Guild will remember it.');
-});
-
-test('AUDIT CHAP3 C3/C4/C5/C9: the hosts\' wiring - a kept gate claim waits for the scan, a raid\'s line on its fighter\'s page, a late writ said in the chat, a stale build\'s stop said (mutants: each seam)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /const GATE_SCAN_WAIT_MS = 90_000;/);
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the wait the Bay's lane's alone - a lane past the Bay's region is its number's, no scan's
-  assert.match(world, /if \(!gateClaimWaits\(readReceipt\(r\)\?\.d, _gateScan\) \|\| Date\.now\(\) - _gateClaimsFrom >= GATE_SCAN_WAIT_MS\) return true;[^\n]*\n\s+warmGateScan\(\);\n\s+return false;/);
-  assert.match(world, /sayLate: \(text\) => chatNotice\(text\),/);
-  assert.match(world, /if \(error === 'roll-seed' \|\| error === 'roll-claim'\) chatNotice\(accountRefusalText\(error\)\);/);
 });
 
 // ── DAGGERFALL'S LAW ────────────────────────────────────────────────

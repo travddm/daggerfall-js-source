@@ -1,7 +1,7 @@
-// STAR4 (bible/11-Multiplayer/Starfall.md section 3): THE STAR IN THE WORLD - its art painted in code under its own
+// STAR4: THE STAR IN THE WORLD - its art painted in code under its own
 // pseudo-archive, its crater and stone made on the land's own heights, the sky's pure path (the omen, the streak, the
 // clamp about the eye, the ring of shock), its shaders' heads, and its sounds out of DAGGER.SND's own records.
-// AUDIT STARFALL (2026-10-20): the rim's stones in its earth (R6), the ring on the land in its shader (R3), the pass's
+// AUDIT STARFALL: the rim's stones in its earth (R6), the ring on the land in its shader (R3), the pass's
 // clamped beacon, the ring's ground and the fog's focus (R2, R3, R5), a cue its distance late (R7).
 // tools/mutants/star4.json.
 import '../../modsOff.js';
@@ -25,7 +25,7 @@ import { STAR_SOUNDS, playStarSound, starHeardAfterMs } from '../../../src/syste
 import { thunderOf } from '../../../src/systems/distantStorms.js';
 import { glslFunctions } from '../../glsl.mjs';
 import { SOUND } from '../../../src/systems/soundClips.js';
-import { PSEUDO_ARCHIVES, pseudoArchiveCollisions, pseudoArchiveOwner } from '../../../src/world/eliteGates/pseudoArchives.js';
+import { PSEUDO_ARCHIVES, pseudoArchiveCollisions, pseudoArchiveOwner } from '../../../src/world/pseudoArchives.js';
 import { STAR_VIOLET_CSS, STAR_GOLD_CSS } from '../../../src/ui/starfall/starMapMark.js';
 
 const N = 493_210, K = 1;
@@ -242,7 +242,7 @@ test('STAR4 THE SOUNDS: DAGGER.SND\'s own records, pitched - the omen and the fa
   assert.equal(playStarSound({}, 'hum', [0, 0, 0]), false);
 });
 
-// ── AUDIT STARFALL (2026-10-20) ──────────────────────────────────────────────────────────────────────────────────────
+// ── AUDIT STARFALL ──────────────────────────────────────────────────────────────────────────────────────
 
 /** A GL that answers every call (its programs link, its uniforms are their names) and keeps what it was told. */
 function fakeGl() {

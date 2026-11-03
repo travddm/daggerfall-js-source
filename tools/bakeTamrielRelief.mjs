@@ -2,8 +2,7 @@
 //
 //     ARENA2_PATH=/home/claude/dfdata/arena2 node tools/bakeTamrielRelief.mjs
 //
-// TAMRIEL-RELIEF (2026-10-24, the owner, with a heightmap of the whole continent: "Heres the entire tamriel height map
-// btw", then "This is the heightmap. Use it"). The picture is committed as supplied - a phone's screenshot, its map
+// TAMRIEL-RELIEF. The picture is committed as supplied - a phone's screenshot, its map
 // cropped - under src/assets/tamriel/source/ (test/tooling/doctrine.test.js row), and this bake turns it into
 // src/world/tamriel/tamrielReliefData.js: a height a cell, two cells a picture unit, over the picture of Daggerfall's
 // own map the land past the Bay is traced from (ui/tamrielTrace.js - TMAP00I0 and TAMRIEL2, the player's files).

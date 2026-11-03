@@ -1,4 +1,4 @@
-// VC6 - THE CLOUDS, SECOND PASS (2026-09-18). Mac, four reports in one:
+// VC6 - THE CLOUDS, SECOND PASS. Mac, four reports in one:
 //
 //   1. "clouds repeat pretty consistently when its partly cloudy"
 //   2. "in the evening when the sun is setting and the sky is golden,

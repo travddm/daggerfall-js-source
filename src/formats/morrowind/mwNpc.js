@@ -42,15 +42,11 @@ export const MESH_ROOT = 'meshes\\';
 export function indexSkins(bodies) {
   const byRace = new Map();
   for (const body of bodies.values()) {
-    // MW-D32: the reference's sweep filters NotPlayable and skin-type
-    // ONLY (getBodyParts, npcanimation.cpp:1208-1211) - there is NO
-    // vampire test there (vampire heads ride the actor's own record
-    // path), and the port had it backwards: vampire filtered, playable
-    // not.
-    // AUDIT 68 S11-indexskins-1st: and the OTHER VIEW's records are
-    // skipped, as getBodyParts and resolveBodyParts skip them - a hand's
-    // .1st twin competed for its slot and dressed the NPC in first-person
-    // arms.
+    // The sweep filters NotPlayable and skin-type only: there is no vampire
+    // test (vampire heads ride the actor's own record path).
+    // AUDIT 68 S11-indexskins-1st: the other view's records are skipped, as
+    // resolveBodyParts skips them - a hand's .1st twin competed for its slot
+    // and dressed the NPC in first-person arms.
     if (body.kind !== BODY_TYPE.skin || !body.playable || body.part < 0 || isFirstPersonId(body.id)) continue;
     let race = byRace.get(body.race);
     if (!race) byRace.set(body.race, (race = new Map()));
@@ -160,7 +156,7 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
  * src/formats/morrowind/mwFirstPerson.js (armReport, armMeshPaths), pinned against hand-built records and proven
  * against real archives.
  *
- * See bible/02-Formats/Morrowind-Rules.md rules 1 and 3, and Part VI.
+ * See rules 1 and 3, and Part VI.
  */
 
 /**

@@ -1,5 +1,4 @@
-// LA-SHADOW / LA-LIGHTS (2026-09-27, Mac: "a deep audit on the enhanced lightning system, look for flickering issues,
-// performance improvements and just a complete detailed overhaul"): THE SHADOWS HOLD STILL.
+// LA-SHADOW / LA-LIGHTS: THE SHADOWS HOLD STILL.
 //
 // Measured first (tools/lightFlickerProbe.mjs, the world host over ARENA2 on SwiftShader), then pinned here:
 // - LA-SHADOW1: the sun's texel grid was snapped at the WORLD ORIGIN, so as the sun turned (a game minute is five real

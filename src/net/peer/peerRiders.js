@@ -1,5 +1,5 @@
 // @ts-check
-// RIDE (2026-09-23, Mac: "Also need to ensure over people see others riding on horses"): ANOTHER PLAYER IN THE SADDLE.
+// RIDE: ANOTHER PLAYER IN THE SADDLE.
 //
 // The pose never said how a player travelled, so a peer on a horse or a cart walked on foot on everyone else's
 // screen - their doll or their body sliding over the road at a gallop's pace. The pose carries the mount now
@@ -15,7 +15,7 @@
 // the speed; the wire carries the bit) - and the view is the viewer's: the rider's yaw against the line from the
 // rider to MY eye (orientationFor, EOTB-IL's order), as every sprite in the world turns for whoever looks at it.
 //
-// PR-WW1 (2026-09-24, player report: "Werewolf morrowind sprite not showing online"): AND ANOTHER PLAYER IN BEAST
+// PR-WW1: AND ANOTHER PLAYER IN BEAST
 // FORM. A transformed player with no Morrowind body sees themselves as Eye Of The Beholder's lycanthrope (archives
 // 112380 the werewolf, 112381 the wereboar - the Bloodmoon-style beast, eotbBody's lycan tables), and everyone else
 // saw DISC12's classic enemy sprite (archives 264 / 269, remotePlayers' mobile), because this layer - the only one
@@ -201,7 +201,7 @@ function figureLayer(art) {
       r.batch.origin[0] = feet[0] + right[0] * x; r.batch.origin[1] = feet[1] + y; r.batch.origin[2] = feet[2] + right[2] * x;
     }
   }
-  /** INVIS-LOOK (2026-09-27): a concealed peer's draw (ECV1's visual, the host's) or null - kept on the figure, so a
+  /** INVIS-LOOK: a concealed peer's draw (ECV1's visual, the host's) or null - kept on the figure, so a
    *  sprite made later takes it, and set on the batch standing now. */
   function veil(r, v) {
     r.veil = v ?? null;
@@ -213,13 +213,12 @@ function figureLayer(art) {
     isDrawn: (id) => !!figs.get(id)?.batch,
     batchOf: (id) => figs.get(id)?.batch ?? null,   // PEERFX3: the one sprite a hurt flash tints
     heightOf: (id) => { const r = figs.get(id); return r?.batch && r.size && r.xml ? r.size.h + (r.xml.y / r.xml.scale) * (r.g ?? 1) : 0; },
-    /** SERAPH-WINGS (2026-10-05): the figure as drawn - { base, mpp, beast }, its quad's foot over the feet (m), its metres
+    /** SERAPH-WINGS: the figure as drawn - { base, mpp, beast }, its quad's foot over the feet (m), its metres
      *  a pixel and whether it is a beast's (AUDIT 3: the shoulders by the pixel) - or null, and null in the saddle (the
      *  frame is the horse's too): what an aura on its back reads for the bones a sprite has not got (render/auraRing.js
      *  auraSpriteBones). */
     figureOf: (id) => { const r = figs.get(id); return r?.batch && r.size && r.xml && r.px > 0 && r.form !== 'rider' ? { base: (r.xml.y / r.xml.scale) * (r.g ?? 1), mpp: r.size.h / r.px, beast: r.form === 'beast' } : null; },
-    /** SPRITE-FACE (2026-10-05, Mac: "The sprite rotation on character input is a little finicky and make the aura
-     *  misallign"): the way the figure drawn faces - { yaw, turn }: `yaw` its picture's (the eight-way view it was drawn
+    /** SPRITE-FACE: the way the figure drawn faces - { yaw, turn }: `yaw` its picture's (the eight-way view it was drawn
      *  in, about the eye it was drawn for - eotbBillboard.js portrayedYaw), `turn` the pose's own facing - this frame's,
      *  in the saddle too; null when not drawn or seen from its own feet. An aura on the sprite is hung on `yaw`, which the
      *  pose's facing runs up to half a view off (render/auraRing.js auraSpritePosed). */
@@ -390,8 +389,7 @@ export const walkerHands = (pose) => (gatherActOf(pose)
   : { sheathed: !pose.wd, spellcasting: !!pose.sr, usingBow: pose.wd === 2 });
 
 /**
- * DISC23-B (2026-09-24, Gryphoth on Discord: "a way to change our sprite in general instead of it defaulting depending
- * on the class") - ANOTHER PLAYER ON FOOT, AS THE SPRITE THEY CHOSE.
+ * DISC23-B - ANOTHER PLAYER ON FOOT, AS THE SPRITE THEY CHOSE.
  *
  * A peer with no Morrowind body on my screen stood as their CLASS's enemy sprite (remotePlayers classMobileType) - a
  * Mage was the Mage monster whatever they had chosen, and the Eye Of The Beholder set the player picked for themselves
@@ -406,7 +404,7 @@ export const walkerHands = (pose) => (gatherActOf(pose)
  * (`skip` - the viewer's own choice of bodies, which a Morrowind player made for everyone they meet). It takes the
  * place of the class sprite and the doll, and hands the name pass its height as the riders do.
  *
- * HT-WAIST-BACK (2026-09-24, Mac: "Make sure all the eye of the Beholder sprites get this change"): AND THEIR LANTERN.
+ * HT-WAIST-BACK: AND THEIR LANTERN.
  * A walker whose shown pose says `hl` (HT-WAIST-NET: their lit lantern hangs at the waist) hangs Daggerfall's lantern
  * picture at the sprite's right hip by the local body's own law (player/eyeOfTheBeholder/eotbLantern.js - the art, the hang, the swing's
  * drive, the batch), swung off this walker's own motion - its pace off the drawn feet (net/peer/peerPace.js, MWBODY1's),
@@ -419,9 +417,7 @@ export const walkerHands = (pose) => (gatherActOf(pose)
  * up, which the flats' shared pass cannot carry.
  */
 /**
- * LAYERED-PEERS (2026-10-19, the owner, of LAYERED-GEAR in play: "when layered skins are on you only see it on your
- * char and players who also choosen the option. Normaly once you picked it you should see all other players too in
- * their layered gear"): whether THIS player wears Layered Gearing - Eye of the Beholder on and Graphics.LayeredGear a
+ * LAYERED-PEERS: whether THIS player wears Layered Gearing - Eye of the Beholder on and Graphics.LayeredGear a
  * body (1, 2, or LAYERED_OWN, the default). While they do, every other player on foot is drawn in their armor too.
  */
 export function viewerLayered() {

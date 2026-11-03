@@ -81,7 +81,7 @@ export function voiceSpec(program) {
 /**
  * THE GENERAL MIDI PERCUSSION MAP, notes 35-87.
  *
- * AUDIT (2026-08-25): this table used to stop at note 51, and
+ * AUDIT: this table used to stop at note 51, and
  * percussionSpec resolves by NEAREST NEIGHBOUR - so every note above it
  * fell to 51. Measured against the real archive that meant 25 of the 30
  * drum notes in use, over 14,000 hits, all played the ride cymbal.
@@ -257,7 +257,7 @@ const FM_SPECS = Object.freeze({
 /**
  * PER-PROGRAM OVERRIDES, for the programs GM files in the same family.
  *
- * AUDIT (2026-08-25): fmSpec resolves a family with `program >> 3`, so
+ * AUDIT: fmSpec resolves a family with `program >> 3`, so
  * all eight programs in a family share one voice. That is a fair base -
  * GM's grouping is mostly by timbre - but it collapses a few pairs whose
  * ARTICULATION is opposite, and articulation is what the ear names an

@@ -1,4 +1,4 @@
-// LW-FIX3 (2026-10-05, bible/06-Systems/Living-World.md "LW-FIX3"): THE TOWN'S FIVE - the deep audit of the town core
+// LW-FIX3: THE TOWN'S FIVE - the deep audit of the town core
 // found a walk begun beyond the street's reach never searched (its walker never came on, though they passed beside the
 // player), the watch's beat dropped five stops in six (home hours early), the regard's bound reading the regard as last
 // noted (a new acquaintance forgotten as they were met), the chronicle's People never reached by its keys, and a walk
@@ -10,7 +10,7 @@ import { synthTown } from '../../lwTown.mjs';
 import { LivingTown, LIVING_RANGE, CENSUS_PATHS, WALK_STRAY_M, walkGap } from '../../../src/systems/livingWorld/livingTown.js';
 import { ResidentWalker } from '../../../src/characters/residentWalker.js';
 import { PERSON_MOVE_SPEED } from '../../../src/characters/mobile/mobilePerson.js';
-import { DAY_MIN, MIN_STAY, schedule, walkMinutes, dayPlan, watchDuty, patrolBeat, WATCH_SHIFTS } from '../../../src/systems/livingWorld/dayPlan.js';   // WATCH-DAY: PIN MOVED
+import { DAY_MIN, MIN_STAY, schedule, walkMinutes, dayPlan, watchDuty, patrolBeat, WATCH_SHIFTS } from '../../../src/systems/livingWorld/dayPlan.js';   // WATCH-DAY:
 import { townPlaces } from '../../../src/systems/livingWorld/places.js';
 import { townCensus } from '../../../src/systems/livingWorld/census.js';
 import { createRelations, RELATIONS_MAX, EVENTS } from '../../../src/systems/livingWorld/relations.js';
@@ -38,7 +38,7 @@ test('LW-FIX3 the walks coming near: a walk not searched yet that may pass near 
   assert.equal(walkGap(e, [130, 0, 20]), 30, 'beside it');
   assert.equal(walkGap(e, [-30, 0, -40]), 50, 'off its corner');
   assert.equal(walkGap({ from: e.to, to: e.from }, [130, 0, 20]), 30, 'either way');
-  // LW-ERRANDS: PIN MOVED - the afternoon's errands at two (the morning's going to work at half past eight is two walkers
+  // LW-ERRANDS:
   // near the player now: the errands are into the shops a trade has need of, the market spread over three hours)
   const minute = 100 * DAY_MIN + 14 * 60, at = [200, 0, 120];
   const live = bigTown(minute), truth = bigTown(minute);
@@ -75,7 +75,7 @@ test('LW-FIX3 the watch\'s beat: each stop a stay\'s length at the least (MIN_ST
   const { nav, buildings, doors } = synthTown();
   const places = townPlaces(nav, doors, buildings);
   const census = townCensus({ mapId: 12345, blocks: 9, region: 17, people: 3, port: false }, buildings);
-  // WATCH-DAY: PIN MOVED - the watch's three shifts (the night's run past the day's turn, held to it), each patrol's beat
+  // WATCH-DAY:
   // its own district; the last stop held to the shift's end, so the beat is walked to it
   let shifts = 0;
   for (const g of census.filter((r) => r.job === 'guard')) {

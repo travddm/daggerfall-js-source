@@ -22,7 +22,7 @@
 //     (the Ledger A engine-PRNG rule); every PART draw stays on
 //     DFRandom.rand(), verbatim order.
 //
-// L10N3f (2026-09-28): A TRANSLATION'S NAME BANKS, READ ONCE A SESSION.
+// L10N3f: A TRANSLATION'S NAME BANKS, READ ONCE A SESSION.
 // DFU's NameHelper reads NameGen.txt once, in its constructor at
 // startup: the Resources copy, replaced whole by StreamingAssets/Text/
 // NameGen.txt where a translation pack installs its own

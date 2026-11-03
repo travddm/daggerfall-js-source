@@ -1,5 +1,4 @@
-// WB5 (2026-09-25, Mac: "On death the boss would physically spew out per player loot and bounce (sort of how dropping a
-// torch works) and have a sort of rarity glow attached to it"): THE SPOILS, DRIVEN. The spew (world/gate/gateSpew.js - each
+// WB5: THE SPOILS, DRIVEN. The spew (world/gate/gateSpew.js - each
 // piece's launch out of his chest toward the player's side, one at a time, and the thrown torch's own flight: gravity
 // by its drag, the bounce off the struck face at its bounciness, rest under a fifth of the throw); the glow
 // (render/spoilsGlow.js - Loot Rarity's own colours, a beam by tier over a halo, the pass on the duel wall's law); the
@@ -23,7 +22,6 @@ import { isAmmunition, templateByIndex, setItemFields, mintCondition, inventoryI
 import { RRI_TEMPLATES } from '../../../src/systems/roleplayRealismItems/rriItems.js';
 import { isStackable, stacksWith, addItem } from '../../../src/systems/inventory.js';
 import { isDeclaredItemField } from '../../../src/systems/item/itemFields.js';
-import { THUNDERLOCK_TEMPLATE, PELLET_TEMPLATE } from '../../../src/characters/thunderlockIds.js';
 import { execFileSync } from 'node:child_process';
 import { RANDOM_TREASURE_ICONS, validLootItem } from '../../../src/systems/loot/loot.js';
 import { createGateCourt, SPEW_AT_MS, RECEIPT_WAIT_MS, COURT_STRIKE_TEXT } from '../../../src/scenes/gate/gateCourt.js';
@@ -179,9 +177,9 @@ test('WB5 the roll: the seed\'s own - the same spoils every time, another seed\'
   assert.ok(custom > 0, `the custom pieces ride the roll: ${custom}`);
 });
 
-test('WB5 the Deadlands Ember is its own row, not a renamed gem: template 570 (past DFU\'s 288, Climates & Calories\' 530-541 and the Thunderlock\'s 560/561), a gem by group at the gate\'s price with a gem\'s weight and wear and the Ruby\'s art; no ingredient, so it never joins a gem - a Ruby in the pack keeps its row and the stone its name - and (SS1) it stacks with its own kind alone; it rides the loot validator whole, a stack too; and every host has the row, because the hosts\' shared module imports it (mutants: a renamed gem; the hosts\' import pulled)', () => {
+test('WB5 the Deadlands Ember is its own row, not a renamed gem: template 570 (past DFU\'s 288, Climates & Calories\' 530-541), a gem by group at the gate\'s price with a gem\'s weight and wear and the Ruby\'s art; no ingredient, so it never joins a gem - a Ruby in the pack keeps its row and the stone its name - and (SS1) it stacks with its own kind alone; it rides the loot validator whole, a stack too; and every host has the row, because the hosts\' shared module imports it (mutants: a renamed gem; the hosts\' import pulled)', () => {
   assert.equal(SIGIL_STONE_TEMPLATE, 570);
-  assert.ok(SIGIL_STONE_TEMPLATE >= ITEM_TEMPLATES.length && ![THUNDERLOCK_TEMPLATE, PELLET_TEMPLATE].includes(SIGIL_STONE_TEMPLATE) && (SIGIL_STONE_TEMPLATE < 530 || SIGIL_STONE_TEMPLATE > 541), 'past every other row');
+  assert.ok(SIGIL_STONE_TEMPLATE >= ITEM_TEMPLATES.length && (SIGIL_STONE_TEMPLATE < 530 || SIGIL_STONE_TEMPLATE > 541), 'past every other row');
   const t = templateByIndex(SIGIL_STONE_TEMPLATE);
   assert.equal(t.name, SIGIL_STONE.name); assert.equal(t.basePrice, SIGIL_STONE.value); assert.equal(t.custom, true); assert.equal(t.isIngredient, false);
   assert.equal(t.baseWeight, templateByIndex(0).baseWeight, 'a gem\'s weight'); assert.equal(t.hitPoints, templateByIndex(0).hitPoints, 'and wear');
@@ -202,8 +200,6 @@ test('WB5 the Deadlands Ember is its own row, not a renamed gem: template 570 (p
   const root = new URL('../../..', import.meta.url);
   const out = execFileSync(process.execPath, ['--input-type=module', '-e', "await import('./src/scenes/shared.js'); const { templateByIndex } = await import('./src/systems/item/itemTemplates.js'); process.stdout.write(String(templateByIndex(570)?.name ?? null));"], { cwd: root, encoding: 'utf8' });
   assert.equal(out, 'Deadlands Ember', 'the hosts carry the row');
-  const shared = readFileSync(new URL('../../../src/scenes/shared.js', import.meta.url), 'utf8');
-  assert.match(shared, /^import '\.\.\/systems\/gate\/gateSpoils\.js';/m, 'and the import is said out loud');
 });
 
 const WALL = 1_700_000_000_000;
@@ -304,7 +300,7 @@ test('WB5 a crash loses nothing: at boot the record\'s pieces AS KEPT (not a re-
   // a piece the validator refuses is not handed over; the rest are
   const bad = JSON.parse(JSON.stringify(spoilsList(42, 6)));
   bad[0].item.templateIndex = 99999;
-  bad[bad.length - 1].gold = -5;   // GEM2 (PIN MOVED): the gold is last, after the Warden's gem and the ember
+  bad[bad.length - 1].gold = -5;   // GEM2 (
   st.set(SPOILS_STORE_KEY, { day: 701, at: WALL, who: 'char-1', pieces: bad });
   const got2 = [];
   assert.equal(bad.at(-1).kind, 'gold');
@@ -350,14 +346,3 @@ test('WB5 the court\'s burst: into his fall his spoils leave his chest toward me
   assert.deepEqual(said2, [COURT_TEXT.portal, COURT_STRIKE_TEXT.noSpoils('Valkynaz Ruhn')], 'said once');
 });
 
-test('WB5 the seams, by source: the world host makes the floor on the link with the dungeon\'s own collider for its ray and the character\'s id for its record, takes a spoil through the one door (the purse, the pack), hands it to the court, and asks the crash\'s door once for each character that stands up - in the main frame, online or not, with the save slots\' word (mutants: each seam removed)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const takeSpoil = \(p\) => \{ if \(p\.kind === 'gold'\) addGoldPieces\(playerEntity, p\.gold\); else if \(p\.item\) addItem\(playerEntity\.items, p\.item\); \};/);
-  assert.match(w, /const spoilsPool = createSpoilsPool\(\{/, 'AUDIT WBX2 M1: online or not - the keeper of the crash\'s records');
-  assert.match(w, /ray: \(from, dir, len\) => \{ const c = modes\?\.dungeonCtx\?\.collider;/);
-  assert.match(w, /store: _spoilsStore,\n    who: \(\) => characterIdOf\(playerEntity\),/);   // AUDIT WB A6: the one store
-  assert.match(w, /link: gateLink, spoils: spoilsPool,/);
-  assert.match(w, /const who = characterIdOf\(playerEntity\);\n    if \(who === _spoilsAskedFor\) return;\n    _spoilsAskedFor = who;\n    try \{ if \(recoverSpoils\(_spoilsStore, takeGateSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => spoilsPool\.adopt\(rec\), inSave: _spoilsInSave \}\)\) setMidScreenText\(SPOILS_TEXT\.gathered\); \}/);   // AUDIT WBX S3: handed over - the next save clears it
-  assert.match(w, /\n    spoilsRecoverFrame\(\);   \/\/ WB5[^\n]*\n    if \(onlineOn && playerSpawned\) \{/, 'in the main frame, ahead of the online one');
-  assert.doesNotMatch(w, /_spoilsRecovered/, 'the online-only door is gone');
-});

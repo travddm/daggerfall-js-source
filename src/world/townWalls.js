@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-SHAPES TS4 (2026-10-25, the owner: "give other towns unique shapes.
-// Its time to move away from perfect squares ... This needs to be
-// perfection"; bible/03-World/Town-Shapes.md TS4) - A CITY PAST THE BAY
+// TOWN-SHAPES TS4 - A CITY PAST THE BAY
 // WALLED ON ITS OWN OUTLINE.
 //
 // DFU's reference: a city's walls are the ring of its MAPS.BSA grid - the
@@ -626,7 +624,7 @@ export function townBlockedCells(dfLocation, wall, rmbOf) {
   return { cells, W, H: h * S };
 }
 
-/** TS8 (2026-10-26, the owner: "Town walls and their curvature expose thin open extruding walls"): DAGGERFALL'S CORNER
+/** TS8: DAGGERFALL'S CORNER
  *  TOWER, measured on the freeware (ARCH3D 444: x -8.4..8.4, z -8.35..8.35, 14.45 m tall). It is a corner's: its body a
  *  9.6 m square - the wall's own thickness, where two walls cross - centred at (-2.8, 2.85) of its origin, under a crown
  *  from `crown` up; and off its +x and -z sides two stubs of wall 6.4 m long (y 0..8.05), open at their ends, where a
@@ -796,8 +794,7 @@ const ioOf = (io) => (typeof io === 'function' ? { servedOf: io, classicOf: null
 /**
  * TS7: A CITY'S WALL REGISTERED, made when first read (`made` when the caller has it): its carrier block on the door at its
  * index (open ground, the wall's model, its markers and what stands at its gates) and its model, and its cells for the
- * town map and the walkers (townWallCellsOf). The Bay's cities register theirs as they are read (world/townOutline.js
- * wallBayCity), a wall made only when a carrier is first laid out.
+ * town map and the walkers (townWallCellsOf).
  * @param {any} dfLocation @param {string[]} templateNames @param {any} io @param {() => any} open @param {any} [made]
  */
 export function registerTownWall(dfLocation, templateNames, io, open, made = undefined) {
@@ -934,7 +931,7 @@ export function wallOnTownMap(blocks, cells, w) {
 /** AUDIT TESA III E1-2: ONE BLOCK'S TOWN-MAP BYTES WITH ITS CITY'S WALL LAID - wallOnTownMap's copy for the block at (bx, by),
  *  else its own bytes (no wall of the city's own, or none of it in this block). A host that carves its walk grid off its
  *  blocks' bytes alone (scenes/exterior.js, the fixed-city bench: CityNavigation.setBlockData shuts every cell not 0)
- *  shuts the wall with them - TS7 opened every Bay city's ring on the door's read, its wall bytes with it.
+ *  shuts the wall with them.
  *  @param {any} dfLocation @param {number} bx @param {number} by @param {?Uint8Array} autoMap */
 export const wallLaidBytes = (dfLocation, bx, by, autoMap) => wallOnTownMap([{ x: bx, y: by, autoMap }], townWallCellsOf(dfLocation), dfLocation?.exterior?.exteriorData?.width ?? 0)[0].autoMap;
 
@@ -959,10 +956,10 @@ export function shutRelief(nav, relief) {
  *  great!", world/city/cityNavigation.js tileWeight - pinned equal), the weight a yard reads as a road. */
 export const PATH_WEIGHT = 15;
 /**
- * TS10 (2026-10-26, the owner: "Sometimes locations like the horse stable, etc can be placed on pathways"): A TOWN'S
+ * TS10: A TOWN'S
  * PAINTED PATHS ON ITS GRID. A town's grid weighs each cell by its own block's ground tile (CityNavigation.SetRMBData), and
  * a yard keeps off the road cells it reads there - but the roads the terrain painted through the town's ground (an arm
- * of the pixel's road or track across a cell a town past the Bay leaves open - TS3 - or a Bay city's old wall ring, TS7)
+ * of the pixel's road or track across a cell a town past the Bay leaves open - TS3)
  * stand on cells its blocks lay as open land: a Stable, a Wagon Yard or a joinery stood on them (8 of 373 yards over every
  * twelfth city and town past the Bay on a pixel with roads every way, measured). Every open cell whose terrain tile the
  * road painter wrote (`paths`, GRASS-PATH1's mask - the painter alone knows a track's dirt from the land's) is a road of

@@ -1,5 +1,4 @@
-// SUPPORT1 (2026-10-05, Mac: "I want to add the kofi link in addition to the patron on the website" and "I also want
-// to add the patron/kofi ingame on the main menu as 2 icons").
+// SUPPORT1.
 //
 // The project asks for support at two doors - the website's corner (index.html, pinned in test/ui/enhanced/landing.test.js) and,
 // new, the game's own front door: two icons top-left, Patreon's mark and Ko-fi's mug. One module holds the asks and
@@ -7,7 +6,7 @@
 // Here: the asks, the drawings pixel for pixel, the rules the drawings become, the door drawn by the REAL menu against
 // the repo's fake document (boot and pause), and the corners' band - the door's stage starting below its corner marks
 // wherever the wordmark reaches under either - derived from the marks' own numbers rather than restated, so a mark that
-// grows without its band fails here; and DOOR-FIT (Mac: "Fix these now"), the door that never cuts itself off. In a
+// grows without its band fails here; and DOOR-FIT, the door that never cuts itself off. In a
 // real browser: tools/supportAsksProbe.mjs (the presses; the logo's own pixels under the marks, a caption at its bound
 // among them; and DOOR-FIT's top, last row and centring, at 192 sizes on both skins).
 import { test } from 'node:test';
@@ -185,7 +184,7 @@ test('SUPPORT1: the corners\' band - the door\'s stage starts below its corner m
   const mark = rule('.px-wordmark:has(.brand-logo)').match(/width: min\((\d+)px, (\d+(?:\.\d+)?)vw\);/);   // BR6: 36.4vw
   assert.ok(mark, 'the wordmark\'s width is px and vw');
   const edge = Number(mark[1]) + 2 * reach - 1;
-  assert.equal(edge, 701);   // PIN MOVED: BR6, 788 under BR5's mark and 1007 under BR4's
+  assert.equal(edge, 701);
   assert.ok(edge < 1024, `the band ends at ${edge}px, short of 1024`);
   const band = mediaRule(`(min-width: 481px) and (max-width: ${edge}px)`, stage);
   // ...it starts below the taller mark - the asks' plaque, or the profile's portrait - with air

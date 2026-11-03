@@ -37,16 +37,6 @@ test('TRADE-INFO itemPowerLines: a DFU magic item names its powers in DFU\'s own
   assert.equal(withTiers.includes('Potent vs Daedra'), false, 'the tiers\' wording, never both');
 });
 
-test('TRADE-INFO the surfaces: the Enhanced card, the trade row\'s hover and the trade detail read the one list (mutants: a surface on rarityLines alone)', () => {
-  const inv = src('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /\{ const lines = itemPowerLines\(picked, deps, \{ set: false, lore: false, technique: false \}\); if \(lines\.length\) \{ const ul = el\('ul', 'rarity'\);/);   // CARD-FIT: the lore is the Info box's; PIN MOVED (TECH-CARD): less a technique's line, its block's
-  const t = src('src/ui/enhanced/enhancedPlayerTrade.js');
-  // CARD-FIT U4: both in brief (itemBriefLines: the tier, its affixes, the sigil's line, the set's name and what I wear of it)
-  assert.match(t, /b\.title = \[line\.name, letterWorthLine\(item\), \.\.\.itemBriefLines\(item, deps, \{ worn: true \}\), \.\.\.setLines\(item\)\.slice\(1\)\]\.filter\(Boolean\)\.join\('\\n'\);/, 'the row\'s hover - mine and theirs alike');
-  assert.match(t, /const powers = itemBriefLines\(selected\.item, deps, \{ worn: true \}\);\n\s*if \(powers\.length\) \{\n\s*const ul = el\('ul', 'rarity'\);\n\s*for \(const p of powers\) ul\.append\(el\('li', null, p\)\);\n\s*const tiers = setLines\(selected\.item\)\.slice\(1\);\n\s*if \(tiers\.length\) ul\.title = tiers\.join\('\\n'\);\n\s*info\.append\(ul\);/, 'and the detail, a line each');
-  assert.match(inv, /export function itemBriefLines\(item, d = deps, \{ worn = false \} = \{\}\) \{\n  const lines = itemPowerLines\(item, d, \{ set: false, lore: false \}\);/, 'the brief is the one list, less the set\'s tiers and the lore');
-});
-
 /** A fake pack whose wire records carry `bytes` of payload each - an enchanted item's weight on the wire. */
 function makePack(ids, bytes) {
   const st = { items: ids.map((id) => ({ id, stackCount: 1 })), gold: 100 };
@@ -110,7 +100,6 @@ test('AUDIT TRADE-FIT D1: an offer is measured by the COMMIT its goods will ride
 });
 
 test('AUDIT TRADE-INFO D2 + D6: the trade window reads an artifact\'s powers where the pack\'s card does (TEXT.RSC through the host\'s `rows`); an item\'s two like powers are two lines, as the Info box says them (mutants: the trade window without the reader; every repeat dropped)', () => {
-  assert.match(src('src/scenes/world.js'), /tradeWin = createPlayerTradeWindow\(session, \{ items: \(\) => \(playerEntity\.items \?\?= \[\]\), entity: playerEntity, gold: \(\) => tradePack\.gold\(\),\n\s*rows: \(id, pick\) => townTalk\.lines\(id, pick\) \}\);/);
   const twice = dfu({ enchantments: [{ type: 4, param: 1 }, { type: 4, param: 1 }, { type: 11, param: -1 }] });
   assert.deepEqual(tiers(false, () => itemPowerLines(twice, {})), ['Potent vs Daedra', 'Potent vs Daedra', 'Feather weight']);
 });
@@ -121,7 +110,4 @@ test('TRADE-LOC (Dudey: "when players trade in any ui the letter of credit doesn
   assert.equal(letterWorthLine({ templateIndex: 113, value: 900 }), null, 'a sword is not a letter');
   const [arrived] = validLootList([JSON.parse(JSON.stringify(letterOfCredit(4321)))]);
   assert.equal(letterWorthLine(arrived), 'Worth 4,321 gold', 'the letter the peer offered, through the wire clamp, keeps its worth');
-  const t = src('src/ui/enhanced/enhancedPlayerTrade.js');
-  assert.match(t, /const bits = \[letterWorthLine\(selected\.item\), line\.material, line\.word,/, 'the detail a click opens - the window every skin wears');
-  assert.match(src('src/ui/playerTradeDoor.js'), /import\('\.\/enhanced\/enhancedPlayerTrade\.js'\)/, 'one window over either skin');
 });

@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-26c (feature-feedback via Mac, "Morrowind models + weapon animations need a little tweaking";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26c.md) - THE BODY MOTION'S TWO FIXES, on the vendored retail biped with the
+// ) - THE BODY MOTION'S TWO FIXES, on the vendored retail biped with the
 // pair's Weapon Bone Left made as the build makes it.
 //
 // THRUST-CHAMBER: "Two-handed sword (claymore) forward pierce attack animation causes character's hands to clip through
@@ -13,7 +13,7 @@
 // with it using the same format"): the arm low and out, the blade forward and a little down, the forearm untwisted, and
 // the blade's way between a stand and a run no longer swung round the back (the old row's `via`).
 //
-// TWO-CLEAR (Mac: "Continue" - the chop's and the slash's left arm seen behind the back in passing, then every arm of the
+// TWO-CLEAR (- the chop's and the slash's left arm seen behind the back in passing, then every arm of the
 // family measured): the two-handed family's arms against the audit's own trunk (bodymotion_audit.test.js MELEE-1: 9 units
 // about the pelvis-to-neck line, under 3 in), BOTH arms - the audit read the striking arm's alone, and the hand on the
 // haft went 4.5 to 8.5 units into the trunk at rest and through every blow of a claymore, a staff's and a spear's.

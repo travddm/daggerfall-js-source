@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAR7 (2026-10-20) — THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM.
+// STAR7 — THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM.
 //
 // The owner: "A lore accurate world encounter defense mission ...
 // something coming from the sky and crashing into the ground, where
@@ -11,7 +11,7 @@
 // starReceipt.js - `j1`, under the relay's GATE_SIGNING_KEY). This file
 // honours it: counted once, and paid in Renown to the character that
 // fought it and in silver under the day's combat cap. Design:
-// bible/11-Multiplayer/Starfall.md section 6. The raid's claim, rung for
+// The raid's claim, rung for
 // rung (raids.js) - one transaction, the row first and stamped with the
 // claim's own nonce, every credit by that row alone.
 //

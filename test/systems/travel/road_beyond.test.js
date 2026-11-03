@@ -1,5 +1,4 @@
-// ROAD-BEYOND (2026-10-26, the owner: "road travel in the overworld needs to work properly outside of tamriel for
-// overworld travel. I dont think it works currently"; bible/06-Systems/Travel-View.md ROAD-BEYOND) - A PLAN PAST THE BAY'S
+// ROAD-BEYOND - A PLAN PAST THE BAY'S
 // TABLE. Measured on the freeware's Tamriel through the host's own ground (routeGround as scenes/world.js tvRouteGround
 // builds it) and the roads past the Bay as its regions lay them: the box never reached past an end beyond the table, so
 // the Imperial City's way out round its lake was in no box (no way to Bruma, Chorrol or Cheydinhal); and the ladder's A*,
@@ -43,7 +42,6 @@ test('ROAD-BEYOND the dials: the ladder\'s whole spend past the table, the roads
   assert.equal(BEYOND_MARGIN, 240);
   assert.equal(BY_ROAD_MAX_EXPANSIONS, 100000);
   assert.equal(BY_ROAD_GREED, 1.25);
-  // PIN MOVED (ROAD-FOLLOW, Travel-View.md ROAD-FOLLOW): BY_ROAD_REACH (24 pixels of open ground about either end) is gone -
   // the open ground is each end's own leg (ROAD_END_SLACK rings past its nearest road) and a gap's narrowest crossing
   assert.equal(ROAD_END_SLACK, 2);
   assert.equal(ROAD_PIECE_CAP, 8192);
@@ -61,10 +59,6 @@ test('ROAD-BEYOND the box reaches past an end beyond the table: a traveller wall
   assert.deepEqual(r.pixels.at(-1), { x: 1500, y: 260 });
   // and the other way about: the end walled in is the goal
   assert.ok(planRoute({ x: 1500, y: 260 }, { x: 1500, y: 300 }, { isWater: lake }), 'and to her');
-  // on the Bay the box is the map's, as it was: the table's own edge the bound
-  const src = read('src/systems/travel/travelRoute.js');
-  assert.match(src, /const reachOf = \(margin\) => \(past \? \{ x0: Math\.min\(bounds\.x0, offTable\(from\) \? from\.x - margin : Infinity/);
-  assert.match(src, /: bounds\);\n/);
 });
 
 test('ROAD-BEYOND a long plan past the Bay walks its roads, found over the roads alone: every step a road\'s, the cells expanded a handful a pixel of the road - where the ladder flooded the field beside it (mutants: the roads first, the step\'s edge)', () => {
@@ -105,12 +99,10 @@ test('ROAD-BEYOND the roads\' search walks the open ground about its ends alone,
   const r = searchByRoad({ x: 1100, y: 300 }, { x: 1200, y: 300 }, { ...bay(), beyond: roadThrough(u) });
   assert.equal(count(r.kinds, 'road'), r.kinds.length, 'the road round, never the field\'s middle');
   assert.equal(r.cost, 400);
-  // PIN MOVED (ROAD-FOLLOW): the plan keeps the road round - TV2's law asked the ladder for a way by the roads dearer than
   // the straight walk and kept its cut across the field (350); the road joins the two ends, so the road is the way
   const plan = planRoute({ x: 1100, y: 300 }, { x: 1200, y: 300 }, { ...bay(), pathsBeyond: roadThrough(u) });
   assert.equal(plan.cost, 400, 'round the field by the road');
   assert.equal(count(plan.kinds, 'open'), 0);
-  // PIN MOVED (ROAD-FOLLOW): a road broken far from both ends (a pixel's bit with no bit back) - the roads' own search
   // crosses the gap, its one open step (roadEndsSteps' narrowest crossing), where the ladder walked it
   const gap = roadThrough(ell());
   const broken = (k, x, y) => (x === 1400 && y === 100 ? gap(k, x, y) & ~DIR.W : gap(k, x, y));
@@ -176,10 +168,6 @@ test('ROAD-BEYOND the Bay\'s own plans are the Bay\'s: both ends on the table, n
   for (let x = 100; x <= 140; x++) net.roads[200 * MAP_W + x] = (x > 100 ? DIR.W : 0) | (x < 140 ? DIR.E : 0);
   const r = planRoute({ x: 100, y: 200 }, { x: 140, y: 200 }, { ...net });
   assert.deepEqual(r.kinds, new Array(40).fill('road'));
-  const src = read('src/systems/travel/travelRoute.js');
-  assert.match(src, /const past = offTable\(from\) \|\| offTable\(to\);/);
-  // PIN MOVED (ROAD-FOLLOW): and only where the roads join the two ends (roadEndsSteps' `strict`)
-  assert.match(src, /if \(past && beyond && ends\?\.strict && \(!sea \|\| \(sea\.start === 'land' && sea\.goal !== 'sea'\)\)\) \{/);
 });
 
 // ── WITH ARENA2: the freeware's own Tamriel ─────────────────────

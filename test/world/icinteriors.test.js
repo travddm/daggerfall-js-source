@@ -1,5 +1,4 @@
-// IC-INTERIORS (2026-10-27, the owner's field report, item 5: "Interiors in the Imperial city need to match their exterior
-// with varied layouts"; "No band aids or half assed work"; bible/03-World/Arena-Provinces.md IC-INTERIORS) - EVERY
+// IC-INTERIORS - EVERY
 // IMPERIAL CITY BUILDING'S INTERIOR ITS OWN, pinned: its grid its footprint's, its storeys the ones its walls show (each
 // reached), its rooms its kind's and its key's (the same key the same rooms on every visit and client, another key other
 // rooms), its street door where the building's door is, its windows where its walls show them, its furniture its kind's

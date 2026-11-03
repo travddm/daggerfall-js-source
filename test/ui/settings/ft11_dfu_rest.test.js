@@ -1,4 +1,4 @@
-// FT11 - THE REST OF DFU'S SWITCHES (2026-09-14, the Features arc):
+// FT11 - THE REST OF DFU'S SWITCHES:
 // Combat Voices, Near Death Warning, Bows In Left Hand, Choose Guild
 // Jobs, and Dungeon Wall Style - the four booleans left in DFU's
 // Enhancements section and the one choice. DFU Classic. The numeric

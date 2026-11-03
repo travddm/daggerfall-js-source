@@ -1,7 +1,7 @@
-// RELAY-LOAD (2026-10-18, from play: "Server is kinda breaking down near oblivion gate cause so many ppl lol") - WHAT IS
+// RELAY-LOAD - WHAT IS
 // FILLING THE RELAY, READ BY THE OPERATOR: tools/relayLoad.mjs builds the Analytics Engine questions over the relay's own
 // metrics points (server/src/relayScale.js RoomMetrics) and .github/workflows/relay-load.yml asks them by hand, writing
-// nothing. bible/11-Multiplayer/Scale-Arc.md RELAY-LOAD; AUDIT PLAN-1000 lane A (its block under RELAY-LOAD there, and `01-Overview/Audit-Log.md`)
+// nothing. RELAY-LOAD; AUDIT PLAN-1000 lane A (its block under RELAY-LOAD there, and `01-Overview/Audit-Log.md`)
 // widened every pin below to reach what its title claims.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,7 +20,7 @@ const DOUBLE_OF = { sockets: 2, hellos: 3, busy: 4, poses: 7, sends: 8, refused:
 
 test('RELAY-LOAD the questions: each over the relay\'s own dataset and window, its columns exactly the aliases it selects, every alias the double RoomMetrics writes for it in EVERY question (a sum weighted by the sample, a row\'s value and a peak its room\'s own), the kind blob1; the kinds by their sends, the five-minute rows of the crowd\'s kinds over at most WINDOW_HOURS_MAX - every row of the span, never cut - the busiest rooms but the channels by their peak; the window whole hours 1 to a week, refused before the SQL; an answer drawn as its columns (mutants: the weight; a double moved in any question; a count unweighted; a column renamed; the IF; the orders; the limits; the span; the channels left in the crowds; the window\'s guard)', () => {
   assert.equal(DATASET, src('server/wrangler.toml').match(/\[\[analytics_engine_datasets\]\]\nbinding = "METRICS"\ndataset = "(\w+)"/)[1], 'the dataset the relay writes');
-  assert.deepEqual(QUESTIONS.map(([n]) => n), ['kinds', 'windows', 'crowds', 'fulls', 'storage', 'levels', 'moves']);   // PIN MOVED (COST-2 part two): the cells by their node's level, and the directory's moves - test/server/cellmoves.test.js
+  assert.deepEqual(QUESTIONS.map(([n]) => n), ['kinds', 'windows', 'crowds', 'fulls', 'storage', 'levels', 'moves']);
 
   // THE DOUBLES ARE THE ONES ROOMMETRICS WRITES: a point flushed with every count its own value, read back by position
   let point = null;

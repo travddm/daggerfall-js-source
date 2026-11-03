@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// OH-B (2026-09-26): THERE'S A HOLE IN THE BOTTOM OF THE OCEAN 1.1.0
+// OH-B: THERE'S A HOLE IN THE BOTTOM OF THE OCEAN 1.1.0
 // (jet082, vendor/ocean-holes/) - THE PURE LAW. Everything the mod's one
 // class, OceanHoles, decides without touching the scene: which map pixels
 // open a pit (StableHash, IsPitPixel), where in the pixel the pit stands
@@ -217,9 +217,7 @@ export function buildDungeonName(mapPixelX, mapPixelY) {
 /** BuildGpsDungeonName: the name with the pit's pixel, "[x,y]". */
 export const buildGpsDungeonName = (dungeonName, pitMapX, pitMapY) => `${dungeonName} [${pitMapX},${pitMapY}]`;
 
-/** GetAbyssMapId: 0x60000000 over the pit pixel's id's low twenty bits. PITS-WORLD (2026-10-27, bible/03-World/World-Wide.md
- *  WORLD-LANES; the owner, after the audit NO SYSTEM LEFT BEHIND IN THE BAY item 35: "Every single thing here needs to be
- *  addressed. No exceptions."): past the Bay a pixel id names no one pixel - a pit a thousand pixels from a Bay pit had
+/** GetAbyssMapId: 0x60000000 over the pit pixel's id's low twenty bits. PITS-WORLD: past the Bay a pixel id names no one pixel - a pit a thousand pixels from a Bay pit had
  *  shared its abyss - so the abyss there is named in the world's abyss lane over the pit's world pixel key
  *  (world/worldWide/worldLanes.js ABYSS_WORLD_LANE: 0x600 to 0x7ff with the lane's flag, never a Bay abyss's id). The
  *  Bay's is the mod's own, to the bit. */

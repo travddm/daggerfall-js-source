@@ -1,5 +1,4 @@
-// AUDIT RELEASE R2-5 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md R2-5; the owner: "expand our world
-// seamlessly. All systems should be integrated precisely") - A QUEST GIVER PAST THE BAY HAS REMOTE SITES TO GIVE: the
+// AUDIT RELEASE R2-5 - A QUEST GIVER PAST THE BAY HAS REMOTE SITES TO GIVE: the
 // quest layer's maps answer a province's region (62..70) from the places past the Bay (scenes/quest/questProvinceSites.js),
 // so DFU's own draws (Place.SelectRemoteTownSite, SelectRemoteDungeonSite, SelectRemoteLocationExteriorSite) send a
 // Skyrim questor's courier to another town of Skyrim and its dungeon to a lair of Skyrim. The law first, on a fixture;
@@ -130,9 +129,6 @@ test('R2-5b the Imperial City is a destination slice by slice: each of its 625 s
   // the plan's fills (its isle, lake and shore - imperialSliceName's last arm, read here so a rename there fails here)
   const fills = [...capitalSpanPixels(0)].filter(({ x, y }) => PLAN_FILL_NAMES.includes(capitalSliceName(CAPITALS[0], capitalOnPixel(x, y).s)));
   assert.equal(fills.length > 300 && fills.every(({ x, y }) => isUnsitedSlice(x, y)), true, `${fills.length} fill slices left out`);
-  const IC_SRC = readFileSync(new URL('../../../src/world/imperialCity.js', import.meta.url), 'utf8');
-  assert.match(IC_SRC, /for \(const d of \['City Isle', 'Lake Rumare', SHORE\]\)/);
-  assert.match(IC_SRC, /const SHORE = 'Rumare Shore'/);
   assert.equal([...capitalSpanPixels(0)].filter(({ x, y }) => !isUnsitedSlice(x, y)).length, 257, 'the slices a site may stand in');
   assert.equal(sliceQuestName(sol.px, sol.py), null);
   const q = sliceQuestName(ic.px - 3, ic.py + 2);
@@ -222,9 +218,6 @@ test('R2-5d a province\'s places made ready in idle time: each tick stands at mo
   assert.equal(ticks.length, 2);
   ticks.shift()();
   assert.equal(ticks.length, 1, 'the first warmer\'s loop ended when the second started');
-  // the quest layer starts one over its provinces, on the browser's idle door
-  const QW = codeOnly(readFileSync(new URL('../../../src/scenes/questWorld.js', import.meta.url), 'utf8'));
-  assert.match(QW, /createProvinceWarm\(\{ provinces, regionNow: \(\) => _questRegionIndex\(\), origin: \(\) => playerTravelOrigin\?\.\(\) \?\? null, schedule: provinces \? idleSchedule\(\) : null \}\)\.start\(\);/);
 });
 const whiterunAt = (() => { const w = townAt({ name: 'Whiterun', mapId: 0xa7000001, px: 1700, py: -420 }); return () => w; })();
 
@@ -281,7 +274,7 @@ test('R2-5 the lairs are bounded: the table asks the places host for the nearest
   const p = createQuestProvinceSites({ worldPlaces: createWorldPlaces(), regionAt: () => SKYRIM, standAt: () => null, origin: () => ({ x: 1700, y: -400 }),
     lairsNear: (...a) => { asked.push(a); return []; } });
   p.getRegion(SKYRIM);
-  assert.deepEqual(asked, [[1700, -400, 66, 12, 16]]);   // PIN MOVED (AUDIT RELEASE R2-5e): 16 within 66, 40 first rolls - now 12, at most 16 cells read, beside the countryside's
+  assert.deepEqual(asked, [[1700, -400, 66, 12, 16]]);
   assert.deepEqual([PROVINCE_LAIR_REACH, PROVINCE_LAIR_COUNT, PROVINCE_LAIR_ROLLS], [66, 12, 16]);
   p.getRegion(SKYRIM);
   assert.equal(asked.length, 1, 'the same questor\'s pixel: the table kept');

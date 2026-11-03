@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, AS THIS PAGE PLAYS IT - the one home
+// WITCH1: THE WITCHES' FESTIVAL, AS THIS PAGE PLAYS IT - the one home
 // of the client's half of the economy: the Soul Cakes this account holds (the service's count, the pack's stack its face),
 // the finds a kill and an act ask for, the Wyrd Sister's sales, and the moves on a Hearth Offering.
 //
@@ -33,7 +33,6 @@ import { restackSoulCakes, restackHearthOfferings, isHearthOffering } from './so
 import { foeFindSource } from './festivalFoes.js';
 import { cakesFoundText, festivalRefusalText, isFestivalRefusal, findsFullText } from './festivalWords.js';
 import { wyrdPieceById } from '../aetheric.js';
-import { mintIliacCard } from '../iliac/iliacItems.js';
 import { addItem } from '../inventory.js';
 
 /** The kill listener's and the act hearer's name. */
@@ -241,7 +240,6 @@ export function saleRid(rand = Math.random) {
 export function wareItem(/** @type {any} */ w) {
   if (!w || accountWare(w) || bowlWare(w)) return null;
   if (w.kind === 'piece') { const it = wyrdPieceById(w.key); if (it) it.bound = true; return it; }
-  if (w.kind === 'card') return mintIliacCard(w.key);
   return null;
 }
 /** A sale answered: while it is still the one pending, its ware minted into the pack (once) and let go; the counts and the

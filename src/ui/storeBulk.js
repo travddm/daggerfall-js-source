@@ -1,5 +1,5 @@
 // @ts-check
-// LOOT-BULK (2026-10-16): Take all and Stash all walk the list the player is looking at, top to bottom, through the
+// LOOT-BULK: Take all and Stash all walk the list the player is looking at, top to bottom, through the
 // same plan a single click uses. One click. The room still hears a container when its window closes, not per item.
 import { stacksWith } from '../systems/inventory.js';
 import { LOOT_LIST_MAX } from '../systems/loot/loot.js';

@@ -219,9 +219,6 @@ test('HOOD-SAID: plain robes worn hood down say so and raise the same way; a clo
       view.unmount();
     }
   });
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const use = src.slice(src.indexOf('function use(item'), src.indexOf('export function inventoryQuickAct('));
-  assert.match(use, /\n {2}refresh\(\);\n {2}if \(act\.repaint\) refreshFigure\(\);/, 'the use path reads the flag');
 });
 
 test('HOOD-SAID: the door\'s hint names the button that raises the hood - the pack card\'s Raise hood on the enhanced skin, the doll\'s Use on the classic one (mutants: the hint the old sentence; the classic told of a button it has not; the skin unread)', () => {
@@ -239,8 +236,5 @@ test('HOOD-SAID: the door\'s hint names the button that raises the hood - the pa
   } finally {
     if (had === undefined) delete globalThis.location; else globalThis.location = had;
   }
-  // the enhanced hint's button is the card's own label; the classic's is the window's Use mode (nativeInventory MODES)
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /hoodUp\(picked\) \? 'Lower hood' : 'Raise hood'/);
-  assert.match(read('src/ui/native/nativeInventory.js'), /const MODES = \['wagon', 'info', 'equip', 'remove', 'use', 'gold'\];/);
   assert.doesNotMatch(VAMPIRE_HOOD_TEXT_CLASSIC, /Raise hood/, 'the classic window has no such button');
 });

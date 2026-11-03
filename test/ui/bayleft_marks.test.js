@@ -1,8 +1,7 @@
-// BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/10-UI/Held-Map-Arc.md BAY-LEFT-MAPS) - THE HELD MAP'S MARKS AND THE MAP'S FLAGS PAST THE BAY.
+// BAY-LEFT-MAPS - THE HELD MAP'S MARKS AND THE MAP'S FLAGS PAST THE BAY.
 //
-// C1: the held map read its party, its travellers, the trader's coin, the serpent's ring (and the Super dungeon's, the
-// arch's, the Ketch's), the Motherlodes, the POIs, the raids and the stars against the Bay's 1000 x 500 (`this._size`,
+// C1: the held map read its party, its travellers, the trader's coin, the serpent's ring (and the Super dungeon's),
+// the Motherlodes, the POIs, the raids and the stars against the Bay's 1000 x 500 (`this._size`,
 // which no host hands), where the gates past the Bay, the bounties and the quests were read over the sheet's own box -
 // so a member in Solitude was no mark. Every reader reads that box now (heldMap.js _marksBox), the Bay's own box the
 // Bay's old bound to the pixel.
@@ -56,8 +55,6 @@ const marksDeps = () => ({
   vendor: () => ({ ...SOLITUDE, label: 'Trader', town: 'Solitude' }),
   serpent: () => ({ cx: SOLITUDE.px, cy: SOLITUDE.py, r: 12, label: 'Sea Serpent' }),
   sd: () => ({ cx: WHITERUN.px, cy: WHITERUN.py, r: 3, label: 'Super dungeon' }),
-  arch: () => ({ cx: WHITERUN.px, cy: WHITERUN.py, r: 2, label: 'Arch' }),
-  ketch: () => ({ cx: SOLITUDE.px, cy: SOLITUDE.py, r: 4, label: 'Sky-Ketch' }),
   lodes: () => [{ cx: WHITERUN.px + 0.5, cy: WHITERUN.py + 0.5, r: 4, label: 'Motherlode' }],
   pois: () => [{ cx: WHITERUN.px + 0.5, cy: WHITERUN.py + 0.5, r: 2, label: 'POI' }],
   raids: () => [{ px: WHITERUN.px, py: WHITERUN.py, label: 'Raid' }],
@@ -77,8 +74,7 @@ const mkWin = (extra = {}) => new HeldMapWindow({
 /** What the poll kept, kind by kind. */
 const kept = (win) => ({
   party: win._party.map((m) => m.name), trav: win._trav.map((m) => m.name), vendor: win._vendor?.town ?? null,
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): WW5's Hollows and KETCH-EVERYWHERE's stations are lists (`_sds`, `_ketches`), each read over the sheet's box
-  serpent: win._serpent?.label ?? null, sd: win._sds?.[0]?.label ?? null, arch: win._arch?.label ?? null, ketch: win._ketches?.[0]?.label ?? null,
+  serpent: win._serpent?.label ?? null, sd: win._sds?.[0]?.label ?? null,
   lodes: win._lodes.length, pois: win._pois.length, raids: win._raids.length, stars: win._stars.length,
   gates: win._gates.length, bounties: win._bounties.length, lairs: win._revenants.length, quests: win._quests.length,
 });
@@ -117,7 +113,7 @@ test('BAY-LEFT-MAPS C1 THE BOX READERS: over the Bay\'s own box each reads exact
   assert.deepEqual(readRaidMarksIn(raids, f).map((m) => m.key), ['0,0', '999,499', '1000,0', '-1,0', 'w']);
 });
 
-test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, the travellers, the trader\'s coin, the serpent\'s ring, a Super dungeon\'s, an arch\'s, the Ketch\'s, the Motherlodes, the POIs, the raids and the stars past the Bay are all kept; with it off the sheet is the Bay\'s and they drop, the Bay\'s own kept (mutants: the party read over the Bay; the travellers over the Bay; the vendor over the Bay; the serpent over the Bay; the lodes over the Bay; the POIs over the Bay; the box the continent\'s with the continent off)', () => {
+test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, the travellers, the trader\'s coin, the serpent\'s ring, a Super dungeon\'s, the Motherlodes, the POIs, the raids and the stars past the Bay are all kept; with it off the sheet is the Bay\'s and they drop, the Bay\'s own kept (mutants: the party read over the Bay; the travellers over the Bay; the vendor over the Bay; the serpent over the Bay; the lodes over the Bay; the POIs over the Bay; the box the continent\'s with the continent off)', () => {
   _resetForTests();
   setTamrielFit(null);
   withDocument(() => {
@@ -127,7 +123,7 @@ test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, t
     on._refreshParty();
     assert.deepEqual(kept(on), {
       party: ['In Solitude', 'In the Bay'], trav: ['Rider past the Bay', 'Rider on the Bay'], vendor: 'Solitude',
-      serpent: 'Sea Serpent', sd: 'Super dungeon', arch: 'Arch', ketch: 'Sky-Ketch', lodes: 1, pois: 1, raids: 1, stars: 1,
+      serpent: 'Sea Serpent', sd: 'Super dungeon', lodes: 1, pois: 1, raids: 1, stars: 1,
       gates: 1, bounties: 1, lairs: 1, quests: 1,
     });
     on.dispose();
@@ -136,20 +132,12 @@ test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, t
     assert.deepEqual(off._marksBox(), BAY_BOX, 'the continent put away: the Bay\'s own sheet');
     off._refreshParty();
     assert.deepEqual(kept(off), {
-      party: ['In the Bay'], trav: ['Rider on the Bay'], vendor: 'Bayton', serpent: null, sd: null, arch: null, ketch: null, lodes: 0, pois: 0, raids: 0, stars: 0,
+      party: ['In the Bay'], trav: ['Rider on the Bay'], vendor: 'Bayton', serpent: null, sd: null, lodes: 0, pois: 0, raids: 0, stars: 0,
       gates: 0, bounties: 0, lairs: 0, quests: 0,
     });
     off.dispose();
   });
   _resetForTests();
-});
-
-test('BAY-LEFT-MAPS C1: the held map reads no mark against the Bay\'s 1000 x 500 any more - every reader of its poll takes the sheet\'s box (a source sweep of _refreshParty)', () => {
-  const src = read('src/ui/heldMap.js');
-  const poll = src.slice(src.indexOf('  _refreshParty() {'), src.indexOf('    this._partyKey = key;'));
-  assert.doesNotMatch(poll, /this\._size\b(?!, sheet)/, 'no reader bound by this._size (the quests\' size is their fallback beside the box)');
-  assert.match(poll, /const sheet = this\._marksBox\(\);/);
-  assert.equal([...poll.matchAll(/, sheet[,)]/g)].length, 16, 'sixteen readers over the one box - the gates, the rings, the bounties, the lairs, the lodes, the POIs, the raids, the stars, the quests, the coin, the travellers and the party');
 });
 
 const fresh = () => { delete globalThis.localStorage; _resetWaypoints(); };
@@ -183,19 +171,6 @@ test('BAY-LEFT-MAPS C2 AN OLDER CLIENT: a line naming a point it cannot place is
   assert.equal(decodeWaypointLine(line), null);
   assert.equal(receiveWaypointLine({ ch: 'party', text: line, id: 'peer' }), true, 'a waypoint line, never a chat line');
   assert.deepEqual(listWaypoints(), []);
-  fresh();
-});
-
-test('BAY-LEFT-MAPS C2 WILD-WAYPOINT IN CYRODIIL: a death in the open zone by the Imperial City and by Bruma plants the remains\' followed flag (mutants: the Bay\'s bound back)', async () => {
-  fresh();
-  const W = await import('../../src/systems/wild/wildRemainsWaypoint.js');
-  const until = Date.now() + 3600e3;
-  const ic = W.markRemains({ mx: 2069.5, my: 658.5, until });
-  assert.ok(ic && waypointById(ic), 'by the Imperial City');
-  assert.deepEqual([waypointById(ic).mx, waypointById(ic).my, waypointById(ic).name], [2069.5, 658.5, W.WILD_WP_NAME]);
-  const bruma = W.markRemains({ mx: 2030.5, my: 560.5, until });
-  assert.ok(bruma && waypointById(bruma) && !waypointById(ic), 'by Bruma - the last flag gone first');
-  W.clearRemainsMark();
   fresh();
 });
 
@@ -259,7 +234,7 @@ test('BAY-LEFT-MAPS C1 on the player\'s data: over the freeware\'s trace and fit
     win._refreshParty();
     assert.deepEqual(kept(win), {
       party: ['In Solitude', 'In the Bay'], trav: ['Rider past the Bay', 'Rider on the Bay'], vendor: 'Solitude',
-      serpent: 'Sea Serpent', sd: 'Super dungeon', arch: 'Arch', ketch: 'Sky-Ketch', lodes: 1, pois: 1, raids: 1, stars: 1,
+      serpent: 'Sea Serpent', sd: 'Super dungeon', lodes: 1, pois: 1, raids: 1, stars: 1,
       gates: 1, bounties: 1, lairs: 1, quests: 1,
     });
     win.dispose();

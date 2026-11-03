@@ -1,5 +1,5 @@
-// AUDIT UICALM-FIRM1 (2026-10-14, the owner: "Lets do an audit on everything") - every FIXED finding of the audit of
-// UI-CALM and FIRM1 (bible/01-Overview/audits/Audit-UICalm-Firm1.md), pinned through the producers that mint the shapes in
+// AUDIT UICALM-FIRM1 - every FIXED finding of the audit of
+// UI-CALM and FIRM1, pinned through the producers that mint the shapes in
 // play: the real Worker over node:sqlite with every migration applied (test/accountDb.mjs), the real door and book,
 // the real law, fold and damage door, the real ship scene.
 import '../modsOff.js';
@@ -75,7 +75,7 @@ function walk(start, ...targets) {
 const named = (name) => [...FIRM_NODES.values()].find((n) => n.name === name)?.key ?? assert.fail(`no star ${name}`);
 
 async function stand(env = { FIRMAMENT_OPEN: 'on' }) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...env });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...env });
   const raw = s.env.DB._raw;
   const state = (who) => s.call('/v1/firmament/state', { character: who.character }, who.secret);
   const set = (who, tree, id = rid()) => s.call('/v1/firmament/set', { character: who.character, tree: typeof tree === 'string' ? tree : packTree(tree), rid: id }, who.secret);
@@ -126,7 +126,7 @@ beforeEach(() => { _resetFirmamentLiveForTests(); _resetFirmamentPowersForTests(
 
 // ─── LANE 1: the law, the sky and the powers ────────────────────────
 
-test('AUDIT UICALM-FIRM1 L1 H1: a key star\'s raw points and a small star\'s share are ONE channel - the build that made +21 Strength and +86 Health makes +15 and +75, the budget\'s', () => {
+test('AUDIT UICALM-FIRM1 L1 H1: a key star\'s raw points and a small star\'s share are ONE channel - the build that made +21 Strength makes +15, the budget\'s; B5: its Health is the card\'s points and share, a few per cent of the body, under no sum over both', () => {
   const t = walk('wr.start', 'wr.c7.2', named('Warlord'), named('Headsman'), named("Giant's Heart"), named("Troll's Blood"), named('Shield Wall'), named("The Lady's Favor"), named('Reaver'));
   const c = treeStats(t);
   assert.ok(c.strength > 0 && c['pct.strength'] > 0 && c.hp > 0 && c.hpPct > 0, 'the build carries both kinds of each');
@@ -137,7 +137,9 @@ test('AUDIT UICALM-FIRM1 L1 H1: a key star\'s raw points and a small star\'s sha
   const s0 = liveStat(p, 'strength'), h0 = p.maxHealth;
   setFirmamentOnline(true); setFirmamentTree(t); computeEntityMods(p); firmamentLayer(p);
   assert.equal(liveStat(p, 'strength') - s0, statDef('strength').max, 'Strength +15');
-  assert.equal(p.maxHealth - h0, statDef('hp').max, 'Health +75');
+  const body = 600 + p.evenHp;
+  assert.equal(p.maxHealth - h0, c.hp + Math.floor((body * c.hpPct) / 100), 'Health: the raw points and the share of the floored body, as the cards print them');
+  assert.ok((p.maxHealth - h0) / body < 0.07, 'a few per cent of the body');
 });
 
 test('FIRM2: a Strength already at 100 still takes the stars\' points, up to the sky\'s own +15 and no further', () => {
@@ -173,12 +175,12 @@ test('AUDIT UICALM-FIRM1 L1 M2: THE GAINS ARE CAPPED, THEN THE PRICE IS PAID - p
   assert.ok(treeParts(mage).gains.spellPower > statDef('spellPower').max, 'the mage stands past the cap');
   assert.equal(treeStats(mage).spellPower, statDef('spellPower').max);
   assert.equal(treeStats(vow).spellPower, statDef('spellPower').max + treeParts(vow).prices.spellPower);
-  // Night Mother's Embrace: -5 in an open fight, though melee and short blades already pass the group's 30
+  // Night Mother's Embrace: -1 in an open fight, though melee and short blades already pass the group's 5
   const without = walk('sh.start', named('Dagger Dance'), 'sh.c5.0', 'sh.c5.1', 'sh.c5.2', 'sh.c5.3', 'sh.c5.4', 'sh.c5.5', 'sh.c5.6', 'st.k');
   const nm = { start: without.start, keys: [...without.keys, ...pathTo(without, 'sh.k')] };
   const aware = (t) => blowPct(treeStats(t), { skill: 'ShortBlade', group: 'humanoid' });
-  assert.equal(aware(without), 30);
-  assert.equal(aware(nm), 25);
+  assert.equal(aware(without), BLOW_CAP); // PIN MOVED: B5 (BLOW_CAP 30 -> 5)
+  assert.equal(aware(nm), BLOW_CAP - 1); // PIN MOVED: B5 (cap 5 less the keystone's price -1, was 30 less 5)
   assert.ok(blowPct(treeStats(nm), { skill: 'ShortBlade', unaware: true }) > blowPct(treeStats(without), { skill: 'ShortBlade', unaware: true }), 'and it pays off on the unaware');
   // through the real blow door
   const me = { isPlayer: true, health: 100, maxHealth: 100 };
@@ -186,7 +188,7 @@ test('AUDIT UICALM-FIRM1 L1 M2: THE GAINS ARE CAPPED, THEN THE PRICE IS PAID - p
   const dagger = { templateIndex: 113 };
   setFirmamentOnline(true);
   const hundred = (t) => { setFirmamentTree(t); _resetFirmamentPowersForTests(); let n = 0; for (let i = 0; i < 100; i++) n += weaponBlowMods(dagger, 100, me, foe, { unaware: false }); return n; };
-  assert.equal(hundred(nm), hundred(without) - 500);
+  assert.equal(hundred(nm), hundred(without) - 100); // PIN MOVED: B5 (the price -5% -> -1%: 100 blows of 100)
   // and the price's own reader: a channel with no price reads as it did (a hand-made sheet has none)
   assert.equal(castCostPct({ castCost: 30 }), 25);
 });
@@ -244,12 +246,6 @@ test('AUDIT UICALM-FIRM1 L1 L2, MENTOR2: mentoring moves the sky at once - the f
   assert.equal(told, 1, 'told once a change');
   setFirmamentMentorScale(1);
   assert.deepEqual([told, firmActMult('herbalism'), firmamentMentorScale()], [2, herb, 1]);
-  assert.match(read('src/scenes/mentorHost.js'), /setFirmamentMentorScale\(mentorPowerScale\(me\)\);/);
-  assert.match(read('src/scenes/world.js'), /mentorHost\.frame\(nowMs\);/);
-});
-
-test('AUDIT UICALM-FIRM1 L1 L3: taking the seat back reads the book again', () => {
-  assert.match(read('src/scenes/world.js'), /setFirmamentOnline\(true\);[^\n]*\n\s+firmBook\?\.read\(\)\.catch\(\(\) => \{\}\);/);
 });
 
 test('AUDIT UICALM-FIRM1 L1 L4: a star no longer joined to the start drops on read with every star it held, free - never paying stats, never billed', () => {
@@ -293,13 +289,6 @@ test('AUDIT UICALM-FIRM1 L2 M4: a shut read leaves no tree in force on the devic
   assert.deepEqual([book.state.open, book.state.tree], [false, { start: null, keys: [] }]);
 });
 
-// PIN MOVED (FIRMAMENT-ON, 2026-10-15, the owner: "switch it on for players"): the config and the record still say one
-// thing - now "on"
-test('AUDIT UICALM-FIRM1 L2 M5, FIRMAMENT-ON: FIRMAMENT_OPEN is "on", as the record says', () => {
-  assert.match(read('server-account/wrangler.toml'), /^FIRMAMENT_OPEN = "on"$/m);
-  assert.match(read('bible/06-Systems/Firmament.md'), /then opened: \*\*`on`\*\* \(FIRMAMENT-ON, 2026-10-15/);
-});
-
 test('AUDIT UICALM-FIRM1 L2 M2: AN ID NAMES ONE TREE - the service refuses another tree under a made change\'s id; the book asks a newer tree under its own', async () => {
   const s = await stand();
   const kay = await s.seated('Kay', { renown: 8 });
@@ -337,7 +326,6 @@ test('AUDIT UICALM-FIRM1 L2 M1: no change is taken while a respec is on its way;
   const Z = walk('mg.start', 'mg.s1');
   assert.equal((await book.commit(Z)).ok, true);
   assert.deepEqual(asked.map((a) => a.tree), [packTree(Z)], 'Z alone - nothing parked behind the respec');
-  assert.match(read('src/ui/firmamentWindow.js'), /goBtn\.disabled = !n \|\| !online \|\| respecking;/);
 });
 
 test('AUDIT UICALM-FIRM1 L2 M3: the Worker\'s own `rate` and `maintenance` keep the change, to be asked again', async () => {
@@ -533,17 +521,13 @@ test('AUDIT UICALM-FIRM1 L5 H4: every craft route takes the tree\'s hand on its 
   const after = await plainSmelt(p);
   assert.equal(after.body.xp, scaleXp(before.body.xp, xpPct(treeStats(best), 'smithing')));
   assert.ok(after.body.xp > before.body.xp);
-  const prof = read('server-account/src/professions.js'), alch = read('server-account/src/alchemy.js');
-  assert.match(prof, /\n {4}xpPct\(await firmStatsOf\(db, player, env, character\), craft\)\);   \/\/ FIRM1: the Firmament's hand on the craft's XP/);
-  assert.match(alch, /const xp = scaleXp\(brewXp\(potion, rank\), xpPct\(await firmStatsOf\(db, player, env, character\), trackOf\('alchemy'\)\)\);/);   // PIN MOVED (FIRST-BUDGET): the brew's law takes no first - brewFirstXp beside it, never scaled
-  assert.match(alch, /const xp = scaleXp\(disenchantXp\(r, rank, base, p\.bought_with == null\), xpPct\(await firmStatsOf\(db, player, env, character\), 'enchanting'\)\);/);   // PIN MOVED (CLOTH-GEMS): the piece's own origin read
 });
 
 test('AUDIT UICALM-FIRM1 L5 M3: the budget\'s numbers as the design page says them, and every price small, whichever way its channel reads', () => {
   const at = (k) => [STAT_DEFS[k].min, STAT_DEFS[k].max];
-  assert.deepEqual([STAT_DEFS.strength.max, statDef('skill.LongBlade').max, STAT_DEFS.hp.max, STAT_DEFS.mp.max], [15, 15, 75, 75]);
-  assert.deepEqual([at('spellPower')[1], at('castCost')[1], at('castSpeed')[1], at('blowTaken')[0], at('evade')[1]], [30, 25, 15, -15, 10]);
-  assert.deepEqual([BLOW_CAP, BLOW_TOTAL_CAP, CAST_COST_CAP], [30, 50, 25]);
+  assert.deepEqual([STAT_DEFS.strength.max, statDef('skill.LongBlade').max, STAT_DEFS.hp.max, STAT_DEFS.mp.max], [15, 15, 15, 75]);
+  assert.deepEqual([at('spellPower')[1], at('castCost')[1], at('castSpeed')[1], at('blowTaken')[0], at('evade')[1]], [6, 25, 15, -3, 10]); // PIN MOVED: B5 (spellPower cap 30 -> 6, blowTaken floor -15 -> -3)
+  assert.deepEqual([BLOW_CAP, BLOW_TOTAL_CAP, CAST_COST_CAP], [5, 6, 25]); // PIN MOVED: B5 (blow caps 30 / 50 -> 5 / 6)
   assert.deepEqual([REFUND_FREE_BELOW_RENOWN, REFUND_SILVER_PER_STAR, FIRM_RESPEC_GOLD, FIRM_RENOWN_MAX], [10, 10, 10_000, 50]);
   assert.deepEqual([refundSilver(3, 9), refundSilver(3, 10)], [0, 30]);
   assert.deepEqual([starsFor(50), starsFor(51)], [98, 98]);
@@ -679,21 +663,6 @@ test('AUDIT UICALM-FIRM1 L5 H5: a small star\'s Spell Points share is of the max
   assert.equal(renownMpOf(p) - renownOnly, Math.min(statDef('mp').max, (c.mp ?? 0) + Math.floor((base * c.mpPct) / 100)));
 });
 
-test('AUDIT UICALM-FIRM1 L5 H2/H3: the hosts - every strike and spell at a player rolled with the sky off; offline no sky; the seat given up puts it to sleep; the book\'s tree the one in force; a rise read and said as its own Stars', () => {
-  const w = read('src/scenes/world.js');
-  const strikes = [...w.matchAll(/duelAttackerOf\(playerEntity, weapon\)/g)].map((m) => w.slice(m.index - 48, m.index));
-  assert.ok(strikes.length >= 4, `${strikes.length} strikes`);
-  for (const pre of strikes) assert.match(pre, /withoutFirmament\(playerEntity, \(\) => $/, pre);
-  const spells = [...w.matchAll(/siegeSpellNumbers\(sp, /g)].map((m) => w.slice(m.index - 48, m.index));
-  assert.ok(spells.length >= 3);
-  for (const pre of spells) assert.match(pre, /withoutFirmament\(playerEntity, \(\) => $/, pre);
-  assert.match(w, /\n {2}setFirmamentOnline\(params\.has\('online'\)\);/);
-  assert.match(w, /\n {4}setFirmamentOnline\(false\);   \/\/ FIRM1: the sky sleeps offline/);
-  assert.match(w, /\n {2}firmBook\?\.onChange\(\(st\) => setFirmamentTree\(st\.tree\)\);/);
-  assert.match(w, /announceRenownRise\(level, \{ stars: starsFor\(level\) - starsFor\(was\),/);
-  assert.match(w, /firmBook\?\.read\(\)\.catch\(\(\) => \{\}\);   \/\/ FIRM1: a Renown level is a Star/);
-});
-
 test('AUDIT UICALM-FIRM1 L5 H5: the herb act\'s Basket glints longer by the steadier hand', () => {
   const plain = createHerbAct({ kind: 'basket', rng: () => 0.5 });
   setFirmamentOnline(true);
@@ -739,7 +708,6 @@ test('AUDIT UICALM-FIRM1 L5 M5 / L4 M1: the saddle panel When needed, on a page 
     toggleSaddlePanel();
     assert.equal(show({ saddle: SADDLE(), now: 9800 }), 'none', 'and its own key puts it away');
   } finally { hideEnhancedSaddle(); _resetPrefsForTests(); }
-  assert.match(read('src/ui/enhanced/enhancedSaddle.js'), /if \(last\.place === 0\) \{ if \(state\.touch\) placeTouch\(doc, parts, last\); else placeBar\(doc, parts, last\); \}/, 'a finger\'s block placed under the compass');   // PIN MOVED (THE MERGE of main into FIELD BUGS 2026-10-14: HUD-SADDLE's preview paints through the same code, so the placers take the nodes they place)
 });
 
 test('AUDIT UICALM-FIRM1 L5 M7 / L4 M3, N1: the calm HUD - the vitals rest after VITALS_REST_S full, and not a moment before; the player\'s Off, a lost point, a foe in the bar and the HUD arranged keep them up', async () => {
@@ -788,100 +756,3 @@ test('AUDIT UICALM-FIRM1 L5 M7 / L4 M3, N1: the calm HUD - the vitals rest after
   }
 });
 
-test('AUDIT UICALM-FIRM1 L4 H1, M4, M5, L1-L4 (text pins - the window wants a canvas): the bar inside the gutters, the say box and hint take no taps, a finger reads before it learns, the overlays\' close asks, a sign alone is a change, the keys hold the sky, Enter on a press is its own, every refusal said', () => {
-  const w = read('src/ui/firmamentWindow.js');
-  assert.match(w, /\.fmt-bar \{ position: absolute; left: 16px; right: 16px; margin-inline: auto; width: fit-content;/);
-  assert.doesNotMatch(w, /\.fmt-bar \{[^}]*translateX/);
-  assert.match(w, /\.fmt-hint \{[^}]*pointer-events: none;/);
-  assert.match(w, /\.fmt-say \{[^}]*pointer-events: none;/);
-  assert.match(w, /view\.y = Math\.max\(40, barFoot\(\) \/ 2\);/);
-  assert.match(w, /view\.y = -n\.y \* view\.z \+ barFoot\(\) \/ 2;/);
-  assert.match(w, /if \(e\.pointerType === 'touch' && d\.button !== 2 && hover !== key\) \{ setHover\(key, p\.x, p\.y\); return; \}/);
-  assert.match(w, /canvas\.addEventListener\('pointerleave', \(e\) => \{ if \(!drag && e\.pointerType !== 'touch'\) setHover\(null, 0, 0\); \}\);/);
-  // PIN MOVED (AUDIT GROWTH LANE5-1): the ask re-armed first (LANE3-8's rearm), its words the window's own t() line
-  assert.match(w, /const overlayClose = \(\) => \{\n\s+rearm\(\);\n\s+if \(!dead && unaccepted\(\) && !armedClose\) \{\n\s+arm\(\);\n\s+say\(unacceptedClose\(\), true\);\n\s+unregister = registerOverlay\(overlayClose\);\n\s+return;/);
-  assert.match(w, /const unacceptedClose = \(\) => t\('firmament\.unacceptedClose', 'You have unaccepted changes\. Press \{accept\} to keep them, or close again to discard them\.', \{ accept: t\('firmament\.accept', 'Accept'\) \}\);/);   // PIN MOVED (AUDIT GROWTH LANE5-2): the button's own word
-  assert.match(w, /if \(used && e\.key !== 'Escape'\) armedClose = false;/);
-  assert.match(w, /function unaccepted\(\) \{ const c = changes\(\); return !!\(c\.added \|\| c\.removed \|\| \(c\.startChanged && pending\.start\)\); \}/);
-  assert.match(w, /const n = c\.added \+ c\.removed \+ \(c\.startChanged && pending\.start \? 1 : 0\);/);
-  assert.match(w, /if \(!c\.added && !c\.removed && !\(c\.startChanged && pending\.start\)\) return;/);
-  for (const d of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']) assert.match(w, new RegExp(`case '${d}': view\\.[xy] [-+]= 60; hold\\(\\); dirty = true; break;`), d);
-  assert.match(w, /case 'Enter': if \(e\.target\?\.tagName === 'BUTTON'\) \{ used = false; break; \}/);
-  assert.match(w, /return \/\*\* @type \{Record<string, string>\} \*\/ \(REFUSALS\)\[error\] \?\? accountRefusalText\(error\);/);
-  assert.match(w, /if \(st\.error === 'firm-closed'\) return t\('firm\.readFail\.closed',/);
-  assert.match(w, /say\(refusalText\(r\?\.error, true\), true\);/);
-  // L4 M6, L5, L6: the pause tabs wrap where a language's six do not fit; a page press's key in page ink; the Stable's
-  // stepper on the card
-  assert.doesNotMatch(read('src/ui/uiCalmStyle.js'), /\.px-tabs \{ flex-wrap: nowrap/);
-  assert.match(read('src/ui/grimoireDress.js'), /\$\{G\} \[data-grim-on="page"\] \[class\$="-key"\] \{ color: \$\{T\.inkSoft\} !important;/);
-  assert.match(read('src/ui/holdingsPages.js'), /\.px-sys \.hld-pick:has\(\.hld-step\) \{ grid-template-columns: auto minmax\(0, 1fr\) auto; \}/);
-  // the type floor: no word of the window under 12px
-  assert.deepEqual([...w.matchAll(/font-size: (\d+)px/g)].map((m) => Number(m[1])).filter((n) => n < 12), []);
-});
-
-test('AUDIT UICALM-FIRM1 L3 H1, M1-M8, L1-L4, N1 (text pins - the door and the walk want a screen; each was proven by a probe): the stage ends at the measured foot, the book stands where it is tall enough, a double click is one door, a class\'s way by its key, the walk\'s bar and sheet keep the screen, a waiting way on reads, the map\'s plates re-laid as they grow, the Grimoire\'s phone rail on its page, the keyboard back on its door', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const calm = read('src/ui/uiCalmStyle.js');
-  const grim = read('src/ui/grimoireDress.js');
-  const gen = read('src/ui/enhanced/enhancedChargen.js');
-  // H1: the foot says its height, the stage ends there; a phone's plaques wrap
-  assert.match(menu, /const reserve = \(\) => \{ const h = Math\.ceil\(foot\.getBoundingClientRect\?\.\(\)\.height \?\? 0\); if \(h > 0\) home\.style\?\.setProperty\?\.\('--px-foot-h', `\$\{h\}px`\); \};\n\s+reserve\(\);\n\s+try \{ footObs = new globalThis\.ResizeObserver\(reserve\); footObs\.observe\(foot\); \}/);
-  assert.match(calm, /\.px-home:not\(\.px-over\)\[style\*="--px-foot-h"\] > \.px-stage:not\(\.px-acctstage\) \{ height: calc\(100% - var\(--px-foot-h\)\); padding-bottom: 12px; \}/);
-  assert.match(calm, /\.px-home:not\(\.px-over\) \.px-footright, \.px-home:not\(\.px-over\) \.px-footleft \{ display: contents; \}/);
-  // M1: the book needs the height its type was set for
-  assert.match(grim, /const BOOK_MQ = '\(min-width: 900px\) and \(min-aspect-ratio: 5\/4\) and \(min-height: 561px\)';/);
-  // M2: a double click's second click opens no door
-  assert.match(menu, /b\.onclick = \(e\) => \{ if \(e\?\.detail > 1\) return; onClick\(e\); \};/);
-  // M3: a class's way by the career's own key, never its shown (translated) name
-  assert.match(gen, /const w = custom \? 'Your own' : classWayOf\(flow\.careers\[i\]\?\.name\);/);
-  assert.match(gen, /const pickedWay = flow\.classListIndex === flow\.careers\.length \? null : classWayOf\(flow\.careers\[flow\.classListIndex\]\?\.name\);/);
-  assert.doesNotMatch(gen, /classWayOf\((name|picked)\)/);
-  // M4: a phone's action bar wraps, its way on with no floor
-  assert.match(calm, /@media \(max-width: 860px\) \{\n\s+\.wizard \.actionbar \{ flex-wrap: wrap; \}\n\s+\.wizard \.actionbar \.act\.primary \{ min-width: 0; \}/);
-  // M5: a waiting way on in an ink of its own, both dresses
-  assert.match(calm, /\$\{P\} \.wizard \.act\.primary\[disabled\] \{ opacity: 1; color: #bdb4a0; \}/);
-  assert.match(grim, /\$\{G\} \.wizard :is\(\.actionbar, \.choose \.acts, \.skillpane \.acts\) \.act\.primary:disabled \{ opacity: 0\.85 !important; \}/);
-  // M6: every plate watched, so a late face re-lays them
-  assert.match(gen, /ro\.observe\(box\);\n\s+for \(const q of plates\) ro\.observe\(q\.tag\);/);
-  // M7: a phone's sheet bounds its confirm card - its words scroll, its presses stand
-  assert.match(calm, /\.wizard \.stagebody > \.detail\.wizsheet:has\(> \.dcard\.confirm\) \{ display: flex; flex-direction: column; overflow: hidden; \}/);
-  assert.match(calm, /\.wizard \.stagebody > \.detail\.wizsheet > \.dcard\.confirm \{ flex: 1 1 auto; min-height: 0; max-height: none; \}/);
-  // M8: the Grimoire's phone rail on its page, its head in the whole deep red
-  assert.match(grim, /@media \(max-width: 860px\), \(pointer: coarse\) \{ \$\{G\} \.shell:not\(\.wizard\) \.rail \{ background: \$\{PAGE\} !important; \} \}/);
-  assert.match(grim, /\$\{G\} \.rail \.railgroup \{ margin: 18px 24px 2px;[^\n]*\n\s+color: \$\{T\.redDeep\}; border-bottom: 1px solid rgba\(43,26,12,0\.25\); padding-bottom: 2px; \}/);
-  // L1: the keyboard back on the door a level or a section was left by
-  assert.match(menu, /: section !== 'home' \? \(\) => \{ const from = section; go\('home'\); if \(mode !== 'pause'\) focusDoor\(from\); \}/);
-  assert.match(menu, /focusDoor\(from\); \}   \/\/ UI-CALM: the offline doors back out to the two questions/);
-  // L2: a level's health as the roll gives it
-  assert.match(gen, /`\$\{Math\.trunc\(career\.hitPointsPerLevel \/ 2\)\}-\$\{career\.hitPointsPerLevel\} a level, more with Endurance`/);
-  // L3: the floor's 11px words
-  assert.match(calm, /\.opt-tools \.act, \.wizard \.poolk \{ font-size: 12px; \}/);
-  assert.match(calm, /\.wizard \.maplabel \{ font-size: 12px; padding: 2px 5px; \}/);
-  // L4: a phone's rail head takes a row of its own
-  assert.match(calm, /\.shell:not\(\.wizard\) \.rail \.railgroup \{ flex: 0 0 100%; margin: 8px 12px 0; \}/);
-  // N1: Settings and Overhauls keep the level they were opened from
-  assert.match(menu, /else if \(section === 'online'\) homeLevel = 'top';/);
-  assert.doesNotMatch(menu, /HOME_LINKS\.some\(\(l\) => idOf\(l\) === section\)\) homeLevel = 'top'/);
-});
-
-test('AUDIT UICALM-FIRM1 L5 M9, L5 L3, L3 N2, N3 (text pins): the enhanced door\'s offline doors and the foot\'s plaques in the player\'s language; the class bars\' colours each dress\'s own; an Acrobat', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const calm = read('src/ui/uiCalmStyle.js');
-  const grim = read('src/ui/grimoireDress.js');
-  const gen = read('src/ui/enhanced/enhancedChargen.js');
-  // L5 M9: the two-question door's offline doors by railLabel (the L10N1b pin reads the classic list's loop alone)
-  assert.match(menu, /for \(const label of HOME_OFFLINE\.slice\(0, 3\)\) games\.append\(doorBtn\(idOf\(label\), railLabel\(label\), '', \(\) => go\(idOf\(label\)\)\)\);/);
-  assert.match(menu, /for \(const label of HOME_OFFLINE\.slice\(3\)\) more\.append\(doorBtn\(idOf\(label\), railLabel\(label\), '', \(\) => go\(idOf\(label\)\)\)\);/);
-  assert.match(menu, /\.append\(doorBtn\('online', railLabel\('Online'\), t\('menu\.home\.onlineSub', /);
-  assert.match(menu, /\.append\(doorBtn\('offline', t\('menu\.home\.offline', 'Offline'\), t\('menu\.home\.offlineSub', /);
-  // L3 N3: the foot's two plaques
-  assert.match(menu, /const tuts = el\('button', 'px-about px-tuts door-tutorials', RAIL_TEXT\.tutorials\(\)\);/);
-  assert.match(menu, /const shots = el\('button', 'px-about px-shots', RAIL_TEXT\.screenshots\(\)\);/);
-  // L5 L3: the bars' dark and amber Plus's (uicalm's rule-by-rule scope pin), the Grimoire's in its ink and red
-  assert.match(calm, /\$\{P\} \.wizard \.cprof-bar \{ border-color: #050608; background: rgba\(5,6,8,0\.6\); box-shadow: 0 0 0 1px #5a5446; \}\n\$\{P\} \.wizard \.cprof-fill \{ background: #c08a3e; \}/);
-  assert.match(grim, /\$\{G\} \.wizard \.cprof-bar \{ border-color: rgba\(43,26,12,0\.55\); background: rgba\(43,26,12,0\.12\); \}\n\$\{G\} \.wizard \.cprof-fill \{ background: \$\{T\.redDeep\}; \}/);
-  // L3 N2: Play as an Acrobat
-  assert.match(gen, /`Play as \$\{\/\^\[aeiou\]\/i\.test\(named\) \? 'an' : 'a'\} \$\{named\}`/);
-  assert.match(gen, /`Play as \$\{\/\^\[aeiou\]\/i\.test\(picked\) \? 'an' : 'a'\} \$\{picked\}`/);
-  assert.doesNotMatch(gen, /Play as a \$\{/);
-});

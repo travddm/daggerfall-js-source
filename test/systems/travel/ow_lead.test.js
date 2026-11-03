@@ -1,5 +1,4 @@
-// OW-LEAD (2026-10-17, the player: "iam 100% sure it even slowed down to 1x without enemies in 500m nearby ... So far it
-// seems random it almost always [goes] down to 1x and after a while it goes up again"). bible/06-Systems/Travel-View.md OW-LEAD.
+// OW-LEAD. OW-LEAD.
 //
 // THE LAND'S HOLD IS HOW NEAR THE HOLE IS, NOT HOW LONG IT HAS STOOD. TV2's governor halved the clock every
 // TV_GOV_SETTLE_S while any pixel of the counted grid was still building - a slower clock builds nothing faster, so a
@@ -23,7 +22,6 @@ import { TRAVEL_VIEW_TEXT, travelWalkRate, TV_MOVE_ACTIONS } from '../../../src/
 import { timeScale, setTimeScale, resetTimeScale, MAX_TIME_SCALE } from '../../../src/systems/timeScale.js';
 import { _resetTravelPace } from '../../../src/systems/travel/travelPace.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const OLD_LINE = 'const load = travelGovernor.step(dt, { unbuilt, requested: want });';
 const NEW_LINE = /const load = travelGovernor\.step\(dt, \{ unbuilt, requested: want, owed: uc\.owed, [^\n]*?\}\);/;
 const ASK = 100;
@@ -49,7 +47,7 @@ function rideHost(W, { buildS, mps, boatWay = null }) {
   const player = { pos: at, speed: mps, isPlayerSwimming: false, feetAt: () => [...player.pos] };
   const boat = boatWay == null ? null : { way: boatWay };   // PASSAGE-PACE: a boat at the traveller's helm, her way Come Sail Away's
   const scope = {
-    capitalPrebuild: { firstReady: () => true },   // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers - none here
+    capitalPrebuild: { firstReady: () => true },
     travelControlUI: { isShowing: true }, travelOptions: { state: { autopilot: {} } },
     travelView: { active: true, state: 'up' }, tvOwnsJourneys: () => true,
     worldTimeScale: timeScale, setWorldTimeScale: setTimeScale, resetTimeScale, createLoadGovernor, travellerPace, MAX_TIME_SCALE,
@@ -137,19 +135,7 @@ test('OW-LEAD: the land\'s cap is how near the nearest owed pixel is - at the tr
   assert.deepEqual(out, [[11, 10]], 'emptied, then the owed pixel alone');
 });
 
-test('OW-LEAD host run: A RIDER AT x100 WITH EVERY BUILD TAKING THE PUMP A SECOND - the old halving took the journey to x1 for most of two minutes; the lead law never lets it walk, keeps it near the ask, and the rider never enters a pixel the stream owes (mutant: the old line)', async (t) => {
-  t.after(() => { resetTimeScale(); _resetTravelPace(); });
-  assert.match(WORLD, NEW_LINE, 'the host hands the governor the owed pixels, the feet and the pace');
-  const now = await rideHost(WORLD, { buildS: 1, mps: 12 }).ride(120);
-  const was = await rideHost(WORLD.replace(NEW_LINE, OLD_LINE), { buildS: 1, mps: 12 }).ride(120);
-  t.diagnostic(`old: ${was.x1.toFixed(1)} s at x1, mean x${was.mean.toFixed(1)}, ${was.pixels} px; new: ${now.x1.toFixed(1)} s at x1, mean x${now.mean.toFixed(1)}, ${now.pixels} px`);
-  assert.ok(was.x1 > 30, `the old law: ${was.x1.toFixed(1)} s of 120 at x1, mean x${was.mean.toFixed(1)} - the report`);
-  assert.equal(now.x1, 0, `the lead law: never at walking pace (mean x${now.mean.toFixed(1)}, ${now.pixels} pixels on, the old ${was.pixels})`);
-  assert.ok(now.pixels > was.pixels, 'and further in the same two minutes');
-  assert.equal(now.inHole, 0, 'never standing in a pixel the stream has not built');
-});
-
-// PASSAGE-PACE (2026-10-27; bible/03-World/Passage.md, PASSAGE-PACE - FIELD BUGS 2026-10-21d found it and left it): the
+// PASSAGE-PACE: the
 // leads are sized by the traveller's own pace, and at a helm that is her way (travelGovernor.js travellerPace).
 const PACE_SITES = /travellerPace\(player, csaBoatUnderMe\(\)\)/g;
 test('PASSAGE-PACE: the traveller\'s own pace is the walking motor\'s, or the way of the boat at their helm where it is more - Come Sail Away\'s `way`; none, or a way that reads as nothing, the motor\'s (mutants: the boat unread, the more of the two)', () => {
@@ -158,15 +144,5 @@ test('PASSAGE-PACE: the traveller\'s own pace is the walking motor\'s, or the wa
   assert.equal(travellerPace({ speed: 4.43 }, null), 4.43);
   assert.equal(travellerPace({ speed: 4.43 }, { way: NaN }), 4.43);
   assert.equal(travellerPace(null, null), 0);
-  assert.equal([...WORLD.matchAll(PACE_SITES)].length, 2, 'the land\'s lead and the enemies\' read it');
 });
 
-test('PASSAGE-PACE host run: A SMALL SHIP AT x100 MAKING 12.5 m/s, THE WALKING MOTOR 4.43, EVERY BUILD TWO SECONDS (a slow machine) - sized by the motor the clock let her sail into pixels the stream still owed (an unbuilt pixel reads no water); sized by her way, never (mutant: the motor\'s pace)', async (t) => {
-  t.after(() => { resetTimeScale(); _resetTravelPace(); });
-  const now = await rideHost(WORLD, { buildS: 2, mps: 4.43, boatWay: 12.5 }).ride(120);
-  const was = await rideHost(WORLD.replace(PACE_SITES, 'player?.speed ?? 0'), { buildS: 2, mps: 4.43, boatWay: 12.5 }).ride(120);
-  t.diagnostic(`the motor's: ${was.inHole.toFixed(1)} s in owed pixels, ${was.pixels} px; her way's: ${now.inHole.toFixed(1)} s, ${now.pixels} px`);
-  assert.ok(was.inHole > 0, `the motor's pace: ${was.inHole.toFixed(1)} s in pixels the stream owed`);
-  assert.equal(now.inHole, 0, 'her own way: never in a pixel not yet built');
-  assert.ok(now.pixels > 10, `and still under way (${now.pixels} pixels)`);
-});

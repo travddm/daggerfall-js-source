@@ -1,5 +1,4 @@
-// DECOR-MODS (FIELD BUGS 2026-10-05b, the owner: "There seems to be a lot of missing decor items with house
-// decoration"; asked which, the town mods' furnishings first). The catalogue read Daggerfall's own blocks alone (WD3), so
+// DECOR-MODS (FIELD BUGS 2026-10-05b,; asked which, the town mods' furnishings first). The catalogue read Daggerfall's own blocks alone (WD3), so
 // nothing Beautiful Villages, Beautiful Cities or Detailed Ships furnish - the coloured beds, the paintings, the
 // tapestries and banners, the set tables and stocked shelves - could be set in a house. Now the pieces the port stands in
 // for what the mods place join it, offered while the port stands them: a room's where the mods stand them inside, a

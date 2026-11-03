@@ -175,7 +175,7 @@ export function generateTileData(heightmapData, mapPixelX, mapPixelY, hDim = HEI
     const hy = Math.min(hDim - 1, Math.max(0, Math.trunc(hDim * (y / tdDim))));
     // x & y swapped in heightmap for TerrainData.SetHeights().
     //
-    // WATER1 (2026-09-08): THE COMPARE IS FLOAT32'S, AS DFU'S IS. The
+    // WATER1: THE COMPARE IS FLOAT32'S, AS DFU'S IS. The
     // sampler clamps the sea to SCALED_OCEAN_ELEVATION and stores
     // scaledHeight / MaxTerrainHeight in a Float32Array; this job
     // multiplies it back. In C# every step is a float: 27.2f / 1539f *
@@ -288,7 +288,7 @@ export function setLocationTiles(dfLocation, mapsFile, blocksFile, tilemapData) 
       blockAt.push(blockIndex === -1 ? null : blocksFile.getBlock(blockIndex));
     }
   }
-  // TOWN-SHAPES (departure from TerrainHelper.SetLocationTiles; bible/03-World/Town-Shapes.md): only the tiles of the
+  // TOWN-SHAPES (departure from TerrainHelper.SetLocationTiles, past the Bay only): only the tiles of the
   // town's own outline are stamped - the rest of its blocks' ground is the land's
   const shape = locationShapeField(dfLocation, (bx, by) => (isWallCarrier(blockAt[by * width + bx]?.name) ? null : blockAt[by * width + bx]?.rmbBlock ?? null), tilePos);   // TS4: a wall's carrier shapes none
   for (let blockY = 0; blockY < height; blockY++) {
@@ -315,7 +315,7 @@ export function setLocationTiles(dfLocation, mapsFile, blocksFile, tilemapData) 
     }
   }
   const extraClearance = dfLocation.mapTableData.locationType === LOCATION_TYPE_TOWN_CITY ? 3 : 2;
-  // AUDIT TESA II C1 (a departure from DFU's SetLocationTiles, bible/03-World/Arena-Provinces.md TESA10): a capital's rim
+  // AUDIT TESA II C1 (a departure from DFU's SetLocationTiles, TESA10): a capital's rim
   // (world/tamrielCapitals.js inCapitalRim - its outer tiles no ground of its own) begins where its ground ends, with no
   // clearance past it: the land's own ground blends from the city's to the neighbour's over the whole rim, where DFU's
   // three tiles would stand a strip of the land's own at the city's height (at a shore capital's sea floor, water). A side
@@ -341,11 +341,11 @@ export function setLocationTiles(dfLocation, mapsFile, blocksFile, tilemapData) 
 /** TOWN-SHAPES: the tiles about a town's grid its outline may reach into - its whole margin and wander, and one more. */
 const SHAPE_PAD = Math.ceil(TOWN_SHAPE.margin + TOWN_SHAPE.wander) + 1;
 /**
- * TOWN-SHAPES (bible/03-World/Town-Shapes.md): A LOCATION'S OUTLINE over its pixel's 128 x 128 tiles - world/townShape.js
+ * TOWN-SHAPES: A LOCATION'S OUTLINE over its pixel's 128 x 128 tiles - world/townShape.js
  * townShapeField over its grid (world/townShape.js townTiles: each block's town-map bytes, its misc models and flats -
  * `rmbOf(bx, by)` a block's RMB half, or null), laid at its tile origin - TS4: a walled city past the Bay's over its
- * round, its apron its own - or null for a location the port stands whole: a capital (its own plan's,
- * world/tamrielCapitals.js), a grid with no block read.
+ * round, its apron its own - or null for a location the port stands whole: a location of Daggerfall's own map, a capital
+ * (its own plan's, world/tamrielCapitals.js), a grid with no block read.
  * @param {any} dfLocation @param {(bx: number, by: number) => any} rmbOf @param {{x: number, y: number}} [tilePos]
  * @returns {?Uint8Array} townShapeField's codes in the pixel's tiles (index x + y * 128), 0 outside
  */
@@ -361,6 +361,19 @@ export function locationShapeField(dfLocation, rmbOf, tilePos = getLocationTerra
 }
 
 /**
+ * Whether the port made this location rather than reading it from Daggerfall's map: a town or lair past the Bay
+ * (world/arenaLocations.js, world/tamrielCountry.js, world/tamrielDungeons.js), an isle's place past the Veil
+ * (world/etherPlaces.js) or a spawned dungeon (world/spawnedDungeons.js). Only these get an outline. A location of
+ * Daggerfall's own map keeps DFU's ground (TerrainHelper.SetLocationTiles and BlendLocationTerrainJob): every ground tile
+ * of its grid stamped and a square plateau. The outline there stood coastal towns on sheer walls over the sea and let
+ * trees grow inside DFU's clearing.
+ * @param {any} dfLocation
+ */
+export const isPortMadeLocation = (dfLocation) => !!(dfLocation.arena || dfLocation.country || dfLocation.ether || dfLocation.spawned);
+/** A capital stands on its own plan's ground (world/tamrielCapitals.js), so it takes no outline either. @param {any} dfLocation */
+const takesOutline = (dfLocation) => !!dfLocation?.exterior?.exteriorData && !dfLocation.capital && isPortMadeLocation(dfLocation);
+
+/**
  * AUDIT TESA III E1-4: AN OUTLINE'S BASIS - what locationShapeField draws its outline from before its seed: the grid's
  * occupied tiles (townTiles) on the outline's padded box (SHAPE_PAD tiles each side - its margin wanders out past the
  * blocks' squares), whether it stands on a walled round (TS4), and where the box lies in the pixel's tiles; and what
@@ -370,7 +383,7 @@ export function locationShapeField(dfLocation, rmbOf, tilePos = getLocationTerra
  * @returns {?{ padded: Uint8Array, stamp: Uint8Array, PW: number, PH: number, walled: boolean, x0: number, y0: number, clear: number }}
  */
 export function locationOutlineBasis(dfLocation, rmbOf, tilePos = getLocationTerrainTileOrigin(dfLocation)) {
-  if (!dfLocation?.exterior?.exteriorData || dfLocation.capital) return null;
+  if (!takesOutline(dfLocation)) return null;
   const { width, height } = dfLocation.exterior.exteriorData;
   const T = RMB_TILES_PER_BLOCK, W = width * T, H = height * T;
   const blockAt = [];
@@ -449,7 +462,7 @@ export const SHAPE_EDGE_TILES = 4;
 const SHAPE_FLOOR = Math.fround((SCALED_BEACH_ELEVATION + 1) / MAX_TERRAIN_HEIGHT);
 
 /**
- * TOWN-SHAPES (departure from BlendLocationTerrainJob; bible/03-World/Town-Shapes.md): A TOWN'S GROUND FLATTENED TO ITS OWN
+ * TOWN-SHAPES (departure from BlendLocationTerrainJob): A TOWN'S GROUND FLATTENED TO ITS OWN
  * OUTLINE - every sample a tile of its ground touches set to the town's height (the mean of the land it stands on, `ground`
  * read there, never the sea's - a step over the beach at the least), the rest eased back to the land over SHAPE_BLEND_TILES
  * and out at the pixel's edge; the sea past its margin never lifted. Answers the height it flattened to.
@@ -497,8 +510,7 @@ export function unstampOffShape(tilemapData, shape, mask) {
   for (let i = 0; i < mask.length; i++) if (shape[i] && !mask[i]) tilemapData[i] = 0;
 }
 /** TOWN-SHAPES: the ring a road paves round a town (the mod's "Paint roads around locations", roadPainter.js): the tiles off
- *  its ground within two and a half of it - its outline's, where the rect's padding was (RING.road). TS9 (2026-10-26, the
- *  owner: "Roads around the city arent properly blended when they are angled"): where the outline runs at an angle the
+ *  its ground within two and a half of it - its outline's, where the rect's padding was (RING.road). TS9: where the outline runs at an angle the
  *  ring's edges stood as stairs of whole tiles. Each step is blended with the road's own diagonal edge, as a diagonal
  *  road's flanks are: a tile off the ring and off the town's ground with the ring on two sides at a corner and neither on
  *  the other two (a step's notch, outside) takes a half tile with its road toward that corner, and a ring tile with the
@@ -525,7 +537,7 @@ export function townRoadRing(mask) {
 }
 
 /**
- * BOOT-RECTS (2026-10-20, bible/07-Rendering/Performance-Priority.md BOOT-RECTS): SetLocationTiles' RECT FOR MANY
+ * BOOT-RECTS: SetLocationTiles' RECT FOR MANY
  * LOCATIONS IN ONE WALK - the boot's two: the Eltheric isles' templates (etherWatersBake.js etherPlaceRects, 7,538 of
  * them) and the Bay's coastal towns for Deep Waters (deepWatersClient.js deepWatersLocationRects). BlocksFile keeps ONE
  * parsed block (autoDiscard, as BlocksFile.cs:32), so a walk parsed a block again - and dried its puddles again

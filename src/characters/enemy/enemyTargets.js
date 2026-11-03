@@ -121,7 +121,7 @@ export function huntsCivilians(self) {
   return !self.mobile?.basics?.hasRangedAttack1;
 }
 /**
- * STAR5 (bible/11-Multiplayer/Starfall.md section 4): THE STAR'S HUNTERS. A fallen star stands in its owner's machine as
+ * STAR5: THE STAR'S HUNTERS. A fallen star stands in its owner's machine as
  * a body of its own (scenes/starfall/starfallHost.js - `starWard`, the townsperson's shape): quarry for its own coven's
  * monsters alone - those the townsperson's law hunts (huntsCivilians: hostile, no class, no spell, no bow), stood at that
  * star (`starSite`, its site). No other foe, ally, companion or watchman takes it for a foe.
@@ -131,7 +131,7 @@ export const huntsStar = (self, ward) => self?.starSite != null && self.starSite
  *  before anyone beside it: this much over a target's own priority (distance, sight). */
 export const STAR_HUNT_PRIORITY = 40;
 /**
- * AUDIT WORLD-EVENTS L6-5 (RAID5, bible/03-World/Raiding-Parties.md): A RAID'S GOAL - its Standard-Bearer, its refugees
+ * AUDIT WORLD-EVENTS L6-5 (RAID5): A RAID'S GOAL - its Standard-Bearer, its refugees
  * (systems/raidingParties.js stamps each `raidGoal` with its raid's key) - is quarry for that raid's raiders (`raidKey`)
  * whatever infighting reads, and first, until a blow turns the raider (`raidTurned`, its health no longer whole) - STAR5's
  * shape. With infighting off a raider took no ally but a companion for its foe: the standard was never sacked and no
@@ -148,10 +148,10 @@ export function targetPriority(targetHasNoTarget, seen, distance) {
 }
 
 /**
- * ARENA2 (2026-10-02, Mac: "Players can choose to watch AI fights"): THE BOUT TEAM - an isolation seam beside the
+ * ARENA2: THE BOUT TEAM - an isolation seam beside the
  * camp's (`campId`). A fighter on the arena's sand carries its bout on its entity (`entity.bout` - `{ id, side, out, hold }`,
  * stood by scenes/arena/arenaBouts.js), and so may the player (`setPlayerBout`, a ladder bout's own). The law
- * (bible/11-Multiplayer/Arena.md "2. The fights"): the fighters of one bout target only each other, across their sides
+ * ("2. The fights"): the fighters of one bout target only each other, across their sides
  * (a Grand Melee is every fighter a side of its own) - never a teammate, never one already out; nobody outside the bout
  * joins it (the city watch, the passers-by, another foe); and a fighter never takes the player for a target unless the
  * player is in that bout on another side. Answers true (a bout's pair - the team, ally, infighting and hostility gates
@@ -260,7 +260,7 @@ export function getTargets(self, candidates, playerFeet, {
     if (isPlayer && selfTeam === 'PlayerAlly') {
       continue;
     } else if (infighting && !self.entity?.suppressInfighting && targetEntity && !targetEntity.suppressInfighting) {
-      // CAMP-RIVALS (2026-09-25, Mac: "if not the same kind they attack each other"): two
+      // CAMP-RIVALS: two
       // wilderness groups of the SAME kind (combat Team) keep the classic truce and never fight;
       // groups of different kinds fight on sight through this ordinary infighting arm.
       if (targetEntity.team === selfTeam) continue;

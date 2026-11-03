@@ -1,9 +1,6 @@
 // THE CLOTHING MORROWIND DOES NOT HAVE.
 //
-// MW-CLOAK1 (2026-10-09, Mac: "2. The new cloak and its textures. Note: The new cloak will need bones to animate with
-// the character movement. Ensure theres no clipping with weapons that are stowed", with the cloak's export and eight
-// paintings of it; asked, both cloaks wear it, Aquamarine and Yellow the nearest of the eight, and stowed gear rides over
-// it). The clothing counterpart of ownArmorModels.js, and a leaf for the same reason: mwItemMap.js asks it, and nothing
+// MW-CLOAK1. The clothing counterpart of ownArmorModels.js, and a leaf for the same reason: mwItemMap.js asks it, and nothing
 // it imports may reach back.
 //
 // Daggerfall's Casual Cloak and Formal Cloak - a man's and a woman's of each - wore a whole Morrowind ROBE on the
@@ -44,8 +41,7 @@ export const isCloakSlot = (slot) => String(slot ?? '').startsWith('cloak (');
 
 // ═══ MW-FOLK1: THE TOWNSFOLK'S OUTFITS ═══════════════════════════════════════════════════════════════════════════
 //
-// (2026-10-13, the owner: "This is for the Townspeople outfits", with the export and its paintings; asked, each walker
-// sprite's own outfit in that sprite's colours - bible/04-Characters/Townsfolk-Outfits.md.) Daggerfall's townspeople
+// Daggerfall's townspeople
 // are pictures, four outfits a race and a sex (mobilePerson.js PERSON_TEXTURES); these are those outfits made for the
 // Morrowind body - all four Redguard men's, all four Nord men's, the Bretons' 385 and 386 and the hooded Redguard
 // woman's 398 - so a body standing in for a picture wears what the picture wears (characters/folkBodies.js folkLookOf).

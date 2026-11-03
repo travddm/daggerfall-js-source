@@ -1,7 +1,4 @@
-// EM3 - THE AUTOMAP'S INK (2026-09-21, Mac: "we're going to put our own
-// spin on the automap and town map themselves, enhancing the look like
-// how we did we the world map. The automap should become a 2d map and
-// floor based instead of the current 3D implementation").
+// EM3 - THE AUTOMAP'S INK.
 //
 // `systems/automap/automapFloors.js` answers WHAT to draw and its own pins hold
 // that. These hold HOW: that the dungeon is drawn by the hand that drew

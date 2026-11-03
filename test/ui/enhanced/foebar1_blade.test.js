@@ -7,10 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { bladeInset } from '../../../src/ui/enhanced/enhancedHud.js';
 import { PREF_DEFAULTS } from '../../../src/systems/uiPrefs.js';
 
-// ═══ FOEBAR1 (2026-09-17): THE BLADE FACE OF THE TARGET BAR ═════════
+// ═══ FOEBAR1: THE BLADE FACE OF THE TARGET BAR ═════════
 //
-// Mac, from a friend's two pictures: "implement these as alternate
-// versions of the enemy health bar we have implemented". A twin-bladed
+// . A twin-bladed
 // shape with a skull hub - the dark one the empty bar, the red one the
 // fill - drawn in place of the plain track under the compass when
 // prefs.foeBarStyle is 'blade', the fill clipped in from both tips
@@ -37,7 +36,7 @@ test('FOEBAR1: the two pictures are one crop, the pref defaults to the plain bar
   assert.deepEqual(full, empty, 'and the fill is the same crop, so the two register');
   assert.equal(PREF_DEFAULTS.foeBarStyle, 'bar', 'the plain bar is what a player has until they choose');
   const hud = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const foeBlade = el\('div', 'hud-foeblade'\);\s*\n\s*const foeBladeEmpty = el\('i', 'hud-bladeempty'\);\s*\n\s*const foeBladeFull = el\('i', 'hud-bladefull'\);\s*\n\s*foeBladeEmpty\.style\.backgroundImage = `url\("\$\{BLADE_EMPTY_URL\}"\)`;\s*\n\s*foeBladeFull\.style\.backgroundImage = `url\("\$\{BLADE_FULL_URL\}"\)`;\s*\n\s*foeBlade\.append\(foeBladeEmpty, foeBladeFull\);\s*\n(?:\s*\/\/[^\n]*\n)*(?:\s*const foePoise[^\n]*\n)+\s*foePoise\.append\(foePoiseFill, foePoiseWord\);\s*\n(?:\s*(?:\/\/[^\n]*|const foe(?:Traits|Ward) = [^\n]*|foeTrack\.append\(foeWard\);)\n)*\s*foe\.append\(foeName, foeTraits, foeTrack, foeBlade, foePoise\);/, 'two pictures under the one track, built once, their URLs the module\'s (PIN MOVED - AUDIT WORLD-EVENTS T1: BOSS-TRAITS\' trait line under the name)');   // PIN MOVED (TELL9: the poise track stands under both faces)
+  assert.match(hud, /const foeBlade = el\('div', 'hud-foeblade'\);\s*\n\s*const foeBladeEmpty = el\('i', 'hud-bladeempty'\);\s*\n\s*const foeBladeFull = el\('i', 'hud-bladefull'\);\s*\n\s*foeBladeEmpty\.style\.backgroundImage = `url\("\$\{BLADE_EMPTY_URL\}"\)`;\s*\n\s*foeBladeFull\.style\.backgroundImage = `url\("\$\{BLADE_FULL_URL\}"\)`;\s*\n\s*foeBlade\.append\(foeBladeEmpty, foeBladeFull\);\s*\n(?:\s*\/\/[^\n]*\n)*(?:\s*const foePoise[^\n]*\n)+\s*foePoise\.append\(foePoiseFill, foePoiseWord\);\s*\n(?:\s*(?:\/\/[^\n]*|const foe(?:Traits|Ward) = [^\n]*|foeTrack\.append\(foeWard\);)\n)*\s*foe\.append\(foeName, foeTraits, foeTrack, foeBlade, foePoise\);/, 'two pictures under the one track, built once, their URLs the module\'s (PIN MOVED - AUDIT WORLD-EVENTS T1: BOSS-TRAITS\' trait line under the name)');
   assert.match(hud, /const BLADE_EMPTY_URL = new URL\('\.\.\/assets\/foe-blade-empty\.png', import\.meta\.url\)\.href;\s*\n\s*const BLADE_FULL_URL = new URL\('\.\.\/assets\/foe-blade-full\.png', import\.meta\.url\)\.href;/, 'module-relative, the workers\' pattern - vite bundles it with the page\'s base; public/ is the root alone and the game runs at /play/');
   assert.match(hud, /const blade = getPref\('foeBarStyle'\) === 'blade';\s*\n\s*if \(last\.foeStyle !== blade\) \{ last\.foeStyle = blade; parts\.foe\.classList\.toggle\('blade', blade\); \}\s*\n\s*if \(blade\) clipInset\(parts\.foeBladeFull, 'foeBlade', bladeInset\(foePct\)\);/, 'the pref picks the face each draw, written only when it changes; the clip follows the same fraction the plain fill takes');
   assert.match(hud, /width\(parts\.foeFill, 'foeFill', foePct\);/, 'the plain fill is untouched');

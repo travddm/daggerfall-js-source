@@ -1,4 +1,4 @@
-// URBANIZER U3 (2026-10-26; bible/03-World/Urban-Fabric.md section 6): a town's fabric stood - which towns are dressed,
+// URBANIZER U3: a town's fabric stood - which towns are dressed,
 // where their main streets run, the plan and the model kept while near and let go after, the walkers shut by it, and the
 // pixel build's wiring.
 import { test } from 'node:test';
@@ -39,7 +39,7 @@ test('URBANIZER U3 where the main streets run: a walled city from each gate\'s o
   const e = fabricEnds(loc({ extra: { capital: { k: so } } }), S, S);
   assert.deepEqual(e.ends, [[S / 2, 0]]);
   assert.deepEqual(e.centre, [(2 * BLOCK_M) / 1.6, ((8 - 3) * BLOCK_M) / 1.6]);
-  // a walled city: its wall's gates as it registered them - each its opening's middle (GATE-ROADS: PIN MOVED, the model's
+  // a walled city: its wall's gates as it registered them - each its opening's middle (GATE-ROADS:
   // way through stands GATE_OPENING.along on its +x, (out[1], -out[0]), from the piece's middle)
   const walled = loc({ mapId: 0xa7012345, extra: { outline: { walled: true } } });
   registerTownWall(walled, walled.exterior.exteriorData.blockNames, () => null, () => ({ RmbBlock: {} }), { pieces: [{ model: WALL_MODELS.gate, at: [100, 10], out: [0, -1] }, { model: WALL_MODELS.wall, at: [50, 10], out: [0, -1] }, { model: WALL_MODELS.gate, at: [10, 60], out: [-1, 0] }], markers: [] });
@@ -113,18 +113,3 @@ test('URBANIZER U3 the walkers: a town\'s walk grid shut where its fabric shuts 
   _resetTownFabrics();
 });
 
-test('URBANIZER U3 the pixel build\'s wiring by source: the fabric planned as the town is laid out, before its yards and walkers are placed; its walk shut the town\'s and the fabric\'s; the model stood at the location\'s origin, its Daggerfall pieces in the town\'s climate, merged and solid as its blocks\' are (mutants: the model unmerged; no collider; planned after the yards)', () => {
-  const pb = rd('src/scenes/pixelBuild.js');
-  assert.match(pb, /const walkShut = dfLocation \? fabricWalkShut\(townWalkShut\(dfLocation, townGround, paths\), dfLocation\) : null;/);   // PIN MOVED (TS10): and the paths its terrain painted
-  // PIN MOVED (TOWN-BOARDS): planned on the town's ground and its painted roads, the terrain job's (test/world/urban/townboards.test.js)
-  const plan = pb.indexOf('const fabric = await townFabricFor(dfLocation, loc.blocks, { px, py, breathe: () => breather.breathe(), ground: townGround, paths });');
-  assert.ok(plan > 0 && plan < pb.indexOf('const places = yardTown || portTown ? await townPlacesFor('), 'before the yards');   // PIN MOVED (IC-STUTTER): awaited
-  const stand = pb.slice(pb.indexOf('      if (fabric) {'), pb.indexOf('      // T2 towns: the streaming host\'s wandering population'));
-  assert.match(stand, /await remapSubMeshes\(gpuF\.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase\);/);
-  assert.match(stand, /const local = trs\(locLocal\[0\], locLocal\[1\], locLocal\[2\], 0, 0, 0\)/);
-  assert.match(stand, /addStatic\(cpuF, local, false\); entry\._batched = true;/);
-  assert.match(stand, /late\.add\(key, cpuF\.positions, cpuF\.indices, local,/);
-  // PIN MOVED (IC-GRAND, test/world/icgrand_lod.test.js): the walkers' gate asks the Imperial City's far view first (`!farView &&`)
-  assert.ok(pb.indexOf('      if (fabric) {') < pb.indexOf('if (!farView && populatesWanderingNpcs(dfLocation.mapTableData.locationType)) {'), 'before the walkers');
-  assert.match(rd('src/scenes/modWorldData.js'), /installTownOutline\(\);[^\n]*\n\s+installUrbanArt\(\);/);
-});

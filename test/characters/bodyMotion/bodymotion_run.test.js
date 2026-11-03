@@ -1,10 +1,8 @@
-// BODY-MOTION, THE RUN (2026-10-19, Mac after the merge of #1025: "the greatsword running doesnt use both hands. The
-// running animation with the legs needs to be stiffer. The hands are way too close together when running both in third
-// and first person."; bible/04-Characters/Body-Motion.md) - on the vendored retail biped, measured on the solved body.
+// BODY-MOTION, THE RUN - on the vendored retail biped, measured on the solved body.
 //
 // What is pinned: RUN-STIFF - the run's knee folds less in the swing and the hips ride higher on the standing leg (the
 // knee folded 98 degrees past the standing leg's at a run, the hips sank to 0.87 of their standing height) - and RUN-EASE
-// (2026-10-20, Mac: "I think we went way too stiff"), no further: RUN-STIFF's own 59 degrees and 0.935 were a stiff-legged
+// no further: RUN-STIFF's own 59 degrees and 0.935 were a stiff-legged
 // lope, so the run's legs stand between the two; RUN-WIDE -
 // the running hands stay on their own sides of the body, as far apart as the walk's at their nearest (the run's crossed
 // the middle, 4.3 units apart against the walk's 22). The greatsword's run in both hands (TWO-RUN) is pinned with the

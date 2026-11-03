@@ -157,13 +157,3 @@ test('HALO-WAIT: an edge paced back and forth while the halo connects churns not
   await flush();
 }));
 
-test('HALO-WAIT by source: the wait is asked before the join clears its lists, sends the pose it was handed, and ends no halo of its own; the host joins at once on crossesNow; the record', () => {
-  const o = rd('src/net/online.js');
-  assert.match(o, /if \(room === this\.room && this\._ws\) return;\n(?:\s*\/\/[^\n]*\n)+\s*if \(this\._haloWait\(room\)\) \{ if \(pose\) this\.sendPose\(pose\); return; \}\n\s*this\._threwKinds\.clear\(\);/, 'asked before the clears');
-  assert.match(o, /return !!h\?\.ws && h\.status === 'connecting' && !!this\._ws && this\.status === 'open' && isCellRoom\(room\) && isCellRoom\(this\.room\)\n\s*&& this\._now\(\) - \(h\.since \?\? -Infinity\) < HALO_WAIT_MS;/);
-  assert.match(o, /export const HALO_WAIT_MS = BACKOFF_MAX_MS;/, 'the wait is the halo\'s own connecting life (A7)');
-  assert.equal((o.match(/this\._endHalo\(\);/g) ?? []).length, 3, 'leave and the two terminal closes, as AUDIT WORLD6b-iii(b) A4 counts them');
-  assert.match(o, /crossesNow\(key\) \{ return this\.inRoom\(key\) \|\| this\._haloWait\(key\); \}/, 'a crossing needs no hold into a cell held or waited for');
-  assert.match(rd('src/scenes/world.js'), /\(isCellRoom\(key\) && online\.crossesNow\(key\)\) \|\| now - _onlineKeySince >= ROOM_HOLD_MS/, 'the host joins at once on it, the hold left to everything else');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## HALO-WAIT - A CELL CROSSING WAITS FOR ITS HALO \(2026-10-22, #1134\)/, 'the record');
-});

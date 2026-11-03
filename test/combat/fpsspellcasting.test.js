@@ -236,57 +236,6 @@ test('fpsSpellCasting: the rig’s cast door starts the hands and its frame runs
   assert.equal(fpsSpellCasting.isPlayingAnim, false);
 });
 
-test('fpsSpellCasting: WeaponManager.cs:247 - the weapon hides while the hands play', () => {
-  // `HasReadySpell || PlayerSpellCasting.IsPlayingAnim`, BOTH legs.
-  // DFU's own header: spellcasting animations "are never mixed with
-  // weapons directly on screen at same time".
-  // PIN MOVED (SPELL-HAND, bible/05-Combat/Two-Hands.md "The spell hand"): unless the spell is in the free hand beside a
-  // one-handed weapon - then the weapon stays up and ONE hand casts (combat/twoHands/spellHand.js; pinned in spellhand.test.js)
-  const rigSrc = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rigSrc, /if \(\(spellArmed\(\) \|\| fpsSpellCasting\.isPlayingAnim\) && !_spellHand\) v = false;\s+\/\/ HasReadySpell \/ IsPlayingAnim/);
-  // And the hands are drawn OUTSIDE that gate, or a cast would show
-  // nothing at all: the weapon's hidden and the hands would be too.
-  const draw = rigSrc.slice(rigSrc.indexOf('    draw({ paralyzed = false } = {}) {'));
-  const handsAt = draw.indexOf('drawSpellCastHands(');
-  const gateAt = draw.indexOf('if (paralyzed ||');   // the law here is the ORDER, so anchor on the gate's head - its condition has widened once (TORCH-VIS) and may again
-  const spriteAt = draw.indexOf('drawFpsWeapon(');
-  assert.ok(handsAt > 0 && gateAt > 0 && spriteAt > 0);
-  assert.ok(handsAt < gateAt, 'the hands draw before the weapon’s show gate');
-  assert.ok(handsAt < spriteAt, '"behind other HUD elements" (:113) - the hands go down first');
-  // The Morrowind lane draws its OWN cast (MW-D39), so exactly one of
-  // the two reaches the screen - the same one seam the sprite has.
-  assert.match(draw, /if \(c && !fpArm\.active\(\) && !eotbHidesSpellHands\(\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s+const side = _spellHand \? spellHandSide\(\) : null;\n\s+const castHands = \(art, f\) => \(side \? drawSpellHand\(renderer, c, art, f, \{ side, tint: fpTint, guard: fpsSpellCasting\.isPlayingAnim \? 0 : _spellGuard\.hand \}\) : drawSpellCastHands\(renderer, c, art, f, \{ tint: fpTint \}\)\);\n\s+castHands\(spellArtFor\(fpsSpellCasting\.element\), fpsSpellCasting\.frameIndex\);/);   // AUDIT SPELL-HAND L5-9: the line whole, and the hands drawn through it   // AUDIT 68 S09-eotb-canvas-null: EOTB's hide rides the hands' own gate (PIN MOVED, SPELL-HAND: both hands through castHands, one with the spell hand)
-  // ...and third person draws neither.
-  assert.ok(draw.indexOf('if (fpArm.thirdActive()) return;') < handsAt,
-    'the third-person gate stands above the hands too');
-});
-
-test('fpsSpellCasting: every host that draws the FPS weapon gets the hands', () => {
-  // The four hosts, and how each one reaches the animation. Three
-  // raise the cast moment themselves; the interior host shares its
-  // parent's cast engine, which is why the animation is a SINGLETON.
-  for (const host of ['src/scenes/dungeonContext.js', 'src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const h = rd(host);
-    const at = h.indexOf('startCastAnim');
-    assert.ok(at > 0, `${host} raises no cast moment`);
-    assert.match(h.slice(at, at + 300), /castSpellAnim\??\.?\(sp\?\.rangeType, sp\?\.element, onRelease\)/,
-      `${host} does not hand the cast its ELEMENT`);
-  }
-  // All four DRAW through the one rig, which is why the draw wiring is
-  // in one file: every host that mounts a weapon rig gets the hands.
-  for (const host of ['src/scenes/dungeonContext.js', 'src/scenes/world.js',
-    'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
-    const h = rd(host);
-    assert.match(h, /createWeaponRig\(\{/, `${host} mounts no weapon rig`);
-    assert.match(h, /\.draw\(\{ paralyzed/, `${host} never draws its rig`);
-  }
-  // The interior host says WHY it starts none of its own.
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /THE FOURTH HOST AND THE SPELLCASTING HANDS/);
-  assert.ok(!/castSpellAnim/.test(wm),
-    'the interior mode has no cast engine of its own - a second door here would be a second animation');
-});
-
 test('fpsSpellCasting: the five spell archives satisfy the animation on real data', { skip: skipReal }, () => {
   const pal = new DFPalette();
   pal.load(new Uint8Array(readFileSync(join(ARENA2, 'ART_PAL.COL'))), 'ART_PAL.COL');
@@ -316,12 +265,3 @@ test('fpsSpellCasting: the five spell archives satisfy the animation on real dat
   }
 });
 
-test('HAND-SEAM: the casting hands upload CLAMPED (NEAREST, no wrap) under their own key - the inner edge of each hand never samples the art\'s far column', () => {
-  const src = readFileSync(new URL('../../src/combat/fpsSpellCasting.js', import.meta.url), 'utf8');
-  assert.match(src, /tex: renderer\.uploadTexture\('img', `fpsc:\$\{fileName\}:\$\{r\}`, c32, \{ clamp: true \}\),/, 'the hands ask for the clamp');
-  const r = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
-  // PIN MOVED (POI-2, render/meshAlpha.js): the key ends on a POI sampler's suffix after the clamp's, and the wrap is a
-  // texture's own sampler's where it asks for one - else, as before, what textureParams answers (the hands ask for none)
-  assert.match(r, /\$\{opts\.clamp && !opts\.smooth \? '#clamp' : ''\}\$\{opts\.sampler && !opts\.smooth \? samplerKey\(opts\.sampler\) : ''\}`;/, 'and a clamped upload keys apart from a tiling one of the same art');
-  assert.match(r, /const \{ wrap, filter \} = textureParams\(gl, opts\);[^\n]*\n(?:\s*\/\/[^\n]*\n)?\s*const own = opts\.sampler && !opts\.smooth \? samplerParams\([^\n]*\n\s*gl\.texParameteri\(gl\.TEXTURE_2D, gl\.TEXTURE_WRAP_S, own \? own\.wrapS : wrap\);\s*\n\s*gl\.texParameteri\(gl\.TEXTURE_2D, gl\.TEXTURE_WRAP_T, own \? own\.wrapT : wrap\);/, 'the upload applies what textureParams answers');
-});

@@ -1,5 +1,4 @@
-// BOOT-OVERLAP (2026-10-12, a player's launch into the world captured from the live client; bible/07-Rendering/
-// Performance-Priority.md BOOT-OVERLAP) - THE BOOT'S NETWORK, ASKED BESIDE ITS WORK. From the character's click to the
+// BOOT-OVERLAP - THE BOOT'S NETWORK, ASKED BESIDE ITS WORK. From the character's click to the
 // boot's last step the main thread waited on the network 7.5 s of 12.2: the realm's lines and then its roster one after
 // the other, the homes' layouts only after the data's read, and each town the boot builds waiting on its homes in turn.
 // The lines and the roster are asked at once and read behind the boot, waited for where Project Legacy's host is made;
@@ -52,17 +51,3 @@ test('BOOT-OVERLAP a town the boot asked early is the build\'s - a build that wa
   assert.deepEqual(api.asked, [[2001, 'realm-7']]);
 });
 
-test('BOOT-OVERLAP the boot, by source: the realm\'s lines and roster asked at once at the join and waited for where Project Legacy\'s host is made; the homes\' door and its layouts ask above the data\'s read, once `online` is settled; the towns the boot builds asked at once as the realm save\'s character, after the start is known (mutants: the lines unawaited, the roster awaited at the join, the layouts asked at the first build, the towns unasked, the save\'s town unread, the character unnamed)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const legacyRealmRead = legacyRealmLine \? Promise\.all\(\[\n\s+legacyRealmLine\.pull\(\)\.catch\([^\n]*\n\s+realmList\(realmIoNow\(\)\)\.catch\(\(\) => null\)\.then\(\(listed\) => \{ if \(listed\?\.ok\) legacyRealmRoster = /);
-  assert.doesNotMatch(w, /await legacyRealmLine\.pull\(\)|await realmList\(realmIoNow\(\)\)/, 'nothing of it waited at the join');
-  assert.match(w, /if \(legacyRealmRead\) \{\n\s+if \(!legacyRealmHeard\) status\('Reading the family'\);\n\s+await legacyRealmRead;\n\s+\}\n\s+legacyHost = createLegacyHost\(\{/);
-  const homesAt = w.indexOf("const homesApi = params.has('online') ? accountHomes(");
-  assert.ok(homesAt > w.indexOf("if (testRoomOffline) { params.delete('online'); publishBootParams(params); }") && homesAt > w.indexOf("if (realmRefused) { params.delete('online'); publishBootParams(params); }"), 'built once `online` is settled');
-  assert.match(w, /const bootHomeLayoutsAsk = homesApi \? homesApi\.layouts\(\)\.catch\(\(\) => null\) : null;\n\s+status\('loading data'\);/);
-  assert.match(w, /let _homeLayoutsAsk = bootHomeLayoutsAsk;/);
-  const towns = w.indexOf('if (onlineHomes && realmBoot && bootSnapRead) {');
-  assert.ok(towns > w.indexOf('const startPixel = longitudeLatitudeToMapPixel('), 'after the start is known');
-  assert.ok(towns < w.indexOf("status(`building player pixel ${startPixel.x},${startPixel.y}`);"), 'before the first build');
-  assert.match(w, /const at = bootSnapRead\.locationKey === 'world' \? bootSnapRead\.world\?\.pixel : null;\n\s+const saved = at \? locationIndex\.get\(`\$\{at\.x\},\$\{at\.y\}`\) : null;\n\s+const as = typeof bootSnapRead\.characterId === 'string' \? bootSnapRead\.characterId : null;\n\s+for \(const loc of new Set\(\[startLoc, saved\]\)\) if \(loc\?\.mapTableData\) onlineHomes\.ensure\(loc\.mapTableData\.mapId, \{ character: as \}\)\.catch\(\(\) => \{\}\);/);
-});

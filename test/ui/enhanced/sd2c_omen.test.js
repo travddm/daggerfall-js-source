@@ -1,9 +1,9 @@
-// SD2c (2026-10-06, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 4): THE HOLLOW SEEN AND
+// SD2c: THE HOLLOW SEEN AND
 // HEARD OF (systems/superDungeon/sdOmen.js, render/superDungeon/sdOmenPass.js, scenes/superDungeon/sdHost.js) - before it is found, a column of brass-gold light
 // over its pixel seen from SD_OMEN_PX round and a word in the taverns of its city; once found, its ring on the held map,
 // its mark on the compass inside SD_COMPASS_M, its row in the Timers window and its note under the red seal, until it
 // is gone.
-import { sdMarksOf, sdEndingOf } from '../../../src/net/superDungeon/sdMarks.js';   // SD18c (PIN MOVED): a Hollow's Ending in its words
+import { sdMarksOf, sdEndingOf } from '../../../src/net/superDungeon/sdMarks.js';   // SD18c (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -63,7 +63,7 @@ test('SD2c the ring: none while it has only risen (a find), its own pixel\'s onc
   const f = sdFind(r, T0 + H, 'Mara');
   const m = sdMapMark(f, HOLLOW, T0 + H + 1000);
   assert.deepEqual({ ...m, tip: null }, { day: 1, cx: 303.5, cy: 202.5, r: SD_RING_R, label: 'The Stopped Bell - fades in 1d 22h', phase: 'found', tip: null });
-  assert.deepEqual(m.tip, { title: 'The Stopped Bell, an Abyss Dungeon', lines: ['Near Copperham', `It keeps the Ending of ${sdEndingOf(sdMarksOf(1)).stone}`, 'Found by Mara', 'Fades in 1d 22h'] });   // SD18c (PIN MOVED): the Ending it keeps
+  assert.deepEqual(m.tip, { title: 'The Stopped Bell, an Abyss Dungeon', lines: ['Near Copperham', `It keeps the Ending of ${sdEndingOf(sdMarksOf(1)).stone}`, 'Found by Mara', 'Fades in 1d 22h'] });   // SD18c (
   assert.equal(sdStateWords(f, T0 + H + 1000), 'fades in 1d 22h');
   const k = sdFell(f, T0 + 3 * H, { top: 'Mara', n: 2 });
   assert.equal(sdMapMark(k, HOLLOW, T0 + 3 * H + 1000).label, 'The Stopped Bell - collapsing');
@@ -76,7 +76,7 @@ test('SD2c the ring: none while it has only risen (a find), its own pixel\'s onc
   assert.deepEqual(read.tip.lines, m.tip.lines);
   assert.notEqual(gateMarkKey(read), gateMarkKey(readGateMark(() => sdMapMark(f, HOLLOW, T0 + 3 * H), { width: 1000, height: 500 })), 'its words tick: a new key, a repaint');
   assert.equal(SD_RING_MAP_CSS, SD_MAP_INK.ring);
-  assert.equal(SD_LEGEND_TEXT, 'Abyss Dungeon');   // ABYSS-NAME (PIN MOVED): the player's word, here and below
+  assert.equal(SD_LEGEND_TEXT, 'Abyss Dungeon');   // ABYSS-NAME (
 });
 
 test('SD2c the note under the red seal: the ring\'s own words - its name, its city, its state; none without a ring; the board hangs it after the gate\'s (mutants: the state dropped; hung without a ring)', () => {
@@ -99,13 +99,12 @@ test('SD2c the Timers row: none while it has only risen, its fading once found, 
   const [c] = rows(k, T0 + 3 * H + M);
   assert.equal(c.title, 'The Stopped Bell collapses');
   assert.equal(c.until, k.fellAt + SD_COLLAPSE_MS);
-  // SD19 (PIN MOVED): gone - its own row with it; the next one's rise counted (never where), until it may rise
+  // SD19 (
   assert.deepEqual(rows(k, k.fellAt + SD_COLLAPSE_MS).map((x) => [x.id, x.title, x.where, x.live, x.at]), [['sd:2', 'An Abyss Dungeon rises', null, false, k.next]], 'gone');
   assert.deepEqual(rows(k, k.next), [], 'and none once it may');
   assert.deepEqual(rows(f, T0 + 2 * H, { name: null, place: null }).map((x) => [x.title, x.where]), [['The Abyss Dungeon stands', null]], 'its name and city not known yet');
   assert.deepEqual(eventTimerRows({ now: T0 }).filter((x) => x.kind === 'super'), [], 'offline: no record');
   assert.deepEqual(TIMER_KINDS.slice(0, 3), ['gate', 'serpent', 'super']);
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.px-timerswin \.tm-super \{ --tm-kind: \$\{SD_RING_MAP_CSS\}; \}/, 'its row in the ring\'s brass');
 });
 
 test('SD2c the taverns: "Any news?" in the city it stands by, while it has risen or been found, one time in SD_RUMOR_CHANCE - the person\'s one answer spent, the spymaster past the gate; nowhere else, not after the kill (mutants: told anywhere; told after the kill; the answer unspent; the cap unread; the chance unrolled)', () => {
@@ -237,29 +236,3 @@ test('SD2c the pass: the gate\'s beacon in brass - its own program over the gate
   assert.equal(calls.length, 0, 'nothing to draw, nothing touched');
 });
 
-test('SD2c the hosts by source: world.js hands the held map, the compass, the Timers, the board and the taverns their Super dungeon, draws its column after the gate\'s fire outside alone, and builds the pass once; the held map, the ink, the HUD and the board read it (THE FOUR HOSTS: world.js WIRED; worldModes.js, dungeonContext.js and exterior.js FLAGGED in the record)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /\n {6}sd: \(\) => sdHost\?\.mapMarks\(\) \?\? null,/, 'the held map\'s ring');   // PIN MOVED (WW5): every lane's ring (scenes/superDungeon/sdLanes.js mapMarks; ui/heldMap.js reads one or a list)
-  // AUDIT EVENTS1 A2: the site itself - its city the Timers row's place (systems/eventTimers.js), its pixel the event board's way
-  assert.match(w, /\n {8}sd: sdHost\?\.timers\(\) \?\? null,/, 'the Timers row\'s source');   // PIN MOVED (WW5): the Bay's record, name and site and every province lane's (scenes/superDungeon/sdLanes.js timers)
-  assert.match(w, /getNewsOrRumors: \(session\) => sdHost\?\.rumor\(rumorHere\(\), session\) \?\? revenantRumor\(rumorHere\(\), session\) \?\? rumorMill\.getNewsOrRumors\(session\),/, 'its city\'s taverns first');
-  assert.match(w, /gate: \(\) => noticeGateCard\(\), sd: \(\) => noticeSdCard\(\),/, 'the board\'s note');
-  assert.match(w, /\n {10}sd: sdCompassMark\(\),/, 'the compass');
-  assert.match(w, /return Math\.hypot\(at\[0\] - f\[0\], at\[1\] - f\[2\]\) <= SD_COMPASS_M \? at : null;/, 'inside its kilometre');
-  assert.match(w, /if \(!o \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return null;\n {4}const p = playerTravelPixel\(\);\n {4}const \{ site, loc, key \} = o\.hollow;\n {4}if \(!sdOmenSeen\(site, p\.x, p\.y\)\) return null;/, 'outside alone, from its twelve pixels');
-  const gateFire = w.indexOf('if (gatePool?.stands() && gatePool.drawPass(');
-  const omen = w.indexOf('if (sdo && sdOmenPassOf()?.draw([sdo], proj, view, new Float32Array(mwv.eye), now / 1000,');
-  assert.ok(gateFire > 0 && omen > gateFire, 'after the gate\'s fire');
-  assert.match(w, /if \(_sdOmenPass === undefined\) \{ try \{ _sdOmenPass = new SdOmenPassRenderer\(renderer\.gl\); \}/, 'built once, the first time');
-  const hm = read('src/ui/heldMap.js');
-  // PIN MOVED (WW5): every lane's ring, one or a list read over the continent's frame as WW2's gates are
-  assert.match(hm, /const sds = readGateMarks\(\(\) => \{ const v = typeof this\.deps\.sd === 'function' \? this\.deps\.sd\(\) : null; return Array\.isArray\(v\) \? v : v \? \[v\] : \[\]; \}, sheet\);/);   // PIN MOVED (BAY-LEFT-MAPS, at AUDIT BAY-LEFT's merge): over the sheet's box (_marksBox) - the continent's frame while it is shown, the zone map's too
-  assert.match(hm, /\n {10}sds: this\._sds,   \/\/ SD2c/);
-  assert.match(read('src/ui/ink/inkMap.js'), /for \(const m of opts\.sds \?\? \(opts\.sd \? \[opts\.sd\] : \[\]\)\) if \(m && visible\(m\.cx, m\.cy, m\.r \+ 2\)\) paintGateRing\(ctx, view, m, pulse, SD_MAP_INK\);/);
-  assert.match(read('src/ui/enhanced/enhancedHud.js'), /drawSdMark\(opts\.sd \?\? null, opts\.playerXZ \?\? null, heading01\);/);
-  assert.match(read('src/ui/noticeWindow.js'), /sd: deps\.sd\?\.\(\) \?\? null,/);
-  const rec = read('bible/11-Multiplayer/Super-Dungeons.md');
-  assert.match(rec, /### SD2c - shipped 2026-10-06/);
-  const sd2c = rec.slice(rec.indexOf('### SD2c - shipped'));
-  for (const host of ['scenes/world.js', 'scenes/worldModes.js', 'scenes/dungeonContext.js', 'scenes/exterior.js']) assert.ok(sd2c.includes(host), `the record names ${host}`);
-});

@@ -1,5 +1,4 @@
-// AUDIT RPT1026 (2026-10-27, lane C - the ledger and the item law; bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md,
-// RPT1026-LEDGERLAW): the account service's ledger and law, driven through the real Worker over node:sqlite with every
+// AUDIT RPT1026: the account service's ledger and law, driven through the real Worker over node:sqlite with every
 // migration applied and R2 beside it (test/accountDb.mjs, test/realmSeat.mjs), the sword made at the real anvil.
 //   - C1: THE CRAFT'S RECORD MOVES ONLY FROM THE ACCOUNT IT NAMES. RPT1026-LEDGERLAW wrote `products.handed_to` on every
 //     move of a crafted piece into a record, whoever gave it. A seller that kept a piece it sold holds the ledger's row
@@ -40,7 +39,7 @@ const noWait = () => Promise.resolve();
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
 
 async function stand() {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Lattymoy' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_ADMINS: 'Lattymoy' });
   const raw = s.env.DB._raw;
   /** A checkpoint of `who`'s tab: its save as a fresh character's, holding `items`, its purse `gold`. */
   const put = async (who, items, gold = 100, extra = {}) => {

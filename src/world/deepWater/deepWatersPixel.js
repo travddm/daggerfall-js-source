@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW-B (2026-09-25): ONE STREAMED PIXEL'S DEEP WATERS, WHOLE. What
+// DW-B: ONE STREAMED PIXEL'S DEEP WATERS, WHOLE. What
 // Iliac Puddle No More 1.2.2 (jet082) does when DFU promotes a terrain,
 // in its own order and as data:
 //

@@ -1,5 +1,4 @@
-// AUDIT SHIPS 2 (2026-10-06, Mac: "Audit everything" - PR #634 again, the first audit's fixes with it;
-// bible/01-Overview/audits/Audit-Ships.md, its second round): THE SERPENT'S HALF. Each pin is one finding, fixed at its root, and
+// AUDIT SHIPS 2: THE SERPENT'S HALF. Each pin is one finding, fixed at its root, and
 // failed on the build before it. tools/mutants/auditships2.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

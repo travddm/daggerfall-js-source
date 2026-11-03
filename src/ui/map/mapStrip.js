@@ -3,8 +3,6 @@
 // EM1 — THE TAB STRIP, AND THE SLOT UNDER IT: the toggle Mac asked for,
 // inked on the paper itself.
 //
-// Mac (2026-09-21): "instead of 3 seperate keybinds, adding a tab
-// toggle ON THE MAP ITSELF."
 //
 // `systems/map/mapTabs.js` says WHICH sheets a place offers. This module is
 // the other half: which one is LIVE, where each one's view is kept
@@ -48,7 +46,7 @@ import { PEN, HALO_PEN, NAME_FACE } from '../ink/inkMap.js';
 export const STRIP = Object.freeze({
   refPaper: 520,   // the paper width these numbers were chosen at
   scaleMin: 0.72,
-  scaleMax: 1.45,  // PLUS-MAP (Mac: "the word dungeon seems small"): the sheet's name reads as its title
+  scaleMax: 1.45,  // PLUS-MAP: the sheet's name reads as its title
   font: 19,        // the hand face's size
   padX: 12,        // from the paper's left edge
   padY: 8,         // from the paper's top edge

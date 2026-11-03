@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT CAPTAIN'S SEA S3's helper, moved out of bootWorld whole (HOST-SPLIT - bible/01-Overview/Host-Split.md, THE HOSTS
+// AUDIT CAPTAIN'S SEA S3's helper, moved out of bootWorld whole (HOST-SPLIT, THE HOSTS
 // DO NOT GROW: SERPENT5's one wiring line, the Old Coil's honour popup, was the first line past bootWorld's ceiling after
 // main's own merges had taken its room - AUDIT WORLD-REWARDS's merge of main moved this out in its place). It reads
 // nothing of the host's scope: the live bindings, the skin, the Plus d-pad's map and the pad's glyphs, every one a

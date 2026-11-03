@@ -45,9 +45,7 @@ import { revenantStarsOver } from './firmamentOver.js';   // RVN-STARS: a sworn 
 import { pauseMenuHooks, pauseMenuAct, openPauseFlow } from './pauseDoor.js';   // F5-QUESTS: the pause window's own hooks and act - a cycle (pauseDoor imports this door), read only at call time
 import { CharSheet, LevelUpScreen, charSheetArtLoaded } from './charsheet.js';
 import { charSheetHooks } from './charSheetNav.js';
-import { VirtueLevelUpScreen } from './virtueLevelUp.js';   // ORL1
 import { levelNotices } from './levelUp/levelNotice.js';   // LV2: who already played the fanfare
-import { usesVirtueLeveling } from '../systems/oblivionLeveling.js';   // ORL1
 import { releaseCapLatch } from '../systems/levelCap.js';   // AUDIT FB1026d C1: F5 at the cap opens the sheet, never a level-up with no level
 import { spendPoolLowest } from '../systems/chargen.js';   // LV1: the headless pool policy, for the font-less escape
 import { noteFirstUse } from '../systems/tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
@@ -104,13 +102,13 @@ export function charSheetDoorReady() {
 /** AUDIT GROWTH LANE1-8: entity -> the level whose fanfare a screen built here played. */
 const fanfared = new WeakMap();
 /**
- * GROWTH1 (bible/10-UI/Growth.md section 4): THE LEVEL-UP'S ROLLOUT for `entity`, one home - the screen a level OWED wants
- * (ORL1's Virtue screen for a mod-law character, DFU's own for any other; the fanfare only while the notice still owes
+ * GROWTH1: THE LEVEL-UP'S ROLLOUT for `entity`, one home - the screen a level OWED wants
+ * (DFU's own rollout; the fanfare only while the notice still owes
  * it - LV2), or null with nothing owed (the view of the stars is the lazy chunk's - levelUp/levelUpView.js viewOnlyScreen,
  * never this boot door's import). This door's own level-up and the pause window's Growth tab (its Level page draws the
- * Ascension in its pane) both build it here. `virtue` the caller's own read of the law, when it made one.
+ * Ascension in its pane) both build it here.
  */
-export function levelUpScreenFor(entity, virtue = !entity?.oghmaLevelUp && usesVirtueLeveling(entity)) {
+export function levelUpScreenFor(entity) {
   releaseCapLatch(entity);   // LEVEL-45 (AUDIT FB1026d C1)
   if (!entity?.readyToLevelUp) return null;
   // LV2: ...and whether the WINDOW still owes the fanfare. On the
@@ -124,7 +122,7 @@ export function levelUpScreenFor(entity, virtue = !entity?.oghmaLevelUp && usesV
   const level = `${entity.pendingLevel ?? 'oghma'}:${entity.level ?? 0}`;
   const fanfare = levelNotices.fanfareOwed(entity.pendingLevel ?? null) && fanfared.get(entity) !== level;
   if (fanfare) fanfared.set(entity, level);
-  return virtue ? new VirtueLevelUpScreen(entity, { fanfare }) : new LevelUpScreen(entity, undefined, { fanfare });
+  return new LevelUpScreen(entity, undefined, { fanfare });
 }
 
 /**
@@ -151,38 +149,18 @@ export function createCharSheetWindow(deps = {}) {
   // points, and the skills pages behind it still work while it does.
   // LevelUpScreen stays as the ENHANCED skin's door, which has no
   // native panel to mount a rollout onto.
-  // ORL1: ...AND BEFORE EITHER LANE'S OWN ROLLOUT, the mod's window.
-  // A character created under Oblivion-Remaster-Like Leveling levels by
-  // the mod's law in BOTH skins, because the mod's window is the mod's
-  // window - the fork above is about which SHEET a skin wears, and this
-  // is not a sheet. The Oghma Infinium is excluded on purpose: that
-  // artefact is Daggerfall's own and its thirty points are DFU's law -
-  // a book the mod has never heard of - so it falls through to the
-  // port's own rollout below, in whichever lane. (The reason this used
-  // to give, that thirty points cannot be spent under the mod's
-  // three-attribute cap, is FALSE at the mod's own defaults: three rows
-  // at five apiece with Luck at four is exactly thirty. ORL1's deep
-  // audit.)
   //
-  // LV1 (Mac, 2026-09-18: "the next enhanced UI window... a replication
-  // of the skyrim level up UI in our own constellation vision"): AND
-  // THE ENHANCED SKIN HAS A FACE FOR BOTH LAWS NOW. Until this slice
-  // the skin fork stopped at the sheet: a level-up in the enhanced skin
-  // mounted the CLASSIC LevelUpScreen - eight drawText rows on the
-  // canvas - because there was nothing else to mount. The window that
-  // replaced it (ui/enhanced/enhancedLevelUp.js) is a FACE, not a third rollout:
-  // it drives whichever of these two screens this character's law
-  // wants, through that screen's own `input`, so the Level++, the
-  // health roll and the mod's caps stay exactly where a11 and ORL1 put
-  // them.
+  // LV1: THE ENHANCED SKIN HAS A FACE TOO. The window that replaced the
+  // canvas rollout (ui/enhanced/enhancedLevelUp.js) is a FACE, not a
+  // second rollout: it drives LevelUpScreen through that screen's own
+  // `input`, so the Level++ and the health roll stay exactly where a11
+  // put them.
   releaseCapLatch(deps.entity);   // LEVEL-45 (AUDIT FB1026d C1): a level latched past the cap opens nothing
   if (deps.entity?.readyToLevelUp) {
-    const virtue = !deps.entity?.oghmaLevelUp && usesVirtueLeveling(deps.entity);
-    const rollout = () => levelUpScreenFor(deps.entity, virtue);   // GROWTH1: the screen's one home (LV2's fanfare with it)
+    const rollout = () => levelUpScreenFor(deps.entity);   // GROWTH1: the screen's one home (LV2's fanfare with it)
     // `document` for the reason this file's other fork gives: node
     // drives these hosts headless and keeps the canvas windows.
     if (isEnhanced() && typeof document !== 'undefined') return enhancedLevelUpOverlay(rollout(), deps.entity);
-    if (virtue) return new VirtueLevelUpScreen(deps.entity);
     if (isEnhanced()) return new LevelUpScreen(deps.entity);
     // ...and the CLASSIC lane falls through to the sheet, which mounts
     // DFU's own rollout on itself (AUDIT 44 / a11). Unchanged.
@@ -209,7 +187,7 @@ export function createCharSheetWindow(deps = {}) {
     // same hooks: PX25 built the Stats page to take them.
     return enhancedSheetPageOverlay(hooks, deps.entity, deps.pause ?? null);   // F5-QUESTS: and the host's pause bag
   }
-  // GROWTH4 (bible/10-UI/Growth.md section 7): the classic sheet's S and W rows open the Growth tab's guide - the enhanced
+  // GROWTH4: the classic sheet's S and W rows open the Growth tab's guide - the enhanced
   // pause window on either skin (pauseDoor.js growthPageAt), pushed as the sheet's own child with this host's pause bag;
   // its Resume comes back to the sheet. No document (node), no hook: the rows keep DFU's boxes.
   // AUDIT GROWTH LANE3-14: no relock on its Save or Load - the sheet still stands under it.
@@ -218,8 +196,7 @@ export function createCharSheetWindow(deps = {}) {
 }
 
 /**
- * ESC-BOOK (2026-09-27, Eterna on Discord: "if u enter the spellbook via the escape menue, instead of the chosen
- * keybind, the spellbook will open and stay persistent, behind all screens, making it unable to exit or play"):
+ * ESC-BOOK:
  * THE PAGE'S DOORS ARE THE HOST'S OWN ARMS. The sheet's hooks are FACTORIES - the classic sheet pushes what they build
  * as its own child - and this page called them, closed itself and dropped what they built. An enhanced spellbook or
  * pack mounts its screen the moment it is built, so it stood over the game with no host slot holding it: the pointer
@@ -280,11 +257,7 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
   // once, the window kept, the arm laid again; the second press puts it away
   const dialClose = () => { if (view?.asksFirst?.()) { unregister = registerOverlay(dialClose); return; } close(); };
   unregister = registerOverlay(dialClose);
-  // MAC-C (2026-09-17, Mac: "you can exit out of the F6 menu
-  // (inventory) by pressing F6 again, but you cannot do the same for
-  // the F5 one (char sheet)" + "it would be extra cool if you could
-  // like, be on the F5 page, press F6 and then go straight from char
-  // sheet to inv").
+  // MAC-C.
   //
   // THE SHEET HAD NO KEY OF ITS OWN. PX27 made the enhanced sheet the
   // pause window's Stats page, and `enhancedMenu`'s capture handler
@@ -329,7 +302,7 @@ function enhancedSheetPageOverlay(hooks, entity = null, pause = null) {
    *  sworn one's stars closed over it (RVN-STARS - remountPage), on the
    *  page they were opened from. */
   function pageOpts() {
-    // F5-QUESTS (2026-09-26, Mac: "Cant see quest on f5 menu but can on tab menu"): THE HOST'S PAUSE BAG, under the
+    // F5-QUESTS: THE HOST'S PAUSE BAG, under the
     // sheet's own doors. This page IS the pause window opened on Stats, and it was handed those doors and nothing
     // else: its Quests tab said "The journal is not wired into this place yet" while the same window through Tab's
     // dial listed every quest, its Save and Load said there was no door, and its Exit did nothing. `pause` is the
@@ -513,7 +486,7 @@ function enhancedLevelUpOverlay(screen, entity) {
   });
   return {
     /** The duck type the font-less escape asks for, in this file's own
-     *  idiom (`isVirtueLevelUp`, `isRestWindow`): a scene must not
+     *  idiom (`isRestWindow`): a scene must not
      *  import a UI class for a type test. */
     isEnhancedLevelUp: true,
     isChoiceWindow: true,
@@ -525,18 +498,13 @@ function enhancedLevelUpOverlay(screen, entity) {
     tick() { /* the sky owns its own clock */ },
     draw() { /* DOM, not canvas */ },
     /**
-     * THE FONT-LESS ESCAPE, per lane. The mod's purse is not a DFU
-     * bonus pool - spending it with spendPoolLowest would ignore the
-     * three-attribute cap, the +5 ceiling and Luck's price - so its own
-     * planner runs and commits through the same `confirm` a player's
-     * Enter uses. The classic pool takes the policy every other
+     * THE FONT-LESS ESCAPE. The pool takes the policy every other
      * headless path takes (systems/chargen.js's spendPoolLowest), which
      * is what scenes/dungeonContext.js's `.leveling` arm already does
      * to the sheet's rollout; the shape is the same because the state
      * is the same.
      */
     spendRemainingHeadless() {
-      if (screen?.isVirtueLevelUp) { screen.spendRemainingHeadless(); close(); return true; }
       if (screen?.working) {
         spendPoolLowest(screen.working, Object.keys(screen.working), screen.pool ?? 0);
         screen.pool = 0;

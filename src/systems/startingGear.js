@@ -143,8 +143,7 @@ export function assignStartingGear(entity, { classIndex = 0, isCustom = false, r
   // startingProvisions), AFTER DFU's own bag (the spellbook first, the clothes, the class kit, the torches - 17f's
   // order holds). It rode equip.js's seedStartingEquipment alone - the retired PRE-CHARGEN fallback - so a character
   // who came through chargen set out with no water, no food, no gear and no fire while the needs drained. Every tier
-  // with the arc on - Boons, Casual and Hard - and never Off, by decision (Mac, 2026-09-23: "No, not off.. theres no
-  // reason to have it in off" - SURV-KIT, withdrawn). AUDIT C&C I7: this said "Casual and Hard alone" - Boons, the
+  // with the arc on - Boons, Casual and Hard - and never Off, by decision (- SURV-KIT, withdrawn). AUDIT C&C I7: this said "Casual and Hard alone" - Boons, the
   // fourth tier, is the arc on and sets out with the kit too.
   addSurvivalProvisions(entity, added);
   addStartingGold(entity, STARTING_GOLD);
@@ -157,12 +156,9 @@ export function addSurvivalProvisions(entity, added = []) {
   if (survivalOn()) for (const it of startingProvisions(entity)) { addItem(entity.items, it); added.push(it); }   // AUDIT C&C I7: the character's own wardrobe for the start's shoes and cloak
   // REST2: online the Campfire is the rest's - a character set out with the arc Off still carries one
   else if (sharedClockOn()) { const it = startingCampfire(); if (it) { addItem(entity.items, it); added.push(it); } }
-  // WALLET1: and the wallet, whatever the switches (systems/walletItem.js) - the kit a new character sets out with holds
-  // one, as a character from before the wallet is given one ONCE as its save is restored (save.js restorePlayer, the
-  // save's `walletGift` mark - PORTAL-GIFT's shape; AUDIT 625 W4: not every load, nor any character that has none)
+  // WALLET1: and the wallet, whatever the switches (systems/walletItem.js) - the kit a new character sets out with holds one
   if (giveWallet(entity)) added.push(entity.items.find(isWalletItem));
-  // LOCKPICK (bible/06-Systems/Lockpicking.md section 2): and a class that holds Lockpicking sets out with its picks - a
-  // lock needs one now - as a character from before the lockpick is given them once (save.js restorePlayer, its gift)
+  // LOCKPICK: and a class that holds Lockpicking sets out with its picks - a lock needs one now
   const picks = giveStartingLockpicks(entity);
   if (picks) added.push(picks);
   return added;

@@ -1,7 +1,5 @@
 // @ts-check
-// DISSOLVE (2026-10-02, Mac: "Killing should show a unique animation where you destroy your foe"; "Companions when
-// playing catch up, spawning in, or spawning out should use a unique portal animation instead of just popping in and
-// out") - A SPRITE THAT BURNS AWAY, OR GATHERS OUT OF NOTHING. A leaf: the GLSL both billboard shaders share (the
+// DISSOLVE - A SPRITE THAT BURNS AWAY, OR GATHERS OUT OF NOTHING. A leaf: the GLSL both billboard shaders share (the
 // classic one, render/renderer.js BB_FS, and the Enhanced Lighting lane's, render/enhancedLighting.js EL_BB_FS), the
 // batch's field, and its colours.
 //
@@ -32,7 +30,7 @@ export function setBatchDissolve(batch, share, colour = DISSOLVE_EMBER) {
   }
   const s = Math.min(1, share);
   const d = batch.dissolve ?? (batch.dissolve = [0, 0, 0, 0, 0]);
-  // AUDIT (2026-10-02): more gone than whole, it casts no shadow - the shadow replays cut by the texture's alpha alone,
+  // AUDIT: more gone than whole, it casts no shadow - the shadow replays cut by the texture's alpha alone,
   // so a body burnt away (or not yet through its portal) kept its whole shadow. [4] says the dissolve took it.
   if (s > DISSOLVE_SHADOWLESS) { if (!batch.noShadow) { batch.noShadow = true; d[4] = 1; } } else if (d[4]) { batch.noShadow = undefined; d[4] = 0; }
   d[0] = s; d[1] = colour[0]; d[2] = colour[1]; d[3] = colour[2];   // in place: a frame's burn allocates nothing

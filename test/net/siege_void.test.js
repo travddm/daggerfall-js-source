@@ -1,12 +1,12 @@
-// VOID (2026-10-02, Mac: "lets finish the build work") - A MODERATOR VOIDS A SIEGE (`/siege void <key>`): Seats-Arc 18,
+// VOID - A MODERATOR VOIDS A SIEGE (`/siege void <key>`): Seats-Arc 18,
 // "Moderators (MOD1) may **void a siege** (`/siege void`) - a history row, the holder keeping the seat - when a fight was
 // won by an exploit found after it". The seat's battle of this week void: before its result, as a Turning voids an
 // unfinished one (the Sellswords' escrow home) but the challenger's Right NOT carried; after a capture, the Charter back
-// to the guild that held it (its Standing, Tithe, Legacy and works as the result's `prior` kept them - migration 0067);
+// to the guild that held it (its Standing, Tithe, Legacy and works as the result's `prior` kept them);
 // after a hold, the holder's Standing and defence fifth struck and the challenger's bar lifted; after a Tourney, the
 // winner's Charter gone. A Chronicle row; Honours paid stand; a later receipt refused; idempotent. Driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), and the chat word parsed.
-// bible/11-Multiplayer/Seats-Arc.md 18; `06-Systems/Online-Arc.md` SIEGE-VOID.
+// 18; `06-Systems/Online-Arc.md` SIEGE-VOID.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -30,7 +30,7 @@ const START = Math.floor(siegeStartMs(W + 1, 0, 20) / 1000);   // Wednesday 20:0
 async function siegeWeek(t) {
   let now = T0;
   t.mock.method(Date, 'now', () => now * 1000);
-  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', MODERATOR_HANDLES: 'Mora', DEVELOPER_HANDLES: 'Devra' });
+  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', BOARD_OPEN: 'on', SEAT_MODERATORS: 'Mora', SEAT_ADMINS: 'Devra' });
   const raw = svc.env.DB._raw;
   const witnesses = [await svc.guest(), await svc.guest(), await svc.guest()];
   for (const seat of [ANTICLERE, ASHFIELD]) for (const w of witnesses) raw.prepare("INSERT INTO world_witness (kind, key, account, report, region, at) VALUES ('seat', ?, ?, ?, ?, ?)").run(String(seat.key), w.id, seatReportText(seat), seat.region, T0 - DAY);
@@ -200,7 +200,7 @@ test('VOID AFTER A CAPTURE: the Charter back to the guild that held it - its Sta
   assert.equal(s.holdOf().guild_id, sh.gid);
 });
 
-test('VOID AFTER A CAPTURE WHOSE RESULT KEPT NOTHING (written before migration 0067): the Charter back at Standing 50, from this week, no Tithe (mutants: the fallbacks)', async (t) => {
+test('VOID AFTER A CAPTURE WHOSE RESULT KEPT NOTHING (its `prior` NULL): the Charter back at Standing 50, from this week, no Tithe (mutants: the fallbacks)', async (t) => {
   const s = await siegeWeek(t);
   s.setNow(START + 1500);
   assert.equal((await s.claim(s.a1)).status, 200);
@@ -296,11 +296,6 @@ test('VOID THE CHAT WORD: `/siege void <key>` parsed - anything else /siege is t
   assert.deepEqual(await book.voidSiege(3022), { ok: true, text: 'The Tourney at seat 3022 is void already.' });
   assert.deepEqual(await book.voidSiege(3023), { ok: false, text: 'Only moderators can do that.' });
   assert.deepEqual(asked, [3021, 3022, 3023]);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const siegeCmd = parseSiegeCommand\(text\);/);
-  assert.match(w, /seatBook\.voidSiege\(siegeCmd\.key\)\.then\(\(r\) => say\(r\.text\)/);
-  const client = readFileSync(new URL('../../src/net/accountClient.js', import.meta.url), 'utf8');
-  assert.match(client, /voidSiege: \(key\) => post\('\/v1\/seats\/siege\/void', \{ key \}\)/);
 });
 
 // ─── AUDIT 529: the void's audit (V1-V5) ─────────────────────────────

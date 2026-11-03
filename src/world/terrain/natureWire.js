@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT BANTHA1 PERF-2 (bible/03-World/Bantha-Jungle.md): A PIXEL'S NATURE ACROSS THE WORKER'S WIRE, BY COLUMN. The
+// AUDIT BANTHA1 PERF-2: A PIXEL'S NATURE ACROSS THE WORKER'S WIRE, BY COLUMN. The
 // kernel's nature is a list of plain objects - a flat each, its record, its place and whatever its layout wrote (a
 // wood's `wood`, a border's `archive`, a jungle tree's `jungle` and `js`). Posted as it is, the main thread rebuilt them
 // in one structured clone as the message landed: 3 ms an ordinary pixel, 10 ms a jungle pixel's 12,600 flats, out of

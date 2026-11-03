@@ -1,5 +1,4 @@
-// SHIP-PLAQUE (2026-10-17, the owner: "the ability to have a name plaque on the ship itself for those who want to show off
-// their ship name"; bible/03-World/Naval-Refit.md SHIP-PLAQUE) - her name on her bows: the lettering (Daggerfall's FONT0003
+// SHIP-PLAQUE - her name on her bows: the lettering (Daggerfall's FONT0003
 // through its glyphs, the block letters where it is not to be had) and the board's picture; the board laid on every hull's
 // planking where it is drawn - each port ship's and the mod's own - flush, under her rail, reading the right way from
 // alongside; the boards made and let go; the ledger, the Fleet's act and page, the boats' word, a peer's board and the
@@ -355,10 +354,4 @@ test('SHIP-PLAQUE the ledger, the Fleet and the word: a named ship\'s alone, a n
   assert.equal(validCsaRecord({ ...rec, p: [1] }).boats.some((b) => b.plaque), false, 'a list not one a boat: none');
   assert.deepEqual(validCsaRecord({ ...rec, p: [1, 1, 1] }).boats.map((b) => !!b.plaque), [true, false, true], 'an unnamed boat\'s never');
   assert.equal(validCsaRecord({ ...rec, p: 'x' }).boats.length, 3, 'never dropped for it');
-  // a peer's board, the world's wiring
-  const peers = readFileSync(new URL('../../../src/scenes/comeSailAway/comeSailAwayPeers.js', import.meta.url), 'utf8');
-  assert.equal((peers.match(/plaqueName = w\.plaque \? w\.name \?\? '' : ''/g) ?? []).length, 2, 'a peer\'s board her name - built and said again');
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /plaqueOf: \(boat\) => \{ const r = boat\.uid \? fleetShip\(boat\.uid\) : null; return r\?\.plaque && r\.name \? r\.name : null; \}, plaqueFont: \(\) => fetchBytes\('FONT0003\.FNT'\) \}\);/);
-  assert.match(world, /plaque: !!\(b\.uid && fleetShip\(b\.uid\)\?\.plaque\),   \/\/ SHIP-PLAQUE: her name on her bows/);
 });

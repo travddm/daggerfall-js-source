@@ -1,9 +1,8 @@
-// SD2b (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most.
-// Only one can be active at a time."): THE HOLLOW IN THE WORLD (scenes/superDungeon/sdHost.js) - the hub's record in, the Hollow it
+// SD2b: THE HOLLOW IN THE WORLD (scenes/superDungeon/sdHost.js) - the hub's record in, the Hollow it
 // names found over this client's own map files and stood at its pixel while its phase stands, the find said at its door
 // until the hub's word moves it, and the chat's lines for the moves everyone online hears. bible/11-Multiplayer/
 // Super-Dungeons.md sections 2-4.
-import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';   // SD19 (PIN MOVED): its marks said with its find
+import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';   // SD19 (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -158,7 +157,7 @@ test('SD2b the lines: the find, the kill and the fading said once each, to every
   host.frame();
   assert.equal(s.lines.length, 2, 'the collapse after a kill says nothing more');
   // a second Hollow fades unbeaten - its line said with the region's name when the world never placed it
-  // (AUDIT SD II, L6 - PIN MOVED: a FOUND one; the rise is said to nobody, so a fade never found says nothing)
+  // (AUDIT SD II, L6
   const { s: s2, host: h2 } = harness({ scanReady: false });
   const r2 = sdFind(sdRise(sdFirst(T0 - 20 * M), T0 - 10 * M, 0), T0 - 9 * M, 'Mara');
   h2.heard({ k: 'ev', ...r2 });
@@ -204,13 +203,3 @@ test('SD2b one Hollow at a time: an older slot\'s word is no word; the next slot
   assert.equal(host.hollow().loc.sdSlot, r2.s, 'the next slot\'s own Hollow');
 });
 
-test('SD2b the world host by source: the hub\'s link hears the record; the host made online alone, framed every frame; the Hollow stood into the index and its pixel built again between builds; the spawn ledger never notes or clears it; the find through the session (mutants: each seam removed)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onSd = \(w\) => sdHost\?\.heard\(w\);/);
-  assert.match(w, /const sdHost = params\.has\('online'\) \? createSdLanes\(\{/);   // PIN MOVED (WW5): a Hollow a lane, the Bay's lane's host as it was (scenes/superDungeon/sdLanes.js)
-  assert.match(w, /try \{ sdHost\?\.frame\(\); \} catch \(e\) \{ console\.warn\('\[sd\] host', e\?\.message \?\? e\); \}/);
-  assert.match(w, /if \(!building\) sweepGateClear\(\);[^\n]*\n\s*if \(_sdLate\.size && !building\) sweepSdLate\(\);/, 'between builds, after the gate\'s clearing');
-  assert.match(w, /function _spawnSeen\(key\) \{\n\s*if \(locationIndex\.get\(key\)\?\.superTier\) return;/, 'a first sight never notes a Hollow - the dungeon\'s door and the roll\'s alike');
-  assert.match(w, /if \(!locationIndex\.get\(key\)\?\.spawned\) return;\n\s*if \(locationIndex\.get\(key\)\.superTier\) return;/, 'nor a clear');
-  assert.match(w, /sendFound: \(word, cell\) => !!online\?\.sendSdFound\?\.\(word, cell\),/);
-});

@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY1 (bible/06-Systems/Legacy-Arc.md section 3): WHERE A FAMILY LIVES, and THE BIRTH'S HANDOFF.
+// LEGACY1: WHERE A FAMILY LIVES, and THE BIRTH'S HANDOFF.
 //
 // Offline a family is its own record in app storage (`dagger.legacy.family.<id>`) - it outlives any one save, so a
 // member's save deleted takes nothing of the line with it - and a copy rides every member's save (`modData`), the
@@ -72,7 +72,7 @@ export function storeFamily(storage, family, base = seenRevOf(family)) {
 /** AUDIT LEGACY III P5: what a member's own save writes of them (legacyHost.js writeCurrent - writePlayer, their
  *  standing, their look, where they were saved) - kept, as a whole, from the copy that saved that member LAST. */
 export const MEMBER_SAVE_FIELDS = Object.freeze(['given', 'surname', 'gender', 'race', 'raceId', 'face', 'careerIndex', 'className', 'career', 'groups',
-  'level', 'stats', 'skills', 'leveling', 'standing', 'look', 'parked', 'deedsTaken']);   // PERMADEATH-HOUSES: the dead's deeds their save took up
+  'level', 'stats', 'skills', 'standing', 'look', 'parked', 'deedsTaken']);   // PERMADEATH-HOUSES: the dead's deeds their save took up
 
 /** AUDIT LEGACY III A3/P3: whether two copies' persons of one id are ONE person. Ids are minted by each copy's own
  *  counter (nextId), so two copies that each minted someone - a child here, a spouse there - gave two people one id. One

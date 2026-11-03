@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10 (bible/03-World/Arena-Provinces.md TESA10) - SOLITUDE'S LANDMARKS: the port's own models of the city's
+// TESA10 (TESA10) - SOLITUDE'S LANDMARKS: the port's own models of the city's
 // signatures (world/tamrielCapitals.js SOLITUDE says where each stands) - the sea stack and the Blue Palace on it, the
 // great arch, the walls, Castle Dour and the Emperor's Tower (TESA-LORE), the docks - every model's origin Solitude's
 // anchor. Shapes of the port's own in the spirit of the city's look - never another game's mesh. No game data.

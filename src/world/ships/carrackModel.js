@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac, sending New_Ship_2.fbx with its shutter and the Tiny Ship: "implement both of these new ship
-// placement models, UV Map/Texture, and ensure it matches the love we gave the other new ship model we implemented"):
+// SHIPS-2:
 // THE NEW CARRACK - Mac's three-masted ship, built as Come Sail Away builds a hull, as the galleon is
 // (world/ships/galleonModel.js) for hull 2.
 //

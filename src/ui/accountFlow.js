@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1e — THE ACCOUNT SCREEN'S FLOW, WITH NO SCREEN IN IT.
 //
-// Mac (2026-09-21): "Should we go ahead and build the account creation
-// screen" - "Yes, please be detailed".
+// "Yes, please be detailed".
 //
 // THE SPLIT IS THE PROJECT'S OWN, not an invention: `ChargenFlow` does
 // the wizard's thinking and `enhancedChargen.js` draws it, and
@@ -52,9 +51,8 @@ import {
 import { handleLooksLikeEmail } from '../net/handleShape.js';   // HANDLE-EMAIL: a new username is never an address
 import { ACCEPTED, TERMS_URL, PRIVACY_URL } from '../net/legalLaw.js';   // TERMS1: the documents a new account agrees to
 import { t, localizedTable } from '../systems/textManager.js';   // L10N4: the card's words in the player's language, read when they are drawn
-import { AURA_TEXT, TITLE_TEXT } from './playerBadge.js';   // SHADOW-CLOAK (AUDIT): an aura's name in the card's note - COLLECTIONS-II: and a title's
+import { AURA_TEXT, TITLE_TEXT } from './playerBadge.js';   // an aura's name in the card's note - COLLECTIONS-II: and a title's
 import { ICON_TEXT } from './profileIcons.js';   // WITCH1: an icon's name in the card's note
-import { shopCardOf, shopWareById, SHOP_WARE_NAME } from '../net/shopLaw.js';   // SHOP: the shop's card on the account read
 
 /** Every stage this card can be on. Exported because a pin that
  *  enumerates them by hand is a pin that stops covering the one added
@@ -183,11 +181,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     patreon: /** @type {any} */ (null),
     /** PATREON-LINK: the link was followed and the player has not come back to a linked account yet */
     patreonWaiting: false,
-    /** SHOP: the shop's card as the service answers it (net/shopLaw.js shopCardOf) - its wares, what is held, a Buy link
-     *  each - or null (nobody signed in, a service from before acct205) */
-    shop: /** @type {any} */ (null),
-    /** SHOP: the ware whose payment page the player went to, until the account read says it is held */
-    shopWaiting: /** @type {string|null} */ (null),
     /** a sentence for the player, never a machine word */
     error: '',
     /** a sentence that is NOT a failure - "your password was changed" */
@@ -245,7 +238,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     self.account = null;
     self.wardrobe = null;   // ACC3c: a wardrobe outliving its account is a title drawn for nobody
     self.patreon = null; self.patreonWaiting = false;   // PATREON-LINK: and a link for nobody
-    self.shop = null; self.shopWaiting = null;   // SHOP: and a Buy link for nobody
     self.busy = false;
     go('out', { error: message });
     return false;
@@ -307,7 +299,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     // top-right button reads the stored session. This is the next answer
     // that states the name after a registration (acknowledging the code
     // lands here), and it is the service's own word, so it is adopted.
-    adoptIdentity(storage, { name: r.data.account?.name, kind: r.data.account?.kind, glyphs: r.data.wardrobe?.glyphs, glyphsOff: r.data.wardrobe?.glyphsOff, aura: auraStated(r.data.wardrobe), icon: iconStated(r.data.wardrobe), secret: asked });   // SHADOW-FANG: and what is true of the account; AUDIT B4: into the session that asked; WB9g: and the aura worn
+    adoptIdentity(storage, { name: r.data.account?.name, kind: r.data.account?.kind, glyphs: r.data.wardrobe?.glyphs, glyphsOff: r.data.wardrobe?.glyphsOff, aura: auraStated(r.data.wardrobe), icon: iconStated(r.data.wardrobe), secret: asked });   // and what is true of the account; AUDIT B4: into the session that asked; WB9g: and the aura worn
     // ACC3c: THE WARDROBE IS ITS OWN FIELD, exactly as the service
     // answers it - what this account HOLDS, what it WEARS, and what is
     // true of it. Held beside `account` rather than folded into it,
@@ -317,7 +309,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     // card then draws no picker at all rather than an empty one.
     self.wardrobe = r.data.wardrobe ?? null;
     self.patreon = r.data.patreon ?? null;   // PATREON-LINK: the card's Patreon row, or none from a service before it
-    self.shop = shopCardOf(r.data.shop);   // SHOP: the shop's card, or none from a service before it
     go('in');
   };
 
@@ -331,16 +322,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     self.patreonWaiting = true;
     self.error = '';
     self.note = t('account.flow.patreonFinish', 'Finish on Patreon, then come back here.');
-    changed();
-  };
-
-  /** SHOP - THE PLAYER FOLLOWED A BUY LINK. Paying happens on Stripe's page in a browser, so all the window can do is
-   *  say where the player is and read the account again when they come back (`refresh`, on the window's focus). */
-  self.shopOpened = (/** @type {string} */ id) => {
-    if (self.stage !== 'in' || !shopWareById(id)) return;
-    self.shopWaiting = id;
-    self.error = '';
-    self.note = t('account.flow.shopFinish', 'Finish paying in your browser, then come back here.');
     changed();
   };
 
@@ -361,12 +342,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     adoptIdentity(storage, { name: d.account?.name, kind: d.account?.kind, glyphs: d.wardrobe?.glyphs, glyphsOff: d.wardrobe?.glyphsOff, aura: auraStated(d.wardrobe), icon: iconStated(d.wardrobe), secret: asked });   // `start`'s word, adopted as it adopts it
     self.wardrobe = d.wardrobe ?? null;
     self.patreon = d.patreon ?? null;
-    self.shop = shopCardOf(d.shop);
-    // SHOP: back from paying, the ware the read says is held now - said once, where the player looks
-    if (self.shopWaiting && self.shop?.wares.some((w) => w.id === self.shopWaiting && w.held)) {
-      self.note = t('account.flow.shopArrived', '{name} is on your account. A receipt is in your mailbox.', { name: SHOP_WARE_NAME[/** @type {keyof typeof SHOP_WARE_NAME} */ (self.shopWaiting)] ?? self.shopWaiting });
-      self.shopWaiting = null;
-    }
     if (self.patreonWaiting && self.patreon?.linked && (!was?.linked || String(was.titles) !== String(self.patreon.titles))) {
       self.patreonWaiting = false;
       self.note = self.patreon.titles?.length ? t('account.flow.patreonLinkedTitle', 'Patreon linked. Wear your title under Title.') : t('account.flow.patreonLinked', 'Patreon linked. Your title arrives when your pledge holds one.');
@@ -399,8 +374,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * ACC3c — WEAR ONE, OR NONE. Mac: "Players can tap the account icon
-   * to equip 1 feature along with signing out."
+   * ACC3c — WEAR ONE, OR NONE.
    *
    * IT ASKS; IT DOES NOT DECIDE. The grant is derived at the service
    * (a founder cutoff, a config list) and can lapse between this card
@@ -440,7 +414,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * GLYPH-WEAR (2026-10-02, Mac: "can we make it where players can also equip/unequip their glyphs") - PRESS A GLYPH
+   * GLYPH-WEAR - PRESS A GLYPH
    * TO TAKE IT OFF, PRESS IT AGAIN TO PUT IT BACK. Paint alone: the service still signs every glyph that is true, so
    * what a glyph grants (/red, /dm, /mute, the staff commands) stays. It asks, as the title does; the answer replaces
    * the wardrobe. Others see it from the next hello, as a title.
@@ -478,8 +452,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   /** WITCH1: the icon a wardrobe answer says is worn (null for the face), or undefined from a service before acct162. */
   function iconStated(d) { return Array.isArray(d?.icons) ? (d.icon ?? null) : undefined; }
   /**
-   * WB9g - WEAR ONE AURA, OR NONE: `equip`'s law at the feet (Mac: "an animated burning ground aura that circles the
-   * ground where your character stands"). It asks; the service decides what is held; the answer replaces the wardrobe;
+   * WB9g - WEAR ONE AURA, OR NONE: `equip`'s law at the feet. It asks; the service decides what is held; the answer replaces the wardrobe;
    * pressing the one worn takes it off. The stored session learns it (net/accountClient.js adoptIdentity), so the fire
    * at the player's own feet lights or goes out at once - and the room's at once (AURA-LIVE: world.js auraFrame - online.js rehello).
    */
@@ -494,7 +467,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
       if (!r.ok) return refuse(accountRefusalText(r.error));
       self.wardrobe = { ...(self.wardrobe ?? {}), titles: r.data.titles, title: r.data.title, glyphs: r.data.glyphs, ...glyphHalf(r.data), ...auraHalf(r.data) };
       self.busy = false;
-      self.note = want ? t('account.flow.wearing', 'Wearing {what}.', { what: AURA_TEXT[want] ?? want }) : t('account.flow.auraRemoved', 'Aura removed.');   // SHADOW-CLOAK (AUDIT): the aura's name, never its key
+      self.note = want ? t('account.flow.wearing', 'Wearing {what}.', { what: AURA_TEXT[want] ?? want }) : t('account.flow.auraRemoved', 'Aura removed.');   // the aura's name, never its key
       adoptIdentity(storage, { glyphs: r.data.glyphs, glyphsOff: r.data.glyphsOff, aura: auraStated(r.data), icon: iconStated(r.data), secret: asked });
       changed();
       return true;
@@ -504,7 +477,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * WITCH1 (bible/06-Systems/Witches-Festival.md) - WEAR ONE PROFILE ICON, OR NONE: the aura's law, in the portrait well.
+   * WITCH1 - WEAR ONE PROFILE ICON, OR NONE: the aura's law, in the portrait well.
    * It asks; the service decides what is held; the answer replaces the wardrobe; pressing the one worn takes it off (the
    * character's face again). The stored session learns it (adoptIdentity), so the corner mark and the card show it at
    * once; another player's Inspect card from the next hello, as a title.
@@ -530,8 +503,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
   };
 
   /**
-   * NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-   * name or character name for ingame use") - WHICH NAME THE ROOM READS: the account's, or the character's being played.
+   * NAME-AS - WHICH NAME THE ROOM READS: the account's, or the character's being played.
    * It asks, as a wear does; the service keeps the choice and every later mint signs it - a character's name only where it
    * can be worn, the mint saying why where it cannot (the game says it once: scenes/world.js adoptIssued). Pressing the
    * one already chosen asks nothing. A choice the service took STAMPS the stored session (`nameAsAt`, forward only), and
@@ -770,7 +742,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
       self.account = null;
       self.wardrobe = null;
       self.patreon = null; self.patreonWaiting = false;   // PATREON-LINK
-      self.shop = null; self.shopWaiting = null;   // SHOP
       self.busy = false;
       go('out', { note: all ? t('account.flow.signedOutAll', 'Signed out everywhere.') : t('account.flow.signedOut', 'Signed out.') });
     }

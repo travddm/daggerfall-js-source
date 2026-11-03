@@ -1,4 +1,4 @@
-// SET-CATCHUP (POWER-CEILING, 2026-10-27; bible/11-Multiplayer/Sigil-Sets.md section 5, bible/05-Combat/Power-Ceiling.md;
+// SET-CATCHUP (POWER-CEILING, 2026-10-27; ;
 // the player: "Add more horizontal progression please!"): GOING SIDEWAYS COSTS LESS. Mac's "grow together" stands - a
 // set's stage is its lowest worn piece's - but a piece below the highest stage the set has stood at for this character
 // (two of its pieces worn at that stage, or the save's record of it) drinks three times the XP until it gets there,
@@ -56,7 +56,6 @@ test('SET-CATCHUP THE REACH: the second-best rank among a set\'s WORN pieces - a
   const e = player();
   wear(e, piece(107, 'dagon', XP[3]), piece(106, 'dagon', XP[1]));
   e.items.push(piece(105, 'dagon', XP[4]), piece(102, 'mora', XP[2]));
-  // PIN MOVED (AUDIT HORIZONTAL D1): the pack counted - a lent Ascendant pair carried for one kill made a reach for good
   assert.deepEqual([...wornSetRanks(e)], [['dagon', [3, 1]]], 'the worn pieces, by set - the pack\'s never');
   assert.equal(setReachOf(e, 'dagon'), 1, 'the Radiant one and the Bright one worn: Bright - the Ascendant one in the pack is no part of it');
   assert.equal(setReachOf(e, 'mora'), -1);
@@ -103,7 +102,7 @@ test('SET-CATCHUP THE DRINK: a full Dagon\'s Brand at Radiant, a fresh helm swap
   drinkWorn(e, null, 1000);
   assert.equal(fresher.sigil.xp, XP[RADIANT] + 1500, 'caught up: the drink whole');
   assert.equal(recordedReach('dagon'), RADIANT);
-  const plain = Object.assign(createWeapon(120, 0), { rarity: 'rare', sigil: { power: 5, party: 1, xp: 0 } });
+  const plain = Object.assign(createWeapon(120, 0), { rarity: 'rare', sigil: { power: 3, party: 1, xp: 0 } });
   drinkWorn(e, plain, 1000);
   assert.equal(plain.sigil.xp, 1000, 'a plain sigil weapon: no set, no catch-up');
   const before = fresher.sigil.xp;
@@ -118,8 +117,8 @@ test('SET-CATCHUP THE DRINK: a full Dagon\'s Brand at Radiant, a fresh helm swap
 
 test('SET-CATCHUP THE SAVE: the reach rides the character\'s save under its own slot, a forged or unknown entry dropped, a new game empty (mutants: the record left out of the save; a stage past Ascendant taken)', () => {
   fresh();
-  noteReach(new Map([['dagon', [3, 3]], ['panoply', [4, 2]]]));
-  assert.deepEqual(modSaveRecords()[SET_REACH_SAVE_VENDOR], { reach: { dagon: 3, panoply: 2 } });
+  noteReach(new Map([['dagon', [3, 3]], ['numidium', [4, 2]]]));
+  assert.deepEqual(modSaveRecords()[SET_REACH_SAVE_VENDOR], { reach: { dagon: 3, numidium: 2 } });
   restoreModSaveRecords({ [SET_REACH_SAVE_VENDOR]: { reach: { dagon: 4, mora: 5, sheogorath: 2, nocturnal: 1.5, ruhn: 0 } } });
   assert.deepEqual(modSaveRecords()[SET_REACH_SAVE_VENDOR], { reach: { dagon: 4, ruhn: 0 } }, 'a stage 0..4 of a set that is one');
   restoreModSaveRecords({});

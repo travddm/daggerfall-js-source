@@ -1,5 +1,4 @@
-// SD13 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16; Mac: "The detail needs to
-// exceed that of the oblivion gates"): THE SCORE OF THE HOUR (systems/superDungeon/sdScore.js) - nine songs written as notes for
+// SD13: THE SCORE OF THE HOUR (systems/superDungeon/sdScore.js) - nine songs written as notes for
 // the game's own player and FM bank, and the law of which plays where. The songs: their names, tempos and lengths,
 // whole bars looping on their bar line with nothing past the end; every voice's program, level and place at their
 // start; the broken chime (its fourth change on the tritone) and the mended (home); the Dragon Break's canon (silver
@@ -22,7 +21,6 @@ import { SD_ARENA, SD_ORRERY, dungeonToRealm, realmToDungeon } from '../../../sr
 import { SD_FIRST_STEP } from '../../../src/world/superDungeon/sdHall.js';
 import { SD_BAR_NEAR_M } from '../../../src/ui/superDungeon/sdRemnantBar.js';
 import { sdPhase } from '../../../src/net/superDungeon/sdLaw.js';
-import { createSpireScoreHost } from '../../../src/systems/eliteGates/egScore.js';
 
 const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const constOf = (name) => { const at = W.indexOf(`\n  const ${name} = `); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  };\n', at) + 5); };
@@ -192,10 +190,9 @@ function scoreHost() {
     modes: { get mode() { return st.mode; }, get dungeonLocation() { return st.loc; }, sdRealmSlot: () => st.slot, get stepping() { return st.stepping; }, get transitioning() { return false; } },
     player: { get pos() { return st.pos; } }, sdDungeonToRealm: dungeonToRealm, sdScorePlace, sdScoreSongs, createHourScore, SD_SCORE_SILENCE, music,
     sdFightLink: { state: () => st.fight, now: () => st.now }, sdHost: { record: () => st.rec }, sdPhase, _sharedOffsetMs: 0,
-    playerEntity: { get health() { return st.hp; } },   // AUDIT SD III (A5, PIN MOVED): the living and the dead
-    _spireScore: createSpireScoreHost({ music }), egClient: null,   // EG-G2 (PIN MOVED): the Spire's score asked first - out of an Elite Breach it holds nothing
+    playerEntity: { get health() { return st.hp; } },   // AUDIT SD III (A5
   };
-  const body = `let _hourScoreHeld = false, _hourScoreMade = false, _hourPlace = null;\nconst _hourScore = createHourScore();\n${constOf('sdScoreWhere')}\n${constOf('hourScoreFrame')}\nreturn hourScoreFrame;`;   // AUDIT SD III (A10, PIN MOVED): where I stood last
+  const body = `let _hourScoreHeld = false, _hourScoreMade = false, _hourPlace = null;\nconst _hourScore = createHourScore();\n${constOf('sdScoreWhere')}\n${constOf('hourScoreFrame')}\nreturn hourScoreFrame;`;   // AUDIT SD III (A10
   return { frame: new Function(...Object.keys(env), body)(...Object.values(env)), log, st };
 }
 
@@ -232,12 +229,12 @@ test('SD13 THE HOST, from the world host\'s own text: outside, nothing held; in 
   st.mode = 'exterior'; st.loc = null; st.slot = null;
   const before = log.length;
   assert.equal(h.frame(), false);
-  assert.deepEqual(log.slice(before), ['fade'], 'let go, faded - never cut');   // AUDIT SD III (A4, PIN MOVED): it was stopped
+  assert.deepEqual(log.slice(before), ['fade'], 'let go, faded - never cut');   // AUDIT SD III (A4
   const n = log.length;
   h.frame(); h.frame();
   assert.equal(log.length, n, 'once');
   // a dungeon that is no Hollow: the director's
   st.mode = 'dungeon'; st.loc = { name: 'Castle Daggerfall' };
   assert.equal(h.frame(), false);
-  assert.match(W, /if \(!hourScoreFrame\(\) && !gateScoreFrame\(\) && !arenaScoreFrame\(\) && !soundscape\.scoreFrame\(\)\) musicDirector\.update\(\{/, 'the Hour before the court and the arena');   // SOUNDSCAPE (PIN MOVED): and the sea's songs after them
+  assert.match(W, /if \(!hourScoreFrame\(\) && !gateScoreFrame\(\) && !arenaScoreFrame\(\) && !soundscape\.scoreFrame\(\)\) musicDirector\.update\(\{/, 'the Hour before the court and the arena');   // SOUNDSCAPE (
 });

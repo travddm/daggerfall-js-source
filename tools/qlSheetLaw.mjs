@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// QL1 (bible/06-Systems/Questlines-Arc.md section 2.5): THE SHEET'S LAW - every way a sheet can lie about its script,
+// QL1: THE SHEET'S LAW - every way a sheet can lie about its script,
 // answered in a writer's words. Moved out of the game (systems/questlines/qlSheets.js holds the sheets the game reads):
 // the game never runs it, and its messages are the tools' and the pins', never a player's (the L10N4 ratchet's reason).
 // Read by tools/qlCheck.mjs, tools/qlSheetDraft.mjs and test/systems/questlines/ql1_sheets.test.js.

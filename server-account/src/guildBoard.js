@@ -1,6 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// GUILD1e (2026-09-30, Mac: "Finish the seats") - A GUILD'S OWN BOARD:
+// GUILD1e - A GUILD'S OWN BOARD:
 // its notes, its members' alone.
 //
 // Seats-Arc 8.2: "the hall carries the guild Stores chest and a private
@@ -59,7 +59,7 @@ const noteView = (n, me) => ({
   mine: n.author === me.player,
 });
 
-/** A guild's expired notes, gone - `limit` at once, answering how many went. SCALE4b (2026-10-08): the service's clock's
+/** A guild's expired notes, gone - `limit` at once, answering how many went. SCALE4b: the service's clock's
  *  (server-account/src/cron.js, each hour), never a read's - the board's read swept first, a write on every look at a
  *  guild's board; nothing it answers waits on it, its notes are read `expires_at > now`. */
 export async function sweepGuildNotes(db, nowS, limit = 200) {

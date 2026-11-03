@@ -1,5 +1,4 @@
-// THE SEA FIGHT'S SOUNDS, SYNTHESISED AND BAKED (NAV-E, 2026-09-28, Mac: "proper naval combat with a huge reference
-// to assassins creed black flag ... extremely detailed, authentic").
+// THE SEA FIGHT'S SOUNDS, SYNTHESISED AND BAKED (NAV-E, 2026-09-28).
 //
 // OURS, the gun lab's way (tools/gunSfx.mjs): built here from noise and sine with the shared kit (tools/sfxSynth.mjs)
 // and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own 11025 Hz unsigned 8-bit mono - so a
@@ -30,7 +29,7 @@
 //   naval-sinking     AUDIT NAV1 (the presentation) - a ship going down, A LOOP: the sea rushing into her (a low swell
 //                     that ebbs and comes again), her timbers groaning under it (two long moans, their pitch sagging),
 //                     and the air leaving her in bubbles - its tail crossfaded into its head, so it joins itself
-//   naval-whistle     NEAR-MISS (COMBAT-FEEL, 2026-10-17, the owner: "Improve and polish combat and visuals") - a ball
+//   naval-whistle     NEAR-MISS (COMBAT-FEEL, 2026-10-17) - a ball
 //                     going by close: the air it tears, a rush through a narrow band that FALLS as it passes (its
 //                     Doppler - higher coming, lower going), swelling to the moment it is nearest and gone just after,
 //                     a faint tone riding the band; the tenth

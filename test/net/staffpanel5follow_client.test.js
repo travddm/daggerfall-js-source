@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow; the weak spot "Follow can't
-// learn the target's next room") - THE RELAY'S HALF (server/src/staffFollow.js, server/src/staffTeleport.js) and the law
+// STAFF-PANEL5-FOLLOW - THE RELAY'S HALF (server/src/staffFollow.js, server/src/staffTeleport.js) and the law
 // both ends run (src/net/staffFollow.js): the where note kept outside a party and read for staff alone, the seat it must
 // not move, a follow's spectator told `on`, the note, `in`/`out` and `gone`, the rooms' word to the bus only for an
 // account someone follows, and a staff /tp answered from the note - with what it costs the bus, measured.
@@ -10,8 +9,8 @@ import { SOCIAL_ROOM, validPartyPose, parseClient } from '../../src/net/wire.js'
 import { mintToken, claimsValid } from '../../src/net/identityToken.js';
 import { noteOf, followNoted, followHello, followJoined, followLeft } from '../../server/src/staffFollow.js';
 import {
-  FOLLOW_INTERNAL_SAY, FOLLOW_RELAY_MIN, FOLLOWERS_MAX, FOLLOWED_MAX, NOTE_STALE_MS, WHERE_NOTE_MOVING_MS, WHERE_NOTE_STILL_MS,
-  followSupported, whereNoteDue, noteRoom, noteWhere, validFollowSay, validFollowOut,
+  FOLLOW_INTERNAL_SAY, FOLLOWERS_MAX, FOLLOWED_MAX, NOTE_STALE_MS, WHERE_NOTE_MOVING_MS, WHERE_NOTE_STILL_MS,
+  whereNoteDue, noteRoom, noteWhere, validFollowSay, validFollowOut,
 } from '../../src/net/staffFollow.js';
 import { validStaffTeleportIn, validStaffTeleportOut } from '../../src/net/staffTeleport.js';
 
@@ -49,9 +48,6 @@ test('STAFF-PANEL5-FOLLOW law: the note\'s pace, its room, its place, the frames
   assert.equal(whereNoteDue(0, -Infinity, false), true, 'the first goes at once');
   assert.equal(NOTE_STALE_MS, 2 * WHERE_NOTE_STILL_MS + 30_000);
   assert.equal(WHERE_NOTE_MOVING_MS, 5_000);
-  assert.equal(followSupported(`world${FOLLOW_RELAY_MIN - 1}`), false);
-  assert.equal(followSupported(`world${FOLLOW_RELAY_MIN}`), true);
-  assert.equal(followSupported(null), false);
   // the room a note names: a cell's, a world room's or a private one's, with its layer; none is no room
   assert.deepEqual(noteRoom(note('dungeon:m1234', { ly: 2 })), { room: 'dungeon:m1234', ly: 2 });
   assert.deepEqual(noteRoom(note('world:3,4')), { room: 'world:3,4', ly: 0 });
@@ -63,8 +59,7 @@ test('STAFF-PANEL5-FOLLOW law: the note\'s pace, its room, its place, the frames
   assert.equal(validPartyPose(note('interior:m12.345')).rk, 'interior:m12.345');
   assert.equal('rk' in validPartyPose(note('owned:abc.m1.2')), false);
   assert.equal('rk' in validPartyPose(note('chat:world')), false);
-  // STAFF-PANEL5-FOLLOW-FIX (finding 2): a home, a boat's cabin and a caravan are rooms a follow enters (mob: "ANY player
-  // ANYWHERE (homes too)") - the note keeps them, and names them
+  // STAFF-PANEL5-FOLLOW-FIX (finding 2): a home, a boat's cabin and a caravan are rooms a follow enters - the note keeps them, and names them
   const bk = (5 << 16) + (9 << 8) + 42, owner = `owned:${'a'.repeat(32)}.${'b'.repeat(16)}`;
   for (const rk of [`${owner}:1291010263.${bk}`, `${owner}:boat.77`, `caravan:${'c'.repeat(24)}`]) {
     assert.equal(validPartyPose(note(rk, { in: 2, bk })).rk, rk, rk);
@@ -316,14 +311,14 @@ test('STAFF-PANEL5-FOLLOW relay: the bus\'s door takes a room\'s word only in it
   assert.deepEqual([ok.status, await ok.json()], [200, { ok: 1, told: 0 }]);
 }));
 
-test('STAFF-PANEL5-FOLLOW relay: SILENT TP - an Admin\'s or a Shadow Fang\'s /tp is answered from the where note and the target\'s game is sent nothing; a missing or unmatched note falls back to the capture, flagged; a Dungeon Master\'s is today\'s capture', () => hub(async ({ r, tick, join, party }) => {
+test('STAFF-PANEL5-FOLLOW relay: SILENT TP - an Admin\'s /tp is answered from the where note and the target\'s game is sent nothing; a missing or unmatched note falls back to the capture, flagged; a Dungeon Master\'s is today\'s capture', () => hub(async ({ r, tick, join, party }) => {
   const send = (ws, m) => { tick(3000); return r.raw(ws, JSON.stringify({ t: 'stp', ...m })); };   // paced: the hub meters teleport frames
   const stp = (ws, k) => ws.sent.filter((m) => m.t === 'stp' && m.k === k);
-  const dev = await join('peer-dev', 'Mac', ['dev']), fang = await join('peer-fang', 'Mob', ['shadowfang']), dm = await join('peer-dm', 'Dee', ['dm']);
+  const dev = await join('peer-dev', 'Mac', ['dev']), dm = await join('peer-dm', 'Dee', ['dm']);
   const bran = await join('peer-bran', 'Bran');
   await party(bran, note('dungeon:m1234', { in: 1 }));
   tick(1000);
-  for (const [staff, nonce, ag] of [[dev, 'a1', 4], [fang, 'a2', 7]]) {
+  for (const [staff, nonce, ag] of [[dev, 'a1', 4]]) {
     await send(staff, { k: 'ask', name: 'Bran', nonce, nt: 1 });
     const res = stp(staff, 'result').at(-1);
     assert.deepEqual([res.via, res.id, res.name, res.acct, res.ag, res.note.rk], ['note', 'peer-bran', 'Bran', 'acct-peer-bran', ag, 'dungeon:m1234']);

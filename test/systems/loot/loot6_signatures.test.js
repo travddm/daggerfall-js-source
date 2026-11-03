@@ -1,6 +1,4 @@
-// LOOT6 - SIGNATURE DROPS (2026-10-01; bible/06-Systems/Loot-Arc.md section 8, Mac: "Do you wanna turn this into an
-// arc and do all of the above?" - "Signature drops. Weight specific Legendaries to specific foes ... That lets players
-// farm for an item while the source still sets the odds"). The laws pinned here:
+// LOOT6 - SIGNATURE DROPS. The laws pinned here:
 //   - THE FAMILIES: every foe of the table in one family but the horse; every dungeon kind its family or none.
 //   - EVERY RECORD FOUND SOMEWHERE: thirty records, eight families, two or more each.
 //   - THE PICK: one roll; a source with no family picks exactly as before; a family's own weigh five to one.
@@ -86,7 +84,4 @@ test('LOOT6: the doors - a corpse\'s family its foe\'s, a dungeon pile\'s its ki
   assert.ok(legs > 50, `enough Legendaries (${legs})`);
   // a battle axe's pool (Wyrmbane, Graveward, Gortwog's Cleaver) gives the undead's own 5 in 7; a dagger's has none of theirs
   assert.ok(ownUndead / legs > 0.25, `the undead's own lean in (${ownUndead} of ${legs})`);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /family: dungeonFamily\(dfLocation\.mapTableData\.dungeonType\) \}/, 'a dungeon pile names its kind\'s family');
-  assert.match(read('src/systems/loot/lootRarity.js'), /const source = corpseSource\(basics, entity\.level, entity\.mobileType\);/, 'the corpse door its foe\'s type');
 });

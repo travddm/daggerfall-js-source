@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GRASS-PX (2026-09-21, Mac: "with the grass model, is there a way we
-// can turn the grass into a pixel art design ... Let's see how detailed
-// you can be").
+// GRASS-PX.
 //
 // THE TUFT IS A SPRITE, AS EVERY OTHER LIVING THING IN THIS WORLD IS.
 // Daggerfall draws its trees, its people and its monsters as hand-set
@@ -55,7 +53,7 @@ export const PX_VARIANTS = 8;
  *  its drawn height wide (labGrass.js GRASSPX_VS_EDITS), so a texel is
  *  square on every blade, buried or not.
  *
- *  GRASS-PX4 (2026-09-22, Mac: "have grass have larger pixels"): it
+ *  GRASS-PX4: it
  *  was sixteen by thirty-two. A texel of that sheet on a blade half a
  *  metre tall is a centimetre and a half - three screen pixels at a
  *  few metres, under one past ten - while every character in this

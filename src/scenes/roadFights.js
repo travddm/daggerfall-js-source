@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW4b (2026-10-05, bible/06-Systems/Living-World.md): THE FIGHT, STOOD - a beset party near the player, fought for
+// LW4b: THE FIGHT, STOOD - a beset party near the player, fought for
 // real and the player's to turn. Mac: NPCs "can encounter enemies in the overworld ... make friends or enemies".
 //
 // The trouble is pure (systems/livingWorld/trouble.js): every reader's world holds the same caravan beset at the same

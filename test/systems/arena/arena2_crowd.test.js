@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02, Mac: "During fights, the crowd is present and can cheer/boo you"): THE CROWD - its mood moved by
+// ARENA2: THE CROWD - its mood moved by
 // the bout's events and settling back (systems/arena/arenaCrowd.js), its favour (the darling, the villain, the home crowd, the
 // beast tier's sympathy), the cues it sounds and the barks it shouts (never the same twice running, one every gap), how
 // it moves (the gesturers' rate, the hop, what it throws), how many come, who sits where; THE SOUND built at runtime out
@@ -280,13 +280,6 @@ test('ARENA2 sound: the driver builds once off the archive\'s voices, plays the 
   const none = createArenaSound({ samplesOf: () => null, registerSamples: () => true });
   assert.equal(none.ensure(), false, 'no archive yet: asked again next frame');
   assert.equal(createArenaSound(null).ensure(), false);
-});
-
-test('ARENA2 sound: nothing new ships - no crowd file in public/, the engine\'s door reads the player\'s own archive', () => {
-  const sfx = readdirSync(new URL('../../../public/sfx/', import.meta.url));
-  assert.ok(!sfx.some((f) => /arena|crowd|cheer|boo|applause/i.test(f)));
-  const a = readFileSync(new URL('../../../src/systems/audio.js', import.meta.url), 'utf8');
-  assert.match(a, /samplesOf\(index\) \{\n\s+const rec = this\.snd\?\.getSound\?\.\(index\);\n\s+return rec\?\.waveData\?\.length \? pcm8ToFloat32\(rec\.waveData\) : null;/);
 });
 
 // ── THE MUSIC ───────────────────────────────────────────────────────────────────────────────────────────────

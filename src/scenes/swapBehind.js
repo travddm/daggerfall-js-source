@@ -1,6 +1,5 @@
 // @ts-check
-// IC-SWAP-BEHIND (2026-10-26, the owner walking the Imperial City: "Weird pop in issues in the city when moving"; "No band
-// aids for any of this"; bible/01-Overview/Host-Split.md, bible/03-World/Arena-Provinces.md IC-GRAND) - A PIXEL BUILT AGAIN
+// IC-SWAP-BEHIND - A PIXEL BUILT AGAIN
 // BEHIND THE ONE THAT STANDS. Every rebuild of a standing pixel tore it down and then queued its build - a season's
 // re-skin, the roads or a region landing late, Arena's places and the capitals' slices, a slice of the Imperial City
 // going near or far - and for the build's whole length (breathed at a few milliseconds a frame: seconds) the pixel stood

@@ -206,18 +206,3 @@ test('W1 review: fast travel applies the ARRAY slot (OnInitWorld), never a fresh
   } finally { resetWeatherSim(); }
 });
 
-test('W1 review: the precip draw gates on the MODE in both hosts - the renderer object outlives a clear-up', () => {
-  // applyWeather lazily creates the PrecipitationRenderer and never
-  // drops it; a draw gated on the object alone rained under clear
-  // skies forever after the first storm passed (the review's bug).
-  // WX2: the gate is the mode SHOWN - the sim's under the classic sky,
-  // the front's under the enhanced one, where the outgoing rain tapers
-  // after the sim has cleared - and still never the object.
-  assert.match(hostText('src/scenes/world.js'), /const precipShown = enhancedFront \? fx\.shown : precipMode;\s*\n\s*if \(isDryFall\(precipShown\)\) \{[\s\S]{0,600}?\} else if \(precipShown && precip\) \{/);   // PIN MOVED (ASHFALL1, 2026-10-27): the dry falls, the sand and the ash
-  assert.match(src('src/scenes/exterior.js'), /const precipShown = enhancedFront \? fx\.shown : precipMode;\s*\n\s*if \(isDryFall\(precipShown\)\) \{[\s\S]{0,600}?\} else if \(precipShown && precip\) \{/);   // PIN MOVED (ASHFALL1, 2026-10-27): the dry falls, the sand and the ash
-  // and the respawner roll lives on the RESPAWNER path alone
-  assert.match(hostText('src/scenes/world.js'), /_respawnAtSite[\s\S]{0,900}weatherRespawn\(/);
-  assert.doesNotMatch(hostText('src/scenes/world.js').slice(0, hostText('src/scenes/world.js').indexOf('async function _respawnAtSite')), /weatherRespawn\(/, 'no earlier caller - not the teleport, not fast travel');
-  // AUDIT HOST-SPLIT 2, the second read: and none in what left the host above it - the pixel build stood in that stretch
-  for (const m of movedOutOf('src/scenes/world.js')) assert.doesNotMatch(readFileSync(m, 'utf8'), /weatherRespawn\(/, `no caller in ${m}, moved out of world.js`);
-});

@@ -58,13 +58,13 @@ export function townMapDoorReady() {
  * Answers null where this build cannot draw a map, so the hosts'
  * `if (win)` guards keep meaning.
  *
- * YARDS-FOUND (2026-10-10): `yards` - the town's Stable and Wagon Yard
+ * YARDS-FOUND: `yards` - the town's Stable and Wagon Yard
  * (world/merchantYards/merchantYardSites.js's sites, the location's frame) - are laid
  * on the block rows HERE, once, for whichever map is built: their ground
  * in a shop's byte and their names among the landmarks
  * (world/merchantYards/merchantYardMap.js yardTownBlocks).
  *
- * SHIPYARDS-FOUND (2026-10-11): `ports` - a port town's shipyard and
+ * SHIPYARDS-FOUND: `ports` - a port town's shipyard and
  * lighthouse (world/portSites.js's sites, the same frame) - laid the
  * same way, the lighthouse in a house's byte.
  */

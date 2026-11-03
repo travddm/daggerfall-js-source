@@ -28,7 +28,7 @@ export const HUD_NEED_WORDS = Object.freeze({
   temp: Object.freeze({ warm: 'Warm', hot: 'Hot', scorching: 'Scorching', cold: 'Cold', freezing: 'Freezing', 'deadly cold': 'Deadly cold' }),
 });
 /**
- * AUDIT C&C S5 (2026-10-12, decisions D1 and D2): RED MEANS IT COSTS - IN THE TIER THAT IS LIVE. A need's chip, the HUD's
+ * AUDIT C&C S5: RED MEANS IT COSTS - IN THE TIER THAT IS LIVE. A need's chip, the HUD's
  * temperature plate and the pack's plaque are red exactly where the live tier's minute law charges for the stage
  * (needs.js survivalMinute's stamina, survivalStatMods' attributes) and amber where it is only felt - the one law the
  * three read. A tier whose needs may take stamina (`stamina.floor` short of the whole pool: Casual, Hard) charges a
@@ -58,7 +58,7 @@ export const LEVEL_WORDS = Object.freeze({ danger: 'it costs you', warn: 'no cos
 /** "Freezing - it costs you"; the word alone where its level says nothing of a cost (comfortable, a boon). */
 export const levelSaid = (word, level) => (Object.hasOwn(LEVEL_WORDS, level) ? `${word} - ${LEVEL_WORDS[level]}` : word);
 /**
- * SURV-BOONS (2026-10-12): A BOON'S CHIP - its word and the glyph it stands on (ui/hud/hudStatus.js STATUS_GLYPHS): the need's
+ * SURV-BOONS: A BOON'S CHIP - its word and the glyph it stands on (ui/hud/hudStatus.js STATUS_GLYPHS): the need's
  * own for the need it rewards, a flame for the hearth (its own - REST1's Next night is the campfire), a sparkle for
  * Thriving. The strip reads them off the record's `boons` (needs.js survivalBoons, written by the minute law), so it
  * shows what the body has, in a rewarding tier (Boons), where nothing costs - so no need's chip there is red (RED MEANS
@@ -77,14 +77,13 @@ export const HUD_BOON_WORDS = Object.freeze({
  *  HUD, the pack and - AUDIT C&C S11 - the Status page hand `rules` in, survival/switch.js survivalRules, so a turn of
  *  the tier shows at once and not a game minute later); else the record's word for it - a record that carries the
  *  minute law's `boons` is a rewarding tier's (Boons), any other a tier that costs, read as the gentlest of them,
- *  Casual. BOONS-DEFAULT (2026-10-13): that was "the default tier's" while the default was Casual - with Boons the
+ *  Casual. BOONS-DEFAULT: that was "the default tier's" while the default was Casual - with Boons the
  *  default it would have read a record no rewarding tier wrote as Boons. */
 const tierOf = (s, rules) => rules ?? (Array.isArray(s.boons) ? SURVIVAL_RULES.boons : SURVIVAL_RULES.casual);
 /** The record's own word that a lit fire answered its last minute's cold (the minute law's `s.warmed`). */
 const warmedBy = (s, word) => !!s.warmed && (word === 'cold' || word === 'freezing' || word === 'deadly cold');
 
-/** NEED-TIER (2026-10-02, Mac: "the debuffs you get from Climates and Calories no longer show the severity (how much
- *  hunger your character has etc)"): a felt need's stage on its own ladder - read off the chips' table, mildest first;
+/** NEED-TIER: a felt need's stage on its own ladder - read off the chips' table, mildest first;
  *  the temperature's two ways each a ladder of their own - so the tile's foot can say "2/3" where its word has no room. */
 const COLD_WORDS = Object.freeze(['cold', 'freezing', 'deadly cold']);   // AUDIT NEED-TIER: the cold way named, not the table's second half by place
 const NEED_LADDERS = Object.freeze({
@@ -148,7 +147,7 @@ export function survivalHudChips(entity, now, { vampire = false, endurance = 50,
 }
 
 /**
- * TEMP-UI (2026-10-12, the owner: "add a temperature widget to the UI"): THE HUD'S TEMPERATURE PLATE, as data - a felt
+ * TEMP-UI: THE HUD'S TEMPERATURE PLATE, as data - a felt
  * reading (`felt`: the live one the HUD and the pack read, env.js feltNow - AUDIT C&C S9; the record's last minute,
  * `s.felt`, by default), its word, and the SAME level the strip's temperature chip wears (needLevel: RED MEANS IT COSTS,
  * in the live tier - `rules`; the fire read off the live air, `env`, where the reader hands it in, else the record's

@@ -1,5 +1,4 @@
-// IC-STAIRS (the owner's field report, 2026-10-27, item 4: "Minecraft looking staircases in Imperial city need to be
-// completely redesigned"; bible/03-World/Arena-Provinces.md IC-STAIRS) - THE IMPERIAL CITY'S WAYS UP, BUILT STAIRS, pinned:
+// IC-STAIRS (; IC-STAIRS) - THE IMPERIAL CITY'S WAYS UP, BUILT STAIRS, pinned:
 // a built stair's proportions (a riser and a tread, flights and landings), measured off the mesh the cell's model draws;
 // every stair reaching the roof it climbs to (its head on the building's roof's edge, a flat roof's parapet open over it,
 // a pitched roof's eave, never a gable's end) along a wall standing over it, from a street open before its foot; the real

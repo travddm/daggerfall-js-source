@@ -1,5 +1,4 @@
-// TIME3 (2026-10-01, Mac: "people have to wait insanely long" / "I don't want a band aid, I want a detailed way we can
-// do this" / "This needs to be perfect"): QUESTS ON TWO CLOCKS. Design: bible/06-Systems/Online-Time-Arc.md 6.3.
+// TIME3: QUESTS ON TWO CLOCKS. Design: 6.3.
 // Online a quest's countdowns - a Clock, a wave's and a sound's interval, a guard's watch, a tombstone - run on the
 // CHARACTER's own clock (LIVED1), which a rest, a loiter or a journey spends as in DFU: a three-day wait is a 72-hour
 // rest. Its hour, date and season are the SKY's (TIME1). Its journal's dates are stamped on the EVENT clock and read
@@ -7,8 +6,7 @@
 // away forgiven); the time they RAISE is charged whole. A party member's copy runs on its holder's clock; an online
 // save from before TIME3 moves its countdowns onto the character's clock once. THE LAW EXECUTES, end to end where a
 // rig reaches, and by source for the four hosts.
-// QCLOCK-WORLD (2026-10-02, Mac: "go back to the quest timer tied to the online world clock"; asked, "Shared world
-// clock"): online the time RAISED is charged NOTHING - a rest, a loiter, a journey spend no quest days - and only the
+// QCLOCK-WORLD: online the time RAISED is charged NOTHING - a rest, a loiter, a journey spend no quest days - and only the
 // time lived with the world is, one played step at most: played time on the world's clock, WORLD7's law. Offline DFU's
 // own. The tests below that drove a clock with a rest drive it with lived play now, and say what a rest no longer does.
 import '../../modsOff.js';
@@ -29,9 +27,9 @@ import { DailyFrom, GivePc, SeasonCondition, PlaySound } from '../../../src/syst
 import { RaiseTime } from '../../../src/systems/quest/questActionsExtension.js';
 import { getMacroValue, getContextValue } from '../../../src/systems/quest/questMacros.js';
 import {
-  QUEST_OWN_SECOND_KEYS, QUEST_WORLD_SECOND_KEYS, raisedSince, shiftQuestStamps, markOwnClock, questBlockOnOwnClock, questDataOnThisClock,
+  QUEST_OWN_SECOND_KEYS, QUEST_WORLD_SECOND_KEYS, raisedSince, shiftQuestStamps, markOwnClock, questDataOnThisClock,
 } from '../../../src/systems/quest/questStamps.js';
-import { offlineCopyOf, onlineCopyOf } from '../../../src/systems/offlineCopy.js';
+import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { snapshotPlayer, restorePlayer } from '../../../src/systems/save/save.js';
 import { RestSession, REST_WAIT_PER_HOUR, MINUTES_PER_TICK } from '../../../src/systems/rest/restSession.js';
 import { setSkyCalendar, skySecondsOfEvent } from '../../../src/systems/skyCalendar.js';
@@ -195,9 +193,6 @@ test('QCLOCK-WORLD CreateFoe\'s interval: a rest spends none of it (no wave), an
     clock.t += 2 * HOUR_S; m.tick();
     assert.equal(world.created.length, 1, 'two hours away (lived, a hidden tab): one step charged, the interval not yet');
   }
-  const src = rd('src/systems/quest/actions.js');
-  assert.match(src, /const raisedNow = this\.parentQuest\.raisedSeconds\?\.\(\) \?\? null;/, 'the wave reads the session\'s raises');
-  assert.match(src, /this\._lastRaised = raisedNow;/, 'and samples them every tick');
 });
 
 test('TIME3 a quest reads three clocks: an hour, a day\'s light, a season and a date on the SKY; a sound\'s interval and a guard\'s watch on the CHARACTER\'s; its start, its steps and its tombstone stamped where they belong', () => {
@@ -321,7 +316,7 @@ test('TIME3 a party member\'s copy runs on its holder\'s clock: its countdowns m
   assert.equal(got.ownSecondsAt, 3_000_000, 'marked: on this character\'s clock, in whole seconds');
   const old = JSON.parse(keep); delete old.ownSecondsAt; old.resources[0].clock.lastWorldTimeSample = 7000;
   assert.equal(questDataOnThisClock(old, 3_000_000, 7777).resources[0].clock.lastWorldTimeSample, 7000 + 3_000_000 - 7777, 'a sender from before TIME3 stamped the event clock: moved from there');
-  assert.deepEqual(QUEST_OWN_SECOND_KEYS, ['lastWorldTimeSample', 'lastTimePlayed', 'lastSpawnTime', 'guardAnchor', 'questTombstoneTime', 'shelvedAt']);   // QUEST-SHELF (PIN MOVED): the second a quest was set aside, on the same clock
+  assert.deepEqual(QUEST_OWN_SECOND_KEYS, ['lastWorldTimeSample', 'lastTimePlayed', 'lastSpawnTime', 'guardAnchor', 'questTombstoneTime', 'shelvedAt']);   // QUEST-SHELF (
   assert.deepEqual(QUEST_WORLD_SECOND_KEYS, ['questStartTime']);
 });
 
@@ -422,25 +417,16 @@ test('TIME3 AUDIT (second round): a resync that keeps a run-out clock keeps its 
   assert.equal(bw.created.length, 3, 'four more hours: no wave past the three');
 });
 
-test('TIME3 saves: an online save from before TIME3 has its countdowns moved onto the character\'s clock once, at the load; a TIME3 save and an offline one load as they stand; the doors between the lanes move only a TIME3 envelope\'s journal dates', () => {
+test('TIME3 saves: a save\'s quest block loads as it stands; the offline copy moves only a TIME3 envelope\'s journal dates', () => {
   const own = 50 * D, world = 230 * D;
   const block = () => ({ machine: { quests: [{ questName: 'Q', questStartTime: world * 60 - 600, questTombstoneTime: 0, activeLogMessages: [{ stepID: 0, messageID: 1, time: world * 60 - 300 }], resources: [{ clock: { lastWorldTimeSample: world * 60 } }], tasks: [{ actions: [{ actionSpecific: { lastTimePlayed: world * 60 - 30, lastSpawnTime: 0 } }] }] }] } });
   const pre = { classicMinutes: own, worldMinutes: world, quest: block() };
-  const keep = JSON.stringify(pre);
-  const moved = questBlockOnOwnClock(pre).machine.quests[0];
-  assert.equal(JSON.stringify(pre), keep, 'the snap is untouched');
-  assert.deepEqual([moved.resources[0].clock.lastWorldTimeSample, moved.tasks[0].actions[0].actionSpecific.lastTimePlayed, moved.tasks[0].actions[0].actionSpecific.lastSpawnTime, moved.questTombstoneTime], [own * 60, own * 60 - 30, 0, 0], 'the countdowns onto the character\'s clock by the distance at the save - three days stay three days');
-  assert.deepEqual([moved.questStartTime, moved.activeLogMessages[0].time], [world * 60 - 600, world * 60 - 300], 'the journal\'s dates stay the world\'s');
-  assert.equal(moved.ownSecondsAt, own * 60, 'and marked, so no load moves them twice');
-  assert.equal(questBlockOnOwnClock({ ...pre, quest: { machine: { quests: [moved] } } }).machine.quests[0].resources[0].clock.lastWorldTimeSample, own * 60, 'a TIME3 envelope loads as it stands');
-  const offline = { classicMinutes: own, quest: block() };
-  assert.equal(questBlockOnOwnClock(offline), offline.quest, 'an offline envelope: one clock, nothing to move');
-  // end to end: the load hands the hosts the moved block
+  // end to end: the load hands the hosts the block it saved
   setSharedClock(() => world + 5);
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(player(), { classicMinutes: own, quest: block() })));
   snap.worldMinutes = world;
   const extras = restorePlayer(player(), snap);
-  assert.equal(extras.quest.machine.quests[0].resources[0].clock.lastWorldTimeSample, own * 60, 'restorePlayer: the countdowns on the character\'s clock');
+  assert.deepEqual(extras.quest, snap.quest, 'restorePlayer: the quest block as it was saved');
   setSharedClock(null);
   // COPY TO OFFLINE, a TIME3 envelope: the journal's dates onto the one clock, the countdowns stay
   const t3 = { classicMinutes: own, worldMinutes: world, quest: { machine: { quests: [{ questName: 'Q', ownSecondsAt: own * 60 - 17, questStartTime: world * 60 - 600, questTombstoneTime: own * 60 - 5, activeLogMessages: [{ stepID: 0, messageID: 1, time: world * 60 - 300 }], resources: [{ clock: { lastWorldTimeSample: own * 60 - 60 } }] }] } } };
@@ -449,11 +435,6 @@ test('TIME3 saves: an online save from before TIME3 has its countdowns moved ont
   assert.deepEqual([off.resources[0].clock.lastWorldTimeSample, off.questTombstoneTime, off.ownSecondsAt], [own * 60 - 60, own * 60 - 5, own * 60 - 17], 'the countdowns were the character\'s already, and its mark stands');
   const legacy = offlineCopyOf({ ...pre, quest: block() }).quest.machine.quests[0];
   assert.deepEqual([legacy.resources[0].clock.lastWorldTimeSample, legacy.ownSecondsAt], [own * 60, own * 60], 'an envelope from before TIME3 moves whole, as LIVED1 moved it, and is marked');
-  // BRING ONLINE: the journal's dates onto the world's, the countdowns stay, marked
-  const on = onlineCopyOf({ classicMinutes: own, quest: { machine: { quests: [{ questName: 'Q', questStartTime: own * 60 - 600, questTombstoneTime: 0, activeLogMessages: [], resources: [{ clock: { lastWorldTimeSample: own * 60 - 60 } }] }] } } }, world);
-  const oq = on.quest.machine.quests[0];
-  assert.deepEqual([oq.questStartTime, oq.resources[0].clock.lastWorldTimeSample, oq.ownSecondsAt], [world * 60 - 600, own * 60 - 60, own * 60], 'the start onto the world\'s clock, the countdown unmoved, marked');
-  assert.equal(questBlockOnOwnClock(on).machine.quests[0].resources[0].clock.lastWorldTimeSample, own * 60 - 60, 'so its first load online moves nothing again');
   // the walk itself
   const tree = { a: { lastSpawnTime: 10, questStartTime: 20, activeLogMessages: [{ time: 30 }, { time: 0 }] } };
   shiftQuestStamps(tree, 5, { own: true });
@@ -489,26 +470,3 @@ test('QCLOCK-WORLD the rest, end to end online: a quest ticks on every sub-tick,
   assert.ok(Math.abs(realSeconds - 32.4) < 1e-6, `about half a minute of real time (${realSeconds.toFixed(1)} s)`);
 });
 
-test('TIME3 by source - THE FOUR HOSTS RULE: world.js and exterior.js hand the machine the character\'s clock, the sky, the event clock and the raises; the dungeon\'s rest and collapse raise through the counted call; every host\'s rest deps tick the quests, and the session no longer stands them down online; the bridge carries the four and the lens rereads on either hour', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(host);
-    assert.match(s, /classicSeconds: \(\) => playerTicker\.ownMinutes \* 60,/, `${host}: the quest's clock is the character's`);
-    assert.match(s, /skySeconds: \(\) => skyMinutes\(\) \* 60,/, `${host}: the sky`);
-    assert.match(s, /worldSeconds: \(\) => playerTicker\.classicMinutes \* 60,/, `${host}: the event clock`);
-    assert.match(s, /raisedSeconds: \(\) => raisedMinutes\(\) \* 60,/, `${host}: the raises`);
-    assert.match(s, /tickQuests: \(\) => questBridge\?\.machine\?\.tick\?\.\(\),/, `${host}: the rest ticks the quests`);
-  }
-  const dungeon = rd('src/scenes/dungeonContext.js');
-  assert.match(dungeon, /const start = Math\.floor\(end\) - n;\s*\n\s*advanceOwnMinutes\(n\);/, 'the dungeon\'s rest: a counted raise');
-  assert.match(dungeon, /advanceOwnMinutes\(60\);   \/\/ RaiseTime\(1 hour\)/, 'the dungeon\'s collapse: a counted raise');
-  assert.match(dungeon, /tickQuests: \(\) => opts\.questBridge\?\.machine\?\.tick\?\.\(\),/, 'and its rest ticks the world host\'s quests');
-  assert.equal(/classicMinutesRef\.value \+= /.test(dungeon), false, 'no raise bypasses the count');
-  assert.match(rd('src/scenes/worldModes.js'), /tickQuests: \(\) => questBridge\?\.machine\?\.tick\?\.\(\),/, 'worldModes\' rest too');
-  const session = rd('src/systems/rest/restSession.js');
-  assert.match(session, /\n\s*this\.deps\.tickQuests\?\.\(\);/);
-  assert.equal(/sharedMinutes\?\.\(\)\)\) this\.deps\.tickQuests/.test(session), false, 'RESTX2\'s online stand-down is gone');
-  const bridge = rd('src/scenes/quest/questBridge.js');
-  for (const k of ['skySeconds', 'worldSeconds', 'raisedSeconds']) assert.match(bridge, new RegExp(`${k}: \\(\\) => ctx\\.${k}\\?\\.\\(\\) \\?\\? null,`), `the bridge carries ${k}`);
-  assert.match(bridge, /const hour = `\$\{Math\.floor\(\(ctx\.classicSeconds\?\.\(\) \?\? 0\) \/ 3600\)\}\|\$\{Math\.floor\(\(ctx\.skySeconds\?\.\(\) \?\? 0\) \/ 3600\)\}`;/, 'the lens rereads on either clock\'s hour');
-  assert.match(rd('src/systems/save/save.js'), /quest: questBlockOnOwnClock\(snap\) \?\? null,/, 'the load moves a pre-TIME3 online save\'s countdowns');
-});

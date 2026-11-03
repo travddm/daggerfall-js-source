@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT18 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7): THE FAMILY'S OWN LAW, AS
+// INT18: THE FAMILY'S OWN LAW, AS
 // THE REALM ASKS IT. A line's record is the client's (family.js - its births, its deaths, what each member inherits) and
 // the account service keeps the copy every device reads (server-account/src/legacy.js putLineage): it took any record of
 // the family's shape, so a modified client could write a member's blood or hearth past what the family law ever gives,

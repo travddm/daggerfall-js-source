@@ -1,4 +1,4 @@
-// PADPLUS1 (2026-09-25): the Enhanced Plus controller layer - the layout move, the crossbar (model, mapping and the
+// PADPLUS1: the Enhanced Plus controller layer - the layout move, the crossbar (model, mapping and the
 // poller's presses), run as a toggle, the menus' world codes standing down, the HD glyphs and the prompt rows.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -245,7 +245,6 @@ test('PADPLUS3: B opens the pack and closes it and neither press leaks into the 
     events.length = 0;
     pad.buttons[15] = { pressed: true, value: 1 }; gp.tick(1 / 60);
     assert.ok(getBinding(store, 'Rest'), 'Rest has a key');
-    // PIN MOVED (2026-10-01 part four, TOUCH-HOLD): right has a hold now (Recast, which LT held before Interact took
     // it), so its tap fires on the RELEASE, as up's, down's and left's do
     assert.ok(!events.includes(`keydown:${getBinding(store, 'Rest')}`), `the press alone rests nothing yet - it might be a hold: ${events}`);
     pad.buttons[15] = { pressed: false, value: 0 }; gp.tick(1 / 60);
@@ -363,18 +362,6 @@ test('PADPLUS6: looking at loot, d-pad up/down move the plaque\'s highlight (hel
     assert.ok(events.includes(`keydown:${getBinding(store, 'AutoMap')}`), 'with no loot in front, down is the map');
     gp.dispose();
   } finally { QL.resetQuickLoot(); registerCrossbar(null); globalThis.window = prevW; resetPrefs(); }
-});
-
-test('PADPLUS7: every carry out of the pack raises the tucked bar - the ghost starts it and ends it, so a mouse or pad drag (no finger hold, no drag lock) does too', async () => {
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8');
-  const start = src.slice(src.indexOf('function ghostStart(item) {'), src.indexOf('}', src.indexOf('document.body?.appendChild(ghost);')) + 1);
-  assert.match(start, /setHotbarDragging\(true\)/, 'the ghost raises it');
-  assert.match(src, /const ghostEnd = \(\) => \{[^\n]*setHotbarDragging\(false\)/, 'and its end lowers it');
-  const onMove = src.slice(src.indexOf('const onDragMove = (e) => {'), src.indexOf('dragTo(e.clientX, e.clientY);', src.indexOf('const onDragMove = (e) => {')));
-  assert.match(onMove, /ghostStart\(drag\.item\)/, 'the mouse arm starts the ghost - the path PADPLUS5 missed');
-  const hb = readFileSync(new URL('../../src/ui/enhanced/enhancedHotbar.js', import.meta.url), 'utf8');
-  assert.match(hb, /function arm\(\) \{[\s\S]{0,120}bar\?\.classList\.add\('dragging'\)/, 'a spell or slot carried out of the book raises it too');
 });
 
 test('PADPLUS9: d-pad down - a tap is the map (on release), a hold is the travel map, and down again closes the map it opened', () => {

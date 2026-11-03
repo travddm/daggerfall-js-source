@@ -1,4 +1,4 @@
-// TELL6a - THE RING (bible/12-Enhanced-AI/Feud-Arc.md section 8.1; Mac, 2026-10-04: "breath more depth into it", then
+// TELL6a - THE RING (;, then
 // "Go" on every call). The first of TELL6's new shapes: an annulus 1.6-4.0 m about the foe's feet, a second's wind-up,
 // x1.5 - the answer to the player who backs off, whose safe ground is the foe's own feet (the hug answers it). Thrown
 // by the whole set of the massive brute, the atronachs and the Daedra Lord (TELL7) - heavy bodies all, so iron
@@ -29,7 +29,7 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 // ── the law ─────────────────────────────────────────────────────────
 
 test('TELL6a: the ring - 1.6 to 4.0 m about its feet, a second\'s wind-up, x1.5; safe at its feet and past its edge, all round (mutants: any number moved; the feet not safe)', () => {
-  assert.deepEqual({ ...BLOW.ring }, { windup: 1.0, rIn: 1.6, rOut: 4.0, mult: 1.5 });
+  assert.deepEqual({ ...BLOW.ring }, { windup: 1.0, rIn: 1.6, rOut: 4.0 });
   assert.ok(Object.isFrozen(BLOW.ring));
   const b = makeBlow('ring', [2, 0, -1], 0.7, 0);
   for (let a = 0; a < 2 * Math.PI; a += Math.PI / 8) {
@@ -60,10 +60,6 @@ test('TELL6a: the ground reads the verdict\'s own law for every shape - blowFiel
   assert.ok(quadHalf('ring') < quadHalf('lunge'), 'each its own size');
   assert.ok(BLOW_QUAD_HALF >= Math.max(...['lunge', 'sweep', 'slam', 'ring'].map((k) => quadHalf(k) - 0.3)), 'the whole quad still holds every shape');
   assert.equal(BLOW_KIND.ring, 3);
-  const fs = rd('src/render/foeTelegraph.js');
-  assert.match(fs, /float d = length\(vec2\(across, along\)\);\n\s*inside = d >= uP\.x && d <= uP\.y;/, 'the shader\'s annulus is the law\'s');
-  assert.match(fs, /else if \(b\.kind === 'ring'\) gl\.uniform4f\(U\.uP, P\.rIn, P\.rOut, 0, 0\);/);
-  assert.match(fs, /gl\.uniform1f\(U\.uHalf, quadHalf\(b\.kind, b\.ahead\)\);/);   // PIN MOVED (TELL6c: a leap's quad by its own point)
 });
 
 test('TELL6a: who throws it - the whole set of the massive brute, the atronachs and the Daedra Lord; never an ordinary one; iron on their weight; it chains into a slam; its miss a second\'s window (mutants: the ring for every brute)', () => {

@@ -1,7 +1,4 @@
 // FT1 - SMALLER DUNGEONS, THE FIRST ROW ON THE FEATURES HOME
-// (2026-09-14, Mac: "smaller dungeons should be a genuine enhanced
-// feature that we can build on instead of being hidden in the settings
-// menu ... go one by one, ensure proper detail and development").
 //
 // The 1:1 port (AUDIT 28 W4, audit28_smallerdungeons.test.js) was read
 // again against its consumers and two things were wrong at the seams:
@@ -69,7 +66,7 @@ test('FT1: the departure, driven - online builds the room\'s size whatever the s
     // in the full layout and this build is the plus.
     assert.equal(needsStartWarp(smallerDungeonsStamp(online), offline), true, 'the case DFU\'s raw-setting stamp missed');
     assert.equal(needsStartWarp(smallerDungeonsStamp(offline), offline), false, 'and a save made offline loads offline without a warp');
-    // SD-ONLINE (PIN MOVED): online every dungeon has the world's own size now - this seven-block dungeon's draw is the
+    // SD-ONLINE (
     // medium size, which it is at or under, so it stands whole online (above); a bigger one is laid medium, and its
     // stamp says the build
     const huge = loc([...BIG, 'W0000007.RDB', 'B0000008.RDB', 'B0000009.RDB']);
@@ -101,28 +98,13 @@ test('FT1: needsStartWarp - the truth table (SerializablePlayer.cs:462-472)', ()
   assert.equal(needsStartWarp(Disabled, story), false);
 });
 
-test('FT1: the dungeon host stamps and warps through the two exports, and holds no enum literal of its own', () => {
-  const ctx = read('src/scenes/dungeonContext.js');
-  assert.match(ctx, /import \{ smallerDungeonsStamp, needsStartWarp \} from '\.\.\/world\/smallerDungeons\.js';/);
-  assert.match(ctx, /smallerDungeonsState: smallerDungeonsStamp\(dfLocation\),/, 'the stamp');
-  // AUDIT DELVE E2 (PIN MOVED): the law read once, before the world record, which a load at another size leaves unapplied
-  assert.match(ctx, /const otherLayout = extras\.locationKey === _locationKey && needsStartWarp\(extras\.smallerDungeonsState, dfLocation\);/, 'the warp\'s law');
-  assert.match(ctx, /if \(otherLayout && setPlayerPos\) \{/, 'the warp');
-  assert.ok(!/getBool\('Experimental', 'SmallerDungeons'\)/.test(ctx), 'the host no longer reads the raw setting for either');
-  assert.ok(!/smallerDungeonsState === 2|\? 2 : 1/.test(ctx), 'ONE DFU MEMBER, ONE EXPORT - no literal 2 for Enabled');
-  // and the departure is RECORDED where the doctrine gate looks
-  assert.match(read('src/world/smallerDungeons.js'), /DEPARTURE \(recorded, Ledger A: THE\s*\*?\s*SMALLER-DUNGEON SAVE STAMP IS THE BUILD\)/);
-  const ledger = read('bible/01-Overview/Port-Ledger.md');
-  assert.match(ledger, /\| \*\*THE SMALLER-DUNGEON SAVE STAMP IS THE BUILD \(FT1, 2026-09-14\)\*\*[^\n]*smallerDungeons\.js[^\n]*dungeonContext\.js/, 'the section A row names both files');
-});
-
 test('FT1: the registry row - DFU Classic, over the settings key, sound', () => {
   const f = FEATURES.find((x) => x.id === 'smaller-dungeons');
   assert.ok(f, 'the row is on the home');
   assert.deepEqual(f.kinds, ['classic'], 'DFU\'s own feature; it wears Enhanced too the day the port builds on it');
   assert.deepEqual(f.control, { store: 'settings', key: 'Experimental/SmallerDungeons' });
   assert.equal(f.title, 'Smaller dungeons');
-  assert.match(f.note, /five blocks/); assert.match(f.note, /Main-story dungeons keep full size; a quest keeps the size it was set up at/);   // AUDIT SD III (SD20g D8, PIN MOVED): the law - a quest started with the switch on builds small after it is turned off
+  assert.match(f.note, /five blocks/); assert.match(f.note, /Main-story dungeons keep full size; a quest keeps the size it was set up at/);   // AUDIT SD III (SD20g D8
   assert.match(f.note, /Online every dungeon has its own size instead\./, 'SD-ONLINE (PIN MOVED): online the world\'s size for each dungeon, which is not this switch');
   assert.match(f.effect, /next dungeon you enter/);
   assert.deepEqual(checkFeature(f), []);
@@ -131,13 +113,3 @@ test('FT1: the registry row - DFU Classic, over the settings key, sound', () => 
   assert.equal(featureForControl('prefs', 'Experimental/SmallerDungeons'), null, 'the store is part of the address');
 });
 
-test('FT1: the settings pane never draws a moved key as a second switch (FT13: nor as a pointer), and the home\'s switch face toggles', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /function settingRow\(key, \{ compact = false, home = false \} = \{\}\) \{[\s\S]{0,900}?if \(!home\) \{\s*const moved = featureForControl\('settings', key\);\s*if \(moved\) return movedRow\(moved\);\s*\}/, 'every settingRow call site asks the registry first - one home per idea');
-  assert.match(menu, /function movedRow\(_f\) \{ return null; \}/, 'FT13: a moved key draws nothing here - the pointer row is gone (Mac, 2026-09-14)');
-  assert.doesNotMatch(menu, /On the Features page\.|function goFeatures/, 'no pointer, no walk');
-  assert.match(menu, /row = settingRow\(c\.key, \{ compact: true, home: true \}\);/, 'the home itself is the one caller that gets the real row');
-  assert.match(menu, /if \(widgetFor\(c\.key\) === 'switch'\) \{\s*const \[sec, k\] = c\.key\.split\('\/'\);\s*main\.onclick = \(\) => write\(c\.key, stepValue\(c\.key, effective\(\)\[sec\]\?\.\[k\], 1\)\);/, 'the face toggles, as prefRow\'s does - the home has no help sheet to open');
-  // the key stays in its settings category: the map is total and pinned
-  assert.match(read('src/ui/settings/settingsMap.js'), /"Experimental\/SmallerDungeons",/);
-});

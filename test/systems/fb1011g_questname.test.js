@@ -7,7 +7,6 @@
 // (GameObjectHelper.cs:1060-1062): in DFU with the mod he is named. The port read the quest-resource arm's `is Item`
 // gate alone. Both hosts' namers name him now (scenes/worldModes.js questStandPersonName), off the layout data the
 // click and Info read. FIELD BUGS 2026-10-06c (4)'s "World Tooltips names a quest ITEM alone" is corrected by this.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-11g.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

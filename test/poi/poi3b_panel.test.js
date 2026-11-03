@@ -1,5 +1,4 @@
-// POI-3b (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE EDITOR'S PANEL, ITS IMPORT, AND ITS PLACE IN THE WORLD.
-// Mac: "a tool my developers can use without having to access the codebase ... I need to be able to approve changes".
+// POI-3b - THE EDITOR'S PANEL, ITS IMPORT, AND ITS PLACE IN THE WORLD.
 //   - the panel (src/ui/poi/poiEditorPanel.js), headless over the shared fake document: the bar follows the editor's tools
 //     and the undo; the outliner its POIs and their states; the inspector's fields each one step; what is wrong said in
 //     words, the asset check waiting for the assets; the store's acts - save, send, take back, refusals as sentences;
@@ -210,7 +209,6 @@ test('POI-3b OPENING FROM THE STORE: the list asked and searched; a POI opened a
   // AUDIT POI T7: each revision carries the base it was made from, and mine was made from revision 1 - with no base the
   // fixture's "the base it was made from" and "the live revision" were one number, and either passed
   P.store.history = { id: 'poi-00000000000a', liveRev: 2, revs: [
-    // PIN MOVED (AUDIT POI P6, T7): every revision carries the store's `base` (poi.js history); my own draft was made
     // from revision 1 while revision 2 went live since - it opens with ITS base, never the live one's
     { rev: 2, kind: 'doc', doc: doc('Tower'), base: 1, author: 'Ann', state: 'approved' },
     { rev: 3, kind: 'doc', doc: doc('Tower (Ann)'), base: 2, author: 'Ann', state: 'draft' },
@@ -256,7 +254,6 @@ test('POI-3b THE IMPORT: a model\'s parts held to the mesh law - one past a limi
   assert.equal(r.asset.name, 'Shrine');
   assert.deepEqual(r.asset.parts.map((p) => [p.name, p.t, p.materials[0].texture]), [['Base', [1, 0, 0], pngSha], ['Roof', [0, 2, 0], pngSha]]);
   assert.equal(r.asset.parts[0].mesh, await sha256(prep.parts[0].bytes));
-  // PIN MOVED (AUDIT POI L9): the store's meta and the bytes put - the facts the budgets read
   assert.deepEqual(r.metas.get(pngSha), { kind: 'texture', w: 1, h: 1, bytes: PNG.byteLength });
   assert.equal(r.asset.parts[0].materials[0].color.length, DEFAULT_MATERIAL.color.length);
   let n = 0;
@@ -272,7 +269,6 @@ test('POI-3b THE EDITOR IN THE WORLD, BY SOURCE: `?editor` alone, refused online
   assert.match(w, /const frameMotor = \(\) => \{[^\n]*\n\s*if \(poiEditor\?\.active\(\)\) poiEditor\.cameraFrame\(dt, cam\);[^\n]*\n\s*else if \(walkMode\) \{/);
   assert.match(w, /if \(poiEditor\?\.active\(\)\) mwv0\.eye = \[cam\.pos\[0\], cam\.pos\[1\], cam\.pos\[2\]\];/);
   assert.match(w, /try \{ poiEditor\?\.frame\(\); poiHost\?\.frame\(\); \}/);
-  // PIN MOVED (AUDIT POI R4, R14): the translucent pass sorts by the view's own eye and stands after the grass and the haze;
   // the editor's lines moved with it, after it still
   const tr = w.indexOf('poiHost?.drawTranslucent(renderer, mwv.eye, yardCull);'), lines = w.indexOf('if (poiEditor?.drawLines(proj, view)) renderer.markForeignPass();');
   assert.ok(tr > 0 && lines > tr && lines - tr < 400, 'the lines after the translucent pass, the pass marked');

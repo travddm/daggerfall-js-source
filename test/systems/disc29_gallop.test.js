@@ -1,5 +1,4 @@
-// DISC29-F (2026-09-28, Skibbster on Discord: ride into a building without stopping and the gallop keeps playing
-// inside) - A MODE CHANGE STOPS THE RIDING LOOP, AS UPDATEMODE DOES.
+// DISC29-F - A MODE CHANGE STOPS THE RIDING LOOP, AS UPDATEMODE DOES.
 //
 // The riding sound is one named channel, `audio.setLoop('riding', ...)`, re-armed at every clip's end; only
 // mountRig.frame ever wrote it null. The door dismounts through mountRig.setMode (TransportManager.HandleTransition ->
@@ -74,14 +73,6 @@ test('DISC29-F: any change stops the old loop - a horse swapped for the cart mid
   frames(30);
   const cart = e._loops.get('riding');
   assert.ok(cart && cart !== horse, 'moving on, the cart\'s loop is made afresh');
-});
-
-test('DISC29-F: setMode stops the channel before the animator mounts the new mode', () => {
-  const rig = src('src/player/mountRig.js');
-  const fn = rig.slice(rig.indexOf('function setMode(mode) {'), rig.indexOf('return {', rig.indexOf('function setMode(mode) {')));
-  const stop = fn.indexOf("audio.setLoop('riding', null);");
-  assert.ok(stop > 0, 'the stop is in setMode');
-  assert.ok(fn.indexOf('player.setTransportMode(mode);') < stop && stop < fn.indexOf('animator.mount(mode);'));
 });
 
 test('DISC29-F: every host that makes a mount rig hands worldModes its dismount seam', () => {

@@ -7,14 +7,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  enumerateSaves, migrateLegacyQuicksave, firstFreeKey, saveInfoOf,
+  enumerateSaves, firstFreeKey, saveInfoOf,
   saveKeysOfCharacter, characterNames, findSave, findMostRecentSave,
   saveSlot, loadSlot, restorableSlot, mostRecentRestorable,
   screenshotOf, deleteSave, renameSave,
   quickSaveSlot, hasQuickSave, quickLoadSlot,
   SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX, QUICK_SAVE_NAME,
 } from '../../src/systems/save/saveSlots.js';
-import { SAVE_VERSION, QUICKSAVE_KEY } from '../../src/systems/save/save.js';
+import { SAVE_VERSION } from '../../src/systems/save/save.js';
 
 // localStorage's shape over a Map (length + key(i) drive the sweep).
 function mockStorage(entries = {}, { failSet = null } = {}) {
@@ -124,32 +124,6 @@ test('SAV4: mostRecentRestorable walks recency and the F2 version gate together'
   assert.equal(mostRecentRestorable(mockStorage()), null);
 });
 
-test('SAV4: legacy dagger.quicksave migrates - written, VERIFIED, then removed', () => {
-  const legacy = JSON.stringify({ v: SAVE_VERSION, name: 'Old Hero', classicMinutes: 777 });
-  const s = mockStorage({ [QUICKSAVE_KEY]: legacy });
-  assert.equal(migrateLegacyQuicksave(s), true);
-  assert.equal(s.getItem(QUICKSAVE_KEY), null, 'the legacy key is gone');
-  const key = findSave('Old Hero', QUICK_SAVE_NAME, s);
-  assert.ok(key !== -1);
-  assert.equal(loadSlot(key, s).classicMinutes, 777);
-  assert.equal(saveInfoOf(key, s).dateAndTime.realTime, 0, 'no real stamp survives the legacy key');
-  // Enumeration runs it implicitly too.
-  const s2 = mockStorage({ [QUICKSAVE_KEY]: legacy });
-  const { characterSaves } = enumerateSaves(s2);
-  assert.ok(characterSaves.has('Old Hero'));
-});
-
-test('SAV4: a quota failure leaves the legacy quicksave standing; a corrupt one is dropped', () => {
-  const legacy = JSON.stringify({ v: SAVE_VERSION, name: 'Old Hero' });
-  const s = mockStorage({ [QUICKSAVE_KEY]: legacy }, { failSet: (k) => k.startsWith(SAVE_DATA_PREFIX) });
-  assert.equal(migrateLegacyQuicksave(s), false);
-  assert.equal(s.getItem(QUICKSAVE_KEY), legacy, 'the old save is untouched');
-
-  const s2 = mockStorage({ [QUICKSAVE_KEY]: 'not json {' });
-  assert.equal(migrateLegacyQuicksave(s2), false);
-  assert.equal(s2.getItem(QUICKSAVE_KEY), null, 'nothing worth keeping');
-});
-
 test('SAV4: a failed NEW save leaves no orphan; a failed overwrite keeps the old slot whole', () => {
   // Info write fails on a NEW slot: the data written before it is
   // swept so no orphan blocks the key forever.
@@ -173,77 +147,11 @@ test('SAV4: a failed NEW save leaves no orphan; a failed overwrite keeps the old
   assert.ok(saveInfoOf(0, s2), 'and still enumerates');
 });
 
-test('SAV4: the host wiring source pins - per-character quickslots, the boot arm loads most recent', () => {
-  const world = hostText('src/scenes/world.js');
-  // Save(name, saveName) with the QuickSave default - F9 and the slot
-  // window's saveAs share the ONE producer.
-  assert.match(world, /function worldQuickSave\(saveName = QUICK_SAVE_NAME, \{ quiet = false, sink = null \} = \{\}\)/);   // REALM P0.5: and the checkpoint's quiet; P1.3: and the realm's sink
-  assert.match(world, /saveSlot\(playerEntity\.name, saveName, snap\)/);
-  // MW-EARLY: the key-then-most-recent pick is pickedSaveSnap's (the boot's early arms build reads it too); the
-  // quickload's own QuickSave stays the door's third arm
-  assert.match(world, /return key != null \? loadSlot\(key\) : mostRecent \? \(mostRecentRestorable\(\)\?\.snap \?\? null\) : null;/);
-  // (AUDIT MW-EARLY F3: a snapshot the boot hands in - its one parse - is the one restored)
-  assert.match(world, /const snap = picked \?\? \(key != null \|\| mostRecent \? pickedSaveSnap\(\{ key, mostRecent \}\)[^\n]*\n\s*: quickLoadSlot\(playerEntity\.name, undefined, playerEntity\.characterId \?\? null\)\);/);
-  // The boot arm: a picked slot key wins, else the most-recent shape.
-  assert.match(world, /\? \{ key: Number\(params\.get\('loadkey'\)\) \}\n\s*: \{ mostRecent: true \}/);
-
-  const dungeon = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dungeon, /quickSave\(saveName = QUICK_SAVE_NAME, \{ quiet = false, sink = null \} = \{\}\)/);   // REALM P0.5: and the checkpoint's quiet; P1.3: and the realm's sink
-  assert.match(dungeon, /saveSlot\(playerEntity\.name, saveName, snap\)/);
-  assert.match(dungeon, /key != null \? loadSlot\(key\) : quickLoadSlot\(playerEntity\.name, undefined, playerEntity\.characterId \?\? null\)/);
-
-  // The pause seam builds the slot-window doors from the hosts' seams.
-  const pause = readFileSync(new URL('../../src/ui/pauseWindow.js', import.meta.url), 'utf8');
-  assert.match(pause, /openSave: hooks\.saveAs/);
-  assert.match(pause, /openLoad: hooks\.loadKey/);
-  // PIN MOVED TWICE, and the half it guards has never changed: a host
-  // without the loadKey seam keeps the ONE-PRESS quickload. It first
-  // read `if (this.hooks.openLoad) this.hooks.openLoad(); else
-  // this.hooks.quickLoad?.();` on one line, which held only while the
-  // LOAD button closed the pause window unconditionally before
-  // dispatching; ROAD-C C1 pushed the slot window OVER the pause window
-  // (:308) with Cancel popping back onto it, so the close became the
-  // replace-fallback's alone. AUDIT 65 UI-2 moved it again: the
-  // quick-verb fallback is a RESUME - it hands the player no window -
-  // so it relocks the pointer inside the click that closed it, which
-  // the pushed door must NOT do. Matched as three ordered fragments
-  // rather than one whitespace-exact block, so the next reformat moves
-  // this pin's LAW and not its indentation.
-  const loadArm = pause.slice(pause.indexOf('if (this.hooks.openLoad)'),
-    pause.indexOf('const bx = vx - panelX()'));
-  assert.match(loadArm, /if \(!this\.hooks\.saveLoadPushes\) this\._closeWith\(\);/,
-    'the pushed door leaves this window standing under the slot window');
-  assert.match(loadArm, /\} else \{[\s\S]*this\._closeWith\(\);[\s\S]*this\.hooks\.quickLoad\?\.\(\);/,
-    'and a host without loadKey still gets the one-press quickload, after the close');
-  assert.match(loadArm, /\} else \{[\s\S]*this\.hooks\.relock\?\.\(\);[\s\S]*this\.hooks\.quickLoad\?\.\(\);/,
-    'AUDIT 65 UI-2: that fallback is a resume, so it relocks inside the click (MAC1 J)');
-  assert.doesNotMatch(loadArm.slice(0, loadArm.indexOf('} else {')), /this\.hooks\.relock\?\.\(\)/,
-    '...and the PUSHED door does not - the slot window needs the cursor');
-
-  const menu = readFileSync(new URL('../../src/scenes/menu.js', import.meta.url), 'utf8');
-  assert.match(menu, /export const hasSavedGame = \(\) => !!mostRecentRestorable\(\);/);
-
-  const enhanced = readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(enhanced, /deleteSave\(save\.key\)/, 'the enhanced delete removes the SLOT it shows');
-  assert.doesNotMatch(enhanced, /removeItem\(QUICKSAVE_KEY\)/);
-});
-
 test('SAV4: a realTime TIE keeps the first-enumerated key (FindMostRecentSave is strictly >)', () => {
   const s = mockStorage();
   saveSlot('Alaric', 'A', snapOf('Alaric'), { storage: s, now: 100 });
   saveSlot('Alaric', 'B', snapOf('Alaric'), { storage: s, now: 100 });
   assert.equal(findMostRecentSave(s), 0, 'the tie is not stolen by the later key');
-});
-
-test('SAV4: migration trusts NOTHING - a silently dropped write keeps the legacy key', () => {
-  // Some browsers fail localStorage writes without throwing (private
-  // windows); the verify readback is the only guard that catches it.
-  const legacy = JSON.stringify({ v: SAVE_VERSION, name: 'Old Hero' });
-  const s = mockStorage({ [QUICKSAVE_KEY]: legacy });
-  const origSet = s.setItem.bind(s);
-  s.setItem = (k, v) => { if (!k.startsWith(SAVE_DATA_PREFIX)) origSet(k, v); };   // the data write silently vanishes
-  assert.equal(migrateLegacyQuicksave(s), false);
-  assert.equal(s.getItem(QUICKSAVE_KEY), legacy, 'the legacy save survives the lie');
 });
 
 // ═══════════════════ SAV4: the save/load window behaviors ═══════════════════
@@ -317,7 +225,6 @@ test('SAV4 window: load go hands the RIGHT KEY through the (char,name) identity'
     seedSaves(globalThis.localStorage);
     win.refresh(); win._select(1);          // 'Old' = slot key 0
     win.input('Enter');
-    // PIN MOVED, ROAD-C C1. It asserted the load landed on the KEY
     // PRESS. It does not: SaveLoadEventHandler's load arm raises
     // `loading` and LoadGame waits out `loadingCountdown` (:313-315,
     // :516-520) so the "Please wait..." label can DRAW first. The half

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-ECON TE2 (2026-10-18, Mac: "Everything"; bible/06-Systems/Town-Economy-Arc.md section 4) - THIS DEVICE'S HALF
+// TOWN-ECON TE2 - THIS DEVICE'S HALF
 // OF THE PLAYERS' SHARE:
 //   - THE SHARES: every town's players' share as the account service answers it (/v1/towns/econ), read once a
 //     TOWN_ECON_KEPT_S and held, synchronous to its readers (systems/town/townEcon.js) - the chapter sheet's shape

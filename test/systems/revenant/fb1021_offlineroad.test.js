@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21 OFFLINE-ROAD (bible/01-Overview/bugs/Field-Bugs-2026-10-21.md), the Discord's #feature-feedback,
+// FIELD BUGS 2026-10-21 OFFLINE-ROAD, the Discord's #feature-feedback,
 // Shines: "I understand not letting fast travel or loitering allow for the instant spamming of missions, but I'd like to
 // see them at least progress on the real time bar when offline. It'd be a nice thing to send my single buddy out for when
 // logging off to deal with IRL." Online an errand ran on the lived step alone (AUDIT RVN F1): the character's own clock
@@ -126,11 +126,11 @@ test('OFFLINE-ROAD THE PAGE: online the sheet says a mission keeps real time - o
   buttons(draw(), 'Mission')[0].onclick();
   assert.doesNotMatch(draw().textContent, /real time/, 'offline: DFU\'s one clock');
   online({ world: T0 });
-  assert.match(draw().textContent, /Online, a mission keeps real time: it goes on while you're away, 2 real hours for each day abroad\. Resting, waiting or traveling doesn't speed it up\./);   // PIN MOVED (AUDIT FB1021 L3-5): the hours read off the wire's rate
+  assert.match(draw().textContent, /Online, a mission keeps real time: it goes on while you're away, 2 real hours for each day abroad\. Resting, waiting or traveling doesn't speed it up\./);
   assert.equal(E.ERRAND_REAL_HOURS_A_DAY, 2);
 });
 
-// ── AUDIT FB1021 (bible/01-Overview/audits/Audit-Field-Bugs-2026-10-21.md) ──────────────────────────────────────────────
+// ── AUDIT FB1021 ──────────────────────────────────────────────
 
 test('AUDIT FB1021 L3-1 A MACHINE CLOCK SET FORWARD PAYS NOTHING: the world\'s reading is the machine\'s wall clock through the relay\'s offset, so a clock moved forward after the welcome moved it - an errand reads it no further than the monotonic time since the welcome; real time passed carries it on, and the next welcome pays what a stopped monotonic clock missed (mutants: the world read whole; the monotonic time unread; the hearing\'s mark unkept)', (t) => {
   let perf = 1000;

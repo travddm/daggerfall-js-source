@@ -1,6 +1,5 @@
 // @ts-check
-// THE REST DOOR (2026-09-22, the party-rest drop's own seam, which shipped in neither of the two drops that
-// imported it): the enhanced/native fork for the rest window - the SAME law ui/tradeDoor.js keeps for the shop
+// THE REST DOOR: the enhanced/native fork for the rest window - the SAME law ui/tradeDoor.js keeps for the shop
 // counter. The enhanced skin gets ui/enhanced/enhancedRest.js's DOM card over the SAME systems/rest/restSession.js engine;
 // the classic skin keeps ui/restWindow.js's RestWindow exactly as it was, byte for byte ("modernize the resting
 // window based on the inventory style... don't touch classic mode").
@@ -30,7 +29,7 @@ export { preloadRestArt };
 
 /** The rest window for this skin over `deps` (scenes/shared.js createRestDeps's bag, or a follower's mirror deps).
  *
- *  OVH4 (2026-09-24, Mac chose "A": a party rest is not solo on the classic skin or under GrimoireUI): A PARTY REST
+ *  OVH4: A PARTY REST
  *  IS AN ONLINE WINDOW, like the chat, the party panel and the player trade (OVH3) - it opens the party card on
  *  either skin. The vote, the mirror, a follower's Stop that stops the rester (onManualStop), the leader's unrested
  *  close that frees the next vote (onClosedUnrested) and the stack's Tab close (stopOrClose) are the card's arms;
@@ -60,8 +59,7 @@ function enhancedRestOverlay(deps, ignoreAllocatedBed = false) {
   const overlay = openEnhancedRest(deps, ignoreAllocatedBed);
   const bare = overlay.dispose;   // enhancedRest.js's own close(), guarded against re-entry
   let unregister = () => {};
-  // PARTY-REST29 (2026-09-23, per-request: "when the leader starts resting but closes the resting window he should
-  // be able to initiate a resting vote again instantly"): a window closed with NO rest chosen (no session ever
+  // PARTY-REST29: a window closed with NO rest chosen (no session ever
   // began) tells its host so, once - the host lifts the start cooldown the granted vote stamped (world.js
   // cancelPartyRestStart), since no rest happened to cool down from.
   let closedOnce = false;

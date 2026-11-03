@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-C (2026-09-28) - THE SEA'S TRAFFIC: which ships are out there, where they come from and where they go. The
+// NAV-C - THE SEA'S TRAFFIC: which ships are out there, where they come from and where they go. The
 // port's own; pure - the host hands where the players are, what is water and what the sea already holds, and gets
 // back a ship to launch or ships to let go.
 //
@@ -19,7 +19,7 @@
 // seedBase, and the spawn's own count - so the same waters on the same day send the same ships, and a pin can name
 // one.
 //
-// SEA-PEACE (2026-09-29, the player: "Enemy AI and Friendly AI should engage in their own encounters naturally") - THE
+// SEA-PEACE - THE
 // BAY'S OWN FIGHTS. Of the rolls that launch with room for two, ENCOUNTER_CHANCE launch a pair already at it, drawn by
 // ENCOUNTERS' weights: a pirate on a merchantman she outguns WARY_ODDS to one (`plunder` - a wary one takes her too),
 // or a crown's ship on a pirate (`patrol`). The quarry sails ENCOUNTER_GAP ahead of her hunter on the hunter's own
@@ -27,8 +27,7 @@
 // in sight. The roll and the pair are drawn on the spawn's own ENCOUNTER_SALT stream (`encounterRng`), so a roll that
 // launches one ship draws exactly what it drew before; the company's seed is the next count's.
 //
-// SEA-EASE (2026-10-01, Mac: "too many ships are appearing", "The sea is too dangerous right now", "Friendly AI should
-// help the player in combat") - A QUIETER, SAFER BAY. The densities keep one, two or four ships near a player (they
+// SEA-EASE - A QUIETER, SAFER BAY. The densities keep one, two or four ships near a player (they
 // kept two, three and five), rolled for every SPAWN_EVERY - a minute to two and a half, not half a minute to one - and
 // the first FIRST_ROLL_S after the water is reached; the open bay sails fewer pirates and more merchantmen and crown's
 // ships, and within PORT_PIXELS of a port the pirates' weight is cut to PORT_PIRATE_K - the crown's own waters. THE
@@ -39,7 +38,7 @@
 // sea sends help, never more strangers. She is a crown's ship like any: the pirate is hers (navalAI.js AID_PRIORITY),
 // and she sails on when the fight is done.
 //
-// CAPT-WATERS (2026-10-11, the owner: "giving a reason to players to experience it" - bible/03-World/Captains-Sea.md) - THE
+// CAPT-WATERS - THE
 // RICH WATERS. SEA-EASE made the Bay safer, and the pirates it thinned were the sea's prizes. The coasts keep SEA-EASE's
 // peace; the DEEP WATERS - DEEP_PX map pixels and more from every port (`watersOf`), the Bay's broad middle and the open
 // Abecean - are the captain's choice of risk: pirates DEEP_PIRATE_K times as likely and the trade's ships fewer, their
@@ -48,7 +47,7 @@
 // (navalHost.js launch, drawHold). The plate says the waters (ui/naval/navalHud.js).
 
 //
-// ETHER-SEA (2026-10-11, the owner: "deadly legendary ships"; bible/03-World/Eltheric-Ocean.md ETHER-SHIPS) - PAST THE VEIL
+// ETHER-SEA - PAST THE VEIL
 // (`ctx.ether`: the waters' band, and the legend whose haunt they are when she sails): no crown's navy - corsairs and
 // the isles' traders by the band's weights (systems/naval/etherShips.js etherFactionWeights), every class drawn the band's
 // `level` levels up, a pair at it only a corsair on a trader, and no relief to call. A LEGEND in her haunt, while no

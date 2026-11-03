@@ -1,5 +1,4 @@
-// SPAWN-WORLD (2026-10-26, bible/06-Systems/Systems-Arc.md SPAWN-WORLD; the audit NO SYSTEM LEFT BEHIND IN THE BAY item 25,
-// A3): online, past the Bay only TESA8's lairs stood (some 1-2% of the land, none of them Elite), where on the Bay about 29%
+// SPAWN-WORLD: online, past the Bay only TESA8's lairs stood (some 1-2% of the land, none of them Elite), where on the Bay about 29%
 // of empty land stands a spawned dungeon of the world roll, a quarter of them Elite. The owner's call taken ("Every single
 // thing here needs to be addressed. No exceptions.", 2026-10-26): the spawns and their Elite tier past the Bay as on the
 // Bay - the same roll, density, gates, clocks and tier - never on a place, their map ids in a world lane like the halls' (in DFU's 12 bits - the halls' high 4 bits are the Abyss Dungeons' salts' too).
@@ -17,7 +16,7 @@ import {
 import { worldLaneMapId, worldLaneOf, isWorldLaneMapId, worldLanePixel, ABYSS_WORLD_LANE, SPAWN_WORLD_LANE, WORLD_LANE_RUN } from '../../src/world/worldWide/worldLanes.js';
 import { WORLD_PIXEL_SPAN } from '../../src/world/worldWide/worldGrid.js';
 import { setArenaRoads, beyondKey } from '../../src/world/arenaRoads.js';
-import { spawnedHallMapId, isHallMapId, WORLD_PIXEL_BOUND, isWorldRoom, wdunHallOfRoom, seaRoomOf, owWireRow, validOwIn, validOwOut, worldRoom, OW_WORLD_RELAY_MIN, relaySupportsOwWorld, roomOf } from '../../src/net/wire.js';
+import { WORLD_PIXEL_BOUND, isWorldRoom, seaRoomCell, owWireRow, validOwIn, validOwOut, worldRoom, roomOf } from '../../src/net/wire.js';
 import { owRowSane, owRowFits, owRowInCell, owSpawnsDungeon } from '../../src/net/overworldLaw.js';
 import { instanceRoomOf, instanceOf } from '../../src/net/instanceRoom.js';
 import { roomKeyFor } from '../../src/net/online.js';
@@ -39,7 +38,7 @@ const cloneAt = (px, py) => synthesizeDungeonLocation(pickTemplate([TEMPLATE], W
 const rolledAt = (x0, y, wanted = true, elite = null) => { for (let x = x0; ; x++) if (spawnsDungeon(WORLD_SALT, x, y) === wanted && (elite === null || isEliteSpawn(WORLD_SALT, x, y) === elite)) return [x, y]; };
 const law = (o = {}) => createSpawnGroundPlace({
   maps: { getClimateIndex: () => CLIMATES.Woodlands }, online: true, etherSea: false, plateauDry: () => true,
-  terrainGen: { roads: () => ({ roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500) }) }, cloneAt, spawnGone: () => false, zoneMask: () => null, ...o,
+  terrainGen: { roads: () => ({ roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500) }) }, cloneAt, spawnGone: () => false, ...o,
 });
 
 test('SPAWN-WORLD the lanes (world/worldWide/worldLanes.js): a world pixel\'s key over a run of DFU\'s 12-bit lanes, under the port\'s own 0x80000 - every id unique per pixel and lane, and none of any other lane\'s: MAPS.BSA\'s, a Bay spawn\'s, the Abyss Dungeons\', the Bay\'s abyss, Arena\'s, the isles\', the countryside\'s, the halls\' (mutants: a lane\'s number, the flag, the run)', () => {
@@ -51,7 +50,6 @@ test('SPAWN-WORLD the lanes (world/worldWide/worldLanes.js): a world pixel\'s ke
       assert.deepEqual([worldLaneOf(id), worldLanePixel(id)], [lane, [x, y]], `${lane.toString(16)} ${x},${y}`);
       assert.ok(high >= lane && high < lane + WORLD_LANE_RUN && (id & 0xfffff) >= 0x80000, 'its run, and its low bits 500,000 and up (TESA II P6)');
       assert.ok(id >= 0 && id <= 0xffffffff && isWorldRoom(`dungeon:m${id}`), 'an unsigned 32-bit room the relay keeps');
-      assert.equal(isHallMapId(id), false, 'no hall');
     }
     assert.ok(worldLaneMapId(SPAWN_WORLD_LANE, x, y) < 0x60000000, 'a spawn under the abyss\'s 0x600');
     const abyss = worldLaneMapId(ABYSS_WORLD_LANE, x, y);
@@ -59,10 +57,10 @@ test('SPAWN-WORLD the lanes (world/worldWide/worldLanes.js): a world pixel\'s ke
   }
   // every other lane's id, whatever its pixel: MAPS.BSA's (high 12 to 0x728, a Bay pixel low), the Bay's spawns (salt 1)
   // and the Abyss Dungeons\' (2049..4095), the Bay's abyss (0x600), Arena's (0xa7) and the isles\' (0xe7, 0xe8) over 500,000
-  // and up, the countryside's, a lair's and a capital's (0x300..0x341, 0x80000), a hall's (0xf...)
+  // and up, the countryside's, a lair's and a capital's (0x300..0x341, 0x80000)
   const others = [0, 1, (0x728 << 20) | 499999, 0x7283288c, (0x400 << 20) | 499999, (0x57f << 20) | 499999, (0x7ff << 20) | 499999, spawnedMapId(1, 999, 499), spawnedMapId(2049, 0, 0), spawnedMapId(4095, 999, 499),
     (0x60000000 | 499999) >>> 0, ((0xa7 << 20) | 500000 + 431) >>> 0, ((0xe7 << 20) | 902193) >>> 0, ((0xe8 << 20) | 902193) >>> 0,
-    ((0x33f << 20) | 0xfffff) >>> 0, ((0x340 << 20) | 0xfffff) >>> 0, ((0x341 << 20) | 0x80000 | 21) >>> 0, spawnedHallMapId(2215, -371), spawnedHallMapId(-8192, -8192), -1, 2 ** 32, 0.5];
+    ((0x33f << 20) | 0xfffff) >>> 0, ((0x340 << 20) | 0xfffff) >>> 0, ((0x341 << 20) | 0x80000 | 21) >>> 0, 0xf0000000 + 5, 0xffffffff - 1, -1, 2 ** 32, 0.5];
   for (const id of others) assert.deepEqual([isWorldLaneMapId(id), worldLaneOf(id), worldLanePixel(id)], [false, -1, null], String(id));
   assert.throws(() => worldLaneMapId(0x381, 0, 0), RangeError);
   assert.throws(() => worldLaneMapId(SPAWN_WORLD_LANE, 8192, 0), RangeError);
@@ -74,7 +72,7 @@ test('SPAWN-WORLD the lanes (world/worldWide/worldLanes.js): a world pixel\'s ke
   assert.equal(lanes.size, 8, 'and every lane its own');
 });
 
-test('SPAWN-WORLD the spawn law past the Bay (world/spawnGroundPlace.js): the same roll and Elite tier as the Bay\'s, cloned under the spawn lane - never on a place, past the Veil, in the open zone or on a road past the Bay (TESA\'s layer) (mutants: the place gate, the zone and the Veil in spawnAt, the roads past the Bay)', () => {
+test('SPAWN-WORLD the spawn law past the Bay (world/spawnGroundPlace.js): the same roll and Elite tier as the Bay\'s, cloned under the spawn lane - never on a place, past the Veil or on a road past the Bay (TESA\'s layer) (mutants: the place gate, the zone and the Veil in spawnAt, the roads past the Bay)', () => {
   const [sx, sy] = rolledAt(2200, -371, true, false), [ex, ey] = rolledAt(2200, -371, true, true);
   const plain = law().spawnAt(sx, sy), elite = law().spawnAt(ex, ey);
   assert.deepEqual([plain.mapTableData.mapId, plain.spawned, plain.elite, plain.name], [worldLaneMapId(SPAWN_WORLD_LANE, sx, sy), true, false, `Old Crypt (${sx},${sy})`]);
@@ -99,16 +97,6 @@ test('SPAWN-WORLD the spawn law past the Bay (world/spawnGroundPlace.js): the sa
   } finally { setArenaRoads(null); }
 });
 
-test('SPAWN-WORLD the open zone in the spawn law: a spawn the Overworld\'s far reads ask for (tvSpawnAt, tvLocationAt) never stands in Cyrodiil\'s halls\' zone, as the ground never shaped one there (mutant: the zone asked by the ground alone)', async () => {
-  const { buildWildMask, wildInside } = await import('../../src/systems/wild/wildZone.js');
-  const mask = buildWildMask({ width: 1000, height: 500, inZone: () => true });
-  let zoned = null;
-  for (let y = 0; y < 500 && !zoned; y++) for (let x = 0; x < 1000 && !zoned; x++) if (wildInside(mask, x, y) && spawnsDungeon(WORLD_SALT, x, y)) zoned = [x, y];
-  assert.ok(zoned);
-  assert.ok(law().spawnAt(...zoned), 'no zone: the roll stands');
-  assert.equal(law({ zoneMask: () => mask }).spawnAt(...zoned), null, 'in the zone: only a hall stands');
-});
-
 /** The stand as the host has it (scenes/spawnStandHost.js), lifted and run over fakes. */
 function stand({ places = new Set(), online = true } = {}) {
   const src = rd('src/scenes/spawnStandHost.js');
@@ -117,7 +105,6 @@ function stand({ places = new Set(), online = true } = {}) {
   const make = new Function('d', 'places', 'online', 'cloneAt', 'pathFreePixel', 'spawnsDungeon', 'CLIMATES', `
     const params = { has: (k) => k === 'online' && online }, _spawnSalt = 1, maps = { getClimateIndex: () => 231 }, _spawnGround = () => true;
     const terrainGen = { roads: () => d.roads }, _spawnUnroaded = new Set(), _spawnLedger = d.ledger, _insideSpawn = (k) => k === d.inside, locationIndex = d.index;
-    const cyrodiilMask = () => null, wildInside = () => false, zoneHalls = { standOf: () => null, standIn: () => null };
     const etherSea = false, inEther = () => false, etherPlaceAt = () => null, onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;
     const _arenaTemplates = {}, _countryTemplates = {}, _capitalBase = {};
     const farm = { name: 'The Ulfgar Farmstead', country: { type: 0 } };
@@ -167,7 +154,7 @@ test('SPAWN-WORLD the stand past the Bay (scenes/spawnStandHost.js, run): online
   assert.equal(stand({ online: false })._locationToBuild(sx, sy), null, 'offline the land past the Bay stands no spawn');
 });
 
-test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cell\'s - the ledger says it, the relay\'s law reads it (the roll its own copy, the cell its square), a client says it to the relay that reads it alone (mutants: the ledger\'s spelling, the relay\'s bound, the client\'s gate)', () => {
+test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cell\'s - the ledger says it, the relay\'s law reads it (the roll its own copy, the cell its square), a client says it (mutants: the ledger\'s spelling, the relay\'s bound)', () => {
   const [sx, sy] = rolledAt(2200, -371);
   const L = createSpawnLedger();
   L.note(`${sx},${sy}`, 100);
@@ -189,12 +176,8 @@ test('SPAWN-WORLD the clocks on the wire: a spawn past the Bay\'s row is its cel
   assert.equal(owRowSane([nx, ny, 100]), false, 'a pixel the roll stands none on is junk');
   assert.equal(owRowInCell(row, worldRoom(sx, sy)), true, 'in its own cell, west and north of the Bay\'s corner');
   assert.deepEqual(validOwOut(validOwIn({ k: 'dg', rows: [row] })), { k: 'dg', rows: [row] }, 'the word round-trips');
-  assert.equal(OW_WORLD_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): world275, past main's world274 (LADDER-CUT), which refuses
-  assert.deepEqual([relaySupportsOwWorld('world276'), relaySupportsOwWorld('world275'), relaySupportsOwWorld('x')], [true, false, false], 'world275 refuses the word whole - and closes the socket');   // PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270   // PIN MOVED: world276, SHOP (Genesis, Eternal and Origin join the vocabulary, last; the token's body bound 896); PIN MOVED: world275, the merge of main (world274 on its branch, renumbered past world274 on main at the merge); PIN MOVED: world274, the merge of main (world272 on its branch, renumbered past world272-world273 on main at the merge)
   const online = rd('src/net/online.js');
-  assert.match(online, /k === 'dg' \? validOwIn\(\{ k, rows: payload\.filter\(\(r\) => owRowSane\(r\) && owRowInCell\(r, room\) && \(this\.owWorldOk \|\| bayMapPixel\(r\?\.\[0\], r\?\.\[1\]\)\)\)/, 'a row past the Bay to the relay that reads it alone');
-  assert.match(online, /if \(primary\) this\.owWorldOk = relaySupportsOwWorld\(relayV\);/);
-  assert.match(online, /old\.owWorldOk = this\.owWorldOk; this\.owWorldOk = !!h\.owWorldOk;/, 'and its word moves with the cell a crossing makes mine');
+  assert.match(online, /k === 'dg' \? validOwIn\(\{ k, rows: payload\.filter\(\(r\) => owRowSane\(r\) && owRowInCell\(r, room\)\)/, 'a row past the Bay said as the Bay\'s is');
 });
 
 test('SPAWN-WORLD the room, the discovered places and the docks: a spawn past the Bay entered is a world room the relay keeps - public and instanced - and no hall\'s nor the sea\'s; found, it is filed by its whole id and finds no Bay place; it is no dock (mutants: the lane\'s flag)', () => {
@@ -202,7 +185,7 @@ test('SPAWN-WORLD the room, the discovered places and the docks: a spawn past th
   const id = spawnedMapId(WORLD_SALT, sx, sy);
   const room = roomKeyFor({ host: 'world', mode: 'dungeon', mapId: id });
   assert.equal(room, `dungeon:m${id}`);
-  assert.deepEqual([roomOf(`/room/${room}`), isWorldRoom(room), wdunHallOfRoom(room), seaRoomOf(room)], [room, true, null, false], 'the relay\'s room law: a world room, no hall, not the sea');
+  assert.deepEqual([roomOf(`/room/${room}`), isWorldRoom(room), seaRoomCell(room)], [room, true, null], 'the relay\'s room law: a world room, not the sea');
   const inst = instanceRoomOf(room, { owner: '0f1e2d3c4b5a6978', epoch: '89abcdef' });
   assert.deepEqual(instanceOf(inst), { base: room, owner: '0f1e2d3c4b5a6978', epoch: '89abcdef' }, 'and an instance beside it');
   // found, filed by its whole id (TESA II P6's law: its low 20 bits 500,000 and up) - never a Bay place's key
@@ -269,7 +252,7 @@ test('SPAWN-WORLD with ARENA2: over the player\'s own maps, trace and woods, a s
     };
     const ground = createSpawnGround(woods);
     const place = (px, py) => arenaPlaceOnPixel(px, py) || !!capitalOnPixel(px, py);
-    const L = createSpawnGroundPlace({ maps, online: true, etherSea: false, plateauDry: ground, terrainGen: { roads: () => null }, cloneAt: host, spawnGone: () => false, zoneMask: () => null, placeAt: place });
+    const L = createSpawnGroundPlace({ maps, online: true, etherSea: false, plateauDry: ground, terrainGen: { roads: () => null }, cloneAt: host, spawnGone: () => false, placeAt: place });
     const held = new Set(rows.map((l) => (l.mapTableData.mapId >>> 0) & 0xfffff));
     let seed = 12345;
     const rnd = () => ((seed = (seed * 1103515245 + 12345) >>> 0) / 4294967296);

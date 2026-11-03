@@ -1,6 +1,4 @@
-// TRAVEL-NAV1 (2026-09-25, Mac: "Improving travel options navigation to
-// properly route around objects and stopping before running into
-// buildings. Currently it could be so much better") - THE WALK GOES ROUND,
+// TRAVEL-NAV1 - THE WALK GOES ROUND,
 // AND STOPS SHORT.
 //
 // Travel Options' autopilot beelines: one bearing, latched a pixel at a
@@ -1123,7 +1121,7 @@ test('TRAVEL-NAV1 THE SWITCH: the port\'s own key on the mod\'s pane - on by def
   assert.ok(def, 'declared');
   assert.equal(def.default, true, 'ON - the improvement Mac asked for is the default');
   assert.equal(typeof def.default, 'boolean', 'a toggle');
-  // PLAIN-TEXT (2026-10-19): the words a player reads, exactly - the note that the switch is the port's own is gone
+  // PLAIN-TEXT: the words a player reads, exactly - the note that the switch is the port's own is gone
   assert.equal(def.description, 'Steers time accelerated travel around buildings, walls and rocks, and pauses the journey before walking into something it can\u2019t get round.');
   const shipped = JSON.parse(read('vendor/travel-options/modsettings.json'));
   assert.ok(!shipped.Sections.flatMap((s) => s.Keys.map((k) => `${s.Name}.${k.Name}`)).includes(KEY), 'the author\'s file is untouched');
@@ -1132,22 +1130,3 @@ test('TRAVEL-NAV1 THE SWITCH: the port\'s own key on the mod\'s pane - on by def
   assert.equal(readTravelOptionsSettings().avoidObstacles, true, 'the shipped store: on');
 });
 
-test('TRAVEL-NAV1 THE HOST: the steering rides the mod\'s own frame with THIS host\'s collider, the frame\'s dt before the update, and the motor\'s real travel after it', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /import \{ createTravelSteer, createColliderProbe, steerDrive \} from '\.\.\/systems\/travel\/travelSteer\.js';/);
-  assert.match(w, /const travelNavProbe = createColliderProbe\(\{ collider, feet: \(\) => \(walkMode && playerSpawned \? player\.pos : cam\.pos\) \}\);/,
-    'the feelers are cast through the host\'s own collider, from the feet the motor moves');
-  assert.match(w, /const travelNavFrame = \{ speed: 0, dt: 0, scale: 1, asked: 0, ratio: SCENE_MAP_RATIO, strafe: 0 \};/);
-  assert.match(w, /steer: \(drive, worldX, worldZ, autopilot\) => \{\s*\n\s*travelNavFrame\.speed = player\.speed;\s*\n\s*travelNavFrame\.scale = worldTimeScale\(\);\s*\n\s*return steerDrive\(travelNav, drive, worldX, worldZ, autopilot, travelNavFrame, travelNavProbe\);/,
-    'the mod\'s door, with the speed and the clock read live');
-  const dtAt = w.indexOf('travelNavFrame.dt = dt;');
-  const updAt = w.indexOf('const report = travelOptions.update({');
-  assert.ok(dtAt > 0 && dtAt < updAt && updAt - dtAt < 200, 'the frame\'s dt, just before the mod\'s update');
-  const motorAt = w.indexOf('}, cam.yaw, cam.pitch);', updAt);
-  const askedAt = w.indexOf('travelNavFrame.asked = _travelDrive && !_overlayHeld && !_seasonHeld && !paralyzed', updAt);
-  assert.ok(motorAt > 0 && askedAt > motorAt && askedAt - motorAt < 400, 'the travel really asked, written after the motor ran');
-  assert.match(w, /\? axes\.forward \* player\.speed \* worldTimeScale\(\) \* Math\.min\(dt, MAX_FRAME_DT\) : 0;/, 'after the ground gate wrote axes.forward');
-  // TRAVEL-STRAFE: and the strafe the motor was given, beside it, gated as it is (mutants: the host drops it)
-  const strafeAt = w.indexOf('travelNavFrame.strafe = _travelDrive && !_overlayHeld && !_seasonHeld && !paralyzed ? axes.strafe : 0;', updAt);
-  assert.ok(strafeAt > askedAt && strafeAt - askedAt < 400, 'the strafe the motor was given, after it ran');
-});

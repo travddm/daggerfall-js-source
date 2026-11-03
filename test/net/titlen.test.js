@@ -1,9 +1,5 @@
-// TITLE-N — THE DUNGEON MASTER AND THE PATREON TIERS (2026-09-24).
+// TITLE-N — THE DUNGEON MASTER AND THE PATREON TIERS.
 //
-// Mac: "Add 4 new titles/glyphs. Dungeon Master is an orange title with its own glyph. This title allows the user to
-// use the /dm to message chat with orange text (similar to /red). This goes strictly to the account SquidKamer.
-// Disciple, Apostle, Hierophant are new patreon titles. These also recieve their own unique glyphs. The account
-// Dutchess will recieve the Disciple title/glyph."
 //
 // Each grant is a handle list in the account service's config (the developers' law), each title carries its own
 // glyph, and /dm is RED1's law one glyph over: the relay alone decides, off the `dm` glyph in the signed token.
@@ -16,7 +12,7 @@ import { TITLES, GLYPHS, claimsValid, mintToken, verifyToken, importPublicKeyB64
 import { TITLE_TEXT, TITLE_RGBA, GLYPH_RGBA, GLYPH_MARK, GLYPH_PATH, GLYPH_STROKE, FONT_GLYPH_MIN, FONT_GLYPH_MAX, cssRgba, titleBadge, glyphBadges } from '../../src/ui/playerBadge.js';
 import { GLYPH_LABEL } from '../../src/ui/enhanced/enhancedAccount.js';
 import { titlesHeld, glyphsOf, equipRefusal, titleWorn, aurasHeld, auraWorn, canModerate, TIER_LISTS, TIER_GLYPH, FOUNDER_UNTIL } from '../../server-account/src/titles.js';
-import { parseClient, dmGate, redGate, DM_HZ_MAX, RED_HZ_MAX, DM_RELAY_MIN, relaySupportsDm, RELAY_VERSION, readBadge } from '../../src/net/wire.js';
+import { parseClient, dmGate, redGate, DM_HZ_MAX, RED_HZ_MAX, readBadge } from '../../src/net/wire.js';
 import { HOST_COMMANDS, parseChatLine } from '../../src/net/chatCommands.js';
 import { ChatLog } from '../../src/net/chat.js';
 import { OnlineSession } from '../../src/net/online.js';
@@ -51,9 +47,9 @@ test('TITLE-N vocabulary: four titles and four glyphs join, each title with its 
 // ── THE GRANTS ──────────────────────────────────────────────────────
 
 test('TITLE-R founder: no account registered after the cutoff can obtain Founder, and every account that holds it keeps it - held and worn (Mac: "Remove the founder title from being obtained. Current users keep their founder title") (mutants: the cutoff moved forward; the cutoff an open end)', () => {
-  // FOUNDER2 (2026-09-24): Mac granted it once more to every account then registered - the cutoff is the end of that
+  // FOUNDER2: Mac granted it once more to every account then registered - the cutoff is the end of that
   // day now (founder2.test.js), and the title is closed again past it
-  // FOUNDER5 (2026-10-07, PIN MOVED): the end of that day on every clock, twelve hours past 00:00Z
+  // FOUNDER5 (2026-10-07
   assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000, 'the cutoff is the end of the day FOUNDER2 was asked, on the last clock to reach the next');
   const later = Date.UTC(2026, 8, 26) / 1000;
   assert.deepEqual(titlesHeld({ handle: 'New', registered_at: later }, {}), [], 'registered after it: no Founder');
@@ -70,35 +66,34 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   assert.equal(v('DISCIPLE_HANDLES'), 'Dutchess,Satranath,Skibbster,Flylighter,valenvalarys', 'Mac: "The account Dutchess will recieve the Disciple title/glyph", then "Satranath please add this account as a disciple also", then "Skibbster needs to be a disciple ingame", then "Grant Flylighter the disciple title/glyph", then "Add valenvalarys as a disciple ingame"');
   assert.deepEqual(titlesHeld({ handle: 'flylighter', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), ['disciple'], 'Flylighter: the Disciple title, case-folded');
   assert.deepEqual(glyphsOf({ handle: 'FLYLIGHTER', created_at: 0 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }, 10 ** 10), ['disciple'], 'and its glyph');
-  // 2026-09-29, Mac: "Add valenvalarys as a disciple ingame" - the fifth, the same list and the same law
+  // 2026-09-29, - the fifth, the same list and the same law
   assert.deepEqual(titlesHeld({ handle: 'Valenvalarys', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), ['disciple'], 'valenvalarys: the Disciple title, case-folded');
   assert.deepEqual(glyphsOf({ handle: 'VALENVALARYS', created_at: 0 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }, 10 ** 10), ['disciple'], 'and its glyph');
   assert.equal(equipRefusal('disciple', { handle: 'valenvalarys', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), null, 'theirs to wear');
-  // Mac (2026-09-25): "Add SirMcMobdon as an Apostle ingame title/glyph"; then (2026-09-26): "SirMcMobdon gets a brand
-  // new title/glyph. Remove them from Apostle" - Shadow Fang is theirs now (test/ui/shadowfang.test.js), and the Apostle
-  // list is empty again
+  // SirMcMobdon was an Apostle for a day; the Apostle list is empty again
   assert.equal(v('APOSTLE_HANDLES'), '', 'SirMcMobdon is no longer an Apostle');
   assert.deepEqual(titlesHeld({ handle: 'sirmcmobdon', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }), [], 'SirMcMobdon holds no Apostle title');
   assert.deepEqual(glyphsOf({ handle: 'SirMcMobdon', created_at: 0 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }, 10 ** 10), [], 'and no Apostle glyph');
-  assert.equal(v('DEVELOPER_HANDLES'), 'Lattymoy,LostMyLeg,Tabby,RookieG,Roderic,SirMcMobdon,kpblca_1', 'DEV2, Mac: "Give trashBattery, LostMyLeg the developer title/glyph"; DEV3: "grant Tabby the developer title/glyph"; DEV4, the owner: "Also add RookieG(Dev) as developer", then "Change RookieG(Dev) to RookieG"; DEV5, Mac: "Remove trashBattery ingame as a dev"; DEV6, Mac: "Give roderic the developer access ingame (title/glyph)"; STAFF-PANEL1, mob 06:33Z: \"can we just add me to the dev and my shadow fang just becomes vanity and i gain admin as well?\"; then \"kpblca_1 needs added to them as welll\"');
-  // DEV6 (2026-10-16): Roderic in every case - the title, the glyph, the wings and the moderating, as every developer's
+  // STAFF-ROLES-BY-ACCOUNT: Admin and Moderator are columns of the account's row, listed in no config
+  assert.doesNotMatch(toml, /^(DEVELOPER|MODERATOR)_HANDLES/m, 'the wrangler.toml carries no role lists');
+  // DEV6: Roderic in every case - the title, the glyph, the wings and the moderating, as every developer's
   for (const h of ['LOSTMYLEG', 'tabby', 'RookieG', 'rookieg', 'ROOKIEG', 'roderic', 'Roderic', 'RODERIC']) {
-    const dev = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };   // FOUNDER3: first played after the cutoff too, so no Founder
-    const denv = { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') };
+    const dev = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, staff_admin: 1 };   // FOUNDER3: first played after the cutoff too, so no Founder
+    const denv = {};
     assert.deepEqual(titlesHeld(dev, denv), ['developer'], `${h}: the Developer title, case-folded`);
     assert.deepEqual(glyphsOf(dev, denv, 1_900_000_000), ['dev'], `${h}: the dev glyph`);
     assert.ok(aurasHeld(dev, denv).includes('seraphwings'), `${h}: the Seraph Wings`);
     assert.equal(canModerate(dev, denv), true, `${h}: /mute`);
   }
-  // DEV6: a near name of Roderic's is no developer either
+  // DEV6: a near name of Roderic's is no developer either: the role is the row's, a name earns none
   for (const h of ['Roderick', 'Roderi', 'Roderic_', 'Rod']) {
-    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') }), [], `${h}: not a developer`);
+    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, {}), [], `${h}: not a developer`);
   }
-  // DEV5 (2026-10-16, Mac: "Remove trashBattery ingame as a dev"): off the list in any case, and the whole set with it -
+  // DEV5: the Admin role taken off the account, in any case of the handle, and the whole set with it -
   // the title, the glyph, the wings, the moderating; and the title and wings a row still stores are no longer worn
   for (const h of ['trashBattery', 'trashbattery', 'TRASHBATTERY']) {
-    const was = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, title: 'developer', aura: 'seraphwings' };
-    const denv = { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') };
+    const was = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, title: 'developer', aura: 'seraphwings', staff_admin: 0 };
+    const denv = {};
     assert.deepEqual(titlesHeld(was, denv), [], `${h}: no Developer title`);
     assert.deepEqual(glyphsOf(was, denv, 1_900_000_000), [], `${h}: no dev glyph`);
     assert.ok(!aurasHeld(was, denv).includes('seraphwings'), `${h}: no Seraph Wings`);
@@ -109,19 +104,18 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   // DEV4: the handle whole - "RookieG(Dev)" (a handle may carry brackets) is another account, and a near name is no
   // developer either: none of them holds its rights
   for (const h of ['RookieG(Dev)', 'RookieGDev', 'Rookie', 'RookieGG', 'RookieG_']) {
-    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') }), [], `${h}: not a developer`);
+    assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, {}), [], `${h}: not a developer`);
   }
-  // MOD2 (2026-10-02, Mac: "give tabbyvish the moderator title/glyph for ingame"): the moderator list, case-folded
-  assert.equal(v('MODERATOR_HANDLES'), 'Asynian,tabbyvish,Starempire42', 'MOD1: Asynian; MOD2: tabbyvish; MOD3 (Mac: "Also add Starempire42 as a moderator"): Starempire42');
+  // MOD2: the Moderator role on the account
   for (const h of ['asynian', 'TabbyVish', 'starempire42']) {
-    const mod = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };
-    assert.deepEqual(glyphsOf(mod, { MODERATOR_HANDLES: v('MODERATOR_HANDLES') }, 1_900_000_000), ['mod'], `${h}: the mod shield`);
+    const mod = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, staff_mod: 1 };
+    assert.deepEqual(glyphsOf(mod, {}, 1_900_000_000), ['mod'], `${h}: the mod shield`);
   }
   assert.equal(v('HIEROPHANT_HANDLES'), '', 'nobody yet');
-  // AUDIT B8 (SHADOW-FANG): the whole list, not a prefix of it - and every list's title and glyph IN the token's closed
+  // AUDIT B8: the whole list, not a prefix of it - and every list's title and glyph IN the token's closed
   // vocabulary: one outside it makes mintToken throw, and /v1/auth/token a 500 for every handle on that list
-  assert.deepEqual(Object.keys(TIER_LISTS), [...NEW_TITLES, 'shadowfang', 'penitent', 'herald', 'aegis', 'primarch', 'crystalfist', 'wikimaid', 'nirnrootsage'], 'TITLE-N\'s four, then SHADOW-FANG\'s, then PENITENT\'s, then HERALD\'s, then AEGIS\'s, then PRIMARCH\'s, then CRYSTAL-FIST\'s, then WIKIMAID\'s, then NIRNROOT-SAGE\'s (PIN MOVED)');
-  assert.deepEqual(Object.values(TIER_GLYPH), [...NEW_GLYPHS, 'shadowfang', 'penitent', 'herald', 'aegis', 'primarch', 'crystalfist', 'wikimaid', 'nirnrootsage']);   // NIRNROOT-SAGE's last (PIN MOVED); WIKIMAID's last (PIN MOVED); CRYSTAL-FIST's before it
+  assert.deepEqual(Object.keys(TIER_LISTS), [...NEW_TITLES, 'herald'], "TITLE-N's four, then HERALD's");
+  assert.deepEqual(Object.values(TIER_GLYPH), [...NEW_GLYPHS, 'herald']);
   for (const t of Object.keys(TIER_LISTS)) assert.ok(TITLES.includes(t), `${t}: a title the token may carry`);
   for (const g of Object.values(TIER_GLYPH)) assert.ok(GLYPHS.includes(g), `${g}: a glyph the token may carry`);
   const env = { DUNGEON_MASTER_HANDLES: v('DUNGEON_MASTER_HANDLES'), DISCIPLE_HANDLES: v('DISCIPLE_HANDLES'), APOSTLE_HANDLES: 'Paul', HIEROPHANT_HANDLES: 'Pope, Other' };
@@ -213,25 +207,14 @@ test('TITLE-N relay: the Dungeon Master is rated on a bucket of its own - not ch
 
 // ── /dm AT HOME ─────────────────────────────────────────────────────
 
-test('TITLE-N session: /dm goes only to a relay that carries it (world104) as {t:\'narrate\'}, under its own gate; a {t:\'dm\'} in is handed on with no speaker (mutants: sent to an older relay; the frame named say; the line given an id)', () => {
-  assert.equal(DM_RELAY_MIN, 104);
-  assert.equal(relaySupportsDm('world103'), false, 'an older relay closes the socket on the frame');
-  assert.equal(relaySupportsDm(RELAY_VERSION), true, 'this relay carries it');
+test('TITLE-N session: /dm goes as {t:\'narrate\'}, under its own gate; a {t:\'dm\'} in is handed on with no speaker (mutants: the frame named say; the line given an id)', () => {
   const s = new OnlineSession({ url: 'wss://example.test', name: 'SquidKamer', id: 'peer-0001', secret: 'x'.repeat(32), presence: false });
   const out = [];
   s._send = (f) => { out.push(f); return true; };
-  assert.equal(s.sendDm('The door groans open.'), false, 'not before the welcome says the relay carries it');
-  s.dmOk = true;
   assert.equal(s.sendDm('The door groans open.'), true);
   assert.deepEqual(out, [{ t: 'narrate', text: 'The door groans open.' }]);
   assert.equal(s.sendDm('again'), false, 'the gate, run at home first');
   assert.equal(s.sendDm('   '), false, 'nothing to say');
-  const online = rd('src/net/online.js');
-  const recv = online.slice(online.indexOf("} else if (m.t === 'dm') {"), online.indexOf("} else if (m.t === 'muted') {"));
-  assert.match(recv, /this\.onDm\?\.\(\{ text, at:/, 'handed on');
-  assert.doesNotMatch(recv, /m\.id|m\.name/, 'no speaker read off it');
-  assert.match(recv, /chatInGate\(this\._inChat\.get\(room\), now\)/, 'gated coming in: the relay is the player\'s own choice');
-  assert.match(online, /if \(primary\) this\.dmOk = relaySupportsDm\(relayV\);/);
 });
 
 test('TITLE-N log and panel: the Dungeon Master\'s line is a system line flagged `dm` from the frame type, one line on every tab, drawn orange in the title\'s own colour; the host parses /dm before /red and never guards it (mutants: the flag off a field; drawn red; the host checking a glyph)', () => {
@@ -244,13 +227,6 @@ test('TITLE-N log and panel: the Dungeon Master\'s line is a system line flagged
   assert.ok(log.tabs.filter((t) => t.shown).every((t) => t.messages.includes(line)), 'on every tab');
   assert.equal('dm' in log.push('world', { id: 'p', name: 'P', text: 'hi' }), false, 'a player\'s line carries no dm key at all');
   assert.ok(CHAT_CSS.includes(`.dfchat-line.dm .dfchat-text { color: ${cssRgba(TITLE_RGBA.dungeonmaster)};`), 'orange, the title\'s own');
-  assert.match(rd('src/ui/chatPanel.js'), /\$\{line\.dm \? ' dm' : ''\}/);
   assert.ok(HOST_COMMANDS.includes('dm'));
   assert.deepEqual(parseChatLine('/dm hello'), { kind: 'host', name: 'dm' }, 'the parser leaves it to the host');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const dm = \/\^\\\/dm\\s\+\(\[\\s\\S\]\+\)\$\/i\.exec\(text\.trim\(\)\);\s*if \(dm\) return chatLinks\.get\('world'\)\?\.sendDm\(dm\[1\]\) \?\? false;/);
-  const arm = w.slice(w.indexOf('const dm = /^'), w.indexOf('const red = /^'));
-  assert.doesNotMatch(arm.replace(/\/\/[^\n]*/g, ''), /glyph|wardrobe|title/i, 'the host does not decide who may narrate');
-  assert.ok(w.indexOf('const dm = /^') < w.indexOf('const red = /^'), 'before /red');
-  assert.match(w, /link\.onDm = \(line\) => chatLog\.pushAll\(\{ text: line\.text, at: line\.at, dm: true \}\);/, 'the flag set here, from the frame type');
 });

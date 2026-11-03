@@ -1,6 +1,4 @@
-// SCALE5d part two (2026-10-11, the plan's "the gate's court ... as copies around one fight object that takes their
-// blows batched and fans the boss's state back"; Mac: "I wanna do every single slice"; bible/11-Multiplayer/Scale-Arc.md
-// SCALE5d): A GATE'S COURT, COPIED. The court keeps its fight and its first SOCKETS_MAX sockets; a crowd past them goes
+// SCALE5d part two: A GATE'S COURT, COPIED. The court keeps its fight and its first SOCKETS_MAX sockets; a crowd past them goes
 // to its copies (`gate:<n>#<k>`), each a crowd of its own whose fight is the court's - its hellos, poses and gate words
 // handed up, the boss's beats, answers and closes handed back - over the shards' machinery (net/hubShards.js
 // isCourtCopy, courtOfCopy, upOf; server/src/index.js _courtHello, _courtPose, _courtSockets). A copy's socket
@@ -71,7 +69,6 @@ test('SCALE5d part two the law: a copy of a gate\'s court is `gate:<n>#<k>`, k 1
   assert.equal(H.isCourtCopy('gate:0#1'), true, 'day 0 is a day');
   assert.equal(H.upOf('chat:world.3'), 'chat:world');
   assert.equal(H.upOf(KEY), null);
-  // PIN MOVED (AUDIT SCALE II R3-1): a copy hands its court the frames PARSED as gate words, said again `t` first - never a frame
   // read off its first bytes (`courtHands`, retired); test/net/auditscale2_bus.test.js holds it over a copy, a court and every key order
 });
 
@@ -88,9 +85,6 @@ test('SCALE5d part two the Worker: a gate\'s court is walked from the court itse
     assert.equal(await res.text(), 'ok');
     assert.deepEqual(asked, [[KEY, '0'], [`${KEY}#1`, '1']], 'the court first, then its first copy');
   } finally { Date.now = realNow; }
-  const w = src('server/src/index.js');
-  assert.match(w, /if \(isGateRoom\(key\)\) return layerWalk\(env\.ROOMS, key, request, 0\);/);
-  assert.match(w, /const ly = isLayered\(key\) \|\| isGateRoom\(key\) \? layerOf\(request\.headers\.get\(LAYER_HEADER\)\) : 0;/, 'and the object keeps its layer');
 });
 
 test('SCALE5d part two a copy\'s socket: welcomed by its copy, and the court\'s - a ShardSocket there the court\'s index never holds; its `in` joins the one fight and is answered through its copy; the boss\'s beats reach it as they reach the court; the crowds never meet (mutants: the hello not handed up; the copy\'s socket in the court\'s index; the gate word kept by the copy; the beat not handed down; a court pose fanned to a copy)', () => court(async ({ F, copy, into, own, say, pose, tick }) => {

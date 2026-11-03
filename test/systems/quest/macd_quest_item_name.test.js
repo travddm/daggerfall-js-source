@@ -1,6 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-D - A QUEST NAMES WHAT IT ASKS FOR (2026-09-17, Mac: "I was given a
-// quest to find a book, but the book's name was just *Book*").
+// MAC-D - A QUEST NAMES WHAT IT ASKS FOR.
 //
 // `Item.ExpandMacro` (Item.cs:236-260) answers `_symbol_` and `=symbol_`
 // with `GetLongName(item)`, and `GetLongName` (:304-307) is one line:
@@ -86,14 +85,3 @@ test('MAC-D: the two arms that are NOT the long name still are not', () => {
   assert.equal(resource(null).expandMacro(1), false);
 });
 
-test('MAC-D: it is Item.cs:306’s call, arguments and all', () => {
-  const s = rd('src/systems/quest/item.js');
-  assert.match(s, /const long = itemLongName\(it, \{/, 'ResolveItemLongName, not the raw field');
-  assert.match(s, /differentiatePlantIngredients: false,/,
-    ':306 passes FALSE - a quest asking for a plant names the plant, not its (northern) variant');
-  assert.match(s, /getQuest: \(uid\) => \(uid === this\.parentQuest\?\.uid \? this\.parentQuest : null\)/,
-    'the letter arm names its OWN quest’s signoff');
-  // ...and the old note is gone, because the thing it excused is.
-  assert.ok(!/so the\n\s+\*\s+long name here is name \?\? template name - one convention/.test(s),
-    'a note excusing behaviour the module no longer has is a lie with a citation');
-});

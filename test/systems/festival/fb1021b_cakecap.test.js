@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b CAKE-CAP-SAID (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md): "Soul Cake stopped dropping".
+// FIELD BUGS 2026-10-21b CAKE-CAP-SAID: "Soul Cake stopped dropping".
 // The service caps a UTC day's finds at FIND_CAKES_PER_DAY, and a find past them answered a miss's own `{ found: 0 }` -
 // so a player who found 120 in the first hour of undead farmed on for hours against a cap nothing named, and every kill
 // was still a write to the service. The answer says it now (`today`, `capped`); this page says it once a day with the

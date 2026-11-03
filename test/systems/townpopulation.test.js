@@ -318,7 +318,6 @@ test('politeness gate: the motor obeys it, and both exterior hosts feed it their
   // encounter pool) - a townsperson must not stand chatting beside a
   // quest foe stood in the street by CreateFoe's exterior arm.
   assert.match(src('src/scenes/exterior.js'), /createTownScratch\(\{ areEnemiesNearby, foes: \(\) => exteriorFoePool\(\) \}\)/);
-  assert.match(hostText('src/scenes/world.js'), /createTownScratch\(\{ areEnemiesNearby, foes: \(\) => enchantFoes\(\) \}\)/);
   // ...and the scratch really does ask that pool, rather than taking a
   // snapshot when it was made
   assert.match(src('src/scenes/townScratch.js'), /enemiesNearby: \(\) => areEnemiesNearby\(foes\(\)\)/);

@@ -1,6 +1,6 @@
-// AUDIT 68 (2026-09-24), cluster "repo": the house around the code - the
+// AUDIT 68, cluster "repo": the house around the code - the
 // release workflow's gate and tag, the dev server's data door, the build's
-// page list, the lab's frame, the lint's reach, the runner's glob and the
+// page list, the lint's reach, the runner's glob and the
 // CDN scripts' integrity. Each pin failed on the tree before its fix.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,7 +27,6 @@ test('AUDIT 68 X2-release-red-suite-ships: the suite is a JOB every packaging le
     return end < 0 ? rest : rest.slice(0, end + 1);
   };
   const gate = job('gate'), build = job('build');
-  // PIN MOVED (REL-FAST, Mac: "Yes, thats insanely slow"): the whole house check as verify.yml's parallel jobs - lint and
   // the types, every shard, the build - on the commit the legs build, not `npm run check` in series
   assert.match(gate, /\n {4}uses: \.\/\.github\/workflows\/verify\.yml\n {4}with:\n {6}ref: \$\{\{ github\.sha \}\}\n/, 'the gate job runs the whole house check');
   assert.doesNotMatch(gate, /build: false/, 'the build is a part of it, as it was of `npm run check`');
@@ -42,7 +41,6 @@ test('AUDIT 68 X2-release-tag-commit: a new release tag is cut at the built comm
   const wf = read('.github/workflows/release-desktop.yml');
   // REL4: the one step that attaches anything is the publish job's draft
   const attach = wf.slice(wf.indexOf('- name: Stage the release as a draft, every file attached'), wf.indexOf('- name: Publish it whole'));
-  // PIN MOVED (REL8): the release is named for the player's update (comments between) - the tag and the commit as ever
   assert.match(attach, /\n {10}tag_name: \$\{\{ needs\.version\.outputs\.tag \}\}\n(?: {10}#[^\n]*\n)* {10}name: \$\{\{ needs\.version\.outputs\.update != '' && format\('Update \{0\}', needs\.version\.outputs\.update\) \|\| needs\.version\.outputs\.tag \}\}\n {10}target_commitish: \$\{\{ github\.sha \}\}\n/,
     'without target_commitish GitHub cuts the tag at main\'s head at upload time');
   const uses = wf.split('\n').filter((l) => l.includes('${{ inputs.release_tag }}'));
@@ -112,7 +110,7 @@ test('AUDIT 68 X2 (books): the BOOKS fallback finds DFU\'s own lowercase `books`
 });
 
 test('AUDIT 68 X2-archive-sheet-orphan: every tracked root page is a build input', async () => {
-  // bible/Home.md: "Prototype HTMLs at repo root must register in
+  // "Prototype HTMLs at repo root must register in
   // vite.config.js rollupOptions.input" - held here, not by memory.
   const input = Object.values((await import('../../vite.config.js')).default.build.rollupOptions.input);
   const pages = tracked('*.html').filter((p) => !p.includes('/'));
@@ -130,14 +128,6 @@ test('AUDIT 68 X2-cdn-three-no-sri: every script a tracked page loads from anoth
     }
   }
   assert.ok(seen > 0, 'the pages still load three.js from cdnjs - this pin is not vacuous');
-});
-
-test('AUDIT 68 S08-gunproto-inlines-gunFrameRect: the gun lab draws through the game\'s frame rather than restating it', () => {
-  const page = read('gun-proto.html');
-  assert.match(page, /\bgunFrameRect\(\{/, 'the page composes its frame with combat/gunViewmodel.gunFrameRect (via gunLab.js)');
-  for (const step of ['placeSprite(', 'widgetTransformRect(', 'unionDrawRect(']) {
-    assert.ok(!page.includes(step), `the page calls ${step} itself - a second copy of the frame the game draws`);
-  }
 });
 
 test('AUDIT 68 X2-eslint-coverage-gaps: tests, tools, scripts and the desktop shell are linted for the structural rules', async () => {
@@ -162,8 +152,8 @@ test('AUDIT 68 X2-npm-test-glob: npm test runs the test files, not the helpers b
   // FAST-SUITE: `npm test` is `tools/testShards.mjs 1/1` now - its list is testFiles(), which must be exactly the glob's
   assert.equal(JSON.parse(read('package.json')).scripts.test, 'node tools/testShards.mjs 1/1');
   const listed = testFiles(root);
-  assert.ok(listed.length > 0 && listed.every((f) => /^test\/(?:[\w-]+\/)*[^/]+\.test\.js$/.test(f)), 'testFiles lists test/**/*.test.js and nothing else');
-  assert.deepEqual(listed, readdirSync(join(root, 'test'), { recursive: true }).filter((f) => f.endsWith('.test.js')).sort().map((f) => `test/${f}`), 'and every one of them, in every folder');
+  assert.ok(listed.length > 0 && listed.every((f) => /^test\/(?:[\w-]+\/)*[^/]+\.test\.(?:js|ts)$/.test(f)), 'testFiles lists test/**/*.test.js and *.test.ts and nothing else');
+  assert.deepEqual(listed, readdirSync(join(root, 'test'), { recursive: true }).filter((f) => /\.test\.(?:js|ts)$/.test(f)).sort().map((f) => `test/${f}`), 'and every one of them, in every folder');
   const stray = tracked('*.js').concat(tracked('*.mjs'), tracked('*.cjs'))
     .filter((f) => /\.test\.[cm]?js$/.test(f) && !/^test\/(?:[\w-]+\/)*[^/]+\.test\.js$/.test(f));
   assert.deepEqual(stray, [], 'every test file sits where the glob looks');

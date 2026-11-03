@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// ROAD-LOOK (bible/03-World/Roads.md ROAD-LOOK) - A BRIDGE'S MESH, made on the page's thread from the kernel's answer
+// ROAD-LOOK (ROAD-LOOK) - A BRIDGE'S MESH, made on the page's thread from the kernel's answer
 // (world/road/roadBridges.js bridgesOf, terrainGen.js `bridges`) in its pixel's own frame: metres, x east, y up, z north.
 //
 // WHY THE PORT'S OWN. Daggerfall stands no bridge over a river in the open: its exteriors have no rivers (Basic Roads'

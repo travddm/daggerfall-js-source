@@ -1,8 +1,8 @@
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE BATTLES' WEEK, THE
+// SEAT2a: THE BATTLES' WEEK, THE
 // LAW AND THE CLIENT - the holder's window and its bounds, when a window opens in a seat week, the crown's slots, the
 // schedule (key order, the clash, the two-hour move, the unplaced), the sides' caps and the rosters' close, the board's
 // words; the Seat tab's battle panel (the announcement, each side, the reader's sign and unsign, a Guildmaster's
-// Sellswords) and the holder's window lever; the seat book's calls. bible/11-Multiplayer/Seats-Arc.md 6.3-6.5;
+// Sellswords) and the holder's window lever; the seat book's calls. 6.3-6.5;
 // `06-Systems/Online-Arc.md` SEAT2a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -92,7 +92,6 @@ test('SEAT2a THE SEAT TAB\'S BATTLE: the announcement and both sides\' rosters f
   const noticeBook = { seenAt: () => null, read: async () => ({ board: { notes: [], notices: [], me: {} } }), markSeen: () => {}, cached: () => null, draft: () => ({ subject: '', body: '', days: 7, button: '' }), noticeDraft: () => ({ subject: '', body: '', days: 3 }), readGuild: async () => ({ data: null, error: 'no-guild' }) };
   const now = 1_800_000_000;
   const SH = { id: 'g1', name: 'The Silver Hand', tag: 'SH', heraldry: null }, EO = { id: 'g2', name: 'Ebon Oath', tag: 'EO', heraldry: null };
-  // PIN MOVED (AUDIT-SEATS): the standings' fight carries its start and end in SECONDS, as the service sends them
   // (server-account/src/seatBattles.js fightOf: `starts_at`) - the tab now reads them so; the fixture had them in ms
   const fight = (mine, open = true) => ({ week: 6, key: 3021, kind: 'siege', tier: 'palace', startsAt: siegeStartMs(WK, 1, 21) / 1000, endsAt: (siegeStartMs(WK, 1, 21) + 1800_000) / 1000, moved: false, state: 'scheduled',
     attackerGuild: EO, defenderGuild: SH, sides: { attack: { n: 4, swords: 1 }, defend: { n: 2, swords: 0 } }, max: 10, swordsMax: 2, open, window: { day: 1, hour: 21 }, mine });
@@ -119,7 +118,6 @@ test('SEAT2a THE SEAT TAB\'S BATTLE: the announcement and both sides\' rosters f
   // a member of the attackers, not signed
   let host = mount(2, 'g2', fight({ side: 'attack', signed: false, sellsword: false }));
   await tick();
-  // PIN MOVED (CROWN2): a guild's name opening a sentence is capitalised - "The Silver Hand", where it read "the"
   assert.match(host.textContent, /Ebon Oath <EO> has won the Right of Siege at Anticlere\. The Silver Hand <SH> holds its Charter\. Battle is joined Thursday at 21:00 UTC\./);
   assert.match(host.textContent, /Attackers: 4 of 10 signed \(1 Sellsword\)\./);
   assert.match(host.textContent, /Defenders: 2 of 10 signed\./);

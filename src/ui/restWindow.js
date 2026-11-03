@@ -74,8 +74,7 @@ import { REST_ACT_TEXT, ambushNight, actAtChannelEnd, channelBroken, channelHeal
  *  watches. The classic skin keeps DFU's "Hide world while resting"
  *  verbatim.
  *
- *  REST-VEIL2 (2026-09-19, Mac: "opening up the rest menu has a black
- *  background behind it") - AND THE SELECTION PAGE TOO. CLK4 relaxed
+ *  REST-VEIL2 - AND THE SELECTION PAGE TOO. CLK4 relaxed
  *  the RESTING page only, so the page a player actually opens with the
  *  key still blacked the world out whole: press it and the world is
  *  gone, pick a rest and the world comes back under the veil. One skin
@@ -158,10 +157,10 @@ export async function preloadRestArt(deps) {
 export const restArtLoaded = () => !!_art;
 
 /** OL2: the world's time of day, for the counter page under the shared
- *  clock. RESTX2 (2026-09-17) retired the pace half of the line ("an
+ *  clock. RESTX2 retired the pace half of the line ("an
  *  hour here is 5 real minutes"): online a rest paces on the window's
  *  own timer now, exactly as offline, and the world's clock is what it
- *  always was under a rest - untouched. LIVED1 (2026-09-29): and the
+ *  always was under a rest - untouched. LIVED1: and the
  *  hours are the character's OWN - their clock runs through the night
  *  (worldTick.js ownMinutes) while the world's sky stays where it is -
  *  so the line says whose time the counter is spending. */
@@ -264,7 +263,7 @@ export class RestWindow {
     // on OPEN, not on the first rested hour: standing in the window
     // deciding already costs a held enchantment.
     this.deps.setResting?.(true);
-    // REST1 (bible/06-Systems/Rest-Arc.md): ONLINE THE WINDOW OPENS ON THE ACT. No selection page, no hours, no loiter:
+    // REST1: ONLINE THE WINDOW OPENS ON THE ACT. No selection page, no hours, no loiter:
     // the host's rest point (createRestDeps' restAct) is read once, here, and the window either refuses or holds the
     // channel, then lands the night (or the short rest inside the night interval) through the host's own bag and
     // ends on the ordinary wake box - so the close, the skill raise and an expired room are this window's own doors.
@@ -278,8 +277,7 @@ export class RestWindow {
    *  building's own law (CanRest: the rented room, the house, the hall), and then the channel. */
   _openAct() {
     if (this._act.meditate) { this.mode = 'act'; this.state = 'channel'; return; }   // REST6: a candle's kneel - anywhere a rest may begin
-    // LOITER-ANYWHERE (2026-10-04, Discord: "the new rest system ... has no loiter"; "adding loitering without a camp
-    // needed would be a solution"): every refusal of the act offers Loiter in its place - DFU's loiter is never gated
+    // LOITER-ANYWHERE: every refusal of the act offers Loiter in its place - DFU's loiter is never gated
     // (no bed, no camp, no crime: _restButton never asks CanRest of it), and REST1 had left it no door online
     this._loiterOffer = true;
     const place = this.deps.restPlace?.();

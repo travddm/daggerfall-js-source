@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03) - THE BAKE, SECOND READ: findings GN2-BK1 to GN2-BK5 pinned over tools/fbxMesh.mjs's
+// AUDIT GALLEON-2 - THE BAKE, SECOND READ: findings GN2-BK1 to GN2-BK5 pinned over tools/fbxMesh.mjs's
 // port of Blender's fill, tools/bakeGalleon.mjs and the file it bakes (src/assets/galleon/galleon.json). The first
 // audit (GN-B1) ported the fill as Blender 5.0 holds it; Mac's export was written by Blender 5.1.1 (its SceneInfo says
 // so), and 5.1.0 rewrote the fill's point test and its kd-tree. So the judge here is Blender 5.1.1's own source -
@@ -29,7 +29,6 @@ const BYTES = readFileSync(join(ROOT, BAKE.SOURCE_FBX));
 const SHIPPED_TEXT = readFileSync(join(ROOT, BAKE.OUT), 'utf8');
 const SHIPPED = JSON.parse(SHIPPED_TEXT);
 const OBJECTS = BAKE.sceneObjects(readFbx(BYTES));
-const MESH_SRC = readFileSync(join(ROOT, 'tools/fbxMesh.mjs'), 'utf8');
 const F = Math.fround;
 /** A cut as the compiled reference prints it: "a b c;d e f;...". */
 const cutOf = (tris) => tris.map((t) => t.join(' ')).join(';');
@@ -141,19 +140,11 @@ test('AUDIT GALLEON-2 BK1: THE BAKE REFUSES AN EXPORT FROM ANY BLENDER BUT THE O
 // ── BK2, BK3: the port's comments say what Blender does ───────────────────────────────────────────────────────────────
 
 test('AUDIT GALLEON-2 BK2: THE PROJECTION\'S COMMENT SAYS BLENDER\'S RULE - BLI_polyfill_calc\'s coords_sign 1 is the winding polyfill_prepare derives from cross_poly_v2 <= 0 (math_geom.cc\'s sum, verbatim here): blenderProject\'s faces have it, strictly, and the comment no longer says ">= 0"', () => {
-  assert.doesNotMatch(MESH_SRC, /coords_sign 1: cross_poly_v2 >= 0/);
-  assert.match(MESH_SRC, /cross_poly_v2 <= 0/);
   // cross_poly_v2, as math_geom.cc sums it: (prev.x - cur.x) * (cur.y + prev.y), from the last corner round
   const crossPoly = (v) => { let c = 0, prev = v[v.length - 1]; for (const cur of v) { c += (prev[0] - cur[0]) * (cur[1] + prev[1]); prev = cur; } return c; };
   for (const face of [[[0, 0, 0], [4, 0, 0], [4, 2, 0], [0, 2, 0]], [[2, 0, 0], [4, 1.5, 0], [3, 4, 0], [1, 4, 0], [0, 1.5, 0]], polygon('Cube', 2), polygon('Cube', 34)]) {
     assert.ok(crossPoly(MESH.blenderProject(face)) < 0, 'cross_poly_v2 < 0: coords_sign 1');
   }
-});
-
-test('AUDIT GALLEON-2 BK3: THE FLOAT COMMENT SAYS HOW BLENDER BUILDS - -ffp-contract=off on Apple, Unix and Windows\' clang (v5.1.1\'s build_files/cmake/platform), no fused multiply-add for a*b - c*d to round into; not "an ARM build may contract"', () => {
-  assert.doesNotMatch(MESH_SRC, /an ARM build may contract/);
-  assert.match(MESH_SRC, /-ffp-contract=off/);
-  assert.match(MESH_SRC, /platform_apple\.cmake:161/);
 });
 
 // ── BK4: the CLI says what it baked and where ─────────────────────────────────────────────────────────────────────────

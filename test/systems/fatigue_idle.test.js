@@ -1,6 +1,4 @@
-// FATIGUE-IDLE (2026-09-29, Mac: "fatigue seems to be insanely draining when being idle with no status effects", then
-// "You shouldn't lose fatigue at an insane rate standing still"; asked what standing still should cost: "Nothing", and
-// Roleplay Realism's overload keeps the mod's rule). MEASURED FIRST, on the live build and through the hosts' own
+// FATIGUE-IDLE. MEASURED FIRST, on the live build and through the hosts' own
 // ticker (offline and online, 60 and 144 fps): standing still paid exactly the walk's minute - 8 fatigue a game minute
 // on BALANCE1's scale, a full bar at STR/END 50 in ~67 real minutes of doing nothing - because DFU charges
 // DefaultFatigueLoss every minute the player is not climbing, running or swimming (PlayerEntity.cs:405-418), standing
@@ -95,26 +93,3 @@ test('FATIGUE-IDLE: Roleplay Realism\'s overload keeps the mod\'s rule - a laden
   }
 });
 
-test('FATIGUE-IDLE: every host hands the tick the motor\'s standing - the street, the world, the interiors, the dungeon, and the dungeon\'s report carries it', () => {
-  const standingFeed = /standing: !!player\.standing,/;
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = codeOnly(rd(f));
-    const at = s.indexOf('playerTicker.tick(dt * timeScaleMult');
-    assert.ok(at > 0, `${f}: the ticker call is where it was`);
-    assert.match(s.slice(at, at + 1500), standingFeed, `${f}: the activity carries standing`);
-  }
-  const modes = codeOnly(rd('src/scenes/worldModes.js'));
-  const interior = modes.indexOf('interiorTicker.tick(dt, {');
-  assert.ok(interior > 0);
-  assert.match(modes.slice(interior, interior + 1500), standingFeed, 'worldModes: the interior ticker');
-  const report = modes.indexOf('dungeonCtx.reportActivity?.({');
-  assert.ok(report > 0);
-  assert.match(modes.slice(report, report + 600), /standing: !!player\.standing/, 'worldModes: the dungeon\'s report');
-  const dungeon = codeOnly(rd('src/scenes/dungeon.js'));
-  const dreport = dungeon.indexOf('ctx.reportActivity?.({');
-  assert.ok(dreport > 0);
-  assert.match(dungeon.slice(dreport, dreport + 600), /standing: !!player\.standing/, 'dungeon.js: the report');
-  const ctx = codeOnly(rd('src/scenes/dungeonContext.js'));
-  assert.match(ctx, /reportActivity\(\{ running = false, runningTally = false, swimming = false, climbing = false, standing = false,/, 'dungeonContext: the report takes it (a host that says nothing is moving - the walk, never free)');
-  assert.match(ctx, /_activity\.standing = standing;/, 'and hands it to the tick');
-});

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b VOYAGE-HOLD (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md): grayhatharry, "I had a quest that
+// FIELD BUGS 2026-10-21b VOYAGE-HOLD: grayhatharry, "I had a quest that
 // wanted me to sail from one port to another, I bought a boat, sailed from one port town to another just a shy journey down
 // the coast ... he informed me I hadn't sailed at all." "Under Sail" (QLIS01) waits on `port-reached`, which the harbour
 // office says at a berth a quarter league on from the port she sailed from (scenes/harbourOffice.js PORT_VOYAGE_M). Each

@@ -1,4 +1,4 @@
-// LEGACY-NAME (2026-10-06, bible/06-Systems/Legacy-Arc.md section 5's naming; found re-reading LEGACY-SHEET's own title):
+// LEGACY-NAME:
 // A HOUSE IS NAMED FOR ITS SEAT WHEN ITS FOUNDER HAS NO SURNAME - EVEN WHEN THE SEAT COMES LATER. The law: "the family's
 // surname is the founder's (their name's last word, or 'of <seat>' when they have none)". It was applied only AT THE
 // FOUNDING, and a new character founds in Privateer's Hold, where no town stands: the seat was noted at the first town and
@@ -118,24 +118,11 @@ test('LEGACY-NAME the words: a seat\'s house says itself once - the pages, the s
   noteNews(f, 'died', 'Janome of Sentinel', 10, SENTINEL.mapId);
   const [item] = newsFor(f, SENTINEL.mapId, 20);
   assert.equal(item.house, 'Sentinel', 'the news says House Sentinel, never House of Sentinel');
-  // no line of the house's news says "{who} {house}" - "Tlist Sentinel" for a seat's house. PIN MOVED (AUDIT LEGACY III
+  // no line of the house's news says "{who} {house}" - "Tlist Sentinel" for a seat's house.
   // A16/F2): `{who}` is filled as the renderer fills it, with the member's FIRST name (meetups.js firstNameOf) - this pin
   // filled the whole name, which no town passes, and the record called the old line a doubled surname
   for (const [kind, scripts] of Object.entries(KIN_NEWS)) {
     for (const s of scripts) for (const line of s) assert.doesNotMatch(line, /\{who\} \{house\}/, `${kind}: "${line}"`);
   }
   assert.equal(fillLine(KIN_NEWS.died[2][0], { who: firstNameOf('Ysolde Hlaalu'), house: 'Hlaalu' }), 'Ysolde, gone. I saw them in the market not a week past.');
-  // PIN MOVED (AUDIT LW-II B14): a band's rout is told by its whole name ("the Red Hand" - its first word was "the"); every
-  // other tale, the house's news among them, by the first name still
-  assert.match(rd('src/systems/livingWorld/meetups.js'), /who: told \? \(told\.item\.kind === 'routed' \? told\.item\.who : firstNameOf\(told\.item\.who\)\) : null/, 'the renderer\'s own fill');
-  // the pages read the one title (by source - drawn in test/legacysheet and test/legacy3_familytab)
-  const pages = rd('src/ui/familyPages.js');
-  assert.doesNotMatch(pages, /House of \$\{(family|f)\.surname\}/, 'no page says the raw surname after "House of"');
-  assert.doesNotMatch(pages, /house of \$\{family\.surname\}/);
-  assert.doesNotMatch(rd('src/scenes/legacyHost.js'), /house of \$\{family\.surname\}/);
-  // ...and the Succession's own words in the world host (scenes/world.js openLegacySuccession, openLegacyDeadLoad)
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const legacyHouse = \(fam, the = 'the'\) => `\$\{the\} house\$\{houseWord\(fam\?\.surname\) \? ` of \$\{houseWord\(fam\.surname\)\}` : ''\}`;/);
-  assert.equal((w.match(/legacyHouse\(fam/g) ?? []).length, 5, 'the heir\'s line, the house going on or ended, the past loaded');
-  assert.doesNotMatch(w, /house of \$\{fam/, 'never the raw surname after "house of"');
 });

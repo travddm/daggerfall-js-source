@@ -1,5 +1,4 @@
-// SWING-SAY (2026-09-22, Mac: "its not working on the install but works
-// on the browser. Each time I bring this up you avoid it").
+// SWING-SAY.
 //
 // THREE REPORTS, TWO SHIPPED FIXES, AND THE REPORTS CONTINUE.
 // MAC-SWING1 found a swing bound to a key that nothing read; MAC-D1

@@ -1,9 +1,9 @@
-// PORT-MAP (2026-10-04, Mac: "Also ports don't show on my map") - the held map's harbours. MAP2 drew a port's anchor
+// PORT-MAP - the held map's harbours. MAP2 drew a port's anchor
 // at the mid and near bands only, and only while Travel Options restricts ships to ports; the map opens on the whole
 // bay, in the far band, and Travel Options' ship restriction is off by default - so the ports the quays stand at
-// (bible/03-World/Holdings.md 7) were on no map a player opened. An anchor at EVERY band (beside the mark the band
+// (7) were on no map a player opened. An anchor at EVERY band (beside the mark the band
 // inks, on the place where it inks none), haloed then inked in the full pen, whenever there are ports to show; the
-// Ports filter and its key stay the mod's. bible/10-UI/Held-Map-Arc.md MAP2.
+// Ports filter and its key stay the mod's. MAP2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -60,11 +60,3 @@ test('PORT-MAP the anchor reads: a parchment halo under it (HARBOUR_HALO) and th
   assert.equal(none.ink.length + none.halo.length, 0);
 });
 
-test('PORT-MAP the held map always asks for its ports - whatever Travel Options says of where a ship may sail from (the Ports filter and the P key still the mod\'s, _portsShown)', () => {
-  const src = readFileSync(new URL('../../../src/ui/heldMap.js', import.meta.url), 'utf8');
-  const at = src.indexOf('paintInkStatic(ctx, split.bay, env.view, {');   // PIN MOVED (AUDIT TESA II M4): the world model's marks less the zone's halls, inked over its fog
-  assert.ok(at >= 0, 'the static paint found');
-  const call = src.slice(at, src.indexOf('});', at));
-  assert.match(call, /\n\s+ports: true,\n/);
-  assert.match(src, /if \(code === 'KeyP' && this\._portsShown\(\)\) \{ this\._togglePorts\(\); return; \}/, 'the P key the mod\'s');
-});

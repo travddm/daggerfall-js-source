@@ -1,4 +1,4 @@
-// DEX4a (2026-10-20, bible/04-Characters/Enemy-Expansion.md section 8) - DAGGERFALL ENEMY EXPANSION'S SPELLBOOKS.
+// DEX4a - DAGGERFALL ENEMY EXPANSION'S SPELLBOOKS.
 // ParseSpellbookTables (BestiaryMod.cs:1884-1954) names thirteen tables of one book each - DFU's own thirteen career
 // lists (EnemyEntity.cs, systems/enemySpells.js MONSTER_SPELL_LISTS) - and "Class", a ladder of seven books by the
 // enemy's level; a row's raw `Spellbook` cell is a table of its own, named after the enemy's id (:1274-1290, read by

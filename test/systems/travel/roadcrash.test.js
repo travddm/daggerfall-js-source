@@ -1,5 +1,4 @@
-// ROAD-CRASH (2026-09-23, Discord through Mac: "crashes while traveling
-// on roads with travel options") - THE RING WALK'S DEAD FRAME, and the
+// ROAD-CRASH - THE RING WALK'S DEAD FRAME, and the
 // recovery walk's give-up.
 //
 // FollowPath's third arm walks the border ring of a town

@@ -1,5 +1,5 @@
-// CLASS-USE (2026-10-21): the eighteen stock classes' revised skill lists (src/systems/stockClasses.js,
-// bible/04-Characters/Stock-Classes.md). The rules are pinned as rules, so a revision that breaks one fails here
+// CLASS-USE: the eighteen stock classes' revised skill lists (src/systems/stockClasses.js,
+// ). The rules are pinned as rules, so a revision that breaks one fails here
 // whatever class it touches, and the producers' wiring runs on records the real reader mints, so CI holds it without
 // ARENA2; the real-data half holds the copied restrictions to the files and drives the classic skin's own art load.
 import { test } from 'node:test';

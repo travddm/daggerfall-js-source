@@ -1,5 +1,5 @@
 // @ts-check
-// IC-GRAND (bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY'S FABRIC, BUILT: the meshes of its streets'
+// IC-GRAND (IC-GRAND) - THE IMPERIAL CITY'S FABRIC, BUILT: the meshes of its streets'
 // buildings (world/imperialFabric.js lays them out) - near, a cell's every building whole with its ledges, balconies,
 // parapets, pavements, the ways up and the bridges between its roofs, its yards' walls, the park's statues and the
 // sewers' covers in its streets (world/imperialSewers.js); far, a slice's blocks as masses (its skyline). In the city's
@@ -13,7 +13,7 @@
 // a picture (64 texels: vanilla's density); a flat roof's, a pavement's and a stone's pictures in the world's metres, so
 // they run on across their neighbours.
 //
-// BLD (the owner, 2026-10-26, walking the city: "some windows are upside down"): A PICTURE'S TOP ROW IS AT v = 0 FROM
+// BLD: A PICTURE'S TOP ROW IS AT v = 0 FROM
 // BELOW, ITS ROWS DOWN THE WALL AT v FALLING - Daggerfall's own models' law (world/meshReader.js: v = -(texel row /
 // height)), because every picture reaches the GL bottom-up (formats/color32Order.js: row 0 of the buffer the picture's
 // BOTTOM row - the stand-in door's toColor32, systems/textureReplacement.js) and the GL samples it unflipped. The fabric

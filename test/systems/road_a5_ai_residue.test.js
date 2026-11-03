@@ -234,7 +234,7 @@ test('a5 pins: the three foe pools fold the flag, build the closure, and hide th
     // The candidate's concealment closure BlockedByIllusionEffect reads.
     assert.ok(/concealment: \{ value: \(\) => concealmentFlags\(|'concealment', \{ value: \(\) => concealmentFlags\(/.test(src),
       `${file}: the foe candidate carries concealment()`);
-    // EntityConcealmentBehaviour's renderer disable. ECV1 (2026-09-07):
+    // EntityConcealmentBehaviour's renderer disable. ECV1:
     // the skip is foeDraw's answer now - `hidden` on the classic skin or
     // with Enhanced Combat Visuals off (systems/combatVisuals.js pins
     // that), and the host still takes it verbatim.

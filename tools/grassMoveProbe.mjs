@@ -29,7 +29,7 @@
 // (process.cpuUsage), which a shared machine's other load does not lengthen as it does the wall clock's (printed
 // beside it); the candidate and cell counts are exact and deterministic. The upload (bufferSubData) is a recorded
 // call here, so a cell's GPU copy is not in the time. The record and its decision:
-// bible/07-Rendering/Performance-Exterior.md, THE GRASS ON THE MOVE (FB1021B).
+// THE GRASS ON THE MOVE (FB1021B).
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';

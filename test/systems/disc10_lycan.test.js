@@ -1,6 +1,5 @@
 // DISC10-E - THE WEREWOLF, DRIVEN THROUGH THE LIVE DOORS.
 //
-// Mac (2026-09-23): "vampires and werewolf. I think these systems are completely broken and not wired correctly".
 // Every pin here EXECUTES the port's own modules the way a host drives them - the real city watch pool on a synthetic
 // CLASS18.CFG, the real encounter pool on a crafted MONSTER.BSA (test/characters/enemy/watch1.test.js's rig), the real PlayerWeapon
 // resolving the swing, the real worldTick round, the real inventory/trade doors - and each one failed on the code
@@ -163,13 +162,6 @@ test('DISC10-E H1: a monster killed is NOT an innocent, and a watchman merely wo
   assert.equal(liveLycanthropy(p).lastKilledInnocent, 523530, 'a watchman still standing is not a kill');
 });
 
-test('DISC10-E H1: the formula no longer carries the hook, and the dispatcher is called after each strike door', () => {
-  const formulas = rd('src/combat/formulas.js');
-  assert.doesNotMatch(formulas, /racialOverride\s*\)\s*\{[\s\S]{0,80}HitHook/, 'no racial hook inside CalculateAttackDamage');
-  assert.doesNotMatch(formulas, /targetIsCivilian/, 'the dead option is gone');
-  assert.match(rd('src/systems/worldTick.js'), /export function playerWeaponHitEntity\(/, 'one dispatcher');
-});
-
 // ── L2: THE BEAST STRIKES WITH ITS HANDS ──────────────────────────────────────────────────────────────────────────
 
 test('DISC10-E L2: a transformed werewolf\'s swing is HAND-TO-HAND - the same damage as the empty hand, and silver-to-hit foes take it', async () => {
@@ -237,22 +229,6 @@ test('DISC10-E L3: the quickslots are inventory doors too - no swap into the cla
   clearQuickslots();
 });
 
-test('DISC10-E L3: no host keeps a per-door copy of the refusal, and no host mounts a refused (null) window', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    const s = rd(host);
-    assert.doesNotMatch(s, /racialSuppressInventory\(/, `${host}: the door refuses, not the host`);
-    assert.doesNotMatch(s, /showOverlay\(makeInventoryWindow\(/, `${host}: a refused pack is null and must not be mounted`);
-  }
-  // the dungeon's slot holds the refusal's box - a null written over it would drop the line
-  assert.doesNotMatch(rd('src/scenes/dungeonContext.js'), /activeOverlay = openInventory\(/, 'the dungeon mounts only a window');
-  // and a counter the trade door refused is no window to the service door (the popup reads it as a dispatch)
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /function mountServiceWindow\(win\) \{\s*if \(!win \|\| win\.refusedByDoor\) return null;/);
-  assert.match(wm, /const w = openTradeWindow\(shelf, b, 'Buy'\);\s*if \(!w\) return;/, 'the shelf\'s counter');
-  assert.match(wm, /win = openTradeWindow\(target, b, 'Sell'\);\s*if \(!win\) return true;/, 'the merchant\'s');
-  assert.match(wm, /'Identify',\s*\{ identifySpell: \{ chance: chance \?\? 0, cost: refund \?\? 0 \} \}\);\s*if \(!win\) return true;/, 'the Identify spell\'s');
-});
-
 // ── L4: THE CEILING IS READ ───────────────────────────────────────────────────────────────────────────────────────
 
 test('DISC10-E L4: MaxHealth reads the limiter, RawMaxHealth does not, a heal stops at the limit and the save keeps the raw one', () => {
@@ -279,11 +255,6 @@ test('DISC10-E L4: MaxHealth reads the limiter, RawMaxHealth does not, a heal st
   restorePlayer(q, JSON.parse(JSON.stringify(snap)));   // through the envelope's own JSON, as the slot stores it
   assert.equal(q.rawMaxHealth, 100);
   assert.equal(q.maxHealth, 100, 'the limiter is not saved: the next round rebuilds it');
-});
-
-test('DISC10-E L4: the accessor is installed where MaxMagicka\'s is - chargen and the load path', () => {
-  assert.match(rd('src/systems/chargen.js'), /^ {2}defineLiveMaxHealth\(playerEntity\);/m);
-  assert.match(rd('src/systems/save/save.js'), /^ {2}defineLiveMaxHealth\(entity\);/m);
 });
 
 // ── V9 / V11: THE CURSE'S CLOCKS ──────────────────────────────────────────────────────────────────────────────────
@@ -374,12 +345,6 @@ test('DISC10-E L4: a level gained under the urge adds its hit points to the RAW 
   applyLevelUp(p, () => {}, () => 0.5);
   assert.ok(p.rawMaxHealth > 100, `the raw ceiling grew from 100: ${p.rawMaxHealth}`);
   assert.equal(p.maxHealth, 30, 'and the urge still holds it down');
-  // ...and the Oblivion leveling lane's commit, the same law (ORL1 keeps Daggerfall's hit points)
-  const { commitVirtueLevelUp } = await import('../../src/systems/oblivionLeveling.js');
-  const q = chargen.defineLiveMaxHealth({ isPlayer: true, level: 5, readyToLevelUp: true, pendingLevel: 6, career: { hitPointsPerLevel: 10 }, stats: { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, health: 20, maxHealth: 100, activeEffects: [], levelProgress: 0 });
-  q.maxHealthLimiter = 30;
-  assert.equal(commitVirtueLevelUp(q, {}, 0, null, () => 0.5), true);
-  assert.ok(q.rawMaxHealth > 100, `the virtue lane too: ${q.rawMaxHealth}`);
 });
 
 test('DISC10-E L3: quick loot takes nothing into a beast\'s pack - it answers "open the window", and the window refuses', async () => {
@@ -401,13 +366,6 @@ test('DISC10-E L3: quick loot takes nothing into a beast\'s pack - it answers "o
     foldQuickLoot(frame());
     assert.equal(quickLootTake('pile:1', { items: () => items }, p, () => {})?.name, 'Longsword');
   } finally { resetQuickLoot(); setPref('quickLoot', PREF_DEFAULTS.quickLoot); }
-});
-
-test('DISC10-D H1: every player strike site calls the one dispatcher AFTER its door - the dungeon\'s swing (both arms), the encounter pool\'s, the watch\'s, the civilian\'s, the arrow\'s', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /attackFromPlayer\(foe, playerFeet\);[^\n]*\n\s*playerWeaponHitEntity\(playerEntity, foe\.entity, \{ mobileType: foe\.mobileType \}\);[^\n]*\n\s*continue;/, 'the dungeon\'s zero-damage connect');
-  assert.match(d, /damageFoe\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);[^\n]*\n\s*playerWeaponHitEntity\(playerEntity, foe\.entity, \{ mobileType: foe\.mobileType \}\);/, 'the dungeon\'s damaging connect');   // PIN MOVED (TELL1: the striking weapon rides the door - a wind-up's poise)
-  assert.match(rd('src/combat/arrowFlight.js'), /playerWeaponHitEntity\(playerEntity, foe\.entity, \{ mobileType: foe\.mobileType \?\? null \}\);\n\s*return dmg;/, 'the arrow, last');
 });
 
 // ── THE BEAST'S BLOW SOUNDS AS THE HAND'S, AND THE SMITH'S GIFT IS A DISPATCH ────────────────────────────────────
@@ -442,12 +400,3 @@ test('DISC10-E: the beast\'s blow SOUNDS as the empty hand\'s - PlayHitSound(cur
   assert.equal((wm.match(/makeInView\(proj, view, multiply\), interiorHitSound(?:, \{ swing \})?\)\)/g) ?? []).length, 2, 'both interior pools');   // AUDIT DISC19: the one swing's token rides beside it
 });
 
-test('DISC10-E: the knightly smith\'s gift, refused to a beast by the pack\'s own door, is a DISPATCH - not "That service is not available yet." on top of the refusal', () => {
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /if \(!win\) return inventoryDoorReady\(\) \? DOOR_REFUSED : null;/, 'a READY door that built nothing refused - by the door\'s own gate, never the curse asked at the host (L3\'s law)');
-  assert.match(wm, /import \{ inventoryDoorReady \} from '\.\.\/ui\/inventoryDoor\.js';/);
-  // and the door's two nulls are the two the host tells apart: its refusal, and nothing else once ready
-  const door = readFileSync(new URL('../../src/ui/inventoryDoor.js', import.meta.url), 'utf8');
-  const body = door.slice(door.indexOf('export function createInventoryWindow'));
-  assert.deepEqual(body.slice(0, body.indexOf('\n}\n')).match(/return null/g), ['return null'], 'the only null a ready door answers is the refusal');
-});

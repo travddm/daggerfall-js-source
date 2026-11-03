@@ -1,4 +1,4 @@
-// FT15 (2026-09-15): THE READING RAIL, MEASURED AND JUDGED.
+// FT15: THE READING RAIL, MEASURED AND JUDGED.
 //
 // Mac's complaint - "reduce the overexplanation wall of text within
 // featured categories" - is about a length, so it needs a number the
@@ -42,7 +42,7 @@ await page.goto(`${BASE}/play/?nointro`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.px-menu');
   if (await page.locator('.px-acctstage').count()) await page.keyboard.press('Escape');
 await page.waitForSelector('.px-menu button');
-// ORG2 (2026-10-09): the Features home is the Settings screen's tabs, and the reading rail is its help pane - a row's
+// ORG2: the Features home is the Settings screen's tabs, and the reading rail is its help pane - a row's
 // name is PRESSED to pick it (a hover is no gesture on a phone). Every tab is walked, so every registry row is read.
 await page.locator('.px-menu button').filter({ hasText: /Settings/ }).first().click();
 await page.waitForSelector('#enhanced-menu .subbtn');

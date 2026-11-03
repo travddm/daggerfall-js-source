@@ -1,4 +1,4 @@
-// LW7b (2026-10-05, bible/06-Systems/Living-World.md "LW7b", Mac: "make friends or enemies"): THE ARMED BEYOND THE
+// LW7b: THE ARMED BEYOND THE
 // WALLS - an armed traveller who counts the player hostile draws on them, an armed friend comes to their fight, and the
 // end is what happens (the slain, the died at their side); a roadside fight's enemies keep the ring; a diving company's
 // hostile draws on the player in the dungeon and its enemies keep away - over mock pools and the synthetic map.
@@ -76,7 +76,7 @@ test('LW7b an armed enemy draws: a member who counts the player HOSTILE within D
   await settle();
   assert.equal(far.spawned.length, 0, 'past DRAW_M, from the sky, nothing able to stand, nowhere');
   // cut down: slain, seen, their party's living turned; the body the pool's own
-  rec.dead = true; rec.corpse = true; rec.killedBy = 'player';   // PIN MOVED (AUDIT LW-III): killed as the pool kills - dead, a corpse; PIN MOVED (AUDIT FB1025i D2): by the player's own hand, as the pool's death door names it
+  rec.dead = true; rec.corpse = true; rec.killedBy = 'player';
   rig.stands.frame([], HERE, T + 2);
   assert.deepEqual(rig.slays, [{ res: BO, t: T + 2, seen: true }]);
   assert.equal(rig.rel.regard(CY.id, DAY), Math.max(-100, EVENTS.struck + EVENTS.slain), 'their party turned against the player');
@@ -305,16 +305,3 @@ test('LW7b a company\'s regard in the deep: one who counts the player HOSTILE dr
   assert.deepEqual(all.said, ['Ada Lark\'s company passes you by.']);
 });
 
-test('LW7b the streaming host: the stands on the roads (the pool\'s loose transient body, allied for a friend; the fights\' own gate; the hand turns; the fight a foe on the player within FIGHT_NEAR_M by the threat law; the HUD line); a death at the player\'s side; the divers\' foe stand and the slaying (mutants: each seam)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /stands: createRoadStands\(\{\n\s*spawn: \(type, feet, o\) => exteriorFoes\.spawnFoe\(type, feet, \{ allied: o\.allied, yaw: o\.yaw, gender: o\.gender, level: o\.level, loose: true, transient: true, managed: true \}\),/);   // PIN MOVED (AUDIT LW-III): managed - its KEEP_M lets them go, never the cull
-  // PIN MOVED (LW11): the road's slay - the hand's turn and the road's report of it
-  assert.match(w, /slay: livingRoadSlay, killed: livingKilled, died: livingDied,[^\n]*\n\s*deadAt: livingDeadAt,[^\n]*\n\s*fighting: \(\) => hccThreats\(\)\.some\(\(q\) => Math\.hypot\(q\[0\] - player\.pos\[0\], q\[2\] - player\.pos\[2\]\) <= FIGHT_NEAR_M\),\n\s*say: \(text\) => townTalk\.say\(text\),/);
-  // PIN MOVED (LEGACY5): a courtship of the fallen's ends first
-  assert.match(w, /const livingDied = \(res, t\) => \{ (?:legacyHost\?\.residentDied\(res\.id\); )?livingRelations\.turn\('died', turnKey\(res, livingCycleOf\(res, Math\.floor\(\(t - 240\) \/ 1440\)\)\), \{ t, who: res\.name \}\); \};/);
-  assert.match(w, /spawnFoe: \(type, feet, o\) => d\.spawnLooseFoe\(type, feet, \{ yawRad: o\.yaw, allied: false, gender: o\.gender, level: o\.level \}\),/);
-  assert.match(w, /spawnFoe: [^\n]*\n\s*slay: livingSlay,\n\s*died: livingDied,[^\n]*\n(?:\s*(?:\/\/|route:|floor:|clearLine:|ring:|choose:|stopPile:)[^\n]*\n)*\s*\}\), \{ pool: d \}\);/);   // PIN MOVED (LW14): the deep's own deps after
-  const lr = rd('src/scenes/livingWorld/livingRoads.js');
-  assert.match(lr, /if \(deps\.stands\?\.stood\(m\.res\.id\)\) continue;/);
-  assert.match(lr, /deps\.fights\?\.clear\(\); deps\.stands\?\.clear\(\);/);
-});

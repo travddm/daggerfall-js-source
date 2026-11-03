@@ -2,10 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // DISC23-B2 — THE SKIN, ON THE PLAYER'S PROFILE.
 //
-// Mac (2026-09-24, over Gryphoth's and Scratchie's reports): "for the
-// EoTB mod, I want to utilize it and make it a choosable skin system in
-// the menu player profile system itself instead of it being hidden in
-// the feature menu".
 //
 // WHO YOU ARE DRAWN AS is a fact about the player, not a feature of the
 // game, so it sits on the profile window the door's profile mark opens -
@@ -28,9 +24,7 @@
 // sprite body at all, so the card says so and offers the switch rather
 // than laying out a grid that would change nothing.
 //
-// SKIN2 (2026-09-25, Mac: "Reorganize the skin selector as 2 single
-// panels for unmounted/mount that can be opened to view available
-// skins"): with Daggerfall's twenty classes beside the mod's sixteen the
+// SKIN2: with Daggerfall's twenty classes beside the mod's sixteen the
 // grids had grown to fifty-seven pictures down the profile. The card is
 // two panels now, ON FOOT and MOUNTED, each closed to the skin worn - its
 // picture and its name, which is what the card is asked most - and
@@ -38,10 +32,7 @@
 // the classes under their own headings). One opens at a time; choosing a
 // skin wears it and closes the panel on it.
 //
-// LAYERED-GEAR (2026-10-18, the owner: "add a option between those two thats
-// also called On foot Layered Gearing Skin (WIP) Female and Male"; 2026-10-19,
-// merging it: "These need a proper toggle in the account profile for players
-// to either equip skins or use this integration"): the card opens on a toggle,
+// LAYERED-GEAR: the card opens on a toggle,
 // LOOK: SKINS | LAYERED GEARING (WIP). Skins is the two panels above. Layered
 // Gearing draws the body on foot in the helmet, chest and leg armor it wears
 // (player/eyeOfTheBeholder/layeredArmor.js), in the body chosen - Female or
@@ -54,7 +45,7 @@
 // opens on Layered Gearing in the character's own body until a body or Skins
 // is chosen. Turned on again, it wears the body last chosen this session, else
 // the character's own; turned off, the on-foot skin chosen before is worn
-// again (bible/04-Characters/Layered-Gearing.md).
+// again.
 //
 // Not a DFU member: Daggerfall Unity has no profile and no skins. The
 // sprites are the vendored mod's (vendor/eye-of-the-beholder).

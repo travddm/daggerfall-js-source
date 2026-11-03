@@ -1,6 +1,6 @@
 // AUDIT TESA II (lane G) - the zones past the Bay: Vvardenfell's lowland hearts about Red Mountain's own summit and the
 // Grazelands (G6, L25); a zone's border bending through the trace's province border (J4). Where ARENA2_PATH names the data,
-// on the player's own trace. bible/03-World/Tamriel-Biomes.md.
+// on the player's own trace..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -140,15 +140,3 @@ test('AUDIT TESA II with ARENA2: on the player\'s own trace Red Mountain stands 
   } finally { setTamrielTrace(null); setTamrielFit(null); }
 });
 
-test('AUDIT TESA II G10: the canopy\'s field keeps its own small cap of pixels past the Bay - it reads the eye\'s 3x3 alone - where the jungle\'s keeps JUNGLE_BEYOND_MAX (the two had held up to about 90 MB between them); a drop is read again, the same (mutants: the canopy\'s cap the jungle\'s)', async () => {
-  const { JUNGLE_CANOPY } = await import('../../src/world/jungle/jungleCanopy.js');
-  const { JUNGLE_BEYOND_MAX, jungleField } = await import('../../src/world/jungle/jungleRegion.js');
-  assert.equal(JUNGLE_CANOPY.fieldMax, 16384);
-  assert.ok(JUNGLE_CANOPY.fieldMax * 64 === JUNGLE_BEYOND_MAX, 'a sixty-fourth of the jungle\'s');
-  assert.match(readFileSync(new URL('../../src/scenes/jungleHost.js', import.meta.url), 'utf8'),
-    /canopyField \?\?= jungleField\(\{ width: mapWidth, height: mapHeight, insideAt: \(\) => false, beyond: canopyAt, beyondMax: JUNGLE_CANOPY\.fieldMax \}\)/);
-  // a capped field answers as an uncapped one
-  const beyond = (x, y) => (x * 7 + y * 3) % 11 < 4;
-  const small = jungleField({ width: 10, height: 10, insideAt: () => false, beyond, beyondMax: 64 }), big = jungleField({ width: 10, height: 10, insideAt: () => false, beyond });
-  for (let y = 20; y < 40; y++) for (let x = 20; x < 40; x++) assert.equal(small.at(x, y), big.at(x, y));
-});

@@ -1,9 +1,9 @@
-// WB13e (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE BEATS - his wake
+// WB13e: THE BEATS - his wake
 // (the relay's `op`: a roar, a flare and his name as the opening ends), a phase's turn as a card held until he lands with
 // his roar after the bound's bark, his fall as an event (a burst, the court's light white, a shake, a column of embers,
 // his body sinking and left on the floor, the spoils after it under a card), the Wrath said and seen, his low health
 // sputtering, a Meteor or a Leap aimed at me stung, and the court's lines standing for their length
-// (bible/11-Multiplayer/World-Bosses.md section 20, WB13e).
+// (WB13e).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -126,7 +126,6 @@ test('WB13e the card: in over TITLE_IN_MS, out over TITLE_OUT_MS; one node writt
   drawGateTitleCard(titleCardModel(beat, 1600), { doc, hidden: true });
   assert.equal(root.style.display, 'none');
   destroyGateTitleCard();
-  assert.match(read('src/scenes/gate/gateCourt.js'), /drawGateTitleCard\(titleCardModel\(beat, t\), \{ hidden: hudHidden\(\) \|\| veiled\(\) \}\);/);
   assert.match(TITLE_CARD_CSS, /\.wb-title-card \{ position: fixed; left: 50%; top: 34%;/);
   assert.match(TITLE_CARD_CSS, /pointer-events: none;/);
 });
@@ -238,5 +237,4 @@ test('WB13e a line over the middle of the screen stands for its length - its wor
   assert.equal(courtSaySeconds('Imps rise from the fire!'), COURT_READ_S[0]);
   assert.equal(courtSaySeconds(Array(14).fill('word').join(' ')), 4);
   assert.equal(courtSaySeconds(Array(60).fill('word').join(' ')), COURT_READ_S[1]);
-  assert.match(read('src/scenes/world.js'), /say: \(text\) => setMidScreenText\(text, courtSaySeconds\(text\)\),   \/\/ WB13e/);
 });

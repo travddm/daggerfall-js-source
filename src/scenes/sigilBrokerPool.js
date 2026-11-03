@@ -1,11 +1,9 @@
 // @ts-check
-// SET7 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 7; Mac: "Sigil stones become a currency to
-// trade for daily reset sigil items at a new NPC vendor that stands outside the oblivion gate"): THE SIGIL BROKER, WHERE
+// SET7: THE SIGIL BROKER, WHERE
 // SHE STANDS - the pool on the runtime pools' shape (scenes/camps.js, scenes/gate/gatePool.js): her body, the eye's box and
 // her name, and the press on her.
 //
-// BROKER-CAGE (2026-10-02, Mac: "she should be present at the site in a jailed gate, and the gate opens after all the
-// enemies are cleared"): SHE IS THE FAITHFUL'S PRISONER, CAGED AT THEIR CIRCLE. Her cage stands at a spot in the circle's
+// BROKER-CAGE: SHE IS THE FAITHFUL'S PRISONER, CAGED AT THEIR CIRCLE. Her cage stands at a spot in the circle's
 // own frame (net/gate/gateRite.js riteLocalOf; world/riteModel.js: its heart, `facing` the bearing to the gate) - CAGE_R out,
 // turned CAGE_TURN from the gate's bearing: outside the braziers, on the gate's side, away from the casket - so every
 // player in the Bay finds her where every other does, and a floating-origin recentre carries her with the land. She
@@ -138,7 +136,7 @@ export function cageTraps(at, rest, f) {
   return Math.abs(lx) < CAGE_W / 2 + reach && Math.abs(lz) < CAGE_D / 2 + reach && f[1] < at[1] + CAGE_H && f[1] + CAPSULE_HEIGHT > at[1] - CAGE_FOOT;
 }
 
-/** AUDIT SET W1 (2026-09-27): would her post, stood at feet `at`, rise around a body whose feet are at `f` (the motor's
+/** AUDIT SET W1: would her post, stood at feet `at`, rise around a body whose feet are at `f` (the motor's
  *  capsule, CAPSULE_RADIUS x CAPSULE_HEIGHT)? The post wider than a hand but narrower than the capsule, four walls
  *  pushing a body centred in it cancel out - a player standing on her spot as the gate stood whole was SEALED IN (the
  *  WBX W1 seal the gate's stone had). The post's square, the capsule's radius about it, the heights overlapping. Pure. */

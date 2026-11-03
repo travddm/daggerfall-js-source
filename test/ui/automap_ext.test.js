@@ -717,7 +717,6 @@ test('A2 wiring pins: the M-outside dispatch in both exterior hosts, gated on a 
     assert.ok(arm > g, `${host}: and M-outside sits inside that gate`);
   }
   const w = src('src/scenes/world.js');
-  // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): `townHere` answers null off a location, and the M key opens nothing without one
   assert.match(w, /if \(!dfLoc \|\| !b\?\.locBlocks \|\| !b\.locOrigin\) return null;/, 'empty wilderness builds nothing');
   assert.match(w, /const here = townHere\(\);\n\s+if \(!here\) return;/, 'empty wilderness opens nothing');
   // EM4: the town map is behind a SKIN DOOR now - the classic skin
@@ -821,7 +820,6 @@ test('A2 grayscale pins: the shader law and the two-tier dungeon pass (Daggerfal
   assert.match(aw, /const run = this\.deps\.insideBuilding \? null : rec\.visitedThisRun;/, 'inside a building there is no prior-run tier');
   assert.match(aw, /const row = \(run === null \|\| run\.has\(key\)\) \? visited : prior;/, 'the prior-run predicate (RENDER_IN_GRAYSCALE)');
   assert.match(aw, /setClipY\(null\);\n\s*renderer\.setAutomapMode\(AUTOMAP_MODE\.OFF\);/, 'beacons ride neither the slice nor the tint');
-  // PIN MOVED, ROAD-C c2/S2: the automap mode is one of the globals
   // renderer.panelFrame saves and returns in its own finally, so the
   // window's hand-rolled restore list is gone. The throwing-body
   // proof lives in test/ui/automap/roadc_panelframe.test.js, where it runs
@@ -1246,7 +1244,6 @@ test('D5 the residence-with-active-quest plate arm: ExteriorAutomap.cs:693-709\'
     // the M-outside door of the host that HAS a quest machine, between
     // the summaries walk and the window, on DFU's own three inputs.
     const wsrc = src('src/scenes/world.js');
-    // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): the plates are built in `townHere`
     const at = wsrc.indexOf('const townHere'), door = wsrc.slice(at, wsrc.indexOf('\n  };\n', at));   // HOST-SPLIT 2: the toggle, wherever it lives (scenes/exteriorAutomapToggle.js)
     assert.match(door, /\n {4}stampResidenceQuestNames\(summaries, discoveredBuildings\(locId\), \{/);
     assert.match(door, /getAllActiveQuestIds: host\.activeQuestIds,/, 'QuestMachine.GetAllActiveQuests, the tree\'s own definition');   // HOST-SPLIT 2: a live name, read through the handle

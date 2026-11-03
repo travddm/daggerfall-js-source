@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WW1 (2026-10-24, bible/03-World/World-Wide.md) - THE WORLD'S GRID: the one key, the theatres and the areas every
+// WW1 - THE WORLD'S GRID: the one key, the theatres and the areas every
 // system reads once the world is more than the Iliac Bay.
 //
 // The owner: "My goal for you is expanding our systems, if not already, out into the entire world. Living world,

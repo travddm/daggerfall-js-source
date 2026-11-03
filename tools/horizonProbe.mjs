@@ -1,5 +1,4 @@
-// MID-RING / FAR-FIELD (2026-10-26, the owner: "expand the overworld view distance without killing performance. Currently
-// tiles visibly load in with distance"; bible/06-Systems/Travel-View.md MID-RING): THE OVERWORLD'S HORIZON, LAYER BY LAYER,
+// MID-RING / FAR-FIELD: THE OVERWORLD'S HORIZON, LAYER BY LAYER,
 // IN THE REAL GAME.
 //
 // The world host boots (Knightstale, Wayrest, at noon in the sun by default), the Overworld is raised, and the probe waits -

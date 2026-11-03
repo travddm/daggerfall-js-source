@@ -1,5 +1,5 @@
-// GATE-MIX (2026-10-20): the limiter every bus reaches the speakers through - systems/audio.js LIMITER, limiterCurve,
-// AudioEngine._limiter. Design: bible/08-Audio/Audio.md, "GATE-MIX".
+// GATE-MIX: the limiter every bus reaches the speakers through - systems/audio.js LIMITER, limiterCurve,
+// AudioEngine._limiter. Design:, "GATE-MIX".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

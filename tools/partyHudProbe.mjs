@@ -1,6 +1,4 @@
-// PARTY8 (Mac, 2026-09-22: "increase the party limit to 8, and also redesign
-// the party UI so it doesnt clutter the screen into a better enhanced
-// design") - THE PARTY HUD AT A FULL PARTY, in a real browser.
+// PARTY8 - THE PARTY HUD AT A FULL PARTY, in a real browser.
 //
 // What only a browser can prove: the stack of seven companions' cards on
 // the enhanced skin's sheet - its width, its height against the viewport,
@@ -9,7 +7,7 @@
 // (test/net/soc4_partyhud.test.js); here the numbers the screen shows are read
 // back off the DOM.
 //
-// PARTY8-B (Mac: "B" - quiet rows): the same seven, now with `here` set
+// PARTY8-B (- quiet rows): the same seven, now with `here` set
 // to Daggerfall so the rows read as the design means them to - Bran's
 // place line gone (with me), the dungeon seat's kept, the digits drawn
 // only on the seats under half health.

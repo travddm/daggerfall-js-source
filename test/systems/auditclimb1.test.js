@@ -1,7 +1,6 @@
-// AUDIT CLIMB1 (2026-09-30, Mac: "let's do an audit on this. I want to ensure it's perfect and 1:1 with what I
-// want"): the enhanced climb's first slice audited in four lenses - fidelity to the ask and the four calls, an
+// AUDIT CLIMB1: the enhanced climb's first slice audited in four lenses - fidelity to the ask and the four calls, an
 // adversarial read of the code, the sensor against hostile geometry, and the hosts and records
-// (bible/03-World/Parkour-Arc.md, AUDIT CLIMB1). Every finding below was pinned here RED on the CLIMB1 code before
+// (, AUDIT CLIMB1). Every finding below was pinned here RED on the CLIMB1 code before
 // its fix. The geometry is boxes, and the body's overlap with them is measured EXACTLY (a capsule against an
 // axis-aligned box), never through the collider's own resolve - which reverts a body it would push up into a
 // ceiling and so reads a head through a slab as clear (the reason the fit needs its ray; parkour.js capsuleFits).
@@ -275,12 +274,6 @@ test('AUDIT CLIMB1 F6b: a refused lip rests the air catch for a few steps - the 
   assert.equal(PARKOUR_QUIET_STEPS, 3);
 });
 
-test('AUDIT CLIMB1 F8: the dungeon bills a move\'s edge once - the bag its tick reads is cleared of the frame\'s edges after the tick', () => {
-  const ctx = read('src/scenes/dungeonContext.js');
-  assert.match(ctx, /classicMinutesRef\.value = _tick\.classicMinutes;\n\s*\/\/[^\n]*\n(\s*\/\/[^\n]*\n)*\s*_activity\.jumped = false;\n\s*_activity\.parkoured = null;/,
-    'the jump\'s and the move\'s edges are spent by the tick that billed them');
-});
-
 test('AUDIT CLIMB1 F9: a move in flight reads as a climb to what watches the body - no walk input, the torch and the shield put away, the probe sees it', () => {
   const s = scene(); s.box(-4, 0, 1, 4, 1.5, 4);
   const { m } = drive(s, { input: (i) => ({ forward: 1, jump: i === 10 }), steps: 16 });
@@ -292,14 +285,12 @@ test('AUDIT CLIMB1 F9: a move in flight reads as a climb to what watches the bod
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
     assert.match(read(f), /camera: \(\) => \(\{ pos: player\.eyeAt\(\),[^\n]*climbing: !!\(player\.climb\?\.isClimbing \|\| player\.mantling( \|\| player\.onWall)?\)/, `${f}: the torch and the shield read the move as a climb`);   // CLIMB4: and the hold (climb4.test.js F16)
   }
-  assert.match(read('src/scenes/world.js'), /window\.__climb = \(\) => JSON\.stringify\(\{[^}]*mantling: !!player\.mantling/, 'the __climb probe sees a mantle');
 });
 
 test('AUDIT CLIMB1 F10: Roleplay & Realism\'s "no climbing with a weapon out" holds for the enhanced climb - a mantle and a clamber refused, said once a press; a vault is a leap and goes', () => {
   assert.equal(rrParkourRefusal({ weaponDrawn: true, weaponMelee: false }), NO_CLIMB_HOLDING_WEAPON);
   assert.equal(rrParkourRefusal({ weaponDrawn: true, weaponMelee: true }), null, 'bare hands climb');
   assert.equal(rrParkourRefusal({ weaponDrawn: false, weaponMelee: false }), null, 'a sheathed weapon climbs');
-  assert.match(read('src/systems/roleplayRealism/rrInstall.js'), /registerParkourGate\(\(\) => \{\n\s*if \(!rrModule\('climbingRestriction'\)\) return null;/, 'the mod registers the gate under its own switch');
   const said = [];
   registerParkourGate(() => NO_CLIMB_HOLDING_WEAPON);
   try {

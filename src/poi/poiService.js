@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-3 (2026-10-14) - THE EDITOR'S DOOR TO THE POI STORE (server-account/src/poi.js; bible/06-Systems/POI-Editor-Arc.md).
+// POI-3 - THE EDITOR'S DOOR TO THE POI STORE (server-account/src/poi.js).
 //
 // Every route the editor asks, by name, so no screen spells a path (net/accountClient.js's ladder's rule). The reads and
 // the acts - who am I, the list, a POI's history, the approver's queue, the library's shelf; submit, withdraw, retire,

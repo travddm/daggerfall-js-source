@@ -8,8 +8,7 @@
 // of the screen's longest side: five pixels on a phone, so a look-drag
 // fed to the seam swings on its first frame.
 //
-// TI1b (2026-09-05, Mac on a phone: "the righthand side of the screen
-// needs to work for touch to look around. currently its bugged"). The
+// TI1b. The
 // first cut told a swipe from a look BY SPEED - 48 px inside 180 ms -
 // and a look-pan clears that in the first thirty. Nearly every look
 // became a swipe, and with the weapon sheathed a swipe is nothing.

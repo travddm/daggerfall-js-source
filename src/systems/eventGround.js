@@ -1,7 +1,5 @@
 // @ts-check
-// RPT1026-EVENTS GATE-WAY (2026-10-26; two private reports: Portal Stone portals opened at the mouth of a breach or another
-// event to carry the arriving crowd elsewhere, and a breach's gate walled with a parked wagon while a portal was laid in it as the gate
-// opened, more than once): AN EVENT'S GATE KEEPS ITS WAY CLEAR.
+// RPT1026-EVENTS GATE-WAY: AN EVENT'S GATE KEEPS ITS WAY CLEAR.
 //
 // A Portal Stone's portal takes whoever steps into it (systems/portalStone.js), and a crowd running at a Dagon's Breach as
 // it opens runs into whatever stands before its fire. So, while an event's gate stands on this screen, no portal stands

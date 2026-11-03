@@ -1,4 +1,4 @@
-// TERRAIN-SCALE1 + BUILD-FAIL1 (2026-09-23, Mac: "Make the best decisions and take care of the found properly") -
+// TERRAIN-SCALE1 + BUILD-FAIL1 -
 // two of the three things World of Daggerfall's AUDIT BRANCH found and left open, taken care of.
 //
 // TERRAIN-SCALE1: DaggerfallUnityGame.unity overrides the StreamingWorld prefab's TerrainScale to 1.25, and nothing
@@ -75,7 +75,7 @@ test('TERRAIN-SCALE1: a save carries the scale its heights stood on; one without
   assert.equal(makeAnchor({ pixel: { x: 1, y: 2 }, nativeX: 0, nativeZ: 0, y: 5 }).terrainScale, null);
 });
 
-/** The world host's restandHeight and scaleOf, run against a stub ground. PIN MOVED (BAY-LEFT-GROUND, D5): the law is
+/** The world host's restandHeight and scaleOf, run against a stub ground.
  *  scenes/groundFrameHost.js recordFrame, run whole - never sliced - on the Bay's pixel these pins were written for. */
 function restander(ground, comp = 0, { landform = null, lift = () => 0 } = {}) {
   const state = { compensation: [0, comp, 0] };
@@ -100,7 +100,6 @@ test('TERRAIN-SCALE1: a height written on the old scale stands again on today\'s
 
 test('TERRAIN-SCALE1: the host stands every saved exterior height again as it lands it - the player, the piles, torches, camps, foes, guards, the inside pools, the exterior scene cache, the anchor', () => {
   assert.match(WORLD, /const was = scaleOf\(extras\.terrainScale\);/);
-  // PIN MOVED (BAY-LEFT-GROUND, D5): each record's frame's law (`groundFrame`) stamped beside its scale and read beside it
   assert.match(WORLD, /const ly = restandHeight\(w\.y \?\? 2, lx, lz, was, extras\.groundFrame\) \+ state\.compensation\[1\];/, 'the player, after the arrival pixel is built');
   assert.match(WORLD, /extras\.interior\.foes = restandRows\(extras\.interior\.foes\); extras\.interior\.guards = restandRows\(extras\.interior\.guards\);/);
   assert.match(WORLD, /droppedLoot\.restoreWorld\(restandRows\(w\.piles\)/);
@@ -269,7 +268,7 @@ test('BUILD-FAIL1: a build that throws frees what it made - the GPU surfaces and
   for (const line of ['made.terrain = terrain; made.water = water;', 'made.tilemapTex = tilemapTex;', 'made.cityGates = pixelGates;', 'made.windmills = windmills;', 'made.personBatches = personBatches;', 'made.batches = batches;', 'made.staticBatch = staticBatch;']) {
     assert.ok(WORLD.includes(line), line);
   }
-  assert.match(WORLD, /flying = buildPixelNow\(px, py\)\n      \.catch\(\(e\) => \{ releaseFailedBuild\(swap\.failed\(px, py\) \?\? key\); throw e; \}\)/);   // PIN MOVED (IC-SWAP-BEHIND): a build behind its view frees under its own key
+  assert.match(WORLD, /flying = buildPixelNow\(px, py\)\n      \.catch\(\(e\) => \{ releaseFailedBuild\(swap\.failed\(px, py\) \?\? key\); throw e; \}\)/);
   // IC-SWAP-BEHIND: a build behind its pixel's standing view that throws frees what it made under its own key - its held
   // buckets and its gates' - and the view stands, its buckets and its doors with it
   const b = pump({ behind: true });

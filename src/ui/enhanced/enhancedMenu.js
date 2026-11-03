@@ -91,7 +91,7 @@
 
 import { statsHunt } from '../bounty/huntRank.js';   // HUNTERS-MARK (Bounty-Boards.md 12.3)
 import { fpArm, hasDaggerfallArrows } from '../../combat/fpArm.js';
-import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1 (2026-09-30, Discord): the Standing page's Dress line
+import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1: the Standing page's Dress line
 import { questRail, shelvedRail, unloggedRail, journalLines, questTitleOf, QUEST_URGENT_SECONDS, remainWords } from '../quest/questRail.js';   // MAC-K2: the ONE quest walk, shared with the chronicle
 import { qlObjectivesBlock, qlOfferDetail, offerRowWords, qlLineDetail, lineStateWords, qlLadderDetail } from '../questlines/qlJournal.js';   // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
 import { lineStepOf } from '../../systems/questlines/qlLines.js';   // QL-OFFERED: a questline's step drawn under its line, never as a side quest
@@ -117,16 +117,12 @@ import {
   effectiveSettings, setValue, saveSettings, resetToDefaults, tierOf, DEFAULTS, defaultOf,
 } from '../../systems/settings/settings.js';
 import { mostRecentRestorable, restorableSaves, firstRestorable, deleteSave, QUICK_SAVE_NAME, loadSlot, saveSlot } from '../../systems/save/saveSlots.js';
-import { offlineCopyOf, onlineCopyOf } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E/G: the doors between the lanes
-import { sharedClassicMinutes } from '../../net/wire.js';   // AUDIT LIVED1 G: the shared clock's minute a character joins at
+import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E: Copy to offline changes lanes
 import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
 import {
-  realmIo, realmList, realmCustoms, realmPut, realmDelete, realmUndo, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
+  realmIo, realmList, realmDelete, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
   sweepUnsent,
 } from '../../systems/realmSaves.js';   // REALM P1.3: the Online door lists the realm's characters, the service's
-import { applyCustoms, customsLines, crossLeveling, LEVELING_CROSS_LINE } from '../../systems/realmCustoms.js';   // REALM P1.5: an offline character comes in once, through customs
-import { REALM_COPY_SAVE_NAME, realmCopyIds } from '../../systems/realmCopyMark.js';   // a copy of a realm character never comes in
-import { bringOnlineButton } from './bringOnlineButton.js';
 import { createRealmLine } from '../../systems/legacy/realmLine.js';   // HOUSE-WAITS (FIELD BUGS 2026-10-09f): the account's lines, read at the door
 import { loadFamily } from '../../systems/legacy/store.js';
 import { waitingHouses, takeUpLine, houseWaitsTitle, houseWaitsLine, heirButtonLabel, newbornButtonLabel } from '../../systems/legacy/waitingHouses.js';
@@ -136,7 +132,6 @@ import { exportSavesZip, collectSlots, importSlots, entriesFromFiles, slotPathOf
 import { appStorage, tabStorage } from '../../systems/appStorage.js';   // SP1: the store under this build - the browser's on the site, the file store in the app   // SAV4: the slot store; SLOTS1: every slot
 import { uiSkin, SKIN_NAMES, isEnhanced } from '../../systems/uiSkin.js';   // FD1: which boot rail
 import { getPref, setPref, isOpen, setOpen, PREF_DEFAULTS } from '../../systems/uiPrefs.js';
-import { EG_DANGER_PALETTES, EG_DANGER_PALETTE_KEYS } from '../eliteGates/egAccess.js';   // EG-G1: the Spire's danger palettes, named once
 import { TOUCH_BUTTON_SLOTS, touchButtonSlots, nextTouchButton, touchButtonChoices } from '../touch/touchButtons.js';   // TOUCH-BUTTONS: the corner's three slots
 import { DEFAULT_SERVER } from '../../net/online.js';   // ONLINE1: the relay this port hosts, the field's placeholder   // R7: the port's own switches; SO1: the folded tiers' memory
 import { GATE_CROWD_TIERS } from '../../net/gate/gateCrowd.js';   // GATE-CROWD: how many other players are drawn at once (CROWD-WIDE: everywhere, not a gate's court alone)
@@ -213,7 +208,7 @@ import { CREDITS, translationCredits } from '../credits.js';   // CR1: who made 
 import { SUPPORT_ASKS } from '../supportAsks.js';   // SUPPORT1: the project's asks - the website's corner and this door's
 import { t, tIn, currentLocale, localeInfo, localeTable, availableLocales, BASE_LOCALE, localizedText, formatText } from '../../systems/textManager.js';   // L10N1b: the port's own strings, the language row and the first-run offer; L10N3d: DFU's Internal_Strings
 import { localeForBrowser, catalogLocale } from '../../systems/localeCatalog.js';   // L10N1b
-// FIX-F (Mac: "changing keybinds in classic/enhanced do not work"): the
+// FIX-F: the
 // rebinding pane. The enhanced skin is the DEFAULT and had no door to
 // the key bindings at all - the only one in the port opens off the
 // CLASSIC pause window. The pane is its own module because it owns a
@@ -240,12 +235,11 @@ import '../../systems/featureLanes.js';   // FT18: the wind, the quick slots and
 import { AccountFlow } from '../accountFlow.js';
 import { accountCard } from './enhancedAccount.js';
 import { skinCard } from '../skinCard.js';   // DISC23-B2: the skin, on the profile
-import { saveTile, cloudStateOf, saveFromCard, newerBackup } from '../saveTile.js';   // TILE1 (Mac: "a detailed tile based design for your saves... showing your portrait and character information"), and ACC2c's card-shaped save
+import { saveTile, cloudStateOf, saveFromCard, newerBackup } from '../saveTile.js';   // TILE1, and ACC2c's card-shaped save
 import { loadFace } from '../facePortrait.js';
 import { timersMark, timersWindow, anchorBeside } from './enhancedTimers.js';   // TIMERS1: the hourglass beside the profile mark, and its window
 import { postMark, postWindow, watchPostMark, anchorPost } from './enhancedPost.js';   // SERVER-POST: the mailbox beside the hourglass, and its window
 import { seasonMark, seasonWindow, seasonSource, anchorSeason } from './enhancedSeason.js';   // SEASON-BOOK: the laurel beside the envelope, and its window
-import { shopMark, shopWindow } from './enhancedShop.js';   // SHOP: the gem at the end of the row of marks, and its window
 import { profileBadge, portraitSave, liveCharacter, characterLine } from '../profileBadge.js';   // PROFILE1: the mark is the last character's portrait   // TILE1: the character's face, the one home chargen also reads
 import { profileIconNode } from '../profileIcons.js';   // WITCH1: a profile icon worn, in the mark's portrait
 import { ownIcon } from '../../systems/ownGlyphs.js';   // WITCH1: the icon the stored session says this device's player wears
@@ -262,7 +256,7 @@ import { maxRoundsRemaining } from '../hud/hudActiveSpells.js';   // BUFF-END: a
 // yet still has a home and says what it is waiting on. A rail with a
 // hole in it teaches the player the hole is permanent.
 // R7 (Mac): ENHANCED was a section of its own on the BOOT rail; SO1
-// (2026-09-11) made it a category of Settings - same rows, one screen. The port's own switches were scattered - the skin under the
+// made it a category of Settings - same rows, one screen. The port's own switches were scattered - the skin under the
 // brand, and the port's own additions in no interface at all - and a
 // switch a player cannot find is not shipped. It is absent from SECTIONS_PAUSE deliberately: these
 // answer "what kind of game am I about to play", which is settled by
@@ -277,7 +271,6 @@ import { maxRoundsRemaining } from '../hud/hudActiveSpells.js';   // BUFF-END: a
 // Mod Authored, DFU Classic) as a coloured label and a chip row filters
 // by it. Empty at FT0; the Enhanced category of Settings and the Mods
 // section keep their rows until each one's slice moves it here
-// (bible/10-UI/Features-Arc.md).
 const SECTIONS_BOOT = ['Online', 'Continue', 'New Game', 'Load Game', 'Test Room', 'Settings', 'Overhauls', 'Tutorials', 'Screenshots', 'About'];   // UI-CALM: Online first, Offline's four under it (drawDoors, the rail's own word)   // TUT1: the tutorials, to read before the game (ui/tutorialsPane.js)   // ORG2: Features is Settings' tabs now   // LOAD1: the gallery (ui/shotsPane.js)   // OVH1: the three looks   // FT16: Controls is a Settings CATEGORY, not a rail door   // FT14: Mods is gone - every mod is a tile on Features, and what the pane carried besides stands under them   // ONLINE1: the shared world's door
 // FD1 (Mac, 2026-09-11): the CLASSIC skin opens on this same door. Its
 // three game doors collapse into BEGIN, which leads into the classic
@@ -285,8 +278,7 @@ const SECTIONS_BOOT = ['Online', 'Continue', 'New Game', 'Load Game', 'Test Room
 // so the classic player keeps every screen Daggerfall had and gains
 // the one it never did: settings before the game, without a wizard.
 // SO1: ENHANCED left the rail for a category of Settings (settingsMap).
-// ONLINE1: ONLINE joins it - Mac: "if using classic, you'd see the
-// other user's paperdoll" - the same pane, the same save brought in.
+// ONLINE1: ONLINE joins it - the same pane, the same save brought in.
 const SECTIONS_CLASSIC = ['Begin', 'Online', 'Settings', 'Overhauls', 'Tutorials', 'Screenshots', 'About'];   // TUT1   // ORG2   // LOAD1: the key keeps its shots under either skin   // OVH1   // FT14; FT16: Controls is a Settings category
 
 // U51: the same rail with the boot-only questions swapped for the
@@ -352,9 +344,7 @@ let onAction = () => {};
 let mode = 'boot';
 let sections = SECTIONS_BOOT;
 let hooks = {};
-// UI-CALM (2026-10-14, a player: "The first screen should just have ONLINE and OFFLINE, with Online first. Continue, New
-// Game and Load Game belong under Offline. I've seen people create characters thinking they're playing online, only to
-// discover later that they're offline."): THE ENHANCED DOOR ASKS ONE QUESTION FIRST - which world - and only then which
+// UI-CALM: THE ENHANCED DOOR ASKS ONE QUESTION FIRST - which world - and only then which
 // game. 'top' is the two doors (Online, Offline); 'offline' the offline doors (HOME_OFFLINE) and the way back. Every
 // visit opens on 'top'; a section an offline door opened backs out to 'offline', where its press was made.
 let homeLevel = 'top';
@@ -363,8 +353,7 @@ function focusDoor(id) {
   globalThis.requestAnimationFrame?.(() => (app?.querySelector?.(`.px-menu .door-${id}`) ?? app?.querySelector?.('.px-menu .doorbtn'))?.focus?.());
 }
 let keyHandler = null;
-// ACC1f (Mac: "The online details itself will live as a popup on main
-// menu startup and a new profile icon"): whether the account window is
+// ACC1f: whether the account window is
 // open, and whether startup has already offered it once.
 let accountOpen = false;
 /** TIMERS1: the timers window over the pause face, and its live view (the tick it must stop). */
@@ -374,8 +363,8 @@ let timersAnchor = null;      // AUDIT TIMERS1 UI-3: the hourglass's re-placing,
 let timersFocusBack = false;  // AUDIT TIMERS1 UI-5: a closed window hands the focus back to the hourglass
 let timersFocusIn = false;    // AUDIT SEASON-BOOK U3: the window just opened - the focus goes into it, once
 const stopTimers = () => { timersView?.stop(); timersView = null; timersAnchor?.(); timersAnchor = null; };
-/** EG-ZM (Elite-Gates.md section 20): a timers row's door (the Elite rows' Boards) is a handoff, as the sheet's doors are -
- *  the pause face down first, the door's window in the slot it frees, and a door that opened nothing a resume. */
+/** A season row's door is a handoff, as the sheet's doors are - the pause face down first, the door's window in the slot
+ *  it frees, and a door that opened nothing a resume. */
 // AUDIT GROWTH LANE2-3: a Growth face under it asked first (GROWTH5) - the timers window shut so the ask is seen
 const timersDoor = (fn) => {
   if (pauseTab === 'growth' && growthAsks()) { timersOpen = false; timersFocusBack = true; render(); return; }
@@ -401,8 +390,7 @@ let postAnchor = null;
 let postFocusBack = false;   // a closed window hands the focus back to the envelope, as the hourglass's does
 let postKeep = {};   // AUDIT SERVER-POST: what the window shows (the piece open, the line said) - a rebuild of the face keeps it
 const stopPost = () => { postView?.stop(); postView = null; postWatch?.(); postWatch = null; postAnchor?.(); postAnchor = null; };
-/** SERVER-POST (Mac: "an ingame server mailbox that goes next to the hourglass in the pause menu. It should show
- *  notifications whenever players have a message"): THE ENVELOPE on the pause face - online, where the host hands its box
+/** SERVER-POST: THE ENVELOPE on the pause face - online, where the host hands its box
  *  (hooks.post), left of the hourglass `glass` (or the profile mark); its count follows the box while the face stands
  *  (the face draws itself only when asked). Answers the envelope, or null where there is no box. */
 function postEnvelope(home, glass) {
@@ -425,8 +413,7 @@ const closeSeason = () => { seasonOpen = false; seasonFocusBack = true; render()
 /** A season row's door - the hourglass's handoff (timersDoor), the season window shut first where a Growth face under it
  *  asks (AUDIT GROWTH LANE2-3's law: the ask seen, never a press that does nothing). */
 const seasonDoor = (fn) => { if (pauseTab === 'growth' && growthAsks()) { closeSeason(); return; } timersDoor(fn); };
-/** SEASON-BOOK (the owner: "a new pause menu icon, like we did for the timers and mail. A condensed place to see season
- *  related content and descriptions"): THE LAUREL on the pause face - online, where the hourglass stands (its clock is
+/** SEASON-BOOK: THE LAUREL on the pause face - online, where the hourglass stands (its clock is
  *  the hourglass's), at the end of the row of marks `chain`. Answers the laurel, or null with no clock. */
 function seasonLaurel(home, chain) {
   if (!hooks.timers?.()) return null;
@@ -435,36 +422,6 @@ function seasonLaurel(home, chain) {
   seasonAnchor = anchorSeason(laurel, chain, home.querySelector?.('.px-profile'), home);
   if (seasonFocusBack && !seasonOpen) { seasonFocusBack = false; globalThis.requestAnimationFrame?.(() => laurel.focus?.()); }
   return laurel;
-}
-/** SHOP: the shop's window over the pause face, its live view, the gem's placing, the visit's account flow (read when
- *  the window first opens) and the tab the window shows - a rebuild of the face keeps both. */
-let shopOpen = false;
-let shopView = null;
-let shopAnchor = null;
-let shopFocusBack = false;   // a closed window hands the focus back to the gem
-let shopFocusIn = false;     // the window just opened - the focus goes into it, once
-let shopFlow = null;
-let shopKeep = {};
-const stopShop = () => { shopView?.stop(); shopView = null; shopAnchor?.(); shopAnchor = null; };
-const closeShop = () => { shopOpen = false; shopFocusBack = true; render(); };
-/** SHOP: the visit's flow - made and started on the window's first ask, after the draw that asked (a read's first word
- *  draws the window again, in place). */
-const shopFlowOf = () => {
-  if (!shopFlow) {
-    const flow = newAccountFlow(() => { if (shopFlow === flow) shopView?.draw(); });
-    shopFlow = flow;
-    globalThis.queueMicrotask?.(() => { if (shopFlow === flow) flow.start().catch?.(() => {}); });
-  }
-  return shopFlow;
-};
-/** SHOP (the owner: "A new glyph panel alongside the timer and mailbox that will be used for our monetization shop"): THE
- *  GEM on the pause face, at the end of the row of marks `chain` - online or not, for the account is the shop's. */
-function shopGem(home, chain) {
-  const gem = shopMark(document, { open: shopOpen, onOpen: () => { shopOpen = true; shopFocusIn = true; render(); } });
-  home.append(gem);
-  shopAnchor = anchorSeason(gem, chain, home.querySelector?.('.px-profile'), home);
-  if (shopFocusBack && !shopOpen) { shopFocusBack = false; globalThis.requestAnimationFrame?.(() => gem.focus?.()); }
-  return gem;
 }
 let accountOffered = false;
 // ═══ TILE2/ACC2: WHAT THE CLOUD HOLDS, ASKED ONCE PER VISIT ═══════
@@ -521,7 +478,7 @@ const el = (t, cls, txt) => {
 let _pickedSaveKey = null;
 let _pickedSaveName = null;
 let _saveNameDraft = '';
-/** TIME4 (bible/06-Systems/Online-Time-Arc.md section 7): THE SKY'S DAY, SAID AT THE DOOR - what is true when the
+/** TIME4: THE SKY'S DAY, SAID AT THE DOOR - what is true when the
  *  pane opens. From the sky's switch on (net/skyLaw.js SKY_SEGMENTS) a day is an hour (SKY-SLOW); its midnights and its
  *  dusks (18:00, forty-five real minutes after a midnight) are said in this machine's own minutes - on the hour for most
  *  of the world, at the half hour or a quarter past where a clock is set off the hour.
@@ -549,7 +506,7 @@ export function takePickedRealmId() { const id = _pickedRealmId; _pickedRealmId 
 let _pickedLegacyBirth = null;
 export function takePickedLegacyBirth() { const b = _pickedLegacyBirth; _pickedLegacyBirth = null; return b; }
 /** REALM P1.3: the realm's characters as the service listed them this visit (null: not asked yet), its bound, what the
- *  last act said (a refusal, customs' report, a copy's word) and whether an act is running. Per VISIT, as the cloud's. */
+ *  last act said (a refusal or a copy's word) and whether an act is running. Per VISIT, as the cloud's. */
 let realmRows = null;
 let realmAsked = false;
 let realmMax = 0;
@@ -586,7 +543,6 @@ function saveOf(entry) {
     hour: date ? `${String(date.hour).padStart(2, '0')}:${String(date.minute).padStart(2, '0')}` : null,
     chargenDone: snap.chargenDone !== false,
     testRoom: snap.testRoom === true,   // AUDIT SET D4: a Test Room character, which plays offline
-    realmCopy: snap.realmCopy === true,   // a copy of a realm character, which plays offline (systems/realmCopyMark.js)
   };
 }
 
@@ -1112,7 +1068,7 @@ function paneTest(body) {
   ride.append(el('p', 'meta', TEST_RIDE.blurb));
   ride.append(acts([{ label: t('menu.test.rideOut', 'Ride out'), primary: true, onClick: () => onAction(`test:${TEST_RIDE.id}`) }]));
   body.append(ride);
-  // FIELD BUGS 2026-09-29 (the sea) #5 (Mac: "Add a ship combat test menu option"): the sea battle - the same
+  // FIELD BUGS 2026-09-29 (the sea) #5: the sea battle - the same
   // `test:<id>` door, a helm on the open Bay and a pirate standing in (systems/testRoom.js TEST_SEA)
   const sea = el('div', 'card');
   sea.append(el('h3', null, TEST_SEA.label));
@@ -1126,8 +1082,7 @@ function paneTest(body) {
   loot.append(el('p', 'meta', TEST_LOOT.blurb));
   loot.append(acts([{ label: t('menu.test.enterLadder', 'Enter with the ladder'), primary: true, onClick: () => onAction(`test:${TEST_LOOT.id}`) }]));
   body.append(loot);
-  // FT12 (Mac, 2026-09-14: "move the test the outdoors to the test room
-  // tab"): the outdoors test door lives with the other test doors. It
+  // FT12: the outdoors test door lives with the other test doors. It
   // was the last row of the Enhanced category of Settings, which is off
   // the rail now - every switch it held is the Features home's.
   const outdoors = el('div', 'card');
@@ -1139,9 +1094,6 @@ function paneTest(body) {
 // ── LOAD GAME ────────────────────────────────────────────────────
 // ═══ ACC1f: THE ACCOUNT LIVES ON THE FRONT DOOR ═══════════════════
 //
-// Mac: "I want [the Online pane] reserved for a detailed tile based
-// design for your saves... The online details itself will live as a
-// popup on main menu startup and a new profile icon."
 //
 // ACC1e put the card at the head of the Online pane. That pane is
 // being reserved for the character tiles, so the card moves to the
@@ -1214,8 +1166,7 @@ const signedIn = () => !!storedSession(appStorage());
 
 /** The profile mark, top-right of the door - the corner About does not
  *  use. It says who you are when it knows, and offers the way in when
- *  it does not. PROFILE1 (Mac: "more like a profile icon less like a
- *  button"): a PORTRAIT - the last character's face (ui/profileBadge.js),
+ *  it does not. PROFILE1: a PORTRAIT - the last character's face (ui/profileBadge.js),
  *  asked for as a promise so the door never waits on a CIF read. */
 /** PROFILE2: the character the profile shows - paused, the one being PLAYED (the newest save may be another's); at the
  *  door, the newest finished save. PROFILE-MENU: one answer for the mark and the card it opens. */
@@ -1242,7 +1193,7 @@ function profileMark() {
   });
 }
 
-/** SUPPORT1 (Mac, 2026-10-05: "add the patron/kofi ingame on the main menu as 2 icons"): THE ASKS, top-left of the
+/** SUPPORT1: THE ASKS, top-left of the
  *  door - the one corner it had free. An icon a platform, its mark drawn by ui/supportAsks.js exactly as the website's
  *  corner draws it, its name on the pointer's tooltip and in what a screen reader says. Each is a LINK out of the game,
  *  never a press the door acts on: a new tab on the web, the system browser from the desktop app (app/main.cjs hands
@@ -1269,22 +1220,18 @@ function accountWindow() {
   for (const c of ['tl', 'tr', 'bl', 'br']) win.append(el('span', `px-gem px-corner px-${c}`));
   const body = el('div', 'px-body');
   body.append(accountBody());
-  body.append(skinCard(document, { gender: () => playerEntity?.gender }).root);   // DISC23-B2 (Mac: "a choosable skin system in the menu player profile system itself"): who you are drawn as, beside who you are; LAYERED-GEAR: the character's own body, the one Layered Gearing first wears
+  body.append(skinCard(document, { gender: () => playerEntity?.gender }).root);   // DISC23-B2: who you are drawn as, beside who you are; LAYERED-GEAR: the character's own body, the one Layered Gearing first wears
   win.append(body);
   return win;
 }
 
-// ONLINE1 (2026-09-12, Mac: "add an option to the menu labeled online
-// which allows you to bring your own developed character into a
-// massive server"): THE ONLINE DOOR. The most recent save is the
-// character brought in (the same card Load shows); a name for over the
-// head and the relay to join ride the prefs shelf. The action boots
-// the world host with ?online beside ?load (main.js).
+// ONLINE1: THE ONLINE DOOR. The realm's characters, played from here;
+// the relay to join rides the prefs shelf. The action boots the world
+// host with ?online (main.js).
 function paneOnline(body) {
   // ═══ ACC1h: THE PANE IS THE TILES ══════════════════════════════════
   //
-  // Mac: "So the online pane should just be the new save panels,
-  // correct?" - and he had said it once already, when ACC1f moved the
+  // and he had said it once already, when ACC1f moved the
   // account card off this pane: "I want [the Online pane] reserved for
   // a detailed tile based design for your saves."
   //
@@ -1314,7 +1261,6 @@ function paneOnline(body) {
   // the buttons are dead when nobody is signed in, and the way in. A
   // player looking at their own characters with every button greyed out
   // and no reason on screen is the fault this pane would otherwise have.
-  const saves = savedGames();
   const who = storedSession(appStorage());
   if (!who) {
     const c = el('div', 'card');
@@ -1328,34 +1274,11 @@ function paneOnline(body) {
     c.append(go);
     body.append(c);
   }
-  // REALM P1.3 (Mac: "A true separation while allowing people to still play offline"; bible/06-Systems/Realm-Arc.md):
+  // REALM P1.3 ():
   // THE REALM'S CHARACTERS COME FIRST. An online character's save is the service's, so this list is the service's -
   // asked once a visit - and a character is played from here and nowhere else.
+  // An online character is made online only, so an offline character has no door in from here.
   body.append(realmCard(who));
-  if (!saves.length) {
-    body.append(empty(t('menu.saves.none', 'No saved games'), t('menu.online.noSaves', 'Each offline character can be brought online from here, once.')));
-    body.append(onlineSyncCard());   // UXB1-E: the rules can come home before a character goes out
-    return;
-  }
-  // REALM P1.5 (decision 3, "Migrate once via customs"): AN OFFLINE CHARACTER COMES IN ONCE. TILE2's tiles, with the
-  // character's own face on them - and the press is customs, not a boot: the realm settles its loans and caps what it
-  // carries (systems/realmCustoms.js) on a copy, the service makes the realm character, and it appears above to play.
-  // The offline character stays exactly what it was.
-  body.append(el('h4', null, t('menu.online.bringHeading', 'Bring an offline character in (once)')));
-  const realmCopies = realmCopyIds(saves);
-  body.append(tileGrid(saves, (save) => {
-    const button = bringOnlineButton(save, { realmCopy: realmCopies.has(save.characterId) });
-    return {
-      current: false,
-      actions: [{
-        label: button.label,
-        // ACC1g: signed out is a DEAD button with the reason one card up,
-        // not a live one that fails at the service.
-        disabled: !who || button.offlineOnly,
-        onClick: () => { if (!realmBusy) bringOnline(save); },
-      }],
-    };
-  }));
   const field = (label, key, placeholder, maxLength) => {
     const wrap = el('label', 'field');
     wrap.append(el('span', 'fieldlabel', label));
@@ -1408,16 +1331,12 @@ function realmCard(who) {
         actions: [
           { label: save.unfinished ? t('menu.realm.neverSaved', 'Never saved') : t('menu.realm.play', 'Play'), primary: true, disabled: realmBusy || save.unfinished, onClick: () => { _pickedRealmId = row.id; onAction('online'); } },
           { label: t('menu.realm.copyOffline', 'Copy to offline'), disabled: realmBusy || save.unfinished, onClick: () => copyToOffline(row) },
-          // HOUSE-LOSS (2026-09-29, Mac: "GarySoup lost his house and furniture"): a character brought in whose first save
-          // never landed is UNDONE, never deleted - its delete took the home customs had carried, and it could never come
-          // in again. The undo gives back its home, its guild place and its customs (realm.js undoRealm).
-          row.customs && save.unfinished ? { label: t('menu.realm.undo', 'Undo bringing in'), disabled: realmBusy, onClick: () => ask(t('menu.realm.undoAsk', 'Undo bringing {name} in?', { name: row.name }), t('menu.realm.undoBody', '{name} didn\u2019t finish coming online because its first save never arrived. Undo removes it and gives back its home and guild place, so you can bring the offline character online again. To finish instead, click Bring online on it below.', { name: row.name }), t('menu.realm.undoYes', 'Undo'), () => realmAct(() => realmUndo(realmIoNow(), row.id), () => [t('menu.realm.undone', '{name} is no longer online. Its home and guild place are back with the offline character. Bring it online again when you are ready.', { name: row.name })])) }
-            : { label: t('menu.realm.delete', 'Delete character'), disabled: realmBusy, onClick: () => ask(t('menu.realm.deleteAsk', 'Delete {name}?', { name: row.name }), t('menu.realm.deleteBody', 'Deleting an online character is permanent. Its Renown, professions, Stores, the homes it bought and its guild place are lost. Homes belong to your account, so your other characters lose them too. Any offline copy you made stays.'), t('menu.realm.deleteYes', 'Delete'), () => realmAct(() => realmDelete(realmIoNow(), row.id), () => [t('menu.realm.deleted', '{name} is gone from the realm.', { name: row.name })])) },
+          { label: t('menu.realm.delete', 'Delete character'), disabled: realmBusy, onClick: () => ask(t('menu.realm.deleteAsk', 'Delete {name}?', { name: row.name }), t('menu.realm.deleteBody', 'Deleting an online character is permanent. Its Renown, professions, Stores, the homes it bought and its guild place are lost. Homes belong to your account, so your other characters lose them too. Any offline copy you made stays.'), t('menu.realm.deleteYes', 'Delete'), () => realmAct(() => realmDelete(realmIoNow(), row.id), () => [t('menu.realm.deleted', '{name} is gone from the realm.', { name: row.name })])) },
         ],
       }));
     }
     box.append(grid);
-  } else box.append(el('p', 'meta', t('menu.realm.none', 'No online characters yet. Make one, or bring one of yours in below.')));
+  } else box.append(el('p', 'meta', t('menu.realm.none', 'No online characters yet. Make one to play online.')));
   for (const card of waitingHouseCards()) box.append(card);
   box.append(acts([{ label: t('menu.realm.new', 'New online character'), primary: !realmRows.length, disabled: realmBusy || realmRows.length >= realmMax, onClick: () => onAction('online-new') }]));
   return box;
@@ -1473,38 +1392,6 @@ function realmAct(run, words) {
     realmWords = r?.ok === false ? [realmRefusalText(r.error)] : (typeof words === 'function' ? words(r) : words);
   }).catch(() => { realmWords = [realmRefusalText('server')]; }).finally(() => { realmBusy = false; realmAsked = false; realmRows = null; render(); });
 }
-/** REALM P1.5: CUSTOMS, ASKED FIRST (FIELD 2026-09-29, Dracula/Valentin: "HOW TF WAS I SUPPOSED TO KNOW YALL WOULD FORCE
- *  THE LOANS TO BE PAID"). Customs is once, so the press says what it will do - customs run on a copy of the save,
- *  nothing sent (systems/realmCustoms.js customsLines, `before`) - and runs it on the answer. A press customs would
- *  refuse before the service (signed out, no save, no id, a Test Room character) goes straight on and says so. */
-function bringOnline(save) {
-  const snap = realmIoNow() ? loadSlot(save.key) : null;
-  if (!snap || typeof snap.characterId !== 'string' || !snap.characterId || snap.testRoom === true) return customsNow(save);
-  const trial = JSON.parse(JSON.stringify(snap));
-  const leveling = crossLeveling(trial);   // LEVEL-ONLINE-2: an Oblivion-levelling character comes in on Daggerfall's leveling - said first
-  const preview = [...(leveling ? [LEVELING_CROSS_LINE.before] : []), ...customsLines(applyCustoms(trial), { before: true })];
-  return ask(t('menu.online.bringAsk', 'Bring {name} online?', { name: save.name }), preview.join(' '), t('menu.online.bring', 'Bring online'), () => { customsNow(save); });
-}
-/** REALM P1.5: CUSTOMS - the local save read, customs applied to a COPY (the offline character is untouched), the realm
- *  character made from it once (the service refuses one never online, and a second try), its first save the copy. */
-function customsNow(save) {
-  return realmAct(async () => {
-    const io = realmIoNow();
-    if (!io) return { ok: false, error: 'signed-out' };
-    const snap = loadSlot(save.key);
-    if (!snap) return { ok: false, error: 'no-data' };
-    if (typeof snap.characterId !== 'string' || !snap.characterId) return { ok: false, error: 'customs-load-once' };
-    if (snap.testRoom === true) return { ok: false, error: 'test-room' };   // AUDIT SET D4's law: the room's characters play offline
-    const copy = onlineCopyOf(snap, sharedClassicMinutes(Date.now()));   // AUDIT LIVED1 G: the world's stamps onto the shared clock, and the world's minute it joins at
-    const leveling = crossLeveling(copy);   // LEVEL-ONLINE-2: a new online character levels the Daggerfall way (the offline one keeps its own)
-    const report = applyCustoms(copy);
-    const made = await realmCustoms(io, snap.characterId, copy.name || save.name, realmSummaryOf(copy));
-    if (!made.ok) return made;
-    copy.characterId = made.data.id;
-    const put = await realmPut(io, made.data.id, { lease: made.data.lease, seq: 1, summary: realmSummaryOf(copy) }, JSON.stringify(copy), { gzip: made.data.gzip === true });   // REALM-GZIP: a long offline life comes in packed
-    return put.ok ? { ok: true, lines: [...(leveling ? [LEVELING_CROSS_LINE.after] : []), ...customsLines(report)] } : put;
-  }, (r) => [...r.lines, t('menu.realm.broughtIn', '{name} is online now. Play them from the list above.', { name: save.name })]);
-}
 /** REALM P1.4: COPY TO OFFLINE - the realm's save read and written as a NEW offline character (a new id), a slot like
  *  any other. Nothing played on the copy ever goes back: the Online door loads only from the service. */
 function copyToOffline(row) {
@@ -1521,8 +1408,7 @@ function copyToOffline(row) {
   }, () => [t('menu.realm.copied', '{name} is copied as a new offline character. Nothing you play on the copy comes back online.', { name: row.name })]);
 }
 
-// UXB1-E (2026-09-25, the UX backlog: "Add a 'sync from server' option so players can ensure their offline play
-// matches the host they prefer to play on if they want."): THE ROOM'S RULES, OFFLINE. The copy and its undo are
+// UXB1-E: THE ROOM'S RULES, OFFLINE. The copy and its undo are
 // systems/online/onlineSync.js's; this is the card - what differs, the one press, and the way back. Every relay plays by
 // the same rules (they are this build's, not the server's), so there is no host to pick: the card says so.
 export const ONLINE_SYNC_TITLE = 'Sync from server';
@@ -1633,8 +1519,7 @@ function paneLoad(body) {
   body.append(transferCard(saves.length));
 }
 
-// SP1 (2026-09-21, a player: "my saves its all gone"; Mac: "we need
-// parity between browser and the install"): THE SAVES MOVE. The website
+// SP1: THE SAVES MOVE. The website
 // keeps a save in the browser's storage for its origin and the app keeps
 // the same save as files under its own folder, and nothing carried one
 // to the other - a player who installed the app after playing on the
@@ -1697,8 +1582,8 @@ function transferCard(count) {
 // opaque div over the whole canvas, so a save that left the door open
 // would put its own confirmation underneath itself.
 //
-// THE CARD SHOWS WHAT IS ABOUT TO BE OVERWRITTEN. There is ONE slot
-// (systems/save/save.js, `dagger.quicksave`), so every save is an
+// THE CARD SHOWS WHAT IS ABOUT TO BE OVERWRITTEN. The QuickSave is
+// one slot per character (systems/save/saveSlots.js), so every save is an
 // overwrite. Classic does not confirm one and neither does F9, so
 // neither does this - but a player who can read the name and the date
 // they are writing over has been told, which is the part classic
@@ -1713,7 +1598,7 @@ function paneSave(body) {
       t('menu.save.notHereWhy', 'You can\u2019t save here. Step back outside to save again.')));
     return;
   }
-  // SLOTS1 (Mac: "multiple save slots"): a save is (character, slot
+  // SLOTS1: a save is (character, slot
   // name) - SaveLoadManager's own identity (systems/save/saveSlots.js
   // saveSlot). The name field says which slot; a name the character
   // already has OVERWRITES it and the card says so, a new name is a
@@ -1805,7 +1690,7 @@ function paneExit(body) {
 // setting is a setting the player cannot find out about, which is the
 // rule U30 landed after the launcher hid them behind a filter.
 //
-// ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): ONE SCREEN FOR
+// ORG2: ONE SCREEN FOR
 // EVERY OPTION. Settings held DFU's keys in seven categories and the Features home held the port's rows and the mods in
 // seven groups of its own - the grass under Features > Sight, the field of view under Settings > Video - so "the
 // graphics" were behind two doors and a long scroll each. Now the rail is TABS by subject (ui/settings/settingsMap.js:
@@ -2174,8 +2059,7 @@ function paneSettings(pane, { pause = false } = {}) {
   pane.append(panes);
 }
 
-/* MENU-TOGGLE (2026-09-26, Mac: "We really need to remove the enhanced/classic menu toggle and ensure all the UI is
- * linked up properly"): THE MENU'S SKIN TOGGLE IS RETIRED - the pair under the brand and on the home's foot, the
+/* MENU-TOGGLE: THE MENU'S SKIN TOGGLE IS RETIRED - the pair under the brand and on the home's foot, the
  * Settings row "Interface Style" and its help. Plain Enhanced went with PLUS-ONLY; the interface is chosen on the
  * Overhauls page's UI Overhaul card alone (Classic, Enhanced Plus, GrimoireUI - systems/overhauls.js uiChoiceUrl, the
  * SKIN-CARRY law's one home now), which both skins' boot rails and the pause menu carry. */
@@ -2493,7 +2377,7 @@ const ONLINE_LOCK_NOTE = 'Always on online: the shared world uses every enhancem
 /** MODS-ONLINE-2: the Mods pane's own line. The lane's note (above)
  *  is about the PORT's switches and was wrong over the tiles the
  *  moment a mod stopped being forced. */
-const ONLINE_MODS_NOTE = 'Most mods are your choice online. A few are set for everyone, so all players share the same ground and rules. Ground: Basic Roads, World of Daggerfall, Detailed Ships, Iliac Puddle No More\u2019s sea and depth, and There\u2019s a Hole in the Bottom of the Ocean. Rules: every setting of Meaner Monsters, the Combat and Armor Overhaul, Unleveled Loot, Roleplay & Realism, Roleplay & Realism: Items and Oblivion leveling, except who stands behind shop counters and which leveling your character uses. Travel Options is on for everyone, so every trip over land is traveled and ships sail only from ports. Immersive Travel is on for everyone too: carriages wait at every city gate, a driver\u2019s fare is your fast travel over land, and fares are the same for everyone. Its map style stays your choice.';   // AUDIT IT1 W5: a port's ship passage is fast travel online too
+const ONLINE_MODS_NOTE = 'Most mods are your choice online. A few are set for everyone, so all players share the same ground and rules. Ground: Basic Roads, World of Daggerfall, Detailed Ships, Iliac Puddle No More\u2019s sea and depth, and There\u2019s a Hole in the Bottom of the Ocean. Rules: every setting of Meaner Monsters, the Combat and Armor Overhaul, Unleveled Loot, Roleplay & Realism and Roleplay & Realism: Items, except who stands behind shop counters. Travel Options is on for everyone, so every trip over land is traveled and ships sail only from ports. Immersive Travel is on for everyone too: carriages wait at every city gate, a driver\u2019s fare is your fast travel over land, and fares are the same for everyone. Its map style stays your choice.';   // AUDIT IT1 W5: a port's ship passage is fast travel online too
 const ONLINE_GROUND_NOTE = 'Set for everyone online, because everyone has to stand on the same ground: roads, rivers, camp sites, ship decks and the seafloor. Offline, your own choice applies.';   // AUDIT LANDFORMS C4: the rivers' row is one of the ground's since LANDFORM3 cut their channels
 /** WOD1: the vendors whose room-owned switch is the GROUND's - the two
  *  that write terrain heights (roads' beds, World of Daggerfall's sites). */
@@ -2581,9 +2465,7 @@ function prefRow(key, name, note, { onChange = null, home = false } = {}) {
 
 
 // ── SO1: THE PORT'S OWN ROWS, IN THE CATEGORIES A PLAYER LOOKS IN ──
-// (2026-09-11, Mac: "a comprehensive organization of all the settings
-// options, and settings audit ensuring proper organization and bloat
-// reduction"). The Enhanced PANE - a rail entry of its own holding
+// . The Enhanced PANE - a rail entry of its own holding
 // every switch the port invented, in five cards - is gone. Its rows
 // live where a player would look for them: the port's departures from
 // Daggerfall (the AI, the outdoors, the water, the combat draw) under
@@ -2649,7 +2531,7 @@ function stepRow(key, name, note, { min, max, step: inc, fmt }) {
 /** L10N1b: THE LANGUAGE ROW. Every language the build holds text for, by its own name and its English one, switched
  *  at once - its tables fetched, the text core switched, the menu drawn again - and remembered (uiPrefs `language`).
  *  The front door's alone, as the skip-video row is: a running game keeps the language it booted in. A language whose
- *  strings are Claude's drafts says so (Mac: "AI drafts, labeled"). */
+ *  strings are Claude's drafts says so. */
 function languageRow() {
   const row = el('div', 'row');
   row.dataset.opt = 'language'; row.dataset.pref = 'language';   // ORG2: the map finds it by its key (settingsMap port:language)
@@ -2906,7 +2788,7 @@ function outdoorsTestRow() {
 }
 
 
-/** MIDI-OUT1 (2026-10-11, a player asking for MIDI out): THE AUDIO TAB'S PORT ROW - the music on a MIDI device
+/** MIDI-OUT1: THE AUDIO TAB'S PORT ROW - the music on a MIDI device
  *  (systems/midiOut.js). The button names the device; a click steps to the next one connected, then Off. The first
  *  click is the one that asks the browser for MIDI, so nothing is asked of a player who never touches the row. */
 export const MIDI_OUT_NAME = 'MIDI out';
@@ -2946,14 +2828,14 @@ function portRowsAudio() {
   return [row, monsterVolumeRow(), companionVolumeRow(), horseVolumeRow(), animalVolumeRow()];
 }
 
-/** MONSTER-VOL (2026-10-20, the owner: "add an option under audio for it called Monster Volume with 0 - 100%"): the
+/** MONSTER-VOL: the
  *  Audio tab's Volume row for what monsters say - calls, attack sounds, pain cries (systems/monsterVolume.js). */
 export const MONSTER_VOLUME_NAME = 'Monster Volume';
 function monsterVolumeRow() {
   return volumeRow('monsterVolume', t('menu.audio.monsterVolume', MONSTER_VOLUME_NAME),
     t('menu.audio.monsterVolumeNote', 'How loud monsters call, strike and cry out.'));
 }
-/** COMPANION-VOL (2026-10-23, the owner: "add companion moaning random screaming in idle volume option"): the Audio tab's
+/** COMPANION-VOL: the Audio tab's
  *  Volume row for a companion's idle calls - the moans and cries a crew hand or a sworn one gives out while it walks with
  *  you (systems/monsterVolume.js companionVolume), under Monster Volume and drawn as it is, so Enhanced Plus and the DFO
  *  Grimoire dress paint it as every Volume row. */
@@ -2962,7 +2844,7 @@ function companionVolumeRow() {
   return volumeRow('companionVolume', t('menu.audio.companionVolume', COMPANION_VOLUME_NAME),
     t('menu.audio.companionVolumeNote', 'How loud companions moan and cry out while they idle, yours and other players\' alike. 0% silences them.'));   // AUDIT UPDATE E-N6: every companion's idle call - a peer's puppet carries `companion` too
 }
-/** HORSE-VOL, ANIMAL-VOL (2026-10-23, travddm: "Add both animal volume & horse volume"): the Audio tab's Volume rows for every
+/** HORSE-VOL, ANIMAL-VOL: the Audio tab's Volume rows for every
  *  horse heard and for the other animal flats (systems/animalVolume.js), drawn as Monster Volume's. */
 export const HORSE_VOLUME_NAME = 'Horse Volume';
 export const ANIMAL_VOLUME_NAME = 'Animal Volume';
@@ -3048,8 +2930,7 @@ function portRowsControls() {
     { min: 0.25, max: 4, step: 0.25, fmt: times }));
   out.push(prefRow('touchHaptics', t('menu.touch.haptics', 'Haptics'),
     t('menu.touch.hapticsNote', 'A short buzz on presses, swings and locks.')));
-  // TOUCH-BUTTONS (2026-09-27, Discord: "I haven't been able to remap the android "buttons" on the bottom right of the
-  // screen. I would much rather use a button to attack"): the corner's three slots, right to left. Changed here while
+  // TOUCH-BUTTONS: the corner's three slots, right to left. Changed here while
   // playing, the corner is re-laid as soon as no finger holds one of its buttons.
   {
     const choices = touchButtonChoices();
@@ -3101,24 +2982,19 @@ function portRowsInterface({ pause = false } = {}) {
   out.push(prefRow('showFps', t('menu.hud.fps', 'FPS counter'),
     t('menu.hud.fpsNote', 'Frame rate in the top-right corner.')));
   if (!pause) out.push(prefRow('skipStartVideo', skipStartVideoName(), skipStartVideoNote()));   // UXB1-A: read at launch, so the front door's alone - as the skin's
-  out.push(...spireAccessRows());   // EG-G1: Settings > Accessibility lists them (ui/settings/settingsMap.js)
+  out.push(reducedMotionRow());   // Settings > Accessibility lists it (ui/settings/settingsMap.js)
   return out.filter(Boolean);   // FT13
 }
 
-/** EG-G1 (bible/11-Multiplayer/Elite-Gates.md section 25.7): THE SPIRE'S ACCESSIBILITY ROWS (ui/eliteGates/egAccess.js) - reduced
- *  motion, the danger palette and a danger fill's light; every device, both skins. AUDIT EG V (c, L7-10): their words in the
- *  player's language, as the rows around them (L10N4). */
-function spireAccessRows() {
-  const motion = prefRow('reducedMotion', t('menu.spire.motion.name', 'Reduced motion'), t('menu.spire.motion.note', 'Nothing on the HUD pulses, flies or rises. Your system\'s own setting does the same.'));
-  const palette = choiceRow('dangerPalette', t('menu.spire.palette.name', 'Danger colors'), t('menu.spire.palette.note', 'The color of a blow\'s edge, of safe ground and of a hazard.'),
-    EG_DANGER_PALETTE_KEYS.map((k) => [k, EG_DANGER_PALETTES[k].name]));   // AUDIT EG V (c, L7-10): each its own t() (ui/eliteGates/egAccess.js)
-  const fill = choiceRow('telegraphFill', t('menu.spire.fill.name', 'Danger fill'), t('menu.spire.fill.note', 'How brightly a blow\'s ground fills. Its edge stays whole.'),
-    [[1, '100%'], [0.85, '85%'], [0.7, '70%'], [0.5, '50%']]);
-  for (const [row, key] of [[palette, 'dangerPalette'], [fill, 'telegraphFill']]) if (row?.dataset) { row.dataset.opt = key; row.dataset.pref = key; }   // ORG2: the map finds it by its key
-  return [motion, palette, fill];
+/** The reduced-motion row (systems/uiPrefs.js reducedMotion): the gate's title cards stand still
+ *  (ui/gate/gateTitleCard.js). Every device, both skins. */
+function reducedMotionRow() {
+  const name = t('menu.spire.motion.name', 'Reduced motion');
+  const note = t('menu.spire.motion.note', 'Nothing on the HUD pulses, flies or rises. Your system\'s own setting does the same.');
+  return prefRow('reducedMotion', name, note);
 }
 
-/** UXB1-A (2026-09-25, the UX backlog: '"Skip Start Video" in the options ... Disabled by default, of course.'):
+/** UXB1-A:
  *  the row's words. The switch is uiPrefs' skipStartVideo, read by main.js at the front door. */
 export const SKIP_START_VIDEO_NAME = 'Skip start video';
 export const SKIP_START_VIDEO_NOTE = 'Open straight onto the main menu. Applies next launch.';
@@ -3126,7 +3002,7 @@ export const SKIP_START_VIDEO_NOTE = 'Open straight onto the main menu. Applies 
 export const skipStartVideoName = () => t('menu.skipVideo.name', SKIP_START_VIDEO_NAME);
 export const skipStartVideoNote = () => t('menu.skipVideo.note', SKIP_START_VIDEO_NOTE);
 
-/** QREPAIR (2026-09-24, Mac: "Add a quest refresh option to settings" - "Repair active quests"): THE GAME CATEGORY'S
+/** QREPAIR: THE GAME CATEGORY'S
  *  PORT ROW. The repair runs over a game in play, so its door is the PAUSE's settings (the host hands
  *  `hooks.repairQuests`, scenes/quest/questBridge.js repair); on the front door the row is drawn, greyed, and says where it
  *  lives - nothing hidden. The confirm is the one sheet every destructive-looking press here takes (`ask`), and the
@@ -3173,7 +3049,7 @@ function peerSpellShakeRow() {
   if (row?.dataset) { row.dataset.opt = 'peerSpellShake'; row.dataset.pref = 'peerSpellShake'; }   // ORG2: the map finds it by its key
   return row;
 }
-/** TECH-FX (bible/05-Combat/Weapon-Techniques.md THE FEEL): how much a weapon technique moves the screen - every device,
+/** TECH-FX (THE FEEL): how much a weapon technique moves the screen - every device,
  *  both skins; Settings > Accessibility > Motion lists it (ui/settings/settingsMap.js). GATHER-FEEL II: and a gathering tool's
  *  landed blow (systems/gatherBlow.js gatherBlowFeel - the springs' one door), on the enhanced skin. */
 function techniqueMotionRow() {
@@ -3275,7 +3151,7 @@ export function morrowindCard({ count = morrowindDataCount(), armState = fpArm.s
     render();
   };
   const actions = [{ label: t('menu.mw.attach', 'Attach data'), primary: !count, onClick: attach }];
-  // MWA2 (2026-09-16): the door that removes the data itself - the one off there is now. Routed through the same
+  // MWA2: the door that removes the data itself - the one off there is now. Routed through the same
   // confirm-before-destroy pattern as Delete Save.
   if (count) {
     actions.push({ label: t('menu.mw.remove', 'Remove data'), onClick: () => ask(
@@ -3307,40 +3183,39 @@ function peerSpritesCard() {
   c.append(prefRow('peerClassSprites', t('menu.peers.sprite', 'Animated sprite'), t('menu.peers.spriteNote', 'On: the sprite above. Off: the paperdoll.'), { home: true }));
   c.append(prefRow('peerAttackSounds', t('menu.peers.attack', 'Attack sounds'), t('menu.peers.attackNote', 'Hear other players\u2019 weapon swings, and their tools as they gather.'), { home: true }));   // PEER-FS1: the two peer-sound switches, beside the sprite one; PEER-ACTS: a gathering tool's blow is a swing, and the act's other beats its hands' work (net/remotePlayers.js _syncGatherSound)
   c.append(prefRow('peerFootsteps', t('menu.peers.footsteps', 'Footstep sounds'), t('menu.peers.footstepsNote', 'Hear other players\u2019 footsteps.'), { home: true }));
-  // PEER-RANGE (2026-10-10, the owner: "the rendering of players far out is contributing to poor performance"): far
+  // PEER-RANGE: far
   // players, not drawn - the near tier is inside a player's shot (200 m), and the row says so; the row reads the law's own
   // answer, so a stored value that is no tier shows the 300 m it stands for (AUDIT PEER-RANGE A L2)
   c.append(choiceRow('peerRange', t('menu.peers.range', 'Draw distance'),
     t('menu.peers.rangeNote', 'How far away other players are drawn. Your party and your duel opponent always show. Shorter runs faster, but 150 m can hide an archer.'),
     PEER_RANGE_TIERS.map((m) => [m, m ? t('menu.peers.metres', '{m} m', { m }) : t('menu.peers.everyone', 'Everyone')]), { home: true, read: () => peerRangeOf(getPref('peerRange')) }));
-  // YARD-RANGE (2026-10-11, a player: "20-40 fps in cities"): how far their yards' decorations are drawn - none, nearer, or
+  // YARD-RANGE: how far their yards' decorations are drawn - none, nearer, or
   // as far as ever; one's own yard always (scenes/homeYards.js)
   c.append(choiceRow('yardRange', t('menu.peers.yards', 'Yard decorations'),
     t('menu.peers.yardsNote', 'How far away other players\u2019 yard decorations are drawn. Your own yard always shows. Nearer is faster in busy towns.'),
     YARD_RANGE_TIERS.map((m) => [m, m ? t('menu.peers.metres', '{m} m', { m }) : t('menu.toggle.off', 'Off')]), { home: true, read: () => yardRangeOf(getPref('yardRange')) }));
-  // GATE-CROWD (2026-10-07, Mac: "some type of filter when there are too many people"): a crowd, thinned - CROWD-WIDE
-  // (2026-10-23, the owner: "into the entire game"): everywhere, not the Burning Court alone, but never where a stranger can
+  // GATE-CROWD: a crowd, thinned - CROWD-WIDE
+  // everywhere, not the Burning Court alone, but never where a stranger can
   // fight you; AUDIT CROWD-WIDE D1: the note says what the count does - the Draw distance row above still hides the far
   c.append(choiceRow('gateCrowd', t('menu.peers.crowd', 'Players shown at once'),
     t('menu.peers.crowdNote', 'How many other players are drawn at once, the nearest first. Your party, your duel opponent and anyone you trade, ride or sail with always show. The count is off in a PvP zone, a siege, a Royal Tourney and the Arena, but not in the Burning Court.'),
     GATE_CROWD_TIERS.map((n) => [n, n ? t('menu.peers.nearest', 'Nearest {n}', { n }) : t('menu.peers.everyone', 'Everyone')]), { home: true }));
-  // SPELL-GIFT (2026-09-27, Tabitha: "Allow casting of buffs on players outside party"): the receiver's say
+  // SPELL-GIFT: the receiver's say
   c.append(prefRow('acceptStrangerSpells', t('menu.peers.spells', 'Spells from strangers'),
     t('menu.peers.spellsNote', 'Let players outside your party cast healing and protective spells on you.'), { home: true }));
-  // REST-OPT (2026-09-27, Tabitha: "Allow party members to choose not to rest with their party")
+  // REST-OPT
   c.append(prefRow('restWithParty', t('menu.peers.rest', 'Rest with my party'),
     t('menu.peers.restNote', 'Sleep when a party member within 15 m sleeps at a fire, a tent or a bed.'), { home: true }));   // AUDIT REST: REST5's night, no vote
-  // TV3 (2026-09-28, bible/06-Systems/Travel-View.md): being SEEN - the region's travellers see where you are
+  // TV3: being SEEN - the region's travellers see where you are
   c.append(prefRow('showToTravellers', t('menu.peers.show', 'Show me to travelers in my region'),
     t('menu.peers.showNote', 'Outdoors, players in your region see you on the overworld and the map. '
     + 'Nothing is shared from indoors except with your party. Kept on this device.'), { home: true }));   // AUDIT DEEP2 C5: the party pose rides from indoors too
-  // CHAT-LANG, CHAT-COLOURS, PING1 (2026-10-11, the players: "More chat channels per-language", "Chat color-coding per
-  // channel", "A unique color or alert for @name pings"): the chat's own three, beside the other players'
+  // CHAT-LANG, CHAT-COLOURS, PING1: the chat's own three, beside the other players'
   c.append(el('h3', null, t('menu.chat.title', 'Chat')));
   c.append(choiceRow('chatLang', t('menu.chat.lang', 'Language channel'),
     t('menu.chat.langNote', 'A chat tab for players who speak your language, wherever they are. /lang in the chat chooses it too.'),
     [['', t('menu.toggle.off', 'Off')], ...Object.entries(CHAT_LANGS).map(([code, name]) => [code, name])], { home: true }));
-  // CHAT-TRADE (2026-10-14, Mac: "New channels: Trading, LFG"): the two channels a player joins, beside the language's
+  // CHAT-TRADE: the two channels a player joins, beside the language's
   c.append(prefRow('chatTrade', t('menu.chat.trade', 'Trade channel'),
     t('menu.chat.tradeNote', 'A chat tab for buying, selling and swapping with players anywhere. /join trade in the chat joins it too.'), { home: true }));
   c.append(prefRow('chatLfg', t('menu.chat.lfg', 'LFG channel'),
@@ -3398,7 +3273,7 @@ function packsCard() {
     { label: t('menu.packs.attachTexture', 'Attach texture pack'), onClick: async () => { const ds = await import('../../scenes/dataSource.js'); await ds.pickTextureFolder(); render(); } },
     ...(textureReplacementCount() > 0 ? [remove(t('menu.packs.removeTexture', 'Remove texture pack'), t('menu.packs.removeTexture', 'Remove texture pack'), t('menu.packs.removeTextureBody', 'This clears the texture folder you picked from this browser. Attached .dfmod texture mods stay. It takes full effect the next time an area loads.'), (d) => d.clearStoredTexturePack())] : []),
   ]));
-  // IIL3 (Mac: "add a button for attach lighting mod, so players arent confused"): THE LIGHTING MOD HAS ITS OWN
+  // IIL3: THE LIGHTING MOD HAS ITS OWN
   // SECTION. It is a .dfmod like the texture mods and rides the same store, but it carries no picture - listed among
   // them it read as a texture pack that did nothing. Here it says what it is, whether it is attached, and where it
   // is switched (the Modded lighting row in Features).
@@ -3582,9 +3457,7 @@ function modRow(vendor, key, def, { name = null, note = null, home = false } = {
 // The registry (systems/features.js) is empty at FT0 and fills one
 // audited slice at a time; an empty list says so rather than hiding
 // the section (the rail-hole law, SECTIONS_BOOT).
-// ── FT14: ONE ROOF (2026-09-15, Mac: "get rid of the mod panel and
-// integrate certain feature/mod adjustments into the toggle themselves
-// and move away from the scrolling list format") ──────────────────
+// ── FT14: ONE ROOF ──────────────────
 //
 // THE THESIS: there are no switches. Every control is a BAR, and Off
 // is simply its first segment. A two-state row and a four-state row
@@ -3845,7 +3718,7 @@ function featurePartsDrawer(parts) {
   return d;
 }
 
-// ── FT18: ALL OFF, AND BACK (Mac: "Add option to set all mods/enhancements off") ──
+// ── FT18: ALL OFF, AND BACK ──
 // One press sets every tile to Off - or, on a row with no Off, to the value that is Daggerfall's own - and keeps
 // what each tile it moved had been, so Restore puts it back. The keep is a PREF, not this screen's memory: a player
 // who turns everything off, plays, and quits comes back to a Restore that still knows. A tile the online room
@@ -3987,8 +3860,7 @@ function featureDrawer(vendor, mods, dials, keys = []) {
   return d;
 }
 
-// ── OVH1 (2026-09-24, Mac: "A new option on the main menu that opens to show 3 large panels. These panels will
-// have directional arrows allowing you to switch being different feature sets") - THE OVERHAULS PANE. Three cards,
+// ── OVH1 - THE OVERHAULS PANE. Three cards,
 // one look each (systems/overhauls.js is the registry and the only writer): the arrows BROWSE, the button WEARS, so a
 // look that reloads the game is never worn by a stray arrow press. The card a player is browsing survives a render.
 const ovhAt = {};   // panel id -> the option index being shown
@@ -4226,8 +4098,7 @@ function overhaulPanel(p) {
       hrow.append(b);
     }
     card.append(hrow);
-    // TEXT-FONT (2026-10-11, a player: "a Sans font, a Monospace font and a Dyslexic compatible font would be nice. But
-    // allowing selection from system fonts would be most ideal"): the words' face, worn at once; 'My font' names one of
+    // TEXT-FONT: the words' face, worn at once; 'My font' names one of
     // this machine's own (ui/textFont.js).
     card.append(choiceRow('Text font', TEXT_FONTS, textFont(), (id) => setTextFont(id)));
     if (textFont() === 'system') card.append(systemFontRow(render));
@@ -4466,7 +4337,7 @@ function renderHome() {
   // sky (there is a world behind), no wordmark (a masthead on every
   // Escape is a billboard), a scrim instead of the opaque night.
   const paused = mode === 'pause';
-  // TITLE-DOOR (2026-10-27, the owner: "we use the intro title screen as the landing pad itself"): the boot door's face
+  // TITLE-DOOR: the boot door's face
   // over the film's held title - no sky (the map is the ground), no wordmark (the film's mark is the masthead); the doors
   // stand in a row under the mark (uiCalmStyle.js TITLE_DOOR_CSS)
   const title = onTitle();
@@ -4500,14 +4371,14 @@ function renderHome() {
     const stage = el('div', 'px-stage');
     stage.append(pauseWindow());
     home.append(stage);
-    // PROFILE2 (Mac, 2026-09-25: "make the profile icon visible somehow on the pause menu and allow changes"): THE
+    // PROFILE2: THE
     // PROFILE MARK OVER THE GAME TOO. The same portrait the door wears, top-right - the character being played - and
     // the same window it opens: the account and the Skin card. A skin worn here is worn at once (the body re-reads the
     // mod's store) and told to the room (scenes/world.js hands the new look to net/online.js setLook). The window is
     // innermost: a tap outside it, or Escape, closes IT and leaves the pause window standing - never the game resumed
     // from under a half-made choice.
     home.append(profileMark());
-    // TIMERS1 (Mac: "an enhanced plus button on the pause menu next to the profile icon"): THE HOURGLASS - online only,
+    // TIMERS1: THE HOURGLASS - online only,
     // where the host hands the clock and what it holds (hooks.timers); its window counts every shared moment down
     let mark = null;
     if (hooks.timers?.()) {
@@ -4518,7 +4389,6 @@ function renderHome() {
     }
     const envelope = postEnvelope(home, mark);   // SERVER-POST: the mailbox beside the hourglass, online - its count kept live
     const laurel = seasonLaurel(home, [mark, envelope]);   // SEASON-BOOK: the laurel beside the envelope, online
-    const gem = shopGem(home, [mark, envelope, laurel]);   // SHOP: the gem beside the laurel, online or not
     // AUDIT SEASON-BOOK S4: a window whose mark is gone (the clock lost, the box gone) is closed - never kept to come back
     // over whatever the player moved on to when the mark returns
     if (timersOpen && !mark) timersOpen = false;
@@ -4529,12 +4399,12 @@ function renderHome() {
       acct.append(accountWindow());
       home.append(acct);
       closeOnOutsideTap(home, '.px-acctwin', closeAccount);   // AUDIT RECOVERY-SET B1: not over codes
-      for (const n of [stage, mark, envelope, laurel, gem]) n?.setAttribute?.('inert', '');   // AUDIT SERVER-POST: the face under the account window out of reach, as under the timers' - SEASON-BOOK: the laurel too - SHOP: and the gem
+      for (const n of [stage, mark, envelope, laurel]) n?.setAttribute?.('inert', '');   // AUDIT SERVER-POST: the face under the account window out of reach, as under the timers' - SEASON-BOOK: the laurel too
     }
     else if (timersOpen && hooks.timers?.()) {
       const tstage = el('div', 'px-stage px-timersstage');
       // AUDIT TIMERS1 UI-9: the window's read is the one that asks the service (the seats list); the hourglass's test does not
-      timersView = timersWindow(document, { read: () => hooks.timers?.({ ask: true }) ?? null, onClose: () => { timersOpen = false; timersFocusBack = true; render(); }, door: timersDoor, focus: timersFocusIn });   // EG-ZM: a row's door
+      timersView = timersWindow(document, { read: () => hooks.timers?.({ ask: true }) ?? null, onClose: () => { timersOpen = false; timersFocusBack = true; render(); }, focus: timersFocusIn });
       timersFocusIn = false;
       tstage.append(timersView.root);
       home.append(tstage);
@@ -4544,7 +4414,6 @@ function renderHome() {
       for (const n of [stage, home.querySelector?.('.px-profile'), mark]) n?.setAttribute?.('inert', '');
       envelope?.setAttribute?.('inert', '');   // SERVER-POST: and the envelope beside it
       laurel?.setAttribute?.('inert', '');   // SEASON-BOOK: and the laurel
-      gem?.setAttribute?.('inert', '');   // SHOP: and the gem
     }
     else if (postOpen && hooks.post?.()) {
       // SERVER-POST: the mailbox's window, on the hourglass's own stage (centred, its own padding - enhancedStyle.js)
@@ -4553,7 +4422,7 @@ function renderHome() {
       pstage.append(postView.root);
       home.append(pstage);
       closeOnOutsideTap(home, '.px-postwin', () => { postOpen = false; postKeep = {}; postFocusBack = true; render(); }, { swallow: true });
-      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel, gem]) n?.setAttribute?.('inert', '');
+      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel]) n?.setAttribute?.('inert', '');
     }
     else if (seasonOpen && laurel) {
       // SEASON-BOOK: the season window, on the hourglass's own stage; its read asks the boards (the laurel's test does not)
@@ -4563,23 +4432,13 @@ function renderHome() {
       sstage.append(seasonView.root);
       home.append(sstage);
       closeOnOutsideTap(home, '.px-seasonwin', closeSeason, { swallow: true });
-      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel, gem]) n?.setAttribute?.('inert', '');
+      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel]) n?.setAttribute?.('inert', '');
     }
-    else if (shopOpen) {
-      // SHOP: the shop's window, on the hourglass's own stage; its flow is the visit's, read on its first open
-      const shstage = el('div', 'px-stage px-timersstage px-shopstage');
-      shopView = shopWindow(document, { flow: shopFlowOf, keep: shopKeep, onClose: closeShop, focus: shopFocusIn });
-      shopFocusIn = false;
-      shstage.append(shopView.root);
-      home.append(shstage);
-      closeOnOutsideTap(home, '.px-shopwin', closeShop, { swallow: true });
-      for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel, gem]) n?.setAttribute?.('inert', '');
-    }
-    // OT1 (Mac: "tapping outside of any UI closes the UI"): a tap on the
+    // OT1: a tap on the
     // scrim - outside the window, the clock and the foot - resumes,
     // the way Escape does; the front door has no scrim and no resume.
     // PROFILE2: the mark is inside too (a press on it opens the window), and with the window open the tap is its.
-    else closeOnOutsideTap(home, '.px-win, .px-clock, .px-foot, .px-profile, .px-timersmark, .px-postmark, .px-seasonmark, .px-shopmark', () => { if (pauseTab === 'growth' && growthAsks()) return; onAction('resume'); });   // SERVER-POST: the envelope inside too - AUDIT GROWTH LANE3-4: a Growth face asked first (GROWTH5)
+    else closeOnOutsideTap(home, '.px-win, .px-clock, .px-foot, .px-profile, .px-timersmark, .px-postmark, .px-seasonmark', () => { if (pauseTab === 'growth' && growthAsks()) return; onAction('resume'); });   // SERVER-POST: the envelope inside too - AUDIT GROWTH LANE3-4: a Growth face asked first (GROWTH5)
     // PX4 (Mac): NO FOOT AT PAUSE - no skin toggle, no About plaque;
     // About is a System-tab row instead, and the skin switch stays on
     // the boot face and the settings shell.
@@ -4776,14 +4635,13 @@ function appendPxFoot(home) {
 let footObs = /** @type {ResizeObserver|null} */ (null);
 
 // ── PX3: THE PAUSE WINDOW ────────────────────────────────────────
-// HOLDINGS (2026-10-03, Mac: "Lets add a new tab to the pause menu as the stat page is starting to get bloated"): what the
+// HOLDINGS: what the
 // player owns and who follows them moved off the Stats rail onto a tab of their own (pauseHoldings, below).
-// LEGACY3 (2026-10-05, Mac: "implement it into the pause menu as a new tab"): Project Legacy's family - its tree, its house
+// LEGACY3: Project Legacy's family - its tree, its house
 // and the Hall of Ancestors - on a tab of its own (pauseFamily, below; ui/familyPages.js).
-// TUT1 (2026-10-11, Mac: "a menu section where tutorials can be revisited"): every tutorial page, on a tab of its own
+// TUT1: every tutorial page, on a tab of its own
 // (pauseTutorials, below; ui/tutorialsPane.js) - the same pane the front door's Tutorials section draws.
-// GROWTH1 (2026-10-17, the owner: "give the firmament, level up page, and specializations its own tab within the pause
-// menu"): how a character grows - the Ascension, the specialisations' guide, the Firmament and the captain's stars, the
+// GROWTH1: how a character grows - the Ascension, the specialisations' guide, the Firmament and the captain's stars, the
 // skies drawn in the tab (pauseGrowth, below; ui/growth/growthTab.js), after the Stats it grew out of.
 const PAUSE_TABS = Object.freeze([['quests', 'Quests'], ['stats', 'Stats'], ['growth', 'Growth'], ['holdings', 'Holdings'], ['family', 'Family'], ['tutorials', 'Tutorials'], ['system', 'System']]);
 /** HOLDINGS: every tab a landing may name (mountEnhancedMenu's `at`). */
@@ -4919,8 +4777,7 @@ function pauseFamily(body) {
 // home and only the paint changes (.px-win repaints .card/.act/.empty
 // in the pixel idiom). Resume ACTS from the rail - a pane whose only
 // content repeats the word just pressed is a pane that wasted a press
-// (the shell's own RAIL_ACTS reasoning). PX9 (Mac: "why isn't this in
-// the pause menu"): SETTINGS LIVES HERE TOO - the same paneSettings
+// (the shell's own RAIL_ACTS reasoning). PX9: SETTINGS LIVES HERE TOO - the same paneSettings
 // function, its category/pickedKey/sheetOpen machine and every F7/F8
 // law intact, REFLOWED by CSS into the window's shape: the category
 // rail becomes a chip strip across the top, the rows scroll beneath,
@@ -5084,7 +4941,7 @@ function pauseStats(body) {
   // opens nothing is PX14's drawn door.
   const doors = statsSec === 'master' ? [] : [   // SOFTCAP6: the Master Skills page carries none of the sheet's doors
     [t('pause.door.pack', 'Pack'), hooks.openPack], [t('pause.door.spellbook', 'Spellbook'), hooks.openSpellbook], [t('pause.door.chronicle', 'Chronicle'), hooks.openChronicle],
-    // ARENA3: THE ARENA WINDOW, once a banner is worn (bible/11-Multiplayer/Arena.md 5 - "from the pause menu's Arena entry
+    // ARENA3: THE ARENA WINDOW, once a banner is worn (5 - "from the pause menu's Arena entry
     // once you have joined"): the host's arm (scenes/arena/arenaGate.js windowOverlay, shown in its own slot)
     [t('pause.door.arena', 'Arena'), hooks.arenaJoined?.() ? hooks.openArena : undefined],
   ].filter(([, fn]) => typeof fn === 'function');
@@ -5105,8 +4962,7 @@ function pauseStats(body) {
     }
     detail.append(row);
   }
-  // SOFTCAP4: THE MASTER SKILLS DOOR (Mac, in game: "add a button to it like ASCEND and there it should be described and
-  // chosen"). It opens a page of THIS window (statsSec 'master'), so it neither resumes nor hands off; the page's own
+  // SOFTCAP4: THE MASTER SKILLS DOOR. It opens a page of THIS window (statsSec 'master'), so it neither resumes nor hands off; the page's own
   // button comes back to Skills. A count on the button when a mastery is waiting (GROWTH2: a specialisation waiting is
   // the Growth door's count now - its guide moved there).
   const masterDoor = m.master ? (() => {
@@ -5115,7 +4971,7 @@ function pauseStats(body) {
     b.onclick = () => { statsSec = 'master'; _masterNote = null; render(); };
     return b;
   })() : null;
-  // GROWTH1 (bible/10-UI/Growth.md section 3; the owner, asked: "Move them"): THE GROWTH DOOR where Ascend and the
+  // GROWTH1 (): THE GROWTH DOOR where Ascend and the
   // Firmament stood (ASCEND-ANYTIME's and FIRM1's) - both moved to the Growth tab with the specialisations and the
   // captain's stars, drawn in its pane. A page of this window, so it neither resumes nor hands off; a count on it when
   // something waits there (a level owed, a path open, the captain's points).
@@ -5153,7 +5009,7 @@ function statsCharacter(detail, m) {
     g.append(r);
   }
   detail.append(g);
-  // LEGACY-SHEET (bible/06-Systems/Legacy-Arc.md section 11): THE HOUSE - the one played's own facts off their Family
+  // LEGACY-SHEET: THE HOUSE - the one played's own facts off their Family
   // card (ui/familyPages.js sheetHouse): the model, the generation, and an Enduring house's age, toll and elder's word
   const house = sheetHouse();
   if (house) {
@@ -5205,7 +5061,7 @@ function statsEffects(detail) {
   }
 }
 
-/** ATTRIBUTES: the eight, each with a meter on the classic 100 - and, AUDIT C&C B11 (2026-10-12), in Climates &
+/** ATTRIBUTES: the eight, each with a meter on the classic 100 - and, AUDIT C&C B11, in Climates &
  *  Calories' Boons tier the boons that raise them, named under them (ui/temperatureCard.js boonStatRows, the pack's
  *  Stats side's one source): a 55 that a meal made says so where it shows. */
 function statsAttributes(detail, m) {
@@ -5246,7 +5102,7 @@ function statsMaster(detail, m) {
     : t('pause.master.on', 'Choose the skills that may climb past 100, up to 200. A choice is permanent.');
   detail.append(el('div', 'px-master-lead', lead));
   if (_masterNote) detail.append(el('div', 'px-master-note', _masterNote));
-  // GROWTH2 (bible/10-UI/Growth.md section 5): the two specialisation cards (SCHOOLS1's, MARTIAL1's) moved to the Growth
+  // GROWTH2: the two specialisation cards (SCHOOLS1's, MARTIAL1's) moved to the Growth
   // tab's guide - every path, what opens it and what it does; one line and its door stand here
   // AUDIT GROWTH LANE5-6: and only for a character with a family still to reach or one held (AUDIT SCHOOLS L4 8)
   if (ms.on && (ms.paths?.open || ms.paths?.held)) {
@@ -5405,8 +5261,7 @@ function statsSkills(detail, m) {
 
 /** ADVANTAGES: GetClassSpecials, which the port had never drawn.
  *
- *  MAC-G (Mac: "the enhanced stat page on the pause menu doesn't have
- *  any listing for character advantages/disadvantages"). DFU prints
+ *  MAC-G. DFU prints
  *  ONE undifferentiated list in a message box behind the classic
  *  sheet's History button; this page has room for the division the
  *  player actually made at chargen, so the model tags each row with
@@ -5479,7 +5334,7 @@ export function statsEveryStanding(detail, entity) {
   }
 }
 
-/** DRESS1 (2026-09-30, Discord: "Add positive and negative reputation buffs for clothing items"): what the worn clothes
+/** DRESS1: what the worn clothes
  *  are doing right now - one light line under the groups, only when the dress moves anybody. Read live off the equip
  *  table (dressStanding is pure), so it is right before the next magic round folds it into reactionMods. */
 export function dressLine(entity) {
@@ -5534,8 +5389,7 @@ export function lawRows(entity, worldNow) {
   return out.sort((a, b) => a.rep - b.rep);
 }
 
-/** GUILD-REP (Mac: "we need to add guild reputation to our enhanced
- *  pause menu, its missing"): the sheet's AFFILIATIONS box, on the
+/** GUILD-REP: the sheet's AFFILIATIONS box, on the
  *  page. ShowAffiliationsDialog's own three facts per membership - the
  *  affiliation, the rank title and the live reputation - off the one
  *  model the classic box draws (systems/affiliations.js), so the two
@@ -5592,7 +5446,7 @@ export function statsGuilds(detail, entity) {
 // LABEL still needs its own trailing separator, which is what keeps
 // "Main Quest Backbone" a name.
 
-/** QT-LIVE1 (Mac, 2026-09-21: "The time doesn't print out live?"):
+/** QT-LIVE1:
  *  the timer line for the selected quest off a FRESH quest log, or
  *  null when that quest no longer has a running clock. The words are
  *  the same the render writes; this is what the interval writes. */
@@ -5693,15 +5547,14 @@ function pauseQuests(body) {
   // QL2: a stamped quest whose objectives stand before its first journal entry is a quest of the rail's too
   const active = [...rail0.active, ...unloggedRail(log)];
   const shelved = shelvedRail(log);   // QUEST-SHELF: and the quests set aside
-  // JOURNAL-CLEAN (2026-09-30, Discord: "Should there be a way to clean both finished and unfinished quests from your
-  // journal for a cleaner look?"): the host's tidy-ups (scenes/quest/questBridge.js journalClean - remove / clear the
+  // JOURNAL-CLEAN: the host's tidy-ups (scenes/quest/questBridge.js journalClean - remove / clear the
   // archive, hide / unhide an active quest). A host that hands none draws no buttons rather than buttons that do
   // nothing.
   const clean = hooks.journalClean?.() ?? null;
-  // QL3 (bible/06-Systems/Questlines-Arc.md section 5.2): the rewards waiting to be chosen - each an ended quest's three
+  // QL3: the rewards waiting to be chosen - each an ended quest's three
   // pieces, its own rail section above the quests, one press from the Take (key `r:<id>`)
   const offers = (clean?.offers?.() ?? []).map((o) => ({ key: `r:${o.id}`, name: offerRowWords(o), offer: o }));
-  // QL12 (Questlines-Arc.md section 6, the owner's fifth: "One unified place to view questlines"): THE QUESTLINES - every
+  // QL12 (Questlines-Arc.md section 6): THE QUESTLINES - every
   // line begun or on offer, under its own heading (key `l:<id>`): the ones under way first, then those on offer, the
   // finished last. None while the questlines are off (the bridge hands none). QL-OFFERED: a line its gate shuts is no row
   // (the runner draws none - UI-Calm's law, nothing drawn that cannot be taken)
@@ -5743,8 +5596,7 @@ function pauseQuests(body) {
       rail.append(b);
     }
   };
-  // PX22 (Mac: "quests aren't supposed to be titled as main quest...
-  // what we developed had 3 sections for main, side and archived"):
+  // PX22:
   // THE RAIL IS THREE SECTIONS, ALWAYS. PX5 made the two active
   // headings CONDITIONAL - "a rail of one group under a header is a
   // header explaining nothing" - and that reasoning is fine for a
@@ -5760,7 +5612,7 @@ function pauseQuests(body) {
   // questName main/side is gone by the time a quest is filed
   // (notebook.js:"AddFinishedQuest(messages)"). Three sections is the shape the DATA has.
   const mains = active.filter((q) => q.main);
-  // QL-OFFERED (2026-10-25, Lord Rumpkin: "My quest log ... has become congested"): a questline's step is its
+  // QL-OFFERED: a questline's step is its
   // line's - drawn under the line's row in Questlines, never a second time as a side quest (while the line is drawn)
   const drawnLines = new Set(lines.filter((r) => r.line).map((r) => r.line.id));
   const lineOfStep = (q) => { const at = lineStepOf(q.questName); return at && drawnLines.has(at.line.id) ? at.line.id : null; };
@@ -5794,7 +5646,7 @@ function pauseQuests(body) {
   // JOURNAL-CLEAN: the hidden quests, drawn only when asked for, under their own heading - and the toggle that asks,
   // which names how many are hidden so a tidied journal never looks like quests were lost.
   if (questShowHidden && hidden.length) section(t('pause.journal.hidden', 'Hidden'), hidden, ' done');
-  // QUEST-SHELF (2026-10-08, Mac: "All quests should be able to be abandoned and reclaimed"): the quests set aside, each
+  // QUEST-SHELF: the quests set aside, each
   // one press from coming back - a section only while there are any
   if (shelved.length) section(t('pause.journal.abandoned', 'Abandoned'), shelved, ' done');
   section(t('pause.journal.archived', 'Archived'), finished, ' done');
@@ -5916,10 +5768,10 @@ function pauseQuests(body) {
       const where = questWhere(sel.written?.at(-1)?.message, 'px-qwhere');
       if (where) detail.append(where);
     }
-    // QL2 (bible/06-Systems/Questlines-Arc.md section 6): a stamped quest's objectives, its choices and how it ended -
+    // QL2: a stamped quest's objectives, its choices and how it ended -
     // ui/questlines/qlJournal.js, the chronicle's own block too. DFU's quest (no `ql`) draws nothing here.
     { const block = qlObjectivesBlock(document, sel.ql); if (block) detail.append(block); }
-    // BOUNTY1 (Mac: "i also dont see the bounty in my questlog means i cant abandon it?"): a bounty's two presses - Abandon
+    // BOUNTY1: a bounty's two presses - Abandon
     // (twice: the first arms it, so a stray click gives nothing up) and, in a party, Share
     if (sel.entries && isBountyQuestId(sel.id)) {
       const acts = el('div', 'px-qacts');
@@ -5941,7 +5793,7 @@ function pauseQuests(body) {
       acts.append(ab);
       detail.append(acts);
     }
-    // RVN7c (bible/12-Enhanced-AI/Feud-Arc.md 18.3): a hunt's one press - Abandon (twice, as a bounty's): its lair forgotten
+    // RVN7c (18.3): a hunt's one press - Abandon (twice, as a bounty's): its lair forgotten
     if (sel.entries && isHuntQuestId(sel.id)) {
       const acts = el('div', 'px-qacts');
       acts.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin:6px 0 8px';
@@ -6087,7 +5939,7 @@ function pauseQuests(body) {
 }
 
 function render() {
-  // MENU-EXIT1 (2026-09-20, rabid.rivas on Discord: "Crash when exiting..." - TypeError reading innerHTML of null):
+  // MENU-EXIT1:
   // a click handler may run an ACTION and then repaint - the confirm card's yes runs `onAction('exit')` and repaints
   // after it - and an action can tear this screen down synchronously (exit unwinds to the front door, destroy()
   // nulls `app`). A screen that is gone has nothing to paint; the repaint after it was the crash, on every exit
@@ -6105,7 +5957,6 @@ function renderInto() {
   stopTimers();   // TIMERS1: a rebuild builds the window again, with its own tick
   stopPost();   // SERVER-POST: and the mailbox's, and the envelope's count
   stopSeason();   // SEASON-BOOK: and the season window's
-  stopShop();   // SHOP: and the shop's, its previews let go
   app.innerHTML = '';
   // TITLE-DOOR: the boot home stands on the film's held title, so its host is see-through there (uiCalmStyle.js
   // TITLE_DOOR_CSS); every section keeps the opaque ground the canvas is hidden under
@@ -6149,7 +6000,7 @@ function renderInto() {
   side.append(brand);
 
   const rail = el('nav', 'rail');
-  // UI-CALM (2026-10-14, a player on DFO Grimoire's rail: "here back to main menu is missing"): THE WAY HOME, SAID. The
+  // UI-CALM: THE WAY HOME, SAID. The
   // wordmark above has always been it (PX1/PX2), and Escape - but a wordmark is not a door a player reads as one; the
   // rail's first row is, at the door the Main menu and over a game the window it came from
   const homeRow = el('button', 'railbtn railhome');
@@ -6311,7 +6162,6 @@ function onKey(e) {
     : timersOpen && timersView ? () => { timersOpen = false; timersFocusBack = true; render(); }   // TIMERS1: the window first, ahead of the pause face's resume (AUDIT UI-11: a window that is drawn)
     : postOpen && postView ? () => { postOpen = false; postKeep = {}; postFocusBack = true; render(); }   // SERVER-POST: the mailbox's window, as the timers'
     : seasonOpen && seasonView ? () => closeSeason()   // SEASON-BOOK: the season window, as the timers'
-    : shopOpen && shopView ? () => closeShop()   // SHOP: the shop's window, as the timers'
     // AUDIT 32 P12: an act under way on the Stores page is set down first (nothing spent, said) - never the window
     : profActUnderWay() ? () => { setDownProfAct(); render(); }
     : confirming ? () => { answered(); render(); }   // RPT1026-MISC CONFIRM-SHEET: and the sheet the ask raised
@@ -6391,9 +6241,7 @@ export function mountEnhancedMenu(host, {
   postOpen = false;   // SERVER-POST: and the mailbox's
   postFocusBack = false;
   postKeep = {};
-  // MAC1 (Mac, 2026-09-10: "after exiting game and then going back to
-  // enhanced settings, the Build and Switch Arms options are gone and
-  // require me to reattach the files"). The Morrowind store is COUNTED
+  // MAC1. The Morrowind store is COUNTED
   // by the hosts' loadMagicRegistries (scenes/shared.js), and the boot
   // door opens before any host boots - so on this surface
   // morrowindDataCount() read -1's zero, the card offered Attach alone,
@@ -6467,7 +6315,6 @@ export function mountEnhancedMenu(host, {
   discardControlsStaging();   // FIX-F: a second visit never inherits the first one's staged binds
   seasonOpen = false;   // SEASON-BOOK: and the season window's (a visit's, as the timers' and the mailbox's above)
   seasonFocusBack = false;
-  shopOpen = false; shopFocusBack = false; shopFlow = null; shopKeep = {};   // SHOP: and the shop's, its account read again next visit
   // PROF2: a landing on a professions page - the Stats tab at it (a home forge's press opens the Stores' forge); the
   // draw falls back to the character's own page when the professions are not the account's
   // HOLDINGS: the Professions page is the Stats rail's, the Stores page the Holdings rail's
@@ -6523,14 +6370,13 @@ export function mountEnhancedMenu(host, {
       stopPost();   // SERVER-POST: and the mailbox's ticks
       releaseTutorialsPane();   // TUT1: the next visit opens on the first page
       stopSeason();   // SEASON-BOOK: and the season window's
-      stopShop();   // SHOP: and the shop's
       releaseGrowthTab();   // GROWTH3: a face on the Growth stage goes with the window (full screen too)
       askUp?.();   // AUDIT GROWTH LANE3-9: and a Yes/No card standing over it
       // FIX-F: and the rebind pane's own capture listener, which is on
       // the DOCUMENT and would outlive this screen exactly as the one
       // above would.
       discardControlsStaging();
-      // MEM-AUDIT (2026-10-23): and what still watched the last screen - the foot's observer (its reserve keeps the home's
+      // MEM-AUDIT: and what still watched the last screen - the foot's observer (its reserve keeps the home's
       // whole tree, the sky's canvas with it) and the account card's paint and focus listener
       footObs?.disconnect?.(); footObs = null;
       acctPaint = null; acctOff?.(); acctOff = null;

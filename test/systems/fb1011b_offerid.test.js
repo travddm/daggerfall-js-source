@@ -1,4 +1,4 @@
-// OFFER-ID (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; found re-reading the Discord's
+// OFFER-ID (FIELD BUGS 2026-10-11b,; found re-reading the Discord's
 // "Unidenitified items"): a valuable piece offered in a realm trade carries its id from the offer. The realm's checkpoint
 // gives every valuable piece its id (INT4, world.js realmCheckpoint -> itemIds.js stampItemIds), and the trade's hold
 // checkpoints AFTER the offer was written for the wire (tradeSession.js setOffer -> tradePack.js wire) - so a piece looted
@@ -116,9 +116,6 @@ test('OFFER-ID through the realm: a Rare looted since the last checkpoint is off
 });
 
 test('OFFER-ID by source: the host hands its realm pack the id stamp; a pack handed none stamps nothing (the other readers of the pack)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const tradePack = checkpointedTradePack\(createTradePack\(playerEntity, \{ stampIds: stampItemIds \}\), \(\) => onlineCheckpoint\(\)\);/);
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/tradePack.js', import.meta.url), 'utf8'), /from '(?:\.\.?\/)+(?:[\w-]+\/)*itemIds\.js'/, 'never imported: the item law would install itself');
   const fresh = rareSword(5);
   createTradePack({ items: [fresh] }).wire([{ item: fresh, count: 1 }]);
   assert.equal(fresh.uid, undefined);

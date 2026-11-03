@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW7 / LW-FIX2 / WATCH-FIX (2026-10-05, bible/06-Systems/Living-World.md "LW7", "LW-FIX2", "WATCH-FIX"): THE TURNED
+// LW7 / LW-FIX2 / WATCH-FIX: THE TURNED
 // WATCH - a resident the watch's conversion took (DFU's: the walker's body gone, a guard stood in its place - a swing, the
 // trample, the crime response's arms, the minute's sweep, the town watch's summons) is followed through the guard that
 // stands for them to its end. Every such guard carries the resident it came from (`livingFrom`, put on it where it is

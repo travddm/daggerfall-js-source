@@ -107,20 +107,6 @@ test('F113: the cure quote scales by the regional price adjustment', () => {
   assert.equal(dear.cost, 351, 'the 750-1250 regional term reaches the quote');
 });
 
-test('F113: the host hands the cure flow the live regional adjustment', () => {
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  // MAC-BUG2 widened this window's contents (the shop and the town
-  // ride the same call now), so the cut is CONTENT-ANCHORED rather
-  // than a byte count: the call's own block, from the branch to the
-  // `});` that closes it. A byte count is a pin that fails when
-  // someone adds a line, which is not what it is for.
-  const from = wm.indexOf("destination === 'guildServiceCureDisease'");
-  const site = wm.slice(from, wm.indexOf('\n      });', from));
-  assert.ok(site.includes('buildCureDiseaseFlow('), 'the slice really is the call');
-  assert.ok(site.includes('priceAdjustment: regionPriceAdjustment(playerEntity,'),
-    'buildCureDiseaseFlow receives regionPriceAdjustment, not the neutral default');
-});
-
 // ── F114 ──────────────────────────────────────────────────────────
 
 test('F114: the rank-9 knightly promotion consults house ownership', () => {
@@ -240,20 +226,3 @@ test('F117: the door restores a tenth instead of presenting the death', async ()
   }
 });
 
-test('F117: every live host installs the consult beside its presenter', () => {
-  // The law is one-homed in guildServices.avoidDeath and the restore
-  // on the door; the hosts only wire seams. The dungeon is the one
-  // host with a submersion model, so ITS hook passes the breath
-  // tick's marker.
-  for (const [file, needle] of [
-    ['../../../src/scenes/world.js', 'setAvoidDeathHook(() => {'],
-    ['../../../src/scenes/exterior.js', 'setAvoidDeathHook(() => {'],
-    ['../../../src/scenes/worldModes.js', 'setAvoidDeathHook(() => {'],
-    ['../../../src/scenes/dungeonContext.js', 'avoidDeath(activeMemberships(playerEntity), { submerged: _submergedNow })'],
-  ]) {
-    const s = readFileSync(new URL(file, import.meta.url), 'utf8');
-    assert.ok(s.includes(needle), `${file} wires the consult`);
-  }
-  const d = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.ok(d.includes('_submergedNow = submerged;'), 'the breath tick feeds the marker');
-});

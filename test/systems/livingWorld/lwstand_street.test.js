@@ -1,5 +1,5 @@
-// LW-STAND (field, 2026-10-05, Mac: "NPCs will get stuck over bodies of water, or be stuck running into walls";
-// bible/06-Systems/Living-World.md, the LW-STAND record): A PLACE TO STAND IS ON THE STREET. The stands about a spot -
+// LW-STAND (field, 2026-10-05,;
+// the LW-STAND record): A PLACE TO STAND IS ON THE STREET. The stands about a spot -
 // one alone up to 3.5 m out, a circle further for each circle - were drawn by geometry alone, and a spot stands a few
 // cells before a door, or at a port's dock on the water's edge: the stand fell in a building's wall or over the harbour
 // and the walker walked straight into it; the way to a stand was straight, round a corner or not. And a walker whose
@@ -15,7 +15,7 @@ import { synthTown, closeTown } from '../../lwTown.mjs';
 import { townPlaces, harbourDock, streetGeometry, STAND_REACH_M } from '../../../src/systems/livingWorld/places.js';
 import { circleStands, circleMiddle, aloneStand, CIRCLE_APART, STAND_BEARINGS, STAND_SOUND_M, STAND_MARGIN_M, ALONE_NEED_M, ALONE_FAR_M } from '../../../src/systems/livingWorld/meetups.js';
 import { LivingTown } from '../../../src/systems/livingWorld/livingTown.js';
-import { ResidentWalker, STAND_FRAME } from '../../../src/characters/residentWalker.js';   // LW-TALK: PIN MOVED - standing, the wheel's still frame
+import { ResidentWalker, STAND_FRAME } from '../../../src/characters/residentWalker.js';   // LW-TALK:
 import { PERSON_MOVE_SPEED, MOVE_RECORDS } from '../../../src/characters/mobile/mobilePerson.js';
 import { CityNavigation, NAV_CELL } from '../../../src/world/city/cityNavigation.js';
 import { DAY_MIN, isOutdoor } from '../../../src/systems/livingWorld/dayPlan.js';
@@ -199,7 +199,7 @@ test('LW-STAND the town: every resident at a stay through the day stands where t
       const c = town._inCircle.get(res.id);
       if (c && c.spot === w.e.at) {
         circled++;
-        const drawn = circleStands(w.e.at, c.circle)[c.circle.members.findIndex((m) => m.id === res.id)];   // LW-SPACE: PIN MOVED - a member's place is the round's laying's (`place`)
+        const drawn = circleStands(w.e.at, c.circle)[c.circle.members.findIndex((m) => m.id === res.id)];   // LW-SPACE:
         if (!on(drawn.x, drawn.z)) circleOff++;
       } else if (!on(aloneStand(w.e.at, res.id).x, aloneStand(w.e.at, res.id).z)) aloneOff++;
       assert.ok(on(w.x, w.z), `${res.id} at ${w.e.at.key}, minute ${m}${c ? ' in a circle' : ''}: on the street`);
@@ -207,7 +207,7 @@ test('LW-STAND the town: every resident at a stay through the day stands where t
   }
   assert.ok(stays > 300 && circled > 100, `a day of stays (${stays}), in circles (${circled})`);
   assert.ok(aloneOff > 0 && circleOff > 0, `drawn by geometry alone some stood off the street (alone ${aloneOff}, in a circle ${circleOff}) - else this pins nothing`);
-  // LW-SPACE: PIN MOVED - the stands the census has not dealt, read off a town whose census never ran
+  // LW-SPACE:
   const undealt = makeTown(day * DAY_MIN + 8 * 60).town;
   let read = 0, readOff = 0;
   for (let m = 6 * 60; m < 23 * 60; m += 20) {

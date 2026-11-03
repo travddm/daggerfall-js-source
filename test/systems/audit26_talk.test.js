@@ -56,7 +56,7 @@ test('F016: the static NPC name bank is the REGION\'s, and the race path is gone
   assert.equal((wm.match(/nameBank: currentNameBank\(\)/g) ?? []).length, 1, 'the one static-NPC name derivation');
   // DISC29-H added the SEVENTH, PresentNPCInfo again: a quest stand's Person looked at in Info mode says "You see
   // <name>" off the layout data its click would stamp, so the look and the click call one person one thing.
-  // FIELD BUGS 2026-10-11g QUEST-NAME added the EIGHTH (PIN MOVED): the plaque names a quest stand's Person (World
+  // FIELD BUGS 2026-10-11g QUEST-NAME added the EIGHTH (
   // Tooltips' StaticNPC arm) off the same layout data, through the same helper - the plaque, Info and the click one name.
   // L10N3e: the pair over the one derivation - the name SHOWN where a player reads it, the talk partner's canonical
   // name at the two talk doors - so the two talk windows' plates beside those doors make the eight ten.
@@ -64,7 +64,6 @@ test('F016: the static NPC name bank is the REGION\'s, and the race path is gone
   // (WORLD-HOVER added three: the dungeon plaque's, the interior
   // plaque's and the street's. Every hover arm reads the same bank as
   // the click beside it, or the two would call one person two things.)
-  // PIN MOVED (AUDIT-TESA A2-5): past the Bay the current region's bank is the province's (the host's TESA3 bank), else
   // the region's, as ever.
   assert.ok(wm.includes('const currentNameBank = () => host.provinceBank?.() ?? getNameBankOfRegion('), 'GetNameBankOfCurrentRegion');
 });
@@ -206,7 +205,7 @@ test('F097: the questor gender is read only on a Work question', () => {
   // E7 moved the shared read into one helper - the four pronoun
   // overrides all fork on it - but the law is unchanged: only
   // Female takes the female arm, and C#'s `default:` shares Male.
-  // QUESTOR-SHE (FIELD BUGS 2026-10-20h, PIN MOVED): Female is the
+  // QUESTOR-SHE (FIELD BUGS 2026-10-20h
   // Genders enum the pool's NPCData carries, not the string 'female'
   // this pin held, which no producer mints.
   assert.ok(tm.includes('const female = () => ctx.questorGender?.() === GENDERS.Female;'),

@@ -1,4 +1,4 @@
-// AUDIT VE P1 (2026-10-05, Mac: "performance isn't affected") - THE SHIPPED PACK'S PICTURES, DECODED OFF THE MAIN THREAD.
+// AUDIT VE P1 - THE SHIPPED PACK'S PICTURES, DECODED OFF THE MAIN THREAD.
 //
 // An attached .dfmod decodes in its bundle worker (formats/unity/unityBundleWorker.js). The shipped pack's PNGs were decoded on
 // the page's own thread: createImageBitmap's decode is the browser's, but the readback (drawImage and getImageData, about

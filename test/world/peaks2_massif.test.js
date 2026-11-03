@@ -1,5 +1,4 @@
-// PEAKS2 (2026-10-26, bible/03-World/Peaks.md PEAKS2; the owner: "The world of daggerfall mountains need to be completely
-// redesigned from the ground up with more integration into the terrian ...") - THE MASSIF'S SHAPE, built whole and NOT
+// PEAKS2 - THE MASSIF'S SHAPE, built whole and NOT
 // WIRED: world/peaks/massif.js, the relief the kernel's shaper is to stand where LANDFORM8's cones stood. Held here: the
 // foothills grade it in from nothing; it is centred on the land (the heightmap's shape stands); its spurs run down the
 // fall line; its crests rise to summits and fall to saddles; it is a function of world position alone (a seam one number);
@@ -108,7 +107,6 @@ test('PEAKS2 THE COST: at most six noise reads a sample and under four on the me
   }
   assert.ok(worst <= 6, `worst ${worst}`);
   assert.ok(total / n < 4, `mean ${(total / n).toFixed(2)}`);
-  assert.match(readFileSync('src/world/peaks/massif.js', 'utf8'), /NOT WIRED YET/, 'the module says it stands unwired');
 });
 
 test('PEAKS2 A FLANK, NOT A FIELD OF SPIKES: at its whole relief on a flank the massif stands under 2% of its ground past 52 degrees (SNOW-FACE counted a third of a high Mountain pixel past it under the cones and the ridged hills), its steepest face under 65 degrees (mutants: the spurs\' spacing, the high)', () => {

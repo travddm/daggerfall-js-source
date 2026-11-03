@@ -1,17 +1,14 @@
-// DEATH PENALTY (2026-09-24, Mac: "add deathpenalty 25% of the gold you
-// have with you" - "online mode only ofc").
+// DEATH PENALTY.
 //
 // WHY A RESPAWN IS THE WHOLE SHAPE. A death that ends the run
 // (endRunToTitleMenu: the video, then the title, or F11 for the last
 // save) leaves no continuing purse to take from. A death that RESPAWNS
 // you - online (D-ONLINE1), half health, the nearest safe place - was
 // free, which is the gap this closes: the fall now costs a tenth of the
-// coin you were carrying (a quarter until 2026-10-03, Mac: "Reduce gold
-// loss on death").
+// coin you were carrying (a quarter until 2026-10-03).
 //
-// BAL4 (2026-10-10, bible/05-Combat/Balance-Arc.md section 6; Mac: "Do
-// everything", of "a real cost for dying offline"): IT WAS ONLINE ONLY
-// UNTIL OFFLINE RESPAWNED TOO. LEGACY2 (2026-10-05) gave Project
+// BAL4: IT WAS ONLINE ONLY
+// UNTIL OFFLINE RESPAWNED TOO. LEGACY2 gave Project
 // Legacy's Enduring member an offline rise - the same respawn - and it
 // cost nothing but Arkay's years (and nothing at all to the ageless).
 // An offline rise now takes the same tenth, stated on the death screen

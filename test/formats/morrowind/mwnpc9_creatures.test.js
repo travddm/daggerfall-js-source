@@ -1,4 +1,4 @@
-// MWNPC9 (2026-10-09, the MW-NPC arc's ninth slice - bible/04-Characters/Morrowind-NPCs.md section 14): DAGGERFALL'S
+// MWNPC9: DAGGERFALL'S
 // CREATURES IN MORROWIND CREATURE BODIES. 9a, the body: a CREA record (formats/morrowind/mwFirstPerson.js readCreature - its
 // flags as OpenMW's loadcrea.hpp numbers them), its model - which is its skeleton and its body at once - and its own
 // .kf (xbase_anim's too for a bipedal one, creatureanimation.cpp). Each rigid shape rides the node it hangs under

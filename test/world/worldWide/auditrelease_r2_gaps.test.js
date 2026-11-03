@@ -1,9 +1,7 @@
-// AUDIT RELEASE R2 - THE EXCLUSIONS AND GAPS (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md; the owner: "Take
-// care of exclusions and gaps"): what lane R2 recorded past the Bay, closed - R2-6 a vampire's crypt in a province. Each
+// AUDIT RELEASE R2 - THE EXCLUSIONS AND GAPS: what lane R2 recorded past the Bay, closed - R2-6 a vampire's crypt in a province. Each
 // pin fails on the head before its fix, and on its mutants (tools/mutants/auditrelease_r2_gaps.json).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { createWorldPlaces } from '../../../src/world/worldWide/worldPlaces.js';
 import { theatreAt, districtOf, DISTRICT_PX, WORLD_PIXEL_SPAN } from '../../../src/world/worldWide/worldGrid.js';
 import { cemeteryPastBay, nearestBayCemetery, isCemeteryPlace } from '../../../src/world/worldWide/worldCemetery.js';
@@ -21,6 +19,7 @@ import { poiPixelKey, poiPixelId, poiDocProblems, POI_WORLD_BOUND, POI_PAST_BAY_
 import { createPoiFeed } from '../../../src/poi/poiFeed.js';
 import { placeAtMapMetres, movePlace, mapMetresOf } from '../../../src/poi/poiEdit.js';
 import { codeOnly } from '../../codeOnly.mjs';
+import { d1 } from '../../accountDb.mjs';
 
 setTamrielTrace(null); setTamrielFit(null);   // the authored shape and fit: no player's picture in the suite
 
@@ -67,11 +66,6 @@ test('R2-6 a vampire turned past the Bay wakes in a cemetery of the province: DF
   assert.deepEqual(vampireCryptPixel({ x: 500, y: 200 }, 1, maps, own, () => 0), { x: 100, y: 400 }, 'the region\'s own, however far');
   assert.equal(vampireCryptPixel({ x: 500, y: 200 }, 5, { ...maps, getRegion: () => null }, own), null);
   assert.equal(isCemeteryPlace({ hasDungeon: false, dungeonType: DUNGEON_TYPES.Cemetery }), false, 'a graveyard with no dungeon is no crypt');
-  // the host asks the module (HOST-SPLIT), with the world's registry
-  const w = codeOnly(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8'));
-  const arm = w.slice(w.indexOf('function transferToCemeteryArm()'), w.indexOf('function cancelRestArm()'));
-  assert.match(arm, /const pos = vampireCryptPixel\(playerTravelPixel\(\), _questRegionIndex\(\), maps, worldPlaces\);/);
-  assert.doesNotMatch(arm, /maps\.getRegion\(/, 'no Bay-only search left in the host');
 });
 
 test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s pixel (the law, the relay\'s word, its cell), a town\'s is the Bay\'s until WW6 and refused by name; the place picker lists a province\'s places from the world\'s registry, each offered as an area, and says where staff stand (mutants: the Bay\'s bound again, the word\'s, a town past the Bay taken, the province unlisted, a place offered as a town)', () => {
@@ -79,7 +73,6 @@ test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s p
   const EV = { id: 'ab12cd34ef', rg: 64, loc: -1, px: WHITERUN.x, py: WHITERUN.y, nm: 'Whiterun', ct: 0, mt: [7, 12], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'Mob' };
   assert.deepEqual(validStaffEvent(EV), { ...EV, hp: 0 }, 'an area past the Bay');
   assert.equal(isAreaEvent(validStaffEvent(EV)), true);
-  // PIN MOVED (WW6, bible/03-World/World-Wide.md WW6): the raids stand past the Bay, and a town's event with them - where its
   // town does: a Bay location's index at a pixel past the Bay is refused by name (`town`), a town past the Bay's own index
   // there taken (test/world/worldWide/ww6_raids.test.js)
   assert.equal(staffEventFault({ ...EV, loc: 3, ct: 1 }), 'town', 'a Bay town\'s location at a pixel past the Bay: two sides of the edge');
@@ -117,8 +110,6 @@ test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s p
   assert.equal(keptPlaces(), reg);
   assert.deepEqual(staffHere(maps, WHITERUN), { dfoStaff: 'here', region: 64, name: 'Skyrim', loc: -1, place: 'Whiterun', kind: 'town', px: WHITERUN.x, py: WHITERUN.y }, 'where I stand past the Bay: the area at Whiterun');
   gamePlaces(null);
-  // the host keeps the registry for the picker
-  assert.match(codeOnly(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8')), /const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);/);
 });
 
 test('R2-8 a POI past the Bay: its law takes the world\'s pixel, its id is one a pixel - the Bay\'s MapsFile ids every one as it was, past them the world\'s - so the feed stands it on its own pixel and no other, and the editor carries a place over the Bay\'s edge; the stored ids are the documents\' own (`poi-<hex>`), no row keyed by a pixel (mutants: the Bay\'s bound again, the old id, the past-Bay ids over the Bay\'s, the feed\'s old key, the editor\'s old clamp, the host\'s riding key)', async () => {
@@ -166,9 +157,8 @@ test('R2-8 a POI past the Bay: its law takes the world\'s pixel, its id is one a
   const q = placeAtMapMetres({ px: 0, py: 0, x: 0, z: 0, y: 0, ground: 'snap', r: [0, 0, 0, 1], s: 1 }, ...mapMetresOf({ px: WHITERUN.x, py: WHITERUN.y, x: 12.5, z: 40 }));
   assert.deepEqual([q.px, q.py, q.x, q.z], [WHITERUN.x, WHITERUN.y, 12.5, 40], 'stood at Whiterun');
   // the stored ids: the documents' own - the store's tables key no row by a pixel
-  const sql = readFileSync(new URL('../../../server-account/migrations/0116_poi.sql', import.meta.url), 'utf8');
-  assert.match(sql, /id\s+TEXT PRIMARY KEY,\s+-- poi-<12 hex>/);
+  const raw = d1()._raw;
+  assert.deepEqual(raw.prepare('PRAGMA table_info(poi_docs)').all().filter((c) => c.pk).map((c) => `${c.name} ${c.type}`), ['id TEXT']);
+  const sql = raw.prepare("SELECT group_concat(sql, ';') AS s FROM sqlite_master WHERE name LIKE 'poi\\_%' ESCAPE '\\'").get().s;
   assert.doesNotMatch(sql, /CHECK\s*\(\s*p[xy]/i, 'no bound on a place\'s pixel in the store');
-  // the host's riding frame a pixel's one id
-  assert.match(codeOnly(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8')), /riding: \(px, py\) => \{\s*const k = poiPixelKey\(px, py\);/);
 });

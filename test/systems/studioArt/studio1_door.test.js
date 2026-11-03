@@ -1,5 +1,4 @@
-// STUDIO1 (2026-10-17, bible/07-Rendering/Studio-Art.md, Mac of trashBattery's "a centralized location for you and I to
-// put 2d art assets": "We need to build what trash is talking about"): THE STUDIO'S PICTURES REACH THE GAME.
+// STUDIO1: THE STUDIO'S PICTURES REACH THE GAME.
 //
 //   D1  a picture's name: its artist (the first folder), what it replaces (DFU's name before any `--` label), refused
 //       when it names nothing; one picture a key, the first path's

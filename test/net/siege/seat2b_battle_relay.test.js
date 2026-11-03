@@ -1,8 +1,8 @@
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE WORKS IN THE RELAY'S BATTLE,
+// SEAT2b part two (b): THE WORKS IN THE RELAY'S BATTLE,
 // pinned over the real Room and its fake sockets (test/fakeRoom.mjs) - the pass's works name the battle's Gatehouse,
 // its Rams and its Walls; an attacker's blow batters the Gatehouse, a defender's the Ram, each at its share; the Ram's
 // crew strikes every ten seconds; a destroyed Ram's successor comes at the attackers' wave; the breach unbars the
-// Throne; a defender rises on the Walls' quicker wave (bible/11-Multiplayer/Seats-Arc.md 6.2, 7.5; server/src/index.js
+// Throne; a defender rises on the Walls' quicker wave (6.2, 7.5; server/src/index.js
 // `_siegeWorkBlow`, net/siege/siegeRef.js). `06-Systems/Online-Arc.md` SEAT2b part two (b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

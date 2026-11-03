@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S11 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): THE HANG -
+// SD-LOOK S11: THE HANG -
 // what each island of the Hour hangs on, and what hangs from it. Every island is a piece of the Bay torn up and welded
 // to a gear of the Numidium:
 //

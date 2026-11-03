@@ -6,7 +6,7 @@ import {
   createWeaponMachine, machineCancelBowDraw, machineAttack,
   getBowCooldownTime, MAX_GESTURE_SECONDS, ATTACK_THRESHOLD,
 } from '../../../src/characters/weaponStates.js';
-// SWING-DEFAULT1 (2026-09-22): these pins are the DRAG's law (WeaponSwingMode 0); the port's default is 2 now (click or hold), so the drag is asked for here, once for the file.
+// SWING-DEFAULT1: these pins are the DRAG's law (WeaponSwingMode 0); the port's default is 2 now (click or hold), so the drag is asked for here, once for the file.
 import { setValue as _swingSetValue } from '../../../src/systems/settings/settings.js';
 _swingSetValue('Controls', 'WeaponSwingMode', '0');
 
@@ -84,7 +84,6 @@ test('audit24 combat: the bow RISE edge, the tracking reset, and the angle sign'
   // "after the button was RELEASED since the last shot"
   // (lastAttackHand == Hand.None), so an OR - or a missing edge - turns
   // one held button into a machine gun.
-  // PIN MOVED (BOW-CLOCK, FIELD BUGS 2026-10-09g): onto the DRAWN bow, which
   // keeps the edge. The instant shot (BowDrawback off) repeats while held now -
   // the owner's departure, pinned in fb1009g_bowclock.test.js.
   const DRAWN = { bowDrawback: true };

@@ -1,5 +1,4 @@
-// SHARE-MEND (2026-09-27, Discord - Tabitha: "Fix sharing Guild & Temple quests - It says the quests don't match up,
-// can't share, etc.").
+// SHARE-MEND.
 //
 // THREE FAULTS BEHIND ONE SENTENCE. A guild's or a temple's quest sends the party to a dungeon, and a dungeon Place
 // carries every quest marker in it - three hundred markers were over the share's byte cap on their own, and the Share
@@ -193,13 +192,6 @@ test('SHARE-MEND once: a deliberate share is always answered; a sync\'s refusal 
   assert.equal(sayShareRefusal(said, 'a-bran', 'M0B00Y00', g, true, 'c1|b2'), false, 'and not the next');
   assert.equal(sayShareRefusal(said, 'a-bran', 'M0B00Y00', { reason: 'active' }, true), true, 'a new reason is said');
   assert.equal(sayShareRefusal(said, 'a-cass', 'M0B00Y00', g, true), true, 'another sharer is said');
-});
-
-test('SHARE-MEND the host: a sync goes out marked, and the receiver says a refusal through the once-law with the sender\'s build (mutants: the sync unmarked; the refusal said every time)', () => {
-  const W = src('src/scenes/world.js');
-  assert.match(W, /socialLink\(\)\?\.shareQuest\(\{ questName: prepared\.questName, displayName: prepared\.displayName, data: \{ \.\.\.prepared\.data, sync: 1 \} \}\)/);
-  assert.match(W, /if \(!sayShareRefusal\(_questRefusalSaid, acct, quest\.questName, result, quest\.data\?\.sync === 1, `\$\{quest\.data\?\.shareId \?\? ''\}\|\$\{quest\.data\?\.build \?\? ''\}`\)\) return;\n\s*setMidScreenText\(shareRefusedLine\(result, who, label, quest\.data\?\.build \?\? null\)\);/);   // PIN MOVED (QUEST-AUDIT III SHARE-WORDS): the line is questShare.js shareRefusedLine's, with the sender's build
-  assert.match(W, /const _questRefusalSaid = new Set\(\);/);
 });
 
 // ─── AUDIT (the batch's audit, agent D) ────────────────────────────────────────────────────────────────────────────

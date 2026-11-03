@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02, Mac: "All UI elements and text must be enhanced UI plus"): THE BOUT'S HUD (ui/arena/arenaHud.js) - its
+// ARENA2: THE BOUT'S HUD (ui/arena/arenaHud.js) - its
 // pure model (the versus bar's two sides, my own row, the darling and the villain, the clock, the crowd's band, my
 // stamina, the yield hint, the crowd's shout), its DOM (textContent only, written on change, hidden never removed, no
 // colour inline, the touch size, reduced motion), its dress through the kit's roles and the Plus sheet; THE HERALD'S
@@ -144,16 +144,13 @@ test('ARENA2 HUD sheet and dress: the pixel face, reduced motion, touch sizes, t
   for (const sel of ['body .arena-hud', 'body .arena-track', 'body .arena-fill', 'body .arena-stam .arena-fill', 'body .arena-crowd .arena-fill', 'body .arena-tag[data-tag="villain"]', 'body .arena-crowd-word[data-band="roar"]']) {
     assert.ok(ONLINE_DRESS_CSS.includes(sel), `the Plus sheet dresses ${sel}`);
   }
-  const hud = rd('src/ui/arena/arenaHud.js');
-  assert.ok(!/innerHTML/.test(hud), 'textContent only');
-  assert.ok(!/style\.(color|background)/.test(hud), 'no colour written inline');
 });
 
 // ── THE HERALD ───────────────────────────────────────────────────────────────────────────────────────────
 test('ARENA2 Herald: his choice - watch while a bout stands or the hour\'s is open, fight when fit, the hall, leave; each refusal said', () => {
   const day = 400 * 1440;
   const open = heraldChoice({ gameMinutes: day + 12 * 60 + 5, ladder: newArenaLadder() });
-  // ARENA3 moved this pin: the Herald is the Arena window's first door (bible/11-Multiplayer/Arena.md 5 - "opened by the
+  // ARENA3 moved this pin: the Herald is the Arena window's first door (5 - "opened by the
   // Herald"), so his choice carries "A - The Arena window" between Fight and the hall
   assert.deepEqual(open.options.map((o) => o.act), ['watch', 'fight', 'window', 'hall', 'leave', 'leave']);
   assert.deepEqual(open.options.map((o) => o.code), ['KeyW', 'KeyF', 'KeyA', 'KeyH', 'KeyL', 'Escape']);

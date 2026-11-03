@@ -132,7 +132,6 @@ test('NT1 (F213): dungeonContext.destroy latches FIRST and marks piles dead befo
   const body = dc.slice(dc.indexOf('    destroy() {'));
   assert.match(body, /destroy\(\) \{\n      _ctxDead = true;/,
     'the context dead latch is the first act of destroy');
-  // PIN MOVED (AUDIT FB1018 L3-2, bible/01-Overview/audits/Audit-Field-Bugs-2026-10-18.md): the teardown frees the piles
   // through the pool's own restore, which marks each dead before it frees it (LOOT-FLATS' one way out of the animator)
   assert.ok(body.indexOf('droppedLoot.restorePiles(null);') > 0, 'the piles freed through the pool');
   assert.match(src('scenes/droppedLoot.js'), /function restorePiles\(saved\) \{\n    for \(const p of piles\) \{ p\.dead = true; freeBatch\(p\); \}/,
@@ -181,7 +180,7 @@ test('NT1 / AUDIT-WH R6: the world plaque has ONE owner per host, and every one 
   const destroy = plaque.slice(plaque.indexOf('export function destroyWorldPlaque() {'));
   for (const slot of ['node = null;', 'shownSig = null;', 'lastX = null;', 'lastTop = null;',
     '_faults = 0;', '_faultSaid = false;', '_gateMark = null;', '_gateOn = false;',
-    '_winKey = null;', '_winFrom = 0;']) {   // FIELD BUGS 2026-10-11g LOOT-SCROLL (PIN MOVED): the scrolled window's pile and top
+    '_winKey = null;', '_winFrom = 0;']) {   // FIELD BUGS 2026-10-11g LOOT-SCROLL (
     assert.ok(destroy.includes(slot), `destroyWorldPlaque leaves ${slot.split(' ')[0]} behind`);
   }
   // THE SIX DOORS. Five of them were unpinned before AUDIT-WH R6, and

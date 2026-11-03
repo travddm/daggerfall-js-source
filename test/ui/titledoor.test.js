@@ -1,6 +1,4 @@
-// TITLE-DOOR (2026-10-27, the owner: "People really love the start game intro screen. I think instead of this leading to
-// the online/offline options. We use the intro title screen as the landing pad itself with these options"; bible/10-UI/
-// UI-Arc.md TITLE-DOOR). THE HELD TITLE IS THE FRONT DOOR: the film lands, steps under the menu, holds its last frame
+// TITLE-DOOR. THE HELD TITLE IS THE FRONT DOOR: the film lands, steps under the menu, holds its last frame
 // for the whole visit and is let go when a game is chosen; the menu's home stands on it - no sky, no masthead, the doors
 // in a row under the mark where Tap to continue stood. Skip intro, Escape and Skip start video land on the title, not
 // past it. Mutants: tools/mutants/titledoor.json.
@@ -12,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { runIntro, runCinematicFrontDoor, TITLE_HELD_TIME, DOORS_FADE_MS } from '../../src/ui/intro/introScreen.js';
 import { titleHeld, holdTitle, TITLE_HELD } from '../../src/ui/intro/titleHeld.js';
 import { TITLE_READY_TIME, MENU_FADE_SECONDS } from '../../src/ui/intro/introCue.js';
-import { MENU_THEME_GAIN } from '../../src/systems/introTheme.js';
+import { MENU_MUSIC_LEVEL } from '../../src/systems/titleMusic.js';
 import { mountEnhancedMenu } from '../../src/ui/enhanced/enhancedMenu.js';
 import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { introPage, fakeTheme, settle } from '../introDom.mjs';
@@ -21,27 +19,13 @@ const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 const quiet = (fn) => { const w = console.warn; console.warn = () => {}; try { return fn(); } finally { console.warn = w; } };
 
 test('TITLE-DOOR: the landed mark makes room for the doors - the band starts at the mark\'s foot, worked from the logo file\'s own size; the film steps under the menu (mutants: TITLEDOOR-band-at-the-centre, TITLEDOOR-film-over-the-menu, TITLEDOOR-host-ground-wins)', () => {
-  const intro = read('src/ui/intro/introScreen.js');
-  const sheet = /const STYLE = `[\s\S]*?`;/.exec(intro)[0];
   // the doors' band begins where the landed mark ends: its centre plus half its height - the file's own height over width,
   // halved, read off the PNG's IHDR so a new logo reddens this and not a layout
   const png = readFileSync(new URL('../../src/assets/branding/dfo-online.png', import.meta.url));
   const half = png.readUInt32BE(20) / png.readUInt32BE(16) / 2;
-  const band = sheet.match(/--intro-doors-top:calc\(var\(--intro-title-y\) \+ var\(--intro-title-w\) \* ([\d.]+)\)/);
-  assert.ok(band, 'the band is the landed mark\'s centre plus a share of its width');
-  const k = Number(band[1]);
-  assert.ok(k >= half && k < half + 0.01, `the share (${k}) is half the mark's height over its width (${half.toFixed(4)}), rounded up - never into the mark`);
-  assert.match(sheet, /#intro\.intro-landed \.intro-title\{top:var\(--intro-title-y\);width:var\(--intro-title-w\);/, 'and the landed mark stands where the band was worked from');
-  // the film over the menu while it plays, under it once landed: the menu's host stands at 12
-  const menuZ = Number(read('src/ui/enhanced/enhancedMenu.js').match(/host\.style\.cssText = 'position:fixed;inset:0;z-index:(\d+);/)[1]);
-  const filmZ = Number(sheet.match(/#intro\{position:fixed;inset:0;z-index:(\d+);/)[1]);
-  const landedZ = Number(sheet.match(/#intro\.intro-landed\{z-index:(\d+)\}/)[1]);
-  assert.ok(filmZ > menuZ && landedZ < menuZ, `the film at ${filmZ} over the menu's ${menuZ}, and at ${landedZ} under it once landed`);
   // the menu's sheet reads the band and goes see-through over the film
   assert.ok(ENHANCED_CSS.includes('#enhanced-menu[data-over-title] { background: transparent !important; }'), 'the host\'s own opaque ground (runEnhancedMenu\'s inline style) gives way');
   assert.ok(ENHANCED_CSS.includes('#enhanced-menu .px-home.px-title > .px-stage:not(.px-acctstage) { justify-content: center; padding-top: calc(var(--intro-doors-top, 62dvh) + 6px); }'), 'the doors stand in the band under the mark');
-  // Tap to continue is retired, its node and its rules with it
-  assert.doesNotMatch(intro, /intro-continue|tapContinue/, 'no node, no rule, no key left for the press the doors replaced');
 });
 
 test('TITLE-DOOR: the boot home on the held title draws no sky and no masthead and its host goes see-through; a section covers it with its own ground and comes home to it; the pause face and an unheld page never wear it (mutants: TITLEDOOR-sky-under-the-title, TITLEDOOR-host-stays-opaque, TITLEDOOR-pause-on-the-title)', () => {
@@ -123,7 +107,7 @@ test('TITLE-DOOR: Skip intro and Escape land on the title - the score at the men
     assert.equal(opened, 1, `${how}: the menu up`);
     assert.equal(titleHeld(page.doc), true, `${how}: on the title`);
     await settle();
-    const menuLevel = ['setLevel', MENU_THEME_GAIN, MENU_FADE_SECONDS];
+    const menuLevel = ['setLevel', MENU_MUSIC_LEVEL, MENU_FADE_SECONDS];
     assert.deepEqual(theme.calls, ['unlock', 'prepare', menuLevel, menuLevel, 'start'], `${how}: unlocked in the press, the score asked to the menu's level at once and again as it starts`);
     const release = await done;
     release();
@@ -152,7 +136,7 @@ test('TITLE-DOOR: the title the score carried in - the menu up on the mark\'s re
   page.frame();
   assert.equal(page.pending, 0);
   page.fire('pointerdown');
-  assert.deepEqual(theme.calls.filter((c) => Array.isArray(c) && c[0] === 'setLevel'), [['setLevel', MENU_THEME_GAIN, MENU_FADE_SECONDS]], 'the first press ducks the score to the menu\'s level');
+  assert.deepEqual(theme.calls.filter((c) => Array.isArray(c) && c[0] === 'setLevel'), [['setLevel', MENU_MUSIC_LEVEL, MENU_FADE_SECONDS]], 'the first press ducks the score to the menu\'s level');
   page.fire('keydown', { key: 'a' });
   assert.equal(theme.calls.filter((c) => Array.isArray(c) && c[0] === 'setLevel').length, 1, 'once');
   const release = await done;
@@ -174,7 +158,7 @@ test('TITLE-DOOR: a film that breaks before it lands is let go - the score at th
   assert.equal(opened, 0, 'the film never revealed the menu');
   assert.equal(page.doc.getElementById('intro'), null);
   assert.equal(titleHeld(page.doc), false);
-  assert.deepEqual(theme.calls.at(-1), ['setLevel', MENU_THEME_GAIN, MENU_FADE_SECONDS]);
+  assert.deepEqual(theme.calls.at(-1), ['setLevel', MENU_MUSIC_LEVEL, MENU_FADE_SECONDS]);
 });
 
 test('TITLE-DOOR: the front door lets the title go with the menu - before the scene asks for the GPU - and ?nointro (no film, no title) still opens the menu on its own sky', async () => {

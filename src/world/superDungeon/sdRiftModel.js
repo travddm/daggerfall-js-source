@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 1): THE RIFT, BUILT - a brass astrolabe stood
+// SD-LOOK: THE RIFT, BUILT - a brass astrolabe stood
 // on its edge in a Daggerfall hall, the escapement of the broken clock torn open. Its parts, each a model in the
 // renderer's shape (`packRealmFaces`), made at the ring's own size (`size`, its gear's span - world/superDungeon/sdDungeon.js
 // sdRiftPlace) in its own frame: x across its face (the right as one standing before its front sees it), y up, z through

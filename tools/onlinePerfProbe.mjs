@@ -1,9 +1,8 @@
 // ═══════════════════════════════════════════════════════════════════
-// THE ONLINE FRAME PROBE (2026-09-19). Mac: "Online mode needs further
-// performance improvements."
+// THE ONLINE FRAME PROBE.
 //
 // MEASURED, NOT GUESSED - PERF-ON's own rule, and the reason this file
-// exists at all. PERF-ON (2026-09-15) measured the online name pass at
+// exists at all. PERF-ON measured the online name pass at
 // 153 GL calls a name a frame and took it to 14. NAME1 landed
 // twenty-six hours later and moved the face a player actually sees off
 // that pass entirely: online forces the enhanced lane (OL1), the

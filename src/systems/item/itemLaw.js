@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT1 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and do it
-// properly"): THE ITEM LAW. One answer to one question - COULD AN HONEST CLIENT OF THIS PORT HAVE MINTED THIS ITEM? -
+// INT1: THE ITEM LAW. One answer to one question - COULD AN HONEST CLIENT OF THIS PORT HAVE MINTED THIS ITEM? -
 // asked by both ends: the account service of every item in a realm character's checkpoint, a listing, a trade and a
 // vault deposit (server-account/src/judge.js), and the client of every item a peer hands it (systems/loot/loot.js
 // validLootItem, through setItemLaw - the law registers itself there, so loot.js owes it no import and the cycle the
@@ -59,33 +58,27 @@ import { itemEnchantmentPower, craftedJewelRecipe, MAX_ENCHANTMENTS } from '../e
 import { isStackable, ARROW_TEMPLATE, GOLD_TEMPLATE, GLASS_BOTTLE_TEMPLATE, LETTER_OF_CREDIT_TEMPLATE } from '../inventory.js';   // HACKED-GOLD: a letter's worth is gold (GOLD-INT)
 import { setItemLaw, LOOT_STACK_MAX, ITEM_GROUP_NAME_BY_CLASS } from '../loot/loot.js';
 import { CREATE_ITEM_ROWS, MENS_PLAIN_ROBES, WOMENS_PLAIN_ROBES } from '../createItemRows.js';
-import { cardById } from '../../net/iliac/iliacCards.js';
 import { PROVENANCE_RE, REPAIR_KIT_TEMPLATE, MASTERWORK } from '../../net/recipeLaw.js';
 import { isMasterWork, MASTER_LINES, MASTER_PROCS_MAX } from '../../net/masterLaw.js';   // MASTER-ART: a Master's work's shape
-import { ILIAC_CARD_TEMPLATE, CARD_BINDER_TEMPLATE, BINDER_DECKS_MAX } from '../iliac/iliacItems.js';
 import { POTENT } from '../../net/alchemyLaw.js';
 import { RRI_TEMPLATES } from '../roleplayRealismItems/rriItems.js';
 import { BANDAGE_TEMPLATE } from '../roleplayRealismItems/rriRealism.js';
 import { FORAGING_TEMPLATES } from '../foraging/foragingLaw.js';
 import { REST_ITEM_ROWS } from '../rest/restItemRows.js';
 import { DEEP_WATERS_FISH_TEMPLATES } from '../deepWater/deepWatersFishRows.js';
-import { WEIR_KEY_LAW_ROW } from '../eliteGates/weirKeyRow.js';   // KEY-LAW: the Weir Key's home pulls the Spire's law and its picture in
 import { SOUL_CAKE_LAW_ROW, HEARTH_OFFERING_LAW_ROW } from '../festival/festivalRows.js';   // WITCH1: the festival's home pulls its pictures and the texture door in
-import { STARGLASS_LAW_ROW } from '../starfall/starglassRow.js';   // STAR7: Starglass's home pulls its picture in - the Weir Key's way
-import { LOCKPICK_LAW_ROW } from '../lockpick/lockpickRow.js';   // LOCKPICK: the Lockpick's home pulls its picture and the loot law in - the Weir Key's way
+import { STARGLASS_LAW_ROW } from '../starfall/starglassRow.js';   // STAR7: Starglass's home pulls its picture in
+import { LOCKPICK_LAW_ROW } from '../lockpick/lockpickRow.js';   // LOCKPICK: the Lockpick's home pulls its picture and the loot law in
 import { DEX_ENEMY_IDS } from '../enemyExpansion/dexIds.js';   // SOUL-LAW: the mod's fifty, whose souls a gem holds - read from its tables, no install
 // THE PORT'S OWN TEMPLATES register as their homes load (itemTemplates.js registerCustomTemplates). A headless reader -
 // the account service - loads none of the game, so the homes that register at import are imported here for exactly
 // that; the four whose homes pull the UI in (foraging, rest, Deep Waters' fish, Roleplay & Realism: Items) hand the law
 // their rows from leaves instead, read beside the registry (lawTemplate) and never put into it - so a client with the
-// mod switched off does not start knowing its items. The Weir Key's (KEY-LAW, FIELD BUGS 2026-10-17) is read beside
-// it too: its home (systems/eliteGates/weirKey.js) pulls the Spire's law and its picture in - and Starglass's (STAR7), whose
+// mod switched off does not start knowing its items. Starglass's (STAR7) is read beside it too: its
 // home (systems/starfall/starglass.js) pulls its picture in, and the Lockpick's (LOCKPICK), whose home
 // (systems/lockpick/lockpickItem.js) pulls its picture, the loot law and the foes' table in.
 import '../professions/profTemplates.js';
 import '../survival/items.js';
-import '../thunderlock.js';
-import '../pistolet.js';   // PISTOLET: the second gun's row, the Thunderlock's way
 import '../gate/gateSpoils.js';
 import '../ayleidStones.js';
 import '../gems.js';   // GEM2: the graded gems' rows
@@ -123,7 +116,7 @@ import '../naval/treasureCharts.js';   // CAPT-CHARTS: the treasure chart
  *  a bow Hourlock is a finding to ask again. KETCH moved it to 13: the Gilded rung's Ketch pair (systems/gilded.js -
  *  Volendrung's Echo, a gilded Dwarven Thunderlock, and the Ketchmaster's Word, a gilded Dwarven Pistolet) are lawful from
  *  it on, so a finding a law of 12 made against either is a finding to ask again. AFFIX-LINES and REFORGE-REPLACE moved it
- *  to 14 (2026-10-25): the Reforge's count (`reforges`, systems/loot/lootRarity.js reforgeCount) is a mark of the tiers
+ *  to 14: the Reforge's count (`reforges`, systems/loot/lootRarity.js reforgeCount) is a mark of the tiers
  *  the Reforge takes alone - on a Legendary no Exalted, or a piece of no tier, a finding from it on (a law of 13 knew no
  *  such field). Nothing a law of 13 found is lawful now. MASTER-ART left it at 14: a Master's work (net/masterLaw.js) is a
  *  shape no earlier law met honestly - none was made before the service that makes it, whose judge is this law - so no
@@ -133,7 +126,7 @@ export const ITEM_LAW_VERSION = 14;
 const T = ENCHANTMENT_TYPES;
 const TYPE_KEY = Object.freeze(Object.fromEntries(Object.entries(T).map(([k, v]) => [v, k])));
 /** The templates whose homes cannot load headless, by index - their rows, as the homes register them. */
-const LAW_ONLY = new Map(/** @type {any[]} */ ([...RRI_TEMPLATES, ...FORAGING_TEMPLATES, ...REST_ITEM_ROWS, ...DEEP_WATERS_FISH_TEMPLATES, WEIR_KEY_LAW_ROW, SOUL_CAKE_LAW_ROW, HEARTH_OFFERING_LAW_ROW, STARGLASS_LAW_ROW, LOCKPICK_LAW_ROW]).map((t) => [t.index, t]));
+const LAW_ONLY = new Map(/** @type {any[]} */ ([...RRI_TEMPLATES, ...FORAGING_TEMPLATES, ...REST_ITEM_ROWS, ...DEEP_WATERS_FISH_TEMPLATES, SOUL_CAKE_LAW_ROW, HEARTH_OFFERING_LAW_ROW, STARGLASS_LAW_ROW, LOCKPICK_LAW_ROW]).map((t) => [t.index, t]));
 /** A template the port knows: the live registry's row, or a law-only row. */
 export const lawTemplate = (/** @type {unknown} */ i) => (Number.isInteger(i) ? templateByIndex(i) ?? LAW_ONLY.get(/** @type {number} */ (i)) ?? null : null);
 
@@ -281,9 +274,6 @@ export function itemFindings(v, opts = {}) {
   if ((has(item, 'kitMetal') || item.fieldKit === true) && item.templateIndex !== REPAIR_KIT_TEMPLATE) out.add('crafted');
   if (has(item, 'hand') && !(item.group === 'Jewellery' && has(item, 'provenance'))) out.add('crafted');
   if (has(item, 'potent') && !(item.templateIndex === GLASS_BOTTLE_TEMPLATE && POTENT_SHARES.includes(item.potent))) out.add('crafted');
-  if (has(item, 'card') && !(item.templateIndex === ILIAC_CARD_TEMPLATE && cardById(item.card))) out.add('card');
-  if (has(item, 'decks') && !(item.templateIndex === CARD_BINDER_TEMPLATE && Array.isArray(item.decks) && item.decks.length <= BINDER_DECKS_MAX
-    && item.decks.every((/** @type {any} */ d) => Array.isArray(d?.cards) && d.cards.every((/** @type {string} */ c) => cardById(c))))) out.add('card');
   // ── a wagon's mark: on DFU's Small Cart alone, and a marked kind at its own price (WAGONS2 AUDIT: a row marked a
   //    Caravan at the cart's 150 sold as a Caravan at the cart's price) - its floor, the price it was first shelved at
   //    (WAGON-PRICE: one bought before the price rose stays lawful) ──
@@ -329,7 +319,7 @@ function tierFindings(/** @type {any} */ item) {
   }
   if (!ROLLED_TIERS.includes(tier)) return ['rarity'];   // 'common' and 'artifact' are the ladder's words for a reading, never written
   if (!TIER_GROUPS.includes(item.group) || item.artifact === true || item.magic === true || item.questItem === true) return ['rarity'];
-  if (item.group === 'Weapons' && isAmmunition(item) && tier !== 'magic') return ['rarity'];   // AUDIT-THUNDERLOCK F4: a Pellet stack rolled Magic before it - kept, never more
+  if (item.group === 'Weapons' && isAmmunition(item) && tier !== 'magic') return ['rarity'];   // ammunition: Magic at most, a stack rolled before kept
   // every line: a kind the group may carry, a param the kind names on this piece, a value inside the widest band
   const own = lines.filter((a) => !isGemLine(a));
   const gems = lines.filter(isGemLine);
@@ -342,7 +332,7 @@ function tierFindings(/** @type {any} */ item) {
   // no kind repeated (a kind with params: no param repeated)
   const seen = new Set(own.map((a) => (AFFIX_KINDS[a?.id]?.params ? `${a.id}:${a.param}` : a?.id)));
   if (seen.size !== own.length) out.push('affixes');
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): A TECHNIQUE LINE - one at most, of the piece's own family (kindParams,
+  // TECH1: A TECHNIQUE LINE - one at most, of the piece's own family (kindParams,
   // above, already refused another family's), and the piece's LAST own line: the door's technique pass is its last draw,
   // so the Exalted's line and a curse's stand before it, and only a set gem's comes after. It is no number and no proc:
   // the counts below are the other lines'.
@@ -536,10 +526,9 @@ function artifactFindings(/** @type {any} */ item, /** @type {any[]} */ found) {
 }
 
 /** A CLASSIC SAVE'S PIECE: ten slots kept whole by its importer (classicSave.js classicItemFromRecord), `None` among them
- *  - an offline character's, come into the realm through customs. The classic item maker's own law is not this tree's,
+ *  - an offline character's. The classic item maker's own law is not this tree's,
  *  so the law takes the piece as it stands, and the realm keeps it the character's: no route of the service hands it to
- *  another player (realm.js prepareRealmRecord, realmTrade.js - 'piece-legacy'; RESTORE's word for what customs brings,
- *  Mac: "Keep all, can't sell"). AUDIT INT: ten slots dressed so carried any nine powers to the market. */
+ *  another player (realm.js prepareRealmRecord, realmTrade.js - 'piece-legacy'). AUDIT INT: ten slots dressed so carried any nine powers to the market. */
 export const classicPiece = (/** @type {any} */ item) => !!item && typeof item === 'object' && item.artifact !== true && item.magic !== true
   && Array.isArray(item.enchantments) && classicSlots(item.enchantments);
 

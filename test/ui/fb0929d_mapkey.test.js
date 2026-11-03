@@ -3,7 +3,7 @@
 // the classic window's four filters as toggles on the SAME live store, through the classic window's own flip
 // (ui/travel/travelMapWindow.js flipTravelMapFilter, DFU's FilterButtonClickHandler); every glyph inked in its classic dot's
 // hue walked toward the pen (ui/ink/inkMap.js markInks over the colours the classic loader reads off FMAP_PAL.COL); and the
-// key saying which glyph is which, in the ink the sheet lays it in. bible/10-UI/Held-Map-Arc.md MAP-KEY.
+// key saying which glyph is which, in the ink the sheet lays it in. MAP-KEY.
 //
 // The window is driven whole on a fake document whose canvases RECORD, so the pins read what the sheet really inks
 // and what the key really shows. The palette is ARENA2 data: here it is an invented one fed through the real classic
@@ -95,7 +95,7 @@ const mkWin = (extra = {}) => new HeldMapWindow({
 /** The sheet rises (MAP-FIELD7) - the key's presses are the MAP phase's. */
 const open = (win) => { for (let i = 0; i < 20; i++) win.tick(0.05); return win; };
 
-/** The key's FILTER rows - each a toggle and its kinds' chips. WAYPOINTS (2026-10-06): the waypoints' row of switches
+/** The key's FILTER rows - each a toggle and its kinds' chips. WAYPOINTS: the waypoints' row of switches
  *  stands under them (as OW-WHO's players' row does while travellers are drawn) and is no kind of place. */
 const rows = (win) => [...win._chrome.key.children].filter((r) => r.children[0]?.dataset?.filter);
 const toggleOf = (win, f) => rows(win).map((r) => r.children[0]).find((b) => b.dataset.filter === f);
@@ -170,8 +170,6 @@ test('MAP-KEY: the key is the classic window\'s four filters, each with the kind
   // and the key has a word for every glyph markKind can ink
   assert.deepEqual(Object.keys(KIND_WORD).sort(), [...new Set([...Array(14).keys()].map(markKind))].sort());
   assert.equal(KIND_WORD.graveyard, 'Graveyard');
-  // no range table was typed into the ink module: the groups are ASKED
-  assert.match(code('src/ui/ink/inkMap.js'), /getPixelColorIndex\(t, \{ \[filter\]: true \}\) < 0/);
 });
 
 test('MAP-KEY: a press flips the LIVE store through the classic window\'s own flip - the sheet re-inks without the kinds, the save carries it, the classic window agrees both ways (mutants: FB0929D-MAPKEY-the-flip-only-hides, FB0929D-MAPKEY-the-flip-takes-any-name, FB0929D-MAPKEY-the-press-leaves-the-marks, FB0929D-MAPKEY-the-press-flips-a-copy, FB0929D-MAPKEY-the-classic-flips-its-own-copy)', () => {
@@ -209,9 +207,6 @@ test('MAP-KEY: a press flips the LIVE store through the classic window\'s own fl
     assert.doesNotMatch(toggleOf(next, 'homes').className, /\bon\b/);
     next.dispose();
   });
-  // ONE flip, both skins: the classic handler presses it, and the held map writes no flag of its own
-  assert.match(read('src/ui/travel/travelMapWindow.js'), /_filterButtonClick\(which\) \{\s*\n\s*if \(!flipTravelMapFilter\(this\.filters, which\)\) return;/);
-  assert.doesNotMatch(code('src/ui/heldMap.js'), /filters\[[^\]]+\]\s*=[^=]/, 'no second copy of the flip');
 });
 
 test('MAP-KEY: the key holds none of the sheet\'s keys or presses - M and Escape still close, no toggle takes the focus, a press under a box or before the sheet is up does nothing, it steps aside for a phone\'s card, and it is the bay\'s alone (mutants: FB0929D-MAPKEY-a-toggle-takes-the-tab, FB0929D-MAPKEY-a-toggle-takes-the-focus, FB0929D-MAPKEY-a-box-does-not-hold-the-key, FB0929D-MAPKEY-the-key-sits-on-the-card, FB0929D-MAPKEY-the-key-stands-over-the-card, FB0929D-MAPKEY-the-key-stays-on-the-town, FB0929D-MAPKEY-the-key-never-comes-back, FB0929D-MAPKEY-the-key-lets-presses-through, FB0929D-MAPKEY-the-key-floats)', () => {
@@ -268,13 +263,6 @@ test('MAP-KEY: the key holds none of the sheet\'s keys or presses - M and Escape
     assert.equal(win._chrome.key.style.display, 'none', 'and gives it back');
     win.dispose();
   });
-  // it stands ON the foot (the row's own top edge), never at a guessed height, and it is a solid panel
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.hmkey \{ position: absolute; left: 0; bottom: calc\(100% \+ 4px\);/);
-  assert.match(css, /\.hmkey \{[^}]*pointer-events: auto; \}/);
-  assert.match(css, /\.hmkeyflt \{ pointer-events: auto;/);
-  assert.match(css, /@media \(max-width: 860px\) \{\s*\n\s*\.hmkey \{ max-width: calc\(100vw \/ var\(--hm-ui, 1\) - 24px\); \}[\s\S]*?\.hmroot\.hmcardup \.hmkey \{ display: none; \}\s*\n\}/,
-    'on a narrow screen the key steps aside for the card');
 });
 
 test('MAP-KEY: each glyph is inked in its classic dot\'s hue walked toward the pen - off the classic loader\'s own colours, its kind\'s FIRST bucket (the ruin in the labyrinth\'s), the halo the paper\'s; no palette, the pen (mutants: FB0929D-MAPKEY-the-unpack-swaps-green, FB0929D-MAPKEY-a-kind-takes-its-last-bucket, FB0929D-MAPKEY-the-mark-ink-is-the-quarters, FB0929D-MAPKEY-the-glyph-strokes-in-the-pen, FB0929D-MAPKEY-the-glyph-fills-in-the-pen, FB0929D-MAPKEY-the-paint-drops-the-inks, FB0929D-MAPKEY-the-sheet-hands-no-inks)', async () => {

@@ -27,7 +27,7 @@ import { GLOBAL_SCALE } from './meshReader.js';
 import { WORLD_MAP_TILE_DIM, getLocationTerrainTileOrigin } from './terrain/terrainTiles.js';
 
 export const TERRAIN_DISTANCE = 3;   // DFU's default (StreamingWorld.cs:56); D1: the world host passes the LIVE Experimental/TerrainDistance (1..4) into the constructor
-/** BUILD-RETRY (bible/06-Systems/Travel-View.md LOAD-OWED, the port's own - DFU's builds do not fail): the stream's own
+/** BUILD-RETRY (LOAD-OWED, the port's own - DFU's builds do not fail): the stream's own
  *  re-asks of a pixel whose build THREW, real milliseconds after each failure - five, doubling from two seconds, a
  *  minute in all. Past the last the pixel waits for the next crossing that lists it, as every failed pixel waited
  *  before (the load list's law). */
@@ -46,7 +46,7 @@ const NATIVE_PIXEL = 32768; // MapsFile world units per map pixel
 /** Verbatim MapsFile.WorldCoordToMapPixel (truncating division). DFU
  * casts the accumulated float to int first; trunc(trunc(w) / k) equals
  * trunc(w / k) for positive integer k, so the single trunc here is the
- * same mapping. WW-C2 (bible/03-World/World-Wide.md WW-C): FLOORED - DFU's truncation to the bit on the Bay, where every coordinate is non-negative and the two agree; past its west and south edges (a negative x or z) truncation named the NEXT pixel toward the Bay, and Cyrodiil's halls stood on a pixel the player standing on them never read. */
+ * same mapping. WW-C2 (WW-C): FLOORED - DFU's truncation to the bit on the Bay, where every coordinate is non-negative and the two agree; past its west and south edges (a negative x or z) truncation named the NEXT pixel toward the Bay, and Cyrodiil's halls stood on a pixel the player standing on them never read. */
 export function worldCoordToMapPixel(worldX, worldZ) {
   return {
     x: Math.floor(worldX / NATIVE_PIXEL),
@@ -189,12 +189,12 @@ export class StreamingWorldState {
       && py >= MIN_MAP_PIXEL_Y && py < MAX_MAP_PIXEL_Y;
   }
 
-  /** TAMRIEL2 (2026-10-08, Mac: "only implement the land mass"): THE FRAME THE WORLD STREAMS OVER, past the map - the
+  /** TAMRIEL2: THE FRAME THE WORLD STREAMS OVER, past the map - the
    *  continent's box in the map's own coordinates (world/tamriel/tamrielFrame.js tamrielFrameInBay), set by the world host
    *  when the land beyond the Bay is on, null for DFU's own edge of the world. `onMap` stays the MAP's law (World of
    *  Daggerfall's slots and every reader of the data ask it); `streams` is what the load list and the range ask. */
   static frame = null;
-  /** ETHER-SEA (bible/03-World/Eltheric-Ocean.md): THE OTHER BOXES the world streams over - each `{ x0, y0, w, h }` in the
+  /** ETHER-SEA: THE OTHER BOXES the world streams over - each `{ x0, y0, w, h }` in the
    *  map's own coordinates (the Eltheric Ocean's, world/ethericSea.js etherFrame), set by the world host apart from the
    *  continent's `frame` (which the picture's fit resets as it lands). */
   static frames = [];
@@ -264,7 +264,7 @@ export class StreamingWorldState {
     return out.sort(nearestFirstFrom(this.current));
   }
 
-  /** QUEUE-OWED (bible/06-Systems/Travel-View.md QUEUE-OWED): whether the host's build queue holds a pixel the stream
+  /** QUEUE-OWED (QUEUE-OWED): whether the host's build queue holds a pixel the stream
    *  still owes next - the ones at its head the stream let go while they waited (left the grid behind a crossing) are
    *  dropped unbuilt, so what stands at the head is the next to build. DFU's UpdateTerrains collects first and builds
    *  only the terrains still active (StreamingWorld.cs:654-657); the pump built every entry and threw the ones let go

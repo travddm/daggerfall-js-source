@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE TOWN'S PLACES - where a resident can go, read off the town as
+// LW1: THE TOWN'S PLACES - where a resident can go, read off the town as
 // it is built: its buildings' doors (the host hands each in the location frame with its outward normal), its navgrid
 // (world/city/cityNavigation.js) and its buildings' types.
 //
@@ -21,8 +21,7 @@
 //  - THE EXITS are, for each side of the grid, the street-net cell nearest that edge: on the border itself in an open
 //    town, in the gate's passage in a walled one (the gate's own footprint ends the street there) - and where the net
 //    reaches no edge at all, the farthest it reaches toward it.
-//  - IC-GRAND x THE LIVING WORLD (2026-10-26, the owner walking the Imperial City: "Seems like NPCs arent navigating the
-//    entirety of the city"): A TOWN OF QUARTERS (`quarters`, a capital's slice's - livingTown.js): a slice of a city is
+//  - IC-GRAND x THE LIVING WORLD: A TOWN OF QUARTERS (`quarters`, a capital's slice's - livingTown.js): a slice of a city is
 //    cut at its pixel's lines, so it holds pieces of several of the city's street nets - a district wall whose gate
 //    stands in the next slice splits it, and the one net the most doors open onto left the others' streets empty. Every
 //    component QUARTER_MIN of its buildings open onto is the town's (its net the union, `net`/`netId`), and each is a
@@ -62,8 +61,7 @@ const BLOCK_CELLS = 64;
 
 /** IC-GRAND: how many of a town's buildings a street component opens onto for it to be a quarter of its own. */
 export const QUARTER_MIN = 3;
-/** IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
- *  Arena-Provinces.md IC-STUTTER): the rows of a pass between two steps of townPlacesSteps and streetNetSteps - a town's
+/** IC-STUTTER: the rows of a pass between two steps of townPlacesSteps and streetNetSteps - a town's
  *  places were one task of its pixel's build, its grid read whole a dozen times (each quarter's again): 0.1-0.4 s on a
  *  near slice of the Imperial City, several a second at x60. The same passes in the same order, the same places. */
 export const PLACES_ROWS_A_STEP = 64;
@@ -232,7 +230,7 @@ const STREET_SLACK = 1e-6;
  */
 
 /**
- * LW-STAND (field, 2026-10-05, Mac: "NPCs will get stuck over bodies of water, or be stuck running into walls"): THE
+ * LW-STAND (field, 2026-10-05): THE
  * STREET A PERSON STANDS AND WALKS ON - the street net's cells (the grid's own walkable cells: a building's footprint
  * and the water are none - world/city/cityNavigation.js - nor is the grid's outside), and a body the square of `reach`
  * about its middle. AUDIT LW-STAND: EXACT. A body stands where the square overlaps no cell off the net (`holds`) - its

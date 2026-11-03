@@ -1,5 +1,5 @@
 // @ts-check
-// SD17 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's SD17): THE HOUR-HAND'S
+// SD17: THE HOUR-HAND'S
 // BEAM IN THE AIR - a ribbon of the Remnant's gold light from its pointing hand to where the sweep's bearing meets the
 // floor (or a pillar's face), turned about its own length to face the eye, ADDED onto the frame (ONE, ONE - the duel
 // wall's law, render/duelWall.js: fixed geometry placed by uniforms, no depth written, tested against the depth the world

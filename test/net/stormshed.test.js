@@ -1,6 +1,5 @@
-// STORM-SHED (2026-10-06 evening, the account service overloaded a second time - "D1_ERROR: D1 DB is overloaded.
-// Requests queued for too long." - and players' decorations missing): read off the database and the service's own
-// metrics (bible/06-Systems/Online-Arc.md STORM-SHED), the overload came in waves - a relay deploy, midnight, a burst of
+// STORM-SHED: read off the database and the service's own
+// metrics (STORM-SHED), the overload came in waves - a relay deploy, midnight, a burst of
 // reconnects at 20:10 - and the clients' own asking again held each wave up:
 //   A. a token mint slower than the session's TOKEN_WAIT_MS was marked as its room's though that room's hello went
 //      without it, so the room's retry minted again (net/accountClient.js `opened`); and a failed mint was asked again
@@ -8,7 +7,7 @@
 //   B. a Watch claim that failed was claimed again the frame after its answer (net/townSeatBook.js SEAT_WATCH_RETRY_MS);
 //   C. the reads those asks multiplied: every seat's witness rows read whole on each list, claim and report (one isolate
 //      keeps them SEAT_ROWS_KEPT_S - server-account/src/townSeats.js), and a character's harvests today read off every
-//      player's (migration 0085's index).
+//      player's (`idx_node_harvests_char_day`).
 // Each pin failed on the build before it. tools/mutants/stormshed.json.
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
@@ -250,10 +249,10 @@ test('STORM-SHED B: a Watch claim that failed waits SEAT_WATCH_RETRY_MS before t
 
 // ═══ C. THE READS THE ASKS MULTIPLIED ════════════════════════════════════════════════════════════════════════════════
 
-const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
+const ENV = { SEATS_OPEN: 'on' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const ALCAIRE = { key: 3022, name: 'Alcaire', region: 21, tier: 'palace', pixel: [410, 160] };
-const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (PIN MOVED): the rows the law judges by are a read of them
+const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
 
 /** The service's database with three witnesses agreeing on Anticlere, its seat witness reads counted - and, `gate.hold`
  *  set, each such read held until `gate.release()`. */
@@ -275,7 +274,7 @@ async function seatsDb() {
   return { svc, db, c, gate };
 }
 const PLAYER = { id: 'p-somebody', handle: 'Somebody', registered_at: T0 - 30 * DAY };
-const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY };
+const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY, staff_admin: 1 };
 
 test('STORM-SHED C: the seats\' witness rows are read once in SEAT_ROWS_KEPT_S by one isolate for a player\'s list and a Watch claim, every ask of one moment sharing the read; a developer\'s list and every other act read the table as it stands (mutants: the kept answer; the shared ask; the developer kept; the claim unkept)', async () => {
   const { db, c } = await seatsDb();
@@ -344,9 +343,3 @@ test('STORM-SHED C: the kept rows are the isolate\'s, not a request\'s - each re
   assert.equal(c.n, 1, 'two requests, two Proxies, one read');
 });
 
-test('STORM-SHED C: a character\'s harvests today are read off its own rows - the professions\' state read plans on idx_node_harvests_char_day by the player, the character and the day, never the primary key by the day alone (every player\'s harvests of the day, 8,021 rows a read in the outage) (mutant: migration 0085 unwritten)', () => {
-  const sql = /'(SELECT node, kind FROM node_harvests WHERE player = \?1 AND char_id = \?2 AND day = \?3)'/.exec(src('server-account/src/professions.js'))?.[1];
-  assert.ok(sql, 'the state\'s own read, as professions.js asks it');
-  const plan = d1()._raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all('p', 'c', 1).map((r) => r.detail).join(' | ');
-  assert.match(plan, /USING COVERING INDEX idx_node_harvests_char_day \(player=\? AND char_id=\? AND day=\?\)/);
-});

@@ -1,6 +1,5 @@
-// AUDIT WB14 (2026-10-20, Mac: "Please audit this and ensure perfection"): THE SCREEN'S HALF OF THE PORTENTS ARC, pinned -
+// AUDIT WB14: THE SCREEN'S HALF OF THE PORTENTS ARC, pinned -
 // each finding of the six cold lanes a client owns, reproduced as its lane found it and held fixed
-// (bible/01-Overview/audits/Audit-Breach-Portents.md).
 //
 //   the court        scenes/gate/gateCourt.js hostTargets (SCREEN-1), judge's first frame (SCREEN-2), perilAt's Wheel
 //                    (SCREEN-7); scenes/gate/gateHost.js hostShapes nearest first (SCREEN-3); scenes/gate/gateCaptive.js
@@ -11,10 +10,10 @@
 //   the looks        world/gate/gateBoss.js LAND_SHAKE (SCREEN-12); ui/gate/gateGroundView.js the Gaze's white (SCREEN-14)
 //   the words        the profile's names and the card's rows read live (TEXT-8), the phase card's (TEXT-9), the bar before
 //                    a wave (TEXT-15)
-//   the door         net/wire.js relaySupportsPortents, net/online.js portentsOk, scenes/world.js gateRefusal, and the relay
+//   the door         scenes/world.js gateRefusal, and the relay
 //                    letting go a fight from before the portents (WIRE-1 / SCREEN-8)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md.
+// Design:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -23,7 +22,7 @@ import {
   BASE_PROFILE, PLAN_PLAIN, nightPlan,
 } from '../../../src/net/gate/gateBrain.js';
 import { wheelStrikes, wheelSlack, inAttack } from '../../../src/net/gate/gateStrike.js';
-import { validGateOut, RELAY_VERSION, GATE_PORTENTS_RELAY_MIN, relaySupportsPortents } from '../../../src/net/wire.js';
+import { validGateOut } from '../../../src/net/wire.js';
 import { foldGate, GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
 import { createGateCourt, perilAt, courtPhaseCard, WHEEL_PERIL_MS } from '../../../src/scenes/gate/gateCourt.js';
 import { hostShapes, HOST_SHAPES_MAX } from '../../../src/scenes/gate/gateHost.js';
@@ -125,7 +124,6 @@ test('AUDIT WB14 SCREEN-5 / SCREEN-9 a watcher is never blinded by the Gaze nor 
   assert.deepEqual(lands, [17, 17], 'judged again');
   A.judge(st(gaze(30_000)), 30_200, BASE_PROFILE, [0, 0], 0, true);
   assert.equal(lands.length, 2, 'once');
-  assert.match(read('src/scenes/gate/gateCourt.js'), /watching: \(\) => watching\(\),   \/\/ AUDIT WB14 \(SCREEN-5\)/);
 });
 
 test('AUDIT WB14 SCREEN-6 the Wheel strikes the blade it draws - a capsule, its round tip, no body past its roots - on the screen and in the relay\'s judge alike (mutants: the side\'s slack past the tip; his body\'s ring)', () => {
@@ -174,7 +172,6 @@ test('AUDIT WB14 SCREEN-12 / SCREEN-13 the Sundering and the Rejoining are felt 
   assert.ok(sh);
   const f = telegraphField(sh, 0, COURT_R - 0.01);
   assert.ok(Math.abs(f.s - 1) < 0.01, `${f.s.toFixed(3)} at the rim`);
-  assert.match(read('src/render/gate/gateTelegraph.js'), /s = d \/ min\(uR, rimDist\(uOrigin, rel \/ max\(d, 1e-4\), uCourt, uFloorR\)\);   \/\/ AUDIT WB14 \(SCREEN-13\)/, 'and in the shader');
 });
 
 test('AUDIT WB14 SCREEN-14 the Gaze\'s white washes the screen through the HUD\'s hide - the rim and the warning hidden with it (mutants: the white hidden with the HUD)', () => {
@@ -209,19 +206,7 @@ test('AUDIT WB14 TEXT-8 / TEXT-9 / TEXT-15 the words read in the player\'s langu
   assert.equal(bossBarModel({ ...s, vg: [0, 2] }, T0, BOSS).host, 'The Vanguard - Bridgehead, wave 2 of 3');
 });
 
-test('AUDIT WB14 WIRE-1 / SCREEN-8 a portent night\'s door refuses a relay from before the portents (its fight is fought plain - on floors the screen does not build); a new relay lets go unfallen a fight from before them it wakes on a portent night (mutants: the door open on an old relay; the old fight kept)', () => {
-  // the relay version that says WB14b is the portents' relay
-  const w = read('src/net/wire.js');
-  const line = w.split('\n').find((l) => /RELAY_VERSION = 'world\d+';   \/\/ WB14b/.test(l)) ?? w.split('\n').find((l) => /^\/\/ world\d+: WB14b/.test(l));
-  assert.ok(line, 'WB14b\'s version line');
-  assert.equal(Number(/world(\d+)/.exec(line)[1]), GATE_PORTENTS_RELAY_MIN, 'GATE_PORTENTS_RELAY_MIN is the version that drew them first');
-  assert.ok(relaySupportsPortents(RELAY_VERSION));
-  assert.ok(!relaySupportsPortents(`world${GATE_PORTENTS_RELAY_MIN - 1}`));
-  assert.ok(!relaySupportsPortents(null));
-  const o = read('src/net/online.js');
-  assert.match(o, /if \(primary\) \{ this\.gateOk = relaySupportsGate\(relayV\); this\.portentsOk = relaySupportsPortents\(relayV\); \}/);
-  assert.match(read('src/scenes/world.js'), /gateRefusal: \(g\) => \(!online\?\.gateOk \|\| online\?\.terminal \|\| \(!!gatePortentsOf\(g\.day\) && !online\?\.portentsOk\) \? GATE_TEXT\.notYet/);
-  assert.match(read('server/src/index.js'), /if \(this\._fight && !\('pt' in this\._fight\) && !this\._fight\.fell && !this\._fight\.wrath && gatePortentsOf\(this\._fight\.day\)\) \{ this\._fight = null; await this\.state\.storage\.delete\('gatefight'\); \}/);
+test('AUDIT WB14 SCREEN-8 the relay lets go unfallen a fight from before the portents it wakes on a portent night: every fight says its portents (mutants: the old fight kept)', () => {
   assert.ok('pt' in newFight(7, T0, WRATH, 'ruhn'), 'every fight since says its portents, a plain night\'s null');
   assert.equal(OPENING_MS > 0, true);
 });

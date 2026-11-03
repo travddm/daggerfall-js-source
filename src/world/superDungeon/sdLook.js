@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md "The visual language"): THE
+// SD-LOOK: THE
 // HOUR'S LOOK IN ONE PLACE - its palette ramps, its five lights and what each means, the escapement every hand ticks on,
 // and the hand that runs a countdown to twelve. Four rules: the void is black; metal and stone are structure and do not
 // glow; light appears only where it means something; every surface reads as Daggerfall pixel art.

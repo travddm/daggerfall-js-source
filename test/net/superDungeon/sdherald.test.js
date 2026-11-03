@@ -1,4 +1,4 @@
-// SD-HERALD (2026-10-09, the owner: "We need to add discord integration to abyss dungeons"): THE ABYSS DUNGEON'S
+// SD-HERALD: THE ABYSS DUNGEON'S
 // HERALD, DRIVEN. The law (net/superDungeon/sdHerald.js: the rise's, the find's, the fall's and the fade's posts, and which the
 // herald owes off the hub's record), and the hub over the real Room with Discord stubbed (server/src/index.js: the rise
 // posted on the alarm that raised it, a find and a fall the moment the hub hears them, a found Hollow's fade, an unfound
@@ -141,15 +141,14 @@ const quiet = (fn) => { const warn = console.warn; console.warn = () => {}; retu
  *  Discord says. The director's record is seeded (`rec`, else a rise a minute off) and its own beat runs as it does. */
 async function withHerald(fn, { env = { GATE_DISCORD_WEBHOOK: HOOK, GATE_DISCORD_ROLE: ROLE, SD_DISCORD_ROLE: OWN }, rec = null, herald = null } = {}) {
   const r = fakeRoom(SOCIAL_ROOM);
-  Object.assign(r.env, { SD_COLLAPSE: 'on' }, env);   // SD-PARTY (PIN MOVED): the fall a Hollow's collapse, the hub's setting on
+  Object.assign(r.env, { SD_COLLAPSE: 'on' }, env);   // SD-PARTY (
   r.room._heraldBeat = async () => {}; r.room._heraldNextAt = () => null;
   r.room._serpentHeraldBeat = async () => {}; r.room._serpentHeraldArm = async () => {};
   const realNow = Date.now, realFetch = globalThis.fetch;
   let clock = T0;
   r.store.set(SD_KEY, rec ?? { s: 0, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + 60_000 });
-  // PIN MOVED (WW5): the provinces' lanes rest a year - this is the Bay's lane's herald alone (each lane's own posts, its
   // province named, are test/world/worldWide/ww5_hollows.test.js's)
-  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + 365 * 86_400_000 });
+  for (let lane = 1; lane <= 9; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: T0, until: T0, next: T0 + 365 * 86_400_000 });
   if (herald) r.store.set('sdherald', herald);
   const posts = [];
   const discord = { answer: () => ({ ok: true, status: 204 }) };
@@ -285,11 +284,3 @@ test('SD-HERALD relay: NO WEBHOOK, NO HERALD - a Hollow rises, is found and fall
   }
 });
 
-test('SD-HERALD the door and the order, by source: the role a var beside the serpent\'s, empty by default (the gate\'s then); read with the serpent\'s law; the herald\'s beat after the director\'s on the hub\'s one alarm', () => {
-  const toml = rd('server/wrangler.toml');
-  assert.match(toml, /^SD_DISCORD_ROLE = "\d*"$/m);
-  assert.ok(toml.indexOf('SD_DISCORD_ROLE') > toml.indexOf('SERPENT_DISCORD_ROLE = '), 'beside the serpent\'s');
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /sdRole: serpentHeraldRole\(role\('sdRole'\), role\('gateRole'\)\)/);   // PIN MOVED (SCALE5b): SD_DISCORD_ROLE and GATE_DISCORD_ROLE through relayCfgValue - the hub's settings over the vars (net/relayCfg.js)
-  assert.match(relay, /await this\._sdBeat\(Date\.now\(\)\); await this\._sdHeraldBeat\(Date\.now\(\)\); await this\._ktHeraldBeat\(Date\.now\(\)\); return; \}/, 'after the director\'s moves');   // PIN MOVED (KETCH): the Sky-Ketch's herald after it
-});

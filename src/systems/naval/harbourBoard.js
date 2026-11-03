@@ -1,7 +1,5 @@
 // @ts-check
-// CAPT-BOARD (2026-10-11, the owner: "giving a reason to players to experience it" - and "I want you to make the
-// decisions and completely make this as detailed as possible, providing depth without overcomplicating systems";
-// bible/03-World/Captains-Sea.md CAPT-BOARD) - THE HARBOURMASTER'S BOARD: work for a captain in every port of the Bay,
+// CAPT-BOARD - THE HARBOURMASTER'S BOARD: work for a captain in every port of the Bay,
 // and the crown's favours a captain's standing buys there. The port's own - Daggerfall's harbours post nothing.
 //
 // THE BOARD: each port posts BOARD_OFFERS contracts a day (a rank's `offers` more - captainLedger.js RANK_PERKS), drawn

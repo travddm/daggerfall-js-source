@@ -1,13 +1,11 @@
-// SERPENT5 (2026-10-15; bible/11-Multiplayer/Sea-Serpent.md section 17; Mac: "A gilded weapon to the serpent + a rare
-// chance of a title/aura drop") - THE OLD COIL'S HONOURS: the title COILBREAKER one dealing ship's serpent kill in twenty
+// SERPENT5 - THE OLD COIL'S HONOURS: the title COILBREAKER one dealing ship's serpent kill in twenty
 // and the aura THE MAELSTROM one in fifty, rolled by the account service on the kill's first write off its own draw (the
-// Hour's law, server-account/src/sds.js), laid on the row (`serpent_honours`, migration 0119) and held for good; said and
+// Hour's law, server-account/src/sds.js), laid on the row (`serpent_honours`) and held for good; said and
 // popped by the claim's carrier (net/serpent/serpentClaims.js); worn as every aura is, and drawn by the aura pass's ninth look
 // (render/auraRing.js): a whirlpool of tide and foam at the feet, its arms drawn IN, a lip of breaking foam, a curl at the
 // lip and spray thrown off it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { d1, standService } from '../../accountDb.mjs';
 import { createGuest } from '../../../server-account/src/accounts.js';
@@ -30,7 +28,6 @@ import {
 } from '../../../src/render/auraRing.js';
 import { glslFunctions, GlslDiscard } from '../../glsl.mjs';
 
-const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
 const rand = (b) => globalThis.crypto.getRandomValues(b);
 const T0 = 1_800_000_000;
@@ -108,7 +105,7 @@ test('SERPENT5 THE CLAIM: a dealing ship\'s first write rolls the grants off its
   assert.deepEqual([stood.recorded, stood.title, stood.aura, rowOf(db, C.id).serpent_honours], [true, false, false, 0], 'a ship that stood: none, whatever its draw');
   const guest = await claim(db, both, G, await receipt(G.id, DAY, priv), pubKey);
   assert.deepEqual([guest.why, guest.title, rowOf(db, G.id).serpent_honours], ['guest', undefined, 0], 'a guest: never counted, never granted');
-  assert.match(src('server-account/migrations/0119_serpent_honours.sql'), /^ALTER TABLE players ADD COLUMN serpent_honours INTEGER NOT NULL DEFAULT 0;$/m);
+  assert.deepEqual({ ...db._raw.prepare("SELECT type, \"notnull\", dflt_value FROM pragma_table_info('players') WHERE name = 'serpent_honours'").get() }, { type: 'INTEGER', notnull: 1, dflt_value: '0' });
 });
 
 test('SERPENT5 HELD: Coilbreaker off the row\'s first bit, The Maelstrom off its second - a registered account\'s alone, each off its own bit; worn through the title\'s and the aura\'s doors (mutants: held off any bit; held by a guest)', () => {
@@ -147,8 +144,8 @@ test('SERPENT5 THE ROUTE (AUDIT WORLD-REWARDS E9): through the real Worker, the 
 // ── the vocabulary and the badge ──────────────────────────────────────
 
 test('SERPENT5 THE VOCABULARY: Coilbreaker last of TITLES, The Maelstrom last of AURAS; their words; the title drawn the open sea into the tide into the foam, edged in black, its one colour the tide\'s and no other title\'s; the Maelstrom\'s button in its paint; both signed into a token and kept by the wire (mutants: the word; the paint)', async () => {
-  assert.equal(TITLES.at(-42) /* PIN MOVED (SHOP): Genesis joined the list last */ /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (KETCH): the Skyfarer joined the list last */ /* PIN MOVED (WITCH1): Witchwarden and Hearthkeeper joined the list last */ /* PIN MOVED (STAR8): the Starwarden joined the list after the questlines' five, before the festival's two */, 'coilbreaker');   // PIN MOVED (QL12): the questlines' five joined the list last, after the WikiMaid; PIN MOVED (EG-E2, the merges of main): the Spire's thirteen after it; PIN MOVED (WIKIMAID): the WikiMaid joined the list last
-  assert.equal(AURAS.at(-8) /* PIN MOVED (SHOP): Eternal joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): Sage's Smoke joined the list last */ /* PIN MOVED (WITCH1): Witchfire joined the list last */, 'maelstrom');   // PIN MOVED (EG-E2, the merges of main): the Spire's three after it; PIN MOVED (WIKIMAID): the Lilac Warren joined the list last
+  assert.equal(TITLES[TITLES.indexOf('ilovelamp') + 1], 'coilbreaker');
+  assert.equal(AURAS[AURAS.indexOf('firsthour') + 1], 'maelstrom');
   assert.deepEqual([TITLE_TEXT.coilbreaker, AURA_TEXT.maelstrom], ['Coilbreaker', 'The Maelstrom']);
   assert.equal(TITLE_RGBA.coilbreaker, COIL_TIDE);
   assert.deepEqual(TITLE_GRADIENT.coilbreaker, [COIL_SEA, COIL_TIDE, COIL_FOAM]);
@@ -194,7 +191,6 @@ test('SERPENT5 THE CARRIER: a counted kill\'s grants said whenever it granted on
   const old = await run({});
   assert.ok(!old.said.includes(SERPENT_CLAIM_TEXT.title()) && !old.said.includes(SERPENT_CLAIM_TEXT.aura()) && old.popped.length === 0, 'a service from before acct137: nothing (AUDIT WORLD-REWARDS E2: the aura\'s line neither)');
   await run({ titleNew: true }, () => { throw new Error('the page\'s'); });   // never the carrier's
-  assert.match(src('src/scenes/world.js'), /createSerpentClaims\(\{[\s\S]{0,900}announce: \(kind, key\) => announceHonour\(kind, key\),   \/\/ SERPENT5/);
 });
 
 // ── the look ──────────────────────────────────────────────────────────

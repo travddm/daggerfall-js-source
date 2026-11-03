@@ -1,7 +1,6 @@
 // @ts-check
-// ARENA4 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title. Being the #1 pvp arena player comes
-// with it's own temporary title/glyph"): A BOUT'S RECEIPT - the relay's third signature, the gate's and the raid's twin
-// (net/gate/gateReceipt.js, net/raid/raidReceipt.js). Design: bible/11-Multiplayer/Arena.md "7. Online" - "PvE ladder results and
+// ARENA4: A BOUT'S RECEIPT - the relay's third signature, the gate's and the raid's twin
+// (net/gate/gateReceipt.js, net/raid/raidReceipt.js). Design: "7. Online" - "PvE ladder results and
 // PvP results that award a title are refereed by the relay ... and signs the result".
 //
 //     a1.<base64url(claims)>.<base64url(64-byte Ed25519 signature)>

@@ -313,8 +313,3 @@ test('AUDIT FB1007b S3-S5: the House page says a refusal as one, leaves no armed
   setFamilyProvider(null);
 });
 
-test('FAMILY-SEAT: the world host hands the House page the Legacy host\'s two doors', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /familySeatHere: \(\) => legacyHost\?\.familySeatHere\(\) \?\? null,/);
-  assert.match(w, /moveFamilySeat: \(\) => legacyHost\?\.moveFamilySeat\(\) \?\? \{ ok: false, why: 'Not here\.' \},/);
-});

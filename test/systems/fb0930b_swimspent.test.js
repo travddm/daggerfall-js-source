@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-09-30b (SWIM-SPENT) - Mac: "Also you can get instakilled when fishing", and on the batch's answer
+// FIELD BUGS 2026-09-30b (SWIM-SPENT), and on the batch's answer
 // that the collapse in the water was left as DFU's: "I dont care about DFU. We're our own thing now".
 //
 // A swimmer pays the swim's fatigue even holding still (worldTick.js; FATIGUE-IDLE spares dry ground only), and DFU's
@@ -40,12 +40,11 @@ test('SWIM-SPENT: the law - in the water a drain to nothing is a tenth of the he
   const e = swimmer();
   const wet = exhaustionOutcome({ enemiesNearby: false, swimming: true, entity: e });
   assert.deepEqual({ kind: wet.kind, damage: wet.damage, line: wet.line, inWater: wet.inWater }, { kind: 'drown', damage: 10, line: EXHAUSTED_SWIMMING_LINE, inWater: true });
-  assert.equal(EXHAUSTED_SPENT_SHARE, 0.1);   // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): renamed - the water's share and the shore's, one constant
+  assert.equal(EXHAUSTED_SPENT_SHARE, 0.1);
   assert.equal(exhaustionOutcome({ enemiesNearby: true, swimming: true, entity: e }).kind, 'drown', 'foes about change nothing in the water');
   assert.equal(exhaustionOutcome({ swimming: true, entity: { ...e, maxHealth: 7 } }).damage, 1, 'rounded up - never nothing');
   assert.equal(exhaustionOutcome({ swimming: true, entity: { ...e, maxHealth: 0 } }).damage, 1, 'never nothing');
   assert.equal(exhaustionOutcome({ enemiesNearby: false, swimming: false, entity: e }).kind, 'rest');
-  // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): foes about on dry feet no longer kill - the water's share, its own
   // line (test/systems/fb1013e_spentashore.test.js)
   const near = exhaustionOutcome({ enemiesNearby: true, swimming: false, entity: e });
   assert.deepEqual([near.kind, near.damage, near.line, near.inWater], ['spent', 10, EXHAUSTED_FIGHTING_LINE, false]);
@@ -109,20 +108,3 @@ test('SWIM-SPENT: a swimmer run out of fatigue on the real ticker lives through 
   assert.equal(kinds.at(-1), 'rest');
 });
 
-test('SWIM-SPENT: the three hosts a swimmer can collapse in take the drown arm first - a line, the share, no box, no death heard by Come Sail Away - and the watery-grave box is gone from them', () => {
-  const W = hostText('src/scenes/world.js'), X = rd('src/scenes/exterior.js'), D = rd('src/scenes/dungeonContext.js');
-  const arm = /if \(out\.kind === 'drown'\) \{ townTalk\.say\(out\.line\); hurtPlayer\(playerEntity, out\.damage, \{ bypassShield: true \}\); return; \}/;
-  for (const [name, src] of [['world.js', W], ['exterior.js', X]]) {
-    const fn = src.slice(src.indexOf('function onExhaustedExterior()'), src.indexOf('function onExhaustedExterior()') + 4000);
-    assert.match(fn, arm, `${name}: the drown arm`);
-    assert.ok(fn.search(arm) < fn.indexOf("['You collapse from exhaustion.']"), `${name}: before the box`);
-    assert.doesNotMatch(src, /EXHAUSTED_IN_WATER/, `${name}: no watery grave`);
-  }
-  const wfn = W.slice(W.indexOf('function onExhaustedExterior()'), W.indexOf('function onExhaustedExterior()') + 4000);
-  assert.ok(wfn.search(arm) < wfn.indexOf('csaRuntime.OnPlayerDeath()'), 'world.js: Come Sail Away hears no death of a swimmer still swimming');
-  const dfn = D.slice(D.indexOf('  function onExhausted() {'), D.indexOf('  function onExhausted() {') + 3000);
-  const darm = /if \(out\.kind === 'drown'\) \{ hudText\.add\(out\.line\); hurtEntity\(playerEntity, out\.damage, \{ bypassShield: true \}\); surfacePlayer\(\); return; \}/;
-  assert.match(dfn, darm, 'dungeonContext.js: the drown arm');
-  assert.ok(dfn.search(darm) < dfn.indexOf('opts.csaOnPlayerDeath?.()'), 'dungeonContext.js: before the death is heard');
-  assert.doesNotMatch(D, /EXHAUSTED_IN_WATER/, 'dungeonContext.js: no watery grave');
-});

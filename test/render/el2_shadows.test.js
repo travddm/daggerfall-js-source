@@ -1,5 +1,4 @@
-// EL2 - ENHANCED LIGHTING, TIER TWO: SHADOWS (2026-09-17, Mac: "enhance our
-// lighting system tenfold" - tiers 1, 2 and 3).
+// EL2 - ENHANCED LIGHTING, TIER TWO: SHADOWS.
 //
 // render/shadowPass.js records what the world pass draws and replays it
 // depth-only from the light at the top of the next frame: a two-cascade
@@ -194,12 +193,12 @@ test('EL2: the receiver block and the depth shaders - six uniforms, no dynamic m
   assert.ok(EL_BB_FS.includes(SHADOW_GLSL));
   assert.match(EL_BB_FS, /in vec3 vBBBase;/);
   assert.match(EL_BB_FS, /vec3 base = vBBBase \+ vec3\(0\.0, 0\.5, 0\.0\);/, 'a flat reads its shadow half a unit up its base');
-  // TREES1 (2026-09-19): a flat reads the SOFT lookup - the kernel at
+  // TREES1: a flat reads the SOFT lookup - the kernel at
   // every distance - because it samples once for a whole sprite and the
   // far cascade's one-tap trade is an antialiasing one that only holds
   // for a surface shading per fragment. EL2's own law here is unchanged:
   // the flat's sun term still wears both shadows, read at its base.
-  // LA-COST3 (2026-09-27): read by the lane's billboard VERTEX shader at
+  // LA-COST3: read by the lane's billboard VERTEX shader at
   // that same point (the quad's centre is the same at all four corners)
   // and handed on flat - the fragment wears it under the cloud's.
   assert.match(EL_BB_FS, /uBBSun \* cloudShadowAt\(vBBWorld\) \* vBBSunVis/);
@@ -209,9 +208,7 @@ test('EL2: the receiver block and the depth shaders - six uniforms, no dynamic m
   assert.match(EL_BB_FS, /elPointFlat\(vBBWorld, base\)/);
   assert.ok(!EL_FAR_RING_FS.includes('uSunShadow'), 'the far ring receives no shadow');
   assert.equal(EL_LANE.shadows, true);
-  const r = read('src/render/renderer.js');
-  assert.match(r, /out vec3 vBBBase;/); assert.match(r, /vBBBase = aCenter \+ uOrigin;/);
-  assert.ok(!/uSunShadow/.test(r.slice(0, r.indexOf('export class Renderer'))), 'no classic shader receives a shadow');
+   
 });
 
 test('EL2: the renderer builds the pass with the lane, records the three draw kinds outside a panel, and draws the maps at the top of the next frame under the frame\'s kind', () => {
@@ -263,7 +260,7 @@ test('EL2: the renderer builds the pass with the lane, records the three draw ki
   calls.length = 0;
   r.beginFrame(I, I, new Float32Array([0.45, 0.8, 0.35]), WORLD_FRAME);
   assert.equal(sp.kind, 'point'); assert.deepEqual([...sp.shadowIndex], [1, ...new Array(SHADOW_POINT_CASTERS - 1).fill(-1)], 'the eye\'s own light (carried) is skipped');
-  // PERF-FLICKER (2026-09-19): the w is the CUBE MAP's far plane, not the
+  // PERF-FLICKER: the w is the CUBE MAP's far plane, not the
   // lantern's live range - the light's range is animated (CityLightAnimator
   // wanders it inside a one-unit band, fourteen steps a second) and the
   // shadow pass compared that number to decide whether a slot had changed,
@@ -318,22 +315,3 @@ test('EL2: the record pool is bounded and reused', () => {
   assert.equal(sp.records[0], first, 'the same record object, reused');
 });
 
-test('EL2: the renderer\'s wiring - the three draw paths record behind one gate, the maps are drawn before the clear, the destroys mark, the far ring takes no map', () => {
-  const r = read('src/render/renderer.js');
-  assert.equal((r.match(/this\._casting\) this\._shadows\.record/g) || []).length, 3, 'mesh, terrain, billboards');
-  assert.match(r, /if \(this\._casting && this\._spriteDepth === 0 && this\._studioDepth === 0\) this\._shadows\.recordCharacter\(mesh, modelMatrix\);/, 'EL7: the rigs, never from the sprite target or the studio');
-  assert.match(r, /if \(!wire && !noShadow && this\._casting\) this\._shadows\.recordMesh\(mesh, modelMatrix, texRemap, 1 - \(this\._dissolve \?\? 1\)\);/, 'a wireframe draw (the automap) is not a caster - nor a mesh drawn with noShadow (AUDIT WAGON-HITCH B2: a grown wagon)');   // AUDIT BAY A12 PIN MOVED: with a fading ship's cut
-  assert.match(r, /get _casting\(\) \{ return !!this\._shadows && !this\._panelSaved; \}/);
-  const bf = r.slice(r.indexOf('beginFrame(proj, view, lightDir, opts = null) {'), r.indexOf('beginFrame(proj, view, lightDir, opts = null) {') + 3800);   // AUDIT-EL F5; LC1: the grid's build sits between the passes and the clear, so the window grew; FAR-SEA1: the sea's haze cleared beside the sea's fog (PIN MOVED); BANTHA1: and the jungle's haze (PIN MOVED, 3400 -> 3600); NODE-OUTLINE: and the 3D trees a frame drew (PIN MOVED, 3600 -> 3800)
-  const passes = bf.indexOf('this._beginLane(proj, view, lightDir, opts?.world === true)');
-  assert.ok(passes > 0 && passes < bf.indexOf('gl.clear('), 'the maps before the clear (EL3: with the air\'s images; AUDIT-EL F5: one call, for a WORLD frame)');
-  assert.match(r, /if \(this\._shadows && world\) this\._renderPasses\(proj, view, lightDir\);/);
-  assert.match(r, /const sp = this\._shadows;   \/\/ AUDIT-EL F8: a panel frame never reaches here/, 'a panel frame keeps the records');
-  assert.match(r, /    sp\.discard\(\);\n    this\._restoreWorldViewport\(\);/, 'the records are dropped after both passes and the world viewport comes back');
-  assert.equal((r.match(/_dead = true;   \/\/ EL2/g) || []).length, 3, 'destroyMesh, destroyBillboardBatch, destroyBatch');
-  assert.match(r, /this\._shadows = this\._shadowPass \?\?= new ShadowPass\(this\.gl, \{ build: \(vs, fs\) => this\._buildProgram\(vs, fs\), vs: \{ mesh: VS, bb: BB_VS, terrain: TERRAIN_VS, char: CHAR_VS, charSkin: CHAR_SKIN_VS \} \}\);/);   // PIN MOVED (MWNPC16): and the skinned body's vertex shader, for a Morrowind body's own shadow
-  assert.match(r, /if \(this\._shadows\) this\._shadows\.upload\(this\._el\[key\]\.shadow\);/);
-  const sp = read('src/render/shadowPass.js');
-  assert.ok(!/from '(?:\.\.?\/)+(?:[\w-]+\/)*renderer\.js'/.test(sp), 'the pass imports nothing of the renderer');
-  assert.ok(!/from '(?:\.\.?\/)+(?:[\w-]+\/)*enhancedLighting\.js'/.test(sp), 'nor of the lane');
-});

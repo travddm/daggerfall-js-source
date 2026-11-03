@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA14 (bible/03-World/Arena-Provinces.md TESA14) - THE ROADS PAST THE BAY, IN THE WORLD HOST.
+// TESA14 (TESA14) - THE ROADS PAST THE BAY, IN THE WORLD HOST.
 //
 // When the places past the Bay stand (the trace and the fit landed: world/arenaPlaces.js arenaPixels) and the Bay's own
 // network is known (its crossings ride it, TESA5), the regions' build starts on the roads' workers
@@ -12,7 +12,7 @@
 // stand, or the Bay's network landing, starts the build again. The host wires it; nothing of it lives in the host.
 // TESA15: the build is handed the pixels Arena's places hold too (routed round, and no rolled place on them), and each
 // region's places are kept as it lands (world/pastBayPlaces.js) - the map's marks, the very places the roads serve.
-// WW7-9 (bible/03-World/World-Wide.md): and a word of each region landed - its grid told (`onRegion`), and whether every
+// WW7-9: and a word of each region landed - its grid told (`onRegion`), and whether every
 // region a stretch of the land past the Bay is laid by has landed (`landedIn`) - so the living world wakes a region at a
 // time, the land about the player first, where it waited for every region of the build.
 // ═══════════════════════════════════════════════════════════════════

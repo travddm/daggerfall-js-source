@@ -1,5 +1,4 @@
-// REL5 (2026-09-29, Mac: "How can we drastically improve the install
-// experience?"): THE DOWNLOADS HAVE NAMES THAT DO NOT MOVE.
+// REL5: THE DOWNLOADS HAVE NAMES THAT DO NOT MOVE.
 //
 // Every release used to carry its build number in each file's name
 // (<name>-0.1.4684-win-x64-setup.exe), so no link could point
@@ -38,7 +37,7 @@ const DOWNLOAD_FILES = Object.freeze({
   linux: 'DFO-Online-linux-x86_64.AppImage',
 });
 
-/** BR5 (2026-10-11): THE NAMES BEFORE THE RENAME. Every copy built
+/** BR5: THE NAMES BEFORE THE RENAME. Every copy built
  *  before BR5 asks for its download - the notice transport's Download, the
  *  launcher's Reinstall - by the name it was built with, at
  *  releases/latest/download/<name>, and nothing it holds can learn a new

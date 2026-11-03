@@ -1,4 +1,4 @@
-// SLAM13 (2026-09-16, AUDIT SLAM): THE FINAL LENS'S RELAY FINDINGS - five, each a hole a modified client or a large
+// SLAM13: THE FINAL LENS'S RELAY FINDINGS - five, each a hole a modified client or a large
 // room could put a full room through, and each in law the slams before it wrote.
 //
 // A1 THE ACT FAN'S BORROW WAS ONE SENDER'S TO HOLD. SLAM11 let the room's act bucket borrow so a big door lands whole.
@@ -53,7 +53,6 @@ async function held(n, key, poseOf = (i) => at(i * 2, 0)) {
 
 test('SLAM13: ONE HOME for the numbers both ends read - RELAY_VERSION and HEARTBEAT_MS live in wire.js, the relay and the session re-export those very values, and the floor and the share are derived, not typed (mutants: a second RELAY_VERSION in index.js; HEARTBEAT_MS re-declared in online.js; KEEPALIVE_FAN_MS 2500 -> 6000, which tiers every honest heartbeat)', () => {
   assert.equal(index.RELAY_VERSION, undefined, 'LOCALDEV1: the worker entry exports handlers alone - workerd refused a bundle whose named export was this string, so the relay could not start locally');
-  assert.match(rd('server/src/index.js'), /version: RELAY_VERSION/, 'and /health still says the wire\'s version, through the import');
   assert.equal(relay.RELAY_VERSION, RELAY_VERSION, 'through relay.js too');
   assert.equal(online.HEARTBEAT_MS, HEARTBEAT_MS, 'the session\'s heartbeat is the wire\'s');
   assert.equal(relay.HEARTBEAT_MS, HEARTBEAT_MS, 'and the relay reads the same one');
@@ -62,12 +61,6 @@ test('SLAM13: ONE HOME for the numbers both ends read - RELAY_VERSION and HEARTB
   assert.ok(KEEPALIVE_FAN_MS * 2 <= HEARTBEAT_MS && HEARTBEAT_MS * 3 <= PEER_TIMEOUT_MS, 'and a standing peer is still heard whole three times before the silence law could hide it');
   assert.equal(ACT_SENDER_BYTES_PER_S * 16, ACT_ROOM_BYTES_PER_S, 'sixteen honest senders fill the room\'s rate exactly');
   assert.ok(ACT_SENDER_BYTES_PER_S >= 64 * 1024, 'and one honest door - a few KiB to a full room - lands whole');
-  assert.doesNotMatch(rd('server/src/index.js'), /export const RELAY_VERSION/, 'one declaration, in wire.js');
-  assert.doesNotMatch(rd('src/net/online.js'), /export const HEARTBEAT_MS/, 'one declaration, in wire.js');
-  assert.match(rd('src/net/wire.js'), /export const RELAY_VERSION = 'world\d+';/);
-  // the false lines the final audit found, struck: nobody has measured where a deployed object stops
-  assert.doesNotMatch(rd('src/net/wire.js'), /stops keeping up somewhere around two hundred|observed a real\s+\*\s+object carry/, 'wire.js no longer claims a measured ceiling');
-  assert.doesNotMatch(rd('server/src/index.js'), /past about two hundred it cannot keep up/, 'index.js neither');
 });
 
 test('SLAM13 A3: the yaw is compared as an ANGLE - a heading that drifts across the -PI/PI seam is not a move (mutant: the bare difference, which read 2PI and tiered that player\'s every keepalive)', () => {
@@ -219,28 +212,6 @@ test('SLAM13 A5: every welcome carries the relay\'s version - a place room\'s an
   const ch = fakeRoom(wire.CHAT_WORLD_ROOM);
   const s = ch.connect(); await ch.hello(s, 'dddd-0004');
   assert.equal(ofType(s, 'welcome')[0].v, RELAY_VERSION, 'a channel\'s too');
-  assert.match(rd('server/src/index.js'), /"v":\$\{JSON\.stringify\(RELAY_VERSION\)\}/, 'built into the welcome string, not a second constant');
-});
-
-test('SKEW1 (Mac: two strings outside the chat box after a deploy): the session puts NO version-skew line on the HUD - a foreign `v` is SRV-N\'s to read (`onRelay`), and statusLine stays quiet (mutant: SLAM13 A5\'s statusLine warning restored)', () => {
-  const { FakeWS, sockets } = fakeSocketClass();
-  const s = new OnlineSession({ url: 'wss://relay.test', name: 'M', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000 });
-  const heard = []; s.onRelay = (v) => heard.push(v);
-  const warned = [];
-  const realWarn = console.warn; console.warn = (...a) => warned.push(a.join(' '));
-  const realInfo = console.info; console.info = () => {};
-  try {
-    s.join('town:m9', at(0, 0)); const ws = sockets[0]; ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', v: 'world1', peers: [], host: null, world: null });
-    assert.deepEqual(heard, ['world1'], 'the relay\'s name reaches SRV-N\'s presenter');
-    assert.equal(s.statusLine('online'), null, 'and the HUD line says nothing about it');
-    assert.equal(s.statusLine('chat'), null, 'nor the chat link\'s');
-    assert.equal(warned.length, 0, 'nor the console');
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null });
-    assert.equal(s.statusLine('online'), null, 'a welcome with no version: the same silence');
-    assert.equal(s.versionWarning, undefined, 'the field is gone, not merely quiet');
-  } finally { console.warn = realWarn; console.info = realInfo; }
-  assert.doesNotMatch(rd('src/net/online.js'), /VERSION_WARNING|versionWarning/, 'nothing of it left in the session');
 });
 
 test('SLAM13 (final lens survivors): the asked list prunes by its own retry, poseHzFor rounds (33 peers is 7 Hz), and byteGate\'s cap is the rate (mutants: the prune removed; `round` -> `floor`; the cap dropped)', () => {

@@ -1,9 +1,7 @@
-// SHIP-CLAIM (2026-10-01, Mac: "provide more accessibility options to acquiring" ships - and of the choices put to him,
-// "Claim captured prizes - Keep a ship you take by boarding as your own boat, instead of scuttling her or casting her
-// adrift") - A PRIZE'S THIRD FATE: claimed, she is my boat. The shelf's own deed for her hull and variant, at a quarter of
+// SHIP-CLAIM - A PRIZE'S THIRD FATE: claimed, she is my boat. The shelf's own deed for her hull and variant, at a quarter of
 // her price, in my pack; her boat stood where she lies by Come Sail Away's own placing and linked to that deed; her hold
 // aboard her; her hurts as shares and no hand aboard; let go from the sea unsunk; and kept by both saves
-// (bible/03-World/Naval-Combat.md SHIP-CLAIM). The host over the sea of test/navalSea.mjs with COME SAIL AWAY'S REAL
+// (SHIP-CLAIM). The host over the sea of test/navalSea.mjs with COME SAIL AWAY'S REAL
 // RUNTIME for its boats (test/csaScene.mjs - the real SpawnBoat, placing and save) over the sea's own pool; the window
 // on the suite's minimal DOM; the room of test/navalRoom.mjs.
 import { byClass, Node_ } from '../../chargenDom.mjs';
@@ -158,7 +156,6 @@ test('SHIP-CLAIM claimed, she is my boat: her deed (the shelf\'s, a fresh UID of
   assert.ok(was.hold.length > 0 && was.hull < 0.25 && was.sail < 0.7, 'a battered prize with a hold');
   assert.ok(Math.abs(Math.sin(was.yaw)) > 0.5, `hauled alongside my turned keel: a heading of her own (${was.yaw})`);
   const sounds = h.log.sounds.length, law = h.log.law.length, says = h.log.say.length;
-  // PIN MOVED (HOLDINGS, bible/03-World/Holdings.md): a deed is the Fleet's book's now, never the pack's - the claim's words say so
   assert.deepEqual(m.claimOffer(), { detail: 'Keep it as your own Small Ship. The title goes to your Fleet ledger and the cargo stays in its hold. It has no crew.' });
   assert.equal(m.fate('claim'), true);
   assert.equal(m.fated(), 'claim');
@@ -351,7 +348,6 @@ test('SHIP-CLAIM kept by both saves: the naval save holds her hurts and her empt
   const csaSave = JSON.parse(JSON.stringify(h.rt.getSaveData()));
   const rec = navalSave.boats[uid];
   assert.ok(rec, 'her record by her UID');
-  // PIN MOVED (TOUGHER-SHIPS): her hurts saved on her first build's scale, to the hundredth (navalHost.js savedRecord)
   const first = firstBuildOf(2), onFirst = (v, whole, then) => Math.round((v / whole) * then * 100) / 100;
   assert.deepEqual([rec.hull, rec.sail, rec.maxHull, rec.maxSail, rec.crew, rec.state, rec.mates.hands],
     [onFirst(st.damage.hull, st.damage.maxHull, first.hullHp), onFirst(st.damage.sail, st.damage.maxSail, first.sailHp), first.hullHp, first.sailHp, 0, SHIP_STATES.afloat, []]);
@@ -366,7 +362,7 @@ test('SHIP-CLAIM kept by both saves: the naval save holds her hurts and her empt
   closeV(quatRotate(back.GameObject.rotation, [0, 0, 1]), forwardOfYaw(was.yaw), 1e-5, 'heading as she lay');
   assert.deepEqual(back.Cargo.Items.map((it) => it.name), was.hold, 'her hold aboard her');
   const st2 = g.host._myState(back);
-  assert.ok(Math.abs(st2.damage.hull - st.damage.hull) < 0.02 && Math.abs(st2.damage.sail - st.damage.sail) < 0.02, `her hurts as she was (${st2.damage.hull} ${st.damage.hull})`);   // PIN MOVED (TOUGHER-SHIPS): read back by her share
+  assert.ok(Math.abs(st2.damage.hull - st.damage.hull) < 0.02 && Math.abs(st2.damage.sail - st.damage.sail) < 0.02, `her hurts as she was (${st2.damage.hull} ${st.damage.hull})`);
   assert.deepEqual([st2.damage.crew, st2.crew.hands.length], [0, 0]);
 });
 
@@ -390,13 +386,12 @@ test('SHIP-CLAIM a harbour\'s ship claimed is not stood at her berth again today
   assert.equal(h.host.activate(), true, 'her window');
   assert.equal(h.log.plunder.at(-1).fate('claim'), true);
   const seed = e.ship.seed;
-  // PIN MOVED (AUDIT HOLDINGS, the mutants' run): she sails off her berth - lying at it, a boat of mine keeps it from the
   // roll (HOLDINGS - QUAYS: none moors into her), and the pin could no longer see her berth kept
   const mine = h.rt.AllBoats.at(-1);
   assert.equal(mine.hull, e.ship.hull, 'mine now');
   mine.GameObject.position = [mine.GameObject.position[0] + 3000, 0, mine.GameObject.position[2] - 3000];
   h.view.feet = [0, 0, 300 + HARBOUR_LEAVE + 800];
-  h.run(1 + SHIP_FADE_S);   // SHIP-FADE (2026-10-02) PIN MOVED: they fade as they go
+  h.run(1 + SHIP_FADE_S);   // SHIP-FADE
   h.view.feet = [0, 0, 300];
   h.run(1);
   assert.ok(moored().length >= 1, 'the harbour stood again');
@@ -484,7 +479,6 @@ test('SHIP-CLAIM the window: "Claim her" beside Scuttle and Cast adrift while th
 
 test('SHIP-CLAIM the world\'s seams - the naval host\'s board in scenes/world.js, the one host with a sea (THE FOUR HOSTS RULE: exterior.js, worldModes.js and dungeonContext.js stand none): the mint the mod\'s items\' own, the deed into the pack with no weight\'s gate answering the live pack, the terrain under her, and her dead re-decked - every body that stood on her hull stands on mine, another hull\'s where it was (mutants: each seam unwired, the redeck re-pointing nothing or every body)', () => {
   assert.match(WORLD, /\n {6}mintUid: \(\) => csaNewItemUid\(\),\n/);
-  // PIN MOVED (HOLDINGS): the deed into the Fleet's book (systems/fleet.js titleDeed), its collection the book's
   assert.match(WORLD, /\n {6}packDeed: \(item\) => \{ titleDeed\(item, \{ port: null \}\); return \(\) => fleetBook\(\); \},[^\n]*\n/);
   assert.match(WORLD, /\n {6}terrainAt: \(p\) => csaTerrainOf\(csaPixelAt\(p\[0\], p\[2\]\)\),\n/);
   const line = /\n {6}redeck: (\(from, to\) => \{[^\n]*\}),\n/.exec(WORLD);

@@ -27,7 +27,7 @@ import { GLOBAL_SCALE } from '../meshReader.js';
 export const HEIGHTMAP_DIMENSION = 129; // TerrainSampler.defaultHeightmapDimension
 export const MAX_TERRAIN_HEIGHT = 1539;
 export const DEFAULT_TERRAIN_SCALE = 1.5; // TerrainHelper.defaultTerrainScale - the StreamingWorld PREFAB's own value
-/** TERRAIN-SCALE1 (2026-09-23): THE SCALE THE GAME STREAMS AT. DaggerfallUnityGame.unity overrides the
+/** TERRAIN-SCALE1: THE SCALE THE GAME STREAMS AT. DaggerfallUnityGame.unity overrides the
  *  StreamingWorld prefab instance's TerrainScale to 1.25 - the scene's one StreamingWorld, the one
  *  GameManager.StreamingWorld names, at v0.11.0-beta, v1.0.0, v1.1.1 and master - and no script writes it at run
  *  time. StreamingWorld hands it to every terrain it streams (StreamingWorld.cs:1209, :1243 ->
@@ -37,10 +37,10 @@ export const DEFAULT_TERRAIN_SCALE = 1.5; // TerrainHelper.defaultTerrainScale -
  *  commented-out constant is 1539 * 1.25 = 1923.75): every hill stood a fifth taller than DFU's. Every height the
  *  streamed world draws, collides with or stands things on reads THIS. */
 export const STREAMING_TERRAIN_SCALE = 1.25;
-/** BAY-LEFT-GROUND (bible/03-World/Landforms.md "BAY-LEFT-GROUND", D5): THE LAW OF A RECORD'S HEIGHT'S FRAME, stamped
+/** BAY-LEFT-GROUND ("BAY-LEFT-GROUND", D5): THE LAW OF A RECORD'S HEIGHT'S FRAME, stamped
  *  beside its scale (`groundFrame`). None (1, every record before it): DFU's frame on the Bay, the shaped ground past
  *  it - the landforms' lift answered 0 off the Bay's 1000 x 500. 2 (LIFT_FRAME_LAW): DFU's frame on every pixel of the
- *  world's grid (scenes/groundFrameHost.js). 3: RELIEF-PEAKS (bible/03-World/Tamriel.md) - DFU's own ground past the Bay
+ *  world's grid (scenes/groundFrameHost.js). 3: RELIEF-PEAKS - DFU's own ground past the Bay
  *  stands its large map by WOODS.WLD's law of the small (world/tamriel/tamrielGround.js largeOfByte), where it stood a
  *  swell about 4.5: a record before it is moved by its ground's own move (world/landforms.js groundMovedField). It says
  *  nothing of the Landforms row (AUDIT LANDFORMS C1's law): a build without the row, or one that never knew the stamp,
@@ -63,7 +63,7 @@ export const BASE_HEIGHT_SCALE = 8;
  *  is how the two would part (Home.md, ONE DFU MEMBER, ONE EXPORT). */
 export const NOISE_MAP_SCALE = 4;
 export const EXTRA_NOISE_SCALE = 10;
-// WATER-AUDIT (2026-09-08): THE REFERENCE'S FLOATS. `3.4f * baseHeightScale`
+// WATER-AUDIT: THE REFERENCE'S FLOATS. `3.4f * baseHeightScale`
 // is 27.200000762939453 in C#, not the double 27.2 - and the tile job's
 // ocean compare is float32's (terrainTiles.js generateTileData), so the
 // one constant every reader shares is the float, or the port carries

@@ -1,4 +1,4 @@
-// PROF1 (2026-09-28, Mac: "Begin!") - THE PROFESSIONS' LAWS, pinned against the record (bible/06-Systems/
+// PROF1 - THE PROFESSIONS' LAWS, pinned against the record (bible/06-Systems/
 // Professions-Arc.md, PROF0 3, 4.3, 6, 11, 22 and Appendix B) and against DFU's own tables: src/net/professionLaw.js,
 // src/net/nodeLaw.js, and the two pure modules both ends read (src/formats/mapsTables.js, src/systems/foraging/foragingCore.js).
 import { test } from 'node:test';
@@ -28,13 +28,12 @@ import { MARKS_FAUCETS, MARKS_KINDS } from '../../../src/net/marksLaw.js';
 const name = (i) => templateByIndex(i).name;
 const names = (list) => list.map(name);
 
-// TIME1 (bible/06-Systems/Online-Time-Arc.md): a UTC day's season and month are the SKY's (nodeLaw dayDate), which
+// TIME1: a UTC day's season and month are the SKY's (nodeLaw dayDate), which
 // turns a year every 7.5 real days from its switch - so the winter day these pins stand on is FOUND, the first on or
 // after the one they used to name whose month is 1 and whose season is winter, never named by its date.
 const WINTER_DAY = (() => { let d = utcDayOfMs(Date.UTC(2027, 0, 15)); while (!(dayMonth(d) === 1 && daySeason(d) === SEASONS.Winter)) d++; return d; })();
 
 test('PROF1 law: ten professions - five that gather, five that craft (CRAFT3: thirteen until eight crafts became five), in the tab\'s order (PROF0 3.1)', () => {
-  // PIN MOVED (CRAFT3): eight crafts became five tracks (Professions-Arc 41.2) - Smithing with Jewelcrafting, Building of Carpentry and Masonry, Outfitting, Provisioning of Alchemy and Cooking, Enchanting
   assert.deepEqual(PROFESSIONS.map((p) => [p.id, p.name, p.kind]), [
     ['mining', 'Mining', 'gathering'], ['logging', 'Logging', 'gathering'], ['herbalism', 'Herbalism', 'gathering'], ['hunting', 'Hunting', 'gathering'], ['fishing', 'Fishing', 'gathering'],
     ['smithing', 'Smithing', 'crafting'], ['building', 'Building', 'crafting'], ['outfitting', 'Outfitting', 'crafting'], ['provisioning', 'Provisioning', 'crafting'],
@@ -61,13 +60,12 @@ test('PROF1 law: ranks 0-100 by 10 x n^2 XP, their five names; tiers by the rank
 
 test('PROF1 law: every profession offers two specialisations at 50 and two at 100 (CRAFT3: a merged craft its two disciplines\' four), the record\'s names; a change is 1,000 Marks and a week, standing from its day (PROF0 3.3)', () => {
   assert.deepEqual(Object.keys(SPECIALISATIONS), PROFESSIONS.map((p) => p.id));
-  // PIN MOVED (CRAFT3): a track of one discipline offers its own two a rank; a merged craft (Smithing, Building, Provisioning) its two disciplines' four, in the discipline table's order
   const MERGED = ['smithing', 'building', 'provisioning'];
   for (const [p, by] of Object.entries(SPECIALISATIONS)) for (const r of SPEC_RANKS) assert.equal(by[r].length, MERGED.includes(p) ? 4 : 2, `${p} at ${r}`);
   const ids = (p) => SPEC_RANKS.map((r) => SPECIALISATIONS[p][r].map((s) => s.id));
-  assert.deepEqual(ids('smithing'), [['weaponsmith', 'armoursmith', 'gemcutter', 'goldsmith'], ['masterwright', 'quartermaster', 'master-jeweller', 'lapidary']]);   // PIN MOVED (CRAFT3): Smithing's and Jewelcrafting's
-  assert.deepEqual(ids('building'), [['bowyer', 'joiner', 'quarryman', 'builder'], ['siegewright', 'master-joiner', 'fortifier', 'sculptor']]);   // PIN MOVED (CRAFT3): Carpentry's and Masonry's
-  assert.deepEqual(ids('provisioning'), [['brewer', 'distiller', 'cook', 'field-cook'], ['master-alchemist', 'transmuter', 'chef', 'provisioner']]);   // PIN MOVED (CRAFT3): Alchemy's and Cooking's
+  assert.deepEqual(ids('smithing'), [['weaponsmith', 'armoursmith', 'gemcutter', 'goldsmith'], ['masterwright', 'quartermaster', 'master-jeweller', 'lapidary']]);
+  assert.deepEqual(ids('building'), [['bowyer', 'joiner', 'quarryman', 'builder'], ['siegewright', 'master-joiner', 'fortifier', 'sculptor']]);
+  assert.deepEqual(ids('provisioning'), [['brewer', 'distiller', 'cook', 'field-cook'], ['master-alchemist', 'transmuter', 'chef', 'provisioner']]);
   assert.deepEqual(SPECIALISATIONS.herbalism[50].map((s) => s.name).concat(SPECIALISATIONS.herbalism[100].map((s) => s.name)), ['Gardener', 'Botanist', 'Seasonal Eye', "Apothecary's Friend"]);
   assert.deepEqual(SPECIALISATIONS.fishing[50].map((s) => s.name), ['Angler', 'Netter']);
   assert.deepEqual(RESPEC, { marks: 1000, days: 7 });
@@ -75,14 +73,14 @@ test('PROF1 law: every profession offers two specialisations at 50 and two at 10
   assert.equal(specOk('herbalism', 100, 'gardener'), false, 'a 50 choice is not a 100 choice');
   assert.equal(specOk('logging', 50, 'gardener'), false);
   const row = { spec50: 'gardener', spec100: null, respec_rank: 50, respec_to: 'botanist', respec_at: 1000 };
-  assert.deepEqual(specsAt(row, 999), { 50: 'botanist', 100: null });   // PIN MOVED (AUDIT PERK-TRIAL P8): a change still written as waiting - the older service's, across the deploy - stands at once (test/net/perktrial.test.js)
+  assert.deepEqual(specsAt(row, 999), { 50: 'botanist', 100: null });
   assert.deepEqual(specsAt(row, 1000), { 50: 'botanist', 100: null });
   assert.deepEqual(specsAt(null, 5), { 50: null, 100: null });
 });
 
 test('PROF1 law: the Stores - 5,000 a material (CAP-OFF: the day\'s 60 harvests a gathering profession are gone - test/net/cap_off.test.js); the Herbalism acts\' numbers; the bands; the Basket\'s step (PROF0 5.2, FORAGE0 14.4, 14.6, Appendix B)', () => {
   assert.equal(STORES_MAX, 5000);
-  assert.deepEqual(HERB_ACT, { commonS: 0.8, steadyS: 2.5, steadyDeg: 3, moveM: 0.25, botanist: 1.5, wet: 0.8 });   // PIN MOVED (AUDIT GATHER F7): rain's -20%
+  assert.deepEqual(HERB_ACT, { commonS: 0.8, steadyS: 2.5, steadyDeg: 3, moveM: 0.25, botanist: 1.5, wet: 0.8 });
   assert.deepEqual([BASKET_ACT.finds, BASKET_ACT.glintS, BASKET_ACT.masterGlintS], [3, 1.0, 1.4]);
   assert.deepEqual(ACT_BANDS, [0.85, 1.0, 1.15, 1.3]);
   assert.deepEqual([39, 40, 59, 60, 79, 80].map(actBand), [0.85, 1.0, 1.0, 1.15, 1.15, 1.3]);
@@ -149,14 +147,14 @@ test('PROF1 law: how many nodes a pixel holds a day, by climate (PROF0 6); the t
   const C = mapsFile.CLIMATES;
   const row = (c) => { const n = NODE_COUNTS[c]; return [n.tree, n.herb, n.vein, n.boulder]; };
   assert.deepEqual([C.Woodlands, C.MountainWoods, C.Mountain, C.HauntedWoodlands, C.Swamp, C.Rainforest, C.Subtropical, C.Desert, C.Desert2].map(row),
-    [[12, 8, 4, 3], [10, 6, 6, 4], [4, 4, 12, 5], [8, 8, 4, 3], [6, 10, 2, 0], [12, 10, 2, 0], [8, 8, 4, 3], [0, 6, 10, 5], [0, 6, 10, 5]]);   // PIN MOVED (BOULDERS, acct47): the boulders 1/2/3 -> 3/4/5, the Swamp and the Rainforest none still; (MORE-NODES, acct48): the trees, patches and veins doubled
+    [[12, 8, 4, 3], [10, 6, 6, 4], [4, 4, 12, 5], [8, 8, 4, 3], [6, 10, 2, 0], [12, 10, 2, 0], [8, 8, 4, 3], [0, 6, 10, 5], [0, 6, 10, 5]]);
   assert.equal(NODE_COUNTS[C.Ocean], undefined);
   assert.deepEqual(NODE_TIER_WEIGHTS, [40, 25, 15, 10, 6, 4]);
   assert.deepEqual([0, 0.4999, 0.5, 0.8124, 0.8125, 0.9999].map((u) => drawTier(u, 3)), [1, 1, 2, 2, 3, 3], 'herbs: 40 : 25 : 15 renormalised (8 : 5 : 3)');
   const id = nodeKey({ kind: 'herb', x: 412, y: 188, day: 20724, slot: 2 });
   assert.equal(id, 'herb:412:188:20724:2');
   assert.deepEqual(parseNodeKey(id), { kind: 'herb', x: 412, y: 188, day: 20724, slot: 2 });
-  assert.deepEqual(['herb:8192:1:1:0', 'herb:1:8192:1:0', 'rock:1:1:1:0', 'herb:1:1:1', 7].map(parseNodeKey), [null, null, null, null, null]);   // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): past the world's grid, where the Bay's map's edge was
+  assert.deepEqual(['herb:8192:1:1:0', 'herb:1:8192:1:0', 'rock:1:1:1:0', 'herb:1:1:1', 7].map(parseNodeKey), [null, null, null, null, null]);
   assert.deepEqual(parseNodeKey('herb:1000:1:1:0'), { kind: 'herb', x: 1000, y: 1, day: 1, slot: 0 }, 'WW-C1: a province\'s pixel past the Bay\'s map is ground');
 });
 

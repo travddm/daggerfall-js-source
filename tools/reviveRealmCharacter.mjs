@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// REVIVE (2026-10-14) - A REALM CHARACTER'S DEATH TAKEN BACK, BY THE OPERATOR. Mac, of TheHalfinStream: "I want to roll
-// back this specific account", then "Undo the death", then "Full revive". Her Enduring elder died of her years in
+// REVIVE - A REALM CHARACTER'S DEATH TAKEN BACK, BY THE OPERATOR., then "Undo the death", then "Full revive". Her Enduring elder died of her years in
 // Castle Wayrest on 2026-10-13, and the remains bug (FIELD BUGS 2026-10-13d REMAINS-STAND) hid everything she lay with.
 //
 // THE PLAN, NEVER THE WRITE. This file reads what stood just before the death and what stands now - each a JSON of
@@ -300,7 +299,7 @@ if (isMain(import.meta.url)) {
   const arg = (k) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : null; };
   const has = (k) => argv.includes(k);
   // THE MODE IS THE FIRST WORD, never any word: the plan's own line carries `--find <found.json>`, and asked "is
-  // --find anywhere?" first, the first run (2026-10-14) took the plan for a find and read a facts file it never named
+  // --find anywhere?" first, the first run took the plan for a find and read a facts file it never named
   const mode = argv[0];
   try {
     if (mode === '--player-query') {

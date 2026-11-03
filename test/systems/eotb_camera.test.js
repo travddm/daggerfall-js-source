@@ -12,7 +12,7 @@ import { PrefabNode } from '../../src/world/prefabNode.js';
 
 // ═══ EOTB2: THE CAMERA, READ OFF THE IL ═══════════════════════════
 //
-// Mac, 2026-09-15: "Alright next mod I want to add 1:1", and on why a
+// and on why a
 // port that already has third person carries a second one: "This is
 // moreso for those who opt out of using morrowind."
 //
@@ -69,8 +69,7 @@ test('EOTB2: the settings are the BUNDLE’s, sign flip and all - derived, never
 });
 
 test('EOTB2: the wheel is ONE LADDER - out of the head, out and out, and back into the head', () => {
-  // Mac: "instead of numpad being used to change views, I want it
-  // scrollable like how we handle morrowind." This is the mod's OWN
+  // This is the mod's OWN
   // CameraScrolling arm, and its shape is already Morrowind's, which
   // is what lets the two cameras share a ladder honestly rather than
   // by assertion.
@@ -463,7 +462,7 @@ test('AUDIT-EOTB F5b: the SHIPPED offset puts the camera above the feet, not bel
   assert.equal(r4(r.eye[2]), -2, '...and at the base distance behind');
 });
 
-// ═══ EOTB-IL (2026-09-16): THE CAMERA, AGAINST THE ASSEMBLY ═════════
+// ═══ EOTB-IL: THE CAMERA, AGAINST THE ASSEMBLY ═════════
 //
 // The shipped `.dfmod` is open (vendor/eye-of-the-beholder/il/). These
 // pin the places where EOTB2's reading of the camera was wrong or

@@ -1,5 +1,4 @@
-// FLORA-GROUND (FIELD BUGS 2026-10-27, the owner: "Plus floating flora and reflective flora can be seen off the ground in
-// first person"; the coordinator: "Make the flora's height and the walk height one law ... Make your flora read the same
+// FLORA-GROUND (FIELD BUGS 2026-10-27,; the coordinator: "Make the flora's height and the walk height one law ... Make your flora read the same
 // ground the player walks on, whatever that ground's height law is, so its change cannot float the flora again") - THE
 // GROUND'S ONE LAW (world/terrain/terrainSurface.js walkGroundAt): the near grid's drawn triangles, which the walker's floor
 // (scenes/world.js heightAt) and every plant (the kernel's woods, DFU's scatter, the border's, the herb stands, the jungle,

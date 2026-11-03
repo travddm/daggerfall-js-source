@@ -1,7 +1,6 @@
-// RVN-OWN-KNEEL (FIELD BUGS 2026-10-17g, bible/01-Overview/bugs/Field-Bugs-2026-10-17g.md; the Discord's #general,
+// RVN-OWN-KNEEL (FIELD BUGS 2026-10-17g,; the Discord's #general,
 // Dude7ox: "Disintegrate just outright kills your rev with no option to hire", the screenshot "REVENANT SLAIN - Skulthor,
-// Psytha's Shadow - Rank 9 - Vampire - Elite ... Has fallen. Your revenant is no more."; the owner: "Hmm thought I fixed
-// this"). RVN-OWNERS-CHOICE (2026-10-16b) took the delete away from everyone else's Disintegrate and kept it for the
+// Psytha's Shadow - Rank 9 - Vampire - Elite ... Has fallen. Your revenant is no more."). RVN-OWNERS-CHOICE took the delete away from everyone else's Disintegrate and kept it for the
 // owner's own (revenantFate.js ownersWholeKill passed the owner's whole blow over the stand, the will AND the kneel).
 // Now the owner's own whole blow passes the stand and the will - the Disintegrate's edge, Revenants.md 19 and 20 - and
 // still kneels it: the kill-or-spare is never skipped. A host with no fates (exterior.js) lets it die as before.

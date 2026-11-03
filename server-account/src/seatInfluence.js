@@ -1,9 +1,9 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT1b (2026-09-30, Mac: "Finish the seats") - INFLUENCE: the pledge,
+// SEAT1b - INFLUENCE: the pledge,
 // the week's sources and the standings.
 //
-// bible/11-Multiplayer/Seats-Arc.md 4.1-4.2. Influence is counted per
+// 4.1-4.2. Influence is counted per
 // guild, per seat, per week (townSeatLaw.js seatWeekOf). A guild PLEDGES
 // to one seat a region, in at most five (an Officer's or the
 // guildmaster's act, until the Reckoning). Every source then counts for
@@ -117,7 +117,7 @@ async function pledgesOf(db, week, guildId) {
 }
 
 /**
- * THE ACCOUNT'S WAR THIS WEEK (SEAT0 4.2, Mac: "Yes"): the guild a contribution counts for, and the member it counts
+ * THE ACCOUNT'S WAR THIS WEEK (SEAT0 4.2): the guild a contribution counts for, and the member it counts
  * through - `{ guild, char }`, or `{ why }`. Bound already: its war-guild, through `character` when that is a seasoned
  * member of it, else (`anyCharacter` - a receipt names an account) through any seasoned member of the account's. Not
  * bound yet: `character`'s own guild, 7 days a member - which the write then binds.
@@ -636,7 +636,7 @@ const guildView = (id, name, tag, heraldry) => ({ id, name: name ?? '', tag: tag
 export async function holdsOf(db) {
   return holdsFrom((await holdsRead(db).all()).results);
 }
-/** SEAT-BATCH (2026-10-16): holdsOf's statement and its answer apart, so the seats' list sends it in one batch. */
+/** SEAT-BATCH: holdsOf's statement and its answer apart, so the seats' list sends it in one batch. */
 export const holdsRead = (/** @type {any} */ db) => db.prepare(`SELECT h.key, h.guild_id, h.since_week, h.standing, h.tithe, g.name, g.tag, g.heraldry FROM town_seat_holds h
     JOIN guilds g ON g.id = h.guild_id`);
 export const holdsFrom = (/** @type {any[]} */ results = []) => new Map(results.map((h) => [Number(h.key), {

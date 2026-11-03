@@ -38,7 +38,7 @@ test('AUDIT 23 items-5: every factory mints condition = template hitPoints (a we
   const torch = mintCondition({ group: 'UselessItems2', templateIndex: 247 });
   assert.equal(torch.maxCondition, 50);
   assert.equal(torch.currentCondition, 50);
-  // weapons scale: Dagger hitPoints 50, Daedric mult 32 -> 50*32/4 = 400 - and since WEAPON-POOL (2026-10-06) the one
+  // weapons scale: Dagger hitPoints 50, Daedric mult 32 -> 50*32/4 = 400 - and since WEAPON-POOL the one
   // pool every weapon type shares stands in the row's 50: 1600*32/4 = 12800 (test/systems/weaponpool.test.js)
   const dagger = createWeapon(113, 9);
   assert.equal(dagger.maxCondition, 12800);
@@ -97,7 +97,6 @@ test('AUDIT 23 FTD-2/3: the spell index fold keeps the FIRST record and the load
   const map = spellsByIndexMap([first, dup]);
   assert.equal(map.get(58).name, 'Holy Word');
   const cs = src('src/systems/chargenSession.js');
-  // PIN MOVED (DEX4a): the loader builds RebuildClassicSpellsDict whole (systems/spell/standardSpells.js - the mods'
   // SpellRecords.json merged, then the same first-wins fold)
   assert.ok(cs.includes('standardSpellsByIndex(await fetchBytes('), 'loadSpellIndex rides the one rebuild');
   assert.ok(src('src/systems/spell/standardSpells.js').includes('spellsByIndexMap(mergeSpellRecords(readSpellsStd(bytes)))'), 'and the rebuild rides the first-wins fold');
@@ -159,7 +158,7 @@ test('AUDIT 23 characters-7 + items-1: the spawn bands and the pile gender ride 
   const dc = src('src/scenes/dungeonContext.js');
   assert.equal((dc.match(/spawnDistanceType: e\.spawnDistanceType \?\? 0/g) ?? []).length, 2,
     'both foe constructions pass the marker band');
-  assert.ok(dc.includes('function rollPileItems({ rolls = Math.random, level = effectiveLevel(playerEntity), gender = playerEntity.gender,') && dc.includes('const items = generateLootItems(lootKey, { level, gender }, rolls, _superTier ? { itemChanceScale: SUPER_LOOT_DROP_MULT } : elite ? { itemChanceScale: ELITE_LOOT_DROP_MULT } : {});') && dc.includes('const items = onlineRoom() ? [] : rollPileItems();'), 'piles roll the player gender (WORLD8: through the one pile roll)');   // PIN MOVED (PARTY-LOOT): the player's level and gender are the roll's defaults - a room's base hands in the room's; online the build rolls none of its own (UNBORN holds nothing)   // SD4a (PIN MOVED): a Super dungeon's +50% before the Elite's
+  assert.ok(dc.includes('function rollPileItems({ rolls = Math.random, level = effectiveLevel(playerEntity), gender = playerEntity.gender,') && dc.includes('const items = generateLootItems(lootKey, { level, gender }, rolls, _superTier ? { itemChanceScale: SUPER_LOOT_DROP_MULT } : elite ? { itemChanceScale: ELITE_LOOT_DROP_MULT } : {});') && dc.includes('const items = onlineRoom() ? [] : rollPileItems();'), 'piles roll the player gender (WORLD8: through the one pile roll)');
   // AUDIT 62 F22: the STREET watch runs the exterior band, and it is
   // the mount that says so - EnemySenses.cs:267 reads
   // PlayerEnterExit.IsPlayerInside per classic tick, so the pool that

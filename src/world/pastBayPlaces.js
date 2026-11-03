@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TESA15 (2026-10-24, bible/03-World/Arena-Provinces.md TESA15) - THE PLACES PAST THE BAY THE REGIONS LAID, ONE ROLL.
+// TESA15 - THE PLACES PAST THE BAY THE REGIONS LAID, ONE ROLL.
 //
 // The roads' workers roll every place past the Bay to lay the roads to them (world/tamrielRoads.js buildTamrielRegion),
 // and the held map wanted the same places - so it rolled them a second time on the page's own thread, a frame's budget at

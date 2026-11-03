@@ -62,7 +62,7 @@ import { raisedSince } from './questStamps.js';   // TIME3: a wave's interval ch
 import { waveIsAwaited, questWaitsShort, ONLINE_DELAY_SECONDS } from './clock.js';   // WAVE-WAIT: a wave the quest waits on comes on the short wait online
 import { stringHash } from '../../formats/netRuntime.js';   // VERMIN-SHARED: a shared copy's pick, seeded (a leaf)
 import { seededFirst } from '../wind/wind.js';   // VERMIN-SHARED: the port's one seeded die (imports nothing)
-/** TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): the SKY a quest reads an hour, a date or a season on - its own
+/** TIME3 (6.3): the SKY a quest reads an hour, a date or a season on - its own
  *  seam, and the quest's clock where none is given (offline, a headless quest: DFU's one clock). */
 const skySecondsOf = (quest) => (quest?.skySeconds ?? quest?.nowSeconds)?.() ?? 0;
 
@@ -1446,7 +1446,7 @@ export class StartQuest extends ActionTemplate {
  *  HUD line, %s replaced by the stack amount, as TextManager does. */
 export const YOU_RECEIVE_GOLD_PIECES = 'You receive %s gold pieces.';
 
-/** REALM P0.4 (2026-09-28, bible/06-Systems/Realm-Arc.md "Shared quest rewards are split"): A PARTY'S QUEST PAYS ONE
+/** REALM P0.4: A PARTY'S QUEST PAYS ONE
  *  REWARD. Each partner's copy pays its own (a resync rearms GivePc - machine.js REPLAYABLE_ONE_TIME_ACTIONS), so a
  *  party of six drew six purses for one quest. A shared quest's gold is paid in shares now - the party's size at the
  *  payment (hooks.rewardShares), never under one piece - and the HUD says so. An item reward is each partner's own.
@@ -1534,7 +1534,7 @@ export class GivePc extends ActionTemplate {
       console.warn(`[quest] Could not find Item resource symbol ${this.itemSymbol?.name}`);
       return;
     }
-    // QL3 (bible/06-Systems/Questlines-Arc.md section 5.2): a stamped quest's outcome settled and paid - its gold by the
+    // QL3: a stamped quest's outcome settled and paid - its gold by the
     // outcome's factor, its choice of gear set waiting (systems/questlines/qlLayer.js reward). DFU's quest: nothing.
     // AUDIT QUESTLINES REWARD-11: before the party's split - split first, the HUD named the share of the unscaled purse
     // ("309 gold") and the pile held the scaled one (386)
@@ -2358,7 +2358,7 @@ export class CreateFoe extends ActionTemplate {
    *  draw is unconditional; floor(r * 0) is 0 either way. */
   _range(n) { return Math.floor((this.parentQuest?.rolls ?? Math.random)() * n); }
 
-  /** WAVE-WAIT (bible/06-Systems/Online-Waits.md WAIT2): how long the wave's first arrival may wait - its interval
+  /** WAVE-WAIT (WAIT2): how long the wave's first arrival may wait - its interval
    *  (DFU's Range(0, interval) backdate, below), or, online and until the wave has come, the short wait
    *  (ONLINE_DELAY_SECONDS: 24 of the character's minutes, about two real minutes of play) for a wave the quest waits
    *  on (clock.js waveIsAwaited, read once). The waves after it keep the script's interval - once the messenger has
@@ -3078,7 +3078,7 @@ export const READ_MAP_NOTE = 'Discovered the location of %map after studying a m
  *  RegisterActionTemplates whole and every corpus line resolves or
  *  pends exactly where DFU's scan sends it. Patterns are the DFU
  *  originals' match surface, group-free. */
-// ══ Q5 (2026-08-27): FOURTEEN GUARDS RETIRED ════════════════════
+// ══ Q5: FOURTEEN GUARDS RETIRED ════════════════════
 // Each class is its .cs whole; the six still guarded below carry
 // their blocker in GUARD_PATTERNS' comment.
 
@@ -3616,8 +3616,7 @@ export class ChangeFoeInfighting extends ActionTemplate {
     // headless charter - which is also C#'s own behaviour with no
     // enemy standing.
     //
-    // WA-ALLIES (2026-09-26, SquidKamer, Warm Ashes - Ships' author: "if the wa ships allies aren't attacking then my
-    // other mods may have issues"): an instance is the host's foe RECORD, and a record keeps its QuestResourceBehaviour
+    // WA-ALLIES: an instance is the host's foe RECORD, and a record keeps its QuestResourceBehaviour
     // as `questBehaviour` (questFoeHost.js bindQuestFoeHost - `behaviour` is the name only on a spawn HANDLE). This
     // wrote `inst.behaviour`, which no record has: the flag never landed, the action completed anyway, and every
     // quest foe stayed un-attackable - WAQ_SHIP_SMALLRAID's crew (`change foe _ally_ infighting true`, team 1) stood
@@ -3690,10 +3689,10 @@ class PendingTrigger extends ActionTemplate {
 }
 
 const GUARD_PATTERNS = Object.freeze({
-  // Q5 (2026-08-27) retired fourteen rows, MT-iii took the two
-  // MobileTeams rows, QG1 (2026-08-28) took CastEffectDo, ClickedFoe
+  // Q5 retired fourteen rows, MT-iii took the two
+  // MobileTeams rows, QG1 took CastEffectDo, ClickedFoe
   // and PromptMulti with the ready-spell doors and the foe-click
-  // surface, and RR3 (2026-09-23) took the last - WorldUpdate - when
+  // surface, and RR3 took the last - WorldUpdate - when
   // Roleplay & Realism's Master Armorer line wrote the first
   // `worldupdate building` a quest here has ever had, so the
   // WorldDataVariants registry it routes into was taken up

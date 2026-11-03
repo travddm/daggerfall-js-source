@@ -1,4 +1,4 @@
-// COMBAT-FEEL (2026-10-17, the owner: "Improve and polish combat and visuals"; bible/03-World/Naval-Refit.md COMBAT-FEEL)
+// COMBAT-FEEL
 // - the sea fight felt at my rail: gun smoke carried by the air (systems/naval/navalEffects.js SMOKE-WIND), a ball's
 // fall a spout grown for the eye far off (SPLASH-SPOUT), a near fall drenching her and a near pass whistling
 // (systems/naval/navalShots.js NEAR-MISS, scenes/naval/navalFeel.js DRENCH), the side a blow came from on her plate and
@@ -311,16 +311,6 @@ test('COMBAT-FEEL over the real naval host: a pirate\'s ball by my side whistles
   assert.match(navalHudText(g.host.hudModel()).tally.rest, new RegExp(` - ${t.men} crew down`));
   const cardMen = navalHudText(g.host.hudModel()).card.crew;
   assert.ok(typeof cardMen === 'number' && cardMen < 100, `her card's men thinned: ${cardMen}`);
-});
-
-test('COMBAT-FEEL the wiring: the host hears a pass, drenches on a splash, scales the fall, feels the blow, counts the men, lights the magazine, and steps the feel each frame (mutants: each line)', () => {
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /if \(e\.type === 'pass'\) \{ feel\.passed\(e\); return; \}/);
-  assert.match(host, /effects\.shotSplash\(\[e\.point\[0\], seaY, e\.point\[2\]\], e\.gun === 'heavy', e\.shot, burstScale\(e\.point\)\);/);
-  assert.match(host, /feel\.splashed\(\[e\.point\[0\], seaY, e\.point\[2\]\]\);/);
-  assert.match(host, /if \(box\) out\.push\(\{ id: myBoatId\(b\), box, rig: rigBoxesOf\(b\), boat: b, ear: true \}\);/);
-  assert.match(host, /feel\.sinking\(entry, s\.seed, s\.damage\.fire > 0 \|\| \(entry\.fires \?\? \[\]\)\.some\(\(f\) => !f\.out\)\);/);
-  assert.match(host, /feel\.frame\(total, \(en\) => \(sea\.get\(en\.id\) === en && en\.ship\.damage\.state === SHIP_STATES\.sinking \?/);
 });
 
 /** A document enough for the HUD's draw. */

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROVINCE-COURTS (2026-10-27; the audit "no system left behind in the Bay", item 33 - the owner's call taken: "Every
-// single thing here needs to be addressed. No exceptions."; bible/03-World/World-Wide.md PROVINCE-COURTS): THE
+// PROVINCE-COURTS: THE
 // PROVINCES' OWN COURTS AND PEOPLE.
 //
 // FACTION.TXT gives each of the Bay's regions a Province faction (type 7) with its Court (14) and its People (15) as

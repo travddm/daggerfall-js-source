@@ -42,7 +42,7 @@ import { farLife, farTreeStep } from './farLife.js';   // BOAT-FAR: her Animator
 export const CSA_PEER_TURN_RATE = 12;
 /** A step past this is a teleport and snaps (the team's law, horseCartWire.js easeToward) - and carries nobody (CSA-K). */
 export const CSA_PEER_SNAP_M = 20;
-/** AUDIT SHIPS A7 (2026-10-06, Mac: "Audit everything"): ...or past what her word's way runs in this long (s), if farther
+/** AUDIT SHIPS A7: ...or past what her word's way runs in this long (s), if farther
  *  (peerSnapM) - a hitch of a wire's seconds is no teleport at any way: at SAIL-FREE's ways a fixed 20 m snapped a
  *  Carrack at 19 m/s after a 1.75 s hitch (and put her passengers off), where HELM-WAY's 10 m/s took 3 s. */
 export const CSA_PEER_SNAP_S = 2.5;

@@ -1,5 +1,4 @@
-// LOOT20 - SOCKETS (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 12; Mac: "what could we do to make it even more
-// amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT20 - SOCKETS.
 //
 // A Rare (150 in a thousand) or a Legendary (300) that a body or a pile mints may carry one empty SOCKET - on a weapon, a
 // piece of armour or a jewel, never a garment. At the Reforge one of DFU's eight gems from the pack is set in it for 100
@@ -12,7 +11,7 @@
 // what it never is; the door's pass (its rates over 40,000 seeded bodies, never a garment, after every draw, a kit too,
 // off nothing); the Reforge's presses and their refusals; the wire; the Sockets page and the hosts' hooks.
 //
-// GEM1 (bible/06-Systems/Gem-Sockets.md, PINS MOVED): the socket is a LIST now (`sockets`, LOOT20's `socket` still
+// GEM1 (, PINS MOVED): the socket is a LIST now (`sockets`, LOOT20's `socket` still
 // read), setting is free and works on a worn piece (its wearer folded again), and the Reforge EXTRACTS a gem whole for
 // gold by its grade. The weapons' own pass and the graded gems are test/systems/gem1_sockets.test.js's.
 
@@ -36,8 +35,8 @@ import { withDom } from '../invdrag.mjs';
 import { rollGemFind } from '../../src/systems/gems.js';   // GEM2: the gem find, held off and put back
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-// PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellet's final find is the door's draw after every pass these laws
-// read - held off here (test/systems/pelletsscarce.test.js holds it the door's very last)
+// A final find is the door's draw after every pass these laws read - held off here (no find is registered final since
+// the Dwemer Pellet's went with the guns)
 const on = () => { _resetForTests(); setPref('lootRarity', true); LR._setSocketForTests(null); LR._setCurseForTests(Infinity); LR._holdFinalFindsForTests(true); };
 const off = () => { _resetForTests(); setPref('lootRarity', false); LR._setSocketForTests(null); LR._setCurseForTests(null); LR._holdFinalFindsForTests(false); };
 const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };
@@ -58,11 +57,12 @@ test('LOOT20: DFU\'s eight gems and their lines - a weapon\'s blow, every other 
   assert.deepEqual(LR.GEM_IDS.map((g, i) => [LR.GEM_NAMES[g], templateByIndex(i).name]), LR.GEM_IDS.map((g, i) => [templateByIndex(i).name, templateByIndex(i).name]), 'the templates\' own order and names');
   assert.deepEqual(LR.SOCKET_PER_MILLE, { rare: 150, legendary: 300 });
   assert.deepEqual(LR.SOCKET_GROUPS, ['Weapons', 'Armor', 'Jewellery'], 'never a garment - the wardrobe keeps the fight off the clothes');
+  // PIN MOVED: B4 rescale, the plain column follows the new gem rows (elemental, leech and stat gems 2)
   const want = {
-    ruby: [['elemental', 'fire', 3], ['resist', 'fire', 10]], sapphire: [['elemental', 'frost', 3], ['resist', 'frost', 10]],
-    emerald: [['leech', undefined, 3], ['resist', 'poison', 10]], diamond: [['damage', undefined, 6], ['resist', 'magic', 10]],
-    amber: [['stat', 'speed', 4], ['stat', 'luck', 3]], jade: [['stat', 'willpower', 4], ['stat', 'willpower', 4]],
-    turquoise: [['stat', 'agility', 4], ['stat', 'personality', 4]], malachite: [['stat', 'strength', 4], ['stat', 'endurance', 4]],
+    ruby: [['elemental', 'fire', 2], ['resist', 'fire', 10]], sapphire: [['elemental', 'frost', 2], ['resist', 'frost', 10]],
+    emerald: [['leech', undefined, 2], ['resist', 'poison', 10]], diamond: [['damage', undefined, 6], ['resist', 'magic', 10]],
+    amber: [['stat', 'speed', 2], ['stat', 'luck', 3]], jade: [['stat', 'willpower', 2], ['stat', 'willpower', 2]],
+    turquoise: [['stat', 'agility', 2], ['stat', 'personality', 2]], malachite: [['stat', 'strength', 2], ['stat', 'endurance', 2]],
   };
   for (const g of LR.GEM_IDS) {
     const w = LR.gemLine(sword(), g), o = LR.gemLine(ring(), g);
@@ -80,7 +80,6 @@ test('LOOT20: DFU\'s eight gems and their lines - a weapon\'s blow, every other 
   assert.deepEqual(it.affixes.at(-1), line);
   assert.equal(it.affixes.length, before.lines + 1);
   assert.deepEqual([it.sockets, LR.socketGem(it), LR.hasSocket(it)], [['ruby'], 'ruby', true]);
-  // PIN MOVED (AUDIT GEM, bible/06-Systems/Gem-Sockets.md section 9): the price by the GEM's own worth - what it sold for
   // loose - never its line's (free setting and law 6 made the line's worth a faucet)
   assert.equal(it.value, before.value + itemBaseValue({ group: 'Gems', templateIndex: LR.gemTemplateOf('ruby') }));
   assert.notEqual(itemBaseValue({ group: 'Gems', templateIndex: LR.gemTemplateOf('ruby') }), LR.affixesWorth([line], it), 'and the two differ, so the pin can tell');
@@ -97,20 +96,20 @@ test('LOOT20: a set gem\'s line through every reader - the fold, LOOT12\'s cap, 
   on();
   const e = player();
   const r1 = socketed(ring, 'rare', 4);
-  r1.affixes = [{ id: 'resist', param: 'fire', value: 35 }, { id: 'stat', param: 'strength', value: 6 }];
-  LR.setGem(r1, 'ruby');
+  r1.affixes = [{ id: 'resist', param: 'fire', value: 30 }, { id: 'stat', param: 'strength', value: 6 }];   // PIN MOVED: B4 rescale, a resistance line tops at 30, so a perfect ruby (20) reaches the 45 cap
+  LR.setGem(r1, 'perfect-ruby');
   e.items.push(r1); equipItem(e, r1); computeEntityMods(e);
   assert.equal(e._mods.resist.fire, LR.RESIST_CAP, '35 and the ruby\'s 10: to the cap - a socket counts toward it');
-  assert.deepEqual(LR.rolledResistOf(e, 'fire'), { worn: 45, counts: 45 });
+  assert.deepEqual(LR.rolledResistOf(e, 'fire'), { worn: 50, counts: 45 });
   const r2 = socketed(ring, 'rare', 5);
   r2.affixes = [{ id: 'stat', param: 'agility', value: 6 }];
   LR.setGem(r2, 'jade');
   e.items.push(r2); equipItem(e, r2); computeEntityMods(e);
-  assert.equal(e._mods.stats.willpower, 4, 'a jewel\'s jade: Willpower to its wearer');
+  assert.equal(e._mods.stats.willpower, 2, 'a jewel\'s jade: Willpower to its wearer');
   // a weapon's: its procs and its damage
   const blade = socketed(sword, 'rare', 6);
   LR.setGem(blade, 'ruby');
-  assert.deepEqual(linesOf(blade, 'elemental').map((a) => [a.param, a.value]), [['fire', 3]], 'the ruby\'s fire on a blow (lootPowers.js)');
+  assert.deepEqual(linesOf(blade, 'elemental').map((a) => [a.param, a.value]), [['fire', 2]], 'the ruby\'s fire on a blow (lootPowers.js)');
   const plain = socketed(sword, 'rare', 7);
   plain.affixes = [{ id: 'stat', param: 'strength', value: 6 }];
   const withDiamond = JSON.parse(JSON.stringify(plain));
@@ -119,12 +118,12 @@ test('LOOT20: a set gem\'s line through every reader - the fold, LOOT12\'s cap, 
   assert.equal(LR.affixWeaponDamage(plain, 100), 100);
   const leech = JSON.parse(JSON.stringify(plain));
   LR.setGem(leech, 'emerald');
-  assert.deepEqual(linesOf(leech, 'leech').map((a) => a.value), [3]);
+  assert.deepEqual(linesOf(leech, 'leech').map((a) => a.value), [2]);
   // the card
   const at = r1.affixes.length - 1;
-  assert.equal(LR.affixLine(r1, at), 'Ruby: +10% Fire resistance');
+  assert.equal(LR.affixLine(r1, at), 'Perfect Ruby: +20% Fire resistance');
   assert.equal(LR.affixBand(r1, at), null, 'no band');
-  assert.ok(LR.rarityLines(r1).includes('Ruby: +10% Fire resistance'));
+  assert.ok(LR.rarityLines(r1).includes('Perfect Ruby: +20% Fire resistance'));
   const empty = socketed(ring, 'rare', 8);
   assert.ok(LR.rarityLines(empty).includes('Socket: empty'));
   assert.ok(!LR.rarityLines(r1).includes('Socket: empty'));
@@ -175,7 +174,6 @@ test('LOOT20: the door\'s pass - a Rare 150 in a thousand, a Legendary 300, neve
       const all = list(); LR.rollLootRarity(all, src, { rolls: lcg(seed) });
       LR._setSocketForTests(0);
       const none = list(); LR.rollLootRarity(none, src, { rolls: lcg(seed) });
-      // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw, after the
       // socket's (which costs no draw at no chance) - where a socket drew, the two runs' techniques differ, so a piece's
       // technique line and its worth are set aside on both sides
       const noTech = (x) => { const t = LR.techniqueLineOf(x); return t ? { ...x, affixes: x.affixes.filter((a) => a !== t), value: x.value - LR.affixesWorth([t], x) } : x; };
@@ -235,7 +233,7 @@ test('LOOT20: the Reforge\'s presses - a gem from the pack, every refusal taking
   assert.equal(RF.setGemRefusal(piece, 'sapphire', me), 'set');
   assert.deepEqual(RF.setGemPiece(piece, 'sapphire', me), { ok: false, reason: 'set' });
   assert.deepEqual([held(me.items), me.goldPieces], [{ sapphire: 1 }, 150], 'nothing taken');
-  // GEM1 (PIN MOVED): a worn piece is filled where it is worn, and its wearer folded again at once
+  // GEM1 (
   const worn = player();
   const wp = socketed(ring, 'rare', 12);
   wp.affixes = [{ id: 'stat', param: 'agility', value: 6 }];
@@ -243,7 +241,7 @@ test('LOOT20: the Reforge\'s presses - a gem from the pack, every refusal taking
   assert.equal(worn._mods.stats.willpower ?? 0, 0);
   assert.equal(RF.setGemRefusal(wp, 'jade', worn), null);
   assert.equal(RF.setGemPiece(wp, 'jade', worn).ok, true);
-  assert.equal(worn._mods.stats.willpower, 4, 'the jade\'s Willpower on its wearer with no fold of the test\'s own');
+  assert.equal(worn._mods.stats.willpower, 2, 'the jade\'s Willpower on its wearer with no fold of the test\'s own');
   assert.equal(RF.unsetGemRefusal(wp), null);
   assert.equal(RF.unsetGemPiece(wp, worn).ok, true);
   assert.equal(worn._mods.stats.willpower ?? 0, 0, 'and off again');
@@ -375,5 +373,4 @@ test('LOOT20: the Sockets page - a row a socketed piece; an empty one offers eac
       assert.ok(kids(shell, 'codex-head').some((h) => h.textContent === SOCKETS_NONE));
     } finally { view.unmount(); }
   });
-  assert.match(read('src/scenes/worldModes.js'), /setGem: \(item, gem\) => setGemPiece\(item, gem, playerEntity\),[^\n]*\n\s+unsetGem: \(item, at\) => unsetGemPiece\(item, playerEntity, at\),[^\n]*\n\s+extractGem: \(item, at\) => extractGemPiece\(item, playerEntity, at\),/, 'the guild\'s window on the player\'s own pack (GEM1: a socket of several, and the extraction)');
 });

@@ -1,5 +1,4 @@
-// DA13 (2026-10-14, Mac: "B only: per-file channel"; the player's report, Discord 2026-10-13: "Every update
-// downloads around 130 MB and overwrites the entire game folder"): THE GAME'S OWN UPDATE - ONLY THE FILES THAT
+// DA13: THE GAME'S OWN UPDATE - ONLY THE FILES THAT
 // CHANGED. The pure half: the release's manifest and what it may say, a file's own encoding in the pack, the plan of
 // what one copy must fetch, the ranges it fetches it in, and which path a release takes.
 //

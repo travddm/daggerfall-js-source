@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -87,7 +87,7 @@ export function createVendorHost(host) {
     if (ok) townTalk.say(`Waypoint set: ${row.owner ?? 'a trader'}'s house in ${vendorTownOf(row.map)}. A gold coin marks it on your world map.`);
     return ok;
   };
-  /** THE TRADERS THIS PLAYER MAY REACH (Mac: "Show only traders whose house a given player can actually enter"): the
+  /** THE TRADERS THIS PLAYER MAY REACH: the
    *  region's directory kept to the houses whose door lets this character in - the door's own law (net/homeLaw.js
    *  homeMayEnter: theirs, public, their party's owner, their guild's, a room they rent); the service says each door, the
    *  party's names are the relay's. A row with no door said is kept (an older service). */

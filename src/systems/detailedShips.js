@@ -1,5 +1,4 @@
-// DS1 (2026-09-25, Mac: "All mods attached are to be compatible and
-// implemented 1:1") - DETAILED SHIPS 1.0.0 (Cliffworms), the art half.
+// DS1 - DETAILED SHIPS 1.0.0 (Cliffworms), the art half.
 //
 // The mod is world data and pictures, no code (its manifest lists no
 // script). The world data - the two ships' building records, rebuilt from
@@ -29,7 +28,7 @@ import { installDetStandIns } from '../world/detStandIns.js';
 export const DETAILED_SHIPS_VENDOR = 'detailed-ships';
 export const detailedShipsOn = () => modSetting(DETAILED_SHIPS_VENDOR, 'Enabled') === true;
 
-// WD3 (2026-10-02): CLIFFWORMS' ITEMS ARE THE TOWNS' TOO. Archive 1210 is his set, and the RMB Resource Pack carries it
+// WD3: CLIFFWORMS' ITEMS ARE THE TOWNS' TOO. Archive 1210 is his set, and the RMB Resource Pack carries it
 // as well ("Cliffworms' Items" in its catalogue - 1210_10, _11 and _12 its green, blue and brown bottles): Beautiful
 // Villages and Beautiful Cities stand his bottles and the classic pieces he moved there (1210_10-12, 1210_17-20) on the
 // shelves and tables of some six hundred interiors. The pictures this mod carries are those pictures, so they stand for

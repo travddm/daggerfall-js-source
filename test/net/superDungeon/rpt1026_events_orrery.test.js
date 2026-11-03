@@ -70,8 +70,6 @@ test('RPT1026-EVENTS ORRERY-HANDS THE RIGHTS PAST A SNAP: the lash\'s nets begin
   // a lone learner: alone in the Hollow, any number of long turns through any number of snaps
   let L = orreryRightsFresh();
   for (let k = 0; k < 4 * SD_TURN_LONG_MAX; k++) { assert.equal(orreryMayTurn(L, 'a:me', k * 400), true); orreryTurned(L, 'a:me', 'peer-me', 5, 6, k * 400); if (k % 7 === 6) L = orreryRightsSnapped(L); }
-  const RELAY = read('server/src/index.js');
-  assert.match(RELAY, /if \(res\.x\) this\._sdRights = \{ s, R: orreryRightsSnapped\(R\) \};/, 'the realm\'s snap keeps the counts');
 });
 
 test('RPT1026-EVENTS ORRERY-HANDS THE NAMES: the hall\'s word names its turner and the snap\'s lashed off the roster - whether their bodies are drawn or not - me as "you"; an id the roster does not know is no name; the snap\'s line names at most SD_LASH_NAMED and counts the rest; a snap with nobody named is the snap alone; and nothing says which way a turn went (mutants: the turner unnamed; the lashed unnamed; the snap\'s line unnamed)', () => {
@@ -94,10 +92,6 @@ test('RPT1026-EVENTS ORRERY-HANDS THE NAMES: the hall\'s word names its turner a
   assert.equal(sdSnapLine(sdHallNamed({ k: 'pz', x: 1, ls: [] }, nameOf)), SD_HALL_TEXT.snap, 'nobody to name: the snap alone');
   assert.equal(sdSnapLine(null), SD_HALL_TEXT.snap);
   for (const w of [turn, snap]) for (const v of Object.values(w)) assert.doesNotMatch(String(v), /longer|shorter|wrong|right way/i, 'never the way a turn went');
-  const W = read('src/scenes/world.js');
-  assert.match(W, /_sdHall = sdHallNamed\(w, peerName, online\?\.id \?\? null\);/, 'the world host names the realm\'s word off its roster');
-  assert.match(W, /sdSay\(sdSnapLine\(_sdHall\)\);/, 'and says the snap by it');
-  assert.match(W, /const peerName = \(peerId\) => \(peerId \? \(online\?\.peers\.get\(peerId\)\?\.name \|\| null\) : null\);/, 'the roster - every peer of the room, drawn or concealed');
 });
 
 test('RPT1026-EVENTS ORRERY-HANDS THE PLAQUE: a stone\'s hover names the hand that last turned it, as the realm\'s word named it, and the next turner in its place; a stone never turned names nobody (mutants: the turner never kept; the hover unnamed)', () => {

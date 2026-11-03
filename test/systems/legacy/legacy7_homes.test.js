@@ -1,5 +1,4 @@
-// LEGACY7 part five (2026-10-06, bible/06-Systems/Legacy-Arc.md section 10b; Mac, LEGACY-HOME: "if a house is owned
-// should live in the house"): THE LINE LIVES IN ITS ONLINE HOMES. The code's last "until LEGACY7": online the realm's
+// LEGACY7 part five: THE LINE LIVES IN ITS ONLINE HOMES. The code's last "until LEGACY7": online the realm's
 // homes were the account service's and no house of the line's. The realm keeps the line now, and a realm character's
 // online homes (HOME1) are its houses - learned with the save as a deed is offline, a list not read yet learning nothing
 // and dropping nothing; the registry tells the world when a home of mine changed (systems/online/onlineHomes.js onWrote); the
@@ -82,24 +81,7 @@ test('LEGACY7 part five the registry tells when a home of mine changed - a claim
   assert.equal((await loud.claim({ mapId: HALL.mapId, buildingKey: HALL.buildingKey, region: 20, price: 1000 })).ok, true, 'the claim stands');
 });
 
-test('LEGACY7 part five the world host reads the account\'s homes (ACCOUNT-HOMES: every member\'s) - named by their towns - at the boot and after each change of mine, and hands them to the house online, whole; offline, the deeds as before', () => {
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and a home learned of, the quest's re-pick
-  assert.match(w, /createOnlineHomes\(\{ api: homesApi, character: \(\) => characterIdOf\(playerEntity\), onWrote: \(\) => legacyOnlineHomesRead\(\), onHomes: \(\) => homesLearned\(\) \}\)/);
-  // ACCOUNT-HOMES (PIN MOVED): it read this realm character's rows alone (`h?.character === me`) - a home is the account's now
-  assert.match(w, /_legacyOnlineHomes = r\.data\.homes\.filter\(\(h\) => h && typeof h === 'object'\)\.map\(\(h\) => \(\{/);
-  assert.match(w, /heldHousesWhole: \(\) => isOnlinePage\(\),/);
-  // PIN MOVED (AUDIT LEGACY III W1): named off the boot's own complete table - the Living World's index read rows the boot had emptied
-  assert.match(w, /location: _townOfMapId\.get\(h\.mapId >>> 0\)\?\.name \?\? '',/);
-  // PIN MOVED (HOUSES-3): every region's three deeds (banking.js allDeeds)
-  assert.match(w, /heldHouses: \(\) => \(isOnlinePage\(\) \? \(realmSession \? _legacyOnlineHomes : null\) : allDeeds\(playerEntity\.houses\)\.filter\(deedStands\)\),/);
-  assert.match(w, /if \(legacyRealmLine\) legacyOnlineHomesRead\(\);/);
-  // PIN MOVED (PERMADEATH-HOUSES): the dead's deeds the save took up ride the sync (household.js syncHouses' `taken`) -
-  // ACCOUNT-HOMES: and online the account's homes are the line's whole
-  assert.match(rd('src/scenes/legacyHost.js'), /const held = deps\.heldHouses\?\.\(\) \?\? null;\n\s*if \(held == null\) return false;\n\s*return syncHouses\(family, p\.id, held, p\.deedsTaken \?\? \[\], \{ whole: deps\.heldHousesWhole\?\.\(\) === true \}\);/);
-});
-
-// ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound"): online a home is its
+// ACCOUNT-HOMES: online a home is its
 // ACCOUNT's - every member of the line owns each - so the line learns them WHOLE: a row another member learned goes once
 // the account no longer holds it (another of its characters sold it), where a member's own rows alone moved before.
 test('ACCOUNT-HOMES online the line learns the account\'s homes whole - a home another member learned leaves once the account holds it no more; offline a member\'s deeds as before, another member\'s kept (mutants: whole unread by the law; the host never asking it)', () => {

@@ -1,4 +1,4 @@
-// AUDIT ANTICHEAT A1 (2026-10-17; #955 - assuredumbrel's "close release-build cheat doors", picked up and audited) -
+// AUDIT ANTICHEAT A1 -
 // THE LIVE ENTITY IS PUBLISHED ON A PROBE'S BOOT ALONE.
 //
 // surfacePlayer() wrote `window.__playerEntity` on every page, so the whole live entity - stats, gold, pack, carry,
@@ -7,7 +7,7 @@
 // ONLINE_REFUSED_FLAGS). Its cut minted a URLSearchParams a call, inside the frame - PERF-URL's waste, and
 // test/systems/perfurl_doors.test.js failed on it - so the gate reads systems/pageQuery.js's memo instead.
 //
-// It hides a handle; it is no lock (bible/01-Overview/Audit-Log.md, AUDIT ANTICHEAT): the browser's console reaches a
+// It hides a handle; it is no lock (, AUDIT ANTICHEAT): the browser's console reaches a
 // module's live exports without it. What another player sees, takes or is ranked against is the Integrity arc's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

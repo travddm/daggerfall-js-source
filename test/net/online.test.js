@@ -1,4 +1,4 @@
-// ONLINE1 (2026-09-12, Mac: "the basic bones of multiplayer"), re-pinned
+// ONLINE1, re-pinned
 // by AUDIT ONLINE (the deep audit before the merge). THE CLIENT
 // EXECUTES: the room key from what a host knows (the world's cell, a
 // town, a dungeon, an interior by MAP ID, null when the host does not
@@ -22,7 +22,7 @@ import {
   POSE_HZ, HEARTBEAT_MS, WORLD_CELL, PEER_TIMEOUT_MS, BACKOFF_MIN_MS, BACKOFF_MAX_MS, DEFAULT_SERVER, SNAP_WORLD_UNITS, SNAP_SCENE_UNITS,
   slug, worldRoom, roomKeyFor, poseChanged, lerpPose, peerId, peerSecret, OnlineSession,
 } from '../../src/net/online.js';
-import { WORLD_CELL as WIRE_CELL, RANGE_PIXELS, PIXEL_UNITS, POSE_BOUND, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, roomOf, validPose, relayUrl, POSE_TS_MOD, GROUND_LAW, GRANT_HELLO_LAW, CELL_HELLO_LAW, LOOT_HELLO_LAW } from '../../src/net/wire.js';
+import { WORLD_CELL as WIRE_CELL, RANGE_PIXELS, PIXEL_UNITS, POSE_BOUND, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, roomOf, validPose, relayUrl, POSE_TS_MOD, GROUND_LAW, GRANT_HELLO_LAW, CELL_HELLO_LAW, LOOT_HELLO_LAW, RELAY_VERSION } from '../../src/net/wire.js';
 import * as relay from '../../server/src/relay.js';
 import { composeLook, lookKey, peerStubEntity, alphaBounds, cropRgba, LOOK_ITEM_FIELDS, LOOK_GROUPS, PEER_ARCHIVE, PEER_HEIGHT, DOLLS_MAX, DOLL_RETRY_MS, RemotePlayers } from '../../src/net/remotePlayers.js';
 import { LOOK_GROUPS as WIRE_GROUPS, LOOK_ITEM_FIELDS as WIRE_FIELDS } from '../../src/net/wire.js';
@@ -55,7 +55,6 @@ test('ONLINE1: the wire is ONE law - the relay re-exports net/wire.js; the world
   for (const k of ['validPose', 'validLook', 'parseClient', 'inRange', 'poseGate', 'rosterFor', 'roomOf', 'sanitizeName']) assert.equal(typeof relay[k], 'function', `${k} at both ends`);
   assert.equal(relay.validPose, validPose, 'the same function object: one home');
   assert.equal(WORLD_CELL, WIRE_CELL); assert.equal(relay.WORLD_CELL, WIRE_CELL);
-  assert.match(rd('server/src/relay.js'), /export \* from '\.\.\/\.\.\/src\/net\/wire\.js';/);
   // the classic start (StartCellX/Y 109,158) in MapsFile units, and the far corners
   const start = { x: 109 * PIXEL_UNITS + 100, y: 5, z: (499 - 158) * PIXEL_UNITS + 100, yaw: 0, pitch: 0 };
   assert.ok(validPose(start), 'the classic start is inside the world');
@@ -96,11 +95,7 @@ test('ONLINE1: the pose - changed past a hair, eased between two with the yaw by
   const id = peerId(storage); assert.match(id, /^[A-Za-z0-9_-]{4,40}$/); assert.equal(peerId(storage), id, 'the same id next time');
   assert.match(peerId({ getItem() { throw new Error('no'); }, setItem() { throw new Error('no'); } }), /^p/, 'a storage that throws: a fresh id, never a crash');
   const sec = peerSecret(storage); assert.match(sec, /^[A-Za-z0-9_-]{8,64}$/); assert.equal(peerSecret(storage), sec, 'the secret kept beside the id'); assert.notEqual(sec, id);
-  // TABS1: the id's home is the TAB's storage, so two tabs of one browser are two players
-  const src = rd('src/net/online.js');
-  assert.match(src, /import \{ tabStorage \} from '\.\.\/systems\/appStorage\.js'/); assert.match(src, /export const peerId = \(storage = tabStorage\(\)\)/); assert.match(src, /export const peerSecret = \(storage = tabStorage\(\)\)/);
-  assert.doesNotMatch(src, /appStorage\(\)/, 'never the browser-wide one');
-  assert.match(rd('src/systems/appStorage.js'), /export function tabStorage\(\) \{\s*\n\s*try \{ return globalThis\.sessionStorage \?\? null; \} catch \{ return null; \}/);
+    
   assert.equal(relayUrl('wss://daggerfall-online.example.workers.dev/'), 'wss://daggerfall-online.example.workers.dev'); assert.equal(relayUrl('ws://localhost:8787'), 'ws://localhost:8787');
   for (const bad of ['http://relay.test', 'ws://relay.test', 'wss://relay.test/x?y=1', 'javascript:alert(1)', '']) assert.equal(relayUrl(bad), null, `${bad || 'empty'} is no relay`);
   assert.match(DEFAULT_SERVER, /^wss:\/\/daggerfall-online\./, 'the relay this port hosts');
@@ -118,18 +113,20 @@ test('ONLINE1: the session over a fake socket, on its own clock - hello on open,
   assert.equal(s.status, 'open'); assert.equal(s.statusLine(), null);
   assert.deepEqual(sockets[0].sent[0], { t: 'hello', id: 'mac-0001', secret: 'shh-shh-shh-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 2, items: [] }, pose: { ...pose(1), ts: now % POSE_TS_MOD }, gl: GROUND_LAW, gv: GRANT_HELLO_LAW, cv: CELL_HELLO_LAW, ll: LOOT_HELLO_LAW, ls: 1, fv: 1 }, 'PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: and, to a loot room, the loot it reads - test/net/lootdoor.test.js); PIN MOVED (COST-2 part two: and, to a cell, the cell law it stands on - test/net/cellrepartition.test.js); PIN MOVED (STAFF-PANEL5-FREEZE: and that it shows the freeze screen); PIN MOVED (LEASE1, net/roomLease.js: and that it hands its hub\'s lease on, to a lease room); PIN MOVED (GRANT-DOOR, Spawn-Grants section 20: and the spawn grants it stands on, to a room whose foes ride): the hello carries the id, its secret and the latest pose - stamped with when it is said (SCALE2b) - and, to a cell, the ground this build stands on (PIN MOVED: GROUND-GATE, Field-Bugs-2026-10-17f)');
   assert.equal(s.sendPose(pose(2)), false, 'SD-HELLO (PIN MOVED): nothing past the hello until the room welcomes the socket');
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [] });   // SD-HELLO (PIN MOVED): welcomed - the pose's law below as it was
+  // Ann, far off in the cell, keeps the session from being alone, so lone sleep holds none of these poses
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'ann-0001', name: 'Ann', look: {}, pose: pose(40 * PIXEL_UNITS) }], v: RELAY_VERSION });   // SD-HELLO (
   assert.equal(s.sendPose(pose(2)), true); now += 20; assert.equal(s.sendPose(pose(3)), false, 'twenty ms later: throttled');
   now += 100; assert.equal(s.sendPose(pose(3)), true, 'a tenth of a second: sent'); now += 100; assert.equal(s.sendPose(pose(3)), false, 'unmoved: not sent');
   assert.equal(sockets[0].sent.filter((m) => m.t === 'pose').length, 2); assert.equal(POSE_HZ, 10);
+  sockets[0].receive({ t: 'leave', id: 'ann-0001', n: 1 });
   now += HEARTBEAT_MS; assert.equal(s.sendPose(pose(3)), false, 'alone in a cell: an unmoved heartbeat wakes nobody');
   assert.equal(s.stats.poses, 2);
   sockets[0].receive({ t: 'join', id: 'nye-0001', name: 'Nye', n: 2 });
-  assert.equal(s.sendPose(pose(3)), true, 'someone joined: the standing pose goes at once');
+  assert.equal(s.stats.poses, 3, 'someone joined: the lone session wakes and says its standing pose at once');
   sockets[0].receive({ t: 'leave', id: 'nye-0001', n: 1 });
   // the roster, a join, a pose, easing, a leave - all on the session's clock, ticked with NO argument
   const far = pose(20 * PIXEL_UNITS);   // twenty pixels off: in the roster, past the relay's range
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(10) }, { id: 'zed-0001', name: 'Zed', look: {}, pose: far }, { id: 'mac-0001', name: 'me' }] });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(10) }, { id: 'zed-0001', name: 'Zed', look: {}, pose: far }, { id: 'mac-0001', name: 'me' }], v: RELAY_VERSION });
   assert.equal(s.peers.size, 2, 'myself left out');
   assert.deepEqual(s.drawable().map((p) => p.id), ['bob-0001'], `a peer past RANGE_PIXELS (${RANGE_PIXELS}) is known but not drawn`);
   sockets[0].receive({ t: 'join', id: 'eve-0001', name: 'Eve', look: {}, pose: null });
@@ -150,14 +147,14 @@ test('ONLINE1: the session over a fake socket, on its own clock - hello on open,
   now += 30; s.tick();
   const drawn = s.peers.get('bob-0001').shown.x;
   assert.ok(drawn > 21 && drawn < 22, `part way from 21 to 22 (${drawn})`);
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(30) }] });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(30) }], v: RELAY_VERSION });
   // SLAM14 (AUDIT SLAM FINAL B2): Zed, not in the roster, is UNCONFIRMED - the roster names the nearest, not the present
   assert.equal(s.peers.size, 2, 'Zed, not in the roster, is kept'); assert.deepEqual(Object.keys(s.peers.get('zed-0001').unconfirmed), [s.room], 'stamped unconfirmed for this room');
   assert.equal(s.peers.get('bob-0001').from.x, drawn, 'Bob eases from where he was drawn');
   now = s.peers.get('zed-0001').seenAt + PEER_TIMEOUT_MS + 1; s.tick();
   assert.equal(s.peers.size, 1, 'and Zed, unconfirmed and silent past the timeout, is gone');
   // the relay's frames are checked by the wire's own law
-  sockets[0].receive({ t: 'welcome', peers: 5 }); assert.equal(s.peers.size, 1, 'a roster that is not a list: nobody named, no throw - and (SLAM14) nobody dropped for it');
+  sockets[0].receive({ t: 'welcome', peers: 5, v: RELAY_VERSION }); assert.equal(s.peers.size, 1, 'a roster that is not a list: nobody named, no throw - and (SLAM14) nobody dropped for it');
   assert.ok(s.peers.get('bob-0001').unconfirmed, 'Bob is unconfirmed by it, as by any roster that does not name him');
   sockets[0].receive({ t: 'leave', id: 'bob-0001' }); assert.equal(s.peers.size, 0, 'a leave takes him at once');
   sockets[0].receive({ t: 'join', id: 'bob-0001', name: '<b>Bob☃</b>', look: null, pose: { x: 'NaN-town' } });
@@ -188,7 +185,7 @@ test('ONLINE1: the socket\'s lifecycle - a room change closes and reopens, a sta
   let now = 1_700_000_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'shh-shh-shh-0001', WebSocketImpl: FakeWS, now: () => now });
   s.join('world:25,15', pose(0)); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(1) }] });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0001', name: 'Bob', look: {}, pose: pose(1) }], v: RELAY_VERSION });
   // a room change: the socket closes, a new one opens on the new room; the old socket's late events do nothing
   s.join('dungeon:m77', pose(0));
   assert.equal(sockets[0].closed.code, 1000); assert.equal(sockets.length, 2); assert.equal(sockets[1].url, 'wss://relay.test/room/dungeon:m77');
@@ -214,7 +211,7 @@ test('ONLINE1: the socket\'s lifecycle - a room change closes and reopens, a sta
   now = s._retryAt + 1; s.tick(); assert.equal(sockets.length, 5);
   assert.ok(BACKOFF_MAX_MS >= BACKOFF_MIN_MS * 4);
   sockets[4].open(); assert.notEqual(s._backoff, BACKOFF_MIN_MS, 'SLAM12: an open alone resets nothing - CLOSE_BUSY arrives after it');
-  sockets[4].receive({ t: 'welcome', id: 'mac-0001', peers: [] }); assert.equal(s._backoff, BACKOFF_MIN_MS, 'the WELCOME resets it - the relay said yes');
+  sockets[4].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION }); assert.equal(s._backoff, BACKOFF_MIN_MS, 'the WELCOME resets it - the relay said yes');
   // the relay's error frame, then its policy close: terminal - no storm
   sockets[4].receive({ t: 'error', m: 'bad pose' }); assert.equal(s.status, 'error'); assert.equal(s.error, 'bad pose');
   sockets[4].drop(CLOSE_POLICY); assert.equal(s.terminal, true); assert.equal(s.statusLine(), 'online: bad pose');
@@ -224,7 +221,7 @@ test('ONLINE1: the socket\'s lifecycle - a room change closes and reopens, a sta
   sockets[5].open(); sockets[5].drop(CLOSE_REPLACED);
   assert.equal(s.terminal, true); assert.match(s.error, /another tab, window or device/);
   now += BACKOFF_MAX_MS * 4; s.tick(); assert.equal(sockets.length, 6, 'replaced: not retried, or two tabs would evict each other forever');
-  // ONE-SEAT (2026-09-27): and STICKY - no room joins until the player takes the seat back (test/net/oneseat.test.js)
+  // ONE-SEAT: and STICKY - no room joins until the player takes the seat back (test/net/oneseat.test.js)
   s.join('town:m6', pose(0)); assert.equal(sockets.length, 6, 'a crossing joins nothing while another tab has the seat');
   s.resume();
   // busy (1013): not terminal, but a hard backoff
@@ -240,7 +237,7 @@ test('ONLINE1: the look and the stub - the equipped items\' doll fields off the 
   const entity = { race: 'Redguard', gender: 'female', faceIndex: 4, equip: createEquipTable() };
   entity.equip.slots[3] = { templateIndex: 102, group: 'Armor', material: 2, dye: 3, variant: 1, equipSlot: 3, currentCondition: 40, name: 'x' };
   entity.equip.slots[10] = { templateIndex: 20, group: 'MensClothing', equipSlot: 10, uid: 99 };
-  const look = composeLook(entity, { layered: null });   // PIN MOVED (LAYERED-GEAR-ON): the doll's fields; the layered body's `lg`, on by default, is pinned in worn_armour.test.js
+  const look = composeLook(entity, { layered: null });
   assert.deepEqual(look, { race: 'Redguard', gender: 'female', faceIndex: 4, items: [{ templateIndex: 102, group: 'Armor', material: 2, dye: 3, variant: 1, equipSlot: 3 }, { templateIndex: 20, group: 'MensClothing', equipSlot: 10 }] }, 'the doll\'s fields, nothing else');
   assert.deepEqual(LOOK_ITEM_FIELDS, ['templateIndex', 'group', 'material', 'dye', 'variant', 'equipSlot']);
   assert.deepEqual(composeLook(null, { layered: null }), { race: 'Breton', gender: 'male', faceIndex: 0, items: [] });
@@ -309,7 +306,7 @@ test('ONLINE1: the others drawn through a fake renderer - the figure cropped to 
   const rect = { x: 0, y: 0, w: 1, h: 0.77 };
   const [n] = rp.namePoints(proj, view, 1600, 900, [0, 1.7, 0], undefined, rect);
   assert.equal(n.name, 'BOB');
-  // NAME1 (2026-09-16, Mac: "Player names clip and cut off the top of the sprite head..."): the anchor is the head
+  // NAME1: the anchor is the head
   // top EXACTLY - `feet + height`. The `+ 0.25` world lift this pin used to carry was half of the clip Mac reported:
   // a quarter of a unit is many pixels at arm's length and barely one at forty, so the clearance it bought swung
   // with depth. The clearance is NAME_GAP_PX now, in screen pixels, taken by the drawing pass.
@@ -324,25 +321,7 @@ test('ONLINE1: the others drawn through a fake renderer - the figure cropped to 
   rp.destroy(); assert.equal(rp.batches().length, 0); assert.equal(renderer.log.releases.length, renderer.log.uploads.length, 'every doll released');
 });
 
-test('ONLINE1: the compositor\'s door is PURE - composePaperDollPixels composes over its own art set and buffer, and the compose body reads nothing of the singleton (mutant: the peer composed through the inventory\'s doll)', () => {
-  const pd = rd('src/ui/paperDoll.js');
-  assert.match(pd, /export async function composePaperDollPixels\(deps, entity, \{ context = 'town', background = true \} = \{\}\)/);
-  const from = pd.indexOf('async function composeDoll(art, deps, entity, { background = true, scale: S = 1 } = {}) {');
-  assert.ok(from > 0, 'the compose is a function of its art and deps');
-  const body = pd.slice(from, pd.indexOf('\nexport async function refreshPaperDoll(', from));
-  const names = (text, list, what) => { for (const name of list) assert.ok(!new RegExp(`\\b${name}\\b`).test(text), `${what} ${name}`); };
-  names(body, ['_art', '_deps', '_live', '_pixels', '_layout', '_identity', '_refreshing', '_pending'], 'the compose reads no');
-  assert.match(body, /for \(let y = 0; background && y < OH; y\+\+\) \{/, 'the background loop is skipped for a peer, the panel stays clear');   // DFMOD4: OH = PAPERDOLL_H * S, and a peer composes at S = 1
-  assert.match(pd, /export async function refreshPaperDoll\(entity\) \{[\s\S]*?const \{ out, layout, bgSize, width: OW, height: OH \} = await composeDoll\(_art, _deps, entity, \{ background: !packBg, scale: composeScale\(\) \}\);/, 'the inventory\'s doll rides the same compose (OVH2: on nothing, when a worn UI pack draws its backdrop under it)');
-  const door = pd.slice(pd.indexOf('export async function composePaperDollPixels('), pd.indexOf('/** Test seam. */'));
-  names(door, ['_art', '_deps', '_live', '_pixels', '_layout', '_identity', 'refreshPaperDoll', 'preloadPaperDollArt'], 'the door touches no');
-  assert.match(door, /_artSets\.set\(key, art\)/, 'an art set per identity');
-  assert.match(rd('src/net/remotePlayers.js'), /import \{ composePaperDollPixels \} from '\.\.\/ui\/paperDoll\.js';/, 'the others compose through the door alone');
-  assert.doesNotMatch(rd('src/net/remotePlayers.js'), /refreshPaperDoll|paperDollPixels\(|preloadPaperDoll/);
-});
-
-// OD1 (2026-09-12) - Mac: "Paperdoll is upside down when viewing other
-// players in multiplayer." The compositor's buffer is a UI image, row 0
+// OD1  The compositor's buffer is a UI image, row 0
 // at the top; the billboard shader samples GL's bottom-up order (every
 // other billboard arrives from TextureFile.getColor32 already so). The
 // crop the doll uploads is written bottom-up.

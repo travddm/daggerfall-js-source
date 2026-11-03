@@ -1,5 +1,4 @@
-// IC-GRAND x THE COORDINATOR'S REVIEW OF THE RENDERS (2026-10-26, bible/03-World/Arena-Provinces.md IC-GRAND, "The Palace
-// District"): "THE PALACE DISTRICT reads empty ... Give it the canon's content at the city's scale: the palace at the
+// IC-GRAND x THE COORDINATOR'S REVIEW OF THE RENDERS: "THE PALACE DISTRICT reads empty ... Give it the canon's content at the city's scale: the palace at the
 // tower's foot, Green Emperor Way's gardens and paths, the emperors' tombs as real monuments along the way, walls/gates of
 // the palace wall dressed, and trees and statuary - so from the air and from the street it reads as the heart of the
 // Empire, not a lawn." Pinned: the palace's ring of wings round the tower's plaza, its gates and its pavilions; the

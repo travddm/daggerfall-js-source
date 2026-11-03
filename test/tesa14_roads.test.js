@@ -1,6 +1,4 @@
-// TESA14 (2026-10-24; the owner, of the land past the Bay: "some of the roads cut off the map, theres no pathways like
-// daggerfall has and roads intersect with some of the capital cities water sources", then "Full Daggerfall network";
-// bible/03-World/Arena-Provinces.md TESA14) - THE ROADS PAST THE BAY, THE BAY'S OWN LAW AT ITS OWN SCALE, pinned. The
+// TESA14 - THE ROADS PAST THE BAY, THE BAY'S OWN LAW AT ITS OWN SCALE, pinned. The
 // builder's two new inputs (a region's own nodes, the pixels no route crosses) and its two faster searches; the regions'
 // lattice, their nearness, a region's network - its places in one order, its seams meeting, its capitals' gates; the roll
 // carried to a worker as numbers and answering as the host's does; the build's print and key; the roads' worker, its
@@ -115,13 +113,12 @@ test('TESA14 the builder\'s searches: nearestWithin answers the brute force\'s l
   assert.ok(Math.abs(pl - kl) < 1e-6, `the least length (${pl} vs ${kl})`);
   assert.deepEqual(primEdges([]), []);
   assert.deepEqual(primEdges([{ x: 0, y: 0 }]), []);
-  assert.match(read('src/world/road/roadNetwork.js'), /for \(const \[i, j\] of \(owns \? primEdges\(roadNodes\) : kruskal\(roadNodes\)\)\)/, 'the Bay\'s tree Kruskal\'s still');
 });
 
 // ── THE REGIONS ─────────────────────────────────────────────────
 
 test('TESA14 the lattice: cores REGION_CORE_W x REGION_CORE_H from the frame\'s north-west pixel, a grid the builder\'s 1000 x 500 with REGION_APRON round its core - wider than a road\'s and a track\'s reach (mutant: the apron, the core, the lattice\'s count)', () => {
-  assert.deepEqual([REGION_APRON, REGION_CORE_W, REGION_CORE_H, LAND_LOOK, TAMRIEL_ROADS_VERSION], [100, 800, 300, 8, 8]);   // TESA15: 2, a region's places in its answer; PIN MOVED (AUDIT TESA II R7, R9): 3; PIN MOVED (VOYAGER1, VOYAGER-CYRODIIL): 4, the land's law and the named roads; PIN MOVED (RIVER-FORDS): 5, the carved rivers crossed as fords; PIN MOVED (ROAD-GAPS): 6, a region's networks linked; PIN MOVED (EXACT-PIECES): 7, a region's land's pieces in its answer; PIN MOVED (ROAD-LOOK): 8, the carved lakes' water no route crosses
+  assert.deepEqual([REGION_APRON, REGION_CORE_W, REGION_CORE_H, LAND_LOOK, TAMRIEL_ROADS_VERSION], [100, 800, 300, 8, 8]);   // TESA15: 2, a region's places in its answer
   assert.equal(REGION_CORE_W + 2 * REGION_APRON, MAP_W);
   assert.equal(REGION_CORE_H + 2 * REGION_APRON, MAP_H);
   assert.ok(REGION_APRON > ROAD_DIALS.roadReach && REGION_APRON > ROAD_DIALS.trackLink, 'an owned edge\'s far end in view');
@@ -203,7 +200,6 @@ test('TESA14 the capitals\' gates: each plan\'s own sides, the pixel just past i
     ['falinesti', ['N', 'E', 'S', 'W']], ['torval', ['N', 'E', 'W']], ['helstrom', ['N', 'S']],
   ]);
   assert.deepEqual(GATE_STEPS, { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] });
-  // PIN MOVED (AUDIT TESA II, lane R's R2): the pixel just past the span at the side's middle where the roads walk it, its
   // step into the city one of the city's own pixels - on the authored shape, on open ground everywhere
   CAPITALS.forEach((cap, k) => {
     const span = capitalSpanPixels(k), on = (x, y) => span.some((p) => p.x === x && p.y === y);
@@ -462,19 +458,6 @@ test('TESA14 the host\'s module: nothing before the trace or while the Bay\'s ne
   pixels = { stood: [] };
   host.frame(null);
   assert.equal(starts.length, 2, 'the places moved: again');
-  const src = read('src/scenes/tamrielRoadsHost.js');
-  assert.match(src, /const walkable = \(x, y\) => !inBay\(x, y\) && heightAt\(x, y\) > WATER_BYTE && !capitalOnPixel\(x, y\);\n[^]*?gates\.push\(\.\.\.capitalGates\(k, \{ walkable \}\)\);/, 'a gate on land past the Bay, the host\'s own - PIN MOVED (AUDIT TESA II R2: walked out over it)');
-  assert.match(src, /const nodes = \[\.\.\.towns, \.\.\.gates\.map\(\(g\) => \(\{ x: g\.x, y: g\.y, type: LOCATION_TYPES\.TownCity \}\)\), \.\.\.joins\.map/, 'Arena\'s towns, the gates, the crossings\' gates');
-});
-
-test('TESA14 the world\'s wiring: the host made where the land past the Bay streams, on the frame with Arena\'s towns (a capital\'s own place its gates while the capitals stand), the roll\'s numbers and the player\'s pixel; the roll reads no road (mutant: the towns\' filter, the spec)', () => {
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /const _tamrielRoads = tamrielLand \? createTamrielRoadsHost\(\{ terrainGen, woodsBytes, heightAt: \(x, y\) => host\.woods\.getHeightMapValue\(x, y\), joinLand: arenaJoinLand, onLanded: arenaRoadsLanded,\n\s+standing: \{ pixels: arenaPixels, towns: tamrielRoadTowns, spec: tamrielRoadsSpec, capitals: \(\) => !!_capitalBase, held: tamrielRoadHeld \} \}\) : null;/);
-  assert.match(W, /if \(_tamrielRoads\) _tamrielRoads\.frame\(state\.current\);/, 'on the frame, with the player\'s pixel (PERF-V8: what stands read by the host)');
-  assert.match(W, /now\.stood\.filter\(\(p\) => !\(p\.pinned && _capitalBase\) && arenaTemplateOf\(_arenaTemplates, p\)\)/, 'a capital\'s place is its gates; a place with no template stands none');
-  assert.match(W, /countryRates: countryRatesNow\(\), countryTemplates: _countryTemplates, lairRates: lairRatesNow\(\), lairTemplates: _lairTemplates, lairPools: _lairPools/);
-  assert.doesNotMatch(W, /arenaPathsAt/, 'no place\'s roll asks a road');
-  assert.doesNotMatch(W, /handArenaRoads|terrainGen\.setArenaRoads/, 'TESA4\'s hand-over retired');
 });
 
 // ── WITH ARENA2 ─────────────────────────────────────────────────

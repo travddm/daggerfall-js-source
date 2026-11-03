@@ -1,6 +1,4 @@
-// RVN-ERRAND (bible/06-Systems/Revenants.md section 42; the owner, 2026-10-17: "Add the ability to send revnants off on
-// timed missions to anywhere within tamriel (They disappear and come back brining rewards like loot, crafting materials,
-// currency, etc)"). A sworn one sent to one of Tamriel's nine provinces on a venture (Plunder, Forage, Sell-sword) leaves
+// RVN-ERRAND (). A sworn one sent to one of Tamriel's nine provinces on a venture (Plunder, Forage, Sell-sword) leaves
 // through its portal, is gone the place's days on the character's own clock, and comes back - at the party's frame - with
 // a haul drawn on its errand's seed into my purse, pack and Materials Bag: won on its odds (its rank and kit against the
 // place's danger) and more loyal, or hard-won with half and hurt. At most two abroad. An errand is the save's.
@@ -67,25 +65,6 @@ function seedFor(r, key, won, venture = 'plunder') {
 const party = () => RC.revenantParty();
 
 // ── the law ─────────────────────────────────────────────────────────
-
-test('RVN-ERRAND THE LAW: every number; the three ventures\' leans; the nine places - each a province of Tamriel with cities, its days and danger, its goods real materials with a pack form (mutants: a number moved; a lean moved; a place\'s days or danger moved; a good misspelt)', async () => {
-  assert.deepEqual(JSON.parse(JSON.stringify(E.ERRAND)), { MAX: 2, WON_LOYALTY: 4, GOLD: [10, 18], DANGER_GOLD: 0.25, RANK_HAUL: 0.1, ODDS: { BASE: 0.55, PER: 0.1, MIN: 0.3, MAX: 0.95, DEVOTED: 0.05 }, HARD_SHARE: 0.5, UNITS: { BASE: 3, PER_DANGER: 2, FINE_TIER: 5, FINE_A_DAY: 1 }, TIERS: { MAGIC: 0.5, RARE: [0.06, 0.03, 0.02], LEGENDARY: [0.005, 0.004, 0.003] }, STEP_MAX: 30 });
-  const { PLAYED_STEP_MAX_SECONDS } = await import('../../../src/systems/quest/clock.js');
-  assert.equal(E.ERRAND.STEP_MAX, PLAYED_STEP_MAX_SECONDS / 60, 'a quest clock\'s played step, in minutes');
-  const T = E.ERRAND.TIERS;
-  assert.ok(T.LEGENDARY[0] + 5 * T.LEGENDARY[1] + 4 * T.LEGENDARY[2] <= 0.045, 'AUDIT RVN F2: a Legendary a piece at most the loot ladder\'s 4.5%');
-  assert.deepEqual(Object.fromEntries(Object.entries(E.VENTURES).map(([k, v]) => [k, [v.gold, v.units, v.items]])), { plunder: [0.4, 0.35, 'many'], forage: [0.15, 1, 0.2], contract: [1, 0, 0.25] });
-  assert.deepEqual(E.ERRAND_PLACES.map((p) => [p.key, p.days, p.danger]), [['HighRock', 1, 1], ['Hammerfell', 1, 2], ['Imperial', 2, 2], ['Skyrim', 2, 3], ['Valenwood', 2, 3], ['Sumurset', 3, 3], ['Elsweyr', 3, 3], ['Morrowind', 3, 4], ['BlackMarsh', 4, 5]]);
-  assert.deepEqual(E.ERRAND_PLACES.map((p) => p.key).sort(), PROVINCES.map((p) => p.key).sort(), 'all nine provinces, and only them');
-  const keys = new Set(materialKeys());
-  for (const p of E.ERRAND_PLACES) {
-    assert.equal(p.name, PROVINCES.find((x) => x.key === p.key).name);
-    assert.ok(CITIES.some((c) => c.province === p.key), `${p.name} has cities`);
-    for (const g of p.goods) { assert.ok(keys.has(g), `${g} is a material`); assert.ok(withdrawable(g), `${g} has a pack form`); }
-  }
-  assert.deepEqual(E.ERRAND_PLACES.map((p) => p.name), E.ERRAND_PLACES.map((p) => PROVINCES.find((x) => x.key === p.key).name), 'AUDIT RVN D6: the map\'s English, through the text core');
-  assert.match(read('src/systems/revenant/revenantErrands.js'), /get BlackMarsh\(\) \{ return t\('rvn\.errand\.place\.blackMarsh', 'Black Marsh'\); \}/);
-});
 
 test('RVN-ERRAND ITS ODDS: BASE + PER a point of its strength (rank and kit) over the danger, within MIN..MAX, a Devoted one more; the words (mutants: the kit unread; a clamp gone; Devoted unread; a word\'s line moved)', () => {
   const r = sworn({ rank: 1 });

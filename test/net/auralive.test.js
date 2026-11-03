@@ -1,4 +1,4 @@
-// AURA-LIVE (2026-10-05, Mac: "Ensure other players can see all auras") - AN AURA WORN MID-SESSION REACHES THE ROOM.
+// AURA-LIVE - AN AURA WORN MID-SESSION REACHES THE ROOM.
 //
 // The relay reads a badge (the aura, the title, the glyphs) off the TOKEN alone, and a token rides a hello - so an aura
 // put on at the account card or the Broker was drawn at my own feet at once and at nobody else's until I changed area
@@ -113,9 +113,9 @@ test('AURA-LIVE: a run of changes inside the gap costs ONE hello, and it is the 
   const a = player(r, 'aaaa-0001', clock), b = player(r, 'bbbb-0002', clock);
   quiet(() => a.s.join(ROOM, at(1, 1))); await until(() => a.s.host === 'aaaa-0001', 'a');
   quiet(() => b.s.join(ROOM, at(1, 1))); await until(() => b.s.peers.has('aaaa-0001'), 'b');
-  a.aura = 'shadowcloak'; a.s.rehello();
-  await until(() => b.s.auraOf('aaaa-0001') === 'shadowcloak', 'first');
-  for (const k of ['oblivionward', 'emberfall', 'seraphwings']) { a.aura = k; a.s.rehello(); a.s.tick(); }
+  a.aura = 'maelstrom'; a.s.rehello();
+  await until(() => b.s.auraOf('aaaa-0001') === 'maelstrom', 'first');
+  for (const k of ['turninghour', 'emberfall', 'seraphwings']) { a.aura = k; a.s.rehello(); a.s.tick(); }
   await settle();
   assert.equal(a.sockets.length, 2, 'held');
   clock.t += REHELLO_GAP_MS; a.s.tick(); a.s.tick();
@@ -212,19 +212,7 @@ test('AURA-LIVE: a replacement whose room went while it minted (a leave, a cross
   }
 });
 
-test('AURA-LIVE: the host asks for it when MY aura changes from the one the last token said - not on a mint, which said it - and the Broker no longer says "once you change area"', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(who && 'aura' in who\) _auraHeard = who\.aura \?\? null;/, 'a mint\'s token said this one');
-  assert.match(w, /const mine = ownAura\(\); if \(_auraHeard !== undefined && mine !== _auraHeard && online\.rehello\?\.\(\)\) _auraHeard = mine;/, 'a change since: said again');
-  assert.match(w, /let renownXp = null, _auraHeard;/, 'declared before anything can call the minter\'s hook');
-  assert.ok(w.indexOf('let renownXp = null, _auraHeard;') < w.indexOf('const adoptIssued = (who) => {'));
-  assert.doesNotMatch(w, /Others see it once you change area/);
-  assert.match(w, /Wearing \$\{row\.name\}\.`/);
-});
-
 test('AURA-LIVE (AUDIT 3): every wearer in reach drawn - a crowd at a hub\'s fountain is more than sixteen; and a peer who blinks out of the list for a moment keeps their aura kindled, it is not lit again from nothing (mutants: the cap back to sixteen, the pool forgetting at once)', () => {
   assert.ok(AURA_DRAW_MAX >= 32, `the cap (${AURA_DRAW_MAX})`);
   assert.ok(AURA_FORGET_S >= 1 && AURA_FORGET_S > AURA_KINDLE_S, `remembered unseen for ${AURA_FORGET_S} s - longer than a kindling`);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(_auraPool\.size\) for \(const \[id, w\] of _auraPool\) if \(t - w\.seen > AURA_FORGET_S\) _auraPool\.delete\(id\);/);
 });

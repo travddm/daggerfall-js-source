@@ -1,6 +1,6 @@
 // @ts-check
 // THE PACE A PEER WALKS AT, measured off its drawn pose - MWBODY1's law (it was net/peer/peerBodies.js `_place`'s own
-// lines), lifted here by HT-WAIST-BACK (2026-09-24) because a second layer reads it: DISC23-B's walkers
+// lines), lifted here by HT-WAIST-BACK because a second layer reads it: DISC23-B's walkers
 // (net/peer/peerRiders.js) swing a peer's lantern off the pace, as the Morrowind body's rig plays its walk clip off it.
 // The pose carries no speed (`mv` is a walk-or-run bit), so the ground speed is the drawn feet's own travel, eased.
 

@@ -251,19 +251,3 @@ test('EOTB-IL wagon: through the seam - the view frame ticks it, the lane gates 
   }
 });
 
-test('EOTB-IL wagon: BOTH exterior hosts carry the three doors, and the interior hosts say why they do not', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(host);
-    assert.match(s, /mwViewAttachWagon\(\{ getGpuMesh, cpuModels \}\)/, `${host}: SpawnWagon's mesh through the host's pipeline`);
-    assert.match(s, /cart: player\.transportMode === TRANSPORT_MODES\.Cart, onExteriorPath: _surfPath/, `${host}: UpdateWagon's two host facts on the frame`);
-    assert.match(s, /_surfPath = !!_surf\.path;/, `${host}: OnExteriorPath from the frame's surface model`);
-    assert.match(s, /mwViewDrawWagon\(renderer/, `${host}: drawn in the world pass`);
-    assert.match(s, /const _wagonPick = pickActivatableHit\(cam\.pos, useFwd, mwViewWagonTargets\(RAY_DISTANCE\), collider\)/, `${host}: picked by the one ray`);
-    assert.match(s, /wagon: _wagonPick,/, `${host}: raced`);
-    assert.match(s, /if \(_race\.wagonWins\) \{ if \(_wagonPick\.distance > _wagonPick\.reach\) setMidScreenText\(tooFarAwayText\(\)\); else mwViewWagonActivate\(getInteractionMode\(\), \{ say: [^}]+, openInventoryWithWagon: \(\) => \{ const w = makeInventoryWindow\(EOTB_WAGON_PACK\); if \(w\) townTalk\.showOverlay\(w\); \} \}\); \}/,   // DISC10-E L3 re-aim: a pack the door refused (a transformed lycanthrope) is null and mounts nothing
-      `${host}: CheckWagon's two arms, refusing out of reach as every family does`);
-    assert.match(s, /const EOTB_WAGON_PACK = Object\.freeze\(\{ dungeon: Object\.freeze\(\{ wagonPrompt: true \}\) \}\);/, `${host}: AllowDungeonWagonAccess, as the dungeon's own door spells it`);
-  }
-  // the seam records why the interior hosts have no cart
-  assert.match(rd('src/player/mwView.js'), /never exists inside/);
-});

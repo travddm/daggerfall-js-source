@@ -1,5 +1,5 @@
 // @ts-check
-// PROF7 (2026-09-29, Mac: "Do it") - THE STITCH, Outfitting's act at the loom (bible/06-Systems/Professions-Arc.md 9.4,
+// PROF7 - THE STITCH, Outfitting's act at the loom (9.4,
 // 29): "presses on a beat, eight in a row". The needle's beat comes every STITCH_ACT.beatS; a stitch pressed while the
 // beat stands in the band (recipeLaw STITCH_ACT.bandW, centred on it, x the attribute band) is on the beat. Pure - a
 // machine the loom's page ticks and presses (ui/professions/profPages.js), as the heat is the anvil's (systems/heatAct.js).

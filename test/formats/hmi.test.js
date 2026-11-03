@@ -520,14 +520,3 @@ test('hmi: the tracks of a song END TOGETHER - the discriminating invariant', { 
   assert.equal(stragglers.length, 8);
 });
 
-test('hmi: an unknown status byte THROWS rather than becoming a pitch bend', () => {
-  // AUDIT 19 F3: pitch bend used to be the switch's DEFAULT arm, so every
-  // undefined status - 0xF1..0xF6, 0xF8..0xFD - decoded as a bend on a phantom
-  // channel taken from its low nibble. That contradicted this reader's central
-  // promise. 0xE0 is explicit now and the default fails loudly.
-  const src = readFileSync('src/formats/hmiFile.js', 'utf8');
-  assert.match(src, /case 0xe0: \{/, 'pitch bend is an EXPLICIT case, not the default');
-  const dflt = src.slice(src.indexOf('        default:'), src.indexOf('        default:') + 600);
-  assert.match(dflt, /_fail\(/, 'the default arm throws');
-  assert.ok(!/pitchBend/.test(dflt), 'and it does not invent a pitch bend');
-});

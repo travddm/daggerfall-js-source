@@ -28,8 +28,7 @@
 //          enter" row, and its press), visit ({ may(target), enter(target) } - WAGONS2-VISIT: another's parked caravan whose
 //          door is open to me, its "Step inside" row and press; absent, no row) }
 //
-// WAGONS1 (2026-10-09, Mac: "1. Is a replacement model for the current cart ingame 2. Theres an open wagon ... 3. Is a
-// closed wagon varient"): THE WAGON DRAWN IS MAC'S. With the hosts' `bakedWagon` the parts are his Wagon Cart, Open
+// WAGONS1: THE WAGON DRAWN IS MAC'S. With the hosts' `bakedWagon` the parts are his Wagon Cart, Open
 // Wagon or Caravan (world/wagonModels.js - their statics, each wheel on its pivot, the rear pair the parked solve's;
 // painted under world/wagonArt.js's archive, which this pool uploads and owns), by the kind each owner drives: mine by
 // `wagonKind`, a peer's by their word's `wk` (systems/horse/horseCartWire.js). The cart is borne level on its axle while a
@@ -37,15 +36,13 @@
 // behind its horse (`hitchOf`). A bake that will not load or build falls back to the classic wagon for that kind, as a
 // ship's does (systems/comeSailAway/comeSailAwayModels.js).
 //
-// WAGONS2 (2026-10-09, Mac: "Real wheel movement"): EACH WHEEL ROLLS ON ITS OWN, AND THE FOUR-WHEELERS STEER. A wheel is
+// WAGONS2: EACH WHEEL ROLLS ON ITS OWN, AND THE FOUR-WHEELERS STEER. A wheel is
 // drawn at its own angle (`turn.angles`, systems/horse/horseCart.js rolledAngles - its contact's travel along its heading over
 // its radius), the open wagon's and the caravan's front axle, pole and front pair turned on their kingpin by the steer
 // (`turn.steer`, horseFollow.js bogieAxle). Mine are the runtime's; a peer's are turned HERE off the pose this client
 // draws (`turnPeer`, `hitchPeerWagon`'s two bars); a parked wagon's stay as they stood. The wire is unchanged.
 //
-// WAGONS3 (2026-10-10, Mac: "sit on the wagon itself, the ledge its built for and requiring 2 horses to use", "Proper
-// animated rope mechanics that connect the horses to the wagon", "All the wagons/carts are oversized in the overworld",
-// "Spawning the wagon can trap you under the wagon"): THE TEAM, THE DRIVER AND THE HARNESS.
+// WAGONS3: THE TEAM, THE DRIVER AND THE HARNESS.
 //  - THE TEAM (`teamOf`): the horses a wagon's harness holds, drawn as the mod's billboard each - the Open Wagon's and
 //    the Caravan's pair either side of the pole (world/wagonModels.js TEAM), the Small Cart's one in its shafts. While a
 //    bench wagon is driven the pair stands where the driven horse would (the player's capsule, the hitch) and faces down
@@ -121,7 +118,7 @@ export const HORSE_LOOKS_KEPT = 16;
 /** PERF-DYE: how many of a look's pictures are dyed a frame - each a CPU pass of about a millisecond on a desktop
  *  (systems/horse/horseCoats.js recolorHorse) and an upload. The budget was a SET a frame, and the walk set is forty pictures:
  *  a look met on a road (a passing team, a parked one come into view) cost one frame some 45 ms, a hitch the eye sees
- *  (2026-10-12, the live client: 29 of the 122 frames over 50 ms in two minutes' travel). Five a frame is the views in
+ *  . Five a frame is the views in
  *  one, the walk frames over eight. */
 export const HORSE_DYE_PICTURES = 5;
 /** StationaryHorseVisual.Initialize [IL_40b7-IL_40d9]: 121 x 0.025 by 94 (or 95, the walk set) x 0.025. */
@@ -133,7 +130,7 @@ export const HORSE_WALK_BILLBOARD_HEIGHT = HORSE_WALK_SPRITE_HEIGHT * GLOBAL_SCA
 export const WAGON_BUCKET = 'hccWagon';
 /** WAGONS1: the plaque row that takes the player into their parked caravan (a row id the mod's modes never are). */
 export const CARAVAN_ENTER_ROW = 'wagon:enter';
-/** WAGONS2-VISIT (2026-10-09, Mac: "Like an online home"): "Step inside" another player's parked caravan whose door is
+/** WAGONS2-VISIT: "Step inside" another player's parked caravan whose door is
  *  open to me, and "Who may enter" on my own - row ids neither the mod's modes nor the riders' ('wagon:...') are. */
 export const CARAVAN_VISIT_ROW = 'caravan:visit';
 export const CARAVAN_ENTRY_ROW = 'caravan:entry';
@@ -172,7 +169,7 @@ export const OUTSIDE_SKIP_REACH = 1.5;
  *  contact was taken down by every body leaning on it - it stood again only once I had walked through the wagon, and
  *  feet on the caravan's roof dropped me into it. Only a body the wagon was laid round reaches in past this. */
 export const CAPSULE_BOX_SKIN = 0.05;
-/** PERF-TEAMS (2026-10-10, the owner: 40 fps by a populated town, 165 forty pixels out): HOW FAR ANOTHER PLAYER'S TEAM
+/** PERF-TEAMS: HOW FAR ANOTHER PLAYER'S TEAM
  *  IS DRAWN AND STEPPED (m, from the eye). HCC-PARK keeps up to PARK_CELL_MAX parked teams a cell for PARK_TTL_MS, owner
  *  online or not, and every one of them - wagon, bogie, wheels, cargo, a caravan's room, its horses and harness - was
  *  stepped and drawn every frame across the whole sixteen-pixel cell (~13 km), behind the eye and past the 6 km far
@@ -186,8 +183,7 @@ export const PEER_TEAM_DRAW_SLACK_M = 25;
  *  how far it rises above the wagon's point and sinks below it - every kind's body, its wheels and a hitched pair
  *  inside it (the Caravan is the longest, its team at the pole's end ahead of it). Generous by design: a box too big
  *  costs a draw, one too small loses a wagon at the screen's edge. */
-/** HARNESS-REST (2026-10-11, a profile of a player's live client in a town: 4.0% of the main thread, eleven parked
- *  teams' harnesses stepped, laid and sent to the GPU every frame): A HARNESS WHOSE ENDS STAND STILL COMES TO REST. Once
+/** HARNESS-REST: A HARNESS WHOSE ENDS STAND STILL COMES TO REST. Once
  *  every end has stayed within HARNESS_STILL_M of where it stood for HARNESS_REST_S, its ropes are neither stepped nor
  *  laid nor sent again - they hang as last drawn - until an end moves. By then the damping has taken any swing (ROPE's
  *  0.97 a step, at least 60 steps a second: under 0.5% of it is left); what stops is the step's own millimetre jitter
@@ -243,7 +239,7 @@ export function boxTriangles(min, max) {
   return { positions: new Float32Array(p), indices: new Uint32Array(i) };
 }
 
-/** WAGON-HITCH x OW-BIG (2026-10-04, Mac: "the wagon when attached to the horse should show in the overworld"): under
+/** WAGON-HITCH x OW-BIG: under
  *  the travel view the traveller is drawn `g` times their size about their feet (OW-BIG, tvOwnGrow - eight or nine
  *  times at the view's usual height), and a wagon drawn at its own size hung a speck under the grown horse's belly. A
  *  wagon on its shafts is grown with its team, about the point it hangs from: its axle `g` times as far from the
@@ -560,7 +556,7 @@ export function createHorseCartPool({
     if (parts !== _bucketParts) { _bucketKey = standBox(WAGON_BUCKET, null, _bucketKey, parts); _bucketParts = parts; }
     _bucketKey = standBox(WAGON_BUCKET, m, _bucketKey, parts);
   }
-  /** WAGONS3 (Mac: "Spawning the wagon can trap you under the wagon"): WHETHER MY CAPSULE STANDS IN A BOX OF `parts` AT
+  /** WAGONS3: WHETHER MY CAPSULE STANDS IN A BOX OF `parts` AT
    *  MATRIX `m` - the box's faces are two-sided and push no body out, so it is never stood round one: a wagon laid where
    *  I stand (a summon, a dismount, a door) stands its box once I have stepped clear of it. WAGON-ALIGHT: or any of my
    *  companions' (`bodyCapsules`) - one getting down from the back, one at heel where the wagon is laid. */
@@ -922,7 +918,7 @@ export function createHorseCartPool({
    *  off screen in a shadow's reach cast alone, else neither), none: drawn. A grown rig under the travel view is drawn
    *  whole (its box is not this one). */
   const teamVerdict = (f, cull) => (!cull || f.g > 1 ? DECOR_DRAW : cull(peerTeamBox(f.at, _teamBox)));
-  /** PERF-WAGON (2026-10-10, Mac: "For carts, wagons, etc, we need culling"): ANY OTHER WAGON THIS POOL DRAWS - the road's
+  /** PERF-WAGON: ANY OTHER WAGON THIS POOL DRAWS - the road's
    *  teams (world/road/roadTeams.js, LW10) - by the same verdict over the same box (teamVerdict): in view drawn, off screen in
    *  a shadow's reach cast into the maps alone, else nothing; no test, or grown, drawn whole. drawWagon's own arguments
    *  after the test. Answers whether it was drawn on screen. */
@@ -1131,7 +1127,7 @@ export function createHorseCartPool({
       // AUDIT WAGONS3 T2: my pair's wagon left in harness with one horse (a horse sold from under the team, an older
       // save) stands that one beside the pole - its mate was a horse I do not own. A peer's word says no count, so
       // their pair stands.
-      // FLAGGED: a peer's word does not say how many horses they own - their parked pair is drawn whole, and their second horse is not drawn at their parked wagon while they ride the first (bible/06-Systems/Wagons.md WAGONS3).
+      // FLAGGED: a peer's word does not say how many horses they own - their parked pair is drawn whole, and their second horse is not drawn at their parked wagon while they ride the first (WAGONS3).
       const sides = pair ? teamSidesOf(w.model) : [0];
       for (const x of mine && pair && (horses?.() ?? 1) < 2 ? sides.slice(0, 1) : sides) {
         const f0 = lone.forward;
@@ -1206,7 +1202,7 @@ export function createHorseCartPool({
     const m = f.g > 1 ? mat4FromQuatPosScale(f.rotation, f.at, [f.g, f.g, f.g]) : wagonMatrix(f.at, f.rotation);
     return pitchedMatrix(m, parts, f.hitched ? parts.hitchPitch ?? 0 : 0);
   }
-  // FLAGGED: the horses are billboards, so a trace's collar and a rein's bit are measured points on the picture, not on a body - from some angles a trace meets the picture beside the horse's chest (bible/06-Systems/Wagons.md WAGONS3).
+  // FLAGGED: the horses are billboards, so a trace's collar and a rein's bit are measured points on the picture, not on a body - from some angles a trace meets the picture beside the horse's chest (WAGONS3).
   /**
    * WAGONS3: THE HARNESS'S ENDS FOR AN OWNER THIS FRAME - `[{ kind, a, b, g }]`: each hitched horse's two traces from its
    * collar to their roots on the wagon (a pair's singletrees, turned with the pole; the Small Cart's shafts' roots,
@@ -1296,7 +1292,7 @@ export function createHorseCartPool({
     return { box, m };
   }
   /**
-   * WAGONS3 (Mac: "Using a wagon doesnt allow you to zoom out into 3rd person"): HOW FAR ALONG A RAY MY DRIVEN WAGON'S
+   * WAGONS3: HOW FAR ALONG A RAY MY DRIVEN WAGON'S
    * BODY STANDS - the third-person camera's wall while I sit its bench (the moving wagon stands no collider, so the
    * camera behind me stood inside the caravan). From `o` along unit `d` up to `max` m, less `radius` (the camera's
    * sphere); Infinity where the ray misses it, starts inside it, or no bench wagon of mine is driven (BENCH-CAM: its
@@ -1324,8 +1320,7 @@ export function createHorseCartPool({
     return Math.max(0, t0 - radius);
   }
   /**
-   * BENCH-CAM (2026-10-10, from play: "this is what i see when i use my carriage" - Eye Of The Beholder's sprite filling
-   * the screen, the camera in the driver's head): THE HEIGHT MY THIRD-PERSON CAMERA'S PIVOT RISES TO while I sit my
+   * BENCH-CAM: THE HEIGHT MY THIRD-PERSON CAMERA'S PIVOT RISES TO while I sit my
    * driven wagon's bench - its `shell`'s top where the wagon is drawn (its highest corner, the wagon pitched as it
    * stands) and SHELL_CLEAR_M over it - or null where no bench wagon of mine is driven. The caravan's room stands 0.4 m
    * behind the bench and over the seated head, so a camera turning about the head (the sprite's: from the head itself;
@@ -1370,9 +1365,7 @@ export function createHorseCartPool({
     }
     if (s?.horse) out.push({ key: KEY_HORSE, aabb: teamAabb('', s.horse), distance: RAY_DISTANCE, reach: ACTIVATION_REACH, noSurface: true });
     for (const [owner, p] of _peers) {
-      // PR-WAGON1 (2026-09-24, a player's report Mac relayed: "Players can grief other players with the wagon by
-      // putting it in front of dungeon entryways and building entrances"; Mac's choice: "Others' wagons don't
-      // block"): ANOTHER PLAYER'S TEAM NEVER STOPS ME. AUDIT HCC O3 stood a peer's parked wagon a box in my collider,
+      // PR-WAGON1: ANOTHER PLAYER'S TEAM NEVER STOPS ME. AUDIT HCC O3 stood a peer's parked wagon a box in my collider,
       // and HCC-PARK keeps a parked team for 72 hours after its owner leaves - so a wagon left across a shop door or
       // a dungeon's mouth walled it off for everyone for days, and shadowed the door from the ray besides. Their
       // wagon and horse stand NO collider here, live or kept, parked or moving (mine keeps the mod's BoxCollider,
@@ -1420,7 +1413,7 @@ export function createHorseCartPool({
     if (!pk) return null;
     const p = _peers.get(pk.owner);
     if (!p) return null;
-    // HCC-TIP (2026-09-23, Mac: "ensure it shows owned if another players"): the World Tooltips plaque names the THING
+    // HCC-TIP: the World Tooltips plaque names the THING
     // as the mod names it - the horse by its name (HorseTargetLabel's "Horse" when unnamed), the wagon "Wagon" - and a
     // second row says whose it is, the way the plaque's other rows speak: the owner's session name, or the name the
     // relay stamped on the cell's memory when the owner is away (HCC-PARK), never nobody's.
@@ -1607,7 +1600,7 @@ export function createHorseCartPool({
     if (p.horse && g.dh !== null) { const q = p.horse.position; p.horse.position = [q[0], q[1] + g.dh, q[2]]; }
   }
   /**
-   * DISC20-C (2026-09-24, Mac: "Horse and carts can be seen parked in the sky"): A PEER'S STANDING TEAM, ON MY
+   * DISC20-C: A PEER'S STANDING TEAM, ON MY
    * GROUND. A word carries the height its OWNER's client stood the team at - the owner's ground, never re-read on
    * mine. The one place the two part by much is a word older than the ground: the relay keeps a parked team for 72
    * hours (HCC-PARK, an identical word refreshing it), and TERRAIN-SCALE1 lowered every ground from the prefab's 1.5
@@ -1829,7 +1822,7 @@ export function createHorseCartPool({
     },
     get enabled() { return enabled; },
     get runtime() { return runtime; },
-    // LW10 (bible/06-Systems/Living-World-II.md): the living world's teams draw with the pool's own pieces - its wagon's
+    // LW10: the living world's teams draw with the pool's own pieces - its wagon's
     // draw and its horse's pose, one home for both (ONE MEMBER, ONE EXPORT; world/road/roadTeams.js); WAGONS1 x LW10: a
     // wagon of a KIND - its parts (`partsOf`) and its hitch (`hitchOfKind`) - never the player's driven one (`hitchOf`)
     presentation: { wagonParts, horseArt, hitchOf: () => hitchOf(myKind()), onChanged: () => onChanged?.(), drawWagon, drawWagonSeen, poseHorse: poseHorseBatch, partsOf, hitchOfKind: hitchOf },   // PERF-WAGON: the road's teams by the one verdict

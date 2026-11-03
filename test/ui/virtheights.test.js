@@ -1,5 +1,4 @@
-// AUDIT TRADE-VIRT (2026-10-20, the owner: "I need you to audit this and ensure this is perfect and fidelity isnt lost";
-// ui/virtualRows.js, bible/07-Rendering/Performance-Priority.md TRADE-VIRT, the audit) - A LONG LIST'S ROWS ARE EACH THEIR
+// AUDIT TRADE-VIRT - A LONG LIST'S ROWS ARE EACH THEIR
 // OWN HEIGHT. The window sized every line at the first two lines' pitch, and a trade's rows are not one height (a book's
 // title wraps: 68 px against 52; a phone's weapons 52, 64 and 82): a list whose first row was tall scrolled into blank
 // stretches, rows jumped, a click's repaint moved the rows under a still pointer, and the scrollbar was the wrong length.

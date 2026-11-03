@@ -1,6 +1,5 @@
 // @ts-check
-// HORSE CART AND CARGO - THE RUNTIME (HCC, 2026-09-23, Mac: "Next mod I want to implement 1 to 1 and also enhance
-// its online integration functionality"). `TrailingWagonRuntime`, `DeployedWagonVisual` and `StationaryHorseVisual`
+// HORSE CART AND CARGO - THE RUNTIME (HCC, 2026-09-23). `TrailingWagonRuntime`, `DeployedWagonVisual` and `StationaryHorseVisual`
 // of demifiend000's Horse Cart and Cargo 1.0.0-rc12, read off the shipped assembly's IL
 // (vendor/horse-cart-and-cargo/il/TrailingWagon.il.txt); every function names the method it restates and the IL
 // offset it was read at. The mod is a MonoBehaviour over Unity's scene; this is the same machine over the port's
@@ -169,7 +168,7 @@ export function solveTwoWheelPose(leftContact, rightContact, heading, wheelMidLo
 
 // ─── WAGONS2: EACH WHEEL ROLLS ON ITS OWN (a departure, 2026-10-09) ─────────────────────────────────────────────
 
-/** WAGONS2 (2026-10-09, Mac: "Real wheel movement"): a wheel's place on its wagon - `parts.wheels` (Mac's wagons: each
+/** WAGONS2: a wheel's place on its wagon - `parts.wheels` (Mac's wagons: each
  *  with its pivot, its own radius, and whether it turns with the bogie), else the classic model's pair on its one
  *  radius (systems/wagon/wagon41214.js buildWagonParts). */
 export const wheelsOf = (parts) => parts?.wheels ?? (parts?.wheelLeftPivot ? [{ pivot: parts.wheelLeftPivot, radius: parts.wheelRadius, front: false }, { pivot: parts.wheelRightPivot, radius: parts.wheelRadius, front: false }] : []);
@@ -364,7 +363,7 @@ export function createHorseCartRuntime(deps) {
 
   /** WAGONS1: the wagon's own length ahead of its axle to its horse - the presentation's (its model's), else the mod's. */
   function hitchZ() { const z = deps.presentation?.hitchOf?.(); return Number.isFinite(z) && z > 0 ? z : HITCHED_HORSE_LOCAL_Z; }
-  /** WAGONS3 (Mac: "Spawning the wagon can trap you under the wagon"): WHERE A WAGON LAID FRESH STANDS ITS REAR AXLE
+  /** WAGONS3: WHERE A WAGON LAID FRESH STANDS ITS REAR AXLE
    *  BEHIND THE PLAYER - a summon, a dismount with no trailing pose cached, a door left with the wagon. The mod's 2.5 m
    *  (WAGON_FOLLOW_DISTANCE) was its own wagon's, 3.1 m long; Mac's run 3.1, 6.1 and 6.7 m forward of their axles, so at
    *  2.5 m every one of them stood round the player's capsule - and the box a parked wagon stands, two-sided faces, held
@@ -373,7 +372,7 @@ export function createHorseCartRuntime(deps) {
   function deploySetback() { const z = hitchZ(); return z > HITCHED_HORSE_LOCAL_Z ? z + DEPLOY_CLEARANCE : WAGON_FOLLOW_DISTANCE; }
   /** ...and a hitched wagon re-laid behind its horse (a following team's arrival): its own hitch, as it trails. */
   function hitchSetback() { const z = hitchZ(); return z > HITCHED_HORSE_LOCAL_Z ? z : WAGON_FOLLOW_DISTANCE; }
-  /** WAGONS3 (Mac: "requiring 2 horses to use"): the host's word on a team short of its wagon's horses, or null. */
+  /** WAGONS3: the host's word on a team short of its wagon's horses, or null. */
   const teamShort = () => deps.teamShort?.() ?? null;
   /** WAGONS3: a hitch the team cannot make - said, and answered true (the caller does nothing more). */
   const refuseShortTeam = () => { const t = teamShort(); if (t) say(t); return !!t; };
@@ -480,8 +479,7 @@ export function createHorseCartRuntime(deps) {
   function ownsStationaryHorseActivator(a) { return physicalPersistenceEnabled && !!stationaryHorseVisual && stationaryHorseVisual === a; }   // [IL_8591]
 
   // ── the save record's setters [IL_73f0-IL_75fb, IL_969c, IL_a205, IL_78c0]
-  // WAGON-STABLED (2026-10-15, the port's own - Fay: "I keep sending my wagon away, but every time I enter a building or
-  // dungeon it appears outside again"): the record's two words of the port's, WagonStabled and HorseStabled
+  // WAGON-STABLED: the record's two words of the port's, WagonStabled and HorseStabled
   // (horseCartLaw.js newSaveData), say the pair was SENT TO THE STABLE (sendTransportAway) - set there alone, and let go
   // by every setter that lays the wagon's or the horse's record afresh or stands it in the world, and by a mount
   // (leaveStable): a stabled one is the mod's WithPlayer that no door parks.
@@ -901,7 +899,7 @@ export function createHorseCartRuntime(deps) {
     || (tm().get() === TRANSPORT.Foot && ((tm().hasCart() && wagonState.Mode === WAGON_MODE.WithPlayer && !wagonState.WagonStabled)
       || (tm().hasHorse() && wagonState.HorseMode === HORSE_MODE.WithPlayer && !wagonState.HorseStabled)));
   /**
-   * HOLDINGS (the port's own, no IL twin - bible/03-World/Holdings.md): SEND AWAY, the summon's other half. Whatever of
+   * HOLDINGS (the port's own, no IL twin): SEND AWAY, the summon's other half. Whatever of
    * the pair stands in the world - a parked wagon, a horse waiting or following - leaves it, and the pair is "with the
    * player" again in the mod's own sense: the record the persistence switch's turning on makes
    * (resolvePersistenceEnabledState for a player on foot - the wagon WithPlayer, the horse WithPlayer), mounted from the
@@ -1237,8 +1235,7 @@ export function createHorseCartRuntime(deps) {
   }
 
   // ── fast travel and Travel Options [IL_9d68-IL_9f33, IL_7ff8, IL_90c4-IL_926a]
-  // WILD1 (bible/11-Multiplayer/Wild-Zone.md - the owner: "when the players respawns in a town near the zone the cart
-  // comes with him"): `force` - a rise out of the open zone. The team comes whatever Follow Fast Travel says, and a team
+  // WILD1 (): `force` - a rise out of the open zone. The team comes whatever Follow Fast Travel says, and a team
   // left waiting (the wagon deployed with its horse hitched, or the horse loose) is called to follow first, so it rides
   // the same relocation a following team does (tryCompleteFastTravelHorseRelocation: behind the player, on the ground).
   // DEPARTURE: the mod has no such journey.
@@ -1535,7 +1532,7 @@ export function createHorseCartRuntime(deps) {
     deployedVisual?.offset(d); stationaryHorseVisual?.offset(d);
     hitch.offset(d); if (hitchSeed) hitchSeed = vadd(hitchSeed, d); horseFollower.offset(d);   // WAGON-HITCH: the shafts' last hitch and a pending drive-off
   }
-  /** DISC20-C (2026-09-24, Mac: "Horse and carts can be seen parked in the sky"): the ground under the standing team
+  /** DISC20-C: the ground under the standing team
    *  was built again (the pool's groundMoved - a pixel streamed in, the road network or a late World of Daggerfall
    *  pack rebuilding one). The mod grounds the parked wagon and the waiting horse once (Tick's `grounded` return, the
    *  requested pose's tolerance) because its terrain never changes under a scene; the port's can, by metres on a
@@ -1561,7 +1558,7 @@ export function createHorseCartRuntime(deps) {
     if (elsewhere) callTeamToLanding();
   }
   /**
-   * HORSE-WAKE (bible/01-Overview/bugs/Field-Bugs-2026-10-25e.md): a load that lands away from its save - the online
+   * HORSE-WAKE: a load that lands away from its save - the online
    * page's wake from a dungeon at the nearest temple, town or graveyard, a dungeon that cannot be found or entered, a
    * save taken somewhere else. DFU's load always lands at the save, so the mod never meets this. Without a call, the
    * record's waiting horse stands at the dungeon door it was left at, out of every mount's reach (canUseHorseTransport),

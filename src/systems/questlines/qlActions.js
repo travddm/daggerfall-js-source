@@ -1,5 +1,5 @@
 // @ts-check
-// QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): THE QUESTLINES' ACTIONS - six lines a quest script may say
+// QL4: THE QUESTLINES' ACTIONS - six lines a quest script may say
 // that DFU's machine does not know, registered by the quest bridge beside DFU's 82 (scenes/quest/questBridge.js), as
 // Jagget's four are (systems/quest/questActionsExtension.js, FORAGE1). Not DFU members; Port-Ledger A (QL4).
 //
@@ -15,7 +15,7 @@
 //                                                                   DFU quest's (unstamped) says nothing.
 //   ql act <kind> <n>                                               a trigger (QL11): true once the player has done <n>
 //                                                                   acts of <kind> since the task was armed - a fish
-//                                                                   caught, a breach closed, a Redoubt taken. The acts
+//                                                                   caught, a breach closed. The acts
 //                                                                   are the layer's (qlLayer.js act), heard from the
 //                                                                   features; a quest that is not stamped hears none.
 //   ql paid                                                         the quest paid, quietly: its success and its

@@ -1,5 +1,5 @@
 // @ts-check
-// TESA10c (2026-10-13, bible/03-World/Arena-Provinces.md TESA10c) - THE OTHER CAPITALS' PLANS: Mournhold, Alinor,
+// TESA10c - THE OTHER CAPITALS' PLANS: Mournhold, Alinor,
 // Falinesti, Torval and Helstrom - each its plan (as a map reads: its first row the north), its districts, its anchor,
 // its own blocks' laws of the metres from the anchor (x east, z south) and its landmarks' measures
 // (world/tamrielCapitals.js lays them; world/capitalMournhold.js and its kin build the landmarks). Pure.
@@ -181,8 +181,7 @@ export const ALINOR_HARBOUR = districtAt(ALINOR_DISTRICTS, 3, 8);
 // (`hutFrom`), the roots under the walkway's first rise (CAPITAL-TREES: each held `rootUnder` under it, all round on
 // `rootArc`), the limbs from above the highest platform (`limbFrom`) - a body's 2 m over the whole climb
 // (test/world/audittesa2c_capitals.test.js).
-// CAPITAL-TREES (KPbICA, forwarded by the owner: "The main trees in Falinesti and Mournhold should get some love. They are
-// too draftish for now"): THE OAK A FINISHED LANDMARK (world/capitalFalinesti.js) - its bark fluted (`bark`: `sides`
+// CAPITAL-TREES (KPbICA, forwarded by): THE OAK A FINISHED LANDMARK (world/capitalFalinesti.js) - its bark fluted (`bark`: `sides`
 // corners a ring, every third a furrow `furrow` in, the rest ridges up to `ridge` out, shares of its radius, the whole
 // turning `twist` radians a metre; its `leader` on over the trunk's last level into the crown, [y, r]); its buttresses
 // all round its foot (`roots` on `rootArc` but clear of the porch by `rootPorch` radians), each up to `rootTop` on the
@@ -338,7 +337,7 @@ export const HELSTROM_DISTRICTS = cells({
 
 // ---------------------------------------------------------------- the gates
 
-/** ROAD-FOLLOW (2026-10-27, the owner: "Also, city gates do not line up with the roads"; Town-Shapes.md ROAD-FOLLOW): each
+/** ROAD-FOLLOW: each
  *  plan's gates by the side of its span a road comes in by - the middle of its opening in the wall, the anchor's metres
  *  (x east, z south), off the same measures the walls are cut at (world/capitalMournhold.js, capitalAlinor.js,
  *  capitalTorval.js, capitalHelstrom.js): the roads' gate pixel stands off its slice and the capital lays the road on to it

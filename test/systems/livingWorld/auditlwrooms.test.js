@@ -1,4 +1,4 @@
-// AUDIT LW-ROOMS (2026-10-08, bible/01-Overview/audits/Audit-LW-Rooms.md; Mac: "Audit this", of LW-ROOMS): THE ROOM'S MEASURE
+// AUDIT LW-ROOMS: THE ROOM'S MEASURE
 // AND ITS COMPANY, AUDITED. Four lenses on the head LW-ROOMS left, the game's own interiors their ground: the room laid out
 // anew for a door left open, a reader's quest or the hour; its people stood on a bench's edge; the walk stopped at a lip
 // the room's people step over; one stirring drawn back beside strangers by a farthest place round a corner, or into

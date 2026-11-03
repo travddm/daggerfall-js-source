@@ -1,5 +1,4 @@
-// RESURRECT1 (2026-09-23, Discord: "Can we create resurrection spells?" - after the Unity co-op's revive, "maybe we
-// can use that for healers"). DFU has no raise-dead effect, so this is the port's own: a RESTORATION effect,
+// RESURRECT1. DFU has no raise-dead effect, so this is the port's own: a RESTORATION effect,
 // `Resurrect` (45,255 - no classic key uses 45), cast at a FALLEN PARTY MEMBER's body within touch reach. The
 // fallen player rises where they fell at RESURRECT_HEALTH_PCT of their health (the Unity co-op's ReviveHealthPercent).
 //

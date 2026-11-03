@@ -62,7 +62,7 @@ test('DECOR-ACCESS gold in a chest is written with the other goods and taken bac
   const goods = dropped.loot.items();
   assert.equal(await dropped.loot.commit('put', pile, 4, () => { goods.push(pile); return pile; }), true);
   assert.equal(pack.includes(pile), true, 'the save carries the pile until the chest keeps it');
-  // RPT1026-CHESTGOLD (PIN MOVED): the take is the window's own transfer, and a pile from the chest comes back a pile -
+  // RPT1026-CHESTGOLD (
   // the pack still holds it, as it held it parked, and the purse took nothing
   assert.equal(await dropped.loot.commit('take', pile, 4, () => applyTransfer(pile, { amount: 4 }, goods, dropped.items(), { entity, toPlayer: true })), true);
   assert.equal(pack.includes(pile), true, 'the pile taken back is the pack\'s, as it was');
@@ -103,7 +103,7 @@ test('DECOR-ACCESS a take still waiting for the list is settled when the chest c
   assert.equal(await openSharedChest('chest-race'), true);
   const from = opened.loot.items();
   const row = from[0];
-  // RPT1026-CHESTGOLD (PIN MOVED): the window's own transfer; the purse is paid by the settle, not the click
+  // RPT1026-CHESTGOLD (
   const take = opened.loot.commit('take', row, 4, () => applyTransfer(row, { amount: 4 }, from, opened.items(), { entity, toPlayer: true }));
   opened.loot.closed();
   await new Promise((r) => setTimeout(r, 0));

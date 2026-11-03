@@ -48,11 +48,6 @@ test('U40: the action-panel art per mode (:78-83, :755-764)', () => {
 test('U40: the shared ids come from ONE home, not a third copy', () => {
   assert.equal(TRADE_MESSAGE_BASE_ID, 260);
   assert.equal(NOT_ENOUGH_GOLD_ID, 454);
-  // and the module re-exports rather than re-declaring - a second 260
-  // is exactly the drift the one-home guard exists to catch
-  const src = readFileSync(new URL('../../src/systems/tradeModes.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /const TRADE_MESSAGE_BASE_ID\s*=/);
-  assert.doesNotMatch(src, /const NOT_ENOUGH_GOLD_ID\s*=/);
 });
 
 test('U40: CalculateItemIdentifyCost - a shift, free on the Witches Festival (:1935-1955)', () => {

@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-01 #7 (CLIMB-PAST) - "Running jumping climbing dint work passed 100"; Mac: "I dont care about
-// DFU. We're our own thing now".
+// FIELD BUGS 2026-10-01 #7 (CLIMB-PAST) - "Running jumping climbing dint work passed 100";.
 //
 // Past 100 a skill's points reach every formula through effectiveSkill (a quarter a point, plus the milestones), and
 // the run, the swim and the jump all read it: run speed, swim speed and jump height grow, slowly, all the way to 200.

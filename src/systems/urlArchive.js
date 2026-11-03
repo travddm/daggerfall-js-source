@@ -2,7 +2,7 @@
 // layer speaks, over files that ship WITH THE BUILD instead of coming
 // out of a player's .bsa.
 //
-// FIELD-GUN-MW2 (2026-09-20): MOVED HERE FROM `weaponSheathing.js`,
+// FIELD-GUN-MW2: MOVED HERE FROM `weaponSheathing.js`,
 // body unchanged, and re-exported from there so that not one caller
 // had to move. It was written for WS1's seventy-one vendored scabbards
 // and now also carries the port's OWN Morrowind assets
@@ -16,7 +16,7 @@
 
 /** A `{ has, get, load, loaded, names }` archive over a table of URLs:
  *  `urls` maps each canonical data-files path (`meshes/w/x_sh.nif`,
- *  `textures/thunderlock.dds`) to its URL, or to a function answering
+ *  `textures/brigandine_ebony.dds`) to its URL, or to a function answering
  *  one; `fetchBytes(url)` brings the bytes. Pure and node-testable. */
 export function makeVendoredArchive(urls, fetchBytes) {
   const norm = (p) => String(p).replace(/\\/g, '/').toLowerCase();

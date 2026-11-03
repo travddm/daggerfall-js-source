@@ -2,7 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1e — THE ACCOUNT CARD, DRAWN.
 //
-// Mac: "please be detailed and match the enhanced aesthetic".
 //
 // THIS FILE DECIDES NOTHING. Every stage, every field, every refusal
 // and every rule about what may be pressed lives in ui/accountFlow.js,
@@ -28,8 +27,7 @@
 
 import { STAGES, FIELDS, FIELD_SPEC, AGREEMENTS, AGREEMENT_SPEC, recoveryCodesText, recoveryCodesFileName } from '../accountFlow.js';   // RECOVERY-SET: the codes as the saved file says them
 import { profileIconNode, ICON_TEXT } from '../profileIcons.js';   // WITCH1: the profile icons, worn in the portrait well
-import { TITLE_TEXT, AURA_TEXT, glyphBadges, glyphArtNode, badgeClass } from '../playerBadge.js';
-import { setTitleFlame } from '../titleFlame.js';   // SHOP: a flame title's plate - a class, as every colour here is   // ACC3c: the SAME table the name over a head reads, so the picker shows what a player will actually wear - the COLOUR is the skin's (this card may not style itself, and a pin holds that)
+import { TITLE_TEXT, AURA_TEXT, glyphBadges, glyphArtNode, badgeClass } from '../playerBadge.js';   // ACC3c: the SAME table the name over a head reads, so the picker shows what a player will actually wear - the COLOUR is the skin's (this card may not style itself, and a pin holds that)
 import { duelRecordText } from '../../net/duel/duelRecord.js';   // DUEL1: the account card's K/D row
 import { renownText, renownProgressText, renownProgress } from '../../net/renown.js';   // RENOWN1: Renown, left of the name and in its rows
 import { gateRecordText } from '../../net/gate/gateClaims.js';   // WB5b: and its gates-closed row
@@ -38,10 +36,9 @@ import { raidRecordText } from '../../net/raid/raidClaims.js';   // RAID4: and i
 import { t, localizedTable, intlLocale } from '../../systems/textManager.js';   // L10N4: the card's words in the player's language, read when it is drawn
 import { serpentRecordText } from '../../net/serpent/serpentClaims.js';   // AUDIT SERPENT D4: and its serpents-slain row
 import { sdRecordText } from '../../net/superDungeon/sdClaims.js';   // SD9b: and its Hours-broken row
-import { ketchRecordText } from '../../net/ketch/ketchClaims.js';   // KETCH: and its voyages-sailed row
 import { starRecordText } from '../../net/starfall/starClaims.js';   // STAR7: and its stars-held row
 
-/** RENOWN-CHAR (Mac: "Can we make renown per character again"): the card's Renown tracks as the service sends them -
+/** RENOWN-CHAR: the card's Renown tracks as the service sends them -
  *  its characters', the most recently played first - or none: none earned yet, or a service from RENOWN-ACCOUNT's day
  *  (which sent the account's one, `{ xp, level }`, not a list - no character's Renown, so none is drawn). */
 export function renownTracksOfCard(r) {
@@ -67,8 +64,6 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   disciple: () => t('account.glyph.disciple', 'Disciple'),   // TITLE-N: the Patreon tiers' marks, each its title's word
   apostle: () => t('account.glyph.apostle', 'Apostle'),
   hierophant: () => t('account.glyph.hierophant', 'Hierophant'),
-  shadowfang: () => t('account.glyph.shadowfang', 'Shadow Fang'),   // SHADOW-FANG: the wolf's head beside SirMcMobdon's name
-  penitent: () => t('account.glyph.penitent', 'Penitent'),   // PENITENT: the sword in its lozenge beside Diggleborf's name
   herald: () => t('account.glyph.herald', 'Herald'),   // HERALD: the herald's trumpet and its banner
   tower: () => t('account.glyph.tower', 'A seat\'s Charter'),   // SEAT1c: the tower of a guild holding a palace seat
   crownDF: () => t('account.glyph.crownDF', 'The Crown of Daggerfall'),   // SEAT1c: a crown seat's crown, its kingdom's
@@ -82,12 +77,6 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   crownBM: () => t('account.glyph.crownBM', 'The Crown of Black Marsh'),
   crownCY: () => t('account.glyph.crownCY', 'The Crown of Cyrodiil'),
   laurel: () => t('account.glyph.laurel', 'Arena Champion'),   // ARENA4: the laurel, while its wearer is the season's #1
-  aegis: () => t('account.glyph.aegis', 'Aegis of Oblivion'),   // AEGIS: the pillars through the ring over the void, beside Sureme's name
-  primarch: () => t('account.glyph.primarch', 'Primarch'),   // PRIMARCH: the three-barred cross, beside GA00250's name
-  crystalfist: () => t('account.glyph.crystalfist', 'Crystal Fist'),   // CRYSTAL-FIST: the three slashes, beside Flylighter's name
-  wikimaid: () => t('account.glyph.wikimaid', 'WikiMaid'),   // WIKIMAID: the rabbit in its maid's headdress, beside SylviaBun's name
-  nirnrootsage: () => t('account.glyph.nirnrootsage', 'Nirnroot Sage'),   // NIRNROOT-SAGE: the nirnroot sprig, beside Blob-Marley's name
-  origin: () => t('account.glyph.origin', 'Origin'),   // SHOP: the ouroboros dragon, the shop's pre-alpha glyph
 });
 
 /** ACC4: THE TWO FACTS MAC ASKED FOR, as words. Pure, so node pins
@@ -118,8 +107,7 @@ const ACCOUNT_TAG = 'Account';
 const accountTag = () => t('account.card.tag', ACCOUNT_TAG);
 
 export const STAGE_COPY = Object.freeze({   // L10N4: the words are getters, read when the card is drawn
-  // THE BLURBS WERE CUT (Mac: "there's uneeded text explaining what an
-  // account is"). A sign-in window is not a place to be taught what an
+  // THE BLURBS WERE CUT. A sign-in window is not a place to be taught what an
   // account is - the two buttons say it. What survives is only what a
   // player CANNOT guess and would be hurt by not knowing: that recovery
   // signs every device out, and that the codes are shown once.
@@ -244,7 +232,6 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       if (worn) {
         const t = el('span', `acctworntitle ${badgeClass('tl', worn)}`);
         const word = el('span', 'acctwornword', TITLE_TEXT[worn] ?? worn);
-        setTitleFlame(word, worn);   // SHOP: Genesis on its fire
         t.append(word);
         line.append(t);
       }
@@ -337,16 +324,14 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   /**
    * ACC3c — THE WARDROBE, and it is a PICKER rather than a list.
    *
-   * Mac: "Players can tap the account icon to equip 1 feature along
-   * with signing out." So it sits on the signed-in card beside Sign
+   * So it sits on the signed-in card beside Sign
    * out, which is where he put it.
    *
    * IT DRAWS NOTHING WHERE THERE IS NOTHING TO CHOOSE. A player who
    * holds no title sees no picker - not an empty box with a heading
    * over it - because ACC1e's own correction was Mac's ("there's
    * uneeded text explaining what an account is") and a control with
-   * no options is exactly that. GLYPH-WEAR (2026-10-02, Mac: "can we
-   * make it where players can also equip/unequip their glyphs"): each
+   * no options is exactly that. GLYPH-WEAR: each
    * glyph is a button too - pressed off, pressed back on - though it
    * stays TRUE of the player: hiding one is paint, and what it grants
    * stays.
@@ -356,7 +341,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     const held = Array.isArray(w?.titles) ? w.titles : [];
     const glyphs = glyphBadges(w);
     const icons = Array.isArray(w?.icons) ? w.icons : [];   // WITCH1: the profile icons held
-    const auras = Array.isArray(w?.auras) ? w.auras : [];   // WB9g: the Broker's auras this account owns; AEGIS: and a listed title's (PRIMARCH: the Golden Radiance; SHADOW-CLOAK: the Holo Shadow Cloak; SERAPH-WINGS: a developer's Seraph Wings)
+    const auras = Array.isArray(w?.auras) ? w.auras : [];   // WB9g: the Broker's auras this account owns; AEGIS: and a listed title's (SERAPH-WINGS: a developer's Seraph Wings)
     if (!held.length && !glyphs.length && !auras.length && !icons.length) return;
 
     const box = el('div', 'acctwear');
@@ -373,11 +358,10 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
         // table, so the gold here and the gold over a head are one
         // fact - and this card goes on bringing no design language of
         // its own, which is the rule ACC1e was built under.
-        // SHADOW-FANG: the word in a span of its own, so a gradient title's paint clips to the letters and leaves
+        // the word in a span of its own, so a gradient title's paint clips to the letters and leaves
         // the button's border in its plain colour (ui/playerBadge.js badgeCss)
         const b = keyedAs(el('button', `acttitle ${badgeClass('tl', key)}${worn ? ' worn' : ''}`), `title:${key}`);
         const word = el('span', 'acttitleword', TITLE_TEXT[key] ?? key);
-        setTitleFlame(word, key);   // SHOP: Genesis on its fire
         b.append(word);
         b.type = 'button';
         b.disabled = !!flow.busy;
@@ -439,8 +423,8 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
         chip.setAttribute('aria-pressed', shown ? 'true' : 'false');
         chip.title = shown ? t('account.wear.glyphShown', 'Shown. Press to hide it') : t('account.wear.glyphHidden', 'Hidden. Press to show it');
         chip.onclick = () => flow.toggleGlyph(g.key);
-        // SHADOW-FANG: the one drawing's colourless half (ui/playerBadge.js glyphArtNode) - its shapes are
-        // currentColor, which this chip's class colours; a gradient glyph brings its own fill and eye
+        // the one drawing's colourless half (ui/playerBadge.js glyphArtNode) - its shapes are
+        // currentColor, which this chip's class colours
         const svg = glyphArtNode(doc, g, 'acctglyphart', 1.6);
         if (svg) chip.append(svg);
         chip.append(el('span', null, GLYPH_LABEL[g.key] ?? g.key));
@@ -479,8 +463,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   }
 
   /**
-   * NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-   * name or character name for ingame use") - THE NAME THE ROOM READS, a toggle of two: the account's (the plate's own
+   * NAME-AS - THE NAME THE ROOM READS, a toggle of two: the account's (the plate's own
    * name) or the character's being played. A press asks the flow (chooseName: the service keeps the choice and every
    * later mint signs it), and the one chosen is pressed - `worn`, aria-pressed - as a title worn is, in the wardrobe's own
    * vocabulary (this card brings no design language of its own). One line under it says what the other players see: the
@@ -512,8 +495,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   }
 
   /**
-   * PATREON-LINK — THE PATRON'S OWN LINK (Mac: "having to manually hand out titles ... its really hard to keep up with
-   * it"). A registered account, on a service with linking on, gets one row: Link Patreon, or Linked with what the
+   * PATREON-LINK — THE PATRON'S OWN LINK. A registered account, on a service with linking on, gets one row: Link Patreon, or Linked with what the
    * pledge holds, a Refresh (the same link - Patreon asked again) and an Unlink.
    *
    * THE LINK IS A LINK, not a button that asks for one: the service put it in the account read, so the press opens it
@@ -562,7 +544,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   /** PATREON-LINK: BACK FROM THE BROWSER, the account is read again - a link that landed, or a pledge that moved, is on
    *  the card the player comes back to. One listener a card, gone on the first focus after the card is. */
   const win = doc.defaultView;
-  let off = () => {};   // MEM-AUDIT (2026-10-23): the card's owner lets it go when it draws the next - a repaint makes a card a render
+  let off = () => {};   // MEM-AUDIT: the card's owner lets it go when it draws the next - a repaint makes a card a render
   if (win && typeof win.addEventListener === 'function') {
     const onFocus = () => {
       if (!root.isConnected) { win.removeEventListener('focus', onFocus); return; }
@@ -575,7 +557,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   function build(stage) {
     const copy = STAGE_COPY[stage];
 
-    // PROFILE-MENU (2026-10-07, Mac: "organize and detail the player profile (the top right icon section)"): SIGNED
+    // PROFILE-MENU: SIGNED
     // IN, THE CARD IS A PROFILE, not a list. It was one centred column of eleven key-and-value rows - who you are, what
     // you have done and what your account is, all at one weight, the Renown rows wrapping to three lines on a phone. Now
     // it reads in the order a player looks: WHO (the plate - the portrait the corner mark wears, the name with its
@@ -601,7 +583,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     // a different sentence; "Account" over "Your account" is the same
     // one twice.
     if (copy.tag !== accountTag()) root.append(el('span', 'tag', copy.tag));
-    // RENOWN1 (Mac: "having their level appear on the left side of character name and profile main menu"): the
+    // RENOWN1: the
     // Renown of the character most recently played online, left of the name - the service's tracks come most
     // recently played first (AUDIT RENOWN1 UI-10: "earned" was never what it measured - a report the hour had spent
     // still marks its character played). None for an account that has not earned any yet, or a service before it.
@@ -659,7 +641,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       // THE RECORD - what the account has done, a tile a deed. A service from before a deed says nothing of it, and a
       // section with nothing in it is not drawn (ACC1e: no heading over an empty box).
       const record = section(t('account.card.record', 'Record'), 'acctrecord');
-      // DUEL1 (Mac: "Add a dueling K/D to the profile menu"): the account's record, the service's count of the duels
+      // DUEL1: the account's record, the service's count of the duels
       // it won and lost (net/duel/duelRecord.js says whose word each result is). A service from before it says nothing.
       const duels = duelRecordText(flow.account.duels);
       if (duels) row(t('account.card.duels', 'Duels'), duels);
@@ -687,10 +669,6 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       // (net/starfall/starClaims.js carries the receipts). A service from before it says nothing.
       const stars = starRecordText(flow.account.stars);
       if (stars) row(t('account.card.stars', 'Stars held'), stars);
-      // KETCH: the voyages this account sailed to the Tonal Warden's fall - each a receipt the relay signed and this service
-      // counted once a voyage (net/ketch/ketchClaims.js carries the receipts). A service from before it says nothing.
-      const voyages = ketchRecordText(flow.account.ketch);
-      if (voyages) row(t('account.card.voyages', 'Voyages sailed'), voyages);
       // MARKS1: the account's Marks - the server's currency, struck for acts a server witnessed (PROF0 10.5). Null where
       // Marks are not this account's (a guest, the service's switch), and a service from before it says nothing.
       if (Number.isSafeInteger(flow.account.marks)) row(t('account.card.silver', 'Silver'), marksText(flow.account.marks));
@@ -723,7 +701,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       if (flow.account.handle) row(t('account.card.username', 'Username'), flow.account.handle);
       else row(t('account.card.name', 'Name'), t('account.card.guestName', '{name} (a guest)', { name: flow.account.guestName ?? flow.account.name }));
       if (flow.account.kind) row(t('account.card.kind', 'Kind'), flow.account.kind === 'linked' ? t('account.card.kindRegistered', 'Registered') : t('account.card.kindGuest', 'Guest'));
-      // ACC4 (Mac: "registered date and time played"). A guest has no
+      // ACC4. A guest has no
       // registered date and gets no row for it, rather than a dash - the
       // Kind row above already says why. Time played is every account's,
       // guest time included: registering upgrades the same row.

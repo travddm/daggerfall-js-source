@@ -1,4 +1,4 @@
-// MONSTER-VOL (2026-10-20, the owner: "add an option under audio for it called Monster Volume with 0 - 100%"): the
+// MONSTER-VOL: the
 // loudness of what a monster says - its attract call and its attack sound (hostCombat.js playEnemyClip, the one seam
 // both ride) and its pain cry. A swing's impact and a parry are the weapon's, not the monster's, and stay on Sound
 // Volume alone. The Audio tab's Volume row writes uiPrefs `monsterVolume` (0..1); the master bus still scales it.
@@ -13,7 +13,7 @@ export function monsterVolume() {
   return shelfVolume('monsterVolume');
 }
 
-/** COMPANION-VOL (2026-10-23, the owner: "add companion moaning random screaming in idle volume option"): the Audio tab's
+/** COMPANION-VOL: the Audio tab's
  *  Companion Idle Volume, 0..1 - how loud a companion's idle call is (the attract bark QUIET-COMPANIONS already slows:
  *  the moans and the cries a crew hand or a sworn revenant gives out while it walks with you, hostCombat.js
  *  tickEnemySound). It rides on top of Monster Volume (the same body's voice), so 0 here silences a companion's idle

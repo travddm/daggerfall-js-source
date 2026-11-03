@@ -176,7 +176,6 @@ test('WW-LID H: the head never rises through a face - a floor the body straddles
   assert.ok(under[1] + 0.9 <= 1.0 + 1e-3, `pushed under it, not set on it (${under[1].toFixed(3)})`);
 });
 
-// PIN MOVED (FIELD BUGS 2026-10-25i RAIL-HANG, player/collider.js): a LEVEL stride's floor is under the step ceiling now
 // (a walking step's sideways pass and ladder), so the strides above, all level, no longer tell WW-LID's own laws from
 // that one - measured, the straddle dropped and the refused rung ignored each passed them. A stroke with a vertical part
 // (a swimmer's rise or sink, the bug's own) is WW-LID's alone: the same lintel, and the rib from its high side.

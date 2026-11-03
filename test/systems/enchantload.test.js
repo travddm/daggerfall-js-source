@@ -1,5 +1,4 @@
-// ENCHANT-LOAD (2026-09-26, DragynDance on the Discord: "Items with vanilla enchants buggy" - "Reloading a save with an
-// enchanted item equipped makes you lose the enchantment until you take it off and put it on again"). A quest reward or
+// ENCHANT-LOAD. A quest reward or
 // an item-maker piece carries Daggerfall's own enchantments, and their constant half (EnhancesSkill, the armour pair,
 // ExtraSpellPts, AbsorbsSpells, IncreasedWeightAllowance, ImprovesTalents) is a FOLD - derived, never saved - that only
 // equipping and the magic round computed. A load rebuilt the equip table without it, and a magic round is a game minute
