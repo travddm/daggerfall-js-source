@@ -8,6 +8,7 @@ import {
   NEED, BOON, BOON_IDS, SAID_BOONS, HEARTH_FATIGUE, WELL_RESTED_PER_SLEEP_MINUTE, WELL_RESTED_MAX_MINUTES, SURVIVAL_TEXT,
   newSurvival, survivalMinute, runSurvivalMinutes, survivalBoons, survivalStatMods, paySleep, pauseSurvival, alignSurvival, boonNotes, drinkWater,
 } from '../../../src/systems/survival/needs.js';
+import { BOON_FED_MINUTES, BOON_QUENCHED_BELOW } from '../../../src/systems/survival/difficulty.js';
 import { sunlit } from '../../../src/systems/survival/temperature.js';   // AUDIT C&C R2: the sun the hosts read
 import { HUD_BOON_WORDS, STATUS_TEXT, survivalHudChips, survivalStatusLines, temperatureReadout, boonEffect, restedLeft } from '../../../src/systems/survival/status.js';
 import { restCost } from '../../../src/systems/survival/rest.js';
@@ -157,10 +158,10 @@ test('SURV-BOONS: NOTHING IS EVER TAKEN - the worst day (starving, dehydrated, e
 });
 
 test('SURV-BOONS: THE OVER-CEILING POOL (AUDIT SURV-BOONS D1/A4) - Well fed fills a pool that Peckish then shrinks, and a Fortify ends under a full one: the fatigue above the new ceiling is never drained by a need', () => {
-  const e = body({ survival: { ...newSurvival(0), lastAte: 1 - 200 } });
+  const e = body({ survival: { ...newSurvival(0), lastAte: 1 - 100 } });
   run(e, 1, 2, DESERT_NOON, BOONS);
   e.fatigue = maxFatigue(e);
-  assert.equal(e.fatigue, 7040, 'Well fed\'s strength and endurance: a pool of (55 + 55) x 64');
+  assert.equal(e.fatigue, 6592, 'Well fed\'s strength and endurance: a pool of (51 + 52) x 64');
   const log = run(e, 3, 120, DESERT_NOON, BOONS, []);
   assert.equal(maxFatigue(e), 6400, 'Peckish: the pool back to its own');
   assert.deepEqual(log.filter((l) => l[0] === 'fatigue'), [], 'and nothing drained from above it, scorching and parched as it is');
@@ -173,44 +174,44 @@ test('SURV-BOONS: Well fed and Quenched - earned while the hunger and the thirst
   const e = body({ survival: newSurvival(0) });
   survivalMinute(e, 1, INDOORS, deps(e, [], BOONS));
   assert.deepEqual(e.survival.boons, ['fed', 'quenched']);
-  assert.deepEqual(entry(e), { strength: 5, endurance: 5, agility: 5, speed: 5 });
-  assert.deepEqual(BOON, { fed: { strength: 5, endurance: 5 }, quenched: { agility: 5, speed: 5 }, rested: { intelligence: 5, willpower: 5 }, thriving: { luck: 5 } });
-  assert.equal(liveStat(e, 'strength'), 55); assert.equal(liveStat(e, 'speed'), 55);
-  assert.equal(maxFatigue(e), 7040, 'Well fed\'s strength and endurance are a bigger pool - Valheim\'s food');
+  assert.deepEqual(entry(e), { strength: 1, endurance: 2, agility: 1, speed: 2 });
+  assert.deepEqual(BOON, { fed: { strength: 1, endurance: 2 }, quenched: { agility: 1, speed: 2 }, rested: { intelligence: 1, willpower: 2 }, thriving: { luck: 2 } });
+  assert.equal(liveStat(e, 'strength'), 51); assert.equal(liveStat(e, 'speed'), 52);
+  assert.equal(maxFatigue(e), 6592, 'Well fed\'s strength and endurance are a bigger pool - Valheim\'s food');
   const at = (m, s) => { Object.assign(e.survival, s); survivalMinute(e, m, INDOORS, deps(e, [], BOONS)); return e.survival.boons; };
-  assert.ok(at(3, { lastAte: 3 - (NEED.PECKISH_AT - 1) }).includes('fed'), 'a minute short of Peckish is fed');
-  assert.equal(at(4, { lastAte: 4 - NEED.PECKISH_AT }).includes('fed'), false, 'Peckish ends Well fed');
-  assert.ok(at(5, { lastAte: 5, thirst: NEED.THIRSTY - 1 }).includes('quenched'), 'a sip under Thirsty is quenched');
-  assert.equal(at(6, { thirst: NEED.THIRSTY }).includes('quenched'), false, 'Thirsty ends Quenched');
-  assert.deepEqual(entry(e), { strength: 5, endurance: 5 });
+  assert.ok(at(3, { lastAte: 3 - (BOON_FED_MINUTES - 1) }).includes('fed'), 'a minute short of two hours is fed');
+  assert.equal(at(4, { lastAte: 4 - BOON_FED_MINUTES }).includes('fed'), false, 'two hours end Well fed');
+  assert.ok(at(5, { lastAte: 5, thirst: BOON_QUENCHED_BELOW - 1 }).includes('quenched'), 'a sip under the line is quenched');
+  assert.equal(at(6, { thirst: BOON_QUENCHED_BELOW }).includes('quenched'), false, 'the line ends Quenched');
+  assert.deepEqual(entry(e), { strength: 1, endurance: 2 });
   const fed = (t) => eatLaw(createSurvivalItem(t), { lastAte: 0, now: 1000, rules: BOONS }).lastAte;
   assert.equal(fed(TEMPLATE.CookedFish) - fed(TEMPLATE.RawFish), 110, 'cooked fish banks 110 minutes more Well fed than raw (200 against 90)');
 });
 
-test('SURV-BOONS: Well rested - banked an hour and a half an hour asleep in a bed or by a fire (the minute law\'s night and REST-SLEEP1\'s short rest alike), to twelve hours; never by a rough rest or another tier; earned only while the sleep debt is paid (AUDIT SURV-BOONS A1); spent a waking minute at a time - a loiter is one - and gone when spent', () => {
+test('SURV-BOONS: Well rested - banked an hour and a half an hour asleep in a bed or by a fire (the minute law\'s night and REST-SLEEP1\'s short rest alike), to four hours; never by a rough rest or another tier; earned only while the sleep debt is paid (AUDIT SURV-BOONS A1); spent a waking minute at a time - a loiter is one - and gone when spent', () => {
   for (const kind of ['bed', 'camp']) {
     const s = newSurvival(0);
     paySleep(s, kind, 60, 60, BOONS);
     assert.equal(s.wellRested, 90, `${kind}: an hour asleep banks an hour and a half`);
     paySleep(s, kind, 24 * 60, 2000, BOONS);
-    assert.equal(s.wellRested, 720, `${kind}: the bank's ceiling, twelve hours`);
+    assert.equal(s.wellRested, 240, `${kind}: the bank's ceiling, four hours`);
   }
-  assert.deepEqual([WELL_RESTED_PER_SLEEP_MINUTE, WELL_RESTED_MAX_MINUTES], [1.5, 720]);
+  assert.deepEqual([WELL_RESTED_PER_SLEEP_MINUTE, WELL_RESTED_MAX_MINUTES], [1.5, 240]);
   const rough = newSurvival(0); paySleep(rough, 'rough', 480, 480, BOONS);
   assert.equal('wellRested' in rough, false, 'a rough rest banks nothing');
   for (const rules of [CASUAL, HARD]) { const s = newSurvival(0); paySleep(s, 'bed', 480, 480, rules); assert.equal('wellRested' in s, false, `${rules.id} banks nothing`); }
   const sr = body({ survival: newSurvival(0) });
   assert.equal(sleepShortRest(sr, 'camp', BOONS, 9000), true);
-  assert.equal(sr.survival.wellRested, 720, `the short rest's ${NIGHT_MINUTES} minutes bank the full twelve hours`);
+  assert.equal(sr.survival.wellRested, 240, `the short rest's ${NIGHT_MINUTES} minutes bank the full four hours`);
   const e = body({ survival: newSurvival(0) });
   run(e, 1, 480, BED, BOONS);
-  assert.equal(e.survival.wellRested, 720, 'eight hours in a bed: the full twelve');
+  assert.equal(e.survival.wellRested, 240, 'eight hours in a bed: the full four');
   assert.ok(e.survival.boons.includes('rested'));
-  assert.deepEqual([entry(e).intelligence, entry(e).willpower], [5, 5]);
+  assert.deepEqual([entry(e).intelligence, entry(e).willpower], [1, 2]);
   run(e, 481, 490, INDOORS, BOONS);
-  assert.equal(e.survival.wellRested, 710, 'spent a waking minute at a time');
+  assert.equal(e.survival.wellRested, 230, 'spent a waking minute at a time');
   run(e, 491, 495, { ...INDOORS, byFire: true, resting: true, sleeping: null }, BOONS);
-  assert.equal(e.survival.wellRested, 705, 'a loiter is waking minutes: the bank is spent (AUDIT SURV-BOONS D6)');
+  assert.equal(e.survival.wellRested, 225, 'a loiter is waking minutes: the bank is spent (AUDIT SURV-BOONS D6)');
   e.survival.wellRested = 1;
   run(e, 496, 496, INDOORS, BOONS);
   assert.equal('wellRested' in e.survival, false, 'spent, and gone from the record');
@@ -231,8 +232,8 @@ test('SURV-BOONS: Thriving - fed, quenched and rested at once earn luck too, and
   const e = restedBody();
   run(e, 481, 481, INDOORS, BOONS);
   assert.deepEqual(e.survival.boons, ['fed', 'quenched', 'rested', 'thriving']);
-  assert.deepEqual(entry(e), { strength: 5, intelligence: 5, willpower: 5, agility: 5, endurance: 5, speed: 5, luck: 5 });
-  assert.equal(liveStat(e, 'luck'), 55);
+  assert.deepEqual(entry(e), { strength: 1, intelligence: 1, willpower: 2, agility: 1, endurance: 2, speed: 2, luck: 2 });
+  assert.equal(liveStat(e, 'luck'), 52);
   e.survival.thirst = NEED.THIRSTY;
   run(e, 482, 482, INDOORS, BOONS);
   assert.deepEqual(e.survival.boons, ['fed', 'rested']);
@@ -335,7 +336,7 @@ test('SURV-BOONS: a jump says what the minute it lands in has - boons gained and
   assert.equal(said(log).some((t) => SAID_BOONS.some((id) => t === SURVIVAL_TEXT.boon[id])), false, 'no boon the body no longer has is announced');
   const n = body({ survival: newSurvival(0) });
   const nl = [];
-  runSurvivalMinutes(n, 0, 120, BED, deps(n, nl, BOONS));
+  runSurvivalMinutes(n, 0, 60, BED, deps(n, nl, BOONS));
   assert.deepEqual(said(nl).filter((t) => t.startsWith('You feel') || t.startsWith('Your thirst') || t.startsWith('You are in')), ['You feel well fed.', 'Your thirst is quenched.', 'You feel well rested.', 'You are in fine form.']);
   assert.deepEqual(SURVIVAL_TEXT.boon, { fed: 'You feel well fed.', quenched: 'Your thirst is quenched.', rested: 'You feel well rested.', thriving: 'You are in fine form.' });
 });
@@ -363,20 +364,20 @@ test('SURV-BOONS: the strip and the page - the boons are green tiles on their ow
   e.survival.drunk = 45;
   const chips = survivalHudChips(e, 481, { endurance: 50 });
   assert.deepEqual(chips.map((c) => `${c.key}:${c.text}:${c.level}:${c.foot ?? ''}`), [
-    'drunk:Very drunk:danger:', 'boon:fed:Well fed:boon:', 'boon:quenched:Quenched:boon:', 'boon:rested:Well rested:boon:12h', 'boon:thriving:Thriving:boon:', 'boon:hearth:Hearth:boon:',
+    'drunk:Very drunk:danger:', 'boon:fed:Well fed:boon:', 'boon:quenched:Quenched:boon:', 'boon:rested:Well rested:boon:4h', 'boon:thriving:Thriving:boon:', 'boon:hearth:Hearth:boon:',
   ]);
   assert.deepEqual(chips.filter((c) => c.level === 'boon').map((c) => needGlyph(c)), ['hunger', 'thirst', 'sleep', 'thriving', 'hearth']);
   for (const c of chips) if (c.glyph) assert.ok(Object.hasOwn(STATUS_GLYPHS, c.glyph), `${c.text} draws`);
   const tiles = statusTiles({ needs: chips });
   assert.deepEqual(tiles.map((t) => t.kind), ['danger', 'buff', 'buff', 'buff', 'buff', 'buff']);
-  assert.equal(tiles.find((t) => t.key === 'need:boon:rested').foot, '12h');
+  assert.equal(tiles.find((t) => t.key === 'need:boon:rested').foot, '4h');
   assert.deepEqual(Object.keys(HUD_BOON_WORDS), [...BOON_IDS]);
   // the hours, whole, rounded up, singular at one
   for (const [bank, foot, left] of [[720, '12h', '12 hours'], [61, '2h', '2 hours'], [60, '1h', '1 hour'], [1, '1h', '1 hour']]) {
     const s = { ...newSurvival(0), boons: ['rested'], wellRested: bank };
     assert.equal(survivalHudChips({ survival: s }, 0).find((c) => c.key === 'boon:rested').foot, foot, `${bank} minutes`);
     assert.equal(restedLeft(s), left);
-    assert.equal(STATUS_TEXT.boon('rested', s), 'Well rested: +5 Intelligence, +5 Willpower.');
+    assert.equal(STATUS_TEXT.boon('rested', s), 'Well rested: +1 Intelligence, +2 Willpower.');
     assert.equal(STATUS_TEXT.restedFor(s), `Rested for another ${left}.`);
   }
   // NO RED but the drink
@@ -394,11 +395,11 @@ test('SURV-BOONS: the strip and the page - the boons are green tiles on their ow
   // the page, in words
   assert.deepEqual(survivalStatusLines(e, 481, { endurance: 50 }).slice(-7), [
     'You are very drunk.',
-    'Well fed: +5 Strength, +5 Endurance.',
-    'Quenched: +5 Agility, +5 Speed.',
-    'Well rested: +5 Intelligence, +5 Willpower.',
-    'Rested for another 12 hours.',
-    'Thriving: +5 Luck.',
+    'Well fed: +1 Strength, +2 Endurance.',
+    'Quenched: +1 Agility, +2 Speed.',
+    'Well rested: +1 Intelligence, +2 Willpower.',
+    'Rested for another 4 hours.',
+    'Thriving: +2 Luck.',
     'The fire\'s warmth restores your stamina.',
   ]);
   assert.ok(survivalStatusLines(e, 481, { endurance: 50 }).every((l) => /^[\x20-\x7e]*$/.test(l)), 'plain characters - the classic faces draw this box');
@@ -420,7 +421,7 @@ test('SURV-BOONS: the sheet explains the points - the Stats side\'s Boons rows i
   run(e, 481, 481, INDOORS, BOONS);
   setPref(SURVIVAL_PREF, 'boons');
   assert.deepEqual(boonStatRows(e), [
-    ['Well fed', '+5 Strength, +5 Endurance'], ['Quenched', '+5 Agility, +5 Speed'], ['Well rested', '+5 Intelligence, +5 Willpower (12 hours left)'], ['Thriving', '+5 Luck'],
+    ['Well fed', '+1 Strength, +2 Endurance'], ['Quenched', '+1 Agility, +2 Speed'], ['Well rested', '+1 Intelligence, +2 Willpower (4 hours left)'], ['Thriving', '+2 Luck'],
   ]);
   setPref(SURVIVAL_PREF, 'casual');
   assert.deepEqual(boonStatRows(e), [], 'another tier: none');

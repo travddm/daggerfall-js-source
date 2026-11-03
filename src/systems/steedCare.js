@@ -9,8 +9,8 @@
 //    its breath comes back, and how slowly a gallop spends it) and STRENGTH (what it pulls). Born 20-80, most near 50;
 //    no field holds them, so a horse born before STEED1 has had its stats all along.
 //  - THE BOND, 0-100 (`horseBond`, in tenths). Grown by feeding: a day's food a day's bond, more for what it loves.
-//    Every five points of it are a point on every stat (BOND_STEP) - a Kindred horse is twenty points better than the
-//    one bought. A horse traded away comes to its new owner a stranger (net/realm/realmTradeLaw.js RECEIVER_MARKS).
+//    Every fifty points of it are a point on every stat (BOND_STEP; F3b, it was five) - a Kindred horse is two points
+//    better than the one bought (it was twenty). A horse traded away comes to its new owner a stranger (net/realm/realmTradeLaw.js RECEIVER_MARKS).
 //  - HUNGER (`horseFed`, the minute of the character's clock its food runs out). Fed, then Hungry (its stats ten down,
 //    its breath slower back), then STARVING two days on (twenty-five down, no gallop, and the bond fading two points a
 //    day). It never dies of it. A horse at the stable is fed there; one left waiting in the world grazes enough never to
@@ -64,7 +64,7 @@ export const horseBornStats = (item) => bornStats(seedOf(item));
 /** The bond is kept in tenths (`horseBond` 1..BOND_TENTHS_MAX; absent, none). */
 export const BOND_TENTHS_MAX = 1000;
 /** Every BOND_STEP points of bond are a point on every stat. */
-export const BOND_STEP = 5;
+export const BOND_STEP = 50;
 /** The words a bond is said in, from the points each begins at. */
 export const BOND_TIERS = Object.freeze([
   Object.freeze({ min: 0, name: 'Wary' }),

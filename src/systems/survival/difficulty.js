@@ -193,3 +193,8 @@ export const SURVIVAL_RULES = deepFreeze({
 export const HARD_RULES = SURVIVAL_RULES.hard;
 /** A tier's rules, or null for Off and for anything that is not a tier. */
 export const rulesForTier = (tier) => (typeof tier === 'string' && Object.hasOwn(SURVIVAL_RULES, tier) ? SURVIVAL_RULES[tier] : null);
+/** F3b: how long a boon lasts. Well fed holds for two hours after a meal (the hunger's fed stage is four) and Quenched
+ *  while the thirst is under 25 (about ninety minutes at a comfortable temperature; the stage is 50). Well rested holds
+ *  for the bank (needs.js WELL_RESTED_MAX_MINUTES, four hours). A small, short reward for tending: DFU has none. */
+export const BOON_FED_MINUTES = 120;
+export const BOON_QUENCHED_BELOW = 25;

@@ -43,7 +43,7 @@
 import { feltTemperature, temperatureWord, wardrobeCtx, sunlit } from './temperature.js';
 import { drinkFrom, findDrink, waterskinName, DRINK_RELIEF, TEMPLATE, isFood, foodStage, FOOD_STAGE, rotFoodDay, rotWeight, ROT_DAY_MINUTES } from './food.js';
 import { STAT_KEYS_ORDER, maxFatigue, liveStat, FATIGUE_MULTIPLIER } from '../statMods.js';
-import { HARD_RULES } from './difficulty.js';
+import { HARD_RULES, BOON_FED_MINUTES, BOON_QUENCHED_BELOW } from './difficulty.js';
 /** SURV4: speed and agility down by this while stiff (survival/rest.js's STIFF_PENALTY, restated here so rest.js may import this module). */
 const STIFF_PENALTY = 5;
 import { MINUTES_PER_DAY, dateFromClassicMinutes } from '../gameDate.js';
@@ -109,10 +109,10 @@ export function heartyMeal(s, at) {
  * Thriving for all three at once. The order is the strip's.
  */
 export const BOON = Object.freeze({
-  fed: Object.freeze({ strength: 5, endurance: 5 }),
-  quenched: Object.freeze({ agility: 5, speed: 5 }),
-  rested: Object.freeze({ intelligence: 5, willpower: 5 }),
-  thriving: Object.freeze({ luck: 5 }),
+  fed: Object.freeze({ strength: 1, endurance: 2 }),
+  quenched: Object.freeze({ agility: 1, speed: 2 }),
+  rested: Object.freeze({ intelligence: 1, willpower: 2 }),
+  thriving: Object.freeze({ luck: 2 }),
 });
 export const BOON_IDS = Object.freeze(['fed', 'quenched', 'rested', 'thriving', 'hearth']);
 /** AUDIT SURV-BOONS C4: the boons a line is said for as they are earned - not the hearth, which every brazier in a street
@@ -121,10 +121,10 @@ export const SAID_BOONS = Object.freeze(['fed', 'quenched', 'rested', 'thriving'
 /** SURV-BOONS: the hearth - fatigue units a waking minute beside a lit fire gives back: one classic point (statMods.js
  *  FATIGUE_MULTIPLIER, AUDIT SURV-BOONS B10 - the one export, not a second 64). */
 export const HEARTH_FATIGUE = FATIGUE_MULTIPLIER;
-/** SURV-BOONS: Well rested - minutes banked a minute asleep in a bed or by a fire (an eight-hour night banks twelve
- *  hours), and the most a body holds. The rest window's rough sleep banks none: the bed and the fire are the go-to rest. */
+/** SURV-BOONS: Well rested - minutes banked a minute asleep in a bed or by a fire (160 minutes of sleep
+ *  fill it), and the most a body holds (four hours, F3b). The rest window's rough sleep banks none: the bed and the fire are the go-to rest. */
 export const WELL_RESTED_PER_SLEEP_MINUTE = 1.5;
-export const WELL_RESTED_MAX_MINUTES = 12 * 60;
+export const WELL_RESTED_MAX_MINUTES = 4 * 60;
 // SURV-TIERS: `FLOOR_FATIGUE = 64` stood here under "rough drains cannot
 // take the last of a pool by themselves", and nothing read it. Hard's
 // drains DO take the last point - the collapse that follows is the cost
@@ -295,8 +295,8 @@ export function paySleep(s, sleeping, minutes, now, rules = HARD_RULES) {
 export function survivalBoons(s, now, { vampire = false, hearth = false } = {}) {
   const out = [];
   if (!vampire) {
-    if (hungerStage(hungerMinutes(s, now)) === 'fed') out.push('fed');
-    if (thirstStage(s.thirst ?? 0) === 'fine') out.push('quenched');
+    if (hungerMinutes(s, now) < BOON_FED_MINUTES) out.push('fed');
+    if ((s.thirst ?? 0) < BOON_QUENCHED_BELOW) out.push('quenched');
     if (s.wellRested > 0 && sleepStage(s.sleepDebt ?? 0) === 'rested') out.push('rested');   // AUDIT SURV-BOONS A1: a bank beside an unpaid debt is no rest - a short night from Exhausted woke Well rested (and Thriving) under an Exhausted chip
     if (out.length === 3) out.push('thriving');
   }

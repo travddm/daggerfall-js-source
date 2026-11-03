@@ -317,13 +317,13 @@ test('STEED-UI the Stable page, polished: the bond a bar to the next word with t
     const d = el('div', 'px-qdetail');
     drawStablePage(d, () => {}, kit);
     const text = d.textContent;
-    assert.match(text, /Familiar - bond 45 of 100, \+9 to every stat\. Fed, with food enough for 14 hours\./);
+    assert.match(text, /Familiar - bond 45 of 100\. Fed, with food enough for 14 hours\./);
     const bond = rows(d, 'hld-meter').find((r) => r.children[0].textContent === 'Bond');
     assert.equal(bond.children[2].textContent, '10 to Trusting');
     assert.equal(bond.title, 'Fed by your hand, Familiar grows to Trusting at 55');
     assert.ok(meters.some(([now, max, tone]) => now === 10 && max === 20 && tone === 'thin'), 'the bar: ten of the twenty points from Familiar to Trusting');
     const speed = rows(d, 'hld-stat').find((r) => r.children[0].textContent === 'Speed');
-    assert.match(speed.title, /^Born \d+, \+9 from your bond$/);
+    assert.match(speed.title, /^Born \d+$/);   // F3b: a bond of 45 is under the first 50-point step
     // the wagon: rickety at 300 of 1400 - its bar plain, the yard's price at the yard and fetched
     const card = u.model().wagon;
     assert.equal(card.stateKey, 'rickety');
