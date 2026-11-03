@@ -13,8 +13,8 @@ import {
   MW_WEAPON_TYPE,
   MW_WEAPON_CLASS,
   weaponClass,
-  rotNegX,
-  applyRotateController,
+  pitchDown,
+  turnInRootFrame,
 } from '../formats/morrowind/mwFirstPerson.js';
 
 /** The two spine bones the tip is spread over, lowest first. Names are lower case, as the skeleton indexes them. */
@@ -74,10 +74,10 @@ export function spinePitchFactor({
  */
 export function applySpineAim(skeleton, pose, rootRef, skelMats, pitch) {
   if (!pitch) return 0;
-  const half = rotNegX(pitch / 2);
+  const half = pitchDown(pitch / 2);
   let turned = 0;
   for (const name of SPINE_AIM_BONES) {
-    if (applyRotateController(skeleton, pose, rootRef, skelMats, skeleton.byName.get(name), half)) turned++;
+    if (turnInRootFrame(skeleton, pose, rootRef, skelMats, skeleton.byName.get(name), half)) turned++;
   }
   return turned;
 }
