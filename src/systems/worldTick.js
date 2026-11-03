@@ -99,8 +99,9 @@ installPcaao();
 installUnleveledLoot();   // UL1: after everything it would override (its manifest orders it after Roleplay Realism)
 installSurvivalIcons();   // SURV2: the mod's spoiled-food and waterskin icons ride the texture pipeline as the port's own art
 installSurvivalLoot({ enabled: corpseFoodOn });   // SURV2: an animal's corpse carries meat, a humanoid's sometimes a meal (after UL1, which walks the gold); off with the one switch - offline (CORPSE-FOOD: online the body's food is the room's)
-import { normalizeReputations, NORMALIZE_INTERVAL_MINUTES, RECOVERY_INTERVAL_MINUTES } from './court.js';   // AUDIT 23 (C4); REP4: the 28-day recovery
+import { normalizeReputations, NORMALIZE_INTERVAL_MINUTES } from './court.js';   // AUDIT 23 (C4); REP4: the recovery's pace is repRecovery.js's (F3a)
 // S43: the entity update's 7-day and 38-day arms (PlayerEntity.cs:460-472).
+import { recoveryIntervalMinutes } from './repRecovery.js';   // F3a: the pace is the player's choice
 import { regionPowerUpdate } from './region/regionPower.js';
 import { runSurvivalMinutes, clearSurvivalMods, pauseSurvival } from './survival/needs.js';   // SURV1: the needs, a world minute at a time; AUDIT SURV A: and the drains dropped when the feed stops; AUDIT SURV-TIERS: and paused while Off
 import { installSurvivalIcons } from './survival/items.js';   // SURV2: the templates register at its import; the icons here
@@ -1005,14 +1006,13 @@ export function runCalendarArms(entity, lastMinutes, nowMinutes, { rolls = Math.
   // minutes), the faction powers and the regional conditions the WORLD's (the shared day's rolls). Offline all of
   // them walk the one clock in DFU's order within a minute, exactly as before.
   const worldArms = arms !== DAY_ARMS.own, ownArms = arms !== DAY_ARMS.world;
-  const shortWaits = sharedClockOn();   // REST8: online the curse's quests come on the short wait, not 38 and 84 days
+  const shortWaits = sharedClockOn(), recoveryEvery = recoveryIntervalMinutes();   // REST8: online the curse's quests come on the short wait, not 38 and 84 days; F3a: the player's pace, read once
   for (let i = lastMinutes; i < nowMinutes; i++) {
     if (ownArms && i % NORMALIZE_INTERVAL_MINUTES === 0 && !entity.preventNormalizingReputations) {
       normalizeReputations(entity, entity.factionRep ?? null);
-    } else if (ownArms && i % RECOVERY_INTERVAL_MINUTES === 0 && !entity.preventNormalizingReputations) {
-      // REP4: between DFU's 112-day walks, a standing below zero recovers a point every
-      // 28 days (RECOVERY_INTERVAL_MINUTES) - the recovery half alone (a positive standing wears down on DFU's walk only). On a 112-day boundary
-      // the walk above is the interval's too, so no minute pays twice.
+    } else if (ownArms && i % recoveryEvery === 0 && !entity.preventNormalizingReputations) {
+      // REP4: between DFU's 112-day walks, a standing below zero recovers a point every repRecovery.js interval - the recovery
+      // half alone (a positive standing wears down on DFU's walk only); on a 112-day boundary the walk above is the interval's too.
       normalizeReputations(entity, entity.factionRep ?? null, { recoveryOnly: true });
     }
     // S43 - :461-462, the SECOND arm of the :453-477 loop: every 7 days the
@@ -1452,9 +1452,9 @@ export function normalizeAcross(entity, from, to) {
   const a = Math.floor(from), b = Math.floor(to);
   if (!(b > a)) return 0;
   // multiples of the interval in [a, b): the same minute VALUES the loop above tests (DFU's `(i + last) % N == 0`).
-  // REP4: the absence pays the recovery half, and the recovery half is on RECOVERY_INTERVAL_MINUTES (28 days) - every boundary crossed away
+  // REP4: the absence pays the recovery half, and the recovery half is on repRecovery.js's interval - every boundary crossed away
   // is a point back for a standing below zero (the 112-day boundaries are among them).
-  const n = Math.floor((b - 1) / RECOVERY_INTERVAL_MINUTES) - Math.floor((a - 1) / RECOVERY_INTERVAL_MINUTES);
+  const n = Math.floor((b - 1) / recoveryIntervalMinutes()) - Math.floor((a - 1) / recoveryIntervalMinutes());
   if (n <= 0 || entity.preventNormalizingReputations) return 0;
   // AUDIT LIVED1b F3: at most NORMALIZE_ACROSS_MAX walks - a tampered save's -1e308 asked for ~1e300 and the load never
   // returned; a reputation is clamped to +-100 and each walk moves it one point, so no more can change anything
