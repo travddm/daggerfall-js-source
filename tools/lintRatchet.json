@@ -356,7 +356,7 @@
     "src/scenes/witchesHost.js::Function 'createWitchesHost'#0": 229,
     "src/scenes/world.js::(unnamed)": 2466,
     "src/scenes/world.js::Async function '_teleportToPixel'#0": 259,
-    "src/scenes/world.js::Async function 'bootWorld'#0": 31358,
+    "src/scenes/world.js::Async function 'bootWorld'#0": 31357,
     "src/scenes/world.js::Async function 'fastTravelTo'#0": 270,
     "src/scenes/world.js::Async function 'worldQuickLoad'#0": 310,
     "src/scenes/world.js::Function 'frame'#0": 3246,
