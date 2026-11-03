@@ -232,8 +232,8 @@ export const LV_MIN = 1;
 export const LV_MAX = 60;
 /** A level claim as the fight reads it: a whole number, LV_MIN..LV_MAX. */
 export const clampLv = (lv) => Math.max(LV_MIN, Math.min(LV_MAX, Number.isFinite(lv) ? Math.floor(lv) : LV_MIN));
-/** The reference damage a second at a level: the port's own formulas at a normal swing (bible section 5). */
-export const dpsRef = (lv) => 5 + clampLv(lv);
+/** The reference damage a second at a level: 5 + the level to 30, then 3.5 a level, what the tamed budget's typical melee build deals (B6). */
+export const dpsRef = (lv) => (clampLv(lv) <= 30 ? 5 + clampLv(lv) : Math.round(35 + 3.5 * (clampLv(lv) - 30)));
 /** Seconds of reference damage the health a player brings stands for. */
 export const BOSS_TTK_S = 240;
 /** A player's damage bucket: refilled at BUCKET_RATE_X times their reference a second, BUCKET_DEPTH_X deep, and no one

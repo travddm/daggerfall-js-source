@@ -1,7 +1,7 @@
 // RPT1026-FIGHTS RETIRED-BLOW (a private report, 2026-10-21: two fighters cleared the Remnant far faster than one
 // could): A BLOW IS A SIGHTING. A fighter the beat has not seen for ABSENT_RETIRE_MS has its share taken out of the boss
 // (gateBrain.js retireShare), and no blow arm asked whether the striker was one of them: a level-60 that stopped posing
-// beside a level-1 struck a Remnant holding the level-1's share alone, its blows whole (68,250 -> 34,125 with two
+// beside a level-1 struck a Remnant holding the level-1's share alone, its blows whole (147,000 -> 73,500 with two
 // level-60s, 3,150 with a level-1, and the "absent" one's next blow 780). And the relay judged that blow from the socket's
 // last pose however old - the census drops a pose older than SD_POSE_FRESH_MS, the blow path did not. Now the relay drops
 // a blow from a stale pose (the Hour's), and a blow that reaches the purse brings its striker's share back
@@ -39,22 +39,23 @@ function beat(f, from, until, bodies, rng = seeded(5)) {
 
 // ── the law: the Remnant ────────────────────────────────────────────
 
-test('RPT1026-FIGHTS RETIRED-BLOW THE REPORT\'S NUMBERS: two level-60s bring 68,250; the one the beat has not seen for ABSENT_RETIRE_MS has its share out (34,125) - and its next blow brings it back, at the fraction the Remnant stands at, before it lands (it landed 780 on the other\'s share alone); beside a level-1 partner the share left is 3,150, and the level-60\'s blow restores 37,275 (mutants: no sighting; a sighting that never restores)', () => {
-  assert.equal(share(60), 34_125); assert.equal(share(1), 3_150);
+// PIN MOVED: B6 (dpsRef(60) 65 -> 140: a level-60 share is 73,500)
+test('RPT1026-FIGHTS RETIRED-BLOW THE REPORT\'S NUMBERS: two level-60s bring 147,000; the one the beat has not seen for ABSENT_RETIRE_MS has its share out (73,500) - and its next blow brings it back, at the fraction the Remnant stands at, before it lands (it landed 780 on the other\'s share alone); beside a level-1 partner the share left is 3,150, and the level-60\'s blow restores 76,650 (mutants: no sighting; a sighting that never restores)', () => {
+  assert.equal(share(60), 73_500); assert.equal(share(1), 3_150);
   const f = newRemnantFight(4, 1, T0);
   joinRemnant(f, 'a', 'A', 60, T0); joinRemnant(f, 'b', 'B', 60, T0);
-  assert.equal(f.max, 68_250);
+  assert.equal(f.max, 147_000);
   let t = beat(f, T0, T0 + SD_OPENING_MS + ABSENT_RETIRE_MS + 1000, [at('b')]);
   assert.equal(f.players.a.retired, true, 'the still one, retired');
-  assert.equal(f.max, 34_125, 'its share out');
+  assert.equal(f.max, 73_500, 'its share out');
   const frac = f.hp / f.max;
   t += 10;
-  const got = applyRemnantHit(f, 'a', 780, HIT_KINDS.Spell, { x: 0, z: -10 }, t);
+  const got = applyRemnantHit(f, 'a', 2000, HIT_KINDS.Spell, { x: 0, z: -10 }, t);
   assert.equal(got, HIT_CAP_X * dpsRef(60), 'the blow lands, capped as ever');
   assert.equal(f.players.a.retired, false, 'seen by its blow');
   assert.equal(f.players.a.seenAt, t);
-  assert.equal(f.max, 68_250, 'its share back in the whole');
-  assert.ok(near(f.hp, frac * 68_250 - got), 'at the fraction it stood at - a return never heals it - and the blow off that');
+  assert.equal(f.max, 147_000, 'its share back in the whole');
+  assert.ok(near(f.hp, frac * 147_000 - got), 'at the fraction it stood at - a return never heals it - and the blow off that');
   // the report's second case: a level-1 partner
   const g = newRemnantFight(4, 2, T0);
   joinRemnant(g, 'hi', 'Hi', 60, T0); joinRemnant(g, 'lo', 'Lo', 1, T0);
@@ -62,7 +63,7 @@ test('RPT1026-FIGHTS RETIRED-BLOW THE REPORT\'S NUMBERS: two level-60s bring 68,
   assert.equal(g.max, 3_150, 'the level-1\'s share alone');
   u += 10;
   assert.ok(applyRemnantHit(g, 'hi', 780, HIT_KINDS.Spell, { x: 0, z: -10 }, u) > 0);
-  assert.equal(g.max, 37_275, 'the level-60\'s share back before its blow');
+  assert.equal(g.max, 76_650, 'the level-60\'s share back before its blow');
   assert.ok(g.hp / g.max > 0.95, `one blow is no longer a quarter of the fight (${(g.hp / g.max).toFixed(3)})`);
   // a blow refused before the purse (off the arena) sees nobody: the share stays out
   const h = newRemnantFight(4, 3, T0);

@@ -45,7 +45,7 @@ const body = (sub, x, z, dead = false) => ({ sub, x, z, dead });
 // ═══ THE BRAIN ══════════════════════════════════════════════════════════════════════════════════════════════════
 
 test('WB3 brain: the numbers a claim sets - the health a player brings and the bucket that bounds them grow together, so NO claim buys a faster kill: one player at the cap kills their own share in (BOSS_TTK_S - BUCKET_DEPTH_X) / BUCKET_RATE_X seconds at every level (mutants: the share off the claim; the bucket rate off the claim; the one-blow cap lifted)', () => {
-  assert.equal(dpsRef(1), 6); assert.equal(dpsRef(20), 25); assert.equal(dpsRef(999), 5 + LV_MAX, 'a claim past the ceiling is the ceiling');
+  assert.equal(dpsRef(1), 6); assert.equal(dpsRef(20), 25); assert.equal(dpsRef(999), dpsRef(LV_MAX), 'a claim past the ceiling is the ceiling');
   assert.equal(clampLv(0), 1); assert.equal(clampLv(NaN), 1); assert.equal(clampLv(12.9), 12);
   const fastest = (BOSS_TTK_S - BUCKET_DEPTH_X) / BUCKET_RATE_X;
   assert.equal(fastest, 75, 'seventy-five seconds of one player at the cap - the burst the bucket holds, then its rate');
