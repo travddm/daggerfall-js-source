@@ -189,13 +189,13 @@ test('MW-D13 rule 30: accurate aiming is an ORDER comparison on the upper-body e
   // `setAccurateAiming(mUpperBodyState > UpperBodyState::WeaponEquipped)`
   // (character.cpp:1894). It is a comparison, which is why the enum is
   // numbered in character.hpp's own order and not a set of strings.
-  assert.equal(accurateAiming(UPPER_BODY.None), false);
-  assert.equal(accurateAiming(UPPER_BODY.Equipping), false);
-  assert.equal(accurateAiming(UPPER_BODY.Unequipping), false);
-  assert.equal(accurateAiming(UPPER_BODY.WeaponEquipped), false, 'merely holding a weapon is not aiming');
-  assert.equal(accurateAiming(UPPER_BODY.AttackWindUp), true);
-  assert.equal(accurateAiming(UPPER_BODY.AttackRelease), true);
-  assert.equal(accurateAiming(UPPER_BODY.AttackEnd), true, 'the follow-through still aims');
+  assert.equal(accurateAiming(UPPER_BODY.Rest), false);
+  assert.equal(accurateAiming(UPPER_BODY.Drawing), false);
+  assert.equal(accurateAiming(UPPER_BODY.Stowing), false);
+  assert.equal(accurateAiming(UPPER_BODY.Ready), false, 'merely holding a weapon is not aiming');
+  assert.equal(accurateAiming(UPPER_BODY.Winding), true);
+  assert.equal(accurateAiming(UPPER_BODY.Striking), true);
+  assert.equal(accurateAiming(UPPER_BODY.Recovering), true, 'the follow-through still aims');
   // MW-D39: Casting is the reference's own last member (character.hpp:
   // 107-117), so the comparison makes a cast aim too - which is the
   // reference's behaviour, not an accident of appending.
@@ -353,8 +353,8 @@ test('MW-D13 rule 30: the neck factor really moves the arm, and aiming moves it 
 test('MW-D13 rule 30: the live arm raises its aim on a swing and lets it fall', async () => {
   const arm = await armWithOffsetWeapon();
   arm.setSheathed(false);
-  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   arm.update(0.05);
   assert.equal(arm.status().aimFactor, 0, 'holding a weapon is not aiming');
 
@@ -365,7 +365,7 @@ test('MW-D13 rule 30: the live arm raises its aim on a swing and lets it fall', 
   assert.equal(arm.status().aimFactor, 1, 'which reaches one within the first frames of a swing');
 
   // Run the blow out, then let the ramp work.
-  for (let i = 0; i < 200 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 200 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   const before = arm.status().aimFactor;
   arm.update(0.5);
   const after = arm.status().aimFactor;

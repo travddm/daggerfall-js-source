@@ -20,6 +20,19 @@ const { inputs, recorded } = JSON.parse(
   fs.readFileSync(new URL('../fixtures/mw/fpAnimStateParity.json', import.meta.url), 'utf8'),
 );
 
+// The upper-body states were renamed; the recording keeps the old names.
+const NEW_NAME = {
+  None: 'Rest',
+  Equipping: 'Drawing',
+  Unequipping: 'Stowing',
+  WeaponEquipped: 'Ready',
+  AttackWindUp: 'Winding',
+  AttackRelease: 'Striking',
+  AttackEnd: 'Recovering',
+  Casting: 'Casting',
+};
+const OLD_NAME = Object.fromEntries(Object.entries(NEW_NAME).map(([old, now]) => [now, old]));
+
 const typeName = new Map(Object.entries(MW_WEAPON_TYPE).map(([k, v]) => [v, k]));
 const api = {
   completion: state.clipCompletion,
@@ -30,7 +43,7 @@ const api = {
   weaponTypeFor: state.animWeaponType,
   carriedLeftVisible: state.carriedLeftVisible,
   spellAttackType: state.spellAttackType,
-  accurateAiming: (name) => state.accurateAiming(state.UPPER_BODY[name]),
+  accurateAiming: (name) => state.accurateAiming(state.UPPER_BODY[NEW_NAME[name]]),
   fpSkeleton: state.fpSkeletonPath,
   tpSkeleton: state.tpSkeletonPath,
   idleLoops: state.FP_IDLE_LOOPS,
@@ -82,7 +95,7 @@ test(
     }
     for (const id of Object.keys(recorded.scripts)) {
       const want = recorded.scripts[id];
-      const got = JSON.parse(JSON.stringify(scripts[id]));
+      const got = JSON.parse(JSON.stringify(scripts[id])).map((row) => [OLD_NAME[row[0]], ...row.slice(1)]);
       assert.equal(got.length, want.length, `${id}: tick count`);
       for (let i = 0; i < want.length; i++) assert.deepEqual(got[i], want[i], `${id}: tick ${i}`);
     }

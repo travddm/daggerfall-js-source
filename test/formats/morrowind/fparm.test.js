@@ -3039,7 +3039,7 @@ test('MW-D39: readySpell and castSpell are the two doors, and neither gates the 
   assert.match(src, /if \(!want && upper === UPPER_BODY\.Casting\) \{ unreadyAfterCast = true; return false; \}/);
   // the cast plays the group's own section and lands back in the stance
   assert.match(src, /if \(!playAction\(`\$\{type\} start`, `\$\{type\} stop`, 0\)\)/);
-  assert.match(src, /case UPPER_BODY\.Casting:\n\s+\/\/ MW-D39[\s\S]*?upper = UPPER_BODY\.WeaponEquipped;/);
+  assert.match(src, /case UPPER_BODY\.Casting:\n\s+\/\/ MW-D39[\s\S]*?upper = UPPER_BODY.Ready;/);
   assert.equal(UPPER_BODY.Casting, 7);
   // the key pair is the SPELL'S RANGE (character.cpp:1618-1636), not a
   // single "cast" - a first draft guessed 'cast start', which no

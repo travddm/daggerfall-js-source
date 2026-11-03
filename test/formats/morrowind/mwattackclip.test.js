@@ -211,7 +211,7 @@ test('MW-D12 rule 10: the loop count is CONDITIONAL on a short group, and the id
   assert.equal(arm.status().loopsLeft, null, 'a sheathed idle loops without end');
 
   arm.setSheathed(false);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0, 'the draw finishes');
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready) >= 0, 'the draw finishes');
   assert.equal(arm.status().idleGroup, 'idle1h');
   const loops = arm.status().loopsLeft;
   assert.ok(loops >= 1 && loops <= 4, `a drawn idle gets 1..4 wraps, got ${loops}`);
@@ -331,10 +331,10 @@ test('MW-D12: drawing plays the equip section and the weapon appears at "equip a
   const arm = await drawnArm();
   assert.equal(arm.status().weapon.type, MW_WEAPON_TYPE.LongBladeOneHand, 'the longsword resolved');
   assert.equal(arm.status().weaponShown, false, 'a sheathed weapon is NOT in shot');
-  assert.equal(arm.status().upper, UPPER_BODY.None);
+  assert.equal(arm.status().upper, UPPER_BODY.Rest);
 
   assert.equal(arm.setSheathed(false), true);
-  assert.equal(arm.status().upper, UPPER_BODY.Equipping);
+  assert.equal(arm.status().upper, UPPER_BODY.Drawing);
   assert.equal(arm.status().weaponGroup, 'weapononehand');
   assert.equal(arm.status().idleGroup, 'idle1h', 'drawing changes the stance AT ONCE (:1495)');
   assert.equal(arm.status().weaponShown, false,
@@ -342,8 +342,8 @@ test('MW-D12: drawing plays the equip section and the weapon appears at "equip a
 
   // equip start 2.0, attach 2.2, stop 2.4.
   assert.ok(run(arm, (s) => s.weaponShown) >= 0, 'the attach key fires');
-  assert.ok(arm.status().time >= 2.2 && arm.status().upper === UPPER_BODY.Equipping);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0, 'and the section ends');
+  assert.ok(arm.status().time >= 2.2 && arm.status().upper === UPPER_BODY.Drawing);
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready) >= 0, 'and the section ends');
   assert.equal(arm.status().weaponShown, true);
   assert.deepEqual(arm.status().clipNotes, [], 'with no refusals along the way');
 });
@@ -351,21 +351,21 @@ test('MW-D12: drawing plays the equip section and the weapon appears at "equip a
 test('MW-D12: a blow runs wind-up -> release -> follow and lands back at WeaponEquipped', async () => {
   const arm = await drawnArm();
   arm.setSheathed(false);
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
 
   assert.equal(arm.attack('StrikeDownLeft'), 'chop', 'the DOWN-LEFT drag is a chop');
-  assert.equal(arm.status().upper, UPPER_BODY.AttackWindUp);
+  assert.equal(arm.status().upper, UPPER_BODY.Winding);
   assert.ok(Math.abs(arm.status().time - 2.5) < 1e-6, 'and it starts at "chop start"');
 
   const phases = [];
   for (let i = 0; i < 200; i++) {
     const s = arm.status();
     if (!phases.length || phases[phases.length - 1][0] !== s.upper) phases.push([s.upper, s.time]);
-    if (s.upper === UPPER_BODY.WeaponEquipped && phases.length > 1) break;
+    if (s.upper === UPPER_BODY.Ready && phases.length > 1) break;
     arm.update(0.05);
   }
   assert.deepEqual(phases.map((p) => p[0]), [
-    UPPER_BODY.AttackWindUp, UPPER_BODY.AttackRelease, UPPER_BODY.AttackEnd, UPPER_BODY.WeaponEquipped,
+    UPPER_BODY.Winding, UPPER_BODY.Striking, UPPER_BODY.Recovering, UPPER_BODY.Ready,
   ], 'all three sections, in the reference\'s order');
   // The release starts at "chop max attack" (2.9) and the follow at
   // "chop LARGE follow start" (3.8) - large because a Daggerfall swing is
@@ -379,7 +379,7 @@ test('MW-D12: a blow runs wind-up -> release -> follow and lands back at WeaponE
 test('MW-D12: the attack type picks a DIFFERENT section of the same group', async () => {
   const arm = await drawnArm();
   arm.setSheathed(false);
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
   assert.equal(arm.attack('StrikeUp'), 'thrust');
   // thrust start is 4.6 in the fixture, chop start 2.5 - the group is the
   // same "weapononehand" both times, which is rule 11's whole point.
@@ -391,9 +391,9 @@ test('MW-D12: a swing is REFUSED while equipping, mid-blow, and while sheathed',
   const arm = await drawnArm();
   assert.equal(arm.attack('StrikeDown'), null, 'sheathed hands do not swing');
   arm.setSheathed(false);
-  assert.equal(arm.status().upper, UPPER_BODY.Equipping);
+  assert.equal(arm.status().upper, UPPER_BODY.Drawing);
   assert.equal(arm.attack('StrikeDown'), null, 'nor do hands still drawing the weapon');
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
   assert.equal(arm.attack('StrikeDown'), 'chop');
   assert.equal(arm.attack('StrikeLeft'), null, 'and a blow in progress is not restarted');
   assert.equal(arm.status().attackType, 'chop');
@@ -402,10 +402,10 @@ test('MW-D12: a swing is REFUSED while equipping, mid-blow, and while sheathed',
 test('MW-D12: sheathing keeps the stance until the unequip section ENDS', async () => {
   const arm = await drawnArm();
   arm.setSheathed(false);
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
 
   assert.equal(arm.setSheathed(true), true);
-  assert.equal(arm.status().upper, UPPER_BODY.Unequipping);
+  assert.equal(arm.status().upper, UPPER_BODY.Stowing);
   // THE ASYMMETRY. Drawing flips the type as the animation starts;
   // sheathing does not flip it until the animation finishes
   // (character.cpp:1857-1859) - otherwise the unequip section would be
@@ -421,7 +421,7 @@ test('MW-D12: sheathing keeps the stance until the unequip section ENDS', async 
   assert.equal(arm.status().time, t, 'and does NOT rewind the unequip');
 
   assert.ok(run(arm, (s) => !s.weaponShown) >= 0, 'the "unequip detach" key hides the blade');
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.None) >= 0);
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Rest) >= 0);
   assert.equal(arm.status().idleGroup, 'idle', 'and NOW the stance drops to the bare idle');
   assert.equal(arm.status().loopsLeft, null, 'which loops without end again');
 });
@@ -429,7 +429,7 @@ test('MW-D12: sheathing keeps the stance until the unequip section ENDS', async 
 test('MW-D12: the drawn arm poses from the WEAPON clip, not the idle', async () => {
   const arm = await drawnArm();
   arm.setSheathed(false);
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
   const idleTime = arm.status().time;
   assert.ok(idleTime >= 0.6 && idleTime <= 1.6, 'idling inside idle1h\'s window');
   arm.attack('StrikeDown');
@@ -438,7 +438,7 @@ test('MW-D12: the drawn arm poses from the WEAPON clip, not the idle', async () 
   assert.ok(atkTime >= 2.5, 'and the attack clip takes the playhead');
   // Two slots, one winner: the idle did not stop, it was outvoted. When
   // the blow ends the playhead is back inside the idle's window.
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
   assert.ok(arm.status().time <= 1.6, 'the idle was still running underneath');
 });
 
@@ -453,7 +453,7 @@ test('MW-D12: bare hands with no "handtohand" group idle plainly and REFUSE to s
   arm.setSheathed(false);
   assert.equal(arm.status().idleGroup, 'idle', 'the BARE idle, not idle1h');
   assert.equal(arm.status().weaponGroup, null);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped, 'with no equip section to play');
+  assert.equal(arm.status().upper, UPPER_BODY.Ready, 'with no equip section to play');
   assert.equal(arm.attack('StrikeDown'), null, 'and no swing it could honestly draw');
   arm.update(0.05);
   assert.ok(arm.status().time <= 0.5, 'while the bare idle keeps running');
@@ -462,15 +462,15 @@ test('MW-D12: bare hands with no "handtohand" group idle plainly and REFUSE to s
 test('MW-D12: a HELD wind-up waits for release, and an unheld one does not', async () => {
   const arm = await drawnArm();
   arm.setSheathed(false);
-  run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped);
+  run(arm, (s) => s.upper === UPPER_BODY.Ready);
   arm.attack('StrikeDown', { hold: true });
   // chop start 2.5 -> max attack 2.9. Run well past it.
   for (let i = 0; i < 40; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.AttackWindUp, 'held at full draw');
+  assert.equal(arm.status().upper, UPPER_BODY.Winding, 'held at full draw');
   assert.ok(Math.abs(arm.status().time - 2.9) < 1e-5, 'parked on "chop max attack"');
   assert.equal(arm.release(), true);
   arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.AttackRelease, 'and the release runs on the ask');
+  assert.equal(arm.status().upper, UPPER_BODY.Striking, 'and the release runs on the ask');
   assert.equal(arm.release(), false, 'a second release is a no-op');
 });
 
@@ -577,13 +577,13 @@ test('MW-D19: swapping while DRAWN re-equips the new weapon and lands back at We
   const res = await arm.build({ race: 'fprace', weapon: LONGSWORD, deps: fpDeps(TWO_WEAPON_ESM()) });
   assert.ok(res.ok, `build: ${res.stage} ${res.error}`);
   arm.setSheathed(false);
-  assert.ok(run(arm, (st) => st.upperName === 'WeaponEquipped') >= 0, 'the sword is drawn');
+  assert.ok(run(arm, (st) => st.upperName === 'Ready') >= 0, 'the sword is drawn');
   assert.ok(arm.status().weaponShown);
   assert.equal(await arm.setWeapon(WAR_AXE, { hasAmmo: false }), true);
   // The reference's shape for an equip change mid-draw: the NEW weapon
   // is equipped - the machine runs its equip section rather than
   // pretending the axe was always in hand.
-  assert.ok(run(arm, (st) => st.upperName === 'WeaponEquipped') >= 0, 'the axe finishes equipping');
+  assert.ok(run(arm, (st) => st.upperName === 'Ready') >= 0, 'the axe finishes equipping');
   const s = arm.status();
   assert.equal(s.weapon && s.weapon.id, 'iron battle axe');
   assert.ok(s.weaponShown, 'and it is IN the hand, not just in the record');
@@ -626,16 +626,16 @@ test('MW-D28: the record\'s mSpeed scales EXACTLY the three attack sections - th
   // THE EQUIP advances at 1.0 whatever the record says.
   arm.setSheathed(false);
   let st = arm.status();
-  assert.equal(st.upperName, 'Equipping');
+  assert.equal(st.upperName, 'Drawing');
   const t0 = st.time;
   arm.update(0.05);
   const equipDelta = arm.status().time - t0;
   assert.ok(Math.abs(equipDelta - 0.05) < 1e-9, `equip advances at 1.0 (${equipDelta})`);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0, 'the draw finishes');
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready) >= 0, 'the draw finishes');
   // THE WIND-UP advances at 2.0.
   assert.equal(arm.attack('StrikeDown'), 'chop');
   st = arm.status();
-  assert.equal(st.upperName, 'AttackWindUp');
+  assert.equal(st.upperName, 'Winding');
   const w0 = st.time;
   arm.update(0.05);
   const windDelta = arm.status().time - w0;
@@ -656,7 +656,7 @@ test('MW-D28: a drawn weapon-to-weapon swap is isStillWeapon - the mesh swaps, N
   const res = await arm.build({ race: 'fprace', weapon: LONGSWORD, deps: fpDeps(twoWeapons) });
   assert.ok(res.ok, `${res.stage}: ${res.error}`);
   arm.setSheathed(false);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0, 'the sword is drawn');
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready) >= 0, 'the sword is drawn');
   assert.equal(arm.status().weaponShown, true);
   // Swap to the claymore (template 122, LongBladeTwoHand - its idle2c
   // IS in the fixture, so the stance change is observable). The machine
@@ -666,7 +666,7 @@ test('MW-D28: a drawn weapon-to-weapon swap is isStillWeapon - the mesh swaps, N
   assert.equal(swapped, true, 'the swap ran');
   const st = arm.status();
   assert.equal(st.weapon.id, 'iron claymore', 'the NEW record is in the hand');
-  assert.equal(st.upperName, 'WeaponEquipped', 'no equip section played - isStillWeapon');
+  assert.equal(st.upperName, 'Ready', 'no equip section played - isStillWeapon');
   assert.equal(st.weaponShown, true, 'and the weapon never blinked off');
   assert.equal(st.sheathed, false, 'still drawn');
   assert.equal(st.idleGroup, 'idle2c', 'and the stance re-resolved to the two-hander\'s idle');
@@ -680,20 +680,20 @@ test('MW-D28: the release and follow-through cannot be sheathed away - the wind-
   // the same per-frame sync.
   const arm = await drawnArm();
   arm.setSheathed(false);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0);
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready) >= 0);
   arm.attack('StrikeDown');
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.AttackRelease, { dt: 0.02 }) >= 0, 'the blow releases');
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Striking, { dt: 0.02 }) >= 0, 'the blow releases');
   assert.equal(arm.setSheathed(true), false, 'mid-release the sheathe REFUSES');
-  assert.equal(arm.status().upperName, 'AttackRelease', 'and the release keeps playing');
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0, 'the attack runs out');
+  assert.equal(arm.status().upperName, 'Striking', 'and the release keeps playing');
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready) >= 0, 'the attack runs out');
   assert.equal(arm.setSheathed(true), true, 'and THEN the sheathe starts');
   // The wind-up half of the gate: a fresh draw and swing, sheathed
   // during the wind-up, goes down immediately (<= AttackWindUp).
   const arm2 = await drawnArm();
   arm2.setSheathed(false);
-  assert.ok(run(arm2, (s) => s.upper === UPPER_BODY.WeaponEquipped) >= 0);
+  assert.ok(run(arm2, (s) => s.upper === UPPER_BODY.Ready) >= 0);
   arm2.attack('StrikeDown');
-  assert.equal(arm2.status().upperName, 'AttackWindUp');
+  assert.equal(arm2.status().upperName, 'Winding');
   assert.equal(arm2.setSheathed(true), true, 'the wind-up may be sheathed away');
 });
 
@@ -772,8 +772,8 @@ test('MW-D29: an equip key living only in the BASE source still fires - keys and
   // appeared.
   const { arm } = await twoSourceArm();
   arm.setSheathed(false);
-  assert.equal(arm.status().upperName, 'Equipping');
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped, { dt: 0.02 }) >= 0, 'the draw finishes');
+  assert.equal(arm.status().upperName, 'Drawing');
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready, { dt: 0.02 }) >= 0, 'the draw finishes');
   assert.equal(arm.status().weaponShown, true,
     'the "equip attach" key CROSSED - the action clip stepped through its own source\'s keys');
 });
@@ -791,7 +791,7 @@ test('MW-D29: drawing a weapon mid-walk re-composes the movement group THAT fram
   assert.equal(arm.status().movementGroup, 'walkforward1h',
     'the sword STANCE re-composed the movement group without stopping');
   // and sheathing walks it back
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped, { dt: 0.02 }) >= 0);
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready, { dt: 0.02 }) >= 0);
   arm.setSheathed(true);
   assert.ok(run(arm, (s) => s.sheathed, { dt: 0.02 }) >= 0, 'the sheathe finishes');
   arm.update(0.05);
@@ -804,7 +804,7 @@ test('MW-D29: stopping resets the IDLE with the movement - fresh start, fresh di
   // refreshIdleAnims replays from startPoint 0 with a new numLoops roll.
   const { arm, cam } = await twoSourceArm();
   arm.setSheathed(false);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped, { dt: 0.02 }) >= 0);
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready, { dt: 0.02 }) >= 0);
   // let the drawn idle advance INTO its clip
   for (let i = 0; i < 6; i++) arm.update(0.05);
   cam.move.forward = 1; cam.move.speed = 1;
@@ -848,10 +848,10 @@ test('MW-D29: the unequip DETACH key in the other source keeps the weapon in han
   // vanishing from the hand instead of being put away.
   const { arm } = await twoSourceArm();
   arm.setSheathed(false);
-  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.WeaponEquipped, { dt: 0.02 }) >= 0);
+  assert.ok(run(arm, (s) => s.upper === UPPER_BODY.Ready, { dt: 0.02 }) >= 0);
   assert.equal(arm.status().weaponShown, true);
   arm.setSheathed(true);
-  assert.equal(arm.status().upperName, 'Unequipping');
+  assert.equal(arm.status().upperName, 'Stowing');
   assert.equal(arm.status().weaponShown, true,
     'the weapon is STILL IN HAND at the start of the sheathe - the detach key was found across sources');
   assert.ok(run(arm, (s) => s.sheathed, { dt: 0.02 }) >= 0, 'the sheathe finishes');

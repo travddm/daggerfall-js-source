@@ -527,7 +527,7 @@ test('TWO-HANDS AUDIT the arm, THE PAIR\'S GUARD (Mac: "When attacking with a we
     worst = Math.max(worst, bones());
     g.push({ w: h.guard.L, e: elev('L'), u: arm.status().upperName });
   }
-  const rel = g.map((r, i) => (r.u === 'AttackRelease' ? i : -1)).filter((i) => i >= 0);
+  const rel = g.map((r, i) => (r.u === 'Striking' ? i : -1)).filter((i) => i >= 0);
   const at = rel[rel.length - 1];   // the release's last frame: the blow's hit
   const drop = rest - g[at].e;
   assert.ok(Math.abs(drop - wantDrop) < 0.15 * wantDrop, `at the hit the held wrist is ${drop.toFixed(4)} rad lower on the picture (LOWER ${GUARD.LOWER} of its blade's ${shownHeight().toFixed(3)} on the picture: ${wantDrop.toFixed(4)}; the fists' ${GUARD_LENS_DROP.toFixed(4)})`);
@@ -539,7 +539,7 @@ test('TWO-HANDS AUDIT the arm, THE PAIR\'S GUARD (Mac: "When attacking with a we
   const piece = (slot) => built.arm.pieces.find((q) => q.slot === slot);
   assert.equal(bladePictureHeight(built.arm, turned, built.cameraRef, piece('offweapon')), bladePictureHeight(built.arm, built.restMats, built.cameraRef, piece('weapon')), 'the left blade measured in the right hand');
   assert.ok(g[2].w > 0.6, `in fast (three frames: ${g[2].w.toFixed(3)}, GUARD.IN_TAU ${GUARD.IN_TAU} s)`);
-  const end = g.findIndex((r) => r.u === 'WeaponEquipped');
+  const end = g.findIndex((r) => r.u === 'Ready');
   assert.ok(end > at && g[end + 2].w > 0.6 && g[end + 2].w < 0.95, `out slower (three frames after the blow: ${g[end + 2].w.toFixed(3)}, GUARD.OUT_TAU ${GUARD.OUT_TAU} s)`);
   assert.ok(worst < 1e-4, `the arm lowered at its shoulder, never moved off it (${worst})`);
   assert.equal(g[g.length - 1].w, 0, 'and up again');
@@ -614,7 +614,7 @@ test('TWO-HANDS AUDIT the arm, A MIRRORED BLOW KEEPS THE WAY ASKED (finding 5): 
     assert.ok(arm.attack(strike, { hand }));
     const reversed = arm.status().attackReversed;
     const path = [];
-    for (let i = 0; i < 200 && /^Attack/.test(arm.status().upperName); i++) { arm.update(0.02); path.push(arm.handsState().wrists[hand].slice()); }
+    for (let i = 0; i < 200 && /^(Winding|Striking|Recovering)$/.test(arm.status().upperName); i++) { arm.update(0.02); path.push(arm.handsState().wrists[hand].slice()); }
     return { reversed, path };
   };
   const b = {};
@@ -781,7 +781,7 @@ test('TWO-HANDS AUDIT the arm, THE PAIR\'S DRAW (finding 7): the second arm is c
   arm.setHands({ mode: 'dual', lead: 'R' });
   await arm.setOffWeapon(LONGSWORD);
   for (let i = 0; i < 40; i++) arm.update(1 / 60);
-  for (const [sheathe, section] of [[true, 'Unequipping'], [false, 'Equipping']]) {
+  for (const [sheathe, section] of [[true, 'Stowing'], [false, 'Drawing']]) {
     arm.setSheathed(sheathe);
     let frames = 0, bladeless = 0;
     for (let i = 0; i < 90; i++) {
@@ -1156,7 +1156,7 @@ test('TWO-HANDS FIELD the arm, A PAIR ON THE MOVE SWINGS ITS ARMS AGAINST EACH O
   for (let i = 0; i < 60; i++) {
     arm.update(0.05);
     const st = arm.status();
-    if (st.upperName === 'Equipping' && arm.handsState().pair) { drawing++; assert.equal(arm.handsState().composed, 'dual', `frame ${i}: the draw poses the arms, not the walk`); }
+    if (st.upperName === 'Drawing' && arm.handsState().pair) { drawing++; assert.equal(arm.handsState().composed, 'dual', `frame ${i}: the draw poses the arms, not the walk`); }
   }
   assert.ok(drawing > 0, 'the draw was seen on the walk');
   assert.equal(arm.handsState().composed, 'dual:stride', 'drawn: the stride again');

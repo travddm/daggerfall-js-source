@@ -212,8 +212,8 @@ test('MW-D16 rule 24: a drawn BOW is empty until the shoot attach key', async ()
   assert.equal(arm.status().arrowShown, false, 'nothing on the string at build');
 
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   assert.equal(arm.status().weaponShown, true, 'the bow is in hand');
   // THE SURPRISE, and it is the reference's: only a CROSSBOW reloads
   // itself at the end of a section. A bow waits for the next draw.
@@ -271,7 +271,7 @@ test('MW-D16: sheathing DETACHES the arrow, at the section start', async () => {
   const arm = liveArm();
   await arm.build({ race: 'fprace', weapon: LONG_BOW, hasAmmo: true, deps: bowDeps() });
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   arm.attack('StrikeDown');
   for (let i = 0; i < 20 && !arm.status().arrowShown; i++) arm.update(0.05);
   assert.equal(arm.status().arrowShown, true);
@@ -292,7 +292,7 @@ test('MW-D16: the arrow is a HIDDEN RANGE, like the weapon', async () => {
   assert.equal(arrow[0].hidden, true);
   const before = ranges.length;
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   arm.attack('StrikeDown');
   for (let i = 0; i < 20 && !arm.status().arrowShown; i++) arm.update(0.05);
   arm.update(0.05);
@@ -316,7 +316,7 @@ test('MW-D42: the arrow is on the string the moment the draw BEGINS, key or no k
   const res = await arm.build({ race: 'fprace', weapon: LONG_BOW, hasAmmo: true, deps: bowDeps() });
   assert.ok(res.ok, `${res.stage}: ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   // MW-D16's surprise still holds: a bow at REST is empty-handed.
   assert.equal(arm.status().arrowShown, false, 'a bow at rest carries nothing');
 
@@ -337,7 +337,7 @@ test('MW-D42: an empty quiver still draws an EMPTY bow', async () => {
   assert.ok(res.ok, `${res.stage}: ${res.error}`);
   assert.equal(res.arrow, null, 'no ammunition, no arrow part');
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   arm.attack('StrikeDown');
   assert.equal(arm.status().arrowShown, false, 'the draw cannot nock what was never built');
 });

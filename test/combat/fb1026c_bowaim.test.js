@@ -41,24 +41,24 @@ const turnOf = (m0, m1, n) => mul(unit(at(m1, n).a), T(unit(at(m0, n).a)));
 test('BOW-AIM THE PITCH FACTOR: none unless a Ranged or Thrown weapon is in its wind-up, release or follow (or a cast); eased in over "start" to "min attack" (unless the group is a random attack); 1 through the release; eased out over the follow - a crossbow\'s in its first tenth (mutants: BOW-AIM-melee-pitches, BOW-AIM-idle-pitches, BOW-AIM-no-ramp-in, BOW-AIM-crossbow-slow, BOW-AIM-follow-held)', () => {
   assert.deepEqual([...SPINE_AIM_BONES], ['bip01 spine1', 'bip01 spine2']);
   assert.deepEqual([...RANDOM_ATTACK_GROUPS], ['attack1', 'attack2', 'attack3', 'swimattack1', 'swimattack2', 'swimattack3']);
-  assert.deepEqual([...AIMING_STATES], ['AttackWindUp', 'AttackRelease', 'AttackEnd', 'Casting']);
+  assert.deepEqual([...AIMING_STATES], ['Winding', 'Striking', 'Recovering', 'Casting']);
   const bow = { weaponType: W.MarksmanBow, group: 'bowandarrow' };
-  for (const upper of ['None', 'Equipping', 'Unequipping', 'WeaponEquipped']) assert.equal(spinePitchFactor({ ...bow, upper }), 0, `${upper}: no aim`);
-  for (const t of [W.LongBladeOneHand, W.SpearTwoWide, W.HandToHand, W.Spell, W.None]) assert.equal(spinePitchFactor({ upper: 'AttackRelease', weaponType: t }), 0, `melee and spells never pitch (${t})`);
-  assert.equal(spinePitchFactor({ upper: 'AttackRelease', weaponType: W.MarksmanThrown }), 1, 'a thrown weapon does');
-  assert.equal(spinePitchFactor({ ...bow, upper: 'AttackRelease' }), 1);
+  for (const upper of ['Rest', 'Drawing', 'Stowing', 'Ready']) assert.equal(spinePitchFactor({ ...bow, upper }), 0, `${upper}: no aim`);
+  for (const t of [W.LongBladeOneHand, W.SpearTwoWide, W.HandToHand, W.Spell, W.None]) assert.equal(spinePitchFactor({ upper: 'Striking', weaponType: t }), 0, `melee and spells never pitch (${t})`);
+  assert.equal(spinePitchFactor({ upper: 'Striking', weaponType: W.MarksmanThrown }), 1, 'a thrown weapon does');
+  assert.equal(spinePitchFactor({ ...bow, upper: 'Striking' }), 1);
   assert.equal(spinePitchFactor({ ...bow, upper: 'Casting' }), 1, 'a cast with a bow in the stance keeps the aim');
   // the ramp in: (t - start) / (min - start) while start <= t < min; 1 past it, and 1 where the keys are missing
-  const wind = { ...bow, upper: 'AttackWindUp', startTime: 5.8, minAttackTime: 6.0 };
+  const wind = { ...bow, upper: 'Winding', startTime: 5.8, minAttackTime: 6.0 };
   assert.ok(near(spinePitchFactor({ ...wind, time: 5.85 }), 0.25));
   assert.equal(spinePitchFactor({ ...wind, time: 6.0 }), 1);
   assert.equal(spinePitchFactor({ ...wind, time: 5.7 }), 1, 'before the start: the guard fails, the factor stays whole');
   assert.equal(spinePitchFactor({ ...wind, time: 5.85, minAttackTime: -1 }), 1, 'no min attack key');
   assert.equal(spinePitchFactor({ ...wind, time: 5.85, group: 'attack2' }), 1, 'a random attack has no pre-wind-up');
   // the ramp out over the follow
-  assert.ok(near(spinePitchFactor({ ...bow, upper: 'AttackEnd', completion: 0.3 }), 0.7));
-  assert.ok(near(spinePitchFactor({ upper: 'AttackEnd', weaponType: W.MarksmanCrossbow, completion: 0.05 }), 0.5));
-  assert.equal(spinePitchFactor({ upper: 'AttackEnd', weaponType: W.MarksmanCrossbow, completion: 0.3 }), 0, 'a crossbow\'s reload plays unpitched past its first tenth');
+  assert.ok(near(spinePitchFactor({ ...bow, upper: 'Recovering', completion: 0.3 }), 0.7));
+  assert.ok(near(spinePitchFactor({ upper: 'Recovering', weaponType: W.MarksmanCrossbow, completion: 0.05 }), 0.5));
+  assert.equal(spinePitchFactor({ upper: 'Recovering', weaponType: W.MarksmanCrossbow, completion: 0.3 }), 0, 'a crossbow\'s reload plays unpitched past its first tenth');
 });
 
 test('BOW-AIM THE SPINE TAKES THE LOOK, IN THE ROOT\'S FRAME: on retail\'s biped a pitch of 0.3 (+ down) turns spine1 by half and spine2 - the chest, the arms, the head - by the whole of it, exactly about the root\'s X, tipping the chest forward and the head down; the hips stand; no pitch, no change (mutants: BOW-AIM-whole-pitch-each, BOW-AIM-local-frame, BOW-AIM-old-conjugation, BOW-AIM-pitch-up)', () => {
