@@ -147,12 +147,11 @@ export function spoilsList(seed, level, claims = null) {
   const look = seededRng((seed ^ 0x5eed) >>> 0);
   const flat = () => RANDOM_TREASURE_ICONS[Math.floor(look() * RANDOM_TREASURE_ICONS.length)];
   if (claims?.x === 'rite') return [{ kind: 'item', item: sigilStone(), tier: SIGIL_TIER, record: flat() }];
-  const s = rollSpoils(seed, level, claims?.p ?? 0);   // WB14g: a portent night's pieces more
+  const s = rollSpoils(seed, level, claims?.p ?? 0);   // PORTENT-FOLD: a portent night's pieces rolled at a higher tier
   // AUDIT WORLD-REWARDS A1: the Dragonfire Oath's picture is drawn LAST of all (below) - drawn in its place among the pieces,
   // it moved every picture after it (the ember's, the gold's, the gems') off what the seed gave them, in
   // every spoils it came in. It still leaves among the pieces, its glow's line in the frame's first eight.
-  const firstPortent = s.pieces.length - (s.portent ?? 0);   // WB14g: a portent's piece's picture drawn last too, as the Oath's
-  const pieces = s.pieces.map((p, i) => ({ kind: 'item', item: p.item, tier: p.tier, record: p.tier === 'gilded' || i >= firstPortent ? null : flat() }));
+  const pieces = s.pieces.map((p) => ({ kind: 'item', item: p.item, tier: p.tier, record: p.tier === 'gilded' ? null : flat() }));
   const ember = { kind: 'item', item: s.sigil, tier: SIGIL_TIER, record: flat() };
   const gold = { kind: 'gold', gold: s.gold, tier: 'common', record: flat() };
   // GEM2: the Warden's gem, its picture drawn after the gold's - so every
