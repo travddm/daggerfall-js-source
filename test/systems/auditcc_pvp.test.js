@@ -120,16 +120,16 @@ test('AUDIT C&C H5 A STRIKER\'S BUFFS HELP ITS BLOW AND NO LUCK HARMS IT: the li
     sheets.push(duelAttackerOf(e, e.items.find((i) => i.group === 'Weapons')).st.join('/'));
   }
   assert.deepEqual(sheets, [
-    '52/52/51/51/51/51/51/51', '57/52/51/51/56/51/51/51', '52/52/51/56/51/51/56/51',
-    '57/57/56/56/56/51/56/56', '52/52/51/51/51/51/51/56', '52/52/51/51/51/51/51/66',
+    '52/52/51/51/51/51/51/51', '53/52/51/51/53/51/51/51', '52/52/51/52/51/51/53/51',
+    '53/53/53/52/53/51/53/53', '52/52/51/51/51/51/51/56', '52/52/51/51/51/51/51/66',
   ], 'every live buff rides the striker\'s sheet');
   installPcaao();   // its shipped switches - online, the room's whole (systems/online/onlineLane.js ONLINE_WHOLE_MODS)
   try {
     for (const [, put] of ARMS) { const e = mintPlayer(); put(e); pcaao.push(swings(e, 4000)); }
   } finally { uninstallPcaao(); }
   for (const [, put] of ARMS) { const e = mintPlayer(); put(e); stock.push(swings(e, 4000)); }
-  assert.deepEqual(pcaao, [[2177, 9940], [2177, 9940], [2222, 10154], [2222, 10154], [2177, 9940], [2222, 10154]], 'the overhaul\'s core: [hits, damage] of 4,000 swings');
-  assert.deepEqual(stock, [[2201, 10067], [2196, 12198], [2201, 10067], [2196, 12198], [2201, 10067], [2233, 10195]], 'DFU\'s own core: an unarmoured body (a stand-in with no table read 0, an armour past any - 3 blows in 100 landed)');
+  assert.deepEqual(pcaao, [[2177, 9940], [2177, 9940], [2177, 9940], [2177, 9940], [2177, 9940], [2222, 10154]], 'the overhaul\'s core: [hits, damage] of 4,000 swings');
+  assert.deepEqual(stock, [[2201, 10067], [2201, 10067], [2201, 10067], [2201, 10067], [2201, 10067], [2233, 10195]], 'DFU\'s own core: an unarmoured body (a stand-in with no table read 0, an armour past any - 3 blows in 100 landed)');
 });
 
 test('AUDIT C&C H5 A SPELL\'S HARM IS COUNTED ON THE NEUTRAL STAND-IN: the caster\'s own race and willpower save against nothing of its own - a Breton\'s Magic bolt counts what its Fire and Frost bolts do, and a Fortify Willpower to 100 changes nothing (2,361 of 200 bolts each; against its own sheet 1,184 and 1,006 - its race\'s +30, its own willpower) - and a Disintegrate counts the body whole whatever the caster\'s own wounds (99,999, sent as a cast\'s most, 60, for the referee to clip; against its own sheet the caster\'s own 35, or 5 wounded) (mutants: the race; an attribute off the middle; the health)', () => {

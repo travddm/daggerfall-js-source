@@ -63,11 +63,11 @@ test('STEED1 EVERY HORSE ITS OWN: four stats off the seed - the same horse the s
   assert.deepEqual(Object.keys(h).sort(), ['group', 'horseSeed', 'templateIndex'], 'read, never written');
 });
 
-test('STEED1 THE BOND: a day\'s food a day\'s bond (three points), its love times more - an apple loves 1.5 - in tenths to 100; five points a point on every stat; its word from Wary to Kindred (mutants: the love unread, the step, the cap, the tiers)', () => {
-  assert.equal(DAY_BOND_TENTHS, 30); assert.equal(BOND_STEP, 5); assert.equal(BOND_TENTHS_MAX, 1000);
+test('STEED1 THE BOND: a day\'s food a day\'s bond (three points), its love times more - an apple loves 1.5 - in tenths to 100; fifty points a point on every stat; its word from Wary to Kindred (mutants: the love unread, the step, the cap, the tiers)', () => {
+  assert.equal(DAY_BOND_TENTHS, 30); assert.equal(BOND_STEP, 50); assert.equal(BOND_TENTHS_MAX, 1000);
   assert.deepEqual(BOND_TIERS.map((t) => [t.min, t.name]), [[0, 'Wary'], [15, 'Accepting'], [35, 'Familiar'], [55, 'Trusting'], [75, 'Devoted'], [95, 'Kindred']]);
   assert.deepEqual([0, 14.9, 15, 34, 35, 55, 74.9, 75, 94, 95, 100].map(bondTier), ['Wary', 'Wary', 'Accepting', 'Accepting', 'Familiar', 'Trusting', 'Trusting', 'Devoted', 'Devoted', 'Kindred', 'Kindred']);
-  assert.deepEqual([0, 4.9, 5, 49, 100].map(bondBonus), [0, 0, 1, 9, 20]);
+  assert.deepEqual([0, 49.9, 50, 99, 100].map(bondBonus), [0, 0, 1, 1, 2]);
   assert.deepEqual(STEED_FOODS[OATS_TEMPLATE], { key: 'oats', name: 'oats', hours: 24, love: 1, treat: false });
   assert.deepEqual(APPLE_TEMPLATES, [532, 1608], 'Climates & Calories\' Apple, and Foraging\'s');
   const h = horse(9, { horseFed: T0 });   // its food just run out
@@ -105,10 +105,10 @@ test('STEED1 HUNGER: fed, hungry the moment its food runs out, starving two days
   assert.deepEqual([hungerOf(h, T0 - 1), hungerOf(h, T0), hungerOf(h, T0 + STARVING_AFTER - 1), hungerOf(h, T0 + STARVING_AFTER)], ['fed', 'hungry', 'hungry', 'starving']);
   assert.equal(hungerOf(horse(2), T0), 'fed', 'a horse never seen fed comes fed');
   const born = bornStats(2);
-  assert.deepEqual(steedStats(h, T0 - 1).stats, Object.fromEntries(STEED_STATS.map((k) => [k, born[k] + 10])), 'fed: born and its bond\'s ten');
-  assert.deepEqual(steedStats(h, T0).stats, Object.fromEntries(STEED_STATS.map((k) => [k, born[k]])), 'hungry: ten off');
+  assert.deepEqual(steedStats(h, T0 - 1).stats, Object.fromEntries(STEED_STATS.map((k) => [k, born[k] + 1])), 'fed: born and its bond\'s one');
+  assert.deepEqual(steedStats(h, T0).stats, Object.fromEntries(STEED_STATS.map((k) => [k, born[k] - 9])), 'hungry: ten off');
   const starving = steedStats(h, T0 + STARVING_AFTER);
-  assert.deepEqual([starving.hunger, starving.penalty, starving.stats.speed], ['starving', 25, born.speed + 10 - 25]);
+  assert.deepEqual([starving.hunger, starving.penalty, starving.stats.speed], ['starving', 25, born.speed + 1 - 25]);
   // the fade: two points a day starving, read live...
   assert.equal(bondAt(h, T0 + STARVING_AFTER + MINUTES_A_DAY), 48, 'a day starving: 50 less 2');
   assert.equal(STARVING_BOND_TENTHS_A_DAY, 20);
@@ -446,14 +446,14 @@ test('STEED1 THE STABLE PAGE: each horse its card - its bond and hunger in words
   const el = (t, cls, text) => { const n = fakeEl(t); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   const kit = { el, divider: (t) => el('h4', 'px-divider', t), meter: (now, max) => el('div', 'px-meter', `${Math.round(now)}/${max}`) };
   const buttons = (root, label) => { const out = []; const walk = (x) => { for (const c of x.children ?? []) { if (c.tag === 'button' && c.textContent.startsWith(label)) out.push(c); walk(c); } }; walk(root); return out; };
-  const a = horse(31, { horseFed: T0 - 60, horseBond: 400 }), b = horse(32, { horseFed: T0 + 600 });
+  const a = horse(31, { horseFed: T0 - 60, horseBond: 500 }), b = horse(32, { horseFed: T0 + 600 });
   const items = [a, b, oats(2)];
   const u = createUpkeep({ items: () => items, now: () => T0, horseCare: () => HARD });
   setHoldingsProvider(stableProviderFor({ runtime: null, on: () => false, hasHorse: () => true, hasCart: () => false, items: () => items, upkeep: u }));
   resetHoldingsPages();
   const draw = () => { const d = el('div', 'px-qdetail'); drawStablePage(d, () => {}, kit); return d; };
   let d = draw();
-  assert.match(d.textContent, /Familiar - bond 40 of 100, \+8 to every stat\. Hungry/);
+  assert.match(d.textContent, /Familiar - bond 50 of 100, \+1 to every stat\. Hungry/);
   assert.match(d.textContent, /Breath/);
   assert.match(d.textContent, /Another horse of yours/);
   for (const k of ['Speed', 'Stamina', 'Endurance', 'Strength']) assert.equal((d.textContent.match(new RegExp(k, 'g')) ?? []).length >= 2, true, `${k} on both cards`);
@@ -463,7 +463,7 @@ test('STEED1 THE STABLE PAGE: each horse its card - its bond and hunger in words
   buttons(d, 'Feed oats')[0].onclick();
   d = draw();
   assert.match(d.textContent, /Your horse eats oats\. Your bond grows \(Familiar\)\./);
-  assert.equal(a.horseBond, 430);
+  assert.equal(a.horseBond, 530);
   buttons(d, 'Ride this one')[0].onclick();
   assert.equal(activeHorseItem(items), b);
   setHoldingsProvider(null);

@@ -8,7 +8,8 @@
 // chains the same way (healthStatus.js's ActionTextBox.addNext) and
 // keeps the words its own, plus a HUD strip the mod never had - one
 // chip a need, shown only while the need is felt.
-import { survivalOf, hungerStage, thirstStage, sleepStage, wetStage, hungerMinutes, NEED, BOON, warmedByFire, wakingHeld, heartyMealLeft } from './needs.js';   // HEARTY-MEAL: the tavern meal's hold
+import { survivalOf, hungerStage, thirstStage, sleepStage, wetStage, hungerMinutes, NEED, warmedByFire, wakingHeld, heartyMealLeft } from './needs.js';   // HEARTY-MEAL: the tavern meal's hold
+import { boonProfile } from './boonProfile.js';
 import { t } from '../textManager.js';   // L10N4: the Well Fed tile's word in the player's language
 import { STAT_KEYS_ORDER } from '../statMods.js';   // AUDIT SURV-BOONS C11: the attributes, named as the sheet names them
 import { temperatureWord, signedDegrees } from './temperature.js';
@@ -172,7 +173,8 @@ export function temperatureReadout(entity, felt = entity?.survival?.felt, { rule
  *  helper: the attributes as the sheet names them, in its order (C11), or the hearth's stamina. */
 export function boonEffect(id) {
   if (id === 'hearth') return 'regain stamina beside a lit fire';
-  return BOON[id] ? STAT_KEYS_ORDER.filter((k) => BOON[id][k]).map((k) => `+${BOON[id][k]} ${k[0].toUpperCase()}${k.slice(1)}`).join(', ') : '';
+  const b = boonProfile().boon[id];
+  return b ? STAT_KEYS_ORDER.filter((k) => b[k]).map((k) => `+${b[k]} ${k[0].toUpperCase()}${k.slice(1)}`).join(', ') : '';
 }
 /** The hours a Well rested bank has left, whole, said singular at one (C10): "12 hours", "1 hour" - '' with none. */
 export function restedLeft(s) {
@@ -203,7 +205,7 @@ export const STATUS_TEXT = Object.freeze({
   boon: (id) => {
     if (id === 'hearth') return 'The fire\'s warmth restores your stamina.';
     const w = HUD_BOON_WORDS[id]?.[0];
-    if (!w || !BOON[id]) return null;
+    if (!w || !boonProfile().boon[id]) return null;
     return `${w}: ${boonEffect(id)}.`;
   },
   // AUDIT C&C (lens S): Well rested's bank, a line of its own - the hours whole and singular at one (C10). The classic

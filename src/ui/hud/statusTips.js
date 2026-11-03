@@ -8,7 +8,7 @@
 // DISEASE_DATA's own columns). Nothing here is drawn: no colour, no node.
 
 import { DISEASE_NAMES, DISEASE_DATA } from '../../systems/diseases.js';
-import { BOON } from '../../systems/survival/needs.js';
+import { boonProfile } from '../../systems/survival/boonProfile.js';
 import { t } from '../../systems/textManager.js';   // L10N4: HEARTY-MEAL's line in the player's language
 import { LEVEL_WORDS } from '../../systems/survival/status.js';
 import { STIFF_PENALTY } from '../../systems/survival/rest.js';
@@ -113,7 +113,7 @@ const NEED_LINES = Object.freeze({
 function boonLines(id) {
   if (id === 'hearth') return ['A lit fire close by gives back fatigue while you are awake.'];
   if (id === 'meal') return [t('survival.boon.mealTip', 'A hearty tavern meal: you stay fed and your thirst is held while it lasts.')];   // HEARTY-MEAL (survival/needs.js)
-  const b = BOON[id];
+  const b = boonProfile().boon[id];
   if (!b) return [];
   return [`${Object.entries(b).map(([k, n]) => `${n > 0 ? '+' : ''}${n} ${statWord(k)}`).join(', ')}.`];
 }

@@ -437,7 +437,7 @@ test('AUDIT C&C S11: THE STATUS PAGE READS THE LIVE TIER - turned from Boons to 
   const e = realPlayer('boons');
   for (let m = 101; m <= 103; m++) minute(e, ROOM, m);
   const rows = () => statusReadoutRows({ lines: () => [], entity: e, survival: { minutes: 103, vampire: false, endurance: 50 } }).map((r) => (typeof r === 'string' ? r : r.text)).filter(Boolean);
-  assert.deepEqual(rows().filter((l) => /tired|rested|Well fed|Quenched/.test(l)), ['You are not tired.', 'Well fed: +5 Strength, +5 Endurance.', 'Quenched: +5 Agility, +5 Speed.']);
+  assert.deepEqual(rows().filter((l) => /tired|rested|Well fed|Quenched/.test(l)), ['You are not tired.', 'Well fed: +1 Strength, +2 Endurance.', 'Quenched: +1 Agility, +2 Speed.']);
   setPref(SURVIVAL_PREF, 'casual');
   assert.deepEqual(rows().filter((l) => /tired|rested|Well fed|Quenched/.test(l)), ['You are well rested.'], 'Casual at once');
   assert.ok(Array.isArray(e.survival.boons), 'the record still Boons\' - no minute ran');
@@ -537,7 +537,7 @@ test('AUDIT C&C R6 (C13): THE STATS SIDE\'S BOONS SECTION, DRIVEN - a Boons body
     const sec = page.children.find((c) => String(c.className).includes('sf-sec') && c.children[0]?.textContent === 'Boons');
     assert.ok(sec, 'the section');
     assert.deepEqual(sec.children.slice(1).map((r) => r.children.map((x) => x.textContent)), [
-      ['Well fed', '+5 Strength, +5 Endurance'], ['Quenched', '+5 Agility, +5 Speed'], ['Well rested', '+5 Intelligence, +5 Willpower (2 hours left)'], ['Thriving', '+5 Luck'],
+      ['Well fed', '+1 Strength, +2 Endurance'], ['Quenched', '+1 Agility, +2 Speed'], ['Well rested', '+1 Intelligence, +2 Willpower (2 hours left)'], ['Thriving', '+2 Luck'],
     ]);
     assert.deepEqual(boonStatRows(e).length, 4);
   });
@@ -559,7 +559,7 @@ test('AUDIT C&C R5 (B11): THE ENHANCED MENU\'S ATTRIBUTES PAGE, DRIVEN - the pau
       const detail = host.querySelectorAll('.px-qdetail')[0];
       const shown = detail.children.map((c) => (c.className === 'px-divider' ? `| ${c.textContent}` : c.className === 'px-mrow' ? c.children[0].children[0].textContent : c.className === 'px-stat' ? `${c.children[0].textContent}: ${c.children[1].textContent}` : null)).filter(Boolean);
       assert.deepEqual(shown, ['| Attributes', 'Strength', 'Intelligence', 'Willpower', 'Agility', 'Endurance', 'Personality', 'Speed', 'Luck', '| Boons',
-        'Well fed: +5 Strength, +5 Endurance', 'Quenched: +5 Agility, +5 Speed', 'Well rested: +5 Intelligence, +5 Willpower (2 hours left)', 'Thriving: +5 Luck']);
+        'Well fed: +1 Strength, +2 Endurance', 'Quenched: +1 Agility, +2 Speed', 'Well rested: +1 Intelligence, +2 Willpower (2 hours left)', 'Thriving: +2 Luck']);
     } finally { menu.unmount(); }
   } finally {
     for (const k of Object.keys(playerEntity)) if (!(k in kept)) delete playerEntity[k];
