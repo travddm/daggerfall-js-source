@@ -82,12 +82,12 @@ test('CAMP1: the timer roll - gated on the wilderness (not inside, not the town 
   assert.equal(rollCampEncounter({ ...WILD, gameMinutes: t, climateIndex: 9999 }, scripted([...SEED, 0.1, 0.5])), null, 'an unknown climate has no table: nothing to spawn - the seed roll itself comes back empty');
 });
 
-test('CAMP1: the chunk-load roll - the same gate and composition, no time gate at all, and its own 50% chance', () => {
-  assert.equal(CAMP_CHANCE_ON_CHUNK_LOAD, 0.50);
-  assert.equal(rollCampChanceOnChunkLoad(0.499), true);
-  assert.equal(rollCampChanceOnChunkLoad(0.5), false);
+test('CAMP1: the chunk-load roll - the same gate and composition, no time gate at all, and its own 12.5% chance', () => {
+  assert.equal(CAMP_CHANCE_ON_CHUNK_LOAD, 0.125);
+  assert.equal(rollCampChanceOnChunkLoad(0.124), true);
+  assert.equal(rollCampChanceOnChunkLoad(0.125), false);
   assert.equal(rollCampEncounterOnChunkLoad({ ...WILD, gameMinutes: 181 }, rollsOf([0.6])), null, 'roll 0.6: no group this pixel');
-  const hit = rollCampEncounterOnChunkLoad({ ...WILD, gameMinutes: 181 }, scripted([0.1, ...SEED, 0.1, 0.5]));   // the 50% chance roll first, then the seed, then kind and size
+  const hit = rollCampEncounterOnChunkLoad({ ...WILD, gameMinutes: 181 }, scripted([0.1, ...SEED, 0.1, 0.5]));   // the 12.5% chance roll first, then the seed, then kind and size
   assert.ok(hit && hit.kind === 'camp', 'roll 0.1 on a CLOSED minute: a group - the pixel crossing is the cadence');
   assert.equal(rollCampEncounterOnChunkLoad({ ...WILD, gameMinutes: 181, inLocationRect: true }, rollsOf([0.1])), null, 'the town gate holds here too');
   // the timer's own 5% is kept for a lower-than-guaranteed rate later, and is not consulted by the timer path
