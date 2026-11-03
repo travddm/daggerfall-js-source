@@ -44,7 +44,7 @@
 // no route takes a player id from a caller.
 // ═══════════════════════════════════════════════════════════════════
 
-import { isMode, codeOf, legacy as legacyMode, DEFAULT_MODE } from '../../src/net/modeLaw.js';   // CHARACTER MODES
+import { isMode, codeOf, legacy as legacyMode, creatableModes, DEFAULT_MODE } from '../../src/net/modeLaw.js';   // CHARACTER MODES
 import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
@@ -212,7 +212,7 @@ async function freeOthers({ db }, /** @type {string} */ playerId, /** @type {str
  * `{ id, lease, seq }` or `{ error }`.
  * @param {any} ctx @param {string} playerId @param {{ name: unknown, summary?: unknown, lineage?: unknown, person?: unknown }} at
  */
-export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null, mode = undefined }) {
+export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null, mode = undefined, offered = undefined }) {
   const n = realmNameOf(name);
   if (!playerId || !n) return { error: 'body' };
   const born = lineage != null || person != null;
@@ -220,6 +220,8 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
   // must agree with the birth: the Legacy mode is born of a line and no other mode is
   const chosen = mode === undefined || mode === null ? (born ? 'legacy' : DEFAULT_MODE) : mode;
   if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
+  // CHARACTER MODES: and the server's profile (`MODES_OFFERED`, net/modeLaw.js offeredFromList) decides which it offers
+  if (!creatableModes(offered).includes(chosen)) return { error: 'mode-off' };
   if (born && Number.isSafeInteger(person)) {
     // LEGACY7: A BIRTH WHOSE FIRST SAVE NEVER LANDED is taken up again - the same row, a new lease -
     // never refused as a person already played: the realm never held a save of them

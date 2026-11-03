@@ -39,9 +39,23 @@ export const ironman = (/** @type {unknown} */ m) => m === 'ironman' || m === 'h
 /** The family system plays this character (Project Legacy). */
 export const legacy = (/** @type {unknown} */ m) => m === 'legacy';
 
-/** The modes the picker offers. Project Legacy's master switch off hides the Legacy mode and refuses it at creation. */
-export const creatableModes = (/** @type {boolean} */ legacySwitchOn) =>
-  MODES.filter((m) => m !== 'legacy' || legacySwitchOn);
+/** The modes a server offers, as `{ hardcore: false }` says it: a mode is offered unless named false. Classic is always
+ *  offered (it is DFU's rule). Project Legacy's master switch is the `legacy` entry. */
+export const creatableModes = (/** @type {Record<string, boolean>} */ offered = {}) =>
+  MODES.filter((m) => m === DEFAULT_MODE || offered[m] !== false);
+
+/** A server profile's list of offered modes, `MODES_OFFERED` (comma separated, e.g. `classic,hardcore,ironman`), read as an
+ *  `offered` table. Absent or empty offers every mode. A name that is no mode is ignored. */
+export function offeredFromList(/** @type {unknown} */ text) {
+  const named =
+    typeof text === 'string'
+      ? text
+          .split(',')
+          .map((s) => s.trim())
+          .filter(isMode)
+      : [];
+  return Object.fromEntries(MODES.map((m) => [m, named.length === 0 || named.includes(m)]));
+}
 
 /**
  * Whether a character may change from one mode to another. A mode can only be loosened, never tightened; Legacy is

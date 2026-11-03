@@ -13,6 +13,7 @@ import {
   ironman,
   legacy,
   creatableModes,
+  offeredFromList,
   canDrop,
   dropsFrom,
 } from '../../src/net/modeLaw.js';
@@ -44,12 +45,20 @@ test('the death and Ironman switches make the five modes', () => {
   assert.deepEqual(row('bogus'), [false, false, false]);
 });
 
-test('the Legacy mode is offered only while Project Legacy is switched on', () => {
-  assert.deepEqual(creatableModes(true), [...MODES]);
+test('a server offers the modes its profile names; Classic is always offered', () => {
+  assert.deepEqual(creatableModes(), [...MODES]);
   assert.deepEqual(
-    creatableModes(false),
+    creatableModes({ legacy: false }),
     MODES.filter((m) => m !== 'legacy'),
   );
+  assert.deepEqual(
+    creatableModes({ classic: false, hardcore: false }),
+    MODES.filter((m) => m !== 'hardcore'),
+  );
+  assert.deepEqual(creatableModes(offeredFromList('classic,hardcore,bogus')), ['classic', 'hardcore']);
+  assert.deepEqual(creatableModes(offeredFromList('hardcore')), ['classic', 'hardcore']);
+  for (const none of [undefined, '', ' , ', 'bogus', 7])
+    assert.deepEqual(creatableModes(offeredFromList(none)), [...MODES], String(none));
 });
 
 test('a mode is only loosened, never tightened', () => {

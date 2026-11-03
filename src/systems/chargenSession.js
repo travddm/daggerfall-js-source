@@ -38,8 +38,11 @@ import { attachFactionRep } from './faction/factionRep.js';   // S25
 import { createRegionConditions } from './region/regionConditions.js';
 import { clearWorldDataVariants } from './worldDataVariants.js';   // AUDIT-RR F39: PlayerEntity.Reset (:818) clears the world variants at every new game
 import { bootstrapRegionPower } from './region/regionPower.js';   // AUDIT 26 F107   // PlayerEntity.InitializeRegionData (:2189-2218), at every new game
-import { legacyOn } from './legacy/settings.js';   // LEGACY2: Project Legacy's question - the family's model
-import { legacyModelScreen } from '../ui/legacy/legacyModelChoice.js';
+import { legacyModelOnlyScreen } from '../ui/legacy/legacyModelChoice.js';
+import { characterModeScreen } from '../ui/characterModeChoice.js';   // CHARACTER MODES: the first question
+import { characterModesOn } from './characterModes.js';
+import { isMode, legacy as legacyMode } from '../net/modeLaw.js';
+import { NO_LINEAGE } from './legacy/family.js';
 import { StartChoiceScreen } from '../ui/startChoice.js';   // START2: where the story begins, the last question
 import { STARTS, BAY_START } from './starts/starts.js';
 import { isLegacyChoice } from './legacy/family.js';   // LEGACY-CHOICE: the answer kept on the character
@@ -285,6 +288,8 @@ export function finishChargen(playerEntity, result, spellsByIndex = null, { roll
   // LEGACY-CHOICE: AND PROJECT LEGACY'S ANSWER, kept on the character - a model, or no lineage,
   // which keeps them out of the system for good (legacyHost.js found). A result the question was not put to carries none.
   if (isLegacyChoice(result.legacyModel)) playerEntity.legacyChoice = result.legacyModel;
+  // CHARACTER MODES: THE MODE, kept on the character for good (net/modeLaw.js). A result the question was not put to carries none: Classic.
+  if (isMode(result.characterMode)) playerEntity.characterMode = result.characterMode;
   return playerEntity;
 }
 
@@ -409,7 +414,10 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoic
   // Bloodline or Enduring, asked of the character who founds a house (legacyModelScreen). The same door, the same one
   // overlay slot: the questions are STAGES of one window, put in turn, each answered once; the answers ride the result.
   const asks = [];
-  if (legacyOn()) asks.push((answer) => legacyModelScreen((model) => answer({ legacyModel: model })));
+  // CHARACTER MODES: THE FIRST QUESTION - how the character will play. Only the Legacy mode founds a house, so Project
+  // Legacy's question (the family's model) follows it for that mode alone; every other mode answers it for them: no lineage.
+  if (characterModesOn()) asks.push((answer) => characterModeScreen((mode) => answer(legacyMode(mode) ? { characterMode: mode } : { characterMode: mode, legacyModel: NO_LINEAGE })));
+  if (characterModesOn()) asks.push((answer, made, so) => (legacyMode(so?.characterMode) ? legacyModelOnlyScreen((model) => answer({ legacyModel: model })) : null));
   // START2: ...AND, LAST, WHERE THE STORY BEGINS - put by a host that
   // can stand a start past the Bay (`startChoice`), once one is open there (one start open is no choice); the new
   // character's race read off the wizard's answer, its homeland chosen first. The answer rides the result as `startKey`.
@@ -429,7 +437,8 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoic
   const next = () => {
     if (stage >= asks.length) { prompt = null; fired = true; onDone?.({ ...result, ...answers }); return; }
     const i = stage++;
-    prompt = asks[i]((a) => { answers = { ...answers, ...a }; next(); }, result);
+    prompt = asks[i]((a) => { answers = { ...answers, ...a }; next(); }, result, answers);
+    if (!prompt) next();   // CHARACTER MODES: a question this answer made unnecessary
   };
   const inner = chargenWizard(flow, {
     hudScale,

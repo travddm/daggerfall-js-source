@@ -1537,6 +1537,20 @@ export const MOD_SETTINGS = Object.freeze({
       'Hotkeys.SummonTransport': Object.freeze({ default: 'Alpha6', text: true, get description() { return t('mods.horseCartAndCargo.Hotkeys.SummonTransport.description', 'Brings your horse and wagon to you when you’re outdoors. Click it and press a key to change it; \u2715 clears it.'); } }),   // KB1: not read by the mod any more - the key is the registry's action (inputActions.js MOD_ACTIONS); a player's saved value is carried there once (migrateKeyBinds)
     }),
   }),
+  // CHARACTER MODES (docs/systems/character-modes.md): the departure from DFU's one death rule. `Enabled` off is Daggerfall
+  // Unity: no question at creation, every character Classic. `Modes.*` say which of the other modes a new character may
+  // pick; the Legacy mode is Project Legacy's own `Enabled`. Online the room pins every key (systems/online/onlineLane.js),
+  // and the account service refuses a mode its profile does not offer (`MODES_OFFERED`, server-account/src/realm.js).
+  'character-modes': Object.freeze({
+    title: 'Character Modes',
+    author: 'Daggerfall Online',
+    keys: Object.freeze({
+      Enabled: Object.freeze({ default: true, description: 'Choose a mode when you create a character: Classic, Hardcore, Legacy, Ironman or Hardcore Ironman. Off is Daggerfall Unity: every character plays Classic.' }),
+      'Modes.Hardcore': Object.freeze({ default: true, description: 'Offer Hardcore: online, a death is final.' }),
+      'Modes.Ironman': Object.freeze({ default: true, description: 'Offer Ironman: no trading with players, no parties, no shared dungeons.' }),
+      'Modes.Hardcore Ironman': Object.freeze({ default: true, description: 'Offer Hardcore Ironman: Hardcore and Ironman together.' }),
+    }),
+  }),
   // LEGACY1:
   // PROJECT LEGACY 0.4.1 (Lattymoy, Ghð§† and Positronico). The mod's own "Family" section, its names and descriptions
   // as modsettings.json ships them (vendor/project-legacy/modsettings.json) - but B14: the mod shipped Max Siblings 0
@@ -1544,15 +1558,15 @@ export const MOD_SETTINGS = Object.freeze({
   // (the G key and the second key) is the keybinding registry's (KB1, inputActions.js MOD_ACTIONS: LegacyFamily). The
   // "Legacy" section is the port's own: the model a family founded without the chargen's answer takes, Arkay's toll in
   // an Enduring family, the heirloom's chance at a Bloodline death, and whether the family stands in the world
-  // (LEGACY-HOME). `Enabled` is the port's (MO1: on).
+  // (LEGACY-HOME). `Enabled` is the port's, the master switch of the Legacy character mode (CHARACTER MODES: off by default).
   'project-legacy': Object.freeze({
     title: 'Project Legacy',
     author: 'Lattymoy, Gh\u00f0\u00a7\u2020 and Positronico',
     keys: Object.freeze({
       Enabled: Object.freeze({
-        default: true,
-        description: 'A family, a family tree and an heir to carry on your line. In a Bloodline house each death is final; '
-          + 'in an Enduring one it costs years.',
+        default: false,
+        description: 'The master switch for the Legacy character mode: a family, a family tree and an heir to carry on your line. '
+          + 'While it is off the Legacy mode is not offered. In a Bloodline house each death is final; in an Enduring one it costs years.',
       }),
       'Family.Descendants': Object.freeze({ default: 0, options: Object.freeze(['Random Descendants', 'Always have descendants']), description: 'Whether you always have descendants, or only sometimes.' }),
       'Family.Max Siblings': Object.freeze({ default: 2, min: 0, max: 10, description: 'Most siblings you can have.' }),

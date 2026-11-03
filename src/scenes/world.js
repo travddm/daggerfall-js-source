@@ -17055,7 +17055,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     await legacyRealmLine?.flush();
     const fam = legacyHost?.family ?? null;
     const me = legacyHost?.current() ?? null;
-    const born = fam && me && legacyOn() ? { lineage: fam.id, person: me.id } : null;
+    const born = fam && me && legacyOn() && playerEntity.characterMode === 'legacy' ? { lineage: fam.id, person: me.id } : null;
     // AUDIT LEGACY III O2/P1: THE LINE STANDS AT THE REALM FIRST - the service reads the person off it. One the network
     // kept is asked again, twice; one the realm refused is the reason the door says (its own word, never the birth's
     // "they cannot take up the line" for a person the realm was never shown)
@@ -17067,7 +17067,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (unwritten) return { ok: false, error: unwritten };
     let made = null;
     for (let i = 0; i < 3; i++) {
-      made = await realmCreate(io, playerEntity.name || 'Traveller', realmSummaryOf(playerEntity), born);
+      made = await realmCreate(io, playerEntity.name || 'Traveller', realmSummaryOf(playerEntity), born, playerEntity.characterMode);
       if (made.ok || !['offline', 'server'].includes(made.error)) break;
       await new Promise((r) => { setTimeout(r, 2000 * (i + 1)); });
     }

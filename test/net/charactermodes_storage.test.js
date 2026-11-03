@@ -92,3 +92,12 @@ test("the Legacy mode is born of a line and no other mode is; a request naming n
   assert.ok(old.id, 'a build from before the modes names no mode');
   assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, old.id)).md, MODE_CODES.legacy);
 });
+
+test('the server profile decides which modes it offers; Classic is always offered', async () => {
+  const S = await standService({ MODES_OFFERED: 'classic,ironman' });
+  const g = await S.guest();
+  const call = (p, b) => S.call(p, b, g.secret);
+  assert.equal((await call('/v1/realm/create', { name: 'Hard', mode: 'hardcore' })).body.error, 'mode-off');
+  assert.ok((await call('/v1/realm/create', { name: 'Iron', mode: 'ironman' })).body.id);
+  assert.ok((await call('/v1/realm/create', { name: 'Plain' })).body.id, 'Classic is always offered');
+});

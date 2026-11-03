@@ -298,6 +298,11 @@ export function onlineForcedPref(key, search) {
 export const ONLINE_LAND_TRAVEL_REFUSAL = 'Online, journeys over land cannot be skipped. Turn on Travel Options and try again.';
 
 export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
+  // CHARACTER MODES: which modes a character may be created in is the SERVER's (its profile, MODES_OFFERED); the room
+  // pins the client to the shipped offer, and the account service refuses what it does not offer. The Legacy mode is
+  // Project Legacy's `Enabled`, pinned on so the mode is offered where the profile offers it.
+  'character-modes': Object.freeze({ Enabled: true, 'Modes.Hardcore': true, 'Modes.Ironman': true, 'Modes.Hardcore Ironman': true }),
+  'project-legacy': Object.freeze({ Enabled: true }),
   'roads-hazelnut': Object.freeze({
     Enabled: true,        // which network is painted, and so which beds are smoothed
     SmoothRoads: true,    // whether the beds are smoothed at all - the dial that gave the floor away
@@ -458,7 +463,8 @@ export const ONLINE_PLAYERS_OWN_MODS = [
   'foraging',               // FORAGE1: my own tools, my own pack, my own quests - a use, a food, a fetch quest all run on my save
   'aquatic-sprites',        // AS1: 119 flats of scenery in three flooded dungeon blocks - no collider, no action, no marker; a peer without them walks the same rooms (the editor's seven sub-degree turns of a room model are under half a degree)
   'low-poly-trees',         // LPT1: how the wilderness's trees are DRAWN - a 3D tree or its far picture where the same flat stands; the tree's cover, its sway, its Logging node and its fall are the flat's own, so a peer without it walks the same wood
-  'project-legacy',         // LEGACY1: my own family - its record, its births and its deaths are my characters'; the heirloom is an item in my save, and its power is folded where it is worn
+  // 'project-legacy' moved to ONLINE_ROOM_MOD_KEYS with CHARACTER MODES: its `Enabled` decides whether the Legacy mode is offered, which is the room's.
+  // LEGACY1 (kept for the dials below): my own family - its record, its births and its deaths are my characters'; the heirloom is an item in my save, and its power is folded where it is worn
   'physical-items',         // PI1: how MY loot lies - my own bodies' items stood round them (a peer's body shows none: its list is its owner's), my own shift-drops a pile as any drop is; a take off a dungeon's body is the room's word as the quick door's is (dungeonContext.js publishLoot), so what any peer reads of a container is the same switch on or off
   'come-sail-away',         // CSA-A: a boat is a possession in my save, placed and sailed by me - HCC's wagon's shape: whose boat stands where is the player's own, and a peer only SEES me move (my pose); its wind is my machine's own roll (ComeSailAway.UpdateWind, UnityEngine.Random), as it is each DFU player's
   'heat-haze',              // HAZE1: the desert's shimmer on your own screen, over a weather and an hour the room already shares

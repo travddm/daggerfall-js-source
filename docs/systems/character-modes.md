@@ -348,6 +348,27 @@ default `Enabled: true` is no longer how a character joins a family; only the Le
 - Every change to a file the relay imports bumps `RELAY_VERSION` (now `world288`, `src/net/wire.js:1659`) with the
   hash row in `test/net/relayversion.test.js`.
 
+### 7.4 The mod, its settings and the server's profile
+
+DFU has one death rule, so the modes are a departure from it and ship as a mod, `character-modes`
+(`src/systems/modSettings.js`, shown as a Features row in `src/systems/features.js`):
+
+| Key                                                         | Default | Meaning                                                                   |
+| ----------------------------------------------------------- | ------- | ------------------------------------------------------------------------- |
+| `Enabled`                                                   | on      | Off is Daggerfall Unity: no question at creation, every character Classic |
+| `Modes.Hardcore`, `Modes.Ironman`, `Modes.Hardcore Ironman` | on      | Offer that mode                                                           |
+
+The Legacy mode is offered while Project Legacy's own `Enabled` is on; that switch ships **off** (decision 11).
+Classic is always offered. A client reads these through `src/systems/characterModes.js` (`offeredModes`).
+
+Online the room pins every key (`ONLINE_ROOM_MOD_KEYS` in `src/systems/online/onlineLane.js`, with Project Legacy's
+`Enabled`), so a player cannot offer themselves a mode. The server's profile decides which modes it offers with the
+account service variable `MODES_OFFERED` (`server-account/wrangler.toml`, comma separated, empty offers every mode);
+`createRealm` answers `mode-off` for a mode the profile does not offer (`offeredFromList` in `src/net/modeLaw.js`).
+When phase 6's mod manifests exist, the manifest and the server's curated list replace the pinned table and the
+variable. Project Legacy's tuning dials (toll, heirloom chance) are player settings today; pinning them online is a
+separate change.
+
 ## 8. PR plan
 
 Sizes: S under 150 lines of diff, M 150-500, L over 500.
