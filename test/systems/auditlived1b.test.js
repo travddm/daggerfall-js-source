@@ -235,10 +235,10 @@ test('AUDIT LIVED1b P4: the absence is measured on the relay\'s clock - a machin
   hearSharedClock();
   // REP4 (the reputation overhaul):
   // (DFU's one boundary: -79); a machine clock months fast still buys nothing
-  assert.equal(e.legalRep[0], -64, 'the true span\'s sixteen weeks, paid on the relay\'s clock');
+  assert.equal(e.legalRep[0], -76, 'the true span\'s four 28-day intervals, paid on the relay\'s clock');
   assert.equal(worldMinutesToSave(), Math.floor(worldMinutes()), 'and the save stamps the world\'s now');
   hearSharedClock();
-  assert.equal(e.legalRep[0], -64, 'once');
+  assert.equal(e.legalRep[0], -76, 'once');
   let paid = 0;
   payAbsenceWhenHeard(left, () => { paid++; });
   assert.equal(paid, 1, 'a load after the welcome pays at once');
