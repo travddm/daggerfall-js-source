@@ -22,7 +22,13 @@ on:
       - 'vite.config.js'
       - 'package.json'
       - 'package-lock.json'
+      # nothing a player or a probe reads: documents do not run the game
+      - '!**/*.md'
+      - '!docs/**'
       - '.github/workflows/probes.yml'
+  # The whole set also runs every night, so a change that a path filter let by is found within a day.
+  schedule:
+    - cron: '17 5 * * *'
   # A manual run repeats one probe, to tell a flaky probe from a real fault: `gh workflow run probes --ref <branch>
   # -f probe=save -f repeat=10`. Leave `probe` empty for one run of every probe.
   workflow_dispatch:
@@ -66,7 +72,7 @@ jobs:
 
   # The game is built once and every probe serves the build with `vite preview` (tools/probes/build.mjs). A dev server
   # transformed thousands of modules on each probe's first page load; that was 5 to 9 minutes for each start of the
-  # game world. The online probe edits the source in memory and keeps the dev server, so it ignores the build.
+  # game world. The online probe's page needs three edits of the source; it gets a build made with them.
   build:
     name: build
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
@@ -90,15 +96,28 @@ jobs:
         run: npm ci
       - name: Fetch the vendored mods' published files
         run: sh tools/fetch-vendor.sh
+      # Two builds side by side: the game, and the game with the online probe's three seams (build.mjs --online)
       - name: Build the game
-        run: node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist"
-      # One archive: the build is 30,000 small files, which the artifact service handles slowly one by one
-      - name: Pack the build
-        run: tar -czf "$RUNNER_TEMP/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist" .
+        run: |
+          node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist" &
+          node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online &
+          wait -n && wait -n
+      # One archive each: a build is 30,000 small files, which the artifact service handles slowly one by one
+      - name: Pack the builds
+        run: |
+          tar -czf "$RUNNER_TEMP/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist" . &
+          tar -czf "$RUNNER_TEMP/probe-dist-online.tgz" -C "$RUNNER_TEMP/probe-dist-online" . &
+          wait
       - uses: actions/upload-artifact@v4
         with:
           name: probe-dist
           path: ${{ runner.temp }}/probe-dist.tgz
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-dist-online
+          path: ${{ runner.temp }}/probe-dist-online.tgz
           compression-level: 0
           retention-days: 1
 
@@ -131,9 +150,25 @@ jobs:
       - name: Install the relay's tools (wrangler)
         if: matrix.probe == 'online'
         run: npm ci --prefix server
+      # Playwright's Chromium is cached by the Playwright version; the system libraries come from apt each time
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cached Chromium
+        id: chromium
+        if: ${{ runner.environment == 'github-hosted' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
       - name: Install Chromium
         if: ${{ runner.environment == 'github-hosted' }}
-        run: npx playwright install --with-deps chromium
+        run: |
+          if [ '${{ steps.chromium.outputs.cache-hit }}' = 'true' ]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
       # The self-hosted image carries Chromium and its system libraries (docs/ci/self-hosted-runner.md). The job user
       # has no sudo, so --with-deps cannot run there; this downloads only if the image's revision is not the lockfile's.
       - name: Chromium from the runner image
@@ -160,21 +195,21 @@ jobs:
             sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
           fi
       - name: Download the build
-        if: matrix.probe != 'online'
         uses: actions/download-artifact@v4
         with:
-          name: probe-dist
+          name: ${{ matrix.probe == 'online' && 'probe-dist-online' || 'probe-dist' }}
           path: ${{ runner.temp }}/probe-dist-pack
       - name: Unpack the build
-        if: matrix.probe != 'online'
         run: |
           mkdir -p "$RUNNER_TEMP/probe-dist"
-          tar -xzf "$RUNNER_TEMP/probe-dist-pack/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist"
+          tar -xzf "$RUNNER_TEMP/probe-dist-pack/"*.tgz -C "$RUNNER_TEMP/probe-dist"
       - name: Probe ${{ matrix.probe }}
         env:
           # the world streams a small grid (tools/probes/lib/harness.mjs): software GL is what makes the probes slow
           PROBE_LIGHT: '1'
-          PROBE_DIST: ${{ matrix.probe != 'online' && format('{0}/probe-dist', runner.temp) || '' }}
+          # a probe that reads no pixels runs with the draw calls stubbed (lib/harness.mjs); software GL is most of a frame
+          PROBE_NODRAW: '1'
+          PROBE_DIST: ${{ runner.temp }}/probe-dist
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots
         run: npm run probes -- ${{ matrix.probe }}

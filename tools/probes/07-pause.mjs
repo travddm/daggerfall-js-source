@@ -17,6 +17,7 @@ export async function run({ browser, base, ck }) {
   // The probe reads the pause menu's text, not the world: PROBE_LIGHT turns off what software GL spends most of its frame on
   // (the enhanced sky, clouds, water, lighting and grass). On CI the probe took 617 s with only the view distance lowered.
   const g = new Game(browser, base, {
+    drawless: true,
     lightPrefs: {
       enhancedEnvironments: false,
       enhancedWater: false,
