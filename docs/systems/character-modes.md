@@ -354,9 +354,9 @@ default `Enabled: true` is no longer how a character joins a family; only the Le
 DFU has one death rule, so the modes are a departure from it and ship as a mod, `character-modes`
 (`src/systems/modSettings.js`, shown as a Features row in `src/systems/features.js`):
 
-| Key                                                         | Default | Meaning                                                                   |
-| ----------------------------------------------------------- | ------- | ------------------------------------------------------------------------- |
-| `Enabled`                                                   | on      | Off is Daggerfall Unity: no question at creation, every character Classic |
+| Key                                                        | Default | Meaning                                                                   |
+| ---------------------------------------------------------- | ------- | ------------------------------------------------------------------------- |
+| `Enabled`                                                  | on      | Off is Daggerfall Unity: no question at creation, every character Classic |
 | `Modes.Hardcore`, `Modes.Ironman`, `Modes.HardcoreIronman` | on      | Offer that mode                                                           |
 
 The Legacy mode is offered while Project Legacy's own `Enabled` is on; that switch ships **off** (decision 11).
