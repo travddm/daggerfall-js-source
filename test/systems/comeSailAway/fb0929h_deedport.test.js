@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createComeSailAwayRuntime, NO_WATER_LEVEL, BOAT_DEED_TEMPLATE } from '../../../src/systems/comeSailAway/comeSailAway.js';
 import { mintBoatItem } from '../../../src/systems/comeSailAway/comeSailAwayItems.js';
-import { hasPort, hasPortFor, PORT_LOCATION_IDS } from '../../../src/systems/travel/travelPorts.js';
+import { hasPort, PORT_LOCATION_IDS } from '../../../src/systems/travel/travelPorts.js';
 import { getPixelFromPixelID, LOCATION_TYPES } from '../../../src/formats/mapsFile.js';
 import { createWorldPorts, COMPASS_WAYS } from '../../../src/world/worldWide/worldPorts.js';
 import { createWorldPlaces } from '../../../src/world/worldWide/worldPlaces.js';
@@ -47,9 +47,9 @@ function hostPorts({ flagged = new Set(), dict, names, here, ether = null, arena
   const places = createWorldPlaces();
   places.register('beyond', [...beyond, ...arena.map((q, i) => ({ mapId: 8000 + i, name: q.name, px: q.bx, py: q.by, type: LOCATION_TYPES.TownCity, port: true }))]);
   const worldPorts = createWorldPorts({ places, openSea: (x, y) => !places.at(x, y) });
-  return new Function('mapDict', 'maps', 'travelLocationSummaryAt', 'hasPort', 'hasPortFor', 'PORT_LOCATION_IDS', 'getPixelFromPixelID', 'playerTravelPixel',
+  return new Function('mapDict', 'maps', 'travelLocationSummaryAt', 'hasPort', 'PORT_LOCATION_IDS', 'getPixelFromPixelID', 'playerTravelPixel',
     'etherSea', 'inEther', 'etherPortAt', 'onTheBay', 'worldPorts', 'worldLanes', 'COMPASS_WAYS',
-    `${port[1]}\n${near[1]}\nreturn { csaIsPortTown, csaNearestPort };`)(dict, maps, travelLocationSummaryAt, hasPort, hasPortFor, PORT_LOCATION_IDS, getPixelFromPixelID, () => here,
+    `${port[1]}\n${near[1]}\nreturn { csaIsPortTown, csaNearestPort };`)(dict, maps, travelLocationSummaryAt, hasPort, PORT_LOCATION_IDS, getPixelFromPixelID, () => here,
     !!ether, (x) => !!ether && x >= ether.x0, (x, y) => (ether?.ports.has(`${x},${y}`) ? { name: 'an isle\'s port' } : null),
     inBay, worldPorts, { bayPorts: () => bayLanePorts(dict, maps, PORT_LOCATION_IDS) }, COMPASS_WAYS);
 }
