@@ -7999,9 +7999,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (!onTheBay(x, y)) return worldPorts.at(x, y);   // TESA6: a port past the Bay - no table of the Bay's there - is its provider's word (WW3); AUDIT TESA II P7: TESA's places are the registry's now (world/pastBayRows.js), Arena's port test their row's
     const summary = travelLocationSummaryAt(mapDict, x, y);
     if (!summary) return false;
-    if (hasPort(summary.id)) return true;   // Travel Options' hand-written harbours
     const loc = maps.getLocation(summary.regionIndex, summary.locationIndex ?? summary.mapIndex);
-    return !!loc && (loc.exterior?.exteriorData?.portTownAndUnknown ?? 0) !== 0;
+    return hasPort(summary.id) || (!!loc && (loc.exterior?.exteriorData?.portTownAndUnknown ?? 0) !== 0);   // Travel Options' hand-written harbours, or the byte
   };
   /** DEED-PORT: the nearest of those harbours to the player's pixel, by name, and the way to it (map y runs south) - or
    *  null where none is named. */
