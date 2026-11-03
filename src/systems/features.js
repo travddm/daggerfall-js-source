@@ -190,7 +190,7 @@ export const MOD_CURATED = Object.freeze({
   'world-tooltips': Object.freeze(['HideDefaultInteractTooltip']),
   // LEGACY1: the mod's three Family dials and the port's own Legacy ones - all a player's choice (LEGACY-HOME: the
   // family in the world, Mac's "can be toggled off").
-  'character-modes': Object.freeze(['Modes.Hardcore', 'Modes.Ironman', 'Modes.Hardcore Ironman']), 'project-legacy': Object.freeze(['Family.Descendants', 'Family.Max Siblings', 'Family.Siblings Probability', 'Legacy.Model', 'Legacy.Toll', 'Legacy.Heirloom Chance', 'Legacy.Family In World']),
+  'character-modes': Object.freeze(['Modes.Hardcore', 'Modes.Ironman', 'Modes.HardcoreIronman']), 'project-legacy': Object.freeze(['Family.Descendants', 'Family.Max Siblings', 'Family.Siblings Probability', 'Legacy.Model', 'Legacy.Toll', 'Legacy.Heirloom Chance', 'Legacy.Family In World']),
   'weapon-widget': Object.freeze(['Swings.Speed', 'Bob.Length', 'Inertia.Scale']),
   // SW1: the three a player reaches for first - how big the shield sits,
   // where it sits, and what it does when the weapon comes out.

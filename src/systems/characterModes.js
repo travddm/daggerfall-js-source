@@ -15,6 +15,6 @@ export function offeredModes() {
     hardcore: !!modSetting(CHARACTER_MODES_MOD, 'Modes.Hardcore'),
     legacy: !!modSetting('project-legacy', 'Enabled'),
     ironman: !!modSetting(CHARACTER_MODES_MOD, 'Modes.Ironman'),
-    hardcore_ironman: !!modSetting(CHARACTER_MODES_MOD, 'Modes.Hardcore Ironman'),
+    hardcore_ironman: !!modSetting(CHARACTER_MODES_MOD, 'Modes.HardcoreIronman'),
   };
 }

@@ -301,7 +301,7 @@ export const ONLINE_ROOM_MOD_KEYS = Object.freeze({
   // CHARACTER MODES: which modes a character may be created in is the SERVER's (its profile, MODES_OFFERED); the room
   // pins the client to the shipped offer, and the account service refuses what it does not offer. The Legacy mode is
   // Project Legacy's `Enabled`, pinned on so the mode is offered where the profile offers it.
-  'character-modes': Object.freeze({ Enabled: true, 'Modes.Hardcore': true, 'Modes.Ironman': true, 'Modes.Hardcore Ironman': true }),
+  'character-modes': Object.freeze({ Enabled: true, 'Modes.Hardcore': true, 'Modes.Ironman': true, 'Modes.HardcoreIronman': true }),
   'project-legacy': Object.freeze({ Enabled: true }),
   'roads-hazelnut': Object.freeze({
     Enabled: true,        // which network is painted, and so which beds are smoothed

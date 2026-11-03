@@ -357,7 +357,7 @@ DFU has one death rule, so the modes are a departure from it and ship as a mod, 
 | Key                                                         | Default | Meaning                                                                   |
 | ----------------------------------------------------------- | ------- | ------------------------------------------------------------------------- |
 | `Enabled`                                                   | on      | Off is Daggerfall Unity: no question at creation, every character Classic |
-| `Modes.Hardcore`, `Modes.Ironman`, `Modes.Hardcore Ironman` | on      | Offer that mode                                                           |
+| `Modes.Hardcore`, `Modes.Ironman`, `Modes.HardcoreIronman` | on      | Offer that mode                                                           |
 
 The Legacy mode is offered while Project Legacy's own `Enabled` is on; that switch ships **off** (decision 11).
 Classic is always offered. A client reads these through `src/systems/characterModes.js` (`offeredModes`).

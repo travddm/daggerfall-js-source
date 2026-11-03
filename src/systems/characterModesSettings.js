@@ -17,7 +17,7 @@ export const CHARACTER_MODES_SETTINGS = Object.freeze({
       default: true,
       description: 'Offer Ironman: no trading with players, no parties, no shared dungeons.',
     }),
-    'Modes.Hardcore Ironman': Object.freeze({
+    'Modes.HardcoreIronman': Object.freeze({
       default: true,
       description: 'Offer Hardcore Ironman: Hardcore and Ironman together.',
     }),

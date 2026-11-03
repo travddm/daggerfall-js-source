@@ -1518,6 +1518,7 @@ features.lootRarity.note,"Weapons, armor and jewelry can drop as Magic, Rare or 
 features.lootRarity.title,"Loot rarity"
 features.mod.beautifulTowns.effect,"Takes effect the next time you start the game; loading a save is not enough. Offline it also needs Replace Game Artwork."
 features.mod.betterAmbience.effect,"Takes effect at once; a dungeon’s fog and light from the next one you enter."
+features.mod.characterModes.effect,"Takes effect for the next character you create."
 features.mod.climatesCalories.boons,"Boons"
 features.mod.climatesCalories.casual,"Casual"
 features.mod.climatesCalories.effect,"Takes effect at once. Online, each player picks their own."

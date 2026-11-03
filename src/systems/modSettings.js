@@ -1551,8 +1551,7 @@ export const MOD_SETTINGS = Object.freeze({
     keys: Object.freeze({
       Enabled: Object.freeze({
         default: false,
-        description: 'The master switch for the Legacy character mode: a family, a family tree and an heir to carry on your line. '
-          + 'While it is off the Legacy mode is not offered. In a Bloodline house each death is final; in an Enduring one it costs years.',
+        description: 'The master switch for the Legacy character mode: a family and an heir to carry on your line. While it is off the mode is not offered.',
       }),
       'Family.Descendants': Object.freeze({ default: 0, options: Object.freeze(['Random Descendants', 'Always have descendants']), description: 'Whether you always have descendants, or only sometimes.' }),
       'Family.Max Siblings': Object.freeze({ default: 2, min: 0, max: 10, description: 'Most siblings you can have.' }),
