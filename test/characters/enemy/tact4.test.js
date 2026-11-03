@@ -14,7 +14,7 @@ import { EnemyAttack } from '../../../src/characters/enemy/enemyAttack.js';
 import { MOBILE_TYPES as M } from '../../../src/characters/mobile/mobileTypes.js';
 import { setTacticsClock, resetTactics, noteLocalPlayer } from '../../../src/ai/tactics.js';
 import {
-  BLOW, blowShapesOf, blowTier, throwsBlows, makeBlow, inBlow, blowPhase, blowConnects, blowScaled, liveBlows, setLiveBlow,
+  BLOW, blowShapesOf, blowTier, throwsBlows, makeBlow, inBlow, blowPhase, blowConnects, liveBlows, setLiveBlow,
   drawableBlows, resetBlows, windupNear, BLOW_TIER_LEVEL, BLOW_COOLDOWN_MIN, BLOW_FLASH, BLOW_VERDICT_LIFE, BLOW_NEAR,
 } from '../../../src/ai/foeBlows.js';
 import { blowField, BLOW_QUAD_HALF } from '../../../src/render/foeTelegraph.js';
@@ -103,26 +103,17 @@ test('TACT4: the phase - filling through the wind-up, a flash at the landing, go
   assert.equal(liveBlows().size, 2);
 });
 
-test('TACT4: the verdict in place of the reach - spent once, a dodge spends the weight, a stale one ignored; the weight on DFU\'s roll', () => {
+test('TACT4: the verdict in place of the reach - spent once, a stale one ignored', () => {
   const ai = {};
   assert.equal(blowConnects(ai, true), true, 'no blow: the classic reach');
   assert.equal(blowConnects(ai, false), false);
-  assert.equal(blowScaled(ai, 7), 7);
-  Object.assign(ai, { _blowVerdict: true, _blowMult: 1.5, _blowAt: 10 });
+  Object.assign(ai, { _blowVerdict: true, _blowAt: 10 });
   assert.equal(blowConnects(ai, false, 10.5), true, 'in the shape: it lands though the reach says no');
   assert.equal(blowConnects(ai, false, 10.6), false, 'once');
-  assert.equal(blowScaled(ai, 7), 11, 'x1.5, rounded');
-  assert.equal(blowScaled(ai, 7), 7, 'once');
-  Object.assign(ai, { _blowVerdict: false, _blowMult: 1.5, _blowAt: 10 });
+  Object.assign(ai, { _blowVerdict: false, _blowAt: 10 });
   assert.equal(blowConnects(ai, true, 10.5), false, 'stepped out: dodged, whatever the reach');
-  assert.equal(blowScaled(ai, 7), 7, 'and no weight left over for the next blow');
-  Object.assign(ai, { _blowVerdict: true, _blowMult: 1.75, _blowAt: 10 });
+  Object.assign(ai, { _blowVerdict: true, _blowAt: 10 });
   assert.equal(blowConnects(ai, false, 10 + BLOW_VERDICT_LIFE + 0.1), false, 'stale: the classic answer');
-  assert.equal(blowScaled(ai, 7), 7);
-  Object.assign(ai, { _blowMult: 1.75 });
-  assert.equal(blowScaled(ai, 0), 0, 'a roll that missed stays a miss');
-  Object.assign(ai, { _blowMult: 1.75 });
-  assert.equal(blowScaled(ai, 1), 2);
 });
 
 // ── on the real motor ───────────────────────────────────────────────

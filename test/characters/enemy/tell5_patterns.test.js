@@ -184,7 +184,6 @@ test('TELL5: A FEINT - a higher-tier blade\'s wind-up cut at 0.55, no glint; a p
   assert.notEqual(f.ai._tac.state, 'windup');
   assert.notEqual(f.ai._tac.state, 'overreach', 'a feint is no missed blow');
   assert.equal(f.ai._blowVerdict ?? null, null, 'no verdict: DFU\'s reach decides');
-  assert.equal(f.ai._blowMult, undefined, 'no weight: DFU\'s damage');
   assert.equal(blowConnects(f.ai, 'classic'), 'classic');
   assert.equal(f.ai._blowHold, false, 'its held swing goes at once');
   const ph = blowPhase(b, b.cut + TELL_FEINT_FADE / 3);

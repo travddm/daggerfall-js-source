@@ -1,5 +1,5 @@
 // FEUD WIRE (FEUD WIRE record). Online, a revenant's blows at a PEER were its kind's plain ones: its owner's `damageScale` - its rank's, its
-// wrath's, a Night-stalker's night, phase two's x1.2 - rode no wire, and a signature landed at its shape's multiplier.
+// wrath's, a Night-stalker's night, phase two's x1.2 - rode no wire, and a signature was drawn as a plain blow.
 // Now the foe record carries its stand's blows (`rb`, per mille - systems/revenant/revenantFeud.js BLOWS_WIRE) and a wind-up its
 // signature (`wk` +64, ai/puppetBlows.js WIRE_SIG); the puppet stands with them on its own scale (its kind's, its
 // elite's, its champion's - never twice), so a peer is struck as its owner would be. Relay world165.
@@ -20,7 +20,7 @@ const N = await import('../../../src/systems/revenant/revenant.js');
 const F = await import('../../../src/systems/revenant/revenantFeud.js');
 const Wire = await import('../../../src/net/wire.js');
 const PB = await import('../../../src/ai/puppetBlows.js');
-const { makeBlow, resetBlows, blowScaled, BLOW, IRON_COLOR } = await import('../../../src/ai/foeBlows.js');
+const { makeBlow, resetBlows, IRON_COLOR } = await import('../../../src/ai/foeBlows.js');
 const { setTacticsClock, resetTactics } = await import('../../../src/ai/tactics.js');
 const { calculateAttackDamage } = await import('../../../src/combat/formulas.js');
 const { makeEnemyEntity } = await import('../../../src/characters/enemy/enemyEntity.js');
@@ -83,7 +83,7 @@ test('FEUD WIRE THE LAW: `rb` a whole per mille from x1 to x4 (the writer\'s bou
   assert.deepEqual({ ...F.BLOWS_WIRE }, { PER: 1000, MIN: 1000, MAX: 4000 });
   assert.equal(Wire.FOE_BLOWS_MIN, F.BLOWS_WIRE.MIN);
   assert.equal(Wire.FOE_BLOWS_MAX, F.BLOWS_WIRE.MAX);
-  assert.equal(Wire.RELAY_VERSION, 'world289');
+  assert.equal(Wire.RELAY_VERSION, 'world290');
   const v = (extra) => Wire.validFoeRecord({ i: 4, ...extra });
   for (const rb of [1000, 1430, 4000]) assert.deepEqual(v({ rb }), { i: 4, rb });
   for (const rb of [999, 4001, 1430.5, '1430', null]) assert.equal(v({ rb }), null, `rb ${rb}`);
@@ -152,9 +152,9 @@ test('FEUD WIRE THE DOOR: the puppet\'s blow at me through the real formula land
   assert.equal(swing(pup), Math.max(1, Math.round(base * 1.43)));
 });
 
-test('FEUD WIRE THE SIGNATURE: its owner flags it; the puppet strikes it at x2.0 on my feet, in its ember, its WIND deeper - and with no numbers from its host, or no flag, its shape\'s (mutants: the flag unwritten; unread; the multiplier, the ember or the pitch dropped)', () => {
+test('FEUD WIRE THE SIGNATURE: its owner flags it; the puppet draws it on my feet in its ember, its WIND deeper - and with no numbers from its host, or no flag, its shape\'s plain look (mutants: the flag unwritten; unread; the ember or the pitch dropped)', () => {
   const b = makeBlow('slam', [0, 0, 0], 0, 10, IRON_COLOR, 'iron');
-  b.sig = true; b.mult = F.SIG.MULT;
+  b.sig = true;
   assert.equal(PB.blowWire({ _tac: { state: 'windup', blow: b } }, 10.1).wk, 2 | PB.WIRE_IRON | PB.WIRE_SIG);
   b.sig = false;
   assert.equal(PB.blowWire({ _tac: { state: 'windup', blow: b } }, 10.1).wk, 2 | PB.WIRE_IRON, 'a plain slam: no flag');
@@ -162,16 +162,14 @@ test('FEUD WIRE THE SIGNATURE: its owner flags it; the puppet strikes it at x2.0
   const at = (r, sig) => { const ai = { feet: [0, 0, 0] }; PB.applyBlowRecord(ai, r, { origin: [0, 0, 0], me: true, sig }); return ai; };
   let ai = at(rec, F.SIG);
   const pb = PB.puppetBlow(ai);
-  assert.deepEqual([pb.sig, pb.mult, pb.windPitch, pb.color], [true, F.SIG.MULT, F.SIG.WIND_PITCH, F.SIG.COLOR]);
+  assert.deepEqual([pb.sig, pb.windPitch, pb.color], [true, F.SIG.WIND_PITCH, F.SIG.COLOR]);
   T = 10.3; PB.puppetBlowTurn(ai, [0, 0, 1], T);
   T = 10.6; PB.puppetBlowTurn(ai, [0, 0, 1], T);
   assert.equal(ai._blowVerdict, true);
-  assert.equal(ai._blowMult, F.SIG.MULT);
-  assert.equal(blowScaled(ai, 10), 20, 'x2.0 on my feet, as on its owner\'s');
   T = 10; resetBlows();
-  assert.equal(PB.puppetBlow(at(rec, null)).mult, BLOW.slam.mult, 'no numbers from the host: its shape\'s');
+  assert.ok(!PB.puppetBlow(at(rec, null)).sig, 'no numbers from the host: its shape\'s plain look');
   T = 10; resetBlows();
-  assert.equal(PB.puppetBlow(at({ ...rec, wk: 2 }, F.SIG)).mult, BLOW.slam.mult, 'no flag: its shape\'s');
+  assert.ok(!PB.puppetBlow(at({ ...rec, wk: 2 }, F.SIG)).sig, 'no flag: its shape\'s plain look');
 });
 
 test('FEUD WIRE THROUGH THE REAL STREET POOL: a peer\'s revenant stands with its owner\'s blows - said again once, phase two folded on them, withdrawn given back; an heir\'s foe writes them (mutants: the reader unwired; the key unwidened; the writer unwritten)', async () => {

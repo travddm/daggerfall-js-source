@@ -16,7 +16,7 @@
 //     the tokens say - nobody waits forever. A target whose back is turned on a waiting foe within reach is open: it
 //     strikes.
 //   - BACKING OFF. A foe that loses a share of its health in a short window backs out of reach and circles before it
-//     comes back. A coward (an animal, a thief's kind of class) at low health runs (DFU's flee).
+//     comes back. A coward (a thief's kind of human class; never a beast) at low health runs.
 //   - KITING. A shooter backs away from a target closing inside its stand-off band - one burst, then it fights.
 //   - FEEDBACK: nobody backpedals after a target that presses it. A waiting
 //     foe the target walks up to fights; the step back after a blow is a hop; a hurt foe or a kiting archer turns and
@@ -32,11 +32,11 @@ import { getPref } from '../systems/uiPrefs.js';
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';
 import { MOBILE_TYPES } from '../characters/mobile/mobileTypes.js';
 import { throwsBlows, blowShapesOf, blowFamily, makeBlow, fitBlowToGround, inBlow, setLiveBlow, shatterBlow, windupNear, offsetBlows, BLOW, BLOW_CHANCE, BLOW_COLOR, IRON_COLOR, BLOW_VERDICT_LIFE, BLOW_STALE, setBlowTargetOf } from './foeBlows.js';   // TACT4; TELL3: iron; TELL5: the family, the shapes' lengths
+import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a staggered foe takes more - the leaf the formulas read
 import { coverDistance } from './cover.js';   // TELL6: a charge's lane must be free of cover
 import { GRAVITY } from '../player/motor.js';   // TELL6c: a leap's hop on the motor's own gravity
 import { tacticsNow, setTacticsClock, tickTactics } from './tacticsClock.js';   // AUDIT TACT D10/A3
 import { TELL, poiseOf, staggerSeconds, glintStrength, blowGuard, punishSeconds, windupSeconds, feints, chains, chainShape, trackYaw, blowCooldown, wholeSet, feintChance, trackShare, chainMax } from './tells.js';   // TELL1: poise and the stagger; TELL3: a blow's guard; TELL4: the punish window; TELL5: patterns; TELL7: the cooldowns
-import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a staggered foe takes more - the leaf the formulas read
 import { noteFeud } from '../systems/feudLedger.js';   // RVN1: a blow of its I dodged, in its fight's ledger (a leaf - the brain brings no revenant system)
 
 export const tacticsSwitchOn = () => getPref('enhancedAI') === true;
@@ -78,11 +78,10 @@ export const TACT = Object.freeze({
 
 /** The cowardly human classes (Mac's call): the ones who live by not being hit. */
 export const COWARD_CLASSES = Object.freeze(new Set(['Mage', 'Sorcerer', 'Healer', 'Bard', 'Burglar', 'Acrobat', 'Thief'].map((n) => MOBILE_TYPES[n])));
-/** Does this kind break and run when badly hurt? Animals and the cowardly classes; undead, daedra, constructs and
- *  guards never (the watch is a Human-affinity class outside the list). */
+/** Does this kind break and run when badly hurt? Only the cowardly human classes (F1): animals, undead, daedra,
+ *  constructs and guards never (the watch is a Human-affinity class outside the list). DFU has no flee at all. */
 export function isCoward(mobileId) {
-  if (COWARD_CLASSES.has(mobileId)) return true;
-  return ENEMY_BASICS[mobileId]?.affinity === 'Animal';
+  return COWARD_CLASSES.has(mobileId);
 }
 
 // AUDIT TACT (D10/A3): the foes' own time, ticked by the hosts (ai/tacticsClock.js) - never the wall's
@@ -183,7 +182,7 @@ export function breakWindup(ai) {
  *  its frames (ai/puppetBlows.js). */
 const unseen = (s, now) => s?.seen != null && now - s.seen > BLOW_STALE;
 /** AUDIT TACT A4/D5/D6: a blow's landing state, spent - no verdict, weight or forced swing left for a later swing. */
-function clearBlowState(ai) { ai._blowVerdict = null; ai._blowMult = undefined; ai._blowSwing = false; ai._blowFor = undefined; }
+function clearBlowState(ai) { ai._blowVerdict = null; ai._blowSwing = false; ai._blowFor = undefined; }
 /** TELL2: a wind-up's held swing dropped (its wind-up broke, a paralysis, its place gone) - the sprite and the attack
  *  component let it go and strike nothing (characters/mobile/mobileUnit.js, characters/enemy/enemyAttack.js). */
 function dropSwing(ai) { ai._blowHold = 'cancel'; ai._blowWind = false; }
@@ -572,8 +571,8 @@ function beginWindup(ai, s, ent, shape, dx, dz, now, chain = 0, sig = null) {
   if (shape === 'leap') { b.ahead = Math.min(BLOW.leap.range, Math.hypot(dx, dz)); b.jumpAt = b.land - BLOW.leap.arc; fitBlowToGround(b, ai.collider); }   // TELL6c: its point - my feet now, locked
   if (shape === 'aimed') b.ahead = Math.hypot(dx, dz);   // TELL6d: its line to me, locked
   if (shape === 'pyre') b.ahead = Math.min(BLOW.pyre.range, Math.hypot(dx, dz));   // RVN5: its disc at my feet, locked
-  if (sig) {   // RVN5: its signature - x2.0, its own cooldown, a deeper WIND, called out (the pools say it once a stand)
-    b.sig = true; b.mult = sig.mult; b.windPitch = sig.windPitch;
+  if (sig) {   // RVN5: its signature - its own cooldown, a deeper WIND, called out (the pools say it once a stand)
+    b.sig = true; b.windPitch = sig.windPitch;
     const [lo, hi] = sig.cooldown;
     s.sigReady = now + lo + (hi - lo) * Math.random();
     ai._sigCall = now;
@@ -653,7 +652,7 @@ function windupTurn(ai, s, now, skipped) {
     ai._blowLandedAt = now; s.landed = { blow: b0, at: now };
     const hit = !!tf && inBlow(b0, tf[0], tf[2]);
     s.blow = null; s.blowReady = cooled;
-    if (atMe && hit) ai._blowPyre = { at: now, mult: b0.mult };
+    if (atMe && hit) ai._blowPyre = { at: now };
     if (tf && !hit) { beginOverreach(ai, s, b0, now, b0.lateIn === true, atMe); return true; }   // TELL4: missed - it stands spent
     s.state = 'wait';   // the aimed shot's law: its landing was its blow - no swing, no spell on top
     return false;
@@ -687,7 +686,7 @@ function resolveLanding(ai, s, b, verdict, now, cooled, atMe = true, judged = at
   ai._blowLandedAt = now;
   s.landed = { blow: b, at: now };   // AUDIT TELL O2: its landing, said to the peers for WIRE_LANDED_S (ai/puppetBlows.js)
   ai._blowVerdict = judged ? verdict : null;
-  ai._blowMult = judged ? b.mult : undefined; ai._blowAt = now; ai._blowSwing = true;
+  ai._blowAt = now; ai._blowSwing = true;
   ai._blowFor = judged ? (b.key ?? targetKey(ai)) : undefined;   // AUDIT ARENA-LADDER 2: whose verdict it is
   ai._blowFx = atMe && verdict ? { kind: b.kind, iron: b.guard === 'iron', at: now } : null;   // TELL6e: what it does where its damage lands (scenes/hostCombat.js landBlowEffect)
   ai._blowHold = false;   // TELL2: the held swing strikes on its next frame
@@ -726,8 +725,6 @@ export function blowPool(ai, ent, dist, near, dx, dz) {
 export function aimsShots(ai, ent) {
   return !!ent && wholeSet(ent) && !!ai?.hasBowAttack && isClassEnemyId(ent.mobileType);
 }
-// TELL6d: an aimed shot that strikes weighs x BLOW.aimed.mult - the arrow says so at contact (formulas' blowInfo)
-registerBlowTakenMod('tell-aimed', (attacker, target, weapon, info) => (info?.aimed ? BLOW.aimed.mult : 1));
 /** The shapes begun out of reach. */
 export const GAP_CLOSERS = Object.freeze(['charge', 'leap']);
 /** RVN5 (16.1): does its signature's shape reach its target now - a gap-closer out of reach with its lane free, the pyre

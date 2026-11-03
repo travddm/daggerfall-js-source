@@ -33,7 +33,7 @@
 //
 // BALANCED: a hostile channel once a fight and broken by any harm; a telegraphed art COOLDOWN apart, each blast its
 // multiple of the pyre's mean exactly (artSpell - AUDIT RVN B3: the pyre's own spell rounded a level's x0.6 up to x1), a
-// barrage's three together lighter than the signature's x2 (SIG.MULT); a sworn one's gifts on cooldowns, its strikes the
+// barrage's three together lighter than the signature; a sworn one's gifts on cooldowns, its strikes the
 // pyre's weight at my level by its rank, on hostile foes in reach and in sight. Owner-side, as the pyre is: a peer
 // fighting my revenant sees its marks only in my game (FEUD WIRE carries none), and its ward and its cry are my game's
 // alone (the wire's `rb` carries its blows' standing weight, never a cry's).
@@ -78,7 +78,7 @@ export const ART_NAMES = Object.freeze({
 /** The three that channel (a disc about its own feet, broken by a blow), and the three that are thrown at me. */
 export const ART_CHANNELS = Object.freeze(['mending', 'warding', 'warcry']);
 /** Every number, hostile then sworn. The thrown three's weights are on the pyre's blast (SIG.PYRE_BASE, SIG.PYRE_PER a
- *  level) - SIG.MULT is the signature's. */
+ *  level), the same blast the signature casts. */
 export const ART_LAW = Object.freeze({
   MEND: Object.freeze({ AT: 0.5, CHANNEL: 2.0, HEAL: 0.2 }),
   WARD: Object.freeze({ AT: 0.75, CHANNEL: 1.5, TAKEN: 0.65, SECONDS: 10 }),
@@ -141,7 +141,7 @@ export const artMagnitude = (level, mult) => ((SIG.PYRE_BASE[0] + SIG.PYRE_BASE[
  *  for the cast to round (pyreSpell rounds SIG.PYRE_PER x `mult` - every multiple from 0.5 to 1.5 was the pyre's own
  *  level's). Its mean is artMagnitude(level, mult). */
 export function artSpell(name, element, level, mult) {
-  const lv = Math.max(1, level | 0), base = pyreSpell(name, element, /** @type {any} */ (1));   // its shape; the magnitudes are set below
+  const lv = Math.max(1, level | 0), base = pyreSpell(name, element);   // its shape; the magnitudes are set below
   const lo = Math.round((SIG.PYRE_BASE[0] + SIG.PYRE_PER * lv) * mult), hi = Math.round((SIG.PYRE_BASE[1] + SIG.PYRE_PER * lv) * mult);
   return Object.freeze({ ...base, effects: [{ ...base.effects[0], magnitudeBaseLow: lo, magnitudeBaseHigh: hi, magnitudeLevelBase: 0, magnitudeLevelHigh: 0 }, ...base.effects.slice(1)] });
 }
