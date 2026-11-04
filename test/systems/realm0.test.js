@@ -75,7 +75,7 @@ test('REALM P0.2: online, every key of a balance mod reads its shipped default -
       if (!room && !own.includes(key)) whole++;
     }
   }
-  assert.equal(whole, 58, 'fifty-eight dials the room now owns beside the thirty-four it did');   // DEX0: Daggerfall Enemy Expansion's troll cheat (Cheat.DisableTrollRespawn) - online, the shipped default: a room's trolls get up. IT1: Immersive Travel's sixteen - the fares, the driver's destinations, his region lock, the captain's rules
+  assert.equal(whole, 57, 'fifty-seven dials the room now owns beside the thirty-four it did');   // DEX0: Daggerfall Enemy Expansion's troll cheat (Cheat.DisableTrollRespawn) - online, the shipped default: a room's trolls get up. IT1: Immersive Travel's sixteen - the fares, the driver's destinations, his region lock, the captain's rules
   assert.equal(onlineWholeModKey('dynamic-skies', 'Enabled', '?online=1'), false, 'a looks mod is not the room\'s');
   assert.equal(onlineWholeModKey('roleplay-realism', 'variantNpcs', '?online=1'), false, 'who stands behind a counter is looks');
 });
