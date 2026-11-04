@@ -1,10 +1,8 @@
 // @ts-check
-// HUMANOID-LOOT: HOW MUCH OF A HUMANOID FOE'S LOOT REACHES ITS BODY - the player's choice.
-// DFU gives every foe its whole loot table roll (EnemyEntity.cs SetEnemyCareer, LootTables.cs GenerateRandomLoot) and drops
-// its whole worn kit on the corpse (EnemyDeath.cs l.108-123 unequips every piece and TransferAll moves it). The port cut
-// both to a quarter for class, Orc, Centaur and human-affinity foes. The `humanoidLoot` pref (a Features row) says which:
-// DFU's whole loot (the default) or the quarter cut. Online the room's answer is forced (onlineLane.js), so every
-// player's foes carry one share. A leaf: the shelf only, so scenes/hostCombat.js can ask without a cycle.
+// HUMANOID-LOOT: how much of a humanoid foe's loot reaches its body. DFU gives every foe its whole table roll and drops
+// its whole worn kit (EnemyDeath.cs l.108-123); the port cut both to a quarter. The `humanoidLoot` pref (a Features row)
+// picks: DFU's whole loot (default) or the cut. Online the lane forces one answer (onlineLane.js). A leaf, so
+// scenes/hostCombat.js can ask without a cycle.
 import { getPref } from './uiPrefs.js';
 
 export const HUMANOID_LOOT_PREF = 'humanoidLoot';
