@@ -802,7 +802,7 @@ export function createGatherHost(deps) {
     const where = plan?.ready ? (kindOf(t.node)?.where?.(t.node) ?? null) : null;   // SETTLE-SAID
     if (where) return { ...plan, ready: false, rest: where };
     if (!plan?.ready || typeof book.closed !== 'function') return plan;
-    if (book.closed(`day:${plan.harvest}`)) return { ...plan, ready: false, rest: 'done all a day allows' };   // PROFESSION-CAPS
+    if (book.closed(`day:${plan.harvest}`)) return { ...plan, ready: false, rest: t('prof.dayCapRest', 'done all a day allows') };   // PROFESSION-CAPS
     if (t.node.what === 'dvein' && book.closed('deep')) {
       const fact = t.dungeon && dungeon ? book.dungeon(dungeon.id) : null;
       if (fact?.state !== 'confirmed' && fact?.state !== 'disputed') return { ...plan, ready: false, rest: `${DEEP_UNCONFIRMED_PER_DAY} veins today in dungeons nobody has vouched for` };

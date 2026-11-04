@@ -4631,6 +4631,7 @@ prof.craftWrit.pay,"Pays {pay, number} silver, {xp, number} {track} experience, 
 prof.craftWrit.shortBrew,"Brew {n, number} more yourself at an alchemy station - found or bought bottles do not count"
 prof.craftWrit.shortCarry,"Carry {n, number} more of these bottles in your pack"
 prof.craftWrit.shortMake,"Make {n, number} more yourself - pieces you bought or sold do not count"
+prof.dayCapRest,"done all a day allows"
 prof.hall.badge.made,"Made before"
 prof.hall.badge.owed,"First-time bonus"
 prof.hall.firsts.closed,"First-time bonuses: {spent, number} of {all, number} made. This craft can rise no further, so they pay nothing."
