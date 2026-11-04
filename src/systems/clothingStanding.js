@@ -1,37 +1,20 @@
-// DRESS1: DRESS FOR THE PART.
+// DRESS1: dress for the part. A port feature: DFU has no clothing reaction. What you wear in the five clothing slots tints
+// how people take you, when the Dress for the part option is on (systems/dressForThePart.js):
+//   - common wear (casual, plain, peasant, work clothes): +3 Commoners, -3 Nobility, per garment.
+//   - fine wear (formal cloaks and tunics, gowns, surcoats, kimono, toga, the Formal Eodoric): +3 Nobility, +1 Merchants,
+//     -1 Commoners, per garment.
+//   - religious wear (Priest / Priestess Robes): +3 with every temple faction (FactionFile type Temple, read in talk.js's
+//     getReactionToPlayer) and +1 Scholars, per garment.
+// Every group's total is capped at +/-10; everything else is neutral.
 //
-// A port feature, NOT classic - Daggerfall and DFU have no clothing
-// reaction at all. What you WEAR in the five clothing slots now tints
-// how people take you:
-//   - COMMON wear (casual / plain / peasant / work clothes): +3 with
-//     Commoners, -3 with Nobility, per garment.
-//   - FINE wear (formal cloaks and tunics, gowns, surcoats, kimono,
-//     toga, the Formal Eodoric): +3 with Nobility, +1 with Merchants,
-//     -1 with Commoners, per garment.
-//   - RELIGIOUS wear (Priest / Priestess Robes): +3 with every TEMPLE
-//     faction (FactionFile type Temple, read in talk.js's
-//     getReactionToPlayer) and +1 with Scholars, per garment.
-// Every group's total is capped at +/-10. Everything else (boots,
-// shoes, long shirts, the arena straps, the Khajiit suit...) is
-// neutral.
+// The social-group half rides DFU's live channel, the player's `reactionMods` (PlayerEntity.cs:129, not serialized),
+// which enchantmentMagicRound clears at the head of every magic round. applyDressStanding runs right after that clear,
+// before the no-enchanted-items early return, so a plain tunic counts with nothing magical worn. A temple is a faction
+// type, not a social group, so its half sits on the same live snapshot, `entity._dressStanding`, beside the group
+// figures the Enhanced Plus Standing page draws.
 //
-// The social-group half rides DFU's own live channel: the player's
-// `reactionMods` (PlayerEntity.cs:129, "do not serialize, set by live
-// effects"), which enchantmentMagicRound clears at the head of every
-// magic round and the worn items refill. applyDressStanding runs
-// straight after that clear - BEFORE the no-enchanted-items early
-// return - so a plain tunic counts with nothing magical worn, and
-// nothing is ever saved: take the garment off and the next round
-// forgets it. The temple half cannot live in a per-sgroup array (a
-// temple is a faction TYPE, not a social group), so it sits on the
-// same live snapshot, `entity._dressStanding`, beside the group
-// figures the Enhanced Plus Standing page draws. Online and offline
-// alike: the pump is worldTick's in both, and the reads are local.
-//
-// Leaf module on purpose: talk.js reads it, and equip.js's import
-// graph is heavy - so the equip table is read by shape
-// (`entity.equip.slots`, equipTableOf's own field) with the bag's
-// `equipSlot` mark as the fallback, as equippedEnchantedItems does.
+// A leaf: talk.js reads it and equip.js's import graph is heavy, so the equip table is read by shape
+// (`entity.equip.slots`) with the bag's `equipSlot` mark as the fallback, as equippedEnchantedItems does.
 
 import { EQUIP_SLOTS } from '../characters/paperdoll/paperdoll.js';
 import { ITEM_GROUPS } from '../characters/equipRules.js';
