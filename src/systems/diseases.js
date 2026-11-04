@@ -180,9 +180,8 @@ export const diseaseCount = (entity) =>
  *  Status box says the character feels unwell (ui/hud/hudStatus.js afflictionRows, systems/healthStatus.js). A
  *  vampirism or lycanthropy infection is never one (it carries no type - DFU's Diseases.None). */
 export const diseaseIncubating = (a) => a?.kind === 'disease' && !a.ended && !a.incubationOver && a.disease != null;
-/** FIELD BUGS 29h (INFECTION-KEPT): the diseases the next cure ENDS - the plain ones while any runs, else the
- *  lycanthropy or vampirism infections (GetDiseaseCount then) - so the temple prices and claims what it takes
- *  (effects.js cureDiseasesInfectionsLast; DFU's cure takes all unless the player chose otherwise). */
+/** INFECTION-KEPT: the diseases the next cure ends, so the temple prices and claims what it takes: with the Cure keeps
+ *  infection option on, the plain ones while any runs, else the infections; off, all of them (DFU). */
 export const curableDiseaseCount = (entity) => {
   const live = (entity?.activeEffects ?? []).filter((a) => a.kind === 'disease' && !a.ended);
   return (cureKeepsInfection() && live.filter((a) => !a.infection).length) || live.length;
