@@ -1,11 +1,10 @@
 // @ts-check
-// LOCKPICK-MODE: HOW A LOCK IS PICKED - the player's choice. DFU rolls a lock once and needs no item: a building's front
-// door in Steal mode rolls CalculateExteriorLockpickingChance, a dungeon's door and a locked chest roll
-// CalculateInteriorLockpickingChance, each attempt tallies Lockpicking once, and a failed attempt locks that door
-// (FailedSkillLevel) or that building (LastLockpickAttempt) until the live skill changes (DaggerfallActionDoor.cs
-// AttemptLockpicking l.150-185; PlayerActivate.cs l.532-566). The port's tumbler window (scenes/lockpickHost.js) with its
-// Lockpick item is the `lockpickTumblers` pref (a Features row): off is DFU's roll, on is the window. Online the room's
-// answer is forced off (onlineLane.js). A leaf: the shelf only.
+// LOCKPICK-MODE: how a lock is picked. DFU rolls a lock once and needs no item: a front door in Steal mode rolls
+// CalculateExteriorLockpickingChance, a dungeon door or chest CalculateInteriorLockpickingChance; each attempt tallies
+// Lockpicking once, and a failure locks that door (FailedSkillLevel) or building (LastLockpickAttempt) until the live
+// skill changes (DaggerfallActionDoor.cs l.150-185; PlayerActivate.cs l.532-566). The tumbler window with its Lockpick item
+// (scenes/lockpickHost.js) is the `lockpickTumblers` pref (a Features row): off is DFU's roll, on is the window. Forced
+// off online (onlineLane.js). A leaf.
 import { getPref } from '../uiPrefs.js';
 
 export const LOCKPICK_TUMBLERS_PREF = 'lockpickTumblers';

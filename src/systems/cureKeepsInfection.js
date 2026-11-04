@@ -1,10 +1,9 @@
 // @ts-check
-// INFECTION-KEPT: DOES A CURE LEAVE A VAMPIRISM OR LYCANTHROPY INFECTION? DFU stores the infection as a disease bundle,
-// and CureAllDiseases ends every disease bundle, the infection included (EntityEffectManager.cs CureAllDiseases;
-// DaggerfallGuildServiceCureDisease.cs prices each disease). The port ended the plain diseases first and left the infection
-// while a plain disease was also active (a field report: a player who wanted to keep lycanthropy while curing plague).
-// The `cureKeepsInfection` pref (a Features row) is that choice: off is DFU's, a cure ends all; on is the port's earlier way.
-// Online the room's answer is forced off (onlineLane.js). A leaf: the shelf only, so effects.js and diseases.js can ask.
+// INFECTION-KEPT: does a cure leave a vampirism or lycanthropy infection? DFU stores the infection as a disease bundle
+// and CureAllDiseases ends every one, the infection included (EntityEffectManager.cs). The port ended the plain diseases
+// first while a plain disease was active (a field report: a player curing plague who wanted to keep lycanthropy). The
+// `cureKeepsInfection` pref (a Features row): off is DFU's, a cure ends all; on is the port's earlier way. Forced off
+// online (onlineLane.js). A leaf, so effects.js and diseases.js can ask.
 import { getPref } from './uiPrefs.js';
 
 export const CURE_KEEPS_INFECTION_PREF = 'cureKeepsInfection';

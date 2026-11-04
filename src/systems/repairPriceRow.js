@@ -1,7 +1,6 @@
 // @ts-check
-// REPAIR-PRICE: the Features row for what a smith charges (systems/repairPriceByDamage.js reads its pref). Off is DFU's:
-// a tenth of the item's value. On is Roleplay & Realism: Items' price, which grows with the damage. Forced off online. Its own
-// file keeps systems/features.js from growing.
+// REPAIR-PRICE: the Features row for what a smith charges (systems/repairPriceByDamage.js reads its pref). Off is DFU's
+// tenth of the item's value; on is Roleplay & Realism: Items' price, which grows with the damage. Forced off online.
 import { t } from './textManager.js';
 
 export const REPAIR_PRICE_ROW = Object.freeze({
