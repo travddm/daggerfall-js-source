@@ -6,7 +6,7 @@
 // hands its foes the flags. (INVIS-LOOK, the same day: that is the classic lane's draw; under Enhanced Combat Visuals the
 // peer is drawn translucent, as a concealed foe is - test/net/invislook.test.js.) Driven through the wire's door, two sessions either side of the real relay Room, the
 // dungeon's peer candidates mounted over its own statements, and the world host by source.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as acorn from 'acorn';
@@ -14,11 +14,12 @@ import * as acorn from 'acorn';
 import { validPose, poseChanged, parseClient } from '../../src/net/wire.js';
 import { lerpPose, OnlineSession } from '../../src/net/online.js';
 import { concealBits, concealFlagsOfBits, concealmentFlags } from '../../src/systems/effects.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { RemotePlayers } from '../../src/net/remotePlayers.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 import { openPeers, pickPeerInFront, SOCIAL_REACH } from '../../src/player/socialPick.js';   // CONCEAL-MATE
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const P = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 };

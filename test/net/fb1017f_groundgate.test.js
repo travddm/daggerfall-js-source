@@ -4,13 +4,15 @@
 // peer in the air. Mac's call: the relay turns such a build away. A ground room's hello says the ground it stands on
 // (net/wire.js GROUND_LAW, `gl`), the relay refuses less or none while `groundGate` is on, and the ground is held to a
 // print recorded under that law, so the law moves whenever the ground does.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { GROUND_LAW, GROUND_LAW_WIRE_MAX, GROUND_OLD_REASON, GRANT_HELLO_LAW, LOOT_HELLO_LAW, groundRoom, isLayered, nativePoseRoom, parseClient, CLOSE_POLICY } from '../../src/net/wire.js';
 import { RELAY_CFG_KEYS, RELAY_INTERNAL_CFG, RELAY_CFG_TTL_MS, parseRelayCfgCommand } from '../../src/net/relayCfg.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { groundPrint, groundMoved, GROUND_PRINT_FILE, GROUND_PRINT_TOLERANCE_M } from '../../tools/groundPrint.mjs';
+import { asOnlinePage } from '../fakeRoom.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return await fn(); } finally { console.warn = w; console.log = l; } };
 

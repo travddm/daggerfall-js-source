@@ -6,15 +6,16 @@
 // socket of the same id, which the relay already takes as a reconnect. These pins run it end to end: a real
 // OnlineSession, a real minter against the room's own key, the real Room (test/fakeRoom.mjs) - and the host
 // (scenes/world.js) that asks for it when my aura changes from the one the last token said.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { OnlineSession, REHELLO_GAP_MS, BACKOFF_MAX_MS } from '../../src/net/online.js';
 import { PIXEL_UNITS, CLOSE_REPLACED, CLOSE_BUSY } from '../../src/net/wire.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { AURA_DRAW_MAX, AURA_FORGET_S, AURA_KINDLE_S } from '../../src/render/auraRing.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const rd = (p) => hostText(p);
 const at = (px, pz) => ({ x: px * PIXEL_UNITS + 10, y: 0, z: pz * PIXEL_UNITS + 10, yaw: 0, pitch: 0, mv: 0 });

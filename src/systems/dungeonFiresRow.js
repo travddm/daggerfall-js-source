@@ -20,5 +20,5 @@ export const DUNGEON_FIRES_ROW = Object.freeze({
     return t('features.dungeonFires.effect', 'Takes effect in the next dungeon you enter.');
   },
   kinds: Object.freeze(['enhanced', 'classic']),
-  control: Object.freeze({ store: 'prefs', key: 'dungeonFires', initial: true, online: true }), // world/dungeon/dungeonFires.js FIRES_PREF
+  control: Object.freeze({ store: 'prefs', key: 'dungeonFires', initial: true, online: 'room' }), // world/dungeon/dungeonFires.js FIRES_PREF
 });

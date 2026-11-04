@@ -12,15 +12,16 @@
 //
 // Driven through the real relay (server/src/index.js Room, fakeRoom's real tokens), the real session (OnlineSession
 // over fake sockets) and the real portrait reader; the pause face's wiring by source.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
 import { parseClient, LOOK_HZ_MAX, LOOK_MIN_MS, HELLO_HZ_MAX, CLOSE_BUSY } from '../../src/net/wire.js';
 import { liveCharacter, characterLine } from '../../src/ui/profileBadge.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const quiet = (fn) => { const i = console.info; console.info = () => {}; try { return fn(); } finally { console.info = i; } };

@@ -11,7 +11,7 @@ import { ribbonClaimOf, ribbonClaimOk, ribbonColours, ribbonRgba, RIBBON_PLAIN, 
 import { readFileSync } from 'node:fs';
 import { verifyToken, claimsValid, mintToken, importPublicKeyB64 } from '../../src/net/identityToken.js';
 import { badged, readRibbon } from '../../src/net/wire.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, OFFICIAL_PH } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
 import { accountTokenMinter, SESSION_KEY } from '../../src/net/accountClient.js';
@@ -129,7 +129,7 @@ test('SEASON1 THE BANNER RIBBON ON THE TOKEN AND THE RELAY: a claim set may carr
   const eve = r.connect(); await r.hello(eve, 'evee-0003', null, { rb: [3, 4] });
   assert.deepEqual([ofType(mara, 'join').find((j) => j.id === 'evee-0003').rb, ofType(bob, 'join').find((j) => j.id === 'evee-0003').rb], [[3, 4], [3, 4]], 'the join wears it');
   const sly = r.connect();
-  await r.room.webSocketMessage(sly, JSON.stringify({ t: 'hello', id: 'slyy-0004', secret: 'secret-of-slyy-0004', name: 'slyy-0004', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, rb: [1, 2], tok: await r.token('slyy-0004') }));
+  await r.room.webSocketMessage(sly, JSON.stringify({ t: 'hello', ph: OFFICIAL_PH, id: 'slyy-0004', secret: 'secret-of-slyy-0004', name: 'slyy-0004', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, rb: [1, 2], tok: await r.token('slyy-0004') }));
   const slyJoin = ofType(bob, 'join').find((j) => j.id === 'slyy-0004');
   assert.ok(slyJoin, 'admitted');
   assert.equal('rb' in slyJoin, false, 'a frame that only types one gets none');

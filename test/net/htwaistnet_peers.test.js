@@ -20,7 +20,7 @@
 // fake sockets either side of the real relay Room (test/fakeRoom.mjs), and
 // PeerBodies over whole createFpArm() rigs on the fixture body with a pelvis
 // and a LIGH lantern (test/fixtures/mw/bodyRig.mjs hipLanternBodyDeps).
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
@@ -31,8 +31,9 @@ import { createFpArm, HIP_LIGHT_SLOT } from '../../src/combat/fpArm.js';
 import * as playerTorch from '../../src/systems/playerTorch.js';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { TEMPLATES } from '../../src/systems/useItem.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { countingRenderer, hipLanternBodyDeps } from '../fixtures/mw/bodyRig.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const P = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 };

@@ -15,12 +15,17 @@
 // Workers' graphs are what esbuild bundles from them (test/server/accountdeploy.test.js IMPORT-GRAPH1).
 import { readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
+import { stripTypeScriptTypes } from 'node:module';
 import { parse } from 'acorn';
 
 /** The relative specifiers a file names, in the order they are written. */
 function specifiers(file) {
-  if (!/\.m?js$/.test(file)) return [];
-  const ast = parse(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
+  if (!/\.(m?js|ts)$/.test(file)) return [];
+  // P0 SERVER PROFILE: a .ts module's imports are read as esbuild reads them, its types stripped first (Node's own
+  // stripper, for the erasable-only TypeScript the coding standards allow). Before, a .ts file was a leaf here, and an
+  // import it gained would have joined a Worker's bundle unseen.
+  const text = readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+  const ast = parse(file.endsWith('.ts') ? stripTypeScriptTypes(text) : text, { ecmaVersion: 'latest', sourceType: 'module' });
   const found = [];
   const visit = (node) => {
     if (Array.isArray(node)) { for (const n of node) visit(n); return; }
