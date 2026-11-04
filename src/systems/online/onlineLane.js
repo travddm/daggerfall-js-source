@@ -123,12 +123,12 @@ export const ONLINE_FORCED_PREFS = {
   // the room agrees on reads the skin: it is what THIS screen draws.
   // MWA4: and `mwArms` left with its switch - the attached Morrowind files are the arms' switch now, online and off.
 };
-/** RF4: the registry's door - `true`/`false` forces the key online,
+/** RF4: the registry's door - `true`/`false` forces the key online (F3a: and a string forces that tier, as a room's pin),
  *  `'player'` leaves it to the player by name. Idempotent. */
 export function declareOnlinePrefs(table) {
   for (const [key, answer] of Object.entries(table ?? {})) {
     if (answer === 'player') { if (!ONLINE_PLAYERS_OWN_PREFS.includes(key)) ONLINE_PLAYERS_OWN_PREFS.push(key); delete ONLINE_FORCED_PREFS[key]; }
-    else if (typeof answer === 'boolean') { ONLINE_FORCED_PREFS[key] = answer; const i = ONLINE_PLAYERS_OWN_PREFS.indexOf(key); if (i >= 0) ONLINE_PLAYERS_OWN_PREFS.splice(i, 1); }
+    else if (typeof answer === 'boolean' || typeof answer === 'string') { ONLINE_FORCED_PREFS[key] = answer; const i = ONLINE_PLAYERS_OWN_PREFS.indexOf(key); if (i >= 0) ONLINE_PLAYERS_OWN_PREFS.splice(i, 1); }
   }
 }
 

@@ -4,9 +4,9 @@ import assert from 'node:assert/strict';
 import { CAMP_CHANCE_ON_CHUNK_LOAD, CAMP_GROUPS_ON_CHUNK_LOAD, MIN_CAMP_SPAWN_DISTANCE, MAX_CAMP_SPAWN_DISTANCE,
   campGroupBearings, campAnchorSpot, rollCampEncountersOnChunkLoad } from '../../src/systems/campEncounters.js';
 
-test('CAMP-RING: 50% per chunk, three groups', () => {
-  assert.equal(CAMP_CHANCE_ON_CHUNK_LOAD, 0.50);
-  assert.equal(CAMP_GROUPS_ON_CHUNK_LOAD, 3);
+test('CAMP-RARE: 12.5% per chunk, one group', () => {
+  assert.equal(CAMP_CHANCE_ON_CHUNK_LOAD, 0.125);
+  assert.equal(CAMP_GROUPS_ON_CHUNK_LOAD, 1);
 });
 
 test('CAMP-RING: three bearings - one in front, one to the right, one to the left', () => {
@@ -35,20 +35,18 @@ test('CAMP-RING: a group handed a bearing stands on it, 100-150 m out', () => {
   }
 });
 
-test('CAMP-RING: a hit returns up to three independently rolled groups, each with its own bearing', () => {
+test('CAMP-RARE: a hit returns one group of two to four', () => {
   const ctx = { climateIndex: 231, playerLevel: 5, gameMinutes: 600, inside: false, inLocationRect: false, preventEnemySpawns: false };
   let hits = 0, groupsSeen = 0;
   for (let i = 0; i < 400; i++) {
     const r = rollCampEncountersOnChunkLoad(ctx, Math.random, { fovDegrees: 60 });
     if (!r) continue;
     hits++; groupsSeen += r.length;
-    assert.ok(r.length >= 1 && r.length <= 3);
-    const bearings = new Set(r.map((g) => g.bearingDegrees));
-    assert.equal(bearings.size, r.length, 'no two groups share a bearing');
-    for (const g of r) assert.ok(g.mobileTypes.length >= 2);
+    assert.equal(r.length, 1);
+    for (const g of r) assert.ok(g.mobileTypes.length >= 2 && g.mobileTypes.length <= 4, `size ${g.mobileTypes.length}`);
   }
-  assert.ok(hits > 120 && hits < 280, `about half the chunks: ${hits}/400`);
-  assert.ok(groupsSeen / hits > 2.5, 'nearly always all three groups');
+  assert.ok(hits > 15 && hits < 90, `about an eighth of the chunks: ${hits}/400`);
+  assert.equal(groupsSeen, hits, 'one group a hit');
   assert.equal(rollCampEncountersOnChunkLoad({ ...ctx, inLocationRect: true }, () => 0), null, 'never in a town');
 });
 

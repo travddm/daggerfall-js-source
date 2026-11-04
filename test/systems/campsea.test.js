@@ -13,9 +13,9 @@ test('CAMP-SEA: a chunk-load camp roll with the deep\'s suppression up stands no
   let seed = 7;
   const rolls = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);   // seeded: the same crossings both ways
   let open = 0, shut = 0;
-  for (let i = 0; i < 200; i++) if (rollCampEncountersOnChunkLoad({ ...ctx, preventEnemySpawns: false }, rolls)) open++;
-  for (let i = 0; i < 200; i++) if (rollCampEncountersOnChunkLoad({ ...ctx, preventEnemySpawns: true }, rolls)) shut++;
-  assert.ok(open > 50, `the land's camps roll where nothing stands them down (${open}/200 crossings)`);
+  for (let i = 0; i < 1000; i++) if (rollCampEncountersOnChunkLoad({ ...ctx, preventEnemySpawns: false }, rolls)) open++;
+  for (let i = 0; i < 1000; i++) if (rollCampEncountersOnChunkLoad({ ...ctx, preventEnemySpawns: true }, rolls)) shut++;
+  assert.ok(open > 60, `the land's camps roll where nothing stands them down (${open}/1000 crossings)`);
   assert.equal(shut, 0, 'suppressed: nothing, ever');
 });
 
