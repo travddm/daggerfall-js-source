@@ -1,4 +1,4 @@
-// CHARACTER CHARACTER_MODES: the shared law (src/net/modeLaw.js) - the codes, the predicates and the drop table.
+// CHARACTER MODES: the shared law (src/net/modeLaw.js) - the codes, the predicates and the drop table.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -8,7 +8,6 @@ import {
   isMode,
   codeOf,
   modeOfCode,
-  modeClaimOk,
   permadeath,
   ironman,
   legacy,
@@ -28,10 +27,6 @@ test('a code outside the table is no mode, and an unknown mode reads as the defa
   for (const bad of [-1, 5, 1.5, '1', null, NaN]) assert.equal(modeOfCode(bad), null);
   assert.equal(codeOf('nonsense'), CHARACTER_MODE_CODES.classic);
   assert.equal(isMode('toString'), false);
-  assert.equal(modeClaimOk(undefined), true);
-  assert.equal(modeClaimOk(4), true);
-  assert.equal(modeClaimOk(5), false);
-  assert.equal(modeClaimOk('1'), false);
 });
 
 test('the death and Ironman switches make the five modes', () => {
