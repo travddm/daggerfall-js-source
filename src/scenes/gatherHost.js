@@ -798,13 +798,13 @@ export function createGatherHost(deps) {
   }
   /** REFUSALS-LEARNED over one plan - the kind's `plan`, or one of its menu's rows. SETTLE-SAID: and the ground's check -
    *  a ready plan on a settlement's ground is none, its reason the act's own words. */
-  function learned(t, plan) {
-    const where = plan?.ready ? (kindOf(t.node)?.where?.(t.node) ?? null) : null;   // SETTLE-SAID
+  function learned(target, plan) {
+    const where = plan?.ready ? (kindOf(target.node)?.where?.(target.node) ?? null) : null;   // SETTLE-SAID
     if (where) return { ...plan, ready: false, rest: where };
     if (!plan?.ready || typeof book.closed !== 'function') return plan;
     if (book.closed(`day:${plan.harvest}`)) return { ...plan, ready: false, rest: t('prof.dayCapRest', 'done all a day allows') };   // PROFESSION-CAPS
-    if (t.node.what === 'dvein' && book.closed('deep')) {
-      const fact = t.dungeon && dungeon ? book.dungeon(dungeon.id) : null;
+    if (target.node.what === 'dvein' && book.closed('deep')) {
+      const fact = target.dungeon && dungeon ? book.dungeon(dungeon.id) : null;
       if (fact?.state !== 'confirmed' && fact?.state !== 'disputed') return { ...plan, ready: false, rest: `${DEEP_UNCONFIRMED_PER_DAY} veins today in dungeons nobody has vouched for` };
     }
     return plan;
