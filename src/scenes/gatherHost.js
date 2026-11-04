@@ -791,9 +791,8 @@ export function createGatherHost(deps) {
    *  holds it, as a tool's Use does (TOUCH-HOLD) - the kind's start reads it beside `tool`. */
   const ctxFor = (t, tool = null, byPress = false) => ({ entity: deps.entity(), info: t.info, book, rank, specs, keyLabel: deps.keyLabel, pitch: t.pitch ?? null, tool, byPress });
   /** REFUSALS-LEARNED (AUDIT 2026-10-01 part four): A PLAN THE SERVICE HAS REFUSED TODAY IS NO READY PLAN - the account's
-   *  veins in dungeons nobody has vouched for: a count the state does not carry, so the book keeps what the refusal said
-   *  (net/profBook.js `closed`) and the prompt says it, never an act played and a tool worn for the same refusal again.
-   *  CAP-OFF: the account's day in a craft closes nothing - there is none. */
+   *  veins in dungeons nobody has vouched for, and (PROFESSION-CAPS) the character's day on the plan's track: counts the state does
+   *  not carry, so the book keeps what the refusal said (net/profBook.js `closed`) and the prompt says it, never a tool worn again. */
   function planFor(t, tool = null) {
     return learned(t, kindOf(t.node)?.plan(t.node, ctxFor(t, tool)) ?? null);
   }
@@ -803,6 +802,7 @@ export function createGatherHost(deps) {
     const where = plan?.ready ? (kindOf(t.node)?.where?.(t.node) ?? null) : null;   // SETTLE-SAID
     if (where) return { ...plan, ready: false, rest: where };
     if (!plan?.ready || typeof book.closed !== 'function') return plan;
+    if (book.closed(`day:${plan.harvest}`)) return { ...plan, ready: false, rest: 'done all a day allows' };   // PROFESSION-CAPS
     if (t.node.what === 'dvein' && book.closed('deep')) {
       const fact = t.dungeon && dungeon ? book.dungeon(dungeon.id) : null;
       if (fact?.state !== 'confirmed' && fact?.state !== 'disputed') return { ...plan, ready: false, rest: `${DEEP_UNCONFIRMED_PER_DAY} veins today in dungeons nobody has vouched for` };

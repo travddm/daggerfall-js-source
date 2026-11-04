@@ -66,6 +66,7 @@ import { pixelKey, parseNodeKey } from './nodeLaw.js';
 import { accountRefusalText } from './accountClient.js';
 import { ASK_AGAIN_NOW, jittered } from './backoff.js';   // SCALE1: asks again spread out, and never at once into a minute's refusal
 import { t } from '../systems/textManager.js';   // L10N4: the Stores' words in the player's language
+import { learnRefusal, closedToday, heardCaps } from './profDayCapBook.js';   // PROFESSION-CAPS
 import { noteAct } from '../systems/questlines/qlActs.js';   // QL11: the features' acts, heard by the running quests
 import { turnedDayOf } from './dayTurn.js';   // DAY-TURN: a page's day turns at its own moment past midnight
 
@@ -190,7 +191,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     hauls: 0,
     /** REFUSALS-LEARNED: the state to be read again (a refusal said the Stores or the carried count moved elsewhere) */
     reread: false,
-    /** REFUSALS-LEARNED: what the account's refusals closed, by key (`deep` - CAP-OFF: no `account:<profession>`) -> the UTC day */
+    /** REFUSALS-LEARNED: what the account's refusals closed, by key (`deep`; `day:<character>:<track>` - PROFESSION-CAPS) -> the UTC day */
     closed: new Map(),
   };
   const account = () => { try { return door.account?.() ?? null; } catch { return null; } };
@@ -312,7 +313,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     for (const c of data?.carried ?? []) applyCarried(c);   // BAG1
     state.silver = new Map(Object.entries(data?.silver && typeof data.silver === 'object' ? data.silver : {}).filter(([, n]) => Number.isSafeInteger(n) && n > 0));   // WOVEN-PAYS
     if (data?.writs) state.writs = { today: data.writs.today | 0, max: data.writs.max | 0 };
-    state.caps = data?.caps ?? null;
+    state.caps = data?.caps ?? null; heardCaps(state.caps);   // PROFESSION-CAPS: the tier prices' scale
     applyHunt(data?.hunt);
     applyHauls(data?.hauls);
     state.made = madeOf(data?.made);   // CRAFT-HALL
@@ -452,8 +453,8 @@ export function createProfBook({ door, storage = null, character = () => null, n
       return state.day < heldDay() && now() - state.readAt >= PROF_REFRESH_BACKOFF_MS;   // DAY-TURN: another day at this page's turn
     },
     /** REFUSALS-LEARNED: whether today a refusal closed `key` for the account - `deep` (its veins in dungeons nobody has
-     *  vouched for). CAP-OFF: the account's day in a craft (`account:<profession>`) closes nothing - there is none. */
-    closed(key) { return state.closed.get(key) === dayOf(now()); },
+     *  vouched for). A refused harvest's track is `dayCapped`. */
+    closed(key) { return closedToday(state.closed, character(), key, dayOf(now())); },   // PROFESSION-CAPS: and `day:<harvest kind>` - a refusal said this character's day on its track is done
     /** A track as the service last said it (never null: a profession not worked yet is at nothing). */
     /** A track as the service said it - CRAFT3: a discipline's its craft's ('jewelcrafting' the Smithing track). */
     track(profession) {
@@ -1272,12 +1273,11 @@ export function createProfBook({ door, storage = null, character = () => null, n
     if (!here) return { ok: false, error: r?.error ?? 'server', elsewhere: true };
     shutBy(r);
     if (r?.error === 'node-taken') state.taken.add(`${h.node}|${h.kind}`);
-    // REFUSALS-LEARNED (AUDIT 2026-10-01 part four): WHAT A REFUSAL SAYS OF THE DAY IS KEPT - the plan went on offering
-    // the act as ready, the act played, the tool wore, and the same refusal came every try. The Stores filled elsewhere
-    // (another device): the state is read again. Its veins in dungeons nobody has vouched for - a count the state does not
-    // carry: closed until the UTC day turns. CAP-OFF: the character's day and the account's day in a craft are no more.
+    // REFUSALS-LEARNED (AUDIT 2026-10-01 part four): WHAT A REFUSAL SAYS OF THE DAY IS KEPT - the plan went on offering the act as
+    // ready, the act played, the tool wore, and the same refusal came every try. The Stores filled elsewhere (another device): the state
+    // is read again. Veins in dungeons nobody has vouched for, and a character's day on a track: closed until the UTC day turns.
     if (r?.error === 'stores-full' || r?.error === 'carried-full') state.reread = true;   // AUDIT2 BAG1 K9: and the carried count's own
-    if (r?.error === 'prof-deep-cap') state.closed.set('deep', dayOf(now()));
+    learnRefusal(state.closed, h, r?.error, dayOf(now()));   // PROFESSION-CAPS: `prof-deep-cap` closes `deep`, `prof-day-cap` the character's day on the track
     staleGround(h.node);   // GROUND-STALE: a refusal (`prof-rank` on a node the client stood within the rank) is the stale ground's word too
     // AUDIT 32 B2: the account's rare hides as the refusal says them - the book counted what this device saw, and another
     // character (or device) of the account may have taken the rest; a knife worn on every try until the next day's read

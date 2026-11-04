@@ -14,6 +14,16 @@ the item templates, the sounds, the Materials Bag, and the Foraging mod port the
   `server-account/wrangler.toml`, read by `profSwitchOf` and `profOpenFor` in `server-account/src/professions.js`.
 - The client plays the act and reports how well it went. The service trusts that report only within a bound: a clean
   act moves a craft's quality roll by at most one step, or adds XP and bonus chances within caps the service checks.
+- **Each track has a daily limit.** A character does a bounded number of acts on a track each UTC day: harvests on a
+  gathering track; crafts, smelts, brews, disenchants and reforges on a crafting track. The service refuses the next
+  one with `prof-day-cap` (`server-account/src/profDayCaps.js`, numbers in `src/net/profCapLaw.js`), and the book
+  remembers the refusal so a capped vein shows as refused and costs no tool wear. `PROF_DAY_CAPS = "off"` lifts it.
+- **A crafted Rare passes the loot level gate.** A Masterwork piece is Rare. A crafter whose level is below the gate gets a
+  Superior piece instead, on the same roll. `PROF_MASTERWORK_GATE = "off"` lifts the gate.
+- **Tier prices follow DFU's ingredient scale** for ores, ingots, planks, leathers and Arcane Essence
+  (`DFU_TIER_PRICE` in `profTemplates.js`). `PROF_DFU_PRICES = "off"` puts back the port's earlier scale; the service
+  reports the choice in the state read and the client sets the rows to it. The three switches move to the server profile
+  later.
 - Shared law lives in `src/net/` and is pure (no clock, DOM or network). The client and the service import the same
   files.
 

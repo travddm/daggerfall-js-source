@@ -102,7 +102,7 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
 
     // the state: the day's counts, and no cap beside them
     const st = (await s.call('/v1/prof/state', { character: mac.character }, mac.secret)).body;
-    assert.deepEqual(st.caps, { stores: STORES_MAX, withdraw: 200, highHides: HIGH_HIDES_PER_DAY });
+    assert.deepEqual(st.caps, { stores: STORES_MAX, withdraw: 200, highHides: HIGH_HIDES_PER_DAY, prices: 'dfu' });   // PROFESSION-CAPS: the tier prices' scale
     assert.deepEqual([st.today.mining, st.hauls, st.hunt], [62, 41, { hides: 31, high: 0 }]);
 
     // KEPT: the rare hides - three of tiers 5-6 taken, a fourth refused, a hide below them still credited
@@ -206,6 +206,13 @@ test('CAP-OFF the host: five hundred Mining harvests today, the vein is ready - 
     assert.equal(host.acting(), true, 'the act starts');
     assert.equal(S.meter, 'mine');
     host.cancel();
+    // PROFESSION-CAPS: a refusal that said the character's Mining day is done - the vein shows refused, and E starts no act
+    book.closed = (k) => k === 'day:ore' || k === 'day:stone';
+    host.tick(0.016);
+    assert.match(S.prompt?.rest ?? '', /done all a day allows/, 'refused: ' + JSON.stringify(S.prompt));
+    host.press();
+    host.tick(0.016);
+    assert.equal(host.acting(), false, 'no act, so no tool worn');
   } finally { host.dispose(); setForagingHost(null); }
 });
 
