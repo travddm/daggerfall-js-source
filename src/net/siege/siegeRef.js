@@ -1,48 +1,19 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
-// PVP-REF - THE REFEREED BLOW AND STEP
-// (6.1).
+// SIEGE-REF - A SIEGE'S ROOM, ITS BATTLE AND ITS TOURNEY
+// (Seats-Arc 6.2).
 //
-// FACT: no server sees a blow between players today - a duel's blow is
-// the defender's to judge, on its own machine (DUEL1). A siege cannot be
-// fought that way: a town's Charter changes hands on it. So in a siege's
-// room the RELAY holds every fighter's vitality, and every blow, cast and
-// step is judged here, the gate's law (net/gate/gateBrain.js applyHit) grown
-// from one foe to many fighters:
+// A siege is one battle a seat a week, in a room of its own (`siege:<seat key>:<seat week>`). This file holds the
+// battle's state and its pure rules: the waves and the places on each side, the field and its works (the gatehouse and
+// the ram), the banners and the Throne, the guards and the revolt, the forfeit and the final tally, and the Royal Tourney's
+// room, bouts and ladder.
 //
-//   - VITALITY is normalised: 300 + 2 x the Renown level the account
-//     service signed (the token's `lv`), 302 to 400 - flat on purpose, so
-//     a lie about Renown buys a third more at most. A siege never touches
-//     the save's health, items or gold.
-//   - A BLOW is a claim `{ to, w, m, d, r }`: accepted while both stand,
-//     the target's last pose within the weapon's reach (melee 2.5 m, a
-//     shaft 60 m) and POSE_SLACK, the striker under 4 a second - and its
-//     damage CLIPPED to the weapon's bucket: DFU's own range for that
-//     weapon at that material, the attacker's bonuses at the game's caps,
-//     doubled for a critical, never more. The weapon is the one the
-//     striker's LOOK carries in hand (the paperdoll every other player
-//     draws), never the claim's own word alone.
-//   - A CAST: at most 3 damaging a 5 seconds, each to 60; a heal to 40,
-//     three a 5 seconds of its own.
-//   - BAL8: EVERY HARM, blows and casts together, at most 180 in any 5
-//     seconds (SIEGE_HARM - the casts' own ceiling, every striker's).
-//   - A STEP: no faster than 18 m/s and half a metre (MEASURED below) -
-//     AUDIT-SEATS R1/R2: its run and its climb together, on an allowance
-//     the fighter carries (a second's run and the slack at most); past it
-//     the relay pulls the fighter back to its last good pose. A fall is
-//     gravity's, never refused.
-//   - A FALLEN fighter rises at its side's next wave, with 3 seconds no
-//     blow touches.
-//
-// A LEAF: the relay bundles every byte it imports (test/net/relayversion
-// .test.js), so DFU's damage tables are copied here and pinned EQUAL to
-// characters/weapons.js and combat/formulas.js by test, not imported
-// (the gate's way - test/net/gate/wb4b_gate_blows.test.js).
+// The REFEREE CORE moved to net/pvp/pvpRef.js: a fighter's vitality, a blow's bucket (DFU's damage tables), a cast, a harm
+// and a step. This file imports it and re-exports every name, so a caller may keep importing it from here. The relay
+// bundles every byte it imports (test/net/relayversion.test.js), so both files are leaves.
 //
 // Pure: no clock (every `now` an argument), no DOM, no network.
-// ═════════════════════════════════════════════════════════════════════
 
-import { siegeVitality, SIEGE_UNITS_PER_M, SIEGE_REACH, SIEGE_HIT, SIEGE_HARM, siegeBlowMax, siegeIsBow, siegeHeld, harmRoom, refereeStep, ROYAL_RING, spend, spendHarm } from '../pvp/pvpRef.js';
+import { siegeVitality, SIEGE_UNITS_PER_M, SIEGE_REACH, SIEGE_HIT, siegeBlowMax, siegeIsBow, harmRoom, ROYAL_RING, spend, spendHarm } from '../pvp/pvpRef.js';
 export { SIEGE_VITALITY, siegeVitality, SIEGE_UNITS_PER_M, SIEGE_REACH, SIEGE_HIT, SIEGE_BLOWS_HZ, SIEGE_CASTS, SIEGE_HARM, SIEGE_SPEED, SIEGE_WEAPONS, SIEGE_WEAPON_MAX, SIEGE_MATERIAL_MOD, SIEGE_FIST_MAX, SIEGE_BONUS, SIEGE_BONUS_MAX, SIEGE_CRIT_MAX, siegeBlowMax, armsTop, ARMS_TOP_MAX, armsOk, armsOf, siegeIsBow, SIEGE_HAND_SLOTS, siegeHeld, newFighter, harmRoom, refereeBlow, refereeCast, SIEGE_STEP_WINDOW_MS, refereeStep, ROYAL_RING } from '../pvp/pvpRef.js';   // the referee core moved to net/pvp/pvpRef.js; the names stay importable from here
 
 /** A siege's room: `siege:<seat key>:<seat week>` - one a battle (Seats-Arc 6.2). */
