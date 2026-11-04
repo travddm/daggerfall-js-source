@@ -1,4 +1,4 @@
-// CHARACTER CHARACTER_MODES: a realm character is created in a mode, the service keeps it on the row, signs it into the identity
+// CHARACTER MODES: a realm character is created in a mode, the service keeps it on the row, signs it into the identity
 // token (`md`, absent for Classic) and shows it on the roster's tile - on the real Worker over the real migrations.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
