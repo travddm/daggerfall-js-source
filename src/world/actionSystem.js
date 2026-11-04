@@ -1377,9 +1377,9 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
    *  inventory. */
   attemptLockpicking(o) {
     if (o.state === 'forward' || o.state === 'reverse') return false;   // IsMoving
-    // LOCKPICK: a host that plays the tumblers takes a lock DFU would roll for - the magic arm below stays DFU's - and its
-    // snapped picks are what a retry costs, so the retry gate is not read for it (Ledger A, LOCKPICK)
-    if (this.onLockpickAttempt && o.currentLockValue < MAGIC_LOCK_THRESHOLD) { this.onLockpickAttempt(o); return false; }
+    // LOCKPICK: a host that plays the tumblers takes a lock DFU would roll for (the magic arm below stays DFU's); its snapped picks
+    // are the retry's cost, so the gate is not read for it. A host that answers false (option off) leaves DFU's roll to this graph
+    if (this.onLockpickAttempt && o.currentLockValue < MAGIC_LOCK_THRESHOLD && this.onLockpickAttempt(o) !== false) return false;
     const skill = this._lockpickSkill();
     if (o.failedSkillLevel === skill) return false;   // the retry gate (:157) - == exactly, so a skill moved EITHER way re-opens it
     if (o.currentLockValue >= MAGIC_LOCK_THRESHOLD) {

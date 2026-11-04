@@ -7077,9 +7077,9 @@ export function createWorldModes(host) {
           }
           // LOCKPICK: the lock's tumblers (scenes/lockpickHost.js frontDoor), DFU's
           // exterior chance their tolerance, where :543-566 rolled it - a lockpick from the pack, its snaps the retry's cost
-          // (the LastLockpickAttempt gate retired). Opened - CG2's tally, the success text, the unlock sound, the host's -
+          // (the LastLockpickAttempt gate is the host's, off the Lockpick puzzle option). Opened - CG2's tally, the success text, the unlock sound, the host's -
           // the door is activated again, `picked`
-          if (!picked) return lockHost.frontDoor({ lock: lockValue, skill: lockpick, key: `front:${locId ?? 0}:${bd.buildingKey}`, enter: () => activateStaticDoor(hit, entries, false, { homeAsked, picked: true }).catch((e) => console.error(e)) });
+          if (!picked) return lockHost.frontDoor({ lock: lockValue, skill: lockpick, place: { locId, buildingKey: bd.buildingKey }, key: `front:${locId ?? 0}:${bd.buildingKey}`, enter: () => activateStaticDoor(hit, entries, false, { homeAsked, picked: true }).catch((e) => console.error(e)) });
           isBrokenIn = true;   // :557 - the pick raises THIS and never buildingUnlocked
         }
         // ROAD-B - THE FIRST BASH ARM (:570-583). "Classic makes a roll

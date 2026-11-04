@@ -93,6 +93,7 @@ export const EXPULSION_TEXT_ID = 668;
 /** DaggerfallDateTime.DaysPerYear, for CalculateDaySinceZero. */
 // AUDIT 24 (wave 24): DaggerfallDateTime's year length, one home.
 import { DAYS_PER_YEAR } from '../gameDate.js';
+import { guildProbationOn } from '../guildProbation.js';   // REP6: off, DFU's first-review expulsion
 
 export { DAYS_PER_YEAR };
 /** UpdateRank's gate: 28 days between rank changes. */
@@ -289,6 +290,10 @@ function baseCalculateNewRank(entity, guild, store) {
   return r - 1;
 }
 
+/** REP6: a review that finds a member below zero gives a probation instead of the expulsion - with the option on, when the member
+ *  is not yet on probation or the standing (with what the Roll owes) is back above the expulsion line. */
+const probationInsteadOfExpulsion = (m, standingWithOwed) => guildProbationOn() && (!m.probation || standingWithOwed >= GUILD_EXPEL_BELOW);
+
 /** UpdateRank (:76-96). Returns what HAPPENED so a caller can show the
  *  right message; DFU returns the message tokens themselves, which is
  *  the same decision made once the port has a text layer.
@@ -316,7 +321,7 @@ export function updateRank(memberships, guild, entity, store, now, ctx = null) {
   const newRank = reviewedRank(m, guild, entity, store, ctx);
   if (!waited && !(newRank > m.rank)) return null;   // PROMO-NOW: inside the 28 days, a promotion alone
   // REP6 (the reputation overhaul, 2026-09-29 - "Guilds: probation below 0, and expulsion only below -10, with a warning
-  // first"): DFU expels a member the first review their standing is below zero - one failed quest's -2 from 0 was out
+  // first"), now the Guild probation option, off by default: DFU expels a member the first review their standing is below zero - one failed quest's -2 from 0 was out
   // ("i got expelled from the mages... it says i dont have reputation"), a timeout's -22 was out with a death squad
   // behind it under Roleplay Realism. A member below zero is put ON PROBATION instead, told so, keeps their rank and
   // has another 28 days; they are expelled only at a review that finds them on probation AND below -10. A standing back
@@ -326,7 +331,7 @@ export function updateRank(memberships, guild, entity, store, now, ctx = null) {
   // spend fast - a member whose quests had earned their way back was expelled before the reward arrived. What is owed
   // counts against the expulsion alone: it renews the probation, and never ends it or buys a rank (the Roll's pace stands).
   const owed = Math.max(0, Number(ctx?.owed) || 0);
-  if (newRank < 0 && (!m.probation || getReputation(store, guild.factionId) + owed >= GUILD_EXPEL_BELOW)) {
+  if (newRank < 0 && probationInsteadOfExpulsion(m, getReputation(store, guild.factionId) + owed)) {
     m.probation = true;
     m.lastRankChange = today;   // the next review is 28 days on
     return { outcome: 'probation', rank: m.rank, textId: null, lines: PROBATION_LINES };
