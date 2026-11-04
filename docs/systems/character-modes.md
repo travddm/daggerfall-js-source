@@ -42,19 +42,24 @@ room per frame. Paths are relative to the repository root.
 ### 1.2 Project Legacy
 
 - Mod `project-legacy`, setting `Enabled` **default true**, and `Legacy.Model` default 0 (Enduring)
-  (`src/systems/modSettings.js:"'project-legacy': Object"`). Together they make every character a family founder whose offline death
+  (`src/systems/modSettings.js:"'project-legacy': Object"`). Together they make every character a family founder whose
+  offline death
   is a toll-and-rise. This is the "default-on rise" decision 23g replaces.
 - A family has one of two models, fixed at founding: `bloodline` (each death final, an heir plays on) or `enduring`
-  (a death costs years, Arkay's toll, until the span is spent) (`src/systems/legacy/family.js:"export const MODELS = Ob"`).
-- Chargen asks the model question when Legacy is on (`src/systems/chargenSession.js:"if (legacyOn()) asks.pus"`, `legacyModelScreen`); the
+  (a death costs years, Arkay's toll, until the span is spent)
+  (`src/systems/legacy/family.js:"export const MODELS = Ob"`).
+- Chargen asks the model question when Legacy is on (`src/systems/chargenSession.js:"if (legacyOn()) asks.pus"`,
+  `legacyModelScreen`); the
   answer is saved as `entity.legacyChoice` (a model, or `none`) (`src/systems/save/save.js:"'legacyChoice',"`).
-- Online, the line lives in `lineages` (`server-account/migrations/0001_schema.sql:"CREATE TABLE lineages ("`), written by
+- Online, the line lives in `lineages` (`server-account/migrations/0001_schema.sql:"CREATE TABLE lineages ("`), written
+  by
   `putLineage`; a realm character is born as a person of a line (`createRealm` with `lineage`/`person`,
   `server-account/src/realm.js:"export async function cre"`). Row columns `lineage_id`, `person_id`.
 - **The tombstone is the permadeath mechanism already.** `realmDie` -> `entomb` stamps `realm_characters.dead_at`
   under the playing tab's lease. From then `joinRealm` returns `dead`, `deleteRealm` refuses, checkpoints and trades
   are refused, and the roster slot is freed (`REALM_CHARACTERS_MAX = 6` counts the living)
-  (`server-account/src/legacy.js:"export async function realmD"`, `realm.js:"export async function jo"`, `realm.js:"export async function de"`). `afterTomb` ends the character's
+  (`server-account/src/legacy.js:"export async function realmD"`, `realm.js:"export async function jo"`,
+  `realm.js:"export async function de"`). `afterTomb` ends the character's
   wedding, frees its item claims (`releaseSteps`), and hands on its guild seat (`legacy.js:"async function afterTomb"`).
 - A held fall: the stamp is made at once, the lease kept aside as `rez_lease` for a Resurrect, and `settleHolds`
   (cron, `legacy.js:"export async function se"`) closes the window.
@@ -63,7 +68,8 @@ room per frame. Paths are relative to the repository root.
 ### 1.3 Trading and value-moving paths
 
 All account-side paths move goods on **realm records** (the character's last checkpoint) in one batch, and all ask the
-judge's hold first: `holdRefusal(row)` -> `trade-held` or `record-unjudged` (`server-account/src/realm.js:"export function holdRefu"`; its
+judge's hold first: `holdRefusal(row)` -> `trade-held` or `record-unjudged`
+(`server-account/src/realm.js:"export function holdRefu"`; its
 comment lists the callers: "a market listing or purchase, a trade's half, a guild's vault or treasury, a rent, a card
 table's stake, a disenchant whose Essence the market sells").
 
@@ -109,7 +115,8 @@ PvP and signs receipts (`docs/multiplayer/group-instances.md`, "A client hosts, 
 Two switches, stored as one value `mode`: `death` in {classic, hardcore, legacy} and `ironman` in {false, true}. The
 five picker entries are: classic = (classic, no); hardcore = (hardcore, no); legacy = (legacy, no); ironman = (classic,
 yes); hardcore_ironman = (hardcore, yes). Legacy plus Ironman is not offered (a family is a social structure, and the
-owner's list has no such entry). The law module exposes the predicates `permadeath(mode)`, `ironman(mode)`, `legacy(mode)`.
+owner's list has no such entry). The law module exposes the predicates `permadeath(mode)`, `ironman(mode)`,
+`legacy(mode)`.
 
 ### 2.1 Rules by mode
 
@@ -169,9 +176,11 @@ character's beneficial spells have none on others (a gift is a trade by another 
 
 ### 3.1 Trading
 
-- **Relay:** the `trade` arm (`server/src/index.js:"if (m.t === 'trade') {"`) drops the frame when the sender's token or the target's token
+- **Relay:** the `trade` arm (`server/src/index.js:"if (m.t === 'trade') {"`) drops the frame when the sender's token or
+  the target's token
   carries Ironman (`md`), as it drops a frame to a peer that is gone: no junk strike, the sender's session times out.
-- **Account service:** one function `modeRefusal(row, other?)` beside `holdRefusal` (`realm.js:"export function holdRefu"`), called wherever
+- **Account service:** one function `modeRefusal(row, other?)` beside `holdRefusal`
+  (`realm.js:"export function holdRefu"`), called wherever
   `holdRefusal` is called and in the mail-with-items, homes transfer, rent and seat-gift routes. It answers
   `{ error: 'ironman' }`. For a two-party act (trade half, market purchase, courier, rent) either side being Ironman
   refuses. The check reads `realm_characters.mode`, never a client field.
@@ -186,7 +195,8 @@ character's beneficial spells have none on others (a gift is a trade by another 
   (`src/net/instanceRoom.js`, `server/src/index.js:"async _instanceKinOf(sub"`).
 - **Abyss copies:** `sdCopyRight` (`server/src/sdCopy.js`) admits an Ironman owner alone and refuses an Ironman
   character entering another's copy.
-- **Raids, serpent, sieges, Royal Tourney, crew signs:** entry checks refuse an Ironman token (`md`), at the Worker as they
+- **Raids, serpent, sieges, Royal Tourney, crew signs:** entry checks refuse an Ironman token (`md`), at the Worker as
+  they
   refuse a closed room today (`gateHolds`, `sdLiveAsk`). Gate rooms are shared, so an Ironman character enters a solo
   copy of the gate, as it does in the Abyss (decided; new content).
 - **Peer effects:** peers' beneficial acts on an Ironman character are dropped at the receiver and by the relay where
@@ -198,7 +208,8 @@ character's beneficial spells have none on others (a gift is a trade by another 
 ### 4.1 The gap
 
 `realmDie` is called by the client's own death door (`legacyHost.onDeath` -> `writeDeath({ hold })`,
-`legacyHost.js:"function onDeath() {"`, route `/v1/realm/die`, `server-account/src/index.js:"if (path === '/v1/realm/d"`). The service checks only the
+`legacyHost.js:"function onDeath() {"`, route `/v1/realm/die`,
+`server-account/src/index.js:"if (path === '/v1/realm/d"`). The service checks only the
 lease. So the client decides. The header's claim that "a tab killed under its death screen escapes nothing"
 covers a tab that reached the door; it does not cover a client that closes the socket at 1 HP and rejoins from its
 last checkpoint (at most the 2-minute checkpoint interval old). That is cheap for any player and trivial for a
@@ -277,7 +288,8 @@ Rules:
 
 ## 6. Creation UI (description only)
 
-A "Character mode" step at the end of chargen, replacing `legacyModelScreen`'s gate (`chargenSession.js:"if (legacyOn()) asks.pus"`). One card
+A "Character mode" step at the end of chargen, replacing `legacyModelScreen`'s gate
+(`chargenSession.js:"if (legacyOn()) asks.pus"`). One card
 per mode, Classic selected and marked "Recommended". Each card has: a name, one line, a Pros list, a Cons list. A
 detail panel on selection shows the rules from section 2 for death, trading and groups in plain words, and the
 change-mode rule from section 5 ("Can be loosened later, never tightened. Cannot be changed after death."). Choosing
@@ -336,7 +348,8 @@ default `Enabled: true` is no longer how a character joins a family; only the Le
 ### 7.3 Token and relay
 
 - New optional token field `md`: 0 classic, 1 hardcore, 2 legacy, 3 ironman, 4 hardcore_ironman. It is minted by
-  `realmMintFacts` (`realm.js:"export async function realmM"`) from the row and added to the token validator and its comment block
+  `realmMintFacts` (`realm.js:"export async function realmM"`) from the row and added to the token validator and its
+  comment block
   (`src/net/identityToken.js`). The relay reads it at the hello and keeps it on the socket attachment.
 - New shared law `src/net/modeLaw.js` (pure; the relay imports only `src/net/*`): `CHARACTER_MODES`, `modeOfCode(md)`,
   `permadeath(m)`, `ironman(m)`, `legacy(m)`, `canDrop(from, to)`.
@@ -346,7 +359,8 @@ default `Enabled: true` is no longer how a character joins a family; only the Le
 - New relay-to-service door `/v1/mod/death-feed` (signature-proven like `/v1/mod/grant-feed`) and the client route
   `/v1/realm/die` gains an optional `receipt`.
 - New account routes: `POST /v1/realm/mode` (a drop), and a read of the Hall of the Fallen (`/v1/realm/fallen`).
-- Every change to a file the relay imports bumps `RELAY_VERSION` (now `world290`, `src/net/wire.js:"export const RELAY_VERSION "`) with the
+- Every change to a file the relay imports bumps `RELAY_VERSION` (now `world290`,
+  `src/net/wire.js:"export const RELAY_VERSION "`) with the
   hash row in `test/net/relayversion.test.js`.
 
 ### 7.4 The mod, its settings and the server's profile
@@ -385,7 +399,8 @@ Sizes: S under 150 lines of diff, M 150-500, L over 500.
 | 7   | Leaderboards per mode: `mode` columns on result rows, a board per mode, badges and titles                                                                                | M    | no         | Depends on 2 and 6.                                                                                                                               |
 | 8   | Mode drops: `/v1/realm/mode`, confirmation UI, badge                                                                                                                     | M    | no         | Depends on 2 and 3.                                                                                                                               |
 
-Order: 1, 2, then 3 and 4 in either order, then 5, 6, 7, 8. PRs 3 to 8 each restate in the PR description what the player
+Order: 1, 2, then 3 and 4 in either order, then 5, 6, 7, 8. PRs 3 to 8 each restate in the PR description what the
+player
 can now feel. Offline Hardcore (decision 2) is a small part of PR 3.
 
 Verification (`verification.md`): each of 4 to 7 is exercised in the running game on two clients through the local
