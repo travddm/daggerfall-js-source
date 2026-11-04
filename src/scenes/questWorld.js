@@ -63,7 +63,7 @@ export function createQuestWorld(host) {
    *  time, WARM_PER_TICK a tick, so asking for work there stands none for the first time. */
   createProvinceWarm({ provinces, regionNow: () => _questRegionIndex(), origin: () => playerTravelOrigin?.() ?? null, schedule: provinces ? idleSchedule() : null }).start();
   /** A dungeon as the quest layer's maps hand it on (AUDIT 28 W4, below: the smaller-dungeon law) - its two location
-   *  doors' and START2's start seam's one sizing. The page flag off `params`, not `onlineOn` - that const is declared
+   *  doors' one sizing. The page flag off `params`, not `onlineOn` - that const is declared
    *  far below, and a quest parsed at chargen asks for its dungeon before it is ("Parsing quest FAILED! Cannot access
    *  'onlineOn' before initialization"). INSTANCES: online a quest's markers are chosen on the dungeon whole - its
    *  instance's layout; AUDIT WORLD34 B2: online, the room's one layout. */

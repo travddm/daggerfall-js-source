@@ -50,8 +50,7 @@ export const SITE_TYPES = Object.freeze({ None: 0, Town: 1, Dungeon: 2, Building
 
 /** START3: A SITE PAST THE BAY KEEPS ITS OWN MAP PIXEL. Every face
  *  finds a Bay site's pixel the way DFU's CanFindPlace does - its region's name lookup in MAPS.BSA, the row's longitude
- *  and latitude - and MAPS.BSA holds no place off the Bay's table (TESA's Arena places, capitals, countryside and lairs,
- *  a province's start). Such a site carries the pixel its location stands on (`worldPixel`, from the same longitude and
+ *  and latitude - and MAPS.BSA holds no place off the Bay's table (TESA's Arena places, capitals, countryside and lairs). Such a site carries the pixel its location stands on (`worldPixel`, from the same longitude and
  *  latitude its synthesized row holds), and the map, the compass and the journal's find read it there. A Bay site
  *  carries none: its SiteDetails stay DFU's, field for field. Not a DFU member: Ledger A (START3). */
 export function siteWorldPixel(location) {
@@ -1048,7 +1047,7 @@ export class Place extends QuestResource {
       regionIndex: location.regionIndex,
       regionName: location.regionName,
       locationName: location.name,
-      ...pastBaySite(location),   // START3: a province's start, past the Bay
+      ...pastBaySite(location),   // START3: a site past the Bay
       // AUDIT 63 F0: SetupFixedLocation (Place.cs:1088-1101) assigns a
       // REAL buildingKey for its SiteTypes.Building arm (:1066) but
       // never a buildingName - so the tombstone's

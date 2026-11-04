@@ -17921,7 +17921,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     NAVAL_DECK_BODY_R, _musicInLocationRect, _questLoc, _questRegionIndex, _questStore, _regionFaction,
     _respawnAtSite, arenaCityPixel, arenaCityStage, blocks, built, cam, collider, exteriorFoePool, exteriorFoes,
     homeLayoutsOnline, maps, navalDeckBody, onlineHomes, params, pipeline, placeByName, player, playerTravelOrigin,
-    playerTravelPixel, provinceQuestPlaces, questSiteMovedHere, talkBuildingCompassDirection, townTalk, walkMode, weatherOverride,   // AUDIT RELEASE R2-5: the places past the Bay (a province's region; START2's start lair among them)
+    playerTravelPixel, provinceQuestPlaces, questSiteMovedHere, talkBuildingCompassDirection, townTalk, walkMode, weatherOverride,   // AUDIT RELEASE R2-5: the places past the Bay (a province's region)
     get _homeLayoutsApplied() { return _homeLayoutsApplied; },
     get _liveSharer() { return _liveSharer; },
     get _locationRevealedByMapItem() { return _locationRevealedByMapItem; },
