@@ -212,7 +212,8 @@ The sea's AI ships are never saved: they are rolled again from the waters and th
   `test/systems/shipyards1*.test.js`, `test/systems/wa1_warmAshesShips.test.js`.
 - Harnesses: `test/csaScene.mjs` runs the real Come Sail Away runtime; `test/navalSea.mjs` and `test/navalRoom.mjs`
   build a sea and an online room for the naval host.
-- In game: buy a boat at a port's shipyard, turn on Naval Combat in the Features home, sail out and fight. Online has boats and cargo but no sea fight.
+- In game: buy a boat at a port's shipyard, turn on Naval Combat in the Features home, sail out and fight. Online has
+  boats and cargo but no sea fight.
 
 ## Known limits and traps
 
