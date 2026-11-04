@@ -53,7 +53,7 @@ test('TELL8: the record\'s law - the wind-up\'s four fields together (its shape 
   for (const ws of [0, 3, '1', true]) assert.equal(validFoeRecord({ ...base, ws }), null, `ws ${ws}`);
   assert.equal(WIRE_LAND_MS, FOE_WINDUP_MS, 'the writer\'s ceiling is the reader\'s');
   assert.deepEqual([...WIRE_KINDS], ['lunge', 'sweep', 'slam', 'ring', 'charge', 'leap', 'aimed']);
-  assert.equal(RELAY_VERSION, 'world290');
+  assert.equal(RELAY_VERSION, 'world291');
 });
 
 test('TELL8: the owner\'s word - a live wind-up\'s shape, iron and feint flags, yaw, landing in ms (clamped), origin through the record\'s projection and point; none for a cut feint, a landed blow or a puppet; the stagger and the overreach; the dedupe key never carries `wl` (mutants: a flag dropped; wl in the key)', () => {
@@ -268,8 +268,8 @@ test('TELL8: the blow\'s class - its K, its back flag and its weakness flag as o
   assert.equal(hitClassOf({}), null);
   // judged against the puppet: K by its kind and weapon, my feet behind its facing
   const ai = { _tac: { puppet: true, state: 'windup', blow: makeBlow('lunge', [0, 0, 0], 0, 10) } };
-  assert.deepEqual(blowClassOf(ai, { kind: 'melee' }, [0, 0, 2]), { k: TELL.K_HANDS, back: false, weak: false });
-  assert.deepEqual(blowClassOf(ai, { kind: 'arrow' }, [0, 0, -2]), { k: TELL.K_ARROW, back: true, weak: false });
+  assert.deepEqual(blowClassOf(ai, { kind: 'melee' }, [0, 0, 2]), { k: TELL.K_HANDS, back: false });
+  assert.deepEqual(blowClassOf(ai, { kind: 'arrow' }, [0, 0, -2]), { k: TELL.K_ARROW, back: true });
   assert.equal(blowClassOf({ _tac: { state: 'engage' } }, { kind: 'melee' }, [0, 0, 2]), null, 'not winding up: no class');
   // the owner's door
   const foe = () => ({ entity: { health: 100, maxHealth: 100 }, ai: { feet: [0, 0, 0], _tac: { state: 'windup', blow: makeBlow('lunge', [0, 0, 0], 0, 10) } } });

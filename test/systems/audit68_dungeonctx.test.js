@@ -31,7 +31,6 @@ import { sayEnemyDied, createCorpsePrefabs, corpseTextureOf } from '../../src/sc
 import { eliteCorpseSize, isEliteCorpse, markEliteCorpseBatch } from '../../src/systems/eliteFoes.js';   // ELITE FOES: the corpse chain's own imports, the real ones (no elite here: the size and batch as they were)
 import { effectiveLevel } from '../../src/systems/mentorMode.js';   // SOFTCAP2: the mentor's level the spawn sites read (a free name there, the module's own import)
 import { blowClassOf } from '../../src/ai/puppetBlows.js';   // AUDIT FEUD: the hit door builds a blow's class whenever its weakness rides (the real one - no wind-up here, no weakness: none)
-import { feudWeakBlow } from '../../src/systems/feudLedger.js';   // AUDIT FEUD: ...asked of the real test (none registered here: no weakness)
 import { ARENA_PUPPET_OWNER } from '../../src/net/arena/arenaLaw.js';   // ARENA4: the kill door's puppet test, the real owner word (no puppet here)
 import { markOutCold } from '../../src/systems/survival/needs.js';   // AUDIT C&C N2: the dungeon's collapse marks its hour
 import { ROOM_LOOT_OFF } from '../roomLootOff.mjs';   // PARTY-LOOT: the room's seams with no room
@@ -106,7 +105,7 @@ function killHarness({ foes, foeDeps = null, getTexture = async () => ({ recordC
   const log = { deaths: 0, chimes: 0, freed: [], minted: 0, hud: [] };
   const state = {
     ...ROOM_LOOT_OFF,
-    foes, foeDeps, ARENA_PUPPET_OWNER, blowClassOf, feudWeakBlow, _authority: true, _layoutFoes: foes.length, opts: {}, lastPlayerFeet: [0, 0, 0], _ecvT: 0, _ctxDead: false,
+    foes, foeDeps, ARENA_PUPPET_OWNER, blowClassOf, _authority: true, _layoutFoes: foes.length, opts: {}, lastPlayerFeet: [0, 0, 0], _ecvT: 0, _ctxDead: false,
     playerEntity: { isPlayer: true, items: [], luck: 50 },
     markFoeStruck: () => {}, markConcealedHit: () => {}, makeEnemiesHostile: () => {}, peerCandidate: () => null, renownFoeStruck, renownFoeDied, reportPlayerKill,   // RENOWN1: the kill door's two stamps, the real ones (no handler: nothing paid)
     partyFoeLoses, noteFighter, foeFighters, takeWholeBlow, PARTY_ME, registerFoeDoor, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame,   // BOSS-TRAITS: the door's two halves   // PSCALE1: the real weight - only my own blows land here, so every foe fights one and every blow lands whole

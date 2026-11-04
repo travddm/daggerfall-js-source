@@ -383,7 +383,7 @@ export function createTamrielPlaces(host) {
   /** LAIR-WORLD: THE LAIR A PIXEL PAST THE BAY HOLDS, as the build stands it - its cell's one site (lairSite), rolled
    *  and planned, on a pixel no capital, Arena place or countryside place takes first (lairOfCell, lairsNear's own row):
    *  `{ mapId, name, px, py, type, dungeonType }`, or null - on the Bay, off a cell's site, or none stands. Kept with the
-   *  cells, the same on every client. The revenants' lairs (scenes/lairHost.js) and the boards' dungeons (world.js
+   *  cells, the same on every client. The boards' dungeons (world.js
    *  createBountyHost's dungeonAt) read it past the Bay as they read MAPS.BSA's rows on it. */
   function lairAt(px, py) {
     if (!_lairTemplates || !Number.isInteger(px) || !Number.isInteger(py) || inBay(px, py)) return null;
@@ -393,7 +393,7 @@ export function createTamrielPlaces(host) {
     return s.px === px && s.py === py ? lairOfCell(c, s) : null;
   }
   /** LAIR-WORLD: that lair laid out as it would stand, NOT stood (lairCloneOf) - what the lair door lays to ask whether
-   *  the player can go down into it (a graveyard's template may place no door: scenes/lairHost.js LAIR-DOOR); or null. */
+   *  the player can go down into it; or null. */
   const lairCloneAt = (px, py) => { const at = lairAt(px, py) ? lairRollAt(px, py) : null; return at ? lairCloneOf(at, px, py) : null; };
   /** LAIR-WORLD: does a place stand on a pixel past the Bay - a capital's, an Arena place, the countryside's or a lair - as
    *  a board's hunt ground asks of it (the Bay's: the game's own rows' pixels). */

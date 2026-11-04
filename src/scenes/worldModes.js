@@ -215,8 +215,6 @@ import { STATIC_NPC_ACTIVATION_DISTANCE, DEFAULT_ACTIVATION_DISTANCE, RAY_DISTAN
 // PlayerActivate.ActivateBulletinBoard (:706-739) - the town sign's arm
 import { BULLETIN_BOARD_ACTIVATION_DISTANCE, bulletinBoardRows } from '../systems/bulletinBoard.js';
 import { applyDeathPenalty, deathPenaltyText } from '../systems/deathPenalty.js';   // DEATH-PENALTY: the in-place respawn is an online death too
-import { revenantTakes } from '../systems/revenant/revenant.js';   // AUDIT FEUD (RVN8): the in-place respawn's theft, as the world host's
-import { endPlayerFights } from '../systems/harmMark.js';   // AUDIT FEUD (RVN10): ...and its fights ended
 import { tokenRows } from '../ui/messageBox.js';
 import { showsJoinButton, serviceAccess, onPushEffects, rankNeedsLines, wayBackLines, NO_POTION_INGREDIENTS, isServiceBox, SERVICE_LABEL, SERVICE_DESTINATION } from '../systems/guild/guildServiceFlow.js';
 import { USE_TEXT, expandItemMacro } from '../systems/useItem.js';   // AUDIT 63 F42: IsPotionRecipe (DaggerfallUnityItem.cs:344-347); RR1: the light's own "You douse the %it."
@@ -1431,7 +1429,6 @@ export function createWorldModes(host) {
       spellsByIndex,
       magicHooks: magic ? {
         explodeAt: (...a) => magic.explodeAt(...a),
-        strikePlayer: (spell, casterLevel, foe) => magic.strikePlayerFrom(spell, casterLevel, foe),   // RVN5: a revenant's pyre - its blast on me through the one cast engine
         // world.js's arm, minus its walk-mode gate: the interior frame
         // runs magic.update itself, so a missile loosed here flies.
         fireMissile: (from, spell, casterLevel, foe, aimAt = null) => {   // AUDIT WORLD6b-iii(a) C3: the aim point the executor hands, my LIVE transform otherwise (AUDIT 62 F21) - world.js's law through the ONE helper
@@ -1518,7 +1515,7 @@ export function createWorldModes(host) {
     hurt: (n, o) => {
       if (n <= 0) return;
       const fp = o?.fromPlayer ?? fromPlayer;   // AUDIT 68 review: a round's tick says whose it is (effects.js runEffectRound)
-      if (foe._encounter) interiorFoes?.damageFoe(foe, n, player.pos, null, { fromPlayer: fp, kind: 'spell', whole: !!o?.whole, round: !!o?.round, element: o?.element ?? null });   // TELL1: a later round weighs nothing on a wind-up; RVN3: a Disintegrate's kill a kill (world.js's line), a landing's element
+      if (foe._encounter) interiorFoes?.damageFoe(foe, n, player.pos, null, { fromPlayer: fp, kind: 'spell', whole: !!o?.whole, round: !!o?.round, element: o?.element ?? null });   // TELL1: a later round weighs nothing on a wind-up
       else interiorGuards?.hurtGuard(foe, n, player.pos, null, { fromPlayer: fp, kind: 'spell', round: !!o?.round });
     },
     heal: (n) => { if (n > 0) foe.entity.health = Math.min(foe.entity.maxHealth ?? Infinity, foe.entity.health + n); },
@@ -8708,12 +8705,9 @@ export function createWorldModes(host) {
                 reviveForPlay(playerEntity, { force: true });   // DEATHLOOP1: the drains go with the heal
                 surfacePlayer();
                 const goldLost = applyDeathPenalty(playerEntity);   // DEATH-PENALTY: Privateer's Hold is an online death like any other; BAL4: and an offline Legacy rise pays the same tenth (the screen stated it)
-                endPlayerFights();   // AUDIT FEUD (RVN10): the death ended every fight
-                const took = online ? revenantTakes(playerEntity, { online: true }) : null;   // AUDIT FEUD (RVN8, Feud-Arc.md 19): its killer's theft, once a death - the world host's respawn's own
                 const rise = legacyRise ? host.legacyRiseLine?.() ?? null : null;   // AUDIT LEGACY B5: the toll's word, the outcome presented
                 ctx.clearDeathOverlay?.();
                 if (goldLost > 0) say(deathPenaltyText(goldLost));
-                if (took?.line) say(took.line);
                 if (rise) say(rise);
                 return true;
               }
@@ -10151,7 +10145,7 @@ export function createWorldModes(host) {
         // host's sinks do (`insideFoeSinks`), so a killed watchman
         // runs the crime and the corpse in the pool that owns it.
         dealDamage: (f, d) => (f._encounter
-          ? interiorFoes?.damageFoe(f, d, player.pos, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })   // AUDIT FEUD 2: the bow (a metal weakness rides to a puppet's owner)   // WORLD6b-iii(e): the kind rides the hit
+          ? interiorFoes?.damageFoe(f, d, player.pos, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })   // WORLD6b-iii(e): the kind rides the hit
           : interiorGuards?.hurtGuard(f, d, player.pos, m.dir, { kind: 'arrow' })),   // TELL1: a shaft's weight on a wind-up
         audio, hitEffects: interiorHitEffects, say: (l) => say(l),
         onInflictPoison: (att, tgt, pt) => (t._encounter ? interiorFoes?.poisonFoe(t, pt) : inflictPoison(tgt, pt, false, { currentMinute: Math.floor(interiorTicker.ownMinutes) })),   // WORLD6b-iii(e): the pool's one poison door, split by pool as the damage door above

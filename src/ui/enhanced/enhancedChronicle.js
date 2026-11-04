@@ -30,7 +30,6 @@ import { followOn, trackButton } from '../quest/questTracker.js';   // GUIDE4: t
 import { breakableNote, filedOutcome } from '../../systems/notebook.js';   // JOURNAL1: a note the notebook's wrap can take, whatever was typed; AUDIT QUESTLINES UI-5: an archived quest's outcome
 import { pageOfNote, pageRefusalText } from '../../net/journalPage.js';   // JOURNAL1: a note as the page it would be shown as, or why it cannot be
 import { isBountyQuestId, abandonBountyQuest, shareBountyQuest, bountyQuestShareable } from '../../systems/bounty/bountyJournal.js';   // BOUNTY1: a bounty's Abandon and Share
-import { isHuntQuestId, abandonHuntQuest } from '../../systems/huntJournal.js';   // RVN7c: a revenant's hunt - its Abandon
 import { t } from '../../systems/textManager.js';   // L10N4: QUEST-SHELF-MAIN's words in the player's language, read when they are drawn
 
 const el = (tag, cls, text) => {
@@ -591,25 +590,11 @@ function paint() {
           };
           top.append(ab);
         }
-        // RVN7c (18.3): a hunt's Abandon (twice), its lair forgotten - never a share
-        if (section === 'quests' && isHuntQuestId(e.uid)) {
-          const armed = bountyArmed === e.uid;
-          const ab = el('button', 'cr-rm cr-share', armed ? 'Click again' : 'Abandon');
-          ab.title = 'Give up this hunt';
-          ab.setAttribute('aria-label', armed ? 'Click again to give up this hunt' : 'Abandon this hunt');
-          ab.onclick = () => {
-            if (bountyArmed !== e.uid) { bountyArmed = e.uid; render(); return; }
-            bountyArmed = null;
-            abandonHuntQuest(e.uid);
-            render();
-          };
-          top.append(ab);
-        }
         // QUEST-SHELF-MAIN: every other running
         // quest's Abandon (twice, BOUNTY1's arming) - QUEST-SHELF's own door (scenes/quest/questBridge.js journalClean.abandon:
         // set aside, kept, reclaimed from the pause window's Quests tab), drawn where it may be (`canAbandon` - never the
-        // main story's, a raid the sea runs, or one ending). A bounty's and a hunt's keep their own above.
-        const clean = section === 'quests' && e.uid != null && !e.main && !isHuntQuestId(e.uid) && !isBountyQuestId(e.uid)
+        // main story's, a raid the sea runs, or one ending). A bounty's keeps its own above.
+        const clean = section === 'quests' && e.uid != null && !e.main && !isBountyQuestId(e.uid)
           ? deps.shelfDoor?.() : null;
         if (clean?.abandon && clean.canAbandon?.(e.uid)) {
           const armed = bountyArmed === `q:${e.uid}`;
@@ -627,7 +612,7 @@ function paint() {
         // QUEST-RESET (LostMyLeg: "an option that can fully reset a quest"): a running quest's Restart (twice, the same
         // arming) - the quest started again from its first step (scenes/quest/questBridge.js journalClean.restart), drawn where
         // it may be (`canRestart` - the main story's steps among them; never one a questor gave, nor the world's own)
-        const reset = section === 'quests' && e.uid != null && !isHuntQuestId(e.uid) && !isBountyQuestId(e.uid) ? deps.shelfDoor?.() ?? null : null;
+        const reset = section === 'quests' && e.uid != null && !isBountyQuestId(e.uid) ? deps.shelfDoor?.() ?? null : null;
         if (reset?.restart && reset.canRestart?.(e.uid)) {
           const armed = bountyArmed === `r:${e.uid}`;
           const rs = el('button', 'cr-rm cr-share', armed ? t('chronicle.quests.restartArmed', 'Click again') : t('chronicle.quests.restart', 'Restart'));
@@ -641,7 +626,7 @@ function paint() {
           };
           top.append(rs);
         }
-        if (section === 'quests' && e.uid != null && !e.main && !isBountyQuestId(e.uid) && !isHuntQuestId(e.uid)
+        if (section === 'quests' && e.uid != null && !e.main && !isBountyQuestId(e.uid)
           && (deps.partyMembers?.() ?? []).length) {
           const share = el('button', 'cr-rm cr-share', 'Share');
           share.title = 'Share this quest with your party';
