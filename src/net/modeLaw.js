@@ -72,3 +72,13 @@ const DROPS = Object.freeze({
 /** The modes a character may drop to now. */
 export const dropsFrom = (/** @type {unknown} */ from, /** @type {{ dead?: boolean }} */ at = {}) =>
   CHARACTER_MODES.filter((to) => canDrop(from, to, at));
+
+/** A token's mode claims, whole: `md` only beside a realm character (`rc` 1) and only a non-Classic code of the table. */
+export const modeClaimsOk = (/** @type {any} */ c) => c?.md === undefined || (c.rc === 1 && c.md !== 0 && modeOfCode(c.md) !== null);
+
+/** The token code the mint signs for a character's mode: none for Classic (the bytes as before) or a value that is no mode. */
+export const tokenCodeOf = (/** @type {unknown} */ m) => (isMode(m) && m !== DEFAULT_MODE ? codeOf(/** @type {string} */ (m)) : null);
+
+/** The mode a create request means: the one it names, else the build from before the modes - a line's birth is the
+ *  Legacy mode, any other Classic. The caller still checks it with `isMode`. */
+export const modeOfRequest = (/** @type {unknown} */ named, /** @type {boolean} */ born) => (named == null ? (born ? 'legacy' : DEFAULT_MODE) : named);
