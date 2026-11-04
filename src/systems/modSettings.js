@@ -8,6 +8,7 @@
 // in-memory where there is not, so the worker and node both read
 // defaults without a DOM.
 
+import { CHARACTER_MODES_SETTINGS } from './characterModesSettings.js';
 import { appStorage } from './appStorage.js';   // the one storage seam - localStorage lives there alone
 import { onlineForcedModSetting, onlineWholeModKey } from './online/onlineLane.js';   // MODS-ONLINE-2: online, the room's ground is forced and every other switch is the player's; REALM P0.2: and the balance mods whole
 import { FOOT_SKIN_COUNT, CLASS_SKINS, classSkinLabel } from '../player/classSkins.js';   // SKIN2: the class skins past the mod's sixteen
@@ -37,8 +38,8 @@ const EOTB_VIEWS = lazyWords(() => t('mods.eyeOfTheBeholder.option.dontChange', 
  *  True") is reworded for a player - an inert key says "Has no effect" and why. A description that already read plainly
  *  is still the mod's own; the tests pin each reworded one by its words. */
 export const MOD_SETTINGS = Object.freeze({
-  // DS1: DYNAMIC SKIES 2.3.4 (BadLuckBurt and carademono). Its own two
-  // sections, names and descriptions as modsettings.json ships them
+  'character-modes': CHARACTER_MODES_SETTINGS,   // CHARACTER MODES: its own file (characterModesSettings.js)
+  // DS1: DYNAMIC SKIES 2.3.4 (BadLuckBurt and carademono). Its own two sections, names and descriptions as modsettings.json ships them
   // (FogDensity/densitySetting; SnowSizeAndNumberOfParticles/*), plus
   // `Enabled`, which is the port's: DFU enables a mod by listing it, and
   // the port has no mod list, so the whole sky is one switch here. A
@@ -1537,22 +1538,20 @@ export const MOD_SETTINGS = Object.freeze({
       'Hotkeys.SummonTransport': Object.freeze({ default: 'Alpha6', text: true, get description() { return t('mods.horseCartAndCargo.Hotkeys.SummonTransport.description', 'Brings your horse and wagon to you when you’re outdoors. Click it and press a key to change it; \u2715 clears it.'); } }),   // KB1: not read by the mod any more - the key is the registry's action (inputActions.js MOD_ACTIONS); a player's saved value is carried there once (migrateKeyBinds)
     }),
   }),
-  // LEGACY1:
-  // PROJECT LEGACY 0.4.1 (Lattymoy, Ghð§† and Positronico). The mod's own "Family" section, its names and descriptions
+  // LEGACY1: PROJECT LEGACY 0.4.1 (Lattymoy, Ghð§† and Positronico). The mod's own "Family" section, its names and descriptions
   // as modsettings.json ships them (vendor/project-legacy/modsettings.json) - but B14: the mod shipped Max Siblings 0
   // and Siblings Probability 0, so a fresh install never rolled a sibling; the port ships 2 and 50. Its "Input" section
   // (the G key and the second key) is the keybinding registry's (KB1, inputActions.js MOD_ACTIONS: LegacyFamily). The
   // "Legacy" section is the port's own: the model a family founded without the chargen's answer takes, Arkay's toll in
   // an Enduring family, the heirloom's chance at a Bloodline death, and whether the family stands in the world
-  // (LEGACY-HOME). `Enabled` is the port's (MO1: on).
+  // (LEGACY-HOME). `Enabled` is the port's, the master switch of the Legacy character mode (CHARACTER MODES: off by default).
   'project-legacy': Object.freeze({
     title: 'Project Legacy',
     author: 'Lattymoy, Gh\u00f0\u00a7\u2020 and Positronico',
     keys: Object.freeze({
       Enabled: Object.freeze({
-        default: true,
-        description: 'A family, a family tree and an heir to carry on your line. In a Bloodline house each death is final; '
-          + 'in an Enduring one it costs years.',
+        default: false,
+        description: 'The master switch for the Legacy character mode: a family and an heir to carry on your line. While it is off the mode is not offered.',
       }),
       'Family.Descendants': Object.freeze({ default: 0, options: Object.freeze(['Random Descendants', 'Always have descendants']), description: 'Whether you always have descendants, or only sometimes.' }),
       'Family.Max Siblings': Object.freeze({ default: 2, min: 0, max: 10, description: 'Most siblings you can have.' }),

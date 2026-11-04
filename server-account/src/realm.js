@@ -44,7 +44,7 @@
 // no route takes a player id from a caller.
 // ═══════════════════════════════════════════════════════════════════
 
-import { isMode, tokenCodeOf, modeOfRequest, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
+import { isMode, tokenCodeOf, modeOfRequest, creatableModes, offeredFromList, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
 import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
@@ -215,11 +215,11 @@ async function freeOthers({ db }, /** @type {string} */ playerId, /** @type {str
  * `{ id, lease, seq }` or `{ error }`.
  * @param {any} ctx @param {string} playerId @param {{ name: unknown, summary?: unknown, lineage?: unknown, person?: unknown }} at
  */
-export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null, mode = undefined }) {
+export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null, mode = undefined, profile }) {
   const n = realmNameOf(name);
   const born = lineage != null || person != null;
   const chosen = modeOfRequest(mode, born);
-  const refused = createRefusal(playerId, n, born, chosen);
+  const refused = createRefusal(playerId, n, born, chosen, profile);
   if (refused) return refused;
   if (born && Number.isSafeInteger(person)) {
     // LEGACY7: A BIRTH WHOSE FIRST SAVE NEVER LANDED is taken up again - the same row, a new lease -
@@ -251,9 +251,10 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
 
 /** What createRealm refuses before it writes: no account or name ('body'); and, CHARACTER MODES, a mode that is no mode or
  *  does not agree with the birth - the Legacy mode is born of a line and no other mode is ('mode'). */
-function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen) {
+function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen, /** @type {unknown} */ profile) {
   if (!playerId || !n) return { error: 'body' };
-  return !isMode(chosen) || born !== legacyMode(chosen) ? { error: 'mode' } : null;
+  if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
+  return creatableModes(offeredFromList(profile)).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
 }
 
 /**

@@ -29,7 +29,7 @@ import { ChargenFlow } from '../../../src/ui/chargen.js';
 import { ChoiceScreen } from '../../../src/ui/choiceScreen.js';
 import { SKILLS } from '../../../src/systems/skills.js';
 import { LEGACY_MOD } from '../../../src/systems/legacy/family.js';
-import { setModSetting } from '../../../src/systems/modSettings.js';
+import { setModSetting, modSetting } from '../../../src/systems/modSettings.js';
 import { entryTarget, targetWords, WHERE_TEXT } from '../../../src/ui/quest/questLens.js';
 import { canFindPlace } from '../../../src/ui/travel/travelMapWindow.js';
 import { HeldMapWindow } from '../../../src/ui/heldMap.js';
@@ -338,15 +338,20 @@ function madeTo(startChoice, race = 0) {
 }
 
 test('AUDIT STARTS P4 the chargen door hands the page the race the wizard made - a Nord\'s homeland, Skyrim, first and the answer of a page torn down - and asks it after the Project Legacy question (mutants: the race unread, the page asked first)', () => {
+  setModSetting('character-modes', 'Enabled', true);   // CHARACTER MODES: this file plays DFU's machine, every mod off
   const nord = madeTo({ open: () => true }, 2);
-  assert.ok(nord.w.questionPrompt instanceof StartChoiceScreen, 'the page, the only question with Project Legacy off');
+  assert.ok(nord.w.questionPrompt instanceof ChoiceScreen, 'the mode question first');
+  nord.w.input('Enter');
+  assert.ok(nord.w.questionPrompt instanceof StartChoiceScreen, 'the page, the only question after it with Project Legacy off');
   assert.equal(nord.w.questionPrompt.options[nord.w.questionPrompt.cursor].id, 'Skyrim', 'the Nord\'s homeland');
   nord.w.dispose();
   assert.equal(nord.result().startKey, 'Skyrim', 'torn down: the homeland\'s');
   setModSetting(LEGACY_MOD, 'Enabled', true);
   try {
     const both = madeTo({ open: () => true }, 2);
-    assert.ok(both.w.questionPrompt instanceof ChoiceScreen, 'the Project Legacy question first');
+    assert.ok(both.w.questionPrompt instanceof ChoiceScreen, 'the mode question first');
+    both.w.input('char:3');
+    assert.ok(both.w.questionPrompt instanceof ChoiceScreen, 'the Project Legacy question next, for the Legacy mode');
     both.w.input('Enter');
     for (let i = 0; i < 3 && !(both.w.questionPrompt instanceof StartChoiceScreen); i++) both.w.input('Enter');
     assert.ok(both.w.questionPrompt instanceof StartChoiceScreen, 'the page after it, last');
