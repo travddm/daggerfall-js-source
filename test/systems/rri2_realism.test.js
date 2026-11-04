@@ -124,6 +124,7 @@ test('RRI2 conditionBasedPrices: CalculateCost scales the base by the condition,
   assert.equal(conditionRepairCostBase(1000, 50, 100, false), 300, '0.6 * (100 - 50) / 100 of 1000');
   assert.equal(conditionRepairCostBase(1000, 50, 100, true), 450, 'InstantRepairs: 0.9');
   assert.equal(conditionRepairCostBase(1, 99, 100, false), 1, 'floored at 1');
+  setModSetting('roleplay-realism-items', 'conditionRepairPrice', true);   // DFU-GAPS EL25: the damage-scaled price is an option, off as shipped
   assert.equal(calculateItemRepairCost(1000, 10, 50, 100, { instantRepairs: false }), 600, '300 through CalculateCost at quality 10');
   assert.equal(calculateItemRepairCost(1000, 10, 100, 100, { instantRepairs: false }), 0, 'free at full condition, both laws');
   // the loot roll: armor, weapons, books - not artifacts, not ingredients
@@ -486,7 +487,7 @@ test('RRI2 wiring: the install registers the six delegates; the read-through sit
   assert.match(rd('src/systems/inventory.js'), /if \(isRriStackable\(item\)\) return true;/);
   assert.match(rd('src/systems/shopStock.js'), /let cost = conditionBasedPricesOn\(\) \? conditionCostBase\(baseValue, conditionPercentage\) : baseValue;/);
   assert.match(rd('src/systems/tradeModes.js'), /calculateCost\(counterValueOf\(item\), quality, priceAdjustment, saleConditionPercentage\(item, \{ online \}\)\) \* stack;/, 'the Sell arm passes ConditionPercentage (:462) - offline as it is, online the find and a third of its owner\'s own mends past it (SELL-AS-FOUND, MEND-THIRD - test/systems/sell_as_found.test.js, mend_third.test.js)');   // PIN MOVED (CRAFT-WORTH): the value the counter pays on (tradeModes.js counterValueOf)
-  assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
+  assert.match(rd('src/systems/repairService.js'), /conditionRepairPriceOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingSpells\(setIndex, spellsByIndex, result\.career\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingEquipment\(playerEntity, \{ classIndex: result\.careerIndex/);
   // ctx (a hand of a pair: the striking hand and the strike's tempo - the clock the machine runs on)

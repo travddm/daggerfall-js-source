@@ -152,6 +152,8 @@ export function conditionRepairCostBase(baseItemValue, condition, max, instantRe
   return Math.max(Math.trunc(baseItemValue * conditionFactor), 1);
 }
 export const conditionBasedPricesOn = () => rriModule('conditionBasedPrices');
+/** DFU-GAPS EL25: the mod's repair price (damage-scaled) is its own switch, off by default - DFU's flat tenth is the price. */
+export const conditionRepairPriceOn = () => conditionBasedPricesOn() && rriModule('conditionRepairPrice');
 
 // ---- storeQualityItemCondition ---------------------------------------
 /** StoreQualityItemCondition (:280-310): the low end of the condition

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { calculateItemRepairCost, dfuItemRepairCost } from '../../src/systems/repairService.js';
-import { PORT_DEFAULTS } from '../../src/systems/settings/settings.js';
+import { PORT_DEFAULTS, getBool } from '../../src/systems/settings/settings.js';
 import {
   mintFieldRepairKit, useRepairKit, repairKitUse, kitMends, FIELD_KIT, maybeAddFieldKit, installSmithing,
   FIELD_KIT_PILE_CHANCE, FIELD_KIT_ENEMY_CHANCE,
@@ -22,8 +22,9 @@ test('B4: a repair costs the DFU price, never under 1 - and nothing at full cond
   assert.equal(calculateItemRepairCost(300, 10, 500, 1000, { reducedRepairCost: () => 0 }), 0, 'a guild free repair stays free');
 });
 
-test('REPAIR-EASE: InstantRepairs is the port\'s default', () => {
-  assert.equal(PORT_DEFAULTS.Controls.InstantRepairs, 'True');
+test('DFU-GAPS EL26: InstantRepairs and AllowMagicRepairs ship as DFU ships them - off', () => {
+  assert.deepEqual([PORT_DEFAULTS.Controls.InstantRepairs, PORT_DEFAULTS.Controls.AllowMagicRepairs], [undefined, undefined]);
+  assert.deepEqual([getBool('Controls', 'InstantRepairs'), getBool('Controls', 'AllowMagicRepairs')], [false, false]);
 });
 
 const sword = (material, cond = 20, max = 100) => ({ group: 'Weapons', material, currentCondition: cond, maxCondition: max });

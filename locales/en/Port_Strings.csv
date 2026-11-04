@@ -3432,6 +3432,7 @@ mods.roleplayRealismItems.Enabled.description,"Adds 2 new weapons and light and 
 mods.roleplayRealismItems.alchemistPotions.description,"Adds random potions for sale at alchemist stores, for a premium price"
 mods.roleplayRealismItems.bandaging.description,"Allows bandages to stack, and to be used for healing based on medical skill"
 mods.roleplayRealismItems.conditionBasedPrices.description,"Item prices are based on condition and loot you find can be quite worn out"
+mods.roleplayRealismItems.conditionRepairPrice.description,"A smith charges for the damage on an item and not a flat tenth of its value. Needs condition based prices"
 mods.roleplayRealismItems.lootRebalance.description,"Rebalances loot on mobs and in piles"
 mods.roleplayRealismItems.newArmor.description,"Adds new chest, arm, leg and foot armor pieces to the game"
 mods.roleplayRealismItems.newWeapons.description,"Adds two new weapons to the game, Archers Axe and Light Flail"
