@@ -2,10 +2,10 @@
 // MAP OVER THE REAL RELAY (the harness of staffpanel5live_e2e.test.js): the game's map link (net/staffMap.js) on the
 // game's own minter, in another region's channel, hands the panel that region's travellers' marks - and only on a hidden
 // token: a game whose Hide me is off sends none, says `hide`, and no player in the region ever learns a staff link came.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { fakeRooms, roomSigner } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, roomKeyFor } from '../../src/net/online.js';
 import { reconnectWave } from '../../src/net/reconnectWave.js';
 import { SOCIAL_ROOM, PIXEL_UNITS, isSocialRoom } from '../../src/net/wire.js';
@@ -15,6 +15,7 @@ import { createStaffFollowHost, staffFollowOnPage } from '../../src/scenes/staff
 import { staffHookDoor } from '../../src/net/staffHook.js';
 import { REGION_NAMES } from '../../src/formats/mapsTables.js';
 import { CHAT_REGION_PREFIX } from '../../src/net/wire.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn, log: console.log }; console.info = console.warn = console.log = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 const turn = () => new Promise((r) => setImmediate(r));

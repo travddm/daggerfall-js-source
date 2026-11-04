@@ -6,10 +6,10 @@
 // with the staff body standing in its room or out of every room (the host's half while a follow is locked). Before the
 // fix every case put the staff game offline: the hook's hub link said hello with the game's own id and secret, and the
 // relay replaced the game's World tab (CLOSE_REPLACED, "online in another tab, window or device").
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { fakeRooms, roomSigner } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, roomKeyFor } from '../../src/net/online.js';
 import { reconnectWave } from '../../src/net/reconnectWave.js';
 import { SOCIAL_ROOM, PIXEL_UNITS, isSocialRoom } from '../../src/net/wire.js';
@@ -20,6 +20,7 @@ import { relinkGame } from '../../src/scenes/staffFollowHost.js';
 import { mintToken, mintFreezeOrder } from '../../src/net/identityToken.js';
 import worker from '../../server/src/index.js';
 import { SAFE_LAW_PATH } from '../../server/src/relay.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn, log: console.log }; console.info = console.warn = console.log = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 const turn = () => new Promise((r) => setImmediate(r));
