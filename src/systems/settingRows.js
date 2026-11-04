@@ -3,3 +3,4 @@
 export { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
 export { CRIME_RECOVERY_ROW } from './crimeRecoveryRow.js';
 export { HUMANOID_LOOT_ROW } from './humanoidLootRow.js';
+export { REPAIR_PRICE_ROW } from './repairPriceRow.js';
