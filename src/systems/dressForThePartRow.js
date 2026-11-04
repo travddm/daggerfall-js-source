@@ -1,7 +1,7 @@
 // @ts-check
 // DRESS1: the Features row for the clothing reaction (systems/dressForThePart.js reads its pref). Off is DFU's: what you wear
 // changes nothing. On, common clothes please commoners, fine clothes the nobility and priest robes the temples. Forced off
-// online. Its own file keeps systems/features.js from growing.
+// online.
 import { t } from './textManager.js';
 
 export const DRESS_FOR_THE_PART_ROW = Object.freeze({

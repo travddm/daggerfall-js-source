@@ -1,7 +1,7 @@
 // @ts-check
 // REP6: the Features row for the guild probation (systems/guildProbation.js reads its pref). Off is DFU's: the first review
 // that finds your reputation below zero expels you. On, you get a warning and 28 days, and are expelled only below -10.
-// Forced off online. Its own file keeps systems/features.js from growing.
+// Forced off online.
 import { t } from './textManager.js';
 
 export const GUILD_PROBATION_ROW = Object.freeze({
