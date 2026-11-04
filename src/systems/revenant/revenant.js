@@ -45,6 +45,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { lootRarityOn } from '../loot/lootRarity.js';
+import { revenantsRowOn } from './revenantsOn.js';
 import { renownOpens } from '../sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
 import { registerPlayerBlowLanded } from '../sigil/sigilSetPowers.js';
 import { registerPlayerHurtListener } from '../../characters/playerEntity.js';   // REVENANT-HARM: a death no blow names
@@ -156,7 +157,7 @@ export const REVENANT_EPITHETS = Object.freeze({
 /** @type {{ list: RevenantRecord[], mirrorId: string|null }} */
 const _state = { list: [], mirrorId: null };
 
-export const revenantOn = () => lootRarityOn();
+export const revenantOn = () => lootRarityOn() && revenantsRowOn();   // the Loot rarity row (its trophy) and the revenants row
 /** RENOWN-GATE: are this page's revenants HELD - online under REVENANT_MIN_RENOWN, or before the page knows its Renown
  *  (sigil.js renownOpens; offline never)? Held, every door that makes, stands, spreads or marks one answers as the
  *  switch's off does - none is made or flees, none returns - and what is remembered stays on the page (ui/revenant/revenantPage.js says it is held) while the sworn keep their days.

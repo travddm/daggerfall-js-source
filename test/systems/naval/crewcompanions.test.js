@@ -388,7 +388,7 @@ test('CREW-COMPANIONS by source: both pools knock a companion out before every d
   assert.ok(knockX > 0 && knockX < x.indexOf('attemptSoulTrap(f.entity', knockX), 'the street: before the trap, the notice and the corpse');
   assert.ok(CATCH_UP_M < ENCOUNTER_CULL_DISTANCE, 'the street\'s cull never reaches a companion - the layer stands him at the player first (and re-stands a swept one)');
   const d = rd('src/scenes/dungeonContext.js');
-  const knockD = d.indexOf("if (foe.companion != null) { foe.entity.health = 1; if (!foe._knockedOut) foe._knockedBy = striker; foe._knockedOut = true; return; }");
+  const knockD = d.indexOf("if (foe.companion != null) { foe.entity.health = 1; foe._knockedOut = true; return; }");
   assert.ok(knockD > 0 && knockD < d.indexOf('attemptSoulTrap(foe.entity', knockD), 'the dungeon: before the trap and the corpse');
   assert.match(d, /if \(foe\.dead \|\| \(fromPlayer && !peer && foe\.companion != null\)\) return;/, 'no blow of mine reaches him');
   assert.match(d, /const live = (?:dropFateHeld\()?foes\.filter\(\(f\) => !f\.dead && f\.companion == null\)\)?;/, 'nor my swing');

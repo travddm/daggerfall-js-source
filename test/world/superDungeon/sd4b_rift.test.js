@@ -65,7 +65,7 @@ test('SD4b the end: the marker farthest from the entrance across the floor plan 
   assert.deepEqual(sdEndMarks([], ends), [{ x: 101, y: 3, z: 201 }]);
   const D = read('src/scenes/dungeonContext.js');
   assert.match(D, /const end = dungeonEnd\(\);/, 'a Super dungeon\'s end');
-  assert.match(D, /const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\)\)/, 'from the same entrance');
+  assert.match(D, /const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return dungeonEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\)\)/, 'from the same entrance');
 });
 
 test('SD4b the Rift\'s size: 7 m at most, the hall\'s own less its air, never under 2.6 m - and in a cramped corner it moves a step or two to the widest hall on the end\'s own floor (mutants: the ring never fitted; never moved; moved through a wall; moved onto another floor)', () => {

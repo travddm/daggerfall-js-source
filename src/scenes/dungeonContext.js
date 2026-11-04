@@ -254,7 +254,7 @@ import { seaPileMore } from '../systems/sea/seaSpoils.js';   // SEA-SET: the dee
 import { elitesAllowed, markDungeonPromotions, pickDungeonElites, promoteEliteFoe, grantEliteLoot, eliteGlow, setBatchEliteGlow, eliteSize, isEliteCorpse, markEliteCorpseBatch, eliteCorpseSize } from '../systems/eliteFoes.js';   // ELITE FOES: 3-4 champions in an Elite Dungeon
 import { ELITE_FOE_MULTIPLIER, ELITE_HEALTH_SCALE, ELITE_DAMAGE_SCALE, ELITE_LOOT_DROP_MULT, ELITE_LOOT_QUALITY_MULT } from '../world/spawnedDungeons.js';   // ELITE: an elite spawn's foe count and strength
 import { superFoeLevel, scaleSuperFoe, SUPER_ELITE_FOES, SUPER_LOOT_OPTS, SUPER_LOOT_DROP_MULT, SUPER_LOOT_QUALITY_MULT, sdEndMarks, sdRiftPlace, sdReturnPlace, sdLandingPlace } from '../world/superDungeon/sdDungeon.js';   // SD4a: a Super dungeon's difficulty; SD4b: its end's place
-import { reachableEndOf } from '../world/dungeon/dungeonEnd.js';   // SD4b: a Super dungeon's end
+import { dungeonEndOf } from '../world/dungeon/dungeonEnd.js';   // SD4b: a Super dungeon's end
 import { createSdEnd, SD_HOME_TEXT, sdProbeOf } from './superDungeon/sdEnd.js';   // SD4b: a Super dungeon's Rift and Return; SD10: the Hour's way home
 import { createSdThrough } from './superDungeon/sdThrough.js';   // SD-THROUGH: the Way Through, beside me once the Rift is stepped through
 import { createSdHall } from './superDungeon/sdHall.js';   // SD6c: the Orrery's hall in the Shattered Hour
@@ -1798,13 +1798,13 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
    *  floor the collider's). A Super dungeon's Rift stands by it. */
   function dungeonEnd() {
     const from = dungeon.enterMarker ?? dungeon.startMarker ?? null;
-    return reachableEndOf(from, sdEndMarks(_layoutEnemies, dungeon.blocks, (m) => floorLanding(collider, [m.x, m.y + 0.2, m.z])[1]));
+    return dungeonEndOf(from, sdEndMarks(_layoutEnemies, dungeon.blocks, (m) => floorLanding(collider, [m.x, m.y + 0.2, m.z])[1]));
   }
   // ── REVENANT-FATE underground: the open world's law (scenes/exteriorFoes.js), for a foe of the player's alone ─────
   const portals = createPortalSet({ renderer, audio });   // COMPANION-PORTAL: this place's own, drawn with its foes
   // SD4b: A SUPER DUNGEON'S END - the Rift (to the Shattered Hour,
   // where its word admits) and the Return (to the way in, until the boss falls), stood the first frame I stand here at
-  // the end the lair's law finds (world/dungeon/dungeonEnd.js), as wide as its hall lets them (world/superDungeon/sdDungeon.js) - the same on
+  // the end the dungeon's law finds (world/dungeon/dungeonEnd.js), as wide as its hall lets them (world/superDungeon/sdDungeon.js) - the same on
   // every client. Pressed, or walked into (scenes/superDungeon/sdEnd.js).
   const sdEndClock = () => opts.sdClock?.() ?? performance.now() / 1000;   // SD-LOOK: the realm's anchored seconds - every screen's gear ticks together
   // AUDIT SD-THROUGH (C13): the Rift's look - its state alone, never the whole word (AUDIT SD V P1) - and a line through the
@@ -5176,7 +5176,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       if (f._ownSeq == null) f._ownSeq = ++_ownSeq;
       const r = roomRecord(f, f._ownSeq, full || !!heirOf, true);
       if (!r) continue;
-      if (heirOf && !f.dead) { const h = f.entity?.revenant?.id ? null : (heirOf(f) ?? null); f._heir = h; if (h) r.e = h; }   // REVENANT-HEIR (exteriorFoes' twin): my revenant (a lair's stand) is never handed on - an heir holds no record of it, and killed it as a plain foe
+      if (heirOf && !f.dead) { const h = f.entity?.revenant?.id ? null : (heirOf(f) ?? null); f._heir = h; if (h) r.e = h; }   // REVENANT-HEIR (exteriorFoes' twin): my revenant is never handed on - an heir holds no record of it, and killed it as a plain foe
       out.push(r); src.push([f, qt]);
     }
     let whole = full || !!heirOf;
@@ -6606,9 +6606,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       // no corpse, no loot, no renown, no death notice
       if (bout) { foe.entity.health = 1; if (!bout.out) { bout.out = true; bout.hooks?.floor?.(foe, { fromPlayer: fromPlayer && !peer, striker }); } return; }
       // CREW-COMPANIONS: a companion is knocked out, never killed (exteriorFoes' twin) - before the trap and the corpse
-      // RVN10 (21.1): and whose blow it was that knocked him down (a later blow on the
-      // body down is nobody's felling) - the layer hands it on, a felling's striker
-      if (foe.companion != null) { foe.entity.health = 1; if (!foe._knockedOut) foe._knockedBy = striker; foe._knockedOut = true; return; }
+      if (foe.companion != null) { foe.entity.health = 1; foe._knockedOut = true; return; }
       // REVENANT-FATE: one of the player's revenants, the player's ALONE here (offline, or past the room's shared run -
       // REVENANT-DUNGEON's own gate), yields instead of dying; a kill (a Disintegrate's whole) kneels it all the same (RVN-OWN-KNEEL)
       if (opts.fates && (!onlineRoom() || !isRoomFoe(foe)) && revenantMayYield(foe)) { yieldDungeonFoe(foe); return; }

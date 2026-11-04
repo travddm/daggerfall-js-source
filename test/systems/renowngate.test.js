@@ -45,7 +45,6 @@ function made(p, { rank = 2, dueAt = 0 } = {}) {
   r.rank = rank; r.dueAt = dueAt; r.out = false;
   return r;
 }
-const LAIR = Object.freeze({ px: 40, py: 41, name: 'The Pit', region: 5 });
 const HERE = Object.freeze({ px: 40, py: 41, region: 5 });
 
 beforeEach(() => {

@@ -12784,7 +12784,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  (:2777) and this read did not. The streamer is frozen while a mode
    *  is mounted (state.update sits below the modal early return), so
    *  state.current IS the entrance pixel DFU holds. */
-  /** RVN7b: where a town's news is asked - my map pixel and its region (a revenant's lair near is the news). */
+  /** RVN7b: where a town's news is asked - my map pixel and its region. */
   function rumorHere() { const p = playerTravelPixel(); return { px: p.x, py: p.y, region: _questRegionIndex() }; }
   function playerTravelPixel() {
     if ((modes?.mode ?? 'exterior') === 'dungeon') return { x: state.current.x, y: state.current.y };

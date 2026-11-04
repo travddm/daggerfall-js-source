@@ -132,7 +132,6 @@ export const FRAME_ROLES = {
     'body .star-hud',
     // EVENTS1: the event board, a plate over the world (ui/eventBoard.js) - its news inside it
     'body .evboard',
-    '.px-sys .cmp-sheet',   // RVN-GEAR / RVN-ERRAND: a sworn one's kit and its errand, a box under its card
     '.px-sys .coll-whole',   // COLLECTIONS-II: a wardrobe row opened whole - a box under its line
     '.px-sys .codex-whole'],   // AUDIT COLLECTIONS-II (lane 3): and a codex row opened whole - the same box, where it was a bare list
   // panels that carry a brass edge on the left as their own mark
@@ -213,7 +212,6 @@ export const FRAME_ROLES = {
     '.hmpick',
     'body .dfdecor-chip',   // PLUS-DRESS: the decorator's filters and modes - pickable cells, the chosen one brass
     'body .dfnaval-choice',   // NAV-F: the captor's three choices - the one taken brass
-    '.px-sys .cmp-vent',   // RVN-ERRAND: the errand's venture - the one chosen brass
     '.px-sys .coll-part',
     '.px-sys .coll-filter', '.px-sys .coll-with', '.px-sys .coll-retry'],   // COLLECTIONS-II: the wardrobe's filters, and a "comes with" press - AUDIT COLLECTIONS-II: and a failed read's Try again   // COLLECTIONS (CARDS-PLUS): the parts' switch
   // HOLDINGS: where a holding is (`.hld-state`)
@@ -225,8 +223,7 @@ export const FRAME_ROLES = {
     'body .aw-chip',   // ARENA3: the Arena window's titles, banners, laurels, odds and states - readouts   // ARENA2: the bout's clock and the crowd's darling/villain marks - readouts
     // FIRM1: the Firmament's window (ui/firmamentWindow.js) - its bar, its panels, its presses
     'body .fmt-purse',
-    '.px-sys .cmp-odds',
-    '.px-sys .coll-tag'],   // COLLECTIONS-II: a row's readouts - whose it is, whether it can be had   // RVN-ERRAND: an errand's odds - a readout
+    '.px-sys .coll-tag'],   // COLLECTIONS-II: a row's readouts - whose it is, whether it can be had
   // HOLDINGS: a holding's picture, a name's field (`.hld-art`, `.hld-field`)
   well: ['body .lk-canvas',   /* AUDIT LOCKPICK C1: the lock itself, sunk in the window */ 'body .rvncard-face', '.px-sys .rvn-face', '.px-sys .hld-art', '.px-sys .hld-field', '.px-sys .fam-view', '.px-sys .fam-card .fam-face', 'body .lgs-face',   // LEGACY3: the tree's ground, the card's portrait
      '.pack-shell .fate-face', '.px-sys .cmp-face', '.px-sys .cmp-slot', '.px-sys .cmp-gslot', '.trade-shell .packcol', '.pack-shell .sf-sec', '.shell .opt-search', '.shell .ft-tile-drawer',   // FT18: the Features search and a tile's opened drawer

@@ -62,9 +62,9 @@ function dressedSword() {
   unequipItem(me, sword);
   return { sword, twin: createWeapon(WEAPONS.Longsword, 1) };
 }
-/** A piece put in a foe's right hand, the piece it replaces (`taken`) taken out of its slots. */
-const sworn = (weapon) => ({ weapon });
-function applySwornGear(entity, { weapon }, { taken = [] } = {}) {
+/** Test setup: a piece put in a foe's right hand, the piece it replaces (`taken`) taken out of its slots. It sets what a gift
+ *  of a weapon sets on the entity; the code under test is the foe's look and its wire record, which read the slots. */
+function putInRightHand(entity, weapon, { taken = [] } = {}) {
   const slots = equipTableOf(entity);
   for (const it of taken) {
     for (let s = 0; s < slots.length; s++) if (slots[s] === it) slots[s] = null;
@@ -72,7 +72,6 @@ function applySwornGear(entity, { weapon }, { taken = [] } = {}) {
   }
   entity.weapon = weapon;
   slots[EQUIP_SLOTS.RightHand] = weapon;
-  return 1;
 }
 const held = (look) => look.items.find((it) => it.equipSlot === EQUIP_SLOTS.RightHand);
 
@@ -84,7 +83,7 @@ test('APPEARANCES-II THE KIT SAYS ITS LOOK: a sworn one given a piece in a look 
   assert.ok(Array.isArray(bare.lw) && bare.lw.length > 0, 'the rolled kit rides');
   assert.equal('la' in bare, false, 'a kit with no look says none - its bytes as they were');
   const { sword } = dressedSword();
-  assert.equal(applySwornGear(knight.entity, sworn(sword)), 1, 'given');
+  putInRightHand(knight.entity, sword);
   assert.deepEqual(held(foeLook(knight)).ap, [121, 7, 0], 'on the owner\'s screen: the look it wears');
   const rec = owner.foesFrame(true).f[0];
   const at = rec.lw.findIndex((p) => p[0] === EQUIP_SLOTS.RightHand);
@@ -111,14 +110,14 @@ test('APPEARANCES-II THE LOOK CHANGES THE KIT: the gift swapped for its plain tw
   const reader = createExteriorFoes(poolRig()); reader.setNet(netFor('bob-0002'));
   const knight = await spawnSeeded(owner, M.Knight, [10, 0, 10]);
   const { sword, twin } = dressedSword();
-  applySwornGear(knight.entity, sworn(sword));
+  putInRightHand(knight.entity, sword);
   const dressedKey = foeWireLook(knight).key;
   reader.applyFoes('mac-0001', owner.foesFrame(true));
   await settle();
   const pup = reader.foes.find((f) => f.puppet === 'mac-0001');
   assert.deepEqual(held(foeLook(pup)).ap, [121, 7, 0]);
   // the plain twin given in its place: one template, one metal, one dye - only the look differs
-  applySwornGear(knight.entity, sworn(twin), { taken: [sword] });
+  putInRightHand(knight.entity, twin, { taken: [sword] });
   assert.equal(held(foeLook(knight)).ap, undefined, 'the owner\'s body wears the twin\'s own look');
   assert.notEqual(foeWireLook(knight).key, dressedKey, 'a new record is owed');
   knight.ai.feet[0] += 1;
@@ -128,7 +127,7 @@ test('APPEARANCES-II THE LOOK CHANGES THE KIT: the gift swapped for its plain tw
   reader.applyFoes('mac-0001', owner.foesFrame(true));
   assert.equal(held(foeLook(pup)).ap, undefined, 'and every screen draws it so');
   // a newer word while the puppet builds: the build keeps the kit and look of the first
-  applySwornGear(knight.entity, sworn(sword), { taken: [twin] });
+  putInRightHand(knight.entity, sword, { taken: [twin] });
   const late = createExteriorFoes(poolRig()); late.setNet(netFor('cat-0003'));
   knight.ai.feet[0] += 1;
   late.applyFoes('mac-0001', owner.foesFrame(true));
