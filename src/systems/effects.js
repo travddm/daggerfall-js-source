@@ -590,12 +590,10 @@ export function cureAllOfKind(target, kind, keepInfections = false) {
   if (target?.activeEffects) target.activeEffects = target.activeEffects.filter((a) => a.kind !== kind || (keepInfections && !!a.infection));
 }
 export const cureAllDiseases = (t) => cureAllOfKind(t, 'disease');
-/** FIELD BUGS 29h (INFECTION-KEPT; Julian: "during this time i had gotten another disease from a dungeon and had to cure
- *  it which likely wiped my lycanthropy progress"): A CURE OF DISEASE TAKES THE PLAIN
- *  DISEASES FIRST. DFU stores a lycanthropy or vampirism infection as a disease bundle, and CureAllDiseases ended it
- *  with the plague caught beside it. With the Cure keeps infection option on (off is DFU: a cure ends all) and a plain disease running, a cure (the temple's, a spell's, a potion's) ends the
- *  plain ones and leaves the infection to its turn; a cure with nothing else to end ends the infection, so curing it
- *  before the turn still saves a player who does not want it. The turn's CureAll of the old life (lycanthropy.js endOldLifeEffects) still ends every disease there is. */
+/** INFECTION-KEPT: DFU stores a lycanthropy or vampirism infection as a disease bundle, and CureAllDiseases ends it with
+ *  the plague caught beside it. With the Cure keeps infection option on and a plain disease running, a cure (temple,
+ *  spell, potion) ends the plain ones first and leaves the infection to its turn; a cure with nothing else to end ends the
+ *  infection. The turn's CureAll of the old life (lycanthropy.js endOldLifeEffects) still ends every disease. */
 export const plainDiseaseLive = (t) => cureKeepsInfection() && (t?.activeEffects ?? []).some((a) => a.kind === 'disease' && !a.ended && !a.infection);
 export const cureDiseasesInfectionsLast = (t) => cureAllOfKind(t, 'disease', plainDiseaseLive(t));
 export const cureAllPoisons = (t) => cureAllOfKind(t, 'poison');
