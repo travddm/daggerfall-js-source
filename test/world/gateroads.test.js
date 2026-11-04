@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { layGateRoads, gateWay, GATE_ROAD, GATE_BLOCK } from '../../src/world/road/gateRoads.js';
-import { gatesOnStreets, opensOntoStreet, townStreets, townHouses, townWall, standTownWall, setTownWallPaths, townWallBlockName, townWallCells, townWallGatesOf, wallPieces, gateOpening, GATE_WAY, GATE_OPENING, GATE_ARMS_MERGE, WALL_MODELS } from '../../src/world/townWalls.js';
+import { gatesOnStreets, opensOntoStreet, townStreets, townHouses, standTownWall, setTownWallPaths, townWallBlockName, townWallCells, townWallGatesOf, wallPieces, gateOpening, GATE_WAY, GATE_OPENING, GATE_ARMS_MERGE, WALL_MODELS } from '../../src/world/townWalls.js';
 import { townGateRoads, blockGates } from '../../src/world/townGates.js';
 import { TOWN_OUTLINE_BLOCK, townOutlineBlockJson } from '../../src/world/townOutline.js';
 import { DIR } from '../../src/world/road/roadNetwork.js';
@@ -257,45 +257,16 @@ test('GATE-ROADS a wall on its outline hands its gates\' openings as it stands t
 // ── WITH ARENA2: the freeware's cities ──────────────────────────
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['BLOCKS.BSA', 'MAPS.BSA', 'WOODS.WLD'].every((f) => existsSync(join(ARENA2, f)));
-test('GATE-ROADS with ARENA2: online the Bay\'s walled cities keep Beautiful Cities\' rings - every sixth one\'s every gate joined to the painter\'s roads where a third were; walled on their outline (the packs off) their gates on streets where a sixth were; past the Bay every sixth city\'s every gate on the road; the gate model\'s floor its opening (mutants: the roads never laid; the slide unread)', { skip: HAVE ? false : 'ARENA2_PATH not set', timeout: 900_000 }, async () => {
+test('GATE-ROADS with ARENA2: online the Bay\'s walled cities keep Beautiful Cities\' rings - every sixth one\'s every gate on the painter\'s roads, with the gate roads and without; past the Bay every sixth city\'s every gate on the road; the gate model\'s floor its opening (mutants: the roads never laid; the slide unread)', { skip: HAVE ? false : 'ARENA2_PATH not set', timeout: 900_000 }, async () => {
   // the gate model's opening (GATE_OPENING): its floor face, every point at the ground, x -8.05 to 1.68 m of its frame
   const { Arch3dFile } = await import('../../src/formats/arch3dFile.js');
   const arch = new Arch3dFile(); arch.load(new Uint8Array(readFileSync(join(ARENA2, 'ARCH3D.BSA'))));
   const floor = arch.getMesh(arch.getRecordIndex(WALL_MODELS.gate)).subMeshes.flatMap((m) => m.planes).filter((f) => f.points.every((q) => q.y === 0));
   const xs = floor.flatMap((f) => f.points.map((q) => q.x / 40)), x0 = Math.min(...xs), x1 = Math.max(...xs);
   assert.ok(floor.length === 1 && Math.abs(x0 - (GATE_OPENING.along - GATE_OPENING.half)) < 0.01 && Math.abs(x1 - (GATE_OPENING.along + GATE_OPENING.half)) < 0.01, `one floor face, ${x0} to ${x1} m`);
-  const { wallBayCity } = await import('../../src/world/townOutline.js');
-  const { BlocksFile } = await import('../../src/formats/blocksFile.js');
-  const { MapsFile } = await import('../../src/formats/mapsFile.js');
-  const { isWallCarrier } = await import('../../src/world/townShape.js');
   const roadsB = new Uint8Array(readFileSync(new URL('../../vendor/roads-hazelnut/roadData.bytes', import.meta.url)));
   const tracksB = new Uint8Array(readFileSync(new URL('../../vendor/roads-hazelnut/trackData.bytes', import.meta.url)));
   const pixelOf = (loc) => ({ px: Math.trunc(loc.mapTableData.longitude / 128), py: 499 - Math.trunc(loc.mapTableData.latitude / 128) });
-  // the packs off, first (the sweep puts both packs on the world-data door for the rest of the process): the Bay's cities
-  // walled on their outline, their gates where their roads come in and onto a street
-  const blocks = new BlocksFile(); blocks.load(new Uint8Array(readFileSync(join(ARENA2, 'BLOCKS.BSA'))));
-  const maps = new MapsFile(); maps.load(...['MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].map((f) => new Uint8Array(readFileSync(join(ARENA2, f))))); maps.autoDiscard = false;
-  const rmbOf = (n) => (isWallCarrier(n) || n === TOWN_OUTLINE_BLOCK ? null : blocks.getBlockByName(n)?.rmbBlock ?? null);
-  let gates = 0, onStreet = 0, crossings = 0, crossingOnStreet = 0;
-  for (let r = 0; r < 62; r++) {
-    const reg = maps.getRegion(r);
-    for (let l = 0; reg && l < reg.locationCount; l += 3) {
-      const loc = maps.getLocation(r, l);
-      if (!loc?.exterior?.exteriorData?.blockNames?.some((x) => /^WALLAA/.test(x)) || !wallBayCity(loc, maps, blocks)) continue;
-      const { px, py } = pixelOf(loc), i = py * 1000 + px, ed = loc.exterior.exteriorData, w = ed.width, h = ed.height;
-      const wall = townWall(loc, ed.wallTook, rmbOf, { roads: roadsB[i], tracks: tracksB[i], curved: false });
-      const at = (bx, by) => rmbOf(ed.blockNames[by * w + bx]), town = { W: w * 16, H: h * 16, houses: townHouses(w, h, at), streets: townStreets(w, h, at) };
-      for (const g of wall.pieces.filter((q) => q.model === WALL_MODELS.gate).map(gateOpening)) { gates++; if (opensOntoStreet(g.at, [-g.out[0], -g.out[1]], town)) onStreet++; }
-      const L = wall.line;
-      for (const q of wall.roads) {
-        let k = 0, best = Infinity;
-        L.forEach((p, j) => { const d = Math.hypot(p[0] - q[0], p[1] - q[1]); if (d < best) { best = d; k = j; } });
-        const a = L[(k + L.length - 1) % L.length], c = L[(k + 1) % L.length], len = Math.hypot(c[0] - a[0], c[1] - a[1]);
-        crossings++; if (opensOntoStreet(q, [-(c[1] - a[1]) / len, (c[0] - a[0]) / len], town)) crossingOnStreet++;
-      }
-    }
-  }
-  assert.ok(gates > 400 && onStreet / gates > 0.85 && crossingOnStreet / crossings < 0.25, `the packs off: ${onStreet} of ${gates} gates on a street, where ${crossingOnStreet} of ${crossings} crossings were`);
   const { openSweep, sweepClone, ROADS_EVERY_WAY } = await import('../../tools/townBoardsSweep.mjs');
   const { setLocationTiles } = await import('../../src/world/terrain/terrainTiles.js');
   const { generatePixelTerrain } = await import('../../src/world/terrain/terrainGen.js');
@@ -323,9 +294,9 @@ test('GATE-ROADS with ARENA2: online the Bay\'s walled cities keep Beautiful Cit
   };
   // the Bay as online stands it: Beautiful Cities' rings kept, their gates the mod's
   const bay = sw.rows.filter((l) => l.exterior?.exteriorData?.blockNames?.some((x) => /^WALLAA/.test(x))).filter((_, k) => k % 6 === 0);
-  for (const loc of bay) assert.equal(wallBayCity(loc, sw.maps, sw.blocks), false, `${loc.name}: Beautiful Cities' ring kept`);
   const b = tally(bay, () => [roadsB, tracksB]);
-  assert.ok(b.gates > 250 && b.after === b.gates && b.before / b.gates < 0.4, `the Bay's gates on the road: ${b.before} of ${b.gates} before, ${b.after} now`);
+  // on DFU's square town ground the painter's roads already reach every gate, and the gate roads keep them there
+  assert.ok(b.gates > 250 && b.after === b.gates && b.before === b.gates, `the Bay's gates on the road: ${b.before} of ${b.gates} before, ${b.after} now`);
   // past the Bay: every sixth city template, walled on its outline, a road every way
   setTownWallPaths(() => ({ roads: ROADS_EVERY_WAY, tracks: 0, curved: false }));
   try {

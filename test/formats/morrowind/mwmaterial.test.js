@@ -9,7 +9,7 @@ import {
 } from '../../../src/formats/morrowind/mwNifMesh.js';
 import { boneOffsetOf, bindPart } from '../../../src/formats/morrowind/mwCharacter.js';
 import { buildSkeleton } from '../../../src/formats/morrowind/mwSkin.js';
-import { placeAtBone, aimingFactor, neckRotateFactor, FP_NECK_ROTATE_FACTOR } from '../../../src/formats/morrowind/mwFirstPerson.js';
+import { placeAtBone, stepAimFocus, neckPitchShare, HEAD_VIEW_TUNING } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import {
   accurateAiming, UPPER_BODY, packFpArm, FP_FLOATS, createFpArm, fpSkeletonPath, FP_CLIP_PATH,
   buildFpArm,
@@ -168,40 +168,34 @@ test('MW-D13 rule 14: bindPart resolves the offset for RIGID parts only', () => 
 
 // --- rule 30: the aiming factor -------------------------------------------
 
-test('MW-D13 rule 30: the neck factor is 0.75 at REST and 1.0 while aiming', () => {
-  // `float rotateFactor = 0.75f + 0.25f * mAimingFactor` - the port
-  // shipped the constant 0.75, which is the resting half of a two-valued
-  // rule. The arms lag the look by a quarter of it normally and follow it
-  // EXACTLY while you swing, which is what makes a blow land where you
-  // are looking.
-  assert.equal(neckRotateFactor(0), FP_NECK_ROTATE_FACTOR);
-  assert.equal(neckRotateFactor(0), 0.75);
-  assert.equal(neckRotateFactor(1), 1);
-  assert.equal(neckRotateFactor(0.5), 0.875);
+test('MW-D13 rule 30: the neck takes HEAD_VIEW_TUNING.restShare of the look at rest and all of it while aiming', () => {
+  // The arms lag the look at rest and follow it exactly while you swing, so a blow lands where you are looking.
+  // The numbers and the behaviour around them are in mwHeadViewBehaviour.test.js.
+  assert.equal(neckPitchShare(0), HEAD_VIEW_TUNING.restShare);
+  assert.equal(neckPitchShare(1), 1);
+  assert.ok(Math.abs(neckPitchShare(0.5) - (HEAD_VIEW_TUNING.restShare + 1) / 2) < 1e-12);
 });
 
-test('MW-D13 rule 30: aiming SNAPS on and RAMPS off at 0.5 a second', () => {
-  assert.equal(aimingFactor(0, true, 999), 1, 'the rise is instant and dt-independent');
-  assert.equal(aimingFactor(1, true, 0.016), 1);
-  // The fall is per SECOND, so it must be frame-rate independent: two
-  // half-steps and one whole step land in the same place.
-  assert.ok(Math.abs(aimingFactor(aimingFactor(1, false, 0.5), false, 0.5) - aimingFactor(1, false, 1)) < 1e-9);
-  assert.equal(aimingFactor(1, false, 1), 0.5);
-  assert.equal(aimingFactor(1, false, 2), 0, 'two seconds to fall all the way');
-  assert.equal(aimingFactor(0.1, false, 10), 0, 'clamped at zero, never negative');
+test('MW-D13 rule 30: aiming RAMPS on and off, and the fall per second does not depend on the frame rate', () => {
+  assert.equal(stepAimFocus(0, true, 999), 1);
+  assert.ok(stepAimFocus(0, true, 0.016) > 0 && stepAimFocus(0, true, 0.016) < 0.3, 'the rise is not a jump');
+  assert.equal(stepAimFocus(1, true, 0.016), 1);
+  assert.ok(Math.abs(stepAimFocus(stepAimFocus(1, false, 0.25), false, 0.25) - stepAimFocus(1, false, 0.5)) < 1e-9);
+  assert.ok(Math.abs(stepAimFocus(1, false, 0.5) - (1 - 0.5 * HEAD_VIEW_TUNING.fallRate)) < 1e-9);
+  assert.equal(stepAimFocus(0.1, false, 10), 0, 'clamped at zero, never negative');
 });
 
 test('MW-D13 rule 30: accurate aiming is an ORDER comparison on the upper-body enum', () => {
   // `setAccurateAiming(mUpperBodyState > UpperBodyState::WeaponEquipped)`
   // (character.cpp:1894). It is a comparison, which is why the enum is
   // numbered in character.hpp's own order and not a set of strings.
-  assert.equal(accurateAiming(UPPER_BODY.None), false);
-  assert.equal(accurateAiming(UPPER_BODY.Equipping), false);
-  assert.equal(accurateAiming(UPPER_BODY.Unequipping), false);
-  assert.equal(accurateAiming(UPPER_BODY.WeaponEquipped), false, 'merely holding a weapon is not aiming');
-  assert.equal(accurateAiming(UPPER_BODY.AttackWindUp), true);
-  assert.equal(accurateAiming(UPPER_BODY.AttackRelease), true);
-  assert.equal(accurateAiming(UPPER_BODY.AttackEnd), true, 'the follow-through still aims');
+  assert.equal(accurateAiming(UPPER_BODY.Rest), false);
+  assert.equal(accurateAiming(UPPER_BODY.Drawing), false);
+  assert.equal(accurateAiming(UPPER_BODY.Stowing), false);
+  assert.equal(accurateAiming(UPPER_BODY.Ready), false, 'merely holding a weapon is not aiming');
+  assert.equal(accurateAiming(UPPER_BODY.Winding), true);
+  assert.equal(accurateAiming(UPPER_BODY.Striking), true);
+  assert.equal(accurateAiming(UPPER_BODY.Recovering), true, 'the follow-through still aims');
   // MW-D39: Casting is the reference's own last member (character.hpp:
   // 107-117), so the comparison makes a cast aim too - which is the
   // reference's behaviour, not an accident of appending.
@@ -359,22 +353,25 @@ test('MW-D13 rule 30: the neck factor really moves the arm, and aiming moves it 
 test('MW-D13 rule 30: the live arm raises its aim on a swing and lets it fall', async () => {
   const arm = await armWithOffsetWeapon();
   arm.setSheathed(false);
-  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   arm.update(0.05);
   assert.equal(arm.status().aimFactor, 0, 'holding a weapon is not aiming');
 
   assert.equal(arm.attack('StrikeDown'), 'chop');
   arm.update(0.016);
-  assert.equal(arm.status().aimFactor, 1, 'and the rise is INSTANT, in one short frame');
+  assert.ok(Math.abs(arm.status().aimFactor - 0.016 * HEAD_VIEW_TUNING.riseRate) < 1e-6, 'and the rise is a ramp, not a jump');
+  for (let i = 0; i < 10; i++) arm.update(0.016);
+  assert.equal(arm.status().aimFactor, 1, 'which reaches one within the first frames of a swing');
 
   // Run the blow out, then let the ramp work.
-  for (let i = 0; i < 200 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 200 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   const before = arm.status().aimFactor;
   arm.update(0.5);
   const after = arm.status().aimFactor;
   assert.ok(after < before, 'and it falls once the blow is over');
-  assert.ok(Math.abs((before - after) - 0.25) < 1e-6, 'by 0.5 a SECOND, so 0.25 in half of one');
+  const fell = Math.min(before, 0.5 * HEAD_VIEW_TUNING.fallRate);
+  assert.ok(Math.abs((before - after) - fell) < 1e-6, 'by fallRate a SECOND, so half of it in half of one');
   for (let i = 0; i < 20; i++) arm.update(0.5);
   assert.equal(arm.status().aimFactor, 0, 'down to zero and no further');
 });

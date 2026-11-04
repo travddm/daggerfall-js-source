@@ -79,7 +79,7 @@ export const BOSS_ARMOR = 60;
  * at 1e9, and a claim of 1e9 is past every wire's ceiling - the gate's hit, ahit and xhit and the Abyss's
  * (net/wire.js GATE_DMG_WIRE_MAX, 100,000) and a refereed bout's
  * (net/arena/arenaLaw.js validArenaIn, 10,000) - so every relay refused the whole cast: the number rose, nothing landed.
- * It stands at the most one blow lands at any relay - HIT_CAP_X times the reference at LV_MAX: 780, over the serpent's (net/serpent/serpentBrain.js, SERPENT_HIT_CAP_X of a
+ * It stands at the most one blow lands at any relay - HIT_CAP_X times the reference at LV_MAX: 1,680, over the serpent's (net/serpent/serpentBrain.js, SERPENT_HIT_CAP_X of a
  * galley's reference) and a bout's (arenaBlowCap) - so a Disintegrate counts whole and the relay's own caps clip it, as
  * a duel's stand-in counts at the wire's vital ceiling (combat/duelCombat.js DUEL_STAND_IN); and under the least ceiling
  * nobody clamps (the bout's 10,000), with the rest of a spell's room beside it. Pinned against the real constants and

@@ -14,7 +14,7 @@
 //     against it takes the same x1.25 and x1.3 - systems/blowTaken.js).
 //   EACH JUDGES THEIR OWN FEET (10.3, net/gate/gateStrike.js's law) - a puppet's wind-up AT ME lands on my feet at the
 //     landing: the verdict, the weight and the effect on the puppet's `ai` as a local landing leaves them, so its swing
-//     resolves through the host's own door (resolveFoeMeleeVsPlayer -> blowConnects, blowScaled, landBlowEffect); the
+//     resolves through the host's own door (resolveFoeMeleeVsPlayer -> blowConnects, landBlowEffect); the
 //     late sample makes a perfect dodge mine too. The owner's view of my feet opens its foe's window (6.3) - never my
 //     damage.
 //   THE BLOW'S CLASS (`blowClassOf`, net/wire.js `wc`) - my blow on a puppet winding up rides to its owner with its K,
@@ -32,7 +32,7 @@ export const WIRE_IRON = 8;
 export const WIRE_FEINT = 16;
 /** AUDIT TELL O2: `wk`'s landed flag - its owner's landing, written for WIRE_LANDED_S after it. */
 export const WIRE_LANDED = 32;
-/** FEUD WIRE (Feud-Arc.md 25): `wk`'s signature flag - a revenant's signature (RVN5), struck at its multiplier. */
+/** FEUD WIRE (Feud-Arc.md 25): `wk`'s signature flag - a revenant's signature (RVN5) and its WIND. */
 export const WIRE_SIG = 64;
 export const WIRE_LANDED_S = 0.5;
 /** `wl`'s ceiling (ms): no wind-up is longer. */
@@ -88,8 +88,7 @@ export const blowWireKey = (r) => `${r.wk ?? ''}/${r.wn ?? ''}/${r.wy ?? ''}/${r
  * the same serial again after it landed here (my clock ahead) is nothing new. A record without `wk` before the landing:
  * an overreach lands it (it follows a landing only), a feint's cut dashes its mark, anything else is a break (its held
  * arm cancelled); at or past the landing it lands on its own clock. FEUD WIRE: `sig` the host's signature numbers
- * (systems/revenant/revenantFeud.js SIG - the brain brings no revenant system): a blow its owner flags one strikes at its
- * multiplier, in its ember, its WIND deeper. Answers the synthetic state.
+ * (systems/revenant/revenantFeud.js SIG - the brain brings no revenant system): a blow its owner flags one is drawn in its ember, its WIND deeper. Answers the synthetic state.
  */
 export function applyBlowRecord(ai, r, { origin = null, me = false, entity = null, collider = null, now = tacticsNow(), sig = null } = {}) {
   if (!ai || !r) return null;
@@ -111,7 +110,7 @@ export function applyBlowRecord(ai, r, { origin = null, me = false, entity = nul
         const total = Math.max(BLOW[kind].windup + (iron ? TELL_IRON_EXTRA : 0), left);   // the shape's nominal length: a late record starts part-filled
         const b = makeBlow(kind, origin, r.wy, now + left - total, signature ? sig.COLOR : iron ? IRON_COLOR : BLOW_COLOR, iron ? 'iron' : 'poise', total);
         b.n = n;
-        if (signature) { b.sig = true; b.mult = sig.MULT; b.windPitch = sig.WIND_PITCH; }   // FEUD WIRE: its owner's signature - x2.0 on my feet as on its owner's
+        if (signature) { b.sig = true; b.windPitch = sig.WIND_PITCH; }   // FEUD WIRE: its owner's signature
         if (feint) b.feint = true;   // a feint never glints (the glint is the honest tell)
         if (Number.isFinite(r.wp)) b.ahead = r.wp;
         fitBlowToGround(b, collider);
@@ -147,7 +146,7 @@ function landPuppetBlow(ai, s, b, now, feet = s.feet) {
   const mine = s.key === LOCAL_TARGET && !!feet && b.kind !== 'aimed';   // an aimed shot's arrow is its owner's to loose
   if (mine) {
     const v = inBlow(b, feet[0], feet[2]);
-    ai._blowVerdict = v; ai._blowMult = b.mult; ai._blowAt = now; ai._blowSwing = true;
+    ai._blowVerdict = v; ai._blowAt = now; ai._blowSwing = true;
     ai._blowFx = v ? { kind: b.kind, iron: b.guard === 'iron', at: now } : null;   // TELL6e: on MY machine, where its damage lands
     if (!v && b.lateIn === true) ai._perfectAt = now;
   }

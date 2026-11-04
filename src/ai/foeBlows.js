@@ -7,8 +7,8 @@
 // (a short lane ahead), the SWEEP (a front cone), the SLAM (a disc just ahead) - and four since TELL6 (the RING, the
 // CHARGE, the LEAP, the AIMED shot: Feud-Arc.md 8.1), each family its own (ai/blowShapes.js). A blow is the foe's own
 // blow, delayed and shaped: at the landing the brain (ai/tactics.js) forces the swing, and the host's ordinary hit
-// resolution asks `blowConnects` (the shape's verdict, in place of the reach test) and `blowScaled` (the shape's
-// weight on DFU's own damage roll - armour, skill and all).
+// resolution asks `blowConnects` (the shape's verdict, in place of the reach test) and the damage is DFU's own roll, armour,
+// skill and all - no shape weighs it (F1: the shapes carry no damage multiplier).
 //
 // Sparingly: a cooldown per foe, at most one wind-up near its mark at a time, only from a foe holding a melee token
 // in reach (TACT2; since TELL6 a charge and a leap from their own bands, an aimed shot from a bow's) - at the local
@@ -48,7 +48,7 @@ export function makeBlow(kind, origin, yaw, now, color = null, guard = 'poise', 
   const P = BLOW[kind];
   const iron = guard === 'iron';
   const w = Number.isFinite(windup) && windup > 0 ? windup : P.windup + (iron ? TELL_IRON_EXTRA : 0);
-  return { kind, origin: [origin[0], origin[1], origin[2]], yaw, start: now, land: now + w, mult: P.mult, color, guard: iron ? 'iron' : 'poise' };
+  return { kind, origin: [origin[0], origin[1], origin[2]], yaw, start: now, land: now + w, color, guard: iron ? 'iron' : 'poise' };
 }
 
 /**
@@ -164,8 +164,8 @@ export function blowConnects(ai, classic, now = tacticsNow()) {
   // at a foe in the street
   const turned = ai._blowFor !== undefined && !!_blowTargetOf && _blowTargetOf(ai) !== ai._blowFor;
   ai._blowVerdict = null;
-  if (!fresh || turned) { ai._blowMult = undefined; return classic; }
-  if (!v) { ai._blowMult = undefined; tellDodged(ai); }   // dodged: the weight is spent with it, and the dodge is told
+  if (!fresh || turned) return classic;
+  if (!v) tellDodged(ai);   // dodged: the weight is spent with it, and the dodge is told
   return v;
 }
 /** AUDIT ARENA-LADDER 2: the brain's own spelling of a foe's target (ai/tactics.js targetKey), registered upward - the
@@ -179,13 +179,6 @@ export function setBlowTargetOf(fn) { _blowTargetOf = typeof fn === 'function' ?
 const _dodged = new Map();
 export function registerBlowDodgedListener(name, fn) { if (typeof fn === 'function') _dodged.set(name, fn); else _dodged.delete(name); }
 function tellDodged(ai) { for (const fn of _dodged.values()) { try { fn(ai); } catch { /* a listener's fault is not the blow's */ } } }
-/** ...and its weight on the damage DFU rolled (spent once). */
-export function blowScaled(ai, dmg) {
-  const m = ai?._blowMult;
-  if (m == null) return dmg;
-  ai._blowMult = undefined;
-  return dmg > 0 ? Math.max(1, Math.round(dmg * m)) : dmg;
-}
 
 /** The colour a blow is drawn in - the boss's weight, a foe's ember. */
 export const BLOW_COLOR = Object.freeze([1.0, 0.42, 0.12]);

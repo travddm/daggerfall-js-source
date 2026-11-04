@@ -22,7 +22,13 @@ on:
       - 'vite.config.js'
       - 'package.json'
       - 'package-lock.json'
+      # nothing a player or a probe reads: documents do not run the game
+      - '!**/*.md'
+      - '!docs/**'
       - '.github/workflows/probes.yml'
+  # The whole set also runs every night, so a change that a path filter let by is found within a day.
+  schedule:
+    - cron: '17 5 * * *'
   # A manual run repeats one probe, to tell a flaky probe from a real fault: `gh workflow run probes --ref <branch>
   # -f probe=save -f repeat=10`. Leave `probe` empty for one run of every probe.
   workflow_dispatch:
@@ -46,7 +52,7 @@ concurrency:
 jobs:
   plan:
     name: plan
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
@@ -54,20 +60,84 @@ jobs:
         env:
           PROBE: ${{ inputs.probe }}
           REPEAT: ${{ inputs.repeat }}
+          # Probes to leave out of a plain run, space-separated (the repository variable DFO_PROBE_SKIP, empty: none).
+          # A self-hosted box short of RAM sets it to "online", whose two clients and workerd peak near 6 GB
+          # (docs/ci/self-hosted-runner.md, Measuring a job). A manual run of one probe ignores it.
+          SKIP: ${{ vars.DFO_PROBE_SKIP }}
         run: |
           # run 0: a plain run, whose job keeps the name "probe <name>"; 1..N: the repeats of a manual run
           include=""
           if [ -n "$PROBE" ]; then
             for i in $(seq 1 "$REPEAT"); do include="$include{\"probe\":\"$PROBE\",\"run\":$i},"; done
           else
-            for p in boot dungeon town travel rest save pause online; do include="$include{\"probe\":\"$p\",\"run\":0},"; done
+            for p in boot dungeon town travel rest save pause online; do
+              case " $SKIP " in *" $p "*) continue ;; esac
+              include="$include{\"probe\":\"$p\",\"run\":0},"
+            done
           fi
           echo "matrix={\"include\":[${include%,}]}" >> "$GITHUB_OUTPUT"
 
+  # The game is built once and every probe serves the build with `vite preview` (tools/probes/build.mjs). A dev server
+  # transformed thousands of modules on each probe's first page load; that was 5 to 9 minutes for each start of the
+  # game world. The online probe's page needs three edits of the source; it gets a build made with them.
+  build:
+    name: build
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cached dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
+      # Two builds side by side: the game, and the game with the online probe's three seams (build.mjs --online)
+      - name: Build the game
+        run: |
+          if [ "$RUNNER_ENVIRONMENT" = self-hosted ]; then
+            # each build peaks near 5 GB; a small self-hosted runner has 8 GB, so one after the other
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist"
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online
+          else
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist" &
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online &
+            wait -n && wait -n
+          fi
+      # One archive each: a build is 30,000 small files, which the artifact service handles slowly one by one
+      - name: Pack the builds
+        run: |
+          tar -czf "$RUNNER_TEMP/probe-dist.tgz" -C "$RUNNER_TEMP/probe-dist" . &
+          tar -czf "$RUNNER_TEMP/probe-dist-online.tgz" -C "$RUNNER_TEMP/probe-dist-online" . &
+          wait
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-dist
+          path: ${{ runner.temp }}/probe-dist.tgz
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-dist-online
+          path: ${{ runner.temp }}/probe-dist-online.tgz
+          compression-level: 0
+          retention-days: 1
+
   probe:
-    needs: plan
+    needs: [plan, build]
     name: "probe ${{ matrix.probe }}${{ matrix.run > 0 && format(' #{0}', matrix.run) || '' }}"
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 40
     strategy:
       # every probe reports, so one red run shows every broken part
@@ -93,19 +163,66 @@ jobs:
       - name: Install the relay's tools (wrangler)
         if: matrix.probe == 'online'
         run: npm ci --prefix server
+      # Playwright's Chromium is cached by the Playwright version; the system libraries come from apt each time
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cached Chromium
+        id: chromium
+        if: ${{ runner.environment == 'github-hosted' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        if: ${{ runner.environment == 'github-hosted' }}
+        run: |
+          if [ '${{ steps.chromium.outputs.cache-hit }}' = 'true' ]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
+      # The self-hosted image carries Chromium and its system libraries (docs/ci/self-hosted-runner.md). The job user
+      # has no sudo, so --with-deps cannot run there; this downloads only if the image's revision is not the lockfile's.
+      - name: Chromium from the runner image
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: npx playwright install chromium
       - name: Cached game data (ARENA2)
         id: arena
+        if: ${{ runner.environment == 'github-hosted' }}
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/arena-data
           key: arena2-freeware-v1
       - name: Fetch ARENA2 (freeware Daggerfall data, never in the repository)
-        if: steps.arena.outputs.cache-hit != 'true'
+        if: ${{ runner.environment == 'github-hosted' && steps.arena.outputs.cache-hit != 'true' }}
         run: sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
+      # The runner's host keeps ARENA2 and mounts it read-only; a runner without the mount downloads it as above.
+      - name: ARENA2 from the runner's own cache
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/arena-data"
+          if [ -d /opt/dfo-cache/arena2 ]; then
+            ln -s /opt/dfo-cache/arena2 "$RUNNER_TEMP/arena-data/arena2"
+          else
+            sh tools/fetch-data.sh "$RUNNER_TEMP/arena-data"
+          fi
+      - name: Download the build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.probe == 'online' && 'probe-dist-online' || 'probe-dist' }}
+          path: ${{ runner.temp }}/probe-dist-pack
+      - name: Unpack the build
+        run: |
+          mkdir -p "$RUNNER_TEMP/probe-dist"
+          tar -xzf "$RUNNER_TEMP/probe-dist-pack/"*.tgz -C "$RUNNER_TEMP/probe-dist"
       - name: Probe ${{ matrix.probe }}
         env:
+          # the world streams a small grid (tools/probes/lib/harness.mjs): software GL is what makes the probes slow
+          PROBE_LIGHT: '1'
+          # a probe that reads no pixels runs with the draw calls stubbed (lib/harness.mjs); software GL is most of a frame
+          PROBE_NODRAW: '1'
+          PROBE_DIST: ${{ runner.temp }}/probe-dist
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots
         run: npm run probes -- ${{ matrix.probe }}

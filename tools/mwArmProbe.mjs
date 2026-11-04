@@ -610,8 +610,8 @@ await boot(FIX.bsa);   // back to the armed-with-nothing baseline for L6/L7
 // the fresh boot below is the first-person baseline L5c measures.)
 // ── L5c: THE LOOK FOLLOWS - PITCH THROUGH THE REAL PASS ─────────────
 // IG1. Rule 54's composition: the neck
-// takes neckRotateFactor (0.75) of the look, the lens takes all of it,
-// so the arms SLIDE by only the remaining quarter and stay in frame.
+// takes HEAD_VIEW_TUNING.restShare (0.7) of the look, the lens takes all of it,
+// so the arms SLIDE by only the remaining 0.3 and stay in frame.
 // Measured, not trusted: drive the camera dep's pitch and read the
 // sprite target's ink - the arms must survive a hard look both ways,
 // and the ink's centroid must move WITH the look direction on screen

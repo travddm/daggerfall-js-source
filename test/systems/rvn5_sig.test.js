@@ -1,7 +1,7 @@
 // RVN5 - SIGNATURE BLOWS (;, then "Go"). From rank 2 a revenant has one signature, drawn on its id from the shapes
 // its family reaches past its ordinary set (a blade a slam or a charge, a beast a charge or a leap, a brute a ring or a
 // charge; a caster, a spectral, a small kind or a flyer the PYRE - a disc at its target's feet that lands as a blast of
-// its element through the one cast engine, so the saving throw answers it). x2.0, its own cooldown of 12-18 s, iron
+// its element through the one cast engine, so the saving throw answers it). Its own cooldown of 12-18 s, iron
 // from rank 3, drawn in its ember, its WIND deeper, called out the first time a stand. Its name: "<given>'s <noun>".
 // Needs the Enhanced AI switch; off, the page says so.
 // Pinned: the law and the pyre's shape (the brain's verdict, the ground's field, its quad); the names (each bank whole,
@@ -67,20 +67,20 @@ const rec = (sig, rank = 2, mobileType = M.Orc, o = {}) => ({ id: `rvn5-${sig}-$
 
 // ── the law ─────────────────────────────────────────────────────────
 
-test('RVN5 THE LAW: from rank 2; x2.0, 12-18 s, iron from rank 3, its ember, its WIND 0.7; the pyre a 2.2 m disc at its target\'s feet out to 12 m, a 1.2 s wind-up; the stand\'s stamp frozen, none under rank 2 or for a shape that is no signature (mutants: any number moved; the rank floors moved; the stamp unfrozen)', () => {
+test('RVN5 THE LAW: from rank 2; 12-18 s, iron from rank 3, its ember, its WIND 0.7; the pyre a 2.2 m disc at its target\'s feet out to 12 m, a 1.2 s wind-up; the stand\'s stamp frozen, none under rank 2 or for a shape that is no signature (mutants: any number moved; the rank floors moved; the stamp unfrozen)', () => {
   assert.equal(F.SIG_RANK, 2);
-  assert.deepEqual({ ...F.SIG, COOLDOWN: [...F.SIG.COOLDOWN], COLOR: [...F.SIG.COLOR], PYRE_BASE: [...F.SIG.PYRE_BASE] }, { MULT: 2.0, COOLDOWN: [12, 18], IRON_RANK: 3, COLOR: [0.95, 0.25, 0.04], WIND_PITCH: 0.7, PYRE_BASE: [3, 6], PYRE_PER: 1 });
+  assert.deepEqual({ ...F.SIG, COOLDOWN: [...F.SIG.COOLDOWN], COLOR: [...F.SIG.COLOR], PYRE_BASE: [...F.SIG.PYRE_BASE] }, { COOLDOWN: [12, 18], IRON_RANK: 3, COLOR: [0.95, 0.25, 0.04], WIND_PITCH: 0.7, PYRE_BASE: [3, 6], PYRE_PER: 1 });
   assert.ok(Object.isFrozen(F.SIG) && Object.isFrozen(F.SIG.COOLDOWN) && Object.isFrozen(F.SIG.COLOR));
   assert.notDeepEqual([...F.SIG.COLOR], [...BLOW_COLOR], 'its ember is not TELL\'s amber');
   assert.notDeepEqual([...F.SIG.COLOR], [...IRON_COLOR], 'nor its iron red');
-  assert.deepEqual({ ...BLOW.pyre }, { windup: 1.2, r: 2.2, mult: 1, range: 12 });
+  assert.deepEqual({ ...BLOW.pyre }, { windup: 1.2, r: 2.2, range: 12 });
   assert.deepEqual(F.SIGNATURES, ['slam', 'charge', 'leap', 'ring', 'pyre']);
   assert.equal(F.signatureStamp(rec('slam', 1)), null, 'rank 1: none');
   assert.equal(F.signatureStamp(rec('sweep', 3)), null, 'no signature shape: none');
   assert.equal(F.signatureStamp(null), null);
   const two = F.signatureStamp(rec('slam', 2)), three = F.signatureStamp(rec('slam', 3));
   assert.ok(Object.isFrozen(two));
-  assert.deepEqual({ ...two }, { kind: 'slam', iron: false, mult: 2.0, cooldown: F.SIG.COOLDOWN, color: F.SIG.COLOR, windPitch: 0.7, name: F.signatureName(rec('slam', 2)), noun: F.signatureNoun(rec('slam', 2)), element: 4 });
+  assert.deepEqual({ ...two }, { kind: 'slam', iron: false, cooldown: F.SIG.COOLDOWN, color: F.SIG.COLOR, windPitch: 0.7, name: F.signatureName(rec('slam', 2)), noun: F.signatureNoun(rec('slam', 2)), element: 4 });
   assert.equal(two.name, `Grushnak's ${two.noun}`);
   assert.equal(three.iron, true, 'rank 3: iron');
   // the stand carries it: the deed's and the return's stamp
@@ -143,22 +143,21 @@ test('RVN5 THE NAMES: "<given>\'s <noun>", the noun drawn on its id from its sha
   assert.equal('sigName' in F.feudFields({ sig: 'slam' }, { id: 'x', mobileType: M.Orc, rank: 2 }), false, 'never stored');
 });
 
-test('RVN5 THE PYRE\'S SPELL: one Damage Health of its element at range (never CasterOnly - the save answers it), DFU\'s magnitude - 3-6 plus 1 a level - x its mult; its name the signature\'s (mutants: a number moved; the mult unread; CasterOnly)', () => {
-  const s = F.pyreSpell("Varis' Rimefall", 1, 2);
+test('RVN5 THE PYRE\'S SPELL: one Damage Health of its element at range (never CasterOnly - the save answers it), DFU\'s magnitude - 3-6 plus 1 a level; its name the signature\'s (mutants: a number moved; CasterOnly)', () => {
+  const s = F.pyreSpell("Varis' Rimefall", 1);
   assert.ok(Object.isFrozen(s));
   assert.equal(s.name, "Varis' Rimefall");
   assert.equal(s.element, 1);
   assert.equal(s.rangeType, 2);
   const e = s.effects[0];
   assert.deepEqual([e.type, e.subType], [4, 0], 'Damage Health');
-  assert.deepEqual([e.magnitudeBaseLow, e.magnitudeBaseHigh, e.magnitudeLevelBase, e.magnitudeLevelHigh, e.magnitudePerLevel], [6, 12, 2, 2, 1]);
+  assert.deepEqual([e.magnitudeBaseLow, e.magnitudeBaseHigh, e.magnitudeLevelBase, e.magnitudeLevelHigh, e.magnitudePerLevel], [3, 6, 1, 1, 1]);
   assert.deepEqual([e.durationBase, e.chanceBase], [0, 100]);
   assert.deepEqual(s.effects.slice(1).map((x) => x.type), [-1, -1]);
-  assert.equal(rollMagnitude(e, 6, () => 0), 6 + 12);
-  assert.equal(rollMagnitude(e, 6, () => 0.999), 12 + 12);
-  const plain = F.pyreSpell(null, null, 1).effects[0];
+  assert.equal(rollMagnitude(e, 6, () => 0), 3 + 6);
+  assert.equal(rollMagnitude(e, 6, () => 0.999), 6 + 6);
+  const plain = F.pyreSpell(null, null).effects[0];
   assert.deepEqual([plain.magnitudeBaseLow, plain.magnitudeBaseHigh, plain.magnitudeLevelBase], [3, 6, 1]);
-  assert.equal(F.pyreSpell(null, null).effects[0].magnitudeBaseHigh, 12, 'the default mult the signature\'s');
   assert.equal(F.pyreSpell(null, 'x').element, 4, 'no element: magic');
   assert.equal(F.pyreSpell(null, 0).name, 'Pyre');
 });
@@ -198,7 +197,7 @@ function firstWindup(f, player, secs = 30) {
 }
 function withRandom(v, fn) { const r = Math.random; Math.random = () => v; try { return fn(); } finally { Math.random = r; } }
 
-test('RVN5 THE PYRE on the REAL brain: wound up at my feet (locked, out to 12 m), iron from rank 3, no held swing; standing in it its blast is asked of the pool (`_blowPyre`, x2.0) and the foe waits - no swing; stepped off, nothing, and it overreaches (mutants: aimed at its own feet; unlocked; a swing held; the blast asked on a miss; no overreach)', () => {
+test('RVN5 THE PYRE on the REAL brain: wound up at my feet (locked, out to 12 m), iron from rank 3, no held swing; standing in it its blast is asked of the pool (`_blowPyre`) and the foe waits - no swing; stepped off, nothing, and it overreaches (mutants: aimed at its own feet; unlocked; a swing held; the blast asked on a miss; no overreach)', () => {
   const land = (stay, rank = 2) => {
     resetTactics(); resetBlows(); T = 0;
     const f = brainFoe('pyre', { mobileType: M.Lich, at: [0, 0, 6], rank });
@@ -214,13 +213,13 @@ test('RVN5 THE PYRE on the REAL brain: wound up at my feet (locked, out to 12 m)
     return f;
   };
   const hit = land(true);
-  assert.deepEqual({ ...hit.ai._blowPyre, at: 0 }, { at: 0, mult: 2.0 });
+  assert.deepEqual({ ...hit.ai._blowPyre, at: 0 }, { at: 0 });
   assert.equal(hit.ai._tac.state, 'wait', 'its landing was its blow');
   assert.equal(hit.ai._blowSwing, false, 'no swing on top');
   const miss = land(false);
   assert.equal(miss.ai._blowPyre ?? null, null, 'stepped off: no blast');
   assert.equal(miss.ai._tac.state, 'overreach');
-  assert.equal(land(true, 3).ai._blowPyre.mult, 2.0);
+  assert.ok(land(true, 3).ai._blowPyre, 'iron rank: the same blast');
 });
 
 test('RVN5 THE SWITCH: off, the brain never winds a signature (a telegraph is the Enhanced AI\'s) (mutants: a signature without the switch)', () => {
@@ -313,19 +312,19 @@ test('RVN5 ON THE REAL STREET POOL: its signature called once a stand - the card
   frame(pool);
   assert.equal(shown.filter((ev) => ev.kind === 'signature').length, 1, 'once a stand');
   // the blast
-  f.ai._blowPyre = { at: T, mult: 2 };
+  f.ai._blowPyre = { at: T };
   frame(pool);
   assert.equal(f.ai._blowPyre, null, 'spent');
   assert.equal(strikes.length, 1);
   assert.equal(strikes[0].spell.name, sb.name);
   assert.equal(strikes[0].spell.element, 2);
-  assert.equal(strikes[0].spell.effects[0].magnitudeBaseHigh, 12, 'x its mult');
+  assert.equal(strikes[0].spell.effects[0].magnitudeBaseHigh, 6, 'the base pyre');
   assert.equal(strikes[0].level, f.entity.level);
   assert.equal(strikes[0].foe, f);
   assert.deepEqual(ids.at(-1).slice(0, 1), [SPELL_CAST_SOUND[2]]);
   // a signature of reach: no blast, whatever is asked
   f.entity.revenant = { ...f.entity.revenant, sigBlow: F.signatureStamp({ ...r, sig: 'slam' }) };
-  f.ai._blowPyre = { at: T, mult: 2 };
+  f.ai._blowPyre = { at: T };
   frame(pool);
   assert.equal(strikes.length, 1, 'a slam casts nothing');
 });

@@ -4,8 +4,9 @@
 played from your own copy of The Elder Scrolls II: Daggerfall. It began as a
 1:1 port of Daggerfall Unity (MIT, Interkarma and contributors) and is now its
 own game: Daggerfall Unity is the reference for its data layer and logic, not a
-target to match. Presentation rebuilt on hand-rolled WebGL2. MIT licensed, with
-Daggerfall Unity's notice alongside (LICENSE). DFO Online is an independent,
+target to match. Presentation rebuilt on hand-rolled WebGL2. MIT licensed:
+LICENSE holds the third-party notices and the parts the license does not
+cover. DFO Online is an independent,
 unofficial project, not affiliated with or endorsed by Bethesda Softworks or
 ZeniMax Media. The Elder Scrolls and Daggerfall are trademarks of ZeniMax
 Media Inc.

@@ -9,7 +9,7 @@ import { TOWN_URL, enterTown, clearBoxes, buildingsOfTown, openInnkeeper, rentRo
 export const name = 'rest';
 
 export async function run({ browser, base, ck }) {
-  const g = new Game(browser, base);
+  const g = new Game(browser, base, { drawless: true });
   const travelState = () => g.J(() => window.__travelProbe());
   try {
     await enterTown(g, TOWN_URL);

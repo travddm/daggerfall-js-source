@@ -108,8 +108,9 @@ frozen `TACT` table.
   longest. A foe past `PATIENCE` goes in anyway. A target whose back is turned (`BACK_TURNED_DEG`) is open.
 - **Backing off**: losing `HURT_SHARE` of health inside `HURT_WINDOW` makes a foe walk away for `BACKOFF`, at most once
   per `BACKOFF_COOLDOWN`.
-- **Fleeing**: animals and `COWARD_CLASSES` (Mage, Sorcerer, Healer, Bard, Burglar, Acrobat, Thief) run below
-  `FLEE_SHARE` health. Undead, daedra, constructs and guards never flee (`isCoward`).
+- **Fleeing**: only the cowardly human classes, `COWARD_CLASSES` (Mage, Sorcerer, Healer, Bard, Burglar, Acrobat,
+  Thief), run below `FLEE_SHARE` health. Beasts, undead, daedra, constructs and guards never flee (`isCoward`). DFU has
+  no flee at all; this is the port's own, and F1 took it from the animals.
 - **Kiting**: a shooter with a token backs off a target inside `KITE_IN`, one burst (`KITE_MAX`) per `KITE_COOLDOWN`;
   cornered, it fights in melee.
 - Foes walk the way they face (turn first, `WALK_FACE_DEG`); nobody backpedals after a pressing target.
@@ -150,7 +151,8 @@ every `TELL` number), `src/render/foeTelegraph.js` and `src/render/telegraphStyl
 
 A blow is the foe's own swing, delayed and shaped. A foe winds up with the shape drawn on the ground; at the landing the
 brain forces the swing, and the host's hit resolution asks `blowConnects` (the shape's verdict in place of the reach
-test) and `blowScaled` (the shape's multiplier on DFU's own damage roll).
+test). The damage is the combat formulas' roll and nothing else: no shape, signature or aimed shot multiplies a foe's
+blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
 
 - **Shapes** (`BLOW`): lunge, sweep, slam, ring, charge, leap, aimed shot, and the revenant pyre. `blowShapesOf` picks
   them by family (`BLOW_FAMILY`); `inBlow` tests a point.

@@ -40,7 +40,9 @@ test('the spine bones end in the same pose at every pitch', () => {
     assert.equal(entry.turned, expected.turned, `pitch ${entry.pitch}: bones turned`);
     entry.bones.forEach((bone, b) => {
       bone.forEach((value, k) => {
-        assert.ok(Math.abs(value - expected.bones[b][k]) < 1e-5, `pitch ${entry.pitch}, bone ${b}, value ${k}`);
+        // The recording is rounded to 1e-5; the turn is now computed as P^T * turn * P * local, which can land on the
+        // other side of a rounding step.
+        assert.ok(Math.abs(value - expected.bones[b][k]) < 2e-5, `pitch ${entry.pitch}, bone ${b}, value ${k}`);
       });
     });
   });

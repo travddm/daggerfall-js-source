@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseNif } from '../../src/formats/morrowind/mwNifFile.js';
 import { buildSkeleton, skeletonSpaceMatrices, injectSkeletonNodes, poseSkeleton, GRAPH_ROOT } from '../../src/formats/morrowind/mwSkin.js';
-import { MW_WEAPON_TYPE, rotNegX, applyRotateController, poseAssembly } from '../../src/formats/morrowind/mwFirstPerson.js';
+import { MW_WEAPON_TYPE, pitchDown, turnInRootFrame, poseAssembly } from '../../src/formats/morrowind/mwFirstPerson.js';
 import { sampleTrack } from '../../src/formats/morrowind/mwAnim.js';
 import { offWeaponBoneAddon } from '../../src/combat/twoHands/mirrorRig.js';
 import { spinePitchFactor, applySpineAim, spineAimSlot, SPINE_AIM_BONES, RANDOM_ATTACK_GROUPS, AIMING_STATES } from '../../src/combat/spineAim.js';
@@ -41,24 +41,24 @@ const turnOf = (m0, m1, n) => mul(unit(at(m1, n).a), T(unit(at(m0, n).a)));
 test('BOW-AIM THE PITCH FACTOR: none unless a Ranged or Thrown weapon is in its wind-up, release or follow (or a cast); eased in over "start" to "min attack" (unless the group is a random attack); 1 through the release; eased out over the follow - a crossbow\'s in its first tenth (mutants: BOW-AIM-melee-pitches, BOW-AIM-idle-pitches, BOW-AIM-no-ramp-in, BOW-AIM-crossbow-slow, BOW-AIM-follow-held)', () => {
   assert.deepEqual([...SPINE_AIM_BONES], ['bip01 spine1', 'bip01 spine2']);
   assert.deepEqual([...RANDOM_ATTACK_GROUPS], ['attack1', 'attack2', 'attack3', 'swimattack1', 'swimattack2', 'swimattack3']);
-  assert.deepEqual([...AIMING_STATES], ['AttackWindUp', 'AttackRelease', 'AttackEnd', 'Casting']);
+  assert.deepEqual([...AIMING_STATES], ['Winding', 'Striking', 'Recovering', 'Casting']);
   const bow = { weaponType: W.MarksmanBow, group: 'bowandarrow' };
-  for (const upper of ['None', 'Equipping', 'Unequipping', 'WeaponEquipped']) assert.equal(spinePitchFactor({ ...bow, upper }), 0, `${upper}: no aim`);
-  for (const t of [W.LongBladeOneHand, W.SpearTwoWide, W.HandToHand, W.Spell, W.None]) assert.equal(spinePitchFactor({ upper: 'AttackRelease', weaponType: t }), 0, `melee and spells never pitch (${t})`);
-  assert.equal(spinePitchFactor({ upper: 'AttackRelease', weaponType: W.MarksmanThrown }), 1, 'a thrown weapon does');
-  assert.equal(spinePitchFactor({ ...bow, upper: 'AttackRelease' }), 1);
+  for (const upper of ['Rest', 'Drawing', 'Stowing', 'Ready']) assert.equal(spinePitchFactor({ ...bow, upper }), 0, `${upper}: no aim`);
+  for (const t of [W.LongBladeOneHand, W.SpearTwoWide, W.HandToHand, W.Spell, W.None]) assert.equal(spinePitchFactor({ upper: 'Striking', weaponType: t }), 0, `melee and spells never pitch (${t})`);
+  assert.equal(spinePitchFactor({ upper: 'Striking', weaponType: W.MarksmanThrown }), 1, 'a thrown weapon does');
+  assert.equal(spinePitchFactor({ ...bow, upper: 'Striking' }), 1);
   assert.equal(spinePitchFactor({ ...bow, upper: 'Casting' }), 1, 'a cast with a bow in the stance keeps the aim');
   // the ramp in: (t - start) / (min - start) while start <= t < min; 1 past it, and 1 where the keys are missing
-  const wind = { ...bow, upper: 'AttackWindUp', startTime: 5.8, minAttackTime: 6.0 };
+  const wind = { ...bow, upper: 'Winding', startTime: 5.8, minAttackTime: 6.0 };
   assert.ok(near(spinePitchFactor({ ...wind, time: 5.85 }), 0.25));
   assert.equal(spinePitchFactor({ ...wind, time: 6.0 }), 1);
   assert.equal(spinePitchFactor({ ...wind, time: 5.7 }), 1, 'before the start: the guard fails, the factor stays whole');
   assert.equal(spinePitchFactor({ ...wind, time: 5.85, minAttackTime: -1 }), 1, 'no min attack key');
   assert.equal(spinePitchFactor({ ...wind, time: 5.85, group: 'attack2' }), 1, 'a random attack has no pre-wind-up');
   // the ramp out over the follow
-  assert.ok(near(spinePitchFactor({ ...bow, upper: 'AttackEnd', completion: 0.3 }), 0.7));
-  assert.ok(near(spinePitchFactor({ upper: 'AttackEnd', weaponType: W.MarksmanCrossbow, completion: 0.05 }), 0.5));
-  assert.equal(spinePitchFactor({ upper: 'AttackEnd', weaponType: W.MarksmanCrossbow, completion: 0.3 }), 0, 'a crossbow\'s reload plays unpitched past its first tenth');
+  assert.ok(near(spinePitchFactor({ ...bow, upper: 'Recovering', completion: 0.3 }), 0.7));
+  assert.ok(near(spinePitchFactor({ upper: 'Recovering', weaponType: W.MarksmanCrossbow, completion: 0.05 }), 0.5));
+  assert.equal(spinePitchFactor({ upper: 'Recovering', weaponType: W.MarksmanCrossbow, completion: 0.3 }), 0, 'a crossbow\'s reload plays unpitched past its first tenth');
 });
 
 test('BOW-AIM THE SPINE TAKES THE LOOK, IN THE ROOT\'S FRAME: on retail\'s biped a pitch of 0.3 (+ down) turns spine1 by half and spine2 - the chest, the arms, the head - by the whole of it, exactly about the root\'s X, tipping the chest forward and the head down; the hips stand; no pitch, no change (mutants: BOW-AIM-whole-pitch-each, BOW-AIM-local-frame, BOW-AIM-old-conjugation, BOW-AIM-pitch-up)', () => {
@@ -66,7 +66,7 @@ test('BOW-AIM THE SPINE TAKES THE LOOK, IN THE ROOT\'S FRAME: on retail\'s biped
   const p = new Map();
   assert.equal(applySpineAim(sk, p, GRAPH_ROOT, sm, 0.3), 2);
   const m1 = sm(sk, p, GRAPH_ROOT);
-  const half = rotNegX(0.15), whole = rotNegX(0.3);
+  const half = pitchDown(0.15), whole = pitchDown(0.3);
   const s1 = turnOf(m0, m1, 'bip01 spine1');
   for (let i = 0; i < 9; i++) assert.ok(near(s1[i], half[i]), `spine1 turned half the pitch about the root's X (element ${i}: ${s1[i]} vs ${half[i]})`);
   for (const n of ['bip01 spine2', 'bip01 neck', 'bip01 head', 'bip01 r hand']) {
@@ -87,10 +87,10 @@ test('BOW-AIM THE CONJUGATION (mwFirstPerson.js rootSpaceTurn): RotateController
   const m0 = sm(sk, new Map(), GRAPH_ROOT);
   for (const n of ['bip01 spine1', 'bip01 neck', 'bip01 r forearm', 'bip01 l thigh']) {
     const p = new Map();
-    assert.equal(applyRotateController(sk, p, GRAPH_ROOT, sm, sk.byName.get(n), rotNegX(0.4)), true);
-    const d = turnOf(m0, sm(sk, p, GRAPH_ROOT), n), r = rotNegX(0.4);
+    assert.equal(turnInRootFrame(sk, p, GRAPH_ROOT, sm, sk.byName.get(n), pitchDown(0.4)), true);
+    const d = turnOf(m0, sm(sk, p, GRAPH_ROOT), n), r = pitchDown(0.4);
     for (let i = 0; i < 9; i++) assert.ok(near(d[i], r[i]), `${n}: element ${i}, ${d[i]} vs ${r[i]}`);
   }
-  assert.equal(applyRotateController(sk, new Map(), GRAPH_ROOT, sm, undefined, rotNegX(0.4)), false, 'no bone, no turn');
+  assert.equal(turnInRootFrame(sk, new Map(), GRAPH_ROOT, sm, undefined, pitchDown(0.4)), false, 'no bone, no turn');
 });
 

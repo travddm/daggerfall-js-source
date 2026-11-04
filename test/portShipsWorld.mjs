@@ -2,7 +2,7 @@
 // ARENA2 (tools/fetch-data.sh; ARENA2_PATH): the Bay's port towns (the port law's - world/portSites.js portTownOnSea over the
 // open sea, as test/portTerrain.mjs and the harbour board read it) and every port past the Bay (the capitals' harbour
 // slices a port to their own byte, and Arena's ports - BAY-LEFT-SEA's 29), each location read as the game reads it (the
-// world-data door's edits: the Bay's walled cities on their outline, TS7; a city past the Bay outlined and walled, TS3/TS4;
+// world-data door's edits: a city past the Bay outlined and walled, TS3/TS4;
 // a capital's slice), each map pixel's ground as scenes/pixelBuild.js has the terrain kernel make it (world/terrain/
 // terrainGen.js generatePixelTerrain over setLocationTiles' stamp - its tiles and its samples; Deep Waters off). Read as the
 // world host reads them: a tile's record 0 is water (world.js navalIsWater's no-Deep-Waters arm), and the ground over the
@@ -71,7 +71,7 @@ export async function portShipsWorld() {
   const woods = groundWoods(woods0);
   wd.installWorldDataReplacement(); wd.bindWorldDataBlocks(blocks);
   installCapitals({ addTextures: () => 0 });
-  installTownOutline();   // the Bay's walled cities read on their outline from here (TS7)
+  installTownOutline();
   const base = tc.capitalBase(rows, isMainStoryDungeon), names = tc.cityBlockNames(rows);
   const pinPort = (k) => { const c = tc.capitalCentrePixel(k); return !!(c && arenaPixels()?.byPixel.get(`${c.px},${c.py}`)?.port); };
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };

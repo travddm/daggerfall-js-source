@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   read:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     # AUDIT PLAN-1000 H10: three questions of a minute's bound each - a hung call never holds a runner for six hours
     timeout-minutes: 10
     defaults:

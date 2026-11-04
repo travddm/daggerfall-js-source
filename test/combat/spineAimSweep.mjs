@@ -4,13 +4,13 @@ import { createHash } from 'node:crypto';
 import { MW_WEAPON_TYPE } from '../../src/formats/morrowind/mwFirstPerson.js';
 
 const UPPER_STATES = [
-  'None',
-  'Equipping',
-  'Unequipping',
-  'WeaponEquipped',
-  'AttackWindUp',
-  'AttackRelease',
-  'AttackEnd',
+  'Rest',
+  'Drawing',
+  'Stowing',
+  'Ready',
+  'Winding',
+  'Striking',
+  'Recovering',
   'Casting',
   'Unknown',
 ];

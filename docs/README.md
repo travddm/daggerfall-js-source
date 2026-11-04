@@ -14,6 +14,7 @@ touched code are in [coding-standards.md](coding-standards.md).
 | [systems/](systems/README.md) | Gameplay: characters, combat, magic, items, quests, professions, the world, naval, UI, audio, AI |
 | [multiplayer/](multiplayer/README.md) | The relay, the wire protocol, the client's net layer, the account service, chat safety, staff tools |
 | [testing/](testing/README.md) | Running and writing tests, and the browser probes |
+| [ci/](ci/self-hosted-runner.md) | The self-hosted CI runner: design, server setup, security, capacity, rollback |
 | [operations/](operations/README.md) | Workflows, deploying the site and services, the desktop release, admin workflows |
 
 ## Writing these pages
@@ -34,6 +35,23 @@ reason says otherwise. A departure from DFU is allowed in two cases only:
 Name each departure where you make it (in the code comment or the page that covers it) and say which of the two cases
 it is. A departure that makes play or progression feel worse than DFU is a defect, and the fix is to revert it. Read
 the DFU source for the behaviour first; its MIT-licensed code is the reference ([mods-and-vendor.md](formats/mods-and-vendor.md)).
+
+### Every departure is a mod
+
+The core game is DFU's rules. Every departure ships as a mod, with no exceptions:
+
+- **Mods**: every piece of content or behaviour that differs from DFU belongs to a mod: our own departures as
+  first-party mods, other people's as third-party mods. The mod API gives each one a clean interface.
+- **Options**: every tuning value that differs from DFU is a player setting, so a single-player game can be set back to
+  DFU's value or anywhere between. New single-player games start with the official curated mod list and its settings.
+  A "Daggerfall Unity classic" preset turns every mod and setting back to DFU.
+- **Servers**: a server runs a curated mod list with its own settings, and every player on it uses exactly that list
+  and those settings. Only mods and settings that are purely cosmetic, and change nothing in play, are left to each
+  player.
+
+Until the mod manifests exist, a departure is a row in `src/systems/features.js` with its values in
+`src/systems/modSettings.js`, and a setting that changes play is forced online through
+`src/systems/online/onlineLane.js`. Name the mod a change belongs to in its pull request.
 
 ## Code comments
 

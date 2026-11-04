@@ -54,7 +54,7 @@ export async function run({ browser, base, ck }) {
   try {
     // the first save, an offline boot of the classic start composed by the world host, is made while the services start
     const composeSave = async () => {
-      const compose = new Game(browser, base, {});
+      const compose = new Game(browser, base, { drawless: true });
       try {
         await compose.open(START, { wait: 'frame' });
         await compose.until(() => compose.page.evaluate(standing), 900000);
@@ -111,7 +111,7 @@ export async function run({ browser, base, ck }) {
       });
       const first = await rs.checkpoint(saveText);
       if (!first?.ok) throw new Error(`${label}'s first save did not land (${first?.error})`);
-      const g = new Game(browser, base, {});
+      const g = new Game(browser, base, { drawless: true });
       players.push(g);
       g.label = label;
       g.accountName = made.name;
@@ -199,8 +199,7 @@ export async function run({ browser, base, ck }) {
     // typing before the field has the focus drops the letters on the key bindings (the journal opens).
     const agree = a.page.getByRole('button', { name: 'I agree' });
     const inLog = (g) => g.page.evaluate((t) => document.body.innerText.includes(t), line);
-    const fieldFocused = (g) =>
-      g.page.evaluate(() => !!document.activeElement?.classList.contains('dfchat-input'));
+    const fieldFocused = (g) => g.page.evaluate(() => !!document.activeElement?.classList.contains('dfchat-input'));
     const agreeShown = () => agree.isVisible().catch(() => false);
     const field = a.page.locator('.dfchat-input');
     let agreed = false;
@@ -209,7 +208,11 @@ export async function run({ browser, base, ck }) {
       if (!got) {
         await a.page.keyboard.press('Enter');
         // a first line is held behind the code of conduct (SAFE1): the card may come instead of the field
-        got = await a.until(async () => ((await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null), 120000, 250);
+        got = await a.until(
+          async () => ((await agreeShown()) ? 'card' : (await fieldFocused(a)) ? 'field' : null),
+          120000,
+          250,
+        );
       }
       lap(`chat attempt ${attempt}: ${got}`);
       if (got === 'card') {
@@ -238,7 +241,9 @@ export async function run({ browser, base, ck }) {
     if (!heard || !sent) {
       for (const g of [a, b]) {
         g.diagnostics(`${g.label}'s page`, 60);
-        console.log(`      ${g.label}'s text: ${(await g.page.evaluate(() => document.body.innerText)).replace(/s+/g, ' ').slice(-500)}`);
+        console.log(
+          `      ${g.label}'s text: ${(await g.page.evaluate(() => document.body.innerText)).replace(/s+/g, ' ').slice(-500)}`,
+        );
       }
       console.log(`  --- account service log tail
 ${svc.account.log.slice(-2500)}`);

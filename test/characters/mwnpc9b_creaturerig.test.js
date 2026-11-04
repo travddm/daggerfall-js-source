@@ -55,7 +55,7 @@ test('MWNPC9b-3 a non-biped\'s stances are bare: its idle drawn or not, its walk
   const { r, cam } = await beast();
   step(r);
   assert.equal(r.setSheathed(false), true);
-  assert.equal(r.status().upperName, 'WeaponEquipped', 'no equip section to play: the claws are out at once');
+  assert.equal(r.status().upperName, 'Ready', 'no equip section to play: the claws are out at once');
   step(r);
   assert.equal(r.status().idleGroup, 'idle', 'no weapon short group for its claws - never "idlehh"');
   assert.equal(r.status().loopsLeft, null, 'and so no loop dice: its idle loops on (rule 10 - a stance with no short group)');
@@ -81,11 +81,11 @@ test('MWNPC9b-4 its blow: one of its attacks by the roll, start to stop in one s
   step(r);
   let s = r.status();
   assert.equal(s.posedGroup, 'attack2');
-  assert.equal(s.upperName, 'AttackEnd', 'one section, standing as the follow-through');
+  assert.equal(s.upperName, 'Recovering', 'one section, standing as the follow-through');
   assert.equal(s.idleGroup, null);
   step(r, 40);
   s = r.status();
-  assert.equal(s.upperName, 'WeaponEquipped', 'free at its stop');
+  assert.equal(s.upperName, 'Ready', 'free at its stop');
   assert.equal(s.idleGroup, 'idle');
   assert.equal(r.attack('StrikeDown', { roll: 2 }), 'attack1', 'roll 2 of two: back to the first');
   // a new blow cuts the last's follow-through, as a person's does
@@ -101,7 +101,7 @@ test('MWNPC9b-4 its blow: one of its attacks by the roll, start to stop in one s
   assert.equal(r.castSpell(2), true);
   step(r);
   assert.match(r.status().posedGroup ?? '', /^attack[12]$/);
-  assert.equal(r.status().upperName, 'AttackEnd');
+  assert.equal(r.status().upperName, 'Recovering');
 });
 
 test('MWNPC9b-5 its recoil and its death are the body\'s: the idle let go under the recoil; the dying body stands', async () => {

@@ -33,8 +33,8 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 
 // ── the law ─────────────────────────────────────────────────────────
 
-test('TELL6b: the charge - a 9 m by 1.6 m lane from its feet, 0.9 s, x1.5, run in 0.45 s, begun 5-12 m out; the ground draws it as a lane (mutants: any number moved; the lane narrowed)', () => {
-  assert.deepEqual({ ...BLOW.charge }, { windup: 0.9, len: 9.0, halfW: 0.8, mult: 1.5, cross: 0.45, from: 5, to: 12 });
+test('TELL6b: the charge - a 9 m by 1.6 m lane from its feet, 0.9 s, run in 0.45 s, begun 5-12 m out; the ground draws it as a lane (mutants: any number moved; the lane narrowed)', () => {
+  assert.deepEqual({ ...BLOW.charge }, { windup: 0.9, len: 9.0, halfW: 0.8, cross: 0.45, from: 5, to: 12 });
   const b = makeBlow('charge', [0, 0, 0], 0, 0);
   assert.equal(inBlow(b, 0, 8.9), true);
   assert.equal(inBlow(b, 0, 9.1), false);

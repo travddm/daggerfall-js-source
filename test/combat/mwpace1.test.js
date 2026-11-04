@@ -133,8 +133,8 @@ async function drawnArm(speed = 1) {
   });
   assert.ok(res.ok, `build: ${res.stage} ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped, 'drawn and at rest');
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready, 'drawn and at rest');
   return arm;
 }
 /** Step a blow and read when each section began, on the blow's own clock. */
@@ -147,7 +147,7 @@ function strikeLog(arm, dt, steps = 2000) {
     clock += dt;
     const u = arm.status().upper;
     if (u !== last) { at[u] ??= clock; last = u; }
-    if (u === UPPER_BODY.WeaponEquipped) break;
+    if (u === UPPER_BODY.Ready) break;
   }
   return at;
 }
@@ -164,8 +164,8 @@ test('MW-PACE1: the arm lands its "hit" on the machine\'s and is ready when the 
     near(plan.rate, 0.8 / blow.hitAt, 1e-6, 'the wind-up runs at the span to the hit over the time to it');
     const at = strikeLog(arm, dt);
     // the release ENDS on "chop hit" - the AttackEnd edge is the frame the playhead crossed it
-    near(at[UPPER_BODY.AttackEnd], blow.hitAt, dt + 1e-9, `hitAt ${blow.hitAt}: the blade lands with the damage`);
-    near(at[UPPER_BODY.WeaponEquipped], blow.seconds, dt + 1e-9, `seconds ${blow.seconds}: the follow-through ends with the blow`);
+    near(at[UPPER_BODY.Recovering], blow.hitAt, dt + 1e-9, `hitAt ${blow.hitAt}: the blade lands with the damage`);
+    near(at[UPPER_BODY.Ready], blow.seconds, dt + 1e-9, `seconds ${blow.seconds}: the follow-through ends with the blow`);
     assert.equal(arm.status().blow, null, 'and the plan goes with the blow');
   }
 });
@@ -188,12 +188,12 @@ test('MW-PACE1: a strike in the FOLLOW-THROUGH cuts it for the next blow - the w
   const blow = { seconds: 1.0, hitAt: 0.4 };
   assert.equal(arm.attack('StrikeDown', { blow }), 'chop');
   assert.equal(arm.attack('StrikeLeft', { blow }), null, 'the wind-up carries a blow that has not landed');
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.AttackRelease; i++) arm.update(1 / 60);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Striking; i++) arm.update(1 / 60);
   assert.equal(arm.attack('StrikeLeft', { blow }), null, 'nor is the release cut');
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.AttackEnd; i++) arm.update(1 / 60);
-  assert.equal(arm.status().upper, UPPER_BODY.AttackEnd);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Recovering; i++) arm.update(1 / 60);
+  assert.equal(arm.status().upper, UPPER_BODY.Recovering);
   assert.equal(arm.attack('StrikeLeft', { blow }), 'slash', 'the follow-through is cut: the machine has finished that blow');
-  assert.equal(arm.status().upper, UPPER_BODY.AttackWindUp);
+  assert.equal(arm.status().upper, UPPER_BODY.Winding);
   near(arm.status().time, 4.1, 1e-6, 'and the new blow starts at "slash start"');
   assert.equal(arm.status().blow.clock, 0, 'on its own clock');
 });
@@ -227,7 +227,7 @@ test('MW-PACE1: a SHOT keeps the record\'s pace - its hit waits for the arm\'s o
   });
   assert.ok(res.ok, `${res.stage}: ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   assert.equal(arm.attack('StrikeDown', { blow: { seconds: 0.3, hitAt: 0.12 } }), 'shoot');
   assert.equal(arm.status().blow, null, 'a shot is not paced');
 });
@@ -242,9 +242,9 @@ test('MW-PACE1: a frame that runs long across the wind-up\'s end is made up in t
   const step = (dt) => { arm.update(dt); clock += dt; };
   for (let i = 0; i < 6; i++) step(1 / 60);                   // 0.1 s in
   step(0.2);                                                  // the hitch: past the wind-up's end by 0.1 s, dropped
-  assert.equal(arm.status().upper, UPPER_BODY.AttackRelease, 'the release has begun, late');
+  assert.equal(arm.status().upper, UPPER_BODY.Striking, 'the release has begun, late');
   let hitAt = null;
-  for (let i = 0; i < 600 && hitAt == null; i++) { step(1 / 60); if (arm.status().upper !== UPPER_BODY.AttackRelease) hitAt = clock; }
+  for (let i = 0; i < 600 && hitAt == null; i++) { step(1 / 60); if (arm.status().upper !== UPPER_BODY.Striking) hitAt = clock; }
   near(hitAt, blow.hitAt, 1 / 60 + 1e-9, 'the release made up the hitch');
 });
 

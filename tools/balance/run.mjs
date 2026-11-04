@@ -4,6 +4,7 @@
 //   node tools/balance/run.mjs [--build warrior,mage] [--levels 1,10,45] [--layers default|all|none|a,b|-x|+y]
 //                              [--dungeon orcstronghold] [--swings 4000] [--gear-percentile 0.9]
 //                              [--arena2 PATH] [--json out.json] [--md out.md] [--ablate]
+//   node tools/balance/run.mjs --content [--build warrior,mage] [--levels 30,45] [--swings 1500] [--arena2 PATH]
 //
 // docs/systems/balance-harness.md says what a number means.
 import { writeFileSync } from 'node:fs';
@@ -60,6 +61,12 @@ export async function main(argv) {
     gearPercentile: Number(options.get('gear-percentile') ?? DEFAULT_GEAR_PERCENTILE), careerOf,
     levels: options.has('levels') ? list(options.get('levels')).map(Number) : DEFAULT_LEVELS,
   };
+  if (options.has('content')) {
+    const { contentReport, contentMarkdown, CONTENT_LEVELS } = await import('./content.mjs');
+    const levels = options.has('levels') ? list(options.get('levels')).map(Number) : CONTENT_LEVELS;
+    process.stdout.write(contentMarkdown(contentReport({ builds, levels, swings: Number(options.get('swings') ?? 1500), careerOf })));
+    return;
+  }
   const layers = parseLayers(typeof options.get('layers') === 'string' ? options.get('layers') : 'default');
   const report = buildReport({ ...common, layers });
   if (options.has('json')) writeFileSync(options.get('json'), `${JSON.stringify(report, null, 2)}\n`);

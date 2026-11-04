@@ -29,7 +29,7 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 // ── the law ─────────────────────────────────────────────────────────
 
 test('TELL6c: the leap - a disc 1.8 m at its point, a second, x1.6, 3-9 m off, its last 0.35 s the jump; the ground draws the disc at the point in a quad of its own (mutants: any number moved; the disc at the feet)', () => {
-  assert.deepEqual({ ...BLOW.leap }, { windup: 1.0, r: 1.8, mult: 1.6, from: 3, range: 9, arc: 0.35 });
+  assert.deepEqual({ ...BLOW.leap }, { windup: 1.0, r: 1.8, from: 3, range: 9, arc: 0.35 });
   const b = makeBlow('leap', [0, 0, 0], 0, 0);
   b.ahead = 6;
   assert.equal(inBlow(b, 0, 6), true);

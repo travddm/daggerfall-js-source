@@ -9,7 +9,8 @@
 // blended to the pixel's edge (BlendLocationTerrainJob) - a square plateau, on
 // a coast a square of land cut into the sea.
 //
-// DEPARTURE (named; Port-Ledger section A): a town's ground is its SHAPE -
+// DEPARTURE, past the Bay only (a location the port makes - world/terrain/terrainTiles.js isPortMadeLocation; one
+// of Daggerfall's own map keeps DFU's square plateau): a town's ground is its SHAPE -
 // every tile its buildings stand on (the blocks' own town-map bytes,
 // AutoMapData: a byte not 0 is a building's or a wall's), the streets between
 // them (any hole the outline closes round), and a margin about them whose
@@ -17,8 +18,7 @@
 // outline and none is a square. NO BLOCK IS DROPPED AND NO BUILDING MOVES: the
 // grid, its blocks and every building key are Daggerfall's (net/homeLaw.js: a
 // home is its town's map id and its building's key), so every home stands
-// where it stood. A walled city of the Bay keeps Daggerfall's wall ring, its
-// ground round it; one past the Bay stands on its round, walled on it (TS4:
+// where it stood. A walled city past the Bay stands on its round, walled on it (TS4:
 // townRound, world/townWalls.js). The water a town stands beside stays water
 // past its margin (world/terrain/terrainTiles.js townGroundMask).
 //
@@ -223,8 +223,9 @@ export function townShape(occ, W, H, seed, o = {}) {
  * TS6: THE WALKERS' TOWN - its walk grid (world/city/cityNavigation.js: four cells a ground tile, its rows the location's
  * tile rows from the north edge, as setLocationTiles stamps them) shut past its ground: `ground` the pixel's tiles that are
  * the town's (world/terrain/terrainTiles.js townGroundMask, index x + y * 128), its grid's south-west tile at `tilePos`. A
- * cell whose tile is none of the town's walks no one - a town past the Bay's open cells (TS3), a Bay town's square past
- * its outline, its tiles the sea took back (TS2). DFU walks the whole grid (CityNavigation.SetRMBData).
+ * cell whose tile is none of the town's walks no one - a town past the Bay's open cells (TS3), its square past its
+ * outline, its tiles the sea took back (TS2). DFU walks the whole grid (CityNavigation.SetRMBData), and so does a
+ * location of Daggerfall's own map, which has no outline.
  * @param {{width: number, height: number, grid: Uint8Array}} nav @param {Uint8Array} ground @param {{x: number, y: number}} tilePos
  */
 export function shutOffGround(nav, ground, tilePos) {
@@ -248,15 +249,5 @@ export function onTownTile(tiles, tilePos, gx, gy) {
   const ty = tilePos.y + (gy >> 2);
   const tx = tilePos.x + (gx >> 2);
   return tx >= 0 && ty >= 0 && tx < D && ty < D && !!tiles[tx + ty * D];
-}
-/** TS7: a location as its template was read - a Bay city world/townOutline.js wallBayCity walled, its own ring again and
- *  no outline (the places past the Bay clone their templates' grids, rings and gates and all); any other location itself.
- *  @param {any} loc */
-export function unwalledLocation(loc) {
-  const ed = loc?.exterior?.exteriorData;
-  if (!ed?.wallTook) return loc;
-  const { wallTook, ...rest } = ed;
-  const { outline, ...out } = loc;
-  return { ...out, exterior: { ...loc.exterior, exteriorData: { ...rest, blockNames: wallTook } } };
 }
 

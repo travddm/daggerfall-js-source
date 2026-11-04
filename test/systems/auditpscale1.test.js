@@ -279,7 +279,7 @@ test('AUDIT PSCALE1 the dungeon, mounted: a layout foe is as tough as the player
   j.healFoe(lf, 20); assert.equal(lf.entity.health, 113, 'a joiner\'s copy is the host\'s to heal - unweighed until the record');
   // the blow and the arrow at me: weighed where the damage is declared, so the flash and the cry read what I took
   const S = strip(D);
-  assert.match(S, /const dmg = (?:blowScaled\(f\.ai, )?_weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the blow');
+  assert.match(S, /const dmg = _weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the blow');
   assert.match(S, /const dmg = foeDeps && shooter \? _weighHit\(shooter, foeDeps\.calculateAttackDamage\(shooter\.entity, playerEntity, \{/, 'the arrow');
   const melee = S.slice(S.indexOf('function resolveFoeMelee('), S.indexOf('function collisionTriggers('));
   assert.deepEqual(melee.match(/hurtPlayer\([^)]*\)/g), ['hurtPlayer(dmg)'], 'the blow lands the weighed number');

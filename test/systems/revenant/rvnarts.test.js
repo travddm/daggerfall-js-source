@@ -96,14 +96,14 @@ test('RVN-ARTS THE LAW: six arts, one in ARTS_CHANCE, from rank II; each family\
   for (const c of Object.values(A.ART_COLORS)) { assert.notDeepEqual([...c], [...B.BLOW_COLOR]); assert.notDeepEqual([...c], [...B.IRON_COLOR]); assert.notDeepEqual([...c], [...F.SIG.COLOR]); }
 });
 
-test('RVN-ARTS AUDIT RVN B3 THE BLASTS\' WEIGHTS: each thrown art\'s spell its multiple of the pyre\'s mean at every level - no per-level term rounded up to the pyre\'s own - and a barrage\'s three together, a siphon and a nova each lighter than the signature\'s x2, measured on the spells the door casts (mutants: the pyre\'s own spell back; a level\'s term rounded; a weight moved)', () => {
+test('RVN-ARTS AUDIT RVN B3 THE BLASTS\' WEIGHTS: each thrown art\'s spell its multiple of the pyre\'s mean at every level - no per-level term rounded up to the pyre\'s own - measured on the spells the door casts, against the signature\'s own pyre blast as the base (mutants: the pyre\'s own spell back; a level\'s term rounded; a weight moved)', () => {
   for (const lvl of [1, 5, 10, 20, 30, 50]) {
-    const sig = meanOf(F.pyreSpell('Pyre', 4, F.SIG.MULT), lvl);
-    for (const [art, mult, count] of [['Siphon', A.ART_LAW.SIPHON.MULT, 1], ['Barrage', A.ART_LAW.BARRAGE.MULT, A.ART_LAW.BARRAGE.COUNT], ['Nova', A.ART_LAW.NOVA.MULT, 1]]) {
+    const sig = meanOf(F.pyreSpell('Pyre', 4), lvl);
+    assert.ok(Math.abs(sig - A.artMagnitude(lvl, 1)) <= 0.5, `the signature's blast is the base pyre at ${lvl}: ${sig}`);
+    for (const [art, mult] of [['Siphon', A.ART_LAW.SIPHON.MULT], ['Barrage', A.ART_LAW.BARRAGE.MULT], ['Nova', A.ART_LAW.NOVA.MULT]]) {
       const sp = A.artSpell(art, 4, lvl, mult);
       assert.deepEqual([sp.rangeType, sp.effects[0].type, sp.effects[0].subType, sp.effects[0].magnitudeLevelBase, sp.effects[0].magnitudeLevelHigh], [2, 4, 0, 0, 0], `${art} at ${lvl}: at range, Damage Health, no level's term`);
       assert.ok(Math.abs(meanOf(sp, lvl) - A.artMagnitude(lvl, mult)) <= 0.5, `${art} at ${lvl}: ${meanOf(sp, lvl)} against ${A.artMagnitude(lvl, mult)}`);
-      assert.ok(meanOf(sp, lvl) * count < sig, `${art} x${count} at ${lvl}: ${meanOf(sp, lvl) * count} under the signature's ${sig}`);
     }
   }
   assert.equal(meanOf(A.artSpell('Barrage', 4, 30, 0.6), 30), 21, 'level 30: three fifths of the pyre\'s 34.5 - not the 33 its own spell rounded to');

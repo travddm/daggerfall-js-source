@@ -113,7 +113,7 @@ test('TS4 the ground: a walled city past the Bay stands on its round - every til
   for (let r = 8; r < 56; r++) for (let c = 8; c < 56; c++) houses[r * 64 + c] = 5;
   const rmbs = { H: { fldHeader: { autoMapData: houses }, misc3dObjectRecords: [], miscFlatObjectRecords: [] }, C: { fldHeader: { autoMapData: new Uint8Array(4096) }, misc3dObjectRecords: [{ xPos: 0, zPos: -4096 }], miscFlatObjectRecords: [{ xPos: 40000, zPos: -4096 }] } };
   const names = ['TESW1.RMB', TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, 'H.RMB', TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK, TOWN_OUTLINE_BLOCK];
-  const loc = (walled) => ({ name: 'W', mapTableData: { mapId: 1, locationType: 0 }, exterior: { exteriorData: { width: 3, height: 3, blockNames: names } }, ...(walled ? { outline: { kept: 1, left: 8, walled: true } } : {}) });
+  const loc = (walled) => ({ name: 'W', mapTableData: { mapId: 1, locationType: 0 }, arena: { kind: 'city-state' }, exterior: { exteriorData: { width: 3, height: 3, blockNames: names } }, ...(walled ? { outline: { kept: 1, left: 8, walled: true } } : {}) });
   const rmbOf = (bx, by) => { const n = names[by * 3 + bx]; return n === 'H.RMB' ? rmbs.H : null; };
   const walled = locationShapeField(loc(true), rmbOf, { x: 40, y: 40 }), open = locationShapeField(loc(false), rmbOf, { x: 40, y: 40 });
   const count = (a, f2) => a.reduce((s2, v) => s2 + (f2(v) ? 1 : 0), 0);

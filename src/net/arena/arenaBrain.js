@@ -368,7 +368,7 @@ function aiStep(st, a, now, rng) {
     const hit = !!(t && !t.out && p) && (s ? inBlow({ kind: s, origin: [ox, 0, oz], yaw: yw }, p[0], p[1]) : Math.hypot(p[0] - here[0], p[1] - here[1]) <= a.reach + ARENA_POSE_SLACK * 0.5);
     if (hit && t) {
       const roll = a.dmg[0] + Math.floor(rng() * (a.dmg[1] - a.dmg[0] + 1));
-      const dmg = s ? Math.max(1, Math.round(roll * BLOW[s].mult)) : roll;
+      const dmg = roll;
       if (tg.startsWith('p')) out.push({ k: 'blow', i: a.id, d: dmg, to: tg });
       land(st, a.id, tg, dmg, now, dmg >= t.maxHealth * 0.15);
     } else boutMiss(st.b, { from: a.id, now });
