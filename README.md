@@ -16,8 +16,6 @@ the repository, the live domain, the servers and the desktop app's identifier
 still carry the old `daggerfall` spellings - renaming those is a move outside
 this tree (BR1, BR5).
 
-Play it: https://daggerfalljs.dev/
-
 The site is `index.html` (what it is, how to play, credits); the game is
 `play/index.html`, served at `/play/`. Both deploy from `main` to GitHub
 Pages. The landing page takes its palette and fonts from the enhanced skin
@@ -27,21 +25,6 @@ Docs live in `docs/` - start at `docs/README.md`.
 
 Original game data (ARENA2) is required and never committed. Point tests at it
 with `ARENA2_PATH`.
-
-## Support development
-
-DFO Online is free and open source. Active development currently
-costs about **$600 per month** to sustain across development tooling,
-multiplayer infrastructure, testing, builds, releases, and mod compatibility
-work.
-
-Support on Patreon: <https://www.patreon.com/c/dfenhanced>
-
-Support on Ko-fi: <https://ko-fi.com/daggerfallonline>
-
-The monthly goal, suggested support levels, and funding breakdown are in
-[`SUPPORT.md`](SUPPORT.md). Sponsorship does not lock gameplay, source code,
-or normal releases behind a paywall.
 
 ## Reporting exploits and security issues
 
