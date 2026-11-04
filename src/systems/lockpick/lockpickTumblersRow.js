@@ -1,7 +1,6 @@
 // @ts-check
 // LOCKPICK-MODE: the Features row for how a lock is picked (systems/lockpick/lockpickMode.js reads its pref). Off is DFU's:
-// one skill roll, no item. On plays the port's tumbler window and spends a Lockpick that snaps. Forced off online. Its own
-// file keeps systems/features.js from growing.
+// one skill roll, no item. On plays the tumbler window and spends a Lockpick that snaps. Forced off online.
 import { t } from '../textManager.js';
 
 export const LOCKPICK_TUMBLERS_ROW = Object.freeze({
