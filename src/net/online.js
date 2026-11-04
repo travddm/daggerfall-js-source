@@ -113,7 +113,7 @@ import { owIdInCell, owRowInCell, owRowSane } from './overworldLaw.js';   // OW6
 import { reconnectWave } from './reconnectWave.js';   // SCALE2c: a relay deploy's reconnect, spread by the hub's count
 import { readWatchReceipt } from './watchReceipt.js';   // SEAT1b: the Watch's tick, read (never judged) at home
 import { ownerClock, stampedFrameText, applyingOwnerTm } from './ownerClock.js';   // OWNER-CLOCK: a foes frame says when its foes were stepped, and is applied with it in hand
-import { installedProfileHash, profileMatches, profileChangedText } from '../systems/online/serverProfile.ts';   // P0 SERVER PROFILE: the profile this page installed, named in every hello and checked in every welcome
+import { installedProfileHash, profileMatches, profileChangedText } from '../systems/online/serverProfile.ts';
 import { sayHelloLaws } from './helloLaws.ts';
 import { t } from '../systems/textManager.js';   // L10N4: the HUD line's words in the player's language (the relay's own words pass as it said them)
 export { WORLD_CELL, RANGE_PIXELS, worldRoom };
@@ -1003,10 +1003,8 @@ export class OnlineSession {
     this.status = 'closed'; this.error = null;
   }
 
-  /** The relay's welcome named another version than this client's RELAY_VERSION (relayMatches). The client and the
-   *  relay ship as one pair, so no retry or rejoin can reach a matching relay from this page: every room is left,
-   *  nothing joins again, and the status line tells the player to reload - in `words` when the refusal is another's (P0
-   *  SERVER PROFILE: the welcome named another profile hash, systems/online/serverProfile.ts profileChangedText). */
+  /** The welcome named another version or profile: no rejoin from this page can reach a matching relay, so every room
+   *  is left and the player is told to reload, in `words` when given. */
   refuseVersion(words) {
     this.leave();
     this.versionRefused = true;
@@ -2086,7 +2084,7 @@ export class OnlineSession {
     if (this.wire2) frame.w2 = 1;   // SCALE5b: the second wire - a relay that knows it batches; one before it reads no such field
     if ((isSocialRoom(this.room) || isRegionRoom(this.room)) && !this._hubBus) frame.hs = 1;   // SCALE5c: the shards understood - the hub's and a region's (part two); the bus says which is this account's
     if (isBattleRoom(this.room) && this._siegePass) frame.sp = this._siegePass;   // SEAT2a part four: the battle's pass (CROWN1 part two: a Royal Tourney's too)
-    sayHelloLaws(frame, room, installedProfileHash());   // the laws this build stands on (net/helloLaws.ts)
+    sayHelloLaws(frame, room, installedProfileHash());
     frame.fv = 1;   // STAFF-PANEL5-FREEZE: this build shows the freeze screen - a relay closes a frozen account's socket from a build that cannot
     return frame;
   }
@@ -3162,7 +3160,7 @@ export class OnlineSession {
     const now = this._now();
     const primary = room === this.room;   // WORLD6b-iii(b): a halo room's frames place its peers and carry a peer's foes and blows; the host, the clock and the memory are my own room's alone
     if (m.t === 'welcome') {
-      if (!relayMatches(m.v) || !profileMatches(m.ph)) { this.refuseVersion(relayMatches(m.v) ? profileChangedText() : undefined); return; }   // one version and (P0 SERVER PROFILE) one rule set: a relay of another, or redeployed on other rules, needs a reload of the page
+      if (!relayMatches(m.v) || !profileMatches(m.ph)) { this.refuseVersion(relayMatches(m.v) ? profileChangedText() : undefined); return; }   // another version or rule set needs a reload of the page
       if (primary) this._shardMiss = 0;   // SCALE5c: a room that welcomes is a room the relay keeps
       this.welcomes++;   // AUDIT HCC-PARK (client C4)
       { const ws = primary ? this._ws : this._halo.get(room)?.ws; if (ws) this._welcomed.add(ws); }   // SD-HELLO: this socket may say more than its hello now

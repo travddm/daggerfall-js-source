@@ -1,6 +1,6 @@
 // @ts-check
 import { validStaffEventIn } from './staffEvent/staffEventLaw.js';   // STAFF-EVENT: a staff event's word in
-import { readHelloLaws } from './helloLaws.ts';   // the laws a hello says it stands on, read in one home with the client's side
+import { readHelloLaws } from './helloLaws.ts';
 import { validStaffTeleportIn } from './staffTeleport.js';
 import { validRelayCfgIn } from './relayCfg.js';   // SCALE5b: a relay setting, said to the hub
 import { HUB_SHARD_ROOMS, isHubShard, HUB_FIND_Q_MAX, REGION_SHARD_ROOMS } from './hubShards.js';   // SCALE5c: the hub, sixteen ways
@@ -1656,7 +1656,7 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  SLAM13: moved here from server/src/index.js so BOTH ENDS know the name. The welcome carries it (`v`), and the client
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
-// world291: P0 SERVER PROFILE - the relay serves its server's profile (`/profile`, net/profile/officialProfile.ts), names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none (PROFILE_OTHER_REASON); net/profile/officialProfile.ts and net/profile/profileHash.ts join the bundle. world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
+// world291: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
 export const RELAY_VERSION = 'world291';
 // world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
 //   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
@@ -2510,7 +2510,7 @@ export function parseClient(text, { hasHello = false } = {}) {
     // SCALE5c: the hub's shards understood (net/hubShards.js) - 1 or nothing, any other value no offer (the `w2` law): the
     // bus tells such a hub link which shard is its own
     if (m.hs === 1) hello.hs = 1;
-    readHelloLaws(m, hello);   // the laws the build stands on (net/helloLaws.ts)
+    readHelloLaws(m, hello);
     if (m.fv === 1) hello.fv = 1;   // STAFF-PANEL5-FREEZE: this build shows the freeze screen (net/staffChat.js) - 1 or nothing; a frozen account's socket from a build without it is closed with the reload words
     return hello;
   }

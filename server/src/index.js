@@ -178,7 +178,7 @@ import { followNoted, withoutRoom, followHello, followJoined, followLeft, follow
 import { FOLLOW_INTERNAL_SAY } from '../../src/net/staffFollow.js';
 import { takeStaffMessage } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: a staff message's nudge, to one account's own hub sockets
 import { cellDoor, cellCall, nodeHeard, cellLevelOf, coverOf, inCover, junkOutsideCover, atCover, cellsWelcome } from './cellNodes.js';   // COST-2: a cell's node, the directory, the node an object is told; part two: a call that names a cell, through the tree
-import { cellDoors, cellTell, isCellDirectory, cellPlanAlarm } from './cellMoves.js';   // COST-2 part two: the tree moves - the directory's and a node's doors, the counts, the cell door, the directory's alarm
+import { cellDoors, cellTell, isCellDirectory, cellPlanAlarm } from './cellMoves.js';   // the cell tree's doors, counts and the directory's alarm
 import { isCoarseNode, cellSeedOf } from '../../src/net/cellTree.js';   // COST-2: a coarse node is the Worker's name for an object, never a page's room; part two: the cellSeed setting read
 import { staffNetFrame, staffNetClosed, staffFoesSeen, staffFoesStripped, staffReactAsk, staffReactPose, staffLeft } from './staffFeeds.js';   // STAFF-PANEL5-FEEDS: the Staff Panel's counts - network bursts, monsters, an encounter's reaction (off until their URLs are set)
 import { hiddenMay, hiddenAsked, seatsTaken, hiddenSeats, hiddenHello, hiddenPose, hiddenLapse, hiddenEntered, isHidden } from './staffHidden.js';   // STAFF-PANEL5-HIDDEN: a hidden staff spectator, named by nobody
@@ -189,8 +189,8 @@ import { isInstanceRoom, instanceOf, instanceAdmission, partyHoldsOwner, INSTANC
 import { isStaff } from '../../src/net/staffCommands.js';
 import { preTokenGate, placeGate } from './helloGate.js';   // a room's hello gate: before the token, or (battles, floors, realms, instances, cells, worlds) after it
 import { sdCopyRight, sdNewcomerWord, sdAcctTell, sdAcctInternal, SD_INTERNAL_ACCT, sdSeatsInternal, SD_INTERNAL_SEATS, sdOpenRoute, SD_OPEN_PATH } from './sdCopy.js';   // SD-PARTY: a party's own Hour - its door, one life and one win a Hollow
-import { relayFactsAnswer, relayProfileHash, RELAY_FACT_PATHS } from './relayFacts.ts';   // /health and (P0 SERVER PROFILE) /profile, and the profile's hash every welcome names
-import { helloDoorRefused, GROUND_OLD_WORDS } from './helloDoor.ts';   // the hello's doors (P0 SERVER PROFILE: the profile's first) and their words
+import { relayFactsAnswer, relayProfileHash, RELAY_FACT_PATHS } from './relayFacts.ts';   // /health, /profile and the profile's hash
+import { helloDoorRefused, GROUND_OLD_WORDS } from './helloDoor.ts';
 import { RELAY_CFG_TTL_MS, RELAY_INTERNAL_CFG, mayRelayCfg, relayCfgValue } from '../../src/net/relayCfg.js';   // SCALE5b: the relay's settings, at run time
 import { leaseKeyOf, mintLease, readLease, leaseRoom, LEASE_FRAME_MIN_MS, LEASE_OLD_REASON } from '../../src/net/roomLease.js';   // LEASE1: the hub's word on every socket, in every room
 /** LEASE1 (the fourth review of the PR): a frame of a build that hands on no lease asks the hub's door at most this often -
@@ -397,8 +397,6 @@ const riteRecordOk = (v) => !!v && typeof v === 'object' && Number.isSafeInteger
  *  is one it reads (a misspelt `enforce` it would ignore), and that it reads as a line rather than as its default.
  *  The words go back in the hub's answer (`error`), which /relay shows its developer. */
 const BODY_KEYS = ['enforce', 'body', 'hull'], BODY_LINE_KEYS = ['depth', 'perS'];
-/** GROUND-GATE (Field-Bugs-2026-10-17f): the words a build on an older ground is refused with - the error frame's, which
- *  every build shows as its own (net/online.js), so the copy that cannot know why is told what to do. */
 /** FOE-BOUNDS: the most stripped records the relay remembers it has counted - a cell's whole stream over a window. */
 const GRANT_STRIPS_SEEN_MAX = 4096;
 const relayCfgRefusal = (k, v) => {
@@ -550,7 +548,7 @@ async function lawKeyOf(env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (RELAY_FACT_PATHS.includes(url.pathname)) return relayFactsAnswer(url.pathname);   // /health; P0 SERVER PROFILE: /profile, fetched before an online world boots
+    if (RELAY_FACT_PATHS.includes(url.pathname)) return relayFactsAnswer(url.pathname);
     if (url.pathname === SD_OPEN_PATH) return sdOpenRoute(request, env, url, await lawKeyOf(env));   // SD-SOLO: which shared Hour a player in no party goes to
     if (url.pathname === SAFE_LAW_PATH) return lawDoor(request, env);   // SAFE4: a mute or ban the account service pushed, for the hub
     const key = roomOf(url.pathname);
@@ -3511,7 +3509,7 @@ export class Room {
       const instRoom = isInstanceRoom(a.key);   // INSTANCES (the audit): nor an instance's - its key is known to every member it ever had
       let gate = null;
       if (preTokenGate(this, ws, a.key, now)) return;   // the room's hello gate (A6) - before the token for the rooms that do not spend it after (helloGate.js); SCALE5a: the close says the token is unspent
-      if (await helloDoorRefused(this, ws, a.key, m, now)) return;   // GROUND-GATE: a build on an older ground - GRANT-DOOR: or on no spawn grant while the door is on - refused before anything is written (a method of its own)
+      if (await helloDoorRefused(this, ws, a.key, m, now)) return;   // refused before anything is written (helloDoor.ts)
       // ACC1d: the name this socket will wear, and whether the relay vouches for it. AUDIT 68 S01-hello-writes-before-token:
       // asked BEFORE anything is written or replaced (the id's secret, its look, a live holder of the id, the
       // attachment), so a refused hello leaves nothing behind - a tokenless one planted a secret that refused the owner
@@ -3719,7 +3717,7 @@ export class Room {
       // WORLD5: the relay's clock rides the welcome, so a client whose machine's clock is off reads the shared world time through the offset
       // AUDIT WORLD5 C11: stamped as the welcome is BUILT, not as the hello began - four storage awaits sit between the
       // two, and every millisecond of them was an offset the client carried as the relay's clock
-      // SRV-N / SLAM13 (AUDIT SLAM A5): the relay's VERSION rides it (`v`, last), so a client can tell a restarted relay from the one it was talking to, and one built against another law can say so
+      // The relay's version (`v`) and profile hash (`ph`) ride it, so a client can tell a relay on another law or other rules.
       const gm = streamsFoes(a.key) ? this._grantWelcome() : '';   // GRANT2: the spawn grants' mode, a cell's (GRANT4: and a world room's)
       const rf = (isCellRoom(a.key) && this._refereesPoses() ? ',"rf":1' : '') + cellsWelcome(a);   // SCALE5b: this cell judges the poses that reach it - a halo's at their full rate; COST-2 (b): and the fine cells this socket covers (`cells`)
       const welcome = `{"t":"welcome","id":${JSON.stringify(m.id)},"peers":${JSON.stringify(roster)},"host":${JSON.stringify(host)}${ow},"world":${world ?? 'null'},"now":${Date.now()},"v":${JSON.stringify(RELAY_VERSION)},"ph":${JSON.stringify(await relayProfileHash())}${rf}${gm}${a.ly ? `,"ly":${a.ly}` : ''}}`;   // SCALE5d: and which layer of the place this is

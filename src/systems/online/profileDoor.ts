@@ -1,9 +1,5 @@
-// P0 SERVER PROFILE: THE FRONT DOOR'S FETCH (server-profile design, section 4; decision #65).
-//
-// Before an online world boots, the page asks its relay for the profile (`GET <relay>/profile`), checks the relay's
-// version and the profile against this build, and installs it (serverProfile.ts). The world reads dungeon sizes,
-// rivers and the ground mods' pins as it boots, so a value that came later, with a room's welcome, would be too late
-// for them. main.js wires this into its lazy `bootWorld`, so no host grows (HOST-SPLIT).
+// The front door: before an online world boots, fetch the relay's `/profile`, check its version and hash, and install
+// it. The world reads dungeon sizes and ground pins while it boots, so the welcome would be too late. main.js wires it.
 
 import { relayUrl, relayMatches } from '../../net/wire.js';
 import { DEFAULT_SERVER } from '../../net/online.js';

@@ -37,7 +37,7 @@ import { windowEmissionRGB } from './render/windowEmission.js';
 const bootExterior = (...a) => import('./scenes/exterior.js').then((m) => m.bootExterior(...a));
 const bootInterior = (...a) => import('./scenes/interior.js').then((m) => m.bootInterior(...a));
 const bootDungeon = (...a) => import('./scenes/dungeon.js').then((m) => m.bootDungeon(...a));
-// P0 SERVER PROFILE: an online world boots on the server's profile, fetched and installed first (systems/online/profileDoor.ts).
+// An online world boots on the server's profile, installed first (profileDoor.ts).
 const bootWorld = (...a) => import('./systems/online/profileDoor.ts').then((d) => d.openProfileDoor(a[2], a[3])).then(() => import('./scenes/world.js')).then((m) => m.bootWorld(...a));
 
 import { ensureArena2, getBytes } from './scenes/dataSource.js';

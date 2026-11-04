@@ -1,20 +1,12 @@
-// P0 SERVER PROFILE: THE HASH THAT NAMES A PROFILE (server-profile design, section 9; decision #65).
-//
-// `ph` is the SHA-256 of the profile AS WRITTEN, in a canonical form: object keys sorted at every depth, arrays in their
-// own order, no whitespace. So the relay, the account Worker and every client that holds the same profile name it the
-// same, whatever order its source lists its keys in. The registry's defaults are NOT filled in first (decision 5): the
-// relay bundles only the profile and this file, never the key registry, so a key added with its default moves no
-// relay bundle.
-//
-// A leaf: no imports. test/importGraph.mjs walks the relay's bundle, and Workers and browsers both have
-// `crypto.subtle`.
+// `ph`, the name of a profile: SHA-256 of the profile as written, in canonical JSON (keys sorted at every depth), so
+// every holder names it the same whatever its key order. Defaults are not filled in, so the relay bundles no registry.
+// A leaf: the relay bundles it.
 
 /** The wire's shape of a profile hash: 64 lowercase hex digits. */
 export const PROFILE_HASH_RE = /^[0-9a-f]{64}$/;
 
-/** The close reason of a hello the relay refused for its `ph`: none, or another than the relay's (a WebSocket close's
- *  reason is at most 123 bytes; the player's words ride the error frame before it, server/src/helloDoor.ts). No setting
- *  holds this door open: the fork has no older build to let in. */
+/** The close reason of a hello refused for its `ph`. A close reason holds 123 bytes, so the player's words ride the
+ *  error frame before it (server/src/helloDoor.ts). */
 export const PROFILE_OTHER_REASON = 'other rules';
 
 /** The profile's JSON with every object's keys sorted, at every depth. Throws on a value JSON cannot hold. */

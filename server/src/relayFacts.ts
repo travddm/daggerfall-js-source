@@ -1,6 +1,5 @@
-// THE RELAY'S PUBLIC FACTS: `/health` (which relay this is) and, P0 SERVER PROFILE, `/profile` (the rules its server
-// plays by, which an online page fetches before its world boots - systems/online/profileDoor.ts). Both name the
-// profile's hash (`ph`), which every welcome names too (server/src/index.js).
+// The relay's public facts: `/health` (which relay this is) and `/profile` (the rules it plays by, fetched by an online
+// page before its world boots). Both name the profile's hash, as every welcome does.
 
 import { RELAY_VERSION } from '../../src/net/wire.js';
 import { OFFICIAL_PROFILE } from '../../src/net/profile/officialProfile.ts';

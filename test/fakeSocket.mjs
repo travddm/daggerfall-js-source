@@ -16,8 +16,8 @@ import { installedProfileHash } from '../src/systems/online/serverProfile.ts';
 
 export const RUNTIME_PING = '{"t":"ping"}';
 export const RUNTIME_PONG = '{"t":"pong"}';
-/** A welcome as the relay of this tree stamps it: `v` added when the frame names none, and (P0 SERVER PROFILE) `ph` the
- *  profile the page installed, when it installed one and the frame names none. */
+/** A welcome as this tree's relay stamps it: `v`, and `ph` when the page installed a profile, each where the frame names
+ *  none. */
 export const stampWelcome = (o) => {
   if (!o || typeof o !== 'object' || o.t !== 'welcome') return o;
   const ph = installedProfileHash();

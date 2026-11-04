@@ -21,9 +21,7 @@ import { parse } from 'acorn';
 /** The relative specifiers a file names, in the order they are written. */
 function specifiers(file) {
   if (!/\.(m?js|ts)$/.test(file)) return [];
-  // P0 SERVER PROFILE: a .ts module's imports are read as esbuild reads them, its types stripped first (Node's own
-  // stripper, for the erasable-only TypeScript the coding standards allow). Before, a .ts file was a leaf here, and an
-  // import it gained would have joined a Worker's bundle unseen.
+  // A .ts module's imports are read with its types stripped, so an import it gains cannot join a Worker's bundle unseen.
   const text = readFileSync(new URL('../' + file, import.meta.url), 'utf8');
   const ast = parse(file.endsWith('.ts') ? stripTypeScriptTypes(text) : text, { ecmaVersion: 'latest', sourceType: 'module' });
   const found = [];

@@ -1,12 +1,6 @@
-// P0 SERVER PROFILE: THE PROFILE THIS PAGE PLAYS BY (server-profile design, sections 4 and 6; decision #65).
-//
-// An online page installs the server's profile once, before the world boots (profileDoor.ts), and it is frozen for the
-// page's life: a relay redeployed with other rules refuses the page's next hello, and its welcome refuses the page
-// (net/online.js refuseProfile). An online page with nothing installed (a test, a probe) plays by the official
-// profile; single player plays by each key's offline value.
-//
-// `rule(name)` is the read that replaces an `isOnlinePage() ? A : B` rule branch, one key per branch. The lane's own
-// switches (systems/online/onlineLane.js) read `activePins()`.
+// The profile this page plays by, installed once before an online world boots (profileDoor.ts) and frozen for the page's
+// life. `rule(name)` replaces an `isOnlinePage() ? A : B` branch; the lane's tables read `activePins()`. Online with
+// nothing installed (a test) plays the official profile; single player plays each key's offline value.
 
 import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
 import { profileKeyOf, profileRuleErrors, resolveRules, type ProfileValue } from '../../net/profile/profileKeys.ts';

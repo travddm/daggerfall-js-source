@@ -28,7 +28,7 @@ function walkFiles(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walkFiles(p, out);
-    else if (name.endsWith('.js') || (name.endsWith('.ts') && !name.endsWith('.d.ts'))) out.push(p);   // P0 SERVER PROFILE: TypeScript modules speak too
+    else if (name.endsWith('.js') || (name.endsWith('.ts') && !name.endsWith('.d.ts'))) out.push(p);
   }
   return out;
 }

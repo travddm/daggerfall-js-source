@@ -1,15 +1,6 @@
-// P0 SERVER PROFILE: THE KEY REGISTRY (server-profile design, sections 5 and 6; decision #65).
-//
-// One row per online rule a server profile may set. Each row declares DFU's value (`dfu`) and today's online value
-// (`online`, the default), so the first PR changes no play and the options sweep can offer DFU's value. The registry
-// is data and pure functions only: the account Worker reads it, and nothing a Worker reaches may import preferences,
-// browser storage, the DOM or `t()` (simulation-core design, section 3). So `offline` names a setting rather than
-// reading it, and `words` is an l10n key the client translates where it shows it.
-//
-// NOT IN THE RELAY'S BUNDLE (decision 5): the relay hashes the profile as written and reads no key yet. The client
-// validates a fetched profile against this registry at the front door (systems/online/serverProfile.ts).
-//
-// A leaf: no imports (test/importGraph.mjs).
+// The key registry: one row per online rule a profile may set, each with DFU's value and today's online value. Data and
+// pure functions only, because the account Worker reads it: `offline` names a setting, and `words` is an l10n key. The
+// relay does not bundle it; the client checks a fetched profile against it.
 
 export type ProfileValue = boolean | number | string;
 
@@ -39,9 +30,8 @@ export type ProfileKey = {
 };
 
 export const PROFILE_KEYS = Object.freeze({
-  // ON60, DISC22-A: whether a smith mends enchanted gear. A rule of the economy every player meets at the same counter,
-  // so the room holds one answer. DFU ships it False (defaults.ini AllowMagicRepairs); the port ships True offline and
-  // the online lane forced True.
+  // Whether a smith mends enchanted gear: every player meets the same counter, so the room holds one answer. DFU ships
+  // False (defaults.ini AllowMagicRepairs).
   'repair.allowMagic': Object.freeze({
     census: Object.freeze(['ON60'] as const),
     feature: 'DISC22-A',

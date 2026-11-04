@@ -37,7 +37,7 @@
 
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
-import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // RF4: the lane learns the player's own switches from the rows (the room's are the server profile's pins)
+import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
 import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
@@ -487,7 +487,7 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.enhancedAi.effect', 'Takes effect at once; pathfinding from the next dungeon you enter.'); },   // AUDIT TACT D7: the tactics, cover and blows read the switch live
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'enhancedAI', initial: true, online: 'room',   // BAL4: ON by default (it was off - DFU's classic motor the 1:1 law); the lane forces it on online as it always did; an unstamped shelf adopts it (uiPrefs.js PREF1_ADOPT_NEW_DEFAULT)
+      store: 'prefs', key: 'enhancedAI', initial: true, online: 'room',   // on by default; an unstamped shelf adopts it (uiPrefs.js PREF1_ADOPT_NEW_DEFAULT)
       // TELL9 (11.3): telegraph contrast - thicker lines, a white keyline, a pattern for
       // every guard (render/foeTelegraph.js telegraphContrastOn); what THIS screen draws, so the player's online too
       also: Object.freeze([Object.freeze({ store: 'prefs', key: 'telegraphContrast', initial: false, online: 'player' })]),
@@ -770,7 +770,7 @@ export const FEATURES = Object.freeze([
       + 'sigil that grows with your Renown.'); },   // SIGIL1; AUDIT UPDATE L8: LOOT-GATE's own words, its numbers never (CLAUDE.md LOOT-GATE)
     get effect() { return t('features.lootRarity.effect', 'Takes effect on the next drop; items you wear update within a few seconds.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
+    control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }),   // on by default: the ladder is the port's own game, not an opt-in
   }),
   WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
@@ -1629,7 +1629,7 @@ export const FEATURES = Object.freeze([
       + 'only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'room' }),   // CAMP-RARE: forced on online, the room's ground (the groups are rare: systems/campEncounters.js); Off is DFU's lone wanderers
+    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'room' }),   // the room's ground online (systems/campEncounters.js); Off is DFU's lone wanderers
   }),
   // WILD-ROAD (FIELD BUGS 2026-10-04e, Discord: "having to completely halt my travel because 1 rat chose today to die
   // can be quite the interruption"): systems/roadEncounters.js - the port's own. On a journey or the Overworld, a
@@ -1870,7 +1870,7 @@ export function checkFeature(f) {
   else if (c.store === 'prefs') {
     // RF4: a prefs row is the ONE declaration of its switch - the shelf's default and the lane's answer ride it
     if (c.initial === undefined) out.push('a prefs row declares its initial value');
-    if (c.online === 'room' ? !roomPinned(c) : c.online !== 'player') out.push("a prefs row declares its online answer: 'room' (pinned in the server profile) or 'player'");   // P0 SERVER PROFILE: the room's value is the profile's pin, a switch or one of the row's own tiers (F3a)
+    if (c.online === 'room' ? !roomPinned(c) : c.online !== 'player') out.push("a prefs row declares its online answer: 'room' (pinned in the server profile) or 'player'");
     if (c.lane && !_lanes.has(c.lane)) out.push(`lane '${c.lane}' is not registered`);
     if (c.tiers !== undefined) {
       if (!Array.isArray(c.tiers) || !c.tiers.length) out.push('tiers is not a list');

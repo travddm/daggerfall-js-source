@@ -1,45 +1,9 @@
-// ONLINE IS THE ENHANCED LANE, WHOLE (OL1).
-//
-// AUDIT WORLD5 recorded that the classic and enhanced lanes diverge
-// under one shared seed (the weather's hourly evolution is the enhanced
-// lane's; a mod's roads and seasons are a mod's), so two players in one
-// world could stand under two skies on two road networks. Mac's answer
-// is not a per-switch rule but a lane: while the page is ONLINE, the
-// skin is enhanced and every enhancement the port owns is on -
-// whatever the player's shelf says, and whatever a probe's
-// `?skin=classic` says. The shelf is not written: the forcing is a
-// READ, for this page load, so the player's own choices stand again
-// the moment they play offline.
-//
-// THE VENDORED MODS ARE NOT IN THAT SENTENCE ANY MORE (MODS-ONLINE-2,
-// 2026-09-22). Every mod's `Enabled` is the player's now,
-// online as offline; the lane forces exactly the two switches the
-// room's GROUND depends on. The reading that got there - why a
-// damage formula, a foe's stats, a loot roll and a block were never
-// shared to begin with, and why a road bed is - is written over
-// ONLINE_ROOM_MOD_KEYS below.
-//
-// ONE HOME, THREE READ PATHS. The three places a switch is read -
-// uiSkin.js (the skin), uiPrefs.js getPref (the port's own switches)
-// and modSettings.js modSetting (a mod's switches) - each ask this
-// module first. Nothing is forced at a mount site, because a port that
-// forces at forty-seven `isEnhanced()` sites is a port where the
-// forty-eighth is missed. And the FUTURE half of Mac's sentence is a
-// pin, not a promise: test/systems/onlinelane.test.js walks PREF_DEFAULTS and
-// MOD_SETTINGS and fails on any boolean switch this module has neither
-// forced nor declared the player's own, so a new enhancement cannot
-// land without answering the question.
-//
-// What stays the player's: the DIALS (grass density, cloud quality,
-// land view distance - a machine that cannot hold the full field keeps
-// the lane at a lower cost), the touch knobs, the FPS counter, the
-// HUD scale and the text size - none of them decides what the world
-// is, only how this machine draws it. The URL kill doors the probes
-// ride (`?sky=classic`, `?water=off`, `?evolve=off`) stay doors: an
-// online page never carries one.
+// Online is one lane: the skin, getPref and modSetting ask this module first, so the room's switches are forced in one
+// place (the server profile's pins) and never at a mount site. test/systems/onlinelane.test.js fails a boolean switch
+// that is neither forced nor declared the player's. The player keeps the dials and what only their screen draws.
 
 import { pageHas } from '../pageQuery.js';   // PERF-URL: the page's query, parsed once a search
-import { activePins, onProfileInstalled, rule } from './serverProfile.ts';   // P0 SERVER PROFILE: the lane's tables are the installed profile's
+import { activePins, onProfileInstalled, rule } from './serverProfile.ts';
 import { PROFILE_KEYS } from '../../net/profile/profileKeys.ts';
 import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
 
@@ -111,8 +75,8 @@ export function refuseOnlinePowerFlags(params) {
   return dropped;
 }
 
-/** P0 SERVER PROFILE: is a Features row that says `online: 'room'` pinned in the official profile - a switch on or off
- *  whole, or one of the row's own tiers? The registry's own check holds every such row to it (systems/features.js). */
+/** Is a Features row that says `online: 'room'` pinned in the official profile, as a boolean or one of its tiers?
+ *  features.js holds every such row to it. */
 export function roomPinned(c) {
   const prefs = OFFICIAL_PROFILE.pins.prefs;
   if (!Object.hasOwn(prefs, c.key)) return false;
@@ -120,13 +84,10 @@ export function roomPinned(c) {
   return typeof pin === 'boolean' || (c.tiers ?? []).some(([v]) => v === pin);
 }
 
-/** Every port-owned switch the online lane forces, and the value it forces: the installed server profile's pins
- *  (net/profile/officialProfile.ts `pins.prefs`; P0 SERVER PROFILE). The skin is the player's (OVH3). A live binding:
- *  it follows the profile the front door installs (systems/online/serverProfile.ts onProfileInstalled). RF4: a
- *  Features row says `online: 'room'` for a switch pinned here, or `'player'`. */
+/** The port's switches the lane forces online, at the installed profile's `pins.prefs`. A live binding, so it follows
+ *  the profile the front door installs. */
 export let ONLINE_FORCED_PREFS = activePins().prefs;
-/** RF4: the registry's door - a `'player'` answer leaves the key to the player by name; a `'room'` answer is the
- *  profile's pin, which the registry's own check holds it to (systems/features.js). Idempotent. */
+/** The registry's door: a `'player'` answer leaves the key to the player by name. Idempotent. */
 export function declareOnlinePrefs(table) {
   for (const [key, answer] of Object.entries(table ?? {})) {
     if (answer === 'player' && !ONLINE_PLAYERS_OWN_PREFS.includes(key)) ONLINE_PLAYERS_OWN_PREFS.push(key);
@@ -166,13 +127,8 @@ export const ONLINE_PLAYERS_OWN_PREFS = [
   'reducedMotion',   // whether THIS player's title cards stand still (ui/gate/gateTitleCard.js) - an accessibility choice, nothing the room agrees on
 ];   // (RF4: grown by declareOnlinePrefs with the registry's 'player' answers - the dials)
 
-/** DISC22-A: THE DFU
- *  SETTINGS THE ROOM PLAYS BY - the fourth read path (settings.js getData asks here first, as getPref and
- *  modSetting do). AllowMagicRepairs is a rule of the economy every player meets at the same smith: one player able
- *  to mend an enchanted blade and another turned away at the same counter is two games in one town. Its OFFLINE
- *  default is the port's too (settings.js PORT_DEFAULTS); online it is not a choice. Values are DFU's own strings.
- *  P0 SERVER PROFILE: each is a profile key's (net/profile/profileKeys.ts, a key with a `setting`), at the installed
- *  profile's value - `repair.allowMagic` (ON60) the first. A live binding, as ONLINE_FORCED_PREFS. */
+/** The DFU settings the room plays by (settings.js getData asks here first), in DFU's own strings: each profile key
+ *  that names a `setting`, at the installed profile's value. A live binding. */
 export let ONLINE_FORCED_SETTINGS = forcedSettingsOf();
 function forcedSettingsOf() {
   const out = {};
@@ -205,25 +161,12 @@ export function onlineForcedPref(key, search) {
  *  unreachable while the room holds Travel Options' switches, said rather than teleported should it ever be reached. */
 export const ONLINE_LAND_TRAVEL_REFUSAL = 'Online, journeys over land cannot be skipped. Turn on Travel Options and try again.';
 
-/** THE MOD KEYS THE ONLINE LANE FORCES - the floor the room stands on, and the switches that spend a stranger's
- *  evening (MODS-ONLINE-2 to -5; the reading that chose them is written over the table in
- *  net/profile/officialProfile.ts, where P0 SERVER PROFILE moved it). The installed profile's `pins.modKeys`; a live
- *  binding, as ONLINE_FORCED_PREFS. */
+/** The mod keys the lane forces online: the installed profile's `pins.modKeys` (why each is the room's is written in
+ *  officialProfile.ts). A live binding. */
 export let ONLINE_ROOM_MOD_KEYS = activePins().modKeys;
 
-/**
- * THE MODS WHOSE EVERY SWITCH IS THE PLAYER'S, ONLINE.
- *
- * Hand-written, and that is the point: test/systems/onlinelane.test.js walks
- * MOD_SETTINGS and fails on a vendor that is in neither this list nor
- * ONLINE_ROOM_MOD_KEYS, so a new mod cannot land without someone
- * answering the question above for it. A list derived from the table
- * would agree with the table by construction and pin nothing.
- *
- * AUDIT-WH R8's own case (world-tooltips) and MODS-ONLINE's seven are
- * kept first, with the reason each was freed; the eight below them are
- * MODS-ONLINE-2's, each with what the port does instead of sharing it.
- */
+/** Mods whose every switch is the player's online: they draw on one screen, or the owner's machine resolves them and the
+ *  wire carries the result. Hand-written, so onlinelane.test.js fails a vendor in neither this list nor the room's. */
 export const ONLINE_PLAYERS_OWN_MODS = [
   // AUDIT-WH R8: a readout is the player's - it stands nothing, rolls
   // nothing, writes nothing and is not on the wire.
@@ -257,11 +200,9 @@ export const ONLINE_PLAYERS_OWN_MODS = [
   'snowfall',               // SNOWFALL1: the winter ground's paint and the snow drawn over it, on your own screen - the floor under it is the terrain's
 ];
 
-/** REALM P0.2: THE BALANCE MODS ARE THE ROOM'S WHOLE - every key of these reads its shipped default online, apart
- *  from the listed free keys (the reasons are written over the table in net/profile/officialProfile.ts). The installed
- *  profile's `pins.wholeMods`; a live binding, as ONLINE_FORCED_PREFS. */
+/** Mods the room holds whole: every key reads its shipped default online but the listed free keys. The installed
+ *  profile's `pins.wholeMods`; a live binding. */
 export let ONLINE_WHOLE_MODS = activePins().wholeMods;
-// P0 SERVER PROFILE: the tables follow the profile the front door installs.
 onProfileInstalled(() => {
   ONLINE_FORCED_PREFS = activePins().prefs;
   ONLINE_FORCED_SETTINGS = forcedSettingsOf();

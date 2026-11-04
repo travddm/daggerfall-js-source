@@ -9,10 +9,10 @@ import { mintToken, MAX_TTL_S, _b64url } from '../src/net/identityToken.js';
 import { OFFICIAL_PROFILE } from '../src/net/profile/officialProfile.ts';
 import { profileHashOf } from '../src/net/profile/profileHash.ts';
 import { installProfile, _resetProfileForTests } from '../src/systems/online/serverProfile.ts';
-/** P0 SERVER PROFILE: the hash every current build's hello says - the relay refuses a hello without it (PROFILE_OTHER_REASON). */
+/** The hash every current build's hello says; the relay refuses a hello without it. */
 export const OFFICIAL_PH = await profileHashOf(OFFICIAL_PROFILE);
-/** P0 SERVER PROFILE: a pin whose game session joins this relay plays as an online page - one that installed the server's
- *  profile at its front door (systems/online/profileDoor.ts), so its hellos say the hash. Answers the undo, for after(). */
+/** For a pin whose game session joins this relay: installs the official profile, as an online page's front door does,
+ *  so its hellos say the hash. Answers the undo, for after(). */
 export function asOnlinePage() {
   installProfile(OFFICIAL_PROFILE, OFFICIAL_PH);
   return _resetProfileForTests;
@@ -206,7 +206,7 @@ export function fakeRoom(key, { now = () => Date.now(), ROOMS = null, poll = 'dr
     // frame would be testing the wrong half forever.
     const tok = 'tok' in over ? over.tok : await token(id, { s: over.tokenSub ?? over.acct, n: over.name ?? String(id), k: over.kind, t: over.title, ts: over.ts, g: over.glyphs, mu: over.mu, fz: over.fz, lv: over.lv, gi: over.gi, gt: over.gt, gm: over.gm, rc: over.rc, ci: over.ci, au: over.au, rb: over.rb, ar: over.ar, cl: over.charLevel, wa: over.wa, hd: over.hd });   // INT7: `wa` the arms the token signs   // ARENA4b: `charLevel` the character's level the token signs as `cl` (never the frame's own `cl`, ONE-SEAT's claim of the seat)   // ARENA4: `kind` 'linked' for a registered account, `ar` its season's rating   // AUDIT HCC-PARK: `tokenSub` names the verified account the token carries (default acct-<id>; never a frame field - a social hello's own `acct` is the hub's) - one player in a second tab is one account under two ids
     // AUDIT FRIENDS-SYNC F5: a hello with an account is a current build's - it says `ps` - unless the pin asks for an old one (`ps: undefined`)
-    // P0 SERVER PROFILE: a hello says the official profile's hash unless the pin says another (`ph`) or none (`ph: undefined`)
+    // the official profile's hash unless the pin says another (`ph`) or none (`ph: undefined`)
     const frame = { t: 'hello', id, secret: 'secret-of-' + id, name: id, look, pose, ph: OFFICIAL_PH, ...(over.acct && !('ps' in over) ? { ps: 1 } : {}), ...over };
     delete frame.title; delete frame.ts; delete frame.glyphs; delete frame.mu; delete frame.fz; delete frame.lv; delete frame.tokenSub; delete frame.gi; delete frame.gt; delete frame.gm; delete frame.rc; delete frame.ci; delete frame.au; delete frame.rb; delete frame.kind; delete frame.ar; delete frame.charLevel; delete frame.wa; delete frame.hd;   // ACC3/MOD1/RENOWN1/GUILD1c/REALM-DOOR/WB9g/SEASON1/ARENA4/ARENA4b/INT7: they went into the token above; the wire has no such hello field
     if (tok == null) delete frame.tok; else frame.tok = tok;
