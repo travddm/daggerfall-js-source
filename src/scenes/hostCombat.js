@@ -94,44 +94,23 @@ export const hasBowAttack = (basics) =>
   !!basics?.hasRangedAttack1 && (!basics?.castsMagic || !!basics?.hasRangedAttack2);
 
 // ---- RF2: THE ONE ENEMY-LOOT SEAM ----
-/** EnemyEntity.SetEnemyCareer's whole loot chain, in the order DFU
- *  runs it, for every host that stands a foe: GenerateItems(LootTableKey)
- *  on the PLAYER's level and gender (EnemyEntity.cs:328; LootTables.cs
- *  :212/:229/:237 - AUDIT 18), the equipment chain appended and put on
- *  (equipEnemy, :330-347), the map/potion/recipe trio (:388-397, AUDIT
- *  24 wave 43), and then the port's own arm - loot rarity's roll over
- *  the loot the foe carries and never the kit it wears (LR1/LR4).
+/** EnemyEntity.SetEnemyCareer's whole loot chain for every host that stands a foe, in DFU's order: GenerateItems on the
+ *  player's level and gender (EnemyEntity.cs:328), the equipment chain (equipEnemy), the map/potion/recipe trio
+ *  (:388-397), then the port's loot rarity roll over the loot carried, never the kit worn. One function, so a loot feature
+ *  lands here and a host calls only `spawnEnemyLoot(entity, mobileType, basics, playerEntity)`.
+ *  `rolls` is the host's stream for the trio and the rarity roll; the table roll stays on Math.random, as before.
+ *  Answers the entity's list.
  *
- *  Four hosts stood the same four lines each (the dungeon's two spawn
- *  arms, the exterior foes, the watch), and the first departure from
- *  DFU's rules had to visit all four; the next would have too. ONE
- *  function now: a loot feature lands here, and a host says only
- *  `spawnEnemyLoot(entity, mobileType, basics, playerEntity)`.
- *
- *  `rolls` is the host's stream for the trio and the rarity roll (the
- *  exterior pool's injectable stream - a puppet stands with an empty
- *  list and never comes here); the table roll itself stays on
- *  Math.random as UnityEngine.Random is, which is what every host
- *  passed before. Answers the entity's list.
- *
- *  HUMANOID-LOOT: DFU rolls a humanoid foe's loot table at its own chance and drops its whole worn kit (EnemyDeath.cs
- *  l.108-123). The "Humanoid loot" Features row (systems/humanoidLootShare.js) is Classic by default; its Cut choice keeps
- *  a QUARTER of the item chance of every non-gold category (weapons, armour, ingredients, magic items, clothing, books,
- *  religious items) and a quarter of the worn pieces. Gold is computed before the scale applies and rolls at its full rate
- *  either way. "Humanoid" is the same line survival/loot.js's corpse food already draws: class enemies (128+), Orcs by
- *  team, and anything the basics row marks affinity Human - so an Orc or a Knight is cut and a Zombie or a Daedra Lord is
- *  not. `humanoidShare` is an argument (PARTY-LOOT): the live row answers only when the caller names none. */
-/** PLAIN-LOOT: a foe that is no elite leaves
- *  PART of what it carries - every piece the chain put on its body (the table's, the worn kit's droppable cut, the trio
- *  and the port's extras) kept on its own coin, after the humanoid cut; its gold all of it, as that cut leaves it.
- *  A coin per piece and not a scale on the table's chance (AUDIT PLAIN-LOOT): DFU's ladder halves its chance at every
- *  step and rolls it truncated to whole percent, so a scaled chance compounded down the ladder and a 1-3% one fell to
- *  0 - the scale had kept 33-50% of the table, and nothing of a level-1 humanoid's. "Elite" is any of the three: an
- *  ELITE FOE (`eliteFoe`), an Elite Dungeon's foe (`elite`), a LOOT7 champion.
- *  LOOT-EASE: THREE PIECES IN FOUR, where PLAIN-LOOT kept
- *  one in two. FOE-CAP's cap and plain ladder landed on the half a day later; measured through this chain, a plain
- *  humanoid's body held 0.9 pieces and a third of them nothing but gold (1.9, an eighth bare, before PLAIN-LOOT). Half
- *  the cut given back: 1.3 pieces, a fifth bare. */
+ *  HUMANOID-LOOT: DFU rolls a humanoid's table at its own chance and drops its whole worn kit (EnemyDeath.cs l.108-123).
+ *  The "Humanoid loot" row (systems/humanoidLootShare.js) is Classic by default; Cut keeps a quarter of every non-gold
+ *  item chance and of the worn pieces. Gold is untouched. "Humanoid" is survival/loot.js's line: class enemies (128+),
+ *  Orcs by team, affinity Human. `humanoidShare` is an argument (PARTY-LOOT): the live row answers only when the caller
+ *  names none. */
+/** PLAIN-LOOT: a foe that is no elite (`eliteFoe`, an Elite Dungeon's `elite`, a LOOT7 champion) keeps each piece the
+ *  chain put on its body on its own coin, after the humanoid cut; its gold all of it. A coin per piece, not a scale on
+ *  the table's chance: DFU's ladder halves its chance per step and truncates to whole percent, so a scaled chance
+ *  compounded down and a 1-3% one fell to 0. LOOT-EASE: three pieces in four, where PLAIN-LOOT kept one in two; a plain
+ *  humanoid's body held 0.9 pieces, a third of them bare, before the buff. */
 const PLAIN_FOE_LOOT_KEEP = 0.75;
 /** PLAIN-LOOT's own half - the live game's before LOOT-EASE, where RENOWN-LOOT's step starts. */
 const PLAIN_FOE_LOOT_KEEP_BEFORE = 0.5;
@@ -141,12 +120,9 @@ export const plainFoeLootKeep = (quarters = renownLootQuarters()) => lootEased(P
 const eliteLooted = (entity) => !!(entity?.eliteFoe || entity?.elite || championOf(entity));
 // ELITE: `lootDropMult` scales every item category's chance (gold untouched, as the humanoid cut);
 // `lootQualityMult` scales the rarity ladder's odds. Both 1 everywhere but an elite dungeon.
-// PARTY-LOOT: EVERY TERM OF THE ROLL IS AN ARGUMENT. A room's shared
-// base (systems/roomLoot.js) is this chain run on the room's dice and the room's terms - the party's level and gender in
-// `player`, Luck 50, RENOWN-LOOT's first stage - so nothing here may read the roller's page behind the caller's back:
-// the dice reach every draw (the table's, the kit's variant and its poison were Math.random), and `quarters`, `luck` and
-// `find` default to the roller's own (renownLootQuarters, the live Luck, legendaryFindMult) only when the caller names
-// none. `rejects`, when given, receives the pieces PLAIN-LOOT's keep let go - the personal bonus's own draw.
+// PARTY-LOOT: every term of the roll is an argument. A room's shared base (systems/roomLoot.js) runs this chain on the
+// room's dice and terms, so nothing here may read the roller's page behind the caller's back. `quarters`, `luck` and
+// `find` default to the roller's own only when the caller names none. `rejects` receives the pieces PLAIN-LOOT let go.
 export function spawnEnemyLoot(entity, mobileType, basics, player, { rolls = Math.random, lootDropMult = 1, lootQualityMult = 1, humanoidShare, where = null, quarters = renownLootQuarters(), luck = liveStat(player, 'luck'), find = undefined, rejects = null } = {}) {
   const itemChanceScale = (isHumanoid(entity) ? humanoidLootShare(humanoidShare) : 1) * lootDropMult;
   const ease = quarters;   // RENOWN-LOOT: the roller's Renown, read once for the keep and the ladder alike (PARTY-LOOT: the caller's terms)
@@ -199,23 +175,13 @@ export function rollRoomBonus({ rolls, player, pile = false, deepPile = false, r
 }
 
 // ---- EnemyEntity.SetEnemyCareer, the equipment chain (EnemyEntity.cs:330-347) ----
-/** DFU runs the equipment chain by careerIndex BEFORE the class arm:
- *  Orc(7)/OrcShaman(21) -> SetEnemyEquipment(0), Centaur(8)/
- *  OrcSergeant(12) -> (1), OrcWarlord(24) -> (2), and only then
- *  EnemyClass -> Random.Range(0,2). equipmentVariantFor already
- *  carries that whole table; the monster spawn path just never called
- *  it, so five equipment-using monsters walked in naked.
+/** DFU runs the equipment chain by careerIndex before the class arm: Orc(7)/OrcShaman(21) -> variant 0, Centaur(8)/
+ *  OrcSergeant(12) -> 1, OrcWarlord(24) -> 2, then EnemyClass -> Random.Range(0,2). GenerateItems(LootTableKey) runs
+ *  first (EnemyEntity.cs:328), so callers must fill `entity.items` before calling this.
  *
- *  Order note: GenerateItems(LootTableKey) runs FIRST (EnemyEntity.cs:
- *  328) and the equipment items are appended after - callers must have
- *  filled `entity.items` before calling this. */
-/** HUMANOID-LOOT: the share spawnEnemyLoot applies to the loot-table roll (1 = DFU's whole kit on the corpse),
- *  reapplied to a humanoid's WORN gear. This only
- *  touches what lands in `entity.items` (the corpse's droppable loot);
- *  `entity.armorValues`, `entity.weapon` and the equip-slot table below
- *  are built from the FULL `worn` set regardless, so the foe still
- *  fights at its real armour and swings its real weapon - it is worn,
- *  just not always left behind. */
+ *  HUMANOID-LOOT: the share spawnEnemyLoot applies to the table roll (1 = DFU's whole kit on the corpse), reapplied to a
+ *  humanoid's worn gear. It limits only what lands in `entity.items`; `armorValues`, `weapon` and the equip table are
+ *  built from the full worn set, so the foe fights at its real gear. */
 export function equipEnemy(entity, mobileType, playerLevel, rolls = Math.random, { player = null, humanoidShare } = {}) {
   const variant = equipmentVariantFor(entity.careerIndex, entity.isClass, rolls);   // PARTY-LOOT: the caller's dice (Range(0, 2) rolled Math.random)
   if (variant === null) return null;
