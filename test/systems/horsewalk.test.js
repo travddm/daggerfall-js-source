@@ -29,6 +29,10 @@ import { TUTORIALS } from '../../src/systems/tutorialCatalogue.js';
 import { setModSetting, onlineModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { rrRidingOn, rrCanRunRiding, rrRidingSetting, RR_VENDOR } from '../../src/systems/roleplayRealism/rrRealism.js';
 import { fakeDoc, one } from '../decorFakes.mjs';
+import { setPref } from '../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Horse walks on. The default (off, DFU's ride base) is the last test.
+setPref('horseWalks', true);
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const near = (a, b) => Math.abs(a - b) < 1e-6;
@@ -376,4 +380,21 @@ test('HORSE-WALK THE WORDS: the Features row and the Horses tutorial say the hor
   assert.ok(TUTORIALS.find((t) => t.id === 'horse').body.some((b) => b.includes('Your horse walks; hold {Run} to gallop. Do not gallop into people in town: trampling them is a crime.')));
   _resetModSettings();
   assert.equal(rrRidingSetting('TrampleCivilians'), true, 'the trample the page warns of ships on');
+});
+
+test("DFU-GAPS SW5: by default a cared-for horse rides at DFU's base with no Run - the walk is the Horse walks option's - and the row is off and the player's own online", async () => {
+  const { FEATURES } = await import('../../src/systems/features.js');
+  const { ONLINE_PLAYERS_OWN_PREFS } = await import('../../src/systems/online/onlineLane.js');
+  const items = [horse(2, { horseFed: T0 + 600 })];
+  setPref('horseWalks', false);
+  try {
+    const u = createUpkeep({ items: () => items, now: () => T0, horseCare: () => HARD });
+    assert.equal(u.rideWalks('Horse', false), false, 'no Run asked: the DFU ride base, not the walk');
+  } finally {
+    setPref('horseWalks', true);
+  }
+  assert.equal(createUpkeep({ items: () => items, now: () => T0, horseCare: () => HARD }).rideWalks('Horse', false), true, 'the option on: the walk');
+  const row = FEATURES.find((f) => f.id === 'horse-walks');
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['horseWalks', false, 'player']);
+  assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes('horseWalks'));
 });

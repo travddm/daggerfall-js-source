@@ -37,6 +37,7 @@ import {
 import { isWagonKitItem, UPKEEP_ITEM } from './upkeepItemRows.js';
 import { registerItemUseHandler } from '../item/itemTemplates.js';
 import { HORSE_MODE, WAGON_MODE, TRANSPORT } from '../horse/horseCartLaw.js';
+import { horseWalksOn } from './horseWalks.js';   // HORSE-WALK: off, DFU's ride base
 
 /** A breath under this share shows short on the HUD. */
 export const BREATH_LOW = 0.25;
@@ -174,7 +175,7 @@ export function createUpkeep({ items, now, horseCare = () => null, wagonUpkeep =
     return canGallop(breathOf(horse), st.hunger);
   }
 
-  /** transport.js's walk (HORSE-WALK): the horse walks unless it gallops wherever horse care rules its gallop - horse
+  /** transport.js's walk (HORSE-WALK, the Horse walks option, off by default): the horse walks unless it gallops wherever horse care rules its gallop - horse
    *  care on, a horse, the one ridden born (its stats; gallopGate defers to the mod without them). Else false: DFU's
    *  ride base. HORSE-TIERS: `runAsked` the rider asks the gallop (Run held, or latched) - a gallop asked and refused
    *  (winded, starving: gallopGate) walks only in a tier that holds a refused gallop to the walk (`refusedRunWalks` -
@@ -183,7 +184,7 @@ export function createUpkeep({ items, now, horseCare = () => null, wagonUpkeep =
   function rideWalks(mode, runAsked = false) {
     const care = horseCare();
     if (!care || mode !== 'Horse') return false;
-    if (runAsked && !care.refusedRunWalks) return false;
+    if (runAsked ? !care.refusedRunWalks : !horseWalksOn()) return false;   // no Run asked: the walk is the Horse walks option's, else DFU's ride base
     return !!steedStats(ridden(), now(), care);
   }
 
