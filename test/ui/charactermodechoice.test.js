@@ -1,4 +1,4 @@
-// CHARACTER CHARACTER_MODES: the mode question (ui/characterModeChoice.js) - the five answers with their pros and cons, Classic
+// CHARACTER MODES: the mode question (ui/characterModeChoice.js) - the five answers with their pros and cons, Classic
 // first, the Legacy answer only while Project Legacy's master switch is on, and a compact screen that fits the 200.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

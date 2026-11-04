@@ -1,5 +1,5 @@
 // @ts-check
-// CHARACTER CHARACTER_MODES: the law both ends share (docs/systems/character-modes.md). A character picks one mode at creation.
+// CHARACTER MODES: the law both ends share (docs/systems/character-modes.md). A character picks one mode at creation.
 // A mode is two switches: how death works (`classic`, `hardcore`, `legacy`) and whether the character is Ironman (no
 // player trade, no groups). The account service stores the mode on the realm character, signs its code into the
 // identity token (`md`), and the relay reads it from there; a client field is never read for enforcement.
@@ -37,9 +37,6 @@ export function modeOfCode(/** @type {unknown} */ md) {
     null
   );
 }
-
-/** Whether a token may carry this `md`: absent, or a whole code of a mode. */
-export const modeClaimOk = (/** @type {unknown} */ md) => md === undefined || modeOfCode(md) !== null;
 
 /** A death online is final: Hardcore and Hardcore Ironman. (Project Legacy's Bloodline is final by its own law.) */
 export const permadeath = (/** @type {unknown} */ m) => m === 'hardcore' || m === 'hardcore_ironman';
