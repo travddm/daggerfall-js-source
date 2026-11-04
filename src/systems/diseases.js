@@ -44,6 +44,7 @@ import { dice100, formulaOverride } from '../combat/formulas.js';   // DEX4b: On
 import { MOBILE_TYPES } from '../characters/mobile/mobileTypes.js';
 import { localizedText } from './textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
 import { noteFirstUse } from './tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
+import { cureKeepsInfection } from './cureKeepsInfection.js';   // INFECTION-KEPT: DFU's cure ends every disease unless the player chose otherwise
 
 // ---- MagicAndEffectsEnums.Diseases, verbatim ----
 export const DISEASES = Object.freeze({
@@ -181,10 +182,10 @@ export const diseaseCount = (entity) =>
 export const diseaseIncubating = (a) => a?.kind === 'disease' && !a.ended && !a.incubationOver && a.disease != null;
 /** FIELD BUGS 29h (INFECTION-KEPT): the diseases the next cure ENDS - the plain ones while any runs, else the
  *  lycanthropy or vampirism infections (GetDiseaseCount then) - so the temple prices and claims what it takes
- *  (effects.js cureDiseasesInfectionsLast). */
+ *  (effects.js cureDiseasesInfectionsLast; DFU's cure takes all unless the player chose otherwise). */
 export const curableDiseaseCount = (entity) => {
   const live = (entity?.activeEffects ?? []).filter((a) => a.kind === 'disease' && !a.ended);
-  return live.filter((a) => !a.infection).length || live.length;
+  return (cureKeepsInfection() && live.filter((a) => !a.infection).length) || live.length;
 };
 
 /** EndDisease, verbatim: completed marker + expire (the tick pass

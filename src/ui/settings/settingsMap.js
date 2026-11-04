@@ -67,7 +67,7 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("gameplay", "Gameplay", [
     sec("general", "General", [
-      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "ChildGuard/PlayerNudity"]),
+      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "feat:repair-price-by-damage", "ChildGuard/PlayerNudity"]),
     sec("quests", "Quests", [
       "port:questRepair", "feat:questlines", "feat:nearby-quests", "feat:choose-guild-jobs", "Enhancements/GuildQuestListBox", "GUI/CanDropQuestItems",
       "GUI/QuestRumorWeight", "GUI/EnableQuestDebugger"]),
@@ -75,11 +75,11 @@ export const CATEGORIES = Object.freeze([
       "feat:smaller-dungeons", "Experimental/SmallerDungeons", "feat:medium-dungeons", "feat:world-dungeon-sizes", "feat:varied-dungeon-monsters",
       "Enhancements/AlternateRandomEnemySelection", "feat:mod-aquatic-sprites"]),
     sec("loot", "Loot & items", [
-      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
+      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:humanoid-loot", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
     sec("light", "Your light", [
       "feat:torches-from-items", "Enhancements/PlayerTorchFromItems", "feat:mod-handheld-torches"]),
     sec("character", "Character & survival", [
-      "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism"]),
+      "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection"]),
     sec("moving", "Climbing & gathering", [
       "feat:enhanced-climbing", "Enhancements/AdvancedClimbing", "feat:resource-highlights", "feat:mod-foraging"]),
     sec("start", "Starting a new game", [
