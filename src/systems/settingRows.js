@@ -4,4 +4,5 @@ export { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
 export { CRIME_RECOVERY_ROW } from './crimeRecoveryRow.js';
 export { HUMANOID_LOOT_ROW } from './humanoidLootRow.js';
 export { CURE_KEEPS_INFECTION_ROW } from './cureKeepsInfectionRow.js';
+export { REPAIR_PRICE_ROW } from './repairPriceRow.js';
 export { LOCKPICK_TUMBLERS_ROW } from './lockpick/lockpickTumblersRow.js';
