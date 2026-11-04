@@ -369,16 +369,12 @@ export function tierOf(key) {
 // for whoever wants it. The stored file carries overrides alone, so a
 // player who never touched the row takes this default too.
 //
-// DISC22-A: AllowMagicRepairs. DFU ships False - a
-// smith turns an enchanted item away (RepairsObjects' magic arm). The
-// port's default mends it; online the lane forces it (onlineLane.js
-// ONLINE_FORCED_SETTINGS), so a player's own False stands offline only.
-//
-// REPAIR-EASE: InstantRepairs. DFU ships False - a smith keeps
-// the item for days. The port's default hands it back at once; a player's own False still stands.
+// AllowMagicRepairs and InstantRepairs take DFU's own False offline (DFU-GAPS EL26): a smith keeps the item for days and
+// turns an enchanted one away, and the player's own True stands. Online the lane forces AllowMagicRepairs True
+// (onlineLane.js ONLINE_FORCED_SETTINGS) until the server profile owns it.
 export const PORT_DEFAULTS = Object.freeze({
   Enhancements: Object.freeze({ PlayerTorchFromItems: 'True' }),
-  Controls: Object.freeze({ WeaponSwingMode: '2', AllowMagicRepairs: 'True', InstantRepairs: 'True' }),
+  Controls: Object.freeze({ WeaponSwingMode: '2' }),
 });
 
 /** The default in effect: the port's, else the vendored ini's. Every
