@@ -33,58 +33,58 @@ room per frame. Paths are relative to the repository root.
 | Online                          | Same sequence, then the player wakes at the nearest temple, town or graveyard (or the dungeon door) with part health. The purse loses a tenth.          | `src/systems/deathRespawn.js` (header: "an ORIGINAL addition, not a DFU or classic system"); `src/systems/deathPenalty.js` `DEATH_GOLD_DIVISOR = 10`, "There is no switch"                                                                            |
 | Offline with Project Legacy on  | An Enduring member "rises": respawn, a toll of years, and the same tenth of gold (BAL4). A Bloodline member falls for good.                             | `src/scenes/legacyHost.js` `onDeath` (:533), `writeDeath`; `src/ui/deathScreen.js` `rises` (:132-135)                                                                                                                                                 |
 | Remains                         | Only Project Legacy leaves remains, a lootable body the heir can claim. Open-world "fallen player's own remains" went with open-world PvP (decision 3). | `src/scenes/legacyRemainsStand.js`; `server-account/migrations/0003_drop_wild_sea_pvp.sql`                                                                                                                                                            |
-| Resurrect                       | A party Resurrect inside `REZ_HOLD_S = 150` s takes a held Bloodline death back (realm: `realmRaise`).                                                  | `src/systems/legacy/revived.js:32`; `server-account/src/legacy.js:379`                                                                                                                                                                                |
-| The Endurance floor             | An online-only layer on `maxHealth`, never saved, applied to every online character. It does not depend on the mode.                                    | `docs/systems/characters.md` ("plus online-only layers (the Endurance floor and the Firmament's Health ...)"); `src/systems/chargen.js:308` `defineLiveMaxHealth`                                                                                     |
+| Resurrect                       | A party Resurrect inside `REZ_HOLD_S = 150` s takes a held Bloodline death back (realm: `realmRaise`).                                                  | `src/systems/legacy/revived.js:"export const REZ_HOLD_S "`; `server-account/src/legacy.js:"export async function realmR"`                                                                                                                             |
+| The Endurance floor             | An online-only layer on `maxHealth`, never saved, applied to every online character. It does not depend on the mode.                                    | `docs/systems/characters.md` ("plus online-only layers (the Endurance floor and the Firmament's Health ...)"); `src/systems/chargen.js:"export function defineLiveMaxH"` `defineLiveMaxHealth`                                                        |
 | The Firmament                   | A passive tree owned by the account service per character. Not tied to death.                                                                           | `server-account/src/firmament.js`; `docs/systems/characters.md` (Firmament section)                                                                                                                                                                   |
-| PvP falls                       | Not a character death. Siege fighters have a relay-side `down`/`upAt` state; arena bouts take vitality from the token's `cl`; a duel loss is a report.  | `src/net/siege/siegeRef.js:196-228`; `src/net/identityToken.js` (`cl`: "never a health the client claims"); `server-account/src/service.js` `/v1/duel/loss`                                                                                           |
+| PvP falls                       | Not a character death. Siege fighters have a relay-side `down`/`upAt` state; arena bouts take vitality from the token's `cl`; a duel loss is a report.  | `src/net/siege/siegeRef.js:"return { lv: Math.max(1,"`; `src/net/identityToken.js` (`cl`: "never a health the client claims"); `server-account/src/service.js` `/v1/duel/loss`                                                                        |
 | Abyss (Super Dungeon)           | Its own death law: the hub keeps one life and one win per account per Hollow across copies.                                                             | `server/src/sdCopy.js` header, `sdAcctKey` (`sdac:<sub>`)                                                                                                                                                                                             |
 
 ### 1.2 Project Legacy
 
 - Mod `project-legacy`, setting `Enabled` **default true**, and `Legacy.Model` default 0 (Enduring)
-  (`src/systems/modSettings.js:1548-1566`). Together they make every character a family founder whose offline death
+  (`src/systems/modSettings.js:"'project-legacy': Object"`). Together they make every character a family founder whose offline death
   is a toll-and-rise. This is the "default-on rise" decision 23g replaces.
 - A family has one of two models, fixed at founding: `bloodline` (each death final, an heir plays on) or `enduring`
-  (a death costs years, Arkay's toll, until the span is spent) (`src/systems/legacy/family.js:35`).
-- Chargen asks the model question when Legacy is on (`src/systems/chargenSession.js:412`, `legacyModelScreen`); the
-  answer is saved as `entity.legacyChoice` (a model, or `none`) (`src/systems/save/save.js:104`).
-- Online, the line lives in `lineages` (`server-account/migrations/0001_schema.sql:121`), written by
+  (a death costs years, Arkay's toll, until the span is spent) (`src/systems/legacy/family.js:"export const MODELS = Ob"`).
+- Chargen asks the model question when Legacy is on (`src/systems/chargenSession.js:"if (legacyOn()) asks.pus"`, `legacyModelScreen`); the
+  answer is saved as `entity.legacyChoice` (a model, or `none`) (`src/systems/save/save.js:"'legacyChoice',"`).
+- Online, the line lives in `lineages` (`server-account/migrations/0001_schema.sql:"CREATE TABLE lineages ("`), written by
   `putLineage`; a realm character is born as a person of a line (`createRealm` with `lineage`/`person`,
-  `server-account/src/realm.js:212`). Row columns `lineage_id`, `person_id`.
+  `server-account/src/realm.js:"export async function cre"`). Row columns `lineage_id`, `person_id`.
 - **The tombstone is the permadeath mechanism already.** `realmDie` -> `entomb` stamps `realm_characters.dead_at`
   under the playing tab's lease. From then `joinRealm` returns `dead`, `deleteRealm` refuses, checkpoints and trades
   are refused, and the roster slot is freed (`REALM_CHARACTERS_MAX = 6` counts the living)
-  (`server-account/src/legacy.js:249-298`, `realm.js:249-262`, `realm.js:669-675`). `afterTomb` ends the character's
-  wedding, frees its item claims (`releaseSteps`), and hands on its guild seat (`legacy.js:315`).
+  (`server-account/src/legacy.js:"export async function realmD"`, `realm.js:"export async function jo"`, `realm.js:"export async function de"`). `afterTomb` ends the character's
+  wedding, frees its item claims (`releaseSteps`), and hands on its guild seat (`legacy.js:"async function afterTomb"`).
 - A held fall: the stamp is made at once, the lease kept aside as `rez_lease` for a Resurrect, and `settleHolds`
-  (cron, `legacy.js:349`) closes the window.
-- The token already carries Bloodline: `hn hc hb hg` (`src/net/identityToken.js:335-338`).
+  (cron, `legacy.js:"export async function se"`) closes the window.
+- The token already carries Bloodline: `hn hc hb hg` (`src/net/identityToken.js:"*   hn hc hb hg  that re"`).
 
 ### 1.3 Trading and value-moving paths
 
 All account-side paths move goods on **realm records** (the character's last checkpoint) in one batch, and all ask the
-judge's hold first: `holdRefusal(row)` -> `trade-held` or `record-unjudged` (`server-account/src/realm.js:307`; its
+judge's hold first: `holdRefusal(row)` -> `trade-held` or `record-unjudged` (`server-account/src/realm.js:"export function holdRefu"`; its
 comment lists the callers: "a market listing or purchase, a trade's half, a guild's vault or treasury, a rent, a card
 table's stake, a disenchant whose Essence the market sells").
 
-| Path                                              | Route or frame                                                                                         | Source                                                                                           |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Player trade                                      | relay `trade` frame, then settle by two halves                                                         | `server/src/index.js:3886`; `server-account/src/realmTrade.js`; `src/net/realm/realmTradeLaw.js` |
-| Market (listings, buy orders, auctions, couriers) | `/v1/market/*`                                                                                         | `server-account/src/market.js`; `src/net/marketLaw.js`                                           |
-| Guild vault, treasury, Marks deposit              | `/v1/guilds/vault/*`, `/v1/marks/guild/deposit`, `/withdraw`                                           | `server-account/src/guildVault.js`; `service.js:461-463`                                         |
-| Guild writs, commissions, craft writs             | `/v1/writs/supply`, `/commission`, `/craft`                                                            | `server-account/src/craftWrits.js`; `service.js` PROF6 block                                     |
-| Mail with items, server post                      | `/v1/mail/send` (items), `/v1/post/claim` (developers' pieces), `/v1/post/lost` (your own lost spoils) | `server-account/src/letters.js`, `post.js`, `lostSpoils.js`                                      |
-| Homes: transfer, room rent                        | `/v1/homes/transfer`, `/v1/homes/rooms/rent`                                                           | `server-account/src/homeTransfer.js`, `rent.js`                                                  |
-| Seat gifts, fort funding                          | `/v1/seats/give`, `/v1/seats/fort/fund`                                                                | `server-account/src/seatGifts.js`, `seatForts.js`                                                |
-| Professions stores                                | `/v1/stores/withdraw` (own record, not a player path)                                                  | `server-account/src/professions.js`                                                              |
-| The Broker                                        | Account shop for insignia and auras; not between players                                               | `server-account/src/brokerSales.js`, `accounts.js` `buyInsignia`                                 |
-| Dropped or looted piles                           | Check in PR 5: `src/net/bodyLoot.js` (what a peer may take from a body)                                | `src/net/bodyLoot.js`                                                                            |
+| Path                                              | Route or frame                                                                                         | Source                                                                                                               |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Player trade                                      | relay `trade` frame, then settle by two halves                                                         | `server/src/index.js:"if (m.t === 'trade') {"`; `server-account/src/realmTrade.js`; `src/net/realm/realmTradeLaw.js` |
+| Market (listings, buy orders, auctions, couriers) | `/v1/market/*`                                                                                         | `server-account/src/market.js`; `src/net/marketLaw.js`                                                               |
+| Guild vault, treasury, Marks deposit              | `/v1/guilds/vault/*`, `/v1/marks/guild/deposit`, `/withdraw`                                           | `server-account/src/guildVault.js`; `service.js:"// GUILD2: a new name fo"`                                          |
+| Guild writs, commissions, craft writs             | `/v1/writs/supply`, `/commission`, `/craft`                                                            | `server-account/src/craftWrits.js`; `service.js` PROF6 block                                                         |
+| Mail with items, server post                      | `/v1/mail/send` (items), `/v1/post/claim` (developers' pieces), `/v1/post/lost` (your own lost spoils) | `server-account/src/letters.js`, `post.js`, `lostSpoils.js`                                                          |
+| Homes: transfer, room rent                        | `/v1/homes/transfer`, `/v1/homes/rooms/rent`                                                           | `server-account/src/homeTransfer.js`, `rent.js`                                                                      |
+| Seat gifts, fort funding                          | `/v1/seats/give`, `/v1/seats/fort/fund`                                                                | `server-account/src/seatGifts.js`, `seatForts.js`                                                                    |
+| Professions stores                                | `/v1/stores/withdraw` (own record, not a player path)                                                  | `server-account/src/professions.js`                                                                                  |
+| The Broker                                        | Account shop for insignia and auras; not between players                                               | `server-account/src/brokerSales.js`, `accounts.js` `buyInsignia`                                                     |
+| Dropped or looted piles                           | Check in PR 5: `src/net/bodyLoot.js` (what a peer may take from a body)                                | `src/net/bodyLoot.js`                                                                                                |
 
 ### 1.4 Group content
 
 | Content                     | How a group forms                                                                                                                             | Source                                                                               |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Parties                     | Hub party records; `partyHoldsOwner`, `_instanceKinOf` ask kinship                                                                            | `src/net/instanceRoom.js`; `server/src/index.js:9176`                                |
+| Parties                     | Hub party records; `partyHoldsOwner`, `_instanceKinOf` ask kinship                                                                            | `src/net/instanceRoom.js`; `server/src/index.js:"async _instanceKinOf(sub"`          |
 | Private instances           | Key carries the owner's digest; only the owner's party is admitted                                                                            | `docs/multiplayer/group-instances.md` (Private instances); `src/net/instanceRoom.js` |
 | The Abyss                   | Copy rooms `sd:<slot>.<owner>`; a public copy admits anyone to a seat cap, a party copy admits the owner, the party and staff (`sdCopyRight`) | `server/src/sdCopy.js`; `src/net/superDungeon/sdLaw.js`                              |
 | Gates                       | Shared brain on the relay, receipts claimed at `/v1/gate/claim`                                                                               | `src/net/gate/`; `docs/multiplayer/group-instances.md` (Receipts)                    |
@@ -98,11 +98,11 @@ PvP and signs receipts (`docs/multiplayer/group-instances.md`, "A client hosts, 
 
 ### 1.5 Where a mode can live
 
-| Place           | Today                                                                                                                                                                                                                                                                            | Precedent                            |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| The save        | Character fields are listed in `src/systems/save/save.js`; `legacyChoice` is "asked ONCE, at chargen, and the character's own" (:101-104).                                                                                                                                       | `legacyChoice`                       |
-| Account service | One `realm_characters` row per online character (`migrations/0001_schema.sql:260`); `saves` rows for offline cloud saves, keyed by `character_id` (:207). Online characters are born online: `firstSaveRefusal` requires `REALM_BIRTH_LEVEL` and a small purse (`realm.js:287`). | `lineage_id`, `person_id`, `dead_at` |
-| The relay       | Trusts only the signed identity token: `rc` (realm character), `ci` (its id), `cl` (judged level), `wa` (arms), `hb` (Bloodline) (`src/net/identityToken.js:296-345`). `realmMintFacts` reads the row at mint (`realm.js:179`). TTL ceiling 300 s.                               | `hb`, `cl`                           |
+| Place           | Today                                                                                                                                                                                                                                                                                                                                                                                                       | Precedent                            |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| The save        | Character fields are listed in `src/systems/save/save.js`; `legacyChoice` is "asked ONCE, at chargen, and the character's own" (:101-104).                                                                                                                                                                                                                                                                  | `legacyChoice`                       |
+| Account service | One `realm_characters` row per online character (`server-account/migrations/0001_schema.sql:"CREATE TABLE realm_chara"`); `saves` rows for offline cloud saves, keyed by `character_id` (`server-account/migrations/0001_schema.sql:"CREATE TABLE saves ("`). Online characters are born online: `firstSaveRefusal` requires `REALM_BIRTH_LEVEL` and a small purse (`realm.js:"export function firstSav"`). | `lineage_id`, `person_id`, `dead_at` |
+| The relay       | Trusts only the signed identity token: `rc` (realm character), `ci` (its id), `cl` (judged level), `wa` (arms), `hb` (Bloodline) (`src/net/identityToken.js:"*   mu muted until, epoc"`). `realmMintFacts` reads the row at mint (`realm.js:"export async function realmM"`). TTL ceiling 300 s.                                                                                                            | `hb`, `cl`                           |
 
 ## 2. The modes
 
@@ -169,9 +169,9 @@ character's beneficial spells have none on others (a gift is a trade by another 
 
 ### 3.1 Trading
 
-- **Relay:** the `trade` arm (`server/src/index.js:3886`) drops the frame when the sender's token or the target's token
+- **Relay:** the `trade` arm (`server/src/index.js:"if (m.t === 'trade') {"`) drops the frame when the sender's token or the target's token
   carries Ironman (`md`), as it drops a frame to a peer that is gone: no junk strike, the sender's session times out.
-- **Account service:** one function `modeRefusal(row, other?)` beside `holdRefusal` (`realm.js:307`), called wherever
+- **Account service:** one function `modeRefusal(row, other?)` beside `holdRefusal` (`realm.js:"export function holdRefu"`), called wherever
   `holdRefusal` is called and in the mail-with-items, homes transfer, rent and seat-gift routes. It answers
   `{ error: 'ironman' }`. For a two-party act (trade half, market purchase, courier, rent) either side being Ironman
   refuses. The check reads `realm_characters.mode`, never a client field.
@@ -183,7 +183,7 @@ character's beneficial spells have none on others (a gift is a trade by another 
 
 - **Parties:** the hub refuses to create, join or invite for an Ironman token. `partyHoldsOwner`/`_instanceKinOf`
   then never find kin for an Ironman account, so private instances admit the owner alone with no new code
-  (`src/net/instanceRoom.js`, `server/src/index.js:9176`).
+  (`src/net/instanceRoom.js`, `server/src/index.js:"async _instanceKinOf(sub"`).
 - **Abyss copies:** `sdCopyRight` (`server/src/sdCopy.js`) admits an Ironman owner alone and refuses an Ironman
   character entering another's copy.
 - **Raids, serpent, sieges, Royal Tourney, crew signs:** entry checks refuse an Ironman token (`md`), at the Worker as they
@@ -198,7 +198,7 @@ character's beneficial spells have none on others (a gift is a trade by another 
 ### 4.1 The gap
 
 `realmDie` is called by the client's own death door (`legacyHost.onDeath` -> `writeDeath({ hold })`,
-`legacyHost.js:533-577`, route `/v1/realm/die`, `server-account/src/index.js:2502`). The service checks only the
+`legacyHost.js:"function onDeath() {"`, route `/v1/realm/die`, `server-account/src/index.js:"if (path === '/v1/realm/d"`). The service checks only the
 lease. So the client decides. The header's claim that "a tab killed under its death screen escapes nothing"
 covers a tab that reached the door; it does not cover a client that closes the socket at 1 HP and rejoins from its
 last checkpoint (at most the 2-minute checkpoint interval old). That is cheap for any player and trivial for a
@@ -277,7 +277,7 @@ Rules:
 
 ## 6. Creation UI (description only)
 
-A "Character mode" step at the end of chargen, replacing `legacyModelScreen`'s gate (`chargenSession.js:412`). One card
+A "Character mode" step at the end of chargen, replacing `legacyModelScreen`'s gate (`chargenSession.js:"if (legacyOn()) asks.pus"`). One card
 per mode, Classic selected and marked "Recommended". Each card has: a name, one line, a Pros list, a Cons list. A
 detail panel on selection shows the rules from section 2 for death, trading and groups in plain words, and the
 change-mode rule from section 5 ("Can be loosened later, never tightened. Cannot be changed after death."). Choosing
@@ -303,7 +303,7 @@ The fork has no player data (this fork has no players), so there is no backfill;
 `ALTER` run.
 
 ```sql
--- The mode a realm character was created in, and the mode it was dropped from (modeLaw.js MODES).
+-- The mode a realm character was created in, and the mode it was dropped from (modeLaw.js CHARACTER_MODES).
 ALTER TABLE realm_characters ADD COLUMN mode TEXT NOT NULL DEFAULT 'classic'
   CHECK (mode IN ('classic', 'hardcore', 'legacy', 'ironman', 'hardcore_ironman'));
 ALTER TABLE realm_characters ADD COLUMN mode_from TEXT;
@@ -336,17 +336,17 @@ default `Enabled: true` is no longer how a character joins a family; only the Le
 ### 7.3 Token and relay
 
 - New optional token field `md`: 0 classic, 1 hardcore, 2 legacy, 3 ironman, 4 hardcore_ironman. It is minted by
-  `realmMintFacts` (`realm.js:179`) from the row and added to the token validator and its comment block
+  `realmMintFacts` (`realm.js:"export async function realmM"`) from the row and added to the token validator and its comment block
   (`src/net/identityToken.js`). The relay reads it at the hello and keeps it on the socket attachment.
-- New shared law `src/net/modeLaw.js` (pure; the relay imports only `src/net/*`): `MODES`, `modeOf(md)`,
-  `permadeath(m)`, `ironman(m)`, `legacy(m)`, `canDrop(from, to)`, .
+- New shared law `src/net/modeLaw.js` (pure; the relay imports only `src/net/*`): `CHARACTER_MODES`, `modeOfCode(md)`,
+  `permadeath(m)`, `ironman(m)`, `legacy(m)`, `canDrop(from, to)`.
 - New frames (validators in `src/net/wire.js` as `validDiedIn` and `validDiedOut`): `died` (client to relay, a death
   begins), `diedRcpt` (relay to client, the signed receipt). No other frame changes: trade, party and room entry read
   `md` from the token already on the socket.
 - New relay-to-service door `/v1/mod/death-feed` (signature-proven like `/v1/mod/grant-feed`) and the client route
   `/v1/realm/die` gains an optional `receipt`.
 - New account routes: `POST /v1/realm/mode` (a drop), and a read of the Hall of the Fallen (`/v1/realm/fallen`).
-- Every change to a file the relay imports bumps `RELAY_VERSION` (now `world288`, `src/net/wire.js:1659`) with the
+- Every change to a file the relay imports bumps `RELAY_VERSION` (now `world290`, `src/net/wire.js:"export const RELAY_VERSION "`) with the
   hash row in `test/net/relayversion.test.js`.
 
 ## 8. PR plan
