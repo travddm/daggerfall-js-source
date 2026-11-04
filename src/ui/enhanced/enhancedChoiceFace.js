@@ -14,6 +14,7 @@
 // always have; the face adds none of its own.
 
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhancedStyle.js';
+import { injectChoiceListStyle } from './enhancedChoiceListStyle.js';
 import { armDrawWatchdog, disarmDraw } from '../drawWatchdog.js';
 
 export const CHOICE_FACE_ID = 'enhanced-leveling';
@@ -36,6 +37,7 @@ function el(doc, tag, cls, text) {
 function buildFace(doc, owner) {
   injectEnhancedStyle(doc);
   injectEnhancedFonts(doc);
+  injectChoiceListStyle(doc);
   const shell = el(doc, 'div', 'px-home px-over lvl-shell');
   shell.id = CHOICE_FACE_ID;
   shell.setAttribute('role', 'dialog');

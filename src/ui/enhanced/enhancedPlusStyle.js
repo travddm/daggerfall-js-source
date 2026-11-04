@@ -9,7 +9,6 @@
 // dress, which the refresh wrote INTO the enhanced sheet, moved here whole. The kit goes LAST, as it always did.
 import { FRAME_CSS, LAYOUT_CSS, PLUS_THEMES, DEFAULT_PLUS_THEME, FRAME_TONES } from './enhancedFrame.js';
 import { getPref, setPref } from '../../systems/uiPrefs.js';
-import { CHOICE_LISTED_CSS } from './enhancedChoiceListStyle.js';
 import { PIXEL_STACK, PIXEL_FONT_CSS, PIXEL_FACE_CSS } from '../pixelifyFive.js';   // PLUS7; PLUS-DRESS: the whole trio for the sheets that forgot it
 import { DIALOG_CSS } from './enhancedDialogStyle.js';
 import { PORT_CSS } from './enhancedPortStyle.js';
@@ -326,7 +325,8 @@ body .dfchat-form .dfchat-close { min-width: 32px; padding: 4px 8px; }
 .lvl-opt.is-on .lvl-pick { color: rgb(243,239,44); text-shadow: 1px 1px 0 rgb(93,77,12); }
 .lvl-lock { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: ${FRAME_TONES.brass}; }
 .lvl-opt:disabled { cursor: default; opacity: 0.55; }
-.lvl-hint { margin-top: 16px; text-align: center; font-size: 12px; letter-spacing: 0.06em; color: #9c937d; }${CHOICE_LISTED_CSS}@media (max-width: 560px) {
+.lvl-hint { margin-top: 16px; text-align: center; font-size: 12px; letter-spacing: 0.06em; color: #9c937d; }
+@media (max-width: 560px) {
   .lvl-shell { padding: 8px; } .lvl-shell .px-win { max-height: 96dvh; } .lvl-shell .px-body { padding: 10px 8px; } .lvl-card { padding: 14px 12px 12px; }
   .lvl-card h2.lvl-title { font-size: 20px; }
   .lvl-opt { min-height: 44px; padding: 12px 12px 10px; gap: 8px; } .lvl-opts { gap: 10px; } .lvl-lead { margin-bottom: 12px; } .lvl-hint { margin-top: 10px; }
