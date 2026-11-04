@@ -36,6 +36,7 @@
 import { EQUIP_SLOTS } from '../characters/paperdoll/paperdoll.js';
 import { ITEM_GROUPS } from '../characters/equipRules.js';
 import { FACTION_TYPES } from '../formats/factionFile.js';
+import { dressForThePartOn } from './dressForThePart.js';   // DRESS1: off, DFU's reaction - clothes change nothing
 
 /** The five named social groups, by index (FactionFile.SocialGroups). */
 export const DRESS_GROUP = Object.freeze({ Commoners: 0, Merchants: 1, Scholars: 2, Nobility: 3, Underworld: 4 });
@@ -127,7 +128,7 @@ const clamp = (v) => Math.max(-DRESS_CAP, Math.min(DRESS_CAP, v));
 export function dressStanding(entity) {
   const groups = new Array(DRESS_GROUP_COUNT).fill(0);
   let temple = 0;
-  for (const it of wornClothing(entity)) {
+  for (const it of dressForThePartOn() ? wornClothing(entity) : []) {
     const fx = DRESS_EFFECT[dressClassOf(it)];
     if (!fx) continue;
     for (let g = 0; g < DRESS_GROUP_COUNT; g++) groups[g] += fx.groups[g];
