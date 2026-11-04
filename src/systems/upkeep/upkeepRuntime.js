@@ -175,11 +175,11 @@ export function createUpkeep({ items, now, horseCare = () => null, wagonUpkeep =
     return canGallop(breathOf(horse), st.hunger);
   }
 
-  /** transport.js's walk (HORSE-WALK, the Horse walks option, off by default): the horse walks unless it gallops wherever horse care rules its gallop - horse
-   *  care on, a horse, the one ridden born (its stats; gallopGate defers to the mod without them). Else false: DFU's
-   *  ride base. HORSE-TIERS: `runAsked` the rider asks the gallop (Run held, or latched) - a gallop asked and refused
-   *  (winded, starving: gallopGate) walks only in a tier that holds a refused gallop to the walk (`refusedRunWalks` -
-   *  Hard); Boons rides it at DFU's own pace, so Run held is never slower than DFU's horse.
+  /** transport.js's walk (HORSE-WALK, the Horse walks option, off by default): the horse walks unless it gallops, wherever
+   *  horse care rules its gallop (care on, a horse, the ridden one born; gallopGate defers to the mod without its stats).
+   *  Else false: DFU's ride base. HORSE-TIERS: `runAsked` is the rider asking the gallop (Run held or latched); one asked
+   *  and refused (winded, starving) walks only in a tier that holds a refused gallop to the walk (`refusedRunWalks`, Hard).
+   *  Boons rides it at DFU's pace, so Run held is never slower than DFU's horse.
    *  @param {string} mode @param {boolean} [runAsked] */
   function rideWalks(mode, runAsked = false) {
     const care = horseCare();

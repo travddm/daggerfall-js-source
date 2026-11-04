@@ -1,7 +1,7 @@
 // @ts-check
-// HORSE-WALK: the Features row for the cared-for horse's walk (systems/upkeep/horseWalks.js reads its pref). Off is DFU's: the
-// horse rides at its own pace. On, horse care walks the horse until you hold Run to gallop. The player's own online, as Horse care is. Its own file
-// keeps systems/features.js from growing.
+// HORSE-WALK: the Features row for the cared-for horse's walk (systems/upkeep/horseWalks.js reads its pref). Off is DFU's:
+// the horse rides at its own pace. On, horse care walks the horse until you hold Run. The player's own online, as Horse
+// care is.
 import { t } from '../textManager.js';
 
 export const HORSE_WALKS_ROW = Object.freeze({
