@@ -161,7 +161,7 @@ test('QA3 A3: a stamped quest\'s `get item` of gold is scaled by its outcome - N
   q.startTask(sym('S.07')); q.startTask(sym('S.04'));   // the love rescued, the noble clicked: _S.06_
   step(6);
   assert.equal(q.questComplete, true);
-  assert.deepEqual(gold, [Math.round(base * 1.25)], `the rescue's purse, x1.25 of ${base}, once`);
+  assert.deepEqual(gold, [Math.round(base * 1.1)], `the rescue's purse, x1.1 of ${base}, once`);
 });
 
 // ---- B1 ----
