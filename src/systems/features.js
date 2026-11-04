@@ -39,6 +39,7 @@ import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
 import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -1006,10 +1007,8 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'nearbyQuests', initial: true, online: 'player' }),
   }),
-  // QL1: QUESTLINES - every quest's
-  // objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
-  // forces it on online (the owner: locked); offline the player's, on by default (the owner's answer). Read when a quest
-  // STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
+  // QL1: QUESTLINES - every quest's objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
+  // forces it on online (the owner: locked); offline the player's, on by default. Read when a quest STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
   Object.freeze({
     id: 'questlines',
     group: 'world',
@@ -1024,6 +1023,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: true }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
   }),
+  QUEST_REWARDS_ROW,   // QUESTLINE-REWARDS: the reward scale, DFU's selectable
   // LW2: THE LIVING WORLD
   //  - a town's people are its residents, each with a name, a home, a trade and a
   // day (systems/livingWorld/livingTown.js stands them where DFU's wandering pool stood). The player's own online: every
