@@ -149,6 +149,8 @@ on:
       - "src/net/arena/arenaLaw.js"
       - "src/net/wire.js"
       - "src/net/siege/siegeRef.js"
+      - "src/net/pvp/pvpRef.js"
+      - "src/net/pvp/pvpCaps.js"
       - "src/net/siege/siegeReceipt.js"
       - "src/net/duel/duelReceipt.js"
       - "src/net/sea/seaSeasonLaw.js"
