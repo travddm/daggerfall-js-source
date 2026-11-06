@@ -20,6 +20,7 @@
 // waits, no move is made and nothing is said: they are born where the world comes to stand.
 import { getInt } from '../systems/settings/settings.js';   // U31: StartCellX/Y + StartInDungeon, the classic start's own three keys
 import { REGION_NAMES, isProvinceRegion } from '../formats/mapsTables.js';
+import { longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';
 import { inBay } from '../world/tamriel/tamrielFrame.js';
 import { BAY_THEATRE } from '../world/worldWide/worldGrid.js';
 import { countryPixelOfId } from '../world/tamrielCountry.js';
@@ -137,5 +138,14 @@ export function createBootStart(host) {
   }
   // a load's own place is the save's (the load teleports there), never the address's
   const farStart = far && !params.has('load') && !params.has('classicload') ? reach(far) : Promise.resolve(null);
-  return { startLoc, farStart };
+  /** A named start stands the player where DFU's StartGameBehaviour does: PositionPlayerToLocation's RandomStartMarker, a
+   *  place inside the town. The boot's first placement is the town's far edge plus 120 units, which on `?loc=Daggerfall`
+   *  was an empty field outside the wall. A start past the Bay is `reach`'s; a dungeon start and a load place themselves. */
+  async function landAtStart() {
+    if (far || !startLoc.exterior?.exteriorData) return null;
+    const at = longitudeLatitudeToMapPixel(startLoc.mapTableData.longitude, startLoc.mapTableData.latitude);
+    await _teleportToPixel(at.x, at.y, null, { reposition: REPOSITION.RandomStartMarker });
+    return at;
+  }
+  return { startLoc, farStart, landAtStart };
 }
