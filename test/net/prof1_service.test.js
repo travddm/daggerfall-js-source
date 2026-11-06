@@ -47,7 +47,7 @@ const harvestBody = (who, p, extra = {}) => ({
   climate: p.climate ?? WOODS, region: ANTICLERE, act: { clean: false, bruised: false }, at: _now - 2, rid: rid(), ...extra,
 });
 async function stand(extra = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...extra });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', PROF_DAY_CAPS: 'off', ...extra });
   const raw = s.env.DB._raw;
   const age = (who, days) => raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(_now - days * DAY, who.id);
   const stores = (who, material) => raw.prepare("SELECT origin, qty FROM prof_stores WHERE player = ? AND char_id = ? AND material = ? ORDER BY origin").all(who.id, who.character, material)
@@ -87,7 +87,7 @@ test('PROF1 service: a character\'s state - ten tracks at nothing (CRAFT3: thirt
   assert.deepEqual(r.tracks.map((t) => t.profession), ['mining', 'logging', 'herbalism', 'hunting', 'fishing', 'smithing', 'building', 'outfitting', 'provisioning', 'enchanting']);
   assert.deepEqual(r.tracks.find((t) => t.profession === 'herbalism'), { profession: 'herbalism', xp: 0, rank: 0, specs: { 50: null, 100: null }, respec: null });
   assert.deepEqual([r.stores, r.taken, r.today, r.writs], [[], [], {}, { today: 0, max: 3 }]);
-  assert.deepEqual(r.caps, { stores: STORES_MAX, withdraw: 200, highHides: 3 });   // PROF7 moved it: Hunting's day, the account's; PROF8: Fishing's; CAP-OFF: no day's harvests, hides or hauls
+  assert.deepEqual(r.caps, { stores: STORES_MAX, withdraw: 200, highHides: 3, prices: 'dfu' });   // PROF7 moved it: Hunting's day, the account's; PROF8: Fishing's; CAP-OFF: no day's harvests, hides or hauls
   assert.deepEqual(r.hunt, { hides: 0, high: 0 });
   assert.equal(r.hauls, 0);   // PROF8: the account's hauls today
   assert.equal(r.day, utcDay(_now));

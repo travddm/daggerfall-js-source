@@ -99,6 +99,7 @@ on:
       - "src/net/motherlodeLaw.js"
       - "src/net/boardLaw.js"
       - "src/net/professionLaw.js"
+      - "src/net/profCapLaw.js"
       - "src/net/firmament/firmamentLaw.js"
       - "src/net/firmament/firmamentTree.js"
       - "src/net/questlineClaims.js"

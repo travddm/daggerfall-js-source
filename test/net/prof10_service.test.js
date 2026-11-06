@@ -60,6 +60,7 @@ async function stand(extra = {}) {
 test('PROF10 service: a Silver Ruby Ring at the jeweller\'s bench - its Silver and its Ruby out of the Stores (bought first), one piece of DFU\'s Ring with its signed record, a quality, its maker; Jewelcrafting XP 20 at rank 0 and the first time\'s 500, credited; asked twice one, nothing moved; the next no 500; the Ruby gone, short', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.stock(mac, 'ring:silver:ruby', 2);
   s.give(mac, 'metal:silver', 'bought', 1);
   const ask = { character: mac.character, recipe: 'ring:silver:ruby', clean: false, name: 'Silverthorn', rid: rid() };
@@ -88,6 +89,7 @@ test('PROF10 service: a Silver Ruby Ring at the jeweller\'s bench - its Silver a
 test('AUDIT PROF-541 J7 service: the first time\'s 500 once a piece and base - a Silver Ruby Ring\'s, then a Silver Emerald Ring and a plain Silver Ring none; a Silver Mark and a Gold Ruby Ring each their own', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.setXp(mac, xpForRank(25));
   for (const r of ['ring:silver:ruby', 'ring:silver:emerald', 'ring:silver', 'mark:silver:ruby', 'ring:gold:ruby']) s.stock(mac, r);
   const firsts = [];
@@ -102,6 +104,7 @@ test('AUDIT PROF-541 J7 service: the first time\'s 500 once a piece and base - a
 test('PROF10 service: the jeweller\'s ladder asked - Gold at 25, Platinum at 55, the Wand at 70 (refused below, nothing spent); the quality on the margin with a clean facet\'s step; a Wand\'s Heartwood its step; a Master\'s full track credits none', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.stock(mac, 'ring:gold');
   const below = await s.cut(mac, 'ring:gold');
   assert.deepEqual([below.status, below.body], [403, { error: 'prof-rank' }]);
@@ -133,6 +136,7 @@ test('PROF10 service: the jeweller\'s ladder asked - Gold at 25, Platinum at 55,
 test('PROF10 service: the jeweller\'s hand at 50 - a Goldsmith\'s Silver piece carries hand 1 (record and piece), a Goldsmith\'s Gold none; a Gemcutter\'s gemmed piece hand 2, a Gemcutter\'s plain piece none; answered on a repeat', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.setXp(mac, xpForRank(50), { spec50: 'goldsmith' });
   s.stock(mac, 'ring:silver');
   s.stock(mac, 'ring:gold');
@@ -155,6 +159,7 @@ test('PROF10 service: the jeweller\'s hand at 50 - a Goldsmith\'s Silver piece c
 test('PROF10 service: a Lapidary\'s Siege-cracked Gem set as the piece\'s gem - the cracked one spent, the gem kept, the piece the recipe\'s; refused to all but a Lapidary and in a piece that sets no gem (403, nothing spent); short of cracked gems, short', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.give(mac, 'metal:gold', 'own', 5);
   s.give(mac, 'gem:diamond', 'own', 1);
   s.give(mac, 'gem:siege', 'own', 1);
@@ -178,6 +183,7 @@ test('PROF10 service: a Lapidary\'s Siege-cracked Gem set as the piece\'s gem - 
 test('PROF10 service: a Master Jeweler\'s Masterwork points (3.3: "+5%") - the roll at 90 of 100 a Masterwork, a Lapidary\'s the same roll Superior; a Masterwork carries the maker\'s mark', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.stock(mac, 'ring:silver', 2);
   s.setXp(mac, xpForRank(100), { spec100: 'lapidary' });
   const plain = await steered(0xe6, () => s.cut(mac, 'ring:silver'));
@@ -190,6 +196,7 @@ test('PROF10 service: a Master Jeweler\'s Masterwork points (3.3: "+5%") - the r
 test('PROF10 service: a Gemcutter\'s piece lists on the market among the Jewellery and is read with its hand - the Crafted view filtered and the lister\'s own', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   s.setXp(mac, xpForRank(50), { spec50: 'gemcutter' });
   s.stock(mac, 'mark:silver:amber');
   const made = await s.cut(mac, 'mark:silver:amber');
