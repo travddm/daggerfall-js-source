@@ -17,7 +17,7 @@ import {
 export const name = 'town';
 
 export async function run({ browser, base, ck }) {
-  const g = new Game(browser, base);
+  const g = new Game(browser, base, { drawless: true });
   try {
     await enterTown(g);
     ck('the player stands in a town exterior', (await g.mode()) === 'exterior', await g.mode());

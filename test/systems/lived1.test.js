@@ -214,7 +214,7 @@ test('LIVED1: arrival and death move NOTHING of the character\'s - the clock tha
   assert.equal(back.rentedRooms[0].expiryMinutes, own + 600, 'the room keeps its ten hours');
   assert.equal(back.legalRep[0], -100, 'AUDIT LIVED1b P4: the absence waits for the relay\'s clock');
   hearSharedClock();
-  assert.equal(back.legalRep[0], -67, 'the absence\'s one arm, measured on the WORLD\'s minutes: thirty-three of its weeks, thirty-three points back');
+  assert.equal(back.legalRep[0], -91, 'the absence\'s one arm, measured on the WORLD\'s minutes: nine 28-day intervals, nine points back');
   // death: the corpse lies an hour under the screen; the rise moves nothing of theirs
   const { e, t } = lane(true, { own: 5000, world: 9000 });
   e.survival = { lastMinute: 5000, lastAte: 4900, awakeSince: 4000 };

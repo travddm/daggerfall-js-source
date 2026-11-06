@@ -54,7 +54,7 @@ const sameAs = (a, b) => {
 };
 
 export async function run({ browser, base, ck }) {
-  const g = new Game(browser, base);
+  const g = new Game(browser, base, { drawless: true });
   try {
     await enterTown(g, TOWN_URL);
     const doors = await g.page.evaluate(() => window.__doors());

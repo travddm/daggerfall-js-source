@@ -108,11 +108,11 @@ const mem = () => { const m = new Map(); return { get length() { return m.size; 
 const PIXEL = { x: 300, y: 200 };
 const blocks = [...Array.from({ length: 9 }, (_, i) => ({ blockName: `N000000${i}.RDB`, x: i, z: 0, isStartingBlock: i === 0 })), ...Array.from({ length: 4 }, (_, i) => ({ blockName: `B000000${i}.RDB`, x: i, z: 1, isStartingBlock: false }))];
 const ruinAt = (mapId, locationId = 8008) => ({ name: 'Ruins of The Hold of Coppering', regionName: 'Isle of Balfiera', regionIndex: 23, locationIndex: 12, hasDungeon: true, mapTableData: { mapId, locationType: LOCATION_TYPES.DungeonRuin }, dungeon: { recordElement: { header: { locationId } }, blocks } });
-const RUINS = ruinAt(52646490);
+const RUINS = ruinAt(52646492);
 /** A map id the world lays whole (a quarter of them), and another it lays smaller - the QUEST-ELSEWHERE test's search. */
 const idOfSize = (want, from) => { let id = from; while (onlineDungeonSize({ mapTableData: { mapId: id } }) !== want) id++; return id; };
 const WHOLE_ID = idOfSize('full', 52646491);
-const OTHER_ID = idOfSize('medium', 52646491);
+const OTHER_ID = idOfSize('medium', 52646493);
 /** The entries a dungeon's door hands its build (scenes/instanceDoor.js): Ann's instance - another player's, which the
  *  heir is not of the party of - and the public room. */
 const ANN = hex('instance:account:acct-ann1', 8), HEIR = hex('instance:account:acct-heir', 8);

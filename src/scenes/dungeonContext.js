@@ -25,7 +25,7 @@ import { isArenaFloor } from '../world/arena/arenaFloor.js';
 import { isArenaUndercroft } from '../world/arena/arenaCity.js';   // ARENA-FIX 4: the fighters' hall
 import { undercroftPopulation, chainTag, deepFoesOf, undercroftHallNear } from '../world/arena/arenaUndercroft.js';   // ARENA2: the arena floor's instance - what the sand will not allow
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // WB3b: the Burning Court - what the Deadlands will not allow
-import { dungeonFirePlan, colliderFireProbe, inFireWard, DUNGEON_FIRE_FLAT, fireLayoutInputs, isPalaceLayout } from '../world/dungeon/dungeonFires.js';   // REST3: the dungeon's own campfires
+import { dungeonFirePlan, colliderFireProbe, DUNGEON_FIRE_FLAT, fireLayoutInputs, isPalaceLayout } from '../world/dungeon/dungeonFires.js';   // REST3: the dungeon's own campfires
 import { withFireMarks } from '../ui/nodeMarks.js';   // REST3: the campfires on the compass
 import { expandMacros } from '../systems/talk/talkSession.js';   // MACRO1: the global symbols every TEXT.RSC box passes through (MacroHelper)
 import { executeConsoleCommand } from '../systems/consoleCommands.js';   // E3: the probe door runs the real database
@@ -332,7 +332,7 @@ import { foeHitFlash, setBatchHitFlash, puppetHurtStep, setBatchGlint, prefersRe
 import { localizedText, getLocalizedLocationName, getLocalizedRegionName } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language; L10N3e: and the place names shown
 import { createCoverIndex, isCoverFlat, coverProxy } from '../ai/cover.js';   // TACT1: billboards are cover
 import { flatBodies } from '../world/propBodies.js';   // PROP-BODIES: the solid flats' bodies, beside their cover
-import { blowConnects, blowScaled } from '../ai/foeBlows.js';   // TACT4
+import { blowConnects } from '../ai/foeBlows.js';   // TACT4
 import { foeGlint, tacticsNow, beginRoar } from '../ai/tactics.js';   // TELL2: a wind-up's glint; TELL8: the record's wind-up on the foes' clock; RVN4: a last stand's roar
 import { lastStandGlint, lastStandSize, pyreSpell, LAIR_GOLD, bandMembers, bandName, bandWord, BAND_SCATTER_S, BAND_SPACING, RALLY_KIN, feudWire, feudFromWire, puppetRevenantBlows, SIG } from '../systems/revenant/revenantFeud.js';   // RVN4: phase two's rim and size; RVN5: the pyre's blast; RVN7d: a lair's gold, its band; RVN13: the wire's feud fields; FEUD WIRE: a puppet's blows and signature
 import { feudRevealWeak, feudWeakBlow } from '../systems/feudLedger.js';   // RVN13: a joiner's blow of its weakness; AUDIT FEUD: and mine on the host's
@@ -1041,13 +1041,13 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   // warmth, drying, cooking, the camp rest kind and, online, a rest point, with no new law. Every client of the dungeon
   // casts the same rays over the same layout, so nothing rides the wire. Offline too (OPEN 8: a hearth; the rest stays
   // DFU's). Never in the Burning Court, nor on the Arena's sand (ARENA2: a made level, its rest refused - the merge of
-  // main's #545, AUDIT REST II). Permanent - never cold, never picked up - and a 15 m ward (_spawnEncounter).
+  // main's #545, AUDIT REST II). Permanent - never cold, never picked up - and no ward: a wandering spawn may stand beside it (DUNGEON-FIRE-ONE).
   const firePlan = isGateArena(dfLocation) || isArenaFloor(dfLocation) ? null : dungeonFirePlan({
     blocks: dungeon.blocks,
     probe: colliderFireProbe(collider),   // the rays, the law's own (world/dungeon/dungeonFires.js) - the probe tool casts the same
     ...fireLayoutInputs(dungeon.blocks, dungeonHearths),   // AUDIT REST-PARTY C6: the law's doors and fires, read as tools/dungeonFireProbe.mjs reads them
     seed: dfLocation?.dungeon?.recordElement?.header?.locationId ?? 0,
-    elite: !!dfLocation?.elite,
+    elite: !!dfLocation?.elite, enabled: getPref('dungeonFires') !== false,   // DUNGEON-FIRE-ONE: the `dungeon-fires` row; off, DFU's dungeon
     cold: _superTier || _sdRealm,   // SD4a: none in a Super dungeon - the Hour is cold; SD5a: nor in the Hour itself
   });
   const placedFires = firePlan?.fires ?? [];
@@ -1067,7 +1067,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       dungeonHearths.push({ x: p[0], y: cy, z: p[2], foot: p[1], w: size.w, h: size.h, placed: true, archive, record });
     }
   }
-  // AUDIT REST II F5: THE FIRES THAT KEEP A CAMPFIRE'S PROMISES - the ward (encounterSpot), the compass (withFireMarks)
+  // AUDIT REST II F5: THE FIRES THAT KEEP A CAMPFIRE'S PROMISES - the compass (withFireMarks)
   // and the held map (`fires`) read this list: the law's placed fires, and the layout's own fire it took for the
   // entrance's (AUDIT REST-PARTY C5 - it counts toward N, so it stands for a fire the law did not place). Read only the
   // placed list, a dungeon whose brazier stood by the door had no warded, marked fire at its entrance at all.
@@ -1813,7 +1813,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       f.ai._blowPyre = null;
       if (sb?.kind === 'pyre') {
         audio.play3dId?.(SPELL_CAST_SOUND[sb.element] ?? SPELL_CAST_SOUND[4], [f.ai.feet[0], f.ai.feet[1], f.ai.feet[2]], 1, { maxDistance: 16 });
-        magic.strikePlayerFrom(pyreSpell(sb.name, sb.element, p.mult), f.entity.level ?? 1, f);
+        magic.strikePlayerFrom(pyreSpell(sb.name, sb.element), f.entity.level ?? 1, f);
       }
     }
   }
@@ -2857,10 +2857,9 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
    *  the enchantment stander uses. */
   const ENCOUNTER_PLACE_ATTEMPTS = 12;
   /** AUDIT REST II F1: THE SPOT A RESTING ENCOUNTER STANDS ON, ONE HOME - DFU's placement (PlaceFoeFreely, bounded at
-   *  ENCOUNTER_PLACE_ATTEMPTS) round `feet` looking `yaw`, online never inside a fire's ward; null where none is found.
+   *  ENCOUNTER_PLACE_ATTEMPTS) round `feet` looking `yaw`; null where none is found.
    *  The host stands its foe here (_spawnEncounter, below), and a joiner asks the host for one only where this finds a
-   *  spot on the joiner's own collider (restEncounter) - every client stands the same fires, so a ward the host would
-   *  refuse every spot of is a ward the joiner sees. */
+   *  spot on the joiner's own collider (restEncounter) - every client stands the same fires. */
   function encounterSpot({ minDistance, maxDistance, lineOfSightCheck }, feet, yaw) {
     const env = placeFoeEnv({
       collider,
@@ -2874,7 +2873,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     let spot = null;
     for (let i = 0; i < ENCOUNTER_PLACE_ATTEMPTS && !spot; i++) {
       spot = placeFoeFreely(env, { minDistance, maxDistance, lineOfSightCheck });
-      if (spot && sharedClockOn() && inFireWard(dungeonFires, spot)) spot = null;   // AUDIT REST-PARTY C1: online alone - offline the fires are cooking and camp points and the rest is DFU's (Rest-Arc.md section 11, OPEN 8), its ambushes with it   // REST3: a placed fire's ward (OPEN 9) - no wandering spawn stands within 15 m; the next attempt
     }
     return spot;
   }
@@ -2883,8 +2881,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
    *  asked where the host then stood nothing (its night broken for nothing, F1 again by chance) and kept quiet where the
    *  host would have stood one. The ask carries the joiner's spot (`rs.s`) and the host stands its foe there - held to
    *  what the placement asks of a spot it finds: inside the band round the feet, no wall between (the ring's own
-   *  ray), a floor its separation under it, open space (the collider and the room's foes), and online outside a fire's
-   *  ward. Null where it fails, and the host searches for itself as before. */
+   *  ray), a floor its separation under it, open space (the collider and the room's foes). Null where it fails, and the host searches for itself as before. */
   function askedSpotStands(s, { minDistance, maxDistance }, feet) {
     const C = PLACE_FOE_DEFAULTS, e = REST_ASK_SPOT_SLACK;
     const o = [feet[0], feet[1] + 0.9, feet[2]];
@@ -2894,7 +2891,6 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     if (!(Math.abs(collider.raycastHit(s, [0, -1, 0], C.maxFloorDistance).dist - C.separationDistance) <= e)) return null;
     const p = { x: s[0], y: s[1], z: s[2] };
     if (collider.sphereOverlaps(s, C.overlapSphereRadius) || entityOccupancy((f) => f.ai?.feet, () => foes, feet)(p, C.overlapSphereRadius)) return null;
-    if (sharedClockOn() && inFireWard(dungeonFires, p)) return null;
     return p;
   }
   /** RE1: the rest interruption, stood through DFU's own placement.
@@ -2940,10 +2936,10 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
    *  test, the feet and the yaw), its own rest breaking at the next hour's check (enemiesNearby) as DFU's does. An ask
    *  the wire refuses stands nothing and breaks nothing - never a foe only its asker can see, which was the report.
    *  AUDIT REST II F1: AND ASKS ONLY FOR A FOE THE HOST CAN STAND. The ask broke the joiner's night whatever the host did
-   *  with it, and the host refuses every spot inside a fire's 15 m ward - in a room that ward fills, every one: the
-   *  joiner woke to fight nothing while the host, resting at the same fire, slept on. So the joiner runs the host's own
-   *  placement first (encounterSpot: the same ring, the same ward, its own collider, the fires every client stands) and
-   *  asks only where a spot stands outside the ward. And A1's latch is the joiner's too: a night running hears the ask
+   *  with it, and the host stands nothing where its placement finds no spot, so the joiner could wake to fight nothing
+   *  while the host slept on. So the joiner runs the host's own placement first (encounterSpot: the same ring, its own
+   *  collider) and asks only where a spot stands. DUNGEON-FIRE-ONE: a fire no longer wards its room, so the ask fails
+   *  only in a room with no free floor. And A1's latch is the joiner's too: a night running hears the ask
    *  at its next sub-tick (ambushNight), as the host's own encounter breaks the host's - it no longer runs on to the
    *  hour's check rolling again; a paced window (no night running) breaks at that check, as before. */
   /** RVN7d: a rest in its own lair - a due revenant (not merely known) stands over me, its band about it. */
@@ -6932,7 +6928,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       applyDamageToNonPlayer(f, t, {
         weapon: wpn, direction: fwd, rolls: Math.random,
         calculateAttackDamage: foeDeps.calculateAttackDamage,
-        dealDamage: (tt, d) => tt.hurtFromFoe?.(blowScaled(f.ai, d), fwd, f),
+        dealDamage: (tt, d) => tt.hurtFromFoe?.(d, fwd, f),
         audio, hitEffects,
         // AUDIT 58: FormulaHelper.cs:691-696 has NO player gate - a
         // poisoned foe blade doses the foe it strikes, on DFU's own
@@ -6971,7 +6967,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     tallySkill(foeDeps.playerEntity, SKILLS.Dodging, 1);
     // S18: the special-attack rider seam - monster weaponless hits
     // run OnMonsterHit per hit (disease/paralysis/fatigue)
-    const dmg = blowScaled(f.ai, _weighHit(f, foeDeps.calculateAttackDamage(f.entity, foeDeps.playerEntity, {   // TACT4: a telegraphed blow's weight
+    const dmg = _weighHit(f, foeDeps.calculateAttackDamage(f.entity, foeDeps.playerEntity, {  
       weapon: wpn,   // AUDIT 18: target group derived from the entity (isPlayer -> Humanoid)
       onMonsterHit: (att, tgt, hit) => onMonsterHit(att, tgt, hit, {
         currentDay: Math.floor(classicMinutesRef.value / MINUTES_PER_DAY), sinks: playerSinks,
@@ -6985,7 +6981,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       // formulas clear the weapon's poison)
       onInflictPoison: (att, tgt, pt) => inflictPoison(foeDeps.playerEntity, pt, false, { currentMinute: Math.floor(classicMinutesRef.value) }),
       say: (l) => hudText.add(l),   // C-slice: equipment breaks speak
-    })));   // PSCALE1: harder for the players fighting it - weighed once, so the flash and the cry below read what I took (AUDIT PSCALE1 DOORS-3)
+    }));   // PSCALE1: harder for the players fighting it - weighed once, so the flash and the cry below read what I took (AUDIT PSCALE1 DOORS-3)
     if (dmg > 0) audio.playOneShot(hitSoundFor(wpn), PLAYER_HIT_VOLUME);   // AUDIT 58: PlayerFootsteps.cs:330-344 - the blow that lands ON the player is volumeScale 1, not EnemySounds' 1.1
     // C2-slice (combat-9): a connected attack that LOST the roll
     // rings the miss sound too (ApplyDamageToPlayer's else arm).

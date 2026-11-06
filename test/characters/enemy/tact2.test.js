@@ -1,4 +1,4 @@
-// TACT2 - THE TACTICS BRAIN (;; his calls: 2 melee + 2 ranged tokens; animals and cowardly humans flee, undead,
+// TACT2 - THE TACTICS BRAIN (;; his calls: 2 melee + 2 ranged tokens; cowardly humans flee, animals never, nor undead,
 // daedra, constructs and guards never). Driven on the REAL motor and the REAL attack component over the real collider,
 // on the brain's own clock: with the switch on, a crowd takes turns - two in, the rest on the ring, each blow followed
 // by a step back and the token handed on, a wounded foe backing off, a coward running, an archer kiting, a back
@@ -53,9 +53,9 @@ function run(foes, secs, { player = [0, 0, 0], each = null } = {}) {
   }
 }
 
-test('TACT2: who runs - animals and the cowardly classes; never the watch, undead, daedra or constructs', () => {
-  assert.equal(isCoward(MOBILE_TYPES.Rat), true);
-  assert.equal(isCoward(MOBILE_TYPES.GrizzlyBear), true);
+test('TACT2: who runs - the cowardly classes; never animals, the watch, undead, daedra or constructs', () => {
+  assert.equal(isCoward(MOBILE_TYPES.Rat), false);
+  assert.equal(isCoward(MOBILE_TYPES.GrizzlyBear), false);
   for (const n of ['Mage', 'Sorcerer', 'Healer', 'Bard', 'Burglar', 'Acrobat', 'Thief']) assert.equal(isCoward(MOBILE_TYPES[n]), true, n);
   for (const n of ['Knight_CityWatch', 'Warrior', 'Knight', 'Barbarian', 'SkeletalWarrior', 'Zombie', 'Lich', 'FireDaedra', 'DaedraLord', 'IronAtronach', 'Orc', 'Giant']) assert.equal(isCoward(MOBILE_TYPES[n]), false, n);
   assert.equal(COWARD_CLASSES.size, 7);
@@ -138,8 +138,8 @@ test('TACT2: a foe that loses a quarter of its health in a moment backs off and 
   assert.notEqual(f.ai._tac.state, 'backoff', 'and back in the fight');
 });
 
-test('TACT2: a coward near death runs; a guard, an orc and the undead fight on', () => {
-  for (const [type, runs] of [[MOBILE_TYPES.Thief, true], [MOBILE_TYPES.Rat, true], [MOBILE_TYPES.Knight_CityWatch, false], [MOBILE_TYPES.Orc, false], [MOBILE_TYPES.Zombie, false]]) {
+test('TACT2: a coward near death runs; a rat, a guard, an orc and the undead fight on', () => {
+  for (const [type, runs] of [[MOBILE_TYPES.Thief, true], [MOBILE_TYPES.Rat, false], [MOBILE_TYPES.Knight_CityWatch, false], [MOBILE_TYPES.Orc, false], [MOBILE_TYPES.Zombie, false]]) {
     resetTactics();
     const foes = crowd(1, { mobileType: type });
     run(foes, 2);

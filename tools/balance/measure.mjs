@@ -143,6 +143,6 @@ export function oursCell(build, buildName, level, foeId, layers, { career, swing
     foeId, foeName: `${kind === 'plain' ? '' : `${kind[0].toUpperCase()}${kind.slice(1)} `}${nameOf(foeId)}`, foeLevel: foe.level,
     foeHealth: foe.maxHealth, playerLevel: entity.level, playerHealth: entity.maxHealth, dps: weaponDps,
     hitChance: fight.hitChance, perSwing: fight.perSwing, swingSeconds: fight.swingSeconds, foeDps, foeHitChance: fight.foeHitRate,
-    perAttack: fight.perAttack, attackSeconds, ceiling: false, spell, material: character.kit.material,
+    perAttack: fight.perAttack, perAttackMost: fight.perAttackMost, attackSeconds, ceiling: false, spell, material: character.kit.material,
   });
 }

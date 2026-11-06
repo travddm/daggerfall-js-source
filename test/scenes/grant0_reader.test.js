@@ -14,7 +14,6 @@ import { createExteriorFoes, ENCOUNTER_PUPPETS_MAX, PEER_ELITE_PUPPETS_MAX, PEER
 import { enemySpellIndices, assignEnemySpells, MONSTER_SPELL_LISTS } from '../../src/systems/enemySpells.js';
 import { puppetBlow, WIRE_SIG } from '../../src/ai/puppetBlows.js';
 import { BLOW } from '../../src/ai/blowShapes.js';
-import { SIG } from '../../src/systems/revenant/revenantFeud.js';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -103,7 +102,7 @@ test('GRANT0 executed: the signature at the street - a forged foe\'s wind-up str
   const revs = stood.filter((f) => f.entity.revenant), rest = stood.filter((f) => !f.entity.revenant);
   assert.equal(revs.length, PEER_REVENANT_PUPPETS_MAX);
   assert.equal(rest.length, 1);
-  assert.ok(revs.every((f) => puppetBlow(f.ai)?.sig === true && puppetBlow(f.ai).mult === SIG.MULT), 'a revenant\'s signature: x2, in its ember');
+  assert.ok(revs.every((f) => puppetBlow(f.ai)?.sig === true), 'a revenant\'s signature, in its ember');
   assert.equal(puppetBlow(rest[0].ai).mult, BLOW.slam.mult, 'the tenth is no revenant here, and its slam no signature');
 });
 

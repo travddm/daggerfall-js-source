@@ -75,7 +75,7 @@ Stated in `builds.mjs` and `progression.mjs`; none comes from a save.
   material `RandomMaterial` gives at the gear percentile. Same gear in both rule sets. No shields.
 - Foes: DFU's encounter-table band for the level (`RandomEncounters.ChooseRandomEnemy`), ranked by health x damage a
   swing. Weak, average and strong are its 10th, 50th and 90th percentile. Health is the row mean. Elite is the strong
-  foe at the elite tier (x2 health, x1.3 damage); boss is an elite in an Elite Dungeon (x7 and x4).
+  foe at the elite tier (x2 health, x1.3 damage); boss is an elite in an Elite Dungeon (x7 and x2.6).
 - Casters cast the Lightning spell (SPELLS.STD 31) while magicka lasts, then swing, over a 30-second horizon.
 
 ## How to read it
@@ -290,10 +290,51 @@ spell magnitude, Master school potency and the health floor are not stacking sou
 no
 ARENA2, with the online health), down from B4's 2.08 / 2.13 / 2.0 / 1.96 / 2.2.
 
+## Endgame content (B6)
+
+`node tools/balance/run.mjs --content [--build ...] [--levels 30,45]` measures endgame content against the finished
+budget. It reads the factors from the modules that apply them (`tools/balance/tiers.mjs`), so a retune moves the harness.
+
+- **Foe tiers**, solo, on the strong foe of a Desecrated Temple table at the tier's level (the Abyss at level 24 or the
+  player's, whichever is higher): `kill` seconds, `taken` a second, `dies` seconds, `K` = dies / kill, `top blow` the
+  biggest blow of the run over the body. A pack of three foes at a marker is worth about K / 6.
+- **Relay bosses**: the health a claim brings is BOSS_TTK_S (gate) or SD_TTK_S x SD_SHARE_X (Remnant) seconds of
+  `dpsRef(level)`; the fight takes `ttk x dpsRef / dps` seconds whatever the group size, because each claim brings its own
+  health. The bucket (3 x dpsRef) stops it from going under BOSS_TTK_S / 3 = 80 s. A boss's blows are a share of the struck
+  player's own health, so the health budget (B5) does not change them.
+- Ocean bands (decision 29) already hold: a ruin isle x1.1 to x1.4 health and x1.05 to x1.15 blows by ring, a Deep Aether
+  vault x1.8 / x1.2, an Abyss vault x2 / x1.3 (they replace the Elite dungeon's step), gold at most x1.25.
+
+What changed: `dpsRef` is 5 + level to level 30 and 3.5 a level past it (it was 5 + level): the tamed budget's
+typical melee character deals 63 at level 35, 80 at 40 and 88 at 45, so the gate's four minutes had become two. The
+blows of an elite in an Elite dungeon went from x4 to x2.6, and of an elite in the Abyss from x4.5 to x3 (their
+health stays x7 and x9): a typical mage at level 45 took 80% and 90% of its body in one blow. Foe health and the
+Abyss's own x4 / x2.5 stand.
+
+Level 45, typical gear / maxed (fight seconds, before -> after):
+
+| Boss | Warrior | Spellsword | Mage | Thief | Archer |
+| --- | --- | --- | --- | --- | --- |
+| Gate | 122 -> 215 / 96 -> 170 | 120 -> 211 / 103 -> 182 | 97 -> 170 / 84 -> 148 | 154 -> 271 / 115 -> 203 | 433 -> 763 / 335 -> 590 |
+| Remnant | 267 -> 470 / 211 -> 371 | 263 -> 462 / 226 -> 398 | 211 -> 372 / 184 -> 323 | 337 -> 594 / 252 -> 444 | 948 -> 1669 / 733 -> 1290 |
+
+Level 45, K (solo wins above 1) and top blow over the body, typical / maxed, before -> after:
+
+| Tier | Warrior | Mage | Thief |
+| --- | --- | --- | --- |
+| Elite dungeon elite | K 2.0 -> 3.1, 15% -> 10% / K 3.3 -> 5.1 | K 0.53 -> 0.81, 80% -> 52% / K 0.78 -> 1.20 | K 0.51 -> 0.79, 47% -> 31% / K 0.86 -> 1.32 |
+| Abyss foe (unchanged) | K 5.7, 9% / K 9.3 | K 1.5, 50% / K 2.2 | K 1.5, 30% / K 2.4 |
+| Abyss elite | K 1.4 -> 2.1, 17% -> 11% / K 2.3 -> 3.5 | K 0.37 -> 0.55, 90% -> 60% / K 0.54 -> 0.81 | K 0.34 -> 0.52, 53% -> 35% / K 0.58 -> 0.87 |
+
+Read with: the caster rows use a 30 s horizon, so a mage's gate dps is a burst, not a four-minute rate; the
+archer's dps is low in the harness at every level (28 at 45 against a warrior's 98), so its rows are long. The
+harness has no foe armour or resistances for a boss.
+
 ## Not modelled
 
 The `power` layer gives a caster no spell line (potency, cast speed): a mage's gear line is a damage line on a staff it
-rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, slams), shields and
+rarely swings. Martial and arcane paths, sets, champions, boss traits, the Enhanced AI (tokens, flanking; F1 removed its
+damage multipliers, so a foe's blow is the formulas' roll in the room as here), shields and
 the block roll, backstab, saving throws and elemental tolerance, class foes, Enemy Expansion tables, spell
 effects other than damage, fatigue, and healing. A value from the harness is a comparison of rule sets on these
 builds, not a prediction of play.

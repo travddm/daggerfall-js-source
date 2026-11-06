@@ -109,7 +109,7 @@ test('AUDIT TACT A3/D1: a wind-up lands at 20 fps, at 15 and at 10 - a slow fram
     run([f], 90, [0, 0, 0], { fps, each: () => {
       const st = f.ai._tac?.state;
       if (st === 'windup' && prev !== 'windup') started++;
-      if (f.ai._blowVerdict != null) { landed++; f.ai._blowVerdict = null; f.ai._blowMult = undefined; }
+      if (f.ai._blowVerdict != null) { landed++; f.ai._blowVerdict = null; }
       prev = st;
     } });
     assert.ok(started >= 2, `${fps} fps: it wound up (${started})`);
@@ -132,7 +132,7 @@ test('AUDIT TACT A3: a paralysed foe\'s wind-up is broken - the motor says when 
 test('AUDIT TACT A4: a landing\'s swing the attack could not take at once is spent, never fired later off the clock', () => {
   const f = foe({ at: [0, 0, 2] });
   run([f], 0.5, [0, 0, 0]);
-  Object.assign(f.ai, { _blowSwing: true, _blowVerdict: true, _blowMult: 1.5, _blowAt: T - 3 });
+  Object.assign(f.ai, { _blowSwing: true, _blowVerdict: true, _blowAt: T - 3 });
   const seq = f.atk.swingSeq;
   f.atk.meleeTimer = 99;
   run([f], 0.2, [0, 0, 0]);
@@ -179,7 +179,7 @@ test('AUDIT TACT A4/D5: a bow foe mid-wind-up neither shoots nor casts; its land
 });
 
 test('AUDIT TACT A4/D6: a verdict is spent within a swing\'s length without a clock being passed, and a landing on a foe that turned on another leaves none', () => {
-  const ai = { _blowVerdict: false, _blowMult: 1.5, _blowAt: 0 };
+  const ai = { _blowVerdict: false, _blowAt: 0 };
   T = 5;
   assert.equal(blowConnects(ai, true), true, 'stale (5 s): the classic reach - the hosts pass no clock and still get this');
   // a wind-up whose foe turned on another foe mid-way lands on no one here
@@ -195,7 +195,7 @@ test('AUDIT TACT A4/D6: a verdict is spent within a swing\'s length without a cl
   assert.equal(mine._blowVerdict, true, 'on me: the verdict (my feet in its slam)');
   const turned = mk({ isPlayer: false });
   assert.equal(turned._blowVerdict ?? null, null, 'on another foe: no verdict');
-  assert.ok(!turned._blowSwing && turned._blowMult == null, 'no weight, no forced swing');
+  assert.ok(!turned._blowSwing, 'no weight, no forced swing');
 });
 
 test('AUDIT TACT A5: a foe backing off holds its own farther ring - no back-and-forth with the classic advance', () => {

@@ -108,7 +108,6 @@ public static class Dump
                 case "img": DumpImg(); break;
                 case "cifrci": DumpCifRci(); break;
                 case "arch3d": DumpArch3d(); break;
-                case "arch3ddetail": DumpArch3dDetail(); break;
                 case "blocks": DumpBlocksMapsMisc.DumpBlocks(); break;
                 case "maps": DumpBlocksMapsMisc.DumpMaps(); break;
                 case "woods": DumpWoods(); break;
@@ -423,39 +422,6 @@ public static class Dump
         }
     }
 
-    // Full per-point detail for a bounded record range (localises mesh mismatches).
-    static void DumpArch3dDetail()
-    {
-        Arch3dFile a3d = new Arch3dFile();
-        a3d.Load(Path.Combine(Arena2, "ARCH3D.BSA"), FileUsage.UseMemory, true);
-        a3d.AutoDiscard = true;
-        string lo = Environment.GetEnvironmentVariable("A3D_LO"), hi = Environment.GetEnvironmentVariable("A3D_HI");
-        int i0 = lo == null ? 0 : int.Parse(lo), i1 = hi == null ? 30 : int.Parse(hi);
-        for (int i = i0; i < i1 && i < a3d.Count; i++)
-        {
-            string p = string.Format("a3d.{0:D5}.", i);
-            DFMesh m = a3d.GetMesh(i);
-            if (m.SubMeshes == null) { Out(p + "subMeshes", -1); continue; }
-            for (int s = 0; s < m.SubMeshes.Length; s++)
-            {
-                DFMesh.DFSubMesh sm = m.SubMeshes[s];
-                for (int pl = 0; pl < sm.Planes.Length; pl++)
-                {
-                    DFMesh.DFPlane plane = sm.Planes[pl];
-                    string pp = string.Format("{0}{1:D3}.{2:D3}.", p, s, pl);
-                    Out(pp + "uvgen", (int)plane.UVGenerationMethod);
-                    Out(pp + "pts", plane.Points.Length);
-                    for (int q = 0; q < plane.Points.Length; q++)
-                    {
-                        DFMesh.DFPoint pt = plane.Points[q];
-                        string pq = string.Format("{0}{1:D2}.", pp, q);
-                        Out(pq + "x", F(pt.X)); Out(pq + "y", F(pt.Y)); Out(pq + "z", F(pt.Z));
-                        Out(pq + "nx", F(pt.NX)); Out(pq + "ny", F(pt.NY)); Out(pq + "nz", F(pt.NZ));
-                        Out(pq + "u", F(pt.U)); Out(pq + "v", F(pt.V));
-                    }
-                }
-            }
-        }
     }
 
     // ---------------- CLASS*.CFG / ENEMY*.CFG ----------------

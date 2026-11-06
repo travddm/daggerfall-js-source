@@ -51,7 +51,7 @@ const atLevel = (lv, fn) => { const was = playerEntity.level; playerEntity.level
 
 test('STAND-IN-WHOLE THE WHOLE (world/gate/gateBoss.js STAND_IN_WHOLE): the most one blow lands at any relay - HIT_CAP_X times the reference at the level cap - at least every relay\'s one-blow cap (the gate\'s, the Abyss\'s, the serpent\'s, a bout\'s) and carried by every wire (the bout\'s 10,000 the least), each relay landing its whole cap on it; 1e9 refused by every one (mutants: 1e9 back; past the bout\'s ceiling)', () => {
   assert.equal(STAND_IN_WHOLE, HIT_CAP_X * dpsRef(LV_MAX));
-  assert.equal(STAND_IN_WHOLE, 780);
+  assert.equal(STAND_IN_WHOLE, 1680);   // PIN MOVED: B6 (dpsRef steepens past level 30)
   assert.equal(dpsRef(999), dpsRef(LV_MAX), 'no level reads past the cap');
   // AT LEAST every relay's one-blow cap
   const bout = Math.max(arenaBlowCap({ r: ARENA_HIT.Spell }), arenaBlowCap({ r: ARENA_HIT.Melee }),
@@ -143,5 +143,5 @@ test('STAND-IN-WHOLE NOTHING READS A STAND-IN\'S WHOLE AS ITS BODY\'S: the blood
     assert.equal(healthShare(e), null, `${who}: its share the relay's word - none heard here - never its whole's`);
   }
   assert.equal(bloodHit(500, { maxHealth: STAND_IN_WHOLE }).maxHealth, STAND_IN_WHOLE, 'a body of that whole is measured');
-  assert.equal(bloodRate(500, STAND_IN_WHOLE), RATE_LADDER[2].rate);
+  assert.equal(bloodRate(1100, STAND_IN_WHOLE), RATE_LADDER[2].rate);   // PIN MOVED: B6 (the whole is 1,680: a blow of 1,100 is the same 65%)
 });

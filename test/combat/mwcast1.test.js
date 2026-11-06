@@ -54,8 +54,8 @@ async function castingArm(clip = castClip()) {
   });
   assert.ok(res.ok, `build: ${res.stage} ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   return arm;
 }
 /** Step until `done(status)` or `steps` run out; answers the steps taken. */
@@ -139,7 +139,7 @@ test('MW-CAST1: THE CAST FINISHES - the ready cleared at the release (Daggerfall
   const s = arm.status();
   assert.equal(s.spellReady, false, 'and drops at "target stop", by itself');
   assert.equal(s.unreadyAfterCast, false);
-  assert.equal(s.upper, UPPER_BODY.WeaponEquipped);
+  assert.equal(s.upper, UPPER_BODY.Ready);
   assert.equal(s.weaponGroup, 'weapononehand', 'back to the sword\'s group');
   // a re-ready mid-cast keeps the stance
   arm.readySpell(true); arm.update(1 / 60); arm.castSpell(2);

@@ -59,8 +59,8 @@ async function arm() {
   const res = await a.build({ race: 'fprace', weapon: { templateIndex: 120 }, deps });
   assert.ok(res.ok, `build: ${res.stage} ${res.error}`);
   a.setSheathed(false);
-  for (let i = 0; i < 400 && a.status().upper !== UPPER_BODY.WeaponEquipped; i++) a.update(0.05);
-  assert.equal(a.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 400 && a.status().upper !== UPPER_BODY.Ready; i++) a.update(0.05);
+  assert.equal(a.status().upper, UPPER_BODY.Ready);
   return { a, deps };
 }
 const run = (a, s, each = null) => { for (let t = 0; t < s; t += 0.05) { each?.(); a.update(0.05); } };
@@ -97,7 +97,7 @@ test('SPELL-HAND THE LIVE ARM: with the spell in the free hand the arm keeps the
   assert.ok(carried.L < 0.1 && carried.R > 0.5, `the body's left arm the clip's, its right the layer's (${carried.L.toFixed(3)}, ${carried.R.toFixed(3)})`);
   assert.ok(a.attack('StrikeDown'), 'the weapon still swings with the spell readied');
   run(a, 2);
-  assert.equal(a.status().upper, UPPER_BODY.WeaponEquipped);
+  assert.equal(a.status().upper, UPPER_BODY.Ready);
   assert.equal(a.castSpell(2), true, 'the cast');
   run(a, 0.1, () => { a.setSpellHand(true); a.readySpell(true); });
   s = a.status();
@@ -132,11 +132,11 @@ test('SPELL-HAND THE LIVE ARM: with the spell in the free hand the arm keeps the
 
 test('AUDIT L3-11 THE ARM\'S LAWS IN THEIR MODULES (HOST-SPLIT): the spell hand\'s stance step (wait under an equip or an unequip, finish a cast, let a Spell stance go, keep), the draw into the spell hand, the striking weapon (mutants: each answer of each law)', () => {
   const U = UPPER_BODY;
-  assert.equal(spellHandStanceStep({ upper: U.Equipping, spellReady: true }, U), 'wait');
-  assert.equal(spellHandStanceStep({ upper: U.Unequipping, spellReady: true }, U), 'wait');
+  assert.equal(spellHandStanceStep({ upper: U.Drawing, spellReady: true }, U), 'wait');
+  assert.equal(spellHandStanceStep({ upper: U.Stowing, spellReady: true }, U), 'wait');
   assert.equal(spellHandStanceStep({ upper: U.Casting, spellReady: true }, U), 'afterCast');
-  assert.equal(spellHandStanceStep({ upper: U.WeaponEquipped, spellReady: true }, U), 'drop');
-  assert.equal(spellHandStanceStep({ upper: U.WeaponEquipped, spellReady: false }, U), 'keep', 'L5-7: a repeat asks nothing of the stance');
+  assert.equal(spellHandStanceStep({ upper: U.Ready, spellReady: true }, U), 'drop');
+  assert.equal(spellHandStanceStep({ upper: U.Ready, spellReady: false }, U), 'keep', 'L5-7: a repeat asks nothing of the stance');
   assert.equal(drawsIntoSpellHand({ spellHand: true, spellReady: true }), true);
   assert.equal(drawsIntoSpellHand({ spellHand: true, spellReady: true, casting: true }), false);
   assert.equal(drawsIntoSpellHand({ spellHand: false, spellReady: true }), false);
@@ -149,8 +149,8 @@ test('AUDIT L3-2 / L3-9 THE ARM\'S CLOCK: a cast pressed in a blow\'s follow-thr
   const { a } = await arm();
   run(a, 0.3);
   assert.ok(a.attack('StrikeDown'));
-  for (let i = 0; i < 400 && a.status().upper !== UPPER_BODY.AttackEnd; i++) a.update(1 / 120);
-  assert.equal(a.status().upper, UPPER_BODY.AttackEnd, 'the blow\'s follow-through');
+  for (let i = 0; i < 400 && a.status().upper !== UPPER_BODY.Recovering; i++) a.update(1 / 120);
+  assert.equal(a.status().upper, UPPER_BODY.Recovering, 'the blow\'s follow-through');
   assert.equal(a.castSpell(2), true, 'a cast pressed now plays');
   assert.equal(a.castInFlight(), true);
   a.unload();
@@ -174,8 +174,8 @@ test('AUDIT L3-3 Z KEEPS THE SPELL ON THE ARM: the weapon put away with the spel
   // Z: the rig tells the arm the hand first (sheathed: no spell hand), then the sheathe, then the spell
   a.setSpellHand(false); a.setSheathed(true); a.readySpell(true);
   assert.equal(a.status().weaponGroup, 'weapononehand', 'the unequip in the weapon\'s own group');
-  for (let i = 0; i < 400 && a.status().upper === UPPER_BODY.Unequipping; i++) { a.update(0.02); a.setSpellHand(false); a.readySpell(true); }
-  assert.equal(a.status().upper, UPPER_BODY.None);
+  for (let i = 0; i < 400 && a.status().upper === UPPER_BODY.Stowing; i++) { a.update(0.02); a.setSpellHand(false); a.readySpell(true); }
+  assert.equal(a.status().upper, UPPER_BODY.Rest);
   assert.equal(a.status().weaponShown, false, 'the blade left the hand');
   run(a, 0.2, () => { a.setSpellHand(false); a.readySpell(true); });
   assert.equal(a.status().spellReady, true, 'sheathed: DFU\'s two-handed stance');

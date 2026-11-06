@@ -10,7 +10,7 @@ export const name = 'dungeon';
 const KEYBOUND_WINDOWS = /Automap|CharSheet|Inventory|Spellbook|Rest|Journal|Notebook|Pause|TravelMap/i;
 
 export async function run({ browser, base, ck }) {
-  const g = new Game(browser, base);
+  const g = new Game(browser, base, { drawless: true });
   try {
     // the classic start: the world host at the settings' start cell, with the real chargen wizard
     await g.open('/play/?world&shot&classic&skin=classic&novideo&play', { wait: 'mode' });
@@ -96,7 +96,11 @@ export async function run({ browser, base, ck }) {
     const live = (foes ?? []).filter((f) => !f.dead && f.pos);
     const target = live.find((f) => f.loot > 0) ?? live[0];
     ck('the dungeon holds a live foe', !!target, `${foes?.length ?? 0} foes`);
-    ck('a live foe carries loot', (target?.loot ?? 0) > 0, `${live.filter((f) => f.loot > 0).length} of ${live.length} live foes`);
+    ck(
+      'a live foe carries loot',
+      (target?.loot ?? 0) > 0,
+      `${live.filter((f) => f.loot > 0).length} of ${live.length} live foes`,
+    );
 
     // move: through the motor, to a point on the line between the player and the foe
     if (target) {

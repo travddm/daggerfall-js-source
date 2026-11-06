@@ -34,13 +34,14 @@ import { markUnquiet } from './revenant/unquietMark.js';   // UNQUIET (Revenants
 /** Health and damage, times the foe's own (rolled, before any Elite Dungeon doubling). */
 export const ELITE_FOE_HEALTH_MULT = PROMOTION.elite.health;
 export const ELITE_FOE_DAMAGE_MULT = PROMOTION.elite.damage;
-/** ...and in an Elite Dungeon, where every foe is already doubled. Standalone numbers, left for the Abyss retune. */
+/** ...and in an Elite Dungeon, where every foe is already doubled. B6: the health stays; the blows are the dungeon's x2 with
+ *  the open elite's step on it (x1.3), 2.6, where they were 4 (a typical mage at level 45 took 80% of its body in one blow). */
 export const ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT = 7;
-export const ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT = 4;
-/** ...and in a Super dungeon, where every foe is x4 health and x2.5 damage already. Standalone numbers, left for the
- *  Abyss retune. */
+export const ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT = 2.6;
+/** ...and in a Super dungeon, where every foe is x4 health and x2.5 damage already. B6: the health stays; the blows are 3,
+ *  where they were 4.5 (90% of a typical mage's body), so no blow of the Abyss takes more than 60% of a typical body. */
 export const ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT = 9;
-export const ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT = 4.5;
+export const ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT = 3;
 /** How much larger the sprite is drawn. */
 export const ELITE_FOE_SIZE = 1.25;
 /** The chance a foe in the open world stands as an elite. */

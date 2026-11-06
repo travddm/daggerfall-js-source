@@ -195,7 +195,7 @@ export class EnemyAttack {
       if (this._held && ai._blowHold === 'cancel') { this._held = false; this.machine.state = 'Idle'; this.machine.acc = 0; }
       if (ai._blowSwing) {
         ai._blowSwing = false;
-        if (ai._blowAt != null && tacticsNow() - ai._blowAt > BLOW_SWING_LATE) { ai._blowVerdict = null; ai._blowMult = undefined; this._held = false; }
+        if (ai._blowAt != null && tacticsNow() - ai._blowAt > BLOW_SWING_LATE) { ai._blowVerdict = null; this._held = false; }
         else if (this._held) {
           // TELL2: the held swing strikes now - no second swing; the brain sees its blow. The machine times its strike and
           // follow-through from here, as the forced swing did (a swing in flight holds the bow roll, DFU's IsPlayingOneShot):

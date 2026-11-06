@@ -26,7 +26,7 @@ export const RANDOM_ATTACK_GROUPS = Object.freeze(
 );
 
 /** The upper-body states in which a ranged weapon aims. Every other state leaves the spine alone. */
-export const AIMING_STATES = Object.freeze(new Set(['AttackWindUp', 'AttackRelease', 'AttackEnd', 'Casting']));
+export const AIMING_STATES = Object.freeze(new Set(['Winding', 'Striking', 'Recovering', 'Casting']));
 
 /** A crossbow is reloaded by the same animation that lowers it, which is quick, so it relaxes in a tenth of it. */
 const CROSSBOW_RELAX_SHARE = 0.1;
@@ -45,7 +45,7 @@ const CROSSBOW_RELAX_SHARE = 0.1;
  * @returns {number}
  */
 export function spinePitchFactor({
-  upper = 'None',
+  upper = 'Rest',
   weaponType = MW_WEAPON_TYPE.None,
   group = null,
   time = -1,
@@ -57,12 +57,12 @@ export function spinePitchFactor({
   const kind = weaponClass(weaponType);
   if (kind !== MW_WEAPON_CLASS.Ranged && kind !== MW_WEAPON_CLASS.Thrown) return 0;
 
-  if (upper === 'AttackEnd') {
+  if (upper === 'Recovering') {
     if (weaponType === MW_WEAPON_TYPE.MarksmanCrossbow) return Math.max(0, 1 - completion / CROSSBOW_RELAX_SHARE);
     return 1 - completion;
   }
 
-  const drawing = upper === 'AttackWindUp' && !RANDOM_ATTACK_GROUPS.has(group ?? '');
+  const drawing = upper === 'Winding' && !RANDOM_ATTACK_GROUPS.has(group ?? '');
   const drawKeysKnown = minAttackTime >= 0 && time >= startTime && time < minAttackTime;
   if (drawing && drawKeysKnown) return (time - startTime) / (minAttackTime - startTime);
   return 1;

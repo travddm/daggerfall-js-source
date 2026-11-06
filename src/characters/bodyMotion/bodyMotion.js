@@ -67,7 +67,7 @@ export function sceneInput({
 }
 
 /** The machine's upper-body state (combat/fpArm.js UPPER_BODY_NAME) as the blow's section. */
-const SECTION_OF = Object.freeze({ AttackWindUp: 'windup', AttackRelease: 'release', AttackEnd: 'follow' });
+const SECTION_OF = Object.freeze({ Winding: 'windup', Striking: 'release', Recovering: 'follow' });
 
 /**
  * THE RIG'S WORD, made from its own state each frame (combat/fpArm.js update - the one place it is read, so a peer's
@@ -79,7 +79,7 @@ const SECTION_OF = Object.freeze({ AttackWindUp: 'windup', AttackRelease: 'relea
  * hands are held (TWO-HANDS), `torch` the left hand's light, `spell` a spell readied or cast. The switch is systems/features.js 'mw-body-motion' (the viewer's - how this machine draws a body).
  */
 export function motionWord({
-  cam = null, third = false, rig = null, built = null, dead = false, hit = false, climb = 0, upper = 'None',
+  cam = null, third = false, rig = null, built = null, dead = false, hit = false, climb = 0, upper = 'Rest',
   attackType = null, reversed = false, hand = null, progress = 0, strength = 1, shown = false, hands = 'single',
   torch = false, spell = false, spellHand = false, guard = null,
 } = {}) {
@@ -102,7 +102,7 @@ export function motionWord({
     // SHIELD-RUN: a shield is a piece the body wears on its left arm, at the Shield Bone - the composer names its slot
     // `shield (<record>)` (formats/morrowind/mwItemMap.js composeWornArmor; fitThirdPersonCloak reads it so too)
     shield: !!rig?.arm?.pieces?.some((p) => /^shield\b/.test(p.slot ?? '')),
-    equip: upper === 'Equipping' || upper === 'Unequipping',
+    equip: upper === 'Drawing' || upper === 'Stowing',
     blow: section && attackType ? { type: attackType, reversed: !!reversed, hand, section, progress, strength } : null,
     // AUDIT BODY-MOTION MELEE-11: the pair's guard - each arm's dip while the other strikes (fpArm.js pairDip, radians)
     guard: guard && (guard.L > 0 || guard.R > 0) ? { L: Number(guard.L) || 0, R: Number(guard.R) || 0 } : null,

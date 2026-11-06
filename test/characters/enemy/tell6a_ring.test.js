@@ -29,7 +29,7 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 // ── the law ─────────────────────────────────────────────────────────
 
 test('TELL6a: the ring - 1.6 to 4.0 m about its feet, a second\'s wind-up, x1.5; safe at its feet and past its edge, all round (mutants: any number moved; the feet not safe)', () => {
-  assert.deepEqual({ ...BLOW.ring }, { windup: 1.0, rIn: 1.6, rOut: 4.0, mult: 1.5 });
+  assert.deepEqual({ ...BLOW.ring }, { windup: 1.0, rIn: 1.6, rOut: 4.0 });
   assert.ok(Object.isFrozen(BLOW.ring));
   const b = makeBlow('ring', [2, 0, -1], 0.7, 0);
   for (let a = 0; a < 2 * Math.PI; a += Math.PI / 8) {
