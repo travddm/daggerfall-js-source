@@ -310,7 +310,7 @@ import { Clock } from './clock.js';
 import { questDataOnThisClock, shiftQuestStamps } from './questStamps.js';   // TIME3: a party member's copy, on this character's clock; QUEST-SHELF: a reclaimed quest's, by the time it was set aside
 import { BUILDING_TYPES } from '../../world/buildingNames.js';   // DISC28-I: IsActiveQuestBuilding's House1-House6
 import { adoptLinkedDungeonSize } from '../../world/smallerDungeons.js';   // AUDIT DELVE E5: the size a quest's markers were chosen on
-import { START_QUESTS } from '../starts/starts.js';   // START1: the starts' quests, the main quest's prologue
+import { START_QUESTS } from '../starts/starts.js';   // START1: the two start quests, the main quest's prologue
 
 const HOUSE1 = BUILDING_TYPES.House1, HOUSE6 = BUILDING_TYPES.House6;
 
