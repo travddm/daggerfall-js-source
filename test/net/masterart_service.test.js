@@ -40,6 +40,7 @@ async function stand({ tracks = { smithing: 100 }, stores = {}, now = NOON } = {
   const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   for (const [p, rank] of Object.entries(tracks)) raw.prepare('INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at) VALUES (?, ?, ?, ?, 1)').run(mac.id, mac.character, p, xpForRank(rank));
   const give = (key, qty, origin = 'own') => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, ?, ?)
     ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = excluded.qty`).run(mac.id, mac.character, key, origin, qty);
@@ -242,6 +243,7 @@ test('AUDIT HORIZONTAL B5 A KEPT WORK ANSWERED PAST MIDNIGHT IS THE DAY BEFORE\'
   const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   raw.prepare('INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at) VALUES (?, ?, ?, ?, 1)').run(mac.id, mac.character, 'smithing', xpForRank(100));
   for (const [k, n] of Object.entries({ ...swordGoods(), ...CATS })) raw.prepare('INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, ?, ?)').run(mac.id, mac.character, k, 'own', n * 2);
   let lose = false;
@@ -274,6 +276,7 @@ test('AUDIT HORIZONTAL B6 THE BOOK PUTS A PEARL JEWEL\'S PEARLS IN AS THE SERVIC
     const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
+    s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
     raw.prepare('INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at) VALUES (?, ?, ?, ?, 1)').run(mac.id, mac.character, 'smithing', xpForRank(100));
     for (const [k, n, o = 'own'] of [['metal:gold', 1], [HEARTWOOD.key, 2], [ARCANE_ESSENCE.key, 10], ...pearls]) raw.prepare('INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, ?, ?)').run(mac.id, mac.character, k, o, n);
     const e = { stats: { strength: 50 }, items: [setItemFields({ group: 'UselessItems2', templateIndex: BAG_TEMPLATE })], bagItems: [], goldPieces: 0 };
