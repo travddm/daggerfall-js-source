@@ -115,17 +115,17 @@ function giant(order, { entity = FIGHTER, reload = false } = {}) {
 
 test('QL3 the pays, exact (section 5.2): each pay\'s gold factor, gear and step; the factor bounded; gold scaled once at least a coin, never an item (mutants: lesser gold 1; greater gold 1 no rung)', () => {
   assert.deepEqual(JSON.parse(JSON.stringify(PAY_PROFILES)), {
-    standard: { gold: 1, gear: true, step: 0 }, lesser: { gold: 0.75, gear: true, step: 0 }, greater: { gold: 1.25, gear: true, step: 1 },
+    standard: { gold: 1, gear: true, step: 0 }, lesser: { gold: 0.9, gear: true, step: 0 }, greater: { gold: 1.1, gear: true, step: 1 },
     double: { gold: 1, gear: true, step: 0 }, betrayal: { gold: 1, gear: false, step: 0 }, own: { gold: 1, gear: false, step: 0 },
     none: { gold: 1, gear: false, step: 0 },
   });
-  assert.deepEqual(['standard', 'lesser', 'greater', 'nosuch'].map((pay) => goldFactor({ pay })), [1, 0.75, 1.25, 1]);
-  assert.deepEqual([OUTCOME_GOLD_MIN, OUTCOME_GOLD_MAX], [0.75, 1.5]);
-  assert.deepEqual(['lesser', 'standard', 'greater'].map((pay) => scaleGold({ stackCount: 100 }, { pay }, true).after), [75, 100, 125]);
+  assert.deepEqual(['standard', 'lesser', 'greater', 'nosuch'].map((pay) => goldFactor({ pay })), [1, 0.9, 1.1, 1]);
+  assert.deepEqual([OUTCOME_GOLD_MIN, OUTCOME_GOLD_MAX], [0.9, 1.1]);
+  assert.deepEqual(['lesser', 'standard', 'greater'].map((pay) => scaleGold({ stackCount: 100 }, { pay }, true).after), [90, 100, 110]);
   for (const pay of Object.keys(PAY_PROFILES)) assert.equal(payProfileOf({ pay }), PAY_PROFILES[pay], pay);
   assert.equal(payProfileOf({ pay: 'nosuch' }), PAY_PROFILES.none, 'an unknown pay pays nothing extra');
   const g = { stackCount: 401 };
-  assert.deepEqual(scaleGold(g, { pay: 'lesser' }, true), { before: 401, after: 301 });
+  assert.deepEqual(scaleGold(g, { pay: 'lesser' }, true), { before: 401, after: 361 });
   assert.deepEqual(scaleGold({ stackCount: 1 }, { pay: 'lesser' }, true), { before: 1, after: 1 }, 'at least a coin');
   assert.equal(scaleGold({ stackCount: 9 }, { pay: 'greater' }, false), null, 'a script\'s own item is never touched');
   assert.deepEqual([1, 2, 3, 4].map((t) => rewardTier(t, { pay: 'greater' })), [2, 3, 4, 4], 'greater: a rung up, never past 4');
@@ -339,11 +339,11 @@ test('QL3 no door, no cut (AUDIT QUESTLINES REWARD-13): a host with no door for 
 
 // ---- the gold settled at the end (REWARD-3) ----
 
-test('QL3 the gold an ending settles (AUDIT QUESTLINES REWARD-3): M0B00Y16 pays at the questor\'s click and settles `rescued` (greater) on the walk home - in either order the player has x1.25, the rest added at the end, and said; a save between keeps the record (mutants: the settle deleted; the record not saved)', () => {
+test('QL3 the gold an ending settles (AUDIT QUESTLINES REWARD-3): M0B00Y16 pays at the questor\'s click and settles `rescued` (greater) on the walk home - in either order the player has x1.1, the rest added at the end, and said; a save between keeps the record (mutants: the settle deleted; the record not saved)', () => {
   for (const order of ['escort first', 'claim first']) {
     const r = giant(order);
     assert.equal(r.quest.ql.outcome, 'rescued', order);
-    assert.equal(r.purse + r.added.reduce((n, x) => n + x, 0), Math.round(r.minted * 1.25), `${order}: x1.25 in all`);
+    assert.equal(r.purse + r.added.reduce((n, x) => n + x, 0), Math.round(r.minted * 1.1), `${order}: x1.1 in all`);
     if (r.added.length) assert.ok(r.hud.includes(`You receive ${r.added[0]} more gold pieces for how it ended.`), 'said');
     assert.equal(r.offers.length, 1);
     assert.equal(r.offers[0].tier, 2, 'tier 1 a rung up');
@@ -353,17 +353,17 @@ test('QL3 the gold an ending settles (AUDIT QUESTLINES REWARD-3): M0B00Y16 pays 
   assert.equal(late.added.length, 1, 'the difference added once');
   const kept = giant('claim first', { reload: true });
   assert.equal(kept.quest.ql.outcome, 'rescued');
-  assert.equal(kept.purse + kept.added.reduce((n, x) => n + x, 0), Math.round(kept.minted * 1.25), 'settled after a load');
+  assert.equal(kept.purse + kept.added.reduce((n, x) => n + x, 0), Math.round(kept.minted * 1.1), 'settled after a load');
 });
 
 test('QL3 the gold still owed, pure: the settled outcome\'s factor above the one applied, a party\'s share of it; never below, never a failure\'s, never `none`\'s (REWARD-3) (mutants: gold taken back; the party\'s shares ignored)', () => {
   const paid = { base: 400, factor: 1, shares: 1 };
-  assert.equal(goldStillOwed(paid, { pay: 'greater' }), 100);
+  assert.equal(goldStillOwed(paid, { pay: 'greater' }), 40);
   assert.equal(goldStillOwed(paid, { pay: 'standard' }), 0);
-  assert.equal(goldStillOwed({ base: 400, factor: 1.25, shares: 1 }, { pay: 'lesser' }), 0, 'never taken back');
-  assert.equal(goldStillOwed({ base: 400, factor: 0.75, shares: 1 }, { pay: 'none' }), 0, 'an ending that pays nothing adds nothing');
+  assert.equal(goldStillOwed({ base: 400, factor: 1.1, shares: 1 }, { pay: 'lesser' }), 0, 'never taken back');
+  assert.equal(goldStillOwed({ base: 400, factor: 0.9, shares: 1 }, { pay: 'none' }), 0, 'an ending that pays nothing adds nothing');
   assert.equal(goldStillOwed(paid, { pay: 'greater', failure: true }), 0);
-  assert.equal(goldStillOwed({ base: 400, factor: 1, shares: 2 }, { pay: 'greater' }), 50, 'a share: 250 - 200');
+  assert.equal(goldStillOwed({ base: 400, factor: 1, shares: 2 }, { pay: 'greater' }), 20, 'a share: 220 - 200');
   assert.equal(goldStillOwed(null, { pay: 'greater' }), 0, 'nothing paid, nothing owed');
 });
 
@@ -377,7 +377,7 @@ test('QL3 a party\'s share is named after the scale (AUDIT QUESTLINES REWARD-11)
   const minted = q.getItem({ name: 'gold' }).daggerfallUnityItem.stackCount;
   q.getTask({ name: 'toseal' }).start(); tick(6);
   const pile = rec.rewards.find((i) => i.group === 'Currency');
-  assert.equal(pile.stackCount, Math.floor(Math.round(minted * 1.25) / 2), 'scaled, then halved');
+  assert.equal(pile.stackCount, Math.floor(Math.round(minted * 1.1) / 2), 'scaled, then halved');
   assert.deepEqual(rec.hud.filter((h) => /share/.test(h)), [`Your share of the party's reward: ${pile.stackCount} gold.`]);
 });
 
@@ -450,4 +450,23 @@ test('QL3 the journal\'s row is kept while what it reads stands (AUDIT QUESTLINE
   const laid = bridge.questlines.rowOf(q, quietText);
   assert.notEqual(laid, words, 'a pack laid: read again');
   assert.equal(laid.objectives[1].text, 'Report to the Guild (laid by a pack)');
+});
+
+test('QUESTLINE-REWARDS the scale is the row\'s: off, a quest pays what its script pays - gold x1, no piece, no rung (DFU\'s); on, the questline pay (mutants: the row unread; the pay kept when off)', () => {
+  try {
+    setPref('questlineRewards', false);
+    assert.deepEqual(['standard', 'lesser', 'greater'].map((pay) => goldFactor({ pay })), [1, 1, 1]);
+    assert.deepEqual(['standard', 'greater'].map((pay) => payProfileOf({ pay }).gear), [false, false], 'no piece offered');
+    assert.deepEqual([1, 2, 3, 4].map((t) => rewardTier(t, { pay: 'greater' })), [1, 2, 3, 4], 'no rung up');
+    assert.deepEqual(scaleGold({ stackCount: 100 }, { pay: 'greater' }, true), { before: 100, after: 100 });
+  } finally { setPref('questlineRewards', true); }
+  assert.equal(payProfileOf({ pay: 'greater' }).gear, true);
+  assert.equal(goldFactor({ pay: 'greater' }), 1.1);
+});
+
+test('QUESTLINE-REWARDS a Rare piece passes the level gate as a drop does: tier 4 at level 1 is Magic nearly always, at level 12 and up Rare (mutants: the gate unread)', () => {
+  const tally = (level) => { const r = seededRng(99 + level); let rare = 0; for (let i = 0; i < 2000; i++) if (pieceRarity(4, r, level) === 'rare') rare++; return rare; };
+  assert.ok(tally(1) < 500, `level 1: ${tally(1)} of 2000 Rare`);
+  assert.equal(tally(12), 2000, 'the gate open at level 12');
+  assert.equal(pieceRarity(4, () => 0.5), 'rare', 'no level handed: not gated, as a tool rolls');
 });
