@@ -35,11 +35,8 @@ export const FOE_BOUND = Object.freeze({
   champion: 1.4,            // systems/foe-promotion.ts PROMOTION.champion.health
   championTraits: Object.freeze([1, 1.2, 1, 1, 1]),   // systems/champions.js CHAMPION_TRAITS' `health` (1 where none), in the wire's order
   championMinLevel: 3,      // systems/foe-promotion.ts PROMOTION.minLevel
-  revenantPerRank: 0.4,     // systems/revenant/revenant.js REVENANT_HEALTH_PER_RANK
+  revenantPerRank: 0.25,    // systems/revenant/revenant.js REVENANT_HEALTH_PER_RANK
   revenantRankMax: 5,       // systems/revenant/revenant.js REVENANT_MAX_RANK
-  festerHealth: 0.1,        // systems/revenant/revenantFeud.js FESTER.HEALTH
-  wrathMax: 3,              // systems/revenant/revenantFeud.js WRATH_MAX
-  dread: 1.5,               // systems/revenant/revenantUnquiet.js DREAD.HEALTH
   rite: 3,                  // net/gate/gateRite.js RITE_SUMMONER_HEALTH
   star: 2,                  // net/starfall/starfallLaw.js STAR_FOE_HEALTH
   watch: 146,               // characters/mobile/mobileTypes.js KNIGHT_CITY_WATCH
@@ -59,7 +56,7 @@ export const FOE_BOUND_ROWS = Object.freeze(new Map([
 const isClass = (t) => t >= 128 && t <= 146;
 /** One builder's stage: its multiplier, rounded once, never under 1. */
 const stage = (v, m) => Math.max(1, Math.round(v * m));
-const revenantStages = (v) => stage(stage(stage(v, 1 + FOE_BOUND.revenantPerRank * FOE_BOUND.revenantRankMax), 1 + FOE_BOUND.festerHealth * FOE_BOUND.wrathMax), FOE_BOUND.dread);
+const revenantStages = (v) => stage(v, 1 + FOE_BOUND.revenantPerRank * FOE_BOUND.revenantRankMax);
 
 /** A record's base: a class foe's roll at its level's worst, a monster's row - or null (no row: unverified). */
 function baseOf(r) {
@@ -78,7 +75,7 @@ function streetBound(r, base, camp) {
   return r.t === FOE_BOUND.watch ? Math.max(v, base) : v;
 }
 
-/** The dungeon's chain (buildFoeAt's order): a layout foe's worst, which a revenant's lair stand never reaches. */
+/** The dungeon's chain (buildFoeAt's order): a layout foe's worst. */
 function dungeonBound(r, base) {
   const superFoe = stage(base, FOE_BOUND.superFoe);
   return Math.max(

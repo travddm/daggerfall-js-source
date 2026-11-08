@@ -1,7 +1,7 @@
 # Enhanced AI
 
 This page covers the Enhanced AI: the optional layer over Daggerfall's classic foe behaviour that adds navmesh
-pathfinding, group tactics, cover, telegraphed blows with poise and staggers, and the feud ledger that revenants read.
+pathfinding, group tactics, cover, and telegraphed blows with poise and staggers.
 It also covers how the layer is switched on and how it falls back to the classic motor.
 
 ## Classic AI and the enhanced layer
@@ -154,7 +154,7 @@ brain forces the swing, and the host's hit resolution asks `blowConnects` (the s
 test). The damage is the combat formulas' roll and nothing else: no shape, signature or aimed shot multiplies a foe's
 blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
 
-- **Shapes** (`BLOW`): lunge, sweep, slam, ring, charge, leap, aimed shot, and the revenant pyre. `blowShapesOf` picks
+- **Shapes** (`BLOW`): lunge, sweep, slam, ring, charge, leap, and aimed shot. `blowShapesOf` picks
   them by family (`BLOW_FAMILY`); `inBlow` tests a point.
 - **Who**: `blowTier` - level `BLOW_TIER_LEVEL` and up, an elite, a champion or a revenant. Higher tiers get the whole
   set and shorter cooldowns (`TELL.COOLDOWN`, `blowCooldown`).
@@ -185,22 +185,6 @@ synthetic brain state on the puppet (`applyBlowRecord`, marked `puppet`), so eve
 client judges its own feet at the landing. The class of a blow on a puppet rides back as `wc` (`blowClassOf`) so the
 owner's poise meter weighs it. Senders and receivers: `src/scenes/dungeonContext.js` and `src/scenes/exteriorFoes.js`.
 
-## Feud ledger
-
-`src/systems/feudLedger.js` records how the player fought a foe that may become a revenant. It is a leaf: it imports
-nothing, so the brain, the magic rounds and the hosts can write to it without loading the revenant system.
-
-- The ledger lives on the foe's entity as `entity._feud`, opened on first write by `feudOf` only if the gate passes.
-- Shape: `{ dmg: {<FEUD_CLASSES>: n}, silver, staggers, dodged, perfect, backHits, backstab, weak, night, place, start,
-  last }`. `FEUD_CLASSES` is blade, blunt, axe, h2h, arrow, fire, frost, shock, poison, magic, other.
-- Writers: `noteFeudHarm` (revenant strike listener, `src/scenes/hostMagic.js`, `src/systems/effects.js`), `noteFeud`
-  (`tactics.js` for dodged and perfect, `hostCombat.js` for staggers and back hits), `noteFeudBackstab`.
-- `src/systems/revenant/revenant.js` injects the gate (`setFeudGate` = `revenantCandidate`), the clock and night flag
-  (`setFeudClock`), and the weakness test (`setFeudWeakTest`). `revenantDeed` takes the ledger with `takeFeud` and folds
-  it into the revenant's scars (`src/systems/revenant/revenantFeud.js`).
-- Revenants exist only with the Loot rarity row on (`revenantOn` = `lootRarityOn`). Their rules that need a telegraph
-  (signature blows, the last-stand burst) also need the Enhanced AI switch.
-
 ## Tests
 
 | Area | Tests |
@@ -213,7 +197,6 @@ nothing, so the brain, the magic rounds and the hosts can write to it without lo
 | Crowding and doors | `test/player/tact3.test.js`, `test/characters/enemy/fb1014b_doorjam.test.js` |
 | Blows and tells | `test/characters/enemy/tact4.test.js`, `tell2_tell.test.js` to `tell7_tier.test.js`, `tell6a_ring.test.js` to `tell6d_aimed.test.js`, `test/scenes/audittell.test.js` |
 | Online wind-ups | `test/ai/tell8_online.test.js` |
-| Feud ledger | `test/systems/rvn1_ledger.test.js`, `auditfeud.test.js`, `auditfeud2.test.js`, `test/characters/feudmerge.test.js` |
 
 ## Known limits
 

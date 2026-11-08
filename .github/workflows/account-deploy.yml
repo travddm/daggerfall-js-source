@@ -257,7 +257,6 @@ on:
       - "src/systems/entityMods.js"
       - "src/systems/equip.js"
       - "src/systems/features.js"
-      - "src/systems/feudLedger.js"
       - "src/systems/foraging/foragingLaw.js"
       - "src/systems/gate/gateSpoils.js"
       - "src/systems/gilded.js"

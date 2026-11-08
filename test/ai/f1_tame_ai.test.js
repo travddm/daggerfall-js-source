@@ -21,7 +21,6 @@ import {
 import { BLOW, makeBlow, liveBlows, resetBlows } from '../../src/ai/foeBlows.js';
 import * as foeBlows from '../../src/ai/foeBlows.js';
 import { blowTakenScale } from '../../src/systems/blowTaken.js';
-import { signatureStamp, pyreSpell, SIG } from '../../src/systems/revenant/revenantFeud.js';
 
 const DT = 1 / 60;
 let T = 0;
@@ -93,21 +92,17 @@ test('F1: strike tokens still limit the foes that swing at once', () => {
   assert.ok(foes.filter((f) => f.swings > 0).length >= 3, 'and the foes took turns: each of several got to swing');
 });
 
-test('F1: a telegraphed blow carries no damage multiplier - the shapes, the signature, the aimed shot', () => {
+test('F1: a telegraphed blow carries no damage multiplier - the shapes and the aimed shot', () => {
   for (const [kind, shape] of Object.entries(BLOW)) {
     assert.equal('mult' in shape, false, `${kind} has no multiplier`);
     assert.equal('mult' in makeBlow(kind, [0, 0, 0], 0, 10), false, `${kind}'s blow carries none`);
   }
   assert.equal(foeBlows.blowScaled, undefined, 'nothing scales the roll the formulas made');
-  const stamp = signatureStamp({ rank: 3, sig: 'slam', mobileType: MOBILE_TYPES.Orc, id: 1 });
-  assert.ok(stamp, 'a rank 3 revenant has a signature');
-  assert.equal('mult' in stamp, false);
-  assert.equal(SIG.MULT, undefined);
   const arrow = blowTakenScale({ level: 20 }, { level: 20 }, null, { kind: 'arrow', aimed: true });
   assert.equal(arrow, 1, 'an aimed arrow weighs what the arrow weighs');
 });
 
-test('F1: a landed telegraphed blow leaves the formula roll alone, and the pyre is the base spell', () => {
+test('F1: a landed telegraphed blow leaves the formula roll alone', () => {
   const c = new Collider(() => 0);
   const ent = { health: 80, maxHealth: 80, mobileType: MOBILE_TYPES.Orc, level: 12 };
   const ai = new EnemyAI(c, [0, 0, 8], Math.PI, { vitals: () => ent });
@@ -123,10 +118,4 @@ test('F1: a landed telegraphed blow leaves the formula roll alone, and the pyre 
   });
   assert.ok(blow, 'a level 12 foe wound a blow up');
   assert.equal(verdict, true, 'and it landed on the player standing in it');
-  const [lo, hi] = SIG.PYRE_BASE;
-  const effect = pyreSpell('Pyre', 4).effects[0];
-  assert.deepEqual(
-    [effect.magnitudeBaseLow, effect.magnitudeBaseHigh, effect.magnitudeLevelBase],
-    [lo, hi, SIG.PYRE_PER],
-  );
 });

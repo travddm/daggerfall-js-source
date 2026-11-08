@@ -15,8 +15,6 @@ import { ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, promoteEliteFoe } from '../../src/
 import { SUPER_HEALTH_SCALE, scaleSuperFoe } from '../../src/world/superDungeon/sdDungeon.js';
 import { CHAMPION_TRAITS, CHAMPION_MIN_LEVEL, applyChampion, _resetStreetChampionsForTests } from '../../src/systems/champions.js';
 import { REVENANT_HEALTH_PER_RANK, REVENANT_MAX_RANK, applyRevenant } from '../../src/systems/revenant/revenant.js';
-import { FESTER, WRATH_MAX } from '../../src/systems/revenant/revenantFeud.js';
-import { DREAD } from '../../src/systems/revenant/revenantUnquiet.js';
 import { RITE_SUMMONER_HEALTH } from '../../src/net/gate/gateRite.js';
 import { STAR_FOE_HEALTH } from '../../src/net/starfall/starfallLaw.js';
 import { KNIGHT_CITY_WATCH } from '../../src/characters/mobile/mobileTypes.js';
@@ -33,14 +31,14 @@ const entityOf = (t, l) => {
 };
 /** The hero's threat at his worst, through the game's own writer. */
 const hero = (e) => applyHeroThreat(e, heroThreat(HERO_THREAT.to));
-const revenantAt = (e) => applyRevenant(e, { id: 'rvn-bound', name: 'Grak', mobileType: e.mobileType, rank: REVENANT_MAX_RANK, wrath: WRATH_MAX, dread: true, wounds: [], learned: [], history: [], returns: 0 });
+const revenantAt = (e) => applyRevenant(e, { id: 'rvn-bound', name: 'Grak', mobileType: e.mobileType, rank: REVENANT_MAX_RANK, history: [], returns: 0 });
 
 test('FOE-BOUNDS EACH MULTIPLIER IS ITS HOME\'S: the class roll, the elite, the Super dungeon, the champion and its traits, the revenant\'s rank, wrath and Dread, the Rite\'s Summoner, a star\'s coven, the City Watch and the hero - copied because the relay cannot import their homes, equal to each (mutants: each copy off its home)', () => {
   assert.equal(rollEnemyClassMaxHealth(7, 1, () => 0), FOE_BOUND.classBase + 7, 'DFU\'s class roll: 10 and a die a level');
   assert.deepEqual([FOE_BOUND.classHpPerLevel, FOE_BOUND.elite, FOE_BOUND.superFoe, FOE_BOUND.champion, FOE_BOUND.championMinLevel], [HP_MAX, PROMOTION.elite.health, SUPER_HEALTH_SCALE, PROMOTION.champion.health, CHAMPION_MIN_LEVEL]);
   assert.equal(FOE_BOUND.superElite, ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, "the Super dungeon's elite");
   assert.deepEqual(FOE_BOUND.championTraits, CHAMPION_TRAITS.map((t) => t.health ?? 1));
-  assert.deepEqual([FOE_BOUND.revenantPerRank, FOE_BOUND.revenantRankMax, FOE_BOUND.festerHealth, FOE_BOUND.wrathMax, FOE_BOUND.dread], [REVENANT_HEALTH_PER_RANK, REVENANT_MAX_RANK, FESTER.HEALTH, WRATH_MAX, DREAD.HEALTH]);
+  assert.deepEqual([FOE_BOUND.revenantPerRank, FOE_BOUND.revenantRankMax], [REVENANT_HEALTH_PER_RANK, REVENANT_MAX_RANK]);
   for (const gone of ['wild', 'wildRingTop', 'giant', 'giantType', 'zoneWatch']) assert.equal(gone in FOE_BOUND, false, `${gone}: the open zone's stages are gone`);
   assert.deepEqual([FOE_BOUND.rite, FOE_BOUND.star, FOE_BOUND.watch], [RITE_SUMMONER_HEALTH, STAR_FOE_HEALTH, KNIGHT_CITY_WATCH]);
   assert.deepEqual(FOE_BOUND.hero, { from: HERO_THREAT.from, to: HERO_THREAT.to, health: HERO_THREAT.health });
@@ -96,8 +94,8 @@ test("FOE-BOUNDS THE DUNGEON'S BOUND IS ITS BUILDERS' WORST, EXACTLY: a layout f
     const r = { t, ...(l != null ? { l } : {}) };
     assert.equal(foeHealthBound(r, { lane: 'dungeon' }), Math.max(a.maxHealth, champion ? b.maxHealth : 0, c.maxHealth), `${t}`);
     assert.ok(foeHealthBound(r, { lane: 'any' }) >= Math.max(foeHealthBound(r, { lane: 'dungeon' }), foeHealthBound(r)), "the relay's 'any': the larger");
-    const lair = entityOf(t, l); hero(lair); revenantAt(lair);
-    assert.ok(lair.maxHealth <= foeHealthBound(r, { lane: 'any' }), `${t}: a revenant's lair stand is under the bound`);
+    const stand = entityOf(t, l); hero(stand); revenantAt(stand);
+    assert.ok(stand.maxHealth <= foeHealthBound(r, { lane: 'any' }), `${t}: a revenant's stand is under the bound`);
   }
 });
 

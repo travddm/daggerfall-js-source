@@ -43,7 +43,6 @@ import { enemyDisplayName, ENEMY_BASICS, isClassEnemyId } from '../characters/en
 import { getLocalizedEnemyName } from '../systems/textManager.js';   // L10N3e: the enemy's name in the player's language
 import { windupHolds, windupStruck, tacticsNow, overreachOpen, poiseTrack, LOCAL_TARGET } from '../ai/tactics.js';   // TELL1: poise and the stagger; TELL2: the cues' clock; TELL4: the punish window
 import { blowK, blowWeight, behind, TELL } from '../ai/tells.js';   // TELL1: a blow's weight on the poise meter; TELL2: the cues' numbers
-import { noteFeud, feudWeakBlow } from '../systems/feudLedger.js';   // RVN1: my staggers and back hits, in a fight's ledger (a leaf); RVN3: a blow of its weakness
 import { BLOW } from '../ai/blowShapes.js';   // TELL6d: the aimed shot's speed
 import { blowEffectOf, queueBlowEffect, drainBlowEffects, tickBleed } from '../systems/blowEffects.js';   // TELL6e: what a landing does to the player
 import { BLOW_VERDICT_LIFE } from '../ai/foeBlows.js';   // TELL6e: a landing's effect, only within its verdict's life
@@ -276,9 +275,8 @@ const _swingTallyCarry = new WeakMap();
 /** The tally is INSIDE the chance calculation in DFU, so every
  *  back-facing swing counts a Backstabbing use whether or not the x3
  *  roll lands. No host tallied it, so Backstabbing could never rise. */
-export function backstabChanceOf(player, isEnemyFacingAwayFromPlayer, foe = null) {
+export function backstabChanceOf(player, isEnemyFacingAwayFromPlayer) {
   if (!isEnemyFacingAwayFromPlayer) return 0;
-  if (foe?.entity?.revenant?.edge?.watchful === true) return 0;   // RVN2: a Watchful revenant - never unaware, no backstab (nor its tally)
   tallySkill(player, SKILLS.Backstabbing, 1);
   return skillValue(player, SKILLS.Backstabbing);
 }
@@ -684,38 +682,29 @@ export function applyDamageToNonPlayer(attacker, target, {
  * player in a beast's form), `weight` (DFU's weight in classic units, or a function answering it - read only when the
  * foe is winding up). `fx`: the pool's `audio`, `hitEffects`, `shake` (the player's own blow only) and `rolls`.
  */
-export function windupDoor(f, damage, { kind = 'melee', weapon = null, round = false, peer = false, striker = null, from = null, claws = false, weight = 0, wc = null, fromPlayer = true, element = null } = {}, fx = {}) {   // AUDIT TELL U6: `fromPlayer` the pool's provenance - a foe's own spell, a SetHealth(0), is nobody's word
+export function windupDoor(f, damage, { kind = 'melee', weapon = null, round = false, peer = false, striker = null, from = null, claws = false, weight = 0, wc = null, fromPlayer = true } = {}, fx = {}) {   // AUDIT TELL U6: `fromPlayer` the pool's provenance - a foe's own spell, a SetHealth(0), is nobody's word
   const mine = fromPlayer && !peer && !striker;
   if (f?.ai && overreachOpen(f.ai)) {   // TELL4: no meter to weigh - the blow lands, and the first staggers it
     const word = windupStruck(f.ai, f.entity, typeof weight === 'function' ? weight() : weight, 0);
     windupFeedback(word, f, fx);
-    if (mine) { windupTag(word, f, true); feudNoteWord(word, f, false); }   // TELL9: my blow's word; RVN1: its ledger
+    if (mine) windupTag(word, f, true);   // TELL9: my blow's word
     return word;
   }
   if (!f?.ai || !windupHolds(f.ai)) return null;
   const blow = f.ai._tac.blow;
   // TELL8 (10.4): a PEER's blow weighs its class as the peer judged it against its puppet (`wc` - its K, its back
-  // flag, its weakness); without one, K_PEER and never from behind (`from` is no peer's feet here)
+  // flag); without one, K_PEER and never from behind (`from` is no peer's feet here)
   const k = peer ? (wc ? wc.k : blowK({ kind, round, peer }))
     : striker
       ? blowK({ kind, weapon: striker.entity?.weapon ?? null, claws: !isClassEnemyId(striker.mobileType ?? 0), round, peer })
       : blowK({ kind, weapon, claws, round, peer });
   const back = peer ? !!wc?.back : behind(blow.origin, blow.yaw, from);
-  const watchful = f.entity?.revenant?.edge?.watchful === true;   // RVN2: a Watchful revenant's poise takes no back multiplier
-  // RVN3 (Feud-Arc.md 14.1): a blow of its weakness weighs x POISE_WEAK - a peer's as it judged it, mine or a foe's here
-  const weak = peer ? !!wc?.weak : !round && feudWeakBlow(f.entity, { kind, weapon: striker ? (striker.entity?.weapon ?? null) : weapon, element, attacker: striker?.entity ?? (fromPlayer ? { isPlayer: true } : null) });
-  const v = blowWeight(damage, k, { back: back && !watchful, weak });
+  const v = blowWeight(damage, k, { back });
   const w = typeof weight === 'function' ? weight() : weight;
   const word = windupStruck(f.ai, f.entity, w, v);
   windupFeedback(word, f, fx);
-  if (mine) { windupTag(word, f, false); feudNoteWord(word, f, back); }   // TELL9: my blow's word; RVN1: its ledger
+  if (mine) windupTag(word, f, false);   // TELL9: my blow's word
   return word;
-}
-/** RVN1 (Feud-Arc.md section 12): my blow on a telegraphing foe, in its fight's ledger - a stagger it dealt, and a blow
- *  at its back (judged as the poise judges it: behind the wind-up's own facing). */
-function feudNoteWord(word, f, back) {
-  if (word === 'stagger') noteFeud(f?.entity, 'staggers');
-  if (back) noteFeud(f?.entity, 'backHits');
 }
 /** TELL9 (section 11.2): the word my own blow on a telegraphing foe raises with its number (ui/hitNumbers.js tagHit) -
  *  "Stagger" at a break that staggers, "Holds" on a wind-up it does not break, "Open" on an overreached foe it could
@@ -748,10 +737,6 @@ export function windupFeedback(word, f, { audio = null, hitEffects = null, shake
 
 // ---- TELL2: THE EAR ----
 const NO_CUES = Object.freeze([]);   // AUDIT TELL U9: what a foe with nothing telegraphed plays
-/** RVN11 (22.1): the host's ear for a wind-up at me as it begins (`fn(f, blow)`) - a
- *  Devoted companion's warning of one behind me. */
-let _windupAtMe = null;
-export function setWindupAtMeListener(fn) { _windupAtMe = typeof fn === 'function' ? fn : null; }
 /**
  * A telegraphed blow's three cues, in the world boss's order (world/gate/gateBoss.js BOSS_CUES), each once, through the
  * foes' own device settings (playEnemyClip's: a metre above the feet, linear to the attract radius by `hearing`):
@@ -761,7 +746,7 @@ export function setWindupAtMeListener(fn) { _windupAtMe = typeof fn === 'functio
  *   (DFU's half-the-time roll stays on its plain swings).
  * A wind-up that breaks plays neither of the last two; a feint (TELL5) no WIND, and its cut's plain blow the LAND. TELL4: a perfect dodge rings at its
  * landing - `SOUND.Parry6` at TELL.PERFECT_PITCH. TELL9: a wind-up at me makes its foe the target bar's (markFoeThreat)
- * and a perfect dodge says "Perfect" (ui/hitNumbers.js); RVN11: the host hears a wind-up at me begin (setWindupAtMeListener). Called once a frame per live foe, after its sprite's update. Answers the cues it played this frame (tests).
+ * and a perfect dodge says "Perfect" (ui/hitNumbers.js); Called once a frame per live foe, after its sprite's update. Answers the cues it played this frame (tests).
  */
 export function tellCues(f, audio, hearing = 1, now = tacticsNow()) {
   const ai = f?.ai;
@@ -779,11 +764,10 @@ export function tellCues(f, audio, hearing = 1, now = tacticsNow()) {
   const row = ENEMY_BASICS[f.mobileType];
   if (b && c.blow !== b) {
     c.blow = b; c.released = false; c.land = false;
-    if (s.key === LOCAL_TARGET) { markFoeThreat(f); try { _windupAtMe?.(f, b); } catch { /* a warning is no blow's business */ } }   // TELL9: a foe winding up at me takes the target bar; RVN11: the host hears it begin
+    if (s.key === LOCAL_TARGET) markFoeThreat(f);   // TELL9: a foe winding up at me takes the target bar
     if (!b.feint) {
-      // RVN5 (Feud-Arc.md 16.1): a signature's WIND deeper (`b.windPitch`)
-      if (ignoreHumanSounds(f.mobileType) || f.quietVoice) play(SOUND.SwingMediumPitch, b.windPitch ? TELL.WIND_CLASS_PITCH * (b.windPitch / TELL.WIND_PITCH) : TELL.WIND_CLASS_PITCH, TELL.WIND_CLASS_VOLUME);   // HALT-ONE: the living watch's wind-up is a person's low swing - never its Halt
-      else play(row?.barkSound, b.windPitch ?? TELL.WIND_PITCH);
+      if (ignoreHumanSounds(f.mobileType) || f.quietVoice) play(SOUND.SwingMediumPitch, TELL.WIND_CLASS_PITCH, TELL.WIND_CLASS_VOLUME);   // HALT-ONE: the living watch's wind-up is a person's low swing - never its Halt
+      else play(row?.barkSound, TELL.WIND_PITCH);
     }
   }
   if (b && !c.released && now >= b.land - TELL.RELEASE_LEAD) { c.released = true; play(SOUND.SwingLowPitch, TELL.RELEASE_PITCH); }
@@ -792,7 +776,7 @@ export function tellCues(f, audio, hearing = 1, now = tacticsNow()) {
     // landed (the brain stamped its landing at or after this blow's), or broken - only a landing strikes; its strike may
     // already be this frame's (the sprite stepped past the release before this call)
     const landed = ai._blowLandedAt != null && ai._blowLandedAt >= c.blow.land - 1e-6;
-    c.land = (landed && c.blow.kind !== 'aimed' && c.blow.kind !== 'pyre' && (ai._blowHold === false || ai._blowHold === 'spent'))   // TELL4: a miss strikes too, then stands spent; TELL6d: a shot strikes nothing - its arrow flies; RVN5: nor a pyre - its blast is its cast's sound
+    c.land = (landed && c.blow.kind !== 'aimed' && (ai._blowHold === false || ai._blowHold === 'spent'))   // TELL4: a miss strikes too, then stands spent; TELL6d: a shot strikes nothing - its arrow flies
       || c.blow.cut != null;   // TELL5: a cut feint's plain blow sounds at its strike
     // TELL4 (6.2): a perfect dodge - the bright parry ring, at the landing
     if (landed && ai._perfectAt != null && ai._perfectAt >= c.blow.land - 1e-6) { play(SOUND.Parry6, TELL.PERFECT_PITCH); showWord(HIT_TAGS.perfect, 'perfect'); }   // TELL9: and says so
