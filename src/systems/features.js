@@ -39,7 +39,7 @@ import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
 import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
-import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { coveredOnlineOk } from './featureOnline.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -1888,7 +1888,7 @@ export function checkFeature(f) {
       else if (a.store === 'prefs') {
         // FT18: a covered pref is declared where it is covered - RF4's law, one row over
         if (a.initial === undefined) out.push(`also: the covered pref '${a.key}' declares its initial value`);
-        if (!(a.online === true || a.online === false || a.online === 'player')) out.push(`also: the covered pref '${a.key}' declares its online answer`);
+        if (!coveredOnlineOk(c, a)) out.push(`also: the covered pref '${a.key}' declares its online answer`);   // or one of its own part's tiers, the room's pin
       }
     }
   }

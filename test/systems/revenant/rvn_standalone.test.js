@@ -28,6 +28,7 @@ const F = await import('../../../src/systems/revenant/revenantFate.js');
 const RC = await import('../../../src/systems/revenant/revenantCompanions.js');
 const S = await import('../../../src/systems/companionSlots.js');
 const { setPref, _resetForTests } = await import('../../../src/systems/uiPrefs.js');
+const { FEATURE_PREF_DEFAULTS, FEATURE_PREF_ONLINE } = await import('../../../src/systems/features.js');
 const { setSigilOnline, setSigilRenown, _resetSigilForTests } = await import('../../../src/systems/sigil/sigil.js');
 
 const me = () => ({
@@ -71,6 +72,18 @@ test('the choices read as the row defaults, and a pref holding anything else rea
   setPref('revenantFlee', 7);
   assert.equal(O.revenantRenownMin(), 0);
   assert.equal(O.revenantFleeFactor(), 1);
+});
+
+test('the row declares every choice: a default each, and online every one but the Renown wait is forced to it', () => {
+  const keys = ['revenantWho', 'revenantRenown', 'revenantSpare', 'revenantRank', 'revenantFlee', 'revenantReturn'];
+  assert.deepEqual(
+    keys.map((k) => FEATURE_PREF_DEFAULTS[k]),
+    ['any', 'none', 'join', '2', 'normal', 'normal'],
+  );
+  assert.deepEqual(
+    keys.map((k) => FEATURE_PREF_ONLINE[k]),
+    ['any', 'player', 'join', '2', 'normal', 'normal'],
+  );
 });
 
 test('with Loot rarity off a plain foe becomes a revenant; "elites and champions" keeps the old rule; a boss never does', () => {

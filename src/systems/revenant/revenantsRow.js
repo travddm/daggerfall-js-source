@@ -21,8 +21,21 @@ export const REVENANT_CHOICES = Object.freeze({
   back: Object.freeze({ key: 'revenantReturn', initial: 'normal' }),
 });
 // The Renown wait is the player's own pace (their own revenants, held on their client, as before), so online it stays theirs; the rest the room fixes.
-const choice = (/** @type {{ key: string, initial: string }} */ c) => Object.freeze({ store: 'prefs', key: c.key, initial: c.initial, online: c === REVENANT_CHOICES.renown ? 'player' : c.initial });
-const part = (/** @type {{ key: string }} */ c, /** @type {() => string} */ label, /** @type {any[]} */ tiers) => Object.freeze({ key: c.key, get label() { return label(); }, tiers: Object.freeze(tiers) });
+const choice = (/** @type {{ key: string, initial: string }} */ c) =>
+  Object.freeze({
+    store: 'prefs',
+    key: c.key,
+    initial: c.initial,
+    online: c === REVENANT_CHOICES.renown ? 'player' : c.initial,
+  });
+const part = (/** @type {{ key: string }} */ c, /** @type {() => string} */ label, /** @type {any[]} */ tiers) =>
+  Object.freeze({
+    key: c.key,
+    get label() {
+      return label();
+    },
+    tiers: Object.freeze(tiers),
+  });
 
 export const REVENANTS_ROW = Object.freeze({
   id: 'revenants',
@@ -40,37 +53,42 @@ export const REVENANTS_ROW = Object.freeze({
     return t('features.revenants.effect', 'Takes effect the next time a foe flees or falls.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: REVENANTS_PREF, initial: true, online: true }),
-  also: Object.freeze(Object.values(REVENANT_CHOICES).map(choice)),
-  parts: Object.freeze([
-    part(REVENANT_CHOICES.who, () => t('features.revenants.who', 'Who rises'), [
-      tier('any', () => t('features.revenants.who.any', 'Any foe')),
-      tier('elite', () => t('features.revenants.who.elite', 'Elites and champions')),
+  control: Object.freeze({
+    store: 'prefs',
+    key: REVENANTS_PREF,
+    initial: true,
+    online: true,
+    also: Object.freeze(Object.values(REVENANT_CHOICES).map(choice)),
+    parts: Object.freeze([
+      part(REVENANT_CHOICES.who, () => t('features.revenants.who', 'Who rises'), [
+        tier('any', () => t('features.revenants.who.any', 'Any foe')),
+        tier('elite', () => t('features.revenants.who.elite', 'Elites and champions')),
+      ]),
+      part(REVENANT_CHOICES.renown, () => t('features.revenants.renown', 'Renown needed'), [
+        tier('none', () => t('features.revenants.renown.none', 'None')),
+        tier('5', () => t('features.revenants.renown.5', 'Renown 5')),
+        tier('10', () => t('features.revenants.renown.10', 'Renown 10')),
+        tier('20', () => t('features.revenants.renown.20', 'Renown 20')),
+      ]),
+      part(REVENANT_CHOICES.spare, () => t('features.revenants.spare', 'A spared revenant'), [
+        tier('join', () => t('features.revenants.spare.join', 'Joins you')),
+        tier('leave', () => t('features.revenants.spare.leave', 'Leaves for good')),
+      ]),
+      part(REVENANT_CHOICES.rank, () => t('features.revenants.rank', 'Levels per rank'), [
+        tier('1', () => t('features.revenants.rank.1', '1')),
+        tier('2', () => t('features.revenants.rank.2', '2')),
+        tier('3', () => t('features.revenants.rank.3', '3')),
+      ]),
+      part(REVENANT_CHOICES.flee, () => t('features.revenants.flee', 'Flight'), [
+        tier('rare', () => t('features.revenants.flee.rare', 'Rare')),
+        tier('normal', () => t('features.revenants.flee.normal', 'Normal')),
+        tier('often', () => t('features.revenants.flee.often', 'Often')),
+      ]),
+      part(REVENANT_CHOICES.back, () => t('features.revenants.back', 'Return'), [
+        tier('soon', () => t('features.revenants.back.soon', 'About a day')),
+        tier('normal', () => t('features.revenants.back.normal', 'One to three days')),
+        tier('late', () => t('features.revenants.back.late', 'Three to seven days')),
+      ]),
     ]),
-    part(REVENANT_CHOICES.renown, () => t('features.revenants.renown', 'Renown needed'), [
-      tier('none', () => t('features.revenants.renown.none', 'None')),
-      tier('5', () => t('features.revenants.renown.5', 'Renown 5')),
-      tier('10', () => t('features.revenants.renown.10', 'Renown 10')),
-      tier('20', () => t('features.revenants.renown.20', 'Renown 20')),
-    ]),
-    part(REVENANT_CHOICES.spare, () => t('features.revenants.spare', 'A spared revenant'), [
-      tier('join', () => t('features.revenants.spare.join', 'Joins you')),
-      tier('leave', () => t('features.revenants.spare.leave', 'Leaves for good')),
-    ]),
-    part(REVENANT_CHOICES.rank, () => t('features.revenants.rank', 'Levels per rank'), [
-      tier('1', () => t('features.revenants.rank.1', '1')),
-      tier('2', () => t('features.revenants.rank.2', '2')),
-      tier('3', () => t('features.revenants.rank.3', '3')),
-    ]),
-    part(REVENANT_CHOICES.flee, () => t('features.revenants.flee', 'Flight'), [
-      tier('rare', () => t('features.revenants.flee.rare', 'Rare')),
-      tier('normal', () => t('features.revenants.flee.normal', 'Normal')),
-      tier('often', () => t('features.revenants.flee.often', 'Often')),
-    ]),
-    part(REVENANT_CHOICES.back, () => t('features.revenants.back', 'Return'), [
-      tier('soon', () => t('features.revenants.back.soon', 'About a day')),
-      tier('normal', () => t('features.revenants.back.normal', 'One to three days')),
-      tier('late', () => t('features.revenants.back.late', 'Three to seven days')),
-    ]),
-  ]),
+  }),
 });
