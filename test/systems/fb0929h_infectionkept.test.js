@@ -109,6 +109,6 @@ test("DFU-GAPS SW14: by default a cure ends every disease, the infection with th
 
 test("DFU-GAPS SW14: the row defaults to DFU's cure and the online lane forces it", () => {
   const row = FEATURES.find((f) => f.id === 'cure-keeps-infection');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['cureKeepsInfection', false, false]);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['cureKeepsInfection', false, 'room']);
   assert.equal(ONLINE_FORCED_PREFS.cureKeepsInfection, false);
 });

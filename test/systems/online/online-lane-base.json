@@ -7,7 +7,14 @@
     "enhancedClimbing": true,
     "enhancedCombatVisuals": true,
     "lootRarity": true,
+    "revenants": true,
     "weaponTechniques": true,
+    "humanoidLoot": "dfu",
+    "repairPriceByDamage": false,
+    "cureKeepsInfection": false,
+    "lockpickTumblers": false,
+    "dressForThePart": false,
+    "guildProbation": false,
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,
@@ -18,8 +25,9 @@
     "roadVerges": true,
     "climateBlend": true,
     "questlines": true,
+    "questlineRewards": true,
     "wildernessCamps": true,
-    "naval": true
+    "naval": false
   },
   "settings": {
     "Controls": {
@@ -27,6 +35,15 @@
     }
   },
   "modKeys": {
+    "character-modes": {
+      "Enabled": true,
+      "Modes.Hardcore": true,
+      "Modes.Ironman": true,
+      "Modes.HardcoreIronman": true
+    },
+    "project-legacy": {
+      "Enabled": true
+    },
     "roads-hazelnut": {
       "Enabled": true,
       "SmoothRoads": true,

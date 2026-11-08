@@ -159,7 +159,7 @@ test('SD-ONLINE: the row - the world\'s sizes, Enhanced, off by default offline 
   assert.deepEqual(ids.slice(ids.indexOf('smaller-dungeons'), ids.indexOf('smaller-dungeons') + 3), ['smaller-dungeons', 'medium-dungeons', 'world-dungeon-sizes']);
   const f = FEATURES.find((x) => x.id === 'world-dungeon-sizes');
   assert.deepEqual(f.kinds, ['enhanced']);
-  assert.deepEqual({ ...f.control }, { store: 'prefs', key: WORLD_DUNGEON_SIZES_PREF, initial: false, online: true });
+  assert.deepEqual({ ...f.control }, { store: 'prefs', key: WORLD_DUNGEON_SIZES_PREF, initial: false, online: 'room' });
   assert.match(f.note, /small, medium or large, five in eight of them large/);
   assert.match(f.note, /Online it is always on\./);
   assert.equal(ONLINE_FORCED_PREFS.worldDungeonSizes, true, 'the lane learned it from the row (RF4)');

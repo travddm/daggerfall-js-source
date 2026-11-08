@@ -116,6 +116,6 @@ test('DFU-GAPS SS19: by default clothes change nothing - the reaction mods stay 
     setPref('dressForThePart', true);
   }
   const row = FEATURES.find((f) => f.id === 'dress-for-the-part');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['dressForThePart', false, false]);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['dressForThePart', false, 'room']);
   assert.equal(ONLINE_FORCED_PREFS.dressForThePart, false);
 });
