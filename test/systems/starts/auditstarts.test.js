@@ -7,7 +7,7 @@
 import '../../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { START_QUESTS, HAND_START_QUEST } from '../../../src/systems/starts/starts.js';
