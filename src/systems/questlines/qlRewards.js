@@ -4,7 +4,8 @@
 // titles - is paid only against what the service witnessed (section 5.3, server-account/src/questlines.js);
 // nothing here mints an account currency (decision 8).
 //
-// THE GOLD stays DFU's formula (quest/item.js _createGold), times the outcome's factor - never below OUTCOME_GOLD_MIN
+// THE GOLD stays DFU's formula (quest/item.js _createGold), times the outcome's factor (a tenth either way; DFU's own
+// scale when the Questline rewards row is off, questRewardsRow.js) - never below OUTCOME_GOLD_MIN
 // nor above OUTCOME_GOLD_MAX of what the script minted, and never touching a reward that is not gold.
 //
 // A PIECE OF GEAR, CHOSEN. An outcome that pays gear offers REWARD_CHOICES pieces - a weapon, a piece of armour and a
@@ -36,20 +37,28 @@ import { weaponSkillUsed } from '../../characters/weapons.js';
 import { SKILLS, skillValue } from '../skills.js';
 import { factionsTable } from '../quest/tables.js';
 import { PAY_NAMES } from './qlSheets.js';
+import { getPref } from '../uiPrefs.js';
+import { rareGate } from '../loot/lootLevelGate.js';
+import { QUEST_REWARDS_PREF } from './questRewardsRow.js';
+
+/** Is the reward scale DFU's - the quest pays what its script pays and nothing more (the Questline rewards row off)? */
+export const rewardsAreDfu = () => getPref(QUEST_REWARDS_PREF) === false;
+/** What a quest pays when the scale is DFU's. */
+const DFU_PAY = Object.freeze({ gold: 1, gear: false, step: 0 });
 
 /** What each pay an outcome names gives: its gold factor, whether it offers a piece, and a step up the tier's ladder. */
 export const PAY_PROFILES = Object.freeze({
   standard: Object.freeze({ gold: 1, gear: true, step: 0 }),
-  lesser: Object.freeze({ gold: 0.75, gear: true, step: 0 }),     // the merciful way: less coin, more standing (the sheet's)
-  greater: Object.freeze({ gold: 1.25, gear: true, step: 1 }),    // the harder way taken
+  lesser: Object.freeze({ gold: 0.9, gear: true, step: 0 }),      // the merciful way: a tenth less coin, more standing (the sheet's)
+  greater: Object.freeze({ gold: 1.1, gear: true, step: 1 }),     // the harder way taken: a tenth more coin
   double: Object.freeze({ gold: 1, gear: true, step: 0 }),        // both sides paid by the script itself - the piece once
   betrayal: Object.freeze({ gold: 1, gear: false, step: 0 }),     // the other side's coin, never the betrayed guild's piece
   own: Object.freeze({ gold: 1, gear: false, step: 0 }),          // the script's own reward is the reward - a Prince's artifact
   none: Object.freeze({ gold: 1, gear: false, step: 0 }),         // a quest that ended unpaid: nothing added
 });
 /** The bounds of an outcome's gold factor (section 5.2). */
-export const OUTCOME_GOLD_MIN = 0.75;
-export const OUTCOME_GOLD_MAX = 1.5;
+export const OUTCOME_GOLD_MIN = 0.9;
+export const OUTCOME_GOLD_MAX = 1.1;
 /** How many pieces an outcome that pays gear offers. */
 export const REWARD_CHOICES = 3;
 /** The tier's ladder (section 5.2): the floor every piece is laddered to, and the share of pieces one rung higher.
@@ -73,7 +82,7 @@ if (PAY_NAMES.some((p) => !PAY_PROFILES[p]) || Object.keys(PAY_PROFILES).some((p
 }
 
 /** The pay an outcome names, read (an unknown name pays nothing extra). */
-export const payProfileOf = (outcome) => PAY_PROFILES[outcome?.pay] ?? PAY_PROFILES.none;
+export const payProfileOf = (outcome) => (rewardsAreDfu() ? DFU_PAY : PAY_PROFILES[outcome?.pay] ?? PAY_PROFILES.none);
 
 /** The gold factor, bounded. */
 export const goldFactor = (outcome) => Math.min(OUTCOME_GOLD_MAX, Math.max(OUTCOME_GOLD_MIN, payProfileOf(outcome).gold));
@@ -91,11 +100,14 @@ export function scaleGold(dfItem, outcome, isGold) {
 /** The tier a quest's pieces are laddered at: its own, stepped by the pay, 1 to 4. */
 export const rewardTier = (tier, outcome) => Math.min(4, Math.max(1, (tier | 0) + payProfileOf(outcome).step));
 
-/** One piece's rarity at `tier`: the floor, or one rung higher `up` of the time. */
-export function pieceRarity(tier, rolls) {
+/** One piece's rarity at `tier`: the floor, or one rung higher `up` of the time. With a `level`, a Rare passes the
+ *  level gate (lootLevelGate.js) as a drop does: below it the piece is Magic. */
+export function pieceRarity(tier, rolls, level = null) {
   const t = TIER_FLOORS[Math.min(4, Math.max(1, tier | 0))];
   const i = RUNGS.indexOf(t.floor) + (rolls() < t.up ? 1 : 0);
-  return RUNGS[Math.min(RUNGS.length - 1, i)];
+  const rarity = RUNGS[Math.min(RUNGS.length - 1, i)];
+  if (level != null && rarity !== RUNGS[0] && rolls() >= rareGate(level)) return RUNGS[0];
+  return rarity;
 }
 
 /** A quest's reward seed: its name, uid and start, hashed (FNV-1a, 32 bits) - the same quest rolls the same three. */
@@ -186,7 +198,7 @@ export function rollRewardChoice({ seed, level, tier, entity = null, named = nul
     // barred from every armour two pieces
     if (!item) { k = kind === 'armor' || out.some((p) => p.kind === 'armor') ? 'jewel' : 'armor'; item = draw(k); }
     if (!item) continue;
-    const rarity = pieceRarity(tier, rolls);
+    const rarity = pieceRarity(tier, rolls, lv);
     applyRarity(item, rarity, rolls);
     item.isIdentified = true;
     if (isNamed) { item.name = named.name; item.qlNamed = true; }   // after the ladder, whose name it replaces
