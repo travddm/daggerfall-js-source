@@ -4,6 +4,7 @@ One page per major gameplay area: what it does, where it lives, its data and its
 
 - [characters.md](characters.md): races, classes, attributes and skills, character creation, advancement, the
   online firmament tree, bodies and the paperdoll.
+- [character-modes.md](character-modes.md): the five modes picked at creation, their rules, enforcement and storage.
 - [combat.md](combat.md): how a swing or an arrow becomes damage, weapons, shields, techniques, enemy strength, the
   power ceiling, blood.
 - [magic.md](magic.md): the spell record, casting and cost, the effect library, enchanting, arcane paths, enemy
@@ -25,5 +26,4 @@ One page per major gameplay area: what it does, where it lives, its data and its
   footsteps, combat voices, volumes.
 - [balance-harness.md](balance-harness.md): the tool that measures combat balance by level under DFU's rules and this
   game's, with a switch for each rule layer.
-- [enhanced-ai.md](enhanced-ai.md): the optional layer over the classic foe AI: navmesh, tactics and cover, tells,
-  the feud ledger.
+- [enhanced-ai.md](enhanced-ai.md): the optional layer over the classic foe AI: navmesh, tactics and cover, tells.

@@ -6,6 +6,7 @@
 // one heal a power gives (systems/playerHeal.js), the Broker's shelf that never carries it, and the host's wiring by
 // source (scenes/world.js, net/serpent/serpentClaims.js). Design:;
 // The service's half: test/net/serpent/serpentset_service.test.js.
+import '../techniquesLinked.js';
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

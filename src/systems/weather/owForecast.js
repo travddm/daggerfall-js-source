@@ -21,7 +21,7 @@
 //   - HERE, standing: the next HERE_HOURS at the traveller's place, every HERE_STEP_MIN (forecastAt) - what falls now and
 //     when it clears, or what comes and when.
 //   - A PLACE'S CARD, under the pointer: its own next hours, the same law.
-// The map's lane only (weatherMapOn: the enhanced skin's world weather map, forced on online). Off it the sky is DFU's
+// The map's lane only (weatherMapOn: the weather-events row's world weather map, forced on online). Off it the sky is DFU's
 // day roll per climate, which has no tomorrow to read - and nothing is said.
 //
 // PURE: points, minutes and a reader in; words out - the player's language's (L10N4: every word through the text core,

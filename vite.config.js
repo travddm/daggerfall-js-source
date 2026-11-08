@@ -3,6 +3,7 @@ import { createReadStream, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { landingHtml, readBuildSha } from './scripts/landingHtml.mjs';
 import { studioArtIndex } from './scripts/studioArtIndex.mjs';   // STUDIO1: the studio's listing, served and built from the folder
+import { buildLicense, THIRD_PARTY_FILE } from './scripts/buildLicense.mjs';   // the licences every copy must carry
 
 // Dev-only: serve ARENA2 game data at /arena2/*. The data is freeware but
 // never committed or bundled (Port-Doctrine); builds contain no game files.
@@ -175,6 +176,8 @@ export default defineConfig({
     // statically joins the host's chunk - pixelBuild.js is in it. Only a
     // dynamic import takes code out; lower this when one does.)
     chunkSizeWarningLimit: 2_750,
+    // The bundled npm packages' licences, beside the LICENSE.txt that buildLicense() writes (scripts/buildLicense.mjs).
+    license: { fileName: THIRD_PARTY_FILE },
     // EVERY ROOT PAGE: the game, the voxel editor (viewer.html), the labs
     // and the prototypes. None carries game data - a page that draws the
     // game's art asks for the user's own ARENA2. AUDIT 68: a root page
@@ -274,5 +277,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [arena2DevServer(), buildTagMeta(), landingHtml(), studioArtIndex()],
+  plugins: [arena2DevServer(), buildTagMeta(), landingHtml(), studioArtIndex(), buildLicense()],
 });

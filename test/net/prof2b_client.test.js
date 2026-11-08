@@ -223,6 +223,6 @@ test('PROF2b the seams by source: the professions\' book sends a harvest\'s Watc
   assert.doesNotMatch(src('src/ui/professions/profPages.js'), /PROF2b/, 'no card waits on the Motherlodes');
   for (const e of ['motherlode-closed', 'motherlode-watch', 'motherlode-found', 'motherlode-full']) assert.ok(REFUSALS[e], e);
   const svc = src('server-account/src/index.js');
-  assert.match(svc, /'\/v1\/prof\/harvest': \(\) => \(isMotherlodeNode\(body\?\.node\) \? strikeMotherlode\(ctx, who\.player, env, body\) : harvestNode\(ctx, who\.player, env, body\)\),/);
+  assert.match(svc, /'\/v1\/prof\/harvest': \(\) => \(isMotherlodeNode\(body\?\.node\) \? strikeMotherlode\(ctx, who\.player, env, body\) : harvestCapped\(ctx, who\.player, env, body, harvestNode\)\),/);
   assert.match(svc, /'\/v1\/prof\/motherlodes': \(\) => motherlodesRead\(ctx, who\.player, env, body\),/);
 });

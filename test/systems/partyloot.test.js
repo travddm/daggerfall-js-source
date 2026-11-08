@@ -878,14 +878,14 @@ test('PARTY-LOOT: the word and its merge - projected and bounded; takes merge th
 // drive), and the outcome asserted is WHERE EACH PIECE IS for every player once every timeout has passed.
 const BULK_N = 40;
 /** `n` distinct weapons, every one a piece of its own (a template and a metal), each through the item law the wire applies. */
-function distinctPieces(n) {
+function distinctPieces(n, avoid = new Set()) {   // `avoid`: keys the body already carries (a foe in its full kit holds weapons of its own)
   const names = ['Dagger', 'Tanto', 'Staff', 'Shortsword', 'Broadsword', 'Saber', 'Longsword', 'Katana', 'Claymore', 'Mace', 'Flail', 'Warhammer', 'Battle Axe', 'War Axe', 'Short Bow', 'Long Bow'];
   const out = [];
   for (const material of [0, 1, 2, 3]) {
     for (const name of names) {
       const t = ITEM_TEMPLATES.find((x) => x.name === name);
       const it = { group: 'Weapons', templateIndex: t.index, name, material, value: 10 + out.length, currentCondition: t.hitPoints ?? 50, maxCondition: t.hitPoints ?? 50 };
-      if (validLootList([it])?.length === 1) out.push(it);
+      if (validLootList([it])?.length === 1 && !avoid.has(pieceKey(it))) out.push(it);
       if (out.length === n) return out;
     }
   }
@@ -936,7 +936,7 @@ test('OUTDOOR-LOOT D-2.1 (Take all, one claimer): a joiner\'s Take all of a body
   const r = room();
   fall(r);
   const key = KEYS.find((k) => k.startsWith('corpse:'));
-  const pieces = distinctPieces(BULK_N);
+  const pieces = distinctPieces(BULK_N, new Set(shown(r.A, key).map(pieceKey)));
   stockBody(r, key, pieces);
   const wanted = shown(r.B, key).filter((it) => !RL.isPersonalLoot(it));
   assert.ok(wanted.length >= BULK_N, `the body holds ${wanted.length} pieces of the room's`);
@@ -976,7 +976,7 @@ test('OUTDOOR-LOOT D-2.1 (judged together): two joiners\' bulk takes of one body
   const r = room3();
   fall(r);
   const key = KEYS.find((k) => k.startsWith('corpse:'));
-  const pieces = distinctPieces(BULK_N);
+  const pieces = distinctPieces(BULK_N, new Set(shown(r.A, key).map(pieceKey)));
   stockBody(r, key, pieces);
   const stored = shown(r.B, key).filter((it) => !RL.isPersonalLoot(it) && pieces.some((p) => wholeKey(p) === wholeKey(it)));
   assert.equal(stored.length, BULK_N);

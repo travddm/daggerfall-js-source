@@ -1,0 +1,8 @@
+{
+  // Every file of the kit, with Node's types: the Workers here use only what Node's types also declare (Request,
+  // Response, crypto). The root `npm run types` checks the modules the tests import; this checks the rest too, and
+  // needs `npm ci --prefix selfhost` first for aws4fetch, esbuild and smol-toml.
+  "extends": "../tsconfig.node.json",
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "build"]
+}

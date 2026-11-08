@@ -14,7 +14,7 @@ import {
 } from '../../../src/systems/weather/weatherField.js';
 import {
   resetWeatherSim, setWeatherFieldLaw, weatherFieldOn, sampleWeatherField, weatherCrossingStamp, weatherJumpStamp, currentFieldCells, currentFieldCell,
-  importClimateWeathers, tickWeather, applyClimateWeather, weatherRespawn, currentWeather, setSnowGroundLaw, WEATHER_ENUM, setWeatherMapLaw,
+  importClimateWeathers, tickWeather, applyClimateWeather, weatherRespawn, currentWeather, setSnowGroundLaw, snowGroundLawOn, WEATHER_ENUM, setWeatherMapLaw,
 } from '../../../src/systems/weather/weatherSim.js';
 import { createWindModel, frontFactor, FRONT_LEAD_MIN, CROSS_LEAD_MIN } from '../../../src/systems/wind/wind.js';
 import { CLIMATES, MAX_MAP_PIXEL_Y } from '../../../src/formats/mapsFile.js';
@@ -158,21 +158,50 @@ test('WEATHER2b the sim: nothing off the lane; on it the player\'s word is the f
   assert.equal(weatherCrossingStamp(), 0); assert.deepEqual(currentFieldCells(), []);
 });
 
-test('WEATHER2b the switch: the enhanced skin, Enhanced Environments and the weather-events row, the seam over them; the row is forced on online', () => {
+test('WEATHER2b the switch: the weather-events row alone, in every skin, with Enhanced Environments on or off; the row is forced on online', () => {
   resetWeatherSim();
   const skin = uiSkin(); const pe = PREF_DEFAULTS.enhancedEnvironments, pw = PREF_DEFAULTS.weatherEvents;
   try {
-    setUiSkin('enhanced'); setPref('enhancedEnvironments', true); setPref('weatherEvents', true);
-    assert.equal(weatherFieldOn(), true);
-    setPref('weatherEvents', false); assert.equal(weatherFieldOn(), false, 'the row is the switch');
-    setPref('weatherEvents', true); setPref('enhancedEnvironments', false); assert.equal(weatherFieldOn(), false);
-    setPref('enhancedEnvironments', true); setUiSkin('classic'); assert.equal(weatherFieldOn(), false, '1:1 on the classic skin');
+    for (const sk of ['enhanced', 'classic']) {
+      for (const ee of [true, false]) {
+        setUiSkin(sk); setPref('enhancedEnvironments', ee); setPref('weatherEvents', true);
+        assert.equal(weatherFieldOn(), true, `on in the ${sk} skin with Enhanced Environments ${ee}`);
+        setPref('weatherEvents', false); assert.equal(weatherFieldOn(), false, 'the row is the switch');
+      }
+    }
     setWeatherFieldLaw(true); assert.equal(weatherFieldOn(), true, 'the seam wins'); setWeatherFieldLaw(null);
   } finally { setUiSkin(skin); setPref('enhancedEnvironments', pe); setPref('weatherEvents', pw); resetWeatherSim(); }
   const row = FEATURES.find((f) => f.id === 'weather-events');
   assert.ok(row); assert.equal(row.control.key, 'weatherEvents'); assert.equal(row.control.initial, true); assert.equal(row.control.online, true);
   assert.equal(PREF_DEFAULTS.weatherEvents, true); assert.equal(ONLINE_FORCED_PREFS.weatherEvents, true, 'one field for every player');
   assert.equal(FEATURES.findIndex((f) => f.id === 'weather-events'), FEATURES.findIndex((f) => f.id === 'enhanced-map') + 4, 'TAMRIEL1/TAMRIEL2 (2026-10-08): the continent\'s two rows stand between the 3D dungeon map and this; FT18: where the sway row stood - the sway is the wind row\'s part now; EM3-3D: the 3D dungeon map row stands between, under the map row it belongs to');
+});
+
+test('WEATHER2b alone: with Enhanced Environments off and the plain skin the events fire (a crossing into a cell is rain, the clear is overcast); with both on the same events fire and the extension is on beside them', () => {
+  const skin = uiSkin(); const pe = PREF_DEFAULTS.enhancedEnvironments, pw = PREF_DEFAULTS.weatherEvents;
+  const now = SUMMER + 12 * 1440;
+  const p = placesOn(Math.floor(now / 1440));
+  const run = () => {
+    resetWeatherSim(); setWeatherMapLaw(false); setWeatherFieldLaw(null);   // the field lane, the real switch (no seam)
+    importClimateWeathers(DAY);
+    tickWeather(now, CLIMATES.Woodlands);
+    assert.equal(weatherFieldOn(), true);
+    assert.equal(sampleWeatherField(now, CLIMATES.Woodlands, p.clear, WOODS, 'drain'), true);
+    assert.equal(currentWeather(), 'overcast', 'the clear between the cells');
+    assert.equal(sampleWeatherField(now, CLIMATES.Woodlands, p.inside, WOODS, 'live'), true);
+    assert.equal(currentWeather(), 'rain', 'walked into the cell'); assert.equal(weatherCrossingStamp(), 1);
+  };
+  try {
+    setPref('weatherEvents', true);
+    setUiSkin('classic'); setPref('enhancedEnvironments', false);
+    run();
+    assert.equal(snowGroundLawOn(), false, 'Enhanced Environments off: no extension');
+    setUiSkin('enhanced'); setPref('enhancedEnvironments', true);
+    run();
+    assert.equal(snowGroundLawOn(), true, 'Enhanced Environments on: the ground law extends the events');
+    setPref('weatherEvents', false);
+    assert.equal(sampleWeatherField(now, CLIMATES.Woodlands, p.clear, WOODS, 'live'), false, 'the row off: Enhanced Environments does not run them');
+  } finally { setUiSkin(skin); setPref('enhancedEnvironments', pe); setPref('weatherEvents', pw); resetWeatherSim(); }
 });
 
 test('WEATHER2b the wind: a crossing builds its front on the short lead, the day roll\'s on three hours; the factor takes the lead; the model says which lead is up', () => {

@@ -465,12 +465,12 @@ const REFUSAL_WORDS = {
   'prof-late': () => t('account.refusal.profLate', 'That gathering arrived too late to count.'),
   'prof-night': () => t('account.refusal.profNight', 'You need daylight to gather.'),   // ANY-HOUR: the service says it no more - kept for one not yet redeployed
   'prof-rank': () => t('account.refusal.profRank', 'Your craft is not yet skilled enough for that.'),
-  // CAP-OFF: the day's cap's four - this one, `prof-account-cap`, `prof-hunt-cap` and `prof-fish-cap` - the
-  // service says no more; kept, without the numbers it no longer holds, for one not yet redeployed
+  // CAP-OFF: these four day caps are said no more (`prof-day-cap` is the track's); kept for one not yet redeployed
   'prof-cap': () => t('account.refusal.profCap', 'You have gathered all a day allows.'),
   // AUDIT 29
   'prof-account-cap': () => t('account.refusal.profAccountCap', 'Your account has gathered all a day allows in this craft, across your characters.'),
   'prof-deep-cap': () => t('account.refusal.profDeepCap', 'Dungeons not yet confirmed by other players give you {max} veins a day.', { max: DEEP_UNCONFIRMED_PER_DAY }),
+  'prof-day-cap': () => t('account.refusal.profDayCap', 'This craft has done all a day allows. Try again tomorrow.'),   // PROFESSION-CAPS: a track's day (profCapLaw.js)
   'prof-spec-stale': () => t('account.refusal.profSpecStale', 'Your specialization changed elsewhere. Look again before you choose.'),
   'prof-trial-over': () => t('account.refusal.profTrialOver', 'The free day to change this specialization has ended. Nothing was spent - look again before you choose.'),   // AUDIT PERK-TRIAL P4
   'prof-spec-taken': () => t('account.refusal.profSpecTaken', 'A specialization was chosen there already. Look again.'),

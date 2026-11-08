@@ -51,7 +51,7 @@ test('QL2 the block: what to do as the state opened it - done, failed, optional,
   assert.match(text(block), /Your choices.*The thief begs for mercy\.Let the thief go/);
   assert.equal(text(block.querySelector('.px-qobj-reward')), rewardWords(3));
   assert.match(rewardWords(3), new RegExp(`choose one of ${REWARD_CHOICES} pieces`));
-  assert.equal(floorWords(3), TIER_FLOORS[3].floor === 'rare' ? 'Rare or better' : 'Magic or better', 'read off the constant');
+  assert.equal(floorWords(3), TIER_FLOORS[3].floor === 'rare' ? 'Rare once your level allows, else Magic' : 'Magic or better', 'read off the constant');
   assert.equal(floorWords(1), 'Magic or better');
 });
 

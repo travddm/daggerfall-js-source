@@ -38,7 +38,8 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
-import { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
+import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -190,7 +191,7 @@ export const MOD_CURATED = Object.freeze({
   'world-tooltips': Object.freeze(['HideDefaultInteractTooltip']),
   // LEGACY1: the mod's three Family dials and the port's own Legacy ones - all a player's choice (LEGACY-HOME: the
   // family in the world, Mac's "can be toggled off").
-  'project-legacy': Object.freeze(['Family.Descendants', 'Family.Max Siblings', 'Family.Siblings Probability', 'Legacy.Model', 'Legacy.Toll', 'Legacy.Heirloom Chance', 'Legacy.Family In World']),
+  'character-modes': Object.freeze(['Modes.Hardcore', 'Modes.Ironman', 'Modes.HardcoreIronman']), 'project-legacy': Object.freeze(['Family.Descendants', 'Family.Max Siblings', 'Family.Siblings Probability', 'Legacy.Model', 'Legacy.Toll', 'Legacy.Heirloom Chance', 'Legacy.Family In World']),
   'weapon-widget': Object.freeze(['Swings.Speed', 'Bob.Length', 'Inertia.Scale']),
   // SW1: the three a player reaches for first - how big the shield sits,
   // where it sits, and what it does when the weapon comes out.
@@ -359,14 +360,14 @@ export const FEATURES = Object.freeze([
   }),
   // SD-ONLINE: THE WORLD'S
   // DUNGEON SIZES. Online every dungeon is built at the size one seeded draw on its map id gives it - small, medium or
-  // large, half of them medium, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
+  // large, five in eight of them large, the same for every player (world/smallerDungeons.js onlineDungeonSize) - which is the
   // room's law there, so the lane forces this row ON online and the sync copies it home: offline it asks for the same
   // sizes. Below DFU's switch (Smaller wins when both are on), above the medium one.
   Object.freeze({
     id: 'world-dungeon-sizes',
     group: 'world',
     title: 'Dungeon sizes as online',
-    note: 'Every dungeon takes the size it has online (small, medium or large, half of them medium), the same every '
+    note: 'Every dungeon takes the size it has online (small, medium or large, five in eight of them large), the same every '
       + 'visit. If Smaller dungeons is on too, it wins; this row wins over Medium dungeons. A quest keeps the size it '
       + 'was set up at. Online it is always on.',
     effect: 'Takes effect on the next dungeon you enter. A save made at another size puts you at the dungeon\u2019s start.',
@@ -772,7 +773,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
   }),
-  WEAPON_TECHNIQUES_ROW,   // WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity
+  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
@@ -889,11 +890,9 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'tamrielLand', initial: true, online: 'player' }),
   }),
-  // WEATHER2b: THE WEATHER FIELD - the
-  // day's words as places (systems/weather/weatherField.js), read by the sim
-  // every exterior frame (weatherSim.js weatherFieldOn). FORCED ON
-  // ONLINE: one field for every player under the shared day's roll.
-  // `?wxfield=off` the kill door.
+  // WEATHER2b: THE WEATHER FIELD - the day's words as places (systems/weather/weatherField.js), read by the sim
+  // every exterior frame (weatherSim.js weatherFieldOn); it needs no other row and no skin. FORCED ON ONLINE: one
+  // field for every player under the shared day's roll. `?wxfield=off` the kill door.
   Object.freeze({
     id: 'weather-events',
     group: 'world',
@@ -1006,10 +1005,8 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'nearbyQuests', initial: true, online: 'player' }),
   }),
-  // QL1: QUESTLINES - every quest's
-  // objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
-  // forces it on online (the owner: locked); offline the player's, on by default (the owner's answer). Read when a quest
-  // STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
+  // QL1: QUESTLINES - every quest's objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
+  // forces it on online (the owner: locked); offline the player's, on by default. Read when a quest STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
   Object.freeze({
     id: 'questlines',
     group: 'world',
@@ -1024,6 +1021,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: true }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
   }),
+  QUEST_REWARDS_ROW,   // QUESTLINE-REWARDS: the reward scale, DFU's selectable
   // LW2: THE LIVING WORLD
   //  - a town's people are its residents, each with a name, a home, a trade and a
   // day (systems/livingWorld/livingTown.js stands them where DFU's wandering pool stood). The player's own online: every
@@ -1343,9 +1341,9 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'mwModelDetail', initial: 'pixel', online: 'player', tiers: Object.freeze([tier('pixel', () => t('features.mwModelDetail.pixel', 'Pixelated')), tier('sharp', () => t('features.mwModelDetail.sharp', 'Sharp'))]) }),
   }),
-  // LEGACY1: PROJECT LEGACY - Mac's own mod. A family is founded around
-  // the character played when the mod is on (at creation, or at the first load of a character made before it), and its
-  // model is the family's for good - so the switch lands at once for the tree and the key, and a family keeps its model.
+  modFeature('character-modes', () => t('features.mod.characterModes.effect', 'Takes effect for the next character you create.'), 'character'),
+  // CHARACTER MODES (the row above): which modes a new character may pick. LEGACY1: PROJECT LEGACY - Mac's own mod. A family is founded around the
+  // character played when the mod is on (at creation, or at the first load of one made before it); its model is the family's for good.
   modFeature('project-legacy', () => t('features.mod.projectLegacy.effect', 'Takes effect at once; a family keeps the model it was founded with.'), 'character'),
   // FT10: DFU'S OWN DUNGEON ENHANCEMENTS - three of the
   // Enhancements section's switches, each read by the port at the point
@@ -1626,10 +1624,10 @@ export const FEATURES = Object.freeze([
     group: 'world',
     get title() { return t('features.wildernessCamps.title', 'Wilderness camps & packs'); },
     get note() { return t('features.wildernessCamps.note', 'Out in the wilds you sometimes meet a small group of enemies, a camp or a roaming pack, instead of '
-      + 'only one at a time. Off keeps the classic single encounters.'); },
+      + 'only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'player' }),
+    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: true }),   // CAMP-RARE: forced on online, the room's ground (the groups are rare: systems/campEncounters.js); Off is DFU's lone wanderers
   }),
   // WILD-ROAD (FIELD BUGS 2026-10-04e, Discord: "having to completely halt my travel because 1 rat chose today to die
   // can be quite the interruption"): systems/roadEncounters.js - the port's own. On a journey or the Overworld, a
@@ -1767,9 +1765,9 @@ export const FEATURES = Object.freeze([
     }),
   }),
   // NAV: THE SEA FIGHT - the port's own, on Come Sail Away's hulls, so
-  // it stands nothing without that mod. ONE SWITCH, FORCED ON ONLINE: the ships at sea are the room's world (one player
-  // stands the sea for everyone near - scenes/naval/navalHost.js), and a room where one player sees the pirate boarding another
-  // and the other does not is two worlds. The rest is each player's own: the traffic the sea they stand is filled with,
+  // it stands nothing without that mod. ONE SWITCH, OFF BY DEFAULT AND OFF ONLINE (NAVAL-OFF): Daggerfall Unity has no sea fight; the
+  // boat itself (sail, row, cargo) is Come Sail Away's own switch. Online the sea is the room's world (scenes/naval/navalHost.js), and
+  // one player seeing a boarding another does not is two worlds, so there is no per-player switch. The rest is each player's own: the traffic the sea they stand is filled with,
   // whether pirates grapple THEIR boat, and whether THEIR voyage's beaten raiders leave a hold to plunder.
   Object.freeze({
     id: 'naval-combat',
@@ -1778,11 +1776,11 @@ export const FEATURES = Object.freeze([
     get note() { return t('features.navalCombat.note', 'Ship battles on Come Sail Away\u2019s boats: at the helm, look to one side and hold Attack to aim a broadside, '
       + 'then let go to fire. Pirates, merchant ships and navies sail the Bay; batter a ship until it surrenders, board '
       + 'it, take its cargo, then sink it or let it go. Piracy is a crime, and pirates can board your ship and '
-      + 'fight you on deck. Online, everyone in the room shares one sea.'); },
-    get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always on.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
+      + 'fight you on deck. Offline only: online rooms have no sea fight.'); },
+    get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always off.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'naval', initial: true, online: true,   // scenes/world.js navalOn: the host stands down and empties the sea
+      store: 'prefs', key: 'naval', initial: false, online: false,   // scenes/world.js navalOn: the host stands down and empties the sea
       also: Object.freeze([
         Object.freeze({ store: 'prefs', key: 'naval-ships', initial: 'some', online: 'player' }),   // systems/naval/navalDirector.js DENSITY
         Object.freeze({ store: 'prefs', key: 'naval-boarders', initial: true, online: 'player' }),   // navalHost.js: a pirate's grapple on MY boat
@@ -1870,7 +1868,7 @@ export function checkFeature(f) {
   else if (c.store === 'prefs') {
     // RF4: a prefs row is the ONE declaration of its switch - the shelf's default and the lane's answer ride it
     if (c.initial === undefined) out.push('a prefs row declares its initial value');
-    if (!(c.online === true || c.online === false || c.online === 'player')) out.push("a prefs row declares its online answer: true, false or 'player'");
+    if (![true, false, 'player', ...(c.tiers ?? []).map((x) => x[0])].includes(c.online)) out.push("a prefs row declares its online answer: true, false or 'player'");   // F3a: or one of its own tiers, the room's pin
     if (c.lane && !_lanes.has(c.lane)) out.push(`lane '${c.lane}' is not registered`);
     if (c.tiers !== undefined) {
       if (!Array.isArray(c.tiers) || !c.tiers.length) out.push('tiers is not a list');

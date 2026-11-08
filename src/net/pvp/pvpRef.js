@@ -208,7 +208,7 @@ export const newFighter = (lv, now) => {
     clipped: 0,
   };
 };
-export const metres = (a, b) =>
+const metres = (a, b) =>
   Math.hypot((a.x - b.x) / SIEGE_UNITS_PER_M, (a.y - b.y) / SIEGE_UNITS_PER_M, (a.z - b.z) / SIEGE_UNITS_PER_M);
 /** The striker's rate bucket, refilled to `now` (one second deep) - true where a blow may be spent. */
 export function spend(f, now) {

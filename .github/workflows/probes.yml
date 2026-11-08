@@ -60,13 +60,20 @@ jobs:
         env:
           PROBE: ${{ inputs.probe }}
           REPEAT: ${{ inputs.repeat }}
+          # Probes to leave out of a plain run, space-separated (the repository variable DFO_PROBE_SKIP, empty: none).
+          # A self-hosted box short of RAM sets it to "online", whose two clients and workerd peak near 6 GB
+          # (docs/ci/self-hosted-runner.md, Measuring a job). A manual run of one probe ignores it.
+          SKIP: ${{ vars.DFO_PROBE_SKIP }}
         run: |
           # run 0: a plain run, whose job keeps the name "probe <name>"; 1..N: the repeats of a manual run
           include=""
           if [ -n "$PROBE" ]; then
             for i in $(seq 1 "$REPEAT"); do include="$include{\"probe\":\"$PROBE\",\"run\":$i},"; done
           else
-            for p in boot dungeon town travel rest save pause online; do include="$include{\"probe\":\"$p\",\"run\":0},"; done
+            for p in boot dungeon town travel rest save pause online; do
+              case " $SKIP " in *" $p "*) continue ;; esac
+              include="$include{\"probe\":\"$p\",\"run\":0},"
+            done
           fi
           echo "matrix={\"include\":[${include%,}]}" >> "$GITHUB_OUTPUT"
 
@@ -99,9 +106,15 @@ jobs:
       # Two builds side by side: the game, and the game with the online probe's three seams (build.mjs --online)
       - name: Build the game
         run: |
-          node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist" &
-          node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online &
-          wait -n && wait -n
+          if [ "$RUNNER_ENVIRONMENT" = self-hosted ]; then
+            # each build peaks near 5 GB; a small self-hosted runner has 8 GB, so one after the other
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist"
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online
+          else
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist" &
+            node tools/probes/build.mjs "$RUNNER_TEMP/probe-dist-online" --online &
+            wait -n && wait -n
+          fi
       # One archive each: a build is 30,000 small files, which the artifact service handles slowly one by one
       - name: Pack the builds
         run: |

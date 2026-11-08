@@ -1,10 +1,10 @@
 // DISC22-A.
 //
-// DFU ships Controls/AllowMagicRepairs False - a smith turns an enchanted item away (RepairsObjects' magic arm,
-// systems/repairService.js repairRefusal). The port's default mends it now (settings.js PORT_DEFAULTS, over the
-// generated DFU table, which is left exactly as DFU ships it), and online the lane forces it (onlineLane.js
-// ONLINE_FORCED_SETTINGS - the fourth read path, asked first by settings.js getData), so a player's own False stands
-// offline only. Driven through the real store and the real repair law.
+// DFU ships Controls/AllowMagicRepairs False - a smith turns an enchanted item away (RepairsObjects magic arm,
+// systems/repairService.js repairRefusal). The port keeps that default offline (DFU-GAPS EL26; the generated table is left
+// exactly as DFU ships it), and online the lane forces True (onlineLane.js ONLINE_FORCED_SETTINGS - the fourth read path,
+// asked first by settings.js getData), so a player own True stands offline only. Driven through the real store and the
+// real repair law.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS, getBool, setValue, effectiveSettings, _resetForTests, PORT_DEFAULTS } from '../../../src/systems/settings/settings.js';
@@ -20,13 +20,13 @@ const withSearch = (search, fn) => {
 };
 const allow = () => getBool('Controls', 'AllowMagicRepairs');
 
-test('DISC22-A: the port\'s default mends an enchanted item; DFU\'s own table is left as DFU ships it', () => {
+test('DISC22-A: offline the smith turns an enchanted item away as DFU does; the DFU table is left as DFU ships it', () => {
   _resetForTests();
   withSearch('', () => {
     assert.equal(DEFAULTS.Controls.AllowMagicRepairs, 'False', 'the generated table is DFU\'s, verbatim');
-    assert.equal(PORT_DEFAULTS.Controls.AllowMagicRepairs, 'True');
-    assert.equal(allow(), true, 'a player who never touched the row reads the port\'s default');
-    assert.equal(repairRefusal(enchanted, { allowMagicRepairs: allow() }) === 'magic', false, 'the smith takes it');
+    assert.equal(PORT_DEFAULTS.Controls.AllowMagicRepairs, undefined, 'the port overrides nothing');
+    assert.equal(allow(), false, 'a player who never touched the row reads the DFU default');
+    assert.equal(repairRefusal(enchanted, { allowMagicRepairs: allow() }), 'magic', 'the smith turns it away');
   });
   _resetForTests();
 });
