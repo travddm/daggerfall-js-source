@@ -11,6 +11,10 @@ import { onPushEffects, rankNeedsLines } from '../../../src/systems/guild/guildS
 import { PORT_SPECS } from '../../../src/ui/enhanced/enhancedPorts.js';
 import { GuildServiceWindow } from '../../../src/ui/guildServiceWindow.js';
 import { SKILLS } from '../../../src/systems/skills.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Guild probation on (off is DFU's first-review expulsion, rep6_probation.test.js).
+setPref('guildProbation', true);
 
 const storeWith = (guild, rep) => {
   const dict = new Map([[guild.factionId, { id: guild.factionId, parent: 0, rep: 0, flags: 0, power: 50,

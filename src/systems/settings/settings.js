@@ -352,33 +352,20 @@ export function tierOf(key) {
 // A player's own override still wins over both, and a value set back to
 // THIS default drops the override, so the two layers behave as one.
 //
-// PlayerTorchFromItems: DFU ships it False, which means a lit torch
-// casts no light at all. With Handheld Torches vendored and on, that
-// default makes the mod's whole subject invisible - you light a torch
-// and nothing happens. Ledger A row MODS-ON.
+// PlayerTorchFromItems: DFU ships it False, so a lit torch casts no light; with Handheld Torches vendored and on, that
+// hides the mod's whole subject. Ledger A row MODS-ON.
 //
-// SWING-DEFAULT1 (Mac, 2026-09-22, after a first-time player on Discord:
-// "my character isn't swinging? I'm holding down RMB and moving my
-// mouse and it's doing nothing" - The Frog: "Change your attack setting
-// to click or click and hold... It should be the default setting"):
-// WeaponSwingMode. DFU ships 0, the vanilla drag - the button held AND
-// the mouse dragged half a percent of the screen's longer side, which a
-// touchpad can barely do and a new player never guesses. 2 is CLICK OR
-// HOLD (WeaponManager.cs:316-350): a click swings, a held button keeps
-// swinging, and the drag mode is one row away in the controls screen
-// for whoever wants it. The stored file carries overrides alone, so a
-// player who never touched the row takes this default too.
+// SWING-DEFAULT1: WeaponSwingMode. DFU ships 0, the vanilla drag (button held and the mouse dragged half a percent of the
+// screen), which a touchpad can barely do and a new player never guesses. 2 is click or hold (WeaponManager.cs:316-350);
+// the drag mode is one row away in the controls screen. The stored file carries overrides alone, so a player who never
+// touched the row takes this default too.
 //
-// DISC22-A: AllowMagicRepairs. DFU ships False - a
-// smith turns an enchanted item away (RepairsObjects' magic arm). The
-// port's default mends it; online the lane forces it (onlineLane.js
-// ONLINE_FORCED_SETTINGS), so a player's own False stands offline only.
-//
-// REPAIR-EASE: InstantRepairs. DFU ships False - a smith keeps
-// the item for days. The port's default hands it back at once; a player's own False still stands.
+// AllowMagicRepairs and InstantRepairs take DFU's own False offline (DFU-GAPS EL26): a smith keeps the item for days and
+// turns an enchanted one away, and the player's own True stands. Online the lane forces AllowMagicRepairs True
+// (onlineLane.js ONLINE_FORCED_SETTINGS) until the server profile owns it.
 export const PORT_DEFAULTS = Object.freeze({
   Enhancements: Object.freeze({ PlayerTorchFromItems: 'True' }),
-  Controls: Object.freeze({ WeaponSwingMode: '2', AllowMagicRepairs: 'True', InstantRepairs: 'True' }),
+  Controls: Object.freeze({ WeaponSwingMode: '2' }),
 });
 
 /** The default in effect: the port's, else the vendored ini's. Every

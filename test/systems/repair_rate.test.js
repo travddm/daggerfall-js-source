@@ -18,6 +18,7 @@ import { useItem } from '../../src/systems/useItem.js';
 import { conditionPercentage } from '../../src/systems/item/itemTemplates.js';
 import { setHotbarSlot, hotbarEntryForItem, hotbarPress, useQuickslot } from '../../src/systems/quickslots.js';
 import { readFileSync } from 'node:fs';
+import { setPref } from '../../src/systems/uiPrefs.js';
 
 installSmithing();
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -27,10 +28,19 @@ const pct = (item) => Math.round(item.currentCondition / item.maxCondition * 100
 test('B4: a repair costs what Daggerfall asks, the port turning InstantRepairs off for the price (mutants: a scale back on the price)', () => {
   assert.equal('REPAIR_COST_SCALE' in repairService, false, 'the cut is gone');
   _resetModSettings();
-  // Roleplay & Realism: Items' damage-scaled price (on as shipped): 0.6 of the value for a broken piece, through CalculateCost
-  assert.equal(calculateItemRepairCost(23040, 10, 0, 6400), 27648);
-  assert.equal(calculateItemRepairCost(23040, 10, 3200, 6400), 13824, 'half the damage, half the price');
-  // the mod off: DFU's own flat tenth
+  // as shipped: DFU's flat tenth of the value, whatever the damage, through CalculateCost
+  assert.equal(calculateItemRepairCost(23040, 10, 0, 6400), 4608);
+  assert.equal(calculateItemRepairCost(23040, 10, 3200, 6400), 4608, 'half the damage, the same price');
+  // the option on: Roleplay & Realism: Items' damage-scaled price, 0.6 of the value for a broken piece
+  setPref('repairPriceByDamage', true);
+  try {
+    assert.equal(calculateItemRepairCost(23040, 10, 0, 6400), 27648);
+    assert.equal(calculateItemRepairCost(23040, 10, 3200, 6400), 13824, 'half the damage, half the price');
+    setModSetting('roleplay-realism-items', 'conditionBasedPrices', false);
+    assert.equal(calculateItemRepairCost(23040, 10, 0, 6400), 4608, 'the option needs the mod prices on');
+    setPref('repairPriceByDamage', false);
+    setModSetting('roleplay-realism-items', 'conditionBasedPrices', true);
+  } finally { _resetModSettings(); setPref('repairPriceByDamage', false); }
   setModSetting('roleplay-realism-items', 'conditionBasedPrices', false);
   try {
     assert.equal(calculateItemRepairCost(23040, 10, 6000, 6400), dfuItemRepairCost(23040, 10, 6000, 6400, { instantRepairs: false }));
@@ -39,7 +49,10 @@ test('B4: a repair costs what Daggerfall asks, the port turning InstantRepairs o
   assert.equal(calculateItemRepairCost(300, 10, 1000, 1000), 0, 'nothing at full condition');
   const fg = (rank) => (p) => reducedRepairCost(GUILDS.FightersGuild, { rank }, p);
   assert.equal(calculateItemRepairCost(1, 1, 99, 100, { reducedRepairCost: fg(5) }), 1, 'a rank-5 member Daggerfall price: 1');
+  setPref('repairPriceByDamage', true);
   assert.equal(calculateItemRepairCost(1000, 10, 0, 6400, { reducedRepairCost: fg(3) }), 839, 'the guild discount, whole');
+  _resetModSettings(); setPref('repairPriceByDamage', false);
+  assert.ok(calculateItemRepairCost(1000, 10, 0, 6400, { reducedRepairCost: fg(3) }) < calculateItemRepairCost(1000, 10, 0, 6400), 'and on the flat tenth');
 });
 
 test('KIT-CEILING: no kit mends a piece past three quarters - 60% to 75%, 70% to 75%, 50% to 65%; a piece at three quarters or more is no kit\'s, and the refusal says a smith can do the rest (mutants: the ceiling at whole; the targets unfiltered; the cap dropped; the refusal dropped)', () => {
@@ -149,4 +162,12 @@ test('KIT-CEILING: on the hotbar a kept kit is a refusal - said once, and never 
 test('KIT-CEILING: what a kit says it does - the tooltip lines and the smithing page name the ceiling (mutants: a line without it)', () => {
   assert.deepEqual(pieceLines(mintFieldRepairKit()), ['Mends 15% of a weapon\'s or armor\'s condition, up to 75%, once']);
   assert.deepEqual(pieceLines({ kitMetal: 4, provenance: '0123456789abcdef' }), ['Mends a quarter of a Dwarven piece\'s condition, up to 75%, once']);
+});
+
+test("DFU-GAPS EL25: the Repair price by damage row defaults to DFU's flat tenth and the online lane forces it", async () => {
+  const { FEATURES } = await import('../../src/systems/features.js');
+  const { ONLINE_FORCED_PREFS } = await import('../../src/systems/online/onlineLane.js');
+  const row = FEATURES.find((f) => f.id === 'repair-price-by-damage');
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['repairPriceByDamage', false, false]);
+  assert.equal(ONLINE_FORCED_PREFS.repairPriceByDamage, false);
 });

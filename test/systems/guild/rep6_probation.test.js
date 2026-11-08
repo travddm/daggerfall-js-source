@@ -9,6 +9,10 @@ import {
 import { createFactionRep, setReputation } from '../../../src/systems/faction/factionRep.js';
 import { onPushEffects } from '../../../src/systems/guild/guildServiceFlow.js';
 import { affiliations } from '../../../src/systems/affiliations.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Guild probation on. The default (off, DFU's first-review expulsion) is pinned at the end.
+setPref('guildProbation', true);
 
 const storeWith = (rep) => {
   const dict = new Map();
@@ -62,4 +66,26 @@ test('REP6: the probation box is the popup\'s own box - the three lines, centred
   const steps = onPushEffects(entity, g, memberships, store, day(28));
   assert.deepEqual(steps[0].rows, PROBATION_LINES.map((text) => ({ text, center: true })));
   assert.equal(affiliations(entity)[0]?.probation, true);
+});
+
+test('DFU-GAPS SS13: by default the first review that finds a member below zero expels them, as DFU does - at once, with no probation (and the row is off and forced off online)', async () => {
+  const { FEATURES } = await import('../../../src/systems/features.js');
+  const { ONLINE_FORCED_PREFS } = await import('../../../src/systems/online/onlineLane.js');
+  setPref('guildProbation', false);
+  try {
+    const g = GUILDS.MagesGuild;
+    const store = storeWith(12);
+    const memberships = {};
+    const m = joinGuild(memberships, g, day(0));
+    m.rank = 1;
+    setReputation(store, g.factionId, -2);
+    const out = updateRank(memberships, g, withSkills(g, 60), store, day(28));
+    assert.equal(out.outcome, 'expulsion');
+    assert.equal(hasJoined(memberships, g), false, 'out at the first review');
+  } finally {
+    setPref('guildProbation', true);
+  }
+  const row = FEATURES.find((f) => f.id === 'guild-probation');
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['guildProbation', false, false]);
+  assert.equal(ONLINE_FORCED_PREFS.guildProbation, false);
 });
