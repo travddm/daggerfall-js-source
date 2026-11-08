@@ -38,8 +38,11 @@ import { attachFactionRep } from './faction/factionRep.js';   // S25
 import { createRegionConditions } from './region/regionConditions.js';
 import { clearWorldDataVariants } from './worldDataVariants.js';   // AUDIT-RR F39: PlayerEntity.Reset (:818) clears the world variants at every new game
 import { bootstrapRegionPower } from './region/regionPower.js';   // AUDIT 26 F107   // PlayerEntity.InitializeRegionData (:2189-2218), at every new game
-import { legacyOn } from './legacy/settings.js';   // LEGACY2: Project Legacy's question - the family's model
-import { legacyModelScreen } from '../ui/legacy/legacyModelChoice.js';
+import { legacyModelOnlyScreen } from '../ui/legacy/legacyModelChoice.js';
+import { characterModeScreen } from '../ui/characterModeChoice.js';   // CHARACTER MODES: the first question
+import { characterModesOn } from './characterModes.js';
+import { isMode, legacy as legacyMode } from '../net/modeLaw.js';
+import { NO_LINEAGE } from './legacy/family.js';
 import { isLegacyChoice } from './legacy/family.js';   // LEGACY-CHOICE: the answer kept on the character
 
 /** SPELLS.STD as an index -> spell map. AUDIT 17f: the exterior
@@ -407,7 +410,10 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2 } = {}) {
   // Bloodline or Enduring, asked of the character who founds a house (legacyModelScreen). The same door, the same one
   // overlay slot: the questions are STAGES of one window, put in turn, each answered once; the answers ride the result.
   const asks = [];
-  if (legacyOn()) asks.push((answer) => legacyModelScreen((model) => answer({ legacyModel: model })));
+  // CHARACTER MODES: THE FIRST QUESTION - how the character will play. Only the Legacy mode founds a house, so Project
+  // Legacy's question (the family's model) follows it for that mode alone; every other mode answers it for them: no lineage.
+  if (characterModesOn()) asks.push((answer) => characterModeScreen((mode) => answer(legacyMode(mode) ? { characterMode: mode } : { characterMode: mode, legacyModel: NO_LINEAGE })));
+  if (characterModesOn()) asks.push((answer, made, so) => (legacyMode(so?.characterMode) ? legacyModelOnlyScreen((model) => answer({ legacyModel: model })) : null));
   if (!asks.length) {
     return chargenWizard(flow, {
       onCancel, hudScale, onDone,
