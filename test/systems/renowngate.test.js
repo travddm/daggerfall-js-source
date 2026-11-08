@@ -48,13 +48,14 @@ function made(p, { rank = 2, dueAt = 0 } = {}) {
 const HERE = Object.freeze({ px: 40, py: 41, region: 5 });
 
 beforeEach(() => {
-  _resetForTests(); setPref('lootRarity', true);
+  _resetForTests(); setPref('lootRarity', true); setPref('revenantRenown', '10');   // the wait is the player's choice now (none by default)
   N._resetRevenantForTests(); _store.clear(); setPlayerDoor(null); _resetSigilForTests(); setWorldMinutes(DAY * 5);
 });
 
-test('RENOWN-GATE THE NUMBERS: elites at Renown 5, revenants at 10, a due revenant on two encounter rolls in five (mutants: any number moved)', () => {
-  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 10, 0.4]);
-  assert.ok(N.REVENANT_MIN_RENOWN >= E.ELITE_FOE_MIN_RENOWN, 'a returning elite always finds elites standing');
+test('RENOWN-GATE THE NUMBERS: elites at Renown 5, a due revenant on two encounter rolls in five, and no Renown wait unless the player sets one (mutants: any number moved)', () => {
+  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 0.4]);
+  setPref('revenantRenown', 'none'); online(null);
+  assert.equal(N.revenantHeld(), false, 'the default: nothing waits, whatever the page knows');
   assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.01, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
 });
 
@@ -235,8 +236,8 @@ test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" -
     return kids.map((k) => k.textContent).join(' | ');
   };
   online(9);
-  assert.match(note(), /No foe has earned your name yet. From Renown 10, an elite or champion that kills you, or breaks, runs and gets away, will remember you and come back for you./);
+  assert.match(note(), /No foe has earned your name yet. From Renown 10, a foe that kills you, or breaks, runs and gets away, will remember you and come back for you./);
   online(10);
-  assert.match(note(), /No foe has earned your name yet. An elite or champion that kills you/);
+  assert.match(note(), /No foe has earned your name yet. A foe that kills you/);
 });
 
