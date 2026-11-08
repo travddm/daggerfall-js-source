@@ -107,10 +107,11 @@ Things to know about the shared daemon:
 2. Outbound HTTPS to `github.com`, `api.github.com`, `*.actions.githubusercontent.com`, `codeload.github.com` and
    `objects.githubusercontent.com` ([runner-comms]), plus npm, `nodejs.org`, Playwright's CDN, Cloudflare for the deploy
    jobs, and the ARENA2 source (`drive.usercontent.google.com`).
-3. Free disk: about 40 GB for the image, caches and four jobs' work folders. More for more slots.
+3. Free disk: about 30 GB for the image, caches and one job's work folder, and more for more slots.
 4. Org owner access on `Daggerfall-JS`.
-5. **Open, waiting for the owner:** how many cores and how much RAM the CI may use (Capacity), and a token that can mint
-   runner configurations (Credential).
+5. The CI budget: 2 to 4 cores and 4 to 8 GB of RAM (Capacity). 4 cores and 8 GB is the working size.
+6. **Open, a step for the owner:** a token that can mint runner configurations (Credential). The owner creates it and
+   stores it on the server. It is never pasted into a chat or a ticket.
 
 ## Setup
 
@@ -151,11 +152,25 @@ The supervisor calls `POST /orgs/{org}/actions/runners/generate-jitconfig` ([jit
 access to the org, and the `admin:org` scope for a classic personal access token. Recommended: a classic token from a
 dedicated GitHub account that is an org owner and owns nothing else, so the token's reach is the org's runners and
 settings. Try a fine-grained token with the organization permission "Self-hosted runners: write" first, if the endpoint
-accepts it (the REST page does not say; the throwaway test shows it). Store it:
+accepts it (the REST page does not say; the throwaway test shows it).
+
+**The owner does this step, on the server.** Create the token in GitHub (the dedicated account's Settings, Developer
+settings, Personal access tokens), and copy it straight into the prompt below. Do not paste it into a chat, an issue, a
+workflow or a GitHub secret. A GitHub secret reaches workflows, not the server, and a workflow that held the token could
+mint runners. The prompt does not echo the token or put it in the shell history:
 
 ```bash
-sudo install -m 0400 -o dfo-ci -g dfo-ci /dev/stdin /etc/dfo-runner/token    # paste the token, then Ctrl-D
+sudo bash -c 'umask 077; read -rsp "Token: " t; printf %s "$t" > /etc/dfo-runner/token; echo; chown dfo-ci:dfo-ci /etc/dfo-runner/token; chmod 0400 /etc/dfo-runner/token'
 ```
+
+Check it without printing it; the command prints `200`:
+
+```bash
+sudo -u dfo-ci bash -c 'curl -fsS -o /dev/null -w "%{http_code}\n" \
+  -H "Authorization: Bearer $(cat /etc/dfo-runner/token)" https://api.github.com/orgs/Daggerfall-JS'
+```
+
+To replace the token, run the prompt again. The supervisor reads the file on every job.
 
 Just-in-time configurations are single-use and leave no idle registered runner. A registration token with
 `config.sh --ephemeral` also works but keeps a registered, idle runner on the box between jobs.
@@ -198,7 +213,7 @@ Slot N gets cores `FIRST_CPU + N*CPUS_PER_RUNNER` upward, so `lscpu -e` decides 
 hardware threads together. Then:
 
 ```bash
-sudo systemctl enable --now dfo-runner@{0..3}.service      # four slots
+sudo systemctl enable --now dfo-runner@0.service           # one slot; more in Capacity
 journalctl -u dfo-runner@0 -f                               # "Listening for Jobs"
 ```
 
@@ -258,40 +273,99 @@ job. A job's own cache writes go to its container and die with it.
 
 ## Capacity
 
-Per job, planned, not measured: the test shards and the probes are the heavy jobs. A shard runs every file at
-`availableParallelism()`; a probe runs Chromium on SwiftShader (software rendering) with a Vite server, and `online`
-adds the relay and account service in workerd. GitHub's public `ubuntu-latest` has 4 vCPUs and 16 GB; a private one has
-2 vCPUs and 8 GB ([hosted]). The suite passes on the public size today, so the plan is 4 cores and 8 GB per slot
-(`MEMORY=8g`) and the first week measures real use:
+### What a job needs
+
+Measured on 2026-11-03 on GitHub-hosted `ubuntu-latest` (4 vCPUs and 16 GB for a public repository, [hosted]) with
+`tools/ci-runner/measure-job.sh`, each job pinned to 4 and to 2 cores with `taskset`. "RAM" is the most the job added to
+the machine's used memory; add about 0.5 GB for the runner application and the container.
+
+| Job                        | RAM at peak | 4 cores    | 2 cores         | Notes                                                                |
+| -------------------------- | ----------- | ---------- | --------------- | -------------------------------------------------------------------- |
+| Test shard (1 of 8)        | 0.7–2.0 GB  | 242–248 s  | 488 s           | Uses every core given: 2 cores take 2x as long                       |
+| Lint and types             | 1.9 GB      | 119 s      | no clean figure | One busy core for most of the run; ESLint's cache skews a second run |
+| Site build                 | 5.0 GB      | 21 s       | 29 s            | Node's heap cap needs raising in a container (Dockerfile)            |
+| Probe build (one of two)   | 4.8 GB      | 16 s       | 18 s            | Both builds at once: 9.1 GB                                          |
+| Probe `boot`               | 0.7 GB      | 10 s       | 11 s            | Pre-built game, software GL                                          |
+| Probe `dungeon` and `save` | 2.3 GB      | 21 s, 36 s | 28 s, 50 s      |                                                                      |
+| Probe `online`             | 6.0 GB      | 59 s       | 94 s            | Two clients, the relay and the account service in workerd            |
+
+Peak tasks (processes and threads) were 20 to 200, far under the `--pids-limit 4096` the supervisor sets. These jobs are
+CPU-bound, so a CPU slower than GitHub's makes them longer in proportion. In the first week on the box, measure again
+(Measuring a job).
+
+**Is 4 to 8 GB enough?** For one job at a time, yes, with two changes already made in this repository: the image sets
+Node's heap cap (`--max-old-space-size=4096`), and on a self-hosted runner `probes.yml` builds the two game builds one
+after the other (9.1 GB at once, 5 GB one at a time). The most any job needs is 6.0 GB (`online`) plus 0.5 GB, so
+**7 GB is the minimum for every job, and 8 GB is the budget.** At 4 GB the shards, lint and types, and the probes
+`boot`, `dungeon`, `save`, `pause`, `town`, `travel` and `rest` fit. The builds (5 GB) and `online` (6 GB) do not.
+
+### Slots and time per pull request
+
+One slot runs one job at a time. Under 4 cores and 8 GB there is one slot: two jobs at once would get 2 cores and 4 GB
+each, and the builds and `online` need more. A pull request starts about 20 jobs. Their durations on GitHub's runners,
+set-up included, averaged over ten recent green runs: 8 shards of 4.3–5.3 min (38.8 min together), lint and types
+2.8 min, `standards` 2.9 min, the site build 0.8 min, the probes build 1.3 min, 8 probes of 1.2–2.3 min (14 min
+together), and about 0.5 min of small jobs. Together that is 61 min of one 4-core slot. Estimates for a pull request run
+that a newer push does not cancel:
+
+| CI budget         | Slots | Time for one pull request                  | Notes                                                 |
+| ----------------- | ----- | ------------------------------------------ | ----------------------------------------------------- |
+| 2 cores, 4 GB     | 1     | not enough RAM for the builds and `online` |                                                       |
+| 2 cores, 8 GB     | 1     | about 105 min                              | Shards take 2x as long                                |
+| **4 cores, 8 GB** | **1** | **about 60 min**                           | The budget. Set `DFO_PROBE_SKIP` only if RAM is short |
+| 8 cores, 16 GB    | 2     | about 30 min                               | Two jobs at once, 4 cores and 8 GB each               |
+| 12 cores, 24 GB   | 3     | about 21 min                               |                                                       |
+
+The figures assume the box's cores match GitHub's. Jobs queue when every slot is busy, and they fail after 24 hours in
+the queue ([runner-comms]). A newer push to a pull request cancels its running and queued jobs (`concurrency` in
+`check.yml`, `probes.yml` and `ste-notes.yml`), so a stack of pushes does not stack up work on the box.
+
+### What the workflows do for a small box
+
+- Fewer, larger shards do not help. A shard job runs 242–248 s of tests inside a job of about 290 s, so set-up is
+  about 15 percent, and fewer jobs would save only that. The shard count stays 8 (`flow1_ci.test.js` pins it).
+- The probes `build` job builds the two game builds one after the other on a self-hosted runner
+  (`RUNNER_ENVIRONMENT`), at a cost of about 16 s.
+- The repository variable `DFO_PROBE_SKIP` (for example `online`) leaves the named probes out of a plain `probes` run.
+  Use it only if the box cannot spare 7 GB. A manual run of one probe ignores it.
+- The path filter on `probes.yml` stays: the probes start only for changes to the game, the relay, the account service
+  and the probe tools.
+
+### Should the owner give it more?
+
+4 cores and 8 GB is enough to run every job, one at a time, in about an hour per pull request. Adding 4 cores and 8 GB
+(8 cores, 16 GB, two slots) halves that to about 30 minutes and lets the checks of two pull requests overlap. That is the
+first step worth buying. Past three slots the gain is small, because the longest job (a shard on 4 cores, about 5
+minutes) sets the floor. Fewer than 4 cores per slot makes the shards slower in proportion, so prefer one 4-core slot to
+two 2-core slots.
+
+In the first week, check real use on the box:
 
 ```bash
-systemd-cgtop -m -n 1 | grep -i dfo        # memory by slice/container while jobs run
+systemd-cgtop -m -n 1 | grep -i dfo         # memory by slice/container while jobs run
 cat /sys/fs/cgroup/dfo-ci.slice/memory.peak # peak since the slice started
 ```
 
-Lower the figures if the peaks stay under half.
+Set `MemoryMax` in `dfo-ci.slice` to slots x 8 GB, and `FIRST_CPU` above the cores Wings keeps.
 
-The shard records in `tools/testTimes.json` sum to about 64 minutes of file time, 8 minutes a shard before the
-runner's parallelism. One pull request starts about 20 jobs: 8 shards, 8 probes, lint and types, the build,
-`standards` and `ste`; the last four are light.
+### Measuring a job
 
-Slots that fit: `min( floor(CI cores / 4), floor((CI RAM in GB - 2) / 8) )`. Examples, with the rest left to the games:
+`tools/ci-runner/measure-job.sh <label> <cpu-list> <command...>` runs a command pinned to those cores and prints one
+table row: wall seconds, peak RAM added in MB, CPU busy percent, peak tasks added, exit status. The table above came
+from it, run on a GitHub-hosted runner by a temporary workflow. On the box:
 
-| Cores and RAM for CI | Slots | One pull request's heavy jobs (16) take about |
-| -------------------- | ----- | --------------------------------------------- |
-| 8 cores, 32 GB       | 2     | 16 / 2 x 10 min = 80 min                      |
-| 16 cores, 64 GB      | 4     | 40 min                                        |
-| 32 cores, 128 GB     | 8     | 20 min                                        |
+```bash
+cd /tmp/dfo-src && npm ci
+bash tools/ci-runner/measure-job.sh shard-1of8 8-11 node tools/testShards.mjs 1/8
+```
 
-These times are estimates from a 10-minute job. Jobs queue when all slots are busy, and a job that waits over 24 hours
-fails ([runner-comms]). Ask the owner for the box's cores and RAM and the share the games can spare, then set
-`MemoryMax` in `dfo-ci.slice` to slots x 8 GB and `FIRST_CPU` above the cores Wings keeps.
+Run it on a quiet box, and compare the row with the table.
 
 ### Adding capacity
 
 1. Raise `MemoryMax` in `dfo-ci.slice`; `systemctl daemon-reload`.
-2. `sudo systemctl enable --now dfo-runner@4.service` (the next number). Its cores are `FIRST_CPU + 4*CPUS_PER_RUNNER`;
-   check they do not overlap Wings' cores.
+2. Set `FIRST_CPU` and `CPUS_PER_RUNNER` so that slot N's cores do not overlap Wings' cores or another slot's, then
+   `sudo systemctl enable --now dfo-runner@1.service` (the next number).
 3. A second server: repeat Setup there with the same group. Names carry the hostname.
 
 Watch disk: `df -h /var/lib/docker` and `docker ps -a --filter label=dfo-ci=1`. A weekly
@@ -327,7 +401,7 @@ Use a throwaway private repository in the org, with no secrets.
   jobs use `ubuntu-latest` at once; queued jobs for `dfo-self-hosted` need cancelling and re-running.
 - This uses the 2,000 free minutes of a private repository, and a private `ubuntu-latest` has half the cores of a public
   one.
-- Slow: stop the slots (`sudo systemctl disable --now dfo-runner@{0..3}`), and remove the runner group.
+- Slow: stop the slots (`sudo systemctl disable --now dfo-runner@0`, and any other slot), and remove the runner group.
 - Removing the expression from the workflows is not needed: with the variable set, or the repository public, it picks
   `ubuntu-latest`.
 

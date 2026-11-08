@@ -46,7 +46,6 @@ import { SD_RING_MAP_CSS } from '../superDungeon/sdMapMark.js';   // SD2c: the S
 import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js';   // STAR6: a fallen star's row in its violet
 import { heraldCss } from '../../net/herald/heraldCard.js';   // TIMERS2 / HERALD-CARDS: the gate's red, the one its Discord card wears
 import { TIER_MARKS, tierMarkCss } from '../lootTierMarks.js';   // LOOT-MARKS: the quick loot's tier gem and wash
-import { SUPPORT_MARKS_CSS } from '../supportAsks.js';   // SUPPORT1: the asks' marks - the door's icons and the website's corner, one drawing
 
 /**
  * QUICK-LOOT-STATS: THE PLAQUE'S LAYOUT NUMBERS LIVE WITH THE DRESS.
@@ -2489,8 +2488,8 @@ ${badgeCss()}
 }
 .px-profile:focus-visible { outline: none; }
 /* L10N1b: THE FIRST-RUN LANGUAGE OFFER - the top-left corner, the About box's plate, the question in the language it
-   offers. Gone for good once answered. It stands under SUPPORT1's asks, which hold the corner itself (their box is
-   52px tall: a 44px mark, its padding and its border), and above them should the two ever meet. */
+   offers. Gone for good once answered. It stands 76px down, where it stood under SUPPORT1's corner asks before they
+   were removed with the upstream project's Patreon and Ko-fi links. */
 .px-langoffer {
   position: absolute; top: 76px; left: 18px; z-index: 5; max-width: min(360px, calc(100vw - 36px));
   padding: 12px 14px; background: rgba(10,12,17,0.95); border: 2px solid var(--brass);
@@ -2556,22 +2555,6 @@ ${badgeCss()}
 .px-home:not(.px-over) .px-profilesub { max-width: min(22ch, 140px); }
 .px-profile:hover .px-profilename, .px-profile:focus-visible .px-profilename {
   color: rgb(243,239,44); text-shadow: 2px 2px 0 rgb(93,77,12); }
-
-/* ── SUPPORT1: THE ASKS ──────────────────
-   The door's TOP-LEFT corner, the one it had free - and the only home a pair of icons has at every size without
-   standing on something a player presses: the foot's centre runs under the last row of the menu on a 768px screen (the
-   PX8 shape), and a phone's foot is full (the build, and Screenshots over About). Patreon's mark and Ko-fi's mug,
-   drawn by ui/supportAsks.js exactly as the website's corner draws them, a 44px target each, in a plaque wearing the
-   About box's own face (ACC1f: two corner marks that look unrelated read as two kinds of thing) - the kit's carved
-   frame under Plus (ui/enhanced/enhancedFrame.js, the window role). A mark lights in the classic pair's gold under the pointer
-   and the keyboard (the marks' own rule). */
-${SUPPORT_MARKS_CSS}
-.px-support { position: absolute; top: 16px; left: 18px; z-index: 4; display: flex; gap: 2px; padding: 2px;
-  background: rgba(10,12,17,0.55); border: 2px solid #7d7460; }
-/* Each mark stands on its feet 12px up, so the two five-row bodies (MARK_BODY_ROWS) centre in the 44px cell side by
-   side and the mug's steam rises into the room above its own. */
-.px-supportlink { display: flex; align-items: flex-end; justify-content: center; width: 44px; height: 44px;
-  padding-bottom: 12px; border: 0; outline: none; }
 
 /* THE WINDOW is the pause window's frame with the account card inside
    it, so the door has ONE kind of modal rather than two. It is
@@ -2960,7 +2943,6 @@ ${SUPPORT_MARKS_CSS}
   .px-profile { top: 10px; right: 10px; }
   .px-portrait { width: 48px; height: 48px; }
   .px-profiletext { display: none; }
-  .px-support { top: 10px; left: 10px; }   /* SUPPORT1: the asks mirror it, the opposite corner */
 }
 @media (max-width: 480px) {
   .px-wordmark { font-size: 60px; }
@@ -3001,11 +2983,12 @@ ${SUPPORT_MARKS_CSS}
   .px-home:not(.px-over) > .px-stage:not(.px-acctstage) > :last-child { margin-bottom: auto; }
 }
 /* SUPPORT1: THE CORNERS' BAND - the front door's twin of AUDIT TIMERS1 UI-2 (below), which stands the pause window
-   clear of the corner marks over a game. With a mark in each top corner, the door's stage starts below them wherever
-   the wordmark is wide enough to reach under either: the asks reach 122px in (18, their 98, the Plus frame's 6), the
-   profile 234 (18, its 58px portrait, the 12px gap, its caption's 140px bound, the frame's 6), and
-   (vw - min(234px, 36.4vw)) / 2 is less than 234 at every width under 702 (BR6: BR5's min(321px, 50vw) took it to
-   789, BR4's min(540px, 84vw) to 1008) - and on a phone, where the marks stand 10px in and the caption is hidden, always. Measured rather than argued: tools/supportAsksProbe.mjs maps the logo's own
+   clear of the corner marks over a game. The door's stage starts below the profile mark, top-right, wherever the
+   wordmark is wide enough to reach under it: the profile reaches 234px in (18, its 58px portrait, the 12px gap, its
+   caption's 140px bound, the frame's 6), and (vw - min(234px, 36.4vw)) / 2 is less than 234 at every width under 702
+   (BR6: BR5's min(321px, 50vw) took it to 789, BR4's min(540px, 84vw) to 1008) - and on a phone, where the mark
+   stands 10px in and the caption is hidden, always. SUPPORT1's asks stood top-left until they were removed; at 122px
+   in they never set the band. Measured rather than argued: tools/doorCornersProbe.mjs maps the logo's own
    opaque pixels onto the screen across 192 sizes, a caption at its bound among them. The band costs height, and where
    the door no longer fits it scrolls (DOOR-FIT, above); its foot keeps the one-row foot's 68px, so the last row can be
    scrolled clear of About and Screenshots. */
