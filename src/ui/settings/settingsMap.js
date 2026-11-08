@@ -67,7 +67,7 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("gameplay", "Gameplay", [
     sec("general", "General", [
-      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "ChildGuard/PlayerNudity"]),
+      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "feat:repair-price-by-damage", "ChildGuard/PlayerNudity"]),
     sec("quests", "Quests", [
       "port:questRepair", "feat:questlines", "feat:questline-rewards", "feat:nearby-quests", "feat:choose-guild-jobs", "Enhancements/GuildQuestListBox", "GUI/CanDropQuestItems",
       "GUI/QuestRumorWeight", "GUI/EnableQuestDebugger"]),
