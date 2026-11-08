@@ -29,7 +29,8 @@ test('RF4: every prefs row declares its switch, and the shelf and the lane deriv
   assert.ok(declared.length > prefsRows.length, 'the covered prefs are declared');
   for (const [f, c] of declared) {
     assert.ok(c.initial !== undefined, `${f.id} declares ${c.key}'s initial`);
-    assert.ok([true, false, 'player', ...(c.tiers ?? []).map((x) => x[0])].includes(c.online), `${f.id} declares ${c.key}'s online answer`);
+    const own = [...(c.tiers ?? []), ...((f.control.parts ?? []).find((p) => p.key === c.key)?.tiers ?? [])];   // a covered pref's tiers sit on its part
+    assert.ok([true, false, 'player', ...own.map((x) => x[0])].includes(c.online), `${f.id} declares ${c.key}'s online answer`);
     assert.equal(PREF_DEFAULTS[c.key], c.initial, `${f.id}: the shelf's default for ${c.key} is the row's`);
     if (c.online === 'player') { assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes(c.key), `${c.key}: the player's online, by name`); assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, c.key)); }
     else assert.equal(ONLINE_FORCED_PREFS[c.key], c.online, `${c.key}: forced online as the row says`);
