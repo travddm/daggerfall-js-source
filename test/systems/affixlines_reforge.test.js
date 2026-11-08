@@ -12,6 +12,7 @@
 // name's slots, the piece renamed), any line, as often as the purse allows, each reforge twice the last - at the Mages
 // Guild and with Essence alike, one `reforgeAffix`; a line nothing else can take the place of is not offered; an old
 // piece's one-line mark is a reforge counted, never a lock.
+import '../techniquesLinked.js';
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

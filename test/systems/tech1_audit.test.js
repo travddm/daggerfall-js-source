@@ -240,8 +240,10 @@ test('AUDIT TECH1 THE REFUSALS: the open water refuses a leap, as DFU refuses a 
   // the gauntlets' line with a sword drawn
   const g = piece(() => mintCondition(setItemFields({ group: 'Armor', templateIndex: 103, material: 0x0201 })), 'haymaker');
   const me = player(); me.equip.slots[EQUIP_SLOTS.Gloves] = g;
-  assert.deepEqual(said(() => ({ pw: weaponOf(createWeapon(120, 1)) }), me), [T.GAUNTLETS_TEXT]);
-  assert.deepEqual(said(() => ({ pw: weaponOf(createWeapon(120, 1)) })), [T.NO_TECHNIQUE_TEXT], 'no gauntlets\' line: the plain word');
+  assert.equal(T.techniqueInHand(me, weaponOf(createWeapon(120, 1)))?.id, 'leap', 'the sword\'s own technique answers, never the haymaker');
+  const arrow = mintCondition(setItemFields({ group: 'Weapons', templateIndex: 131, material: 0 }));
+  assert.deepEqual(said(() => ({ pw: weaponOf(arrow) }), me), [T.GAUNTLETS_TEXT], 'a piece with no technique of its own: the gauntlets\' line sleeps, and says so');
+  assert.deepEqual(said(() => ({ pw: weaponOf(arrow) })), [T.NO_TECHNIQUE_TEXT], 'no gauntlets\' line: the plain word');
 });
 
 test('AUDIT TECH1 A LOAD AND THE NAME: a load (systems/save/save.js restoresSoFar - the player\'s entity is one object, refilled in place) starts the cooldowns, the aim and the act fresh; an unidentified piece\'s technique works and is named no more than its card names it (mutants: the load unread; the name told)', () => {

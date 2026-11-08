@@ -32,7 +32,7 @@ import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { maxFatigue, liveStat } from '../../src/systems/statMods.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
 import { LOOT_RARITY_KEY, validAffix } from '../../src/systems/loot/lootRarity.js';
-import { techniqueInHand, refusal, stepTechnique, techniqueWait, techniqueHudChips, LADDER_OFF_TEXT, _resetTechniquesForTests } from '../../src/combat/techniques.js';
+import { techniqueInHand, refusal, stepTechnique, techniqueWait, techniqueHudChips, _resetTechniquesForTests } from '../../src/combat/techniques.js';
 import { TECHNIQUES, TECHNIQUE_FAMILIES, techniqueFamily, techniquesFor, GAUNTLETS_TEMPLATE } from '../../src/combat/technique/techniqueRoster.js';
 import { tellTechniqueLanded, tellTechniqueUsed } from '../../src/combat/technique/techniqueBlow.js';
 import { PlayerWeapon } from '../../src/combat/playerWeapon.js';
@@ -228,7 +228,8 @@ test('MARTIAL3 THE SIGNATURE IN HAND: the technique key\'s answer with no line o
   const hand = techniqueInHand(ranger, { weapon: bow });
   assert.deepEqual([hand.value, hand.known, hand.signature, hand.tech.name], [0, true, 'ranger', 'Mark of the Hunt']);
   assert.equal(techniqueInHand(ranger, { weapon: bow }), hand, 'kept while nothing it was read from moves');
-  assert.equal(techniqueInHand(ranger, { weapon: weapon(WEAPONS.War_Axe) }), null, 'an axe is no Ranger\'s');
+  const axeHand = techniqueInHand(ranger, { weapon: weapon(WEAPONS.War_Axe) });
+  assert.deepEqual([axeHand.id, axeHand.signature], ['cleave', undefined], 'an axe is no Ranger\'s: the axe family\'s own technique answers');
   assert.equal(techniqueInHand(ranger, { weapon: null }), null, 'nor the bare hand');
   const lined = weapon(WEAPONS.Longsword, { affixes: [{ id: 'technique', param: 'leap', value: 20 }] });
   assert.equal(techniqueInHand(ranger, { weapon: lined })?.id, 'leap', 'a line on the weapon wins');
@@ -240,12 +241,13 @@ test('MARTIAL3 THE SIGNATURE IN HAND: the technique key\'s answer with no line o
   equipTableOf(dancer)[EQUIP_SLOTS.Gloves] = gauntlets({ affixes: [{ id: 'technique', param: 'kick', value: 20 }] });
   assert.equal(techniqueInHand(dancer, { weapon: null })?.id, 'kick', 'gauntlets with a line: the line');
   const off = pathFighter('ranger'); off._online = false; off.masterSkills = false;
-  assert.equal(techniqueInHand(off, { weapon: sword }), null, 'a path not held answers nothing');
+  assert.equal(techniqueInHand(off, { weapon: sword })?.signature, undefined, 'a path not held answers no signature');
   // the ladder off: a found line sleeps, a signature does not - and answers the key the sleeping line leaves free (PIN
   // MOVED, AUDIT MARTIAL L4 L6); with no path held, the line's own refusal
   setPref(LOOT_RARITY_KEY, false);   // set back by reset() at the next test's start and the file's end (AUDIT MARTIAL L5 L2)
   assert.equal(techniqueInHand(ranger, { weapon: lined })?.id, 'huntersPounce', 'the line asleep: the signature');
-  assert.equal(refusal(techniqueInHand(off, { weapon: lined }), press(off, lined)), LADDER_OFF_TEXT);
+  const asleep = techniqueInHand(off, { weapon: lined });
+  assert.deepEqual([asleep.id, asleep.value], ['leap', 0], 'no ladder, no line: the family\'s own technique at its base');
   ranger.fatigue = maxFatigue(ranger);
   assert.equal(refusal(techniqueInHand(ranger, { weapon: sword }), press(ranger, sword)), 'Not here.', 'past the ladder\'s gate - a pounce asks a motor this press has none of');
   const cm = pathFighter('crusader'); cm.fatigue = maxFatigue(cm);

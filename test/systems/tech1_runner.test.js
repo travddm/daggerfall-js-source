@@ -195,9 +195,9 @@ test('TECH1 THE KEY - REFUSALS: no technique, the beast, the ladder off, a duel,
     T.stepTechnique(1 / 60, ctx(true, s.extra ?? {}));
     return { said: log.said.at(-1) ?? null, started: log.started.length, fatigue: me.fatigue };
   };
-  assert.equal(said(() => ({ pw: weaponOf(LR.applyRarity(createWeapon(120, 1), 'rare', lcg(1))) })).said, T.NO_TECHNIQUE_TEXT);
+  assert.equal(said(() => ({ pw: weaponOf(createWeapon(131, 0)) })).said, T.NO_TECHNIQUE_TEXT, 'an arrow has none');
   assert.equal(said(() => { const pw = weaponOf(null); pw.weapon = { werecreatureClaws: true }; return { pw }; }).said, T.BEAST_TEXT);
-  const off = said(() => { const pw = weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')); setPref('lootRarity', false); return { pw }; });
+  const off = said(() => { const pw = weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')); setPref('weaponTechniques', false); return { pw }; });
   assert.deepEqual([off.said, off.started, off.fatigue], [T.LADDER_OFF_TEXT, 0, 6400]);
   assert.equal(said(() => { setSigilDueling(true); return { pw: weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')) }; }).said, T.DUEL_TEXT);
   setSigilDueling(false);
@@ -219,7 +219,7 @@ test('TECH1 THE KEY - REFUSALS: no technique, the beast, the ladder off, a duel,
   const { log, ctx } = rig({ pw: fists, entity: me });
   T.stepTechnique(1 / 60, ctx(true));
   assert.deepEqual(log.started, ['StrikeRight']);
-  assert.equal(T.techniqueInHand(me, weaponOf(createWeapon(120, 1))), null, 'a weapon in hand: the gauntlets sleep');
+  assert.equal(T.techniqueInHand(me, weaponOf(createWeapon(120, 1))).id, 'leap', 'a weapon in hand: the gauntlets sleep, the sword has its own');
   // asked again at the release: a duel begun while the aim is held - the key says so, and nothing goes or is paid
   reset();
   const me3 = player(); me3.items.push(arrows(9));
@@ -524,14 +524,14 @@ test('TECH1 THE SCREEN: the marks in the ground pass at their own sizes, nothing
   const { ctx } = rig({ pw, entity: me });
   T.stepTechnique(1 / 60, ctx(true));
   assert.deepEqual(T.techniqueHudChips(me, pw, 'MOUSE3'), [{ key: 'technique', set: 'technique', name: 'Whirlwind', text: '10s', state: 'recovering' }]);
-  assert.deepEqual(T.techniqueHudChips(me, weaponOf(createWeapon(120, 1))), [], 'no technique in hand');
+  assert.deepEqual(T.techniqueHudChips(me, weaponOf(createWeapon(131, 0))), [], 'no technique in hand');
   // the ring of a swing that strikes all round, and its recentre
   const ring = T.techniqueMarks(0);
   assert.deepEqual(ring.map((m) => [m.blow.kind, m.blow.r]), [['leap', 3]]);
   T.offsetTechniques([10, 0, -5]);
   assert.deepEqual(pw.techniqueBlow.feet, [10, 0, -5]);
-  setPref('lootRarity', false);
-  assert.deepEqual(T.techniqueHudChips(me, pw), [], 'the ladder off: no chip');
+  setPref('weaponTechniques', false);
+  assert.deepEqual(T.techniqueHudChips(me, pw), [], 'the switch off: no chip');
   _resetForTests();
 });
 
