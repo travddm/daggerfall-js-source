@@ -309,7 +309,7 @@ test('RRI2 realisticEnemyEquipment, AUDIT DEX E2: every piece the kit puts on go
   assert.ok(claymore && !eq.worn.includes(claymore), 'the Claymore stays in Items (the corpse\'s), not worn');
   assert.ok(eq.armorPieces.some((a) => a.shield && a.piece === 109), 'the shield is worn');
   // through the spawn: no weapon, the table as EquipItem left it, and no poison drawn (`mainWeapon != null`, :667-668) -
-  // the variant's Range(0, 2), the arm's draws and the humanoid cut's one per piece, and nothing else
+  // the variant's Range(0, 2), the arm's draws and nothing else (the whole kit rolls no coin per piece; the Cut choice rolls one)
   const foe = barb();
   const spawn = counted(() => 0);
   equipEnemy(foe, MOBILE_TYPES.Barbarian, 5, spawn, { player });
@@ -317,7 +317,7 @@ test('RRI2 realisticEnemyEquipment, AUDIT DEX E2: every piece the kit puts on go
   const slots = equipTableOf(foe);
   assert.equal(slots[EQUIP_SLOTS.RightHand], null);
   assert.equal(slots[EQUIP_SLOTS.LeftHand]?.templateIndex, 109);
-  assert.equal(spawn.calls, 1 + arm.calls + eq.items.length, 'no poison draw for an empty right hand');
+  assert.equal(spawn.calls, 1 + arm.calls, 'no poison draw for an empty right hand');
   // a Knight (the coin blunt, the Mace): the shield's Dice100 at 60 fails, the left-hand weapon's at 0 lands - a Dagger, carried
   const knight = assignRriEnemyEquipment({ mobileType: MOBILE_TYPES.Knight, isClass: true, level: 5, careerIndex: 16 }, 0, 5, { player, rolls: seq(0, 0, 0, 0, 0.6, 0, 0, 0, 0, 0) });
   assert.equal(knight.rightHand.templateIndex, WEAPONS.Mace);
