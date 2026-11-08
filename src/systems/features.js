@@ -890,11 +890,9 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'tamrielLand', initial: true, online: 'player' }),
   }),
-  // WEATHER2b: THE WEATHER FIELD - the
-  // day's words as places (systems/weather/weatherField.js), read by the sim
-  // every exterior frame (weatherSim.js weatherFieldOn). FORCED ON
-  // ONLINE: one field for every player under the shared day's roll.
-  // `?wxfield=off` the kill door.
+  // WEATHER2b: THE WEATHER FIELD - the day's words as places (systems/weather/weatherField.js), read by the sim
+  // every exterior frame (weatherSim.js weatherFieldOn); it needs no other row and no skin. FORCED ON ONLINE: one
+  // field for every player under the shared day's roll. `?wxfield=off` the kill door.
   Object.freeze({
     id: 'weather-events',
     group: 'world',
