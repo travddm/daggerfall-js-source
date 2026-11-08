@@ -3,6 +3,7 @@
 // power or a set carries at or under today's strongest of its kind. Pinned against every fixed record the game keeps and
 // every item its honest producers mint (test/honestItems.mjs), so a record added above the ceiling fails here, named.
 // The composites (the blow's product, the guards' share) are test/combat/powerceiling.test.js's.
+import '../techniquesLinked.js';
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

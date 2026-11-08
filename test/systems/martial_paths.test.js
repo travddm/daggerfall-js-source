@@ -90,7 +90,7 @@ let _clock = 100;
 const reset = () => {
   POW._resetMartialPowersForTests(); WM._resetWeaponMasteryForTests(); _resetSetPowersForTests(); _resetPlayerHealForTests(); _resetTechniquesForTests();
   _clock = 100; POW._setMartialPowersClockForTests(() => _clock); POW._setMartialPowersRandForTests(null);
-  setSigilDueling(false); setPlayerDoor(null); setPref(LOOT_RARITY_KEY, true);
+  setSigilDueling(false); setPlayerDoor(null); setPref(LOOT_RARITY_KEY, true); setPref('weaponTechniques', true);
 };
 /** The blow's whole registry on a 100 at `target` - every modifier the port registers (asleep ones answer nothing). */
 const blow100 = (w, p, target, info = { unaware: false }) => weaponBlowMods(w, 100, p, target, info);
@@ -243,7 +243,7 @@ test('MARTIAL3 THE SIGNATURE IN HAND: the technique key\'s answer with no line o
   assert.equal(techniqueInHand(off, { weapon: sword }), null, 'a path not held answers nothing');
   // the ladder off: a found line sleeps, a signature does not - and answers the key the sleeping line leaves free (PIN
   // MOVED, AUDIT MARTIAL L4 L6); with no path held, the line's own refusal
-  setPref(LOOT_RARITY_KEY, false);   // set back by reset() at the next test's start and the file's end (AUDIT MARTIAL L5 L2)
+  setPref('weaponTechniques', false);   // set back by reset() at the next test's start and the file's end (AUDIT MARTIAL L5 L2)
   assert.equal(techniqueInHand(ranger, { weapon: lined })?.id, 'huntersPounce', 'the line asleep: the signature');
   assert.equal(refusal(techniqueInHand(off, { weapon: lined }), press(off, lined)), LADDER_OFF_TEXT);
   ranger.fatigue = maxFatigue(ranger);
