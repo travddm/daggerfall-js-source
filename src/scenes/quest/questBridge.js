@@ -205,10 +205,10 @@ export const choiceDoor = (showQuestBox) => (q, message, choices, respond) => sh
  *
  *  START1: _BRISIEN is no longer started here either - it put the main quest on its clock from the first
  *  tick. The Bay's start quest stands in its place (systems/starts/starts.js BAY_START_QUEST): its commission, opened
- *  when the player chooses, starts _BRISIEN in the city of Daggerfall. Port-Ledger section A. */
+ *  when the player opens it, starts _BRISIEN in the city of Daggerfall. Port-Ledger section A. */
 export const GAME_START_QUESTS = Object.freeze(['S0000977', BAY_START_QUEST]);
-/** START2: a new character's first quests - the curse's, and the start's they chose (scenes/startsHost.js: a
- *  province's, the Bay's, or the commission in hand for a character born at no start). The Bay's by default. */
+/** START2: a new character's first quests - the curse's, and the start's (scenes/startsHost.js: the Bay's, or
+ *  the commission in hand for a character born at no start). The Bay's by default. */
 export const gameStartQuests = (start = BAY_START_QUEST) => Object.freeze(['S0000977', isStartQuestName(start) ? start : BAY_START_QUEST]);
 
 /** TUT1: the DFU tutorial a save from before TUT1 may still be running, and the quest its close starts. */

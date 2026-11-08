@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
 import {
   RRI_LOOT_MATRICES, RRI_MOB_LOOT_KEYS, rriLootMatrix, rriEnemyLootTableKey, isRriStackable, bandageHeal, shelfBandageStack,
   randomConditionLootItems, conditionCostBase, conditionRepairCostBase, storeQualityLow, storeQualityItemCondition,
@@ -124,8 +125,10 @@ test('RRI2 conditionBasedPrices: CalculateCost scales the base by the condition,
   assert.equal(conditionRepairCostBase(1000, 50, 100, false), 300, '0.6 * (100 - 50) / 100 of 1000');
   assert.equal(conditionRepairCostBase(1000, 50, 100, true), 450, 'InstantRepairs: 0.9');
   assert.equal(conditionRepairCostBase(1, 99, 100, false), 1, 'floored at 1');
+  setPref('repairPriceByDamage', true);   // DFU-GAPS EL25: the damage-scaled price is an option, off as shipped
   assert.equal(calculateItemRepairCost(1000, 10, 50, 100, { instantRepairs: false }), 600, '300 through CalculateCost at quality 10');
   assert.equal(calculateItemRepairCost(1000, 10, 100, 100, { instantRepairs: false }), 0, 'free at full condition, both laws');
+  setPref('repairPriceByDamage', false);
   // the loot roll: armor, weapons, books - not artifacts, not ingredients
   const items = [mint({ group: 'Armor', templateIndex: 102, material: 0 }), mint({ group: 'Weapons', templateIndex: 120, material: 0 }), mint({ group: 'Books', templateIndex: 277 }), mint({ group: 'Armor', templateIndex: 107, material: 0, artifact: true }), mint({ group: 'Gems', templateIndex: 0 })];
   const before = items.map((it) => it.currentCondition);
@@ -309,7 +312,7 @@ test('RRI2 realisticEnemyEquipment, AUDIT DEX E2: every piece the kit puts on go
   assert.ok(claymore && !eq.worn.includes(claymore), 'the Claymore stays in Items (the corpse\'s), not worn');
   assert.ok(eq.armorPieces.some((a) => a.shield && a.piece === 109), 'the shield is worn');
   // through the spawn: no weapon, the table as EquipItem left it, and no poison drawn (`mainWeapon != null`, :667-668) -
-  // the variant's Range(0, 2), the arm's draws and the humanoid cut's one per piece, and nothing else
+  // the variant's Range(0, 2), the arm's draws and nothing else (the whole kit rolls no coin per piece; the Cut choice rolls one)
   const foe = barb();
   const spawn = counted(() => 0);
   equipEnemy(foe, MOBILE_TYPES.Barbarian, 5, spawn, { player });
@@ -317,7 +320,7 @@ test('RRI2 realisticEnemyEquipment, AUDIT DEX E2: every piece the kit puts on go
   const slots = equipTableOf(foe);
   assert.equal(slots[EQUIP_SLOTS.RightHand], null);
   assert.equal(slots[EQUIP_SLOTS.LeftHand]?.templateIndex, 109);
-  assert.equal(spawn.calls, 1 + arm.calls + eq.items.length, 'no poison draw for an empty right hand');
+  assert.equal(spawn.calls, 1 + arm.calls, 'no poison draw for an empty right hand');
   // a Knight (the coin blunt, the Mace): the shield's Dice100 at 60 fails, the left-hand weapon's at 0 lands - a Dagger, carried
   const knight = assignRriEnemyEquipment({ mobileType: MOBILE_TYPES.Knight, isClass: true, level: 5, careerIndex: 16 }, 0, 5, { player, rolls: seq(0, 0, 0, 0, 0.6, 0, 0, 0, 0, 0) });
   assert.equal(knight.rightHand.templateIndex, WEAPONS.Mace);
@@ -486,7 +489,7 @@ test('RRI2 wiring: the install registers the six delegates; the read-through sit
   assert.match(rd('src/systems/inventory.js'), /if \(isRriStackable\(item\)\) return true;/);
   assert.match(rd('src/systems/shopStock.js'), /let cost = conditionBasedPricesOn\(\) \? conditionCostBase\(baseValue, conditionPercentage\) : baseValue;/);
   assert.match(rd('src/systems/tradeModes.js'), /calculateCost\(counterValueOf\(item\), quality, priceAdjustment, saleConditionPercentage\(item, \{ online \}\)\) \* stack;/, 'the Sell arm passes ConditionPercentage (:462) - offline as it is, online the find and a third of its owner\'s own mends past it (SELL-AS-FOUND, MEND-THIRD - test/systems/sell_as_found.test.js, mend_third.test.js)');   // PIN MOVED (CRAFT-WORTH): the value the counter pays on (tradeModes.js counterValueOf)
-  assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
+  assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) && repairPriceByDamageOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingSpells\(setIndex, spellsByIndex, result\.career\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingEquipment\(playerEntity, \{ classIndex: result\.careerIndex/);
   // ctx (a hand of a pair: the striking hand and the strike's tempo - the clock the machine runs on)

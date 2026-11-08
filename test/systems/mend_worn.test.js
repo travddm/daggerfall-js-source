@@ -158,7 +158,7 @@ test('MEND-WORN: nothing a smith refuses - DFU\'s quiver minted at 0 and its lit
   assert.equal(axe.currentCondition, Math.round(axe.maxCondition * 0.6) + POOL_WEAPON_MEND);
 });
 
-test('MEND-WORN: an enchanted piece mends only under AllowMagicRepairs - the Wall of Daggerfall mends itself at the port\'s default, and a player\'s own Off passes it for the helm (DISC22-A)', () => {
+test('MEND-WORN: an enchanted piece mends only under AllowMagicRepairs - the Wall of Daggerfall mends itself when the player allows it, and a player\'s own Off passes it for the helm (DISC22-A)', () => {
   _resetForTests();
   try {
     const wall = at(applyRarity(armorOfMaterial(KITE_SHIELD, IRON_PLATE), 'legendary', () => 0, [legendaryById('wall-of-daggerfall')]), 30);
@@ -168,7 +168,8 @@ test('MEND-WORN: an enchanted piece mends only under AllowMagicRepairs - the Wal
     p.items.push(helm, wall);
     equipItem(p, helm);
     equipItem(p, wall);
-    assert.equal(getBool('Controls', 'AllowMagicRepairs'), true, 'the port\'s default');
+    setValue('Controls', 'AllowMagicRepairs', 'True');
+    assert.equal(getBool('Controls', 'AllowMagicRepairs'), true, 'the player own On');
     const [w0, h0] = [wall.currentCondition, helm.currentCondition];
     tick(p, 4, getBool('Controls', 'AllowMagicRepairs'));
     assert.deepEqual([wall.currentCondition - w0, helm.currentCondition - h0], [41, 0], '"The gate fell; this did not." - the most worn, itself');

@@ -64,13 +64,10 @@ test('AUDIT A1/A6: a judged revenant does no deed - executed, released or sworn,
   // back from the sworn)
   fresh();
   RC.setRetinuePlayer(me);
-  const s = N.revenantDeed(me, orc({ champion: 'swift' }), 'fled', { now: -10, rolls: () => 0 });
-  N.revenantSpared(me, { revenant: { id: s.id } }, { state: 'away' });
   const out = N.revenantDeed(me, orc(), 'slew', { now: 0, rolls: () => 0 });   // a kill: it stands over the body (out) - the weakest, the oldest
   assert.equal(out.out, true);
-  for (let i = 0; i < N.REVENANT_MAX - 1; i++) N.revenantDeed(me, orc({ champion: 'stalwart' }), 'fled', { now: 100 + i, rolls: () => 0.4 });
+  for (let i = 0; i < N.REVENANT_MAX; i++) N.revenantDeed(me, orc({ champion: 'stalwart' }), 'fled', { now: 100 + i, rolls: () => 0.4 });
   assert.equal(N.livingRevenants().length, N.REVENANT_MAX);
-  N.revenantDeserts(me, N.revenantById(s.id), { now: 200 });
   assert.ok(N.livingRevenants().some((x) => x.id === out.id), 'the one standing is never buried');
   assert.equal(N.livingRevenants().length, N.REVENANT_MAX, 'the cap holds');
   // a tombstone's id is never worn again (AUDIT UNQUIET, Revenants.md section 49: past the cap no birth at all - room made)

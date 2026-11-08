@@ -44,6 +44,7 @@ function onPage(online, fn) {
   const had = Object.hasOwn(globalThis, 'location') ? globalThis.location : undefined;
   globalThis.location = { search: online ? '?skin=enhanced&online' : '?skin=enhanced' };
   resetPrefs();
+  setPref('horseWalks', true);   // these tests are the Horse walks option's: DFU's ride base is the default
   try { return fn(); } finally {
     resetPrefs();
     setRideWalk(null); setGallopGate(null); setCanRunOverride(null);

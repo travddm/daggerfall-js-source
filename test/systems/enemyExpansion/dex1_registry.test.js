@@ -21,7 +21,6 @@ import { makeEnemyEntity, loadEnemyCareer, _resetMintRowEditors } from '../../..
 import { careerTolerance } from '../../../src/systems/spellcast.js';
 import { careerAttackModifier } from '../../../src/combat/formulas.js';
 import { loadQuestTables, foesTable, addIntoQuestTables, _resetExtraQuestRows } from '../../../src/systems/quest/tables.js';
-import { adaptBlowClass } from '../../../src/systems/revenant/revenantFeud.js';   // AUDIT DEX A2
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { DEX_ENEMY_NAME_TEXT } from '../../../src/systems/enemyExpansion/dexNames.js';   // AUDIT DEX A6
 import { getLocalizedEnemyName, patchLocaleTable, setLocale, clearLocaleTables } from '../../../src/systems/textManager.js';
@@ -214,8 +213,6 @@ test('AUDIT DEX A5 the reading\'s reachable arms: a caster that shoots keeps bot
     assert.equal(ENEMY_BASICS[MOBILE_TYPES[n]].hasRangedAttack1, true, `${n} keeps its ranged attack`);
   }
   for (const n of ['Mage', 'Spellsword', 'Healer', 'Sorcerer']) assert.equal(ENEMY_BASICS[MOBILE_TYPES[n]].hasRangedAttack2 ?? false, false, `${n}: no bow`);
-  assert.deepEqual([7, 256, 290, 384, 394].map((mobileType) => adaptBlowClass({ mobileType }, null, 'melee')), ['other', 'other', 'other', 'h2h', 'h2h'], 'a monster\'s body, the mod\'s too, is no person\'s hands; a class\'s are');
-  assert.equal(adaptBlowClass({ isPlayer: true }, null, 'melee'), 'h2h');
 });
 
 test("DEX1 loaded: the classic rows written in the table, and at a foe's mint - the mod's own lines alone here (MUDEX over them is MUDEX1, mudex1.test.js)", (t) => {

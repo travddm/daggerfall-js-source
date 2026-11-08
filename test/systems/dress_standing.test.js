@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  dressClassOf, dressStanding, applyDressStanding, dressTempleBonus, DRESS_CLASS, DRESS_CAP,
+  dressClassOf, dressStanding, applyDressStanding, dressTempleBonus, DRESS_CLASS, DRESS_CAP, DRESS_SLOTS,
 } from '../../src/systems/clothingStanding.js';
 import { enchantmentMagicRound } from '../../src/systems/enchantments.js';
 import { equipItem, unequipItem } from '../../src/systems/equip.js';
@@ -12,6 +12,10 @@ import { getReactionToPlayer } from '../../src/systems/talk/talk.js';
 import { FACTION_TYPES, SOCIAL_GROUP_COUNT } from '../../src/formats/factionFile.js';
 import { dressLine } from '../../src/ui/enhanced/enhancedMenu.js';
 import TEMPLATES from '../../src/characters/itemTemplates.json' with { type: 'json' };
+import { setPref } from '../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Dress for the part on. The default (off, DFU's reaction) is pinned at the end.
+setPref('dressForThePart', true);
 
 const nameOf = (i) => (Array.isArray(TEMPLATES) ? TEMPLATES : Object.values(TEMPLATES)).find((t) => (t.index ?? t.Index) === i)?.name;
 const garment = (templateIndex, group = templateIndex >= 182 ? 'WomensClothing' : 'MensClothing') => ({ group, templateIndex, condition: 100, maxCondition: 100 });
@@ -97,4 +101,21 @@ test('DRESS1: non-players are untouched; the Standing line names the groups', ()
   assert.equal(npc._dressStanding, undefined);
   assert.equal(dressLine(wear(player(), garment(164))), 'Scholars +1, Temples +3');
   assert.equal(dressLine(wear(player(), garment(151))), 'Commoners +3, Nobility -3');
+});
+
+test('DFU-GAPS SS19: by default clothes change nothing - the reaction mods stay at DFU\'s, the temple bonus is 0, and the row is off and forced off online', async () => {
+  const { FEATURES } = await import('../../src/systems/features.js');
+  const { ONLINE_FORCED_PREFS } = await import('../../src/systems/online/onlineLane.js');
+  setPref('dressForThePart', false);
+  try {
+    const p = { isPlayer: true, reactionMods: [0, 0, 0, 0, 0], items: [], equip: { slots: {} } };
+    for (const slot of DRESS_SLOTS) p.equip.slots[slot] = { group: 'MensClothing', templateIndex: 142 };
+    const d = applyDressStanding(p);
+    assert.deepEqual([d.groups, d.temple, p.reactionMods], [[0, 0, 0, 0, 0], 0, [0, 0, 0, 0, 0]]);
+  } finally {
+    setPref('dressForThePart', true);
+  }
+  const row = FEATURES.find((f) => f.id === 'dress-for-the-part');
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['dressForThePart', false, false]);
+  assert.equal(ONLINE_FORCED_PREFS.dressForThePart, false);
 });

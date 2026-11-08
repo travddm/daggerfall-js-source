@@ -88,9 +88,9 @@ test('WEAR-VANILLA: a player\'s broken enchanted piece breaks and STAYS in the p
   damageEquipment(foe(), me, 30, longsword(), BODY_PARTS.Head, { rolls: () => 0.99 });
   assert.equal(worn.currentCondition, 0, 'broken');
   assert.equal(me.items.includes(worn), true, 'and kept');
-  // AUDIT ECON (records): and REPAIRABLE - a smith takes an enchanted piece under AllowMagicRepairs, which ships on
-  assert.equal(getBool('Controls', 'AllowMagicRepairs'), true, 'the setting ships on');
-  assert.equal(repairRefusal(worn, { allowMagicRepairs: getBool('Controls', 'AllowMagicRepairs') }), null, 'a smith repairs it');
+  // AUDIT ECON (records): and REPAIRABLE - a smith takes an enchanted piece under AllowMagicRepairs, which ships off as DFU's does
+  assert.equal(getBool('Controls', 'AllowMagicRepairs'), false, 'the setting ships off');
+  assert.equal(repairRefusal(worn, { allowMagicRepairs: true }), null, 'a smith repairs it once the player allows it');
 
   setModSetting('pcaao', 'equipmentDamageEnhanced', true); setModSetting('pcaao', 'fadingEnchantedItems', true);
   const me2 = armed(helm(), EQUIP_SLOTS.Head, { isPlayer: true, items: [], activeEffects: [], stats: { strength: 50 } });
