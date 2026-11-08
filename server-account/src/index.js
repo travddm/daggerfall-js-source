@@ -333,7 +333,7 @@ import { isGzip, gzipSizeOf, gunzipText, REALM_TEXT_MAX_BYTES } from '../../src/
 import { tradeRealm, REALM_TRADE_BODY_MAX } from './realmTrade.js';   // REALM P2.1: a trade, settled here
 import { listLineages, putLineage, realmDie, realmRaise, realmWed, listUnions, LINEAGE_BODY_MAX } from './legacy.js';   // LEGACY7: Project Legacy's lines and the tombstone; REZ-BLOODLINE AUDIT R1: a Resurrect inside its hold
 import { measured, heartbeatPartsOf } from './metrics.js';   // SCALE1: every request counted (Workers Analytics Engine); AUDIT SCALE II A-3: a heartbeat's parts, of the body the route read
-import { runCron } from './cron.js';   // SCALE4b: the service's own clock
+import { scheduled, isCronDoor, cronDoor } from './cron-triggers.ts';   // SCALE4b: the service's own clock, and its door where there are no cron triggers
 import { blocksOf, blockAccount, unblockAccount, fileReport, agreeConduct, conductAgreed, takeFeed, bannedAnswer, modCases, modCase, modDismiss, modAct, REPORT_BODY_MAX } from './safety.js';   // SAFE1-SAFE7: the chat's safety
 import { strikesLook, isBanned } from './sanctions.js';   // SAFE4: the record, the ladder and the ban
 import { freezeRefusal, frozenAnswer, playerStaffChat, isFrozen, STAFF_CHAT_ROUTES, STAFF_CHAT_STATUS } from './staffFreeze.js';   // STAFF-PANEL5-FREEZE: the freeze gate and the player's staff chat
@@ -2521,8 +2521,8 @@ const service = {
 };
 
 export default {
-  fetch: (request, env, exec) => measured(request, env, service.fetch, exec),   // AUDIT SAFE DISCORD-4: the ExecutionContext, for waitUntil
+  fetch: (request, env, exec) => (isCronDoor(request, env) ? cronDoor(request, env) : measured(request, env, service.fetch, exec)),   // AUDIT SAFE DISCORD-4: the ExecutionContext, for waitUntil
   // SCALE4b: THE SERVICE'S OWN CLOCK - wrangler.toml's [triggers] crons, each firing its list (cron.js), the sweeps no
   // read runs any more and the settlements every read now nearly always finds done
-  scheduled: (controller, env) => runCron(env, { cron: controller?.cron, nowS: Math.floor(Number(controller?.scheduledTime ?? Date.now()) / 1000) }),
+  scheduled,
 };
