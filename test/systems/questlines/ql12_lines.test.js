@@ -553,6 +553,7 @@ test('AUDIT QUESTLINES LINES-13, LINES-17, LINES-18 (PIN MOVED, QL-OFFERED): end
   assert.equal(runner.lineState('introGear').step, 0);
   // the pacing (LINES-17's, retired): level 30 offline - the introductions that open offline, none begun unasked for a
   // day of looks; each taken begins at once, the take itself the player's pace
+  setPref('naval', true);   // NAVAL-OFF: Under Sail needs the sea fight, off by default now; this pin is the pacing, so the fight is on for it
   const many = runnerWith({ level: 30, online: false });
   const begun = () => QL_LINES.filter((l) => many.runner.lineState(l.id)).length;
   for (let i = 0; i < 24; i++) { many.step(); many.clock.s += STEP_GAP_S; }
@@ -562,6 +563,7 @@ test('AUDIT QUESTLINES LINES-13, LINES-17, LINES-18 (PIN MOVED, QL-OFFERED): end
   for (const id of open) assert.equal(many.runner.takeLine(id).ok, true, id);
   many.step();
   assert.equal(begun(), 3, 'taken, each begins');
+  setPref('naval', false);
   // an adopted copy: the Old Coil's first step already running when the line is taken - its opening asked all the same
   const calls = [];
   const svc = { account: () => 'a', guest: () => false, claim: async (b) => { calls.push(b); return { ok: true, data: { opened: true } }; } };
