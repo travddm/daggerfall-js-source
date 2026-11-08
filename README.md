@@ -6,7 +6,9 @@ played from your own copy of The Elder Scrolls II: Daggerfall. It began as a
 own game: Daggerfall Unity is the reference for its data layer and logic, not a
 target to match. Presentation rebuilt on hand-rolled WebGL2. MIT licensed:
 LICENSE holds the third-party notices and the parts the license does not
-cover. DFO Online is an independent,
+cover. The website and the desktop app carry it as LICENSE.txt, with the
+licenses of the bundled npm packages in THIRD-PARTY-LICENSES.txt. DFO Online
+is an independent,
 unofficial project, not affiliated with or endorsed by Bethesda Softworks or
 ZeniMax Media. The Elder Scrolls and Daggerfall are trademarks of ZeniMax
 Media Inc.
@@ -15,8 +17,6 @@ The project's working name in the docs and the code is `project-dagger`, and
 the repository, the live domain, the servers and the desktop app's identifier
 still carry the old `daggerfall` spellings - renaming those is a move outside
 this tree (BR1, BR5).
-
-Play it: https://daggerfalljs.dev/
 
 The site is `index.html` (what it is, how to play, credits); the game is
 `play/index.html`, served at `/play/`. Both deploy from `main` to GitHub
@@ -27,21 +27,6 @@ Docs live in `docs/` - start at `docs/README.md`.
 
 Original game data (ARENA2) is required and never committed. Point tests at it
 with `ARENA2_PATH`.
-
-## Support development
-
-DFO Online is free and open source. Active development currently
-costs about **$600 per month** to sustain across development tooling,
-multiplayer infrastructure, testing, builds, releases, and mod compatibility
-work.
-
-Support on Patreon: <https://www.patreon.com/c/dfenhanced>
-
-Support on Ko-fi: <https://ko-fi.com/daggerfallonline>
-
-The monthly goal, suggested support levels, and funding breakdown are in
-[`SUPPORT.md`](SUPPORT.md). Sponsorship does not lock gameplay, source code,
-or normal releases behind a paywall.
 
 ## Reporting exploits and security issues
 

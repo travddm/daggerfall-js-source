@@ -63,6 +63,12 @@
         "to": "dist"
       }
     ],
+    "extraFiles": [
+      {
+        "from": "../LICENSE",
+        "to": "LICENSE.txt"
+      }
+    ],
     "linux": {
       "target": [
         "AppImage"
