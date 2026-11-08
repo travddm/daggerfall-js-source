@@ -148,15 +148,17 @@ Widget mod, default on) only draws the shield and its recoil.
 A weapon with a technique, and gauntlets for bare hands, can use it with the Weapon technique key. `techniqueRoster.js`
 `TECHNIQUES` holds twelve: Volley and Piercing Shot (archery), Leap Strike and Whirlwind (long blade), Shadowstep and
 Lunge (short blade), Cleave and Headsman's Chop (axe), Ground Slam and Skull Crack (blunt), Flying Kick and Haymaker
-(hand to hand). With Loot rarity off, every weapon uses its family's first one at its `base` power; with it on, a weapon with no line has none. Each technique has a mechanic,
-aim, fatigue, cooldown and a `base` multiplier on the normal `calculateAttackDamage` result (a miss stays a miss).
+(hand to hand). With Loot rarity off, every weapon uses its family's first one at its `base` power; with it on, a
+weapon with no line has none. Each technique has a mechanic, aim, fatigue, cooldown and a `base` multiplier on the
+normal `calculateAttackDamage` result (a miss stays a miss).
 `techniques.js` runs them, `techniqueBlow.js` shapes the blow (reach, arc; never against a player), `techniqueFx.js`
 adds the feel. The Weapon techniques row (`techniquesOn.js`) is their only switch. DFU has no techniques.
 
 Loot rarity extends them and the techniques work without it. `rarityLink.js` is the one file where the two meet: the
 techniques register their roster with the ladder (`registerTechniqueRoster`), and with the ladder on a drop may carry a
 technique line (`AFFIX_KINDS.technique`, see [items-and-loot.md](items-and-loot.md)) that picks the technique and adds
-+5..30% (`TECHNIQUE_BANDS`). With the ladder on a found line is the only source of a technique (apart from a path's signature). With the ladder off a found line is ignored. `lootRarity.js` imports no techniques code.
++5..30% (`TECHNIQUE_BANDS`). With the ladder on, a found line is the only source of a technique (apart from a path's
+signature). With the ladder off a found line is ignored. `lootRarity.js` imports no techniques code.
 
 Martial paths (`martialPaths.js`): with Master Skills on and two weapon skills mastered, a character picks one of 15
 paths (one per pair of weapon skills). A path adds passives, riders and a signature technique outside the loot roster
