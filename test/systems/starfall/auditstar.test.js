@@ -5,6 +5,7 @@
 // and its spell named through the text core; Bound in Silk's held blow cuts the count whatever its weight; a chip
 // carries its tier; the star's glass is Starfall Glass, no custom row's name is another's, and its card says what it is.
 // tools/mutants/auditstar.json.
+import '../../techniquesLinked.js';
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
