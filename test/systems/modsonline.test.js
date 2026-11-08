@@ -70,7 +70,7 @@ test('MODS-ONLINE-2: every vendored mod is classified, and the only keys the lan
   // (WEAR-VANILLA: Roleplay Realism's equipDamage, which the mod ships on).
   // ONE KEY IS FORCED PAST ITS DEFAULT, BY NAME, and to a value the mod
   // itself offers: LANDFORM3's rivers - the room holding the shipped off would have no rivers.
-  const PAST_DEFAULT = { 'roads-hazelnut': { RiversAndStreams: true } };
+  const PAST_DEFAULT = { 'roads-hazelnut': { RiversAndStreams: true }, 'project-legacy': { Enabled: true } };   // CHARACTER MODES: the Legacy mode's master switch ships off; the room offers the mode
   for (const [vendor, keys] of Object.entries(ONLINE_ROOM_MOD_KEYS)) {
     for (const [key, value] of Object.entries(keys)) {
       const def = MOD_SETTINGS[vendor]?.keys?.[key];
@@ -82,7 +82,7 @@ test('MODS-ONLINE-2: every vendored mod is classified, and the only keys the lan
   }
 });
 
-test('MODS-ONLINE-4: every mod switch is the player\'s online, except the forty-eight the room owns', () => {
+test('MODS-ONLINE-4: every mod switch is the player\'s online, except the fifty-three the room owns', () => {
   for (const [vendor, def] of Object.entries(MOD_SETTINGS)) {
     for (const key of Object.keys(def.keys)) {
       const room = ONLINE_ROOM_MOD_KEYS[vendor] && Object.hasOwn(ONLINE_ROOM_MOD_KEYS[vendor], key);
@@ -95,7 +95,7 @@ test('MODS-ONLINE-4: every mod switch is the player\'s online, except the forty-
   // The whole shelf, counted, so a mod quietly re-forced shows up as a
   // number rather than as a player's complaint.
   const forced = Object.values(ONLINE_ROOM_MOD_KEYS).reduce((n, keys) => n + Object.keys(keys).length, 0);
-  assert.equal(forced, 48, 'the lane forces forty-eight mod switches in the whole shelf');   // DEX0: Daggerfall Enemy Expansion's Enabled - the host's foes are the party's   // WOD-PEAKS: and World of Daggerfall's Mountains, off - the spires level the ground and stand rock   // LANDFORM3: Basic Roads' RiversAndStreams, the rivers cut into the land   // IT1: Immersive Travel's Enabled (its carriages stand at the gates) and its DisableNormalTravel held off (the map's trips stay walked)   // TRAVEL-ONLINE: Travel Options' Enabled and its two journey dials - no instant travel online; AUDIT T1: and its ports rule   // WD3: Beautiful Villages' and Beautiful Cities' Enabled - the towns themselves   // RAID2: World Events - Raiding Parties' Enabled, the world's raids   // OH-A: Ocean Holes' three - its switch, the pits' rate and the seafloor hole's size (the fifth floor)   // DW-D: Iliac Puddle No More's thirteen - the sea and its depth (the fourth floor), the deep's foes and loot, its swim and breath rules   // DS1: Detailed Ships' Enabled, the ships' shared deck   // MODS-ONLINE-5: one ruleset per room - RR's six combat overrides and its intensive training   // RRI1/RR1 (merged 2026-09-23): five of Roleplay & Realism: Items' (the items that change hands) and two of Roleplay & Realism's (the location, the host's foes)   // WOD1: World of Daggerfall's Enabled, the second floor
+  assert.equal(forced, 53, 'the lane forces fifty-three mod switches in the whole shelf');   // DEX0: Daggerfall Enemy Expansion's Enabled - the host's foes are the party's   // WOD-PEAKS: and World of Daggerfall's Mountains, off - the spires level the ground and stand rock   // LANDFORM3: Basic Roads' RiversAndStreams, the rivers cut into the land   // IT1: Immersive Travel's Enabled (its carriages stand at the gates) and its DisableNormalTravel held off (the map's trips stay walked)   // TRAVEL-ONLINE: Travel Options' Enabled and its two journey dials - no instant travel online; AUDIT T1: and its ports rule   // WD3: Beautiful Villages' and Beautiful Cities' Enabled - the towns themselves   // RAID2: World Events - Raiding Parties' Enabled, the world's raids   // OH-A: Ocean Holes' three - its switch, the pits' rate and the seafloor hole's size (the fifth floor)   // DW-D: Iliac Puddle No More's thirteen - the sea and its depth (the fourth floor), the deep's foes and loot, its swim and breath rules   // DS1: Detailed Ships' Enabled, the ships' shared deck   // MODS-ONLINE-5: one ruleset per room - RR's six combat overrides and its intensive training   // RRI1/RR1 (merged 2026-09-23): five of Roleplay & Realism: Items' (the items that change hands) and two of Roleplay & Realism's (the location, the host's foes)   // WOD1: World of Daggerfall's Enabled, the second floor
   // MODS-ONLINE-4: the two GROUND
   // switches, and the three that spend somebody else's evening - the
   // host's dungeon foes (Daggerfall Enemy Expansion, the overhaul) and a roll that
@@ -103,8 +103,8 @@ test('MODS-ONLINE-4: every mod switch is the player\'s online, except the forty-
   // switch, World of Daggerfall's, which levels camp sites into the same
   // terrain the road beds are smoothed into.
   assert.deepEqual(Object.keys(ONLINE_ROOM_MOD_KEYS).sort(),
-    ['beautiful-cities', 'beautiful-villages', 'daggerfall-enemy-expansion', 'detailed-ships', 'iliac-puddle-no-more', 'immersive-travel', 'ocean-holes', 'pcaao', 'roads-hazelnut', 'roleplay-realism', 'roleplay-realism-items', 'travel-options', 'unleveledLoot', 'world-events-raiding-parties', 'world-of-daggerfall']);
-  assert.equal(ONLINE_PLAYERS_OWN_MODS.length, Object.keys(MOD_SETTINGS).length - 15);   // DEX0: Daggerfall Enemy Expansion, sixteen   // IT1: Immersive Travel, fifteen   // TRAVEL-ONLINE: Travel Options, fourteen   // THE MERGE: the raids' switch (the batch's) beside Ocean Holes' (main's) - eleven the room owns; WD3: the two town mods, thirteen
+    ['beautiful-cities', 'beautiful-villages', 'character-modes', 'daggerfall-enemy-expansion', 'detailed-ships', 'iliac-puddle-no-more', 'immersive-travel', 'ocean-holes', 'pcaao', 'project-legacy', 'roads-hazelnut', 'roleplay-realism', 'roleplay-realism-items', 'travel-options', 'unleveledLoot', 'world-events-raiding-parties', 'world-of-daggerfall']);
+  assert.equal(ONLINE_PLAYERS_OWN_MODS.length, Object.keys(MOD_SETTINGS).length - 17);   // CHARACTER MODES: Character Modes and Project Legacy's master switch, seventeen   // DEX0: Daggerfall Enemy Expansion, sixteen   // IT1: Immersive Travel, fifteen   // TRAVEL-ONLINE: Travel Options, fourteen   // THE MERGE: the raids' switch (the batch's) beside Ocean Holes' (main's) - eleven the room owns; WD3: the two town mods, thirteen
 });
 
 test('MODS-ONLINE-2: a declared key is an OWN key - the lane and the store both refuse a name off Object.prototype', () => {

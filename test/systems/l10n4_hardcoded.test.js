@@ -311,6 +311,8 @@ const HARDCODED = {
   'src/systems/caravanVisit.js': 5,
   'src/systems/champions.js': 6,
   'src/systems/chargen.js': 1,
+  'src/systems/characterModesSettings.js': 6,
+  'src/ui/characterModeChoice.js': 20,
   'src/systems/cloudSaves.js': 5,
   'src/systems/comeSailAway/comeSailAway.js': 86,
   'src/systems/comeSailAway/comeSailAwayBoat.js': 1,

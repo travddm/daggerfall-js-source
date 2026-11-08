@@ -47,9 +47,23 @@ export const ironman = (/** @type {unknown} */ m) => m === 'ironman' || m === 'h
 /** The family system plays this character (Project Legacy). */
 export const legacy = (/** @type {unknown} */ m) => m === 'legacy';
 
-/** The modes the picker offers. Project Legacy's master switch off hides the Legacy mode and refuses it at creation. */
-export const creatableModes = (/** @type {boolean} */ legacySwitchOn) =>
-  CHARACTER_MODES.filter((m) => m !== 'legacy' || legacySwitchOn);
+/** The modes a server offers, as `{ hardcore: false }` says it: a mode is offered unless named false. Classic is always
+ *  offered (it is DFU's rule). Project Legacy's master switch is the `legacy` entry. */
+export const creatableModes = (/** @type {Record<string, boolean>} */ offered = {}) =>
+  CHARACTER_MODES.filter((m) => m === DEFAULT_MODE || offered[m] !== false);
+
+/** A server profile's list of offered modes, `MODES_OFFERED` (comma separated, e.g. `classic,hardcore,ironman`), read as an
+ *  `offered` table. Absent or empty offers every mode. A name that is no mode is ignored. */
+export function offeredFromList(/** @type {unknown} */ text) {
+  const named =
+    typeof text === 'string'
+      ? text
+          .split(',')
+          .map((s) => s.trim())
+          .filter(isMode)
+      : [];
+  return Object.fromEntries(CHARACTER_MODES.map((m) => [m, named.length === 0 || named.includes(m)]));
+}
 
 /**
  * Whether a character may change from one mode to another. A mode can only be loosened, never tightened; Legacy is
@@ -74,11 +88,14 @@ export const dropsFrom = (/** @type {unknown} */ from, /** @type {{ dead?: boole
   CHARACTER_MODES.filter((to) => canDrop(from, to, at));
 
 /** A token's mode claims, whole: `md` only beside a realm character (`rc` 1) and only a non-Classic code of the table. */
-export const modeClaimsOk = (/** @type {any} */ c) => c?.md === undefined || (c.rc === 1 && c.md !== 0 && modeOfCode(c.md) !== null);
+export const modeClaimsOk = (/** @type {any} */ c) =>
+  c?.md === undefined || (c.rc === 1 && c.md !== 0 && modeOfCode(c.md) !== null);
 
 /** The token code the mint signs for a character's mode: none for Classic (the bytes as before) or a value that is no mode. */
-export const tokenCodeOf = (/** @type {unknown} */ m) => (isMode(m) && m !== DEFAULT_MODE ? codeOf(/** @type {string} */ (m)) : null);
+export const tokenCodeOf = (/** @type {unknown} */ m) =>
+  isMode(m) && m !== DEFAULT_MODE ? codeOf(/** @type {string} */ (m)) : null;
 
 /** The mode a create request means: the one it names, else the build from before the modes - a line's birth is the
  *  Legacy mode, any other Classic. The caller still checks it with `isMode`. */
-export const modeOfRequest = (/** @type {unknown} */ named, /** @type {boolean} */ born) => (named == null ? (born ? 'legacy' : DEFAULT_MODE) : named);
+export const modeOfRequest = (/** @type {unknown} */ named, /** @type {boolean} */ born) =>
+  named == null ? (born ? 'legacy' : DEFAULT_MODE) : named;

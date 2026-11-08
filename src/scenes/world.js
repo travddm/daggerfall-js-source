@@ -16996,7 +16996,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     if (unwritten) return { ok: false, error: unwritten };
     let made = null;
     for (let i = 0; i < 3; i++) {
-      made = await realmCreate(io, playerEntity.name || 'Traveller', realmSummaryOf(playerEntity), born);
+      made = await realmCreate(io, playerEntity.name || 'Traveller', realmSummaryOf(playerEntity), born, playerEntity.characterMode);
       if (made.ok || !['offline', 'server'].includes(made.error)) break;
       await new Promise((r) => { setTimeout(r, 2000 * (i + 1)); });
     }
