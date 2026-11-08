@@ -647,7 +647,7 @@ test('AUDIT MARTIAL L5 M2 / L5 L1: THE LAW\'S GUARDS - a mentored Ranger keeps t
   for (const [have, label] of [[[LB], 'Archery'], [[AR], 'Long Blade']]) {
     const forged = fighter(have, 150); forged.martialPath = 'ranger';
     assert.equal(MP.martialHeld(forged), null, `${label} unmastered: nothing held`);
-    assert.equal(techniqueInHand(forged, { weapon: weapon(have[0] === LB ? WEAPONS.Longsword : WEAPONS.Long_Bow) })?.signature, undefined, 'no signature: the family own technique answers');
+    assert.equal(techniqueInHand(forged, { weapon: weapon(have[0] === LB ? WEAPONS.Longsword : WEAPONS.Long_Bow) }), null);
   }
   const r = pathFighter('ranger');
   assert.equal(techniqueInHand(r, { restingWeapon: weapon(WEAPONS.Long_Bow), weapon: weapon(WEAPONS.Longsword) })?.id, 'huntersMark', 'the lead hand at rest names it');

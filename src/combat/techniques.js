@@ -29,7 +29,7 @@
 
 import { techniqueById, techniqueMult, techniqueFamily, techniquesFor, TECHNIQUE_MAX_SPEED, TECHNIQUES, TECHNIQUE_ACTION } from './technique/techniqueRoster.js';
 import { signatureFor, signatureById, SIGNATURE_IDS, SIGNATURE_TECHNIQUES } from '../systems/martialPaths.js';   // MARTIAL3: a martial path's signature - the key's answer when the weapon carries no line
-import { rarityLineOf, rarityKnownOf } from './technique/rarityLink.js';   // Loot rarity's extension of the techniques: a found line (the one place the ladder is named)
+import { rarityLineOf, rarityKnownOf, rarityOn } from './technique/rarityLink.js';   // Loot rarity's extension of the techniques: a found line (the one place the ladder is named)
 import { techniquesOn } from './technique/techniquesOn.js';
 import { EQUIP_SLOTS } from '../systems/equip.js';
 import { sigilDueling } from '../systems/sigil/sigil.js';
@@ -119,7 +119,7 @@ export function techniqueItem(entity, pw) {
 }
 /** The technique in hand - { id, value, tech, item, known } - or null. Read whatever the Weapon techniques switch says (the
  *  refusal says it). Which technique answers: a found line (Loot rarity on: it picks the technique and adds power), else a
- *  held path's signature, else the weapon family's own first technique at its base power - so a weapon with no line has one. AUDIT TECH-FX: the HUD asks
+ *  held path's signature, else - only while Loot rarity is off - the weapon family's own first technique at its base power (with it on, a piece with no line has none). AUDIT TECH-FX: the HUD asks
  *  it every frame, so the last answer is kept while nothing it was read from has moved (the piece, its line, the line's
  *  technique and value, whether it is known) - a snapshot no caller writes, so one is as good as another. */
 let _handMemo = null;
@@ -128,7 +128,7 @@ export function techniqueInHand(entity, pw) {
   const item = techniqueItem(entity, pw);
   const line = rarityLineOf(item);
   const tech = line ? techniqueById(line.param) : null;
-  if (!tech) return signatureInHand(entity, pw, item) ?? familyDefaultInHand(item);
+  if (!tech) return signatureInHand(entity, pw, item) ?? (rarityOn() ? null : familyDefaultInHand(item));
   // AUDIT MARTIAL L4 L6: a found line SLEEPS with the techniques switch off, so the key is free - a held path's
   // signature answers it; with none, the line's own refusal says why
   if (!techniquesOn()) { const sig = signatureInHand(entity, pw, item); if (sig) return sig; }
@@ -138,7 +138,7 @@ export function techniqueInHand(entity, pw) {
   _handMemo = { item, line, id: line.param, value: line.value, known, hand };
   return hand;
 }
-/** A piece with no found line: its family's first technique, at its base power (value 0), known. null for a piece with no
+/** Loot rarity off, a piece with no found line: its family's first technique, at its base power (value 0), known. null for a piece with no
  *  family (an arrow, the bare hand - its signature, when held, is signatureInHand's). Kept while the piece is the same. */
 let _defaultMemo = null;
 function familyDefaultInHand(item) {

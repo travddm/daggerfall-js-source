@@ -25,6 +25,8 @@ registerTechniqueRoster({
   parts: techniqueParts,
 });
 
+/** Whether the ladder is on. With it off, techniques fall back to each weapon family's first technique. */
+export const rarityOn = lootRarityOn;
 /** The technique line a piece carries, or null. A line is a Loot rarity extension, so it answers only while the ladder is on. */
 export const rarityLineOf = (item) => (lootRarityOn() ? techniqueLineOf(item) : null);
 /** Whether the piece's technique line is identified (an unknown piece hides its technique's name). */

@@ -116,7 +116,7 @@ export const TUTORIALS = Object.freeze([
     ],
     points: [
       '{SwitchHand} changes hands, or which hand leads when both are armed.',
-      'Your weapon has a technique on {WeaponTechnique}, which costs fatigue and takes time to recover.',
+      'Some weapons have a technique on {WeaponTechnique}, which costs fatigue and takes time to recover.',
     ],
   }),
   page({

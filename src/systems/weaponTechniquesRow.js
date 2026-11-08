@@ -14,7 +14,7 @@ export const WEAPON_TECHNIQUES_ROW = Object.freeze({
   get note() {
     return t(
       'features.weaponTechniques.note',
-      'Every weapon has a technique: a special attack on its own key, with a cooldown and a fatigue cost. With Loot rarity on, a weapon may drop with a stronger one.',
+      'A special attack on its own key, with a cooldown and a fatigue cost. With Loot rarity off, every weapon uses the first technique of its weapon type. With it on, a weapon has one only if it drops with a technique line.',
     );
   },
   get effect() {

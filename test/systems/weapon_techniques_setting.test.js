@@ -211,7 +211,7 @@ test("B1 THE BUDGET: every technique's to-hit is 5-10, no base passes 1.5, and t
   assert.ok(topBase * (1 + topBand / 100) <= 1.95 + 1e-9, `${topBase} x ${1 + topBand / 100}`);
 });
 
-test('TECHNIQUES WITHOUT LOOT RARITY: a plain weapon has its family first technique at base power, the switch alone turns it off (mutants: the ladder asked; a line needed)', () => {
+test('TECHNIQUES WITHOUT LOOT RARITY: a plain weapon has its family first technique at base power, the switch alone turns it off (mutants: the ladder asked; a line needed; the default kept with the ladder on)', () => {
   reset();
   setPref('lootRarity', false);
   setPref('weaponTechniques', true);
@@ -228,6 +228,12 @@ test('TECHNIQUES WITHOUT LOOT RARITY: a plain weapon has its family first techni
   setPref('weaponTechniques', false);
   T._resetTechniquesForTests();
   assert.equal(T.refusal(T.techniqueInHand(me, { weapon: sword }), press(me, sword)), T.LADDER_OFF_TEXT);
+  // Loot rarity on: no family default, a weapon with no line has no technique, as on the base
+  setPref('weaponTechniques', true);
+  setPref('lootRarity', true);
+  T._resetTechniquesForTests();
+  assert.equal(T.techniqueInHand(me, { weapon: sword }), null, 'ladder on, no line: none');
+  assert.equal(T.techniqueHudChips(me, { weapon: sword }, 'X').length, 0);
   reset();
 });
 
