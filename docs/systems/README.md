@@ -4,6 +4,7 @@ One page per major gameplay area: what it does, where it lives, its data and its
 
 - [characters.md](characters.md): races, classes, attributes and skills, character creation, advancement, the
   online firmament tree, bodies and the paperdoll.
+- [character-modes.md](character-modes.md): the five modes picked at creation, their rules, enforcement and storage.
 - [combat.md](combat.md): how a swing or an arrow becomes damage, weapons, shields, techniques, enemy strength, the
   power ceiling, blood.
 - [magic.md](magic.md): the spell record, casting and cost, the effect library, enchanting, arcane paths, enemy
