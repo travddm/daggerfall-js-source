@@ -6,7 +6,6 @@
 // the floating number; the relay's draw; the Spire's lords; the rules never shown; the title's word.
 import '../modsOff.js';
 import { test, beforeEach } from 'node:test';
-import { _forceUnquietForTests } from '../../src/systems/revenant/unquietMark.js';   // the Unquiet mark held off: its draw is a fresh voice id's, so one foe in eight came "Unquiet Elite Orc"
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
@@ -78,7 +77,7 @@ async function elite(p, traits, hp = 5000, x = 0) {
   giveBossTraits(f.entity, traits);
   return f;
 }
-beforeEach(() => { _resetBossTraitsTaughtForTests(); clearFoeTarget(); _forceUnquietForTests(false); });   // a trait's foe, never the revenant arc's mark (unquietMark.js) - its own law, its own pins
+beforeEach(() => { _resetBossTraitsTaughtForTests(); clearFoeTarget(); });
 
 test('AUDIT WORLD-EVENTS L2-1: a PEER\'s Cast-When-Strikes spell on my Flameproof elite lands a quarter, as mine does - its element resisted where it lands whole (mutants: the peer\'s spell unresisted)', async () => {
   const FIRE = { name: 'Burn', element: 0, rangeType: 0, effects: [{ type: 4, subType: 0, magnitudeBaseLow: 40, magnitudeBaseHigh: 40, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1 }] };

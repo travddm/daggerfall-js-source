@@ -5,7 +5,7 @@
 // DFU's knockback (floored at 15 classic units, three times the hurt threshold) and the brain broke the wind-up on any
 // knock, at the cost of the blow's cooldown alone. Now a foe WINDING UP holds through a blow - no shove, no Hurt - and
 // the blow's WEIGHT fills its POISE meter; at its poise the wind-up BREAKS and the foe is STAGGERED: helpless for about
-// a second, taking a quarter more from every blow. A heavy weapon, a blow at its back (and a revenant's weakness, RVN3)
+// a second, taking a quarter more from every blow. A heavy weapon and a blow at its back
 // weigh more; a dagger rarely breaks a giant.
 //
 // The law here; the meter and the stagger on the brain (ai/tactics.js windupStruck), the doors in the pools.
@@ -47,7 +47,6 @@ export const TELL = Object.freeze({
   K_PEER: 1,                    // a peer's relayed blow (TELL8 carries its class)
   POISE_BACK: 1.5,              // a blow from behind the wind-up's locked facing...
   BACK_DEG: 110,                // ...more than this far off it (TACT's BACK_TURNED_DEG)
-  POISE_WEAK: 2,                // a revenant's weakness (RVN3)
   // the stagger
   STAGGER_S: Object.freeze({ light: 1.4, medium: 1.2, heavy: 1.0, massive: 0.8 }),
   STAGGER_KNOCK: 1.5,           // the breaking blow's withheld knockback, written at this
@@ -126,8 +125,6 @@ export function poiseSpecial(entity) {
   if (entity.champion) s *= entity.champion === 'stalwart' ? TELL.POISE_STALWART : TELL.POISE_CHAMPION;
   const rank = entity.revenant?.rank | 0;
   if (rank > 0) s *= 1 + TELL.POISE_REVENANT_RANK * rank;
-  const edge = entity.revenant?.edge?.poise;   // RVN2: Braced, Steadfast (systems/revenant/revenantFeud.js ADAPT)
-  if (edge > 0) s *= edge;
   return s;
 }
 
@@ -179,10 +176,10 @@ export function behind(origin, yaw, from) {
   return dot < Math.cos(TELL.BACK_DEG * Math.PI / 180);
 }
 
-/** v: a blow's weight on the meter - its final damage, by its kind, from behind, of its weakness. */
-export function blowWeight(damage, k, { back = false, weak = false } = {}) {
+/** v: a blow's weight on the meter - its final damage, by its kind, from behind. */
+export function blowWeight(damage, k, { back = false } = {}) {
   if (!(damage > 0) || !(k > 0)) return 0;
-  return damage * k * (back ? TELL.POISE_BACK : 1) * (weak ? TELL.POISE_WEAK : 1);
+  return damage * k * (back ? TELL.POISE_BACK : 1);
 }
 
 /** TELL2: the glint's strength `sinceStart` seconds into a wind-up with `toLand` seconds left (0 none): a flare that
@@ -199,14 +196,12 @@ export function glintStrength(sinceStart, toLand, reduced = false) {
 
 /** TELL3 (section 5): a blow's guard as it is wound up - 'iron' for the slam and the ring of a heavy or massive body
  *  (`weight` DFU's, in classic units), and one blow in IRON_ELITE from an elite (`isElite`: the ELITE FOES gold or an
- *  Elite Dungeon's - section 9's reading of the word, taken at TELL5); RVN2: a Steadfast revenant's one in two (its
- *  stand's `revenant.edge.iron` - the larger share where both are, on the one roll); else 'poise'. `roll` in [0, 1), drawn
- *  only for those. The revenant's other iron (its signature from rank 3, a last stand) joins with RVN4 and RVN5. */
+ *  Elite Dungeon's - section 9's reading of the word, taken at TELL5); else 'poise'. `roll` in [0, 1), drawn
+ *  only for an elite. */
 export function blowGuard(kind, weight, ent = null, roll = null) {
   const cls = weightClass(weight);
   if (TELL.IRON_SHAPES.includes(kind) && (cls === 'heavy' || cls === 'massive')) return 'iron';
-  const share = Math.max(isElite(ent) ? TELL.IRON_ELITE : 0, ent?.revenant?.edge?.iron > 0 ? ent.revenant.edge.iron : 0, ent?.revenant?.p2?.iron > 0 ? ent.revenant.p2.iron : 0);   // RVN4: phase two's half
-  if (share > 0 && (roll ?? Math.random()) < share) return 'iron';
+  if (isElite(ent) && (roll ?? Math.random()) < TELL.IRON_ELITE) return 'iron';
   return 'poise';
 }
 
@@ -231,12 +226,11 @@ export const higherTier = (ent) => isElite(ent) || !!ent?.champion || revenantRa
  *  own base and floor and `roll` null (no draw: a chain is quick by law). The fill runs on it, so the mark tells the truth.
  *  @param {number} base @param {any} [ent] @param {{ guard?: string, roll?: number|null, floor?: number }} [opts] */
 export function windupSeconds(base, ent = null, { guard = 'poise', roll = Math.random(), floor = TELL.TELL_MIN_WINDUP } = {}) {
-  const [lo, hi] = ent?.revenant?.edge?.wind ?? TELL.WINDUP_VARY;   // RVN2: a Patient revenant's wider band
+  const [lo, hi] = TELL.WINDUP_VARY;
   let w = base * (roll == null ? 1 : lo + (hi - lo) * roll);
   if (isElite(ent)) w *= TELL.WINDUP_ELITE;
   const rank = revenantRank(ent);
   if (rank > 0) w *= 1 - TELL.WINDUP_RANK * rank;
-  if (ent?.revenant?.p2?.windup > 0) w *= ent.revenant.p2.windup;   // RVN4: phase two's quicker wind-ups
   if (guard === 'iron') w += TELL.IRON_EXTRA;
   return Math.max(floor, w);
 }
@@ -244,12 +238,6 @@ export function windupSeconds(base, ent = null, { guard = 'poise', roll = Math.r
 export function feints(family, ent, sinceFeint = Infinity) {
   return family === 'blade' && higherTier(ent) && sinceFeint >= TELL.FEINT_GAP;
 }
-/** RVN2: a feinting foe's chance to feint a wind-up - TELL5's, a Patient revenant's one in three (its stand's edge). */
-export const feintChance = (ent) => ent?.revenant?.edge?.feint ?? TELL.FEINT_CHANCE;
-/** RVN2: the share of a tracker's wind-up it turns through - TELL5's half, a Patient revenant's longer. */
-export const trackShare = (ent) => ent?.revenant?.edge?.track ?? TELL.TRACK_SHARE;
-/** RVN4: how many blows may chain after a first - TELL5's one, phase two's two (three in all). */
-export const chainMax = (ent) => (ent?.revenant?.p2?.chainMax > 0 ? ent.revenant.p2.chainMax : 1);
 /** TELL5 (7.4): may this foe chain - a brute of the higher tier, an elite, a revenant of rank 3 or more - with two shapes
  *  or more to chain between? */
 export function chains(family, ent, shapes) {
@@ -276,11 +264,10 @@ export function trackYaw(yaw, want, dt) {
  *  (ai/blowShapes.js, where the whole set is), handed on. */
 export { wholeSet };
 /** TELL7 (9): the seconds before this foe's next telegraphed blow - an ordinary foe's 8-15, a champion's 7-13, an elite's
- *  6-11 (the best of its tiers), a revenant's less 8% a rank (rank 5: 4.8-9 of an ordinary's). `roll` in [0, 1). A last
- *  stand's x0.7 joins with RVN4. */
+ *  6-11 (the best of its tiers), a revenant's less 8% a rank (rank 5: 4.8-9 of an ordinary's). `roll` in [0, 1). */
 export function blowCooldown(ent = null, roll = Math.random()) {
   const C = TELL.COOLDOWN;
   const [lo, hi] = isElite(ent) ? C.elite : ent?.champion ? C.champion : C.ordinary;
   const rank = revenantRank(ent);
-  return (lo + (hi - lo) * roll) * (rank > 0 ? 1 - TELL.COOLDOWN_RANK * rank : 1) * (ent?.revenant?.p2?.cooldown > 0 ? ent.revenant.p2.cooldown : 1);   // RVN4: phase two's x0.7
+  return (lo + (hi - lo) * roll) * (rank > 0 ? 1 - TELL.COOLDOWN_RANK * rank : 1);
 }

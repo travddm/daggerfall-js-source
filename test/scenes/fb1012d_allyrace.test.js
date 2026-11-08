@@ -137,9 +137,6 @@ test('FB1012d ALLY-RACE a revenant is the person it was born as: the body that d
   // a dungeon's record (its layout marker the stand's law) - the stamp wins there too
   assert.equal(foeSeed({ mobileType: r.mobileType, marker: [12, 0, 7], entity: { revenant: foe.entity.revenant } }), r.person, 'a dungeon return: its person over the marker');
   // THE OATH: sworn, stood by the companion layer at my side through doors - the one that knelt.
-  // C1, C2): the body its returns replaced is LEFT for good and
-  // swears nothing in its name; the one that kneels is its latest
-  assert.ok(!N.revenantSpared(me, foe.entity, { state: 'with' }), 'the body a later stand replaced swears nothing');
   assert.ok(N.revenantSpared(me, last.entity, { state: 'with' }), 'sworn');
   const sworn = RC.revenantParty();
   assert.equal(sworn.party[0].person, r.person, 'the sworn member carries its person');

@@ -24,6 +24,10 @@ import { LOCKPICKING_SUCCESS_TEXT } from '../../../src/world/actionSystem.js';
 import { createLockpickHost, OPEN_HOLD_MS } from '../../../src/scenes/lockpickHost.js';
 import { createLockpickOverlay } from '../../../src/ui/lockpickDoor.js';
 import { createLockpickAct } from '../../../src/systems/lockpick/lockpickAct.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests play the tumbler window: the option on (off is DFU's one roll, test/systems/lockpick/lockpick_dfu.test.js).
+setPref('lockpickTumblers', true);
 
 globalThis.addEventListener ??= () => {}; globalThis.removeEventListener ??= () => {};
 globalThis.fetch = async () => { throw new Error('no fetch'); };

@@ -67,19 +67,19 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("gameplay", "Gameplay", [
     sec("general", "General", [
-      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "ChildGuard/PlayerNudity"]),
+      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "feat:repair-price-by-damage", "ChildGuard/PlayerNudity"]),
     sec("quests", "Quests", [
-      "port:questRepair", "feat:questlines", "feat:nearby-quests", "feat:choose-guild-jobs", "Enhancements/GuildQuestListBox", "GUI/CanDropQuestItems",
+      "port:questRepair", "feat:questlines", "feat:questline-rewards", "feat:nearby-quests", "feat:choose-guild-jobs", "Enhancements/GuildQuestListBox", "GUI/CanDropQuestItems",
       "GUI/QuestRumorWeight", "GUI/EnableQuestDebugger"]),
     sec("dungeons", "Dungeons", [
       "feat:smaller-dungeons", "Experimental/SmallerDungeons", "feat:medium-dungeons", "feat:world-dungeon-sizes", "feat:varied-dungeon-monsters",
       "Enhancements/AlternateRandomEnemySelection", "feat:mod-aquatic-sprites"]),
     sec("loot", "Loot & items", [
-      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
+      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:humanoid-loot", "feat:revenants", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
     sec("light", "Your light", [
       "feat:torches-from-items", "Enhancements/PlayerTorchFromItems", "feat:mod-handheld-torches"]),
     sec("character", "Character & survival", [
-      "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism"]),
+      "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection", "feat:lockpick-tumblers"]),
     sec("moving", "Climbing & gathering", [
       "feat:enhanced-climbing", "Enhancements/AdvancedClimbing", "feat:resource-highlights", "feat:mod-foraging"]),
     sec("start", "Starting a new game", [
@@ -111,11 +111,11 @@ export const CATEGORIES = Object.freeze([
     sec("weather", "Weather & ambience", [
       "feat:weather-events", "feat:mod-better-ambience"]),
     sec("towns", "Towns & people", [
-      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:town-watch", "feat:crime-recovery"]),
+      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:town-watch", "feat:crime-recovery", "feat:guild-probation", "feat:dress-for-the-part"]),
     sec("encounters", "Wilderness & encounters", [
       "feat:mod-world-of-daggerfall", "feat:wilderness-camps", "feat:road-encounters", "feat:mod-world-events-raiding-parties"]),
     sec("travel", "Travel", [
-      "feat:mod-travel-options", "feat:mod-immersive-travel", "feat:mod-horse-cart-and-cargo", "feat:horse-care", "feat:wagon-upkeep"]),
+      "feat:mod-travel-options", "feat:mod-immersive-travel", "feat:mod-horse-cart-and-cargo", "feat:horse-care", "feat:horse-walks", "feat:wagon-upkeep"]),
     sec("sea", "The sea & ships", [
       "feat:mod-come-sail-away", "feat:mod-detailed-ships", "feat:mod-warm-ashes-ships", "feat:mod-iliac-puddle-no-more", "feat:mod-ocean-holes"]),
   ]),

@@ -38,7 +38,8 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
-import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -772,7 +773,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
   }),
-  WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
+  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
@@ -1006,10 +1007,8 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'nearbyQuests', initial: true, online: 'player' }),
   }),
-  // QL1: QUESTLINES - every quest's
-  // objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
-  // forces it on online (the owner: locked); offline the player's, on by default (the owner's answer). Read when a quest
-  // STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
+  // QL1: QUESTLINES - every quest's objectives, branches whose choices end it differently, outcomes that pay gear, and the questlines. A rule, so the lane
+  // forces it on online (the owner: locked); offline the player's, on by default. Read when a quest STARTS and stamped on it for life (systems/questlines/qlLaw.js startStamp), so turning it off strands nothing.
   Object.freeze({
     id: 'questlines',
     group: 'world',
@@ -1024,6 +1023,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: true }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
   }),
+  QUEST_REWARDS_ROW,   // QUESTLINE-REWARDS: the reward scale, DFU's selectable
   // LW2: THE LIVING WORLD
   //  - a town's people are its residents, each with a name, a home, a trade and a
   // day (systems/livingWorld/livingTown.js stands them where DFU's wandering pool stood). The player's own online: every
@@ -1767,9 +1767,9 @@ export const FEATURES = Object.freeze([
     }),
   }),
   // NAV: THE SEA FIGHT - the port's own, on Come Sail Away's hulls, so
-  // it stands nothing without that mod. ONE SWITCH, FORCED ON ONLINE: the ships at sea are the room's world (one player
-  // stands the sea for everyone near - scenes/naval/navalHost.js), and a room where one player sees the pirate boarding another
-  // and the other does not is two worlds. The rest is each player's own: the traffic the sea they stand is filled with,
+  // it stands nothing without that mod. ONE SWITCH, OFF BY DEFAULT AND OFF ONLINE (NAVAL-OFF): Daggerfall Unity has no sea fight; the
+  // boat itself (sail, row, cargo) is Come Sail Away's own switch. Online the sea is the room's world (scenes/naval/navalHost.js), and
+  // one player seeing a boarding another does not is two worlds, so there is no per-player switch. The rest is each player's own: the traffic the sea they stand is filled with,
   // whether pirates grapple THEIR boat, and whether THEIR voyage's beaten raiders leave a hold to plunder.
   Object.freeze({
     id: 'naval-combat',
@@ -1778,11 +1778,11 @@ export const FEATURES = Object.freeze([
     get note() { return t('features.navalCombat.note', 'Ship battles on Come Sail Away\u2019s boats: at the helm, look to one side and hold Attack to aim a broadside, '
       + 'then let go to fire. Pirates, merchant ships and navies sail the Bay; batter a ship until it surrenders, board '
       + 'it, take its cargo, then sink it or let it go. Piracy is a crime, and pirates can board your ship and '
-      + 'fight you on deck. Online, everyone in the room shares one sea.'); },
-    get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always on.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
+      + 'fight you on deck. Offline only: online rooms have no sea fight.'); },
+    get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always off.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'naval', initial: true, online: true,   // scenes/world.js navalOn: the host stands down and empties the sea
+      store: 'prefs', key: 'naval', initial: false, online: false,   // scenes/world.js navalOn: the host stands down and empties the sea
       also: Object.freeze([
         Object.freeze({ store: 'prefs', key: 'naval-ships', initial: 'some', online: 'player' }),   // systems/naval/navalDirector.js DENSITY
         Object.freeze({ store: 'prefs', key: 'naval-boarders', initial: true, online: 'player' }),   // navalHost.js: a pirate's grapple on MY boat

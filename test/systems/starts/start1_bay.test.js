@@ -99,8 +99,8 @@ const textOf = (q, id) => q.getMessage(id).getTextTokens(-1, () => 0).map((t) =>
 
 test('START1 the start\'s place: a new character starts the curse and the Bay\'s start quest - never _BRISIEN, which a start\'s commission starts; the start is the main quest\'s own (its family, protected, never shared) (mutants: _BRISIEN back in the list, the start out of the protected list, out of the main quest\'s name test)', () => {
   assert.equal(BAY_START_QUEST, '_STARTIB');
-  // START2: the provinces' starts and the commission in hand beside it (test/systems/starts/start2_provinces.test.js)
-  assert.deepEqual([...START_QUESTS], ['_STARTIB', '_STARTSK', '_STARTMW', '_STARTIC', '_STARTBM', '_STARTEL', '_STARTVW', '_STARTSU', '_STARTHD']);
+  // the commission in hand beside it: a character born at no start (test/systems/starts/start2_hand.test.js)
+  assert.deepEqual([...START_QUESTS], ['_STARTIB', '_STARTHD']);
   assert.equal(MAIN_QUEST_OPENER, '_BRISIEN');
   assert.deepEqual([...GAME_START_QUESTS], ['S0000977', BAY_START_QUEST]);
   assert.ok(!GAME_START_QUESTS.includes(MAIN_QUEST_OPENER), 'the main quest waits for the commission');
@@ -348,7 +348,7 @@ test('START1 the patch: _BRISIEN as the pack reads it is DFU\'s script with its 
 
 // ── the welcome tour ─────────────────────────────────────────────
 
-test('START1 the welcome tour says the main story waits on the commission (bible/10-UI/Voice.md rule 7: the capital unnamed) - START2: whichever start the character chose, so it names none', () => {
+test('START1 the welcome tour says the main story waits on the commission (bible/10-UI/Voice.md rule 7: the capital unnamed) - whichever start the character began in, so it names none', () => {
   const body = tutorialById('welcome').body.join(' ');
   assert.match(body, /Your story begins with the Emperor's sealed orders, your commission\. When you hold them, open them from your pack: they name the city where the main story begins\./);   // PIN MOVED (AUDIT STARTS U9): true of the commission in hand, and of where the story begins
   assert.doesNotMatch(body, /cave|shipwreck|Privateer/i, 'no one start\'s words');

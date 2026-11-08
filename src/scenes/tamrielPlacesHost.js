@@ -5,7 +5,7 @@
 import { arenaPixels, arenaPlaceOnPixel, arenaPlaces, arenaPlacesVersion } from '../world/arenaPlaces.js';
 import { arenaRoadTowns, arenaTemplateOf, synthesizeArenaLocation, arenaPlaceId } from '../world/arenaLocations.js';
 import { bayLand, countryMayStandAt, countryName, countryNameSeed, countryRates, countryStandsAt, createCountryGround, synthesizeCountryLocation, countryOrdinal, countryPlaceId, countryLocationIndex } from '../world/tamrielCountry.js';
-import { capitalOnPixel, capitalPixel, synthesizeCapitalLocation, CAPITALS, capitalPlaceId, capitalSliceOrdinal, capitalSpanPixels, capitalsVersion, imperialOutskirts, capitalCentrePixel, capitalSlicePort } from '../world/tamrielCapitals.js';
+import { capitalOnPixel, synthesizeCapitalLocation, CAPITALS, capitalPlaceId, capitalSliceOrdinal, capitalSpanPixels, capitalsVersion, imperialOutskirts, capitalCentrePixel, capitalSlicePort } from '../world/tamrielCapitals.js';
 import { createTamrielRoadsHost } from './tamrielRoadsHost.js';
 import { getNameBankOfRegion } from '../characters/nameHelper.js';
 import { getWorldClimateSettings, REGION_NAMES, LOCATION_TYPES } from '../formats/mapsFile.js';
@@ -19,7 +19,6 @@ import { provinceNameBank } from '../world/tamrielPeople.js';
 import { rollSpec } from '../world/tamrielRoads.js';
 import { outlineTownLocation, townOutlineBlockJson } from '../world/townOutline.js';   // TOWN-SHAPES TS3: a town past the Bay laid as its own outline of blocks
 import { standTownWall, setTownWallPaths, townWallPathsReader } from '../world/townWalls.js';   // TOWN-SHAPES TS4: a city past the Bay walled on its outline; ROAD-FOLLOW: its gates where its roads come in
-import { startLairSites } from '../systems/starts/startSite.js';
 import { pastBayPlaceRows, PAST_BAY_SOURCE } from '../world/pastBayRows.js';   // AUDIT TESA II P7: the places past the Bay on the world's registry
 import { pastBayPlacesIn } from '../world/pastBayPlaces.js';   // WW7-7: a pixel the roads past the Bay rolled a place on is dry
 import { nearestSafePlace } from '../systems/deathRespawn.js';   // AUDIT TESA II P2/P3: the nearest town of the world
@@ -138,8 +137,7 @@ export function createTamrielPlaces(host) {
     locationIndex.set(key, loc);
     return loc;
   }
-  /** TESA8: a rolled lair laid out to its plan and cloned under its own id, name and index - NOT stood (START2: the start
-   *  host weighs a candidate's dungeon before any stands); null for a lair with no plan. */
+  /** TESA8: a rolled lair laid out to its plan and cloned under its own id, name and index - NOT stood; null for a lair with no plan. */
   function lairCloneOf(at, px, py) {
     const blocks = lairBlocksOf(at);
     if (!blocks) return null;
@@ -147,21 +145,8 @@ export function createTamrielPlaces(host) {
     return synthesizeLairLocation(pick.template, { c, px, py, type: pick.type, name, blocks }, { regionIndex, regionName: REGION_NAMES[regionIndex], politic: 128 + regionIndex, climate: getWorldClimateSettings(maps.getClimateIndex(px, py)) });
   }
   /** A pixel a lair may stand on as the build stands it: no capital, Arena place or countryside place first (world.js
-   *  _locationToBuild) - START2's start lairs and AUDIT RELEASE R2-5's quest lairs. */
+   *  _locationToBuild) - AUDIT RELEASE R2-5's quest lairs. */
   const lairFree = (x, y) => !capitalOnPixel(x, y) && !(_arenaTemplates && arenaPlaceOnPixel(x, y)) && !countryRollAt(x, y);
-  /** START2 (systems/starts/startSite.js): A PROVINCE'S START DUNGEON - the first of its candidates (the kinds its story
-   *  wants, nearest its capital first; then any lair in reach) whose dungeon `usable` takes, stood in the index as its
-   *  pixel's build stands it; or null - the land past the Bay with no lairs, its capital on no pixel, none in reach. */
-  function startLairAt(start, usable = () => true) {
-    const cap = _lairTemplates ? CAPITALS.find((k) => k.key === start?.capital) : null;
-    const centre = cap ? capitalPixel(cap) : null;
-    const rollAt = (x, y) => { const at = lairRollAt(x, y); return at && lairBlocksOf(at) ? { type: at.pick.type, dungeonType: at.dungeonType } : null; };
-    for (const site of startLairSites(start, { centre, rollAt, free: lairFree, provinceAt: provinceKeyBeyondBay })) {
-      const at = lairRollAt(site.px, site.py), loc = at ? lairCloneOf(at, site.px, site.py) : null;
-      if (loc && usable(loc)) return lairLocationAt(site.px, site.py);
-    }
-    return null;
-  }
   /** TESA14 (scenes/tamrielRoadsHost.js): THE ROADS PAST THE BAY - the Bay's own road law at its own scale over every place
    *  past it, a region at a time on the roads' own workers, each region's layer to the kernels as it lands. Its inputs:
    *  Arena's places that stand as towns (a capital's own place is its gates while the capitals stand), the roll's numbers
@@ -383,7 +368,7 @@ export function createTamrielPlaces(host) {
   /** LAIR-WORLD: THE LAIR A PIXEL PAST THE BAY HOLDS, as the build stands it - its cell's one site (lairSite), rolled
    *  and planned, on a pixel no capital, Arena place or countryside place takes first (lairOfCell, lairsNear's own row):
    *  `{ mapId, name, px, py, type, dungeonType }`, or null - on the Bay, off a cell's site, or none stands. Kept with the
-   *  cells, the same on every client. The revenants' lairs (scenes/lairHost.js) and the boards' dungeons (world.js
+   *  cells, the same on every client. The boards' dungeons (world.js
    *  createBountyHost's dungeonAt) read it past the Bay as they read MAPS.BSA's rows on it. */
   function lairAt(px, py) {
     if (!_lairTemplates || !Number.isInteger(px) || !Number.isInteger(py) || inBay(px, py)) return null;
@@ -393,7 +378,7 @@ export function createTamrielPlaces(host) {
     return s.px === px && s.py === py ? lairOfCell(c, s) : null;
   }
   /** LAIR-WORLD: that lair laid out as it would stand, NOT stood (lairCloneOf) - what the lair door lays to ask whether
-   *  the player can go down into it (a graveyard's template may place no door: scenes/lairHost.js LAIR-DOOR); or null. */
+   *  the player can go down into it; or null. */
   const lairCloneAt = (px, py) => { const at = lairAt(px, py) ? lairRollAt(px, py) : null; return at ? lairCloneOf(at, px, py) : null; };
   /** LAIR-WORLD: does a place stand on a pixel past the Bay - a capital's, an Arena place, the countryside's or a lair - as
    *  a board's hunt ground asks of it (the Bay's: the game's own rows' pixels). */
@@ -474,11 +459,11 @@ export function createTamrielPlaces(host) {
    *  own order: a capital, an Arena place, the countryside, a lair), the lairs near one, and the registry kept up.
    *  BAY-LEFT-MAPS: and the ids a pixel could hold (a place found there is known by them before it stands), and its row. */
   const provinceQuestPlaces = Object.freeze({
-    worldPlaces, lairsNear, countryNear, refresh: registerTamrielPlaces, startLairAt, sliceAt: capitalSliceAt,   // R2-5f: a capital slice read before it stands   // START2's start lair rides with them (the quest layer's startSiteOfId)
+    worldPlaces, lairsNear, countryNear, refresh: registerTamrielPlaces, sliceAt: capitalSliceAt,   // R2-5f: a capital slice read before it stands
     lairAt, lairCloneAt, placeOnPixel, version: placesVersion,   // LAIR-WORLD: a lair, a place and their stamp on a pixel past the Bay - the revenants' lairs and the boards' hunts
     tableKeyAt,   // BAY-LEFT-B: a place's MapTable key, for its province's table (the talk's regional "Where is")
     regionAt: (px, py) => maps.getRegionIndexAt(px, py),
     standAt, idsOnPixel, rowAt,   // BAY-LEFT-MAPS
   });
-  return { _tamrielRoads, arenaLocationAt, arenaWarm, capitalLocationAt, countryLocationAt, lairLocationAt, nearestTownOf, provinceQuestPlaces, registerTamrielPlaces, startLairAt, tamrielPlaceName };
+  return { _tamrielRoads, arenaLocationAt, arenaWarm, capitalLocationAt, countryLocationAt, lairLocationAt, nearestTownOf, provinceQuestPlaces, registerTamrielPlaces, tamrielPlaceName };
 }
