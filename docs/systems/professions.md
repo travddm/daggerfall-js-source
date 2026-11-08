@@ -14,24 +14,34 @@ the item templates, the sounds, the Materials Bag, and the Foraging mod port the
   `server-account/wrangler.toml`, read by `profSwitchOf` and `profOpenFor` in `server-account/src/professions.js`.
 - The client plays the act and reports how well it went. The service trusts that report only within a bound: a clean
   act moves a craft's quality roll by at most one step, or adds XP and bonus chances within caps the service checks.
+- **Each track has a daily limit.** A character does a bounded number of acts on a track each UTC day: harvests on a
+  gathering track; crafts, smelts, brews, disenchants and reforges on a crafting track. The service refuses the next
+  one with `prof-day-cap` (`server-account/src/profDayCaps.js`, numbers in `src/net/profCapLaw.js`), and the book
+  remembers the refusal so a capped vein shows as refused and costs no tool wear. `PROF_DAY_CAPS = "off"` lifts it.
+- **A crafted Rare passes the loot level gate.** A Masterwork piece is Rare. A crafter below the gate's level gets a
+  Superior piece instead, on the same roll. `PROF_MASTERWORK_GATE = "off"` lifts the gate.
+- **Tier prices follow DFU's ingredient scale** for ores, ingots, planks, leathers and Arcane Essence
+  (`DFU_TIER_PRICE` in `profTemplates.js`). `PROF_DFU_PRICES = "off"` puts back the port's earlier scale; the service
+  reports the choice in the state read and the client sets the rows to it. The three switches move to the server profile
+  later.
 - Shared law lives in `src/net/` and is pure (no clock, DOM or network). The client and the service import the same
   files.
 
 ## Where it lives
 
-| Layer | Files |
-|---|---|
-| Shared law | `src/net/professionLaw.js` (tracks, ranks, XP, tiers, specialisations, materials, Stores bounds), `src/net/recipeLaw.js` (recipes, quality, craft XP, act tuning), `src/net/nodeLaw.js` (nodes per pixel per day, herb tables, yields), `src/net/provinceNodes.js` (what each province outside the Bay is rich in), `src/net/bagLaw.js` (Materials Bag bounds) |
-| Account service | `server-account/src/professions.js` (tracks, Stores, harvests, crafts, withdrawals, Court writs), `alchemy.js`, `masterWork.js`, `craftWrits.js`, `writs.js`, `market.js`, `craftedPiece.js` |
-| Client book | `src/net/profBook.js` (this device's view of tracks and Stores; queues and retries requests) |
-| Gathering hosts | `src/scenes/gatherHost.js` (one shell for every node kind), with kinds `herbHost.js`, `mineHost.js`, `treeHost.js`, `huntHost.js`, `fishHost.js` (all in `src/scenes/`) |
-| Act machines | `src/systems/herbAct.js`, `mineAct.js`, `chopAct.js`, `traceAct.js`, `fishAct.js`, `heatAct.js`, `planeAct.js`, `stitchAct.js`, `chiselAct.js`, `facetAct.js`, `panAct.js` |
-| Products | `src/systems/smithItems.js`, `cookItems.js`, `alchemyItems.js`, `fletching.js`, `src/systems/professions/profItems.js` |
-| Templates | `src/systems/professions/profTemplates.js` |
-| Feel | `src/systems/professions/profSounds.js`, `src/systems/gatherSounds.js`, `src/systems/gatherBlow.js`, `src/systems/veinCrack.js` |
-| UI | `src/ui/professions/profPages.js` (Professions, Stores and Crafting pages; station acts), `profHud.js` (toasts, rank banner), `profReticle.js` (the act drawn round the crosshair), `craftHall.js`, `masterBox.js` |
-| Bag | `src/systems/materialsBag.js` |
-| Foraging | `src/systems/foraging/` and `vendor/foraging/` |
+| Layer           | Files                                                                                                                                                                                                                                                                                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shared law      | `src/net/professionLaw.js` (tracks, ranks, XP, tiers, specialisations, materials, Stores bounds), `src/net/recipeLaw.js` (recipes, quality, craft XP, act tuning), `src/net/nodeLaw.js` (nodes per pixel per day, herb tables, yields), `src/net/provinceNodes.js` (what each province outside the Bay is rich in), `src/net/bagLaw.js` (Materials Bag bounds) |
+| Account service | `server-account/src/professions.js` (tracks, Stores, harvests, crafts, withdrawals, Court writs), `alchemy.js`, `masterWork.js`, `craftWrits.js`, `writs.js`, `market.js`, `craftedPiece.js`                                                                                                                                                                   |
+| Client book     | `src/net/profBook.js` (this device's view of tracks and Stores; queues and retries requests)                                                                                                                                                                                                                                                                   |
+| Gathering hosts | `src/scenes/gatherHost.js` (one shell for every node kind), with kinds `herbHost.js`, `mineHost.js`, `treeHost.js`, `huntHost.js`, `fishHost.js` (all in `src/scenes/`)                                                                                                                                                                                        |
+| Act machines    | `src/systems/herbAct.js`, `mineAct.js`, `chopAct.js`, `traceAct.js`, `fishAct.js`, `heatAct.js`, `planeAct.js`, `stitchAct.js`, `chiselAct.js`, `facetAct.js`, `panAct.js`                                                                                                                                                                                     |
+| Products        | `src/systems/smithItems.js`, `cookItems.js`, `alchemyItems.js`, `fletching.js`, `src/systems/professions/profItems.js`                                                                                                                                                                                                                                         |
+| Templates       | `src/systems/professions/profTemplates.js`                                                                                                                                                                                                                                                                                                                     |
+| Feel            | `src/systems/professions/profSounds.js`, `src/systems/gatherSounds.js`, `src/systems/gatherBlow.js`, `src/systems/veinCrack.js`                                                                                                                                                                                                                                |
+| UI              | `src/ui/professions/profPages.js` (Professions, Stores and Crafting pages; station acts), `profHud.js` (toasts, rank banner), `profReticle.js` (the act drawn round the crosshair), `craftHall.js`, `masterBox.js`                                                                                                                                             |
+| Bag             | `src/systems/materialsBag.js`                                                                                                                                                                                                                                                                                                                                  |
+| Foraging        | `src/systems/foraging/` and `vendor/foraging/`                                                                                                                                                                                                                                                                                                                 |
 
 The gathering host exists only on the streaming world host (`src/scenes/world.js` builds it with `createGatherHost`
 when a professions book exists).
@@ -41,13 +51,13 @@ when a professions book exists).
 `PROFESSIONS` in `professionLaw.js` lists ten tracks: five gathering and five crafting. Eight crafting disciplines
 are filed under the five crafting tracks (`DISCIPLINES`, `trackOf`).
 
-| Gathering | Crafting track | Disciplines |
-|---|---|---|
-| Mining (veins, boulders, dungeon veins) | Smithing | Smithing, Jewelcrafting |
-| Logging (trees) | Building | Carpentry, Masonry |
-| Herbalism (patches; the Basket) | Outfitting | Outfitting |
-| Hunting (bodies the player killed) | Provisioning | Alchemy, Cooking |
-| Fishing (the net, schools) | Enchanting | Enchanting (Disenchanting over DFU's item maker) |
+| Gathering                               | Crafting track | Disciplines                                      |
+| --------------------------------------- | -------------- | ------------------------------------------------ |
+| Mining (veins, boulders, dungeon veins) | Smithing       | Smithing, Jewelcrafting                          |
+| Logging (trees)                         | Building       | Carpentry, Masonry                               |
+| Herbalism (patches; the Basket)         | Outfitting     | Outfitting                                       |
+| Hunting (bodies the player killed)      | Provisioning   | Alchemy, Cooking                                 |
+| Fishing (the net, schools)              | Enchanting     | Enchanting (Disenchanting over DFU's item maker) |
 
 ## Ranks, tiers and XP
 
@@ -82,13 +92,13 @@ All in `professionLaw.js` and `recipeLaw.js`.
 5. **The ask.** The end wears the tool by 1 and sends the report through `profBook.js`, which keeps and retries it
    until answered. The service rolls the yield and the XP. The goods land in the Materials Bag or the pack.
 
-| Act | Profession | Tool | Mechanic |
-|---|---|---|---|
-| `herbAct.js` | Herbalism | Sickle; Basket | Hold steady on a patch; the Basket finds glints |
-| `mineAct.js` | Mining | Pick-Axe | Strike the moving glint on a vein or boulder |
-| `chopAct.js` | Logging | Wood-Axe | Chop as a shrinking ring crosses the notch (a "clean cut" counts double) |
-| `traceAct.js` | Hunting | Skinning Knife | Trace a line on a body the player's own blow felled |
-| `fishAct.js` | Fishing | Fishing-Net | Hold to wind and cast, press on the tug, hold the net's weight inside a band to haul |
+| Act           | Profession | Tool           | Mechanic                                                                             |
+| ------------- | ---------- | -------------- | ------------------------------------------------------------------------------------ |
+| `herbAct.js`  | Herbalism  | Sickle; Basket | Hold steady on a patch; the Basket finds glints                                      |
+| `mineAct.js`  | Mining     | Pick-Axe       | Strike the moving glint on a vein or boulder                                         |
+| `chopAct.js`  | Logging    | Wood-Axe       | Chop as a shrinking ring crosses the notch (a "clean cut" counts double)             |
+| `traceAct.js` | Hunting    | Skinning Knife | Trace a line on a body the player's own blow felled                                  |
+| `fishAct.js`  | Fishing    | Fishing-Net    | Hold to wind and cast, press on the tug, hold the net's weight inside a band to haul |
 
 Swings land on DFU's melee hit frame. `gatherBlow.js` adds the hit feel and ore chunks, `veinCrack.js` the crack
 shader on a worked vein, and `gatherSounds.js` the sounds (also heard from party members through
@@ -102,16 +112,16 @@ and no bonus chance.
 A craft is asked from the **Crafting page** (`profPages.js`) while standing at a station. The service consumes the
 inputs and returns the product; the client mints the item.
 
-| Station (`PROF_STATIONS`) | Where | Act | Disciplines |
-|---|---|---|---|
-| `forge` / anvil | Weaponsmith, Armorer | `heatAct.js`: strike while the glow is in the band | Smithing (smelting ores to ingots, weapons, armour, repair kits) |
-| `workbench` | Furniture Store | `planeAct.js`: a steady drag along the grain | Carpentry (bows, staves, arrows, furniture, Ram Kit) |
-| `loom` | Clothing Store | `stitchAct.js`: press on the beat | Outfitting (leather armour, clothing, cloth) |
-| `mason` | General Store | `chiselAct.js`: strike the marked line | Masonry (cut stone, mortar, stone decor) |
-| `jeweller` | Pawn Shop, Gem Store | `facetAct.js`: stop the turn where the light catches | Jewelcrafting |
-| A fire | Campfire or hearth | `panAct.js`: take each pan off in its window | Cooking |
-| Alchemy station | Alchemist | DFU's potion maker (`src/scenes/potionMakerHost.js`) | Alchemy (`server-account/src/alchemy.js`) |
-| Enchanting station | Mages Guild hall | DFU's item maker | Enchanting, Disenchanting |
+| Station (`PROF_STATIONS`) | Where                | Act                                                  | Disciplines                                                      |
+| ------------------------- | -------------------- | ---------------------------------------------------- | ---------------------------------------------------------------- |
+| `forge` / anvil           | Weaponsmith, Armorer | `heatAct.js`: strike while the glow is in the band   | Smithing (smelting ores to ingots, weapons, armour, repair kits) |
+| `workbench`               | Furniture Store      | `planeAct.js`: a steady drag along the grain         | Carpentry (bows, staves, arrows, furniture, Ram Kit)             |
+| `loom`                    | Clothing Store       | `stitchAct.js`: press on the beat                    | Outfitting (leather armour, clothing, cloth)                     |
+| `mason`                   | General Store        | `chiselAct.js`: strike the marked line               | Masonry (cut stone, mortar, stone decor)                         |
+| `jeweller`                | Pawn Shop, Gem Store | `facetAct.js`: stop the turn where the light catches | Jewelcrafting                                                    |
+| A fire                    | Campfire or hearth   | `panAct.js`: take each pan off in its window         | Cooking                                                          |
+| Alchemy station           | Alchemist            | DFU's potion maker (`src/scenes/potionMakerHost.js`) | Alchemy (`server-account/src/alchemy.js`)                        |
+| Enchanting station        | Mages Guild hall     | DFU's item maker                                     | Enchanting, Disenchanting                                        |
 
 The station checks are the interior host's `forgeHere`, `workbenchHere`, `loomHere` and so on in
 `src/scenes/worldModes.js`. A home or guild hall with a placed station also counts.

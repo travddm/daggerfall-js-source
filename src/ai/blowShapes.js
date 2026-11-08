@@ -19,10 +19,6 @@ export const BLOW = Object.freeze({
   // TELL6 (8.1): the aimed shot - a line from the archer to its target, locked at its start; the arrow leaves along it
   // x1.3 as fast (`speed`). The arrow's own flight decides: stepping off the line dodges it
   aimed: Object.freeze({ windup: 0.6, halfW: 0.25, speed: 1.3 }),
-  // RVN5 (16.1): the pyre - a revenant's signature where its family reaches no other: a
-  // disc at its target's feet, locked at its start, out to `range`; its landing a blast of its own element (a spell -
-  // the player's saving throw answers it), never a swing
-  pyre: Object.freeze({ windup: 1.2, r: 2.2, range: 12 }),
 });
 
 // TELL2: the numbers the ground's pass reads beside the brain - their one
@@ -120,6 +116,5 @@ export function inBlow(b, px, pz) {
   if (b.kind === 'ring') { const P = BLOW.ring, d = Math.hypot(rx, rz); return d >= P.rIn && d <= P.rOut; }   // TELL6: safe at its feet
   if (b.kind === 'leap') return Math.hypot(along - (b.ahead ?? 0), across) <= BLOW.leap.r;   // TELL6: a disc at its point
   if (b.kind === 'aimed') return along >= -0.3 && along <= (b.ahead ?? 0) && Math.abs(across) <= BLOW.aimed.halfW;   // TELL6: its line to its target
-  if (b.kind === 'pyre') return Math.hypot(along - (b.ahead ?? 0), across) <= BLOW.pyre.r;   // RVN5: a disc at its target's feet
   return false;
 }

@@ -16,7 +16,7 @@ import {
   allyCastCasterLineMany, ALLY_CAST_TYPES,
 } from '../../src/systems/allyCast.js';
 import { activeSpellIcons } from '../../src/ui/hud/hudActiveSpells.js';
-import { PREF_DEFAULTS } from '../../src/systems/uiPrefs.js';
+import { PREF_DEFAULTS, setPref } from '../../src/systems/uiPrefs.js';
 import { ONLINE_PLAYERS_OWN_PREFS } from '../../src/systems/online/onlineLane.js';
 import { createInfection, INFECTION } from '../../src/systems/infection.js';
 
@@ -180,7 +180,9 @@ test('AUDIT SPELL-GIFT B2: the ready\'s arm counts MATES - a stranger near leave
   assert.ok(r2.world.said.includes(ALLY_ARMED_LINE));
 });
 
-test('AUDIT SPELL-GIFT B6: a STRANGER\'s Cure Disease leaves an incubating infection be - a player choosing the curse lost it to anyone passing - and cures the rest; a party mate\'s cures as ever (mutants: the stranger\'s flag never read)', () => {
+test('AUDIT SPELL-GIFT B6: a STRANGER\'s Cure Disease leaves an incubating infection be - a player choosing the curse lost it to anyone passing - and cures the rest; a party mate\'s cures as ever (mutants: the stranger\'s flag never read)', (t) => {
+  setPref('cureKeepsInfection', true);   // the option on: a cure leaves an infection while a plain disease runs
+  t.after(() => setPref('cureKeepsInfection', false));
   const infected = () => { const p = mkPlayer(); p.activeEffects.push(createInfection(INFECTION.Vampirism), { kind: 'disease', disease: 3, daysOfSymptomsLeft: 5, statMods: {} }); return p; };
   const cure = allyCastSpell({ name: 'Cure', effects: [fx(3, 0, 0)] }, { stranger: true });
   assert.ok(cure, 'Cure Disease is on the stranger\'s list');

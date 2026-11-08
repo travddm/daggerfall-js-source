@@ -12,21 +12,25 @@
 //   scenes/exterior.js       - the fixed city: its building doors are worldModes' too (createWorldModes), so it picks as
 //                              the street does.
 //
-// `begin` asks the pack for a LOCKPICK (systems/lockpick/lockpickItem.js) - none, and the lock says so and nothing is
-// rolled, tallied or spent - and opens the lock's window (ui/lockpickDoor.js) over the tumblers (systems/lockpick/
-// lockpickAct.js), DFU's chance for that lock at that site its tolerance. A pick that snaps is gone from the pack and
-// tallies Lockpicking once (DFU's one tally an attempt - an attempt ends in a snap or an open); the last one gone ends the
-// attempt. The lock opened tallies once more, the window shows the plug turn and shuts, and THEN the host's `onOpen` runs -
-// DFU's success tail at each site (the chime, the line, the door opened, the building entered, the chest searched).
-// Leaving costs nothing. DFU's retry gate (FailedSkillLevel, LastLockpickAttempt - "the skill must rise past the last
-// failure") is not read here: a snapped pick is what a retry costs now (Ledger A, LOCKPICK).
+// `begin` asks the pack for a LOCKPICK (systems/lockpick/lockpickItem.js); with none, the lock says so and nothing is
+// rolled, tallied or spent. Otherwise it opens the lock's window (ui/lockpickDoor.js) over the tumblers
+// (systems/lockpick/lockpickAct.js) at DFU's chance for that lock. A pick that snaps leaves the pack and tallies
+// Lockpicking once; the last one gone ends the attempt. An opened lock tallies once more, then the host's `onOpen` runs
+// (DFU's success tail: chime, line, door opened, building entered, chest searched). Leaving costs nothing. DFU's retry
+// gate (FailedSkillLevel, LastLockpickAttempt) is not read in the window: a snapped pick is what a retry costs there.
+//
+// LOCKPICK-MODE: the window is the `lockpickTumblers` option, off by default. Off, `frontDoor` and `inside` are DFU's one
+// roll with no item (PlayerActivate.cs:543-566, DaggerfallActionDoor.AttemptLockpicking), a front door reads DFU's
+// LastLockpickAttempt gate again, and a dungeon door's roll stays the action graph's own (`inside` declines it with `door`).
 // ═══════════════════════════════════════════════════════════════════
 import { createLockpickAct } from '../systems/lockpick/lockpickAct.js';
 import { lockSeed, lockBand } from '../systems/lockpick/lockpickLaw.js';
 import { lockpickCount, spendLockpick } from '../systems/lockpick/lockpickItem.js';
 import { createLockEar } from '../systems/lockpick/lockpickSounds.js';
 import { createLockpickOverlay } from '../ui/lockpickDoor.js';
-import { lookAtLockText, exteriorLockpickingChance, interiorLockpickingChance, LOCKPICKING_SUCCESS_TEXT } from '../world/actionSystem.js';
+import { lookAtLockText, exteriorLockpickingChance, interiorLockpickingChance, LOCKPICKING_SUCCESS_TEXT, LOCKPICKING_FAILURE_TEXT } from '../world/actionSystem.js';
+import { lockpickTumblersOn } from '../systems/lockpick/lockpickMode.js';   // LOCKPICK-MODE: off, DFU's one roll with no item
+import { getLastLockpickAttempt, setLastLockpickAttempt } from '../systems/discovery.js';   // DFU's retry gate at a front door
 import { tallyCrimeGuildRequirements } from '../systems/crimeGuilds.js';
 import { playerEntity, surfacePlayer } from '../characters/playerEntity.js';
 import { setMidScreenText } from '../ui/midScreenText.js';
@@ -63,6 +67,30 @@ export function createLockpickHost({ talk = null, mount = (w) => talk?.showOverl
   let ear = null, dead = false;
   /** @type {any} */
   let open = null;
+  const tell = (/** @type {string} */ l) => { if (talk) line(l); else say(l); };
+  /** DFU's roll at a front door (PlayerActivate.cs:543-566): the retry gate, one tally, one roll; opened, the break-in tally, the
+   *  success line and the chime come before the door is entered again. */
+  const dfuFrontDoor = ({ lock, skill, enter, place }) => {
+    if (place?.locId && skill <= getLastLockpickAttempt(place.locId, place.buildingKey)) { say(lookAtLockText(lock, player.level, skill)); return true; }
+    tallySkill(player, SKILLS.Lockpicking, 1);
+    if (!(exteriorLockpickingChance(lock, skill) > 1 + Math.floor(rolls() * 100))) {
+      tell(LOCKPICKING_FAILURE_TEXT);
+      if (place?.locId) setLastLockpickAttempt(place.locId, place.buildingKey, skill);
+      return true;
+    }
+    tallyCrimeGuildRequirements(player, true, 1);
+    line(LOCKPICKING_SUCCESS_TEXT);
+    audio?.playOneShot?.(SOUND.ActivateLockUnlock, 1);
+    enter();
+    return true;
+  };
+  /** DFU's roll at a locked chest or crate (SEARCH1: an interior door's chance): one tally, one roll; opened, the host's tail. */
+  const dfuInside = ({ lock, onOpen }) => {
+    tallySkill(player, SKILLS.Lockpicking, 1);
+    if (rolls() * 100 >= interiorLockpickingChance(player.level, lock, skillValue(player, SKILLS.Lockpicking))) { tell(LOCKPICKING_FAILURE_TEXT); return true; }
+    onOpen?.();
+    return true;
+  };
   const host = {
     /**
      * A LOCK MET IN STEAL MODE. `lock` its value; `chance` DFU's for it here (interiorLockpickingChance underground,
@@ -108,12 +136,14 @@ export function createLockpickHost({ talk = null, mount = (w) => talk?.showOverl
     },
     /**
      * A BUILDING'S FRONT DOOR (worldModes.js activateStaticDoor's pick, PlayerActivate.cs:543-566): DFU's exterior chance
-     * for its `lock` at `skill` Lockpicking; opened, CG2's tally lands BEFORE the success text and the unlock sound, as
-     * PlayerActivate.cs:552 has it - a picked exterior lock IS a break-in and counts one toward the Thieves Guild's ten (a
-     * window left broke into nothing, and tallies nothing) - and `enter` activates the door again, picked.
-     * @param {{ lock: number, skill: number, key: string, enter: () => void }} o
+     * for its `lock` at `skill` Lockpicking. Opened, CG2's tally lands before the success text and the unlock sound
+     * (PlayerActivate.cs:552: a picked lock is a break-in, one toward the Thieves Guild's ten), and `enter` activates the
+     * door again, picked.
+     * @param {{ lock: number, skill: number, key: string, enter: () => void, place?: { locId: number, buildingKey: any } | null }} o
+     *   `place` the building's discovery record, where DFU keeps the skill it last failed at
      */
-    frontDoor({ lock, skill, key, enter }) {
+    frontDoor({ lock, skill, key, enter, place = null }) {
+      if (!lockpickTumblersOn()) return dfuFrontDoor({ lock, skill, enter, place });
       return host.begin({
         lock, chance: exteriorLockpickingChance(lock, skill), exterior: true, key,
         onOpen: () => { tallyCrimeGuildRequirements(player, true, 1); line(LOCKPICKING_SUCCESS_TEXT); audio?.playOneShot?.(SOUND.ActivateLockUnlock, 1); enter(); },
@@ -122,23 +152,23 @@ export function createLockpickHost({ talk = null, mount = (w) => talk?.showOverl
     /**
      * A LOCK UNDERGROUND - a dungeon's door, a chest or a crate: DFU's interior chance (CalculateInteriorLockpickingChance)
      * at the character's level and its live Lockpicking. `begin`'s own `lock`, `key`, `what` and `onOpen`.
-     * @param {{ lock: number, key: string, what?: string, onOpen?: () => void }} o
+     * @param {{ lock: number, key: string, what?: string, onOpen?: () => void, door?: boolean }} o
+     *   `door` an action graph's door: off the option, the answer is false and the graph rolls it as DFU does
      */
-    inside({ lock, key, what, onOpen }) {
+    inside({ lock, key, what, onOpen, door = false }) {
+      if (!lockpickTumblersOn()) return door ? false : dfuInside({ lock, onOpen });
       return host.begin({ lock, chance: interiorLockpickingChance(player.level, lock, skillValue(player, SKILLS.Lockpicking)), key, what, onOpen });
     },
     /**
-     * AN ACTION GRAPH'S LOCKED DOORS (world/actionSystem.js onLockpickAttempt - the magic arm stays the roll's): each picked
-     * in the window at DFU's interior chance; opened, swung through the graph's own seam (`lockpicked`: WORLD3's change, and
-     * never a door a peer swung first) and DFU's success said - the graph's own `onLockpickResult` where it has one (the
-     * dungeon's), else the host's line and chime (a building's). `place` names the graph: a door's lock is `place:key`. AUDIT LOCKPICK A4: a
-     * building's doors a Lock spell locked were never pickable - the graph had no hook, and DFU's roll it fell to read a
-     * Lockpicking of 0 against a retry gate of 0.
+     * AN ACTION GRAPH'S LOCKED DOORS (world/actionSystem.js onLockpickAttempt; the magic arm stays the roll's): each picked
+     * in the window at DFU's interior chance. Opened, the door swings through the graph's `lockpicked` seam (never a door
+     * a peer swung first) and DFU's success is said: the graph's `onLockpickResult` where it has one (the dungeon's), else
+     * the host's line and chime (a building's). `place` names the graph: a door's lock is `place:key`.
      * @param {any} actions @param {string} place
      */
     wire(actions, place) {
       if (!actions) return;
-      actions.onLockpickAttempt = (o) => host.inside({ lock: o.currentLockValue, key: `${place}:${o.key}`, onOpen: () => {
+      actions.onLockpickAttempt = (o) => host.inside({ lock: o.currentLockValue, key: `${place}:${o.key}`, door: true, onOpen: () => {
         if (!actions.lockpicked(o)) return;
         if (actions.onLockpickResult) actions.onLockpickResult(o, true);
         else { line(LOCKPICKING_SUCCESS_TEXT); audio?.playOneShot?.(SOUND.ActivateLockUnlock, 1); }

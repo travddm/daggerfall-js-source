@@ -62,7 +62,7 @@ test('SNOW-TELL: the pass lies its marks BLOW_LIFT over the ground without snow 
     const { gl, calls } = fakeGl();
     const pass = new FoeTelegraphPass(gl);
     calls.length = 0;
-    pass.draw([{ blow: makeBlow('pyre', [1, 2, 3], 0, 0), phase: { t: 0.5, flash: 0 } }], I, I, null, opts);
+    pass.draw([{ blow: makeBlow('slam', [1, 2, 3], 0, 0), phase: { t: 0.5, flash: 0 } }], I, I, null, opts);
     return calls.filter((c) => c[0] === 'uniform1f' && c[1] === 'uLift').map((c) => c[2]);
   };
   assert.deepEqual(lifts({ contrast: false }), [BLOW_LIFT], 'no snow: as it always lay');

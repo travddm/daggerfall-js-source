@@ -15,9 +15,8 @@
 // THE TWO HALVES: THE MASTER, to the left, in the Firmament's life ring's verdigris; THE COMMANDER, to the right, in its
 // battle ring's brass. Nothing here decides what may be set - the law is captainTree.js, and the ledger asks it again.
 //
-// RVN-STARS: the window itself is ui/skyWindow.js now - taken out of this file whole when the sworn
-// revenant's sky came (ui/revenantStarsWindow.js), one home for both; this file is the captain's sky as that window
-// draws it (its words, its tones, its wheel).
+// RVN-STARS: the window itself is ui/skyWindow.js now, one home for every sky; this file is the captain's sky as that
+// window draws it (its words, its tones, its wheel).
 
 import { t, formatNumber } from '../systems/textManager.js';
 import {

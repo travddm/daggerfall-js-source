@@ -101,7 +101,7 @@ export function revenantTrophy(r, { entity = null, level = 1, rolls = Math.rando
   const item = mintCondition(setItemFields({ group: 'Weapons', ...createWeapon(templateIndex, material, rolls) }));
   if (!item) return null;
   const tier = trophyRarity(r?.rank ?? 1, rolls);
-  applyRarity(item, r?.dread ? 'legendary' : tier, rolls);   // UNQUIET II (Revenants.md section 47): the Dread's, Legendary always (its tier's roll drawn first all the same)
+  applyRarity(item, tier, rolls);
   item.name = trophyName(r, templateIndex);   // over the ladder's name - a Legendary's record keeps its powers, not its name
   return item;
 }
