@@ -254,7 +254,8 @@ test('WIND3 rows and switches: three switches on the Features home (FT18: two ro
     assert.equal(PREF_DEFAULTS[c.key], true, 'the shelf derives the default from the row (RF4)');
     assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes(c.key), 'the lane leaves it to the player (RF4)');
   }
-  assert.equal(FEATURES.findIndex((f) => f.id === 'wind'), FEATURES.findIndex((f) => f.id === 'weapon-techniques') + 2, 'after the weapon techniques and the town seats (which follow LR1), before the packs');
+  const lastSettingRow = Math.max(...['weapon-techniques', 'town-seats', 'crime-recovery', 'boon-size', 'dungeon-fires'].map((id) => FEATURES.findIndex((f) => f.id === id)));
+  assert.equal(FEATURES.findIndex((f) => f.id === 'wind'), lastSettingRow + 1, 'after the weapon techniques and the setting rows that follow them (which follow LR1), before the packs');
   const skin = uiSkin();
   const doors = [[wispsOn, 'windWisps', 'wisps'], [windSoundOn, 'soundEnhancements', 'windaudio'], [floraSwayOn, 'floraSway', 'sway']];
   try {

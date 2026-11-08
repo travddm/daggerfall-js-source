@@ -127,8 +127,8 @@ export const realmList = async (/** @type {any} */ io) => {
 };
 /** A character born online: `{ ok, data: { id, lease, seq, gzip } }` - `gzip` the service's word that it opens a packed save.
  *  LEGACY7: `born` - `{ lineage, person }`, born as that living member of the account's own line (Project Legacy). */
-export const realmCreate = (/** @type {any} */ io, /** @type {string} */ name, /** @type {any} */ summary = null, /** @type {{ lineage: string, person: number } | null} */ born = null) =>
-  realmAsk(io, '/v1/realm/create', { method: 'POST', json: born ? { name, summary, lineage: born.lineage, person: born.person } : { name, summary } });
+export const realmCreate = (/** @type {any} */ io, /** @type {string} */ name, /** @type {any} */ summary = null, /** @type {{ lineage: string, person: number } | null} */ born = null, /** @type {string | undefined} */ mode = undefined) =>
+  realmAsk(io, '/v1/realm/create', { method: 'POST', json: { name, summary, ...(born ? { lineage: born.lineage, person: born.person } : {}), ...(mode ? { mode } : {}) } });   // CHARACTER MODES: `mode` - the character's, net/modeLaw.js
 /** LEGACY7: the account's Project Legacy lines - `{ ok, lineages: [{ id, surname, model, rev, record }] }`. */
 export const realmLineages = async (/** @type {any} */ io) => {
   const r = await realmAsk(io, '/v1/realm/lineages', { method: 'POST', json: {} });

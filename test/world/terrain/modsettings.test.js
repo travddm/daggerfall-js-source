@@ -173,7 +173,8 @@ test('the Mods pane puts each creator\'s name in the mod title (Mac, 2026-09-08)
   // without the switch was the one nobody asserted about.
   for (const [vendor, mod] of Object.entries(MOD_SETTINGS)) {
     assert.ok('Enabled' in mod.keys, `${vendor} has no Enabled switch - a player cannot turn it off`);
-    assert.equal(mod.keys.Enabled.default, true, `${vendor} is not on by default (MO1)`);
+    // CHARACTER MODES: Project Legacy's switch is the Legacy mode's master switch and ships off (owner's Q11, 2026-11-03)
+    assert.equal(mod.keys.Enabled.default, vendor !== 'project-legacy', `${vendor} is not on by default (MO1)`);
   }
   assert.equal(MOD_SETTINGS['roads-hazelnut'].author, 'Hazelnut');
   assert.match(readFileSync('vendor/roads-hazelnut/README.md', 'utf8'), /by Hazelnut/);

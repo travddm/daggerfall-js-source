@@ -26,7 +26,6 @@ import { createDecorRoom } from '../../src/scenes/decor/decorRoom.js';
 import { returnUnstood } from '../../src/systems/decor/decorPack.js';
 import { equipItem } from '../../src/systems/equip.js';
 import { setRealmLocked } from '../../src/systems/item/itemBound.js';
-import { revenantMayTake, pickTaken } from '../../src/systems/revenant/revenant.js';
 import { DUPE_GRACE_S, piecesRefusal, ownCopiesLiftable, ownCopyLiftSteps } from '../../server-account/src/ledger.js';
 import { ledgerPrintOf } from '../../server-account/src/judge.js';
 import { createSceneCache, cacheScene, snapshotSceneCache } from '../../src/systems/sceneCache.js';

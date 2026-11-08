@@ -1,6 +1,6 @@
 // RPT1026-EVENTS CROWD-KIN (a private report: the Players shown at once count left other players' revenants standing): A
 // PLAYER'S OWN FOES GO WITH THEM. A peer the crowd's count leaves undrawn
-// (net/gate/gateCrowd.js, the world host's one crowd) takes their revenants, their revenants' bands and their companions
+// (net/gate/gateCrowd.js, the world host's one crowd) takes their revenants and their companions
 // with them on this screen - no sprite, no body, nothing for the ray - unless one is on ME; the world's foes their screen
 // runs stand as ever. Driven over the real open-world foe pool (scenes/exteriorFoes.js) and the real crowd, the records the
 // owner's own wire would carry; a dungeon's (scenes/dungeonContext.js) by its records' shape and the one draw question it
@@ -54,10 +54,10 @@ function rig() {
   const cut = (max = 12) => crowd.cut(peers, { on: true, me: [0, 0, 0], at: (p) => p.feet, max });
   return { pool, crowd, cut, peers };
 }
-/** The far owner's foes, as its foes frame says them: a revenant, a follower of its band, a companion, a plain encounter foe. */
+/** The far owner's foes, as its foes frame says them: a revenant, a second revenant, a companion, a plain encounter foe. */
 const records = (extra = {}) => [
   { i: 1, t: 0, x: 0, f: [58, 0, 2], y: 0, h: 10, k: 10, d: 0, nm: 'Grushnak the Unbroken', ...(extra[1] ?? {}) },
-  { i: 2, t: 0, x: 0, f: [58, 0, 4], y: 0, h: 10, k: 10, d: 0, rt: 1, ...(extra[2] ?? {}) },
+  { i: 2, t: 0, x: 0, f: [58, 0, 4], y: 0, h: 10, k: 10, d: 0, nm: 'Varis the Scarred', ...(extra[2] ?? {}) },
   { i: 3, t: 0, x: 0, f: [61, 0, 1], y: 0, h: 10, k: 10, d: 0, ...(extra[3] ?? {}) },
   { i: 4, t: 0, x: 0, f: [62, 0, 6], y: 0, h: 10, k: 10, d: 0, ...(extra[4] ?? {}) },
 ];
@@ -86,7 +86,7 @@ test('RPT1026-EVENTS CROWD-KIN THE POOL: a cut owner\'s revenant, its band and i
   const [rev, band, comp, plain] = [1, 2, 3, 4].map((i) => bySeq(pool, i));
   assert.ok(rev && band && comp && plain, 'all four stood');
   assert.ok(rev.entity.revenant, 'the revenant, by its owner\'s word');
-  assert.ok(band.entity.bandName, 'its band\'s follower, named for it');
+  assert.ok(band.entity.revenant, 'the second revenant, by its owner\'s word');
   assert.equal(comp.companion, `peer:${FAR}:3`, 'the owner\'s companion');
   const drawn = () => new Set(pool.batches());
   const offered = () => new Set(pool.liveTargets().map((t) => t.key));

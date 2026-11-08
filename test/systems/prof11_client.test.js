@@ -88,7 +88,9 @@ test('PROF11 DONE WHEN: Rough Stone cut with a clean chisel at a General Store\'
   const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   const ann = await s.seated('Ann');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(ann.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   const give = (m, qty) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)
     ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = excluded.qty`).run(mac.id, mac.character, m, qty);
   const track = (xp, spec50 = null, spec100 = null) => raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'building', ?, ?, ?, ?)

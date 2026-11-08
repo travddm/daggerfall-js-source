@@ -36,8 +36,7 @@ import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a st
 import { coverDistance } from './cover.js';   // TELL6: a charge's lane must be free of cover
 import { GRAVITY } from '../player/motor.js';   // TELL6c: a leap's hop on the motor's own gravity
 import { tacticsNow, setTacticsClock, tickTactics } from './tacticsClock.js';   // AUDIT TACT D10/A3
-import { TELL, poiseOf, staggerSeconds, glintStrength, blowGuard, punishSeconds, windupSeconds, feints, chains, chainShape, trackYaw, blowCooldown, wholeSet, feintChance, trackShare, chainMax } from './tells.js';   // TELL1: poise and the stagger; TELL3: a blow's guard; TELL4: the punish window; TELL5: patterns; TELL7: the cooldowns
-import { noteFeud } from '../systems/feudLedger.js';   // RVN1: a blow of its I dodged, in its fight's ledger (a leaf - the brain brings no revenant system)
+import { TELL, poiseOf, staggerSeconds, glintStrength, blowGuard, punishSeconds, windupSeconds, feints, chains, chainShape, trackYaw, blowCooldown, wholeSet } from './tells.js';   // TELL1: poise and the stagger; TELL3: a blow's guard; TELL4: the punish window; TELL5: patterns; TELL7: the cooldowns
 
 export const tacticsSwitchOn = () => getPref('enhancedAI') === true;
 
@@ -290,7 +289,6 @@ function beginOverreach(ai, s, b, now, perfect, atMe = true) {
   if (ent) ent.overreachUntil = s.until;
   ai._blowHold = 'spent';   // the strike goes out; then its follow-through stands (characters/mobile/mobileUnit.js)
   if (perfect && atMe) ai._perfectAt = now;   // the tag's and the bright ring's (scenes/hostCombat.js tellCues) - mine alone (AUDIT TELL O5)
-  if (atMe && ent) { noteFeud(ent, 'dodged'); if (perfect) noteFeud(ent, 'perfect'); }   // RVN1 (Feud-Arc.md 12): my dodge - a peer's is its own fight
   ai._tacStrike = false; ai._tacShoot = false; ai.moving = false;
 }
 /** TELL4: the window shut - by its time, a stagger, or its place gone. The swing goes with it: let go after its strike,
@@ -486,12 +484,6 @@ export function tacticsStep(ai, dx, dz) {
     // TELL6d (8.1): an archer of the whole set aims one shot in three - the attack component asks as its shot comes
     // (`_wantAimed`), and the brain winds it up instead: its line on the ground, locked; its landing looses it
     const ent = ai.vitals?.();
-    // RVN5 (16.1): a caster's signature, the pyre - with its token, as its shot or its spell would go: the casters' first tell
-    const sig = ent?.revenant?.sigBlow;
-    if (has && sig?.kind === 'pyre' && _me && ai.canAct !== false && now >= (s.blowReady ?? 0) && now >= (s.sigReady ?? 0) && !windupNear(_me.feet, now, ai) && signatureReaches(ai, ent, 'pyre', dist, false, 0, 0) && Math.random() < BLOW_CHANCE) {
-      beginWindup(ai, s, ent, 'pyre', _me.feet[0] - ai.feet[0], _me.feet[2] - ai.feet[2], now, 0, sig);
-      return windupTurn(ai, s, now, skipped);
-    }
     ai._aimReady = has && key === LOCAL && !!_me && ai.canAct !== false && now >= (s.blowReady ?? 0) && aimsShots(ai, ent) && !windupNear(_me.feet, now, ai);
     if (ai._wantAimed) {
       ai._wantAimed = false;
@@ -522,16 +514,8 @@ export function tacticsStep(ai, dx, dz) {
     // AUDIT TELL B7: aimed at its TARGET's feet - the motor's (dx, dz) is its destination, a detour's point or a search's
     const tdx = tf[0] - ai.feet[0], tdz = tf[2] - ai.feet[2];
     const near = dist <= reach + 0.5;
-    // RVN5 (16.1): ITS SIGNATURE - a revenant's own blow, ahead of any other whenever its
-    // own cooldown is spent and its shape reaches (its stand's `revenant.sigBlow`)
-    const sig = ent?.revenant?.sigBlow;
-    if (sig && now >= (s.sigReady ?? 0) && !windupNear(tf, now, ai) && signatureReaches(ai, ent, sig.kind, dist, near, tdx, tdz) && Math.random() < BLOW_CHANCE) {
-      beginWindup(ai, s, ent, sig.kind, tdx, tdz, now, 0, sig);
-      return windupTurn(ai, s, now, skipped);
-    }
     const shapes = blowPool(ai, ent, dist, near, tdx, tdz);
-    // RVN2: an Arrow-wise revenant out of reach closes with its charge or its leap whenever its lane is free (no roll)
-    if (shapes.length && !windupNear(tf, now, ai) && ((!near && ent?.revenant?.edge?.closes === true) || Math.random() < BLOW_CHANCE)) {
+    if (shapes.length && !windupNear(tf, now, ai) && Math.random() < BLOW_CHANCE) {
       beginWindup(ai, s, ent, shapes[Math.floor(Math.random() * shapes.length)], tdx, tdz, now);
     }
   }
@@ -558,54 +542,28 @@ function walkAway(ai, wx, wz, speed) {
 /** TACT4: a telegraphed blow wound up - `shape` aimed along (dx, dz). TELL3: its guard; TELL5: its drawn length (a
  *  chain's quick and undrawn), a feint one wind-up in FEINT_CHANCE for a blade of the higher tier (never two within
  *  FEINT_GAP; never a chain's). `chain` its place in a chain (0 the first). */
-function beginWindup(ai, s, ent, shape, dx, dz, now, chain = 0, sig = null) {
-  const guard = sig?.iron ? 'iron' : blowGuard(shape, ENEMY_BASICS[ent.mobileType]?.weight ?? 0, ent);   // TELL3: iron or poise (the kind's own weight - no class throws an iron shape); RVN5: a signature iron from rank 3
+function beginWindup(ai, s, ent, shape, dx, dz, now, chain = 0) {
+  const guard = blowGuard(shape, ENEMY_BASICS[ent.mobileType]?.weight ?? 0, ent);   // TELL3: iron or poise (the kind's own weight - no class throws an iron shape)
   const windup = chain > 0
     ? windupSeconds(TELL.CHAIN_WINDUP, ent, { guard, roll: null, floor: TELL.CHAIN_FLOOR })
     : windupSeconds(BLOW[shape].windup, ent, { guard });
-  const b = fitBlowToGround(makeBlow(shape, ai.feet, Math.atan2(dx, dz), now, sig ? sig.color : guard === 'iron' ? IRON_COLOR : BLOW_COLOR, guard, windup), ai.collider);   // AUDIT TACT D8: on the ground it marks; RVN5: a signature in its ember
+  const b = fitBlowToGround(makeBlow(shape, ai.feet, Math.atan2(dx, dz), now, guard === 'iron' ? IRON_COLOR : BLOW_COLOR, guard, windup), ai.collider);   // AUDIT TACT D8: on the ground it marks
   b.chain = chain; b.trackedAt = now;
   b.n = ai._blowN = ((ai._blowN ?? 0) + 1) & 255;   // AUDIT TELL O2: its serial on the wire (ai/puppetBlows.js `wn`)
   b.key = targetKey(ai);   // AUDIT TELL B8: whom it is aimed at - a foe that turns on another breaks it (the owner and the struck peer agree)
   if (b.key !== LOCAL && !ai.target?.isPeer) b.sand = true;   // AUDIT ARENA-LADDER: one at a bout-mate (no other mark is begun at) is drawn for the stands (foeBlows.js SAND_DRAW_RANGE)
   if (shape === 'leap') { b.ahead = Math.min(BLOW.leap.range, Math.hypot(dx, dz)); b.jumpAt = b.land - BLOW.leap.arc; fitBlowToGround(b, ai.collider); }   // TELL6c: its point - my feet now, locked
   if (shape === 'aimed') b.ahead = Math.hypot(dx, dz);   // TELL6d: its line to me, locked
-  if (shape === 'pyre') b.ahead = Math.min(BLOW.pyre.range, Math.hypot(dx, dz));   // RVN5: its disc at my feet, locked
-  if (sig) {   // RVN5: its signature - its own cooldown, a deeper WIND, called out (the pools say it once a stand)
-    b.sig = true; b.windPitch = sig.windPitch;
-    const [lo, hi] = sig.cooldown;
-    s.sigReady = now + lo + (hi - lo) * Math.random();
-    ai._sigCall = now;
-  }
   const n = (s.windups ?? 0) + 1;
   s.windups = n;
-  if (chain === 0 && !sig && shape !== 'aimed' && shape !== 'pyre' && !GAP_CLOSERS.includes(shape) && feints(blowFamily(ent.mobileType), ent, n - (s.lastFeint ?? -Infinity)) && Math.random() < feintChance(ent)) {   // RVN2: a Patient one's one in three
+  if (chain === 0 && shape !== 'aimed' && !GAP_CLOSERS.includes(shape) && feints(blowFamily(ent.mobileType), ent, n - (s.lastFeint ?? -Infinity)) && Math.random() < TELL.FEINT_CHANCE) {
     b.feint = true; b.cutAt = b.start + TELL.FEINT_AT * (b.land - b.start); s.lastFeint = n;
   }
   s.blow = b;
   setLiveBlow(ai, b);
   s.state = 'windup';
-  const swings = shape !== 'aimed' && shape !== 'pyre';   // TELL6d: a shot draws no held swing - its landing looses it (ai._blowShot); RVN5: nor a pyre - its landing is a spell
+  const swings = shape !== 'aimed';   // TELL6d: a shot draws no held swing - its landing looses it (ai._blowShot)
   ai._blowHold = swings; ai._blowWind = swings;   // TELL2: the swing begins now and stands at its raised arm until the landing
-}
-/** RVN4 (15.2): ITS LAST STAND'S ROAR - an iron ring about its feet wound up for
- *  `seconds` and landing as the roar ends (TELL6a's shape; TELL6e's rattle and, iron, its knockdown), whatever its kind's shapes. Its
- *  wind-up before is dropped. The switch off, a puppet, or no brain yet: nothing (the pool holds the motor - the roar
- *  alone). Answers whether it was wound. */
-export function beginRoar(ai, ent, seconds, now = clock()) {
-  const s = ai?._tac;
-  if (!s || s.puppet || !ent || !tacticsSwitchOn()) return false;
-  if (s.blow) { setLiveBlow(ai, null); s.blow = null; }
-  s.dash = null;
-  const b = fitBlowToGround(makeBlow('ring', ai.feet, ai.yaw, now, IRON_COLOR, 'iron', seconds), ai.collider);
-  b.chain = 0; b.trackedAt = now; b.roar = true;
-  b.n = ai._blowN = ((ai._blowN ?? 0) + 1) & 255;   // its serial on the wire, as any wind-up's
-  b.key = targetKey(ai);
-  s.blow = b;
-  setLiveBlow(ai, b);
-  s.state = 'windup';
-  ai._blowHold = true; ai._blowWind = true;
-  return true;
 }
 /** TACT4: the wind-up's turn - broken by a knock or a paralysis (a step the motor did not let the brain decide), else
  *  stood, its aim locked, until the landing: where my feet stand decides it, and the swing comes now. */
@@ -634,7 +592,7 @@ function windupTurn(ai, s, now, skipped) {
     return false;
   }
   // TELL5 (7.2): a lunge (and TELL6's charge) turns after my feet through the first TRACK_SHARE of its wind-up, then locks
-  if (tf && TELL.TRACKERS.includes(b0.kind) && now < b0.start + trackShare(ai.vitals?.()) * (b0.land - b0.start)) {   // RVN2: a Patient one tracks longer
+  if (tf && TELL.TRACKERS.includes(b0.kind) && now < b0.start + TELL.TRACK_SHARE * (b0.land - b0.start)) {
     const y = trackYaw(b0.yaw, Math.atan2(tf[0] - b0.origin[0], tf[2] - b0.origin[2]), now - (b0.trackedAt ?? b0.start));
     b0.trackedAt = now;
     if (y !== b0.yaw) { b0.yaw = y; ai.yaw = y; fitBlowToGround(b0, ai.collider); }   // the foe turns with its mark
@@ -646,15 +604,6 @@ function windupTurn(ai, s, now, skipped) {
     ai._blowLandedAt = now; s.landed = { blow: b0, at: now };   // AUDIT TELL O2: its landing, for the wire
     if (atMe) ai._blowShot = { yaw: b0.yaw, at: now, fired: false };   // the attack component draws, the sprite looses
     s.blowReady = cooled; s.state = 'wait'; s.blow = null;
-    return false;
-  }
-  if (now >= s.blow.land && b0.kind === 'pyre') {   // RVN5: its blast - a spell at my feet (the pool casts it), never a swing
-    ai._blowLandedAt = now; s.landed = { blow: b0, at: now };
-    const hit = !!tf && inBlow(b0, tf[0], tf[2]);
-    s.blow = null; s.blowReady = cooled;
-    if (atMe && hit) ai._blowPyre = { at: now };
-    if (tf && !hit) { beginOverreach(ai, s, b0, now, b0.lateIn === true, atMe); return true; }   // TELL4: missed - it stands spent
-    s.state = 'wait';   // the aimed shot's law: its landing was its blow - no swing, no spell on top
     return false;
   }
   if (now >= s.blow.land) {
@@ -695,7 +644,7 @@ function resolveLanding(ai, s, b, verdict, now, cooled, atMe = true, judged = at
   // charge - its foe ends its lane past its target
   const ent = ai.vitals?.();
   const shapes = ent ? blowShapesOf(ent.mobileType, ent).filter((k) => !GAP_CLOSERS.includes(k)) : [];
-  if (!GAP_CLOSERS.includes(b.kind) && (b.chain ?? 0) < chainMax(ent) && chains(blowFamily(ent?.mobileType), ent, shapes) && Math.random() < TELL.CHAIN_CHANCE) {   // RVN4: phase two chains to three
+  if (!GAP_CLOSERS.includes(b.kind) && (b.chain ?? 0) < 1 && chains(blowFamily(ent?.mobileType), ent, shapes) && Math.random() < TELL.CHAIN_CHANCE) {
     const next = chainShape(b.kind, shapes);
     if (next) {
       s.state = 'chain'; s.chainAt = now + TELL.CHAIN_GAP; s.chainShape = next; s.chainN = (b.chain ?? 0) + 1; s.chainKey = b.key ?? targetKey(ai);   // AUDIT TELL B8: at the same target
@@ -704,9 +653,8 @@ function resolveLanding(ai, s, b, verdict, now, cooled, atMe = true, judged = at
       return true;
     }
   }
-  // TELL4 (6.1): it missed - OVERREACHED; inside at the late sample and out at the landing, a perfect dodge. AUDIT FEUD 2:
-  // OUT, judged here - a leap a ledge stopped short, a charge a wall stopped, misses a target that never left its shape:
-  // no dodge of its, and (FEUD BALANCE) no will broken by it
+  // TELL4 (6.1): it missed - OVERREACHED; inside at the late sample and out at the landing, a perfect dodge. A leap a ledge
+  // stopped short, or a charge a wall stopped, misses a target that never left its shape: no perfect dodge.
   if (!verdict) { const tfo = targetFeet(ai, b.key !== undefined ? b.key : targetKey(ai)); beginOverreach(ai, s, b, now, b.lateIn === true && !(tfo && inBlow(b, tfo[0], tfo[2])), atMe); return true; }   // AUDIT TELL O5: a peer's perfect dodge is the peer's to see
   s.state = 'engage';
   ai._tacStrike = true;
@@ -727,13 +675,6 @@ export function aimsShots(ai, ent) {
 }
 /** The shapes begun out of reach. */
 export const GAP_CLOSERS = Object.freeze(['charge', 'leap']);
-/** RVN5 (16.1): does its signature's shape reach its target now - a gap-closer out of reach with its lane free, the pyre
- *  in its range and in sight at me (its blast is cast at the local player alone), any other in reach? */
-export function signatureReaches(ai, ent, kind, dist, near, dx, dz) {
-  if (GAP_CLOSERS.includes(kind)) return !near && gapCloses(ai, kind, dist, dx, dz, ent);
-  if (kind === 'pyre') return dist <= BLOW.pyre.range && !!ai.inSight && targetKey(ai) === LOCAL;   // its blast is mine alone: a peer's or a foe's is RVN13's (off the wire)
-  return near;
-}
 /** May `kind` be begun from `dist` out along (dx, dz)? The charge: 5-12 m, its lane free of the collider and of cover
  *  (ai/cover.js) to the target and a metre past. TELL6c the leap: 3-9 m, a clear line to the target, ground under its
  *  point, never a flyer. A shape of reach: never out of it. */
