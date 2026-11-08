@@ -14,6 +14,11 @@ GitHub Release, how the app updates itself, and where the patch notes come from.
 Installers carry no game data. The player points the app at an ARENA2 folder, or the game's in-page picker takes
 over.
 
+The install folder holds the game's licence beside Electron's own (`LICENSE.electron.txt`, `LICENSES.chromium.html`):
+`LICENSE.txt`, the repository's `LICENSE`, copied by `extraFiles` in `app/package.json`. `dist/` inside `app.asar`
+carries the same `LICENSE.txt` and `THIRD-PARTY-LICENSES.txt`, the licences of the npm packages in the web build
+(`scripts/buildLicense.mjs`).
+
 | File | Role |
 | --- | --- |
 | `app/main.cjs` | Main process: the `dagger://` protocol that serves the game, the window fence (only `dagger://` loads inside; `http(s)` opens in the system browser), menus, updates. |
