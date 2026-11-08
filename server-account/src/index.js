@@ -321,7 +321,7 @@ import { motherlodesRead, strikeMotherlode, isMotherlodeNode } from './motherlod
 import { marketRead, marketList, marketBuy, marketCancel, marketOrder, marketFill, marketUnorder, marketCollect, marketReport, marketRemove, marketAuction, marketBid, marketGoldCollect, marketVendor, marketVendors, marketMyVendors, marketRoad } from './market.js';   // PROF5: the market; PROF5b: its auctions; GOLD-MARKET: gold held collected; RPT1026-MARKET: the road alone
 import {
   listRealm, createRealm, joinRealm, checkpointRealm, getRealmBlob, leaveRealm, deleteRealm,
-  realmMintFacts, REALM_CHARACTERS_MAX, REALM_MAX_BYTES, objectBytesOf,
+  realmMintFacts, modeClaimOf, REALM_CHARACTERS_MAX, REALM_MAX_BYTES, objectBytesOf,
 } from './realm.js';   // REALM P1: the realm's characters; ARENA4b: the level on a realm character's tile, the token's `cl`
 import { grantSpoils, portentPieces } from './budget.js';   // INT5: a signed win's spoils fill the playing character's budget (AUDIT WB14 WIRE-6: a portent's pieces with them)
 import { reviewAct } from './review.js';   // INT6: the review of the judge's verdicts
@@ -1237,7 +1237,7 @@ const service = {
         // AUDIT LEGACY III O1: AND WHICH REALM CHARACTER (`ci`, beside a 1 alone) - the relay stamps it on a wedding's frames,
         // so each half names the character its player saw. Kept when a house is left unsaid: the widest token without a
         // house is under TOKEN_MAX_CHARS with it (test/auditlegacy3)
-        const signed = { s: who.player.id, n: nameWorn.name, k: accountKind(who.player), ...wardrobe, mu, lv, ...(guild ?? {}), rc, ...(rc ? { ci: body.character } : {}), ...(ar !== undefined ? { ar } : {}), ...(cl != null ? { cl } : {}), ...(wa ? { wa } : {}), ...(fz ? { fz } : {}) };
+        const signed = { s: who.player.id, n: nameWorn.name, k: accountKind(who.player), ...wardrobe, mu, lv, ...(guild ?? {}), rc, ...(rc ? { ci: body.character } : {}), ...modeClaimOf(facts), ...(ar !== undefined ? { ar } : {}), ...(cl != null ? { cl } : {}), ...(wa ? { wa } : {}), ...(fz ? { fz } : {}) };
         let token = await mintToken(house ? { ...signed, ...house } : signed, key, { subtle, nowS });
         // the token's own bounds (identityToken.js TOKEN_MAX_CHARS, and AUDIT LEGACY III O11 the relay hello's TOKEN_BODY_MAX):
         // a house that would take it past either is left unsaid, never the rest
@@ -2481,7 +2481,7 @@ const service = {
         // REALM-GZIP: every answer that hands a tab a lease says this service opens a packed save - a tab packs only then,
         // so a new build before its service is deployed (or after one rolled back) sends the text it always sent
         const leased = (/** @type {any} */ r) => answer(r.error ? r : { ...r, gzip: true });
-        if (path === '/v1/realm/create') return leased(await createRealm(rctx, me, { name: body.name, summary: body.summary, lineage: body.lineage, person: body.person }));   // LEGACY7: born as a person of the account's own line
+        if (path === '/v1/realm/create') return leased(await createRealm(rctx, me, { name: body.name, summary: body.summary, lineage: body.lineage, person: body.person, mode: body.mode }));   // LEGACY7: born as a person of the account's own line
         if (path === '/v1/realm/join') return leased(await joinRealm(rctx, me, body.id));
         if (path === '/v1/realm/trade') {
           // REALM P2.1: a sequence refused says the service's own, as a checkpoint's does
