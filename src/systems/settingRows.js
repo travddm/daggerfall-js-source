@@ -8,3 +8,4 @@ export { REPAIR_PRICE_ROW } from './repairPriceRow.js';
 export { LOCKPICK_TUMBLERS_ROW } from './lockpick/lockpickTumblersRow.js';
 export { DRESS_FOR_THE_PART_ROW } from './dressForThePartRow.js';
 export { GUILD_PROBATION_ROW } from './guildProbationRow.js';
+export { HORSE_WALKS_ROW } from './upkeep/horseWalksRow.js';
