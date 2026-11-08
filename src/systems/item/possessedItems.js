@@ -10,7 +10,7 @@ const lists = (/** @type {any[]} */ ...ls) => ls.filter(Array.isArray);
 const arrayOf = (/** @type {unknown} */ x) => (Array.isArray(x) ? x : []);
 const objectOf = (/** @type {unknown} */ x) => (x && typeof x === 'object' ? /** @type {Record<string, unknown>} */ (x) : {});
 
-/** Come Sail Away's, the sea fight's and the feud's records in a save's per-mod slot (realmGoldLaw.js's own names). */
+/** Come Sail Away's, the sea fight's and the revenants' records in a save's per-mod slot (realmGoldLaw.js's own names). */
 const CSA_VENDOR = 'come-sail-away', NAVAL_VENDOR = 'NavalCombat', REVENANT_VENDOR = 'Revenant';
 /** A building's interior, by the name the scene cache files it under (sceneCache.js interiorSceneName; realmGoldLaw.js
  *  keeps the same). */
@@ -40,7 +40,6 @@ export function possessedItemLists(save) {
   out.push(...lists(...Object.values(objectOf(csa?.packedCargoes))));
   for (const c of arrayOf(save?.modData?.[NAVAL_VENDOR]?.party?.party)) out.push(...lists(/** @type {any} */ (c)?.items));
   for (const r of arrayOf(save?.modData?.[REVENANT_VENDOR]?.list)) if (/** @type {any} */ (r)?.sworn && !/** @type {any} */ (r).defeated) out.push(...lists(/** @type {any} */ (r).companion?.items));
-  for (const r of arrayOf(save?.modData?.[REVENANT_VENDOR]?.list)) if (/** @type {any} */ (r)?.sworn && !/** @type {any} */ (r).defeated) out.push(...lists(Object.values(objectOf(/** @type {any} */ (r).companion?.gear)).filter((it) => it && typeof it === 'object')));   // RVN-GEAR: and the kit it wears (revenantGear.js)
   return out;
 }
 

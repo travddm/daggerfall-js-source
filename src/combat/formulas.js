@@ -456,18 +456,6 @@ export const isSkeletalTarget = (target) => {
   return target.careerIndex === SKELETAL_WARRIOR_INDEX;
 };
 
-/** RVN2 (13.2): NAMED VETOES on silver's double against a kind it doubles against -
- *  `fn(target) -> true` keeps silver to its plain damage on that target (a Silver-scarred revenant's: its kind's double
- *  gone). With none registered, or none answering true, DFU's double stands - in both cores (this one's Skeletal Warrior,
- *  PCAAO's six beside it). A veto that throws is no veto. */
-const _silverVetoes = new Map();
-export function registerSilverDoubleVeto(name, fn) { if (typeof fn === 'function') _silverVetoes.set(name, fn); else _silverVetoes.delete(name); }
-/** Does silver double against `target` (its kind aside - the cores ask only for a kind it doubles against)? */
-export function silverDoubles(target) {
-  for (const fn of _silverVetoes.values()) { try { if (fn(target) === true) return false; } catch { /* a veto that throws is none */ } }
-  return true;
-}
-
 // ---- CalculateWeaponAttackDamage ----
 /** AUDIT 18: the pre-resolved `targetGroup` parameter is GONE. DFU
  *  passes the TARGET ENTITY to GetBonusOrPenaltyByEnemyType
@@ -480,7 +468,7 @@ export function weaponAttackDamage(attacker, target, damageMod, weapon, rolls = 
   let damage = weaponDamageMods(weapon, wMin + Math.floor(rolls() * (wMax + 1 - wMin))) + damageMod;   // RF1: the weapon's own modifiers over ITS roll, before the swing's mods
   if (!target.isPlayer && isSkeletalTarget(target)) {   // DEX4b: a mod's skeletal enemy too
     if ((weapon.flags & 0x10) === 0) damage = Math.trunc(damage / 2);   // edged-weapon rule
-    if (weapon.material === 2 && silverDoubles(target)) damage *= 2;    // Silver (RVN2: unless a veto keeps it plain)
+    if (weapon.material === 2) damage *= 2;    // Silver
   }
   damage += damageModifier(liveStat(attacker, 'strength'));
   damage += WEAPON_MATERIAL_MODIFIER[weapon.material] ?? 0;   // half of the in-game display, per the source comment
@@ -865,7 +853,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
   // core's crits, materials and armour, which PCAAO's apply after the blow modifiers), so a power that shares the blow
   // (Ruhn's Cleave) shares what landed, never the number before the struck foe's own armour took its part
   if (attacker.isPlayer && !attacker.peer && !target.isPlayer && damage > 0) {
-    const info = { backstab: notes.backstab, blow: whole };   // RVN1: and whether it was a backstab (the fight's ledger, systems/feudLedger.js); AUDIT 2: whether it counts whole for a per-blow charge
+    const info = { blow: whole };   // AUDIT 2: whether it counts whole for a per-blow charge
     for (const fn of _playerStrikeListeners.values()) { try { fn(attacker, target, damage, weapon, info); } catch { /* a set is not the blow's problem */ } }
   }
   return report(damage);
@@ -901,7 +889,7 @@ const _playerStruckListeners = new Map();
 export function registerPlayerStruckListener(name, fn) { if (typeof fn === 'function') _playerStruckListeners.set(name, fn); else _playerStruckListeners.delete(name); }
 const _playerStrikeListeners = new Map();
 /** AUDIT SET M2: NAMED listeners at the same tail for the other direction - `fn(attacker, target, damage, weapon, info)`
- *  (RVN1: `info.backstab` - the blow landed as a backstab), told
+ *  (`info.blow` - the blow counts whole), told
  *  when MY attack (never a peer's resolved here) resolves with damage on a foe (never a player: a duel's blow is its
  *  own), the damage final, before any host subtracts it. A name re-registered replaces, `null` removes; an answer is
  *  ignored. */

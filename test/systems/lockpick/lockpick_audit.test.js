@@ -17,6 +17,10 @@ import { createLockpickHost, OPEN_HOLD_MS } from '../../../src/scenes/lockpickHo
 import { readFileSync } from 'node:fs';
 import { SOUND } from '../../../src/systems/soundClips.js';
 import { ActionSystem, LOCKPICKING_SUCCESS_TEXT } from '../../../src/world/actionSystem.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests play the tumbler window: the option on (off is DFU's one roll, test/systems/lockpick/lockpick_dfu.test.js).
+setPref('lockpickTumblers', true);
 
 const DT = 1 / 60;
 /** Tick `act` `s` seconds in frames of DT. */
