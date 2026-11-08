@@ -43,10 +43,11 @@ export const SENSE_PREF = 'dungeonSense';
 export const SENSE_CSS = Object.freeze({ use: '#ffe9a8', door: '#9cc8ff', find: '#7dff9a', secret: '#c48cff' });
 /** AUDIT DELVE D6: each kind's form - the glow's three parts (render/nodeGlow.js: the halo, the shimmer climbing it,
  *  the motes rising out of it), each 0..1: a thing to work, the halo and its shimmer; a way through, a steady halo
- *  alone; a find, the motes - a treasure's glints - over a faint halo; a secret, the shimmer and a few faint motes, no
- *  body of light (a wall that is not quite a wall). A profession's node is all three, whole. */
+ *  alone; a find, the motes - a treasure's glints - over a faint halo; a secret, a strong shimmer and motes over a light halo,
+ *  less body than a way through (a wall that is not quite a wall). SECRET-GLOW: the shimmer was 1.6 and the halo 0.25,
+ *  which was barely visible in the game; the shimmer now carries it. A profession's node is all three, whole. */
 export const SENSE_FORM = Object.freeze({
-  use: Object.freeze([1, 1, 0]), door: Object.freeze([1.2, 0, 0]), find: Object.freeze([0.4, 0, 1]), secret: Object.freeze([0.25, 1.6, 0.35]),
+  use: Object.freeze([1, 1, 0]), door: Object.freeze([1.2, 0, 0]), find: Object.freeze([0.4, 0, 1]), secret: Object.freeze([0.9, 5, 0.8]),
 });
 const hexRgb = (hex) => { const n = parseInt(hex.slice(1), 16); return Object.freeze([((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]); };
 export const SENSE_RGB = Object.freeze(Object.fromEntries(Object.entries(SENSE_CSS).map(([k, hex]) => [k, hexRgb(hex)])));
