@@ -32,8 +32,6 @@ export const WIRE_IRON = 8;
 export const WIRE_FEINT = 16;
 /** AUDIT TELL O2: `wk`'s landed flag - its owner's landing, written for WIRE_LANDED_S after it. */
 export const WIRE_LANDED = 32;
-/** FEUD WIRE (Feud-Arc.md 25): `wk`'s signature flag - a revenant's signature (RVN5) and its WIND. */
-export const WIRE_SIG = 64;
 export const WIRE_LANDED_S = 0.5;
 /** `wl`'s ceiling (ms): no wind-up is longer. */
 export const WIRE_LAND_MS = 3000;
@@ -63,7 +61,7 @@ export function blowWire(ai, now = tacticsNow(), toWire = (p) => p) {
   if (b && k >= 0) {
     const w = toWire(b.origin);
     if (w && w.length === 3 && w.every(Number.isFinite)) {
-      out.wk = k | (b.guard === 'iron' ? WIRE_IRON : 0) | (b.feint ? WIRE_FEINT : 0) | (landed ? WIRE_LANDED : 0) | (b.sig ? WIRE_SIG : 0);
+      out.wk = k | (b.guard === 'iron' ? WIRE_IRON : 0) | (b.feint ? WIRE_FEINT : 0) | (landed ? WIRE_LANDED : 0);
       out.wy = q3(b.yaw);
       out.wl = landed ? 0 : Math.max(0, Math.min(WIRE_LAND_MS, Math.round((b.land - now) * 1000)));
       out.wo = [q2(w[0]), q2(w[1]), q2(w[2])];
@@ -87,10 +85,9 @@ export const blowWireKey = (r) => `${r.wk ?? ''}/${r.wn ?? ''}/${r.wy ?? ''}/${r
  * behind its owner's); another serial lands the live one first (its owner's chain - the one before it landed there);
  * the same serial again after it landed here (my clock ahead) is nothing new. A record without `wk` before the landing:
  * an overreach lands it (it follows a landing only), a feint's cut dashes its mark, anything else is a break (its held
- * arm cancelled); at or past the landing it lands on its own clock. FEUD WIRE: `sig` the host's signature numbers
- * (systems/revenant/revenantFeud.js SIG - the brain brings no revenant system): a blow its owner flags one is drawn in its ember, its WIND deeper. Answers the synthetic state.
+ * arm cancelled); at or past the landing it lands on its own clock. Answers the synthetic state.
  */
-export function applyBlowRecord(ai, r, { origin = null, me = false, entity = null, collider = null, now = tacticsNow(), sig = null } = {}) {
+export function applyBlowRecord(ai, r, { origin = null, me = false, entity = null, collider = null, now = tacticsNow() } = {}) {
   if (!ai || !r) return null;
   if (ai._tac && !ai._tac.puppet) releaseTactics(ai);   // AUDIT TELL O4: a brain that was mine (a seat handed back) gives up its tokens
   const s = ai._tac?.puppet ? ai._tac : (ai._tac = { puppet: true, state: 'engage', blow: null, key: null, seen: now, cancel: false, landed: null, wn: null, feet: null });
@@ -105,12 +102,11 @@ export function applyBlowRecord(ai, r, { origin = null, me = false, entity = nul
     } else {
       if (live) landPuppetBlow(ai, s, live, now);   // its owner is on another blow: this one landed there
       if (!landedThere && n !== s.wn) {
-        const iron = (r.wk & WIRE_IRON) !== 0, feint = (r.wk & WIRE_FEINT) !== 0, signature = (r.wk & WIRE_SIG) !== 0 && !!sig;
+        const iron = (r.wk & WIRE_IRON) !== 0, feint = (r.wk & WIRE_FEINT) !== 0;
         const left = Math.max(0.001, r.wl / 1000);
         const total = Math.max(BLOW[kind].windup + (iron ? TELL_IRON_EXTRA : 0), left);   // the shape's nominal length: a late record starts part-filled
-        const b = makeBlow(kind, origin, r.wy, now + left - total, signature ? sig.COLOR : iron ? IRON_COLOR : BLOW_COLOR, iron ? 'iron' : 'poise', total);
+        const b = makeBlow(kind, origin, r.wy, now + left - total, iron ? IRON_COLOR : BLOW_COLOR, iron ? 'iron' : 'poise', total);
         b.n = n;
-        if (signature) { b.sig = true; b.windPitch = sig.WIND_PITCH; }   // FEUD WIRE: its owner's signature
         if (feint) b.feint = true;   // a feint never glints (the glint is the honest tell)
         if (Number.isFinite(r.wp)) b.ahead = r.wp;
         fitBlowToGround(b, collider);
@@ -190,14 +186,13 @@ export function puppetGapLanded(ai, now = tacticsNow()) {
   return true;
 }
 
-/** 10.4: my blow on a foe winding up, as its class for its owner's meter - `{ k, back, weak }` (K by its kind and
- *  weapon, the door's `opts`; from behind its facing, judged from `from`, my feet; its weakness, RVN3's) - or null when
- *  it is not winding up (no class to weigh). AUDIT FEUD: a blow of its WEAKNESS rides whether or not it winds up (no
- *  facing to be behind) - its owner's reveal reads it (RVN13, Feud-Arc.md 25). */
-export function blowClassOf(ai, { kind = 'melee', weapon = null, claws = false, round = false } = {}, from = null, weak = false) {
+/** 10.4: my blow on a foe winding up, as its class for its owner's meter - `{ k, back }` (K by its kind and
+ *  weapon, the door's `opts`; from behind its facing, judged from `from`, my feet) - or null when
+ *  it is not winding up (no class to weigh). */
+export function blowClassOf(ai, { kind = 'melee', weapon = null, claws = false, round = false } = {}, from = null) {
   const s = ai?._tac, b = s?.state === 'windup' ? s.blow : null;
-  if (!b) return weak ? { k: blowK({ kind, weapon, claws, round }), back: false, weak: true } : null;
-  return { k: blowK({ kind, weapon, claws, round }), back: behind(b.origin, b.yaw, from), weak: !!weak };
+  if (!b) return null;
+  return { k: blowK({ kind, weapon, claws, round }), back: behind(b.origin, b.yaw, from) };
 }
 
 /** Tests: the live blows a puppet holds. */

@@ -629,7 +629,7 @@ export function resolvePendingSpells(entity, spellsByIndex) {
   return got;
 }
 
-/** The feud's and Project Legacy's records in a save's per-mod slot (systems/revenant/revenant.js REVENANT_SAVE and
+/** The revenants' and Project Legacy's records in a save's per-mod slot (systems/revenant/revenant.js REVENANT_SAVE and
  *  systems/legacy/family.js LEGACY_VENDOR, pinned equal by test/systems/itemwalk.test.js through the real records - both
  *  modules reach this one through their imports, so this one names their keys). */
 const REVENANT_VENDOR = 'Revenant';
@@ -641,8 +641,8 @@ const arrayOf = (/** @type {any} */ x) => (Array.isArray(x) ? x : []);
  * the wealth measure never reads, because no one's wealth lies in them (net/realm/realmGoldLaw.js stashedItemLists reads the rest):
  * in each cached scene, the owner's own things set out in a room (DECOR2a `decorOwn`, one item a piece) and a guild's
  * day's Buy shelves (GUILD-SHELF `guildShelves`); a living foe's kit and a guard's, in the world bag and in a
- * building's half of the save (`interior`; a dead foe's is a container the measure reads); what a revenant took (the
- * feud's `list[].took`, its own until it falls); each quest's item as its Item resource keeps it (quest/item.js
+ * building's half of the save (`interior`; a dead foe's is a container the measure reads); a revenant's `took` list, which
+ * saves from before the cut may still carry; each quest's item as its Item resource keeps it (quest/item.js
  * getSaveData `item`) and what a Foe resource will hand its spawns (quest/foe.js `itemQueue`); and Project Legacy's
  * bequests (each member's and the waiting Succession's) and remains (each list as it lies and as it was laid). Not its
  * pictures of items: a member's `look` is a paperdoll's recipe, a piece's `decor[].item` a descriptor.

@@ -149,10 +149,11 @@ test('TERMS1: the documents ship - build inputs, served at the paths the form li
   assert.equal(input.terms, DOCS.terms.file, 'terms/index.html works under npm run dev and never ships');
   assert.equal(input.privacy, DOCS.privacy.file, 'privacy/index.html works under npm run dev and never ships');
   // The form's links are ABSOLUTE (the desktop app's dagger:// cannot
-  // reach the site relatively), on the site the README names, at the
-  // directory each page is built into.
-  const site = /Play it: (https:\/\/[^/\s]+\/)/.exec(read('README.md'))?.[1];
-  assert.ok(site, 'the README no longer names the site');
+  // reach the site relatively), both on one site, at the directory each
+  // page is built into. The site was the README's "Play it" line until
+  // that line was removed: it named the upstream project's site.
+  const site = /^https:\/\/[^/\s]+\//.exec(TERMS_URL)?.[0];
+  assert.ok(site, 'the Terms link is an absolute https address');
   assert.equal(TERMS_URL, `${site}${DOCS.terms.file.replace('index.html', '')}`);
   assert.equal(PRIVACY_URL, `${site}${DOCS.privacy.file.replace('index.html', '')}`);
   // ...and the site itself links them, from its foot, relatively.

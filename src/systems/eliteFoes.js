@@ -29,7 +29,6 @@ import { WEAPON_MATERIALS } from '../characters/weapons.js';   // BOSS-HARD: Sil
 import { PROMOTION, markPromotions, scalePromoted } from './foe-promotion.ts';
 import { CHAMPION_TRAITS } from './champions.js';   // the tier's numbers and the one scaling path
 import { renownOpens } from './sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
-import { markUnquiet } from './revenant/unquietMark.js';   // UNQUIET (Revenants.md section 46): one elite in four carries the mark - its own, never a puppet's
 
 /** Health and damage, times the foe's own (rolled, before any Elite Dungeon doubling). */
 export const ELITE_FOE_HEALTH_MULT = PROMOTION.elite.health;
@@ -110,7 +109,6 @@ export function promoteEliteFoe(entity, { own = true, eliteDungeon = false, supe
     damage: superDungeon ? ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT : ELITE_FOE_DAMAGE_MULT,
     ownHealth: own,
   });
-  if (own) markUnquiet(entity);   // UNQUIET: the mark that lets it rise, drawn on its own
   return true;
 }
 

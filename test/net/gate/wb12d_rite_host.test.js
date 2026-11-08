@@ -223,7 +223,7 @@ test('AUDIT WB12d (C3): taken over, the faithful stay the rite\'s - where they s
   peers = [far, nearby];
   const walker = await B.pool.spawnFoe(0, [E, 0, N + 5], { feetGiven: true });
   assert.equal(handOverSiteFoes(), FAITHFUL.length, 'the faithful went at the teleport');
-  const heirs = sent[0].f.filter((r) => r.e).map((r) => r.e);
+  const heirs = sent.flatMap((fr) => fr.f).filter((r) => r.e).map((r) => r.e);   // a foe in a full kit makes a frame long enough to go in two
   assert.ok(heirs.length === FAITHFUL.length && heirs.every((e) => e === 'near-0002'), 'to the one within reach of them');
   assert.ok(B.pool.foes.includes(walker) && !walker.dead, 'a wanderer goes with me');
   fresh();

@@ -1,6 +1,6 @@
 // @ts-check
 // THE ONE-TIME QUESTIONS OF MAKING A CHARACTER, on one screen: Project Legacy's model (ui/legacy/legacyModelChoice.js)
-// is put on it, and ui/startChoice.js follows its contract. Its cursor, its one answer, its keys and clicks and both
+// is put on it. Its cursor, its one answer, its keys and clicks and both
 // faces (the canvas text below, and the Enhanced Plus window of ui/enhanced/enhancedChoiceFace.js) are shared.
 //
 // ── WHY A SCREEN AND NOT A CHARGEN STAGE ──────────────────────────

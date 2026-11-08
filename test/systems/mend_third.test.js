@@ -109,8 +109,8 @@ test('MEND-THIRD: online a smith\'s whole repair of a found piece adds nothing t
     const plate = found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0);
     const mended = { ...plate, currentCondition: plate.maxCondition };
     const best = { mercantile: 100, personality: 100 };
-    assert.equal(quote('Repair', plate, { quality: 1, skills: best }), 34595);
-    assert.equal(quote('Sell', mended, { quality: 20, skills: best }) - quote('Sell', plate, { quality: 20, skills: best }), 0, 'cross-counter: the sale gains nothing for 34,595');
+    assert.equal(quote('Repair', plate, { quality: 1, skills: best }), 7207);
+    assert.equal(quote('Sell', mended, { quality: 20, skills: best }) - quote('Sell', plate, { quality: 20, skills: best }), 0, 'cross-counter: the sale gains nothing for 7,207');
     for (let rank = 0; rank <= 9; rank++) {
       const discount = (price) => reducedRepairCost(fighters, { rank }, price);
       const repair = quote('Repair', plate, { reducedRepairCost: discount });

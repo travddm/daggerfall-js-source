@@ -17,7 +17,7 @@
 // DEPARTURE (same Port-Ledger A row as the Perlin substitution):
 // DFU seeds UnityEngine.Random with TerrainHelper.MakeTerrainKey - an
 // engine-internal PRNG not in DFU source. We seed our byte-exact
-// Unity.Mathematics Random port (umRandom.js) with the same verbatim
+// Unity.Mathematics Random stream (umRandom.js) with the same verbatim
 // key; the scatter is deterministic per pixel with the same statistics,
 // but concrete positions differ from DFU. Pins pin OUR scatter.
 // Presentation substitutions (our terrain is not a Unity Terrain

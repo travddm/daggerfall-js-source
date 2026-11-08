@@ -19,9 +19,8 @@
 // A node's id is real by the law (nodeLaw.js - a hash of the pixel and
 // the UTC day); the act's end is the request's, ten minutes at most past
 // (ANY-HOUR: no hour of it is refused); the Stores' room and the dice are
-// the service's (CAP-OFF: no day's cap). The act's report moves the roll
-// by its bounded step only (PROF0 5.1: a bruise one less, the Basket's
-// +50% at most) - the tool, its wear, the foe and the load are the
+// the service's (the day's cap is profDayCaps.js's). The act's report moves the roll
+// by its bounded step only (PROF0 5.1: a bruise one less, the Basket's +50% at most) - the tool, its wear, the foe and the load are the
 // client's courtesy.
 //
 // ═══ ONE STATEMENT DECIDES, AND A REQUEST ASKED TWICE IS ONE ════════
@@ -46,6 +45,8 @@ import { marksOpenFor, balanceOf, gatherStrikeStatement, gatherStrikeRid, findLi
 import { dice } from './unitRoll.js';   // SILVER-FINDS: the service's dice, below this file and marks.js (which needs them too)
 import { CHAR_ID_RE, readAll } from './service.js';   // GATHER-SPEED: a harvest's reads in one round trip
 import { MARKS_MAX, utcDay, gatherFindOf } from '../../src/net/marksLaw.js';
+import { gatedQuality, priceScaleOf } from './profDayCaps.js';
+export { harvestCapped, craftCapped, smeltCapped, brewCapped, disenchantCapped, reforgeCapped } from './profDayCaps.js';   // PROFESSION-CAPS: the routes' guards
 import { renownForXp, RENOWN_XP_MAX, RENOWN_TRACKS_MAX } from '../../src/net/renown.js';
 import {
   PROFESSIONS, isProfession, rankOfXp, tierOpen, harvestXp, writXp, specOk, specsAt, SPEC_RANKS, RESPEC, trackOf,   // CRAFT3: a discipline's track its craft's
@@ -358,7 +359,7 @@ export async function profState({ db, nowS }, player, env, { character } = {}) {
     writs: { today: Number(writs[0]?.n ?? 0), max: COURT_WRITS_PER_DAY },
     hunt: huntFrom(hunt[0]),   // PROF7: the account's hides today (PROF0 6)
     hauls: Number(hauls[0]?.n ?? 0),   // PROF8: the account's hauls today (PROF0 6)
-    caps: { stores: STORES_MAX, withdraw: WITHDRAW_MAX, highHides: HIGH_HIDES_PER_DAY },   // CAP-OFF: no day's harvests, hides or hauls
+    caps: { stores: STORES_MAX, withdraw: WITHDRAW_MAX, highHides: HIGH_HIDES_PER_DAY, prices: priceScaleOf(env) },   // PROFESSION-CAPS: the day's bound is refused per act (`prof-day-cap`), not listed; the tier prices the client sets its rows to
     silver: Object.fromEntries(silverRows.map((r) => [r.material, Number(r.qty)])),   // WOVEN-PAYS: the cloth's silver counts standing
     made: madeFrom(made),   // CRAFT-HALL
     master: { made: master.length > 0 },   // MASTER-ART (Professions-Arc 57): whether today's Master's work is made
@@ -840,7 +841,6 @@ export async function harvestNode(ctx, player, env, body = {}) {
   if (made) return harvestAnswer(db, player, env, made, nowS, { repeat: true });   // the same request, racing itself
   if (await db.prepare('SELECT 1 FROM node_harvests WHERE day = ?1 AND node = ?2 AND kind = ?3 AND player = ?4 AND char_id = ?5')
     .bind(day, node, kind, player.id, character).first()) return { error: 'node-taken' };
-  // CAP-OFF: no day's cap to say - `prof-cap`, `prof-account-cap`, `prof-hunt-cap` and `prof-fish-cap` are said no more
   if (isBody) {   // PROF7: Hunting's rare hides (PROF0 6)
     const hunt = await huntToday(db, player.id, day);
     if (tier >= HIGH_HIDE_TIER && hunt.high >= HIGH_HIDES_PER_DAY) return { error: 'prof-hunt-high' };
@@ -1442,9 +1442,9 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   // SEAT2b part two: the seat's crafting halls' steps, where the crafter's guild holds the town it crafts in (seatStepsFor)
   // PROF12: and a dish's - the Apothecary's step a dish's XP (recipeLaw cookXp: a clean pan's half again, a step each)
   const halls = rollsQuality(r) || r.kind === 'dish' ? await seatStepsFor(db, player.id, character, seat, prof, nowS) : 0;
-  const quality = rollsQuality(r)   // CRAFT5: a Repair Kit's too - its quality its reach
+  const quality = await gatedQuality(db, env, player.id, character, r, rollsQuality(r)   // CRAFT5: a Repair Kit's too - its quality its reach; PROFESSION-CAPS: a Masterwork's Rare passes the level gate
     ? craftQuality(rollQuality(dice(rand), qualityOdds(rank - r.rank, { masterwright: masterworkSpec(specs[100], r) })), qualitySteps(r, { clean: clean === true, spec50: specs[50], heartwood: wood }) + halls)
-    : -1;
+    : -1, () => dice(rand));
   // SEAT2b part two (PROF0 4.8: "690 | Ram Kit | Stores (a siege work)"): A SIEGE WORK goes into the crafter's Stores, never
   // the pack - own or bought as its inputs were spent (bought first, as every spend - so bought where any input held a
   // bought unit: the smelt's rule, professionLaw smeltOrigin, read before the spend), within the Stores' room. AUDIT
