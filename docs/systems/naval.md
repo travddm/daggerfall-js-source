@@ -32,10 +32,10 @@ clock, and gets numbers or events back. Keep it that way; the tests depend on it
 - **Only the streaming world has a sea.** Interiors and dungeons (`src/scenes/worldModes.js`,
   `src/scenes/dungeonContext.js`) have none, and every transition, teleport and load empties the sea. The `?exterior`
   bench (`src/scenes/exterior.js`) has no Come Sail Away runtime and therefore no sea fight.
-- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (on; forced on online) plus the drawer
-  prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`, `naval-handling`
-  (`responsive` or `classic`) and `naval-auto-repair`. `navalOn()` in `world.js` needs both the Come Sail Away runtime
-  and the `naval` pref. With Come Sail Away off there is no sea fight.
+- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; forced off online) plus
+  the drawer prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`,
+  `naval-handling` (`responsive` or `classic`) and `naval-auto-repair`. `navalOn()` in `world.js` needs both the Come
+  Sail Away runtime and the `naval` pref. With Come Sail Away off there is no sea fight.
 
 ## Boats and sailing (Come Sail Away)
 
@@ -179,9 +179,10 @@ Storm, treasure fleet on a shared clock), `seaVaults.js` and `seaSpoils.js` are 
 - Come Sail Away boats ride the owner's foes frame as `sa` (`comeSailAwayWire.js`): pose, sails, helm, lanterns, and a
   velocity for smooth leading. Peers can stand on another player's boat (`src/scenes/comeSailAway/comeSailAwayAboard.js`)
   but never sail or open it.
-- The sea's ships ride as `nv` (`src/systems/naval/navalWire.js`): ships (`s`), volleys (`v`), barrels (`b`), the
-  owner's boat (`p`), notoriety (`n`), traffic density (`t`) and more. The relay reads nothing inside a foes frame,
-  so naval changes need no relay change, and `navalWire.js` stays out of the relay's bundle.
+- The sea fight is forced off online, so the `nv` frame below is sent only by an offline build with the `naval` pref
+  on, or by a test. The sea's ships ride as `nv` (`src/systems/naval/navalWire.js`): ships (`s`), volleys (`v`),
+  barrels (`b`), the owner's boat (`p`), notoriety (`n`), traffic density (`t`) and more. The relay reads nothing
+  inside a foes frame, so naval changes need no relay change, and `navalWire.js` stays out of the relay's bundle.
 - One player **stands** the sea for everyone within `NAVAL_SHARE_RADIUS`: the lowest id among players on the water
   (the election in `src/systems/campEncounters.js`). Others show puppets eased toward the stander's word.
 - A ship is her seed. Her word carries a handover count (`gen`); of two claims the higher count wins, then the lower
@@ -211,7 +212,8 @@ The sea's AI ships are never saved: they are rolled again from the waters and th
   `test/systems/shipyards1*.test.js`, `test/systems/wa1_warmAshesShips.test.js`.
 - Harnesses: `test/csaScene.mjs` runs the real Come Sail Away runtime; `test/navalSea.mjs` and `test/navalRoom.mjs`
   build a sea and an online room for the naval host.
-- In game: buy a boat at a port's shipyard, sail out and fight. Online needs two clients near each other on the water.
+- In game: buy a boat at a port's shipyard, turn on Naval Combat in the Features home, sail out and fight. Online has
+  boats and cargo but no sea fight.
 
 ## Known limits and traps
 

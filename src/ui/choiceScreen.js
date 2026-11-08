@@ -1,6 +1,6 @@
 // @ts-check
 // THE ONE-TIME QUESTIONS OF MAKING A CHARACTER, on one screen: Project Legacy's model (ui/legacy/legacyModelChoice.js)
-// is put on it, and ui/startChoice.js follows its contract. Its cursor, its one answer, its keys and clicks and both
+// is put on it. Its cursor, its one answer, its keys and clicks and both
 // faces (the canvas text below, and the Enhanced Plus window of ui/enhanced/enhancedChoiceFace.js) are shared.
 //
 // ── WHY A SCREEN AND NOT A CHARGEN STAGE ──────────────────────────
@@ -72,24 +72,29 @@ export const CHOICE_STACK_GAP = 3;
 /** LEGACY-CHOICE: WHERE EACH BLOCK STARTS ON A STACKED SCREEN - each under the last by its own height and the gap, so
  *  three answers fit the 200 the fixed pitch spends on two - and, one past the last, where the footer stands. The
  *  draw and the hit test read this one table, as they read the fixed pitch's. */
-export function stackedTops(options = /** @type {readonly any[]} */ ([])) {
-  const tops = [CHOICE_TOP];
-  for (let i = 0; i < options.length; i++) tops.push(tops[i] + choiceHeight(options[i]) + CHOICE_STACK_GAP);
+export function stackedTops(options = /** @type {readonly any[]} */ ([]), top = CHOICE_TOP, gap = CHOICE_STACK_GAP) {
+  const tops = [top];
+  for (let i = 0; i < options.length; i++) tops.push(tops[i] + choiceHeight(options[i]) + gap);
   return tops;
 }
+/** CHARACTER MODES: a COMPACT screen's title row and first block - no lines under the title, so five two-line answers and the
+ *  footer fit the 200. */
+export const CHOICE_COMPACT_TOP = 16;
+export const CHOICE_COMPACT_GAP = 2;
 /** The keys a screen of `n` answers names ('1 or 2', '1, 2 or 3'). */
 export const choiceKeysWord = (n) => (n <= 1 ? '1' : `${Array.from({ length: n - 1 }, (_, i) => i + 1).join(', ')} or ${n}`);
 
 export class ChoiceScreen {
   /** @param {(id: string) => void} onAnswer
-   *  @param {{ options: readonly any[], text: { title: string, lines: readonly string[] }, faceText: any, faceTags?: any, stacked?: boolean }} question
+   *  @param {{ options: readonly any[], text: { title: string, lines: readonly string[] }, faceText: any, faceTags?: any, stacked?: boolean, compact?: boolean }} question
    *  `options` are the answers, `text` the canvas face's words above them, `faceText` / `faceTags` the Plus face's. */
-  constructor(onAnswer, { options, text, faceText, faceTags = null, stacked = false }) {
+  constructor(onAnswer, { options, text, faceText, faceTags = null, stacked = false, compact = false }) {
     this._onAnswer = onAnswer;
     this.options = options;
     /** LEGACY-CHOICE: a stacked screen's own block tops (stackedTops), one past the last its footer's; null keeps the
      *  fixed pitch. */
-    this.tops = stacked ? stackedTops(this.options) : null;
+    this.tops = compact ? stackedTops(this.options, CHOICE_COMPACT_TOP, CHOICE_COMPACT_GAP) : stacked ? stackedTops(this.options) : null;
+    this.compact = compact;
     this.text = text;
     this.faceText = faceText;
     this.faceTags = faceTags;
@@ -152,6 +157,8 @@ export class ChoiceScreen {
     'char:1': 'one', Digit1: 'one', Numpad1: 'one',
     'char:2': 'two', Digit2: 'two', Numpad2: 'two',
     'char:3': 'three', Digit3: 'three', Numpad3: 'three',   // LEGACY-CHOICE: the third answer online
+    'char:4': 'four', Digit4: 'four', Numpad4: 'four',   // CHARACTER MODES: the mode question has five
+    'char:5': 'five', Digit5: 'five', Numpad5: 'five',
   });
 
   input(action) {
@@ -173,6 +180,8 @@ export class ChoiceScreen {
       case 'one': this.pickIndex(0, false); break;
       case 'two': this.pickIndex(1, false); break;
       case 'three': this.pickIndex(2, false); break;   // a screen of two has no third: refused as no option
+      case 'four': this.pickIndex(3, false); break;
+      case 'five': this.pickIndex(4, false); break;
       case 'confirm': this.pickIndex(this.cursor, false); break;
       default: break;   // every other key is inert: this screen has no way out but an answer
     }
@@ -255,9 +264,11 @@ export class ChoiceScreen {
     const centre = (text, y, colour) =>
       at(text, (NATIVE_W - measureText(font.fnt, text)) / 2, y, colour);
 
-    centre(this.text.title, 12, gold);
-    centre(this.text.lines[0], 24, dim);
-    centre(this.text.lines[1], 34, dim);
+    centre(this.text.title, this.compact ? 3 : 12, gold);
+    if (!this.compact) {
+      centre(this.text.lines[0], 24, dim);
+      centre(this.text.lines[1], 34, dim);
+    }
 
     this.options.forEach((opt, i) => {
       const on = i === this.cursor;

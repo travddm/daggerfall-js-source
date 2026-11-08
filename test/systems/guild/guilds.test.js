@@ -160,14 +160,11 @@ test('guilds: a lost reputation demotes, and a negative one expels', () => {
   assert.equal(down.textId, DEMOTION_TEXT_ID, 'every guild demotes on the shared 667');
   assert.equal(hasJoined(memberships, g), true, 'a demotion keeps the membership');
 
-  // REP6 (the reputation overhaul: "probation below 0, and expulsion only below -10, with a warning first"):
-  // below zero is a probation first (the rank and the membership kept, test/systems/guild/rep6_probation.test.js), and the review that
-  // finds the member still on probation and below -10 expels (DFU: the first review below zero)
+  // DFU: the first review that finds the member below zero expels (Guild.cs UpdateRank l.84-92). The probation before it is
+  // the Guild probation option's, off by default (test/systems/guild/rep6_probation.test.js)
   setReputation(store, g.factionId, -1);
-  assert.equal(updateRank(memberships, g, entity, store, day(56)).outcome, 'probation');
-  setReputation(store, g.factionId, -11);
-  const out = updateRank(memberships, g, entity, store, day(84));
-  assert.equal(out.outcome, 'expulsion');
+  const out = updateRank(memberships, g, entity, store, day(56));
+  assert.equal(out.outcome, 'expulsion', 'the first review below zero expels');
   assert.equal(out.rank, -1);
   assert.equal(out.textId, EXPULSION_TEXT_ID, 'and expels on the shared 668');
   // EXPULSION REMOVES THE MEMBERSHIP, right here, as DFU does. Leaving

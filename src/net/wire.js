@@ -857,7 +857,7 @@ export const PARTY_LOC_MAX = 32;
 export const BOUNTY_POSE_MAX = 8;
 /** BOUNTY-TIER: the highest level a party pose's `lv` carries. */
 export const BOUNTY_POSE_LV_MAX = 99;
-/** LAIR-WORLD: a town's pixel the world's (worldPixelOk's four digits either side of the Bay's corner), as
+/** A town's pixel the world's (worldPixelOk's four digits either side of the Bay's corner), as
  *  bountyBoard.js BOUNTY_ID_RE reads it - a board past the Bay posts too. A relay before it drops such a row: the share is
  *  not taken up, nothing closes. */
 export const BOUNTY_POSE_ID_RE = /^\d{1,7}\.-?\d{1,4}\.-?\d{1,4}\.[0-3]\.\d{1,2}$/;
@@ -1306,22 +1306,10 @@ export const LIVING_ID_RE = /^L\d{1,10}\.[tw]?\d{1,6}(?:~\d{1,9})?$/;
  *  point at most this far along its yaw (m - the bow band's far edge with room). */
 export const FOE_WINDUP_MS = 3000;
 export const FOE_WINDUP_REACH = 64;
-/** RVN13 (25): a revenant's own on the foe record - its adaptations' mask (sixteen bits,
- *  systems/revenant/revenantFeud.js ADAPTATIONS; at most FOE_ADAPT_MAX of them set - its ADAPT_MAX) and its weakness's index
- *  (WEAKNESSES, the last FOE_WEAK_MAX). This file names none of them; the tests hold the numbers in step. */
-export const FOE_ADAPT_MASK_MAX = 0xffff;
-export const FOE_ADAPT_MAX = 3;
-export const FOE_WEAK_MAX = 13;
-/** FEUD WIRE (25): a revenant's blows - its stand's own factor on its kind's (its rank's,
- *  its wrath's, a Night-stalker's night: systems/revenant/revenantFeud.js BLOWS_WIRE), per mille. A rank-5 one in its full wrath
- *  by night is x1.98; the ceiling leaves room. */
-export const FOE_BLOWS_MIN = 1000;
 /** BOSS-TRAITS: a foe's traits on the wire - a mask over systems/bossTraits.js BOSS_TRAITS,
  *  eleven bits (held equal to its BOSS_TRAIT_MASK_MAX by test/systems/bosstraits.test.js: the relay's bundle carries no
  *  systems module). */
 export const FOE_TRAITS_MAX = 0x7ff;
-export const FOE_BLOWS_MAX = 4000;
-const bitsOf = (v) => { let n = 0; for (let x = v; x; x &= x - 1) n++; return n; };
 /** DEX1: a foe's kind on the wire - MobileTypes' own space (a u16, None its top), where a mod's enemies join the
  *  classic 0-42 and 128-146 (Daggerfall Enemy Expansion's 256-290 and 384-398: systems/enemyExpansion/). It was 255, which
  *  refused every record of a mod's foe whole. A kind no row names lands as one did before: a peer finds no row for it. */
@@ -1455,16 +1443,6 @@ export function validFoeRecord(r) {
     if (r.wp !== undefined) { if (!Number.isFinite(r.wp) || r.wp < 0 || r.wp > FOE_WINDUP_REACH) return null; out.wp = r.wp; }
   }
   if (r.ws !== undefined) { if (r.ws !== 1 && r.ws !== 2) return null; out.ws = r.ws; }
-  // RVN13 (25): A REVENANT'S OWN - `ad` its adaptations (a mask, at most FOE_ADAPT_MAX
-  // set), `wq` its weakness (an index), `p2` 1 in its last stand's second phase, `rt` a band follower's master's `i` (its
-  // name's) - each absent for a foe without one; a puppet stands with them, so a peer's roll sees what its owner's would
-  if (r.ad !== undefined) { if (!Number.isInteger(r.ad) || r.ad < 1 || r.ad > FOE_ADAPT_MASK_MAX || bitsOf(r.ad) > FOE_ADAPT_MAX) return null; out.ad = r.ad; }
-  if (r.wq !== undefined) { if (!Number.isInteger(r.wq) || r.wq < 0 || r.wq > FOE_WEAK_MAX) return null; out.wq = r.wq; }
-  if (r.p2 !== undefined) { if (r.p2 !== 1) return null; out.p2 = 1; }
-  if (r.rt !== undefined) { if (!Number.isInteger(r.rt) || r.rt < 0 || r.rt > FOE_SEQ_MAX) return null; out.rt = r.rt; }
-  // FEUD WIRE (Feud-Arc.md 25): `rb` its stand's blows (per mille, FOE_BLOWS_MIN..MAX) - absent for a foe without one; a
-  // puppet strikes with them (and phase two's on `p2`), so a peer is struck as its owner would be
-  if (r.rb !== undefined) { if (!Number.isInteger(r.rb) || r.rb < FOE_BLOWS_MIN || r.rb > FOE_BLOWS_MAX) return null; out.rb = r.rb; }
   // WATCH-FIX (WATCH-FIX): `lr` the living world's resident a watchman stands for (his
   // body taken by the owner's watch) - the census's id (LIVING_ID_RE); a reader takes that resident off its own street
   // while the record stands, so nobody walks beside his own guard. Absent for one who stands for nobody
@@ -1656,8 +1634,8 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  SLAM13: moved here from server/src/index.js so BOTH ENDS know the name. The welcome carries it (`v`), and the client
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
-// world291: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world291';
+// world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
+export const RELAY_VERSION = 'world295';   // world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
 // world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
 //   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
 // world282: one version for client and relay - the per-feature relay gates are gone, and a welcome naming another
@@ -5313,7 +5291,7 @@ export const OW_GRAVE_ACCT_MAX = 128;
 export function owGraveIn(r) {
   if (!Array.isArray(r) || r.length !== 3) return null;
   const [px, py, n] = r;
-  return worldPixelOk(px) && worldPixelOk(py) && intIn(n, 0, OW_GRAVE_N_MAX) ? [px, py, n] : null;   // AUDIT RELEASE R2-3: a headstone past the Bay (a lair's graveyard) is the world's pixel
+  return worldPixelOk(px) && worldPixelOk(py) && intIn(n, 0, OW_GRAVE_N_MAX) ? [px, py, n] : null;   // AUDIT RELEASE R2-3: a headstone past the Bay is the world's pixel
 }
 /** A searched grave as a cell says it - `[px, py, n, minute, acct, name]` - or null. The name (AUDIT GRAVE-PARTY G5) is the
  *  searching CHARACTER's, the token's own (NAME_MAX), '' where the relay held none: the lock is the account's, and a game

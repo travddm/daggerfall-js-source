@@ -267,8 +267,8 @@ async function boot() {
     // that once entered the room would re-enter it on New Game.
     if (typeof choice === 'string' && choice.startsWith('test:')) params.set('test', choice.slice(5));
     else params.delete('test');
-    // AUDIT STARTS W8: `?start=` is a headless boot's dev door (scenes/startsHost.js) - no menu door is one, so a URL that
-    // once carried it never moves a later new character into a province (F12's law: DELETED on every door)
+    // `?start=` was a headless boot's dev door for a province's start (removed with the provinces' starts); a stale URL
+    // may still carry it, so it is DELETED on every door (F12's law)
     params.delete('start');
     // TSR4b: the classic start is Privateer's Hold - a map cell
     // out of settings, and StartInDungeon puts a new character INSIDE

@@ -118,7 +118,7 @@ export const currentWeatherRaw = () => WEATHER_TYPES[_raw];
 // ---- WEATHER2b: THE WEATHER FIELD -------------------------
 // systems/weather/weatherField.js is the law (the day's words as
 // cells over the land, drifting on the day's wind); this is its seam
-// into the sim. On the enhanced lane the player's word is what the
+// into the sim. On the weather-events lane the player's word is what the
 // field says AT THE PLAYER - sampled every exterior frame after the
 // drain, at every travel and respawn arrival - and it goes through the
 // same `_set` (the ground law included). A change the sample makes on a
@@ -126,16 +126,18 @@ export const currentWeatherRaw = () => WEATHER_TYPES[_raw];
 // drifted over them. It is stamped apart from the jumps so the sky
 // builds a SHORT front for it (wind.js `arrive`, the sky eased on the
 // same short lead) rather than the day roll's three hours - the storm
-// was already in view. Behind Enhanced Environments and its own row on
-// the Features home (`weather-events`, the pref `weatherEvents`, forced
-// on online so one sky is shared); `?wxfield=off` the door.
+// was already in view. Behind its own row on the Features home
+// (`weather-events`, the pref `weatherEvents`, forced on online so one
+// sky is shared) and nothing else: it runs on DFU's weather words in
+// every skin, and Enhanced Environments only adds to it (the clouds'
+// cells, the air's phase law). `?wxfield=off` the door.
 let _fieldOverride = null;   // tests: true/false; null reads the lane
 let _fieldUrlDoor = null;    // ?wxfield=off, read once (lazily)
 export function setWeatherFieldLaw(on) { _fieldOverride = on == null ? null : !!on; }
 export function weatherFieldOn() {
   if (_fieldOverride !== null) return _fieldOverride;
   _fieldUrlDoor ??= new URLSearchParams(globalThis.location?.search ?? '').get('wxfield') !== 'off';
-  return _fieldUrlDoor && isEnhanced() && !!getPref('enhancedEnvironments') && !!getPref('weatherEvents');
+  return _fieldUrlDoor && !!getPref('weatherEvents');
 }
 /** WEATHER2b: the count of crossings. A host keeps the last value it saw;
  *  a new one means the change on this frame is a crossing - a short front. */
@@ -169,8 +171,7 @@ export function sampleWeatherField(nowMinutes, climateIndex, at, climateAt, how 
 // systems/weather/weatherMap.js is the law (systems born on the
 // land, drifting, growing, dying; the weather a pure function of place
 // and minute); this is its seam into the sim. On its lane - the field's
-// own (the enhanced skin, Enhanced Environments, the weather-events row,
-// forced on online) unless `?wxmap=off` hands the lane back to WEATHER2b's
+// own (the weather-events row, forced on online) unless `?wxmap=off` hands the lane back to WEATHER2b's
 // field - the player's word is the map at the player:
 //   - every exterior frame, through the same `_set` (the ground law, the
 //     raw word kept for the wind's violence);

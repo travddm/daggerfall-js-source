@@ -12,8 +12,6 @@ import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
 const GIANT = MOBILE_TYPES.Giant;   // a plain Giant: the pool's tallest ordinary foe
 import { createExteriorFoes, ENCOUNTER_PUPPETS_MAX, PEER_ELITE_PUPPETS_MAX, PEER_REVENANT_PUPPETS_MAX, PEER_CHAMPION_PUPPETS_MAX } from '../../src/scenes/exteriorFoes.js';
 import { enemySpellIndices, assignEnemySpells, MONSTER_SPELL_LISTS } from '../../src/systems/enemySpells.js';
-import { puppetBlow, WIRE_SIG } from '../../src/ai/puppetBlows.js';
-import { BLOW } from '../../src/ai/blowShapes.js';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -55,15 +53,13 @@ const READER = 'mmm-0002', FORGER = 'fff-0006';
 /** A forged record - a live foe of kind `t` at `x`, with whatever else the forger writes. */
 const rec = (i, extra = {}) => ({ i, t: 0, x: 0, f: [100 + (i % 50), 0, 100 + Math.floor(i / 50)], y: 0, h: 10, k: 10, d: 0, ...extra });
 const seqs = (from, n) => Array.from({ length: n }, (_, j) => from + j);
-/** A slam wound up with the signature's bit - all five wind-up fields together (net/wire.js validFoeRecord). */
-const sigSlam = (i) => ({ wk: 2 | WIRE_SIG, wy: 0, wl: 900, wo: [100 + (i % 50), 0, 100], wn: 1 });
 let n = 0;
 const send = async (p, from, frame) => { p.applyFoes(from, { n: ++n, ...frame }); await settle(); };
 const lootOn = () => { _resetForTests(); setPref('lootRarity', true); };
 
 test('GRANT0: the bounds - a champion\'s trait for the elites\' allowance and the revenants\' bound; what a foe casts is assignEnemySpells\' own list, at any level asked', () => {
   assert.equal(PEER_CHAMPION_PUPPETS_MAX, PEER_ELITE_PUPPETS_MAX + PEER_REVENANT_PUPPETS_MAX, 'an owner\'s capped spawns roll one in fourteen, and each of its revenants may wear its trait');
-  assert.equal(PEER_CHAMPION_PUPPETS_MAX, 17);
+  assert.equal(PEER_CHAMPION_PUPPETS_MAX, 19);
   // DFU EnemyEntity.cs's lists, as indices: a monster's its career's; a class caster's EnemyClassSpells[min(6, level / 3)]
   assert.deepEqual(enemySpellIndices({ isClass: false, careerIndex: 27 }), [0x16, 0x17, 0x1F], 'a Daedroth\'s');
   assert.deepEqual(enemySpellIndices({ isClass: false, careerIndex: 0 }), [], 'a rat casts nothing');
@@ -89,21 +85,13 @@ test('GRANT0: the bounds - a champion\'s trait for the elites\' allowance and th
   }
 });
 
-test('GRANT0 executed: the signature at the street - a forged foe\'s wind-up strikes as its shape, a believed revenant\'s at the signature\'s x2, and one past the revenants\' bound as its shape', async () => {
-  const reader = pool(READER);
-  await send(reader, FORGER, { f: [rec(0, sigSlam(0))] });
-  const plain = reader.foes.find((f) => f.puppet === FORGER && f.seq === 0);
-  assert.ok(puppetBlow(plain.ai), 'its wind-up stands');
-  assert.equal(puppetBlow(plain.ai).mult, BLOW.slam.mult, 'a plain foe\'s: the slam\'s own weight, never x2');
-  assert.notEqual(puppetBlow(plain.ai).sig, true);
+test('GRANT0 executed: a forged frame of named revenants stands PEER_REVENANT_PUPPETS_MAX of them and the rest as their plain kind', async () => {
   const r2 = pool(READER);
-  await send(r2, FORGER, { f: seqs(0, PEER_REVENANT_PUPPETS_MAX + 1).map((i) => rec(i, { nm: `Rev ${i}`, rb: 1300, ...sigSlam(i) })) });
+  await send(r2, FORGER, { f: seqs(0, PEER_REVENANT_PUPPETS_MAX + 1).map((i) => rec(i, { nm: `Rev ${i}` })) });
   const stood = r2.foes.filter((f) => f.puppet === FORGER && !f.dead);
   const revs = stood.filter((f) => f.entity.revenant), rest = stood.filter((f) => !f.entity.revenant);
   assert.equal(revs.length, PEER_REVENANT_PUPPETS_MAX);
   assert.equal(rest.length, 1);
-  assert.ok(revs.every((f) => puppetBlow(f.ai)?.sig === true), 'a revenant\'s signature, in its ember');
-  assert.equal(puppetBlow(rest[0].ai).mult, BLOW.slam.mult, 'the tenth is no revenant here, and its slam no signature');
 });
 
 test('GRANT0 executed: champions - an honest owner\'s stand as champions; a forged frame of forty stands PEER_CHAMPION_PUPPETS_MAX of them, the builds in flight counted, the rest their plain kind', async () => {

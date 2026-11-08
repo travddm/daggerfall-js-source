@@ -841,18 +841,6 @@
    "why": "a moon power's night"
   },
   {
-   "file": "src/systems/revenant/revenant.js",
-   "has": "const skyIsNight = () => { try { return isNight(skyMinutes()); }",
-   "clock": "sky",
-   "why": "RVN1/RVN2: whether a fight with a revenant began by night (its ledger's night scar), and a Night-stalker's night - its return and its blows"
-  },
-  {
-   "file": "src/systems/revenant/revenant.js",
-   "has": "const skyIsDay = () => { try { return !isNight(skyMinutes()); }",
-   "clock": "sky",
-   "why": "RVN3: whether the sky reads day - a daylight weakness bites"
-  },
-  {
    "file": "src/systems/save/save.js",
    "has": "? Math.floor(worldMinutes()), worldMinutes",
    "clock": "event",
@@ -887,12 +875,6 @@
    "has": "export const eventOfSkyLaw = (skyMinutes) => sharedClassicMinutes(wallMsForSkyMinutes(skyMinutes));",
    "clock": "law",
    "why": "BANISH-SKY: the event minute at a sky minute - a banishment's thirty days of the sky's calendar, stamped on the event clock"
-  },
-  {
-   "file": "src/systems/revenant/revenantCompanions.js",
-   "has": "export const errandWorldNow = () => errandWorldMinute(trustedWorldMinutes(), sharedClockHeardMark(), _monotonic());",
-   "clock": "event",
-   "why": "OFFLINE-ROAD: a sworn one abroad keeps the world's time, held to the session's monotonic time since the welcome (AUDIT FB1021 L3-1)"
   },
   {
    "file": "src/systems/worldTick.js",

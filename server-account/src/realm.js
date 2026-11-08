@@ -44,6 +44,7 @@
 // no route takes a player id from a caller.
 // ═══════════════════════════════════════════════════════════════════
 
+import { isMode, tokenCodeOf, modeOfRequest, creatableModes, offeredFromList, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
 import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
@@ -131,6 +132,7 @@ const view = (/** @type {any} */ r, /** @type {number} */ nowS) => {
     id: r.id, name: r.name, summary, seq: r.seq, bytes: r.bytes,
     playing: !!r.lease && nowS - r.lease_at < REALM_PLAYING_S,
     createdAt: r.created_at, updatedAt: r.updated_at,
+    mode: r.mode,   // CHARACTER MODES: the mode it was created in (net/modeLaw.js)
     lineage: r.lineage_id ?? null, person: r.person_id ?? null,   // LEGACY7: the line and the person it plays (legacy.js)
     house: r.line ? houseOn(r.line, r.person_id) : null,   // LEGACY7 part two: its house, for the tile (net/houseLaw.js)
   };
@@ -140,7 +142,7 @@ const view = (/** @type {any} */ r, /** @type {number} */ nowS) => {
  *  (legacy.js realmDie) is played no more and holds no slot; its family's record keeps it (the Hall). */
 export async function listRealm({ db, nowS }, /** @type {string} */ playerId) {
   const r = await db.prepare(
-    'SELECT r.id, r.name, r.summary, r.seq, r.bytes, r.lease, r.lease_at, r.created_at, r.updated_at, r.lineage_id, r.person_id, l.record AS line'
+    'SELECT r.id, r.name, r.summary, r.seq, r.bytes, r.lease, r.lease_at, r.created_at, r.updated_at, r.lineage_id, r.person_id, r.mode, l.record AS line'
     + ' FROM realm_characters r LEFT JOIN lineages l ON l.player = r.player AND l.id = r.lineage_id'
     + ' WHERE r.player = ? AND r.dead_at IS NULL ORDER BY r.updated_at DESC LIMIT ?',
   ).bind(playerId, REALM_CHARACTERS_MAX).all();
@@ -176,10 +178,13 @@ export const REALM_LEVEL_CLAIM_MAX = 45;
  *  asked by every mint - and a relay deploy's wave asks the mint of every player at once. One statement answers exactly
  *  what the four answered: test/server/scale4f.test.js holds it to them, as they stood at acct106, over every state a row can be
  *  in. */
+/** The mint's mode claim from `realmMintFacts`: `{ md }` for a mode but Classic, else nothing. */
+export const modeClaimOf = (/** @type {{ md: number | null }} */ facts) => (facts.md == null ? {} : { md: facts.md });
+
 export async function realmMintFacts({ db }, /** @type {string} */ playerId, /** @type {unknown} */ id) {
-  const none = { rc: 0, cl: null, wa: null, house: null, name: null };
+  const none = { rc: 0, cl: null, wa: null, house: null, name: null, md: null };
   if (typeof id !== 'string' || !REALM_ID_RE.test(id)) return none;
-  const row = await db.prepare('SELECT r.dead_at, r.lease, r.summary, r.level_seen, r.arms_top, r.arms_bow, r.person_id AS person, r.name AS name, l.record AS record'
+  const row = await db.prepare('SELECT r.dead_at, r.lease, r.summary, r.level_seen, r.arms_top, r.arms_bow, r.person_id AS person, r.name AS name, r.mode AS mode, l.record AS record'
     + ' FROM realm_characters r LEFT JOIN lineages l ON l.player = r.player AND l.id = r.lineage_id WHERE r.id = ? AND r.player = ?').bind(id, playerId).first();
   if (!row || row.dead_at != null || row.lease == null) return none;
   let summary = null;
@@ -191,6 +196,7 @@ export async function realmMintFacts({ db }, /** @type {string} */ playerId, /**
     cl: Number.isSafeInteger(lv) && lv >= 1 && lv <= REALM_LEVEL_CLAIM_MAX ? lv : null,
     wa: armsIssuable(arms) ? /** @type {[number, 0|1]} */ (arms) : null,
     house: houseOn(row.record, row.person),   // no line, no record: none (houseOn's own null)
+    md: tokenCodeOf(row.mode),   // CHARACTER MODES: the mode's token code; Classic says nothing, the bytes as before
     name: typeof row.name === 'string' && row.name ? row.name : null,   // NAME-AS: its own name, for the mint to wear where chosen
   };
 }
@@ -209,10 +215,12 @@ async function freeOthers({ db }, /** @type {string} */ playerId, /** @type {str
  * `{ id, lease, seq }` or `{ error }`.
  * @param {any} ctx @param {string} playerId @param {{ name: unknown, summary?: unknown, lineage?: unknown, person?: unknown }} at
  */
-export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null }) {
+export async function createRealm({ db, rand, nowS }, playerId, { name, summary = null, lineage = null, person = null, mode = undefined, profile }) {
   const n = realmNameOf(name);
-  if (!playerId || !n) return { error: 'body' };
   const born = lineage != null || person != null;
+  const chosen = modeOfRequest(mode, born);
+  const refused = createRefusal(playerId, n, born, chosen, profile);
+  if (refused) return refused;
   if (born && Number.isSafeInteger(person)) {
     // LEGACY7: A BIRTH WHOSE FIRST SAVE NEVER LANDED is taken up again - the same row, a new lease -
     // never refused as a person already played: the realm never held a save of them
@@ -228,9 +236,9 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
   let wrote;
   try {
     wrote = await db.prepare(
-      'INSERT INTO realm_characters (id, player, name, summary, seq, bytes, lease, lease_at, created_at, updated_at, lineage_id, person_id)'
-      + ' SELECT ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM realm_characters WHERE player = ? AND dead_at IS NULL) < ?',
-    ).bind(id, playerId, n, realmSummaryOf(summary), lease, nowS, nowS, nowS, born ? lineage : null, born ? person : null, playerId, REALM_CHARACTERS_MAX).run();
+      'INSERT INTO realm_characters (id, player, name, summary, seq, bytes, lease, lease_at, created_at, updated_at, lineage_id, person_id, mode)'
+      + ' SELECT ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM realm_characters WHERE player = ? AND dead_at IS NULL) < ?',
+    ).bind(id, playerId, n, realmSummaryOf(summary), lease, nowS, nowS, nowS, born ? lineage : null, born ? person : null, chosen, playerId, REALM_CHARACTERS_MAX).run();
   } catch (e) {
     // LEGACY7: two tabs born as one person race to the unique index - one wins
     if (born && /UNIQUE/i.test(String(/** @type {any} */ (e)?.message ?? e))) return { error: 'lineage-played' };
@@ -239,6 +247,14 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
   if (!wrote.meta.changes) return { error: 'too-many-characters' };
   await freeOthers({ db }, playerId, id);
   return { id, lease, seq: 0 };
+}
+
+/** What createRealm refuses before it writes: no account or name ('body'); and, CHARACTER MODES, a mode that is no mode or
+ *  does not agree with the birth - the Legacy mode is born of a line and no other mode is ('mode'). */
+function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen, /** @type {unknown} */ profile) {
+  if (!playerId || !n) return { error: 'body' };
+  if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
+  return creatableModes(offeredFromList(profile)).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
 }
 
 /**

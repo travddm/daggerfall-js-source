@@ -3,6 +3,7 @@
 // records, the Reforge, the shelves, chargen, the crafts, the item maker, every port item home) carries no finding, as
 // it lies in the save and as it rides the wire; and every forgery the arc's research fed the wire's old validator - each
 // taken from an honest piece and moved by one field - carries the finding that names it.
+import '../../techniquesLinked.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { honestItems, honestItemsSkipped } from '../../honestItems.mjs';

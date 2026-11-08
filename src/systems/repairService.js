@@ -33,31 +33,26 @@ import { templateByIndex, TRANSPORT_HORSE, TRANSPORT_SMALL_CART } from './item/i
 import { isEnchantedItem } from './enchantments.js';
 import { MINUTES_PER_DAY, MINUTES_PER_HOUR } from './gameDate.js';
 import { getBool } from './settings/settings.js';   // RRI2: InstantRepairs picks the mod's repair factor
-import { conditionBasedPricesOn, conditionRepairCostBase } from './roleplayRealismItems/rriRealism.js';   // RRI2: the CalculateItemRepairCost override
+import { conditionBasedPricesOn, conditionRepairCostBase } from './roleplayRealismItems/rriRealism.js';
+import { repairPriceByDamageOn } from './repairPriceByDamage.js';   // REPAIR-PRICE: off, DFU's flat tenth
 import { localizedText } from './textManager.js';   // L10N3d: the refusal, the interrupt box, the label
 import { stampLayout, layoutStampOfMapId, recordStands } from './layoutPins.js';   // WD3: a ticket names the smith's town and its layout
 import { spendOwnMends } from './item/foundMark.js';   // RPT1026-LEDGERLAW: a paid repair spends what wear took of a found piece's own mends
 
-/** B4 (tame loot and economy): a repair costs what DFU's formula asks (REPAIR-EASE and REPAIR-RATE had cut it to a third;
- *  a departure that made gear cheaper to keep than DFU, reverted). The port still turns InstantRepairs off for the price:
- *  Roleplay & Realism: Items prices an instant repair at 0.9 of the damage against 0.6, which undid the old cut under
- *  conditionBasedPrices. Instant is the port's default now, not a service bought. */
+/** B4: a repair costs what DFU's formula asks (REPAIR-EASE and REPAIR-RATE had cut it to a third, cheaper to keep than
+ *  DFU; reverted). Asked as if InstantRepairs were off: Roleplay & Realism: Items prices an instant repair at 0.9 of
+ *  the damage against 0.6 under its Repair price by damage option (off by default, so DFU's flat tenth stands). */
 export function calculateItemRepairCost(baseItemValue, shopQuality, condition, max, opts = {}) {
   return dfuItemRepairCost(baseItemValue, shopQuality, condition, max, { ...opts, instantRepairs: false });
 }
-/** CalculateItemRepairCost (:1901-1922): free at full condition; ten
- *  percent of the item's base value floored at 1, through the shop's
- *  CalculateCost (quality + regional adjustment), then the guild
- *  discount hook (guild.ReducedRepairCost - the Fighters Guild's
- *  rank scaling; every other guild returns the price unchanged).
- *  NOTE the condition/max pair gates the zero alone - DFU's repair
- *  price does NOT scale with how damaged the item is. */
+/** CalculateItemRepairCost (:1901-1922): free at full condition; a tenth of the item's base value floored at 1, through
+ *  the shop's CalculateCost (quality + regional adjustment), then the guild discount hook (the Fighters Guild's rank
+ *  scaling). The condition/max pair gates the zero alone: DFU's price does not scale with the damage. */
 export function dfuItemRepairCost(baseItemValue, shopQuality, condition, max, { reducedRepairCost = null, priceAdjustment = 1000, instantRepairs = getBool('Controls', 'InstantRepairs') } = {}) {
   if (condition === max) return 0;
-  // RRI2: the mod's override (RoleplayRealismItemsMod.cs:262-278) scales the
-  // tenth by the damage - 0.6 (0.9 under InstantRepairs) of the missing
-  // fraction - under conditionBasedPrices; the rest is DFU's own
-  let cost = conditionBasedPricesOn() ? conditionRepairCostBase(baseItemValue, condition, max, instantRepairs) : Math.trunc(10 * baseItemValue / 100);
+  // RRI2: the mod's override (RoleplayRealismItemsMod.cs:262-278) scales the tenth by the damage under the Repair price
+  // by damage option (0.6 of the missing fraction, 0.9 under InstantRepairs); the rest is DFU's own.
+  let cost = conditionBasedPricesOn() && repairPriceByDamageOn() ? conditionRepairCostBase(baseItemValue, condition, max, instantRepairs) : Math.trunc(10 * baseItemValue / 100);
   if (cost < 1) cost = 1;
   cost = calculateCost(cost, shopQuality, priceAdjustment);
   return reducedRepairCost ? reducedRepairCost(cost) : cost;

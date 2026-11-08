@@ -512,7 +512,7 @@ test('WAGONS2 (AUDIT) THE RIDERS\' WAYS OUT: an owner on the road keeps their ri
   assert.match(w, /fare\.opts, \{ \.\.\.fare\.computed, totalCost: 0, piecesCost: 0 \}\);/);
   assert.match(w, /hccRuntime\.handleStartLoad\(\);[^\n]*\n {6}wagonRiders\?\.clear\(\);/);
   assert.match(w, /if \(_mode\(\) !== 'exterior' \|\| !\(playerEntity\.health > 0\)\) wagonRiders\?\.leave\(\);/);
-  assert.match(w, /_respawning = true;\n {4}endPlayerFights\(\);[^\n]*\n {4}wagonRiders\?\.leave\(\);/);
+  assert.match(w, /_respawning = true;\n {4}wagonRiders\?\.leave\(\);/);
   // the journey's pixel: the travel map's
   const rec = (go) => validHccRecord({ w: [HCC_WIRE_KIND.Trailing, 0, 0, 0, 0, 0, 0, 1, 0, 0], wk: 1, go });
   assert.deepEqual(rec([999, 499, 1]).go, [999, 499, 1]);

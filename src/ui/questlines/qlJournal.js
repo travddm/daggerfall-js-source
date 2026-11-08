@@ -44,7 +44,7 @@ function divider(doc, word) {
 /** The tier's floor, in words. */
 export function floorWords(tier) {
   const floor = TIER_FLOORS[Math.min(4, Math.max(1, tier | 0))]?.floor ?? 'magic';
-  return floor === 'rare' ? t('ql.journal.floorRare', 'Rare or better') : t('ql.journal.floorMagic', 'Magic or better');
+  return floor === 'rare' ? t('ql.journal.floorRare', 'Rare once your level allows, else Magic') : t('ql.journal.floorMagic', 'Magic or better');
 }
 
 /** What finishing a stamped quest pays, in one line: the script's own reward and a pick of REWARD_CHOICES pieces. */

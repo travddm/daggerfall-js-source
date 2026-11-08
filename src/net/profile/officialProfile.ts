@@ -26,7 +26,15 @@ const PREFS = Object.freeze({
   climateBlend: true,
   questlines: true,
   wildernessCamps: true,
-  naval: true,
+  naval: false,
+  revenants: true,
+  humanoidLoot: 'dfu',
+  repairPriceByDamage: false,
+  cureKeepsInfection: false,
+  lockpickTumblers: false,
+  dressForThePart: false,
+  guildProbation: false,
+  questlineRewards: true,
 });
 
 /**
@@ -35,6 +43,14 @@ const PREFS = Object.freeze({
  * the party's foes, and loot changes hands. Looks and a player's own difficulty stay the player's.
  */
 const MOD_KEYS = Object.freeze({
+  // Which modes a character may be created in is the server's; Legacy is Project Legacy's `Enabled`.
+  'character-modes': Object.freeze({
+    Enabled: true,
+    'Modes.Hardcore': true,
+    'Modes.Ironman': true,
+    'Modes.HardcoreIronman': true,
+  }),
+  'project-legacy': Object.freeze({ Enabled: true }),
   'roads-hazelnut': Object.freeze({
     Enabled: true, // which network is painted, and so which beds are smoothed
     SmoothRoads: true, // whether the beds are smoothed: the heights under every road

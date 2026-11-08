@@ -35,7 +35,7 @@ import { isWelkyndStone, isVarlaStone } from '../../src/systems/ayleidStones.js'
 
 // A final find is the door's draw after every pass these laws read - held off here (no find is registered final since
 // the Dwemer Pellet's went with the guns)
-const on = () => { _resetForTests(); setPref('lootRarity', true); LR._holdFinalFindsForTests(true); };
+const on = () => { _resetForTests(); setPref('lootRarity', true); setPref('dressForThePart', true); LR._holdFinalFindsForTests(true); };
 const off = () => { _resetForTests(); setPref('lootRarity', false); LR._holdFinalFindsForTests(false); };
 const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };
 const garment = (templateIndex, extra = {}) => ({
@@ -202,6 +202,7 @@ test('LOOT14: the readers, through the real fold - DRESS1\'s standing (the gear\
   off();
   computeEntityMods(e);
   assert.deepEqual([e._mods.standing.every((v) => v === 0), e._mods.warmth, e._mods.dry], [true, 0, 0], 'off: the fold answers nothing');
+  setPref('dressForThePart', true);   // off() reset the shelf
   assert.equal(dressStanding(e).groups[DRESS_GROUP.Nobility], 3, 'and DRESS1 reads the dress alone');
   assert.ok(3 <= DRESS_CAP);
 });
