@@ -1037,7 +1037,7 @@
     "src/systems/gilded.js": 5,
     "src/systems/grammar/frenchGrammar.js": 16,
     "src/systems/guild/guildServiceFlow.js": 10,
-    "src/systems/guild/guilds.js": 2,
+    "src/systems/guild/guilds.js": 1,
     "src/systems/handheldTorches.js": 108,
     "src/systems/healthStatus.js": 8,
     "src/systems/herbAct.js": 11,
