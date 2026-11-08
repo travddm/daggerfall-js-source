@@ -10,11 +10,10 @@
 //    companion, its arrival through a portal, its leaving, a fall, a kill, a fight and its farewell when released.
 //  - A BEAST NEVER SPEAKS: the narrator says what it does, in its temperament ("with a nervous whine").
 //
-// `{p}` is the player's first name; RVN12a (23): `{how}` a learned habit, `{item}` a
-// piece it took, `{move}` its signature, `{ally}` the companion it felled (VOICE_PLACEHOLDERS - exactly these).
+// `{p}` is the player's first name.
 
 /** @typedef {'brutal'|'witty'|'humorous'|'arrogant'|'cold'|'zealous'|'unhinged'|'honourable'|'craven'|'weary'} PersonalityId */
-/** @typedef {'taunt_slew'|'taunt_fled'|'taunt_risen'|'flee'|'cornered'|'escape'|'slain'|'rise'|'yield'|'executed'|'spared'|'slip'|'arrive'|'dismiss'|'downed'|'kill'|'battle'|'release'|'learned'|'signature'|'laststand'|'stole'|'festered'|'felled_return'|'routed_return'|'deserted'|'betrayed'|'devoted_warn'} VoiceEvent */
+/** @typedef {'taunt_slew'|'taunt_fled'|'taunt_risen'|'flee'|'cornered'|'escape'|'slain'|'rise'|'yield'|'executed'|'spared'|'slip'|'arrive'|'dismiss'|'downed'|'kill'|'battle'|'release'} VoiceEvent */
 
 /** The ten, with the card's word for each, a line for the page, and a beast's manner. */
 export const PERSONALITIES = Object.freeze({
@@ -38,10 +37,6 @@ export const isPersonality = (id) => typeof id === 'string' && Object.prototype.
 export const VOICE_EVENTS = Object.freeze(/** @type {VoiceEvent[]} */ ([
   'taunt_slew', 'taunt_fled', 'taunt_risen', 'flee', 'cornered', 'escape', 'slain', 'rise',
   'yield', 'executed', 'spared', 'slip', 'arrive', 'dismiss', 'downed', 'kill', 'battle', 'release',
-  // RVN12a (23): what it learned, its signature, its last stand, what it took, its
-  // festering, its return after felling a companion or routing me, a sworn one's desertion and betrayal, a Devoted one's
-  // warning
-  'learned', 'signature', 'laststand', 'stole', 'festered', 'felled_return', 'routed_return', 'deserted', 'betrayed', 'devoted_warn',
 ]));
 
 // ── the words ───────────────────────────────────────────────────────
@@ -66,7 +61,6 @@ const LINES = deepFreeze({
     kill: ['Another one for the pile!', "Ha! That's how it's done!"],
     battle: ['Blood! Finally!', 'Leave the big one to me!'],
     release: ["Free? Then I go where the fighting is. Don't follow.", "Hmph. Next time we meet, maybe I'll kill you."],
-    // RVN12a (23): FEUD's moments
     learned: ["I know your {how} now, {p}. You won't catch me twice.", "Your {how} again? My scars say I'm ready."],
     signature: ['Taste {move}!', '{move}! Break!'],
     laststand: ['Not yet! NOT YET!', "You'll have to cut me apart, {p}!", "I'm still standing. Your mistake."],
@@ -97,7 +91,6 @@ const LINES = deepFreeze({
     kill: ["Didn't even scuff my boots.", 'One less critic.'],
     battle: ['Ooh, company!', 'Shall we dance, then?'],
     release: ['Free? How novel. Do write.', 'Farewell, {p}. You were almost tolerable.'],
-    // RVN12a (23): FEUD's moments
     learned: ['Your {how} again? I took notes last time, {p}.', "I've studied your {how}. Rather dull, really."],
     signature: ['Allow me to introduce {move}.', 'And now, {move}. Do try to keep up.'],
     laststand: ["Ah, the second act. You didn't think I'd skip it?", 'Down? Merely resting my eyes.', "You'll find I'm terribly hard to finish, {p}."],
@@ -128,7 +121,6 @@ const LINES = deepFreeze({
     kill: ['And stay down! Ha!', 'Did you see that? Tell me you saw that!'],
     battle: ['Party time!', "Ooh, this'll be a good one!"],
     release: ["Free! Ha! Don't forget me, {p}!", "I'll tell everyone about you! Mostly the good bits!"],
-    // RVN12a (23): FEUD's moments
     learned: ['Ha! Your {how} again? I know that one, {p}!', "Same old {how}? I've seen this act!"],
     signature: ['Here comes {move}! Hold still!', 'Ta-da! {move}!'],
     laststand: ['Ha! Did you think that was the end?', 'Encore! Encore!', "You'll have to try harder than that, {p}!"],
@@ -159,7 +151,6 @@ const LINES = deepFreeze({
     kill: ['As expected.', 'Know your place, wretch.'],
     battle: ['Stand aside. Watch how it is done.', 'They challenge us? Pitiful.'],
     release: ['You release me? I was never truly bound.', 'Remember that I chose to serve you, {p}.'],
-    // RVN12a (23): FEUD's moments
     learned: ['I am above your {how} now, {p}.', 'I have mastered your {how}. Bow.'],
     signature: ['Behold {move}!', 'Witness {move}, and despair.'],
     laststand: ['You cannot fell your betters, {p}.', 'I do not fall to the likes of you!', 'Rise? Of course I rise.'],
@@ -190,7 +181,6 @@ const LINES = deepFreeze({
     kill: ['One fewer.', 'Done.'],
     battle: ['Hostiles.', 'Engaging.'],
     release: ['The debt is paid. Farewell, {p}.', 'Then our account is closed.'],
-    // RVN12a (23): FEUD's moments
     learned: ['I have measured your {how}. Nothing remains.', 'I have adapted to your {how}, {p}.'],
     signature: ['{move}.', 'Now. {move}.'],
     laststand: ['Not yet.', 'Your blow was insufficient.', 'I continue.'],
@@ -221,7 +211,6 @@ const LINES = deepFreeze({
     kill: ['Judged!', 'Sent to their gods!'],
     battle: ['For the Divines!', 'The heathen approach!'],
     release: ['My vow is fulfilled. The gods walk with you, {p}.', 'I go to spread the word of your mercy.'],
-    // RVN12a (23): FEUD's moments
     learned: ['The gods taught me your {how}, {p}!', 'Your {how}? A sin the gods forgave me!'],
     signature: ['By the gods - {move}!', '{move}, by their will!'],
     laststand: ['The gods will not let me fall!', 'I am lifted up! I rise again!', 'Not by your hand, {p}!'],
@@ -252,7 +241,6 @@ const LINES = deepFreeze({
     kill: ['Broken! All broken! Hahaha!', 'Again! Do it again!'],
     battle: ['Ooh! Playmates!', 'Let me at them! LET ME AT THEM!'],
     release: ['Free! Free as a bird! A mad bird!', "Bye-bye, {p}! I'll visit! In your sleep!"],
-    // RVN12a (23): FEUD's moments
     learned: ["Hee! I'm not scared of your {how} anymore!", 'I know your {how} now, {p}! Hee hee!'],
     signature: ['{move}! {move}! {move}!', 'Here it comes - {move}! Hee!'],
     laststand: ['Hee hee! Not dead! Not DEAD!', 'More! Do it again!', "I'm still laughing, {p}! Hear me?"],
@@ -283,7 +271,6 @@ const LINES = deepFreeze({
     kill: ['A clean blow.', 'Rest now, foe.'],
     battle: ['Stand with me!', 'Face me, if you dare!'],
     release: ['My debt is paid. Go with honor, {p}.', 'Farewell, friend. I will not forget your mercy.'],
-    // RVN12a (23): FEUD's moments
     learned: ['I have learned your {how}, {p}. Fight me fairly.', 'Your {how} will not serve you again.'],
     signature: ['Guard yourself - {move}!', 'I give you fair warning: {move}!'],
     laststand: ['I am not yet beaten, {p}.', 'Again, then. On your guard.', 'My honor holds me up.'],
@@ -314,7 +301,6 @@ const LINES = deepFreeze({
     kill: ['I did that! Did you see? I did that!', 'Is it dead? Poke it.'],
     battle: ['Oh no. Oh no no no.', 'You go first!'],
     release: ["Free? Truly? I'll never fight again!", "Thank you, {p}! Don't come looking for me!"],
-    // RVN12a (23): FEUD's moments
     learned: ['I-I know your {how} now, {p}! Ha!', "Your {how} won't scare me... much."],
     signature: ['Th-there! {move}!', 'Take {move}, and leave me be!'],
     laststand: ['N-no! Not like this!', "I-I'm not done! I'm not!", "Stay back! I'll fight! I will!"],
@@ -345,7 +331,6 @@ const LINES = deepFreeze({
     kill: ['Another one. Always another.', 'Rest, poor thing.'],
     battle: ['Again. Always again.', "Let's get this over with."],
     release: ["Free. I'll find somewhere quiet, {p}. Thank you.", 'Farewell. May your road be kinder than mine.'],
-    // RVN12a (23): FEUD's moments
     learned: ['Your {how} again. I learned the hard way.', "I've had enough of your {how}, {p}."],
     signature: ["Here. {move}. Let's be done.", '{move}, then. If I must.'],
     laststand: ['Not yet. Somehow, not yet.', 'Will this never end?', "Again, then. I'm so tired, {p}."],
@@ -380,7 +365,6 @@ const BEAST = deepFreeze({
   kill: 'Stands over its kill {manner}.',
   battle: 'Lunges into the fray {manner}.',
   release: 'Looks back once {manner}, and is gone.',
-  // RVN12a (Feud-Arc.md 23)
   learned: 'Circles you {manner}. It knows your ways now.',
   signature: 'Gathers itself {manner} for something terrible.',
   laststand: 'Rises again {manner}, refusing to die.',
@@ -437,27 +421,20 @@ export function personalityFor(id, mobileType) {
 export const personalityLabel = (id) => (isPersonality(id) ? PERSONALITIES[id].label : null);
 
 // ── what it says ────────────────────────────────────────────────────
-/** RVN12a (23): THE PLACEHOLDERS, exactly - `{p}` the player's first name, `{how}` a
- *  learned habit's word ("blade", "arrows", "fire"), `{item}` a piece it took, `{move}` its signature's name, `{ally}` the
- *  companion it felled. A line naming one its caller did not hand is passed over: none is said with a `{` left in it. */
-export const VOICE_PLACEHOLDERS = Object.freeze(['p', 'how', 'item', 'move', 'ally']);
-const PLACEHOLDER = /\{(p|how|item|move|ally)\}/g;
-const fill = (s, vars) => s.replace(PLACEHOLDER, (_, k) => String(vars[k]));   // AUDIT: a `$` in a typed name is a letter, never a pattern
-const sayable = (s, vars) => [...s.matchAll(PLACEHOLDER)].every((m) => vars[m[1]] != null && vars[m[1]] !== '');
+/** `{p}` is the only placeholder. */
+const fill = (s, p) => s.replace(/{p}/g, () => p);   // a function replacement: a `$` in a typed name is a letter, never a pattern
 /** A name's possessive, one rule for every title ("Varis' Rod", "Grushnak's Shadow"). */
 export const possessive = (name) => `${name}${/s$/i.test(name) ? "'" : "'s"}`;
 /** Every line a personality has for a moment (the page's, the tests'). */
 export const voiceLines = (personality, event) => LINES[isPersonality(personality) ? personality : 'brutal']?.[event] ?? [];
 /**
  * ITS WORDS for a moment, in its own voice: a speaker's quoted line, or null for a beast (`beastBody` says what it
- * does). `p` the player's first name; `rolls` the pick (a moment said twice need not repeat); RVN12a: `how`, `item`,
- * `move`, `ally` its moment's words (a line needing one not handed is passed over).
+ * does). `p` the player's first name; `rolls` the pick (a moment said twice need not repeat).
  */
-export function voiceLine(personality, event, { p = 'stranger', rolls = Math.random, how = null, item = null, move = null, ally = null } = {}) {
-  const vars = { p, how, item, move, ally };
-  const pool = voiceLines(personality, event).filter((l) => sayable(l, vars));   // RVN12a: never a line it cannot fill
+export function voiceLine(personality, event, { p = 'stranger', rolls = Math.random } = {}) {
+  const pool = voiceLines(personality, event);
   if (!pool.length) return null;
-  return fill(pool[Math.min(pool.length - 1, Math.floor(rolls() * pool.length))], vars);
+  return fill(pool[Math.min(pool.length - 1, Math.floor(rolls() * pool.length))], p);
 }
 /** What a beast does at a moment, in its temperament - the narrator's sentence. */
 export function beastBody(personality, event) {

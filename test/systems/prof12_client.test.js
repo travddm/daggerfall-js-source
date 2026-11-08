@@ -402,8 +402,8 @@ test('PROF12 wiring: the alchemy station an Alchemist\'s (open for trade) or a h
   assert.match(w, /r = await profBook\.disenchant\(provenance\);\n\s*if \(r\?\.ok && here\(\) && !r\.elsewhere\) takeOut\(\);/);
   assert.match(w, /if \(at >= 0\) out = \{ piece: playerEntity\.items\.splice\(at, 1\)\[0\], at \};/);
   const idx = src('server-account/src/index.js');
-  assert.match(idx, /'\/v1\/prof\/brew': \(\) => brewAtStation\(ctx, who\.player, env, body\),/);
-  assert.match(idx, /'\/v1\/prof\/disenchant': \(\) => disenchantPiece\(\{ \.\.\.ctx, bucket: env\.SAVES \}, who\.player, env, body\),/);
+  assert.match(idx, /'\/v1\/prof\/brew': \(\) => brewCapped\(ctx, who\.player, env, body, brewAtStation\),/);
+  assert.match(idx, /'\/v1\/prof\/disenchant': \(\) => disenchantCapped\(\{ \.\.\.ctx, bucket: env\.SAVES \}, who\.player, env, body, disenchantPiece\),/);
   assert.match(src('server-account/src/service.js'), /'\/v1\/prof\/brew', '\/v1\/prof\/disenchant',/);
   assert.match(src('src/ui/professions/profPages.js'), /\['jeweller', \(d\) => drawJewellerBench\(d, rerender, kit\)\],   \/\/ PROF10\n\s*\['alchemy', \(d\) => drawAlchemyStation\(d, rerender, kit\)\],   \/\/ PROF12\n\s*\['enchant', \(d\) => drawEnchantingStation\(d, rerender, kit\)\],   \/\/ PROF12/);
   assert.equal(POTENT.pct, 25);

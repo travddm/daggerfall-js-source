@@ -84,8 +84,8 @@ export function crowdKept(party, ones, ...lists) {
 }
 
 /**
- * RPT1026-EVENTS CROWD-KIN: THE CROWD'S LAST CUT, ASKED WHERE A PLAYER'S OWN FOES STAND. A peer's revenants, their bands and
- * the peer's companions are puppets of a foe pool (scenes/exteriorFoes.js, scenes/dungeonContext.js), stood by the peer's own screen
+ * RPT1026-EVENTS CROWD-KIN: THE CROWD'S LAST CUT, ASKED WHERE A PLAYER'S OWN FOES STAND. A peer's revenants and
+ * companions are puppets of a foe pool (scenes/exteriorFoes.js, scenes/dungeonContext.js), stood by the peer's own screen
  * about the peer - and a player the count left undrawn left them walking the ground on mine. The draw asks the page's one
  * crowd (the one createGateCrowd made last - the world host's) without the host handing it round: the construction seam's
  * shape (systems/questlines/qlActs.js's sink), nothing of a host grown. Whether the last cut left `id` out by the count.
@@ -97,8 +97,8 @@ export const crowdCutsPeer = (id) => id != null && !!_crowdGone?.has(id);
  * RPT1026-EVENTS CROWD-KIN - A PLAYER'S OWN FOES GO WITH THEM: is foe record `f` of a foe pool one of a cut player's own, not
  * drawn here (systems/combatVisuals.js foeDraw - every pool's one draw question) nor offered to the ray (player/activate.js
  * foeAabb)? Its owner the peer whose screen stands it (`puppet`, the open world's pools - scenes/exteriorFoes.js;
- * `_ownFrom`, a dungeon's - scenes/dungeonContext.js); their own its owner's word makes it - a revenant (`nm` - `entity.revenant`), a
- * follower of a revenant's band (`rt` - `entity.bandName`) or their companion (`cp` - `companion`). A crowd of forty cut to
+ * `_ownFrom`, a dungeon's - scenes/dungeonContext.js); their own its owner's word makes it - a revenant (`nm` - `entity.revenant`) or their
+ * companion (`cp` - `companion`). A crowd of forty cut to
  * twelve still stood every revenant the forty brought, walking an empty ground. Never one on ME (`_pupMine` - its blow is
  * mine to take, and nothing that strikes me stands unseen), and never the world's foes a peer's screen happens to run (a
  * cell's encounter, a camp, a raid): those are everyone's. Pure but for the crowd's word.
@@ -106,7 +106,7 @@ export const crowdCutsPeer = (id) => id != null && !!_crowdGone?.has(id);
  */
 export const crowdKinHidden = (f) => {
   const owner = f?.puppet ?? f?._ownFrom ?? null;
-  return owner != null && !f._pupMine && (f.companion != null || !!f.entity?.revenant || !!f.entity?.bandName) && crowdCutsPeer(owner);
+  return owner != null && !f._pupMine && (f.companion != null || !!f.entity?.revenant) && crowdCutsPeer(owner);
 };
 
 /**

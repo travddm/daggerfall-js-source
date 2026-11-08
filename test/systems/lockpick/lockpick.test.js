@@ -31,6 +31,10 @@ import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { SKILLS } from '../../../src/systems/skills.js';
 import { SOUND } from '../../../src/systems/soundClips.js';
 import { PSEUDO_ARCHIVES } from '../../../src/world/pseudoArchives.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests play the tumbler window: the option on (off is DFU's one roll, test/systems/lockpick/lockpick_dfu.test.js).
+setPref('lockpickTumblers', true);
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const src = (p) => readFileSync(join(ROOT, p), 'utf8');

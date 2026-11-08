@@ -355,7 +355,7 @@ test('PROF7 items: the Skinning Knife is 603 (0.5 kg, 50 uses, 100 gold, DFU\'s 
   assert.deepEqual(HIDE_TEMPLATE_ROWS.map((r) => r.index), [655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 681, 682, 683, 665, 666, 668, 669, 670, 671]);
   assert.ok(HIDE_TEMPLATE_ROWS.every((r) => r.stackable === true && r.rarity === 10));
   assert.deepEqual([657, 659, 662, 665, 666, 670].map((t) => [templateByIndex(t).name, templateByIndex(t).baseWeight, templateByIndex(t).basePrice]),
-    [['Bear Hide', 1, 16], ['Spider Silk', 0.25, 32], ['Harpy Feathers', 0.25, 72], ['Cured Leather', 1, 24], ['Hardened Leather', 1, 108], ['Silk Bolt', 0.5, 72]]);
+    [['Bear Hide', 1, 8], ['Spider Silk', 0.25, 12], ['Harpy Feathers', 0.25, 30], ['Cured Leather', 1, 12], ['Hardened Leather', 1, 45], ['Silk Bolt', 0.5, 30]]);
   const pic = inventoryItemImage(mintMaterialItem('hide:bear', false));
   assert.deepEqual([pic.archive, pic.record], [254, 55], 'Nymph Hair\'s lock');
   assert.deepEqual(['hide:bear', 'leather:hardened', 'cloth:wool'].map((k) => { const it = mintMaterialItem(k, false); return [it.group, it.templateIndex]; }), [['UselessItems2', 657], ['UselessItems2', 666], ['UselessItems2', 669]]);

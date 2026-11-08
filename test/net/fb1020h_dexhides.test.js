@@ -76,7 +76,7 @@ test('DEX-HIDES: the three new hides - the Wolf Pelt and the Boar Hide tier 2, a
   assert.deepEqual(marketCatalogue().filter((m) => /^hide:(wolf|boar|mudcrab)$/.test(m.key)).map((m) => [m.key, m.tier, m.value]).sort(),
     [['hide:boar', 2, 2], ['hide:mudcrab', 1, 1], ['hide:wolf', 2, 2]], 'the market lists each at its tier\'s Marks value');
   assert.deepEqual([681, 682, 683].map((i) => [templateByIndex(i)?.name, templateByIndex(i)?.basePrice, templateByIndex(i)?.baseWeight]),
-    [['Wolf Pelt', 16, 1], ['Boar Hide', 16, 1], ['Mudcrab Chitin', 8, 1]]);
+    [['Wolf Pelt', 8, 1], ['Boar Hide', 8, 1], ['Mudcrab Chitin', 6, 1]]);
   assert.deepEqual(HIDE_TEMPLATE_ROWS.filter((r) => r.index >= 681 && r.index <= 683).map((r) => [r.index, r.stackable, r.rarity]), [[681, true, 10], [682, true, 10], [683, true, 10]]);
   assert.deepEqual(HIDE_TEMPLATES.slice(10, 13).map((m) => m.templateIndex), [681, 682, 683]);
   // withdrawn to the pack as their templates, on the pictures the ten borrow (a pelt Nymph Hair's lock, a chitin Fairy Dragon's Scales')

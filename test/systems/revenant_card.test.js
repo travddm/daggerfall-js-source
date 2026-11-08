@@ -241,11 +241,8 @@ test('REVENANT AAA: the forgotten and the long-fallen leave TOMBSTONES a merge k
   const me = player('char-tomb');
   const first = N.revenantDeed(me, orc(), 'fled', { now: 0, rolls: () => 0 });
   const save = JSON.parse(JSON.stringify(modSave()));
-  // UNQUIET (Revenants.md section 46): no birth past the cap buries one now - a deserter living again past it does
-  const s = N.revenantDeed(me, orc({ champion: 'swift' }), 'fled', { now: 1, rolls: () => 0 });
-  N.revenantSpared(me, { revenant: { id: s.id } }, { state: 'away' });
-  for (let i = 1; i < N.REVENANT_MAX; i++) { const x = N.revenantDeed(me, orc({ champion: 'swift' }), 'fled', { now: 1 + i, rolls: () => 0 }); x.rank = 2; }
-  N.revenantDeserts(me, N.revenantById(s.id), { now: 50 });
+  // a birth past the cap buries the weakest, oldest
+  for (let i = 1; i <= N.REVENANT_MAX; i++) { const x = N.revenantDeed(me, orc({ champion: 'swift' }), 'fled', { now: 1 + i, rolls: () => 0 }); x.rank = 2; }
   assert.equal(N.revenantById(first.id), null, 'past the cap the weakest, oldest is forgotten');
   assert.equal(N.livingRevenants().length, N.REVENANT_MAX);
   restore(save);

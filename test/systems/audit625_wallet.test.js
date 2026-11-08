@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs';
 
 import { mintWallet, walletContents, walletLines, setWalletSilver, _resetWalletForTests } from '../../src/systems/walletItem.js';
 import { decorStandOf, decorMountOf, decorOwnEntry } from '../../src/systems/decor/decorItems.js';
-import { revenantMayTake, pickTaken } from '../../src/systems/revenant/revenant.js';
 import { letterOfCredit } from '../../src/systems/inventory.js';
 import { sigilStone } from '../../src/systems/gate/gateSpoils.js';
 import { SMALL_CART_TEMPLATE } from '../../src/systems/inventorySession.js';
@@ -30,15 +29,6 @@ test('AUDIT 625 W1: the decorate panel never sets the wallet out - a piece set d
   assert.equal(decorStandOf({ group: 'UselessItems2', templateIndex: BAG_TEMPLATE }), null, 'the Materials Bag, as ever');
   const ruby = { group: 'Gems', templateIndex: 0, name: 'Ruby', stackCount: 1 };
   assert.ok(decorStandOf(ruby), 'a gem still stands');
-});
-
-test('AUDIT 625 W2: a revenant never takes the wallet - what it takes leaves the pack for its record, and one that escapes keeps it for good, while the gift is given once (PORTAL-GIFT\'s mark); the next piece is taken instead (mutants: the pack-only unread at the take)', () => {
-  const wallet = mintWallet();
-  assert.equal(revenantMayTake(wallet), false);
-  assert.equal(pickTaken('r1', 1, null, [wallet]), null, 'a pack of a wallet alone: nothing to take');
-  const ruby = { group: 'Gems', templateIndex: 0, name: 'Ruby', stackCount: 1, value: 300 };
-  for (let k = 0; k < 6; k++) assert.equal(pickTaken('r1', k, null, [wallet, ruby]), ruby, `kill ${k}: the gem, never the wallet`);
-  assert.equal(revenantMayTake(sigilStone()), true, 'a bound ember is still the feud\'s (RVN8 names its own exclusions)');
 });
 
 // ─── THE SHEET'S ROWS ────────────────────────────────────────────────
