@@ -1,3 +1,4 @@
+// PROFESSION-CAPS: the service here runs with PROF_DAY_CAPS off (src/net/profCapLaw.js), the operator's switch for no cap; test/net/profcaps_service.test.js pins the caps on.
 // CAP-OFF. A gathering profession gave a character 60 harvests a
 // UTC day (the Basket's among Herbalism's) and an account 120 in a craft (AUDIT 29 A3); Fishing 40 hauls an account;
 // Hunting 30 hides. Past them the service refused (`prof-cap`, `prof-account-cap`, `prof-fish-cap`, `prof-hunt-cap`), the
@@ -55,9 +56,10 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
   const realNow = Date.now;
   Date.now = () => NOON * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', PROF_DAY_CAPS: 'off' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
+    s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
     const day = utcDay(NOON);
     const at = NOON - 2;
     /** `n` rows of `profession` today on the account's character `char`, as a harvest writes them. */
@@ -100,7 +102,7 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
 
     // the state: the day's counts, and no cap beside them
     const st = (await s.call('/v1/prof/state', { character: mac.character }, mac.secret)).body;
-    assert.deepEqual(st.caps, { stores: STORES_MAX, withdraw: 200, highHides: HIGH_HIDES_PER_DAY });
+    assert.deepEqual(st.caps, { stores: STORES_MAX, withdraw: 200, highHides: HIGH_HIDES_PER_DAY, prices: 'dfu' });   // PROFESSION-CAPS: the tier prices' scale
     assert.deepEqual([st.today.mining, st.hauls, st.hunt], [62, 41, { hides: 31, high: 0 }]);
 
     // KEPT: the rare hides - three of tiers 5-6 taken, a fourth refused, a hide below them still credited
@@ -204,6 +206,13 @@ test('CAP-OFF the host: five hundred Mining harvests today, the vein is ready - 
     assert.equal(host.acting(), true, 'the act starts');
     assert.equal(S.meter, 'mine');
     host.cancel();
+    // PROFESSION-CAPS: a refusal that said the character's Mining day is done - the vein shows refused, and E starts no act
+    book.closed = (k) => k === 'day:ore' || k === 'day:stone';
+    host.tick(0.016);
+    assert.match(S.prompt?.rest ?? '', /done all a day allows/, 'refused: ' + JSON.stringify(S.prompt));
+    host.press();
+    host.tick(0.016);
+    assert.equal(host.acting(), false, 'no act, so no tool worn');
   } finally { host.dispose(); setForagingHost(null); }
 });
 

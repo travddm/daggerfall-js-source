@@ -30,8 +30,11 @@ test('MO1: every mod with a switch ships ON - the Mods pane is where one is turn
   const switched = Object.entries(MOD_SETTINGS).filter(([, def]) => def.keys.Enabled);
   assert.ok(switched.length >= 5, `the vendored mods with a switch: ${switched.map(([k]) => k).join(', ')}`);
   for (const [vendor, def] of switched) {
-    assert.equal(def.keys.Enabled.default, true, `${vendor} ships on`);
-    assert.equal(modSetting(vendor, 'Enabled'), true, `${vendor} reads on with nothing stored`);
+    // CHARACTER MODES: Project Legacy's switch is the master switch for the Legacy mode, and the owner's answer (Q11,
+    // 2026-11-03) is that it ships off, so the mode is not offered until a server or a player turns it on.
+    const ships = vendor !== 'project-legacy';
+    assert.equal(def.keys.Enabled.default, ships, `${vendor} ships ${ships ? 'on' : 'off'}`);
+    assert.equal(modSetting(vendor, 'Enabled'), ships, `${vendor} reads ${ships ? 'on' : 'off'} with nothing stored`);
   }
   // BR3 REVERSES MO1'S ONE EXEMPTION, and the reason it
   // was made is the reason it could go. MO1 held Basic Roads out because

@@ -1,0 +1,9 @@
+# TLS in front of the two workerd sockets. Caddy proxies WebSocket upgrades as it proxies any request. A name that
+# resolves to this machine gets a certificate from Let's Encrypt; *.localhost gets Caddy's local one.
+{$DFO_RELAY_HOST} {
+	reverse_proxy workerd:8787
+}
+
+{$DFO_ACCOUNTS_HOST} {
+	reverse_proxy workerd:8788
+}

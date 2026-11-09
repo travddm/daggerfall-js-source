@@ -165,10 +165,11 @@ export const LEGAL_REP_MAX = 100;
 
 /** Minutes between NormalizeReputations runs (PlayerEntity.cs:457, 112 days). */
 export const NORMALIZE_INTERVAL_MINUTES = 161280;
-/** REP4: a standing BELOW zero recovers a point every 7 days - legal and faction alike,
- *  lived and across an absence (worldTick.js) - where DFU's walk every 112 days takes it (and wears a positive standing
- *  down, which stays DFU's). 112 is a multiple of 7, so the 112-day walk is the week's own on its boundary. */
-export const RECOVERY_INTERVAL_MINUTES = 10080;
+/** REP4 (F3a): a standing BELOW zero recovers a point every 28 days - legal and faction alike, lived and across an
+ *  absence (worldTick.js) - where DFU's walk every 112 days takes it (and wears a positive standing down, which stays
+ *  DFU's). 28 days is 4x DFU (the week this was, 16x, was tamed). It must divide 112 days, so the 112-day walk lands on
+ *  the interval's own boundary and no minute pays twice. */
+export const RECOVERY_INTERVAL_MINUTES = 40320;
 
 /** REP5: the one ear on a legal standing's change - the host says it (a line on screen). Null by default: a host that
  *  hands none hears nothing, and the law is the same. `cause` names what moved it ('crime', 'sentence', ...). */

@@ -38,10 +38,11 @@ import { attachFactionRep } from './faction/factionRep.js';   // S25
 import { createRegionConditions } from './region/regionConditions.js';
 import { clearWorldDataVariants } from './worldDataVariants.js';   // AUDIT-RR F39: PlayerEntity.Reset (:818) clears the world variants at every new game
 import { bootstrapRegionPower } from './region/regionPower.js';   // AUDIT 26 F107   // PlayerEntity.InitializeRegionData (:2189-2218), at every new game
-import { legacyOn } from './legacy/settings.js';   // LEGACY2: Project Legacy's question - the family's model
-import { legacyModelScreen } from '../ui/legacy/legacyModelChoice.js';
-import { StartChoiceScreen } from '../ui/startChoice.js';   // START2: where the story begins, the last question
-import { STARTS, BAY_START } from './starts/starts.js';
+import { legacyModelOnlyScreen } from '../ui/legacy/legacyModelChoice.js';
+import { characterModeScreen } from '../ui/characterModeChoice.js';   // CHARACTER MODES: the first question
+import { characterModesOn } from './characterModes.js';
+import { isMode, legacy as legacyMode } from '../net/modeLaw.js';
+import { NO_LINEAGE } from './legacy/family.js';
 import { isLegacyChoice } from './legacy/family.js';   // LEGACY-CHOICE: the answer kept on the character
 
 /** SPELLS.STD as an index -> spell map. AUDIT 17f: the exterior
@@ -285,6 +286,8 @@ export function finishChargen(playerEntity, result, spellsByIndex = null, { roll
   // LEGACY-CHOICE: AND PROJECT LEGACY'S ANSWER, kept on the character - a model, or no lineage,
   // which keeps them out of the system for good (legacyHost.js found). A result the question was not put to carries none.
   if (isLegacyChoice(result.legacyModel)) playerEntity.legacyChoice = result.legacyModel;
+  // CHARACTER MODES: THE MODE, kept on the character for good (net/modeLaw.js). A result the question was not put to carries none: Classic.
+  if (isMode(result.characterMode)) playerEntity.characterMode = result.characterMode;
   return playerEntity;
 }
 
@@ -361,9 +364,7 @@ export async function createChargenFlow(fetchBytes, { rolls = Math.random } = {}
  *      that reads nativeMetrics off the real canvas itself). Since
  *      U31 that path is the `?dungeon` dev scene alone, which is why
  *      it stayed open so long - but small is not the same as absent. */
-/** START2: `startChoice` - `{ open(start), why(start) }`, a host that stands the land past the Bay asks where the story begins
- *  (ui/startChoice.js): the world host alone; every other host's new character wakes where its boot put them. */
-export function createChargenWindow(flow, { onDone, onCancel, hudScale = 2, startChoice = null } = {}) {
+export function createChargenWindow(flow, { onDone, onCancel, hudScale = 2 } = {}) {
   // THE FOUR HOSTS RULE, answered here rather than three times over. Three hosts run a new game and all three build
   // their wizard through this function - world.js:"came from hosts wiring these", exterior.js:"AUDIT 17i: ONE construction",
   // dungeonContext.js:"const missing = (targetEntity.maxHealth ?? 0)"."questPoolOps.removeFoe(f);" - so a question put after the
@@ -374,7 +375,7 @@ export function createChargenWindow(flow, { onDone, onCancel, hudScale = 2, star
   // (The reserved word for an unwired host is deliberately not used here: this file's own pin,
   // test/ui/enhanced/enhancedChargen.test.js's "the FOUR HOSTS are each named at the seam", holds that the SKIN fork has
   // no host outside it, and that guard must keep meaning what it says.)
-  return withChargenQuestions(flow, { onDone, onCancel, hudScale, startChoice });
+  return withChargenQuestions(flow, { onDone, onCancel, hudScale });
 }
 
 /** The wizard this skin wears - the fork createChargenWindow used to
@@ -404,18 +405,15 @@ function chargenWizard(flow, { onDone, onCancel, hudScale = 2 } = {}) {
  *
  * With no question to put there is no wrapper stage: the wizard's own answer goes straight out.
  */
-function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoice = null } = {}) {
+function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2 } = {}) {
   // LEGACY2: PROJECT LEGACY'S QUESTION - the family's model,
   // Bloodline or Enduring, asked of the character who founds a house (legacyModelScreen). The same door, the same one
   // overlay slot: the questions are STAGES of one window, put in turn, each answered once; the answers ride the result.
   const asks = [];
-  if (legacyOn()) asks.push((answer) => legacyModelScreen((model) => answer({ legacyModel: model })));
-  // START2: ...AND, LAST, WHERE THE STORY BEGINS - put by a host that
-  // can stand a start past the Bay (`startChoice`), once one is open there (one start open is no choice); the new
-  // character's race read off the wizard's answer, its homeland chosen first. The answer rides the result as `startKey`.
-  if (startChoice && STARTS.some((s) => s !== BAY_START && startChoice.open(s))) {
-    asks.push((answer, made) => new StartChoiceScreen((key) => answer({ startKey: key }), { race: made?.race ?? null, open: startChoice.open, why: startChoice.why }));
-  }
+  // CHARACTER MODES: THE FIRST QUESTION - how the character will play. Only the Legacy mode founds a house, so Project
+  // Legacy's question (the family's model) follows it for that mode alone; every other mode answers it for them: no lineage.
+  if (characterModesOn()) asks.push((answer) => characterModeScreen((mode) => answer(legacyMode(mode) ? { characterMode: mode } : { characterMode: mode, legacyModel: NO_LINEAGE })));
+  if (characterModesOn()) asks.push((answer, made, so) => (legacyMode(so?.characterMode) ? legacyModelOnlyScreen((model) => answer({ legacyModel: model })) : null));
   if (!asks.length) {
     return chargenWizard(flow, {
       onCancel, hudScale, onDone,
@@ -429,7 +427,8 @@ function withChargenQuestions(flow, { onDone, onCancel, hudScale = 2, startChoic
   const next = () => {
     if (stage >= asks.length) { prompt = null; fired = true; onDone?.({ ...result, ...answers }); return; }
     const i = stage++;
-    prompt = asks[i]((a) => { answers = { ...answers, ...a }; next(); }, result);
+    prompt = asks[i]((a) => { answers = { ...answers, ...a }; next(); }, result, answers);
+    if (!prompt) next();   // CHARACTER MODES: a question this answer made unnecessary
   };
   const inner = chargenWizard(flow, {
     hudScale,

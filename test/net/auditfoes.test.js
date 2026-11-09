@@ -7,13 +7,14 @@
 // is pinned by SOURCE here as every other law of that file is - it cannot be
 // mounted in node - with the comments stripped first, because FOE1 was a
 // property hiding inside a comment and a raw text match is what missed it.
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { PIXEL_UNITS } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, asOnlinePage } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
+after(asOnlinePage());   // its sessions join the real relay, so their hellos say the profile's hash
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 /** The file's CODE - a law inside a comment is not a law (FOE1). */

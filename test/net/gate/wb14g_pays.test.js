@@ -79,12 +79,12 @@ test('WB14g (PORTENT-FOLD) the floor: a portent receipt\'s list is a plain recei
   assert.equal(spoilsList(5, 20, { x: 'rite', p: 3 }).length, 1, 'the rite\'s ember alone');
 });
 
-test('WB14g (PORTENT-FOLD) the Features row `gate-portent-loot`: on by default and forced on online; off, a portent receipt list is a plain receipt list (mutants: the row unread; the default off)', async () => {
+test('WB14g (PORTENT-FOLD) the Features row `gate-portent-loot`: on by default and pinned on by the server profile; off, a portent receipt list is a plain receipt list (mutants: the row unread; the default off)', async () => {
   const { FEATURES } = await import('../../../src/systems/features.js');
   const { getPref, setPref, _resetForTests } = await import('../../../src/systems/uiPrefs.js');
   const { onlineForcedPref } = await import('../../../src/systems/online/onlineLane.js');
   const row = FEATURES.find((f) => f.id === 'gate-portent-loot');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['gatePortentLoot', true, true]);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['gatePortentLoot', true, 'room']);
   _resetForTests();
   assert.equal(getPref('gatePortentLoot'), true);
   assert.equal(onlineForcedPref('gatePortentLoot', '?online=1'), true);

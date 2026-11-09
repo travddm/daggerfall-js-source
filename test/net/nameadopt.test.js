@@ -23,7 +23,7 @@
 // `glyphs` lying right beside it.
 //
 // Each pin below REPRODUCES a symptom first and then shows it gone.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
@@ -33,6 +33,8 @@ import { AccountFlow } from '../../src/ui/accountFlow.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { rosterRows } from '../../src/net/roster.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+import { asOnlinePage } from '../fakeRoom.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const rd = (p) => hostText(p);
 

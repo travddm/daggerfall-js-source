@@ -1,0 +1,20 @@
+{
+  "name": "dfo-selfhost",
+  "private": true,
+  "description": "Runs the relay and the account service on one machine under workerd.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "generate": "node generate.ts",
+    "keys": "node keys.ts",
+    "start": "workerd serve build/dfo.capnp --experimental"
+  },
+  "dependencies": {
+    "aws4fetch": "1.0.20",
+    "esbuild": "0.28.1",
+    "smol-toml": "1.9.1",
+    "workerd": "1.20261108.1"
+  }
+}

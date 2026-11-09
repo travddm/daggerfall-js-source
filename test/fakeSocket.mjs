@@ -9,13 +9,20 @@
 //
 // A welcome given as an object carries the relay's version (`v`) as the real relay stamps every welcome
 // (server/src/index.js), so a pin speaks to the relay of its own tree unless it says otherwise. A welcome given as a
-// string is sent as written - the way to drive a relay of another version, or one that names none.
+// string is sent as written - the way to drive a relay of another version, or one that names none. The profile's hash
+// (`ph`) is stamped the same way, from the profile the page installed (systems/online/serverProfile.ts).
 import { RELAY_VERSION } from '../src/net/wire.js';
+import { installedProfileHash } from '../src/systems/online/serverProfile.ts';
 
 export const RUNTIME_PING = '{"t":"ping"}';
 export const RUNTIME_PONG = '{"t":"pong"}';
-/** A welcome as the relay of this tree stamps it: `v` added when the frame names none. */
-export const stampWelcome = (o) => (o && typeof o === 'object' && o.t === 'welcome' && !('v' in o) ? { ...o, v: RELAY_VERSION } : o);
+/** A welcome as this tree's relay stamps it: `v`, and `ph` when the page installed a profile, each where the frame names
+ *  none. */
+export const stampWelcome = (o) => {
+  if (!o || typeof o !== 'object' || o.t !== 'welcome') return o;
+  const ph = installedProfileHash();
+  return { ...o, ...(!('v' in o) ? { v: RELAY_VERSION } : {}), ...(ph && !('ph' in o) ? { ph } : {}) };
+};
 export function fakeSocketClass({ pong = true } = {}) {
   const sockets = [];
   class FakeWS {

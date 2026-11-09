@@ -384,11 +384,11 @@ test('CREW-COMPANIONS the boat\'s menu: a crewed boat of mine lists Companions w
 
 test('CREW-COMPANIONS by source: both pools knock a companion out before every death arm; the dungeon spares him my blows and never saves him', () => {
   const x = rd('src/scenes/exteriorFoes.js');
-  const knockX = x.indexOf("if (f.companion != null) { f.entity.health = 1; if (!f._knockedOut) f._knockedBy = striker; f._knockedOut = true; return; }");
+  const knockX = x.indexOf("if (f.companion != null) { f.entity.health = 1; f._knockedOut = true; return; }");
   assert.ok(knockX > 0 && knockX < x.indexOf('attemptSoulTrap(f.entity', knockX), 'the street: before the trap, the notice and the corpse');
   assert.ok(CATCH_UP_M < ENCOUNTER_CULL_DISTANCE, 'the street\'s cull never reaches a companion - the layer stands him at the player first (and re-stands a swept one)');
   const d = rd('src/scenes/dungeonContext.js');
-  const knockD = d.indexOf("if (foe.companion != null) { foe.entity.health = 1; if (!foe._knockedOut) foe._knockedBy = striker; foe._knockedOut = true; return; }");
+  const knockD = d.indexOf("if (foe.companion != null) { foe.entity.health = 1; foe._knockedOut = true; return; }");
   assert.ok(knockD > 0 && knockD < d.indexOf('attemptSoulTrap(foe.entity', knockD), 'the dungeon: before the trap and the corpse');
   assert.match(d, /if \(foe\.dead \|\| \(fromPlayer && !peer && foe\.companion != null\)\) return;/, 'no blow of mine reaches him');
   assert.match(d, /const live = (?:dropFateHeld\()?foes\.filter\(\(f\) => !f\.dead && f\.companion == null\)\)?;/, 'nor my swing');
@@ -404,7 +404,7 @@ test('CREW-COMPANIONS by source: the world stands the party in every place and e
   assert.match(w, /allied: true, loose: true, transient: true \}\)/);
   assert.match(w, /crewAshoreTick\(\);   \/\/ CREW-COMPANIONS: the party stood indoors and underground too/);
   assert.match(w, /crewAshoreTick\(\);   \/\/ CREW-COMPANIONS: the party stood on the street/);
-  assert.match(w, /onKnocked: \(c, by\) => \{ naval\?\.companionKnocked\?\.\(c\); felledBy\(by, c\.name\); \},/);
+  assert.match(w, /onKnocked: \(c\) => \{ naval\?\.companionKnocked\?\.\(c\); \},/);
   assert.match(w, /else navalCompanions\(pick\.boat\);/);
   assert.match(w, /away: naval\?\.awayOf\?\.\(boat\) \?\? NO_HANDS_AWAY \}\);/);
   const m = rd('src/scenes/worldModes.js');

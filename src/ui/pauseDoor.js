@@ -53,7 +53,6 @@
 import { isEnhanced } from '../systems/uiSkin.js';
 import { mountEnhancedChunk } from './enhanced/enhancedChunk.js';   // MENU1: the one lazy-chunk door
 import { growthPageAt } from './growth/growthPages.js';   // GROWTH1: the Growth tab's pages, on either skin (a leaf: the tab is the menu chunk's)
-import { revenantStarsOver } from './firmamentOver.js';   // RVN-STARS: a sworn one's stars, over Companions
 import { levelUpScreenFor } from './charSheetDoor.js';   // GROWTH1: a level owed's rollout, drawn in the Growth tab (the view is the tab's own)
 import { playerEntity } from '../characters/playerEntity.js';   // the shared entity the Stats page already reads (enhancedMenu's sheetModel)
 import { profPagesShown, PROF_PAGE_SECTIONS, professionsKeyAt } from './professions/profPages.js';   // CLASSIC-PAGES: the professions' pages, on either skin
@@ -290,15 +289,7 @@ function enhancedPauseOverlay(show, base) {
     // Ascension and the Firmament in its own pane (ui/growth/growthStage.js) - this door hands it the screen to draw, a
     // level owed or the view of the stars, off the shared entity the Stats page reads
     ascendScreen: () => (playerEntity ? levelUpScreenFor(playerEntity) : null),
-    // RVN-STARS: the Companions page's Stars - a sworn one's sky over this window, the window back on Companions (the
-    // owner: "Keep it on the companion page")
-    get openRevenantStars() { return rvnStars.hook; },
   };
-  const rvnStars = revenantStarsOver({
-    alive: () => !fired,
-    below: () => { try { view?.unmount(); } catch { /* already gone */ } view = null; },
-    back: () => { if (!fired && seams) view = seams.mountEnhancedMenu(host, { mode: 'pause', hooks, onAction: act, at: 'companions' }); },
-  });
   const host = document.createElement('div');
   host.id = 'enhanced-pause';
   host.setAttribute?.('data-dom-focus', '');   // AUDIT LEGACY II U3: Tab walks its controls (ui/input.js isDomFocusWalk)
@@ -344,7 +335,6 @@ function enhancedPauseOverlay(show, base) {
 
   const close = () => {
     if (fired) return;
-    rvnStars.drop();   // RVN-STARS: a sworn one's stars go with this window
     document.removeEventListener?.('keydown', tabIn, true);
     view?.unmount();
     view = null;

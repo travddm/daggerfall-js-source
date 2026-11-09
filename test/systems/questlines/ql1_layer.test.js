@@ -61,8 +61,8 @@ test('QL1 the switch: a Features row, on by default, forced on online (the owner
   assert.ok(row, 'the row stands');
   assert.equal(row.control.key, QUESTLINES_PREF);
   assert.equal(row.control.initial, true, 'on by default offline (the owner\'s answer)');
-  assert.equal(row.control.online, true, 'forced on online - never "player"');
-  assert.equal(FEATURE_PREF_ONLINE[QUESTLINES_PREF], true, 'the lane learns it from the row');
+  assert.equal(row.control.online, 'room', 'pinned online by the server profile - never "player"');
+  assert.equal(FEATURE_PREF_ONLINE[QUESTLINES_PREF], 'room', 'the row says the room holds it');
   setPref(QUESTLINES_PREF, false);
   assert.equal(questlinesOn(), false);
   assert.equal(startStamp(), null, 'off: DFU\'s quest');
@@ -465,7 +465,7 @@ test('AUDIT QUESTLINES LAW-6: M0B00Y06 whose time runs out inside its hand-in\'s
   assert.equal(rec.offers.length, 1);
 });
 
-test('AUDIT QUESTLINES LAW-6: QLCH03\'s courier letter (`give pc _letter_ notify`) pays nothing - the quest stays unpaid and its seal\'s gold is scaled x1.25; a second gold reward is never scaled again (mutants: reward\'s letter rule deleted; reward\'s paid guard on the gold deleted)', () => {
+test('AUDIT QUESTLINES LAW-6: QLCH03\'s courier letter (`give pc _letter_ notify`) pays nothing - the quest stays unpaid and its seal\'s gold is scaled x1.1; a second gold reward is never scaled again (mutants: reward\'s letter rule deleted; reward\'s paid guard on the gold deleted)', () => {
   const { rec, start, tick } = packBridge({ playerEntity: { name: 'Hero', level: 20, gender: 'male', career: { weaponArmorShieldsBitfield: 0, forbiddenMaterialsFlags: 0 }, skills: new Array(35).fill(30) } });
   const q = start('QLCH03');
   for (const t of q.tasks.values()) for (const a of t.actions) if (a.typeName === 'PlaceNpc') a.isComplete = true;
@@ -476,7 +476,7 @@ test('AUDIT QUESTLINES LAW-6: QLCH03\'s courier letter (`give pc _letter_ notify
   const minted = gold.stackCount;
   q.getTask({ name: 'toseal' }).start(); tick(6);
   assert.equal(q.ql.outcome, 'seal');
-  assert.equal(gold.stackCount, Math.round(minted * 1.25), 'greater: x1.25 at GivePc');
+  assert.equal(gold.stackCount, Math.round(minted * 1.1), 'greater: x1.1 at GivePc');
   assert.ok(rec.rewards.includes(gold), 'the scaled purse is the one offered');
   const second = goldStack(200);
   q.hooks.questReward(q, second, { itemName: 'gold' });   // a second `give pc` of gold: the quest already paid

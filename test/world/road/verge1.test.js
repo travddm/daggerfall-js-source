@@ -198,6 +198,6 @@ test('VERGE1: the switch - the row, the enhanced skin, ?verges=off; online the r
   const row = FEATURES.find((f) => f.id === 'road-verges');
   assert.deepEqual(checkFeature(row), []);
   assert.deepEqual([...row.kinds], ['enhanced']);
-  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'roadVerges', initial: true, online: true });
+  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'roadVerges', initial: true, online: 'room' });
 });
 
