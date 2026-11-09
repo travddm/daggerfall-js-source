@@ -51,7 +51,7 @@ import { CHAR_SPRITE_RT_SIZE } from '../render/renderer.js';
 import {
   sampleTrack, resetClip, advanceClip, getTextKeyTime, getStartTime,
 } from '../formats/morrowind/mwAnim.js';
-import { accumRootRef, buildSkeleton, GRAPH_ROOT } from '../formats/morrowind/mwSkin.js';
+import { accumRootRef, GRAPH_ROOT } from '../formats/morrowind/mwSkin.js';
 import { nodeTransformOf } from '../formats/morrowind/mwCharacter.js';
 import { parseNif } from '../formats/morrowind/mwNifFile.js';
 import { flattenNif } from '../formats/morrowind/mwNifMesh.js';
@@ -96,7 +96,6 @@ import { createParticleSystem, packParticleQuads, particleDrawState, affineOfTra
 import { boneSourcesFor, resolveHolsterParts, holsterPartPaths, holsterHidden, HOLSTER_SLOTS } from '../systems/weaponSheathing.js';   // WS1
 import { fitCloakOver, fitStowedGear, followCloak, HIP_PITCH_LIMIT, CLOAK_PUSH_LIMIT, SLUNG_MOVE_LIMIT } from '../formats/morrowind/mwCloakFit.js';   // MW-CLOAK1: the cloak over what the body wears, stowed gear against it; AUDIT MW-CLOAK: and going with it
 import { isCloakSlot, ownCloakFor, isOutfitSlot } from '../characters/ownModels/ownClothingModels.js';   // MW-CLOAK1; AUDIT MW-CLOAK: and its picture; AUDIT MW-FOLK1: an outfit's add, by its label
-import { injectSkeletonNodes } from '../formats/morrowind/mwSkin.js';   // WS1: the dry injection the holster's bone probe runs
 // MAP3: THE HELD SHEET - the pose deltas over the idle, the paper piece
 // the hands hold, and where its corners land on the composite
 import { deltaTracks, heldSampler, paperPiece, refreshPaperSource, projectPaperCorners, normaliseHeldPose, HELD_POSE_DEFAULT } from './heldPose.js';
@@ -116,72 +115,13 @@ import {
   FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType, accurateAiming, clipCompletion,
   strideOppositeTime, blowRate, releaseSkip,
 } from './fpArm/fpAnimState.js';   // the animation-state helpers
+import { loadFromArchives, findLoaded, parseNifOnce, nifBytes, skeletonHasBone, boneProbe, esmLoadOrder } from './fpArm/archiveBytes.js';   // the archive reads
+export { nifParseCount, esmLoadOrder, NIF_COPY_CAP, nifBytes } from './fpArm/archiveBytes.js';
 export {
   WOLFSKIN, WOLFSKIN_1ST, fpSkeletonPath, tpSkeletonPath, FP_CLIP_PATH, FP_IDLE_BASE, FP_IDLE_SNEAK, TORCH_GROUP,
   carriedLeftVisible, idleBaseFor, FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType,
   accurateAiming, clipCompletion, strideOppositeTime, BLOW_RATE_MAX, BLOW_RATE_MIN, BLOW_LEFT_MIN, blowRate, releaseSkip,
 } from './fpArm/fpAnimState.js';
-
-// MW-LOAD: THE ARCHIVE IS OPENED, NOT READ, AND THIS FILE IS ITS
-// ONE READER.
-//
-// Every boot used to pull each stored .bsa out of IndexedDB as one whole
-// ArrayBuffer - 150-300 MB apiece, three of them on a retail set, one to
-// three seconds each measured - and hold them for the session, so that
-// this file could read a few dozen entries out of them. dataSource now
-// OPENS each archive off its stored Blob (MwBsaFile.open): the directory
-// arrives by range, and an ENTRY's bytes arrive by range when somebody
-// loads them.
-//
-// What that costs this file is one law. `get` is still synchronous and
-// still answers what is in hand - the contract every reader here already
-// speaks - but on a lazily opened archive it THROWS ("not loaded - await
-// load(path) first") for an entry nobody asked for. So every synchronous
-// read below is now preceded, IN THE SAME FUNCTION, by the load that
-// brings its bytes in, and the two helpers here are the whole mechanism.
-// There is no second copy of the `find` law in any preload: the archive
-// a path is loaded from is the archive it is read from, by construction.
-//
-// The resident archives - every test fixture's {has, get} duck, the
-// loose-file archive, a whole-buffer MwBsaFile - answer `loaded` true for
-// everything they carry and `load` out of memory, so one body of code
-// drives both and no fixture had to move.
-
-/** MW-LOAD: bring in every path the archives carry, through the SAME
- *  `find` law the synchronous read uses - the first archive whose `has`
- *  answers owns the path. Deduped and CONCURRENT: one lazy entry is a
- *  ranged read of about a millisecond, and forty of them in a row is
- *  forty round trips, which is the load time this whole change is about.
- *  Never throws - a path that will not load is reported by the read that
- *  follows, in that read's own words. An archive with no `load` door is
- *  already resident, which is the old two-door duck. */
-async function loadFromArchives(archives, paths) {
-  const seen = new Set();
-  const jobs = [];
-  for (const path of paths ?? []) {
-    if (!path || seen.has(path)) continue;
-    seen.add(path);
-    const arc = (archives ?? []).find((a) => a.has(path));
-    if (!arc || typeof arc.load !== 'function') continue;
-    if (typeof arc.loaded === 'function' && arc.loaded(path)) continue;
-    jobs.push(Promise.resolve(arc.load(path)).catch(() => null));
-  }
-  if (jobs.length) await Promise.all(jobs);
-}
-
-/** MW-LOAD: `find`, asserting the bytes are in hand. A path no archive
- *  carries answers null exactly as `find` does, and every caller already
- *  reports that as "not in your archives". A path an archive DOES carry
- *  and has not loaded is a missed preload - a defect in this file - and
- *  it is named here, with the path, rather than left to surface as a
- *  bare throw from inside MwBsaFile.get two frames down. */
-function findLoaded(archives, path) {
-  const arc = (archives ?? []).find((a) => a.has(path));
-  if (arc && typeof arc.loaded === 'function' && !arc.loaded(path)) {
-    throw new Error(`MW-LOAD: ${path} was read before it was loaded - the preload that covers this read missed it`);
-  }
-  return arc;
-}
 
 /** MW-LOAD: the texture bytes collectArmTextures reads synchronously.
  *  It walks rule 36's OWN ladder - correctTexturePath over the same
@@ -671,33 +611,6 @@ export function portraitWindow(ranges, model, bodyBox) {
  * Morrowind.bsa for the life of the tab. Copy what we need, release the
  * rest.
  */
-/** MW-D16: the weapon mesh is parsed twice - once by the assembly and
- *  once here, for getArrowBone's fallback - so it is cached per call
- *  rather than parsed twice for the same bytes. */
-function parseNifOnce(bytes, cache = parseNifOnce.cache) {
-  if (cache.has(bytes)) return cache.get(bytes);
-  const nif = parseNif(bytes);
-  cache.set(bytes, nif);
-  parseNifOnce.parses++;   // MWNPC3: the parses the memo could not answer - the pins' count of the one parse a mesh
-  return nif;
-}
-parseNifOnce.cache = new WeakMap();
-parseNifOnce.parses = 0;
-/** MWNPC3: how many meshes the builds have PARSED (a memo hit is not one) - the shared parse's pins read it. */
-export const nifParseCount = () => parseNifOnce.parses;
-
-/**
- * MWNPC3: ONE COPY OF A
- * MESH'S BYTES, FOR EVERY BODY. Every build copied each part's bytes out of its archive (`.slice()`) and parsed the
- * copy - a fresh copy a build, so parseNifOnce's memo (keyed by the bytes) never met the same mesh twice, and every
- * body re-parsed every mesh it wore: the player's on each equip, each peer's, and a crowd of NPCs wearing the same
- * dozen body parts. A mesh's bytes are copied ONCE per archive now and handed to every build that asks, so the memo
- * answers the second body from the first's parse (a parsed NIF is read, never written - mwFirstPerson.js
- * assembleFirstPersonArm's note). Keyed by the archive object and the path (a whole-buffer archive answers a fresh
- * view each `get`; a lazy one its cached bytes - both key the same), the copy is kept per archive while it lives, the
- * oldest let go past NIF_COPY_CAP, and its parse with it (the memo is weak). A path the archive cannot answer is
- * `undefined`, as `find(path)?.get(path)?.slice()` was.
- */
 /**
  * MWNPC3: ONE GL TEXTURE A PICTURE, FOR EVERY BODY. The decoded image was already shared (TEXTURE_CACHE, by data
  * generation and file) - but every mesh uploaded its own GL copy of every texture it
@@ -734,59 +647,6 @@ export function releaseCharacterTexture(renderer, tex) {
   TEXTURE_HOLDS.delete(tex);
   renderer?.gl?.deleteTexture(tex);
   return true;
-}
-
-/** The masters in their load order. */
-const ESM_MASTERS = Object.freeze(['morrowind.esm', 'tribunal.esm', 'bloodmoon.esm']);
-/**
- * AUDIT MW-NPC D6: THE MASTERS IN LOAD ORDER - Morrowind.esm, Tribunal.esm, Bloodmoon.esm, then any other (a mod, after
- * the masters it names), each run of them as stored. The store answers its keys alphabetically (Bloodmoon, Morrowind,
- * Tribunal), and both record walks below let the last record of an id win "as the engine's load order does" - so an
- * expansion's record lost to Morrowind's own. dataSource.js ranks the .bsa files by the same three names, the other way
- * round: there the first archive that has a path answers it.
- * @param {string[]} names
- */
-export function esmLoadOrder(names) {
-  // AUDIT MW-NPC II G2: the masters by their WHOLE names - by prefix, "Morrowind Patch.esm" ranked as Morrowind's own
-  // and, stored before it (' ' sorts before '.'), lost every record it patched to the master it patches
-  const rank = (n) => { const i = ESM_MASTERS.indexOf(String(n).split(/[\\/]/).pop().toLowerCase()); return i < 0 ? ESM_MASTERS.length : i; };
-  return names.map((n, i) => [n, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([n]) => n);
-}
-
-export const NIF_COPY_CAP = 384;
-const NIF_COPIES = new WeakMap();   // archive -> Map(path -> bytes), insertion-ordered: the oldest first
-export function nifBytes(arc, path) {
-  if (!arc) return undefined;
-  let m = NIF_COPIES.get(arc);
-  if (!m) NIF_COPIES.set(arc, (m = new Map()));
-  let b = m.get(path);
-  if (b) { m.delete(path); m.set(path, b); return b; }
-  const src = arc.get(path);
-  if (!src) return src;
-  b = src.slice();
-  m.set(path, b);
-  if (m.size > NIF_COPY_CAP) m.delete(m.keys().next().value);
-  return b;
-}
-
-/** getArrowBone's FIRST branch: does the ACTOR's own skeleton carry the
- *  ammo type's attach bone? */
-function skeletonHasBone(skeletonBytes, name) {
-  try {
-    const skel = buildSkeleton(parseNifOnce(skeletonBytes));
-    return skel.byName.has(String(name).toLowerCase());
-  } catch { return false; }
-}
-/** WS1: skeletonHasBone AFTER the bone addons - a dry injection over the
- *  same bytes, so the holster resolves against the skeleton the
- *  assembly will build. */
-function boneProbe(skeletonBytes, boneSources) {
-  let skel = null;
-  try {
-    skel = buildSkeleton(parseNifOnce(skeletonBytes));
-    for (const src of boneSources ?? []) { try { injectSkeletonNodes(skel, parseNifOnce(src.bytes)); } catch { /* the assembly notes it */ } }
-  } catch { skel = null; }
-  return (name) => !!skel && skel.byName.has(String(name).toLowerCase());
 }
 
 /**

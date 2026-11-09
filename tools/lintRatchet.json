@@ -10,7 +10,7 @@
     "src/characters/enemy/enemyMotor.js": 2326,
     "src/combat/diverseWeapons/diverseWeaponsIndex.js": 1307,
     "src/combat/formulas.js": 1101,
-    "src/combat/fpArm.js": 6912,
+    "src/combat/fpArm.js": 6772,
     "src/combat/pcaao.js": 1257,
     "src/combat/weapon/weaponRig.js": 2001,
     "src/formats/blocksFile.js": 1008,
