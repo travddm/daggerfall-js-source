@@ -19,6 +19,9 @@ A departure from Daggerfall Unity is named in a comment where it is made, with t
 ## What a comment never holds
 
 - Ticket, slice, audit or report codes: `AUDIT SLAM`, `SAFE8:`, `HARD3 -`, `FB1019F`, `(LOOT-GATE)`.
+- References to an owner decision, a pull request, an issue or a plan item: `decision 122 (7)`, `#130`, `P7`, `T11`.
+  State the reason the reference stands for in your own words, or write no comment. The reference goes in the commit
+  message and the pull request description.
 - Dates, release or relay version names of the past, and the names of people who asked for a change.
 - History: what the code did before, where it moved from, which pull request or audit changed it.
 - Quotes of chat or of people, such as `(mob, 03:03Z: "...")`.
