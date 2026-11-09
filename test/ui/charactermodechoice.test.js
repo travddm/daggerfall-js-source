@@ -55,7 +55,7 @@ test("the Plus face hint counts the answers shown, and the face lists each answe
   assert.equal(characterModeScreen(() => {}, { offered: {} }).faceText.listLines, true);
 });
 
-// Decision 116 (1): an online page hides the modes online play does not enforce yet.
+// An online page hides the modes online play does not enforce yet.
 test('online, the offered table turns off every unenforced mode; offline it is the mod settings, as before', () => {
   const offline = offeredModes({ online: false });
   const online = offeredModes({ online: true });

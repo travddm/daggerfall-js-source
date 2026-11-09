@@ -1,4 +1,4 @@
-// Decision 116 (1): online, the modes online play does not enforce yet are not created. The picker side is in
+// Online, the modes online play does not enforce yet are not created. The picker side is in
 // test/ui/charactermodechoice.test.js.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

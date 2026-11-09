@@ -1,4 +1,4 @@
-// Decision 116 (1): Hardcore and Ironman are hidden online until their enforcement lands. Online, nothing yet makes a
+// Hardcore and Ironman are hidden online until their enforcement lands. Online, nothing yet makes a
 // Hardcore death final or keeps an Ironman out of trade and groups, so offering them would promise rules the server
 // does not keep. Offline the modes stay as they are. Take a mode out of this list in the pull request that enforces it.
 //

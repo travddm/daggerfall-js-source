@@ -255,7 +255,7 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
 function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen, /** @type {unknown} */ profile) {
   if (!playerId || !n) return { error: 'body' };
   if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
-  // Every realm character is online, so the modes online play does not enforce yet are refused (decision 116 (1)).
+  // Every realm character is online, so the modes online play does not enforce yet are refused.
   return creatableModes(withoutUnenforcedModes(offeredFromList(profile))).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
 }
 

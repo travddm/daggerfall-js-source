@@ -44,7 +44,7 @@ test('a realm character keeps the mode it was created in, and the modes online d
     'no mode named: Classic, the bytes as before',
   );
 
-  // Online play does not enforce Hardcore or Ironman yet, so the service creates neither (decision 116 (1)).
+  // Online play does not enforce Hardcore or Ironman yet, so the service creates neither.
   for (const mode of ['hardcore', 'ironman', 'hardcore_ironman'])
     assert.equal((await call('/v1/realm/create', { name: 'Nope', mode })).body.error, 'mode-off', mode);
 
