@@ -10,12 +10,17 @@ export const mentoringOnText = () => t('social.party.mentoringOn', 'Allow mentor
 
 /** The line under the mentor note, as a list of nodes: one while no mentoring stands, none otherwise.
  *  @param {(tag: string, cls: string, text?: string) => any} el @param {any} party */
-export const noMentoringLines = (el, party) => (party?.nm === 1 ? [el('div', 'dfsocial-empty dfsocial-nomentor', noMentoringText())] : []);
+export const noMentoringLines = (el, party) =>
+  party?.nm === 1 ? [el('div', 'dfsocial-empty dfsocial-nomentor', noMentoringText())] : [];
 
 /** The leader's switch, as a list of buttons: none for a member.
  *  @param {(label: string, o: any) => any} btn @param {any} party @param {boolean} leads @param {(a: any) => any} act */
 export function mentoringSwitch(btn, party, leads, act) {
   if (!leads) return [];
   const off = party?.nm === 1;
-  return [btn(off ? mentoringOnText() : mentoringOffText(), { run: () => act({ k: off ? 'party.mentoring.on' : 'party.mentoring.off' }) })];
+  return [
+    btn(off ? mentoringOnText() : mentoringOffText(), {
+      run: () => act({ k: off ? 'party.mentoring.on' : 'party.mentoring.off' }),
+    }),
+  ];
 }

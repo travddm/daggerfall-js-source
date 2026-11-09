@@ -14,7 +14,11 @@ test('NO-MENTORING wire: the two acts name nothing; a party view keeps nm 1 and 
   assert.deepEqual([SOCIAL_ACTS['party.mentoring.off'], SOCIAL_ACTS['party.mentoring.on']], ['', '']);
   assert.deepEqual(validSocialAct({ k: 'party.mentoring.off' }), { k: 'party.mentoring.off' });
   assert.deepEqual(validSocialAct({ k: 'party.mentoring.on' }), { k: 'party.mentoring.on' });
-  const view = { id: 'party-1', leader: 'acct-a', members: [{ acct: 'acct-a', name: 'a', online: true, seen: null, peers: [], p: null }] };
+  const view = {
+    id: 'party-1',
+    leader: 'acct-a',
+    members: [{ acct: 'acct-a', name: 'a', online: true, seen: null, peers: [], p: null }],
+  };
   assert.equal(validPartyView({ ...view, nm: 1 }).nm, 1);
   assert.equal('nm' in validPartyView(view), false);
   assert.equal('nm' in validPartyView({ ...view, nm: 'yes' }), false);
@@ -25,42 +29,78 @@ const lastOf = (ws, k) => ofKind(ws, k).at(-1) ?? null;
 const errors = (ws) => ofKind(ws, 'error').map((m) => m.m);
 async function withHub(fn) {
   const r = fakeRoom(SOCIAL_ROOM);
-  const realNow = Date.now; let clock = 1e12; Date.now = () => clock;
-  const tick = (ms = 600) => { clock += ms; };
+  const realNow = Date.now;
+  let clock = 1e12;
+  Date.now = () => clock;
+  const tick = (ms = 600) => {
+    clock += ms;
+  };
   const act = (ws, o) => r.raw(ws, JSON.stringify({ t: 'social', ...o }));
-  const join = async (n) => { const ws = r.connect(); await r.hello(ws, `peer-${n}`, null, { name: n, acct: `acct-${n}`, asecret: `secret-of-acct-${n}` }); tick(10); return ws; };
-  try { await fn({ r, act, join, tick }); } finally { Date.now = realNow; }
+  const join = async (n) => {
+    const ws = r.connect();
+    await r.hello(ws, `peer-${n}`, null, { name: n, acct: `acct-${n}`, asecret: `secret-of-acct-${n}` });
+    tick(10);
+    return ws;
+  };
+  try {
+    await fn({ r, act, join, tick });
+  } finally {
+    Date.now = realNow;
+  }
 }
 
-test('NO-MENTORING hub: the leader sets no mentoring and back - stored, said to every member in the party view; a member and a player in no party are refused', () => withHub(async ({ r, act, join, tick }) => {
-  const a = await join('a'), b = await join('b'), c = await join('c');
-  await act(a, { k: 'party.invite', peer: 'peer-b' }); tick(); await act(b, { k: 'party.accept', party: lastOf(b, 'invite').party }); tick();
-  const pid = a.att.party;
-  await act(c, { k: 'party.mentoring.off' }); tick(); assert.equal(errors(c).at(-1), 'you are not in a party');
-  await act(b, { k: 'party.mentoring.off' }); tick(); assert.equal(errors(b).at(-1), 'only the leader can do that');
-  assert.equal(r.store.get('party:' + pid).nm, undefined, 'a refusal changed nothing');
-  await act(a, { k: 'party.mentoring.off' }); tick();
-  assert.equal(r.store.get('party:' + pid).nm, 1);
-  for (const ws of [a, b]) {
-    const f = lastOf(ws, 'party');
-    assert.equal(f.party.nm, 1, 'every member reads it');
-    assert.ok(validSocialFrame(f), JSON.stringify(f));
-  }
-  await act(a, { k: 'party.mentoring.on' }); tick();
-  assert.equal('nm' in r.store.get('party:' + pid), false);
-  for (const ws of [a, b]) assert.equal('nm' in lastOf(ws, 'party').party, false, 'mentoring again');
-}));
+test('NO-MENTORING hub: the leader sets no mentoring and back - stored, said to every member in the party view; a member and a player in no party are refused', () =>
+  withHub(async ({ r, act, join, tick }) => {
+    const a = await join('a'),
+      b = await join('b'),
+      c = await join('c');
+    await act(a, { k: 'party.invite', peer: 'peer-b' });
+    tick();
+    await act(b, { k: 'party.accept', party: lastOf(b, 'invite').party });
+    tick();
+    const pid = a.att.party;
+    await act(c, { k: 'party.mentoring.off' });
+    tick();
+    assert.equal(errors(c).at(-1), 'you are not in a party');
+    await act(b, { k: 'party.mentoring.off' });
+    tick();
+    assert.equal(errors(b).at(-1), 'only the leader can do that');
+    assert.equal(r.store.get('party:' + pid).nm, undefined, 'a refusal changed nothing');
+    await act(a, { k: 'party.mentoring.off' });
+    tick();
+    assert.equal(r.store.get('party:' + pid).nm, 1);
+    for (const ws of [a, b]) {
+      const f = lastOf(ws, 'party');
+      assert.equal(f.party.nm, 1, 'every member reads it');
+      assert.ok(validSocialFrame(f), JSON.stringify(f));
+    }
+    await act(a, { k: 'party.mentoring.on' });
+    tick();
+    assert.equal('nm' in r.store.get('party:' + pid), false);
+    for (const ws of [a, b]) assert.equal('nm' in lastOf(ws, 'party').party, false, 'mentoring again');
+  }));
 
 test('NO-MENTORING host: in a no-mentoring party the high-level member is themself at once and a low-level partner beside them never mentors them; mentoring again engages after the join wait', () => {
   const me = { name: 'Hero', isPlayer: true, level: 30, activeEffects: [], items: [], stats: {}, skills: 40 };
   const lines = [];
   const state = { nm: false };
-  const social = { get party() { return state.nm ? { members: [], nm: 1 } : { members: [] }; }, others: () => [{ acct: 'low', online: true, p: { cl: 5 } }] };
+  const social = {
+    get party() {
+      return state.nm ? { members: [], nm: 1 } : { members: [] };
+    },
+    others: () => [{ acct: 'low', online: true, p: { cl: 5 } }],
+  };
   const host = createMentorHost({
-    player: () => me, social: () => social, near: () => [{ acct: 'low', feet: [10, 0, 0] }], outdoors: () => false, feet: () => [0, 0, 0],
-    fighting: () => false, chat: () => ({ active: 'main', push: (_tab, l) => lines.push(l.text) }),
+    player: () => me,
+    social: () => social,
+    near: () => [{ acct: 'low', feet: [10, 0, 0] }],
+    outdoors: () => false,
+    feet: () => [0, 0, 0],
+    fighting: () => false,
+    chat: () => ({ active: 'main', push: (_tab, l) => lines.push(l.text) }),
   });
-  host.frame(0); host.frame(MENTOR_JOIN_MS);
+  host.frame(0);
+  host.frame(MENTOR_JOIN_MS);
   assert.ok(me._mentor, 'mentored by default');
   state.nm = true;
   host.frame(MENTOR_JOIN_MS + 16);
@@ -69,6 +109,7 @@ test('NO-MENTORING host: in a no-mentoring party the high-level member is themse
   host.frame(MENTOR_JOIN_MS * 4);
   assert.equal(me._mentor, null, 'still none, however long the partner stands beside');
   state.nm = false;
-  host.frame(MENTOR_JOIN_MS * 5); host.frame(MENTOR_JOIN_MS * 6 + 1);
+  host.frame(MENTOR_JOIN_MS * 5);
+  host.frame(MENTOR_JOIN_MS * 6 + 1);
   assert.ok(me._mentor, 'the switch back: mentoring after the join wait');
 });
