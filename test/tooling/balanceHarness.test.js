@@ -157,11 +157,15 @@ test('ours: the same seed gives the same number, and the overhaul moves a level-
 
 test('report: layers, the target line, the table and the ablation', () => {
   near(targetRatio(1), 1, 1e-12, 'target at 1');
-  near(targetRatio(45), 1.5, 1e-12, 'target at 45');
+  near(targetRatio(45), 1.6, 1e-12, 'a melee build at 45: decision 41');
+  near(targetRatio(45, BUILDS.mage), 1.75, 1e-12, 'a caster at 45');
+  near(targetRatio(45, BUILDS.warrior), 1.6, 1e-12, 'a build that casts nothing is held to the melee budget');
+  near(targetRatio(1, BUILDS.mage), 1, 1e-12);
   assert.deepEqual([...parseLayers('none')], []);
-  assert.ok(parseLayers('default').has('pcaao') && !parseLayers('default').has('virtue'));
+  assert.ok(parseLayers('default').has('pcaao') && !parseLayers('default').has('ceiling'));
   assert.ok(!parseLayers('-hero').has('hero') && parseLayers('-hero').has('pcaao'));
-  assert.ok(parseLayers('+virtue').has('virtue'));
+  assert.ok(parseLayers('+ceiling').has('ceiling'));
+  assert.throws(() => parseLayers('+virtue'), /unknown layer/, 'the virtue layer is gone (decision 122 (2))');
   assert.throws(() => parseLayers('nonsense'), /unknown layer/);
   const common = { builds: ['warrior'], levels: [10, 45], swings: 300 };
   const report = buildReport({ ...common, layers: parseLayers('default') });
