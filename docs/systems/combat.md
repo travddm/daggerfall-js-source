@@ -178,7 +178,9 @@ paths (one per pair of weapon skills). A path adds passives, riders and a signat
   the same hash marks the same records on every client. A promoted foe takes no hero's threat. Never under level 3,
   never the watch, an ally or a quest foe. Online always; offline only while the loot ladder is on.
 - **Elites** (`eliteFoes.js`): x2 health, x1.3 damage, 1.25x size, a glow, better loot, one boss trait. An Elite
-  Dungeon holds three or four, at x7 health and x2.6 damage; the super dungeon's are x9 and x3.
+  Dungeon holds three or four. There an elite takes the larger of the elite tier and the dungeon's own layer, stat by
+  stat: x2 and x2 in an Elite Dungeon, x4 and x2.5 in a super dungeon (`elite-stacking.ts`). The "Elites stack with
+  dungeon difficulty" row (pinned off online) multiplies them instead: x7 health and x2.6 damage, x9 and x3.
 - **Champions** (`champions.js`): x1.4 health, x1.15 damage, and one trait from `CHAMPION_TRAITS` (Mighty, Stalwart,
   Swift, Vampiric, Thorned).
 - **Boss traits** (`bossTraits.js`): `warded` (a ward of 30% health that regrows), five element proofs (a spell of

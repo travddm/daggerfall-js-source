@@ -75,7 +75,8 @@ Stated in `builds.mjs` and `progression.mjs`; none comes from a save.
   material `RandomMaterial` gives at the gear percentile. Same gear in both rule sets. No shields.
 - Foes: DFU's encounter-table band for the level (`RandomEncounters.ChooseRandomEnemy`), ranked by health x damage a
   swing. Weak, average and strong are its 10th, 50th and 90th percentile. Health is the row mean. Elite is the strong
-  foe at the elite tier (x2 health, x1.3 damage); boss is an elite in an Elite Dungeon (x7 and x2.6).
+  foe at the elite tier (x2 health, x1.3 damage); boss is an elite in an Elite Dungeon (x2 and x2 by default, the larger
+  layer; x7 and x2.6 with the elite stacking row on).
 - Casters cast the Lightning spell (SPELLS.STD 31) while magicka lasts, then swing, over a 30-second horizon.
 
 ## How to read it

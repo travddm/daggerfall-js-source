@@ -27,20 +27,20 @@ import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';   // EL
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';   // ELITE-FLOOR: a kind's own level, the same on every client
 import { WEAPON_MATERIALS } from '../characters/weapons.js';   // BOSS-HARD: Silver, the Troll's floor
 import { PROMOTION, markPromotions, scalePromoted } from './foe-promotion.ts';
+import { eliteMults, ELITE_DUNGEON_STACKED, SUPER_DUNGEON_STACKED } from './elite-stacking.ts';   // decision 124: no stacking by default
 import { CHAMPION_TRAITS } from './champions.js';   // the tier's numbers and the one scaling path
 import { renownOpens } from './sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
 
 /** Health and damage, times the foe's own (rolled, before any Elite Dungeon doubling). */
 export const ELITE_FOE_HEALTH_MULT = PROMOTION.elite.health;
 export const ELITE_FOE_DAMAGE_MULT = PROMOTION.elite.damage;
-/** ...and in an Elite Dungeon, where every foe is already doubled. B6: the health stays; the blows are the dungeon's x2 with
- *  the open elite's step on it (x1.3), 2.6, where they were 4 (a typical mage at level 45 took 80% of its body in one blow). */
-export const ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT = 7;
-export const ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT = 2.6;
-/** ...and in a Super dungeon, where every foe is x4 health and x2.5 damage already. B6: the health stays; the blows are 3,
- *  where they were 4.5 (90% of a typical mage's body), so no blow of the Abyss takes more than 60% of a typical body. */
-export const ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT = 9;
-export const ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT = 3;
+/** ...and, with the stacking option on (elite-stacking.ts), in an Elite Dungeon, where every foe is already doubled: the
+ *  dungeon's x2 with the open elite's step on it. Off (the default), the larger of the two layers, stat by stat. */
+export const ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT = ELITE_DUNGEON_STACKED.health;
+export const ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT = ELITE_DUNGEON_STACKED.damage;
+/** ...and in a Super dungeon, where every foe is x4 health and x2.5 damage already: the stacked figures, the option's. */
+export const ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT = SUPER_DUNGEON_STACKED.health;
+export const ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT = SUPER_DUNGEON_STACKED.damage;
 /** How much larger the sprite is drawn. */
 export const ELITE_FOE_SIZE = 1.25;
 /** The chance a foe in the open world stands as an elite. */
@@ -104,11 +104,9 @@ export function promoteEliteFoe(entity, { own = true, eliteDungeon = false, supe
   entity.eliteFoe = true;
   // the hosts promote BEFORE any other scaling (and in place of the Elite Dungeon's doubling), so this is the foe's own
   // roll: an elite is 5x, not 10x
-  scalePromoted(entity, {
-    health: superDungeon ? ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT : ELITE_FOE_HEALTH_MULT,
-    damage: superDungeon ? ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT : eliteDungeon ? ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT : ELITE_FOE_DAMAGE_MULT,
-    ownHealth: own,
-  });
+  // decision 124: in an Elite or Super dungeon the larger of the elite tier and the dungeon's layer, unless they stack
+  const m = eliteMults(PROMOTION.elite, { eliteDungeon, superDungeon });
+  scalePromoted(entity, { health: m.health, damage: m.damage, ownHealth: own });
   return true;
 }
 

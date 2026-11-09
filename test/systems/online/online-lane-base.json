@@ -25,6 +25,7 @@
     "soldGoodsOnShelf": false,
     "absorptionLimits": false,
     "openingDamage": false,
+    "eliteStacking": false,
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,

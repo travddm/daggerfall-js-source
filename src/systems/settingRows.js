@@ -13,3 +13,4 @@ export { TERRAIN_SLOPE_CUT_ROW } from './terrainSlopeCutRow.js';
 export { SOLD_GOODS_ON_SHELF_ROW } from './sold-goods-on-shelf-row.ts';
 export { ABSORPTION_LIMITS_ROW } from './absorption-limits-row.ts';
 export { OPENING_DAMAGE_ROW } from '../ai/opening-damage-row.ts';
+export { ELITE_STACKING_ROW } from './elite-stacking-row.ts';
