@@ -54,8 +54,8 @@ Pull requests target `feat/tamriel-review` and use the template in
 - A change a player can see or feel stays a draft until it was checked in the running game and the check is recorded
   with the commit it checked ([verification-and-ui.md](.claude/rules/verification-and-ui.md)).
 - Patch notes go in the description, in ASD-STE100 Simplified Technical English
-  ([docs/operations/desktop-release.md](docs/operations/desktop-release.md)). `node scripts/steNotes.mjs <file>` is an
-  optional local check of a draft.
+  ([docs/operations/desktop-release.md](docs/operations/desktop-release.md)). The `ste-notes` check
+  reads the description each time it changes, so run `node scripts/steNotes.mjs <file>` on it before you post it.
 - A new file is named in kebab-case, and its test is `<module>.test.ts`. Existing files keep their names until a later
   rename pass ([code.md](.claude/rules/code.md)).
 
