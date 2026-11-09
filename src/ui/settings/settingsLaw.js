@@ -24,7 +24,7 @@
 import { DEFAULTS, tierOf, UNAVAILABLE } from '../../systems/settings/settings.js';
 import { READOUT } from './settingsCopy.js';
 import { FRAME_CAP_FLOOR, FRAME_CAP_STOPS } from '../../systems/frameCap.js';   // FPS-CAP1: the cap's floor and the rates its row walks
-import { localizedText, localizedTextList, TextCollections } from '../../systems/textManager.js';   // L10N3d: DFU's words, read in the player's language
+import { t, localizedText, localizedTextList, TextCollections } from '../../systems/textManager.js';   // L10N3d: DFU's words, read in the player's language
 
 /** DFU's own value names, in DFU's order. `encode:'index'` means the
  *  store holds the position; `'token'` means it holds the word. */
@@ -69,7 +69,7 @@ export function enumWords(key) {
     case 'GUI/HelmAndShieldMaterialDisplay':
       return localizedTextList('helmAndShieldMaterialDisplay', ['Off', 'No Leather Chain', 'No Leather', 'On'], TextCollections.TextSettings);
     case 'Video/RetroRenderingMode':
-      return [localizedText('retroModeOff', 'Off'), localizedText('retroMode320x200', '320x200'), localizedText('retroMode640x400', '640x400')];
+      return [localizedText('retroModeOff', 'Off'), localizedText('retroMode320x200', '320x200'), retroSharperWord()];
     case 'Video/PostProcessingInRetroMode':
       return [localizedText('off', 'Off'), localizedText('posterizationFull', 'Posterization (full)'),
         localizedText('posterizationMinusSky', 'Posterization (-sky)'), localizedText('palettizationFull', 'Palettization (full)'),
@@ -79,6 +79,12 @@ export function enumWords(key) {
     default:
       return ENUM_LAW[key]?.values ?? [];
   }
+}
+
+/** DFU's 640x400 word, marked as the sharper choice: no source shows the original game drew at that size, so it is not
+ *  offered as the classic look (classic-rendering-options study, decision #111). */
+function retroSharperWord() {
+  return t('settings.retroMode640x400Sharper', '{size} (sharper)', { size: localizedText('retroMode640x400', '640x400') });
 }
 
 /** {min,max,step,coarse,format,source}. format: pct | mult | a unit.

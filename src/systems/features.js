@@ -39,6 +39,7 @@ import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
 import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW, TERRAIN_SLOPE_CUT_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { CLASSIC_PICTURE_ROWS } from './classic-picture-rows.ts';
 import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
@@ -675,12 +676,9 @@ export const FEATURES = Object.freeze([
     // "to Daggerfall's own where a row has no Off"); without it All off left the world drawn at 50%
     control: Object.freeze({ store: 'prefs', key: 'renderScale', initial: 1, online: 'player', classic: 1, tiers: Object.freeze([[1, '100%'], [0.85, '85%'], [0.75, '75%'], [0.67, '67%'], [0.5, '50%']]) }),
   }),
-  // FT8: ENHANCED COMBAT VISUALS (ECV1) - what the enhanced
-  // skin DRAWS for a concealed foe; the rules are DFU's either way. The
-  // last row of the Enhanced category of Settings, which is a pointer
-  // here now. Read once per frame by every foe host through
-  // combatVisualsOn (systems/combatVisuals.js; `?combatvisuals=off` the
-  // kill door), so a press takes effect at once.
+  ...CLASSIC_PICTURE_ROWS,   // Daggerfall Unity's retro mode, over its own [Video] keys
+  // What the enhanced skin draws for a concealed foe; the rules are DFU's either way. Every foe host reads it each frame
+  // through combatVisualsOn (systems/combatVisuals.js; `?combatvisuals=off` turns it off), so a press takes effect at once.
   Object.freeze({
     id: 'enhanced-combat-visuals',
     group: 'sight',

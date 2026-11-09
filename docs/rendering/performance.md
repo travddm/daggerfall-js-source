@@ -75,7 +75,10 @@ world frame, so a change applies on the next frame.
 - **Retro mode** (`src/systems/retroMode.js`, Daggerfall Unity's settings `Video.RetroRenderingMode`,
   `PostProcessingInRetroMode`, `UseMipMapsInRetroMode`, `RetroModeAspectCorrection`, `PalettizationLUTShift`). The
   world draws into 320x200 or 640x400 (320x154 or 640x308 with the docked large HUD) and is point-sampled up, with
-  optional posterize or palettize post-processing. Retro mode wins over render scale.
+  optional posterize or palettize post-processing. Retro mode wins over render scale. The settings screen shows the
+  first three keys as the Classic picture, Classic aspect and Classic colours rows (`src/systems/features.js`); the rows
+  write the keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)",
+  not classic: no source shows the original game drew at that size.
 - Leaving both returns to drawing straight to the canvas, and the renderer frees the image and depth it used.
 
 ## GPU memory and context loss
