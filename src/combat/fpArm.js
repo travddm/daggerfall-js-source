@@ -3399,7 +3399,7 @@ export function createFpArm() {
    *  lets go as its cast ends (stepUpper's unreadyAfterCast), back to the weapon's. */
   function spellHandReady(want) {
     spellInHand = want;
-    const step = spellHandStanceStep({ upper: ub.upper, spellReady: ub.spellReady }, UPPER_BODY);   // AUDIT SPELL-HAND L3-11: the law is spellHandArm.js's
+    const step = spellHandStanceStep({ upper: ub.upper, spellReady: ub.spellReady }, UPPER_BODY);   // the stance rule lives in spellHandArm.js
     if (step === 'afterCast') ub.unreadyAfterCast = true;
     if (step !== 'drop') return false;
     ub.spellReady = false; ub.refreshWeaponGroup(); slots.resetIdle(); slots.resetMovement();
@@ -4224,8 +4224,8 @@ export function createFpArm() {
      * held at max attack".
      */
     attack(strike, { hold = false, blow = null, roll = 0, hand = null } = {}) {   // TWO-HANDS: `hand` - the hand the law gave the blow
-      if (!built || !built.ok || ub.sheathed || dead) return null;   // MWNPC4: the dead swing nothing
-      if (nonBiped()) return ub.creatureAttack(roll, blow);   // MWNPC9: claws and jaws - one of its attacks by the roll
+      if (!built || !built.ok || ub.sheathed || dead) return null;   // the dead swing nothing
+      if (nonBiped()) return ub.creatureAttack(roll, blow);   // claws and jaws: one of its attacks by the roll
       // A blow in its follow-through is cut for the next. The game's machine starts a strike only from idle, so a
       // strike arriving here is a blow it has already finished; refusing it drew one blow in two at a high Speed, the
       // second landing on an arm at rest. The wind-up and the release are never cut: their blow has not landed.
@@ -4842,7 +4842,7 @@ export function createFpArm() {
           else if (r.slot === 'arrow') r.hidden = !ub.arrowShown;
           else if (r.slot === 'torch') r.hidden = !torchVisible();   // MW-D51
           else if (r.slot === HIP_LIGHT_SLOT) r.hidden = !hipVisible();   // HT-WAIST: lit, and never the carried-left rule
-          else if (HOLSTER_SLOTS.includes(r.slot)) r.hidden = holsterHidden(r.slot, ub.weaponShown, { arrowShown: ub.arrowShown, tag: r.piece?.tag });   // WS1: the holster while the hand is empty, the scabbard always, the quiver less the round on the string
+          else if (HOLSTER_SLOTS.includes(r.slot)) r.hidden = holsterHidden(r.slot, ub.weaponShown, { arrowShown: ub.arrowShown, tag: r.piece?.tag });   // the holster while the hand is empty, the scabbard always, the quiver less the round on the string
         }
         return;
       }
@@ -5486,7 +5486,7 @@ export function createFpArm() {
         else if (r.slot === 'arrow') r.hidden = !ub.arrowShown;
         else if (r.slot === 'torch') r.hidden = !torchLit;   // MW-D51: a portrait shows what you carry - the lit light, whatever the hand holds
         else if (r.slot === HIP_LIGHT_SLOT) r.hidden = !hipLit;   // HT-WAIST: and the lantern at the waist, lit
-        else if (HOLSTER_SLOTS.includes(r.slot)) r.hidden = holsterHidden(r.slot, true, { arrowShown: ub.arrowShown, tag: r.piece?.tag });   // WS1: the weapon is in the hand here, so the holster is empty; the scabbard and quiver show
+        else if (HOLSTER_SLOTS.includes(r.slot)) r.hidden = holsterHidden(r.slot, true, { arrowShown: ub.arrowShown, tag: r.piece?.tag });   // the weapon is in the hand here, so the holster is empty; the scabbard and quiver show
       }
       const u = 1 / MW_UNITS_PER_METER;
       const rs = (built && built.raceScale) || { weight: 1, height: 1 };
@@ -5523,10 +5523,10 @@ export function createFpArm() {
         notes: built && built.notes,
         binding: built && built.binding,
         weapon: built && built.ok ? built.weapon : null,
-        spellReady: ub.spellReady,                       // MW-D39
+        spellReady: ub.spellReady,
         casting: ub.upper === UPPER_BODY.Casting,
         weaponInHand: weaponInHand(),     // MW-CAST1: the casting hands are empty
-        unreadyAfterCast: ub.unreadyAfterCast,                 // MW-CAST1: the spell went mid-cast - the stance drops at the cast's end
+        unreadyAfterCast: ub.unreadyAfterCast,                 // the spell went mid-cast - the stance drops at the cast's end
         raceScale: built && built.ok ? built.raceScale : null,
         worn: built && built.ok ? built.worn : null,
         face: built && built.ok ? built.face : null,
@@ -5551,7 +5551,7 @@ export function createFpArm() {
         aimFactor,
         attackType: ub.attackType,
         attackReversed: reversedNow(),   // MS1: the backhand in flight
-        blow: ub.blowPlan ? { ...ub.blowPlan } : null,   // MW-PACE1: the machine's blow this one is paced to, and how far in
+        blow: ub.blowPlan ? { ...ub.blowPlan } : null,   // the machine's blow this one is paced to, and how far in
         sheathed: ub.sheathed,
         sneaking,
         sneakDelta: built && built.ok ? built.sneakDelta : null,
