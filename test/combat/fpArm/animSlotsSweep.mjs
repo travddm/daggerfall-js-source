@@ -1,9 +1,9 @@
 // Scripted input for the arm's animation slots below the upper body (src/combat/fpArm/animSlots.js), and the way their
 // answers are recorded tick by tick.
 //
-// animSlots.test.js plays the 10a scripts (fpAnimStateSweep.mjs SCRIPTS) and the scripts below on the retail files
+// animSlots.test.js plays the animation-state scripts (fpAnimStateSweep.mjs SCRIPTS) and the scripts below on the retail files
 // and compares every slot of every tick with test/fixtures/mw/animSlotsParity.json, recorded before the rewrite. The
-// scripts below reach what the 10a scripts do not: turning in third person, a weapon drawn while walking and in the
+// scripts below reach what those do not: turning in third person, a weapon drawn while walking and in the
 // air, the sneak idle, levitation, and walking after a revive. A step may turn the view by `yawRate` radians a second.
 import { SCRIPTS, TICK, seededRandom } from '../fpAnimStateSweep.mjs';
 
