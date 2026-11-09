@@ -1,7 +1,8 @@
 # DFO Online documentation
 
 DFO Online is a browser RPG based on The Elder Scrolls II: Daggerfall, with an online world. These pages are for
-the people who maintain it. The code is the authority: when a page and the code disagree, fix the page.
+the people who maintain it and for server owners, who run the relay and the account service from `selfhost/`. There
+is no official live service (decision 95). The code is the authority: when a page and the code disagree, fix the page.
 
 Start with [getting-started.md](getting-started.md), then [architecture/](architecture/README.md). The rules for new and
 touched code are in [coding-standards.md](coding-standards.md).
@@ -31,9 +32,6 @@ from DFU is an agreed mod or option (decisions 49, 102 and 103), and online rule
 mod or option where you make a departure (in the code comment or the page that covers it). A departure that makes
 play or progression feel worse than DFU is a defect, and the fix is to revert it. Read the DFU source for the
 behaviour first; its MIT-licensed code is the reference ([mods-and-vendor.md](formats/mods-and-vendor.md)).
-
-There is no official live service (decision 95). These pages are written for a maintainer and for a server owner, who
-runs the relay and the account service from `selfhost/`.
 
 ### Every departure is a mod
 

@@ -21,8 +21,8 @@ written for a maintainer and for a server owner: there is no official live servi
   to it.
 - **Before a push**: run `npm run lint`, `npm run types` and `npm run test:changed` (the tests a change can reach).
   When that selects most of the suite, run the change's own test files and leave the rest to CI. CI's `verify` runs
-  lint, types, every test file in eight shards and the build on every pull request, before every staging deploy and
-  before every release. A pull request is done when `verify` is green on its head. A pull request that conflicts with
+  lint, types, every test file in eight shards and the build on every pull request, before every deploy and every
+  release. A pull request is done when `verify` is green on its head. A pull request that conflicts with
   its base runs no workflow, so merge the base in before the push you want verified.
 - **Docs follow the code**: a change that makes a page in `docs/` wrong updates that page. Docs hold no history:
   git does.
@@ -40,6 +40,6 @@ written for a maintainer and for a server owner: there is no official live servi
   bot, grants its roles and rotates its token (the `DISCORD_BOT_TOKEN` secret).
 - **The hosts do not grow** (`docs/architecture/hosts-and-modules.md`): new behaviour goes into a module the host
   wires (`src/scenes/merchantYardsHost.js` is the shape), never into the scene hosts themselves (`bootWorld`,
-  `createWorldModes`, `buildDungeonContext`, `bootExterior`), and on the relay into a `Room` method of its own, never
-  into `_message`. The hosts are split into narrow modules before the repository goes public (decision 92). No test
-  enforces this.
+  `createWorldModes`, `buildDungeonContext`, `bootExterior`, `createNavalHost`, `createComeSailAwayRuntime`), and on the
+  relay into a `Room` method of its own, never into `_message`. The hosts are split into narrow modules before the
+  repository goes public (decision 92). No test enforces this.
