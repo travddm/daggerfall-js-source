@@ -74,7 +74,8 @@ import { settleHolds, REZ_SETTLE_MAX } from './legacy.js';   // REZ-BLOODLINE AU
 import { TOWN_ECON_SWEEPS, TOWN_ECON_SEEN_SWEEP, townEconKeptFrom, townEconSeenFrom, keepTownShares, townsOpen } from './townEcon.js';   // TOWN-ECON TE2: a town's acts past the days kept; AUDIT TOWN-ECON 2 SVC-3: the shares kept once
 import { settleStaleYards } from './decor.js';   // YARD-SNAP: a town's yards built again where a write left them stale
 import { STAFF_AUDIT_KEEP_S } from './staff.js';   // STAFF-PANEL1: the audit log's month
-import { censusDay, censusBackfill } from './staffCensus.js';   // STAFF-PANEL4-CENSUS: the census's day and its one backfill, off peak
+import { censusDay, censusBackfill } from './staffCensus.js';
+import { whenOption } from './operator-options.ts';   // the census runs only while the operator's option is on   // STAFF-PANEL4-CENSUS: the census's day and its one backfill, off peak
 import { STAFF_MESSAGE_KEEP_S } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: a staff message's month
 import { STAFF_EVENT_KEEP_S } from './staffEvents.js';   // STAFF-EVENT: a staff event's month
 import { STAFF_FEED_KEEP_S } from './staffNet.js';   // STAFF-PANEL5-FEEDS: the relay's net feed's day
@@ -247,8 +248,8 @@ export const HOUR_JOBS = Object.freeze([
   // STAFF-PANEL4-CENSUS (design doc, Server load: "add up server totals by deltas or on demand, off-peak"): each kind's
   // count summed once a UTC day at the census's quiet hour (the trend), and - only with CENSUS_BACKFILL 'on', only in
   // its quiet hours, once - a latest tally for every character no checkpoint has tallied (staffCensus.js)
-  ['census-day', (ctx) => censusDay(ctx)],
-  ['census-backfill', (ctx, env) => censusBackfill(ctx, env)],
+  ['census-day', (ctx, env) => whenOption(env, 'census', () => censusDay(ctx), 0)],
+  ['census-backfill', (ctx, env) => whenOption(env, 'census', () => censusBackfill(ctx, env), 0)],
   // STAFF-PANEL5-MESSAGE (design doc: "Each new table gets a retention"): a staff message's row past STAFF_MESSAGE_KEEP_S
   ['staff-messages', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM staff_messages WHERE id IN (SELECT id FROM staff_messages WHERE at < ?1 LIMIT ?2)', ctx.nowS - STAFF_MESSAGE_KEEP_S), SWEEP_ROWS)],

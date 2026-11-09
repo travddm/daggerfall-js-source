@@ -47,7 +47,10 @@ import { judgeSave, judgeProducts, STRIKES_FOR_TIMED, JUDGE_VERSION, FINDINGS_KE
 import { ledgerStep, chargeSteps } from './ledger.js';
 import { budgetConfig, bandOf, stepBudget } from './budget.js';
 import { levelWealthCeiling } from '../../src/net/realm/realmGoldLaw.js';
-import { censusStep } from './staffCensus.js';   // STAFF-PANEL4-CENSUS: the census's tally, on the hour's row and the character's latest
+import { censusStep } from './staffCensus.js';
+import { whenOption } from './operator-options.ts';   // the census's tally only while the operator's option is on
+/** No census this checkpoint: no step, and the hour's row keeps its tally. */
+const NO_CENSUS = Object.freeze({ steps: [], tally: null });   // STAFF-PANEL4-CENSUS: the census's tally, on the hour's row and the character's latest
 
 /** INT2's cutover: a character whose first judged wealth stands past this many
  *  of its level's wealth ceiling (realmGoldLaw.js levelWealthCeiling) is flagged for staff - flagged, never held. */
@@ -149,7 +152,7 @@ export function trustedLevel({ seen, at, level, played }) {
  * @param {{ mine: any, dupes: any, config: any } | null} [known] SAVE-BATCH: the ledger's reads and the config, answered in
  * the checkpoint's first batch (realm.js checkpointRealm) - null, and they are asked here
  */
-export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, save, summary, baseline = null, known = null) {
+export async function verdictOn({ db, nowS, env = null }, { player, char, seq, key }, row, save, summary, baseline = null, known = null) {
   const first = row.wealth == null;
   const playedS = Number.isSafeInteger(row.played_now) ? row.played_now : 0;
   const lv = trustedLevel({
@@ -223,7 +226,7 @@ export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, s
   // STAFF-PANEL4-CENSUS (design doc, Server load: "keep a tally on the hourly wealth row the checkpoint already writes,
   // only when it changes"): the census's tally rides this row - null, unchanged, and the row keeps its own - and the
   // character's latest beside it. censusStep never throws: a census that fails is no census, never a lost save
-  const census = censusStep(db, { player, char, seq, nowS }, save, row.census_tally ?? null);
+  const census = whenOption(env, 'census', () => censusStep(db, { player, char, seq, nowS }, save, row.census_tally ?? null), NO_CENSUS);
   after.push(db.prepare(
     'INSERT INTO realm_wealth_hours (char_id, hour, player, level, gain, loss, played_s, checkpoints, tally) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)'
     + ' ON CONFLICT (char_id, hour) DO UPDATE SET level = excluded.level, gain = gain + excluded.gain, loss = loss + excluded.loss,'

@@ -6,13 +6,13 @@ in [chat-safety.md](chat-safety.md).
 
 ## Roles
 
-| Role | Source | Checked by |
-| --- | --- | --- |
-| Admin | `players.staff_admin` | `isDeveloper`; `staffRole` returns `admin` |
-| Moderator | `players.staff_mod` | `canModerate`; `staffRole` returns `moderator` |
-| Owner | `players.staff_owner` (and Admin) | `isOwner` |
-| Report reader, POI approver | an Owner | `isReportReader`, `poiRolesOf` |
-| POI builder | an Admin | `poiRolesOf` |
+| Role                        | Source                            | Checked by                                     |
+| --------------------------- | --------------------------------- | ---------------------------------------------- |
+| Admin                       | `players.staff_admin`             | `isDeveloper`; `staffRole` returns `admin`     |
+| Moderator                   | `players.staff_mod`               | `canModerate`; `staffRole` returns `moderator` |
+| Owner                       | `players.staff_owner` (and Admin) | `isOwner`                                      |
+| Report reader, POI approver | an Owner                          | `isReportReader`, `poiRolesOf`                 |
+| POI builder                 | an Admin                          | `poiRolesOf`                                   |
 
 A role belongs to the account, never to a handle: registering a name grants nothing. The columns are read fresh on every
 request. An Owner is set only by the operator (`tools/staffRole.mjs`); an Owner adds and removes Admins
@@ -90,16 +90,39 @@ Admins can start a live event: a pack of creatures and an optional boss at a pla
 - Game: the event runs as a raid (`src/systems/staffEvents.js`, `src/systems/raidingParties.js`); the boss is
   promoted by `promoteStaffBoss` (`src/systems/eliteFoes.js`) and can be piloted (`src/systems/staffBossPilot.js`).
 
+## Operator options
+
+Tools that core play does not need are off unless the operator names them in `OPERATOR_OPTIONS`
+(`server-account/wrangler.toml`, a comma-separated list; `server-account/src/operator-options.ts`). An option that is
+off answers `option-off` (404) on its staff routes, drops its feed as taken (`{ ok: true, read: false }`), and runs no
+job.
+
+| Option     | What it turns on                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `census`   | The item and gold census: the tally on each realm checkpoint, the daily row and backfill, the census routes |
+| `economy`  | The market, trade, node and economy routes                                                                  |
+| `desk`     | Staff notes and watchlists                                                                                  |
+| `status`   | The server status routes                                                                                    |
+| `follow`   | Follow tokens                                                                                               |
+| `hidden`   | Hide me, the hidden token, and the relay's report of a private home entered                                 |
+| `give`     | An Admin's item mint (`/v1/staff/item/catalogue`, `/v1/staff/item/give`)                                    |
+| `feeds`    | The network and monster feeds and their routes; also set the relay's `STAFF_NET_FEED_URL`                   |
+| `botcheck` | The encounter reaction feed and its route; also set the relay's `REACTION_FEED_URL`                         |
+
+Moderation (cases, mute, ban, freeze, staff messages) and the realm review are core and have no switch. Metrics have
+their own switch: the `METRICS` binding (on the self-host kit, `--metrics`).
+
 ## Monitoring feeds
 
 The relay posts signed batches to the account service (signature header `x-relay-staff-sig`,
-`server/src/staffFeedLaw.js`):
+`server/src/staffFeedLaw.js`). The network and reaction feeds ship off: their relay URLs are empty and their options
+are off (above).
 
-| Feed | Relay | Service route | Tables |
-| --- | --- | --- | --- |
-| Network rows and foes seen | `staffNetFrame`, `staffFoesSeen`, `staffNetFlush` (`server/src/staffFeeds.js`) | `/v1/staff/net-feed` | `staff_net_batches`, `staff_net_rows`, `staff_foe_rows` |
-| Encounter reactions | `staffReactAsk` | `/v1/mod/reaction-feed` | `encounter_reactions`, `reaction_batches` |
-| Spawn grants | grant window | `/v1/mod/grant-feed` | not traced |
+| Feed                       | Relay                                                                          | Service route           | Tables                                                  |
+| -------------------------- | ------------------------------------------------------------------------------ | ----------------------- | ------------------------------------------------------- |
+| Network rows and foes seen | `staffNetFrame`, `staffFoesSeen`, `staffNetFlush` (`server/src/staffFeeds.js`) | `/v1/staff/net-feed`    | `staff_net_batches`, `staff_net_rows`, `staff_foe_rows` |
+| Encounter reactions        | `staffReactAsk`                                                                | `/v1/mod/reaction-feed` | `encounter_reactions`, `reaction_batches`               |
+| Spawn grants               | grant window                                                                   | `/v1/mod/grant-feed`    | not traced                                              |
 
 Feed windows are flushed when a room empties (`flushAtDrain`), so they do not keep a room awake. The hourly cron
 sweeps old rows.

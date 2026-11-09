@@ -163,6 +163,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[vars] *_HANDLES`, `OWNER_KEYS` | `*_HANDLES`: comma-separated account handles for honorary titles only. `OWNER_KEYS`: the public key an Owner account signs in with first. Staff roles are not vars: see [Staff roles](staff-roles.md). |
 | `[vars] *_OPEN`, `SEASON_ZERO_WEEK`, `DOMAINS_WEEK` | Feature switches and season schedule. |
 | `[vars] MOD_AI`, `MOD_AI_MODEL`, `MOD_AI_DAILY_MAX` | The chat-safety reviewer's mode and limits. |
+| `[vars] OPERATOR_OPTIONS` | The operator's tools that are off unless named ([staff tools](../multiplayer/staff-tools.md#operator-options)). |
 | `[vars] DISCORD_MOD_CHANNEL`, `DISCORD_PUBLIC_KEY`, `DISCORD_INVITE_URL` | The moderation bot's channel and interaction key. |
 | `[vars] PATREON_CLIENT_ID`, `PATREON_TIERS` | Patreon linking. |
 
