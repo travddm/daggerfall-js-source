@@ -3846,9 +3846,9 @@ export function createFpArm() {
         wornEquipKey = wornEquipKeyOf(opts && opts.armor);
         lastBuildOpts = opts ? { ...opts } : null;
         buildDeps = (opts && opts.deps) || null;
-        slots.idleState = null; ub.actionState = null; slots.idleGroup = null; ub.weaponGroup = null; weaponClock = { group: null, value: 0 };   // MW-BOW1: no group, no state
+        slots.idleState = null; ub.actionState = null; slots.idleGroup = null; ub.weaponGroup = null; weaponClock = { group: null, value: 0 };   // no weapon group, so no clip state
         slots.movementState = null; slots.movementGroup = null; slots.movementSource = null; slots.movementBase = null;
-        slots.jumpState = null; slots.jumpGroup = null; slots.jumpSource = null; slots.jumpStance = null; slots.jumpKind = null;   // MW-D39
+        slots.jumpState = null; slots.jumpGroup = null; slots.jumpSource = null; slots.jumpStance = null; slots.jumpKind = null;
         slots.lastYaw = null; slots.turnDir = 0; slots.turnHold = 0;
         ub.upper = UPPER_BODY.Rest; ub.attackType = null; ub.holdWindUp = false;
         attackHand = null;   // AUDIT MIXED-PAIR L3-7: a blow a rebuild cuts takes its hand with it
@@ -3907,9 +3907,9 @@ export function createFpArm() {
       held = null; heldMemo = null; lastFrame = null; drewLast = false;   // MAP3: the sheet goes with the rig
       releaseThirdMesh(); thirdBuilt = null; thirdPacked = null; viewMode = 'first';
       slots.movementState = null; slots.movementGroup = null; slots.movementSource = null; slots.movementBase = null;
-      slots.jumpState = null; slots.jumpGroup = null; slots.jumpSource = null; slots.jumpStance = null; slots.jumpKind = null;   // MW-D39
+      slots.jumpState = null; slots.jumpGroup = null; slots.jumpSource = null; slots.jumpStance = null; slots.jumpKind = null;
       slots.lastYaw = null; slots.turnDir = 0; slots.turnHold = 0;
-      slots.idleState = null; ub.actionState = null; slots.idleGroup = null; ub.weaponGroup = null; weaponClock = { group: null, value: 0 };   // MW-BOW1: no group, no state
+      slots.idleState = null; ub.actionState = null; slots.idleGroup = null; ub.weaponGroup = null; weaponClock = { group: null, value: 0 };   // no weapon group, so no clip state
       ub.upper = UPPER_BODY.Rest; ub.attackType = null; ub.holdWindUp = false;
       attackHand = null;   // AUDIT MIXED-PAIR L3-7
       ub.weaponShown = false; ub.arrowShown = false;
@@ -4803,7 +4803,7 @@ export function createFpArm() {
         if (!t || !t.ok) return;
         // MW-D51: the torch overlay on the body's own LeftArm mask.
         const tBase = poseSource ? poseSource.trackMap : t.tracks;
-        const tOverlay = torchState && torchSource && !slots.deathState && t.leftArm && t.leftArm.size;   // MWNPC4: the death takes the left arm too (Priority_Death over Priority_Torch)
+        const tOverlay = torchState && torchSource && !slots.deathState && t.leftArm && t.leftArm.size;   // the death takes the left arm too: it outranks the torch
         if (tOverlay) overlayClock = torchState.time;
         // HT-WAIST: the lantern at the waist swings on the frame's motion before the body is posed around it - on the
         // body motion's stride while it walks the legs (BODY-MOTION), else on the walk clip's
@@ -4853,7 +4853,7 @@ export function createFpArm() {
       // clock. The arm's LeftArm set is rule 25's walk on THIS
       // skeleton; a rig without "Bip01 L Clavicle" overlays nothing.
       const fBase = poseSource ? poseSource.trackMap : built.tracks;
-      const fOverlay = torchState && torchSource && !slots.deathState && built.leftArm && built.leftArm.size;   // MWNPC4: and here
+      const fOverlay = torchState && torchSource && !slots.deathState && built.leftArm && built.leftArm.size;   // the death takes the left arm here too
       if (fOverlay) overlayClock = torchState.time;
       let fTracks = fOverlay ? overlayFor(fBase, built.leftArm) : fBase;
       let fSampler = fOverlay ? overlaySample : sampleTrack;
@@ -5122,7 +5122,7 @@ export function createFpArm() {
       // from where they stood when the player LEFT this view); a fresh carry takes its first composition as it stands
       mirrorCarry.first = {}; mirrorCarry.third = {};
       slots.resetMovement();
-      slots.resetJump();   // MW-D39: the clip state came from the OTHER rig's sources; the next frame re-derives
+      slots.resetJump();   // the clip state came from the OTHER rig's sources; the next frame re-derives
       slots.resetIdle();
       refreshTorch(true);   // MW-D51: the torch clip came from the OTHER rig's sources too
       return true;
@@ -5589,7 +5589,7 @@ export function createFpArm() {
         jumpSource: slots.jumpSource && slots.jumpSource.name,
         clipNotes: notes.slice(-6),
         time: ub.actionState ? ub.actionState.time : (slots.idleState ? slots.idleState.time : null),
-        poseTime: ub.actionState ? poseTime(ub.actionState) : (slots.idleState ? slots.idleState.time : null),   // MS1: what the pose sampled
+        poseTime: ub.actionState ? poseTime(ub.actionState) : (slots.idleState ? slots.idleState.time : null),   // what the pose sampled
         frames,
         // MW-D24: which rig the machine is driving, and the body's own
         // build verdict - a refusal is a sentence on the card, exactly

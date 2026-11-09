@@ -298,7 +298,7 @@ test('MW-D8: active() is false unless EVERY term holds - a frozen arm is not a r
   // or idle - is the same guarantee (a rig with none is the frozen bind
   // pose, and the sprite is the correct picture).
   // BEAST-SELF added the EIGHTH, ahead of the seven: the arm stands aside for a transformed lycanthrope (setStandIn)
-  assert.match(src, /const active = \(\) => !standIn && !!\(built && built\.ok && mesh && renderer && camera && \(ub\.actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState\)\s*&& viewMode === 'first'\);/,   // MW-D39 widened the clip term again: the jump slot counts
+  assert.match(src, /const active = \(\) => !standIn && !!\(built && built\.ok && mesh && renderer && camera && \(ub\.actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState\)\s*&& viewMode === 'first'\);/,   // the jump slot counts as a clip too
     'not standing aside, built, built.ok, mesh, renderer, camera, a clip AND the first-person view - all eight');
 });
 
@@ -615,7 +615,7 @@ test('MW-D9f: the rig gates the step on ready() and the draw on active()', () =>
 
   // ready() must not require the mesh, or the deadlock comes straight back.
   const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(ub\.actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState \|\| slots\.hitState \|\| slots\.deathState\) && renderer\);/,   // MW-D39: the jump slot counts here too
+  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(ub\.actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState \|\| slots\.hitState \|\| slots\.deathState\) && renderer\);/,   // the jump slot counts here too
     'ready() is update()\'s own requirements - no mesh term, no camera term (MW-D26 widened the clip term)');
 });
 
