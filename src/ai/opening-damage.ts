@@ -1,8 +1,7 @@
 // Whether a foe caught open takes extra damage: a staggered foe x1.25 and an overreached one x1.3 (ai/tells.js
-// STAGGER_TAKEN, PUNISH_TAKEN; registered in ai/tactics.js). Decision 13 drops the Enhanced AI's damage multipliers,
-// and the docs review (decision 117, item 15) counts these two among them, so DFU's damage is the default: a stagger
-// and an overreach still stop the foe, and a blow on it does what any blow does. The `openingDamage` pref (a Features
-// row, opening-damage-row.ts) keeps the multipliers as an option. Pinned off online (net/profile/officialProfile.ts).
+// STAGGER_TAKEN, PUNISH_TAKEN; registered in ai/tactics.js). DFU's blows do the same damage whatever the foe is doing,
+// so DFU's damage is the default: a stagger and an overreach still stop the foe, and a blow on it does what any blow
+// does. The `openingDamage` pref (a Features row, opening-damage-row.ts) keeps the multipliers as an option. Pinned off online (net/profile/officialProfile.ts).
 
 import { getPref } from '../systems/uiPrefs.js';
 

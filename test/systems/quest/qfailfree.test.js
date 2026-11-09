@@ -1,5 +1,5 @@
-// A quest's end online (Quest.cs EndQuest): DFU's -2 on failure, propagated, by default; QFAIL-FREE, a failure that costs
-// its faction nothing, is the server profile's option (quest.failureFree). A success's +5 is DFU's on both lanes.
+// A quest's end online (Quest.cs EndQuest): DFU's -2 on failure, propagated, by default; a failure that costs
+// its faction nothing is the server profile's option (quest.failureFree). A success's +5 is DFU's on both lanes.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

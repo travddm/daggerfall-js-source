@@ -84,13 +84,13 @@ export function setSkyClockRule(/** @type {() => boolean} */ fn) {
 /** Whether the sky runs on a clock of its own (time.skyClock). */
 export const skyHasOwnClock = () => _skyOwnClock() === true;
 
-/** TIME1: the sky's clock, classic minutes, for a relay-clock instant (ms) - the event clock's before the first switch,
+/** The sky's clock, classic minutes, for a relay-clock instant (ms) - the event clock's before the first switch,
  *  and always with one clock. */
 export const skyClassicMinutes = (nowMs) => (skyHasOwnClock() ? LAW.minutesAt(nowMs) : sharedClassicMinutes(nowMs));
 /** TIME1: the inverse - the relay-clock millisecond at which the sky reads a classic minute (the words that say how long
  *  until the sky's dusk). */
 export const wallMsForSkyMinutes = (classicMinutes) => (skyHasOwnClock() ? LAW.wallMsAt(classicMinutes) : wallMsForClassicMinutes(classicMinutes));
-/** TIME1: the sky's rate at an instant, classic minutes per real ms (the event clock's before the first switch, and with
+/** The sky's rate at an instant, classic minutes per real ms (the event clock's before the first switch, and with
  *  one clock). */
 export const skyMinutesPerMsAt = (nowMs) => (skyHasOwnClock() ? LAW.rateAt(nowMs) : ONLINE_MINUTES_PER_MS);
 
