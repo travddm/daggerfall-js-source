@@ -1,5 +1,5 @@
 // The operator's options: tools a server's operator may want and core play does not need, each off unless the
-// operator names it in OPERATOR_OPTIONS (server-account/wrangler.toml), a comma-separated list (decision #118 A2;
+// operator names it in OPERATOR_OPTIONS (server-account/wrangler.toml), a comma-separated list (decision 118 A2;
 // server feature audit PR 8). An option that is off answers `option-off` on its staff routes, takes no feed, and runs
 // no job, so a server that never turns it on pays nothing for it.
 //
