@@ -3,11 +3,11 @@
 // (a build that shows the box), the session's frame arm, the box (ui/staffMessageBox.js) and the game's half
 // (net/staffMessages.js) - and the whole chain, from the panel's send to "they pressed OK", over the real relay and the
 // real account service.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../chargenDom.mjs';
 import worker from '../../server/src/index.js';
-import { fakeRooms } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { standService, sessionStorageOf } from '../accountDb.mjs';
 import { OnlineSession } from '../../src/net/online.js';
@@ -20,6 +20,7 @@ import { ChatLog } from '../../src/net/chat.js';
 import { showStaffMessageBox, STAFF_MESSAGE_BOX_ID } from '../../src/ui/staffMessageBox.js';
 import { staffWords, STAFF_SESSION_HEADER } from '../../server-account/src/staff.js';
 import * as H from '../../src/net/hubShards.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const subtle = globalThis.crypto.subtle;
 const ofType = (ws, t) => ws.sent.filter((m) => m.t === t);

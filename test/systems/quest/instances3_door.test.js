@@ -40,7 +40,7 @@ function questAt(m, site) {
   q.resources.set('crypt', p);
   return q;
 }
-const CRYPT = { siteType: SITE_TYPES.Dungeon, mapId: 52646490 };   // Ruins of The Hold of Coppering (Isle of Balfiera)
+const CRYPT = { siteType: SITE_TYPES.Dungeon, mapId: 52646492 };   // Ruins of The Hold of Coppering (Isle of Balfiera)
 const SHOP = { siteType: SITE_TYPES.Building, mapId: 206728581, buildingKey: 131590 };
 
 test('INSTANCES the door\'s law: a running quest whose Place names the site - a dungeon by its map id, a building by its key; the oldest opens the room; an ended, set-aside or moved one names none', () => {
@@ -73,7 +73,7 @@ test('INSTANCES where a quest\'s things stand: online only in a dungeon whole; o
 });
 
 test('INSTANCES the sizes: online the quest\'s world and an instance ask for the dungeon whole; the public room keeps the world\'s size; a quest started online is stamped DFU\'s Disabled', () => {
-  const loc = { name: 'Ruins of The Hold of Coppering', hasDungeon: true, mapTableData: { mapId: 52646490 }, dungeon: { blocks: Array.from({ length: 13 }, (_, i) => ({ blockName: `N${i}.RDB` })) } };
+  const loc = { name: 'Ruins of The Hold of Coppering', hasDungeon: true, mapTableData: { mapId: 52646492 }, dungeon: { blocks: Array.from({ length: 13 }, (_, i) => ({ blockName: `N${i}.RDB` })) } };
   assert.equal(onlineDungeonSize(loc), 'medium', 'the world builds it medium (the probe: its entrance walks into a cap)');
   assert.equal(dungeonSizeFor(loc, { online: true }), 'medium');
   assert.equal(dungeonSizeFor(loc, { online: true, whole: true }), 'full');
@@ -129,7 +129,7 @@ test('INSTANCES a partner\'s instance at this place: a member standing in an ins
   const ann = '0123456789abcdef', fi = 'fedcba9876543210', stranger = '1111111111111111';
   const owners = { a1: ann, a6: fi, a2: '2222222222222222', a3: '3333333333333333', a4: '4444444444444444', a5: '5555555555555555', a7: '7777777777777777' };
   const ownerOf = (acct) => owners[acct] ?? null;
-  const crypt = 'dungeon:m52646490', shop = 'interior:m206728581.7';
+  const crypt = 'dungeon:m52646492', shop = 'interior:m206728581.7';
   const members = [
     { acct: 'a2', name: 'Bo', online: true, p: { in: 1, ins: instanceRoomOf(crypt, { owner: ann, epoch: '89abcdef' }) } },   // Bo stands in Ann's room
     { acct: 'a1', name: 'Ann', online: true, p: { in: 0 } },                                                                  // Ann, its owner, outside
@@ -321,7 +321,7 @@ test('QUEST-FIRST (FIELD BUGS 2026-10-26, runa: "The Masoleum of Darkivaron ... 
   // the report's crypt: Isle of Balfiera's Masoleum of Darkivaron, its eight blocks as MAPS.BSA lays them - its public room
   // built small (SD-ONLINE), N0000057 (the hall the lift rises to) replaced by a border block
   const DARKIVARON = {
-    name: 'The Masoleum of Darkivaron', hasDungeon: true, mapTableData: { mapId: 9601832 },
+    name: 'The Masoleum of Darkivaron', hasDungeon: true, mapTableData: { mapId: 9601848 },
     dungeon: { blocks: [['N0000091', 0, 0], ['N0000057', 0, 1], ['B0000014', -1, 0], ['B0000000', -1, 1], ['B0000012', 0, -1], ['B0000005', 0, 2], ['B0000013', 1, 0], ['B0000010', 1, 1]]
       .map(([n, x, z], i) => ({ blockName: `${n}.RDB`, x, z, isStartingBlock: i === 0 })) },
   };
@@ -365,10 +365,10 @@ test('INSTANCES the door\'s other words: atDoor - Leave spends the press, a row 
   assert.deepEqual(said, [INSTANCE_TEXT.refused()]);
   assert.equal(d.refused({ terminal: true, error: 'busy', room: room.replace('89abcdef', '89abcdee') }), false);
   assert.equal(d.refused({ terminal: false, error: INSTANCE_DOOR_WORD, room: room.replace('89abcdef', '89abcdee') }), false);
-  assert.equal(d.refused({ terminal: true, error: INSTANCE_DOOR_WORD, room: 'dungeon:m52646490' }), false, 'a public room\'s refusal is no instance\'s');
+  assert.equal(d.refused({ terminal: true, error: INSTANCE_DOOR_WORD, room: 'dungeon:m52646492' }), false, 'a public room\'s refusal is no instance\'s');
   assert.deepEqual(d.poseWord('dungeon', room), { ins: room });
   assert.deepEqual(d.poseWord('exterior', room), {});
-  assert.deepEqual(d.poseWord('dungeon', 'dungeon:m52646490.m'), {}, 'its public room: none');
+  assert.deepEqual(d.poseWord('dungeon', 'dungeon:m52646492.m'), {}, 'its public room: none');
   const build = { ...COPPERING };
   assert.equal(d.questElsewhere(build), true);
   assert.equal(d.questElsewhere(build), false, 'once a build');
@@ -533,7 +533,7 @@ test('INSTANCES the hosts, by source: the place\'s instance is the MODE\'s - set
   assert.match(W, /if \(instanceDoor\.refused\(online\)\) modes\?\.forceExitToExterior\?\.\(\);/);
   assert.match(W, /landed = !!\(await modes\?\.startInDungeon\?\.\(\{ recorded: a\.dungeon \?\? \{\} \}\)\);/, 'a Recall');
   assert.match(W, /interior: inside\.interior, dungeon: inside\.dungeon \?\? null,/, 'the anchor is set with the dungeon\'s record');
-  assert.match(W, /startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/, 'a load');
+  assert.match(W, /startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: extras\.dungeon \?\? \{\} \}\)/, 'a load');
   assert.match(W, /startInDungeon\?\.\(\{ locationKey: d\.locationKey \?\? null, holdOpen: true, recorded: \{ ins: d\.ins \?\? null, whole: d\.whole === true, staff: true \} \}\)/, 'a staff landing in a dungeon');
   assert.match(W, /\.\.\.\(d\.ins \? \{ ins: d\.ins, staff: true \} : \{\}\) \}, null, \{ strictDoor: true \}\)/, 'and in a building');
   assert.match(W, /var modes = createWorldModes\(\{\n {4}climbFeel[,:][^\n]*\n {4}outsideView,[^\n]*\n {4}instanceDoor,/);

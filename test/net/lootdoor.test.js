@@ -3,9 +3,9 @@
 // without it, and every peer landed that - the piece gone. A loot room's hello says the loot its build reads (net/wire.js
 // LOOT_HELLO_LAW, `ll`), and while `lootDoor` is on the relay refuses one that says less or none - GRANT-DOOR's own law.
 import '../chargenDom.mjs';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fakeRooms } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms } from '../fakeRoom.mjs';
 import { LOOT_HELLO_LAW, LOOT_HELLO_LAW_WIRE_MAX, LOOT_OLD_REASON, GROUND_LAW, GRANT_HELLO_LAW, lootRoom, groundRoom, parseClient, CLOSE_POLICY } from '../../src/net/wire.js';
 import { RELAY_CFG_KEYS, RELAY_CFG_VARS, RELAY_INTERNAL_CFG, RELAY_CFG_TTL_MS, parseRelayCfgCommand } from '../../src/net/relayCfg.js';
 import { privateInteriorPrefix, privateInteriorRoom, privateBoatRoom } from '../../src/net/privateInterior.js';
@@ -17,6 +17,7 @@ import { MINT_V_MASTER } from '../../src/net/productRecord.js';
 import { rollMasterLines, masterRecordLines } from '../../src/net/masterLaw.js';
 import { mintTrophy, TROPHY_BEASTS } from '../../src/systems/hunt/trophies.js';
 import { OnlineSession } from '../../src/net/online.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return await fn(); } finally { console.warn = w; console.log = l; } };
 /** Main's build (4c696da8d): it says its ground, its grants and its lease - and no loot law. */

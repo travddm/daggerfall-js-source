@@ -9,11 +9,9 @@
 import '../../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
-import { siteWorldPixel, SITE_TYPES } from '../../../src/systems/quest/place.js';
-import { STARTS, startOfSiteId } from '../../../src/systems/starts/starts.js';
+import { siteWorldPixel } from '../../../src/systems/quest/place.js';
+import { BAY_START_QUEST } from '../../../src/systems/starts/starts.js';
 import { mapPixelToLongitudeLatitude } from '../../../src/formats/mapsFile.js';
 import { canFindPlace } from '../../../src/ui/travel/travelMapWindow.js';
 import { entryTarget } from '../../../src/ui/quest/questLens.js';
@@ -23,10 +21,9 @@ import { _resetForTests, setPref } from '../../../src/systems/uiPrefs.js';
 import { HeldMapWindow } from '../../../src/ui/heldMap.js';
 import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { FACTION_TYPES } from '../../../src/formats/factionFile.js';
-import { ROOT, packMachine, loadTables } from '../../qlSources.mjs';
+import { packMachine, loadTables } from '../../qlSources.mjs';
 import { town, dungeon, rmbBlock, worldOf, SPAWN, ITEM } from '../../fb1004dTowns.mjs';
 
-const rd = (p) => readFileSync(join(ROOT, p), 'utf8');
 const skin = (v) => { _resetForTests(); globalThis.location = { search: `?skin=${v}` }; };
 afterEach(() => { _resetForTests(); delete globalThis.location; });
 
@@ -60,7 +57,6 @@ function pastBay() {
     currentLocation: () => where.loc, playerInside: () => where.inside, isPlayerInLocationRect: () => !where.inside,
     currentLocationIndex: () => locations.indexOf(where.loc),
     discoverLocation: () => {}, mountCurrentSiteQuestResources: () => {},
-    startSiteOfId: (id) => (startOfSiteId(id) ? lair : null),
   };
   const now = { s: 1e6 };
   const m = packMachine({ nowSeconds: () => now.s, skySeconds: () => 100 * 86400 + 12 * 3600, world, showPopup: () => {}, isPlayerInTown: () => !where.inside, giveItemToPlayer: () => {}, removeItemFromPlayer: () => {}, carriesQuestItem: () => true });
@@ -77,22 +73,6 @@ test('START3 a site past the Bay keeps its own map pixel - the one its row\'s lo
   for (const [x, y] of [[0, 0], [999, 499], [207, 213]]) assert.equal(siteWorldPixel(at(x, y)), null, `the Bay's (${x}, ${y})`);
   assert.equal(siteWorldPixel({ mapTableData: {} }), null, 'a row without its place');
   assert.equal(siteWorldPixel(null), null);
-});
-
-test('START3 a province\'s start, played: its dungeon\'s site carries the pixel the lair stands on, through the save; the order\'s city, a Bay site, carries none (mutants: the fixed site\'s pixel unset)', () => {
-  const p = pastBay();
-  const q = p.m.startQuestByName(STARTS[1].quest);
-  assert.ok(q);
-  p.tick(2);
-  const lair = q.getPlace({ name: 'lair' });
-  assert.equal(lair.siteDetails.siteType, SITE_TYPES.Dungeon);
-  assert.deepEqual(lair.siteDetails.worldPixel, LAIR_PX, 'the lair\'s own pixel');
-  const city = q.getPlace({ name: 'daggerfall' });
-  assert.equal('worldPixel' in city.siteDetails, false, 'a Bay site: DFU\'s SiteDetails, nothing added');
-  const saved = structuredClone(lair.getSaveData());
-  lair.siteDetails = null;
-  lair.restoreSaveData(saved);
-  assert.deepEqual(lair.siteDetails.worldPixel, LAIR_PX, 'kept by the save');
 });
 
 test('START3 the one "on my map" law: a site past the Bay is on the player\'s map exactly where the map they open shows the land past the Bay - the held sheet, its continent on - and never asks MAPS.BSA; a Bay site asks it as before (mutants: the site unread; the classic map answering yes; the continent\'s switch unread)', () => {
@@ -116,19 +96,10 @@ test('START3 the one "on my map" law: a site past the Bay is on the player\'s ma
   assert.equal(canFindPlace(null, null, 'Daggerfall', 'Daggerfall', pixelOf), false, 'and a caller with no site, as before');
 });
 
-test('START3 the lens: a start\'s first entry names its dungeon, on the map past the Bay, and its `find` carries the pixel; the Bay\'s start\'s names Privateer\'s Hold with DFU\'s `find`, nothing added (mutants: the site unpassed; the pixel left off `find`)', () => {
+test('START3 the lens: the Bay\'s start names Privateer\'s Hold with DFU\'s `find`, nothing added (mutants: a pixel added to a Bay site)', () => {
   skin('enhanced');
   const p = pastBay();
-  const q = p.m.startQuestByName(STARTS[1].quest);
-  p.tick(2);
-  const asks = [];
-  const where = { canFindPlace: (r, n, site) => { asks.push(site ?? null); return canFindPlace(null, null, r, n, () => null, site); }, currentLocationName: () => '' };
-  const t = entryTarget(q.getMessage(1010), where);
-  assert.equal(t.onMap, true);
-  assert.equal(t.locationName, 'The Haunt of Baringon');
-  assert.deepEqual(t.find, { regionIndex: 64, regionName: 'Skyrim', locationName: 'The Haunt of Baringon', worldPixel: LAIR_PX });
-  assert.deepEqual(asks[0]?.worldPixel, LAIR_PX, 'the host asked with the site');
-  const ib = p.m.startQuestByName(STARTS[0].quest);
+  const ib = p.m.startQuestByName(BAY_START_QUEST);
   p.tick(2);
   const bay = entryTarget(ib.getMessage(1010), { canFindPlace: () => true, currentLocationName: () => '' });
   assert.deepEqual(bay.find, { regionIndex: 17, regionName: 'Daggerfall', locationName: "Privateer's Hold" }, 'a Bay site\'s find is DFU\'s');

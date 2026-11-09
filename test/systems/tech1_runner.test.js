@@ -197,7 +197,7 @@ test('TECH1 THE KEY - REFUSALS: no technique, the beast, the ladder off, a duel,
   };
   assert.equal(said(() => ({ pw: weaponOf(LR.applyRarity(createWeapon(120, 1), 'rare', lcg(1))) })).said, T.NO_TECHNIQUE_TEXT);
   assert.equal(said(() => { const pw = weaponOf(null); pw.weapon = { werecreatureClaws: true }; return { pw }; }).said, T.BEAST_TEXT);
-  const off = said(() => { const pw = weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')); setPref('lootRarity', false); return { pw }; });
+  const off = said(() => { const pw = weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')); setPref('weaponTechniques', false); return { pw }; });
   assert.deepEqual([off.said, off.started, off.fatigue], [T.LADDER_OFF_TEXT, 0, 6400]);
   assert.equal(said(() => { setSigilDueling(true); return { pw: weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')) }; }).said, T.DUEL_TEXT);
   setSigilDueling(false);
@@ -530,8 +530,8 @@ test('TECH1 THE SCREEN: the marks in the ground pass at their own sizes, nothing
   assert.deepEqual(ring.map((m) => [m.blow.kind, m.blow.r]), [['leap', 3]]);
   T.offsetTechniques([10, 0, -5]);
   assert.deepEqual(pw.techniqueBlow.feet, [10, 0, -5]);
-  setPref('lootRarity', false);
-  assert.deepEqual(T.techniqueHudChips(me, pw), [], 'the ladder off: no chip');
+  setPref('weaponTechniques', false);
+  assert.deepEqual(T.techniqueHudChips(me, pw), [], 'the switch off: no chip');
   _resetForTests();
 });
 

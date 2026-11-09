@@ -816,7 +816,7 @@ ${G} :is([data-grim="ink"], .px-journal) :is(.opt-tools, .poolbar, .reviewhead, 
   background: linear-gradient(180deg, #ddc28e, #d6b982) !important; border-bottom: ${px(1)} solid rgba(74,44,18,0.45) !important;
   box-shadow: 0 ${px(1)} 0 rgba(74,44,18,0.12) !important; }`;
 /** The windows too small or too thin for the board's frame. */
-export const SMALL_WINDOWS = Object.freeze(['.px-about', '.px-profile', '.px-support', '.travelpanel-bar', '.tview-bar', '.tview-side',
+export const SMALL_WINDOWS = Object.freeze(['.px-about', '.px-profile', '.travelpanel-bar', '.tview-bar', '.tview-side',
   '.tview-confirm', '#wp-menu', '#travel-pace-box', '.helmpanel-bar', '.saddlepanel-bar', '.hmroot .hmtools', 'body .dfdecor-bar']);
 
 export function kitCss() {

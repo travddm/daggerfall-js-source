@@ -18,7 +18,7 @@
 // foe retyped (B1), the memory's records the shared half out and projected
 // in (C2), the pending acts kept through a reconnect (C3), the room and the
 // host said out loud (D5), the pane's copy (D5), the relay's version (D4).
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { isWorldRoom, roomOf, WORLD_MIN_MS, PIXEL_UNITS, CLOSE_POLICY } from '../../src/net/wire.js';
@@ -27,9 +27,10 @@ import { RELAY_VERSION } from '../../src/net/wire.js';   // LOCALDEV1: the worke
 import { roomKeyFor, OnlineSession } from '../../src/net/online.js';
 import { MAIN_STORY_DUNGEON_IDS, isMainStoryDungeon } from '../../src/world/dungeon/dungeonTextures.js';
 import { useSmallerDungeon, dungeonSizeFor, onlineDungeonSize, SMALLER_DUNGEONS_STATE } from '../../src/world/smallerDungeons.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, asOnlinePage } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+after(asOnlinePage());   // its sessions join the real relay, so their hellos say the profile's hash
 
 const rd = (p) => hostText(p);
 const at = (px, pz) => ({ x: px * PIXEL_UNITS + 10, y: 0, z: pz * PIXEL_UNITS + 10, yaw: 0, pitch: 0, mv: 0 });

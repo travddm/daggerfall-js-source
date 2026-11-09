@@ -3,10 +3,11 @@
 // signature is no found line and still answers. Also the budget B1 states for the roster's numbers.
 import '../modsOff.js';
 import { test } from 'node:test';
+import { readFileSync, readdirSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { setPref, getPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import * as LR from '../../src/systems/loot/lootRarity.js';
-import { techniquesOn, WEAPON_TECHNIQUES_KEY } from '../../src/systems/loot/techniquesOn.js';
+import { techniquesOn, WEAPON_TECHNIQUES_KEY } from '../../src/combat/technique/techniquesOn.js';
 import * as RO from '../../src/combat/technique/techniqueRoster.js';
 import * as T from '../../src/combat/techniques.js';
 import { FEATURES, FEATURE_PREF_DEFAULTS } from '../../src/systems/features.js';
@@ -131,7 +132,9 @@ test('B1 THE SWITCH: the preference defaults on, and the Features row declares i
   assert.equal(techniquesOn(), false, 'ladder on, switch off');
   setPref('weaponTechniques', true);
   setPref('lootRarity', false);
-  assert.equal(techniquesOn(), false, 'switch on, ladder off: techniques need both');
+  assert.equal(techniquesOn(), true, 'switch on, ladder off: techniques need no ladder');
+  setPref('weaponTechniques', false);
+  assert.equal(techniquesOn(), false, 'switch off, ladder off');
   reset();
 });
 
@@ -164,7 +167,7 @@ test('B1 THE KEY: a weapon carrying a technique line answers the off text and sh
   assert.ok(T.techniqueHudChips(me, { weapon: sword }, 'X').length > 0, 'a chip with the switch on');
   setPref('weaponTechniques', false);
   T._resetTechniquesForTests();
-  assert.equal(T.LADDER_OFF_TEXT, 'Weapon techniques are turned off (they need Loot rarity and Weapon techniques on).');
+  assert.equal(T.LADDER_OFF_TEXT, 'Weapon techniques are turned off.');
   assert.equal(T.refusal(T.techniqueInHand(me, { weapon: sword }), press(me, sword)), T.LADDER_OFF_TEXT);
   assert.equal(T.techniqueHudChips(me, { weapon: sword }, 'X').length, 0, 'no chip with the switch off');
   reset();
@@ -206,4 +209,57 @@ test("B1 THE BUDGET: every technique's to-hit is 5-10, no base passes 1.5, and t
   assert.equal(withToHit, 10, 'the ten melee techniques carry a to-hit; the two archery ones none');
   const topBand = Math.max(...Object.values(RO.TECHNIQUE_BANDS).map((b) => b[1]));
   assert.ok(topBase * (1 + topBand / 100) <= 1.95 + 1e-9, `${topBase} x ${1 + topBand / 100}`);
+});
+
+test('TECHNIQUES WITHOUT LOOT RARITY: a plain weapon has its family first technique at base power, the switch alone turns it off (mutants: the ladder asked; a line needed; the default kept with the ladder on)', () => {
+  reset();
+  setPref('lootRarity', false);
+  setPref('weaponTechniques', true);
+  T._resetTechniquesForTests();
+  const me = fighter();
+  const sword = weapon(WEAPONS.Longsword);
+  const hand = T.techniqueInHand(me, { weapon: sword });
+  assert.equal(hand?.id, 'leap', 'the long blade family first');
+  assert.equal(hand.value, 0, 'base power: no line adds to it');
+  assert.equal(hand.known, true);
+  assert.notEqual(T.refusal(hand, press(me, sword)), T.LADDER_OFF_TEXT, 'the switch does not refuse it');
+  assert.ok(T.techniqueHudChips(me, { weapon: sword }, 'X').length > 0, 'a chip shows');
+  assert.equal(T.techniqueInHand(me, { weapon: weapon(WEAPONS.Dagger) })?.id, 'shadowstep');
+  setPref('weaponTechniques', false);
+  T._resetTechniquesForTests();
+  assert.equal(T.refusal(T.techniqueInHand(me, { weapon: sword }), press(me, sword)), T.LADDER_OFF_TEXT);
+  // Loot rarity on: no family default, a weapon with no line has no technique, as on the base
+  setPref('weaponTechniques', true);
+  setPref('lootRarity', true);
+  T._resetTechniquesForTests();
+  assert.equal(T.techniqueInHand(me, { weapon: sword }), null, 'ladder on, no line: none');
+  assert.equal(T.techniqueHudChips(me, { weapon: sword }, 'X').length, 0);
+  reset();
+});
+
+test('TECHNIQUES WITH LOOT RARITY: a found line picks the technique and adds its power; with the ladder off the same line is ignored (mutants: the line ignored with the ladder on; read with it off)', () => {
+  prefs(true);
+  const me = fighter();
+  const sword = swordWithLine();
+  sword.affixes = sword.affixes.map((a) => (LR.isTechniqueAffix(a) ? { ...a, param: 'whirlwind', value: 15 } : a));
+  const hand = T.techniqueInHand(me, { weapon: sword });
+  assert.equal(hand?.id, 'whirlwind');
+  assert.equal(hand.value, 15);
+  setPref('lootRarity', false);
+  const off = T.techniqueInHand(me, { weapon: sword });
+  assert.equal(off?.id, 'leap', 'rarity off: the family default answers');
+  assert.equal(off.value, 0);
+  reset();
+});
+
+
+test('TECHNIQUES AND LOOT RARITY DO NOT IMPORT EACH OTHER: the ladder names no techniques code or switch; the techniques reach it in one file', () => {
+  const code = (url) => readFileSync(url, 'utf8').replace(/\/\/[^\n]*/g, '');
+  const ladder = code(new URL('../../src/systems/loot/lootRarity.js', import.meta.url));
+  assert.ok(!/combat\/technique/.test(ladder), 'lootRarity.js imports nothing of the techniques');
+  assert.ok(!/weaponTechniques/.test(ladder), 'lootRarity.js reads no techniques switch');
+  const dir = new URL('../../src/combat/', import.meta.url);
+  const files = [...readdirSync(new URL('technique/', dir)).map((n) => `technique/${n}`), 'techniques.js'].filter((n) => n.endsWith('.js'));
+  const naming = files.filter((n) => /loot\/(lootRarity|techniquesOn)/.test(code(new URL(n, dir))));
+  assert.deepEqual(naming, ['technique/rarityLink.js']);
 });

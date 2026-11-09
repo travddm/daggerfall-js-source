@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { FEATURES, FEATURE_PREF_DEFAULTS, FEATURE_PREF_ONLINE, registerFeatureLane, featureLane, resolveControl, checkFeature } from '../../src/systems/features.js';
 import { PREF_DEFAULTS, getPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import { ONLINE_FORCED_PREFS, ONLINE_PLAYERS_OWN_PREFS, declareOnlinePrefs, onlineForcedPref } from '../../src/systems/online/onlineLane.js';
+import { OFFICIAL_PROFILE } from '../../src/net/profile/officialProfile.ts';
 import '../../src/world/landView.js';
 import '../../src/world/outdoors.js';
 import '../../src/systems/featureLanes.js';   // FT18: the wind, the quick slots and the blood lanes register themselves too
@@ -29,10 +30,10 @@ test('RF4: every prefs row declares its switch, and the shelf and the lane deriv
   assert.ok(declared.length > prefsRows.length, 'the covered prefs are declared');
   for (const [f, c] of declared) {
     assert.ok(c.initial !== undefined, `${f.id} declares ${c.key}'s initial`);
-    assert.ok([true, false, 'player'].includes(c.online), `${f.id} declares ${c.key}'s online answer`);
+    assert.ok(['room', 'player'].includes(c.online), `${f.id} declares ${c.key}'s online answer`);   // P0 SERVER PROFILE: the room's value is the profile's pin
     assert.equal(PREF_DEFAULTS[c.key], c.initial, `${f.id}: the shelf's default for ${c.key} is the row's`);
     if (c.online === 'player') { assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes(c.key), `${c.key}: the player's online, by name`); assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, c.key)); }
-    else assert.equal(ONLINE_FORCED_PREFS[c.key], c.online, `${c.key}: forced online as the row says`);
+    else assert.equal(ONLINE_FORCED_PREFS[c.key], OFFICIAL_PROFILE.pins.prefs[c.key], `${c.key}: forced online at the profile's pin`);
   }
   assert.deepEqual(FEATURE_PREF_DEFAULTS, Object.fromEntries(declared.map(([, c]) => [c.key, c.initial])));
   assert.deepEqual(FEATURE_PREF_ONLINE, Object.fromEntries(declared.map(([, c]) => [c.key, c.online])));
@@ -45,21 +46,17 @@ test('RF4: every prefs row declares its switch, and the shelf and the lane deriv
   assert.equal(onlineForcedPref('grassDensity', '?online=1'), undefined, 'a dial is the player\'s');
 });
 
-test('RF4: the lane door - true/false forces, \'player\' leaves it by name, idempotent and reversible', () => {
-  declareOnlinePrefs({ rf4x: true, rf4y: 'player', rf4z: false });
+test(`RF4: the lane door - 'player' leaves a switch to the player by name, idempotent; any other answer declares nothing, since the room's switches are the server profile's pins (P0 SERVER PROFILE)`, () => {
+  const forced = { ...ONLINE_FORCED_PREFS };
+  declareOnlinePrefs({ rf4x: 'room', rf4y: 'player', rf4z: true, rf4q: 42 });
   try {
-    assert.equal(ONLINE_FORCED_PREFS.rf4x, true); assert.equal(ONLINE_FORCED_PREFS.rf4z, false);
     assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes('rf4y') && !Object.hasOwn(ONLINE_FORCED_PREFS, 'rf4y'));
     declareOnlinePrefs({ rf4y: 'player' });
     assert.equal(ONLINE_PLAYERS_OWN_PREFS.filter((k) => k === 'rf4y').length, 1, 'idempotent');
-    declareOnlinePrefs({ rf4x: 'player', rf4y: true });
-    assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, 'rf4x') && ONLINE_PLAYERS_OWN_PREFS.includes('rf4x'));
-    assert.equal(ONLINE_FORCED_PREFS.rf4y, true); assert.ok(!ONLINE_PLAYERS_OWN_PREFS.includes('rf4y'));
-    declareOnlinePrefs({ rf4q: 'nonsense' });
-    assert.ok(!Object.hasOwn(ONLINE_FORCED_PREFS, 'rf4q') && !ONLINE_PLAYERS_OWN_PREFS.includes('rf4q'), 'an unknown answer declares nothing');
+    for (const k of ['rf4x', 'rf4z', 'rf4q']) assert.ok(!ONLINE_PLAYERS_OWN_PREFS.includes(k), k);
+    assert.deepEqual({ ...ONLINE_FORCED_PREFS }, forced, 'the rows force nothing: the profile does');
   } finally {
-    delete ONLINE_FORCED_PREFS.rf4x; delete ONLINE_FORCED_PREFS.rf4y; delete ONLINE_FORCED_PREFS.rf4z;
-    for (const k of ['rf4x', 'rf4y']) { const i = ONLINE_PLAYERS_OWN_PREFS.indexOf(k); if (i >= 0) ONLINE_PLAYERS_OWN_PREFS.splice(i, 1); }
+    const i = ONLINE_PLAYERS_OWN_PREFS.indexOf('rf4y'); if (i >= 0) ONLINE_PLAYERS_OWN_PREFS.splice(i, 1);
   }
 });
 

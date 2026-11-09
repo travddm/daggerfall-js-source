@@ -1364,22 +1364,16 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
     return true;
   }
 
-  /** DaggerfallActionDoor.AttemptLockpicking (:147-191), verbatim:
-   *  no-op while the door swings; a SILENT return while the live
-   *  Lockpicking skill still equals the recorded failure (the
-   *  C# == test, so a skill that moved EITHER way re-opens the
-   *  attempt); a magically held lock (>= 20) speaks the failure line
-   *  with NO tally, NO roll and NO record; otherwise the attempt
-   *  tallies Lockpicking BEFORE the roll, rolls d100 under
-   *  CalculateInteriorLockpickingChance, and on success zeroes the
-   *  lock and opens the door (ToggleDoor(true)), on failure records
-   *  the skill level. No lockpick ITEM is required - DFU checks no
-   *  inventory. */
+  /** DaggerfallActionDoor.AttemptLockpicking (:147-191), verbatim: no-op while the door swings; a silent return while
+   *  the live Lockpicking skill equals the recorded failure (the C# == test, so a skill that moved either way re-opens the
+   *  attempt); a magically held lock (>= 20) speaks the failure line with no tally, roll or record; otherwise the attempt
+   *  tallies Lockpicking before the roll, rolls d100 under CalculateInteriorLockpickingChance, and on success zeroes the
+   *  lock and opens the door (ToggleDoor(true)), on failure records the skill level. No lockpick item is required. */
   attemptLockpicking(o) {
     if (o.state === 'forward' || o.state === 'reverse') return false;   // IsMoving
-    // LOCKPICK: a host that plays the tumblers takes a lock DFU would roll for - the magic arm below stays DFU's - and its
-    // snapped picks are what a retry costs, so the retry gate is not read for it (Ledger A, LOCKPICK)
-    if (this.onLockpickAttempt && o.currentLockValue < MAGIC_LOCK_THRESHOLD) { this.onLockpickAttempt(o); return false; }
+    // LOCKPICK: a host that plays the tumblers takes a lock DFU would roll for (the magic arm below stays DFU's); its snapped picks
+    // are the retry's cost, so the gate is not read for it. A host that answers false (option off) leaves DFU's roll to this graph
+    if (this.onLockpickAttempt && o.currentLockValue < MAGIC_LOCK_THRESHOLD && this.onLockpickAttempt(o) !== false) return false;
     const skill = this._lockpickSkill();
     if (o.failedSkillLevel === skill) return false;   // the retry gate (:157) - == exactly, so a skill moved EITHER way re-opens it
     if (o.currentLockValue >= MAGIC_LOCK_THRESHOLD) {

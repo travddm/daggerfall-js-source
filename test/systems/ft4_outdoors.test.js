@@ -72,7 +72,7 @@ test('FT4: the registry row - both labels, a condensed choice with its own defau
   assert.equal(f.control.lane, 'outdoors');
   assert.equal(c.tiers, OUTDOORS_TIERS); assert.equal(c.default, OUTDOORS_DEFAULT);
   assert.equal(c.read, outdoorsRead); assert.equal(c.write, outdoorsWrite);
-  assert.equal(c.initial, true); assert.equal(c.online, true, 'the lane forces the outdoors on');
+  assert.equal(c.initial, true); assert.equal(c.online, 'room', 'the server profile pins the outdoors on');
   assert.deepEqual(f.control.also, [{ store: 'mods', vendor: 'dynamic-skies', key: 'Enabled' }]);
   assert.match(f.note, /Off brings back the classic painted sky/);
   // FT15: the note used to send a player to the Mods page for the mod's fog and

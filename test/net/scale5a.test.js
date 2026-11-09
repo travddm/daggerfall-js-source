@@ -5,17 +5,18 @@
 // refused busy - hundreds a wave - cost the account service another token mint. The relay's half over the real Room on
 // the pins' fake object (test/fakeRoom.mjs); the client's over a fake socket and a fake service.
 // tools/mutants/scale5a.json.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, asOnlinePage } from '../fakeRoom.mjs';
 import { SOCIAL_ROOM, CHAT_HELLO_HZ_MAX, CLOSE_BUSY, BUSY_TOKEN_UNREAD, ACCOUNT_TABS_MAX, SERPENT_INTERNAL_FELL, SERPENT_RC_PREFIX, CHAT_WORLD_ROOM, CHAT_ROSTER_MAX } from '../../src/net/wire.js';
 import { rosterRows } from '../../src/net/roster.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { accountTokenMinter, SESSION_KEY } from '../../src/net/accountClient.js';
 import { mintSerpentReceipt } from '../../src/net/serpent/serpentReceipt.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
+after(asOnlinePage());   // its sessions join the real relay, so their hellos say the profile's hash
 
 const { subtle } = globalThis.crypto;
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');

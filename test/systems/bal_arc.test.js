@@ -223,7 +223,7 @@ test('BAL4 the Enhanced AI ships On: the row, the shelf\'s default, the brain an
   _resetForTests();
   const row = FEATURES.find((f) => f.id === 'enhanced-ai');
   assert.equal(row.control.initial, true);
-  assert.equal(row.control.online, true, 'and forced on online, as it always was');
+  assert.equal(row.control.online, 'room', 'and pinned online by the server profile, as it always was forced');
   assert.equal(PREF_DEFAULTS.enhancedAI, true);
   assert.equal(getPref('enhancedAI'), true, 'a fresh shelf');
   assert.equal(tacticsSwitchOn(), true, 'the tactics brain');

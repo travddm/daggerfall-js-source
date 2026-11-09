@@ -69,12 +69,13 @@ import { CLAIM_KEEP_MS, CLAIMS_KEPT_MAX } from '../../src/systems/loot/claimLedg
 import { SEARCH_COOLDOWN_MINUTES, SEARCH_LOOT_MAX } from '../../src/systems/searchables.js';
 import * as RL from '../../src/systems/roomLoot.js';
 const { ROOM_PUT_RESAY_MS } = RL;
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import '../../src/scenes/physicalItemsLayer.js';   // PI1's
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
 import { appliedOwnerTm } from '../../src/net/ownerClock.js';
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 installForaging(); installSmithing(); installHealingSupply(); installRestItemLoot(); installSurvivalLoot();   // the hosts' order (scenes/shared.js)
 setPref(LOOT_RARITY_KEY, true);   // the loot ladder - forced on online (OL1)

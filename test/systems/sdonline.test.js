@@ -37,9 +37,10 @@ const quiet = (fn) => { const info = console.info, warn = console.warn; console.
 const at = (px, pz) => ({ x: px * PIXEL_UNITS + 10, y: 0, z: pz * PIXEL_UNITS + 10, yaw: 0, pitch: 0, mv: 0 });
 const stored = (r) => { const meta = r.store.get('world:meta'); return meta ? JSON.parse(Array.from({ length: meta.chunks }, (_, i) => r.store.get('world:' + i)).join('')) : null; };
 
+const MAIN_STORY_MEDIUM = 19021260;   // a main-story keep whose draw is medium (DWHOLE moved Privateers' Hold's to large)
 const PRIVATEERS_HOLD = 187853213;   // a main-story keep (world/dungeon/dungeonTextures.js MAIN_STORY_DUNGEON_IDS)
 // three map ids the draw sends to each size (pinned below, so a changed salt or weight moves them loudly)
-const SMALL_ID = 700, MEDIUM_ID = 701, LARGE_ID = 704;
+const SMALL_ID = 703, MEDIUM_ID = 700, LARGE_ID = 704;
 const block = (name) => ({ blockName: name, x: 9, z: 9, isStartingBlock: false });
 /** n blocks, a third of them border blocks (`B...`), the rest the interior pools' names. */
 const loc = (n, mapId) => ({
@@ -48,8 +49,8 @@ const loc = (n, mapId) => ({
 });
 const room = (l) => roomKeyFor({ host: 'world', mode: 'dungeon', mapId: l.mapTableData.mapId, regionIndex: l.regionIndex, locationName: l.name, size: builtDungeonSize(l) });
 
-test('SD-ONLINE: the world\'s sizes - small 1, medium 2, large 1, frozen; one draw of the port\'s seeded die on the map id and its own salt; the same answer every time, for the unsigned id', () => {
-  assert.deepEqual(ONLINE_DUNGEON_SIZES.map((r) => [...r]), [['small', 1], ['medium', 2], ['full', 1]]);
+test('SD-ONLINE: the world\'s sizes - small 1, medium 2, large 5, frozen; one draw of the port\'s seeded die on the map id and its own salt; the same answer every time, for the unsigned id', () => {
+  assert.deepEqual(ONLINE_DUNGEON_SIZES.map((r) => [...r]), [['small', 1], ['medium', 2], ['full', 5]]);
   assert.ok(Object.isFrozen(ONLINE_DUNGEON_SIZES) && ONLINE_DUNGEON_SIZES.every(Object.isFrozen));
   assert.equal(ONLINE_DUNGEON_SIZE_SALT, 0x5d1e5a2b);
   assert.equal(onlineDungeonSize(loc(20, SMALL_ID)), 'small');
@@ -57,19 +58,19 @@ test('SD-ONLINE: the world\'s sizes - small 1, medium 2, large 1, frozen; one dr
   assert.equal(onlineDungeonSize(loc(20, LARGE_ID)), 'full');
   // the law, recomputed from the die itself: the draw is the salted id's first, scaled by the weights' sum
   for (const id of [SMALL_ID, MEDIUM_ID, LARGE_ID, PRIVATEERS_HOLD, 1291010263, 0x80000001]) {
-    const u = seededFirst(id ^ ONLINE_DUNGEON_SIZE_SALT) * 4;
+    const u = seededFirst(id ^ ONLINE_DUNGEON_SIZE_SALT) * 8;
     assert.equal(onlineDungeonSize(loc(5, id)), u < 1 ? 'small' : u < 3 ? 'medium' : 'full', `map ${id}`);
   }
   assert.equal(onlineDungeonSize(loc(5, -1)), onlineDungeonSize(loc(5, 4294967295)), 'a map id read signed is the same dungeon (AUDIT WORLD34 A1)');
   assert.equal(onlineDungeonSize({ mapTableData: {} }), 'full', 'no map id: the whole dungeon');
   assert.equal(onlineDungeonSize(null), 'full');
-  // and across the Bay's number range the weights hold: a quarter small, half medium, a quarter large
+  // and across the Bay's number range the weights hold: an eighth small, a quarter medium, five in eight large (DWHOLE)
   const n = { small: 0, medium: 0, full: 0 };
   const N = 40000;
   for (let i = 1; i <= N; i++) n[onlineDungeonSize({ mapTableData: { mapId: Math.imul(i, 2654435761) >>> 0 } })]++;
-  assert.ok(Math.abs(n.small / N - 0.25) < 0.02, `small ${n.small}`);
-  assert.ok(Math.abs(n.medium / N - 0.5) < 0.02, `medium ${n.medium}`);
-  assert.ok(Math.abs(n.full / N - 0.25) < 0.02, `large ${n.full}`);
+  assert.ok(Math.abs(n.small / N - 0.125) < 0.02, `small ${n.small}`);
+  assert.ok(Math.abs(n.medium / N - 0.25) < 0.02, `medium ${n.medium}`);
+  assert.ok(Math.abs(n.full / N - 0.625) < 0.02, `large ${n.full}`);
 });
 
 test('SD-ONLINE: the size law - online the world\'s size whatever either switch or a quest\'s copy says, the guards first; offline a quest stamped with the world\'s sizes builds at them, and the world-sizes ask sits under Smaller and over Medium', () => {
@@ -89,8 +90,8 @@ test('SD-ONLINE: the size law - online the world\'s size whatever either switch 
     assert.equal(dungeonSizeFor(l, { setting: false, medium: false, world: false }), 'full');
   }
   // the guards come first, online too: the main story's keeps and the arena's undercroft stay whole
-  assert.equal(onlineDungeonSize(loc(20, PRIVATEERS_HOLD)), 'medium', 'its draw is medium...');
-  assert.equal(dungeonSizeFor(loc(20, PRIVATEERS_HOLD), { online: true }), 'full', '...and the main story never shrinks');
+  assert.equal(onlineDungeonSize(loc(20, MAIN_STORY_MEDIUM)), 'medium', 'its draw is medium...');
+  assert.equal(dungeonSizeFor(loc(20, MAIN_STORY_MEDIUM), { online: true }), 'full', '...and the main story never shrinks');
   const undercroft = { ...loc(32, SMALL_ID), arenaUndercroft: true, dungeon: { ...loc(32, SMALL_ID).dungeon, recordElement: { header: { locationId: UNDERCROFT_LOCATION_ID } } } };
   assert.equal(dungeonSizeFor(undercroft, { online: true }), 'full', 'the fighters\' hall keeps its blocks (ARENA5)');
   assert.equal(dungeonSizeFor({ hasDungeon: false }, { online: true }), 'full');
@@ -158,8 +159,8 @@ test('SD-ONLINE: the row - the world\'s sizes, Enhanced, off by default offline 
   assert.deepEqual(ids.slice(ids.indexOf('smaller-dungeons'), ids.indexOf('smaller-dungeons') + 3), ['smaller-dungeons', 'medium-dungeons', 'world-dungeon-sizes']);
   const f = FEATURES.find((x) => x.id === 'world-dungeon-sizes');
   assert.deepEqual(f.kinds, ['enhanced']);
-  assert.deepEqual({ ...f.control }, { store: 'prefs', key: WORLD_DUNGEON_SIZES_PREF, initial: false, online: true });
-  assert.match(f.note, /small, medium or large, half of them medium/);
+  assert.deepEqual({ ...f.control }, { store: 'prefs', key: WORLD_DUNGEON_SIZES_PREF, initial: false, online: 'room' });
+  assert.match(f.note, /small, medium or large, five in eight of them large/);
   assert.match(f.note, /Online it is always on\./);
   assert.equal(ONLINE_FORCED_PREFS.worldDungeonSizes, true, 'the lane learned it from the row (RF4)');
   assert.equal(ONLINE_FORCED_PREFS.mediumDungeons, false);

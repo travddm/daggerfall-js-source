@@ -2,7 +2,8 @@
 // tools/hostMove.mjs refuses this group (its `let startLoc` is written by the statements after it, which declare no name
 // to group them by). The host constructs it where the code stood. What it reads of the host's scope comes through
 // `host`: the settled names by value at construction (`_worldReady` the host's own readiness, asked at each look), every
-// live one (`arenaTraced`, `townTalk`, declared below the construction) asked at its use.
+// live one (`arenaTraced`, `townTalk`, declared below the construction) asked at its use, and only once the boot's world
+// stands: before that the host may not have declared it.
 //
 // BAY-LEFT-B:
 // A START PAST THE BAY. The named start (`?region=&loc=`) read MAPS.BSA alone, so a Project Legacy birth whose family seat
@@ -15,7 +16,8 @@
 // country place's id read back to its pixel, an isle's to its centre) or by its region's name and its own (the
 // registry's first listed place of that name past the Bay). `farStart` settles when the move is made (or none could
 // be): a birth waits on it before the heir is made (world.js's birth chain), so they are born, and first saved, there.
-// Where no way stands they are born where the world stood, and it is said.
+// Where no way stands they are born where the world stood, and it is said. Where the world does not stand within the
+// waits, no move is made and nothing is said: they are born where the world comes to stand.
 import { getInt } from '../systems/settings/settings.js';   // U31: StartCellX/Y + StartInDungeon, the classic start's own three keys
 import { REGION_NAMES, isProvinceRegion } from '../formats/mapsTables.js';
 import { longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';
@@ -112,7 +114,13 @@ export function createBootStart(host) {
    *  past the Bay loads (world.js: the load's wait on arenaTraced, then its teleport). Answers the pixel reached, or null. */
   async function reach(/** @type {{ id: ?number, region: string, loc: string }} */ to) {
     for (let i = 0; !_worldReady() && i < START_READY_TRIES; i++) await wait(START_READY_MS);
-    const landed = _worldReady() && await Promise.race([Promise.resolve(host.arenaTraced).then(() => true, () => true), wait(ARENA_LOAD_WAIT_MS).then(() => false)]);
+    // The host declares `townTalk` and `arenaTraced` far below this construction, and its getters throw until it has.
+    // A standing world proves both exist. A world that has not stood is not "no way" either, so nothing is said.
+    if (!_worldReady()) {
+      console.warn(`[world] the world did not stand within the waits: no move to ${to.region}/${to.loc} past the Bay; the start stays at ${startLoc.name}`);
+      return null;
+    }
+    const landed = await Promise.race([Promise.resolve(host.arenaTraced).then(() => true, () => true), wait(ARENA_LOAD_WAIT_MS).then(() => false)]);
     const at = landed ? farPixelOf(to, worldPlaces) : null;
     if (!at) {
       console.warn(`[world] no way to ${to.region}/${to.loc} past the Bay (seat ${to.id ?? '-'}): the world stands at ${startLoc.name}`);

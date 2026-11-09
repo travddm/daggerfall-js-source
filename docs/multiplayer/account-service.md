@@ -23,7 +23,8 @@ Placement is pinned to one region (`[placement] region`). Crons: `* * * * *` and
 
 | Path | Role |
 | --- | --- |
-| `server-account/src/index.js` | Worker entry: `fetch` calls `route(request, env)`; `scheduled` calls `runCron` |
+| `server-account/src/index.js` | Worker entry: `fetch` calls `route(request, env)`; `scheduled` and the cron door are in `cron-triggers.ts` |
+| `server-account/src/cron-triggers.ts` | `scheduled`, and the cron door `POST /__cron` where there are no cron triggers; both call `runCron` |
 | `server-account/src/service.js` | Route sets (`ROUTES`, `OPEN_ROUTES`, `SAFE_OPEN_ROUTES`, `STAFF_ROUTES`, `REPLICA_ROUTES`), body caps, `ACCOUNT_VERSION`, `routeDb` |
 | `server-account/src/accounts.js` | Guests, register, login, recover, sessions |
 | `server-account/src/password.js` | PBKDF2-SHA256 password hashing |
@@ -128,6 +129,11 @@ Feature areas have a var with `off`, `dev` (developers only) or `on`: `MARKS_OPE
   `rate-limits`, `sessions`, `guild-invites`, `realm-findings`, `realm-wealth-hours`, `progress-hours`,
   `crew-signs`, `patrons`, `safety-sweep`, and the staff sweeps (audit, evidence,
   census, messages, events, feeds, reactions, staff chat).
+
+A self-hosted service has no cron triggers. There, a timer outside the runtime posts `{"cron": "<schedule>"}` to
+`/__cron` with the header `x-cron-secret`, and the door runs the same `runCron`. The door is off while the
+`CRON_SECRET` secret is unset, as it is on Cloudflare: the path then answers as any unknown path does. A missing or
+wrong secret gets 401 and runs nothing.
 
 Each job is bounded (`SWEEP_ROWS`, `ROUNDS_MAX`, `FIRING_STATEMENTS_MAX`). A minute job that runs long competes with
 player requests for D1.

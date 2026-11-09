@@ -231,7 +231,7 @@ export function takeOut(node, piece) {
 /**
  * AUDIT FB1025i F1: EVERY COPY OF THE MARKED PIECES A SAVE HOLDS, WHEREVER IT LIES - by ledger key, the record's own
  * lists first and in their order (possessedItemLists: a keep keeps one of them), then whatever else the save's tree
- * holds: a deserter revenant's take (revenant.js RVN8), a pile on the ground, a shop's shelf, a dungeon's chest - lists
+ * holds: a pile on the ground, a shop's shelf, a dungeon's chest - lists
  * the checkpoint's ledger never reads, where a copy waited out a lift and came back. `listed` how many of `all` the
  * record's lists hold. @param {any} save @param {Set<string>} keySet @returns {Map<string, { all: any[], listed: number }>}
  */
@@ -671,8 +671,8 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
    * checkpoint landed between this act's read and the seizure's).
    * FIELD BUGS 2026-10-25i COPY-LIFT: `keep: true` KEEPS ONE OF EACH - the record's own lists first (its pack before a
    * room's chest), of them the first of the print its ledger row holds (AUDIT FB1025i F6), else the first - and only the
-   * copies go: every other one the save holds, `hidden` counting those where the record lists nothing (a deserter
-   * revenant's take - revenant.js RVN8 splitPack, and its kill's take, pickTaken - a pile on the ground, a shop's shelf),
+   * copies go: every other one the save holds, `hidden` counting those where the record lists nothing (a pile on
+   * the ground, a shop's shelf),
    * and the account's chests' of a piece it lifts (AUDIT FB1025i F5: one it does not lift may be the chest's real piece).
    * The ledger's rows stay, and in the same batch a copy of the record's own is lifted (ledger.js ownCopiesLiftable) ONLY
    * where the act itself leaves one (AUDIT FB1025i F1): this batch destroys a copy of it, or staff's Remove took one off

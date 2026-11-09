@@ -363,7 +363,7 @@ test('LANDFORM1-3: the switch is the Features row on the enhanced skin, the room
   const row = FEATURES.find((f) => f.id === 'landforms');
   assert.deepEqual(checkFeature(row), []);
   assert.deepEqual([...row.kinds], ['enhanced']);
-  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'landforms', initial: true, online: true });
+  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'landforms', initial: true, online: 'room' });
   assert.equal(row.effect, 'Takes effect when the world next loads.');
 });
 
