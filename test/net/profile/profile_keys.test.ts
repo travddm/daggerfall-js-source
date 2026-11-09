@@ -90,3 +90,14 @@ test('P0 TYPES AND BOUNDS: an int, a number, an enum and a string are each held 
     [true, false],
   );
 });
+
+test("P9 THE TRADE KEYS: trade.saleCap is DFU's no cap online by default; trade.haggleRange keeps the skills inside 0 to 100 online", () => {
+  const cap = profileKeyOf('trade.saleCap');
+  assert.deepEqual([cap?.dfu, cap?.online, cap?.offline, cap?.type], [false, false, false, 'bool']);
+  const range = profileKeyOf('trade.haggleRange');
+  assert.deepEqual([range?.dfu, range?.online, range?.offline, range?.type], [false, true, false, 'bool']);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'trade.saleCap': true } }), []);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'trade.saleCap': 0.5 } }), [
+    'bad value for trade.saleCap',
+  ]);
+});

@@ -43,6 +43,32 @@ export const PROFILE_KEYS = Object.freeze({
     words: 'profile.repair.allowMagic',
     setting: 'Controls.AllowMagicRepairs',
   }),
+  // Whether a shop's offer for a sale is capped online at half of what the counter asks the best haggler, with the
+  // seller's skills at half weight under it (shopStock.js calculateTradePrice). DFU has no cap: a poor shop pays more
+  // for goods, and Mercantile and Personality move a sale at full weight (FormulaHelper.CalculateTradePrice). Buying
+  // back a counter's own piece for profit stays shut by the counter-paid mark (ON7), which this key does not touch.
+  'trade.saleCap': Object.freeze({
+    census: Object.freeze(['ON2'] as const),
+    feature: 'REALM-P0.4',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.trade.saleCap',
+  }),
+  // Whether the haggle reads Mercantile and Personality inside 0 to 100 online. DFU reads them unbounded, so a skill
+  // raised past 100 by enchantments drives a price under nothing (FormulaHelper.CalculateTradePrice).
+  'trade.haggleRange': Object.freeze({
+    census: Object.freeze(['ON3'] as const),
+    feature: 'MERC-CAP',
+    type: 'bool',
+    dfu: false,
+    online: true,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.trade.haggleRange',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;

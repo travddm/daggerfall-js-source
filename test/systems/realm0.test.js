@@ -11,6 +11,7 @@
 //          Broker's stock is bound to its buyer, and a party's shared quest pays one gold reward in shares.
 //   P0.5 - the character is saved as it plays online: every ONLINE_CHECKPOINT_MS (five real minutes, CHECKPOINT-5), and at each change a trade makes to the
 //          pack - the giver's loss on disk before the goods leave.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -225,7 +226,8 @@ test('REALM P0.3: a character joining online has the debt past the Empire\'s one
   });
 });
 
-test('REALM P0.4: online a shop pays at most half what it asks for the same piece - the buy-and-sell-back loop is shut; buying and offline selling are Daggerfall\'s', () => {
+test('REALM P0.4: online a shop pays at most half what it asks for the same piece - the buy-and-sell-back loop is shut; buying and offline selling are Daggerfall\'s', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   assert.equal(ONLINE_SALE_SHARE, 0.5);
   const loop = { mercantile: 2, personality: 50 };
   const buy = calculateTradePrice(1_000, 1, loop, false, { online: false });
