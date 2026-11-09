@@ -2675,9 +2675,19 @@ test('MW-D38: the weapon\u2019s material is READ - a daedric sword is not the ty
   const daedric = { group: 'Weapons', templateIndex: 115, material: 9 };
   assert.notEqual(fpWeaponKey(iron, false), fpWeaponKey(daedric, false), 'two materials of one type must be two keys');
   assert.match(fpWeaponKey(daedric, false), /:Daedric:/);
-  const arm = readFileSync('src/combat/fpArm.js', 'utf8') + readFileSync('src/combat/fpArm/fpArmParts.js', 'utf8');
-  assert.match(arm, /pickWeaponRecord\(allWeapons, mwType, weapon \? materialName\(weapon\) : null, \{\s*has,\s*shape: dfWeaponShape\(weapon, WEAPONS\),?\s*\}\)/,   // MW-D50: and among the records the archives carry
+  // The hand's weapon is resolved by its material: an iron and a daedric longsword pick their own records.
+  const { weaponPartPaths } = await import('../../../src/combat/fpArm.js');
+  const { MW_WEAPON_TYPE: TYPE } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
+  const longsword = TYPE.LongBladeOneHand;
+  const records = [
+    { id: 'iron_longsword', type: longsword, model: 'w/iron.nif' },
+    { id: 'daedric_longsword', type: longsword, model: 'w/daedric.nif' },
+  ];
+  const sword = (material) => ({ group: 'Weapons', templateIndex: 120, material });
+  assert.deepEqual(weaponPartPaths({ weapon: sword(0), allWeapons: records }), ['meshes/w/iron.nif']);
+  assert.deepEqual(weaponPartPaths({ weapon: sword(9), allWeapons: records }), ['meshes/w/daedric.nif'],
     'the hand\u2019s weapon is not resolved by its material');
+  const arm = readFileSync('src/combat/fpArm.js', 'utf8') + readFileSync('src/combat/fpArm/fpArmParts.js', 'utf8');
   const code = arm.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
   assert.ok(!/weapon\.materialName|item\.materialName/.test(code), 'the phantom field is still read somewhere');
 });

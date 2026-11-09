@@ -36,7 +36,7 @@ const HARDCODED = {
   'src/combat/diverseWeapons/diverseWeaponsAssets.js': 1,
   'src/combat/enemyEquipment.js': 1,
   'src/combat/fpArm.js': 55,
-  'src/combat/fpArm/fpArmParts.js': 17,
+  'src/combat/fpArm/fpArmParts.js': 16,
   'src/combat/pcaao.js': 19,
   'src/combat/playerWeapon.js': 2,
   'src/combat/rriEnemyEquipment.js': 9,
