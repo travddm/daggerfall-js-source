@@ -85,7 +85,7 @@ test('EnemySenses.Start: 190 degrees on, 180 off - a target 92 degrees off the f
 });
 
 /** A target walking +x across the foe's front at 4 m/s, 10 m ahead, for `steps` fixed steps. */
-function chase(ai: { feet: number[] } & Record<string, any>, steps: number): number[] {
+function chase(ai: { update(dt: number, at: number[], senses: object): void }, steps: number): number[] {
   let feet = [0, 0, 10];
   for (let i = 0; i < steps; i++) {
     feet = [feet[0] + 4 / 60, 0, 10];
