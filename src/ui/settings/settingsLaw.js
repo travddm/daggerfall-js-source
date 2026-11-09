@@ -82,7 +82,7 @@ export function enumWords(key) {
 }
 
 /** DFU's 640x400 word, marked as the sharper choice: no source shows the original game drew at that size, so it is not
- *  offered as the classic look (classic-rendering-options study, decision #111). */
+ *  offered as the classic look (classic-rendering-options study, decision 111). */
 function retroSharperWord() {
   return t('settings.retroMode640x400Sharper', '{size} (sharper)', { size: localizedText('retroMode640x400', '640x400') });
 }
