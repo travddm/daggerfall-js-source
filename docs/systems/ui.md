@@ -1,30 +1,48 @@
 # User interface
 
-This page covers the game's screens: the two skins, how windows are opened and stacked, the HUD, input (keyboard,
-mouse, gamepad, touch), the settings screen, the maps, and how text is translated.
+This page covers the game's screens: the skins, how windows are opened and stacked, the HUD, input (keyboard, mouse,
+gamepad, touch), the settings screen, the maps, and how text is translated.
 
-## Two skins
+## Skins
 
-The game wears one of two skins. Each surface that has two versions asks one predicate which to mount.
+Decision 73 (3) sets the target: core holds Daggerfall Unity's classic UI, and every other UI skin is its own mod. A
+feature works in every skin or depends on none. The code is not there yet. Today the game ships two skins in core, and
+each surface that has two versions asks one predicate which to mount.
 
 | Skin | What it is | How it draws |
 | --- | --- | --- |
 | Classic | Daggerfall's own screens on its art (`.IMG`, `.CIF`, `.RCI` from ARENA2), laid out as Daggerfall Unity lays them | WebGL textures on a virtual 320x200 screen, integer-scaled and letterboxed |
-| Enhanced (named "Enhanced Plus") | The game's own screens, DOM and CSS, in a stone-and-brass style | HTML elements over the game canvas |
+| Enhanced | The game's own screens, DOM and CSS, in a stone-and-brass style | HTML elements over the game canvas |
 
 - `src/systems/uiSkin.js` owns the choice. `uiSkin()` answers the `?skin=classic|enhanced` URL override first (this
-  page load only, never stored), then uiPrefs `skin`, then `DEFAULT_SKIN` (`'enhanced'`). Call `isEnhanced()` at every
-  mount site; never compare the string yourself.
+  page load only, never stored), then uiPrefs `skin`, then `DEFAULT_SKIN`. Call `isEnhanced()` at every mount site;
+  never compare the string yourself. `isEnhancedPlus()` is an alias of `isEnhanced()`.
+- `DEFAULT_SKIN` is `'enhanced'` today. Decided default: Daggerfall Unity's classic UI (decision 117 (16)). That is
+  not built yet. Under decision 104 the enhanced look stays reachable by loading the skin mod.
 - `setUiSkin(skin)` stores the choice. A change reloads the game, because each skin mounts its own windows.
 - The skin is not a settings key. `src/systems/settings/settings.js` holds Daggerfall Unity's own keys only; the
   game's own preferences live in `src/systems/uiPrefs.js` (localStorage key `dagger.ui.v1`).
-- `isEnhancedPlus()` answers the same as `isEnhanced()`. It remains as a name for the enhanced dress's own seams.
 - The player picks a look on the Overhauls screen (`src/systems/overhauls.js`, drawn by `paneOverhauls` in
-  `src/ui/enhanced/enhancedMenu.js`): Classic, Enhanced, the GrimoireUI pack over the classic skin
-  (`src/systems/uiPack.js`, `src/ui/packArt.js`, files in `public/art/grimoire-ui/`), or the DFO Grimoire dress over the
-  enhanced skin (`src/ui/grimoireDress.js`, `src/ui/grimoireArt.js`, uiPrefs `plusDress`). A UI pack keeps the classic
-  logical size of every picture, so layouts and hit rects stay classic.
-- Online play uses the same skin choice; the online panels mount on either skin.
+  `src/ui/enhanced/enhancedMenu.js`): Classic, Enhanced, the GrimoireUI pack over the classic skin, or the Grimoire
+  dress over the enhanced skin (`src/ui/grimoireDress.js`, `src/ui/grimoireArt.js`, uiPrefs `plusDress`).
+- Online play uses the same skin choice.
+
+### Skin-gated features
+
+A Features row's `kinds` are labels, not skin gates: `enhanced` marks the game's own change, `classic` a Daggerfall
+Unity setting, `mod` an outside author's mod (`KINDS` in `src/systems/features.js`). Whether a feature works on the
+classic skin depends on its reader. Some readers ask `isEnhanced()` and do nothing on the classic skin, for example
+`livingWorldOn` (`src/systems/livingWorld/livingSwitch.js`), `mediumDungeonsWanted` and `worldDungeonSizesWanted`
+(`src/world/smallerDungeons.js`), and the held map (`heldMapWorn`, see Maps). Decision 117 (16) fixes these to work
+in every skin where that is cheap; the rest move into the Enhanced skin mod.
+
+### GrimoireUI pack
+
+> Leaves core: the GrimoireUI mod (decision 99).
+
+`src/systems/uiPack.js` and `src/ui/packArt.js` lay the GrimoireUI 1.2 art (`vendor/grimoire-ui/`, files in
+`public/art/grimoire-ui/`) over the classic skin. A UI pack keeps the classic logical size of every picture, so layouts
+and hit rects stay classic.
 
 ### Classic building blocks
 
@@ -38,12 +56,15 @@ The game wears one of two skins. Each surface that has two versions asks one pre
 
 ### Enhanced building blocks
 
+> Leaves core: the Enhanced skin mod (decisions 73 and 102).
+
 - `src/ui/enhanced/enhancedStyle.js`: the shared stylesheet and tokens. `src/ui/enhanced/enhancedFrame.js`: the frame
   kit, which assigns a role (`window`, `panel`, `button`, `tile`, `well` and others) and changes paint, never geometry.
 - `src/ui/bitmapCanvas.js`: turns a palettized Daggerfall bitmap into a canvas for the DOM (index 0 transparent,
   nearest scaling).
-- `src/ui/enhanced/enhancedChunk.js` `mountEnhancedChunk`: each large enhanced window is a lazy chunk. A deploy deletes
-  old chunk files, so a stale tab can fail to load one; the door reports the failure instead of staying silent.
+- `src/ui/enhanced/enhancedChunk.js` `mountEnhancedChunk`: each large enhanced window is a lazy chunk. A new build
+  replaces the chunk files, so a tab left open across an update can fail to load one; the door reports the failure
+  instead of staying silent.
 - `src/ui/enhanced/enhancedOverlays.js` `registerOverlay`: a stack of close functions. Tab (the `QuickDial` action)
   closes the top enhanced overlay before it opens the dial (`src/ui/pixelDial.js`).
 - `src/ui/uiClickSound.js`: one capture-phase listener plays Daggerfall's button click for every enhanced button.
@@ -132,6 +153,10 @@ adding a second input system.
   `src/ui/enhanced/enhancedStyle.js` after the comment "A THUMB IS NOT A SCREEN WIDTH"; a new element must add its
   coarse sizing there. Both pages use `viewport-fit=cover`, and screens pad with `env(safe-area-inset-*)`.
   `play/index.html` sets `user-scalable=no` on purpose: the touch layer owns pinch and drag.
+- Phone skies: on a touch device in the browser (not the desktop app), `src/scenes/dataSource.js` keeps a lean set of
+  ARENA2 files (`LEAN`, `KEEP`) that leaves out the `SKY??.DAT` skies (247 MB). The sky then falls back to a gradient
+  (`src/scenes/shared.js`). This is a device rule today, with no player choice. Decided: a player option, with the
+  gradient as the phone default (decision 117 (22)). That is not built yet.
 - Probes: `tools/enhancedTapProbe.mjs`, `tools/chargenPhoneProbe.mjs`, `tools/shortTouchProbe.mjs`.
 
 ## Settings screen
@@ -210,5 +235,6 @@ rule.
 - Probes in `tools/` measure classic geometry with `?skin=classic`; the override must never persist.
 - A new uiPrefs key belongs in `src/systems/uiPrefs.js` `PREF_DEFAULTS`, never in the settings store.
 - Do not insert into `ACTIONS`; append.
-- A Features row with `kinds: ['enhanced']` does nothing on the classic skin.
+- A Features row's `kinds` do not gate it by skin. Check the reader: one that asks `isEnhanced()` does nothing on the
+  classic skin.
 - Node tests drive hosts headless: doors fall back to the classic canvas window when `document` is absent.
