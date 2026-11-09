@@ -14,15 +14,16 @@
 //   the stamp) is heard only while nobody is blocked - a place room's roster names no account to stand in for it (AUDIT
 //   RPT1026 A2, test/net/audit_rpt1026_secnet.test.js). The relay's half is CLIENT-7's (safe_client.test.js), on the
 //   relay's own frames.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession, POSE_HZ, LINE_STALL_MS } from '../../src/net/online.js';
 import { instanceOwnerOf, instanceRoomOf } from '../../src/net/instanceRoom.js';
 import { CLOSE_POLICY, PIXEL_UNITS, PING_MS, HEARTBEAT_MS, POSE_HZ_MAX, FOES_HZ_MAX, DROP_STRIKES_MAX, RELAY_VERSION, WORLD_CELL, cellHaloFor } from '../../src/net/wire.js';
 import { createChatSafetyHost } from '../../src/scenes/chatSafetyHost.js';
 import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
 /** Waits on the machine's own clock (performance.now), so a pin that holds Date.now still at its own time can wait too. */

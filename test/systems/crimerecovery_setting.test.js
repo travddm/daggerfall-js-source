@@ -36,7 +36,7 @@ test("F3a: a theft's -8 clears in 896 days on the classic pace, 224 on the defau
 
 test("F3a: the row declares its default and the room's pin, and the online lane forces it", () => {
   const row = FEATURES.find((f) => f.id === 'crime-recovery');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], [CRIME_RECOVERY_PREF, 'x4', 'x4']);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], [CRIME_RECOVERY_PREF, 'x4', 'room']);
   assert.deepEqual(
     row.control.tiers.map((x) => x[0]),
     ['dfu', 'x4', 'x16'],

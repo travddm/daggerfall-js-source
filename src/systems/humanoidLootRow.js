@@ -1,7 +1,7 @@
 // @ts-check
 // HUMANOID-LOOT: the Features row for how much of a humanoid foe's loot reaches its body (systems/humanoidLootShare.js reads
-// its pref). DFU's whole loot, or the port's quarter cut. Online the room uses DFU's: the row's `online` names the tier
-// the lane forces (onlineLane.js declareOnlinePrefs). Its own file keeps systems/features.js from growing.
+// its pref). DFU's whole loot, or the port's quarter cut. Online the room uses DFU's tier, pinned in the server profile
+// (net/profile/officialProfile.ts). Its own file keeps systems/features.js from growing.
 import { t } from './textManager.js';
 
 /** @param {string} value @param {() => string} label */
@@ -27,7 +27,7 @@ export const HUMANOID_LOOT_ROW = Object.freeze({
     store: 'prefs',
     key: 'humanoidLoot',
     initial: 'dfu',
-    online: 'dfu',
+    online: 'room',
     tiers: Object.freeze([
       tier('dfu', () => t('features.humanoidLoot.dfu', 'Classic')),
       tier('cut', () => t('features.humanoidLoot.cut', 'Cut')),

@@ -25,5 +25,5 @@ export const REVENANTS_ROW = Object.freeze({
     return t('features.revenants.effect', 'Takes effect the next time a foe flees or falls.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: REVENANTS_PREF, initial: true, online: true }),
+  control: Object.freeze({ store: 'prefs', key: REVENANTS_PREF, initial: true, online: 'room' }),
 });

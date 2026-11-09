@@ -10,15 +10,16 @@
 // - A5: ACT WAITS counted `host` among the flags a hello resets, and an AURA-LIVE rehello keeps it: at an instance whose
 //   hub is slow, a member's blow at the host and, hosting, the room's memory went down the replacement socket ahead of
 //   its welcome, and the room closed it for good.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, asOnlinePage } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession, POSE_HZ, LINE_STALL_MS } from '../../src/net/online.js';
 import { PIXEL_UNITS, PING_MS, POSE_HZ_MAX, HIT_HZ_MAX, DROP_STRIKES_MAX, RELAY_VERSION } from '../../src/net/wire.js';
 import { createChatSafetyHost } from '../../src/scenes/chatSafetyHost.js';
 import { instanceOwnerOf, instanceRoomOf, INSTANCE_INTERNAL_KIN } from '../../src/net/instanceRoom.js';
 import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
+after(asOnlinePage());   // its sessions join the real relay, so their hellos say the profile's hash
 
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
 /** Waits on the machine's own clock (performance.now), so a pin that holds Date.now still can wait too. */

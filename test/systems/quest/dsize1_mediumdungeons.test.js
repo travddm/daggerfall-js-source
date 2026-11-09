@@ -285,7 +285,7 @@ test('DSIZE1: the Features row - Enhanced, its own, off by default and forced of
   const f = FEATURES.find((x) => x.id === 'medium-dungeons');
   assert.ok(f);
   assert.deepEqual(f.kinds, ['enhanced']);
-  assert.deepEqual({ ...f.control }, { store: 'prefs', key: MEDIUM_DUNGEONS_PREF, initial: false, online: false });
+  assert.deepEqual({ ...f.control }, { store: 'prefs', key: MEDIUM_DUNGEONS_PREF, initial: false, online: 'room' });
   assert.match(f.note, /Online every dungeon has its own size instead\./, 'the row says what the room does (PIN MOVED)');
   assert.doesNotMatch(f.note, /every dungeon online, keep full size/, 'and no longer the law it replaced');
   assert.equal(FEATURES.findIndex((x) => x.id === 'medium-dungeons'), FEATURES.findIndex((x) => x.id === 'smaller-dungeons') + 1, 'beside DFU\'s own switch');

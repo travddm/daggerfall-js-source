@@ -321,7 +321,7 @@ test('ECOTONE1: the switch - the row, the enhanced skin, ?ecotone=off; online th
   assert.equal(onlineForcedPref('climateBlend', '?online=1'), true);
   const row = FEATURES.find((f) => f.id === 'climate-blend');
   assert.deepEqual(checkFeature(row), []);
-  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'climateBlend', initial: true, online: true });
+  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'climateBlend', initial: true, online: 'room' });
   assert.equal(floraSwayOf(510, new Set([504, 510]), 10), 1, 'a border pixel\'s other nature sways as its own does');
   assert.equal(floraSwayOf(210, new Set([504, 510]), 10), 0);
 });
