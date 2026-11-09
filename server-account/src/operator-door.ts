@@ -1,6 +1,6 @@
 // The operator's door: the acts a server's operator runs on its own account service, from the machine that hosts it
 // (`selfhost/operator.ts`). Each act was a GitHub workflow that ran wrangler against the old Cloudflare account; a
-// self-hosted server has no such path (decision #118 A6, server feature audit PR 1b).
+// self-hosted server has no such path (decision 118 A6, server feature audit PR 1b).
 //
 // The door answers only while OPERATOR_SECRET is set, and only a request that carries it. Cloudflare never sets it,
 // so the path stays an unknown one there, as the cron door's does.
