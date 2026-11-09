@@ -8,10 +8,10 @@
 // welcome is read without a seat of mine (a join elsewhere, a count of nobody), the mark follows the socket the relay
 // holds (Hide me and Show myself mid-session, a halo promoted at a crossing), and the harness hands the game the relay's
 // own closes and the count each room says each HUB_COUNT_MS (`sayCounts`), as a browser and a deployed room would.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { fakeRooms, roomSigner } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, tokenHidden } from '../../src/net/online.js';
 import { relinkGame } from '../../src/scenes/staffFollowHost.js';
 import { tokenHidden as mapTokenHidden } from '../../src/net/staffMap.js';
@@ -19,6 +19,7 @@ import { reconnectWave } from '../../src/net/reconnectWave.js';
 import { SOCIAL_ROOM } from '../../src/net/wire.js';
 import * as H from '../../src/net/hubShards.js';
 import { rosterRows, rosterTitle, partyRosterSource, guildRosterSource, localRosterSource, placedRosterSource } from '../../src/net/roster.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn, log: console.log }; console.info = console.warn = console.log = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 const turn = () => new Promise((r) => setImmediate(r));

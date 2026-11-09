@@ -39,8 +39,6 @@ import { getSeed, setSeed } from '../../formats/dfRandom.js';   // AUDIT QA2: a 
 import { seededFirst } from '../wind/wind.js';   // QUEST-AUDIT II SHARED-SEAT: the port's one seeded die (imports nothing)
 import { isMainStoryDungeon } from '../../world/dungeon/dungeonTextures.js';   // KVAR-HOLD: the main story's own dungeons are no random quest's
 import { boundWorldDataBlocks } from '../../formats/worldData/worldDataReplacement.js';   // AUDIT QA2: Daggerfall's own blocks (BLOCKS.BSA, past the door) - what the mods took away
-import { startOfSiteId } from '../starts/starts.js';   // START2: a start's own site, named by the world
-import '../starts/startPlaces.js';   // START2: ...and its row in Quests-Places, laid before any Place reads the table
 import { inBay } from '../../world/tamriel/tamrielFrame.js';   // START3: a site off the Bay's table
 
 /** QUEST-AUDIT III MARKERLESS-DRAW: how many dungeons of a remote draw's pool are walked before it gives up. */
@@ -52,8 +50,7 @@ export const SITE_TYPES = Object.freeze({ None: 0, Town: 1, Dungeon: 2, Building
 
 /** START3: A SITE PAST THE BAY KEEPS ITS OWN MAP PIXEL. Every face
  *  finds a Bay site's pixel the way DFU's CanFindPlace does - its region's name lookup in MAPS.BSA, the row's longitude
- *  and latitude - and MAPS.BSA holds no place off the Bay's table (TESA's Arena places, capitals, countryside and lairs,
- *  a province's start). Such a site carries the pixel its location stands on (`worldPixel`, from the same longitude and
+ *  and latitude - and MAPS.BSA holds no place off the Bay's table (TESA's Arena places, capitals, countryside and lairs). Such a site carries the pixel its location stands on (`worldPixel`, from the same longitude and
  *  latitude its synthesized row holds), and the map, the compass and the journal's find read it there. A Bay site
  *  carries none: its SiteDetails stay DFU's, field for field. Not a DFU member: Ledger A (START3). */
 export function siteWorldPixel(location) {
@@ -996,15 +993,8 @@ export class Place extends QuestResource {
     // locationId by p1, then p1-1 (dungeons); 50000 is MantellanCrux
     let buildingKey = 0;
     let siteType;
-    // START2: A START'S OWN SITE (starts/starts.js startSiteId) - a province's start dungeon, which the world stands of its
-    // own (no MAPS.BSA table holds it: a lair past the Bay, world/tamrielDungeons.js) - is the dungeon the world names
-    // for it (`startSiteOfId`, scenes/startsHost.js). One it cannot name yet throws where DFU's unknown id throws.
-    const start = startOfSiteId(this.p1);
-    let location = start ? world.startSiteOfId?.(this.p1) ?? null : findQuestLocation(world.maps, this.p1);
-    if (start) {
-      if (!location?.hasDungeon) throw new Error(`Could not find the start site '${this.name}' (${start.key}): the world stands no dungeon for it yet`);
-      siteType = SITE_TYPES.Dungeon;
-    } else if (!location) {
+    let location = findQuestLocation(world.maps, this.p1);
+    if (!location) {
       location = findQuestLocation(world.maps, this.p1 - 1);
       if (!location) throw new Error(`Could not find locationId from p1 using: '${this.p1}' or '${this.p1 - 1}'`);
       siteType = location.hasDungeon ? SITE_TYPES.Dungeon : SITE_TYPES.Building;
@@ -1057,7 +1047,7 @@ export class Place extends QuestResource {
       regionIndex: location.regionIndex,
       regionName: location.regionName,
       locationName: location.name,
-      ...pastBaySite(location),   // START3: a province's start, past the Bay
+      ...pastBaySite(location),   // START3: a site past the Bay
       // AUDIT 63 F0: SetupFixedLocation (Place.cs:1088-1101) assigns a
       // REAL buildingKey for its SiteTypes.Building arm (:1066) but
       // never a buildingName - so the tombstone's
@@ -1659,23 +1649,6 @@ export function townBlockGrid(world, location) {
 /** ValidateQuestMarkers (Place.cs:1462). */
 export function validateQuestMarkers(questSpawnMarkers, questItemMarkers) {
   return !!(questSpawnMarkers?.length || questItemMarkers?.length);
-}
-
-/** START2: THE QUEST ITEM MARKERS a dungeon's interior blocks hold (a border block's left out, QUEST-CAPS' law) - where
- *  a start's commission can lie. A start dungeon is weighed by it before it is chosen (scenes/questWorld.js
- *  startSiteOfId): one with none - a graveyard's, its five blocks marker-free - is never a start's. */
-export function dungeonItemMarkerCount(getBlock, location) {
-  let n = 0;
-  for (const dungeonBlock of location?.dungeon?.blocks ?? []) {
-    if (QUEST_CAP_BLOCK_RE.test(dungeonBlock.blockName ?? '')) continue;
-    for (const group of getBlock(dungeonBlock.blockName)?.rdbBlock?.objectRootList ?? []) {
-      for (const obj of group?.rdbObjects ?? []) {
-        const flat = obj.type === RDB_RESOURCE_TYPES.Flat ? obj.resources?.flatResource : null;
-        if (flat?.textureArchive === EDITOR_FLAT_ARCHIVE && flat.textureRecord === ITEM_MARKER_RECORD) n++;
-      }
-    }
-  }
-  return n;
 }
 
 /** AssignResourceToMarker (Place.cs:1473). */

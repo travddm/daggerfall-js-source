@@ -255,6 +255,7 @@ const career = {
 
 test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts the three-way one, and the answer rides the result onto the character and its save', () => {
   let result = null;
+  setModSetting(LEGACY_MOD, 'Enabled', true);   // CHARACTER MODES: the master switch - off by default, and then the Legacy mode is not offered
   withPage('?online', () => {
     const w = createChargenWindow(new ChargenFlow([{ name: 'Warrior', career }], () => 0), { onDone: (r) => { result = r; } });
     const key = (code, n = 1) => { for (let i = 0; i < n; i++) w.input(code); };
@@ -266,14 +267,26 @@ test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts
     key('Equal', 6); key('ArrowDown', 3);
     key('Equal', 6); key('Enter');
     key('Enter'); key('Enter');   // reflexes, summary -> Project Legacy's question (online: on)
-    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), [MODELS.enduring, MODELS.bloodline, NO_LINEAGE], 'then Project Legacy\'s, three ways');
+    // CHARACTER MODES: the mode question comes first; only the Legacy mode (offered while Project Legacy's switch is on)
+    // goes on to the family's model, in its two answers; every other mode answers it for the character: no lineage
+    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), ['classic', 'hardcore', 'legacy', 'ironman', 'hardcore_ironman'], 'the mode first');
     w.input('char:3');
+    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), [MODELS.enduring, MODELS.bloodline], 'then the family\'s model, two ways');
+    w.input('char:2');
     assert.equal(w.done, true);
-    assert.equal(result.legacyModel, NO_LINEAGE);
+    assert.equal(result.characterMode, 'legacy');
+    assert.equal(result.legacyModel, MODELS.bloodline);
     const e = { gender: 'male', race: 'Breton' };
     finishChargen(e, result, null);
-    assert.equal(e.legacyChoice, NO_LINEAGE, 'kept on the character');
+    assert.equal(e.legacyChoice, MODELS.bloodline, 'kept on the character');
+    assert.equal(e.characterMode, 'legacy');
+    // ...and Ironman asks nothing more: no lineage, the mode kept
+    const ironman = { gender: 'male', race: 'Breton' };
+    finishChargen(ironman, { ...result, characterMode: 'ironman', legacyModel: NO_LINEAGE }, null);
+    assert.equal(ironman.legacyChoice, NO_LINEAGE);
+    assert.equal(ironman.characterMode, 'ironman');
   });
+  setModSetting(LEGACY_MOD, 'Enabled', false);
   for (const answer of [MODELS.enduring, MODELS.bloodline]) {
     const e = { gender: 'male', race: 'Breton' };
     finishChargen(e, { ...result, legacyModel: answer }, null);

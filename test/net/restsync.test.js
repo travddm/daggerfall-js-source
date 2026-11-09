@@ -10,7 +10,6 @@ import * as acorn from 'acorn';
 import { validFoeRecord, hitPoisonOf, hitSpellOf, FOE_HEALTH_MAX, FOE_LEVEL_MAX, FOES_FRAME_MAX, PARTY_MAX } from '../../src/net/wire.js';
 import { ELITE_FOE_MULTIPLIER } from '../../src/world/spawnedDungeons.js';
 import { blowClassOf } from '../../src/ai/puppetBlows.js';   // AUDIT FEUD: the hit door builds a blow's class whenever its weakness rides (the real one)
-import { feudWeakBlow } from '../../src/systems/feudLedger.js';   // AUDIT FEUD: ...asked of the real test (none registered here)
 import { ARENA_PUPPET_OWNER } from '../../src/net/arena/arenaLaw.js';   // ARENA4: the kill door's puppet test, the real owner word (no puppet here)
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';   // AUDIT MW-NPC II K3: the dungeon context's look seed, in the mounted scope
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
@@ -74,7 +73,7 @@ function restDoors(over = {}) {
     _authority: true, lastPlayerFeet: [1.234, 2, 3.456], _motorYaw: 0.5, _locationKey: 'dungeon:7', _restAskAt: null, _restAskSentAt: -Infinity,   // AUDIT III E1: the joiner's own last ask
     _askAt: new Map(), ENEMY_BASICS: { 5: {}, 9: {} }, clock: 1000,
     _spawnEncounter: (hit, o) => { spawned.push([hit, o]); return Promise.resolve(null); },
-    // AUDIT REST II F1 (RE-AIMED): a joiner asks only where the host's own placement finds a spot outside a fire's ward
+    // AUDIT REST II F1 (RE-AIMED): a joiner asks only where the host's own placement finds a spot (the fire wards nothing now: DUNGEON-FIRE-ONE)
     // (encounterSpot), and a night running hears the ask at once (ambushNight) - here a spot stands and no night runs
     // (a paced window), so these doors keep their own question; test/world/auditrest2_fires.test.js asks the others
     encounterSpot: () => ({ x: 9, y: 0, z: 9 }), ambushNight: () => false,
@@ -310,7 +309,7 @@ test('REST-SYNC: a joiner\'s blow at the room\'s encounter goes to the host by t
   const sent = [];
   const layout0 = foe(), pup = foe({ _encId: 7 });
   const j = {
-    _authority: false, ARENA_PUPPET_OWNER, blowClassOf, feudWeakBlow, foes: [layout0, pup], _layoutFoes: 1, lastPlayerFeet: [1, 0, 1], _ecvT: 0,
+    _authority: false, ARENA_PUPPET_OWNER, blowClassOf, foes: [layout0, pup], _layoutFoes: 1, lastPlayerFeet: [1, 0, 1], _ecvT: 0,
     opts: { onFoeHit: (h) => sent.push(h) }, renownFoeStruck() {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck() {}, markConcealedHit() {},
   };
   const jd = mount(`${consts()}\n${declSrc('isRoomFoe')}\n${fnSrc('damageFoe')}\nreturn { damageFoe };`, j);

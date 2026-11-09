@@ -98,7 +98,7 @@ load or apply code into a host.
   `bioMethod`, `biography`, `name`, `face`, `stats`, `skills`, `reflexes`, `summary`, `done`. Two wizard skins exist
   (classic and enhanced, chosen by `isEnhanced` in `src/systems/uiSkin.js`).
 - After the wizard: the levelling-system question (offline only), the Project Legacy model question when that mod is
-  on, and the start-location choice (`src/systems/starts/starts.js`).
+  on, and the start quest (`src/systems/starts/starts.js`): every character starts at Privateer's Hold, as in DFU.
 - `finishChargen` applies the result: `applyCharacter`, starting spells (`assignStartingSpells`), starting equipment
   (`startingGear.js`), biography effects, faction reputation and region data.
 - `applyHeadlessChargen(entity, classIndex)` builds a character with no window (`?class=N`, tests).

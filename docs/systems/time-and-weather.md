@@ -111,7 +111,10 @@ two. The same file holds fog settings (`fogForWeather`), sky offsets and `isSnow
 
 ### Enhanced lane
 
-Behind the enhanced skin and the Enhanced Environments preference:
+The weather map, the field and the forecast run on the `weatherEvents` preference alone, in every skin, on DFU's own
+weather words. Enhanced Environments adds to them (the clouds' cells, the air's snow-or-rain law, the hourly
+evolution) and is not required. The rest of this section is behind the enhanced skin and the Enhanced Environments
+preference:
 
 - `src/systems/weather/weatherMap.js` `weatherAt(x, z, minutes, climateAt)`: weather systems (storms, rain bands,
   squalls, sandstorms, ashfall, fog banks, cloud decks) are born per map node, drift, grow and die. The map is a pure
@@ -129,8 +132,9 @@ Lane gates in `weatherSim.js` (`weatherFieldOn`, `weatherMapOn`, `snowGroundLawO
 ### Weather online
 
 The relay has no weather code. Online, `src/scenes/world.js` calls `setSharedWeather(true)`: the day roll is seeded by
-the event-clock day (`rollsFor`), and the season comes from the sky date, so every client rolls the same six words. The weather map, distant storms, snowpack and forecast are pure
-in place and minute, so clients agree without messages. The weather-events preference is forced on online.
+the event-clock day (`rollsFor`), and the season comes from the sky date, so every client rolls the same six words.
+The weather map, distant storms, snowpack and forecast are pure in place and minute, so clients agree without
+messages. The weather-events preference is forced on online.
 
 ### Rendering
 

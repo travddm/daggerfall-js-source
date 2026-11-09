@@ -411,7 +411,7 @@ export function playerArrowHitFoe(m, foe, {
   if (!foe || foe.dead || !playerEntity) return 0;
   // REVENANT-FATE (the 2026-10-02 audit): one held by its fate (kneeling, burning, gathering into a portal) - the shaft
   // lands nothing: no blow, no poison, no rage, no Archery (the kill door refused the damage; the rest still landed)
-  if (foe.yielded || foe.executing || foe.sparing || foe.leaving || foe.roaring) return 0;   // RVN4: nor one roaring its last stand
+  if (foe.yielded || foe.executing || foe.sparing || foe.leaving) return 0;
   const swing = SWING_MODS[playerWeapon?.machine?.state] ?? { damage: 0, toHit: 0 };
   const back = foe.ai && playerFeet ? isBackFacing(foe.ai.yaw, foe.ai.feet, playerFeet) : false;
   const rolled = calculateAttackDamage(playerEntity, foe.entity, {

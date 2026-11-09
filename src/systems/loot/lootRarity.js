@@ -87,12 +87,17 @@ import { rareGate, legendaryGate, rollerLevel, gateLevel } from './lootLevelGate
 import { ROLLED_TIERS } from '../rarityTier.js';   // RARE-BREAK1: the rolled tiers' one home
 import { GEM_IDS, GEM_GRADES, GEM_GRADE_WORDS, GEM_ROW_GRADES, GEM_GRADE_TEMPLATE_BASE, GEM_GRADE_TEMPLATES, gemId, ALL_GEM_IDS, isGemId, gemKind, gemGrade, GEM_NAMES, gemTemplateOf } from './gemGrades.js';   // GEM-GRADES: a gem's kind and grade, one home
 import { setPieceKind, rollSetSigil, rollSetJoin, setLines, setSigilLines } from '../sigil/sigilSets.js';   // SET4: a won piece of armour or a shield may carry a set's sigil; a weapon's may join one; SET5: the set in words
-import { TECHNIQUE_IDS, TECHNIQUE_BANDS, TECHNIQUE_PER_MILLE, techniqueById, techniquesFor, techniqueBrief, techniqueParts } from '../../combat/technique/techniqueRoster.js';   // TECH1: a weapon's technique - the roster's one table (a leaf)
 
 export const LOOT_RARITY_KEY = 'lootRarity';
 /** The switch. Read at every seam, so a press takes effect on the next
  *  roll and the next fold. */
 export const lootRarityOn = () => !!getPref(LOOT_RARITY_KEY);
+
+// Weapon techniques extend this ladder; it imports none of their code. They register their roster here, and with none
+// registered the technique line kind is empty and rolls nothing.
+const NO_TECHNIQUES = Object.freeze({ ids: Object.freeze([]), bands: Object.freeze({ magic: [0, 0], rare: [0, 0], legendary: [0, 0] }), perMille: Object.freeze({}), on: () => false, byId: () => null, forItem: () => Object.freeze([]), brief: () => '', parts: () => null });
+let techniqueRoster = NO_TECHNIQUES;
+export const registerTechniqueRoster = (roster) => { techniqueRoster = roster ?? NO_TECHNIQUES; };   // { ids, bands, perMille, on, byId, forItem, brief, parts }; null unregisters
 
 // ── the tiers ───────────────────────────────────────────────────────
 export const RARITY_ORDER = Object.freeze(['common', 'magic', 'rare', 'legendary', 'aetheric', 'artifact', 'gilded']);
@@ -482,8 +487,8 @@ export const AFFIX_RANGES = Object.freeze({
   // BAL9c: the caster's damage and its magicka (systems/spell/spellPower.js, systems/loot/lootPowers.js)
   potency:    Object.freeze({ magic: [1, 1], rare: [1, 2], legendary: [2, 3] }),  // % more of a damage spell's landing
   wellspring: Object.freeze({ magic: [1, 2], rare: [2, 4], legendary: [4, 6] }),    // % of my magicka back on a kill
-  // TECH1: a technique's power - +% on its own multiplier (combat/technique/techniqueRoster.js TECHNIQUE_BANDS, one band for all)
-  technique: TECHNIQUE_BANDS,
+  // TECH1: a technique's power - +% on its own multiplier, the registered roster's bands (one band for all)
+  get technique() { return techniqueRoster.bands; },
 });
 /** How many affixes a tier rolls: [min, max]. A Legendary's are its record's. */
 export const AFFIX_COUNTS = Object.freeze({ magic: [1, 2], rare: [3, 4] });
@@ -599,15 +604,11 @@ export const AFFIX_KINDS = Object.freeze({
     word: (band) => POTENCY_PREFIX[band], label: (a) => `+${a.value}% spell damage` }),
   wellspring: Object.freeze({ slot: 'suffix', groups: Object.freeze(['Jewellery']), params: null, proc: true,
     word: (band) => WELLSPRING_SUFFIX[band], label: (a) => `${a.value}% magicka on a kill` }),
-  // TECH1: A WEAPON'S TECHNIQUE - what the WeaponTechnique key does
-  // with the weapon in hand (combat/techniques.js): its param the technique (combat/technique/techniqueRoster.js, the piece's own
-  // family alone - kindParams), its value the power over the technique's own multiplier. APPENDED LAST and drawn in no
-  // pool any other line is drawn from - it is not among AFFIX_IDS, the pools' kinds (rollAffixes, the proc line, the
-  // Exalted, the curse, the Reforge), so every one of those draws is the draw it was: one line a piece at most, taken at a
-  // door's END (techniquePass). No slot: it never names a piece. A weapon's, and the Gauntlets' for the bare hand
-  // (techniqueFamily).
-  technique: Object.freeze({ slot: null, groups: Object.freeze(['Weapons', 'Armor']), params: TECHNIQUE_IDS, technique: true,
-    word: (band, p) => techniqueById(p)?.name ?? '', label: (a) => `${techniqueById(a.param)?.name ?? 'Technique'} +${a.value}%` }),   // its word is its name (no piece's - it has no slot)
+  // TECH1: A WEAPON'S TECHNIQUE (the WeaponTechnique key): its param the registered roster's technique for the piece's own
+  // family, its value the power over that technique's multiplier. In no pool another line is drawn from (not in AFFIX_IDS),
+  // so every other draw is what it was: one line a piece at most, taken at a door's END (techniquePass). No slot.
+  technique: Object.freeze({ slot: null, groups: Object.freeze(['Weapons', 'Armor']), get params() { return techniqueRoster.ids; }, technique: true,
+    word: (band, p) => techniqueRoster.byId(p)?.name ?? '', label: (a) => `${techniqueRoster.byId(a.param)?.name ?? 'Technique'} +${a.value}%` }),   // its word is its name (no piece's - it has no slot)
 });
 /** The kinds the ladder's pools draw from, in their order - every kind but a technique (TECH1: its door's own pass). */
 export const AFFIX_IDS = Object.freeze(Object.keys(AFFIX_KINDS).filter((id) => !AFFIX_KINDS[id].technique));
@@ -630,7 +631,7 @@ const GARMENT_STATS = Object.freeze(['personality']);
 export function kindParams(id, item) {
   const k = AFFIX_KINDS[id];
   if (!k?.params) return null;
-  if (id === 'technique') return techniquesFor(item);   // TECH1: the piece's own family's - a bow's Volley, a sword's Leap Strike
+  if (id === 'technique') return techniqueRoster.forItem(item);   // TECH1: the piece's own family's - a bow's Volley, a sword's Leap Strike
   return id === 'stat' && isGarment(item) ? GARMENT_STATS : k.params;
 }
 
@@ -1564,10 +1565,9 @@ function withLine(affixes, line) {
 }
 
 // ── TECH1: a weapon's technique ─────────────────────────────────────
-// . A Magic, Rare or Legendary weapon - or the Gauntlets, for the bare hand - minted
-// at a loot door takes, one time in TECHNIQUE_PER_MILLE, ONE technique line: a technique of its own family, its power
-// from its tier's band. The roll is the door's LAST draw (Loot-II law 9 - every draw the door made before it, the card's
-// and the late finds' among them, is still its seed's), and a piece that can carry no technique takes no draw at all.
+// A Magic, Rare or Legendary weapon (or the Gauntlets) minted at a loot door takes, at its tier's chance, ONE technique
+// line of its own family, its power from its tier's band. The roll is the door's LAST draw (Loot-II law 9), and a piece that
+// can carry no technique takes no draw at all.
 /** Is a line a technique (TECH1)? */
 export const isTechniqueAffix = (a) => !!AFFIX_KINDS[a?.id]?.technique;
 /** The piece's technique line, or null - the first valid one (the law allows one). AUDIT TECH-FX: a loop, not a `find`
@@ -1578,19 +1578,19 @@ export function techniqueLineOf(item) {
   for (let i = 0; i < list.length; i++) { const a = list[i]; if (isTechniqueAffix(a) && validAffix(a)) return a; }
   return null;
 }
-let _techniquePerMille = TECHNIQUE_PER_MILLE;
+let _techniquePerMille = null;
 /** Tests only: the chances (null puts them back). */
-export function _setTechniqueForTests(table) { _techniquePerMille = table == null ? TECHNIQUE_PER_MILLE : table; }
+export function _setTechniqueForTests(table) { _techniquePerMille = table; }
 /** Whether a piece may take a technique line now: a rolled tier, a family with a technique, and none yet. */
 export const techniqueEligible = (item) => ROLLED_TIERS.includes(item?.rarity) && Array.isArray(item.affixes)
-  && techniquesFor(item).length > 0 && !item.affixes.some(isTechniqueAffix);
+  && techniqueRoster.forItem(item).length > 0 && !item.affixes.some(isTechniqueAffix);
 /** ADD a technique line IN PLACE: one of the piece's family's techniques (`id` chooses it - the Test Room's - and a
  *  technique of another family is refused), its value from its tier's band, set before a set gem's line (a gem's is
  *  always last - LOOT20), its price with it. Answers the line, or null. */
 export function addTechniqueLine(item, rolls = Math.random, { id: chosen = null } = {}) {
   if (!techniqueEligible(item)) return null;
-  if (chosen != null && !techniquesFor(item).includes(chosen)) return null;
-  const id = chosen ?? pick(techniquesFor(item), rolls);
+  if (chosen != null && !techniqueRoster.forItem(item).includes(chosen)) return null;
+  const id = chosen ?? pick(techniqueRoster.forItem(item), rolls);
   const [lo, hi] = AFFIX_RANGES.technique[item.rarity];
   const line = { id: 'technique', param: id, value: rangeInt(lo, hi, rolls) };
   const gem = item.affixes.findIndex((a) => a?.gem != null);
@@ -1600,8 +1600,8 @@ export function addTechniqueLine(item, rolls = Math.random, { id: chosen = null 
 }
 /** The chance, for a piece a door just minted: one roll, then the line. Answers the line, or null. */
 export function rollTechniqueLine(item, rolls = Math.random) {
-  if (!lootRarityOn() || !getPref('weaponTechniques') || !techniqueEligible(item)) return null;
-  const perMille = _techniquePerMille[item.rarity] ?? 0;
+  if (!lootRarityOn() || !techniqueRoster.on() || !techniqueEligible(item)) return null;
+  const perMille = (_techniquePerMille ?? techniqueRoster.perMille)[item.rarity] ?? 0;
   if (!(perMille > 0)) return null;   // a tier with no chance costs the stream no draw (the socket pass's own rule)
   if (!(rolls() * 1000 < perMille)) return null;
   return addTechniqueLine(item, rolls);
@@ -1610,9 +1610,9 @@ export function rollTechniqueLine(item, rolls = Math.random) {
 export function techniquePass(pieces, rolls = Math.random) {
   for (const it of pieces ?? []) rollTechniqueLine(it, rolls);
 }
-/** The card's line under a technique line: what a press does, with its numbers (combat/technique/techniqueRoster.js
+/** The card's line under a technique line: what a press does, with its numbers (the roster's
  *  techniqueBrief). '' for any other line. */
-export const techniqueDetail = (a) => (isTechniqueAffix(a) && validAffix(a) ? techniqueBrief(a.param, a.value) : '');
+export const techniqueDetail = (a) => (isTechniqueAffix(a) && validAffix(a) ? techniqueRoster.brief(a.param, a.value) : '');
 
 // ── LOOT2: the roll seen, and the Exalted ──────────────────────────
 // The Loot arc. A rolled line says the band it was rolled in, so two swords
@@ -2396,10 +2396,10 @@ export const rarityKnown = (item) => identified(item);
 export function techniqueCardView(item) {
   if (!lootRarityOn() || !item || rarityOf(item) === 'common' || !identified(item)) return null;
   const line = techniqueLineOf(item);
-  const parts = line ? techniqueParts(line.param, line.value) : null;
+  const parts = line ? techniqueRoster.parts(line.param, line.value) : null;
   if (!parts) return null;
-  return { id: line.param, name: techniqueById(line.param).name, value: line.value, band: affixBand(item, item.affixes.indexOf(line)),
-    base: techniqueById(line.param).base, ...parts };
+  return { id: line.param, name: techniqueRoster.byId(line.param).name, value: line.value, band: affixBand(item, item.affixes.indexOf(line)),
+    base: techniqueRoster.byId(line.param).base, ...parts };
 }
 
 /** SET6: the lore of a fixed record the ladder does not hold - an Aetheric piece's (systems/aetheric.js registers the

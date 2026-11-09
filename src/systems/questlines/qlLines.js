@@ -25,7 +25,7 @@
 // title is its quest's DisplayName in English (test/systems/questlines/ql12_lines.test.js holds the two to one word).
 import { t } from '../textManager.js';
 import { QL_SERVICE_LINES } from '../../net/questlineClaims.js';
-import { REVENANT_MIN_RENOWN } from '../revenant/revenant.js';   // AUDIT QUESTLINES LINES-3: the Renown a revenant comes at, in the window's words
+import { revenantRenownMin } from '../revenant/revenantsOn.js';   // AUDIT QUESTLINES LINES-3: the Renown a revenant comes at, in the window's words
 
 /**
  * @typedef {{ quest: string, title: () => string, needs?: ReadonlyArray<LineNeed> }} LineStep
@@ -250,7 +250,7 @@ export const eventHolds = (l, probe) => !l.opens.event || (probe.need?.(l.opens.
 const NEED_WORDS = Object.freeze({
   lootRarity: () => t('ql.line.needs.lootRarity', 'with Loot rarity on'),
   naval: () => t('ql.line.needs.naval', 'with Naval Combat on'),
-  renown: () => t('ql.line.needs.renown', 'at Renown {n}', { n: REVENANT_MIN_RENOWN }),
+  renown: () => t('ql.line.needs.renown', 'at Renown {n}', { n: revenantRenownMin() }),
   starfall: () => t('ql.line.needs.starfall', 'during the Witches’ Festival'),   // STAR8
 });
 

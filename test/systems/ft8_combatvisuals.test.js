@@ -21,7 +21,7 @@ const read = (p) => readFileSync(join(root, p), 'utf8');
 test('FT8: the registry row - Enhanced, over the pref, on by default, taking effect at once', () => {
   const f = FEATURES.find((x) => x.id === 'enhanced-combat-visuals');
   assert.ok(f); assert.deepEqual(f.kinds, ['enhanced']);
-  assert.deepEqual(f.control, { store: 'prefs', key: 'enhancedCombatVisuals', initial: true, online: true });   // RF4
+  assert.deepEqual(f.control, { store: 'prefs', key: 'enhancedCombatVisuals', initial: true, online: 'room' });   // RF4
   assert.equal(PREF_DEFAULTS.enhancedCombatVisuals, true);
   assert.equal(f.effect, 'Takes effect at once.', 'read once per frame by every foe host - no reload');
   assert.match(f.note, /Off hides them as the original does/); assert.match(f.note, /The rules don’t change/);
@@ -36,5 +36,5 @@ test('FT8: the registry row - Enhanced, over the pref, on by default, taking eff
 test('FT8/FT12: the Enhanced category emptied into the home and then left the settings rail; its test door is the Test Room\'s', () => {
   assert.equal(CATEGORIES.find((c) => c.id === 'enhanced'), undefined, 'gone from the category map');
   // the home holds every switch the category ever drew
-  assert.deepEqual(featureCounts(FEATURES).enhanced, 68);
+  assert.deepEqual(featureCounts(FEATURES).enhanced, 79);
 });

@@ -2,7 +2,7 @@
 // to -55 rep, now I'm at -53 rep, but they kicked me out so I can't do any quests to recover. It's unclear to me whether
 // I'll have to remake my character or wait IRL weeks just to get back to 0"). Both roads back were open and nothing
 // said either: a stranger may ask a hall's quest-giver for work, each quest done pays the guild DFU's +5, and a standing
-// below 0 recovers a point every 7 days of the character's own time. The hall (the enhanced skin), the join's refusal
+// below 0 recovers a point every 28 days of the character's own time. The hall (the enhanced skin), the join's refusal
 // (the classic skin) and the Standing page now say so, with the numbers the law moves by. AUDIT WAY-BACK
 //  read it cold: the guild skills the join also asks, a shut hall, time logged
 // off, and the chapter writs the Roll's pace does not bound are said too.
@@ -39,8 +39,8 @@ const storeOf = (reps) => {
 };
 const STANDING = 'Your standing here is -53. It takes members at 0 or more.';
 const QUESTS = (tail) => `As a stranger you may still ask its quest-giver for work: each quest done raises your standing 5${tail}.`;
-const DRIFT = 'Below 0 your standing also recovers a point every 7 days of your own time. Rests and journeys count.';
-const DRIFT_ONLINE = 'Below 0 your standing also recovers a point every 7 days of your own time. Rests and journeys count, and so does time logged off.';
+const DRIFT = 'Below 0 your standing also recovers a point every 28 days of your own time. Rests and journeys count.';
+const DRIFT_ONLINE = 'Below 0 your standing also recovers a point every 28 days of your own time. Rests and journeys count, and so does time logged off.';
 const PACE = (owed) => `Online, quests and the recovery raise it by at most 15 a real day (days start at midnight UTC)${owed}. On top of that, a chapter writ of the guild's on a notice board adds 2.`;
 /** A character whose guild skills meet rank 0's bars (one at 22, a second at 4), as the join reads them - and one with none. */
 const skilled = (g) => ({ name: 'Glade', skills: Object.fromEntries(g.skills.map((sk) => [sk, 30])) });

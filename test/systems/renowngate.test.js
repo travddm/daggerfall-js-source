@@ -20,7 +20,6 @@ globalThis.localStorage = {
 };
 
 const N = await import('../../src/systems/revenant/revenant.js');
-const { ambitionOf, AMBITION } = await import('../../src/systems/revenant/revenantUnquiet.js');   // UNQUIET: the return's share by its ambition
 const P = await import('../../src/ui/revenant/revenantPage.js');
 const E = await import('../../src/systems/eliteFoes.js');
 const CH = await import('../../src/systems/champions.js');
@@ -29,7 +28,6 @@ const { setSigilOnline, setSigilRenown, renownOpens, _resetSigilForTests } = awa
 const { setPref, _resetForTests } = await import('../../src/systems/uiPrefs.js');
 const { setPlayerDoor } = await import('../../src/systems/playerDoor.js');
 const { setWorldMinutes } = await import('../../src/systems/worldTick.js');
-const { LOYALTY } = await import('../../src/systems/revenant/revenantFeud.js');
 const { MOBILE_TYPES: M } = await import('../../src/characters/mobile/mobileTypes.js');
 const { createExteriorFoes } = await import('../../src/scenes/exteriorFoes.js');
 
@@ -41,23 +39,23 @@ const orc = (over = {}) => ({ mobileType: M.Orc, level: 6, health: 5, maxHealth:
 const offline = () => setSigilOnline(false);
 const online = (renown = null) => { setSigilOnline(true); setSigilRenown(renown); };
 /** A revenant made while the gate is open (offline), then left as the test needs it. */
-function made(p, { rank = 2, dueAt = 0, lair = null, known = false } = {}) {
+function made(p, { rank = 2, dueAt = 0 } = {}) {
   offline();
   const r = N.revenantDeed(p, orc(), 'fled', { mobileType: M.Orc, rolls: () => 0 });
-  r.rank = rank; r.dueAt = dueAt; r.out = false; r.lair = lair ? { ...lair } : null; r.lairKnown = known;
+  r.rank = rank; r.dueAt = dueAt; r.out = false;
   return r;
 }
-const LAIR = Object.freeze({ px: 40, py: 41, name: 'The Pit', region: 5 });
 const HERE = Object.freeze({ px: 40, py: 41, region: 5 });
 
 beforeEach(() => {
-  _resetForTests(); setPref('lootRarity', true);
+  _resetForTests(); setPref('lootRarity', true); setPref('revenantRenown', '10');   // the wait is the player's choice now (none by default)
   N._resetRevenantForTests(); _store.clear(); setPlayerDoor(null); _resetSigilForTests(); setWorldMinutes(DAY * 5);
 });
 
-test('RENOWN-GATE THE NUMBERS: elites at Renown 5, revenants at 10, a due revenant on two encounter rolls in five (mutants: any number moved)', () => {
-  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 10, 0.4]);
-  assert.ok(N.REVENANT_MIN_RENOWN >= E.ELITE_FOE_MIN_RENOWN, 'a returning elite always finds elites standing');
+test('RENOWN-GATE THE NUMBERS: elites at Renown 5, a due revenant on two encounter rolls in five, and no Renown wait unless the player sets one (mutants: any number moved)', () => {
+  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 0.4]);
+  setPref('revenantRenown', 'none'); online(null);
+  assert.equal(N.revenantHeld(), false, 'the default: nothing waits, whatever the page knows');
   assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.01, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
 });
 
@@ -183,7 +181,7 @@ test('RENOWN-GATE THE SHARED DUNGEON\'S PICK STANDS: every client builds it alik
   assert.deepEqual(picked(b), picked(a), 'the room\'s pick, whoever builds it');
 });
 
-test('RENOWN-GATE HELD, NONE IS MADE OR RUNS: under Renown 10 online no special foe becomes a revenant, flees or keeps a ledger - a flight that could make none would only rob a kill; at 10 and offline, as ever (mutants: the candidate\'s gate dropped)', () => {
+test('RENOWN-GATE HELD, NONE IS MADE OR RUNS: under Renown 10 online no special foe becomes a revenant, or flees - a flight that could make none would only rob a kill; at 10 and offline, as ever (mutants: the candidate\'s gate dropped)', () => {
   const p = me();
   online(9);
   assert.equal(N.revenantCandidate(orc()), false, 'a champion: held');
@@ -205,14 +203,12 @@ test('RENOWN-GATE HELD, NONE IS MADE OR RUNS: under Renown 10 online no special 
 test('RENOWN-GATE HELD, NONE RETURNS: a due revenant takes no roll and is never claimed under Renown 10; from 10 on two rolls in five (mutants: the return\'s gate dropped; the chance moved either way)', () => {
   const p = me();
   const r = made(p, { dueAt: 0 });
-  r.personality = 'cold';   // AUDIT UNQUIET (Revenants.md section 49): one ambition, every run - not vengeance, its share REVENANT_RETURN_CHANCE
   const now = DAY * 9;
   online(9);
   assert.equal(N.revenantToReturn(p, { now, rolls: () => 0 }), null, 'held');
   assert.equal(r.out, false, 'and not claimed');
   online(10);
-  assert.notEqual(ambitionOf(r.personality), 'vengeance');
-  const chance = N.REVENANT_RETURN_CHANCE;   // UNQUIET (Revenants.md section 46): a revenant of vengeance takes more of the rolls (AMBITION.VENGEANCE_RETURN - unquiet.test.js)
+  const chance = N.REVENANT_RETURN_CHANCE;
   assert.equal(N.revenantToReturn(p, { now, rolls: () => chance }), null, 'the roll at its share passes it by');
   assert.equal(r.out, false);
   assert.equal(N.revenantToReturn(p, { now, rolls: () => chance - 0.01 }), r, 'under it, it comes');
@@ -222,85 +218,14 @@ test('RENOWN-GATE HELD, NONE RETURNS: a due revenant takes no roll and is never 
   assert.equal(N.revenantToReturn(p, { now, rolls: () => 0.39 }), r, 'offline: as ever, at the same two in five');
 });
 
-test('RENOWN-GATE HELD, NONE AT HOME: entering its lair, a rest\'s ask too, stands none and claims none under Renown 10 (mutants: the lair\'s gate dropped)', () => {
-  const p = me();
-  const r = made(p, { dueAt: 0, lair: LAIR, known: true });
-  online(9);
-  assert.equal(N.revenantForLair(p, HERE, { now: DAY * 9 }), null, 'held: not at home');
-  assert.equal(N.revenantForLair(p, HERE, { now: DAY * 9, dueOnly: true }), null, 'a rest\'s ask: held too');
-  assert.equal(r.out, false, 'never claimed');
-  online(10);
-  assert.equal(N.revenantForLair(p, HERE, { now: DAY * 9 }), r, 'Renown 10: at home');
-});
-
-test('RENOWN-GATE HELD, NO WORD, NO MARK, NO HUNT: the towns say nothing of a held one (the person\'s answer unspent, the lair unlearned), the maps mark no lair, the log holds no hunt; from Renown 10 all three (mutants: each gate dropped)', () => {
-  const p = me();
-  const r = made(p, { dueAt: 0, lair: LAIR, known: true });
-  const q = made(p, { dueAt: 0, lair: { px: 42, py: 41, name: 'Old Barrow', region: 5 }, known: false });
-  online(9);
-  const s = { numAnswersGivenTellMeAboutOrRumors: 0, isSpyMaster: false };
-  assert.equal(N.revenantRumor(HERE, s, { rolls: () => 0 }), null, 'no word - the mill\'s turn');
-  assert.equal(s.numAnswersGivenTellMeAboutOrRumors, 0, 'the person\'s one answer unspent');
-  assert.equal(q.lairKnown, false, 'nothing learned');
-  assert.deepEqual(N.revenantMapMarks(), [], 'no lair on the maps');
-  assert.deepEqual(N.revenantHuntEntries({ px: 30, py: 30 }), [], 'no hunt in the log');
-  online(10);
-  assert.deepEqual(N.revenantMapMarks().map((m) => m.id), [r.id], 'Renown 10: the known lair marked');
-  assert.deepEqual(N.revenantHuntEntries({ px: 30, py: 30 }).map((h) => h.name), [`Hunt: ${r.name}`]);
-  assert.match(N.revenantRumor(HERE, s, { rolls: () => 0 }) ?? '', /They say/, 'and the towns speak of one');
-});
-
-test('RENOWN-GATE HELD, NONE FESTERS: a held one gains no wrath on its days and its held days are not caught up when the gate opens; the sworn\'s days run all the while (mutants: the hunters\' loop ungated; the held days counted later)', () => {
-  const p = me();
-  const r = made(p, { rank: 1, dueAt: DAY * 10 + 300 });   // due day 10: a wrath on days 13, 16, 19...
-  r.wrath = 0;
-  const e = orc();
-  const sworn = N.revenantDeed(p, e, 'fled', { mobileType: M.Orc, rolls: () => 0 });
-  assert.ok(N.revenantSpared(p, { revenant: { id: sworn.id } }, { state: 'with' }), 'one sworn, walking with me');
-  const start = sworn.companion.loyalty;
-  const at = (day) => ({ now: DAY * day + 60, rolls: () => 0.99 });   // no desertion roll lands
-  N.revenantFester(p, at(14));   // the first count: from here
-  online(9);
-  N.revenantFester(p, at(16));
-  assert.equal(r.wrath, 0, 'day 16 held: no wrath');
-  assert.equal(sworn.companion.loyalty, Math.min(100, start + 2 * LOYALTY.DAY_WITH), 'the sworn\'s two days ran');
-  online(10);
-  N.revenantFester(p, at(17));
-  assert.equal(r.wrath, 0, 'the gate opens on day 17: the held day 16 is not caught up');
-  N.revenantFester(p, at(19));
-  assert.equal(r.wrath, 1, 'day 19: festering again, on its own days');
-});
-
-test('RENOWN-GATE HELD, NONE TURNS: a sworn one at the edge of betrayal stays sworn under Renown 10 - its turning would stand a hostile revenant beside me - and turns from 10 on; a desertion stands nothing, and runs (mutants: the betrayal\'s gate dropped)', () => {
-  const p = me();
-  const r = made(p, { rank: 1 });
-  assert.ok(N.revenantSpared(p, { revenant: { id: r.id } }, { state: 'with' }), 'sworn');
-  online(9);
-  assert.equal(N.revenantBetrays(p, r, { now: DAY * 6, rolls: () => 0 }), null, 'held: no turning');
-  assert.equal(r.sworn, true, 'still at my side');
-  online(10);
-  assert.equal(N.revenantBetrays(p, r, { now: DAY * 6, rolls: () => 0 }), r, 'Renown 10: it turns');
-  assert.equal(r.sworn, false);
-  const d = made(p, { rank: 1 });
-  assert.ok(N.revenantSpared(p, { revenant: { id: d.id } }, { state: 'with' }));
-  online(9);
-  assert.equal(N.revenantDeserts(p, d, { now: DAY * 6, rolls: () => 0 }), d, 'a desertion leaves - it stands no foe, and its return is held');
-  assert.equal(N.revenantToReturn(p, { now: DAY * 99, rolls: () => 0 }), null, 'held');
-});
-
-test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" - never Hunting on any road nor coming in days; its lair promised on no map nor by the towns; none, and the page says from when (mutants: the held words dropped; the door unread; the lair\'s words; the note)', () => {
-  const r = { dueAt: -1, lair: { name: 'The Pit' }, lairKnown: true };
+test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" - never Hunting on any road nor coming in days; none, and the page says from when (mutants: the held words dropped; the door unread; the lair\'s words; the note)', () => {
+  const r = { dueAt: -1 };
   assert.deepEqual(P.comeWords(r, 0, true), { tag: 'Held', cls: 'is-waiting', line: 'It will not come for you before Renown 10.' });
   assert.equal(P.comeWords({ dueAt: 2 * DAY }, 0, true).tag, 'Held', 'not "in about 2 days" either');
   assert.equal(P.comeWords({ out: true }, 0, true).tag, 'Abroad', 'one standing is standing');
   assert.equal(P.comeWords(r, 0, false).tag, 'Hunting', 'open: as ever');
   online(9); assert.equal(P.comeWords(r, 0).tag, 'Held', 'the page\'s door read');
   online(10); assert.equal(P.comeWords(r, 0).tag, 'Hunting');
-  assert.equal(P.lairWords(r, true), 'Lair: The Pit.', 'held: no map promised');
-  assert.equal(P.lairWords({ lair: { name: 'The Pit' }, lairKnown: false }, true), 'Lair: unknown.', 'nor the towns');
-  assert.equal(P.lairWords(r, false), 'Lair: The Pit, marked on your map.');
-  online(9); assert.equal(P.lairWords(r), 'Lair: The Pit.', 'the page\'s door read');
-  online(10); assert.equal(P.lairWords(r), 'Lair: The Pit, marked on your map.');
   // none: the note
   const note = () => {
     const kids = [];
@@ -311,8 +236,8 @@ test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" -
     return kids.map((k) => k.textContent).join(' | ');
   };
   online(9);
-  assert.match(note(), /No foe has earned your name yet\. From Renown 10, an elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you\./);   // UNQUIET (Revenants.md section 46): only the marked rise
+  assert.match(note(), /No foe has earned your name yet. From Renown 10, an elite or champion that kills you, or breaks, runs and gets away, will remember you and come back for you./);
   online(10);
-  assert.match(note(), /No foe has earned your name yet\. An elite or champion marked Unquiet that escapes you/);
+  assert.match(note(), /No foe has earned your name yet. An elite or champion that kills you/);
 });
 

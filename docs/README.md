@@ -36,6 +36,23 @@ Name each departure where you make it (in the code comment or the page that cove
 it is. A departure that makes play or progression feel worse than DFU is a defect, and the fix is to revert it. Read
 the DFU source for the behaviour first; its MIT-licensed code is the reference ([mods-and-vendor.md](formats/mods-and-vendor.md)).
 
+### Every departure is a mod
+
+The core game is DFU's rules. Every departure ships as a mod, with no exceptions:
+
+- **Mods**: every piece of content or behaviour that differs from DFU belongs to a mod: our own departures as
+  first-party mods, other people's as third-party mods. The mod API gives each one a clean interface.
+- **Options**: every tuning value that differs from DFU is a player setting, so a single-player game can be set back to
+  DFU's value or anywhere between. New single-player games start with the official curated mod list and its settings.
+  A "Daggerfall Unity classic" preset turns every mod and setting back to DFU.
+- **Servers**: a server runs a curated mod list with its own settings, and every player on it uses exactly that list
+  and those settings. Only mods and settings that are purely cosmetic, and change nothing in play, are left to each
+  player.
+
+Until the mod manifests exist, a departure is a row in `src/systems/features.js` with its values in
+`src/systems/modSettings.js`, and a setting that changes play is forced online through
+`src/systems/online/onlineLane.js`. Name the mod a change belongs to in its pull request.
+
 ## Code comments
 
 - A comment says why: the reason, an invariant, a workaround, a constraint the code cannot show. The code says what.

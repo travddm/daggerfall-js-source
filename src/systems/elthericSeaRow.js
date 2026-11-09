@@ -23,5 +23,5 @@ export const ELTHERIC_SEA_ROW = Object.freeze({
     return t('features.elthericSea.effect', 'Takes effect the next time the world loads. Online it is always on.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'etherSea', initial: false, online: true }),
+  control: Object.freeze({ store: 'prefs', key: 'etherSea', initial: false, online: 'room' }),
 });
