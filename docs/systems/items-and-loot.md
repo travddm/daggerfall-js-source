@@ -101,6 +101,10 @@ container, a shop. It also decides what closing the window owes the world (`clos
 
 `containers.js` identifies private house containers from furniture model ids, as DFU's `DaggerfallInterior` does.
 `containerLoot.js` raises DFU's `OnLootSpawned` event after a shelf or a house container is stocked.
+A shop shelf is the player's own, online too, as in DFU: rolled for the player when the day turns and sold out as it
+is bought. A server profile can make it the building's shared shelf instead (`shop.sharedShelf`,
+`shop-shelf-rule.ts`). A sold piece is gone, as DFU clears the merchant's basket; the "Sold goods stay on the shelf"
+Features row shelves it until the next restock, and online that row is pinned off.
 
 **Shared room loot.** Online, a dungeon's or building's container is one list for every player in the room
 (`roomLoot.js`):

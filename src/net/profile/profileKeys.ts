@@ -135,6 +135,19 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.quest.failureFree',
   }),
+  // Whether a shop's shelves are shared by everyone in the building online. DFU gives each player their own shelf
+  // (PlayerActivate.cs ActivateLootContainer); shared, the first opener's roll is the room's list and its endless rows
+  // never sell out or sell back (systems/shop-shelf-rule.ts).
+  'shop.sharedShelf': Object.freeze({
+    census: Object.freeze(['ON1', 'ON5', 'ON6'] as const),
+    feature: 'WORLD6a',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.shop.sharedShelf',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;
