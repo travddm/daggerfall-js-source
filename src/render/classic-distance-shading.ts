@@ -1,5 +1,5 @@
 // Classic distance shading, route A of the classic rendering study (dfo-plans, rendering/classic-rendering-options.md,
-// decision #111). The original game darkened and fogged by distance through 64-step palette remap tables: the far a
+// decision 111). The original game darkened and fogged by distance through 64-step palette remap tables: the far a
 // surface, the further its colours were moved toward the table's fade colour. This pass gives the same 64 steps to the
 // full-colour image: after the world is drawn, each pixel is moved toward the scene's fog colour by its step.
 //

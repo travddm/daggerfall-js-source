@@ -92,7 +92,7 @@ const CLASSIC_COLOURS_ROW: SettingsRow = Object.freeze({
   control: Object.freeze({ store: 'settings', key: 'Video/PostProcessingInRetroMode' }),
 });
 
-/** Off by default (decision #104). 'steps' is route A; route B, the original palette tables, would be a third tier. */
+/** Off by default (decision 104). 'steps' is route A; route B, the original palette tables, would be a third tier. */
 const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   id: 'classic-distance-shading',
   group: 'sight',
