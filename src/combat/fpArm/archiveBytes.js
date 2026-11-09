@@ -72,18 +72,18 @@ export function parseNifOnce(bytes, cache = parseNifOnce.cache) {
   if (cache.has(bytes)) return cache.get(bytes);
   const nif = parseNif(bytes);
   cache.set(bytes, nif);
-  parseNifOnce.parses++; // MWNPC3: the parses the memo could not answer - the pins' count of the one parse a mesh
+  parseNifOnce.parses++; // only the parses the memo could not answer, so a test can see one parse per mesh
   return nif;
 }
 parseNifOnce.cache = new WeakMap();
 parseNifOnce.parses = 0;
-/** MWNPC3: how many meshes the builds have PARSED (a memo hit is not one) - the shared parse's pins read it. */
+/** How many meshes the builds have PARSED (a memo hit is not one); tests read it to check the shared parse. */
 export const nifParseCount = () => parseNifOnce.parses;
 
 /** The masters in their load order. */
 const ESM_MASTERS = Object.freeze(['morrowind.esm', 'tribunal.esm', 'bloodmoon.esm']);
 /**
- * AUDIT MW-NPC D6: THE MASTERS IN LOAD ORDER - Morrowind.esm, Tribunal.esm, Bloodmoon.esm, then any other (a mod, after
+ * THE MASTERS IN LOAD ORDER - Morrowind.esm, Tribunal.esm, Bloodmoon.esm, then any other (a mod, after
  * the masters it names), each run of them as stored. The store answers its keys alphabetically (Bloodmoon, Morrowind,
  * Tribunal), and both record walks below let the last record of an id win "as the engine's load order does" - so an
  * expansion's record lost to Morrowind's own. dataSource.js ranks the .bsa files by the same three names, the other way
@@ -91,7 +91,7 @@ const ESM_MASTERS = Object.freeze(['morrowind.esm', 'tribunal.esm', 'bloodmoon.e
  * @param {string[]} names
  */
 export function esmLoadOrder(names) {
-  // AUDIT MW-NPC II G2: the masters by their WHOLE names - by prefix, "Morrowind Patch.esm" ranked as Morrowind's own
+  // The masters by their WHOLE names - by prefix, "Morrowind Patch.esm" ranked as Morrowind's own
   // and, stored before it (' ' sorts before '.'), lost every record it patched to the master it patches
   const rank = (n) => {
     const i = ESM_MASTERS.indexOf(String(n).split(/[\\/]/).pop().toLowerCase());
@@ -104,7 +104,7 @@ export function esmLoadOrder(names) {
 }
 
 /**
- * MWNPC3: ONE COPY OF A
+ * ONE COPY OF A
  * MESH'S BYTES, FOR EVERY BODY. Every build copied each part's bytes out of its archive (`.slice()`) and parsed the
  * copy - a fresh copy a build, so parseNifOnce's memo (keyed by the bytes) never met the same mesh twice, and every
  * body re-parsed every mesh it wore: the player's on each equip, each peer's, and a crowd of NPCs wearing the same
@@ -144,7 +144,7 @@ export function skeletonHasBone(skeletonBytes, name) {
     return false;
   }
 }
-/** WS1: skeletonHasBone AFTER the bone addons - a dry injection over the
+/** skeletonHasBone AFTER the bone addons - a dry injection over the
  *  same bytes, so the holster resolves against the skeleton the
  *  assembly will build. */
 export function boneProbe(skeletonBytes, boneSources) {
