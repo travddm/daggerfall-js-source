@@ -99,10 +99,11 @@ names its `ph` in `/health`, `/profile` and every welcome (see [relay.md](relay.
 On `welcome`, `src/net/online.js` checks `v` with `relayMatches` and `ph` with `profileMatches`
 (`src/systems/online/serverProfile.ts`, against the hash of the profile the page installed). When the version is
 missing or differs, or the hash differs from the page's, the session refuses the relay (`refuseVersion`): it leaves
-every room, sets `versionRefused`, and its status line asks the player to reload the page (`net.relayVersionMismatch` for the version, `net.profile.changed` for
-the profile). A refused session never retries, rejoins or joins again; only a reload of the page, which fetches the
-relay's profile again and loads the client that matches the deployed relay, brings it back. The presence session and
-every chat link apply the rule to their own welcomes.
+every room, sets `versionRefused`, and its status line asks the player to reload the page
+(`net.relayVersionMismatch` for the version, `net.profile.changed` for the profile). A refused session never
+retries, rejoins or joins again. Only a reload of the page, which fetches the relay's profile again and loads the
+client that matches the deployed relay, brings it back. The presence session and every chat link apply the rule to
+their own welcomes.
 
 In the other direction, the hello carries `ph` and the law numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`,
 `LOOT_HELLO_LAW`, the cell tree's `of`). The relay's hello doors (`server/src/helloDoor.ts`) refuse a hello on another
