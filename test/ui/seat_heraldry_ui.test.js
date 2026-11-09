@@ -107,10 +107,6 @@ test('HERALDRY-SHOWN THE INDEX: a guild\'s heraldry by its tag off what the clie
   assert.equal(of('siege-forfeit', { guild: SH, against: EO }), 'EO');
   assert.equal(of('siege-void', { battle: 'siege', guild: EO, holder: SH, carried: true }), 'SH');
   assert.equal(of('siege-void', { battle: 'tourney', guild: EO, holder: SH }), null, 'a void Tourney names neither');
-  assert.equal(of('fealty-sworn', { vassal: IC, liege: SH }), 'IC');
-  assert.equal(of('fealty-broken', { vassal: IC, liege: SH, breaker: SH }), 'SH');
-  assert.equal(of('fealty-tribute', { vassal: EO, liege: SH, marks: 5 }), 'EO');
-  assert.equal(of('fealty-lapsed', { vassal: EO, liege: SH }), 'EO');
   assert.equal(of('royal-champion', { name: 'Mara', wins: 3 }), null);
   assert.equal(of('held', { guild: { name: 'X', tag: '' } }), null);
   assert.equal(of('held', { guild: 'SH' }), null);
@@ -288,9 +284,6 @@ test('AUDIT HERALDRY H2 the Roll of Arms names only the guilds a row\'s LINE nam
   assert.deepEqual(roll([{ kind: 'siege-void', week: 4, data: { battle: 'siege', guild: NAMED(EO), holder: NAMED(SH), carried: true } }]), [
     'The Silver Hand <SH>: Azure bordered Gold, a Tower.', 'Ebon Oath <EO>: Crimson bordered Argent, a Wolf.',
   ], 'a carried void: the holder its line names first, then the attacker');
-  assert.deepEqual(roll([{ kind: 'fealty-broken', week: 6, data: { vassal: NAMED(IC), liege: NAMED(SH), breaker: NAMED(SH) } }]), [
-    'The Silver Hand <SH>: Azure bordered Gold, a Tower.', 'Iron Circle <IC>: Vert bordered Sable, an Axe.',
-  ], 'the breaker first, as the line says it');
   assert.deepEqual(roll([{ kind: 'siege-voided', week: 7, data: { battle: 'siege', guild: NAMED(EO), holder: NAMED(SH), restored: false } }]), [], 'a voided battle restored to none names no guild');
 });
 

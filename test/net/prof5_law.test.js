@@ -88,7 +88,7 @@ test('PROF5 law: the catalogue - every registered material, the four foods and e
   assert.ok(cat.every((c) => material(c.key)), 'every one a Stores material');
   assert.equal(new Set(cat.map((c) => c.key)).size, cat.length);
   assert.ok(cat.some((c) => c.family === 'herbs') && cat.some((c) => c.key === 'food:apple') && cat.some((c) => c.key === 'ore:mithril') && cat.some((c) => c.key === 'cloth:wool'));
-  assert.deepEqual([...new Set(cat.map((c) => c.family))], ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'siege']);   // SEAT2b part two (
+  assert.deepEqual([...new Set(cat.map((c) => c.family))], ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences']);   // SEAT2b part two (
   assert.deepEqual({ key: WOOL.key, tier: WOOL.tier, templateIndex: WOOL.templateIndex, name: WOOL.name }, { key: 'cloth:wool', tier: 2, templateIndex: 669, name: 'Wool Bolt' });
   assert.equal(minedMaterial('cloth:wool').family, 'hides');
   assert.deepEqual(WEAVERS_STOCK.map((w) => [w.key, w.marks, w.counter]), [['cloth:linen', 2, 'weavers'], ['cloth:wool', 3, 'weavers']], '4.5\'s own prices');
@@ -105,7 +105,7 @@ test('PROF5 law: the ledger\'s market kinds - the fee, the tax and the courier b
   // The faucets are the gate, the writ and the Seats' three (a siege's Honours, an Incursion's second half, a struck
   // seat's fee given back) - none of them the market's.
   assert.deepEqual(Object.entries(MARKS_KINDS).filter(([, w]) => w === 'mint').map(([k]) => k),
-    ['gate', 'writ', 'siege-honours', 'gate-incursion', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the market strikes no Mark');
+    ['gate', 'writ', 'siege-honours', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the market strikes no Mark');
   const raw = d1()._raw;
   const sqlOf = (name) => raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name).sql;
   const ledger = sqlOf('marks_ledger');

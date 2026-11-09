@@ -73,7 +73,7 @@ test('PROF12 law: THE APOTHECARIES\' SIXTEEN (4.5) - exactly the ingredients DFU
   }
   assert.deepEqual(APOTHECARY_STOCK.map((x) => x.key), REAGENTS.map((r) => r.key));
   assert.deepEqual(COUNTER_ONLY.slice(0, 2), ['cloth:linen', 'cloth:wool']);
-  assert.deepEqual(MATERIAL_FAMILIES.map(([id]) => id), ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'spoils', 'siege'], 'no new filter');
+  assert.deepEqual(MATERIAL_FAMILIES.map(([id]) => id), ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'spoils'], 'no new filter');
   assert.deepEqual([ALCHEMY_FEE, ENCHANT_FEE], [25, 50]);
   assert.deepEqual([ARCANE_ESSENCE.key, ARCANE_ESSENCE.family, ARCANE_ESSENCE.tier, ARCANE_ESSENCE.templateIndex, ARCANE_ESSENCE.name, [...ARCANE_ESSENCE.icon]],
     ['essence:arcane', 'essences', 3, 680, 'Arcane Essence', [254, 39]]);
@@ -183,7 +183,7 @@ test('PROF12 law: THE APOTHECARY\'S STEP for a dish (DECIDED: a dish takes no qu
 // ─── AUDIT PROF12: E1, E2, A3, E3 ───────────────────────
 
 test('AUDIT PROF12 E1 law: Arcane Essence has no pack form (NO_PACK_FORM) - it sold to any shop at 32 gold a unit; the Apothecaries\' sixteen beside it in the Essences\' family still withdraw', () => {
-  assert.deepEqual([...NO_PACK_FORM], ['work:ram', ARCANE_ESSENCE.key]);
+  assert.deepEqual([...NO_PACK_FORM], [ARCANE_ESSENCE.key]);
   assert.equal(withdrawable('essence:arcane'), false);
   for (const r of REAGENTS) assert.equal(withdrawable(r.key), true, r.key);
 });

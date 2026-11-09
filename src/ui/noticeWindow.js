@@ -308,15 +308,7 @@ export function mountNoticeBoard(host, deps) {
   const seatHost = guildOnly ? null : (deps.seat ?? null);
   const seatShown = () => !!seatHost && seatHost.book?.open === true;
   let seatBusy = false, seatOpened = false;
-  // DOMAIN1 (5): a member's gift reads the Stores and the bag as the market's listing does
-  // (its host's own reads) and puts the bag's units in the Stores first - nothing given where the market is not open
-  const mk = deps.market ?? null;
-  const giving = mk ? {
-    stores: (/** @type {string} */ k) => { const s = mk.stores?.()?.get?.(k); return s ? (s.own | 0) + (s.bought | 0) : 0; },
-    bag: (/** @type {string} */ k) => Number(mk.carried?.()?.get?.(k)) || 0,
-    putIn: (/** @type {string} */ k, /** @type {number} */ n) => mk.putIn(k, n),
-  } : null;
-  const seatTab = seatHost ? createSeatTab({ ...seatHost, giving, ...(deps.seatBattle ? { enterBattle: deps.seatBattle } : {}), ...(deps.seatRoyal ? { enterRoyal: deps.seatRoyal } : {}), ...(deps.seatRecords ? { readRecords: deps.seatRecords } : {}), banner: (h, w) => bannerImg(h, w) }, {   // SEAT2a part four: and the battle's door
+  const seatTab = seatHost ? createSeatTab({ ...seatHost, ...(deps.seatBattle ? { enterBattle: deps.seatBattle } : {}), ...(deps.seatRoyal ? { enterRoyal: deps.seatRoyal } : {}), ...(deps.seatRecords ? { readRecords: deps.seatRecords } : {}), banner: (h, w) => bannerImg(h, w) }, {   // SEAT2a part four: and the battle's door
     busy: () => seatBusy,
     run: async (start) => {
       if (seatBusy) return;
@@ -484,7 +476,7 @@ export function mountNoticeBoard(host, deps) {
           tab = id; word = null;
           if (id === 'work') openWork();
           if (id === 'market' && market && !marketOpened) { marketOpened = true; market.open(); }
-          if (id === 'seat' && seatTab && !seatOpened) { seatOpened = true; seatTab.open(); }   // SEAT1b
+          if (id === 'seat' && seatTab) { if (seatOpened) seatTab.reload(); else { seatOpened = true; seatTab.open(); } }   // SEAT1b; a return to the tab reads the Pacts and offers afresh
           if (id === 'vendors' && vendorTab && !vendorOpened) { vendorOpened = true; vendorTab.open(); }   // HOME-VENDOR
           if (id === 'guilds') { view = 'board'; reading = null; if (!gboard && !gbusy) loadGuild(false); }   // GUILD1e
           else if (view === 'gpin') view = 'board';

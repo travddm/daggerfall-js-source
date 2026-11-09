@@ -54,7 +54,7 @@ export const GUILD_RANK_ACTS = Object.freeze([
   Object.freeze({ table: 'writ', power: 'postWrit', words: 'post guild writs and contracts (Officers within the weekly budget the guildmaster sets) and withdraw the ones they posted' }),
   Object.freeze({ table: 'writ', power: 'storesWithdraw', words: 'take any materials out of the guild Stores' }),
   Object.freeze({ table: 'seat', power: 'pledge', words: 'pledge the guild to a seat in the Muster' }),
-  Object.freeze({ table: 'levers', power: 'levers', words: 'run a held seat: its Tithe, Edict, battle window, Works, fealty and Pacts' }),
+  Object.freeze({ table: 'levers', power: 'levers', words: 'run a held seat: its Tithe, Edict, battle window, Works and Pacts' }),
   Object.freeze({ table: 'guild', power: 'withdraw', words: 'take gold and silver out of the treasuries' }),
   Object.freeze({ table: 'writ', power: 'writBudget', words: 'set the Officers\' weekly silver budget for guild writs and contracts' }),
   Object.freeze({ master: true, words: 'withdraw any guild writ or contract' }),

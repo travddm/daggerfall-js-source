@@ -1085,11 +1085,11 @@ export function chapterRollLines(/** @type {unknown} */ faction, /** @type {any}
 
 // ─── CHAP6a: THE SEASON'S EVENT (Chapters-Arc 7) ────────────────────
 // At the Turning that opens a Season every confirmed chapter draws one event - a pure function of the Season, the
-// chapter's key and a salt, as a Tide is (tideLaw.js) - from weights its last Season moved. The event holds the whole
+// chapter's key and a salt - from weights its last Season moved. The event holds the whole
 // Season: a Crackdown's members' own writs earn half again Merit (AUDIT CHAP5 E1) and a chapter under 30 at the Season's
 // end shuts its halls for the next, a Rivalry races two chapters of one region on the Season's Merit and the winner takes
 // 10 Strength from the loser. The Schism's and the Succession's choices are CHAP6b's; what the client shows of every
-// event CHAP6c's. No Season counted, no event: every chapter is Calm, as every land's Tide is.
+// event CHAP6c's. No Season counted, no event: every chapter is Calm.
 // GUILD3e (, CUT A DUPLICATE, NEVER DEPTH): five events, where there were seven -
 // the Decline (2 Strength a week) said what the Failing band says, and the Ascendancy (a tenth off, a High Master) what
 // the Ascendant band should; the Ascendant band carries both now (CHAPTER_BANDS, chapterTitlesOf's `high`).

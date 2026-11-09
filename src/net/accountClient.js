@@ -49,7 +49,7 @@ import { HOME_CAP, RENT_ROOMS_MAX, RENT_HELD_MAX, RENT_DAYS_MAX } from './homeLa
 import { DECOR_CAP, DECOR_YARD_CAP, DECOR_YARD_HIGH_WHY, DECOR_YARDS_TOWN_MAX } from './decorLaw.js';   // DECOR1: the cap its refusal names; HOME-YARD: a yard's; YARD-TOWN: a town's
 import { MARKS_MAX, MARKS_BANK, MARKS_MOVE_MAX, MARKS_FAUCETS } from './marksLaw.js';   // MARKS1: the bounds its refusals name; CRAFT-WRITS: a crafting writ's day
 import { NOTES_LIVE_MAX, NOTE_DAYS, NOTICE_DAYS_MAX } from './boardLaw.js';   // NOTICE1: the bounds its refusals name
-import { SIGN_WHY, SIEGE_WHY, ROYAL_WHY, FEALTY_WHY, SELLSWORD_FEE_MAX } from './townSeatLaw.js';   // SEAT2a: the rosters' refusals in the board's own words; the fee's bound
+import { SIGN_WHY, SIEGE_WHY, ROYAL_WHY, POLITICS_WHY, SELLSWORD_FEE_MAX } from './townSeatLaw.js';   // SEAT2a: the rosters' refusals in the board's own words; the fee's bound
 import {
   DEEP_UNCONFIRMED_PER_DAY, STORES_MAX, WITHDRAW_MAX, COURT_WRITS_PER_DAY, RESPEC, HIGH_HIDES_PER_DAY,
 } from './professionLaw.js';   // PROF1: the bounds its refusals name; PROF7: Hunting's rare hides (CAP-OFF: no day's cap)
@@ -422,7 +422,6 @@ const REFUSAL_WORDS = {
   'bad-watch': () => t('account.refusal.badWatch', 'Those watch records could not be read.'),
   // SEAT1c: the Charters
   'seat-not-held': () => t('account.refusal.seatNotHeld', 'Your guild does not hold that Charter.'),
-  'seat-none-here': () => t('account.refusal.seatNoneHere', 'Your guild neither holds a Charter in this region nor is pledged to a seat here this week, so there is nowhere here to give to.'),   // DOMAIN1: a gift with no stockpile or Siege Camp of the guild's in the region
   'seat-held-here': () => t('account.refusal.seatHeldHere', 'Your guild holds a Charter in this region, and is pledged to it.'),
   'seat-not-charter': () => t('account.refusal.seatNotCharter', 'This town is a holding of its region\'s Charter. Pledge to the Charter at its seat of power.'),   // DOMAIN3
   // SEAT1d: the holder's levers
@@ -433,7 +432,6 @@ const REFUSAL_WORDS = {
   'edict-tier': () => t('account.refusal.edictTier', 'Only a crown may proclaim that Edict.'),
   'seat-no-edict': () => t('account.refusal.seatNoEdict', 'No Edict is proclaimed for next week.'),
   'bad-bounty': () => t('account.refusal.badBounty', 'A Bounty sets aside at least 20 silver, and at most 100,000.'),
-  'bad-orc-camp': () => t('account.refusal.badOrcCamp', 'That camp is not one the Orc Raids count.'),   // SEASON1 part two
   // SEAT2a: the battles' week - the window, the rosters, the Sellswords (the board's own words: townSeatLaw.js SIGN_WHY)
   'bad-window': () => t('account.refusal.badWindow', 'A window is a day from Wednesday to Saturday and a start from 16:00 to 02:00 UTC.'),
   'bad-fee': () => t('account.refusal.badFee', 'A Sellsword\'s fee is a whole amount of silver, at most {max, number}.', { max: SELLSWORD_FEE_MAX }),
@@ -444,7 +442,7 @@ const REFUSAL_WORDS = {
   ...readEach(SIGN_WHY),
   ...readEach(SIEGE_WHY),   // SEAT2a part three: the pass and the Honours
   ...readEach(ROYAL_WHY),   // CROWN1 part two: the Royal Tourney's pass and bouts
-  ...readEach(FEALTY_WHY),   // CROWN2: fealty and Pacts
+  ...readEach(POLITICS_WHY),   // CROWN2: Pacts
   ...readEach(VENDOR_REFUSAL_WORDS),   // HOME-VENDOR
   // NOTICE1: the Notice Board (server-account/src/board.js)
   'board-need-account': () => t('account.refusal.boardNeedAccount', 'Only registered accounts can pin notes. Add a username to pin one.'),
@@ -619,11 +617,13 @@ const REFUSAL_WORDS = {
   'writ-elsewhere': () => t('account.refusal.writElsewhere', 'That writ is delivered at the boards of the region that posted it.'),
   'writ-short': () => t('account.refusal.writShort', 'That writ needs fewer than that now.'),
   'writ-moved': () => t('account.refusal.writMoved', 'Someone else delivered first. Check the writ again.'),
-  // SEAT2b: a seat writ and a fortification project
-  'seat-not-pledged': () => t('account.refusal.seatNotPledged', 'Your guild neither holds that seat nor is pledged to it this week.'),
+  // SEAT2b: a fortification and a Siege Camp
+  'seat-not-pledged': () => t('account.refusal.seatNotPledged', 'Your guild has not pledged that seat this week.'),
+  'camp-holder': () => t('account.refusal.campHolder', 'Your guild holds that seat. A Siege Camp is a challenger\'s.'),
+  'camp-pitched': () => t('account.refusal.campPitched', 'Your guild has pitched a Siege Camp there this week.'),
   'bad-work': () => t('account.refusal.badWork', 'There is no such work.'),
   'fort-not-here': () => t('account.refusal.fortNotHere', 'That work cannot be raised at this seat.'),
-  'fort-building': () => t('account.refusal.fortBuilding', 'That work is being raised already.'),
+  'seat-option-off': () => t('account.refusal.seatOptionOff', 'That option is switched off on this server.'),
   'fort-max': () => t('account.refusal.fortMax', 'That work has reached its final stage.'),
   'seat-treasury': () => t('account.refusal.seatTreasury', 'The guild\'s treasury does not hold the silver that project asks.'),
   'bad-rid': () => t('account.refusal.badRid', 'That request could not be read. Try again.'),
@@ -2183,20 +2183,13 @@ export function accountSeats({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
     // CROWN1 part two: a Royal Tourney's pass (a contender's ring, or a spectator's); a bout's receipt claimed
     royalPass: (key, field, watch) => post('/v1/seats/royal/pass', { key, ...(field ? { field } : {}), ...(watch ? { watch: true } : {}) }),
     claimRoyal: (receipt) => post('/v1/seats/royal/claim', { receipt }),
-    // CROWN2: fealty offered (`as` 'vassal' or 'liege'), accepted, broken or withdrawn; a Pact offered or signed, broken
-    // SEAT2b: a seat's works read; a project begun (`port`: DFU names the town a port - a Harbour's ask)
+    // CROWN2: a Pact offered or signed, broken
+    // SEAT2b: a seat's works read; a tier raised (`port`: DFU names the town a port - a Harbour's ask); a Siege Camp pitched
     forts: (key) => post('/v1/seats/forts', { key }),
     fortFund: (character, key, work, rid, port = false) => post('/v1/seats/fort/fund', { character, key, work, rid, ...(port ? { port: true } : {}) }),
-    // DOMAIN1 (5): where this character's guild gives in a region, and a gift made
-    gifts: (character, region) => post('/v1/seats/gifts', { character, region }),
-    give: (character, region, material, units, rid) => post('/v1/seats/give', { character, region, material, units, rid }),
-    fealty: (character, tag, as) => post('/v1/seats/fealty', { character, tag, as }),
-    fealtyAccept: (character, tag) => post('/v1/seats/fealty/accept', { character, tag }),
-    fealtyBreak: (character, tag) => post('/v1/seats/fealty/break', { character, ...(tag ? { tag } : {}) }),
+    camp: (character, key, rid) => post('/v1/seats/camp', { character, key, rid }),
     pact: (character, tag) => post('/v1/seats/pact', { character, tag }),
     pactBreak: (character, tag) => post('/v1/seats/pact/break', { character, tag }),
-    // SEASON1 part two: an Orc Raid's camp cleared
-    orcCamp: (character, site, region) => post('/v1/seats/orc-camp', { character, site, region }),
   };
 }
 

@@ -50,7 +50,7 @@ test('CROWN1 THE FREE LANDS\' WATCH (4.3): every account\'s Watch there a tenth 
 });
 
 test('CROWN1 CONSCRIPTION IS A CROWN\'S (7.6): an Edict of its own, proclaimed at a crown seat alone, costing nothing, its words in the Seat tab (mutants: the tier gate; the crown flag)', () => {
-  assert.deepEqual(Object.keys(EDICTS), ['market-day', 'open-gates', 'curfew', 'festival', 'levy', 'bounty', 'conscription', 'royal-tourney']);   // part two: and the Royal Tourney
+  assert.deepEqual(Object.keys(EDICTS), ['market-day', 'open-gates', 'curfew', 'festival', 'bounty', 'conscription', 'royal-tourney']);   // part two: and the Royal Tourney
   assert.equal(EDICTS.conscription.crown, true);
   assert.ok(edictOk('conscription'));
   assert.equal(edictForTier('conscription', 'crown'), true);

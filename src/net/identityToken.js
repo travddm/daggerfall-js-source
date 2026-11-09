@@ -190,14 +190,13 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
 /** The titles that exist. A title is WORN one at a time, so a token
  *  carries at most one. Grants are the service's business (who HOLDS
  *  one); this list is the vocabulary both ends share. */
-export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane']);
+export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'gatebreaker', 'herald', 'warden', 'protector', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane']);
 
-/** SEAT1c: THE SEATS' TITLES - five GENERIC ids, because a town's
+/** SEAT1c: THE SEATS' TITLES - three GENERIC ids, because a town's
  *  or a Season's name cannot be a closed list's word: "Warden of <Town>" (a palace seat's guildmaster), "Protector of
- *  <Kingdom>" (a crown's), "Crowned in Season N", "Keeper of <Town>, Season N" (kept for good, SEASON1) and the Royal
- *  Tourney's champion (CROWN1). Each rides with a bounded claim beside it - `ts`: [the seat key, the Season] - from
+ *  <Kingdom>" (a crown's) and the Royal Tourney's champion (CROWN1). Each rides with a bounded claim beside it - `ts`: [the seat key, the Season] - from
  *  which the client words it. Reaching the relay once, here, before the service mints any - a relay that does not know a title refuses the token that carries it. */
-export const SEAT_TITLES = Object.freeze(['warden', 'protector', 'crowned', 'keeper', 'champion']);
+export const SEAT_TITLES = Object.freeze(['warden', 'protector', 'champion']);
 /** SEAT1c: whether `ts` is a seat title's claim - [seat key (a map id, unsigned 32), Season (0-9999)]. */
 export const seatTitleClaimOk = (ts) => Array.isArray(ts) && ts.length === 2 && Number.isSafeInteger(ts[0]) && ts[0] >= 0 && ts[0] <= 0xffffffff
   && Number.isSafeInteger(ts[1]) && ts[1] >= 0 && ts[1] <= 9999;

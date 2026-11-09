@@ -21,8 +21,8 @@ import { createNameLayer, NAME_CSS } from '../../src/ui/nameLayer.js';
 import { perspective, mirrorProjectionX, lookAt } from '../../src/world/mat4.js';
 
 test('SEASON1 THE BANNER RIBBON\'S LAW: a Season\'s end ribbons each keeper\'s guild once (never a crown alone); a ribbon is worn in the Season after its own, none with no Season or in Season 0; a guild\'s field and border as two colour indexes, Argent bordered Ash for none; a claim two different colours of the sixteen, read back as their hexes (mutants: the keepers; the once; the Season before; each bound; the plain; the read)', () => {
-  const titles = [{ guild: 'a', title: 'crowned', key: 1 }, { guild: 'a', title: 'keeper', key: 1 }, { guild: 'b', title: 'crowned', key: 2 }, { guild: 'c', title: 'keeper', key: 3 }, { guild: 'a', title: 'keeper', key: 4 }];
-  assert.deepEqual(seasonRibbons(titles), ['a', 'c']);
+  const keepers = [{ guild: 'a', key: 1 }, { guild: 'c', key: 3 }, { guild: 'a', key: 4 }];
+  assert.deepEqual(seasonRibbons(keepers), ['a', 'c']);
   assert.deepEqual([seasonRibbons([]), seasonRibbons(null)], [[], []]);
   assert.deepEqual([ribbonSeasonOf({ n: 3 }), ribbonSeasonOf({ n: 1 }), ribbonSeasonOf({ n: 0 }), ribbonSeasonOf(null)], [2, 0, null, null]);
   const idx = (key) => HERALDRY_COLOURS.findIndex((c) => c.key === key);

@@ -57,8 +57,6 @@ import { titheAt } from './seatHolding.js';   // SEAT1d: the bailiwick's Tithe
 import { listingsCapAt } from './seatForts.js';   // SEAT2b: a Market Hall's listings
 import { titheOf, TITHE_CAP } from '../../src/net/townSeatLaw.js';
 import { marketHallTitheCap } from '../../src/net/fortLaw.js';
-import { tideNow } from './tides.js';   // SEASON1 part two: a Bandit Summer's couriers (9.3)
-import { tideCourier } from '../../src/net/tideLaw.js';
 import { profOpenFor, spendStatements, spendOrigins, spendableSql, storeOf, silverClothIn } from './professions.js';   // WOVEN-PAYS: a cloth bought with Drakes, counted
 import { REALM_ID_RE, realmActFirst, prepareRealmRecord, mustChange, dropIfUnnamed, recordMovedOf, dropObjects, realmHoldOf, holdStandsSql } from './realm.js';   // GOLD-MARKET
 import { lawfulItem, itemWorth } from '../../src/systems/item/itemLaw.js';   // INT1: no piece the law cannot stand behind is listed; LW15: a patron's judge
@@ -163,16 +161,14 @@ function hubsFrom(keys, /** @type {any[]} */ results, own) {
   return new Map(keys.map((k) => [Number(k), hubPixel(by.get(k) ?? [], own.get(Number(k)) ?? null)]));
 }
 /** The courier between two regions: `{ courier, seconds, road }` - nothing on the same region, null with no road.
- *  SEASON1 part two: `slow` the Tide's factor on its seconds where it is bound (tideLaw.js tideCourier). */
-function courierOf(hubs, from, to, units, slow = 1) {
+ */
+function courierOf(hubs, from, to, units) {
   if (from === to) return { courier: 0, seconds: 0, road: 0 };
   const a = hubs.get(from), b = hubs.get(to);
   if (!a || !b) return null;
   const road = roadPixels(a, b);
-  return { courier: courierFee(units, road), seconds: courierSeconds(road) * slow, road };
+  return { courier: courierFee(units, road), seconds: courierSeconds(road), road };
 }
-/** SEASON1 part two (9.3): a Bandit Summer where a courier is bound, while a Season is counted. */
-const courierSlow = (env, nowS, to) => tideCourier(tideNow(env, nowS, to));
 /** AUDIT 30 S3: whether the ledger already holds this account's line `rid` + `suffix` - a request id spent, though the
  *  row that would answer its repeat was pruned. */
 const spent = async (db, me, rid, suffix) => !!(await db.prepare('SELECT 1 FROM marks_ledger WHERE actor = ?1 AND rid = ?2').bind(me, `${rid}${suffix}`).first());
@@ -733,7 +729,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
     const by = new Map(q.map(([name], i) => [name, got[i]]));
     const at = hubKeys.length ? hubsFrom(hubKeys, by.get('hubs') ?? [], own) : new Map();
     return {
-      quotes: quoted.map((l) => courierOf(at, Number(l.region), region, unitsOf(l), courierSlow(env, nowS, region))),
+      quotes: quoted.map((l) => courierOf(at, Number(l.region), region, unitsOf(l))),
       medians: medianKeys?.length ? mediansFrom(medianKeys, by.get('medians') ?? [], today) : new Map(),
       reports: new Map((by.get('reports') ?? []).map((r) => [r.listing, Number(r.n)])),
       auctionReports: new Map((by.get('auctions') ?? []).map((r) => [r.auction, Number(r.n)])),
@@ -1324,7 +1320,7 @@ export async function marketBuy(ctx, player, env, { character, region, listing: 
     at ? null : titheAt(db, nowS, from, rowBoard(l), env),
     at || from === region ? null : titheAt(db, nowS, region, boardOf(board), env),
   ]);
-  const road = courierOf(hubsNow, from, region, units, courierSlow(env, nowS, region));
+  const road = courierOf(hubsNow, from, region, units);
   if (!road) return { error: 'market-no-road' };
   if (at) return buyWithGold(ctx, player, { character, region, l, units, max, rid, road, own, at, answer, vend, landed: landed === true });
   const total = units * Number(l.price);
@@ -2027,7 +2023,7 @@ export async function marketBid(ctx, player, env, { character, region, auction: 
   if (amount < next) return { error: 'auction-low' };
   const from = Number(a.region);
   const own = hubsOf(hubs);
-  const road = courierOf(await hubsAt(db, [from, region], own), from, region, 1, courierSlow(env, nowS, region));
+  const road = courierOf(await hubsAt(db, [from, region], own), from, region, 1);
   if (!road) return { error: 'market-no-road' };
   const held = amount + road.courier;
   const bidId = mintId(rand);
