@@ -105,6 +105,9 @@ jobs:
         run: sh tools/fetch-vendor.sh
       # Two builds side by side: the game, and the game with the online probe's three seams (build.mjs --online)
       - name: Build the game
+        # the online build imports the load harness, which reaches the shader modules' `?raw` imports under Node
+        env:
+          NODE_OPTIONS: --import ./tools/raw-import-hooks.ts
         run: |
           if [ "$RUNNER_ENVIRONMENT" = self-hosted ]; then
             # each build peaks near 5 GB; a small self-hosted runner has 8 GB, so one after the other
@@ -225,6 +228,8 @@ jobs:
           PROBE_DIST: ${{ runner.temp }}/probe-dist
           ARENA2_PATH: ${{ runner.temp }}/arena-data/arena2
           SHOT_DIR: ${{ runner.temp }}/probe-shots
+          # a probe file may import game modules that read shaders with `?raw`
+          NODE_OPTIONS: --import ./tools/raw-import-hooks.ts
         run: npm run probes -- ${{ matrix.probe }}
       - name: Keep the screenshots
         if: ${{ failure() }}
