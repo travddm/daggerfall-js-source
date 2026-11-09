@@ -7,7 +7,7 @@
 // blow and crouch (net/peer/peerBodies.js), Eye Of The Beholder's walker's stance and strokes (net/peer/peerRiders.js); and the
 // stand-ins pinned equal to the hosts' own.
 import '../chargenDom.mjs';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -36,8 +36,9 @@ import { RemotePlayers, PEER_SOUND_PROFILE } from '../../src/net/remotePlayers.j
 import { createPeerWalkers, createEotbArt, WALK_ONE_SHOTS, WALK_GATHER_STROKES, walkerHands } from '../../src/net/peer/peerRiders.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { setForagingHost } from '../../src/systems/foraging/foragingInstall.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { PX, rig, arrive, dice, sfxOf } from '../gatherRig.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 const ROOT = join(fileURLToPath(new URL('..', import.meta.url)), '..');
 const src = (p) => readFileSync(join(ROOT, p), 'utf8');
 const near = (a, b, e = 1e-9) => Math.abs(a - b) <= e;

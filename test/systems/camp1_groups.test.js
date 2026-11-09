@@ -189,7 +189,7 @@ test('CAMP1 by source: both exterior hosts roll it after the single roll comes b
   // the switch
   const row = FEATURES.find((f) => f.id === 'wilderness-camps');
   assert.ok(row, 'the enhanced pane carries the row');
-  assert.deepEqual([row.group, row.title, [...row.kinds], row.control.key, row.control.initial, row.control.online], ['world', 'Wilderness camps & packs', ['enhanced'], 'wildernessCamps', true, true]);
+  assert.deepEqual([row.group, row.title, [...row.kinds], row.control.key, row.control.initial, row.control.online], ['world', 'Wilderness camps & packs', ['enhanced'], 'wildernessCamps', true, 'room']);
   assert.match(read('src/systems/campEncounters.js'), /^\/\/ This is an ORIGINAL addition, not a Daggerfall Unity or classic/m, 'the module says what it is');
 });
 

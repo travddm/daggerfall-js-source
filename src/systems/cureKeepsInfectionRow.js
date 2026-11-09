@@ -20,5 +20,5 @@ export const CURE_KEEPS_INFECTION_ROW = Object.freeze({
     return t('features.cureKeepsInfection.effect', 'Takes effect on the next cure.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'cureKeepsInfection', initial: false, online: false }),
+  control: Object.freeze({ store: 'prefs', key: 'cureKeepsInfection', initial: false, online: 'room' }),
 });

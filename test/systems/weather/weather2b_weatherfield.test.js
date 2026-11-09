@@ -172,7 +172,7 @@ test('WEATHER2b the switch: the weather-events row alone, in every skin, with En
     setWeatherFieldLaw(true); assert.equal(weatherFieldOn(), true, 'the seam wins'); setWeatherFieldLaw(null);
   } finally { setUiSkin(skin); setPref('enhancedEnvironments', pe); setPref('weatherEvents', pw); resetWeatherSim(); }
   const row = FEATURES.find((f) => f.id === 'weather-events');
-  assert.ok(row); assert.equal(row.control.key, 'weatherEvents'); assert.equal(row.control.initial, true); assert.equal(row.control.online, true);
+  assert.ok(row); assert.equal(row.control.key, 'weatherEvents'); assert.equal(row.control.initial, true); assert.equal(row.control.online, 'room');
   assert.equal(PREF_DEFAULTS.weatherEvents, true); assert.equal(ONLINE_FORCED_PREFS.weatherEvents, true, 'one field for every player');
   assert.equal(FEATURES.findIndex((f) => f.id === 'weather-events'), FEATURES.findIndex((f) => f.id === 'enhanced-map') + 4, 'TAMRIEL1/TAMRIEL2 (2026-10-08): the continent\'s two rows stand between the 3D dungeon map and this; FT18: where the sway row stood - the sway is the wind row\'s part now; EM3-3D: the 3D dungeon map row stands between, under the map row it belongs to');
 });

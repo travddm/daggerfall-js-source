@@ -27,7 +27,7 @@ export const CRIME_RECOVERY_ROW = Object.freeze({
     store: 'prefs',
     key: 'crimeRecovery',
     initial: 'x4',
-    online: 'x4',
+    online: 'room',
     tiers: Object.freeze([
       tier('dfu', () => t('features.crimeRecovery.dfu', 'Classic')),
       tier('x4', () => t('features.crimeRecovery.x4', '4x')),

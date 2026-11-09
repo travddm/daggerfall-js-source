@@ -141,6 +141,6 @@ test("LOCKPICK-MODE: through the real action graph, a wired host off the option 
 
 test("LOCKPICK-MODE: the row defaults to DFU's roll and the online lane forces it", () => {
   const row = FEATURES.find((f) => f.id === 'lockpick-tumblers');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], [LOCKPICK_TUMBLERS_PREF, false, false]);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], [LOCKPICK_TUMBLERS_PREF, false, 'room']);
   assert.equal(ONLINE_FORCED_PREFS[LOCKPICK_TUMBLERS_PREF], false);
 });

@@ -26,7 +26,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseClient, isWorldRoom, isChatRoom, WORLD_FRAME_MAX, WORLD_MIN_MS, WORLD_CHUNK, WORLD_PREFIX, MAX_FRAME_BYTES, PIXEL_UNITS } from '../../src/net/wire.js';
 import * as relay from '../../server/src/relay.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { OFFICIAL_PH, fakeRoom } from '../fakeRoom.mjs';
 import { OnlineSession, WORLD_PUBLISH_MS } from '../../src/net/online.js';
 import { RELAY_VERSION } from '../../src/net/wire.js';   // LOCALDEV1: the worker entry exports handlers alone
 
@@ -150,7 +150,7 @@ test('WORLD1: the Room - the host is the hello\'d socket in the room longest, sa
   // a channel: no host frame business, no world
   const chat = fakeRoom('chat:world');
   const ch = chat.connect(); await chat.hello(ch, 'chat-0001');
-  assert.deepEqual(welcomeOf(ch), { t: 'welcome', id: 'chat-0001', peers: [], n: 1, v: RELAY_VERSION, now: welcomeOf(ch).now, ldo: 0 }, 'a channel\'s welcome: SRV-N\'s deploy name and ROSTER-G\'s roster and count - still no host, still no world (AUDIT SOC B7: the clock, since the hub link reads last-seen on it)');
+  assert.deepEqual(welcomeOf(ch), { t: 'welcome', id: 'chat-0001', peers: [], n: 1, v: RELAY_VERSION, ph: OFFICIAL_PH, now: welcomeOf(ch).now, ldo: 0 }, 'a channel\'s welcome: SRV-N\'s deploy name and ROSTER-G\'s roster and count - still no host, still no world (AUDIT SOC B7: the clock, since the hub link reads last-seen on it)');
 });
 
 function fakeSocketClass() {
