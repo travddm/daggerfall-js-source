@@ -197,7 +197,7 @@ export const REVOLT = Object.freeze({ captainRenown: 50, rebels: 12, windowMs: 2
 /** Whether a seat revolts at its next window: its Standing at nought. */
 export const revoltDue = (standing) => Number(standing) <= 0;
 
-// ─── THE WORKS' WORDS (7.9: "the stockpile: every fortification project and what it still needs") ───
+// ─── THE WORKS' WORDS (7.9) ───
 
 /** What a work's tier does, as the Seat tab says it. */
 export const FORT_EFFECT_WORDS = Object.freeze({
