@@ -117,14 +117,10 @@ import {
 import { loadFromArchives, findLoaded, parseNifOnce, nifBytes, boneProbe, esmLoadOrder } from './fpArm/archiveBytes.js';   // the archive reads
 export { nifParseCount, esmLoadOrder, NIF_COPY_CAP, nifBytes } from './fpArm/archiveBytes.js';
 import {
-  hasDaggerfallArrows, hasAmmoFor, weaponPartPaths, torchPartPaths, TORCH_BONE, LIGHT_ATTITUDE, resolveTorchPart,
+  weaponPartPaths, torchPartPaths, resolveTorchPart,
   HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK, PLUMB, hipLanternPartPaths, resolveHipLanternPart, archiveHas,
-  OFF_WEAPON_BONE, resolveOffWeaponParts, resolveWeaponParts,
+  resolveOffWeaponParts, resolveWeaponParts,
 } from './fpArm/fpArmParts.js';   // the carried parts
-export {
-  hasDaggerfallArrows, hasAmmoFor, weaponPartPaths, torchPartPaths, TORCH_BONE, LIGHT_ATTITUDE, resolveTorchPart, HIP_LIGHT_BONE,
-  HIP_LIGHT_SLOT, HIP_LANTERN_HOOK, hipLanternPartPaths, resolveHipLanternPart, archiveHas, OFF_WEAPON_BONE, resolveOffWeaponParts, resolveWeaponParts,
-};
 export {
   WOLFSKIN, WOLFSKIN_1ST, fpSkeletonPath, tpSkeletonPath, FP_CLIP_PATH, FP_IDLE_BASE, FP_IDLE_SNEAK, TORCH_GROUP,
   carriedLeftVisible, idleBaseFor, FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType,

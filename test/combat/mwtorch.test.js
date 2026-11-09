@@ -24,10 +24,8 @@ import { fileURLToPath } from 'node:url';
 import {
   pickTorchRecord, blendMaskBones, overlayTracks, overlaySampler, MW_LIGHT_CARRY, MW_LIGHT_FIRE,
 } from '../../src/formats/morrowind/mwFirstPerson.js';
-import {
-  resolveTorchPart, torchPartPaths, TORCH_BONE, TORCH_GROUP, LIGHT_ATTITUDE, idleBaseFor, FP_IDLE_SNEAK, FP_IDLE_BASE,
-  carriedLeftVisible, createFpArm, fpSkeletonPath, FP_CLIP_PATH,
-} from '../../src/combat/fpArm.js';
+import { TORCH_GROUP, idleBaseFor, FP_IDLE_SNEAK, FP_IDLE_BASE, carriedLeftVisible, createFpArm, fpSkeletonPath, FP_CLIP_PATH } from '../../src/combat/fpArm.js';
+import { resolveTorchPart, torchPartPaths, TORCH_BONE, LIGHT_ATTITUDE } from '../../src/combat/fpArm/fpArmParts.js';
 import { MW_WEAPON_TYPE, weaponFlags, MW_TWO_HANDED } from '../../src/formats/morrowind/mwFirstPerson.js';
 import { armBuildOptsOf, isLitTorch } from '../../src/combat/weapon/weaponRig.js';
 import { TEMPLATES } from '../../src/systems/useItem.js';
