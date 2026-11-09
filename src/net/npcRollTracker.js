@@ -63,9 +63,10 @@
 // and the entity's standing are arguments.
 // ═══════════════════════════════════════════════════════════════════
 
+import { bookRankMax, promotesWithoutWait, seatsHoldTopRanks } from '../systems/guild/guild-rank-rule.ts';   // the server profile's guild ranks
 import {
   ROLL_FACTIONS, ROLL_CLAIM_MS, ROLL_RETRY_MS, ROLL_RETRY_MAX_MS, rollDeltasOf, rollAdopt, rollMembersKey, rollMembersOf, rollRep, rollKeptOf,
-  rollBookCap, rollSeatsOf, ROLL_SEATS_MS, ROLL_BOOK_RANK_MAX, rollPromoteCeiling, rollPaceWait,   // ROLL-PACE
+  rollBookCap, rollSeatsOf, ROLL_SEATS_MS, rollPromoteCeiling, rollPaceWait,   // ROLL-PACE
   rollMovesOf,   // STANDING-WORDS
 } from './npcChapterLaw.js';
 import { setReputation } from '../systems/faction/factionRep.js';
@@ -112,7 +113,7 @@ export function rollEntityDoors(/** @type {() => any} */ entityOf) {
       carryInvitationOnly(entity?.guildMemberships, rollVampireOf(entity));   // CURSE-CARRY: before the read, not at the next activeMemberships
       return rollMembersOf(entity?.guildMemberships, rollVampireOf(entity));
     },
-    cap: () => rollBookCap(entityOf()?.guildMemberships),   // CHAP4b: the book held at 7
+    cap: () => rollBookCap(entityOf()?.guildMemberships, bookRankMax()),   // CHAP4b: the book held at 7 while the chairs hold 8 and 9 (guild.seatRanks)
   };
 }
 
@@ -303,8 +304,10 @@ export function createRollTracker({
  *  else the book's ceiling, the highest rank a review may promote to now, and the days the pace still holds a rank.
  * @param {{ stopped: string | null, standing: (f: number) => { rep: number, since: number | null } | null } | null} tracker
  * @param {number} f @param {number} nowS */
-export function rollPaceOf(tracker, f, nowS) {
+export function rollPaceOf(tracker, f, nowS, { book = bookRankMax(), promoteNow = promotesWithoutWait() } = {}) {
   if (!tracker || tracker.stopped) return null;
   const standing = tracker.standing(f);
-  return { book: ROLL_BOOK_RANK_MAX, ceiling: rollPromoteCeiling(standing, nowS), wait: (/** @type {number} */ rank) => rollPaceWait(standing, nowS, rank) };
+  return { book, promoteNow, ceiling: rollPromoteCeiling(standing, nowS, book), wait: (/** @type {number} */ rank) => rollPaceWait(standing, nowS, rank, book) };
 }
+
+export { seatsHoldTopRanks };   // world.js: whether a chapter chair gives its rank (guild.seatRanks)

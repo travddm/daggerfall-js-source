@@ -6,6 +6,7 @@
 // grew, and a gain lost to the most a standing holds said lost (II B-3); the review's warnings (a probation's stakes, one
 // the next review begins, a demotion before it lands, each with its days) come first; the tutorial and the notice board's
 // guide say the law as it is.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -436,7 +437,8 @@ test('AUDIT GUILD-WORDS II E-12: an unstamped membership is due now; no store, n
 
 // ── THE WORDS ───────────────────────────────────────────────────────
 
-test('SEAT-WORDS: the tutorial and the notice board\'s guide say the law - a review\'s 7, the chairs\' 8 and 9, a quest\'s pace in real days and the UTC day, a chair\'s services at its own halls, a chapter writ\'s 2 and a receipt\'s 1 beyond the pace (mutants: a number not the law\'s)', () => {
+test('SEAT-WORDS: the tutorial and the notice board\'s guide say the law - a review\'s 7, the chairs\' 8 and 9, a quest\'s pace in real days and the UTC day, a chair\'s services at its own halls, a chapter writ\'s 2 and a receipt\'s 1 beyond the pace (mutants: a number not the law\'s)', (t) => {
+  playByRules(t, { 'guild.seatRanks': true });   // the chairs hold ranks 8 and 9: the server profile's option
   const guilds = tutorialById('guilds');
   assert.deepEqual([guilds.title, guilds.trigger, guilds.body], ['Guilds', 'When you first visit a guild.',
     ['Join a guild for its services and its work. Do that work and practice the skills it teaches to rise in rank.', 'You may join one temple, one knightly order, and as many guilds as will have you.']]);

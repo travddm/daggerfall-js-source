@@ -97,6 +97,31 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.rest.fireOnly',
   }),
+  // Whether a guild review online promotes at once while the Roll paces the reputation. DFU waits 28 days between rank
+  // changes (Guild.cs UpdateRank); online the days are the character's own (systems/guild/guild-rank-rule.ts).
+  'guild.promoteNow': Object.freeze({
+    census: Object.freeze(['ON35'] as const),
+    feature: 'PROMO-NOW',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.guild.promoteNow',
+  }),
+  // Whether chapter chairs won by Merit hold guild ranks 8 and 9 online, a member's own book stopping at 7. DFU's ranks 8
+  // and 9 are earned by reputation and skill as the others are, and their services follow the rank (Guild.cs
+  // CalculateNewRank; MagesGuild.cs CanAccessService).
+  'guild.seatRanks': Object.freeze({
+    census: Object.freeze(['ON35'] as const),
+    feature: 'CHAP4b',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.guild.seatRanks',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;

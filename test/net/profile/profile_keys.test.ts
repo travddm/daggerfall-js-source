@@ -115,3 +115,10 @@ test("P11 THE REST KEY: rest.fireOnly is DFU's rest window online by default; tr
   const key = profileKeyOf('rest.fireOnly');
   assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool']);
 });
+
+test("P12 THE GUILD KEYS: guild.promoteNow and guild.seatRanks are DFU's wait and DFU's ranks online by default", () => {
+  for (const name of ['guild.promoteNow', 'guild.seatRanks']) {
+    const key = profileKeyOf(name);
+    assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool'], name);
+  }
+});
