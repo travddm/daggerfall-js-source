@@ -174,16 +174,6 @@ DISCORD_PUBLIC_KEY = "36e74945022f94ec7955a84ccccb270e63780100e558d30777742337b6
 # server's Discord invite the frozen player's Staff tab shows beside its Copy button (server-account/src/staffFreeze.js
 # discordInvite), so it changes without a game update. An https address; empty, the tab shows none.
 DISCORD_INVITE_URL = "https://discord.gg/QADbZYQ73j"
-# FOUNDER5 (2026-10-07, Mac: "Can we grant every account before sept 25th
-# the founder title"): THE FOUNDERS BY NAME. Founder is held by every
-# registered account that first played by the end of 24 September on any
-# clock (titles.js FOUNDER_UNTIL), and the service can only know that from
-# what it recorded. A player who played before then where it recorded
-# nothing - a guest's storage cleared, a character never saved to the
-# cloud - is named here: comma-separated handles, case-insensitive, the
-# same as the lines above. It only adds: a founder by the date holds the
-# title whether listed or not. Empty: nobody by name yet.
-FOUNDER_HANDLES = ""
 # HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant
 # them a unique different version of the aura, a title named Hour's First,
 # and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON - the
