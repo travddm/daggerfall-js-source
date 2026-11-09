@@ -72,7 +72,8 @@ from `EFFECT_COST_TABLE`, spell points as `gold * (110 - skill) / 400` in the ef
 
 Port additions:
 
-- Online, a school past 100 still lowers the price, but never to zero.
+- Online, a school past 100 still lowers the price, but never to zero. It branches on `isOnlinePage()`; decision 58
+  moves such rules to server profile keys.
 - `registerSpellCostMod` and `registerSpellFreeCast` let loot, set bonuses and arcane paths change the price.
 - `castSchool` prices a signature spell in its path's schools (see below).
 
@@ -83,21 +84,18 @@ Port additions:
 
 - `schoolPotency`: online, each effective point of a school's climb past 100 adds 1% to what that school does, up to
   x1.4. Destruction raises damage, Restoration raises healing, Alteration raises Shield, Illusion raises concealment
-  duration, Mysticism and Thaumaturgy raise their chances. Offline, DFU's numbers stand.
+  duration, Mysticism and Thaumaturgy raise their chances. Offline, DFU's numbers stand. It too reads `isOnlinePage()`.
 - `registerSpellPowerMod` and `spellPowerMult` sum percent bonuses onto a player's damage spell at a foe.
 - `registerSpellPierceMod` lowers a foe's saving throw.
 - `registerSpellLandedListener` tells listeners when the player's spell lands. The cast engine calls `tellSpellLanded`.
 - `ownSpellAt` limits all of this to the local player's own spell at a foe. Nothing applies at another player.
-
-The online price floor and `schoolPotency` choose their lane with `isOnlinePage()` (`spellcost.js`, `spellPower.js`).
-Decision 58 moves such online rules to server profile keys with DFU's value selectable; these two are not converted yet.
 
 ### Cast speed
 
 `castSpeed.js` `castRate(entity)` sets the speed of both hand lanes, the classic sprites and the Morrowind arm. Speed
 50 is rate 1. Registered modifiers (loot, arcane paths) add percents. The result is clamped to `CAST_RATE_MIN` and
 `CAST_RATE_MAX`. `weaponRig.js` reads it once per cast. DFU uses a fixed animation clock; this is a port departure
-with no option yet. Under decision 49 DFU's fixed rate must become selectable.
+with no option yet (decision 49 wants DFU's rate selectable).
 
 ### Casts on a party mate
 
@@ -151,8 +149,7 @@ the cast spent.
 Port changes: the Absorbs Spells item enchantment is a roll (`ABSORB_ENCHANT_CHANCE`), not always. The Spell
 Absorption effect's chance is capped (`SPELL_ABSORPTION_CHANCE_CAP`). Every absorb refunds half the points, floored
 (`ABSORB_REFUND_SCALE`, `absorbRefund`). A career with absorption Always (the Sorcerer) still absorbs every time.
-These changes have no option today. It is decided that absorption defaults to DFU's value, with the halved refund as an
-option (decision 117 (20)).
+Decided, not built: DFU's absorption by default, the halved refund as an option (decision 117 (20)).
 Tests: `test/systems/absorption.test.js`, `absorb_nerf.test.js`.
 
 ## Enchantments
