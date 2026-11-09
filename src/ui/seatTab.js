@@ -82,7 +82,7 @@ export function seatGuide(seat) {
   return [
     ['Pledge', `In the Muster, a guild's Officers or Guildmaster pledge it to one seat a region, in up to ${SEAT_PLEDGE_REGIONS_MAX} regions. Pledges lock at the Reckoning, Friday 18:00 UTC.`],
     // AUDIT 657 B9: Tribute is the Guildmaster's, paid from the treasury - never a member's earning; D6: the wait the law's
-    ['Earn', `Members ${n(SEAT_MEMBER_WAIT_S / 86400)} days in the guild earn influence in the seat's region: walking the town (the Watch), closing Dagon's Breaches, a home in the town, Renown and seat writs. The Guildmaster adds Tribute from the treasury. One account counts for at most ${n(ACCOUNT_SEAT_WEEK_CAP)} a week at a seat.`],
+    ['Earn', `Members ${n(SEAT_MEMBER_WAIT_S / 86400)} days in the guild earn influence in the seat's region: walking the town (the Watch), closing Dagon's Breaches, a home in the town and Renown. The Guildmaster adds Tribute from the treasury. One account counts for at most ${n(ACCOUNT_SEAT_WEEK_CAP)} a week at a seat.`],
     // AUDIT 657 B9: the law's taker - the strongest past the line whose treasury holds the fee (townSeatLaw.js turningPlan)
     ['Claim', `At the Turning, Sunday 18:00 UTC, an unheld Charter goes to the strongest guild with at least ${n(CLAIM_THRESHOLD[t])} influence whose treasury can pay ${n(CLAIM_FEE[t])} silver. Two guilds within ${Math.round(CONTESTED_MARGIN * 100)}% of each other meet in a Tourney for it.`],
     ['Siege', `A held Charter is challenged by beating the holder's defense with at least ${n(CLAIM_THRESHOLD[t])}: the strongest challenger wins a Right of Siege, fought in the holder's battle window. Sign for your side on this tab.`],
@@ -136,8 +136,8 @@ export function seatNextStep(seat, data, { nameOf = () => null, nowS = NaN } = {
   if (!mine.seasoned) return `You count for your guild once you have been in it ${SEAT_MEMBER_WAIT_S / 86400} days.`;
   if (mine.bound && mine.bound !== mine.guild) return 'Your account fights for another guild this week, and what you earn counts there.';
   return here.held
-    ? 'Your guild holds this Charter. Earn influence here to keep its defense above every challenger: walk the town, close Dagon\'s Breaches, keep a home here, gain Renown, fill seat writs.'
-    : 'Earn influence for your guild here: walk the town, close Dagon\'s Breaches, keep a home here, gain Renown, fill seat writs.';
+    ? 'Your guild holds this Charter. Earn influence here to keep its defense above every challenger: walk the town, close Dagon\'s Breaches, keep a home here, gain Renown.'
+    : 'Earn influence for your guild here: walk the town, close Dagon\'s Breaches, keep a home here, gain Renown.';
 }
 
 /**
@@ -152,8 +152,8 @@ export function seatWords(seat) {
     ['Influence', `A guild's score at this seat for the week, earned by its members and bought with Tribute. ${SEAT_LEGACY_SHARE === 0.1 ? 'A tenth' : `${Math.round(SEAT_LEGACY_SHARE * 100)}%`} carries into the next week (none past a Season's end); the rest is cleared at the Turning.`],
     ['Muster, Reckoning, Turning', 'The week\'s three parts. The Muster, Sunday 18:00 to Friday 18:00 UTC: guilds pledge. The Reckoning, to Sunday 18:00: pledges are locked, influence still counts. The Turning, Sunday 18:00: the week is settled.'],
     // AUDIT PLAIN-UI W4: the pledged seat takes the region's Breaches and Renown too (seatInfluence.js countsAt)
-    ['Pledge', 'A guild\'s choice of the one seat it fights for in a region this week. Its members\' work counts there: the Watch, a home and seat writs in that seat\'s town; Dagon\'s Breaches and Renown anywhere in the region.'],
-    ['Defence', 'The holder\'s strength here this week: its own influence, raised or cut by the town\'s Standing, its last siege, how many seats it holds and its liege. A challenger must beat it.'],   // seatDefence
+    ['Pledge', 'A guild\'s choice of the one seat it fights for in a region this week. Its members\' work counts there: the Watch and a home in that seat\'s town; Dagon\'s Breaches and Renown anywhere in the region.'],
+    ['Defence', 'The holder\'s strength here this week: its own influence, raised or cut by the town\'s Standing, its last siege, and how many seats it holds. A challenger must beat it.'],   // seatDefence
     ['Right of Siege', `Won at the Turning by the strongest challenger past the defense (and at least ${CLAIM_THRESHOLD[t].toLocaleString('en-US')} influence): a battle with the holder for the Charter, in the holder's battle window.`],
     ['Tourney', `Two guilds that pass the claim's line within ${Math.round(CONTESTED_MARGIN * 100)}% of each other fight for an unheld Charter in a Tourney.`],
     ['Standing', `How the town feels about its holder, from 0 to 100. A new Charter starts at ${STANDING_START}. Under ${STANDING_UNREST} the town is in Unrest and challengers earn ${Math.round(UNREST_BONUS * 100)}% more influence. At 0 it revolts.`],
@@ -207,7 +207,7 @@ const SHUT = new Set(['seats-closed', 'no-session', 'auth', 'seat-unconfirmed'])
 export function createSeatTab(host, ui) {
   const { book } = host;
   // DOMAIN3 (Domains.md section 7): the board of a HOLDING speaks of its region's Charter - its standings, pledges, works
-  // and gifts are the Charter's (net/townSeatBook.js dressed `charterSeat`); `town` the seat town the board stands in
+  // are the Charter's (net/townSeatBook.js dressed `charterSeat`); `town` the seat town the board stands in
   const town = host.seat;
   const seat = town?.charterSeat ?? town;
   // AUDIT DOMAINS C1: whether the CHARTER's own town stands on the coast (a Harbour's work) - the board's town's word only
@@ -643,7 +643,7 @@ export function createSeatTab(host, ui) {
       // SEAT2b (4.2): a challenger pitches its Siege Camp where it pledged this seat this week
       const pledgedHere = (data.mine?.pledges ?? []).some((/** @type {any} */ p) => p.key === seat.key);
       if (data.mine && data.mine.guild !== holder?.guild.id && pledgedHere && SEAT_LEVER_RANKS.includes(data.mine.rank)) {
-        drawSeatCamp(panel(null, 'seat-camppanel'), { busy: ui.busy(), onPitch: () => act(() => book.camp(seat)) });
+        drawSeatCamp(panel(null, 'seat-camppanel'), { busy: ui.busy(), pitched: !!data.mine.camp, onPitch: () => act(() => book.camp(seat)) });
       }
       // SEAT1c: the Chronicle (SEAT0 9.2), newest first
       const lines = (data.chronicle ?? []).map((r) => chronicleLine(r, seat, book.zero ?? null)).filter(Boolean);   // SEASON1 part three: in its Season's words

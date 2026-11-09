@@ -315,6 +315,6 @@ test('SEAT1b THE ACCOUNT\'S CAP AND THE STANDINGS\' SHAPE: 2,000 an account a se
   assert.deepEqual([s.phase, s.week, s.seat.key], ['muster', week, ANTICLERE.key]);
   assert.deepEqual(s.standings[0].guild, { id: gid, name: 'Silver Hand', tag: 'SH', heraldry: null });
   // CROWN2 (
-  assert.deepEqual(s.mine, { guild: gid, rank: 0, seasoned: true, bound: gid, pledges: [{ region: 21, key: ANTICLERE.key, by: 'Gamal', at: T0 }], influence: ACCOUNT_SEAT_WEEK_CAP, tributeRoom: 5000, politics: { pacts: [] } });
+  assert.deepEqual(s.mine, { guild: gid, rank: 0, seasoned: true, bound: gid, pledges: [{ region: 21, key: ANTICLERE.key, by: 'Gamal', at: T0 }], influence: ACCOUNT_SEAT_WEEK_CAP, tributeRoom: 5000, politics: { pacts: [] }, camp: false });
   assert.equal((await svc.call('/v1/seats/standings', { key: 999 }, gm.secret)).body.error, 'seat-unconfirmed');
 });

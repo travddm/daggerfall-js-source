@@ -84,7 +84,7 @@ test('AUDIT PLAIN-UI W2 W3 W10 W11 the Family page: the estate is whoever carrie
 
 test('AUDIT PLAIN-UI W4 W5 W7 W12 T4 the Seat tab\'s words: a pledge takes the region\'s Breaches and Renown; a guild at its regions\' most told it cannot pledge here; a Sellsword of neither guild; a guest told a guild needs an account; an account bound to nobody yet earns here (mutants: the full guild offered a pledge; the unbound account sent elsewhere)', () => {
   const said = (w) => seatWords(ANT).find(([k]) => k === w)[1];
-  assert.match(said('Pledge'), /the Watch, a home and seat writs in that seat's town; Dagon's Breaches and Renown anywhere in the region\.$/);
+  assert.match(said('Pledge'), /the Watch and a home in that seat's town; Dagon's Breaches and Renown anywhere in the region\.$/);
   assert.match(said('Sellsword'), /^A player of neither guild in the battle, hired for a fee by one side's Guildmaster/);
   assert.match(said('Influence'), new RegExp(`^A guild's score .* ${SEAT_LEGACY_SHARE === 0.1 ? 'A tenth' : ''} carries into the next week \\(none past a Season's end\\)`));
   assert.ok(seatWords(ANT).some(([k]) => k === 'The Works') && seatWords(ANT).some(([k]) => k === 'Pacts'), 'T6: the tab\'s Works and Pacts named');

@@ -315,8 +315,6 @@ export const RENOWN_WEEK_CAP = 400;
 /** AUDIT-SEATS S7 (4.2: "capped 400 an account a week"): the Renown XP an ACCOUNT may bank in a week, every region together
  *  (400 influence at 1 per 20) - asked in the write (seatInfluence.js creditRenown). */
 export const RENOWN_WEEK_XP = RENOWN_WEEK_CAP * RENOWN_XP_PER_INFLUENCE;
-/** A delivery to the seat's stockpile: 1 per Mark of the materials' own value (PROF0 4.8) - the deliverer's own units;
- *  bought units count at Tribute's rate, inside Tribute's cap. */
 /** Tribute: 1 per 10 Marks, burnt, at most 20% of the guild's week at the seat. */
 export const TRIBUTE_MARKS_PER_INFLUENCE = 10;
 export const TRIBUTE_SHARE_MAX = 0.2;
@@ -567,7 +565,7 @@ export function turningPlan({ week, seats, treasuries, active = CROWN_SCALE.per 
     const e = s.holder.edict ?? null;
     let law = null;
     if (e && edictOk(e)) {
-      const cost = e === 'bounty' ? Math.max(0, s.holder.setAside ?? 0) : edictCost(e, s.tier), has = purse.get(s.holder.guild) ?? 0;   // SEASON1 part two: its week's Tide
+      const cost = e === 'bounty' ? Math.max(0, s.holder.setAside ?? 0) : edictCost(e, s.tier), has = purse.get(s.holder.guild) ?? 0;
       law = has >= cost ? e : null;
       if (law) purse.set(s.holder.guild, has - cost);
       edicts.push({ key: s.key, guild: s.holder.guild, edict: e, cost, state: law ? 'law' : 'unpaid' });

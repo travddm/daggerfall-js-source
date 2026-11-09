@@ -1089,7 +1089,7 @@ export function chapterRollLines(/** @type {unknown} */ faction, /** @type {any}
 // Season: a Crackdown's members' own writs earn half again Merit (AUDIT CHAP5 E1) and a chapter under 30 at the Season's
 // end shuts its halls for the next, a Rivalry races two chapters of one region on the Season's Merit and the winner takes
 // 10 Strength from the loser. The Schism's and the Succession's choices are CHAP6b's; what the client shows of every
-// event CHAP6c's. No Season counted, no event: every chapter is Calm, as every land's Tide is.
+// event CHAP6c's. No Season counted, no event: every chapter is Calm.
 // GUILD3e (, CUT A DUPLICATE, NEVER DEPTH): five events, where there were seven -
 // the Decline (2 Strength a week) said what the Failing band says, and the Ascendancy (a tenth off, a High Master) what
 // the Ascendant band should; the Ascendant band carries both now (CHAPTER_BANDS, chapterTitlesOf's `high`).

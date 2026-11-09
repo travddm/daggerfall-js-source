@@ -186,6 +186,7 @@ test('SEAT2b A SIEGE CAMP PITCHED: the pledged challenger\'s Guildmaster or Offi
   assert.equal(s.purse(eo.gid), 2500, 'burnt');
   assert.deepEqual(s.raw.prepare("SELECT src_kind, dst_kind, amount FROM marks_ledger WHERE kind = 'camp'").all().map((x) => [x.src_kind, x.dst_kind, x.amount]), [['guild', 'burn', 1500]]);
   assert.deepEqual(camps(), [[W, ANTICLERE.key, eo.gid]]);
+  assert.equal((await s.svc.call('/v1/seats/standings', { character: eo.gm.character, key: ANTICLERE.key }, eo.gm.secret)).body.mine?.camp, true, 'the standings say the camp stands');
   assert.equal((await camp(off, ANTICLERE.key, { rid: 'camp-pitch-01' })).body.repeat, true, 'the same rid: one camp, one burn');
   assert.equal((await camp(eo.gm)).body.error, 'camp-pitched', 'a new rid, the same guild, seat and week');
   assert.equal(s.purse(eo.gid), 2500);

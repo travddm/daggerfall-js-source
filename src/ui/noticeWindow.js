@@ -476,7 +476,7 @@ export function mountNoticeBoard(host, deps) {
           tab = id; word = null;
           if (id === 'work') openWork();
           if (id === 'market' && market && !marketOpened) { marketOpened = true; market.open(); }
-          if (id === 'seat' && seatTab && !seatOpened) { seatOpened = true; seatTab.open(); }   // SEAT1b
+          if (id === 'seat' && seatTab) { if (seatOpened) seatTab.reload(); else { seatOpened = true; seatTab.open(); } }   // SEAT1b; a return to the tab reads the Pacts and offers afresh
           if (id === 'vendors' && vendorTab && !vendorOpened) { vendorOpened = true; vendorTab.open(); }   // HOME-VENDOR
           if (id === 'guilds') { view = 'board'; reading = null; if (!gboard && !gbusy) loadGuild(false); }   // GUILD1e
           else if (view === 'gpin') view = 'board';

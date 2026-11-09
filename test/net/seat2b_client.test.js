@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';
-import { drawSeatWorks, fortLeverText, SEAT_WORKS_WORDS } from '../../src/ui/seatWorks.js';
+import { drawSeatWorks, drawSeatCamp, fortLeverText, SEAT_WORKS_WORDS } from '../../src/ui/seatWorks.js';
 import { fortWorkLine, FORT_EFFECT_WORDS } from '../../src/net/fortLaw.js';
 
 test('SEAT2b THE WORKS\' WORDS: a tier and what it does, and the Marks of the next tier; every work\'s effect said at its tiers (mutants: the next tier\'s Marks; each effect\'s words)', () => {
@@ -131,7 +131,7 @@ test('SEAT2b THE BOOK\'S WORKS: the read is refused while the seats are shut; a 
   assert.deepEqual(asks[0], ['c1', 3021, 'walls', 'rid-0000-1', true]);
   answer = { ok: true, data: { work: 'walls', tier: 2, marks: 2000 } };
   const r = await book.fortFund(SEAT, 'walls', true);
-  assert.equal(r.text, 'The Walls at Anticlere stands at tier 2: 2,000 Marks from the treasury.');
+  assert.equal(r.text, 'Raised the Walls at Anticlere to tier 2: 2,000 Marks from the treasury.');
   await book.fortFund(SEAT, 'walls', true);
   assert.notEqual(asks[3][3], asks[2][3], 'an answer lets the id go');
   answer = { ok: false, error: 'fort-held' };
@@ -139,5 +139,15 @@ test('SEAT2b THE BOOK\'S WORKS: the read is refused while the seats are shut; a 
   await book.fortFund(SEAT, 'shrine');
   assert.notEqual(asks[5][3], asks[4][3], 'a refusal lets it go');
   answer = { ok: true, data: { repeat: true, work: 'walls' } };
-  assert.equal((await book.fortFund(SEAT, 'walls')).text, 'The Walls at Anticlere was already raised.');
+  assert.equal((await book.fortFund(SEAT, 'walls')).text, 'Already raised: the Walls at Anticlere.');
+});
+
+test('a pitched Siege Camp shows no pitch button, only that it stands', () => {
+  const open = document.createElement('div');
+  assert.ok(drawSeatCamp(open, {}), 'before a pitch the lever is drawn');
+  assert.ok(open.textContent.includes('Pitch a Siege Camp'));
+  const done = document.createElement('div');
+  assert.equal(drawSeatCamp(done, { pitched: true }), null);
+  assert.ok(!done.textContent.includes('Pitch a Siege Camp'));
+  assert.ok(done.textContent.includes('has pitched a Siege Camp'));
 });

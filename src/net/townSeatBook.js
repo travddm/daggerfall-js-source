@@ -418,7 +418,7 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       // D1-LOAD: this client's share of SEAT_TURN_READ_SPREAD_MS past the boundary - never every client in one second
       else if (!pending && open === true && seatWeekOf(at) !== seatWeekOf(nowMs() - turnSpreadMs)) read({ force: true });
     },
-    // ─── SEASON1 part two: THE TIDES AS THIS CLIENT READS THEM ───────
+    // ─── SEASON1 part two: SEASON ZERO AS THIS CLIENT READS IT ───
     /** The week Season 0 began, as the seats' list last said - or null (no Season counted: every land is Calm). */
     get zero() { return Number.isSafeInteger(data?.zero) ? data.zero : null; },
     /** A World of Daggerfall camp cleared in `region` - the Bounty's twenty Drakes where one rules there. Quiet: `{ paid }`. */
@@ -482,8 +482,8 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (!r?.ok) return { ok: false, text: accountRefusalText(r?.error) };
       const name = fortWork(work)?.name ?? 'work';
       const forts = r.data?.forts ?? null;
-      if (r.data?.repeat) return { ok: true, text: `The ${name} at ${seat.name} was already raised.`, forts };
-      return { ok: true, text: `The ${name} at ${seat.name} stands at tier ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} Marks from the treasury.`, forts };
+      if (r.data?.repeat) return { ok: true, text: `Already raised: the ${name} at ${seat.name}.`, forts };
+      return { ok: true, text: `Raised the ${name} at ${seat.name} to tier ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} Marks from the treasury.`, forts };
     },
     /** A Siege Camp pitched at `seat`, where this guild pledged it this week (an Officer's or the guildmaster's) - its Marks
      *  burnt from the treasury, once; `{ ok, text }`. ONE REQUEST ID A CAMP, as a tier's. */

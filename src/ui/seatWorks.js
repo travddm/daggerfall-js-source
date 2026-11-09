@@ -73,14 +73,22 @@ export const campLeverText = () => t('seat.camp.pitch', 'Pitch a Siege Camp ({ma
 /** What the camp does, said under the lever. */
 export const campRuleLine = () => t('seat.camp.rule', 'Pay once from the treasury. If your guild wins the Right of Siege here, the camp brings {rams, number} Rams to the siege where a Gatehouse stands; if it wins none, the Marks are lost.', { rams: CAMP_RAMS });
 
+/** Said in place of the lever once this guild's camp stands at the seat. */
+export const campPitchedLine = () => t('seat.camp.pitched', 'Your guild has pitched a Siege Camp here. If it wins the Right of Siege, it brings {rams, number} Rams where a Gatehouse stands.', { rams: CAMP_RAMS });
+
 /**
  * THE CAMP'S PANEL into `host`, for a challenger's Guildmaster or an Officer who pledged this seat: the lever and its rule.
- * Returns the button.
+ * Returns the button, or null once the camp is pitched.
  * @param {HTMLElement} host
- * @param {{ onPitch?: () => any, busy?: boolean }} o
+ * @param {{ onPitch?: () => any, busy?: boolean, pitched?: boolean }} o
  */
-export function drawSeatCamp(host, { onPitch = () => {}, busy = false } = {}) {
+export function drawSeatCamp(host, { onPitch = () => {}, busy = false, pitched = false } = {}) {
   const box = el('div', 'notice-seat-camp');
+  if (pitched) {
+    box.append(el('p', 'notice-seat-works-line', campPitchedLine()));
+    host.append(box);
+    return null;
+  }
   box.append(el('p', 'notice-seat-works-line', campRuleLine()));
   const b = /** @type {HTMLButtonElement} */ (el('button', 'act notice-seat-camp-pitch', campLeverText()));
   b.setAttribute('type', 'button');

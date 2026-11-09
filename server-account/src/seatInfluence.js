@@ -520,7 +520,8 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
       mine = {
         guild: me.guild_id, rank: Number(me.rank), seasoned: seasoned(me, nowS), bound: await boundTo(db, week, player.id),
         pledges: await pledgesOf(db, week, me.guild_id), influence: s?.per.get(player.id) ?? 0,
-        politics: await politicsOf(db, me.guild_id, nowS),   // CROWN2: its liege, vassals, Pacts and the offers standing
+        politics: await politicsOf(db, me.guild_id, nowS),   // CROWN2: its Pacts and the offers standing
+        camp: !!(await db.prepare('SELECT 1 FROM town_seat_camps WHERE week = ? AND key = ? AND guild_id = ?').bind(week, key, me.guild_id).first()),   // SEAT2b: whether its Siege Camp stands at this seat
         tributeRoom: s ? tributeRoom(s.others, s.tribute) * TRIBUTE_MARKS_PER_INFLUENCE : 0,
       };
     }
