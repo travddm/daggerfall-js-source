@@ -145,7 +145,7 @@ function setJewel(item, r, hand) {
 }
 
 /**
- * MASTER-ART (Professions-Arc 57): A MASTER'S WORK laid on its piece - at its record's tier (MASTER-CAP: Rare from
+ * MASTER-ART (Professions-Arc 57): A MASTER'S WORK laid on its piece - at its record's tier (Rare from
  * MINT_V_MASTER_RARE, Legendary before), marked `master`, its lines at the values its record signs
  * (AUDIT HORIZONTAL B1: net/masterLaw.js masterLinesOfRecord, never rolled again), its name its lines' (a mark's name over
  * it), its worth its lines'. No record, no enchantment and no power: a drop's Legendary keeps those. Answers whether the
@@ -266,7 +266,7 @@ export function asMinted(item) {
   if (item.honed !== undefined) return false;   // AUDIT LOOT II C1: nor a line honed past its roll (LOOT17) - the market's mint would hand back the roll, the shards and the gold gone
   if ((item.foodStage ?? 0) > 0) return false;   // PROF9: a dish spoiled since it was cooked - the record mints it fresh
   const e = item.enchantments ?? [];
-  if (item.rarity !== 'rare' || item.master === true) return e.length === 0;   // MASTER-CAP: a Rare Master's work rolls no flavour
+  if (item.rarity !== 'rare' || item.master === true) return e.length === 0;   // a Rare Master's work rolls no flavour
   const roll = RARE_FLAVOURS[item.group] ?? RARE_FLAVOURS.Jewellery;
   return e.length === 1 && roll.some((f) => f.type === e[0]?.type && f.param === e[0]?.param);
 }

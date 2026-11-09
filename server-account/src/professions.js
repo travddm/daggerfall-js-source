@@ -45,7 +45,7 @@ import { marksOpenFor, balanceOf, gatherStrikeStatement, gatherStrikeRid, findLi
 import { dice } from './unitRoll.js';   // SILVER-FINDS: the service's dice, below this file and marks.js (which needs them too)
 import { CHAR_ID_RE, readAll } from './service.js';   // GATHER-SPEED: a harvest's reads in one round trip
 import { MARKS_MAX, utcDay, gatherFindOf } from '../../src/net/marksLaw.js';
-import { gatedQuality, priceScaleOf } from './profDayCaps.js'; import { masterTierFor } from '../../src/net/masterLaw.js';   // MASTER-CAP: the tier a Master's work is made at
+import { gatedQuality, priceScaleOf } from './profDayCaps.js'; import { masterTierFor } from '../../src/net/masterLaw.js';   // the tier a Master's work is made at
 export { harvestCapped, craftCapped, smeltCapped, brewCapped, disenchantCapped, reforgeCapped } from './profDayCaps.js';   // PROFESSION-CAPS: the routes' guards
 import { renownForXp, RENOWN_XP_MAX, RENOWN_TRACKS_MAX } from '../../src/net/renown.js';
 import {
@@ -357,7 +357,7 @@ export async function profState({ db, nowS }, player, env, { character } = {}) {
     caps: { stores: STORES_MAX, withdraw: WITHDRAW_MAX, highHides: HIGH_HIDES_PER_DAY, prices: priceScaleOf(env) },   // PROFESSION-CAPS: the day's bound is refused per act (`prof-day-cap`), not listed; the tier prices the client sets its rows to
     silver: Object.fromEntries(silverRows.map((r) => [r.material, Number(r.qty)])),   // WOVEN-PAYS: the cloth's silver counts standing
     made: madeFrom(made),   // CRAFT-HALL
-    master: { made: master.length > 0, tier: masterTierFor(env) },   // MASTER-ART (Professions-Arc 57): whether today's Master's work is made; MASTER-CAP: its tier
+    master: { made: master.length > 0, tier: masterTierFor(env) },   // MASTER-ART (Professions-Arc 57): whether today's Master's work is made, and its tier
   };
 }
 

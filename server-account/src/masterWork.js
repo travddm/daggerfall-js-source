@@ -51,7 +51,7 @@ async function masterAnswer(db, player, row, nowS, extra = {}) {
 }
 
 /**
- * A MASTER'S WORK: `{ character, recipe, lines, name, dye, rid }` - a Rare piece (MASTER-CAP; Legendary where PROF_MASTER_LEGENDARY is on) of `recipe` with the three `lines`
+ * A MASTER'S WORK: `{ character, recipe, lines, name, dye, rid }` - a Rare piece (Legendary where PROF_MASTER_LEGENDARY is on) of `recipe` with the three `lines`
  * chosen (masterLaw.js: `kind` or `kind:param`), its values the service's roll in that tier's band, a Masterwork with
  * the maker's mark. Refused: a recipe whose piece takes no tier (`prof-master`), lines the piece may not carry
  * (`prof-master-lines`), a dye on anything but a garment (`prof-dye`), a craft not at Master (`prof-rank`), the day's
@@ -82,7 +82,7 @@ export async function masterWork(ctx, player, env, { character, recipe: id, line
   const seed = Math.floor(dice(rand) * 4294967296);
   const provenance = provenanceId(rand);
   // AUDIT HORIZONTAL B1: THE ROLL, ONCE - the record and the row keep its values, so no reader rolls today's bands again
-  const tier = masterTierFor(env);   // MASTER-CAP (decision 122 (8)): Rare, unless PROF_MASTER_LEGENDARY is on
+  const tier = masterTierFor(env);   // Rare, so crafted gear stays below Legendary, unless PROF_MASTER_LEGENDARY is on
   const rolled = rollMasterLines(r, lines, seed, tier);
   if (!rolled) return { error: 'prof-master-lines' };
   const signed = masterRecordLines(rolled);

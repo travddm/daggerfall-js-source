@@ -1,4 +1,4 @@
-// MASTER-CAP (decision 122 (8)): a Master's work is Rare, below Legendary (decision 23f). The record's mint version carries
+// A Master's work is Rare, so crafted gear stays below Legendary. The record's mint version carries
 // the tier, so every reader mints the piece its record names; the service's PROF_MASTER_LEGENDARY setting makes it
 // Legendary as before.
 import '../chargenDom.mjs';

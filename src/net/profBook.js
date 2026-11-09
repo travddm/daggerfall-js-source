@@ -318,7 +318,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     applyHauls(data?.hauls);
     state.made = madeOf(data?.made);   // CRAFT-HALL
     // MASTER-ART: the day's work as the service says it; the last one's card kept for its own character alone
-    state.master = { made: typeof data?.master?.made === 'boolean' ? data.master.made : null, last: was === state.character ? state.master.last : null, tier: masterTierOfState(data) };   // MASTER-CAP: the tier the service makes it at
+    state.master = { made: typeof data?.master?.made === 'boolean' ? data.master.made : null, last: was === state.character ? state.master.last : null, tier: masterTierOfState(data) };   // the tier the service makes it at
   }
   /** CRAFT-HALL: the state's `made` as Sets, or null when the service sent none. */
   function madeOf(m) {

@@ -346,7 +346,7 @@ function tierFindings(/** @type {any} */ item) {
   const procs = body.filter((a) => AFFIX_KINDS[a?.id]?.proc);
   const numbers = body.filter((a) => !AFFIX_KINDS[a?.id]?.proc);
   // MASTER-ART (Professions-Arc 57): a Master's work - no record; its chosen lines, a Masterwork, nothing laid on after.
-  // MASTER-CAP: asked before the Rare's own law, which wants a rolled flavour a Master's work never carries
+  // asked before the Rare's own law, which wants a rolled flavour a Master's work never carries
   if (isMasterWork(item)) return [...out, ...masterFindings(item, body, procs, techs, gems)];
   if (tier === 'magic' || tier === 'rare') {
     const [lo, hi] = AFFIX_COUNTS[tier];
@@ -411,7 +411,7 @@ function masterFindings(item, body, procs, techs, gems) {
   const out = [];
   if (item.quality !== MASTERWORK || body.length !== MASTER_LINES || procs.length > MASTER_PROCS_MAX || techs.length || gems.length) out.push('legendary');
   for (const a of body) {
-    const band = AFFIX_RANGES[a?.id]?.[item.rarity];   // MASTER-CAP: the band of its own tier
+    const band = AFFIX_RANGES[a?.id]?.[item.rarity];   // the band of its own tier
     if (!band || !(a.value >= band[0] && a.value <= band[1])) out.push('affixes');
   }
   if (item.exalted === true || isCursed(item) || has(item, 'reforged') || has(item, 'reforges') || has(item, 'honed')) out.push('legendary');

@@ -1,6 +1,6 @@
 // @ts-check
 // MASTER-ART: A MASTER'S WORK. A Master in a craft makes a
-// Rare piece of its kinds (MASTER-CAP, decision 122 (8): crafted gear stays below Legendary, decision 23f): the crafter
+// Rare piece of its kinds (crafted gear stays below Legendary, as the tamed loot tiers do): the crafter
 // chooses its three lines, the service rolls their values in the piece's tier's band (never past its top -
 // POWER-CEILING), for catalysts from three pursuits besides the recipe's goods, one a character a UTC day. No Legendary
 // power, no enchantment: the build you want, not a higher number (a player: "Add more horizontal progression please!").
@@ -95,12 +95,12 @@ export function masterChoiceRefusal(r, keys) {
   return null;
 }
 
-/** MASTER-CAP: the tier a Master's work is made at on a service - Rare, unless its PROF_MASTER_LEGENDARY setting says
+/** The tier a Master's work is made at on a service - Rare, unless its PROF_MASTER_LEGENDARY setting says
  *  "on". The record carries the tier it was made at (productRecord.js masterVersionOf), so a reader never asks this.
  *  @param {any} env @returns {'rare' | 'legendary'} */
 export const masterTierFor = (env) => (String(env?.PROF_MASTER_LEGENDARY ?? 'off').trim().toLowerCase() === 'on' ? 'legendary' : 'rare');
 
-/** MASTER-CAP: the tier a service's state read names (`master.tier`) - Rare unless it says Legendary. @param {any} state
+/** The tier a service's state read names (`master.tier`) - Rare unless it says Legendary. @param {any} state
  *  @returns {'rare' | 'legendary'} */
 export const masterTierOfState = (state) => (state?.master?.tier === 'legendary' ? 'legendary' : 'rare');
 
@@ -108,7 +108,7 @@ export const masterTierOfState = (state) => (state?.master?.tier === 'legendary'
 export const masterBand = (id, tier = 'rare') => AFFIX_RANGES[id]?.[tier] ?? null;
 
 /**
- * THE ROLL: each chosen line's value in the tier's band (MASTER-CAP: Rare unless the service says Legendary), off the service's seed, in the order chosen - lo to hi, the
+ * THE ROLL: each chosen line's value in the tier's band (Rare unless the service says Legendary), off the service's seed, in the order chosen - lo to hi, the
  * ladder's own draw (lootRarity.js rangeInt), so no value passes the band's top. Null for a choice the law refuses.
  * The service's alone, once: the record signs what it rolled (masterRecordLines - AUDIT HORIZONTAL B1).
  * @param {any} r @param {unknown} keys @param {number} seed @param {'rare' | 'legendary'} [tier]

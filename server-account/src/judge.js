@@ -229,7 +229,7 @@ export function judgeSave(save, summary = null, o = {}) {
     list.forEach((/** @type {any} */ it, /** @type {number} */ i) => {
       items++;
       for (const code of findingsOf(it)) keep({ code, list: li, at: i, t: it?.templateIndex ?? null });
-      if (typeof it?.provenance === 'string' && PROVENANCE_RE.test(it.provenance)) provenances.push({ provenance: it.provenance, t: it.templateIndex, m: it.material, q: it.quality, w: worthless(it) ? 0 : itemWorth(it), ...(isMasterWork(it) ? { l: `${it.rarity}|${masterSignature(it.affixes)}` } : {}) });   // MASTER-ART: a Master's work's lines; MASTER-CAP: its tier
+      if (typeof it?.provenance === 'string' && PROVENANCE_RE.test(it.provenance)) provenances.push({ provenance: it.provenance, t: it.templateIndex, m: it.material, q: it.quality, w: worthless(it) ? 0 : itemWorth(it), ...(isMasterWork(it) ? { l: `${it.rarity}|${masterSignature(it.affixes)}` } : {}) });   // MASTER-ART: a Master's work's lines, after its tier
     });
   });
   // INT7: THE ARMS - the most reach of the weapons in the pack the law takes, and whether a lawful bow is among them
@@ -265,7 +265,7 @@ export function ledgerPieces(/** @type {any} */ save) {
 
 /** MASTER-ART: the lines a record's Master's work mints, as one string - '' for a record that names none, so no piece
  *  claims a Master's lines on another craft's provenance. AUDIT HORIZONTAL B1: the values the record signs
- *  (masterLaw.js masterLinesOfRecord), never a roll of today's bands. MASTER-CAP: after the tier its version mints, so a
+ *  (masterLaw.js masterLinesOfRecord), never a roll of today's bands. After the tier its version mints, so a
  *  Rare record's piece cannot claim Legendary. @param {unknown} record */
 const recordLines = (record) => {
   const c = readProductRecord(record);

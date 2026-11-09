@@ -119,7 +119,7 @@ export const ITEM_FIELDS = Object.freeze({
   reforged: int({ min: 0, max: 15 }),   // LOOT9: the one line the Reforge had rolled again (its index) - REFORGE-REPLACE: an old piece's, read as one reforge taken (lootRarity.js reforgeCount), never a lock; a reforge folds it into `reforges`
   reforges: int({ min: 1, max: REFORGES_MAX }),   // REFORGE-REPLACE (Loot-Arc.md section 11): the reforges a piece has taken - what the next costs (reforge.js reforgePrice, temperLaw.js reforgeEssence), or absent
   imprint: str(),   // LOOT10: a Rare's imprinted power - a Legendary record's id of its own group (loot.js validLootItem: lootRarity.js validImprint)
-  master: bool(),   // MASTER-CAP: a Master's work (smithItems.js applyMasterWork) - true or absent; masterLaw.js isMasterWork reads it on a Rare
+  master: bool(),   // a Master's work (smithItems.js applyMasterWork) - true or absent; masterLaw.js isMasterWork reads it on a Rare
   imbued: bool(),   // LOOT-GATE: a piece whose tier the Reforge's Imbue raised (reforge.js imbuePiece) - a counter pays for the piece it was, true or absent
   imbueWorth: int({ min: 0 }),   // AUDIT UPDATE L5: the price the Imbue added (reforge.js imbuePiece) - what a counter takes off (lootRarity.js craftedRarityWorth), or absent
   honed: int({ min: 1, max: 63 }),   // LOOT17: the hones a piece has taken - what the next costs (reforge.js honePrice), or absent

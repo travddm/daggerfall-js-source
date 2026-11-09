@@ -130,7 +130,7 @@ The station checks are the interior host's `forgeHere`, `workbenchHere`, `loomHe
   clean act and specialisations add steps (`craftQuality`). Kits, arrows, siege works and dishes take no quality
   (`takesQuality`).
 - **Rarity ceiling.** A craft reaches Rare (Masterwork) at most. A Master's work (`masterWork.js`, `masterBox.js`) is
-  Rare too, its three chosen lines rolled in the Rare band (decision 122 (8)). `PROF_MASTER_LEGENDARY = "on"` makes it
+  Rare too, its three chosen lines rolled in the Rare band. `PROF_MASTER_LEGENDARY = "on"` makes it
   Legendary again; the record's mint version carries the tier (`MINT_V_MASTER` Legendary, `MINT_V_MASTER_RARE` Rare).
   Aetheric, Artifact and Sigil pieces are never craftable.
 - **Minting.** `smithItems.js` `mintPiece` makes DFU's own item first (`ItemBuilder.CreateWeapon` and friends), then

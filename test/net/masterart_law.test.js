@@ -1,4 +1,4 @@
-// MASTER-ART - THE LAW OF A MASTER'S WORK, ALONE, AT THE LEGENDARY TIER - since MASTER-CAP (decision 122 (8)) the
+// MASTER-ART - THE LAW OF A MASTER'S WORK, ALONE, AT THE LEGENDARY TIER - since the Rare cap, the
 // service's PROF_MASTER_LEGENDARY option and a MINT_V_MASTER record; the Rare default is test/net/master-cap.test.js. Which
 // recipes take one, the lines a piece may be given, the refusals, the roll in the Legendary band (never past its top -
 // POWER-CEILING), the catalysts' one table, the record's `l`, the mint, the item law and the item maker's refusal.

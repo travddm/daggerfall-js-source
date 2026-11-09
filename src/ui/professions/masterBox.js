@@ -31,7 +31,7 @@ export function masterPicks(station, r) {
 const pursuitWord = (/** @type {string} */ p) => (p === 'gathering' ? t('prof.master.from.gathering', 'Logging\'s rarest find')
   : p === 'sea' ? t('prof.master.from.sea', 'nets hauled at sea') : p === 'enchanting' ? t('prof.master.from.enchanting', 'Enchanting') : '');
 
-/** MASTER-CAP: the tier the service makes a Master's work at (its state read's `master.tier`) - Rare unless it says
+/** The tier the service makes a Master's work at (its state read's `master.tier`) - Rare unless it says
  *  Legendary. @param {any} book @returns {'rare' | 'legendary'} */
 export const masterTierOf = (book) => masterTierOfState(book?.state);
 /** The box's note on what a Master's work is, at the tier. @param {'rare' | 'legendary'} tier */
