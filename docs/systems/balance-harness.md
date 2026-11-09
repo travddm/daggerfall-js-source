@@ -175,6 +175,10 @@ DFU that stays is named here.
   6.7 at 45. DFU multiplies by the level (45 at level 45); Unleveled Loot made it flat.
 - **Healing potions**: a looting foe carries one 0.35 times in 100 and a deep pile 0.45 (DFU's random potion gives
   about 0.15 and 0.2), at most 2.8 times DFU at the highest Renown online. The alchemist's shelf is unchanged.
+- **Gate portents** (`rollSpoils` in `gateSpoils.js`, the `gate-portent-loot` feature): a portent night adds no piece. Each
+  portent turns one of the two plain Magic-or-better pieces into a Rare-or-better one, two at most, drawn through the
+  same source chances and level gate. Per kill at level 30, pieces 3.2 (was 4.2 with one portent, 5.2 with two) and piece
+  worth +1.5% over a plain night with two portents (was +25%). The account's spoils bucket no longer grows for portents.
 - **Repair cost, the Daedric sale and the soul value**: repair costs DFU's price (it was a third); a counter pays
   Daedric gear its whole value; the general-spawn Dragonling binds at DFU's 0 (it had been -5000, a gift of budget).
 

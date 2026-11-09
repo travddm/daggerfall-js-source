@@ -14,6 +14,7 @@
     "revenantFlee": "normal",
     "revenantReturn": "normal",
     "weaponTechniques": true,
+    "gatePortentLoot": true,
     "humanoidLoot": "dfu",
     "repairPriceByDamage": false,
     "cureKeepsInfection": false,
