@@ -32,7 +32,7 @@
 // The slots' state is the fields of the object createAnimSlots answers; fpArm.js reads and writes them by name. What
 // the slots read of the arm comes through `ctx`, as live getters.
 import { wrapAngle } from '../../world/mat4.js';
-import { resetClip } from '../../formats/morrowind/mwAnim.js';
+import { resetClip, advanceClip } from '../../formats/morrowind/mwAnim.js';
 import {
   pickAnimSource,
   composeStanceGroup,
@@ -398,4 +398,55 @@ export function createAnimSlots(ctx) {
   }
 
   return slots;
+}
+
+/** Advances a slot's clip by `dt` at `rate`, on its own source's keys (the rig's when it has none). */
+function advance(rig, state, source, dt, rate = 1) {
+  advanceClip(state, (source || rig).keys, dt * rate, null);
+}
+
+/**
+ * One tick of the slots, after the upper body's: the recoil (let go when it ends) and the death (held at its end), then
+ * the jump before the movement (the movement waits while the body is in the air), each clip advanced, and the idle
+ * last, checked against the stance after everything else moved.
+ * @param {any} slots
+ * @param {any} rig the rig whose sources the slots play
+ * @param {number} dt
+ * @param {{ yaw?: number, move?: MoveInput } | null} cam
+ */
+export function stepSlots(slots, rig, dt, cam) {
+  if (slots.hitState) {
+    advance(rig, slots.hitState, slots.hitSource, dt);
+    if (!slots.hitState.playing) {
+      slots.hitState = null;
+      slots.hitSource = null;
+    }
+  }
+  if (slots.deathState) advance(rig, slots.deathState, slots.deathSource, dt);
+  const inJump = slots.refreshJump((cam && cam.move) || null);
+  slots.refreshMovement(cam, dt, inJump);
+  if (slots.movementState) advance(rig, slots.movementState, slots.movementSource, dt, slots.movementRate);
+  if (slots.jumpState) advance(rig, slots.jumpState, slots.jumpSource, dt);
+  if (slots.idleState) advance(rig, slots.idleState, slots.idleSource, dt);
+  slots.refreshIdle();
+}
+
+/**
+ * The clip that poses the body this tick and the source whose tracks it reads: the death over everything, then the
+ * upper body's action, the recoil, the movement, the jump and the idle. Null when nothing plays.
+ * @param {any} slots
+ * @param {any} action the upper body's clip
+ * @param {any} actionSource
+ */
+export function slotWinner(slots, action, actionSource) {
+  const ranked = [
+    [slots.deathState, slots.deathSource],
+    [action, actionSource],
+    [slots.hitState, slots.hitSource],
+    [slots.movementState, slots.movementSource],
+    [slots.jumpState, slots.jumpSource],
+    [slots.idleState, slots.idleSource],
+  ];
+  const top = ranked.find(([state]) => state);
+  return top ? { state: top[0], source: top[1] } : null;
 }

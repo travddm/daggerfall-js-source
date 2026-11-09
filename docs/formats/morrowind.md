@@ -67,8 +67,10 @@ An async read must store its result in the cache generation it started under.
 - `src/combat/fpArm.js`: `createFpArm()` builds and draws the player's arms and, in third person, the whole body
   (`drawThird`). It draws into the renderer's offscreen character pass with its own projection (first person has its
   own field of view and a cleared depth buffer). Its helpers are in `src/combat/fpArm/`: `fpAnimState.js` (animation
-  state), `archiveBytes.js` (archive reads, the shared mesh copy and parse) and `fpArmParts.js` (the weapon, arrow,
-  torch and hip lantern parts and the nodes they hang on).
+  state), `archiveBytes.js` (archive reads, the shared mesh copy and parse), `fpArmParts.js` (the weapon, arrow,
+  torch and hip lantern parts and the nodes they hang on), `buildRules.js` (the race scale and the shared
+  accumulation root), `animSlots.js` (the idle, movement, jump, hit and death slots) and `upperBody.js` (the weapon
+  and cast machine).
 - `src/combat/weapon/weaponRig.js`: builds the rig from the player's equip table.
 - `src/net/peer/peerBodies.js`: other players' bodies, one `createFpArm()` instance each, nearest first, capped, built
   one at a time.

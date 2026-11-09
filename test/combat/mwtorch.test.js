@@ -298,7 +298,7 @@ test('MW-D51/52 pins: the rig hands the lit light over per frame and at the buil
   const opts = armBuildOptsOf({ race: 'Argonian', gender: 'male', faceIndex: 0, items: [], lightSource: { templateIndex: TEMPLATES.Torch } });
   assert.equal(opts.torch, true);
   const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, sheathed, spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
+  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, ub\.sheathed, ub\.spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
   assert.equal((arm.match(/else if \(r\.slot === 'torch'\) r\.hidden = !torchVisible\(\);/g) ?? []).length, 2, 'both world meshes hide on the rule');
   assert.match(arm, /else if \(r\.slot === 'torch'\) r\.hidden = !torchLit;/, 'the portrait shows the lit light whatever the hand holds');
   assert.equal((arm.match(/overlayFor\((?:tBase|fBase), (?:t|built)\.leftArm\)/g) ?? []).length, 2, 'the overlay on both rigs’ own LeftArm sets, through the memo');

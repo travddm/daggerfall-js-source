@@ -60,7 +60,7 @@ import {
   weaponRecords, dfWeaponToMw, dfWeaponShape, pickWeaponRecord, MW_WEAPON_TYPE,
   shootsRatherThanSwings,
   headViewRef, composeStanceGroup, mwAttackType, attackKeys, MW_SHOOT_ATTACK, strikeReversed,
-  EQUIP_KEYS, UNEQUIP_KEYS, isRealWeapon,
+  isRealWeapon,
   stepAimFocus, fpAnimSources, pickAnimSource, anySourceHasGroup, FP_BASE_MODEL, animSourceName,
   gmstValue, GMST_SNEAK_DELTA, sneakOffset,
   lightRecords, pickTorchRecord, blendMaskBones, overlayTracks, overlaySampler,   // MW-D51: the held torch
@@ -102,14 +102,13 @@ import { vfxOf, createVfx, vfxCapacity, vfxTextures } from '../formats/morrowind
 import { spellFxPlan } from '../formats/morrowind/mwSpellFx.js';   // MW-SPELLFX1: which visuals a spell wears
 import { effectSchool } from '../systems/spellcost.js';   // MW-SPELLFX1: a family the mapping does not name is drawn as its school
 import { createVfxGpu } from '../render/vfxGpu.js';   // MW-SPELLFX1: an effect's streams on the GPU
-import { validCastRate } from '../systems/castSpeed.js';   // CAST-SPEED: the rate a cast is handed, made safe
 import { skinLayout, skinSamePieces, packSkinStream, writeSkinPalette, restreamMovedRows } from '../formats/morrowind/mwGpuSkin.js';   // MWNPC1: the third body's skin, on the GPU
 import { pageParam } from '../systems/pageQuery.js';   // MWNPC1: the GPU skin's bisect door
 import { t } from '../systems/textManager.js';   // L10N4: AUDIT MW-FOLK1's note in the player's language
 import {
   fpSkeletonPath, tpSkeletonPath, FP_IDLE_BASE, TORCH_GROUP, carriedLeftVisible,
-  animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType, accurateAiming, clipCompletion,
-  strideOppositeTime, blowRate,
+  animWeaponType, UPPER_BODY, UPPER_BODY_NAME, accurateAiming, clipCompletion,
+  strideOppositeTime,
 } from './fpArm/fpAnimState.js';   // the animation-state helpers
 import { loadFromArchives, findLoaded, parseNifOnce, nifBytes, boneProbe, esmLoadOrder } from './fpArm/archiveBytes.js';   // the archive reads
 export { nifParseCount, esmLoadOrder, NIF_COPY_CAP, nifBytes } from './fpArm/archiveBytes.js';
@@ -119,7 +118,7 @@ import {
   resolveOffWeaponParts, resolveWeaponParts,
 } from './fpArm/fpArmParts.js';   // the carried parts
 import { raceScaleOf, stickyAccumRoot } from './fpArm/buildRules.js';   // the race scale and the shared accum root
-import { createAnimSlots } from './fpArm/animSlots.js';   // the slots below the upper body
+import { createAnimSlots, stepSlots, slotWinner } from './fpArm/animSlots.js';   // the slots below the upper body
 import { createUpperBody } from './fpArm/upperBody.js';   // the weapon and cast machine
 export {
   WOLFSKIN, WOLFSKIN_1ST, fpSkeletonPath, tpSkeletonPath, FP_CLIP_PATH, FP_IDLE_BASE, FP_IDLE_SNEAK, TORCH_GROUP,
@@ -3931,70 +3930,17 @@ export function createFpArm() {
      * Rule 8: sheathed is weapon type None - the bare "idle" group with
      * rule 10's endless loop and no weapon in shot. Drawn is the weapon's
      * own type, its "idle<short>" stance, and the equip section played
-     * once on the way in. The reference reaches this through
-     * updateWeaponState comparing `weaptype` to `mWeaponType`
-     * (character.cpp:1382-1500); here the caller says which it wants and
-     * the same two sections play.
+     * once on the way in (upperBody.js sheathe). The caller says which it wants.
      */
     setSheathed(next) {
-      const want = !!next;
-      if (!built || !built.ok) return false;
-      if (want === ub.sheathed) return false;
-      // THE TWO HALVES ARE NOT SYMMETRIC, and that asymmetry is the rule.
-      //
-      // Drawing sets mWeaponType to the new type AS THE EQUIP ANIMATION
-      // STARTS (character.cpp:1495-1496), so the stance becomes "idle1h"
-      // immediately. Sheathing does NOT: mWeaponType stays the old type
-      // for the whole unequip section and only becomes None when it
-      // finishes (:1857-1859). Flipping it early would compose the
-      // unequip section's group name from a weapon that is already gone -
-      // the animation would look for "unequip start" in the bare-handed
-      // group and find nothing, and the weapon would vanish rather than
-      // be put away.
-      if (want) {
-        // :1384 - the guard against restarting the unequip we are
-        // already playing, which the per-frame sync makes load-bearing.
-        if (ub.upper === UPPER_BODY.Stowing) return false;
-        // MW-D28: the OTHER half of :1383-1384's guard, which the port
-        // had dropped - `mUpperBodyState <= UpperBodyState::AttackWindUp`.
-        // The wind-up may be interrupted by a sheathe; the release and
-        // the follow-through may NOT: the attack runs out first and the
-        // per-frame sync starts the unequip on the next frame, exactly
-        // as the reference's per-frame updateWeaponState does.
-        if (ub.upper === UPPER_BODY.Striking || ub.upper === UPPER_BODY.Recovering) return false;
-        if (ub.upper === UPPER_BODY.Rest || !ub.weaponGroup) {
-          ub.sheathed = true; ub.weaponShown = false; ub.arrowShown = false;
-          ub.refreshWeaponGroup(); slots.refreshIdle(true);
-          return true;
+      // A spell kept in the free hand goes there as the weapon is drawn, so the weapon comes up in its own stance
+      // rather than the two-handed spell stance the sheathed hands held.
+      return ub.sheathe(!!next, () => {
+        if (drawsIntoSpellHand({ spellHand, spellReady: ub.spellReady, casting: ub.upper === UPPER_BODY.Casting })) {
+          ub.spellReady = false;
+          spellInHand = true;
         }
-        ub.upper = UPPER_BODY.Stowing;
-        // If the file has no "unequip detach" key the weapon is hidden
-        // by hand, immediately (:1412-1414).
-        const detach = ub.keyTime(UNEQUIP_KEYS.detach);
-        if (!ub.playAction(UNEQUIP_KEYS.start, UNEQUIP_KEYS.stop, 0)) {
-          ub.upper = UPPER_BODY.Rest; ub.sheathed = true; ub.weaponShown = false; ub.arrowShown = false;
-          ub.refreshWeaponGroup(); slots.refreshIdle(true);
-          return true;
-        }
-        if (detach < 0) ub.weaponShown = false;
-        // detachArrow() (character.cpp:1410), unconditionally, as the
-        // unequip section starts - not at its "unequip detach" key.
-        ub.arrowShown = false;
-        return true;
-      }
-      ub.sheathed = false;
-      // AUDIT SPELL-HAND L3-3: drawn with the spell kept in the free hand, the weapon comes up in ITS stance - the two-handed
-      // Spell stance the sheathed hands held is let go first, never the spellcast group's own equip played for the blade
-      if (drawsIntoSpellHand({ spellHand, spellReady: ub.spellReady, casting: ub.upper === UPPER_BODY.Casting })) { ub.spellReady = false; spellInHand = true; }
-      ub.refreshWeaponGroup();
-      ub.upper = UPPER_BODY.Drawing;
-      ub.resetIdleOnAttackEnd = true;
-      const attach = ub.keyTime(EQUIP_KEYS.attach);
-      if (!ub.playAction(EQUIP_KEYS.start, EQUIP_KEYS.stop, 0)) { ub.upper = UPPER_BODY.Ready; ub.weaponShown = true; }
-      // :1468-1472 - no "equip attach" key means show the weapon now.
-      if (attach < 0) ub.weaponShown = true;
-      slots.refreshIdle(true);
-      return true;
+      });
     },
 
     /**
@@ -4095,9 +4041,8 @@ export function createFpArm() {
       // queued before the key compare (wornKey is the old hand until a
       // swap lands, so switching back mid-swap was dropped).
       if (busy) { pendingWeapon = { item, hasAmmo, ammoCount }; return false; }
-      // AUDIT SPELL-HAND L3-9: A CAST FINISHES BEFORE THE HAND CHANGES - OpenMW's equip waits for the upper body to come
-      // back to WeaponEquipped (character.cpp updateWeaponState); the swap cut the cast's motion and let its spell go at
-      // once. The rig hands the hand in every frame, so the swap lands the frame the cast ends.
+      // A cast finishes before the hand changes: a swap mid-cast cut the cast's motion and let its spell go at once. The
+      // rig hands the weapon over every frame, so the swap lands the frame the cast ends.
       if (ub.upper === UPPER_BODY.Casting) return false;
       // WEREWOLF1 (AUDIT D7/C5): THE WOLF HOLDS NOTHING, whatever the hand the game hands it (the claws, a debug
       // weapon) - setTorch's and setHipLight's law; the person's hand waits in the build opts for the way back
@@ -4213,39 +4158,15 @@ export function createFpArm() {
           }
           releaseMesh();
           packed = null;
-          // The old action clip belonged to the old weapon's group.
-          ub.actionState = null; ub.actionSource = null; ub.attackType = null; ub.holdWindUp = false;
           wornKey = key;
           wornWeaponKey = fpWeaponKey(item, false);   // WEAPON-GLOW1 (AUDIT NET-1): the hand the mesh now holds
           if (lastBuildOpts) { lastBuildOpts.weapon = item; lastBuildOpts.hasAmmo = hasAmmo; lastBuildOpts.ammoCount = ammoCount; }   // AUDIT MW-TORCH F5: setWorn's rebuild carries the hand that is IN it (AUDIT 68 S08-fparm-ammocount-dropped: and its quiver)
           const wasDrawn = !ub.sheathed;
-          // MW-D28: isStillWeapon (character.cpp:1364) - a DRAWN hand
-          // swapping one real weapon for another plays NO unequip and NO
-          // equip: "We should not play equipping animation and sound
-          // during weapon->weapon transition". The unequip block is
-          // gated `&& !isStillWeapon` (:1385) and the whole equip body
-          // is wrapped `if (!isStillWeapon)` (:1445); only the group
-          // and the stance re-resolve (:1443, :1495-1496), and a
-          // mid-attack swap is forced to WeaponEquipped with the weapon
-          // SHOWN first (:1370-1377). The mesh swaps in the hand.
+          // One real weapon for another while drawn swaps the mesh in the hand with no unequip and no equip
+          // (upperBody.js swapWeapon); anything else is put away, and a drawn hand then draws the new weapon.
           const stillWeapon = wasDrawn && isRealWeapon(oldType) && isRealWeapon(resolved.mwType);
-          if (stillWeapon) {
-            ub.weaponShown = true;    // :1377 showWeapons(true)
-            ub.arrowShown = false;    // a fresh round attaches at its own shoot keys (MW-D16)
-            ub.upper = UPPER_BODY.Ready;
-            ub.refreshWeaponGroup();
-            slots.resetIdle();           // forcestateupdate (:1372) - the new stance's idle
-          } else {
-            ub.weaponShown = false; ub.arrowShown = false;
-            ub.sheathed = true;
-            ub.upper = UPPER_BODY.Rest;
-            ub.refreshWeaponGroup();
-            slots.refreshIdle(true);
-            // A drawn hand equips the NEW weapon - the same section the
-            // reference plays when the equip slot changes mid-draw
-            // (real-weapon-to-real-weapon never reaches here any more).
-            if (wasDrawn) { busy = false; api.setSheathed(false); }
-          }
+          ub.swapWeapon(stillWeapon);
+          if (!stillWeapon && wasDrawn) { busy = false; api.setSheathed(false); }
           return true;
         } catch (err) {
           // AUDIT 68 X7-fparm-swap-rejection-unhandled: every caller drops
@@ -4305,20 +4226,13 @@ export function createFpArm() {
     attack(strike, { hold = false, blow = null, roll = 0, hand = null } = {}) {   // TWO-HANDS: `hand` - the hand the law gave the blow
       if (!built || !built.ok || ub.sheathed || dead) return null;   // MWNPC4: the dead swing nothing
       if (nonBiped()) return ub.creatureAttack(roll, blow);   // MWNPC9: claws and jaws - one of its attacks by the roll
-      // MW-PACE1: A BLOW IN THE FOLLOW-THROUGH IS CUT FOR THE NEXT. The machine starts a strike only from Idle, so
-      // a strike arriving here is a blow it has already finished; refusing it (the reference's gate, which knows no
-      // second clock) drew one blow in two at a high Speed, the second landing on an arm at rest. The wind-up and the
-      // release are still never cut - the blow they carry has not landed.
+      // A blow in its follow-through is cut for the next. The game's machine starts a strike only from idle, so a
+      // strike arriving here is a blow it has already finished; refusing it drew one blow in two at a high Speed, the
+      // second landing on an arm at rest. The wind-up and the release are never cut: their blow has not landed.
       if (ub.upper === UPPER_BODY.Recovering) ub.endAttack();
       if (ub.upper !== UPPER_BODY.Ready) return null;
-      // MW-D16: the SHOOT test is the weapon CLASS, not a flag the
-      // caller passes:
-      //   if (weapclass == Ranged || weapclass == Thrown)
-      //       mAttackType = "shoot";            character.cpp:1676-1677
-      // The arm already knows its weapon type, so asking the caller was
-      // a second source of truth for a question the data answers - and
-      // the port's own `isBow` would have missed MarksmanThrown, which
-      // shoots without being a bow.
+      // A ranged or thrown weapon shoots instead of swinging (shootsRatherThanSwings), decided from the weapon's own
+      // type rather than a caller's flag: a flag would have missed thrown weapons, which shoot without being bows.
       const blowHand = hand === 'L' || hand === 'R' ? hand : leadHand;   // TWO-HANDS: the blow's hand - the clip's, or its mirror's
       const type = mwAttackType(strike, {
         bow: shootsRatherThanSwings(animWeaponType(built.mwType, ub.sheathed)),
@@ -4354,13 +4268,8 @@ export function createFpArm() {
       // through the entire shot and the bow drew empty with nothing
       // anywhere saying why. That is the never-traps law: a missing
       // asset degrades, it does not silently delete the feature.
-      // The floor is not a departure from the reference either. MW-D16
-      // records the surprise as "a freshly drawn BOW is empty-handed
-      // UNTIL YOU BEGIN TO DRAW IT", and this line is exactly that
-      // moment - attack() IS the beginning of the draw. What it must
-      // not do is nock a bow at rest, which is why it lives here and
-      // not in the equip section, and why reloadCrossbow stays the
-      // only other way in.
+      // A freshly drawn bow is empty until the draw begins, and attack() is that moment. A bow at rest is never
+      // nocked, which is why this lives here and not in the equip section; reloadCrossbow is the only other way in.
       if (type === MW_SHOOT_ATTACK && built.arrow) ub.arrowShown = true;
       // BOW-CLOCK: and a release this draw has not reached is not this draw's. A shot the rig let go on its ceiling
       // leaves its own release key to land later, unasked - and the next draw's arrow took it and left at the click.
@@ -4713,24 +4622,7 @@ export function createFpArm() {
       // (mechanicsmanagerimp.cpp:1888-1890), and the wolf readies none
       if (!built || !built.ok || (want && built.werewolf)) return false;
       if (spellHand) return spellHandReady(want);   // SPELL-HAND: the spell in the free hand - the weapon's stance stands
-      // AUDIT SPELL-HAND L3-3: no stance flips under an equip or an unequip - its keys are its group's (onActionKey), and a
-      // group changed mid-section never crossed "unequip detach": the blade stood in the sheathed hand. OpenMW waits the
-      // same (character.cpp updateWeaponState, mUpperBodyState != Unequipping); the rig asks again every frame
-      if (ub.upper === UPPER_BODY.Drawing || ub.upper === UPPER_BODY.Stowing) return false;
-      if (want) ub.unreadyAfterCast = false;
-      if (ub.spellReady === want) return false;
-      // MW-CAST1: A CAST IN FLIGHT FINISHES. Daggerfall clears the readied spell AT the release
-      // (EntityEffectManager.PlayerSpellCasting_OnReleaseFrame :2136-2141), so this un-ready arrives mid-cast on every
-      // spell that goes - and the arm used to take it for an abort and drop the cast there, two tenths of a second into
-      // Morrowind's motion. A cast plays to its "<type> stop" in the reference whatever its spell did; the stance it
-      // came from drops when it ends (stepUpper). An abort cannot reach here mid-cast: the cast is not begun until the
-      // click, and from the click Daggerfall's own castInProgress holds the ready to the release.
-      if (!want && ub.upper === UPPER_BODY.Casting) { ub.unreadyAfterCast = true; return false; }
-      ub.spellReady = want;
-      ub.refreshWeaponGroup();
-      slots.resetIdle();
-      slots.resetMovement();
-      return true;
+      return ub.readySpell(want);
     },
 
     /** A hit recoil, picked by `roll` (animSlots.js hurt): under a weapon action, over the movement and the idle. */
@@ -4744,8 +4636,7 @@ export function createFpArm() {
     die(roll = 0, { startPoint = 0 } = {}) {
       if (!built || !built.ok) return false;
       dead = true;
-      ub.actionState = null; ub.actionSource = null; ub.holdWindUp = false; ub.attackType = null; ub.blowPlan = null;
-      ub.upper = ub.sheathed ? UPPER_BODY.Rest : UPPER_BODY.Ready;
+      ub.stopForDeath();
       return slots.die(roll, startPoint);
     },
 
@@ -4759,18 +4650,11 @@ export function createFpArm() {
     /** MWNPC4: has this body died? */
     isDead: () => dead,
 
-    /** MW-D39: THE SPELL GOES. The key pair is THE SPELL'S RANGE, not a
-     *  single "cast": character.cpp:1618-1636 sets mAttackType from the
-     *  first effect's range - self / touch / target - and plays
-     *  "<type> start" ... "<type> stop" in the spellcast group. A first
-     *  draft here guessed "cast start", which no Morrowind animation
-     *  carries, and every cast would have been a silent note. The
-     *  Daggerfall range byte maps onto the reference's three
-     *  (spellcast.js TARGET_TYPES): CasterOnly and AreaAroundCaster are
-     *  SELF, ByTouch is TOUCH, SingleTargetAtRange and AreaAtRange are
-     *  TARGET. Lands back in the stance through the upper-body machine.
-     *  Never a gate: a missing clip is a note on the card and the spell
-     *  still flies.
+    /** The spell goes (upperBody.js cast). The spellcast group's keys are named for the spell's range: "self start",
+     *  "touch start", "target start" and their release and stop, as the retail clips carry them. The Daggerfall range
+     *  byte maps onto the three (spellcast.js TARGET_TYPES): CasterOnly and AreaAroundCaster are self, ByTouch is
+     *  touch, SingleTargetAtRange and AreaAtRange are target. Lands back in the stance through the upper body. Never
+     *  a gate: a missing clip is a note on the card and the spell still flies.
      *
      *  CAST-SPEED: `rate` is the cast's own (systems/castSpeed.js - the live Speed and the castSpeed loot line), the
      *  speed its spellcast group plays at from "<type> start" to "<type> stop", as the classic frames step at it.
@@ -4781,52 +4665,11 @@ export function createFpArm() {
      *  hit (blowRate, its bounds), here a cast's to the classic clock. The cast's time is then the same whatever the
      *  hands look like; castPaced() says the fit was made. A group with no release key plays at `rate`, unpaced. */
     castSpell(rangeType = 2, rate = 1, releaseIn = 0) {
-      ub.castPaced = false;   // RPT1026-MISC CAST-PACE: this cast's own word
-      if (dead) return false;   // MWNPC4: the dead cast nothing
-      // MWNPC9: a non-biped casts in one of its attacks ("No 'release' text key to use, so cast immediately" -
-      // character.cpp:1459-1464: its spellcast group is a random attack, played start to stop)
-      if (nonBiped()) return ub.creatureAttack(++ub.creatureCasts, null) !== null;
-      // WEREWOLF1 (AUDIT E6): nor casts one - the turn back is cast in beast form, and on the wolf it latched a spell
-      // stance the next frame's readySpell(false) tore down again
+      ub.castPaced = false;   // this cast says for itself whether it was paced
+      if (dead) return false;
+      if (nonBiped()) return ub.creatureAttack(++ub.creatureCasts, null) !== null;   // a creature casts with one of its attacks
       if (!built || !built.ok || built.werewolf) return false;
-      // AUDIT WORLD C2: a SHEATHED arm casts too. Sheathed the stance is None, which the gate below refused, so a
-      // caster with nothing drawn - the peer whose wd is 0, and the player's own arm alike - never played a cast,
-      // though animWeaponType composes the spellcast group for the stance regardless (the spell survives the
-      // sheath). The cast plays from None and stepUpper hands the arm back to None when it ends.
-      if (ub.upper === UPPER_BODY.Recovering) ub.endAttack();   // AUDIT SPELL-HAND L3-2: a blow's follow-through is cut for the cast, as attack() cuts it for the next blow - a shot's outlasts the machine, and a cast pressed then played on no arm
-      if (ub.upper !== UPPER_BODY.Ready && ub.upper !== UPPER_BODY.Casting && !(ub.upper === UPPER_BODY.Rest && ub.sheathed)) return false;
-      // AUDIT 36 F2 (severe): THE CAST LATCHES ITS OWN STANCE. A
-      // CasterOnly spell is readied and cast in ONE synchronous call -
-      // hostMagic's readySpell runs castInput immediately for
-      // rangeType 0 - so no frame ticked between them, the rig had
-      // never read spellArmed() as true, and spellReady was still
-      // false here. The old gate refused outright; worse, had it not,
-      // playAction would have played "self start" in the SWORD's group,
-      // because weaponGroup is composed from the stance. Every instant
-      // self-cast - the healing and buff spells a player casts most -
-      // was silent. The cast is proof enough that a spell is going, so
-      // it latches the stance and composes the group before it plays.
-      if (!ub.spellReady) { ub.spellReady = true; ub.refreshWeaponGroup(); slots.resetIdle(); slots.resetMovement(); }
-      const type = spellAttackType(rangeType);
-      ub.attackType = type;
-      ub.castReleased = false;   // MW-CAST1: this cast's own release, not a stale one
-      ub.castRate = validCastRate(rate);
-      ub.unreadyAfterCast = false;
-      ub.attackReversed = false;   // MS1: a cast has no side
-      ub.attackStrength = 1;
-      ub.resetIdleOnAttackEnd = true;
-      const from = ub.upper;   // C2: None while sheathed
-      ub.upper = UPPER_BODY.Casting;
-      if (!ub.playAction(`${type} start`, `${type} stop`, 0)) {
-        // no keys for this range in this group: the stance stands, and
-        // the note on the card says which group could not answer.
-        ub.upper = from;
-        ub.attackType = null;
-        return false;
-      }
-      const lead = releaseIn > 0 ? ub.keyTime(`${type} release`) - ub.actionState.startTime : 0;   // RPT1026-MISC CAST-PACE: start to release, file seconds (-1 with no key)
-      if (lead > 0) { ub.castRate = blowRate(lead, releaseIn); ub.castPaced = true; }
-      return true;
+      return ub.cast(rangeType, rate, releaseIn);
     },
 
     /** RPT1026-MISC CAST-PACE: was the cast just started paced to the spell's moment (castSpell's `releaseIn`)? */
@@ -4880,11 +4723,7 @@ export function createFpArm() {
     },
 
     release() {
-      if (ub.upper !== UPPER_BODY.Winding) return false;
-      ub.holdWindUp = false;
-      if (ub.actionState && ub.actionState.playing) return true;   // still winding up; the machine takes it
-      ub.beginRelease();
-      return true;
+      return ub.release();
     },
 
     /** PER FRAME. Synchronous, no allocation after the first pack, no
@@ -4915,55 +4754,19 @@ export function createFpArm() {
       stepRunPump(dt);   // TWO-HANDS: the running hands' weight and stride
       stepPairGuard(dt);   // TWO-HANDS AUDIT: the pair's guard
       stepPairSpread(dt);   // TWO-HANDS SPREAD: the pair's arms turned out
-      // refreshCurrentAnims' order, and it is not arbitrary: the weapon
-      // state is stepped FIRST because the idle refresh below depends on
-      // it - "idle handled last as it can depend on the other states"
-      // (character.cpp:842) - and MW-D26's movement sits between them,
-      // exactly where refreshMovementAnims runs (:842-845).
+      // The order matters: the upper body steps first because the idle, checked last, depends on every other state.
       // MW-D29: EACH clip advances against ITS OWN source's text keys -
       // a state minted from one .kf and stepped through another's key
       // list crosses the wrong markers the moment two sources serve
       // different groups (the base .kf plus a skeleton's own is the
       // everyday retail case for a female or beast actor).
-      if (ub.actionState) {
-        // MW-D28: the weapon record's mSpeed scales EXACTLY the three
-        // attack sections - wind-up, release, follow - and nothing else
-        // (character.cpp:1718/:1786/:1811 pass weapSpeed as speedmult;
-        // the equip/unequip plays at :1408/:1465 pass 1.0f). A dagger
-        // swings fast and a warhammer slow, off the record, not a guess.
-        const attacking = ub.upper === UPPER_BODY.Winding
-          || ub.upper === UPPER_BODY.Striking || ub.upper === UPPER_BODY.Recovering;
-        // AUDIT MIXED-PAIR L3-8: the STRIKING weapon's record - a pair's left blow plays at its own weapon's mSpeed, as
-        // character.cpp reads the weapon that strikes
+      // The upper body first, then the slots under it (the recoil, the death, the jump, the movement, the idle).
+      ub.step(dt, () => {
+        // A strike plays at its weapon's speed: the hand's own weapon in a pair.
         const striking = blowWeaponOf({ hand: attackHand, weapon: built.weapon, offWeapon: built.offWeapon });
-        const weapSpeed = attacking && striking && Number.isFinite(striking.speed)
-          ? striking.speed : 1;
-        // MW-PACE1: a blow with a schedule runs on the MACHINE's clock instead - the section's fitted rate, the
-        // blow's own clock advanced beside it (blowPace). The record's pace is the fallback, unchanged.
-        const paced = attacking && ub.blowPlan;
-        if (paced) ub.blowPlan.clock += dt;
-        // CAST-SPEED: a cast plays at its own rate, where OpenMW plays the spellcast group at 1
-        const speed = paced ? ub.blowPlan.rate : ub.upper === UPPER_BODY.Casting ? ub.castRate : weapSpeed;
-        advanceClip(ub.actionState, (ub.actionSource || rig()).keys, dt * speed, ub.onActionKey);
-        noteWeaponClock();   // MW-BOW1: before stepUpper ends the section - the group's state keeps its last time
-        ub.stepUpper();
-      }
-      // MWNPC4: the recoil plays once and lets go (refreshHitRecoilAnims - the first of refreshCurrentAnims' refreshes:
-      // `!isPlaying(mCurrentHit)` clears the hit state); the death plays once and HOLDS its last frame - playDeath's autodisable is false
-      if (slots.hitState) { advanceClip(slots.hitState, (slots.hitSource || rig()).keys, dt, null); if (!slots.hitState.playing) { slots.hitState = null; slots.hitSource = null; } }
-      if (slots.deathState) advanceClip(slots.deathState, (slots.deathSource || rig()).keys, dt, null);
-      // MW-D39: jump refreshes BEFORE movement, the reference's own
-      // order (refreshCurrentAnims, character.cpp:841-844: hit recoil,
-      // jump, movement, idle last), and its inJump is what gates the
-      // movestate ladder this frame.
-      const inJump = slots.refreshJump((cam && cam.move) || null);
-      slots.refreshMovement(cam, dt, inJump);
-      if (slots.movementState) advanceClip(slots.movementState, (slots.movementSource || rig()).keys, dt * slots.movementRate, null);
-      // The jump plays at speedmult 1.0 (character.cpp:528-531 pass
-      // 1.0f) - no rate scaling, unlike movement.
-      if (slots.jumpState) advanceClip(slots.jumpState, (slots.jumpSource || rig()).keys, dt, null);
-      if (slots.idleState) advanceClip(slots.idleState, (slots.idleSource || rig()).keys, dt, null);
-      slots.refreshIdle();
+        return striking && Number.isFinite(striking.speed) ? striking.speed : 1;
+      }, noteWeaponClock);   // the bow clock reads the section before the next one starts
+      stepSlots(slots, rig(), dt, cam);
       // MW-D51: the torch's own clock, on its own keys - it is not the
       // frame's winner, it is the LEFT ARM's, and it plays through
       // whatever the four-slot winner does with the rest of the body.
@@ -4977,23 +4780,14 @@ export function createFpArm() {
         attackType: ub.attackType, reversed: ub.attackReversed, hand: attackHand, progress: ub.actionState ? clipCompletion(ub.actionState) : 0, strength: ub.attackStrength,
         shown: weaponInHand(), hands: handsMode, torch: torchVisible(), spell: spellStance(), spellHand: spellHand && spellInHand, guard: pairDip(),
       }));
-      if (!ub.actionState && !slots.movementState && !slots.jumpState && !slots.idleState && !slots.hitState && !slots.deathState) return;
-      // THE WINNER, not a blend. See the two-slot note above: in first
-      // person both animations are played on BlendMask_All, so the higher
-      // priority takes every bone for as long as it is playing.
-      // THE FOUR-SLOT WINNER (MW-D26, MW-D39): weapon action, then
-      // movement, then jump, then idle - the reference's priority order
-      // (character.hpp:30-43: Jump below Movement below Weapon) with
-      // BlendMask_All everywhere. The jump wins the air because the
-      // movement slot empties there, not by outranking it. The
-      // per-bone-group vector is the recorded gap.
-      const state = slots.deathState || ub.actionState || slots.hitState || slots.movementState || slots.jumpState || slots.idleState;   // MWNPC4: death over all, the recoil under the weapon
+      // The highest slot that plays poses the body (slotWinner). Its tracks come from the same file as its clip: a
+      // female actor can take her idle from xbase_anim_female.1st.kf and her swing from xbase_anim.1st.kf, and posing
+      // one with the other's tracks gives a bind pose with no error.
+      const top = slotWinner(slots, ub.actionState, ub.actionSource);
+      if (!top) return;
+      const state = top.state;
       posedGroup = state.group;
-      // MW-D14: and the TRACKS come from the same file as the clip. A
-      // female actor can win her idle from xbase_anim_female.1st.kf and
-      // her swing from the base xbase_anim.1st.kf, and posing one with
-      // the other's tracks is a bind pose with no error.
-      poseSource = slots.deathState ? slots.deathSource : ub.actionState ? ub.actionSource : slots.hitState ? slots.hitSource : (slots.movementState ? slots.movementSource : (slots.jumpState ? slots.jumpSource : slots.idleSource));
+      poseSource = top.source;
       // Rule 54's neck: the camera node hangs off "bip01 neck", so the
       // pitch has to be in the pose before any matrix is composed - the
       // eye MOVES with the look, it is not a lens tilt.
@@ -5307,15 +5101,9 @@ export function createFpArm() {
     },
 
     /**
-     * MW-D24: THE VIEW SWITCH, the port's setViewMode + forceStateUpdate
-     * (npcanimation.cpp:295-317; character.cpp:2798). The camera machine
-     * only crosses the first-person boundary when upperBodyReady() - the
-     * reference queues otherwise (camera.cpp:225-232) - so by the time
-     * this runs the machine is in a stable state (None or
-     * WeaponEquipped) and the re-derivation is exactly a force refresh:
-     * the action slot empties ("Changing the view will stop all playing
-     * animations"), the stance re-resolves on the NEW rig's sources, and
-     * weaponShown/sheathed carry over untouched.
+     * THE VIEW SWITCH. The camera crosses the first-person boundary only when upperBodyReady() answers true, so the
+     * upper body stands at Rest or Ready when this runs. The action clip stops (upperBody.js cutForView), the slots
+     * and the stance are chosen again on the new rig's sources, and weaponShown and sheathed carry over.
      */
     setViewMode(mode) {
       const want = mode === 'third' ? 'third' : 'first';
@@ -5327,7 +5115,7 @@ export function createFpArm() {
         return false;
       }
       viewMode = want;
-      ub.actionState = null; ub.actionSource = null; ub.attackType = null; ub.holdWindUp = false;
+      ub.cutForView();   // the action clip came from the other rig; the stance is composed again
       attackHand = null;   // AUDIT MIXED-PAIR L3-7: the blow the switch cut takes its hand with it
       // TWO-HANDS AUDIT: each rig's carry starts afresh - the rig now drawn was not drawn in the other view, so there is
       // nothing on the screen for a composition change to carry from (a carry kept across the switch eased the arms in
@@ -5335,10 +5123,6 @@ export function createFpArm() {
       mirrorCarry.first = {}; mirrorCarry.third = {};
       slots.resetMovement();
       slots.resetJump();   // MW-D39: the clip state came from the OTHER rig's sources; the next frame re-derives
-      if (ub.upper !== UPPER_BODY.Rest && ub.upper !== UPPER_BODY.Ready) {
-        ub.upper = ub.weaponShown ? UPPER_BODY.Ready : UPPER_BODY.Rest;
-      }
-      ub.refreshWeaponGroup();
       slots.resetIdle();
       refreshTorch(true);   // MW-D51: the torch clip came from the OTHER rig's sources too
       return true;
@@ -5364,10 +5148,8 @@ export function createFpArm() {
      *  hands (a lantern, whose held art is the classic lane's alone, is exactly that case). `status()` has carried
      *  this as `torchShown` all along - this is the same read without building a thirty-field card for it. */
     torchShown: () => torchVisible(),
-    /** Animation::upperBodyReady (animation.cpp:1846-1857), which is
-     *  what the camera's queued-mode gate consults (camera.cpp:135):
-     *  a stable stance, no action section in flight, no build in
-     *  flight. */
+    /** Whether the upper body may change views now: a stable stance (Rest or Ready), no action section and no build in
+     *  flight. The camera waits for it before crossing the first-person boundary. */
     upperBodyReady: () => !busy && !ub.actionState
       && (ub.upper === UPPER_BODY.Rest || ub.upper === UPPER_BODY.Ready),
     /** What the wheel may cross INTO: a body that refused keeps the
