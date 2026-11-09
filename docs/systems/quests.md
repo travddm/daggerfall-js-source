@@ -98,8 +98,7 @@ click lives for exactly one quest tick unless an action consumes it.
 | Bounty board | `src/systems/bounty/` | Not a machine quest (below). |
 
 `offerFlow.js` keeps DFU's quirks on purpose (for example, the picker's index drift and a missing `QuestorOffer` showing
-nothing). `questRepute.js` holds DFU's success and failure repute values, charged when a quest ends. Online the
-failure costs the same; a server profile can waive it (`quest.failureFree`, `quest-failure-rule.ts`).
+nothing). `questRepute.js` holds DFU's success and failure repute values, charged when a quest ends.
 
 Plain bulletin boards are DFU's rumour board: `src/systems/bulletinBoard.js` composes the first rumour fit for a sign
 (`src/systems/rumorMill.js`).
@@ -209,8 +208,8 @@ client) are bounty boards; the rest show DFU's rumour.
 - Do not edit `vendor/dfu-quests/`. Fix a broken quest with a patch in `questPatches.js` (or `qlPatches.js` for a
   branch).
 - Many DFU quirks are kept deliberately and commented `QUIRK KEPT`. Check the comment before "fixing" one.
-- `parseUtils.js` is a leaf the resource modules import. Keep shared helpers there, not in `parser.js`: parser.js
-  imports every resource module, and resources extend `QuestResource`, so a helper in parser.js closes an import cycle.
+- `parseUtils.js` is a leaf the resource modules import. Keep shared helpers there, not in `parser.js`: parser.js imports every resource module, and resources extend
+  `QuestResource`, so a helper in parser.js closes an import cycle.
 - Random draws go through the quest's injectable roll, never `Math.random`, so seeded tests stay seeded.
 - A host change to quest wiring belongs in `questBridge.js`, not in each scene host.
 - Offline and online differ in clocks, gates and the questlines switch. Test both lanes.
