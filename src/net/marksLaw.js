@@ -144,7 +144,8 @@ export const MARKS_KINDS = Object.freeze({
   'royal-escrow': 'move',     // CROWN1: a Royal Tourney's prize, held from the crown's treasury while it rules
   'royal-prize': 'move',      // CROWN1: the prize, out of the escrow to the champion's account
   'royal-return': 'move',     // CROWN1: a Tourney no bout won - the prize home
-  fort: 'burn',               // SEAT2b: a fortification project's Marks, from the holder's treasury as it is begun (7.5)
+  fort: 'burn',               // SEAT2b: a tier of a work, its Marks burnt once from the holder's treasury (7.5)
+  camp: 'burn',               // SEAT2b: a challenger's Siege Camp, its Marks burnt once from the treasury (4.2)
   'seat-strike-refund': 'mint', // AUDIT-SEATS S4: a struck seat's claim fee, minted back to its holder within the Season (16)
   raid: 'mint',               // SILVER-WAYS: a town defended - the relay's raid receipt, counted (under the day's combat cap)
   'guild-deed': 'mint',       // SILVER-WAYS: a guild deed - three of a guild's accounts on one raid or gate - into its treasury

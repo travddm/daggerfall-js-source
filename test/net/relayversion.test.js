@@ -47,6 +47,7 @@ const LAW = {
   world287: '5fa98938d25fe3be574c04ebe52e8fa09adbb01e84b316e02fb213d8ce0a64ad',     // SD LANES: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone)
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
+  world302: '8237ea60f480917689964f9cba2243cb1c8bb9653ac4846cc5bdf4f546c46114', // SEAT CUT: Tides, Incursion Marks, Levy, gifts, Fealty and the Season titles leave; the works cost Marks alone
   world298: '376f332b8b831c5fc1f174e008dbdb262109a852d47aba46800e3542d33682ca',     // PORTENT-FOLD: the omen lines (rise, wrath, marks) go through the text core
   world295: 'f6d6346724b88967a86d923f4572233d348954362169c1f6565ebd00a6504204', // P0 SERVER PROFILE: the relay serves its profile (`/profile`), names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none
   world297: 'edcdfe81f2e0e80905658b9a03eb0367151f23e4211fb7f2cc5a1c5a26f09890', // REVENANTS-STANDALONE: the Revenants row's five fixed choices are pinned in the server profile (officialProfile.ts); a profile's hash moves
