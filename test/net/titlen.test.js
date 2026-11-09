@@ -1,4 +1,4 @@
-// TITLE-N — THE DUNGEON MASTER AND THE PATREON TIERS.
+// TITLE-N — THE DUNGEON MASTER AND THE NAMED TITLES.
 //
 //
 // Each grant is a handle list in the account service's config (the developers' law), each title carries its own

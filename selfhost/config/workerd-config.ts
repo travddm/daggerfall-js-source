@@ -48,8 +48,6 @@ export const SECRETS: Record<string, readonly string[]> = {
     'GATE_PUBLIC_KEY',
     'CRON_SECRET',
     'ANTHROPIC_API_KEY',
-    'PATREON_CLIENT_SECRET',
-    'PATREON_WEBHOOK_SECRET',
     'STAFF_ANALYTICS_ACCOUNT',
     'STAFF_ANALYTICS_TOKEN',
   ],

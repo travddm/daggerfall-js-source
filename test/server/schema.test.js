@@ -58,7 +58,7 @@ const PLAYER_COLUMNS = [
   'fest_cakes', 'fest_given', 'fest_taken', 'fest_wares', 'first_played_at', 'freeze_live', 'freeze_rev', 'frozen_at',
   'frozen_by', 'frozen_reason', 'frozen_until', 'glyphs_off', 'guest_name', 'handle', 'handle_lc', 'icon', 'id',
   'insignia', 'insignia_spent', 'lamp_title', 'last_seen', 'legal_accepted_at', 'mute_admin', 'muted_by',
-  'muted_until', 'name_as', 'password', 'patreon_at', 'patreon_status', 'patreon_tiers', 'patreon_user', 'played_at',
+  'muted_until', 'name_as', 'password', 'played_at',
   'played_s', 'privacy_version', 'ql_titles', 'recovery_hash', 'registered_at', 'renown_hour', 'renown_hour_xp',
   'renown_last_credit', 'sd_honours', 'serpent_honours', 'staff_admin', 'staff_hide', 'staff_hide_on', 'staff_mod', 'staff_owner', 'staff_suspended',
   'terms_version', 'title',

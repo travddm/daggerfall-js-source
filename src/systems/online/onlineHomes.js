@@ -416,7 +416,7 @@ export const hallOfferLabel = (price, guild) => `G - buy it for ${guild?.name ??
 export const hallNextEntry = (entry) => GUILD_HALL_ENTRIES[(Math.max(0, GUILD_HALL_ENTRIES.indexOf(entry)) + 1) % GUILD_HALL_ENTRIES.length];
 /** GUILD1d: the hall bought and refused at its door, in words. */
 export const hallBoughtLine = (name) => `This house is now the hall of ${name}. Its members can enter, and its Officers can furnish it.`;
-/** HALL-GOLD (FIELD BUGS 2026-10-03, from the Patreon chat: "we have the cash, began with putting it all in guild bank,
+/** HALL-GOLD (FIELD BUGS 2026-10-03, from the players' chat: "we have the cash, began with putting it all in guild bank,
  *  but then when we went to buy it says whats above ... so went and took all out and put in in bank thinking it meant it
  *  had to be within the realm ... that took all night to figure out"): THE TWO REFUSALS, EACH ITS OWN WORDS. Both read
  *  "The treasury needs N gold put in by realm characters" - "the realm" read as a place, so the gold went to a bank

@@ -13,7 +13,7 @@ reads. Details of the deploys are in [deploying.md](deploying.md), of the deskto
 | `test-times.yml` | Called by `check.yml` and `deploy.yml` | Merges the 8 shards' recorded file times (`tools/testTimes.mjs --merge`) and saves them in the Actions cache for the next run's split. Also uploads them as the `test-times` artifact. | None |
 | `deploy.yml` | Push to `main`; manual | Verifies `main`'s head, builds the site, waits until the account service serves this build's `ACCOUNT_VERSION`, then publishes to GitHub Pages. | None (uses `pages: write`, `id-token: write`) |
 | `relay-deploy.yml` | Push to `main`; manual (`force`, `redeploy`) | Deploys `server/` only when `RELAY_VERSION` in `src/net/wire.js` differs from the live relay's `/health`. Runs `verify.yml` (500 sweep seeds) first. Drops every connected player. | `CLOUDFLARE_API_TOKEN` |
-| `account-deploy.yml` | Push to `main` that touches `server-account/**` or a file the account Worker imports; manual | Runs `verify.yml`, creates the D1 database and R2 bucket if missing, applies migrations, waits for the relay, deploys `server-account/`, mints missing keys, puts optional secrets, verifies the live service. | `CLOUDFLARE_API_TOKEN`; optional `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET`, `ANTHROPIC_API_KEY` |
+| `account-deploy.yml` | Push to `main` that touches `server-account/**` or a file the account Worker imports; manual | Runs `verify.yml`, creates the D1 database and R2 bucket if missing, applies migrations, waits for the relay, deploys `server-account/`, mints missing keys, puts optional secrets, verifies the live service. | `CLOUDFLARE_API_TOKEN`; optional `ANTHROPIC_API_KEY` |
 
 ## Desktop release and patch notes
 

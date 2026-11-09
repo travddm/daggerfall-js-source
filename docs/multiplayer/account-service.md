@@ -51,7 +51,7 @@ The service imports shared law from `src/net/` (for example `identityToken.js`, 
 4. Signed relay feeds: `/v1/mod/grant-feed`, `/v1/mod/reaction-feed`, `/v1/mod/hidden-seen`, `/v1/staff/net-feed`,
    each checked by a signature header.
 5. `STAFF_ROUTES` (`/v1/staff/*`): POST, staff session in `x-staff-session`. Game sessions are refused.
-6. `OPEN_ROUTES` (`/v1/auth/guest`, `/login`, `/recover`) and Patreon callbacks: no session, rate-limited.
+6. `OPEN_ROUTES` (`/v1/auth/guest`, `/login`, `/recover`): no session, rate-limited.
 7. Everything else needs a session: `Authorization: Bearer <secret>` (or a body `secret` on POST), resolved by
    `resolveSession`. Unknown paths return 404 from the one `ROUTES` set.
 

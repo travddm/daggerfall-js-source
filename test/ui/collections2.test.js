@@ -27,7 +27,6 @@ import { seasonTitles } from '../../src/net/townSeatLaw.js';
 import { codexRows, codexSets, noteFind, _resetCodexForTests } from '../../src/systems/loot/lootCodex.js';
 import { GILDED_RECORDS, DRAGONFIRE_OATH, mintGilded } from '../../src/systems/gilded.js';
 import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, FOUNDER_UNTIL, wardrobeOf } from '../../server-account/src/titles.js';
-import { PATREON_TITLES } from '../../server-account/src/patreon.js';
 import { SD_TITLE_CHANCE, SD_AURA_CHANCE } from '../../server-account/src/sds.js';
 import { SERPENT_TITLE_CHANCE, SERPENT_AURA_CHANCE } from '../../server-account/src/serpents.js';
 import { EMBERS_EARNED_SQL } from '../../server-account/src/accounts.js';
@@ -107,8 +106,8 @@ const CATALOGUE = {
   'title:keeper': 'seats open', 'title:champion': 'seats open', 'title:chaptermaster': 'chapters dormant', 'title:chapterofficer': 'chapters dormant',
   'title:formermaster': 'chapters dormant', 'title:highmaster': 'chapters dormant', 'title:seasonmaster': 'chapters dormant', 'title:grandchampion': 'ranked open',
   'title:arenachampion': 'ranked ranked', 'title:ilovelamp': 'world open',
-  'title:founder': 'account closed', 'title:disciple': 'patrons patron', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons patron',
-  'title:herald': 'patrons patron', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff',
+  'title:founder': 'account closed', 'title:disciple': 'patrons dormant', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons dormant',
+  'title:herald': 'patrons dormant', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff',
   /* HUNTERS-MARK, MARKS-OF-MASTERY ( */
   'title:bloodhound': 'hunt open', 'title:beastbane': 'hunt open', 'title:grandhuntsman': 'hunt open', 'title:huntlegend': 'hunt open',
   'title:mastermining': 'mastery open', 'title:masterlogging': 'mastery open', 'title:masterherbalism': 'mastery open', 'title:masterhunting': 'mastery open',
@@ -122,8 +121,8 @@ const CATALOGUE = {
   'glyph:crownSK': 'seats open character', 'glyph:crownMW': 'seats open character', 'glyph:crownSU': 'seats open character', 'glyph:crownVW': 'seats open character',
   'glyph:crownEW': 'seats open character', 'glyph:crownBM': 'seats open character', 'glyph:crownCY': 'seats open character',
   'glyph:laurel': 'ranked ranked',
-  'glyph:sprout': 'account auto', 'glyph:disciple': 'patrons patron', 'glyph:apostle': 'patrons dormant', 'glyph:hierophant': 'patrons patron',
-  'glyph:herald': 'patrons patron', 'glyph:dev': 'staff staff', 'glyph:mod': 'staff staff', 'glyph:dm': 'staff staff',
+  'glyph:sprout': 'account auto', 'glyph:disciple': 'patrons dormant', 'glyph:apostle': 'patrons dormant', 'glyph:hierophant': 'patrons dormant',
+  'glyph:herald': 'patrons dormant', 'glyph:dev': 'staff staff', 'glyph:mod': 'staff staff', 'glyph:dm': 'staff staff',
 };
 
 // ── THE CATALOGUE ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -157,19 +156,17 @@ test('COLLECTIONS-II WHAT COMES TOGETHER, ALL OF IT EACH WAY (AUDIT COLLECTIONS-
   assert.deepEqual(got, want);
 });
 
-test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (AUDIT COLLECTIONS-II lanes 1 and 5): the lists\' titles; each roll\'s own odds, each patron tier\'s own name, each board\'s own floor, each questline\'s own name, giver and level or the line it follows; the founders\' instant and the routes still open; Season 0 crowning no one; the cakes others take; a dealing claim\'s roll; the embers\' three purses; the prices; the chapters\' switch and the festival\'s, the questlines\' and the seats\' (mutants: the Hourbreaker saying the aura\'s odds; every patron the Disciple; a questline\'s level, its predecessor, another line; a board\'s floor; the founder retired; a switch off)', () => {
+test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (AUDIT COLLECTIONS-II lanes 1 and 5): the lists\' titles; each roll\'s own odds, each named title granted by name alone, each board\'s own floor, each questline\'s own name, giver and level or the line it follows; the founders\' instant and the routes still open; Season 0 crowning no one; the cakes others take; a dealing claim\'s roll; the embers\' three purses; the prices; the chapters\' switch and the festival\'s, the questlines\' and the seats\' (mutants: the Hourbreaker saying the aura\'s odds; a named title offered to players; a questline\'s level, its predecessor, another line; a board\'s floor; the founder retired; a switch off)', () => {
   const entry = (kind, key) => W.wardrobeEntry(kind, key);
   const how = (kind, key) => entry(kind, key).how();
   // the lists
-  const mapped = (configOf('PATREON_TIERS') ?? '').split(',').map((p) => p.split(':')[1]).filter(Boolean);
-  assert.ok(mapped.length >= 3, 'the config read');
   for (const t of Object.keys(TIER_LISTS)) {
     const e = entry('title', t);
-    if (PATREON_TITLES.includes(t)) {
-      assert.deepEqual([e.src, e.avail], ['patrons', mapped.includes(t) ? 'patron' : 'dormant'], `${t}: a pledge's, ${mapped.includes(t) ? 'mapped' : 'no tier yet'}`);
-      if (mapped.includes(t)) assert.match(e.how(), new RegExp(`at the ${t[0].toUpperCase()}${t.slice(1)} tier`), `${t}: its own tier named`);
-    } else if (t === 'dungeonmaster') assert.deepEqual([e.src, e.avail], ['staff', 'staff']);
-    else assert.fail(`${t}: every listed title is a pledge's or the Dungeon Master's`);
+    if (t === 'dungeonmaster') assert.deepEqual([e.src, e.avail], ['staff', 'staff']);
+    else {
+      assert.deepEqual([e.src, e.avail], ['patrons', 'dormant'], `${t}: granted by name alone`);
+      assert.match(e.how(), /^Granted by name/, `${t}: says how it is granted`);
+    }
     assert.equal(entry('glyph', TIER_GLYPH[t]).avail, e.avail, `${t}'s glyph is had as it is`);
     if (TIER_AURA[t]) assert.equal(entry('aura', TIER_AURA[t]).avail, e.avail, `${t}'s aura is had as it is`);
   }
@@ -256,9 +253,9 @@ test('COLLECTIONS-II THE SEASONS AND THE FILTERS: a festival\'s piece seasonal w
   const w = mintedWardrobe();
   const titles = W.wardrobeEntries('title');
   const now = titles.filter((e) => wardrobeFilterPasses('now', e, w, DURING)).map((e) => e.key);
-  for (const k of ['founder', 'developer', 'chaptermaster', 'hoursfirst', 'apostle']) assert.ok(!now.includes(k), `${k} is not to be had now`);
+  for (const k of ['founder', 'developer', 'chaptermaster', 'hoursfirst', 'apostle', 'disciple']) assert.ok(!now.includes(k), `${k} is not to be had now`);
   assert.ok(!W.wardrobeEntries('glyph').filter((e) => wardrobeFilterPasses('now', e, w, DURING)).some((e) => e.key === 'sprout'), 'the sprout comes by itself, never had now');
-  for (const k of ['gatebreaker', 'covenbane', 'hourbreaker', 'arenachampion', 'witchwarden', 'disciple', 'ilovelamp']) assert.ok(now.includes(k), `${k} is`);
+  for (const k of ['gatebreaker', 'covenbane', 'hourbreaker', 'arenachampion', 'witchwarden', 'ilovelamp']) assert.ok(now.includes(k), `${k} is`);
   assert.ok(!titles.filter((e) => wardrobeFilterPasses('now', e, w, AFTER)).some((e) => e.key === 'witchwarden'), 'out of season, not now');
   const held = titles.filter((e) => wardrobeFilterPasses('held', e, w)).map((e) => e.key);
   const missing = titles.filter((e) => wardrobeFilterPasses('missing', e, w)).map((e) => e.key);

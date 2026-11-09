@@ -75,11 +75,11 @@ export const TITLE_TEXT = Object.freeze({
   founder: 'Founder',
   developer: 'Developer',
   dungeonmaster: 'Dungeon Master',   // TITLE-N
-  disciple: 'Disciple',              // TITLE-N: the Patreon tiers, lowest first
+  disciple: 'Disciple',              // TITLE-N: the named titles, lowest first
   apostle: 'Apostle',
   hierophant: 'Hierophant',
   gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought
-  herald: 'Herald',                  // HERALD: the Patreon tier between Disciple and Hierophant
+  herald: 'Herald',                  // HERALD: the named title between Disciple and Hierophant
   // SEAT1c (Seats-Arc 7.4): the seats' five - each worded off its claim where this client knows the place
   // (townSeatLaw.js seatTitleText: "Warden of Anticlere"), and these words alone where it does not
   warden: 'Warden',
@@ -182,7 +182,7 @@ export const WITCH_VIOLET = Object.freeze([0.71, 0.42, 0.94, 1]);     // #b56bf0
  *  in, so `nameLayer.cssRgba` turns it into CSS and `drawText` takes it
  *  as a tint, and neither face writes a colour down a second time.
  *  Mac: Founder gold, Developer red, Dungeon Master orange (TITLE-N). The
- *  three Patreon tiers had no colour named: a colour each, none near
+ *  three named titles had no colour named: a colour each, none near
  *  another title's, rising from teal to violet to rose - this table is
  *  the one place to change them, and costs no relay. */
 export const TITLE_RGBA = Object.freeze({

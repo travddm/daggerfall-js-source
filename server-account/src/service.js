@@ -604,9 +604,6 @@ export const ROUTES = new Set([
   '/v1/realm/raise',
   // LEGACY7 part three: a half of one wedding between two players' characters, and the account's unions
   '/v1/realm/wed', '/v1/realm/unions',
-  // PATREON-LINK: a patron's own Patreon, linked (patreon.js) - Patreon sends the player back to the callback, the
-  // confirm is their yes, the webhook is Patreon's word on a member; the unlink is the account's, behind a session.
-  '/v1/patreon/callback', '/v1/patreon/confirm', '/v1/patreon/webhook', '/v1/patreon/unlink',
   // ARENA4: the arena (arena.js) - a bout's receipt the relay signed, carried here by an account it names; the boards,
   // counted from the rows; a banner joined or quit. Every one behind a session; a guest reads the boards and keeps nothing.
   '/v1/arena/claim', '/v1/arena/board', '/v1/arena/team',
@@ -647,11 +644,6 @@ export function poiPathOf(path) {
  *  resolves a session first. Named rather than special-cased inside the
  *  ladder, so "what can a stranger reach?" has one answer. */
 export const OPEN_ROUTES = new Set(['/v1/health', '/v1/auth/guest', '/v1/auth/login', '/v1/auth/recover']);
-
-/** PATREON-LINK: the three a stranger reaches that are NOT the JSON ladder's - a browser carrying Patreon's code back
- *  (a GET, answered with a page), the page's yes (a form), and Patreon's own webhook. Each proves itself with what it
- *  carries - a state or a ticket this service signed, a signature under the webhook's secret - never a session. */
-export const PATREON_OPEN_ROUTES = new Set(['/v1/patreon/callback', '/v1/patreon/confirm', '/v1/patreon/webhook']);
 
 /** SAFE5: the chat safety's door a stranger reaches, NOT the JSON ladder's - the relay's feed of public lines. It proves
  *  itself by a signature over its exact bytes (the relay's receipt key), never a session. */

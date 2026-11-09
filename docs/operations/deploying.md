@@ -162,7 +162,6 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[vars] *_OPEN`, `SEASON_ZERO_WEEK`, `DOMAINS_WEEK` | Feature switches and season schedule. |
 | `[vars] MOD_AI`, `MOD_AI_MODEL`, `MOD_AI_DAILY_MAX` | The chat-safety reviewer's mode and limits. |
 | `[vars] DISCORD_INVITE_URL` | The community invite a frozen player's Staff tab shows; empty shows none. |
-| `[vars] PATREON_CLIENT_ID`, `PATREON_TIERS` | Patreon linking. |
 
 A var change in the relay's file deploys only with a manual `relay-deploy.yml` run with `redeploy` on. A var change
 in the account file deploys on the next push (the file is under `server-account/**`).
@@ -175,7 +174,6 @@ Repository secrets (Settings > Secrets and variables > Actions):
 | --- | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Every deploy and operator workflow | Nothing deploys. Needs Workers, D1 (edit), R2 and Durable Objects permissions. |
 | `ANTHROPIC_API_KEY` | `account-deploy.yml` -> Worker secret | The chat-safety reviewer (`server-account/src/modAi.js`) is off. |
-| `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | Patreon linking or pledge tracking is off. |
 
 Worker secrets the workflow mints and never stores in the repository: `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`,
 `GATE_PUBLIC_KEY` (account service) and `GATE_SIGNING_KEY` (relay). Rotate the identity pair only on purpose: delete

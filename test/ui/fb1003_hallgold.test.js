@@ -1,4 +1,4 @@
-// HALL-GOLD (FIELD BUGS 2026-10-03, the Patreon chat - a guild of realm characters with "Buy it for Empire of Tamriel:
+// HALL-GOLD (FIELD BUGS 2026-10-03, the players' chat - a guild of realm characters with "Buy it for Empire of Tamriel:
 // 1274880 gold from the treasury" at a house's door: "we have the cash, began with putting it all in guild bank, but then
 // when we went to buy it says whats above ... so went and took all out and put in in bank thinking it meant it had to be
 // within the realm ... so is this a glitch, or r we not putting gold in right place").
