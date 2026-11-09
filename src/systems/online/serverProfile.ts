@@ -66,7 +66,8 @@ export function installProfile(profile: unknown, ph: string): void {
 /** The installed profile's hash, or null when nothing is installed. */
 export const installedProfileHash = (): string | null => installed?.ph ?? null;
 
-/** Does the hash a relay named (`ph` in its welcome) match this page's? A page with none installed matches none. */
+/** Does the hash a relay named (`ph` in its welcome) match this page's? A page with none installed matches only a
+ *  welcome that names no `ph`. */
 export const profileMatches = (ph: unknown): boolean => (typeof ph === 'string' ? ph : null) === installedProfileHash();
 
 /** The pins this page plays by: the installed profile's, else the official profile's. */

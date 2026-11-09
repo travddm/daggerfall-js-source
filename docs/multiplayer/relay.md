@@ -123,7 +123,8 @@ hello.
 
 Because the profile is in the relay bundle, an edit to `officialProfile.ts` is a relay change and needs a new
 `RELAY_VERSION` ([wire-protocol.md](wire-protocol.md)). The self-host kit has no setting for another profile yet: a
-server on other rules needs a build with another profile.
+server on other rules needs a build with another profile. Decision 122 (3) moves the profile into a file the kit
+loads; that is not built yet.
 
 ## Durable storage
 
