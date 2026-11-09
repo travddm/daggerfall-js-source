@@ -83,10 +83,24 @@ test('tools/vendored-mods.json is in the form --update writes, one entry per fol
   assert.equal(readFileSync(MANIFEST_PATH, 'utf8'), serialize(manifest));
   const folders = manifest.mods.map((m) => m.folder);
   assert.equal(new Set(folders).size, folders.length);
+  // A single backslash in the JSON text ("\b") decodes to a backspace, and that pattern never matches.
+  for (const pattern of [manifest.shared, ...manifest.mods].flatMap((b) => b.patterns)) {
+    assert.ok(!/[\u0000-\u001f]/.test(pattern), `a control character in the pattern ${JSON.stringify(pattern)}`);
+    assert.doesNotThrow(() => new RegExp(pattern), `the pattern ${JSON.stringify(pattern)} does not compile`);
+  }
 });
 
-test('no vendored mod grows back: every count in tools/vendored-mods.json holds or falls', () => {
+test('no vendored mod grows back: every count in tools/vendored-mods.json holds, and in CI none has fallen unrecorded', () => {
   const manifest = readManifest();
-  const { grown } = compare(measure(manifest, readTree()), manifest);
+  const { grown, fallen } = compare(measure(manifest, readTree()), manifest);
   assert.deepEqual(grown, [], 'a change added files or lines that name a vendored mod; see tools/vendored-mods.ts');
+  // An unrecorded fall leaves room for the same number of new lines, so CI holds the record to the tree, as the lint
+  // ratchet's --strict does.
+  if (process.env.CI) {
+    assert.deepEqual(
+      fallen,
+      [],
+      'a count fell: run node tools/vendored-mods.ts --update and commit tools/vendored-mods.json',
+    );
+  }
 });

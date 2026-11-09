@@ -60,11 +60,11 @@
         "Ambient Text"
       ],
       "patterns": [
-        "daggerfallunity/mods/303\b"
+        "daggerfallunity/mods/303\\b"
       ],
       "counts": {
         "paths": 5,
-        "lines": 111
+        "lines": 110
       }
     },
     {
@@ -88,11 +88,11 @@
         "Aquatic Sprites"
       ],
       "patterns": [
-        "daggerfallunity/mods/276\b"
+        "daggerfallunity/mods/276\\b"
       ],
       "counts": {
         "paths": 6,
-        "lines": 26
+        "lines": 27
       }
     },
     {
@@ -116,11 +116,11 @@
         "Beautiful Cities"
       ],
       "patterns": [
-        "daggerfallunity/mods/720\b"
+        "daggerfallunity/mods/720\\b"
       ],
       "counts": {
         "paths": 3,
-        "lines": 274
+        "lines": 275
       }
     },
     {
@@ -144,11 +144,11 @@
         "Beautiful Villages"
       ],
       "patterns": [
-        "daggerfallunity/mods/566\b"
+        "daggerfallunity/mods/566\\b"
       ],
       "counts": {
         "paths": 3,
-        "lines": 301
+        "lines": 302
       }
     },
     {
@@ -176,7 +176,7 @@
       "patterns": [],
       "counts": {
         "paths": 21,
-        "lines": 265
+        "lines": 264
       }
     },
     {
@@ -197,13 +197,14 @@
       "terms": [
         "class-skins",
         "classSkins",
-        "Class Skins",
-        "ExistingClasses"
+        "Class Skins"
       ],
-      "patterns": [],
+      "patterns": [
+        "ExistingClasses(?!/)"
+      ],
       "counts": {
         "paths": 1688,
-        "lines": 775
+        "lines": 45
       }
     },
     {
@@ -252,11 +253,11 @@
       ],
       "patterns": [
         "\\bSURV\\d+",
-        "daggerfallunity/mods/49\b"
+        "daggerfallunity/mods/49\\b"
       ],
       "counts": {
         "paths": 34,
-        "lines": 954
+        "lines": 936
       }
     },
     {
@@ -331,11 +332,11 @@
         "\\bcsa[A-Z]\\w*",
         "\\bCSA_\\w+",
         "\\bCSA\\d*\\b",
-        "daggerfallunity/mods/1131\b"
+        "daggerfallunity/mods/1131\\b"
       ],
       "counts": {
         "paths": 72,
-        "lines": 3750
+        "lines": 3727
       }
     },
     {
@@ -372,7 +373,7 @@
       "patterns": [],
       "counts": {
         "paths": 13,
-        "lines": 385
+        "lines": 380
       }
     },
     {
@@ -437,11 +438,11 @@
         "\\bdex[A-Z]\\w*",
         "\\bDEX_\\w+",
         "\\bDEX\\d*\\b",
-        "daggerfallunity/mods/372\b"
+        "daggerfallunity/mods/372\\b"
       ],
       "counts": {
         "paths": 5543,
-        "lines": 859
+        "lines": 860
       }
     },
     {
@@ -497,7 +498,7 @@
         "detStandIns"
       ],
       "patterns": [
-        "daggerfallunity/mods/1080\b"
+        "daggerfallunity/mods/1080\\b"
       ],
       "counts": {
         "paths": 19,
@@ -534,7 +535,7 @@
         "diverseWeaponsIcons"
       ],
       "patterns": [
-        "daggerfallunity/mods/242\b"
+        "daggerfallunity/mods/242\\b"
       ],
       "counts": {
         "paths": 12635,
@@ -575,7 +576,7 @@
       "patterns": [],
       "counts": {
         "paths": 43,
-        "lines": 285
+        "lines": 284
       }
     },
     {
@@ -614,11 +615,11 @@
       "patterns": [
         "\\beotb[A-Z]\\w*",
         "\\bEOTB\\w*",
-        "daggerfallunity/mods/762\b"
+        "daggerfallunity/mods/762\\b"
       ],
       "counts": {
         "paths": 3050,
-        "lines": 1375
+        "lines": 1368
       }
     },
     {
@@ -653,11 +654,11 @@
         "systems/foraging/"
       ],
       "patterns": [
-        "daggerfallunity/mods/1260\b"
+        "daggerfallunity/mods/1260\\b"
       ],
       "counts": {
         "paths": 40,
-        "lines": 272
+        "lines": 267
       }
     },
     {
@@ -684,11 +685,11 @@
         "grimoireArt"
       ],
       "patterns": [
-        "daggerfallunity/mods/1222\b"
+        "daggerfallunity/mods/1222\\b"
       ],
       "counts": {
         "paths": 144,
-        "lines": 100
+        "lines": 101
       }
     },
     {
@@ -715,11 +716,11 @@
         "droppedTorches"
       ],
       "patterns": [
-        "daggerfallunity/mods/780\b"
+        "daggerfallunity/mods/780\\b"
       ],
       "counts": {
         "paths": 44,
-        "lines": 540
+        "lines": 539
       }
     },
     {
@@ -745,11 +746,11 @@
         "Heat Haze"
       ],
       "patterns": [
-        "daggerfallunity/mods/1397\b"
+        "daggerfallunity/mods/1397\\b"
       ],
       "counts": {
         "paths": 8,
-        "lines": 88
+        "lines": 89
       }
     },
     {
@@ -794,11 +795,11 @@
       "patterns": [
         "\\bhcc[A-Z]\\w*",
         "\\bHCC\\d*\\b",
-        "daggerfallunity/mods/1374\b"
+        "daggerfallunity/mods/1374\\b"
       ],
       "counts": {
         "paths": 62,
-        "lines": 1694
+        "lines": 1693
       }
     },
     {
@@ -886,11 +887,11 @@
         "Iliac Puddle"
       ],
       "patterns": [
-        "daggerfallunity/mods/1304\b"
+        "daggerfallunity/mods/1304\\b"
       ],
       "counts": {
         "paths": 43,
-        "lines": 916
+        "lines": 912
       }
     },
     {
@@ -919,7 +920,7 @@
       "patterns": [],
       "counts": {
         "paths": 2,
-        "lines": 190
+        "lines": 189
       }
     },
     {
@@ -952,11 +953,11 @@
         "kkgobkk/immersive-travel"
       ],
       "patterns": [
-        "daggerfallunity/mods/986\b"
+        "daggerfallunity/mods/986\\b"
       ],
       "counts": {
         "paths": 13,
-        "lines": 156
+        "lines": 157
       }
     },
     {
@@ -1019,7 +1020,7 @@
       "patterns": [
         "\\blpt[A-Z]\\w*",
         "\\bLPT\\w*",
-        "daggerfallunity/mods/380\b"
+        "daggerfallunity/mods/380\\b"
       ],
       "counts": {
         "paths": 12,
@@ -1062,11 +1063,11 @@
         "Hole in the Bottom"
       ],
       "patterns": [
-        "daggerfallunity/mods/1313\b"
+        "daggerfallunity/mods/1313\\b"
       ],
       "counts": {
         "paths": 11,
-        "lines": 206
+        "lines": 207
       }
     },
     {
@@ -1096,7 +1097,7 @@
       "patterns": [],
       "counts": {
         "paths": 5,
-        "lines": 504
+        "lines": 503
       }
     },
     {
@@ -1123,11 +1124,11 @@
         "physicalItemsLayer"
       ],
       "patterns": [
-        "daggerfallunity/mods/1411\b"
+        "daggerfallunity/mods/1411\\b"
       ],
       "counts": {
         "paths": 7,
-        "lines": 110
+        "lines": 111
       }
     },
     {
@@ -1182,7 +1183,7 @@
         "fpsSpellCasting"
       ],
       "patterns": [
-        "daggerfallunity/mods/91\b"
+        "daggerfallunity/mods/91\\b"
       ],
       "counts": {
         "paths": 7,
@@ -1214,7 +1215,7 @@
         "basicRoadsOn"
       ],
       "patterns": [
-        "daggerfallunity/mods/134\b"
+        "daggerfallunity/mods/134\\b"
       ],
       "counts": {
         "paths": 5,
@@ -1254,11 +1255,11 @@
         "[Rr]oleplay-realism(?!-items)",
         "[Rr]oleplayRealism(?!Items)",
         "Roleplay & Realism(?!: Items)",
-        "daggerfallunity/mods/16\b"
+        "daggerfallunity/mods/16\\b"
       ],
       "counts": {
         "paths": 56,
-        "lines": 473
+        "lines": 474
       }
     },
     {
@@ -1300,11 +1301,11 @@
         "\\brri[A-Z]\\w*",
         "\\bRRI_\\w+",
         "\\bRRI\\d*\\b",
-        "daggerfallunity/mods/61\b"
+        "daggerfallunity/mods/61\\b"
       ],
       "counts": {
         "paths": 307,
-        "lines": 691
+        "lines": 692
       }
     },
     {
@@ -1327,11 +1328,11 @@
         "Sands of the Alik'r"
       ],
       "patterns": [
-        "daggerfallunity/mods/1390\b"
+        "daggerfallunity/mods/1390\\b"
       ],
       "counts": {
         "paths": 50,
-        "lines": 38
+        "lines": 39
       }
     },
     {
@@ -1358,11 +1359,11 @@
         "seasonsIliacBayAssets"
       ],
       "patterns": [
-        "daggerfallunity/mods/1377\b"
+        "daggerfallunity/mods/1377\\b"
       ],
       "counts": {
         "paths": 4,
-        "lines": 115
+        "lines": 114
       }
     },
     {
@@ -1389,11 +1390,11 @@
         "shieldWidgetAssets"
       ],
       "patterns": [
-        "daggerfallunity/mods/733\b"
+        "daggerfallunity/mods/733\\b"
       ],
       "counts": {
         "paths": 606,
-        "lines": 212
+        "lines": 213
       }
     },
     {
@@ -1432,11 +1433,11 @@
         "dynamic-snow"
       ],
       "patterns": [
-        "daggerfallunity/mods/1401\b"
+        "daggerfallunity/mods/1401\\b"
       ],
       "counts": {
         "paths": 186,
-        "lines": 170
+        "lines": 172
       }
     },
     {
@@ -1479,15 +1480,14 @@
         "travelJunctionMap",
         "travelMapOptions",
         "travelPathsOverlay",
-        "pathData",
         "road/pathData"
       ],
       "patterns": [
-        "daggerfallunity/mods/122\b"
+        "daggerfallunity/mods/122\\b"
       ],
       "counts": {
         "paths": 21,
-        "lines": 1467
+        "lines": 1353
       }
     },
     {
@@ -1515,7 +1515,7 @@
       "patterns": [],
       "counts": {
         "paths": 3,
-        "lines": 176
+        "lines": 175
       }
     },
     {
@@ -1576,7 +1576,7 @@
         "Warm Ashes"
       ],
       "patterns": [
-        "daggerfallunity/mods/985\b"
+        "daggerfallunity/mods/985\\b"
       ],
       "counts": {
         "paths": 16,
@@ -1607,11 +1607,11 @@
         "weaponSheathingAssets"
       ],
       "patterns": [
-        "morrowind/mods/46069\b"
+        "morrowind/mods/46069\\b"
       ],
       "counts": {
         "paths": 78,
-        "lines": 89
+        "lines": 90
       }
     },
     {
@@ -1640,7 +1640,7 @@
         "weaponWidgetMotion"
       ],
       "patterns": [
-        "daggerfallunity/mods/860\b"
+        "daggerfallunity/mods/860\\b"
       ],
       "counts": {
         "paths": 6,
@@ -1681,11 +1681,11 @@
         "'./windfall.js'"
       ],
       "patterns": [
-        "daggerfallunity/mods/1396\b"
+        "daggerfallunity/mods/1396\\b"
       ],
       "counts": {
         "paths": 45,
-        "lines": 117
+        "lines": 119
       }
     },
     {
@@ -1719,11 +1719,11 @@
         "world/windmills"
       ],
       "patterns": [
-        "daggerfallunity/mods/33\b"
+        "daggerfallunity/mods/33\\b"
       ],
       "counts": {
         "paths": 15,
-        "lines": 118
+        "lines": 114
       }
     },
     {
@@ -1750,7 +1750,7 @@
       "patterns": [],
       "counts": {
         "paths": 5,
-        "lines": 240
+        "lines": 239
       }
     },
     {
@@ -1794,11 +1794,11 @@
       "patterns": [
         "\\bwod[A-Z]\\w*",
         "\\bWOD\\w*",
-        "daggerfallunity/mods/181\b"
+        "daggerfallunity/mods/181\\b"
       ],
       "counts": {
         "paths": 130,
-        "lines": 1146
+        "lines": 1137
       }
     },
     {
@@ -1824,11 +1824,11 @@
         "World Tooltips"
       ],
       "patterns": [
-        "daggerfallunity/mods/158\b"
+        "daggerfallunity/mods/158\\b"
       ],
       "counts": {
         "paths": 7,
-        "lines": 168
+        "lines": 169
       }
     },
     {

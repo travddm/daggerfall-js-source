@@ -9,7 +9,7 @@
 //   node tools/vendored-mods.ts --update   # lower the recorded counts to the measurement; never raises one
 //   node tools/vendored-mods.ts --update --allow-growth   # set every count to the measurement: reviewed in the diff
 //   node tools/vendored-mods.ts --report <folder>   # print every hit of one mod (or "shared")
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +24,9 @@ export const SELF = new Set([
   'tools/vendored-mods.json',
   'test/tooling/vendored-mods.test.ts',
 ]);
+
+/** Generated records that list test or source paths: a refresh rewrites them without adding to any mod. */
+const GENERATED = new Set(['tools/testTimes.json']);
 
 /** Files that are never read as text. They are still counted as paths. */
 const BINARY =
@@ -108,7 +111,7 @@ export function hitsByBucket(manifest: Manifest, files: TrackedFile[]): Map<stri
   const each = buckets.map(([key, b]): [string, Bucket | Mod, Matcher] => [key, b, matcherOf([b])]);
   const hits = new Map<string, Hit[]>(buckets.map(([key]) => [key, []]));
   for (const file of files) {
-    if (file.text === null || SELF.has(file.path)) continue;
+    if (file.text === null || SELF.has(file.path) || GENERATED.has(file.path)) continue;
     const lowerFile = file.text.toLowerCase();
     if (!names(any, file.text, lowerFile)) continue;
     const lines = file.text.split('\n');
@@ -197,9 +200,10 @@ export function readManifest(path: string = MANIFEST_PATH): Manifest {
 /** Every tracked file of the checkout, with its text unless it is binary. */
 export function readTree(root: string = ROOT): TrackedFile[] {
   const listing = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: 1 << 28 }).toString();
+  // The index still lists a file deleted with `rm` rather than `git rm`; the tree no longer has it.
   return listing
     .split('\0')
-    .filter(Boolean)
+    .filter((path) => path && existsSync(join(root, path)))
     .map((path) => {
       if (BINARY.test(path)) return { path, text: null };
       const bytes = readFileSync(join(root, path));
