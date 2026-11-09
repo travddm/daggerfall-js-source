@@ -1,4 +1,4 @@
-// STAFF-ROLES-BY-ACCOUNT: THE OPERATOR'S WAY TO SET A STAFF ROLE - the first Owner and Admin.
+// THE OPERATOR'S WAY TO SET A STAFF ROLE - the first Owner and Admin.
 //
 //   node tools/staffRole.mjs find <handle>                          the account id, when it registered, and its roles
 //   node tools/staffRole.mjs set <account id> owner|admin|moderator|none

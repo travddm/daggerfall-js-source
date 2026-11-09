@@ -908,7 +908,7 @@ const service = {
         return 'error' in r ? no(r.error, r.error === 'seen-signature' ? 401 : 400, origin) : json(r, 202, origin);
       }
 
-      // SAFE5: THE DOOR THE CHAT'S SAFETY OPENS TO A STRANGER - the relay's feed. It is not JSON a session carries; it is
+      // THE DOOR THE CHAT'S SAFETY OPENS TO A STRANGER - the relay's feed. It is not JSON a session carries; it is
       // proven by a signature over its exact bytes, checked before a byte is read.
       if (SAFE_OPEN_ROUTES.has(path)) {
         if (request.method !== 'POST') return no('method', 405, origin);

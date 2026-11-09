@@ -133,7 +133,7 @@ export const credibleReporter = (player, nowS) => accountKind(player) === 'linke
 /**
  * The account's open case, or a new one. A case opened by a report is the reports'; one the reviewer opened is the
  * reviewer's (`source`). The reviewer's read starts `due` when it is on, `off` otherwise - but a case the reviewer
- * opened from the feed starts READ (`done`): that read was its verdict (AUDIT SAFE AI-6).
+ * opened from the feed starts READ (`done`): that read was its verdict.
  * STAFF-PANEL2-FIX: of its `kind` - a spawn grants' case is never a chat report's.
  * @param {{ db: any, nowS: number, rand: (b: Uint8Array) => void }} ctx @param {any} env @param {string} target @param {'report'|'review'} source
  * @param {'chat'|'spawn'} [kind]
@@ -187,7 +187,7 @@ export const touchCase = (db, env, caseId, nowS) => db.prepare(`UPDATE mod_cases
 
 /**
  * A CASE CLOSED - by its id, or the account's open one: actioned or dismissed, by whom and how. The reviewer's read is
- * no longer wanted (AUDIT SAFE AI-2: a dismissed case was read and muted after). A statement, for the caller's batch.
+ * no longer wanted (else a dismissed case was read and muted after). A statement, for the caller's batch.
  * @param {any} db @param {{ caseId?: string|null, target?: string|null, status: 'actioned'|'dismissed', by: string, resolution: string, nowS: number }} r
  */
 export const resolveCase = (db, { caseId = null, target = null, status, by, resolution, nowS }) => db.prepare(`UPDATE mod_cases SET status = ?3,
@@ -327,8 +327,7 @@ export const modDismiss = (ctx, actor, env, { target, name, caseId = null }, { f
  *   Worker cut off mid-act leaves a struck case open for a second strike.
  * - ONE PRESS, ONE STRIKE: a click is UNIQUE in `mod_actions` (mod_actions_click), so the same press sent twice at
  *   once, with no case to take, strikes once - the second's record refused by the index and answered as the first.
- * - THE AUDIT ROW IS WRITTEN HERE (Weak spots: audit rows are written inside the shared act code, so in-game acts land
- *   in the log too): one row an act - ok, denied or failed, the door named (`from`) - whichever door asked.
+ * - THE AUDIT ROW IS WRITTEN HERE, inside the shared act code, so in-game acts land in the log too: one row an act - ok, denied or failed, the door named (`from`) - whichever door asked.
  *   The panel hands in its own writer (its session's role and key); the others write as the actor's staff role. */
 
 /** A press's one-time id, as a door sends it (the panel's own). */
