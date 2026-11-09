@@ -6,14 +6,14 @@ seasons are in [time-and-weather.md](time-and-weather.md).
 
 ## Units and frames
 
-| Quantity | Value | Where |
-| --- | --- | --- |
-| Map | 1000 x 500 map pixels | `MAX_MAP_PIXEL_X/Y` in `src/world/streamingWorld.js` |
-| Map pixel | 819.2 world units (32768 x `GLOBAL_SCALE` 0.025) | `TERRAIN_SIZE` in `src/world/terrain/terrainSampler.js` |
-| Heightmap per pixel | 129 x 129 samples (128 cells, about 6.4 units each) | `HEIGHTMAP_DIMENSION` |
-| Ground tiles per pixel | 128 x 128 | `src/world/terrain/terrainTiles.js` |
-| RMB block (town) | 102.4 units | `RMB_SIDE` in `src/world/locationLayout.js` |
-| RDB block (dungeon) | 51.2 units | `RDB_SIDE` in `src/world/dungeon/dungeonLayout.js` |
+| Quantity               | Value                                               | Where                                                   |
+| ---------------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| Map                    | 1000 x 500 map pixels                               | `MAX_MAP_PIXEL_X/Y` in `src/world/streamingWorld.js`    |
+| Map pixel              | 819.2 world units (32768 x `GLOBAL_SCALE` 0.025)    | `TERRAIN_SIZE` in `src/world/terrain/terrainSampler.js` |
+| Heightmap per pixel    | 129 x 129 samples (128 cells, about 6.4 units each) | `HEIGHTMAP_DIMENSION`                                   |
+| Ground tiles per pixel | 128 x 128                                           | `src/world/terrain/terrainTiles.js`                     |
+| RMB block (town)       | 102.4 units                                         | `RMB_SIDE` in `src/world/locationLayout.js`             |
+| RDB block (dungeon)    | 51.2 units                                          | `RDB_SIDE` in `src/world/dungeon/dungeonLayout.js`      |
 
 `worldCoordToMapPixel` and `mapPixelToWorldCoords` (`streamingWorld.js`) convert; map Y is flipped against world Z.
 
@@ -143,13 +143,13 @@ The Imperial City is its own build (`src/world/imperialCity.js`, `imperialBlocks
 
 ### Town and region systems
 
-| File | Role |
-| --- | --- |
-| `src/systems/town/townPopulation.js` | Wandering townsfolk (`TownPopulation`, `maxPopulationFor`) |
-| `src/systems/town/townWatch.js` | Guards answering threats (`createTownWatch`) |
-| `src/systems/town/townEcon.js` | Town economy (`createTownEcon`) |
-| `src/systems/town/townSeats.js` | Seats of rule and palaces (`deriveTownSeats`) |
-| `src/systems/region/regionHubs.js`, `marketHubs.js` | Hub cities per region and province |
+| File                                                       | Role                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `src/systems/town/townPopulation.js`                       | Wandering townsfolk (`TownPopulation`, `maxPopulationFor`)               |
+| `src/systems/town/townWatch.js`                            | Guards answering threats (`createTownWatch`)                             |
+| `src/systems/town/townEcon.js`                             | Town economy (`createTownEcon`)                                          |
+| `src/systems/town/townSeats.js`                            | Seats of rule and palaces (`deriveTownSeats`)                            |
+| `src/systems/region/regionHubs.js`, `marketHubs.js`        | Hub cities per region and province                                       |
 | `src/systems/region/regionConditions.js`, `regionPower.js` | Region flags and faction power, port of `RegionPowerAndConditionsUpdate` |
 
 Trap: the province key is spelled `Sumurset` in `urbanRecords.js`, `townLook.js` and `tamrielCapitals.js`.
@@ -207,6 +207,12 @@ Walked travel (autopilot) is the port's own: `travelRoute.js` `planRoute` (costs
 hands off to ships (see [naval.md](naval.md)). `src/systems/immersiveTravel.js` ports the Immersive Travel mod's
 carriage and sailor services.
 
+Travel Options' own journey (`beginTravel`) walks a straight line, as the mod does. With the mod pane's Avoid Obstacles
+key on (the default; a port key, off is the mod's beeline), the steering (`travelSteer.js`) feels its way at two heights
+over the feet, so a rail fence's rails are seen, and the journey walks the streets of every town it starts in or crosses
+on the town's grid (`townWalk.js`, `src/scenes/townWalkHost.js`). That journey grid covers the faces of the town's solid
+models (fences, walls, the town mods' pieces), which DFU's town grid does not hold; the residents' grid is unchanged.
+
 Map: `src/systems/map/mapTabs.js` (automap, town, world sheets), `mapWaypoints.js` (personal, party, guild
 waypoints); the surface is `src/ui/heldMap.js`. Horse and wagon: `src/systems/horse/horseCart.js` runs them,
 `horseCartLaw.js` holds the modes; `src/systems/wagon/` holds wagon kinds, seats, ropes, looks and upkeep.
@@ -237,16 +243,16 @@ The Tamriel trace past the Bay is being remade. This section describes the code 
 
 ## Tests
 
-| Area | Test files |
-| --- | --- |
-| Terrain and streaming | `test/world/terrain/terrain.test.js`, `test/world/terrain/terrainworker.test.js`, `test/world/streaming.test.js` |
-| Landforms | `test/world/terrain/landform6.test.js`, `test/world/terrain/auditlandforms.test.js`, `test/world/peaks2_massif.test.js` |
-| Roads | `test/world/road/roads.test.js`, `test/world/road/roadsReal.test.js`, `test/world/gateroads.test.js` |
-| Towns | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js` |
-| Dungeons | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js` |
-| Delve, super dungeons | `test/systems/sense1_dungeonsense.test.js`, `test/systems/echo1_dungeonecho.test.js`, `test/systems/superDungeon/sd2_sdsite.test.js` |
-| Discovery, travel | `test/systems/audit26_discovery.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js` |
-| Past the Bay | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js` |
+| Area                  | Test files                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Terrain and streaming | `test/world/terrain/terrain.test.js`, `test/world/terrain/terrainworker.test.js`, `test/world/streaming.test.js`                            |
+| Landforms             | `test/world/terrain/landform6.test.js`, `test/world/terrain/auditlandforms.test.js`, `test/world/peaks2_massif.test.js`                     |
+| Roads                 | `test/world/road/roads.test.js`, `test/world/road/roadsReal.test.js`, `test/world/gateroads.test.js`                                        |
+| Towns                 | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js`                                  |
+| Dungeons              | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js` |
+| Delve, super dungeons | `test/systems/sense1_dungeonsense.test.js`, `test/systems/echo1_dungeonecho.test.js`, `test/systems/superDungeon/sd2_sdsite.test.js`        |
+| Discovery, travel     | `test/systems/audit26_discovery.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js`                                  |
+| Past the Bay          | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js`               |
 
 Tests that read the map need ARENA2: run `sh tools/fetch-data.sh` and set `ARENA2_PATH`.
 

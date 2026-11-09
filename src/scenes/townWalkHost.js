@@ -12,18 +12,33 @@
 //   - townWay(from, to): the way from `from` to the street nearest `to` (or the town's edge toward it), as natives, and
 //     its town's pace - or null; `shut` when it ends short behind a gate shut for the night (AUDIT OW-REVISITED L6-3: and
 //     only then - a way the gates would not have opened is walked as far as it reaches).
-// THE JOURNEY'S GRID is the town's with each OPEN city gate's passage carved through it (systems/travel/townWalk.js
-// gatePassage, carveNav): the pixel's own gates (`cityGates`, DaggerfallCityGate's placements the build keeps, each its
+// THE JOURNEY'S GRID is the town's with its solid models' faces covered (TOWN-SOLIDS: townWalk.js solidCells, coverNav -
+// the fences, walls and town mods' pieces no automap holds; the built pixel's `models`, townSolids) and each OPEN city gate's
+// passage carved through it (systems/travel/townWalk.js gatePassage, carveNav): the pixel's own gates (`cityGates`, DaggerfallCityGate's placements the build keeps, each its
 // model open or closed as the frame's tick left it - world/city/cityGate.js), at their model's middle on the grid. Kept
 // a town and its gates' state (JOURNEY_GRIDS_MAX of them), so a gate swung at dusk makes its town's grid again; one whose
 // pixel was built again or let go is dropped.
 // The streaming host constructs it (scenes/world.js); the other three hosts stream no pixels and walk no journey
 // through a town: scenes/exterior.js (the fixed city - no Travel Options journey crosses it), scenes/worldModes.js (a
 // building) and scenes/dungeonContext.js (a dungeon).
-import { townWayCells, townWayCellsSteps, gatePassage, carveNav, componentsOf, edgePieces, snapCell, TOWN_PACE_MAX, IMPERIAL_PACE_MAX } from '../systems/travel/townWalk.js';
+import {
+  townWayCells,
+  townWayCellsSteps,
+  gatePassage,
+  carveNav,
+  coverNav,
+  solidCells,
+  componentsOf,
+  edgePieces,
+  snapCell,
+  TOWN_PACE_MAX,
+  IMPERIAL_PACE_MAX,
+} from '../systems/travel/townWalk.js';
+import { NAV_CELL } from '../world/city/cityNavigation.js';
 import { worldCoordToMapPixel } from '../formats/mapsFile.js';
-import { CITY_GATE_OPEN_MODEL_ID } from '../world/rmbLayout.js';
-import { capitalOnPixel } from '../world/tamrielCapitals.js';   // IC-PACE: the Imperial City's slices
+import { CITY_GATE_OPEN_MODEL_ID, isCityGate } from '../world/rmbLayout.js';
+import { isSolidModel } from '../world/customModels.js';
+import { capitalOnPixel } from '../world/tamrielCapitals.js'; // IC-PACE: the Imperial City's slices
 
 /** IC-PACE: the most a journey's clock runs in the streets of the town on map pixel (x, y) - a town's pace, the Imperial
  *  City's own on every one of its slices (world/tamrielCapitals.js capitalOnPixel). */
@@ -39,10 +54,24 @@ export const WAY_STEPS_AN_ASK = 6;
  *  its pieces' labels live as long as it does: about 8 MB at the greatest (AUDIT OW-REVISITED L1-7). */
 export const JOURNEY_GRIDS_MAX = 4;
 
-/** @param {{ built: Map<string, any>, state: any }} host */
+/** TOWN-SOLIDS: a built pixel's solid models, pixel-local - every model the build placed and drew (`models`, scenes/
+ *  pixelBuild.js: each its matrix `local` and its model id `_order`) that is solid (world/customModels.js isSolidModel)
+ *  and no city gate (the journey's grid carves its passage, townWalk.js gatePassage), its mesh read from `cpuModels`. */
+export function townSolids(b, cpuModels) {
+  const out = [];
+  for (const m of b?.models ?? []) {
+    if (!isSolidModel(m._order) || isCityGate(m._order)) continue;
+    const cpu = cpuModels?.get(m._order);
+    if (cpu?.positions && cpu.indices) out.push({ positions: cpu.positions, indices: cpu.indices, matrix: m.local });
+  }
+  return out;
+}
+
+/** @param {{ built: Map<string, any>, state: any, cpuModels?: Map<any, any> }} host */
 export function createTownWalk(host) {
-  const { built, state } = host;
-  const grids = new Map();   // pixel key -> { base, sig, nav, shut }
+  const { built, state, cpuModels } = host;
+  const grids = new Map(); // pixel key -> { base, sig, nav, shut }
+  const solidMasks = new WeakMap(); // TOWN-SOLIDS: a town's grid -> the cells its solid models close (gone with the grid)
   /** IC-STUTTER: the way in the making - its town, its grid's state and its point (`k`), its search's steps. */
   let making = /** @type {?{ k: string, steps: Generator<void, any, void> }} */ (null);
   /** The town at a native point: its pixel's key, grid, origin and translation, and the point's cell - or null. */
@@ -50,24 +79,46 @@ export function createTownWalk(host) {
     const px = worldCoordToMapPixel(n.x, n.z);
     const key = `${px.x},${px.y}`;
     const b = built.get(key);
-    const nav = b?.population?.nav, o = b?.locOrigin;
+    const nav = b?.population?.nav,
+      o = b?.locOrigin;
     if (!nav || !o) return null;
     const t = state.pixelTranslation(px.x, px.y);
     const [sx, sz] = state.localFromWorld(n.x, n.z);
     const cell = nav.worldToNav(sx - o[0] - t[0], sz - o[2] - t[2]);
     return { key, px, b, nav, o, t, cell, inside: nav.inBounds(cell[0], cell[1]) };
   }
+  /** TOWN-SOLIDS: the cells the town's solid models close (systems/travel/townWalk.js solidCells), worked out once a
+   *  town's grid - the gates' state never changes them. */
+  function solidsOf(town) {
+    let got = solidMasks.get(town.nav);
+    if (!got) {
+      got = solidCells(town.nav, townSolids(town.b, cpuModels), town.o, NAV_CELL);
+      solidMasks.set(town.nav, got);
+    }
+    return got;
+  }
   /** The town's journey grid: its own with each open gate's passage carved through (`allOpen`: every gate's, as by day)
    *  - and whether any gate is shut. */
   function journeyGrid(town, allOpen = false) {
-    const gates = (town.b.cityGates ?? []).map((g) => ({ open: allOpen || g.gate?.modelId === CITY_GATE_OPEN_MODEL_ID, local: g.local }));
+    const gates = (town.b.cityGates ?? []).map((g) => ({
+      open: allOpen || g.gate?.modelId === CITY_GATE_OPEN_MODEL_ID,
+      local: g.local,
+    }));
     const sig = gates.map((g) => (g.open ? 1 : 0)).join('');
     const key = `${town.key}|${sig}`;
     const kept = grids.get(key);
     if (kept && kept.base === town.nav) return kept;
-    const passages = gates.filter((g) => g.open && g.local).map((g) => gatePassage(town.nav, town.nav.worldToNav(g.local[12] - town.o[0], g.local[14] - town.o[2]))).filter(Boolean);
-    const made = { base: town.nav, sig, nav: carveNav(town.nav, passages), shut: gates.some((g) => !g.open) };
-    for (const [k, g] of grids) if (built.get(k.split('|')[0])?.population?.nav !== g.base) grids.delete(k);   // a pixel built again or let go
+    const passages = gates
+      .filter((g) => g.open && g.local)
+      .map((g) => gatePassage(town.nav, town.nav.worldToNav(g.local[12] - town.o[0], g.local[14] - town.o[2])))
+      .filter(Boolean);
+    const made = {
+      base: town.nav,
+      sig,
+      nav: carveNav(coverNav(town.nav, solidsOf(town)), passages),
+      shut: gates.some((g) => !g.open),
+    };
+    for (const [k, g] of grids) if (built.get(k.split('|')[0])?.population?.nav !== g.base) grids.delete(k); // a pixel built again or let go
     grids.delete(key);
     grids.set(key, made);
     if (grids.size > JOURNEY_GRIDS_MAX) grids.delete(grids.keys().next().value);
@@ -91,9 +142,9 @@ export function createTownWalk(host) {
       if (!town?.inside) return null;
       const pace = paceAt(town.px.x, town.px.y);
       const pieces = edgePieces(town.nav);
-      if (!town.b.cityGates?.length || pieces.edge.size >= pieces.all) return pace;   // no walls (or none that close): the grid is the town
-      const at = snapCell(town.nav, town.cell);   // a doorstep reads as its street
-      return at && pieces.edge.has(componentsOf(town.nav)[at[1] * town.nav.width + at[0]]) ? null : pace;   // the fields' piece (the residents' grid, its gates closed) is no street of the town
+      if (!town.b.cityGates?.length || pieces.edge.size >= pieces.all) return pace; // no walls (or none that close): the grid is the town
+      const at = snapCell(town.nav, town.cell); // a doorstep reads as its street
+      return at && pieces.edge.has(componentsOf(town.nav)[at[1] * town.nav.width + at[0]]) ? null : pace; // the fields' piece (the residents' grid, its gates closed) is no street of the town
     },
     townWay(from, to) {
       const town = townAt(from);
@@ -113,8 +164,9 @@ export function createTownWalk(host) {
       const way = got.value;
       // short of its point: behind a shut gate - said, if the gates open by day would have let it through; else (a yard
       // the houses close in, its piece no street reaches) walked as far as it reaches, never blamed on the gates
-      const pace = paceAt(town.px.x, town.px.y);   // IC-PACE
-      if (!way?.reached && grid.shut && townWayCells(journeyGrid(town, true).nav, town.cell, toCell)?.reached) return { pts: [], inside: !!way?.inside, shut: true, pace };
+      const pace = paceAt(town.px.x, town.px.y); // IC-PACE
+      if (!way?.reached && grid.shut && townWayCells(journeyGrid(town, true).nav, town.cell, toCell)?.reached)
+        return { pts: [], inside: !!way?.inside, shut: true, pace };
       if (!way) return null;
       // AUDIT OW-REVISITED L1-2: the first cell kept - the walk's first run is checked from it (the pursuit takes it up
       // from where the body stands), where the line from the body to the second cell was never checked at all
