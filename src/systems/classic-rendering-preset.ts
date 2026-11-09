@@ -29,10 +29,12 @@ export type ClassicRenderingDoors = {
 export const CLASSIC_RENDERING_SAVED_PREF = 'classicRenderingSaved';
 
 /** Features rows the preset sets. Land view 3 is Daggerfall Unity's default terrain distance; ground sharpness off draws
- *  the ground without mip-mapped sharpening, as the retro picture does. */
+ *  the ground without mip-mapped sharpening, as the retro picture does; distance shading gives the original game's
+ *  steps to dark and fog. */
 export const CLASSIC_RENDERING_ROWS: Readonly<Record<string, RowValue>> = Object.freeze({
   'land-view-distance': 3,
   'ground-sharpness': 'off',
+  'classic-distance-shading': 'steps',
 });
 
 /** Daggerfall Unity's retro keys: 320x200, 4:3, palettization of the whole picture, and no mip maps. */

@@ -787,6 +787,7 @@ export function gpuNameOf(gl) {
 import { multiply as mat4Multiply } from '../world/mat4.js';   // PERF-CROWD2: proj * view, for this call's planes
 import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js';   // EL8: `?perf`   // EL5: the bounds every bundle carries for the replays' culling   // EL2: the lane's shadow maps - a leaf that compiles nothing until a lane asks
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
+import { DistanceShadePass } from './classic-distance-shading.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -1711,14 +1712,14 @@ export class Renderer {
     this._sceneGrade = null;   // SD-LOOK: the frame's grade, taken by its resolve (setSceneGrade)
     this._airWanted = false;
     this._frameFbo = null;   // EL4: the frame image the world pass draws into while the air is on (null = the canvas)
-    // RETRO1: DFU's retro mode (render/retroPass.js, systems/retroMode.js). The source is a function answering the
-    // frame's retro config or null - main.js hands it systems/retroMode.js's retroFrameConfig, so this file never
-    // reads the settings store; it is asked once per WORLD frame
+    // DFU's retro mode (render/retroPass.js). main.js hands in the source, so this file never reads the settings store.
     this._retro = null;         // the RetroPass, built on the first retro frame
     this._retroSource = null;
     this._retroFrame = null;    // the retro world frame in flight: its image, its effect, the rect it presents to, its depth
     this._retroOwed = false;    // a retro image is drawn and not yet presented
     this._retroMips = true;     // whether the world's textures read their mip chains (TextureReader's retro arm)
+    this._shade = null;         // the DistanceShadePass, built on the first shaded frame
+    this._shadeSource = null;   // whether classic distance shading is on; main.js hands it in, as the retro source
     // PERF-SCALE: the render scale's source (systems/renderScale.js renderScaleSetting, handed over by main.js as the
     // retro source is) - a function answering the frame's scale, 1 the whole canvas. Null (every test's) is 1
     this._scaleSource = null;
@@ -2910,14 +2911,9 @@ export class Renderer {
    *  were taken from. The mip chains follow the config (a no-op unless it
    *  changed); retro mode off frees the palette's LUT (E2).
    *
-   *  PERF-SCALE: THE ONE HOME FOR A WORLD DRAWN SMALLER AND
-   *  SHOWN. With retro off and the render scale below 1, the frame is a
-   *  `kind: 'scale'` one on this same path: the image is the host's world
-   *  rect (the canvas when none) x the scale, rounded, and its present is
-   *  LINEAR and effect-free (RetroPass.present `smooth`). Retro wins - its
-   *  config is asked first and a retro frame never reads the scale. At a
-   *  scale of 1 there is no frame: the world draws straight to the canvas
-   *  (or the lane's canvas-sized frame) as it always did.
+   *  With retro off, a render scale below 1 makes a `kind: 'scale'` frame: the world rect x the scale, presented
+   *  LINEAR and effect-free. Classic distance shading at a scale of 1 makes one at full size, for its depth. Retro
+   *  wins. With none of the three the world draws straight to the canvas (or the lane's canvas-sized frame).
    *
    *  THE REVIEW: the world frame that goes back to no image (retro off, the
    *  scale back at 100%) frees the image the last one drew - the RetroPass's
@@ -2953,11 +2949,10 @@ export class Renderer {
     return this._retroFrame;
   }
 
-  /** PERF-SCALE: the render scale's image for this frame - { scale, width, height }, the host's world rect in canvas
-   *  pixels (the whole canvas when it set none) x the scale, rounded - or null at 1 (or a source that answers no
-   *  scale below it), or over an empty rect. */
+  /** The world image for this frame, { scale, width, height }: the world rect x the render scale, or at full size while
+   *  distance shading needs the image's depth; null when neither is on, or over an empty rect. */
   _scaledImage() {
-    const scale = this._scaleOn();
+    const scale = this._scaleOn() ?? (this._shadeSource?.() ? 1 : null);
     if (scale === null) return null;
     const p = this._worldViewportPx ?? [0, 0, this.canvas.width, this.canvas.height];
     if (!(p[2] > 0 && p[3] > 0)) return null;
@@ -2971,13 +2966,21 @@ export class Renderer {
     return scale > 0 && scale < 1 ? scale : null;
   }
 
-  /** PERF-SCALE (the review): free the world's image - the RetroPass's image and depth and the lane's image-sized
-   *  frame - once a world frame draws without one. Reached after the owed present (_beginLane presents first).
-   *  AUDIT BRANCH-0925 PS-A2: the frame is the KEPT pass's (`_airPass`, built once), not the installed one's - with
-   *  the lane or the air off `_air` is null while the pass keeps its frames, and this is the one chance to free it. */
+  /** Frees the world image once a world frame draws without one. The lane's frame is the kept pass's (`_airPass`):
+   *  with the lane off, `_air` is null while the pass still holds its frames. */
   _dropWorldImage() {
     this._retro?.dropTarget();
+    this._shade?.dropTarget();
     this._airPass?.dropFrame('retro');
+  }
+
+  /** Classic distance shading over the world image, before the present palettizes it (render/classic-distance-shading.ts). */
+  _shadeWorldImage(f) {
+    const image = this._retro.target;
+    if (!image) return;
+    this._shade ??= new DistanceShadePass(this.gl, { build: (vs, fs) => this._buildProgram(vs, fs) });
+    const fog = { mode: this._fogMode, density: this._fogDensity, end: this._fogRange[1], color: this._fogColor };
+    this._shade.draw({ color: image.tex, depth: f.depth ?? image.depth, width: image.w, height: image.h, proj: this._proj, fog });
   }
 
   /** RETRO1: the RetroPass, built once. */
@@ -2992,14 +2995,9 @@ export class Renderer {
       : null;
   }
 
-  /** RETRO1: PRESENT the retro image to the canvas (RetroPass.present) - the
-   *  classic lane's resolve, and the lane's second half once its own resolve
-   *  has written the image. The present binds units 0..2 and a program and a
-   *  VAO of its own, so the shadows are forgotten after it. AUDIT RETRO1 J1:
-   *  both callers in _compositeAir call it BEFORE the frame's meter closes,
-   *  so `?perf` shows the present - and the LUT's slice inside it - as the
-   *  frame's last span, `retro` (the classic arm's line carries no comment:
-   *  PERF-2D's pin reads that function's first 700 characters). */
+  /** Presents the world image to the canvas (RetroPass.present), distance-shaded first when that is on. It binds units
+   *  and a program of its own, so the shadows are forgotten after it. Both callers in _compositeAir call it before the
+   *  frame's meter closes, so `?perf` shows it as the frame's last span. */
   _presentRetroFrame() {
     if (this._perfOpen) this._perf?.mark('retro');
     this._retroOwed = false;
@@ -3007,6 +3005,7 @@ export class Renderer {
     const f = this._retroFrame;
     try {
       if (this._retro && f) {
+        if (this._shadeSource?.()) this._shadeWorldImage(f);
         this._retro.present({
           depth: f.depth, rect: this._viewportPx(f.view) ?? [0, 0, this.canvas.width, this.canvas.height], canvasW: this.canvas.width, canvasH: this.canvas.height,
           post: f.post, lutShift: f.lutShift, clear: this._clearColor, scissor: this._scissor,
@@ -3048,10 +3047,10 @@ export class Renderer {
   /** PERF-SCALE: where the renderer asks for each WORLD frame's render scale - systems/renderScale.js
    *  renderScaleSetting, handed over by main.js; null (the default, and every test's) is 1, today's frame. */
   setRenderScaleSource(fn) { this._scaleSource = typeof fn === 'function' ? fn : null; }
-  /** PERF-SCALE: THE FRAME'S SIZE, for the FPS counter - the world image it draws into ([w, h]: the scale's or
-   *  retro's image, else the host's world rect, else the canvas), the canvas, the page's devicePixelRatio, the
-   *  render scale the last world frame took (1 under retro or at 100%) and the GPU (read once, gpuNameOf). A
-   *  property read or two: the counter asks once a second. */
+  /** Where the renderer asks whether classic distance shading is on, once per world frame. Null (every test's) is off. */
+  setDistanceShadeSource(fn) { this._shadeSource = typeof fn === 'function' ? fn : null; }
+  /** The frame's size for the FPS counter: the world image, the canvas, the devicePixelRatio, the render scale the
+   *  last world frame took (1 under retro or at 100%) and the GPU. The counter asks once a second. */
   get frameInfo() {
     const f = this._retroFrame, c = this.canvas, p = this._worldViewportFrame ? this._viewportPx(this._worldViewportFrame) : null;
     return {

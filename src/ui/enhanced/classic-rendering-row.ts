@@ -26,8 +26,8 @@ const WORDS = {
   note: (): string =>
     t(
       'menu.settings.classicRendering.note',
-      'Classic picture 320x200, Classic aspect 4:3 and Classic colours Palettization, with ground sharpness Off, ' +
-        'no mip maps and land view distance 3.',
+      'Classic picture 320x200, Classic aspect 4:3, Classic colours Palettization and Classic distance shading, ' +
+        'with ground sharpness Off, no mip maps and land view distance 3.',
     ),
   effect: (): string =>
     t(

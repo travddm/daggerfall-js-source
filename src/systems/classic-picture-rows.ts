@@ -1,7 +1,8 @@
-// The Features rows over Daggerfall Unity's retro mode (systems/retroMode.js). Each row is a door over one of DFU's own
-// [Video] keys, so a DFU settings file keeps its meaning. The keys alone sat under DFU's names in the Retro look section,
-// where few players looked for the original game's picture. Mip maps and the palette shift stay plain keys there.
-import { t } from './textManager.js';
+// The Features rows for the original game's picture. Three are doors over Daggerfall Unity's retro mode
+// (systems/retroMode.js), each over one of DFU's own [Video] keys, so a DFU settings file keeps its meaning. The keys
+// alone sat under DFU's names in the Retro look section, where few players looked. Mip maps and the palette shift stay
+// plain keys there. The fourth, classic distance shading (render/classic-distance-shading.ts), is this game's own.
+import { t, localizedText } from './textManager.js';
 
 type SettingsRow = {
   readonly id: string;
@@ -12,6 +13,22 @@ type SettingsRow = {
   readonly kinds: readonly string[];
   readonly control: { readonly store: 'settings'; readonly key: string };
 };
+
+type Tier = readonly [string, string];
+
+type PrefsRow = Omit<SettingsRow, 'control'> & {
+  readonly control: {
+    readonly store: 'prefs';
+    readonly key: string;
+    readonly initial: string;
+    readonly online: 'player';
+    readonly tiers: readonly Tier[];
+  };
+};
+
+/** A tier whose label is read in the player's language when it is shown. */
+const tier = (value: string, label: () => string): Tier =>
+  Object.freeze(Object.defineProperty([value], 1, { enumerable: true, get: label }) as unknown as Tier);
 
 const takesEffectAtOnce = (): string => t('features.effect.atOnce', 'Takes effect at once.');
 
@@ -75,9 +92,41 @@ const CLASSIC_COLOURS_ROW: SettingsRow = Object.freeze({
   control: Object.freeze({ store: 'settings', key: 'Video/PostProcessingInRetroMode' }),
 });
 
+/** Off by default (decision #104). 'steps' is route A; route B, the original palette tables, would be a third tier. */
+const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
+  id: 'classic-distance-shading',
+  group: 'sight',
+  get title() {
+    return t('features.classicDistanceShading.title', 'Classic distance shading');
+  },
+  get note() {
+    return t(
+      'features.classicDistanceShading.note',
+      'Darkens the world in 64 steps with distance, as the original game did: to black in dungeons and buildings, ' +
+        'and to the fog colour outdoors. Made for Classic picture, but it works without it. The original game picked ' +
+        'one step for each surface; this picks one for each pixel.',
+    );
+  },
+  get effect() {
+    return takesEffectAtOnce();
+  },
+  kinds: Object.freeze(['enhanced']),
+  control: Object.freeze({
+    store: 'prefs',
+    key: 'classicDistanceShading',
+    initial: 'off',
+    online: 'player',
+    tiers: Object.freeze([
+      tier('off', () => localizedText('off', 'Off')),
+      tier('steps', () => t('features.classicDistanceShading.steps', 'Steps')),
+    ]),
+  }),
+});
+
 /** In the order the Features home draws them. */
-export const CLASSIC_PICTURE_ROWS: readonly SettingsRow[] = Object.freeze([
+export const CLASSIC_PICTURE_ROWS: readonly (SettingsRow | PrefsRow)[] = Object.freeze([
   CLASSIC_PICTURE_ROW,
   CLASSIC_ASPECT_ROW,
   CLASSIC_COLOURS_ROW,
+  CLASSIC_DISTANCE_SHADING_ROW,
 ]);

@@ -37,7 +37,7 @@ function storesDoors(stores: Stores): ClassicRenderingDoors {
 
 function playerStores(): Stores {
   return {
-    rows: { 'land-view-distance': 5, 'ground-sharpness': 'max' },
+    rows: { 'land-view-distance': 5, 'ground-sharpness': 'max', 'classic-distance-shading': 'off' },
     video: {
       'Video/RetroRenderingMode': '0',
       'Video/RetroModeAspectCorrection': '2',

@@ -11,7 +11,7 @@ frame, and the rules for code that draws. It is hand-written WebGL2 with no engi
 - the world programs (mesh, billboard, terrain, character, decal, water) in two sets: the classic set and the
   enhanced lighting set ([lighting-and-shadows.md](lighting-and-shadows.md));
 - texture, mesh and billboard caches;
-- the post passes it drives: the shadow pass, the air pass, the retro pass;
+- the post passes it drives: the shadow pass, the air pass, the retro pass, the distance shading pass;
 - per-frame counters in `renderer.stats` (`draws`, `programBinds`, `vaoBinds`, `texBinds`, `bbCulled`,
   `spriteBinds`, `viewDraws`, `shadowDraws`) and `renderer.frameInfo`. The FPS counter shows them.
 
@@ -67,7 +67,8 @@ What `beginFrame` does:
    (`setWorldViewport`, used by the docked large HUD). The request is consumed, so the host asks every frame.
 3. `_beginLane`:
    - presents an image still owed from the previous frame (the enhanced resolve or a retro image);
-   - opens a retro or render-scale image when one is active (`_retroBegin`);
+   - opens a retro or render-scale image when one is active, or a full-size image for classic distance shading
+     (`_retroBegin`);
    - on a world frame with shadows, runs the shadow pass (`_renderPasses`). It replays the casters recorded during
      the previous frame's world pass into the shadow maps;
    - binds the frame target: the air pass's canvas-sized image under enhanced lighting, the retro image, or the
@@ -112,7 +113,8 @@ the same context. These are foreign passes. Rules:
 Screen-space drawing uses `drawScreenQuad`, `drawScreenQuadRun`, `drawScreenQuadGlow`, `setScreenOffset` and
 `setScreenScissor`. The first screen-space draw of a frame resolves the world image first (`_compositeAir`): the air
 pass composites ambient occlusion, bloom and sun shafts and writes the frame to the canvas, then the retro or
-render-scale image is presented. `resolveFrame()` does the same for a frame that draws no screen quad afterwards.
+render-scale image is distance-shaded (when that is on) and presented. `resolveFrame()` does the same for a frame
+that draws no screen quad afterwards.
 
 ### Panel frames
 
