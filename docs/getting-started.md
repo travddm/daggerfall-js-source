@@ -46,6 +46,23 @@ sh tools/fetch-vendor.sh
 fetched. A plain `node --test <file>` does not run it. See
 [formats/mods-and-vendor.md](formats/mods-and-vendor.md#fetched-folders-toolsfetch-vendorsh).
 
+## Node and shader files
+
+Some modules import their shaders as files (`import fs from './retro-pass.frag?raw'`). Vite reads them; plain Node
+cannot, and a test or tool that reaches such a module fails with `ERR_UNKNOWN_FILE_EXTENSION ".vert"`. Load the hook
+`tools/raw-import-hooks.ts` in every shell you run Node from, at the repository root:
+
+```sh
+export NODE_OPTIONS="--import=./tools/raw-import-hooks.ts"    # Git Bash, Linux, macOS
+```
+
+```powershell
+$env:NODE_OPTIONS = "--import=./tools/raw-import-hooks.ts"    # PowerShell
+```
+
+The commands in these docs (`node --test <file>`, `node tools/<tool>.mjs`) assume it. `npm test`, `npm run
+test:changed` and the CI shards set it for you (`runnerEnv` in `tools/testShards.mjs`).
+
 ## Fetch the game data (ARENA2)
 
 Daggerfall's data is freeware but not redistributable. It never enters the repository or the build. Fetch it once:

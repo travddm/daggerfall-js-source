@@ -39,7 +39,8 @@ processes that run one after another (`WIN32_ARGV_BUDGET`). Elsewhere it uses on
 | `npm run check` | Lint, types, the whole suite and the build, in series. Slow; use it only when CI cannot run. |
 
 To run one area, list its files with a quoted glob: `node --test "test/net/**/*.test.js"`. Do not pass a bare
-directory such as `test/ui/`: a trailing directory path breaks file discovery on Node 22.
+directory such as `test/ui/`: a trailing directory path breaks file discovery on Node 22. A direct `node --test` needs
+the `?raw` hook, as the table shows or through `NODE_OPTIONS` ([getting-started.md](../getting-started.md#node-and-shader-files)).
 
 Runner flags pass through the tools. `npm test -- --test-name-pattern=foo` and
 `node tools/testChanged.mjs --test-only` hand every `--test-*` argument to each runner process (`runnerFlags`).
