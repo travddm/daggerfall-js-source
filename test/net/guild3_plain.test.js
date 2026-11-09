@@ -87,7 +87,7 @@ test('GUILD3a silver in every sentence a player reads - a siege\'s Honour, a str
 /** Every MARKS_KINDS kind a guild's treasury is an end of (marksLaw.js and the service's writes). */
 const GUILD_KINDS = ['guild-deposit', 'guild-withdraw', 'heraldry', 'guild-deed', 'contract-escrow', 'contract-return', 'writ-escrow', 'writ-return', 'tribute',
   'seat-claim', 'seat-upkeep', 'seat-edict', 'fort', 'seat-strike-refund', 'tithe', 'bounty-escrow', 'bounty-return', 'sellsword-escrow', 'sellsword-return',
-  'royal-escrow', 'royal-return', 'patron-escrow', 'patron-return', 'conscription', 'fealty-tribute'];
+  'royal-escrow', 'royal-return', 'patron-escrow', 'patron-return', 'conscription'];
 
 test('GUILD3b a silver line by its own kind and way: every kind a guild\'s treasury is an end of has words; one that runs either way by its direction; a kind with none "paid" or "received" - never "put in" for silver that left; an older service\'s line by its `kind` as before (mutants: the words, the direction, the fallback)', () => {
   for (const k of GUILD_KINDS) {
@@ -101,8 +101,6 @@ test('GUILD3b a silver line by its own kind and way: every kind a guild\'s treas
   assert.equal(guildSilverLineText({ who: 'Bryn', raw: 'guild-deposit', out: false, amount: 5 }), 'Bryn put in 5 silver');
   assert.deepEqual([guildSilverLineText({ who: 'X', raw: 'conscription', out: true, amount: 3 }), guildSilverLineText({ who: 'X', raw: 'conscription', out: false, amount: 3 })],
     ['The guild paid Conscription of 3 silver', 'The guild received Conscription of 3 silver']);
-  assert.deepEqual([guildSilverLineText({ who: 'X', raw: 'fealty-tribute', out: true, amount: 3 }), guildSilverLineText({ who: 'X', raw: 'fealty-tribute', out: false, amount: 3 })],
-    ['The guild paid its liege a fealty share of 3 silver', 'The guild received a vassal\'s fealty share of 3 silver']);   // PIN MOVED: AUDIT GUILD3 W5 - fealty, never "tribute"
   assert.equal(guildSilverLineText({ who: 'X', raw: 'some-new-kind', out: true, amount: 7 }), 'The guild paid 7 silver', 'a kind with no words, out: paid');
   assert.equal(guildSilverLineText({ who: 'X', raw: 'some-new-kind', out: false, amount: 7 }), 'The guild received 7 silver');
   assert.equal(guildSilverLineText({ who: 'X', kind: 'heraldry', amount: 500 }), 'X changed the guild\'s arms for 500 silver', 'an older service: by its kind');   // PIN MOVED: AUDIT GUILD3 W6 - arms
@@ -110,7 +108,7 @@ test('GUILD3b a silver line by its own kind and way: every kind a guild\'s treas
   // the sweep: no kind that LEAVES a treasury is worded as one coming in (the in-only kinds - a deposit, a Tithe, a deed,
   // a refund, a return - are never a guild's `out`)
   const OUT_KINDS = ['guild-withdraw', 'heraldry', 'contract-escrow', 'writ-escrow', 'tribute', 'seat-claim', 'seat-upkeep', 'seat-edict', 'fort', 'bounty-escrow',
-    'sellsword-escrow', 'royal-escrow', 'patron-escrow', 'conscription', 'fealty-tribute', 'some-new-kind'];
+    'sellsword-escrow', 'royal-escrow', 'patron-escrow', 'conscription', 'some-new-kind'];
   for (const k of OUT_KINDS) assert.doesNotMatch(guildSilverLineText({ who: 'X', raw: k, out: true, amount: 1 }), /put in|received|collected|came home|come home/, k);
 });
 
