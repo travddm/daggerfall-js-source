@@ -26,6 +26,7 @@
 // consumer that keys by index (the readied-spell round trip). The
 // save envelope carries the whole record for these; see save.js.
 
+import { absorptionLimitsOn } from '../absorption-limits.ts';   // ABSORB-NERF, a player option
 import { calculateCastCost, effectCost } from '../spellcost.js';
 import { skillValue } from '../skills.js';   // E8: the editor's per-effect cost reads the caster's own skill
 import { MAGIC_ONLY_KEYS } from '../effects.js';   // AUDIT 26 F181: the AllowedElements set, already read off the effect classes
@@ -177,7 +178,7 @@ export function blankEffectSettings() {
   return s;
 }
 
-/** ABSORB-NERF: THE PORT'S OWN - a crafted Spell
+/** ABSORB-NERF: THE PORT'S OWN, with the absorption limits on (absorption-limits.ts) - a crafted Spell
  *  Absorption (effect key '20,255') stops its chanceBase at 50, the same 50% absorption.js caps the live chance at.
  *  Every other effect and field keeps SPINNER_RANGES as it stands. */
 export const SPELL_ABSORPTION_KEY = '20,255';
@@ -185,7 +186,7 @@ export const SPELL_ABSORPTION_CHANCE_BASE_MAX = 50;
 /** The [min, max] of `field` for the effect `effectKey` (its `type,subType` key), or undefined for no such field. */
 export function spinnerRange(field, effectKey = null) {
   const r = SPINNER_RANGES[field];
-  if (r && field === 'chanceBase' && effectKey === SPELL_ABSORPTION_KEY) return [r[0], SPELL_ABSORPTION_CHANCE_BASE_MAX];
+  if (r && field === 'chanceBase' && effectKey === SPELL_ABSORPTION_KEY && absorptionLimitsOn()) return [r[0], SPELL_ABSORPTION_CHANCE_BASE_MAX];
   return r;
 }
 
@@ -273,7 +274,7 @@ export function buildCustomSpell({ slots, rangeType = 0, element = 4, name = '',
     if (!s || s.type == null || s.type < 0) continue;
     const st = { ...blankEffectSettings(), ...(s.settings ?? {}) };
     // ABSORB-NERF: a Spell Absorption record never carries a chanceBase past the maker's own 50
-    if (`${s.type},${s.subType ?? -1}` === SPELL_ABSORPTION_KEY && st.chanceBase > SPELL_ABSORPTION_CHANCE_BASE_MAX) st.chanceBase = SPELL_ABSORPTION_CHANCE_BASE_MAX;
+    if (`${s.type},${s.subType ?? -1}` === SPELL_ABSORPTION_KEY && absorptionLimitsOn() && st.chanceBase > SPELL_ABSORPTION_CHANCE_BASE_MAX) st.chanceBase = SPELL_ABSORPTION_CHANCE_BASE_MAX;
     effects.push({
       type: s.type, subType: s.subType ?? -1,
       durationBase: st.durationBase, durationMod: st.durationMod, durationPerLevel: st.durationPerLevel,

@@ -20,6 +20,7 @@
 //     (:1180-1184). An absorber at full magicka absorbs nothing.
 //   - then the sources in order: the Spell Absorption EFFECT, the
 //     CAREER flag, and a persistent absorb state.
+import { absorptionLimitsOn } from './absorption-limits.ts';   // ABSORB-NERF, a player option
 import { SKILLS, skillValue } from './skills.js';
 import { effectCost, effectSchool, TARGET_COST_MULT, CAST_COST_FLOOR } from './spellcost.js';
 
@@ -29,7 +30,7 @@ import { effectCost, effectSchool, TARGET_COST_MULT, CAST_COST_FLOOR } from './s
  *  pinned). */
 export const SPELL_ABSORPTION = Object.freeze({ None: 0, InLight: 1, InDarkness: 2, Always: 4 });
 
-/** ABSORB-NERF: THE PORT'S OWN, never DFU's. A
+/** ABSORB-NERF: THE PORT'S OWN, never DFU's, now a player option (absorption-limits.ts; off, DFU's). A
  *  100% AbsorbsSpells item (or a 100% crafted Spell Absorption) made its wearer all but immune to casters AND refilled
  *  their magicka off every bolt. Three numbers, one home:
  *   - ABSORB_ENCHANT_CHANCE: the AbsorbsSpells item enchantment is a ROLL of 50%, no longer DFU's flat always;
@@ -43,7 +44,7 @@ export const ABSORB_ENCHANT_CHANCE = 50;
 export const SPELL_ABSORPTION_CHANCE_CAP = 50;
 export const ABSORB_REFUND_SCALE = 0.5;
 /** ABSORB-NERF: the magicka an absorb of `points` gives back - half, floored. */
-export const absorbRefund = (points) => Math.max(0, Math.floor((Number(points) || 0) * ABSORB_REFUND_SCALE));
+export const absorbRefund = (points) => Math.max(0, Math.floor((Number(points) || 0) * (absorptionLimitsOn() ? ABSORB_REFUND_SCALE : 1)));
 
 /** GetEffectCastingCost (:1238-1252): the effect's own spellpoint
  *  cost, the TARGET-TYPE multiplier, then the floor of 5 - which DFU
@@ -82,6 +83,9 @@ export function careerAbsorbs(career, { day = false, inside = true } = {}) {
 const _absorbChances = new Map();
 export function registerAbsorptionChance(name, fn) { if (typeof fn === 'function') _absorbChances.set(name, fn); else _absorbChances.delete(name); }
 
+/** Whether an AbsorbsSpells enchantment absorbs: always in DFU (:1196); a 50% roll with the absorption limits on. */
+const enchantAbsorbs = (rolls) => !absorptionLimitsOn() || Math.floor(rolls() * 100) < ABSORB_ENCHANT_CHANCE;
+
 /** TryAbsorption (:1160-1200). Returns the spell points absorbed, or 0
  *  when the effect passes through. `absorbing` is DFU's persistent
  *  IsAbsorbingSpells state (:1196) - the port has no such effect yet,
@@ -114,7 +118,7 @@ export function tryAbsorption(effect, targetType, target, { day = false, inside 
   if (careerAbsorbs(target?.career, { day, inside })) return drink;
   // ABSORB-NERF: the AbsorbsSpells enchantment is
   // a 50% roll, no longer DFU's flat always (:1196)
-  if (absorbing && Math.floor(rolls() * 100) < ABSORB_ENCHANT_CHANCE) return drink;
+  if (absorbing && enchantAbsorbs(rolls)) return drink;
   return 0;
 }
 
@@ -138,5 +142,5 @@ export function spellAbsorptionChance(target) {
     if (chance > best) best = chance;
   }
   // ABSORB-NERF: the effect's chance caps at 50%
-  return Math.min(SPELL_ABSORPTION_CHANCE_CAP, best);
+  return absorptionLimitsOn() ? Math.min(SPELL_ABSORPTION_CHANCE_CAP, best) : best;
 }

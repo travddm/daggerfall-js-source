@@ -43,6 +43,7 @@ const PREFS = Object.freeze({
   dressForThePart: false,
   guildProbation: false,
   soldGoodsOnShelf: false,
+  absorptionLimits: false,
   questlineRewards: true,
 });
 

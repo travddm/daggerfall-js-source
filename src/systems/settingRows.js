@@ -11,3 +11,4 @@ export { GUILD_PROBATION_ROW } from './guildProbationRow.js';
 export { HORSE_WALKS_ROW } from './upkeep/horseWalksRow.js';
 export { TERRAIN_SLOPE_CUT_ROW } from './terrainSlopeCutRow.js';
 export { SOLD_GOODS_ON_SHELF_ROW } from './sold-goods-on-shelf-row.ts';
+export { ABSORPTION_LIMITS_ROW } from './absorption-limits-row.ts';
