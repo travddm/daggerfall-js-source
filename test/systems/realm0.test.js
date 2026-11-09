@@ -261,7 +261,14 @@ test('REALM P0.4: online a shop pays at most half what it asks for the same piec
   assert.deepEqual([calculateTradePrice(1_000, 20, { mercantile: 0, personality: 10 }, true, { online: true }), calculateTradePrice(1_000, 20, { mercantile: 0, personality: 10 }, true, { online: false })], [187, 222], 'a weak seller at a dear counter: under Daggerfall\'s own offer');
 });
 
-test('REALM P0.4: online a pile\'s gold is divided back by the level, every key, never under one piece; offline it is the level\'s', () => {
+test("ONLINE PILE GOLD, DFU's by default (LootTables.GenerateLoot): a pile's gold is the level's online too, as offline", () => {
+  const pile = (n) => [goldStack(n), { group: 'Books', templateIndex: 277 }];
+  assert.equal(addPileLootExtras(pile(30 * 37), 'A', undefined, { level: 30, online: true })[0].stackCount, 30 * 37);
+  assert.equal(addPileLootExtras(pile(30 * 37), 'J', () => 0.99, { level: 30, online: true })[0].stackCount, 30 * 37);
+});
+
+test('REALM P0.4, the server profile\'s flat pile gold (loot.pileGold): online a pile\'s gold is divided back by the level, every key, never under one piece; offline it is the level\'s', (t) => {
+  playByRules(t, { 'loot.pileGold': 'flat' });
   const pile = (n) => [goldStack(n), { group: 'Books', templateIndex: 277 }];
   assert.equal(addPileLootExtras(pile(30 * 37), 'A', undefined, { level: 30, online: true })[0].stackCount, 37, 'a key outside J-O too');
   assert.equal(addPileLootExtras(pile(30 * 37), 'A', undefined, { level: 30, online: false })[0].stackCount, 30 * 37);

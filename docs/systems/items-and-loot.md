@@ -159,6 +159,8 @@ bosses and named foes stay off the plain ladder. `kill-gold.ts` sets a killed fo
 `1 + 1.5 ln(level)`, so gold grows early and flattens late (DFU multiplies by the level; Unleveled Loot made it flat).
 It applies where Unleveled Loot's death handler runs. `renownLoot.js` scales the loot bonus with the roller's Renown
 online.
+A dungeon treasure pile's gold is the player's level times the table's roll, as in DFU, online too. A server profile
+can divide it back to level 1's gold online instead (`loot.pileGold` `flat`, `loot.js` `unlevelPileGold`).
 
 The hosts apply rarity where they mint loot: `scenes/hostCombat.js` for bodies (`rollCorpseLoot`), and
 `scenes/dungeonContext.js`, `scenes/interiorContext.js`, `scenes/world.js` and `src/systems/searchables.js` for piles

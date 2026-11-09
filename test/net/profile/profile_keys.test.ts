@@ -101,3 +101,12 @@ test("P9 THE TRADE KEYS: trade.saleCap is DFU's no cap online by default; trade.
     'bad value for trade.saleCap',
   ]);
 });
+
+test("P10 THE PILE GOLD KEY: loot.pileGold is DFU's level multiple online by default, 'flat' the old online rule", () => {
+  const key = profileKeyOf('loot.pileGold');
+  assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.values], ['dfu', 'dfu', 'dfu', ['dfu', 'flat']]);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'loot.pileGold': 'flat' } }), []);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'loot.pileGold': 'half' } }), [
+    'bad value for loot.pileGold',
+  ]);
+});
