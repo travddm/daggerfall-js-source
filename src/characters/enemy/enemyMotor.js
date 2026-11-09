@@ -37,6 +37,7 @@
 // (IsBlending -> an 8%-per-classic-update see-through roll).
 
 import { GLOBAL_SCALE } from '../../world/meshReader.js';
+import { playerHalfOfStealthCheck } from './stealth-check.ts';   // StealthCheck's player half
 import { dice100 } from '../../combat/formulas.js';   // PT1: Dice100 has ONE home and this file had written it out twice
 import { CLASSIC_UPDATE_INTERVAL } from '../weaponStates.js';   // single source (GameManager.cs:42)
 import { CAPSULE_HEIGHT, CAPSULE_RADIUS, DF_WALK_BASE } from '../../player/motor.js';           // single source
@@ -895,17 +896,8 @@ export class EnemyAI {
     // and not senses.playerStealth against a distance measured to the joiner. Its own skill is a later slice's wire
     // field; until then the candidate answers 0, the same fallback the foe arm below already takes.
     const foeTarget = this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || this._targetCandidate.isPeer === true);
-    if (!foeTarget) {
-      if (senses.movingLessThanHalfSpeed) {
-        if ((gameMinutes & 1) === 1) return this.detected;
-      } else if (this.hasEncounteredPlayer) {
-        return true;
-      }
-      if (senses.sharedStealth && senses.sharedStealth.minute !== gameMinutes) {
-        senses.tallyStealth?.();
-        senses.sharedStealth.minute = gameMinutes;
-      }
-    }
+    const half = foeTarget ? undefined : playerHalfOfStealthCheck(this, senses, gameMinutes);   // stealth-check.ts
+    if (half !== undefined) return half;
     this._lastStealthMinute = gameMinutes;
     // CalculateStealthChance(distanceToTarget, target) reads the
     // TARGET's live Stealth (:654): the foe entity's uniform skill
