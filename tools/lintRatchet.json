@@ -1155,7 +1155,7 @@
     "src/systems/rest/restSession.js": 19,
     "src/systems/resurrect.js": 2,
     "src/systems/revenant/revenant.js": 32,
-    "src/systems/revenant/revenantFate.js": 8,
+    "src/systems/revenant/revenantFate.js": 6,
     "src/systems/riding.js": 13,
     "src/systems/roleplayRealism/rrRidingHost.js": 3,
     "src/systems/roleplayRealismItems/rriKits.js": 31,
