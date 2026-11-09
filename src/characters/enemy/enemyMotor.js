@@ -83,6 +83,7 @@ export const GIVE_UP_TICKS = 200;   // EnemyMotor.GiveUpTimer refill (classic ti
 import { GRAVITY, FIXED_DT, MAX_FRAME_DT, CLASSIC_TO_UNITY_RATIO, FALL_DAMAGE_THRESHOLD } from '../../player/motor.js';   // the shared fall rule + the P16 fixed-timestep law; CH3: the fall threshold single-sources with the player's
 import { wrapAngle } from '../../world/mat4.js';   // ONCRASH1: the port's one angle wrap, which cannot loop
 import { MOBILE_TYPES } from '../mobile/mobileTypes.js';
+import { predictNextTargetPos } from './target-prediction.ts';   // EnemySenses.PredictNextTargetPos
 import { coverDistance } from '../../ai/cover.js';   // TACT1: billboards are cover (sight, the clear shot)
 import { groundHit } from '../../player/groundRay.js';   // AUDIT GROUND-BOLT C1: the clear shot meets the terrain, as the shot does
 import { tacticsStep, tacticsNow, breakWindup } from '../../ai/tactics.js';   // TACT2: the tactics brain; TELL1: its clock, for the stagger's end
@@ -924,85 +925,10 @@ export class EnemyAI {
    *  port stores FEET. */
   _centre() { return [this.feet[0], this.feet[1] + this.centreOffset, this.feet[2]]; }   // transform.position (REVIEW 2026-09-05: centreOffset, not height/2)
 
-  /**
-   * EnemySenses.PredictNextTargetPos (:541-616), the position the two
-   * shooting probes aim at - a LEAD, solved as a cone/line
-   * intersection against the target's own movement.
-   *
-   * Answers a CENTRE-space point (the target's feet plus half its
-   * capsule, the same lift `_getDestination` takes), or null for DFU's
-   * ResetPlayerPos sentinel - "nothing has ever been seen", which
-   * HasClearPathToShootProjectile reads as a refusal (:702-703).
-   *
-   * :551-560's FIRST arm is the only one reachable here. Both callers
-   * of this method sit behind `senses.TargetInSight` (DoRangedAttack's
-   * band condition, EnemyMotor.cs:572), so `targetInSight ||...` is
-   * true every time and `assumedCurrentPosition` is always
-   * lastKnownTargetPos; the else-arm's remembered no-lead prediction
-   * belongs to the one caller this port does not have,
-   * DaggerfallMissile's mid-flight re-aim. The field it feeds
-   * (predictedTargetPosWithoutLead) is still written at :612, because
-   * that write is what the arm would read.
-   *
-   * :563-570 is DFU's arithmetic quirk, kept: targetPosPredictTimer is
-   * zero only on the frame the prediction pass itself ran, so every
-   * other call divides ONE prediction interval's worth of movement by
-   * the SHORTER time since that pass and overstates the target's
-   * speed. It also rewrites lastPositionDiff as a side effect, and so
-   * does this.
-   */
+  /** EnemySenses.PredictNextTargetPos (:541-616): the lead on the target, in centre space, or null for
+   *  ResetPlayerPos (characters/enemy/target-prediction.ts). */
   predictNextTargetPos(interceptSpeed) {
-    if (this.lastKnownTargetPos === null) return null;   // ResetPlayerPos
-    if (this._predictedTargetPosWithoutLead === null) {
-      this._predictedTargetPosWithoutLead = [...this.lastKnownTargetPos];
-    }
-    const assumed = this.lastKnownTargetPos;
-    let divisor = CLASSIC_UPDATE_INTERVAL;   // predictionInterval (:34) = 0.0625
-    let diff = this.lastPositionDiff;
-    if (this._targetPosPredictTimer !== 0) {
-      divisor = this._targetPosPredictTimer;
-      const old = this.oldLastKnownTargetPos ?? assumed;
-      diff = [assumed[0] - old[0], assumed[1] - old[1], assumed[2] - old[2]];
-      this.lastPositionDiff = diff;
-    }
-    // The quadratic is solved centre-to-centre, as DFU's transform
-    // positions are; `assumed` is feet-space like every other position
-    // on this class, so it lifts by half the TARGET's capsule.
-    const c = this._centre();
-    const lift = this._targetCentreOffset();   // REVIEW 2026-09-05: the target's transform, not its capsule half
-    const d = [assumed[0] - c[0], assumed[1] + lift - c[1], assumed[2] - c[2]];
-    const v = [diff[0] / divisor, diff[1] / divisor, diff[2] / divisor];
-    const a = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) - interceptSpeed * interceptSpeed;
-    const b = 2 * (d[0] * v[0] + d[1] * v[1] + d[2] * v[2]);
-    const cc = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
-    const at = [assumed[0], assumed[1] + lift, assumed[2]];
-    let prediction = [at[0], at[1], at[2]];
-    let t = -1;
-    if (Math.abs(a) >= 1e-5) {
-      const disc = b * b - 4 * a * cc;
-      if (disc >= 0) {
-        // "find the minimal positive solution" (:586-591).
-        const discSqrt = Math.sqrt(disc) * Math.sign(a);
-        t = (-b - discSqrt) / (2 * a);
-        if (t < 0) t = (-b + discSqrt) / (2 * a);
-      }
-    } else if (Math.abs(b) >= 1e-5) {
-      t = -cc / b;   // the degenerate case (:597-598)
-    }
-    if (t >= 0) {
-      prediction = [at[0] + v[0] * t, at[1] + v[1] * t, at[2] + v[2] * t];
-      // :605-609 - "Don't predict target will move through obstacles".
-      let px = prediction[0] - at[0], py = prediction[1] - at[1], pz = prediction[2] - at[2];
-      const pl = Math.hypot(px, py, pz);
-      if (pl > 1e-9) {
-        px /= pl; py /= pl; pz /= pl;
-        if (Number.isFinite(this.collider.raycast(at, [px, py, pz], pl))) prediction = at;
-      }
-    }
-    // :612-613 - the no-lead prediction stored for the next pass, in
-    // this class's feet space.
-    this._predictedTargetPosWithoutLead = [assumed[0] + diff[0], assumed[1] + diff[1], assumed[2] + diff[2]];
-    return prediction;
+    return predictNextTargetPos(this, interceptSpeed);
   }
 
   /**
