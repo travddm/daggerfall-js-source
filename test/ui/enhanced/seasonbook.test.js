@@ -57,15 +57,15 @@ test('SEASON-BOOK the model: three sections, each its clock; the season\'s two b
   assert.deepEqual(realm.rows.map((r) => r.name), ['The Arena', 'The season\'s captains']);
   const seats = sec(m, 'seats');
   assert.deepEqual([seats.title, seats.sub, seats.at, seats.atLabel], ['The Seats: Season 0', 'Week 3 of 4', Date.UTC(2026, 10, 1, 18), 'ends']);
-  assert.equal(seats.lead, 'Season 0 is the beta. When it ends, the seats\' war is wiped and no one is crowned. Silver, the Stores and your professions stay.');
-  assert.deepEqual(seats.rows.map((r) => r.id), ['tides', 'chapters'], 'Season 0 crowns no one: no titles, no ribbon, no soft reset');
+  assert.equal(seats.lead, 'Season 0 is the beta. When it ends, the seats\' war is wiped. Silver, the Stores and your professions stay.');
+  assert.deepEqual(seats.rows.map((r) => r.id), ['chapters'], 'Season 0 keeps no one: no ribbon, no soft reset');
   assert.ok(seats.rows.every((r) => r.standing === null && r.door === null));
   assert.equal(seats.foot, 'The Notice Board\'s Seat tab has the week\'s standings.');
   const later = seasonBookModel({ now: Date.UTC(2026, 10, 10), seatsOpen: true, zero: 2, boards: {} });
   const s1 = sec(later, 'seats');
   assert.deepEqual([s1.title, s1.atLabel], ['The Seats: Season of Morning Star', 'ends']);
   assert.equal(s1.lead, 'The guilds\' war for the towns. A Season ends at its last Sunday Turning.', 'P7: a counted Season never told it is the beta');
-  assert.deepEqual(s1.rows.map((r) => r.id), ['crowns', 'ribbon', 'reset', 'tides', 'chapters']);
+  assert.deepEqual(s1.rows.map((r) => r.id), ['ribbon', 'reset', 'chapters']);
   assert.equal(sec(seasonBookModel({ now: NOW, seatsOpen: false, zero: 2 }), 'seats'), undefined, 'the seats shut: no section');
   assert.equal(sec(seasonBookModel({ now: NOW, seatsOpen: true, zero: null }), 'seats'), undefined, 'no Season counted: no section');
   const fest = sec(m, 'festival');
@@ -82,8 +82,6 @@ test('AUDIT SEASON-BOOK L1/L5/L6/L7/L12/W4-W8: every line says what the game doe
   assert.equal(realm.foot, 'Arena Champion is worn by the leader, once they have 10 rated bouts against 5 different opponents.');
   assert.equal(row(realm, 'arena').about, 'Rated bouts set your season rating. The leader wears Arena Champion, and the banner with more points wears the laurel next season.');
   assert.equal(row(realm, 'sea').about, 'The deepest voyage past the Veil and the most legends sunk or taken, on the board at any freeport\'s harbormaster.');
-  assert.equal(row(seats, 'tides').about, 'Each week every kingdom, the Marches and the Free Lands draw a Tide - a harvest, a plague, raiders - or stay Calm.');
-  assert.equal(row(seats, 'crowns').about, 'Each crown\'s guildmaster earns Crowned in Season 1. The guildmaster of a guild that holds a seat all Season earns Keeper of its town.');
   assert.equal(row(seats, 'reset').about, 'Standing drifts halfway back to 50 and every fortification loses a tier. Charters stand.');
   const fest = sec(seasonBookModel({ now: NOW }), 'festival');
   assert.equal(row(fest, 'cakes').about, 'Found on foes, the dead and the summoned most often, and in gathering, crafting, looting and at sea. Spend them with the Wyrd Sister outside any tavern. Finds count double on 31 October (UTC) and on in-game nights the dead walk.');
@@ -338,7 +336,7 @@ test('SEASON-BOOK the window: a dialog named by its title, every section\'s titl
   assert.deepEqual(all(root, 'sb-name').map((n) => n.textContent), rows.map((r) => r.name));
   assert.deepEqual(all(root, 'sb-about').map((n) => n.textContent), rows.map((r) => r.about));
   assert.equal(one(one(root, 'sb-arena'), 'sb-standing').textContent, '#4 - rating 1240');
-  assert.equal(one(one(root, 'sb-tides'), 'sb-standing').hidden, true, 'a row with no standing hides its empty line');
+  assert.equal(one(one(root, 'sb-chapters'), 'sb-standing').hidden, true, 'a row with no standing hides its empty line');
   // P8: each section's moment is its own, less the relay's lead on this machine's clock - to the millisecond
   const wantAt = model.sections.map((s) => s.at - offset);
   assert.equal(seen.length, wantAt.length);

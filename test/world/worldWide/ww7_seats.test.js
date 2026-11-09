@@ -5,22 +5,19 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { KINGDOMS, kingdomOf, kingdomSeatName, BAY_KINGDOMS, isMarch, isFreeLand } from '../../../src/net/kingdomLaw.js';
 import { CROWN_SEAT_REGIONS, seatRegionOk, seatReportOf, gateRegionOk, KINGDOM_METALS, KINGDOM_BANNER_COLOURS, SEAT_CROWN_GLYPHS, seatGlyphsOf, CROWN_SIEGE_SLOT, siegeWindowOk, seatArrivalLine } from '../../../src/net/townSeatLaw.js';
-import { tideLandOf } from '../../../src/net/tideLaw.js';
 import { GLYPHS } from '../../../src/net/identityToken.js';
 import { GATE_LANE_SPAN } from '../../../src/net/gate/gateLaw.js';
 import { deriveTownSeats, tamrielSeatsOf, replaceSeats, seatPixelTest, seatAtMapId } from '../../../src/systems/town/townSeats.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
-test('WW7-3 the provinces\' kingdoms: seven crowns past the Bay, each its province\'s region and seated at its capital; High Rock\'s and Hammerfell\'s past the Bay no crown\'s, no March, no Free Land; the Bay\'s three the Tides\' alone (mutants: a crown unseated; a province a Tide\'s land)', () => {
+test('WW7-3 the provinces\' kingdoms: seven crowns past the Bay, each its province\'s region and seated at its capital; High Rock\'s and Hammerfell\'s past the Bay no crown\'s, no March, no Free Land (mutants: a crown unseated; a province a Tide\'s land)', () => {
   const past = Object.values(KINGDOMS).filter((k) => !BAY_KINGDOMS.includes(k.id));
   assert.deepEqual(past.map((k) => [k.id, k.seat, k.regions[0]]), [['skyrim', 'Solitude', 64], ['morrowind', 'Mournhold', 65], ['summerset', 'Alinor', 66],
     ['valenwood', 'Falinesti', 67], ['elsweyr', 'Torval', 68], ['blackmarsh', 'Helstrom', 69], ['cyrodiil', 'Imperial City', 70]]);
   for (const k of past) assert.equal(CROWN_SEAT_REGIONS[k.regions[0]], k.id);
   assert.deepEqual([kingdomSeatName('wayrest'), kingdomSeatName('skyrim'), kingdomSeatName('nowhere')], ['Wayrest', 'Solitude', null]);
   for (const r of [62, 63]) assert.deepEqual([kingdomOf(r), isMarch(r), isFreeLand(r)], [null, false, false], `region ${r}`);
-  assert.equal(tideLandOf(64), null, 'a province\'s crown is no Tide\'s land');
-  assert.equal(tideLandOf(17), 'daggerfall');
   for (const k of Object.keys(KINGDOMS)) {
     assert.ok(KINGDOM_METALS[k] && KINGDOM_BANNER_COLOURS[k] && SEAT_CROWN_GLYPHS[k] && GLYPHS.includes(SEAT_CROWN_GLYPHS[k]), `${k}: its metal, banner and crown`);
     assert.ok(siegeWindowOk(CROWN_SIEGE_SLOT[k].day, CROWN_SIEGE_SLOT[k].hour), `${k}: its crown siege inside the window`);

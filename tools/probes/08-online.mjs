@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { Game } from './lib/harness.mjs';
 import { editsPlugin } from '../frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from '../onlineFrameProbe.mjs';
-import { standServices, stopAll, localFetch, botStorage, LOAD_SERVICE } from '../loadHarness.mjs';
+import { standServicesRetrying, stopAll, localFetch, botStorage, LOAD_SERVICE } from '../loadHarness.mjs';
 import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../../src/systems/realmSaves.js';
 import { ACCEPTED } from '../../src/net/legalLaw.js';
@@ -65,16 +65,9 @@ export async function run({ browser, base, ck }) {
       }
     };
     // wrangler's dev server now and then dies while it boots (seen on CI: the account service never answered, 188 s in);
-    // a second start from the same state directory is a fresh process on the same ledger
-    const standOnce = async () => {
-      try {
-        return await standServices({ port: SVC_PORT }, state);
-      } catch (e) {
-        console.log(`   the services did not start, once more: ${String(e?.message).slice(0, 200)}`);
-        stopAll();
-        return standServices({ port: SVC_PORT }, state);
-      }
-    };
+    // a second start from the same state directory is a fresh process on the same ledger, begun once the first one is
+    // stopped and its ports are free (the first start's leftover workerd held 8873 and failed the retry)
+    const standOnce = () => standServicesRetrying({ port: SVC_PORT }, state);
     const [svc, saveText] = await Promise.all([standOnce(), composeSave()]);
     lap('services up and first save composed');
     const io = { fetch: localFetch({ port: svc.accountPort, ip: '10.9.9.9' }) };

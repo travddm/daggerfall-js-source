@@ -24,6 +24,7 @@ const PREFS = Object.freeze({
   banthaJungle: true,
   tamrielLands: true,
   landforms: true,
+  terrainSlopeCut: false, // the walked ground between samples
   roadVerges: true,
   climateBlend: true,
   questlines: true,
@@ -35,6 +36,7 @@ const PREFS = Object.freeze({
   revenantRank: '2',
   revenantFlee: 'normal',
   revenantReturn: 'normal',
+  townSeats: true,
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,

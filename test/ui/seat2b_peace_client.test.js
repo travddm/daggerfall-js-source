@@ -1,7 +1,7 @@
 // SEAT2b part two: THE WORKS AT PEACE ON THE CLIENT - the
 // Watchtowers' word asked ten minutes apart and said once a challenger, a week and a share, kept on the device; the
 // seats dressed in their works; the Seat tab's towers lines; a craft carrying the town its station stands in; the host's
-// seams - a members' Harbour a Travel Options port, a coast the sea beside the town, the Ram Kit's words (bible/
+// seams - a members' Harbour a Travel Options port, a coast the sea beside the town (bible/
 // 11-Multiplayer/Seats-Arc.md 7.5; src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
 // src/scenes/world.js). `06-Systems/Online-Arc.md` SEAT2b part two.
 import { test } from 'node:test';
@@ -9,8 +9,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { byClass } from '../chargenDom.mjs';
 import { createTownSeatBook, SEAT_TOWERS_KEY, SEAT_TOWERS_SAID_MAX, SEAT_TOWERS_EVERY_MS } from '../../src/net/townSeatBook.js';
-import { storedText } from '../../src/systems/smithItems.js';
-import { SIEGE_STAYS_LINE, STOCK_STAYS_LINE } from '../../src/ui/professions/profPages.js';
 
 const memStore = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), m }; };
 const SH = { id: 'gsh', name: 'The Silver Hand', tag: 'SH' };
@@ -84,7 +82,7 @@ test('SEAT2b part two THE SEAT TAB\'S TOWERS: the standings the service answered
       battle: null, chronicle: [], mine: { guild: 'gsh', rank: 2, seasoned: true, bound: 'gsh', pledges: [], influence: 0, tributeRoom: 0 },
       standings: [{ guild: { ...SH, heraldry: null }, influence: 1000, legacy: 0, holder: true }, { guild: { id: 'geo', name: 'Ebon Oath', tag: 'EO', heraldry: null }, influence: 600, legacy: 0, holder: false }],
       ...(towers ? { towers } : {}) };
-    const book = { zero: null, standings: async () => ({ data, error: null }), forts: async () => ({ data: { works: {}, stockpile: [] }, error: null }) };
+    const book = { zero: null, standings: async () => ({ data, error: null }), forts: async () => ({ data: { works: {} }, error: null }) };
     const ui = { busy: () => false, run: (start) => start(), rerender: () => {}, nowS: () => 1_800_000_000, alive: () => true };
     return createSeatTab({ seat: SEAT, book, port: false, countName: (k) => k }, ui);
   };
@@ -117,8 +115,4 @@ test('SEAT2b part two THE HOST\'S SEAMS: a members\' Harbour is the travel map\'
   for (const f of ['src/ui/travel/travelPopUp.js', 'src/ui/travel/travelMapOptions.js', 'src/ui/heldMap.js']) {   // TIDY2: whole paths, so a move rewrites them
     assert.match(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'), /import \{ hasPortFor as hasPort \} from '(?:\.\.\/)+systems\/travel\/travelPorts\.js';/, f);
   }
-  assert.equal(storedText('Ram Kit'), 'You made a Ram Kit. It waits in your Stores');
-  assert.equal(storedText('Ram Kit', 2), 'You made 2 Ram Kits. They wait in your Stores');
-  assert.notEqual(SIEGE_STAYS_LINE, STOCK_STAYS_LINE);
-  assert.match(SIEGE_STAYS_LINE, /Siege Camp/);
 });

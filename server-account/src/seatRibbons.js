@@ -13,9 +13,9 @@ import { ribbonClaimOf } from '../../src/net/heraldryLaw.js';
  * the colours are the guild's as they are now (a banner changed is a ribbon changed).
  * @param {any} db
  */
-export async function ribbonOf(db, playerId, character, season, member = undefined) {
+export async function ribbonOf(db, playerId, character, season, member = undefined, on = true) {
   const n = ribbonSeasonOf(season);
-  if (n == null || typeof character !== 'string') return null;
+  if (!on || n == null || typeof character !== 'string') return null;
   // SCALE4f part two: the mint's one membership read (guilds.js mintMemberOf) - its guild's ribbon of the Season, earned
   // while it was a member (the join's own `m.joined_at <= r.at`), in the guild's colours as they are now
   const r = member !== undefined

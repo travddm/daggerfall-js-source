@@ -36,7 +36,7 @@
 import { witnessedFact, factConfirmed } from '../../src/net/nodeLaw.js';
 import { seatReportOf } from '../../src/net/townSeatLaw.js';
 import { domainReportOf, domainReportText, parseDomainReport, domainSeats, domainsWeekOf, domainsRule } from '../../src/net/domainLaw.js';
-import { confirmedSeats, seatIgnored, witnessSeat } from './townSeats.js';
+import { confirmedSeats, seatIgnored, witnessSeat, seatOptionOn } from './townSeats.js';
 import { DB_ROOT } from './service.js';
 
 /** Every seat-of-power answer - some hundred rows (the header). */
@@ -92,16 +92,18 @@ export async function confirmedDomains(db, nowS, { fresh = false } = {}) {
   return domainSeats(seats, domainFacts(rows, ignored));
 }
 
+/** The week the region law first rules: DOMAINS_WEEK, unless the Charters option is off (SEATS_CHARTERS), or null. */
+export const domainsWeekFor = (env) => (seatOptionOn(env, 'CHARTERS') ? domainsWeekOf(env?.DOMAINS_WEEK) : null);
 /** THE REGION LAW FOR SEAT WEEK `week`: its seats of power (confirmedDomains) where DOMAINS_WEEK rules that week, else
  *  null - the seat law, read as before. No read at all where it does not rule. */
 export async function domainsFor(db, nowS, env, week, opts = {}) {
-  return domainsRule(week, domainsWeekOf(env?.DOMAINS_WEEK)) ? confirmedDomains(db, nowS, opts) : null;
+  return domainsRule(week, domainsWeekFor(env)) ? confirmedDomains(db, nowS, opts) : null;
 }
 
 /** THE SEATS' LIST'S WORD OF IT: `{ from, rule, seats: [[region, key], ...] }` - the week the law first rules, whether it
  *  rules this one, and each region's confirmed seat of power - or null where DOMAINS_WEEK is unset. */
 export async function domainsBoard(db, nowS, env, week) {
-  const from = domainsWeekOf(env?.DOMAINS_WEEK);
+  const from = domainsWeekFor(env);
   if (from == null) return null;
   const d = await confirmedDomains(db, nowS);
   return { from, rule: domainsRule(week, from), seats: [...d].map(([region, s]) => [region, s.key]).sort((a, b) => a[0] - b[0]) };

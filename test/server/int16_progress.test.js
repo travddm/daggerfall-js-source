@@ -23,7 +23,6 @@ import { RENOWN_XP_HOUR_MAX } from '../../src/net/renown.js';
 import { WATCH_DAY_CAP, BOUNTY_CAMPS_DAY } from '../../src/net/townSeatLaw.js';
 import { WATCH_TICK_MS } from '../../src/net/watchReceipt.js';
 import { MARKS_FAUCETS } from '../../src/net/marksLaw.js';
-import { TIDE_EFFECTS } from '../../src/net/tideLaw.js';
 import { writXp } from '../../src/net/professionLaw.js';
 import { REFUSALS } from '../../src/net/accountClient.js';
 import { FIND_DROPS } from '../../src/net/marksBook.js';
@@ -32,13 +31,12 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
 test('INT17: the first line - each stream a clock cap of today read per hour of play (a raid\'s game day two real hours, a Watch tick each two minutes), the professions a guess; measuring, never enforced', () => {
   assert.equal(PROGRESS_LINE.enforce, false, 'MEASURE first (the owner, asked)');
-  assert.deepEqual(PROGRESS_STREAMS, ['renown', 'raid', 'bounty', 'camp', 'watch', 'find', 'gather', 'prof']);
+  assert.deepEqual(PROGRESS_STREAMS, ['renown', 'raid', 'bounty', 'watch', 'find', 'gather', 'prof']);
   assert.equal(GAME_DAY_REAL_HOURS, 2, 'the raid line reads a game day as two real hours');
   assert.deepEqual(PROGRESS_LINE.streams, {
     renown: { rate: RENOWN_XP_HOUR_MAX, cap: RENOWN_XP_HOUR_MAX },
     raid: { rate: RAID_CLAIMS_DAY_MAX / GAME_DAY_REAL_HOURS, cap: RAID_CLAIMS_DAY_MAX },
     bounty: { rate: BOUNTY_CAMPS_DAY, cap: BOUNTY_CAMPS_DAY },
-    camp: { rate: TIDE_EFFECTS.orcsCampsDay, cap: TIDE_EFFECTS.orcsCampsDay },
     watch: { rate: 3_600_000 / WATCH_TICK_MS, cap: WATCH_DAY_CAP },
     find: { rate: MARKS_FAUCETS.find.perDay, cap: MARKS_FAUCETS.find.perDay },
     gather: { rate: MARKS_FAUCETS.gather.perDay, cap: MARKS_FAUCETS.gather.perDay },
@@ -63,8 +61,6 @@ test('INT17: what an answer spent - Renown credited (never asked), a cleanse and
   assert.deepEqual(progressSpentOf('/v1/raid/claim', { recorded: false, why: 'day-full' }), []);
   assert.deepEqual(progressSpentOf('/v1/seats/bounty', { ok: true, paid: 20 }), [['bounty', 1]]);
   assert.deepEqual(progressSpentOf('/v1/seats/bounty', { ok: true, paid: 0, why: 'claimed' }), []);
-  assert.deepEqual(progressSpentOf('/v1/seats/orc-camp', { ok: true, counted: true }), [['camp', 1]]);
-  assert.deepEqual(progressSpentOf('/v1/seats/orc-camp', { ok: true, counted: false }), []);
   assert.deepEqual(progressSpentOf('/v1/seats/watch', { ok: true, counted: 7 }), [['watch', 7]]);
   assert.deepEqual(progressSpentOf('/v1/marks/find', { ok: true, struck: 3 }), [['find', 1]]);
   assert.deepEqual(progressSpentOf('/v1/marks/find', { ok: true, struck: 0, why: 'cap' }), []);

@@ -2,7 +2,7 @@
 // (the law's tree, its logs, its Resin and a Clean Cut's Heartwood, the Wood-Axe's report bounded, Logging's XP); the
 // forge's burns and the workbench's saws (a unit's yield and the choices that raise it, no XP); the workbench's crafts
 // (Carpentry's rank, XP and limit, a Joiner's half the planks, a Heartwood for a plank and its step, a Master Joiner's
-// mark, arrows at no quality, the Ram Kit refused); the furnisher's Linen; and a crafted table set down in a home with
+// mark, arrows at no quality); the furnisher's Linen; and a crafted table set down in a home with
 // the mark the service's own row gives it. Driven through the real Worker over node:sqlite with every migration applied
 // (test/accountDb.mjs). 25.
 import { test } from 'node:test';
@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { trees, tree, nodeKey, TREE_YIELD } from '../../src/net/nodeLaw.js';
 import { xpForRank, harvestXp, cutsMax, STOCK_MAX } from '../../src/net/professionLaw.js';
-import { recipeById, firstCraftXp, PROVENANCE_RE, RAM_KIT_RANK } from '../../src/net/recipeLaw.js';
+import { recipeById, firstCraftXp, PROVENANCE_RE } from '../../src/net/recipeLaw.js';
 import { readProductRecord } from '../../src/net/productRecord.js';
 import { sharedClassicMinutes } from '../../src/net/wire.js';
 import { utcDay } from '../../src/net/marksLaw.js';
@@ -201,7 +201,7 @@ test('PROF4 service: a Small Oak Table made - three Oak Planks spent, the piece 
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.deepEqual([r.body.quality, r.body.xp, r.body.first, r.body.marked, r.body.track.profession], [0, 20 * 2 + firstCraftXp(recipeById('table-small:oak')), true, false, 'building'], 'margin 0, the roll\'s foot: Crude');   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp), no longer a flat 500 - Building's, 1,823;   // PIN MOVED (CRAFT3): the track answered is the craft's, Building
   assert.deepEqual(s.stores(mac, 'plank:oak'), []);
-  assert.equal(s.xpOf(mac, 'building'), xpForRank(10) + 40 + 1823);
+  assert.equal(s.xpOf(mac, 'building'), xpForRank(10) + 40 + 1869);
   const [{ provenance, record }] = r.body.pieces;
   assert.match(provenance, PROVENANCE_RE);
   const row = s.raw.prepare('SELECT * FROM products WHERE provenance = ?').get(provenance);
@@ -235,7 +235,7 @@ test('PROF4 service: a Small Oak Table made - three Oak Planks spent, the piece 
   assert.equal(both.body.quality, 1, 'one step, not two');
 });
 
-test('PROF4 service: arrows are twenty at no quality (their record -1), one piece; the Ram Kit is refused - it waits for the sieges; Carpentry\'s rank; the bed\'s Linen from the furnisher for Marks, a `stock` line', async () => {
+test('PROF4 service: arrows are twenty at no quality (their record -1), one piece; Carpentry\'s rank; the bed\'s Linen from the furnisher for Marks, a `stock` line', async () => {
   const s = await stand();
   const mac = await s.seated('Mac');
   s.give(mac, 'plank:pine', 'own', 1); s.give(mac, 'ingot:iron', 'own', 1); s.give(mac, 'p1:8', 'own', 4);
@@ -244,8 +244,6 @@ test('PROF4 service: arrows are twenty at no quality (their record -1), one piec
   assert.deepEqual([a.body.quality, a.body.count, a.body.pieces.length, readProductRecord(a.body.pieces[0].record).q], [-1, 1, 1, -1]);
   assert.deepEqual(s.stores(mac, 'p1:8'), []);
   assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'arrows:south'), mac.secret)).body.error, 'stores-short', 'the southern Twigs are another material');
-  s.setXp(mac, xpForRank(RAM_KIT_RANK), 'building');
-  assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'ramkit:oak'), mac.secret)).body, { error: 'stores-short' });   // SEAT2b part two (
   s.setXp(mac, 0, 'building');
   s.give(mac, 'plank:oak', 'own', 3);
   assert.deepEqual((await s.call('/v1/prof/craft', craft(mac, 'table-small:oak'), mac.secret)).body, { error: 'prof-rank' }, 'Oak asks Carpentry 10');

@@ -75,7 +75,7 @@ export const CATEGORIES = Object.freeze([
       "feat:smaller-dungeons", "Experimental/SmallerDungeons", "feat:medium-dungeons", "feat:world-dungeon-sizes", "feat:varied-dungeon-monsters",
       "Enhancements/AlternateRandomEnemySelection", "feat:mod-aquatic-sprites"]),
     sec("loot", "Loot & items", [
-      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:gate-portent-loot", "feat:humanoid-loot", "feat:revenants", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
+      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:gate-portent-loot", "feat:town-seats", "feat:humanoid-loot", "feat:revenants", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
     sec("light", "Your light", [
       "feat:torches-from-items", "Enhancements/PlayerTorchFromItems", "feat:mod-handheld-torches"]),
     sec("character", "Character & survival", [
@@ -107,7 +107,7 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("world", "World", [
     sec("land", "Land", [
-      "feat:tamriel-land", "feat:landforms", "feat:real-forests", "feat:bantha-jungle", "feat:tamriel-lands", "feat:climate-blend", "feat:road-verges", "feat:mod-roads-hazelnut"]),
+      "feat:tamriel-land", "feat:landforms", "feat:terrain-slope-cut", "feat:real-forests", "feat:bantha-jungle", "feat:tamriel-lands", "feat:climate-blend", "feat:road-verges", "feat:mod-roads-hazelnut"]),
     sec("weather", "Weather & ambience", [
       "feat:weather-events", "feat:mod-better-ambience"]),
     sec("towns", "Towns & people", [

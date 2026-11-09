@@ -52,7 +52,7 @@ function bedOf(stride) {
 function drawnOracle(hm, stride = 1, carve = null) {
   const grid = buildTerrainGrid(hm, stride), g = 128 / stride + 1;
   const positions = carve ? carveBed(grid.positions, grid.normals, carve, g, g).positions : grid.positions;
-  const idx = buildTerrainIndices(stride), q = 128 / stride, cell = CELL * stride;
+  const idx = buildTerrainIndices(stride, hm), q = 128 / stride, cell = CELL * stride;
   return (x, z) => {
     const qx = Math.min(q - 1, Math.floor(x / cell)), qz = Math.min(q - 1, Math.floor(z / cell)), o = (qz * q + qx) * 6;
     for (let t = 0; t < 2; t++) {

@@ -18,7 +18,7 @@ import {
   domainsWeekOf, domainsRule, domainReportOf, domainReportText, parseDomainReport, domainSeats, charterSeats, charterUnder,
 } from '../../src/net/domainLaw.js';
 import { confirmedDomains, domainFacts, witnessDomain, DOMAIN_ROWS_KEPT_S, DOMAIN_AGREEING_KEPT } from '../../server-account/src/domains.js';
-import { titheAt, levyAt } from '../../server-account/src/seatHolding.js';
+import { titheAt } from '../../server-account/src/seatHolding.js';
 import { settleWeek } from '../../server-account/src/seatTurning.js';
 import { readFileSync } from 'node:fs';
 import { createTownSeatBook } from '../../src/net/townSeatBook.js';
@@ -216,12 +216,9 @@ test('DOMAIN3 THE BAILIWICK IS THE REGION: a board nearer a holding pays the Cha
   s.domain(21, ANTICLERE.key);
   const sh = await s.guild('Gamal', 'Silver Hand', 'SH');
   s.hold(ANTICLERE, sh.gid, { tithe: 5 });
-  s.raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, state, set_aside, spent, at) VALUES (?, ?, 'levy', ?, 'Gamal', 'law', 0, 0, ?)").run(ANTICLERE.key, W, sh.gid, T0);
   const db = s.svc.env.DB, env = s.svc.env;
   assert.deepEqual(await titheAt(db, T0, 21, RIPMORE.pixel, env), { key: ANTICLERE.key, guild: sh.gid, pct: 5 });
   assert.equal(await titheAt(db, T0, 21, RIPMORE.pixel), null, 'the seat law: Ripmore\'s own bailiwick, unheld');
-  assert.equal(await levyAt(db, T0, 21, RIPMORE.pixel, env), ANTICLERE.key);
-  assert.equal(await levyAt(db, T0, 21, RIPMORE.pixel), null);
 });
 
 test('DOMAIN3 THE FOLD: the Turning before the first region-law week releases a Charter held at a holding - its claim fee home, its stockpile to the region\'s Charter\'s, the Chronicle\'s line - keeps the seat of power\'s holder, and claims nothing at a holding; Season 0\'s last Turning wipes instead, and folds nothing (mutants: the fold\'s refund; the stockpile moved; the claims filtered; the wipe\'s guard; the week unthreaded to the Turning)', async (t) => {
@@ -234,14 +231,12 @@ test('DOMAIN3 THE FOLD: the Turning before the first region-law week releases a 
   s.treasury(eo.gid, 20_000); s.treasury(sh.gid, 20_000);
   s.raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('guild', ?, 'burn', NULL, 'seat-claim', 8000, 1, 1, 'seats', 'The Turning', ?)`).run(eo.gid, `claim-${W - 2}-${RIPMORE.key}`);
-  s.raw.prepare("INSERT INTO town_seat_stockpile (key, material, qty) VALUES (?, 'iron', 10), (?, 'iron', 4), (?, 'oak', 2)").run(RIPMORE.key, ANTICLERE.key, RIPMORE.key);
   const before = s.silver(eo.gid);
   const r = await settleWeek(s.svc.env.DB, W, TURNED, null, W + 1);
   assert.equal(r.settled, true);
   assert.deepEqual(s.raw.prepare('SELECT key, guild_id FROM town_seat_holds ORDER BY key').all().map((h) => [h.key, h.guild_id]), [[ANTICLERE.key, sh.gid]]);
   assert.equal(s.silver(eo.gid) - before, 8000, 'its claim fee home');
   assert.equal(s.raw.prepare("SELECT amount FROM marks_ledger WHERE kind = 'domain-fold'").get().amount, 8000);
-  assert.deepEqual(s.raw.prepare('SELECT key, material, qty FROM town_seat_stockpile ORDER BY key, material').all().map((x) => [x.key, x.material, x.qty]), [[ANTICLERE.key, 'iron', 14], [ANTICLERE.key, 'oak', 2]]);
   const line = s.raw.prepare("SELECT data FROM town_seat_history WHERE kind = 'fold'").get();
   assert.deepEqual([JSON.parse(line.data).into, JSON.parse(line.data).refund], [ANTICLERE.key, 8000]);
   // Season 0's last Turning: wiped, and no fee home
@@ -276,7 +271,7 @@ test('DOMAIN3 A HOLDING\'S PLEDGE CLAIMS NOTHING at the fold\'s Turning, and the
   q.treasury(g.gid, 50_000);
   assert.equal((await q.pledge(g.gm, RIPMORE.key)).status, 200);
   q.raw.prepare(`INSERT INTO town_seat_influence (week, key, guild_id, account, char_id, source, amount, region, day, ref, at)
-    VALUES (?, ?, ?, ?, ?, 'writ', 5000, 21, 1, 'x', ?)`).run(W, RIPMORE.key, g.gid, g.gm.id, g.gm.character, T0);
+    VALUES (?, ?, ?, ?, ?, 'watch', 5000, 21, 1, 'x', ?)`).run(W, RIPMORE.key, g.gid, g.gm.id, g.gm.character, T0);
   q.raw.prepare('INSERT OR IGNORE INTO town_seat_binds (week, account, guild_id, char_id, at) VALUES (?, ?, ?, ?, ?)').run(W, g.gm.id, g.gid, g.gm.character, T0);
   assert.equal((await settleWeek(q.svc.env.DB, W, TURNED, null, W + 1)).settled, true);
   assert.equal(q.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_holds').get().n, 0, 'no Charter claimed at a holding');
