@@ -5,8 +5,8 @@
 // Professions page on the pause window's Stats rail (ui/enhanced/enhancedMenu.js),
 // beside Character, Attributes and Skills, and the Stores page on its
 // Holdings rail (HOLDINGS, 2026-10-03, moved it there with the other
-// things the player holds) - the sheet's own bones (bible/06-Systems/
-// Professions-Arc.md 8, 21, 22). Online only, and only while the
+// things the player holds) - the sheet's own bones (docs/systems/professions.md).
+// Online only, and only while the
 // professions are this account's: the host registers its book here
 // (`setProfessionsPages`), and a page with nothing behind it is never
 // drawn (PX14's drawn door).
@@ -580,8 +580,7 @@ const gatherHow = (id) => (id === 'herbalism' ? t('prof.page.how.herbalism', GAT
 /** UNWITNESSED-ORE (FIELD BUGS 2026-10-09e, "Mining veins": hundreds of Iron veins in the mountains and not one of
  *  Silver, Gold, Platinum or Mithril, read as a bug): the ground's own law, said on the Mining page - a vein holds its
  *  ground's rarer ores only where three players have gathered (net/nodeLaw.js witnessedFact, UNCONFIRMED_VEIN_TIER).
- *  ORE-MAP: and where to read it for a place - the world map's ore card (ui/oreMapTip.js). DEEP-OPEN (bible/06-Systems/
- *  Professions-Arc.md section 53): a dungeon's deep veins draw their whole table on anyone's word (nodeLaw.js
+ *  ORE-MAP: and where to read it for a place - the world map's ore card (ui/oreMapTip.js). DEEP-OPEN (docs/systems/professions.md): a dungeon's deep veins draw their whole table on anyone's word (nodeLaw.js
  *  dungeonVein) - only the woods' Moonstone waits (deepClimateOres) - where this line had said "Silver anywhere". */
 export const MINING_GROUND_LINE = 'Veins hold Silver at most until three different players, each with an account at least a week old, have gathered on that ground. Then Gold, Platinum and Mithril in the mountains, and the region\'s own ore, can appear. Deep veins in dungeons can hold any of their ores, Dwarven Scrap and Adamantium among them, in any dungeon; only a woodland dungeon\'s Moonstone waits for three players to gather in it. Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet.';
 /** L10N4: MINING_GROUND_LINE in the player's language. */

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // SAFE1-SAFE7: THE CHAT'S SAFETY, AS THE PLAYER MEETS IT - a module the
 // streaming host wires (scenes/world.js bootWorld; fishHost.js is the shape - HOST-SPLIT: the host does not grow).
 //

@@ -26,7 +26,7 @@ const at = (x, z) => ({ x: COURT_CENTRE[0] + x, y: 0, z: COURT_CENTRE[2] + z, ya
 const gates = (ws, k) => ws.sent.filter((m) => m.t === 'gate' && (!k || m.k === k));
 const settle = () => new Promise((r) => setImmediate(r));
 
-// ═══ THE LAW ═══════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('GATE-COURTS the law: fifty a court, sixteen courts a night, a whole party\'s slack (PARTY_MAX - 1); a court\'s room `gate:<day>.<k>` past the first, and each court copied past its sockets (mutants: the slack not the party\'s; a court past the last)', () => {
   assert.equal(C.GATE_COURT_FIGHTERS, 50, 'the owner\'s fifty');
@@ -130,7 +130,7 @@ test('GATE-COURTS the night: done after the seal once every court a fighter JOIN
   assert.equal(C.isGateBook(w), true); assert.equal(C.isGateBook({ d: 1 }), false); assert.equal(C.isGateBook(null), false);
 });
 
-// ═══ THE WIRE ═════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('GATE-COURTS the wire: `go` its day and court, `cf` a court\'s kill with its court and the courts held, the night\'s `fell` with the courts that won and held - each bounded; the brain\'s law 7 (mutants: a court past the last taken; the night\'s counts dropped)', () => {
   assert.deepEqual(validGateOut({ k: 'go', d: DAY, c: 3, x: 1 }), { k: 'go', d: DAY, c: 3 });
@@ -145,7 +145,7 @@ test('GATE-COURTS the wire: `go` its day and court, `cf` a court\'s kill with it
   assert.equal(GATE_BRAIN_V, 7); assert.equal(GATE_BRAIN_MIN, 7, 'a game that would not hear `go` is told to reload');
 });
 
-// ═══ THE RELAY ════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 /** A night's courts over real Rooms - the first court's object holding the book, the hub's party door answered as `party` says. */
 async function night(fn, { start = TT.openAt + 1000, party = {} } = {}) {
@@ -328,7 +328,7 @@ test('GATE-COURTS the hub: a court\'s kill (`c`) said as `cf`, its receipts hand
   });
 });
 
-// ═══ THE CLIENT ═══════════════════════════════════════════════════════════════════════════════
+// THE CLIENT
 
 test('GATE-COURTS the link: `go` moves my room to that court for its day; a court\'s kill said once in its own words, moving no fall; the night\'s `fell` the fall, said only where no court\'s was; a court\'s own `fell` folds its fight alone (mutants: the go unkept; a court\'s kill as the fall; said twice; the night said over a court\'s)', () => {
   const said = [];
@@ -365,7 +365,7 @@ test('GATE-COURTS the words: a court\'s kill by its number, where, and who struc
   assert.ok(card({}).includes(`${gateBossOf(DAY).name} has fallen"`), 'a night of one court: the card as it was');
 });
 
-// ═══ AUDIT GATE-COURTS ════════════════════════════════════════════════════════════
+// AUDIT GATE-COURTS
 // The owner: "Audit this". Three cold lanes (the relay; the law, the wire and the client; the pins, the record and the
 // cost) Each finding's pin below fails on the code before its fix.
 

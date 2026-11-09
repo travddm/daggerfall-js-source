@@ -5,7 +5,7 @@
 // NAME_WORDS, CROWN_LORE): a crown's ship by her crown's royals, places and martial words, a merchantman by her port,
 // her cargo and her fortune, a pirate by her dark beasts, her Daedric patron and her deeds; the old lists among the
 // forms. On its own stream (SHIP_NAME_SALT): her captain is the captain she always had. Every pin runs the real module; each
-// is red on the record's code (168bf2587). `03-World/Naval-Combat.md` (NAV-C).
+// is red on the record's code (168bf2587). `docs/systems/naval.md`.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

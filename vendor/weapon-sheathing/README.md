@@ -14,7 +14,7 @@ Mac (Lattymoy) handed the archive over on 2026-09-17: "Can we
 implement this for the morrowind model" - the port's Morrowind
 third-person body (the player's own behind the wheel camera, and other
 players' online). The mechanism is ported in `src/systems/
-weaponSheathing.js` (WS1); see `bible/06-Systems/Weapon-Sheathing.md`.
+weaponSheathing.js` (WS1); see `docs/formats/mods-and-vendor.md`.
 
 **Permission**, the mod's own, verbatim from `WeaponSheathing.txt`:
 "Everything included in this mod is free to use for your own Morrowind

@@ -6,8 +6,7 @@
 // tier 2, and the Mountain's table holds Iron at 1 and nothing again until Silver at 3 - so every mountain pixel nobody
 // else had worked stood Iron alone, and the Mountain Woods never stood its Silver. A lone miner confirms nothing. A vein
 // on such ground is held where a dungeon's deep vein already is - UNCONFIRMED_VEIN_TIER, 3 - and the Mining page says
-// what still waits on the witnesses. `01-Overview/bugs/Field-Bugs-2026-10-09e.md`. DEEP-OPEN (Professions-Arc.md section
-// 50): the dungeon's deep vein is held no more - it draws its whole table on anyone's word,
+// what still waits on the witnesses. DEEP-OPEN (docs/systems/professions.md): the dungeon's deep vein is held no more - it draws its whole table on anyone's word,
 // bounded by the account's four a day - so the cap is the surface's alone now.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

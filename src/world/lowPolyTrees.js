@@ -9,7 +9,7 @@
 // THE ATLASES ARE DAGGERFALL'S OWN SPRITES. Measured against every record of TEXTURE.500-511, 75.5-90.9% of each of
 // the mod's larger atlases' drawn texels is a classic record copied texel for texel - turned or mirrored in places, cut
 // down in others - and the five small pictures are classic records whole. A render of game data IS game data
-// (01-Overview/Port-Doctrine.md), so no atlas is carried: the extractor wrote each as a list of BLITS (the record, its
+// (docs/README.md), so no atlas is carried: the extractor wrote each as a list of BLITS (the record, its
 // turn, where it lands, the rectangle it may paint) and the atlas is painted here from the player's own records - or,
 // under Seasons of the Iliac Bay, from that mod's seasonal picture of the same record, which is what makes the 3D trees
 // turn with the seasons. The rest of each atlas is no exact copy of any record - the author's top-down crowns, his

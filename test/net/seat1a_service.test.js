@@ -1,6 +1,6 @@
 // SEAT1a: THE SEATS' WITNESSED REGISTRY, AS THE SERVICE KEEPS IT - driven through
 // the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// 3.2; `06-Systems/Online-Arc.md` SEAT1a.
+// 3.2; SEAT1a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

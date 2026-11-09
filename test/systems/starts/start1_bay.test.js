@@ -348,7 +348,7 @@ test('START1 the patch: _BRISIEN as the pack reads it is DFU\'s script with its 
 
 // ── the welcome tour ─────────────────────────────────────────────
 
-test('START1 the welcome tour says the main story waits on the commission (bible/10-UI/Voice.md rule 7: the capital unnamed) - whichever start the character began in, so it names none', () => {
+test('START1 the welcome tour says the main story waits on the commission (the capital unnamed) - whichever start the character began in, so it names none', () => {
   const body = tutorialById('welcome').body.join(' ');
   assert.match(body, /Your story begins with the Emperor's sealed orders, your commission\. When you hold them, open them from your pack: they name the city where the main story begins\./);   // PIN MOVED (AUDIT STARTS U9): true of the commission in hand, and of where the story begins
   assert.doesNotMatch(body, /cave|shipwreck|Privateer/i, 'no one start\'s words');

@@ -2,7 +2,7 @@
 // service's store of an online home's pieces driven through the real Worker over node:sqlite with every migration
 // applied (server-account/src/decor.js), the client's door to it, and the deploy's wiring; DECOR1c: the pieces standing
 // in a room (scenes/decor/decorRoom.js), the scene that keeps them, and the host that stands them (worldModes.js).
-// `06-Systems/Online-Arc.md` DECOR1.
+// DECOR1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-12b (Discord #bug-reports, "Odd family tree behavior"; `01-Overview/bugs/Field-Bugs-2026-10-12d.md`):
+// FIELD BUGS 2026-10-12b (Discord #bug-reports, "Odd family tree behavior"):
 // "A marriage between two Enduring bloodline characters resulted in some strange things happening with the family tree.
 // ... The two heirs originally had two different names and classes, but once the mantle was passed on they suddenly both
 // had the same name and class, although different birthdays. ... The nightblade is gone entirely." And: "the house

@@ -1,6 +1,6 @@
 // DISC12: the two online gaps DISC10 left - a peer fighting
 // with the LEFT hand was drawn and heard with the right hand's weapon (or a fist), and a peer in beast form was
-// drawn as the person. The pose carries both now (`lh`, `wb`, world101). 01-Overview/bugs/Field-Bugs-2026-09-23.md.
+// drawn as the person. The pose carries both now (`lh`, `wb`, world101).
 import { test } from 'node:test';
 import { poseHandsOf } from '../../src/net/wire.js';
 import assert from 'node:assert/strict';

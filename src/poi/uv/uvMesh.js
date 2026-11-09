@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // POI-5 - THE UV EDITOR'S GEOMETRY: A MESH AS ITS FACES' CORNERS, ITS SEAMS AND ITS ISLANDS.
 //
 // asked what "UV map" covers: "Full UV editor" - select vertices,
@@ -28,7 +27,6 @@
 //     UVs now part, shared everywhere else - in the submeshes' own order, so the part's materials still match.
 //
 // Not a DFU member. Ledger A (POI).
-// ═══════════════════════════════════════════════════════════════════
 
 import { orderByDissection, cholesky, solveCholesky, upperCsc } from '../sparseCholesky.js';
 import { wrapAngle } from '../../world/mat4.js';

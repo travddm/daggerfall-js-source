@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // TESA14 (TESA14) - THE ROADS PAST THE BAY'S OWN WORKER.
 //
 // A region's network is seconds of work - its places rolled (the countryside's plateau is a terrain kernel's mean) and
@@ -17,7 +16,6 @@
 // recorded intent, "with no worker this thread builds it"): `inThread` on its init takes the trace and the fit this thread
 // has installed already - installing them again would move the land's version under every reader here - and `steps`
 // answers a build a step at a time, so the client spends a budget of it between frames.
-// ═══════════════════════════════════════════════════════════════════
 import { WoodsFile } from '../formats/woodsFile.js';
 import { groundWoods, dropGroundCache } from './tamriel/tamrielGround.js';
 import { groundClimateIndex } from './tamriel/tamrielGround.js';

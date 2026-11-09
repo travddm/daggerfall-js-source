@@ -59,7 +59,7 @@ function door(foes, me) {
   setPlayerDoor({ foes: () => foes.filter((f) => !f.dead && f.entity), feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, player: () => me });
 }
 
-// ═══ THE POWERS ═══════════════════════════════════════════════════════════════════════════════════
+// THE POWERS
 
 test('AUDIT SETS L1 + L5: NO ESCAPE\'S MARK ENDS WITH ITS FOE - killed by me or by anyone (its body read, not its clock), its chip gone; the same foe marked again renews its time and says nothing (mutants: the mark on a body; the kill of the marked foe leaving it; the line said for every re-mark)', () => {
   const v = fresh();
@@ -171,7 +171,7 @@ test('AUDIT SETS L4: A BLOW THE WARDEN\'S WARD TURNS spends no power - Riposte s
   assert.equal(setBlow(s, 100, e, RAT, {}), 101, 'and the next blow that lands has it');   // PIN MOVED: B5 (Riposte Faint 4 -> 1)
 });
 
-// ═══ THE WIRE AND THE ROOM ═══════════════════════════════════════════════════════════════════════
+// THE WIRE AND THE ROOM
 
 test('AUDIT SETS M1: A FOE\'S MAXIMUM HEALTH RIDES ITS RECORD (`k`) - bounded as its health is; the exterior owner and the dungeon host say it, the puppet and the guest\'s copy take it, so Run Them Down reads the OWNER\'s "under half" (mutants: `k` unbounded; unsaid; untaken)', () => {
   assert.deepEqual(validFoeRecord({ i: 1, h: 40, k: 70 }), { i: 1, h: 40, k: 70 });

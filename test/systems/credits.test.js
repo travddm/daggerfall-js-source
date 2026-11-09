@@ -60,7 +60,7 @@ test('CR1: a mod row carries what a modder is owed - title, author, what it is, 
   assert.equal(kamer.contact, 'DFU Discord');
 });
 
-// ═══ WM3: A CREDITED MOD IS A MOD THE PLAYER CAN FIND ═════════════
+// WM3: A CREDITED MOD IS A MOD THE PLAYER CAN FIND
 //
 //
 // The credit was there and the gate above proves it. The FEATURES

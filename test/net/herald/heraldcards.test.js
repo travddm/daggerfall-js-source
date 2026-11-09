@@ -28,7 +28,7 @@ const HOOK = 'https://discord.com/api/webhooks/123456789012345678/abc_DEF-123';
 const T_GATE = '200000000000000001', T_SEA = '200000000000000002';
 const LOUD_NAME = '**@everyone** <@&1> https://evil.io/x [a](b) `c` ~d~ |e|';
 
-// ═══ THE CARD ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE CARD
 
 test('HERALD-CARDS the card: one embed - its family\'s name and colour, the title, the text, the fields that have a value (inline unless they say not), the moment its footer; content only when it pings, the role and the line beside it; Discord may ping that role and nothing else (mutants: content on a quiet card; every mention allowed; an empty field posted; the family\'s colour another\'s)', () => {
   const c = heraldCard({ family: 'serpent', moment: 'Bells', title: 'T', text: 'x', fields: [['A', 'a'], ['B', null], ['C', 'c', false], ['D', '']], role: ROLE, ping: 'P' });
@@ -131,7 +131,7 @@ test('HERALD-CARDS the door and the words: a thread is a Discord id or nothing; 
   for (const [k, f] of Object.entries({ heraldWebhook, heraldRole, heraldName, heraldStamp, heraldList })) assert.equal(gateHerald[k], f, `${k}: one export, said again`);
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 const quiet = (fn) => { const warn = console.warn; console.warn = () => {}; return Promise.resolve().then(fn).finally(() => { console.warn = warn; }); };
 /** The hub with Discord stubbed: `posts` is every URL and body the herald sent. */
@@ -199,7 +199,7 @@ test('HERALD-CARDS the client says a thread setting down the hub link; the roles
   });
 });
 
-// ═══ AUDIT HERALD-CARDS ══════════════════════════════════════════════════════════════════════════════════════════
+// AUDIT HERALD-CARDS
 
 const T_ABYSS = '200000000000000003';
 const FAMILY_OF = Object.fromEntries(Object.entries(HERALD_FAMILIES).map(([f, F]) => [F.name, f]));

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // POI-5 - A SPARSE HERMITIAN POSITIVE-DEFINITE SYSTEM, SOLVED DIRECTLY.
 //
 // The UV editor's unwrap (poi/uv/uvMesh.js unwrapLscm) is a least-squares system over every vertex of an island; an
@@ -24,7 +23,6 @@
 //   - `solveCholesky(L, bRe, bIm)`: L L^H x = b.
 //
 // Pure - typed arrays in, typed arrays out. Not a DFU member. Ledger A (POI).
-// ═══════════════════════════════════════════════════════════════════
 
 /**
  * An elimination order for a mesh's vertices by geometric nested dissection: split at the median of the longest axis of

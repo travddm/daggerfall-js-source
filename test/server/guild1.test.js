@@ -1,6 +1,6 @@
 // GUILD1: THE GUILDS. The law both ends read (net/guild/guildLaw.js), the account service's guilds
 // driven through the real Worker over node:sqlite with every migration applied (server-account/src/guilds.js), and the
-// client's door (net/accountClient.js accountGuilds). `06-Systems/Online-Arc.md` GUILD1.
+// client's door (net/accountClient.js accountGuilds). GUILD1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

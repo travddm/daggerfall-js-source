@@ -57,4 +57,4 @@ write, without it the tree is checked) and the two Python tools.
 
 ## The port
 
-`bible/07-Rendering/Heat-Haze.md` is the record.
+`docs/formats/mods-and-vendor.md` is the record.

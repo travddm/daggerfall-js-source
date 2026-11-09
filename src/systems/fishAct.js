@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // PROF8 - FISHING'S ACT, the net
 // (5.2, 30). A pure machine, as
 // herbAct.js and traceAct.js are: the gathering host ticks it with the
@@ -18,7 +17,6 @@
 //
 // A missed moment never fails the haul - it gives less (PROF0 5.1). Gentle
 // acts: no moment at all - the net comes in plain after its wait.
-// ═══════════════════════════════════════════════════════════════════
 
 import { FISH_ACT, fishBand, tugWindow, waitMult, throwM } from '../net/professionLaw.js';
 import { firmActMult } from './firmamentLive.js';   // FIRM1: the Firmament's patient line (act.fishing)

@@ -15,9 +15,9 @@ the on-foot tables (walk, attack, hurt, idle, bow and cast: 80 frames an outfit)
 shapes come from Daggerfall's own class sprites (TEXTURE 1540, 1541) and enemy frames (TEXTURE.475-490).
 
 **Permission.** Because its pixels are drawn from Daggerfall's own sprites, this art is a render of game data under
-`bible/01-Overview/Port-Doctrine.md`. The owner approved carrying it as a named exception (2026-10-19, "Approve as an
+`docs/README.md`. The owner approved carrying it as a named exception (2026-10-19, "Approve as an
 exception"), as for Vanilla Enhanced and the desert's and winter's ground; the doctrine records it and
 `test/tooling/doctrine.test.js` holds this folder to it.
 
-**Rebuilding.** `bible/04-Characters/Layered-Gearing.md` says how the strips, the cloak layer and the hood fixes are
+**Rebuilding.** `docs/formats/mods-and-vendor.md` says how the strips, the cloak layer and the hood fixes are
 built again after another cleanup round.

@@ -71,7 +71,7 @@ here - the earlier mod records carry theirs in this line.]**
 
 ## Why the textures ARE here
 
-The port's doctrine (`bible/01-Overview/Port-Doctrine.md`) keeps ARENA2
+The port's doctrine (`docs/README.md`) keeps ARENA2
 and every render of it out of the repository. No ARENA2 file shows a
 saddled horse standing in a field from five sides; the mod's own
 `StationaryHorseBillboard` draws these, and the walk is the mod's own

@@ -45,7 +45,7 @@ const FESTIVAL = FESTIVALS[0];
 const N = starNightAt(FESTIVAL.fromMs) + 30;
 const BAY_PX = [300, 200], PAST_PX = [1600, -120];
 
-// ═══ THE LAW BEFORE WW5, WRITTEN OUT ════════════════════════════════════════════════════════════════════════════════
+// THE LAW BEFORE WW5, WRITTEN OUT
 /** The Bay's star instants before WW5: `n * STAR_HOUR_MS` and the night's three falls. */
 const oldFallAt = (n, k) => n * 3_600_000 + [-900_000, -450_000, 0][k];
 /** The Bay's coven of a night before WW5 (starfallCovens.js starCovenOf, at e77eadc58f). */

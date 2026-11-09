@@ -8,7 +8,7 @@
 // List form sends does not. The realm's trade law (net/realm/realmTradeLaw.js recordIsOffered) compares every field but the
 // volatile ones, and its volatile list named the two older receiver's marks and not the new one: every marked piece
 // was "not the record's piece", at the market, a stall and a realm trade alike. The three now read ONE list
-// (RECEIVER_MARKS). `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
+// (RECEIVER_MARKS).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as law from '../../src/net/realm/realmTradeLaw.js';

@@ -2,7 +2,7 @@
 // the law's words and numbers (src/net/townSeatLaw.js), the decorator's rule in the palace (src/scenes/decor/decorTool.js
 // charterWhyNot: the largest room, two metres from the court; a room's own cap), the account door's `seat`
 // (src/net/accountClient.js accountDecor) and the hosts' seams (src/scenes/worldModes.js interiorSeatHall, world.js
-// seatHall). 7.2; `06-Systems/Online-Arc.md` SEAT-HALL.
+// seatHall). 7.2; SEAT-HALL.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

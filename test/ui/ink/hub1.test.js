@@ -1,6 +1,6 @@
 // HUB1: EVERY REGION'S MAIN CITY IS ITS HUB (systems/region/regionHubs.js). The
 // rule, the words, the base-row count, the held map's circles and names, and the world host's wiring by source.
-// The held map window's label and info box are driven in test/ui/heldmap.test.js. `06-Systems/Online-Arc.md` HUB1.
+// The held map window's label and info box are driven in test/ui/heldmap.test.js. HUB1.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

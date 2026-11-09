@@ -477,7 +477,7 @@ test('QL12 THE VOCABULARY: the five join TITLES last, in QL_TITLES\' order; a re
   assert.deepEqual([e.name, e.kicker, e.honour.rgba], ["Satakal's Witness", 'New Title', TITLE_RGBA.satakalwitness], 'its loot banner');
 });
 
-// ═══ AUDIT QUESTLINES (SERVICE-1, SERVICE-2, SERVICE-3, SERVICE-6, SERVICE-7): THE CLIENT'S HALF, END TO END ═══
+// AUDIT QUESTLINES (SERVICE-1, SERVICE-2, SERVICE-3, SERVICE-6, SERVICE-7): THE CLIENT'S HALF, END TO END
 // The real line runner (systems/questlines/qlLineRunner.js) through the real door (net/accountClient.js
 // accountQuestlines) into the real Worker - no test joined them, and a door posting to the wrong path, an end dropping
 // its outcome, a load not asking an open again all stayed green.

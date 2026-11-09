@@ -46,4 +46,4 @@ the link to it, here.]
 `node tools/mudexText.mjs`, held to these bytes by
 `test/systems/enemyExpansion/mudex1.test.js`) carries the two tables as text;
 DEX's install reads them after its own when MUDEX is loaded for the game -
-`bible/04-Characters/Enemy-Expansion.md`, MUDEX.
+`docs/formats/mods-and-vendor.md`.

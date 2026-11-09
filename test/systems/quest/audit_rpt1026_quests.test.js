@@ -1,5 +1,5 @@
-// AUDIT RPT1026, lane H (QUESTS): FIELD BUGS 2026-10-26r's quest fixes read cold (bible/01-Overview/bugs/
-// Field-Bugs-2026-10-26r.md, RPT1026-QUESTS). Each pin fails on the batch head 2dc8f31a2 and passes with its fix; the
+// AUDIT RPT1026, lane H (QUESTS): FIELD BUGS 2026-10-26r's quest fixes read cold (RPT1026-QUESTS).
+// Each pin fails on the batch head 2dc8f31a2 and passes with its fix; the
 // mutants are tools/mutants/audit_rpt1026_quests.json.
 //
 // H1 - NO-GIVES-BACK FORGOT A NO THE QUESTLINES READ. The batch re-asks a prompt whose No only hands back the item its

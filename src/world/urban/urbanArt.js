@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // URBANIZER U2 - THE TOWNS'
 // OWN PICTURES: cut stone, brick courses and timber framing over plaster for the port's own buildings (the capitals'
 // landmarks past the Bay - world/capitalSolitude.js and its kin), and each province's paving, kerbs, cobbles and walls
@@ -16,7 +15,6 @@
 // Altmer's white limestone, the Velothi's ochre stucco, the Empire's grey setts and brick, the Bosmer's and the Argonians'
 // planks and stakes. Each style's four pictures (URBAN_KINDS): its SETTS (a main street's carriageway - small dressed
 // stones in courses), its FLAGS (a pavement's slabs), its COBBLES (a side street's rounded stones) and its WALL.
-// ═══════════════════════════════════════════════════════════════════
 import { CAPITAL_PAINT } from '../capitalModels.js';
 import { CAPITAL_ARCHIVE, CAPITAL_ART } from '../capitalShapes.js';
 import { addVendorTextures } from '../../systems/textureReplacement.js';

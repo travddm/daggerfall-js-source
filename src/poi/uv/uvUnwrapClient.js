@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT POI M13 - THE UNWRAP, OFF THE THREAD THAT DRAWS THE EDITOR.
 //
 // The UV editor's unwrap (poi/uv/uvMesh.js unwrapLscm) of an island at the mesh law's size is seconds of solve - 522,000
@@ -19,7 +18,6 @@
 //    terminated (its session is the mesh's size again); the next unwrap opens it again.
 //
 // Not a DFU member. Ledger A (POI).
-// ═══════════════════════════════════════════════════════════════════
 
 /** How long a worker with nothing to do keeps its session - past a builder's few presses between unwraps. */
 export const UV_UNWRAP_IDLE_MS = 30000;

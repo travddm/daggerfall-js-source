@@ -4,7 +4,7 @@
 // plant. Attached to new accounts for 2 weeks. Developer glyph
 // specifically for developers."
 //
-// ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
+// WHAT THESE PINS ARE FOR
 //
 // THE GRANTS ARE DERIVED AND NOT A COLUMN, and that is the claim worth
 // pinning, because it is the one a later slice will be tempted to

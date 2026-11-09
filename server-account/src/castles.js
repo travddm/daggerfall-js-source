@@ -1,11 +1,10 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DOMAIN2 - A
 // GUILD'S CASTLE, AS THE SERVICE KEEPS IT (
 // section 6; the numbers are src/net/castleLaw.js, which the client reads
 // too).
 //
-// ═══ ONE ROW A CASTLE, KEYED BY ITS REGION ══════════════════════════
+// ONE ROW A CASTLE, KEYED BY ITS REGION
 //
 // `guild_castles`: a region keeps one castle, so the
 // region is the row's key and a second buyer finds it taken in the very
@@ -16,7 +15,7 @@
 // `<dungeon>.i<the guild's digest>.<epoch>`) - so the next owner of the
 // castle walks into a fresh one, and an owner who buys it back does too.
 //
-// ═══ ONE STATEMENT DECIDES ══════════════════════════════════════════
+// ONE STATEMENT DECIDES
 //
 // A buy is one batch whose first statement writes the row only where
 // everything holds as the rows stand: the buyer the guild's Guildmaster,
@@ -26,7 +25,7 @@
 // ledger's line first (the Guildmaster's, the row still the guild's), the
 // row deleted off that line.
 //
-// ═══ SETTLED ON READ ════════════════════════════════════════════════
+// SETTLED ON READ
 //
 // A castle goes with its region (Domains law 3), by any road - a siege, a
 // lapse, a revolt, a Charter given up, a Season's wipe. Nothing here runs
@@ -38,7 +37,6 @@
 // row deleted off that line.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═══════════════════════════════════════════════════════════════════
 import { displayName, mintId, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { marksOpenFor } from './marks.js';

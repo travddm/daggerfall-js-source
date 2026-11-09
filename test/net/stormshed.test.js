@@ -32,7 +32,7 @@ const settle = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(
 const quiet = async (fn) => { const w = console.warn; console.warn = () => {}; try { return await fn(); } finally { console.warn = w; } };
 const DAY = 86400;
 
-// ═══ A. THE TOKEN ════════════════════════════════════════════════════════════════════════════════════════════════════
+// A. THE TOKEN
 
 function fakeStorage(seed = null) {
   const m = new Map();
@@ -197,7 +197,7 @@ test('STORM-SHED A: a room refused for want of a token is asked again only once 
   assert.ok(z.s._retryAt < z.clock.now + BACKOFF_MAX_MS + BACKOFF_MIN_MS, 'within the backoff');
 }));
 
-// ═══ B. THE WATCH'S CLAIM ════════════════════════════════════════════════════════════════════════════════════════════
+// B. THE WATCH'S CLAIM
 
 test('STORM-SHED B: a Watch claim that failed waits SEAT_WATCH_RETRY_MS before the next, doubling with each failure in a row to SEAT_WATCH_CLAIM_EVERY_MS - never the frame after its answer; an answer lets the wait go (mutants: no wait; the frame\'s test unheld; undoubled; uncapped; kept past an answer)', async () => {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -247,7 +247,7 @@ test('STORM-SHED B: a Watch claim that failed waits SEAT_WATCH_RETRY_MS before t
   assert.equal(SEAT_WATCH_RETRY_MS, 30_000);
 });
 
-// ═══ C. THE READS THE ASKS MULTIPLIED ════════════════════════════════════════════════════════════════════════════════
+// C. THE READS THE ASKS MULTIPLIED
 
 const ENV = { SEATS_OPEN: 'on' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };

@@ -195,7 +195,7 @@ export const sigilRenown = () => _renown;
  *  offline earns none, so offline play keeps what it had (RENOWN-LOOT's offline answer). Online once the page's Renown
  *  reaches `min`, and never before the page knows it (the moments before the first token) - nothing opens ahead of the
  *  Renown behind it, RENOWN-LOOT's first-stage law. The one door: eliteFoes.js eliteRenownOpen (Renown 5) and revenant.js
- *  revenantHeld (Renown 10) ask it (`06-Systems/Revenants.md` section 39).
+ *  revenantHeld (Renown 10) ask it.
  *  @param {number} min
  *  @param {{ online?: boolean, renown?: number|null }} [o] */
 export const renownOpens = (min, { online = _online, renown = _renown } = {}) => !online || (Number.isSafeInteger(renown) && /** @type {number} */ (renown) >= min);

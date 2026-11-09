@@ -1,12 +1,11 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // INT2-INT5: THE VERDICT ON
 // A CHECKPOINT - what the judge found (judge.js), what the ledger says (INT4, ledger.js), what the budget says (INT5,
 // budget.js), the level the realm trusts, and the hold they come to - as the statements realm.js checkpointRealm lays in
 // the SAME BATCH that moves the character's row to the new save. One batch, so a checkpoint that loses its race (a
 // trade settling, a join) writes no verdict either, and a verdict never stands for a save that did not land.
 //
-// ═══ THE HOLD ══════════════════════════════════════════════════════
+// THE HOLD
 //
 // `held` is the character's, and every route that hands its value to another player reads it (realm.js holdRefusal).
 // Its reasons stand in an order - staff's, the law's, the budget's - and each clears its own way:
@@ -28,20 +27,19 @@
 // trades on. 'dupe' - DUPES_FOR_HOLD copies, staff alone to lift - is retired: no verdict writes it, a row still holding
 // it is lifted by its next checkpoint, and the schema's start has none standing.
 //
-// ═══ WHAT A VERDICT WRITES OVER ════════════════════════════════════
+// WHAT A VERDICT WRITES OVER
 //
 // The row as the checkpoint READ it (`judge_rev`): a staff act landing in between moves the rev, and this verdict is not
 // written - the next checkpoint judges again over the row as it stands
 // (AUDIT INT: a staff hold landing mid-checkpoint was written over). The bucket is written as a change, so a win's
 // spoils granted in between (budget.js grantSpoils) are kept.
 //
-// ═══ THE FIRST JUDGEMENT ═══════════════════════════════════════════
+// THE FIRST JUDGEMENT
 //
 // . The baseline is what the realm ALREADY HELD for the
 // character - its stored record, read once - never the save the first judged checkpoint brings: that save is charged
 // for what it adds like any other (AUDIT INT: the first judged save could hold anything, and was the baseline). A new
 // character's baseline is a newborn's purse (REALM_BIRTH_WEALTH_MAX).
-// ═══════════════════════════════════════════════════════════════════
 
 import { judgeSave, judgeProducts, STRIKES_FOR_TIMED, JUDGE_VERSION, FINDINGS_KEPT, WEALTH_VERSION, goodsOf, lawValuesOf, LAW_VALUES_CUT } from './judge.js';
 import { ledgerStep, chargeSteps } from './ledger.js';

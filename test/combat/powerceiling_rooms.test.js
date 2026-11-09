@@ -32,7 +32,7 @@ import { ARMOR_MATERIAL } from '../../src/systems/armorMaterials.js';
 import { WEAPONS, WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 
-const RULE = 'THE CEILING HOLDS (bible/05-Combat/Power-Ceiling.md section 5): a registry spends the room it is given, never its raw per cent';
+const RULE = 'THE CEILING HOLDS: a registry spends the room it is given, never its raw per cent';
 /** `fn()` with the product already spent: a blow's (or a hurt's) every share taken before the registry asks. */
 const spentBlow = (fn) => { const was = openBlowCeiling(); blowRoom(1e9); try { return fn(); } finally { closeBlowCeiling(was); } };
 /** `fn()` inside a fresh product, as the runner holds it for a blow. */

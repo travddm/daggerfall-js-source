@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // PROF8 -
-// FISHING WITH THE NET IN THE STREAMING WORLD (bible/06-Systems/
-// Professions-Arc.md 5.2, 6, 30). Fishing's KIND in the gathering host
+// FISHING WITH THE NET IN THE STREAMING WORLD (docs/systems/professions.md).
+// Fishing's KIND in the gathering host
 // (scenes/gatherHost.js):
 //
 //   THE CAST. No node stands for it: while the pack holds a Fishing-Net

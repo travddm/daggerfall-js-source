@@ -1,9 +1,9 @@
 // SEAT2b part two: THE WORKS AT PEACE ON THE CLIENT - the
 // Watchtowers' word asked ten minutes apart and said once a challenger, a week and a share, kept on the device; the
 // seats dressed in their works; the Seat tab's towers lines; a craft carrying the town its station stands in; the host's
-// seams - a members' Harbour a Travel Options port, a coast the sea beside the town (bible/
-// 11-Multiplayer/Seats-Arc.md 7.5; src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
-// src/scenes/world.js). `06-Systems/Online-Arc.md` SEAT2b part two.
+// seams - a members' Harbour a Travel Options port, a coast the sea beside the town
+// (src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
+// src/scenes/world.js). SEAT2b part two.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

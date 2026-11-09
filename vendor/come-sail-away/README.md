@@ -125,4 +125,4 @@ archive carries no licence text and no readme.**
 writes `Textures/`, `Sounds/` and `Models/` from the shipped bundle; the
 output is a function of the bundle and the ARENA2 alone.
 
-The page for the whole port is `bible/03-World/Come-Sail-Away.md`.
+The page for the whole port is `docs/formats/mods-and-vendor.md`.

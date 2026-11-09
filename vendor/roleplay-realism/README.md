@@ -87,4 +87,4 @@ vendored now.
   (InitMod's registrations at the scene boot), the seams they hang on
   in formulas, climbing, the weapon rig, banking, the ship, the magic
   round, potions, the guilds, the interior context and the world host.
-  `bible/06-Systems/Roleplay-Realism.md` is the page.
+  `docs/formats/mods-and-vendor.md` is the page.

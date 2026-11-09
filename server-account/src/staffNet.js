@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL5-FEEDS - THE RELAY'S NET
 // FEED, KEPT, AND THE PANEL'S NETWORK BURSTS.
 //

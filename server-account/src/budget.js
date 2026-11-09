@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // INT5: THE WEALTH BUDGET. Realm-Arc section 4's
 // "budgets per hour of online play the service measured itself", built.
 //
@@ -18,7 +17,6 @@
 // have held - and nothing is held. Staff read the hours (/v1/mod/realm-budget, tools/realmReview.mjs), set the line
 // from them and turn `enforce` on; from then a gain past the bucket holds the character's trade ('budget') until play
 // refills it. The numbers below are the first setting, a guess the measure exists to replace.
-// ═══════════════════════════════════════════════════════════════════
 
 import { DB_ROOT } from './service.js';   // SCALE4d: the binding a request's counted Proxy wraps - what the config is kept by
 

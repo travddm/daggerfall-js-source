@@ -35,7 +35,7 @@ here - the earlier mod records carry theirs in this line.]**
 **The script.** The bundle carries `Weapon Widget.dll` (42,496 bytes),
 a compiled assembly; the `FPSWeaponClone.cs` its manifest names is not
 in the bundle. The port read the IL method by method - the record is
-`bible/05-Combat/Weapon-Widget.md`, a table of every method against
+`docs/formats/mods-and-vendor.md`, a table of every method against
 where it lives in `src/combat/weapon/weaponWidget.js`. The DLL itself is the
 author's compiled work and is not carried.
 
@@ -44,7 +44,7 @@ author's compiled work and is not carried.
 set, record 0 frame 0 (the idle pose), one per metal - repainted at
 double size for the DoubleScaleTextures and Inertia modules
 (`w_WEAPON04.CIF_0-0_Elven.png` and the rest). The port's doctrine
-(`bible/01-Overview/Port-Doctrine.md`) is that A RENDER OF GAME DATA IS
+(`docs/README.md`) is that A RENDER OF GAME DATA IS
 GAME DATA, and a re-shaded, re-scaled sprite that keeps the original
 silhouette answers yes to "did these pixels come from ARENA2?" - the
 same ruling `vendor/seasons-iliac-bay/README.md` records for that mod's

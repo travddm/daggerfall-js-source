@@ -9,7 +9,7 @@
 // Unity transform, no Harmony, no ModManager message bus, no session-scoped texture release. There is no NOT DONE
 // row. The dump is READ here: a row's method must be in it, and no authored method may be missing from the table.
 //
-// 340 of 398 are ported; 58 have no twin (AUDIT HCC U6 ported the horse-name label's three; KB1 retired ParseConfiguredHotkey - the keys are registry actions). The bible page (06-Systems/Horse-Cart-And-Cargo.md) states
+// 340 of 398 are ported; 58 have no twin (AUDIT HCC U6 ported the horse-name label's three; KB1 retired ParseConfiguredHotkey - the keys are registry actions). The record states
 // these numbers and the no-twin families, and a pin below holds it to them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

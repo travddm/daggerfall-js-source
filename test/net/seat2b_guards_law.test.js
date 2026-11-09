@@ -2,7 +2,7 @@
 // net/siege/siegeRef.js's Barracks guards and a revolt's rising (their posts, their beat, their blows, their falls and rises,
 // a guard counted at a point, the revolt's end and its Honours), the field's frame and the wire that carries them
 // (net/wire.js), the revolt's pass (net/identityToken.js) and the schedule's law for a revolt (net/townSeatLaw.js).
-// 6.1, 7.5, 7.7; `06-Systems/Online-Arc.md` SEAT2b part two (c).
+// 6.1, 7.5, 7.7; SEAT2b part two (c).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

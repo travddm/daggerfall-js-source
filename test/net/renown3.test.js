@@ -4,7 +4,7 @@
 // no higher than RENOWN_OVER_MAX above the character's Renown (net/renown.js renownCeiling), which rises with every
 // level; a character new to Daggerfall fights at or under the ceiling almost from its first kill and earns what it did.
 // RENOWN-ACCOUNT paid every source three quarters of it (net/renown.js renownRate), and read the ceiling
-// against the ACCOUNT's Renown - the numbers below are at that rate. `06-Systems/Accounts-And-Cloud-Saves-Arc.md` RENOWN3.
+// against the ACCOUNT's Renown - the numbers below are at that rate. RENOWN3.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

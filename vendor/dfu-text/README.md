@@ -15,8 +15,7 @@ commit 2343305 (2026-09-14):
 They are the English every translation is made from: the pipeline
 (`tools/translate.mjs`) drafts a language's table from them, and the
 L10N3 pins hold the port's English constants to them key by key. The
-game itself never loads them - the English it shows is in the code
-(`06-Systems/Localization-Arc.md`, L10N1).
+game itself never loads them - the English it shows is in the code.
 
 And the first:
 

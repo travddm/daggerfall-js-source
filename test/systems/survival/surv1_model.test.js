@@ -23,7 +23,7 @@ import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { RACES } from '../../../src/systems/races.js';
 import { DISEASES } from '../../../src/systems/diseases.js';
 
-// ═══ SURV1: THE SURVIVAL MODEL ═════════════════════════
+// SURV1: THE SURVIVAL MODEL
 //
 // The
 // mod's rules were read off its DLL (no source ships) and rebuilt as

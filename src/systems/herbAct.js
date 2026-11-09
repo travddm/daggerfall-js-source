@@ -1,8 +1,7 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // PROF1 - HERBALISM'S
-// ACTS, as machines the host feeds a frame at a time (bible/06-Systems/
-// Professions-Arc.md 5, 22; FORAGE0 14.6). Pure: the host hands in the
+// ACTS, as machines the host feeds a frame at a time (docs/systems/professions.md).
+// Pure: the host hands in the
 // frame's time, whether Interact is held, whether attack was pressed,
 // the view's yaw and pitch and the player's place; the machine answers
 // where the act stands and, at its end, the report the harvest carries.
@@ -26,7 +25,6 @@
 //
 // Every act is cancelled by Esc (the host's `cancel`), nothing lost: the
 // node stands, no tool wears, no harvest is asked.
-// ═══════════════════════════════════════════════════════════════════
 import { HERB_ACT, BASKET_ACT } from '../net/professionLaw.js';
 import { firmActMult } from './firmamentLive.js';   // FIRM1: the Firmament's steadier hand (act.herbalism)
 

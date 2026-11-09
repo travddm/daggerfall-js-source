@@ -31,7 +31,7 @@ import { templateByIndex, mintCondition } from '../../src/systems/item/itemTempl
 import { createEquipTable } from '../../src/characters/equipTable.js';
 import { equipItem } from '../../src/systems/equip.js';
 
-// ═══ AUDIT C&C: THE OWNER'S DECISIONS, MADE, AND THE COMPREHENSIVE AUDIT ═══
+// AUDIT C&C: THE OWNER'S DECISIONS, MADE, AND THE COMPREHENSIVE AUDIT
 //
 // The owner: "Make the best decisions. DO a comprehensive audit on everything ensuring perfection". The open questions
 // AUDIT SURV-BOONS and AUDIT TEMP-UI left (, AUDIT C&C) decided - E4 the sea at

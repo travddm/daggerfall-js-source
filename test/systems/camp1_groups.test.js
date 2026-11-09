@@ -16,7 +16,7 @@ import { CLIMATES } from '../../src/formats/mapsFile.js';
 import { FEATURES } from '../../src/systems/features.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// ═══ CAMP1: WILDERNESS CAMPS AND PACKS ═════════════════════════════
+// CAMP1: WILDERNESS CAMPS AND PACKS
 //
 // Mac, 2026-09-17 ("daggerfalljsWildlifeSpawnsRespawn"): a rare group
 // encounter outdoors - a settled camp or a pack crossing your path -
@@ -286,7 +286,7 @@ test('CAMP-REST by source: every time skip is spent through the tick as a rest, 
   assert.match(ef, /noTargetMode: campAsleep,[^\n]*\n\s*dropLocal: wildUnaware,/, 'the target machine leaves the player off its list for it (WILD-ALERT: and the local player alone for a wilderness foe that has not noticed a fast traveller - test/scenes/wildalert.test.js, test/systems/wildalertfix.test.js)');
 });
 
-// ═══ CAMP-FAR ══════════════════════════════════════════
+// CAMP-FAR
 //
 // The band moves out, and the
 // anchor gets its own placement law, because DFU's ring cannot reach:

@@ -40,4 +40,4 @@ Every file here but this note is made by
 
 ## The port
 
-`bible/07-Rendering/Sands-Of-The-Alikr.md` is the record.
+`docs/formats/mods-and-vendor.md` is the record.

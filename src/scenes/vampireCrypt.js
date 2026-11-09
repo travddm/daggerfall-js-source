@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT RELEASE R2-6 - WHERE A NEW VAMPIRE WAKES: the crypt's
 // map pixel the turn's transfer lands on (VampirismInfection's GetRandomCemetery, then the respawn into its dungeon -
 // scenes/world.js transferToCemeteryArm, which this module answers for; HOST-SPLIT: the host asks, the law is here).
@@ -9,7 +8,6 @@
 //     district, as the region; else the nearest of the districts about it), and where no lair stands at all the nearest
 //     of the Bay's own - never skipped.
 // The isles past the Veil are the host's own skip before this is asked (AUDIT CAPTAIN'S SEA P4).
-// ═══════════════════════════════════════════════════════════════════
 import { randomCemeteryLocationIndex } from '../systems/infection.js';
 import { longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';
 import { inBay } from '../world/tamriel/tamrielFrame.js';

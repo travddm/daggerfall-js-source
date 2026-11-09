@@ -65,7 +65,7 @@ const signer = async () => {
 /** Beats of a room's fight until `n` have passed. */
 async function beats(r, n, now, set) { for (let i = 0; i < n; i++) { set(now() + SERPENT_TICK_MS); if (r.alarm.at != null && now() >= r.alarm.at) await r.fire(); } }
 
-// ═══ F1: EVERY WORD NAMES ITS SITE ═══════════════════════════════════════════════════════════════════════
+// F1: EVERY WORD NAMES ITS SITE
 
 test('AUDIT SERPENT 2 F1: every word a fight says names its site, and a client folds its own site\'s alone - a forged site in the NEXT cell, its fight heard by an honest ship\'s socket there by her pose, never reads as her serpent: not its swim, not its blows, not its kill (mutants: the stamp left off the fan; an unnamed word folded; a word of another site folded)', async () => {
   // the honest site at its cell's east edge, the forged one 1.6 km east, over the line
@@ -109,7 +109,7 @@ test('AUDIT SERPENT 2 F1: every word a fight says names its site, and a client f
   });
 });
 
-// ═══ F2: ONE TIMELINE, NO WORD KEPT TWICE ════════════════════════════════════════════════════════════════
+// F2: ONE TIMELINE, NO WORD KEPT TWICE
 
 test('AUDIT SERPENT 2 F2: a word that changes nothing is never kept twice - a breach begun in the beat that sent a strayed head to surface said "deep now" again after dropping the surfacing; the relay kept the word twice and every client took it for one it had and kept the surfacing; now the relay\'s ride and track and the client\'s are one - PIN MOVED (SERPENT3): the beat that takes up a slept room (serpentResume) and begins an attack in it (mutants: the duplicate kept on the relay; the client\'s check before the rule)', () => {
   const SOUND = T0 + 25 * 60_000;
@@ -152,7 +152,7 @@ test('AUDIT SERPENT 2 F2: a word that changes nothing is never kept twice - a br
   assert.deepEqual(L.state().modes, [{ at: T0 - 1000, m: MODE.deep }], 'the breach the relay dropped, dropped');
 });
 
-// ═══ F5 / F7: THE BRAIN ═════════════════════════════════════════════════════════════════════════════════
+// F5 / F7: THE BRAIN
 
 test('AUDIT SERPENT 2 F5: a newcomer whose first `in` is from past ENGAGE_R joins with her share out of its health and unseen - anchored off she brings none, and the first beat that finds her at the fight brings it in; S8 held only a known fighter to it (mutants: the far newcomer\'s share brought at once; her seen time now)', () => {
   const SOUND = T0 + 25 * 60_000;
@@ -176,7 +176,7 @@ test('AUDIT SERPENT 2 F7: the ram is chosen only at a ship its lane reaches - it
   assert.ok(serpentAttacksFor(1, 150, true).includes(ram), 'at 150 m');
 });
 
-// ═══ F3 / F4 / F9: THE CLIENT ═══════════════════════════════════════════════════════════════════════════
+// F3 / F4 / F9: THE CLIENT
 
 /** The host over a link on the site's own frame (the scene the site's), the relay's words stamped as it fans them. */
 function rig() {
@@ -248,7 +248,7 @@ test('AUDIT SERPENT 2 F9: the shots\' targets are made once a frame - the shots\
   assert.notDeepEqual(t2.map((t) => t.box), t1.map((t) => t.box), 'where it has swum');
 });
 
-// ═══ F6 / F8: THE RELAY ═════════════════════════════════════════════════════════════════════════════════
+// F6 / F8: THE RELAY
 
 test('AUDIT SERPENT 2 F6: a slain serpent is never let go for another site\'s fight while its waters stand open - a ship whose hub word was missed finds it slain, never a new one at full health; a fight one ship keeps about its waters is never idle; only one nobody keeps gives way (mutants: the slain let go at its kill; a lone ship\'s fight let go)', async () => {
   await withSea(async ({ world, say, now }) => {

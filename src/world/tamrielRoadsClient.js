@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // TESA14 (TESA14) - THE ROADS PAST THE BAY, ASKED FOR A REGION AT A TIME.
 //
 // The host hands the build's inputs and the regions to build, nearest the player first; this keeps WORKERS of the roads'
@@ -19,7 +18,6 @@
 //       recorded fallback, its intent kept - and says so once.
 //   R10 a fresh region lets go of its entries under every other print (and TESA14's and TESA15's keys); a cache that
 //       cannot keep it is said once.
-// ═══════════════════════════════════════════════════════════════════
 import { idbStore } from './roadsCache.js';
 import { unpackArenaRoads } from './arenaRoads.js';
 import { unpackPastBayPlaces } from './pastBayPlaces.js';

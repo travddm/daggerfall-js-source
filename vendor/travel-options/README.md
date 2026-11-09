@@ -81,7 +81,7 @@ roads-hazelnut/README.md`) records a permission from the same author.]**
   (`SDFFontRendering` picks between the mod's two help texts and its
   two travel-time formats - the port carries both strings and picks
   the SDF one, because the port's text is not the classic bitmap
-  font). Every one is recorded in `bible/06-Systems/Travel-Options.md`
+  font). Every one is recorded in `docs/formats/mods-and-vendor.md`
   rather than silently dropped.
 
 ## The port
@@ -98,4 +98,4 @@ port's own `src/ui/travel/travelMapWindow.js` and `src/ui/travel/travelPopUp.js`
 The enhanced lane's control panel and junction map are
 `src/ui/enhanced/enhancedTravelControl.js` - the port's own, not the mod's.
 
-See `bible/06-Systems/Travel-Options.md`. Thank you, Hazelnut.
+See `docs/formats/mods-and-vendor.md`. Thank you, Hazelnut.

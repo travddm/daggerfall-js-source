@@ -471,7 +471,7 @@ test('AUDIT 24: the knockback caps, and the SWIMMER arm the campaign left alive'
 });
 
 
-// ═══ E6: the shooting probe ═════════════════════════════════════════
+// E6: the shooting probe
 
 test('E6: HasClearPathToShootProjectile - the sentinel, the clear shot, the wall', () => {
   // EnemyMotor.cs:698-741, asked with CanCastRangedSpell's own three

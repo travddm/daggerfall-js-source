@@ -78,6 +78,6 @@ checks every one.
 
 ## The port
 
-`bible/03-World/World-Of-Daggerfall.md` is the arc page: what each C#
+`docs/formats/mods-and-vendor.md` is the arc page: what each C#
 member became, the readings taken where the C# leaves a choice, and the
 four-hosts record. The Port-Ledger carries the section-A row.

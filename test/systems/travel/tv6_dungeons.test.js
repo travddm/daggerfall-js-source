@@ -1,4 +1,4 @@
-// TV6 - THE DUNGEONS, DISCOVERED ON APPROACH (bible/06-Systems/Travel-View.md, THE OVERHAUL; Mac 2026-09-28:
+// TV6 - THE DUNGEONS, DISCOVERED ON APPROACH (Mac 2026-09-28:
 // "Discover on approach"). The pure law (systems/travel/travelDungeons.js), the readout's unnamed mark, and the host's wiring.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -276,7 +276,7 @@ test('AUDIT OW3 D2: THE ARRIVAL GUARD - no dungeon is found while the world is b
   assert.match(w, /function worldMoveBusy\(\) \{\n(\s*\/\/[^\n]*\n)*\s*return _seasonStraightening \|\| _traveling \|\| _teleporting \|\| _recalling \|\| _respawning \|\| _loading/, 'the one question every mover answers');
 });
 
-// ═══ AUDIT OW4 (2026-09-28) - the dungeons' lane again: the laws the OW3 fixes left open, behaviourally ═══
+// AUDIT OW4 (2026-09-28) - the dungeons' lane again: the laws the OW3 fixes left open, behaviourally
 
 test('AUDIT OW4 D7: THE FOUND FIRST - the twelve are taken of the found dungeons first, then of the unfound nearest first (a found plate no longer drops behind nearer "?"s), and handed back nearest first', () => {
   const at = { x: 100, y: 100 };
@@ -500,7 +500,7 @@ test('AUDIT OW4 D2/D4 host: a spawn is GONE by the feature\'s own test (the ledg
   clock = NaN;
   assert.equal(gone(5, 6), false, 'a clock not yet running expires nothing');
   // what would stand
-  // PIN MOVED (GROUND-AGREE, bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): the stand is the shared spawn law's
+  // PIN MOVED (GROUND-AGREE): the stand is the shared spawn law's
   // (world/spawnGroundPlace.js), run here over the same cases
   assert.match(w, /const tvSpawnAt = spawnGroundPlace\.spawnAt;/, 'the stand');
   const pathAtThree = new Uint8Array(1000 * 500);

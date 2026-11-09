@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // MORROWIND MESH VIEWER - slice 2 of the import arc: a static
 // weapon/item/body mesh, on screen, from the user's own files.
 //
@@ -15,7 +14,6 @@
 //
 // three.js r128 from CDN, THREE as a global - the paperdoll viewer's
 // pattern, kept so both viewer pages stay the same shape.
-// ═══════════════════════════════════════════════════════════════════
 /* global THREE */
 
 import { MwBsaFile, normalizeBsaPath } from '../formats/morrowind/mwBsaFile.js';

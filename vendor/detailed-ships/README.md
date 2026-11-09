@@ -51,7 +51,7 @@ not part of this port. Asked outright (2026-09-25), Mac chose **"Build
 your own"**: every one of those pieces is the PORT'S OWN stand-in, made
 for the place the author put it (`src/world/detStandIns.js`; the table of
 what each is, and how it was read off its placements, is
-`bible/03-World/Detailed-Ships.md`). None of it is DET's, which the port
+`docs/systems/naval.md`). None of it is DET's, which the port
 has never seen:
 
 - the ten models are built in code, textured with the classic textures
@@ -73,7 +73,7 @@ stand-in, shared by this mod and the town mods. This mod's own pictures
 carries Cliffworms' set as "Cliffworms' Items", and the towns stand his
 bottles and the classic pieces he moved to `1210` on their shelves - the
 pictures here answer for them while a town mod or this one is loaded
-(`bible/03-World/Detailed-Ships.md`).
+(`docs/systems/naval.md`).
 
 ## What is here, and what deliberately is NOT
 

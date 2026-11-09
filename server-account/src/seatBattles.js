@@ -1,5 +1,4 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
 // SEAT2a - THE BATTLES' WEEK: the holder's window, the
 // battle the Turning places in it (seatTurning.js), the two sides' rosters
 // and their Sellswords, and the week's live battles for the relay's
@@ -16,7 +15,6 @@
 // only where that write landed.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { accountKind, displayName, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { seatsOpenFor } from './townSeats.js';

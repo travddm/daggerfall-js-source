@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // CRAFT-WRITS: THE WORK TAB'S CRAFTING WRITS, HANDED OVER
 // FROM THE PACK. The law is src/net/craftWritLaw.js, the service server-account/src/craftWrits.js; this is the host's
 // half - what the pack holds toward a writ, and its goods out of the pack inside the realm act that takes them out of the
@@ -9,7 +8,6 @@
 // THE FOUR HOSTS. The Notice Board's Work tab is scenes/world.js's (its `work` names this host); worldModes.js and
 // dungeonContext.js stand inside world.js's page and open no board of their own;
 // scenes/exterior.js - FLAGGED: the fixed-city bench never goes online, so it posts no crafting writ, as no Court writ.
-// ═══════════════════════════════════════════════════════════════════
 
 import { realmGoldAct } from '../systems/realmSaves.js';
 import { craftGoodsPick, craftGoodsHeld, pieceOf } from '../net/craftWritLaw.js';

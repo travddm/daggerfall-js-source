@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL3-PLAYERS - THE PANEL'S PLAYERS: a search over every account, online or not, by handle or character name (mob,
 // 03:23Z); one account's profile, read tab by tab; its devices and Sign out everywhere; and the rename of an offensive
 // handle or character name (the last was done by hand). Admins alone: Moderators have no profile screen

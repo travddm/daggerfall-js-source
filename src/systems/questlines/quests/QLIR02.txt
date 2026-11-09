@@ -1,4 +1,4 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE MERCHANT'S ROAD, step 2 of 2.
+-- QL15 (2026-10-19; docs/systems/quests.md): THE MERCHANT'S ROAD, step 2 of 2.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner an hour after
 -- step 1 ends: the stable master's word is in the journal at once. The giver is unnamed (a stable master): a
 -- Shopkeeper of the player's own town, at its tavern. NO ACT (qlActs.js: a wagon's load hauled is no kind): DFU's own

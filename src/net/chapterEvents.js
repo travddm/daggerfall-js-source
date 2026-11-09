@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // CHAP6c — A CHAPTER'S SEASON IN WORDS:
 // the lines the board, the hall's roll and the backing say of a chapter's Season's event (net/npcChapterLaw.js
 // chapterSeasonOf reads it off the sheet or the board), and the names of its candidates.
@@ -12,7 +11,6 @@
 //
 // Client-only: the name banks are the client's (the service holds a candidate by its index alone). Worded without
 // gender. Not a DFU member: Daggerfall's guilds have no Seasons. Ledger A row.
-// ═══════════════════════════════════════════════════════════════════
 
 import { gateHash } from './gate/gateLaw.js';
 import { chapterTitleKey, chapterSeasonOf, chapterDoctrineWords, hallPosterName, hallHidden, isRollFaction, SUCCESSION_CANDIDATES } from './npcChapterLaw.js';

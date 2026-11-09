@@ -1,7 +1,6 @@
 // TV-BEYOND (FIELD BUGS 2026-10-09 #8 and #9, maya on Discord: "if i bug the game outside of the bay i can become
 // invisible to everyone and everyone becomes invisible to me", "i relogged and im still invisible"; and from the same
-// wilds, a click on the Overworld: "CRASH (2) RangeError: invalid array length" up through `onPick`;
-// `01-Overview/bugs/Field-Bugs-2026-10-09.md`) - THE LAND PAST THE BAY IS THE WORLD'S. TAMRIEL2 streams the ground beyond
+// wilds, a click on the Overworld: "CRASH (2) RangeError: invalid array length" up through `onPick`) - THE LAND PAST THE BAY IS THE WORLD'S. TAMRIEL2 streams the ground beyond
 // the Bay's edge, and two laws still ended at it:
 //
 // - THE PLANNER (systems/travel/travelRoute.js) clamped its search box to the map. Two ends beyond one edge clamped it inside

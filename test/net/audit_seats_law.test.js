@@ -2,7 +2,7 @@
 // SHARED LAW'S FINDINGS, FIXED - the audit's law lane read every pure rule of the Seats arc against its design
 //  and each test below is one finding it proved: Season 1's Keepers (L1), the Rights
 // of Siege ranked as risen (L2), a split sale's Tithe (L4), the crown sieges' fixed slots (L5), the Chronicle's words (L7), an ignored witness's week (L8), the law's drift (L10)
-// and the arrival line's siege (G2). `06-Systems/Online-Arc.md` AUDIT-SEATS. The service is driven through the real
+// and the arrival line's siege (G2). The service is driven through the real
 // Worker over node:sqlite where it is touched (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

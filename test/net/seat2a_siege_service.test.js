@@ -4,7 +4,7 @@
 // (written once a battle, with all it gives: a Charter taken, a seat held and the Turning's memory of it, a forfeit, a
 // Tourney's winner and its fee, the Sellswords paid), each fighter's Honours, and the deploy blackout's public question.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// 6.2, 6.5-6.8, 17; `06-Systems/Online-Arc.md` SEAT2a (part three).
+// 6.2, 6.5-6.8, 17; SEAT2a (part three).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

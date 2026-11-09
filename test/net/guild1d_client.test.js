@@ -2,7 +2,7 @@
 // (net/heraldryLaw.js, net/hallLaw.js, net/homeLaw.js), the drawing (ui/heraldryArt.js), the homes' registry and the
 // door's rows (systems/online/onlineHomes.js), the guild book's acts (net/guild/guildBook.js), the Guild tab's Hall and Heraldry
 // (ui/socialPanel.js), the banners' anchors and the cloth (scenes/hallBanners.js, render/bannerPass.js), and the hosts'
-// wiring by source. 8; `06-Systems/Online-Arc.md` GUILD1d.
+// wiring by source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

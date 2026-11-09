@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT-SEATS G1: THE BATTLES ANNOUNCED IN THE SERVER'S VOICE (bible/11-Multiplayer/
-// Seats-Arc.md 6.3: "Announcements - in the server's voice (RED1's red text, and EVENT1's welcome record for late
+// AUDIT-SEATS G1: THE BATTLES ANNOUNCED IN THE SERVER'S VOICE ("Announcements - in the server's voice (RED1's red text, and EVENT1's welcome record for late
 // joiners), at the Turning and 24 hours, 1 hour and 5 minutes before: 'The Silver Hand <SH> has won the Right of Siege at
 // Anticlere. The Ebon Oath <EO> holds its Charter. Battle is joined Wednesday at 20:00 UTC.'"). SEAT2a part one left them
 // the relay half's; no relay keeps a clock of the week's battles, so they are this client's, CROWN2's red lines' way

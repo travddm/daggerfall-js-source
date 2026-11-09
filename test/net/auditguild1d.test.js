@@ -2,7 +2,7 @@
 // money, state and races; who can reach a hall and what a visit does; the client's book, the Guild tab, the drawing and
 // the banner pass. Every finding was checked against the code before it was fixed, and each fix is pinned here (the
 // service's through the real Worker over node:sqlite, a race by landing the other request between a read and its
-// write). `06-Systems/Online-Arc.md` GUILD1d, THE AUDIT.
+// write).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

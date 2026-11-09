@@ -157,8 +157,7 @@ export function eventTimerRows(src) {
   // WW5 (WW5): AND EVERY PROVINCE'S HOLLOW (sdLaneRows)
   sdLaneRows(src, now, live, coming, rows);
 
-  // ── THE STARFALL (net/starfall/starfallLaw.js: three stars a night while the Witches' Festival runs) ── STAR6 (bible/11-Multiplayer/
-  // Starfall.md section 8): the rows the star's own law lays (systems/starfall/starfallClient.js starTimerRows) - each
+  // ── THE STARFALL (net/starfall/starfallLaw.js: three stars a night while the Witches' Festival runs) ── STAR6: the rows the star's own law lays (systems/starfall/starfallClient.js starTimerRows) - each
   // fallen star still undecided, to its deadline; the next fall, with the night's coven - handed in whole by the host, the
   // one that knows where the night's stars fall and which of them are held.
   for (const r of src?.stars ?? []) if (r?.kind === 'star' && typeof r.id === 'string' && Number.isFinite(r.at)) rows.push(r);

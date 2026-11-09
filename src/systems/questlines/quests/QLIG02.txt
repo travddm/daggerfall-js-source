@@ -1,4 +1,4 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE SMITH'S SECRETS, step 2 of 2.
+-- QL15 (2026-10-19; docs/systems/quests.md): THE SMITH'S SECRETS, step 2 of 2.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner an hour after
 -- step 1 ends: the armourer's word is in the journal at once. The giver is unnamed (an armourer): an Armorer of the
 -- player's own town, at its armoury. The act is the Reforge's (qlActs.js piece-reforged - systems/reforge.js

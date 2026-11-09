@@ -1,11 +1,11 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE HERALD'S CALL, step 1 of 2 - the
+-- QL15 (2026-10-19; docs/systems/quests.md): THE HERALD'S CALL, step 1 of 2 - the
 -- QL-OFFERED (2026-10-25; Questlines-Arc.md section 4, THE RUNNER): a questline is TAKEN, never sent. This letter
 -- (1011) is read where its line is offered - a notice board, a giver's door, the Quests tab - and taken, it is in
 -- hand from the start-up (`start task`, `get item`): no courier's clock, and no courier's words.
 -- introduction to the Arena (the Tutorials' `challenges` group). Taken where the line is posted, never sent by a
 -- courier: the Herald's broadsheet is the offer and the word. The act: a bout won in the Arena (`ql act arena-won 1` -
 -- systems/questlines/qlActs.js, a ladder bout of the player's own); the Herald of the Arena stands at its gate in
--- Daggerfall (bible/11-Multiplayer/Arena.md section 1) and pays the purse where the bout is won, so no Person is placed.
+-- Daggerfall and pays the purse where the bout is won, so no Person is placed.
 -- The giver is unnamed, as the registry's (qlLines.js "the Arena's Herald").
 -- AUDIT QUESTLINES LINES-26: the broadsheet ends on its crier's name - DFU's pack names a quest letter by its last line
 -- (ItemHelper.cs:335-348, itemInfo.js questLetterName); it was "Letter: Somebody always bleeds."

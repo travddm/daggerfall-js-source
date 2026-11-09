@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // GROUND TEXTURE PROTOTYPE (Mac: prototype and develop the new ground
 // textures BEFORE any code change, so he can see them).
 //

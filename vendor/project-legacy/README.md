@@ -38,4 +38,4 @@ To re-derive the dump:
     pip install dnfile dncil
     python3 tools/ilDump.py "/tmp/pl/Project Legacy.dll" > vendor/project-legacy/il/Project_Legacy.il.txt
 
-The arc: `bible/06-Systems/Legacy-Arc.md`.
+The arc: `docs/formats/mods-and-vendor.md`.

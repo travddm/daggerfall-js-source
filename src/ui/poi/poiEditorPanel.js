@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // POI-3 - THE EDITOR'S PANEL: EVERYTHING A BUILDER READS AND PRESSES.
 //
-// (bible/06-Systems/
-// POI-Editor-Arc.md POI-3). The editor's screen over the world (scenes/poiEditorHost.js draws the handles in it):
+// The editor's screen over the world (scenes/poiEditorHost.js draws the handles in it):
 //
 //   - THE BAR (top): the tools (select, move, turn, size - Q W E R), the space (world or the thing's own - X), snap and
 //     its steps, undo and redo with what they would undo, the eye's speed, a new POI, an import, the map, and the way

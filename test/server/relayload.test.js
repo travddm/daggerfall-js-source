@@ -1,7 +1,7 @@
 // RELAY-LOAD - WHAT IS
 // FILLING THE RELAY, READ BY THE OPERATOR: tools/relayLoad.mjs builds the Analytics Engine questions over the relay's own
 // metrics points (server/src/relayScale.js RoomMetrics) and .github/workflows/relay-load.yml asks them by hand, writing
-// nothing. RELAY-LOAD; AUDIT PLAN-1000 lane A (its block under RELAY-LOAD there, and `01-Overview/Audit-Log.md`)
+// nothing. RELAY-LOAD; AUDIT PLAN-1000 lane A (its block under RELAY-LOAD there)
 // widened every pin below to reach what its title claims.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -764,10 +764,10 @@ test('STAFF-PANEL5-FOLLOW host: outside a party the pose goes on as the where no
   assert.match(worldSource, /if \(socialLink\(\)\) socialLink\(\)\.solo = !social\.party;/, 'sent outside a party, at the note\'s pace');
 });
 
-// ═══ STAFF-HIDE-TOGGLE - Hide me and Show myself take
+// STAFF-HIDE-TOGGLE - Hide me and Show myself take
 // effect at once: the panel's `relink` word (net/staffHook.js), the game's own links remade on a fresh token
 // (scenes/staffFollowHost.js relinkGame), and the minter letting go of a mint on its way (net/accountClient.js `forget`).
-// tools/mutants/staff-hide-toggle.json ═══
+// tools/mutants/staff-hide-toggle.json
 
 /** A device signed in (net/accountClient.js storedSession's shape). */
 const signedIn = () => {

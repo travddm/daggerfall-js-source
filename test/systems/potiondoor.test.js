@@ -5,8 +5,8 @@
 // accepts is the station's brew, paid by the service (scenes/potionMakerHost.js over ui/professions/profPages.js
 // potionMakerDoor); away from a station the mix stays the client's and says it earns nothing; offline the maker is DFU's
 // as it is. Built from the producers: the real Worker (test/accountDb.mjs), a book that reads it (net/profBook.js), DFU's
-// own window (ui/potionMakerWindow.js) and DFU's own items (profItems.js mintMaterialItem). bible/06-Systems/
-// Professions-Arc.md 52.
+// own window (ui/potionMakerWindow.js) and DFU's own items (profItems.js mintMaterialItem).
+// docs/systems/professions.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

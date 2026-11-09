@@ -67,4 +67,4 @@ writes both from the shipped bundle.
   whole clipped quads out of the ground's index set); the compiled blobs
   are not carried.
 
-The page for the whole port is `bible/03-World/Deep-Waters.md`.
+The page for the whole port is `docs/formats/mods-and-vendor.md`.

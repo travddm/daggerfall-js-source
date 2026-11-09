@@ -104,7 +104,7 @@ const secs = (root) => find(one(root, 'dfsocial-body'), 'dfsocial-sec').map((n) 
 const buttons = (n) => find(n, 'dfsocial-btn');
 const btnBy = (n, label) => buttons(n).find((b) => b.textContent === label);
 
-// ═══ THE BUTTON ══════════════════════════════════════════════════════
+// THE BUTTON
 
 test('SOC3: the Social button stands in BOTH chat states with one badge law, is no chat tab, swallows its press, and a host that asked for none gets none (mutants: the button drawn on touch alone; the badge counting unread lines; a badge drawn at zero; the tab-bar button classed dfchat-tab; the press reaching the host)', () => {
   const log = new ChatLog({ now: () => T0 });
@@ -157,7 +157,7 @@ test('SOC3: the Social button stands in BOTH chat states with one badge law, is 
   assert.equal(find(plain.body.children[0], 'dfchat-social').length, 0, 'no option, no dead button');
 });
 
-// ═══ THE PANEL'S DOOR ════════════════════════════════════════════════
+// THE PANEL'S DOOR
 
 test('SOC3: the panel is a POINTER SURFACE - the host refuses it under a window, the cursor is freed and taken back inside the gesture, Escape closes it and opens no pause menu, a covering frame takes it out of the page (mutants: opening under a window; the pointer hooks dropped; Escape reaching the host; a covered frame leaving it up)', () => {
   let willing = true;
@@ -230,7 +230,7 @@ test('SOC3: the sheet is injected once, and the panel is its own layer over the 
   }
 });
 
-// ═══ THE TABS ════════════════════════════════════════════════════════
+// THE TABS
 
 test('SOC3: two tabs, Friends first, each badged with what is waiting on IT - requests on Friends, invitations on Party (mutants: one badge for both; the party body drawn on the friends tab; a tab click that repaints nothing)', () => {
   const { social, panel, root, clock } = build({ frame: stateFrame({ friends: [row('Ann')], in: [{ ...row('Bob'), at: T0 }] }) });
@@ -254,7 +254,7 @@ test('SOC3: two tabs, Friends first, each badged with what is waiting on IT - re
   assert.equal(find(root, 'dfsocial-tab')[1].className, 'dfsocial-tab active');
 });
 
-// ═══ THE FRIENDS ═════════════════════════════════════════════════════
+// THE FRIENDS
 
 test('SOC3: the friends list is ONLINE FIRST then by name, each row saying when they were last seen on the RELAY\'s clock, my party\'s green and everyone else\'s friend colour (mutants: the order by name alone; the sort by Map order; last-online read off this machine\'s clock; a seated friend drawn in the friend colour)', () => {
   const friends = [row('Zed'), row('ann'), row('Bob', { online: false, seen: T0 - 5 * 60_000 }), row('Cid', { online: false, seen: null })];
@@ -367,7 +367,7 @@ test('SOC3: Invite on a friend row is enabled only when they have a tab in the w
   assert.equal(inviteOf('Ann').disabled, true); assert.equal(inviteOf('Ann').attrs.title, 'the party is full');
 });
 
-// ═══ THE PARTY ═══════════════════════════════════════════════════════
+// THE PARTY
 
 test('PARTY-LEAD: the leader is offered Make leader on every other seat, through a hub that knows the act - an offline seat drawn and explained, never pressed; a member, my own seat and an older hub get none (mutants: the button for a member; on my own seat; drawn through an older hub; an offline seat pressable; the act naming the wrong seat)', () => {
   const party = {
@@ -500,7 +500,7 @@ test('SOC3: the invite TOAST works with the panel shut, answers by party id, and
   assert.equal(sent.length, 1, 'and a button on a toast that is down sends nothing');
 });
 
-// ═══ THE REFUSALS ════════════════════════════════════════════════════
+// THE REFUSALS
 
 test('SOC3: an act the RATE GATE refused keeps its button and says "try again" - and the note clears itself; the hub\'s own refusal stands under the header (mutants: the row disabled on a refusal; the act swallowed silently; a note that never clears; lastError ignored)', () => {
   const { social, panel, root, sent, clock, set, toast } = build({ accept: false, frame: stateFrame({ in: [{ ...row('Bob'), at: T0 }] }) });
@@ -536,7 +536,7 @@ test('SOC3: an act the RATE GATE refused keeps its button and says "try again" -
   assert.equal(one(root, 'dfsocial-err').textContent, '', 'and a fresh state clears it');
 });
 
-// ═══ THE CHAT'S TWO SEAMS ════════════════════════════════════════════
+// THE CHAT'S TWO SEAMS
 
 test('SOC3: nameColor paints the AUTHOR of a chat line and the roster row, is asked again on every frame rather than baked in, and leaves a stranger alone (mutants: the colour taken at build time; the roster ignoring it; a stranger coloured; the friend colour over my party\'s green)', () => {
   const clock = { t: T0 };
@@ -682,9 +682,9 @@ test('ROSTER-STAFF (mob, 2026-10-24: "need to add follor to find a player in cha
   assert.deepEqual(ran, ['mute 60', 'follow']);
 });
 
-// ═══ THE HOST ════════════════════════════════════════════════════════
+// THE HOST
 
-// ═══ THE AUDIT'S OWN PINS ════════════════════════════════════════════
+// THE AUDIT'S OWN PINS
 
 test('AUDIT SOC C2/C14: ONE Escape closes ONE surface - the panel stops the key immediately (no sibling capture listener and no pause door sees it) and, with something ABOVE it, leaves the key entirely alone (mutants: stopPropagation alone, so the chat behind closes on the same press; above() ignored, so two surfaces close at once; the panel closing but the key reaching the host)', () => {
   let above = false;
@@ -945,7 +945,7 @@ test('FONT1: the friends + party panel and its toast wear the enhanced face, uns
   assert.match(SOCIAL_CSS, /\.dfsocial\.touch \.dfsocial-tab \{ min-height: 44px;/, 'mutant: the touch targets shrunk to make room for the wider face');
 });
 
-// ═══ PARTY-UI: THE JOURNEY ON THE PARTY TAB ══════════════════════════
+// PARTY-UI: THE JOURNEY ON THE PARTY TAB
 //
 // 2026-09-26,. The chat's
 // /leader and /travel become buttons on the Party tab, over the one session (systems/party/partyTravel.js - its status,
@@ -1026,7 +1026,7 @@ test('PARTY-UI: the Party tab\'s Journey - the leader\'s Travel map, the round a
   assert.deepEqual(secs(root), ['Your party (2/8)'], 'no session status (out of a party): none either');
 });
 
-// ═══ AUDIT PARTY-UI ═══════
+// AUDIT PARTY-UI
 //
 // The Journey block's buttons say why not rather than refuse - or, the leader's Travel map, rather than open a map on a
 // building's floor or turn a round into a journey alone - every answer is the note, and the live pass rebuilds the
@@ -1111,7 +1111,7 @@ test('AUDIT PARTY-UI: the live pass rebuilds the Journey only when its buttons c
   assert.equal(find(root, 'dfsocial-field')[0], field, 'the form stands - the journey is the Party tab\'s alone');
 });
 
-// ═══ AUDIT PARTY-UI2 ═══════
+// AUDIT PARTY-UI2
 
 test('AUDIT PARTY-UI2: where two reasons stand, the leader\'s Travel map says the one gathering cannot mend - indoors first, then an old hub, then a round still held for its followers ("The party is still on its way"), and only then "Gather the party first" (mutants: the hub and gathered checks swapped; the held round unread)', () => {
   const party = { id: 'p1', leader: 'acct-me', members: [member('Mac', { acct: 'acct-me' }), member('Bob')] };

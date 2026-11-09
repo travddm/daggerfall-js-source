@@ -385,7 +385,7 @@ test('STAFF-PANEL1 (mob, 12:08Z, a review of the PR: "Audit log reads generate a
   assert.equal(STAFF_AUDIT_KEEP_S, 30 * 24 * 3600, 'mob: "only keep for one month"');
 });
 
-// ═══ AUDIT STAFF-PANEL1 (the step's flaw review, 2026-10-22): each hole it found, pinned shut ═══
+// AUDIT STAFF-PANEL1 (the step's flaw review, 2026-10-22): each hole it found, pinned shut
 
 test('AUDIT STAFF-PANEL1: a refusal\'s audit row is written off the answer\'s path - a right password costs a wrong one\'s time', async () => {
   const s = await stand();

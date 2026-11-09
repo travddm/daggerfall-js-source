@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LW10: THE WAGON TRAIN - the horses and wagons the road's
 // parties travel with, and where each stands at any minute.. Pure,
 // like the trips they ride on (LW0 decision 2): the team is the trip's, its place the party's place on its way - every

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // SP1: SAVES MOVE
 // BETWEEN THE WEBSITE AND THE APP.
 //

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // JOURNAL1 - A PAGE OF MY JOURNAL, SHOWN; AND ONE SHOWN TO ME, KEPT.
 //
 // Addison Knox, on Discord: "Player journals ... shared in-world for
@@ -34,7 +33,6 @@
 // the window and the letters.
 //
 // Not a DFU member: Daggerfall Unity has no other players. Ledger A row (ONLINE).
-// ═══════════════════════════════════════════════════════════════════
 import { pageLaw, PAGE_LINES_MAX } from './wire.js';
 import { breakableNote } from '../systems/notebook.js';
 

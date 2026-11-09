@@ -69,7 +69,7 @@ test('TIME1 census: every line in src/ that reads a shared clock is named, every
       if (best.clock === 'event') assert.doesNotMatch(line, SKY_RE, `${file}: "${best.has}" is an event row and its line reads the sky: ${line.slice(0, 160)}`);
     }
   }
-  assert.deepEqual(unnamed, [], `a line reads a shared clock and the census does not say which it means - add a row to test/fixtures/time1_census.json (bible/06-Systems/Online-Time-Arc.md section 5 says which):\n${unnamed.join('\n')}`);
+  assert.deepEqual(unnamed, [], `a line reads a shared clock and the census does not say which it means - add a row to test/fixtures/time1_census.json (docs/systems/time-and-weather.md says which):\n${unnamed.join('\n')}`);
   const wrong = CENSUS.rows.filter((r) => (counts.get(r) ?? 0) !== (r.count ?? 1))
     .map((r) => `${r.file}: "${r.has}" names ${counts.get(r) ?? 0} line(s), the row says ${r.count ?? 1}`);
   assert.deepEqual(wrong, [], `a row names lines that are gone, or more than it says:\n${wrong.join('\n')}`);

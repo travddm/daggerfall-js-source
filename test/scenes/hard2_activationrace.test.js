@@ -1,6 +1,6 @@
 // HARD2 - THE ACTIVATION RACE, ONE HOME.
 //
-// The second slice of `01-Overview/Hardening.md`, and the first that
+// The second slice, and the first that
 // moves code rather than adding a gate.
 //
 // WHAT MOVED, AND WHY. DFU fires one ray and the nearest thing it

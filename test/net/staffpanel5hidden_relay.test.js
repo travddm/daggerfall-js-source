@@ -437,7 +437,7 @@ test('STAFF-PANEL5-HIDDEN the mark lapses: a hide order through the Worker\'s la
   });
 });
 
-// ═══ STAFF-PANEL5-HIDDEN-FIX (the relay flaw review, findings 3, 16, 17 and 20) ═══
+// STAFF-PANEL5-HIDDEN-FIX (the relay flaw review, findings 3, 16, 17 and 20)
 
 test('STAFF-PANEL5-HIDDEN-FIX the relay is told where to report a home entered: HIDDEN_SEEN_URL in server/wrangler.toml is the account service\'s door, on the host the reviewer\'s feed posts to (mutants: the var gone)', () => {
   const toml = readFileSync(new URL('../../server/wrangler.toml', import.meta.url), 'utf8');

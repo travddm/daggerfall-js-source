@@ -36,7 +36,7 @@ import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, 
 import { bossClockS } from '../../../src/systems/bossTraits.js';
 const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };
 
-// ═══ AUDIT SURV-TIERS, THE THIRD PASS ═══════════════════
+// AUDIT SURV-TIERS, THE THIRD PASS
 //
 // . Main merged in first (DISC6/DISC7), then five
 // fresh lenses over the merged tree - the newest slices and the merge,

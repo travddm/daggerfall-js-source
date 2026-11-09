@@ -3,7 +3,6 @@
 // ring, the room, the card's Challenge as a challenge or an accept, the bout's one foe, the ring kept, the receipts),
 // the ring from the town (systems/siegeField.js royalRingWire), the bouts' carrier (net/siege/siegeClaims.js createRoyalClaims),
 // the socket's royal room (net/online.js), the Seat tab's doors (ui/seatTab.js) and the world's wiring.
-// 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two, the client).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

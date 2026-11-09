@@ -318,7 +318,7 @@ test('AUDIT REALM2 S8: a lone guildmaster is deleted only once its treasury is e
   s.renown(P, m.id);
   assert.equal((await s.call('/v1/guilds/found', { character: m.id, name: 'Rich Guild', tag: 'RICH', realm: m.at() }, P.secret)).status, 200);
   assert.equal((await s.call('/v1/guilds/deposit', { character: m.id, gold: 100_000, realm: m.at() }, P.secret)).body.treasury, 100_000);
-  assert.deepEqual(Object.values(await s.call('/v1/guilds/leave', { character: m.id }, P.secret)), [409, { error: 'guild-treasury', keeps: ['guild-treasury'] }], 'the guild\'s own law');   // PIN MOVED: GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md) - the whole list beside the first
+  assert.deepEqual(Object.values(await s.call('/v1/guilds/leave', { character: m.id }, P.secret)), [409, { error: 'guild-treasury', keeps: ['guild-treasury'] }], 'the guild\'s own law');   // PIN MOVED: GUILD3c - the whole list beside the first
   assert.deepEqual(Object.values(await s.call('/v1/realm/delete', { id: m.id }, P.secret)), [409, { error: 'guild-treasury' }]);
   assert.ok(s.saveStands(m.id), 'the character stands');
   assert.deepEqual(s.rows('SELECT treasury, (SELECT COUNT(*) FROM guild_members) AS members FROM guilds'), [{ treasury: 100_000, members: 1 }]);

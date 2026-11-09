@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // POI-2 - A POI AS THE RENDERER DRAWS IT: PURE.
 //
-// The POI editor's document (poi/poiLaw.js) and meshes (poi/poiMesh.js) as the game stands them (bible/06-Systems/
-// POI-Editor-Arc.md). Everything here is arithmetic over arrays - no GL, no DOM - so the host (scenes/poiHost.js) and
+// The POI editor's document (poi/poiLaw.js) and meshes (poi/poiMesh.js) as the game stands them. Everything here is arithmetic over arrays - no GL, no DOM - so the host (scenes/poiHost.js) and
 // the tests read a POI the same way:
 //
 //   - THE LOOK OF A MATERIAL (`materialLook`): what the texture it is drawn with depends on - its picture, its tint, its

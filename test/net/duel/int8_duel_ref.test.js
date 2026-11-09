@@ -267,7 +267,7 @@ test('INT8 THE CLIENT\'S CARRIER: a duel\'s receipt is either fighter\'s to carr
   assert.equal(duelClaimSettles({ ok: false, error: 'offline' }), false);
 });
 
-test('INT8 (AUDIT) THE DUEL\'S CAST PATH IS DORMANT: no caller hands a spell to the target\'s own effects as a duel\'s (`duelCast`) since the referee holds the duel - its floor and its strip in systems/effects.js stand unread, kept as they stand (bible/06-Systems/Integrity-Arc.md 5b) (mutants: a duel opponent\'s spell applied on its target\'s machine)', () => {
+test('INT8 (AUDIT) THE DUEL\'S CAST PATH IS DORMANT: no caller hands a spell to the target\'s own effects as a duel\'s (`duelCast`) since the referee holds the duel - its floor and its strip in systems/effects.js stand unread, kept as they stand (mutants: a duel opponent\'s spell applied on its target\'s machine)', () => {
   const callers = [];
   const walk = (dir) => {
     for (const e of readdirSync(new URL(`../../../${dir}`, import.meta.url), { withFileTypes: true })) {

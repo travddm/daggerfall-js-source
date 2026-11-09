@@ -33,14 +33,13 @@ handful of crossed cards, some true low-poly shells), 32 materials, 30 textures,
   for texel - upright or mirrored, cut down in places, now and then turned - for 75-91% of its drawn texels, with the
   author's top-down crowns and some larger side views made from the same records (capped with painted snow on the
   winter atlases), a few touch-ups and a few hand-written record numbers for the rest. A render of game data is game
-  data (`bible/01-Overview/Port-Doctrine.md`), so the spec names what to copy - each record, its turn, where it lands,
+  data (`docs/README.md`), so the spec names what to copy - each record, its turn, where it lands,
   the rectangle it paints and where it must not (erase spans, each the whole gap between that copy's own claims, so no
   span traces a record's silhouette) - and the game paints the atlas from the player's own TEXTURE files
   (`src/world/lowPolyTrees.js` `paintAtlas`); every texel a copy claims comes back (the tool checks it). The regions no
   record copies are FILLS: the record they were made from and a coarse map of where they lie (8-texel cells, never
   their picture), painted by the game as a crown folded out of the record, a tiled crop of it or the record stretched
-  over the region, whichever the tool found nearer the author's own - near his, not his
-  (`bible/01-Overview/audits/Audit-Low-Poly-Trees.md` measures how near).
+  over the region, whichever the tool found nearer the author's own - near his, not his.
 
 `tools/lowPolyTreesExtract.mjs` rebuilds every file here but this README from the archive and the player's ARENA2. The
-design and the record: `bible/07-Rendering/Low-Poly-Trees.md`.
+design and the record: `docs/formats/mods-and-vendor.md`.

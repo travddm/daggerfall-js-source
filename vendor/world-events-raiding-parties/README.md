@@ -64,7 +64,7 @@ To re-derive the dump:
 
 ## The port
 
-`bible/03-World/Raiding-Parties.md` is the page: what is ported as the IL
+`docs/formats/mods-and-vendor.md` is the page: what is ported as the IL
 has it, the mod's own bugs and what each became here, and the online
 plan (the world's event - the same raids for every player, one runner,
 the relay keeping the count).

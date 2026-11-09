@@ -1,7 +1,7 @@
 // DECOR1d: THE DECORATOR. The catalogue read out of the game's own blocks a
 // few at a time (systems/decor/decorScan.js), where a new piece stands (systems/decor/decorPlacer.js), the three surfaces
 // (ui/decorPanel.js) driven headless over a fake document, the tool that joins them (scenes/decor/decorTool.js) over fakes of
-// the host's seams, and the host's wiring by source. `06-Systems/Online-Arc.md` DECOR1.
+// the host's seams, and the host's wiring by source. DECOR1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

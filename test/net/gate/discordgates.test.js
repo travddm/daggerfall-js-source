@@ -31,7 +31,7 @@ const s = (ms) => Math.floor(ms / 1000);
 /** Every character Discord reads as markdown, a link or a mention. */
 const LOUD = /[*_~|`<>@:/\\[\]()#.!?&=+%$^{}";]/;
 
-// ═══ THE LAW ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('DISCORD-GATES law: THE DOOR - a Discord webhook URL (discord.com, discordapp.com, ptb, canary; an API version) or nothing, never another host, a query or a lookalike; a role is a Discord id or nothing (mutants: any https URL taken; the role taken unread)', () => {
   assert.equal(heraldWebhook(HOOK), HOOK);
@@ -145,7 +145,7 @@ test('DISCORD-GATES law: WHERE THE GATE STANDS - one word an account a day; one 
   assert.ok(!gateSiteDayOk('538', now) && !gateSiteDayOk(null, now));
 });
 
-// ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its law leaves as it is (never rewritten at the relay); parseClient projects it and drops the rest (mutants: a raw place taken; the pixel unbounded)', () => {
   const ok = { k: 'site', d: DAY, px: 100, py: 200, pl: 'Copperham, Wrothgarian Mountains' };
@@ -157,7 +157,7 @@ test('DISCORD-GATES wire: the `site` word - its day, a map pixel and a place its
   assert.equal(gatePlaceWire(' St. Olms  Keep:*  '), 'St Olms Keep');
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 const quiet = (fn) => { const warn = console.warn; console.warn = () => {}; return Promise.resolve().then(fn).finally(() => { console.warn = warn; }); };
 /** The hub over a driven clock with Discord stubbed: `posts` is every body the herald sent, `answer` what Discord says. */

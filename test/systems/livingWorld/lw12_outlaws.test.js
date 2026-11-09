@@ -434,7 +434,6 @@ test('LW12 a caravan the outlaws held up: its purse theirs (a sale refused), hal
   assert.equal(opened.allow('Buy', [], 1), true);
 });
 
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT LW-II: THE OUTLAWS, AUDITED - each finding reproduced, fixed, and pinned below.
 
 test('AUDIT LW-II C2: a hand in the chest is `looted` the frame it shows - a piece taken and another put in its place, before any let-go; a save made while it stands carries it, and the chest stands empty from that save (mutants: the frame, the pieces, the counts)', async () => {

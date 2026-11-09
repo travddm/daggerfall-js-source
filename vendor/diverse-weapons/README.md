@@ -82,7 +82,7 @@ nobody.
 ## What the port carries, and where
 
 The mod's flag and Daggerfall Unity's own law behind it - the record is
-`bible/05-Combat/Diverse-Weapons.md`:
+`docs/formats/mods-and-vendor.md`:
 
 | DFU | port |
 |---|---|

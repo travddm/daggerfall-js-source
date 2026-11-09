@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // PROF1 -
-// THE PROFESSIONS IN THE WORLD'S FACE (bible/06-Systems/
-// Professions-Arc.md 8, 21, 22), each in the Enhanced Plus stone and
+// THE PROFESSIONS IN THE WORLD'S FACE (docs/systems/professions.md), each in the Enhanced Plus stone and
 // brass (ui/enhanced/enhancedPlusStyle.js PROF_CSS), scaled by the HUD's scale:
 //
 //   the PROMPT  - bottom centre above the hotbar: "[E] Pick Red Rose -

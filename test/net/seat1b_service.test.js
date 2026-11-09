@@ -1,7 +1,7 @@
 // SEAT1b: INFLUENCE, AS THE SERVICE KEEPS IT - the pledge, the Watch's receipts,
 // a gate kill's region, Renown's region, members' homes, Tribute, and the standings that sum them - driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// 4.1-4.2; `06-Systems/Online-Arc.md` SEAT1b.
+// 4.1-4.2; SEAT1b.
 import { test } from 'node:test';
 import { SEAT_ROWS_KEPT_S } from '../../server-account/src/townSeats.js';   // D1-LOAD: the kept rows' minute
 import assert from 'node:assert/strict';

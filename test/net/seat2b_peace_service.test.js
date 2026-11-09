@@ -3,7 +3,7 @@
 // and at the Turning, and its Standing a week; the Watchtowers' word to the holder's members alone; the crafting halls'
 // steps for the holder's members crafting in its town; each seat's works on the seats' list (7.5; Professions-Arc 3.3, 4.8;
 // server-account/src/seatForts.js, seatInfluence.js, seatTurning.js, professions.js). Driven through the real
-// Worker over node:sqlite with every migration applied (test/accountDb.mjs). `06-Systems/Online-Arc.md` SEAT2b part two.
+// Worker over node:sqlite with every migration applied (test/accountDb.mjs). SEAT2b part two.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

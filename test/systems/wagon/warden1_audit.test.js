@@ -7,7 +7,7 @@
 // team is no longer the one thrown (C7); the carried wagon in its own load, wheels and hitch (C8); the live wagon lifted
 // only on the spot thrown from, the hold counted (C9); a rider stood down (C10); the team set down before the pool's step
 // (C11); an idle frame does nothing (C12); a concealed owner's horses concealed (C13); the wagon on the top of the guard's
-// picture; and the records the lanes found unpinned (D1-D13). `06-Systems/Wagon-Warden.md` AUDIT WARDEN1.
+// picture; and the records the lanes found unpinned (D1-D13). AUDIT WARDEN1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

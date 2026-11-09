@@ -1,7 +1,7 @@
 // HOLD-ONCE:
 // online, Privateer's Hold is entered once - by the new game's start, or a save made inside it, or staff landing by a
 // player there. Its door, a Recall to an anchor set inside, and a quest's transfer are refused, at the one funnel every
-// dungeon entry takes (worldModes.js tryEnterDungeon). Offline, DFU's. `06-Systems/Online-Arc.md` HOLD-ONCE.
+// dungeon entry takes (worldModes.js tryEnterDungeon). Offline, DFU's. HOLD-ONCE.
 //
 // Fixtures from the producers: MapsFile's own pixel math for the location, worldModes.js's tryEnterDungeon executed
 // from its source, the real isPrivateersHold.

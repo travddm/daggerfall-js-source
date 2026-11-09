@@ -1,7 +1,7 @@
 // SEAT2b: A SEAT'S FORTIFICATIONS AS THE SERVICE KEEPS THEM - a tier funded in Marks alone by the holder's Guildmaster or
 // Officer, burnt from the treasury and standing at once; who may raise what; the drops; the Siege Camp pitched for
 // Marks and spent at the Turning (7.5, 4.2; server-account/src/seatForts.js). Driven through the
-// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). `06-Systems/Online-Arc.md` SEAT2b.
+// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). SEAT2b.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

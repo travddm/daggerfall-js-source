@@ -29,7 +29,7 @@ import { RACES, raceById } from '../../../src/systems/races.js';
 import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { withDom } from '../../invdrag.mjs';
 
-// ═══ TEMP-UI: THE TEMPERATURE, SHOWN ═══════════════════════
+// TEMP-UI: THE TEMPERATURE, SHOWN
 //
 // The owner: "We also need to add a tempurature widget to the UI including allowing players to see their personal
 // tempurature in their inventory." These pins hold: the breakdown ADDS UP to the felt temperature (the natural
@@ -336,7 +336,7 @@ test('TEMP-UI: the Stats side carries the Temperature section with the arc on - 
   });
 });
 
-// ═══ AUDIT TEMP-UI - THE LAW UNDER THE NUMBER ═══════════════════════════
+// AUDIT TEMP-UI - THE LAW UNDER THE NUMBER
 // The temperature lens (lens E) read the law a widget would now put a number on, and a number shows every jump the
 // words had hidden. Each fix, pinned against the case that found it.
 

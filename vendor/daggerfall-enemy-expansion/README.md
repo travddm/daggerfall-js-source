@@ -117,7 +117,7 @@ places:
   twenty records). `derived.json` names each one's record, and the port
   rebuilds it from the player's own file when the archive loads
   (`formats/derivedTexture.js`) - a render of game data is game data
-  (`bible/01-Overview/Port-Doctrine.md`).
+  (`docs/README.md`).
 - **774 are Daggerfall's sprites under the authors' paint** - the Bounty
   Hunter (1504, TEXTURE.482), the Royal Knight (1505, from 482), the Druid and
   the Necromancer Acolyte (1509, 1511, from 486), the Rogue Druid (1512, from
@@ -173,8 +173,7 @@ through the texture door these register on, so neither draws the other's.
   edits and the quest foes while the mod is loaded
   (`src/systems/enemyExpansion/dexInstall.js`), on DFU's custom-enemy doors
   (`src/characters/enemy/customEnemies.js`, `enemyBasics.js`,
-  `enemyEntity.js` loadEnemyCareer). `bible/04-Characters/Enemy-Expansion.md`
-  section 5.
+  `enemyEntity.js` loadEnemyCareer). `docs/formats/mods-and-vendor.md`.
 - **DEX2** (2026-10-20): the pictures on the texture door as DFU
   imports them (`src/systems/enemyExpansion/dexSprites.js`) - each record's
   frames to the first missing (a picture past a gap ships and is never drawn),

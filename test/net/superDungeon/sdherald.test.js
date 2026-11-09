@@ -23,7 +23,7 @@ const fresh = { rise: -1, found: -1, end: -1 };
 /** Slot 2's name needs no city (The Stopped Bell); slot 4's does (The Last Bell of <city>). */
 const risen = (slot, r, at = T0) => ({ s: slot, ph: 'risen', r, at, until: at + SD_LIFETIME_MS, next: at + SD_LIFETIME_MS + SD_COOLDOWN_MS });
 
-// ═══ THE LAW ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('SD-HERALD law: THE NAMES - a slot\'s name when it needs no city, else none (the city is every client\'s own); the region as MapsFile names it, the Bay\'s great cities none (mutants: a city name said bare; the region one off)', () => {
   assert.equal(sdHeraldName(2), 'The Stopped Bell');
@@ -133,7 +133,7 @@ test('SD-HERALD law: WHAT IS OWED - each moment once a slot, while it is still s
   assert.deepEqual(readSdHeraldState({ rise: 3, found: '3', end: 2.5 }), { rise: 3, found: -1, end: -1 });
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 const quiet = (fn) => { const warn = console.warn; console.warn = () => {}; return Promise.resolve().then(fn).finally(() => { console.warn = warn; }); };
 /** The hub over a driven clock with Discord stubbed - the Abyss Dungeon's herald alone (the gate's and the serpent's, on

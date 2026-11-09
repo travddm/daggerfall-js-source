@@ -15,7 +15,8 @@
     "public/**",
     "locales/**",
     "package-lock.json",
-    "tools/testTimes.json"
+    "tools/testTimes.json",
+    "src/systems/**/quests/*.txt"
   ],
   "ignoreRegExpList": ["/`[^`\\n]+`/g", "/```[\\s\\S]*?```/g", "/https?:\\/\\/\\S+/g", "/\\b[0-9a-f]{7,40}\\b/g"]
 }

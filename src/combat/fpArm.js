@@ -1325,7 +1325,7 @@ export const TORCH_BONE = 'Shield Bone';
  * `attitude` - which `ActorAnimation::attach` passes for `isLight` ALONE
  * (actoranimation.cpp:97-103) and never for a weapon (:104-105). It is an
  * extra -90 degrees about X, and this port's own reference notes wrote it
- * down at `02-Formats/Morrowind-Rules.md:3228` ("a held light (the torch
+ * down at `docs/formats/morrowind.md` ("a held light (the torch
  * in the player's left hand) gets an extra -90 deg X rotation passed as
  * attitude") beside the two engine-injected transforms it DID port. The
  * torch hung at Shield Bone unrotated: the right bone, the wrong way up.

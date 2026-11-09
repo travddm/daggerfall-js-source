@@ -39,7 +39,7 @@ function counting(db, marks) {
 }
 const plan = (raw, sql, n) => raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all(...Array.from({ length: n }, (_, i) => (i === 0 ? 1 : 'p1'))).map((r) => r.detail).join(' | ');
 
-// ═══ B. AN ACCOUNT'S RATING, OFF ITS OWN BOUTS ═══════════════════════════════════════════════════════════════════════
+// B. AN ACCOUNT'S RATING, OFF ITS OWN BOUTS
 
 test('STORM-SHED 2 B: an account\'s rating is read off its own bouts - one read, planned on idx_arena_pvp_a and idx_arena_pvp_b, never the season\'s every bout - and answers what the `a = ? OR b = ?` read answered: the last rated rating, the wins, losses, draws and bouts, a bout fought against oneself counted once (mutants: a side unread; the OR back; the self-bout counted twice; the first bout read as the last; of one second\'s two, the first)', async () => {
   const db = d1();
@@ -84,7 +84,7 @@ test('STORM-SHED 2 B: a Grand Champion\'s row, asked on every registered account
   assert.match(plan(db._raw, grand, 1).replace(/^/, ''), /USING COVERING INDEX idx_arena_pve_player_grand \(player=\? AND tier=\? AND step=\? AND won=\?\)/);
 });
 
-// ═══ A. THE SEASON'S #1, KEPT ════════════════════════════════════════════════════════════════════════════════════════
+// A. THE SEASON'S #1, KEPT
 
 test('STORM-SHED 2 A: the season\'s #1 is counted when a rated bout lands and kept for every Worker - a token read off the kept word counts no board; a word ARENA_CHAMPION_STORED_S old is counted again (mutants: the claim\'s count dropped; the kept word unread; never counted again; the count\'s failure the claim\'s)', async (t) => {
   let now = 1_800_000_000;
@@ -128,7 +128,7 @@ test('STORM-SHED 2 A: the season\'s #1 is counted when a rated bout lands and ke
   assert.equal(r.body.recorded, true, 'the board\'s count failed: the bout recorded all the same');
 });
 
-// ═══ C. THE TOWNS' LAYOUTS ═══════════════════════════════════════════════════════════════════════════════════════════
+// C. THE TOWNS' LAYOUTS
 
 test('STORM-SHED 2 C: the towns\' layouts are read again only once the database says a town\'s homes moved - a home made, gone, or moved to another layout reads afresh; a home\'s door opened or its rent moved does not; asks of one moment share the read (mutants: the generation unasked; each trigger dropped; a trigger on every column; the shared ask; an older read shared; the route unkept; kept per request)', async () => {
   const S = await standService();
@@ -185,7 +185,7 @@ test('STORM-SHED 2 C: the towns\' layouts are read again only once the database 
   assert.equal(c.scan, m, 'two more boots\' asks through the route: the kept read');
 });
 
-// ═══ D. A SAVE THAT CHANGED NOTHING ══════════════════════════════════════════════════════════════════════════════════
+// D. A SAVE THAT CHANGED NOTHING
 
 test('STORM-SHED 2 D: a Project Legacy save that changed nothing leaves the line as it was - no stamp, no rev, nothing stored, nothing written to the realm - while the store still holds this page\'s last write: a change stores it, one made outside the save included; another tab\'s write since is merged in; a write the storage refused, or the realm dropped, is made again (mutants: every save stored; the stamps kept; the store\'s rev unasked; a refused write counted as written; the realm not asked again)', async () => {
   _resetModSettings();

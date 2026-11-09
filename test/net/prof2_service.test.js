@@ -2,8 +2,7 @@
 // boulder's stone and a dungeon's deep vein through the one harvest (the law's node, the day, the hour - and none
 // underground - the rank, the act's bounded report); the witnessed dungeon; the forge's smelts (every input held, bought
 // first, an ingot own only when all its units were, Smithing's XP under the crafter's limit, asked twice one). Driven
-// through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). bible/06-Systems/
-// Professions-Arc.md 23.
+// through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). docs/systems/professions.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

@@ -406,7 +406,7 @@ test('SAFE7 THE CARD: its rules in the player\'s language, "I agree" and "Not no
   assert.equal(c.isUp(), false);
 });
 
-/* ═══ AUDIT SAFE - THE CLIENT LANE ═══════════════════════════════════════════════════════════════════════
+/* AUDIT SAFE - THE CLIENT LANE
  * The audit of the chat safety arc, read cold: each pin below failed on the arc as it merged (driven against a copy of
  * the old modules) and holds the fix now. Its mutants are tools/mutants/safe_audit_client.json. */
 

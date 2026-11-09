@@ -62,7 +62,7 @@ export function staffPlaces(maps, r, places = keptPlaces()) {
 /**
  * AUDIT RELEASE R2-7: A PROVINCE'S PLACES PAST THE BAY - the world's
  * registry's listed places of its theatre (the capitals, the cities, towns and villages TESA stands), towns first, then
- * by name. WW6 (03-World/World-Wide.md WW6): a TOWN is offered as itself - its `loc` its place's own location index
+ * by name. WW6: a TOWN is offered as itself - its `loc` its place's own location index
  * (the registry's `location`, negative: no MAPS.BSA row holds it), as the raids past the Bay key it - for a town's own
  * event runs as the town's raid runs, and the raids stand past the Bay since WW6 (net/staffEvent/staffEventLaw.js
  * staffTownPixelOk); a place with no location of its own, as an AREA at its pixel (`loc` -1).

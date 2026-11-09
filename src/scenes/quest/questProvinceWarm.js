@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT RELEASE R2-5d - A PROVINCE'S PLACES MADE READY IN IDLE
 // TIME, so asking for work past the Bay does not stall the frame.
 //
@@ -15,7 +14,6 @@
 // every client; a warm cache only makes it fast.
 //
 // Not a DFU member: DFU reads MAPS.BSA. Ledger A (R2-5).
-// ═══════════════════════════════════════════════════════════════════
 import { isProvinceRegion } from '../../formats/mapsTables.js';
 import { longitudeLatitudeToMapPixel } from '../../formats/mapsFile.js';
 

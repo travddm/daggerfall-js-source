@@ -157,7 +157,7 @@ export const GUILD_HALL_NONE_TEXT = `Your guild has no hall. The guildmaster can
  *  characters put in counts (halls.js buyHall), and a guild whose gold came in before the realm could not see why it was
  *  refused. Absent from an older service's answer: nothing said. */
 export const guildHallGoldText = (hallGold, treasury) => guildRealmGoldText(hallGold, treasury, false);   // AUDIT GUILD3 W15: one rule, one sentence (GUILD3c's)
-/** GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE PRESS): THE TREASURY'S TWO GOLDS, said
+/** GUILD3c: THE TREASURY'S TWO GOLDS, said
  *  where the gold is - the Treasury page's top - and not only where a hall is bought: only the gold realm characters put
  *  in buys a hall or a new name or tag (halls.js buyHall, guilds.js renameGuild - AUDIT GUILD3 W15: the rename's own words);
  *  a guild with its hall already, the name alone (C10). Absent from an older service's answer: null. */
@@ -237,7 +237,7 @@ export function guildKeepsOf(v, said) {
   return out;
 }
 export const GUILD_HERALDRY_NONE_TEXT = 'Your guild has no arms yet.';   // AUDIT GUILD3 W6: one word - the page is "Arms"
-/** GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): the pages' own sentences. */
+/** GUILD2: the pages' own sentences. */
 export const GUILD_RENAME_COST_TEXT = `A new name or tag costs ${GUILD_RENAME_GOLD.toLocaleString('en-US')} gold from the treasury (gold put in by realm characters). You can rename again after two weeks. The old name is free for anyone at once.`;
 /** GUILD2a: when the next new name may come, from `at` (epoch seconds). */
 export const guildRenameSoonText = (at, nowS) => {
@@ -267,7 +267,7 @@ export const GUILD_MARKS_LEDGER_WORDS = Object.freeze({
   // SILVER-WAYS: a guild deed (its third member names it), a contract's pay put up, and what came home of it
   deed: 'completed a guild deed:', contract: 'put up a contract of', 'contract-return': 'came home with',
 });
-/** GUILD3b (bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE PRESS): A SILVER LINE BY ITS OWN KIND - the
+/** GUILD3b: A SILVER LINE BY ITS OWN KIND - the
  *  ledger's (`raw`, marksLaw.js MARKS_KINDS) where the service sends it, each kind a guild's treasury is an end of, worded
  *  as `<who> <words> <amount>`; a kind that runs either way (a Conscription) worded by its
  *  direction. Before it, every line the service had no word for said "put in" - a Tribute, an upkeep, a claim fee, a writ's
@@ -309,7 +309,7 @@ export function guildSilverLineText(l) {
   const words = typeof w === 'string' ? w : w ? w[l.out === true ? 'out' : 'in'] : l.out === true ? 'paid' : 'received';
   return `${GUILD_SILVER_MEMBER_KINDS.includes(l.raw) ? l.who : 'The guild'} ${words} ${amount}`;
 }
-/** DOMAIN2 (bible/11-Multiplayer/Domains.md 6): THE CASTLE'S WORDS on the Guild window's Overview - read at each call, in
+/** DOMAIN2: THE CASTLE'S WORDS on the Guild window's Overview - read at each call, in
  *  the player's language. `city` the crown city (castleLaw.js castleCityOf - AUDIT TESA III E2-2: a province's capital, never
  *  the province), every number already in figures. */
 export const guildCastleText = Object.freeze({
@@ -475,7 +475,7 @@ textarea.dfsocial-field { resize: vertical; min-height: 120px; line-height: 1.4;
 .dfsocial-count { font-size: 11px; color: var(--dim, #9a9486); text-align: right; }
 .dfsocial-count.over { color: #e0704a; }
 
-/* GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): THE GUILD PAGE - its header (the banner beside the name), its page
+/* GUILD2: THE GUILD PAGE - its header (the banner beside the name), its page
    strip (wrapping: seven pages are wider than the panel at a phone's width), a member's vault grant beneath its row, and
    the arms' choices drawn - colour swatches and shield tiles, the one picked ringed in brass. */
 .dfsocial-guildhead { flex-direction: row; align-items: center; gap: 10px; }
@@ -1475,7 +1475,7 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
     if (acts.children.length) out.push(acts);
     return out;
   };
-  /** DOMAIN2 (bible/11-Multiplayer/Domains.md 6): THE CASTLE - each castle the guild keeps (its door, what was paid, both
+  /** DOMAIN2: THE CASTLE - each castle the guild keeps (its door, what was paid, both
    *  refunds said before the press, the Guildmaster's Give up, pressed twice), each one its crowns may buy (the
    *  Guildmaster's, its price beside the treasury's silver), and with neither, what a castle is and how one is had. */
   const guildCastleNodes = (g, v, me) => {
@@ -1503,7 +1503,7 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
     }
     return out;
   };
-  // ═══ GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): THE GUILD PAGE, IN PAGES ══════════════════════════════════════
+  // ═══ GUILD2: THE GUILD PAGE, IN PAGES ══════════════════════════════════════
   // Asked: "the guild page needs an overhaul". GUILD1b's tab was one scroll - roster, invites, two treasuries and their
   // ledgers, the hall, the heraldry, the guild Stores, the rank names and leaving, every section under the one before. It
   // is pages now, under the guild's own header (its banner, its name and tag, the reader's rank): Overview, Members,

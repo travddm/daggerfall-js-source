@@ -26,8 +26,8 @@
 // describes this exact failure, word for word, because each of them hit
 // it first and wrote down what it cost. The rule was enforced in four
 // files by whoever remembered to copy the block, and the fifth door
-// missed it. That is the program's measured failure mode (see
-// `01-Overview/Hardening.md`) landing on a player rather than on a test.
+// missed it. That is the program's measured failure mode
+// landing on a player rather than on a test.
 //
 // So the door list was DERIVED - every `ui/*Door.js` that can hand a
 // host a window - and every window it returns had to answer the contract

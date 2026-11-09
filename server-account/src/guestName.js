@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // ACC1b — A GUEST'S NAME: drawn from Daggerfall's own name banks, and
 // shaped so a chosen handle can never be mistaken for one.
 //
@@ -11,7 +10,7 @@
 // every townsperson draw from), so the world names its visitors out of
 // the same book it names everybody else.
 //
-// ═══ THE SHAPE IS THE GUARANTEE ════════════════════════════════════
+// THE SHAPE IS THE GUARANTEE
 //
 // A GUEST NAME ALWAYS CARRIES EXACTLY ONE SPACE; A CHOSEN HANDLE NEVER
 // CARRIES ONE. That is the whole of the anti-impersonation law and it
@@ -30,7 +29,6 @@
 // A guest's name matches nothing, so this draws uniformly from a CSPRNG
 // and imports the bank alone - the Worker's bundle stays 13 KB of data
 // and no engine.
-// ═══════════════════════════════════════════════════════════════════
 
 import banks from '../../src/characters/nameGen.json' with { type: 'json' };
 // AUDIT-ACC F7: the generator has to know the wire's own bound, because
@@ -45,7 +43,7 @@ export const GUEST_BANKS = Object.freeze(Object.keys(banks)
   .filter((k) => Array.isArray(banks[k]?.sets) && banks[k].sets.length >= 6)
   .sort());
 
-/* ═══ THE TWO NAME SHAPES MOVED TO src/net/handleShape.js (ACC1e) ══
+/* THE TWO NAME SHAPES MOVED TO src/net/handleShape.js (ACC1e)
  *
  * They were born here and the law is unchanged; only the address is.
  * ACC1e gave the player a field to type a handle into, and the client
@@ -96,7 +94,7 @@ function drawName(rand, bank) {
  * A name for a guest. Two parts for the first name and two for the
  * surname, the way every Breton in the game is named.
  *
- * ═══ AUDIT-ACC F7: THE BANK CAN SPELL A NAME THE WIRE CANNOT CARRY ══
+ * AUDIT-ACC F7: THE BANK CAN SPELL A NAME THE WIRE CANNOT CARRY
  *
  * `NAME_MAX` is 24 and the longest name this bank can produce is 25:
  * `Kelkemmelian Larethbinder`, and three siblings sharing that surname.

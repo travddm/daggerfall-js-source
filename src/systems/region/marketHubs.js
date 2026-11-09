@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // BAY-LEFT-SEA - THE MARKET'S HUBS, THE PROVINCES' TOO
 // (BAY-LEFT-SEA).
 //
@@ -24,7 +23,6 @@
 //
 // Pure: the hubs, the seats' book and the registry are arguments. Not a DFU member (DFU has no market). No account
 // change: the service's hub law already takes a pixel past the Bay.
-// ═══════════════════════════════════════════════════════════════════
 import { PROVINCE_REGION_NAMES, regionOfTheatre } from '../../formats/mapsTables.js';
 import { settlementRank } from './regionHubs.js';
 

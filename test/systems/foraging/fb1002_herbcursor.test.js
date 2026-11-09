@@ -4,8 +4,7 @@
 // look, moving it toward a glint turned the view and the glint with it. Its act now holds the cursor free while it
 // plays (player/pointerLock.js holdCursor - not the player's own FreeMouse toggle) and hands the look back as it ends,
 // however it ends. The other acts, checked: a vein's points and a body's line are aimed by the look itself, so a mouse
-// the player freed is taken back for them; the ring, the hold and the net need neither. bible/01-Overview/
-// Field-Bugs-2026-10-02.md, part four.
+// the player freed is taken back for them; the ring, the hold and the net need neither.
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

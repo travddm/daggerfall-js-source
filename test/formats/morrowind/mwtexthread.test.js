@@ -185,7 +185,7 @@ test('MW-TEXTHREAD: the build\'s textures arrive through the pool - its preload 
   } finally { _resetTexturePool(); }
 });
 
-// ═══ AUDIT MW-TEXTHREAD ═════════════════════════════════════════════
+// AUDIT MW-TEXTHREAD
 const enc = (s) => [...s].map((c) => c.charCodeAt(0));
 const u32 = (n) => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
 const z = (s) => [...enc(s), 0];
