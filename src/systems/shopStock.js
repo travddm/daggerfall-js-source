@@ -147,8 +147,8 @@ const isShelfArrow = (it) => it?.group === 'Weapons' && it.templateIndex === ARR
 /** ENDLESS-ARROWS: the counter's quiver, minted as the shelf mints its own (CreateWeapon's arrow arm, its roll a constant). */
 const mintQuiver = (n) => mintCondition(setItemFields({ ...createWeapon(ARROW_TEMPLATE, 0, () => 0), stackCount: n }));
 /** A SOLD PIECE ONTO A SHELF, where the Features row keeps one there (DFU clears the merchant's basket: shop-shelf-rule.ts) -
- *  STOLEN-GOODS' law (stolenGoods.js landSold), but an arrow sold at a General Store's COUNTER is never shelved there
- *  (AUDIT UPDATE II B2): its quiver is endless, and a sold row bought back would read as arrows the purchase took from it.
+ *  the stolen goods' law (stolenGoods.js landSold), but an arrow sold at a General Store's COUNTER is never shelved there
+ *  because its quiver is endless, and a sold row bought back would read as arrows the purchase took from it.
  *  `buildingType` the counter's shop, null for any other shelf. Answers whether the piece is on the shelf. */
 export function landSoldAt(shelfItems, item, buildingType = null) {
   if (!soldGoodsStayOnShelf() || (endlessArrowsAt(buildingType) && isShelfArrow(item))) return false;
@@ -855,7 +855,7 @@ export function calculateCost(baseValue, shopQuality, priceAdjustment = 1000, co
   return cost;
 }
 
-/** REALM P0.4, the server profile's option (trade.saleCap, off by default: DFU's haggle online too). With it on, ONLINE A
+/** The server profile's option (trade.saleCap, off by default: DFU's haggle online too). With it on, ONLINE A
  *  SHOP PAYS AT MOST HALF WHAT IT ASKS for the same piece; off, a counter's piece sells back for no more than was paid. DFU's haggle can turn a counter's spread upside down - a quality-1 shop pays 125/256 of the
  *  cost to a seller with Mercantile 2 and asks 124/256 of a buyer - so buying a piece and selling it back made gold,
  *  and the regions' price walk paid a carrier. Offline, DFU's haggle stands. */
