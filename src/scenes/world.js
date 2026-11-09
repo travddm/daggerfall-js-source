@@ -19533,7 +19533,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     },
   }) : null;
   // CHAP4b: the rank the playing character's seat gives it at a hall of `faction` where it stands - the politic region,
-  // as the chapter sheet's (AUDIT CHAP3 C6) - null offline, before the Roll's first word, with no seat here, or where a chair is no rank (guild.seatRanks)
+  // as the chapter sheet's - null offline, before the Roll's first word, with no seat here, or where a chair is no rank (guild.seatRanks)
   const seatRankHere = (/** @type {number} */ faction) => {
     if (!rollTracker?.held || rollTracker.stopped || !seatsHoldTopRanks()) return null;
     const px = playerTravelPixel();

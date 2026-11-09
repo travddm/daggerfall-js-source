@@ -66,7 +66,7 @@
 import { bookRankMax, promotesWithoutWait, seatsHoldTopRanks } from '../systems/guild/guild-rank-rule.ts';   // the server profile's guild ranks
 import {
   ROLL_FACTIONS, ROLL_CLAIM_MS, ROLL_RETRY_MS, ROLL_RETRY_MAX_MS, rollDeltasOf, rollAdopt, rollMembersKey, rollMembersOf, rollRep, rollKeptOf,
-  rollBookCap, rollSeatsOf, ROLL_SEATS_MS, rollPromoteCeiling, rollPaceWait,   // ROLL-PACE
+  rollBookCap, rollSeatsOf, ROLL_SEATS_MS, rollPromoteCeiling, rollPaceWait,
   rollMovesOf,   // STANDING-WORDS
 } from './npcChapterLaw.js';
 import { setReputation } from '../systems/faction/factionRep.js';
@@ -113,7 +113,7 @@ export function rollEntityDoors(/** @type {() => any} */ entityOf) {
       carryInvitationOnly(entity?.guildMemberships, rollVampireOf(entity));   // CURSE-CARRY: before the read, not at the next activeMemberships
       return rollMembersOf(entity?.guildMemberships, rollVampireOf(entity));
     },
-    cap: () => rollBookCap(entityOf()?.guildMemberships, bookRankMax()),   // CHAP4b: the book held at 7 while the chairs hold 8 and 9 (guild.seatRanks)
+    cap: () => rollBookCap(entityOf()?.guildMemberships, bookRankMax()),   // the book held at 7 while the chairs hold 8 and 9 (guild.seatRanks)
   };
 }
 

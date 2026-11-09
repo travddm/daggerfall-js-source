@@ -394,11 +394,11 @@ export class Quest {
     // tombstone later scrubs the "rumor mill" rumors and info topics.
     this.hooks?.removeProgressRumors?.(this.uid);
     this.hooks?.removeQuestorPostMessage?.(this.uid);
-    // QFAIL-FREE, the server profile's option (quest.failureFree; off: DFU's -2 online too): online a quest
+    // The server profile's option (quest.failureFree; off: DFU's -2 online too): online a quest
     // that ends unfinished costs the faction nothing. TIME3 put the
     // countdowns on the character's clock, so a journey or a rest spent
     // them, and DFU's -2 (propagated through the tree) bled every
-    // standing a player held; QCLOCK-WORLD now charges only lived time.
+    // standing a player held; a deadline now charges only lived time.
     const failureFree = questFailureFree(this.questSuccess, this.hooks);
     if (this.factionId > 0 && !failureFree) {
       const repChange = this.questSuccess ? QUEST_SUCCESS_REP : QUEST_FAILURE_REP;

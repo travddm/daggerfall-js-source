@@ -2604,7 +2604,7 @@ export function createRestDeps(entity, opts = {}) {
     // the last stage of the walk. Flatten here, once, for every host.
     endLines: (id) => plainLines(rest.endLines?.(id)),
   };
-  // REST1: THE ACT ONLINE, the server profile's option (rest.fireOnly), composed here beside the window's deps so the four
+  // The rest act online, the server profile's option (rest.fireOnly), composed here beside the window's deps so the four
   // hosts share one law (systems/rest/restAct.js). `restAct` answers the plan the window opens on - null offline and
   // online by default, where the window is DFU's own on the character's own clock; `restNight` runs the night through THIS bag (the timed rest's own session, its sub-ticks,
   // quest ticks, hourly checks and vitals, in one call), stamps it, tops the yield up and spends a rented room's

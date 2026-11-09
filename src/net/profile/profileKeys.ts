@@ -46,7 +46,7 @@ export const PROFILE_KEYS = Object.freeze({
   // Whether a shop's offer for a sale is capped online at half of what the counter asks the best haggler, with the
   // seller's skills at half weight under it (shopStock.js calculateTradePrice). DFU has no cap: a poor shop pays more
   // for goods, and Mercantile and Personality move a sale at full weight (FormulaHelper.CalculateTradePrice). Buying
-  // back a counter's own piece for profit stays shut by the counter-paid mark (ON7), which this key does not touch.
+  // back a counter's own piece for profit stays shut by the counter-paid mark, which this key does not touch.
   'trade.saleCap': Object.freeze({
     census: Object.freeze(['ON2'] as const),
     feature: 'REALM-P0.4',
@@ -124,7 +124,7 @@ export const PROFILE_KEYS = Object.freeze({
   }),
   // Whether a quest that ends unfinished online costs its faction nothing. DFU takes 2 reputation, spread through the
   // faction's allies and enemies (Quest.cs EndQuest). The cost was waived when deadlines ran on the character's clock in
-  // travel and rest; a deadline now charges only the time lived (audit SS2, SS17), so ON32's row is the census.
+  // travel and rest; a deadline now charges only the time lived.
   'quest.failureFree': Object.freeze({
     census: Object.freeze(['ON32'] as const),
     feature: 'QFAIL-FREE',

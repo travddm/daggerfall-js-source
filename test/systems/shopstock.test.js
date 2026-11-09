@@ -212,7 +212,7 @@ test("online a sale is DFU's haggle (FormulaHelper.CalculateTradePrice): the sam
       }
     }
   }
-  // The audit's probe, cost 1000 (dfu-gaps-audit SB3).
+  // DFU's offers for a 1000-gold piece at a quality-10 shop, for a weak seller and for the best one.
   assert.equal(sell(10, WEAK, ONLINE), 371);
   assert.equal(sell(10, BEST, ONLINE), 671);
 });

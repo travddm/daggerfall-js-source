@@ -1,5 +1,5 @@
 // What a quest that ends unfinished costs online. DFU takes QuestFailureRep (2) from the quest's faction, spread through
-// its allies and enemies (Quest.cs EndQuest). QFAIL-FREE, a failure that costs nothing online, is the server profile's
+// its allies and enemies (Quest.cs EndQuest). A failure that costs nothing online is the server profile's
 // option (net/profile/profileKeys.ts quest.failureFree). Kept apart from questRepute.js, which stays a leaf the guild hall
 // reads without the server profile.
 
