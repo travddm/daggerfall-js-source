@@ -391,7 +391,7 @@ const HARDCODED = {
   'src/systems/livingWorld/livingTown.js': 1,
   'src/systems/livingWorld/people.js': 10,
   'src/systems/livingWorld/trips.js': 1,
-  'src/systems/localeCatalog.js': 3,
+  'src/systems/localeCatalog.js': 2,
   'src/systems/loot/loot.js': 2,
   'src/systems/loot/lootCodex.js': 11,
   'src/systems/loot/lootPowers.js': 7,

@@ -15,7 +15,7 @@ and translations in step. `locales/README.md` is the translator-facing guide; th
 ## Two kinds of text
 
 | Text | Call | Table |
-|---|---|---|
+| --- | --- | --- |
 | The game's own words (menus, enhanced UI, online, anything DFU lacks) | `t(key, en, args)` | `Port_Strings` |
 | Daggerfall's and DFU's words (DFU interface strings, `TEXT.RSC`, locations, spells, items, factions) | `localizedText(key, en, collection)`, `localizedTextList`, `localizedStrings({...})`, `localizedTable({...})` | DFU's collections: `Internal_Strings`, `Internal_RSC`, `Internal_Flats`, `Internal_Quests`, `Internal_Locations`, `Internal_Settings`, `Internal_Spells`, `Internal_Items`, `Internal_MagicItems`, `Internal_Factions` |
 
@@ -63,8 +63,8 @@ text that overflows its box has no room to grow. Use it to check a UI change.
 
 ## Which translations ship
 
-The repository ships English and translations a person has reviewed. It ships no machine drafts: a machine-written
-language is not accepted, because nobody has checked that it reads well. `locales/` holds only `en/` until a reviewed
+The repository ships English and translations a person has reviewed. It has no machine translation tools
+(decision 116 (12)). `locales/` holds only `en/` until a reviewed
 translation is added.
 
 To add a reviewed language:
@@ -72,12 +72,12 @@ To add a reviewed language:
 1. Create `locales/<tag>/Port_Strings.csv` (`tools/l10nReview.mjs --export <tag>` writes a sheet to fill; see
    `locales/README.md`). Add the tag to `LOCALE_CATALOG` in `src/systems/localeCatalog.js` if it is not there.
 2. A person writes or checks every row. `tools/l10nReview.mjs --import` records each fix as a person's row
-   (`"by": "human"` in `Port_Strings.meta.json`). Do not commit rows drafted by `tools/translate.mjs` or
-   `tools/l10nInSession.mjs`.
+   (`"by": "human"` in `Port_Strings.meta.json`).
 3. Name the reviewers in `locales/<tag>/translators.json`, and run `node tools/l10nCoverage.mjs`: every row must be a
    person's, and the language must cover the English catalog exactly.
 
-The picker offers each language in `LOCALE_CATALOG` that has files in `locales/`, so a folder plus its catalog entry is the whole change.
+The picker offers each language in `LOCALE_CATALOG` that has files in `locales/`, so a folder plus its catalog entry
+is the whole change.
 
 ## The `locales/` tree
 
@@ -93,22 +93,22 @@ locales/
 ```
 
 - `src/systems/localeCatalog.js` `LOCALE_CATALOG` lists the offered languages: tag, native and English name, script.
-  `drafting: true` means the drafts are incomplete, so the drafts alone do not offer the language (an installed pack
-  does). `hidden` keeps a locale out of the picker. Right-to-left and complex scripts are not offered yet.
+  A language is offered when it has files in `locales/` or the player installed a pack for it. `hidden` keeps a
+  locale out of the picker. Right-to-left and complex scripts are not offered yet.
 - `src/scenes/localeData.js` globs `locales/*/*.csv` as lazy chunks and loads only the chosen language's chain. Text is
-  layered: machine drafts, then a bundled pack, then a pack the player installed. Boot picks `?lang=` for one visit,
-  else the saved pref `language`. A language that fails to load leaves English.
+  layered: the language's own tables, then a bundled pack, then a pack the player installed. Boot picks `?lang=` for
+  one visit, else the saved pref `language`. A language that fails to load leaves English.
 - A player installs any DFU translation pack (folder or zip) from the Language row. `src/systems/translationPacks.js`
   classifies its files (`Text/<Table>.csv`, `Text/Quests/*-LOC.txt`, `Text/Books/*-LOC.txt`, `Text/NameGen.txt`,
   `Fonts/FONT000N-SDF.*`); `src/scenes/translationStore.js` keeps them.
-- `vendor/dfu-text/Internal_*.csv` are DFU's English masters for its collections. Drafts are made from them and tests
+- `vendor/dfu-text/Internal_*.csv` are DFU's English masters for its collections. Tests
   hold the port's English constants to them. The game does not load them.
 
 ### Who owns a row
 
-`<table>.meta.json` records what a machine wrote. A row whose text no longer matches the recorded hash was edited by a
-person and is theirs: no tool overwrites it. A row whose English changed is redrafted only if a machine owns it;
-otherwise it is reported as stale for review. The Language row and About pane say which languages are machine drafts.
+`<table>.meta.json` records, per row, a hash of the English it was written against, a hash of the text, and who wrote
+it (`by`). A row whose English changed since is reported as stale for review (`tools/l10nCoverage.mjs`). The row
+law is `tools/lib/translation-rows.mjs`.
 
 ## Workflow for a code change
 
@@ -125,10 +125,9 @@ otherwise it is reported as stale for review. The Language row and About pane sa
 Other tools:
 
 | Command | Does |
-|---|---|
-| `node tools/translate.mjs --lang fr --table Port_Strings [--dry-run]` | Drafts missing and changed rows. Options `--model`, `--batch`, `--jobs`, `--limit`, `--retranslate`. |
+| --- | --- |
 | `node tools/l10nReview.mjs --export fr` / `--import fr file.csv` | A review sheet for translators; imports apply as a person's rows. |
-| `node tools/l10nCoverage.mjs [--json]` | Each language's coverage, machine versus person, stale rows. |
+| `node tools/l10nCoverage.mjs [--json]` | Each language's coverage, rows owed, stale rows. |
 | `node tools/l10nPack.mjs` | Checks every bundled pack under `locales/<tag>/pack/`. |
 | `node tools/l10nRouted.mjs` | Lists DFU words routed through `localizedText` and the tables. |
 

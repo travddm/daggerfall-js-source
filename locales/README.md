@@ -29,7 +29,7 @@ literal brace.
 
 ## Reviewed translations only
 
-This repository ships English and translations that a person wrote or reviewed. It does not ship machine drafts. A
+This repository ships English and translations that a person wrote or reviewed. A
 language folder is added with the whole translation reviewed, and the reviewers named in `translators.json`.
 
 ## Fixing a translation
@@ -78,24 +78,11 @@ DFU's own layout:
     locales/<tag>/pack/Fonts/...     its fonts
 
 `terms` records what the authors allowed, and when. The game layers the text in this order:
-1. the machine drafts;
-2. the bundled pack, on top of the drafts;
+1. the language's own tables (`locales/<tag>/*.csv`);
+2. the bundled pack, on top of them;
 3. a pack the player installs, on top of both.
 
 The credits carry the bundled pack's name, authors, licence and source. A pack's textures and videos are edits of
 Bethesda's assets and are never bundled, whatever the pack's terms say. `node tools/l10nPack.mjs` checks every bundled
 pack, and test/tooling/l10n6_tools.test.js holds the tree to it. No pack is bundled yet: one is added only once its authors'
 permission is in hand.
-
-## The pipeline
-
-`tools/translate.mjs` drafts a language's table on the Claude API:
-
-    ANTHROPIC_API_KEY=... node tools/translate.mjs --lang fr --table Port_Strings
-    node tools/translate.mjs --lang ja --table Internal_RSC --dry-run
-
-It drafts only the rows a language lacks, and the rows whose English changed. A row a person wrote or edited is theirs:
-`<table>.meta.json` records what the pipeline wrote, so the pipeline sees the edit and never overwrites it. A draft that
-loses a placeholder is asked for again, then left out. `locales/<tag>/glossary.json` (`{ "English": "yours" }`) keeps
-a language's names the same across a run. Options: `--model`, `--batch`, `--jobs`, `--limit`, `--retranslate`,
-`--dry-run`.
