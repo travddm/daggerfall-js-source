@@ -10,7 +10,7 @@ uniform vec2 uPresent;      // RetroPresentation's 640x400
 uniform int uKind;          // 0 plain Blit, 1 posterize, 2 palettize
 uniform int uNoSky;         // EXCLUDE_SKY
 uniform int uLutSize;
-uniform int uSmooth;        // PERF-SCALE: the render scale's image - LINEAR, unsnapped, no effect
+uniform int uSmooth;        // the render scale's image: shown LINEAR and unsnapped, with no retro effect
 out vec4 outColor;
 // the display byte to DFU's linear and back: the exact sRGB pair
 vec3 srgbToLinear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
