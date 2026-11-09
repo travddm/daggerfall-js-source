@@ -782,7 +782,7 @@ const service = {
     }
 
     // HELD FOR MAINTENANCE. A history repair
-    // (.github/workflows/realm-revive.yml) rewinds the database for a minute to read what was lost, and puts it back;
+    // rewinds the database for a minute to read what was lost, and puts it back;
     // anything written in between would vanish with the rewind. So the job deploys this Worker with MAINTENANCE = "1"
     // first, and every call but the two above is refused for that minute - 503, which a playing tab's checkpoint waits
     // out and sends again (systems/realmSaves.js), never a write that is silently lost. The job's own last step deploys

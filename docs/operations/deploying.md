@@ -142,7 +142,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | --- | --- |
 | `[[durable_objects.bindings]] ROOMS` -> class `Room` | Every room (map cells, the hub, region channels, instances). SQLite-backed (`[[migrations]] v1`). |
 | `[[services]] ACCOUNTS` | Service binding to the account Worker. |
-| `[[analytics_engine_datasets]] METRICS` | Room metrics (`server/src/relayScale.js`), read by `relay-load.yml`. |
+| `[[analytics_engine_datasets]] METRICS` | Room metrics (`server/src/relayScale.js`). |
 | `[vars] IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S` | Verifies identity tokens. Must match the account service's key. |
 | `[vars] CELL_SPLIT_AT`, `CELL_MERGE_AT`, `*_DWELL_MS`, `REGION_SHARDS` | Crowd thresholds for splitting and merging cells. |
 | `[vars] *_FEED_URL`, `HIDDEN_SEEN_URL` | Account service endpoints the relay calls for moderation and staff feeds. |
@@ -156,7 +156,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[[r2_buckets]] SAVES` | Cloud saves. |
 | `[[durable_objects.bindings]] ADMIT` -> class `AdmitGate` | The sign-in line: queues the burst of sign-ins after a relay deploy (`server-account/src/admit.js`). |
 | `[[services]] RELAY` | Service binding to the relay. |
-| `[[analytics_engine_datasets]] METRICS` | Service metrics (`server-account/src/metrics.js`), read by `d1-load.yml`. |
+| `[[analytics_engine_datasets]] METRICS` | Service metrics (`server-account/src/metrics.js`). |
 | `[placement] region` | Runs the Worker near the D1 primary. |
 | `[triggers] crons` | The service's own clock (`server-account/src/cron.js` `runCron`): sweeps and retention. |
 | `[vars] ACCOUNT_VERSION` | Must equal `ACCOUNT_VERSION` in `server-account/src/service.js`. |
