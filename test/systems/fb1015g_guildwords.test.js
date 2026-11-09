@@ -377,10 +377,11 @@ test('AUDIT GUILD-WORDS L1-3, L1-4, L1-7, II A-6, C-7: a probation as its review
   assert.deepEqual(reviewWarnings(entity, g, bookOf(entity), store, { now: day(30) }), [probationWords(8)]);
   assert.deepEqual(reviewWarnings(entity, g, bookOf(entity), store, { now: day(30), online: true }), [probationWords(8, 'expel', true)]);
   assert.deepEqual(affiliations(entity, { now: day(30) })[0].warnings, [probationWords(8)], 'the Standing page\'s days (II E-6)');
-  assert.deepEqual(affiliations(entity, { now: day(30), online: true })[0].warnings, [probationWords(8, 'expel', true)]);
+  assert.deepEqual(affiliations(entity, { now: day(30), online: true })[0].warnings, [probationWords(8)], 'online a review waits DFU\'s 28 days by default');
   const lines = rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30) });
   assert.deepEqual(lines.slice(0, 2), [probationWords(8), 'Next rank: Journeyman']);
-  assert.equal(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30), pace: PACE })[0], probationWords(8, 'expel', true), 'the hall online, while the Roll paces');
+  assert.equal(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30), pace: PACE })[0], probationWords(8), 'the hall online waits the 28 days by default');
+  assert.equal(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30), pace: { ...PACE, promoteNow: true } })[0], probationWords(8, 'expel', true), 'the hall online under guild.promoteNow, while the Roll paces');
   setReputation(store, MAGES, 20);   // mended, the review not yet run: nothing short, the probation still said
   assert.deepEqual(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30) }), [probationWords(8)]);
   const skillsWords = (d) => `On probation: your guild skills are short of a member's. Your review is ${when(d)}: below -10 you are expelled, and it ends only once one skill reaches 22, a second 4, and your standing is 0 or more.`;
