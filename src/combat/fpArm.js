@@ -1576,7 +1576,7 @@ async function buildTpBody({
  * body is, and animated from its sources - xbase_anim first for a Bipedal one, then its own (creatureanimation.cpp).
  * Nothing is worn, held, hung or faced, and there is no first person: the answer is the third-person body, shaped as
  * buildTpBody's so the rig, the GPU skin and the sprite take it unchanged, standing also as `built` (no arm), with the
- * record (`creature`) and XSCL as a uniform scale (Creature::adjustScale - weight and height alike).
+ * record (`creature`) and its XSCL as one scale for width and height alike.
  */
 async function buildCreatureBody({ creature, flies = false, deps = null }) {
   const ids = [].concat(creature).map((c) => String(c || '').toLowerCase());   // the candidates, in the match's order (characters/creatureBodies.js)
@@ -2030,17 +2030,10 @@ export async function buildFpArm({
         if (rrec && rrec.radt) beast = rrec.beast;   // raceBeastFlag's own rule, off the memo
       }
     }
-    // MW-D34: Npc::adjustScale (npc.cpp:1102-1136) - the race record's
-    // RADT carries per-gender height and weight, and the rendered body
-    // scales x,y by WEIGHT and z by HEIGHT (:1124-1135). The player's
-    // own FIRST-person meshes take uniform HEIGHT only - "Race weight
-    // should not affect 1st-person meshes, otherwise it will change
-    // hand proportions and can break aiming" (:1112-1121); in this
-    // port's FP composition (rule 54: camera and rig share one space)
-    // a uniform scale of both cancels exactly, so the carve-out is the
-    // no-op the reference's comment wants. Collision never scales
-    // (:1104-1106) - the classic motor's collider is untouched. Last
-    // .esm wins, the load order as everywhere else.
+    // The race's body scale (buildRules.js raceScaleOf) is drawn on the third-person body only. The first-person arm
+    // takes no scale: its camera sits in the rig's own space, so a scale would move the camera with the hands and
+    // change nothing on screen, and a wider race must not widen the hands it aims with. The camera's eye height follows
+    // the height factor (raceHeightScale). The collider never scales.
     const raceScale = raceScaleOf(esmBytes.map((e) => walk(e, 'races', raceRecords).get(raceKey)), female);
     // MW-D14 / RULE 18: the settings name is not the final name. The
     // x-form is used only when its .kf is in the archive, which for a
@@ -2357,12 +2350,7 @@ export async function buildFpArm({
     }
     const idleCheck = idlePick.state;
     const tracks = idlePick.source.trackMap;
-    // RULE 56's STICKINESS. `if (!mAccumRoot)` guards the whole block in
-    // addAnimSource, so the accum root is chosen by the FIRST source
-    // that resolves one - in PUSH order - and later sources do not
-    // re-pick it. It is ONE value for the whole rig, not one per clip:
-    // a per-source accum root would move the extraction bone when the
-    // player swung, which is a rig that walks away mid-blow.
+    // One accumulation root for the whole rig, set by the first source that has one (buildRules.js stickyAccumRoot).
     const accumRoot = stickyAccumRoot(sources);
     const poseAt = (t) => poseAssembly(arm, { tracks, sampleTrack, time: t, accumRoot });
     // PX27 (Mac: the full arms do not show on a swing or a bow): THE
@@ -2499,8 +2487,7 @@ export async function buildFpArm({
       offWeapon: offBound.first?.info ?? null,   // TWO-HANDS AUDIT 2: the left hand's, bound in the build (setOffWeapon's `offWeapon`)
       binding: idlePick.source.binding,
       pieces: armPieceRows(arm.pieces).length,
-      // MW-D34: adjustScale's factors for the drawn body and the
-      // camera's focal height.
+      // The race's factors for the drawn body and the camera's focal height.
       raceScale,
       // TWO-HANDS AUDIT 2: this rest pose's matrices (the idle's first frame), which the pair's guard is measured on - once
       // per bound blade, the first time a pair guards (the rig's guardDipNow), never per build: an NPC's never holds a pair
@@ -5994,10 +5981,8 @@ export function createFpArm() {
       return armBonesInBody(drawn ? { skeleton: arm.skeleton, mats: drawn } : arm, names, built && built.raceScale);
     },
 
-    /** MW-D34: the race's HEIGHT factor (adjustScale's z, npc.cpp:1127/
-     *  1134), which is what the camera's focal height rides - the
-     *  tracked node sits on the scaled actor. mwViewFrame passes it so
-     *  no host re-derives the seam (MW-D25's law). */
+    /** The race's height factor. The camera's focal height rides it, because the tracked node sits on the scaled
+     *  body. mwViewFrame passes it on, so no host works it out again. */
     raceHeightScale: () => (built && built.ok && built.raceScale ? built.raceScale.height : 1),
     /** MWNPC9: a creature's own standing height in metres (its build's measure), null for a person - who is the capsule. */
     bodyHeight: () => (built && built.ok && built.creature && built.creature.height > 0 ? built.creature.height : null),
@@ -6040,10 +6025,8 @@ export function createFpArm() {
       // AUDIT OW3 J6: `grow` - the travel view's OW-BIG, the body drawn that many times its size ABOUT ITS FEET (the root
       // trs stands MW 0,0,0 on them at any scale), its box and so its picture with it; 1 everywhere else
       const u = thirdUnit(grow);
-      // MW-D34: adjustScale on the rendered body (npc.cpp:1124-1135):
-      // x,y take the race's WEIGHT, z its HEIGHT. In this frame the
-      // local x/z pair is the MW horizontal (side/forward through
-      // Rx(-90)) and local y is the MW vertical.
+      // The race's scale on the drawn body: its weight across and forward, its height up. In this frame the local x/z
+      // pair is Morrowind's horizontal (side and forward, through Rx(-90)) and local y is its vertical.
       const rs = (built && built.raceScale) || { weight: 1, height: 1 };
       const model = thirdModel(feet, yaw, grow);   // MWNPC16: one home with castThird's
       drawnArm = t.arm; drawnMats = t.arm.mats;   // the pose this body was drawn in
