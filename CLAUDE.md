@@ -32,9 +32,8 @@ The docs are in `docs/`. Start at `docs/README.md`, and read `docs/architecture/
   (`.github/pull_request_template.md`). The desktop release reads them there, so editing a merged pull request's
   description rewrites its release notes (`release-notes.yml`). Never commit a patch-notes file
   (`test/tooling/rel4_release.test.js` fails on one).
-- **Patch notes are written in ASD-STE100 Simplified Technical English** (`docs/operations/desktop-release.md`). The
-  `ste-notes` check reads the description each time it changes: write it to a file and run
-  `node scripts/steNotes.mjs <file>` before you post it.
+- **Patch notes are written in ASD-STE100 Simplified Technical English** (`docs/operations/desktop-release.md`). No CI
+  check reads them; `node scripts/steNotes.mjs <file>` is an optional local check of a draft.
 - **Discord is code**: the bot's commands are in `server-account/src/discordCommands.js`, its cards and answers in
   `server-account/src/discord.js`, its channel and moderators in `server-account/wrangler.toml`. The account deploy
   (`account-deploy.yml`) writes them to Discord. Change Discord by changing those files. A person still invites the

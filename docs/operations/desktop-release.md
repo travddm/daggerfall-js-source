@@ -119,10 +119,9 @@ Patch notes for players live in the pull request description, never in a file in
 
 - Write them under `## Patch notes: <title>`, with parts under `###` headings
   (`.github/pull_request_template.md`). Leave the section out when players would not notice the change.
-- Write them in ASD-STE100 Simplified Technical English. `ste-notes.yml` runs `scripts/steNotes.mjs` on every open
-  pull request when the description changes or a commit is pushed. It checks what a machine can: sentence and
-  paragraph length, semicolons, `-ing` forms, contractions, complex verbs. The approved-word rules are the
-  reviewer's. Check a draft locally with `node scripts/steNotes.mjs <file>`.
+- Write them in ASD-STE100 Simplified Technical English. No CI check reads them. `node scripts/steNotes.mjs <file>`
+  is an optional local check of a draft: sentence and paragraph length, semicolons, `-ing` forms, contractions,
+  complex verbs. The approved-word rules are the reviewer's.
 - At release time `desktopRelease.mjs notes` finds the pull request numbers in the first-parent commit subjects since
   the previous `app-v` tag, reads each from the GitHub API, and takes the `## Patch notes` section (`patchNotesOf`)
   of each merged pull request opened by an owner, member or collaborator. GitHub's generated list of merged changes

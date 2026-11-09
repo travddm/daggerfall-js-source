@@ -26,12 +26,11 @@
 // unit is one word, and a name in **bold**, `code` or "quotes" is one word.
 // The rest of STE - the approved words in their approved meanings, an
 // article before a noun, no noun cluster past three words, the active
-// voice - is the writer's and the reviewer's
-// (, STE-NOTES). A clean run is not proof
+// voice - is the writer's and the reviewer's. A clean run is not proof
 // the notes are STE.
 //
-// The pull request's `ste-notes` check (.github/workflows/ste-notes.yml)
-// runs this on every description; run it on a draft before you post it:
+// No CI check runs this. It is an optional local check: run it on a draft
+// before you post it:
 //
 //   node scripts/steNotes.mjs <description.md>   (or - for stdin)
 import { readFileSync } from 'node:fs';
@@ -246,7 +245,7 @@ function main(args) {
     console.log('the patch notes keep the STE rules this check reads (STE-NOTES) - the dictionary is the writer\'s and the reviewer\'s');
     return 0;
   }
-  console.log(`the patch notes break STE in ${findings.length} place${findings.length === 1 ? '' : 's'} (STE-NOTES, bible/01-Overview/Desktop-App.md):`);
+  console.log(`the patch notes break STE in ${findings.length} place${findings.length === 1 ? '' : 's'} (STE-NOTES, docs/operations/desktop-release.md):`);
   for (const f of findings) console.log(`- ${f.message}`);
   return 1;
 }

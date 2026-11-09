@@ -318,7 +318,7 @@ that a newer push does not cancel:
 
 The figures assume the box's cores match GitHub's. Jobs queue when every slot is busy, and they fail after 24 hours in
 the queue ([runner-comms]). A newer push to a pull request cancels its running and queued jobs (`concurrency` in
-`check.yml`, `probes.yml` and `ste-notes.yml`), so a stack of pushes does not stack up work on the box.
+`check.yml` and `probes.yml`), so a stack of pushes does not stack up work on the box.
 
 ### What the workflows do for a small box
 

@@ -13,8 +13,8 @@ approved words in their approved meanings, one topic in a sentence, 25 words
 at most in a sentence and 20 in an instruction, six sentences at most in a
 paragraph, no semicolons, no -ing verb forms, no contractions, and the simple
 present, the simple past or the future. Write a control or an item **bold**,
-as the game shows it. The ste-notes check reads this section each time the
-description changes - run `node scripts/steNotes.mjs <file>` on a draft first.
+as the game shows it. No CI check reads this section: check a draft with
+`node scripts/steNotes.mjs <file>`.
 -->
 
 ## What changed

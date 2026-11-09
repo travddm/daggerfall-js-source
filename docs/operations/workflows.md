@@ -21,7 +21,6 @@ reads. Details of the deploys are in [deploying.md](deploying.md), of the deskto
 | --- | --- | --- | --- |
 | `release-desktop.yml` | Push to `main`; push of a tag `app-v*`; manual (`release_tag`) | Gates on `verify.yml`, builds the Electron installers on Ubuntu, Windows and macOS, then publishes one GitHub Release with every file and notes from the merged pull requests. A manual run without a tag only uploads run artifacts. | Built-in `github.token` only |
 | `release-notes.yml` | A merged pull request's description is edited (`pull_request_target: edited`); manual (`tag`) | Re-reads the patch notes for the release that first shipped that pull request and rewrites that release's body (`scripts/desktopRelease.mjs renotes`). Files are not touched. | Built-in `github.token` only |
-| `ste-notes.yml` | Pull request opened, edited, reopened or pushed to (open ones only) | Checks the `## Patch notes` section of the description against the machine-checkable rules of ASD-STE100 Simplified Technical English (`scripts/steNotes.mjs`). A description with no patch notes passes. | None |
 
 ## Operator workflows (manual only)
 
