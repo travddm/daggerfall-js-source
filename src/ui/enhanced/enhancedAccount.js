@@ -61,7 +61,7 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   dev: () => t('account.glyph.dev', 'Developer'),
   mod: () => t('account.glyph.mod', 'Moderator'),
   dm: () => t('account.glyph.dm', 'Dungeon Master'),   // TITLE-N: the die beside the Dungeon Master's name
-  disciple: () => t('account.glyph.disciple', 'Disciple'),   // TITLE-N: the named titles' marks, each its title's word
+  disciple: () => t('account.glyph.disciple', 'Disciple'),   // the named titles' marks, each its title's word
   apostle: () => t('account.glyph.apostle', 'Apostle'),
   hierophant: () => t('account.glyph.hierophant', 'Hierophant'),
   herald: () => t('account.glyph.herald', 'Herald'),   // HERALD: the herald's trumpet and its banner
@@ -495,7 +495,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   }
 
   /**
-   * RECOVERY-SET - THE CODES' ROW, in the Account section: how many recovery codes still open the
+   * THE CODES' ROW, in the Account section: how many recovery codes still open the
    * account (a count, never a code - the service keeps only hashes), and the press that makes a new set. AUDIT
    * RECOVERY-SET B3: in the section, not the window's foot - a fifth press there took the sticky foot to three rows (225px
    * of a 667px phone, 193px of a landscape one's 390). None for a guest, nor where the service counts no codes (a
@@ -512,7 +512,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     host.append(box);
   }
 
-  /** MEM-AUDIT: the card's owner lets it go when it draws the next. The card holds no listener of its own now, so there
+  /** The card's owner lets it go when it draws the next. The card holds no listener of its own now, so there
    *  is nothing to let go; the owner's call stays. */
   const off = () => {};
 
@@ -647,7 +647,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       }
       keep(deeds, chars);
 
-      // THE WARDROBE (ACC3c), under its head, where there is one to draw
+      // THE WARDROBE, under its head, where there is one to draw
       host = el('section', 'acctsec');
       host.append(el('h4', 'acctsechead', 'Wardrobe'));
       wardrobe();

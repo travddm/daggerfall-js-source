@@ -187,7 +187,7 @@ HOURS_FIRST_HANDLES = "aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDee
 # off the `dm` glyph in the signed token, as /red reads `dev`). "This
 # goes strictly to the account SquidKamer."
 DUNGEON_MASTER_HANDLES = "SquidKamer"
-# TITLE-N: Disciple, Apostle and Hierophant, lowest first - each list grants its
+# Disciple, Apostle and Hierophant, lowest first - each list grants its
 # title and its glyph. Dutchess and Satranath are the first Disciples (Mac); a handle
 # taken off is gone from that player's next token.
 # 2026-09-26, Mac: "Grant Flylighter the disciple title/glyph".

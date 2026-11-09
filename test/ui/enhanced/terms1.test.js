@@ -81,7 +81,7 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
     // game too, the reporters' automatic mute named, the names a line's own words carry, the second review before a
     // mute, a letter from a blocked player undelivered, every retention said and the Discord copies deleted with the
     // case's; the Terms' agreement the game asks for, never one it enforces
-    // Decision #115: material in both - the Terms lose their donations section, the Policy its payments section, its two
+    // Material in both - the Terms lose their donations section, the Policy its payments section, its two
     // payment list items and the Discord moderation channel; later sections renumbered - so a new version, 2026-11-09
     terms: 'bc3acaa4aadea29e13859bcb2b4ad6f9160a17accdb31d89fe1ed9926fd5a5c2',
     privacy: '1756279fa050fe26cb998581439189200f6005d32270fd4ec6b0342e530afbfd',

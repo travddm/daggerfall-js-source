@@ -75,7 +75,7 @@ export const TITLE_TEXT = Object.freeze({
   founder: 'Founder',
   developer: 'Developer',
   dungeonmaster: 'Dungeon Master',   // TITLE-N
-  disciple: 'Disciple',              // TITLE-N: the named titles, lowest first
+  disciple: 'Disciple',              // the named titles, lowest first
   apostle: 'Apostle',
   hierophant: 'Hierophant',
   gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought

@@ -102,7 +102,7 @@ export const REMNANT_ODDS = Object.freeze({ hourbreaker: 4, turninghour: 8 });
 export const SERPENT_ODDS = Object.freeze({ coilbreaker: 20, maelstrom: 50 });
 
 // ── the words of how ──────────────────────────────────────────────────────────────────────────────────────────────────
-/** TITLE-N's named titles (server-account/src/titles.js TIER_LISTS): a server's config grants each by name alone. */
+/** The named titles (server-account/src/titles.js TIER_LISTS): a server's config grants each by name alone. */
 const named = () => t('coll.how.named', 'Granted by name in the server’s settings.');
 const developer = () => t('coll.how.developer', 'The game’s developers.');
 const dungeonMaster = () => t('coll.how.dungeonmaster', 'The game’s Dungeon Master, who may speak to chat in orange with /dm.');
