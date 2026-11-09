@@ -110,3 +110,8 @@ test("P10 THE PILE GOLD KEY: loot.pileGold is DFU's level multiple online by def
     'bad value for loot.pileGold',
   ]);
 });
+
+test("P11 THE REST KEY: rest.fireOnly is DFU's rest window online by default; true is the rest act", () => {
+  const key = profileKeyOf('rest.fireOnly');
+  assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool']);
+});

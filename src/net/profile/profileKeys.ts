@@ -83,6 +83,20 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.loot.pileGold',
   }),
+  // How a rest works online. DFU's Rest window rests wherever CanRest allows, for the hours chosen or a loiter, and
+  // each hour gives what DFU's recovery rates give (DaggerfallRestWindow.cs); online the hours are the character's own.
+  // True is the rest act (systems/rest/restAct.js): only at a fire or a bed, one 8-hour night at most every 2 hours of
+  // the character's time, a short rest between, and either ends with health, fatigue and magicka full.
+  'rest.fireOnly': Object.freeze({
+    census: Object.freeze(['ON26'] as const),
+    feature: 'REST1',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.rest.fireOnly',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;
