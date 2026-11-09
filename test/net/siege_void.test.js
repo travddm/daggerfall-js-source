@@ -2,7 +2,7 @@
 // "Moderators (MOD1) may **void a siege** (`/siege void`) - a history row, the holder keeping the seat - when a fight was
 // won by an exploit found after it". The seat's battle of this week void: before its result, as a Turning voids an
 // unfinished one (the Sellswords' escrow home) but the challenger's Right NOT carried; after a capture, the Charter back
-// to the guild that held it (its Standing, Tithe and Legacy as the result's `prior` kept them);
+// to the guild that held it (its Standing, Tithe, Legacy and works as the result's `prior` kept them);
 // after a hold, the holder's Standing and defence fifth struck and the challenger's bar lifted; after a Tourney, the
 // winner's Charter gone. A Chronicle row; Honours paid stand; a later receipt refused; idempotent. Driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), and the chat word parsed.
@@ -145,11 +145,12 @@ test('VOID BEFORE ITS RESULT: the battle void as a Turning voids an unfinished o
   assert.equal(s.purse(eo.gid), before + 500, 'and pays no escrow twice');
 });
 
-test('VOID AFTER A CAPTURE: the Charter back to the guild that held it - its Standing, the week it took the seat, its Tithe and arrears as the result kept them; its Legacy back; the capturer\'s Edict void; Honours already paid stand, a later receipt refused; the Chronicle says so (mutants: the prior kept; the Charter; the Legacy; the Edict; the Honours)', async (t) => {
+test('VOID AFTER A CAPTURE: the Charter back to the guild that held it - its Standing, the week it took the seat, its Tithe and arrears as the result kept them; its Legacy back; the works\' capture drop undone; the capturer\'s Edict void; Honours already paid stand, a later receipt refused; the Chronicle says so (mutants: the prior kept; the Charter; the Legacy; the works; the Edict; the Honours)', async (t) => {
   const s = await siegeWeek(t);
   const { eo, sh, a1, a2, mora } = s;
   s.raw.prepare('UPDATE town_seat_holds SET standing = 73, tithe = 5, tithe_week = ?, owed = 40 WHERE key = ?').run(W + 1, ANTICLERE.key);
   s.raw.prepare('INSERT OR REPLACE INTO town_seat_legacy (week, key, guild_id, amount) VALUES (?, ?, ?, ?)').run(W + 1, ANTICLERE.key, sh.gid, 120);
+  for (const [work, tier] of [['walls', 2], ['gatehouse', 1], ['market', 0]]) s.raw.prepare('INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, ?, ?, ?)').run(ANTICLERE.key, work, tier, T0);
   const legacyNow = () => s.raw.prepare('SELECT week, guild_id, amount FROM town_seat_legacy WHERE key = ? ORDER BY week, guild_id').all(ANTICLERE.key).map((l) => [l.week, l.guild_id, l.amount]);
   const legacy0 = legacyNow();
   assert.ok(legacy0.some(([w, g, n]) => w === W + 1 && g === sh.gid && n === 120));
@@ -162,8 +163,10 @@ test('VOID AFTER A CAPTURE: the Charter back to the guild that held it - its Sta
   const prior = JSON.parse(s.raw.prepare('SELECT prior FROM town_seat_results WHERE week = ? AND key = ?').get(W + 1, ANTICLERE.key).prior);
   assert.deepEqual({ ...prior, legacy: [...prior.legacy].sort((a, b) => a[0] - b[0] || (a[1] < b[1] ? -1 : 1)) }, {
     hold: { guild: sh.gid, region: ANTICLERE.region, standing: 73, since: W - 2, truce: null, tithe: 5, titheWeek: W + 1, owed: 40 },
-    legacy: legacy0,
+    legacy: legacy0, forts: { gatehouse: 1, market: 0, walls: 2 }, edict: null,
   }, 'the result kept what stood before it');
+  const tier = (work) => s.raw.prepare('SELECT tier FROM town_seat_forts WHERE key = ? AND work = ?').get(ANTICLERE.key, work);
+  assert.deepEqual([tier('walls').tier, tier('gatehouse').tier], [1, 0], 'the capture\'s drop');
   // the capturer proclaims next week's Edict
   s.raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, at) VALUES (?, ?, 'market-day', ?, 'x', ?)").run(ANTICLERE.key, W + 2, eo.gid, T0);
   const paid = s.marks(a1);
@@ -174,6 +177,9 @@ test('VOID AFTER A CAPTURE: the Charter back to the guild that held it - its Sta
   assert.deepEqual(s.holdOf(), { guild_id: sh.gid, standing: 73, since_week: W - 2, truce_week: null, tithe: 5, tithe_week: W + 1, owed: 40 }, 'the Charter back as it stood');
   assert.equal(s.raw.prepare('SELECT amount FROM town_seat_legacy WHERE week = ? AND key = ? AND guild_id = ?').get(W + 1, ANTICLERE.key, sh.gid)?.amount, 120, 'its Legacy back');
   assert.deepEqual(legacyNow(), legacy0, 'every Legacy row as it stood');
+  assert.equal(tier('walls').tier, 2, 'the Walls at the tier they were fought behind');
+  assert.equal(tier('gatehouse').tier, 1);
+  assert.equal(tier('market').tier, 0);
   assert.equal(s.raw.prepare('SELECT state FROM town_seat_edicts WHERE key = ? AND week = ?').get(ANTICLERE.key, W + 2).state, 'void', 'the capturer\'s Edict void');
   assert.equal(s.marks(a1), paid, 'Honours already paid stand');
   const after = await s.claim(a2);
@@ -286,6 +292,72 @@ test('VOID THE CHAT WORD: `/siege void <key>` parsed - anything else /siege is t
 });
 
 // ─── AUDIT 529: the void's audit (V1-V5) ─────────────────────────────
+
+/** A revolt at Ashfield in week W + 1 against the Ebon Oath, which holds it at Standing 0 - its Walls standing at tier 1 and its
+ *  Edict for next week proclaimed. */
+function revoltAt(s) {
+  const K = ASHFIELD.key;
+  s.raw.prepare(`INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, standing, truce_week, at, tithe, owed) VALUES (?, ?, ?, ?, ?, 0, NULL, ?, 0, 0)`)
+    .run(K, s.eo.gid, ASHFIELD.region, ASHFIELD.tier, W - 3, T0 - 20 * DAY);
+  s.raw.prepare(`INSERT INTO town_seat_battles (week, key, kind, tier, attacker, defender, starts_at, ends_at, at) VALUES (?, ?, 'revolt', 'palace', '', ?, ?, ?, ?)`)
+    .run(W + 1, K, s.eo.gid, START + 4 * 3600, START + 4 * 3600 + 1800, T0);
+  s.raw.prepare("INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, 'walls', 1, ?)").run(K, T0 + 7);
+  s.raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, at) VALUES (?, ?, 'market-day', ?, 'x', ?)").run(K, W + 2, s.eo.gid, T0);
+  return {
+    K,
+    seat: () => ({
+      hold: s.holdOf(K),
+      edict: s.raw.prepare('SELECT state FROM town_seat_edicts WHERE key = ? AND week = ?').get(K, W + 2)?.state ?? null,
+      walls: { ...s.raw.prepare('SELECT tier, at FROM town_seat_forts WHERE key = ? AND work = ?').get(K, 'walls') },
+      stood: s.raw.prepare("SELECT COUNT(*) AS n FROM town_seat_history WHERE key = ? AND kind = 'revolt-stood'").get(K).n,
+    }),
+  };
+}
+
+test('AUDIT 529 V1 VOID A REVOLT BEFORE ITS RESULT: what the Turning does with a revolt nobody put down - the holder\'s Charter lapses now, its Edict for next week void, the Chronicle\'s revolt-stood; the Turning after finds the seat as it would have left it, and lapses nothing twice; a holder already gone lapses nothing (mutants: the lapse; the holder asked)', async (t) => {
+  const outcome = async (how) => {
+    const s = await siegeWeek(t);
+    const r = revoltAt(s);
+    s.setNow(START - 3600);
+    let now = null;
+    if (how === 'relinquished') assert.equal((await s.call('/v1/seats/relinquish', { character: s.eo.gm.character, key: r.K }, s.eo.gm)).status, 200);
+    if (how !== 'control') {
+      const v = await s.voidIt(s.mora, r.K);
+      assert.deepEqual(v.body, { ok: true, key: r.K, week: W + 1, battle: 'revolt', result: null, restored: false });
+      assert.equal(s.battle(r.K).state, 'void');
+      now = r.seat();
+    }
+    s.setNow(AFTER(W + 1));
+    await s.call('/v1/seats/list', {}, s.sh.gm);
+    assert.ok(s.raw.prepare('SELECT 1 FROM town_seat_weeks WHERE week = ?').get(W + 1), 'the week settled');
+    return { now, after: r.seat() };
+  };
+  const control = await outcome('control');
+  const lapsed = { hold: null, edict: 'void', walls: { tier: 1, at: T0 + 7 }, stood: 1 };
+  assert.deepEqual(control.after, lapsed, 'the Turning lapses a revolt nobody put down');
+  const voided = await outcome('void');
+  assert.deepEqual(voided.now, lapsed, 'the void lapses it now - never a Charter saved');
+  assert.deepEqual(voided.after, control.after, 'and the Turning after finds the seat as it would have left it');
+  const gone = await outcome('relinquished');
+  assert.equal(gone.now.stood, 0, 'a holder already gone: no revolt stood against it');
+  assert.equal(gone.now.hold, null);
+});
+
+test('AUDIT 529 V2 VOID A REVOLT THAT STOOD: the Charter back to its holder, its Edict for next week proclaimed again (mutants: the revolt\'s prior; its Edict)', async (t) => {
+  const s = await siegeWeek(t);
+  const r = revoltAt(s);
+  s.setNow(START + 4 * 3600 + 1500);
+  const stood = await s.claim(s.a1, { sk: r.K, sd: 'defend', r: 'attack', h: 0 });
+  assert.equal(stood.status, 200, JSON.stringify(stood.body));
+  assert.deepEqual(r.seat(), { hold: null, edict: 'void', walls: { tier: 1, at: T0 + 7 }, stood: 1 }, 'the revolt stood: the Charter lapsed');
+  const prior = JSON.parse(s.raw.prepare('SELECT prior FROM town_seat_results WHERE week = ? AND key = ?').get(W + 1, r.K).prior);
+  assert.equal(prior.edict, 'market-day');
+  const v = await s.voidIt(s.mora, r.K);
+  assert.deepEqual(v.body, { ok: true, key: r.K, week: W + 1, battle: 'revolt', result: 'attack', restored: true });
+  const now = r.seat();
+  assert.deepEqual([now.hold?.guild_id, now.hold?.standing, now.hold?.since_week], [s.eo.gid, 0, W - 3], 'the Charter back as it stood');
+  assert.deepEqual({ ...now, hold: null }, { hold: null, edict: 'proclaimed', walls: { tier: 1, at: T0 + 7 }, stood: 1 });
+});
 
 test('AUDIT 529 V3 VOID A CAPTURE OF A SEAT NOBODY HELD: its holder relinquished before the battle - the capturer\'s Charter goes and none comes back; the guild that gave it up does not get it again (mutants: the kept unheld seat)', async (t) => {
   const s = await siegeWeek(t);

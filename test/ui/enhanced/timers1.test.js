@@ -48,18 +48,21 @@ test('TIMERS1: the week\'s battles from the seats list - coming to the start, li
   const start = NOW + 26 * 3600_000;
   const seats = [
     { key: 'w', name: 'Wayrest', tier: 'palace', battle: { kind: 'siege', guild: 'The Red Hand', against: 'Crows', startsAt: start / 1000, endsAt: null, state: 'scheduled' } },
+    { key: 'v', name: 'Ilessan', tier: 'palace', battle: { kind: 'revolt', guild: 'Ilessan', startsAt: (NOW - 600_000) / 1000, endsAt: null, state: 'scheduled' } },
     { key: 'f', name: 'Old', tier: 'palace', battle: { kind: 'siege', startsAt: (NOW - 7200_000) / 1000, endsAt: (NOW - 3600_000) / 1000, state: 'scheduled' } },
     { key: 'x', name: 'Fought', tier: 'palace', battle: { kind: 'siege', startsAt: start / 1000, state: 'fought' } },
     { key: 's', name: 'Sentinel', tier: 'crown', holder: { edict: 'royal-tourney' } },
   ];
   const rows = eventTimerRows({ now: NOW, seats });
-  // AUDIT TIMERS1 D1: the service's shape - each side the guild record, never a name
+  // AUDIT TIMERS1 D1: the service's shape - each side the guild record, never a name; a revolt names the holder alone
   const g = (name, tag) => ({ id: 1, name, tag, heraldry: {} });
   const real = eventTimerRows({ now: NOW, seats: [
     { key: 'a', name: 'Anticlere', tier: 'palace', battle: { kind: 'siege', guild: g('Silver Hand', 'SH'), against: g('the Ebon Oath', 'EO'), startsAt: start / 1000, state: 'scheduled' } },
+    { key: 'b', name: 'Ilessan', tier: 'palace', holder: { guild: g('Crows', 'CR') }, battle: { kind: 'revolt', guild: null, startsAt: start / 1000, state: 'scheduled' } },
     { key: 'c', name: 'Kvatch', tier: 'palace', battle: { kind: 'tourney', guild: g('Red Hand', 'RH'), startsAt: start / 1000, state: 'scheduled' } },
   ] });
   assert.equal(byId(real, 'battle:a').where, 'Silver Hand <SH> against the Ebon Oath <EO>');
+  assert.equal(byId(real, 'battle:b').where, 'Against Crows <CR>');
   assert.equal(byId(real, 'battle:c').where, 'Red Hand <RH>');
   assert.ok(!real.some((r) => /object Object/.test(`${r.where} ${r.title}`)), 'no "[object Object]" anywhere');
   // AUDIT TIMERS1 D2: a crown's battle over (still 'scheduled' until the Turning) does not hide its Royal Tourney
@@ -68,6 +71,8 @@ test('TIMERS1: the week\'s battles from the seats list - coming to the start, li
   assert.ok(byId(crown, 'royal:r'), 'the Royal Tourney still stands');
   const siege = byId(rows, 'battle:w');
   assert.deepEqual([siege.title, siege.where, siege.live, siege.at], ['Siege of Wayrest', 'The Red Hand against Crows', false, start]);
+  const revolt = byId(rows, 'battle:v');
+  assert.deepEqual([revolt.live, revolt.at], [true, NOW - 600_000 + BATTLE_LENGTH_MS.revolt], 'a revolt under way, to its two hours\' end');
   assert.equal(byId(rows, 'battle:f'), undefined, 'a battle already over says nothing');
   assert.equal(byId(rows, 'battle:x'), undefined, 'nor one fought');
   assert.equal(byId(rows, 'royal:s').at, seatWeekStartMs(seatWeekOf(NOW) + 1));

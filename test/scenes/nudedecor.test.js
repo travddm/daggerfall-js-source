@@ -215,6 +215,7 @@ const NO_PERSON = Object.freeze({
   'src/scenes/portalFx.js': 'a portal',
   'src/scenes/portHost.js': 'a port\'s shipmaster, crewmaster, sailors, shipwrights and lightkeeper as walkers (PERSON_TEXTURES, never the table\'s flats)',   // SHIPYARDS
   'src/scenes/riteHost.js': 'a rite\'s fire',
+  'src/scenes/siegeNpcs.js': 'a siege\'s fighters as mobile units',
   'src/scenes/sigilBrokerPool.js': 'the Sigil broker as a mobile unit',
   'src/scenes/witchesHost.js': 'the Hearth Offerings at the homes\' doors (the festival\'s painted bowl, FESTIVAL_ARCHIVE) - never a person; the Wyrd Sisters stand with the street\'s people through drawnFlat (scenes/pixelBuild.js)',   // WITCH1
   'src/scenes/spoilsPool.js': 'a boss\'s spoils',

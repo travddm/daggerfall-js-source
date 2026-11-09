@@ -93,7 +93,7 @@ test('TOWN-ECON a town\'s Prosperity: the base, its size, its cycle, its seat (S
   assert.equal(townProsperity({ key: KEY, type: 0, day: DAY, players: NaN }), 61);
   assert.equal(townProsperity({ key: KEY, type: 0, day: DAY, seat: seat(100, 'festival'), players: 30 }), 100, 'held at the top');
   assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(0, 'curfew'), raided: true }), 13, '50 - 2 - 5.61 - 10 - 4 - 15');
-  assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(-100, 'curfew'), raided: true }), 0, 'held at the bottom');
+  assert.equal(townProsperity({ key: KEY, type: 2, day: DAY + 5, seat: seat(-100, 'levy'), raided: true }), 0, 'held at the bottom');
 });
 
 test('TOWN-ECON the bands: Destitute, Struggling, Steady, Thriving, Booming at 0, 15, 35, 65 and 85 (mutants: TOWNECON-bands)', () => {

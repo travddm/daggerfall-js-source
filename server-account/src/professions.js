@@ -90,6 +90,8 @@ import { CLIMATES } from '../../src/formats/mapsTables.js';
 import { seasonZeroOf } from '../../src/net/townSeatLaw.js';
 import { firmStatement, firmStatsFrom, firmStatsOf } from './firmament.js';   // FIRM1: the Firmament's hand on a harvest and a craft
 import { yieldPct, xpPct, scaleQty, scaleXp } from '../../src/net/firmament/firmamentLaw.js';
+import { stationSteps } from '../../src/net/fortLaw.js';   // SEAT2b part two (7.5): a seat's crafting halls
+import { fortTiersOf } from './seatForts.js';   // SEAT2b part two: the halls standing at the seat
 import { SIEGE_GEM } from '../../src/net/professionLaw.js';   // PROF10: a Lapidary's Siege-cracked Gem, spent for a piece's gem
 import { SURVEYOR } from '../../src/net/professionLaw.js';   // MINE-PERKS: Mining 100's Surveyor (the Stonebreaker's id)
 import { trophyHunted } from '../../src/net/professionLaw.js';   // HUNTERS-MARK: a Trophy Hunter's clean pelt of a tier 5+ body
@@ -598,8 +600,8 @@ export async function harvestNode(ctx, player, env, body = {}) {
   const wkind = deep ? 'dungeon' : 'pixel';
   const key = deep ? String(n.dungeon) : isBody ? null : pixelKey(n.x, n.y);
   const profession = law.profession;
-  // GATHER-SPEED: the hour's acts counted, the ground and the track read, AT ONCE,
-  // two asks in flight together where they were three trips in a row. None reads what another writes; the hour's
+  // GATHER-SPEED: the hour's acts counted, the ground and the track read - AT ONCE,
+  // asks in flight together where they were trips in a row. None reads what another writes; the hour's
   // refusal still comes first, and a refused harvest's reads are only read
   // FIRM1: and the character's Firmament beside its track (firmament.js firmStatement) - its yield and XP the service's
   const [over, [factRows, trackRows, firmRows]] = await Promise.all([
@@ -632,6 +634,8 @@ export async function harvestNode(ctx, player, env, body = {}) {
   const rank = rankOfXp(Number(row?.xp ?? 0));
   const specs = specsAt(row, nowS);
   const march = !deep && !isBody && confirmed && isMarch(region);
+  // SEASON1 part two (9.3): the land's Tide this week, on confirmed ground alone - as the March's, so a region named
+  // falsely earns no Harvest and dodges no Blight
   const roll = (lo, hi) => lo + Math.floor(dice(rand) * (hi - lo + 1));
   let tier, key2, qty, clean, gem = null, extra = null, extraQty = 1, trophy = 0, schooled = 0;
   let xpTier = /** @type {number|null} */ (null);   // HERB-XP: the tier the XP is reckoned at, where it is not the node's
@@ -713,7 +717,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
     // PROF2: THE PICK-AXE - a vein's ore, a boulder's stone, a dungeon vein's deep ore (PROF0 23)
     // MINE-PERKS (Professions-Arc 43): a Surveyor's surface vein on ground the witnesses have not confirmed is its
     // climate's whole table - their word its witness, for their own veins alone; never a signature (veinSlots above
-    // counted none), never the March's (named by the region, on confirmed ground alone)
+    // counted none), never the March's or a Tide's (named by the region, on confirmed ground alone)
     const surveyed = n.kind === 'vein' && !confirmed && specs[100] === SURVEYOR;
     const found = n.kind === 'vein' ? vein({ x: n.x, y: n.y, day, slot: n.slot, climate, region, confirmed, surveyed })
       : n.kind === 'boulder' ? boulder({ x: n.x, y: n.y, day, slot: n.slot, climate, region, confirmed })
@@ -744,6 +748,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
   if (firmYield) qty = scaleQty(qty, firmYield, dice(rand));   // a die drawn only for a tree that moves the yield
   const xp = scaleXp(harvestXp(xpTier ?? tier, rank, clean), xpPct(firm, profession));
   const nonce = mintId(rand);
+  const kept = qty;
   // SILVER-FINDS: A
   // HARVEST'S FIND - the service's dice, after every draw above so each of them is what it was; struck in this batch, by
   // THIS harvest's row alone, under the day's `gather` silver (marks.js gatherStrikeStatement). Bounded, not witnessed:
@@ -780,7 +785,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
       WHERE (?15 = 0 OR (SELECT COUNT(*) FROM node_harvests WHERE player = ?1 AND day = ?6 AND deep_unconfirmed = 1) < ?16)
         AND (?9 <> 'hunting' OR ?19 < ?20 OR ${huntedHigh} < ?21)
         AND ?11 - ${stored} >= 1`)
-      .bind(player.id, rid, nonce, character, key2, day, node, kind, profession, qty, ROOM, xp, at, gem,
+      .bind(player.id, rid, nonce, character, key2, day, node, kind, profession, kept, ROOM, xp, at, gem,
         deepUnconfirmed, DEEP_UNCONFIRMED_PER_DAY, PROF_XP_MAX, extra,
         tier, HIGH_HIDE_TIER, HIGH_HIDES_PER_DAY, extraQty, trophy, carry ? 1 : 0, schooled),
     db.prepare(`INSERT INTO ${T} (player, char_id, material, origin, qty)
@@ -1353,7 +1358,9 @@ async function craftAnswer(db, player, row, nowS, extra = {}) {
  * garment's colour (recipeLaw GARMENT_DYES) - signed into the record, kept on the piece; asked of anything else,
  * refused (`prof-dye`). The service cannot see the anvil, the workbench or the loom (as it cannot see the forge,
  * PROF0 23): the inputs are the Stores' and their units are the bound. The recipe's rank is the
- * character's rank in its profession to reach; a recipe whose slice is to come is refused (`prof-later` - none now).
+ * character's rank in its profession to reach; a recipe whose slice is to come is refused (`prof-later` - none since SEAT2b
+ * part two made the Ram Kit: a siege work, into the Stores, PROF0 4.8). SEAT2b part two: `seat` the town the station stands
+ * in - its holder's members craft there a step a tier of its crafting halls better (seatStepsFor).
  * The quality is the service's roll on the margin (9.2), then a step each for the act the client reports clean (the
  * honest bound: one step, 5.1), the family's specialisation, and a Warforged ingot or a Heartwood (one step between
  * them); a Masterwright's points; nothing past Masterwork - a Repair Kit and arrows take none, and a Quartermaster's kit
@@ -1373,7 +1380,21 @@ async function craftAnswer(db, player, row, nowS, extra = {}) {
  * gem) signed into the record (`f`) and kept on the piece (`hand`, a column of its own); `cracked` a Siege-cracked
  * Gem for the piece's gem, a Lapidary's alone (`prof-lapidary`, 403) and only in a piece that sets one.
  */
-export async function craftAtAnvil(ctx, player, env, { character, recipe: id, clean, name, heartwood = false, dye = null, rid, cracked = false, mint = null } = {}) {
+/**
+ * SEAT2b part two (Seats-Arc 7.5: "members smithing here: quality +1 step" a tier - the Forge's, and the Workshop's and
+ * the Apothecary's for theirs): THE STEPS A SEAT'S CRAFTING HALLS GIVE a craft in `profession` at `seat` (a map id - the
+ * town the client says its station stands in), where the crafting character's guild holds that seat; nought anywhere
+ * else. The service cannot see the anvil (PROF0 23): the place is the client's word, bounded as the clean act's is - the
+ * holder's own members alone, its own seat's tiers, nothing past Masterwork (craftQuality).
+ */
+export async function seatStepsFor(db, player, character, seat, profession, nowS) {
+  if (!Number.isSafeInteger(seat) || seat < 0 || seat > 0xffffffff) return 0;
+  const held = await db.prepare(`SELECT 1 FROM guild_members m JOIN town_seat_holds h ON h.guild_id = m.guild_id
+    WHERE m.player = ? AND m.char_id = ? AND h.key = ?`).bind(player, character, seat).first();
+  return held ? stationSteps(profession, await fortTiersOf(db, seat, nowS)) : 0;
+}
+
+export async function craftAtAnvil(ctx, player, env, { character, recipe: id, clean, name, heartwood = false, dye = null, rid, seat = null, cracked = false, mint = null } = {}) {
   const { db, nowS, rand, subtle } = ctx;
   const refused = asks(player, { character, rid });
   if (refused) return refused;
@@ -1383,12 +1404,12 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   if (closed) return closed;
   const r = recipeById(id);
   if (!r) return { error: 'bad-recipe' };
-  if (r.later) return { error: 'prof-later' };   // PROF4: a recipe named before its slice
+  if (r.later) return { error: 'prof-later' };   // PROF4: a recipe named before its slice (the Ram Kit until SEAT2b part two - none now)
   if (!dyeOk(r, dye)) return { error: 'prof-dye' };   // PROF7: a garment's dye, of its ten - nothing else is dyed
   if (await overRate(ctx, `prof:${player.id}`, PROF_OPS_MAX, PROF_OPS_WINDOW_S)) return { error: 'prof-rate' };
   const { results: tracks = [] } = await db.prepare('SELECT * FROM prof_tracks WHERE player = ?1 AND char_id = ?2').bind(player.id, character).all();
   const ranks = Object.fromEntries(tracks.map((t) => [t.profession, rankOfXp(Number(t.xp))]));
-  const prof = r.profession;   // the discipline
+  const prof = r.profession;   // the discipline - a hall's steps are its (seatStepsFor)
   const craft = trackOf(prof);   // CRAFT3: the track it is read and raised on - a Ring's Smithing
   const rank = ranks[craft] ?? 0;
   const specs = specsAt(tracks.find((t) => t.profession === craft), nowS);
@@ -1399,8 +1420,11 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   const cap = craftCapSql('?1', '?2', craft);   // AUDIT FB1018f L5-1: the crafter's limit read in the decision itself
   const wood = heartwood === true && takesHeartwood(r);
   const inputs = recipeInputs(r, { heartwood: wood, joiner: specs[50] === 'joiner', cracked: crack });
+  // SEAT2b part two: the seat's crafting halls' steps, where the crafter's guild holds the town it crafts in (seatStepsFor)
+  // PROF12: and a dish's - the Apothecary's step a dish's XP (recipeLaw cookXp: a clean pan's half again, a step each)
+  const halls = rollsQuality(r) || r.kind === 'dish' ? await seatStepsFor(db, player.id, character, seat, prof, nowS) : 0;
   const quality = await gatedQuality(db, env, player.id, character, r, rollsQuality(r)   // CRAFT5: a Repair Kit's too - its quality its reach; PROFESSION-CAPS: a Masterwork's Rare passes the level gate
-    ? craftQuality(rollQuality(dice(rand), qualityOdds(rank - r.rank, { masterwright: masterworkSpec(specs[100], r) })), qualitySteps(r, { clean: clean === true, spec50: specs[50], heartwood: wood }))
+    ? craftQuality(rollQuality(dice(rand), qualityOdds(rank - r.rank, { masterwright: masterworkSpec(specs[100], r) })), qualitySteps(r, { clean: clean === true, spec50: specs[50], heartwood: wood }) + halls)
     : -1, () => dice(rand));
   const count = craftCount(r, specs[100], specs[50]);   // PROF9: a Cook's dish two
   const maker = makerMark(name);   // TEXT-F1: a mark the filter lets stand, or the piece unmarked
@@ -1416,7 +1440,7 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   // first craft's ?13 (AUDIT 32 S1: CLOTH-GEMS - laid on a recipe wholly of the counter's goods only where its units are
   // own, `p` in the decision) ?11 now ?12 nonce ?14 the profession ?15 heartwood ?16 the dye; the inputs ?17 on, two a one
   // PROF9: a dish's XP follows the rank, a clean pan's half again (cookXp); every other craft's its tier's (craftXp)
-  const xp = scaleXp(r.kind === 'dish' ? cookXp(rank, { clean: clean === true }) : craftXp(r.tier, rank),
+  const xp = scaleXp(r.kind === 'dish' ? cookXp(rank, { clean: clean === true, steps: halls }) : craftXp(r.tier, rank),   // PROF12: the Apothecary's steps
     xpPct(await firmStatsOf(db, player, env, character), craft));   // FIRM1: the Firmament's hand on the craft's XP
   const binds = [player.id, character, rid, r.id, quality, count, provs[0], provs[1] ?? null, seed, xp, nowS, nonce, firstCraftXp(r, true), craft, wood ? 1 : 0, u];   // FIRST-BUDGET: ?13 its track's first-make share (recipeLaw firstCraftXp, asked as own) - CLOTH-GEMS' `p` says whether the units pay it
   const held = [];
@@ -1447,7 +1471,7 @@ export async function craftAtAnvil(ctx, player, env, { character, recipe: id, cl
   // (AUDIT PROF-541 R2-S5: `at` the first input key's bind - the kit's statement binds them from ?6)
   // AUDIT BAG-CRAFT A1: AND A PIECE MADE OF LOOSE GOODS IS WALLED TO GOLD - 'gold' where any input held a loose unit (spent
   // first): the service never saw those goods, and a piece made of them lists as a pack's piece does (MARKET-ANY: for
-  // gold alone, never Drakes, no Drakes commission or auction - law 3); a piece of them is loose, a station's alone
+  // gold alone, never Drakes, no Drakes commission or auction - law 3); a Ram Kit of them is loose, a station's alone
   const anySql = (/** @type {number} */ at, /** @type {string} */ origin) => `${inputs.map((_, i) => `COALESCE((SELECT qty FROM prof_stores WHERE player = ?1 AND char_id = ?2 AND material = ?${at + i} AND origin = '${origin}'), 0) > 0`).join(' OR ') || '0'}`;
   const boughtWith = `CASE WHEN ${anySql(13, LOOSE_ORIGIN)} THEN 'gold' WHEN ${anySql(13, 'bought')} THEN 'marks' END`;
   // FB1020h ESSENCE-LOOSE: and the piece says that its gold wall is its goods', never a purchase (products.loose) - so its disenchant's Essence is loose, a station's, as a smelt's products of loose goods are, and

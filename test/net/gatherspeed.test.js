@@ -1,7 +1,7 @@
 // GATHER-SPEED and MARKET-SPEED. Neither waits on the
 // relay: a harvest and every market look are the account service's, on D1, and every `first()` and `all()` there is a
 // round trip from the Worker to the database's primary. A harvest asked fifteen to seventeen of them in a row before its
-// player saw the goods; a market read eighteen to twenty-two; and a market read at a board and a
+// player saw the goods; a market read eighteen to twenty-two; and a harvest under a Levy, a market read at a board and a
 // buy each read every seat's witness rows whole, uncached. 10.12 (GATHER-SPEED,
 // MARKET-SPEED). These pins count the round trips - a statement's own call one, a batch one - and hold the answers to
 // the shape they had. On the client: the node goes as its act ends (the book's `gone`), and the frame's reads of the
@@ -14,6 +14,7 @@ import { standService, T0 } from '../accountDb.mjs';
 import { harvestNode, profState, profPixels } from '../../server-account/src/professions.js';
 import { marketRead } from '../../server-account/src/market.js';
 import { titheAt } from '../../server-account/src/seatHolding.js';
+import { listingsCapAt } from '../../server-account/src/seatForts.js';
 import { herbPatches, nodeKey, veins, utcDayOfMs, WITNESS } from '../../src/net/nodeLaw.js';
 import { seatReportText, seatWeekOf } from '../../src/net/townSeatLaw.js';
 import { MARKET_LISTINGS_MAX, roadPixels } from '../../src/net/marketLaw.js';
@@ -143,21 +144,23 @@ test('GATHER-SPEED: the professions\' state is one round trip, and a pixels-and-
 
 const SEAT = { key: 3021, name: 'Anticlere', region: ANTICLERE, tier: 'palace', pixel: [402, 151] };
 const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
-test('GATHER-SPEED / MARKET-SPEED: a Tithe\'s ask reads the seats\' witness rows off the isolate\'s kept minute - once for both asks, where each read them whole (mutant: the Tithe unkept)', async () => {
+test('GATHER-SPEED / MARKET-SPEED: a Levy\'s seat, a Tithe\'s and a board\'s Market Hall read the seats\' witness rows off the isolate\'s kept minute - once for all the asks, where each read them whole (mutants: the Levy unkept; the Tithe unkept; the Market Hall unkept)', async () => {
   const s = await stand({ SEATS_OPEN: 'on' });
   const raw = s.raw;
   raw.exec('PRAGMA foreign_keys = OFF');
   for (const a of ['w1', 'w2', 'w3']) raw.prepare("INSERT INTO world_witness (kind, key, account, report, region, at) VALUES ('seat', ?, ?, ?, ?, ?)").run(String(SEAT.key), a, seatReportText(SEAT), SEAT.region, NOW - DAY);
   const week = seatWeekOf(NOW * 1000);
   raw.prepare("INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, at, tithe) VALUES (?, 'g1', ?, 'palace', ?, ?, 5)").run(SEAT.key, SEAT.region, week - 1, NOW);
+  raw.prepare("INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, 'market', 1, ?)").run(SEAT.key, NOW);
   const base = s.env.DB;
   const c = { n: 0 };
   const db = Object.create(base);
   db.prepare = (sql) => { if (seatRead(sql)) c.n++; return base.prepare(sql); };
   for (let i = 0; i < 2; i++) {
     assert.deepEqual(await titheAt(db, NOW + i, SEAT.region, SEAT.pixel), { key: SEAT.key, guild: 'g1', pct: 5 }, 'the Tithe\'s');
+    assert.ok((await listingsCapAt(db, NOW + i, SEAT.pixel)) > MARKET_LISTINGS_MAX, 'a Market Hall\'s listings');
   }
-  assert.equal(c.n, 1, 'two asks within the minute: the rows read once');
+  assert.equal(c.n, 1, 'the asks within the minute: the rows read once');
 });
 
 // ═══ THE SERVICE: A MARKET READ ══════════════════════════════════════════════════════════════════════════════════════

@@ -140,3 +140,27 @@ export function heraldryKey(raw) {
   const base = `${h.field}|${h.border}|${h.device}`;
   return h.division || h.charge ? `${base}|${h.division ?? 'plain'}|${h.field2 ?? ''}|${h.charge ?? ''}` : base;
 }
+
+// ─── SEASON1 part two: THE BANNER RIBBON ─────────────
+// Seats-Arc 9.1: "a thin band in the guild's colours under their name tag for the next Season". The token carries it as
+// two indexes of HERALDRY_COLOURS - [field, border] - so it costs a few bytes and every face reads it off the signature.
+
+/** A ribbon for a guild that has chosen no heraldry: Argent bordered Ash. */
+export const RIBBON_PLAIN = Object.freeze({ field: 'argent', border: 'ash' });
+/** A guild's heraldry as a ribbon's claim: [field, border], each an index of HERALDRY_COLOURS - Argent bordered Ash for
+ *  none. */
+export function ribbonClaimOf(raw) {
+  const h = heraldryOf(raw) ?? RIBBON_PLAIN;
+  return [HERALDRY_COLOURS.findIndex((c) => c.key === h.field), HERALDRY_COLOURS.findIndex((c) => c.key === h.border)];
+}
+/** Whether `rb` is a ribbon's claim: two different whole indexes of HERALDRY_COLOURS. */
+export function ribbonClaimOk(rb) {
+  if (!Array.isArray(rb) || rb.length !== 2) return false;
+  const [f, b] = rb;
+  return Number.isInteger(f) && Number.isInteger(b) && f !== b && f >= 0 && b >= 0 && f < HERALDRY_COLOURS.length && b < HERALDRY_COLOURS.length;
+}
+/** A ribbon's claim read back as its two colours - `{ field, border }`, hexes - or null for anything but a claim. */
+export const ribbonColours = (rb) => (ribbonClaimOk(rb) ? { field: HERALDRY_COLOURS[rb[0]].hex, border: HERALDRY_COLOURS[rb[1]].hex } : null);
+const rgbaOf = (hex) => [parseInt(hex.slice(1, 3), 16) / 255, parseInt(hex.slice(3, 5), 16) / 255, parseInt(hex.slice(5, 7), 16) / 255, 1];
+/** A ribbon's claim as the bitmap face's two tints - `{ field, border }`, each RGBA from 0 to 1 - or null. */
+export const ribbonRgba = (rb) => { const c = ribbonColours(rb); return c ? { field: rgbaOf(c.field), border: rgbaOf(c.border) } : null; };

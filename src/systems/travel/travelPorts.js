@@ -160,3 +160,21 @@ export function hasPort(mapId) {
   if (mapId == null || !Number.isFinite(mapId)) return false;
   return PORT_SET.has(maskMapId(mapId));
 }
+
+// SEAT2b part two (7.5: "Harbour (coastal seats only) ... ships (the Sea update) dock at
+// the seat; the town is a Travel Options port for members"): A SEAT'S HARBOUR. The mod's own table above is untouched
+// (hasPort stays TravelOptionsMapWindow.cs's list); every place that asks Travel Options whether a town is a port asks
+// `hasPortFor`, which adds the host's word - a Harbour standing at a seat the playing character's guild holds
+// (scenes/world.js, net/fortLaw.js harbourPortFor): the travel map's PORTS filter, the popup's ship rules, the held map,
+// the "hasPort" Travel Options answers other mods (travelOptions.js - Roleplay Realism's ship gate) and Come Sail
+// Away's deed. A DEPARTURE - Travel Options has no seats (Port-Ledger A, EVERY PALACE A SEAT's row).
+let _seatHarbour = () => false;
+/** The host's word on a map id (the location's own, unmasked - the seats' key): a members' Harbour there. Anything but a
+ *  function clears it. */
+export const setSeatHarbours = (fn) => { _seatHarbour = typeof fn === 'function' ? fn : () => false; };
+/** HasPort, or a members' Harbour at the seat. */
+export function hasPortFor(mapId) {
+  if (hasPort(mapId)) return true;
+  if (mapId == null || !Number.isFinite(mapId)) return false;
+  try { return _seatHarbour(mapId) === true; } catch { return false; }
+}

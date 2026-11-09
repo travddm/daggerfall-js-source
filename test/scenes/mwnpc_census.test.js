@@ -31,6 +31,7 @@ const WIRED = Object.freeze([
   'src/scenes/naval/navalCrew.js',       // MWNPC10b: the crews
   'src/scenes/pixelBuild.js',      // HOST-SPLIT 2: the world's pixel build, moved out of world.js - a pixel's street people
   'src/scenes/portHost.js',        // SHIPYARDS: the shipyards' and lighthouses' people, as the yards' keepers
+  'src/scenes/siegeNpcs.js',       // MWNPC10b: the siege
   'src/scenes/world.js',           // MWNPC7: the street's walkers (and the peers' PeerBodies)
   'src/world/travellerSprites.js', // MWNPC10c: the roads' parties and the rooms' residents
 ]);

@@ -1,13 +1,14 @@
 // SEASON1 part one: THE SEASONS IN THE SERVICE - a Season's
-// last Turning (every Standing halfway back toward 50, no Legacy carried, the Chronicle's
+// last Turning (its titles to the guildmasters, every Standing halfway back toward 50, no Legacy carried, the Chronicle's
 // line), set against a twin service counting no Season; Season 0's last Turning wiping the seats and keeping what is
-// owed and earned; the pair's
+// owed and earned; the Season on the standings and on every title's claim; a Pact to its Season's end; the pair's
 // Honours and a forfeit's Standing once a Season (9.1, 18). Driven through the real
 // Worker over node:sqlite with every migration applied.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S, seasonStanding, SIEGE_HONOURS } from '../../src/net/townSeatLaw.js';
+import { verifyToken } from '../../src/net/identityToken.js';
 import { mintSiegeReceipt } from '../../src/net/siege/siegeReceipt.js';
 import { SEASON_ZERO_WIPED } from '../../server-account/src/seatTurning.js';
 
@@ -52,7 +53,7 @@ async function stood(t, zero) {
   return { svc, raw, guild, hold, held, watch, count, call, list, getNow: () => now, setNow: (v) => { now = v; } };
 }
 
-test('SEASON1 A SEASON\'S END, AGAINST A TWIN COUNTING NONE: every Standing the twin\'s moved halfway back toward 50; no Legacy carried where the twin carries it; the Chronicle\'s line at both seats (mutants: the end; the halfway; the Legacy; the line)', async (t) => {
+test('SEASON1 A SEASON\'S END, AGAINST A TWIN COUNTING NONE: the crown\'s guildmaster "Crowned" and, its crown held the whole Season, its "Keeper"; a seat taken in the Season keeps no title; every Standing the twin\'s moved halfway back toward 50; no Legacy carried where the twin carries it; the Chronicle\'s line at both seats; the standings name the next Season; the titles worn with the Season they were won in, a Charter\'s with the Season now (mutants: the end; the titles; the keeper\'s week; the guildmaster; the halfway; the Legacy; the line; the Season on each claim)', async (t) => {
   const scenario = async (zero) => {
     const s = await stood(t, zero);
     const oa = await s.guild('Orla', 'The Oath', 'OA'), sh = await s.guild('Gamal', 'The Silver Hand', 'SH');
@@ -76,21 +77,38 @@ test('SEASON1 A SEASON\'S END, AGAINST A TWIN COUNTING NONE: every Standing the 
   };
   const plain = await scenario(null);
   const plainStanding = [plain.s.held(WAYREST.key).standing, plain.s.held(ALCAIRE.key).standing];
+  assert.equal(plain.s.count('town_seat_titles'), 0, 'no Season counted: none');
   assert.ok(plain.s.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_legacy WHERE week = ?').get(W + 1).n > 0, 'the twin carries Legacy');
   // W the last week of Season 1: Season 0 W-11..W-8, Season 1 W-7..W
   const { s, oa, sh } = await scenario(W - 11);
-  assert.deepEqual([s.held(WAYREST.key).standing, s.held(ALCAIRE.key).standing], plainStanding.map(seasonStanding));
+  assert.deepEqual(s.raw.prepare('SELECT account, title, key, week FROM town_seat_titles ORDER BY title').all().map((r) => ({ ...r })), [], 'Season titles are cut: none minted');
+  assert.deepEqual([s.held(WAYREST.key).standing, s.held(ALCAIRE.key).standing], plainStanding.map((x) => seasonStanding(x)), 'the Season halves each Standing toward 50');
   assert.deepEqual([s.held(TULUNE.key), plain.s.held(TULUNE.key)], [null, null], 'the Daggers\' Charter lapsed in both');
   assert.ok(s.held(YKALON.key) && s.raw.prepare('SELECT 1 FROM town_seat_weeks WHERE week = ?').get(W), 'a guild with no guildmaster: the week settled all the same');
   assert.equal(s.raw.prepare("SELECT COUNT(*) AS n FROM town_seat_history WHERE key = ? AND kind = 'season-end'").get(TULUNE.key).n, 0, 'a lapsed Charter: no line');
   assert.notDeepEqual(plainStanding.map(seasonStanding), plainStanding, 'the reset moves them');
   assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_legacy WHERE week = ?').get(W + 1).n, 0, 'Legacy is cleared');
   const ends = (key) => s.raw.prepare("SELECT data FROM town_seat_history WHERE key = ? AND kind = 'season-end'").all(key).map((r) => JSON.parse(r.data));
-  assert.deepEqual(ends(WAYREST.key), [{ guild: { name: 'The Oath', tag: 'OA' }, season: 1 }]);
-  assert.deepEqual(ends(ALCAIRE.key), [{ guild: { name: 'The Silver Hand', tag: 'SH' }, season: 1 }]);
+  assert.deepEqual(ends(WAYREST.key), [{ guild: { name: 'The Oath', tag: 'OA' }, season: 1, kept: true }]);
+  assert.deepEqual(ends(ALCAIRE.key), [{ guild: { name: 'The Silver Hand', tag: 'SH' }, season: 1, kept: false }]);
+  const st = (await s.call('/v1/seats/standings', { key: ALCAIRE.key }, sh.gm)).body;
+  assert.deepEqual(st.season, { n: 2, start: W + 1, end: W + 9 });
+  // the titles worn: a kept one with the Season it was won in, the Charter's with the Season now
+  const wear = async (title) => {
+    assert.equal((await s.call('/v1/account/title', { title }, oa.gm)).status, 200, title);
+    const minted = (await s.call('/v1/auth/token', { character: oa.gm.character }, oa.gm)).body;
+    const v = await verifyToken(minted.token, s.svc.identityPublic, { subtle, nowS: s.getNow() });
+    assert.deepEqual([minted.title, minted.ts], [v.claims.t, v.claims.ts]);
+    return [minted.title, minted.ts];
+  };
+  assert.deepEqual(await wear('protector'), ['protector', [WAYREST.key, 2]]);
+  // a champion's title won in Season 0 (week W-9): its own row and its own Season, whatever else is newer
+  s.raw.prepare("INSERT INTO town_seat_titles (account, title, key, week, at) VALUES (?, 'champion', ?, ?, ?)").run(oa.gm.id, WAYREST.key, W - 9, T0);
+  assert.deepEqual(await wear('champion'), ['champion', [WAYREST.key, 0]]);
+  assert.equal((await s.call('/v1/account/title', { title: 'keeper' }, sh.gm)).status, 400, 'Season titles are cut: no such title');
 });
 
-test('SEASON1 SEASON 0\'S END WIPES THE SEATS (18): its own week settled - the upkeep paid, Legacy carried nowhere - then nothing set up for the next (no claim though a guild passed the line, the Edict proclaimed for it void) and the Charters, influence, pledges, binds, Legacy and history gone; the titles and the weeks kept (mutants: the wipe; each table; the claim; the Edict)', async (t) => {
+test('SEASON1 SEASON 0\'S END WIPES THE SEATS (18): its own week settled - the upkeep paid, Legacy carried nowhere - then nothing set up for the next (no claim though a guild passed the line, the Edict proclaimed for it void) and the Charters, influence, pledges, binds, Legacy, history, fealty and Pacts gone; the titles, the red lines and the weeks kept; no Season title for the beta (mutants: the wipe; each table; the claim; the Edict; the beta\'s titles)', async (t) => {
   const s = await stood(t, W - 3);
   const oa = await s.guild('Orla', 'The Oath', 'OA'), sh = await s.guild('Gamal', 'The Silver Hand', 'SH'), dg = await s.guild('Doran', 'Daggers', 'DG');
   s.hold(WAYREST, oa, 60, W - 3);
@@ -100,23 +118,36 @@ test('SEASON1 SEASON 0\'S END WIPES THE SEATS (18): its own week settled - the u
   s.raw.prepare('INSERT INTO town_seat_pledges (week, guild_id, region, key, set_by, at) VALUES (?, ?, ?, ?, ?, ?)').run(W, dg.gid, TULUNE.region, TULUNE.key, 'x', T0);
   for (let i = 0; i < 4; i++) s.watch(dg, TULUNE, W, 2000, await s.svc.registered(`Dagger${i}`, { renown: 1 }));
   s.raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, state, at) VALUES (?, ?, 'festival', ?, 'x', 'proclaimed', ?)").run(WAYREST.key, W + 1, oa.gid, T0);
+  s.raw.prepare("INSERT INTO guild_pacts (a, b, state, offered_by, until_week, at) VALUES (?, ?, 'signed', ?, ?, ?)").run(...[dg.gid, oa.gid].sort(), dg.gid, W + 1, T0);
   s.raw.prepare("INSERT INTO town_seat_titles (account, title, key, week, at) VALUES (?, 'champion', ?, ?, ?)").run(oa.gm.id, WAYREST.key, W - 1, T0);
+  s.raw.prepare('INSERT INTO town_seat_red (text, at) VALUES (?, ?)').run('A line.', T0);
   s.raw.prepare("INSERT INTO town_seat_history (key, week, kind, data, at) VALUES (?, ?, 'held', '{}', ?)").run(ALCAIRE.key, W - 1, T0);
   s.setNow(AFTER(W));
   await s.list(oa);
   assert.ok(s.raw.prepare('SELECT 1 FROM town_seat_weeks WHERE week = ?').get(W), 'its own week settled');
   assert.equal(s.raw.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE kind = 'seat-upkeep'").get().n, 2, 'its upkeep paid');
   assert.equal(s.raw.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE kind = 'seat-claim'").get().n, 0, 'no Charter claimed for the next');
-  for (const table of ['town_seat_holds', 'town_seat_legacy', 'town_seat_pledges', 'town_seat_binds', 'town_seat_influence', 'town_seat_history', 'town_seat_rights', 'town_seat_battles']) {
+  for (const table of ['town_seat_holds', 'town_seat_legacy', 'town_seat_pledges', 'town_seat_binds', 'town_seat_influence', 'town_seat_history', 'guild_pacts', 'town_seat_rights', 'town_seat_battles']) {
     assert.equal(s.count(table), 0, table);
   }
   assert.equal(s.raw.prepare('SELECT state FROM town_seat_edicts WHERE key = ? AND week = ?').get(WAYREST.key, W + 1).state, 'void');
-  assert.deepEqual(s.raw.prepare('SELECT title FROM town_seat_titles').all().map((r) => r.title), ['champion'], 'the titles kept');
+  assert.deepEqual(s.raw.prepare('SELECT title FROM town_seat_titles').all().map((r) => r.title), ['champion'], 'the titles kept; the beta crowns no one');
+  assert.equal(s.count('town_seat_red'), 1);
   assert.deepEqual([...SEASON_ZERO_WIPED], ['town_seat_holds', 'town_seat_legacy', 'town_seat_pledges', 'town_seat_binds', 'town_seat_influence',
-    'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_history']);
+    'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_history',
+    'guild_pacts',
+    'town_seat_forts', 'town_seat_camps']);
+  // Season 1 begins: the board says so
+  const st = (await s.call('/v1/seats/standings', { key: ALCAIRE.key }, sh.gm)).body;
+  assert.deepEqual([st.season, st.holder], [{ n: 1, start: W + 1, end: W + 9 }, null]);
 });
 
-test('SEASON1 THE ONCE-A-SEASON RULES OVER THE SEASON ITSELF: a forfeit\'s Standing and the pair\'s Honours come again in the next Season\'s first week, where the 8-week stand-in would have spent them (mutants: the forfeit\'s floor; the Honours\' floor)', async (t) => {
+test('SEASON1 THE ONCE-A-SEASON RULES OVER THE SEASON ITSELF: a Pact runs to its Season\'s end; a forfeit\'s Standing and the pair\'s Honours come again in the next Season\'s first week, where the 8-week stand-in would have spent them (mutants: the Pact\'s Season; the forfeit\'s floor; the Honours\' floor)', async (t) => {
+  // a Pact signed in week W, Season 0 running W-2..W+1: to W+2
+  const p = await stood(t, W - 2);
+  const oa = await p.guild('Orla', 'The Oath', 'OA'), dg = await p.guild('Doran', 'Daggers', 'DG');
+  await p.call('/v1/seats/pact', { character: oa.gm.character, tag: 'DG' }, oa.gm);
+  assert.deepEqual((await p.call('/v1/seats/pact', { character: dg.gm.character, tag: 'OA' }, dg.gm)).body, { ok: true, signed: true, until: W + 2 });
   // two forfeits by the same challenger, in Season 1's last week (W+1) and Season 2's first (W+2)
   const run = async (zero) => {
     const s = await stood(t, zero);

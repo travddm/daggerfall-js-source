@@ -1,5 +1,5 @@
 // SEAT1d: HOLDING A SEAT - the law (upkeep and Overreach, the crown's
-// scale, the Tithe and its bailiwick, the members' discount, every row of Standing, Unrest, the Edicts,
+// scale, the Tithe and its bailiwick, the members' discount, every row of Standing, Unrest, the Edicts, the Levy's share,
 // a camp's pixel), the Turning's plan over them, the client's own (systems/seatEdicts.js: the shops, the arrival's news,
 // the Festive buff, Curfew, the Bounty's camps), the Seat tab's levers, the hosts by source, and the economy model.
 // 7.1-7.3, 7.6, Appendix C; `06-Systems/Online-Arc.md` SEAT1d.
@@ -61,10 +61,10 @@ test('SEAT1d WHAT IT PAYS: the Tithe 0-10% at a palace, 0-15% at a crown, whole 
   assert.equal(seatShopFactor(null, 'g1'), 1);
 });
 
-test('SEAT1d STANDING: every row of 7.3 - the Tithe\'s two (at or below half its cap +2, above three quarters -3), unchallenged +5, a gate +2 to +6, no Watch -5, a siege held +15 and the Throne reached -5, Festival +10, Neglect -10, writs +1 to +5, upkeep late -5, Curfew -2, Open Gates +3; held to 0-100; Unrest below 20, challengers a quarter more (mutants: each row; each cap; the clamp; Unrest)', () => {
+test('SEAT1d STANDING: every row of 7.3 - the Tithe\'s two (at or below half its cap +2, above three quarters -3), unchallenged +5, a gate +2 to +6, no Watch -5, a siege held +15 and the Throne reached -5, Festival +10, Neglect -10, writs +1 to +5, upkeep late -5, a revolt put down to 20, Curfew -2, Levy -2, Open Gates +3; held to 0-100; Unrest below 20, challengers a quarter more (mutants: each row; each cap; the clamp; Unrest)', () => {
   assert.deepEqual({ ...STANDING_CHANGES }, {
     titheLow: 2, titheHigh: -3, unchallenged: 5, gate: 2, gateWeekMax: 6, noWatch: -5, siegeHeld: 15, throneReached: -5, festival: 10,
-    neglect: -10, writ: 1, writWeekMax: 5, paidLate: -5, curfew: -2, openGates: 3,
+    neglect: -10, writ: 1, writWeekMax: 5, paidLate: -5, revoltTo: 20, curfew: -2, openGates: 3,
     conscripted: -5,
   });
   assert.deepEqual([0, 5, 6, 7, 8, 10].map((p) => titheStanding('palace', p)), [2, 2, 0, 0, -3, -3]);
@@ -86,7 +86,7 @@ test('SEAT1d STANDING: every row of 7.3 - the Tithe\'s two (at or below half its
   assert.deepEqual([unrestInfluence(5000, 19), unrestInfluence(5000, 20), unrestInfluence(-5, 10)], [6250, 5000, 0]);
 });
 
-test('SEAT1d THE EDICTS AND THEIR NUMBERS: five for a palace (the crown\'s two CROWN1\'s), none twice running but Market Day; a Festival 2,500 / 10,000, the Bounty 20 a camp and 5 a day, the Festive +5 a game day, Curfew 5 levels and twice the reputation; levers for the Guildmaster and Officers, five an hour; a camp\'s pixel off its id (mutants: the list; the repeat; the costs; the shares; the caps; the pixel)', () => {
+test('SEAT1d THE EDICTS AND THEIR NUMBERS: six for a palace (the crown\'s two CROWN1\'s), none twice running but Market Day; a Festival 2,500 / 10,000; the Levy a tenth (its fraction kept by the harvest\'s roll), the Bounty 20 a camp and 5 a day, the Festive +5 a game day, Curfew 5 levels and twice the reputation; levers for the Guildmaster and Officers, five an hour; a camp\'s pixel off its id (mutants: the list; the repeat; the costs; the shares; the caps; the pixel)', () => {
   assert.deepEqual(Object.keys(EDICTS), ['market-day', 'open-gates', 'curfew', 'festival', 'bounty', 'conscription', 'royal-tourney']);
   assert.deepEqual([edictOk('festival'), edictOk('royal-tourney'), edictOk('feast'), edictOk('toString'), edictOk(null)], [true, true, false, false, false]);
   assert.deepEqual([edictMayFollow('market-day', 'market-day'), edictMayFollow('festival', 'festival'), edictMayFollow('festival', 'curfew'), edictMayFollow('festival', null), edictMayFollow('nope', null)], [true, false, true, true, false]);

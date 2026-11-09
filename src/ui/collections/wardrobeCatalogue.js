@@ -164,7 +164,7 @@ export const WARDROBE = Object.freeze({
     hierophant: E('patrons', 'patron', patron('hierophant'), { with: ['glyph:hierophant'] }),
     gatebreaker: E('broker', 'open', broker('title:gatebreaker')),
     herald: E('patrons', 'patron', patron('herald'), { with: ['glyph:herald'] }),
-    // AUDIT COLLECTIONS-II (lane 1): a seat's title is worn on the guildmaster's character (the token's mint); the Tourney when proclaimed
+    // AUDIT COLLECTIONS-II (lane 1): a seat's title is worn on the guildmaster's character (the token's mint); the Tourney's champion when proclaimed
     warden: E('seats', 'open', () => t('coll.how.warden', 'Lead a guild that holds a town’s palace seat. Your guildmaster character wears it as “Warden of” the town.')),
     protector: E('seats', 'open', () => t('coll.how.protector', 'Lead a guild that holds a kingdom’s crown seat. Your guildmaster character wears it as “Protector of” the kingdom.')),
     champion: E('seats', 'open', () => t('coll.how.champion', 'Win a kingdom’s Royal Tourney - the week-long duel ladder at its castle, held when its crown proclaims one. Kept for good as “Champion of” the kingdom.')),

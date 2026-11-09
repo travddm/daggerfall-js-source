@@ -127,10 +127,10 @@ export const courtFellLine = ({ near, boss, top, c = 0 }) => {
  */
 export function gateTip(c, cd, fell = null, boss = gateBossOf(c.t.day)) {
   const when = cd
-    ? (cd.to === 'open' ? `Opens in ${countdownText(cd.ms)}` : cd.to === 'seal' ? `Open. Seals in ${countdownText(cd.ms)}` : `Sealed. Collapses in ${countdownText(cd.ms)}`)
-    : (c.phase === 'collapsing' ? 'Collapsing' : null);
+    ? (cd.to === 'open' ? t('gate.tip.opens', 'Opens in {left}', { left: countdownText(cd.ms) }) : cd.to === 'seal' ? t('gate.tip.seals', 'Open. Seals in {left}', { left: countdownText(cd.ms) }) : t('gate.tip.collapses', 'Sealed. Collapses in {left}', { left: countdownText(cd.ms) }))
+    : (c.phase === 'collapsing' ? t('gate.tip.collapsing', 'Collapsing') : null);
   const pt = gatePortentsWords(gatePortentsOf(c.t.day));   // WB14b: the night's portents, named
-  return { title: 'Dagon\'s Breach', lines: [`Near ${c.site.place}`, ...(when ? [when] : []), ...(Number.isFinite(fell) ? [`${boss.name} has fallen`] : [`${boss.name}, ${boss.title}`, marksLineOf(c.t.day), ...(pt ? [pt] : [])])] };
+  return { title: t('gate.tip.title', "Dagon's Breach"), lines: [t('gate.tip.near', 'Near {place}', { place: c.site.place }), ...(when ? [when] : []), ...(Number.isFinite(fell) ? [t('gate.tip.fallen', '{boss} has fallen', { boss: boss.name })] : [t('gate.tip.boss', '{name}, {title}', { name: boss.name, title: boss.title }), marksLineOf(c.t.day), ...(pt ? [pt] : [])])] };
 }
 /** AUDIT PRE-MERGE 0929 W2-2: a day's marks as the card says them, worded once a day - the card is asked every frame a
  *  gate stands on the map, and the marks were read and joined anew each time. WW2: once a gate - every lane's card is

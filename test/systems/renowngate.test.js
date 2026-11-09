@@ -48,13 +48,14 @@ function made(p, { rank = 2, dueAt = 0 } = {}) {
 const HERE = Object.freeze({ px: 40, py: 41, region: 5 });
 
 beforeEach(() => {
-  _resetForTests(); setPref('lootRarity', true);
+  _resetForTests(); setPref('lootRarity', true); setPref('revenantRenown', '10');   // the wait is the player's choice now (none by default)
   N._resetRevenantForTests(); _store.clear(); setPlayerDoor(null); _resetSigilForTests(); setWorldMinutes(DAY * 5);
 });
 
-test('RENOWN-GATE THE NUMBERS: elites at Renown 5, revenants at 10, a due revenant on two encounter rolls in five (mutants: any number moved)', () => {
-  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 10, 0.4]);
-  assert.ok(N.REVENANT_MIN_RENOWN >= E.ELITE_FOE_MIN_RENOWN, 'a returning elite always finds elites standing');
+test('RENOWN-GATE THE NUMBERS: elites at Renown 5, a due revenant on two encounter rolls in five, and no Renown wait unless the player sets one (mutants: any number moved)', () => {
+  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 0.4]);
+  setPref('revenantRenown', 'none'); online(null);
+  assert.equal(N.revenantHeld(), false, 'the default: nothing waits, whatever the page knows');
   assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.01, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
 });
 

@@ -144,11 +144,15 @@ import { capturePointer } from '../pointerCapture.js';   // RPT1026-CLIENT: a pa
  *   brazier - within C&C's reach of its flame), or null
  * @property {() => number} [panBand]   PROF9: the pan's attribute band (recipeLaw panBand)
  * @property {() => boolean} [skillet]   PROF9: whether the pack holds C&C's Skillet (the pan's window half again)
+ * @property {() => number} [cookSteps]   AUDIT PROF-541 K7: the town Apothecary's steps a dish's XP takes here (0 where my guild holds no hall)
  * @property {() => ({ kind: 'shop'|'home', fee: number }|null)} [jeweller]   PROF10: the jeweller's bench the player stands at
  * @property {() => number} [facetBand]   PROF10: the facet's attribute band (recipeLaw facetBand)
+ * @property {() => number} [jewelSteps]   AUDIT PROF-541 R2-C6: the town Apothecary's quality steps a piece takes here (0 where my guild holds no hall)
  * @property {() => ({ kind: 'shop'|'home', fee: number }|null)} [alchemy]   PROF12: the alchemy station the player stands at
  * @property {(potion: string, keys: string[]) => Promise<{ ok: boolean, text: string }>} [brew]   PROF12: a brew, its potions
  *   into the pack and its fee paid
+ * @property {() => number} [alchemySteps]   AUDIT PROF-541 B4: the Apothecary's steps of the town the station stands in,
+ *   where the player's guild holds it (fortLaw stationSteps) - 0 elsewhere
  * @property {() => ({ kind: 'shop'|'home', fee: number }|null)} [enchanter]   PROF12: the enchanting station the player stands at
  * @property {() => Array<{ provenance: string, name: string, points: number, essence: number, recipe?: string }>} [disenchantable]   PROF12: the
  *   pack's crafted pieces the enchanting station lists (disenchantableOf), each its points and its Essence (AUDIT PROF12 E2:
@@ -184,7 +188,7 @@ const workOf = (/** @type {any} */ book, /** @type {string} */ k) => (typeof boo
 export function setProfessionsPages(p) { _provider = p ?? null; }
 /** What a locked specialisation's card says it waits for (professionLaw.js `later`). */
 const LATER_WORDS = Object.freeze({
-  get SEAT2() { return t('prof.page.later.seat2', 'Comes with the sieges'); },
+  get SEAT2() { return t('prof.page.later.seat2', 'Comes with the sieges'); },   // PROF11: the Builder's and the Fortifier's
   // PROF7 (Professions-Arc.md 29): what DFU gives these nothing to stand as - for Mac (HUNTERS-MARK built the trophy)
   get 'two-colour'() { return t('prof.page.later.twoColour', 'Comes when cloth can take a second dye'); },   // AUDIT 32 R11: never "DFU" where a player reads it; BR5: nor the game's name - the original game, the classic
   get wagon() { return t('prof.page.later.wagon', 'Comes when wagons can be upgraded'); },
@@ -2048,7 +2052,7 @@ function drawWorkbench(detail, rerender, kit) {
     }
     const chain = chainNote(box, el, p, book, spends);   // CRAFT1: the works it runs first
     _bench.chained = chain?.ok === true;   // AUDIT CRAFT1 F1: a craft pressed now runs its chain - the work rows held under it
-    if (r.later) box.append(el('p', 'px-note', t('prof.page.later.anyLine', 'Comes with a later work.')));   // a recipe named before its slice
+    if (r.later) box.append(el('p', 'px-note', t('prof.page.later.anyLine', 'Comes with a later work.')));   // a recipe named before its slice (none since SEAT2b part two)
     else if (r.kind === 'arrows') box.append(el('p', 'px-note', t('prof.page.bench.arrows', 'Makes a quiver of 20 arrows. Arrows have no quality.')));
     else if (r.family === 'furniture') box.append(el('p', 'px-note', t('prof.page.bench.furniture', 'Furniture goes to your things. Place it in a room of your own with Decorate.')));
     if (takesQuality(r) && recipeOpen(r, rank)) {
@@ -2771,13 +2775,14 @@ function drawCookFire(detail, rerender, kit) {
     }
     const hand = dishHand(r, specs[100]);
     const serves = craftCount(r, specs[100], specs[50]);
+    const steps = Math.max(0, Math.trunc(Number(p.cookSteps?.()) || 0));   // AUDIT PROF-541 K7: the town Apothecary's steps where my guild holds it
     const effect = dishEffectText(dishOf(r.id), hand);
     box.append(el('p', 'px-note', hand === HAND_PROVISIONER ? t('prof.page.fire.effectKept', '{effect}. Yours never spoil.', { effect }) : t('prof.page.fire.effect', '{effect}.', { effect })));
     // CRAFT-LIMIT-SAID: the pans' XP as the service scales it (the Firmament's percent), and none said where the track can take none
-    const pay = craftPayOf(book, 'cooking'), clean = paidXp(cookXp(rank, { clean: true }), { pct: pay.pct });
+    const pay = craftPayOf(book, 'cooking'), clean = paidXp(cookXp(rank, { clean: true, steps }), { pct: pay.pct });
     box.append(el('p', 'px-note', `${serves > 1 ? t('prof.page.fire.servesTwo', 'Two servings (a Cook\'s), into your pack.') : t('prof.page.fire.servesOne', 'One serving, into your pack.')} ${pay.limit.room === 0 ? t('prof.page.fire.pansOnly', '{pans, plural, one {# pan} other {# pans}}.', { pans: panCount(r) }) : t('prof.page.fire.pans',
-      '{pans, plural, one {# pan} other {# pans}}. Take every pan off in time for half as much again as its {xp} {profession} experience.',
-      { pans: panCount(r), xp: paidXp(cookXp(rank), { pct: pay.pct }), clean, profession: professionName('cooking') })}`));   // CRAFT3: the craft's own name
+      '{pans, plural, one {# pan} other {# pans}}. Take every pan off in time for {steps, plural, =0 {half as much again as its {xp} {profession} experience} one {{clean} {profession} experience instead of {xp}, with the town Apothecary\'s step in both} other {{clean} {profession} experience instead of {xp}, with the town Apothecary\'s # steps in both}}.',
+      { pans: panCount(r), steps, xp: paidXp(steps > 0 ? cookXp(rank, { steps }) : cookXp(rank), { pct: pay.pct }), clean, profession: professionName('cooking') })}`));   // AUDIT PROF-541 K7: the XP the service pays (cookXp's steps); CRAFT3: the craft's own name
     const firstWord = dishFirstLine(r, professionName('cooking'), pay, clean, first(r));   // CRAFT-FIRST-SHOWN: the dish's first, laid on beside the pans' XP; CRAFT-LIMIT-SAID: or the limit's line; CRAFT-HALL: owed or made
     if (firstWord) box.append(el('p', 'px-note', firstWord));
     const ready = recipeOpen(r, rank, specs) && craftable(r, held) && !_cook.crafting && !_cook.act && !elsewhere;
@@ -3011,8 +3016,10 @@ function drawJewellerBench(detail, rerender, kit) {
       { points: jewelPointsLine(r, hand), hand: hand === JEWEL_HAND_GOLDSMITH ? 'goldsmith' : hand === JEWEL_HAND_GEMCUTTER ? 'gemcutter' : 'none', wand: r.product === 'wand' ? 'yes' : 'no' })));   // AUDIT PROF10 J2: it takes a crafted piece with its Rare roll (itemMakerWindow.js itemMakerFilter); AUDIT PROF-541 J5: a Wand rolls none (lootRarity.js rarityEligible: no slot)
     if (recipeOpen(r, rank)) {
       const odds = qualityOdds(rank - r.rank, { masterwright: masterworkSpec(specs[100], r) });   // CRAFT3: the Master Jeweller's, on a jewel
-      box.append(el('p', 'px-note', t('prof.page.jewel.odds', 'Quality chances: {odds}. They get better the further your rank ({rank}) is above the recipe\'s ({need}). Stop every turn where the stone catches the light to raise the result one quality.',
-        { odds: oddsText(odds), rank, need: r.rank })));
+      // AUDIT PROF-541 R2-C6: and the town Apothecary's quality steps the service adds (professions.js seatStepsFor)
+      const steps = Math.max(0, Math.trunc(Number(p.jewelSteps?.()) || 0));
+      box.append(el('p', 'px-note', t('prof.page.jewel.odds', 'Quality chances: {odds}. They get better the further your rank ({rank}) is above the recipe\'s ({need}). Stop every turn where the stone catches the light to raise the result one quality.{steps, plural, =0 {} one { The town\'s Apothecary raises it one more.} other { The town\'s Apothecary raises it # more.}}',
+        { odds: oddsText(odds), rank, need: r.rank, steps })));
       box.append(el('p', 'px-note', craftXpLine(r, rank, professionName('jewelcrafting'), craftPayOf(book, 'jewelcrafting'), 0, recipeFirstOwed(made, r))));   // CRAFT-FIRST-SHOWN: its XP moved here, beside its first's; CRAFT-LIMIT-SAID; CRAFT-HALL
     }
     heartwoodToggle(box, el, r, book, _jewel, rerender, cutting);   // a Wand's plank (4.2: Heartwood "worth one quality step in any recipe")
@@ -3094,11 +3101,12 @@ const alchemyAwayLine = () => t('prof.page.alchemy.away', ALCHEMY_AWAY, { fee: A
 export const _alchemyForTests = () => _alchemy;
 /** The potion line a brew's chance says: "Potent 30% (+25% magnitude)" - AUDIT PROF12 A3: a potion whose magnitude is DFU's
  *  default "(lasts 25% longer)" (alchemyLaw potentLasts), and the station's line, no potion picked, "(+25% magnitude or
- *  duration)". B3: a Cure that is never Potent (alchemyLaw potentAble) says so, and no chance. */
+ *  duration)". AUDIT PROF-541 B4: `steps` the town's Apothecary's (+10 a step - the service's own sum, potentChance);
+ *  B3: a Cure that is never Potent (alchemyLaw potentAble) says so, and no chance. */
 export const POTENT_NONE_LINE = 'Never Potent (a cure acts at once)';
-export function potentLine(rank, specs, unbruised = 0, potion = null) {
+export function potentLine(rank, specs, unbruised = 0, potion = null, steps = 0) {
   if (potion && !potentAble(potion)) return t('prof.page.alchemy.neverPotent', POTENT_NONE_LINE);
-  const c = potentChance(rank, { distiller: specs?.[50] === DISTILLER, unbruised });
+  const c = potentChance(rank, { distiller: specs?.[50] === DISTILLER, unbruised, steps });
   const pct = potentPct(specs?.[100] ?? null);
   return !potion ? t('prof.page.alchemy.potentAny', 'Potent {c}% (+{pct}% magnitude or duration)', { c, pct })
     : potentLasts(potion) ? t('prof.page.alchemy.potentLasts', 'Potent {c}% (lasts {pct}% longer)', { c, pct }) : t('prof.page.alchemy.potent', 'Potent {c}% (+{pct}% magnitude)', { c, pct });
@@ -3126,9 +3134,10 @@ function drawAlchemyStation(detail, rerender, kit) {
   const rank = track?.rank ?? 0;
   const specs = track?.specs ?? {};
   const n = brewCount(rank, specs[50]);
+  const steps = Math.max(0, Math.trunc(Number(p.alchemySteps?.()) || 0));   // AUDIT PROF-541 B4: the town's Apothecary; R2-C3: a whole step or none, as cookSteps
   // CRAFT-HALL: the header shows the rank, so this line no longer repeats it
-  const brewLine = t('prof.page.alchemy.brewAt', '{n, plural, one {A potion} other {# potions}} a brew. {potent}. +{unbruised}% for each herb picked unbruised.',
-    { n, potent: potentLine(rank, specs, 0, null), unbruised: POTENT.unbruised });
+  const brewLine = t('prof.page.alchemy.brewAt', '{n, plural, one {A potion} other {# potions}} a brew. {potent}{withSteps, select, yes { (the Apothecary\'s +{apothecary}% with it)} other {}}. +{unbruised}% for each herb picked unbruised.',
+    { n, potent: potentLine(rank, specs, 0, null, steps), withSteps: steps > 0 ? 'yes' : 'no', apothecary: POTENT.apothecary * steps, unbruised: POTENT.unbruised });
   stationTrack(detail, kit, book, 'alchemy');   // CRAFT-HALL
   detail.append(el('p', 'px-note', `${station.kind === 'shop' ? t('prof.page.alchemy.shop', 'The alchemist\'s station - {fee} gold a brew.', { fee: station.fee }) : t('prof.page.alchemy.home', 'Your alchemy station.')} ${brewLine}${n > 1 ? ` ${t('prof.page.alchemy.counterOne', 'A potion made only from the Apothecaries\' goods brews just one.')}` : ''}`));   // AUDIT PROF-541 R2-S1
   const short = purseShort(station, 'alchemy');
@@ -3172,7 +3181,7 @@ function drawAlchemyStation(detail, rerender, kit) {
     const more = owed === false ? 0 : brewFirstXp(potion);
     box.append(el('p', 'px-note', [
       t('prof.page.alchemy.made', '{n, plural, one {A potion} other {# potions}} a brew.', { n: made }),
-      t('prof.page.alchemy.potentLine', '{potent}{gathered, select, yes { - and +{unbruised}% for each of its herbs you picked unbruised} other {}}.', { potent: potentLine(rank, specs, 0, potion), gathered: gathered ? 'yes' : 'no', unbruised: POTENT.unbruised }),
+      t('prof.page.alchemy.potentLine', '{potent}{gathered, select, yes { - and +{unbruised}% for each of its herbs you picked unbruised} other {}}.', { potent: potentLine(rank, specs, 0, potion, steps), gathered: gathered ? 'yes' : 'no', unbruised: POTENT.unbruised }),
       // CRAFT-FIRST-SHOWN: a potion wholly of the Apothecaries' goods says why its first lays on nothing (AUDIT 32 S1's law, brewFirstPays - brewFirstXp 0)
       capLine(profession, pay, xp + more)
         || (owed === false ? t('prof.page.alchemy.xpMade', '{xp} {profession} experience. You have brewed this before, so no first-time bonus.', { xp, profession })

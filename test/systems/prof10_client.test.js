@@ -640,3 +640,15 @@ test('AUDIT PROF-541 R2-C5: the item maker\'s cap counts a crafted piece\'s kept
   applyEnchantments(plain, rows);
   assert.equal(plain.enchantments.length, MAX_ENCHANTMENTS + 1, 'DFU\'s own eleventh row');
 });
+
+test('AUDIT PROF-541 R2-C6: the jeweller\'s bench\'s odds say the town Apothecary\'s quality steps the service adds (professions.js seatStepsFor) - a whole number or none; the world hands them by Jewelcrafting\'s station', () => {
+  for (const [steps, says] of [[2, ' The town\'s Apothecary raises it 2 more.'], [1.6, ' The town\'s Apothecary raises it one more.'], [0, ''], [-2, '']]) {
+    stubPages({ rank: 25, held: { 'metal:gold': 9 }, over: { jewelSteps: () => steps } });
+    const page = pageOf();
+    try {
+      page.family('Gold').onclick();
+      page.recipe('Gold Ring').onclick();
+      assert.ok(page.text().includes(`Quality chances: Crude 20% | Standard 60% | Fine 20%. They get better the further your rank (25) is above the recipe's (25). Stop every turn where the stone catches the light to raise the result one quality.${says}`), String(steps));   // PIN MOVED (PLAIN-ODDS): the odds said in plain words
+    } finally { page.done(); setProfessionsPages(null); }
+  }
+});

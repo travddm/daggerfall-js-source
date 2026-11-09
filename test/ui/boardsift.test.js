@@ -71,7 +71,7 @@ const SWORD = { item: { provenance: 'c0ffee00c0ffee01', quality: 3 }, where: 'pa
 const ALL_WORK = () => ({
   writs: [writ('C1', IRON, 10, 40), writ('C2', OAK, 20, 30), writ('C3', OAK, 80, 90), writ('C4', OAK, 5, 10, { state: 'taken' }),
     writ('H1', RUBY, 1, 25, { kind: 'hall', faction: FIGHTERS }), writ('M1', OAK, 5, 12, { kind: 'member', faction: FIGHTERS })],
-  guildWrits: [gwrit('W1', HND, OAK, 100, T + 2 * DAY), gwrit('W2', HND, RUBY, 10, T + 3 * DAY), gwrit('W3', SH, OAK, 40, T + 4 * DAY),
+  guildWrits: [gwrit('W1', HND, OAK, 100, T + 2 * DAY), gwrit('W2', HND, RUBY, 10, T + 3 * DAY), gwrit('W3', SH, OAK, 40, T + 4 * DAY, { seat: 3021, seatName: 'Anticlere', camp: true }),
     gwrit('W4', HND, IRON, 10, T + 3 * DAY)],
   contracts: [contract('X1', 40, 7, T + 5 * DAY), contract('X2', 20, 30, T + 2 * DAY)],
   commissions: [commission('K1', 'Ann', 'Merra', true, T + 3 * DAY), commission('K2', 'Bo', 'Silverthorn', false, T + 4 * DAY),
@@ -126,7 +126,7 @@ test('BOARD-SIFT the Work tab, every kind as its producer mints it: the kinds an
   full.v.unmount();
 });
 
-test('BOARD-SIFT the Work tab\'s search finds a card by what it says - the material one and many, the kind as the card writes it, a guild\'s tag, a commission\'s crafter and poster, a contract\'s region; "Most silver" a contract\'s pay to one defender (mutants: the singular unindexed; the seat\'s words dropped; the crafter and poster dropped; the contract\'s region dropped; the card\'s own kind unindexed; the contract\'s silver its whole pool)', async () => {
+test('BOARD-SIFT the Work tab\'s search finds a card by what it says - the material one and many, the kind as the card writes it, a seat writ\'s seat and camp, a guild\'s tag, a commission\'s crafter and poster, a contract\'s region; "Most silver" a contract\'s pay to one defender (mutants: the singular unindexed; the seat\'s words dropped; the crafter and poster dropped; the contract\'s region dropped; the card\'s own kind unindexed; the contract\'s silver its whole pool)', async () => {
   const r = workBoard();
   await openWork(r.host);
   const found = async (words) => { await find(r.host, words); return ids(r.host).sort(); };
@@ -135,6 +135,8 @@ test('BOARD-SIFT the Work tab\'s search finds a card by what it says - the mater
   assert.deepEqual(await found('court writ'), ['C1', 'C2', 'C3', 'C4']);
   assert.deepEqual(await found('chapter writ'), ['H1', 'M1'], '"Your chapter writ" too');
   assert.deepEqual(await found('your'), ['M1'], 'as the card writes its kind - the bar\'s "Chapter writs" says no "your"');
+  assert.deepEqual(await found('seat'), ['W3']);
+  assert.deepEqual(await found('siege camp anticlere'), ['W3']);
   assert.deepEqual(await found('hnd'), ['W1', 'W2', 'W4', 'X1', 'X2']);
   assert.deepEqual(await found('silverthorn'), ['K2'], 'the crafter');
   assert.deepEqual(await found('ann'), ['K1'], 'the poster');

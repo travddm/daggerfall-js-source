@@ -51,7 +51,7 @@ export function createTravelViewMarks(host) {
     tvRaid, tvSceneKept, tvTrip, tvTripLive, walkMode, wildCampKeys
   } = host;
   /** OVERWORLD NAMES: a player's badge as their name wears it in play - the relay's stamps, never a frame's own words. */
-  const tvBadgeOf = (p) => ({ title: p.title ?? null, glyphs: Array.isArray(p.glyphs) ? p.glyphs : [], lv: p.lv ?? null, gt: p.gt ?? null });
+  const tvBadgeOf = (p) => ({ title: p.title ?? null, glyphs: Array.isArray(p.glyphs) ? p.glyphs : [], lv: p.lv ?? null, gt: p.gt ?? null, rb: p.rb ?? null });   // AUDIT-SEATS: and a Season's banner ribbon
   const TV_PEER_HEAD_M = 1.8;   // m: a peer's head when no body layer knows their height
   const _tvQuestHold = new Map();   // OW-QUEST: each quest place's point, kept by its key between frames (the bounties' own way)
   /** OW-FORECAST (scenes/overworldForecastHost.js): A PLACE'S CARD - its own next hours first ("Weather: Rain - clearing in

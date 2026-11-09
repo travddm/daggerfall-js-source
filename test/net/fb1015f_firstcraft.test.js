@@ -145,7 +145,7 @@ test('CRAFT-FIRST-SHOWN the stations say it, read off the real book: the loom\'s
     const master = new Set(b.querySelector('.prof-master')?.querySelectorAll('p') ?? []);
     return [b.children[0].textContent, [...b.querySelectorAll('p')].filter((p) => !master.has(p)).map((p) => p.textContent)];
   };
-  // Building's 1,869 (each the least that brings its track to Master in Smithing's crafts)
+  // Building's 1,823 (each the least that brings its track to Master in Smithing's crafts)
   // the bonus is still to earn, not the rule (craftXpLine's `owed`)
   const FIRST = (xp, prof, more = 500) => `${xp} ${prof} experience, plus a ${more.toLocaleString('en')} first-time bonus.`;
   const SHOP = (xp) => `${xp} Outfitting experience, and 511 more the first time you make this piece at this grade from cloth not bought with silver.`;
@@ -197,13 +197,13 @@ test('CRAFT-FIRST-SHOWN the stations say it, read off the real book: the loom\'s
     press('The Alchemy Station', 'Water Breathing');
     assert.match(box('The Alchemy Station')[1].join('|'), /60 Provisioning experience\. It is made only from the Apothecaries' goods, so it earns no first-time bonus\./);
     // quarter (5) and its first still the 500; the mason's works their first.
-    // first is Building's share now (1,869), a Master's room past it at 90
+    // first is Building's share now (1,823), a Master's room past it at 90
     track('building', xpForRank(90));
     assert.equal((await book.refresh({ force: true })).ok, true);
     draw();
     press('The Workbench', 'Staff');
-    assert.deepEqual([box('The Workbench')[0], box('The Workbench')[1].at(-1)], ['Pine Staff - rank 0', FIRST(5, 'Building', 1869)]);
-    assert.ok(station('The Mason\'s Bench').querySelectorAll('p').some((p) => p.textContent === 'First-time bonus, 1,869 Building experience each: first cut still to earn, first mix still to earn.'));   // PIN MOVED (CRAFT-HALL): each work's own   // PIN MOVED (FIRST-BUDGET): Building's share, each work   // PIN MOVED (VOICE2): experience in a sentence (Voice.md rule 3)
+    assert.deepEqual([box('The Workbench')[0], box('The Workbench')[1].at(-1)], ['Pine Staff - rank 0', FIRST(5, 'Building', 1823)]);
+    assert.ok(station('The Mason\'s Bench').querySelectorAll('p').some((p) => p.textContent === 'First-time bonus, 1,823 Building experience each: first cut still to earn, first mix still to earn.'));   // PIN MOVED (CRAFT-HALL): each work's own   // PIN MOVED (FIRST-BUDGET): Building's share, each work   // PIN MOVED (VOICE2): experience in a sentence (Voice.md rule 3)
   } finally {
     setProfessionsPages(null);
     root?.remove?.();

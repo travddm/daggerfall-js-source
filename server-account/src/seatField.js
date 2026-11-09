@@ -48,7 +48,7 @@ export async function settleBattleField({ db, nowS }, { b, week, key, side, fiel
       rows.map((r) => ({ side: r.side, field: r.field, at: Number(r.at) })),
       nowS >= b.starts_at,
       b.kind,
-    );
+    ); // a revolt's first defender's
   if (!settled) return { error: 'field-unsettled' };
   await db
     .prepare('UPDATE town_seat_battles SET field = ? WHERE week = ? AND key = ? AND field IS NULL')

@@ -1,5 +1,6 @@
 // WW7-4: every capital's castle its halls - a Bay palace's blocks under the port's own
-// names, the Bay's court stood down - entered by its palace's door.
+// names, the Bay's court stood down - entered by its palace's door; a province's castle a guild's to buy, the White-Gold
+// Tower's open to all and never one.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -19,6 +20,8 @@ import { CAPITAL_ART } from '../../../src/world/capitalShapes.js';
 import { DOOR_TYPE } from '../../../src/world/meshReader.js';
 import { RDB_RESOURCE_TYPES, BlocksFile } from '../../../src/formats/blocksFile.js';
 import { registerPortBlockOf, getDFBlockReplacementData, getNewDFBlockIndex, bindWorldDataBlocks, _resetWorldDataReplacement, installWorldDataReplacement } from '../../../src/formats/worldData/worldDataReplacement.js';
+import { CASTLE_MAP_IDS, BAY_CASTLE_MAP_IDS, PROVINCE_CASTLE_MAP_IDS, instanceRoomOf, instanceGuildOwnerOf, instanceAdmission } from '../../../src/net/instanceRoom.js';
+import { castleKeyOk, castleOffers } from '../../../src/net/castleLaw.js';
 import { dungeonSizeFor } from '../../../src/world/smallerDungeons.js';
 import { layoutDungeon } from '../../../src/world/dungeon/dungeonLayout.js';
 
@@ -125,6 +128,21 @@ test('WW7-4 every castle\'s door: one dungeon entrance on its palace\'s dark doo
   });
   const oak = buildGrahtOak().doors[0];
   assert.ok(-oak.vert0.z > trunkRadius(0) + 2.5, 'the porch\'s door clear of the roughest bark');
+});
+
+test('WW7-4 the castle keys: each province\'s capital\'s centre a castle the relay admits a guild to - never the Imperial City\'s (Domains.md section 6); offered to its Charter\'s holder; the guild\'s instance of it admits its members (mutants: the Imperial City a castle; a province\'s none)', async () => {
+  assert.deepEqual(BAY_CASTLE_MAP_IDS, [6634853, 630439035, 1291010263]);
+  assert.deepEqual(PROVINCE_CASTLE_MAP_IDS, [1, 2, 3, 4, 5, 6].map((k) => capitalPlaceId(k)));
+  assert.deepEqual(CASTLE_MAP_IDS, [...BAY_CASTLE_MAP_IDS, ...PROVINCE_CASTLE_MAP_IDS]);
+  assert.equal(castleKeyOk(capitalPlaceId(0)), false, 'the White-Gold Tower no guild\'s');
+  assert.ok(PROVINCE_CASTLE_MAP_IDS.every(castleKeyOk));
+  assert.deepEqual(castleOffers([{ key: capitalPlaceId(1), region: 64, tier: 'crown' }, { key: capitalPlaceId(0), region: 70, tier: 'crown' }, { key: capitalPlaceId(6), region: 69, tier: 'crown' }], [69]),
+    [{ region: 64, key: capitalPlaceId(1) }]);
+  const G = 'gabcdefghij';
+  const key = instanceRoomOf(`dungeon:m${capitalPlaceId(1)}`, { owner: await instanceGuildOwnerOf(G), epoch: '89abcdef' });
+  assert.equal(await instanceAdmission(key, 'acct-ofelia', { guild: G }), 'guild');
+  const tower = instanceRoomOf(`dungeon:m${capitalPlaceId(0)}`, { owner: await instanceGuildOwnerOf(G), epoch: '89abcdef' });
+  assert.equal(await instanceAdmission(tower, 'acct-ofelia', { guild: G }), null);
 });
 
 test('WW7-4 on the freeware: every capital\'s castle lays - its halls the port\'s copies (a castle block, its start marker), no court person left, its borders the Bay\'s (real data)', { skip: skipReal }, () => {

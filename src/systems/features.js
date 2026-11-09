@@ -38,7 +38,7 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
-import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
 import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
@@ -773,7 +773,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }),   // on by default: the ladder is the port's own game, not an opt-in
   }),
-  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, TOWN_SEATS_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
+  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, GATE_PORTENT_LOOT_ROW, TOWN_SEATS_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame

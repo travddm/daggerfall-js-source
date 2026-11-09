@@ -18,7 +18,7 @@
 // ═══════════════════════════════════════════════════════════════════
 import { mintId, overRate } from './accounts.js';
 import {
-  asks, shut, trackView, trackRow, storeOf, workableSql, workStatements, workHeld,   // FB1020h ESSENCE-LOOSE: the Reforge a station's spend
+  asks, shut, trackView, trackRow, storeOf, seatStepsFor, workableSql, workStatements, workHeld,   // FB1020h ESSENCE-LOOSE: the Reforge a station's spend
   craftCapSql,   // AUDIT FB1018f L5-1: the crafter's limit read in the decision itself
 } from './professions.js';
 import { dice } from './unitRoll.js';   // SILVER-FINDS: the service's dice moved below professions.js and marks.js
@@ -61,20 +61,22 @@ async function brewAnswer(db, player, row, nowS, extra = {}) {
 }
 
 /**
- * A BREW: `{ character, potion, keys, rid }` - one of DFU's twenty (alchemyLaw POTIONS, by its recipe's name),
+ * A BREW: `{ character, potion, keys, seat?, rid }` - one of DFU's twenty (alchemyLaw POTIONS, by its recipe's name),
  * `keys` the cauldron as the Stores hold it (an herb's group the brewer's), which DFU's own law must answer with that very
  * potion (brewSpends: the templates' sorted hash its key - `bad-brew` else); the potion's rank (its price's tier -
  * `prof-rank`). The service cannot see the alchemy station (as it cannot see the forge): the inputs are the Stores' and
- * their units the bound.
+ * their units the bound. `seat` the town the station stands in - its holder's members brew there under its Apothecary's
+ * steps (professions.js seatStepsFor; alchemyLaw potentChance: +10 a step).
  * POTENT is rolled here, once a brew: the rank's chance (10 at Expert, 20 at Master), +5 an unbruised herb the brew spends
- * (prof_unbruised, its units reckoned against the OWN units spent - bought ones are spent first), a Distiller's +10; its share +25, a Master Alchemist's +40. The potions a brew makes: brewCount (2 - CRAFT-PAYS's, it was 1; 2 at Journeyman, a Brewer's 3;
+ * (prof_unbruised, its units reckoned against the OWN units spent - bought ones are spent first), a Distiller's +10, the
+ * hall's; its share +25, a Master Alchemist's +40. The potions a brew makes: brewCount (2 - CRAFT-PAYS's, it was 1; 2 at Journeyman, a Brewer's 3;
  * 3 at Master - AUDIT PROF-541 R2-S1: one whatever the rank for a potion wholly of the Apothecaries' goods). XP 20 x the potion's tier, and the character's first of it Provisioning's first-make share (FIRST-BUDGET,
  * recipeLaw brewFirstXp - none for one made wholly of the Apothecaries' goods, brewFirstPays), under the crafter's limit. Decided by the brew's own INSERT: every input held (never gold's).
  * Then the unbruised count down by what it reckoned, the inputs out (bought first - the count clamped to the own units
  * left, AUDIT PROF12 A1), the XP in. The potions are the
  * client's to mint on the answer (DFU's own potion, potions.js's key; a Potent one carries its share).
  */
-export async function brewAtStation(ctx, player, env, { character, potion: id, keys, rid } = {}) {
+export async function brewAtStation(ctx, player, env, { character, potion: id, keys, rid, seat = null } = {}) {
   const { db, nowS, rand } = ctx;
   const refused = asks(player, { character, rid });
   if (refused) return refused;
@@ -90,6 +92,7 @@ export async function brewAtStation(ctx, player, env, { character, potion: id, k
   const { rank, specs } = await tracksOf(db, player.id, character, 'alchemy', nowS);
   if (rank < potion.rank) return { error: 'prof-rank' };
   const cap = craftCapSql('?1', '?2', 'alchemy');   // AUDIT FB1018f L5-1: the crafter's limit read in the decision itself
+  const steps = await seatStepsFor(db, player.id, character, seat, 'alchemy', nowS);
   // THE UNBRUISED HERBS (4.3): each herb's own units this brew spends (bought ones go first - AUDIT BAG-CRAFT A1: and loose
   // ones before them, never picked by this character), at most what was picked unbruised
   let unbruised = 0;
@@ -102,16 +105,16 @@ export async function brewAtStation(ctx, player, env, { character, potion: id, k
     const u = Math.min(ownSpent, Number(row?.qty ?? 0));
     if (u > 0) { unbruised += u; reckoned.push({ key: inp.key, n: u }); }
   }
-  const chance = potentChance(rank, { distiller: specs[50] === DISTILLER, unbruised });
+  const chance = potentChance(rank, { distiller: specs[50] === DISTILLER, unbruised, steps });
   // AUDIT PROF-541 B3: a Cure of DFU's default magnitude is never Potent (alchemyLaw potentAble: an instant, its chance
   // bypassed as it is drunk) - the die still cast first, so the dice after it fall as they did
   const potent = dice(rand) * 100 < chance && potentAble(potion) ? potentPct(specs[100]) : 0;
   const count = brewCount(rank, specs[50], potion);   // AUDIT PROF-541 R2-S1: the counter's goods alone one potion
   const xp = scaleXp(brewXp(potion, rank), xpPct(await firmStatsOf(db, player, env, character), trackOf('alchemy')));   // FIRM1: the Firmament's hand on the brew's XP
   const nonce = mintId(rand);
-  // ?1 player ?2 character ?3 rid ?4 potion ?5 keys ?6 count ?7 potent ?8 unbruised ?9 steps (always 0 since the seats' halls were cut) ?10 xp ?11 the first time's
+  // ?1 player ?2 character ?3 rid ?4 potion ?5 keys ?6 count ?7 potent ?8 unbruised ?9 steps ?10 xp ?11 the first time's
   // ?12 now ?13 nonce; the inputs ?14 on, two a one
-  const binds = [player.id, character, rid, potion.id, JSON.stringify(keys), count, potent, unbruised, 0, xp, brewFirstXp(potion), nowS, nonce];   // FIRST-BUDGET: Provisioning's first-make share (recipeLaw brewFirstXp - none for the counter's goods alone)
+  const binds = [player.id, character, rid, potion.id, JSON.stringify(keys), count, potent, unbruised, steps, xp, brewFirstXp(potion), nowS, nonce];   // FIRST-BUDGET: Provisioning's first-make share (recipeLaw brewFirstXp - none for the counter's goods alone)
   const held = [];
   inputs.forEach((inp, i) => {
     binds.push(inp.key, inp.n);

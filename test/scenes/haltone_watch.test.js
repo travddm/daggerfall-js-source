@@ -11,6 +11,8 @@ import { readFileSync } from 'node:fs';
 import { WatchVoice, HALT_GAP_S, EnemySoundSource, ATTRACT_RADIUS, OCCLUDED_VOLUME_SCALE } from '../../src/characters/enemy/enemySounds.js';
 import { createCityGuards, GUARD_MOBILE_TYPE } from '../../src/scenes/cityGuards.js';
 import { windupFeedback, tellCues } from '../../src/scenes/hostCombat.js';
+import { createSiegeNpcs } from '../../src/scenes/siegeNpcs.js';
+import { SIEGE_UNITS_PER_M } from '../../src/net/siege/siegeRef.js';
 import { EnemyAI } from '../../src/characters/enemy/enemyMotor.js';
 import { Collider } from '../../src/player/collider.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
@@ -18,7 +20,7 @@ import { CRIMES } from '../../src/systems/court.js';
 import { SOUND } from '../../src/systems/soundClips.js';
 
 const rd = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
-const HALT = ENEMY_BASICS[GUARD_MOBILE_TYPE].barkSound;
+const HALT = ENEMY_BASICS[GUARD_MOBILE_TYPE].barkSound, MOVE = ENEMY_BASICS[GUARD_MOBILE_TYPE].moveSound;
 const seeded = (a) => () => { a = (a * 1103515245 + 12345) >>> 0; return a / 2 ** 32; };
 
 test('HALT-ONE the voice: the first caller at once, the nearest of them; then none for HALT_GAP_S whoever calls; none under a window, its time running on; the incident over, the next met at once (mutants: the gap; the nearest; the window; the end)', () => {
@@ -160,3 +162,18 @@ test('HALT-ONE the tells: in the lane a watchman\'s stagger and wind-up are a pe
   assert.deepEqual(windup(true), [SOUND.SwingMediumPitch], 'the lane: a person\'s low swing');
   assert.deepEqual(windup(false), [HALT], 'classic: the bark at the wind pitch');
 });
+
+test('HALT-ONE beyond the pool: a peer\'s watchman is silent here in the lane (his call is his owner\'s); the siege\'s Town Guard cries his move voice when hurt, never a Halt (mutants: the peer\'s watch calling; the siege\'s Halt)', async () => {
+  const M = SIEGE_UNITS_PER_M, T = 1_800_000_000_000;
+  const heard = [];
+  const tex = { getFrameCount: () => 4, getSize: () => ({ width: 40, height: 80 }), getScale: () => ({ x: 0, y: 0 }) };
+  const renderer = { textures: new Set(), createBillboardBatch: () => ({ bounds: [0, 0, 0, 0] }), destroyBillboardBatch: () => {} };
+  const d = createSiegeNpcs({ renderer, getTexture: async () => tex, uploadRecordFrame: () => {}, cam: () => [0, 2, 10], toScene: (x, z) => [x / M, 7, z / M],
+    audio: { play3d: (clip) => heard.push(clip) } });
+  const n = { id: 'n0', kind: 'guard', hp: 360, max: 360, x: 0, z: 0, tx: 0, tz: 0, at: T, down: false, atk: 0, hurtAt: -Infinity };
+  d.frame([n], T);
+  d.frame([{ ...n, hp: 300, hurtAt: T + 100 }], T + 100);
+  assert.deepEqual(heard, [MOVE], 'hurt: his move voice');
+  d.leave();
+});
+

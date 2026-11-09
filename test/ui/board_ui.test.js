@@ -173,13 +173,14 @@ test('BOARD-UI the Seat tab: its parts each on a panel under its name, in order 
   const asked = [];
   let answer;
   const seatBook = { open: true, data: { seats: [] },
-    standings: () => { asked.push('standings'); return new Promise((r) => { answer = r; }); } };
+    standings: () => { asked.push('standings'); return new Promise((r) => { answer = r; }); },
+    forts: async () => { asked.push('forts'); return { data: { works: {}, stockpile: [] }, error: null }; } };
   const host = document.createElement('div');
   mountNoticeBoard(host, { town: { name: 'Anticlere', mapId: 3021 }, book: bookOf(EMPTY), nowS: () => T, seat: { seat: ANT, book: seatBook } });
   await tick();
   byClass(host, 'notice-tab')[1].onclick();
   await tick();
-  assert.deepEqual(asked, ['standings']);
+  assert.deepEqual(asked, ['standings', 'forts'], 'the works asked while the standings are still out');
   answer({ data, error: null });
   await tick();
   const named = byClass(host, 'notice-panel').map((p) => (['H3', 'SUMMARY'].includes(p.children[0]?.tagName) ? p.children[0].textContent : null)).filter(Boolean);

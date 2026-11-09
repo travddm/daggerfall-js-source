@@ -1,18 +1,26 @@
 // AUDIT SEATS-3 - THE
 // SEATS IN THE ACCOUNT SERVICE, THE THIRD AUDIT'S FINDINGS FIXED: an Edict re-proclaimed between the Turning's read and
-// its batch made law at the new edict over the old one's escrow (A1); a siege's Honours paid to any character id the
-// request named (A3); the holder's upkeep read over last week's accounts where the Turning burns this week's (D1); a
-// guild's five-region reach counted over its pledges, never the regions it holds (D5). Driven through the real Worker
-// over node:sqlite with every migration applied (test/accountDb.mjs). 4.1, 6.8, 7.1, 7.5, 7.6, 7.8, 9.1;
-// server-account/src/seatTurning.js, seatHolding.js, seatSiege.js, seatInfluence.js.
+// its batch made law at the new edict over the old one's escrow (A1); a Season's wear lowered a Market Hall under a Tithe
+// set at its higher cap, which stood (A2); a siege's Honours paid to any character id the request named (A3); a guild's
+// Pact breaks unlimited, every red line of a day carried on every list (A4); the holder's upkeep read over last week's
+// accounts where the Turning burns this week's (D1); a guild's five-region reach counted over its pledges, never the
+// regions it holds (D5); the market's read never saying the board's listing cap (D2's service half). Driven through the
+// real Worker over node:sqlite with every migration applied (test/accountDb.mjs), and the statements a batch carries
+// where a Worker path cannot reach the state (a Season's wear). 4.1, 6.8, 7.1, 7.5,
+// 7.6, 7.8, 9.1; server-account/src/seatTurning.js, seatForts.js, seatHolding.js, seatSiege.js, seatPolitics.js,
+// seatInfluence.js, market.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService, T0 } from '../accountDb.mjs';
-import { seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S, SEAT_UPKEEP, CROWN_SCALE, BOUNTY_MARKS } from '../../src/net/townSeatLaw.js';
+import { seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S, SEAT_EDICTS_HOUR, SEAT_UPKEEP, CROWN_SCALE, BOUNTY_MARKS, TITHE_CAP } from '../../src/net/townSeatLaw.js';
+import { marketHallListings } from '../../src/net/fortLaw.js';
+import { MARKET_LISTINGS_MAX } from '../../src/net/marketLaw.js';
 import { _b64url } from '../../src/net/identityToken.js';
 import { SIEGE_RECEIPT_V, SIEGE_RECEIPT_TTL_S } from '../../src/net/siege/siegeReceipt.js';
-import { holdingOf } from '../../server-account/src/seatHolding.js';
+import { fortsSeasonStatements } from '../../server-account/src/seatForts.js';
+import { titheAt, holdingOf } from '../../server-account/src/seatHolding.js';
+import { redOf, SEAT_RED_MAX } from '../../server-account/src/seatPolitics.js';
 
 const { subtle } = globalThis.crypto;
 const src = (f) => readFileSync(new URL(`../../server-account/src/${f}`, import.meta.url), 'utf8');
@@ -144,6 +152,31 @@ test('AUDIT SEATS-3 A1 (source): the law and the unpaid writes ask the planned e
   assert.match(tu, /UPDATE town_seat_edicts SET state = 'unpaid' WHERE key = \? AND week = \? AND guild_id = \? AND state = 'proclaimed' AND edict = \? AND set_aside = \?"\)\n\s*\.bind\(e\.key, next, e\.guild, e\.edict, askedAside\(e\)\), mustChange\(db\)\);/);
 });
 
+// ─── A2 ──────────────────────────────────────────────────────────────
+
+test('AUDIT SEATS-3 A2: A SEASON\'S WEAR LOWERS THE MARKET HALL AND THE TITHE WITH IT - a palace\'s 11% under a first-tier Hall is 10% once the Hall wears to nought; a crown\'s 12% under its own 15 stands; and a Tithe row above its Hall\'s cap is charged at the cap (titheAt, the belt) (mutants: the clamp; the tier\'s cap; the Hall\'s tier; titheAt\'s cap)', async (t) => {
+  const s = await stood(t);
+  const sh = await s.guild('Gamal', 'The Silver Hand', 'SH');
+  const ic = await s.guild('Cyril', 'Iron Circle', 'IC');
+  s.hold(ANTICLERE, sh.gid, { tithe: 0 });
+  s.hold(WAYREST, ic.gid, { tithe: 12 });
+  s.raw.prepare("INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, 'market', 1, ?)").run(ANTICLERE.key, T0);
+  s.setNow(T0 + 3600);
+  assert.deepEqual((await s.call('/v1/seats/tithe', { character: sh.gm.character, key: ANTICLERE.key, pct: 11 }, sh.gm)).body, { ok: true, tithe: 11 });
+  const db = s.svc.env.DB;
+  assert.equal((await titheAt(db, T0 + 3600, 21, ANTICLERE.pixel)).pct, 11, 'the Hall standing: 11');
+  await db.batch(fortsSeasonStatements(db));   // the Season's end, as the Turning runs it
+  const tithe = (seat) => s.raw.prepare('SELECT tithe FROM town_seat_holds WHERE key = ?').get(seat.key).tithe;
+  assert.equal(tithe(ANTICLERE), TITHE_CAP.palace, 'worn to nought: the palace\'s ten');
+  assert.equal(tithe(WAYREST), 12, 'a Tithe under the cap stands');
+  assert.equal((await titheAt(db, T0 + 7200, 21, ANTICLERE.pixel)).pct, TITHE_CAP.palace);
+  // the belt: a row above its cap however it came there is charged at the cap
+  s.raw.prepare('UPDATE town_seat_holds SET tithe = 11 WHERE key = ?').run(ANTICLERE.key);
+  assert.equal((await titheAt(db, T0 + 7200, 21, ANTICLERE.pixel)).pct, TITHE_CAP.palace);
+  s.raw.prepare("UPDATE town_seat_forts SET tier = 1 WHERE key = ? AND work = 'market'").run(ANTICLERE.key);
+  assert.equal((await titheAt(db, T0 + 7200, 21, ANTICLERE.pixel)).pct, 11, 'a Hall standing again: its point');
+});
+
 // ─── A3 ──────────────────────────────────────────────────────────────
 
 test('AUDIT SEATS-3 A3: A SIEGE\'S HONOURS GO TO THE CHARACTER ON THE ROSTER - a claim naming another character id of the account, or one not in the saves\' shape, is refused \'honours-character\' (the result written whatever); the rostered character\'s claim is paid (mutants: the shape; the roster\'s character; the battle asked)', async (t) => {
@@ -177,6 +210,34 @@ test('AUDIT SEATS-3 A3: A SIEGE\'S HONOURS GO TO THE CHARACTER ON THE ROSTER - a
   assert.equal(ok.status, 200, JSON.stringify(ok.body));
   assert.equal(ok.body.honours.won, true);
   assert.equal(s.raw.prepare('SELECT char_id FROM town_seat_honours WHERE account = ?').get(a1.id).char_id, a1.character);
+});
+
+// ─── A4 ──────────────────────────────────────────────────────────────
+
+test('AUDIT SEATS-3 A4: A GUILD\'S PACT BREAKS ARE RATE-LIMITED BY THE GUILD - five an hour across its officers, the sixth \'seats-rate\' from yet another officer, the other guild\'s own break still standing; the red lines carried are the newest twenty, oldest first (mutants: the guild\'s key; the cap; the LIMIT; the order)', async (t) => {
+  const s = await stood(t);
+  const sh = await s.guild('Gamal', 'The Silver Hand', 'SH');
+  const eo = await s.guild('Horst', 'Ebon Oath', 'EO');
+  const [a, b] = sh.gid < eo.gid ? [sh.gid, eo.gid] : [eo.gid, sh.gid];
+  const sign = () => s.raw.prepare("INSERT INTO guild_pacts (a, b, state, offered_by, until_week, at) VALUES (?, ?, 'signed', ?, ?, ?)").run(a, b, sh.gid, W + 4, T0);
+  const officers = [sh.gm];
+  for (let i = 0; i < SEAT_EDICTS_HOUR; i++) officers.push(await s.member(sh, `Officer${i}`, 1));
+  for (let i = 0; i < SEAT_EDICTS_HOUR; i++) {
+    sign();
+    assert.deepEqual((await s.call('/v1/seats/pact/break', { character: officers[i].character, tag: 'EO' }, officers[i])).body, { ok: true, announced: true }, `break ${i + 1}`);
+  }
+  sign();
+  const late = officers[SEAT_EDICTS_HOUR];
+  assert.equal((await s.call('/v1/seats/pact/break', { character: late.character, tag: 'EO' }, late)).body.error, 'seats-rate', 'the guild\'s hour, whoever pulls it');
+  assert.deepEqual((await s.call('/v1/seats/pact/break', { character: eo.gm.character, tag: 'SH' }, eo.gm)).body, { ok: true, announced: true }, 'the other guild\'s own');
+  // the red lines: thirty in the day, the newest twenty carried, oldest first
+  for (let i = 0; i < 30; i++) s.raw.prepare('INSERT INTO town_seat_red (text, at) VALUES (?, ?)').run(`line ${i}`, T0 - 60 + i);
+  const red = await redOf(s.svc.env.DB, T0);
+  assert.equal(SEAT_RED_MAX, 20);
+  assert.equal(red.length, SEAT_RED_MAX);
+  const all = s.raw.prepare('SELECT seq FROM town_seat_red ORDER BY seq').all().map((r) => Number(r.seq));
+  assert.deepEqual(red.map((r) => r.id), all.slice(-SEAT_RED_MAX), 'the newest, oldest first');
+  assert.equal((await s.list(sh.gm)).body.red.length, SEAT_RED_MAX, 'and the list carries them');
 });
 
 // ─── D1 ──────────────────────────────────────────────────────────────
@@ -215,6 +276,28 @@ test('AUDIT SEATS-3 D5: A GUILD\'S FIVE REGIONS COUNT THE REGIONS IT HOLDS - hol
   s.raw.prepare('DELETE FROM town_seat_pledges WHERE week = ? AND guild_id = ? AND key = ?').run(W, sh.gid, ALCAIRE.key);
   s.pledge(sh.gid, ANTICLERE);
   assert.equal((await pledge()).status, 200, 'region 21 held and pledged: one region');
+});
+
+// ─── D2 ──────────────────────────────────────────────────────────────
+
+test('AUDIT SEATS-3 D2: THE MARKET\'S READ SAYS THE BOARD\'S LISTING CAP - `listingsMax` beside `counts`: thirty with no board or another town\'s, a quarter more at a board in a town with a first-tier Market Hall; a piece from a realm record lists under the same cap (mutants: the board read; the Hall; the realm path\'s cap)', async (t) => {
+  const s = await stood(t);
+  const sh = await s.guild('Gamal', 'The Silver Hand', 'SH');
+  s.hold(ANTICLERE, sh.gid);
+  s.raw.prepare("INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, 'market', 1, ?)").run(ANTICLERE.key, T0);
+  const seller = await s.svc.registered('Selma');
+  const read = async (board) => (await s.call('/v1/market/read', { character: seller.character, region: 21, view: 'materials', hubs: { 21: [402, 151] }, ...(board ? { board } : {}) }, seller)).body;
+  const none = await read(null);
+  assert.equal(none.ok, true, JSON.stringify(none));
+  assert.equal(none.listingsMax, MARKET_LISTINGS_MAX);
+  assert.equal((await read([470, 160])).listingsMax, MARKET_LISTINGS_MAX, 'another town\'s board');
+  assert.equal((await read([402, 151])).listingsMax, marketHallListings(MARKET_LISTINGS_MAX, 1), 'Anticlere\'s board');
+  assert.equal(marketHallListings(MARKET_LISTINGS_MAX, 1), 37);
+  const mk = src('market.js');
+  assert.match(mk, /if \(kind === 'item'\) return listGood\(ctx, player, env, \{ character, region, item, pick, price, hubs, rid, currency, realm, board, vendor \}\);/);
+  // MARKET-AUDIT (
+  assert.match(mk, /const listingsMax = vend \? VENDOR_STOCK_MAX : await listingsCapAt\(db, nowS, boardOf\(board\)\);[^\n]*\n\s*if \(Number\(open\?\.n \?\? 0\) >= listingsMax\) return \{ error: vend \? 'vendor-full' : 'market-listings-max' \};\n\s*\/\/ THE RECORD'S OWN PIECE/);
+  assert.match(mk, /JSON\.stringify\(moved\), listingsMax,\n\s*vend\?\.map \?\? null, vend\?\.id \?\? null\),/);
 });
 
 test('AUDIT SEATS-3 E2: THE WARDROBE\'S OTHER DOORS KEEP A CHARTER\'S TITLES - an aura worn or taken off answers the wardrobe with the guildmaster\'s "warden" still held and worn, as the account read and the title\'s equip do; the insignia and the Patreon unlink are read the same way (mutants: the aura on the bare row; the insignia; the unlink)', async (t) => {

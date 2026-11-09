@@ -1,6 +1,6 @@
 // AUDIT-SEATS: THE
 // SHARED LAW'S FINDINGS, FIXED - the audit's law lane read every pure rule of the Seats arc against its design
-//  and each test below is one finding it proved: the Rights
+//  and each test below is one finding it proved: Season 1's Keepers (L1), the Rights
 // of Siege ranked as risen (L2), a split sale's Tithe (L4), the crown sieges' fixed slots (L5), the Chronicle's words (L7), an ignored witness's week (L8), the law's drift (L10)
 // and the arrival line's siege (G2). `06-Systems/Online-Arc.md` AUDIT-SEATS. The service is driven through the real
 // Worker over node:sqlite where it is touched (test/accountDb.mjs).
@@ -9,15 +9,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService, T0 } from '../accountDb.mjs';
 import {
-  seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, turningPlan, placeBattles, CROWN_SIEGE_SLOT,
+  seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, seasonKeepers, keptWholeSeason, turningPlan, placeBattles, CROWN_SIEGE_SLOT,
   siegeStartMs, chronicleLine, edictWords, seatRuleLine, seatArrivalNews, seatTitleText, seatIgnoredAccounts, SEAT_WITNESS_IGNORED_S,
   accountSeatInfluence, tributeRoom, claimTotal, SIEGE_STANDING, STANDING_CHANGES, KINGDOM_METALS, SEAT_RING_UNHELD, FREE_LAND_RING,
-  seatArrivalLine, siegeCalledClause, battleWhenText,
+  seatArrivalLine, siegeCalledClause, battleWhenText, seatWeekStartMs,
 } from '../../src/net/townSeatLaw.js';
 import { saleTithe, saleTitheOn, saleTax } from '../../src/net/marketLaw.js';
 import { isMarch } from '../../src/net/kingdomLaw.js';
 import { HERALDRY_COLOURS } from '../../src/net/heraldryLaw.js';
-import { MARKS_KINDS } from '../../src/net/marksLaw.js';
+import { MARKS_KINDS, utcDay } from '../../src/net/marksLaw.js';
+import { gameDayAt, gateTimes } from '../../src/net/gate/gateLaw.js';
 import { readdirSync } from 'node:fs';
 
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
@@ -45,6 +46,18 @@ async function stood(t, env = {}) {
   const purse = () => Number(raw.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').get(gid)?.balance ?? 0);
   return { svc, raw, gm, gid, hold, purse };
 }
+
+// ─── L1 ──────────────────────────────────────────────────────────────
+
+test('AUDIT-SEATS L1 SEASON 1\'S KEEPERS: Season 0\'s last Turning claims nothing, so a Charter from Season 1\'s first Turning held it whole; any later Season asks its first week (mutants: the first Season\'s week; the rule\'s use)', () => {
+  const s1 = { n: 1, start: 7 }, s2 = { n: 2, start: 15 };
+  const hold = (since) => [{ key: 1, guild: 'g', tier: 'palace', since }];
+  assert.deepEqual(seasonKeepers(s1, hold(8)), [{ guild: 'g', key: 1 }], 'the earliest any Charter of Season 1 can stand');
+  assert.deepEqual(seasonKeepers(s1, hold(9)), [], 'a week short');
+  assert.deepEqual(seasonKeepers(s2, hold(15)), [{ guild: 'g', key: 1 }]);
+  assert.deepEqual(seasonKeepers(s2, hold(16)), [], 'Season 2 asks its own first week');
+  assert.deepEqual([keptWholeSeason(null, 1), keptWholeSeason(s1, 7), keptWholeSeason(s1, 8), keptWholeSeason(s1, 9)], [false, true, true, false]);
+});
 
 // ─── L2 ──────────────────────────────────────────────────────────────
 
@@ -99,7 +112,7 @@ test('AUDIT-SEATS L5 THE CROWN SIEGES\' SLOTS: placed first, at Saturday\'s hour
 
 // ─── L7 ──────────────────────────────────────────────────────────────
 
-test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' word, on Conscription\'s and fealty\'s sums; an Edict with its article ("proclaimed a Festival", 9.2) but Market Day and Open Gates bare; a title won with no Season counted names none (mutants: the plural; the Drakes; the article; the Season\'s tail)', () => {
+test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' word, on Conscription\'s sum; an Edict with its article ("proclaimed a Festival", 9.2) but Market Day and Open Gates bare; a title won with no Season counted names none (mutants: the plural; the Drakes; the article; the Season\'s tail)', () => {
   const seat = { key: 5023, name: 'Wayrest', region: 23, tier: 'crown' };
   const line = (kind, data) => chronicleLine({ week: 9, kind, data }, seat);
   assert.equal(line('royal-champion', { name: 'Arden', kingdom: 'wayrest', wins: 1 }), 'In week 9, Arden won the Royal Tourney at Wayrest with 1 bout - Champion of Wayrest.');
@@ -140,7 +153,7 @@ test('AUDIT-SEATS L8 AN IGNORED WITNESS\'S WEEK: three unmatched answers inside 
 
 test('AUDIT-SEATS L10 THE LAW\'S DRIFT: a NaN is no count; a negative sale pays no Tithe; a region is a number; the held siege\'s Standing written once; the map\'s marks the heraldry\'s own colours (mutants: each)', () => {
   assert.equal(accountSeatInfluence({ gates: NaN }), 0);
-  assert.equal(accountSeatInfluence({ watch: NaN, gates: 1 }, NaN), accountSeatInfluence({ gates: 1 }));
+  assert.equal(accountSeatInfluence({ watch: NaN, gates: 1 }), accountSeatInfluence({ gates: 1 }));
   assert.equal(tributeRoom(NaN), 0);
   assert.equal(tributeRoom(300, NaN), tributeRoom(300));
   assert.equal(claimTotal({ influence: NaN, legacy: 5 }), 5);
