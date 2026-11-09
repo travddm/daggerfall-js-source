@@ -38,8 +38,11 @@ mod's lines without adding any, such as a host split, and say so in the pull req
 1. Remove the mod and cut its callers.
 2. Run `node tools/vendored-mods.ts --report <folder>` and remove or re-aim what is left.
 3. Run `node tools/vendored-mods.ts --update`, and check that the mod's counts are zero.
-4. Leave the mod's entry in the manifest at zero. The last pull request of the series removes the manifest and this
-   page.
+4. Leave the mod's entry in the manifest at zero.
+
+When the last vendored mod has left core, the ratchet guards nothing: the pull request that removes that mod also
+deletes `tools/vendored-mods.ts`, its manifest, its test, this page and their entries in `.prettierignore` and
+`docs/testing/README.md`.
 
 Removal pull requests that run in parallel conflict on the counts they both lower, `shared.counts.lines` most often.
 Take either side, then run `--update` on the merged tree.

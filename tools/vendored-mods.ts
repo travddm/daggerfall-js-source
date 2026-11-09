@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// The vendored-mods ratchet. Every outside author's mod leaves the core repository, one pull request at a time
-// (decisions 77 and 99). tools/vendored-mods.json lists each mod's paths and the words that name it, with two
+// The vendored-mods ratchet. Every outside author's mod leaves the core repository, one pull request at a time,
+// for a repository of its own. tools/vendored-mods.json lists each mod's paths and the words that name it, with two
 // counts per mod: tracked paths under its own files, and lines elsewhere that name it. A count may fall and may never
 // grow, so a later change cannot bring a removed mod back. The words are chosen to name one mod only; author handles
 // shared by several mods are counted once, in the shared bucket.
@@ -9,6 +9,10 @@
 //   node tools/vendored-mods.ts --update   # lower the recorded counts to the measurement; never raises one
 //   node tools/vendored-mods.ts --update --allow-growth   # set every count to the measurement: reviewed in the diff
 //   node tools/vendored-mods.ts --report <folder>   # print every hit of one mod (or "shared")
+//
+// TODO: delete this tool, tools/vendored-mods.json, test/tooling/vendored-mods.test.ts,
+// docs/testing/vendored-mods-ratchet.md and their entries in .prettierignore and docs/testing/README.md when the last
+// vendored mod has left core: the ratchet then guards nothing.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
