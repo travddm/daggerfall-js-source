@@ -1,7 +1,7 @@
 # World
 
 This page covers the Iliac Bay overworld: terrain and its heightmap, landforms, roads, towns and cities, dungeons,
-wilderness encounters, places of interest and travel. The land past the Bay is in [past-the-bay.md](past-the-bay.md).
+wilderness encounters, discovery and travel. The land past the Bay is in [past-the-bay.md](past-the-bay.md).
 Ships and the sea are in [naval.md](naval.md); the clock, weather and seasons are in
 [time-and-weather.md](time-and-weather.md).
 
@@ -157,7 +157,7 @@ starting block carries start markers and the exit door (model 70300). Only dunge
 - Tier: `src/systems/dungeon/dungeonTier.js` `dungeonTier` returns `regular`, `elite` or `super`. Respawn times are in
   `src/systems/dungeon/dungeonRespawn.js`; offline, nothing respawns.
 - Spawned dungeons: `src/world/spawnedDungeons.js` rolls extra dungeons per map pixel from a hash and keeps a spawn
-  ledger (cleared, expired, reborn). It has no Features row.
+  ledger (cleared, expired, reborn). It has no Features row yet; decision 122 (7) gives it one, off by default.
 - Delve aids, all overlays on the same layout: dungeon sense (`src/systems/dungeon/dungeonSense.js`), the echo book of
   movers set going (`dungeonEcho.js`), and the way-out compass (`src/systems/wayOut.js`).
 
@@ -193,15 +193,13 @@ Unity's lone wanderers (`src/systems/encounters.js`): each chunk entered has a `
 chance to stand one group of two to four foes from the same encounter table, a camp or a pack. One member that notices
 the player wakes the rest. The `wilderness-camps` row (on by default, held by the room online) switches it.
 
-## Places of interest and discovery
+## Discovery
 
 - `src/systems/discovery.js` records what the player has found: `discoverLocation`, `discoverBuilding`,
   `discoveryKeyOf`. Bay places are keyed by the low 20 bits of the map id; made places
   (`src/world/placeIds.js` `isMadePlaceId`) by the whole id.
 - `src/world/locationKey.js` `locationKeyOf` builds the map-table key (temples, shops, guild halls) that "Where is" talk
   reads.
-- Editor-placed POIs are a separate system in `src/poi/` (`poiLaw.js`, `poiRuntime.js`, `poiService.js`), approved by
-  the realm and drawn with a map marker.
 
 ## Travel
 

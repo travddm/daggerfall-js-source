@@ -89,7 +89,7 @@ Other rest files:
   `CanRest` allows, with its hour choice on the character's own clock, no free full top-up, and fire-only rest as a
   server-profile key (decision 62). Open pull request #143 builds it.
 - `src/systems/rest/restItems.js` and `restItemRows.js`: bedrolls, ember jars, firewood, tonics, salts. They belong to
-  the survival arc (below).
+  the survival arc and leave with it (below; decision 122 (10)).
 - `src/systems/rest/restWarning.js`: ailment lines shown before a rest.
 
 ## Holidays
@@ -120,6 +120,9 @@ two. The same file holds fog settings (`fogForWeather`), sky offsets and `isSnow
 
 ### Enhanced lane
 
+> Leaves core: a mod of the weather map and Enhanced Environments, with `airTemperature.js` and `snowpack.js`
+> (decision 122 (5)).
+
 A departure from Daggerfall Unity, on two Features rows: `weather-events` (`weatherEvents`) and
 `enhanced-environments` (`enhancedEnvironments`), both on by default and both held by the room online. The parts
 gated on the enhanced skin fall under decision 117 (16): they are made to work in every skin where that is cheap, or
@@ -138,6 +141,10 @@ preference:
 - `weatherFront.js` `createWeatherFront` eases sky, sound and precipitation through a three-hour front.
 - `src/systems/wind/wind.js` `createWindModel`: daily calm and front strength, seeded (`?wseed` overrides the seed).
 - `owForecast.js`: the forecast. `nightFog.js`: fog colour from the lit air, so fog darkens at night.
+- `src/systems/weather/airTemperature.js`: an air model in Celsius (lapse rate with altitude). It decides the snow
+  share of precipitation (`snowShareOf`) and feeds the snowpack. It does not feed the survival arc's felt temperature.
+- `src/systems/weather/snowpack.js` integrates snow water over the weather map's history with the air model, and gives
+  snowlines that `src/render/snowCoverGlsl.js` reads.
 
 Lane gates in `weatherSim.js` (`weatherFieldOn`, `weatherMapOn`, `snowGroundLawOn`, `precipLawOn`,
 `weatherEvolutionOn`) are read per call. Each has a URL switch: `?wxfield=off`, `?wxmap=off`, `?snowground=off`,
@@ -182,12 +189,8 @@ tree; see [characters.md](characters.md).
 ## Snow
 
 Classic winter ground is calendar-only: `src/world/climateSwaps.js` `getTerrainGroundArchive` swaps to the winter
-archive, as Daggerfall Unity's `ClimateSwaps`. This stays in core. Two snow systems sit on top of it:
-
-- `src/systems/weather/snowpack.js` integrates snow water over the weather map's history with
-  `src/systems/weather/airTemperature.js`, and gives snowlines that `src/render/snowCoverGlsl.js` reads. It is part of
-  the weather map's lane.
-- Snowfall, below.
+archive, as Daggerfall Unity's `ClimateSwaps`. This stays in core. Two snow systems sit on top of it: the snowpack of
+the enhanced weather lane (above), and Snowfall (below).
 
 ### Snowfall
 
@@ -202,8 +205,7 @@ saved). The host is `src/scenes/snowfallHost.js`; the shader is `src/render/snow
 - `src/world/climateSwaps.js` ports `ClimateSwaps.ApplyClimate`. It has its own `SEASON` enum (Summer 0, Winter 1,
   Rain 2), not `gameDate.js`'s. Interiors always use summer.
 - `src/world/seasonReskin.js` `createSeasonReskin` re-skins or rebuilds streamed pixels when the season changes.
-- `src/systems/weather/airTemperature.js` is an air model in Celsius (lapse rate with altitude). It decides the snow
-  share of precipitation (`snowShareOf`) and feeds the snowpack. It does not feed the survival arc's felt temperature.
+- The air temperature model is part of the enhanced weather lane (above).
 
 ### Seasons of the Iliac Bay
 
@@ -227,7 +229,7 @@ starting gear, shops and rest.
 - `src/systems/survival/temperature.js`: the felt temperature in abstract degrees (`CLIMATE_TEMP`, `MONTH_TEMP`,
   `NIGHT_MULT`, `WEATHER_TEMP`, `feltTemperature`).
 - `src/systems/survival/` also holds food, camps (`camp.js`, stood by `src/scenes/camps.js`), hearths and the tier
-  table (`difficulty.js`). The rest supplies are `src/systems/rest/restItems.js` and `restItemRows.js`.
+  table (`difficulty.js`). The rest supplies (`src/systems/rest/restItems.js`, `restItemRows.js`) leave with the arc too.
 
 ## Tests
 
@@ -245,7 +247,8 @@ starting gear, shops and rest.
 
 - Two season enums, two temperature models and two snow systems exist side by side. Check which one a caller reads.
   `gameDate.js`'s `SEASONS` and `climateSwaps.js`'s `SEASON` are Daggerfall Unity ports and stay in core. The felt
-  temperature leaves with the survival arc, and Snowfall leaves as its own mod.
+  temperature leaves with the survival arc, the air model and the snowpack with the enhanced weather lane, and
+  Snowfall as its own mod.
 - Online, a write to the world clock silently does nothing. Move the character's own clock instead.
 - `bandNight` in `src/scenes/world.js` repeats the dawn and dusk hours as literal minutes (360 and 1080).
 - Weather must stay a pure function of place, minute and the shared seed, or online clients disagree.

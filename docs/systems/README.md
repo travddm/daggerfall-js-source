@@ -15,7 +15,7 @@ One page per major gameplay area: what it does, where it lives, its data and its
   online rules, questlines, bounty boards.
 - [professions.md](professions.md): online gathering and crafting: tracks, XP, acts, stations, quality, materials.
 - [world.md](world.md): the Iliac Bay's terrain, landforms, roads, towns and townsfolk, dungeons, wilderness camps,
-  places of interest, travel.
+  discovery, travel.
 - [past-the-bay.md](past-the-bay.md): the map past the Iliac Bay: the Tamriel frame and data, towns, walls and
   capitals made there.
 - [time-and-weather.md](time-and-weather.md): the calendar and clocks (offline and online), rest and waits, weather,

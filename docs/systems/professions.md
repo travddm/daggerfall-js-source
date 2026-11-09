@@ -143,7 +143,8 @@ The station checks are the interior host's `forgeHere`, `workbenchHere`, `loomHe
   clean act and specialisations add steps (`craftQuality`). Kits, arrows, siege works and dishes take no quality
   (`takesQuality`).
 - **Rarity ceiling.** A craft reaches Rare (Masterwork) at most. A Master's work (`masterWork.js`, `masterBox.js`) can
-  reach Legendary. Aetheric, Artifact and Sigil pieces are never craftable.
+  reach Legendary; decision 122 (8) caps it below Legendary, not built yet.
+  Aetheric, Artifact and Sigil pieces are never craftable.
 - **Minting.** `smithItems.js` `mintPiece` makes DFU's own item first (`ItemBuilder.CreateWeapon` and friends), then
   lays the quality on it. It also owns tempering, reforging and repair kits. `cookItems.js` mints dishes and their
   effects (stamina, feasts shared with a party). `alchemyItems.js` mints brewed potions as DFU's own potion items.

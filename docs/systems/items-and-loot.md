@@ -205,16 +205,6 @@ the pack; extracting a gem whole costs `EXTRACT_PRICE` at the Reforge.
 The Materials Bag (`src/systems/materialsBag.js`, `src/net/bagLaw.js`) belongs to the professions; see
 [professions.md](professions.md).
 
-## Decided, not built
-
-Two decisions change defaults that this area's code still has the old way. Their code lives beside it:
-
-- Elite stacking: in an Elite Dungeon an elite foe runs at x7 health and x2.6 damage, and in a super dungeon x9 and
-  x3 (`src/systems/eliteFoes.js`), so the elite layer stacks on the dungeon's. Decided default: capped at the elite
-  tier, with the old stacking as an option (decision 117 (19)).
-- Absorption: `src/systems/absorption.js` halves the refund (`ABSORB_REFUND_SCALE` 0.5) and caps the chances at 50,
-  with no option. Decided default: DFU's value, with the halved refund as an option (decision 117 (20)).
-
 ## Testing
 
 Run a file with `node --test <file>`. Start with `test/systems/inventory.test.js`, `itemTransfer.test.js`,
