@@ -38,7 +38,7 @@ test('FT18: two groups more - Interface and Sound - and every moved row stands w
   assert.equal(GROUPS.sound.label, 'Sound');
   for (const g of GROUP_ORDER) assert.ok(FEATURES.some((f) => f.group === g), `${g} is not an empty heading`);
   const at = Object.fromEntries(FEATURES.map((f) => [f.id, f.group]));
-  for (const id of ['enhanced-map', 'quick-slots', 'mod-world-tooltips', 'mod-ambient-text', 'near-death-warning', 'choose-guild-jobs']) assert.equal(at[id], 'interface', id);
+  for (const id of ['enhanced-map', 'quick-slots', 'mod-world-tooltips', 'near-death-warning', 'choose-guild-jobs']) assert.equal(at[id], 'interface', id);
   for (const id of ['enhanced-sounds', 'mod-immersive-footsteps', 'combat-voices']) assert.equal(at[id], 'sound', id);
   for (const id of ['mod-seasons-iliac-bay', 'mod-eye-of-the-beholder', 'grass', 'wind']) assert.equal(at[id], 'sight', id);
   assert.equal(at['town-watch'], 'world');
@@ -50,7 +50,7 @@ test('FT18: ten rows are four, and nothing they offered is lost - every key, def
   for (const gone of ['grass-density', 'grass-style', 'wind-wisps', 'flora-sway', 'quickslot-diamond', 'quickbar-style', 'blood-marks', 'blood-overkill', 'blood-screen', 'blood-gore']) {
     assert.equal(row(gone), undefined, `${gone} is condensed`);
   }
-  assert.equal(FEATURES.length, 130);
+  assert.equal(FEATURES.length, 129);
   const want = { grassDensity: 1, grassStyle: 'meadow', floraSway: true, windWisps: true, quickbarStyle: 'hotbar', quickslots: true,   // HB-LYCFREE: the hotbar by default (
     'blood-gore': 'normal', 'blood-marks': true, 'blood-overkill': true, 'blood-screen': true };
   for (const [k, v] of Object.entries(want)) assert.equal(FEATURE_PREF_DEFAULTS[k], v, `${k} keeps its default`);

@@ -34,7 +34,7 @@
     ],
     "counts": {
       "paths": 0,
-      "lines": 3185
+      "lines": 3177
     }
   },
   "mods": [
@@ -63,8 +63,8 @@
         "daggerfallunity/mods/303\b"
       ],
       "counts": {
-        "paths": 5,
-        "lines": 111
+        "paths": 0,
+        "lines": 0
       }
     },
     {
