@@ -1,7 +1,7 @@
 // @ts-check
 // DUNGEON-FIRE-ONE: the Features row for the dungeon's campfire (world/dungeon/dungeonFires.js). Daggerfall Unity stands
 // no fire in a dungeon, so Off is DFU's dungeon. Forced on online: a fire is a rest point, and the room's ground is the
-// room's. Its own file keeps systems/features.js from growing (docs/testing/lint-ratchet.md).
+// room's. Its own file, so the large systems/features.js does not take another row.
 import { t } from './textManager.js';
 
 export const DUNGEON_FIRES_ROW = Object.freeze({
