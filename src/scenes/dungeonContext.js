@@ -193,6 +193,7 @@ import { identifySpellPass, identifiedTallyText, notEnoughSpellPointsText } from
 import { isEquipped } from '../systems/equip.js';   // DR1: FilterLocalItems' `!item.IsEquipped` (:693); PARTY-LOOT: a claimed piece taken back off
 import { totalGoldAmount } from '../systems/court.js';   // DR1: the trade screen's gold strip - AUDIT 58: PlayerEntity.GetGoldAmount (:1313-1316), coins PLUS letters
 import { isAzurasStarEquipped, registerFoeDoor } from '../systems/artifactEffects.js';   // V3: the Star's kill capture; AUDIT PSCALE1 DOORS-2: Namira's reflection through this pool's door
+import { createPeerCandidates } from '../characters/enemy/peer-candidates.ts';   // the room's other players as target candidates
 import { applySpell, hasActiveEffect, isEntityWaterWalking, entityIsParalyzed, maxFatigue, applyEnemyMotorEffectFlags, concealmentFlags, concealFlagsOfBits, isSoulTrapEffect } from '../systems/effects.js';   // A5: the enemy Levitate arm, the foe-target concealment closure + EntityConcealmentBehaviour's visual
 import { createStandInSpell } from './gate/standInSpell.js';   // FIELD BUGS 2026-10-19f STAND-IN-WHOLE (HOST-SPLIT): my spell on a body the relay runs, its one door (AUDIT SCHOOLS L2 F4's telling with it)
 import { liveStat, killIfAnyLiveStatZero, clampFatigue } from '../systems/statMods.js';   // AUDIT C&C N5: SetFatigue's clamp
@@ -5731,30 +5732,9 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   //   and the spell land here with my own reach and my own stats (the host decided the swing; I decide the hit); at
   //   another they are the swing's clip, a shaft and a cast that pay nothing.
   // - THE ROSTER IS THE ROOM'S: a species the stream or the memory disagrees with is REBUILT at that index (retypeFoe).
-  const _peerCands = new Map();   // id -> { isPlayer, isPeer, id, feet, height, health }
-  let _peerFrame = 0, _peerRead = -1;
-  /** The peers in my room as target candidates (WORLD3) - read once a frame off the world host, each a stable
-   *  identity; a peer gone is dead to the machine (health 0, targetHealth's read) and dropped. */
-  function peerCandidates() {
-    if (_peerRead === _peerFrame) return [..._peerCands.values()];
-    _peerRead = _peerFrame;
-    const list = opts.peers?.() ?? null;
-    if (!list) { for (const c of _peerCands.values()) c.health = 0; _peerCands.clear(); return []; }
-    const seen = new Set();
-    for (const q of list) {
-      if (!q || typeof q.id !== 'string' || !Array.isArray(q.feet) || q.feet.length !== 3 || !q.feet.every(Number.isFinite)) continue;
-      seen.add(q.id);
-      let c = _peerCands.get(q.id);
-      if (!c) { c = { isPlayer: true, isPeer: true, id: q.id, feet: [0, 0, 0], height: CAPSULE_HEIGHT, health: 1, cv: 0, concealment: () => concealFlagsOfBits(c.cv) }; _peerCands.set(q.id, c); }   // INVIS-NET: its concealment, off its pose - EnemySenses.BlockedByIllusionEffect reads a peer as it reads any target
-      c.feet[0] = q.feet[0]; c.feet[1] = q.feet[1]; c.feet[2] = q.feet[2];
-      c.height = Number.isFinite(q.height) && q.height > 0 ? q.height : CAPSULE_HEIGHT;
-      c.health = 1;
-      c.cv = q.cv | 0;
-    }
-    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); }
-    return [..._peerCands.values()];
-  }
-  const peerCandidate = (id) => { peerCandidates(); return (typeof id === 'string' && _peerCands.get(id)) || null; };
+  const _peers = createPeerCandidates({ read: () => opts.peers?.() ?? null, concealFlags: concealFlagsOfBits, capsuleHeight: CAPSULE_HEIGHT });
+  function peerCandidates() { return _peers.all(); }
+  const peerCandidate = _peers.byId;
   // the doors: what an entry changed goes out (the session refuses it outside a world room)
   if (opts.onActions) actions.onChanged = (recs) => opts.onActions({ k: _locationKey, a: recs });
   /** WORLD3: another's change to this dungeon's doors, levers and movers - keyed by this dungeon. */
@@ -7384,7 +7364,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     // MWNPC5b: the lane, this frame - none while it is not wanted (and the one standing let go)
     const npcLane = npcBodiesOn() ? (_npcLane ??= createHostNpcBodies({ renderer, collider: () => collider })) : null;
     if (!npcLane && _npcLane) { _npcLane.destroy(); _npcLane = null; }
-    _peerFrame++;   // WORLD3: the peers' feet are read once a frame
+    _peers.nextFrame();   // WORLD3: the peers' feet are read once a frame
     // HOST-CLOCK (scenes/ownerCatchUp.js ownerFoes): THE FOES' STEP IS A CALL, as a street pool's update is - made once a
     // frame, or, online with anyone else in the room under 20 fps, the host's frame in FOE-CATCHUP's steps on the page's
     // one plan (my player's pace, never past it); `dt` inside is the call's. Each call stands the frame's foes whole - the

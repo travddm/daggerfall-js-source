@@ -36,6 +36,7 @@ import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, CAPSULE_HEIGHT } from '../pla
 import { SOUND, hitSoundFor, ENEMY_HIT_VOLUME } from '../systems/soundClips.js';   // CH3: the FallDamage clip; WORLD6b: a peer's blow rung at the owner
 import { EnemyCaster, castEnemySpell, hasMagickaToCast, MIN_RANGED_DISTANCE, MAX_RANGED_DISTANCE } from '../characters/enemy/enemyCasting.js';   // X3: the shared decision + the ONE cast executor
 import { assignEnemySpells, SPELL_CAST_SOUND } from '../systems/enemySpells.js';   // X3
+import { createPeerCandidates } from '../characters/enemy/peer-candidates.ts';   // the room's other players as target candidates
 import { applySpell, isSoulTrapEffect, maxFatigue, entityIsParalyzed, applyEnemyMotorEffectFlags, concealmentFlags, concealFlagsOfBits } from '../systems/effects.js';   // X3: self-casts land through the effect spine   // A5: the enemy Levitate arm, the foe-target concealment closure + EntityConcealmentBehaviour's visual
 import { calculateCastCost } from '../systems/spellcost.js';   // X3: costs priced off the player (magic-15 note)
 import { silenceBlocksCast, attemptSoulTrap, SOUL_TRAP_TEXT, fillEmptyTrap, peerSoulTrapOf } from '../systems/mysticism.js';   // X3: the enemy silence gate; X5: the soul trap's kill intercept; STRIKE-SHARED: a peer's trap is its caster's
@@ -381,8 +382,8 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
   // alone here). A peer's hit on my foe carries the striker's feet and the blow's direction, so the foe turns on
   // the striker and the shove goes the way the blow went. Casts stay the owner's own: a foe whose target is a peer
   // does not cast (6b-iii).
-  const _peerCands = new Map();   // id -> { isPlayer, isPeer, id, feet, height, health }
-  let _peerFrame = 0, _peerRead = -1;
+  const _peers = createPeerCandidates({ read: () => _net?.peers?.() ?? null, concealFlags: concealFlagsOfBits, capsuleHeight: CAPSULE_HEIGHT });
+  let _peerFrame = 0;   // the frame a blow's divert was taken in
 
   const activeCount = () => foes.filter((f) => !f.dead && !f.puppet && !f.placed && f.companion == null).length;   // AUDIT CC-A7: a companion is the player's, never one of the place's encounter slots   // WORLD6b: a puppet is its owner's, not this cap's; WOD3: nor is a foe a mod PLACED
 
@@ -1156,26 +1157,8 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
   }
   /** WORLD6b-ii: the peers in my cell as target candidates (WORLD3) - read once a frame off the net, each a stable
    *  identity; a peer gone is dead to the machine (health 0, targetHealth's read) and dropped. */
-  function peerCandidates() {
-    if (_peerRead === _peerFrame) return [..._peerCands.values()];
-    _peerRead = _peerFrame;
-    const list = _net?.peers?.() ?? null;
-    if (!list) { for (const c of _peerCands.values()) c.health = 0; _peerCands.clear(); return []; }
-    const seen = new Set();
-    for (const q of list) {
-      if (!q || typeof q.id !== 'string' || !Array.isArray(q.feet) || q.feet.length !== 3 || !q.feet.every(Number.isFinite)) continue;
-      seen.add(q.id);
-      let c = _peerCands.get(q.id);
-      if (!c) { c = { isPlayer: true, isPeer: true, id: q.id, feet: [0, 0, 0], height: CAPSULE_HEIGHT, health: 1, cv: 0, concealment: () => concealFlagsOfBits(c.cv) }; _peerCands.set(q.id, c); }   // INVIS-NET: its concealment, off its pose - EnemySenses.BlockedByIllusionEffect reads a peer as it reads any target
-      c.feet[0] = q.feet[0]; c.feet[1] = q.feet[1]; c.feet[2] = q.feet[2];
-      c.height = Number.isFinite(q.height) && q.height > 0 ? q.height : CAPSULE_HEIGHT;
-      c.health = 1;
-      c.cv = q.cv | 0;
-    }
-    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); }
-    return [..._peerCands.values()];
-  }
-  const peerCandidate = (id) => { peerCandidates(); return (typeof id === 'string' && _peerCands.get(id)) || null; };
+  function peerCandidates() { return _peers.all(); }
+  const peerCandidate = _peers.byId;
   /** The feet the ATTACK and CAST components must aim at: DFU's
    *  components read senses.Target, not the player (EnemyAttack.cs:
    *  199-209). Unarmed, or with the player selected, this is the
@@ -1394,7 +1377,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     hitEffects?.bleed?.(dt, foes, foeBleedView);   // BLOOD2c: the wounded drip, the dead bleed out - every body this pool walks, puppets included
     corpsePrefabs.frame(foes, dt);   // DEX5: a prefab's body on the foes' clock
     tickCorpseMarkers(corpseBatches, dt);   // AUDIT DEX B3: a body of more than one frame animates (the Hell Hound's)
-    _peerFrame++;   // WORLD6b-ii: the peers are read once a frame
+    _peerFrame = _peers.nextFrame();   // WORLD6b-ii: the peers are read once a frame
     const _bossS = tickBossClock(performance.now(), !(dt > 0));   // AUDIT WORLD-EVENTS L2-5: the traits' clock - a pause holds it
     spaceFoes(foes, collider, foeFrameDt(dt));   // FOE-SPACING: two bodies in one spot are pushed apart (characters/foeSpacing.js)
     for (const f of foes) {
