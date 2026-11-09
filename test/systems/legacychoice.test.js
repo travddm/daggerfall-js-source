@@ -269,8 +269,9 @@ test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts
     key('Enter'); key('Enter');   // reflexes, summary -> Project Legacy's question (online: on)
     // CHARACTER MODES: the mode question comes first; only the Legacy mode (offered while Project Legacy's switch is on)
     // goes on to the family's model, in its two answers; every other mode answers it for the character: no lineage
-    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), ['classic', 'hardcore', 'legacy', 'ironman', 'hardcore_ironman'], 'the mode first');
-    w.input('char:3');
+    // Online offers no mode online play does not enforce yet (decision 116 (1)), so Legacy is the second answer
+    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), ['classic', 'legacy'], 'the mode first');
+    w.input('char:2');
     assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), [MODELS.enduring, MODELS.bloodline], 'then the family\'s model, two ways');
     w.input('char:2');
     assert.equal(w.done, true);
