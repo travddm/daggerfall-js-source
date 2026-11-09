@@ -118,4 +118,4 @@ Mac, 2026-09-15: *"instead of numpad being used to change views, I want
 it scrollable like how we handle morrowind."* So the port takes the
 mod's own scrollable arm as the ONLY way in and out of third person,
 and its ladder is Morrowind's (`player/mwView.js`, MW-D25/MW-D30) -
-one wheel, whichever body answers. Recorded on the mod's bible page.
+one wheel, whichever body answers.

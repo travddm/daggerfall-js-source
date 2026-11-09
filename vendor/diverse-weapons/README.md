@@ -81,8 +81,7 @@ nobody.
 
 ## What the port carries, and where
 
-The mod's flag and Daggerfall Unity's own law behind it - the record is
-`docs/formats/mods-and-vendor.md`:
+The mod's flag and Daggerfall Unity's own law behind it:
 
 | DFU | port |
 |---|---|

@@ -75,9 +75,3 @@ Windmills of Daggerfall into this tree - confirmed by Mac 2026-09-23.**
 
 The packs' and prefabs' hashes are in `locations.json`, and the suite
 checks every one.
-
-## The port
-
-`docs/formats/mods-and-vendor.md` is the arc page: what each C#
-member became, the readings taken where the C# leaves a choice, and the
-four-hosts record. The Port-Ledger carries the section-A row.
