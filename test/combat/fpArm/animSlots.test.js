@@ -1,7 +1,7 @@
 // The arm's animation slots below the upper body (src/combat/fpArm/animSlots.js) are compared with a recording of the
 // code that was moved out of createFpArm unchanged (test/fixtures/mw/animSlotsParity.json): createFpArm driven at
-// 1/60 s on the retail files through the animation-state scripts (fpAnimStateSweep.mjs) and the slot scripts (animSlotsSweep.mjs), every slot of every
-// tick. Needs MW_DATA_PATH; skips without it.
+// 1/60 s on the retail files through the animation-state scripts (fpAnimStateSweep.mjs) and the slot scripts
+// (animSlotsSweep.mjs), every slot of every tick. Needs MW_DATA_PATH; skips without it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
