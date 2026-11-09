@@ -37,7 +37,7 @@ import { verifySiegeReceipt, SIEGE_RECEIPT_TTL_S } from '../../src/net/siege/sie
 import { RENOWN_XP_MAX, RENOWN_TRACKS_MAX } from '../../src/net/renown.js';
 import {
   seatWeekOf, seatKeyOk, passWindowEnds, passOpens, siegeWinner, siegeAftermath, spoilsOf, SIEGE_HONOURS,
-  CLAIM_FEE, STANDING_START, STANDING_MAX, seasonFloor, seasonZeroOf, siegeMinutes, seatWeekStartMs, seasonOf, STANDING_CHANGES,
+  CLAIM_FEE, STANDING_START, STANDING_MAX, seasonFloor, seasonZeroOf, siegeMinutes, seatWeekStartMs, STANDING_CHANGES,
 } from '../../src/net/townSeatLaw.js';
 import { domainsFor } from './domains.js';   // DOMAIN3: a Tourney's dead heat counts the region's homes at a seat of power
 
@@ -149,7 +149,7 @@ async function higherOf(db, b, nowS, zero, env = null) {   // DOMAIN3: `env`, th
   const seat = (await confirmedSeats(db, nowS)).get(b.key);
   if (!seat) return null;
   const w = b.week - 1;
-  const list = await gatherStandings(db, seat, w, Math.floor(seatWeekStartMs(b.week) / 1000), !!seasonOf(w, zero), await domainsFor(db, nowS, env, w));
+  const list = await gatherStandings(db, seat, w, Math.floor(seatWeekStartMs(b.week) / 1000), await domainsFor(db, nowS, env, w));
   const { results: legacy = [] } = await db.prepare('SELECT guild_id, amount FROM town_seat_legacy WHERE week = ? AND key = ?').bind(w, b.key).all();
   const of = (g) => (list.find((s) => s.guild === g)?.total ?? 0) + Number(legacy.find((l) => l.guild_id === g)?.amount ?? 0);
   const a = of(b.attacker), d = of(b.defender);

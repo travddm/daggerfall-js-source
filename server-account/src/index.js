@@ -279,7 +279,7 @@ import { HOME_ORDER_KEYS_MAX } from '../../src/net/homeLaw.js';   // QUEST-HOME:
 import { buyHall, sellHall, setHallEntry, setHeraldry } from './halls.js';   // GUILD1d: the guild hall and heraldry
 import { readGuildBoard, pinGuildNote, takeDownGuildNote } from './guildBoard.js';   // GUILD1e: a guild's own board
 import { listSeats, strikeSeat, seatsOpenFor } from './townSeats.js';   // SEAT1a: the seats' witnessed registry
-import { pledgeSeat, claimWatch, creditGate, creditRenown, readStandings, payTribute, claimOrcCamp, readRecords } from './seatInfluence.js';   // SEAT1b: influence   // SEASON1 part two: an Orc Raid's camp
+import { pledgeSeat, claimWatch, creditGate, creditRenown, readStandings, payTribute, readRecords } from './seatInfluence.js';   // SEAT1b: influence   // SEASON1 part two: an Orc Raid's camp
 import { settleDueOnce, seatsBoard, relinquishSeat, seatBadgeOf, seatTitlesOf } from './seatTurning.js';   // SEAT1c: the Turning, the Charters, their titles and glyphs
 import { setTithe, proclaimEdict, claimBounty } from './seatHolding.js';   // SEAT1d: the holder's levers, a Bounty's camp
 import { setWindow, signBattle, unsignBattle, hireSellsword, withdrawHire, siegesLive } from './seatBattles.js';   // SEAT2a: the battles' week
@@ -287,7 +287,7 @@ import { siegePass, claimSiege, voidSiege } from './seatSiege.js';   // SEAT2a p
 import { royalPass, claimRoyal, keptTitleOf, KEPT_TITLES } from './seatRoyal.js';   // CROWN1 part two: the Royal Tourney's pass, its bouts, its champion's title (SEASON1: every title kept)
 import { ribbonOf } from './seatRibbons.js';   // SEASON1 part two: a Season's banner ribbon, on the token
 import { seatWeekOf, seasonOf, seasonZeroOf } from '../../src/net/townSeatLaw.js';   // SEASON1: the Season counted
-import { offerFealty, acceptFealty, breakFealty, offerPact, breakPact } from './seatPolitics.js';   // CROWN2: fealty and Pacts, the red lines
+import { offerPact, breakPact } from './seatPolitics.js';   // CROWN2: Pacts, the red lines
 import { fundFort, readForts, pitchCamp } from './seatForts.js';   // SEAT2b: a seat's fortifications, a challenger's Siege Camp
 import { witnessSeatAndDomain, domainsBoard } from './domains.js';   // DOMAIN3: a region's seat of power witnessed beside the seat; the list's word of the region law
 import { domainsWeekOf, chartersMarked } from '../../src/net/domainLaw.js';   // DOMAIN3: the region law's first week, the Turning's; the list's holdings marked
@@ -559,8 +559,8 @@ const SEAT_STATUS = Object.freeze({
   // CROWN1 part two: no Royal Tourney here 404; its week's champion named, its ring unsettled 409
   'royal-none': 404, 'royal-over': 409, 'ring-unsettled': 409,
   // CROWN2: no such guild, offer or Pact 404; a pair that does not fit, one sworn or signed already, a pledge between them 409
-  'guild-unknown': 404, 'fealty-none': 404, 'pact-none': 404, 'fealty-unfit': 409, 'fealty-sworn': 409, 'fealty-pledged': 409,
-  'pact-signed': 409, 'pact-self': 409, 'pact-pledged': 409, 'fealty-pledge': 409, 'pact-pledge': 409,
+  'guild-unknown': 404, 'pact-none': 404,
+  'pact-signed': 409, 'pact-self': 409, 'pact-pledged': 409, 'pact-pledge': 409,
   // SEAT2b: a work the seat may not raise, one at its last tier, a treasury short; a camp pitched already, or by the holder, 409
   'fort-not-here': 409, 'fort-max': 409, 'seat-treasury': 409, 'camp-pitched': 409, 'camp-holder': 409,
   // the Stores' account and switch 403; the Stores short of it 409; the writs' bucket 429
@@ -1857,7 +1857,6 @@ const service = {
           '/v1/seats/tithe': () => setTithe(ctx, who.player, env, body),
           '/v1/seats/edict': () => proclaimEdict(ctx, who.player, env, body),
           '/v1/seats/bounty': () => claimBounty(ctx, who.player, env, body),
-          '/v1/seats/orc-camp': () => claimOrcCamp(ctx, who.player, env, body),   // SEASON1 part two (9.3): an Orc Raid's camp cleared
           // SEAT2a: the battles' week - the holder's window; a side signed, unsigned; a Sellsword hired, withdrawn
           '/v1/seats/window': () => setWindow(ctx, who.player, env, body),
           '/v1/seats/siege/sign': () => signBattle(ctx, who.player, env, body),
@@ -1871,10 +1870,7 @@ const service = {
           // CROWN1 part two: a Royal Tourney's pass (the ring the contender's game derived); a bout's receipt claimed
           '/v1/seats/royal/pass': async () => royalPass(ctx, who.player, env, body, await signingKey(env, subtle)),
           '/v1/seats/royal/claim': async () => claimRoyal(ctx, who.player, env, body, await gatePublicKey(env, subtle)),
-          // CROWN2: fealty offered (as vassal or liege), accepted, broken; a Pact offered (or accepted) and broken
-          '/v1/seats/fealty': () => offerFealty(ctx, who.player, env, body),
-          '/v1/seats/fealty/accept': () => acceptFealty(ctx, who.player, env, body),
-          '/v1/seats/fealty/break': () => breakFealty(ctx, who.player, env, body),
+          // CROWN2: a Pact offered (or accepted) and broken
           '/v1/seats/pact': () => offerPact(ctx, who.player, env, body),
           '/v1/seats/pact/break': () => breakPact(ctx, who.player, env, body),
           // SEAT2b (7.5): the works read, a tier raised; a challenger's Siege Camp pitched

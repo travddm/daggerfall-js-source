@@ -28,7 +28,6 @@ import { SEAT_REPORT_EVERY_S, SEAT_WATCH_CLAIM_MAX, seatReportOf, seatKeyOk, EDI
 import { accountRefusalText } from './accountClient.js';
 import { readWatchReceipt } from './watchReceipt.js';
 import { mintMarksRid } from './marksBook.js';
-import { tideAt } from './tideLaw.js';   // SEASON1 part two: the Tides
 import { fortWork, towersText } from './fortLaw.js';   // SEAT2b: the works; part two: the Watchtowers' word
 import { jittered } from './backoff.js';   // STORM-SHED: a failed claim's wait, jittered as every book's is
 import { seatPixelTest } from '../systems/town/townSeats.js';   // DOMAIN3: the Watch's pixels off the derivation the book is handed
@@ -388,7 +387,7 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       const d = r.data ?? {};
       return { ok: true, counted: !!d.counted, wins: Number(d.wins ?? 0) };
     },
-    // ─── CROWN2: FEALTY AND PACTS ────────────────────────────────────
+    // ─── CROWN2: PACTS ────────────────────────────────────────────
     /** One act on this guild's crown politics - `{ ok, text }`, the standings read afresh after it. */
     async politicsAct(ask, said) {
       let r;
@@ -396,27 +395,11 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       standingsAt.clear();
       return r?.ok ? { ok: true, text: said(r.data ?? {}) } : { ok: false, text: accountRefusalText(r?.error) };
     },
-    /** Fealty offered to the guild tagged `tag` - `as` 'vassal' (this guild swears to it) or 'liege' (takes it as vassal). */
-    offerFealty(tag, as) {
-      return this.politicsAct(() => door.fealty(character(), tag, as), () => (as === 'vassal' ? `Your guild offers to swear fealty to <${tag}>.` : `Your guild offers to take <${tag}> as its vassal.`));
-    },
-    /** The fealty <tag> offered, accepted - sworn from this week. */
-    acceptFealty(tag) {
-      return this.politicsAct(() => door.fealtyAccept(character(), tag), () => `The fealty with <${tag}> is sworn.`);
-    },
-    /** This guild's fealty with <tag> broken at the next Turning (a vassal's needs no tag) - or its offer withdrawn. */
-    breakFealty(tag) {
-      return this.politicsAct(() => door.fealtyBreak(character(), tag), (d) => (d.withdrawn ? 'Your guild\'s offer of fealty is withdrawn.' : 'The fealty ends at the Turning. Your guild loses 10 Standing at each seat it holds.'));
-    },
     /** A Pact offered to <tag>, or its offer signed. */
     offerPact(tag) {
       return this.politicsAct(() => door.pact(character(), tag), (d) => (d.signed ? `The Pact with <${tag}> is signed, until week ${d.until}.` : `Your guild offers <${tag}> a Pact of non-aggression.`));
     },
     /** The Pact with <tag> broken (a signed one is announced to everyone in red) - or its offer withdrawn. */
-    /** AUDIT-SEATS: the offer of fealty the guild tagged `tag` made to this one, declined. */
-    declineFealty(tag) {
-      return this.politicsAct(() => door.fealtyBreak(character(), tag), (d) => (d.declined ? `The offer of fealty from <${tag}> is declined.` : d.withdrawn ? 'Your guild\'s offer of fealty is withdrawn.' : 'The fealty ends at the Turning. Your guild loses 10 Standing at each seat it holds.'));
-    },
     /** AUDIT-SEATS: the offer of a Pact the guild tagged `tag` made to this one, declined (an unsigned offer's break). */
     declinePact(tag) {
       return this.politicsAct(() => door.pactBreak(character(), tag), (d) => (d.announced ? `Your guild has broken its Pact with <${tag}>. Everyone has been told.` : `The offer of a Pact from <${tag}> is declined.`));
@@ -438,21 +421,6 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
     // ─── SEASON1 part two: THE TIDES AS THIS CLIENT READS THEM ───────
     /** The week Season 0 began, as the seats' list last said - or null (no Season counted: every land is Calm). */
     get zero() { return Number.isSafeInteger(data?.zero) ? data.zero : null; },
-    /** The Tide at `region` this seat week, while the seats are open to this account and a Season is counted - else Calm. */
-    tideAt(region) {
-      if (open !== true) return 'calm';
-      const week = seatWeekOf(nowMs());
-      return tideAt(week, region, !!seasonOf(week, this.zero));
-    },
-    /** An Orc Raid's camp cleared in `region` - its influence for this character's guild where the Tide is Orc Raids.
-     *  Quiet: `{ counted }`. */
-    async orcCamp(site, region) {
-      if (open !== true) return { counted: false };
-      let r;
-      try { r = await door.orcCamp(character(), site, region); } catch { r = { ok: false, error: 'offline' }; }
-      if (r?.ok) standingsAt.clear();
-      return { counted: !!(r?.ok && r.data?.counted) };
-    },
     /** A World of Daggerfall camp cleared in `region` - the Bounty's twenty Drakes where one rules there. Quiet: `{ paid }`. */
     async bounty(site, region) {
       if (open !== true) return { paid: 0 };

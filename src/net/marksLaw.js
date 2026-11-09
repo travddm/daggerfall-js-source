@@ -41,8 +41,7 @@ export const MARK_WORTH_GOLD = 10;
  * THE FAUCETS - acts a server witnessed, each capped (SILVER-FINDS' `gather` and `find` bounded by the day instead -
  * above). MARKS1 strikes the first (the gate's receipts); the rest come with their slices, and are named here so the
  * cap is the law before the faucet is built.
- *   gate      - an Oblivion Gate receipt the relay signed and the service counted (WB5b): 50 (100 under a Daedric
- *               Incursion, SEAT0 9.3 - the second half at the Turning, seatIncursion.js). SILVER-WAYS: under the day's
+ *   gate      - an Oblivion Gate receipt the relay signed and the service counted (WB5b): 50. SILVER-WAYS: under the day's
  *               COMBAT cap (MARKS_COMBAT) with the raids', no longer two a day of its own.
  *   raid      - SILVER-WAYS: a town defended - a raid's receipt the relay signed at its
  *               cleanse (RAID3/RAID4) and the service counted once a (raid, account): 30, under the COMBAT cap.
@@ -145,8 +144,6 @@ export const MARKS_KINDS = Object.freeze({
   'royal-escrow': 'move',     // CROWN1: a Royal Tourney's prize, held from the crown's treasury while it rules
   'royal-prize': 'move',      // CROWN1: the prize, out of the escrow to the champion's account
   'royal-return': 'move',     // CROWN1: a Tourney no bout won - the prize home
-  'fealty-tribute': 'move',   // CROWN2: a vassal's 5% of its Tithe to its liege
-  'gate-incursion': 'mint',   // AUDIT-SEATS: a Daedric Incursion's second half of a gate's Marks, once three claims agree (9.3)
   fort: 'burn',               // SEAT2b: a fortification project's Marks, from the holder's treasury as it is begun (7.5)
   'seat-strike-refund': 'mint', // AUDIT-SEATS S4: a struck seat's claim fee, minted back to its holder within the Season (16)
   raid: 'mint',               // SILVER-WAYS: a town defended - the relay's raid receipt, counted (under the day's combat cap)

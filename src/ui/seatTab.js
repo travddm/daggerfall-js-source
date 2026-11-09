@@ -16,9 +16,9 @@
 // BOARD-UI: the same parts, each on its own panel under its own name, in the order a reader asks them - the
 // Charter (who holds it, how firmly, the Tithe and Edict); PLAIN-UI: WHAT THIS IS and the
 // reader's next step, HOW THE SEAT WAR WORKS (five steps, its counts the law's own) and WORDS ON THIS BOARD; This week
-// (the phase on a strip - Muster, Reckoning, Turning - and its clock, the Season, the Tide); the battle; the standings,
+// (the phase on a strip - Muster, Reckoning, Turning - and its clock, the Season); the battle; the standings,
 // each guild's bar toward what it needs (the claim, or the holder's defence); your guild (its pledge, your part, the
-// levers, its Fealty and Pacts - AUDIT 657 B10); the holder's orders; the Works; and the Chronicle.
+// levers, its Pacts - AUDIT 657 B10); the holder's orders; the Works; and the Chronicle.
 //
 // Every act goes through the window's one-at-a-time door (`ui.run`), and the standings are read again after each.
 import { HALL_OF_RECORDS_SHUT } from '../systems/online/onlineHomes.js';   // AUDIT-SEATS: the Hall of Records' words where it cannot be read
@@ -34,7 +34,6 @@ import {
 } from '../net/townSeatLaw.js';
 import { fightAnnouncement } from '../net/siege/siegeHerald.js';   // AUDIT-SEATS G1: the battle's line, its start in the service's seconds
 import { GUILD_RANK_MASTER } from '../net/guild/guildLaw.js';
-import { tideLine } from '../net/tideLaw.js';
 import { drawSeatWorks, drawSeatCamp } from './seatWorks.js';   // SEAT2b: the works, a challenger's Siege Camp
 import { towersText } from '../net/fortLaw.js';   // SEAT2b part two: the Watchtowers' word
 import { heraldryIndex, armsNamed } from '../net/heraldryIndex.js';   // HERALDRY-SHOWN: the Chronicle's guilds' heraldry, by tag (and name)
@@ -164,9 +163,9 @@ export function seatWords(seat) {
     // AUDIT PLAIN-UI W7: a player of neither guild in the battle - a third guild's member may be one
     ['Sellsword', 'A player of neither guild in the battle, hired for a fee by one side\'s Guildmaster to fight on that side.'],
     // AUDIT PLAIN-UI T6: the Works and crown politics are on this tab too
-    ['The Works', 'The seat\'s own buildings, such as Walls, a Gatehouse, Watchtowers, Barracks and a Market Hall. The holder builds them with silver and the goods in its stockpile. They stay with the seat when the Charter changes hands, and each drops a grade.'],
-    ['Fealty and Pacts', 'A guild holding a palace in a crown\'s kingdom can swear fealty to the crown\'s holder. The vassal pays the crown a share of its Tithe and gains half the crown\'s reach in its defense, and neither can pledge against the other. A Pact of non-aggression stops two guilds pledging against each other\'s seats for the rest of a Season.'],
-    ['Season and Tide', 'A Season is a run of weeks, and This week shows which week of it this is. A Tide is the week\'s change of fortune in a land, such as a Harvest, a Blight or a Plague.'],
+    ['The Works', 'The seat\'s own buildings, such as Walls, a Gatehouse, Watchtowers, Barracks and a Market Hall. The holder raises them with Marks from the treasury, once a tier, and they stand for the Season. They stay with the seat when the Charter changes hands, and each drops a tier.'],
+    ['Pacts', 'A Pact of non-aggression stops two guilds pledging against each other\'s seats for the rest of a Season.'],
+    ['Season', 'A Season is a run of weeks, and This week shows which week of it this is.'],
   ];
 }
 /**
@@ -356,7 +355,7 @@ export function createSeatTab(host, ui) {
     if (chosen) sel.value = chosen;
     sel.onchange = () => { edictAsk = sel.value; ui.rerender(); };
     out.append(sel);
-    const words = edictLine(chosen, seat.tier, data?.tides?.next ?? 'calm', seat);   // SEASON1 part two: the coming week's Tide on its cost; BAY-LEFT-SEA: a Bounty past the Bay its dens'
+    const words = edictLine(chosen, seat.tier, seat);   // BAY-LEFT-SEA: a Bounty past the Bay its dens'
     if (words) out.append(el('p', 'notice-seat-mine', words));
     if (chosen === 'bounty') {
       const a = /** @type {HTMLInputElement} */ (el('input', 'notice-input notice-seat-bounty'));
@@ -425,18 +424,17 @@ export function createSeatTab(host, ui) {
     return out;
   }
 
-  /** CROWN2: A GUILD'S CROWN POLITICS (SEAT0 7.8) - its liege, vassals, Pacts and the offers standing, for every member;
-   *  for an Officer or the guildmaster, each one's lever and a guild's tag to offer fealty or a Pact to. */
+  /** CROWN2: A GUILD'S CROWN POLITICS (SEAT0 7.8) - its Pacts and the offers standing, for every member;
+   *  for an Officer or the guildmaster, each one's lever and a guild's tag to offer a Pact to. */
   function politicsNode(p, lever) {
     const out = el('div', 'notice-seat-politics');
     const busy = ui.busy();
-    out.append(el('p', 'notice-section', 'Fealty and Pacts'));
+    out.append(el('p', 'notice-section', 'Pacts'));
     const rows = politicsRows(p);
-    if (!rows.length) out.append(el('p', 'notice-seat-mine', 'Your guild has no liege, no vassal and no Pact.'));
+    if (!rows.length) out.append(el('p', 'notice-seat-mine', 'Your guild has no Pact.'));
     const acts = {
-      'fealty-accept': (t) => book.acceptFealty(t), 'fealty-withdraw': (t) => book.breakFealty(t), 'fealty-break': (t) => book.breakFealty(t),
       'pact-accept': (t) => book.offerPact(t), 'pact-withdraw': (t) => book.breakPact(t), 'pact-break': (t) => book.breakPact(t),
-      'fealty-decline': (t) => book.declineFealty(t), 'pact-decline': (t) => book.declinePact(t),   // AUDIT-SEATS: an offer turned down
+      'pact-decline': (t) => book.declinePact(t),   // AUDIT-SEATS: an offer turned down
     };
     for (const r of rows) {
       const line = el('p', 'notice-seat-mine', r.text);
@@ -458,8 +456,6 @@ export function createSeatTab(host, ui) {
     out.append(tag);
     /** @type {Array<[string, string, (t: string) => Promise<any>]>} */
     const offers = [
-      ['notice-seat-swear', 'Swear fealty', (t) => book.offerFealty(t, 'vassal')],
-      ['notice-seat-take', 'Take as vassal', (t) => book.offerFealty(t, 'liege')],
       ['notice-seat-pact', 'Offer a Pact', (t) => book.offerPact(t)],
     ];
     for (const [cls, words, ask] of offers) {
@@ -588,7 +584,7 @@ export function createSeatTab(host, ui) {
       if (rule) who.append(el('p', 'notice-seat-mine', rule));
       if (data.holding) for (const line of seatHoldingLines(seat, data.holding)) who.append(el('p', 'notice-seat-mine', line));
       explain();
-      // THIS WEEK: the phase on its strip, the Season, the Tide, the clock
+      // THIS WEEK: the phase on its strip, the Season, the clock
       const week = panel(SEAT_PANELS.week, 'seat-weekpanel');
       const strip = el('ol', 'seat-phases');
       for (const [id, name] of SEAT_PHASES) {
@@ -599,8 +595,6 @@ export function createSeatTab(host, ui) {
       week.append(strip);
       const season = seasonLine(data.week, data.season ?? null);   // SEASON1
       if (season) week.append(el('p', 'notice-seat-week notice-seat-season', season));
-      const tide = data.tides ? tideLine(seat.region, data.tides.now, data.tides.next) : null;   // SEASON1 part two (9.3)
-      if (tide) week.append(el('p', 'notice-seat-week notice-seat-tide', tide));
       week.append(el('p', 'notice-seat-week', seatWeekLine(data, ui.nowS())));
       // SEAT2a: the battle placed in the week, with its sides - or the Turning's line where none is placed (an older week);
       // CROWN1 part two: the Royal Tourney ruling here
@@ -614,7 +608,7 @@ export function createSeatTab(host, ui) {
       // THE STANDINGS, and what it takes
       const standings = panel(SEAT_PANELS.standings, 'seat-standingspanel');
       standings.append(standingsNode(), el('p', 'notice-seat-mine', seatClaimLine(seat, data.defence ?? null)));
-      // YOUR GUILD: its pledge, your part, the levers (SEAT1b); CROWN2's Fealty and Pacts under it
+      // YOUR GUILD: its pledge, your part, the levers (SEAT1b); CROWN2's Pacts under it
       const mine = panel(SEAT_PANELS.mine, 'seat-minepanel');
       for (const line of seatMineLines(seat, data.mine ?? null, nameOf)) mine.append(el('p', 'notice-seat-mine', line));
       if (data.mine) mine.append(leversNode(data.mine));
