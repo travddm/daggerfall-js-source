@@ -48,6 +48,7 @@ const LAW = {
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
   world295: 'f6d6346724b88967a86d923f4572233d348954362169c1f6565ebd00a6504204', // P0 SERVER PROFILE: the relay serves its profile (`/profile`), names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none
+  world297: 'edcdfe81f2e0e80905658b9a03eb0367151f23e4211fb7f2cc5a1c5a26f09890', // REVENANTS-STANDALONE: the Revenants row's five fixed choices are pinned in the server profile (officialProfile.ts); a profile's hash moves
   world293: '7230bed078cb68f80ab642db411d569c9a6b99b272464aca12c628ac43b2c0d8', // CHARACTER MODES: the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet
   world294: '2dc2b1e1c8ff155264ce87a4b0ac94a3c817f6f8b8750d4be7b5329f13c53ad5', // CHARACTER MODES: the shared mode law offers modes by a server profile (creatableModes, offeredFromList); the relay reads no mode yet
   world292: '9f149f9a098fa8227055d7ff6b5b1d583220d4204962af07177b8924502f5877',     // F4b PVP-REF-LEAF: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js; no behaviour change

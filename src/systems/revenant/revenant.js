@@ -2,12 +2,12 @@
 // ═══════════════════════════════════════════════════════════════════
 // REVENANTS.
 //
-// WHO BECOMES ONE. A SPECIAL foe - an elite (systems/eliteFoes.js), a LOOT7 champion (systems/champions.js) or a
-// revenant already - that
+// WHO BECOMES ONE. Any regular foe, or only a special one (the row's "Who rises"): an elite (systems/eliteFoes.js), a
+// LOOT7 champion (systems/champions.js) or a revenant already. It
 //   - lands the blow that KILLS the player (melee or an arrow: the blows the struck seam names, formulas.js), or
 //   - at under a fifth of its health, wins a small roll (REVENANT_FLEE_CHANCE; a revenant already, more) and RUNS -
 //     and is out of reach before its run is spent (scenes/exteriorFoes.js: the open world's foes).
-// Never under level 3, the city watch, an ally, a quest's foe or a summons - LOOT7's floor and exclusions.
+// Never under level 3, the city watch, an ally, a quest's foe, a summons, a boss or a staff event's foe.
 //
 // WHAT IT BECOMES. A record per character (below): a given name from DFU's own name banks (characters/nameHelper.js,
 // drawn on a seeded side-stream so the shared DFRandom never moves) and an EPITHET that says what it did - "Grushnak
@@ -26,13 +26,11 @@
 // nothing saved and a death is exactly what makes a revenant. Each record carries a revision; the two are merged by
 // it, so a reload of an older save never forgets a revenant made since, nor raises one already slain.
 //
-// OFF IS DFU EXACTLY: with the loot-rarity row off (the Loot arc's switch, as LOOT7's), no revenant is made, flees or
-// returns.
+// OFF IS DFU EXACTLY: with the revenants row off, no revenant is made, flees or returns. The mod needs no other row.
 //
-// RENOWN-GATE: ONLINE, REVENANTS WAIT FOR RENOWN 10
-// (REVENANT_MIN_RENOWN). Under it a character's are HELD (revenantHeld): every door that makes, stands, spreads or marks
-// one answers as the switch's off does, while what is remembered stays on the page and the sworn keep their days.
-// Offline nothing is held. And a due one takes two encounter rolls in five, not one in two (REVENANT_RETURN_CHANCE).
+// RENOWN-GATE: online, the player may set a Renown their revenants wait for (none by default). Under it they are HELD
+// (revenantHeld): every door that makes, stands, spreads or marks one answers as the switch's off does, while what is
+// remembered stays on the page and the sworn keep their days. Offline nothing is held.
 //
 // ONLINE: a revenant is its character's own memory; a returning one is my own foe, streamed as any - its kind, health,
 // trait, glow and (REVENANT-WIRE) its NAME, the foe record's `nm`, so every puppet is called what its owner calls it.
@@ -44,8 +42,7 @@
 // REVENANT-PAGE: the pause menu's Stats rail lists them (ui/revenant/revenantPage.js).
 // ═══════════════════════════════════════════════════════════════════
 
-import { lootRarityOn } from '../loot/lootRarity.js';
-import { revenantsRowOn } from './revenantsOn.js';
+import { revenantsRowOn, revenantAnyFoe, revenantRenownMin, revenantLevelsPerRank, revenantFleeFactor, revenantReturnWindow } from './revenantsOn.js';
 import { renownOpens } from '../sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
 import { registerPlayerBlowLanded } from '../sigil/sigilSetPowers.js';
 import { registerPlayerHurtListener } from '../../characters/playerEntity.js';   // REVENANT-HARM: a death no blow names
@@ -57,6 +54,7 @@ import { appStorage } from '../appStorage.js';
 import { characterIdOf, mintCharacterId } from '../characterId.js';
 import { ownMinutes } from '../worldTick.js';
 import { tieredGear } from '../eliteFoes.js';
+import { bossTraitsOf } from '../bossTraits.js';
 import { legendaryGate, rollerLevel } from '../loot/lootLevelGate.js';   // LOOT-GATE
 import { foeSeed } from '../../characters/foeBodies.js';   // FB1012d ALLY-RACE: the person a revenant is born as - the seed its body was drawn by
 import { goldStack } from '../inventory.js';
@@ -69,9 +67,6 @@ import { personalityFor, isPersonality, personalityLabel, voiceLine, beastBody, 
 // ── the numbers ─────────────────────────────────────────────────────
 /** A revenant is a foe of this level or more (LOOT7's champion floor, ELITE-FLOOR's). */
 export const REVENANT_MIN_LEVEL = 3;
-/** RENOWN-GATE: online, a character's revenants wait for this Renown (revenantHeld) - an evening's play
- *  past the elites' 5 (eliteFoes.js ELITE_FOE_MIN_RENOWN), so a returning elite always finds elites standing. */
-export const REVENANT_MIN_RENOWN = 10;
 /** How many living revenants a character keeps; a new one past it replaces the weakest, oldest. */
 export const REVENANT_MAX = 5;
 /** The highest rank a revenant climbs to. */
@@ -157,12 +152,12 @@ export const REVENANT_EPITHETS = Object.freeze({
 /** @type {{ list: RevenantRecord[], mirrorId: string|null }} */
 const _state = { list: [], mirrorId: null };
 
-export const revenantOn = () => lootRarityOn() && revenantsRowOn();   // the Loot rarity row (its trophy) and the revenants row
-/** RENOWN-GATE: are this page's revenants HELD - online under REVENANT_MIN_RENOWN, or before the page knows its Renown
+export const revenantOn = revenantsRowOn;
+/** RENOWN-GATE: are this page's revenants HELD - online under the Renown the player set, or before the page knows its Renown
  *  (sigil.js renownOpens; offline never)? Held, every door that makes, stands, spreads or marks one answers as the
  *  switch's off does - none is made or flees, none returns - and what is remembered stays on the page (ui/revenant/revenantPage.js says it is held) while the sworn keep their days.
  *  @param {{ online?: boolean, renown?: number|null }} [o] */
-export const revenantHeld = (o) => !renownOpens(REVENANT_MIN_RENOWN, o);
+export const revenantHeld = (o) => revenantRenownMin() > 0 && !renownOpens(revenantRenownMin(), o);
 const nowMinutes = () => { try { return Math.floor(ownMinutes()); } catch { return 0; } };
 const isU32 = (v) => Number.isInteger(v) && v >= 0 && v <= 0xFFFFFFFF;
 function hashStr(s) {
@@ -317,17 +312,21 @@ function prune() {
   }
 }
 const deed = (r, d, at) => { r.history.push({ deed: d, at }); if (r.history.length > HISTORY_MAX) r.history.splice(0, r.history.length - HISTORY_MAX); };
-const dueFrom = (now, rolls) => now + REVENANT_RETURN_MIN_MINUTES + Math.floor(rolls() * (REVENANT_RETURN_MAX_MINUTES - REVENANT_RETURN_MIN_MINUTES + 1));
+const dueFrom = (now, rolls) => { const [lo, hi] = revenantReturnWindow(); return now + lo + Math.floor(rolls() * (hi - lo + 1)); };
 
 // ── who may become one ──────────────────────────────────────────────
-/** A foe that may become (or stay) a revenant: special (an elite, a champion, a revenant already), of the floor's level,
- *  never the watch or an ally; `rec` the pool's record when there is one - never a quest's foe or a summons. */
+/** Who the row lets rise: any foe but a boss (its own fight, never a nemesis), or only a special one - an elite, a
+ *  champion, a revenant already. */
+const mayRise = (entity) => !entity.staffBoss && !bossTraitsOf(entity).length
+  && (revenantAnyFoe() || !!entity.revenant || !!entity.eliteFoe || (typeof entity.champion === 'string' && !!entity.champion));
+/** A foe that may become (or stay) a revenant: a regular foe, or as the row says a special one (an elite, a champion, a
+ *  revenant already), of the floor's level, never the watch, an ally or a boss; `rec` the pool's record when there is
+ *  one - never a quest's foe or a summons. */
 export function revenantCandidate(entity, rec = null) {
   if (!entity || !revenantOn()) return false;
   if (revenantHeld()) return false;   // RENOWN-GATE: held - none made, none runs (a flight that could make no revenant would only rob a kill)
   if (entity.bout) return false;   // a fighter on the sand is its bout's - it never flees as a revenant, nor becomes one
-  const special = !!entity.revenant || !!entity.eliteFoe || (typeof entity.champion === 'string' && !!entity.champion);
-  if (!special) return false;
+  if (!mayRise(entity)) return false;
   if ((entity.level | 0) < REVENANT_MIN_LEVEL) return false;
   if (entity.mobileType === KNIGHT_CITY_WATCH || entity.team === 'PlayerAlly' || entity.mobileTeam === 'PlayerAlly') return false;
   if (rec && (rec.questBehaviour || rec.allied || rec.questMarker || rec.puppet || rec.riteRole)) return false;   // never another client's foe, nor a rite's faithful
@@ -423,7 +422,7 @@ registerPlayerStruckListener('revenant', (attacker, target) => {
 /** THE FLEE ROLL: does this special foe, under REVENANT_FLEE_HEALTH of its health for the first time, run? */
 export function rollRevenantFlee(entity, rolls = Math.random) {
   if (!revenantCandidate(entity)) return false;
-  return rolls() < (entity.revenant ? REVENANT_FLEE_CHANCE_REVENANT : REVENANT_FLEE_CHANCE);
+  return rolls() < (entity.revenant ? REVENANT_FLEE_CHANCE_REVENANT : REVENANT_FLEE_CHANCE) * revenantFleeFactor();
 }
 /** Under the line? (a foe's own share of its health; a dead one never) */
 export const revenantFleeHealth = (entity) => !!entity && entity.health > 0 && entity.health < (entity.maxHealth || 1) * REVENANT_FLEE_HEALTH;
@@ -543,7 +542,7 @@ export function releaseRevenantStand(r) {
 /** The spawn options a returning revenant stands with (scenes/exteriorFoes.js spawnFoe): its record, its gender, and a
  *  class foe's level over the player's. */
 export function revenantSpawnOptions(r, playerLevel) {
-  return { revenant: r, gender: isClassEnemyId(r.mobileType) ? r.gender : null, level: isClassEnemyId(r.mobileType) ? Math.max(1, (playerLevel | 0) + r.rank * REVENANT_LEVEL_PER_RANK) : null };   // a monster's sprite is its kind's, whatever its gender
+  return { revenant: r, gender: isClassEnemyId(r.mobileType) ? r.gender : null, level: isClassEnemyId(r.mobileType) ? Math.max(1, (playerLevel | 0) + r.rank * revenantLevelsPerRank()) : null };   // a monster's sprite is its kind's, whatever its gender
 }
 /** Stand the record on a freshly built entity (before its loot): its name, its rank's health and blows. The record is
  *  OUT from here until the foe dies, escapes or leaves the world. */
