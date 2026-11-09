@@ -35,6 +35,7 @@ const PREFS = Object.freeze({
   revenantRank: '2',
   revenantFlee: 'normal',
   revenantReturn: 'normal',
+  townSeats: true,
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,

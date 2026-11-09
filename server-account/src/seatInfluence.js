@@ -72,15 +72,13 @@ import {
   HUNT_INFLUENCE, HUNT_WEEK_CAP,   // HUNTERS-MARK: a bounty board's clear
   SEAT_WEEK_MS, SEAT_RECKONING_MS,
   accountSeatInfluence, guildSeatInfluence, tributeRoom, homeDaysIn, seatDefence, SEAT_CHRONICLE_SHOWN,
-  overreachOf, unrestInfluence, crownsHeld, seatReach, withReach, FREE_LAND_WATCH_BONUS, pledgeBarred, fealtyKingdom, seasonOf, seasonZeroOf, bountySitePixel, HALL_OF_RECORDS_ROWS,
+  overreachOf, unrestInfluence, crownsHeld, seatReach, withReach, FREE_LAND_WATCH_BONUS, pledgeBarred, seasonOf, seasonZeroOf, HALL_OF_RECORDS_ROWS,
 } from '../../src/net/townSeatLaw.js';
 import { isFreeLand } from '../../src/net/kingdomLaw.js';
 import { holdingOf } from './seatHolding.js';   // SEAT1d: the holder's own view of its Charter
 import { fightOf } from './seatBattles.js';   // SEAT2a: the battle as the Seat tab shows it
 import { royalView } from './seatRoyal.js';   // CROWN1 part two: a Royal Tourney's ladder
 import { bansOf, politicsOf } from './seatPolitics.js';   // CROWN2: the pledges fealty and Pacts forbid; a guild's politics
-import { tideAt, TIDE_EFFECTS } from '../../src/net/tideLaw.js';   // SEASON1 part two: the Tides
-import { tideNow } from './tides.js';   // SEASON1 part two: an Orc Raid's camps
 import { domainsFor } from './domains.js';   // DOMAIN3: the region law, where DOMAINS_WEEK rules
 import { charterUnder } from '../../src/net/domainLaw.js';   // DOMAIN3: the Charter a seat is held under
 
@@ -294,36 +292,6 @@ export async function creditGate({ db, nowS }, player, env, { character, day, re
 }
 
 /**
- * SEASON1 part two (9.3): AN ORC RAID'S CAMP - a World of Daggerfall camp the character cleared (`site` its id, naming its
- * pixel - townSeatLaw.js bountySitePixel) in `region` (the client's) while that land's Tide is Orc Raids: 50 influence for
- * the account's war-guild at its pledged seat there - at most 5 camps an account a UTC day and 250 influence an account a
- * week, a camp once a day an account (all asked in the write). Bounded, not witnessed, as the Bounty's camps are: a
- * modified client can claim camps it never fought, five a day and 250 a week. Answers `{ ok, counted, why? }`.
- * @param {{db: any, nowS: number}} ctx
- */
-export async function claimOrcCamp({ db, nowS }, player, env, { character, site, region } = {}) {
-  if (accountKind(player) !== 'linked') return { error: 'seats-need-account' };
-  if (!seatsOpenFor(player, env)) return { error: 'seats-closed' };
-  if (!bountySitePixel(site) || !seatRegionOk(region)) return { error: 'bad-orc-camp' };
-  if (tideNow(env, nowS, region) !== 'orcs') return { ok: true, counted: false, why: 'no-raid' };
-  const at = await countsAt(db, player, character, region, nowS, { anyCharacter: true });
-  if ('counted' in at) return { ok: true, counted: false, why: at.why };
-  const day = utcDay(nowS);
-  const ref = `${day}:${site}:${player.id}`;
-  const [, ins] = await db.batch([
-    bindStatement(db, at, player.id, nowS),
-    db.prepare(`INSERT OR IGNORE INTO town_seat_influence (week, key, guild_id, account, char_id, source, amount, region, day, ref, at)
-      SELECT ?1, ?2, ?3, ?4, ?5, 'raid', ?6, ?7, ?8, ?9, ?10 WHERE ${STILL_COUNTS}
-        AND (SELECT COUNT(*) FROM town_seat_influence WHERE account = ?4 AND source = 'raid' AND day = ?8) < ?11
-        AND COALESCE((SELECT SUM(amount) FROM town_seat_influence WHERE account = ?4 AND source = 'raid' AND week = ?1), 0) + ?6 <= ?12`)
-      .bind(at.week, at.key, at.guild, player.id, at.char, TIDE_EFFECTS.orcsCampInfluence, region, day, ref, nowS, TIDE_EFFECTS.orcsCampsDay, TIDE_EFFECTS.orcsInfluenceWeek),
-  ]);
-  if (ins?.meta?.changes) return { ok: true, counted: true, key: at.key };
-  if (await db.prepare("SELECT 1 FROM town_seat_influence WHERE source = 'raid' AND ref = ?").bind(ref).first()) return { ok: true, counted: false, why: 'claimed' };
-  return { ok: true, counted: false, why: 'capped' };
-}
-
-/**
  * HUNTERS-MARK (Bounty-Boards.md 12.6): A BOUNTY CLEARED - a clear the hunt's ledger recorded (hunts.js huntClear), on a
  * board of `region` (the client's): HUNT_INFLUENCE for the account's war-guild at its pledged seat there, at most
  * HUNT_WEEK_CAP an account a week (asked in the write), `ref` the clear's own key, so it counts once. Bounded, not
@@ -345,33 +313,6 @@ export async function creditHunt({ db, nowS }, player, env, { character, region,
   if (ins?.meta?.changes) return { counted: true, key: at.key };
   if (await db.prepare("SELECT 1 FROM town_seat_influence WHERE source = 'hunt' AND ref = ?").bind(ref).first()) return { counted: false, why: 'claimed' };
   return { counted: false, why: 'capped' };
-}
-
-/**
- * SEAT2b (4.2: "Writs ... 1 per Mark of the materials' value"): A SEAT WRIT'S DELIVERY AS INFLUENCE - `own` units at the
- * materials' value (`value` a unit's Marks, never the writ's pay, so a guild paying itself mints nothing) and `bought`
- * units at Tribute's rate inside Tribute's cap (their value as a `bought` row, read as Tribute's Marks); for the posting
- * guild alone, through a 7-day member whose account is bound to it this week (warOf) - anyone else's delivery earns the
- * pay alone and binds nobody's war - and only while that guild still holds or is pledged to the seat. `ref` the delivery's
- * own id (a fill's rid), so a delivery counts once. Answers `{ counted, why? }`; never refuses the delivery it rode on.
- * @param {{db: any, nowS: number}} ctx
- */
-export async function creditSeatWrit({ db, nowS }, player, env, { character, key, region, guild, own = 0, bought = 0, value = 0, ref } = {}) {
-  if (!seatsOpenFor(player, env)) return { counted: false, why: 'seats-closed' };
-  const week = weekAt(nowS);
-  const war = await warOf(db, player, character, nowS, week);
-  if ('why' in war) return { counted: false, why: war.why };
-  if (war.guild !== guild) return { counted: false, why: 'not-its-guild' };
-  const at = { guild, char: war.char, key, week };
-  const rows = [['writ', Math.max(0, own) * value], ['bought', Math.max(0, bought) * value]].filter(([, n]) => n > 0);
-  if (!rows.length) return { counted: false, why: 'nothing' };
-  const done = await db.batch([
-    bindStatement(db, at, player.id, nowS),
-    ...rows.map(([source, amount]) => db.prepare(`INSERT OR IGNORE INTO town_seat_influence (week, key, guild_id, account, char_id, source, amount, region, day, ref, at)
-      SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11 WHERE ${STILL_COUNTS}`)
-      .bind(week, key, guild, player.id, war.char, source, amount, region, utcDay(nowS), `${ref}:${source}`, nowS)),
-  ]);
-  return done.slice(1).some((r) => r?.meta?.changes) ? { counted: true } : { counted: false, why: 'bound-elsewhere' };
 }
 
 /** Each gate day's region, where GATE_REGION_AGREE of its claims agree on it - the most agreeing; two regions level at
@@ -432,21 +373,19 @@ export async function creditRenown({ db, nowS }, player, env, { character, regio
  * @param {{ guilds: string[], rows: any[], renown: any[], homes: any[], binds: Map<string, string>,
  *   agreed: Map<number, number>, weekStartS: number, nowS: number, reach?: Map<string, number>, freeLand?: boolean }} o
  */
-export function standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS, nowS, reach = new Map(), freeLand = false, tide = 'calm', shrine = null }) {
+export function standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS, nowS, reach = new Map(), freeLand = false, shrine = null }) {
   const out = [];
   for (const g of guilds) {
     /** @type {Map<string, { watch: number, gates: number, renownXp: number, writ: number, homeDays: number, raid: number, hunt: number }>} */
     const acc = new Map();
-    const a = (id) => { let v = acc.get(id); if (!v) acc.set(id, v = { watch: 0, gates: 0, renownXp: 0, writ: 0, homeDays: 0, raid: 0, hunt: 0 }); return v; };
+    const a = (id) => { let v = acc.get(id); if (!v) acc.set(id, v = { watch: 0, gates: 0, renownXp: 0, homeDays: 0, hunt: 0 }); return v; };
     let tributeMarks = 0;
     for (const r of rows) {
       if (r.guild_id !== g) continue;
-      if (r.source === 'tribute' || r.source === 'bought') { tributeMarks += Number(r.amount); continue; }
+      if (r.source === 'tribute') { tributeMarks += Number(r.amount); continue; }
       if (binds.get(r.account) !== g) continue;
       if (r.source === 'watch') a(r.account).watch += Number(r.amount);
       else if (r.source === 'gate') { if (agreed.get(Number(r.day)) === Number(r.region)) a(r.account).gates += Number(r.n ?? 1); }   // AUDIT-SEATS S11: a row the read grouped counts its receipts
-      else if (r.source === 'writ') a(r.account).writ += Number(r.amount);
-      else if (r.source === 'raid') a(r.account).raid += Number(r.amount);   // SEASON1 part two: an Orc Raid's camps
       else if (r.source === 'hunt') a(r.account).hunt += Number(r.amount);   // HUNTERS-MARK: a bounty board's clears
     }
     for (const r of renown) if (binds.get(r.account) === g) a(r.account).renownXp += Number(r.xp);
@@ -455,7 +394,7 @@ export function standingsOf({ guilds, rows, renown, homes, binds, agreed, weekSt
       .map((h) => ({ player: h.player, days: homeDaysIn(Number(h.bought_at), weekStartS, nowS) }))
       .sort((x, y) => y.days - x.days).slice(0, HOMES_SEAT_MAX);
     for (const h of hs) if (h.days > 0) a(h.player).homeDays += h.days;
-    const per = new Map([...acc].map(([id, v]) => [id, accountSeatInfluence(v, freeLand ? FREE_LAND_WATCH_BONUS : 0, tide)]));   // SEASON1 part two: the week's Tide here
+    const per = new Map([...acc].map(([id, v]) => [id, accountSeatInfluence(v, freeLand ? FREE_LAND_WATCH_BONUS : 0)]));
     const row = { guild: g, ...withReach(guildSeatInfluence([...per.values()], tributeMarks), reach.get(g) ?? 0), accounts: [...per.values()].filter((v) => v > 0).length, per };
     // SEAT2b part two (7.5: "each gate felled in the region gives the holder +50 influence"): THE SHRINE'S, the holder's
     // own - a guild's row beside its accounts' (no account's cap is spent on it, as Tribute's is not), past the reach
@@ -515,11 +454,11 @@ export async function allIn(db, ids, sql, before = [], after = []) {
   return out;
 }
 /** Each pledged guild's week at a seat (standingsOf), the rows gathered. Exported for the Turning (seatTurning.js).
- *  SEASON1 part two: `counted` whether a Season is counted that week - the Tides roll only then. DOMAIN3: `domains` the
+ *  DOMAIN3: `domains` the
  *  region law's seats of power that week (domains.js domainsFor; null where it does not rule) - at a region's seat of
  *  power the homes counted are the whole region's, every seat town of it the Charter's holding; anywhere else the town's.
  *  Every reader of a week's standings hands it: the board, the Turning, a Tourney's dead heat, Tribute's room. */
-export async function gatherStandings(db, seat, week, nowS, counted = false, domains = null) {
+export async function gatherStandings(db, seat, week, nowS, domains = null) {
   const region = domains?.get?.(seat.region)?.key === seat.key;
   const guilds = [...(await seatGuildsOf(db, seat.key, week)).keys()];
   if (!guilds.length) return [];
@@ -541,7 +480,7 @@ export async function gatherStandings(db, seat, week, nowS, counted = false, dom
   // CROWN1 (4.3): each guild's reach here - the crowns it holds, at a palace seat of their kingdom or March
   const crownRows = seat.tier === 'palace' ? await allIn(db, guilds, (qs) => `SELECT guild_id, tier, region FROM town_seat_holds WHERE tier = 'crown' AND guild_id IN (${qs})`) : [];
   const reach = new Map(guilds.map((g) => [g, seatReach(seat, crownsHeld(crownRows.filter((h) => h.guild_id === g).map((h) => ({ tier: h.tier, region: Number(h.region) }))))]));
-  return standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS: Math.floor(seatWeekStartMs(week) / 1000), nowS, reach, freeLand: isFreeLand(seat.region), tide: tideAt(week, seat.region, counted),
+  return standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS: Math.floor(seatWeekStartMs(week) / 1000), nowS, reach, freeLand: isFreeLand(seat.region),
     shrine: await shrineOf(db, seat, week, nowS) });   // SEAT2b part two: the holder's Shrine
 }
 
@@ -556,8 +495,8 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
   const seat = (await confirmedSeats(db, nowS)).get(key);
   if (!seat) return { error: 'seat-unconfirmed' };
   const week = weekAt(nowS);
-  const season = seasonOf(week, seasonZeroOf(env?.SEASON_ZERO_WEEK));   // SEASON1: the Season counted, and its Tides
-  const list = await gatherStandings(db, seat, week, nowS, !!season, await domainsFor(db, nowS, env, week));   // DOMAIN3: the region's homes at its seat of power
+  const season = seasonOf(week, seasonZeroOf(env?.SEASON_ZERO_WEEK));   // SEASON1: the Season counted
+  const list = await gatherStandings(db, seat, week, nowS, await domainsFor(db, nowS, env, week));   // DOMAIN3: the region's homes at its seat of power
   // SEAT1c: the Legacy each guild carried in, the holder and its defence, the week's battle here, the Chronicle
   const { results: legacyRows = [] } = await db.prepare('SELECT guild_id, amount FROM town_seat_legacy WHERE week = ? AND key = ?').bind(week, key).all();
   const legacy = new Map(legacyRows.map((l) => [l.guild_id, Number(l.amount)]));
@@ -568,14 +507,7 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
   const was = await standingWas(db, key, week - 1, holder);   // STANDING-TREND: the last Turning settled the week before this one
   const { results: tiers = [] } = holder ? await db.prepare('SELECT tier, region FROM town_seat_holds WHERE guild_id = ?').bind(holder.guild.id).all() : { results: [] };
   const held = holder ? !!(await db.prepare("SELECT 1 FROM town_seat_aftermath WHERE week = ? AND key = ? AND guild_id = ? AND what = 'bonus'").bind(week, key, holder.guild.id).first()) : false;   // SEAT2a: a held siege's x1.2
-  // CROWN2 (7.8): a vassal's - its liege's half-reach here, as the Turning reckons it: a fealty sworn (not breaking) that
-  // still fits
-  const liege = holder ? (await db.prepare("SELECT liege FROM guild_fealty WHERE vassal = ? AND state = 'sworn'").bind(holder.guild.id).first())?.liege ?? null : null;
-  const { results: liegeRows = [] } = liege ? await db.prepare('SELECT tier, region FROM town_seat_holds WHERE guild_id = ?').bind(liege).all() : { results: [] };
-  const liegeHolds = liegeRows.map((h) => ({ tier: h.tier, region: Number(h.region) }));
-  const fits = liege && fealtyKingdom(tiers.map((h) => ({ tier: h.tier, region: Number(h.region) })), liegeHolds);
-  const liegeReach = fits ? seatReach(seat, crownsHeld(liegeHolds)) : 0;
-  const defence = holder ? seatDefence({ influence: own?.total ?? 0, legacy: legacy.get(holder.guild.id) ?? 0 }, holder.standing, overreachOf(tiers.map((t) => t.tier)), held, liegeReach) : null;
+  const defence = holder ? seatDefence({ influence: own?.total ?? 0, legacy: legacy.get(holder.guild.id) ?? 0 }, holder.standing, overreachOf(tiers.map((t) => t.tier)), held) : null;
   const ids = list.map((s) => s.guild);
   const gs = await allIn(db, ids, (qs) => `SELECT id, name, tag, heraldry FROM guilds WHERE id IN (${qs})`);   // SEAT-CAP
   const byId = new Map(gs.map((g) => [g.id, g]));
@@ -588,7 +520,8 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
       mine = {
         guild: me.guild_id, rank: Number(me.rank), seasoned: seasoned(me, nowS), bound: await boundTo(db, week, player.id),
         pledges: await pledgesOf(db, week, me.guild_id), influence: s?.per.get(player.id) ?? 0,
-        politics: await politicsOf(db, me.guild_id, nowS),   // CROWN2: its liege, vassals, Pacts and the offers standing
+        politics: await politicsOf(db, me.guild_id, nowS),   // CROWN2: its Pacts and the offers standing
+        camp: !!(await db.prepare('SELECT 1 FROM town_seat_camps WHERE week = ? AND key = ? AND guild_id = ?').bind(week, key, me.guild_id).first()),   // SEAT2b: whether its Siege Camp stands at this seat
         tributeRoom: s ? tributeRoom(s.others, s.tribute) * TRIBUTE_MARKS_PER_INFLUENCE : 0,
       };
     }
@@ -612,12 +545,6 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
     : null;
   return {
     seat, week, phase: seatPhaseOf(nowS * 1000), season,   // SEASON1: the Season this week falls in, or null
-    // SEASON1 part two (9.3): this week's Tide in the seat's land and the coming week's, while a Season is counted
-    // AUDIT-SEATS L6: and the week before the first counted one - the Turning prices next week's Edict at next week's Tide
-    tides: (() => {
-      const nextCounted = !!seasonOf(week + 1, seasonZeroOf(env?.SEASON_ZERO_WEEK));
-      return season || nextCounted ? { now: tideAt(week, seat.region, !!season), next: tideAt(week + 1, seat.region, nextCounted) } : null;
-    })(),
     reckoningAt: Math.floor((start + SEAT_WEEK_MS - SEAT_RECKONING_MS) / 1000), turningAt: Math.floor((start + SEAT_WEEK_MS) / 1000),
     standings,
     ...(towers ? { towers } : {}),   // SEAT2b part two: the Watchtowers' word, the holder's members'
@@ -765,7 +692,7 @@ export async function payTribute({ db, nowS }, player, env, { character, key, ma
   if (!seat) return { error: 'seat-unconfirmed' };
   const gid = a.me.guild_id;
   if ((await pledgeIn(db, week, gid, seat.region)) !== key) return { error: 'seat-no-pledge' };
-  const s = (await gatherStandings(db, seat, week, nowS, !!seasonOf(week, seasonZeroOf(env?.SEASON_ZERO_WEEK)), await domainsFor(db, nowS, env, week))).find((x) => x.guild === gid);   // DOMAIN3: the room as the standings count it
+  const s = (await gatherStandings(db, seat, week, nowS, await domainsFor(db, nowS, env, week))).find((x) => x.guild === gid);   // DOMAIN3: the room as the standings count it
   const room = s ? tributeRoom(s.others, s.tribute) : 0;
   if (marks / TRIBUTE_MARKS_PER_INFLUENCE > room) return { error: 'seat-tribute-cap' };   // the room is the standings' to say (mine.tributeRoom)
   try {

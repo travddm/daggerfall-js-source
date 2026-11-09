@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SEASON_ZERO_WEEKS, SEASON_WEEKS, SEASON_MONTHS, seasonZeroOf, seasonOf, seatSeasonName, seasonEndingAt, seasonFloor, seasonStanding, seasonTitles,
+  SEASON_ZERO_WEEKS, SEASON_WEEKS, SEASON_MONTHS, seasonZeroOf, seasonOf, seatSeasonName, seasonEndingAt, seasonFloor, seasonStanding, seasonKeepers,
   seasonLine, pactUntil, seatTitleOf, seatTitleText, chronicleLine, SIEGE_PAIR_WEEKS, STANDING_START,
 } from '../../src/net/townSeatLaw.js';
 
@@ -55,16 +55,13 @@ test('SEASON1 THE SEASON\'S TITLES (9.1): every crown\'s guild "Crowned in Seaso
     { key: 5023, guild: 'OA', tier: 'crown', since: 12 }, { key: 3034, guild: 'SH', tier: 'palace', since: 20 },
     { key: 3021, guild: 'DG', tier: 'palace', since: 21 }, { key: 5017, guild: 'IC', tier: 'crown', since: 25 },
   ];
-  assert.deepEqual(seasonTitles(season, holds), [
-    { guild: 'SH', title: 'keeper', key: 3034 }, { guild: 'IC', title: 'crowned', key: 5017 },
-    { guild: 'OA', title: 'crowned', key: 5023 }, { guild: 'OA', title: 'keeper', key: 5023 },
-  ]);
-  assert.deepEqual(seasonTitles({ n: 0, start: 20, end: 24 }, holds), [], 'Season 0 crowns no one');
-  assert.deepEqual([seasonTitles(null, holds), seasonTitles(season, null)], [[], []]);
+  assert.deepEqual(seasonKeepers(season, holds), [{ guild: 'SH', key: 3034 }, { guild: 'OA', key: 5023 }]);
+  assert.deepEqual(seasonKeepers({ n: 0, start: 20, end: 24 }, holds), [], 'Season 0 keeps no one');
+  assert.deepEqual([seasonKeepers(null, holds), seasonKeepers(season, null)], [[], []]);
   assert.deepEqual(seatTitleOf([{ key: 3034, tier: 'palace', region: 34 }], 3), { title: 'warden', ts: [3034, 3] });
   assert.deepEqual(seatTitleOf([{ key: 5023, tier: 'crown', region: 23 }]), { title: 'protector', ts: [5023, 0] }, 'none counted: 0');
   const place = (k) => (k === 3034 ? { name: 'Alcaire Keep', region: 34 } : null);
-  assert.deepEqual([seatTitleText('crowned', [5023, 3], place), seatTitleText('keeper', [3034, 3], place)], ['Crowned in Season 3', 'Keeper of Alcaire Keep, Season 3']);
+  assert.deepEqual([seatTitleText('crowned', [5023, 3], place), seatTitleText('keeper', [3034, 3], place)], [null, null], 'cut: no words');
   const seat = { key: 3034, name: 'Alcaire Keep', tier: 'palace', region: 34 };
   assert.equal(chronicleLine({ kind: 'season-end', week: 27, data: { guild: { name: 'The Silver Hand', tag: 'SH' }, season: 3, kept: true } }, seat),
     'At the end of the Season of First Seed, the Silver Hand <SH> held Alcaire Keep, as it had the whole Season through.');

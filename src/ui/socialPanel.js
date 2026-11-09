@@ -269,7 +269,7 @@ export const GUILD_MARKS_LEDGER_WORDS = Object.freeze({
 });
 /** GUILD3b (bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE PRESS): A SILVER LINE BY ITS OWN KIND - the
  *  ledger's (`raw`, marksLaw.js MARKS_KINDS) where the service sends it, each kind a guild's treasury is an end of, worded
- *  as `<who> <words> <amount>`; a kind that runs either way (a Conscription, a vassal's fealty share) worded by its
+ *  as `<who> <words> <amount>`; a kind that runs either way (a Conscription) worded by its
  *  direction. Before it, every line the service had no word for said "put in" - a Tribute, an upkeep, a claim fee, a writ's
  *  escrow, a patron's bid: silver LEAVING the treasury read as silver coming into it. */
 export const GUILD_SILVER_LINE_WORDS = Object.freeze({
@@ -284,8 +284,6 @@ export const GUILD_SILVER_LINE_WORDS = Object.freeze({
   'royal-escrow': 'put up a Royal Tourney prize of', 'royal-return': 'had a Royal Tourney prize come home:',
   'patron-escrow': 'bid for a chapter\'s patronage:', 'patron-return': 'had a patronage bid come home:',
   conscription: Object.freeze({ in: 'received Conscription of', out: 'paid Conscription of' }),
-  // AUDIT GUILD3 W5: a vassal's 5% is its FEALTY share - "Tribute" is the seat's, paid where the guild pledged
-  'fealty-tribute': Object.freeze({ in: 'received a vassal\'s fealty share of', out: 'paid its liege a fealty share of' }),
 });
 /** DOMAIN2: the castle's silver lines in words, in the player's language - read before GUILD_SILVER_LINE_WORDS (whose
  *  English stands as it was), each a guild's own line ("The guild bought a castle for 120,000 silver"). */

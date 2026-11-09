@@ -61,10 +61,10 @@ test('PROF1 law: ranks 0-100 by 10 x n^2 XP, their five names; tiers by the rank
 test('PROF1 law: every profession offers two specialisations at 50 and two at 100 (CRAFT3: a merged craft its two disciplines\' four), the record\'s names; a change is 1,000 Marks and a week, standing from its day (PROF0 3.3)', () => {
   assert.deepEqual(Object.keys(SPECIALISATIONS), PROFESSIONS.map((p) => p.id));
   const MERGED = ['smithing', 'building', 'provisioning'];
-  for (const [p, by] of Object.entries(SPECIALISATIONS)) for (const r of SPEC_RANKS) assert.equal(by[r].length, MERGED.includes(p) ? 4 : 2, `${p} at ${r}`);
+  for (const [p, by] of Object.entries(SPECIALISATIONS)) for (const r of SPEC_RANKS) assert.equal(by[r].length, MERGED.includes(p) ? (p === 'building' ? [3, 2][SPEC_RANKS.indexOf(r)] : 4) : 2, `${p} at ${r}`);
   const ids = (p) => SPEC_RANKS.map((r) => SPECIALISATIONS[p][r].map((s) => s.id));
   assert.deepEqual(ids('smithing'), [['weaponsmith', 'armoursmith', 'gemcutter', 'goldsmith'], ['masterwright', 'quartermaster', 'master-jeweller', 'lapidary']]);
-  assert.deepEqual(ids('building'), [['bowyer', 'joiner', 'quarryman', 'builder'], ['siegewright', 'master-joiner', 'fortifier', 'sculptor']]);
+  assert.deepEqual(ids('building'), [['bowyer', 'joiner', 'quarryman'], ['master-joiner', 'sculptor']]);
   assert.deepEqual(ids('provisioning'), [['brewer', 'distiller', 'cook', 'field-cook'], ['master-alchemist', 'transmuter', 'chef', 'provisioner']]);
   assert.deepEqual(SPECIALISATIONS.herbalism[50].map((s) => s.name).concat(SPECIALISATIONS.herbalism[100].map((s) => s.name)), ['Gardener', 'Botanist', 'Seasonal Eye', "Apothecary's Friend"]);
   assert.deepEqual(SPECIALISATIONS.fishing[50].map((s) => s.name), ['Angler', 'Netter']);

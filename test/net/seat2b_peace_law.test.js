@@ -6,33 +6,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  fortStandsAt, SIEGEWRIGHT_DAYS, FORT_TIER_DAYS, towersSee, towersText, watchtowerShare, coastalAt, harbourPortFor, RAM_KIT_KEY,
+  towersSee, towersText, watchtowerShare, coastalAt, harbourPortFor,
   shrineStanding,
 } from '../../src/net/fortLaw.js';
 import { standingWeek, seatStandingLine, guildWords } from '../../src/net/townSeatLaw.js';
-import {
-  RAM_KIT, materialOf, withdrawable, NO_PACK_FORM, MATERIAL_FAMILIES, isSiegewright, specOk, SPECIALISATIONS,
-} from '../../src/net/professionLaw.js';
-import { recipeById, recipeOpen, takesQuality } from '../../src/net/recipeLaw.js';
-import { material } from '../../src/net/nodeLaw.js';
-import { marketCatalogue } from '../../src/net/marketLaw.js';
 import { hasPort, hasPortFor, setSeatHarbours } from '../../src/systems/travel/travelPorts.js';
 
 const DAY = 86400;
-
-test('SEAT2b part two THE SIEGEWRIGHT\'S DAY: a project begun by a Siegewright stands a day sooner at every tier - 1, 3 and 6 days; anyone else\'s 2, 4 and 7; Carpentry\'s choice at 100 is chosen now (mutants: the day; its tiers; the choice)', () => {
-  assert.equal(SIEGEWRIGHT_DAYS, 1, 'Professions-Arc 3.3: "siege works a day sooner"');
-  assert.deepEqual([1, 2, 3].map((t) => fortStandsAt(1000, t)), FORT_TIER_DAYS.map((d) => 1000 + d * DAY));
-  assert.deepEqual([1, 2, 3].map((t) => fortStandsAt(1000, t, { siegewright: true })), [1000 + DAY, 1000 + 3 * DAY, 1000 + 6 * DAY]);
-  assert.equal(fortStandsAt(1000, 1, { siegewright: false }), 1000 + 2 * DAY);
-  assert.equal(fortStandsAt(1000, 4, { siegewright: true }), null, 'no fourth tier');
-  assert.equal(fortStandsAt(NaN, 1, { siegewright: true }), null);
-  assert.deepEqual([isSiegewright({ 100: 'siegewright' }), isSiegewright({ 100: 'master-joiner' }), isSiegewright({ 50: 'siegewright' }), isSiegewright(null)], [true, false, false, false]);
-  assert.equal(specOk('carpentry', 100, 'siegewright'), true);
-  assert.equal(SPECIALISATIONS.carpentry, undefined, 'no track of its own');
-  assert.equal(SPECIALISATIONS.building[100].find((s) => s.id === 'siegewright')?.later, undefined);
-  assert.equal(specOk('building', 100, 'siegewright'), true);
-});
 
 test('SEAT2b part two WHAT THE WATCHTOWERS SEE: every challenger at or past half the holder\'s defence (tier 1) or a quarter (tier 2), the most dangerous first; never the holder, never without towers or a defence; the word names the seat, the guild and the share (mutants: the share; at the line; the holder; the order; the words)', () => {
   const standings = [
@@ -103,14 +83,3 @@ test('SEAT2b part two THE SHRINE\'S STANDING: a Shrine\'s tier is its Standing r
   assert.equal(seatStandingLine({ guild: { name: 'The Silver Hand', tag: 'SH' }, influence: 8393 }, 0), '1. the Silver Hand <SH> - 8,393 influence');
 });
 
-test('SEAT2b part two THE RAM KIT IN THE STORES: a siege work, template 690, tier 5, worth its inputs at their values (108); never to the pack; on the market as a Stores material; made at Carpentry 60 at no quality (mutants: the worth; the pack; the family)', () => {
-  const r = recipeById('ramkit:oak');
-  assert.deepEqual(materialOf(RAM_KIT_KEY), { key: 'work:ram', family: 'siege', tier: 5, value: 108, templateIndex: 690 });
-  assert.equal(RAM_KIT.key, RAM_KIT_KEY);
-  assert.equal(material(RAM_KIT_KEY).value, r.inputs.reduce((a, i) => a + i.n * material(i.key).value, 0), 'the inputs\' worth: a writ\'s pay and a delivery\'s influence keep the materials\'');
-  assert.ok(MATERIAL_FAMILIES.some(([f, w]) => f === 'siege' && w === 'Siege Works'));
-  assert.deepEqual([...NO_PACK_FORM], [RAM_KIT_KEY, 'essence:arcane']);   // AUDIT PROF12 E1 (
-  assert.equal(withdrawable(RAM_KIT_KEY), false, 'its road is the writ\'s');
-  assert.ok(marketCatalogue().some((m) => m.key === RAM_KIT_KEY && m.family === 'siege'), 'a Stores material lists - a sale makes it bought');
-  assert.deepEqual([r.kind, r.rank, recipeOpen(r, 60), recipeOpen(r, 59), takesQuality(r)], ['siege', 60, true, false, false]);
-});

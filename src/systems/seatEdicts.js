@@ -39,14 +39,11 @@ const MINUTES_A_DAY = 1440;
 /** The Festive buff's mods: +5 to every attribute (`keys` statMods.js STAT_KEYS_ORDER). */
 export const festiveMods = (keys) => ({ stats: Object.fromEntries(keys.map((k) => [k, FESTIVE.attributes])) });
 
-/** SEASON1 part two: an Orc Raid's camp counted for the guild. */
-export const ORC_CAMP_TEXT = 'The Orc Raids: your guild gains 50 influence at its seat in the region.';
 /**
  * @param {{ seatAt: (mapId: any) => any, here: () => any, seats: () => any[], guildId: () => (string|null),
  *   minutes: () => number, regionAt: (px: number, py: number) => number, say?: (line: string, s?: number) => void,
  *   claim?: (site: string, region: number) => Promise<{ paid: number }>, onFestive?: () => void,
- *   tideAt?: (region: number) => string, orcCamp?: (site: string, region: number) => Promise<{ counted: boolean }>,
- *   nowMs?: () => number }} host   SEASON1 part two: the land's Tide, an Orc Raid's camp; BAY-LEFT-SEA: `nowMs` the real clock (Date.now)
+ *   nowMs?: () => number }} host   BAY-LEFT-SEA: `nowMs` the real clock (Date.now)
  *   `seatAt` a town's seat, dressed (null where none); `here` the map id the player stands in; `seats` every seat this
  *   client knows, dressed; `guildId` the playing character's own guild; `minutes` the game clock; `regionAt` a map
  *   pixel's region.
@@ -68,9 +65,6 @@ export function createSeatEdicts(host) {
     const pixel = typeof site === 'string' ? bountyClaimPixel(site) : null;
     if (!pixel || !host.claim) return 0;
     const region = host.regionAt(pixel[0], pixel[1]), camp = !!bountySitePixel(site);
-    if (camp && (host.tideAt?.(region) ?? 'calm') === 'orcs' && host.orcCamp) {
-      host.orcCamp(site, region).then((r) => { if (r?.counted) host.say?.(ORC_CAMP_TEXT, 4); }).catch(() => {});
-    }
     if (!bountyAt(region, pixel)) return 0;
     if (!camp) {
       const now = host.nowMs?.() ?? Date.now(), was = denAsked.get(site);
@@ -107,11 +101,9 @@ export function createSeatEdicts(host) {
     /** THE BOUNTY (7.6): whether a World of Daggerfall camp at map pixel (`px`, `py`) lies in a Bounty seat's
      *  bailiwick - its loot doubled. */
     bountyAt: (px, py) => bountyAt(host.regionAt(px, py), [px, py]),
-    /** SEASON1 part two (Seats-Arc 9.3): whether an Orc Raid is the Tide at map pixel (`px`, `py`) - its camps doubled. */
-    orcsAt: (px, py) => (host.tideAt?.(host.regionAt(px, py)) ?? 'calm') === 'orcs',
     /** A camp cleared by this player - `site` its id (src/world/worldOfDaggerfall/wodShared.js wodSiteId, naming its pixel), claimed where a
-     *  Bounty rules (and, SEASON1 part two, where an Orc Raid is the Tide - its influence). Answers the Drakes paid.
-     *  BAY-LEFT-SEA: or a den past the Bay (net/townSeatLaw.js bountyDenPixel), claimed the same way - never an Orc Raid's,
+     *  Bounty rules. Answers the Drakes paid.
+     *  BAY-LEFT-SEA: or a den past the Bay (net/townSeatLaw.js bountyDenPixel), claimed the same way,
      *  and asked once in BOUNTY_DEN_ASK_GAP_MS (a lair's foe struck down: the world host hands its dungeon's den, lairDenOf). */
     campCleared,
     /** BAY-LEFT-SEA: a den past the Bay cleared - an outlaws' hideout routed (scenes/hideouts.js), a lair's foe struck

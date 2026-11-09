@@ -23,7 +23,6 @@ import { FESTIVALS, FESTIVAL_WARES, FESTIVAL_ICONS, HEARTHKEEPER_GIVEN, SOULCAKE
 import { QL_SERVICE_LINES } from '../../src/net/questlineClaims.js';
 import { QL_LINES } from '../../src/systems/questlines/qlLines.js';
 import { ARENA_CHAMPION_MIN_BOUTS, ARENA_CHAMPION_MIN_FOES } from '../../src/net/arena/arenaLaw.js';
-import { seasonTitles } from '../../src/net/townSeatLaw.js';
 import { codexRows, codexSets, noteFind, _resetCodexForTests } from '../../src/systems/loot/lootCodex.js';
 import { GILDED_RECORDS, DRAGONFIRE_OATH, mintGilded } from '../../src/systems/gilded.js';
 import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, FOUNDER_UNTIL, wardrobeOf } from '../../server-account/src/titles.js';
@@ -102,8 +101,8 @@ const CATALOGUE = {
   'title:hourbreaker': 'abyss chance', 'title:hoursfirst': 'abyss retired', 'title:coilbreaker': 'serpent chance',
   'title:gatebreaker': 'broker open', 'title:doorwarden': 'questlines open', 'title:covenbane': 'questlines open',
   'title:hourwitness': 'questlines open', 'title:satakalwitness': 'questlines open', 'title:starwarden': 'questlines seasonal', 'title:witchwarden': 'festival seasonal',
-  'title:hearthkeeper': 'festival seasonal', 'title:warden': 'seats open', 'title:protector': 'seats open', 'title:crowned': 'seats open',
-  'title:keeper': 'seats open', 'title:champion': 'seats open', 'title:chaptermaster': 'chapters dormant', 'title:chapterofficer': 'chapters dormant',
+  'title:hearthkeeper': 'festival seasonal', 'title:warden': 'seats open', 'title:protector': 'seats open',
+  'title:champion': 'seats open', 'title:chaptermaster': 'chapters dormant', 'title:chapterofficer': 'chapters dormant',
   'title:formermaster': 'chapters dormant', 'title:highmaster': 'chapters dormant', 'title:seasonmaster': 'chapters dormant', 'title:grandchampion': 'ranked open',
   'title:arenachampion': 'ranked ranked', 'title:ilovelamp': 'world open',
   'title:founder': 'account closed', 'title:disciple': 'patrons dormant', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons dormant',
@@ -197,11 +196,8 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   assert.equal(entry('title', 'founder').avail, 'closed');
   assert.match(how('title', 'founder'), /by noon UTC on 25 September 2026, or is granted it by name\. A guest from before then earns it by registering; a character from before then brought onto your account counts too\./);
   assert.ok(!W.AVAIL_NOW.includes('closed') && !W.AVAIL_NOW.includes('retired'));
-  // the seats: Season 0 crowns no one; the guildmaster's character wears a seat's title
+  // the seats: the guildmaster's character wears a seat's title
   for (const t of SEAT_TITLES) assert.equal(entry('title', t).src, 'seats');
-  assert.deepEqual(seasonTitles({ n: 0, start: 1 }, [{ key: 1, guild: 'g', tier: 'crown', since: 1 }]), []);
-  assert.ok(seasonTitles({ n: 1, start: 3 }, [{ key: 1, guild: 'g', tier: 'crown', since: 3 }]).some((x) => x.title === 'crowned'));
-  for (const t of ['crowned', 'keeper']) assert.match(how('title', t), /from Season 1 on/);
   for (const t of ['warden', 'protector']) assert.match(how('title', t), /Your guildmaster character wears it as/);
   assert.match(how('title', 'champion'), /held when its crown proclaims one/);
   assert.match(how('title', 'hearthkeeper'), new RegExp(`have other players take ${HEARTHKEEPER_GIVEN} Soul Cakes from it`));

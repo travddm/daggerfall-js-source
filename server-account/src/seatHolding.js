@@ -3,8 +3,7 @@
 // SEAT1d - HOLDING A
 // SEAT: the holder's levers on its board (the Tithe, the Edict), what a
 // Charter pays (the Tithe across its bailiwick, beside every sale that
-// takes one - market.js), what its Edicts do on the service (the Levy on
-// a harvest, the Bounty's camps paid, Open Gates' homes), and what the
+// takes one - market.js), what its Edicts do on the service (the Bounty's camps paid, Open Gates' homes), and what the
 // Seat tab shows the holder (its Standing, Tithe, Edicts and upkeep).
 //
 // 7.1-7.3, 7.6. The numbers are
@@ -39,7 +38,7 @@ export const BOUNTY_SET_ASIDE_MAX = 100_000;
 
 /** DOMAIN3 (Domains law 1: "The bailiwick | The whole region"): THE SEATS A NOTICE BOARD'S BAILIWICK IS READ AMONG - every
  *  confirmed seat, and where the region law rules this week (`env`'s DOMAINS_WEEK) the Charters alone, so every board of a
- *  region with a seat of power is its Charter's - its Tithe, its Levy, its Bounty. */
+ *  region with a seat of power is its Charter's - its Tithe, its Bounty. */
 async function bailiwickSeats(db, nowS, env) {
   const seats = (await confirmedSeats(db, nowS)).values();
   return charterSeats(seats, await domainsFor(db, nowS, env, weekAt(nowS)));
@@ -153,7 +152,7 @@ export async function holdingOf(db, key, nowS) {
   };
 }
 
-// ─── THE BAILIWICK'S TITHE, THE LEVY, OPEN GATES ────────────────────
+// ─── THE BAILIWICK'S TITHE, OPEN GATES ────────────────────
 
 /**
  * THE SEAT A BOARD IN `region` AT `pixel` BELONGS TO, AND ITS HOLDER'S TITHE (SEAT0 7.2) - `{ key, guild, pct }`, or
@@ -173,17 +172,6 @@ export async function titheAt(db, nowS, region, pixel = null, env = null) {
   const seat = bailiwickOf(await bailiwickSeats(db, nowS, env), region, pixel);   // DOMAIN3: the region's Charter, where the region law rules
   const h = seat ? held.find((x) => Number(x.key) === seat.key) : null;
   return h ? { key: seat.key, guild: h.guild_id, pct: Math.min(Number(h.tithe), marketHallTitheCap(TITHE_CAP[h.tier] ?? 0, Number(h.market ?? 0))) } : null;
-}
-
-/** THE LEVY'S SEAT for a harvest at `pixel` in `region` (SEAT0 7.6: "from the nodes of the region nearer this seat than
- *  any other seat of the region"): the bailiwick's seat key, where its Levy rules this week - else null. */
-export async function levyAt(db, nowS, region, pixel, env = null) {
-  if (!seatRegionOk(region) || !pixel) return null;
-  const { results = [] } = await db.prepare("SELECT key FROM town_seat_edicts WHERE week = ? AND state = 'law' AND edict = 'levy'").bind(weekAt(nowS)).all();
-  if (!results.length) return null;
-  // GATHER-SPEED: the seats' places off the isolate's kept witness rows - every harvest under a Levy read them whole
-  const seat = bailiwickOf(await bailiwickSeats(db, nowS, env), region, pixel);   // DOMAIN3: the region's Charter, where the region law rules
-  return seat && results.some((e) => Number(e.key) === seat.key) ? seat.key : null;
 }
 
 /** OPEN GATES (SEAT0 7.6: "homes in the town may not be set private this week"): whether it rules at the town `mapId`

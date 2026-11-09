@@ -33,5 +33,5 @@ test('SEASON1 THE SEAT TAB\'S SEASON: the standings\' Season said as its week of
     assert.match(byClass(host, 'notice-seat-week')[0].textContent, /^The Muster/);
   }
   const place = (k) => (k === ANTICLERE.key ? ANTICLERE : null);
-  assert.deepEqual([seatTitleText('crowned', [5023, 2], place), seatTitleText('keeper', [3021, 2], place), seatTitleText('keeper', [9999, 2], place)], ['Crowned in Season 2', 'Keeper of Anticlere, Season 2', null]);
+  assert.deepEqual([seatTitleText('crowned', [5023, 2], place), seatTitleText('keeper', [3021, 2], place), seatTitleText('keeper', [9999, 2], place)], [null, null, null], 'Season titles are cut: the words say nothing for them');
 });

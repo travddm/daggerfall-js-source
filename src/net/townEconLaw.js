@@ -43,7 +43,7 @@ export const TOWN_CYCLE = Object.freeze([Object.freeze({ amp: 12, days: 11 }), O
 /** A seat town's Standing moves it (Standing - 50) / TOWN_STANDING_DIV. */
 export const TOWN_STANDING_DIV = 5;
 /** The Edict in force at a seat town, as a term of its Prosperity (townSeatLaw.js EDICTS' ids). */
-export const TOWN_EDICT_TERMS = Object.freeze({ 'market-day': 6, festival: 8, 'open-gates': 3, levy: -6, curfew: -4 });
+export const TOWN_EDICT_TERMS = Object.freeze({ 'market-day': 6, festival: 8, 'open-gates': 3, curfew: -4 });
 /** A raid running at the town's gates. */
 export const TOWN_RAID_TERM = -15;
 /** The most the players' share (TE2) adds. */
@@ -303,7 +303,6 @@ export const TOWN_REASONS = Object.freeze({
   get 'market-day'() { return t('town.econ.reason.marketDay', 'Market Day draws trade.'); },
   get festival() { return t('town.econ.reason.festival', 'The Festival draws visitors.'); },
   get 'open-gates'() { return t('town.econ.reason.openGates', 'Open Gates draw trade.'); },
-  get levy() { return t('town.econ.reason.levy', 'The Levy weighs on trade.'); },
   get curfew() { return t('town.econ.reason.curfew', 'The Curfew keeps buyers home.'); },
   get players() { return t('town.econ.reason.players', 'Busy with travellers and traders.'); },
   get harbour() { return t('town.econ.reason.harbour', 'Its harbor brings trade.'); },   // SEA-TRADE: a port town's lanes
