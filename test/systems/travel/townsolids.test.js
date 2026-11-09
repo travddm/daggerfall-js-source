@@ -1,4 +1,4 @@
-// TOWN-SOLIDS: the journey's grid covers the town's solid models (fences, walls, the town mods' pieces), which no automap
+// The journey's grid covers the town's solid models (fences, walls, the town mods' pieces), which no automap
 // holds - so a journey's way through a town goes round a fenced yard instead of through it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -68,7 +68,7 @@ function yard(at = [0, 0, 0]) {
 
 const inYard = ([x, y]) => x >= 9 && x <= 15 && y >= 9 && y <= 15;
 
-test("TOWN-SOLIDS the law: a fence's faces cover the cells they cross; a step under the band, a ramp and a board hung over the head cover none; the town's own grid is never written", () => {
+test("the journey grid: a fence's faces cover the cells they cross; a step under the band, a ramp and a board hung over the head cover none; the town's own grid is never written", () => {
   const nav = road(30, 30);
   const solid = solidCells(nav, yard(), [0, 0, 0], C);
   assert.equal(solid[12 * 30 + 16], 1, 'the east fence covers its cell');
@@ -108,7 +108,7 @@ test("TOWN-SOLIDS the law: a fence's faces cover the cells they cross; a step un
   assert.equal(coverNav(nav, new Uint8Array(900)), nav, 'nothing covered: the grid itself');
 });
 
-test("TOWN-SOLIDS the way: a way across a fenced yard's closed side goes round the yard; on the bare grid it went straight through (mutant: no stamp)", () => {
+test("the journey grid's way: a way across a fenced yard's closed side goes round the yard; on the bare grid it went straight through (mutant: no stamp)", () => {
   const nav = road(30, 30);
   const bare = townWayCells(nav, [25, 12], [2, 12]);
   assert.ok(bare.cells.some(inYard) || bare.cells.length === 2, 'the bare grid: a straight line through the yard');
@@ -120,7 +120,7 @@ test("TOWN-SOLIDS the way: a way across a fenced yard's closed side goes round t
   assert.ok(!way.cells.some(inYard), 'never into the yard');
 });
 
-test("TOWN-SOLIDS the host: the journey's way is asked of the town's grid with its solid models' faces covered, in the location frame; a town with none walks its grid as before", () => {
+test("the town walk host: the journey's way is asked of the town's grid with its solid models' faces covered, in the location frame; a town with none walks its grid as before", () => {
   const o = mapPixelWorldOrigin(100, 200);
   const R = SCENE_MAP_RATIO,
     t = [0, 0, 0],
