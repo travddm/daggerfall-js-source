@@ -755,6 +755,7 @@ import { getLocationTerrainTileOrigin, setLocationTiles, locationRectReader } fr
 import { locationArrivalLanding, locationStartMarkers } from '../world/locationEntrance.js';
 import { preloadPrisonScreenArt, preloadCourtScreenArt } from '../ui/prisonScreen.js';   // PRIS00I0 - the serving-time screen   // ROAD-B B5: CORT01I0 - the courtroom the trial is pushed over
 import { TerrainGenClient } from '../world/terrain/terrainGenClient.js';   // EV7: the pixel kernel, off the main thread (samples/blend/tiles/grid/nature moved whole to terrainGen.js)
+import { terrainSlopeCutOn } from '../systems/terrainSlopeCut.js';   // TERRAIN-CUT: the slope cut's switch
 import { getPref, setPref } from '../systems/uiPrefs.js';
 import { createCoverIndex } from '../ai/cover.js';   // TACT1: billboards are cover
 import { techniqueMarksNow, techniqueHudChips, offsetTechniques, TECHNIQUE_ACTION } from '../combat/techniques.js';   // TECH1: the player's marks on the ground, the HUD's chip, the recentre's shift
@@ -1514,7 +1515,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   StreamingWorldState.frames = etherSea ? [etherFrame()] : [];
   // EV7: the pixel kernel's off-thread home - a COPY of the WOODS
   // bytes crosses once; this thread's `woods` stays the fallback law.
-  const terrainGen = new TerrainGenClient({ woods, woodsBytes });
+  const terrainGen = new TerrainGenClient({ woods, woodsBytes, slopeCut: terrainSlopeCutOn() });   // TERRAIN-CUT: the world's cut, read once
   // ROADS 3: OUR network, from the player's own map. Built once here,
   // handed to both terrain kernels; a failure draws a world without
   // roads and says so, never no world.

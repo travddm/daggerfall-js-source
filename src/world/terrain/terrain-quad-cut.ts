@@ -5,11 +5,25 @@
 // best fits the ground: a Catmull-Rom (cubic) read of the 4 x 4 samples estimates the quad's centre, and the diagonal
 // whose midpoint lies nearer that estimate wins, so a crest joins along the crest. Joining the corners that differ least
 // keeps a rising ridge's teeth, so that rule is not used.
-// Departure from DFU, a written and agreed design that is better for play: Unity cuts every terrain quad on one diagonal.
+// Departure from DFU, so an option (the `terrainSlopeCut` row, systems/terrainSlopeCutRow.js), off by default: Unity
+// cuts every terrain quad on one diagonal, (x, z) to (x+1, z+1), and off is that cut.
 
 import { HEIGHTMAP_DIMENSION } from './terrainSampler.js';
 
 const LAST_SAMPLE = HEIGHTMAP_DIMENSION - 1;
+
+/** Whether quads follow their slope. A flag of the module, not a parameter, so every reader of the drawn ground (on
+ *  this thread and on the terrain worker) reads one switch and the walked, drawn and water ground stay one surface. Set
+ *  as a world mounts (terrainGenClient.js), before any pixel is built. */
+let slopeCut = false;
+
+export function setSlopeCut(on: boolean): void {
+  slopeCut = on;
+}
+
+export function slopeCutIsOn(): boolean {
+  return slopeCut;
+}
 
 /** The Catmull-Rom weights at a cell's middle (t = 0.5), times 16: for the samples one before, the two corners, and
  *  one after. Integers, so the estimate's sign does not depend on the order the products are summed in. */
@@ -39,8 +53,9 @@ function columnSum(
  *  than south-west to north-east, (x, z) to (x+1, z+1). Decided from the pixel's own samples alone (data[x * 129 + z],
  *  clamped at its edge), so every reader that holds them decides the same cut; the bed's carve and the snow do not move
  *  it. A quad whose corners make no saddle keeps the south-west to north-east cut: flat ground draws as it did.
- *  Returns true for the south-east to north-west cut. */
+ *  With the option off, every quad keeps that cut. Returns true for the south-east to north-west cut. */
 export function quadCutsSeNw(heightmapData: ArrayLike<number>, qx: number, qz: number, stride = 1): boolean {
+  if (!slopeCut) return false;
   const x0 = qx * stride;
   const z0 = qz * stride;
   const column0 = x0 * HEIGHTMAP_DIMENSION;

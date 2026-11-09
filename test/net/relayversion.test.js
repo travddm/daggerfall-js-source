@@ -47,6 +47,7 @@ const LAW = {
   world287: '5fa98938d25fe3be574c04ebe52e8fa09adbb01e84b316e02fb213d8ce0a64ad',     // SD LANES: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone)
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
+  world298: 'e47c26f778eb0ed165aeb12503358541702609f5fa343a67cc220ed3b10a8eba', // TERRAIN-CUT: the official profile pins the slope cut off (net/profile/officialProfile.ts `terrainSlopeCut`); the ground is unchanged
   world295: 'f6d6346724b88967a86d923f4572233d348954362169c1f6565ebd00a6504204', // P0 SERVER PROFILE: the relay serves its profile (`/profile`), names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none
   world293: '7230bed078cb68f80ab642db411d569c9a6b99b272464aca12c628ac43b2c0d8', // CHARACTER MODES: the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet
   world294: '2dc2b1e1c8ff155264ce87a4b0ac94a3c817f6f8b8750d4be7b5329f13c53ad5', // CHARACTER MODES: the shared mode law offers modes by a server profile (creatableModes, offeredFromList); the relay reads no mode yet
