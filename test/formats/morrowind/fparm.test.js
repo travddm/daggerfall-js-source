@@ -2675,8 +2675,8 @@ test('MW-D38: the weapon\u2019s material is READ - a daedric sword is not the ty
   const daedric = { group: 'Weapons', templateIndex: 115, material: 9 };
   assert.notEqual(fpWeaponKey(iron, false), fpWeaponKey(daedric, false), 'two materials of one type must be two keys');
   assert.match(fpWeaponKey(daedric, false), /:Daedric:/);
-  const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  assert.match(arm, /pickWeaponRecord\(allWeapons, mwType, weapon \? materialName\(weapon\) : null, \{ has, shape: dfWeaponShape\(weapon, WEAPONS\) \}\)/,   // MW-D50: and among the records the archives carry
+  const arm = readFileSync('src/combat/fpArm.js', 'utf8') + readFileSync('src/combat/fpArm/fpArmParts.js', 'utf8');
+  assert.match(arm, /pickWeaponRecord\(allWeapons, mwType, weapon \? materialName\(weapon\) : null, \{\s*has,\s*shape: dfWeaponShape\(weapon, WEAPONS\),?\s*\}\)/,   // MW-D50: and among the records the archives carry
     'the hand\u2019s weapon is not resolved by its material');
   const code = arm.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
   assert.ok(!/weapon\.materialName|item\.materialName/.test(code), 'the phantom field is still read somewhere');
