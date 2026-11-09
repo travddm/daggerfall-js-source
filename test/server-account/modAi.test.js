@@ -12,6 +12,7 @@ import { safetyMinute } from '../../server-account/src/safetyClock.js';
 import { pushLaw } from '../../server-account/src/sanctions.js';
 import { mintStamp } from '../../src/net/safety/chatStamp.js';
 import { FEED_SIG_HEADER, sealFeed } from '../../src/net/safety/chatFeed.js';
+import { conductConsequence } from '../../src/net/safety/conduct.js';
 import { SAFE_LAW_PATH } from '../../src/net/wire.js';
 import { standService } from '../accountDb.mjs';
 
@@ -29,6 +30,12 @@ test('the shipped reviewer is off even when an operator adds an Anthropic key', 
   const env = { ...accountVars, ANTHROPIC_API_KEY: 'sk-test' };
   assert.equal(modAiModeOf(env), 'off');
   assert.equal(modAiOn(env), false);
+});
+
+test('the Code of Conduct a player agrees to names no automated reviewer while the shipped reviewer is off', () => {
+  assert.equal(modAiOn({ ...accountVars, ANTHROPIC_API_KEY: 'sk-test' }), false);
+  assert.doesNotMatch(conductConsequence(), /automated|reviewer/i);
+  assert.match(conductConsequence(), /Moderators read every report/);
 });
 
 test('with the shipped vars and a key, a reported line and the relay feed never reach the Messages API', async () => {
