@@ -5,11 +5,13 @@ import {
   CLASSIC_SHADE_STEPS,
   CLASSIC_DARK_RANGE_M,
   SHADE_FS,
+  clearsIndoors,
   shadeAmount,
+  shadeFade,
   shadeRange,
   shadeStep,
 } from '../../src/render/classic-distance-shading.ts';
-import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
+import { INTERIOR_CLEAR, Renderer, SKY_CLEAR, VIEW_OUT_CLEAR, WORLD_FRAME } from '../../src/render/renderer.js';
 import { setFrameTarget } from '../../src/render/renderTarget.js';
 import { perspective } from '../../src/world/mat4.js';
 import { glslFunctions } from '../glsl.mjs';
@@ -18,6 +20,9 @@ import { E, stateGl, presents, retroCfg } from '../retroGl.mjs';
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const L = new Float32Array([0.3, 0.8, -0.2]);
 const BLACK = new Float32Array([0, 0, 0]);
+/** Better Ambience's FoggyDungeons fog: linear, 1.76 to 98.7 m, brown. */
+const BROWN = new Float32Array([0.208, 0.157, 0.005]);
+const DUNGEON_BROWN = { mode: 1, density: 0, end: 98.7, color: BROWN };
 
 test('a step is 0 near the player, one more each 64th of the range, and 63 from the last 64th on', () => {
   assert.equal(CLASSIC_SHADE_STEPS, 64);
@@ -42,6 +47,30 @@ test("the range: 30 m to black indoors, the fog's own distance outdoors, none wi
     'rain: 5% left at 3 / density',
   );
   assert.equal(shadeRange({ mode: 0, density: 0, end: 0, color: BLACK }), null, 'fog off');
+});
+
+test('to black, a dungeon or a building goes to black over 30 m whatever its fog; to fog colour, to its own fog', () => {
+  assert.deepEqual(shadeFade(DUNGEON_BROWN, true, 'black'), { range: CLASSIC_DARK_RANGE_M, color: [0, 0, 0] });
+  assert.deepEqual(shadeFade(DUNGEON_BROWN, true, 'fog'), { range: 98.7, color: BROWN });
+  const dfuDungeon = { mode: 2, density: 0.005, end: 0, color: BLACK };
+  for (const target of ['black', 'fog']) {
+    const fade = shadeFade(dfuDungeon, true, target);
+    assert.deepEqual([fade?.range, Array.from(fade?.color ?? [])], [CLASSIC_DARK_RANGE_M, [0, 0, 0]], target);
+  }
+});
+
+test("a dungeon or a building is told by its opaque black clear, never the view out's transparent one", () => {
+  assert.equal(clearsIndoors(INTERIOR_CLEAR), true);
+  assert.equal(clearsIndoors(SKY_CLEAR), false);
+  assert.equal(clearsIndoors(VIEW_OUT_CLEAR), false);
+});
+
+test('outdoors both choices go to the fog colour over the fog distance; with the fog off nothing is shaded', () => {
+  const clear = { mode: 1, density: 0, end: 2400, color: [0.5, 0.6, 0.7] };
+  for (const target of ['black', 'fog']) {
+    assert.deepEqual(shadeFade(clear, false, target), { range: 2400, color: clear.color }, target);
+    assert.equal(shadeFade({ mode: 0, density: 0, end: 0, color: BLACK }, true, target), null, `${target}: fog off`);
+  }
 });
 
 /** What the fragment shader writes for a pixel whose surface is `distance` metres away along that pixel's ray. */
@@ -88,16 +117,16 @@ test("the shader picks the same step as shadeStep, by distance along each pixel'
 /** Every shader source the renderer compiled. */
 const compiled = (calls) => calls.filter((c) => c[0] === 'shaderSource').map((c) => c[2]);
 
-function worldFrames(r, n) {
+function worldFrames(r, n, fog = ['exp', 0.005, 0, 0, BLACK]) {
   for (let i = 0; i < n; i++) {
     r.beginFrame(I, I, L, WORLD_FRAME);
-    r.setFog('exp', 0.005, 0, 0, BLACK);
+    r.setFog(...fog);
     r.drawScreenQuad(null, { x: 0, y: 0, w: 1, h: 1 });
   }
 }
 
 test('off, the shading costs nothing: no program, pass, image or framebuffer of it, with retro mode off or on', () => {
-  for (const source of [null, () => false]) {
+  for (const source of [null, () => null]) {
     for (const retro of [null, retroCfg({ post: 3 })]) {
       const { canvas, calls } = stateGl();
       const r = new Renderer(canvas);
@@ -123,7 +152,7 @@ test('on, the world is drawn into a full-size image, shaded through its depth, t
   const { canvas, calls, errors, s } = stateGl();
   const r = new Renderer(canvas);
   let on = true;
-  r.setDistanceShadeSource(() => on);
+  r.setDistanceShadeSource(() => (on ? 'black' : null));
   try {
     worldFrames(r, 1);
     const frame = r.retroFrame;
@@ -153,7 +182,7 @@ test('with retro mode, the 320x200 image is shaded before the present palettizes
   const { canvas, s, errors } = stateGl();
   const r = new Renderer(canvas);
   r.setRetroSource(() => retroCfg({ post: 3 }));
-  r.setDistanceShadeSource(() => true);
+  r.setDistanceShadeSource(() => 'black');
   try {
     worldFrames(r, 1);
     const shade = s.draws.find((d) => d.prog?.locs?.has('uRange'));
@@ -163,5 +192,36 @@ test('with retro mode, the 320x200 image is shaded before the present palettizes
     assert.deepEqual(errors, []);
   } finally {
     setFrameTarget(null);
+  }
+});
+
+test('the renderer tells a dungeon from the outdoors by its clear colour, and fades as the choice says', () => {
+  const cases = [
+    {
+      clear: INTERIOR_CLEAR,
+      target: 'black',
+      range: CLASSIC_DARK_RANGE_M,
+      fade: [0, 0, 0],
+      what: 'a dungeon, to black',
+    },
+    { clear: INTERIOR_CLEAR, target: 'fog', range: 98.7, fade: [...BROWN], what: 'a dungeon, to its brown fog' },
+    { clear: SKY_CLEAR, target: 'black', range: 98.7, fade: [...BROWN], what: 'outdoors, to the fog colour' },
+  ];
+  for (const { clear, target, range, fade, what } of cases) {
+    const { canvas, s } = stateGl();
+    const r = new Renderer(canvas);
+    r.setDistanceShadeSource(() => target);
+    r.setClearColor(clear);
+    try {
+      worldFrames(r, 1, ['linear', 0, 1.76, 98.7, BROWN]);
+      const shade = s.draws.find((d) => d.prog?.locs?.has('uRange'));
+      assert.ok(Math.abs(shade.prog.values.uRange[0] - range) < 1e-4, `${what}: range ${shade.prog.values.uRange}`);
+      assert.ok(
+        shade.prog.values.uFade.every((v, i) => Math.abs(v - fade[i]) < 1e-6),
+        `${what}: fade ${shade.prog.values.uFade}`,
+      );
+    } finally {
+      setFrameTarget(null);
+    }
   }
 });

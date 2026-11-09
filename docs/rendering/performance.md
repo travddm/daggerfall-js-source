@@ -82,9 +82,11 @@ world frame, so a change applies on the next frame.
   section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
   Off and land view distance 3 in one press. It keeps the values it replaced in the `classicRenderingSaved` preference,
   and Off puts back each one that still holds the preset's value.
-- **Classic distance shading** (`src/render/classic-distance-shading.ts`, preference `classicDistanceShading`, off
-  by default). Before the present, one full-screen pass reads the image's depth and moves each pixel toward the
-  frame's fog colour in 64 steps: over 30 m to black indoors, over the fog's own distance outdoors. It needs the
+- **Classic distance shading** (`src/render/classic-distance-shading.ts`, preference `classicDistanceShading`:
+  `off` by default, `black` or `fog`). Before the present, one full-screen pass reads the image's depth and moves
+  each pixel in 64 steps toward a fade colour. Outdoors that is the fog colour, over the fog's own distance. Indoors
+  (the frame clears to black) `black` goes to black over 30 m, and `fog` goes to the frame's fog colour over its
+  distance, so a mod's coloured dungeon fog tints the far view. A black indoor fog gives 30 m either way. It needs the
   world in an image, so with retro mode and render scale off it opens a full-size one (the cost of the option, on top
   of the pass). Off, nothing of it is built; the renderer asks its source once per world frame.
 - Leaving all three returns to drawing straight to the canvas, and the renderer frees the image and depth it used.

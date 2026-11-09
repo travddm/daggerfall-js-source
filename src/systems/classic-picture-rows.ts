@@ -92,7 +92,8 @@ const CLASSIC_COLOURS_ROW: SettingsRow = Object.freeze({
   control: Object.freeze({ store: 'settings', key: 'Video/PostProcessingInRetroMode' }),
 });
 
-/** Off by default (decision 104). 'steps' is route A; route B, the original palette tables, would be a third tier. */
+/** Off by default (decision 104). Both choices are route A, and they differ only in where the steps lead (decision 126).
+ *  Route B, the original palette tables, would be a choice of its own. */
 const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   id: 'classic-distance-shading',
   group: 'sight',
@@ -102,9 +103,10 @@ const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   get note() {
     return t(
       'features.classicDistanceShading.note',
-      'Darkens the world in 64 steps with distance, as the original game did: to black in dungeons and buildings, ' +
-        'and to the fog colour outdoors. Made for Classic picture, but it works without it. The original game picked ' +
-        'one step for each surface; this picks one for each pixel.',
+      'Darkens the world in 64 steps with distance, as the original game did. To black: dungeons and buildings go to ' +
+        'black, and the outdoors to the fog colour. To fog colour: every place goes to its own fog colour, so a mod ' +
+        'that colours the fog, as Better Ambience does in dungeons, tints the far view. Made for Classic picture, but ' +
+        'it works without it. The original game picked one step for each surface; this picks one for each pixel.',
     );
   },
   get effect() {
@@ -118,7 +120,8 @@ const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
     online: 'player',
     tiers: Object.freeze([
       tier('off', () => localizedText('off', 'Off')),
-      tier('steps', () => t('features.classicDistanceShading.steps', 'Steps')),
+      tier('black', () => t('features.classicDistanceShading.black', 'To black')),
+      tier('fog', () => t('features.classicDistanceShading.fog', 'To fog colour')),
     ]),
   }),
 });

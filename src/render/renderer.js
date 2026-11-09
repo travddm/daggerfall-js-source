@@ -1719,7 +1719,7 @@ export class Renderer {
     this._retroOwed = false;    // a retro image is drawn and not yet presented
     this._retroMips = true;     // whether the world's textures read their mip chains (TextureReader's retro arm)
     this._shade = null;         // the DistanceShadePass, built on the first shaded frame
-    this._shadeSource = null;   // whether classic distance shading is on; main.js hands it in, as the retro source
+    this._shadeSource = null;   // classic distance shading's target, null while off; main.js hands it in, as the retro source
     // PERF-SCALE: the render scale's source (systems/renderScale.js renderScaleSetting, handed over by main.js as the
     // retro source is) - a function answering the frame's scale, 1 the whole canvas. Null (every test's) is 1
     this._scaleSource = null;
@@ -2976,11 +2976,11 @@ export class Renderer {
 
   /** Classic distance shading over the world image, before the present palettizes it (render/classic-distance-shading.ts). */
   _shadeWorldImage(f) {
-    const image = this._retro.target;
-    if (!image) return;
+    const target = this._shadeSource?.(), image = this._retro.target;
+    if (!target || !image) return;
     this._shade ??= new DistanceShadePass(this.gl, { build: (vs, fs) => this._buildProgram(vs, fs) });
     const fog = { mode: this._fogMode, density: this._fogDensity, end: this._fogRange[1], color: this._fogColor };
-    this._shade.draw({ color: image.tex, depth: f.depth ?? image.depth, width: image.w, height: image.h, proj: this._proj, fog });
+    this._shade.draw({ color: image.tex, depth: f.depth ?? image.depth, width: image.w, height: image.h, proj: this._proj, fog, clear: this._clearColor, target });
   }
 
   /** RETRO1: the RetroPass, built once. */
@@ -3005,7 +3005,7 @@ export class Renderer {
     const f = this._retroFrame;
     try {
       if (this._retro && f) {
-        if (this._shadeSource?.()) this._shadeWorldImage(f);
+        this._shadeWorldImage(f);
         this._retro.present({
           depth: f.depth, rect: this._viewportPx(f.view) ?? [0, 0, this.canvas.width, this.canvas.height], canvasW: this.canvas.width, canvasH: this.canvas.height,
           post: f.post, lutShift: f.lutShift, clear: this._clearColor, scissor: this._scissor,
@@ -3047,7 +3047,7 @@ export class Renderer {
   /** PERF-SCALE: where the renderer asks for each WORLD frame's render scale - systems/renderScale.js
    *  renderScaleSetting, handed over by main.js; null (the default, and every test's) is 1, today's frame. */
   setRenderScaleSource(fn) { this._scaleSource = typeof fn === 'function' ? fn : null; }
-  /** Where the renderer asks whether classic distance shading is on, once per world frame. Null (every test's) is off. */
+  /** Where the renderer asks classic distance shading's target ('black' or 'fog', null and no source off) per world frame. */
   setDistanceShadeSource(fn) { this._shadeSource = typeof fn === 'function' ? fn : null; }
   /** The frame's size for the FPS counter: the world image, the canvas, the devicePixelRatio, the render scale the
    *  last world frame took (1 under retro or at 100%) and the GPU. The counter asks once a second. */

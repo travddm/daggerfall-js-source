@@ -64,7 +64,7 @@ test('the Classic rendering row turns on the classic picture through the real st
     assert.deepEqual([config?.width, config?.height, config?.post, config?.mipmaps], [320, 200, 3, false]);
     assert.equal(getString('Video', 'RetroModeAspectCorrection'), '1');
     assert.equal(getPref('groundSharpness'), 'off');
-    assert.equal(getPref('classicDistanceShading'), 'steps');
+    assert.equal(getPref('classicDistanceShading'), 'black');
     assert.equal(rowValue('land-view-distance'), 'Classic (3)', 'land view went through its own door');
     assert.equal(drawRow().on.attrs['aria-pressed'], 'true', 'a redrawn row reads On');
     press(drawRow().off);

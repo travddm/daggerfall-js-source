@@ -11,7 +11,7 @@ before you add anything that runs every frame.
 2. Creates the one `Renderer` (`src/render/renderer.js`) on the canvas. Every scene uses this renderer; no scene
    creates a second WebGL context for the world.
 3. Gives the renderer its per-frame setting sources: `setRetroSource(retroFrameConfig)`,
-   `setRenderScaleSource(renderScaleSetting)` and `setDistanceShadeSource(classicDistanceShadingOn)`. The renderer
+   `setRenderScaleSource(renderScaleSetting)` and `setDistanceShadeSource(classicDistanceShading)`. The renderer
    asks them once per world frame, so a settings change applies on the next frame.
 4. Loads the language (`src/scenes/localeData.js` `initLocale`), mounts the FPS counter (`src/ui/fpsCounter.js`) and,
    in the desktop app, the update notice.
