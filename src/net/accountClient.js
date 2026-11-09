@@ -69,13 +69,12 @@ import { busyRead, busyAnswer, busyWaitMs, retryAfterMs, BUSY_HOLD_MS } from './
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the arena's refusals, in its own frozen table
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
 import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HOLD-SAID: the standing hold's own notice
-import { MINT_VERSION } from './productRecord.js';   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
+import { MINT_VERSION } from './productRecord.js';
+import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
 
-/** WHERE THE SERVICE IS. Its own constant beside the relay's
- *  DEFAULT_SERVER (net/online.js), because they are two Workers and
- *  ACC0's whole argument is that they deploy apart - a player pointing
- *  at a test relay has not moved their account. */
-export const DEFAULT_ACCOUNT_SERVICE = 'https://daggerfall-accounts.mackcothran.workers.dev';
+/** There is no built-in account service (decision 116 (8)): the relay a player enters names its own
+ *  (net/account-service-address.ts). Empty is no service. The deploy workflows read this line with grep. */
+export const DEFAULT_ACCOUNT_SERVICE = '';
 
 /** The bounds the SERVICE enforces, restated here for the field caps
  *  alone. `password.js` PASSWORD_MIN/MAX and `guestName.js` HANDLE_RE
@@ -93,7 +92,7 @@ export const HANDLE_MAX_LEN = 24;
  *  credentials at once, so the merge belongs there - and two different
  *  credentials under one key is how a player gets signed out of both. */
 export const SESSION_KEY = 'dagger.account.session';
-export const SERVICE_KEY = 'dagger.account.service';
+export { SERVICE_KEY } from './account-service-address.ts';
 
 /**
  * WHAT A REFUSAL MEANS, IN WORDS A PLAYER CAN ACT ON.
@@ -2323,11 +2322,8 @@ export function accountWrits({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
   };
 }
 
-/** The service this device talks to. Overridable the same way the
- *  relay is, so a test deployment can be pointed at without a build. */
+/** The service this device talks to: a developer's override, then what the player's relay named
+ *  (net/account-service-address.ts accountServiceOf). */
 export function serviceBase(storage) {
-  try {
-    const v = storage?.getItem?.(SERVICE_KEY);
-    return (typeof v === 'string' && /^https:\/\/\S+$/.test(v)) ? v : DEFAULT_ACCOUNT_SERVICE;
-  } catch { return DEFAULT_ACCOUNT_SERVICE; }
+  return accountServiceOf(storage, DEFAULT_ACCOUNT_SERVICE);
 }

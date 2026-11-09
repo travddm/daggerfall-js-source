@@ -16,7 +16,7 @@
     "src/formats/blocksFile.js": 1008,
     "src/formats/morrowind/mwFirstPerson.js": 2476,
     "src/formats/morrowind/mwNifFile.js": 1138,
-    "src/net/accountClient.js": 2333,
+    "src/net/accountClient.js": 2329,
     "src/net/gate/gateBrain.js": 2315,
     "src/net/npcChapterLaw.js": 1427,
     "src/net/online.js": 4050,

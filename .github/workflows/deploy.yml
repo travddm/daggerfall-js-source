@@ -93,9 +93,10 @@ jobs:
         run: |
           set -euo pipefail
           v=$(grep -oP "^export const ACCOUNT_VERSION = '\K[^']+" server-account/src/service.js)
-          base=$(grep -oP "^export const DEFAULT_ACCOUNT_SERVICE = '\K[^']+" src/net/accountClient.js)
+          base=$(grep -oP "^export const DEFAULT_ACCOUNT_SERVICE = '\K[^']+" src/net/accountClient.js || true)
           test -n "$v" || { echo "::error::could not read ACCOUNT_VERSION from server-account/src/service.js"; exit 1; }
-          test -n "$base" || { echo "::error::could not read DEFAULT_ACCOUNT_SERVICE from src/net/accountClient.js"; exit 1; }
+          # Empty is no built-in account service (decision 116 (8)): the site then waits on none.
+          test -n "$base" || echo "::notice::DEFAULT_ACCOUNT_SERVICE is empty - the site waits on no account service"
           { echo "version=$v"; echo "base=$base"; } >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v4
@@ -182,7 +183,8 @@ jobs:
           BASE: ${{ needs.site.outputs.account_base }}
         run: |
           set -euo pipefail
-          test -n "$WANT" && test -n "$BASE" || { echo "::error::the site job named no account service"; exit 1; }
+          test -n "$WANT" || { echo "::error::the site job named no account version"; exit 1; }
+          if [ -z "$BASE" ]; then echo "no built-in account service - nothing to wait on"; exit 0; fi
           n() { printf '%s' "$1" | grep -oE '[0-9]+$' || echo -1; }
           for i in $(seq 1 1050); do
             got=$(curl -fsS --max-time 15 "$BASE/v1/health" | sed -n 's/.*"v":"\([^"]*\)".*/\1/p' || true)
