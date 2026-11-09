@@ -1,6 +1,6 @@
 // The row law the translation tools share (tools/l10nReview.mjs, tools/l10nCoverage.mjs): which placeholders a
 // translation must keep, and who owns a row of `locales/<tag>/Port_Strings.csv`. Moved whole out of the removed machine
-// translation pipeline (decision 116 (12)); the tools no longer draft rows, so every row is a person's.
+// translation pipeline; the tools no longer draft rows, so every row is a person's.
 import { createHash } from 'node:crypto';
 import { parseMessage } from '../../src/systems/textManager.js';
 

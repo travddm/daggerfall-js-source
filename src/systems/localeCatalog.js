@@ -8,7 +8,7 @@
 // scenes/localeData.js's.
 
 /** English first, then by English name. `hidden` keeps a locale out of the picker (the pseudo-locale is ?lang= only).
- *  Every language stays listed so that a pack the player installs for it is offered (decision 123). */
+ *  Every language stays listed so that a pack the player installs for it is offered. */
 export const LOCALE_CATALOG = Object.freeze([
   { code: 'en', name: 'English', englishName: 'English', script: 'latin', source: 'base' },
   { code: 'bg', name: 'Български', englishName: 'Bulgarian', script: 'cyrillic' },
