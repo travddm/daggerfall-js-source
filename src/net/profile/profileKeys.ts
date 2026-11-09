@@ -124,7 +124,7 @@ export const PROFILE_KEYS = Object.freeze({
   }),
   // Whether a quest that ends unfinished online costs its faction nothing. DFU takes 2 reputation, spread through the
   // faction's allies and enemies (Quest.cs EndQuest). The cost was waived when deadlines ran on the character's clock in
-  // travel and rest; a deadline now charges only the time lived (audit SS2, SS17), so ON32's row is the census.
+  // travel and rest; a deadline now charges only the time lived.
   'quest.failureFree': Object.freeze({
     census: Object.freeze(['ON32'] as const),
     feature: 'QFAIL-FREE',
