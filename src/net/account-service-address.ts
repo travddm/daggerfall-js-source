@@ -16,13 +16,6 @@ type Store = { getItem(key: string): string | null; setItem(key: string, value: 
 export const isServiceUrl = (value: unknown): value is string =>
   typeof value === 'string' && /^https:\/\/\S+$/.test(value);
 
-/** The URL of `path` on the service at `base`. A blank base (no service known yet) throws, so the caller's
- *  network-failure branch answers instead of a request to the page's own host. */
-export function serviceUrl(base: string | null | undefined, path: string): string {
-  if (!base) throw new TypeError('no account service is known');
-  return `${base}${path}`;
-}
-
 function readStored(storage: Store, key: string): string | null {
   try {
     return storage?.getItem?.(key) ?? null;

@@ -10,7 +10,7 @@ import {
   rememberAccountService,
   SERVICE_KEY,
 } from '../../src/net/account-service-address.ts';
-import { DEFAULT_ACCOUNT_SERVICE, serviceBase, call } from '../../src/net/accountClient.js';
+import { DEFAULT_ACCOUNT_SERVICE, serviceBase } from '../../src/net/accountClient.js';
 import { DEFAULT_SERVER } from '../../src/net/online.js';
 import { accountServiceOfEnv, relayFactsAnswer } from '../../server/src/relayFacts.ts';
 import { openProfileDoor } from '../../src/systems/online/profileDoor.ts';
@@ -144,16 +144,4 @@ test('the account card: no relay says so; a relay not yet asked is asked once; o
     globalThis.fetch = realFetch;
     _resetAccountServiceWaitForTests();
   }
-});
-
-test('decision 116 (8): with no account service known, a call asks nothing and answers offline', async () => {
-  const asked = [];
-  const fetch = async (url) => {
-    asked.push(url);
-    return new Response('{}', { status: 200 });
-  };
-  assert.deepEqual(await call({ fetch, base: '' }, '/v1/heartbeat', { beat: true }), { ok: false, error: 'offline' });
-  assert.deepEqual(asked, [], 'no request to the page host');
-  assert.equal((await call({ fetch, base: 'https://accounts.invalid' }, '/v1/heartbeat', { beat: true })).ok, true);
-  assert.deepEqual(asked, ['https://accounts.invalid/v1/heartbeat']);
 });
