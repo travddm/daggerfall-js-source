@@ -50,11 +50,9 @@ test('REVENANT WHO: a special foe of level 3 or more - an elite, a champion, a r
   assert.equal(N.revenantCandidate(orc()), true, 'a champion');
   assert.equal(N.revenantCandidate(orc({ champion: undefined, eliteFoe: true })), true, 'an elite');
   assert.equal(N.revenantCandidate(orc({ champion: undefined, revenant: { id: 'x' } })), true, 'a revenant already');
-  assert.equal(N.revenantCandidate(orc({ champion: undefined })), true, 'a plain foe too: the mod runs on any regular foe');
-  setPref('revenantWho', 'elite');
-  assert.equal(N.revenantCandidate(orc({ champion: undefined })), false, 'a plain foe never, when the row says elites and champions only');
-  assert.equal(N.revenantCandidate(orc()), true, '...a champion still');
+  assert.equal(N.revenantCandidate(orc({ champion: undefined })), false, 'a plain foe never, by default: the row says elites and champions only');
   setPref('revenantWho', 'any');
+  assert.equal(N.revenantCandidate(orc({ champion: undefined })), true, 'a plain foe too, when the row says any regular foe');
   assert.equal(N.revenantCandidate(orc({ staffBoss: { size: 2 } })), false, 'a staff event boss');
   assert.equal(N.revenantCandidate(orc({ bossTraits: ['warded'] })), false, 'a boss with traits');
   assert.equal(N.revenantCandidate(orc({ level: 2 })), false, 'under the floor');

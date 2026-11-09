@@ -1021,7 +1021,7 @@
     "src/systems/equip.js": 13,
     "src/systems/eventBoard.js": 39,
     "src/systems/eventTimers.js": 96,
-    "src/systems/features.js": 58,
+    "src/systems/features.js": 60,
     "src/systems/festival/festivalClient.js": 13,
     "src/systems/fishAct.js": 10,
     "src/systems/fleet.js": 5,

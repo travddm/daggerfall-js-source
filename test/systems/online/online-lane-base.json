@@ -8,7 +8,7 @@
     "enhancedCombatVisuals": true,
     "lootRarity": true,
     "revenants": true,
-    "revenantWho": "any",
+    "revenantWho": "elite",
     "revenantSpare": "join",
     "revenantRank": "2",
     "revenantFlee": "normal",

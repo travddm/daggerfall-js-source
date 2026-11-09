@@ -48,6 +48,7 @@ beforeEach(() => {
   _resetForTests();
   setPref('lootRarity', false);
   setPref('revenants', true);
+  setPref('revenantWho', 'any'); // most cases run with any regular foe; the default (elites and champions) is read in its own tests
   setPref('revenantRenown', 'none'); // the mod runs with Loot rarity off, as a Daggerfall-only game has it
   N._resetRevenantForTests();
   RC._resetRetinueForTests();
@@ -58,6 +59,7 @@ beforeEach(() => {
 });
 
 test('the choices read as the row defaults, and a pref holding anything else reads as the default', () => {
+  setPref('revenantWho', undefined);
   assert.deepEqual(
     [
       O.revenantAnyFoe(),
@@ -67,7 +69,7 @@ test('the choices read as the row defaults, and a pref holding anything else rea
       O.revenantFleeFactor(),
       O.revenantReturnWindow(),
     ],
-    [true, 0, true, 2, 1, [1440, 4320]],
+    [false, 0, true, 2, 1, [1440, 4320]],
   );
   setPref('revenantRenown', 'lots');
   setPref('revenantFlee', 7);
@@ -79,7 +81,7 @@ test('the row declares every choice: a default each, and online every one but th
   const keys = ['revenantWho', 'revenantRenown', 'revenantSpare', 'revenantRank', 'revenantFlee', 'revenantReturn'];
   assert.deepEqual(
     keys.map((k) => FEATURE_PREF_DEFAULTS[k]),
-    ['any', 'none', 'join', '2', 'normal', 'normal'],
+    ['elite', 'none', 'join', '2', 'normal', 'normal'],
   );
   assert.deepEqual(
     keys.map((k) => FEATURE_PREF_ONLINE[k]),
@@ -90,8 +92,11 @@ test('the row declares every choice: a default each, and online every one but th
   assert.ok(!Object.hasOwn(OFFICIAL_PROFILE.pins.prefs, 'revenantRenown'), 'the Renown wait stays with the player');
 });
 
-test('with Loot rarity off a plain foe becomes a revenant; "elites and champions" keeps the old rule; a boss never does', () => {
+test('with Loot rarity off a plain foe becomes a revenant when "any regular foe" is chosen; the default keeps elites and champions; a boss never does', () => {
   assert.equal(N.revenantOn(), true, 'the row alone switches the mod');
+  setPref('revenantWho', undefined);
+  assert.equal(N.revenantCandidate(plainFoe()), false, 'by default only an elite or a champion');
+  setPref('revenantWho', 'any');
   assert.ok(N.revenantDeed(me(), plainFoe(), 'fled', { mobileType: 2, rolls: () => 0.5 }), 'a plain foe rises');
   setPref('revenantWho', 'elite');
   assert.equal(N.revenantCandidate(plainFoe()), false);

@@ -13,7 +13,7 @@ const tier = (value, label) => Object.freeze(Object.defineProperty([value], 1, {
 export const REVENANTS_PREF = 'revenants';
 /** The row's choices, their prefs and defaults (revenantsOn.js reads them). */
 export const REVENANT_CHOICES = Object.freeze({
-  who: Object.freeze({ key: 'revenantWho', initial: 'any' }),
+  who: Object.freeze({ key: 'revenantWho', initial: 'elite' }),
   renown: Object.freeze({ key: 'revenantRenown', initial: 'none' }),
   spare: Object.freeze({ key: 'revenantSpare', initial: 'join' }),
   rank: Object.freeze({ key: 'revenantRank', initial: '2' }),
@@ -39,13 +39,14 @@ const part = (/** @type {{ key: string }} */ c, /** @type {() => string} */ labe
   });
 
 /** Each choice with its label and tiers, read twice: as the covered pref (also) and as the part the screen draws. */
+/** @type {Array<[{ key: string, initial: string }, () => string, any[]]>} */
 const SPECS = [
   [
     REVENANT_CHOICES.who,
     () => t('features.revenants.who', 'Who rises'),
     [
-      tier('any', () => t('features.revenants.who.any', 'Any foe')),
       tier('elite', () => t('features.revenants.who.elite', 'Elites and champions')),
+      tier('any', () => t('features.revenants.who.any', 'Any regular foe')),
     ],
   ],
   [

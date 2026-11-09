@@ -28,7 +28,7 @@ const PREFS = Object.freeze({
   wildernessCamps: true,
   naval: false,
   revenants: true,
-  revenantWho: 'any',
+  revenantWho: 'elite',
   revenantSpare: 'join',
   revenantRank: '2',
   revenantFlee: 'normal',

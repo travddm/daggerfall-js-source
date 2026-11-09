@@ -236,8 +236,8 @@ test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" -
     return kids.map((k) => k.textContent).join(' | ');
   };
   online(9);
-  assert.match(note(), /No foe has earned your name yet. From Renown 10, a foe that kills you, or breaks, runs and gets away, will remember you and come back for you./);
+  assert.match(note(), /No foe has earned your name yet. From Renown 10, an elite or champion that kills you, or breaks, runs and gets away, will remember you and come back for you./);
   online(10);
-  assert.match(note(), /No foe has earned your name yet. A foe that kills you/);
+  assert.match(note(), /No foe has earned your name yet. An elite or champion that kills you/);
 });
 
