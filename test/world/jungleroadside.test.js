@@ -21,6 +21,7 @@ import {
 import { JUNGLE, withJungle, jungleLayout, pairTile } from '../../src/world/terrain/jungleNature.js';
 import { groundAt } from '../../src/world/terrain/terrainNature.js';
 import { surfaceHeightAt } from '../../src/world/terrain/terrainSurface.js';
+import { setSlopeCut } from '../../src/world/terrain/terrain-quad-cut.ts';   // TERRAIN-CUT: the saddle read in both settings
 import { trailClear } from '../../src/world/jungle/jungleTrails.js';
 import { HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, SCALED_BEACH_ELEVATION, TERRAIN_SIZE as PIXEL_M } from '../../src/world/terrain/terrainSampler.js';
 import { MAP_W, MAP_H } from '../../src/world/road/roadNetwork.js';
@@ -367,12 +368,21 @@ test('JUNGLE-ROADSIDE THE DRAWN GROUND\'S LOWEST AND HIGHEST, exactly: lowestDra
     const hi = highestDrawn(hm, [at(-1, -1), at(1, -1), at(1, 1), at(-1, 1)]);
     assert.ok(hi >= fine - 1e-9 && hi <= fine + 0.01, `the highest over (${x}, ${z}): ${hi} against the walk's ${fine}`);
   }
-  // a saddle: two corners of a cell raised across the diagonal its ground is cut on - the drawn ground at the cell's
-  // middle is the diagonal's, 2 m under the bilinear's
+  // a saddle: two corners of a cell raised across the fixed diagonal. Off (DFU's cut) the middle is that diagonal's, 2 m
+  // under the bilinear's; with the slope cut on the cell is cut along them (a ridge's crest joined), 2 m over it
   const saddle = new Float32Array(H * H).fill(100 / yScale);
   saddle[10 * H + 11] += 4 / yScale; saddle[11 * H + 10] += 4 / yScale;
   const mx = 10.5 * CELL, mz = 10.5 * CELL;
-  assert.ok(near(groundAt(saddle, mx, mz), 102, 1e-3) && near(lowestDrawn(saddle, mx, mz, 0.5), 100, 1e-3), 'the drawn ground\'s, not the bilinear\'s');
+  for (const [on, middle] of [[false, 100], [true, 104]]) {
+    setSlopeCut(on);
+    try {
+      let saddleFine = Infinity;
+      for (let t = 0; t < 2 * Math.PI; t += 0.0002) saddleFine = Math.min(saddleFine, surfaceHeightAt(saddle, mx + 0.5 * Math.cos(t), mz + 0.5 * Math.sin(t)));
+      assert.ok(near(groundAt(saddle, mx, mz), 102, 1e-3) && near(surfaceHeightAt(saddle, mx, mz), middle, 1e-3) && near(lowestDrawn(saddle, mx, mz, 0.5), saddleFine, 1e-6), `the drawn ground's, not the bilinear's (slope cut ${on})`);
+    } finally {
+      setSlopeCut(false);
+    }
+  }
 });
 
 test('JUNGLE-ROADSIDE SUNK, NEVER FLOATING: a pair stands 0.3 m under the lowest drawn ground beneath either foot - nowhere under its feet is the ground within 0.3 m of it, and under one it is exactly that; a trunk buried more than 3 m stands none; the road under its lianas keeps 2.75 m under each of their cells, and 2.75 m under UNDER_TOP anywhere under the pair (mutants: the highest ground taken; the sink raised out of the ground or dropped; the burial unasked or moved; the headroom moved or unscaled; the cells over the band unasked; the road\'s highest unasked)', () => {

@@ -280,5 +280,7 @@ test('TAMRIEL2-WORKER: every module the terrain worker reaches, at any depth, li
   // world/lands/landPropMesh.js), RED-MOUNTAIN's cone (world/tamriel/redMountain.js) and SOLITUDE-RELIEF's rock
   // (world/solitudeRelief.js, world/terrain/capitalRelief.js), each fold under the ceiling alone and the three at it - all pure.
   // (world/road/roadEdge.js), both pure
-  assert.ok(seen.size > 20 && seen.size < 73, `${seen.size} modules`);
+  // world/terrain/terrain-quad-cut.ts, which cuts the grid's triangles on the worker, is pure; its one import is the sampler
+  // the worker holds already.
+  assert.ok(seen.size > 20 && seen.size < 74, `${seen.size} modules`);
 });

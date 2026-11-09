@@ -188,7 +188,7 @@ const workOf = (/** @type {any} */ book, /** @type {string} */ k) => (typeof boo
 export function setProfessionsPages(p) { _provider = p ?? null; }
 /** What a locked specialisation's card says it waits for (professionLaw.js `later`). */
 const LATER_WORDS = Object.freeze({
-  get SEAT2() { return t('prof.page.later.seat2', 'Comes with the sieges'); }, get SEAT2b() { return t('prof.page.later.seat2b', 'Comes with the fortifications'); },   // PROF11: the Builder's and the Fortifier's
+  get SEAT2() { return t('prof.page.later.seat2', 'Comes with the sieges'); },   // PROF11: the Builder's and the Fortifier's
   // PROF7 (Professions-Arc.md 29): what DFU gives these nothing to stand as - for Mac (HUNTERS-MARK built the trophy)
   get 'two-colour'() { return t('prof.page.later.twoColour', 'Comes when cloth can take a second dye'); },   // AUDIT 32 R11: never "DFU" where a player reads it; BR5: nor the game's name - the original game, the classic
   get wagon() { return t('prof.page.later.wagon', 'Comes when wagons can be upgraded'); },
@@ -465,9 +465,6 @@ function purseShort(station, which) {
 /** What a Stores material of the smith's stock says in place of a withdrawal. */
 export const STOCK_STAYS_LINE = 'It stays at the bench for the anvil and the workbench to use.';   // PROF4: a counter's good with no pack form - none since PROF7 registered them all (NO_PACK_FORM empty), kept for a material to come
 const stockStaysLine = () => t('prof.page.stores.stockStays', STOCK_STAYS_LINE);
-/** SEAT2b part two: what a siege work (the Ram Kit) says in place of a withdrawal - its road is a Siege Camp's writ. */
-export const SIEGE_STAYS_LINE = 'Siege works stay in your Stores. Deliver them to your guild\'s Siege Camp with a writ on a Notice Board\'s Work tab.';
-const siegeStaysLine = () => t('prof.page.stores.siegeStays', SIEGE_STAYS_LINE);
 /** AUDIT PROF12 E1: what Arcane Essence says in place of a withdrawal - it never goes to the pack (NO_PACK_FORM). */
 export const ESSENCE_STAYS_LINE = 'Arcane Essence stays in your Stores and can\'t go to your pack. Sell it on the Market tab.';
 const essenceStaysLine = () => t('prof.page.stores.essenceStays', ESSENCE_STAYS_LINE);
@@ -477,7 +474,7 @@ const planeDownLine = () => t('prof.page.bench.down', 'You set the plane down; n
 const needleDownLine = () => t('prof.page.loom.down', 'You set the needle down; nothing is spent.');
 /** BAG1: what a material with no pack form says where Withdraw would stand - an essence's, a siege work's, the stock's -
  *  one law for the Stores page and the bag's page beside it (L10N4: in the player's language). */
-const staysLine = (pick) => (pick.family === 'essences' ? essenceStaysLine() : pick.family === 'siege' ? siegeStaysLine() : stockStaysLine());
+const staysLine = (pick) => (pick.family === 'essences' ? essenceStaysLine() : stockStaysLine());
 /**
  * AUDIT 32 P12: ESCAPE SETS AN ACT DOWN before it closes the window (AUDIT 31's law: Escape closes a form before the
  * window) - the heat, the plane or the stitch under way let go, nothing spent, and said. It closed the pause window, and
@@ -1033,8 +1030,8 @@ export function storesRows(stores, { family = null, query = '', sort = 'tier' } 
 
 /** A Stores card's split: own, bought and (GOLD-MARKET) bought with gold - "own" alone where nothing was bought. AUDIT
  *  BAG-CRAFT A1: and what a station's put-in brought from the pack, loose. FB1020h ESSENCE-LOOSE: a material with no pack
- *  form (Arcane Essence, a Ram Kit) never came from the pack itself - its loose units were MADE of goods that did (a piece
- *  of them disenchanted, a kit of them built), and say so. */
+ *  form (Arcane Essence) never came from the pack itself - its loose units were MADE of goods that did (a piece
+ *  of them disenchanted), and say so. */
 export function storesSplit(r) {
   const gold = r.gold | 0, loose = r.loose | 0;
   const own = () => t('prof.page.stores.own', '{n} own', { n: r.own }), bought = () => t('prof.page.stores.bought', '{n} bought', { n: r.bought });
@@ -1127,7 +1124,7 @@ export function drawStoresPage(detail, rerender, kit) {
     detail.append(bar);
     detail.append(el('p', 'px-note', withdrawable(pick.material)
       ? t('prof.page.stores.withdrawNote', 'A withdrawn material becomes an item in your pack and can\'t go back into the Stores. Writs are delivered on a Notice Board\'s Work tab.')
-      : staysLine(pick)));   // SEAT2b part two: a siege work's road
+      : staysLine(pick)));
     if ((pick.gold | 0) > 0) detail.append(el('p', 'px-note', goldGoodsLine(pick.material)));
     if ((pick.loose | 0) > 0) detail.append(el('p', 'px-note', looseGoodsLine(pick.material)));   // AUDIT BAG-CRAFT A1: an older book's page (another device's put-in)
   }
@@ -1915,11 +1912,9 @@ function heartwoodToggle(box, el, r, book, state, rerender, locked = false) {
   lab.append(cb, globalThis.document.createTextNode(` ${t('prof.page.heartwood', 'Use a Heartwood for a plank one grade better ({n} stored)', { n: have })}`));
   box.append(lab);
 }
-/** The workbench's families, in its row's order: staves and bows by wood, the arrows, the furniture by wood, the Basket,
- *  the Ram Kit. */
+/** The workbench's families, in its row's order: staves and bows by wood, the arrows, the furniture by wood, the Basket. */
 export const BENCH_FAMILIES = Object.freeze([wordRow('staves', () => t('prof.page.family.staves', 'Staves')), wordRow('bows', () => t('prof.page.family.bows', 'Bows')),
-  wordRow('arrows', () => localizedText('Arrows', 'Arrows')), wordRow('furniture', () => t('prof.page.family.furniture', 'Furniture')), wordRow('tools', toolsWord),
-  wordRow('siege', () => t('prof.page.family.siege', 'Siege'))]);
+  wordRow('arrows', () => localizedText('Arrows', 'Arrows')), wordRow('furniture', () => t('prof.page.family.furniture', 'Furniture')), wordRow('tools', toolsWord)]);
 /** The woods a family is shown by - every wood for the staves and bows, DFU's furniture's four and the beds' for the
  *  furniture; none for the rest. */
 const WOODS_OF = Object.freeze({ staves: WOODS.map((w) => `plank:${w.id}`), bows: WOODS.map((w) => `plank:${w.id}`), furniture: ['plank:pine', 'plank:oak', 'plank:cherry', 'plank:mahogany', 'plank:teak'] });
@@ -2058,7 +2053,6 @@ function drawWorkbench(detail, rerender, kit) {
     const chain = chainNote(box, el, p, book, spends);   // CRAFT1: the works it runs first
     _bench.chained = chain?.ok === true;   // AUDIT CRAFT1 F1: a craft pressed now runs its chain - the work rows held under it
     if (r.later) box.append(el('p', 'px-note', t('prof.page.later.anyLine', 'Comes with a later work.')));   // a recipe named before its slice (none since SEAT2b part two)
-    else if (r.kind === 'siege') box.append(el('p', 'px-note', t('prof.page.bench.ramKit', 'A Ram Kit goes to your Stores. Deliver it to your guild\'s Siege Camp with a seat writ. If the camp wins a Right of Siege, it goes to the battle against a Gatehouse.')));   // SEAT2b part two: a siege work's road
     else if (r.kind === 'arrows') box.append(el('p', 'px-note', t('prof.page.bench.arrows', 'Makes a quiver of 20 arrows. Arrows have no quality.')));
     else if (r.family === 'furniture') box.append(el('p', 'px-note', t('prof.page.bench.furniture', 'Furniture goes to your things. Place it in a room of your own with Decorate.')));
     if (takesQuality(r) && recipeOpen(r, rank)) {

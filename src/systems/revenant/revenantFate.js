@@ -11,16 +11,19 @@
 //  - KILL: an EXECUTION plays where it knelt - its last words, the blow, a burst of blood and a flash, and the body
 //    burning away from the feet up in embers (systems/dissolve.js) - and where it stood lies a pile: everything it
 //    carried and its TROPHY. Its record closes for good (executed).
-//  - SPARE: it rises, steps into a portal, and is SWORN (systems/revenant/revenantCompanions.js) - a companion from then on.
+//  - SPARE: it rises, steps into a portal, and is SWORN (systems/revenant/revenantCompanions.js) - a companion from then on,
+//    or, as the row says, leaves for good.
 //  - HESITATE (REVENANT_YIELD_MS kneeling, or walk REVENANT_YIELD_REACH away) and it SLIPS AWAY - an escape, its rank
 //    up, its words about your hesitation.
 // Online the choice is its owner's (a revenant is its character's memory): a peer sees it kneel, and burn.
 //
 // PURE but for the clock and the records it is handed - the pools (scenes/exteriorFoes.js, scenes/dungeonContext.js)
 // call in, and draw what it answers.
-import { revenantById, revenantOn, revenantYielded, revenantExecuted, revenantSpared, revenantMomentEvent, revenantPortrait, revenantRankNumeral } from './revenant.js';
+import { revenantById, revenantOn, revenantYielded, revenantExecuted, revenantSpared, revenantCompanionUpdate, revenantMomentEvent, revenantPortrait, revenantRankNumeral } from './revenant.js';
 import { revenantTrophy, trophyKindWords } from './revenantTrophy.js';
 import { PERSONALITIES } from './revenantPersonality.js';
+import { revenantSpareJoins } from './revenantsOn.js';
+import { t } from '../textManager.js';
 import { retinueHasRoom, swornPlace, REVENANT_RETINUE_MAX, setRetinuePlayer, holdSworn } from './revenantCompanions.js';
 import { companionsWithYou, COMPANION_SLOTS } from '../companionSlots.js';
 import { enemyDisplayName } from '../../characters/enemy/enemyBasics.js';
@@ -124,20 +127,33 @@ export function dropFateHeld(list) {
   return list;
 }
 
-/** SPARE chosen: sworn - at the player's side while a slot is free, else away. Answers { r, state, event }, or null
- *  when the retinue has no room (the window never offers it then). */
+/** The Spare row's detail and confirm: where a sworn one would stand, or that it leaves for good (the row's choice). */
+function spareWords(r, { joins, room, free, used }) {
+  if (!joins) return { detail: t('rvn.spare.leaveDetail', '{given} swears off the feud and leaves for good', { given: r.given }), confirm: t('rvn.spare.leaveConfirm', 'Spare {name}? It will leave for good.', { name: r.name }) };
+  const detail = !room ? `You keep ${REVENANT_RETINUE_MAX} sworn already - release one first`
+    : free ? `It joins you as a companion (${used + 1} of ${COMPANION_SLOTS})`
+      : `It is sworn to you, and waits until you call it (your ${COMPANION_SLOTS} companion slots are full)`;
+  return { detail, confirm: free ? `Spare ${r.name}? It will walk at your side.` : `Spare ${r.name}? It will wait, sent away, until you call it.` };
+}
+/** The line a spared one is sworn, or leaves, by. */
+function spareBody(r, joins, state) {
+  if (!joins) return t('rvn.spare.leaveBody', '{given} swears off the feud and leaves you in peace.', { given: r.given });
+  return state === 'with' ? `Sworn to you. ${r.given} walks at your side now.` : `Sworn to you. Your companions are full, so ${r.given} waits until you call it.`;
+}
+/** SPARE chosen: sworn - at the player's side while a slot is free, else away - or, as the row says, gone for good. Answers
+ *  { r, state, event }, or null when the retinue has no room (the window never offers it then). */
 export function beginSpare(player, f, { now = Date.now(), rolls = Math.random } = {}) {
-  if (!retinueHasRoom()) return null;
+  const joins = revenantSpareJoins();
+  if (joins && !retinueHasRoom()) return null;
   setRetinuePlayer(player);
-  const state = swornPlace();
+  const state = joins ? swornPlace() : 'away';
   const r = revenantSpared(player, f.entity, { state });
   if (!r) return null;
+  if (!joins) revenantCompanionUpdate(player, r.id, () => 'release');   // the row's "Leaves for good": it swears off the feud and goes
   f.yielded = null;
   f.sparing = { at: now };
-  if (state === 'with') holdSworn(r.id, SPARING_MS);   // AUDIT (2026-10-02): its companion steps out once the kneeling one is through
-  const body = state === 'with'
-    ? `Sworn to you. ${r.given} walks at your side now.`
-    : `Sworn to you. Your companions are full, so ${r.given} waits until you call it.`;
+  if (joins && state === 'with') holdSworn(r.id, SPARING_MS);   // AUDIT (2026-10-02): its companion steps out once the kneeling one is through
+  const body = spareBody(r, joins, state);
   return { r, state, event: revenantMomentEvent('spared', r, player?.name, { body, archive: f.archive, rolls }) };
 }
 /** The sworn one has stepped through its portal - take its kneeling body out. */
@@ -175,6 +191,7 @@ export function fateModel(player, f, { choose } = /** @type {any} */ ({})) {
   const trait = typeof r.trait === 'string' && r.trait ? r.trait.charAt(0).toUpperCase() + r.trait.slice(1) : null;
   const P = PERSONALITIES[r.personality] ?? null;
   const used = companionsWithYou();
+  const joins = revenantSpareJoins();
   const room = retinueHasRoom();
   const free = used < COMPANION_SLOTS;
   const trophy = f.trophy ?? null;
@@ -203,11 +220,8 @@ export function fateModel(player, f, { choose } = /** @type {any} */ ({})) {
       {
         id: 'spare', key: 'S', label: 'Spare', verb: 'Spare', tone: 'primary',
         title: `Spare ${r.given}`,
-        detail: !room ? `You keep ${REVENANT_RETINUE_MAX} sworn already - release one first`
-          : free ? `It joins you as a companion (${used + 1} of ${COMPANION_SLOTS})`
-            : `It is sworn to you, and waits until you call it (your ${COMPANION_SLOTS} companion slots are full)`,
-        confirm: free ? `Spare ${r.name}? It will walk at your side.` : `Spare ${r.name}? It will wait, sent away, until you call it.`,
-        disabled: !room,
+        ...spareWords(r, { joins, room, free, used }),
+        disabled: joins && !room,
       },
     ],
     choose: (id) => choose?.(id),

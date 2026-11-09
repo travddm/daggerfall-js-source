@@ -1,23 +1,13 @@
 // @ts-check
-// SEAT2b: A SEAT'S FORTIFICATIONS, ITS SIEGE WORKS AND ITS REVOLT - the law both ends read (bible/11-Multiplayer/
-// Seats-Arc.md 6.2, 7.5, 7.7, 4.2's Siege Camp; Appendix B). Fortifications belong to the SEAT, not the guild: a
-// project on the seat's board, its materials delivered by writs to the stockpile and its Marks paid from the
-// treasury, standing 2, 4 or 7 days after its last delivery; each drops a tier when the seat changes hands and at a
-// Season's end, and Season 0's end wipes them (18).
+// SEAT2b: A SEAT'S FORTIFICATIONS, ITS SIEGE WORKS AND ITS REVOLT - the law both ends read (docs: Seats-Arc 6.2, 7.5, 7.7,
+// 4.2's Siege Camp). Fortifications belong to the SEAT, not the guild: a project on the seat's board, its Marks paid once
+// from the treasury, and the tier stands at once for the rest of the Season; each drops a tier when the seat changes hands
+// and at a Season's end, and Season 0's end wipes them (18). There are no materials, no stockpile and no writs: the works
+// cost Marks alone. A Siege Camp is Marks too (SIEGE_CAMP_MARKS), paid once by the challenger's guild at the pledge.
 //
-// THE MATERIALS (PROF0 section 4, net/professionLaw.js's keys): the table's "Cut Stone" `stone:cut`, "Oak Planks"
-// `plank:oak` (and Pine, Cherry, Teak, Mahogany), "Iron/Steel/Mithril Ingots" `ingot:*`, "Pearls" `gem:pearl`.
-// DECIDED: the table's bare "Silver" and "Gold" are the raw metals `metal:silver` and `metal:gold` - it names an ingot
-// "Ingots" wherever it means one, and no gold ingot exists.
-//
-// Pure (it reads professionLaw.js's materials and its Builder). Not a DFU member: Daggerfall's towns have no player
-// works. Ledger A (EVERY PALACE A SEAT's row).
-import { fortificationStone, minedMaterial } from './professionLaw.js';
+// Pure. Not a DFU member: Daggerfall's towns have no player works. Ledger A (EVERY PALACE A SEAT's row).
 
-/** The days a tier stands after its last delivery (7.5): tier 1, 2, 3. */
-export const FORT_TIER_DAYS = Object.freeze([2, 4, 7]);
-const need = (...pairs) => Object.freeze(pairs.map(([k, n]) => Object.freeze([k, n])));
-const tier = (marks, ...pairs) => Object.freeze({ marks, needs: need(...pairs) });
+const tier = (marks) => Object.freeze({ marks });
 
 /**
  * THE WORKS (7.5), in the table's order: each `{ id, name, tiers: [{ marks, needs: [[material, units]] }], where }` -
@@ -26,31 +16,27 @@ const tier = (marks, ...pairs) => Object.freeze({ marks, needs: need(...pairs) }
  */
 export const FORT_WORKS = Object.freeze([
   Object.freeze({ id: 'walls', name: 'Walls', where: 'any', tiers: Object.freeze([
-    tier(1000, ['stone:cut', 400], ['plank:oak', 100]), tier(3000, ['stone:cut', 800], ['ingot:iron', 200]), tier(8000, ['stone:cut', 1600], ['ingot:steel', 200])]) }),
+    tier(700), tier(2000), tier(5300)]) }),
   Object.freeze({ id: 'gatehouse', name: 'Gatehouse', where: 'gate', tiers: Object.freeze([
-    tier(2000, ['stone:cut', 300], ['ingot:iron', 200]), tier(5000, ['stone:cut', 600], ['ingot:steel', 200]), tier(12000, ['stone:cut', 1000], ['ingot:mithril', 100])]) }),
+    tier(1300), tier(3300), tier(8000)]) }),
   Object.freeze({ id: 'watchtowers', name: 'Watchtowers', where: 'any', tiers: Object.freeze([
-    tier(800, ['stone:cut', 200], ['plank:pine', 200]), tier(2000, ['stone:cut', 400], ['ingot:iron', 100])]) }),
+    tier(500), tier(1300)]) }),
   Object.freeze({ id: 'barracks', name: 'Barracks', where: 'any', tiers: Object.freeze([
-    tier(1500, ['plank:oak', 300], ['ingot:iron', 100]), tier(4000, ['plank:oak', 600], ['ingot:steel', 200]), tier(9000, ['plank:teak', 800], ['ingot:mithril', 100])]) }),
+    tier(1000), tier(2700), tier(6000)]) }),
   Object.freeze({ id: 'market', name: 'Market Hall', where: 'any', tiers: Object.freeze([
-    tier(1000, ['plank:oak', 200], ['stone:cut', 100]), tier(2500, ['plank:cherry', 400], ['stone:cut', 200]), tier(6000, ['plank:mahogany', 400], ['metal:gold', 50])]) }),
+    tier(700), tier(1700), tier(4000)]) }),
   Object.freeze({ id: 'shrine', name: 'Shrine', where: 'any', tiers: Object.freeze([
-    tier(1000, ['stone:cut', 100], ['metal:silver', 20]), tier(3000, ['stone:cut', 200], ['gem:pearl', 10])]) }),
+    tier(700), tier(2000)]) }),
   Object.freeze({ id: 'forge', name: 'Forge', where: 'any', tiers: Object.freeze([
-    tier(1000, ['stone:cut', 200], ['ingot:iron', 100]), tier(2500, ['stone:cut', 300], ['ingot:steel', 100])]) }),
+    tier(700), tier(1700)]) }),
   Object.freeze({ id: 'workshop', name: 'Workshop', where: 'any', tiers: Object.freeze([
-    tier(1000, ['plank:oak', 200], ['ingot:iron', 50]), tier(2500, ['plank:teak', 300], ['ingot:steel', 50])]) }),
+    tier(700), tier(1700)]) }),
   Object.freeze({ id: 'apothecary', name: 'Apothecary', where: 'any', tiers: Object.freeze([
-    tier(1000, ['stone:cut', 100], ['plank:oak', 100]), tier(2500, ['stone:cut', 200], ['gem:pearl', 20])]) }),
+    tier(700), tier(1700)]) }),
   Object.freeze({ id: 'harbour', name: 'Harbor', where: 'coast', tiers: Object.freeze([
-    tier(2000, ['plank:oak', 400], ['stone:cut', 200]), tier(5000, ['plank:teak', 800], ['stone:cut', 400])]) }),
+    tier(1300), tier(3300)]) }),
 ]);
 const BY_ID = new Map(FORT_WORKS.map((w) => [/** @type {string} */ (w.id), w]));
-/** Every material a work's tier asks - what a seat writ may ask for its stockpile or a Siege Camp (Professions-Arc 11:
- *  "A seat's writs build its fortifications"). */
-export const FORT_MATERIALS = Object.freeze([...new Set(FORT_WORKS.flatMap((w) => w.tiers.flatMap((t) => t.needs.map(([k]) => k))))].sort());
-export const fortMaterialOk = (key) => FORT_MATERIALS.includes(key);
 /** A work by its id, or null. */
 export const fortWork = (id) => (typeof id === 'string' ? BY_ID.get(id) ?? null : null);
 /** A work's highest tier (2 or 3), or 0 for none. */
@@ -78,51 +64,17 @@ export function fortMayRaise(id, seat) {
   return true;
 }
 
-/** Whether a material is the stone a Builder saves: the Stores' stone family (Cut Stone; Rough Stone and Mortar should a
- *  work ever ask them) - professionLaw.js's own test, so the Builder has one law. */
-const isStone = (key) => minedMaterial(key)?.family === 'stone';
-/**
- * WHAT A PROJECT ASKS (7.5): tier `t` of a work, its needs as `[[material, units]]` - a Builder's (`builder`, Masonry 50,
- * Professions-Arc 3.3: "fortification projects need 10% less stone") stone a tenth less, rounded UP
- * (professionLaw.js fortificationStone, PROF11's) - and its Marks; or null for no such tier.
- */
-export function fortNeeds(id, t, { builder = false } = {}) {
-  const row = fortTierRow(id, t);
-  if (!row) return null;
-  return { marks: row.marks, needs: row.needs.map(([k, n]) => [k, isStone(k) ? fortificationStone(n, builder) : n]) };
-}
-/**
- * THE SIEGEWRIGHT'S DAY (Carpentry 100, Professions-Arc 3.3: "Rams +50% vitality; siege works a day sooner"). SEAT2b
- * part two DECIDED: the day is a WORK's - a project begun by a Siegewright stands a day sooner. Both records name the
- * Siege Camp's Ram Kits "siege works", but a kit is made at the bench at once and spent at the Turning; the only siege
- * work that waits days is 7.5's, a project's tier standing 2, 4 or 7 days after its last delivery. The Rams' half is the
- * battle's (ramVitality, a Siegewright on the attacking roster - the Fortifier's way).
- */
-export const SIEGEWRIGHT_DAYS = 1;
-/** When a project of tier `t` stands: its last delivery (s) and the tier's days (7.5) - a day fewer where a Siegewright
- *  began it - or null. */
-export const fortStandsAt = (lastDeliveryS, t, { siegewright = false } = {}) => (Number.isFinite(lastDeliveryS) && t >= 1 && t <= 3
-  ? lastDeliveryS + (FORT_TIER_DAYS[t - 1] - (siegewright ? SIEGEWRIGHT_DAYS : 0)) * 86400 : null);
-/** How much of each need is still wanting, given what the project holds (`held`: material -> units). */
-export const fortWanting = (needs, held) => (needs ?? []).map(([k, n]) => [k, Math.max(0, n - Math.max(0, Number(held?.get?.(k) ?? held?.[k] ?? 0)))]);
-/** Whether every need is met. */
-export const fortMet = (needs, held) => fortWanting(needs, held).every(([, n]) => n === 0);
-
+/** What tier `t` of a work costs in Marks (7.5), or null for no such tier. */
+export const fortCost = (id, t) => fortTierRow(id, t)?.marks ?? null;
 // ─── THE DROPS (7.5, 9.1, 18) ─────────────────────────────────────────
 
 /** A work's tier after a drop: one less, at least nought. */
 export const fortDropped = (t) => Math.max(0, Math.floor(Number(t) || 0) - 1);
 /**
  * THE CAPTURE'S DROP (6.8: "the fortifications, each one tier down"; Appendix A: "the Walls drop to tier 0") over a
- * seat's works (`{ [id]: tier }`): each a tier down - but the Walls kept where a Fortifier saved them (Masonry 100,
- * Professions-Arc 3.3: "once a Season a seat's Walls skip their drop on capture"). A building project falls with
- * the Charter (the new holder raises its own).
+ * seat's works (`{ [id]: tier }`): each a tier down.
  */
-export function fortsAfterCapture(forts, { fortifier = false } = {}) {
-  const out = {};
-  for (const [id, t] of Object.entries(forts ?? {})) out[id] = id === 'walls' && fortifier ? Math.max(0, Number(t) || 0) : fortDropped(t);
-  return out;
-}
+export const fortsAfterCapture = (forts) => Object.fromEntries(Object.entries(forts ?? {}).map(([id, t]) => [id, fortDropped(t)]));
 /** A Season's end (9.1): every work a tier down. */
 export const fortsAfterSeason = (forts) => Object.fromEntries(Object.entries(forts ?? {}).map(([id, t]) => [id, fortDropped(t)]));
 
@@ -135,10 +87,9 @@ export const defendersWaveMs = (baseMs, walls) => Math.max(WALLS_WAVE_MIN_MS, ba
 /** The Gatehouse (6.2): vitality 20,000, +50% a tier; a fighter's blow deals a tenth of its damage to it. */
 export const GATEHOUSE = Object.freeze({ vitality: 20000, perTier: 0.5, blowShare: 0.1 });
 export const gatehouseVitality = (t) => Math.round(GATEHOUSE.vitality * (1 + GATEHOUSE.perTier * Math.max(0, Math.min(3, Number(t) || 0))));
-/** A Ram (6.2): vitality 3,000 (a Siegewright's +50%, Professions-Arc 3.3), 500 every 10 s to the Gatehouse while two
+/** A Ram (6.2): vitality 3,000, 500 every 10 s to the Gatehouse while two
  *  of its side stand within 3 m; one a side at a time; a destroyed Ram is gone. */
-export const RAM = Object.freeze({ vitality: 3000, damage: 500, everyMs: 10000, crew: 2, crewM: 3, siegewright: 0.5 });
-export const ramVitality = (siegewright = false) => Math.round(RAM.vitality * (siegewright ? 1 + RAM.siegewright : 1));
+export const RAM = Object.freeze({ vitality: 3000, damage: 500, everyMs: 10000, crew: 2, crewM: 3 });
 /** The Watchtowers: the holder told when a challenger passes half its defence (tier 1), a quarter (tier 2). */
 export const watchtowerShare = (t) => (t >= 2 ? 0.25 : t === 1 ? 0.5 : null);
 /**
@@ -226,25 +177,16 @@ export const harbourPortFor = (seat, guild) => !!guild && seat?.holder?.guild?.i
 
 // ─── THE SIEGE CAMP (4.2, 5.2 step 7) ─────────────────────────────────
 
-/** A Ram Kit as the Stores hold it (PROF0 4.8's 690, a siege work). */
-export const RAM_KIT_KEY = 'work:ram';
+/** What a Siege Camp costs its guild, once, at the pledge (4.2); a camp that wins no Right of Siege is burnt whole. */
+export const SIEGE_CAMP_MARKS = 1500;
+/** The Rams a camp that won the Right brings to the siege. */
+export const CAMP_RAMS = 3;
 /**
- * A CHALLENGER'S SIEGE CAMP AT THE TURNING (4.2: "its siege works (a Ram Kit) go to the siege it won, and everything
- * else is burnt; a camp that won no Right of Siege is burnt whole"): `camp` `[[material, units]]`, `won` whether its
- * guild won the Right there, `gated` whether the seat has a Gatehouse a Ram could strike (Appendix A: "no Ram - a
- * palace has no Gatehouse"). Answers `{ rams, burnt: [[material, units]] }`.
+ * A CHALLENGER'S SIEGE CAMP AT THE TURNING (4.2): `paid` whether its guild pitched one, `won` whether its guild won the
+ * Right there, `gated` whether the seat has a Gatehouse a Ram could strike (Appendix A: "no Ram - a palace has no
+ * Gatehouse"). Answers the Rams it brings.
  */
-export function campSpent(camp, { won = false, gated = false } = {}) {
-  let rams = 0;
-  const burnt = [];
-  for (const [k, n] of camp ?? []) {
-    const u = Math.max(0, Math.floor(Number(n) || 0));
-    if (!u) continue;
-    if (k === RAM_KIT_KEY && won && gated) rams += u;
-    else burnt.push([k, u]);
-  }
-  return { rams, burnt };
-}
+export const campRams = ({ paid = false, won = false, gated = false } = {}) => (paid && won && gated ? CAMP_RAMS : 0);
 
 // ─── THE REVOLT (7.7) ─────────────────────────────────────────────────
 
@@ -255,7 +197,7 @@ export const REVOLT = Object.freeze({ captainRenown: 50, rebels: 12, windowMs: 2
 /** Whether a seat revolts at its next window: its Standing at nought. */
 export const revoltDue = (standing) => Number(standing) <= 0;
 
-// ─── THE WORKS' WORDS (7.9: "the stockpile: every fortification project and what it still needs") ───
+// ─── THE WORKS' WORDS (7.9) ───
 
 /** What a work's tier does, as the Seat tab says it. */
 export const FORT_EFFECT_WORDS = Object.freeze({
@@ -273,20 +215,16 @@ export const FORT_EFFECT_WORDS = Object.freeze({
   harbour: () => 'a port for the holder\'s members',
 });
 /**
- * A WORK'S LINE on the Seat tab - `w` its row as the service reads it (`{ tier, building, standsAt, needs, held }`):
- * "Walls: tier 1 - the defenders' wave 3 s faster. Raising tier 2: 320 Cut Stone, 200 Iron Ingots still wanted." -
- * `nameOf` a material's name for a count, `whenOf` a moment's words (ms).
+ * A WORK'S LINE on the Seat tab - `w` its row as the service reads it (`{ tier }`): "Walls: tier 1 - the defenders' wave
+ * 3 s faster." or "Walls: none raised.", and the Marks of the next tier where one can still be raised.
  */
-export function fortWorkLine(id, w, { nameOf = (k, n) => `${k}`, whenOf = (ms) => new Date(ms).toISOString(), seatTier = null } = {}) {
+export function fortWorkLine(id, w, { seatTier = null } = {}) {
   const work = fortWork(id);
   if (!work) return '';
   const t = Math.max(0, Number(w?.tier ?? 0) || 0);
   // AUDIT SEATS-2 L3 (6.2: "a crown's Gatehouse stands from the first"): a crown's stands at tier 0, its vitality said
   const head = t > 0 ? `${work.name}: tier ${t} - ${FORT_EFFECT_WORDS[id](t)}.`
     : id === 'gatehouse' && seatTier === 'crown' ? `${work.name}: standing - ${FORT_EFFECT_WORDS.gatehouse(0)}.` : `${work.name}: none raised.`;
-  if (w?.building == null) return head;
-  if (w.standsAt != null) return `${head} Tier ${w.building} stands ${whenOf(Number(w.standsAt) * 1000)}.`;
-  const held = new Map(w.held ?? []);
-  const wanted = fortWanting(w.needs ?? [], held).filter(([, n]) => n > 0).map(([k, n]) => `${n.toLocaleString('en-US')} ${nameOf(k, n)}`);
-  return `${head} Raising tier ${w.building}: ${wanted.length ? `${wanted.join(', ')} still wanted` : 'every need met'}.`;
+  const next = fortCost(id, t + 1);
+  return next == null ? head : `${head} Tier ${t + 1}: ${next.toLocaleString('en-US')} Marks.`;
 }

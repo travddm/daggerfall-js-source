@@ -1,8 +1,7 @@
 // AUDIT-SEATS: THE
 // SHARED LAW'S FINDINGS, FIXED - the audit's law lane read every pure rule of the Seats arc against its design
 //  and each test below is one finding it proved: Season 1's Keepers (L1), the Rights
-// of Siege ranked as risen (L2), a split sale's Tithe (L4), the crown sieges' fixed slots (L5), the coming week's Tide
-// before the first counted week (L6), the Chronicle's words (L7), an ignored witness's week (L8), the law's drift (L10)
+// of Siege ranked as risen (L2), a split sale's Tithe (L4), the crown sieges' fixed slots (L5), the Chronicle's words (L7), an ignored witness's week (L8), the law's drift (L10)
 // and the arrival line's siege (G2). `06-Systems/Online-Arc.md` AUDIT-SEATS. The service is driven through the real
 // Worker over node:sqlite where it is touched (test/accountDb.mjs).
 import { test } from 'node:test';
@@ -10,18 +9,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService, T0 } from '../accountDb.mjs';
 import {
-  seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, seasonTitles, keptWholeSeason, turningPlan, placeBattles, CROWN_SIEGE_SLOT,
+  seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, seasonKeepers, keptWholeSeason, turningPlan, placeBattles, CROWN_SIEGE_SLOT,
   siegeStartMs, chronicleLine, edictWords, seatRuleLine, seatArrivalNews, seatTitleText, seatIgnoredAccounts, SEAT_WITNESS_IGNORED_S,
   accountSeatInfluence, tributeRoom, claimTotal, SIEGE_STANDING, STANDING_CHANGES, KINGDOM_METALS, SEAT_RING_UNHELD, FREE_LAND_RING,
   seatArrivalLine, siegeCalledClause, battleWhenText, seatWeekStartMs,
 } from '../../src/net/townSeatLaw.js';
 import { saleTithe, saleTitheOn, saleTax } from '../../src/net/marketLaw.js';
 import { isMarch } from '../../src/net/kingdomLaw.js';
-import { tideAt } from '../../src/net/tideLaw.js';
 import { HERALDRY_COLOURS } from '../../src/net/heraldryLaw.js';
 import { MARKS_KINDS, utcDay } from '../../src/net/marksLaw.js';
 import { gameDayAt, gateTimes } from '../../src/net/gate/gateLaw.js';
-import { tideOf } from '../../src/net/tideLaw.js';
 import { readdirSync } from 'node:fs';
 
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
@@ -55,10 +52,10 @@ async function stood(t, env = {}) {
 test('AUDIT-SEATS L1 SEASON 1\'S KEEPERS: Season 0\'s last Turning claims nothing, so a Charter from Season 1\'s first Turning held it whole; any later Season asks its first week (mutants: the first Season\'s week; the rule\'s use)', () => {
   const s1 = { n: 1, start: 7 }, s2 = { n: 2, start: 15 };
   const hold = (since) => [{ key: 1, guild: 'g', tier: 'palace', since }];
-  assert.deepEqual(seasonTitles(s1, hold(8)), [{ guild: 'g', title: 'keeper', key: 1 }], 'the earliest any Charter of Season 1 can stand');
-  assert.deepEqual(seasonTitles(s1, hold(9)), [], 'a week short');
-  assert.deepEqual(seasonTitles(s2, hold(15)), [{ guild: 'g', title: 'keeper', key: 1 }]);
-  assert.deepEqual(seasonTitles(s2, hold(16)), [], 'Season 2 asks its own first week');
+  assert.deepEqual(seasonKeepers(s1, hold(8)), [{ guild: 'g', key: 1 }], 'the earliest any Charter of Season 1 can stand');
+  assert.deepEqual(seasonKeepers(s1, hold(9)), [], 'a week short');
+  assert.deepEqual(seasonKeepers(s2, hold(15)), [{ guild: 'g', key: 1 }]);
+  assert.deepEqual(seasonKeepers(s2, hold(16)), [], 'Season 2 asks its own first week');
   assert.deepEqual([keptWholeSeason(null, 1), keptWholeSeason(s1, 7), keptWholeSeason(s1, 8), keptWholeSeason(s1, 9)], [false, true, true, false]);
 });
 
@@ -113,22 +110,9 @@ test('AUDIT-SEATS L5 THE CROWN SIEGES\' SLOTS: placed first, at Saturday\'s hour
   assert.equal(alone.moved, false, 'alone, its window stands');
 });
 
-// ─── L6 ──────────────────────────────────────────────────────────────
-
-test('AUDIT-SEATS L6 THE FESTIVAL\'S PRICE BEFORE THE FIRST COUNTED WEEK: the week before Season 0 the tab hears next week\'s Tide (a Plague around T0), as the Turning prices it - this week\'s Calm; no Tides with neither counted (mutants: the next week\'s count)', async (t) => {
-  const s = await stood(t, { SEASON_ZERO_WEEK: String(W + 1) });
-  s.hold();
-  const st = (await s.svc.call('/v1/seats/standings', { key: ANTICLERE.key, character: s.gm.character }, s.gm.secret)).body;
-  assert.deepEqual(st.tides, { now: 'calm', next: tideAt(W + 1, ANTICLERE.region, true) });
-  assert.equal(st.tides.next, 'plague', 'the Marches\' Plague in week W+1');
-  const u = await stood(t, { SEASON_ZERO_WEEK: String(W + 5) });
-  u.hold();
-  assert.equal((await u.svc.call('/v1/seats/standings', { key: ANTICLERE.key, character: u.gm.character }, u.gm.secret)).body.tides, null);
-});
-
 // ─── L7 ──────────────────────────────────────────────────────────────
 
-test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' word, on Conscription\'s and fealty\'s sums; an Edict with its article ("proclaimed a Festival", 9.2) but Market Day and Open Gates bare; a title won with no Season counted names none (mutants: the plural; the Drakes; the article; the Season\'s tail)', () => {
+test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' word, on Conscription\'s sum; an Edict with its article ("proclaimed a Festival", 9.2) but Market Day and Open Gates bare; a title won with no Season counted names none (mutants: the plural; the Drakes; the article; the Season\'s tail)', () => {
   const seat = { key: 5023, name: 'Wayrest', region: 23, tier: 'crown' };
   const line = (kind, data) => chronicleLine({ week: 9, kind, data }, seat);
   assert.equal(line('royal-champion', { name: 'Arden', kingdom: 'wayrest', wins: 1 }), 'In week 9, Arden won the Royal Tourney at Wayrest with 1 bout - Champion of Wayrest.');
@@ -136,17 +120,15 @@ test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' wor
   const SH = { name: 'The Silver Hand', tag: 'SH' };
   assert.match(line('conscription', { guild: SH, marks: 1 }), /brought the Silver Hand <SH> 1 silver of its kingdom's Tithe\.$/);
   assert.match(line('conscripted', { guild: SH, crown: SH, marks: 1200 }), /paid 1,200 silver of its Tithe/);
-  assert.match(line('fealty-tribute', { vassal: SH, liege: SH, marks: 5 }), /paid 5 silver in fealty to/);
   assert.equal(line('edict', { guild: SH, edict: 'festival' }), 'In week 9, the Silver Hand <SH> proclaimed a Festival at Wayrest.');
   assert.equal(line('edict', { guild: SH, edict: 'market-day' }), 'In week 9, the Silver Hand <SH> proclaimed Market Day at Wayrest.');
   assert.equal(line('edict', { guild: SH, edict: 'nonsense' }), 'In week 9, the Silver Hand <SH> proclaimed an Edict at Wayrest.');
-  assert.deepEqual(['curfew', 'levy', 'bounty', 'conscription', 'royal-tourney', 'open-gates', 'x'].map(edictWords),
-    ['a Curfew', 'a Levy', 'a Bounty', 'a Conscription', 'a Royal Tourney', 'Open Gates', null]);
-  assert.equal(seatRuleLine({ tier: 'palace' }, { tithe: 6, edict: 'levy', standing: 50 }), 'Tithe 6%. A Levy is proclaimed.');
+  assert.deepEqual(['curfew', 'bounty', 'conscription', 'royal-tourney', 'open-gates', 'x'].map(edictWords),
+    ['a Curfew', 'a Bounty', 'a Conscription', 'a Royal Tourney', 'Open Gates', null]);
+  assert.equal(seatRuleLine({ tier: 'palace' }, { tithe: 6, edict: 'curfew', standing: 50 }), 'Tithe 6%. A Curfew is proclaimed.');
   assert.equal(seatArrivalNews({ holder: { standing: 50, edict: 'open-gates' } }), 'Open Gates is proclaimed.');
   const place = (k) => (k === 5023 ? seat : null);
   assert.deepEqual([seatTitleText('champion', [5023, 0], place), seatTitleText('champion', [5023, 2], place)], ['Champion of Wayrest', 'Champion of Wayrest, Season 2']);
-  assert.deepEqual([seatTitleText('keeper', [5023, 0], place), seatTitleText('keeper', [5023, 3], place)], ['Keeper of Wayrest', 'Keeper of Wayrest, Season 3']);
 });
 
 // ─── L8 ──────────────────────────────────────────────────────────────
@@ -171,7 +153,7 @@ test('AUDIT-SEATS L8 AN IGNORED WITNESS\'S WEEK: three unmatched answers inside 
 
 test('AUDIT-SEATS L10 THE LAW\'S DRIFT: a NaN is no count; a negative sale pays no Tithe; a region is a number; the held siege\'s Standing written once; the map\'s marks the heraldry\'s own colours (mutants: each)', () => {
   assert.equal(accountSeatInfluence({ gates: NaN }), 0);
-  assert.equal(accountSeatInfluence({ watch: NaN, gates: 1 }, NaN), accountSeatInfluence({ gates: 1 }));
+  assert.equal(accountSeatInfluence({ watch: NaN, gates: 1 }), accountSeatInfluence({ gates: 1 }));
   assert.equal(tributeRoom(NaN), 0);
   assert.equal(tributeRoom(300, NaN), tributeRoom(300));
   assert.equal(claimTotal({ influence: NaN, legacy: 5 }), 5);
@@ -216,58 +198,6 @@ test('AUDIT-SEATS G2 THE ARRIVAL LINE\'S SIEGE: a seat under siege this week gai
   assert.deepEqual([b.kind, b.guild.tag, b.startsAt, b.endsAt, b.moved, b.state], ['siege', 'EO', start / 1000, end / 1000, false, 'scheduled']);
 });
 
-// ─── THE INCURSION'S MARKS (9.3) ─────────────────────────────────────
-
-test('AUDIT-SEATS A DAEDRIC INCURSION\'S MARKS: at the Turning, every claim of a gate day whose region three claims agree on, in a land that rolled the Incursion, is minted its gate Marks again - once, where its purse has room; an unagreed region, an unstruck claim, a full purse and a Calm land none (mutants: the Tide; the agreed region; the struck line; the room; once)', async (t) => {
-  assert.equal(tideOf(W, 'marches'), 'daedra', 'the Marches\' Incursion around T0 (test/net/tide_service.test.js)');
-  let now = T0;
-  t.mock.method(Date, 'now', () => now * 1000);
-  const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on', SEASON_ZERO_WEEK: String(W) });
-  const raw = svc.env.DB._raw;
-  raw.prepare('INSERT INTO town_seat_weeks (week, settled_at) VALUES (?, ?)').run(W - 1, T0);
-  const weekStart = seatWeekStartMs(W) / 1000;
-  const days = [];
-  for (let d = gameDayAt(weekStart * 1000); days.length < 2; d++) if (gateTimes(d).riseAt / 1000 >= weekStart) days.push(d);
-  const [d, e] = days;
-  const accounts = [];
-  for (const h of ['Ada', 'Bram', 'Cora', 'Dov', 'Esk', 'Fen']) accounts.push(await svc.registered(h));
-  const kill = (a, day, region, struck = true) => {
-    raw.prepare("INSERT INTO gate_kills (day, account, boss, earned, at, region) VALUES (?, ?, 'ruhn', 'x', ?, ?)").run(day, a.id, T0, region);
-    if (struck) raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-      VALUES ('mint', NULL, 'account', ?, 'gate', 50, ?, ?, ?, NULL, ?)`).run(a.id, utcDay(T0), T0, a.id, `gate:${day}`);
-  };
-  // day d: four claim the Marches' Anticlere (21), one a Calm kingdom's region; one of the four's Marks unstruck, one purse full
-  for (const a of accounts.slice(0, 3)) kill(a, d, 21);
-  kill(accounts[3], d, 21, false);
-  kill(accounts[4], d, 23);
-  raw.prepare('UPDATE marks SET balance = ? WHERE account = ?').run(10_000_000 - 10, accounts[2].id);
-  // day e: two claims only - no region agreed
-  kill(accounts[0], e, 21); kill(accounts[5], e, 21);
-  now = Math.floor(seatWeekStartMs(W + 1) / 1000) + 3 * 3600;
-  await svc.call('/v1/seats/list', {}, accounts[0].secret);
-  const lines = () => raw.prepare("SELECT dst_id, amount, rid FROM marks_ledger WHERE kind = 'gate-incursion' ORDER BY dst_id").all().map((r) => [r.dst_id, Number(r.amount), r.rid]);
-  assert.deepEqual(lines(), [[accounts[0].id, 50, `incursion:${d}`], [accounts[1].id, 50, `incursion:${d}`]].sort((x, y) => (x[0] < y[0] ? -1 : 1)),
-    'the agreed day\'s struck claims alone - not the unstruck, not the full purse, not the other region, not the day two claims named');
-  assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM town_seat_weeks WHERE week = ?').get(W).n, 1, 'the settle stood');
-  // a second settle is no settle (the weeks' key) - and no second half
-  await svc.call('/v1/seats/list', {}, accounts[1].secret);
-  assert.equal(lines().length, 2);
-  // the same week counting no Season: the Marches Calm, none paid
-  let then = T0;
-  t.mock.method(Date, 'now', () => then * 1000);
-  const calm = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on' });
-  const craw = calm.env.DB._raw;
-  craw.prepare('INSERT INTO town_seat_weeks (week, settled_at) VALUES (?, ?)').run(W - 1, T0);
-  const c3 = [await calm.registered('Cato'), await calm.registered('Cyra'), await calm.registered('Cole')];
-  for (const a of c3) {
-    craw.prepare("INSERT INTO gate_kills (day, account, boss, earned, at, region) VALUES (?, ?, 'ruhn', 'x', ?, 21)").run(d, a.id, T0);
-    craw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid) VALUES ('mint', NULL, 'account', ?, 'gate', 50, ?, ?, ?, NULL, ?)`).run(a.id, utcDay(T0), T0, a.id, `gate:${d}`);
-  }
-  then = now;
-  await calm.call('/v1/seats/list', {}, c3[0].secret);
-  assert.equal(craw.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE kind = 'gate-incursion'").get().n, 0, 'no Season, no Tide');
-});
-
 test('AUDIT-SEATS THE LEDGER\'S KINDS: every kind a service statement writes to the one ledger is named in MARKS_KINDS, with the way it moves Marks (the guilds\' and the seats\' had drifted off it) (mutants: a kind dropped)', () => {
   const dir = new URL('../../server-account/src/', import.meta.url);
   const written = new Set();
@@ -278,9 +208,9 @@ test('AUDIT-SEATS THE LEDGER\'S KINDS: every kind a service statement writes to 
     // AUDIT-SEATS S2: the Sellswords' settle binds its kind - a paid fee's or a fee home's (seatSiege.js swordsSettled)
     for (const m of text.matchAll(/paid \? 'sellsword-([a-z]+)' : 'sellsword-([a-z]+)'/g)) { written.add(`sellsword-${m[1]}`); written.add(`sellsword-${m[2]}`); }
   }
-  for (const k of ['gate-incursion', 'siege-honours', 'fealty-tribute', 'conscription', 'royal-prize', 'heraldry', 'sellsword-fee', 'tribute', 'seat-claim']) assert.ok(written.has(k), `the sweep finds ${k}`);
+  for (const k of ['siege-honours', 'conscription', 'royal-prize', 'heraldry', 'sellsword-fee', 'tribute', 'seat-claim']) assert.ok(written.has(k), `the sweep finds ${k}`);
   for (const k of written) assert.ok(Object.hasOwn(MARKS_KINDS, k), `${k} is written to the ledger and named nowhere`);
-  assert.deepEqual(['siege-honours', 'gate-incursion', 'conscription', 'fealty-tribute', 'heraldry'].map((k) => MARKS_KINDS[k]), ['mint', 'mint', 'move', 'move', 'burn']);
+  assert.deepEqual(['siege-honours', 'conscription', 'heraldry'].map((k) => MARKS_KINDS[k]), ['mint', 'move', 'burn']);
 });
 
 // ─── G21: A CROWN'S FIELD AT ITS CASTLE'S ENTRANCE ───────────────────

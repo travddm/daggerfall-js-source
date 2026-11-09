@@ -68,7 +68,7 @@
 //
 // It is NOT in the suite and has no Testing.md row, for the account probe's reason (tools/accountProbe.mjs): it needs a
 // toolchain and minutes. Its parts that can be pinned without one are - test/net/scale3.test.js.
-import { spawn, execFile } from 'node:child_process';
+import { spawn, execFile, execFileSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtempSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -387,6 +387,48 @@ function stopDev(p) {
   try { killTree(p.pid, 'SIGKILL'); } catch { /* already gone */ }
 }
 export const stopAll = () => { for (const p of [...started]) stopDev(p); };
+
+/** The pids listening on a local port, for a process that outlived its tree's kill (a workerd that left the group). */
+function listeners(port) {
+  try {
+    if (process.platform === 'win32') {
+      const out = execFileSync('netstat', ['-ano', '-p', 'tcp'], { encoding: 'utf8', windowsHide: true });
+      return [...new Set(out.split('\n').filter((l) => l.includes(`127.0.0.1:${port} `) && /LISTENING/.test(l)).map((l) => l.trim().split(/\s+/).pop()))];
+    }
+    return execFileSync('lsof', ['-t', '-i', `tcp:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).split('\n').filter(Boolean);
+  } catch { return []; }
+}
+function killListeners(port) {
+  for (const pid of listeners(port)) { try { killTree(Number(pid), 'SIGKILL'); } catch { /* gone */ } }
+}
+
+/** Stop what this run started, then wait - bounded - until the ports are free, so a restart does not meet the first
+ *  start's leftover workerd on them. A port still held at the half way mark has a holder that outlived the kill (the
+ *  ports are this run's own): its listener is killed too. Returns whether the ports are free. */
+export async function stopAndFree(ports, { stop = stopAll, held = portHeld, wait = sleep, killHolder = killListeners, timeoutMs = 20_000, stepMs = 250 } = {}) {
+  stop();
+  let killed = false;
+  for (let waited = 0; waited < timeoutMs; waited += stepMs) {
+    const busy = [];
+    for (const port of ports) if (await held(port)) busy.push(port);
+    if (!busy.length) return true;
+    if (!killed && waited >= timeoutMs / 2) { killed = true; for (const port of busy) killHolder(port); }
+    await wait(stepMs);
+  }
+  return false;
+}
+
+/** standServices, once more when the first start fails (wrangler's dev server now and then dies while it boots): the
+ *  first start is stopped and its ports freed before the second begins. */
+export async function standServicesRetrying(o, state, { stand = standServices, free = stopAndFree, log = console.log } = {}) {
+  try {
+    return await stand(o, state);
+  } catch (e) {
+    log(`   the services did not start, once more: ${String(e?.message).slice(0, 200)}`);
+    if (!(await free([o.port, o.port + 1]))) throw new Error(`the first start's ports stayed held: ${String(e?.message).slice(0, 200)}`);
+    return stand(o, state);
+  }
+}
 
 // ═══ THE SERVICES ══════════════════════════════════════════════════════════════════════════════════════════════════
 

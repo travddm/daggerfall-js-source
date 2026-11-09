@@ -66,8 +66,8 @@ import { settlementsOf, loadModRoads, retryModRoads, basicRoadsPathsPoint, WATER
 import { modSetting, modSettingsOf, modSettingsGeneration, MOD_SETTINGS, latchModLoaded } from '../systems/modSettings.js';   // ROADS 24; HCC: the mod's eight switches; CSA-D: a mod's title for the load's failure line; AUDIT PRE-MERGE 0928 S4: the next-load mods latched at mount
 import { hasPortFor, hasPort, setSeatHarbours, PORT_LOCATION_IDS } from '../systems/travel/travelPorts.js';   // AUDIT-RR2 G22: Travel Options' port list for RR's ship gate; SEAT2b part two: a members' Harbour among them (hasPortFor)
 import { WoodsFile, MAP_WIDTH, MAP_HEIGHT } from '../formats/woodsFile.js';
-import { buildTerrainIndices, isOutdoorWaterTile, TERRAIN_TILE_DIM, surfaceHeightAt, surfaceNormalAt, terrainSampleHeightAt, walkGroundAt } from '../world/terrain/terrainSurface.js';   // GRASS-LIT2: the ground's normal under a blade; SNOWFALL1: and a pixel's that keeps none; FLORA-GROUND: the ground's one law
-import { waterUniforms, buildWaterIndices, waterSwitchOn } from '../render/waterSurface.js';   // WATER1: the enhanced water surface over the pixel's own grid; WATER-AUDIT: its own index set
+import { isOutdoorWaterTile, TERRAIN_TILE_DIM, surfaceHeightAt, surfaceNormalAt, terrainSampleHeightAt, walkGroundAt } from '../world/terrain/terrainSurface.js';   // GRASS-LIT2: the ground's normal under a blade; SNOWFALL1: and a pixel's that keeps none; FLORA-GROUND: the ground's one law
+import { waterUniforms, buildPixelWaterIndices, waterSwitchOn } from '../render/waterSurface.js';   // WATER1: the enhanced water surface over the pixel's own grid; WATER-AUDIT: its own index set
 import { bedFields, sheetDepthsOf } from '../world/water/waterBed.js';   // WATER-NEXT 2: the bed under the water, carved for the eye alone (AUDIT WATER-NEXT H1: the cap's re-carve asks its depths)
 import { createRipples, createRippleStir, RIPPLE_SPAN, RIPPLE_CELLS, BOAT_STIR, BOAT_WAKE_SPEED } from '../world/water/waterRipples.js';   // WATER-NEXT 4: the rings and wakes
 import { waterCorners, WATER_DRAW_MASK_TABLE } from '../world/water/waterCorners.js';   // GRASS-WET1: the one table that says which of a tile's corners stand in water - the DRAW's, because a blade in a puddle is a picture, not a physics
@@ -467,8 +467,7 @@ import { loadSlot, quickLoadSlot, mostRecentRestorable, QUICK_SAVE_NAME, saveKey
 import { frameBegin, frameEnd, frameAbort } from '../systems/frameClock.js';   // PERF1: the frame's script time; AUDIT-WH2 L1-F4: and the door an early return takes
 import { frameCapSkip } from '../systems/frameCap.js';   // FPS-CAP1: DFU's TargetFrameRate - a held frame re-arms before the clock and the input frame
 import { frameInterval, lastBusy, lendFrame, framesBegun } from '../systems/frameClock.js';   // PERF-EXT24: the frame's period and its own script, and the stream's slices lent back - those no frame ran inside
-import { arrivalClampMinutes, playerTravelPosition, travelDays, setSeaTide } from '../systems/travel/travel.js';   // F-slice; F114: the ship-aware travel origin; SHIP-SAIL: the passage's days, as the map counts them
-import { TIDE_EFFECTS } from '../net/tideLaw.js';   // SEASON1 part two: a Storm Season's sea (Seats-Arc 9.3)
+import { arrivalClampMinutes, playerTravelPosition, travelDays } from '../systems/travel/travel.js';   // F-slice; F114: the ship-aware travel origin; SHIP-SAIL: the passage's days, as the map counts them
 import { hallOfRecordsWindow } from '../ui/hallOfRecords.js';   // SEASON1 part three: a seat's Chronicle as a book (Seats-Arc 9.2)
 import { hasSpecialAbility, SPECIAL_ABILITY } from '../systems/rest/rest.js';   // F-slice: the NoRegen restore gate
 import { buildingCompassDirection, directionHintString } from '../systems/talk/talk.js';   // wave 26: %di's remote arm + the region-faction search; the LOCAL arm beside it; SPAWNED-DUNGEONS2b: the same eight-word compass
@@ -607,7 +606,7 @@ import { createPeerRiders, createPeerWalkers, createEotbArt } from '../net/peer/
 import { createHorseCartRuntime } from '../systems/horse/horseCart.js';   // HCC: TrailingWagonRuntime over this host's seams
 import { setForagingHost } from '../systems/foraging/foragingInstall.js';   // FORAGE1: Foraging's reaches into the world, answered by this host
 import { registerContainerLootHandler } from '../systems/containerLoot.js';   // THE MERGE: CSA-H's shelf subscriber, by its mod's name, on PlayerActivate.OnLootSpawned's one home
-import { mintPieces, craftedText, storedText, CRAFT_KEPT_TEXT, BENCH_KEPT_TEXT, LOOM_KEPT_TEXT, MASON_KEPT_TEXT, isCraftedFurniture } from '../systems/smithItems.js';   // PROF3: a craft's pieces, minted into the pack; PROF4: furniture into the home's things; PROF11: the mason's word; SEAT2b part two: a siege work's
+import { mintPieces, craftedText, CRAFT_KEPT_TEXT, BENCH_KEPT_TEXT, LOOM_KEPT_TEXT, MASON_KEPT_TEXT, isCraftedFurniture } from '../systems/smithItems.js';   // PROF3: a craft's pieces, minted into the pack; PROF4: furniture into the home's things; PROF11: the mason's word; SEAT2b part two: a siege work's
 import { heatBand, planeBand, stitchBand, chiselBand, recipeById } from '../net/recipeLaw.js';   // PROF3: the heat's attribute band; PROF4: the plane's, and a recipe's station; PROF7: the stitch's; PROF11: the chisel's
 import { COOK_KEPT_TEXT } from '../systems/smithItems.js';   // PROF9: the fire's word, a dish whose answer did not come
 import { JEWEL_KEPT_TEXT } from '../systems/smithItems.js';   // PROF10: the jeweller's bench's word, a piece whose answer did not come
@@ -755,6 +754,7 @@ import { getLocationTerrainTileOrigin, setLocationTiles, locationRectReader } fr
 import { locationArrivalLanding, locationStartMarkers } from '../world/locationEntrance.js';
 import { preloadPrisonScreenArt, preloadCourtScreenArt } from '../ui/prisonScreen.js';   // PRIS00I0 - the serving-time screen   // ROAD-B B5: CORT01I0 - the courtroom the trial is pushed over
 import { TerrainGenClient } from '../world/terrain/terrainGenClient.js';   // EV7: the pixel kernel, off the main thread (samples/blend/tiles/grid/nature moved whole to terrainGen.js)
+import { terrainSlopeCutOn } from '../systems/terrainSlopeCut.js';   // TERRAIN-CUT: the slope cut's switch
 import { getPref, setPref } from '../systems/uiPrefs.js';
 import { createCoverIndex } from '../ai/cover.js';   // TACT1: billboards are cover
 import { techniqueMarksNow, techniqueHudChips, offsetTechniques, TECHNIQUE_ACTION } from '../combat/techniques.js';   // TECH1: the player's marks on the ground, the HUD's chip, the recentre's shift
@@ -839,6 +839,7 @@ import { pickRegionHubs, hubAtMapId, hubArrivalLine, hubClaim } from '../systems
 import { dungeonTier, tierPhrase } from '../systems/dungeon/dungeonTier.js';   // TIER1: a dungeon's tier, said online...
 import { dungeonTierLabel } from '../world/dungeon/dungeonLabel.js';   // ...with its size, never over a place the port made
 import { deriveTownSeats, seatAtMapId } from '../systems/town/townSeats.js';   // SEAT1a: every palace a seat, the three capitals crowns
+import { townSeatsOnline } from '../systems/town/townSeatsOn.js';
 import { createTownSeatBook, parseSeatCommand, parseSiegeCommand } from '../net/townSeatBook.js';   // SEAT1a: the seats open, confirmed, witnessed   // VOID: a moderator's /siege void
 import { seatArrivalLine, boardTithePct } from '../net/townSeatLaw.js';   // SEAT1a: the seat's arrival line; AUDIT SEATS-3 D3: a board's Tithe (SEAT-HALL's and CROWN-HALL's halls: scenes/seatHallHost.js)
 import { createSeatHallHost } from './seatHallHost.js';   // DOMAIN2 (HOST-SPLIT): a seat's halls and the guild's castle
@@ -1514,7 +1515,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   StreamingWorldState.frames = etherSea ? [etherFrame()] : [];
   // EV7: the pixel kernel's off-thread home - a COPY of the WOODS
   // bytes crosses once; this thread's `woods` stays the fallback law.
-  const terrainGen = new TerrainGenClient({ woods, woodsBytes });
+  const terrainGen = new TerrainGenClient({ woods, woodsBytes, slopeCut: terrainSlopeCutOn() });   // TERRAIN-CUT: the world's cut, read once
   // ROADS 3: OUR network, from the player's own map. Built once here,
   // handed to both terrain kernels; a failure draws a world without
   // roads and says so, never no world.
@@ -1959,11 +1960,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const noticeBook = params.has('online')
     ? createNoticeBook({ door: accountBoard({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }), storage: appStorage() })
     : null;
-  // SEAT1a (Seats-Arc 3.2): whether the seats are open to this account (SEATS_OPEN), the ones the witnesses confirmed,
-  // and the seat this client stands in reported once a day (net/townSeatBook.js). Online only - offline the Bay is DFU's.
+  // SEAT1a (Seats-Arc 3.2): whether the seats are open to this account (SEATS_OPEN), the ones the witnesses confirmed, and the seat this client stands in reported once a day (net/townSeatBook.js). Online only, the Town seats row on - offline the Bay is DFU's.
   // SEAT1b: and this device's half of influence - the standings, a pledge, Tribute, and the Watch's receipts, kept for the
   // signed-in account while they stand in a seat's own pixel as this client derives the seats
-  const _seatDoor = params.has('online') ? accountSeats({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }) : null;
+  const _seatDoor = townSeatsOnline(params) ? accountSeats({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }) : null;
   const seatBook = _seatDoor
     ? createTownSeatBook({
       door: _seatDoor, storage: appStorage(), me: _seatDoor.me, character: () => characterIdOf(playerEntity),
@@ -1972,7 +1972,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // CROWN2: a Pact broken early, said in red on every tab as the server's own line (RED1) - offered again while there is no chat yet
       onRed: (line) => (redChat ? redChat(line) : false),
       turnMs: dayTurnMs(),   // DAY-TURN: its report's day turns at this page's moment past midnight
-      stores: (st) => profBook?.applyStore(st),   // DOMAIN1 (Domains.md 5): a gift's Stores told the professions' book, as a writ's are
     })
     : null;
   // CHAP2a (Chapters-Arc 4): the guild halls of the towns this client walks into, reported once a UTC day a town while
@@ -2064,9 +2063,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     say: (line, s) => townTalk.say(line, s),
     claim: (site, region) => seatBook?.bounty(site, region) ?? Promise.resolve({ paid: 0 }),
     onFestive: () => computeEntityMods(playerEntity),
-    // SEASON1 part two (Seats-Arc 9.3): the land's Tide here; an Orc Raid's camp cleared
-    tideAt: (region) => seatBook?.tideAt(region) ?? 'calm',
-    orcCamp: (site, region) => seatBook?.orcCamp(site, region) ?? Promise.resolve({ counted: false }),
   });
   // TOWN-ECON TE1 (3): every town's economy online - its counters' factor, the seat's
   // folded in, and its card on the Held Map and the Overworld (SEAT-TIP's seat card is its guild lines now); TE2 (4): the
@@ -2075,8 +2071,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     seats: () => (seatBook?.open === true ? seatBook.data?.seats ?? null : null), seatsHeard: () => !seatBook || seatBook.open != null, onBandsReady: () => _livingTripMemo.clear(),   // unread: nothing said of the area, never "no guild"; AUDIT TOWN-ECON 2 CLI-1: the market's band kept once the shares and the seats have answered, the trips planned before made again
     raidedAt: (px, py) => raidingPartiesOn() && raidState().raids.some((r) => r.px === px && r.py === py && raidActive(r, worldMinutes())), regionHere: () => { const p = playerTravelPixel(); try { return maps.getRegionIndexAt(p.x, p.y); } catch { return null; } },   // AUDIT TOWN-ECON 2 SVC-1: the `/town audit`'s region
     locAt: (x, y) => locationIndex.get(`${x},${y}`)?.mapTableData ?? null, portLanes: () => (_lanesReady && mapDict ? worldLanes.all() : null) });   // TE2: a Watch tick is kept where a town stands; SEA-TRADE: a port's town and its lanes (the lanes once they stand - BOOT-TDZ II; WW7-10: the world's)
-  // SEASON1 part two: a Storm Season's slow sea, on every voyage this client reckons (systems/travel/travel.js) - online alone
-  setSeaTide(seatBook ? (end) => (seatBook.tideAt(maps.getRegionIndexAt(end.x, end.y)) === 'storms' ? TIDE_EFFECTS.stormsSea : 1) : null);
   registerEntityFold(FESTIVE_FOLD, (e) => (e === playerEntity && seatEdicts.festive() ? festiveMods(STAT_KEYS_ORDER) : EMPTY_MODS));
   setCrimeRepFactor(() => seatEdicts.crimeFactor());   // SEAT1d: a Curfew's crimes cost twice the legal reputation
   // PROF1 (22): this character's professions - its tracks, Stores and day as the
@@ -4126,8 +4120,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     }
   };
   const hitDistance = (hit) => (hit && Number.isFinite(hit.dist) ? hit.dist : null);
-  /** SEASON1 part two (Seats-Arc 9.3): how far from its marker an Orc Raid's second foe stands, metres. */
-  const ORC_RAID_PACE = 1.5;
   function standWodAction(p, w, act, x, y, z) {
     const key = `${p.px},${p.py}`;
     if (act.kind === 'foe') {
@@ -4135,10 +4127,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       exteriorFoes.spawnFoe(act.mobileType, [x, y, z], { yaw: act.yawDeg * Math.PI / 180, gender: act.gender, allied: act.allied, placed: true, groundAlign: { hitDist: hitDistance(hit) }, site: wodSiteOf(p, w) })   // WOD7: tagged with its marker
         .then((f) => { if (f && !act.hostile && f.ai) f.ai.isHostile = false; })   // MobileReactions.Passive
         .catch(() => {});
-      // SEASON1 part two (Seats-Arc 9.3): an Orc Raid's camp stands its foes twice - the second a pace beside the first
-      if (act.hostile && seatEdicts.orcsAt(p.px, p.py)) {
-        exteriorFoes.spawnFoe(act.mobileType, [x + ORC_RAID_PACE, y, z + ORC_RAID_PACE], { yaw: act.yawDeg * Math.PI / 180, gender: act.gender, allied: act.allied, placed: true, groundAlign: { hitDist: hitDistance(hit) }, site: wodSiteOf(p, w) }).catch(() => {});
-      }
       return;
     }
     if (act.kind === 'loot') {
@@ -4840,8 +4828,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const grid = { positions: p._bed.sheet, normals: p._bed.normals };
     const bed = fields ? gridBed(grid, bedBytesOf(p), stride, halo) : null;
     renderer.destroyMesh(p.terrain);
-    p.terrain = renderer.createTerrainSurface(bed?.positions ?? grid.positions, bed?.normals ?? grid.normals,
-      stride === 1 ? TERRAIN_INDICES : TERRAIN_INDICES_LOD);
+    p.terrain = renderer.createPixelTerrainSurface(bed?.positions ?? grid.positions, bed?.normals ?? grid.normals, p.terrainIndices, stride);
     p._bed = { sheet: grid.positions, normals: grid.normals, depths: bed?.depths ?? null, sheetDepths: bed?.sheetDepths ?? null, halo };   // the grid kept: a cap lifted carves it back
     seatFlora(p, renderer);   // FLORA-GROUND, THE RINGS: its plants on the ground as carved now (scenes/floraSeat.js)
   }
@@ -4857,7 +4844,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   function dwWaterSurface(p) {
     if (!waterOn || !p.terrain) return;
     if (p.water) { renderer.destroyWaterSurface(p.water); p.water = null; }
-    const idx = buildWaterIndices(p._dwBytes ?? p.tilemapBytes, p._stride ?? 1);
+    const idx = buildPixelWaterIndices(p._dwBytes ?? p.tilemapBytes, p._stride ?? 1, p.samples);
     p.water = idx ? renderer.createWaterSheet(idx, waterSheetOf(p._bed, p.terrain)) : null;   // WATER-NEXT 2: the bed the build carved
   }
   /** WATER-NEXT 2: a water sheet's source - the bed's grid and depths, or (no vertex under water) the terrain's own
@@ -4869,7 +4856,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // (render/renderer.js terrainClipFs), which draws the pixel's ground while the cap's TileMap stands on it (the drain below).
   function dwClipTerrain(p) {
     if (p.dwTerrain) { renderer.destroyWaterSurface(p.dwTerrain); p.dwTerrain._dead = true; p.dwTerrain = null; }
-    const idx = p._dwBytes ? clippedTerrainIndices(p._dwBytes, p._stride ?? 1, renderer.coastEdges) : null;   // COAST-LOOK: the coast's ring of clipped tiles the program's to cut
+    const idx = p._dwBytes ? clippedTerrainIndices(p._dwBytes, p._stride ?? 1, renderer.coastEdges, p.samples) : null;   // COAST-LOOK: the coast's ring of clipped tiles the program's to cut
     if (idx) { p.dwTerrain = renderer.createWaterSurface(p.terrain, idx); p.dwTerrain.bounds = p.terrain.bounds; }
   }
   /** FAR-CLIP1: the ground queue's order - the cap's pixels after the rest (a stable sort: near first within each),
@@ -5166,16 +5153,14 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // three discrete events, no polling. Everything else in the world
   // can move without touching a static door.
   let doorGeneration = 0;
-  const TERRAIN_INDICES = buildTerrainIndices();
-  // EV4: the far ring's strided twin - 33x33 plus its crack skirt, a
-  // 16x triangle cut per pixel. Enhanced only: the 1:1 lane keeps full
+  // EV4: the far ring's strided grid - 33x33 plus its crack skirt, a
+  // 16x triangle cut per pixel (each pixel's indices its own: restrideGrid). Enhanced only: the 1:1 lane keeps full
   // resolution at every distance, exactly as DFU draws it. The ring
   // test reads the LIVE player pixel, so a pixel's class follows the
   // walk (restrideTerrain below swaps a built pixel's surface).
   const LOD_STRIDE = 4;
   const LOD_NEAR = 3;   // chebyshev distance where the far ring starts
   const lodOn = isEnhanced();
-  const TERRAIN_INDICES_LOD = lodOn ? buildTerrainIndices(LOD_STRIDE) : null;   // AUDIT EV: the 1:1 lane never pays for the strided twin
   const lodStride = lodOn ? LOD_STRIDE : 1;   // FLORA-GROUND, THE RINGS: the far ring's class, its plants' lifts made ahead in a near pixel's build
   const strideFor = (px, py) => ((lodOn
     && Math.max(Math.abs(px - state.current.x), Math.abs(py - state.current.y)) >= LOD_NEAR)
@@ -5326,7 +5311,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     frames: framesBegun,   // PERF-EXT24 (the review): a slice a frame ran inside held a wait, and is not lent
   });
   const { buildPixelNow } = createPixelBuild({   // HOST-SPLIT: src/scenes/pixelBuild.js
-    MILL_SAIL_PAD, TERRAIN_INDICES, TERRAIN_INDICES_LOD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
+    MILL_SAIL_PAD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
     _livingPatrons, _locationToBuild, spawnGroundPlace, _lptSway, _lptWindfall, _reskin, adoptWodCarry, archAabb, blocks, boardSplitOf,
     breather, buildingDoors, built, chapterSheet, climates3x3, collider, cpuModels, deepWaters, destroyPixel,
     dfMeshSize, dwDecor, ecotones, ensurePersonTex, forests, gateClearSweep, getTexture, getWindmillMeshes,
@@ -5518,9 +5503,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     renderer.destroyMesh(p.terrain);
     const bed = waterOn ? hostBed(grid, grid.bed) : null;   // WATER-NEXT 2: the bed at the new ring class - AUDIT WATER-NEXT P1/H1: the kernel's, by the TileMap the water draws from
     p._bed = bed;
-    p.terrain = renderer.createTerrainSurface(grid.bed?.positions ?? grid.positions, grid.bed?.normals ?? grid.normals,
-      stride === 1 ? TERRAIN_INDICES : TERRAIN_INDICES_LOD);
-    const waterIndices = waterOn ? buildWaterIndices(p._dwBytes ?? p.tilemapBytes, stride) : null;   // DW-F: the cap's TileMap, where it patched one
+    p.terrain = renderer.createPixelTerrainSurface(grid.bed?.positions ?? grid.positions, grid.bed?.normals ?? grid.normals, grid.indices, stride);
+    p.terrainIndices = grid.indices;
+    const waterIndices = waterOn ? buildPixelWaterIndices(p._dwBytes ?? p.tilemapBytes, stride, p.samples) : null;   // DW-F: the cap's TileMap, where it patched one
     p.water = waterIndices ? renderer.createWaterSheet(waterIndices, waterSheetOf(bed, p.terrain)) : null;
     p._stride = stride;
     seatFlora(p, renderer);   // FLORA-GROUND, THE RINGS: its plants drawn on the ground it draws at the new ring class (scenes/floraSeat.js)
@@ -11023,7 +11008,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           if (!r?.ok) return { ok: false, text: r?.kept ? `${st.kept}${chain ? ` ${chain}` : ''}` : `${accountRefusalText(r?.error)}${movedFirstText(r)}${chain ? ` ${chain}` : ''}` };
           const paid = f.fee > 0 && !r.elsewhere;
           const rec = recipeById(recipe);
-          const made = rec?.kind === 'siege' ? storedText(rec.name, Number(r.data.count) || 1) : craftedText(mintPieces(r.data));   // SEAT2b part two: a Ram Kit is the Stores'
+          const made = craftedText(mintPieces(r.data));
           return { ok: true, text: `${chain ? `${chain} ` : ''}${made} ${craftXpText(rec, r.data, st.xp, profBook.limit(rec?.profession))}${paid ? `, and paid the ${f.who ?? st.who} ${f.fee} gold` : ''}.` };   // CRAFT-LIMIT-SAID: and the crafter's limit, where it now holds the track
         },
         stock: async (material, qty, counter = stockOf(material)?.counter) => {
@@ -17299,7 +17284,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           for (let dz = -r; dz <= r * 3 && all; dz++) for (let dx = -r; dx <= r && all; dx++) all = grass.has(p.tilemapBytes[(tz + dz) * TERRAIN_TILE_DIM + tx + dx] >> 2);
           if (!all) continue;
           const x = t[0] + (tx + 0.5) * 6.4, z = t[2] + (tz + 0.5) * 6.4;
-          const n = steep > 0 && p.groundNormals ? surfaceNormalAt(p.groundNormals, (tx + 0.5) * 6.4, (tz + r * 2 + 0.5) * 6.4, [0, 1, 0]) : null;   // AUDIT B5: the far half's middle
+          const n = steep > 0 && p.groundNormals ? surfaceNormalAt(p.groundNormals, p.samples, (tx + 0.5) * 6.4, (tz + r * 2 + 0.5) * 6.4, [0, 1, 0]) : null;   // AUDIT B5: the far half's middle
           if (steep > 0 && !(n && Math.hypot(n[0], n[2]) >= steep)) continue;
           if (skip-- > 0) continue;
           return { feet: [x, heightAt(x, z), z], yaw: n ? Math.atan2(n[0], n[2]) : 0, pixel: [p.px, p.py], archive: p.groundArchive, normal: n };   // AUDIT B5: a hillside's yaw looks down it
@@ -32026,7 +32011,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
         const hit = pieceAt(x, z);   // PERF8
         if (!hit?.p.groundNormals) return null;
         const { p, t } = hit;
-        return surfaceNormalAt(p.groundNormals, x - t[0], z - t[2], grassNormalScratch);
+        return surfaceNormalAt(p.groundNormals, p.samples, x - t[0], z - t[2], grassNormalScratch);
       };
       if (!labGrassField) labGrassField = jungleFloor ? jungleFloor.pair(createGrassField(labGrass, { keep, ground, slope, density: grassDensity })) : createGrassField(labGrass, { keep, ground, slope, density: grassDensity });   // PERF1: the pref's fraction of the lab's field; BANTHA2: the floor's paired with it
       labGrassField.update(ex, ez, keep, ground, slope);

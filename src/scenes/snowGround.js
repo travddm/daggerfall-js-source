@@ -55,7 +55,7 @@ export function createSnowGround(host) {
       if (p.deepWaters && host.deepWaters) { const f = host.deepWaters.floorLocalY(p, lx, lz); if (f != null) return f; }   // DW-B: the floor is drawn there
       return drawnGroundAt(p.samples, lx, lz, p._stride ?? 1, p._bed?.depths ?? null);   // WATER-NEXT 2: and the bed carved under a shore - FLORA-GROUND: the ground the pixel draws, the plants' (terrainSurface.js drawnGroundAt)
     },
-    normal: (p, lx, lz, out) => (p.groundNormals && (p._stride ?? 1) === 1 ? surfaceNormalAt(p.groundNormals, lx, lz, out) : surfaceNormalFromSamples(p.samples, lx, lz, p._stride ?? 1, out)),
+    normal: (p, lx, lz, out) => (p.groundNormals && (p._stride ?? 1) === 1 ? surfaceNormalAt(p.groundNormals, p.samples, lx, lz, out) : surfaceNormalFromSamples(p.samples, lx, lz, p._stride ?? 1, out)),
     tileMap: (p) => p._dwBytes ?? p.tilemapBytes,
     climate: (p) => maps.getClimateIndex(p.px, p.py),
     mapPixel: (p) => ({ x: p.px, y: p.py }),

@@ -10,7 +10,7 @@ import {
   worksOf, siegeGateVitality, siegeRamVitality, siegeWaveMs, siegeThroneBarred, refereeWorkBlow, siegeRamDown, siegeBreach,
   fieldOf, newBattle, newFighter, battleStep, siegeFieldFrame, siegeNextWave, siegeReturn, SIEGE_HIT,
 } from '../../src/net/siege/siegeRef.js';
-import { GATEHOUSE, RAM, WALLS_WAVE_STEP_MS, WALLS_WAVE_MIN_MS, gatehouseVitality, ramVitality, defendersWaveMs } from '../../src/net/fortLaw.js';
+import { GATEHOUSE, RAM, WALLS_WAVE_STEP_MS, WALLS_WAVE_MIN_MS, gatehouseVitality, defendersWaveMs } from '../../src/net/fortLaw.js';
 import { mintSiegeOrder, verifyOrder, siegePassValid } from '../../src/net/identityToken.js';
 import { validSiegeIn, validSiegeOut } from '../../src/net/wire.js';
 
@@ -26,11 +26,11 @@ const SWORD = { w: 123, m: 9 };   // a Daedric Dai-Katana the look holds (its bu
 
 test('SEAT2b part two (b) THE NUMBERS ARE THE LAW\'S: the Gatehouse\'s, the Ram\'s and the Walls\' copied into the relay\'s leaf and pinned equal to net/fortLaw.js (mutants: each number)', () => {
   assert.deepEqual([SIEGE_GATEHOUSE.vitality, SIEGE_GATEHOUSE.perTier, SIEGE_GATEHOUSE.blowShare], [GATEHOUSE.vitality, GATEHOUSE.perTier, GATEHOUSE.blowShare]);
-  assert.deepEqual([SIEGE_RAM.vitality, SIEGE_RAM.damage, SIEGE_RAM.everyMs, SIEGE_RAM.crew, SIEGE_RAM.crewM, SIEGE_RAM.siegewright], [RAM.vitality, RAM.damage, RAM.everyMs, RAM.crew, RAM.crewM, RAM.siegewright]);
+  assert.deepEqual([SIEGE_RAM.vitality, SIEGE_RAM.damage, SIEGE_RAM.everyMs, SIEGE_RAM.crew, SIEGE_RAM.crewM], [RAM.vitality, RAM.damage, RAM.everyMs, RAM.crew, RAM.crewM]);
   assert.deepEqual([SIEGE_WALLS.stepMs, SIEGE_WALLS.minMs], [WALLS_WAVE_STEP_MS, WALLS_WAVE_MIN_MS]);
   for (const t of [0, 1, 2, 3]) assert.equal(siegeGateVitality(t), gatehouseVitality(t), `tier ${t}`);
   assert.deepEqual([siegeGateVitality(0), siegeGateVitality(1), siegeGateVitality(3)], [20000, 30000, 50000]);
-  assert.deepEqual([siegeRamVitality(false), siegeRamVitality(true)], [ramVitality(false), ramVitality(true)]);
+  assert.equal(siegeRamVitality(false), RAM.vitality);
   assert.deepEqual([siegeRamVitality(0), siegeRamVitality(1)], [3000, 4500]);
   for (const tier of ['palace', 'crown']) for (const w of [0, 1, 2, 3]) {
     assert.equal(siegeWaveMs({ tier, works: { walls: w } }, 'defend'), defendersWaveMs(SIEGE_WAVE_MS[tier], w), `${tier} walls ${w}`);

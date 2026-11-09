@@ -9,7 +9,9 @@
 // Dressed by the stone-and-brass kit's roles (ui/enhanced/enhancedFrame.js FRAME_ROLES: a row a tile, the portrait a well, the
 // rank a chip) - this sheet writes geometry and the words' colours alone, as the stats card's does.
 
-import { revenantsFor, revenantOn, revenantHeld, revenantPortrait, revenantRankNumeral, REVENANT_MAX, REVENANT_MIN_RENOWN } from '../../systems/revenant/revenant.js';
+import { revenantsFor, revenantOn, revenantHeld, revenantPortrait, revenantRankNumeral, REVENANT_MAX } from '../../systems/revenant/revenant.js';
+import { revenantRenownMin, revenantAnyFoe } from '../../systems/revenant/revenantsOn.js';
+import { t } from '../../systems/textManager.js';
 import { ownMinutes } from '../../systems/worldTick.js';
 import { requestFittedIcon, fittedImg } from '../textureCanvas.js';
 import { PERSONALITIES } from '../../systems/revenant/revenantPersonality.js';   // REVENANT-VOICE: who each is
@@ -22,6 +24,11 @@ let _icon = (p, onReady) => requestFittedIcon(p.archive, p.record, { box: FACE_B
 export function _setRevenantPageIconForTests(fn) { _icon = fn ?? ((p, onReady) => requestFittedIcon(p.archive, p.record, { box: FACE_BOX, dpr: Number(globalThis.devicePixelRatio) || 1, cap: 8, onReady })); }
 
 /** The rail shows the page while revenants are made (the loot-rarity row), or while any is remembered. */
+/** Who the note says will come back for you: "A foe", "An elite or champion" - after "From Renown 10, " when held. */
+function nemesisWords() {
+  const who = revenantAnyFoe() ? t('rvn.page.anyFoe', 'a foe') : t('rvn.page.elites', 'an elite or champion');
+  return revenantHeld() ? t('rvn.page.fromRenown', 'From Renown {n}, {who}', { n: revenantRenownMin(), who }) : who.charAt(0).toUpperCase() + who.slice(1);
+}
 export const revenantPageShown = (player = null) => revenantOn() || revenantsFor(player).length > 0;
 
 export const REVENANT_PAGE_CSS = `
@@ -72,7 +79,7 @@ export function agoWords(minute, now) {
 /** When a living revenant will come, in words: out in the world now, due (any road), or in so long. */
 export function comeWords(r, now, held = revenantHeld()) {
   if (r.out) return { tag: 'Abroad', cls: 'is-out', line: 'Out in the world, looking for you.' };
-  if (held) return { tag: 'Held', cls: 'is-waiting', line: `It will not come for you before Renown ${REVENANT_MIN_RENOWN}.` };
+  if (held) return { tag: 'Held', cls: 'is-waiting', line: `It will not come for you before Renown ${revenantRenownMin()}.` };
   const left = r.dueAt - now;
   if (left <= 0) return { tag: 'Hunting', cls: '', line: 'Hunting you. It may appear on any road.' };
   const days = Math.round(left / 1440);
@@ -160,8 +167,8 @@ export function drawRevenantsPage(detail, rerender, { el, divider, player = null
   detail.append(divider(`Revenants (${living.length} of ${REVENANT_MAX})`));
   if (!living.length) {
     detail.append(el('p', 'px-note', revenantOn()
-      ? `${all.length ? 'None hunts you now.' : 'No foe has earned your name yet.'} ${revenantHeld() ? `From Renown ${REVENANT_MIN_RENOWN}, an` : 'An'} elite or champion that kills you, or breaks, runs and gets away, will remember you and come back for you.`   // AUDIT (2026-10-02): the sworn and the fallen below are revenants too
-      : 'Revenants need Loot rarity, which is off.'));
+      ? `${all.length ? 'None hunts you now.' : 'No foe has earned your name yet.'} ${nemesisWords()} that kills you, or breaks, runs and gets away, will remember you and come back for you.`   // AUDIT (2026-10-02): the sworn and the fallen below are revenants too
+      : t('rvn.page.off', 'Revenants are off.')));
   } else {
     const list = el('div', 'rvn-list');
     for (const r of living) list.append(row(el, r, now, kindName));
