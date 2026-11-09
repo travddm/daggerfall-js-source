@@ -111,6 +111,7 @@ import { ARMOR_ENUM } from '../../combat/enemyEquipment.js';
 import { morrowindDataCount, morrowindDataCounted, countMorrowindArchives, assetPickerOpen, textureStoreRegistered, textureStoreSettled } from '../../scenes/dataSource.js';   // MAC1: the boot door counts the store itself; AUDIT 65 XL-6: by NAME - it never reads a stored file   // MW-IMPORT: the attach door; MWFIX: and the modal it opens owns the keyboard
 import { CATEGORIES, keysOf, isSettingItem, optionPath, whereIs } from '../settings/settingsMap.js';   // ORG2: the one map of every option
 import { GRAPHICS_PRESETS, PRESET_ROWS, PRESET_PARTS, presetNow } from '../../systems/graphicsPresets.js';   // ORG2; MEM-AUDIT: and its parts
+import { classicRenderingRow, classicRenderingSearchText } from './classic-rendering-row.ts';
 import { widgetFor, blockedReason, formatValue, stepValue, COLOUR_KEYS, ENUM_LAW, enumWords } from '../settings/settingsLaw.js';   // FT14: the enum's own values are the bar's segments
 import { labelOf, helpOf, INSTEAD, TIER_TEXT } from '../settings/settingsCopy.js';
 import {
@@ -1740,13 +1741,12 @@ function itemKinds(item) {
   return [];
 }
 
-/** ORG2: what the search reads of an item - a DFU key's label and help, a Features row's words (its search text), a port
- *  row's own text, a card's. */
+/** What the search reads of an item: a DFU key's label and help, a row's search text, a preset's or a card's words. */
 function itemText(item, pool) {
   if (isSettingItem(item)) return `${labelOf(item)} ${helpOf(item)} ${item}`;
   if (item.startsWith('feat:')) { const f = FEATURES.find((x) => x.id === item.slice(5)); return f ? featureSearchText(f) : ''; }
   if (item.startsWith('port:')) return pool.get(item.slice(5))?.textContent ?? '';
-  if (item === 'preset:graphics') return presetSearchText();
+  if (Object.hasOwn(PRESET_PIECES, item)) return PRESET_PIECES[item].text();
   if (item === 'link:overhauls') return 'overhauls looks textures vanilla enhanced sounds interface';
   if (item === 'bindings') return 'key bindings keys keyboard rebind controls';
   if (item.startsWith('card:')) return { morrowind: 'morrowind files data body 3d attach', packs: 'packs textures music replacement folder',
@@ -1763,8 +1763,7 @@ function itemMatches(item, pool, q) {
 /** ORG2: whether a DFU key draws as a row here - live, or read at the next start; at pause, live alone (PX10). */
 const drawsHere = (key, pause) => (pause ? tierOf(key) === 'live' : drawsFlat(key));
 
-/** ORG2: AN ITEM AS THE NODES IT DRAWS - none for a key a Features row owns (FT13), a key that folds (`fold`
- *  collects it), a port row this device does not have, or a row the filter leaves out. */
+/** The nodes an item draws: none for a key a Features row owns, a folded key, a missing port row or a filtered row. */
 function itemNodes(item, ctx) {
   const { pool, pause, fold = null, any = false } = ctx;
   if (optFilter !== 'all') {
@@ -1786,7 +1785,7 @@ function itemNodes(item, ctx) {
   }
   if (item === 'port:language') { const r = pool.get('language'); const pack = r ? translationPackRow() : null; return r ? [mark(r), ...(pack ? [pack] : [])] : []; }   // L10N3b: the translation pack rides under the language row
   if (item.startsWith('port:')) { const r = pool.get(item.slice(5)); return r ? [mark(r)] : []; }
-  if (item === 'preset:graphics') return [graphicsPresetRow()];
+  if (Object.hasOwn(PRESET_PIECES, item)) return PRESET_PIECES[item].nodes();
   if (item === 'link:overhauls') return pause ? [] : [overhaulsLinkRow()];
   if (item === 'mods-index') return modsIndexRows();
   if (item === 'bindings') { const box = el('div', 'opt-bindings'); paneControls(box, { render }); return [box]; }
@@ -1833,7 +1832,7 @@ function tabCount(tab, ctx) {
       else if (item.startsWith('feat:')) n++;
       else if (item.startsWith('port:')) { const r = ctx.pool.get(item.slice(5)); if (r && r.dataset.live !== '0') n++; }   // QREPAIR: a row greyed here is not one that works here
       else if (item === 'mods-index') n += FEATURES.filter((f) => f.kinds.includes('mod')).length;   // every mod has a row in the list
-      else if (item === 'preset:graphics') n++;   // the preset is a choice of its own; the Overhauls door is not
+      else if (Object.hasOwn(PRESET_PIECES, item)) n++;   // a preset is a choice of its own; the Overhauls door is not
     }
   }
   return n;
@@ -2062,9 +2061,7 @@ function categoryCard({ pool = portPool(), pause = false } = {}) {
 
 // ── ORG2: THE SCREEN'S OWN PIECES ────────────────────────────────
 
-/** AUDIT MEM-AUDIT G4/G5/G6: the preset row's words, one home and in the player's language - its note names what it
- *  sets, its effect when, and its search finds it by either (in English too) and by the rows' own titles: a fixed list
- *  of English words did not know its own note, and the row was the one on the tab no language reached. */
+/** The quality preset's words, in the player's language; the search finds the row by them and by the rows' titles. */
 const PRESET_WORDS = {
   name: () => t('menu.settings.preset.name', 'Quality preset'),
   note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.'),
@@ -2080,9 +2077,7 @@ export const presetSearchText = () => ['quality preset graphics low medium high 
   ...GRAPHICS_PRESETS.map((p) => PRESET_LABELS[p.id]?.() ?? p.label),
   ...PRESET_ROWS.map((id) => FEATURES.find((f) => f.id === id)?.title ?? ''),
   ...PRESET_PARTS.map((k) => FEATURES.flatMap((f) => resolveControl(f)?.parts ?? []).find((pt) => pt.key === k)?.label ?? k)].join(' ');
-/** ORG2: THE GRAPHICS PRESET - one bar over the six rows that cost the most and its parts (systems/graphicsPresets.js), reading
- *  the preset they stand at or Custom. A press writes each row through its own door, so a lane's second store moves
- *  with it and a row the room decides is left as it is. */
+/** The quality preset's bar (systems/graphicsPresets.js): it reads the preset the rows stand at, or Custom. */
 export function graphicsPresetRow() {   // AUDIT MEM-AUDIT G3: exported for the pins - the bar as drawn
   const now = presetNow(featureValue, getPref);
   const row = el('div', 'row opt-preset');
@@ -2108,6 +2103,11 @@ export function graphicsPresetRow() {   // AUDIT MEM-AUDIT G3: exported for the 
   row.append(ctl);
   return row;
 }
+/** The Quality section's pieces: the quality preset and the Classic rendering preset (ui/enhanced/classic-rendering-row.ts). */
+const PRESET_PIECES = {
+  'preset:graphics': { nodes: () => [graphicsPresetRow()], text: () => presetSearchText() },
+  'preset:classic': { nodes: () => [classicRenderingRow(tileStates, () => { _eff = null; render(); })], text: () => classicRenderingSearchText() },
+};
 /** ORG2: a preset, written - each of its rows to its value through the row's own states (tileStates). */
 export function applyGraphicsPreset(p) {
   for (const id of PRESET_ROWS) {

@@ -78,7 +78,10 @@ world frame, so a change applies on the next frame.
   optional posterize or palettize post-processing. Retro mode wins over render scale. The settings screen shows the
   first three keys as the Classic picture, Classic aspect and Classic colours rows (`src/systems/features.js`); the rows
   write the keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)",
-  not classic: no source shows the original game drew at that size.
+  not classic: no source shows the original game drew at that size. The Classic rendering preset in the Quality
+  section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
+  Off and land view distance 3 in one press. It keeps the values it replaced in the `classicRenderingSaved` preference,
+  and Off puts back each one that still holds the preset's value.
 - Leaving both returns to drawing straight to the canvas, and the renderer frees the image and depth it used.
 
 ## GPU memory and context loss
