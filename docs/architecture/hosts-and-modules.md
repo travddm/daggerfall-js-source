@@ -86,8 +86,9 @@ gathering profession; each profession is a "kind" object built by its own module
 })` in `src/scenes/fishHost.js`, and passed in its `kinds` list. Add a new profession as a new kind, not as code in
 `gatherHost.js`.
 
-Other examples of the pattern: `createBountyHost`, `createCaravanHost`, `createMentorHost`, `createCraftWritHost`,
-`createGrantHost`, `createChatSafetyHost`, `createCityGuards` and `createPixelBuild` (all in `src/scenes/`).
+Other examples of the pattern: `createCityGuards`, `createPixelBuild`, `createBountyHost`, `createCaravanHost`,
+`createMentorHost` and `createCraftWritHost` (all in `src/scenes/`). The last four belong to departures that leave
+core as mods (decision 102); the shape is the same.
 
 ## How systems, UI and net connect
 
@@ -116,7 +117,7 @@ holds no values itself.
 | --- | --- | --- |
 | Daggerfall Unity's settings | `src/systems/settings/settings.js` (`getInt`, `getBool`) | The settings Daggerfall Unity has, by section and key, for example `Video.RetroRenderingMode`. |
 | The game's own preferences | `src/systems/uiPrefs.js` (`getPref`) | Everything Daggerfall Unity does not have: enhanced lighting, render scale, touch options. |
-| Mod settings | `src/systems/modSettings.js` | The settings of each vendored mod. |
+| Mod settings | `src/systems/modSettings.js` | The values of every departure from Daggerfall Unity, by mod (vendored and first-party), until the mod manifests exist. |
 
 The UI skin (`enhanced` or `classic`) is `src/systems/uiSkin.js` (`isEnhanced()`). Many enhanced visual features
 require the enhanced skin and their own preference.
@@ -134,15 +135,17 @@ Write new code to this standard; do not copy the denser style of the hosts.
    to a plain object where it is used. Shapes that cross into the renderer are in `src/render/contract.js`.
 5. A file and a function fit in a reader's head.
 
-New files should start with `// @ts-check` so `npm run types` checks them.
+New files are TypeScript (`.ts`). Naming, tests and formatting are in [coding-standards.md](../coding-standards.md).
 
 ## Daggerfall Unity as the reference
 
-DFO Online is its own game. Daggerfall Unity is where you look first, not a target to match:
+Daggerfall Unity is the core: the game does what it does, and every departure is an agreed mod or option
+([README.md](../README.md), "Scope"; decisions 49, 102 and 103):
 
 - Before you build something Daggerfall Unity has, read its version, and search this tree for the member's name and
   its constants so you do not create a second copy.
 - Format readers in `src/formats/` read ARENA2 exactly as Daggerfall Unity does. Constants and tables translated from
   it stay byte-exact.
-- When behaviour departs from Daggerfall Unity on purpose, the comment names the member it departs from (for example
-  `FormulaHelper.CalculateX`) and says why.
+- When behaviour departs from Daggerfall Unity, the comment names the member it departs from (for example
+  `FormulaHelper.CalculateX`) and the mod or option that carries the departure. Online, the rule comes from the
+  server profile, not from an `isOnlinePage()` branch.

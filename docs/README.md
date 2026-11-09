@@ -23,6 +23,9 @@ touched code are in [coding-standards.md](coding-standards.md).
   traps. Leave out history: git holds it.
 - Name files by path and functions by name. Do not cite line numbers.
 - Keep a page under about 250 lines. Add a page to its folder's `README.md` when you add it.
+- A section about a vendored port or a first-party departure that leaves core carries one line under its heading:
+  `> Leaves core: <the mod it becomes, or "an option"> (decision N).` Add it when you touch the section, and remove it
+  when the code leaves.
 
 ## Scope
 
