@@ -13,8 +13,8 @@ file you create, and to the code you change in an old file.
 A comment says why: the reason for the code, an invariant, a workaround, a constraint or a trap the code cannot show.
 The code says what. Delete a comment that only restates the code.
 
-A departure from Daggerfall Unity is named in a comment where it is made, with its case (online or better design), as
-`docs/README.md` ("Scope") asks. Keep those, in plain words.
+A departure from Daggerfall Unity is named in a comment where it is made, with the mod or option it belongs to
+(`.claude/rules/design-rules.md`). Keep those, in plain words.
 
 ## What a comment never holds
 

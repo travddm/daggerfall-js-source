@@ -26,7 +26,7 @@ and `docs/README.md` ("Code comments"). Read both first.
 ## What to do with each comment
 
 - Keep every reason that still holds: why the code is this way, an invariant, a trap, a workaround, a named departure
-  from Daggerfall Unity and its case. Check it against the code. Delete a claim the code no longer supports.
+  from Daggerfall Unity and the mod or option it belongs to. Check it against the code. Delete a claim the code no longer supports.
 - Remove ticket, slice, audit and report codes, dates, names of who asked, history, quotes of chat, and `bible/` cites.
   When a code is the only label of a reason, keep the reason in plain words.
 - Remove banner bars. Turn an ALL-CAPS headline into one plain sentence-case line, or delete it when the code that

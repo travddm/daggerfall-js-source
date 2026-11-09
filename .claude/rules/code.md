@@ -7,6 +7,12 @@ paths:
 
 `docs/coding-standards.md` holds the standards for new and touched code. This page adds what it leaves open.
 
+## File names
+
+A new file is named in kebab-case for what it holds (`changed-paths.ts`), and its test is `<module>.test.ts`
+(`changed-paths.test.ts`). Existing files keep their names until a later rename pass renames them all at once; do not
+rename one in passing, because a scattered rename breaks every open pull request that touches it.
+
 ## Move what you touch out of a big module
 
 When a change edits code in a big module (about 1,000 lines) or a big function (about 150 lines), move the code you

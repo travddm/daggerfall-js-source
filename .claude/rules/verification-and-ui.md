@@ -9,7 +9,8 @@ and check the neighbouring behaviour it could break. Tests and CI do not show th
 Check every surface the change reaches: the browser on a desktop, a phone layout, and the desktop app (`app/`). Choose
 by risk: shared logic with nothing new on screen needs one surface; a change to a shell, to saves or to what is drawn
 needs each surface that differs there. Say which surfaces were emulated. The probes are in `docs/testing/probes.md`
-and `docs/testing/game-probes.md`.
+and `docs/testing/game-probes.md`. The game probes run on every pull request that touches `src/`; they boot the game,
+but they do not replace a check of the change itself.
 
 ## Before and after images
 

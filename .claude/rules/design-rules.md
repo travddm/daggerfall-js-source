@@ -11,11 +11,14 @@ machines and players who like the old look must not lose it to an update.
 
 ## Departures are mods, cheap options stay in core (decisions 102 and 103)
 
-A system of our own that differs from Daggerfall Unity (new mechanics, content, UI, wire frames, relay handlers) leaves
-core as a first-party mod in its own repository, once the mod API gives it the hooks it needs. Until then it stays in
-core behind its option. A plain, cheap option stays in core: rendering options above all, and small tuning values over
-Daggerfall Unity's own systems. The core then stays Daggerfall Unity's game and the engine. Follow `docs/README.md`
-("Every departure is a mod") for the settings.
+Every departure from Daggerfall Unity is an agreed mod or option, and the rules a server plays by online live in its
+server profile, not in code paths of their own.
+
+A system of our own that differs from Daggerfall Unity (new mechanics, content, UI, wire frames, relay handlers)
+leaves core as a first-party mod in its own repository, once the mod API gives it the hooks it needs. Until then it
+stays in core behind its option. A plain, cheap option stays in core: rendering options above all, and small tuning
+values over Daggerfall Unity's own systems. The core then stays Daggerfall Unity's game and the engine. Follow
+`docs/README.md` ("Every departure is a mod") for the settings.
 
 ## No payments, credit in the mod manager (decisions 107 and 114)
 

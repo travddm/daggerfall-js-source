@@ -10,6 +10,8 @@ The docs are `docs/`. The base rules are in `docs/README.md` ("Writing these pag
 
 ## What a page holds
 
+- What a maintainer or a server owner needs. There is no official live service: write for people who change the code
+  or run their own server, not for players of one service.
 - What a maintainer needs to change the code safely: what a part does, where it lives, how it connects, its data
   formats and invariants, and its traps.
 - Facts checked against the code. The code is the authority: when a page and the code disagree, fix the page.

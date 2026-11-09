@@ -44,5 +44,6 @@ free number and the hash the test reports. Never edit an existing hash row: it r
 ## Patch notes
 
 Patch notes go in the pull request's description, under `## Patch notes: <title>`, written in ASD-STE100 Simplified
-Technical English. `CLAUDE.md` and `docs/operations/desktop-release.md` hold the rules; run
-`node scripts/steNotes.mjs <file>` on a draft.
+Technical English, because the desktop release prints them from there. Describe what changed for players; do not
+tabulate levels, factors or chances. `docs/operations/desktop-release.md` holds the rules.
+`node scripts/steNotes.mjs <file>` is an optional local check of a draft; no CI check enforces it.
