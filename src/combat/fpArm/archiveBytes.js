@@ -66,9 +66,8 @@ export function findLoaded(archives, path) {
   return arc;
 }
 
-/** MW-D16: the weapon mesh is parsed twice - once by the assembly and
- *  once here, for getArrowBone's fallback - so it is cached per call
- *  rather than parsed twice for the same bytes. */
+/** A mesh is parsed once per byte array: the assembly parses the weapon mesh, and so does the search for the bow's
+ *  arrow node (fpArmParts.js arrowPlacement). */
 export function parseNifOnce(bytes, cache = parseNifOnce.cache) {
   if (cache.has(bytes)) return cache.get(bytes);
   const nif = parseNif(bytes);
@@ -136,8 +135,7 @@ export function nifBytes(arc, path) {
   return b;
 }
 
-/** getArrowBone's FIRST branch: does the ACTOR's own skeleton carry the
- *  ammo type's attach bone? */
+/** Whether a skeleton carries a node of this name (any case): the weapon's own node, the arrow's, the torch's. */
 export function skeletonHasBone(skeletonBytes, name) {
   try {
     const skel = buildSkeleton(parseNifOnce(skeletonBytes));
