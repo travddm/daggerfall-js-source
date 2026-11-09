@@ -18,7 +18,7 @@ journal and guidance layers built over it, how quests behave online, the questli
 ## Engine modules (`src/systems/quest/`)
 
 | File | Ports | What it does |
-|---|---|---|
+| --- | --- | --- |
 | `parser.js`, `parseUtils.js` | `Parser.cs` | Reads a quest source: header, QRC message blocks, QBN resources and tasks. The first unrecognised block is the headless startup task; a second one throws. |
 | `quest.js` | `Quest.cs` | One live quest: messages, resources, tasks, the update loop, `EndQuest`'s two-tick grace, log steps, the tombstone, questor registry. |
 | `task.js` | `Task.cs` | Task types: Headless, Standard (`_sym_ task:`), PersistUntil (`until _sym_ performed:`), Variable, GlobalVarLink. |
@@ -37,7 +37,7 @@ journal and guidance layers built over it, how quests behave online, the questli
 Supporting modules that are the port's own (not DFU members):
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | `questPatches.js` | Text patches over vendored quests that are broken in play. A patch is exact old text plus an occurrence count; a wrong count throws, and the loader then falls back to the unpatched text. The vendored files stay verbatim. |
 | `noAsksAgain.js` | A `prompt` whose "no" leads nowhere asks again on the next click, so a misclick does not soft-lock the quest. |
 | `mainSpine.js` | Keeps the main-quest backbone `S0000999` running; the machine calls `keepSpine` on a fixed beat. |
@@ -78,7 +78,8 @@ click lives for exactly one quest tick unless an action consumes it.
 - `questData.js` `loadQuestPack()` preloads every quest source through Vite's `import.meta.glob`, so the machine's data
   seams stay synchronous. It is browser-only; node tests feed the bridge from the file system. It globs DFU's pack,
   the vendored mod packs (`vendor/roleplay-realism`, `vendor/warm-ashes-ships`, `vendor/foraging`), the questline
-  scripts (`src/systems/questlines/quests/`) and the start quests (`src/systems/starts/quests/`).
+  scripts (`src/systems/questlines/quests/`) and the two start quests (`_STARTIB.txt` and `_STARTHD.txt` in
+  `src/systems/starts/quests/`). The vendored packs leave the repository with their mods (decision 99).
 - `questFoeHost.js` spawns and places quest foes (`mintQuestFoeWave`, `placeRoomQuestFoe`) and decides which party
   member's client owns a shared quest foe.
 - `questProvinceSites.js` and `questProvinceWarm.js` give regions outside the Iliac Bay (no MAPS.BSA rows) remote sites,
@@ -88,7 +89,7 @@ click lives for exactly one quest tick unless an action consumes it.
 ## How quests are offered
 
 | Door | Code | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Guild "Get quest" service | `offerFlow.js` `offerGuildQuest`, `src/systems/guild/guildServiceFlow.js` | DFU's guild popup. Pool from `QuestListsManager` by guild group, membership and rank (or level, for guilds that use `isSatisfyQuestReqByLevel`). |
 | Talk "work" answer, merchant/noble click | `offerSocialQuest` | DFU's quest offer window. The questor leaves the work pool. |
 | Named quest | `offerNamedQuest` | A quest offered by name. |
@@ -114,12 +115,14 @@ Plain bulletin boards are DFU's rumour board: `src/systems/bulletinBoard.js` com
 - Guidance tier (`questGuidance.js`, Features row `quest-guidance`, pref `questGuidance`):
 
 | Tier | Shows |
-|---|---|
+| --- | --- |
 | `journal` (default) | Marks only places the player's map already knows, never inside a dungeon. |
 | `town` | Also rings the building the latest entry names, on the town map and the compass. |
 | `exact` | Also marks quest items, people and foes inside dungeons and buildings. Can spoil a quest. |
 
-`town` and `exact` apply only on the Enhanced skin. The classic skin keeps DFU's behaviour.
+`town` and `exact` apply only on the Enhanced skin. The classic skin keeps DFU's behaviour. Decision 117 (16) makes
+core default to DFU's classic UI and has Enhanced-only rows fixed to work in every skin where cheap, or moved into the
+skin mod; this row is not changed yet.
 
 ## Online behaviour
 
@@ -131,8 +134,8 @@ Each client simulates its own world; there is no server-side quest state. The re
 - **Stamps** (`questStamps.js`). Online, a quest reads three clocks: the character's own (`nowSeconds`, all
   countdowns), the sky (`skySeconds`, hour/date/season), and the event clock (`worldSeconds`, journal dates). Offline
   they are one clock.
-- **Guard windows** (`onlineGuard.js`). `N0B10Y03` ("Guard the Guild") opens its watch ten game minutes (about 50 real seconds) after arrival for
-  one game hour, instead of waiting for the shared midnight.
+- **Guard windows** (`onlineGuard.js`). `N0B10Y03` ("Guard the Guild") opens its watch ten game minutes (about 50
+  real seconds) after arrival for one game hour, instead of waiting for the shared midnight.
 - **Repute gates** (`onlineRepute.js`). Online, two Mages Guild quests are offered only once guild standing reaches the
   value their headers name, because online standing is held by the account service.
 - **Sharing** (`questShare.js`). The sender captures a quest's save envelope (`machine.getShareableQuestData`); the
@@ -140,9 +143,11 @@ Each client simulates its own world; there is no server-side quest state. The re
   keeps an independent copy. While partied, the host re-shares changed quests and the receiver updates in place
   (`machine.updateSharedQuest`). `shareActions.js` fixes which action state a resync may overwrite; new actions fail
   closed. The envelope must fit `QUEST_SHARE_MAX_BYTES`.
-- **Questlines** are forced on online (Features row `questlines`, `online: true`).
+- **Questlines** are a room pref online (Features row `questlines`, `online: 'room'`): the server profile pins them,
+  and the official profile pins them on.
 - **Nearby quests** (`questReach.js`, Features row `nearby-quests`) is the player's choice online. Reach is
-  `QUEST_REACH_BASE` + `QUEST_REACH_PER_LEVEL` per level above 1 (`questReachPixels`), with at least `QUEST_REACH_MIN_CHOICES` candidates.
+  `QUEST_REACH_BASE` + `QUEST_REACH_PER_LEVEL` per level above 1 (`questReachPixels`), with at least
+  `QUEST_REACH_MIN_CHOICES` candidates.
 
 ## Questlines (`src/systems/questlines/`)
 
@@ -163,6 +168,8 @@ quest; the machine does not import it. It is the port's own; DFU quests pay only
 - **Rewards** (`qlRewards.js`). Gold stays DFU's formula times the outcome's `PAY_PROFILES` factor. An outcome that pays
   gear offers `REWARD_CHOICES` pieces fitted to the player, seeded by the quest. Account currencies are paid only by
   the account service (`server-account/src/questlines.js`) against receipts it witnessed (`src/net/questlineClaims.js`).
+  The Features row `questline-rewards` (`QUEST_REWARDS_ROW` in `questRewardsRow.js`, pref `questlineRewards`, default
+  on) turns the outcome pay off: off, a quest pays only what DFU's script pays. Online the server profile pins it.
 - **Lines** (`qlLines.js` `QL_LINES`, `qlLineRunner.js`). A line is data: steps (quests in `quests/*.txt`), tier, and
   when it opens (level, another line, online, a live event). A line whose gate holds is offered; the player takes it;
   later steps start an hour (`STEP_GAP_S`) after the previous one; a failed later step is offered again a day later.
@@ -177,7 +184,8 @@ quest; the machine does not import it. It is the port's own; DFU quests pay only
 ## Bounty boards (`src/systems/bounty/`)
 
 The port's own. Half of a town's bulletin boards (`questBoardIndices`, every other one by position, the same on every
-client) are bounty boards; the rest show DFU's rumour.
+client) are bounty boards; the rest show DFU's rumour. There is no switch for this (`features.js` has no bounty row);
+DFU shows its rumour on every board. Under decision 49 it must become an option with DFU's boards selectable.
 
 - `bountyBoard.js` is the pure law. A posting is a pure function of (day, town pixel, slot): `BOUNTIES_PER_DAY` (4)
   hunts, each 4 to 10 map pixels out (Chebyshev), a pack of 4-8 (2-4 in a dungeon). `BOUNTY_TIERS` maps the reader's
@@ -208,8 +216,8 @@ client) are bounty boards; the rest show DFU's rumour.
 - Do not edit `vendor/dfu-quests/`. Fix a broken quest with a patch in `questPatches.js` (or `qlPatches.js` for a
   branch).
 - Many DFU quirks are kept deliberately and commented `QUIRK KEPT`. Check the comment before "fixing" one.
-- `parseUtils.js` is a leaf the resource modules import. Keep shared helpers there, not in `parser.js`: parser.js imports every resource module, and resources extend
-  `QuestResource`, so a helper in parser.js closes an import cycle.
+- `parseUtils.js` is a leaf the resource modules import. Keep shared helpers there, not in `parser.js`: parser.js
+  imports every resource module, and resources extend `QuestResource`, so a helper in parser.js closes an import cycle.
 - Random draws go through the quest's injectable roll, never `Math.random`, so seeded tests stay seeded.
 - A host change to quest wiring belongs in `questBridge.js`, not in each scene host.
 - Offline and online differ in clocks, gates and the questlines switch. Test both lanes.

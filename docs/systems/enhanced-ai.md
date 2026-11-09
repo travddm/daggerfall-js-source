@@ -1,5 +1,7 @@
 # Enhanced AI
 
+> Leaves core: an Enhanced AI mod (decision 117 (15)).
+
 This page covers the Enhanced AI: the optional layer over Daggerfall's classic foe behaviour that adds navmesh
 pathfinding, group tactics, cover, and telegraphed blows with poise and staggers.
 It also covers how the layer is switched on and how it falls back to the classic motor.
@@ -23,13 +25,16 @@ plain `EnemyAI`. The result is Daggerfall Unity's classic behaviour.
 
 Departure from Daggerfall Unity: DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies"). This port does not
 implement it; the port runs DFU's classic path only. The Enhanced AI here is a separate design that shares half a name.
+It is decided that DFU's own setting is ported into core and that this layer becomes the mod (decision 117 (15)); that
+work is not done yet.
 
 ## The switch
 
 - Pref key `enhancedAI` in `src/systems/uiPrefs.js`, declared as the `enhanced-ai` row in `src/systems/features.js`
   (group `combat`).
-- `initial: true` (on by default offline). `online: true`: the online lane forces it on for every player
-  (`src/systems/online/onlineLane.js` derives this from the row).
+- `initial: true` (on by default offline). `online: 'room'`: online the server profile decides it for every player.
+  The official profile pins `enhancedAI: true` in `pins.prefs` (`src/net/profile/officialProfile.ts`), and
+  `src/systems/online/onlineLane.js` applies the installed profile's pins (`ONLINE_FORCED_PREFS`).
 - `PREF1_ADOPT_NEW_DEFAULT` in `uiPrefs.js` lists `enhancedAI`: a prefs shelf saved before the default changed adopts
   the new default once. A shelf with `featuresRestore` set and no `enhancedAI` key keeps it off.
 - The row has a sub-part `telegraphContrast` (default off, the player's own choice online): thicker telegraph lines, a
@@ -110,7 +115,7 @@ frozen `TACT` table.
   per `BACKOFF_COOLDOWN`.
 - **Fleeing**: only the cowardly human classes, `COWARD_CLASSES` (Mage, Sorcerer, Healer, Bard, Burglar, Acrobat,
   Thief), run below `FLEE_SHARE` health. Beasts, undead, daedra, constructs and guards never flee (`isCoward`). DFU has
-  no flee at all; this is the port's own, and F1 took it from the animals.
+  no flee at all; this is the port's own.
 - **Kiting**: a shooter with a token backs off a target inside `KITE_IN`, one burst (`KITE_MAX`) per `KITE_COOLDOWN`;
   cornered, it fights in melee.
 - Foes walk the way they face (turn first, `WALK_FACE_DEG`); nobody backpedals after a pressing target.
@@ -152,7 +157,7 @@ every `TELL` number), `src/render/foeTelegraph.js` and `src/render/telegraphStyl
 A blow is the foe's own swing, delayed and shaped. A foe winds up with the shape drawn on the ground; at the landing the
 brain forces the swing, and the host's hit resolution asks `blowConnects` (the shape's verdict in place of the reach
 test). The damage is the combat formulas' roll and nothing else: no shape, signature or aimed shot multiplies a foe's
-blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
+blow (DFU rolls the same damage whether or not the swing was telegraphed).
 
 - **Shapes** (`BLOW`): lunge, sweep, slam, ring, charge, leap, and aimed shot. `blowShapesOf` picks
   them by family (`BLOW_FAMILY`); `inBlow` tests a point.
@@ -169,12 +174,14 @@ blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
 - **Patterns**: varied wind-up length, tracking lunges and charges, feints (`feints`; a feint never glints), chains.
 - **Landing effects**: `src/systems/blowEffects.js` (push, bleed, rattle, knock-down; `blowEffectOf`, `drainBlowEffects`).
 - **Damage modifiers**: staggered and overreached multipliers register through `registerBlowTakenMod` in
-  `src/systems/blowTaken.js`, a leaf the combat formulas read.
+  `src/systems/blowTaken.js`, a leaf the combat formulas read. These multiply the damage a foe takes
+  (`STAGGER_TAKEN` 1.25, `PUNISH_TAKEN` 1.3 in `tells.js`). Decision 117 (15) puts them under decision 13's rule on
+  damage multipliers: they are dropped or become an option. The code still applies them.
 - **Cues**: `tellCues` in `src/scenes/hostCombat.js` (glint, wind sound, release whoosh); `foeGlint` and `poiseTrack` in
   `tactics.js`.
 
-`blowShapes.js` imports nothing so the renderer can read the shapes without pulling the brain onto its boot graph
-(`test/render/boot2.test.js` checks this).
+`blowShapes.js` imports nothing so the renderer can read the shapes without pulling the brain onto its boot graph. No
+test checks this; keep the module free of imports by hand.
 
 ### Online
 

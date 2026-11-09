@@ -18,7 +18,7 @@ source it was translated from, and the layout facts and traps a maintainer needs
 ## The file map
 
 | ARENA2 file(s) | Reader | DFU source | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | any `*.BSA` container | `bsaFile.js` (`BsaFile`) | `BsaFile.cs` | 4-byte header (`int16` count, `uint16` directory type), records packed from offset 4, directory at the end. `NameRecord` 0x0100: 18-byte entries (14-byte name + `int32` size). `NumberRecord` 0x0200: 8-byte entries (`uint32` id + `int32` size). |
 | `*.PAL`, `*.COL` | `dfPalette.js` | `DFPalette.cs` | 768-byte files are raw RGB; 776-byte files have an 8-byte header. `MAP.PAL` stores 6-bit values and is multiplied by 4 (selected by file name). An unloaded palette is all red. `PAL.PAL` index 1 is the transparency sentinel. |
 | `TEXTURE.nnn` | `textureFile.js` + `baseImageFile.js` | `TextureFile.cs`, `BaseImageFile.cs` | Multi-record, multi-frame; frames decode lazily and are cached. `TEXTURE.215`, `.217`, `.436` are rejected (`UNSUPPORTED_FILENAMES`). Archives above 511 (`LAST_CLASSIC_TEXTURE_ARCHIVE`) are mod or port archives. The caller assigns the palette (DFU loads `ART_PAL.COL` itself). |
@@ -83,8 +83,12 @@ imports it (`server-account/src/market.js`, `server-account/src/professions.js`)
 BSA reader into the Worker.
 
 **`blocksFile.js` serves a block with port changes laid on.** The door may replace it, and an RMB's puddles are served
-dry (`world/puddleDry.js`). `readClassicBlock` returns the block as the BSA holds it, past both. Use it when you need
-the original (world-data patches do).
+dry. `readClassicBlock` returns the block as the BSA holds it, past both. Use it when you need the original (world-data
+patches do).
+
+**Puddle drying is a departure, not part of the reader.** `dryPuddles` (`src/world/puddleDry.js`) is the port's own
+change, applied in `blocksFile.js` to every RMB block with no setting read. It is decided that it is tied to the Iliac
+Puddle No More switch and leaves with that mod (decision 117 (23)); the code does not do that yet.
 
 **Departures are listed in headers.** `mapsFile.js` returns `null` where C# returns a default struct, memoizes
 `loadRegion`, and bounds a terminator scan at the record end. `bsaFile.js` bounds the name scan at the 14-byte field.

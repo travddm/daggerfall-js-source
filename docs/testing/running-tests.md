@@ -6,7 +6,9 @@ recorded times and the game data that some tests need.
 ## The runner
 
 The suite uses Node's built-in runner, `node:test`, with `node:assert/strict`. There is no Jest, Mocha or Vitest.
-Every file named `*.test.js` anywhere under `test/` is a test file. Each file runs in its own process.
+Every file named `*.test.js` or `*.test.ts` anywhere under `test/` is a test file (`testFiles` in
+`tools/testShards.mjs`). Each file runs in its own process. A new test file is `<module>.test.ts`; existing files keep
+their names until the rename pass (decision 116 (9), [writing-tests.md](writing-tests.md)).
 
 Node must be `>=22.18.0` (`package.json` `engines`), the first 22 release that runs `.ts` files. CI uses Node 22.
 
@@ -62,6 +64,11 @@ files. Options:
 
 - `--list` prints the chosen files and runs nothing.
 - `--base <rev>` compares against another commit.
+
+Pull requests on this fork target `feat/tamriel-review`, not `main`, so the default base picks too many files. Pass the
+merge base with the branch the pull request targets:
+`node tools/testChanged.mjs --base $(git merge-base HEAD origin/feat/tamriel-review)`. The tool's default is not fixed
+yet.
 
 When a change touches a module that most tests import (a scene host such as `src/scenes/world.js`), the tool picks
 most of the suite. In that case run the change's own test files and let CI run the rest.

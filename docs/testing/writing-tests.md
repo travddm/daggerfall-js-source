@@ -27,10 +27,13 @@ one exists.
 | `test/tree/` | Rules over the whole source tree (see below) |
 | `test/fixtures/` | Data files that tests load. It holds no tests. |
 
-A few `*.test.js` files sit at the top of `test/` for historical reasons. New tests go in an area folder.
+Some test files sit at the top of `test/`. New tests go in an area folder.
 
-Name the file `<topic>.test.js`. Say what the file covers in a header comment and in each `test()` title. Shared code
-that is not a test goes in a `.mjs` file at the top of `test/`, never in a `.test.js` file.
+Name a new test file `<module>.test.ts`, after the module it covers, in kebab-case like every new file (decision 116
+(9)). Existing files keep their names until the rename pass (decision 101 Q1). Many of them are named for a ticket or
+an audit (`audit*`, `fb*`, `rel4_`, `tesa*`); do not copy those names. Say what the file covers in a header comment
+and in each `test()` title. Shared code that is not a test goes in a `.mjs` file at the top of `test/`, never in a
+test file.
 
 A minimal test:
 
@@ -50,8 +53,10 @@ test('a file with no recorded time weighs the median', () => {
 - **Import the module and run it.** Assert on what it returns, what it writes and what it sends. A behavioural test
   survives a refactor that keeps the behaviour, and it fails when the behaviour breaks.
 - **Never read source text to check a module.** A test that greps a file for a line passes on a comment that quotes
-  the line and fails when correct code moves. Older tests do this, with helpers such as `test/hostText.mjs` and
-  `test/codeOnly.mjs`. Do not copy that style, and rewrite such a test as a behavioural one when you touch it.
+  the line and fails when correct code moves. Several hundred older test files do this (about 440 use
+  `test/hostText.mjs` alone; `test/codeOnly.mjs` is the other helper). Do not copy that style, and rewrite such a test
+  as a behavioural one when you touch it. When the split plan ends, one tree test fails any test that reads source
+  text, except a listed set of tree-wide sweeps (decision 101 Q3).
 - **A source sweep is correct only to enforce a rule across many files.** Examples in `test/tree/`:
   - `probegate.test.js`: every `window.__X =` (also `globalThis.` and `self.`) in `src/` must sit behind the
     screenshot gate (`shotMode`, `params.has('shot')`, `pageHas('shot')`) or be listed as always on, with a reason.

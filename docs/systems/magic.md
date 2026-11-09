@@ -89,11 +89,15 @@ Port additions:
 - `registerSpellLandedListener` tells listeners when the player's spell lands. The cast engine calls `tellSpellLanded`.
 - `ownSpellAt` limits all of this to the local player's own spell at a foe. Nothing applies at another player.
 
+The online price floor and `schoolPotency` choose their lane with `isOnlinePage()` (`spellcost.js`, `spellPower.js`).
+Decision 58 moves such online rules to server profile keys with DFU's value selectable; these two are not converted yet.
+
 ### Cast speed
 
 `castSpeed.js` `castRate(entity)` sets the speed of both hand lanes, the classic sprites and the Morrowind arm. Speed
 50 is rate 1. Registered modifiers (loot, arcane paths) add percents. The result is clamped to `CAST_RATE_MIN` and
-`CAST_RATE_MAX`. `weaponRig.js` reads it once per cast. DFU uses a fixed animation clock; this is a port departure.
+`CAST_RATE_MAX`. `weaponRig.js` reads it once per cast. DFU uses a fixed animation clock; this is a port departure
+with no option yet. Under decision 49 DFU's fixed rate must become selectable.
 
 ### Casts on a party mate
 
@@ -147,6 +151,8 @@ the cast spent.
 Port changes: the Absorbs Spells item enchantment is a roll (`ABSORB_ENCHANT_CHANCE`), not always. The Spell
 Absorption effect's chance is capped (`SPELL_ABSORPTION_CHANCE_CAP`). Every absorb refunds half the points, floored
 (`ABSORB_REFUND_SCALE`, `absorbRefund`). A career with absorption Always (the Sorcerer) still absorbs every time.
+These changes have no option today. It is decided that absorption defaults to DFU's value, with the halved refund as an
+option (decision 117 (20)).
 Tests: `test/systems/absorption.test.js`, `absorb_nerf.test.js`.
 
 ## Enchantments
@@ -188,7 +194,7 @@ rider.
   `SPEC_RESET_GOLD`.
 - `arcanePowers.js` registers each path's effects at import through the existing hooks: spell power, pierce, cost,
   cast speed, the entity fold, the player's damage and hurt listeners, blow evasion, kills, the magic round and
-  absorption. Every power is off in a refereed fight (`sigil.js` `sigilDueling`).
+  absorption. Every power is off in a refereed fight (`src/systems/sigil/sigil.js` `sigilDueling`).
 - `signatureSpells.js` builds each signature spell's record with the spell maker's builder. Records use their own
   index band from `SIGNATURE_INDEX_BASE`. Only the Mages Guild (or temple) shelf sells it, and only to the path's
   holder. Without its holder, the spell is the plain classic bundle with no rider.
@@ -199,6 +205,8 @@ rider.
 Tests: `test/systems/schools_arcane.test.js`, `audit_schools.test.js`.
 
 ## Readied spellcasting hands
+
+> Leaves core: the Readied Spellcasting Hands mod (decision 99).
 
 A port of the Readied Spellcasting Hands mod (jefetienne, MIT, vendored in `vendor/readied-spellcasting-hands/`,
 credited in `src/ui/credits.js`). A readied spell that is not CasterOnly shows frame 0 of its element's cast art until

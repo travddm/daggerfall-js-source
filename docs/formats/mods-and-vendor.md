@@ -1,5 +1,8 @@
 # Mods, `vendor/`, and Daggerfall Unity as the baseline
 
+> The `vendor/` mod folders are transitional: every vendored mod leaves this repository for its own repository
+> (decisions 77, 91 and 99). The folder tables below shrink as the folders leave.
+
 This page covers how the game carries Daggerfall Unity (DFU) mods: what `vendor/` holds, how a vendored mod's switches
 work (`src/systems/modSettings.js`), how a player's own `.dfmod` bundle is read, and how DFU's source is used as the
 baseline.
@@ -64,6 +67,7 @@ Mods (the folder README has the version, credits and permission):
 | `diverse-weapons`, `seasons-iliac-bay`, `vanilla-enhanced` | Manifests and settings; the textures come from a bundle (the player's, or for Vanilla Enhanced a pack the port ships) |
 | `dynamic-skies`, `handheld-torches`, `shield-widget`, `weapon-widget` | Settings, textures, shaders |
 | `grimoire-ui` | UI art listing (`systems/uiPack.js`) |
+| `world-of-daggerfall` | The author's C# source (shipped in the bundle), location prefabs (`LocationPrefab/`) and placements (`Locations/`, `locations.json`), ported in `src/world/worldOfDaggerfall/` |
 | `weapon-sheathing` | An OpenMW mod's scabbard meshes and bone add-ons (`systems/weaponSheathingAssets.js`) |
 | `raum-book` | The animated journal's book and paper code |
 | `pixelify-glyphs`, `silkscreen-five` | Single glyphs for the enhanced skin's fonts |
@@ -72,7 +76,7 @@ Mods (the folder README has the version, credits and permission):
 
 ## Fetched folders (`tools/fetch-vendor.sh`)
 
-Four mods are published on GitHub under the MIT licence. Their published files are not committed:
+Three mods are published on GitHub under the MIT licence. Their published files are not committed:
 `sh tools/fetch-vendor.sh` downloads each repository at a pinned commit and copies the files the game and the tests
 read into `vendor/<folder>/`. `.gitignore` lists the fetched paths. Each folder's `README.md`, and every file that
 differs from the published repository or is missing from it, stay committed.
@@ -125,9 +129,12 @@ does not claim a permission that is not recorded.
   loaded). `modSettingsOf(vendor)` returns every key resolved.
 - Values are stored in one record, `dfjs-mod-settings`, through `systems/appStorage.js` (in memory where there is no
   storage). `modSettingsGeneration()` changes on every write; a reader that caches a resolved copy keys on it.
-- **Online, the room decides some keys.** `onlineModSetting` (via `systems/online/onlineLane.js`) forces keys the shared
-  ground depends on (`ONLINE_ROOM_MOD_KEYS`) and reads whole balance mods at their shipped defaults
-  (`ONLINE_WHOLE_MODS`). While a room's shared loot base rolls, every key reads its shipped default (`asTheRoom`).
+- **Online, the server profile decides some keys.** The installed server profile's pins
+  (`activePins()` in `src/systems/online/serverProfile.ts`; the official profile is `src/net/profile/officialProfile.ts`)
+  name the mod keys the room owns (`pins.modKeys`) and the balance mods it reads whole at their shipped defaults
+  (`pins.wholeMods`). `onlineModSetting` applies them through `systems/online/onlineLane.js`, whose
+  `ONLINE_ROOM_MOD_KEYS` and `ONLINE_WHOLE_MODS` are live copies of those pins. While a room's shared loot base rolls,
+  every key reads its shipped default (`asTheRoom`).
 - **Load-time mods latch.** A mod that takes effect on the next game load is read once by the host that builds it
   (`latchModLoaded`); its other code asks `modLatchedOn` so a mid-game switch reaches nothing until the next load.
 - `flattenModPreset` turns a DFU preset (`{ Values: { Section: { Key: "True" } } }`) into store keys.
