@@ -56,6 +56,12 @@ export function seatsOpenFor(player, env) {
   const s = seatsSwitchOf(env?.SEATS_OPEN);
   return s === 'on' || (s === 'dev' && isDeveloper(player, env));
 }
+/**
+ * THE SEAT MODS' OPTIONS (the server's pins): each of the six extras the seats keep is switched by its own `SEATS_<NAME>` var
+ * (CASTLES, CHARTERS, FORTS, SIEGE_WORKS, RIBBONS, PACTS) - on unless it says `off`. The Features row's choices pin the same six
+ * for the client (net/profile/officialProfile.ts), so the room and its service agree.
+ */
+export const seatOptionOn = (env, name) => String(env?.[`SEATS_${name}`] ?? 'on').trim().toLowerCase() !== 'off';
 /** An account a week registered may witness (SEAT0 3.2), as a harvest's and a hub's do - and a guild hall's (CHAP2a,
  *  npcHalls.js reads this one). */
 export const witnessOf = (player, nowS) => Number.isSafeInteger(player?.registered_at) && player.registered_at <= nowS - WITNESS.ageS;

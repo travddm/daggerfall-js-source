@@ -623,6 +623,7 @@ const REFUSAL_WORDS = {
   'camp-pitched': () => t('account.refusal.campPitched', 'Your guild has pitched a Siege Camp there this week.'),
   'bad-work': () => t('account.refusal.badWork', 'There is no such work.'),
   'fort-not-here': () => t('account.refusal.fortNotHere', 'That work cannot be raised at this seat.'),
+  'seat-option-off': () => t('account.refusal.seatOptionOff', 'That option is switched off on this server.'),
   'fort-max': () => t('account.refusal.fortMax', 'That work has reached its final stage.'),
   'seat-treasury': () => t('account.refusal.seatTreasury', 'The guild\'s treasury does not hold the silver that project asks.'),
   'bad-rid': () => t('account.refusal.badRid', 'That request could not be read. Try again.'),
