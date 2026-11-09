@@ -5,7 +5,7 @@
 import { parseNif } from '../../formats/morrowind/mwNifFile.js';
 import { buildSkeleton, injectSkeletonNodes } from '../../formats/morrowind/mwSkin.js';
 
-// MW-LOAD: THE ARCHIVE IS OPENED, NOT READ, AND THIS FILE IS ITS
+// THE ARCHIVE IS OPENED, NOT READ, AND THIS FILE IS ITS
 // ONE READER.
 //
 // Every boot used to pull each stored .bsa out of IndexedDB as one whole
@@ -30,7 +30,7 @@ import { buildSkeleton, injectSkeletonNodes } from '../../formats/morrowind/mwSk
 // everything they carry and `load` out of memory, so one body of code
 // drives both and no fixture had to move.
 
-/** MW-LOAD: bring in every path the archives carry, through the SAME
+/** Bring in every path the archives carry, through the SAME
  *  `find` law the synchronous read uses - the first archive whose `has`
  *  answers owns the path. Deduped and CONCURRENT: one lazy entry is a
  *  ranged read of about a millisecond, and forty of them in a row is
@@ -52,7 +52,7 @@ export async function loadFromArchives(archives, paths) {
   if (jobs.length) await Promise.all(jobs);
 }
 
-/** MW-LOAD: `find`, asserting the bytes are in hand. A path no archive
+/** `find`, asserting the bytes are in hand. A path no archive
  *  carries answers null exactly as `find` does, and every caller already
  *  reports that as "not in your archives". A path an archive DOES carry
  *  and has not loaded is a missed preload - a defect in this file - and
