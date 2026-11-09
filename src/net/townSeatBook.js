@@ -112,12 +112,6 @@ export function parseSiegeCommand(text) {
   return { op: 'void', key: k };
 }
 
-/** DOMAIN1: a gifts answer as the tab reads it - the place, its seat, what it holds and its last gifts. */
-const giftViewOf = (d) => ({
-  place: d?.place === 'stockpile' || d?.place === 'camp' ? d.place : null, key: Number.isSafeInteger(d?.key) ? d.key : null,
-  contents: Array.isArray(d?.contents) ? d.contents : [], recent: Array.isArray(d?.recent) ? d.recent : [],
-});
-
 /**
  * @param {{
  *   door: ReturnType<typeof import('./accountClient.js').accountSeats>,
@@ -127,16 +121,16 @@ const giftViewOf = (d) => ({
  *   isSeatPixel?: (x: number, y: number) => boolean, relayNowS?: () => (number|null),
  *   seats?: { list: any[], powers?: Map<number, number> }|null,
  *   onRed?: ((line: { text: string, at: number }) => boolean)|null,
- *   rand?: () => number, turnMs?: number, stores?: ((count: any) => void)|null,
+ *   rand?: () => number, turnMs?: number,
  * }} deps SEAT1b: `me` the signed-in account's id, `character` the character standing here, `rid` a fresh request id
  *   (the Marks' own shape), `isSeatPixel` whether this client's own derivation holds a seat at a map pixel, `relayNowS`
  *   the relay's clock (null unheard - a receipt's life is the relay's); CROWN2: `onRed` says a red line (false: not yet);
  *   STORM-SHED: `rand` Math.random's shape, a failed Watch claim's jitter; DAY-TURN: `turnMs` this page's moment past
- *   midnight (net/dayTurn.js); DOMAIN1: `stores` the professions' book told a gift's Stores count (profBook.applyStore);
+ *   midnight (net/dayTurn.js);
  *   DOMAIN3: `seats` this client's own derivation (systems/town/townSeats.js deriveTownSeats) - its seats' pixels (the
  *   Watch's, where `isSeatPixel` is not handed) and each region's seat of power, reported beside a seat (`witness`)
  */
-export function createTownSeatBook({ door, storage = null, nowMs = () => Date.now(), me = () => null, character = () => null, rid = () => mintMarksRid(), seats = null, isSeatPixel = seats ? seatPixelTest(seats) : () => false, relayNowS = () => null, onRed = null, rand = Math.random, turnMs = 0, stores = null }) {   // DOMAIN1: `stores(count)` the professions' book told a gift's Stores
+export function createTownSeatBook({ door, storage = null, nowMs = () => Date.now(), me = () => null, character = () => null, rid = () => mintMarksRid(), seats = null, isSeatPixel = seats ? seatPixelTest(seats) : () => false, relayNowS = () => null, onRed = null, rand = Math.random, turnMs = 0 }) { 
   const turnSpreadMs = Math.floor(rand() * SEAT_TURN_READ_SPREAD_MS);   // D1-LOAD: this client's share of the Turning's read
   /** CROWN2: the red lines already said, by id - read from the device once */
   let redSeen = null;
@@ -192,12 +186,9 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
   const recordsAt = new Map();
   /** @type {{ ask: string, rid: string }|null} */
   let tributeAsk = null;
-  /** SEAT2b: a project begun - its ask and its one request id, as the Tribute's */
+  /** SEAT2b: a tier raised or a camp pitched - its ask and its one request id, as the Tribute's */
   /** @type {{ ask: string, rid: string }|null} */
   let fortAsk = null;
-  /** DOMAIN1: a gift - its ask (the region, the material, the units) and its one request id, as a project's */
-  /** @type {{ ask: string, rid: string }|null} */
-  let giftAsk = null;
   /** SEAT2b part two: the Watchtowers' words already said (`week:seat:guild:share`), read from the device once, and the
    *  last ask's moment and its flight */
   let towersSaid = null, towersAt = -Infinity, towersBusy = false;
@@ -498,20 +489,20 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (SHUT.includes(r?.error)) open = false;
       return { data: null, error: r?.error ?? 'server' };
     },
-    /** SEAT2b (Seats-Arc 7.9): A SEAT'S WORKS (`/v1/seats/forts`) - each work's tier and the project raising it, and the
-     *  stockpile, `{ data: { works, stockpile }, error }`. Read afresh each time the tab is: a delivery moves it. */
+    /** SEAT2b (Seats-Arc 7.9): A SEAT'S WORKS (`/v1/seats/forts`) - each work's tier, `{ data: { works }, error }`. Read afresh
+     *  each time the tab is. */
     async forts(key) {
       if (open !== true) return { data: null, error: 'seats-closed' };
       let r;
       try { r = await door.forts(key); } catch { r = { ok: false, error: 'offline' }; }
-      if (r?.ok) return { data: { works: r.data?.works ?? {}, stockpile: Array.isArray(r.data?.stockpile) ? r.data.stockpile : [] }, error: null };
+      if (r?.ok) return { data: { works: r.data?.works ?? {} }, error: null };
       if (SHUT.includes(r?.error)) open = false;
       return { data: null, error: r?.error ?? 'server' };
     },
-    /** SEAT2b (7.5): a project begun on `work` at `seat` - its tier's Drakes burnt from the holder's treasury (an Officer's
-     *  or the guildmaster's), `port` whether DFU names the town a port (a Harbour's ask). `{ ok, text, forts }`. ONE
-     *  REQUEST ID A PROJECT, as the Tribute's: the same work asked again after an answer that never came carries the same
-     *  id, and the service answers it `repeat` rather than burning twice. */
+    /** SEAT2b (7.5): the next tier of `work` raised at `seat` - its Marks burnt from the holder's treasury (an Officer's or the
+     *  guildmaster's), `port` whether DFU names the town a port (a Harbour's ask). `{ ok, text, forts }`. ONE REQUEST ID A
+     *  TIER, as the Tribute's: the same work asked again after an answer that never came carries the same id, and the
+     *  service answers it `repeat` rather than burning twice. */
     async fortFund(seat, work, port = false) {
       const ask = `${seat.key}:${work}`;
       if (fortAsk?.ask !== ask) fortAsk = { ask, rid: rid() };
@@ -523,36 +514,21 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (!r?.ok) return { ok: false, text: accountRefusalText(r?.error) };
       const name = fortWork(work)?.name ?? 'work';
       const forts = r.data?.forts ?? null;
-      if (r.data?.repeat) return { ok: true, text: `Work on the ${name} at ${seat.name} was already begun.`, forts };
-      return { ok: true, text: `Work on the ${name} at ${seat.name} is begun toward grade ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} silver from the treasury. Seat writs deliver what they need.`, forts };
+      if (r.data?.repeat) return { ok: true, text: `The ${name} at ${seat.name} was already raised.`, forts };
+      return { ok: true, text: `The ${name} at ${seat.name} stands at tier ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} Marks from the treasury.`, forts };
     },
-    /** DOMAIN1 (5): WHERE THIS CHARACTER'S GUILD GIVES in `region` (`/v1/seats/gifts`) -
-     *  `{ data: { place, key, contents, recent }, error }`, `place` 'stockpile' (the seat it holds), 'camp' (the seat it
-     *  pledged this week) or null (neither). Read afresh each time the tab is: a gift, a delivery or the Levy moves it. */
-    async gifts(region) {
-      if (open !== true) return { data: null, error: 'seats-closed' };
+    /** A Siege Camp pitched at `seat`, where this guild pledged it this week (an Officer's or the guildmaster's) - its Marks
+     *  burnt from the treasury, once; `{ ok, text }`. ONE REQUEST ID A CAMP, as a tier's. */
+    async camp(seat) {
+      const ask = `camp:${seat.key}`;
+      if (fortAsk?.ask !== ask) fortAsk = { ask, rid: rid() };
+      const id = fortAsk.rid;
       let r;
-      try { r = await door.gifts(character(), region); } catch { r = { ok: false, error: 'offline' }; }
-      if (r?.ok) return { data: giftViewOf(r.data), error: null };
-      if (SHUT.includes(r?.error)) open = false;
-      return { data: null, error: r?.error ?? 'server' };
-    },
-    /** DOMAIN1: A GIFT of `units` of `material` from this character's Stores to its guild's stockpile or Siege Camp in
-     *  `region` - `{ ok, data: { place, key, contents, recent, gift, repeat, counted, why }, error }`; the Stores' count
-     *  after it told the professions' book (`stores`). ONE REQUEST ID A GIFT, as a project's: the same gift asked again
-     *  after an answer that never came carries the same id, and the service answers it `repeat` rather than giving twice. */
-    async give(region, material, units) {
-      const ask = `${region}:${material}:${units}`;
-      if (giftAsk?.ask !== ask) giftAsk = { ask, rid: rid() };
-      const id = giftAsk.rid;
-      let r;
-      try { r = await door.give(character(), region, material, units, id); } catch { r = { ok: false, error: 'offline' }; }
-      if (r?.ok || (r?.error && !['offline', 'server', 'timeout'].includes(r.error))) { if (giftAsk?.rid === id) giftAsk = null; }
-      standingsAt.clear();   // its influence is the standings'
-      if (!r?.ok) return { ok: false, data: null, error: r?.error ?? 'server' };
-      if (r.data?.store) stores?.(r.data.store);
-      const gift = r.data?.gift ?? null;
-      return { ok: true, error: null, data: { ...giftViewOf(r.data), gift, repeat: !!r.data?.repeat, counted: !!r.data?.counted, why: r.data?.why ?? null } };
+      try { r = await door.camp(character(), seat.key, id); } catch { r = { ok: false, error: 'offline' }; }
+      if (r?.ok || (r?.error && !['offline', 'server', 'timeout'].includes(r.error))) { if (fortAsk?.rid === id) fortAsk = null; }
+      standingsAt.clear();
+      if (!r?.ok) return { ok: false, text: accountRefusalText(r?.error) };
+      return { ok: true, text: r.data?.repeat ? `The Siege Camp at ${seat.name} was already pitched.` : `A Siege Camp is pitched at ${seat.name}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} Marks from the treasury. It brings its Rams if your guild wins the Right of Siege.` };
     },
     /** A pledge to `seat` for this week (an Officer's or the guildmaster's) - `{ ok, text }`, the standings read afresh after. */
     async pledge(seat) {

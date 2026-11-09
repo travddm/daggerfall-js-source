@@ -41,7 +41,7 @@ import { redRead, redFrom } from './seatPolitics.js';   // SEAT-BATCH: the list'
 import { windowOf } from './seatBattles.js';   // SEAT2a: the holder's window, frozen into its battle
 import { royalTurning } from './seatRoyal.js';   // CROWN1 part two: a Royal Tourney's champion named
 import { incursionStatements } from './seatIncursion.js';   // AUDIT-SEATS: a Daedric Incursion's Marks
-import { fortsSeasonStatements, campsSpent, fortTiersOf, fortsLapsedStatements, campsWorn } from './seatForts.js';   // SEAT2b: a Season's wear, the Siege Camps spent; part two: a holder's Shrine; AUDIT SEATS-2 S5, S4: a lapse's projects fallen, the worn gate's Rams
+import { fortsSeasonStatements, campsSpent, fortTiersOf, campsWorn } from './seatForts.js';   // SEAT2b: a Season's wear, the Siege Camps spent; part two: a holder's Shrine; AUDIT SEATS-2 S5, S4: a lapse's projects fallen, the worn gate's Rams
 import { shrineStanding, marketHallTitheCap } from '../../src/net/fortLaw.js';   // SEAT2b part two (7.5): the Shrine's Standing a week
 import { weekSettled, keepWeekSettled } from './weekKept.js';   // PRIMARY-FOLD: a week read settled, kept
 import { swordsSettled } from './seatSiege.js';   // AUDIT-SEATS S3: a void battle's Sellsword escrow home
@@ -205,7 +205,7 @@ export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null
         // SEASON1 part two (9.3): the week's Tide here (a Royal Wedding's Standing, a Tax Revolt's) and the coming week's
         // (a Festival's cost)
         tide: tideAt(week, seat.region, counted), tideNext: tideAt(next, seat.region, !!seasonOf(next, zero)),
-        // SEAT2b part two (7.5: "Standing +1 a week" a tier): the Shrine standing at the Turning's clock (its due raised first)
+        // SEAT2b part two (7.5: "Standing +1 a week" a tier): the Shrine standing at the Turning's clock
         ...(await (async () => { const f = await fortTiersOf(db, key, atS); return { shrine: shrineStanding(f.shrine ?? 0), titheCap: marketHallTitheCap(TITHE_CAP[h.tier] ?? 0, f.market ?? 0) }; })()),   // AUDIT SEATS-2 L1: and the Market Hall's Tithe cap, Standing's measure
         revolted: revolted.has(key),   // SEAT2b part two (c)
       };
@@ -301,7 +301,6 @@ export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null
       stmts.push(history(u.key, 'neglect', { guild: names.get(u.guild), owed: u.owed }));
     } else {
       stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(u.key, u.guild));
-      stmts.push(...fortsLapsedStatements(db, u.key, atS));   // AUDIT SEATS-2 S5: its building projects fall with it
       stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(u.key, next));
       stmts.push(history(u.key, u.state === 'revolt' ? 'revolt-stood' : 'lapse', { guild: names.get(u.guild) }));   // SEAT2b part two (c): a revolt's lapse
     }
@@ -394,7 +393,6 @@ export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null
   // Edict void; no fee refunded (a strike's own batch refunds it, townSeats.js strikeSeat)
   for (const h of unregistered) {
     stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(Number(h.key), h.guild_id));
-    stmts.push(...fortsLapsedStatements(db, Number(h.key), atS));   // AUDIT SEATS-2 S5: its building projects fall with it
     stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(Number(h.key), next));
     stmts.push(history(Number(h.key), 'unregistered', { guild: names.get(h.guild_id) ?? { name: '', tag: '' } }));
   }
@@ -417,7 +415,6 @@ export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null
       LIMIT 1`).bind(key, utcDay(nowS), nowS, rid, floor));
     stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(key, next));
     stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(key, h.guild_id));
-    stmts.push(...fortsLapsedStatements(db, key, atS));
     stmts.push(db.prepare(`INSERT INTO town_seat_stockpile (key, material, qty) SELECT ?2, material, qty FROM town_seat_stockpile WHERE key = ?1 AND qty > 0
       ON CONFLICT (key, material) DO UPDATE SET qty = town_seat_stockpile.qty + excluded.qty`).bind(key, into));
     stmts.push(db.prepare('DELETE FROM town_seat_stockpile WHERE key = ?').bind(key));
@@ -479,10 +476,8 @@ export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null
  *  `{ seats, red }`. */
 export async function seatsBoard(db, seats, nowS) {
   const week = weekAt(nowS);
-  // SEAT2b part two (7.5): each seat's works standing now - a project whose day has come counts (seatForts.js fortTierAt's
-  // rule, read and never written) - so every client knows a members' Harbour, the Watchtowers and the crafting halls
-  const fortsRead = db.prepare(`SELECT key, work, CASE WHEN building IS NOT NULL AND stands_at IS NOT NULL AND stands_at <= ?1
-    THEN building ELSE tier END AS t FROM town_seat_forts WHERE tier > 0 OR (building IS NOT NULL AND stands_at IS NOT NULL AND stands_at <= ?1)`).bind(nowS);
+  // SEAT2b part two (7.5): each seat's works standing now, so every client knows a members' Harbour, the Watchtowers and the crafting halls
+  const fortsRead = db.prepare('SELECT key, work, tier AS t FROM town_seat_forts WHERE tier > 0');
   const [heldRes, rightsRes, revoltsRes, edictsRes, fortsRes, redRes] = await db.batch([holdsRead(db), ...battlesRead(db, week), edictsRead(db, week), fortsRead, redRead(db, nowS)]);
   const holds = holdsFrom(heldRes?.results), battles = battlesFrom(rightsRes?.results, revoltsRes?.results), edicts = edictsFrom(edictsRes?.results);
   const forts = new Map();
@@ -568,7 +563,6 @@ export async function relinquishSeat({ db, nowS }, player, env, { character, key
     db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at) SELECT ?1, ?2, 'relinquish', ?3, ?4 WHERE changes() > 0`)
       .bind(key, weekAt(nowS), JSON.stringify({ guild: names.get(a.me.guild_id) }), nowS),
     // AUDIT SEATS-2 S5: its building projects fall with the Charter (the tiers stay) - nothing where the DELETE moved none
-    ...fortsLapsedStatements(db, key, nowS),
   ]);
   return gone?.meta?.changes ? { ok: true } : { error: 'seat-not-held' };
 }

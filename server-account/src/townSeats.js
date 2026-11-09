@@ -48,7 +48,6 @@ import {
   SEAT_WITNESS_REPORTS_HOUR, SEAT_WITNESSES_AUDIT, seasonFloor, seasonZeroOf,
 } from '../../src/net/townSeatLaw.js';
 import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';   // AUDIT-SEATS S4: a struck Charter's fee refunded
-import { fortsLapsedStatements } from './seatForts.js';   // AUDIT SEATS-2 S5: a struck Charter's building projects fall with it
 import { DB_ROOT, replicaDb, d1Overloaded, bookmarkOf } from './service.js';   // STORM-SHED: the binding a request's counted Proxy wraps; SEAT-REPLICA: the kept read's session
 import { exactRows, witnessRow, strikeWitness, LEAN_ROWS } from './leanWitness.js';   // LEAN-WITNESS
 
@@ -365,7 +364,6 @@ export async function strikeSeat({ db, nowS }, dev, env, { key } = {}) {
     db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at)
       SELECT ?1, ?2, 'strike', json_set(?3, '$.refund', COALESCE((SELECT amount FROM marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4`)
       .bind(key, week, JSON.stringify({ by: dev.handle ?? null, ...(h ? { guild: { name: h.name ?? '', tag: h.tag ?? '' } } : {}) }), nowS, rid),
-    ...fortsLapsedStatements(db, key, nowS),   // AUDIT SEATS-2 S5: a building project falls with the Charter
   ]);
   forgetSeatRows(db, nowS);   // STORM-SHED: the struck seat's reports are gone - asked afresh here
   return { ok: true, key, reports: Number(late?.meta?.changes ?? 0) + Number(rest?.meta?.changes ?? 0) };

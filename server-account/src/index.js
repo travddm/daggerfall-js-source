@@ -288,8 +288,7 @@ import { royalPass, claimRoyal, keptTitleOf, KEPT_TITLES } from './seatRoyal.js'
 import { ribbonOf } from './seatRibbons.js';   // SEASON1 part two: a Season's banner ribbon, on the token
 import { seatWeekOf, seasonOf, seasonZeroOf } from '../../src/net/townSeatLaw.js';   // SEASON1: the Season counted
 import { offerFealty, acceptFealty, breakFealty, offerPact, breakPact } from './seatPolitics.js';   // CROWN2: fealty and Pacts, the red lines
-import { fundFort, readForts } from './seatForts.js';   // SEAT2b: a seat's fortifications
-import { giveToSeat, readGifts } from './seatGifts.js';   // DOMAIN1: a member's gift to the guild's stockpile or Siege Camp
+import { fundFort, readForts, pitchCamp } from './seatForts.js';   // SEAT2b: a seat's fortifications, a challenger's Siege Camp
 import { witnessSeatAndDomain, domainsBoard } from './domains.js';   // DOMAIN3: a region's seat of power witnessed beside the seat; the list's word of the region law
 import { domainsWeekOf, chartersMarked } from '../../src/net/domainLaw.js';   // DOMAIN3: the region law's first week, the Turning's; the list's holdings marked
 import { buyCastle, sellCastle } from './castles.js';   // DOMAIN2: a guild's castle, bought and given up
@@ -533,7 +532,7 @@ const TOWN_STATUS = Object.freeze({ 'towns-need-account': 403, 'towns-rate': 429
 /** SEAT1a (SEAT1b): each seat refusal's status - not this account's (a guest, the switch, a developer's act) 403, a seat struck
  *  409, the hour's reports spent 429, a bad shape 400 (the default). */
 /** SEAT-LEASE: the seat routes that only read, answered from the state as it stands while another settles the Turning. */
-const SEAT_READS = new Set(['/v1/seats/list', '/v1/seats/standings', '/v1/seats/records', '/v1/seats/forts', '/v1/seats/gifts']);   // DOMAIN1: and where a gift goes
+const SEAT_READS = new Set(['/v1/seats/list', '/v1/seats/standings', '/v1/seats/records', '/v1/seats/forts']);
 const SEAT_STATUS = Object.freeze({
   'seats-need-account': 403, 'seats-closed': 403, 'not-developer': 403, 'seat-struck': 409, 'seats-rate': 429,
   'not-moderator': 403,   // VOID: `/siege void` asked by anyone but a moderator or a developer
@@ -562,10 +561,10 @@ const SEAT_STATUS = Object.freeze({
   // CROWN2: no such guild, offer or Pact 404; a pair that does not fit, one sworn or signed already, a pledge between them 409
   'guild-unknown': 404, 'fealty-none': 404, 'pact-none': 404, 'fealty-unfit': 409, 'fealty-sworn': 409, 'fealty-pledged': 409,
   'pact-signed': 409, 'pact-self': 409, 'pact-pledged': 409, 'fealty-pledge': 409, 'pact-pledge': 409,
-  // SEAT2b: a work the seat may not raise, one building already, one at its last tier, a treasury short 409
-  'fort-not-here': 409, 'fort-building': 409, 'fort-max': 409, 'seat-treasury': 409,
-  // DOMAIN1: a gift - the Stores' account and switch 403; no place in the region, the Stores short of it 409; the writs' bucket 429
-  'prof-need-account': 403, 'prof-closed': 403, 'seat-none-here': 409, 'stores-short': 409, 'stores-gold': 409, 'writ-rate': 429,
+  // SEAT2b: a work the seat may not raise, one at its last tier, a treasury short; a camp pitched already, or by the holder, 409
+  'fort-not-here': 409, 'fort-max': 409, 'seat-treasury': 409, 'camp-pitched': 409, 'camp-holder': 409,
+  // the Stores' account and switch 403; the Stores short of it 409; the writs' bucket 429
+  'prof-need-account': 403, 'prof-closed': 403, 'stores-short': 409, 'stores-gold': 409, 'writ-rate': 429,
   ...JUDGE_STATUS,   // a held character's Stores go to no guild's ends (realm.js realmHoldOf)
 });
 /** PROF1: each professions refusal's status - not this account's (a guest, the switch, the Marks' switch, the rank) 403,
@@ -1878,12 +1877,10 @@ const service = {
           '/v1/seats/fealty/break': () => breakFealty(ctx, who.player, env, body),
           '/v1/seats/pact': () => offerPact(ctx, who.player, env, body),
           '/v1/seats/pact/break': () => breakPact(ctx, who.player, env, body),
-          // SEAT2b (7.5): the works read, a project begun
+          // SEAT2b (7.5): the works read, a tier raised; a challenger's Siege Camp pitched
           '/v1/seats/forts': () => readForts(ctx, who.player, env, body),
           '/v1/seats/fort/fund': () => fundFort(ctx, who.player, env, body),
-          // DOMAIN1 (Domains.md 5): where a member's gift goes in a region, and a gift made
-          '/v1/seats/gifts': () => readGifts(ctx, who.player, env, body),
-          '/v1/seats/give': () => giveToSeat(ctx, who.player, env, body),
+          '/v1/seats/camp': () => pitchCamp(ctx, who.player, env, body),
         }[path];
         if (!act) return no('not-found', 404, origin);
         const r = await act();

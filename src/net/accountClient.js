@@ -422,7 +422,6 @@ const REFUSAL_WORDS = {
   'bad-watch': () => t('account.refusal.badWatch', 'Those watch records could not be read.'),
   // SEAT1c: the Charters
   'seat-not-held': () => t('account.refusal.seatNotHeld', 'Your guild does not hold that Charter.'),
-  'seat-none-here': () => t('account.refusal.seatNoneHere', 'Your guild neither holds a Charter in this region nor is pledged to a seat here this week, so there is nowhere here to give to.'),   // DOMAIN1: a gift with no stockpile or Siege Camp of the guild's in the region
   'seat-held-here': () => t('account.refusal.seatHeldHere', 'Your guild holds a Charter in this region, and is pledged to it.'),
   'seat-not-charter': () => t('account.refusal.seatNotCharter', 'This town is a holding of its region\'s Charter. Pledge to the Charter at its seat of power.'),   // DOMAIN3
   // SEAT1d: the holder's levers
@@ -619,11 +618,12 @@ const REFUSAL_WORDS = {
   'writ-elsewhere': () => t('account.refusal.writElsewhere', 'That writ is delivered at the boards of the region that posted it.'),
   'writ-short': () => t('account.refusal.writShort', 'That writ needs fewer than that now.'),
   'writ-moved': () => t('account.refusal.writMoved', 'Someone else delivered first. Check the writ again.'),
-  // SEAT2b: a seat writ and a fortification project
-  'seat-not-pledged': () => t('account.refusal.seatNotPledged', 'Your guild neither holds that seat nor is pledged to it this week.'),
+  // SEAT2b: a fortification and a Siege Camp
+  'seat-not-pledged': () => t('account.refusal.seatNotPledged', 'Your guild has not pledged that seat this week.'),
+  'camp-holder': () => t('account.refusal.campHolder', 'Your guild holds that seat. A Siege Camp is a challenger's.'),
+  'camp-pitched': () => t('account.refusal.campPitched', 'Your guild has pitched a Siege Camp there this week.'),
   'bad-work': () => t('account.refusal.badWork', 'There is no such work.'),
   'fort-not-here': () => t('account.refusal.fortNotHere', 'That work cannot be raised at this seat.'),
-  'fort-building': () => t('account.refusal.fortBuilding', 'That work is being raised already.'),
   'fort-max': () => t('account.refusal.fortMax', 'That work has reached its final stage.'),
   'seat-treasury': () => t('account.refusal.seatTreasury', 'The guild\'s treasury does not hold the silver that project asks.'),
   'bad-rid': () => t('account.refusal.badRid', 'That request could not be read. Try again.'),
@@ -2184,12 +2184,10 @@ export function accountSeats({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
     royalPass: (key, field, watch) => post('/v1/seats/royal/pass', { key, ...(field ? { field } : {}), ...(watch ? { watch: true } : {}) }),
     claimRoyal: (receipt) => post('/v1/seats/royal/claim', { receipt }),
     // CROWN2: fealty offered (`as` 'vassal' or 'liege'), accepted, broken or withdrawn; a Pact offered or signed, broken
-    // SEAT2b: a seat's works read; a project begun (`port`: DFU names the town a port - a Harbour's ask)
+    // SEAT2b: a seat's works read; a tier raised (`port`: DFU names the town a port - a Harbour's ask); a Siege Camp pitched
     forts: (key) => post('/v1/seats/forts', { key }),
     fortFund: (character, key, work, rid, port = false) => post('/v1/seats/fort/fund', { character, key, work, rid, ...(port ? { port: true } : {}) }),
-    // DOMAIN1 (5): where this character's guild gives in a region, and a gift made
-    gifts: (character, region) => post('/v1/seats/gifts', { character, region }),
-    give: (character, region, material, units, rid) => post('/v1/seats/give', { character, region, material, units, rid }),
+    camp: (character, key, rid) => post('/v1/seats/camp', { character, key, rid }),
     fealty: (character, tag, as) => post('/v1/seats/fealty', { character, tag, as }),
     fealtyAccept: (character, tag) => post('/v1/seats/fealty/accept', { character, tag }),
     fealtyBreak: (character, tag) => post('/v1/seats/fealty/break', { character, ...(tag ? { tag } : {}) }),

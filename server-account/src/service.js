@@ -483,9 +483,8 @@ export const ROUTES = new Set([
   '/v1/seats/fealty', '/v1/seats/fealty/accept', '/v1/seats/fealty/break', '/v1/seats/pact', '/v1/seats/pact/break',
   // SEASON1 part two (seatInfluence.js): an Orc Raid's camp cleared
   '/v1/seats/orc-camp',
-  // SEAT2b (seatForts.js): a seat's fortifications read, a project begun
-  '/v1/seats/forts', '/v1/seats/fort/fund',
-  '/v1/seats/gifts', '/v1/seats/give',   // DOMAIN1: where a member's gift goes, and a gift (seatGifts.js)
+  // SEAT2b (seatForts.js): a seat's fortifications read, a tier raised, a Siege Camp pitched
+  '/v1/seats/forts', '/v1/seats/fort/fund', '/v1/seats/camp',
   // WB5b: the gates closed - the kill receipt the relay signed, carried
   // here by the account it names. Behind a session.
   '/v1/gate/claim',
