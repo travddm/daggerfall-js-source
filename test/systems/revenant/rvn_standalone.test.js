@@ -5,6 +5,7 @@
 import '../../modsOff.js';
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { OFFICIAL_PROFILE } from '../../../src/net/profile/officialProfile.ts';
 
 const _store = new Map();
 globalThis.localStorage = {
@@ -74,7 +75,7 @@ test('the choices read as the row defaults, and a pref holding anything else rea
   assert.equal(O.revenantFleeFactor(), 1);
 });
 
-test('the row declares every choice: a default each, and online every one but the Renown wait is forced to it', () => {
+test('the row declares every choice: a default each, and online every one but the Renown wait is pinned in the profile', () => {
   const keys = ['revenantWho', 'revenantRenown', 'revenantSpare', 'revenantRank', 'revenantFlee', 'revenantReturn'];
   assert.deepEqual(
     keys.map((k) => FEATURE_PREF_DEFAULTS[k]),
@@ -82,8 +83,11 @@ test('the row declares every choice: a default each, and online every one but th
   );
   assert.deepEqual(
     keys.map((k) => FEATURE_PREF_ONLINE[k]),
-    ['any', 'player', 'join', '2', 'normal', 'normal'],
+    ['room', 'player', 'room', 'room', 'room', 'room'],
   );
+  for (const k of keys.filter((x) => x !== 'revenantRenown'))
+    assert.equal(OFFICIAL_PROFILE.pins.prefs[k], FEATURE_PREF_DEFAULTS[k], `${k}: the profile pins the default`);
+  assert.ok(!Object.hasOwn(OFFICIAL_PROFILE.pins.prefs, 'revenantRenown'), 'the Renown wait stays with the player');
 });
 
 test('with Loot rarity off a plain foe becomes a revenant; "elites and champions" keeps the old rule; a boss never does', () => {

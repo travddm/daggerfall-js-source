@@ -9,17 +9,22 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { onlineForcedPref, ONLINE_FORCED_PREFS, isOnlinePage } from '../../../src/systems/online/onlineLane.js';
 import { getPref, PREF_DEFAULTS } from '../../../src/systems/uiPrefs.js';
+import { OFFICIAL_PROFILE } from '../../../src/net/profile/officialProfile.ts';
+import { installProfile, _resetProfileForTests } from '../../../src/systems/online/serverProfile.ts';
+
+/** Forces one more key for the length of a test: the table is the installed profile's pins, so the probe is a pin. */
+const forceProbe = () => installProfile({ ...OFFICIAL_PROFILE, pins: { ...OFFICIAL_PROFILE.pins, prefs: { ...OFFICIAL_PROFILE.pins.prefs, perfUrl2Probe: 'forced' } } }, 'f'.repeat(64));
 
 test('PERF-URL2: onlineForcedPref answers what it answered - every key the shelf knows and a stranger, a key the table forces and one it does not, on pages online and not (mutants: the forced value lost; the page test dropped)', () => {
   const searches = ['', '?online', '?online&skin=classic', '?x=1&online=', '?realm=a&load'];
   const old = (key, search) => (isOnlinePage(search) && Object.hasOwn(ONLINE_FORCED_PREFS, key) ? ONLINE_FORCED_PREFS[key] : undefined);   // the order before
   const keys = [...Object.keys(PREF_DEFAULTS), 'no-such-pref', 'toString', '__proto__'];
-  ONLINE_FORCED_PREFS.perfUrl2Probe = 'forced';   // a key forced for the length of the test, beside the table's own
+  forceProbe();
   try {
     for (const k of [...keys, 'perfUrl2Probe']) for (const s of searches) assert.equal(onlineForcedPref(k, s), old(k, s), `${k} on '${s}'`);
     assert.equal(onlineForcedPref('perfUrl2Probe', '?online'), 'forced', 'a forced key online reads forced');
     assert.equal(onlineForcedPref('perfUrl2Probe', ''), undefined, 'and offline reads the player\'s');
-  } finally { delete ONLINE_FORCED_PREFS.perfUrl2Probe; }
+  } finally { _resetProfileForTests(); }
 });
 
 test('PERF-URL2: a pref no page forces reads the page NOT AT ALL - getPref over every shelf key the table does not force asks `location.search` zero times, and a forced key still asks it once a read (mutants: the page asked first again)', () => {
@@ -31,11 +36,11 @@ test('PERF-URL2: a pref no page forces reads the page NOT AT ALL - getPref over 
     assert.ok(free.length > 20 && free.length < Object.keys(PREF_DEFAULTS).length, `the shelf's free keys (${free.length}) and some the table forces`);
     for (let i = 0; i < 3; i++) for (const k of free) getPref(k);
     assert.equal(reads, 0, `${reads} page reads for prefs no page forces`);
-    ONLINE_FORCED_PREFS.perfUrl2Probe = 'forced';
+    forceProbe();
     try {
       assert.equal(getPref('perfUrl2Probe'), 'forced', 'online, a forced key reads forced through getPref');
       assert.equal(reads, 1, 'and asked the page once');
-    } finally { delete ONLINE_FORCED_PREFS.perfUrl2Probe; }
+    } finally { _resetProfileForTests(); }
   } finally {
     if (had) Object.defineProperty(globalThis, 'location', had); else delete globalThis.location;
   }

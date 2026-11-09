@@ -10,11 +10,11 @@
 //
 // Driven over the REAL OnlineSession, the REAL relay Room (test/fakeRoom.mjs) and the REAL accountTokenMinter, one clock
 // for all of them (node's mock timers: Date and setTimeout), an account service whose mint takes its seconds.
-import { test, mock } from 'node:test';
+import { after, test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { fakeRooms, roomSigner } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, roomKeyFor, TOKEN_WAIT_MS } from '../../src/net/online.js';
 import { accountTokenMinter, SESSION_KEY, TOKEN_REUSE_MS, MINT_COOL_MS } from '../../src/net/accountClient.js';
 import { reconnectWave } from '../../src/net/reconnectWave.js';
@@ -22,6 +22,7 @@ import { PIXEL_UNITS, cellHaloFor, isWorldRoom, isCellRoom } from '../../src/net
 import { createDoorToken, EXIT_NEAR_M, EXIT_ARM_M, DOOR_SOON_MS, EXIT_WALK_MS, DOOR_PENDING_MS } from '../../src/scenes/doorTokenHost.js';
 import { arenaExitDoors } from '../../src/world/arena/arenaFloor.js';
 import { doorWorldPosition } from '../../src/player/enterExit.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const T0 = 1_800_000_000_000;
 const STEP = 100;

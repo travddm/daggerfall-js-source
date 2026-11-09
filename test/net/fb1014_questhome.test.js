@@ -13,13 +13,13 @@
 // registry, and the real quest machine choosing its residence in a region of synthetic blocks (test/fb1004dTowns.mjs).
 // QUEST-HOME; 06-Systems/Online-Arc.md HOME1.
 import '../modsOff.js';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { standService, sessionStorageOf, T0 } from '../accountDb.mjs';
 import { realmJoinAt, seatRealm } from '../realmSeat.mjs';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { accountHomes, onHomeOrders, SESSION_KEY } from '../../src/net/accountClient.js';
 import { OnlineSession } from '../../src/net/online.js';
@@ -34,6 +34,7 @@ import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 import { loadTables, rmbBlock, town, worldOf, questScript } from '../fb1004dTowns.mjs';
 import { seeded } from '../fb1004dArena.mjs';
 import { hostText } from '../hostText.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 loadTables();
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');

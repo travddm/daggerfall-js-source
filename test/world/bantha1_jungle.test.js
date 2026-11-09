@@ -863,7 +863,7 @@ test('BANTHA1 the switch: the Jungle of Bantha row on the enhanced skin, on by d
   assert.equal(jungleHazeOn('?junglehaze=off'), false);
   const row = FEATURES.find((f) => f.id === 'bantha-jungle');
   assert.deepEqual(checkFeature(row), []);
-  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'banthaJungle', initial: true, online: true });
+  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'banthaJungle', initial: true, online: 'room' });
   assert.equal(STREAMING_TERRAIN_SCALE, 1.25, '(the beach line in metres the species read is the kernel\'s own scale)');
 });
 

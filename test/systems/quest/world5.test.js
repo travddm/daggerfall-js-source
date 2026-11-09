@@ -31,7 +31,7 @@ import { createPlayerTicker } from '../../../src/scenes/shared.js';
 import { setSharedWeather, sharedWeatherOn, resetWeatherSim, rollClimateWeathersForDay, weatherForClimate, ZONE_CLIMATES, tickWeather, weatherRespawn, currentWeatherEnum } from '../../../src/systems/weather/weatherSim.js';
 import { RestSession, MINUTES_PER_TICK, REST_WAIT_PER_HOUR, LOITER_WAIT_PER_HOUR } from '../../../src/systems/rest/restSession.js';
 import { Clock } from '../../../src/systems/quest/clock.js';
-import { fakeRoom } from '../../fakeRoom.mjs';
+import { OFFICIAL_PH, fakeRoom } from '../../fakeRoom.mjs';
 import { fakeSocketClass } from '../../fakeSocket.mjs';
 
 const rd = (p) => readFileSync(new URL('../../../' + p, import.meta.url), 'utf8');
@@ -62,7 +62,7 @@ test('WORLD5: the relay\'s welcome carries its clock (`now`, ms) in every place 
   const town = fakeRoom('world:3,12'); const t = town.connect(); await town.hello(t, 'tttt-0001', at(1, 1));
   assert.ok(Number.isFinite(town.sockets[0].sent[0].now), 'a cell too - the clock is the world\'s, not a dungeon\'s');
   const chat = fakeRoom('chat:world'); const c = chat.connect(); await chat.hello(c, 'cccc-0001');
-  assert.deepEqual(c.sent[0], { t: 'welcome', id: 'cccc-0001', peers: [], n: 1, v: RELAY_VERSION, now: c.sent[0].now, ldo: 0 }, 'a channel\'s welcome: SRV-N\'s deploy name and ROSTER-G\'s roster and count - and the clock (AUDIT SOC B7)');
+  assert.deepEqual(c.sent[0], { t: 'welcome', id: 'cccc-0001', peers: [], n: 1, v: RELAY_VERSION, ph: OFFICIAL_PH, now: c.sent[0].now, ldo: 0 }, 'a channel\'s welcome: SRV-N\'s deploy name and ROSTER-G\'s roster and count - and the clock (AUDIT SOC B7)');
   assert.ok(Math.abs(c.sent[0].now - Date.now()) < 5000, 'the clock is the relay\'s now');
   // the session
   const { FakeWS, sockets } = fakeSocketClass();

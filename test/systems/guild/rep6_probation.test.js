@@ -86,6 +86,6 @@ test('DFU-GAPS SS13: by default the first review that finds a member below zero 
     setPref('guildProbation', true);
   }
   const row = FEATURES.find((f) => f.id === 'guild-probation');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['guildProbation', false, false]);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['guildProbation', false, 'room']);
   assert.equal(ONLINE_FORCED_PREFS.guildProbation, false);
 });

@@ -308,8 +308,8 @@ test('WOD-PEAKS: with the Mountains switch off (the default) a Mountains instanc
   }
   assert.deepEqual(asked, [[false, false, true], [true, true, true]], 'off: the spires are no prefab, the rock fields stand; on: both');
   assert.match(src, /export function openWodWorld\(\{ online = false, sources = browserWodSources, mountains = wodMountainsOn\(\) \} = \{\}\) \{\n\s*if \(!_world \|\| _world\.online !== online \|\| _world\.mountains !== !!mountains\)/, 'the world is built for the switch it was opened with');
-  const lane = readFileSync(new URL('../../../src/systems/online/onlineLane.js', import.meta.url), 'utf8');
-  assert.match(lane, /'world-of-daggerfall': Object\.freeze\(\{ Enabled: true, Mountains: false \}\)/, 'online the room\'s - off');
+  const { onlineForcedModSetting } = await import('../../../src/systems/online/onlineLane.js');
+  assert.deepEqual(['Enabled', 'Mountains'].map((k) => onlineForcedModSetting('world-of-daggerfall', k, '?online')), [true, false], 'online the room\'s - off');
 });
 
 test('ROCK-SEAT: a rock field\'s piece set into the ground but hanging over ground that falls away under it is lowered until its foot is WOD_ROCK_SEAT_M under the lowest ground beneath it - one already in the ground, or resting on another\'s crown, keeps the mod\'s height, and none is raised', async () => {

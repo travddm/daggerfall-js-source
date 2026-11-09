@@ -37,9 +37,9 @@
 
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
-import { declareOnlinePrefs } from './online/onlineLane.js';   // RF4: the lane learns its answers from the rows
+import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
 import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
-import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { coveredOnlineOk } from './featureOnline.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -356,7 +356,7 @@ export const FEATURES = Object.freeze([
       + 'Online every dungeon has its own size instead.',
     effect: 'Takes effect on the next dungeon you enter. A save made at another size puts you at the dungeon\u2019s start.',
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'mediumDungeons', initial: false, online: false }),   // world/smallerDungeons.js MEDIUM_DUNGEONS_PREF
+    control: Object.freeze({ store: 'prefs', key: 'mediumDungeons', initial: false, online: 'room' }),   // world/smallerDungeons.js MEDIUM_DUNGEONS_PREF
   }),
   // SD-ONLINE: THE WORLD'S
   // DUNGEON SIZES. Online every dungeon is built at the size one seeded draw on its map id gives it - small, medium or
@@ -372,7 +372,7 @@ export const FEATURES = Object.freeze([
       + 'was set up at. Online it is always on.',
     effect: 'Takes effect on the next dungeon you enter. A save made at another size puts you at the dungeon\u2019s start.',
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'worldDungeonSizes', initial: false, online: true }),   // world/smallerDungeons.js WORLD_DUNGEON_SIZES_PREF; forced on online, the room's sizes
+    control: Object.freeze({ store: 'prefs', key: 'worldDungeonSizes', initial: false, online: 'room' }),   // world/smallerDungeons.js WORLD_DUNGEON_SIZES_PREF; forced on online, the room's sizes
   }),
   // STEED1: HORSE CARE (, systems/steedCare.js).
   // HORSE-WALK: its horse walks unless the run gallops it.
@@ -463,7 +463,7 @@ export const FEATURES = Object.freeze([
     // the shelf's migration still reads its proceduralSky. On by
     // default; the lane forces it on.
     control: Object.freeze({
-      store: 'prefs', key: 'enhancedEnvironments', initial: true, online: true, lane: 'outdoors',   // the lane (world/outdoors.js) registers its tiers, its default and its read/write
+      store: 'prefs', key: 'enhancedEnvironments', initial: true, online: 'room', lane: 'outdoors',   // the lane (world/outdoors.js) registers its tiers, its default and its read/write
       also: Object.freeze([Object.freeze({ store: 'mods', vendor: 'dynamic-skies', key: 'Enabled' })]),   // written by outdoorsWrite while the outdoors are on
     }),
   }),
@@ -488,7 +488,7 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.enhancedAi.effect', 'Takes effect at once; pathfinding from the next dungeon you enter.'); },   // AUDIT TACT D7: the tactics, cover and blows read the switch live
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'enhancedAI', initial: true, online: true,   // BAL4: ON by default (it was off - DFU's classic motor the 1:1 law); the lane forces it on online as it always did; an unstamped shelf adopts it (uiPrefs.js PREF1_ADOPT_NEW_DEFAULT)
+      store: 'prefs', key: 'enhancedAI', initial: true, online: 'room',   // on by default; an unstamped shelf adopts it (uiPrefs.js PREF1_ADOPT_NEW_DEFAULT)
       // TELL9 (11.3): telegraph contrast - thicker lines, a white keyline, a pattern for
       // every guard (render/foeTelegraph.js telegraphContrastOn); what THIS screen draws, so the player's online too
       also: Object.freeze([Object.freeze({ store: 'prefs', key: 'telegraphContrast', initial: false, online: 'player' })]),
@@ -511,7 +511,7 @@ export const FEATURES = Object.freeze([
       + 'lasts, how high you reach and how fast you climb. Off keeps the classic climbing.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'enhancedClimbing', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'enhancedClimbing', initial: true, online: 'room' }),
   }),
   // FT6: ENHANCED WATER (WATER1) - the surface pass over the
   // terrain's water tiles on the enhanced skin; off, or the classic
@@ -689,7 +689,7 @@ export const FEATURES = Object.freeze([
       + 'flashes when you hit it. The rules don’t change. Off hides them as the original does.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'enhancedCombatVisuals', initial: true, online: true }),   // ECV1: on by default like the other enhanced visuals; the rules are untouched either way
+    control: Object.freeze({ store: 'prefs', key: 'enhancedCombatVisuals', initial: true, online: 'room' }),   // ECV1: on by default like the other enhanced visuals; the rules are untouched either way
   }),
   // WEAPON-GLOW1: WHAT A WEAPON'S ELEMENT LOOKS LIKE IN THE HAND - systems/weaponGlow.js
   // the law, render/weaponGlowGlsl.js the drawing, the page. A look, read every frame
@@ -771,7 +771,7 @@ export const FEATURES = Object.freeze([
       + 'sigil that grows with your Renown.'); },   // SIGIL1; AUDIT UPDATE L8: LOOT-GATE's own words, its numbers never (CLAUDE.md LOOT-GATE)
     get effect() { return t('features.lootRarity.effect', 'Takes effect on the next drop; items you wear update within a few seconds.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: true }),   // LR5: ON by default (Mac) - the ladder is the port's own game, not an opt-in; the lane forces it on online as it always did
+    control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }),   // on by default: the ladder is the port's own game, not an opt-in
   }),
   REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
@@ -901,7 +901,7 @@ export const FEATURES = Object.freeze([
       + 'it and out the other side. Off uses the classic weather, the same everywhere in the region.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'weatherEvents', initial: true, online: true }),   // WEATHER2b: weatherSim.js weatherFieldOn; forced on online - one sky
+    control: Object.freeze({ store: 'prefs', key: 'weatherEvents', initial: true, online: 'room' }),   // WEATHER2b: weatherSim.js weatherFieldOn; forced on online - one sky
   }),
   // FOREST1: REAL
   // FORESTS - the wilderness's trees gathered into woods with open land
@@ -918,7 +918,7 @@ export const FEATURES = Object.freeze([
       + 'Off spreads the trees evenly, like the original.'); },
     get effect() { return t('features.effect.worldLoads', 'Takes effect when the world next loads.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'realForests', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'realForests', initial: true, online: 'room' }),
   }),
   // BANTHA1: THE JUNGLE - since BANTHA2 the area the owner painted on Hammerfell's shore of the Bay (world/jungle/banthaArea.js; BANTHA1
   // stood it on Glenpoint), grown over with the owner's jungle trees in storeys,
@@ -933,7 +933,7 @@ export const FEATURES = Object.freeze([
       + 'leaves underfoot, and a humid haze that is thickest at dawn and in rain. Off keeps its original woods.'); },
     get effect() { return t('features.effect.worldLoads', 'Takes effect when the world next loads.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'banthaJungle', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'banthaJungle', initial: true, online: 'room' }),
   }),
   // TESA-LANDS: THE LANDS PAST THE BAY - each zone of seven provinces its own ground, its own
   // flats and its own landmarks (world/tamriel/tamrielLands.js). FORCED ON ONLINE: its
@@ -947,7 +947,7 @@ export const FEATURES = Object.freeze([
       + 'mushrooms, Black Marsh\'s Hist, Summerset\'s vineyards. Off keeps each climate\'s original look.'); },
     get effect() { return t('features.effect.worldLoads', 'Takes effect when the world next loads.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'tamrielLands', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'tamrielLands', initial: true, online: 'room' }),
   }),
   // LANDFORM1-3: LANDFORMS - the small heightmap
   // stands taller, roads are graded into the land, rivers lie in channels (world/landforms.js, inside the terrain's
@@ -961,7 +961,7 @@ export const FEATURES = Object.freeze([
       + 'over hollows, and rivers run in channels below their banks. Off keeps the classic ground.',
     effect: 'Takes effect when the world next loads.',
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'landforms', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'landforms', initial: true, online: 'room' }),
   }),
   // VERGE1: THE VERGE - a wilderness flat stands only where nothing of it reaches over a road or a track: the disc of
   // its widest picture, a Low Poly tree's crown among them, against the painted network (world/road/roadVerge.js). FORCED ON
@@ -975,7 +975,7 @@ export const FEATURES = Object.freeze([
       + 'grow up to the edge of the road, like the original.',
     effect: 'Takes effect when the world next loads.',
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'roadVerges', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'roadVerges', initial: true, online: 'room' }),
   }),
   // ECOTONE1: THE ECOTONE - where map pixels of two climates meet, the ground, the grass and the
   // wild's flats follow one wandering, patchy border (world/ecotone.js) in place of the pixel's straight edge. FORCED ON
@@ -989,7 +989,7 @@ export const FEATURES = Object.freeze([
       + 'along a straight line. Off changes them at a straight edge, like the original.',
     effect: 'Takes effect when the world next loads.',
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'climateBlend', initial: true, online: true }),
+    control: Object.freeze({ store: 'prefs', key: 'climateBlend', initial: true, online: 'room' }),
   }),
   // NEARBY-QUESTS: a remote quest site is drawn near the player, within a reach that grows with level
   // (systems/quest/questReach.js; systems/quest/place.js reads it as each new quest picks its sites). The player's own
@@ -1019,7 +1019,7 @@ export const FEATURES = Object.freeze([
       + 'and its rewards, and online it is always on.'); },
     get effect() { return t('features.questlines.effect', 'Takes effect on the next quest you take; quests you already have keep the rules they began with.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: true }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
+    control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: 'room' }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
   }),
   QUEST_REWARDS_ROW,   // QUESTLINE-REWARDS: the reward scale, DFU's selectable
   // LW2: THE LIVING WORLD
@@ -1627,7 +1627,7 @@ export const FEATURES = Object.freeze([
       + 'only one at a time. A group stands in about one pixel in eight. Off keeps the classic single encounters. Online it is always on.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
-    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: true }),   // CAMP-RARE: forced on online, the room's ground (the groups are rare: systems/campEncounters.js); Off is DFU's lone wanderers
+    control: Object.freeze({ store: 'prefs', key: 'wildernessCamps', initial: true, online: 'room' }),   // the room's ground online (systems/campEncounters.js); Off is DFU's lone wanderers
   }),
   // WILD-ROAD (FIELD BUGS 2026-10-04e, Discord: "having to completely halt my travel because 1 rat chose today to die
   // can be quite the interruption"): systems/roadEncounters.js - the port's own. On a journey or the Overworld, a
@@ -1780,7 +1780,7 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.navalCombat.effect', 'Takes effect at once; Ship handling, the next time you take the helm. Online it is always off.'); },   // AUDIT NAV2 F14: the helm takes the handling once a session (comeSailAway.js responsive)
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({
-      store: 'prefs', key: 'naval', initial: false, online: false,   // scenes/world.js navalOn: the host stands down and empties the sea
+      store: 'prefs', key: 'naval', initial: false, online: 'room',   // scenes/world.js navalOn: the host stands down and empties the sea
       also: Object.freeze([
         Object.freeze({ store: 'prefs', key: 'naval-ships', initial: 'some', online: 'player' }),   // systems/naval/navalDirector.js DENSITY
         Object.freeze({ store: 'prefs', key: 'naval-boarders', initial: true, online: 'player' }),   // navalHost.js: a pirate's grapple on MY boat
@@ -1825,7 +1825,7 @@ const declaredPrefs = (list) => list.flatMap((f) => [f.control, ...(f.control?.a
   .filter((c) => c?.store === 'prefs' && c.initial !== undefined);
 /** The prefs-store keys the rows declare: key -> the shelf's default. */
 export const FEATURE_PREF_DEFAULTS = Object.freeze(Object.fromEntries(declaredPrefs(FEATURES).map((c) => [c.key, c.initial])));
-/** ...and key -> the online lane's answer (true/false forced, 'player'). */
+/** ...and key -> the online lane's answer ('room': the server profile pins it; 'player'). */
 export const FEATURE_PREF_ONLINE = Object.freeze(Object.fromEntries(declaredPrefs(FEATURES).map((c) => [c.key, c.online])));
 declareOnlinePrefs(FEATURE_PREF_ONLINE);
 
@@ -1868,7 +1868,7 @@ export function checkFeature(f) {
   else if (c.store === 'prefs') {
     // RF4: a prefs row is the ONE declaration of its switch - the shelf's default and the lane's answer ride it
     if (c.initial === undefined) out.push('a prefs row declares its initial value');
-    if (![true, false, 'player', ...(c.tiers ?? []).map((x) => x[0])].includes(c.online)) out.push("a prefs row declares its online answer: true, false or 'player'");   // F3a: or one of its own tiers, the room's pin
+    if (c.online === 'room' ? !roomPinned(c) : c.online !== 'player') out.push("a prefs row declares its online answer: 'room' (pinned in the server profile) or 'player'");
     if (c.lane && !_lanes.has(c.lane)) out.push(`lane '${c.lane}' is not registered`);
     if (c.tiers !== undefined) {
       if (!Array.isArray(c.tiers) || !c.tiers.length) out.push('tiers is not a list');
@@ -1888,7 +1888,7 @@ export function checkFeature(f) {
       else if (a.store === 'prefs') {
         // FT18: a covered pref is declared where it is covered - RF4's law, one row over
         if (a.initial === undefined) out.push(`also: the covered pref '${a.key}' declares its initial value`);
-        if (!coveredOnlineOk(c, a)) out.push(`also: the covered pref '${a.key}' declares its online answer`);   // or one of its own part's tiers, the room's pin
+        if (a.online === 'room' ? !roomPinned(a) : a.online !== 'player') out.push(`also: the covered pref '${a.key}' declares its online answer`);
       }
     }
   }

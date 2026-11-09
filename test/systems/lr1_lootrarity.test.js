@@ -84,7 +84,7 @@ test('LR5: the switch - ON by default (the ladder is the port\'s own game), forc
   const row = FEATURES.find((f) => f.id === 'loot-rarity');
   assert.ok(row, 'the row is on the home');
   assert.deepEqual(row.kinds, ['enhanced']);
-  assert.deepEqual(row.control, { store: 'prefs', key: 'lootRarity', initial: true, online: true }, 'RF4: the row declares its default and the lane\'s answer');
+  assert.deepEqual(row.control, { store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }, 'RF4: the row declares its default and the lane\'s answer');
   // AUDIT FT15 (drift): this was tightened from /Magic .*Rare .*Legendary/s to the
   // exact phrase during the trim - a move TOWARD drift, where one comma reworded
   // turns it red for nothing. The claim is that the note names the three tiers in

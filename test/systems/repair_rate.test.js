@@ -168,6 +168,6 @@ test("DFU-GAPS EL25: the Repair price by damage row defaults to DFU's flat tenth
   const { FEATURES } = await import('../../src/systems/features.js');
   const { ONLINE_FORCED_PREFS } = await import('../../src/systems/online/onlineLane.js');
   const row = FEATURES.find((f) => f.id === 'repair-price-by-damage');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['repairPriceByDamage', false, false]);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['repairPriceByDamage', false, 'room']);
   assert.equal(ONLINE_FORCED_PREFS.repairPriceByDamage, false);
 });

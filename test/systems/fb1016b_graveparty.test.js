@@ -21,7 +21,7 @@
 // fresh stones neither evicts another searcher's row nor writes the ledger at its pace (the real Room); G4 a stranger's
 // word kept is stamped never ahead of now; G5 the lock is the account's, and another character of it is told whose
 // search it was.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as acorn from 'acorn';
@@ -61,8 +61,9 @@ import { enemyDisplayName, ENEMY_BASICS } from '../../src/characters/enemy/enemy
 import * as RL from '../../src/systems/roomLoot.js';
 import { playerEntity } from '../../src/characters/playerEntity.js';   // AUDIT GRAVE-PARTY G2: the pack a room container's take is lifted back out of (roomLootHost.js roomLift)
 import { installRoleplayRealismItems } from '../../src/systems/roleplayRealismItems/rriInstall.js';
-import { fakeRooms } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 installRoleplayRealismItems();   // the hosts' own install (scenes/shared.js): its weapons are among a search's finds, and its templates the wire's
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');

@@ -24,5 +24,5 @@ export const QUEST_REWARDS_ROW = Object.freeze({
     return t('features.questlineRewards.effect', 'Takes effect on the next reward a quest pays.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: QUEST_REWARDS_PREF, initial: true, online: true }),
+  control: Object.freeze({ store: 'prefs', key: QUEST_REWARDS_PREF, initial: true, online: 'room' }),
 });

@@ -19,5 +19,5 @@ export const LOCKPICK_TUMBLERS_ROW = Object.freeze({
     return t('features.lockpickTumblers.effect', 'Takes effect on the next lock.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'lockpickTumblers', initial: false, online: false }),
+  control: Object.freeze({ store: 'prefs', key: 'lockpickTumblers', initial: false, online: 'room' }),
 });

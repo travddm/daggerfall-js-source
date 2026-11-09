@@ -26,10 +26,10 @@ const read = (f) => readFileSync(join(ROOT, f), 'utf8');
 
 // Fixtures built over REAL keys of each store, so a pin here fails if
 // the store loses the key (the shape-the-producer-mints law).
-const prefsRow = { id: 'p', title: 'P', note: 'n', group: 'sight', kinds: ['enhanced'], control: { store: 'prefs', key: 'enhancedAI', initial: false, online: true } };   // RF4: a prefs row declares its switch
+const prefsRow = { id: 'p', title: 'P', note: 'n', group: 'sight', kinds: ['enhanced'], control: { store: 'prefs', key: 'enhancedAI', initial: false, online: 'room' } };   // RF4: a prefs row declares its switch
 const settingsRow = { id: 's', title: 'S', note: 'n', group: 'world', kinds: ['classic'], control: { store: 'settings', key: 'Experimental/SmallerDungeons' } };
 const modRow = { id: 'm', title: 'M', note: 'n', group: 'sight', kinds: ['mod'], control: { store: 'mods', vendor: 'dynamic-skies', key: 'Enabled' } };
-const bothRow = { id: 'b', title: 'B', note: 'n', group: 'sight', kinds: ['enhanced', 'mod'], control: { store: 'prefs', key: 'enhancedEnvironments', initial: true, online: true } };
+const bothRow = { id: 'b', title: 'B', note: 'n', group: 'sight', kinds: ['enhanced', 'mod'], control: { store: 'prefs', key: 'enhancedEnvironments', initial: true, online: 'room' } };
 
 test('FT0: three kinds in label order, three stores, and the registry is empty and sound', () => {
   assert.deepEqual(KIND_ORDER, ['enhanced', 'mod', 'classic']);
@@ -58,9 +58,9 @@ test('FT0: every law of the row fails under a one-field mutation', () => {
   assert.deepEqual(mut(prefsRow, { control: null }), ['no control']);
   assert.deepEqual(mut(prefsRow, { control: { store: 'ini', key: 'enhancedAI' } }), ["unknown store 'ini'"]);
   // RF4: a prefs row IS the shelf's declaration of its key, so a typo is a new key - what a row cannot do is stay silent on its default or its online answer
-  assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', online: true } }), ['a prefs row declares its initial value']);
-  assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', initial: false } }), ["a prefs row declares its online answer: true, false or 'player'"]);
-  assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', initial: false, online: 'maybe' } }), ["a prefs row declares its online answer: true, false or 'player'"]);
+  assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', online: 'room' } }), ['a prefs row declares its initial value']);
+  assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', initial: false } }), ["a prefs row declares its online answer: 'room' (pinned in the server profile) or 'player'"]);
+  assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', initial: false, online: 'maybe' } }), ["a prefs row declares its online answer: 'room' (pinned in the server profile) or 'player'"]);
   assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: 'enhancedAI', initial: false, online: 'player', lane: 'nope' } }), ["lane 'nope' is not registered"]);
   assert.deepEqual(mut(prefsRow, { control: { store: 'prefs', key: '' } }), ["prefs has no key ''"], 'an empty key is no key');
   assert.deepEqual(mut(settingsRow, { control: { store: 'settings', key: 'Experimental/SmallerDungeon' } }), ["settings has no key 'Experimental/SmallerDungeon'"]);
@@ -80,7 +80,7 @@ test('FT0: the list refuses a repeated id and two rows over one switch', () => {
   assert.deepEqual(checkFeatures([modRow, { ...modRow, id: 'm2' }]), ['m2: control repeated (mods:dynamic-skies:Enabled)']);
   assert.deepEqual(checkFeatures([settingsRow, { ...prefsRow, control: { ...prefsRow.control, also: [settingsRow.control] } }]), ['p: control repeated (settings::Experimental/SmallerDungeons)'], 'FT2: a covered control is a control - two rows cannot both own a key');
   assert.deepEqual(checkFeatures([{ id: 'x', title: 'X', group: 'sight', kinds: ['nope'], control: { store: 'prefs', key: 'zzz' } }]),
-    ["x: unknown kind 'nope'", 'x: a prefs row declares its initial value', "x: a prefs row declares its online answer: true, false or 'player'"], 'every problem, prefixed by the row');
+    ["x: unknown kind 'nope'", 'x: a prefs row declares its initial value', "x: a prefs row declares its online answer: 'room' (pinned in the server profile) or 'player'"], 'every problem, prefixed by the row');
 });
 
 test('FT0: the filter shows a two-kind row under both kinds, and the counts say so', () => {
