@@ -902,8 +902,7 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'weatherEvents', initial: true, online: 'room' }),   // WEATHER2b: weatherSim.js weatherFieldOn; forced on online - one sky
-  }),
-  ELTHERIC_SEA_ROW,   // ETHER-SEA: its own switch, beside the weather
+  }), ELTHERIC_SEA_ROW,   // ETHER-SEA: its own switch, beside the weather
   // FOREST1: REAL
   // FORESTS - the wilderness's trees gathered into woods with open land
   // between them, in place of DFU's even scatter (world/terrain/terrainNature.js
