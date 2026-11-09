@@ -79,7 +79,7 @@ export const CATEGORIES = Object.freeze([
     sec("light", "Your light", [
       "feat:torches-from-items", "Enhancements/PlayerTorchFromItems", "feat:mod-handheld-torches"]),
     sec("character", "Character & survival", [
-      "feat:mod-character-modes", "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection", "feat:lockpick-tumblers"]),
+      "feat:mod-character-modes", "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection", "feat:gentle-equip-bill", "feat:legendary-equip-free", "feat:lockpick-tumblers"]),
     sec("moving", "Climbing & gathering", [
       "feat:enhanced-climbing", "Enhancements/AdvancedClimbing", "feat:resource-highlights", "feat:mod-foraging"]),
     sec("start", "Starting a new game", [

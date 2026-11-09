@@ -39,6 +39,8 @@ const PREFS = Object.freeze({
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,
+  gentleEquipBill: false,
+  legendaryEquipFree: false,
   lockpickTumblers: false,
   dressForThePart: false,
   guildProbation: false,

@@ -68,7 +68,7 @@
     "src/systems/banking.js": 1080,
     "src/systems/comeSailAway/comeSailAway.js": 3384,
     "src/systems/effects.js": 2034,
-    "src/systems/enchantments.js": 1136,
+    "src/systems/enchantments.js": 1135,
     "src/systems/features.js": 1975,
     "src/systems/horse/horseCart.js": 1606,
     "src/systems/inputActions.js": 1628,

@@ -11,15 +11,19 @@ import { classicCastingCost } from '../../src/systems/spellcost.js';
 import { foundFamily, addChild, recordDeath, personOf, MODELS } from '../../src/systems/legacy/family.js';
 import { storeFamily, loadFamily, readBirth } from '../../src/systems/legacy/store.js';
 import { waitingHouses, takeUpLine } from '../../src/systems/legacy/waitingHouses.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
+import { GENTLE_EQUIP_BILL_PREF } from '../../src/systems/equipBill.js';
 
 // a Fortify record, CasterOnly (enchantcast.test.js's shape): 49 classic points at skill 40
 const rec = { index: 4, name: 'Fortify', rangeType: 0, effects: [{ type: 9, subType: 0, durationBase: 3, durationMod: 0, durationPerLevel: 1, chanceBase: 0, chanceMod: 0, chancePerLevel: 1, magnitudeBaseLow: 5, magnitudeBaseHigh: 5, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1 }, { type: -1 }, { type: -1 }] };
 const amulet = (cond) => ({ name: 'Amulet', templateIndex: 133, group: ITEM_GROUPS.Jewellery, currentCondition: cond, maxCondition: 800, enchantments: [{ type: T.CastWhenHeld, param: 4 }] });
 const wearer = (items) => ({ name: 'W', isPlayer: true, health: 20, maxHealth: 30, items, level: 5, stats: {}, skills: 40, career: {} });
+// HELD-REWEAR is the gentleEquipBill option (EQUIP-BILL); DFU's default bill is test/systems/equipbill_dfu.test.js.
 function withClock(fn) {
   const clock = { now: 100_000 };
   setDefaultEnchantCtx({ spellsByIndex: () => new Map([[4, rec]]), now: () => clock.now });
-  try { fn(clock); } finally { setDefaultEnchantCtx(null); }
+  setPref(GENTLE_EQUIP_BILL_PREF, true);
+  try { fn(clock); } finally { setDefaultEnchantCtx(null); setPref(GENTLE_EQUIP_BILL_PREF, false); }
 }
 
 test('HELD-REWEAR: the first wear pays the casting cost; a re-wear inside the six hours pays nothing; past them it pays again', () => withClock((clock) => {
