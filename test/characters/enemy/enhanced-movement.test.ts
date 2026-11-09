@@ -20,8 +20,14 @@ import {
   writePlayerBowOrSheathed,
   writePlayerYaw,
 } from '../../../src/player/player-stance.ts';
-import { EnemyAI } from '../../../src/characters/enemy/enemyMotor.js';
-import { Collider } from '../../../src/player/collider.js';
+
+// The motor and the collider are loaded by a computed path, which tsconfig.node.json does not follow: their imports
+// reach src/player/motor.js and src/net, which name the DOM's crypto types (CryptoKey, SubtleCrypto), and the node
+// config has no DOM library.
+const MOTOR_PATH: string = '../../../src/characters/enemy/enemyMotor.js';
+const COLLIDER_PATH: string = '../../../src/player/collider.js';
+const { EnemyAI } = await import(MOTOR_PATH);
+const { Collider } = await import(COLLIDER_PATH);
 
 /** Rolls handed out in order, then the last one again. */
 const scripted = (...values: number[]) => {
@@ -172,7 +178,6 @@ const floored = () => {
   );
   return c;
 };
-type EnemyAIOptions = NonNullable<ConstructorParameters<typeof EnemyAI>[3]>;
 const senses = () => ({ gameMinutes: 0, playerStealth: 0, rolls: () => 0.5 });
 /** `roll` is every draw: 0.99 closes in and waits the longest reflex (0.8 s); 0 backs off and waits the shortest (0.2 s). */
 const motor = (on: boolean, yaw = 0, roll = 0.99) =>
@@ -182,8 +187,8 @@ const motor = (on: boolean, yaw = 0, roll = 0.99) =>
     centreOffset: 0.9,
     rolls: () => roll,
     enhancedCombatAI: () => on,
-  } as EnemyAIOptions);
-const steps = (ai: EnemyAI, n: number, at: number[]) => {
+  });
+const steps = (ai: { update(dt: number, at: number[], senses: object): void }, n: number, at: number[]) => {
   for (let i = 0; i < n; i++) ai.update(1 / 60, at, senses());
 };
 
