@@ -5,8 +5,13 @@
 // machine's reference compares hold. A peer that is gone is dead to the machine (health 0, targetHealth's read) and
 // is dropped.
 
-/** A peer as the room reports it: its id, its feet in scene space, its capsule height and its concealment bits. */
-export type PeerReport = { id?: unknown; feet?: unknown; height?: unknown; cv?: unknown };
+import { readPeerStealth } from './peer-senses.ts';
+
+/**
+ * A peer as the room reports it: its id, its feet in scene space, its capsule height, its concealment bits, and its live
+ * Stealth and half-speed state.
+ */
+export type PeerReport = { id?: unknown; feet?: unknown; height?: unknown; cv?: unknown; sk?: unknown; hv?: unknown };
 
 export type PeerCandidate = {
   isPlayer: true;
@@ -17,6 +22,12 @@ export type PeerCandidate = {
   health: number;
   cv: number;
   concealment: () => unknown;
+  sk: number;
+  hv: number;
+  /** The live Stealth a foe's stealth roll reads (enemyMotor.js _stealthCheck). */
+  stealthOf: () => number;
+  /** Whether the peer moves under half speed (stealth-check.ts peerHalfOfStealthCheck). */
+  halfSpeed: () => boolean;
 };
 
 export type PeerCandidatesDeps = {
@@ -68,6 +79,10 @@ export function createPeerCandidates({ read, concealFlags, capsuleHeight }: Peer
           cv: 0,
           // Its concealment, off its pose: EnemySenses.BlockedByIllusionEffect reads a peer as it reads any target.
           concealment: () => concealFlags(made.cv),
+          sk: 0,
+          hv: 0,
+          stealthOf: () => made.sk,
+          halfSpeed: () => made.hv === 1,
         };
         c = made;
         cands.set(q.id, c);
@@ -78,6 +93,7 @@ export function createPeerCandidates({ read, concealFlags, capsuleHeight }: Peer
       c.height = typeof q.height === 'number' && Number.isFinite(q.height) && q.height > 0 ? q.height : capsuleHeight;
       c.health = 1;
       c.cv = Number(q.cv) | 0;
+      readPeerStealth(c, q);
     }
     for (const [id, c] of cands) {
       if (seen.has(id)) continue;

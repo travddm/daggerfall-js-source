@@ -34,3 +34,43 @@ export function playerHalfOfStealthCheck(
   }
   return undefined;
 }
+
+/** The motor's per-peer state, beside DFU's per-player fields. */
+export type PeerStealthMotor = {
+  detected: boolean;
+  /** The players on other clients this foe has met: DFU's hasEncounteredPlayer, one for each player. Made on first use. */
+  peersMet?: Set<string>;
+  /** The classic minute of the foe's last stealth check at a peer. The foe record carries it (peer-senses.ts). */
+  peerStealthMinute?: number;
+};
+
+/** A player on another client as the foe's motor holds it (peer-candidates.ts). */
+export type PeerTarget = { id: string; isPeer?: boolean; halfSpeed?: () => boolean };
+
+/**
+ * Records the first meeting with a peer, one for each peer, as DFU records the player's. Returns false for a target that
+ * is not a peer. The peer rolls its own language check on its own client (peer-senses.ts).
+ */
+export function meetPeer(ai: PeerStealthMotor, target: PeerTarget): boolean {
+  if (target.isPeer !== true) return false;
+  (ai.peersMet ??= new Set()).add(target.id);
+  return true;
+}
+
+/**
+ * The player half for a player on another client, read off its pose: its half-speed skip and its encountered
+ * fast-mover arm. Its Stealth tallies on its own client: this keeps the minute of the check for the foe record.
+ */
+export function peerHalfOfStealthCheck(
+  ai: PeerStealthMotor,
+  target: PeerTarget,
+  gameMinutes: number,
+): boolean | undefined {
+  if (target.halfSpeed?.() === true) {
+    if ((gameMinutes & 1) === 1) return ai.detected;
+  } else if (ai.peersMet?.has(target.id)) {
+    return true;
+  }
+  ai.peerStealthMinute = gameMinutes;
+  return undefined;
+}

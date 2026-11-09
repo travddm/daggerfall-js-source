@@ -194,6 +194,7 @@ import { isEquipped } from '../systems/equip.js';   // DR1: FilterLocalItems' `!
 import { totalGoldAmount } from '../systems/court.js';   // DR1: the trade screen's gold strip - AUDIT 58: PlayerEntity.GetGoldAmount (:1313-1316), coins PLUS letters
 import { isAzurasStarEquipped, registerFoeDoor } from '../systems/artifactEffects.js';   // V3: the Star's kill capture; AUDIT PSCALE1 DOORS-2: Namira's reflection through this pool's door
 import { createPeerCandidates } from '../characters/enemy/peer-candidates.ts';   // the room's other players as target candidates
+import { stealthCheckRecord, createPeerSensesLink, applyCalm } from '../characters/enemy/peer-senses.ts';   // DFU's stealth tally and language roll for a player on another client
 import { applySpell, hasActiveEffect, isEntityWaterWalking, entityIsParalyzed, maxFatigue, applyEnemyMotorEffectFlags, concealmentFlags, concealFlagsOfBits, isSoulTrapEffect } from '../systems/effects.js';   // A5: the enemy Levitate arm, the foe-target concealment closure + EntityConcealmentBehaviour's visual
 import { createStandInSpell } from './gate/standInSpell.js';   // FIELD BUGS 2026-10-19f STAND-IN-WHOLE (HOST-SPLIT): my spell on a body the relay runs, its one door (AUDIT SCHOOLS L2 F4's telling with it)
 import { liveStat, killIfAnyLiveStatZero, clampFatigue } from '../systems/statMods.js';   // AUDIT C&C N5: SetFatigue's clamp
@@ -4912,8 +4913,8 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     if (f.dead && f.corpseDestroyed) r.bg = f.corpseDestroyed;   // DEX5b: the body a mod's prefab destroyed (1 risen, 2 burnt) - every copy loses it too
     // FLAGGED (10.1, section 32): this stream carries none of the street record's z, nm, yd, ex or sp
     if (!f.dead && f.ai._tac && !f.ai._tac.puppet) Object.assign(r, blowWire(f.ai, tacticsNow()));   // TELL8 (10.1): its wind-up, its stagger, its overreach (the room's own frame) - a foe with a brain
-    Object.assign(r, traitWire(f.entity, seeded));   // AUDIT WORLD-EVENTS L2-3: its wrath, its ward's share (an own lane's elite its mark and traits) - every joiner's copy as mine
-    const key = `${r.f[0]},${r.f[1]},${r.f[2]},${r.y},${r.h},${r.d},${r.bg ?? 0},${r.a},${r.m},${r.g},${r.c},${r.s},${r.n},${r.j},${r.v},${traitWireKey(r)}${r.wk !== undefined || r.ws !== undefined ? `,${blowWireKey(r)}` : ''}`;   // TELL8: and the wind-up's (never `wl`)
+    Object.assign(r, stealthCheckRecord(f.ai), traitWire(f.entity, seeded));   // peer-senses.ts: its last stealth check at a peer; AUDIT WORLD-EVENTS L2-3: its wrath, its ward's share (an own lane's elite its mark and traits) - every joiner's copy as mine
+    const key = `${r.f[0]},${r.f[1]},${r.f[2]},${r.y},${r.h},${r.d},${r.bg ?? 0},${r.a},${r.m},${r.g},${r.c},${r.s},${r.n},${r.j},${r.v},${r.sc},${traitWireKey(r)}${r.wk !== undefined || r.ws !== undefined ? `,${blowWireKey(r)}` : ''}`;   // TELL8: and the wind-up's (never `wl`)
     // AUDIT SETS M1: the maximum - every full frame owes it again (and pays it, fitMaxima), a delta pays a few owed
     if (full) f._maxSent = undefined;
     const max = foeMaxOf(f);
@@ -5514,6 +5515,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     if (f._mwWire) applyWireLook(f, r);   // AUDIT MW-NPC II K3: a puppet's owner's seed (a layout copy's is its layout point's, every machine's)
     const p = f._pup ?? (f._pup = { feet: [f.ai.feet[0], f.ai.feet[1], f.ai.feet[2]], yaw: f.ai.yaw, moving: false, hurt: false, hurtUntil: 0, strike: null, a: null, target: null, c: null, cast: null });
     if (typeof r.g === 'string') p.target = r.g;   // WORLD3: whose blow this puppet's is
+    _peerSenses.read(f, r, p.target);   // my Stealth tally and my first-meeting language roll at another's foe
     if (r.d !== 1) f._fightN = r.n ?? 1;   // AUDIT PSCALE1: the host's count of who fights it (a record without one: one). SIGIL1: a LIVE record's - a body's carries none, and the fight it died in was the last live count (its Renown bonus, its sigils)
     if (r.l !== undefined && isClassEnemyId(f.mobileType)) f.streamedLevel = r.l;   // AUDIT RENOWN1 GAME-3: the host's class foe's level - what its kill is worth (net/renownTracker.js renownFoeLevel)
     if (r.c != null) { const c = r.c | 0; if (p.c != null && c !== p.c) p.cast = r.s | 0; p.c = c; }   // WORLD3: a cast once per count, never the count a joiner arrived with
@@ -5587,6 +5589,14 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     const pi = foes.indexOf(foe);
     if ((!_authority && isRoomFoe(foe, pi)) || foe._ownFrom != null) { if (!(landed > 0)) damageFoe(foe, 0, playerFeet, null, { kind }); else foe._divertPt = null; return; }   // REST-SYNC: a shared encounter's puppet too; QUEST-PARTY phase 3c: and a party member's quest foe
     handleAttackFromPlayer(foe, playerFeet);
+  }
+  /** A peer's language roll pacified my foe (peer-senses.ts): a room foe while I host, or one of my own lane's. The word
+   *  comes down the route the peer's blows take, so it is addressed as they are. */
+  function applyCalmWord(data, own) {
+    if (own ? data.k != null && data.k !== _locationKey : !_authority) return false;
+    const i = data.i | 0;
+    const f = own ? foes.find((x) => x._ownFrom == null && x._ownSeq === i) : data.xs === 1 ? _sharedById.get(i) : i < _layoutFoes ? foes[i] : null;
+    return applyCalm(f?.ai, !f || !!f.dead || f.companion != null);
   }
   function applyHit(id, data) {
     if (!_authority || !data || typeof data !== 'object') return false;
@@ -5735,6 +5745,15 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   const _peers = createPeerCandidates({ read: () => opts.peers?.() ?? null, concealFlags: concealFlagsOfBits, capsuleHeight: CAPSULE_HEIGHT });
   function peerCandidates() { return _peers.all(); }
   const peerCandidate = _peers.byId;
+  // A foe another client runs makes DFU's stealth tally and language roll for my player here (peer-senses.ts); a won
+  // roll goes to its owner down the route my blows take (onFoeHit).
+  const _peerSenses = createPeerSensesLink({
+    playerEntity,
+    isMe: (f, at) => opts.selfId?.() != null && (at === '.' ? (f._ownFrom ?? _foesFrom) : (at || null)) === opts.selfId(),
+    minute: () => Math.floor(classicMinutesRef.value),
+    rollLanguage: (f, edge) => (foeDeps ? tryLanguagePacification(edge, f.entity, f.mobileType, playerEntity, { sheathed: playerWeapon.sheathed, enemyLanguageSkill: foeDeps.enemyLanguageSkill, calculateEnemyPacification: foeDeps.calculateEnemyPacification, say: (l) => hudText.add(l) }) : null),
+    send: (f, word) => opts.onFoeHit?.({ ...(f._ownFrom != null ? { own: 1, to: f._ownFrom, k: _locationKey, i: f._ownI } : f._encId != null ? { i: f._encId, xs: 1 } : { i: f._surI ?? foes.indexOf(f) }), ...word }),
+  });
   // the doors: what an entry changed goes out (the session refuses it outside a world room)
   if (opts.onActions) actions.onChanged = (recs) => opts.onActions({ k: _locationKey, a: recs });
   /** WORLD3: another's change to this dungeon's doors, levers and movers - keyed by this dungeon. */
@@ -9550,11 +9569,11 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     // WORLD2: one simulation per room - the stream out and in, the hit in, the seat
     foesFrame,
     applyFoes,
-    applyHit,
+    applyHit: (id, data) => (data?.calm === 1 ? applyCalmWord(data, false) : applyHit(id, data)),
     setAuthority,
     // QUEST-PARTY phase 3c: the room's own lane - my shared quest's foes out, a party member's in, a blow on mine in,
     // the owners swept, the handover
-    ownFrame, applyOwnFrame, applyOwnHit, pruneOwnOwners, clearOwnPuppets, ownHandOverFrame, dropOwnHanded,
+    ownFrame, applyOwnFrame, applyOwnHit: (id, data) => (data?.calm === 1 ? applyCalmWord(data, true) : applyOwnHit(id, data)), pruneOwnOwners, clearOwnPuppets, ownHandOverFrame, dropOwnHanded,
     isAuthority: () => _authority,
     // WORLD3: the live world as events - another's doors in
     // WORLD4: and the room's loot - what a container the room has opened holds now
