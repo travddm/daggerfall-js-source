@@ -6063,6 +6063,10 @@ export function createFpArm() {
         // MW-D26: the movement slot, on the card like the others.
         movementGroup: slots.movementGroup,
         movementRate: slots.movementState ? +slots.movementRate.toFixed(3) : null,
+        // The slots' own clocks, for the parity recording and the card.
+        idleTime: slots.idleState ? slots.idleState.time : null,
+        movementTime: slots.movementState ? slots.movementState.time : null,
+        jumpTime: slots.jumpState ? slots.jumpState.time : null,
         movementSource: slots.movementSource && slots.movementSource.name,
         // MW-D39: the jump slot, on the card like the others.
         jumpGroup: slots.jumpGroup,
