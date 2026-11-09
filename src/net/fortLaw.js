@@ -87,10 +87,9 @@ export const defendersWaveMs = (baseMs, walls) => Math.max(WALLS_WAVE_MIN_MS, ba
 /** The Gatehouse (6.2): vitality 20,000, +50% a tier; a fighter's blow deals a tenth of its damage to it. */
 export const GATEHOUSE = Object.freeze({ vitality: 20000, perTier: 0.5, blowShare: 0.1 });
 export const gatehouseVitality = (t) => Math.round(GATEHOUSE.vitality * (1 + GATEHOUSE.perTier * Math.max(0, Math.min(3, Number(t) || 0))));
-/** A Ram (6.2): vitality 3,000 (a Siegewright's +50%, Professions-Arc 3.3), 500 every 10 s to the Gatehouse while two
+/** A Ram (6.2): vitality 3,000, 500 every 10 s to the Gatehouse while two
  *  of its side stand within 3 m; one a side at a time; a destroyed Ram is gone. */
-export const RAM = Object.freeze({ vitality: 3000, damage: 500, everyMs: 10000, crew: 2, crewM: 3, siegewright: 0.5 });
-export const ramVitality = (siegewright = false) => Math.round(RAM.vitality * (siegewright ? 1 + RAM.siegewright : 1));
+export const RAM = Object.freeze({ vitality: 3000, damage: 500, everyMs: 10000, crew: 2, crewM: 3 });
 /** The Watchtowers: the holder told when a challenger passes half its defence (tier 1), a quarter (tier 2). */
 export const watchtowerShare = (t) => (t >= 2 ? 0.25 : t === 1 ? 0.5 : null);
 /**
