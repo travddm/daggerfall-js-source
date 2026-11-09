@@ -18,6 +18,8 @@ import { discoverLocation, restoreDiscovery } from '../../../src/systems/discove
 import { spawnedMapId, WORLD_SALT } from '../../../src/world/spawnedDungeons.js';
 import { inBay } from '../../../src/world/tamriel/tamrielFrame.js';
 import { hostText } from '../../hostText.mjs';
+import { setPref, _resetForTests as resetPrefs } from '../../../src/systems/uiPrefs.js';
+import { SPAWNED_DUNGEONS_PREF } from '../../../src/systems/dungeon/spawned-dungeons-row.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
@@ -155,9 +157,10 @@ test('TVD-WORLD the host: a found spawn past the Bay, its pixel never built, sta
     t.host.tvSpawnAt = (x, y) => (x === sx && y === sy ? stood : null);
     const t2 = createTravelViewDungeons(t.host);
     discoverLocation(spawnedMapId(WORLD_SALT, sx, sy), { regionName: 'Skyrim', locationName: stood.name });
+    setPref(SPAWNED_DUNGEONS_PREF, true);   // decision 122 (7): the room's Spawned dungeons row on
     const filed = t2.tvFiledSpawns(SKYRIM).filter((s) => s.x === sx && s.y === sy);
     assert.equal(filed.length, 1, 'its pixel past the Bay read');
-  } finally { restoreDiscovery(null); }
+  } finally { restoreDiscovery(null); resetPrefs(); }
 });
 
 const ARENA2 = process.env.ARENA2_PATH ?? '';

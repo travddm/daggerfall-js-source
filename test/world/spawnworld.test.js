@@ -23,6 +23,7 @@ import { roomKeyFor } from '../../src/net/online.js';
 import { discoverLocation, hasDiscoveredLocationId, restoreDiscovery, snapshotDiscovery, discoveryKeyOf } from '../../src/systems/discovery.js';
 import { hasDock, nearDock, DOCK_PIXEL_IDS } from '../../src/systems/immersiveTravel.js';
 import { hostText } from '../hostText.mjs';
+import { spawnedDungeonsStand } from '../../src/systems/dungeon/spawned-dungeons-row.js';   // decision 122 (7): the hosts' gate, handed to the lifted bodies
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -102,7 +103,8 @@ function stand({ places = new Set(), online = true } = {}) {
   const src = rd('src/scenes/spawnStandHost.js');
   const lift = (head, close) => { const i = src.indexOf(head); assert.ok(i > 0, head); return src.slice(i, src.indexOf(close, i) + close.length); };
   const d = { index: new Map(), ledger: createSpawnLedger(), now: 0, inside: null, gen: 0, roads: { roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500) } };
-  const make = new Function('d', 'places', 'online', 'cloneAt', 'pathFreePixel', 'spawnsDungeon', 'CLIMATES', `
+  const make = new Function('d', 'places', 'online', 'cloneAt', 'pathFreePixel', 'spawnsDungeon', 'CLIMATES', 'spawnedDungeonsStand', `
+    const getPref = () => true;   // decision 122 (7): the room's Spawned dungeons row on
     const params = { has: (k) => k === 'online' && online }, _spawnSalt = 1, maps = { getClimateIndex: () => 231 }, _spawnGround = () => true;
     const terrainGen = { roads: () => d.roads }, _spawnUnroaded = new Set(), _spawnLedger = d.ledger, _insideSpawn = (k) => k === d.inside, locationIndex = d.index;
     const etherSea = false, inEther = () => false, etherPlaceAt = () => null, onTheBay = (x, y) => x >= 0 && y >= 0 && x < 1000 && y < 500;
@@ -115,7 +117,7 @@ function stand({ places = new Set(), online = true } = {}) {
     ${lift('  function _locationToBuild(px, py) {', '\n  }\n')}
     ${lift('  function spawnPastBayAt(px, py) {', '\n  }\n')}
     return { _locationToBuild, spawnedDungeonAt };`);
-  return { d, ...make(d, places, online, cloneAt, pathFreePixel, spawnsDungeon, CLIMATES) };
+  return { d, ...make(d, places, online, cloneAt, pathFreePixel, spawnsDungeon, CLIMATES, spawnedDungeonsStand) };
 }
 
 test('SPAWN-WORLD the stand past the Bay (scenes/spawnStandHost.js, run): online the spawner stands last, after every place; kept in the index; its clocks the Bay\'s (gone past its time, never while the player is in it); a road landing on a provisional one takes it back - the index and its clocks; offline none (mutants: the spawner\'s tail, the clocks past the Bay, the roads\' take-back, the place gate)', () => {

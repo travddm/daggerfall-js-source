@@ -7,6 +7,7 @@ import { TERRAIN_SIZE } from '../../src/world/terrain/terrainSampler.js';
 import { isWorldRoom } from '../../src/net/wire.js';
 import { getMapPixelID, longitudeLatitudeToMapPixel } from '../../src/formats/mapsFile.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2: the world host whole
+import { spawnedDungeonsStand } from '../../src/systems/dungeon/spawned-dungeons-row.js';   // decision 122 (7): the hosts' gate, handed to the lifted bodies
 
 test('SPAWNED-DUNGEONS: the roll is a pure function of (salt, pixel) and lands near the chance', () => {
   assert.equal(SPAWN_CHANCE, 0.30);
@@ -120,7 +121,7 @@ test('SPAWNED-DUNGEONS by source: ONE choke point (buildPixelNow), online-only o
   assert.match(w, /function _locationToBuild\(px, py\) \{[\s\S]{0,1300}?return loc \|\| spawnedDungeonAt\(px, py\);\n  \}/, 'a real location always wins; only an empty pixel is asked');   // PIN MOVED (TESA8): 600 -> 640, past the Bay the lair's ask after the country's; PIN MOVED (TESA10): 640 -> 700; 700 -> 800 at the merge of main into TESA (main's ether place beside the arc's), a capital's before them; PIN MOVED (AUDIT TESA II P1): 800 -> 1000, online the zone's hall of the day first past the Bay; PIN MOVED (WW5): 1000 -> 1200, a province's Hollow first past the Bay; 1200 -> 1300 at AUDIT BAY-LEFT's merge (WW5's Hollow-first clause and SPAWN-WORLD's host reads on the one line past the Bay, 1,233 measured)
   const i = w.indexOf('const spawnedDungeonAt = (px, py) => {');
   const fn = w.slice(i, w.indexOf('\n  };\n', i));
-  assert.match(fn, /if \(!params\.has\('online'\)\) return null;/, 'online only - and off params: `onlineOn` is a const declared far below this build');
+  assert.match(fn, /if \(!spawnedDungeonsStand\(params, getPref\)\) return null;/, 'online only, and the room\'s row on (decision 122 (7)) - off params: `onlineOn` is a const declared far below this build');
   assert.match(fn, /spawnsDungeon\(_spawnSalt, px, py\)/, 'the roll is the hash, so a reload of the pixel answers the same');
   assert.match(fn, /CLIMATES\.Ocean \|\| !_spawnGround\(px, py\)\) return null/, 'no dungeon at sea - nor on a coast the climate page was spread over (SPAWN-SHORE)');
   assert.match(fn, /const key = `\$\{px\},\$\{py\}`;/);
@@ -438,7 +439,8 @@ test('AUDIT OW5b D2 host run (SPAWN-REBIRTH): A SPAWN PAST ITS TIME IS GONE UNTI
   assert.ok(i > 0 && j > 0 && k > 0, 'all three lifted');
   const run = ({ inside = false } = {}) => {
     const d = { now: 0, inside, index: new Map(), ledger: createSpawnLedger(), owed: [] };
-    const host = new Function('d', 'createSpawnLedger', `
+    const host = new Function('d', 'createSpawnLedger', 'spawnedDungeonsStand', `
+      const getPref = () => true;   // decision 122 (7): the room's Spawned dungeons row on
       const params = { has: () => true }, spawnsDungeon = () => true, _spawnSalt = 1, maps = { getClimateIndex: () => 0 }, CLIMATES = { Ocean: 99 }, _spawnGround = () => true;
       const terrainGen = { roads: () => null }, pathFreePixel = () => true, _spawnUnroaded = new Set();
       const _spawnLedger = d.ledger, _spawnClock = () => d.now, _insideSpawn = () => d.inside, locationIndex = d.index;
@@ -454,7 +456,7 @@ test('AUDIT OW5b D2 host run (SPAWN-REBIRTH): A SPAWN PAST ITS TIME IS GONE UNTI
       ${seen}
       ${spawned}
       ${build}
-      return { spawnedDungeonAt, _locationToBuild, _spawnSeen, gen: () => _locIndexGen };`)(d, createSpawnLedger);
+      return { spawnedDungeonAt, _locationToBuild, _spawnSeen, gen: () => _locIndexGen };`)(d, createSpawnLedger, spawnedDungeonsStand);
     return { d, ...host };
   };
   const h = run();

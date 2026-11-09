@@ -167,7 +167,9 @@ starting block carries start markers and the exit door (model 70300). Only dunge
 - Tier: `src/systems/dungeon/dungeonTier.js` `dungeonTier` returns `regular`, `elite` or `super`. Respawn times are in
   `src/systems/dungeon/dungeonRespawn.js`; offline, nothing respawns.
 - Spawned dungeons: `src/world/spawnedDungeons.js` rolls extra dungeons per map pixel from a hash and keeps a spawn
-  ledger (cleared, expired, reborn).
+  ledger (cleared, expired, reborn). They stand only online, and only when the Spawned dungeons row is on
+  (`src/systems/dungeon/spawned-dungeons-row.js`). The row is off by default, and the official profile pins it off
+  (decision 122 (7)).
 - Delve aids, all overlays on the same layout: dungeon sense (`src/systems/dungeon/dungeonSense.js`), the echo book of
   movers set going (`dungeonEcho.js`), and the way-out compass (`src/systems/wayOut.js`).
 

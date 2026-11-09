@@ -15,9 +15,8 @@ export function createSpawnStand(host) {
     _arenaTemplates, _capitalBase, _countryTemplates, _insideSpawn, _spawnGround, _spawnLedger, _spawnSalt,
     _spawnUnroaded, etherPlaceAt, etherSea, locationIndex, maps, params, terrainGen
   } = host;
-  const spawnsStand = spawnedDungeonsStand(params, getPref);   // decision 122 (7): online, and the room's row on
   const spawnedDungeonAt = (px, py) => {
-    if (!spawnsStand) return null;
+    if (!spawnedDungeonsStand(params, getPref)) return null;   // decision 122 (7): online, and the room's row on
     try {
       if (!spawnsDungeon(_spawnSalt, px, py) || maps.getClimateIndex(px, py) === CLIMATES.Ocean || !_spawnGround(px, py)) return null;
       // SPAWN-ROADS: no ruin on a pixel a road,
