@@ -53,7 +53,7 @@ test('TELL8: the record\'s law - the wind-up\'s four fields together (its shape 
   for (const ws of [0, 3, '1', true]) assert.equal(validFoeRecord({ ...base, ws }), null, `ws ${ws}`);
   assert.equal(WIRE_LAND_MS, FOE_WINDUP_MS, 'the writer\'s ceiling is the reader\'s');
   assert.deepEqual([...WIRE_KINDS], ['lunge', 'sweep', 'slam', 'ring', 'charge', 'leap', 'aimed']);
-  assert.equal(RELAY_VERSION, 'world310');
+  assert.equal(RELAY_VERSION, 'world311');
 });
 
 test('TELL8: the owner\'s word - a live wind-up\'s shape, iron and feint flags, yaw, landing in ms (clamped), origin through the record\'s projection and point; none for a cut feint, a landed blow or a puppet; the stagger and the overreach; the dedupe key never carries `wl` (mutants: a flag dropped; wl in the key)', () => {
@@ -116,7 +116,8 @@ test('TELL8: the puppet\'s state - its mark from `wl` (landing at now + wl, part
   assert.equal(foeGlint(fai, 10.1), null, 'a feint never glints');
 });
 
-test('TELL8: the field gone - a feint\'s cut dashes its mark and lets its swing go on, a break drops the mark and cancels the held arm once; the stagger and the overreach on the puppet and its entity, so my roll takes x1.25 and x1.3 (mutants: the cancel never sent; the fold infinite - unread)', () => {
+test('TELL8: the field gone - a feint\'s cut dashes its mark and lets its swing go on, a break drops the mark and cancels the held arm once; the stagger and the overreach on the puppet and its entity, so my roll takes x1.25 and x1.3 (mutants: the cancel never sent; the fold infinite - unread)', (tc) => {
+  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default (decision 13)
   const ai = { feet: [0, 0, 0] }, ent = {};
   applyBlowRecord(ai, { wk: 0 | WIRE_FEINT, wy: 0, wl: 500, wo: [0, 0, 0], wn: 1 }, { origin: [0, 0, 0], entity: ent });
   const fb = puppetBlow(ai);

@@ -32,6 +32,7 @@ import { getPref } from '../systems/uiPrefs.js';
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';
 import { MOBILE_TYPES } from '../characters/mobile/mobileTypes.js';
 import { throwsBlows, blowShapesOf, blowFamily, makeBlow, fitBlowToGround, inBlow, setLiveBlow, shatterBlow, windupNear, offsetBlows, BLOW, BLOW_CHANCE, BLOW_COLOR, IRON_COLOR, BLOW_VERDICT_LIFE, BLOW_STALE, setBlowTargetOf } from './foeBlows.js';   // TACT4; TELL3: iron; TELL5: the family, the shapes' lengths
+import { openingDamageOn } from './opening-damage.ts';   // decision 13: the extra damage on an opening is an option
 import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a staggered foe takes more - the leaf the formulas read
 import { coverDistance } from './cover.js';   // TELL6: a charge's lane must be free of cover
 import { GRAVITY } from '../player/motor.js';   // TELL6c: a leap's hop on the motor's own gravity
@@ -266,8 +267,9 @@ export function poiseTrack(ai) {
 }
 /** TELL1: is this entity staggered now (on the brain's clock)? */
 export const staggeredNow = (ent, now = clock()) => Number.isFinite(ent?.staggerUntil) && now < ent.staggerUntil;
-// TELL1: a staggered foe takes a quarter more from every blow - the formulas' tail and a spell's landing read this
-registerBlowTakenMod('tell-stagger', (attacker, target) => (staggeredNow(target) ? TELL.STAGGER_TAKEN : 1));
+// TELL1: a staggered foe takes a quarter more from every blow, with the opening-damage row on (opening-damage.ts) - the
+// formulas' tail and a spell's landing read this
+registerBlowTakenMod('tell-stagger', (attacker, target) => (staggeredNow(target) && openingDamageOn() ? TELL.STAGGER_TAKEN : 1));
 
 // ── TELL4: THE PUNISH WINDOW ──────────────────────────────────────────
 /** Is this foe OVERREACHED now - its telegraphed blow landed on no feet, and it stands spent, open to an answer? */
@@ -277,8 +279,8 @@ export function overreachOpen(ai) {
 }
 /** TELL4: is this entity overreached now (on the brain's clock)? */
 export const overreachedNow = (ent, now = clock()) => Number.isFinite(ent?.overreachUntil) && now < ent.overreachUntil;
-// TELL4: an overreached foe takes 30% more from every blow - the same registry the stagger's quarter rides
-registerBlowTakenMod('tell-overreach', (attacker, target) => (overreachedNow(target) ? TELL.PUNISH_TAKEN : 1));
+// TELL4: an overreached foe takes 30% more from every blow, with the opening-damage row on - the stagger's registry
+registerBlowTakenMod('tell-overreach', (attacker, target) => (overreachedNow(target) && openingDamageOn() ? TELL.PUNISH_TAKEN : 1));
 /** TELL4: its blow missed me (`perfect`: my feet were inside it TELL_LATE before the landing) - OVERREACHED for
  *  `punishSeconds`: locked as a stagger locks (the motor's CanAct), its swing's follow-through standing (the sprite's
  *  `'spent'`), every blow it takes x`PUNISH_TAKEN`, the first that lands staggering it. It keeps its melee token. */

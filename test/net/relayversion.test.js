@@ -50,6 +50,7 @@ const LAW = {
   world303: '4fc754a8d0c8b5e6924f4020314737053d761a020a6033dbc4f0f916d9783c8e', // TOWN-SEATS ROW: the Town seats switch is pinned on in the server profile (officialProfile.ts)
   world309: 'd064bb785c4c4928a2802a44d50eb2e0dee8a89a337c4ba3c45e77bdd6ec4f12', // the official profile pins the Sold goods stay on the shelf row off (officialProfile.ts)
   world310: '8d646b68af0cc70da6101493ace2ced94b1b5b6ec24df80f5dd751ff63b2cd50', // the official profile pins the Absorption limits row off (officialProfile.ts)
+  world311: '50e02868d7d206b3e3410391ac235a19d7306d217cab204a9707b367bbb2e7f5', // the official profile pins the Openings take extra damage row off (officialProfile.ts)
   world302: 'cd7db4ace76a0f92962266b653af9af8feb08eb41e434f24049144d2682847e1', // SEAT CUT: Tides, Incursion Marks, Levy, gifts, Fealty and the Season titles leave; the works cost Marks alone
   world299: '1499885d9b7acea7843e3a972286da212e9c9aaf44f88a38ec96c7d837363c4c', // TERRAIN-CUT: the official profile pins the slope cut off (net/profile/officialProfile.ts `terrainSlopeCut`); the ground is unchanged
   world298: '376f332b8b831c5fc1f174e008dbdb262109a852d47aba46800e3542d33682ca',     // PORTENT-FOLD: the omen lines (rise, wrath, marks) go through the text core

@@ -286,7 +286,8 @@ test('TELL1: a paralysis still breaks a wind-up (DFU\'s CanAct), and no stagger 
 
 // ── what a staggered foe takes ─────────────────────────────────────
 
-test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\' tail end to end, a spell\'s landing (mutants: the tail never asks; the fold unregistered)', () => {
+test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\' tail end to end, a spell\'s landing (mutants: the tail never asks; the fold unregistered)', (tc) => {
+  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default (decision 13)
   assert.ok(blowTakenNames().includes('tell-stagger'));
   const ent = { staggerUntil: 5 };
   T = 4;
@@ -410,3 +411,10 @@ test('TELL1: the foe-vs-foe payload writes no knockback on a foe winding up - it
   assert.equal(windupDoor({ ...f, entity: f.ent }, 5, { striker: attacker, from: [0, 0, 0], weight: ORC_W }), 'stagger', '25 + 5 x 1.0 reaches 30 (hands: 18)');
 });
 
+
+test('DECISION 13: by default a staggered or overreached foe takes the blow it is dealt - no extra damage (ai/opening-damage.ts)', () => {
+  setTacticsClock(() => 10);
+  const open = { staggerUntil: 20, overreachUntil: 20 };
+  assert.equal(blowTakenScale({}, open), 1);
+  assert.equal(blowTaken(40, {}, open), 40);
+});

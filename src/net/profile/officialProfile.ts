@@ -44,6 +44,7 @@ const PREFS = Object.freeze({
   guildProbation: false,
   soldGoodsOnShelf: false,
   absorptionLimits: false,
+  openingDamage: false,
   questlineRewards: true,
 });
 

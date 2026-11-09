@@ -24,6 +24,7 @@
     "guildProbation": false,
     "soldGoodsOnShelf": false,
     "absorptionLimits": false,
+    "openingDamage": false,
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,
