@@ -157,7 +157,7 @@ test('TVD-WORLD the host: a found spawn past the Bay, its pixel never built, sta
     t.host.tvSpawnAt = (x, y) => (x === sx && y === sy ? stood : null);
     const t2 = createTravelViewDungeons(t.host);
     discoverLocation(spawnedMapId(WORLD_SALT, sx, sy), { regionName: 'Skyrim', locationName: stood.name });
-    setPref(SPAWNED_DUNGEONS_PREF, true);   // decision 122 (7): the room's Spawned dungeons row on
+    setPref(SPAWNED_DUNGEONS_PREF, true);   // the room's Spawned dungeons row on
     const filed = t2.tvFiledSpawns(SKYRIM).filter((s) => s.x === sx && s.y === sy);
     assert.equal(filed.length, 1, 'its pixel past the Bay read');
   } finally { restoreDiscovery(null); resetPrefs(); }

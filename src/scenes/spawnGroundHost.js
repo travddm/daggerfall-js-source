@@ -43,7 +43,7 @@ export function createSpawnGroundHost(host) {
   /** GROUND-AGREE: the spawn law the Overworld and the ground share (world/spawnGroundPlace.js) - the gates it reads, handed in. */
   const spawnGroundPlace = createSpawnGroundPlace({
     maps,
-    online: spawnedDungeonsStand(params, getPref),   // decision 122 (7): the room's Spawned dungeons row
+    online: spawnedDungeonsStand(params, getPref),   // online, and only where the room has the Spawned dungeons row on
     etherSea,
     plateauDry: _spawnGround,
     terrainGen,

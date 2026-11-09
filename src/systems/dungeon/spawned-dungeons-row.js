@@ -1,5 +1,5 @@
 // @ts-check
-// SPAWNED-DUNGEONS ROW (decision 122 (7)): the Features row for spawned dungeons, the ruins that stand on map pixels
+// The Features row for spawned dungeons, the ruins that stand on map pixels
 // online and expire (world/spawnedDungeons.js). DFU has none, so the row is off by default and the official profile
 // pins it off. The feature stands only on an online page, as it did before the row, so offline the row changes
 // nothing. Its own file keeps systems/features.js from growing. It imports no pref store: uiPrefs.js reads features.js,

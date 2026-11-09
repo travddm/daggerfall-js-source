@@ -15,7 +15,7 @@ import { planRoute, routeLegs, routeDrawPoints, routeGround, TV_MOUNTAIN_CLIMATE
 import { planJourney } from '../../../src/systems/travel/planSlices.js';   // PLAN-SLICES
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 import { createSpawnGroundPlace } from '../../../src/world/spawnGroundPlace.js';   // GROUND-AGREE: the spawn law the Overworld and the ground share
-import { spawnedDungeonsStand } from '../../../src/systems/dungeon/spawned-dungeons-row.js';   // decision 122 (7): the hosts' gate, handed to the lifted bodies
+import { spawnedDungeonsStand } from '../../../src/systems/dungeon/spawned-dungeons-row.js';   // the hosts' gate, handed to the lifted bodies
 
 // PIN MOVED (AUDIT OW5 G2): the Overworld's own lines are said through tvSay - held at the scale they are said at
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -546,7 +546,7 @@ test('AUDIT OW4 D2/D4 host: a spawn is GONE by the feature\'s own test (the ledg
   const idx = new Map();
   const filedNow = new Function('d', `const { params, filedSpawns, spawnsDungeon, _spawnSalt, hasDiscoveredLocationId, spawnedMapId, locationIndex, tvSpawnAt, spawnedDungeonsStand, getPref } = d; ${f[1]} return tvFiledSpawns;`)({
     params: { has: (k) => k === 'online' && online }, filedSpawns, spawnsDungeon, _spawnSalt: 1, hasDiscoveredLocationId, spawnedMapId, locationIndex: idx,
-    spawnedDungeonsStand, getPref: () => true,   // decision 122 (7): the room's Spawned dungeons row on
+    spawnedDungeonsStand, getPref: () => true,   // the room's Spawned dungeons row on
     tvSpawnAt: (x, y) => ({ name: `S${x},${y}` }),
   });
   assert.deepEqual(filedNow(near).map((s) => [s.x, s.y]), [[rolled[0], 200]], 'the rolled AND filed pixel alone (its neighbour rolled, unfiled; a filed id no spawn rolls on)');
@@ -573,7 +573,7 @@ test('AUDIT OW4 D5/D3 host: every write to the index after the boot\'s fill bump
     params: { has: () => true }, spawnsDungeon: () => true, _spawnSalt: 1, maps: { getClimateIndex: () => 231 }, CLIMATES, _spawnGround: () => true, terrainGen: { roads: () => ({}) },
     pathFreePixel: () => true, _spawnLedger: ledger, _spawnClock: () => clock, _insideSpawn: () => false, locationIndex: index,
     _spawnCloneAt: (x, y) => spawnLoc(x, y), _spawnUnroaded: unroaded, owSayRow: () => {},
-    spawnedDungeonsStand, getPref: () => true,   // decision 122 (7): the room's Spawned dungeons row on
+    spawnedDungeonsStand, getPref: () => true,   // the room's Spawned dungeons row on
     cyrodiilMask: () => null, wildInside: () => false, zoneHalls: { standOf: () => null },   // PVPDUNGEONS: no open zone here - the spawner's own pixel (PIN MOVED, WW-C2: the zone's mask Cyrodiil's, its halls scenes/zoneHallsHost.js)
   });
   assert.equal(env.at(7, 8).name, 'Old Keep (7,8)');

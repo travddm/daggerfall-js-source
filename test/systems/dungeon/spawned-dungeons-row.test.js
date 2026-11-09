@@ -1,4 +1,4 @@
-// Decision 122 (7): spawned dungeons get a Features row, off by default and pinned off in the official profile. On, the
+// Spawned dungeons get a Features row, off by default and pinned off in the official profile. On, the
 // feature stands where it stood before the row (an online page); offline it never stands.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
