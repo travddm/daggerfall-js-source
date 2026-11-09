@@ -87,7 +87,7 @@ locales/
   en/Port_Strings.csv           the English catalog: GENERATED, never edited by hand
   <tag>/Port_Strings.csv        a reviewed language's rows (none ships yet)
   <tag>/Port_Strings.meta.json  per key: hash of the English read, hash of the text written, and who wrote it ("by")
-  <tag>/glossary.json           { "English": "translation" }, names kept consistent across a run
+  <tag>/glossary.json           { "English": "translation" }, the translators' own reference for names
   <tag>/translators.json        names credited in the About pane (optional)
   <tag>/pack/                   a bundled DFU translation pack (none yet): PACK.json, LICENSE, Text/, Fonts/
 ```
@@ -136,7 +136,7 @@ Other tools:
 - A string built by concatenating translated pieces cannot be reordered by a translator. Use one pattern with
   arguments.
 - An English plural by ternary (`n === 1 ? 'item' : 'items'`) is wrong in most languages. Use `{n, plural, ...}`.
-- Keep every argument name in a translation; the pipeline refuses a draft that loses one.
+- Keep every argument name in a translation; `tools/l10nReview.mjs --import` refuses a fix that loses one.
 - Quest and book text come from DFU packs as `-LOC` files, not from `Port_Strings`.
 - Fonts: the classic bitmap fonts lack most scripts. `ui/localeFaces.js` and a pack's own `Fonts/` supply faces for a
   language.

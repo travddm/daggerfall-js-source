@@ -37,22 +37,22 @@ language folder is added with the whole translation reviewed, and the reviewers 
 There are two ways in. Name the language in the title either way.
 
 **A pull request.** Edit the value in `locales/<tag>/Port_Strings.csv` and send it. `Port_Strings.meta.json` records
-what the machine wrote, so your edit is recognised as a person's row and kept.
+who wrote each row, so your edit is recorded as a person's row and kept.
 
 **The review sheet**, if you would rather work in a spreadsheet:
 
-    node tools/l10nReview.mjs --export fr > fr-review.csv            every row (or --machine for the drafts alone)
+    node tools/l10nReview.mjs --export fr > fr-review.csv            every row
     node tools/l10nReview.mjs --import fr fr-review.csv              apply the filled fix cells
 
-The sheet has five columns: `key`, `english`, `translation` (as it stands), `owner` (`machine`, `person` or `missing`)
-and an empty `fix`. Fill in `fix` wherever you would say it better, and leave everything else as it is. The import
-holds every fix to the same rules as the drafts. Each `{argument}` the English names must stay, and plurals use your
-language's own categories. A row whose English changed since you exported is refused as stale, and you'll need to
-export again. Every applied fix is recorded as a person's row (`"by": "human"`). If you can't run the tool, attach the
-filled sheet to a translation issue and a maintainer will import it.
+The sheet has five columns: `key`, `english`, `translation` (as it stands), `owner` (`person`, `missing`, or `machine`
+for a row with no person's record) and an empty `fix`. Fill in `fix` wherever you would say it better, and leave
+everything else as it is. The import holds every fix to the catalog's rules. Each `{argument}` the English names must
+stay, and plurals use your language's own categories. A row whose English changed since you exported is refused as
+stale, and you'll need to export again. Every applied fix is recorded as a person's row (`"by": "human"`). If you
+can't run the tool, attach the filled sheet to a translation issue and a maintainer will import it.
 
 **Credit.** Add your name to `locales/<tag>/translators.json` (a JSON list of names) in your pull request, and the
-About pane will credit the language as "checked and corrected by" you.
+About pane will credit the language as translated by you.
 
 ## Coverage
 
