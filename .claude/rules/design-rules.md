@@ -33,7 +33,11 @@ access to its repository. Check what the build bundles before a release.
 
 ## No CI size limits, split the hosts (decision 92)
 
-CI holds no limit on file or function size, length or complexity; the lint ratchet's unused-code and type limits stay.
-Instead, the big scene hosts are split into narrow modules before the
-repository goes public (`docs/architecture/hosts-and-modules.md`), and every test that reads source text is rewritten
-to run the code.
+The big scene hosts are split into narrow modules before the repository goes public
+(`docs/architecture/hosts-and-modules.md`), and every test that reads source text is rewritten to run the code. After
+that, CI holds no limit on file or function size, length or complexity; the lint ratchet's unused-code and type limits
+stay.
+
+Until `travddm/daggerfall-js-source#115` merges after the host splits (decision 96), the lint ratchet holds every
+large module's and function's size (`docs/testing/lint-ratchet.md`). A change that shrinks one lowers its figure with
+`node tools/lintRatchet.mjs --update`.

@@ -54,7 +54,3 @@ in over the thirty minutes after 06:00 and out over the thirty before
 Every file here but this note is made by
 `node tools/environmentModsExtract.mjs` (the four archives in, `--write` to
 write, without it the tree is checked) and the two Python tools.
-
-## The port
-
-`docs/formats/mods-and-vendor.md` is the record.

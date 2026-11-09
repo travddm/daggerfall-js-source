@@ -61,10 +61,3 @@ To re-derive the dump:
 
     python3 tools/ilDump.py "vendor/world-events-raiding-parties/World Events - Raiding Parties.dll" \
       > vendor/world-events-raiding-parties/il/World_Events_Raiding_Parties.il.txt
-
-## The port
-
-`docs/formats/mods-and-vendor.md` is the page: what is ported as the IL
-has it, the mod's own bugs and what each became here, and the online
-plan (the world's event - the same raids for every player, one runner,
-the relay keeping the count).

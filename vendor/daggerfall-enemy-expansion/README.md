@@ -117,7 +117,7 @@ places:
   twenty records). `derived.json` names each one's record, and the port
   rebuilds it from the player's own file when the archive loads
   (`formats/derivedTexture.js`) - a render of game data is game data
-  (`docs/README.md`).
+  (`test/tooling/doctrine.test.js`).
 - **774 are Daggerfall's sprites under the authors' paint** - the Bounty
   Hunter (1504, TEXTURE.482), the Royal Knight (1505, from 482), the Druid and
   the Necromancer Acolyte (1509, 1511, from 486), the Rogue Druid (1512, from

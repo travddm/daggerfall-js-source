@@ -77,7 +77,3 @@ use and implement everything into the codebase").]**
 
 Every file here but this note is made by
 `node tools/environmentModsExtract.mjs` and the two Python tools.
-
-## The port
-
-`docs/formats/mods-and-vendor.md` is the record.

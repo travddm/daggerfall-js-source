@@ -37,5 +37,3 @@ To re-derive the dump:
     node tools/eotbIl.mjs "<...>/project legacy (6).dfmod" /tmp/pl
     pip install dnfile dncil
     python3 tools/ilDump.py "/tmp/pl/Project Legacy.dll" > vendor/project-legacy/il/Project_Legacy.il.txt
-
-The arc: `docs/formats/mods-and-vendor.md`.

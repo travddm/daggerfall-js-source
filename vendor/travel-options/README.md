@@ -81,8 +81,7 @@ roads-hazelnut/README.md`) records a permission from the same author.]**
   (`SDFFontRendering` picks between the mod's two help texts and its
   two travel-time formats - the port carries both strings and picks
   the SDF one, because the port's text is not the classic bitmap
-  font). Every one is recorded in `docs/formats/mods-and-vendor.md`
-  rather than silently dropped.
+  font). Every one is listed here rather than silently dropped.
 
 ## The port
 

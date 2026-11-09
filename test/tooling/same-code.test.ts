@@ -40,6 +40,12 @@ test('a YAML whole-line comment can change and a value cannot', () => {
   assert.equal(sameCode('a.yml', yml, '# INT1\nrun: echo bye # keep\n'), false);
 });
 
+test('a shell shebang is code and the comment under it is not', () => {
+  const sh = '#!/bin/sh\n# HARD3: greet\necho hi\n';
+  assert.equal(sameCode('a.sh', sh, '#!/bin/sh\n# Greets.\necho hi\n'), true);
+  assert.equal(sameCode('a.sh', sh, '#!/bin/bash\n# HARD3: greet\necho hi\n'), false);
+});
+
 test('JSON with comments keeps its values', () => {
   const json = '{\n  // HARD3 (bible/x.md)\n  "strict": true\n}\n';
   assert.equal(sameCode('tsconfig.json', json, '{\n  "strict": true\n}\n'), true);

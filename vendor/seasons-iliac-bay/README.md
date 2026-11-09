@@ -28,7 +28,7 @@ nature flats - the same rocks, trees and plants as `TEXTURE.504` to
 `TEXTURE.510`, with autumn colour, spring flowers and snow painted
 over them (put the mod's `K1` beside the classic record 1 of
 `TEXTURE.505` and the silhouette is the same). The port's doctrine
-(`docs/README.md`) is that A RENDER OF GAME DATA IS
+(`test/tooling/doctrine.test.js`) is that A RENDER OF GAME DATA IS
 GAME DATA, and it names this case exactly: "a re-shaded sprite that
 keeps the original silhouette" answers yes to "did these pixels come
 from ARENA2?". The author's permission covers the author's work; the

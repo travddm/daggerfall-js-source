@@ -1,5 +1,4 @@
-// PROF2 - MINING AND QUARRYING'S LAWS, pinned against the record (docs/systems/professions.md,
-// PROF0 4.1, 4.5, 4.6, 4.7, 5.2, 6, 11 and 23; SEAT0 4.3's kingdoms) and against DFU's own tables:
+// PROF2 - MINING AND QUARRYING'S LAWS, pinned against docs/systems/professions.md and against DFU's own tables:
 // src/net/kingdomLaw.js, src/net/professionLaw.js, src/net/nodeLaw.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

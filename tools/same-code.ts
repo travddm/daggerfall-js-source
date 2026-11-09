@@ -6,6 +6,9 @@
 //
 // Exit code 1 when a file's code differs or a file cannot be read or parsed. A file type it cannot check (HTML, CSS)
 // is listed as unchecked and does not fail the run: review that diff by hand.
+//
+// In YAML, TOML and shell files, every line that starts with `#` is read as a comment, except a `#!` first line. A `#`
+// line inside a YAML block scalar or a heredoc is text, not a comment, and is not checked: review those lines by hand.
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
@@ -63,12 +66,18 @@ function scriptCode(text: string, typescript: boolean): string[] {
   return [...tokenTexts, '\u0000', withoutComments.replace(/\s+/g, ' ').trim()];
 }
 
+function isHashComment(line: string, index: number): boolean {
+  // A shebang names the interpreter that runs the file, so it is code.
+  if (index === 0 && line.startsWith('#!')) return false;
+  return line.trimStart().startsWith('#');
+}
+
 function hashCommentCode(text: string): string[] {
   // Only whole-line comments are left out. A trailing `# ...` may sit inside a string, so it counts as code.
   return text
     .split(/\r?\n/)
     .map((line) => line.trimEnd())
-    .filter((line) => line.trim() !== '' && !line.trimStart().startsWith('#'));
+    .filter((line, index) => line.trim() !== '' && !isHashComment(line, index));
 }
 
 /** The parts of `text` that are code, in order, so two versions of a file have the same code when these are equal. */

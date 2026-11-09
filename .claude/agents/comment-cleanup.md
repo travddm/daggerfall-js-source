@@ -52,6 +52,9 @@ and `docs/README.md` ("Code comments"). Read both first.
    Every file must print `same`. For a file it lists as `unchecked` (HTML, CSS), read `git diff` and confirm that only
    comment lines changed. Undo any edit that changed code.
 
-2. Run `npm run lint` and `npm run types`, and the tests that import or read the files.
+2. Run `npm run lint` and `npm run types`, and the tests that import or read the files. The lint ratchet counts
+   comment lines, so a cleanup that removes lines can lower a recorded figure. When `npm run lint` reports a fallen
+   figure, run `node tools/lintRatchet.mjs --update` and commit `tools/lintRatchet.json`: CI runs the ratchet with
+   `--strict`, which fails on a fallen figure.
 3. Report, per file: done, or skipped and why. List any reason you could not confirm against the code and left as it
    was, and any comment you kept because a reader quotes it.

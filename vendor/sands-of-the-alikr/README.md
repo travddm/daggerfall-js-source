@@ -37,7 +37,3 @@ water, the dirt and the paving at their edges are the original's). Records
 
 Every file here but this note is made by
 `node tools/environmentModsExtract.mjs`.
-
-## The port
-
-`docs/formats/mods-and-vendor.md` is the record.
