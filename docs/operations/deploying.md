@@ -175,7 +175,7 @@ Repository secrets (Settings > Secrets and variables > Actions):
 
 | Secret | Used by | Effect when absent |
 | --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Every deploy and operator workflow | Nothing deploys. Needs Workers, D1 (edit), R2 and Durable Objects permissions. |
+| `CLOUDFLARE_API_TOKEN` | `relay-deploy.yml`, `account-deploy.yml` | Nothing deploys. Needs Workers, D1 (edit), R2 and Durable Objects permissions. |
 | `ANTHROPIC_API_KEY` | `account-deploy.yml` -> Worker secret | The chat-safety reviewer (`server-account/src/modAi.js`) is off. |
 | `DISCORD_BOT_TOKEN` | `account-deploy.yml` -> Worker secret and command registration | The Discord bot is off. |
 | `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | Patreon linking or pledge tracking is off. |

@@ -162,8 +162,7 @@ Hardcore characters out of all PvP and would need a second health model on the r
 - The row stays, with `dead_at` and `dead_why = 'fell'`, and appears in a Hall of the Fallen (name, class, level,
   place, time, killer when known). The slot is freed.
 - The existing party Resurrect window applies (150 s).
-- Staff may take a death back for a verified bug only. The operator revival workflow was removed (decision 116); the
-  stamp law stays in `revived.js`. Section 4.4.
+- Staff may take a death back for a verified bug only (`revived.js` `takeBack` stamps it). Section 4.4.
 
 ### 2.4 Ironman details
 
