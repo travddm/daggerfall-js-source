@@ -166,7 +166,7 @@ export async function claimStar({ db, nowS, subtle, rand }, player, { receipt, c
     ...(mint ? [mint] : []),
     // INT5's FILL - a signed win's spoils, the playing character's bucket - by THIS claim's row alone, IN the batch (B3: run
     // after it, as index.js ran it, an answer lost between the two lost the fill for good)
-    spoilsGrantStatement(db, player.id, 0, `EXISTS (SELECT 1 FROM stars_held WHERE star = ?5 AND account = ?1 AND nonce = ?6)`, key, nonce),
+    spoilsGrantStatement(db, player.id, `EXISTS (SELECT 1 FROM stars_held WHERE star = ?4 AND account = ?1 AND nonce = ?5)`, key, nonce),
   ]);
   const [row, decided, , , , after, count] = res;
   const spoils = thanks ? spoilsAnswer(res[8], cid) : false;

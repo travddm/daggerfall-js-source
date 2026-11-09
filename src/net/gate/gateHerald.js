@@ -59,7 +59,7 @@ export function omenPost({ day, place = null, role = null }) {
   const t = gateTimes(day), boss = gateBossOf(day), { aspect, trials } = readGateMods(gateModsOf(day));
   // WB13b: the marks in the chat's own sentence (net/gate/gateLaw.js marksLine)
   const marks = `${boss.name} comes **${aspect.epithet}** tonight${trials.length ? `, ${heraldList(trials.map((x) => x.name))}` : ''}.`;
-  const pt = portentsLine(gatePortentsOf(day));   // WB14b: and the night's portents after them, the chat's own line (bible Breach-Portents.md section 6)
+  const pt = portentsLine(gatePortentsOf(day));   // WB14b: and the night's portents after them, the chat's own line
   return heraldCard({
     family: 'gate', moment: 'Omen', role,
     title: `The sky burns ${place ? `near ${place}` : 'over the wilds'}`,
