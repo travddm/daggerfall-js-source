@@ -1,6 +1,6 @@
 // The Classic rendering preset: one switch that sets the picture options closest to the original game, and puts back
-// what the player had when it is switched off, so today's look stays one press away (decision #104). It writes
-// Daggerfall Unity's own [Video] retro keys as well as Features rows (decision #111), so a DFU settings file keeps its
+// what the player had when it is switched off, so today's look stays one press away (decision 104). It writes
+// Daggerfall Unity's own [Video] retro keys as well as Features rows (decision 111), so a DFU settings file keeps its
 // meaning. It does not change the skin, the field of view or the HUD.
 //
 // The stores are reached through doors the caller hands in, so this module holds the rule and imports no store.
