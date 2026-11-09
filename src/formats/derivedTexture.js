@@ -1,14 +1,14 @@
 // WD2: A MOD'S SPRITE THAT IS A CLASSIC RECORD, OR ONE WITH
 // THE AUTHOR'S EDITS ON IT - REBUILT FROM THE PLAYER'S OWN ART.
 //
-// Detailed Ships (Cliffworms) ships thirteen pictures under two archives
-// of its own, 1210 and 1230. Measured against every record of every
-// TEXTURE file (tools/detailedShipsAssets.mjs), five of them are classic
-// records exported whole - a map, a loaf, a scroll - moved to the new
-// archive so an xml can size them; four more are classic records with
-// the author's paint on them (fruit in an empty basket, a potion's
-// colour, a cork). A render of game data IS game data (Port-Doctrine),
-// so none of those nine are carried: the spec below names the classic
+// A mod can ship pictures under archives of its own that are classic
+// records exported whole (a map, a loaf, a scroll), moved to the new
+// archive so an xml can size them, or classic records with the author's
+// paint on them (fruit in an empty basket, a potion's colour, a cork).
+// Measured against every record of every TEXTURE file
+// (tools/lib/classic-source.ts), such a picture is found. A render of game
+// data IS game data (Port-Doctrine), so none of those pictures are
+// carried: the spec below names the classic
 // record, where it stands on the picture, and the pixels the author
 // changed, and the picture is rebuilt from the player's own ARENA2 when
 // the archive loads (systems/textureReplacement.js `build`). The author's

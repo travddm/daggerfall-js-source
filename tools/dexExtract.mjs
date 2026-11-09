@@ -13,7 +13,7 @@
 //   repository at the commit the README names; test/systems/dex0_record.test.js proves the two agree).
 // - The pictures. Every texture of every archive the mod's own tables draw (MaleTexture, FemaleTexture, a corpse
 //   archive, ClassicClassBase's and ClassicMonsterReplacement's swaps, the troll corpse prefab's two records) is
-//   measured against every record of every TEXTURE file (DS1's search, tools/detailedShipsAssets.mjs) and goes to
+//   measured against every record of every TEXTURE file (DS1's search, tools/lib/classic-source.ts) and goes to
 //   exactly one of three places:
 //     DERIVED - a picture a classic record covers (DERIVED_SHARE of its visible pixels or more): rebuilt from the
 //       player's own record when the archive loads, never shipped (formats/derivedTexture.js), as a spec in
@@ -52,7 +52,7 @@ import { composeDerivedPicture, deriveSpec } from '../src/formats/derivedTexture
 import { readCsvTable, parseCsInt } from '../src/systems/enemyExpansion/dexCsv.js';
 import { readPng } from './pngIO.mjs';
 import { encodeSprite, sameOnScreen } from './diverseWeaponsExtract.mjs';
-import { classicRecords, findClassicSource } from './detailedShipsAssets.mjs';
+import { classicRecords, findClassicSource } from './lib/classic-source.ts';
 import { isMain } from './lib/isMain.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

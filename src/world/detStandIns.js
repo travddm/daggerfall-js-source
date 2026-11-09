@@ -1,16 +1,18 @@
-// DS1: THE PIECES DETAILED SHIPS BORROWS, STOOD IN BY THE PORT.
+// DS1: DET'S PIECES, STOOD IN BY THE PORT.
 //
-// Detailed Ships 1.0.0 declares Ninelan's *Daggerfall Expanded Textures*
-// (DET) 1.2.0 a required peer dependency: its two ship records place ten
-// DET models and twenty-seven DET flat records, none of which Daggerfall
-// or Detailed Ships itself carries. DET is not part of this port, and Mac
+// Mods that place Ninelan's *Daggerfall Expanded Textures* (DET) 1.2.0
+// pieces need them as a peer dependency. The first of them, a ship mod
+// by another author, placed ten DET models and twenty-seven DET flat
+// records in its two ship records, none of which Daggerfall or that mod
+// itself carries. The ship mod is no longer in this repository (it waits
+// for the mod API); the stand-ins are the port's own and stay, for the
+// town mods. DET is not part of this port, and Mac
 // chose to "build your own": so every one of
 // those pieces is the PORT'S OWN stand-in, made for the place the author
 // put it - never a copy of DET, which the port has never seen.
 //
 // What each piece is was read off its placements, in the port's own
-// renders of the two ships (bible `03-World/Detailed-Ships.md` keeps the
-// table): two rope-thin segments carry a flag above the small ship's
+// renders of the two ships: two rope-thin segments carry a flag above the small ship's
 // crow's nest, and the same piece scaled 13.8 along its length runs from
 // that masthead to the rail - so it is line, and laid on its side across
 // the stern it is the stern's rails of line; three thicker segments stand
@@ -500,10 +502,10 @@ export const DOLPHIN_SCALE = Object.freeze({ width: 384, height: 384 });
 
 let _installed = false;
 const _gates = new Set();
-/** WD3: on while ANY mod that places DET's pieces is loaded - Detailed Ships, Beautiful Villages, Beautiful Cities. */
+/** WD3: on while ANY mod that places DET's pieces is loaded - Beautiful Villages, Beautiful Cities. */
 export const detStandInsOn = () => { for (const g of _gates) if (g() === true) return true; return false; };
 /** The models on the model door and the flats and pictures on the texture door, once, all behind `detStandInsOn`;
- *  every call adds the switch it is handed to the ones that turn them on (Detailed Ships' own, the town mods'). */
+ *  every call adds the switch it is handed to the ones that turn them on (the town mods'). */
 export function installDetStandIns(isOn) {
   if (typeof isOn === 'function') _gates.add(isOn);
   if (_installed) return 0;

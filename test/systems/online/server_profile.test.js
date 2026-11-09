@@ -23,7 +23,8 @@ import { getBool, _resetForTests as resetSettings } from '../../../src/systems/s
 import { MOD_SETTINGS, onlineModSetting } from '../../../src/systems/modSettings.js';
 import { FEATURE_PREF_ONLINE } from '../../../src/systems/features.js';
 
-/** The base commit's lane tables (857275eee9), dumped by running its own onlineLane.js with its registry's answers. */
+/** The base commit's lane tables (857275eee9), dumped by running its own onlineLane.js with its registry's answers,
+ *  less the vendored mods removed since (docs/testing/vendored-mods-ratchet.md). */
 const BASE = JSON.parse(readFileSync(new URL('./online-lane-base.json', import.meta.url), 'utf8'));
 const OFFICIAL_PH = await profileHashOf(OFFICIAL_PROFILE);
 const withRules = (rules) => ({ ...OFFICIAL_PROFILE, rules });

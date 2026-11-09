@@ -34,7 +34,7 @@
     ],
     "counts": {
       "paths": 0,
-      "lines": 3177
+      "lines": 3129
     }
   },
   "mods": [
@@ -91,8 +91,8 @@
         "daggerfallunity/mods/276\\b"
       ],
       "counts": {
-        "paths": 6,
-        "lines": 27
+        "paths": 0,
+        "lines": 0
       }
     },
     {
@@ -120,7 +120,7 @@
       ],
       "counts": {
         "paths": 3,
-        "lines": 275
+        "lines": 273
       }
     },
     {
@@ -148,7 +148,7 @@
       ],
       "counts": {
         "paths": 3,
-        "lines": 302
+        "lines": 301
       }
     },
     {
@@ -488,21 +488,19 @@
       "paths": [
         "vendor/detailed-ships/",
         "src/systems/detailedShips.js",
-        "src/world/detStandIns.js",
         "tools/detailedShipsAssets.mjs"
       ],
       "terms": [
         "detailed-ships",
         "detailedShips",
-        "Detailed Ships",
-        "detStandIns"
+        "Detailed Ships"
       ],
       "patterns": [
         "daggerfallunity/mods/1080\\b"
       ],
       "counts": {
-        "paths": 19,
-        "lines": 176
+        "paths": 0,
+        "lines": 0
       }
     },
     {
@@ -1723,7 +1721,7 @@
       ],
       "counts": {
         "paths": 15,
-        "lines": 114
+        "lines": 113
       }
     },
     {
