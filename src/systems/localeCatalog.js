@@ -1,28 +1,41 @@
 // L10N1b. THE LANGUAGES THE PORT
 // OFFERS: each one's BCP 47 tag, its name in its own language and in English, the script it is written in, and where
-// its words come from. A language is offered when the build holds its text (`locales/<tag>/`, a person's reviewed
-// translation, scenes/localeData.js) or the player installs a Daggerfall Unity pack for it. English is the port's own and lives in the code. The right-to-left and complex
+// its words come from. A language is offered when the build holds a person's translation of it (`locales/<tag>/`,
+// scenes/localeData.js) or the player installs a Daggerfall Unity pack for it. English is the port's own and lives in
+// the code. The right-to-left and complex
 // scripts (Arabic, Hebrew, Persian, Thai, the Indic scripts) wait for L10N7's shaping; Chinese is tagged by script,
 // not by region, because the script is what a reader reads. The laws here are pure - the build's files are
 // scenes/localeData.js's.
 
 /** English first, then by English name. `hidden` keeps a locale out of the picker (the pseudo-locale is ?lang= only).
- *  The languages that were only ever part machine-drafted left with the machine translation tools (decision 116 (12)). */
+ *  Every language stays listed so that a pack the player installs for it is offered (decision 123). */
 export const LOCALE_CATALOG = Object.freeze([
   { code: 'en', name: 'English', englishName: 'English', script: 'latin', source: 'base' },
   { code: 'bg', name: 'Български', englishName: 'Bulgarian', script: 'cyrillic' },
+  { code: 'zh-Hans', name: '简体中文', englishName: 'Chinese (Simplified)', script: 'han' },
+  { code: 'zh-Hant', name: '繁體中文', englishName: 'Chinese (Traditional)', script: 'han' },
   { code: 'cs', name: 'Čeština', englishName: 'Czech', script: 'latin' },
   { code: 'da', name: 'Dansk', englishName: 'Danish', script: 'latin' },
+  { code: 'nl', name: 'Nederlands', englishName: 'Dutch', script: 'latin' },
+  { code: 'fi', name: 'Suomi', englishName: 'Finnish', script: 'latin' },
   { code: 'fr', name: 'Français', englishName: 'French', script: 'latin' },
   { code: 'de', name: 'Deutsch', englishName: 'German', script: 'latin' },
+  { code: 'el', name: 'Ελληνικά', englishName: 'Greek', script: 'greek' },
+  { code: 'hu', name: 'Magyar', englishName: 'Hungarian', script: 'latin' },
   { code: 'id', name: 'Bahasa Indonesia', englishName: 'Indonesian', script: 'latin' },
   { code: 'it', name: 'Italiano', englishName: 'Italian', script: 'latin' },
+  { code: 'ja', name: '日本語', englishName: 'Japanese', script: 'han' },
   { code: 'ko', name: '한국어', englishName: 'Korean', script: 'hangul' },
   { code: 'nb', name: 'Norsk bokmål', englishName: 'Norwegian', script: 'latin' },
+  { code: 'pl', name: 'Polski', englishName: 'Polish', script: 'latin' },
   { code: 'pt-BR', name: 'Português (Brasil)', englishName: 'Portuguese (Brazil)', script: 'latin' },
   { code: 'ro', name: 'Română', englishName: 'Romanian', script: 'latin' },
   { code: 'ru', name: 'Русский', englishName: 'Russian', script: 'cyrillic' },
   { code: 'es', name: 'Español', englishName: 'Spanish', script: 'latin' },
+  { code: 'sv', name: 'Svenska', englishName: 'Swedish', script: 'latin' },
+  { code: 'tr', name: 'Türkçe', englishName: 'Turkish', script: 'latin' },
+  { code: 'uk', name: 'Українська', englishName: 'Ukrainian', script: 'cyrillic' },
+  { code: 'vi', name: 'Tiếng Việt', englishName: 'Vietnamese', script: 'latin' },
   { code: 'qps-ploc', name: 'Pseudo', englishName: 'Pseudo-locale (testing)', script: 'latin', source: 'pseudo', hidden: true },
 ].map((l) => Object.freeze({ dir: 'ltr', source: 'community', ...l })));
 

@@ -144,3 +144,14 @@ test('L10N3b the pack\'s font, where a browser can load it: registered for its l
   }
 });
 
+
+test('decision 123: a language with no translation in the build (Japanese) is offered once the player installs a pack for it, and speaks the pack', async () => {
+  data._useLocaleFilesForTests({});
+  assert.equal(data.hasLocaleText('ja'), false, 'no pack, no Japanese');
+  await data.installTranslationPack('ja', entries({ 'JA/Text/Internal_Strings.csv': 'Key,Value\nsaveGame,セーブ\n' }));
+  assert.equal(data.hasLocaleText('ja'), true, 'the pack offers it');
+  await data.switchLocale('ja');
+  assert.equal(tm.getLocalizedText('saveGame'), 'セーブ');
+  assert.equal(await data.removeTranslationPack('ja'), true);
+  assert.equal(data.hasLocaleText('ja'), false, 'removed, it is not offered');
+});

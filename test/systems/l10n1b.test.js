@@ -41,7 +41,7 @@ test('L10N1b catalog: every language once, by a well-formed tag, its own name an
   const pseudo = LOCALE_CATALOG.at(-1);
   assert.equal(pseudo.code, tm.PSEUDO_LOCALE);
   assert.equal(pseudo.hidden, true);
-  assert.ok(LOCALE_CATALOG.length >= 15, 'as many as the port can offer');
+  assert.ok(LOCALE_CATALOG.length >= 26, 'as many as the port can offer');
   assert.equal(catalogLocale('fr').name, 'Français');
   assert.equal(catalogLocale('xx'), null);
 });
@@ -53,7 +53,11 @@ test('L10N1b the pure laws: a saved choice resolves to itself only when the cata
   assert.equal(resolveLocale(null), 'en');
   assert.equal(localeForBrowser(['fr-CA', 'en']), 'fr');
   assert.equal(localeForBrowser(['en-US', 'fr']), null);
-  assert.equal(localeForBrowser(['ja-JP']), null, 'a language the catalog does not hold');
+  assert.equal(localeForBrowser(['zh-TW']), 'zh-Hant');
+  assert.equal(localeForBrowser(['zh-HK']), 'zh-Hant');
+  assert.equal(localeForBrowser(['zh-Hant-SG']), 'zh-Hant');
+  assert.equal(localeForBrowser(['zh-CN']), 'zh-Hans');
+  assert.equal(localeForBrowser(['zh']), 'zh-Hans');
   assert.equal(localeForBrowser(['nn-NO']), 'nb');
   assert.equal(localeForBrowser(['no']), 'nb');
   assert.equal(localeForBrowser(['pt-PT']), 'pt-BR');
