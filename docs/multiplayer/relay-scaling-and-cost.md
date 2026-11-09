@@ -70,8 +70,8 @@ hub about parties (`partyHoldsOwner`), gate and Super Dungeon rooms reporting ki
 ## Cost: what keeps an object awake
 
 On the bills seen so far, Durable Object **duration** (wall time an object is active in memory) has been the largest
-line, ahead of D1 rows read and DO storage rows written. A hibernating object with idle sockets costs almost nothing. These things keep an object
-awake:
+line, ahead of D1 rows read and DO storage rows written. A hibernating object with idle sockets costs almost
+nothing. These things keep an object awake:
 
 | Source | Where | Effect |
 | --- | --- | --- |
