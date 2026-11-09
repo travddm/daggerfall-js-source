@@ -2,7 +2,7 @@ name: Realm revive (a realm character's death taken back)
 
 # REVIVE (2026-10-14, Mac, of TheHalfinStream's Enduring elder, dead of her years in Castle Wayrest on 2026-10-13 while
 # the remains bug hid what she lay with: "I want to roll back this specific account", then "Undo the death", then "Full
-# revive"). tools/reviveRealmCharacter.mjs says what a death wrote and what the
+# revive"; bible/06-Systems/Legacy-Arc.md REVIVE). tools/reviveRealmCharacter.mjs says what a death wrote and what the
 # plan puts back; src/systems/legacy/revived.js is the law that makes it hold (a death taken back is stamped, and every
 # copy of the line that meets the stamp drops it - so a device that never heard of it cannot kill her again).
 #

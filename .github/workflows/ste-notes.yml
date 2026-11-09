@@ -7,7 +7,7 @@
 # read (scripts/steNotes.mjs - sentence and paragraph lengths, semicolons,
 # -ing forms, contractions, complex verbs). A description with no patch
 # notes passes. The rest of STE - the dictionary's words in their approved
-# meanings - is the reviewer's (docs/operations/desktop-release.md).
+# meanings - is the reviewer's (bible/01-Overview/Desktop-App.md, STE-NOTES).
 #
 # The file is ste-notes.yml, not patch-notes.yml: REL6's sweep refuses any
 # file named for patch notes (PATCH_NOTES_PATH_RE).

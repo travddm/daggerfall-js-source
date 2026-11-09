@@ -15,7 +15,7 @@ import { LOCATION_TYPES, DUNGEON_TYPES } from '../../src/formats/mapsFile.js';
 import { WEATHER_TYPES, weatherFlags } from '../../src/world/weather.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// AMBIENT TEXT 1.8 - Regnier (AT1/AT2)
+// ═══ AMBIENT TEXT 1.8 - Regnier (AT1/AT2) ═════════════════════════
 //
 // The mod is forty lines of arithmetic around 918 lines of the
 // author's prose, so the pins here are aimed at the arithmetic AND at

@@ -70,8 +70,8 @@ RAID_TOWNS_SHA256 = ""
 # Region numbers separated by commas ("0,23"), or "all" - each named
 # region's channel is split in four shards as SCALE5c part two split it
 # (src/net/hubShards.js regionsSharded). EMPTY IS THE DEFAULT: every
-# region's channel is whole, so a quiet region sleeps (docs/multiplayer/relay-scaling-and-cost.md).
-# Name a region here only if its
+# region's channel is whole, so a quiet region sleeps (bible/
+# 11-Multiplayer/Scale-Arc.md COST-1). Name a region here only if its
 # reconnect wave through its one hello gate shows (the relay's metrics,
 # `chat` busy refusals) - a split region keeps up to five objects awake.
 REGION_SHARDS = ""
@@ -141,7 +141,8 @@ SD_DISCORD_THREAD = ""
 # ═══ SAFE5: THE REVIEWER'S FEED ═════════════════════════════════════
 #
 # Where the public channels' lines are posted for the account service's
-# reviewer to read (src/net/safety/chatFeed.js; docs/multiplayer/chat-safety.md) - World, Region, a language, Trade and
+# reviewer to read (src/net/safety/chatFeed.js; bible/11-Multiplayer/
+# Chat-Safety-Arc.md section 6) - World, Region, a language, Trade and
 # LFG, never a party's, a guild's or a place's talk. Each batch is
 # signed with GATE_SIGNING_KEY, the key the receipts are signed with, so
 # nobody but the relay can feed it. Never awaited by a line, never
@@ -152,7 +153,8 @@ MOD_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/feed"
 # ═══ GRANT2: THE SPAWN GRANTS' MEASURE ═══════════════════════════════
 #
 # Where each cell posts its window of spawn grant asks for the account
-# service to keep (src/net/grantMeasure.js) - per account and kind, the asks, the
+# service to keep (src/net/grantMeasure.js; bible/11-Multiplayer/
+# Spawn-Grants.md section 12) - per account and kind, the asks, the
 # members, and what the buckets and the cell's ceiling would have
 # refused; read with `node tools/realmReview.mjs grants`. Signed with
 # GATE_SIGNING_KEY, the chat feed's door: never awaited by an ask, never
@@ -174,7 +176,7 @@ MOD_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/feed"
 # woken (or one whose hub did not answer) never reads it off. Leases are
 # signed with a key derived from GATE_SIGNING_KEY; no new secret.
 GRANT_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/grant-feed"
-# COST-2 part two (docs/multiplayer/relay-scaling-and-cost.md): THE CELL TREE MOVES.
+# COST-2 part two (bible/11-Multiplayer/Scale-Arc.md): THE CELL TREE MOVES.
 # The setting `cellSeed` (CELL_SEED, off unset) is the level the cell
 # directory seeds its tree at - 2 is 64-pixel cells. It stays off until the
 # site serves the build that says `cv` (a coarse node refuses a cell's
