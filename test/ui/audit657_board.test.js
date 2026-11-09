@@ -152,7 +152,7 @@ test('AUDIT 657 B9 + D6 the words true to the law: a gold listing pays a 1% fee 
   const n = (x) => x.toLocaleString('en-US');
   const [, earn, claim] = seatGuide({ tier: 'palace' });
   assert.match(earn[1], new RegExp(`^Members ${SEAT_MEMBER_WAIT_S / 86400} days in the guild earn influence`));
-  assert.match(earn[1], /a home in the town, Renown and seat writs\. The Guildmaster adds Tribute from the treasury\./);
+  assert.match(earn[1], /a home in the town and Renown. The Guildmaster adds Tribute from the treasury\./);
   assert.match(claim[1], new RegExp(`goes to the strongest guild with at least ${n(CLAIM_THRESHOLD.palace)} influence whose treasury can pay ${n(CLAIM_FEE.palace)} silver\\.`));
 });
 
