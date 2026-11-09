@@ -179,10 +179,12 @@ paths (one per pair of weapon skills). A path adds passives, riders and a signat
   never the watch, an ally or a quest foe. Online always; offline only while the loot ladder is on.
 - **Elites** (`eliteFoes.js`): x2 health, x1.3 damage, 1.25x size, a glow, better loot, one boss trait. An Elite
   Dungeon holds three or four. There an elite takes the larger of the elite tier and the dungeon's own layer, stat by
-  stat: x2 and x2 in an Elite Dungeon, x4 and x2.5 in a super dungeon (`elite-stacking.ts`). The "Elites stack with
-  dungeon difficulty" row (pinned off online) multiplies them instead: x7 health and x2.6 damage, x9 and x3.
+  stat: x2 and x2 in an Elite Dungeon, x4 and x2.5 in a super dungeon (`elite-stacking.ts`). The "Elites and champions
+  stack with dungeon difficulty" row (pinned off online) multiplies them instead: x7 health and x2.6 damage, x9 and x3,
+  and a champion's step on the layer.
 - **Champions** (`champions.js`): x1.4 health, x1.15 damage, and one trait from `CHAMPION_TRAITS` (Mighty, Stalwart,
-  Swift, Vampiric, Thorned).
+  Swift, Vampiric, Thorned). In a dungeon with a layer of its own (an Elite or super dungeon, an ocean band) a champion
+  takes the larger of its step and the layer, stat by stat (`elite-stacking.ts` `stepOnLayer`).
 - **Boss traits** (`bossTraits.js`): `warded` (a ward of 30% health that regrows), five element proofs (a spell of
   that element lands 25%), `bladeturning` (blades and arrows land 50%), `stoneskin` (blunt and fists land 50%),
   `curbing` (no blow over 5% of health), `wrathful` (x1.6 damage 75 s into a fight), `thorned` (20% of weapon damage

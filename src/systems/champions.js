@@ -28,6 +28,7 @@
 // OFF IS DFU EXACTLY: with the loot-rarity row off, no champion stands.
 // ═══════════════════════════════════════════════════════════════════
 
+import { stepOnLayer } from './elite-stacking.ts';   // decision 125: a champion's step on its dungeon's layer
 import { lootRarityOn } from './loot/lootRarity.js';
 import { PROMOTION, promotionHash, promotionTierOf, promotionTrait, scalePromoted } from './foe-promotion.ts';   // the tier's numbers and the one roll/scale path
 import { foeTitle } from './foeTitle.js';   // FOE-TITLE: the names' one home
@@ -103,11 +104,12 @@ export function championTraitFor(entity, traitIndex) {
  * Mighty's half again more) multiplied onto whatever `damageScale` it has (an elite's double stands under it), the
  * Swift's Speed. Nothing where championTraitFor answers none. Answers whether it stood as one.
  */
-export function applyChampion(entity, traitIndex) {
+export function applyChampion(entity, traitIndex, layer = null) {
   const t = championTraitFor(entity, traitIndex);
   if (!t) return false;
   entity.champion = t.id;
-  scalePromoted(entity, { health: CHAMPION_HEALTH * (t.health ?? 1), damage: CHAMPION_DAMAGE * (t.damage ?? 1) });
+  // decision 125: on a dungeon's layer (`layer`, the host's word) the step gives only what passes it, unless they stack
+  scalePromoted(entity, stepOnLayer({ health: CHAMPION_HEALTH * (t.health ?? 1), damage: CHAMPION_DAMAGE * (t.damage ?? 1) }, layer));
   if (t.speed && entity.stats) entity.stats.speed = Math.min(100, (entity.stats.speed ?? 50) + t.speed);
   return true;
 }

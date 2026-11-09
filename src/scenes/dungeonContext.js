@@ -1416,14 +1416,14 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
   }
   function applyEliteScaling(entity, e) {
     if (e?.eliteFoe && entity && promoteEliteFoe(entity, { eliteDungeon: !!e.elite, superDungeon: !!e.superTier, checkLevel: false })) { if (e.elite) entity.elite = true; eliteTraits(entity, e.eliteSeed); return; }   // BOSS-TRAITS: its trait off the pick's own seed - every client the same   // ELITE-FLOOR: the pick's own (by the kind's level, every client alike)   // ELITE FOES: 5x health, 3x damage - 7x / 4x in an Elite Dungeon, in place of its doubling
-    if (e?.superTier && entity) { scaleSuperFoe(entity); return void applyChampion(entity, e.champion); }   // SD4a: a Super dungeon's - x4 health, x2.5 damage, an Elite dungeon's marks at the least
-    if (!e?.elite || !entity) { if (entity && _oceanBand) applyOceanBand(entity, false); return void applyChampion(entity, e?.champion); }   // LOOT7: a plain dungeon's champion (its loot reads the mark, so before it); a ruin isle's foe takes its band's step
+    if (e?.superTier && entity) { scaleSuperFoe(entity); return void applyChampion(entity, e.champion, 'super'); }   // SD4a: a Super dungeon's - x4 health, x2.5 damage, an Elite dungeon's marks at the least
+    if (!e?.elite || !entity) { if (entity && _oceanBand) applyOceanBand(entity, false); return void applyChampion(entity, e?.champion, _oceanBand); }   // LOOT7: a plain dungeon's champion (its loot reads the mark, so before it); a ruin isle's foe takes its band's step
     entity.maxHealth = Math.max(1, Math.round(entity.maxHealth * ELITE_HEALTH_SCALE));
     entity.health = entity.maxHealth;
     entity.healthMult = (entity.healthMult ?? 1) * ELITE_HEALTH_SCALE;   // TELL1: what was stood on the kind's own health (its poise)
     entity.damageScale = ELITE_DAMAGE_SCALE;
     if (_oceanBand) applyOceanBand(entity, true);   // a vault of the deep: its band's factors in place of the elite step
-    entity.elite = true; applyChampion(entity, e.champion);   // LOOT7: an elite dungeon's champion - its scale on the elite's
+    entity.elite = true; applyChampion(entity, e.champion, _oceanBand ?? 'elite');   // LOOT7: an elite dungeon's champion - its scale against the dungeon's layer (decision 125)
   }
   /** An ocean dungeon's foe takes its band's health and blows (systems/sea/oceanBandDifficulty.js). `fromElite`: the elite
    *  dungeon's step was just laid on it, so it is taken back first and the band's laid in its place. */

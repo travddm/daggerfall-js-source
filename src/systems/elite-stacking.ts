@@ -1,8 +1,9 @@
-// How an elite foe's multipliers meet its dungeon's own (decision 124, from decision 117 item 19). Decision 5 keeps
+// How an elite's or a champion's multipliers meet its dungeon's own (decision 124, from decision 117 item 19; decision 125). Decision 5 keeps
 // elites as their own tier (about x2 health, x1.3 damage) with "no stacking with other layers". By default an elite in an
 // Elite or Super dungeon takes the larger of the elite tier and the dungeon's own layer, stat by stat, with nothing
-// multiplied. The `eliteStacking` pref (a Features row, elite-stacking-row.ts) brings back the stacked figures: x7 health
-// and x2.6 damage in an Elite Dungeon, x9 and x3 in a Super dungeon. Pinned off online (net/profile/officialProfile.ts).
+// multiplied, and a champion likewise takes the larger of its own step and the layer. The `eliteStacking` pref (a Features
+// row, elite-stacking-row.ts) brings back the stacked figures: x7 health and x2.6 damage for an elite in an Elite Dungeon,
+// x9 and x3 in a Super dungeon, and a champion's step on the layer. Pinned off online (net/profile/officialProfile.ts).
 
 import { getPref } from './uiPrefs.js';
 
@@ -36,4 +37,24 @@ export function eliteMults(
   if (stacked) return superDungeon ? SUPER_DUNGEON_STACKED : ELITE_DUNGEON_STACKED;
   const layer = superDungeon ? SUPER_DUNGEON_LAYER : ELITE_DUNGEON_LAYER;
   return { health: Math.max(tier.health, layer.health), damage: Math.max(tier.damage, layer.damage) };
+}
+
+/** A dungeon's layer as a host names it: an Elite or Super dungeon by name, an ocean band by its own figures, or none. */
+export type DungeonLayer = 'elite' | 'super' | FoeMults | null | undefined;
+
+/** The figures of a named layer. */
+export function layerOf(layer: DungeonLayer): FoeMults | null {
+  if (layer === 'elite') return ELITE_DUNGEON_LAYER;
+  if (layer === 'super') return SUPER_DUNGEON_LAYER;
+  return layer && Number.isFinite(layer.health) && Number.isFinite(layer.damage) ? layer : null;
+}
+
+/**
+ * Decision 125: a champion's step on a foe its dungeon's layer has already scaled. By default the foe ends at the larger of
+ * the two, stat by stat, so the step gives only what passes the layer; with the stacking row on, the whole step multiplies.
+ */
+export function stepOnLayer(step: FoeMults, layer: DungeonLayer, { stacked = eliteStackingOn() } = {}): FoeMults {
+  const l = layerOf(layer);
+  if (!l || stacked) return step;
+  return { health: Math.max(step.health, l.health) / l.health, damage: Math.max(step.damage, l.damage) / l.damage };
 }
