@@ -887,7 +887,7 @@ export function addEnemyLootExtras(items, basics, rolls = Math.random, { quarter
 const _enemyLootExtras = new Map();
 export function registerEnemyLootExtra(name, fn) { if (typeof fn === 'function') _enemyLootExtras.set(name, fn); else _enemyLootExtras.delete(name); }
 
-/** REALM P0.4, the server profile's option (loot.pileGold 'flat'; DFU's level multiple by default): A PILE'S GOLD IS
+/** The server profile's option (loot.pileGold 'flat'; DFU's level multiple by default): A PILE'S GOLD IS
  *  NOT THE LEVEL'S. GenerateRandomLoot rolls a pile's gold times the player's level, so a level-30 character found thirty
  *  times a level-1 one's in the same pile, and the hour's respawn (WORLD8) paid it again. Unleveled Loot's own arm
  *  divides it back (unleveledLoot.js unleveledGoldLootPiles); with the option the division runs online for every pile,

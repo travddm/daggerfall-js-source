@@ -855,7 +855,7 @@ export function calculateCost(baseValue, shopQuality, priceAdjustment = 1000, co
   return cost;
 }
 
-/** REALM P0.4, the server profile's option (trade.saleCap, off by default: DFU's haggle online too). With it on, ONLINE A
+/** The server profile's option (trade.saleCap, off by default: DFU's haggle online too). With it on, ONLINE A
  *  SHOP PAYS AT MOST HALF WHAT IT ASKS for the same piece; off, a counter's piece sells back for no more than was paid. DFU's haggle can turn a counter's spread upside down - a quality-1 shop pays 125/256 of the
  *  cost to a seller with Mercantile 2 and asks 124/256 of a buyer - so buying a piece and selling it back made gold,
  *  and the regions' price walk paid a carrier. Offline, DFU's haggle stands. */

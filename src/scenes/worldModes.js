@@ -5187,7 +5187,7 @@ export function createWorldModes(host) {
         // F114: OwnsHouse per CURRENT region (DaggerfallBankManager.cs:136).
         ownsHouse: () => ownsHouse(playerEntity.houses ?? [], interiorBuilding?.regionIndex ?? 0),
         rankCeiling: host.rollPace?.(guild.factionId)?.ceiling ?? null,   // CHAP4b: 7 online while the Roll holds - 8 and 9 are seats; ROLL-PACE: and no further than its pace since joining
-        promoteWhenEarned: sharedClockOn() && !!host.rollPace?.(guild.factionId)?.promoteNow,   // PROMO-NOW, the server profile's option (guild.promoteNow): no 28 days while the Roll paces it; else DFU's wait on the character's own clock
+        promoteWhenEarned: sharedClockOn() && !!host.rollPace?.(guild.factionId)?.promoteNow,   // the server profile's option (guild.promoteNow): no 28 days while the Roll paces it; else DFU's wait on the character's own clock
       }),
       // PROMO-NOW: online, the popup says what the next rank asks (the enhanced skin's line; the classic window is DFU's)
       rankNeeds: () => { const pace = sharedClockOn() ? host.rollPace?.(guild.factionId) ?? null : null; return sharedClockOn() ? rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships }) : null; },   // ROLL-PACE: and when the pace holds it; SEAT-LINE: read seated - a seat's own hall asks nothing more; STANDING-WORDS: the review's date and its book
