@@ -7,7 +7,7 @@ import {
   FORT_WORKS, fortWork, fortMaxTier, fortTierRow, fortMayRaise, fortCost, fortWorkLine,
   fortDropped, fortsAfterCapture, fortsAfterSeason, defendersWaveMs, GATEHOUSE, gatehouseVitality, RAM, watchtowerShare,
   barracksGuards, marketHallListings, marketHallTitheCap, shrineStanding, shrineGateInfluence, stationSteps, harbourPort,
-  CAMP_MARKS, CAMP_RAMS, campRams, REVOLT, revoltDue, WALLS_WAVE_MIN_MS,
+  SIEGE_CAMP_MARKS, CAMP_RAMS, campRams, REVOLT, revoltDue, WALLS_WAVE_MIN_MS,
 } from '../../src/net/fortLaw.js';
 import { SIEGE_WAVE_MS } from '../../src/net/siege/siegeRef.js';
 
@@ -70,7 +70,7 @@ test('SEAT2b WHAT A TIER DOES: the defenders\' wave 3 s faster a tier; the Gateh
 });
 
 test('SEAT2b THE SIEGE CAMP AT THE TURNING: a paid camp that won the Right brings its Rams to a siege with a Gatehouse; a palace without a gate, a camp that won nothing and an unpaid one bring none (mutants: the Right; the gate; the payment)', () => {
-  assert.deepEqual([CAMP_MARKS, CAMP_RAMS], [1500, 3]);
+  assert.deepEqual([SIEGE_CAMP_MARKS, CAMP_RAMS], [1500, 3]);
   assert.equal(campRams({ paid: true, won: true, gated: true }), 3);
   assert.equal(campRams({ paid: true, won: true, gated: false }), 0, 'Appendix A: no Ram - a palace has no Gatehouse');
   assert.equal(campRams({ paid: true, won: false, gated: true }), 0, 'no Right: burnt whole');

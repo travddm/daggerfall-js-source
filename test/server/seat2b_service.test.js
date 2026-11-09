@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, chronicleLine } from '../../src/net/townSeatLaw.js';
 import { fortsCapturedStatements, fortsSeasonStatements, campsSpent, campsWorn } from '../../server-account/src/seatForts.js';
-import { CAMP_MARKS, CAMP_RAMS } from '../../src/net/fortLaw.js';
+import { SIEGE_CAMP_MARKS, CAMP_RAMS } from '../../src/net/fortLaw.js';
 import { readFileSync } from 'node:fs';
 
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
@@ -181,8 +181,8 @@ test('SEAT2b A SIEGE CAMP PITCHED: the pledged challenger\'s Guildmaster or Offi
   s.treasury(eo.gid, 2501);
   const a = await camp(off, ANTICLERE.key, { rid: 'camp-pitch-01' });
   assert.equal(a.status, 200, JSON.stringify(a.body));
-  assert.deepEqual([a.body.ok, a.body.key, a.body.marks], [true, ANTICLERE.key, CAMP_MARKS]);
-  assert.equal(CAMP_MARKS, 1500);
+  assert.deepEqual([a.body.ok, a.body.key, a.body.marks], [true, ANTICLERE.key, SIEGE_CAMP_MARKS]);
+  assert.equal(SIEGE_CAMP_MARKS, 1500);
   assert.equal(s.purse(eo.gid), 2500, 'burnt');
   assert.deepEqual(s.raw.prepare("SELECT src_kind, dst_kind, amount FROM marks_ledger WHERE kind = 'camp'").all().map((x) => [x.src_kind, x.dst_kind, x.amount]), [['guild', 'burn', 1500]]);
   assert.deepEqual(camps(), [[W, ANTICLERE.key, eo.gid]]);

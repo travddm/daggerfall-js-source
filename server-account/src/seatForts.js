@@ -9,7 +9,7 @@
 // THE DROPS: a capture takes every work a tier down (fortLaw.js fortsAfterCapture); a Season's end takes every work a
 // tier down; Season 0's end wipes them (seatTurning.js SEASON_ZERO_WIPED). A Charter relinquished or lapsed keeps them (16).
 //
-// THE SIEGE CAMP (4.2): a challenger's guild that pledged a seat this week pitches a camp for CAMP_MARKS from its
+// THE SIEGE CAMP (4.2): a challenger's guild that pledged a seat this week pitches a camp for SIEGE_CAMP_MARKS from its
 // treasury, once. If the guild wins the Right of Siege there and a Gatehouse stands, the camp brings CAMP_RAMS Rams to the
 // siege; a camp that wins no Right is burnt whole.
 //
@@ -22,7 +22,7 @@ import { seatsOpenFor, confirmedSeats } from './townSeats.js';
 import { mustChange } from './realm.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 import { seatWeekOf, seatKeyOk, SEAT_LEVER_RANKS, SEAT_EDICTS_HOUR } from '../../src/net/townSeatLaw.js';
-import { FORT_WORKS, fortWork, fortMaxTier, fortMayRaise, fortCost, marketHallListings, marketHallTitheCap, campRams, CAMP_MARKS } from '../../src/net/fortLaw.js';
+import { FORT_WORKS, fortWork, fortMaxTier, fortMayRaise, fortCost, marketHallListings, marketHallTitheCap, campRams, SIEGE_CAMP_MARKS } from '../../src/net/fortLaw.js';
 import { MARKET_LISTINGS_MAX } from '../../src/net/marketLaw.js';
 import { TITHE_CAP } from '../../src/net/townSeatLaw.js';
 
@@ -126,7 +126,7 @@ export function fortsCapturedStatements(db, key) {
 
 /**
  * PITCH A SIEGE CAMP (`/v1/seats/camp`): `character`'s guild must have pledged the seat `key` this seat week and not hold
- * it, and the character be its Guildmaster or an Officer. CAMP_MARKS burnt from the treasury, once a guild and seat a week
+ * it, and the character be its Guildmaster or an Officer. SIEGE_CAMP_MARKS burnt from the treasury, once a guild and seat a week
  * (`camp`, once a `rid`). Answers `{ ok, key, marks }` or `{ error }`.
  * @param {{db: any, nowS: number}} ctx
  */
@@ -142,7 +142,7 @@ export async function pitchCamp(ctx, player, env, { character, key, rid } = {}) 
   const g = a.me.guild_id;
   const week = weekAt(nowS);
   const prior = await db.prepare("SELECT 1 FROM marks_ledger WHERE actor = ? AND rid = ? AND kind = 'camp'").bind(player.id, `${rid}:camp`).first();
-  if (prior) return { ok: true, repeat: true, key, marks: CAMP_MARKS };
+  if (prior) return { ok: true, repeat: true, key, marks: SIEGE_CAMP_MARKS };
   if (await db.prepare('SELECT 1 FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(key, g).first()) return { error: 'camp-holder' };
   if (!(await db.prepare('SELECT 1 FROM town_seat_pledges WHERE week = ? AND key = ? AND guild_id = ?').bind(week, key, g).first())) return { error: 'seat-not-pledged' };
   if (await db.prepare('SELECT 1 FROM town_seat_camps WHERE week = ? AND key = ? AND guild_id = ?').bind(week, key, g).first()) return { error: 'camp-pitched' };
@@ -154,15 +154,15 @@ export async function pitchCamp(ctx, player, env, { character, key, rid } = {}) 
         WHERE COALESCE((SELECT balance FROM guild_marks WHERE guild_id = ?1), 0) >= ?2
           AND EXISTS (SELECT 1 FROM town_seat_pledges WHERE week = ?7 AND key = ?8 AND guild_id = ?1)
           AND EXISTS (SELECT 1 FROM guild_members WHERE rowid = ?9 AND guild_id = ?1 AND rank IN (${SEAT_LEVER_RANKS.join(', ')}))`)
-        .bind(g, CAMP_MARKS, utcDay(nowS), nowS, player.id, `${rid}:camp`, week, key, Number(a.me.rid)),
+        .bind(g, SIEGE_CAMP_MARKS, utcDay(nowS), nowS, player.id, `${rid}:camp`, week, key, Number(a.me.rid)),
       mustChange(db),
       db.prepare('INSERT INTO town_seat_camps (week, key, guild_id, at) VALUES (?, ?, ?, ?)').bind(week, key, g, nowS),
     ]);
   } catch {
     const has = Number((await db.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').bind(g).first())?.balance ?? 0);
-    return { error: has < CAMP_MARKS ? 'seat-treasury' : 'camp-pitched' };
+    return { error: has < SIEGE_CAMP_MARKS ? 'seat-treasury' : 'camp-pitched' };
   }
-  return { ok: true, key, marks: CAMP_MARKS };
+  return { ok: true, key, marks: SIEGE_CAMP_MARKS };
 }
 
 /**

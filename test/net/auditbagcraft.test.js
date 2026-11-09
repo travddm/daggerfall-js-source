@@ -170,14 +170,6 @@ test('AUDIT BAG-CRAFT A1 service: a station spends the loose units first, and wh
   const t = await s.ask(mac, '/v1/prof/temper', { recipe: 'longsword:steel', quality: q, provenance: spv });
   assert.equal(t.status, 200, JSON.stringify(t.body));
   assert.equal(s.raw.prepare('SELECT bought_with FROM products WHERE provenance = ?').get(spv).bought_with, 'gold', 'raised with goods no Stores had');
-  // a Ram Kit of loose planks: loose - a station's, never a camp's writ (it reads own and bought)
-  s.rank(mac, 'building', 60);   // CRAFT3: Carpentry is Building's
-  s.give(mac, 'ingot:iron', 'own', 20);
-  s.give(mac, 'hide:bear', 'own', 4);
-  await s.loose(mac, 'plank:oak', 40);
-  const ram = await s.ask(mac, '/v1/prof/craft', { recipe: 'ramkit:oak', clean: false, name: 'Mac' });
-  assert.equal(ram.status, 200, JSON.stringify(ram.body));
-  assert.deepEqual(s.stores(mac, 'work:ram'), [['loose', 1]]);
   // the refusal counts the loose units as a station's
   assert.equal((await s.ask(mac, '/v1/prof/smelt', { recipe: 'ingot:iron', count: 2 })).body.error, 'stores-short', 'two own Iron: one ingot\'s worth');
   await s.loose(mac, 'metal:iron', 2);

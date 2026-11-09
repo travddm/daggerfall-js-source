@@ -3,7 +3,7 @@
 // 4.2's Siege Camp). Fortifications belong to the SEAT, not the guild: a project on the seat's board, its Marks paid once
 // from the treasury, and the tier stands at once for the rest of the Season; each drops a tier when the seat changes hands
 // and at a Season's end, and Season 0's end wipes them (18). There are no materials, no stockpile and no writs: the works
-// cost Marks alone. A Siege Camp is Marks too (CAMP_MARKS), paid once by the challenger's guild at the pledge.
+// cost Marks alone. A Siege Camp is Marks too (SIEGE_CAMP_MARKS), paid once by the challenger's guild at the pledge.
 //
 // Pure. Not a DFU member: Daggerfall's towns have no player works. Ledger A (EVERY PALACE A SEAT's row).
 
@@ -178,7 +178,7 @@ export const harbourPortFor = (seat, guild) => !!guild && seat?.holder?.guild?.i
 // ─── THE SIEGE CAMP (4.2, 5.2 step 7) ─────────────────────────────────
 
 /** What a Siege Camp costs its guild, once, at the pledge (4.2); a camp that wins no Right of Siege is burnt whole. */
-export const CAMP_MARKS = 1500;
+export const SIEGE_CAMP_MARKS = 1500;
 /** The Rams a camp that won the Right brings to the siege. */
 export const CAMP_RAMS = 3;
 /**

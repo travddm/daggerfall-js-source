@@ -5,7 +5,7 @@
 // Siege Camp's lever beside the pledge (drawSeatCamp).
 //
 // Drawn into a host the Seat tab hands it (ui/seatTab.js), its acts through the tab's own one-at-a-time door.
-import { FORT_WORKS, fortMayRaise, fortMaxTier, fortCost, fortWorkLine, CAMP_MARKS, CAMP_RAMS } from '../net/fortLaw.js';
+import { FORT_WORKS, fortMayRaise, fortMaxTier, fortCost, fortWorkLine, SIEGE_CAMP_MARKS, CAMP_RAMS } from '../net/fortLaw.js';
 import { t } from '../systems/textManager.js';
 
 /** @param {string} tag @param {string|null} [cls] @param {string|null} [text] */
@@ -69,7 +69,7 @@ export function drawSeatWorks(host, { forts, seat, port = false, lever = false, 
 // ─── THE SIEGE CAMP (4.2) ─────────────────────────────────────────
 
 /** The camp lever's words. */
-export const campLeverText = () => t('seat.camp.pitch', 'Pitch a Siege Camp ({marks, number} Marks)', { marks: CAMP_MARKS });
+export const campLeverText = () => t('seat.camp.pitch', 'Pitch a Siege Camp ({marks, number} Marks)', { marks: SIEGE_CAMP_MARKS });
 /** What the camp does, said under the lever. */
 export const campRuleLine = () => t('seat.camp.rule', 'Pay once from the treasury. If your guild wins the Right of Siege here, the camp brings {rams, number} Rams to the siege where a Gatehouse stands; if it wins none, the Marks are lost.', { rams: CAMP_RAMS });
 
