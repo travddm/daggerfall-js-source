@@ -137,7 +137,7 @@ test('settings: the tier map is complete and honest', () => {
     assert.ok(why && why.length > 10, `${key} states WHY it is unavailable`);
   }
   // the Ledger's climbing row is unavailable for the documented reason - the port implements one side of the branch.
-  // EnhancedCombatAI left the row when the port ran both sides (decision 117).
+  // EnhancedCombatAI left the row when the port ran both sides.
   assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'live');
   assert.equal(tierOf('Enhancements/AdvancedClimbing'), 'unavailable');
 });

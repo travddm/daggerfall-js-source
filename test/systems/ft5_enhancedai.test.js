@@ -5,8 +5,8 @@
 // - dungeons only, the crowd and the doors ahead - and one thing to
 // say that nothing said: it shares half a name with DFU's own
 // Enhancements/EnhancedCombatAI ("Smarter Enemies"), which is a
-// different feature: DFU's own setting, which this layer sits on top of
-// (decision 117). Not a merge; the DFU key stays in Settings.
+// different feature: DFU's own setting, which this layer sits on top of.
+// Not a merge; the DFU key stays in Settings.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
