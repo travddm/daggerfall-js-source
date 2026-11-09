@@ -19,7 +19,7 @@ import {
   MARKS_MAX, MARKS_FAUCETS, MARKS_BANK, MARKS_KINDS, MARKS_SWITCH, marksSwitchOf, utcDay, marksAmountOk, exchangeGold,
   MARKS_RID_RE, marksText,
 } from '../../src/net/marksLaw.js';
-import { accountMarks, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountMarks, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { createMarksBook, MARKS_TEXT, MARKS_PENDING_KEY, mintMarksRid } from '../../src/net/marksBook.js';
 import { createGateClaims, gateClaimVerdict, GATE_CLAIM_TEXT } from '../../src/net/gate/gateClaims.js';
 import { creditMarksSale, marksSaleCredit, createBankAccounts } from '../../src/systems/banking.js';
@@ -336,7 +336,7 @@ const jsonStore = () => { const m = new Map(); return { get: (k) => m.get(k), se
 /** The door over the real Worker, as a signed-in device holds it. */
 const doorOver = (env, who) => accountMarks({
   fetch: (u, i) => worker.fetch(new Request(u, i), env),
-  storage: { getItem: (k) => (k === SESSION_KEY ? JSON.stringify({ secret: who.secret, id: who.id }) : null) },
+  storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : k === SESSION_KEY ? JSON.stringify({ secret: who.secret, id: who.id }) : null) },
 });
 const seedMarks = (env, who, n) => env.DB._raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
   VALUES ('mint', NULL, 'account', ?, 'test', ?, 1, 1, ?, NULL, ?)`).run(who.id, n, who.id, `seed-${who.handle}-${n}`);
@@ -344,7 +344,7 @@ const seedMarks = (env, who, n) => env.DB._raw.prepare(`INSERT INTO marks_ledger
 test('MARKS1 the client\'s door: every Marks route posts to the service behind the session; every word the service says has its sentence', async () => {
   const sent = [];
   const fetch = async (url, init) => { sent.push([new URL(url).pathname, JSON.parse(init.body), init.headers.authorization]); return new Response(JSON.stringify({ ok: true }), { status: 200 }); };
-  const door = accountMarks({ fetch, storage: { getItem: (k) => (k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } });
+  const door = accountMarks({ fetch, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } });
   await door.balance(); await door.exchange(5, 'r-00000001'); await door.guildDeposit('c1', 7, 'r-00000002'); await door.guildWithdraw('c1', 8, 'r-00000003'); await door.report();
   assert.deepEqual(sent.map((s) => s[0]), ['/v1/marks/balance', '/v1/marks/exchange', '/v1/marks/guild/deposit', '/v1/marks/guild/withdraw', '/v1/marks/report']);
   assert.ok(sent.every((s) => s[2] === 'Bearer sek'));

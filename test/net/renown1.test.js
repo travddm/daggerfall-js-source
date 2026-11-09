@@ -29,7 +29,7 @@ import { badged, readRenown, parseClient, renownGate, RENOWN_HZ_MAX, RELAY_VERSI
 import { fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
-import { accountTokenMinter, accountRenown, SESSION_KEY, REFUSALS } from '../../src/net/accountClient.js';
+import { accountTokenMinter, accountRenown, SESSION_KEY, SERVICE_KEY, REFUSALS } from '../../src/net/accountClient.js';
 import { createRenownTracker, renownFoeStruck, renownFoeDied, renownFoeLevel, setRenownKillHandler, RENOWN_ASSIST_MS, _resetRenownKillsForTests } from '../../src/net/renownTracker.js';
 import { setRenownLayer, setOnlineLayerExtra, offlineVitals, keepFraction, renownHpOf, renownMpOf } from '../../src/systems/renownLayer.js';
 import { defineLiveMaxHealth, defineLiveMaxMagicka } from '../../src/systems/chargen.js';
@@ -284,7 +284,7 @@ test('RENOWN1 the wire: `badged` stamps `lv` beside the badge only within the bo
   assert.deepEqual(parseClient('{"t":"renown","order":"v1.a.b"}', { hasHello: false }), { error: 'renown before hello' });
   assert.deepEqual(parseClient('{"t":"renown"}', { hasHello: true }), { error: 'bad renown' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'renown', order: 'x'.repeat(1025) }), { hasHello: true }), { error: 'bad renown' });
-  assert.equal(RELAY_VERSION, 'world303');
+  assert.equal(RELAY_VERSION, 'world309');
   assert.equal(RENOWN_HZ_MAX, 1);
   const g1 = renownGate(null, 1000);
   assert.equal(g1.pass, true);
@@ -402,7 +402,7 @@ test('RENOWN1 the session: a peer\'s level off the welcome, the join and a renow
 test('RENOWN1 the client\'s calls: the minter names the character it is bringing online and hands the signed level back; the report goes as a POST with the bearer and nothing with no session (mutants: the character unnamed; the level dropped from the answer)', async () => {
   const sent = [];
   const fetch = async (url, init) => { sent.push({ url, init }); return { ok: true, status: 200, json: async () => (url.endsWith('/v1/auth/token') ? { token: 'v1.t.s', name: 'Mac', kind: 'guest', title: null, glyphs: [], level: 7 } : { character: 'char-aaaa', xp: 10, level: 1, credited: 10, rose: false, order: null }) }; };
-  const m = new Map([[SESSION_KEY, JSON.stringify({ id: 'p_me', name: 'Mac', kind: 'guest', sessionId: 's1', secret: 'SECRETSECRETSECRETSECRET' })]]);
+  const m = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: 'p_me', name: 'Mac', kind: 'guest', sessionId: 's1', secret: 'SECRETSECRETSECRETSECRET' })]]);
   const storage = { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v), removeItem: (k) => m.delete(k) };
   const issued = [];
   const mint = accountTokenMinter({ fetch, storage, onIssued: (w) => issued.push(w), character: () => 'char-aaaa' });

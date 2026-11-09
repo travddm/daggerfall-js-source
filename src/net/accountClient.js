@@ -70,7 +70,7 @@ import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the ar
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
 import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HOLD-SAID: the standing hold's own notice
 import { MINT_VERSION } from './productRecord.js';
-import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
+import { accountServiceOf, serviceUrl } from './account-service-address.ts';   // where the service is: an override, or what the relay said   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
 
 /** There is no built-in account service (decision 116 (8)): the relay a player enters names its own
  *  (net/account-service-address.ts). Empty is no service. The deploy workflows read this line with grep. */
@@ -92,7 +92,7 @@ export const HANDLE_MAX_LEN = 24;
  *  credentials at once, so the merge belongs there - and two different
  *  credentials under one key is how a player gets signed out of both. */
 export const SESSION_KEY = 'dagger.account.session';
-export { SERVICE_KEY } from './account-service-address.ts';
+export { SERVICE_KEY, serviceUrl } from './account-service-address.ts';
 
 /**
  * WHAT A REFUSAL MEANS, IN WORDS A PLAYER CAN ACT ON.
@@ -1055,7 +1055,7 @@ export async function call({ fetch, base = DEFAULT_ACCOUNT_SERVICE, secret = nul
   // ran out is the stall that hold answered, never a second word on it (busyAgain)
   const sentAt = now();
   try {
-    res = await fetch(`${base}${path}`, {
+    res = await fetch(serviceUrl(base, path), {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,

@@ -10,7 +10,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { webcrypto } from 'node:crypto';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY, accountGuilds } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY, accountGuilds } from '../../src/net/accountClient.js';
 import { payFromSave, creditSave, payableOf, REALM_LETTER_TEMPLATE } from '../../src/net/realm/realmGoldLaw.js';
 import { GUILD_FOUND_GOLD, GUILD_FOUND_RENOWN, GUILD_TREASURY_MAX } from '../../src/net/guild/guildLaw.js';
 import { renownXpFor } from '../../src/net/renown.js';
@@ -86,7 +86,7 @@ async function stand() {
     }), env);
     assert.equal(reg.status, 200, `${handle} registers`);
     const storage = fakeStorage();
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const door = { inits: [], before: null, loseNext: null };
     const fetch = fetchOf(door);
     const io = realmIo({ fetch, storage });

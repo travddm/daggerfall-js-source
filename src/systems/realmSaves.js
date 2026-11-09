@@ -48,7 +48,7 @@
 // for the save as stored and opens it here.
 // ═══════════════════════════════════════════════════════════════════
 
-import { storedSession, serviceBase, forgetSession, accountRefusalText, forgetD1Bookmark, sessionPassFor, noteSessionPass, forgetSessionPass, passKeptThrough } from '../net/accountClient.js';   // AUDIT SCALE II A-2: a write forgets the page's D1 bookmark; SESSION-SIGN: the checkpoint carries the session's pass
+import { storedSession, serviceBase, serviceUrl, forgetSession, accountRefusalText, forgetD1Bookmark, sessionPassFor, noteSessionPass, forgetSessionPass, passKeptThrough } from '../net/accountClient.js';   // AUDIT SCALE II A-2: a write forgets the page's D1 bookmark; SESSION-SIGN: the checkpoint carries the session's pass
 import { realmTradeRefusalText, LOCKED_SAID_MAX } from '../net/realm/realmTradeLaw.js';   // REALM P2.1: a trade the realm settles
 import { REALM_DOOR_WORD } from '../net/wire.js';   // REALM-DOOR: the relay's word for a token that names no realm character
 import { SESSION_PASS_HEADER } from '../net/sessionPassLaw.js';   // SESSION-SIGN: the pass's one name on the wire
@@ -91,7 +91,7 @@ async function realmAsk(io, path, { method = 'GET', json = null, raw = null, hea
   if (writes) forgetD1Bookmark();
   let res;
   try {
-    res = await io.fetch(`${io.base}${path}`, {
+    res = await io.fetch(serviceUrl(io.base, path), {
       method, headers, body: json ? JSON.stringify(json) : (raw ?? undefined), ...(keepalive ? { keepalive: true } : {}),
     });
   } catch (e) {

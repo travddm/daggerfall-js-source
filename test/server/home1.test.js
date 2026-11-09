@@ -14,7 +14,7 @@ import {
   HOME_CAP, HOME_ENTRIES, HOME_ENTRY_DEFAULT, HOME_PRICE_MIN, HOME_PRICE_MAX, HOME_CLAIMS_MAX, HOME_KEY_MAX,
   homeMapIdOk, homeBuildingKeyOk, homeRegionOk, homePriceOk, homeEntryOk, homeMayEnter,
 } from '../../src/net/homeLaw.js';
-import { accountHomes, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountHomes, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { claimHome } from '../../server-account/src/homes.js';
 import {
   HOME_TOWN_TTL_MS, HOME_RETRY_MS, HOME_ENTRY_WORDS, HOME_BANK_LINES, homeCandidate, homePurchasable, homeSceneName, homeRefund,
@@ -225,7 +225,7 @@ test('HOME1 the claim\'s rate: an account makes at most twenty claims an hour, a
 test('HOME1 the client\'s door: every call rides the one session as a Bearer header to its route, and no session is a word, not a throw; every refusal the service can say has a sentence (mutants: a route misspelt, the secret in the body)', async () => {
   const seen = [];
   const fetch = async (url, init) => { seen.push({ url, init }); return { ok: true, status: 200, json: async () => ({ ok: true }) }; };
-  const storage = new Map([[SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
+  const storage = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
   const store = { getItem: (k) => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v), removeItem: (k) => storage.delete(k) };
   const api = accountHomes({ fetch, storage: store });
   await api.town(7);

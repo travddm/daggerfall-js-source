@@ -8,7 +8,7 @@ import {
   parseTownCommand, townAuditLines, TOWN_USAGE,
 } from '../../src/net/townEconBook.js';
 import { createTownEconHost, MARKET_BANDS_MAX } from '../../src/scenes/townEconHost.js';
-import { accountTowns, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountTowns, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { TOWN_WATCH_CLAIM_MAX, TOWN_ECON_KEPT_S, townProsperity, townKeyOf, townDayOf, TOWN_DAY_MS, TOWN_SEA_TICK_S } from '../../src/net/townEconLaw.js';
 
 // TOWN-ECON TE2: this device's half of the players' share -
@@ -189,7 +189,7 @@ test('TOWN-ECON TE2 the host module (scenes/townEconHost.js): the reading\'s pla
 test('TOWN-ECON TE2 the door and the wiring: the three routes; the world host builds the module with the town\'s location in its row, hands it the Watch beside the seats\' and the Motherlodes\', and witnesses the town at its entry (mutants: TOWNECON2-door-path, TOWNECON2-world-unwatched, TOWNECON2-world-unwitnessed, TOWNECON2-location-lost)', async () => {
   const sent = [];
   const storage = memory();
-  storage.setItem(SESSION_KEY, JSON.stringify({ secret: 'sek', id: ME }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ secret: 'sek', id: ME })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const door = accountTowns({ fetch: async (u, i) => { sent.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true,"towns":[]}', { status: 200 }); }, storage });
   assert.equal(door.me(), ME, 'the signed-in account');
   await door.econ();
@@ -316,7 +316,7 @@ test('AUDIT TOWN-ECON 2 the client\'s fixes: a pixel the service says is full to
   // the door's routes
   const posted = [];
   const signed = memory();
-  signed.setItem(SESSION_KEY, JSON.stringify({ secret: 'sek', id: ME }));
+  signed.setItem(SESSION_KEY, JSON.stringify({ secret: 'sek', id: ME })); signed.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const door = accountTowns({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: signed });
   await door.strike(42); await door.audit(17); await door.witness({ map: 1 }, 'k1.r.s'); await door.audit(64, 2);
   assert.deepEqual(posted.map(([p, b]) => [p, Object.keys(b).filter((k) => k !== 'secret')]), [['/v1/towns/strike', ['map']], ['/v1/towns/audit', ['region']], ['/v1/towns/witness', ['town', 'receipt']], ['/v1/towns/audit', ['region', 'page']]]);   // BAY-LEFT-SEA: a page past the first

@@ -19,7 +19,7 @@ import { createEtherHost } from '../../../src/scenes/etherHost.js';
 import { offlineCopyOf } from '../../../src/systems/offlineCopy.js';
 import { createSeaSeason, SEA_SEASON_FRESH_MS } from '../../../src/scenes/seaSeasonHost.js';
 import { seasonText, etherOfficeText, mountNavalYardWindow } from '../../../src/ui/naval/navalYardWindow.js';
-import { accountSeaSeason, SESSION_KEY } from '../../../src/net/accountClient.js';
+import { accountSeaSeason, SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
 import worker from '../../../server-account/src/index.js';
 import { standService } from '../../accountDb.mjs';
 import { seatRealm } from '../../realmSeat.mjs';
@@ -233,7 +233,7 @@ test('SEA-SEASON the page\'s half (seaSeasonHost.js) and its door: no section of
   assert.ok(n.line.text.length > 0);
   const sent = [];
   const fetch = async (url, init) => { sent.push([new URL(url).pathname, JSON.parse(init.body), init.headers.authorization]); return new Response(JSON.stringify({ ok: true }), { status: 200 }); };
-  await accountSeaSeason({ fetch, storage: { getItem: (k) => (k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } }).board({ character: RC });
+  await accountSeaSeason({ fetch, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } }).board({ character: RC });
   assert.deepEqual(sent, [['/v1/sea/season/board', { character: RC }, 'Bearer sek']]);
 });
 
