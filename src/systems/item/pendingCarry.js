@@ -29,7 +29,8 @@ export function pendingCarryKg(entity) {
 }
 
 /** The weight of `n` of a piece as the pack weighs it: coin by the piece, the rest by its effective unit weight. */
-export const pieceCarryKg = (item, n) => (n > 0 ? n * (isGoldPieces(item) ? GOLD_PIECE_WEIGHT_KG : effectiveUnitWeightInKg(item)) : 0);
+export const pieceCarryKg = (item, n) =>
+  n > 0 ? n * (isGoldPieces(item) ? GOLD_PIECE_WEIGHT_KG : effectiveUnitWeightInKg(item)) : 0;
 
 /** The kilograms a run of claims will land: those not answered, not lapsed and not puts, by what each lifted (`give`). */
 export function inFlightKg(entries) {

@@ -38,13 +38,49 @@ const ready = () => {
 function client(id, { authority = false } = {}) {
   const frames = [];
   const host = {
-    _deepCleared: new Set(), _deepFoeCleared: new Set(), _sharedFoe: () => false, _wildDungeon: false, _wildRing: null, eliteLootOpts: () => ({}), fightN: () => 1,
-    foes: [], lootKeyOf: (k) => k, lootableBody: () => false, respawnDue: () => false, rollPileItems: chain, roomLootKey: (k) => k, searchHeard: () => {},
-    searchables: [], settleLootFlat: () => {}, dfLocation: { mapTableData: { dungeonType: 0 } },
-    opts: { selfId: () => id, onActions: (data) => frames.push(JSON.parse(JSON.stringify(data))), onLootClaimed: () => {}, partyLevels: () => [], roomHost: () => HOST },
-    lootPiles: [{ items: [], pos: [0, 0, 0] }], _lootUnreadable: new Set(), _lootSeen: new Set(), _lootAt: new Map(), _lootOpenKey: null, _lootTooBig: new Set(),
-    _authority: authority, _foesFrom: authority ? null : HOST, _locationKey: ROOM, _layoutFoes: 0, _sharedById: new Map(), _sharedStamp: `st${id}`,
-    _roomClaimN: 0, _roomMintHold: 0, _roomNowMs: 0, _retyping: new Set(), lootKey: 'N', onlineRoom: () => true, _wallNow: () => 1_000_000,
+    _deepCleared: new Set(),
+    _deepFoeCleared: new Set(),
+    _sharedFoe: () => false,
+    _wildDungeon: false,
+    _wildRing: null,
+    eliteLootOpts: () => ({}),
+    fightN: () => 1,
+    foes: [],
+    lootKeyOf: (k) => k,
+    lootableBody: () => false,
+    respawnDue: () => false,
+    rollPileItems: chain,
+    roomLootKey: (k) => k,
+    searchHeard: () => {},
+    searchables: [],
+    settleLootFlat: () => {},
+    dfLocation: { mapTableData: { dungeonType: 0 } },
+    opts: {
+      selfId: () => id,
+      onActions: (data) => frames.push(JSON.parse(JSON.stringify(data))),
+      onLootClaimed: () => {},
+      partyLevels: () => [],
+      roomHost: () => HOST,
+    },
+    lootPiles: [{ items: [], pos: [0, 0, 0] }],
+    _lootUnreadable: new Set(),
+    _lootSeen: new Set(),
+    _lootAt: new Map(),
+    _lootOpenKey: null,
+    _lootTooBig: new Set(),
+    _authority: authority,
+    _foesFrom: authority ? null : HOST,
+    _locationKey: ROOM,
+    _layoutFoes: 0,
+    _sharedById: new Map(),
+    _sharedStamp: `st${id}`,
+    _roomClaimN: 0,
+    _roomMintHold: 0,
+    _roomNowMs: 0,
+    _retyping: new Set(),
+    lootKey: 'N',
+    onlineRoom: () => true,
+    _wallNow: () => 1_000_000,
     searchRoom: { ours: () => true, fields: () => ({}), whose: () => null },
   };
   return { id, host, frames, m: createRoomLoot(host) };
@@ -64,7 +100,7 @@ function windowTake(pile, piece) {
   return plan;
 }
 
-test('CARRY-CLAIMS: a joiner\'s take waiting for the host still weighs - the second 20 kg piece is refused at 30 kg, before and after the first leaves the pack as a claim', () => {
+test("CARRY-CLAIMS: a joiner's take waiting for the host still weighs - the second 20 kg piece is refused at 30 kg, before and after the first leaves the pack as a claim", () => {
   ready();
   const rec = hostWord();
   const b = client('b0b0-0002');
@@ -82,25 +118,42 @@ test('CARRY-CLAIMS: a joiner\'s take waiting for the host still weighs - the sec
   assert.equal(pile.includes(second), true, 'and stays in the pile');
 });
 
-test('CARRY-CLAIMS: a lapsed claim is back in the pile and weighs nothing; another player\'s weight never counts', () => {
+test("CARRY-CLAIMS: a lapsed claim is back in the pile and weighs nothing; another player's weight never counts", () => {
   ready();
   const rec = hostWord();
   const b = client('b0b0-0002');
   b.m.landRoomWord('loot:0', rec, HOST);
   const pile = b.host.lootPiles[0].items;
-  windowTake(pile, pile.find((it) => it.name === 'Anvil Torc'));
+  windowTake(
+    pile,
+    pile.find((it) => it.name === 'Anvil Torc'),
+  );
   b.m.roomSettle('loot:0');
   assert.equal(pendingCarryKg({ isPlayer: true }), 0, 'another entity has no claims here');
   b.m.roomClaimTick(ROOM_CLAIM_TIMEOUT_MS);
   assert.equal(pendingCarryKg(playerEntity), 0, 'lapsed: no verdict came, the piece reads as back in the pile');
-  assert.equal(windowTake(pile, pile.find((it) => it.name === 'Iron Torc')).ok, true, 'so the other piece can be taken');
+  assert.equal(
+    windowTake(
+      pile,
+      pile.find((it) => it.name === 'Iron Torc'),
+    ).ok,
+    true,
+    'so the other piece can be taken',
+  );
 });
 
 test('CARRY-CLAIMS: the claim ledger of outdoor bodies and interiors weighs its claims in flight, answered and lapsed ones not', () => {
   ready();
   const entity = { ...playerEntity, items: [heavy('Anvil Torc')], stats: { ...playerEntity.stats } };
-  const ledger = createClaimLedger({ entity, newId: (() => { let n = 0; return () => `c${++n}`; })(), lapseMs: 4000 });
-  setPendingCarry('test-ledger', (e) => (e === entity ? ledger.pendingKg() : 0));   // as bodyLootHost.js and interiorRoomLoot.js register it
+  const ledger = createClaimLedger({
+    entity,
+    newId: (() => {
+      let n = 0;
+      return () => `c${++n}`;
+    })(),
+    lapseMs: 4000,
+  });
+  setPendingCarry('test-ledger', (e) => (e === entity ? ledger.pendingKg() : 0)); // as bodyLootHost.js and interiorRoomLoot.js register it
   const c = ledger.take('body:1', { p: 0 }, entity.items[0], 1, {}, 0);
   assert.equal(entity.items.length, 0, 'lifted out of the pack');
   assert.equal(ledger.pendingKg(), 20);
