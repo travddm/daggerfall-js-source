@@ -19,6 +19,7 @@ import { generateItems, addPileLootExtras, validLootList, LOOT_LIST_MAX, DUNGEON
 import { rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons, LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
 import { peerHanded, neverPeerHanded, notCarried } from '../../src/systems/peerWord.js';
 import { addItem, stacksWith, isGoldPieces, addGoldPieces } from '../../src/systems/inventory.js';
+import { weighClaims } from '../../src/systems/item/pendingCarry.js';
 import { isEquipped, unequipItem } from '../../src/systems/equip.js';
 import { spawnEnemyLoot, rollRoomBonus } from '../../src/scenes/hostCombat.js';
 import { raiseEnemyDeath, corpseTextureOf } from '../../src/scenes/corpseMarker.js';
@@ -181,6 +182,7 @@ function peer(net, { id, level, luck, renown, seed, host, foraging, partners, ch
     opts: { selfId: () => id, onActions: (data) => net.send(id, data), onLootClaimed: () => {}, partyLevels: () => partners, roomHost: () => seat.id },
     _foesFrom: host ? null : seat.id, _sharedStamp: `st${seed}`, _foesSeqIn: -1, clearSurplus: () => {}, ...TRAIT_DOORS,   // WORLD2: the host this client follows, and the seat's handover
     addItem, stacksWith, isGoldPieces, addGoldPieces, isEquipped, unequipItem, neverPeerHanded, notCarried,   // AUDIT AUTO-HOLD: the give asks it (offline here: no filter)
+    weighClaims,   // CARRY-CLAIMS: the module weighs its claims in flight for the carry gate
     onlineRoom: () => true, _wallNow: () => clock.t, respawnDue, validLootList, peerHanded, LOOT_LIST_MAX, LOOT_NEWER_TEXT, ENEMY_BASICS, corpseTextureOf,   // AUDIT DEX A1: the corpse mints read it
     generateLootItems: generateItems, addPileLootExtras, rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons,
     spawnEnemyLoot, grantEliteLoot, rollCorpseKit, raiseEnemyDeath, capFoeLoot, rollRoomBonus: (args) => { bonusCalls.push(args); return rollRoomBonus(args); }, applyChampion, championTraitFor, promoteEliteFoe, _retyping: new Set(),   // CHAMP-BASE: the build's champion and elite arms (applyEliteScaling) and the base's

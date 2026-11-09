@@ -3,6 +3,7 @@
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 import { addGoldPieces, addItem, isGoldPieces, stacksWith } from '../systems/inventory.js';
+import { weighClaims } from '../systems/item/pendingCarry.js';   // CARRY-CLAIMS: my takes in flight weigh at the carry gate
 import { asTheRoom } from '../systems/online/onlineLane.js';
 import { withRollerLevel } from '../systems/loot/lootLevelGate.js';   // AUDIT UPDATE L1: the room's base at the room's level
 import { baseSignature, bonusSpent, carriedBase, claimOf, claimWord, composeRoomView, isPersonalLoot, isRoomBaseKind, isRoomWord, judgeRoomClaim, legacyCounts, legacyDelta, legacySig, markPersonal, mergeRoomWord, pieceCount, recentAnswers, roomEmptied, ROOM_ANSWERS_KEPT, ROOM_BASE_FIND, ROOM_BASE_LUCK, ROOM_BASE_MAX, ROOM_BASE_QUARTERS, ROOM_CLAIM_TIMEOUT_MS, ROOM_CLAIMS_MAX, ROOM_PUT_RESAY_MS, ROOM_TAKEN_TEXT, LOOT_SKEW_TEXT, ROOM_LAPSED_TEXT, roomBaseGender, roomBaseLevel, roomClaimId, roomClaimOrder, roomContainerName, roomRoller, roomState, roomTermsBeat, roomWord, sameRoomTerms, seededRolls, settleBonusSpent, validRoomWord } from '../systems/roomLoot.js';
@@ -54,7 +55,7 @@ export function createRoomLoot(host) {
   /** canon -> the generation of a memory word this build could not match, kept until this client holds the seat. */
   const staleMemory = new Map();
   const _roomSeen = new Map();      // canon -> { list, at }: the shared pieces its list held at its last compose (a take is read against it)
-  const _roomMine = new Map();      // claim id -> this player's own claim or put the host has not answered (or a claim that timed out, still answered late)
+  const _roomMine = weighClaims('dungeon-room', playerEntity, new Map());      // CARRY-CLAIMS: weighed while in flight. claim id -> this player's own claim or put the host has not answered (or a claim that timed out, still answered late)
   const _roomWon = new Set();       // `canon#g|place` this player's claims were granted - a sibling claim's refusal is then no news
   // OUTDOOR-LOOT slice 3: a dungeon's search find (`srch:<i>`) is a CARRIED kind - its base is the searcher's roll, minted once at the search
   const _roomSees = new Set();      // canon -> this client SEES the find (it is its own or its party's - GRAVE-PARTY); the host keeps a judging state for every find, seen or not

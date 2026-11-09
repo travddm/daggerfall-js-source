@@ -39,6 +39,7 @@ import { validLootList, LOOT_LIST_MAX, LOOT_NEWER_TAKE_TEXT } from '../systems/l
 import { peerHanded, notCarried } from '../systems/peerWord.js';
 import { roomState, judgeRoomClaim, composeRoomView, listMovesSince, liftPiece, pieceCount, roomClaimId, ROOM_BASE_MAX, ROOM_CLAIMS_MAX, ROOM_TAKEN_TEXT } from '../systems/roomLoot.js';
 import { createClaimLedger, LEGACY_ASK_KEEP_MS } from '../systems/loot/claimLedger.js';
+import { weighLedger } from '../systems/item/pendingCarry.js';   // CARRY-CLAIMS: my takes in flight weigh at the carry gate
 import { tokenGate, mintSharedStamp, CELL_FRAME_RECORDS_MAX } from '../net/wire.js';
 import {
   BODY_PEEK_REACH, PEEK_RETRY_MS, BODY_ASKS_PER_S, TAKES_PER_S, TAKE_WINDOW_MS, GRANT_BACK_MS, GRANT_FRAME_MAX, GENERATION_SPACE, BAD, HIDDEN,
@@ -87,7 +88,7 @@ export function createBodyLoot(h) {
   const stamp = mintSharedStamp();
   let claimN = 0;
   /** THE CLAIMER'S LEDGER: this pool's claims in flight, their verdicts, their lapse and re-ask, the legacy asks. */
-  const ledger = createClaimLedger({ entity: playerEntity, say: tell, newId: () => roomClaimId(net()?.selfId?.() ?? 'self', stamp, ++claimN) });
+  const ledger = weighLedger('body-loot', playerEntity, createClaimLedger({ entity: playerEntity, say: tell, newId: () => roomClaimId(net()?.selfId?.() ?? 'self', stamp, ++claimN) }));
   /** THE OWNER'S VERDICT LEDGER: a claim id -> what was judged; outlives the body. */
   const verdicts = makeVerdictLedger();
   /** My own dead bodies' states, by foe. */
