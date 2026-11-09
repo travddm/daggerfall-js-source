@@ -18,7 +18,7 @@
 //   - The relay reports only players over a limit (Server load), so this lists those and the ones over their budget.
 //
 // /v1/staff/monster/flag { target|name, note? } - OPENS A SPAWN CASE on the player, where the relay's own spawn findings
-// land (grants.js grantCaseLines: the `grant` tab's line, the case the reviewer's kind), as the kind the cases builder gives them ('spawn'). STAFF-PANEL5-FEEDS-FIX: ITS LINE IS WRITTEN EVERY TIME, never
+// land (grants.js grantCaseLines: the `grant` tab's line, the case the reviewer's kind), as the kind the cases builder gives them ('spawn'). ITS LINE IS WRITTEN EVERY TIME, never
 // through grantCaseLines' one line a window - that rule is the automatic findings', and a Flag on the hot spawner inside
 // one wrote nothing, its staff member's name and note dropped while it answered ok.
 import { GRANT_KINDS, GRANT_CASE_REASONS } from '../../src/net/grantLaw.js';

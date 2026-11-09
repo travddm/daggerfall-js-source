@@ -849,7 +849,7 @@ jobs:
             echo "A receipt signed by any earlier relay key is refused at the signature and expires with its week."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # SAFE5 (docs/multiplayer/chat-safety.md): THE CHAT'S SAFETY HAS ONE SECRET - the reviewer's ANTHROPIC_API_KEY
+      # THE CHAT'S SAFETY HAS ONE SECRET (docs/multiplayer/chat-safety.md): the reviewer's ANTHROPIC_API_KEY
       # (server-account/src/modAi.js), put on the Worker here on EVERY deploy from the repository's own secrets, so a key
       # changed there reaches the service on the next push. An unset one is not an error: the reviewer reads nothing
       # (MOD_AI is a switch over a key) - the cases still gather. Fed through jq: the value is never echoed, written to a

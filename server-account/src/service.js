@@ -642,7 +642,7 @@ export function poiPathOf(path) {
  *  ladder, so "what can a stranger reach?" has one answer. */
 export const OPEN_ROUTES = new Set(['/v1/health', '/v1/auth/guest', '/v1/auth/login', '/v1/auth/recover']);
 
-/** SAFE5: the chat safety's door a stranger reaches, NOT the JSON ladder's - the relay's feed of public lines. It proves
+/** The chat safety's door a stranger reaches, NOT the JSON ladder's - the relay's feed of public lines. It proves
  *  itself by a signature over its exact bytes (the relay's receipt key), never a session. */
 export const SAFE_OPEN_ROUTES = new Set(['/v1/mod/feed']);
 

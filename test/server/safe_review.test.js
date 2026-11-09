@@ -1,4 +1,4 @@
-// SAFE5: THE REVIEWER - the Messages API request the reviewer makes (its brief, its schema, its cached system prompt,
+// THE REVIEWER - the Messages API request the reviewer makes (its brief, its schema, its cached system prompt,
 // the speakers it never names), what it does with a verdict in each mode, the relay's signed feed in, the minute's clock
 // that reads the feed and the cases, and the hour's sweep. Every outside service is a stub that records what it was
 // asked; every signature is a real Ed25519 one.

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE5: THE
-// CHAT SAFETY'S CLOCK - what no request waits on. Every minute (cron.js MINUTE_JOBS 'safety'):
+// THE CHAT SAFETY'S CLOCK - what no request waits on. Every minute (cron.js MINUTE_JOBS 'safety'):
 //   1. the reviewer reads the cases reports opened or grew (TRIAGE_MAX), the most reporters who count first, and gives
 //      each its verdict on the reported account's lines - BEFORE the feed (AUDIT SAFE AI-3: the feed spent the day's
 //      calls first, and a report went unread);
@@ -30,7 +29,7 @@
 // Every hour (HOUR_JOBS 'safety-sweep'), each a page asked again while full and the budget holds (AI-7: one page of
 // 500 an hour kept the feed's lines past the privacy policy's day): the feed's batches past FEED_KEEP_S; a case left
 // open past CASE_OPEN_MAX_S closed as expired; a resolved case's lines, its reports' notes and the reviewer's reason
-// past RESOLVED_LINES_KEEP_S (DOC-1: the privacy policy's ninety days); the reviewer's daily counts past AI_DAYS_KEEP.
+// past RESOLVED_LINES_KEEP_S (the privacy policy's ninety days); the reviewer's daily counts past AI_DAYS_KEEP.
 // ═══════════════════════════════════════════════════════════════════
 
 import { reviewLines, modAiOn, modAiModeOf, flagActs, FLAG_SEVERITY, AI_WAITS } from './modAi.js';
@@ -103,7 +102,7 @@ async function actOn(ctx, env, fetchFn, caseId, targetId, flag, lines) {
 
 /**
  * A verdict kept on its case - only ever raised (a worse severity, or the same at more confidence - AI-12), with the
- * line it flagged (AI-10). A read of the case itself (`read`, the triage's) closes its claim;
+ * line it flagged. A read of the case itself (`read`, the triage's) closes its claim;
  * the feed's verdict on a case a report holds leaves that report's read due (AI-6).
  * @param {any} db @param {string} caseId @param {any} flag @param {{ at: number, sub: string }|null} line
  * @param {string} mode @param {number} nowS @param {{ read: boolean }} how

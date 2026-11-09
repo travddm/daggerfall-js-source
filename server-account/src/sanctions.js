@@ -18,8 +18,8 @@
 // so, and its own client leaves. A moderator may ban and unban; a moderator is never banned, nor muted, by anyone (MOD1's
 // `protected`).
 //
-// THE SERVICE'S DOOR TO THE RELAY (pushLaw). A moderator's /mute in the game is carried to the rooms by their own client
-// (MOD1). A mute or ban from the staff panel, or an automatic one, has no such client, so the service posts its signed order to
+// THE SERVICE'S DOOR TO THE RELAY (pushLaw). A moderator's /mute in the game is carried to the rooms by their own client.
+// A mute or ban from the staff panel, or an automatic one, has no such client, so the service posts its signed order to
 // the relay's SAFE_LAW_PATH (RELAY_LAW_URL): the hub applies it and hands it to its target's own client to carry on.
 // Never the truth - the row is - only how a room already open hears it now; a push that fails is said in the log and the
 // order lands on the target's next connection, as MOD1's always did without a key.
