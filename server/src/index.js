@@ -174,7 +174,7 @@
 // token seam is the one piece that has to be paid for, and it is paid
 // once here rather than a little at a time.
 import { routeStaffTeleport } from './staffTeleport.js';
-import { followNoted, withoutRoom, followHello, followJoined, followLeft, followSayInternal } from './staffFollow.js';   // STAFF-PANEL5-FOLLOW: the where note kept and read, and a player followed
+import { followNoted, withoutRoom, followHello, followJoined, followLeft, followSayInternal } from './staffFollow.js'; import { partyMentoring } from './partyMentoring.js';   // STAFF-PANEL5-FOLLOW: the where note kept and read, and a player followed; NO-MENTORING: the leader's switch
 import { FOLLOW_INTERNAL_SAY } from '../../src/net/staffFollow.js';
 import { takeStaffMessage } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: a staff message's nudge, to one account's own hub sockets
 import { cellDoor, cellCall, nodeHeard, cellLevelOf, coverOf, inCover, junkOutsideCover, atCover, cellsWelcome } from './cellNodes.js';   // COST-2: a cell's node, the directory, the node an object is told; part two: a call that names a cell, through the tree
@@ -9701,7 +9701,7 @@ export class Room {
       if (pm) { p = withoutRoom(pm); delete p.at; }   // STAFF-PANEL5-FOLLOW: its room is the staff's to read, never a member's (staffFollow.js)
       return { ...this._rowOf(id, recs.get(id), now, except), p };
     });
-    return { id: party.id, leader: party.leader, members };
+    return { id: party.id, leader: party.leader, members, ...(party.nm === 1 ? { nm: 1 } : {}) };   // NO-MENTORING: the leader's switch rides the view
   }
   /** The party to every member's sockets, `except` one. */
   async _sayParty(party, now, except = null) {
@@ -9906,7 +9906,7 @@ export class Room {
       case 'party.decline': return this._partyDecline(me, rec, m.party, now);
       case 'party.leave': return this._partyLeave(me, rec, now);
       case 'party.kick': return this._partyKick(me, rec, m.acct, now);
-      case 'party.lead': return this._partyLead(me, rec, m.acct, now);   // PARTY-LEAD
+      case 'party.lead': return this._partyLead(me, rec, m.acct, now); case 'party.mentoring.off': case 'party.mentoring.on': return partyMentoring(this, me, rec, m.k === 'party.mentoring.on', now);   // PARTY-LEAD; NO-MENTORING
       default: return 'unknown act';
     }
   }

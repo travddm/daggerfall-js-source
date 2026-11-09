@@ -39,8 +39,11 @@ export function createMentorHost(deps) {
     const me = deps.player();
     if (!me) return;
     const social = deps.social();
-    if (!social?.party) presence.reset();   // leaving the party is a deliberate act: I am myself again the same frame
-    const mates = social?.party ? social.others() : [];
+    // leaving the party is a deliberate act: I am myself again the same frame. NO-MENTORING (decision #70): so is the
+    // leader's "no mentoring" - nobody is mentored and nobody is a pupil while it stands
+    const mentoring = !!social?.party && social.party.nm !== 1;
+    if (!mentoring) presence.reset();
+    const mates = mentoring ? social.others() : [];
     const member = (acct) => mates.some((m) => m.acct === acct);
     const levels = presence.levels(nearPartners(mates), nowMs, { fighting, member });
     const word = refreshMentor(me, levels);

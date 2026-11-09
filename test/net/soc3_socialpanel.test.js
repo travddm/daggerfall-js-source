@@ -7,6 +7,7 @@
 // would have said.
 //
 // Each pin names the mutants it kills.
+import { noMentoringText, mentoringOffText, mentoringOnText } from '../../src/ui/partyMentoring.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -1173,4 +1174,25 @@ test('PARTY-READY: the Party tab the travel map took comes back when the map clo
   panel.open(); find(root, 'dfsocial-tab')[0].fire('click');
   panel.render({ covered: true }); panel.render();
   assert.equal(panel.isOpen(), false, 'the cover over another tab keeps it closed');
+});
+
+test('NO-MENTORING (decision #70): the leader is offered No mentoring and, once set, Allow mentoring; every member reads the line while it stands; a member gets no switch', () => {
+  const party = { id: 'q-1', leader: 'acct-me', members: [member('me', { acct: 'acct-me', name: 'Mac' }), member('Bob')] };
+  const { social, panel, root, sent } = build({ frame: stateFrame({ party }) });
+  panel.open();
+  find(root, 'dfsocial-tab')[1].fire('click');
+  const switchOf = () => bodyRows(root).map((r) => btnBy(r, mentoringOffText()) ?? btnBy(r, mentoringOnText())).find(Boolean) ?? null;
+  assert.equal(find(root, 'dfsocial-nomentor').length, 0, 'mentoring stands: no line');
+  switchOf().fire('click');
+  assert.deepEqual(sent, [{ k: 'party.mentoring.off' }]);
+  social.apply({ t: 'social', k: 'party', party: { ...party, nm: 1 } });
+  panel.render();
+  assert.equal(one(root, 'dfsocial-nomentor').textContent, noMentoringText());
+  assert.equal(switchOf().textContent, mentoringOnText());
+  switchOf().fire('click');
+  assert.deepEqual(sent.at(-1), { k: 'party.mentoring.on' });
+  social.apply({ t: 'social', k: 'party', party: { ...party, leader: 'acct-Bob', nm: 1 } });
+  panel.render();
+  assert.equal(switchOf(), null, 'a member has no switch');
+  assert.equal(one(root, 'dfsocial-nomentor').textContent, noMentoringText(), 'and still reads the line');
 });
