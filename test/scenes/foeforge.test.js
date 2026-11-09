@@ -150,12 +150,11 @@ test('FOE-FORGE executed: a peer\'s elites - an honest owner\'s stand as elites;
 
 test('FOE-FORGE executed: a peer\'s revenants - a forged frame naming twenty stands PEER_REVENANT_PUPPETS_MAX, and only those take the record\'s blows', async () => {
   const reader = pool(READER);
-  await send(reader, FORGER, { f: seqs(0, 20).map((i) => rec(i, { nm: `Rev ${i}`, rb: 4000, p2: 1 })) });
+  await send(reader, FORGER, { f: seqs(0, 20).map((i) => rec(i, { nm: `Rev ${i}` })) });
   const stood = reader.foes.filter((f) => f.puppet === FORGER && !f.dead);
   assert.equal(stood.length, 20);
   const revs = stood.filter((f) => f.entity.revenant);
   assert.equal(revs.length, PEER_REVENANT_PUPPETS_MAX);
-  assert.ok(revs.every((f) => f.entity.damageScale > 4), 'a believed revenant strikes as its record says (x4, its second phase x1.2)');
   assert.ok(stood.filter((f) => !f.entity.revenant).every((f) => !(f.entity.damageScale > 1)), 'the rest strike as their plain kind');
 });
 

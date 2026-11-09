@@ -40,7 +40,7 @@ test('TELL1: the table is the arc\'s section 27 (mutants: any number moved)', ()
     WEIGHT_MEDIUM: 200, WEIGHT_HEAVY: 700, WEIGHT_MASSIVE: 1500, POISE_FLOOR_MASSIVE: 60,
     POISE_ELITE: 1.5, POISE_ELITE_DUNGEON: 1.25, POISE_CHAMPION: 1.25, POISE_STALWART: 1.5, POISE_REVENANT_RANK: 0.1,
     K_BLUNT: 1.5, K_AXE: 1.25, K_LONG_BLADE: 1.0, K_SHORT_BLADE: 0.7, K_HANDS: 0.6, K_CLAWS: 1.0, K_TWO_HANDED: 1.15,
-    K_ARROW: 0.5, K_SPELL: 0.75, K_PEER: 1, POISE_BACK: 1.5, BACK_DEG: 110, POISE_WEAK: 2,
+    K_ARROW: 0.5, K_SPELL: 0.75, K_PEER: 1, POISE_BACK: 1.5, BACK_DEG: 110,
     STAGGER_S: { light: 1.4, medium: 1.2, heavy: 1.0, massive: 0.8 },
     STAGGER_KNOCK: 1.5, STAGGER_TAKEN: 1.25, STAGGER_IMMUNE: 3,
     GLINT_PULSE: 0.9, GLINT_PULSE_S: 0.15, GLINT_STEADY: 0.2, TELL_NOW: 0.2, GLINT_REDUCED: 0.45, RELEASE_LEAD: 0.25,
@@ -109,7 +109,7 @@ test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite
   const r = { id: 'x', name: 'Grushnak the Butcher', rank: 2, returns: 0, history: [] };
   const re = { maxHealth: 40, health: 40 };
   rv.applyRevenant(re, r, { now: 0 });
-  assert.equal(re.healthMult, 1.8); assert.equal(kindHealth(re), 40);
+  assert.equal(re.healthMult, 1 + rv.REVENANT_HEALTH_PER_RANK * r.rank); assert.equal(kindHealth(re), 40);
 });
 
 test('TELL1: a blow\'s class - blunt, axe, long blade, short blade, hands, claws, two-handed on top, an arrow, a spell\'s landing (its round nothing), a peer\'s, nothing else', () => {
@@ -132,7 +132,7 @@ test('TELL1: a blow\'s class - blunt, axe, long blade, short blade, hands, claws
   assert.equal(blowK({ kind: 'fall' }), 0);
 });
 
-test('TELL1: from behind - more than 110 degrees off the locked facing; the weight is its damage by its class, half again from behind, double its weakness', () => {
+test('TELL1: from behind - more than 110 degrees off the locked facing; the weight is its damage by its class, half again from behind', () => {
   const o = [0, 0, 0];
   assert.equal(behind(o, 0, [0, 0, 2]), false, 'ahead');
   assert.equal(behind(o, 0, [2, 0, 0]), false, 'beside');
@@ -145,7 +145,6 @@ test('TELL1: from behind - more than 110 degrees off the locked facing; the weig
   assert.equal(behind(o, 0, o), false); assert.equal(behind(null, 0, o), false);
   assert.equal(blowWeight(10, 1.5), 15);
   assert.equal(blowWeight(10, 1.5, { back: true }), 22.5);
-  assert.equal(blowWeight(10, 1, { weak: true }), 20);
   assert.equal(blowWeight(0, 1.5), 0); assert.equal(blowWeight(10, 0), 0);
 });
 

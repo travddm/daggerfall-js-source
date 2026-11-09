@@ -33,8 +33,8 @@
 import { savingThrow, rollMagnitude, EFFECT_FLAGS, careerTolerance, isDamageHealthEffect } from './spellcast.js';   // BAL9: the damage-health pair a pierce reads
 import { mentorDamageTakenMult } from './mentorMode.js';   // SOFTCAP2: a leaf
 import { spellPowerMult, spellPierce, schoolMult } from './spell/spellPower.js';   // BAL9: my damage spell's power and pierce (a leaf); SCHOOLS2: every school past 100
+import { cureKeepsInfection } from './cureKeepsInfection.js';   // INFECTION-KEPT: DFU's cure ends every disease unless the player chose otherwise
 import { castSchool } from './spellcost.js';   // SCHOOLS3: the school an effect is cast in (a signature spell's path's)
-import { noteFeudHarm, elementFeudClass } from './feudLedger.js';   // RVN1: my spell's round, in its fight's ledger (a leaf)
 import { raceById, raceByKey } from './races.js';   // L2-slice (magic-10): the racial immunity arm
 import { STAT_KEYS_ORDER, FATIGUE_MULTIPLIER, maxFatigue, increaseDrainMagnitude, liveStat } from './statMods.js';
 import { dice100 } from '../combat/formulas.js';
@@ -589,14 +589,11 @@ export function cureAllOfKind(target, kind, keepInfections = false) {
   if (target?.activeEffects) target.activeEffects = target.activeEffects.filter((a) => a.kind !== kind || (keepInfections && !!a.infection));
 }
 export const cureAllDiseases = (t) => cureAllOfKind(t, 'disease');
-/** FIELD BUGS 29h (INFECTION-KEPT; Julian: "during this time i had gotten another disease from a dungeon and had to cure
- *  it which likely wiped my lycanthropy progress"): A CURE OF DISEASE TAKES THE PLAIN
- *  DISEASES FIRST. DFU stores a lycanthropy or vampirism infection as a disease bundle, and CureAllDiseases ended it
- *  with the plague caught beside it. While a plain disease runs, a cure (the temple's, a spell's, a potion's) ends the
- *  plain ones and leaves the infection to its turn; a cure with nothing else to end ends the infection, so curing it
- *  before the turn still saves a player who does not want it. The turn's CureAll of the old life
- *  (lycanthropy.js endOldLifeEffects) still ends every disease there is. */
-export const plainDiseaseLive = (t) => (t?.activeEffects ?? []).some((a) => a.kind === 'disease' && !a.ended && !a.infection);
+/** INFECTION-KEPT: DFU stores a lycanthropy or vampirism infection as a disease bundle, and CureAllDiseases ends it with
+ *  the plague caught beside it. With the Cure keeps infection option on and a plain disease running, a cure (temple,
+ *  spell, potion) ends the plain ones first and leaves the infection to its turn; a cure with nothing else to end ends the
+ *  infection. The turn's CureAll of the old life (lycanthropy.js endOldLifeEffects) still ends every disease. */
+export const plainDiseaseLive = (t) => cureKeepsInfection() && (t?.activeEffects ?? []).some((a) => a.kind === 'disease' && !a.ended && !a.infection);
 export const cureDiseasesInfectionsLast = (t) => cureAllOfKind(t, 'disease', plainDiseaseLive(t));
 export const cureAllPoisons = (t) => cureAllOfKind(t, 'poison');
 export const cureParalyzation = (t) => cureAllOfKind(t, 'paralyze');
@@ -723,9 +720,6 @@ function runEffectRound(a, target, sinks, rolls) {
     // DUEL1: and the entry's duel tag rides along - a duel's damage over time (bundleDuel) stops at the duel's floor
     if (n > 0 && target?.isPlayer && a.caster && !a.caster.isPlayer) markPlayerHarm(a.caster);   // REVENANT-HARM: the round that may be the death is its caster's
     if (n > 0 && sinks.hurt) sinks.hurt(n, { fromPlayer: !a.caster || !!a.caster.isPlayer, bundleDuel: !!a.bundleDuel, round: true, element: a.element ?? null });   // TELL1: a round, not a landing - it weighs nothing on a wind-up's poise; BOSS-TRAITS: its element (a resistance reads it)
-    // RVN1 (Feud-Arc.md section 12): MY round on a foe goes in its fight's ledger by its element (the provenance law
-    // above - no caster is mine; a peer's stand-in, a foe's, never)
-    if (n > 0 && target && !target.isPlayer && (!a.caster || (a.caster.isPlayer && !a.caster.peer))) noteFeudHarm(target, elementFeudClass(a.element), n);
     handleAttackFromSource(a.caster);   // DamageHealthFromSource's tail, wave 31
   } else if (a.kind === 'continuousDamageSpellPoints') {
     const n = effectMagnitude(a.effect, a.casterLevel, a.saveScaled ?? true, a.element, a.flag, target, rolls);

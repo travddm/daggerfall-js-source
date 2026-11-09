@@ -72,3 +72,10 @@ export const legacyModelScreen = (onAnswer, { online = isOnlinePage() } = {}) =>
   options: legacyModelOptions({ online }), text: online ? LEGACY_CHOICE_TEXT : LEGACY_MODEL_TEXT,
   faceText: online ? LEGACY_CHOICE_FACE : LEGACY_MODEL_FACE, faceTags: LEGACY_MODEL_TAGS, stacked: online,
 });
+
+/** CHARACTER MODES: the question put to a character who chose the Legacy mode - the two models only (the mode question
+ *  already decided there is a house), online as offline. */
+export const legacyModelOnlyScreen = (onAnswer, { online = isOnlinePage() } = {}) => new ChoiceScreen(onAnswer, {
+  options: legacyModelOptions({ online }).filter((o) => o.id !== NO_LINEAGE), text: LEGACY_MODEL_TEXT,
+  faceText: LEGACY_MODEL_FACE, faceTags: LEGACY_MODEL_TAGS, stacked: false,
+});

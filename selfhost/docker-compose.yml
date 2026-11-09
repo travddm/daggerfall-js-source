@@ -1,0 +1,55 @@
+# One machine: workerd serving the relay, the account service and their shims; Caddy in front with TLS; and a cron
+# sidecar that fires the account service's schedules through its cron door. No cluster mode.
+#
+#   node selfhost/keys.ts                 # once: writes selfhost/.env (keys and the cron secret)
+#   DFO_RELAY_HOST=relay.example.org DFO_ACCOUNTS_HOST=accounts.example.org docker compose -f selfhost/docker-compose.yml up -d --build
+#
+# Options: GENERATE_FLAGS="--metrics" binds METRICS to the sink; GENERATE_FLAGS="--r2 s3" keeps saves in S3 (set the
+# S3_* variables in .env). Data lives in the `dfo-data` volume.
+name: dfo-selfhost
+
+services:
+  workerd:
+    build:
+      context: ..
+      dockerfile: selfhost/Dockerfile
+      args:
+        GENERATE_FLAGS: ${GENERATE_FLAGS:-}
+    image: dfo-selfhost:local
+    env_file: .env
+    volumes:
+      - dfo-data:/data
+    expose:
+      - '8787'
+      - '8788'
+    restart: unless-stopped
+    stop_grace_period: 10s
+
+  cron:
+    image: dfo-selfhost:local
+    depends_on:
+      - workerd
+    env_file: .env
+    environment:
+      CRON_DOOR: http://workerd:8788/__cron
+    command: ['node', '/dfo/selfhost/cron/sidecar.ts']
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.10.2
+    depends_on:
+      - workerd
+    environment:
+      DFO_RELAY_HOST: ${DFO_RELAY_HOST:-relay.localhost}
+      DFO_ACCOUNTS_HOST: ${DFO_ACCOUNTS_HOST:-accounts.localhost}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    restart: unless-stopped
+
+volumes:
+  dfo-data:
+  caddy-data:

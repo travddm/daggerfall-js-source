@@ -9,7 +9,7 @@ import { TOWN_URL, enterTown, nativeClick, clearBoxes } from './lib/town.mjs';
 export const name = 'travel';
 
 export async function run({ browser, base, ck }) {
-  const g = new Game(browser, base);
+  const g = new Game(browser, base, { drawless: true });
   const travelState = () => g.J(() => window.__travelProbe());
   const travelMap = () => g.J(() => window.__travelMap());
   try {

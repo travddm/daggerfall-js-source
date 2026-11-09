@@ -22,17 +22,25 @@ const VIEWPORT = { width: Number(process.env.PROBE_W || 640), height: Number(pro
 /** PROBE_LIGHT=1: the light settings in Game.open. Off unless asked for. */
 const LIGHT = process.env.PROBE_LIGHT === '1';
 
+/**
+ * PROBE_NODRAW=1: a probe that opened its Game with `drawless: true` runs with the WebGL draw calls stubbed out. Such a probe
+ * reads game state through the `?shot` hooks and the page's DOM, never pixels. The simulation, the loading, the input and the
+ * UI keep running; the software GL, which does most of the work of a frame, does none. Off unless asked for.
+ */
+const NODRAW = process.env.PROBE_NODRAW === '1';
+
 const SWIFTSHADER_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
 /**
  * Starts a server on `port`. PROBE_DIST (a folder from tools/probes/build.mjs) serves the built game with `vite preview`;
- * a dev server transforms thousands of modules on first load, in every run, and that is minutes on CI. A probe that
- * passes `plugins` (edits to the source) needs the dev server and gets it whatever PROBE_DIST says.
+ * a dev server transforms thousands of modules on first load, in every run, and that is minutes on CI. A probe that has
+ * `plugins` (edits to the source, `online`) needs a build made with them: `build.mjs --online`. Without PROBE_DIST every
+ * probe gets the dev server with its plugins.
  * HMR and the watcher are off on the dev server: a reload under a probe destroys its page.
  */
 export async function serve({ port, plugins = [] }) {
   const dist = process.env.PROBE_DIST;
-  if (dist && !plugins.length) {
+  if (dist) {
     const server = await preview({
       root: ROOT,
       configFile: join(ROOT, 'vite.config.js'),
@@ -83,13 +91,15 @@ export function ledger(name) {
  * HTTP errors from a local origin) are collected; `noErrors()` checks them against ALLOWED_ERRORS.
  */
 export class Game {
-  constructor(browser, base, { viewport = VIEWPORT, lightPrefs = {}, ...ctxOpts } = {}) {
+  constructor(browser, base, { viewport = VIEWPORT, lightPrefs = {}, drawless = false, ...ctxOpts } = {}) {
     this.browser = browser;
     this.base = base;
     this.viewport = viewport;
     this.ctxOpts = ctxOpts;
     /** Prefs a probe that asserts nothing about them lets PROBE_LIGHT turn off (enhancedWater, cloudQuality ...). */
     this.lightPrefs = lightPrefs;
+    /** True for a probe that reads no pixels: PROBE_NODRAW then stubs the draw calls. */
+    this.drawless = drawless;
     this.errors = [];
     /** Console lines and the local requests that failed or answered 4xx/5xx, for `diagnostics()`. */
     this.trace = [];
@@ -131,6 +141,21 @@ export class Game {
             /* no storage */
           }
         }, this.lightPrefs);
+      if (NODRAW && this.drawless)
+        await this.context.addInitScript(() => {
+          for (const C of [window.WebGLRenderingContext, window.WebGL2RenderingContext]) {
+            if (!C) continue;
+            for (const m of [
+              'drawArrays',
+              'drawElements',
+              'drawArraysInstanced',
+              'drawElementsInstanced',
+              'drawRangeElements',
+              'clear',
+            ])
+              if (C.prototype[m]) C.prototype[m] = function noDraw() {};
+          }
+        });
       if (init) await this.context.addInitScript(init.fn, init.arg);
       // hermetic: the game phones the live account service (/v1/poi/live) even offline; a probe never reaches it
       await this.context.route(

@@ -177,7 +177,7 @@ test('audit18 sweep: all three spawn sites run the one shared equip chain', () =
     if (name === 'hostCombat.js') continue;   // the one shared home
     assert.equal(/assignEnemyEquipment\(|\bequipEnemy\(/.test(src), false, `${name} keeps a private copy of the equip chain`);
   }
-  assert.match(hostSrc('hostCombat.js'), /^  const eq = equipEnemy\(entity, mobileType, effectiveLevel\(player\), rolls, \{ player \}\);   \/\/ SOFTCAP2/m, 'the seam runs the shared chain (RRI2: the player rides in for a mod\'s assigner)');
+  assert.match(hostSrc('hostCombat.js'), /^  const eq = equipEnemy\(entity, mobileType, effectiveLevel\(player\), rolls, \{ player, humanoidShare \}\);   \/\/ SOFTCAP2/m, 'the seam runs the shared chain (RRI2: the player rides in for a mod\'s assigner)');
 });
 
 // ---------------------------------------------------------------

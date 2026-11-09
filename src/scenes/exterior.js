@@ -146,7 +146,7 @@ import { createRestWindow } from '../ui/restDoor.js';   // RESTDOOR1: the enhanc
 import { DecisionBoxWindow } from '../ui/decisionBox.js';   // REST-WARN2: the Plus decision box
 import { restAilmentLines } from '../systems/rest/restWarning.js';   // REST-WARN: the fourth host's rest asks too
 import { setEnemyAlert, areEnemiesNearby, intermittentEnemySpawn, fightNear } from '../systems/encounters.js';
-import { revenantToReturn, revenantSpawnOptions, revenantPresence, takeRevenantNotice, revenantSay, releaseRevenantStand, revenantRoutSweep, revenantRoutedEvent } from '../systems/revenant/revenant.js';   // REVENANT: the world host's twin - who comes back, and what the player is told
+import { revenantToReturn, revenantSpawnOptions, revenantPresence, takeRevenantNotice, revenantSay, releaseRevenantStand } from '../systems/revenant/revenant.js';   // REVENANT: the world host's twin - who comes back, and what the player is told
 import { createStandingWatch, installLegalNotices } from './standingHost.js';   // REP1: the watch's stop; REP5: the law's notices
 import { setForagingHost } from '../systems/foraging/foragingInstall.js';   // FORAGE1: Foraging's reaches into the world, this host's answers
 import { questActionsExtensionTemplates } from '../systems/quest/questActionsExtension.js';   // FORAGE1: QAE's four actions
@@ -2110,7 +2110,6 @@ export async function bootExterior(canvas, renderer, params, status) {
     spellsByIndex: () => spellsByIndex,
     magicHooks: {
       explodeAt: (...a) => magic.explodeAt(...a),
-      strikePlayer: (spell, casterLevel, foe) => { if (walkMode) magic.strikePlayerFrom(spell, casterLevel, foe); },   // RVN5: a revenant's pyre - its blast on me through the one cast engine (fireMissile's gate)
       fireMissile: (from, spell, casterLevel, foe, aimAt = null) => {   // AUDIT WORLD6b-iii(a) C3: the aim point the executor hands (a peer's transform), my LIVE transform otherwise (AUDIT 62 F21) - world.js's law, through the ONE helper; this host dropped the point
         if (!walkMode) return;
         magic.fireEnemyMissile(from, missileAimDirection(from, aimAt ?? targetAimPoint(null, player.pos, player.height)), spell, casterLevel, foe);
@@ -2686,7 +2685,7 @@ export async function bootExterior(canvas, renderer, params, status) {
    *  them, and so does the broker fan-out below - one set of doors per
    *  entity, exactly as one EntityEffectManager per entity. */
   const foeSinks = (g, fromPlayer = true) => ({   // AUDIT WORLD6b-iii(a) B2: the engine's provenance, world.js's line
-    hurt: (n, o) => { const fp = o?.fromPlayer ?? fromPlayer; if (n > 0) (g._encounter ? exteriorFoes.damageFoe(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', whole: !!o?.whole, round: !!o?.round, element: o?.element ?? null }) : cityGuards.hurtGuard(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', round: !!o?.round })); },   // RVN3: a Disintegrate's kill a kill here too (world.js's line), a landing's element   // AUDIT 68 review: a round's tick says whose it is, world.js's line   // ROAD-G G2: route by pool, world.js's line
+    hurt: (n, o) => { const fp = o?.fromPlayer ?? fromPlayer; if (n > 0) (g._encounter ? exteriorFoes.damageFoe(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', whole: !!o?.whole, round: !!o?.round, element: o?.element ?? null }) : cityGuards.hurtGuard(g, n, player.pos, null, { fromPlayer: fp, kind: 'spell', round: !!o?.round })); },   // AUDIT 68 review: a round's tick says whose it is, world.js's line   // ROAD-G G2: route by pool, world.js's line
     heal: (n) => { if (n > 0) g.entity.health = Math.min(g.entity.maxHealth ?? Infinity, g.entity.health + n); },
     drainMagicka: (n) => { if (n > 0) g.entity.magicka = Math.max(0, (g.entity.magicka ?? 0) - n); },
     restoreMagicka: (n) => { if (n > 0) g.entity.magicka = Math.min(g.entity.maxMagicka ?? Infinity, (g.entity.magicka ?? 0) + n); },
@@ -2801,9 +2800,6 @@ export async function bootExterior(canvas, renderer, params, status) {
       // PlayerEnterExit.cs:860); inside a dungeon DFU caches nothing at
       // all and takes TransitionDungeonExteriorImmediate (:151).
       if ((modes?.mode ?? 'exterior') !== 'exterior') {
-        // RVN10 (21.2): out of a fight - the mode's pool I leave asked before its
-        // teardown (the street's own pool stays: a jump within it is the distance's to judge)
-        for (const { r, f } of revenantRoutSweep(playerEntity)) revenantSay(revenantRoutedEvent(r, { archive: f.archive ?? f.mobileArchive ?? null }), (l) => townTalk.say(l));
         modes?.forceExitToExterior({ cacheScene: plan.cacheScene === 'building' });
       }
       // RestorePositionHelper's three arms (PlayerEnterExit.cs:622-655),
@@ -6042,7 +6038,7 @@ export async function bootExterior(canvas, renderer, params, status) {
         playerEntity, playerWeapon: weaponRig.playerWeapon, playerFeet: player.pos,
         dealDamage: (f, d) => (cityGuards.guards.includes(f)
           ? cityGuards.hurtGuard(f, d, player.pos, m.dir, { kind: 'arrow' })   // AUDIT-39r: WeaponManager's KnockbackDirection, the missile's forward; TELL1: a shaft's weight on a wind-up
-          : exteriorFoes.damageFoe(f, d, player.pos, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })),   // AUDIT FEUD 2: the bow (a metal weakness rides to a puppet's owner)   // WORLD6b-iii(e): the kind rides the hit - a puppet's owner lands the shaft (ar), as the dungeon's host has since WORLD3
+          : exteriorFoes.damageFoe(f, d, player.pos, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })),   // WORLD6b-iii(e): the kind rides the hit - a puppet's owner lands the shaft (ar), as the dungeon's host has since WORLD3
         audio, hitEffects, say: (l) => townTalk.say(l),
         onInflictPoison: (att, tgt, pt) => (cityGuards.guards.includes(t) ? inflictPoison(tgt, pt, false, { currentMinute: Math.floor(playerTicker.ownMinutes) }) : exteriorFoes.poisonFoe(t, pt)),   // WORLD6b-iii(e): the pool's one poison door - a puppet's dose rides the hit to its owner; the watch is dosed here (the player's own)
         // AUDIT 58: WeaponManager.cs:630's HandleAttackFromSource sits

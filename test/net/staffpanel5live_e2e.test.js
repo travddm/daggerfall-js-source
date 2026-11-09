@@ -4,10 +4,10 @@
 // them (server-account/src/staffFollow.js). No step stubbed between the panel's pick and the camera. The freeze: the
 // service's signed order through the Worker's law door, the target's hub link told `frozen` and its lease handed to its
 // cell (scenes/chatSafetyHost.js), and a second player in the cell who must see them stand still.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { fakeRooms, roomSigner } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, roomKeyFor } from '../../src/net/online.js';
 import { reconnectWave } from '../../src/net/reconnectWave.js';
 import { SOCIAL_ROOM, PIXEL_UNITS, isSocialRoom } from '../../src/net/wire.js';
@@ -16,6 +16,7 @@ import { createStaffHook } from '../../src/net/staffHook.js';
 import { mintToken, mintFreezeOrder } from '../../src/net/identityToken.js';
 import worker from '../../server/src/index.js';
 import { SAFE_LAW_PATH } from '../../server/src/relay.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn, log: console.log }; console.info = console.warn = console.log = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 const turn = () => new Promise((r) => setImmediate(r));

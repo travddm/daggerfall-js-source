@@ -29,8 +29,7 @@ Message:  1012
  what became of a letter he sent to the Queen of
  Daggerfall. I am to make for the city of
  Daggerfall in the Iliac Bay, where his agent will
- find me. His writ pays my passage on any ship
- bound there.
+ find me.
 
 Message:  1020
 <ce>      A courier in the Emperor's colors found
@@ -64,10 +63,6 @@ Message:  1030
  throne. Speak of this to no one. Make for the
  city of Daggerfall, and burn this letter there.
  Our agent will find you.
- 
-     This letter is Our writ of passage. Any master
- in a harbor of the Empire will carry you to
- Daggerfall at Our expense.
  
 <ce>                    Uriel Septim VII
 

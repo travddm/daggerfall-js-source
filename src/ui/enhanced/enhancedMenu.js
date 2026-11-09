@@ -205,7 +205,6 @@ import { keyCodeForDomCode, KEYCODE_NONE } from '../../systems/keyCodes.js';   /
 import { isOnlinePage, onlineForcedPref, onlineForcedModSetting, onlineForcedSetting, onlineWholeModKey, ONLINE_ROOM_MOD_KEYS } from '../../systems/online/onlineLane.js';   // OL1: online is the enhanced lane, whole - a forced switch is shown locked   // ROADS 24; DS1: the integer keys; UL1: the choice keys
 import { onlineSyncPlan, applyOnlineSync, lastOnlineSync, undoOnlineSync } from '../../systems/online/onlineSync.js';   // UXB1-E: the room's rules, copied home
 import { CREDITS, translationCredits } from '../credits.js';   // CR1: who made what the port carries
-import { SUPPORT_ASKS } from '../supportAsks.js';   // SUPPORT1: the project's asks - the website's corner and this door's
 import { t, tIn, currentLocale, localeInfo, localeTable, availableLocales, BASE_LOCALE, localizedText, formatText } from '../../systems/textManager.js';   // L10N1b: the port's own strings, the language row and the first-run offer; L10N3d: DFU's Internal_Strings
 import { localeForBrowser, catalogLocale } from '../../systems/localeCatalog.js';   // L10N1b
 // FIX-F: the
@@ -246,7 +245,6 @@ import { ownIcon } from '../../systems/ownGlyphs.js';   // WITCH1: the icon the 
 import { cloudIo, cloudList, pushSlot, pullSlot, removeCloudSlot, cloudOnly, slotKeyOf, cloudRefusalText } from '../../systems/cloudSaves.js';   // ACC2: the backup a tile can offer, AUDIT-312 F1's delete, and ACC2c's download of a save that is only up there
 import { serviceBase, storedSession } from '../../net/accountClient.js';
 import { isBountyQuestId, abandonBountyQuest, shareBountyQuest, bountyQuestShareable } from '../../systems/bounty/bountyJournal.js';   // BOUNTY1: a bounty in the journal - its Abandon and its Share
-import { isHuntQuestId, abandonHuntQuest } from '../../systems/huntJournal.js';   // RVN7c: a revenant's hunt in the journal - its Abandon
 import { liveBundles, canEndBundle, endBundle } from '../../systems/mysticism.js';   // BUFF-END: the Stats page's Effects - the ONE bundle walk, and which the player may end
 import { maxRoundsRemaining } from '../hud/hudActiveSpells.js';   // BUFF-END: a bundle's rounds, as the HUD reads them
 
@@ -1191,27 +1189,6 @@ function profileMark() {
     face: portraitOf(save),   // WITCH1: the icon worn, else the face
     onOpen: () => { accountOpen = true; render(); },
   });
-}
-
-/** SUPPORT1: THE ASKS, top-left of the
- *  door - the one corner it had free. An icon a platform, its mark drawn by ui/supportAsks.js exactly as the website's
- *  corner draws it, its name on the pointer's tooltip and in what a screen reader says. Each is a LINK out of the game,
- *  never a press the door acts on: a new tab on the web, the system browser from the desktop app (app/main.cjs hands
- *  http(s) there), as the credits' links and TERMS1's documents open. */
-function supportMarks() {
-  const nav = el('nav', 'px-support');
-  nav.setAttribute('aria-label', 'Support');
-  for (const ask of SUPPORT_ASKS) {
-    const a = el('a', `px-supportlink px-support-${ask.id}`);
-    a.href = ask.url; a.target = '_blank'; a.rel = 'noopener';
-    a.title = ask.label;
-    a.setAttribute('aria-label', ask.label);
-    const mark = el('i', `supmark supmark-${ask.id}`);
-    mark.setAttribute('aria-hidden', 'true');
-    a.append(mark);
-    nav.append(a);
-  }
-  return nav;
 }
 
 /** The window itself, wearing the pause window's own frame. */
@@ -4487,9 +4464,6 @@ function renderHome() {
   // ACC1f: the profile mark, top-right - the corner the foot's About
   // box does not use.
   home.append(profileMark());
-  // SUPPORT1: the asks, top-left - the front door's alone; PX4 keeps the
-  // pause face to its window, so they are not drawn over a game.
-  home.append(supportMarks());
   // L10N1b: the first-run language offer, in the top-left corner nothing else uses
   const offer = languageOffer();
   if (offer) home.append(offer);
@@ -4732,7 +4706,7 @@ function pauseHoldings(body) {
     // first, as the sheet's doors do (PX25/ESC-BOOK), and comes back if the door opened nothing (AUDIT 27h A4)
     fleet: (d) => drawFleetPage(d, render, { ...kit, door: (fn) => { handoff(fn); } }),   // AUDIT SEASON-BOOK S3: the handoff's one home
     captain: (d) => drawCaptainPage(d, render, { ...kit, door: (fn) => { handoff(fn); }, growth: () => { setGrowthSection('captain'); pauseTab = 'growth'; render(); } }),   // CAPT-LOG: the crowns' regard, the letter, the contracts, the log - CAPTAIN-TREE: the stars' door, the Fleet's shape
-    companions: (d) => drawCompanionsPage(d, render, { ...kit, kindName: enemyDisplayName, here: swornBodyOf, stars: typeof hooks.openRevenantStars === 'function' ? hooks.openRevenantStars : null }),   // COMPANION-ROSTER - RVN-STARS: a sworn one's stars, over this window
+    companions: (d) => drawCompanionsPage(d, render, { ...kit, kindName: enemyDisplayName, here: swornBodyOf }),   // COMPANION-ROSTER
     revenants: (d) => drawRevenantsPage(d, render, { ...kit, player: playerEntity, kindName: enemyDisplayName }),   // REVENANT-PAGE
     stores: (d) => drawStoresPage(d, render, kit),   // PROF1
     collections: (d) => drawCollectionsPage(d, render, { ...kit, player: playerEntity, account: newAccountFlow }),   // COLLECTIONS: the codex and the cards - COLLECTIONS-II: and the account's wardrobe, read through its own flow
@@ -5787,22 +5761,6 @@ function pauseQuests(body) {
         if (bountyAbandonArmed !== sel.id) { bountyAbandonArmed = sel.id; render(); return; }
         bountyAbandonArmed = null;
         abandonBountyQuest(sel.id);
-        questSel = null;
-        render();
-      };
-      acts.append(ab);
-      detail.append(acts);
-    }
-    // RVN7c (18.3): a hunt's one press - Abandon (twice, as a bounty's): its lair forgotten
-    if (sel.entries && isHuntQuestId(sel.id)) {
-      const acts = el('div', 'px-qacts');
-      acts.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin:6px 0 8px';
-      const armed = bountyAbandonArmed === sel.id;
-      const ab = el('button', 'act', armed ? t('pause.journal.abandonArmed', 'Click again to abandon') : t('pause.journal.abandonHunt', 'Abandon hunt'));   // QUEST-AUDIT III SHELF-WORDS
-      ab.onclick = () => {
-        if (bountyAbandonArmed !== sel.id) { bountyAbandonArmed = sel.id; render(); return; }
-        bountyAbandonArmed = null;
-        abandonHuntQuest(sel.id);
         questSel = null;
         render();
       };

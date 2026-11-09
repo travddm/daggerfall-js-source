@@ -1,6 +1,7 @@
 // TECH1: THE TECHNIQUES AS LINES - the roster's one table (combat/technique/techniqueRoster.js),
 // the line on the weapon (systems/loot/lootRarity.js AFFIX_KINDS.technique), its draw at a door's END (Loot-II law 9), the
 // Reforge, the hone and the card, and the item law that judges it (systems/item/itemLaw.js - the account service's too).
+import '../techniquesLinked.js';
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

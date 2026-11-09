@@ -1,6 +1,9 @@
 // Builds the game once for the probes and the in-game checks (docs/testing/game-probes.md, "Speed").
 //
-//   node tools/probes/build.mjs [outDir]     default outDir: scratch/probe-dist
+//   node tools/probes/build.mjs [outDir] [--online]     default outDir: scratch/probe-dist
+//
+// --online builds with the online probe's in-memory edits of the source (08-online.mjs plugins): that probe's page needs
+// three seams the shipped game does not have. Such a build serves only that probe.
 //
 // A Vite dev server transforms every module on its first request, in every run, and a probe's page asks for
 // thousands of them: each start of the game world cost minutes on CI. A built game is a few chunks. The probes serve
@@ -16,7 +19,9 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
-const outDir = resolve(process.argv[2] || join(ROOT, 'scratch', 'probe-dist'));
+const args = process.argv.slice(2);
+const online = args.includes('--online');
+const outDir = resolve(args.find((a) => !a.startsWith('--')) || join(ROOT, 'scratch', 'probe-dist'));
 
 // Vite reads every file under vendor/ (about 7,600 PNGs) at once. Windows runs out of file handles (EMFILE);
 // Linux does not. Capping the reads in flight is harmless there and lets a local build finish.
@@ -42,6 +47,7 @@ await build({
   root: ROOT,
   configFile: join(ROOT, 'vite.config.js'),
   build: { outDir, emptyOutDir: true, minify: false },
+  plugins: online ? (await import('./08-online.mjs')).plugins() : undefined,
   logLevel: 'warn',
 });
 console.log(`built the game into ${outDir} in ${Math.round((Date.now() - t0) / 1000)}s`);
