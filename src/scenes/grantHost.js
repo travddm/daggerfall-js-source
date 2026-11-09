@@ -130,7 +130,7 @@ export function grantDiceRefusal(gr, r, climateAt, faunaAt = () => null) {
 /** The relay's public half, from the account service's open route - null when it cannot be had. */
 async function relayKeyOf({ subtle }) {
   const base = serviceBase(appStorage());   // the storage seam, never the browser's own (a PIN)
-  if (!base) return null;   // no account service known yet (decision 116 (8)): nothing to ask
+  if (!base) return null;   // no account service known yet: nothing to ask
   const res = await fetch(`${base}/v1/relaykey`);
   if (!res.ok) return null;
   const j = await res.json().catch(() => null);

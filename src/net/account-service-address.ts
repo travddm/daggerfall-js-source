@@ -1,4 +1,4 @@
-// Where this device's account service is (decision 116 (8)). There is no built-in service: a player enters one address,
+// Where this device's account service is. There is no built-in service: a player enters one address,
 // the relay's, and the relay's `/profile` names its account service (`accounts`, server/src/relayFacts.ts). The
 // client remembers that answer beside the relay it came from. A developer may still point the client at a service by
 // hand with the `dagger.account.service` storage key, which wins over what a relay said.

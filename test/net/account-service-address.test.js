@@ -1,4 +1,4 @@
-// Decision 116 (8): there is no built-in relay or account service. The player enters the relay's address, the relay's
+// There is no built-in relay or account service. The player enters the relay's address, the relay's
 // /profile names its account service, and the client remembers it; a developer's override still wins.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

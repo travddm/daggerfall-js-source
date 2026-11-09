@@ -243,7 +243,7 @@ import { profileBadge, portraitSave, liveCharacter, characterLine } from '../pro
 import { profileIconNode } from '../profileIcons.js';   // WITCH1: a profile icon worn, in the mark's portrait
 import { ownIcon } from '../../systems/ownGlyphs.js';   // WITCH1: the icon the stored session says this device's player wears
 import { cloudIo, cloudList, pushSlot, pullSlot, removeCloudSlot, cloudOnly, slotKeyOf, cloudRefusalText } from '../../systems/cloudSaves.js';   // ACC2: the backup a tile can offer, AUDIT-312 F1's delete, and ACC2c's download of a save that is only up there
-import { serviceBase, storedSession } from '../../net/accountClient.js'; import { accountServiceWait, accountWaitNote } from './account-service-wait.ts';   // decision 116 (8): the card waits for the relay to name its account service
+import { serviceBase, storedSession } from '../../net/accountClient.js'; import { accountServiceWait, accountWaitNote } from './account-service-wait.ts';   // the card waits for the relay to name its account service
 import { isBountyQuestId, abandonBountyQuest, shareBountyQuest, bountyQuestShareable } from '../../systems/bounty/bountyJournal.js';   // BOUNTY1: a bounty in the journal - its Abandon and its Share
 import { liveBundles, canEndBundle, endBundle } from '../../systems/mysticism.js';   // BUFF-END: the Stats page's Effects - the ONE bundle walk, and which the player may end
 import { maxRoundsRemaining } from '../hud/hudActiveSpells.js';   // BUFF-END: a bundle's rounds, as the HUD reads them

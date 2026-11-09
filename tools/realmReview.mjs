@@ -155,7 +155,7 @@ async function main() {
   const req = reviewRequest(process.argv.slice(2));
   if ('usage' in req) { console.error(req.usage); process.exit(2); }
   const base = process.env.DAGGER_ACCOUNT_SERVICE || DEFAULT_ACCOUNT_SERVICE;
-  // There is no built-in account service (decision 116 (8)): the operator names theirs.
+  // There is no built-in account service: the operator names theirs.
   if (!base) { console.error('Set DAGGER_ACCOUNT_SERVICE to your account service (https://...).'); process.exit(2); }
   let secret = process.env.DAGGER_SECRET || null;
   let opened = false;

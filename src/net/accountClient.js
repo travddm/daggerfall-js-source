@@ -72,7 +72,7 @@ import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HO
 import { MINT_VERSION } from './productRecord.js';
 import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
 
-/** There is no built-in account service (decision 116 (8)): the relay a player enters names its own
+/** There is no built-in account service: the relay a player enters names its own
  *  (net/account-service-address.ts). Empty is no service. The deploy workflows read this line with grep. */
 export const DEFAULT_ACCOUNT_SERVICE = '';
 

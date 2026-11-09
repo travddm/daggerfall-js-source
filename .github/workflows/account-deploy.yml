@@ -671,7 +671,7 @@ jobs:
           want=$(grep -oP "^export const RELAY_VERSION = '\K[^']+" src/net/wire.js)
           host=$(grep -oP "^export const DEFAULT_SERVER = 'wss://\K[^'/]+" src/net/online.js || true)
           test -n "$want" || { echo "::error::could not read RELAY_VERSION from src/net/wire.js"; exit 1; }
-          # Empty is no built-in relay (decision 116 (8)): there is none to wait on.
+          # Empty is no built-in relay: there is none to wait on.
           if [ -z "$host" ]; then echo "no built-in relay - nothing to wait on"; exit 0; fi
           n() { printf '%s' "$1" | grep -oE '[0-9]+$' || echo -1; }
           # SEAT2a part three (Seats-Arc 17): the relay's deploy now waits out a siege's blackout, so this waits to

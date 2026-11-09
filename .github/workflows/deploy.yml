@@ -95,7 +95,7 @@ jobs:
           v=$(grep -oP "^export const ACCOUNT_VERSION = '\K[^']+" server-account/src/service.js)
           base=$(grep -oP "^export const DEFAULT_ACCOUNT_SERVICE = '\K[^']+" src/net/accountClient.js || true)
           test -n "$v" || { echo "::error::could not read ACCOUNT_VERSION from server-account/src/service.js"; exit 1; }
-          # Empty is no built-in account service (decision 116 (8)): the site then waits on none.
+          # Empty is no built-in account service: the site then waits on none.
           test -n "$base" || echo "::notice::DEFAULT_ACCOUNT_SERVICE is empty - the site waits on no account service"
           { echo "version=$v"; echo "base=$base"; } >> "$GITHUB_OUTPUT"
 

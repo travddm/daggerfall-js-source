@@ -222,7 +222,7 @@ const TRADE_IN_SENDERS_MAX = 64;
 /** AUDIT 68 S14-quest-inbound-ungated: the quest shares one room passes a second - an honest hub's worst case, every
  *  other seat of my party sharing at the hub's own per-socket cooldown (QUEST_HUB_MIN_MS), with all of them at once for its burst. */
 const QUEST_IN_ROOM_HZ = ((PARTY_MAX - 1) * 1000) / QUEST_HUB_MIN_MS;
-/** No built-in relay (decision 116 (8)): the player enters one in Settings, Online, Relay. Workflows grep this line. */
+/** No built-in relay: the player enters one in Settings, Online, Relay. Workflows grep this line. */
 export const DEFAULT_SERVER = '';
 /** A peer silent this long is HIDDEN (out of range, or its socket is
  *  gone and the leave is on its way); only the room's leave removes it. */

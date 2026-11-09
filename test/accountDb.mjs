@@ -187,7 +187,7 @@ export async function standService({ SEAT_ADMINS, SEAT_MODERATORS, SEAT_OWNERS, 
   return { env, call, setStaff, guest, registered, seated, claim, seedMarks, fetch, found, seatHome, identityPublic: kp.publicKey, gateKey: gatePriv, gatePriv };   // ARENA4: the relay's signing half, so a bout's receipt is signed as the relay signs it   // PROF3: the identity key's public half, a product record's verifier; SEAT1b: the relay's private half, a watch receipt's signer
 }
 
-/** The account service a test device names. No service is built in (decision 116 (8)); this one resolves nowhere,
+/** The account service a test device names. No service is built in; this one resolves nowhere,
  *  and the test's fetch takes any URL to the Worker. */
 export const TEST_ACCOUNT_SERVICE = 'https://accounts.invalid';
 

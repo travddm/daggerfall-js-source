@@ -19,7 +19,7 @@ const json = (o: unknown): Response =>
   });
 
 /** The account service a player of this relay signs in to: the `ACCOUNT_SERVICE_URL` var when it is an https address,
- *  else null (decision 116 (8): the client has no built-in service, so a relay without one offers no accounts). */
+ *  else null. The client has no built-in service, so a relay without one offers no accounts. */
 export function accountServiceOfEnv(env: { ACCOUNT_SERVICE_URL?: unknown } | null | undefined): string | null {
   const url = env?.ACCOUNT_SERVICE_URL;
   return typeof url === 'string' && /^https:\/\/\S+$/.test(url) ? url : null;

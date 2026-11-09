@@ -1,4 +1,4 @@
-// The account card before it knows its service (decision 116 (8)). There is no built-in account service: the
+// The account card before it knows its service. There is no built-in account service: the
 // player's relay (Settings, Online, Relay) is asked which one is its own, and until it answers the card says why it
 // waits instead of offering a sign-in that cannot reach anything.
 import { learnAccountService, needsAccountService } from '../../net/account-service-address.ts';
