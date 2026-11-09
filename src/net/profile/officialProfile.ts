@@ -15,6 +15,7 @@ const PREFS = Object.freeze({
   enhancedCombatVisuals: true,
   lootRarity: true,
   weaponTechniques: true,
+  gatePortentLoot: true,
   crimeRecovery: 'x4',
   dungeonFires: true,
   weatherEvents: true,

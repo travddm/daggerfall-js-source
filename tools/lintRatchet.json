@@ -533,7 +533,7 @@
     "src/world/worldWide/worldPlaces.js::Function 'createWorldPlaces'#0": 151
   },
   "complexity": {
-    "server-account/src/accounts.js": 36,
+    "server-account/src/accounts.js": 35,
     "server-account/src/alchemy.js": 25,
     "server-account/src/arena.js": 40,
     "server-account/src/board.js": 3,
