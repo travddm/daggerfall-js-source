@@ -33,13 +33,15 @@ door (`POST /__cron`, `server-account/src/cron-triggers.ts`).
 
 ## Secrets
 
-`keys.ts` writes `.env` (git-ignored): a new identity signing pair, a gate receipt pair and a cron door secret. It keeps
-a value that is already there, so running it again changes nothing. workerd reads these from the environment:
+`keys.ts` writes `.env` (git-ignored): a new identity signing pair, a gate receipt pair, a cron door secret and an
+operator door secret. It keeps a value that is already there, so running it again changes nothing. workerd reads these
+from the environment:
 
 | Variable                                                                                           | Read by                | Unset                                                     |
 | -------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------------------------------- |
 | `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`                                                      | both                   | No sign-in token can be minted or read                    |
 | `GATE_SIGNING_KEY`, `GATE_PUBLIC_KEY`                                                              | relay, accounts        | Gate kills are not counted                                |
+| `OPERATOR_SECRET`                                                                                  | accounts               | The operator door is off                                  |
 | `CRON_SECRET`                                                                                      | accounts, cron sidecar | The cron door is off                                      |
 | `OWNER_KEYS`                                                                                       | accounts               | No owner can enrol (see `docs/operations/staff-roles.md`) |
 | `DISCORD_BOT_TOKEN`, `ANTHROPIC_API_KEY`, `PATREON_*`, `STAFF_ANALYTICS_*`, `GATE_DISCORD_WEBHOOK` | as on Cloudflare       | That feature is off                                       |
@@ -87,6 +89,12 @@ set -a && . selfhost/.env && set +a && node selfhost/cron/sidecar.ts
 ```
 
 `--experimental` is required: Durable Object storage on disk (`localDisk`) is an experimental workerd feature.
+
+## Operator commands
+
+`node selfhost/operator.ts` sets staff roles, issues recovery codes, sends server posts and rolls back realm
+characters through the account service's operator door. It runs on the host, with `OPERATOR_SECRET` from `.env`;
+Caddy does not pass the door to the public name. See `docs/operations/operator-commands.md`.
 
 ## Limits
 

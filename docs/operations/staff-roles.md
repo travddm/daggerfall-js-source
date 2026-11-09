@@ -15,6 +15,10 @@ route makes or removes an Owner.
 
 ## Set the first Owner (once, by the operator)
 
+On a self-hosted server, use the operator commands ([operator-commands.md](operator-commands.md)): register the account
+in the game, run `node selfhost/operator.ts find <handle>`, check the registration time, then
+`node selfhost/operator.ts role <account id> owner`. The steps below are for a Cloudflare deploy.
+
 The operator needs deploy access to the Cloudflare account (the same access as `wrangler d1 migrations apply`).
 
 1. Register the account in the game, as any player does.
