@@ -168,11 +168,9 @@ export default defineConfig({
     assetsInlineLimit: (filePath) => (/[\\/]vendor[\\/]/.test(filePath) ? false : undefined),
     // BUILD-LEFTOVERS: THE CHUNK-SIZE WARNING IS A LINE AGAIN.
     // At Vite's 500 kB it fired on every build - the world chunk, world.js
-    // and all it imports statically, is 2,662 kB - so it said nothing. Set
-    // just over today's largest chunk, it speaks when a chunk grows past the
-    // world. (AUDIT BUILD-LEFTOVERS, the second read: 2,500 sat over the
-    // world's 2,446 when written, and main's POI editor took it to 2,662 by
-    // the merge. And HOST-SPLIT does not shrink it: a module the host imports
+    // and all it imports statically, was 2,662 kB when this was set - so it
+    // said nothing. Set just over the largest chunk then, it speaks when a
+    // chunk grows past the world. (HOST-SPLIT does not shrink it: a module the host imports
     // statically joins the host's chunk - pixelBuild.js is in it. Only a
     // dynamic import takes code out; lower this when one does.)
     chunkSizeWarningLimit: 2_750,

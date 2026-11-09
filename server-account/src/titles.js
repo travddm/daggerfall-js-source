@@ -219,7 +219,7 @@ export const isDeveloper = (player, _env) =>
   && player.staff_admin === 1;
 
 /** STAFF-ROLES-BY-ACCOUNT: is this player an Owner? An Owner is an Admin whose row also says `staff_owner` (migration 0002),
- *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports and approves POIs. */
+ *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports. */
 export const isOwner = (player, env) => isDeveloper(player, env) && player.staff_owner === 1;
 
 /** MOD1: is this player a moderator? A guest cannot be, for the same reason a guest cannot be a developer. The role is

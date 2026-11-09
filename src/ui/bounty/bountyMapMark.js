@@ -32,7 +32,7 @@ export const BOUNTY_MARKS_MAX = 8;
 
 /**
  * The host's marks, read and checked - an empty list for none, a throw, or anything a map could not place - `max` at
- * most (AUDIT POI R7: a reader of more circles than a hunter's names its own cap - ui/poi/poiMapMark.js POI_MARKS_MAX).
+ * most.
  * @param {(() => any) | undefined} fn
  * @param {{width:number, height:number}} size the map, in pixels
  * @returns {Array<{cx:number, cy:number, r:number, label:string}>}

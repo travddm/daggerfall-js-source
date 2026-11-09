@@ -7,9 +7,9 @@ service itself is in [account-service.md](account-service.md).
 ## Schema and migrations
 
 - The whole schema is one file, `server-account/migrations/0001_schema.sql`: every table, index and trigger, grouped
-  by area, with a one-line comment on what each table holds. It also seeds the three version counters the service
-reads and raises but never inserts (`arena_board_ver`, `homes_gen`, `poi_feed`). The database starts empty; no data is
-  migrated into it.
+  by area, with a one-line comment on what each table holds. It also seeds the version counters the service reads
+  and raises but never inserts (`arena_board_ver`, `homes_gen`, and `poi_feed`, which `0009_drop_poi.sql` drops). The
+  database starts empty; no data is migrated into it.
 - A later schema change is a new file with the next number (`0002_<what>.sql`, `0003_...`), snake_case name, applied
   in name order. Never edit a file that was applied, `0001_schema.sql` included: the ledger does not run it again.
 - The deploy (`.github/workflows/account-deploy.yml`, step "Apply migrations") runs

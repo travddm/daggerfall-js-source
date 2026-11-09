@@ -16,7 +16,6 @@ manual testing use.
 | `src/formats/` | Readers for Daggerfall's file formats (BSA, TEXTURE, IMG/CIF, ARCH3D, BLOCKS, MAPS, SKY, sound, video, saves) and for Morrowind and Unity data (`morrowind/`, `unity/`, `save/`, `worldData/`). |
 | `src/net/` | The online client (`online.js`, `accountClient.js`, chat) and the rules both the client and the relay run (`*Law.js`). Feature folders per online feature. |
 | `src/player/` | The player in the world: motor, collision, camera, pointer lock, first-person views, seats, climbing. |
-| `src/poi/` | The points-of-interest editor and feed. |
 | `src/render/` | The WebGL2 renderer, its shaders and passes ([rendering/](../rendering/README.md)). |
 | `src/scenes/` | The scene hosts (`world.js`, `worldModes.js`, `dungeonContext.js`, `exterior.js`, `interior.js`, `dungeon.js`), the host modules they wire (`*Host.js` and others), and shared scene code (`shared.js`, `dataSource.js`, `dataPipeline.js`). |
 | `src/systems/` | Game rules that are neither combat nor online: items, quests, guilds, travel, time, weather, saving, sound, settings, preferences. About 60 feature folders. |

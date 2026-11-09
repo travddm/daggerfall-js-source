@@ -1,26 +1,25 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-2 - A MESH SEEN THROUGH: THE RENDERER'S TRANSLUCENT DRAW, AND A TEXTURE'S OWN SAMPLING.
+// A MESH SEEN THROUGH: THE RENDERER'S TRANSLUCENT DRAW, AND A TEXTURE'S OWN SAMPLING.
 //
-// The POI editor's materials (; src/poi/poiLaw.js) promise what an imported glTF
-// carries - alpha BLEND, wrap per axis (repeat, clamp, mirror), the filter (nearest, linear) - and the renderer had
-// none of them for a mesh: INCIDENT 2026-09-04's law is that the mesh shader clips nothing and writes alpha 1, and every
-// world texture is REPEAT/NEAREST. So both are added here as the renderer's own, opt-in, every other draw unchanged:
+// Alpha blending, wrap per axis (repeat, clamp, mirror) and the filter (nearest, linear) for a mesh. INCIDENT
+// 2026-09-04's law is that the mesh shader clips nothing and writes alpha 1, and every world texture is REPEAT/NEAREST,
+// so both are the renderer's own, opt-in, and every other draw is unchanged:
 //
 //   - MESH_ALPHA_GLSL: `uMeshAlpha`, nought (every uniform's own start) for the opaque world - alpha 1 written, as ever -
 //     and above nought for a translucent draw: the texel's alpha times it (`meshAlphaOf`). Both mesh programs (the
 //     classic FS and the Enhanced Lighting lane's) end on it.
 //   - drawMesh(..., { translucent }) (renderer.js): blending on (straight alpha over, the destination's own alpha kept at
 //     one), depth tested and never written, no shadow cast - a pane of glass is not a wall - drawn by its owner after the
-//     opaque world, back to front (scenes/poiHost.js).
+//     opaque world, back to front.
 //   - samplerParams / samplerKey: a texture's wrap per axis and its filter, its mips as world art's, keyed apart (AUDIT
-//     19 F10's law: the sampling is part of the key) - a POI's material asks for the key through its texRemap.
+//     19 F10's law: the sampling is part of the key) - a material asks for the key through its texRemap.
 // ═══════════════════════════════════════════════════════════════════
 
-export const MESH_ALPHA_GLSL = `uniform float uMeshAlpha;   // POI-2: 0 the opaque world (alpha 1, INCIDENT 2026-09-04's law); above 0 a translucent draw (render/meshAlpha.js)
+export const MESH_ALPHA_GLSL = `uniform float uMeshAlpha;   // 0 the opaque world (alpha 1, INCIDENT 2026-09-04's law); above 0 a translucent draw (render/meshAlpha.js)
 float meshAlphaOf(float a) { return uMeshAlpha > 0.0 ? a * uMeshAlpha : 1.0; }`;
 
-/** The sampler a texture may ask for (poiLaw.js POI_WRAP, POI_FILTER). */
+/** The sampler a texture may ask for. */
 export const SAMPLER_WRAPS = Object.freeze(['repeat', 'clamp', 'mirror']);
 export const SAMPLER_FILTERS = Object.freeze(['nearest', 'linear']);
 

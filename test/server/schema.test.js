@@ -30,8 +30,7 @@ const TABLES = [
   'mod_cases', 'mod_feed', 'mod_reports', 'motherlode_days', 'motherlode_strikes', 'motherlodes', 'node_harvests',
   'npc_chapter_backing', 'npc_chapter_history', 'npc_chapter_merit', 'npc_chapter_patron_bids', 'npc_chapter_seats',
   'npc_chapter_weeks', 'npc_chapters', 'npc_hall_regions', 'npc_hall_strikes', 'npc_receipt_credits', 'npc_rep_events',
-  'npc_roll', 'npc_roll_heads', 'piece_escrow', 'players', 'poi_assets', 'poi_docs', 'poi_feed', 'poi_rev_assets',
-  'poi_revs', 'poi_shelf', 'poi_upload_days', 'private_reports', 'products', 'prof_brews', 'prof_carried',
+  'npc_roll', 'npc_roll_heads', 'piece_escrow', 'players', 'private_reports', 'products', 'prof_brews', 'prof_carried',
   'prof_carried_gate', 'prof_choices', 'prof_crafts', 'prof_deposits', 'prof_disenchants', 'prof_masters',
   'prof_reforges', 'prof_silver_cloth', 'prof_smelts', 'prof_stock', 'prof_stores', 'prof_tempers', 'prof_tracks',
   'prof_unbruised', 'prof_withdrawals', 'progress_hours', 'progress_play', 'ql_steps', 'raid_cleanses', 'raid_spoils',
@@ -87,6 +86,7 @@ test('the schema file is the first migration, numbered files follow it, and each
 test('the schema holds the service\'s tables, and the account row its columns', () => {
   const raw = d1()._raw;
   assert.deepEqual(tablesOf(raw), TABLES);
+  assert.deepEqual(tablesOf(raw).filter((n) => n.startsWith('poi_')), [], 'the POI store\'s tables are dropped (0009_drop_poi.sql)');
   assert.deepEqual(columnsOf(raw, 'players').sort(), PLAYER_COLUMNS);
   assert.deepEqual(raw.prepare("SELECT type, COUNT(*) AS n FROM sqlite_master WHERE type = 'view' GROUP BY type").all(), [], 'no views');
 });
@@ -118,11 +118,10 @@ test('the version counters the triggers raise stand seeded, and a write moves th
   const raw = d1()._raw;
   assert.deepEqual({ ...raw.prepare('SELECT id, ver FROM arena_board_ver').get() }, { id: 1, ver: 1 });
   assert.deepEqual({ ...raw.prepare('SELECT id, gen FROM homes_gen').get() }, { id: 1, gen: 0 });
-  assert.deepEqual({ ...raw.prepare('SELECT k, v, at FROM poi_feed').get() }, { k: 'feed', v: 0, at: 0 });
   raw.prepare("INSERT INTO players (id, guest_name, created_at, last_seen) VALUES ('p1', 'Guest', 1, 1)").run();
   raw.prepare("INSERT INTO arena_members (player, banner, season, at) VALUES ('p1', 'red', 1, 1)").run();
   assert.equal(raw.prepare('SELECT ver FROM arena_board_ver WHERE id = 1').get().ver, 2, 'a member joined moves the arena board');
-  for (const t of TABLES.filter((n) => !['arena_board_ver', 'homes_gen', 'poi_feed', 'players', 'arena_members'].includes(n))) {
+  for (const t of TABLES.filter((n) => !['arena_board_ver', 'homes_gen', 'players', 'arena_members'].includes(n))) {
     assert.equal(raw.prepare(`SELECT COUNT(*) AS n FROM "${t}"`).get().n, 0, `${t} starts empty`);
   }
 });
