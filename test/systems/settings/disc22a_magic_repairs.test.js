@@ -52,7 +52,7 @@ test('DISC22-A: online it is required - the room\'s value wins over a stored Off
     assert.equal(onlineForcedSetting('Controls', 'InstantRepairs'), undefined, 'only the room\'s own rule is forced');
   });
   withSearch('', () => assert.equal(allow(), false, 'offline again, the player\'s own choice returns - the store was never written'));
-  assert.deepEqual(Object.keys(ONLINE_FORCED_SETTINGS), ['Controls', 'Enhancements']);   // and DFU's Enhanced Combat AI (decision 117)
+  assert.deepEqual(Object.keys(ONLINE_FORCED_SETTINGS), ['Controls', 'Enhancements']);   // and DFU's Enhanced Combat AI
   _resetForTests();
 });
 

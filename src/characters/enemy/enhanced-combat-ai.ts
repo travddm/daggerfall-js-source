@@ -1,9 +1,8 @@
 // DFU's Enhanced Combat AI setting ([Enhancements] EnhancedCombatAI, DFU's default True). DFU reads it live in
-// EnemySenses, EnemyMotor, EnemyAttack and DaggerfallMissile; the survey of every read is
-// dfo-plans/future-work/dfu-parity/enhanced-combat-ai-port.md. The foe pools hand `enhancedCombatAIEnabled` to each
+// EnemySenses, EnemyMotor, EnemyAttack and DaggerfallMissile. The foe pools hand `enhancedCombatAIEnabled` to each
 // EnemyAI as a thunk, so a bare EnemyAI (every motor test) keeps the classic path. Online the server profile forces the
 // setting (net/profile/profileKeys.ts `combat.enhancedAI`), so every player in a room meets the same foes. The port's
-// own Enhanced AI layer (ai/tactics.js, the `enhancedAI` pref) is a separate option on top of this one (decision 117).
+// own Enhanced AI layer (ai/tactics.js, the `enhancedAI` pref) is a separate option on top of this one.
 //
 // Ported so far, the senses: the field of view, the lead on the target (target-prediction.ts), the rate of approach
 // and the melee reach (enemyAttack.js), and the runner-up target (enemyTargets.js).
