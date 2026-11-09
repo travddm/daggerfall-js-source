@@ -76,14 +76,27 @@ test('the official profile pins the row off, so an online page reads off whateve
   assert.equal(OFFICIAL_PROFILE.pins.prefs.spawnedDungeons, false);
   assert.ok(roomPinned(SPAWNED_DUNGEONS_ROW.control));
   assert.equal(onlineForcedPref(SPAWNED_DUNGEONS_PREF, '?online'), false);
-  assert.equal(onlineForcedPref(SPAWNED_DUNGEONS_PREF, ''), undefined, 'offline the player\'s own pref is read');
+  assert.equal(onlineForcedPref(SPAWNED_DUNGEONS_PREF, ''), undefined, "offline the player's own pref is read");
 });
 
 test('spawns stand only on an online page whose room has the row on', () => {
-  assert.equal(spawnedDungeonsStand(ONLINE, () => true), true);
-  assert.equal(spawnedDungeonsStand(ONLINE, () => false), false);
-  assert.equal(spawnedDungeonsStand(ONLINE, () => undefined), false);
-  assert.equal(spawnedDungeonsStand(OFFLINE, () => true), false, 'offline nothing stands, as before the row');
+  assert.equal(
+    spawnedDungeonsStand(ONLINE, () => true),
+    true,
+  );
+  assert.equal(
+    spawnedDungeonsStand(ONLINE, () => false),
+    false,
+  );
+  assert.equal(
+    spawnedDungeonsStand(ONLINE, () => undefined),
+    false,
+  );
+  assert.equal(
+    spawnedDungeonsStand(OFFLINE, () => true),
+    false,
+    'offline nothing stands, as before the row',
+  );
 });
 
 test('online on the official profile, the host stands no spawn on a spawn pixel', () => {

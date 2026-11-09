@@ -18,7 +18,7 @@ export const SPAWNED_DUNGEONS_ROW = Object.freeze({
   get note() {
     return t(
       'features.spawnedDungeons.note',
-      'Online, ruins appear on the map, and each one goes after its time runs out. Off, only Daggerfall\'s dungeons stand. Online it follows the server.',
+      "Online, ruins appear on the map, and each one goes after its time runs out. Off, only Daggerfall's dungeons stand. Online it follows the server.",
     );
   },
   get effect() {
