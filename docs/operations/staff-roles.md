@@ -47,5 +47,6 @@ The operator needs deploy access to the Cloudflare account (the same access as `
 - A role taken off applies on the account's next request and the next token. A banned or cut account holds no role
   while the ban or cut stands.
 - The remaining `*_HANDLES` vars (`FOUNDER_HANDLES`, `HOURS_FIRST_HANDLES`, `DUNGEON_MASTER_HANDLES`, and the
-  `DISCIPLE_HANDLES`, `APOSTLE_HANDLES`, `HERALD_HANDLES` and `HIEROPHANT_HANDLES` lists) grant honorary **titles** and glyphs, not staff rights.
+  `DISCIPLE_HANDLES`, `APOSTLE_HANDLES`, `HERALD_HANDLES` and `HIEROPHANT_HANDLES` lists) grant honorary **titles**
+  and glyphs, not staff rights.
 - The staff panel's audit log records `admin-add`, `admin-remove`, `mod-add` and `mod-remove`.
