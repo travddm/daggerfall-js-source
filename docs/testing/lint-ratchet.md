@@ -12,10 +12,11 @@ figure. The record may only fall. The script is `tools/lintRatchet.mjs`; `npm ru
 | `no-unused-private-class-members` | none                                                        | file: the count of reports      |
 | `ts-check`                        | every file under `src/` starts with `// @ts-check`          | file: `1` for a file without it |
 
-There is no limit on the size, complexity or nesting of a file or function. The owner decided on 2026-11-08 that CI
-enforces none. The project instead commits, before the new repository goes public, to
-break the large modules into readable modules with narrow interfaces and to rewrite the tests that read source
-text. Until then, new behaviour goes into a module of its own (HOST-SPLIT in `CLAUDE.md`).
+There is no limit on the size, complexity or nesting of a file or function. DFO's ceilings only stopped the hosts
+growing, and moving code into helpers to pass a ratchet hid the problem without fixing it. The project instead
+commits, before the new repository goes public, to break the large modules into readable modules with narrow
+interfaces and to rewrite the tests that read source text. Until then, new behaviour goes into a module of its own
+([architecture/hosts-and-modules.md](../architecture/hosts-and-modules.md)).
 
 ## What fails
 
