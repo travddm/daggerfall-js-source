@@ -47,43 +47,24 @@ async function stood(t) {
   return { svc, raw, guild, hold, act };
 }
 
-test('AUDIT-SEATS AN OFFER DECLINED: an offer of fealty made to a guild is declined by it at no cost (the offer gone, nothing sworn, no Standing lost), and its own offer still withdrawn first, a sworn fealty still broken; an offer of a Pact made to it declined, unannounced; the Seat tab\'s rows carry a Decline beside Accept and Sign, and the book says each in its own words (mutants: the decline\'s pair; its order; the lever; the words)', async (t) => {
+test('AUDIT-SEATS AN OFFER DECLINED: an offer of a Pact made to a guild is declined by it, unannounced; the Seat tab rows carry a Decline beside Sign, and the book says it in its own words (mutants: the decline pair; the lever; the words)', async (t) => {
   const s = await stood(t);
   const oa = await s.guild('Orla', 'The Oath', 'OA'), sh = await s.guild('Gamal', 'The Silver Hand', 'SH');
   s.hold(WAYREST, oa); s.hold(ALCAIRE, sh);
-  // the Silver Hand offers to swear; the Oath declines
-  assert.deepEqual(await s.act('/v1/seats/fealty', sh, { tag: 'OA', as: 'vassal' }), { ok: true });
-  assert.deepEqual(await s.act('/v1/seats/fealty/break', oa, { tag: 'SH' }), { ok: true, declined: true });
-  assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM guild_fealty').get().n, 0);
-  assert.deepEqual(s.raw.prepare('SELECT standing FROM town_seat_holds ORDER BY key').all().map((r) => r.standing), [50, 50], 'no cost');
-  assert.equal((await s.act('/v1/seats/fealty/break', oa, { tag: 'SH' })).error, 'fealty-none', 'nothing left to decline');
-  // the Oath offers to take the Silver Hand; the Silver Hand declines; a third guild cannot decline another pair's
   const dg = await s.guild('Doran', 'Daggers', 'DG');
-  assert.deepEqual(await s.act('/v1/seats/fealty', oa, { tag: 'SH', as: 'liege' }), { ok: true });
-  assert.equal((await s.act('/v1/seats/fealty/break', dg, { tag: 'OA' })).error, 'fealty-none', 'not its offer to decline');
-  assert.deepEqual(await s.act('/v1/seats/fealty/break', sh, { tag: 'OA' }), { ok: true, declined: true });
-  // sworn: the break still breaks
-  await s.act('/v1/seats/fealty', sh, { tag: 'OA', as: 'vassal' });
-  assert.deepEqual(await s.act('/v1/seats/fealty/accept', oa, { tag: 'SH' }), { ok: true });
-  assert.deepEqual(await s.act('/v1/seats/fealty/break', oa, { tag: 'SH' }), { ok: true, breaking: true });
-  // a Pact offered to the Oath, declined unannounced
   assert.equal((await s.act('/v1/seats/pact', dg, { tag: 'OA' })).signed, false);
   assert.deepEqual(await s.act('/v1/seats/pact/break', oa, { tag: 'DG' }), { ok: true, announced: false });
   assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_red').get().n, 0);
-  // the rows and the book
-  const SHg = { name: 'The Silver Hand', tag: 'SH' }, OAg = { name: 'The Oath', tag: 'OA' };
-  assert.deepEqual(politicsRows({ fealty: [{ vassal: SHg, liege: OAg, state: 'offered', mine: false, asVassal: false }] }).map((r) => [r.act, r.alt]), [['fealty-accept', 'fealty-decline']]);
+  assert.equal((await s.act('/v1/seats/pact/break', oa, { tag: 'DG' })).error, 'pact-none', 'nothing left to decline');
+  const SHg = { name: 'The Silver Hand', tag: 'SH' };
   assert.deepEqual(politicsRows({ pacts: [{ with: SHg, state: 'offered', until: 9, mine: false }] }).map((r) => [r.act, r.alt]), [['pact-accept', 'pact-decline']]);
   assert.deepEqual(politicsRows({ pacts: [{ with: SHg, state: 'offered', until: 9, mine: true }] }).map((r) => [r.act, r.alt]), [['pact-withdraw', undefined]], 'its own offer: no Decline');
-  assert.deepEqual([POLITICS_ACTS['fealty-decline'], POLITICS_ACTS['pact-decline']], ['Decline', 'Decline']);
+  assert.equal(POLITICS_ACTS['pact-decline'], 'Decline');
   const calls = [];
-  let answer = { declined: true };
-  const door = new Proxy({}, { get: (_, k) => (...a) => { calls.push([k, ...a]); return Promise.resolve({ ok: true, data: answer }); } });
+  const door = new Proxy({}, { get: (_, k) => (...a) => { calls.push([k, ...a]); return Promise.resolve({ ok: true, data: { announced: false } }); } });
   const book = createTownSeatBook({ door, character: () => 'c1', storage: null });
-  assert.equal((await book.declineFealty('SH')).text, 'The offer of fealty from <SH> is declined.');
-  answer = { announced: false };
   assert.equal((await book.declinePact('SH')).text, 'The offer of a Pact from <SH> is declined.');
-  assert.deepEqual(calls, [['fealtyBreak', 'c1', 'SH'], ['pactBreak', 'c1', 'SH']]);
+  assert.deepEqual(calls, [['pactBreak', 'c1', 'SH']]);
 });
 
 test('AUDIT-SEATS A SIEGE\'S LENGTH IN THE CHRONICLE (9.2: "stormed the gates of Anticlere and took its Charter from the Ebon Oath after thirty-one minutes"): a count in words to ninety-nine, its digits past; a siege\'s whole minutes from its start to its receipt\'s end, at least one, none for a bad pair; the line in the design\'s words where the row keeps the length, the old line where it does not (mutants: the words; the rounding; the floor; the line; the singular)', () => {

@@ -59,13 +59,10 @@ import { charterSeats, domainsRule } from '../../src/net/domainLaw.js';   // DOM
  *  still owed out of - a battle's contracts, an Edict's escrow, a Royal Tourney's prize - and the titles and Honours
  *  earned stay, and so does every red line. */
 export const SEASON_ZERO_WIPED = Object.freeze(['town_seat_holds', 'town_seat_legacy', 'town_seat_pledges', 'town_seat_binds', 'town_seat_influence',
-  'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_stockpile', 'town_seat_levies', 'town_seat_history',
+  'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_history',
   'guild_pacts',
-  // SEAT2b (18: "At its end seats, influence, fortifications and history are wiped"): the works, their projects' holds, the
-  // Fortifiers' saves and the Siege Camps
-  'town_seat_forts', 'town_seat_fort_held', 'town_seat_fortifier', 'town_seat_camps',
-  // DOMAIN1: the gifts' rows, with the stockpiles and camps they filled
-  'town_seat_gifts']);
+  // SEAT2b (18: "At its end seats, influence, fortifications and history are wiped"): the works and the Siege Camps
+  'town_seat_forts', 'town_seat_camps']);
 /** AUDIT-SEATS S5 (3.2: "a struck key is never witnessed again" - the strike's own history row says so, townSeats.js
  *  struck): what the wipe keeps of a table it clears - every strike, so a seat struck in Season 0 stays struck. */
 export const SEASON_ZERO_KEPT = Object.freeze({ town_seat_history: "kind = 'strike'" });
@@ -375,9 +372,6 @@ export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null
       LIMIT 1`).bind(key, utcDay(nowS), nowS, rid, floor));
     stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(key, next));
     stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(key, h.guild_id));
-    stmts.push(db.prepare(`INSERT INTO town_seat_stockpile (key, material, qty) SELECT ?2, material, qty FROM town_seat_stockpile WHERE key = ?1 AND qty > 0
-      ON CONFLICT (key, material) DO UPDATE SET qty = town_seat_stockpile.qty + excluded.qty`).bind(key, into));
-    stmts.push(db.prepare('DELETE FROM town_seat_stockpile WHERE key = ?').bind(key));
     stmts.push(db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at)
       SELECT ?1, ?2, 'fold', json_set(?3, '$.refund', COALESCE((SELECT amount FROM marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4`)
       .bind(key, week, JSON.stringify({ guild: names.get(h.guild_id) ?? { name: '', tag: '' }, into }), nowS, rid));
