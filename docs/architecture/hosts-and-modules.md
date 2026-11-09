@@ -117,7 +117,7 @@ holds no values itself.
 | --- | --- | --- |
 | Daggerfall Unity's settings | `src/systems/settings/settings.js` (`getInt`, `getBool`) | The settings Daggerfall Unity has, by section and key, for example `Video.RetroRenderingMode`. |
 | The game's own preferences | `src/systems/uiPrefs.js` (`getPref`) | Everything Daggerfall Unity does not have: enhanced lighting, render scale, touch options. |
-| Mod settings | `src/systems/modSettings.js` | The values of every departure from Daggerfall Unity, by mod (vendored and first-party), until the mod manifests exist. |
+| Mod settings | `src/systems/modSettings.js` | The settings of each vendored mod, and of first-party mods with their own settings file (`character-modes`), until the mod manifests exist. |
 
 The UI skin (`enhanced` or `classic`) is `src/systems/uiSkin.js` (`isEnhanced()`). Many enhanced visual features
 require the enhanced skin and their own preference.
@@ -139,7 +139,7 @@ New files are TypeScript (`.ts`). Naming, tests and formatting are in [coding-st
 
 ## Daggerfall Unity as the reference
 
-Daggerfall Unity is the core: the game does what it does, and every departure is an agreed mod or option
+Daggerfall Unity is the core: the game does what Daggerfall Unity does, and every departure is an agreed mod or option
 ([README.md](../README.md), "Scope"; decisions 49, 102 and 103):
 
 - Before you build something Daggerfall Unity has, read its version, and search this tree for the member's name and

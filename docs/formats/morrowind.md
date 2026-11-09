@@ -25,8 +25,9 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
     `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js` and `mwAnimSources.js`.
   - Still OpenMW-derived: `mwFirstPerson.js`, `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`),
     `mwNifMesh.js` (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
-    `mwParticles.js`, `mwSpellFx.js`, `mwVfx.js`, and outside this folder most of `src/combat/fpArm.js`,
-    `src/combat/fpsSpellCasting.js`, the two-hand rig (`src/combat/twoHands/`) and `src/systems/weaponSheathing.js`.
+    `mwParticles.js`, `mwSpellFx.js`, `mwVfx.js`, and outside this folder parts of `src/combat/fpArm.js` and
+    `src/systems/weaponSheathing.js`. `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`)
+    only quote OpenMW in comments.
 
   Do not add OpenMW logic to a derived module; change it only as part of its rewrite.
 
