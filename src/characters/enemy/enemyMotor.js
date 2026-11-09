@@ -37,7 +37,7 @@
 // (IsBlending -> an 8%-per-classic-update see-through roll).
 
 import { GLOBAL_SCALE } from '../../world/meshReader.js';
-import { playerHalfOfStealthCheck, peerHalfOfStealthCheck, meetPeer } from './stealth-check.ts';   // StealthCheck's player half, for a peer too
+import { playerHalfOfStealthCheck, peerHalfOfStealthCheck, meetPeer, stealthBandHolds } from './stealth-check.ts';   // StealthCheck's player half, for a peer too
 import { dice100 } from '../../combat/formulas.js';   // PT1: Dice100 has ONE home and this file had written it out twice
 import { CLASSIC_UPDATE_INTERVAL } from '../weaponStates.js';   // single source (GameManager.cs:42)
 import { CAPSULE_HEIGHT, CAPSULE_RADIUS, DF_WALK_BASE } from '../../player/motor.js';           // single source
@@ -883,7 +883,7 @@ export class EnemyAI {
    *  scene's senses context, like PlayerEntity.TimeOfLastStealthCheck). */
   _stealthCheck(senses) {
     if (senses.insideDungeonCastle && !this.isHostile) return false;   // :619-621, the FIRST statement
-    if (!this.wouldBeSpawned) return false;
+    if (!stealthBandHolds(this, wouldBeSpawnedInClassic)) return false;   // stealth-check.ts: the band of the player checked
     if (this._dist > STEALTH_MAX_DISTANCE) return false;
     const gameMinutes = senses.gameMinutes ?? 0;
     if (gameMinutes === this._lastStealthMinute) return this.detected;
@@ -2295,7 +2295,7 @@ export class EnemyAI {
    *  (and held the encounter cap), `inSight` kept its melee deciding, either one or `wouldBeSpawned` refused the
    *  player's rest (areEnemiesNearby). The first step after the hold senses afresh. */
   holdFrame() {
-    this.inSight = false; this.detected = false; this.wouldBeSpawned = false;
+    this.inSight = false; this.detected = false; this.wouldBeSpawned = false; this.peerSpawned = null;
   }
 
   /** AUDIT 68 S20-offset-ai-memory: the floating-origin recenter moves every WORLD position the motor holds, not the

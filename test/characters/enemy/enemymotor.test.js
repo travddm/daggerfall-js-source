@@ -567,18 +567,18 @@ test('E6: PredictNextTargetPos leads a moving target and never through a wall', 
 const peerCollider = { raycast: () => Infinity, capsuleCast: () => ({ dist: Infinity, key: null }), move: () => ({ grounded: true }) };
 // Behind the foe (yaw 0 faces +z) and out of earshot (25 m), still inside the stealth check's 25.6 m.
 const PEER_BEHIND = [0, 0, -25.2];
-// The check runs only inside the classic spawn band around this client's own player (WouldBeSpawnedInClassic).
+// This client's own player, near the foe. A peer's check reads the band measured to the peer (stealth-check.ts).
 const LOCAL_NEAR = [3, 0, 3];
 const peerCandidate = (id, sk, hv) => {
   const c = { isPlayer: true, isPeer: true, id, feet: PEER_BEHIND, height: 1.8, health: 1, sk: 0, hv: 0, stealthOf: () => c.sk, halfSpeed: () => c.hv === 1 };
   readPeerStealth(c, { sk, hv });
   return c;
 };
-function huntPeer(target, { minute = 4, roll = 0.02, met = false } = {}) {
+function huntPeer(target, { minute = 4, roll = 0.02, met = false, local = LOCAL_NEAR } = {}) {
   const ai = Object.assign(new EnemyAI(peerCollider, [0, 0, 0], 0, {}), { isHostile: true });
   if (met) (ai.peersMet ??= new Set()).add(target.id);
   for (let i = 0; i < 12; i++) {
-    ai.update(1 / 60, LOCAL_NEAR, { targeting: (m) => { m.target = target; }, playerHeight: 1.8, gameMinutes: minute, sharedStealth: { minute: -1 }, tallyStealth: () => {}, playerStealth: 0, rolls: () => roll });
+    ai.update(1 / 60, local, { targeting: (m) => { m.target = target; }, playerHeight: 1.8, gameMinutes: minute, sharedStealth: { minute: -1 }, tallyStealth: () => {}, playerStealth: 0, rolls: () => roll });
   }
   return ai;
 }
@@ -590,6 +590,17 @@ test("a foe hunting a peer rolls against that peer's own Stealth (EnemySenses.St
   assert.equal(sneaking.detected, false, 'Stealth 100 hides the peer');
   assert.equal(sneaking.peerStealthMinute, 4, 'and the minute of the check is kept for the record');
   assert.equal(huntPeer(peerCandidate('p2', 0, 0)).detected, true, 'Stealth 0 is found by the same roll');
+});
+
+test("a peer's stealth check reads the classic spawn band measured to that peer, not to this client's player", () => {
+  // This client's player is 60 m off and out of the foe's band; the peer, 25.2 m behind on the foe's level, is inside it.
+  const farLocal = [0, 0, 60];
+  const inBand = huntPeer(peerCandidate('p6', 100, 0), { local: farLocal });
+  assert.equal(inBand.wouldBeSpawned, false, "the motor's own band is still this client's player's");
+  assert.equal(inBand.peerStealthMinute, 4, 'the check runs at the peer');
+  // A peer 4 m above the foe and 10 m off is inside the check's 25.6 m but outside the band's 3.2 m of height.
+  const above = Object.assign(peerCandidate('p7', 100, 0), { feet: [0, 4, -10] });
+  assert.equal(huntPeer(above, { local: farLocal }).peerStealthMinute, undefined, 'outside its own band, no check');
 });
 
 test("a peer's half-speed minute skip and its encountered fast-mover arm are DFU's player half", () => {

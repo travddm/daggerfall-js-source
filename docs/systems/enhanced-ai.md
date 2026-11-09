@@ -38,8 +38,9 @@ client (a peer) the same rules, with no setting, because nothing here departs fr
 - A failed language roll shows a line ("Orc ignores your words."), in single player and online. DFU shows nothing; the line
   changes no outcome.
 
-The stealth check runs only while the foe is inside the classic spawn band around its owner's player, as DFU's
-`WouldBeSpawnedInClassic` gate reads it.
+The stealth check runs only while the peer is inside the foe's classic spawn band. DFU's `WouldBeSpawnedInClassic` gate
+measures that band to its one player, so the port measures it to the peer the check is about, with a latch for each
+peer. The foe's own band, which the rest gate and the target machine read, stays measured to its owner's player.
 
 Departure from Daggerfall Unity: DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies"). This port does not
 implement it; the port runs DFU's classic path only. The Enhanced AI here is a separate design that shares half a name.
