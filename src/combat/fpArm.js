@@ -3706,7 +3706,7 @@ export function createFpArm() {
    *  weapon type is Spell (character.cpp: the equip of a spell never attaches one; Morrowind-Rules.md [C] "equip
    *  attach") - so a readied spell, and a cast still in the hands, put the weapon out of them on both rigs. */
   const spellStance = () => ub.spellReady || ub.upper === UPPER_BODY.Casting;
-  const weaponInHand = () => ub.weaponShown && (!spellStance() || spellHand);   // SPELL-HAND: the weapon stays in its hand beside the spell's
+  const weaponInHand = () => ub.weaponShown && (!spellStance() || spellHand);   // the weapon stays in its hand beside the spell's
   function refreshTorch(force = false) {
     if (!torchVisible()) { torchState = null; torchSource = null; torchGroup = null; return; }
     if (!force && torchState && torchState.playing) return;
