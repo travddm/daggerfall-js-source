@@ -45,7 +45,7 @@ async function stood(t) {
     raw.prepare('INSERT INTO guild_members (player, char_id, guild_id, rank, name, joined_at) VALUES (?, ?, ?, ?, ?, ?)').run(m.id, m.character, gid, 2, handle, T0 - 30 * DAY);
     return m;
   };
-  const work = (w, tier) => raw.prepare(`INSERT INTO town_seat_forts (key, work, tier, building, stands_at, at) VALUES (?, ?, ?, NULL, NULL, ?)
+  const work = (w, tier) => raw.prepare(`INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, ?, ?, ?)
     ON CONFLICT (key, work) DO UPDATE SET tier = excluded.tier`).run(ANTICLERE.key, w, tier, T0);
   const give = (who, m, qty = 1) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)
     ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = prof_stores.qty + excluded.qty`).run(who.id, who.character, m, qty);
@@ -66,22 +66,18 @@ async function stood(t) {
   };
   const treasury = (n) => raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('mint', NULL, 'guild', ?, 'test', ?, 1, 1, 'seed', NULL, ?)`).run(gid, n, `seed-${gid}-${n}`);
-  const stock = (material, qty) => raw.prepare(`INSERT INTO town_seat_stockpile (key, material, qty) VALUES (?, ?, ?)
-    ON CONFLICT (key, material) DO UPDATE SET qty = town_seat_stockpile.qty + excluded.qty`).run(ANTICLERE.key, material, qty);
-  return { svc, raw, gm, gid, member, work, give, setXp, craft, brew, treasury, stock };
+  return { svc, raw, gm, gid, member, work, give, setXp, craft, brew, treasury };
 }
 
-test('PROF12 APOTHECARY: the gate open - the law raises it at any seat (AUDIT SEATS-2 L5\'s gate, PIN MOVED there), and the holder\'s Guildmaster begins its first tier at the board, its 100 Cut Stone and 100 Oak Planks from the stockpile, where it was `fort-not-here` (mutant: the gate shut)', async (t) => {
+test('PROF12 APOTHECARY: the gate open - the law raises it at any seat (AUDIT SEATS-2 L5\'s gate, PIN MOVED there), and the holder\'s Guildmaster begins its first tier at the board, its Marks burnt from the treasury and the tier standing at once', async (t) => {
   assert.equal(APOTHECARY_OPEN, true);
   assert.equal(fortMayRaise('apothecary', { tier: 'palace' }), true);
   assert.equal(fortMayRaise('apothecary', { tier: 'crown' }), true);
   const s = await stood(t);
   s.treasury(5_000);
-  s.stock('stone:cut', 100);
-  s.stock('plank:oak', 100);
   const r = await s.svc.call('/v1/seats/fort/fund', { character: s.gm.character, key: ANTICLERE.key, work: 'apothecary', rid: rid() }, s.gm.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual([r.body.tier, r.body.forts.works.apothecary.standsAt], [1, T0 + 2 * DAY], 'met at once, standing its two days');
+  assert.deepEqual([r.body.tier, r.body.marks, r.body.forts.works.apothecary.tier], [1, 700, 1], 'paid once, standing at once');
 });
 
 test('PROF12 APOTHECARY: a holder\'s member cutting a piece of jewellery in its town takes a quality step a tier - the tier-2 Apothecary\'s two (Crude to Fine); a stranger none, another town none, and the Forge none (mutants: the profession\'s hall; the seat; the member)', async (t) => {
