@@ -6,6 +6,8 @@ import { CLIMATES } from '../formats/mapsFile.js';
 import { inEther } from '../world/ethericSea.js';
 import { inBay as onTheBay } from '../world/tamriel/tamrielFrame.js';
 import { pathFreePixel, spawnsDungeon } from '../world/spawnedDungeons.js';
+import { spawnedDungeonsStand } from '../systems/dungeon/spawned-dungeons-row.js';
+import { getPref } from '../systems/uiPrefs.js';
 
 /** @param {any} host */
 export function createSpawnStand(host) {
@@ -13,8 +15,9 @@ export function createSpawnStand(host) {
     _arenaTemplates, _capitalBase, _countryTemplates, _insideSpawn, _spawnGround, _spawnLedger, _spawnSalt,
     _spawnUnroaded, etherPlaceAt, etherSea, locationIndex, maps, params, terrainGen
   } = host;
+  const spawnsStand = spawnedDungeonsStand(params, getPref);   // decision 122 (7): online, and the room's row on
   const spawnedDungeonAt = (px, py) => {
-    if (!params.has('online')) return null;
+    if (!spawnsStand) return null;
     try {
       if (!spawnsDungeon(_spawnSalt, px, py) || maps.getClimateIndex(px, py) === CLIMATES.Ocean || !_spawnGround(px, py)) return null;
       // SPAWN-ROADS: no ruin on a pixel a road,
