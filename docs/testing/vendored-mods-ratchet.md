@@ -1,7 +1,7 @@
 # Vendored-mods ratchet
 
 Every outside author's mod leaves the core repository, one pull request at a time, and goes to a private repository
-of its own (decisions #77, #91 and #99). The ratchet makes sure that a removed mod does not come back, and that no
+of its own (decisions 77, 91 and 99). The ratchet makes sure that a removed mod does not come back, and that no
 change adds to a mod that is still waiting for its removal.
 
 `tools/vendored-mods.json` lists each mod: its folder, title, authors and links, its paths, the words that name it,
