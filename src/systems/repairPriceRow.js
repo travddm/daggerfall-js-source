@@ -19,5 +19,5 @@ export const REPAIR_PRICE_ROW = Object.freeze({
     return t('features.repairPriceByDamage.effect', 'Takes effect at the next quote.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'repairPriceByDamage', initial: false, online: false }),
+  control: Object.freeze({ store: 'prefs', key: 'repairPriceByDamage', initial: false, online: 'room' }),
 });

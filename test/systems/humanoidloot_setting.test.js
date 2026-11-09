@@ -76,7 +76,7 @@ test('HUMANOID-LOOT: the live row sets the share spawnEnemyLoot rolls with - Cut
 
 test("HUMANOID-LOOT: the row declares the classic default and the room's pin, and the online lane forces it", () => {
   const row = FEATURES.find((f) => f.id === 'humanoid-loot');
-  assert.deepEqual([row.control.key, row.control.initial, row.control.online], [HUMANOID_LOOT_PREF, 'dfu', 'dfu']);
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], [HUMANOID_LOOT_PREF, 'dfu', 'room']);
   assert.deepEqual(
     row.control.tiers.map((x) => x[0]),
     ['dfu', 'cut'],

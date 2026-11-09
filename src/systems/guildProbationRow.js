@@ -20,5 +20,5 @@ export const GUILD_PROBATION_ROW = Object.freeze({
     return t('features.guildProbation.effect', 'Takes effect at the next review.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'guildProbation', initial: false, online: false }),
+  control: Object.freeze({ store: 'prefs', key: 'guildProbation', initial: false, online: 'room' }),
 });

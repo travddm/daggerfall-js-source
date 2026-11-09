@@ -20,5 +20,5 @@ export const DRESS_FOR_THE_PART_ROW = Object.freeze({
     return t('features.dressForThePart.effect', 'Takes effect within a few seconds.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'dressForThePart', initial: false, online: false }),
+  control: Object.freeze({ store: 'prefs', key: 'dressForThePart', initial: false, online: 'room' }),
 });

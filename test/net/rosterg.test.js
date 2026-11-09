@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { CHAT_WORLD_ROOM, CHAT_ROSTER_MAX, CHAT_SOCKETS_MAX, SOCKETS_MAX, RELAY_VERSION } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { rosterRows, rosterTitle, ROSTER_ROWS_MAX } from '../../src/net/roster.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { OFFICIAL_PH, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -28,9 +28,9 @@ test('ROSTER-G: the channel\'s welcome NAMES who is in it - id and name, no look
     const a = r.connect(), b = r.connect(), c = r.connect();
     await r.hello(a, 'aaaa-0001', null, { name: 'Alpha' }); clock += 100;
     await r.hello(b, 'bbbb-0002', null, { name: 'Bravo' }); clock += 100;
-    assert.deepEqual(a.sent[0], { t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION, now: a.sent[0].now, ldo: 0 }, 'first in: nobody to name, and the count says one');
+    assert.deepEqual(a.sent[0], { t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION, ph: OFFICIAL_PH, now: a.sent[0].now, ldo: 0 }, 'first in: nobody to name, and the count says one');
     assert.equal(typeof a.sent[0].now, 'number', 'AUDIT SOC B7: the relay\'s clock rides the channel\'s welcome too');
-    assert.deepEqual(b.sent[0], { t: 'welcome', id: 'bbbb-0002', peers: [{ id: 'aaaa-0001', name: 'Alpha', sub: 'acct-aaaa-0001' }], n: 2, v: RELAY_VERSION, now: b.sent[0].now, ldo: 0 }, 'second in: told the first, by name and its verified account (MOD1: what /mute names)');
+    assert.deepEqual(b.sent[0], { t: 'welcome', id: 'bbbb-0002', peers: [{ id: 'aaaa-0001', name: 'Alpha', sub: 'acct-aaaa-0001' }], n: 2, v: RELAY_VERSION, ph: OFFICIAL_PH, now: b.sent[0].now, ldo: 0 }, 'second in: told the first, by name and its verified account (MOD1: what /mute names)');
     assert.deepEqual(ofType(a, 'join'), [{ t: 'join', id: 'bbbb-0002', name: 'Bravo', sub: 'acct-bbbb-0002', n: 2 }], 'the first hears the second join - the name and the account, and the room\'s count (PIN MOVED, AUDIT SCALE5a C1-C3: `n` on a channel\'s join and leave), nothing else');
     await r.hello(c, 'cccc-0003', null, { name: 'Charlie' }); clock += 100;
     assert.deepEqual(c.sent[0].peers.map((p) => p.id).sort(), ['aaaa-0001', 'bbbb-0002']); assert.equal(c.sent[0].n, 3);

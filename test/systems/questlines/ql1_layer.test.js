@@ -61,8 +61,8 @@ test('QL1 the switch: a Features row, on by default, forced on online (the owner
   assert.ok(row, 'the row stands');
   assert.equal(row.control.key, QUESTLINES_PREF);
   assert.equal(row.control.initial, true, 'on by default offline (the owner\'s answer)');
-  assert.equal(row.control.online, true, 'forced on online - never "player"');
-  assert.equal(FEATURE_PREF_ONLINE[QUESTLINES_PREF], true, 'the lane learns it from the row');
+  assert.equal(row.control.online, 'room', 'pinned online by the server profile - never "player"');
+  assert.equal(FEATURE_PREF_ONLINE[QUESTLINES_PREF], 'room', 'the row says the room holds it');
   setPref(QUESTLINES_PREF, false);
   assert.equal(questlinesOn(), false);
   assert.equal(startStamp(), null, 'off: DFU\'s quest');

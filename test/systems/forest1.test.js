@@ -333,7 +333,7 @@ test('FOREST1: the switch - the row, the enhanced skin, ?forests=off; online the
   assert.ok(row);
   assert.deepEqual(checkFeature(row), []);
   assert.deepEqual([...row.kinds], ['enhanced']);
-  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'realForests', initial: true, online: true });
+  assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'realForests', initial: true, online: 'room' });
   assert.deepEqual([...FOREST_HIDDEN_LOCATION_TYPES].sort((a, b) => a - b), [4, 7, 9, 10, 12, 13]);
 });
 

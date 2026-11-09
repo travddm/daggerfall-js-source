@@ -356,7 +356,7 @@ test('CLIMB1: the switch - the enhanced skin, the row, and ?parkour=off; the cla
   assert.deepEqual(checkFeature(row), []);
   assert.deepEqual([...row.kinds], ['enhanced']);
   assert.equal(row.control.key, 'enhancedClimbing');
-  assert.equal(row.control.online, true, 'on for everyone online: nobody crosses a rooftop a way another cannot');
+  assert.equal(row.control.online, 'room', 'on for everyone online: nobody crosses a rooftop a way another cannot');
 });
 
 test('CLIMB1: every host mounts the enhanced climb and reports its edge - the three motors, the five activity reports', () => {

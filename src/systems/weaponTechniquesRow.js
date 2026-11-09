@@ -24,5 +24,5 @@ export const WEAPON_TECHNIQUES_ROW = Object.freeze({
     );
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: 'weaponTechniques', initial: true, online: true }),
+  control: Object.freeze({ store: 'prefs', key: 'weaponTechniques', initial: true, online: 'room' }),
 });
