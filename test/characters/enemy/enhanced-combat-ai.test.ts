@@ -3,9 +3,6 @@
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { EnemyAI, FIELD_OF_VIEW } from '../../../src/characters/enemy/enemyMotor.js';
-import { EnemyAttack } from '../../../src/characters/enemy/enemyAttack.js';
-import { getTargets } from '../../../src/characters/enemy/enemyTargets.js';
 import { srand } from '../../../src/formats/dfRandom.js';
 import {
   ENHANCED_FIELD_OF_VIEW,
@@ -18,6 +15,16 @@ import { tierOf } from '../../../src/systems/settings/settings.js';
 import { onlineForcedSetting } from '../../../src/systems/online/onlineLane.js';
 import { profileKeyOf } from '../../../src/net/profile/profileKeys.ts';
 
+// The motor, its attack and its targeting are loaded by a computed path, which tsconfig.node.json does not follow: their imports
+// reach src/player/motor.js and src/net, which name the DOM's crypto types (CryptoKey, SubtleCrypto), and the node
+// config has no DOM library.
+const MOTOR_PATH: string = '../../../src/characters/enemy/enemyMotor.js';
+const TARGETS_PATH: string = '../../../src/characters/enemy/enemyTargets.js';
+const ATTACK_PATH: string = '../../../src/characters/enemy/enemyAttack.js';
+const { EnemyAI, FIELD_OF_VIEW } = await import(MOTOR_PATH);
+const { getTargets } = await import(TARGETS_PATH);
+const { EnemyAttack } = await import(ATTACK_PATH);
+
 const DEG = Math.PI / 180;
 const clearCollider = () => ({
   raycast: () => Infinity,
@@ -25,12 +32,11 @@ const clearCollider = () => ({
   move: () => ({ grounded: true }),
 });
 const senses = () => ({ gameMinutes: 0, playerStealth: 0, rolls: () => 0.5 });
-// The motor is JavaScript, so TypeScript reads its options and fields off their defaults and the constructor's own
-// writes; the setting's option has no default and initEnhancedCombatAI writes its fields.
-type EnemyAIOptions = NonNullable<ConstructorParameters<typeof EnemyAI>[3]>;
-const withSetting = (reader: () => boolean, more: Record<string, unknown> = {}) =>
-  ({ ...more, enhancedCombatAI: reader }) as EnemyAIOptions;
-const fields = (ai: EnemyAI) => ai as unknown as EnhancedCombatAIFields;
+const withSetting = (reader: () => boolean, more: Record<string, unknown> = {}) => ({
+  ...more,
+  enhancedCombatAI: reader,
+});
+const fields = (ai: object) => ai as unknown as EnhancedCombatAIFields;
 const foe = (on: boolean) =>
   new EnemyAI(
     clearCollider(),
@@ -79,7 +85,7 @@ test('EnemySenses.Start: 190 degrees on, 180 off - a target 92 degrees off the f
 });
 
 /** A target walking +x across the foe's front at 4 m/s, 10 m ahead, for `steps` fixed steps. */
-function chase(ai: EnemyAI, steps: number): number[] {
+function chase(ai: { feet: number[] } & Record<string, any>, steps: number): number[] {
   let feet = [0, 0, 10];
   for (let i = 0; i < steps; i++) {
     feet = [feet[0] + 4 / 60, 0, 10];
