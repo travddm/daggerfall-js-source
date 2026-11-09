@@ -1,11 +1,12 @@
 // STE-NOTES - A PULL REQUEST'S PATCH
 // NOTES ARE WRITTEN IN STE. scripts/steNotes.mjs reads a description's notes
 // as the release reads them (patchNotesOf) and reports each place they break
-// a rule of STE a machine can read; it is an optional local check. Each rule is pinned both ways here: a sentence that
-// breaks it is found, and its STE twin is clean.
+// a rule of STE a machine can read; it is an optional local check. Each
+// rule is pinned both ways here: a sentence that breaks it is found, and its
+// STE twin is clean.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, mkdtempSync, writeFileSync, rmSync, cpSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
