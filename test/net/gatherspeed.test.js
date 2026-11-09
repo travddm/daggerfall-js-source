@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { harvestNode, profState, profPixels } from '../../server-account/src/professions.js';
 import { marketRead } from '../../server-account/src/market.js';
-import { levyAt, titheAt } from '../../server-account/src/seatHolding.js';
+import { titheAt } from '../../server-account/src/seatHolding.js';
 import { listingsCapAt } from '../../server-account/src/seatForts.js';
 import { herbPatches, nodeKey, veins, utcDayOfMs, WITNESS } from '../../src/net/nodeLaw.js';
 import { seatReportText, seatWeekOf } from '../../src/net/townSeatLaw.js';
@@ -144,13 +144,12 @@ test('GATHER-SPEED: the professions\' state is one round trip, and a pixels-and-
 
 const SEAT = { key: 3021, name: 'Anticlere', region: ANTICLERE, tier: 'palace', pixel: [402, 151] };
 const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
-test('GATHER-SPEED / MARKET-SPEED: a Levy\'s seat, a Tithe\'s and a board\'s Market Hall read the seats\' witness rows off the isolate\'s kept minute - once for all six asks, where each read them whole (mutants: the Levy unkept; the Tithe unkept; the Market Hall unkept)', async () => {
+test('GATHER-SPEED / MARKET-SPEED: a Levy\'s seat, a Tithe\'s and a board\'s Market Hall read the seats\' witness rows off the isolate\'s kept minute - once for all the asks, where each read them whole (mutants: the Levy unkept; the Tithe unkept; the Market Hall unkept)', async () => {
   const s = await stand({ SEATS_OPEN: 'on' });
   const raw = s.raw;
   raw.exec('PRAGMA foreign_keys = OFF');
   for (const a of ['w1', 'w2', 'w3']) raw.prepare("INSERT INTO world_witness (kind, key, account, report, region, at) VALUES ('seat', ?, ?, ?, ?, ?)").run(String(SEAT.key), a, seatReportText(SEAT), SEAT.region, NOW - DAY);
   const week = seatWeekOf(NOW * 1000);
-  raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, state, at) VALUES (?, ?, 'levy', 'g1', 'x', 'law', ?)").run(SEAT.key, week, NOW);
   raw.prepare("INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, at, tithe) VALUES (?, 'g1', ?, 'palace', ?, ?, 5)").run(SEAT.key, SEAT.region, week - 1, NOW);
   raw.prepare("INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, 'market', 1, ?)").run(SEAT.key, NOW);
   const base = s.env.DB;
@@ -158,11 +157,10 @@ test('GATHER-SPEED / MARKET-SPEED: a Levy\'s seat, a Tithe\'s and a board\'s Mar
   const db = Object.create(base);
   db.prepare = (sql) => { if (seatRead(sql)) c.n++; return base.prepare(sql); };
   for (let i = 0; i < 2; i++) {
-    assert.equal(await levyAt(db, NOW + i, SEAT.region, SEAT.pixel), SEAT.key, 'the Levy\'s seat');
     assert.deepEqual(await titheAt(db, NOW + i, SEAT.region, SEAT.pixel), { key: SEAT.key, guild: 'g1', pct: 5 }, 'the Tithe\'s');
     assert.ok((await listingsCapAt(db, NOW + i, SEAT.pixel)) > MARKET_LISTINGS_MAX, 'a Market Hall\'s listings');
   }
-  assert.equal(c.n, 1, 'six asks within the minute: the rows read once');
+  assert.equal(c.n, 1, 'the asks within the minute: the rows read once');
 });
 
 // ═══ THE SERVICE: A MARKET READ ══════════════════════════════════════════════════════════════════════════════════════

@@ -87,9 +87,7 @@ import {
   haulYield, haulFinds, haulAtSea,   // PROF8
 } from '../../src/net/nodeLaw.js';
 import { CLIMATES } from '../../src/formats/mapsTables.js';
-import { seatsOpenFor } from './townSeats.js';   // SEAT1d: the Levy, where the seats are this account's
-import { levyAt } from './seatHolding.js';
-import { levyOf, seatWeekOf, seasonZeroOf } from '../../src/net/townSeatLaw.js';
+import { seasonZeroOf } from '../../src/net/townSeatLaw.js';
 import { tideNow } from './tides.js';   // SEASON1 part two: the land's Tide (9.3)
 import { tideYield } from '../../src/net/tideLaw.js';
 import { firmStatement, firmStatsFrom, firmStatsOf } from './firmament.js';   // FIRM1: the Firmament's hand on a harvest and a craft
@@ -605,16 +603,14 @@ export async function harvestNode(ctx, player, env, body = {}) {
   const wkind = deep ? 'dungeon' : 'pixel';
   const key = deep ? String(n.dungeon) : isBody ? null : pixelKey(n.x, n.y);
   const profession = law.profession;
-  // GATHER-SPEED: the hour's acts counted, the ground and the track read, and (SEAT1d) the Levy's seat asked - AT ONCE,
-  // three asks in flight together where they were four trips in a row. None reads what another writes; the hour's
+  // GATHER-SPEED: the hour's acts counted, the ground and the track read - AT ONCE,
+  // asks in flight together where they were trips in a row. None reads what another writes; the hour's
   // refusal still comes first, and a refused harvest's reads are only read
   // FIRM1: and the character's Firmament beside its track (firmament.js firmStatement) - its yield and XP the service's
-  const [over, [factRows, trackRows, firmRows], levyKey] = await Promise.all([
+  const [over, [factRows, trackRows, firmRows]] = await Promise.all([
     overRate(ctx, `prof:${player.id}`, PROF_OPS_MAX, PROF_OPS_WINDOW_S),
     readAll(db, [...(key === null ? [] : [factsStatement(db, [key], wkind)]), trackStatement(db, player.id, character, profession), firmStatement(db, player.id, character)])
       .then((rows) => (key === null ? [[], ...rows] : rows)),
-    // A dungeon's vein and a body name no ground of a town
-    !deep && !isBody && seatsOpenFor(player, env) ? levyAt(db, nowS, region, [n.x, n.y], env) : null,
   ]);
   if (over) return { error: 'prof-rate' };
   const fact = key === null ? null : factsFrom([key], factRows).get(key);
@@ -756,10 +752,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
   if (firmYield) qty = scaleQty(qty, firmYield, dice(rand));   // a die drawn only for a tree that moves the yield
   const xp = scaleXp(harvestXp(xpTier ?? tier, rank, clean), xpPct(firm, profession));
   const nonce = mintId(rand);
-  // SEAT1d (SEAT0 7.6): THE LEVY - a tenth of a harvest on ground in the bailiwick of a seat whose Levy rules this week
-  // goes to the seat's stockpile; the gatherer keeps at least one (its seat asked above, beside the ground).
-  const levy = levyKey == null ? 0 : Math.max(0, Math.min(levyOf(qty, dice(rand)), qty - 1));
-  const kept = qty - levy;
+  const kept = qty;
   // SILVER-FINDS: A
   // HARVEST'S FIND - the service's dice, after every draw above so each of them is what it was; struck in this batch, by
   // THIS harvest's row alone, under the day's `gather` silver (marks.js gatherStrikeStatement). Bounded, not witnessed:
@@ -816,13 +809,6 @@ export async function harvestNode(ctx, player, env, body = {}) {
     db.prepare(`INSERT INTO ${T} (player, char_id, material, origin, qty)
       SELECT player, char_id, extra, 'own', extra_qty FROM node_harvests WHERE ${mine} AND extra IS NOT NULL
       ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = ${T}.qty + excluded.qty`).bind(player.id, rid, nonce),
-    // SEAT1d: the Levy's units to the seat's stockpile, beside the harvest that paid them - once (the request's own row)
-    ...(levy > 0 ? [
-      db.prepare(`INSERT OR IGNORE INTO town_seat_levies (player, rid, key, week, material, qty, at)
-        SELECT ?1, ?2, ?4, ?5, material, ?6, ?7 FROM node_harvests WHERE ${mine}`).bind(player.id, rid, nonce, levyKey, seatWeekOf(nowS * 1000), levy, nowS),
-      db.prepare(`INSERT INTO town_seat_stockpile (key, material, qty) SELECT ?4, material, ?5 FROM node_harvests WHERE ${mine}
-        ON CONFLICT (key, material) DO UPDATE SET qty = town_seat_stockpile.qty + excluded.qty`).bind(player.id, rid, nonce, levyKey, levy),
-    ] : []),
     db.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at)
       SELECT player, char_id, profession, MIN(?4, xp), ?5 FROM node_harvests WHERE ${mine}
       ON CONFLICT (player, char_id, profession) DO UPDATE SET xp = MIN(?4, prof_tracks.xp + excluded.xp), updated_at = excluded.updated_at`)
@@ -837,7 +823,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
   ];
   const rows = await readAll(db, [...decided, ...answer.map(([, st]) => st)]);
   const made = rows[decided.length - 1][0] ?? null;
-  if (made?.n === nonce) return answerOf(made, readsBy(answer, rows, decided.length), nowS, levy > 0 ? { levy: { qty: levy, key: levyKey } } : {}, rank);
+  if (made?.n === nonce) return answerOf(made, readsBy(answer, rows, decided.length), nowS, {}, rank);
   if (made) return harvestAnswer(db, player, env, made, nowS, { repeat: true });   // the same request, racing itself
   if (await db.prepare('SELECT 1 FROM node_harvests WHERE day = ?1 AND node = ?2 AND kind = ?3 AND player = ?4 AND char_id = ?5')
     .bind(day, node, kind, player.id, character).first()) return { error: 'node-taken' };

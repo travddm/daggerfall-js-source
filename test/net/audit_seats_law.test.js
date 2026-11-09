@@ -140,9 +140,9 @@ test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' wor
   assert.equal(line('edict', { guild: SH, edict: 'festival' }), 'In week 9, the Silver Hand <SH> proclaimed a Festival at Wayrest.');
   assert.equal(line('edict', { guild: SH, edict: 'market-day' }), 'In week 9, the Silver Hand <SH> proclaimed Market Day at Wayrest.');
   assert.equal(line('edict', { guild: SH, edict: 'nonsense' }), 'In week 9, the Silver Hand <SH> proclaimed an Edict at Wayrest.');
-  assert.deepEqual(['curfew', 'levy', 'bounty', 'conscription', 'royal-tourney', 'open-gates', 'x'].map(edictWords),
-    ['a Curfew', 'a Levy', 'a Bounty', 'a Conscription', 'a Royal Tourney', 'Open Gates', null]);
-  assert.equal(seatRuleLine({ tier: 'palace' }, { tithe: 6, edict: 'levy', standing: 50 }), 'Tithe 6%. A Levy is proclaimed.');
+  assert.deepEqual(['curfew', 'bounty', 'conscription', 'royal-tourney', 'open-gates', 'x'].map(edictWords),
+    ['a Curfew', 'a Bounty', 'a Conscription', 'a Royal Tourney', 'Open Gates', null]);
+  assert.equal(seatRuleLine({ tier: 'palace' }, { tithe: 6, edict: 'curfew', standing: 50 }), 'Tithe 6%. A Curfew is proclaimed.');
   assert.equal(seatArrivalNews({ holder: { standing: 50, edict: 'open-gates' } }), 'Open Gates is proclaimed.');
   const place = (k) => (k === 5023 ? seat : null);
   assert.deepEqual([seatTitleText('champion', [5023, 0], place), seatTitleText('champion', [5023, 2], place)], ['Champion of Wayrest', 'Champion of Wayrest, Season 2']);

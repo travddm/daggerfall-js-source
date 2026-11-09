@@ -18,7 +18,7 @@ import {
   domainsWeekOf, domainsRule, domainReportOf, domainReportText, parseDomainReport, domainSeats, charterSeats, charterUnder,
 } from '../../src/net/domainLaw.js';
 import { confirmedDomains, domainFacts, witnessDomain, DOMAIN_ROWS_KEPT_S, DOMAIN_AGREEING_KEPT } from '../../server-account/src/domains.js';
-import { titheAt, levyAt } from '../../server-account/src/seatHolding.js';
+import { titheAt } from '../../server-account/src/seatHolding.js';
 import { settleWeek } from '../../server-account/src/seatTurning.js';
 import { readFileSync } from 'node:fs';
 import { createTownSeatBook } from '../../src/net/townSeatBook.js';
@@ -216,12 +216,9 @@ test('DOMAIN3 THE BAILIWICK IS THE REGION: a board nearer a holding pays the Cha
   s.domain(21, ANTICLERE.key);
   const sh = await s.guild('Gamal', 'Silver Hand', 'SH');
   s.hold(ANTICLERE, sh.gid, { tithe: 5 });
-  s.raw.prepare("INSERT INTO town_seat_edicts (key, week, edict, guild_id, set_by, state, set_aside, spent, at) VALUES (?, ?, 'levy', ?, 'Gamal', 'law', 0, 0, ?)").run(ANTICLERE.key, W, sh.gid, T0);
   const db = s.svc.env.DB, env = s.svc.env;
   assert.deepEqual(await titheAt(db, T0, 21, RIPMORE.pixel, env), { key: ANTICLERE.key, guild: sh.gid, pct: 5 });
   assert.equal(await titheAt(db, T0, 21, RIPMORE.pixel), null, 'the seat law: Ripmore\'s own bailiwick, unheld');
-  assert.equal(await levyAt(db, T0, 21, RIPMORE.pixel, env), ANTICLERE.key);
-  assert.equal(await levyAt(db, T0, 21, RIPMORE.pixel), null);
 });
 
 test('DOMAIN3 THE FOLD: the Turning before the first region-law week releases a Charter held at a holding - its claim fee home, its stockpile to the region\'s Charter\'s, the Chronicle\'s line - keeps the seat of power\'s holder, and claims nothing at a holding; Season 0\'s last Turning wipes instead, and folds nothing (mutants: the fold\'s refund; the stockpile moved; the claims filtered; the wipe\'s guard; the week unthreaded to the Turning)', async (t) => {

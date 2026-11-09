@@ -896,7 +896,7 @@ export function seatShopFactor(seat, guildId = null) {
 export const STANDING_CHANGES = Object.freeze({
   titheLow: 2, titheHigh: -3, unchallenged: STANDING_UNCHALLENGED, gate: 2, gateWeekMax: 6, noWatch: -5,
   siegeHeld: 15, throneReached: -5, festival: 10, neglect: -10, writ: 1, writWeekMax: 5, paidLate: -5,
-  revoltTo: 20, curfew: -2, levy: -2, openGates: 3,
+  revoltTo: 20, curfew: -2, openGates: 3,
   conscripted: -5,   // CROWN1 (7.6): a seat that paid a crown's Conscription
   fealtyBroken: -10,   // CROWN2 (7.8): every seat of a guild that broke its fealty
   wedding: TIDE_EFFECTS.weddingStanding, taxRevolt: TIDE_EFFECTS.revoltStanding,   // SEASON1 part two (9.3): a Royal Wedding's week; a Tax Revolt's, its Tithe above 5%
@@ -925,7 +925,6 @@ export const EDICTS = Object.freeze({
   'open-gates': Object.freeze({ name: 'Open Gates', standing: STANDING_CHANGES.openGates, cost: null, repeat: false }),
   curfew: Object.freeze({ name: 'Curfew', standing: STANDING_CHANGES.curfew, cost: null, repeat: false }),
   festival: Object.freeze({ name: 'Festival', standing: STANDING_CHANGES.festival, cost: Object.freeze({ palace: 2500, crown: 10000 }), repeat: false }),
-  levy: Object.freeze({ name: 'Levy', standing: STANDING_CHANGES.levy, cost: null, repeat: false }),
   bounty: Object.freeze({ name: 'Bounty', standing: 0, cost: null, repeat: false }),
   // CROWN1 (SEAT0 7.6): a crown's alone - the kingdom's palace seats held by other guilds pay it a share of their Tithe
   conscription: Object.freeze({ name: 'Conscription', standing: 0, cost: null, repeat: false, crown: true }),
@@ -933,7 +932,7 @@ export const EDICTS = Object.freeze({
   'royal-tourney': Object.freeze({ name: 'Royal Tourney', standing: 0, cost: Object.freeze({ crown: 5000 }), repeat: false, crown: true }),
 });
 export const edictOk = (e) => typeof e === 'string' && Object.hasOwn(EDICTS, e);
-/** AUDIT-SEATS L7: an Edict as a sentence names it (9.2: "proclaimed a Festival") - a Curfew, a Festival, a Levy, a
+/** AUDIT-SEATS L7: an Edict as a sentence names it (9.2: "proclaimed a Festival") - a Curfew, a Festival, a
  *  Bounty, a Conscription, a Royal Tourney; Market Day and Open Gates bare - or null for none. */
 export const edictWords = (e) => (edictOk(e) ? (e === 'market-day' || e === 'open-gates' ? EDICTS[e].name : `a ${EDICTS[e].name}`) : null);
 /** The same at a sentence's start: "A Festival", "Market Day". */
@@ -945,8 +944,7 @@ export const edictMayFollow = (edict, last) => edictOk(edict) && (edict !== last
 /** What an Edict costs at a seat of `tier` (0 for most). */
 export const edictCost = (edict, tier, tide = 'calm') => Math.floor((EDICTS[edict]?.cost?.[tier] ?? 0)
   * (edict === 'festival' ? (tide === 'plague' ? TIDE_EFFECTS.plagueFestival : tide === 'wedding' ? TIDE_EFFECTS.weddingFestival : 1) : 1));   // SEASON1 part two: the coming week's Tide on a Festival
-/** The Levy's share of a gathering's yield (SEAT0 7.6), the Bounty's pay a camp and the camps an account a day. */
-export const LEVY_SHARE = 0.1;
+/** The Bounty's pay a camp and the camps an account a day. */
 export const BOUNTY_MARKS = 20;
 export const BOUNTY_CAMPS_DAY = 5;
 /** The Festive buff (SEAT0 7.6): +5 to every attribute for a game day, in the town while the Festival is proclaimed. */
@@ -1017,7 +1015,6 @@ export const EDICT_WORDS = Object.freeze({
   'open-gates': 'Every home in the town stands open to all. Standing +3.',
   curfew: 'The guards are stronger at night and every crime costs twice the reputation. Standing -2.',
   festival: 'Music and banners; everyone in the town is Festive, +5 to every attribute for a day. Standing +10.',
-  levy: 'A tenth of what is gathered near the town goes to its stockpile. Standing -2.',
   bounty: 'Camps near the town yield double, and the treasury pays 20 silver a camp cleared, from what is set aside.',
   conscription: 'The kingdom\'s palace seats held by other guilds pay the crown 2% of their week\'s Tithe, a March\'s 1%. Standing -5 at every seat that pays.',
   'royal-tourney': 'A duel ladder all week at the castle\'s square, every blow refereed; the week\'s champion takes the prize and the title Champion of the kingdom for good.',
@@ -1104,14 +1101,6 @@ export function bountyDenPixel(site) {
 }
 /** A Bounty claim's pixel: a World of Daggerfall camp's on the Bay (bountySitePixel), a den's past it. @param {unknown} site */
 export const bountyClaimPixel = (site) => bountySitePixel(site) ?? bountyDenPixel(site);
-
-/** THE LEVY'S SHARE OF ONE HARVEST (SEAT0 7.6): a tenth of `qty`, its fraction kept or not by `roll` (0-1, the
- *  harvest's own) - so a harvest of 3 gives the seat one unit three times in ten, and the tenth holds on average. */
-export const levyOf = (qty, roll) => {
-  const whole = Math.round(Math.max(0, qty) * LEVY_SHARE * 1e6) / 1e6;   // 3 x 0.1 is 0.30000000000000004 in floats
-  const n = Math.floor(whole + 1e-9);
-  return n + (roll < whole - n ? 1 : 0);
-};
 
 // ═══ SEAT2a: THE BATTLES' WEEK - WINDOWS, THE SCHEDULE, THE SIDES (SEAT0 6.3-6.5) ═══
 // The Turning names a Right of Siege (or a Tourney at a Contested seat) for the coming week; SEAT2a places each in the
