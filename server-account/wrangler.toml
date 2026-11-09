@@ -134,13 +134,6 @@ MODES_OFFERED = ""
 # remove Moderators, and the Discord moderators' queue links a Discord id to an account the same way.
 # The other *_HANDLES lists below grant a TITLE (a name beside a name), never a right to act on another player.
 #
-# STAFF-PANEL1: AN OWNER'S FIRST WAY IN - `handle:publicKey`, comma-separated, the key raw Ed25519 in base64url. The owner's own
-# staff panel extension minted the pair on their computer and holds the private half; this half only checks its signature,
-# so it is safe in a public repository. It is that owner's first way in; every other staff member is invited from the
-# panel. Empty: no owner can enrol (no key is a shut door, never an open one).
-# STAFF-PANEL1 (2026-10-22, mob pasted the key his panel showed): SirMcMobdon's first computer. Latty enrols by mob's invite,
-# or adds a pair here.
-OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"
 # SAFE1-SAFE8 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system";
 # bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY.
 #

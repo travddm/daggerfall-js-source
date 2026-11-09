@@ -1,15 +1,14 @@
 // STAFF-CHAT-RED.
 // The switch beside the chat's field, Me or Red: an Admin's alone (the dev glyph, the relay's own test for /red), kept
 // across reloads, Red sending each line as "/red <line>" would and a command as typed, and Me while hidden asking first
-// and then asking the Staff Panel to turn Hide off. Its mutants are tools/mutants/staff-chat-red.json.
+// and then asking for Hide to be turned off. Its mutants are tools/mutants/staff-chat-red.json.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { ChatLog } from '../../src/net/chat.js';
 import { createChatPanel } from '../../src/ui/chatPanel.js';
-import { createChatVoice, VOICE_PREF, VOICE_ASK_MS, voiceAskText, voiceShownText, voiceOpenPanelText, voiceHiddenText } from '../../src/net/chatVoice.js';
-import { staffShowMe, STAFF_TOKEN_WAIT_MS } from '../../src/net/staffHook.js';
+import { createChatVoice, VOICE_PREF, VOICE_ASK_MS, voiceAskText, voiceShownText, voiceCannotShowText, voiceHiddenText } from '../../src/net/chatVoice.js';
 import { createChatSafetyHost } from '../../src/scenes/chatSafetyHost.js';
 import { accountTokenMinter, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { PUBLIC_TABS } from '../../src/net/safety/chatStamp.js';
@@ -83,7 +82,7 @@ test('STAFF-CHAT-RED KEPT: the voice is the device\'s uiPrefs shelf - Red read b
   assert.equal(VOICE_PREF in shelf(), false, 'Me is the default, so the shelf holds no word for it (PREF1)');
 });
 
-test('STAFF-CHAT-RED HIDDEN: Red still speaks; Me asks first and a second press inside the window says yes - Hide off asked of the Staff Panel, its answer said; a lapsed ask asks again; a line in Me while hidden is not sent and says so (mutants: Me while hidden with no ask; the yes never asking the panel; the panel\'s no said as a yes; the ask never lapsing; a hidden Me line sent)', async () => {
+test('STAFF-CHAT-RED HIDDEN: Red still speaks; Me asks first and a second press inside the window says yes - Hide off asked, its answer said, and the game alone has no way to turn it off; a lapsed ask asks again; a line in Me while hidden is not sent and says so (mutants: Me while hidden with no ask; the yes never asking the panel; the panel\'s no said as a yes; the ask never lapsing; a hidden Me line sent)', async () => {
   fresh();
   const r = rig();
   r.voice.adopt({ hidden: true });
@@ -96,7 +95,7 @@ test('STAFF-CHAT-RED HIDDEN: Red still speaks; Me asks first and a second press 
   assert.equal(voiceAskText(), 'This shows you to players. Turn Hide off? Press Me again to say yes.');
   assert.equal(r.voice.mode(), 'red', 'nothing changed on the first press');
   assert.equal(r.voice.asking(), true);
-  assert.equal(r.shows.length, 0, 'the panel is not asked before the yes');
+  assert.equal(r.shows.length, 0, 'nothing is asked before the yes');
   r.tick(VOICE_ASK_MS + 1);
   assert.equal(r.voice.asking(), false, 'an ask left alone lapses');
   r.voice.pick('me', 'world');
@@ -105,20 +104,27 @@ test('STAFF-CHAT-RED HIDDEN: Red still speaks; Me asks first and a second press 
   r.voice.pick('me', 'world');
   assert.equal(r.voice.mode(), 'me', 'yes: Me');
   assert.equal(r.voice.asking(), false);
-  assert.equal(r.shows.length, 1, 'yes: the Staff Panel asked to turn Hide off');
+  assert.equal(r.shows.length, 1, 'yes: Hide off asked');
   await settle();
   assert.deepEqual(r.said.at(-1), ['world', voiceShownText()]);
   const old = rig({ show: false });
   old.voice.adopt({ hidden: true });
   old.voice.pick('me', 'world'); old.voice.pick('me', 'world');
   await settle();
-  assert.deepEqual(old.said.at(-1), ['world', voiceOpenPanelText()], 'no panel, or one older than the ask');
-  assert.equal(voiceOpenPanelText(), 'Open the Staff Panel to show yourself.');
+  assert.deepEqual(old.said.at(-1), ['world', voiceCannotShowText()], 'refused');
+  assert.equal(voiceCannotShowText(), 'Hide cannot be turned off from the game.');
+  // decision 122: no extension answers, so the voice's own showMe says no
+  const said = [];
+  const bare = createChatVoice({ glyphs: () => ['dev'], say: (tab, text) => said.push([tab, text]) });
+  bare.adopt({ hidden: true });
+  bare.pick('me', 'world'); bare.pick('me', 'world');
+  await settle();
+  assert.deepEqual(said.at(-1), ['world', voiceCannotShowText()], 'the default: Hide stays on');
   const broke = rig({ show: () => Promise.reject(new Error('gone')) });
   broke.voice.adopt({ hidden: true });
   broke.voice.pick('me', 'world'); broke.voice.pick('me', 'world');
   await settle(); await settle();
-  assert.deepEqual(broke.said.at(-1), ['world', voiceOpenPanelText()], 'a failed ask is a no');
+  assert.deepEqual(broke.said.at(-1), ['world', voiceCannotShowText()], 'a failed ask is a no');
   // Me while hidden: the relay would drop the line without a word
   const before = r.sent.length;
   assert.equal(r.voice.send('world', 'can anyone see me', r.onSend), false, 'held: it stays in the field');
@@ -134,7 +140,7 @@ test('STAFF-CHAT-RED HIDDEN: Red still speaks; Me asks first and a second press 
   assert.deepEqual(seen.said, [], 'not hidden: Me is simply Me');
 });
 
-/** A window for the staff door: its listeners, what it posted, and a way to answer as another sender. */
+/** A window: its listeners, what it posted, and a way to answer as another sender. */
 function fakeWin(origin = 'https://daggerfalljs.dev') {
   const listeners = new Set(), posted = [];
   const win = {
@@ -146,33 +152,6 @@ function fakeWin(origin = 'https://daggerfalljs.dev') {
   const hear = (data, { source = win, from = origin } = {}) => { for (const fn of [...listeners]) fn({ data, source, origin: from }); };
   return { win, posted, hear, listeners };
 }
-
-test('STAFF-CHAT-RED THE DOOR\'S ASK: staffShowMe posts { dfoStaff: hide, on: false } to the page\'s own origin and resolves the panel\'s ok - from this window and origin only, the ask itself no answer; no answer in STAFF_TOKEN_WAIT_MS is a no, and the listener goes either way (mutants: the ask to any origin; another sender\'s answer taken; the ask heard as its own answer; no timeout)', async () => {
-  const a = fakeWin();
-  const p = staffShowMe(a.win, { setTimer: () => 1, clearTimer: () => {} });
-  assert.deepEqual(a.posted, [[{ dfoStaff: 'hide', on: false }, 'https://daggerfalljs.dev']]);
-  a.hear({ dfoStaff: 'hide', on: false });   // the ask itself, which this window hears too
-  a.hear({ dfoStaff: 'hide', on: false, ok: true }, { source: {} });
-  a.hear({ dfoStaff: 'hide', on: false, ok: true }, { from: 'https://evil.test' });
-  a.hear({ dfoStaff: 'token', ok: true });
-  assert.equal(a.listeners.size, 1, 'none of those was the answer');
-  a.hear({ dfoStaff: 'hide', on: false, ok: true });
-  assert.equal(await p, true);
-  assert.equal(a.listeners.size, 0, 'let go once answered');
-  const b = fakeWin();
-  const q = staffShowMe(b.win, { setTimer: () => 1, clearTimer: () => {} });
-  b.hear({ dfoStaff: 'hide', on: false, ok: false });
-  assert.equal(await q, false, 'the service refused');
-  const c = fakeWin();
-  let fire = null, waited = 0;
-  const w = staffShowMe(c.win, { setTimer: (fn, ms) => { fire = fn; waited = ms; return 1; }, clearTimer: () => {} });
-  assert.equal(waited, STAFF_TOKEN_WAIT_MS);
-  fire();
-  assert.equal(await w, false, 'no panel answered: an older one ignores the ask');
-  assert.equal(c.listeners.size, 0);
-  assert.equal(await staffShowMe({ location: { origin: 'null' }, postMessage() {} }), false, 'an opaque page asks nobody');
-  assert.equal(await staffShowMe(null), false);
-});
 
 test('STAFF-CHAT-RED THE MINT\'S WORD: the service\'s `hidden: 1` reaches the voice through the page\'s own minter and the chat safety host (accountTokenMinter -> onIssued -> adopt, world.js adoptIssued\'s path), and a visible mint takes it back (mutants: `hidden` dropped from the minter\'s answer; the host not forwarding it)', async () => {
   fresh();

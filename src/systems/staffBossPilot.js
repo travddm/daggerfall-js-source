@@ -4,6 +4,8 @@
 // every game hands me the raid's run. The boss takes my feet and facing; its own swings and casts are held, a left
 // click swings at the player nearest my facing and a right click opens its cast. My body draws as concealment 7 and
 // no foe senses it. It ends when the boss falls, the event ends, or at Leave boss. No relay, no account change.
+// Nothing in the game starts it: Play as boss was the staff panel extension's message, removed with the game's hook
+// (decision 122).
 
 /** The oldest claim my word on the event says - the wire's bound (world/raidShared.js RAID_CLAIM_AGE_MAX). */
 export const PILOT_CLAIM_AGE = 7_200_000;
@@ -35,7 +37,7 @@ export function pilotStop() { _p = null; }
 /** The event raid's key I steer the boss of, or null. */
 export const pilotKey = () => _p?.key ?? null;
 export const piloting = () => _p !== null;
-/** The camera's facing, each frame (scenes/staffFollowHost.js). @param {number} yaw */
+/** The camera's facing, each frame. @param {number} yaw */
 export function pilotYaw(yaw) { if (_p && Number.isFinite(yaw)) _p.yaw = yaw; }
 /** A mouse press while I steer: 0 the swing, 2 the spell. @param {number} button @param {number} now ms */
 export function pilotPress(button, now) {
