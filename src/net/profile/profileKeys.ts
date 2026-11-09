@@ -148,6 +148,19 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.shop.sharedShelf',
   }),
+  // Whether the sky runs on a clock of its own online (net/skyLaw.js, TimeScale 24 beside the event clock's 12). DFU has
+  // one clock: the hour, the date, the season and the moons a player sees are the world's own. The census has no row of
+  // its own for the sky; it is a consequence of the shared clock (ON31).
+  'time.skyClock': Object.freeze({
+    census: Object.freeze(['ON31'] as const),
+    feature: 'TIME1',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client', 'account'] as const),
+    words: 'profile.time.skyClock',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;

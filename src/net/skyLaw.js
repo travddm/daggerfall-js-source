@@ -9,9 +9,11 @@
 //
 // A LEAF, AND NEVER THE RELAY'S. wire.js is in the relay's bundle and test/net/relayversion.test.js binds RELAY_VERSION to
 // every byte of it, so the sky lives here, outside the relay's import graph (test/systems/time1_sky.test.js holds it out); the
-// account service bundles it through nodeLaw.js, whose UTC days take their season from the sky. It imports wire.js
-// alone, so neither graph grows past this one file.
+// account service bundles it through nodeLaw.js, whose UTC days take their season from the sky. It imports wire.js and
+// the server profile's data (net/profile/), so neither graph grows past those leaves.
 import { sharedClassicMinutes, wallMsForClassicMinutes, ONLINE_MINUTES_PER_MS } from './wire.js';
+import { OFFICIAL_PROFILE } from './profile/officialProfile.ts';   // whether the sky has a clock of its own (time.skyClock)
+import { resolveRules } from './profile/profileKeys.ts';
 
 /**
  * TIME1: the sky's segments, oldest first. From `fromMs` (relay-clock ms) the sky runs at `minutesPerMs` classic
@@ -71,13 +73,26 @@ export function skyLawOf(segments) {
 
 const LAW = skyLawOf(SKY_SEGMENTS);
 
-/** TIME1: the sky's clock, classic minutes, for a relay-clock instant (ms) - the event clock's before the first switch. */
-export const skyClassicMinutes = (nowMs) => LAW.minutesAt(nowMs);
+// ONE CLOCK BY DEFAULT, AS IN DFU: the sky's own clock is the server profile's option (time.skyClock). Off, every read
+// below is the event clock's, so the sky, the date, the season and the moons are the world's. The account service reads
+// the official profile; the client reads the profile it installed (systems/online/serverProfile.ts sets the rule).
+let _skyOwnClock = () => resolveRules(OFFICIAL_PROFILE.rules)['time.skyClock'] === true;
+/** Sets the rule that answers whether the sky has a clock of its own. */
+export function setSkyClockRule(/** @type {() => boolean} */ fn) {
+  _skyOwnClock = fn;
+}
+/** Whether the sky runs on a clock of its own (time.skyClock). */
+export const skyHasOwnClock = () => _skyOwnClock() === true;
+
+/** TIME1: the sky's clock, classic minutes, for a relay-clock instant (ms) - the event clock's before the first switch,
+ *  and always with one clock. */
+export const skyClassicMinutes = (nowMs) => (skyHasOwnClock() ? LAW.minutesAt(nowMs) : sharedClassicMinutes(nowMs));
 /** TIME1: the inverse - the relay-clock millisecond at which the sky reads a classic minute (the words that say how long
  *  until the sky's dusk). */
-export const wallMsForSkyMinutes = (classicMinutes) => LAW.wallMsAt(classicMinutes);
-/** TIME1: the sky's rate at an instant, classic minutes per real ms (the event clock's before the first switch). */
-export const skyMinutesPerMsAt = (nowMs) => LAW.rateAt(nowMs);
+export const wallMsForSkyMinutes = (classicMinutes) => (skyHasOwnClock() ? LAW.wallMsAt(classicMinutes) : wallMsForClassicMinutes(classicMinutes));
+/** TIME1: the sky's rate at an instant, classic minutes per real ms (the event clock's before the first switch, and with
+ *  one clock). */
+export const skyMinutesPerMsAt = (nowMs) => (skyHasOwnClock() ? LAW.rateAt(nowMs) : ONLINE_MINUTES_PER_MS);
 
 /**
  * TIME1: the instants after `afterMs` at which the sky could switch to `minutesPerMs` with no jump AND with a midnight

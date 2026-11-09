@@ -4,6 +4,7 @@
 // day and its modal frame). Each fix held against the real producers: the census through LivingTown over the synthetic
 // town (test/lwTown.mjs), dayPlan, the service's own law, and the host's own source lifted out of world.js and run with
 // its seams stubbed.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -38,7 +39,8 @@ function makeTown(o = {}, size = {}) {
   return { town, nav, buildings };
 }
 /** The online pace's walk (TIME1: a real hour a sky day) - the host's livingBaseRate online, off the sky's law. */
-const ONLINE_MPM = PERSON_MOVE_SPEED / (skyMinutesPerMsAt(SKY_SEGMENTS.at(-1).fromMs) * 1000);
+/** The online walk's pace, read at the call: the sky's rate is the server profile's (time.skyClock). */
+const onlineMpm = () => PERSON_MOVE_SPEED / (skyMinutesPerMsAt(SKY_SEGMENTS.at(-1).fromMs) * 1000);
 
 test('AUDIT LW-II-2 W1: a crew hand\'s plan under a patrons\' word is made once - asked again, and again once the word moves, the same array and the plans\' count unmoved (never signed, it was made again at every read of a town with any word, and the stir and the walks with it) (mutants: W1-asked-alone)', () => {
   const { nav, buildings, doors } = synthTown();
@@ -298,7 +300,8 @@ test('AUDIT LW-II-2 W8 / C11: a token that opens a sentence opens it with a capi
   assert.ok(lines > 10);
 });
 
-test('AUDIT LW-II-2 W10: the word carried is the host\'s alone (`carriedOf` - the roads\' read, the host\'s livingTripsOf, hands its away, visitors, holders, news and places, never a word), told once the host has it; and at the ONLINE pace (a real hour a sky day) a patron\'s errand is still walked - 557 of 13,832 dropped (4.03%) where the calendar\'s drops 34 (0.25%) (mutants: LW16-host-word, W10-late-online, W10-leave-online)', () => {
+test('AUDIT LW-II-2 W10: the word carried is the host\'s alone (`carriedOf` - the roads\' read, the host\'s livingTripsOf, hands its away, visitors, holders, news and places, never a word), told once the host has it; and at the ONLINE pace (a real hour a sky day) a patron\'s errand is still walked - 557 of 13,832 dropped (4.03%) where the calendar\'s drops 34 (0.25%) (mutants: LW16-host-word, W10-late-online, W10-leave-online)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const visit = { id: 'v1', from: { mapId: 1, region: 17, name: 'Wayrest' }, outT0: D + 600, inT: D + 900, courier: false, news: [{ id: 'a9', enc: 'ea9', kind: 'fell', who: 'Ada Lark', foe: 'Orcs', place: 'Ripmarket', t: D + 100 }] };
   const roads = { away: new Map(), visitors: [], holders: new Map(), news: [], places: [] };
   const day = Math.floor((D + 600 - 240) / DAY_MIN);
@@ -307,7 +310,7 @@ test('AUDIT LW-II-2 W10: the word carried is the host\'s alone (`carriedOf` - th
   assert.deepEqual(hosted.carriedAt(D + 1000).map((x) => [x.key, x.from]), [['trip:a9', 'Wayrest']], 'the host\'s told');
   assert.match(W, /return \{ away, visitors, holders, news, places \};/);
   // the online pace: the measure of test/systems/livingWorld/lw16_word.test.js's B2 at the walk a real hour a sky day gives
-  assert.equal(ONLINE_MPM, CALENDAR_MPM / 2);
+  assert.equal(onlineMpm(), CALENDAR_MPM / 2);
   const { nav, buildings, doors } = synthTown();
   const places = townPlaces(nav, doors, buildings);
   const census = townCensus({ mapId: 4242, blocks: 9, region: 17, people: 3 }, buildings);
@@ -318,7 +321,7 @@ test('AUDIT LW-II-2 W10: the word carried is the host\'s alone (`carriedOf` - th
     const h2 = houses[(dd * 7 + r.slot + k) % houses.length];
     if (h2 === places.doors.get(r.home)) continue;
     total++;
-    if (!dayPlan(r, places, dd, { mpm: ONLINE_MPM, errands: [{ at: h2, from: dd * DAY_MIN + 540 + 16 * k, dur: PATRON_STAY_MIN }] }).some((e) => e.at === h2 && e.kind === 'shop')) missing++;
+    if (!dayPlan(r, places, dd, { mpm: onlineMpm(), errands: [{ at: h2, from: dd * DAY_MIN + 540 + 16 * k, dur: PATRON_STAY_MIN }] }).some((e) => e.at === h2 && e.kind === 'shop')) missing++;
   }
   assert.equal(total, 13832);
   assert.ok(missing / total < 0.045, `${missing} of ${total} dropped at the online pace`);
