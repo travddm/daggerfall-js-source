@@ -23,6 +23,7 @@ const PREFS = Object.freeze({
   banthaJungle: true,
   tamrielLands: true,
   landforms: true,
+  terrainSlopeCut: false, // the walked ground between samples
   roadVerges: true,
   climateBlend: true,
   questlines: true,

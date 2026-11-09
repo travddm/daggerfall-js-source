@@ -1214,8 +1214,8 @@ export function landformLiftField(woods, px, py, locationRect = null, hDim = HEI
 }
 
 /** A field of a pixel's samples (`f(x, y)`, integer samples 0..span) read between them: the read the collider's own floor
- *  takes (world.js heightAt), held to the pixel - FLORA-GROUND: the ground's one law, the drawn quad's two triangles cut on
- *  its (x, y)-(x+1, y+1) diagonal (terrainSurface.js walkGroundAt). */
+ *  took (world.js heightAt), held to the pixel, cut on the fixed (x, y)-(x+1, y+1) diagonal: a field of differences between
+ *  two grounds has no one cut of its own, though the drawn ground may take the other (terrain-quad-cut.ts). */
 function fieldBetween(f, span) {
   return (sx, sy) => {
     const cx = Math.max(0, Math.min(span, sx)), cy = Math.max(0, Math.min(span, sy));
