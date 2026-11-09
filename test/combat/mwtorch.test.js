@@ -307,11 +307,12 @@ test('MW-D51/52 pins: the rig hands the lit light over per frame and at the buil
   assert.equal((arm.match(/if \((?:t|f)Overlay\) overlayClock = torchState\.time;/g) ?? []).length, 2, 'F4: the torch’s clock through a variable, both rigs - no sampler allocated per frame');
   assert.match(arm, /const overlaySample = overlaySampler\(sampleTrack, \(\) => overlayClock\);/, 'F4: one sampler for the life of the rig');
   assert.match(arm, /if \(pendingBuild\) \{[\s\S]*?api\.build\(o\);\n\s+return;\n\s+\}/, 'F6: a queued build drains first and supersedes the rest');
-  assert.match(arm, /resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
+  assert.match(arm, /slots\.resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
   assert.match(arm, /refreshTorch\(\);\n\s+if \(torchState\) advanceClip\(torchState, \(torchSource \|\| rig\(\)\)\.keys, dt, null\);/, 'the torch’s own clock, on its own keys');
   assert.match(arm, /pickAnimSource\(r\.sources, TORCH_GROUP, resetClip, \{ loopFallback: true \}\)/, '"torch", start to stop, looping');
-  assert.match(arm, /const base = idleBaseFor\(\{ sneaking, inJump: !!jumpState, hasGroup \}\);/, 'MW-D52: refreshIdle takes the state');
-  assert.match(arm, /const short = base === FP_IDLE_SNEAK \? null : weaponShortGroup\(type\);/, 'the sneak idle rolls no loop dice');
+  const slots = rd('src/combat/fpArm/animSlots.js');
+  assert.match(slots, /idleBaseFor\(\{ sneaking: ctx\.sneaking\(\), inJump: !!slots\.jumpState, hasGroup: ctx\.hasGroup \}\)/, 'MW-D52: the idle takes the state');
+  assert.match(slots, /if \(base === FP_IDLE_SNEAK\) return \{ group: base, dice: false \};/, 'the sneak idle rolls no loop dice');
   assert.match(arm, /if \(pendingTorch !== null\) \{ const l = pendingTorch; pendingTorch = null; api\.setTorch\(l\); \}/, 'a light that arrived mid-build is not dropped (MAC-S1’s law)');
   const menu = rd('src/ui/enhanced/enhancedMenu.js');
   assert.doesNotMatch(menu, /\['Torch', armState\.torch/, 'MWA4: the carried light left the card with the per-piece readout - status() still carries it');

@@ -298,7 +298,7 @@ test('MW-D8: active() is false unless EVERY term holds - a frozen arm is not a r
   // or idle - is the same guarantee (a rig with none is the frozen bind
   // pose, and the sprite is the correct picture).
   // BEAST-SELF added the EIGHTH, ahead of the seven: the arm stands aside for a transformed lycanthrope (setStandIn)
-  assert.match(src, /const active = \(\) => !standIn && !!\(built && built\.ok && mesh && renderer && camera && \(actionState \|\| movementState \|\| jumpState \|\| idleState\)\s*&& viewMode === 'first'\);/,   // MW-D39 widened the clip term again: the jump slot counts
+  assert.match(src, /const active = \(\) => !standIn && !!\(built && built\.ok && mesh && renderer && camera && \(actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState\)\s*&& viewMode === 'first'\);/,   // MW-D39 widened the clip term again: the jump slot counts
     'not standing aside, built, built.ok, mesh, renderer, camera, a clip AND the first-person view - all eight');
 });
 
@@ -615,7 +615,7 @@ test('MW-D9f: the rig gates the step on ready() and the draw on active()', () =>
 
   // ready() must not require the mesh, or the deadlock comes straight back.
   const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| movementState \|\| jumpState \|\| idleState \|\| hitState \|\| deathState\) && renderer\);/,   // MW-D39: the jump slot counts here too
+  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState \|\| slots\.hitState \|\| slots\.deathState\) && renderer\);/,   // MW-D39: the jump slot counts here too
     'ready() is update()\'s own requirements - no mesh term, no camera term (MW-D26 widened the clip term)');
 });
 
@@ -2966,31 +2966,28 @@ test('MW-D39: the two jump plays over real keys - InAir loops on its loop window
   assert.ok(!resetClip(bare, 'jump', { start: 'loop stop', stop: 'stop', loopCount: 0 }).ok);
 });
 
-test('MW-D39: refreshJumpAnims\' wiring, source-pinned (character.cpp:494-532, :841-844)', () => {
+test('MW-D39: the jump slot\'s wiring in the arm and in its slots', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // The refresh order is the reference's: jump before movement, and
-  // its inJump is the movestate ladder's gate (:2296).
-  assert.match(arm, /const inJump = refreshJump\(\(cam && cam\.move\) \|\| null\);\s*\n\s*refreshMovement\(cam, dt, inJump\);/,
+  const slots = readFileSync('src/combat/fpArm/animSlots.js', 'utf8');
+  // Jump before movement: its inJump is what keeps the movement slot empty in the air.
+  assert.match(arm, /const inJump = slots\.refreshJump\(\(cam && cam\.move\) \|\| null\);\s*\n\s*slots\.refreshMovement\(cam, dt, inJump\);/,
     'jump refreshes first and gates movement');
-  assert.match(arm, /const base = inJump \? null : movementAnimState\(\{/,
-    'airborne, the movestate ladder does not run');
-  // The four-slot winner, in the priority enum's order
-  // (character.hpp:30-43: Weapon > Movement > Jump > idle-tier).
-  assert.match(arm, /actionState \|\| movementState \|\| jumpState \|\| idleState/);
-  // The group is the one-home ladder, from the jump base.
-  assert.match(arm, /composeStanceGroup\('jump', stance, hasGroup\)/);
-  // InAir: unbounded loops, startAtLoop on a forced same-state re-pick,
-  // and NO loopFallback in the options.
-  assert.match(arm, /\{ start: startAtLoop \? 'loop start' : 'start', stop: 'stop', loopCount: Infinity \}/);
+  assert.match(slots, /const base = inJump\s*\?\s*null\s*:\s*movementAnimState\(\{/,
+    'airborne, no movement group is chosen');
+  // The slot winner: the weapon action, the movement, the jump, the idle.
+  assert.match(arm, /actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState/);
+  // The group comes from the stance ladder, from the jump base.
+  assert.match(slots, /composeStanceGroup\('jump', stance, ctx\.hasGroup\)/);
+  // In the air: unbounded loops, from the loop on a stance change, and no loopFallback in the options.
+  assert.match(slots, /\{ start: sameKind \? 'loop start' : 'start', stop: 'stop', loopCount: Infinity \}/);
   // Landing: the tail, once.
-  assert.match(arm, /\{ start: 'loop stop', stop: 'stop', loopCount: 0 \}/);
-  // The jump advances at speedmult 1.0 - no rate scaling (:528-531).
-  assert.match(arm, /advanceClip\(jumpState, \(jumpSource \|\| rig\(\)\)\.keys, dt, null\)/);
-  // A jump ending resets the idle with it (:499-505), and the slot dies
-  // with a rebuild, an unload and a view switch like the others.
-  assert.match(arm, /function resetJump\(\)/);
-  assert.equal((arm.match(/jumpState = null; jumpGroup = null; jumpSource = null; jumpStance = null;/g) ?? []).length, 3,
-    'resetJump, the rebuild wipe and the unload wipe all clear the slot');
+  assert.match(slots, /\{ start: 'loop stop', stop: 'stop', loopCount: 0 \}/);
+  // The jump advances at rate 1.
+  assert.match(arm, /advanceClip\(slots\.jumpState, \(slots\.jumpSource \|\| rig\(\)\)\.keys, dt, null\)/);
+  // The slot empties with a rebuild and an unload as well as with resetJump.
+  assert.match(slots, /function resetJump\(\)/);
+  assert.equal((arm.match(/slots\.jumpState = null; slots\.jumpGroup = null; slots\.jumpSource = null; slots\.jumpStance = null;/g) ?? []).length, 2,
+    'the rebuild wipe and the unload wipe clear the slot');
 });
 
 test('MW-D39: THE FOUR HOSTS feed the jump-state inputs, named and swept', () => {
@@ -3043,8 +3040,8 @@ test('MW-D39: readySpell and castSpell are the two doors, and neither gates the 
   // AUDIT SPELL-HAND L5-9: the blow's own type in the weapon group alone (was: either form, three times)
   assert.equal((src.match(/animWeaponType\((?:blowType \?\? )?built\.mwType, sheathed, spellReady\)/g) || []).length, 3,
     'stanceOf, the weapon group and the torch\'s carried-left rule (MW-D51) must all read the spell stance');
-  assert.equal((src.match(/= stanceOf\(\);/g) || []).length, 3, 'the idle, the jump and the movement through stanceOf');
-  assert.match(src, /readySpell\(ready\) \{[\s\S]*?refreshWeaponGroup\(\);\n      resetIdle\(\);\n      resetMovement\(\);/);
+  assert.equal((readFileSync('src/combat/fpArm/animSlots.js', 'utf8').match(/= ctx\.stanceOf\(\);/g) || []).length, 3, 'the idle, the jump and the movement through stanceOf');
+  assert.match(src, /readySpell\(ready\) \{[\s\S]*?refreshWeaponGroup\(\);\n      slots\.resetIdle\(\);\n      slots\.resetMovement\(\);/);
   // the cast finishes and the stance drops at its end (it used to be taken for an abort and dropped mid-motion)
   assert.match(src, /if \(!want && upper === UPPER_BODY\.Casting\) \{ unreadyAfterCast = true; return false; \}/);
   // the cast plays the group's own section and lands back in the stance
@@ -3112,7 +3109,7 @@ test('AUDIT 36 F2: an INSTANT self-cast animates - the cast latches its own stan
   // ready - which is EVERY CasterOnly spell, readied and cast in one
   // synchronous call (hostMagic readySpell -> castInput for range 0).
   assert.ok(!/!spellReady\) return false/.test(fn), 'the cast must not refuse before the ready has been read');
-  assert.match(fn, /if \(!spellReady\) \{ spellReady = true; refreshWeaponGroup\(\); resetIdle\(\); resetMovement\(\); \}/,
+  assert.match(fn, /if \(!spellReady\) \{ spellReady = true; refreshWeaponGroup\(\); slots\.resetIdle\(\); slots\.resetMovement\(\); \}/,
     'the cast must latch the stance, or it plays its keys in the WEAPON\u2019s group');
   // the group is composed from the stance, which is why the latch is
   // not merely a gate: without it the keys land in the sword's group.
@@ -3225,11 +3222,11 @@ test('PX29: the movement rate divides by the PLAYING clip\u2019s own velocity (M
   // with a different source's number than the clip on screen, and the
   // sprint's rate changed under Mac without the sprint changing.
   // Reverted at his direction; the multi-source walk stays exported.
-  const src = readFileSync('src/combat/fpArm.js', 'utf8');
-  assert.match(src, /const vel = movementSource \? sourceVelocityOf\(movementSource, movementGroup\) : 0;/,
+  const src = readFileSync('src/combat/fpArm/animSlots.js', 'utf8');
+  assert.match(src, /const travel = slots\.movementSource \? sourceVelocityOf\(slots\.movementSource, slots\.movementGroup\) : 0;/,
     'the rate must divide by the clip that is playing');
-  assert.ok(!/sourcesVelocity\(rig\(\)\.sources, movementGroup\)/.test(src), 'the multi-source walk must not decide the movement rate');
-  assert.match(src, /PX29 - REVERTED AT MAC'S DIRECTION/, 'a declared divergence must say so where it lives');
+  assert.ok(!/sourcesVelocity\(/.test(src), 'the multi-source walk must not decide the movement rate');
+  assert.match(src, /The playing clip's own source answers, not a search over every source/, 'the choice must say so where it lives');
   // the helper reads ONE source and answers 0 for a source with no
   // accumulation root - which is every first-person clip.
   assert.equal(sourceVelocityOf(null, 'runforward'), 0);

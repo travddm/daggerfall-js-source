@@ -2817,38 +2817,15 @@ export function createFpArm() {
   let wornEquipKey = null;
   let lastBuildOpts = null;
 
-  // MW-D12: TWO CLIP SLOTS, because Morrowind's first-person arm plays
-  // TWO animations and the port had one.
-  //
-  // The reference keeps mCurrentIdle and mCurrentWeapon as separate
-  // AnimStates on separate priorities and lets rule 26 resolve them per
-  // bone group. In first person the weapon group is played on
-  // BlendMask_All at priorityWeapon, and the idle at a lower priority on
-  // the same mask, so the resolution is not a blend at all: WHILE A
-  // WEAPON ANIMATION IS PLAYING IT WINS EVERY BONE. That is why this can
-  // be two slots and a winner rather than the whole priority vector -
-  // and it is stated here so that when a third animation arrives
-  // (hit recoil, sneak) somebody ports rule 26 instead of adding a third
-  // `if`.
+  // THE CLIP SLOTS. The arm plays several clips at once, each in a slot of its own: the weapon action here, and the
+  // idle, movement, jump, hit recoil and death in fpArm/animSlots.js (`slots`). Every one of them moves every bone,
+  // so posing takes the highest slot that plays rather than blending: death, then the weapon action, then the
+  // recoil, the movement, the jump, and the idle last. The jump ranks under the movement but still shows in the air,
+  // because the movement slot empties there. On landing the movement takes over again, so a player who lands
+  // walking walks over the landing tail. A blend per bone group (a swing on the torso over a walk on the legs) is
+  // not done here.
   let actionState = null;
   let weaponGroup = null;
-  // MW-D26: THE THIRD SLOT - MOVEMENT. The reference plays movement at
-  // Priority_Movement, above the idle and below the weapon action, and
-  // in first person everything rides BlendMask_All - so the two-slot
-  // winner grows to three: action beats movement beats idle. The
-  // per-bone-group blend (a swing on the torso OVER a walk on the legs,
-  // rule 26's real vector) is NOT this - recorded in the bible as the
-  // known gap, so nobody mistakes the ladder for the vector.
-  // MW-D39: THE FOURTH SLOT - JUMP. Priority_Jump sits BELOW
-  // Priority_Movement in the reference's enum (character.hpp:34-35),
-  // so the winner ladder reads action > movement > JUMP > idle - and
-  // the jump still SHOWS in the air because the movestate ladder only
-  // runs inside `if (!mInJump)` (character.cpp:2296): airborne, the
-  // movement slot empties and the jump is the highest thing playing.
-  // On the landing frame movement selects again, so a player who lands
-  // holding W walks over the landing tail - the reference's own look.
-  // character.cpp:2355-2366 - the turn animation HOLDS 0.05s past the
-  // last actual rotation, so mouse jitter does not flicker it.
   let upper = UPPER_BODY.Rest;
   let spellReady = false;        // MW-D39: a spell is readied (the stance)
   let spellHand = false, spellInHand = false;   // SPELL-HAND: the spell goes in the free hand beside the weapon (the rig's word), and one is readied there
@@ -2864,15 +2841,10 @@ export function createFpArm() {
   // BlendMask_All: Priority_Torch on the LEFT ARM (character.cpp's
   // `mAnimation->play("torch", Priority_Torch, BlendMask_LeftArm, ...)`),
   // so the right arm keeps swinging while the left holds the light up.
-  // MWNPC4: THE REACTIONS - the hit recoil and the death
-  // (character.cpp refreshHitRecoilAnims, playRandomDeath/playDeath). Both play on BlendMask_All
-  // (`playBlendedAnimation(mCurrentHit, priority, MWRender::BlendMask_All, ...)`, and playDeath's own), so they join the
-  // winner ladder EXACTLY - the "third animation" the two-slot note above foresaw needs no per-bone vector, because
-  // neither has a mask of its own: Priority_Death over everything, Priority_Hit between the weapon and the movement
-  // (character.hpp's enum - Movement < Hit < Weapon < Block < Knockdown < Torch < Storm < Death). An NPC's body takes
-  // them (net/peer/peerBodies.js `_arm`, the pose's `ht` and `dd`); the player's own never does.
+  // The hit recoil and the death are slots too (animSlots.js). An NPC's body takes them (net/peer/peerBodies.js
+  // `_arm`, the pose's `ht` and `dd`); the player's own never does.
   let posedGroup = null;        // MWNPC4: the frame's winner, by name - on the card
-  let dead = false;              // MWNPC4: died - the reference stops refreshing a dead actor's states (character.cpp:"For dead actors, refreshCurrentAnims is no longer called")
+  let dead = false;              // died: a dead body's slots are no longer refreshed
   let torchLit = false;
   // WEAPON-GLOW1: the held weapon's glow - `{ look, code, level, ramp }`
   // (systems/weaponGlow.js meshGlow, or glowFromWord for a peer's body) - laid on the mesh each draw; the renderer lights
@@ -3415,6 +3387,7 @@ export function createFpArm() {
     built: () => built, dead: () => dead, upper: () => upper, sneaking: () => sneaking, viewMode: () => viewMode,
     notes: () => notes, rig: () => rig(), stanceOf: () => stanceOf(), nonBiped: () => nonBiped(), hasGroup,
   });
+  const clockOf = (state) => (state ? state.time : null);   // a slot's clock on the card
 
   /** MF1: the third body's OWN idle for the drawn stance - the same
    *  ladder refreshIdle climbs (composeStanceGroup: asked group, short
@@ -4996,18 +4969,14 @@ export function createFpArm() {
       return true;
     },
 
-    /** MWNPC4: A HIT RECOIL (character.cpp refreshHitRecoilAnims, the `recovery` arm): "hit" + one of the body's hitN
-     *  (chooseRandomGroup, by `roll`), played start to stop, once, at Priority_Hit - under a weapon action, over the
-     *  movement and the idle. A body that carries none plays none (mCurrentHit cleared); the dead recoil from nothing;
-     *  and a recoil still playing takes no other (refreshHitRecoilAnims returns while `isPlaying(mCurrentHit)`). */
+    /** A hit recoil, picked by `roll` (animSlots.js hurt): under a weapon action, over the movement and the idle. */
     hurt(roll = 0) {
       return slots.hurt(roll);
     },
 
-    /** MWNPC4: THE DEATH (playRandomDeath, playDeath): one of the body's deathN by `roll`, played once at
-     *  Priority_Death and held at its last frame; every other state reset (movement, weapon, hit, idle, jump) and no
-     *  longer refreshed. `startPoint` 1 stands a body already dead in its last frame - the reference's own startpoint,
-     *  which a loaded game hands a corpse. A body that carries no death stops where it stood. */
+    /** The death, picked by `roll` (animSlots.js die), held at its last frame over everything. The weapon action ends
+     *  and the upper body stands at rest or ready. `startPoint` 1 stands a body that a loaded game hands over already
+     *  dead in its last frame. A body whose clips carry no death stops where it stood. */
     die(roll = 0, { startPoint = 0 } = {}) {
       if (!built || !built.ok) return false;
       dead = true;
@@ -5016,7 +4985,7 @@ export function createFpArm() {
       return slots.die(roll, startPoint);
     },
 
-    /** MWNPC4: back from the dead - a body handed to a living actor (a spare, a pooled walker re-rolled in place). */
+    /** Back from the dead: a body handed to a living actor (a spare, a pooled walker re-rolled in place). */
     revive() {
       if (!dead && !slots.deathState) return;
       dead = false;
@@ -6064,9 +6033,9 @@ export function createFpArm() {
         movementGroup: slots.movementGroup,
         movementRate: slots.movementState ? +slots.movementRate.toFixed(3) : null,
         // The slots' own clocks, for the parity recording and the card.
-        idleTime: slots.idleState ? slots.idleState.time : null,
-        movementTime: slots.movementState ? slots.movementState.time : null,
-        jumpTime: slots.jumpState ? slots.jumpState.time : null,
+        idleTime: clockOf(slots.idleState),
+        movementTime: clockOf(slots.movementState),
+        jumpTime: clockOf(slots.jumpState),
         movementSource: slots.movementSource && slots.movementSource.name,
         // MW-D39: the jump slot, on the card like the others.
         jumpGroup: slots.jumpGroup,
