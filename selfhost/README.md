@@ -42,7 +42,7 @@ a value that is already there, so running it again changes nothing. workerd read
 | `GATE_SIGNING_KEY`, `GATE_PUBLIC_KEY`                                                              | relay, accounts        | Gate kills are not counted                                |
 | `CRON_SECRET`                                                                                      | accounts, cron sidecar | The cron door is off                                      |
 | `OWNER_KEYS`                                                                                       | accounts               | No owner can enrol (see `docs/operations/staff-roles.md`) |
-| `ANTHROPIC_API_KEY`, `STAFF_ANALYTICS_*`, `GATE_DISCORD_WEBHOOK` | as on Cloudflare       | That feature is off                                       |
+| `ANTHROPIC_API_KEY`, `STAFF_ANALYTICS_*`, `GATE_DISCORD_WEBHOOK`                                   | as on Cloudflare       | That feature is off                                       |
 | `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`                | r2, with `--r2 s3`     | The bucket refuses every request                          |
 
 The relay's `IDENTITY_PUBLIC_KEY` and the account service's `OWNER_KEYS` come from the environment, not from the
