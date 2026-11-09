@@ -2,10 +2,10 @@
 // "Every single thing here needs to be addressed. No exceptions."): A HOLLOW IN EVERY THEATRE. One Abyss Dungeon stood at a
 // time, in the world: the hub's one record (`sdev`), its census the Bay's 62 region channels, its site over MAPS.BSA's
 // rows (`W = 1000`), its find's word the Bay's 0..999. Now each theatre that holds ground for one (the Bay and the eight
-// provinces; Cyrodiil's open zone none) keeps a slot of its own - its own record, census, rest, find, receipts and herald,
+// provinces; Cyrodiil's open zone none) keeps a slot of its own - its own record, census, rest, find and receipts,
 // its slots numbered in its lane's span (the Bay's the 1, 2, 3 they always were); a crowd in Skyrim counts and draws
 // Skyrim's Hollow; a province's stands by its own cities (the registry's - TESA's places) on its theatre's ground, named
-// and heralded in its province. The Bay's Hollow is the one it always was. tools/mutants/ww5_hollows.json.
+// in its province. The Bay's Hollow is the one it always was. tools/mutants/ww5_hollows.json.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,7 +18,6 @@ import {
   sdLaneOf, SD_LANES, sdLaneRegions, sdFirst, sdRise, sdFind, sdFell, pickSdRegion, sdRoomKey, isSdRoom, sdWhere, sdFoundLine, SD_FIRST_RISE_MS, SD_LIFETIME_MS,
   SD_COOLDOWN_MS, SD_BAY_NAME, SD_COLLAPSE_MS,
 } from '../../../src/net/superDungeon/sdLaw.js';
-import { sdProvinceName, sdRisePost, sdFoundPost, sdFellPost, sdHeraldDue } from '../../../src/net/superDungeon/sdHerald.js';
 import { mintSdReceipt } from '../../../src/net/superDungeon/sdReceipt.js';
 import { sdTheatreCities, findSdTheatreSite, sdHollowLocation, sdWorldMapId, SD_WORLD_LANE, sdSalt, sdTemplates, pickSdTemplate, findSdSite, sdCities } from '../../../src/systems/superDungeon/sdSite.js';
 import { spawnedMapId } from '../../../src/world/spawnedDungeons.js';
@@ -98,28 +97,19 @@ test('WW5 THE WIRE: a record on its own lane\'s span and region - the Bay\'s `ev
   assert.deepEqual([sdReceiptKey('acct_1'), sdReceiptKey('acct_1', 0), sdReceiptKey('acct_1', 3)], ['sdrc:acct_1', 'sdrc:acct_1', 'sdrc:acct_1.3']);
 });
 
-test('WW5 THE WORDS AND THE HERALD: a province\'s Hollow said in its province ("in Skyrim") where a Bay\'s says its region; its herald\'s rise "somewhere in Skyrim", its find "in Skyrim", its end\'s field "In Skyrim" - the Bay\'s posts the words they always were (mutants: the province unnamed; the Bay\'s rise text moved)', () => {
+test('WW5 THE WORDS: a province\'s Hollow said in its province ("in Skyrim") where a Bay\'s says its region (mutants: the province unnamed)', () => {
   assert.equal(SD_BAY_NAME, 'the Iliac Bay');
   assert.equal(sdWhere(), 'near the Iliac Bay');
   assert.equal(sdWhere('', '', 'Skyrim'), 'in Skyrim');
   assert.equal(sdWhere('Solitude', 'Daggerfall', 'Skyrim'), 'near Solitude');
   assert.equal(sdFoundLine({ who: 'Mara', near: '', region: '', province: 'Skyrim' }), 'Mara has found an Abyss Dungeon in Skyrim!');
-  assert.deepEqual([0, 1, SKY_S + 1, 8 * SD_LANE_SPAN + 1].map(sdProvinceName), ['', '', 'Skyrim', 'Black Marsh']);
-  const bayRise = sdRisePost({ rec: { s: 4, ph: 'risen', r: 17, at: T0, until: T0 + SD_LIFETIME_MS, next: T0 + 2 * SD_LIFETIME_MS } });
-  assert.match(JSON.stringify(bayRise), /stands over it somewhere in the Iliac Bay, and the taverns of the nearest city speak of it\./, 'the Bay\'s rise, as it always was');
-  const skyRise = sdRisePost({ rec: { s: SKY_S + 4, ph: 'risen', r: -1, at: T0, until: T0 + SD_LIFETIME_MS, next: T0 + 2 * SD_LIFETIME_MS } });
-  assert.match(JSON.stringify(skyRise), /stands over it somewhere in Skyrim, and the taverns/);
-  const found = sdFind({ s: SKY_S + 4, ph: 'risen', r: 64, at: T0, until: T0 + SD_LIFETIME_MS, next: T0 + 2 * SD_LIFETIME_MS }, T0 + M, 'Mara');
-  assert.match(JSON.stringify(sdFoundPost({ rec: found })), /Mara has found an Abyss Dungeon in Skyrim!/);
-  assert.match(JSON.stringify(sdFellPost({ rec: sdFell(found, T0 + 2 * M, { top: 'Ann', n: 2 }) })), /In Skyrim/);
-  assert.equal(sdHeraldDue(found, { rise: SKY_S + 4, found: -1, end: -1 }, T0 + 2 * M).kind, 'found', 'a lane\'s own state');
 });
 
 const quiet = (fn) => { const warn = console.warn, info = console.info; console.warn = () => {}; console.info = () => {}; return Promise.resolve().then(fn).finally(() => { console.warn = warn; console.info = info; }); };
 const UNITS_PER_M = PIXEL_UNITS / PIXEL_M;
 const doorPose = (px, py, east = 10) => ({ x: (px + 0.5) * PIXEL_UNITS + east * UNITS_PER_M, y: 0, z: (500 - py - 0.5) * PIXEL_UNITS, yaw: 0, pitch: 0 });
 
-test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first beat, rest and rise, its census its own regions (a crowd in Skyrim\'s channel draws Skyrim\'s Hollow, the Bay\'s crowd the Bay\'s), fanned and said at every hello as its kind (`ev` the Bay\'s, `ln` a province\'s); a find at a province\'s world pixel found in its own lane alone; the live door answers the asker\'s slot\'s lane; an account\'s receipts kept and spent a lane each (a province\'s never standing over the Bay\'s), handed at its hello; the herald posts each lane\'s (mutants: one lane beaten; the census across lanes; the fan\'s kind; the find\'s lane; the live door\'s lane; a receipt key shared; the herald\'s lane)', async () => {
+test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first beat, rest and rise, its census its own regions (a crowd in Skyrim\'s channel draws Skyrim\'s Hollow, the Bay\'s crowd the Bay\'s), fanned and said at every hello as its kind (`ev` the Bay\'s, `ln` a province\'s); a find at a province\'s world pixel found in its own lane alone; the live door answers the asker\'s slot\'s lane; an account\'s receipts kept and spent a lane each (a province\'s never standing over the Bay\'s), handed at its hello(mutants: one lane beaten; the census across lanes; the fan\'s kind; the find\'s lane; the live door\'s lane; a receipt key shared)', async () => {
   const realNow = Date.now;
   let clock = T0;
   Date.now = () => clock;
@@ -127,10 +117,6 @@ test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first b
     await quiet(async () => {
       const world = fakeRooms({ now: () => clock });
       const hub = world.room(SOCIAL_ROOM);
-      const posts = [];
-      hub.room._heraldOf = () => ({ sdRole: null });
-      hub.room._heraldSend = async (body) => { posts.push(body); return true; };
-      hub.room._heraldBeat = async () => {}; hub.room._serpentHeraldBeat = async () => {}; hub.room._egHeraldBeat = async () => {}; hub.room._ktHeraldBeat = async () => {};
       const fire = async (room) => { if (room.alarm.at != null && Date.now() >= room.alarm.at) await room.fire(); };
       const hubber = async (n) => { const ws = hub.connect(); await hub.hello(ws, `peer-h${n}`, null, { name: `H${n}`, acct: `acct-h${n}`, asecret: `secret-of-acct-h${n}` }); return ws; };
       const inRegion = async (r, id, sub) => { const room = world.room(chatRegionRoom(r)); const ws = room.connect(); await room.hello(ws, id, null, { kind: 'linked', tokenSub: sub }); return ws; };
@@ -152,10 +138,6 @@ test('WW5 THE RELAY: the hub keeps a Hollow in every lane - each its own first b
       const h2 = await hubber(2);
       const said = h2.sent.filter((m) => m.t === 'sd');
       assert.deepEqual(said.map((m) => [m.k, sdLaneOf(m.s)]), [['ev', 0], ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => ['ln', l])], 'a hello: the Bay\'s first, then every lane\'s');
-      // the herald: each lane's rise, its province named
-      await fire(hub);
-      assert.ok(posts.some((p) => JSON.stringify(p).includes('somewhere in Skyrim')), 'Skyrim\'s rise posted');
-      assert.ok(posts.some((p) => JSON.stringify(p).includes('somewhere in the Iliac Bay')), 'the Bay\'s, as always');
       // a find at Skyrim's pixel, in its cell
       const [px, py] = [1566, -427];
       const cell = world.room(worldRoom(px, py));

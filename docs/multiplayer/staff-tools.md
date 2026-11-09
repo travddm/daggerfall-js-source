@@ -6,13 +6,13 @@ in [chat-safety.md](chat-safety.md).
 
 ## Roles
 
-| Role | Source | Checked by |
-| --- | --- | --- |
-| Admin | `players.staff_admin` | `isDeveloper`; `staffRole` returns `admin` |
-| Moderator | `players.staff_mod` | `canModerate`; `staffRole` returns `moderator` |
-| Owner | `players.staff_owner` (and Admin) | `isOwner` |
-| Report reader, POI approver | an Owner | `isReportReader`, `poiRolesOf` |
-| POI builder | an Admin | `poiRolesOf` |
+| Role                        | Source                            | Checked by                                     |
+| --------------------------- | --------------------------------- | ---------------------------------------------- |
+| Admin                       | `players.staff_admin`             | `isDeveloper`; `staffRole` returns `admin`     |
+| Moderator                   | `players.staff_mod`               | `canModerate`; `staffRole` returns `moderator` |
+| Owner                       | `players.staff_owner` (and Admin) | `isOwner`                                      |
+| Report reader, POI approver | an Owner                          | `isReportReader`, `poiRolesOf`                 |
+| POI builder                 | an Admin                          | `poiRolesOf`                                   |
 
 A role belongs to the account, never to a handle: registering a name grants nothing. The columns are read fresh on every
 request. An Owner is set only by the operator (`tools/staffRole.mjs`); an Owner adds and removes Admins
@@ -46,7 +46,7 @@ game's hook.
 - `/tp <player>` goes to the relay (`server/src/staffTeleport.js`, `routeStaffTeleport`), which checks `isStaff` and
   answers the target's position to the asker only. Client: `src/net/staffTeleport.js`.
 - `/relay <setting> <value>` (developers, `mayRelayCfg`) changes relay settings stored on the hub (`relaycfg`), such
-  as Discord roles and threads, `bossBody`, `leaseDoor`, `grantMode`. Settings are read through
+  as `bossBody`, `leaseDoor`, `grantMode`. Settings are read through
   `/internal/relay/cfg`. See `src/net/relayCfg.js`.
 
 ## Follow, hidden mode and the map
@@ -95,11 +95,11 @@ Admins can start a live event: a pack of creatures and an optional boss at a pla
 The relay posts signed batches to the account service (signature header `x-relay-staff-sig`,
 `server/src/staffFeedLaw.js`):
 
-| Feed | Relay | Service route | Tables |
-| --- | --- | --- | --- |
-| Network rows and foes seen | `staffNetFrame`, `staffFoesSeen`, `staffNetFlush` (`server/src/staffFeeds.js`) | `/v1/staff/net-feed` | `staff_net_batches`, `staff_net_rows`, `staff_foe_rows` |
-| Encounter reactions | `staffReactAsk` | `/v1/mod/reaction-feed` | `encounter_reactions`, `reaction_batches` |
-| Spawn grants | grant window | `/v1/mod/grant-feed` | not traced |
+| Feed                       | Relay                                                                          | Service route           | Tables                                                  |
+| -------------------------- | ------------------------------------------------------------------------------ | ----------------------- | ------------------------------------------------------- |
+| Network rows and foes seen | `staffNetFrame`, `staffFoesSeen`, `staffNetFlush` (`server/src/staffFeeds.js`) | `/v1/staff/net-feed`    | `staff_net_batches`, `staff_net_rows`, `staff_foe_rows` |
+| Encounter reactions        | `staffReactAsk`                                                                | `/v1/mod/reaction-feed` | `encounter_reactions`, `reaction_batches`               |
+| Spawn grants               | grant window                                                                   | `/v1/mod/grant-feed`    | not traced                                              |
 
 Feed windows are flushed when a room empties (`flushAtDrain`), so they do not keep a room awake. The hourly cron
 sweeps old rows.

@@ -75,69 +75,6 @@ RAID_TOWNS_SHA256 = ""
 # reconnect wave through its one hello gate shows (the relay's metrics,
 # `chat` busy refusals) - a split region keeps up to five objects awake.
 REGION_SHARDS = ""
-# ═══ DISCORD-GATES: THE ROLE THE OMEN PINGS ════════════════════════
-#
-# The Discord id of the opt-in role the hub pings on each gate's omen
-# (src/net/gate/gateHerald.js) - Server Settings > Roles, right-click the
-# role, Copy Role ID (Developer Mode on), with "Allow anyone to
-# @mention this role" turned on, or Discord shows the ping and notifies
-# nobody. An id is no secret. EMPTY IS A LEGAL STATE: the posts go out
-# pinging nobody.
-#
-# THE WEBHOOK IS A SECRET, NEVER A VAR: GATE_DISCORD_WEBHOOK, the
-# channel's webhook URL (Edit Channel > Integrations > Webhooks) - its
-# URL is the key to post in the channel, so the repository never holds
-# it. Put it on the Worker (the dashboard's Settings > Variables and
-# Secrets, type Secret; or `npx wrangler secret put
-# GATE_DISCORD_WEBHOOK` here) - that redeploys the Worker and drops
-# every player once. WITHOUT IT THE RELAY POSTS NOTHING and keeps
-# nothing for it.
-# SCALE5b: each role here is also a setting a developer changes at run
-# time, with no deploy: `/relay gateRole <id>`, `/relay serpentRole <id>`,
-# `/relay sdRole <id>` (src/net/relayCfg.js); the var is the role while
-# the hub holds none.
-# The role: its id handed over 2026-10-02, before the WB12/WB13 merge (it was
-# 1554215379817988167, World Events, from 2026-09-28).
-GATE_DISCORD_ROLE = "1555589839825670258"
-# ═══ SERPENT2: THE ROLE THE SERPENT'S BELLS PING ═══════════════════
-#
-# The Discord id of the opt-in role the hub pings on each sea serpent's
-# bells, fifteen minutes before it rises (net/serpent/serpentHerald.js) - posted
-# to the gate's channel, through the gate's webhook above. EMPTY IS A
-# LEGAL STATE: the bells ping the gate's role (GATE_DISCORD_ROLE); name
-# one here to give the serpent its own.
-SERPENT_DISCORD_ROLE = ""
-# ═══ SD-HERALD: THE ROLE AN ABYSS DUNGEON'S RISE AND FIND PING ══════
-#
-# The Discord id of the opt-in role the hub pings when an Abyss
-# Dungeon rises and when it is found (net/superDungeon/sdHerald.js) - posted to the
-# gate's channel, through the gate's webhook above; its fall and its
-# fade ping nobody. EMPTY IS A LEGAL STATE: the posts ping the gate's
-# role (GATE_DISCORD_ROLE); name one here to give the Abyss Dungeon
-# its own.
-SD_DISCORD_ROLE = ""
-# ═══ HERALD-CARDS: THE THREAD EACH EVENT POSTS TO ═══════════════════
-#
-# Every herald post is a card (src/net/herald/heraldCard.js) - Dagon's
-# Breach, the Sea Serpent and the Abyss Dungeon each in
-# its own colour. Name a thread of the gate's channel for a family and
-# its cards go there: a forum channel with one post a family (every
-# gate's cards in the gate's post), or a text channel's threads -
-# right-click the thread or the post and copy its ID (Developer Mode
-# on). A family with no thread of its own posts to the gate's thread;
-# with none set at all, everything goes to the channel itself, as
-# before. A thread Discord refuses (no thread of this channel, deleted,
-# locked) is said in the log and the card goes to the channel instead.
-# A FORUM CHANNEL NEEDS GATE_DISCORD_THREAD at least: Discord refuses a
-# forum post with no thread, and a refused post is let go.
-# Each is also a setting a developer changes at run time, with no
-# deploy: `/relay gateThread <id>`, `/relay serpentThread <id>`,
-# `/relay sdThread <id>`
-# (src/net/relayCfg.js).
-# EMPTY IS A LEGAL STATE: one channel, as before.
-GATE_DISCORD_THREAD = ""
-SERPENT_DISCORD_THREAD = ""
-SD_DISCORD_THREAD = ""
 # ═══ SAFE5: THE REVIEWER'S FEED ═════════════════════════════════════
 #
 # Where the public channels' lines are posted for the account service's

@@ -1635,7 +1635,7 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
 // world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world303';   // world303: the Town seats switch is pinned on in the server profile. world302: the seat system keeps its castles, regional Charters, fortifications, siege works, banner ribbons and Pacts, and loses Tides, Incursion Marks, the Levy, gifts, Fealty and the Season titles (the Crowned and Keeper titles leave the token's closed list). world299: TERRAIN-CUT - the official profile pins the slope cut off (`terrainSlopeCut`, net/profile/officialProfile.ts), so its hash `ph` moves; the ground and GROUND_LAW are unchanged. world298: PORTENT-FOLD - the omen lines (rise, wrath, marks) go through the text core. world297: the Revenants row's five fixed choices (who rises, spare, levels per rank, flight, return) are pinned in the server profile at their defaults. world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
+export const RELAY_VERSION = 'world311';   // world311: the relay's Discord herald leaves core (decision 118): the hub posts no gate, serpent or Abyss Dungeon cards, and the Discord role and thread settings leave the relay's settings; the gate's and the serpent's site agreement move to net/gate/gate-site.ts and net/serpent/serpent-site.ts. world303: the Town seats switch is pinned on in the server profile. world302: the seat system keeps its castles, regional Charters, fortifications, siege works, banner ribbons and Pacts, and loses Tides, Incursion Marks, the Levy, gifts, Fealty and the Season titles (the Crowned and Keeper titles leave the token's closed list). world299: TERRAIN-CUT - the official profile pins the slope cut off (`terrainSlopeCut`, net/profile/officialProfile.ts), so its hash `ph` moves; the ground and GROUND_LAW are unchanged. world298: PORTENT-FOLD - the omen lines (rise, wrath, marks) go through the text core. world297: the Revenants row's five fixed choices (who rises, spare, levels per rank, flight, return) are pinned in the server profile at their defaults. world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
 // world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
 //   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
 // world282: one version for client and relay - the per-feature relay gates are gone, and a welcome naming another
@@ -4414,9 +4414,9 @@ export function validSeaOut(m) {
 
 /** What a client may say to a gate's room - and AUDIT WBX S1's `spent`, to the hub alone: a day's receipt whose spoils
  *  this account has taken, so the hub forgets its kept copy (it handed it to every hello for a week, and a second
- *  device, a second browser or a private window rolled the same spoils again). DISCORD-GATES' `site`, to the hub alone:
- *  where this game found the gate the clock is about (systems/gate/gateSite.js) - the hub names the place in its Discord
- *  posts once two accounts agree (net/gate/gateHerald.js). */
+ *  device, a second browser or a private window rolled the same spoils again). And `site`, to the hub alone: where this
+ *  game found the gate the clock is about (systems/gate/gateSite.js) - the broken rite stands by the site two accounts
+ *  agree on (net/gate/gate-site.ts). */
 export const GATE_KINDS = Object.freeze(['in', 'hit', 'spent', 'site', 'xhit', 'ahit', 'heal', 'vt']);   // INT11: `vt` - my body, in my own word (net/bossBody.js)   // WB9c: `xhit` - a blow on a crystal of Oblivion; WB11b: `ahit` - a blow on one of his host; GATE-HEAL: `heal` - what healed me, and by whom
 /** AUDIT WBX R7: THE BRAIN'S LAW, by number - said on every `in` (`bv`) and refused below GATE_BRAIN_MIN: a client that
  *  does not know the brain's attacks (a tab loaded before a deploy) judged each new one a miss, fighting immune to it.
@@ -4472,9 +4472,9 @@ export const readArenaOut = (m) => validArenaOut(m);
  *  number of points under GATE_HEAL_WIRE_MAX. */
 export const GATE_HEAL_ROWS_MAX = 8;
 export const GATE_HEAL_WIRE_MAX = 100_000;
-/** DISCORD-GATES: a gate's place on the wire - "Copperham, Wrothgarian Mountains" (gateSite.js `place`) - and its law:
- *  letters, digits, spaces, commas, apostrophes and hyphens, one space at a time, GATE_PLACE_MAX long. It goes out to a
- *  Discord channel, so it can carry no markdown, no link and no mention; both ends run it, and the relay takes only a
+/** A gate's place on the wire - "Copperham, Wrothgarian Mountains" (gateSite.js `place`) - and its law:
+ *  letters, digits, spaces, commas, apostrophes and hyphens, one space at a time, GATE_PLACE_MAX long. Other players
+ *  read it, so it can carry no markup, no link and no mention; both ends run it, and the relay takes only a
  *  place it leaves as it is (a client that sends it unrun is refused, not rewritten). */
 export const GATE_PLACE_MAX = 64;
 export const gatePlaceWire = (s) => String(s ?? '').replace(/[^A-Za-z0-9 ',-]/g, '').replace(/\s+/g, ' ').trim().slice(0, GATE_PLACE_MAX).trim();
@@ -4591,7 +4591,7 @@ export function validGateIn(m) {
     const h = m.h.map((t) => (Array.isArray(t) && t.length === 2 && typeof t[0] === 'string' && ID_RE.test(t[0]) && intIn(t[1], 1, GATE_HEAL_WIRE_MAX) ? [t[0], t[1]] : null));
     return h.every(Boolean) && new Set(h.map((t) => t[0])).size === h.length ? { k: 'heal', h } : null;
   }
-  if (m.k === 'site') {   // DISCORD-GATES: the day, the gate's map pixel and its place, as gatePlaceWire leaves it
+  if (m.k === 'site') {   // the day, the gate's map pixel and its place, as gatePlaceWire leaves it
     if (!Number.isSafeInteger(m.d) || m.d < 0 || !gatePixelOk(m.d, m.px, m.py) || typeof m.pl !== 'string') return null;   // WW2: a lane past the Bay's a world pixel
     return /^[A-Za-z]/.test(m.pl) && gatePlaceWire(m.pl) === m.pl ? { k: 'site', d: m.d, px: m.px, py: m.py, pl: m.pl } : null;
   }
@@ -5376,14 +5376,14 @@ export function validOwOut(m) {
 // SERPENT_SITES_MAX a day - and a forged site stands its own fight, which no honest client sees or hears the kill of.
 
 /** What a client may say to the serpent's cell - and SERPENT2's `site`, to the HUB alone: the day, the site's native
- *  point to the whole unit and the port it lies off, so the hub's Discord herald names the place and posts the kill at
- *  the site the most accounts agree on (net/serpent/serpentHerald.js). */
+ *  point to the whole unit and the port it lies off, so the hub can tell every game the site the most accounts agree on
+ *  (net/serpent/serpent-site.ts). */
 export const SERPENT_KINDS = Object.freeze(['in', 'hit', 'held', 'esc', 'wr', 'site', 'vt']);   // INT13: `vt` - my hull, in my own word
 /** What the cell (or the hub) says back (the client drops any other kind): the whole state, a leg of its swim, a change
  *  in how it rides the sea, an attack begun, its health, a phase's turn, a coil wound / its health / broken / crushed /
  *  slipped, the maelstrom formed, the kill, the sounding, a refusal, a receipt. WW7-12 (;
  *  ): and the HUB's `at` - where the
- *  accounts that found the serpent agree it lies (net/serpent/serpentHerald.js serpentAtWord: the `site` words folded,
+ *  accounts that found the serpent agree it lies (net/serpent/serpent-site.ts serpentAtWord: the `site` words folded,
  *  GATE_SITE_AGREE of them), told to every game online, so a game that cannot roll the site over the world's lanes (the
  *  land past the Bay off, or its picture still coming) rises its serpent where the rest do. */
 export const SERPENT_OUT_KINDS = Object.freeze(['st', 'sw', 'dv', 'atk', 'hp', 'ph', 'coil', 'ch', 'cb', 'cr', 'cx', 'mael', 'fell', 'gone', 'no', 'rcpt', 'bd', 'at']);   // INT13: `bd` - the relay's count has wrecked my ship (enforced)

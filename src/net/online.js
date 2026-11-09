@@ -742,7 +742,7 @@ export class OnlineSession {
     this._wedBucket = null;       // LEGACY7 part three: my own wed frames out - wedGate's law
     this._inWedBuckets = new Map();   // LEGACY7 part three: the gate on wed frames coming in, per sender (`_directedIn`)
     this.onSea = null;            // SEA-EVENTS: (word) => void - the social room's word on the treasure fleets (wire.js validSeaOut)
-    this._gateSiteSaid = null;    // DISCORD-GATES: the socket and day my `site` last went on - once a socket and day (WW2: and gate - `{ ws, said }`, the gates said on it)
+    this._gateSiteSaid = null;    // the socket and day my `site` last went on - once a socket and day (WW2: and gate - `{ ws, said }`, the gates said on it)
     this.arenaHeard = false;      // FIELD BUGS 2026-10-16b ARENA-WAIT: a primary welcome has come (sticky) - before it the arena on the online lane waits (scenes/arena/arenaOnline.js waiting)
     this.onArena = null;          // ARENA4: (word, room) => void - the hall's or a bout's word, projected by the wire's readArenaOut
     this._arenaBucket = null;     // ARENA4: my own arena words out - arenaGate's law
@@ -1776,8 +1776,8 @@ export class OnlineSession {
     return true;
   }
   /** SERPENT2: where this game found the serpent the clock is about (systems/serpent/serpentSite.js - its day, its native point
-   *  to the whole unit and the port it lies off), said to the hub, whose Discord herald names the place and posts the
-   *  kill at the site the most accounts agree on (net/serpent/serpentHerald.js). ONCE A SOCKET AND DAY (the gate's `site` law);
+   *  to the whole unit and the port it lies off), said to the hub, which tells every game the site the most accounts agree
+   *  on (net/serpent/serpent-site.ts serpentAtWord). ONCE A SOCKET AND DAY (the gate's `site` law);
    *  on the hub's socket alone, under the serpent frames' own bucket; true once it went. */
   sendSerpentSite(day, sx, sz, place) {
     if (this._serpentSiteSaid && this._serpentSiteSaid.ws === this._ws && this._serpentSiteSaid.d === day) return true;
@@ -2008,9 +2008,9 @@ export class OnlineSession {
     return true;
   }
 
-  /** DISCORD-GATES: where this game found the gate the clock is about (systems/gate/gateSite.js - its day, its map pixel and
-   *  its place), said to the hub, which names the place in its Discord posts once two accounts agree (net/gate/gateHerald.js).
-   *  ONCE A SOCKET AND DAY - a reconnect says it again, to a hub a deploy may have given a herald since. On the hub's
+  /** Where this game found the gate the clock is about (systems/gate/gateSite.js - its day, its map pixel and its place),
+   *  said to the hub, whose broken rite stands by the site two accounts agree on (net/gate/gate-site.ts).
+   *  ONCE A SOCKET AND DAY - a reconnect says it again, to a hub that may have restarted since. On the hub's
    *  socket alone, under the gate frames' own bucket; true once it went. */
   sendGateSite(day, px, py, place) {
     // WW2: once a socket and GATE - each lane's gate of a day is its own number, and said once on the socket
