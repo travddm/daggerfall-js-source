@@ -98,7 +98,8 @@ click lives for exactly one quest tick unless an action consumes it.
 | Bounty board | `src/systems/bounty/` | Not a machine quest (below). |
 
 `offerFlow.js` keeps DFU's quirks on purpose (for example, the picker's index drift and a missing `QuestorOffer` showing
-nothing). `questRepute.js` holds DFU's success and failure repute values, charged when a quest ends.
+nothing). `questRepute.js` holds DFU's success and failure repute values, charged when a quest ends. Online the
+failure costs the same; a server profile can waive it (`quest.failureFree`, `quest-failure-rule.ts`).
 
 Plain bulletin boards are DFU's rumour board: `src/systems/bulletinBoard.js` composes the first rumour fit for a sign
 (`src/systems/rumorMill.js`).
