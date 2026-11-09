@@ -47,6 +47,9 @@ Pull requests target `feat/tamriel-review` and use the template in
 
 - Name the branch `<type>/<topic>`, keep commits short, and search the open pull requests for overlap first
   ([git-and-prs.md](.claude/rules/git-and-prs.md)).
+- Write an owner decision as "decision 104", never "#104": GitHub links `#N` to pull request N. Only a real pull request
+  or issue gets a number, as a full link or `travddm/daggerfall-js-source#N`
+  ([git-and-prs.md](.claude/rules/git-and-prs.md)).
 - One concern per pull request. A refactor never shares one with a visible change.
 - A change a player can see or feel stays a draft until it was checked in the running game and the check is recorded
   with the commit it checked ([verification-and-ui.md](.claude/rules/verification-and-ui.md)).
@@ -64,6 +67,6 @@ Pull requests target `feat/tamriel-review` and use the template in
 | [.claude/rules/code.md](.claude/rules/code.md)                               | Moving touched code out of big modules, readable code, tests that run the code, out-of-scope work |
 | [.claude/rules/comments.md](.claude/rules/comments.md)                       | Comments say why; no codes, dates, history, quotes, banners or `bible/` cites                     |
 | [.claude/rules/docs.md](.claude/rules/docs.md)                               | What a `docs/` page holds and how it stays true                                                   |
-| [.claude/rules/git-and-prs.md](.claude/rules/git-and-prs.md)                 | Branches, commits, descriptions, drafts, relay version races, patch notes                         |
+| [.claude/rules/git-and-prs.md](.claude/rules/git-and-prs.md)                 | Branches, commits, descriptions, numbers, drafts, relay version races, patch notes                |
 | [.claude/rules/verification-and-ui.md](.claude/rules/verification-and-ui.md) | Checking in the running game, before and after images, touch and phones                           |
 | [.claude/rules/design-rules.md](.claude/rules/design-rules.md)               | No graphics regressions, departures as mods, no payments, private mods, host splits               |

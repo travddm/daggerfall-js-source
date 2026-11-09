@@ -22,6 +22,13 @@ Before you open a pull request, search the open pull requests for the same files
 (`gh pr list --state open --search "<terms>"`). Name each overlap in the description and say how the two relate. An
 overlap found before the work is cheaper than a conflict found at review.
 
+## Numbers
+
+Write an owner decision as "decision 104", and any other item that is not a pull request or an issue (a plan step, a
+finding) without a `#`. Only a real pull request or issue gets a number, as a full link or as
+`travddm/daggerfall-js-source#N`. GitHub turns `#104` in a description, a commit message or a comment into a link to
+pull request 104, which has nothing to do with decision 104.
+
 ## Drafts
 
 A pull request that changes what a player sees or feels is a draft until it was checked in the running game
