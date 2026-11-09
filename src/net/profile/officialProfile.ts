@@ -28,6 +28,7 @@ const PREFS = Object.freeze({
   wildernessCamps: true,
   naval: false,
   revenants: true,
+  townSeats: true,
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,

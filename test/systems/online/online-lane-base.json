@@ -8,6 +8,7 @@
     "enhancedCombatVisuals": true,
     "lootRarity": true,
     "revenants": true,
+    "townSeats": true,
     "weaponTechniques": true,
     "humanoidLoot": "dfu",
     "repairPriceByDamage": false,

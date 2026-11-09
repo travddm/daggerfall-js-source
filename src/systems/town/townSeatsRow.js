@@ -25,5 +25,5 @@ export const TOWN_SEATS_ROW = Object.freeze({
     return t('features.townSeats.effect', 'Takes effect the next time you load a place.');
   },
   kinds: Object.freeze(['enhanced']),
-  control: Object.freeze({ store: 'prefs', key: TOWN_SEATS_PREF, initial: true, online: true }),
+  control: Object.freeze({ store: 'prefs', key: TOWN_SEATS_PREF, initial: true, online: 'room' }),
 });
