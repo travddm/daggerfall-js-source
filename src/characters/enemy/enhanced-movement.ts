@@ -322,8 +322,8 @@ export function rangedStep(foe: MovingFoe, dx: number, dz: number, ops: YawOps):
  * Outside the 5.625 degree gate it turns, and with its target in sight it walks on while it turns ("for more
  * natural-looking movement while pursuing"). A strafe and a back-away walk the way they chose, at a quarter and a half
  * of the walk, through the motor's step seam (_tacDir, which the Enhanced AI layer also uses); a wall or a drop there
- * stops the step, as DFU finds no detour for either. A flyer or swimmer only pursues for now: its strafe and back-away
- * come with the pitch group.
+ * stops the step, as DFU finds no detour for either. A flyer or swimmer only pursues: its strafe and back-away move in
+ * three dimensions, and DFU's pitch handling for them is not ported yet.
  */
 export function applyEnhancedStep(foe: MovingFoe, step: EnhancedStep, dx: number, dz: number, ops: YawOps): void {
   foe.moving = false;
