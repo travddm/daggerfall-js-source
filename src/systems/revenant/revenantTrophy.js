@@ -12,7 +12,7 @@
 // Pre-rolled when the revenant yields, so the choice shows exactly what killing it gives.
 import { createWeapon, randomMaterial, WEAPONS_ENUM } from '../../combat/enemyEquipment.js';
 import { mintCondition, setItemFields, templateByIndex } from '../item/itemTemplates.js';
-import { applyRarity } from '../loot/lootRarity.js';
+import { applyRarity, lootRarityOn } from '../loot/lootRarity.js';
 import { MOBILE_TYPES as M } from '../../characters/mobile/mobileTypes.js';
 import { possessive } from './revenantPersonality.js';   // one possessive for every title
 
@@ -91,8 +91,8 @@ export function trophyRarity(rank = 1, rolls = Math.random) {
 }
 
 /**
- * THE TROPHY: the weapon a revenant `r` drops when the player destroys it - its own kind of weapon, a random rarity,
- * named for it. `entity` the body it stood in (the weapon it carried), `level` the player's (the material's roll).
+ * THE TROPHY: the weapon a revenant `r` drops when the player destroys it - its own kind of weapon, a random rarity
+ * when Loot rarity is on, named for it. `entity` the body it stood in (the weapon it carried), `level` the player's (the material's roll).
  */
 export function revenantTrophy(r, { entity = null, level = 1, rolls = Math.random } = {}) {
   const templateIndex = trophyTemplate(r, entity);
@@ -100,8 +100,7 @@ export function revenantTrophy(r, { entity = null, level = 1, rolls = Math.rando
   const material = Math.max(randomMaterial(lv, rolls), randomMaterial(lv, rolls));   // the better of two
   const item = mintCondition(setItemFields({ group: 'Weapons', ...createWeapon(templateIndex, material, rolls) }));
   if (!item) return null;
-  const tier = trophyRarity(r?.rank ?? 1, rolls);
-  applyRarity(item, tier, rolls);
+  if (lootRarityOn()) applyRarity(item, trophyRarity(r?.rank ?? 1, rolls), rolls);   // Loot rarity off: the revenant's own weapon, as it carried it
   item.name = trophyName(r, templateIndex);   // over the ladder's name - a Legendary's record keeps its powers, not its name
   return item;
 }

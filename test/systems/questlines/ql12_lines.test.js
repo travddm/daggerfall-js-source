@@ -13,7 +13,6 @@ import { QL_LINES, lineById, lineStepOf, lineOpens, opensWords } from '../../../
 import { createLineRunner, STEP_GAP_S, RETRY_GAP_S, CLAIM_RETRY_MS, NEED_CHECKS } from '../../../src/systems/questlines/qlLineRunner.js';
 import { LOOT_RARITY_KEY } from '../../../src/systems/loot/lootRarity.js';
 import { setSigilOnline, setSigilRenown } from '../../../src/systems/sigil/sigil.js';
-import { REVENANT_MIN_RENOWN } from '../../../src/systems/revenant/revenant.js';
 import { QL_SERVICE_LINES, QL_WITNESS_KINDS, qlClaimOf, qlStepClaimed, QL_TITLES } from '../../../src/net/questlineClaims.js';
 import { ACT_KINDS } from '../../../src/systems/questlines/qlActs.js';
 import { sheetFor } from '../../../src/systems/questlines/qlSheets.js';
@@ -480,14 +479,15 @@ test('AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: a step whose deed needs a switc
     step();
     assert.ok(machine.scheduled.includes('QLIG01'), 'taken: it begins');
   } finally { setPref(LOOT_RARITY_KEY, true); }
-  // the Renown a revenant comes at: online, below it the Bay's second step waits
+  // the Renown a revenant comes at, once the player sets one: online, below it the Bay's second step waits
+  setPref('revenantRenown', '10');
   setSigilOnline(true);
   setSigilRenown(3);
   try {
     assert.equal(NEED_CHECKS.renown(), false, 'Renown 3 online: held');
-    setSigilRenown(REVENANT_MIN_RENOWN);
+    setSigilRenown(10);
     assert.equal(NEED_CHECKS.renown(), true);
-  } finally { setSigilOnline(false); }
+  } finally { setSigilOnline(false); setPref('revenantRenown', 'none'); }
   assert.equal(NEED_CHECKS.renown(), true, 'offline: no revenant is held');
 });
 
