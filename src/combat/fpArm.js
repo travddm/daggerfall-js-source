@@ -121,6 +121,7 @@ import {
   HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK, PLUMB, hipLanternPartPaths, resolveHipLanternPart, archiveHas,
   OFF_WEAPON_BONE, resolveOffWeaponParts, resolveWeaponParts,
 } from './fpArm/fpArmParts.js';   // the carried parts
+import { raceScaleOf, stickyAccumRoot } from './fpArm/buildRules.js';   // the race scale and the shared accum root
 export {
   hasDaggerfallArrows, hasAmmoFor, weaponPartPaths, torchPartPaths, TORCH_BONE, LIGHT_ATTITUDE, resolveTorchPart, HIP_LIGHT_BONE,
   HIP_LIGHT_SLOT, HIP_LANTERN_HOOK, hipLanternPartPaths, resolveHipLanternPart, archiveHas, OFF_WEAPON_BONE, resolveOffWeaponParts, resolveWeaponParts,
@@ -1528,8 +1529,7 @@ async function buildTpBody({
     if (!idlePick) {
       return { ok: false, stage: 'clip', error: `no source gives group "${idleProbe.group}" a start and a stop key`, notes: missing, rows };
     }
-    const accumRoot = sources.reduce((acc, so) => (acc ?? so.wouldAccumRoot), null) ?? null;
-    for (const so of sources) so.accumRoot = accumRoot;
+    const accumRoot = stickyAccumRoot(sources);
     poseAssembly(arm, { tracks: idlePick.source.trackMap, sampleTrack, time: idlePick.state.startTime, accumRoot });
 
     return {
@@ -1631,8 +1631,7 @@ async function buildCreatureBody({ creature, flies = false, deps = null }) {
     const groupSet = new Set(sources.flatMap((so) => so.groups));
     const idlePick = groupSet.has(FP_IDLE_BASE) ? pickAnimSource(sources, FP_IDLE_BASE, resetClip, { loopFallback: true }) : null;
     if (!idlePick) return { ok: false, stage: 'clip', error: `no source gives "${FP_IDLE_BASE}" a start and a stop key`, notes: arm.notes };
-    const accumRoot = sources.reduce((acc, so) => (acc ?? so.wouldAccumRoot), null) ?? null;
-    for (const so of sources) so.accumRoot = accumRoot;
+    const accumRoot = stickyAccumRoot(sources);
     poseAssembly(arm, { tracks: idlePick.source.trackMap, sampleTrack, time: idlePick.state.startTime, accumRoot });
     const third = {
       ok: true, arm, tracks: idlePick.source.trackMap, accumRoot, keys: idlePick.source.keys, sources, sourcePaths,
@@ -2042,13 +2041,7 @@ export async function buildFpArm({
     // no-op the reference's comment wants. Collision never scales
     // (:1104-1106) - the classic motor's collider is untouched. Last
     // .esm wins, the load order as everywhere else.
-    let raceScale = { weight: 1, height: 1 };
-    for (const e of esmBytes) {
-      const rrec = walk(e, 'races', raceRecords).get(raceKey);
-      if (rrec && rrec.radt) {
-        raceScale = { weight: rrec.weight[female ? 1 : 0], height: rrec.height[female ? 1 : 0] };
-      }
-    }
+    const raceScale = raceScaleOf(esmBytes.map((e) => walk(e, 'races', raceRecords).get(raceKey)), female);
     // MW-D14 / RULE 18: the settings name is not the final name. The
     // x-form is used only when its .kf is in the archive, which for a
     // male is never (the entry is already x-form, so the insert yields
@@ -2370,8 +2363,7 @@ export async function buildFpArm({
     // re-pick it. It is ONE value for the whole rig, not one per clip:
     // a per-source accum root would move the extraction bone when the
     // player swung, which is a rig that walks away mid-blow.
-    const accumRoot = sources.reduce((acc, so) => (acc ?? so.wouldAccumRoot), null) ?? null;
-    for (const so of sources) so.accumRoot = accumRoot;
+    const accumRoot = stickyAccumRoot(sources);
     const poseAt = (t) => poseAssembly(arm, { tracks, sampleTrack, time: t, accumRoot });
     // PX27 (Mac: the full arms do not show on a swing or a bow): THE
     // REACH IS SWEPT OVER EVERY CLIP THE ARM WILL EVER PLAY, not the
