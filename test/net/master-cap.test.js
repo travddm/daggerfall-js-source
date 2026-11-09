@@ -17,6 +17,9 @@ import { mintPiece } from '../../src/systems/smithItems.js';
 import { itemFindings } from '../../src/systems/item/itemLaw.js';
 import { isDeclaredItemField, validItemField } from '../../src/systems/item/itemFields.js';
 import { keptEnchantments } from '../../src/systems/enchanting.js';
+import { imprintRefusal } from '../../src/systems/loot/lootCodex.js';
+import { LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
+import { setPref, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { asMinted } from '../../src/systems/smithItems.js';
 
 const SWORD = recipeById('longsword:daedric');
@@ -69,6 +72,11 @@ test('a Rare record mints a Rare Master\'s work the item law holds lawful, close
   assert.deepEqual(honeableLines(piece), []);
   assert.equal(keptEnchantments(piece), null, 'the item maker refuses it');
   assert.equal(asMinted(piece), true, 'the market takes it as minted');
+  setPref(LOOT_RARITY_KEY, true);
+  try {
+    assert.equal(imprintRefusal(piece, 'any', { items: [piece], goldPieces: 0 }), 'not', 'the imprint refuses it');
+    assert.notEqual(imprintRefusal({ ...piece, master: undefined }, 'any', { items: [], goldPieces: 0 }), 'not', 'as it does not an ordinary Rare');
+  } finally { resetPrefs(); }
 });
 
 test('a Legendary record (the option, or one made before the cap) mints Legendary as it always did', () => {
