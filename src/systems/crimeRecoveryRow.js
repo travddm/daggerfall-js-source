@@ -1,7 +1,7 @@
 // @ts-check
 // F3a: the Features row for how fast a bad name recovers (systems/repRecovery.js reads its pref). DFU's pace, 4x it (the
 // default) or 16x. Online the room uses the default: the row's `online` names the tier the lane forces
-// (onlineLane.js declareOnlinePrefs). Its own file keeps systems/features.js from growing (docs/testing/lint-ratchet.md).
+// (onlineLane.js declareOnlinePrefs). Its own file, so the large systems/features.js does not take another row.
 import { t } from './textManager.js';
 
 /** @param {string} value @param {() => string} label */

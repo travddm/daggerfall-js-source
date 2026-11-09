@@ -1,29 +1,29 @@
 # Lint ratchet
 
-Size, complexity, unused-code and type-check limits for production code (`src/`, `server/src/`,
+Unused-code and type-check limits for production code (`src/`, `server/src/`,
 `server-account/src/`). Code that is already over a limit is recorded in `tools/lintRatchet.json` with its current
 figure. The record may only fall. The script is `tools/lintRatchet.mjs`; `npm run lint` runs it after ESLint.
 
 ## The limits
 
-| Check                             | Limit (target)                                              | Recorded figure, per                                                                                                   |
-| --------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `max-lines`                       | 1,000 lines a file                                          | file: its line count                                                                                                   |
-| `max-lines-per-function`          | 150 lines a function (IIFEs included)                       | `file::Function 'name'#n`: its line count. Unnamed functions share one `file::(unnamed)` entry: the sum of their lines |
-| `complexity`                      | 20                                                          | file: the summed excess over 20 of its functions                                                                       |
-| `max-depth`                       | 4 nested blocks                                             | file: the count of blocks nested deeper                                                                                |
-| `no-unused-vars`                  | none (`_`-prefixed arguments and caught errors are allowed) | file: the count of reports                                                                                             |
-| `no-unused-private-class-members` | none                                                        | file: the count of reports                                                                                             |
-| `ts-check`                        | every file under `src/` starts with `// @ts-check`          | file: `1` for a file without it                                                                                        |
+| Check                             | Limit                                                       | Recorded figure, per            |
+| --------------------------------- | ----------------------------------------------------------- | ------------------------------- |
+| `no-unused-vars`                  | none (`_`-prefixed arguments and caught errors are allowed) | file: the count of reports      |
+| `no-unused-private-class-members` | none                                                        | file: the count of reports      |
+| `ts-check`                        | every file under `src/` starts with `// @ts-check`          | file: `1` for a file without it |
 
-The limits are in `LIMITS` in the script. Blank lines and comments count: the limits cap how much a reader must hold.
+There is no limit on the size, complexity or nesting of a file or function. DFO's ceilings only stopped the hosts
+growing, and moving code into helpers to pass a ratchet hid the problem without fixing it. The project instead
+commits, before the new repository goes public, to break the large modules into readable modules with narrow
+interfaces and to rewrite the tests that read source text. Until then, new behaviour goes into a module of its own
+([architecture/hosts-and-modules.md](../architecture/hosts-and-modules.md)).
 
 ## What fails
 
 `npm run lint` (and CI) fails when:
 
-- a recorded figure **grows** (a file gets longer, a function longer or more complex);
-- something **not recorded** crosses a limit (a new file over 1,000 lines, a new unused variable, a new file under
+- a recorded figure **grows** (a file gains unused variables);
+- something **not recorded** crosses a limit (a new unused variable, a new file under
   `src/` without `// @ts-check`).
 
 CI's lint job also runs `node tools/lintRatchet.mjs --strict`, which fails too when a recorded figure has **fallen**
@@ -44,8 +44,7 @@ zero or whose file is gone. It never adds an entry and never raises one.
 
 A moved or split file is the exception: the new path is not recorded, so it fails as a new offender. When the move
 keeps the code as it was, run `npm run lint:ratchet -- --update --allow-new`. That re-baselines every entry from the
-current tree, so check that the diff of the JSON shows only the entries of the move. Prefer a split whose pieces are
-under the limits: they need no entry.
+current tree, so check that the diff of the JSON shows only the entries of the move.
 
 The file has one entry a line, sorted by key, so two branches that lower different files merge without a conflict.
 After a merge conflict in it, take either side and run `--update --allow-new` on the merged tree.
@@ -54,10 +53,6 @@ After a merge conflict in it, take either side and run `--update --allow-new` on
 
 ## Why a ratchet
 
-The tree has functions of tens of thousands of lines. A limit that fails on all of them would block every change; a
-limit that exempts a whole file lets it keep growing. The ratchet fails only on growth, so the count of offenders and
-their sizes can only go down while the refactor moves code out. The new-code rule (HOST-SPLIT in `CLAUDE.md`) is the
-same limit in another form: new behaviour goes into a module of its own, which starts under every limit.
-
-Function identity is its name and its occurrence among same-named offenders in the file. Adding a same-named offender
-above another shifts the numbers; update with `--allow-new` and read the diff.
+The tree has many unused variables and files without `// @ts-check`. A limit that fails on all of them would block
+every change; a limit that exempts a whole file lets it keep growing. The ratchet fails only on growth, so the count
+of offenders can only go down.

@@ -9,9 +9,9 @@ const empty = () => Object.fromEntries(CHECKS.map((c) => [c, {}]));
 const with_ = (check, entries) => ({ ...empty(), [check]: entries });
 
 test('LINT-RATCHET: a recorded figure that grows, and a new offender, fail; one that falls only shows as fallen', () => {
-  const ratchet = with_('max-lines', { 'src/a.js': 2000, 'src/b.js': 1500 });
+  const ratchet = with_('no-unused-vars', { 'src/a.js': 2000, 'src/b.js': 1500 });
   const { grown, added, fallen } = compare(
-    with_('max-lines', { 'src/a.js': 2001, 'src/b.js': 1400, 'src/c.js': 1001 }),
+    with_('no-unused-vars', { 'src/a.js': 2001, 'src/b.js': 1400, 'src/c.js': 1001 }),
     ratchet,
   );
   assert.deepEqual(
@@ -34,10 +34,10 @@ test('LINT-RATCHET: a file that left the offenders (or was deleted) is fallen to
 });
 
 test('LINT-RATCHET: --update lowers and drops figures and never raises or adds one; --allow-new takes the measurement', () => {
-  const ratchet = with_('max-lines', { 'src/a.js': 2000, 'src/b.js': 1500, 'src/gone.js': 1200 });
-  const measured = with_('max-lines', { 'src/a.js': 2100, 'src/b.js': 1400, 'src/c.js': 1001 });
-  assert.deepEqual(updated(measured, ratchet, false)['max-lines'], { 'src/a.js': 2000, 'src/b.js': 1400 });
-  assert.deepEqual(updated(measured, ratchet, true)['max-lines'], measured['max-lines']);
+  const ratchet = with_('no-unused-vars', { 'src/a.js': 2000, 'src/b.js': 1500, 'src/gone.js': 1200 });
+  const measured = with_('no-unused-vars', { 'src/a.js': 2100, 'src/b.js': 1400, 'src/c.js': 1001 });
+  assert.deepEqual(updated(measured, ratchet, false)['no-unused-vars'], { 'src/a.js': 2000, 'src/b.js': 1400 });
+  assert.deepEqual(updated(measured, ratchet, true)['no-unused-vars'], measured['no-unused-vars']);
 });
 
 test('LINT-RATCHET: the committed ratchet is the form serialize writes, one entry a line and sorted', () => {

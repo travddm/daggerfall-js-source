@@ -1,8 +1,8 @@
 // @ts-check
 // WEAPON-TECHNIQUES-SETTING: the Features row for the twelve weapon techniques (combat/technique/techniqueRoster.js). It
 // is the only switch the techniques have: they work with Loot rarity on or off, and rarity adds drops that carry a stronger
-// one. Off, a found technique line sleeps and its key is free; the loot ladder is untouched. Its own file keeps
-// systems/features.js from growing (docs/testing/lint-ratchet.md).
+// one. Off, a found technique line sleeps and its key is free; the loot ladder is untouched. Its own file, so the large
+// systems/features.js does not take another row.
 import { t } from './textManager.js';
 
 export const WEAPON_TECHNIQUES_ROW = Object.freeze({
