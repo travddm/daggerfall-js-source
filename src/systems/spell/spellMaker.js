@@ -178,7 +178,7 @@ export function blankEffectSettings() {
   return s;
 }
 
-/** ABSORB-NERF: THE PORT'S OWN, with the absorption limits on (absorption-limits.ts) - a crafted Spell
+/** THE PORT'S OWN, with the absorption limits on (absorption-limits.ts) - a crafted Spell
  *  Absorption (effect key '20,255') stops its chanceBase at 50, the same 50% absorption.js caps the live chance at.
  *  Every other effect and field keeps SPINNER_RANGES as it stands. */
 export const SPELL_ABSORPTION_KEY = '20,255';

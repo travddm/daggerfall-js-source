@@ -30,7 +30,7 @@ import { effectCost, effectSchool, TARGET_COST_MULT, CAST_COST_FLOOR } from './s
  *  pinned). */
 export const SPELL_ABSORPTION = Object.freeze({ None: 0, InLight: 1, InDarkness: 2, Always: 4 });
 
-/** ABSORB-NERF: THE PORT'S OWN, never DFU's, now a player option (absorption-limits.ts; off, DFU's). A
+/** THE PORT'S OWN, never DFU's, now a player option (absorption-limits.ts; off, DFU's). A
  *  100% AbsorbsSpells item (or a 100% crafted Spell Absorption) made its wearer all but immune to casters AND refilled
  *  their magicka off every bolt. Three numbers, one home:
  *   - ABSORB_ENCHANT_CHANCE: the AbsorbsSpells item enchantment is a ROLL of 50%, no longer DFU's flat always;
