@@ -12,6 +12,12 @@ export async function run({ browser, base, ck }) {
   const g = new Game(browser, base, { drawless: true });
   const travelState = () => g.J(() => window.__travelProbe());
   const travelMap = () => g.J(() => window.__travelMap());
+  // A town start puts the player inside the town, where a message box (the quest's courier, a town page) can open after
+  // the probe cleared the boxes and pauses the game under it, so the trip never walks. A player closes it; so does the probe.
+  const closeMessageBox = async () => {
+    const kind = await g.page.evaluate(() => window.__overlayKind?.());
+    if (kind === 'ActionTextBox') await g.key('Escape');
+  };
   try {
     // ── fast travel ──
     await enterTown(g, TOWN_URL);
@@ -68,6 +74,7 @@ export async function run({ browser, base, ck }) {
       async () => {
         const m = await travelMap();
         if (m === null) return true;
+        await closeMessageBox();
         if (pressed === 0 || Date.now() - lastPress > 30000) {
           pressed++;
           lastPress = Date.now();
@@ -94,6 +101,7 @@ export async function run({ browser, base, ck }) {
     let dumped = false;
     const landed = await g.until(
       async () => {
+        await closeMessageBox();
         const t = await travelState();
         const j = await g.J(() => JSON.stringify(window.__journeyState()));
         lastState = j;
