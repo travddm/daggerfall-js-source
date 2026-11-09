@@ -8,9 +8,9 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
 ## The rule and the gate
 
 - Morrowind is sold, not freeware. Its files never enter the repository or the build. The player attaches
-  `Morrowind.bsa`, the expansions, `Morrowind.esm` and any mod files through the Morrowind card of the enhanced menu (`morrowindCard` in
-  `src/ui/enhanced/enhancedMenu.js`, which also reports why a body was refused); they live only in IndexedDB
-  (store `morrowind`, see [arena2-data.md](arena2-data.md)).
+  `Morrowind.bsa`, the expansions, `Morrowind.esm` and any mod files through the Morrowind card of the enhanced menu
+  (`morrowindCard` in `src/ui/enhanced/enhancedMenu.js`, which also reports why a body was refused); they live only
+  in IndexedDB (store `morrowind`, see [arena2-data.md](arena2-data.md)).
 - The layer is on when the enhanced skin is on and Morrowind data is attached: `isEnhanced() && morrowindDataCount() > 0`.
   There is no separate switch for the player's own arms and body. NPC bodies also honour the pref `mwNpcBodies`
   (`characters/npcBodies.js`).
@@ -24,7 +24,7 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
 ## Data plumbing (`src/scenes/dataSource.js`)
 
 | Function | Does |
-|---|---|
+| --- | --- |
 | `pickMorrowindFiles`, `storeMorrowindFiles` | Store `.bsa`, `.esm`, `.esp`, and loose `.nif .kf .dds .tga .wav`. Loose files are keyed by `mwLoosePath`: lower-case, from the first known root (`meshes/`, `textures/`, `sound/`, `icons/`, `bookart/`, `animations/`, ...). |
 | `registerMorrowindData` | Counts the stored archives at boot; bumps `morrowindDataGeneration()` when the stored set changed. |
 | `loadMorrowindArchives` | Opens every source as a `{ has, get, load, loaded }` archive, in lookup order (below). Cached per generation. |
@@ -47,7 +47,7 @@ An async read must store its result in the cache generation it started under.
 ## Readers (`src/formats/morrowind/`)
 
 | Module | Reads or does |
-|---|---|
+| --- | --- |
 | `mwBsaFile.js` | Morrowind BSA v0x100 (unrelated to Daggerfall's BSA). Paths normalized by `normalizeBsaPath`. |
 | `mwEsmFile.js` | TES3 `.esm`/`.esp`. Every record has a size, so unknown records are skipped and counted. Decodes `BODY`, `RACE`, `NPC_`, `CREA`; deleted records are dropped. Text is Windows-1252. |
 | `mwNifFile.js` | NIF 4.0.0.2 only. Records have no size field, so the reader is strict: an unknown record type throws with its name and index. |

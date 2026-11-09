@@ -2188,7 +2188,7 @@ test('MW-D31 rule 13: the mirror reads the RESOLVED node\'s own name, case-sensi
 
 import { resolveBodyParts, raceRecords } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { indexSkins, assembleNpc } from '../../../src/formats/morrowind/mwNpc.js';
-import { resolveWeaponParts } from '../../../src/combat/fpArm.js';
+import { resolveWeaponParts } from '../../../src/combat/fpArm/fpArmParts.js';
 
 test('MW-D32: the sweep - last wins, filters exact, FP hand ladder', () => {
   const P = (id, slot, o = {}) => ({ id, slot, race: 'fprace', female: false, skin: true,
@@ -2676,7 +2676,7 @@ test('MW-D38: the weapon\u2019s material is READ - a daedric sword is not the ty
   assert.notEqual(fpWeaponKey(iron, false), fpWeaponKey(daedric, false), 'two materials of one type must be two keys');
   assert.match(fpWeaponKey(daedric, false), /:Daedric:/);
   // The hand's weapon is resolved by its material: an iron and a daedric longsword pick their own records.
-  const { weaponPartPaths } = await import('../../../src/combat/fpArm.js');
+  const { weaponPartPaths } = await import('../../../src/combat/fpArm/fpArmParts.js');
   const { MW_WEAPON_TYPE: TYPE } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
   const longsword = TYPE.LongBladeOneHand;
   const records = [
