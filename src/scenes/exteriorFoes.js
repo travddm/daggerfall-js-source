@@ -24,7 +24,7 @@ import { markFoeStruck } from '../ui/hud/hudFoeTarget.js';   // PX30
 import { damageShieldPool, playerBlowCameToNothing } from '../characters/playerEntity.js';   // AUDIT 58: DecreaseHealth's shield hook is the BASE class's (DaggerfallEntity.cs:313-328)
 import { lycanthropeAttackVoice } from '../systems/lycanthropy.js';   // V4: the beast's attack voice
 import { copyEffectEntry } from '../systems/save/save.js';   // AUDIT 26 F216: the caster-stripping effect copy, one home
-import { EnemyAI, isBackFacing, withinYaw, MELEE_DISTANCE, foeFrameDt, enhancedCombatAIEnabled } from '../characters/enemy/enemyMotor.js';   // AUDIT WORLD6b-iii(a) B4: the puppet's cast is read against the owner's own bands
+import { EnemyAI, isBackFacing, withinYaw, MELEE_DISTANCE, foeFrameDt, enhancedCombatAIEnabled, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from '../characters/enemy/enemyMotor.js';   // AUDIT WORLD6b-iii(a) B4: the puppet's cast is read against the owner's own bands
 import { pilotFoe, pilotSteer } from '../systems/staffBossPilot.js';   // STAFF-PILOT: a staff member steering their event's mini boss
 import { EnhancedEnemyAI } from '../ai/enhancedMotor.js';   // FIELD BUGS 2026-10-16b INDOOR-WATCH: the routes, where the host hands a mesh (`nav`)
 import { getPref } from '../systems/uiPrefs.js';   // INDOOR-WATCH: the Enhanced AI switch, as the dungeon's construction sites read it
@@ -1170,9 +1170,9 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       c.feet[0] = q.feet[0]; c.feet[1] = q.feet[1]; c.feet[2] = q.feet[2];
       c.height = Number.isFinite(q.height) && q.height > 0 ? q.height : CAPSULE_HEIGHT;
       c.health = 1;
-      c.cv = q.cv | 0;
+      c.cv = q.cv | 0; writePlayerYaw(q.id, q.yaw); writePlayerBowOrSheathed(q.id, q.wd === 0);   // the stance a foe's retreat roll reads: the pose's facing, and wd 0 is sheathed
     }
-    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); }
+    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); forgetPlayerStance(id); }
     return [..._peerCands.values()];
   }
   const peerCandidate = (id) => { peerCandidates(); return (typeof id === 'string' && _peerCands.get(id)) || null; };
