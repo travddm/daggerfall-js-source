@@ -4,6 +4,9 @@ Status: decided, 2026-11-03 (owner decision 23g and its follow-up answers). Not 
 lists the order. Companion to the simulation-core note: the relay checks or decides on messages and never simulates a
 room per frame. Paths are relative to the repository root.
 
+Online play does not enforce Hardcore or Ironman yet, so an online page does not offer them and the account service
+refuses them (`src/systems/unenforced-online-modes.ts`, decision 116 (1)). Offline the picker offers all five.
+
 ## Summary
 
 - The player picks one of five modes when creating a character: Classic (default), Hardcore, Legacy, Ironman,

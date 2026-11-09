@@ -5,6 +5,8 @@ import assert from 'node:assert/strict';
 import { characterModeOptions, characterModeScreen, MODE_TAGS } from '../../src/ui/characterModeChoice.js';
 import { choiceHeight, choiceAtNative, CHOICE_COMPACT_TOP, CHOICE_COMPACT_GAP } from '../../src/ui/choiceScreen.js';
 import { CHARACTER_MODES } from '../../src/net/modeLaw.js';
+import { offeredModes } from '../../src/systems/characterModes.js';
+import { UNENFORCED_ONLINE_MODES, withoutUnenforcedModes } from '../../src/systems/unenforced-online-modes.ts';
 
 test('five answers, Classic first and recommended, each with a pro and a con', () => {
   const options = characterModeOptions({ offered: {} });
@@ -51,4 +53,31 @@ test("the Plus face hint counts the answers shown, and the face lists each answe
   assert.match(characterModeScreen(() => {}, { offered: { legacy: false } }).faceText.hint, /1 to 4$/);
   assert.match(characterModeScreen(() => {}, { offered: {} }).faceText.hint, /1 to 5$/);
   assert.equal(characterModeScreen(() => {}, { offered: {} }).faceText.listLines, true);
+});
+
+// Decision 116 (1): an online page hides the modes online play does not enforce yet.
+test('online, the offered table turns off every unenforced mode; offline it is the mod settings, as before', () => {
+  const offline = offeredModes({ online: false });
+  const online = offeredModes({ online: true });
+  for (const mode of UNENFORCED_ONLINE_MODES) assert.equal(online[mode], false, mode);
+  assert.equal(online.legacy, offline.legacy, 'Legacy follows Project Legacy either way');
+  assert.equal(offline.hardcore, true, 'offline, the shipped settings offer Hardcore');
+});
+
+test('the online picker shows Classic and Legacy and numbers them from 1; offline it shows all five', () => {
+  const everything = { hardcore: true, legacy: true, ironman: true, hardcore_ironman: true };
+  const answers = [];
+  const screen = characterModeScreen((mode) => answers.push(mode), {
+    offered: withoutUnenforcedModes(everything),
+  });
+  assert.deepEqual(
+    screen.options.map((o) => o.id),
+    ['classic', 'legacy'],
+  );
+  screen.input('char:2');
+  assert.deepEqual(answers, ['legacy']);
+  assert.deepEqual(
+    characterModeOptions({ offered: everything }).map((o) => o.id),
+    [...CHARACTER_MODES],
+  );
 });

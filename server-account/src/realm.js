@@ -45,6 +45,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { isMode, tokenCodeOf, modeOfRequest, creatableModes, offeredFromList, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
+import { withoutUnenforcedModes } from '../../src/systems/unenforced-online-modes.ts';
 import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
@@ -254,7 +255,8 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
 function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen, /** @type {unknown} */ profile) {
   if (!playerId || !n) return { error: 'body' };
   if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
-  return creatableModes(offeredFromList(profile)).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
+  // Every realm character is online, so the modes online play does not enforce yet are refused (decision 116 (1)).
+  return creatableModes(withoutUnenforcedModes(offeredFromList(profile))).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
 }
 
 /**
