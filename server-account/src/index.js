@@ -278,7 +278,7 @@ import { vaultOf, vaultPut, vaultTake, vaultGrant } from './guildVault.js';   //
 import { HOME_ORDER_KEYS_MAX } from '../../src/net/homeLaw.js';   // QUEST-HOME: the most buildings one home order names
 import { buyHall, sellHall, setHallEntry, setHeraldry } from './halls.js';   // GUILD1d: the guild hall and heraldry
 import { readGuildBoard, pinGuildNote, takeDownGuildNote } from './guildBoard.js';   // GUILD1e: a guild's own board
-import { listSeats, strikeSeat, seatsOpenFor, seatOptionOn } from './townSeats.js';   // SEAT1a: the seats' witnessed registry
+import { listSeats, strikeSeat, seatsOpenFor, seatOptionOn, ifSeatOption } from './townSeats.js';   // SEAT1a: the seats' witnessed registry
 import { pledgeSeat, claimWatch, creditGate, creditRenown, readStandings, payTribute, readRecords } from './seatInfluence.js';   // SEAT1b: influence   // SEASON1 part two: an Orc Raid's camp
 import { settleDueOnce, seatsBoard, relinquishSeat, seatBadgeOf, seatTitlesOf } from './seatTurning.js';   // SEAT1c: the Turning, the Charters, their titles and glyphs
 import { setTithe, proclaimEdict, claimBounty } from './seatHolding.js';   // SEAT1d: the holder's levers, a Bounty's camp
@@ -1169,7 +1169,7 @@ const service = {
             : CHAPTER_TITLES.includes(wornT) ? (chapterT ? { t: chapterT.high ? 'highmaster' : wornT, ts: chapterT.ts } : {}) : (wornT ? { t: wornT } : {});   // CHAP6e: a Master's in an Ascendancy signed its High Master
         // SEASON1 part two (Seats-Arc 9.1): AND A SEASON'S BANNER RIBBON - the named character's, where its guild kept a
         // seat through the Season before and it was a member at that Season's last Turning (seatRibbons.js ribbonOf)
-        const rb = seats && seatOptionOn(env, 'RIBBONS') && renownCharacterOk(body.character) ? await ribbonOf(ctx.db, who.player.id, body.character, seasonOf(seatWeekOf(nowS * 1000), zero), member) : null;
+        const rb = seats && renownCharacterOk(body.character) ? await ribbonOf(ctx.db, who.player.id, body.character, seasonOf(seatWeekOf(nowS * 1000), zero), member, seatOptionOn(env, 'RIBBONS')) : null;
         const wardrobe = {
           ...seatT,
           g: [...glyphsOf(who.player, env, nowS), ...(seatBadge?.glyphs ?? [])],
@@ -1730,7 +1730,7 @@ const service = {
         }
         if (path === '/v1/guilds/invites') return json(await invitesOf(ctx, who.player), 200, origin);
         if (accountKind(who.player) !== 'linked') return no('guilds-need-account', 403, origin);
-        const castleAct = (f) => async (c, p, b) => !seatOptionOn(env, 'CASTLES') ? { error: 'seat-option-off' } : (seatsOpenFor(p, env) && (await settleDueOnce(c.db, nowS, seasonZeroOf(env.SEASON_ZERO_WEEK), domainsWeekFor(env))).pending ? { error: 'seats-settling' } : f(c, p, b));
+        const castleAct = (f) => async (c, p, b) => ifSeatOption(env, 'CASTLES', async () => seatsOpenFor(p, env) && (await settleDueOnce(c.db, nowS, seasonZeroOf(env.SEASON_ZERO_WEEK), domainsWeekFor(env))).pending ? { error: 'seats-settling' } : f(c, p, b));
         const act = {
           '/v1/guilds/found': foundGuild, '/v1/guilds/invite': inviteToGuild, '/v1/guilds/answer': answerInvite,
           '/v1/guilds/leave': leaveGuild, '/v1/guilds/remove': removeFromGuild, '/v1/guilds/rank': rankGuildMember,
@@ -1871,12 +1871,12 @@ const service = {
           '/v1/seats/royal/pass': async () => royalPass(ctx, who.player, env, body, await signingKey(env, subtle)),
           '/v1/seats/royal/claim': async () => claimRoyal(ctx, who.player, env, body, await gatePublicKey(env, subtle)),
           // CROWN2: a Pact offered (or accepted) and broken
-          '/v1/seats/pact': () => (seatOptionOn(env, 'PACTS') ? offerPact(ctx, who.player, env, body) : { error: 'seat-option-off' }),
+          '/v1/seats/pact': () => ifSeatOption(env, 'PACTS', () => offerPact(ctx, who.player, env, body)),
           '/v1/seats/pact/break': () => breakPact(ctx, who.player, env, body),
           // SEAT2b (7.5): the works read, a tier raised; a challenger's Siege Camp pitched
           '/v1/seats/forts': () => readForts(ctx, who.player, env, body),
-          '/v1/seats/fort/fund': () => (seatOptionOn(env, 'FORTS') ? fundFort(ctx, who.player, env, body) : { error: 'seat-option-off' }),
-          '/v1/seats/camp': () => (seatOptionOn(env, 'SIEGE_WORKS') ? pitchCamp(ctx, who.player, env, body) : { error: 'seat-option-off' }),
+          '/v1/seats/fort/fund': () => ifSeatOption(env, 'FORTS', () => fundFort(ctx, who.player, env, body)),
+          '/v1/seats/camp': () => ifSeatOption(env, 'SIEGE_WORKS', () => pitchCamp(ctx, who.player, env, body)),
         }[path];
         if (!act) return no('not-found', 404, origin);
         const r = await act();

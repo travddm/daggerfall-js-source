@@ -200,7 +200,7 @@ const SHUT = new Set(['seats-closed', 'no-session', 'auth', 'seat-unconfirmed'])
  *   book: ReturnType<typeof import('../net/townSeatBook.js').createTownSeatBook>,
  *   nameOf?: (key: number) => (string|null), banner?: (heraldry: any, width: number) => (Node|null),
  *   enterBattle?: (seat: any, fight: any) => boolean, enterRoyal?: (seat: any, royal: any, watch: boolean) => boolean,
- *   readRecords?: (seat: any) => Promise<boolean>, port?: boolean, countName?: (key: string, n: number) => string,
+ *   readRecords?: (seat: any) => Promise<boolean>, port?: boolean, countName?: (key: string, n: number) => string }} host
  * @param {{ busy: () => boolean, run: (start: () => Promise<any>) => any, rerender: () => void, nowS: () => number,
  *   alive?: () => boolean }} ui
  */
@@ -224,7 +224,6 @@ export function createSeatTab(host, ui) {
   let windowAsk = null, hireHandle = '', hireFee = 0;   // SEAT2a: the window and the contract asked, kept across redraws
   let politicsTag = '';   // CROWN2: the guild an offer is made to, kept across redraws
   let forts = null;   // SEAT2b: the works as last read, read with the standings
-  /** @type {Record<string, number>} */
   let guideOpen = null;   // BOARD-UI: the guide unfolded - PLAIN-UI: null until the reader folds or unfolds it (seatGuideOpen)
   let wordsOpen = false;   // PLAIN-UI: the board's words unfolded
 

@@ -24,7 +24,7 @@
 //
 // Pure - the door, the storage and the clock are handed in.
 // ═══════════════════════════════════════════════════════════════════
-import { SEAT_REPORT_EVERY_S, SEAT_WATCH_CLAIM_MAX, seatReportOf, seatKeyOk, EDICTS, siegeWindowText, seatWeekOf, seasonOf, guildWords } from './townSeatLaw.js';
+import { SEAT_REPORT_EVERY_S, SEAT_WATCH_CLAIM_MAX, seatReportOf, seatKeyOk, EDICTS, siegeWindowText, seatWeekOf, guildWords } from './townSeatLaw.js';
 import { accountRefusalText } from './accountClient.js';
 import { readWatchReceipt } from './watchReceipt.js';
 import { mintMarksRid } from './marksBook.js';

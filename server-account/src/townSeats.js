@@ -62,6 +62,8 @@ export function seatsOpenFor(player, env) {
  * for the client (net/profile/officialProfile.ts), so the room and its service agree.
  */
 export const seatOptionOn = (env, name) => String(env?.[`SEATS_${name}`] ?? 'on').trim().toLowerCase() !== 'off';
+/** Runs `f` where the option is on, else answers the refusal the routes give for an option switched off. */
+export const ifSeatOption = (env, name, f) => (seatOptionOn(env, name) ? f() : { error: 'seat-option-off' });
 /** An account a week registered may witness (SEAT0 3.2), as a harvest's and a hub's do - and a guild hall's (CHAP2a,
  *  npcHalls.js reads this one). */
 export const witnessOf = (player, nowS) => Number.isSafeInteger(player?.registered_at) && player.registered_at <= nowS - WITNESS.ageS;
