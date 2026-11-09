@@ -104,7 +104,7 @@ export function promoteEliteFoe(entity, { own = true, eliteDungeon = false, supe
   entity.eliteFoe = true;
   // the hosts promote BEFORE any other scaling (and in place of the Elite Dungeon's doubling), so this is the foe's own
   // roll: an elite is 5x, not 10x
-  // decision 124: in an Elite or Super dungeon the larger of the elite tier and the dungeon's layer, unless they stack
+  // in an Elite or Super dungeon the larger of the elite tier and the dungeon's layer, unless they stack
   const m = eliteMults(PROMOTION.elite, { eliteDungeon, superDungeon });
   scalePromoted(entity, { health: m.health, damage: m.damage, ownHealth: own });
   return true;

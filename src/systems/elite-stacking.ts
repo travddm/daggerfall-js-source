@@ -1,5 +1,5 @@
-// How an elite's or a champion's multipliers meet its dungeon's own (decision 124, from decision 117 item 19; decision 125). Decision 5 keeps
-// elites as their own tier (about x2 health, x1.3 damage) with "no stacking with other layers". By default an elite in an
+// How an elite's or a champion's multipliers meet its dungeon's own. Elites are a tier of their own (about x2 health,
+// x1.3 damage), one step above the foes around them rather than a second layer on theirs. By default an elite in an
 // Elite or Super dungeon takes the larger of the elite tier and the dungeon's own layer, stat by stat, with nothing
 // multiplied, and a champion likewise takes the larger of its own step and the layer. The `eliteStacking` pref (a Features
 // row, elite-stacking-row.ts) brings back the stacked figures: x7 health and x2.6 damage for an elite in an Elite Dungeon,
@@ -50,7 +50,7 @@ export function layerOf(layer: DungeonLayer): FoeMults | null {
 }
 
 /**
- * Decision 125: a champion's step on a foe its dungeon's layer has already scaled. By default the foe ends at the larger of
+ * A champion's step on a foe its dungeon's layer has already scaled. By default the foe ends at the larger of
  * the two, stat by stat, so the step gives only what passes the layer; with the stacking row on, the whole step multiplies.
  */
 export function stepOnLayer(step: FoeMults, layer: DungeonLayer, { stacked = eliteStackingOn() } = {}): FoeMults {

@@ -108,7 +108,7 @@ export function applyChampion(entity, traitIndex, layer = null) {
   const t = championTraitFor(entity, traitIndex);
   if (!t) return false;
   entity.champion = t.id;
-  // decision 125: on a dungeon's layer (`layer`, the host's word) the step gives only what passes it, unless they stack
+  // on a dungeon's layer (`layer`, the host's word) the step gives only what passes it, unless they stack
   scalePromoted(entity, stepOnLayer({ health: CHAMPION_HEALTH * (t.health ?? 1), damage: CHAMPION_DAMAGE * (t.damage ?? 1) }, layer));
   if (t.speed && entity.stats) entity.stats.speed = Math.min(100, (entity.stats.speed ?? 50) + t.speed);
   return true;

@@ -1,4 +1,4 @@
-// Decision 124 (from decision 117, item 19): an elite takes the larger of the elite tier and its dungeon's layer, stat by
+// An elite takes the larger of the elite tier and its dungeon's layer, stat by
 // stat; the stacked figures are an option (systems/elite-stacking.ts).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
