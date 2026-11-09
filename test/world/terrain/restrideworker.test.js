@@ -65,6 +65,7 @@ test('PERF-EXT26: the REAL worker shell answers a grid job by its id, the bytes 
     const want = TG.restrideGrid({ woods, px: 300, py: 180, stride: 1, samples });
     assert.equal(bytes(msg.positions), bytes(want.positions), 'the worker\'s grid is the main thread\'s, byte for byte');
     assert.equal(bytes(msg.normals), bytes(want.normals));
+    assert.equal(msg.indices, null, 'the slope cut off (the default): no index set of its own - the host draws the shared one');
     assert.deepEqual(transfer, [msg.positions.buffer, msg.normals.buffer], 'both arrays transferred back');
     // a grid needs no network: one asked while the network is still being fetched is answered at once
     const roadsSettled = new Promise((resolve) => {

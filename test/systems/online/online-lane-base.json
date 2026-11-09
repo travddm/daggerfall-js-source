@@ -29,6 +29,7 @@
     "banthaJungle": true,
     "tamrielLands": true,
     "landforms": true,
+    "terrainSlopeCut": false,
     "roadVerges": true,
     "climateBlend": true,
     "questlines": true,

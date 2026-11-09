@@ -3,6 +3,8 @@ dist/
 # the gun lab's own build (vite.config.gun.js)
 dist-gun/
 dist-pistol/
+# Vite's dep cache when the verify harness serves a tree (cacheDir in dfo-verify/tools/vite.verify.mjs)
+.vite-verify-cache/
 .DS_Store
 
 # Original game data - freeware but not redistributable. NEVER commit.

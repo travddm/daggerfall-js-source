@@ -32,6 +32,7 @@
 import { HEIGHTMAP_DIMENSION } from '../terrain/terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from '../terrain/terrainTiles.js';
 import { heightSample, mapDataHasWater, mapDataFullySubmerged, DW_WATER_THRESHOLD } from './deepWaterClassification.js';
+import { quadCutsSeNw, writeQuadTriangles } from '../terrain/terrain-quad-cut.ts';
 import { CLIP_SENTINEL } from '../terrain/terrainSurface.js';   // FAR-CLIP1: the byte's one home, the TileMap format's module - the renderer reads it there too
 
 const f32 = Math.fround;
@@ -130,6 +131,10 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
   return { hide, tilemap: clip ? patchTilemapForClip(tilemapBytes, mapData) : null };
 }
 
+/** Which way each standing quad is cut: as `samples` cut their ground, or, without them, on the fixed cut flat
+ *  ground keeps. */
+const quadCutOf = (samples, stride) => (samples ? (x, z) => quadCutsSeNw(samples, x, z, stride) : () => false);
+
 /**
  * THE CLIP'S CULL. The mod discards a clipped texel in its terrain shader
  * (TilemapTextureArrayClipWater's `(255, 0, 255)` test), and so does the
@@ -151,10 +156,11 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
  * @param {number} [stride]
  * @returns {?Uint32Array} null when no quad or skirt segment is clipped
  */
-export function clippedTerrainIndices(bytes, stride = 1, ring = false) {
+export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples) {
   const dim = WORLD_MAP_TILE_DIM;
   const g = (HEIGHTMAP_DIMENSION - 1) / stride + 1;
   const q = g - 1;
+  const cutsSeNw = quadCutOf(samples, stride);
   // COAST-LOOK (`ring`, renderer.coastEdges): the clip program cuts on a wandering line inside the clipped tiles, so a
   // clipped tile goes only when it and the eight about it are clipped (wholeCut) - the coast's ring is the program's
   const gone = ring ? wholeCut(bytes, dim) : null;
@@ -168,8 +174,9 @@ export function clippedTerrainIndices(bytes, stride = 1, ring = false) {
         for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (!cut(tz * dim + tx)) { clipped = false; break; }
       }
       if (clipped) { dropped++; continue; }
-      const i0 = z * g + x, i1 = i0 + 1, i2 = i0 + g, i3 = i2 + 1;
-      out.push(i0, i2, i3, i0, i3, i1);
+      const quad = [0, 0, 0, 0, 0, 0];   // a quad that stands is cut as `samples` cut its ground (terrain-quad-cut.ts)
+      writeQuadTriangles(quad, 0, z * g + x, g, cutsSeNw(x, z));
+      out.push(...quad);
     }
   }
   if (stride > 1) {

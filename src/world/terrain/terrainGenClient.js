@@ -31,6 +31,7 @@ import { setTamrielTrace } from '../tamriel/tamrielLand.js';   // TAMRIEL3: the 
 import { setTamrielFit } from '../tamriel/tamrielFrame.js';
 import { dropGroundCache } from '../tamriel/tamrielGround.js';
 import { generatePixelTerrain, restrideGrid } from './terrainGen.js';   // PERF-EXT26: and the promotion's grid, on either thread
+import { setSlopeCut } from './terrain-quad-cut.ts';   // the world's cut, set on this thread as on the worker
 import { buildRoadsFromSettlements } from '../roadsProducer.js';   // AUDIT ROADS F2
 import { packArenaRoads, mergeArenaRoads, arenaRoadsLayer, setArenaRoads as installArenaRoads } from '../arenaRoads.js';   // TESA4/TESA14: the roads past the Bay
 import { midRingSide, farFieldSide } from './midRingGrid.js';   // MID-RING / FAR-FIELD: a ground's bands
@@ -62,9 +63,13 @@ export class TerrainGenClient {
    * @param {Uint8Array} [deps.woodsBytes] - the raw WOODS.WLD bytes;
    *   a COPY crosses to the worker once. Absent = same-thread only.
    * @param {?Function} [deps.workerFactory] - test seam.
+   * @param {boolean} [deps.slopeCut] - the `terrainSlopeCut` row, read as the world mounts: this thread's readers and
+   *   the worker's index sets take the same cut (terrain-quad-cut.ts).
    */
-  constructor({ woods, woodsBytes = null, workerFactory = null } = {}) {
+  constructor({ woods, woodsBytes = null, workerFactory = null, slopeCut = false } = {}) {
     this._woods = woods;
+    this._slopeCut = slopeCut;
+    setSlopeCut(slopeCut);
     this._tamriel = !!woods?.isTamrielGround;   // TAMRIEL2: the host's reader has the continent round it (world/tamriel/tamrielGround.js groundWoods) - the worker composes its own copy the same way
     this._ether = !!woods?.isEtherGround;   // ETHER-SEA: ...and the Eltheric Ocean (world/ethericSea.js etherWoods), composed there the same way
     this._sites = null;   // LANDFORM4: setLandformTables
@@ -121,7 +126,7 @@ export class TerrainGenClient {
       // a COPY - transferring the reader's own bytes would detach the
       // buffer the rest of the session still reads (the RA1 law)
       const bytes = woodsBytes.slice();
-      w.postMessage({ t: 'init', woodsBytes: bytes, tamriel: this._tamriel, ether: this._ether }, [bytes.buffer]);   // TAMRIEL2: the worker composes its own reader the same way (ETHER-SEA: the Eltheric Ocean's too)
+      w.postMessage({ t: 'init', woodsBytes: bytes, tamriel: this._tamriel, ether: this._ether, slopeCut: this._slopeCut }, [bytes.buffer]);   // TAMRIEL2: the worker composes its own reader the same way (ETHER-SEA: the Eltheric Ocean's too)
       this._worker = w;
     } catch (e) {
       console.warn('[terrain] worker unavailable; generating on the main thread', e);
@@ -296,7 +301,7 @@ export class TerrainGenClient {
    * under the feet and a fallback. Always resolves: a worker failure or
    * death builds that grid here instead.
    * @param {{ px: number, py: number, stride: number, samples: Float32Array, bed?: ?Uint8Array }} job
-   * @returns {Promise<{ positions: Float32Array, normals: Float32Array, bed: ?object }>}
+   * @returns {Promise<{ positions: Float32Array, normals: Float32Array, indices: ?Uint32Array, bed: ?object }>}
    */
   grid(job) {
     if (!this._worker) return Promise.resolve(restrideGrid({ woods: this._woods, roads: this._roads ?? null, sites: this._sites, beyond: this._beyond, climates: this._climates, ...job }));   // LANDFORM1-3: the fallback's own network
@@ -406,7 +411,7 @@ export class TerrainGenClient {
       g.resolve(restrideGrid({ woods: this._woods, roads: this._roads ?? null, sites: this._sites, beyond: this._beyond, climates: this._climates, ...g.job }));
       return;
     }
-    g.resolve({ positions: m.positions, normals: m.normals, bed: m.bed ?? null });   // AUDIT WATER-NEXT P1: the bed the worker carved
+    g.resolve({ positions: m.positions, normals: m.normals, indices: m.indices ?? null, bed: m.bed ?? null });   // AUDIT WATER-NEXT P1: the bed the worker carved
   }
 
   _answer(m) {
