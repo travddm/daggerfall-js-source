@@ -4841,7 +4841,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const grid = { positions: p._bed.sheet, normals: p._bed.normals };
     const bed = fields ? gridBed(grid, bedBytesOf(p), stride, halo) : null;
     renderer.destroyMesh(p.terrain);
-    p.terrain = renderer.createTerrainSurface(bed?.positions ?? grid.positions, bed?.normals ?? grid.normals, p.terrainIndices);
+    p.terrain = renderer.createPixelTerrainSurface(bed?.positions ?? grid.positions, bed?.normals ?? grid.normals, p.terrainIndices, stride);
     p._bed = { sheet: grid.positions, normals: grid.normals, depths: bed?.depths ?? null, sheetDepths: bed?.sheetDepths ?? null, halo };   // the grid kept: a cap lifted carves it back
     seatFlora(p, renderer);   // FLORA-GROUND, THE RINGS: its plants on the ground as carved now (scenes/floraSeat.js)
   }
@@ -5516,7 +5516,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     renderer.destroyMesh(p.terrain);
     const bed = waterOn ? hostBed(grid, grid.bed) : null;   // WATER-NEXT 2: the bed at the new ring class - AUDIT WATER-NEXT P1/H1: the kernel's, by the TileMap the water draws from
     p._bed = bed;
-    p.terrain = renderer.createTerrainSurface(grid.bed?.positions ?? grid.positions, grid.bed?.normals ?? grid.normals, grid.indices);
+    p.terrain = renderer.createPixelTerrainSurface(grid.bed?.positions ?? grid.positions, grid.bed?.normals ?? grid.normals, grid.indices, stride);
     p.terrainIndices = grid.indices;
     const waterIndices = waterOn ? buildPixelWaterIndices(p._dwBytes ?? p.tilemapBytes, stride, p.samples) : null;   // DW-F: the cap's TileMap, where it patched one
     p.water = waterIndices ? renderer.createWaterSheet(waterIndices, waterSheetOf(bed, p.terrain)) : null;

@@ -60,6 +60,9 @@ const keptBook = (limit) => {
 const keptMid = keptBook(HORIZON_KEPT.mid), keptFar = keptBook(HORIZON_KEPT.far);
 globalThis.onmessage = (ev) => handle(ev.data ?? {});
 
+/** The buffers of the arrays a reply transfers, a null array (the slope cut's index set, off) left out. */
+const buffersOf = (...arrays) => arrays.filter(Boolean).map((a) => a.buffer);
+
 function handle(m) {
   try {
     if (m.t === 'init' || m.t === 'roads' || m.t === 'landform-tables' || m.t === 'landform-beyond' || m.t === 'tamriel') { keptMid.clear(); keptFar.clear(); }   // MID-RING: what the grounds read moved; BAY-LEFT-GROUND: the sites past the Bay too
@@ -145,7 +148,7 @@ function handle(m) {
     // silently dropped at the wire (the audit found the explicit list
     // was the one place a field could rot with every test green).
     const out = generatePixelTerrain({ ...m, woods, roads, sites, beyond, climates });
-    const transfer = [out.samples.buffer, out.tilemap.buffer, out.positions.buffer, out.normals.buffer, out.indices.buffer, out.tilemapBytes.buffer];
+    const transfer = buffersOf(out.samples, out.tilemap, out.positions, out.normals, out.indices, out.tilemapBytes);   // indices: the slope cut's own set, null off
     if (out.paths) transfer.push(out.paths.buffer);   // GRASS-PATH1: null on a roadless pixel, and a null is not a buffer
     if (out.beach) transfer.push(out.beach.buffer);   // AUDIT LANDFORMS II H2: a location's DFU blend, with the row on
     if (out.landProps?.length) transfer.push(out.landProps.buffer);   // TESA-LANDS: the landmarks (a Fens pixel's 5,000 reeds)
@@ -236,7 +239,7 @@ function answerGrid(m) {
     // LANDFORM1-3: the ghost rows are the shaped ground when the job carries the Landforms row, cut along this
     // worker's own network - the one its jobs paint
     const { positions, normals, indices, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates });
-    const transfer = [positions.buffer, normals.buffer, indices.buffer];
+    const transfer = buffersOf(positions, normals, indices);
     if (bed) transfer.push(bed.depths.buffer, bed.sheetDepths.buffer, bed.positions.buffer, bed.normals.buffer, ...(bed.halo ? [bed.halo.bits.buffer] : []));   // AUDIT WATER-NEXT P1: and its bed
     globalThis.postMessage({ t: 'grid', id: m.id, positions, normals, indices, bed }, transfer);
   } catch (e) {

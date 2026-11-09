@@ -24,6 +24,7 @@ import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN
 import { MESH_ALPHA_GLSL, samplerParams, samplerKey } from './meshAlpha.js';   // POI-2: a translucent mesh draw, and a texture's own wrap and filter
 import { frameTarget, setFrameTarget } from './renderTarget.js';   // RW1: the view out's pass hands the frame target back as it found it (EL4's restore)
 import { CLIP_SENTINEL } from '../world/terrain/terrainSurface.js';   // FAR-CLIP1: the byte the terrain's clip variant discards - the TileMap format's module, already in this file's closure (waterCorners.js)
+import { sharedIndexBuffer, ownIndexBuffer, createPixelTerrainSurface } from './terrainIndexBuffers.js';   // the terrain's index sets: shared, or a pixel's own with the slope cut
 /** AUDIT TECH-FX: the screen offset before any is set - one, frozen (Renderer `screenOffset`). */
 const NO_SCREEN_OFFSET = Object.freeze([0, 0]);
 /** OW-HITCH: how many layers of a ground tile array go up between two of uploadTileArraySteps' yields (8 of 256 texels: 2 MB). */
@@ -7205,12 +7206,10 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     batch.buffers = [];
   }
 
-  /** Create one pixel's terrain surface (positions + normals grid). The
-   *  indices are the pixel's own (each quad cut by its samples,
-   *  terrain-quad-cut.ts), so the index buffer is the surface's and dies
-   *  with it in destroyMesh. */
-  createTerrainSurface(positions, normals, indices) {
+  /** One pixel's terrain surface; `own` indices (the slope cut on) are its own buffer, freed with it (terrainIndexBuffers.js). */
+  createTerrainSurface(positions, normals, indices, { own = false } = {}) {
     const gl = this.gl;
+    const indexSet = own ? null : sharedIndexBuffer(this, indices);
     const vao = gl.createVertexArray();
     this._bindVao(vao);
     const buffers = [];
@@ -7225,13 +7224,13 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     };
     buf(positions, 0);
     buf(normals, 1);
-    const indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-    buffers.push(indexBuffer);
+    if (indexSet) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexSet.buffer);
+    else buffers.push(ownIndexBuffer(gl, indices));
     this._bindVao(null);
     return { vao, buffers, indexCount: indices.length, bounds: boundsOf(positions) };   // EL5: the replays cull by it
   }
+
+  createPixelTerrainSurface(positions, normals, ownIndices, stride) { return createPixelTerrainSurface(this, positions, normals, ownIndices, stride); }
 
   /** WATER-AUDIT (M4): a second surface over a terrain surface's OWN
    *  vertex buffers with an index set of its own (buildWaterIndices'

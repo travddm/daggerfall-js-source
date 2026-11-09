@@ -6,14 +6,14 @@ seasons are in [time-and-weather.md](time-and-weather.md).
 
 ## Units and frames
 
-| Quantity | Value | Where |
-| --- | --- | --- |
-| Map | 1000 x 500 map pixels | `MAX_MAP_PIXEL_X/Y` in `src/world/streamingWorld.js` |
-| Map pixel | 819.2 world units (32768 x `GLOBAL_SCALE` 0.025) | `TERRAIN_SIZE` in `src/world/terrain/terrainSampler.js` |
-| Heightmap per pixel | 129 x 129 samples (128 cells, about 6.4 units each) | `HEIGHTMAP_DIMENSION` |
-| Ground tiles per pixel | 128 x 128 | `src/world/terrain/terrainTiles.js` |
-| RMB block (town) | 102.4 units | `RMB_SIDE` in `src/world/locationLayout.js` |
-| RDB block (dungeon) | 51.2 units | `RDB_SIDE` in `src/world/dungeon/dungeonLayout.js` |
+| Quantity               | Value                                               | Where                                                   |
+| ---------------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| Map                    | 1000 x 500 map pixels                               | `MAX_MAP_PIXEL_X/Y` in `src/world/streamingWorld.js`    |
+| Map pixel              | 819.2 world units (32768 x `GLOBAL_SCALE` 0.025)    | `TERRAIN_SIZE` in `src/world/terrain/terrainSampler.js` |
+| Heightmap per pixel    | 129 x 129 samples (128 cells, about 6.4 units each) | `HEIGHTMAP_DIMENSION`                                   |
+| Ground tiles per pixel | 128 x 128                                           | `src/world/terrain/terrainTiles.js`                     |
+| RMB block (town)       | 102.4 units                                         | `RMB_SIDE` in `src/world/locationLayout.js`             |
+| RDB block (dungeon)    | 51.2 units                                          | `RDB_SIDE` in `src/world/dungeon/dungeonLayout.js`      |
 
 `worldCoordToMapPixel` and `mapPixelToWorldCoords` (`streamingWorld.js`) convert; map Y is flipped against world Z.
 
@@ -48,7 +48,8 @@ Departure, as an option: Unity cuts every terrain quad on one fixed diagonal, (x
 slopes** row (`terrainSlopeCut`, `src/systems/terrainSlopeCutRow.js`, off by default) cuts each quad on the diagonal
 that its ground follows instead. The world reads it once as it mounts. `TerrainGenClient` sets the module's switch on
 the main thread and sends it to the terrain worker at init, so the drawn, walked and water ground stay one surface. The
-classic skin keeps the fixed cut. Online the room holds it: the official profile pins it off
+classic skin keeps the fixed cut. Off costs nothing: every pixel of a stride draws one shared index set, uploaded once
+(`sharedTerrainIndices`). On, the worker builds each pixel's own set, and its buffer is freed with the surface. Online the room holds it: the official profile pins it off
 (`src/net/profile/officialProfile.ts`). Off, the ground is the one `GROUND_LAW` 3 records.
 
 ## Landforms
@@ -141,13 +142,13 @@ The Imperial City is its own build (`src/world/imperialCity.js`, `imperialBlocks
 
 ### Town and region systems
 
-| File | Role |
-| --- | --- |
-| `src/systems/town/townPopulation.js` | Wandering townsfolk (`TownPopulation`, `maxPopulationFor`) |
-| `src/systems/town/townWatch.js` | Guards answering threats (`createTownWatch`) |
-| `src/systems/town/townEcon.js` | Town economy (`createTownEcon`) |
-| `src/systems/town/townSeats.js` | Seats of rule and palaces (`deriveTownSeats`) |
-| `src/systems/region/regionHubs.js`, `marketHubs.js` | Hub cities per region and province |
+| File                                                       | Role                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `src/systems/town/townPopulation.js`                       | Wandering townsfolk (`TownPopulation`, `maxPopulationFor`)               |
+| `src/systems/town/townWatch.js`                            | Guards answering threats (`createTownWatch`)                             |
+| `src/systems/town/townEcon.js`                             | Town economy (`createTownEcon`)                                          |
+| `src/systems/town/townSeats.js`                            | Seats of rule and palaces (`deriveTownSeats`)                            |
+| `src/systems/region/regionHubs.js`, `marketHubs.js`        | Hub cities per region and province                                       |
 | `src/systems/region/regionConditions.js`, `regionPower.js` | Region flags and faction power, port of `RegionPowerAndConditionsUpdate` |
 
 Trap: the province key is spelled `Sumurset` in `urbanRecords.js`, `townLook.js` and `tamrielCapitals.js`.
@@ -235,16 +236,16 @@ The Tamriel trace past the Bay is being remade. This section describes the code 
 
 ## Tests
 
-| Area | Test files |
-| --- | --- |
-| Terrain and streaming | `test/world/terrain/terrain.test.js`, `test/world/terrain/terrainworker.test.js`, `test/world/streaming.test.js` |
-| Landforms | `test/world/terrain/landform6.test.js`, `test/world/terrain/auditlandforms.test.js`, `test/world/peaks2_massif.test.js` |
-| Roads | `test/world/road/roads.test.js`, `test/world/road/roadsReal.test.js`, `test/world/gateroads.test.js` |
-| Towns | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js` |
-| Dungeons | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js` |
-| Delve, super dungeons | `test/systems/sense1_dungeonsense.test.js`, `test/systems/echo1_dungeonecho.test.js`, `test/systems/superDungeon/sd2_sdsite.test.js` |
-| Discovery, travel | `test/systems/audit26_discovery.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js` |
-| Past the Bay | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js` |
+| Area                  | Test files                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Terrain and streaming | `test/world/terrain/terrain.test.js`, `test/world/terrain/terrainworker.test.js`, `test/world/streaming.test.js`                            |
+| Landforms             | `test/world/terrain/landform6.test.js`, `test/world/terrain/auditlandforms.test.js`, `test/world/peaks2_massif.test.js`                     |
+| Roads                 | `test/world/road/roads.test.js`, `test/world/road/roadsReal.test.js`, `test/world/gateroads.test.js`                                        |
+| Towns                 | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js`                                  |
+| Dungeons              | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js` |
+| Delve, super dungeons | `test/systems/sense1_dungeonsense.test.js`, `test/systems/echo1_dungeonecho.test.js`, `test/systems/superDungeon/sd2_sdsite.test.js`        |
+| Discovery, travel     | `test/systems/audit26_discovery.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js`                                  |
+| Past the Bay          | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js`               |
 
 Tests that read the map need ARENA2: run `sh tools/fetch-data.sh` and set `ARENA2_PATH`.
 

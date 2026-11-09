@@ -403,7 +403,7 @@ export function createPixelBuild(host) {
     // (heightAt, the samples) never moves - and the water's own sheet, the grid as it stood with the bed's depth.
     // AUDIT WATER-NEXT P1: carved by the kernel on the worker (terrainGen.js restrideGrid), not on this thread
     const bed = hostBed({ positions, normals }, carved);
-    const terrain = renderer.createTerrainSurface(carved?.positions ?? positions, carved?.normals ?? normals, terrainIndices);
+    const terrain = renderer.createPixelTerrainSurface(carved?.positions ?? positions, carved?.normals ?? normals, terrainIndices, stride);
     // WATER1 / WATER-AUDIT (M4): the water's own quads - null for a pixel without water, which never enters the pass
     const waterIndices = waterOn ? buildPixelWaterIndices(tilemapBytes, stride, samples) : null;
     const water = waterIndices ? renderer.createWaterSheet(waterIndices, waterSheetOf(bed, terrain)) : null;
@@ -1490,7 +1490,7 @@ export function createPixelBuild(host) {
       chapterHalls: pixelChapterHalls,   // CHAP7b (above)
       beach: beach ?? null,   // AUDIT LANDFORMS II H2: DFU's own blend in a location's pixel with the row on - where a gathering node asks the beach line
       px, py, terrain, water, tilemapTex, tilemap, groundArchive, models, windmills, batches, flatAnims, texRemap, lights: pixelLights, hearths: pixelHearths, animals: pixelAnimals, springs: pixelSprings, skyBase: climate.skyBase, samples, natureCount: nature.length,
-      terrainIndices,   // its ground's triangles, cut by its samples (terrain-quad-cut.ts): a re-carve draws the same ones
+      terrainIndices,   // with the slope cut on, its ground's own triangles (terrain-quad-cut.ts): a re-carve draws the same ones; off, null
       tilemapBytes, season: pixelSeason,   // GR1: the placer reads the tiles and the season (PRECIP4: the pixel's)
       _snow: snowSeen,   // PRECIP4: the snow it was built under, every season it took (the sweep's - AUDIT PRECIP HOST-6)
       // AUDIT PRECIP HOST-7: what a re-skin reads (reskinPixelNow), on the snow lane alone - its flats as logged, its blocks'

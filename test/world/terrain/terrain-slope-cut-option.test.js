@@ -12,7 +12,46 @@ import { uiSkin, setUiSkin } from '../../../src/systems/uiSkin.js';
 import { terrainSlopeCutOn, TERRAIN_SLOPE_CUT_PREF } from '../../../src/systems/terrainSlopeCut.js';
 import { setSlopeCut, slopeCutIsOn, quadCutsSeNw } from '../../../src/world/terrain/terrain-quad-cut.ts';
 import { TerrainGenClient } from '../../../src/world/terrain/terrainGenClient.js';
-import { HEIGHTMAP_DIMENSION } from '../../../src/world/terrain/terrainSampler.js';
+import { HEIGHTMAP_DIMENSION, generateSamples } from '../../../src/world/terrain/terrainSampler.js';
+import { buildTerrainIndices, sharedTerrainIndices } from '../../../src/world/terrain/terrainSurface.js';
+import { restrideGrid } from '../../../src/world/terrain/terrainGen.js';
+import { WoodsFile } from '../../../src/formats/woodsFile.js';
+import { Renderer } from '../../../src/render/renderer.js';
+import { syntheticWoodsBytes } from '../../landformWorld.mjs';
+
+const ELEMENT_ARRAY_BUFFER = 34963;
+
+/** A WebGL2 that records every call; each create answers a fresh object. */
+function recordingGl() {
+  const calls = [];
+  let ids = 0;
+  const consts = {
+    ELEMENT_ARRAY_BUFFER,
+    ARRAY_BUFFER: 34962,
+    TEXTURE_CUBE_MAP_POSITIVE_X: 100,
+    TEXTURE0: 1000,
+    DEPTH_BUFFER_BIT: 256,
+    COLOR_BUFFER_BIT: 16384,
+  };
+  const gl = new Proxy(
+    {},
+    {
+      get(_, k) {
+        if (k in consts) return consts[k];
+        if (k === 'getProgramParameter' || k === 'getShaderParameter') return () => true;
+        if (k === 'getUniformLocation') return (_p, n) => n;
+        if (k === 'getAttribLocation') return () => 0;
+        if (typeof k === 'string' && k.startsWith('create')) return () => ({ id: ++ids });
+        if (k === 'getParameter') return () => new Float32Array(4);
+        if (typeof k === 'string' && k.toUpperCase() === k) return 1;
+        return (...args) => {
+          calls.push([k, ...args]);
+        };
+      },
+    },
+  );
+  return { calls, canvas: { getContext: () => gl, clientWidth: 320, clientHeight: 200, width: 320, height: 200 } };
+}
 
 const H = HEIGHTMAP_DIMENSION;
 
@@ -81,7 +120,7 @@ test('the real worker shell takes the cut from its init', async () => {
   globalThis.postMessage = () => {};
   try {
     await import('../../../src/world/terrain/terrainGenWorker.js');
-    const { syntheticWoodsBytes } = await import('../../landformWorld.mjs');
+
     for (const on of [true, false]) {
       setSlopeCut(!on);
       globalThis.onmessage({ data: { t: 'init', woodsBytes: syntheticWoodsBytes(), slopeCut: on } });
@@ -92,4 +131,54 @@ test('the real worker shell takes the cut from its init', async () => {
     globalThis.onmessage = prevOn;
     setSlopeCut(false);
   }
+});
+
+test('off, the option costs nothing: no pixel builds or uploads indices of its own - every surface of a stride draws one shared upload, as the base did', () => {
+  const woods = new WoodsFile();
+  assert.equal(woods.load(syntheticWoodsBytes()), true);
+  const samples = generateSamples(woods, 300, 180);
+  const surfaces = (on) => {
+    setSlopeCut(on);
+    try {
+      const { calls, canvas } = recordingGl();
+      const r = new Renderer(canvas);
+      const made = [];
+      for (const stride of [1, 1, 4, 4]) {
+        const grid = restrideGrid({ woods, px: 300, py: 180, stride, samples });
+        if (!on) assert.equal(grid.indices, null, 'off, the worker builds no index set');
+        const n = calls.length;
+        made.push(r.createPixelTerrainSurface(grid.positions, grid.normals, grid.indices, stride));
+        made.at(-1).indexUploads = calls
+          .slice(n)
+          .filter(([k, target]) => k === 'bufferData' && target === ELEMENT_ARRAY_BUFFER).length;
+      }
+      return made;
+    } finally {
+      setSlopeCut(false);
+    }
+  };
+  const off = surfaces(false);
+  assert.deepEqual(
+    off.map((t) => t.indexUploads),
+    [1, 0, 1, 0],
+    'off: one upload a stride, the rest share it',
+  );
+  assert.deepEqual(
+    off.map((t) => t.buffers.length),
+    [2, 2, 2, 2],
+    'off: a surface owns its positions and normals only',
+  );
+  assert.equal(sharedTerrainIndices(1), sharedTerrainIndices(1), 'one array a stride');
+  assert.deepEqual(sharedTerrainIndices(4), buildTerrainIndices(4), "the shared set is the fixed cut's");
+  const on = surfaces(true);
+  assert.deepEqual(
+    on.map((t) => t.indexUploads),
+    [1, 1, 1, 1],
+    'on: each pixel its own cut',
+  );
+  assert.deepEqual(
+    on.map((t) => t.buffers.length),
+    [3, 3, 3, 3],
+    'on: the index buffer is one of the surface buffers, freed with it',
+  );
 });

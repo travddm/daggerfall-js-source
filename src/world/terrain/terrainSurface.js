@@ -21,7 +21,7 @@ import {
   HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE,
 } from './terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from './terrainTiles.js';
-import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from './terrain-quad-cut.ts';
+import { quadCutsSeNw, quadValueAt, slopeCutIsOn, writeQuadTriangles } from './terrain-quad-cut.ts';
 
 /** Verbatim UpdateTileMapDataJob byte conversion, for ONE tile - the
  *  one home, because FD1 needed the same conversion per-tile off the
@@ -494,6 +494,22 @@ export function buildTerrainGrid(heightmapData, stride = 1, ghost = null) {
  *  EV4: `stride` > 1 indexes the matching strided grid and stitches
  *  its skirt - both windings on the skirt quads, so the curtain shows
  *  whichever way the crack is looked through. */
+const sharedIndexSets = new Map();
+
+/** The fixed cut's index set at `stride`, one array for every pixel: the renderer keys its one upload by the array
+ *  (createTerrainSurface), so with the slope cut off no pixel pays for indices of its own. */
+export function sharedTerrainIndices(stride = 1) {
+  let set = sharedIndexSets.get(stride);
+  if (!set) {
+    set = buildTerrainIndices(stride);
+    sharedIndexSets.set(stride, set);
+  }
+  return set;
+}
+
+/** A pixel's own index set when the slope cut is on, else null: off, it draws sharedTerrainIndices. */
+export const pixelTerrainIndices = (stride, heightmapData) => (slopeCutIsOn() ? buildTerrainIndices(stride, heightmapData) : null);
+
 export function buildTerrainIndices(stride = 1, heightmapData = null) {
   const hDim = HEIGHTMAP_DIMENSION;
   const g = (hDim - 1) / stride + 1;

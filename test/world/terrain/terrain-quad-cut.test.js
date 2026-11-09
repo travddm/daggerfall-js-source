@@ -340,7 +340,7 @@ test("the water's sheet, the coast's clip and the fence's ground walk take the g
     });
 });
 
-test('the kernel publishes the triangles of the samples it publishes, near and far - with the option off and on', () => {
+test('the kernel publishes the triangles of the samples it publishes, near and far (none of its own with the option off) - with the option off and on', () => {
   for (const on of [false, true])
     withCut(on, () => {
       const woods = new WoodsFile();
@@ -357,8 +357,8 @@ test('the kernel publishes the triangles of the samples it publishes, near and f
         });
         assert.deepEqual(
           out.indices,
-          buildTerrainIndices(stride, out.samples),
-          `stride ${stride}: the build's index set is its samples' cut`,
+          on ? buildTerrainIndices(stride, out.samples) : null,
+          `stride ${stride}: on, the build's index set is its samples' cut; off, none (the host draws the shared set)`,
         );
       }
     });
