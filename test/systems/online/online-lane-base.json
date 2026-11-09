@@ -13,6 +13,7 @@
     "revenantRank": "2",
     "revenantFlee": "normal",
     "revenantReturn": "normal",
+    "townSeats": true,
     "weaponTechniques": true,
     "gatePortentLoot": true,
     "humanoidLoot": "dfu",

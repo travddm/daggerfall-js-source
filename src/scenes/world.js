@@ -467,8 +467,7 @@ import { loadSlot, quickLoadSlot, mostRecentRestorable, QUICK_SAVE_NAME, saveKey
 import { frameBegin, frameEnd, frameAbort } from '../systems/frameClock.js';   // PERF1: the frame's script time; AUDIT-WH2 L1-F4: and the door an early return takes
 import { frameCapSkip } from '../systems/frameCap.js';   // FPS-CAP1: DFU's TargetFrameRate - a held frame re-arms before the clock and the input frame
 import { frameInterval, lastBusy, lendFrame, framesBegun } from '../systems/frameClock.js';   // PERF-EXT24: the frame's period and its own script, and the stream's slices lent back - those no frame ran inside
-import { arrivalClampMinutes, playerTravelPosition, travelDays, setSeaTide } from '../systems/travel/travel.js';   // F-slice; F114: the ship-aware travel origin; SHIP-SAIL: the passage's days, as the map counts them
-import { TIDE_EFFECTS } from '../net/tideLaw.js';   // SEASON1 part two: a Storm Season's sea (Seats-Arc 9.3)
+import { arrivalClampMinutes, playerTravelPosition, travelDays } from '../systems/travel/travel.js';   // F-slice; F114: the ship-aware travel origin; SHIP-SAIL: the passage's days, as the map counts them
 import { hallOfRecordsWindow } from '../ui/hallOfRecords.js';   // SEASON1 part three: a seat's Chronicle as a book (Seats-Arc 9.2)
 import { hasSpecialAbility, SPECIAL_ABILITY } from '../systems/rest/rest.js';   // F-slice: the NoRegen restore gate
 import { buildingCompassDirection, directionHintString } from '../systems/talk/talk.js';   // wave 26: %di's remote arm + the region-faction search; the LOCAL arm beside it; SPAWNED-DUNGEONS2b: the same eight-word compass
@@ -607,7 +606,7 @@ import { createPeerRiders, createPeerWalkers, createEotbArt } from '../net/peer/
 import { createHorseCartRuntime } from '../systems/horse/horseCart.js';   // HCC: TrailingWagonRuntime over this host's seams
 import { setForagingHost } from '../systems/foraging/foragingInstall.js';   // FORAGE1: Foraging's reaches into the world, answered by this host
 import { registerContainerLootHandler } from '../systems/containerLoot.js';   // THE MERGE: CSA-H's shelf subscriber, by its mod's name, on PlayerActivate.OnLootSpawned's one home
-import { mintPieces, craftedText, storedText, CRAFT_KEPT_TEXT, BENCH_KEPT_TEXT, LOOM_KEPT_TEXT, MASON_KEPT_TEXT, isCraftedFurniture } from '../systems/smithItems.js';   // PROF3: a craft's pieces, minted into the pack; PROF4: furniture into the home's things; PROF11: the mason's word; SEAT2b part two: a siege work's
+import { mintPieces, craftedText, CRAFT_KEPT_TEXT, BENCH_KEPT_TEXT, LOOM_KEPT_TEXT, MASON_KEPT_TEXT, isCraftedFurniture } from '../systems/smithItems.js';   // PROF3: a craft's pieces, minted into the pack; PROF4: furniture into the home's things; PROF11: the mason's word; SEAT2b part two: a siege work's
 import { heatBand, planeBand, stitchBand, chiselBand, recipeById } from '../net/recipeLaw.js';   // PROF3: the heat's attribute band; PROF4: the plane's, and a recipe's station; PROF7: the stitch's; PROF11: the chisel's
 import { COOK_KEPT_TEXT } from '../systems/smithItems.js';   // PROF9: the fire's word, a dish whose answer did not come
 import { JEWEL_KEPT_TEXT } from '../systems/smithItems.js';   // PROF10: the jeweller's bench's word, a piece whose answer did not come
@@ -840,6 +839,7 @@ import { pickRegionHubs, hubAtMapId, hubArrivalLine, hubClaim } from '../systems
 import { dungeonTier, tierPhrase } from '../systems/dungeon/dungeonTier.js';   // TIER1: a dungeon's tier, said online...
 import { dungeonTierLabel } from '../world/dungeon/dungeonLabel.js';   // ...with its size, never over a place the port made
 import { deriveTownSeats, seatAtMapId } from '../systems/town/townSeats.js';   // SEAT1a: every palace a seat, the three capitals crowns
+import { townSeatsOnline } from '../systems/town/townSeatsOn.js';
 import { createTownSeatBook, parseSeatCommand, parseSiegeCommand } from '../net/townSeatBook.js';   // SEAT1a: the seats open, confirmed, witnessed   // VOID: a moderator's /siege void
 import { seatArrivalLine, boardTithePct } from '../net/townSeatLaw.js';   // SEAT1a: the seat's arrival line; AUDIT SEATS-3 D3: a board's Tithe (SEAT-HALL's and CROWN-HALL's halls: scenes/seatHallHost.js)
 import { createSeatHallHost } from './seatHallHost.js';   // DOMAIN2 (HOST-SPLIT): a seat's halls and the guild's castle
@@ -1960,11 +1960,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const noticeBook = params.has('online')
     ? createNoticeBook({ door: accountBoard({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }), storage: appStorage() })
     : null;
-  // SEAT1a (Seats-Arc 3.2): whether the seats are open to this account (SEATS_OPEN), the ones the witnesses confirmed,
-  // and the seat this client stands in reported once a day (net/townSeatBook.js). Online only - offline the Bay is DFU's.
+  // SEAT1a (Seats-Arc 3.2): whether the seats are open to this account (SEATS_OPEN), the ones the witnesses confirmed, and the seat this client stands in reported once a day (net/townSeatBook.js). Online only, the Town seats row on - offline the Bay is DFU's.
   // SEAT1b: and this device's half of influence - the standings, a pledge, Tribute, and the Watch's receipts, kept for the
   // signed-in account while they stand in a seat's own pixel as this client derives the seats
-  const _seatDoor = params.has('online') ? accountSeats({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }) : null;
+  const _seatDoor = townSeatsOnline(params) ? accountSeats({ fetch: (u, i) => globalThis.fetch(u, i), storage: appStorage() }) : null;
   const seatBook = _seatDoor
     ? createTownSeatBook({
       door: _seatDoor, storage: appStorage(), me: _seatDoor.me, character: () => characterIdOf(playerEntity),
@@ -1973,7 +1972,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // CROWN2: a Pact broken early, said in red on every tab as the server's own line (RED1) - offered again while there is no chat yet
       onRed: (line) => (redChat ? redChat(line) : false),
       turnMs: dayTurnMs(),   // DAY-TURN: its report's day turns at this page's moment past midnight
-      stores: (st) => profBook?.applyStore(st),   // DOMAIN1 (Domains.md 5): a gift's Stores told the professions' book, as a writ's are
     })
     : null;
   // CHAP2a (Chapters-Arc 4): the guild halls of the towns this client walks into, reported once a UTC day a town while
@@ -2065,9 +2063,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     say: (line, s) => townTalk.say(line, s),
     claim: (site, region) => seatBook?.bounty(site, region) ?? Promise.resolve({ paid: 0 }),
     onFestive: () => computeEntityMods(playerEntity),
-    // SEASON1 part two (Seats-Arc 9.3): the land's Tide here; an Orc Raid's camp cleared
-    tideAt: (region) => seatBook?.tideAt(region) ?? 'calm',
-    orcCamp: (site, region) => seatBook?.orcCamp(site, region) ?? Promise.resolve({ counted: false }),
   });
   // TOWN-ECON TE1 (3): every town's economy online - its counters' factor, the seat's
   // folded in, and its card on the Held Map and the Overworld (SEAT-TIP's seat card is its guild lines now); TE2 (4): the
@@ -2076,8 +2071,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     seats: () => (seatBook?.open === true ? seatBook.data?.seats ?? null : null), seatsHeard: () => !seatBook || seatBook.open != null, onBandsReady: () => _livingTripMemo.clear(),   // unread: nothing said of the area, never "no guild"; AUDIT TOWN-ECON 2 CLI-1: the market's band kept once the shares and the seats have answered, the trips planned before made again
     raidedAt: (px, py) => raidingPartiesOn() && raidState().raids.some((r) => r.px === px && r.py === py && raidActive(r, worldMinutes())), regionHere: () => { const p = playerTravelPixel(); try { return maps.getRegionIndexAt(p.x, p.y); } catch { return null; } },   // AUDIT TOWN-ECON 2 SVC-1: the `/town audit`'s region
     locAt: (x, y) => locationIndex.get(`${x},${y}`)?.mapTableData ?? null, portLanes: () => (_lanesReady && mapDict ? worldLanes.all() : null) });   // TE2: a Watch tick is kept where a town stands; SEA-TRADE: a port's town and its lanes (the lanes once they stand - BOOT-TDZ II; WW7-10: the world's)
-  // SEASON1 part two: a Storm Season's slow sea, on every voyage this client reckons (systems/travel/travel.js) - online alone
-  setSeaTide(seatBook ? (end) => (seatBook.tideAt(maps.getRegionIndexAt(end.x, end.y)) === 'storms' ? TIDE_EFFECTS.stormsSea : 1) : null);
   registerEntityFold(FESTIVE_FOLD, (e) => (e === playerEntity && seatEdicts.festive() ? festiveMods(STAT_KEYS_ORDER) : EMPTY_MODS));
   setCrimeRepFactor(() => seatEdicts.crimeFactor());   // SEAT1d: a Curfew's crimes cost twice the legal reputation
   // PROF1 (22): this character's professions - its tracks, Stores and day as the
@@ -2508,7 +2501,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // U31 / THE CLASSIC START (and EE13's random spawn, and the named start) - HOST-SPLIT: scenes/bootStartHost.js.
   // BAY-LEFT-B: a start past the Bay (a family's seat there) stands the world on the Bay, then moves to it once its land
   // stands (`farStart`, which a birth waits on) - as a save made past the Bay loads
-  const { startLoc, farStart } = createBootStart({ locationIndex, locationName, maps, params, regionName, _teleportToPixel, worldPlaces, _worldReady,
+  const { startLoc, farStart, landAtStart } = createBootStart({ locationIndex, locationName, maps, params, regionName, _teleportToPixel, worldPlaces, _worldReady,
     get arenaTraced() { return arenaTraced; }, get townTalk() { return townTalk; } });
   const startPixel = longitudeLatitudeToMapPixel(
     startLoc.mapTableData.longitude, startLoc.mapTableData.latitude);
@@ -4127,8 +4120,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     }
   };
   const hitDistance = (hit) => (hit && Number.isFinite(hit.dist) ? hit.dist : null);
-  /** SEASON1 part two (Seats-Arc 9.3): how far from its marker an Orc Raid's second foe stands, metres. */
-  const ORC_RAID_PACE = 1.5;
   function standWodAction(p, w, act, x, y, z) {
     const key = `${p.px},${p.py}`;
     if (act.kind === 'foe') {
@@ -4136,10 +4127,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       exteriorFoes.spawnFoe(act.mobileType, [x, y, z], { yaw: act.yawDeg * Math.PI / 180, gender: act.gender, allied: act.allied, placed: true, groundAlign: { hitDist: hitDistance(hit) }, site: wodSiteOf(p, w) })   // WOD7: tagged with its marker
         .then((f) => { if (f && !act.hostile && f.ai) f.ai.isHostile = false; })   // MobileReactions.Passive
         .catch(() => {});
-      // SEASON1 part two (Seats-Arc 9.3): an Orc Raid's camp stands its foes twice - the second a pace beside the first
-      if (act.hostile && seatEdicts.orcsAt(p.px, p.py)) {
-        exteriorFoes.spawnFoe(act.mobileType, [x + ORC_RAID_PACE, y, z + ORC_RAID_PACE], { yaw: act.yawDeg * Math.PI / 180, gender: act.gender, allied: act.allied, placed: true, groundAlign: { hitDist: hitDistance(hit) }, site: wodSiteOf(p, w) }).catch(() => {});
-      }
       return;
     }
     if (act.kind === 'loot') {
@@ -11021,7 +11008,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           if (!r?.ok) return { ok: false, text: r?.kept ? `${st.kept}${chain ? ` ${chain}` : ''}` : `${accountRefusalText(r?.error)}${movedFirstText(r)}${chain ? ` ${chain}` : ''}` };
           const paid = f.fee > 0 && !r.elsewhere;
           const rec = recipeById(recipe);
-          const made = rec?.kind === 'siege' ? storedText(rec.name, Number(r.data.count) || 1) : craftedText(mintPieces(r.data));   // SEAT2b part two: a Ram Kit is the Stores'
+          const made = craftedText(mintPieces(r.data));
           return { ok: true, text: `${chain ? `${chain} ` : ''}${made} ${craftXpText(rec, r.data, st.xp, profBook.limit(rec?.profession))}${paid ? `, and paid the ${f.who ?? st.who} ${f.fee} gold` : ''}.` };   // CRAFT-LIMIT-SAID: and the crafter's limit, where it now holds the track
         },
         stock: async (material, qty, counter = stockOf(material)?.counter) => {
@@ -27429,7 +27416,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // keeps a door's height above the terrain) to the terrain under the
     // entrance - into whatever the structure stands on.
     if (entered) playerSpawned = true;
-  }
+  } else await landAtStart();   // a named start stands in its town, not at its edge (scenes/bootStartHost.js)
   _bootLoaded = true; if (testRoomOffline) townTalk.say(TEST_ROOM_OFFLINE_TEXT);   // HOTFIX 1003d: the boot's character loaded (moveArenaHomesOnline waits for it)   // AUDIT SET D4: said once the world stands, the character loaded
   if (realmRefused) townTalk.say(REALM_OFFLINE_TEXT);   // REALM P1.3: an online boot with no realm character plays offline, and says so
   if (realmBoot?.restored && realmBoot.missed) townTalk.say(REALM_RESTORED_TEXT);   // RESCUE-SAVE: the device's copy of a save the realm refused or never answered, played on (AUDIT A8: an ordinary close's, silently)

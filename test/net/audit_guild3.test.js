@@ -132,11 +132,10 @@ test('AUDIT GUILD3 S4: a line between two guilds reads by THIS guild - a Conscri
   const line = (src, dst, kind, amount, rid) => s.raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('guild', ?, 'guild', ?, ?, ?, 1, ?, 'seats', 'The Turning', ?)`).run(src, dst, kind, amount, T0, rid);
   line('gother', s.gid, 'conscription', 30, 'r-con');
-  line(s.gid, 'gother', 'fealty-tribute', 5, 'r-fea');
+  line(s.gid, 'gother', 'conscription', 5, 'r-pay');
   const view = (await s.call('/v1/guilds/mine', { character: s.gm.character }, s.gm.secret)).body.guild;
-  const by = Object.fromEntries(view.marksLedger.map((l) => [l.raw, l.out]));
-  assert.deepEqual(by, { conscription: false, 'fealty-tribute': true });
-  assert.deepEqual(view.marksLedger.map(guildSilverLineText).sort(), ['The guild paid its liege a fealty share of 5 silver', 'The guild received Conscription of 30 silver']);
+  assert.deepEqual(view.marksLedger.map((l) => l.out).sort(), [false, true]);
+  assert.deepEqual(view.marksLedger.map(guildSilverLineText).sort(), ['The guild paid Conscription of 5 silver', 'The guild received Conscription of 30 silver']);
 });
 
 // ─── THE CHAPTERS' LAW (lane L) and THE RECORD'S LAW 1 (R1) ─────────
@@ -340,7 +339,6 @@ test('AUDIT GUILD3 T9: the words, each a literal - the primer, the Overview\'s E
     'royal-escrow': 'put up a Royal Tourney prize of', 'royal-return': 'had a Royal Tourney prize come home:',
     'patron-escrow': 'bid for a chapter\'s patronage:', 'patron-return': 'had a patronage bid come home:',
     conscription: { in: 'received Conscription of', out: 'paid Conscription of' },
-    'fealty-tribute': { in: 'received a vassal\'s fealty share of', out: 'paid its liege a fealty share of' },
   });
 });
 

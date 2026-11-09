@@ -108,8 +108,7 @@ test('SEAT1b THE CAPS\' ARITHMETIC: each source at its own cap, then 2,000 an ac
   assert.equal(accountSeatInfluence({ renownXp: 60000 }), RENOWN_WEEK_CAP);
   assert.equal(accountSeatInfluence({ renownXp: 39 }), 1, '1 per 20 XP, rounded down');
   assert.equal(accountSeatInfluence({ homeDays: 7 }), 175);
-  assert.equal(accountSeatInfluence({ writ: 900 }), 900);
-  assert.equal(accountSeatInfluence({ watch: 420, gates: 3, renownXp: 8000, homeDays: 7, writ: 900 }), ACCOUNT_SEAT_WEEK_CAP);
+  assert.equal(accountSeatInfluence({ watch: 420, gates: 3, renownXp: 8000, homeDays: 7, hunt: 250 }), ACCOUNT_SEAT_WEEK_CAP);
   assert.equal(accountSeatInfluence({ watch: -5 }), 0);
   assert.equal(tributeRoom(400), 100, 'a quarter of the rest is a fifth of the whole');
   assert.equal(tributeRoom(400, 60), 40);

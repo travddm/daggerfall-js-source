@@ -438,8 +438,8 @@ async function drawn(t, edicts, { regions = null } = {}) {
 test('AUDIT CHAP5 T8: the draw reads a Curfew only where it is law, and no other edict as one; its rival only a chapter confirmed now (mutants: the law, the edict, the rival confirmed)', async (t) => {
   const none = await drawn(t, []);
   assert.deepEqual(await drawn(t, [[900, ANTICLERE, 'curfew', 'proclaimed'], [901, DAGGERFALL, 'curfew', 'void']]), none, 'a curfew not law');
-  assert.deepEqual(await drawn(t, [[900, ANTICLERE, 'festival', 'law'], [901, DAGGERFALL, 'levy', 'law']]), none, 'another edict');
-  assert.notDeepEqual(await drawn(t, [[900, ANTICLERE, 'curfew', 'law'], [901, DAGGERFALL, 'curfew', 'law']]), none, 'the control: a law Curfew moves the draw');
+  assert.deepEqual(await drawn(t, [[900, ANTICLERE, 'festival', 'law'], [901, DAGGERFALL, 'bounty', 'law']]), none, 'another edict');
+  assert.notDeepEqual(await drawn(t, [[900, ANTICLERE, 'curfew', 'law'], [901, DAGGERFALL, 'bounty', 'law']]), none, 'the control: a law Curfew moves the draw');
   // the Thieves no longer confirmed, their rows held Ascendant: the Fighters draw as with no rival, in every region
   const regions = Array.from({ length: 30 }, (_, i) => i + 1);
   const events = await drawn(t, [], { regions });
