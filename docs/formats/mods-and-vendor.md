@@ -109,6 +109,7 @@ These folders stay committed: no public download reproduces them. The folder REA
 | `raum-book` | Mac (Lattymoy) | project-raum's book and paper code | `github.com/Lattymoy/project-raum` (not public) | The owner's own work | none |
 | `readied-spellcasting-hands` | jefetienne | Readied Spellcasting Hands 1.3 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
 | `vorbis-fsb-setups` | vgmstream; the Xiph.org Foundation | Two Vorbis setup headers | vgmstream's `vorbis_codebooks_fsb.h`; libvorbis | vgmstream's licence; BSD-3-Clause for libvorbis | `COPYING.vgmstream`, `COPYING.libvorbis` |
+| `world-of-daggerfall` | Kamer | World of Daggerfall 2.0 | Nexus Mods, Daggerfall Unity mod 181; the shipped archive, from Lattymoy | The archive states no licence. Permission granted by the author (the grant that covers Windmills of Daggerfall), confirmed by Mac on 2026-09-23 and recorded in the folder's `README.md` (decision 122) | none |
 | `world-tooltips` | jefetienne | World Tooltips 1.1 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
 
 The other vendored mod folders (all but DFU's own `dfu-*` data and the fetched folders above) await a record of their

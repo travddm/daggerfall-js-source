@@ -30,10 +30,11 @@ one exists.
 Some test files sit at the top of `test/`. New tests go in an area folder.
 
 Name a new test file `<module>.test.ts`, after the module it covers, in kebab-case like every new file (decision 116
-(9)). Existing files keep their names until the rename pass (decision 101 Q1). Many of them are named for a ticket or
-an audit (`audit*`, `fb*`, `rel4_`, `tesa*`); do not copy those names. Say what the file covers in a header comment
-and in each `test()` title. Shared code that is not a test goes in a `.mjs` file at the top of `test/`, never in a
-test file.
+(9)). A test for a camelCase module is named in kebab-case now (`heroThreat.js` gets `hero-threat.test.ts`), and the
+module follows in the rename pass (decision 122). Existing files keep their names until the rename pass (decision 101
+Q1). Many of them are named for a ticket or an audit (`audit*`, `fb*`, `rel4_`, `tesa*`); do not copy those names.
+Say what the file covers in a header comment and in each `test()` title. Shared code that is not a test goes in a
+`.mjs` file at the top of `test/`, never in a test file.
 
 A minimal test:
 
