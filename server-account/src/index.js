@@ -1159,7 +1159,7 @@ const service = {
         const seatBadge = seats && renownCharacterOk(body.character) ? await seatBadgeOf(ctx.db, who.player.id, body.character, seasonOf(seatWeekOf(nowS * 1000), zero)?.n ?? 0, member) : null;
         const wornT = titleWorn(worn, env);
         // CROWN1 part two: the champion's is the account's own, kept for good - no guildmaster's; SEASON1: and so are a
-        // Season's crowned and keeper (seatRoyal.js keptTitleOf)
+        // the Tourney's champion (seatRoyal.js keptTitleOf)
         const kept = seats && KEPT_TITLES.includes(wornT) ? await keptTitleOf(ctx.db, who.player.id, wornT, zero) : null;
         // CHAP4c: a chapter's seat's title worn only by a character of the account that holds it, with its claim - the
         // named character's own first, else none (a title a character does not hold is not signed for it)

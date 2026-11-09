@@ -818,8 +818,6 @@ export function seatTitleText(title, ts, place) {
   switch (title) {
     case 'warden': return seat ? `Warden of ${seat.name}` : null;
     case 'protector': return kingdom ? `Protector of ${kingdom}` : null;
-    case 'crowned': return `Crowned in Season ${ts[1]}`;
-    case 'keeper': return seat ? `Keeper of ${seat.name}${seasonTail(ts[1])}` : null;
     case 'champion': return kingdom ? `Champion of ${kingdom}${seasonTail(ts[1])}` : null;   // CROWN1 part two: 7.6's words
     default: return null;
   }
@@ -1558,27 +1556,22 @@ export const seasonFloor = (week, zero) => seasonOf(week, zero)?.start ?? week -
 /** THE SOFT RESET'S STANDING (9.1: "Standing moves halfway back toward 50") - rounded toward 50. */
 export const seasonStanding = (standing) => STANDING_START + Math.trunc((Number(standing) - STANDING_START) / 2);
 /**
- * THE SEASON'S TITLES (9.1) - at the Turning that ends Season `season` (`{ n, start }`), over the Charters standing
- * through its last week (`[{ key, guild, tier, since }]`, `since` the first week held): every crown's guild "Crowned in
- * Season N", every guild that held a seat the whole Season "Keeper of <Town>, Season N" - `[{ guild, title, key }]`, each
- * its guildmaster's. DECIDED: Season 0, the beta, crowns no one.
+ * THE SEASON'S KEEPERS (9.1) - at the Turning that ends Season `season` (`{ n, start }`), over the Charters standing
+ * through its last week (`[{ key, guild, tier, since }]`, `since` the first week held): every seat held the whole Season,
+ * `[{ guild, key }]`. Their guilds wear the banner ribbon (seasonRibbons); no title is minted. DECIDED: Season 0, the
+ * beta, keeps no one.
  */
-export function seasonTitles(season, holds) {
+export function seasonKeepers(season, holds) {
   if (!season || season.n < 1) return [];
-  const out = [];
-  for (const h of [...(holds ?? [])].sort((a, b) => a.key - b.key)) {
-    if (h.tier === 'crown') out.push({ guild: h.guild, title: 'crowned', key: h.key });
-    if (keptWholeSeason(season, h.since)) out.push({ guild: h.guild, title: 'keeper', key: h.key });
-  }
-  return out;
+  return [...(holds ?? [])].sort((a, b) => a.key - b.key).filter((h) => keptWholeSeason(season, h.since)).map((h) => ({ guild: h.guild, key: h.key }));
 }
 /** WHETHER A CHARTER HELD `season` WHOLE (9.1's Keeper) - its `since` (the first week held) at the Season's first week.
  *  AUDIT-SEATS L1, DECIDED: Season 1's first week is no one's - Season 0's last Turning claims nothing (18: the seats are
  *  wiped), so its first Charters stand from the week after; a Charter from Season 1's first Turning held it whole. */
 export const keptWholeSeason = (season, since) => !!season && Number(since) <= season.start + (season.n === 1 ? 1 : 0);
-/** SEASON1 (9.1): THE BANNER RIBBON'S GUILDS at a Season's end - every guild a keeper's title names (it held a seat the
- *  whole Season), once each, in the titles' order. Its members at that Turning wear the ribbon through the next Season. */
-export const seasonRibbons = (titles) => [...new Set((titles ?? []).filter((t) => t.title === 'keeper').map((t) => t.guild))];
+/** SEASON1 (9.1): THE BANNER RIBBON'S GUILDS at a Season's end - every guild of a keeper (it held a seat the
+ *  whole Season), once each, in the keepers' order. Its members at that Turning wear the ribbon through the next Season. */
+export const seasonRibbons = (keepers) => [...new Set((keepers ?? []).map((k) => k.guild))];
 /** The Season whose ribbons are worn in `season` (seasonOf's): the one before it - null with none counted or in Season 0. */
 export const ribbonSeasonOf = (season) => (season && season.n >= 1 ? season.n - 1 : null);
 /** The Seat tab's Season line off the standings' `season` (seasonOf's): "Week 3 of 8 of the Season of Morning Star." -

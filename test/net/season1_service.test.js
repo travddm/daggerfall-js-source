@@ -82,9 +82,7 @@ test('SEASON1 A SEASON\'S END, AGAINST A TWIN COUNTING NONE: the crown\'s guildm
   assert.ok(plain.s.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_legacy WHERE week = ?').get(W + 1).n > 0, 'the twin carries Legacy');
   // W the last week of Season 1: Season 0 W-11..W-8, Season 1 W-7..W
   const { s, oa, sh } = await scenario(W - 11);
-  assert.deepEqual(s.raw.prepare('SELECT account, title, key, week FROM town_seat_titles ORDER BY title').all().map((r) => ({ ...r })), [
-    { account: oa.gm.id, title: 'crowned', key: WAYREST.key, week: W }, { account: oa.gm.id, title: 'keeper', key: WAYREST.key, week: W },
-  ]);
+  assert.deepEqual(s.raw.prepare('SELECT account, title, key, week FROM town_seat_titles ORDER BY title').all().map((r) => ({ ...r })), [], 'Season titles are cut: none minted');
   // week W's Tide in Wayrest is a Royal Wedding - counted only with a Season (SEASON1 part two): +3 before the halving
   assert.equal(tideOf(W, 'wayrest'), 'wedding');
   assert.deepEqual([s.held(WAYREST.key).standing, s.held(ALCAIRE.key).standing], plainStanding.map((x) => seasonStanding(x + STANDING_CHANGES.wedding)));
@@ -106,13 +104,11 @@ test('SEASON1 A SEASON\'S END, AGAINST A TWIN COUNTING NONE: the crown\'s guildm
     assert.deepEqual([minted.title, minted.ts], [v.claims.t, v.claims.ts]);
     return [minted.title, minted.ts];
   };
-  assert.deepEqual(await wear('crowned'), ['crowned', [WAYREST.key, 1]]);
-  assert.deepEqual(await wear('keeper'), ['keeper', [WAYREST.key, 1]]);
   assert.deepEqual(await wear('protector'), ['protector', [WAYREST.key, 2]]);
   // a champion's title won in Season 0 (week W-9): its own row and its own Season, whatever else is newer
   s.raw.prepare("INSERT INTO town_seat_titles (account, title, key, week, at) VALUES (?, 'champion', ?, ?, ?)").run(oa.gm.id, WAYREST.key, W - 9, T0);
   assert.deepEqual(await wear('champion'), ['champion', [WAYREST.key, 0]]);
-  assert.equal((await s.call('/v1/account/title', { title: 'keeper' }, sh.gm)).status, 403, 'a seat taken in the Season: no Keeper');
+  assert.equal((await s.call('/v1/account/title', { title: 'keeper' }, sh.gm)).status, 400, 'Season titles are cut: no such title');
 });
 
 test('SEASON1 SEASON 0\'S END WIPES THE SEATS (18): its own week settled - the upkeep paid, Legacy carried nowhere - then nothing set up for the next (no claim though a guild passed the line, the Edict proclaimed for it void) and the Charters, influence, pledges, binds, Legacy, history, fealty and Pacts gone; the titles, the red lines and the weeks kept; no Season title for the beta (mutants: the wipe; each table; the claim; the Edict; the beta\'s titles)', async (t) => {

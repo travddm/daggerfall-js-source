@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService, T0 } from '../accountDb.mjs';
 import {
-  seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, seasonTitles, keptWholeSeason, turningPlan, placeBattles, CROWN_SIEGE_SLOT,
+  seatReportText, seatWeekOf, SEAT_MEMBER_WAIT_S, seasonKeepers, keptWholeSeason, turningPlan, placeBattles, CROWN_SIEGE_SLOT,
   siegeStartMs, chronicleLine, edictWords, seatRuleLine, seatArrivalNews, seatTitleText, seatIgnoredAccounts, SEAT_WITNESS_IGNORED_S,
   accountSeatInfluence, tributeRoom, claimTotal, SIEGE_STANDING, STANDING_CHANGES, KINGDOM_METALS, SEAT_RING_UNHELD, FREE_LAND_RING,
   seatArrivalLine, siegeCalledClause, battleWhenText, seatWeekStartMs,
@@ -55,10 +55,10 @@ async function stood(t, env = {}) {
 test('AUDIT-SEATS L1 SEASON 1\'S KEEPERS: Season 0\'s last Turning claims nothing, so a Charter from Season 1\'s first Turning held it whole; any later Season asks its first week (mutants: the first Season\'s week; the rule\'s use)', () => {
   const s1 = { n: 1, start: 7 }, s2 = { n: 2, start: 15 };
   const hold = (since) => [{ key: 1, guild: 'g', tier: 'palace', since }];
-  assert.deepEqual(seasonTitles(s1, hold(8)), [{ guild: 'g', title: 'keeper', key: 1 }], 'the earliest any Charter of Season 1 can stand');
-  assert.deepEqual(seasonTitles(s1, hold(9)), [], 'a week short');
-  assert.deepEqual(seasonTitles(s2, hold(15)), [{ guild: 'g', title: 'keeper', key: 1 }]);
-  assert.deepEqual(seasonTitles(s2, hold(16)), [], 'Season 2 asks its own first week');
+  assert.deepEqual(seasonKeepers(s1, hold(8)), [{ guild: 'g', key: 1 }], 'the earliest any Charter of Season 1 can stand');
+  assert.deepEqual(seasonKeepers(s1, hold(9)), [], 'a week short');
+  assert.deepEqual(seasonKeepers(s2, hold(15)), [{ guild: 'g', key: 1 }]);
+  assert.deepEqual(seasonKeepers(s2, hold(16)), [], 'Season 2 asks its own first week');
   assert.deepEqual([keptWholeSeason(null, 1), keptWholeSeason(s1, 7), keptWholeSeason(s1, 8), keptWholeSeason(s1, 9)], [false, true, true, false]);
 });
 
@@ -146,7 +146,7 @@ test('AUDIT-SEATS L7 THE CHRONICLE\'S WORDS: "1 bout"; Drakes, the players\' wor
   assert.equal(seatArrivalNews({ holder: { standing: 50, edict: 'open-gates' } }), 'Open Gates is proclaimed.');
   const place = (k) => (k === 5023 ? seat : null);
   assert.deepEqual([seatTitleText('champion', [5023, 0], place), seatTitleText('champion', [5023, 2], place)], ['Champion of Wayrest', 'Champion of Wayrest, Season 2']);
-  assert.deepEqual([seatTitleText('keeper', [5023, 0], place), seatTitleText('keeper', [5023, 3], place)], ['Keeper of Wayrest', 'Keeper of Wayrest, Season 3']);
+  assert.deepEqual([seatTitleText('keeper', [5023, 0], place), seatTitleText('keeper', [5023, 3], place)], [null, null]);
 });
 
 // ─── L8 ──────────────────────────────────────────────────────────────
