@@ -8,7 +8,6 @@ import { standService } from '../accountDb.mjs';
 import { staffWords, STAFF_SESSION_HEADER } from '../../server-account/src/staff.js';
 import { caseUrgency, CLAIM_S, CASES_PAGE, AI_WAIT_S, STALE_S, CASE_ROUTES } from '../../server-account/src/staffCases.js';
 import { STAFF_ROUTES } from '../../server-account/src/service.js';
-import { discordInteraction } from '../../server-account/src/discord.js';
 import { mintStamp } from '../../src/net/safety/chatStamp.js';
 import { SAFE_LAW_PATH } from '../../src/net/wire.js';
 import { LADDER_BAN_AT } from '../../src/net/safety/safetyLaw.js';
@@ -54,10 +53,6 @@ async function stand() {
   const troll = await s.registered('Troll');
   const sylvia = await s.registered('Sylvia');
   const raw = s.env.DB._raw;
-  // the operator's link (docs/operations/staff-roles.md): a Discord user id bound to the moderator's ACCOUNT
-  for (const [discordId, handle] of [['111111111111111111', 'Asynian'], ['222222222222222222', 'Tabbyvish']]) {
-    raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, (SELECT id FROM players WHERE handle_lc = ?), ?)').run(discordId, handle.toLowerCase(), nowS());
-  }
   raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(nowS() - SPROUT_S - 60, sylvia.id);   // old enough to count
   const mob = (await staff('/v1/staff/login', { handle: 'SirMcMobdon', password: PASSWORD, ...(await mobKey.proof('login', 'SirMcMobdon')) })).body;
   const enrol = async (handle) => {
@@ -75,7 +70,7 @@ async function stand() {
   const caseOn = (who, { reports = [['harassment', 1, nowS()]], ...cols } = {}) => {
     const id = (++n).toString(16).padStart(16, 'c');
     const t = nowS();
-    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: reports.length, credible: reports.filter((r) => r[1]).length, ai_state: 'off', discord_state: 'off', ...cols };
+    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: reports.length, credible: reports.filter((r) => r[1]).length, ai_state: 'off', ...cols };
     raw.prepare(`INSERT INTO mod_cases (${Object.keys(row).join(', ')}) VALUES (${Object.keys(row).map(() => '?').join(', ')})`).run(...Object.values(row));
     reports.forEach(([reason, counted, at], i) => {
       const rep = `p_rep${n}x${i}`.padEnd(10, '0');
@@ -104,7 +99,7 @@ test('STAFF-PANEL2: the reports\' doors are listed among the staff panel\'s, and
 
 test('STAFF-PANEL2: WHAT GOES FIRST - a case\'s level and the words that say why, as the design doc ranks them (mutants: each rule dropped)', () => {
   const t = 1_000_000;
-  const c = (cols = {}) => ({ reports: 1, ai_state: 'off', discord_state: 'off', updated_at: t, ...cols });
+  const c = (cols = {}) => ({ reports: 1, ai_state: 'off', updated_at: t, ...cols });
   const one = [{ reason: 'spam', counted: 1, at: t }];
   const lv = (cols, reports = one, strikes = 0) => caseUrgency(c(cols), { reports, strikes, nowS: t }).level;
   // high
@@ -122,7 +117,6 @@ test('STAFF-PANEL2: WHAT GOES FIRST - a case\'s level and the words that say why
   assert.equal(lv({ reports: 2 }, [{ reason: 'spam', counted: 1, at: t }, { reason: 'spam', counted: 0, at: t }]), 'medium', 'two reporters');
   assert.equal(lv({ ai_state: 'due', updated_at: t - AI_WAIT_S }), 'medium', 'a read waiting ten minutes');
   assert.equal(lv({ ai_state: 'reading', updated_at: t - AI_WAIT_S + 1 }), 'low', 'not yet ten');
-  assert.equal(lv({ discord_state: 'failed' }), 'medium', 'a card nobody saw');
   assert.equal(lv({}, one, 1), 'medium', 'a strike in 90 days');
   // low
   assert.equal(lv({ ai_state: 'done', ai_category: 'harassment', ai_severity: 1 }), 'low', 'severity 1');
@@ -179,7 +173,7 @@ test('STAFF-PANEL2: THE LIST - most urgent first for an Admin and a Moderator al
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2: A CLAIM - a Moderator holds one case at a time, an Admin takes any (the Moderator told), the holder\'s look keeps it, it lets go by itself, and nobody else acts on it meanwhile, from the panel or from Discord (mutants: the one-case check; the held check; claim_from)', async () => {
+test('STAFF-PANEL2: A CLAIM - a Moderator holds one case at a time, an Admin takes any (the Moderator told), the holder\'s look keeps it, it lets go by itself, and nobody else acts on it meanwhile in the panel (mutants: the one-case check; the held check; claim_from)', async () => {
   const s = await stand();
   try {
     const a = await s.player();
@@ -194,12 +188,6 @@ test('STAFF-PANEL2: A CLAIM - a Moderator holds one case at a time, an Admin tak
     assert.deepEqual((await s.staff('/v1/staff/mute', { target: a.id, minutes: 30, click: 'press-0001' }, s.tab.session)).body, { error: 'staff-claimed' });
     assert.deepEqual((await s.staff('/v1/staff/dismiss', { target: a.id }, s.mob.session)).body, { error: 'staff-claimed' }, 'an Admin takes it first');
     assert.equal(s.raw.prepare('SELECT muted_until FROM players WHERE id = ?').get(a.id).muted_until, null);
-    // Discord: the panel's claim of another member stands; the holder's own press goes through
-    const ctx = { db: s.env.DB, nowS: nowS(), subtle, rand: (b8) => globalThis.crypto.getRandomValues(b8) };
-    const press = (user) => ({ type: 3, member: { user: { id: user } }, data: { custom_id: `safe:m30:${ca}` } });
-    const no = await discordInteraction(ctx, s.env, press('222222222222222222'));
-    assert.match(no.data.content, /Another staff member has this case in the staff panel/);
-    assert.equal(s.raw.prepare('SELECT status FROM mod_cases WHERE id = ?').get(ca).status, 'open');
     // an Admin takes it from the Moderator, who is told
     assert.equal((await s.staff('/v1/staff/claim', { target: a.id }, s.mob.session)).status, 200);
     const told = await s.staff('/v1/staff/cases', {}, s.asy.session);

@@ -155,7 +155,7 @@ The labs are development aids. The player reaches only `index.html`, `play/index
 | --- | --- |
 | `src/` | The browser client: entry `src/main.js`, scenes, systems, UI, renderer, format readers. See [architecture/source-layout.md](architecture/source-layout.md). |
 | `server/` | The multiplayer relay: a Cloudflare Worker with one Durable Object `Room` per room (`server/src/index.js`). |
-| `server-account/` | The account service: a Cloudflare Worker with a D1 database (`migrations/`) and the Discord bot. |
+| `server-account/` | The account service: a Cloudflare Worker with a D1 database (`migrations/`). |
 | `app/` | The Electron desktop shell (`app/main.cjs`, preloads, launcher). Builds with `electron-builder`. |
 | `play/` | The game's HTML entry. |
 | `public/` | Static files copied to the build as they are: icons, fonts, sound effects, skins and approved art packs. |

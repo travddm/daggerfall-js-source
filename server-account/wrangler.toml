@@ -130,8 +130,8 @@ MODES_OFFERED = ""
 # STAFF ROLES (Admin, Owner, Moderator) ARE COLUMNS OF THE ACCOUNT, NOT HANDLE LISTS (server-account/migrations/0002, titles.js,
 # staff.js). This file names no handle that holds a role: a name is free to whoever registers it first, so a name list was a way
 # in to bans, rollbacks and grants. An Owner sets the first Admin and Owner from a machine with deploy access, once:
-# docs/operations/staff-roles.md (tools/staffRole.mjs). Owners then add and remove Admins from the staff panel, Admins add and
-# remove Moderators, and the Discord moderators' queue links a Discord id to an account the same way.
+# docs/operations/staff-roles.md (tools/staffRole.mjs). Owners then add and remove Admins from the staff panel, and Admins add
+# and remove Moderators.
 # The other *_HANDLES lists below grant a TITLE (a name beside a name), never a right to act on another player.
 #
 # STAFF-PANEL1: AN OWNER'S FIRST WAY IN - `handle:publicKey`, comma-separated, the key raw Ed25519 in base64url. The owner's own
@@ -145,7 +145,7 @@ OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"
 # bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY.
 #
 # RELAY_LAW_URL - SAFE4: the relay's door for a mute or a ban decided with no moderator's client to carry its order to
-# the rooms (one from Discord, an automatic one): the relay's own host and SAFE_LAW_PATH (src/net/wire.js), which the
+# the rooms (one from the staff panel, an automatic one): the relay's own host and SAFE_LAW_PATH (src/net/wire.js), which the
 # hub applies and hands to its target's own client. Empty: the order lands on the target's next connection instead.
 # AUDIT SAFE RELAY S1: the order goes through the RELAY service binding below, which this address only names the path
 # for - one Worker fetching another's workers.dev address on the same account may be refused (Cloudflare's error 1042).
@@ -160,16 +160,6 @@ MOD_AI = "shadow"
 # a UTC day, empty for 1,500.
 MOD_AI_MODEL = ""
 MOD_AI_DAILY_MAX = ""
-# SAFE8: THE MODERATORS' QUEUE IN DISCORD (src/discord.js). DISCORD_MOD_CHANNEL: the private channel's id the bot posts
-# each case to. DISCORD_PUBLIC_KEY: the Discord application's public key (hex - not a secret), which every press and
-# /mod is signed with. Who may press is a `staff_discord` row (account id), not a var - a press is that account's act, and only
-# while it holds a staff role. The bot's token is DISCORD_BOT_TOKEN, a
-# secret the deploy puts, never here. Empty: no cards and no presses - the cases still gather, and the game's
-# /mute, /ban and /strikes still answer. The setup: bible/11-Multiplayer/Chat-Safety-Arc.md section 9.
-DISCORD_MOD_CHANNEL = "1560996671440293908"
-DISCORD_PUBLIC_KEY = "36e74945022f94ec7955a84ccccb270e63780100e558d30777742337b62de3e0"
-# DISCORD MODERATORS ARE LINKED BY ACCOUNT, NOT BY NAME: the `staff_discord` table binds a Discord user id to an account id
-# (tools/staffRole.mjs discord, docs/operations/staff-roles.md), and a press is that account's act only while it holds a staff role.
 # STAFF-PANEL5-FREEZE (2026-10-22, mob, 03:22Z; design doc "DFO Staff Panel: design", Freeze player): DISCORD_INVITE_URL - the
 # server's Discord invite the frozen player's Staff tab shows beside its Copy button (server-account/src/staffFreeze.js
 # discordInvite), so it changes without a game update. An https address; empty, the tab shows none.

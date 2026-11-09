@@ -219,7 +219,7 @@ async function refusalOf(/** @type {Response} */ res) {
 export async function measured(request, env, serve, exec = null) {
   const sink = env?.METRICS;
   const said = { parts: '' };
-  if (!sink || typeof sink.writeDataPoint !== 'function') return serve(request, env, said, exec);   // AUDIT SAFE DISCORD-4: the Worker's ExecutionContext, for what follows an answer
+  if (!sink || typeof sink.writeDataPoint !== 'function') return serve(request, env, said, exec);   // the Worker's ExecutionContext, for what follows an answer
   const started = Date.now();
   const tally = { n: 0, ms: 0, trips: 0, capped: 0, rr: 0, rw: 0, replica: 0, tables: /** @type {Record<string, number>} */ ({}) };
   const counted = env.DB ? { ...env, DB: countedDb(env.DB, tally) } : env;

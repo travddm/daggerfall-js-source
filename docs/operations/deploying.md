@@ -110,8 +110,6 @@ Steps (every one is safe to re-run):
 12. Puts the optional secrets the repository has (below). A missing one turns its feature off; it is not an error.
 13. Verifies the live service: `/v1/health` names this version, the gate public key is held, a password route runs
     on the platform, `/v1/pubkey` answers.
-14. Registers the Discord bot's commands and endpoint when `DISCORD_BOT_TOKEN` is set (`server-account/src/
-    discordCommands.js`, `tools/discordModCommands.mjs`).
 
 A secret listing that cannot be read stops the job. It must never be read as "no secrets", because that would
 re-mint the signing pair.
@@ -163,7 +161,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[vars] *_HANDLES`, `OWNER_KEYS` | `*_HANDLES`: comma-separated account handles for honorary titles only. `OWNER_KEYS`: the public key an Owner account signs in with first. Staff roles are not vars: see [Staff roles](staff-roles.md). |
 | `[vars] *_OPEN`, `SEASON_ZERO_WEEK`, `DOMAINS_WEEK` | Feature switches and season schedule. |
 | `[vars] MOD_AI`, `MOD_AI_MODEL`, `MOD_AI_DAILY_MAX` | The chat-safety reviewer's mode and limits. |
-| `[vars] DISCORD_MOD_CHANNEL`, `DISCORD_PUBLIC_KEY`, `DISCORD_INVITE_URL` | The moderation bot's channel and interaction key. |
+| `[vars] DISCORD_INVITE_URL` | The community invite a frozen player's Staff tab shows; empty shows none. |
 | `[vars] PATREON_CLIENT_ID`, `PATREON_TIERS` | Patreon linking. |
 
 A var change in the relay's file deploys only with a manual `relay-deploy.yml` run with `redeploy` on. A var change
@@ -177,7 +175,6 @@ Repository secrets (Settings > Secrets and variables > Actions):
 | --- | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Every deploy and operator workflow | Nothing deploys. Needs Workers, D1 (edit), R2 and Durable Objects permissions. |
 | `ANTHROPIC_API_KEY` | `account-deploy.yml` -> Worker secret | The chat-safety reviewer (`server-account/src/modAi.js`) is off. |
-| `DISCORD_BOT_TOKEN` | `account-deploy.yml` -> Worker secret and command registration | The Discord bot is off. |
 | `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | Patreon linking or pledge tracking is off. |
 
 Worker secrets the workflow mints and never stores in the repository: `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`,

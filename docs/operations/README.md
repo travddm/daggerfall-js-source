@@ -13,4 +13,4 @@ and their configuration, the desktop app release, and the manual workflows that 
   and the load readings.
 - [tools-index.md](tools-index.md) - hand-run tools in `tools/` that no script, workflow or other page names.
 - [staff-roles.md](staff-roles.md) - Admin, Moderator and Owner are account roles: who sets them, and how the
-  operator sets the first Owner and links Discord moderators.
+  operator sets the first Owner.

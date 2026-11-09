@@ -504,10 +504,10 @@ export const ROUTES = new Set([
   '/v1/board/read', '/v1/board/pin', '/v1/board/take-down', '/v1/board/report', '/v1/board/mod/remove', '/v1/board/mod/restore',
   '/v1/board/notice', '/v1/board/notice/remove',
   // SAFE1-SAFE8: a player's block list, a report, the code of conduct agreed;
-  // a moderator's ban, unban and look; and the two doors a stranger reaches that prove themselves (SAFE_OPEN_ROUTES);
+  // a moderator's ban, unban and look; and the door a stranger reaches that proves itself (SAFE_OPEN_ROUTES);
   // AUDIT SAFE DOC-4: the moderators' read of the cases in the game - the open ones, one, and its dismissal
   '/v1/safety/blocks', '/v1/safety/block', '/v1/safety/unblock', '/v1/safety/report', '/v1/safety/conduct',
-  '/v1/mod/ban', '/v1/mod/unban', '/v1/mod/strikes', '/v1/mod/feed', '/v1/discord/interactions',
+  '/v1/mod/ban', '/v1/mod/unban', '/v1/mod/strikes', '/v1/mod/feed',
   '/v1/mod/cases', '/v1/mod/case', '/v1/mod/dismiss',
   // STAFF-PANEL1: the staff panel's doors (staff.js) - its own sign-in and session, never a game session (STAFF_ROUTES)
   '/v1/staff/login', '/v1/staff/enroll', '/v1/staff/me', '/v1/staff/logout', '/v1/staff/keys', '/v1/staff/key/forget',
@@ -653,10 +653,9 @@ export const OPEN_ROUTES = new Set(['/v1/health', '/v1/auth/guest', '/v1/auth/lo
  *  carries - a state or a ticket this service signed, a signature under the webhook's secret - never a session. */
 export const PATREON_OPEN_ROUTES = new Set(['/v1/patreon/callback', '/v1/patreon/confirm', '/v1/patreon/webhook']);
 
-/** SAFE5 + SAFE8: the chat safety's two doors a stranger reaches, NOT the JSON ladder's - the relay's feed of public
- *  lines and Discord's presses and commands. Each proves itself by a signature over its exact bytes (the relay's receipt
- *  key, the Discord application's key), never a session. */
-export const SAFE_OPEN_ROUTES = new Set(['/v1/mod/feed', '/v1/discord/interactions']);
+/** SAFE5: the chat safety's door a stranger reaches, NOT the JSON ladder's - the relay's feed of public lines. It proves
+ *  itself by a signature over its exact bytes (the relay's receipt key), never a session. */
+export const SAFE_OPEN_ROUTES = new Set(['/v1/mod/feed']);
 
 /** STAFF-PANEL1: the staff panel's doors (staff.js), NOT the JSON ladder's - none takes a game session. Two prove themselves by
  *  a password and an extension's signature (login, enroll); the rest by a staff session in `x-staff-session`. */

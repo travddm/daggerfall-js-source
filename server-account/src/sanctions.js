@@ -5,7 +5,7 @@
 // MOD1 wrote who muted a player beside the mute, and cleared it with the mute: a power whose use was forgotten the
 // moment it lapsed, so a player muted every week for a month looked, to the next moderator, like a first offender. Now
 // every mute, unmute, ban, unban and dismissal is a row in `mod_actions` that nothing clears - who acted (a moderator's
-// account, a Discord moderator through theirs, or the automatic `auto:reports` / `auto:review`), on whom, until when,
+// account, or the automatic `auto:reports` / `auto:review`), on whom, until when,
 // why, and the case it answered. A STRIKE is a mute or a ban in the last STRIKE_WINDOW_S - but an automatic mute a
 // moderator dismissed (AUDIT SAFE SERVICE-6: three accounts who count could otherwise walk an innocent player up the
 // ladder one dismissed case at a time) - and the LADDER (net/safety/safetyLaw.js) is the mute the next strike earns.
@@ -19,7 +19,7 @@
 // `protected`).
 //
 // THE SERVICE'S DOOR TO THE RELAY (pushLaw). A moderator's /mute in the game is carried to the rooms by their own client
-// (MOD1). A mute or ban from Discord, or an automatic one, has no such client, so the service posts its signed order to
+// (MOD1). A mute or ban from the staff panel, or an automatic one, has no such client, so the service posts its signed order to
 // the relay's SAFE_LAW_PATH (RELAY_LAW_URL): the hub applies it and hands it to its target's own client to carry on.
 // Never the truth - the row is - only how a room already open hears it now; a push that fails is said in the log and the
 // order lands on the target's next connection, as MOD1's always did without a key.
@@ -39,7 +39,7 @@ export const ACTION_KINDS = Object.freeze(['mute', 'unmute', 'ban', 'unban', 'di
 export const REASON_MAX = 200;
 /** How many of an account's acts a moderator's look reads, newest first. */
 export const HISTORY_MAX = 20;
-/** How long the service waits on the relay's door, ms (a Discord press pushes after it answers - AUDIT SAFE DISCORD-4). */
+/** How long the service waits on the relay's door, ms. */
 export const LAW_PUSH_MS = 2000;
 /** The automatic actors - the record's words for a mute no moderator wrote. */
 export const AUTO_ACTORS = Object.freeze(['auto:reports', 'auto:review']);
@@ -133,35 +133,32 @@ export async function voidAutoMutes({ db, nowS, subtle }, env, { caseId, row, ac
 
 /**
  * BAN, a moderator's: `days` 1 to BAN_DAYS_MAX, or 0 for good. The account is found by id or name (findAccount); a
- * moderator is never banned, nor is the moderator who asks. The row and the act in one batch. `keepLonger` (a case's
- * button) never shortens a ban that stands longer (AUDIT SAFE DISCORD-5: "Ban 30 days" cut a ban for good) - its act
- * is recorded, the longer end kept; a moderator who names the days by command means them.
+ * moderator is never banned, nor is the moderator who asks. The row and the act in one batch. A moderator who names the
+ * days means them.
  * @param {{ db: any, nowS: number }} ctx @param {any} actor @param {any} env
  * STAFF-PANEL2-FIX: `also(answer)`, the caller's own statements for the same batch (safety.js modAct: its case closed,
  * so the ban, its record and the close land together or none does).
- * @param {{ target?: unknown, name?: unknown, days?: unknown, reason?: unknown, caseId?: string|null, click?: string|null, actorName?: string|null, keepLonger?: boolean,
+ * @param {{ target?: unknown, name?: unknown, days?: unknown, reason?: unknown, caseId?: string|null, click?: string|null, actorName?: string|null,
  *   also?: ((answer: { ok: true, target: string, name: string, until: number, reason: string|null }) => any[])|null }} ask
  */
-export async function banAccount({ db, nowS }, actor, env, { target, name, days, reason, caseId = null, click = null, actorName = null, keepLonger = false, also = null }) {
+export async function banAccount({ db, nowS }, actor, env, { target, name, days, reason, caseId = null, click = null, actorName = null, also = null }) {
   if (!canModerate(actor, env)) return { error: 'not-moderator' };
   if (!Number.isSafeInteger(days) || /** @type {number} */ (days) < 0 || /** @type {number} */ (days) > BAN_DAYS_MAX) return { error: 'bad-days' };
   const row = await findAccount(db, { target, name });
   if ('error' in row) return row;
   if (row.id === actor.id || canModerate(row, env)) return { error: 'protected' };
-  const asked = banUntil(/** @type {number} */ (days), nowS);
-  const until = keepLonger && isBanned(row, nowS) ? Math.max(asked, bannedUntil(row)) : asked;
-  const why = reasonOf(reason) ?? (until !== asked ? (row.ban_reason ?? null) : null);
+  const until = banUntil(/** @type {number} */ (days), nowS);
+  const why = reasonOf(reason);
   // STAFF-PANEL2-FIX (design doc, Weak spots: "A Moderator can lift an Admin's ban"): a ban an Admin set (`ban_admin`,
   // 0156) is cut short by an Admin alone, and stays the Admin's when another moderator lengthens it; who set the ban that
   // stands is kept beside it (`banned_by`), as MOD1's `muted_by` is beside a mute
   const adminHeld = row.ban_admin === 1 && isBanned(row, nowS);
   const admin = isDeveloper(actor, env);
   if (adminHeld && !admin && until < bannedUntil(row)) return { error: 'admin-sanction' };
-  const keptOld = until !== asked;   // a button's ban that left a longer one standing: its setter stays who set it
   const done = /** @type {{ ok: true, target: string, name: string, until: number, reason: string|null }} */ ({ ok: true, target: row.id, name: displayName(row), until, reason: why });
   await db.batch([
-    db.prepare(`UPDATE players SET banned_until = ?1, ban_reason = ?2, banned_by = CASE WHEN ?5 = 1 THEN banned_by ELSE ?4 END,
-      ban_admin = CASE WHEN ?5 = 1 THEN ban_admin ELSE ?6 END WHERE id = ?3`).bind(until, why, row.id, actor.id, keptOld ? 1 : 0, admin || adminHeld ? 1 : 0),
+    db.prepare('UPDATE players SET banned_until = ?1, ban_reason = ?2, banned_by = ?4, ban_admin = ?5 WHERE id = ?3')
+      .bind(until, why, row.id, actor.id, admin || adminHeld ? 1 : 0),
     actionStatement(db, { target: row.id, kind: 'ban', until, reason: why, actor: actor.id, actorName: actorName ?? displayName(actor), caseId, click, at: nowS }),
     ...(also ? also(done) : []),
   ]);

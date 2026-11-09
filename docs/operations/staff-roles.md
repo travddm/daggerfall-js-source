@@ -42,18 +42,6 @@ The operator needs deploy access to the Cloudflare account (the same access as `
    computer (`<handle>:<key>`). The key only works for an account that already holds `staff_owner`. Every other staff
    member is invited from the panel (`/v1/staff/invite`).
 
-## Discord moderators
-
-A press in the moderators' queue is an account's act. Link the Discord user id to the account id, and the account must
-hold a staff role:
-
-```bash
-node ../tools/staffRole.mjs discord <account id> <discord user id>
-node ../tools/staffRole.mjs discord <account id> --remove
-```
-
-Taking the role off the account stops its presses at once. The link grants nothing by itself.
-
 ## Notes
 
 - A role taken off applies on the account's next request and the next token. A banned or cut account holds no role

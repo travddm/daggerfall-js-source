@@ -260,7 +260,7 @@ job. A job's own cache writes go to its container and die with it.
 - The single-use JIT configuration is passed in the container's environment and removed from it before the job starts;
   it remains in the runner's command line for that job. It is valid only for that runner.
 - Repository secrets (the private-repository setup). The deploy workflows read `secrets.CLOUDFLARE_API_TOKEN` (and the
-  Patreon, Discord and Anthropic keys in `account-deploy.yml`) as repository secrets. The organization is on the Free
+  Patreon and Anthropic keys in `account-deploy.yml`) as repository secrets. The organization is on the Free
   plan, which cannot configure environments for private repositories ([environments]), so while the repository is
   private these stay repository-wide secrets. Anyone who can push a branch to the repository can write a workflow that
   reads them. That is accepted for now: keep write access to the owner and trusted collaborators, and keep the
