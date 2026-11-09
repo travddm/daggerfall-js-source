@@ -238,6 +238,9 @@ PROF_DAY_CAPS = "on"
 PROF_MASTERWORK_GATE = "on"
 # PROFESSION-CAPS: the gathered goods are priced on DFU's ingredient scale; "off" puts back the port's earlier scale.
 PROF_DFU_PRICES = "on"
+# MASTER-CAP (decision 122 (8)): a Master's work is Rare; "on" makes it Legendary, as before the cap (src/net/masterLaw.js
+# masterTierFor).
+PROF_MASTER_LEGENDARY = "off"
 # CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the Admins alone)
 # or "on". Shipped at "dev": the developers' realm characters keep their guild standing on the service first; everyone
 # else's stays the save's, as before CHAP1, until this line says "on". CHAP2a: and the halls' witness, a hall writ's

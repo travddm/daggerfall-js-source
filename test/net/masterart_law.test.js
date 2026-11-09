@@ -1,4 +1,5 @@
-// MASTER-ART - THE LAW OF A MASTER'S WORK, ALONE: which
+// MASTER-ART - THE LAW OF A MASTER'S WORK, ALONE, AT THE LEGENDARY TIER - since MASTER-CAP (decision 122 (8)) the
+// service's PROF_MASTER_LEGENDARY option and a MINT_V_MASTER record; the Rare default is test/net/master-cap.test.js. Which
 // recipes take one, the lines a piece may be given, the refusals, the roll in the Legendary band (never past its top -
 // POWER-CEILING), the catalysts' one table, the record's `l`, the mint, the item law and the item maker's refusal.
 import '../chargenDom.mjs';
@@ -28,7 +29,7 @@ const { subtle } = webcrypto;
 const SWORD = recipeById('longsword:daedric');
 const LINES = ['damage', 'stat:strength', 'elemental:fire'];
 /** The lines as the service signs them at seed 4242 (AUDIT HORIZONTAL B1: rolled once, the values in the record). */
-const SIGNED = masterRecordLines(rollMasterLines(SWORD, LINES, 4242));
+const SIGNED = masterRecordLines(rollMasterLines(SWORD, LINES, 4242, 'legendary'));
 
 test('MASTER-ART WHICH PIECES: every recipe of the nine kinds that wear a tier - the smith\'s weapons and armour, the workbench\'s staves and bows, the loom\'s leather and garments, the jeweller\'s pieces - but the Wand, which no slot takes; never a tool, kit, arrow, furniture, dish or siege work; at Master in its craft\'s track (mutants: a kind dropped; the Wand let in; the rank below Master)', () => {
   assert.deepEqual(MASTER_KINDS, ['weapon', 'staff', 'bow', 'plate', 'shield', 'chain', 'leather', 'garment', 'jewel']);
@@ -77,7 +78,7 @@ test('MASTER-ART THE ROLL: each line in its Legendary band off the seed, in the 
   for (const [r, ks] of [[SWORD, ['damage', 'skill:29', 'slayer:undead']], [ring, lines], [recipeById('garment-141:linen'), ['standing:nobility', 'warmth', 'dry']], [recipeById('cuirass:ebony'), ['armor', 'weight', 'thorns']]]) {
     const seen = ks.map(() => new Set());
     for (let seed = 0; seed < 4000; seed++) {
-      const got = rollMasterLines(r, ks, seed * 2654435761 >>> 0);
+      const got = rollMasterLines(r, ks, seed * 2654435761 >>> 0, 'legendary');
       got.forEach((a, i) => {
         const [lo, hi] = AFFIX_RANGES[a.id].legendary;
         assert.ok(a.value >= lo && a.value <= hi, `${a.id} ${a.value} in [${lo}, ${hi}]`);
@@ -85,11 +86,11 @@ test('MASTER-ART THE ROLL: each line in its Legendary band off the seed, in the 
       });
     }
     ks.forEach((k, i) => {
-      const [lo, hi] = masterBand(masterLineOf(r, k).id);
+      const [lo, hi] = masterBand(masterLineOf(r, k).id, 'legendary');
       assert.deepEqual([Math.min(...seen[i]), Math.max(...seen[i])], [lo, hi], `${k} reaches both ends`);
     });
   }
-  assert.deepEqual(masterBand('damage'), [12, 24]);   // PIN MOVED (B4 rescale): the Legendary damage band was 20-40
+  assert.deepEqual(masterBand('damage', 'legendary'), [12, 24]);   // PIN MOVED (B4 rescale): the Legendary damage band was 20-40
   assert.equal(masterSignature([{ id: 'damage', value: 31 }, { id: 'skill', param: 29, value: 22 }]), 'damage::31|skill:29:22');
   assert.equal(masterDayOf(86_400 * 3 + 5), 3);
 });
@@ -129,7 +130,7 @@ test('MASTER-ART THE RECORD names the lines (`l`) only for a Masterwork at the m
   assert.equal(productRecordValid({ ...base, l: [['armor', 15], SIGNED[1], SIGNED[2]] }), true, 'history, not today\'s pool');
   const rec = await mintProductRecord({ ...base, i: undefined }, null, { subtle, nowS: 1 });
   assert.deepEqual(masterLinesOf(rec), SIGNED);
-  assert.deepEqual(masterLinesOfRecord(masterLinesOf(rec)), rollMasterLines(SWORD, LINES, 4242), 'read back as the piece carries them');
+  assert.deepEqual(masterLinesOfRecord(masterLinesOf(rec)), rollMasterLines(SWORD, LINES, 4242, 'legendary'), 'read back as the piece carries them');
   assert.deepEqual(masterLinesOfRecord(masterLinesOf(rec)).map(masterKeyOf), LINES, 'and the keys the station chose');
   assert.equal(masterLinesOf(await mintProductRecord({ ...base, l: null, i: undefined }, null, { subtle, nowS: 1 })), null);
   // the widest: the longest master recipe, its three widest lines at their bands' tops, the longest ids, and a mark of 32
@@ -154,7 +155,7 @@ test('MASTER-ART THE RECORD names the lines (`l`) only for a Masterwork at the m
 test('MASTER-ART THE MINT: a Master\'s record makes a Legendary of exactly its lines at the values it signs - its maker\'s mark its name, no record, no enchantment, its worth its lines\'; the same record without its lines makes the Masterwork it always did; the market takes it as minted; no temper, no Reforge, no item maker (mutants: the lines laid at another version; the Rare roll laid over them; a Legendary let into the item maker; AUDIT HORIZONTAL B1: the values read at today\'s band)', () => {
   const made = { recipe: SWORD.id, quality: MASTERWORK, seed: 4242, maker: 'Mac', marked: true, version: MINT_V_MASTER, lines: SIGNED };
   const sword = mintPiece(made, 'a1b2c3d4e5f60718');
-  const lines = rollMasterLines(SWORD, LINES, 4242);
+  const lines = rollMasterLines(SWORD, LINES, 4242, 'legendary');
   assert.deepEqual([sword.rarity, sword.affixes, sword.legendary, sword.enchantments ?? [], sword.isIdentified], ['legendary', lines, undefined, [], true]);
   // AUDIT HORIZONTAL B1: the values are the record's, never the seed's roll under today's bands - a record signed under
   // another band (its values not what this seed rolls now) mints what it signed
@@ -173,7 +174,7 @@ test('MASTER-ART THE MINT: a Master\'s record makes a Legendary of exactly its l
   assert.equal(before.rarity, 'rare', 'lines on a record of the craft\'s version are not laid');
   const unmarked = mintPiece({ ...made, maker: null }, 'a1b2c3d4e5f60718');
   assert.match(unmarked.name, /^Slayer's Longsword of the Titan$/, 'no mark: the name its lines give, at the Legendary band');
-  const gl = masterRecordLines(rollMasterLines(recipeById('garment-141:linen'), ['standing:nobility', 'warmth', 'dry'], 9));
+  const gl = masterRecordLines(rollMasterLines(recipeById('garment-141:linen'), ['standing:nobility', 'warmth', 'dry'], 9, 'legendary'));
   const garment = mintPiece({ recipe: 'garment-141:linen', quality: MASTERWORK, seed: 9, maker: 'Mac', version: MINT_V_MASTER, lines: gl, dye: 3 }, 'b1b2c3d4e5f60718');
   assert.deepEqual([garment.rarity, garment.affixes.map((a) => a.id), garment.dye], ['legendary', ['standing', 'warmth', 'dry'], 3], 'a garment\'s too, whatever the switch');
   assert.equal(temperRefusal(sword), 'rarity', 'no temper - law 7\'s tiers');

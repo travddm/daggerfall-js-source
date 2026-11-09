@@ -61,7 +61,7 @@ import { recipeById, recipeInputs, recipeOpen, counterMade } from './recipeLaw.j
 import { potionById, brewSpends } from './alchemyLaw.js';   // BAG1: a brew's
 import { chainPlan, chainNeeded, storesRoom } from './chainLaw.js';   // CRAFT1: the works a craft's inputs want first
 import { temperableRecipe, temperCost } from './temperLaw.js';   // CRAFT4: a temper's input, moved in from the bag first
-import { MASTER_CATALYSTS, masterDayOf } from './masterLaw.js';   // MASTER-ART: a Master's work's catalysts, moved in from the bag first; its day
+import { MASTER_CATALYSTS, masterDayOf, masterTierOfState } from './masterLaw.js';   // MASTER-ART: a Master's work's catalysts, moved in from the bag first; its day
 import { pixelKey, parseNodeKey } from './nodeLaw.js';
 import { accountRefusalText } from './accountClient.js';
 import { ASK_AGAIN_NOW, jittered } from './backoff.js';   // SCALE1: asks again spread out, and never at once into a minute's refusal
@@ -181,7 +181,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     /** CRAFT-HALL: what the service says the character has made, or null from an older service */
     made: /** @type {{ crafts: Set<string>, works: Set<string>, brews: Set<string> }|null} */ (null),
     /** MASTER-ART: whether today's Master's work is made (null unknown - an older service), and the last one's answer */
-    master: /** @type {{ made: boolean|null, last: any }} */ ({ made: null, last: null }),
+    master: /** @type {{ made: boolean|null, last: any, tier: 'rare'|'legendary' }} */ ({ made: null, last: null, tier: 'rare' }),
     /** PROF3: the account's Marks as the smith's stock last answered them, or null */
     marks: /** @type {number|null} */ (null),
     /** PROF7: the account's hides today, every character's together, and of them those of tiers 5-6 (PROF0 6: 3 a day -
@@ -318,7 +318,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     applyHauls(data?.hauls);
     state.made = madeOf(data?.made);   // CRAFT-HALL
     // MASTER-ART: the day's work as the service says it; the last one's card kept for its own character alone
-    state.master = { made: typeof data?.master?.made === 'boolean' ? data.master.made : null, last: was === state.character ? state.master.last : null };
+    state.master = { made: typeof data?.master?.made === 'boolean' ? data.master.made : null, last: was === state.character ? state.master.last : null, tier: masterTierOfState(data) };   // MASTER-CAP: the tier the service makes it at
   }
   /** CRAFT-HALL: the state's `made` as Sets, or null when the service sent none. */
   function madeOf(m) {
@@ -1339,7 +1339,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       applyTrack(r.data?.track);
       // CRAFT-HALL: what it made; a judged cloth pattern only by the craft that laid its first on (WOVEN-PAYS, `firstPaid`)
       if (w.brew === true) noteMade('brews', w.recipe);
-      else if (Array.isArray(w.master)) state.master = { made: state.master.made === true || Number(r.data?.day) === masterDayOf(now() / 1000), last: r.data };   // MASTER-ART: the work made, its card; AUDIT HORIZONTAL B5: today's by an answer of today's day alone
+      else if (Array.isArray(w.master)) state.master = { made: state.master.made === true || Number(r.data?.day) === masterDayOf(now() / 1000), last: r.data, tier: state.master.tier };   // MASTER-ART: the work made, its card; AUDIT HORIZONTAL B5: today's by an answer of today's day alone
       else if (!counterMade(recipeById(w.recipe)) || r.data?.firstPaid === true) noteMade('crafts', w.recipe);
       // AUDIT CRAFT-WRITS C7: a brew, a dish or a kit moves what a crafting writ's card holds (its `brewed`, its `pieces`)
       const made = w.brew === true ? null : recipeById(w.recipe);

@@ -345,6 +345,9 @@ function tierFindings(/** @type {any} */ item) {
   if ((has(item, 'socket') || has(item, 'sockets')) && (has(item, 'provenance') || item.bound === true)) out.push('socket');   // GEM1: the list as the string
   const procs = body.filter((a) => AFFIX_KINDS[a?.id]?.proc);
   const numbers = body.filter((a) => !AFFIX_KINDS[a?.id]?.proc);
+  // MASTER-ART (Professions-Arc 57): a Master's work - no record; its chosen lines, a Masterwork, nothing laid on after.
+  // MASTER-CAP: asked before the Rare's own law, which wants a rolled flavour a Master's work never carries
+  if (isMasterWork(item)) return [...out, ...masterFindings(item, body, procs, techs, gems)];
   if (tier === 'magic' || tier === 'rare') {
     const [lo, hi] = AFFIX_COUNTS[tier];
     // a curse's line is one more - and stays when the temple lifts the curse (lootCurse.js liftCurse keeps it, by design;
@@ -364,8 +367,6 @@ function tierFindings(/** @type {any} */ item) {
     }
     return out;
   }
-  // MASTER-ART (Professions-Arc 57): a Master's work - no record; its chosen lines, a Masterwork, nothing laid on after
-  if (isMasterWork(item)) return [...out, ...masterFindings(item, body, procs, techs, gems)];
   // a Legendary: its record, its record's lines, then one Exalted line or one curse line, then a gem's
   const rec = legendaryById(item.legendary);
   if (!rec || !legendariesFor(item).some((l) => l.id === rec.id)) return [...out, 'legendary'];
@@ -410,7 +411,7 @@ function masterFindings(item, body, procs, techs, gems) {
   const out = [];
   if (item.quality !== MASTERWORK || body.length !== MASTER_LINES || procs.length > MASTER_PROCS_MAX || techs.length || gems.length) out.push('legendary');
   for (const a of body) {
-    const band = AFFIX_RANGES[a?.id]?.legendary;
+    const band = AFFIX_RANGES[a?.id]?.[item.rarity];   // MASTER-CAP: the band of its own tier
     if (!band || !(a.value >= band[0] && a.value <= band[1])) out.push('affixes');
   }
   if (item.exalted === true || isCursed(item) || has(item, 'reforged') || has(item, 'reforges') || has(item, 'honed')) out.push('legendary');

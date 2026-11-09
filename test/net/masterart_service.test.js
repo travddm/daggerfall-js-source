@@ -14,7 +14,7 @@ import { createProfBook } from '../../src/net/profBook.js';
 import { xpForRank, HEARTWOOD, PEARL, ARCANE_ESSENCE } from '../../src/net/professionLaw.js';
 import { recipeById, MASTERWORK } from '../../src/net/recipeLaw.js';
 import { MASTER_CATALYSTS, rollMasterLines, masterSignature, masterRecordLines, masterLinesOfRecord, masterKeyOf } from '../../src/net/masterLaw.js';
-import { verifyProductRecord, readProductRecord, mintProductRecord, MINT_V_MASTER } from '../../src/net/productRecord.js';
+import { verifyProductRecord, readProductRecord, mintProductRecord, MINT_V_MASTER, MINT_V_MASTER_RARE } from '../../src/net/productRecord.js';
 import { mintPieces, asMinted } from '../../src/systems/smithItems.js';
 import { AFFIX_RANGES } from '../../src/systems/loot/lootRarity.js';
 import { itemFindings } from '../../src/systems/item/itemLaw.js';
@@ -36,8 +36,8 @@ const LINES = ['damage', 'stat:strength', 'elemental:fire'];
 const CATS = Object.fromEntries(MASTER_CATALYSTS.map((c) => [c.key, c.n]));
 
 /** A service, Mac in it with tracks at ranks and the Stores given, and Mac's book on the service's clock. */
-async function stand({ tracks = { smithing: 100 }, stores = {}, now = NOON } = {}) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
+async function stand({ tracks = { smithing: 100 }, stores = {}, now = NOON, env = {} } = {}) {
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', ...env });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
   s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
@@ -54,7 +54,7 @@ async function stand({ tracks = { smithing: 100 }, stores = {}, now = NOON } = {
 }
 const swordGoods = () => Object.fromEntries(recipeById(SWORD).inputs.map((i) => [i.key, i.n]));
 
-test('MASTER-ART DONE WHEN: a Smith at Master makes a Daedric Longsword her own way - the three lines she chose at the values the service rolled in the Legendary band, a Masterwork with her mark, the record signed and naming the lines; the goods and the three catalysts spent; the piece is what its record mints, lawful to the item law and to the judge; the craft\'s word says it (mutants: the record without its lines; the catalysts unspent; the lines minted off another seed)', async (t) => {
+test('MASTER-ART DONE WHEN: a Smith at Master makes a Daedric Longsword her own way - the three lines she chose at the values the service rolled in the Rare band (MASTER-CAP), a Masterwork with her mark, the record signed and naming the lines; the goods and the three catalysts spent; the piece is what its record mints, lawful to the item law and to the judge; the craft\'s word says it (mutants: the record without its lines; the catalysts unspent; the lines minted off another seed)', async (t) => {
   t.mock.method(Date, 'now', () => NOON * 1000);
   const m = await stand({ stores: { ...swordGoods(), ...CATS } });
   const minted = [];
@@ -63,33 +63,38 @@ test('MASTER-ART DONE WHEN: a Smith at Master makes a Daedric Longsword her own 
   const d = r.data;
   assert.deepEqual([d.master, d.quality, d.xp, d.first, d.chosen], [true, MASTERWORK, 0, false, LINES]);
   assert.deepEqual(d.lines, rollMasterLines(recipeById(SWORD), LINES, d.seed), 'the lines at the values its seed rolls');
-  for (const a of d.lines) assert.ok(a.value >= [12, 6, 4][LINES.indexOf(a.param ? `${a.id}:${a.param}` : a.id)], 'in the Legendary band');
+  for (const a of d.lines) assert.ok(a.value >= AFFIX_RANGES[a.id].rare[0] && a.value <= AFFIX_RANGES[a.id].rare[1], 'MASTER-CAP: in the Rare band');
   // the record: signed, Masterwork, the master's version and its lines
   const v = await verifyProductRecord(d.pieces[0].record, m.s.identityPublic, { subtle });
   assert.equal(v.ok, true, JSON.stringify(v));
-  assert.deepEqual([v.claims.q, v.claims.v, v.claims.l, v.claims.m, v.claims.a], [MASTERWORK, MINT_V_MASTER, masterRecordLines(d.lines), 'Mac', 1], 'AUDIT HORIZONTAL B1: the values signed');
+  assert.deepEqual([v.claims.q, v.claims.v, v.claims.l, v.claims.m, v.claims.a], [MASTERWORK, MINT_V_MASTER_RARE, masterRecordLines(d.lines), 'Mac', 1], 'AUDIT HORIZONTAL B1: the values signed; MASTER-CAP: the Rare version');
   // what it spent: the recipe's goods and the catalysts, each to nought
   for (const k of [...Object.keys(swordGoods()), ...Object.keys(CATS)]) assert.equal(m.held(k), 0, k);
   const row = m.raw.prepare('SELECT * FROM prof_masters WHERE player = ?').get(m.mac.id);
   assert.deepEqual([row.recipe, row.day, JSON.parse(row.lines), row.provenance], [SWORD, utcDay(NOON), masterRecordLines(d.lines), d.pieces[0].provenance]);
   const prod = m.raw.prepare('SELECT * FROM products WHERE provenance = ?').get(row.provenance);
   assert.deepEqual([prod.quality, prod.marked, prod.owner, prod.recipe, prod.bought_with], [MASTERWORK, 1, m.mac.id, SWORD, null]);
-  // the piece the client minted: Legendary, its lines, its maker's mark, no record, no enchantment
+  // the piece the client minted: Rare (MASTER-CAP), its lines, its maker's mark, no record, no enchantment
   assert.equal(minted.length, 1);
   const sword = minted[0];
-  assert.deepEqual([sword.rarity, sword.affixes, sword.legendary, sword.enchantments ?? [], sword.quality, sword.maker], ['legendary', d.lines, undefined, [], MASTERWORK, 'Mac']);
+  assert.deepEqual([sword.rarity, sword.master, sword.affixes, sword.legendary, sword.enchantments ?? [], sword.quality, sword.maker], ['rare', true, d.lines, undefined, [], MASTERWORK, 'Mac']);
   assert.equal(asMinted(sword), true, 'the market takes it as minted');
   assert.deepEqual(itemFindings(sword), [], 'the item law holds it lawful');
   const judged = judgeSave({ level: 10, goldPieces: 0, items: [sword] });
   assert.deepEqual(judged.findings, []);
   assert.equal((await judgeProducts(m.s.env.DB, judged.provenances)).findings.length, 0, 'and its record agrees, line for line');
   // a piece carrying other values than its record's is no Master's work of it
-  const forged = { ...sword, affixes: sword.affixes.map((a, i) => (i === 0 ? { ...a, value: a.value === 24 ? 23 : 24 } : a)) };
+  const forged = { ...sword, affixes: sword.affixes.map((a, i) => (i === 0 ? { ...a, value: a.value === 15 ? 14 : 15 } : a)) };
   assert.deepEqual(itemFindings(forged), [], 'in the band, the law alone cannot tell');
   const fj = judgeSave({ level: 10, goldPieces: 0, items: [forged] });
   assert.deepEqual((await judgeProducts(m.s.env.DB, fj.provenances)).findings.map((f) => f.code), ['provenance'], 'the judge holds it to its record');
+  // MASTER-CAP: the same piece claiming Legendary is no Master's work of its record
+  const raised = { ...sword, rarity: 'legendary' };
+  const rj = judgeSave({ level: 10, goldPieces: 0, items: [raised] });
+  assert.deepEqual((await judgeProducts(m.s.env.DB, rj.provenances)).findings.map((f) => f.code), ['provenance'], 'a Rare record\'s piece cannot claim Legendary');
   // the state and the craft's word
   assert.equal(m.book.state.master.made, true);
+  assert.equal(m.book.state.master.tier, 'rare', 'MASTER-CAP: the box reads the tier from the state');
   assert.equal(m.book.state.master.last.recipe, SWORD);
   assert.equal(craftXpText(recipeById(SWORD), d, 'Smithing'), '(a Master\'s work)');
   assert.equal((await m.book.refresh({ force: true })).ok, true);
@@ -181,7 +186,7 @@ test('AUDIT HORIZONTAL B1 THE VALUES ARE THE RECORD\'S: the service rolls once a
   assert.deepEqual(asAffixes(JSON.parse(m.raw.prepare('SELECT lines FROM prof_masters WHERE provenance = ?').get(prov).lines)), one.body.lines, 'and the row keeps them');
   // a band moved since the work was made: the record signed values its seed no longer rolls - signed here as the service
   // signs, the row beside it (the judge reads the products row's record, a request asked again the prof_masters row)
-  const then = c.l.map(([id, v, ...p]) => [id, v === AFFIX_RANGES[id].legendary[0] ? v + 1 : v - 1, ...p]);
+  const then = c.l.map(([id, v, ...p]) => [id, v === AFFIX_RANGES[id].rare[0] ? v + 1 : v - 1, ...p]);
   const rec = await mintProductRecord({ p: c.p, s: c.s, h: c.h, r: c.r, q: c.q, m: c.m, c: c.c, a: c.a === 1, v: c.v, l: then }, await signingKey(m.s.env, subtle), { subtle, nowS: NOON });
   m.raw.prepare('UPDATE products SET record = ? WHERE provenance = ?').run(rec, prov);
   m.raw.prepare('UPDATE prof_masters SET lines = ? WHERE provenance = ?').run(JSON.stringify(then), prov);
@@ -195,6 +200,25 @@ test('AUDIT HORIZONTAL B1 THE VALUES ARE THE RECORD\'S: the service rolls once a
   const rolled = { ...piece, affixes: rollMasterLines(recipeById(SWORD), LINES, c.c) };
   assert.deepEqual(itemFindings(rolled), []);
   assert.deepEqual((await judgeProducts(m.s.env.DB, judgeSave({ level: 10, goldPieces: 0, items: [rolled] }).provenances)).findings.map((f) => f.code), ['provenance'], 'today\'s roll of its seed is not what was signed');
+});
+
+test('MASTER-CAP THE OPTION: with PROF_MASTER_LEGENDARY on, the service rolls the Legendary band and stamps MINT_V_MASTER, and the piece mints Legendary as before the cap', async (t) => {
+  t.mock.method(Date, 'now', () => NOON * 1000);
+  const m = await stand({ stores: { ...swordGoods(), ...CATS }, env: { PROF_MASTER_LEGENDARY: 'on' } });
+  assert.equal(m.book.state.master.tier, 'legendary');
+  const minted = [];
+  const r = await m.book.craft(SWORD, { clean: false, name: 'Mac', master: LINES }, (data) => minted.push(...mintPieces(data)));
+  assert.equal(r.ok, true, JSON.stringify(r));
+  const d = r.data;
+  assert.deepEqual(d.lines, rollMasterLines(recipeById(SWORD), LINES, d.seed, 'legendary'));
+  for (const a of d.lines) assert.ok(a.value >= AFFIX_RANGES[a.id].legendary[0] && a.value <= AFFIX_RANGES[a.id].legendary[1], 'in the Legendary band');
+  assert.equal(readProductRecord(d.pieces[0].record).v, MINT_V_MASTER);
+  const [sword] = minted;
+  assert.deepEqual([sword.rarity, sword.master, sword.affixes], ['legendary', true, d.lines]);
+  assert.deepEqual(itemFindings(sword), []);
+  const judged = judgeSave({ level: 10, goldPieces: 0, items: [sword] });
+  assert.deepEqual(judged.findings, []);
+  assert.deepEqual((await judgeProducts(m.s.env.DB, judged.provenances)).findings, [], 'its record agrees');
 });
 
 test('AUDIT HORIZONTAL B2 A PLAIN CRAFT IS NO MASTER\'S WORK: a Smith at 90\'s Masterwork Iron Dagger, edited to a Legendary of three lines at their bands\' tops, passes the item law - the judge alone finds it, its record naming no lines (mutant: a record of no lines let through)', async (t) => {
@@ -214,7 +238,7 @@ test('AUDIT HORIZONTAL B2 A PLAIN CRAFT IS NO MASTER\'S WORK: a Smith at 90\'s M
   for (const k of ['reforged', 'reforges', 'honed', 'imprint']) delete forged[k];
   assert.deepEqual(itemFindings(forged), [], 'a Masterwork, three lines in the band: the item law cannot tell');
   const j = judgeSave({ level: 10, goldPieces: 0, items: [forged] });
-  assert.equal(j.provenances[0].l, masterSignature(forged.affixes));
+  assert.equal(j.provenances[0].l, `legendary|${masterSignature(forged.affixes)}`, 'MASTER-CAP: the tier it claims, then its lines');
   assert.deepEqual((await judgeProducts(m.s.env.DB, j.provenances)).findings.map((f) => f.code), ['provenance'], 'its record names no Master\'s lines');
 });
 

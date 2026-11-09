@@ -20,7 +20,7 @@
 //           last pass (MINT_V_LAST_PASS); 2 its roll's lines drawn over the lines and its name following them
 //           (MINT_V_LINES, AFFIX-LINES); 3 a piece of armour's lines on its family's leans (MINT_V_ARMOR_LEAN,
 //           ARMOR-LEAN); 4 a jewel's skill lines leaning to the bare hand's two as well (MINT_V_JEWEL_KIN, JEWEL-KIN); 5 a
-//           Master's work, its lines signed in `l` (MINT_V_MASTER). Stamped with the version the craft's client mints
+//           Master's work, its lines signed in `l` (MINT_V_MASTER); 6 a Rare Master's work (MINT_V_MASTER_RARE, MASTER-CAP). Stamped with the version the craft's client mints
 //           (craftMintVersion); absent on every record made before, which mints as it always did
 //
 // ONE KEY, SEVERAL THINGS, NEVER CONFUSED: the identity key signs tokens (`v1`) and orders; this is `p1`, the version
@@ -80,6 +80,14 @@ export const craftMintVersion = (asked) => (typeof asked === 'number' && Number.
  *  `[kind, value, param]` (net/masterLaw.js masterRecordLines; AUDIT HORIZONTAL B1: signed, never rolled again).
  *  Every other craft's law is MINT_VERSION's. */
 export const MINT_V_MASTER = 5;
+/** MASTER-CAP (decision 122 (8)): the mint version of a Rare Master's work - its `l` minted at the Rare tier. A record of
+ *  MINT_V_MASTER mints Legendary, as every Master's work did before the cap; the service stamps it where its
+ *  PROF_MASTER_LEGENDARY setting is on (masterLaw.js masterTierFor). */
+export const MINT_V_MASTER_RARE = 6;
+/** The tier a Master's work's record mints its lines at, by its version. @param {unknown} v @returns {'rare' | 'legendary'} */
+export const masterTierOfVersion = (v) => (Number.isSafeInteger(v) && /** @type {number} */ (v) >= MINT_V_MASTER_RARE ? 'rare' : 'legendary');
+/** The version a Master's work of `tier` is stamped with. @param {'rare' | 'legendary'} tier */
+export const masterVersionOf = (tier) => (tier === 'legendary' ? MINT_V_MASTER : MINT_V_MASTER_RARE);
 /** A character id's shape (the account service's CHAR_ID_RE). */
 const CHAR_RE = /^[A-Za-z0-9_-]{4,64}$/;
 

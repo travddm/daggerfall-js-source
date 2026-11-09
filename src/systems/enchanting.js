@@ -185,7 +185,7 @@ export function rareKeeps(item) {
  * item (DFU's refusal) or a row the catalogue cannot cost.
  */
 export function keptEnchantments(item) {
-  if (item?.rarity === 'legendary') return null;   // MASTER-ART: a Master's work carries no rows, and is refused with every Legendary
+  if (item?.rarity === 'legendary' || item?.master === true) return null;   // MASTER-ART: a Master's work carries no rows (MASTER-CAP: a Rare one too)
   const list = item?.enchantments ?? [];
   if (!list.length) return [];
   const jewel = craftedJewelRecipe(item) != null;

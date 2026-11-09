@@ -80,7 +80,7 @@ test('MASTER-ART THE BOX at the anvil, Smithing at Master: three line pickers of
     assert.equal(picks().length, 3);
     const opts = picks()[0].querySelectorAll('option');
     assert.equal(opts.length, 1 + masterOptions(recipeById(SWORD)).length, 'a blank, then every line the sword may carry');
-    assert.equal([...opts].find((o) => o.value === 'damage').textContent, '+12 to 24% damage');
+    assert.equal([...opts].find((o) => o.value === 'damage').textContent, '+6 to 15% damage', 'MASTER-CAP: the Rare band');
     assert.equal([...a.box().querySelectorAll('.prof-master-cat')].map((c) => c.textContent).join(' | '),
       'wood:heartwood 2 / 2 (Logging\'s rarest find) | gem:pearl 3 / 3 (nets hauled at sea) | essence:arcane 10 / 10 (Enchanting)');
     assert.match(a.box().textContent, /One Master's work a day\./);
@@ -132,7 +132,8 @@ test('MASTER-ART NO BOX below Master, none for a piece no tier takes; a catalyst
     resetProfPages();
   }
   assert.deepEqual(masterNeeds(() => 3).find((c) => c.key === PEARL.key), { key: PEARL.key, need: 3, have: 3, pursuit: 'sea' });
-  assert.equal(masterOptionWords({ id: 'focus' }), '-4 to 6% spell cost');
+  assert.equal(masterOptionWords({ id: 'focus' }), '-2 to 4% spell cost', 'MASTER-CAP: the Rare band');
+  assert.equal(masterOptionWords({ id: 'focus' }, 'legendary'), '-4 to 6% spell cost', 'the Legendary option\'s');
   resetMasterBoxes();
   const p1 = masterPicks('anvil', recipeById(SWORD));
   p1[0] = 'damage';
@@ -197,7 +198,7 @@ test('AUDIT HORIZONTAL B4 THE BOX LISTS ITS OWN GOODS: a Pine Staff at the workb
     assert.equal(go().disabled, false, 'the chain saws the third, the Heartwood option still ticked');
     await go().onclick();
     assert.equal(m.pack.length, 1, 'made');
-    assert.deepEqual([m.pack[0].rarity, m.held('log:pine'), m.held(HEARTWOOD.key)], ['legendary', 0, 1], 'the log sawn, two Heartwood the catalysts - none a stand-in');
+    assert.deepEqual([m.pack[0].rarity, m.held('log:pine'), m.held(HEARTWOOD.key)], ['rare', 0, 1], 'the log sawn, two Heartwood the catalysts - none a stand-in');
   } finally {
     setProfessionsPages(null);
     resetProfPages();

@@ -186,7 +186,7 @@ export const imprintChoices = (item) => (item?.rarity === 'rare'
  *  'unfound' (a record the codex has not, of another group, or with no power), 'shards', 'gold'. */
 export function imprintRefusal(item, recordId, player) {
   if (!lootRarityOn()) return 'off';
-  if (item?.rarity !== 'rare') return 'not';
+  if (item?.rarity !== 'rare' || item.master === true) return 'not';   // MASTER-CAP: a Master's work takes no power
   if (!itemIsIdentified(item)) return 'unknown';
   if (isEquipped(item)) return 'worn';
   if (typeof item.imprint === 'string') return 'imprinted';
