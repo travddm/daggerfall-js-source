@@ -63,6 +63,10 @@ $env:NODE_OPTIONS = "--import=./tools/raw-import-hooks.ts"    # PowerShell
 The commands in these docs (`node --test <file>`, `node tools/<tool>.mjs`) assume it. `npm test`, `npm run
 test:changed` and the CI shards set it for you (`runnerEnv` in `tools/testShards.mjs`).
 
+The path is relative, so Node finds the hook only when it starts at the repository root. A command that runs Node from
+another folder (`wrangler` in `server-account/`, `npm --prefix server-account`) fails with `ERR_MODULE_NOT_FOUND`:
+clear `NODE_OPTIONS` for it, or give the hook as an absolute `file://` URL, as `.github/workflows/probes.yml` does.
+
 ## Fetch the game data (ARENA2)
 
 Daggerfall's data is freeware but not redistributable. It never enters the repository or the build. Fetch it once:
