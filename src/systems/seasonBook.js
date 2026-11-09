@@ -9,7 +9,7 @@
 //     that start fresh with it - the Arena and the season's captains.
 //     "Season {n}", as every one of those boards names it (AUDIT SEASON-BOOK W7).
 //   - THE SEATS' SEASON (net/townSeatLaw.js seasonOf - its own weeks off the service's Season 0, ending at a Sunday
-//     Turning): the guilds' war for the towns and its reset; Season 0 the beta, wiped at its end.
+//     Turning): the guilds' war for the towns, its ribbon, its reset; Season 0 the beta, wiped at its end.
 //   - THE FESTIVAL (net/festivalLaw.js FESTIVALS - the real calendar): the Witches' Festival and its Starfall.
 // Words through the text core (L10N4), read when built; every name a player reads in their own language (AUDIT
 // SEASON-BOOK W1: the seats' Season by the months' own table, never townSeatLaw's English).
@@ -129,8 +129,10 @@ export function seasonBookModel(/** @type {any} */ src) {
         : t('season.book.seats.lead', 'The guilds\' war for the towns. A Season ends at its last Sunday Turning.'),
       rows: [
         ...(seat.trial ? [] : [
+          { id: 'ribbon', name: t('season.book.ribbon.name', 'The banner ribbon'),
+            about: t('season.book.ribbon.about', 'Members of a guild that kept a seat all Season wear its ribbon through the next.') },
           { id: 'reset', name: t('season.book.reset.name', 'The turn of the Season'),
-            about: t('season.book.reset.about', 'Standing drifts halfway back to 50. Charters stand.') },
+            about: t('season.book.reset.about', 'Standing drifts halfway back to 50 and every fortification loses a tier. Charters stand.') },
         ]),
         { id: 'chapters', name: t('season.book.chapters.name', 'Guild chapters'),
           about: t('season.book.chapters.about', 'Every chapter draws an event when the Season opens. In a Schism or a Succession, members back a side.') },

@@ -1,9 +1,10 @@
-// The siege referee spends magicka on casts and heals, and keeps the
+// The siege referee holds a work blow to the striker's harm ceiling, spends magicka on casts and heals, and keeps the
 // field's ground near the first one judged; the service settles a field by three aged witnesses and never by a count.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   newFighter,
+  refereeWorkBlow,
   refereeCast,
   SIEGE_HIT,
   SIEGE_UNITS_PER_M,
@@ -20,6 +21,25 @@ import { PIXEL_UNITS } from '../../../src/net/wire.js';
 
 const M = SIEGE_UNITS_PER_M;
 const at = (x) => ({ x: x * M, y: 0, z: 0 });
+
+test("blows on the Ram are held to the striker's harm ceiling, as blows on a fighter are", () => {
+  const by = newFighter(10, 0);
+  const ram = { hp: 3000, max: 3000 };
+  let now = 1000;
+  let dealt = 0;
+  for (let i = 0; i < 40; i++) {
+    now += 250;
+    dealt += refereeWorkBlow(
+      by,
+      ram,
+      { point: [0, 0], size: 2, from: at(0), held: { w: 123, m: 9 }, d: 124, r: SIEGE_HIT.Melee, share: 1 },
+      now,
+    ).dealt;
+  }
+  assert.ok(dealt > 0, 'honest blows land');
+  assert.ok(dealt <= SIEGE_HARM.max * 3, `ten seconds of blows stay under the ceiling (${dealt})`);
+  assert.ok(ram.hp > 3000 - 124 * 40, 'not one blow in four at the cap');
+});
 
 test('casts and heals draw on a magicka pool', () => {
   assert.deepEqual(

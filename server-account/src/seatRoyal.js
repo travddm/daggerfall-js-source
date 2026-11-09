@@ -170,7 +170,8 @@ export async function royalTurning(db, week, nowS, history, registry) {
   return out;
 }
 
-/** The titles an account keeps for good (`town_seat_titles`): the Royal Tourney's champion (7.6). */
+/** The titles an account keeps for good (`town_seat_titles`): the Royal
+ *  Tourney's champion (7.6). */
 export const KEPT_TITLES = Object.freeze(['champion']);
 /** A TITLE KEPT FOR GOOD an account wears: its newest of `title` - `{ ts }` its seat's key and the Season of the week it
  *  was won (SEASON1 - seasonOf over `zero`, 0 where none was counted) - or null. */

@@ -144,6 +144,8 @@ export const MARKS_KINDS = Object.freeze({
   'royal-escrow': 'move',     // CROWN1: a Royal Tourney's prize, held from the crown's treasury while it rules
   'royal-prize': 'move',      // CROWN1: the prize, out of the escrow to the champion's account
   'royal-return': 'move',     // CROWN1: a Tourney no bout won - the prize home
+  fort: 'burn',               // SEAT2b: a tier of a work, its Marks burnt once from the holder's treasury (7.5)
+  camp: 'burn',               // SEAT2b: a challenger's Siege Camp, its Marks burnt once from the treasury (4.2)
   'seat-strike-refund': 'mint', // AUDIT-SEATS S4: a struck seat's claim fee, minted back to its holder within the Season (16)
   raid: 'mint',               // SILVER-WAYS: a town defended - the relay's raid receipt, counted (under the day's combat cap)
   'guild-deed': 'mint',       // SILVER-WAYS: a guild deed - three of a guild's accounts on one raid or gate - into its treasury
@@ -158,6 +160,10 @@ export const MARKS_KINDS = Object.freeze({
   patron: 'burn',             // CHAP7a: the winning bid, burnt at the Turning that opens its Season (Chapters-Arc 8, CALL 6)
   'patron-return': 'move',    // CHAP7a: a losing bid, home to its guild at that Turning - burnt where the guild is gone or full
   star: 'mint',               // STAR7: a fallen star's receipt, counted
+  castle: 'burn',             // DOMAIN2: a castle's price, from the buying guild's treasury (6)
+  'castle-sale': 'mint',      // DOMAIN2: 85% of it home, the castle given up while its region is held
+  'castle-lost': 'mint',      // DOMAIN2: half of it home, the castle gone with its region
+  'domain-fold': 'mint',      // DOMAIN3: a Charter folded into its region's at the region law's first Turning, its claim fee home (seatTurning.js)
   firmament: 'burn',          // FIRM1: the Firmament's refunds - silver a star taken back, at Renown 10 and past (firmamentLaw.js refundSilver)
   'craft-writ': 'mint',       // CRAFT-WRITS: a crafting writ filled - goods the service saw made, out of the realm record (server-account/src/craftWrits.js)
 });

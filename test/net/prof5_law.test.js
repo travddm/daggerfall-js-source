@@ -102,10 +102,10 @@ test('PROF5 law: the ledger\'s market kinds - the fee, the tax and the courier b
   for (const [k, way] of [['market-fee', 'burn'], ['market-tax', 'burn'], ['courier', 'burn'], ['market-sale', 'move'], ['order-escrow', 'move'], ['order-fill', 'move'], ['order-return', 'move']]) {
     assert.equal(MARKS_KINDS[k], way, k);
   }
-  // The faucets are the gate, the writ and the Seats' two (a siege's Honours, a struck
+  // The faucets are the gate, the writ and the Seats' three (a siege's Honours, an Incursion's second half, a struck
   // seat's fee given back) - none of them the market's.
   assert.deepEqual(Object.entries(MARKS_KINDS).filter(([, w]) => w === 'mint').map(([k]) => k),
-    ['gate', 'writ', 'siege-honours', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'craft-writ'], 'the market strikes no Mark');
+    ['gate', 'writ', 'siege-honours', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the market strikes no Mark');
   const raw = d1()._raw;
   const sqlOf = (name) => raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get(name).sql;
   const ledger = sqlOf('marks_ledger');

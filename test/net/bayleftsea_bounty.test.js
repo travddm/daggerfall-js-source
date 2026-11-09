@@ -10,7 +10,7 @@ import { standService, T0 } from '../accountDb.mjs';
 import {
   bountySitePixel, bountyDenPixel, bountyDenId, bountyClaimPixel, BOUNTY_DEN_KINDS, edictLine, EDICT_WORDS, seatReportText, seatWeekOf,
 } from '../../src/net/townSeatLaw.js';
-import { createSeatEdicts, lairDenOf, bountyPaidText, bountyDenPaidText, BOUNTY_DEN_ASK_GAP_MS } from '../../src/systems/seatEdicts.js';
+import { createSeatEdicts, lairDenOf, bountyPaidText, bountyDenPaidText, ORC_CAMP_TEXT, BOUNTY_DEN_ASK_GAP_MS } from '../../src/systems/seatEdicts.js';
 import { synthesizeLairLocation } from '../../src/world/tamrielDungeons.js';
 import { synthesizeCountryLocation } from '../../src/world/tamrielCountry.js';
 import { createHideouts } from '../../src/scenes/hideouts.js';
@@ -33,20 +33,21 @@ test('BAY-LEFT-SEA A DEN\'S ID: an outlaws\' hideout or a lair past the Bay name
 });
 
 test('BAY-LEFT-SEA THE SEAT TAB: a Bounty past the Bay says it pays for dens; the Bay\'s says its camps, as ever (mutants: the province unread)', () => {
-  assert.equal(edictLine('bounty', 'crown', SOLITUDE), 'Bounty: Outlaws\' hideouts and lairs near the town: the treasury pays 20 silver a den cleared, from what is set aside.');
-  assert.equal(edictLine('bounty', 'palace', ANTICLERE), `Bounty: ${EDICT_WORDS.bounty}`);
+  assert.equal(edictLine('bounty', 'crown', 'calm', SOLITUDE), 'Bounty: Outlaws\' hideouts and lairs near the town: the treasury pays 20 silver a den cleared, from what is set aside.');
+  assert.equal(edictLine('bounty', 'palace', 'calm', ANTICLERE), `Bounty: ${EDICT_WORDS.bounty}`);
   assert.equal(edictLine('bounty', 'palace'), `Bounty: ${EDICT_WORDS.bounty}`, 'no seat named: the camps\'');
+  assert.equal(edictLine('curfew', 'crown', 'calm', SOLITUDE), `Curfew: ${EDICT_WORDS.curfew}`);
 });
 
-test('BAY-LEFT-SEA THE CLIENT: a den cleared past the Bay in a Bounty seat\'s bailiwick is claimed and its pay said, once in BOUNTY_DEN_ASK_GAP_MS (a lair\'s every foe falls); a camp as ever, asked at each, an Orc Raid\'s count a camp\'s alone; a lair\'s dungeon names its den; a hideout routed tells its host; the world host wires both (mutants: the den unclaimed; the den\'s words a camp\'s; the gap never kept; the gap kept for camps; never asked again; the lair unread; the rout untold; the host unwired)', async () => {
-  const claims = [], said = [];
+test('BAY-LEFT-SEA THE CLIENT: a den cleared past the Bay in a Bounty seat\'s bailiwick is claimed and its pay said, once in BOUNTY_DEN_ASK_GAP_MS (a lair\'s every foe falls); a camp as ever, asked at each, an Orc Raid\'s count a camp\'s alone; a lair\'s dungeon names its den; a hideout routed tells its host; the world host wires both (mutants: the den unclaimed; the orcs counting a den; the den\'s words a camp\'s; the gap never kept; the gap kept for camps; never asked again; the lair unread; the rout untold; the host unwired)', async () => {
+  const claims = [], orcs = [], said = [];
   let now = 1_000_000;
   const held = (seat) => ({ ...seat, holder: { edict: 'bounty' } });
   const se = createSeatEdicts({
     seatAt: () => null, here: () => null, seats: () => [held(SOLITUDE), held(ANTICLERE)], guildId: () => null, minutes: () => 0,
     regionAt: (px, py) => (px === 1569 || px === 1580 ? 64 : px === 410 ? 21 : 63), say: (l) => said.push(l),
     claim: async (site, region) => { claims.push([site, region]); return { paid: 20 }; },
-    nowMs: () => now,
+    tideAt: () => 'orcs', orcCamp: async (site) => { orcs.push(site); return { counted: false }; }, nowMs: () => now,
   });
   assert.equal(BOUNTY_DEN_ASK_GAP_MS, 600_000);
   assert.equal(await se.denCleared('lair', 1580, -420), 20);
@@ -61,6 +62,7 @@ test('BAY-LEFT-SEA THE CLIENT: a den cleared past the Bay in a Bounty seat\'s ba
   now += 1;
   assert.equal(await se.denCleared('lair', 1580, -420), 20, 'past the gap: asked again');
   assert.deepEqual(claims, [['1580,-420:lair', 64], ['410,150:91', 21], ['1569,-400:hideout', 64], ['410,150:91', 21], ['1580,-420:lair', 64]]);
+  assert.deepEqual(orcs, ['410,150:91', '410,150:91'], 'an Orc Raid counts camps alone');
   assert.deepEqual(said, [bountyDenPaidText(20), bountyPaidText(20), bountyDenPaidText(20), bountyPaidText(20), bountyDenPaidText(20)]);
   // a hideout routed: its den claimed, quietly (scenes/hideouts.js `routed`, the world host's seatEdicts.hideoutRouted)
   const quiet = [];
@@ -69,6 +71,7 @@ test('BAY-LEFT-SEA THE CLIENT: a den cleared past the Bay in a Bounty seat\'s ba
   await new Promise((r) => setImmediate(r));
   assert.deepEqual(quiet, ['1600,-380:hideout']);
   assert.equal(bountyDenPaidText(20), 'The Bounty pays you 20 silver for the den.');
+  assert.ok(!said.includes(ORC_CAMP_TEXT));
   // a lair's dungeon as TESA8 stands it names its den; any other place none
   const lair = synthesizeLairLocation({ name: 'T', mapTableData: { mapId: 1 }, exterior: { exteriorData: {} }, dungeon: { header: { blockCount: 1 }, recordElement: { header: {} } } }, { c: 77, px: 1580, py: -420, name: 'The Barrow of Ulf', type: 7, blocks: [] });
   // a countryside place past the Bay (TESA7) carries its pixel too, and is no den

@@ -22,6 +22,10 @@
 // RESPAWN-30's half-hour, exactly as a public room's. Who comes in is the relay's to say: its owner, staff, or a member
 // of.
 //
+// DOMAIN2: A GUILD'S CASTLE IS AN INSTANCE OWNED BY A GUILD - its owner the
+// guild's digest (instanceGuildOwnerOf, a hash domain of its own, so no account's digest is ever a guild's), its epoch the
+// one the account service minted when the castle was bought. The relay admits a socket whose verified token names that
+// guild (`guild`), and no guest: the owner chose one owner a castle.
 import { digest } from './privateInterior.js';
 
 /** The owner's digest, in hex characters (eight bytes). */
@@ -30,6 +34,18 @@ export const INSTANCE_OWNER_HEX = 16;
 export const INSTANCE_EPOCH_HEX = 8;
 /** The instance tag's spelling, ONE home: net/wire.js composes WORLD_ROOM from it. */
 export const INSTANCE_TAG_SOURCE = '\\.i[0-9a-f]{16}\\.[0-9a-f]{8}';
+/** DOMAIN2 (AUDIT DOMAINS R2): THE ROOMS A GUILD MAY OWN - the castles', each a crown city's own dungeon whole (its key the
+ *  crown seat's, the city's own location: Sentinel's, Wayrest's and Daggerfall's - world/dungeon/dungeonTextures.js
+ *  MAIN_STORY_DUNGEON_IDS, measured on the freeware's MAPS.BSA). The `guild` arm admits these alone: it admitted any room
+ *  a guild's digest owned, so a modified client opened its whole guild a private copy of any dungeon or building. */
+export const BAY_CASTLE_MAP_IDS = Object.freeze([6634853, 630439035, 1291010263]);
+/** WW7-4 (WW7-4): AND EACH PROVINCE'S CAPITAL'S CASTLE but Cyrodiil's (Domains.md section 6: the
+ *  Imperial City never - the White-Gold Tower's halls stand open to all) - its centre's map id, the crown seat's key
+ *  (world/tamrielCapitals.js capitalPlaceId(k, 0): its lane 0x341, 0x80000, its ordinal k; Solitude 1 .. Helstrom 6). */
+export const PROVINCE_CASTLE_MAP_IDS = Object.freeze([1, 2, 3, 4, 5, 6].map((k) => ((0x341 << 20) | 0x80000 | k) >>> 0));
+export const CASTLE_MAP_IDS = Object.freeze([...BAY_CASTLE_MAP_IDS, ...PROVINCE_CASTLE_MAP_IDS]);
+const GUILD_ROOMS = new Set(CASTLE_MAP_IDS.map((k) => `dungeon:m${k}`));
+
 /** The hub's internal door a place room asks whether an account's party holds an instance's owner (partyHoldsOwner). */
 export const INSTANCE_INTERNAL_KIN = '/internal/instance/kin';
 /** How long a place room keeps the hub's YES for one account and owner, and how often it asks again for a member it let
@@ -54,6 +70,11 @@ export const isInstanceEpoch = (v) => typeof v === 'string' && EPOCH_RE.test(v);
 /** The owner's digest of an account, or null for no account. */
 export async function instanceOwnerOf(account) {
   return identity(account) ? digest(`instance:account:${account}`, INSTANCE_OWNER_HEX / 2) : null;
+}
+/** DOMAIN2: the owner's digest of a GUILD - a castle's instance's - or null for no guild. Its own hash domain
+ *  (`instance:guild:`), so it is never an account's. */
+export async function instanceGuildOwnerOf(guild) {
+  return identity(guild) ? digest(`instance:guild:${guild}`, INSTANCE_OWNER_HEX / 2) : null;
 }
 /** The epoch of a character's instance of Privateer's Hold - no quest opens it, the Hold itself does (HOLD-ONCE: online
  *  its public room is entered once), so it is the character's for good - or null for no character. */
@@ -89,14 +110,16 @@ export function instanceOfWord(word) {
 
 /**
  * THE RELAY'S DOOR: by what right may the account `subject` (the token's verified subject - never a hello field) stand in
- * the instance room `key`? 'staff', 'owner', or 'party' - asked of `kin(subject, owner)`, the hub's word (partyHoldsOwner), a member of
+ * the instance room `key`? 'staff', 'owner', 'guild' (DOMAIN2: `guild` the guild the verified token names, whose digest
+ * owns the room - a castle's, CASTLE_MAP_IDS' alone), or 'party' - asked of `kin(subject, owner)`, the hub's word (partyHoldsOwner), a member of
  * the owner's party, whom the room asks again while it stays. Null for none, and for anything but an instance's key.
  */
-export async function instanceAdmission(key, subject, { staff = false, kin = null } = {}) {
+export async function instanceAdmission(key, subject, { staff = false, kin = null, guild = null } = {}) {
   const r = instanceOf(key);
   if (!r || !identity(subject)) return null;
   if (staff) return 'staff';
   if (r.owner === await instanceOwnerOf(subject)) return 'owner';
+  if (guild != null && GUILD_ROOMS.has(r.base) && r.owner === await instanceGuildOwnerOf(guild)) return 'guild';   // a castle's, whole (AUDIT DOMAINS R2)
   return typeof kin === 'function' && await kin(subject, r.owner) ? 'party' : null;
 }
 /** May the account `subject` stand in the instance room `key`? (instanceAdmission's yes or no.) */

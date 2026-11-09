@@ -56,6 +56,14 @@ export function seatsOpenFor(player, env) {
   const s = seatsSwitchOf(env?.SEATS_OPEN);
   return s === 'on' || (s === 'dev' && isDeveloper(player, env));
 }
+/**
+ * THE SEAT MODS' OPTIONS (the server's pins): each of the six extras the seats keep is switched by its own `SEATS_<NAME>` var
+ * (CASTLES, CHARTERS, FORTS, SIEGE_WORKS, RIBBONS, PACTS) - on unless it says `off`. The Features row's choices pin the same six
+ * for the client (net/profile/officialProfile.ts), so the room and its service agree.
+ */
+export const seatOptionOn = (env, name) => String(env?.[`SEATS_${name}`] ?? 'on').trim().toLowerCase() !== 'off';
+/** Runs `f` where the option is on, else answers the refusal the routes give for an option switched off. */
+export const ifSeatOption = (env, name, f) => (seatOptionOn(env, name) ? f() : { error: 'seat-option-off' });
 /** An account a week registered may witness (SEAT0 3.2), as a harvest's and a hub's do - and a guild hall's (CHAP2a,
  *  npcHalls.js reads this one). */
 export const witnessOf = (player, nowS) => Number.isSafeInteger(player?.registered_at) && player.registered_at <= nowS - WITNESS.ageS;
@@ -285,10 +293,9 @@ export async function listSeats({ db, nowS }, player, env) {
 /**
  * SEAT1b: THE SEATS A PLEDGE, A TICK OR A TRIBUTE MAY NAME - every confirmed seat (a disputed one too: it keeps every
  * effect it had), by key: `Map<key, { key, name, region, tier, pixel, state }>`. The ignored accounts left out, as the
- * list leaves them. STORM-SHED: the Watch's claims read the isolate's kept rows (seatRowsOf); GATHER-SPEED and
- * MARKET-SPEED kept them too for the ask on a market read's way - a Tithe's seat (seatHolding.js titheAt),
- * which read every seat row on every read and buy. D1-LOAD: AND EVERY OTHER CALLER - the
- * standings (every board opened), the minute's auctions closed,
+ * list leaves them. STORM-SHED: the Watch's claims read the isolate's kept rows (seatRowsOf); MARKET-SPEED kept them too for the asks on a market read's way - a Tithe's (titheAt) and a board's Market Hall (seatForts.js listingsCapAt), each of which read every seat row on
+ * every harvest, read and buy. D1-LOAD: AND EVERY OTHER CALLER - the
+ * standings (every board opened, and a holder's members' Watchtowers every ten minutes), the minute's auctions closed,
  * a Bounty's camp, a pledge - so kept is the rule, not a choice each caller must remember: all 4,050 of the seats'
  * witness rows were STORM-SHED's costliest read by time. A seat's facts move only with a witness's report or a strike
  * (each lets the rows go here) and by the week, so the minute's bound is the list's own. `fresh` reads the table as it
@@ -301,6 +308,10 @@ export async function confirmedSeats(db, nowS, { fresh = false } = {}) {
   const { seats } = fresh ? seatFacts(await judgedSeatRows(db, nowS), nowS) : await keptSeatFacts(db, nowS);   // SEAT-FACTS: the service's kept facts
   return new Map(seats.filter((s) => factConfirmed(s.fact)).map((s) => [s.key, { ...s.fact.seat, state: s.fact.state }]));
 }
+
+/** DOMAIN3: the accounts the seats' law ignores this week (seatIgnoredAccounts), off the service's kept facts - a seat
+ *  of power's witness counts none of theirs, as a seat's does not (domains.js). */
+export const seatIgnored = async (db, nowS) => (await keptSeatFacts(db, nowS)).ignored;
 
 /**
  * A SEAT WITNESSED - the client standing in a seat town reports the seat it derived (`{ key, name, region, tier, pixel }`,

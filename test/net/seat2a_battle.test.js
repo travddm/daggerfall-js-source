@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import {
   SIEGE_BANNER, SIEGE_THRONE, SIEGE_LENGTH_MS, SIEGE_FORFEIT_MS, SIEGE_SPECTATORS_MAX, SIEGE_TICK_MS, SIEGE_UNITS_PER_M, SIEGE_OPENS_MS,
   fieldOf, newBattle, battleStep, honoured, siegeNextBeat, siegeCampPose, siegeFieldFrame, siegeBannerCount,
+  siegeBreach,   // SEAT2b part two (b): a crown's Gatehouse breached
 } from '../../src/net/siege/siegeRef.js';
 import { BATTLE_LENGTH_MS, SIGN_CLOSES_MS } from '../../src/net/townSeatLaw.js';
 import { mintSiegeOrder, verifyOrder, orderValid, siegePassValid, SIEGE_PASS_SPAN_S } from '../../src/net/identityToken.js';
@@ -108,10 +109,15 @@ test('SEAT2a THE THRONE AND THE CLOCK: open to the attackers at 2 of 3 banners (
   run(k, [fighter('attack', 0, -40)], T, T + 5000);
   assert.equal(k.throne, 0, 'two of four: shut');
   k.banners[2].side = 'attack';
-  // a crown's banners alone open the Throne: three of four, its 180 s
-  run(k, [fighter('attack', 0, -40)], T + 6000, T + 6000 + 178_000);
+  // SEAT2b part two (b) (
+  // Gatehouse is breached"; SEAT2a opened it on the banners alone until the Gatehouse was raised): three of four, its
+  // Gatehouse standing - shut; breached, its 180 s
+  run(k, [fighter('attack', 0, -40)], T + 6000, T + 9000);
+  assert.equal(k.throne, 0, 'three of four, the Gatehouse standing: shut');
+  siegeBreach(k);
+  run(k, [fighter('attack', 0, -40)], T + 10_000, T + 10_000 + 178_000);
   assert.equal(k.result, null, 'not at 179');
-  run(k, [fighter('attack', 0, -40)], T + 185_000, T + 185_000);
+  run(k, [fighter('attack', 0, -40)], T + 189_000, T + 189_000);
   assert.equal(k.result, 'attack');
   // time
   const h = newBattle({ kind: 'siege', tier: 'palace', startMs: T, field: fieldOf(SF, 'palace') });

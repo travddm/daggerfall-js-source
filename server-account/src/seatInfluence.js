@@ -24,6 +24,11 @@
 //   Tribute      Marks out of the guild's Drake treasury, burnt, 1 per
 //                10, never past 20% of the guild's week at the seat.
 //
+// The stockpile's deliveries (the Writs source, SEAT0 4.2) are SEAT1c's,
+// with the Siege Camp they fill and the Turning that spends it; the
+// sources' table already admits their rows (`writ`, `bought`) and the law
+// reads them (townSeatLaw.js guildSeatInfluence).
+//
 // ═══ WHO COUNTS ═════════════════════════════════════════════════════
 //
 // A character 7 days in its guild (SEAT_MEMBER_WAIT_S); an account
@@ -55,7 +60,9 @@ import { mustChange } from './realm.js';
 import { seatsOpenFor, confirmedSeats } from './townSeats.js';
 import { marksOpenFor } from './marks.js';
 import { verifyWatchReceipt } from '../../src/net/watchReceipt.js';
-import { gateTimes } from '../../src/net/gate/gateLaw.js';
+import { gateTimes, gameDayAt } from '../../src/net/gate/gateLaw.js';
+import { shrineGateInfluence, towersSee } from '../../src/net/fortLaw.js';   // SEAT2b part two (7.5): a Shrine's gates, the Watchtowers' word
+import { fortTierAt } from './seatForts.js';   // SEAT2b part two: the Shrine standing, read without a write
 import { MARKS_RID_RE, utcDay } from '../../src/net/marksLaw.js';
 import { RENOWN_XP_REPORT_MAX } from '../../src/net/renown.js';
 import {
@@ -65,12 +72,15 @@ import {
   HUNT_INFLUENCE, HUNT_WEEK_CAP,   // HUNTERS-MARK: a bounty board's clear
   SEAT_WEEK_MS, SEAT_RECKONING_MS,
   accountSeatInfluence, guildSeatInfluence, tributeRoom, homeDaysIn, seatDefence, SEAT_CHRONICLE_SHOWN,
-  overreachOf, unrestInfluence, crownsHeld, seatReach, withReach, FREE_LAND_WATCH_BONUS, HALL_OF_RECORDS_ROWS,
+  overreachOf, unrestInfluence, crownsHeld, seatReach, withReach, FREE_LAND_WATCH_BONUS, pledgeBarred, seasonOf, seasonZeroOf, HALL_OF_RECORDS_ROWS,
 } from '../../src/net/townSeatLaw.js';
 import { isFreeLand } from '../../src/net/kingdomLaw.js';
 import { holdingOf } from './seatHolding.js';   // SEAT1d: the holder's own view of its Charter
 import { fightOf } from './seatBattles.js';   // SEAT2a: the battle as the Seat tab shows it
 import { royalView } from './seatRoyal.js';   // CROWN1 part two: a Royal Tourney's ladder
+import { bansOf, politicsOf } from './seatPolitics.js';   // CROWN2: the pledges fealty and Pacts forbid; a guild's politics
+import { domainsFor } from './domains.js';   // DOMAIN3: the region law, where DOMAINS_WEEK rules
+import { charterUnder } from '../../src/net/domainLaw.js';   // DOMAIN3: the Charter a seat is held under
 
 const weekAt = (nowS) => seatWeekOf(nowS * 1000);
 /** Whether a member row has stood its 7 days (SEAT0 4.2: "A new member waits"). */
@@ -177,8 +187,15 @@ export async function pledgeSeat({ db, nowS }, player, env, { character, key = n
   if (!seatKeyOk(key)) return { error: 'bad-seat' };
   const seat = (await confirmedSeats(db, nowS)).get(key);
   if (!seat) return { error: 'seat-unconfirmed' };
+  // DOMAIN3 (Domains law 1): where the region law rules, a region's Charter alone is pledged - its seat of power; every
+  // other seat town of the region is that Charter's holding
+  if (charterUnder(seat, await domainsFor(db, nowS, env, week)).key !== key) return { error: 'seat-not-charter' };
   // SEAT1c: a guild holding a seat in the region is pledged to it, and nowhere else there
   if (await db.prepare('SELECT 1 FROM town_seat_holds WHERE guild_id = ? AND region = ?').bind(gid, seat.region).first()) return { error: 'seat-held-here' };
+  // CROWN2 (7.8): never against a liege's, a vassal's or a Pact partner's seat
+  const heldBy = (await db.prepare('SELECT guild_id FROM town_seat_holds WHERE key = ?').bind(key).first())?.guild_id ?? null;
+  const barred = pledgeBarred(gid, heldBy, await bansOf(db, gid, week));
+  if (barred) return { error: barred };
   // AUDIT SEATS-3 D5 (4.1: "A guild holding a seat is pledged to it automatically", at most five regions): the reach counted
   // over the regions pledged AND held, each once - a guild holding two regions pledges in three more, as the Muster's
   // count shows it - the region pledged now never among them
@@ -213,6 +230,7 @@ export async function claimWatch({ db, nowS, subtle }, player, env, { character,
   const seats = await confirmedSeats(db, nowS);   // STORM-SHED: the isolate's kept witness rows
   const byPixel = new Map([...seats.values()].map((s) => [`${s.pixel[0]},${s.pixel[1]}`, s]));
   const week = weekAt(nowS);
+  const domains = await domainsFor(db, nowS, env, week);   // DOMAIN3: a holding's Watch is kept for its region's Charter
   let counted = 0;
   /** @type {Record<string, number>} */
   const why = {};
@@ -223,8 +241,9 @@ export async function claimWatch({ db, nowS, subtle }, player, env, { character,
     const c = v.claims;
     if (c.s !== player.id) { tally('not-yours'); continue; }
     if (weekAt(c.i) !== week) { tally('old-week'); continue; }
-    const seat = byPixel.get(`${c.x},${c.y}`);
-    if (!seat) { tally('no-seat'); continue; }
+    const town = byPixel.get(`${c.x},${c.y}`);
+    if (!town) { tally('no-seat'); continue; }
+    const seat = charterUnder(town, domains);   // DOMAIN3: the Charter the town is held under - itself under the seat law
     const at = await countsAt(db, player, character, seat.region, nowS, { key: seat.key, anyCharacter: true });
     if ('counted' in at) { tally(at.why); continue; }
     const day = utcDay(c.i);
@@ -276,7 +295,7 @@ export async function creditGate({ db, nowS }, player, env, { character, day, re
  * HUNTERS-MARK (Bounty-Boards.md 12.6): A BOUNTY CLEARED - a clear the hunt's ledger recorded (hunts.js huntClear), on a
  * board of `region` (the client's): HUNT_INFLUENCE for the account's war-guild at its pledged seat there, at most
  * HUNT_WEEK_CAP an account a week (asked in the write), `ref` the clear's own key, so it counts once. Bounded, not
- * witnessed. Answers `{ counted, why? }`; never refuses the clear it rode on.
+ * witnessed, as an Orc Raid's camps are. Answers `{ counted, why? }`; never refuses the clear it rode on.
  * @param {{db: any, nowS: number}} ctx
  */
 export async function creditHunt({ db, nowS }, player, env, { character, region, ref } = {}) {
@@ -354,10 +373,10 @@ export async function creditRenown({ db, nowS }, player, env, { character, regio
  * @param {{ guilds: string[], rows: any[], renown: any[], homes: any[], binds: Map<string, string>,
  *   agreed: Map<number, number>, weekStartS: number, nowS: number, reach?: Map<string, number>, freeLand?: boolean }} o
  */
-export function standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS, nowS, reach = new Map(), freeLand = false }) {
+export function standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS, nowS, reach = new Map(), freeLand = false, shrine = null }) {
   const out = [];
   for (const g of guilds) {
-    /** @type {Map<string, { watch: number, gates: number, renownXp: number, homeDays: number, hunt: number }>} */
+    /** @type {Map<string, { watch: number, gates: number, renownXp: number, writ: number, homeDays: number, raid: number, hunt: number }>} */
     const acc = new Map();
     const a = (id) => { let v = acc.get(id); if (!v) acc.set(id, v = { watch: 0, gates: 0, renownXp: 0, homeDays: 0, hunt: 0 }); return v; };
     let tributeMarks = 0;
@@ -376,7 +395,11 @@ export function standingsOf({ guilds, rows, renown, homes, binds, agreed, weekSt
       .sort((x, y) => y.days - x.days).slice(0, HOMES_SEAT_MAX);
     for (const h of hs) if (h.days > 0) a(h.player).homeDays += h.days;
     const per = new Map([...acc].map(([id, v]) => [id, accountSeatInfluence(v, freeLand ? FREE_LAND_WATCH_BONUS : 0)]));
-    out.push({ guild: g, ...withReach(guildSeatInfluence([...per.values()], tributeMarks), reach.get(g) ?? 0), accounts: [...per.values()].filter((v) => v > 0).length, per });
+    const row = { guild: g, ...withReach(guildSeatInfluence([...per.values()], tributeMarks), reach.get(g) ?? 0), accounts: [...per.values()].filter((v) => v > 0).length, per };
+    // SEAT2b part two (7.5: "each gate felled in the region gives the holder +50 influence"): THE SHRINE'S, the holder's
+    // own - a guild's row beside its accounts' (no account's cap is spent on it, as Tribute's is not), past the reach
+    if (shrine && shrine.guild === g && shrine.influence > 0) { row.total += shrine.influence; row.shrine = shrine.influence; }
+    out.push(row);
   }
   return out.sort((x, y) => y.total - x.total || (x.guild < y.guild ? -1 : 1));
 }
@@ -389,6 +412,27 @@ export async function seatGuildsOf(db, key, week) {
   const held = await db.prepare('SELECT guild_id, at FROM town_seat_holds WHERE key = ?').bind(key).first();
   if (held && !out.has(held.guild_id)) out.set(held.guild_id, Number(held.at));
   return out;
+}
+/** SEAT2b part two: THE GATES FELLED IN `region` this seat week, to `nowS` - each gate day whose rise falls in the week
+ *  and whose claims agree on the region (GATE_REGION_AGREE - agreedGateRegions), as the Turning counts them for Standing
+ *  (seatTurning.js gatesIn). */
+export async function gatesFelledIn(db, week, region, nowS) {
+  const fromS = Math.floor(seatWeekStartMs(week) / 1000), toS = Math.min(nowS, fromS + SEAT_WEEK_MS / 1000);
+  const days = [];
+  for (let d = gameDayAt(fromS * 1000); d <= gameDayAt(toS * 1000); d++) { const r = gateTimes(d).riseAt / 1000; if (r >= fromS && r < toS) days.push(d); }
+  let n = 0;
+  for (const rg of (await agreedGateRegions(db, days)).values()) if (rg === Number(region)) n++;
+  return n;
+}
+/** SEAT2b part two: A HOLDER'S SHRINE AT A SEAT this week - `{ guild, influence }` (its tier's 50 a gate felled in the
+ *  region - fortLaw.js shrineGateInfluence), or null with no holder, no Shrine or no gate. */
+export async function shrineOf(db, seat, week, nowS) {
+  const h = await db.prepare('SELECT guild_id FROM town_seat_holds WHERE key = ?').bind(seat.key).first();
+  if (!h) return null;
+  const per = shrineGateInfluence(await fortTierAt(db, seat.key, 'shrine', nowS));
+  if (per <= 0) return null;
+  const gates = await gatesFelledIn(db, week, seat.region, nowS);
+  return gates > 0 ? { guild: h.guild_id, influence: per * gates, gates } : null;
 }
 /** D1's bound on a statement's parameters, less a margin. */
 export const IN_CHUNK = 90;
@@ -410,8 +454,12 @@ export async function allIn(db, ids, sql, before = [], after = []) {
   return out;
 }
 /** Each pledged guild's week at a seat (standingsOf), the rows gathered. Exported for the Turning (seatTurning.js).
+ *  DOMAIN3: `domains` the
+ *  region law's seats of power that week (domains.js domainsFor; null where it does not rule) - at a region's seat of
+ *  power the homes counted are the whole region's, every seat town of it the Charter's holding; anywhere else the town's.
  *  Every reader of a week's standings hands it: the board, the Turning, a Tourney's dead heat, Tribute's room. */
-export async function gatherStandings(db, seat, week, nowS) {
+export async function gatherStandings(db, seat, week, nowS, domains = null) {
+  const region = domains?.get?.(seat.region)?.key === seat.key;
   const guilds = [...(await seatGuildsOf(db, seat.key, week)).keys()];
   if (!guilds.length) return [];
   // AUDIT-SEATS S11: summed in SQL - one row a guild, account, source, region and game or UTC day (its amount the sum, `n`
@@ -422,16 +470,18 @@ export async function gatherStandings(db, seat, week, nowS) {
   const bindRows = await allIn(db, guilds, (qs) => `SELECT account, guild_id FROM town_seat_binds WHERE week = ? AND guild_id IN (${qs})`, [week]);   // SEAT-CAP
   const binds = new Map(bindRows.map((b) => [b.account, b.guild_id]));
   const { results: renown = [] } = await db.prepare('SELECT account, xp FROM town_seat_renown WHERE week = ? AND region = ?').bind(week, seat.region).all();
-  // the town's homes whose owning character is a 7-day member of a pledged guild (a guild's hall is no member's home)
+  // the town's homes whose owning character is a 7-day member of a pledged guild (a guild's hall is no member's home);
+  // DOMAIN3: the region's, where the region law rules
   const homes = await allIn(db, guilds, (qs) => `SELECT h.player, h.bought_at, m.guild_id FROM homes h
     JOIN guild_members m ON m.player = h.player AND m.char_id = h.char_id
-    WHERE h.map_id = ? AND h.guild_id IS NULL AND m.guild_id IN (${qs}) AND m.joined_at <= ?`, [seat.key], [nowS - SEAT_MEMBER_WAIT_S]);
+    WHERE h.${region ? 'region' : 'map_id'} = ? AND h.guild_id IS NULL AND m.guild_id IN (${qs}) AND m.joined_at <= ?`, [region ? seat.region : seat.key], [nowS - SEAT_MEMBER_WAIT_S]);
   const days = [...new Set(rows.filter((r) => r.source === 'gate').map((r) => Number(r.day)))];
   const agreed = await agreedGateRegions(db, days);
   // CROWN1 (4.3): each guild's reach here - the crowns it holds, at a palace seat of their kingdom or March
   const crownRows = seat.tier === 'palace' ? await allIn(db, guilds, (qs) => `SELECT guild_id, tier, region FROM town_seat_holds WHERE tier = 'crown' AND guild_id IN (${qs})`) : [];
   const reach = new Map(guilds.map((g) => [g, seatReach(seat, crownsHeld(crownRows.filter((h) => h.guild_id === g).map((h) => ({ tier: h.tier, region: Number(h.region) }))))]));
-  return standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS: Math.floor(seatWeekStartMs(week) / 1000), nowS, reach, freeLand: isFreeLand(seat.region) });
+  return standingsOf({ guilds, rows, renown, homes, binds, agreed, weekStartS: Math.floor(seatWeekStartMs(week) / 1000), nowS, reach, freeLand: isFreeLand(seat.region),
+    shrine: await shrineOf(db, seat, week, nowS) });   // SEAT2b part two: the holder's Shrine
 }
 
 /**
@@ -445,7 +495,8 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
   const seat = (await confirmedSeats(db, nowS)).get(key);
   if (!seat) return { error: 'seat-unconfirmed' };
   const week = weekAt(nowS);
-  const list = await gatherStandings(db, seat, week, nowS);
+  const season = seasonOf(week, seasonZeroOf(env?.SEASON_ZERO_WEEK));   // SEASON1: the Season counted
+  const list = await gatherStandings(db, seat, week, nowS, await domainsFor(db, nowS, env, week));   // DOMAIN3: the region's homes at its seat of power
   // SEAT1c: the Legacy each guild carried in, the holder and its defence, the week's battle here, the Chronicle
   const { results: legacyRows = [] } = await db.prepare('SELECT guild_id, amount FROM town_seat_legacy WHERE week = ? AND key = ?').bind(week, key).all();
   const legacy = new Map(legacyRows.map((l) => [l.guild_id, Number(l.amount)]));
@@ -469,6 +520,7 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
       mine = {
         guild: me.guild_id, rank: Number(me.rank), seasoned: seasoned(me, nowS), bound: await boundTo(db, week, player.id),
         pledges: await pledgesOf(db, week, me.guild_id), influence: s?.per.get(player.id) ?? 0,
+        politics: await politicsOf(db, me.guild_id, nowS),   // CROWN2: its liege, vassals, Pacts and the offers standing
         tributeRoom: s ? tributeRoom(s.others, s.tribute) * TRIBUTE_MARKS_PER_INFLUENCE : 0,
       };
     }
@@ -479,12 +531,22 @@ export async function readStandings({ db, nowS }, player, env, { key, character 
     // SEAT1d: a challenger's influence at a seat in Unrest risen a quarter, as the Turning counts it
     const own = s.guild === holder?.guild.id;
     const influence = own || !holder ? s.total : unrestInfluence(s.total, holder.standing);
-    return { guild: { id: s.guild, name: g?.name ?? '', tag: g?.tag ?? '', heraldry: heraldryOfRow(g?.heraldry) }, influence: influence + carried, legacy: carried, tribute: s.tribute, accounts: s.accounts, holder: own };
+    return { guild: { id: s.guild, name: g?.name ?? '', tag: g?.tag ?? '', heraldry: heraldryOfRow(g?.heraldry) }, influence: influence + carried, legacy: carried, tribute: s.tribute, accounts: s.accounts, holder: own,
+      ...(s.shrine ? { shrine: s.shrine } : {}) };   // SEAT2b part two: the holder's Shrine's part of its week
   }).sort((x, y) => y.influence - x.influence);
+  // SEAT2b part two (7.5: "the holder is told when a challenger passes half its defence (tier 1) or a quarter (tier 2)"):
+  // THE WATCHTOWERS' WORD, to the holder's own members alone - every challenger at or past its towers' share of the
+  // defence, as the Seat tab shows both (fortLaw.js towersSee); the client says each once (net/townSeatBook.js towers)
+  const towerTier = holder && mine?.guild === holder.guild.id ? await fortTierAt(db, key, 'watchtowers', nowS) : 0;
+  const towers = towerTier > 0 && defence != null
+    ? towersSee(standings.map((s) => ({ guild: s.guild.id, influence: s.influence })), { holder: holder.guild.id, defence, t: towerTier })
+      .map((w) => ({ ...w, name: byId.get(w.guild)?.name ?? '', tag: byId.get(w.guild)?.tag ?? '' }))
+    : null;
   return {
-    seat, week, phase: seatPhaseOf(nowS * 1000),
+    seat, week, phase: seatPhaseOf(nowS * 1000), season,   // SEASON1: the Season this week falls in, or null
     reckoningAt: Math.floor((start + SEAT_WEEK_MS - SEAT_RECKONING_MS) / 1000), turningAt: Math.floor((start + SEAT_WEEK_MS) / 1000),
     standings,
+    ...(towers ? { towers } : {}),   // SEAT2b part two: the Watchtowers' word, the holder's members'
     holder: holder ? { ...holder, ...(holding ? { edict: holding.edict } : {}), ...(was != null ? { was } : {}) } : holder, defence, battle: (await battlesOf(db, week)).get(key) ?? null, chronicle: await chronicleOf(db, key),   // STANDING-TREND: the holder's `was`, its Standing at the last Turning
     fight: await fightOf(db, key, player, character, nowS),   // SEAT2a: the week's battle placed, its sides, the reader's place; the holder's window
     royal: seat.tier === 'crown' ? await royalView(db, key, nowS) : null,   // CROWN1 part two: the Royal Tourney ruling here this week, its prize and ladder
@@ -511,20 +573,29 @@ export const holdsFrom = (/** @type {any[]} */ results = []) => new Map(results.
  *  placed it (seconds, as the standings' `fight` - null for a battle no hour could hold), whether it was moved and its
  *  state, so the arrival line can call the siege (3.3) and the client's herald say it (G1) without a standings read. */
 export async function battlesOf(db, week) {
-  return battlesFrom((await battlesRead(db, week).all()).results);
+  const [rights, revolts] = battlesRead(db, week);
+  return battlesFrom((await rights.all()).results, (await revolts.all()).results);
 }
-/** SEAT-BATCH: battlesOf's statement (the week's Rights) and its answer apart. */
-export const battlesRead = (/** @type {any} */ db, /** @type {number} */ week) =>
+/** SEAT-BATCH: battlesOf's two statements (the week's Rights, its revolts) and their answer apart. */
+export const battlesRead = (/** @type {any} */ db, /** @type {number} */ week) => [
   db.prepare(`SELECT r.key, r.kind, r.guild_id, r.against, a.name AS an, a.tag AS at, a.heraldry AS ah,
       b.name AS bn, b.tag AS bt, b.heraldry AS bh, x.starts_at, x.ends_at, x.moved, x.state FROM town_seat_rights r JOIN guilds a ON a.id = r.guild_id
       LEFT JOIN guilds b ON b.id = r.against LEFT JOIN town_seat_battles x ON x.week = r.week AND x.key = r.key
-    WHERE r.week = ?`).bind(week);
-export function battlesFrom(/** @type {any[]} */ results = []) {
+    WHERE r.week = ?`).bind(week),
+  // SEAT2b part two (c) (7.7): a revolt is no Right - its battle row alone names it, the holder it rises against `against`
+  db.prepare(`SELECT x.key, x.defender, b.name AS bn, b.tag AS bt, b.heraldry AS bh, x.starts_at, x.ends_at, x.moved, x.state
+    FROM town_seat_battles x LEFT JOIN guilds b ON b.id = x.defender WHERE x.week = ? AND x.kind = 'revolt'`).bind(week),
+];
+export function battlesFrom(/** @type {any[]} */ results = [], /** @type {any[]} */ revolts = []) {
   const out = new Map(results.map((r) => [Number(r.key), {
     kind: r.kind, guild: guildView(r.guild_id, r.an, r.at, r.ah), against: r.against ? guildView(r.against, r.bn, r.bt, r.bh) : null,
     startsAt: r.starts_at == null ? null : Number(r.starts_at), endsAt: r.ends_at == null ? null : Number(r.ends_at),
     moved: Number(r.moved ?? 0) === 1, state: r.state ?? null,
   }]));
+  for (const r of revolts) {
+    out.set(Number(r.key), { kind: 'revolt', guild: null, against: guildView(r.defender, r.bn, r.bt, r.bh), startsAt: Number(r.starts_at), endsAt: Number(r.ends_at),
+      moved: Number(r.moved ?? 0) === 1, state: r.state ?? null });
+  }
   return out;
 }
 /** A seat's Chronicle, newest first - `{ kind, week, data }`, at most `max` (SEAT_CHRONICLE_SHOWN, the Seat tab's).
@@ -581,8 +652,8 @@ export async function standingWas(db, key, week, holder) {
 }
 
 /**
- * THE HALL OF RECORDS - a seat's Chronicle for its book, oldest first (its newest
- * HALL_OF_RECORDS_ROWS). Anyone the seats
+ * SEASON1 part three (9.2): THE HALL OF RECORDS - a seat's Chronicle for its book, oldest first (its newest
+ * HALL_OF_RECORDS_ROWS), and the week Season 0 began so the book reads each row in its Season's words. Anyone the seats
  * are open to may read it, as the standings; a seat the registry has struck reads its rows all the same.
  * @param {{db: any}} ctx
  */
@@ -590,7 +661,7 @@ export async function readRecords({ db }, player, env, { key } = {}) {
   if (!seatsOpenFor(player, env)) return { error: 'seats-closed' };
   if (!seatKeyOk(key)) return { error: 'bad-seat' };
   const rows = (await chronicleOf(db, key, HALL_OF_RECORDS_ROWS)).reverse();
-  return { ok: true, key, rows };
+  return { ok: true, key, rows, zero: seasonZeroOf(env?.SEASON_ZERO_WEEK) };
 }
 
 // ─── TRIBUTE ─────────────────────────────────────────────────────────
@@ -620,7 +691,7 @@ export async function payTribute({ db, nowS }, player, env, { character, key, ma
   if (!seat) return { error: 'seat-unconfirmed' };
   const gid = a.me.guild_id;
   if ((await pledgeIn(db, week, gid, seat.region)) !== key) return { error: 'seat-no-pledge' };
-  const s = (await gatherStandings(db, seat, week, nowS)).find((x) => x.guild === gid);
+  const s = (await gatherStandings(db, seat, week, nowS, await domainsFor(db, nowS, env, week))).find((x) => x.guild === gid);   // DOMAIN3: the room as the standings count it
   const room = s ? tributeRoom(s.others, s.tribute) : 0;
   if (marks / TRIBUTE_MARKS_PER_INFLUENCE > room) return { error: 'seat-tribute-cap' };   // the room is the standings' to say (mine.tributeRoom)
   try {

@@ -58,14 +58,14 @@ test('SEASON-BOOK the model: three sections, each its clock; the season\'s two b
   const seats = sec(m, 'seats');
   assert.deepEqual([seats.title, seats.sub, seats.at, seats.atLabel], ['The Seats: Season 0', 'Week 3 of 4', Date.UTC(2026, 10, 1, 18), 'ends']);
   assert.equal(seats.lead, 'Season 0 is the beta. When it ends, the seats\' war is wiped. Silver, the Stores and your professions stay.');
-  assert.deepEqual(seats.rows.map((r) => r.id), ['chapters'], 'Season 0 has no soft reset');
+  assert.deepEqual(seats.rows.map((r) => r.id), ['chapters'], 'Season 0 keeps no one: no ribbon, no soft reset');
   assert.ok(seats.rows.every((r) => r.standing === null && r.door === null));
   assert.equal(seats.foot, 'The Notice Board\'s Seat tab has the week\'s standings.');
   const later = seasonBookModel({ now: Date.UTC(2026, 10, 10), seatsOpen: true, zero: 2, boards: {} });
   const s1 = sec(later, 'seats');
   assert.deepEqual([s1.title, s1.atLabel], ['The Seats: Season of Morning Star', 'ends']);
   assert.equal(s1.lead, 'The guilds\' war for the towns. A Season ends at its last Sunday Turning.', 'P7: a counted Season never told it is the beta');
-  assert.deepEqual(s1.rows.map((r) => r.id), ['reset', 'chapters']);
+  assert.deepEqual(s1.rows.map((r) => r.id), ['ribbon', 'reset', 'chapters']);
   assert.equal(sec(seasonBookModel({ now: NOW, seatsOpen: false, zero: 2 }), 'seats'), undefined, 'the seats shut: no section');
   assert.equal(sec(seasonBookModel({ now: NOW, seatsOpen: true, zero: null }), 'seats'), undefined, 'no Season counted: no section');
   const fest = sec(m, 'festival');
@@ -82,7 +82,7 @@ test('AUDIT SEASON-BOOK L1/L5/L6/L7/L12/W4-W8: every line says what the game doe
   assert.equal(realm.foot, 'Arena Champion is worn by the leader, once they have 10 rated bouts against 5 different opponents.');
   assert.equal(row(realm, 'arena').about, 'Rated bouts set your season rating. The leader wears Arena Champion, and the banner with more points wears the laurel next season.');
   assert.equal(row(realm, 'sea').about, 'The deepest voyage past the Veil and the most legends sunk or taken, on the board at any freeport\'s harbormaster.');
-  assert.equal(row(seats, 'reset').about, 'Standing drifts halfway back to 50. Charters stand.');
+  assert.equal(row(seats, 'reset').about, 'Standing drifts halfway back to 50 and every fortification loses a tier. Charters stand.');
   const fest = sec(seasonBookModel({ now: NOW }), 'festival');
   assert.equal(row(fest, 'cakes').about, 'Found on foes, the dead and the summoned most often, and in gathering, crafting, looting and at sea. Spend them with the Wyrd Sister outside any tavern. Finds count double on 31 October (UTC) and on in-game nights the dead walk.');
   assert.equal(row(fest, 'starfall').about, 'Every in-game night, about once a real hour, one coven pulls three stars down near its region\'s towns. Hold the crater against the waves.');

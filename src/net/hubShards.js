@@ -187,10 +187,10 @@ export const HUB_UP_QUEUE_BYTES = 8 * 1024 * 1024;
  *  reset with no close said) - the bus lets go of every ShardSocket of its. Three of its syncs. */
 export const HUB_SILENT_MS = 3 * HUB_SYNC_MS;
 /** AUDIT SCALE II R2-5: the attachment's law the bus may change after a shard's hello - a mute, a guild worn or taken
- *  off, its Renown - said back to the shard (a down batch's `att`), so the shard's own attachment, which every
+ *  off, its ribbon, its Renown - said back to the shard (a down batch's `att`), so the shard's own attachment, which every
  *  hello it says again is made of, is the bus's word and never the token's alone. LEASE1 (net/roomLease.js): and a
  *  freeze and the time of the last word on both (`fz`, `lt`) - a hub's shard mints its sockets' leases from its own copy. */
-export const SHARD_LAW_KEYS = Object.freeze(['mu', 'gi', 'gt', 'gm', 'gio', 'lv', 'fz', 'lt']);
+export const SHARD_LAW_KEYS = Object.freeze(['mu', 'gi', 'gt', 'gm', 'gio', 'rb', 'lv', 'fz', 'lt']);
 /** The largest frame a shard hands the bus - the largest the hub takes (a shared quest, wire.js QUEST_FRAME_MAX). */
 export const HUB_FRAME_MAX = 64 * 1024;
 /** The frames a second a shard hands up for one socket, and the burst - a hub link says a few a second (its party's

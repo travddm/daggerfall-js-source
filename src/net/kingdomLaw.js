@@ -37,7 +37,7 @@ export const KINGDOMS = Object.freeze({
   blackmarsh: Object.freeze({ id: 'blackmarsh', name: 'Black Marsh', seat: 'Helstrom', regions: regions(69) }),
   cyrodiil: Object.freeze({ id: 'cyrodiil', name: 'Cyrodiil', seat: 'Imperial City', regions: regions(70) }),
 });
-/** WW7-3: the Bay's three crowns (the Marches', the region signatures' and the card suits' kingdoms). */
+/** WW7-3: the Bay's three crowns (the Marches', the Tides', the region signatures' and the card suits' kingdoms). */
 export const BAY_KINGDOMS = Object.freeze(['daggerfall', 'wayrest', 'sentinel']);
 /** WW7-3: a crown seat's own name - its kingdom's `seat` (a province's capital), else the kingdom's name (the Bay's). */
 export const kingdomSeatName = (id) => KINGDOMS[id]?.seat ?? KINGDOMS[id]?.name ?? null;

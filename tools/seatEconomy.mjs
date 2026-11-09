@@ -17,7 +17,7 @@
 //   node tools/seatEconomy.mjs --runs 2000 --seed 7
 //   node tools/seatEconomy.mjs --json
 import {
-  WATCH_INFLUENCE, WATCH_DAY_CAP, GATE_INFLUENCE, GATE_WEEK_CAP, RENOWN_XP_PER_INFLUENCE, RENOWN_WEEK_CAP, WRIT_INFLUENCE_PER_MARK,
+  WATCH_INFLUENCE, WATCH_DAY_CAP, GATE_INFLUENCE, GATE_WEEK_CAP, RENOWN_XP_PER_INFLUENCE, RENOWN_WEEK_CAP,
   ACCOUNT_SEAT_WEEK_CAP, SEAT_UPKEEP, CLAIM_THRESHOLD, crownScale,
 } from '../src/net/townSeatLaw.js';
 import { COURT_WRITS_PER_DAY, WRIT_UNITS, WRIT_TIER_WEIGHTS, writPay } from '../src/net/professionLaw.js';
@@ -75,8 +75,7 @@ export function memberWeek(profile, r) {
   }
   const gates = Math.min(GATE_WEEK_CAP, poisson(p.gates * ASSUME.inRegion, r) * GATE_INFLUENCE);
   const renown = Math.min(RENOWN_WEEK_CAP, Math.floor(around(p.renownXp, r) * ASSUME.inRegion / RENOWN_XP_PER_INFLUENCE));
-  const camp = Math.floor(harvests * ASSUME.inRegion * ASSUME.unitsAHarvest * ASSUME.marksAUnit * ASSUME.toCamp) * WRIT_INFLUENCE_PER_MARK;
-  return { influence: Math.min(ACCOUNT_SEAT_WEEK_CAP, watch + gates + renown + camp), writMarks: Math.round(writMarks), writs };
+  return { influence: Math.min(ACCOUNT_SEAT_WEEK_CAP, watch + gates + renown), writMarks: Math.round(writMarks), writs };
 }
 
 const pct = (sorted, q) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];

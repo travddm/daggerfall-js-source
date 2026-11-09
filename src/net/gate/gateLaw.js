@@ -14,6 +14,7 @@
 //
 // Not a DFU member: Daggerfall has no other players and no world events. Ledger A (WB).
 import { sharedClassicMinutes, wallMsForClassicMinutes, GATE_LANES_OPEN, gateLaneOpen } from '../wire.js';   // AUDIT WW F2: the lanes that stand
+import { t } from '../../systems/textManager.js';   // the omen lines in the player's language (the relay's herald sets none: English)
 import { GATE_COURTS_MAX } from './gateCourts.js';   // GATE-COURTS: a night's courts' rooms - gateCourts.js imports nothing
 import { GATE_ASPECTS, GATE_TRIALS, readGateMods, GATE_DIRE, gateDireLine, CAPTIVE_NAMES, validGatePortents, portentOf } from './gateMods.js';   // WB8b: the Warden's marks, drawn by the day; WB14b: and the night's portents
 
@@ -443,14 +444,14 @@ export const portentsLine = (pt) => {
 // (world151) retired them here.
 // WB13b: each line the event, where and when -
 // the map's ring, the banner and the countdowns say the rest
-export const riseLine = ({ near, left }) => `Dagon's Breach rises near ${near}. It opens in ${left}.`;
-export const wrathLine = ({ near, boss }) => `The Covenant tears Dagon's Breach near ${near} shut. ${boss} is cast back into the Deadlands.`;
+export const riseLine = ({ near, left }) => t('gate.line.rise', "Dagon's Breach rises near {near}. It opens in {left}.", { near, left });
+export const wrathLine = ({ near, boss }) => t('gate.line.wrath', "The Covenant tears Dagon's Breach near {near} shut. {boss} is cast back into the Deadlands.", { near, boss });
 /** WB8c: the Warden's marks said beside the omen (and to a player who comes in later, beside the line they hear first).
  *  WB13b: by name - "Valkynaz Ruhn comes the Rime-Wrought tonight, Colossal and Echoing." - the marks' card and the bar
  *  say what each does; Discord says the same sentence. */
 export const marksLine = ({ boss, md }) => {
   const { aspect, trials } = readGateMods(md);
-  const names = trials.map((t) => t.name);
-  const said = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0] ?? '';
-  return `${boss} comes ${aspect.epithet} tonight${said ? `, ${said}` : ''}.`;
+  const names = trials.map((trial) => trial.name);
+  const said = names.length > 1 ? t('gate.line.marksList', '{head} and {last}', { head: names.slice(0, -1).join(', '), last: names[names.length - 1] }) : names[0] ?? '';
+  return said ? t('gate.line.marksTrials', '{boss} comes {epithet} tonight, {said}.', { boss, epithet: aspect.epithet, said }) : t('gate.line.marks', '{boss} comes {epithet} tonight.', { boss, epithet: aspect.epithet });
 };

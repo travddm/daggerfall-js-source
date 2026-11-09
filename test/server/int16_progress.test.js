@@ -1,6 +1,6 @@
 // INT16-INT17: PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT
 // PAYS FOR THEM (server-account/src/progress.js).
-//   - INT16: every claim (Renown, a raid's cleanse, the Watch, a silver find, a profession's XP) is the account's
+//   - INT16: every claim (Renown, a raid's cleanse, a camp, the Watch, a silver find, a profession's XP) is the account's
 //     SEATED realm character's - an offline id, another character of the account, a seat another device took and a held
 //     character are refused before the route reads a word;
 //   - INT17: each stream a bucket the account's play fills (budget.js stepBudget, one law) - measured first: a claim past
@@ -53,7 +53,7 @@ test('INT17: the first line - each stream a clock cap of today read per hour of 
   }
 });
 
-test('INT17: what an answer spent - Renown credited (never asked), a cleanse and its Renown, the Watch\'s ticks, a find, a harvest\'s XP and silver, a writ\'s XP and Renown; a refusal or a repeat spends nothing', () => {
+test('INT17: what an answer spent - Renown credited (never asked), a cleanse and its Renown, a camp, the Watch\'s ticks, a find, a harvest\'s XP and silver, a writ\'s XP and Renown; a refusal or a repeat spends nothing', () => {
   assert.deepEqual(progressSpentOf('/v1/renown/xp', { credited: 900, xp: 5000 }), [['renown', 900]]);
   assert.deepEqual(progressSpentOf('/v1/renown/xp', { credited: 900, repeat: true }), []);
   assert.deepEqual(progressSpentOf('/v1/renown/xp', { error: 'renown-xp' }), []);
@@ -111,7 +111,7 @@ test('INT16 service: a Renown report is its SEAT\'s - an offline id refused, ano
   } finally { t.done(); }
 });
 
-test('INT16 service: every progression route asks the seat before its own words - a find (no character named: the account\'s seat), the Watch, a raid, a harvest, a craft, a writ', async () => {
+test('INT16 service: every progression route asks the seat before its own words - a find (no character named: the account\'s seat), a camp, the Watch, a raid, a harvest, a craft, a writ', async () => {
   const t = await stand({ MARKS_OPEN: 'on', PROFESSIONS_OPEN: 'on', SEATS_OPEN: 'on' });
   try {
     const bare = await t.s.registered('bare');   // registered, no realm character

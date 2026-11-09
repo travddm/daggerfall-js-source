@@ -200,10 +200,11 @@ import { wrapAngle } from '../world/mat4.js';   // ONCRASH1: the port's one angl
 import { TITLES, GLYPHS, GLYPHS_MAX, AURAS, ICONS, titleClaimed, seatTitleClaimOk, renownIssuable } from './identityToken.js';   // ACC3: the badge vocabulary, closed - `badged` writes it and `readBadge` checks it back   // RENOWN1: and the level's bound, `badged` and `readRenown` alike
 import { nameAllowed, maskText, textCaught } from './nameFilter.js';   // NAME-F2: the filter runs INSIDE sanitizeName, so the relay carries it; TEXT-F1: and a player's words are starred inside sanitizeChat and wordsLine, the same way - nameFilter.js imports nothing, same as mat4.js above, so the worker's graph stays flat
 import { validRollSpec, validRoll, rollDice, ROLL_DICE_MAX, ROLL_SIDES_MAX, ROLL_MOD_MAX } from './dice.js';   // DICE1: the dice's law - one home for both ends (dice.js imports nothing, so the worker's graph stays flat)
+import { ribbonClaimOk } from './heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon - heraldryLaw.js imports nothing, so the worker's graph stays flat
 import { GUILD_TAG_RE } from './guild/guildLaw.js';   // GUILD1c: a guild's tag is badged beside the name - guildLaw.js imports nothing, so the worker's graph stays flat
 import { homeMapIdOk, homeBuildingKeyOk, HOME_ORDER_KEYS_MAX } from './homeLaw.js';   // QUEST-HOME: a home word's town and buildings, the homes' own shapes - homeLaw.js imports nothing, so the worker's graph stays flat
 import { RAID_KEY_RE, RAID_SIG_RE, RAID_TARGET_MIN, RAID_TARGET_MAX, RAID_TYPES, RAID_WORD_KILLS_MAX, RAID_ACCOUNTS_MAX, RAID_TOP_MAX, RAID_TOWNS_SHA_RE, RAID_TOWNS_CHUNK, RAID_TOWNS_CHUNKS_MAX } from './raid/raidLaw.js';   // RAID3: a town raid's law - raidLaw.js imports nothing, so the worker's graph stays flat
-import { SIEGE_HAND_SLOTS, SIEGE_HIT, isBattleRoom } from './siege/siegeRef.js';   // PVP-REF: a siege's blow kinds - siegeRef.js imports nothing, so the worker's graph stays flat
+import { SIEGE_HAND_SLOTS, SIEGE_HIT, SIEGE_WORK_IDS, SIEGE_RAMS_MAX, SIEGE_WORK_TIER_MAX, siegeGateVitality, siegeRamVitality, isSiegeNpcId, SIEGE_NPC_MAX, SIEGE_NPC_KINDS, isBattleRoom } from './siege/siegeRef.js';   // PVP-REF: a siege's blow kinds - siegeRef.js imports nothing, so the worker's graph stays flat; SEAT2b part two (b): the works a blow may name; part two (c): the relay's own fighters
 import { INSTANCE_TAG_SOURCE, isInstanceRoom } from './instanceRoom.js';   // INSTANCES: an instance's room is a world room (WORLD_ROOM) with a memory of its own length (worldTtlMsFor) - instanceRoom.js imports privateInterior.js alone, which the relay walks already
 import { privateInteriorOf } from './privateInterior.js';   // SLIM-FRAME: an owned interior's poses are MapsFile's (nativePoseRoom) - privateInterior.js imports nothing, and the relay walks it already
 import { validSdMarks, SD_ELEMENTS } from './superDungeon/sdMarks.js';   // SD18a: a Hollow's marks and its blows' elements - sdMarks.js imports nothing, so the worker's graph stays
@@ -1634,7 +1635,7 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
 // world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world296';   // world296: the seat system's extras are cut (F4b SEAT-EXTRAS): the siege Gatehouse, Rams, Walls, Barracks guards and Revolt, Tides, Pacts, ribbons, gifts, Domains, guild castles and fortifications leave the relay's siege and seat records. world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
+export const RELAY_VERSION = 'world302';   // world302: the seat system keeps its castles, regional Charters, fortifications, siege works, banner ribbons and Pacts, and loses Tides, Incursion Marks, the Levy, gifts, Fealty and the Season titles (the Crowned and Keeper titles leave the token's closed list). world298: PORTENT-FOLD - the omen lines (rise, wrath, marks) go through the text core. world297: the Revenants row's five fixed choices (who rises, spare, levels per rank, flight, return) are pinned in the server profile at their defaults. world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
 // world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
 //   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
 // world282: one version for client and relay - the per-feature relay gates are gone, and a welcome naming another
@@ -2867,6 +2868,9 @@ export function badged(row, from) {
   // WITCH1: AND THE PROFILE ICON WORN, by the aura's law - off the verified token alone, one of the known or nothing
   const pi = from?.pi;
   if (typeof pi === 'string' && ICONS.includes(pi)) row.pi = pi;
+  // SEASON1 part two (Seats-Arc 9.1): AND A SEASON'S BANNER RIBBON, by the same law - off the verified token alone, two
+  // of the sixteen colours or nothing
+  if (ribbonClaimOk(from?.rb)) row.rb = from.rb;
   // LEGACY7 part two: AND THE HOUSE, by the same law - read off the verified token, absent for a character of no line
   // (net/houseLaw.js: `hn`, and `hc`, `hb`, `hg` beside it)
   const house = readHouse(from);
@@ -2888,6 +2892,9 @@ export const readAura = (row) => (typeof row?.au === 'string' && AURAS.includes(
 /** WITCH1: the profile icon a row carries, as a client reads it back - `badged`'s other half; null for none (the face),
  *  and for a word the vocabulary does not hold (a stranger's word about themselves). */
 export const readIcon = (row) => (typeof row?.pi === 'string' && ICONS.includes(row.pi) ? row.pi : null);
+/** SEASON1 part two: the banner ribbon a row carries, as a client reads it back - `badged`'s other half; null for none,
+ *  and for anything but two of the sixteen colours (a stranger's word about themselves). */
+export const readRibbon = (row) => (ribbonClaimOk(row?.rb) ? row.rb : null);
 
 /** ═══ AND THE INVERSE, because a reader is half of a field ════════
  *
@@ -3436,7 +3443,7 @@ export function validTravellerFrame(m) {
   const p = m.p === null ? null : validTravellerMark(m.p);
   if (m.p !== null && !p) return null;
   const words = p ? (validTravWords(m, p) ?? {}) : {};
-  return { t: 'trav', id, name: sanitizeName(m.name), sub: idOf(m.sub), p, ...words, ...readBadge(m), lv: readRenown(m), gt: readGuildTag(m) };   // OVERWORLD NAMES: and the Renown and the guild's tag the relay stamps (badged) - the name as it reads in play
+  return { t: 'trav', id, name: sanitizeName(m.name), sub: idOf(m.sub), p, ...words, ...readBadge(m), lv: readRenown(m), gt: readGuildTag(m), rb: readRibbon(m) };   // OVERWORLD NAMES: and the Renown and the guild's tag the relay stamps (badged) - the name as it reads in play; AUDIT-SEATS: and a Season's banner ribbon
 }
 
 /** QUEST1: a quest shared by a party member, from the hub ({t:'quest', acct, name, quest:{questName, displayName,
@@ -4601,7 +4608,8 @@ export function validGateIn(m) {
 
 /** What a client says to a siege's room: `in` (a fighter enters), `blow` (a weapon's on another fighter - `to` its peer
  *  id, `w` the template held or -1 a fist, `m` its material, `d` the damage claimed, `r` melee 0 or a shaft 1), `cast` (a
- *  spell's on another - `h` 1 a heal). */
+ *  spell's on another - `h` 1 a heal). SEAT2b part two (b): a blow's `to` may name a work instead - the Gatehouse `gh`,
+ *  the Ram `rm` (net/siege/siegeRef.js SIEGE_WORK_IDS: two letters, never a peer's id); a blow's alone. */
 export const SIEGE_KINDS = Object.freeze(['in', 'blow', 'cast', 'ask', 'yes']);   // CROWN1 part two: a Royal Tourney's challenge (`ask` - `to` the one challenged) and its accept (`yes` - `to` the challenger)
 /** What the room says back: `st` (every fighter's vitality), `hp` (one fighter's), `fell`, `up` (a fighter rose at its
  *  wave), `back` (a step refused - the last good pose), `no` (a refusal in words); SEAT2a's battle: `f` (the field each
@@ -4623,7 +4631,9 @@ export const SIEGE_IN_MS = 3000;
 export function validSiegeIn(m) {
   if (!m || typeof m !== 'object' || !SIEGE_KINDS.includes(m.k)) return null;
   if (m.k === 'in') return { k: 'in' };
-  if (typeof m.to !== 'string' || !ID_RE.test(m.to)) return null;
+  const work = m.to === SIEGE_WORK_IDS.gate || m.to === SIEGE_WORK_IDS.ram;   // SEAT2b part two (b): a blow on a work
+  const npc = isSiegeNpcId(m.to) && (m.k === 'blow' || m.k === 'cast');   // SEAT2b part two (c): a blow or a cast on one of the relay's own fighters
+  if (typeof m.to !== 'string' || !(ID_RE.test(m.to) || (work && m.k === 'blow') || npc)) return null;
   if (m.k === 'ask' || m.k === 'yes') return { k: m.k, to: m.to };
   if (!finite(m.d) || m.d <= 0 || m.d > SIEGE_DMG_WIRE_MAX) return null;
   if (m.k === 'cast') return { k: 'cast', to: m.to, d: m.d, h: m.h === 1 ? 1 : 0 };
@@ -4639,6 +4649,9 @@ export function validSiegeIn(m) {
 export const SIEGE_END_RESULTS = Object.freeze(['attack', 'defend', 'tie', 'forfeit', 'absent']);
 /** The most a roll call names (siegeRef.js SIEGE_FIGHTERS_MAX), the most a field's frame counts in the room. */
 export const SIEGE_ROLL_MAX = 48;
+/** SEAT2b part two (c): the bound on where one of the relay's own fighters stands, room units - a field's own point bound
+ *  (identityToken.js SIEGE_PASS_COORD_MAX) and its leash beyond it. */
+export const SIEGE_NPC_XZ_MAX = 2e9;
 export const SIEGE_ROOM_MAX = 200;
 const SIEGE_RC_RE = /^s1\.[A-Za-z0-9_-]{1,380}\.[A-Za-z0-9_-]{0,128}$/;
 const ROYAL_RC_RE = /^t1\.[A-Za-z0-9_-]{1,380}\.[A-Za-z0-9_-]{0,128}$/;
@@ -4656,6 +4669,7 @@ const siegeCode = (v) => v === 0 || v === 1 || v === 2;
 export function validSiegeOut(m) {
   if (!m || typeof m !== 'object' || !SIEGE_OUT_KINDS.includes(m.k)) return null;
   const isId = (v) => typeof v === 'string' && ID_RE.test(v);
+  const isBody = (v) => isId(v) || isSiegeNpcId(v);   // SEAT2b part two (c): a fighter, or one of the relay's own
   switch (m.k) {
     case 'st': {
       if (!Array.isArray(m.f) || m.f.length > SIEGE_ROLL_MAX) return null;
@@ -4667,8 +4681,9 @@ export function validSiegeOut(m) {
       }
       return { k: 'st', f };
     }
-    case 'hp': return isId(m.id) && siegeHp(m.h) && siegeHp(m.m) && m.h <= m.m ? { k: 'hp', id: m.id, h: m.h, m: m.m } : null;
-    case 'fell': return isId(m.id) && isId(m.by) ? { k: 'fell', id: m.id, by: m.by } : null;
+    case 'hp': return isBody(m.id) && siegeHp(m.h) && siegeHp(m.m) && m.h <= m.m ? { k: 'hp', id: m.id, h: m.h, m: m.m } : null;
+    // SEAT2b part two (c): one of the relay's own felled by a fighter, or a fighter felled by one of them - never one by another
+    case 'fell': return isBody(m.id) && isBody(m.by) && (isId(m.id) || isId(m.by)) ? { k: 'fell', id: m.id, by: m.by } : null;
     case 'up': {
       if (!isId(m.id)) return null;
       if (m.p === undefined) return { k: 'up', id: m.id };
@@ -4678,11 +4693,34 @@ export function validSiegeOut(m) {
     case 'back': { const p = validPose(m.p); return p ? { k: 'back', p } : null; }
     case 'no': return typeof m.m === 'string' && m.m.length > 0 && m.m.length <= 120 ? { k: 'no', m: m.m } : null;
     case 'f': {
-      if (!Array.isArray(m.b) || m.b.length < 3 || m.b.length > 4) return null;
+      // SEAT2b part two (c): a revolt's field (`v` 1) has no banner; every other battle's three or four
+      if (m.v !== undefined && m.v !== 1) return null;
+      if (!Array.isArray(m.b) || (m.v === 1 ? m.b.length !== 0 : m.b.length < 3 || m.b.length > 4)) return null;
       if (!m.b.every((x) => Array.isArray(x) && x.length === 3 && siegeCode(x[0]) && intIn(x[1], 0, 20) && siegeCode(x[2]))) return null;
       if (!intIn(m.th, 0, 180) || !Number.isSafeInteger(m.s) || !Number.isSafeInteger(m.e) || m.e <= m.s) return null;
       if (!Array.isArray(m.n) || m.n.length !== 3 || !m.n.every((v) => intIn(v, 0, SIEGE_ROOM_MAX))) return null;
-      return { k: 'f', b: m.b.map((x) => x.slice()), th: m.th, s: m.s, e: m.e, n: m.n.slice() };
+      // SEAT2b part two (b): a siege's works - the Gatehouse `[vitality, whole]`, the Ram `[vitality, whole, charge,
+      // left]`, the Walls' tier (net/siege/siegeRef.js siegeFieldFrame)
+      const gateMax = siegeGateVitality(SIEGE_WORK_TIER_MAX), ramMax = siegeRamVitality(true);
+      if (m.g !== undefined && !(Array.isArray(m.g) && m.g.length === 2 && intIn(m.g[0], 0, gateMax) && intIn(m.g[1], 1, gateMax) && m.g[0] <= m.g[1])) return null;
+      if (m.r !== undefined && !(Array.isArray(m.r) && m.r.length === 4 && intIn(m.r[0], 0, ramMax) && intIn(m.r[1], 0, ramMax) && m.r[0] <= m.r[1]
+        && intIn(m.r[2], 0, 10) && intIn(m.r[3], 0, SIEGE_RAMS_MAX))) return null;
+      if (m.w !== undefined && !intIn(m.w, 1, SIEGE_WORK_TIER_MAX)) return null;
+      // SEAT2b part two (c): the relay's own fighters - `[id, kind, vitality, whole, x, z, tx, tz, down, blow's landing]`
+      // (net/siege/siegeRef.js siegeFieldFrame), each id once
+      if (m.np !== undefined) {
+        if (!Array.isArray(m.np) || m.np.length > SIEGE_NPC_MAX) return null;
+        const ids = new Set();
+        for (const r of m.np) {
+          if (!Array.isArray(r) || r.length !== 10 || !isSiegeNpcId(r[0]) || ids.has(r[0]) || !intIn(r[1], 1, SIEGE_NPC_KINDS.length - 1)) return null;
+          if (!siegeHp(r[2]) || !intIn(r[3], 1, 1000) || r[2] > r[3] || !r.slice(4, 8).every((v) => intIn(v, -SIEGE_NPC_XZ_MAX, SIEGE_NPC_XZ_MAX))) return null;
+          if ((r[8] !== 0 && r[8] !== 1) || !(r[9] === 0 || (Number.isSafeInteger(r[9]) && r[9] > 0))) return null;
+          ids.add(r[0]);
+        }
+      }
+      return { k: 'f', b: m.b.map((x) => x.slice()), th: m.th, s: m.s, e: m.e, n: m.n.slice(),
+        ...(m.g !== undefined ? { g: m.g.slice() } : {}), ...(m.r !== undefined ? { r: m.r.slice() } : {}), ...(m.w !== undefined ? { w: m.w } : {}),
+        ...(m.v === 1 ? { v: 1 } : {}), ...(m.np !== undefined ? { np: m.np.map((r) => r.slice()) } : {}) };
     }
     case 'end': {
       if (!SIEGE_END_RESULTS.includes(m.r) || (m.a !== 0 && m.a !== 1)) return null;

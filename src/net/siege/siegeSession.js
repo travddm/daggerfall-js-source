@@ -19,7 +19,7 @@
 // only while it is this session's own. C3 - an unsettled field is said ONCE and asked again on a backing-off wait (5 s,
 // 10, 20, 40, then every 60 s), so the service's hourly bound on passes is never reached. C7 - every settling answer to
 // this fighter's receipt reaches the card (a refusal in words), so it never stands on "claim it".
-import { siegeRoomKey } from './siegeRef.js';
+import { siegeRoomKey, fieldOf, SIEGE_WORK_IDS, SIEGE_NPC, isSiegeNpcId } from './siegeRef.js';   // SEAT2b part two (b): the works' point and ids; part two (c): the relay's own fighters
 import { foldSiege, siegeHudModel, siegeClaimRefusal, SIEGE_STATE_EMPTY, fightArmed } from './siegeLink.js';   // HERALDRY-SHOWN: fightArmed, the HUD's two sides' heraldry
 import { readSiegeReceipt } from './siegeReceipt.js';
 
@@ -44,6 +44,10 @@ export const SIEGE_SESSION_TEXT = Object.freeze({
   refused: (why) => `The battle would not have you: ${why}`,
   away: (town) => `You have left ${town}, and the battle with it.`,   // AUDIT-SEATS C1
   closed: 'The connection to the battle closed. You have left it.',   // AUDIT-SEATS C1: its socket closed for good
+  breach: (town) => `The Gatehouse of ${town} is breached.`,   // SEAT2b part two (b)
+  ramDown: 'A Ram is destroyed at the gate.',   // SEAT2b part two (b)
+  captainDown: 'The Rebel Captain falls at the palace door!',   // SEAT2b part two (c)
+  struckBy: (kind) => (kind === 'guard' ? 'A town guard cuts you down.' : kind === 'captain' ? 'The Rebel Captain cuts you down.' : 'A rebel cuts you down.'),
 });
 
 /**
@@ -103,10 +107,19 @@ export function createSiegeSession({ online, pass, claims = null, hud = null, no
       if (!quiet) say(words);
       return true;
     },
-    /** A word from the battle's room (net/online.js onSiege). */
+    /** A word from the battle's room (net/online.js onSiege). SEAT2b part two (b): a breach and a Ram's end said once,
+     *  off the field's frames. */
     onSiege(g, room) {
       if (!s || room !== s.room) return;
+      const was = s.state;
       s.state = foldSiege(s.state, g, nowMs());
+      if (g.k === 'f') {
+        if (was.gate && was.gate[0] > 0 && s.state.gate && s.state.gate[0] === 0) say(SIEGE_SESSION_TEXT.breach(s.seat?.name ?? 'the town'));
+        else if (was.ram && was.ram[0] > 0 && s.state.gate?.[0] > 0 && !(s.state.ram && s.state.ram[1] > 0)) say(SIEGE_SESSION_TEXT.ramDown);
+      }
+      // SEAT2b part two (c): the Captain's fall, and this fighter cut down by one of the relay's own - said once
+      if (g.k === 'fell' && isSiegeNpcId(g.id) && was.npcs.find((n) => n.id === g.id)?.kind === 'captain') say(SIEGE_SESSION_TEXT.captainDown);
+      if (g.k === 'fell' && g.id === online.id && isSiegeNpcId(g.by)) say(SIEGE_SESSION_TEXT.struckBy(was.npcs.find((n) => n.id === g.by)?.kind));
       if (g.k === 'back') movePlayer(g.p);
       if (g.k === 'up' && g.id === online.id && g.p) movePlayer(g.p);
       if (g.k === 'no') say(g.m);
@@ -141,14 +154,19 @@ export function createSiegeSession({ online, pass, claims = null, hud = null, no
       hud?.update(siegeHudModel(s.state, { seat: s.seat?.name, kind: s.battle?.kind, tier: s.battle?.tier, attacker: s.battle?.attackerGuild, defender: s.battle?.defenderGuild }, online.id, now,
         { watching: s.side === 'watch', honours: s.honours, claimable: !!s.state.receipt && s.honours === undefined }));
     },
-    /** Whether a peer is this fighter's foe (a fighter of the other side). */
+    /** Whether a peer is this fighter's foe (a fighter of the other side). SEAT2b part two (c): or one of the relay's own
+     *  fighting for the other side, standing (a guard an attacker's foe, a rebel and the Captain a defender's). */
     isFoe(id) {
       if (!s || s.side === 'watch') return false;
+      if (isSiegeNpcId(id)) { const n = s.state.npcs.find((x) => x.id === id); return !!n && !n.down && !!SIEGE_NPC[n.kind] && SIEGE_NPC[n.kind].side !== s.side; }
       const f = s.state.roll[id];
       return !!f && !!f.side && f.side !== s.side && !f.down;
     },
     /** The peers this fighter may strike. */
-    foes() { return s && s.side !== 'watch' ? Object.keys(s.state.roll).filter((id) => api.isFoe(id)) : []; },
+    foes() { return s && s.side !== 'watch' ? [...Object.keys(s.state.roll), ...s.state.npcs.map((n) => n.id)].filter((id) => api.isFoe(id)) : []; },
+    /** SEAT2b part two (c): the relay's own fighters as the field last said them (net/siege/siegeLink.js SiegeNpc) - none outside a
+     *  battle. */
+    npcs() { return s ? s.state.npcs : []; },
     /** AUDIT-SEATS G5: the side-mates standing this fighter may heal (not itself - a self-heal is the save's own). */
     mates() { return s && s.side !== 'watch' ? Object.keys(s.state.roll).filter((id) => id !== online.id && s.state.roll[id].side === s.side && !s.state.roll[id].down) : []; },
     /** A blow on a foe, to the referee (net/wire.js validSiegeIn's `blow`). True when it left. */
@@ -156,10 +174,24 @@ export function createSiegeSession({ online, pass, claims = null, hud = null, no
     /** A cast on a peer - a harmful one on a foe, a heal on a side-mate. */
     cast(to, d, heal = false) {
       if (!s || s.side === 'watch') return false;
+      if (isSiegeNpcId(to)) return !heal && api.isFoe(to) && online.sendSiege({ k: 'cast', to, d, h: 0 });   // SEAT2b part two (c): no heal reaches one
       const f = s.state.roll[to];
       if (!f || (heal ? f.side !== s.side : !api.isFoe(to))) return false;
       return online.sendSiege({ k: 'cast', to, d, h: heal ? 1 : 0 });
     },
+    /** SEAT2b part two (b) (6.2): THE WORK THIS FIGHTER MAY STRIKE - an attacker the Gatehouse (`gh`) while it stands
+     *  unbreached, a defender the Ram (`rm`) while one stands before it - or null (a spectator, a battle without, a relay
+     *  that says no works: an older one never hears a work named). */
+    workTarget() {
+      if (!s || s.side === 'watch' || !s.state.gate || !(s.state.gate[0] > 0)) return null;
+      if (s.side === 'attack') return SIEGE_WORK_IDS.gate;
+      return s.side === 'defend' && s.state.ram && s.state.ram[0] > 0 ? SIEGE_WORK_IDS.ram : null;
+    },
+    /** SEAT2b part two (b): where the works stand - the Gatehouse (and its Ram) at the Throne's point, `[x, z]` in the
+     *  room's units, off the field this game derived (the one the service settled where it agreed) - or null. */
+    workPoint() { return s ? (fieldOf(s.field, s.battle?.tier ?? 'palace')?.throne ?? null) : null; },
+    /** SEAT2b part two (b): a melee blow on the work this fighter may strike, to the referee. True when it left. */
+    workBlow(to, { w, m, d, r }) { return !!s && to != null && api.workTarget() === to && online.sendSiege({ k: 'blow', to, w, m, d, r }); },
     /** This fighter has fallen (it waits for its wave). */
     down: () => !!s && !!s.state.roll[online.id]?.down,
     /** The state, for the pins. */

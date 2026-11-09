@@ -1,12 +1,12 @@
 // SEASON1 part one: THE SEASONS' LAW - the calendar from the
-// week Season 0 begins (four weeks, then eight), the names, the week a Season ends, the once-a-Season floor,
-// the soft reset's Standing, a Charter title's Season, the Chronicle's line and
+// week Season 0 begins (four weeks, then eight), the names, the week a Season ends, the once-a-Season floor, a Pact to
+// its Season's end, the soft reset's Standing, the Season's titles, a Charter title's Season, the Chronicle's line and
 // the Seat tab's (9.1, 18). Pure: src/net/townSeatLaw.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SEASON_ZERO_WEEKS, SEASON_WEEKS, SEASON_MONTHS, seasonZeroOf, seasonOf, seatSeasonName, seasonEndingAt, seasonFloor, seasonStanding,
-  seasonLine, seatTitleOf, chronicleLine, SIEGE_PAIR_WEEKS, STANDING_START,
+  SEASON_ZERO_WEEKS, SEASON_WEEKS, SEASON_MONTHS, seasonZeroOf, seasonOf, seatSeasonName, seasonEndingAt, seasonFloor, seasonStanding, seasonKeepers,
+  seasonLine, pactUntil, seatTitleOf, seatTitleText, chronicleLine, SIEGE_PAIR_WEEKS, STANDING_START,
 } from '../../src/net/townSeatLaw.js';
 
 const Z = 100;
@@ -43,14 +43,25 @@ test('SEASON1 THE RULES THAT READ IT: the week a Season ends (its last); the onc
   assert.equal(seasonEndingAt(Z + 11, null), null);
   assert.deepEqual([seasonFloor(Z + 11, Z), seasonFloor(Z + 12, Z), seasonFloor(Z + 2, Z)], [Z + 4, Z + 12, Z]);
   assert.deepEqual([seasonFloor(Z + 11, null), seasonFloor(Z - 1, Z)], [Z + 11 - SIEGE_PAIR_WEEKS + 1, Z - 1 - SIEGE_PAIR_WEEKS + 1], 'none counted: the last 8 weeks');
+  assert.deepEqual([pactUntil(Z + 5, Z), pactUntil(Z + 11, Z), pactUntil(Z + 1, Z)], [Z + 12, Z + 12, Z + 4]);
+  assert.deepEqual([pactUntil(13), pactUntil(13, null), pactUntil(Z - 1, Z)], [16, 16, Math.floor((Z - 1) / 8) * 8 + 8], 'none counted: the 8-week block');
   assert.deepEqual([55, 45, 100, 0, 50, 51, 49, 52, 21].map(seasonStanding), [52, 48, 75, 25, 50, 50, 50, 51, 36]);
   assert.equal(STANDING_START, 50);
 });
 
 test('SEASON1 THE SEASON\'S TITLES (9.1): every crown\'s guild "Crowned in Season N", a seat held from the Season\'s first week "Keeper of <Town>, Season N" - a crown both; a seat taken later none; Season 0 crowns no one; a Charter\'s own title carries the Season counted; the words; the Chronicle\'s line; the Seat tab\'s (mutants: the crown; the keeper\'s week; the beta; the order; the Season on the claim; the words)', () => {
   const season = { n: 3, start: 20, end: 28 };
+  const holds = [
+    { key: 5023, guild: 'OA', tier: 'crown', since: 12 }, { key: 3034, guild: 'SH', tier: 'palace', since: 20 },
+    { key: 3021, guild: 'DG', tier: 'palace', since: 21 }, { key: 5017, guild: 'IC', tier: 'crown', since: 25 },
+  ];
+  assert.deepEqual(seasonKeepers(season, holds), [{ guild: 'SH', key: 3034 }, { guild: 'OA', key: 5023 }]);
+  assert.deepEqual(seasonKeepers({ n: 0, start: 20, end: 24 }, holds), [], 'Season 0 keeps no one');
+  assert.deepEqual([seasonKeepers(null, holds), seasonKeepers(season, null)], [[], []]);
   assert.deepEqual(seatTitleOf([{ key: 3034, tier: 'palace', region: 34 }], 3), { title: 'warden', ts: [3034, 3] });
   assert.deepEqual(seatTitleOf([{ key: 5023, tier: 'crown', region: 23 }]), { title: 'protector', ts: [5023, 0] }, 'none counted: 0');
+  const place = (k) => (k === 3034 ? { name: 'Alcaire Keep', region: 34 } : null);
+  assert.deepEqual([seatTitleText('crowned', [5023, 3], place), seatTitleText('keeper', [3034, 3], place)], [null, null], 'cut: no words');
   const seat = { key: 3034, name: 'Alcaire Keep', tier: 'palace', region: 34 };
   assert.equal(chronicleLine({ kind: 'season-end', week: 27, data: { guild: { name: 'The Silver Hand', tag: 'SH' }, season: 3, kept: true } }, seat),
     'At the end of the Season of First Seed, the Silver Hand <SH> held Alcaire Keep, as it had the whole Season through.');

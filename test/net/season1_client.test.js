@@ -1,9 +1,11 @@
 // SEASON1 part one: THE SEASON ON THE SEAT TAB - the week
-// of the Season the standings name, above the week's clock; nothing where no Season is counted (9.1).
+// of the Season the standings name, above the week's clock; nothing where no Season is counted; a Season's titles in
+// words on the badge (9.1, 7.4).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';
 import { mountNoticeBoard } from '../../src/ui/noticeWindow.js';
+import { seatTitleText } from '../../src/net/townSeatLaw.js';
 
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const tick = (n = 4) => new Promise((r) => { let i = 0; const go = () => (++i >= n ? r() : setTimeout(go, 0)); setTimeout(go, 0); });
@@ -30,4 +32,6 @@ test('SEASON1 THE SEAT TAB\'S SEASON: the standings\' Season said as its week of
     assert.equal(byClass(host, 'notice-seat-season').length, 0, String(season));
     assert.match(byClass(host, 'notice-seat-week')[0].textContent, /^The Muster/);
   }
+  const place = (k) => (k === ANTICLERE.key ? ANTICLERE : null);
+  assert.deepEqual([seatTitleText('crowned', [5023, 2], place), seatTitleText('keeper', [3021, 2], place), seatTitleText('keeper', [9999, 2], place)], [null, null, null], 'Season titles are cut: the words say nothing for them');
 });

@@ -113,7 +113,7 @@ test('SEAT1a the ignored accounts: three disagreements nobody else shares, insid
   assert.deepEqual([...seatIgnoredAccounts(rows.slice(1), conf, now)], [], 'two is not three');
 });
 
-test('SEAT1a the words and the marks: the Charter, the arrival line, the map\'s line; the ring stone grey, a crown\'s metal, a Free Land\'s green; the kingdom\'s plain banner (none in a Free Land); the week\'s clock (mutants: each word; each colour; the week\'s start and the Reckoning)', () => {
+test('SEAT1a the words and the marks: the Charter, the arrival line, the map\'s line; the ring stone grey, a crown\'s metal, a March\'s two, a Free Land\'s green; the kingdom\'s plain banner (none in a Free Land); the week\'s clock (mutants: each word; each colour; the March\'s pair; the week\'s start and the Reckoning)', () => {
   const pal = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace' };
   const crown = { key: 5023, name: 'Wayrest', region: 23, tier: 'crown' };
   assert.equal(charterName(pal), 'the Charter of Anticlere');
@@ -129,11 +129,11 @@ test('SEAT1a the words and the marks: the Charter, the arrival line, the map\'s 
   assert.equal(FREE_LAND_RING, '#2f8f4e');
   // SEAT1c (
   assert.deepEqual(seatMapMark(crown), { ring: '#8a8a8a', crown: '#b3262e', second: null, fill: null, split: null, siege: false });
-  assert.deepEqual(seatMapMark(pal), { ring: '#8a8a8a', crown: null, second: null, fill: null, split: null, siege: false }, 'Anticlere: no kingdom, no second ring');
+  assert.deepEqual(seatMapMark(pal), { ring: '#8a8a8a', crown: null, second: ['#3b6fd8', '#b3262e'], fill: null, split: null, siege: false }, 'Anticlere: Daggerfall and Wayrest');
   assert.deepEqual(seatMapMark({ region: 26, tier: 'palace' }), { ring: '#8a8a8a', crown: null, second: ['#2f8f4e'], fill: null, split: null, siege: false });
   assert.deepEqual(seatMapMark({ region: 59, tier: 'palace' }), { ring: '#8a8a8a', crown: null, second: null, fill: null, split: null, siege: false });
   assert.deepEqual(seatPlainBanner({ region: 59 }), { field: 'azure', border: 'azure', device: null });
-  assert.equal(seatPlainBanner({ region: 21 }), null, 'no kingdom hangs nothing');
+  assert.deepEqual(seatPlainBanner({ region: 21 }), { field: 'azure', border: 'crimson', device: null });
   assert.equal(seatPlainBanner({ region: 26 }), null, 'a Free Land hangs nothing');
   assert.deepEqual(plainBannerOf({ field: 'gold', border: 'gold', device: null }), { field: 'gold', border: 'gold', device: null });
   assert.equal(plainBannerOf({ field: 'gold', border: 'gold', device: 'wolf' }), null, 'a device is heraldry\'s, not a plain cloth');
@@ -195,7 +195,7 @@ test('SEAT1a the book: open by the service\'s word; the list kept its minutes (a
   assert.equal((await book.strike(8)).ok, false);
 });
 
-test('SEAT1a the map: a seat\'s mark carries its ring, round any hub\'s circle, the names kept clear of it; the ring hollow in stone grey, a Free Land\'s second ring in its green, a crown over a crown seat (mutants: the reach; the ring\'s colour; the second ring; the crown)', () => {
+test('SEAT1a the map: a seat\'s mark carries its ring, round any hub\'s circle, the names kept clear of it; the ring hollow in stone grey, a March\'s second ring in both crowns\' metals, a crown over a crown seat (mutants: the reach; the ring\'s colour; the second ring; the crown)', () => {
   const summary = { mapID: 3021, regionIndex: 21 };
   const seat = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace' };
   const sum = (x, y) => ({ id: y * 1000 + x, mapID: -(y * 1000 + x), regionIndex: 21, mapIndex: 1, locationType: LOCATION_TYPES.TownCity, discovered: true });
@@ -211,9 +211,9 @@ test('SEAT1a the map: a seat\'s mark carries its ring, round any hub\'s circle, 
   assert.ok(markReach(seated) > markReach({ kind: 'town', hub: { capital: false } }));
   const calls = [];
   const ctx = new Proxy({}, { get: (_, k) => (typeof k === 'string' && !['strokeStyle', 'fillStyle', 'lineWidth'].includes(k) ? (...a) => calls.push([k, ...a]) : undefined), set: (_, k, v) => { calls.push(['set', k, v]); return true; } });
-  paintSeatRing(ctx, 10, 20, 7, seatMapMark({ region: 26, tier: 'palace' }));
-  assert.deepEqual(calls.filter((c) => c[0] === 'arc').map((c) => c.slice(1, 4)), [[10, 20, 7], [10, 20, 7 + SEAT_SECOND_PAD]]);
-  assert.deepEqual(calls.filter((c) => c[0] === 'set' && c[1] === 'strokeStyle').map((c) => c[2]), ['#8a8a8a', '#2f8f4e']);
+  paintSeatRing(ctx, 10, 20, 7, seatMapMark(seat));
+  assert.deepEqual(calls.filter((c) => c[0] === 'arc').map((c) => c.slice(1, 4)), [[10, 20, 7], [10, 20, 7 + SEAT_SECOND_PAD], [10, 20, 7 + SEAT_SECOND_PAD]]);
+  assert.deepEqual(calls.filter((c) => c[0] === 'set' && c[1] === 'strokeStyle').map((c) => c[2]), ['#8a8a8a', '#3b6fd8', '#b3262e']);
   assert.equal(calls.filter((c) => c[0] === 'fill').length, 0, 'hollow, and no crown over a palace');
   calls.length = 0;
   paintSeatRing(ctx, 10, 20, 7, seatMapMark({ region: 23, tier: 'crown' }));
@@ -245,11 +245,11 @@ test('SEAT1a the banners: the palace door\'s two, a gate\'s on its town side bes
   // the list: the kingdom's cloth while open, none in a Free Land or shut
   let open = true;
   const built = new Map([['a', { px: 5, py: 6, homeTown: 3021, seatAnchors: [g] }], ['b', { px: 7, py: 8, homeTown: 2626, seatAnchors: [g] }]]);
-  const seats = { 3021: { region: 59 }, 2626: { region: 26 } };
+  const seats = { 3021: { region: 21 }, 2626: { region: 26 } };
   const sb = createSeatBanners({ built: () => built, seatAt: (k) => (open ? seats[k] ?? null : null), translation: () => [100, 0, 200], now: () => 0, version: () => (open ? 1 : 0) });
   const hung = sb.list();
   assert.equal(hung.length, 1, 'Orsinium hangs nothing');
-  assert.deepEqual(hung[0].heraldry, { field: 'azure', border: 'azure', device: null });
+  assert.deepEqual(hung[0].heraldry, { field: 'azure', border: 'crimson', device: null });
   assert.deepEqual(hung[0].top, [100 + g.top[0], g.top[1], 200 + g.top[2]]);
   open = false;
   assert.deepEqual(sb.list(), [], 'shut: none');

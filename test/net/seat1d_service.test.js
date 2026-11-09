@@ -2,15 +2,17 @@
 // each Charter's upkeep (Overreach's share, the crown's scale), puts a short treasury in Neglect and lapses a Charter
 // neglected twice, and reckons every row of Standing; a challenger's influence at a seat in Unrest risen a quarter; the
 // Tithe set once a week and taken across its bailiwick from a sale and a courier's share; the Edicts proclaimed for the
-// coming week and made law (or let fall) at the Turning - Open Gates' homes, the Bounty's camps.
+// coming week and made law (or let fall) at the Turning - Open Gates' homes, the Levy's stockpile, the Bounty's camps.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 // 7.1-7.3, 7.6; `06-Systems/Online-Arc.md` SEAT1d.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
 import { holdPieces } from '../realmSeat.mjs';   // INT19: a crafted piece in its seller's realm record
-import { MARKS_MAX } from '../../src/net/marksLaw.js';
+import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';
+import { sharedClassicMinutes } from '../../src/net/wire.js';
 import { gameDayAt, gateTimes } from '../../src/net/gate/gateLaw.js';
+import { boulders, nodeKey } from '../../src/net/nodeLaw.js';
 import { saleTax, courierFee, roadPixels, AUCTION_S } from '../../src/net/marketLaw.js';
 import {
   seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S, SEAT_UPKEEP, CROWN_SCALE, EDICTS,
@@ -279,7 +281,7 @@ test('SEAT1d THE EDICTS: proclaimed by an Officer for the coming week, replaced 
   assert.equal((await town(off)).openGates, undefined, 'Open Gates over with its week');
 });
 
-test('SEAT1d THE BOUNTY: a Bounty\'s set-aside escrowed at the Turning pays 20 Drakes a camp cleared in its bailiwick, a camp once a day whoever cleared it, five an account a day, never past the set-aside; what is left goes home at the next Turning (mutants: the escrow; the pay; the caps; the return)', async (t) => {
+test('SEAT1d THE BOUNTY: a Bounty\'s set-aside escrowed at the Turning pays 20 Drakes a camp cleared in its bailiwick, a camp once a day whoever cleared it, five an account a day, never past the set-aside; what is left goes home at the next Turning (mutants: the levy; the stockpile; the bailiwick; the escrow; the pay; the caps; the return)', async (t) => {
   let now = T0 + 3600;
   t.mock.method(Date, 'now', () => now * 1000);
   const { svc, raw, guild, member, treasury, purse, hold, watch, lines, list } = await stood();

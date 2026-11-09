@@ -46,7 +46,7 @@ import { NAV_CELL, NAV_CELLS_PER_BLOCK, tileWeight } from './city/cityNavigation
 import { summed, frontStrip, closeSite, YARD_PAD_M, YARD_TURNS, NO_ROAD_COST } from './merchantYards/merchantYardSites.js';
 import { PORT_SITE_ORDER, portPlaceName, portTownByData } from '../systems/portPlaces.js';
 import { longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';
-import { SEA_RING, seaBears } from '../net/sea/seaRing.js';   // FB1020c BERTH-RING: the ring and the sea's bearing, the coast law's own
+import { SEA_RING, seaBears } from '../net/fortLaw.js';   // FB1020c BERTH-RING: the ring and the sea's bearing, the coast law's own
 
 export { SEA_RING, seaBears };
 
@@ -74,7 +74,7 @@ export const PORT_FOOT = Object.freeze({
 });
 /** The least body of water, cells, that is the sea (never a puddle or a pond) - a body reaching the block grid's edge. */
 export const SEA_CELLS_MIN = 48;
-/** How far the map pixels round the town's are asked for the sea (SEA_RING, net/sea/seaRing.js - FB1020c BERTH-RING: the coast's
+/** How far the map pixels round the town's are asked for the sea (SEA_RING, net/fortLaw.js - FB1020c BERTH-RING: the coast's
  *  law's home, which the account Worker bundles), and each ring's weight (the nearest the heavier). */
 export const SEA_RING_WEIGHT = Object.freeze([0, 2, 1]);
 /** Off the seaward edge's middle: a cell of distance for every LATERAL_K^-1 cells along it. */

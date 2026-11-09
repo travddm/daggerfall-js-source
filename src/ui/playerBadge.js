@@ -80,7 +80,7 @@ export const TITLE_TEXT = Object.freeze({
   hierophant: 'Hierophant',
   gatebreaker: 'Gatebreaker',        // WB9g: the Sigil Broker's, bought
   herald: 'Herald',                  // HERALD: the Patreon tier between Disciple and Hierophant
-  // SEAT1c (Seats-Arc 7.4): the seats' three - each worded off its claim where this client knows the place
+  // SEAT1c (Seats-Arc 7.4): the seats' five - each worded off its claim where this client knows the place
   // (townSeatLaw.js seatTitleText: "Warden of Anticlere"), and these words alone where it does not
   warden: 'Warden',
   protector: 'Protector',

@@ -108,8 +108,7 @@ test('SEAT1b THE CAPS\' ARITHMETIC: each source at its own cap, then 2,000 an ac
   assert.equal(accountSeatInfluence({ renownXp: 60000 }), RENOWN_WEEK_CAP);
   assert.equal(accountSeatInfluence({ renownXp: 39 }), 1, '1 per 20 XP, rounded down');
   assert.equal(accountSeatInfluence({ homeDays: 7 }), 175);
-  assert.equal(accountSeatInfluence({ writ: 900 }), 900);
-  assert.equal(accountSeatInfluence({ watch: 420, gates: 3, renownXp: 8000, homeDays: 7, writ: 900 }), ACCOUNT_SEAT_WEEK_CAP);
+  assert.equal(accountSeatInfluence({ watch: 420, gates: 3, renownXp: 8000, homeDays: 7, hunt: 250 }), ACCOUNT_SEAT_WEEK_CAP);
   assert.equal(accountSeatInfluence({ watch: -5 }), 0);
   assert.equal(tributeRoom(400), 100, 'a quarter of the rest is a fifth of the whole');
   assert.equal(tributeRoom(400, 60), 40);
@@ -335,7 +334,7 @@ test('SEAT1b THE HOSTS BY SOURCE: the relay ticks in its pose arm and nowhere el
   assert.match(w, /      seats: townSeats,   \/\/ DOMAIN1 \(HOST-SPLIT\)/);
   const seatPixelAt = seatPixelTest({ list: [{ pixel: [402, 151] }, { pixel: [7, 9] }] });
   assert.deepEqual([seatPixelAt(402, 151), seatPixelAt(7, 9), seatPixelAt(151, 402), seatPixelAt(402, 152), seatPixelTest(null)(0, 0)], [true, true, false, false, false]);
-  assert.match(w, /seat: seatAt \? \{ seat: seatAt, book: seatBook, nameOf: \(k\) => seatAtMapId\(townSeats, k\)\?\.name \?\? null } : null,/);
+  assert.match(w, /seat: seatAt \? \{ seat: seatAt, book: seatBook, nameOf: \(k\) => seatAtMapId\(townSeats, k\)\?\.name \?\? null, port: coastalAt\(town\.px, town\.py, seaPixel, csaIsPortTown\(town\.px, town\.py\)\), countName: materialCountLabel \} : null,/);   // SEAT2b: and whether DFU names the town a port, the works' material words
   assert.match(w, /const seatAt = seatHere\(town\.mapId\);/);
   // own province's (scenes/gate/gateSeat.js gateSeatRegion), named where there is one
   assert.match(w, /const character = characterIdOf\(playerEntity\);\n[^\n]*\n\s*return region != null \? \{ region, character \} : character \? \{ character \} : null;/);

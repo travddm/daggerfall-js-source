@@ -1,5 +1,5 @@
 // CROWN1 part one: THE CROWN TIER, AS THE SERVICE KEEPS IT -
-// a crown's reach in the standings and at the Turning, the Free Lands' Watch; the Conscription Edict
+// a crown's reach in the standings and at the Turning, the Marches' share, the Free Lands' Watch; the Conscription Edict
 // proclaimed at a crown alone, made law at the Turning and paid at the next out of the kingdom's palace holders' Tithe,
 // each paying seat's Standing -5. Driven through the real Worker over node:sqlite with every migration applied
 // (test/accountDb.mjs). 4.3, 7.6; `06-Systems/Online-Arc.md` CROWN1.
@@ -9,7 +9,7 @@ import { standService, T0 } from '../accountDb.mjs';
 import { utcDay } from '../../src/net/marksLaw.js';
 import { seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S } from '../../src/net/townSeatLaw.js';
 
-const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };   // no kingdom's
+const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };   // a March: Daggerfall's and Wayrest's
 const ALCAIRE = { key: 3034, name: 'Alcaire Keep', region: 34, tier: 'palace', pixel: [520, 130] };  // Wayrest's
 const YKALON = { key: 3040, name: 'Ykalon', region: 40, tier: 'palace', pixel: [560, 100] };          // Wayrest's
 const TULUNE = { key: 3058, name: 'Tulune', region: 58, tier: 'palace', pixel: [150, 120] };         // Daggerfall's
@@ -57,7 +57,7 @@ async function stood() {
   return { svc, raw, guild, credit, hold, held, pledge, watch, lines, chronicle, standings, list };
 }
 
-test('CROWN1 REACH IN THE STANDINGS (4.3): a crown\'s holder a quarter more at its kingdom\'s palace seat, nothing at another kingdom\'s; a Free Land\'s Watch a tenth more for everyone (mutants: the crowns read; the seat\'s tier; the Free Land)', async (t) => {
+test('CROWN1 REACH IN THE STANDINGS (4.3): a crown\'s holder a quarter more at its kingdom\'s palace seat, an eighth at a March it claims, nothing at another kingdom\'s; a Free Land\'s Watch a tenth more for everyone (mutants: the crowns read; the seat\'s tier; the Free Land)', async (t) => {
   t.mock.method(Date, 'now', () => T0 * 1000);
   const { guild, hold, pledge, watch, standings } = await stood();
   const oa = await guild('Orla', 'The Oath', 'OA');      // holds Wayrest's crown
@@ -68,7 +68,7 @@ test('CROWN1 REACH IN THE STANDINGS (4.3): a crown\'s holder a quarter more at i
   }
   const at = async (seat) => Object.fromEntries((await standings(pl.gm, seat)).standings.map((s) => [s.guild.tag, s.influence]));
   assert.deepEqual(await at(ALCAIRE), { OA: 1250, PL: 1000 }, 'Wayrest\'s own palace: a quarter more');
-  assert.deepEqual(await at(ANTICLERE), { OA: 1000, PL: 1000 }, 'in no kingdom: no reach');
+  assert.deepEqual(await at(ANTICLERE), { OA: 1125, PL: 1000 }, 'a March Wayrest claims: an eighth');
   assert.deepEqual(await at(TULUNE), { OA: 1000, PL: 1000 }, 'Daggerfall\'s: no reach');
   assert.deepEqual(await at(ORSINIUM), { OA: 1100, PL: 1100 }, 'a Free Land: no crown\'s reach, every guild\'s Watch a tenth more');
 });
@@ -92,7 +92,7 @@ test('CROWN1 REACH AT THE TURNING (5.2 step 1): 4,900 of a crown\'s holder at it
   assert.equal(held(TULUNE.key), null, '4,900 alone is short of 6,000');
 });
 
-test('CROWN1 CONSCRIPTION (7.6): proclaimed at a crown alone (a palace refused), made law at the Turning at no cost; at the next the kingdom\'s palace holders pay the crown their share of the week\'s Tithe - 2% - each paying seat Standing -5, the Chronicle saying so at both ends; the crown\'s own palace pays nothing (mutants: the tier gate; the Tithe\'s week; the share; the transfer; the Standing; the rows)', async (t) => {
+test('CROWN1 CONSCRIPTION (7.6): proclaimed at a crown alone (a palace refused), made law at the Turning at no cost; at the next the kingdom\'s palace holders pay the crown their share of the week\'s Tithe - 2% at its own, 1% at a March it claims - each paying seat Standing -5, the Chronicle saying so at both ends; the crown\'s own palace pays nothing (mutants: the tier gate; the Tithe\'s week; the share; the transfer; the Standing; the rows)', async (t) => {
   let now = T0;
   t.mock.method(Date, 'now', () => now * 1000);
   const { svc, raw, guild, credit, hold, held, watch, lines, chronicle, list } = await stood();
@@ -122,16 +122,16 @@ test('CROWN1 CONSCRIPTION (7.6): proclaimed at a crown alone (a palace refused),
   credit(sh.gid, 50000, 'tithe', turning(W) - DAY);
   now = AFTER(W + 1);
   await list(oa.gm);
-  // 20,000 over its two Charters: Alcaire 2% of 10,000; Anticlere is no kingdom's and pays none
-  assert.deepEqual(lines('conscription'), [['guild', sh.gid, 'guild', oa.gid, 200]]);
-  assert.deepEqual([held(ALCAIRE.key).standing, held(ANTICLERE.key).standing], [55, 60], 'unchallenged +5, Alcaire conscripted -5, Anticlere not');
+  // 20,000 over its two Charters: Alcaire 2% of 10,000 and Anticlere 1% of it
+  assert.deepEqual(lines('conscription'), [['guild', sh.gid, 'guild', oa.gid, 300]]);
+  assert.deepEqual([held(ALCAIRE.key).standing, held(ANTICLERE.key).standing], [55, 55], 'unchallenged +5, conscripted -5');
   assert.equal(chronicle(ALCAIRE.key).filter((k) => k === 'conscripted').length, 1);
-  assert.equal(chronicle(ANTICLERE.key).filter((k) => k === 'conscripted').length, 0);
+  assert.equal(chronicle(ANTICLERE.key).filter((k) => k === 'conscripted').length, 1);
   assert.ok(chronicle(WAYREST.key).includes('conscription'));
   assert.equal(held(YKALON.key).standing, 60, 'no Tithe taken, nothing paid: not conscripted (+5 unchallenged twice)');
   assert.ok(!chronicle(YKALON.key).includes('conscripted'));
   const row = JSON.parse(raw.prepare("SELECT data FROM town_seat_history WHERE key = ? AND kind = 'conscripted'").get(ALCAIRE.key).data);
-  assert.deepEqual([row.guild.tag, row.crown.tag, row.marks], ['SH', 'OA', 200]);
+  assert.deepEqual([row.guild.tag, row.crown.tag, row.marks], ['SH', 'OA', 300]);
   // the week after, no Conscription rules: nothing paid, the Standing back to its own rows
   credit(sh.gid, 20000, 'tithe', turning(W + 1) + DAY);
   for (const seat of [WAYREST, ALCAIRE, ANTICLERE, YKALON]) await watch(own(seat), seat, 100, W + 2);
