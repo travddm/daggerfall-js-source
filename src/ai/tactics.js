@@ -267,7 +267,7 @@ export function poiseTrack(ai) {
 }
 /** TELL1: is this entity staggered now (on the brain's clock)? */
 export const staggeredNow = (ent, now = clock()) => Number.isFinite(ent?.staggerUntil) && now < ent.staggerUntil;
-// TELL1: a staggered foe takes a quarter more from every blow, with the opening-damage row on (opening-damage.ts) - the
+// A staggered foe takes a quarter more from every blow, with the opening-damage row on (opening-damage.ts) - the
 // formulas' tail and a spell's landing read this
 registerBlowTakenMod('tell-stagger', (attacker, target) => (staggeredNow(target) && openingDamageOn() ? TELL.STAGGER_TAKEN : 1));
 
@@ -279,7 +279,7 @@ export function overreachOpen(ai) {
 }
 /** TELL4: is this entity overreached now (on the brain's clock)? */
 export const overreachedNow = (ent, now = clock()) => Number.isFinite(ent?.overreachUntil) && now < ent.overreachUntil;
-// TELL4: an overreached foe takes 30% more from every blow, with the opening-damage row on - the stagger's registry
+// An overreached foe takes 30% more from every blow, with the opening-damage row on - the stagger's registry
 registerBlowTakenMod('tell-overreach', (attacker, target) => (overreachedNow(target) && openingDamageOn() ? TELL.PUNISH_TAKEN : 1));
 /** TELL4: its blow missed me (`perfect`: my feet were inside it TELL_LATE before the landing) - OVERREACHED for
  *  `punishSeconds`: locked as a stagger locks (the motor's CanAct), its swing's follow-through standing (the sprite's
