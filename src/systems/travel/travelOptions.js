@@ -50,7 +50,7 @@ import {
   playerOnPathAt, pathsDataPoint, roadsDataPoint, nextPathDirection,
 } from './travelPaths.js';
 import { TravelAutopilot, rectOf, rectMinMax, rectContains, rectCentre, ARRIVAL_BUFFER } from './travelAutopilot.js';
-import { TOWN_PACE_MAX } from './townWalk.js';   // OW-TOWN-WALK: a town's streets walked at a town's pace
+import { TOWN_PACE_MAX, startTownRoute, townWatched, walksTown } from './townWalk.js';   // OW-TOWN-WALK: a town's streets walked at a town's pace
 import { TRAVEL_OPTIONS_TEXT as T, TRAVEL_NAV_TEXT, format, localize } from './travelOptionsText.js';
 import { hasPortFor } from './travelPorts.js';   // SEAT2b part two: HasPort, or a members' Harbour at a seat
 import { FATIGUE_MULTIPLIER } from '../statMods.js';
@@ -561,7 +561,7 @@ export function createTravelOptions(deps = {}) {
   function beginTravel(summary, speedCautious = false, estimateMinutes = null) {
     const name = deps.localizedLocationName?.(summary) ?? summary?.name ?? null;
     if (name == null) throw new Error('TravelOptions: destination not found!');   // :472
-    st.route = null;   // TV2: a journey of the mod's replaces the view's
+    st.route = startTownRoute(summary, deps.townKey?.(pos()));   // TV2: a journey of the mod's replaces the view's; begun in a town, it walks that town's streets first
     st.destinationName = name;
     ui?.setDestinationName(name);
     st.destinationSummary = summary;
@@ -679,7 +679,7 @@ export function createTravelOptions(deps = {}) {
     r.townAt = deps.townKey?.(pos()) ?? null;
     const leg = r.legs[Math.min(r.i, r.legs.length - 1)];
     const key = `${r.i}|${r.townAt}`;
-    if (!r.townAt || !deps.townWay || leg?.ring || SEA_LEG_KINDS.includes(leg?.kind) || deps.atSea?.() || r.streetFor === key) return null;
+    if (!r.townAt || !walksTown(r) || !deps.townWay || leg?.ring || SEA_LEG_KINDS.includes(leg?.kind) || deps.atSea?.() || r.streetFor === key) return null;
     if (r.summary && r.i >= r.legs.length - 1 && arrivedAtPlace(r)) return null;   // in the place it is bound for: arrived, not walked across
     r.streetFor = key;
     const aim = routeAim(r);
@@ -1302,7 +1302,7 @@ export function createTravelOptions(deps = {}) {
     let drive = null;
     // OW-TOWN-WALK: A TOWN WALKED INTO on the way (a spot clicked in its square): the leg begun again from the town's edge -
     // its streets first (startRouteLeg's streetRun), at the town's pace
-    if (st.autopilot && st.route && !st.route.street && deps.townKey) {
+    if (st.autopilot && townWatched(st.route) && deps.townKey) {
       const k = deps.townKey(pos());
       if (k !== st.route.townAt) { st.route.townAt = k; if (k) { startRouteLeg(); applyRate(); } else st.route.streetFor = null; }   // AUDIT OW-REVISITED L1-9: left, the town is asked again if walked back into
     }

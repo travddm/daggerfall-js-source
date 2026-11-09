@@ -322,3 +322,20 @@ test('AUDIT OW-REVISITED L1-9: a line of runs is arrived at its end\'s square on
   const lane = new TravelAutopilot({ x: 0, y: 0 }, rectOf(150, 0, 100, 100), 1, { path: [[0, 0], [200, 40]] });
   assert.equal(lane.update({ worldX: 160, worldZ: 50, mapPixelX: 0, mapPixelY: 0 }).arrived, true, 'a lane\'s end square: arrived');
 });
+
+test('a named journey begun inside a town walks that town\'s streets out first, and passes the towns on its way as before (a named start lands inside Daggerfall, by a gate)', () => {
+  const start = mid(500, 250), exit = { x: start.x - 6000, z: start.z };
+  const r = rig({ town: (n) => (Math.abs(n.x - start.x) < 8000 ? '500,250' : null), way: () => ({ pts: [exit], pace: 5 }) });
+  r.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(r.asked.length, 1, 'the town the traveller stands in is asked for its way');
+  assert.equal(r.to.state.route.street.pts.length, 1, 'and its way is the journey\'s first run');
+  assert.deepEqual(r.to.state.autopilot.path.at(-1), [exit.x, exit.z], 'walked to where the way ends');
+  // a town met on the way is not asked for its streets: the steering passes it
+  r.go({ x: mid(499, 250).x, z: mid(499, 250).z });
+  assert.equal(r.asked.length, 1, 'no second way is asked');
+  // begun in the open: the straight walk, no route
+  const open = rig({ town: () => null, way: () => ({ pts: [exit] }) });
+  open.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(open.to.state.route, null, 'no town: no route');
+  assert.equal(open.asked.length, 0);
+});

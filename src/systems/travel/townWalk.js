@@ -314,3 +314,16 @@ export function* townWayCellsSteps(nav, from, to, { maxExpansions = nav.width * 
   }
   return null;
 }
+
+/** A named journey begun inside a town is a route of no legs, so that it walks the town's streets out before the straight
+ *  walk: the straight line from a street or a yard meets the town's walls and gates, and the steering gives it up as stuck
+ *  or blocked (a named start lands by a gate in about one boot of four). Null outside a town: the straight walk as ever. */
+export const startTownRoute = (summary, startTown) =>
+  startTown ? { legs: [], i: 0, summary, point: null, quiet: false, join: null, street: null, streetFor: null, townAt: null, startTown } : null;
+
+/** Whether the town walk watches a route for the towns it enters: not on a street, and not on a route begun in a town,
+ *  which walks that town's streets alone and passes the towns on its way by the steering, as before. */
+export const townWatched = (route) => !!route && !route.street && !route.startTown;
+
+/** Whether the route walks the streets of the town it stands in (`route.townAt`): every town, but for a route begun in a town. */
+export const walksTown = (route) => !route.startTown || route.townAt === route.startTown;
