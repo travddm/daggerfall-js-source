@@ -20,7 +20,7 @@ later mechanical pass renames and reformats them. Do not rename or reformat a fi
 (`tools/check-changed.mjs`). They never touch a file you did not change. CI runs the same three checks on a pull
 request's changed files (the `standards` job in `.github/workflows/check.yml`).
 
-The lint size ratchet (limits on file size, complexity and unused code that may only go down) is described in the
+The lint ratchet (unused-code and `@ts-check` limits that may only go down) is described in the
 lint-ratchet page of [testing/](testing/README.md) once that page has merged.
 
 ## Formatting

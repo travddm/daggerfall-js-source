@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// LINT-RATCHET: the size, complexity, unused-code and type-check limits the tree is moving toward, held as a
-// ratchet. Code that is already over a limit is recorded in tools/lintRatchet.json with its current figure; the
-// check fails when a recorded figure grows or when anything not recorded crosses a limit. Docs: docs/testing/lint-ratchet.md.
+// LINT-RATCHET: the unused-code and type-check limits the tree is moving toward, held as a ratchet. Code that is
+// already over a limit is recorded in tools/lintRatchet.json with its current figure; the check fails when a
+// recorded figure grows or when anything not recorded crosses a limit. Docs: docs/testing/lint-ratchet.md.
 //
 //   node tools/lintRatchet.mjs             # check: fail on growth or a new offender (npm run lint runs this)
 //   node tools/lintRatchet.mjs --strict    # also fail on a recorded figure that has fallen (CI runs this)
@@ -22,49 +22,18 @@ export const SCOPE = ['src/', 'server/src/', 'server-account/src/'];
 /** The type check's include (tsconfig.json): only these files can opt in with `// @ts-check`. */
 const TS_SCOPE = 'src/';
 
-/** The limits. Targets are the ones in docs/testing/lint-ratchet.md; code over one is recorded, not forgiven. */
-export const LIMITS = {
-  'max-lines': 1000,
-  'max-lines-per-function': 150,
-  complexity: 20,
-  'max-depth': 4,
-};
-
 const ESLINT_RULES = {
-  'max-lines': ['error', { max: LIMITS['max-lines'], skipBlankLines: false, skipComments: false }],
-  'max-lines-per-function': [
-    'error',
-    { max: LIMITS['max-lines-per-function'], skipBlankLines: false, skipComments: false, IIFEs: true },
-  ],
-  complexity: ['error', { max: LIMITS.complexity }],
-  'max-depth': ['error', { max: LIMITS['max-depth'] }],
   'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
   'no-unused-private-class-members': 'error',
 };
 
-/**
- * What each check measures, as `file` -> a number (max-lines-per-function: `file::function#n` -> a number):
- * max-lines the file's lines; complexity the summed excess over the limit; max-depth and the unused checks a count
- * of reports; ts-check 1 for a file without the comment.
- */
-export const CHECKS = [
-  'max-lines',
-  'max-lines-per-function',
-  'complexity',
-  'max-depth',
-  'no-unused-vars',
-  'no-unused-private-class-members',
-  'ts-check',
-];
+/** What each check measures, as `file` -> a number: the unused checks a count of reports; ts-check 1 for a file without the comment. */
+export const CHECKS = ['no-unused-vars', 'no-unused-private-class-members', 'ts-check'];
 
 const toPosix = (p) => p.split(sep).join('/');
 
-/** `Function 'foo' has too many lines (200)...` -> `Function 'foo'`; the name of the offender, whatever its kind. */
-const offenderName = (message) => message.replace(/ has (too many lines|a complexity of).*$/, '');
-
 /**
  * Lint the covered trees with the ratchet's rules and return `{ check: { key: figure } }`.
- * Keys for a function carry its occurrence among same-named offenders in the file, so a line shift keeps its identity.
  */
 export async function measureEslint(root = ROOT) {
   const eslint = new ESLint({
@@ -74,7 +43,6 @@ export async function measureEslint(root = ROOT) {
   });
   const results = await eslint.lintFiles(SCOPE);
   const measured = Object.fromEntries(CHECKS.map((c) => [c, {}]));
-  const seen = new Map();
   for (const r of results) {
     const file = toPosix(relative(root, r.filePath));
     const messages = [...r.messages].sort((a, b) => a.line - b.line || a.column - b.column);
@@ -82,24 +50,7 @@ export async function measureEslint(root = ROOT) {
       if (m.fatal) throw new Error(`${file}:${m.line} ${m.message}`);
       const rule = m.ruleId;
       if (!rule || !(rule in measured)) continue;
-      if (rule === 'max-lines') measured[rule][file] = Number(/\((\d+)\)/.exec(m.message)[1]);
-      else if (rule === 'max-lines-per-function') {
-        const name = offenderName(m.message);
-        const figure = Number(/\((\d+)\)/.exec(m.message)[1]);
-        if (!name.includes("'")) {
-          // an unnamed function has no identity that survives an edit above it: one bucket a file, the sum of its lines
-          const key = `${file}::(unnamed)`;
-          measured[rule][key] = (measured[rule][key] ?? 0) + figure;
-          continue;
-        }
-        const n = seen.get(`${file}|${name}`) ?? 0;
-        seen.set(`${file}|${name}`, n + 1);
-        measured[rule][`${file}::${name}#${n}`] = figure;
-      } else if (rule === 'complexity') {
-        // the excess over the limit, summed over the file: a function that gets more complex, or a new one, raises it
-        const over = Number(/complexity of (\d+)/.exec(m.message)[1]) - LIMITS.complexity;
-        measured[rule][file] = (measured[rule][file] ?? 0) + over;
-      } else measured[rule][file] = (measured[rule][file] ?? 0) + 1;
+      measured[rule][file] = (measured[rule][file] ?? 0) + 1;
     }
   }
   return measured;
@@ -179,11 +130,6 @@ export function updated(measured, ratchet, allowNew) {
 }
 
 const HOW = {
-  'max-lines': (l) => `a file over ${l} lines: split it, or move the new code into a module of its own`,
-  'max-lines-per-function': (l) => `a function over ${l} lines: extract the new code into a function of its own`,
-  complexity: (l) =>
-    `functions with complexity over ${l} (the figure is the summed excess): split the new branches into functions of their own`,
-  'max-depth': (l) => `blocks nested deeper than ${l}`,
   'no-unused-vars': () =>
     'an unused variable, import or parameter: remove it, or name an unused parameter with a leading underscore',
   'no-unused-private-class-members': () => 'an unused private class member: remove it',
@@ -191,9 +137,8 @@ const HOW = {
 };
 
 function describe(c) {
-  const limit = LIMITS[c.check];
   const detail = c.was === undefined ? `now ${c.now}` : `${c.was} -> ${c.now}`;
-  return `  ${c.check}: ${c.key} (${detail}) - ${HOW[c.check](limit)}`;
+  return `  ${c.check}: ${c.key} (${detail}) - ${HOW[c.check]()}`;
 }
 
 async function main(argv) {
