@@ -153,9 +153,9 @@ test('SEAT2b ASKED AGAIN: a work the seat may not raise is refused before the ho
 
 test('SEAT2b THE TURNING WIRES THE CAMPS AND THE WEAR: the Turning spends the camps and a Season\'s end wears the works and burns the Rams of a worn-out gate (mutants: the hooks)', () => {
   const src = (f) => readFileSync(new URL('../../server-account/src/' + f, import.meta.url), 'utf8');
-  assert.match(src('seatTurning.js'), /stmts.push(\.\.\.(await campsSpent(db, week, next, plan.rights, (k) => registry.get(k)?.tier ?? 'palace')));/, 'the Turning spends the camps');
-  assert.match(src('seatTurning.js'), /if (!wipe) stmts.push(\.\.\.fortsSeasonStatements(db));/, 'a Season\'s end wears the works');
-  assert.match(src('seatTurning.js'), /if (!wipe) stmts.push(campsWorn(db, next));/, 'and the worn gate\'s Rams');
+  assert.ok(src('seatTurning.js').includes(`stmts.push(...(await campsSpent(db, week, next, plan.rights, (k) => registry.get(k)?.tier ?? 'palace')));`), 'the Turning spends the camps');
+  assert.ok(src('seatTurning.js').includes(`if (!wipe) stmts.push(...fortsSeasonStatements(db));`), 'a Season\'s end wears the works');
+  assert.ok(src('seatTurning.js').includes(`if (!wipe) stmts.push(campsWorn(db, next));`), 'and the worn gate\'s Rams');
 });
 
 test('SEAT2b A SIEGE CAMP PITCHED: the pledged challenger\'s Guildmaster or Officer burns 1,500 Marks from its treasury, once a guild and seat a week; the holder, an unpledged guild, a Member, a short treasury and the option off refused; the same rid twice is one burn, a new rid for the same week is camp-pitched (mutants: the rank; the pledge; the holder; the price; the once-a-week; the rid)', async (t) => {

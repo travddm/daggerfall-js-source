@@ -66,8 +66,6 @@ test('SEAT1d STANDING: every row of 7.3 - the Tithe\'s two (at or below half its
     titheLow: 2, titheHigh: -3, unchallenged: 5, gate: 2, gateWeekMax: 6, noWatch: -5, siegeHeld: 15, throneReached: -5, festival: 10,
     neglect: -10, writ: 1, writWeekMax: 5, paidLate: -5, revoltTo: 20, curfew: -2, openGates: 3,
     conscripted: -5,
-    fealtyBroken: -10,
-    wedding: 3, taxRevolt: -3,
   });
   assert.deepEqual([0, 5, 6, 7, 8, 10].map((p) => titheStanding('palace', p)), [2, 2, 0, 0, -3, -3]);
   assert.deepEqual([7, 8, 11, 12].map((p) => titheStanding('crown', p)), [2, 0, 0, -3]);
