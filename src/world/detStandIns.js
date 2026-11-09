@@ -1,4 +1,4 @@
-// DS1: DET'S PIECES, STOOD IN BY THE PORT.
+// DET'S PIECES, STOOD IN BY THE PORT.
 //
 // Mods that place Ninelan's *Daggerfall Expanded Textures* (DET) 1.2.0
 // pieces need them as a peer dependency. The first of them, a ship mod

@@ -7,7 +7,7 @@
 // decoration"; asked which, the town mods' furnishings first. Beautiful
 // Villages and Beautiful Cities redecorate some 1,400 interiors - coloured
 // beds, paintings, tapestries and banners, rugs, set tables and stocked
-// shelves, a captain's chest; none of it could be set in a house. WD3 kept the catalogue to Daggerfall's
+// shelves, a captain's chest; none of it could be set in a house. The catalogue was kept to Daggerfall's
 // own blocks (systems/decor/decorScan.js reads BLOCKS.BSA past the door), so the
 // mods' pieces would never renumber it nor leave it when a mod went off.
 //

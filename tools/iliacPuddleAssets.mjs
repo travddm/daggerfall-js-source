@@ -24,7 +24,7 @@ import { PNG } from 'pngjs';
 import { isMain } from './lib/isMain.mjs';
 import { readUnityBundle } from '../src/formats/unity/unityBundle.js';
 import { DFPalette } from '../src/formats/dfPalette.js';
-import { classicRecords, findClassicSource } from './lib/classic-source.ts';   // DS1's search: a record within a pixel of the picture's size, at every offset
+import { classicRecords, findClassicSource } from './lib/classic-source.ts';   // the classic-record search: a record within a pixel of the picture's size, at every offset
 
 /** The seven pictures PassiveFishSpeciesCatalog loads, by their bundle names. */
 export const FISH_TEXTURES = Object.freeze(['longnose_butterflyfish', 'largemouth_bass', 'canary_rockfish', 'crucian_carp', 'mackerel', 'white_zebra_angelfish', 'finulon']);

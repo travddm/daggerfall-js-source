@@ -500,7 +500,7 @@ export function getDFBlockReplacementData(block, blockName) {
     if (variant === NO_VARIANT) cacheBlock(blockName, NO_REPLACEMENT);
     return null;
   }
-  // WD1 (a mod's dungeon blocks): the whole DFBlock, RdbBlock and RdiBlock included (:363-369) - the
+  // A mod's dungeon blocks: the whole DFBlock, RdbBlock and RdiBlock included (:363-369) - the
   // AUDIT-RR2 G14 refusal of RDB/RDI files is lifted now that the converters below read both halves
   const dfBlock = blockFromJson(json, block, blockName);
   if (blockName.endsWith('.RMB')) replaceRmbBlockBuildingData(blockName, block, dfBlock);   // :382-384 - RMB blocks only
