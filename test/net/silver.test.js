@@ -10,7 +10,6 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { marksText } from '../../src/net/marksLaw.js';
 import { accountRefusalText } from '../../src/net/accountClient.js';
 import { bountyPaidText } from '../../src/systems/seatEdicts.js';
-import { TIDE_WORDS } from '../../src/net/tideLaw.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -28,13 +27,13 @@ function code(text) {
   return out.join('');
 }
 
-/** Every file that shows the currency to a player - DRAKES' twelve and the seats' seven. */
+/** Every file that shows the currency to a player - DRAKES' twelve and the seats' five. */
 const SHOWN = [
   'src/net/marksLaw.js', 'src/net/marksBook.js', 'src/net/accountClient.js', 'src/scenes/world.js', 'src/ui/bankWindow.js',
   'src/ui/enhanced/enhancedAccount.js', 'src/ui/enhanced/enhancedPorts.js', 'src/ui/marketTab.js', 'src/ui/workTab.js', 'src/ui/noticeWindow.js',
   'src/ui/professions/profPages.js', 'src/ui/socialPanel.js',
-  'src/net/royalLink.js', 'src/net/tideLaw.js', 'src/net/townSeatBook.js', 'src/net/townSeatLaw.js', 'src/systems/seatEdicts.js',
-  'src/ui/seatTab.js', 'src/ui/seatWorks.js',
+  'src/net/royalLink.js', 'src/net/townSeatBook.js', 'src/net/townSeatLaw.js', 'src/systems/seatEdicts.js',
+  'src/ui/seatTab.js',
 ];
 
 /** Where the old name is left on purpose: a CSS comment inside a style sheet's string, and SQL comments in the service's
@@ -51,6 +50,5 @@ test('SILVER a balance reads in silver - the same word for one, none and many (m
   assert.equal(accountRefusalText('marks-rate'), 'You have moved too much silver this hour. Try again later.');
   assert.equal(accountRefusalText('heraldry-drakes'), 'Changing the heraldry costs 500 silver from the guild\'s silver treasury, and it holds less.');
   assert.equal(bountyPaidText(20), 'The Bounty pays you 20 silver for the camp.');
-  assert.equal(TIDE_WORDS.daedra, 'Gate kills give double influence and double silver.');
 });
 
