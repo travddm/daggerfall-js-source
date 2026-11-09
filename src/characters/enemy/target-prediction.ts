@@ -7,6 +7,10 @@ type Vec3 = number[];
 
 /** The EnemyAI fields PredictNextTargetPos reads and writes. Positions are feet space, as on the motor. */
 export type PredictingFoe = {
+  inSight: boolean;
+  _inEarshot: boolean;
+  sightRadius?: number;
+  predictedTargetPos: Vec3 | null;
   lastKnownTargetPos: Vec3 | null;
   oldLastKnownTargetPos: Vec3 | null;
   lastPositionDiff: Vec3;
@@ -27,15 +31,13 @@ export type PredictingFoe = {
  * ResetPlayerPos sentinel - "nothing has ever been seen", which
  * HasClearPathToShootProjectile reads as a refusal (:702-703).
  *
- * :551-560's FIRST arm is the only one reachable here. Both callers
- * of this method sit behind `senses.TargetInSight` (DoRangedAttack's
- * band condition, EnemyMotor.cs:572), so `targetInSight ||...` is
- * true every time and `assumedCurrentPosition` is always
- * lastKnownTargetPos; the else-arm's remembered no-lead prediction
- * belongs to the one caller this port does not have,
- * DaggerfallMissile's mid-flight re-aim. The field it feeds
- * (predictedTargetPosWithoutLead) is still written at :612, because
- * that write is what the arm would read.
+ * :551-560 picks the position the lead starts from (assumedTargetPos).
+ * The two shooting probes sit behind `senses.TargetInSight`, so for
+ * them it is always lastKnownTargetPos; DFU's Enhanced Combat AI also
+ * predicts a target it has lost (the motor's _trackPredictedPos), and
+ * takes the remembered no-lead prediction while that may still be good.
+ * `sightRadius` is the motor's SIGHT_RADIUS, for a foe with no radius
+ * of its own.
  *
  * :563-570 is DFU's arithmetic quirk, kept: targetPosPredictTimer is
  * zero only on the frame the prediction pass itself ran, so every
@@ -44,12 +46,12 @@ export type PredictingFoe = {
  * speed. It also rewrites lastPositionDiff as a side effect, and so
  * does this.
  */
-export function predictNextTargetPos(foe: PredictingFoe, interceptSpeed: number): Vec3 | null {
+export function predictNextTargetPos(foe: PredictingFoe, interceptSpeed: number, sightRadius: number): Vec3 | null {
   if (foe.lastKnownTargetPos === null) return null; // ResetPlayerPos
   if (foe._predictedTargetPosWithoutLead === null) {
     foe._predictedTargetPosWithoutLead = [...foe.lastKnownTargetPos];
   }
-  const assumed = foe.lastKnownTargetPos;
+  const assumed = assumedTargetPos(foe, sightRadius);
   let divisor = CLASSIC_UPDATE_INTERVAL; // predictionInterval (:34) = 0.0625
   let diff = foe.lastPositionDiff;
   if (foe._targetPosPredictTimer !== 0) {
@@ -100,4 +102,33 @@ export function predictNextTargetPos(foe: PredictingFoe, interceptSpeed: number)
   // the motor's feet space.
   foe._predictedTargetPosWithoutLead = [assumed[0] + diff[0], assumed[1] + diff[1], assumed[2] + diff[2]];
   return prediction;
+}
+
+/**
+ * PredictNextTargetPos :551-560, assumedCurrentPosition: the last known position while the target is seen or heard,
+ * while the last prediction lies past sight range, or while a ray toward the no-lead prediction meets nothing;
+ * otherwise the no-lead prediction ("if not aware of target and predicted position may still be good"). The ray meets
+ * only the level here (entities are not in the collider), where DFU's also meets bodies.
+ */
+function assumedTargetPos(foe: PredictingFoe, defaultSightRadius: number): Vec3 {
+  const known = foe.lastKnownTargetPos;
+  const withoutLead = foe._predictedTargetPosWithoutLead;
+  const predicted = foe.predictedTargetPos;
+  if (foe.inSight || foe._inEarshot || !withoutLead || !predicted) return known;
+  const c = foe._centre();
+  const lift = foe._targetCentreOffset();
+  const radius = Number.isFinite(foe.sightRadius) && foe.sightRadius > 0 ? foe.sightRadius : defaultSightRadius;
+  if (Math.hypot(predicted[0] - c[0], predicted[1] + lift - c[1], predicted[2] - c[2]) > radius) return known;
+  const ray = [withoutLead[0] - c[0], withoutLead[1] + lift - c[1], withoutLead[2] - c[2]];
+  const length = Math.hypot(ray[0], ray[1], ray[2]);
+  if (length < 1e-9) return known;
+  const hit = foe.collider.raycast(c, [ray[0] / length, ray[1] / length, ray[2] / length], radius);
+  return Number.isFinite(hit) ? withoutLead : known;
+}
+
+/** EnemySenses.Update :496-501: DFU's Enhanced Combat AI's predicted position, the lead at the foe's own walking speed,
+ *  in the motor's feet space; null while nothing has been seen. */
+export function leadInFeet(foe: PredictingFoe, walkSpeed: number, sightRadius: number): Vec3 | null {
+  const lead = predictNextTargetPos(foe, walkSpeed, sightRadius);
+  return lead ? [lead[0], lead[1] - foe._targetCentreOffset(), lead[2]] : null;
 }

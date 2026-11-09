@@ -1,6 +1,6 @@
-// Enemy senses + pursuit (C8 E2). Verbatim port of the CLASSIC path
-// (EnhancedCombatAI = false) from DFU EnemyMotor.cs / EnemySenses.cs /
-// EnemyAttack.cs (MIT, Daggerfall Workshop):
+// Enemy senses + pursuit (C8 E2). Port of DFU EnemyMotor.cs, EnemySenses.cs and EnemyAttack.cs (MIT, Daggerfall
+// Workshop). EnhancedCombatAI's enhanced side is ported in groups (enhanced-combat-ai.ts); the CLASSIC path
+// (EnhancedCombatAI = false) is verbatim:
 //   - sight = 4096 * MeshReader.GlobalScale, FOV 180, hearing 25
 //   - senses re-evaluate when the classic system timer (dt divided by
 //     0.0549254, the 0x46C memory-timer divisor) accumulates past 5
@@ -83,7 +83,9 @@ export const GIVE_UP_TICKS = 200;   // EnemyMotor.GiveUpTimer refill (classic ti
 import { GRAVITY, FIXED_DT, MAX_FRAME_DT, CLASSIC_TO_UNITY_RATIO, FALL_DAMAGE_THRESHOLD } from '../../player/motor.js';   // the shared fall rule + the P16 fixed-timestep law; CH3: the fall threshold single-sources with the player's
 import { wrapAngle } from '../../world/mat4.js';   // ONCRASH1: the port's one angle wrap, which cannot loop
 import { MOBILE_TYPES } from '../mobile/mobileTypes.js';
-import { predictNextTargetPos } from './target-prediction.ts';   // EnemySenses.PredictNextTargetPos
+import { predictNextTargetPos, leadInFeet } from './target-prediction.ts';   // EnemySenses.PredictNextTargetPos
+import { initEnhancedCombatAI, trackUnarmedRateOfApproach } from './enhanced-combat-ai.ts';   // DFU's Enhanced Combat AI
+export { enhancedCombatAIEnabled } from './enhanced-combat-ai.ts';   // the setting's reader, which the foe pools pass in
 import { coverDistance } from '../../ai/cover.js';   // TACT1: billboards are cover (sight, the clear shot)
 import { groundHit } from '../../player/groundRay.js';   // AUDIT GROUND-BOLT C1: the clear shot meets the terrain, as the shot does
 import { tacticsStep, tacticsNow, breakWindup } from '../../ai/tactics.js';   // TACT2: the tactics brain; TELL1: its clock, for the stagger's end
@@ -265,14 +267,14 @@ export function turnTowards(yaw, dx, dz, maxDeg = CLASSIC_TURN_DEG) {
  * EnemySenses.CanSeeTarget:912-918 records an action door the sight
  * ray strikes first, which is what OpenDoors later consumes.
  */
-export function canSeeTarget(collider, feet, yaw, height, targetFeet, targetHeight = CAPSULE_HEIGHT, blockerOut = null, distIn = null, sightRadius = SIGHT_RADIUS) {
+export function canSeeTarget(collider, feet, yaw, height, targetFeet, targetHeight = CAPSULE_HEIGHT, blockerOut = null, distIn = null, sightRadius = SIGHT_RADIUS, fieldOfView = FIELD_OF_VIEW) {
   const dx = targetFeet[0] - feet[0], dz = targetFeet[2] - feet[2];
   // REVIEW 2026-09-05: the radius gate is distanceToTarget (EnemySenses.cs:881),
   // transform to transform - the caller's own measure when it has one.
   const dist = distIn ?? Math.hypot(dx, (targetFeet[1] + targetHeight / 2) - (feet[1] + height / 2), dz);
   const radius = Number.isFinite(sightRadius) && sightRadius > 0 ? sightRadius : SIGHT_RADIUS;   // CAMP-SIGHT: a per-foe override (wilderness camps), else DFU's own. P13: the S8 half-sight chameleon interim retired - concealment is the illusion gate now
   if (dist >= radius) return false;
-  if (!withinYaw(yaw, dx, dz, FIELD_OF_VIEW / 2)) return false;
+  if (!withinYaw(yaw, dx, dz, fieldOfView / 2)) return false;   // the enhanced AI's 190 (enhanced-combat-ai.ts)
   const eye = [feet[0], feet[1] + height * EYE_FRAC, feet[2]];
   const tEye = [targetFeet[0], targetFeet[1] + targetHeight * EYE_FRAC, targetFeet[2]];
   const ex = tEye[0] - eye[0], ey = tEye[1] - eye[1], ez = tEye[2] - eye[2];
@@ -388,7 +390,7 @@ export const DETOUR_ARRIVAL = 0.3;              // UpdateTimers zeroes the timer
 export const WALK_ARRIVE_M = 0.35;
 
 export class EnemyAI {
-  constructor(collider, feet, yawRad, { liveSpeed = 50, isHostile = true, height = CAPSULE_HEIGHT, seesThroughInvisibility = false, behaviour = 'General', mobileId = -1, waterSurfaceY = null, spawnDistanceType = 0, playerInside = true, isActionDoor = null, rolls = Math.random, hasBowAttack = false, canCastRangedSpell = null, hasMagickaToCast = null, centreOffset = null, vitals = null } = {}) {
+  constructor(collider, feet, yawRad, { liveSpeed = 50, isHostile = true, height = CAPSULE_HEIGHT, seesThroughInvisibility = false, behaviour = 'General', mobileId = -1, waterSurfaceY = null, spawnDistanceType = 0, playerInside = true, isActionDoor = null, rolls = Math.random, hasBowAttack = false, canCastRangedSpell = null, hasMagickaToCast = null, centreOffset = null, vitals = null, enhancedCombatAI } = {}) {
     this.collider = collider;
     /** ObstacleCheck's DaggerfallActionDoor arm (:1167-1176). The AI
      *  cannot resolve a collider bucket key to an action object - the
@@ -456,7 +458,7 @@ export class EnemyAI {
     // cannot; callers that own the entity pass a THUNK over
     // liveStat(entity, 'speed') and the read happens per step.
     this._liveSpeed = typeof liveSpeed === 'function' ? liveSpeed : () => liveSpeed;
-    this.seesThroughInvisibility = seesThroughInvisibility;
+    this.seesThroughInvisibility = seesThroughInvisibility; initEnhancedCombatAI(this, enhancedCombatAI, FIELD_OF_VIEW);   // DFU's Enhanced Combat AI: the pools pass the setting's reader, none is classic (one line: the lint ratchet caps this constructor)
     // MobileUnit.ClassicSpawnDistanceType (the marker's SoundIndex) and
     // PlayerEnterExit.IsPlayerInside - both feed the spawn-band recompute.
     this.spawnDistanceType = spawnDistanceType;
@@ -701,7 +703,7 @@ export class EnemyAI {
     // WORLD3 left unpatched, so the ray to a PEER was aimed at the LOCAL player's live capsule (0.9 crouched) planted
     // on the peer's feet, while _dist beside it already measured the peer's own.
     const _targetHeight = this._targetHeight();
-    this.inSight = canSeeTarget(this.collider, this.feet, this.yaw, this.height, playerFeet, _targetHeight, _blocker, this._dist, this.sightRadius);   // CAMP-SIGHT: undefined = SIGHT_RADIUS   // the sight-radius gate (:881) reads distanceToTarget
+    this.inSight = canSeeTarget(this.collider, this.feet, this.yaw, this.height, playerFeet, _targetHeight, _blocker, this._dist, this.sightRadius, this.fieldOfView);   // CAMP-SIGHT: undefined = SIGHT_RADIUS   // the sight-radius gate (:881) reads distanceToTarget
     this.doorKey = _blocker.key;
     // AUDIT 24 (the re-read): DFU's NON-HOSTILE MODE is a TARGET drop,
     // not an action skip. EnemySenses.Update:321-327 nulls `target`
@@ -729,6 +731,7 @@ export class EnemyAI {
       // It still owes the target-position memory, or a foe driven this way
       // never has a destination at all and HandleNoAction freezes it.
       this.detected = this.inSight || this._dist < HEARING_RADIUS;
+      this._inEarshot = false;   // the no-stealth path keeps no earshot of its own
       if (this.detected) {
         this.lastKnownTargetPos = [playerFeet[0], playerFeet[1], playerFeet[2]];
         this.lastHadLOSTimer = LAST_HAD_LOS_TICKS;
@@ -742,6 +745,7 @@ export class EnemyAI {
     const inEarshot = (this.detected && !this.inSight)
       ? canHearTarget(this.collider, this.feet, this.height, playerFeet, this._dist, this.centreOffset, this._targetCentreOffset())
       : false;
+    this._inEarshot = inEarshot;   // PredictNextTargetPos reads it (target-prediction.ts)
     // AUDIT 24 (wave 35): the TARGET-POSITION MEMORY, which the port did
     // not have at all - EnemySenses.cs:451-495. Sight or earshot writes
     // the live position and refills lastHadLOSTimer; a bare STEALTH
@@ -785,7 +789,8 @@ export class EnemyAI {
     // !EnhancedCombatAI` is true every pass, and PredictNextTargetPos is
     // called only inside the Enhanced guard at :496-501. So the port has
     // no lead prediction to write, and that is verbatim, not a gap.
-    this.predictedTargetPos = this.lastKnownTargetPos;
+    // DFU's Enhanced Combat AI keeps its prediction between passes and seeds it only while it is still ResetPlayerPos.
+    if (!this.enhancedCombatAI || this.predictedTargetPos === null) this.predictedTargetPos = this.lastKnownTargetPos;
     // :479-495, gated on targetPosPredict - a 0.0625s timer, which is the
     // classic-update interval; the port folds it onto the classic tick.
     // The DIFFERENCE is only taken across two CONSECUTIVE prediction
@@ -806,6 +811,8 @@ export class EnemyAI {
       } else {
         this.awareOfTargetForLastPrediction = false;
       }
+      // :496-501, sight or not: DFU's Enhanced Combat AI leads its target at its own walking speed
+      if (this.enhancedCombatAI) this.predictedTargetPos = leadInFeet(this, this.speed, SIGHT_RADIUS) ?? this.predictedTargetPos;
     }
   }
 
@@ -923,12 +930,15 @@ export class EnemyAI {
   /** The controller CENTRE - DFU's `transform.position` for a
    *  CharacterController, which every probe below is written from. The
    *  port stores FEET. */
+  /** DFU's Enhanced Combat AI setting, read whenever it is asked, as DFU reads it every frame. */
+  get enhancedCombatAI() { return this._enhancedCombatAIOn() === true; }
+
   _centre() { return [this.feet[0], this.feet[1] + this.centreOffset, this.feet[2]]; }   // transform.position (REVIEW 2026-09-05: centreOffset, not height/2)
 
   /** EnemySenses.PredictNextTargetPos (:541-616): the lead on the target, in centre space, or null for
    *  ResetPlayerPos (characters/enemy/target-prediction.ts). */
   predictNextTargetPos(interceptSpeed) {
-    return predictNextTargetPos(this, interceptSpeed);
+    return predictNextTargetPos(this, interceptSpeed, SIGHT_RADIUS);
   }
 
   /**
@@ -1916,7 +1926,7 @@ export class EnemyAI {
       // decrement (:443-449). A tick that ends with no target runs
       // NEITHER, which is why they sit together in one method.
       this._classicSenses(playerFeet, senses);
-      if (targeting) targeting(this, playerFeet, dt);
+      if (targeting) targeting(this, playerFeet, dt); else trackUnarmedRateOfApproach(this);   // EnemySenses' rate of approach (:353-370): the armed machine keeps its own
       if (!targeting || this.target != null) this._classicPostTarget(senses);
     }
     // EnemySenses.targetPosPredict (:249-257) is its own 0.0625s timer -

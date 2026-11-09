@@ -64,7 +64,7 @@ import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';
 import { copyEffectEntry } from '../systems/save/save.js';   // AUDIT 26 F217
 import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';
 import { MobileUnit } from '../characters/mobile/mobileUnit.js';
-import { EnemyAI, withinYaw, isBackFacing, foeFrameDt } from '../characters/enemy/enemyMotor.js';
+import { EnemyAI, withinYaw, isBackFacing, foeFrameDt, enhancedCombatAIEnabled } from '../characters/enemy/enemyMotor.js';
 import { EnhancedEnemyAI } from '../ai/enhancedMotor.js';   // FIELD BUGS 2026-10-16b INDOOR-WATCH: the routes, where the host hands a mesh (`nav`)
 import { getPref } from '../systems/uiPrefs.js';   // INDOOR-WATCH: the Enhanced AI switch, as the dungeon's construction sites read it
 import { spaceFoes, DOORWAY_DEPTH } from '../characters/foeSpacing.js';   // FOE-SPACING: the watch keeps apart   // TACT3c: past the threshold
@@ -352,7 +352,7 @@ export function createCityGuards({ renderer, collider, fetchBytes, getTexture, u
       const idleH = idleSpriteHeight(tex);
       const ai = new (nav && getPref('enhancedAI') ? EnhancedEnemyAI : EnemyAI)(collider, pending.feet, yaw, {   // INDOOR-WATCH: the switch chooses the motor where the room has a mesh; the bake is read per step
         nav: nav?.chf, navWorld: nav?.world, navGoal: nav?.goal, navSeed: Math.imul(_nextGuardId + 1, 0x9e3779b1) >>> 0,   // the dungeon's three (its seed off the spawn's yaw; the watch faces one way, so off his number), and the room's goal for a player off its mesh (AUDIT W1)
-        liveSpeed: () => liveStat(entity, 'speed'),   // AUDIT 39: EnemyMotor.cs:432 re-reads LiveSpeed per FixedUpdate
+        liveSpeed: () => liveStat(entity, 'speed'), enhancedCombatAI: enhancedCombatAIEnabled,   // AUDIT 39: EnemyMotor.cs:432 re-reads LiveSpeed per FixedUpdate
         seesThroughInvisibility: basics.seesThroughInvisibility ?? false,
         height: enemyControllerHeight(idleH, basics.behaviour ?? 'General'),   // REVIEW 2026-09-05: SetupDemoEnemy.cs:103-115
         centreOffset: idleH / 2,

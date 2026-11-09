@@ -21,8 +21,12 @@ The enhanced layer never replaces that motor. It hooks in at three points:
 With the switch off, `tacticsStep` returns false and writes nothing, the cover index answers nothing, and hosts build
 plain `EnemyAI`. The result is Daggerfall Unity's classic behaviour.
 
-Departure from Daggerfall Unity: DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies"). This port does not
-implement it; the port runs DFU's classic path only. The Enhanced AI here is a separate design that shares half a name.
+DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies", `Enhancements/EnhancedCombatAI`, DFU's default on).
+The port runs it under the same name (decision 117): the foe pools hand each `EnemyAI` the setting's reader
+(`src/characters/enemy/enhanced-combat-ai.ts`), and online the server profile pins it at DFU's value
+(`combat.enhancedAI` in `src/net/profile/profileKeys.ts`). Its behaviours are ported in groups; the senses group is in
+(the 190-degree field of view, the lead on the target, the rate of approach in the melee reach, the runner-up target).
+The Enhanced AI here is a separate option on top of it that shares half a name.
 
 ## The switch
 
