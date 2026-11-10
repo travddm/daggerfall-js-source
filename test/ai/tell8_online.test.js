@@ -117,7 +117,7 @@ test('TELL8: the puppet\'s state - its mark from `wl` (landing at now + wl, part
 });
 
 test('TELL8: the field gone - a feint\'s cut dashes its mark and lets its swing go on, a break drops the mark and cancels the held arm once; the stagger and the overreach on the puppet and its entity, so my roll takes x1.25 and x1.3 (mutants: the cancel never sent; the fold infinite - unread)', (tc) => {
-  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default (decision 13)
+  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default
   const ai = { feet: [0, 0, 0] }, ent = {};
   applyBlowRecord(ai, { wk: 0 | WIRE_FEINT, wy: 0, wl: 500, wo: [0, 0, 0], wn: 1 }, { origin: [0, 0, 0], entity: ent });
   const fb = puppetBlow(ai);

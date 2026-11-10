@@ -32,7 +32,7 @@ import { getPref } from '../systems/uiPrefs.js';
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';
 import { MOBILE_TYPES } from '../characters/mobile/mobileTypes.js';
 import { throwsBlows, blowShapesOf, blowFamily, makeBlow, fitBlowToGround, inBlow, setLiveBlow, shatterBlow, windupNear, offsetBlows, BLOW, BLOW_CHANCE, BLOW_COLOR, IRON_COLOR, BLOW_VERDICT_LIFE, BLOW_STALE, setBlowTargetOf } from './foeBlows.js';   // TACT4; TELL3: iron; TELL5: the family, the shapes' lengths
-import { openingDamageOn } from './opening-damage.ts';   // decision 13: the extra damage on an opening is an option
+import { openingDamageOn } from './opening-damage.ts';   // the extra damage on an opening is an option
 import { registerBlowTakenMod } from '../systems/blowTaken.js';   // TELL1: a staggered foe takes more - the leaf the formulas read
 import { coverDistance } from './cover.js';   // TELL6: a charge's lane must be free of cover
 import { GRAVITY } from '../player/motor.js';   // TELL6c: a leap's hop on the motor's own gravity
