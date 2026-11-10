@@ -15459,7 +15459,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  site guards - a player who turns Travel Options off has the
    *  classic travel map and classic fast travel, whole. */
   _travelUIHolder.ui = travelControlUI;   // AUDIT-TO1 F2: the holder the enchant ctx reads
-  const townWalk = createTownWalk({ built, state });   // OW-TOWN-WALK: the town a journey stands in, and its streets (scenes/townWalkHost.js)
+  const townWalk = createTownWalk({ built, state, cpuModels });   // the town a journey stands in, and its streets (scenes/townWalkHost.js), its solid models read from the meshes
   const tvTownPace = () => townWalk.townPace(state.worldCoords(player.pos));   // OW-TOWN-WALK: the pace of the town's streets the traveller stands in, or null (AUDIT OW-REVISITED L1-4: never a walled city's fields; IC-PACE: the Imperial City's its own)
   travelOptions = travelOptionsOn ? createTravelOptions({   // BOOT-TDZ: ASSIGNED here; the binding stands above the stream that reads it
     townKey: townWalk.townKey, townWay: townWalk.townWay,   // OW-TOWN-WALK: in a town, its streets first, at its pace
