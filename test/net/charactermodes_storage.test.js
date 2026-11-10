@@ -26,7 +26,7 @@ test('the token carries a mode code for a realm character, and refuses a code th
   await assert.rejects(mintToken({ ...who, md: 9 }, kp.privateKey, { subtle, nowS }), /refused/);
 });
 
-test('a realm character keeps the mode it was created in; the mint signs it and the tile shows it', async () => {
+test('a realm character keeps the mode it was created in, and the modes online does not enforce are refused', async () => {
   const S = await standService();
   const g = await S.guest();
   const call = (p, b) => S.call(p, b, g.secret);
@@ -44,21 +44,12 @@ test('a realm character keeps the mode it was created in; the mint signs it and 
     'no mode named: Classic, the bytes as before',
   );
 
-  const iron = (await call('/v1/realm/create', { name: 'Iron', mode: 'ironman' })).body;
-  assert.equal(
-    claims((await call('/v1/auth/token', { character: iron.id })).body.token).md,
-    CHARACTER_MODE_CODES.ironman,
-  );
-  assert.equal((await realmMintFacts({ db: S.env.DB }, g.id, iron.id)).md, CHARACTER_MODE_CODES.ironman);
-
-  const hard = (await call('/v1/realm/create', { name: 'Hard', mode: 'hardcore' })).body;
-  assert.equal(
-    claims((await call('/v1/auth/token', { character: hard.id })).body.token).md,
-    CHARACTER_MODE_CODES.hardcore,
-  );
+  // Online play does not enforce Hardcore or Ironman yet, so the service creates neither.
+  for (const mode of ['hardcore', 'ironman', 'hardcore_ironman'])
+    assert.equal((await call('/v1/realm/create', { name: 'Nope', mode })).body.error, 'mode-off', mode);
 
   const byName = Object.fromEntries((await tiles()).map((t) => [t.name, t.mode]));
-  assert.deepEqual(byName, { Plain: 'classic', Iron: 'ironman', Hard: 'hardcore' });
+  assert.deepEqual(byName, { Plain: 'classic' });
 });
 
 test("the Legacy mode is born of a line and no other mode is; a request naming no mode is a line's birth or Classic", async () => {
@@ -105,6 +96,10 @@ test('the server profile decides which modes it offers; Classic is always offere
   const g = await S.guest();
   const call = (p, b) => S.call(p, b, g.secret);
   assert.equal((await call('/v1/realm/create', { name: 'Hard', mode: 'hardcore' })).body.error, 'mode-off');
-  assert.ok((await call('/v1/realm/create', { name: 'Iron', mode: 'ironman' })).body.id);
+  assert.equal(
+    (await call('/v1/realm/create', { name: 'Iron', mode: 'ironman' })).body.error,
+    'mode-off',
+    'a profile that offers Ironman does not make it enforced online',
+  );
   assert.ok((await call('/v1/realm/create', { name: 'Plain' })).body.id, 'Classic is always offered');
 });

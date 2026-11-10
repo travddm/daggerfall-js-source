@@ -79,6 +79,12 @@ function meleeReach(ai) {
   return (vsAI ? CLASSIC_MELEE_DISTANCE_VS_AI : MELEE_DISTANCE) + (ai.targetRateOfApproach ?? 0);
 }
 
+/** MobileUnit.IsPlayingOneShot for the motor: an attack in flight, which slows DFU's Enhanced Combat AI to half its
+ *  walk (enhanced-movement.ts attackPace). The state at this step's start is the one the motor reads next. */
+function markAttackOneShot(ai, machine) {
+  if (ai) ai._attackOneShot = machine.state !== 'Idle';
+}
+
 export class EnemyAttack {
   /** rangedAttack: set by the scene when the foe HAS A BOW ATTACK
    *  (hasBowAttack - mobile flags, not the equipped weapon). */
@@ -134,8 +140,8 @@ export class EnemyAttack {
     // already in flight keeps being stepped, and only the DECISION
     // half stops.
     if (paused || ai?._pilot?.swing) return machineStep(this.machine, dt, this.liveSpeed);   // STAFF-PILOT (systems/staffBossPilot.js): a boss a staff member steers decides no swing of its own - a swing in flight still steps
-    this.meleeTimer -= dt;
-    if (this.meleeTimer < 0) this.meleeTimer = 0;
+    this.meleeTimer = Math.max(0, this.meleeTimer - dt);   // counts down, floored at 0
+    markAttackOneShot(ai, this.machine);
     const dist = ai._dist;
     this._classicTimer += dt;
     while (this._classicTimer >= CLASSIC_UPDATE_INTERVAL) {

@@ -34,14 +34,15 @@ processes that run one after another (`WIN32_ARGV_BUDGET`). Elsewhere it uses on
 | `node tools/testShards.mjs 3/8` | Shard 3 of 8, as CI runs it. |
 | `node tools/testShards.mjs 3/8 --list` | The files in shard 3 of 8, one a line. |
 | `node tools/testShards.mjs --plan 8` | File count and recorded seconds for each of 8 shards. |
-| `node --test test/ui/chatscroll.test.js` | One file, directly. |
+| `node --import ./tools/raw-import-hooks.ts --test test/ui/chatscroll.test.js` | One file, directly. The `--import` lets Node load a shader file imported with `?raw`; without it, a test that reaches such a module fails with `ERR_UNKNOWN_FILE_EXTENSION`. The tools above add it for you. |
 | `npm run lint` | ESLint over `src/`, `server/src/`, `server-account/src/`, `test/`, `tools/`, `scripts/`, `app/` and the root `*.config.js`. It keeps a content-keyed cache in `node_modules/.cache/eslint/`. |
 | `npm run types` | `tsc -p tsconfig.json`. `checkJs` is off: only `src/` files with `// @ts-check` on their first line are reported. `test/systems/save/hard3_types.test.js` decides which files must opt in. |
 | `npm run build` | `vite build` into `dist/`. |
 | `npm run check` | Lint, types, the whole suite and the build, in series. Slow; use it only when CI cannot run. |
 
 To run one area, list its files with a quoted glob: `node --test "test/net/**/*.test.js"`. Do not pass a bare
-directory such as `test/ui/`: a trailing directory path breaks file discovery on Node 22.
+directory such as `test/ui/`: a trailing directory path breaks file discovery on Node 22. A direct `node --test` needs
+the `?raw` hook, as the table shows or through `NODE_OPTIONS` ([getting-started.md](../getting-started.md#node-and-shader-files)).
 
 Runner flags pass through the tools. `npm test -- --test-name-pattern=foo` and
 `node tools/testChanged.mjs --test-only` hand every `--test-*` argument to each runner process (`runnerFlags`).

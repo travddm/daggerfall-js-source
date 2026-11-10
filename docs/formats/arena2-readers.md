@@ -100,4 +100,5 @@ Keep these lists current when you add one.
 2. Translate it; keep constants and quirks; list departures in the header.
 3. Add a test in `test/formats/` with a synthetic fixture and a real-data half gated on `ARENA2_PATH`.
 4. Add the file kind to `KEEP` in `src/scenes/dataSource.js` and bump `MANIFEST_V` if it is not already ingested.
-5. Run the real-data half locally (`sh tools/fetch-data.sh`, then `ARENA2_PATH=... node --test test/formats/<file>`).
+5. Run the real-data half locally (`sh tools/fetch-data.sh`, then `ARENA2_PATH=... node --test test/formats/<file>`,
+   with `NODE_OPTIONS` set as [getting-started.md](../getting-started.md#node-and-shader-files) shows).

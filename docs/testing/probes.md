@@ -108,8 +108,8 @@ same rooms the world host opens as `OnlineSession`s, sends poses and chat, and m
 the client's own timers.
 
 ```sh
-node tools/loadHarness.mjs --bots 200 --minutes 5
-node tools/loadHarness.mjs --help      # every option and its default
+node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --bots 200 --minutes 5
+node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --help      # every option and its default
 ```
 
 It reports the relay's and the service's work per bot. Local numbers are relative: they compare two builds on one
