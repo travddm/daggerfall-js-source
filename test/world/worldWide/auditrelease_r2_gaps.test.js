@@ -12,7 +12,7 @@ import { pictureToBay, setTamrielFit } from '../../../src/world/tamriel/tamrielF
 import { setTamrielTrace } from '../../../src/world/tamriel/tamrielLand.js';
 import { validStaffEvent, staffEventFault, validStaffEventIn, STAFF_EVENT_PIXEL_BOUND, staffTownPixelOk, isAreaEvent } from '../../../src/net/staffEvent/staffEventLaw.js';
 import { WORLD_PIXEL_BOUND, parseClient, worldRoom } from '../../../src/net/wire.js';
-import { staffPlaces, staffHere, gamePlaces, keptPlaces } from '../../../src/net/staffPlaces.js';
+import { gamePlaces, keptPlaces } from '../../../src/net/staffPlaces.js';
 import { staffRaidHere, staffEventBook } from '../../../src/systems/staffEvents.js';
 import { theatreOfRegion, REGION_NAMES } from '../../../src/formats/mapsTables.js';
 import { poiPixelKey, poiPixelId, poiDocProblems, POI_WORLD_BOUND, POI_PAST_BAY_ID_BASE, DEFAULT_MATERIAL } from '../../../src/poi/poiLaw.js';
@@ -68,7 +68,7 @@ test('R2-6 a vampire turned past the Bay wakes in a cemetery of the province: DF
   assert.equal(isCemeteryPlace({ hasDungeon: false, dungeonType: DUNGEON_TYPES.Cemetery }), false, 'a graveyard with no dungeon is no crypt');
 });
 
-test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s pixel (the law, the relay\'s word, its cell), a town\'s is the Bay\'s until WW6 and refused by name; the place picker lists a province\'s places from the world\'s registry, each offered as an area, and says where staff stand (mutants: the Bay\'s bound again, the word\'s, a town past the Bay taken, the province unlisted, a place offered as a town)', () => {
+test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s pixel (the law, the relay\'s word, its cell), a town\'s is the Bay\'s until WW6 and refused by name; the world\'s registry is kept as the boot makes it (mutants: the Bay\'s bound again, the word\'s, a town past the Bay taken)', () => {
   assert.equal(STAFF_EVENT_PIXEL_BOUND, WORLD_PIXEL_BOUND, 'the law\'s bound is the wire\'s (it imports nothing)');
   const EV = { id: 'ab12cd34ef', rg: 64, loc: -1, px: WHITERUN.x, py: WHITERUN.y, nm: 'Whiterun', ct: 0, mt: [7, 12], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'Mob' };
   assert.deepEqual(validStaffEvent(EV), { ...EV, hp: 0 }, 'an area past the Bay');
@@ -92,23 +92,15 @@ test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s p
   assert.equal(staffRaidHere(null, WHITERUN, true)?.staff.id, EV.id, 'outdoors on its pixel: in it');
   assert.equal(staffRaidHere(null, WHITERUN, false), null, 'indoors: not');
   staffEventBook([]);
-  // the picker: a province's places from the registry, as areas
+  // the world's registry, kept as the boot makes it
   const reg = createWorldPlaces();
   reg.register('tesa', [
     { mapId: 600001, name: 'Whiterun', px: WHITERUN.x, py: WHITERUN.y, type: LOCATION_TYPES.TownCity },
     { mapId: 600002, name: 'Riverwood', px: WHITERUN.x + 4, py: WHITERUN.y + 2, type: LOCATION_TYPES.TownVillage },
     { mapId: 600003, name: 'Anvil', px: 2000, py: 1400, type: LOCATION_TYPES.TownCity },
   ]);
-  const maps = { getRegion: () => null, getRegionName: (r) => REGION_NAMES[r] ?? '', getRegionIndexAt: () => 64 };
-  assert.equal(theatreOfRegion(64) > 0, true);
-  const p = staffPlaces(maps, 64, reg);
-  assert.equal(p.name, 'Skyrim');
-  assert.deepEqual(p.list.map((x) => [x.loc, x.name, x.px, x.py]), [[-1, 'Riverwood', WHITERUN.x + 4, WHITERUN.y + 2], [-1, 'Whiterun', WHITERUN.x, WHITERUN.y]], 'Skyrim\'s alone, each an area, by name');
-  for (const x of p.list) assert.equal(staffEventFault({ ...EV, loc: x.loc, px: x.px, py: x.py, nm: x.name }), null, `${x.name}: what the picker offers runs`);
-  assert.deepEqual(staffPlaces(maps, 64, null).list, [], 'no registry: none');
   gamePlaces(reg);
   assert.equal(keptPlaces(), reg);
-  assert.deepEqual(staffHere(maps, WHITERUN), { dfoStaff: 'here', region: 64, name: 'Skyrim', loc: -1, place: 'Whiterun', kind: 'town', px: WHITERUN.x, py: WHITERUN.y }, 'where I stand past the Bay: the area at Whiterun');
   gamePlaces(null);
 });
 

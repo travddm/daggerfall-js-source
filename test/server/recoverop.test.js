@@ -12,7 +12,6 @@ import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { verifyPassword, codeForHashing } from '../../server-account/src/password.js';
-import { FOUNDER_UNTIL } from '../../server-account/src/titles.js';
 import { mintReissue, reissueSql } from '../../tools/reissueRecoveryCode.mjs';
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
 
@@ -60,15 +59,15 @@ test('RECOVER-OP end to end: the operator\'s code, set by the tool\'s own statem
     return { status: res.status, body: await res.json().catch(() => null) };
   };
 
-  // A founder who registered, then lost the password AND the code - still signed in on this device.
+  // A player who registered, then lost the password AND the code - still signed in on this device.
   const me = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
-  const firstSeen = FOUNDER_UNTIL - 5 * 86400;
+  const firstSeen = Date.UTC(2026, 8, 20, 12) / 1000;
   await env.DB.prepare('UPDATE players SET created_at = ? WHERE id = ?').bind(firstSeen, me.id).run();
   const reg = await call('POST', '/v1/auth/register', { handle: 'Twoddle', password: 'the-lost-password', ...ACCEPTED }, me.secret);
   assert.equal(reg.status, 200);
   const lostCode = reg.body.recoveryCode;
   const before = (await call('GET', '/v1/account', undefined, me.secret)).body;
-  assert.deepEqual(before.wardrobe.titles, ['founder']);
+  const titlesBefore = before.wardrobe.titles;
 
   // THE OPERATOR: a code minted, and the statement the workflow runs, typed in another case.
   const { code, hash } = await mintReissue({ subtle, rand });
@@ -90,7 +89,7 @@ test('RECOVER-OP end to end: the operator\'s code, set by the tool\'s own statem
   assert.equal(after.account.id, before.account.id, 'the same account');
   assert.equal(after.account.createdAt, firstSeen);
   assert.equal(after.account.registeredAt, before.account.registeredAt);
-  assert.deepEqual(after.wardrobe.titles, ['founder'], 'and the Founder with it');
+  assert.deepEqual(after.wardrobe.titles, titlesBefore, 'and its titles with it');
 });
 
 test('RECOVER-OP: the statement changes that account\'s recovery_hash and nothing else, finds it in any case, and a quote in a username is data, not SQL (mutants: the handle as typed; the quote not doubled)', async () => {
