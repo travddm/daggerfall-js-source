@@ -8,6 +8,7 @@
 //   A9 - the host hands the machine the character's Lockpicking (the sense) and Agility (the band); the opened lock is
 //        seen turning before its window shuts; the action graph never swings a moving door for a pick.
 //   A4 - a building's door a Lock spell locked is picked, as DFU picks it (the interior's graph wired to the window).
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { LOCKPICK_ACT, setWindowS, lockBand, lockSeed } from '../../../src/systems/lockpick/lockpickLaw.js';
@@ -171,7 +172,8 @@ test('AUDIT LOCKPICK B2: the Lockpick\'s card lines reach every card that shows 
   assert.ok(want.every((w) => stats.includes(w)), `the stat rows: ${JSON.stringify(stats)}`);
 });
 
-test('AUDIT LOCKPICK B4: online, a counter\'s picks stand back by what a purchase took - a stack shoplifted stays gone, ENDLESS-ARROWS\' law; a whole stack bought stands the whole again (mutants: the whole stack on any purchase; past the stack)', async () => {
+test('AUDIT LOCKPICK B4: online, a counter\'s picks stand back by what a purchase took - a stack shoplifted stays gone, ENDLESS-ARROWS\' law; a whole stack bought stands the whole again (mutants: the whole stack on any purchase; past the stack)', async (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const { restockEndless } = await import('../../../src/systems/shopStock.js');
   const { restockLockpicks, lockpickCount, ENDLESS_LOCKPICK_STACK } = await import('../../../src/systems/lockpick/lockpickItem.js');
   const saved = globalThis.location;

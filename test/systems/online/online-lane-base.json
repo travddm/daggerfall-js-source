@@ -25,6 +25,7 @@
     "lockpickTumblers": false,
     "dressForThePart": false,
     "guildProbation": false,
+    "soldGoodsOnShelf": false,
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,

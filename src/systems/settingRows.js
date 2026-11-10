@@ -12,3 +12,4 @@ export { HORSE_WALKS_ROW } from './upkeep/horseWalksRow.js';
 export { TERRAIN_SLOPE_CUT_ROW } from './terrainSlopeCutRow.js';
 export { CLAW_METAL_ROW } from '../combat/clawMetalRow.js';
 export { LEGENDARY_EQUIP_FREE_ROW, GENTLE_EQUIP_BILL_ROW } from './equipBillRows.js';
+export { SOLD_GOODS_ON_SHELF_ROW } from './sold-goods-on-shelf-row.ts';

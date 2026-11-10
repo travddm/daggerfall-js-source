@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world313: '84b59a258ff5325e9b747c2638941aedf616ce37089315177ad147a0d74ec75e', // the official profile pins the Sold goods stay on the shelf row off (officialProfile.ts)
   world312: 'b50e191194a38a9a6dccb5009224dae3506046703dfc5c74a0b1129d4971513c', // a failed quest costs DFU's reputation online, a server profile rule in the relay's graph
   world311: 'd727d6099fabd9f641ed904a4e7e320fb6d543b7cbca4fb0d03439acc9aecab6', // a guild rank follows DFU's 28-day rule online, a server profile rule in the relay's graph
   world310: '0d2cd05fd97ae86b9841b1eecae3d80b2b309c4538d0b1eb32e89b38c37f02f1', // a pile's gold follows DFU's level formula online, a server profile rule (loot.pileGold) in the relay's graph

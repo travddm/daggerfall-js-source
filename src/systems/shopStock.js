@@ -39,6 +39,7 @@
 // certified, and it is what kept the ungated MagicItems arm (F104)
 // from being read as the bug it was.
 
+import { shopShelvesShared, soldGoodsStayOnShelf } from './shop-shelf-rule.ts';   // whether a shop's shelves are the room's online (shop.sharedShelf), and where a sold piece goes
 import { dice100 } from '../combat/formulas.js';
 import { rand } from '../formats/dfRandom.js';   // F209: StockHouseContainer's one classic-stream draw
 import { randomMaterial, randomArmorMaterial, createWeapon } from '../combat/enemyEquipment.js';
@@ -145,13 +146,12 @@ export const endlessArrowsAt = (buildingType) => buildingType === BUILDING_TYPES
 const isShelfArrow = (it) => it?.group === 'Weapons' && it.templateIndex === ARROW_TEMPLATE;
 /** ENDLESS-ARROWS: the counter's quiver, minted as the shelf mints its own (CreateWeapon's arrow arm, its roll a constant). */
 const mintQuiver = (n) => mintCondition(setItemFields({ ...createWeapon(ARROW_TEMPLATE, 0, () => 0), stackCount: n }));
-/** AUDIT UPDATE II B2: A SOLD PIECE ONTO A SHELF - STOLEN-GOODS' law (stolenGoods.js landSold), but an arrow sold at a
- *  General Store's COUNTER is paid for and never shelved there (a departure from DFU's remoteItems, for these arrows
- *  alone): its quiver is endless, and a sold row bought back would read as arrows the purchase took from it - a theft,
- *  a sale and the buy-back stood the quiver again. `buildingType` the counter's shop, null for any other shelf.
- *  Answers landSold's word: whether the piece is on the shelf. */
+/** A SOLD PIECE ONTO A SHELF, where the Features row keeps one there (DFU clears the merchant's basket: shop-shelf-rule.ts) -
+ *  the stolen goods' law (stolenGoods.js landSold), but an arrow sold at a General Store's COUNTER is never shelved there
+ *  because its quiver is endless, and a sold row bought back would read as arrows the purchase took from it.
+ *  `buildingType` the counter's shop, null for any other shelf. Answers whether the piece is on the shelf. */
 export function landSoldAt(shelfItems, item, buildingType = null) {
-  if (endlessArrowsAt(buildingType) && isShelfArrow(item)) return false;
+  if (!soldGoodsStayOnShelf() || (endlessArrowsAt(buildingType) && isShelfArrow(item))) return false;
   return landSold(shelfItems, item);
 }
 /** ENDLESS-ARROWS: a General Store's quiver given back what a purchase took of it, up to its whole; answers 1 when it
@@ -195,7 +195,7 @@ export const shopBuysItem = (buildingType, item) => (SHOP_BUYS_GROUPS[buildingTy
   && item.templateIndex !== BOAT_PARTS_TEMPLATE && item.templateIndex !== BOAT_DEED_TEMPLATE
   // AUDIT ENDLESS-STOCK F1/F2: online no shop buys back what never sells out - bought at a cheap shop and sold at a dear one
   // (the online asking price is halved, the buy-back cap is not) it was gold for nothing, and a sold one made any shelf endless
-  && !(isOnlinePage() && isEndlessStock(item));
+  && !(isOnlinePage() && shopShelvesShared() && isEndlessStock(item));   // only where the server profile shares the shelves
 
 /** RMBLayout.IsShop, verbatim (the nine stocked storefronts). */
 export function isShop(buildingType) {
@@ -314,7 +314,7 @@ export function restockEndless(shelfItems, bought, buildingType = null) {
   // ENDLESS-ARROWS: a General Store's quiver, offline and online (`buildingType` the counter's shop)
   let n = restockArrows(shelfItems, bought, buildingType);
   // AUDIT ENDLESS-STOCK F4: online alone, as the bag is - offline a shelf sells out as Daggerfall's does
-  if (!isOnlinePage()) return n;
+  if (!isOnlinePage() || !shopShelvesShared()) return n;   // a shelf of the player's own sells out, as in DFU
   n += restockLockpicks(shelfItems, (bought ?? []).filter(isLockpick).reduce((k, it) => k + Math.max(1, Math.trunc(it.stackCount ?? 1)), 0));   // AUDIT LOCKPICK B4: what the purchase took
   for (const it of bought ?? []) {
     if (!isEndlessStock(it)) continue;
