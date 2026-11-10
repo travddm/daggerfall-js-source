@@ -78,7 +78,7 @@ import { STAFF_GLYPHS } from '../../src/net/staffCommands.js';   // STAFF-PANEL2
 import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MARKS-OF-MASTERY: the hunt's, a Master's and the sea's titles
 
 /** HOURS-FIRST: THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
- *  accounts the first clear's claims name (sd_kills, slot 1; .github/workflows/sd-clears.yml read them). A list in config,
+ *  accounts the first clear's claims name (sd_kills, slot 1). A list in config,
  *  the developers' law: held while listed, and a guest - no handle - never is. It grants the title Hour's
  *  First and its aura, The First Hour, and no glyph (TIER_LISTS would owe one). */
 export function hoursFirstHandles(env) {

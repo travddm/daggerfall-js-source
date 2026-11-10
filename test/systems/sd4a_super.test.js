@@ -4,6 +4,7 @@
 // health and x2.5 damage, its random foes rolled at the encounter tables' top band and a class foe built at the band's
 // level, six elite foes among them (each the Elite Dungeon's stack read the Super's way), loot +50% drop and quality on
 // bodies and piles, and no fire of its own - the Hour is cold.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -93,7 +94,8 @@ test('SD4a the list: a Super dungeon\'s layout rolled at the band, three at ever
   assert.equal(pickDungeonElites([foe(), foe()], 1, { count: 0 }), 0);
 });
 
-test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health x9, its damage x4.5 - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', () => {
+test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack read the Super\'s way - its health x9, its damage x4.5 - and a Super\'s word wins over the Elite mark its records also carry (mutants: the Elite Dungeon\'s stack in a Super)', (tc) => {
+  setPref('eliteStacking', true); tc.after(() => setPref('eliteStacking', false));   // elites stack with the dungeon: the Features row, off by default
   // The dungeon stacks are their own numbers: they stay put when the open world's elite multiples (ELITE_FOE_HEALTH_MULT) move.
   assert.deepEqual([ELITE_FOE_SUPER_DUNGEON_HEALTH_MULT, ELITE_FOE_SUPER_DUNGEON_DAMAGE_MULT], [9, 3]);   // PIN MOVED: B6 (the blows 4.5 -> 3)
   assert.deepEqual([ELITE_FOE_ELITE_DUNGEON_HEALTH_MULT, ELITE_FOE_ELITE_DUNGEON_DAMAGE_MULT], [7, 2.6], 'the Elite\'s own');
@@ -112,7 +114,8 @@ test('SD4a the elites: a Super dungeon\'s elite is the Elite Dungeon\'s stack re
   assert.deepEqual([pup.maxHealth, pup.damageScale], [60, 3], 'a puppet: its owner\'s maximum, the Super\'s blows');
 });
 
-test('SD4a the host\'s scale and loot, run: a Super record x4 / x2.5 with the Elite mark, its elite x9 / x4.5, its body +50% - an Elite record and a plain one as they were (mutants: the Super\'s scale lost; the Elite\'s doubling in a Super; the loot the Elite\'s)', () => {
+test('SD4a the host\'s scale and loot, run: a Super record x4 / x2.5 with the Elite mark, its elite x9 / x4.5, its body +50% - an Elite record and a plain one as they were (mutants: the Super\'s scale lost; the Elite\'s doubling in a Super; the loot the Elite\'s)', (tc) => {
+  setPref('eliteStacking', true); tc.after(() => setPref('eliteStacking', false));   // elites stack with the dungeon: the Features row, off by default
   const { eliteLootOpts, applyEliteScaling } = hostScale();
   const sup = foe();
   applyEliteScaling(sup, { elite: true, superTier: true });

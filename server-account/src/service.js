@@ -310,8 +310,8 @@ export const saveKey = (playerId, characterId, saveName, part) =>
  *  bound somebody raises by accident. */
 export const SAVE_MAX_BYTES = 4 * 1024 * 1024;
 
-/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only its own
- *  deploy sets (.github/workflows/realm-revive.yml); every call but /v1/health and /v1/pubkey is then refused 503. */
+/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only an
+ *  operator's deploy sets; every call but /v1/health and /v1/pubkey is then refused 503. */
 export const maintaining = (/** @type {any} */ env) => env?.MAINTENANCE === '1';
 export const SHOT_MAX_BYTES = 256 * 1024;
 /** Slots per ACCOUNT. An account at this bound is refused; its oldest

@@ -23,6 +23,7 @@
 
 import { getFloat, getInt } from '../systems/settings/settings.js';   // MAC-O2: Controls/WeaponSwingMode, the term the swing suppression was missing
 import { PITCH_LIMIT } from './mwCamera.js';
+import { LOCAL_PLAYER, writePlayerYaw } from './player-stance.ts';   // the facing a foe's retreat roll reads
 
 /** PlayerMouseLook.SmoothingMax (:45): the setter clamps to it. */
 export const SMOOTHING_MAX = 0.9;
@@ -190,6 +191,7 @@ export class LookFilter {
     cam.yaw += stepYaw + this.turnYaw;   // AUDIT CLIMB-ARC F13: the game's turn, whole
     this.turnYaw = 0;
     cam.pitch += stepPitch;
+    writePlayerYaw(LOCAL_PLAYER, cam.yaw);
     this.residualYaw -= stepYaw;
     this.residualPitch -= stepPitch;
   }

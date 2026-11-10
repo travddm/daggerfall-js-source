@@ -167,7 +167,8 @@ starting block carries start markers and the exit door (model 70300). Only dunge
 - Tier: `src/systems/dungeon/dungeonTier.js` `dungeonTier` returns `regular`, `elite` or `super`. Respawn times are in
   `src/systems/dungeon/dungeonRespawn.js`; offline, nothing respawns.
 - Spawned dungeons: `src/world/spawnedDungeons.js` rolls extra dungeons per map pixel from a hash and keeps a spawn
-  ledger (cleared, expired, reborn).
+  ledger (cleared, expired, reborn). They stand only online, and only when the Spawned dungeons row is on
+  (`src/systems/dungeon/spawned-dungeons-row.js`). The row is off by default, and the official profile pins it off.
 - Delve aids, all overlays on the same layout: dungeon sense (`src/systems/dungeon/dungeonSense.js`), the echo book of
   movers set going (`dungeonEcho.js`), and the way-out compass (`src/systems/wayOut.js`).
 
@@ -204,6 +205,12 @@ Walked travel (autopilot) is the port's own: `travelRoute.js` `planRoute` (costs
 `travelPathMode.js` (`roads` or `free`). `travelThreat.js` and `travelBands.js` pace road threats. `travelPorts.js`
 hands off to ships (see [naval.md](naval.md)). `src/systems/immersiveTravel.js` ports the Immersive Travel mod's
 carriage and sailor services.
+
+The mod's own journey (`beginTravel`) walks a straight line, as the mod does. With the mod pane's Avoid Obstacles
+key on (the default; a port key, off is the mod's beeline), the steering (`travelSteer.js`) feels its way at two heights
+over the feet, so a rail fence's rails are seen, and the journey walks the streets of every town it starts in or crosses
+on the town's grid (`townWalk.js`, `src/scenes/townWalkHost.js`). That journey grid covers the faces of the town's solid
+models (fences, walls, the town mods' pieces), which DFU's town grid does not hold; the residents' grid is unchanged.
 
 Map: `src/systems/map/mapTabs.js` (automap, town, world sheets), `mapWaypoints.js` (personal, party, guild
 waypoints); the surface is `src/ui/heldMap.js`. Horse and wagon: `src/systems/horse/horseCart.js` runs them,

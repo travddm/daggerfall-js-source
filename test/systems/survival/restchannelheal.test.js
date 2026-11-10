@@ -1,6 +1,7 @@
 // @ts-check
 // REST-CHANNEL-HEAL: the rest
 // channel's bar raises health, fatigue and magicka as it fills, toward the rest's own yield, and keeps what it paid.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { openChannelHeal, stepChannelHeal, channelHealTick, REST_ACT_TEXT } from '../../../src/systems/rest/restAct.js';
@@ -57,7 +58,8 @@ async function atTheFire({ kind = REST_KIND.Camp, tier = 'casual', skin = 'class
   return { e, w, host, bag, calls, half: Math.round(maxFatigue(e) / 2), max: maxFatigue(e), foesComing: () => { foes = true; } };
 }
 
-test('REST-CHANNEL-HEAL classic: half the bar is half of all three, Esc keeps it; a foe at half keeps it too; held to its end the bar is full before the night', async () => {
+test('REST-CHANNEL-HEAL classic: half the bar is half of all three, Esc keeps it; a foe at half keeps it too; held to its end the bar is full before the night', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const a = await atTheFire();
   a.w.tick(3);
   assert.deepEqual(vit(a.e), [33, a.half, 15]);
@@ -74,7 +76,8 @@ test('REST-CHANNEL-HEAL classic: half the bar is half of all three, Esc keeps it
   assert.deepEqual([c.calls.night, vit(c.e)], [1, [60, c.max, 30]]);
 });
 
-test('REST-CHANNEL-HEAL classic: a blow after the bar healed past the open still breaks the hold; Hard rough fills to half; a kneel heals nothing', async () => {
+test('REST-CHANNEL-HEAL classic: a blow after the bar healed past the open still breaks the hold; Hard rough fills to half; a kneel heals nothing', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const a = await atTheFire();
   a.w.tick(3); a.e.health -= 5; a.w.tick(0.1);
   assert.deepEqual([a.w.endLines, a.e.health, a.calls.night], [[REST_ACT_TEXT.interrupted], 28, 0]);
@@ -95,7 +98,8 @@ const mkEl = (tag) => ({
 });
 const buttons = (n, out = []) => { if (n.tag === 'button') out.push(n); for (const c of n.children ?? []) buttons(c, out); return out; };
 
-test('REST-CHANNEL-HEAL the enhanced card: half the bar heals half, Stop keeps it; a blow after healing still breaks', async () => {
+test('REST-CHANNEL-HEAL the enhanced card: half the bar heals half, Stop keeps it; a blow after healing still breaks', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const prev = [globalThis.document, globalThis.window, globalThis.requestAnimationFrame];
   globalThis.document = /** @type {any} */ ({ createElement: mkEl, createTextNode: (t) => ({ text: t, className: '' }), getElementById: () => null, head: mkEl('head'), body: mkEl('body'), addEventListener() {}, removeEventListener() {}, pointerLockElement: null, exitPointerLock() {}, querySelector: () => null });
   globalThis.window = /** @type {any} */ ({ addEventListener() {}, removeEventListener() {} });

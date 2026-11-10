@@ -47,6 +47,7 @@
 // never lands (a word about `container:3` would have overwritten the
 // owner's chest, and then been published back as the room's), and a
 // refused act's records name none. The bag's `home` says so.
+import { shopShelvesShared } from '../../systems/shop-shelf-rule.ts';   // whether a shop's shelves are the room's (shop.sharedShelf)
 import { sharedRecord, validActionRecord } from '../actionSystem.js';
 import { validLootList, LOOT_LIST_MAX, LOOT_NEWER_TEXT } from '../../systems/loot/loot.js';   // LOOT_NEWER_TEXT: AUDIT SETS M2 - a shelf the room has spoken about in words this build cannot read
 import { peerHanded } from '../../systems/peerWord.js';   // SS3: a bound piece in a room's container never lands; HACKED-GOLD: nor a letter of credit (systems/peerWord.js)
@@ -98,6 +99,10 @@ export function interiorLootKeyOf(key) {
   return m ? `${m[1]}:${Number(m[2])}` : null;
 }
 
+/** The loot keys (or records, by `keyOf`) the room speaks of: a shop's shelf is each player's own, as in DFU, unless the
+ *  server profile shares it (shop.sharedShelf) - then the room is told nothing of it and its word never lands on it. */
+const roomKeys = (items, keyOf = (k) => k) => (shopShelvesShared() ? items ?? [] : (items ?? []).filter((x) => !String(interiorLootKeyOf(keyOf(x))).startsWith('shelf:')));
+
 /** The shelf or container a loot key names on this context, or null. */
 export function interiorLootTarget(ctx, key) {
   const canon = interiorLootKeyOf(key);
@@ -114,7 +119,7 @@ export function interiorLootTarget(ctx, key) {
  *  a shelf, and a cupboard no room holds (a bare context, an offline page), say the whole list as WORLD6a built it. */
 export function interiorLootRecords(ctx, keys, tooBig = new Set(), bag = null) {
   const out = [];
-  for (const key of keys ?? []) {
+  for (const key of roomKeys(keys)) {
     const canon = interiorLootKeyOf(key);
     if (canon && canon.startsWith('container:') && bag?.room?.live()) { out.push(...bag.room.records(ctx, canon)); continue; }
     const t = canon && interiorLootTarget(ctx, canon);
@@ -162,7 +167,7 @@ export function withoutCarried(items, carried = null, { stowed = false } = {}) {
  *  twice lands once. */
 export function applyInteriorLoot(ctx, list, { seen = new Set(), openKey = null, today = null, unreadable = null, carried = null, room = null, from = null } = {}) {
   let n = 0;
-  for (const rec of Array.isArray(list) ? list : []) {
+  for (const rec of roomKeys(Array.isArray(list) ? list : [], (r) => r?.k)) {
     const canon = interiorLootKeyOf(rec?.k);
     if (!canon) continue;
     // OUTDOOR-LOOT: a cupboard's word is the room's TAKES, merged - never a list landed over a list (interiorRoomLoot.js). `from`: the

@@ -29,7 +29,7 @@ literal brace.
 
 ## Reviewed translations only
 
-This repository ships English and translations that a person wrote or reviewed. It does not ship machine drafts. A
+This repository ships English and translations that a person wrote or reviewed. A
 language folder is added with the whole translation reviewed, and the reviewers named in `translators.json`.
 
 ## Fixing a translation
@@ -37,22 +37,22 @@ language folder is added with the whole translation reviewed, and the reviewers 
 There are two ways in. Name the language in the title either way.
 
 **A pull request.** Edit the value in `locales/<tag>/Port_Strings.csv` and send it. `Port_Strings.meta.json` records
-what the machine wrote, so your edit is recognised as a person's row and kept.
+who wrote each row, so your edit is recorded as a person's row and kept.
 
 **The review sheet**, if you would rather work in a spreadsheet:
 
-    node tools/l10nReview.mjs --export fr > fr-review.csv            every row (or --machine for the drafts alone)
+    node tools/l10nReview.mjs --export fr > fr-review.csv            every row
     node tools/l10nReview.mjs --import fr fr-review.csv              apply the filled fix cells
 
-The sheet has five columns: `key`, `english`, `translation` (as it stands), `owner` (`machine`, `person` or `missing`)
-and an empty `fix`. Fill in `fix` wherever you would say it better, and leave everything else as it is. The import
-holds every fix to the same rules as the drafts. Each `{argument}` the English names must stay, and plurals use your
-language's own categories. A row whose English changed since you exported is refused as stale, and you'll need to
-export again. Every applied fix is recorded as a person's row (`"by": "human"`). If you can't run the tool, attach the
-filled sheet to a translation issue and a maintainer will import it.
+The sheet has five columns: `key`, `english`, `translation` (as it stands), `owner` (`person`, `missing`, or `machine`
+for a row with no person's record) and an empty `fix`. Fill in `fix` wherever you would say it better, and leave
+everything else as it is. The import holds every fix to the catalog's rules. Each `{argument}` the English names must
+stay, and plurals use your language's own categories. A row whose English changed since you exported is refused as
+stale, and you'll need to export again. Every applied fix is recorded as a person's row (`"by": "human"`). If you
+can't run the tool, attach the filled sheet to a translation issue and a maintainer will import it.
 
 **Credit.** Add your name to `locales/<tag>/translators.json` (a JSON list of names) in your pull request, and the
-About pane will credit the language as "checked and corrected by" you.
+About pane will credit the language as translated by you.
 
 ## Coverage
 
@@ -78,24 +78,11 @@ DFU's own layout:
     locales/<tag>/pack/Fonts/...     its fonts
 
 `terms` records what the authors allowed, and when. The game layers the text in this order:
-1. the machine drafts;
-2. the bundled pack, on top of the drafts;
+1. the language's own tables (`locales/<tag>/*.csv`);
+2. the bundled pack, on top of them;
 3. a pack the player installs, on top of both.
 
 The credits carry the bundled pack's name, authors, licence and source. A pack's textures and videos are edits of
 Bethesda's assets and are never bundled, whatever the pack's terms say. `node tools/l10nPack.mjs` checks every bundled
 pack, and test/tooling/l10n6_tools.test.js holds the tree to it. No pack is bundled yet: one is added only once its authors'
 permission is in hand.
-
-## The pipeline
-
-`tools/translate.mjs` drafts a language's table on the Claude API:
-
-    ANTHROPIC_API_KEY=... node tools/translate.mjs --lang fr --table Port_Strings
-    node tools/translate.mjs --lang ja --table Internal_RSC --dry-run
-
-It drafts only the rows a language lacks, and the rows whose English changed. A row a person wrote or edited is theirs:
-`<table>.meta.json` records what the pipeline wrote, so the pipeline sees the edit and never overwrites it. A draft that
-loses a placeholder is asked for again, then left out. `locales/<tag>/glossary.json` (`{ "English": "yours" }`) keeps
-a language's names the same across a run. Options: `--model`, `--batch`, `--jobs`, `--limit`, `--retranslate`,
-`--dry-run`.

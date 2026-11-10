@@ -11,6 +11,7 @@
 //          Broker's stock is bound to its buyer, and a party's shared quest pays one gold reward in shares.
 //   P0.5 - the character is saved as it plays online: every ONLINE_CHECKPOINT_MS (five real minutes, CHECKPOINT-5), and at each change a trade makes to the
 //          pack - the giver's loss on disk before the goods leave.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -225,7 +226,8 @@ test('REALM P0.3: a character joining online has the debt past the Empire\'s one
   });
 });
 
-test('REALM P0.4: online a shop pays at most half what it asks for the same piece - the buy-and-sell-back loop is shut; buying and offline selling are Daggerfall\'s', () => {
+test('REALM P0.4: online a shop pays at most half what it asks for the same piece - the buy-and-sell-back loop is shut; buying and offline selling are Daggerfall\'s', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   assert.equal(ONLINE_SALE_SHARE, 0.5);
   const loop = { mercantile: 2, personality: 50 };
   const buy = calculateTradePrice(1_000, 1, loop, false, { online: false });
@@ -259,7 +261,14 @@ test('REALM P0.4: online a shop pays at most half what it asks for the same piec
   assert.deepEqual([calculateTradePrice(1_000, 20, { mercantile: 0, personality: 10 }, true, { online: true }), calculateTradePrice(1_000, 20, { mercantile: 0, personality: 10 }, true, { online: false })], [187, 222], 'a weak seller at a dear counter: under Daggerfall\'s own offer');
 });
 
-test('REALM P0.4: online a pile\'s gold is divided back by the level, every key, never under one piece; offline it is the level\'s', () => {
+test("ONLINE PILE GOLD, DFU's by default (LootTables.GenerateLoot): a pile's gold is the level's online too, as offline", () => {
+  const pile = (n) => [goldStack(n), { group: 'Books', templateIndex: 277 }];
+  assert.equal(addPileLootExtras(pile(30 * 37), 'A', undefined, { level: 30, online: true })[0].stackCount, 30 * 37);
+  assert.equal(addPileLootExtras(pile(30 * 37), 'J', () => 0.99, { level: 30, online: true })[0].stackCount, 30 * 37);
+});
+
+test('REALM P0.4, the server profile\'s flat pile gold (loot.pileGold): online a pile\'s gold is divided back by the level, every key, never under one piece; offline it is the level\'s', (t) => {
+  playByRules(t, { 'loot.pileGold': 'flat' });
   const pile = (n) => [goldStack(n), { group: 'Books', templateIndex: 277 }];
   assert.equal(addPileLootExtras(pile(30 * 37), 'A', undefined, { level: 30, online: true })[0].stackCount, 37, 'a key outside J-O too');
   assert.equal(addPileLootExtras(pile(30 * 37), 'A', undefined, { level: 30, online: false })[0].stackCount, 30 * 37);

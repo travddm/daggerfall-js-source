@@ -1116,7 +1116,7 @@ export async function pickTranslationPack(code, languageName = code) {
   return pickAssetFolder({
     title: `A translation for ${languageName}`,
     blurb: `<p>Pick a <b>Daggerfall Unity translation</b>: its folder, or the .zip it came in. Its text replaces
-      the machine translation wherever it can. Nothing is uploaded. It is stored in this browser.</p>
+      the game’s own text wherever it can. Nothing is uploaded. It is stored in this browser.</p>
       <p style="color:#999">As in Daggerfall Unity, the string tables, quests and books are read from <b>Text</b>,
       and the fonts from <b>Fonts</b>.</p>`,
     store: async (files) => {

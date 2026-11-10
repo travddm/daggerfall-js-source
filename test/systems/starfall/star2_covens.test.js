@@ -2,6 +2,7 @@
 // that names a night's coven, the thirteen (WW-C2) held against the player's own data (MAPS.BSA's covens, FACTION.TXT's witches,
 // DFU's quest places), a night's three pixels in its coven's wilds over the gate's own scan, and the festival's night
 // read off the sky. tools/mutants/star2.json.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -103,7 +104,8 @@ test('STAR2 THE NIGHT\'S STARS ON THE PLAYER\'S MAP: for a hundred nights, three
   assert.ok(distinct / total > 0.95, `three towns a night (${distinct} of ${total})`);
 });
 
-test('STAR2 THE WITCHES\' NIGHT: the festival is day 283 - the holiday table\'s Witches\' Festival and Mephala\'s summoning day both; the night whose dusk falls on it is the Witches\' Night, once a sky year, and its last star the Heart-Star (mutants: the day off by one; the Heart-Star the first)', () => {
+test('STAR2 THE WITCHES\' NIGHT: the festival is day 283 - the holiday table\'s Witches\' Festival and Mephala\'s summoning day both; the night whose dusk falls on it is the Witches\' Night, once a sky year, and its last star the Heart-Star (mutants: the day off by one; the Heart-Star the first)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   assert.equal(WITCHES_FESTIVAL_DAY, 283);
   assert.equal(holidayDayOfYear(HOLIDAYS.Witches_Festival), 283);
   assert.equal(DAEDRA.find((d) => d.name === 'Mephala').dayOfYear, WITCHES_FESTIVAL_DAY, 'Mephala\'s day is the Witches\' Festival');

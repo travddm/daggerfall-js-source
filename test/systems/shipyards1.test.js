@@ -3,6 +3,7 @@
 // (the day's named recruits, their fees, signing on and paying off) and what they lean on: a ship's named hands enlisted
 // and released (naval/shipCrew.js), her crew discharged (naval/navalDamage.js), the shelf's parts minted
 // (comeSailAwayItems.js mintParts) and no counter buying a ship (shopStock.js). Design:.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -146,7 +147,8 @@ test('SHIPYARDS THE PRICE: the counter\'s one law at a yard\'s quality and index
   assert.equal(shipWorth({ hull: 1, value: 2000 }), 2000, 'a claimed prize\'s papers\' value');
 });
 
-test('SHIPYARDS NO LOOP ONLINE: the counter\'s online law caps a sale at half the least it asks (REALM P0.4, MERC-RISE) - so buying a ship and selling her back never pays, at any skill (mutants: the cap gone)', () => {
+test('SHIPYARDS NO LOOP ONLINE: the counter\'s online law caps a sale at half the least it asks (REALM P0.4, MERC-RISE) - so buying a ship and selling her back never pays, at any skill (mutants: the cap gone)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   for (const sk of [{ mercantile: 0, personality: 10 }, { mercantile: 60, personality: 60 }, { mercantile: 100, personality: 100 }, { mercantile: 300, personality: 250 }]) {
     for (const hull of SHIPYARD_HULLS) {
       const v = HULL_PRICES[hull], cost = calculateCost(v, YARD_QUALITY, YARD_PRICE_INDEX);
@@ -296,4 +298,17 @@ test('SHIPYARDS A NAMED HAND ENLISTED AND RELEASED (shipCrew.js): he joins at hi
   assert.equal(w.crew, 24, 'never past her whole');
   w.muster(3);
   assert.equal(w.crew, 24, 'a muster never lowers');
+});
+
+test("SHIPYARDS NO LOOP ONLINE, DFU's haggle: with no sale cap in the server profile, a ship sold back online fetches at most what the yard asks that seller for her; single player keeps the counter's offer", () => {
+  for (const sk of [{ mercantile: 0, personality: 10 }, { mercantile: 60, personality: 60 }, { mercantile: 100, personality: 100 }]) {
+    for (const hull of SHIPYARD_HULLS) {
+      const worth = shipWorth({ hull, value: HULL_PRICES[hull] });
+      const asked = shipBuyPrice(HULL_PRICES[hull], sk);
+      assert.ok(shipSalePrice(worth, sk, { online: true }) <= asked, `hull ${hull} at ${JSON.stringify(sk)}`);
+    }
+  }
+  const best = { mercantile: 100, personality: 100 };
+  const worth = shipWorth({ hull: SHIPYARD_HULLS[0], value: HULL_PRICES[SHIPYARD_HULLS[0]] });
+  assert.ok(shipSalePrice(worth, best, { online: false }) > shipBuyPrice(HULL_PRICES[SHIPYARD_HULLS[0]], best), "offline DFU's haggle pays the best seller more than it asks");
 });

@@ -172,8 +172,7 @@ DISCORD_INVITE_URL = "https://discord.gg/QADbZYQ73j"
 # HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant
 # them a unique different version of the aura, a title named Hour's First,
 # and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON - the
-# thirteen accounts the first clear's claims name (slot 1, read by
-# .github/workflows/sd-clears.yml). The title Hour's First and its aura, The
+# thirteen accounts the first clear's claims name (slot 1). The title Hour's First and its aura, The
 # First Hour (titles.js isHoursFirst). Comma-separated handles,
 # case-insensitive, the same as the lines above; held while listed.
 HOURS_FIRST_HANDLES = "aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDeeJew,mayaamano,Nirnroot,ofrizz,rosalina,ShikiX3,Temegast,Terra"
@@ -223,6 +222,9 @@ PROF_DAY_CAPS = "on"
 PROF_MASTERWORK_GATE = "on"
 # PROFESSION-CAPS: the gathered goods are priced on DFU's ingredient scale; "off" puts back the port's earlier scale.
 PROF_DFU_PRICES = "on"
+# A Master's work is Rare, so crafted gear stays below Legendary; "on" makes it Legendary, as before the cap (src/net/masterLaw.js
+# masterTierFor).
+PROF_MASTER_LEGENDARY = "off"
 # CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the Admins alone)
 # or "on". Shipped at "dev": the developers' realm characters keep their guild standing on the service first; everyone
 # else's stays the save's, as before CHAP1, until this line says "on". CHAP2a: and the halls' witness, a hall writ's

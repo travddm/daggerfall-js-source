@@ -590,6 +590,7 @@ import { preloadMessageBoxArt } from '../ui/messageBox.js';   // U11
 import { buildingDataForDoor, locationBuildings, BUILDING_KEY_0, blockBuildingCount } from '../systems/talk/talkTopics.js';   // E2: the shop identity   // H2: every building, with its key   // AUDIT 58: BuildingDirectory.buildingKey0, the key both ship interiors are filed under
 import { hitSoundFor, swingSoundFor, ENEMY_HIT_VOLUME, PLAYER_HIT_VOLUME } from '../systems/soundClips.js';   // AUDIT 58: DFU's two hit volumes
 import { isInvisible, entityIsParalyzed, concealBits } from '../systems/effects.js';   // AUDIT 39: the S19 gate is host-agnostic in DFU
+import { stealthPoseOf, stealthOfShown } from '../characters/enemy/peer-senses.ts';   // my live Stealth and half-speed state on the pose, and a peer's to the foes
 import { concealmentFlags } from '../systems/effects.js';   // INVIS-SWING: the traveller's concealment, the wild gate's notice
 import { createSerpentSpell } from './gate/standInSpell.js';   // FIELD BUGS 2026-10-19f BOSS-DOT: my spell on the serpent's hide, its door (AUDIT SCHOOLS L2 F4's telling and its lasting harm with it)
 import { hasActiveEffect } from '../systems/effects.js';   // PEERLIGHT2: my Light spell, for the pose
@@ -796,7 +797,6 @@ import { spaceAcross, clearDoorways, doorSpotsNear, spacingSkips } from '../char
 import { Collider } from '../player/collider.js';
 import { createDataPipeline } from './dataPipeline.js';
 import { createWorldModes } from './worldModes.js';
-import { setAmbientTextHost, tickAmbientText } from '../systems/ambientText.js';   // AT2: Ambient Text's one component - this host claims it and feeds it the frame
 import { OnlineSession, steadyNow, roomKeyFor, DEFAULT_SERVER, WORLD_PUBLISH_MS, WORLD_REPUBLISH_MS, FOES_MS, FOES_FULL_MS, FOES_STALE_MS, SHOWN_MOVE_HOLD_MS } from '../net/online.js';   // ONLINE1: the session; WORLD1: the room's memory; AUDIT 637 D7: the move hold, one law both ends
 import { createSeatClock } from '../net/seatLive.js';   // FIELD BUGS 2026-10-18d SEAT-LIVE: the named seat's patience, which this page's own absence never spends
 import { pageWave } from '../net/reconnectWave.js';   // SCALE2c: a relay deploy's reconnect, spread by the hub's count
@@ -819,7 +819,7 @@ import { setRenownLayer } from '../systems/renownLayer.js';   // RENOWN1: the le
 import { createHallBook, hallFactionsOf, chapterFactionOf, parseHallCommand, hallAuditLines } from '../net/npcHallBook.js';   // CHAP2a: a town's guild halls, witnessed as I walk in; AUDIT CHAP2 E1: a developer's /hall
 import { createChapterSheet } from '../net/chapterSheet.js';   // CHAP3c: the chapter sheet, for the halls' prices and shelves
 import { createChapterBanners } from './chapterBanners.js';   // CHAP7b: a patron's banners at its chapter's halls
-import { createRollTracker, rollEntityDoors, rollPaceOf } from '../net/npcRollTracker.js';   // CHAP1: the Roll - this realm character's standing with Daggerfall's guilds, the account service's
+import { createRollTracker, rollEntityDoors, rollPaceOf, seatsHoldTopRanks } from '../net/npcRollTracker.js';   // CHAP1: the Roll - this realm character's standing with Daggerfall's guilds, the account service's
 import { rollKeptOf, ROLL_KEPT_VENDOR, hallPosterName, hallRememberLine, isChapterWrit, seatLinesOf, seatRankAt, chapterRollTitle, chapterRollLines, chapterBandOf } from '../net/npcChapterLaw.js';   // AUDIT CHAP: the pace's line; the last adoption, kept in the save; CHAP2a: a hall writ's guild, named; CHAP3a: a member's own writ too; CHAP5a: the hall's roll; CHAP5b: a chapter's band, the living town's
 import { chapterSeasonLines } from '../net/chapterEvents.js';   // CHAP6c: a chapter's Season in words, its candidates named
 import { setHudRenown } from '../ui/hud/hudRenown.js';   // RENOWN4: my own Renown and its bar, under the vitals
@@ -862,7 +862,7 @@ import { createStaffFreezeHost } from './staffFreezeHost.js';   // STAFF-PANEL5-
 import { skyClassicMinutes, wallMsForSkyMinutes, skyMinutesPerMsAt } from '../net/skyLaw.js';   // TIME1: the sky's own clock, installed beside the event clock
 import { POSE_STRIKES, isWorldRoom, isCellRoom, cellHaloFor, actFrameFits, sharedClassicMinutes, wallMsForClassicMinutes } from '../net/wire.js';   // WORLD6b-iii(b): the cell seam's halo   // MAC7 #1: the swing's kind on the wire; AUDIT WORLD4 A1: whether an act frame can be said at all
 import { POSE_RIDE } from '../net/wire.js';   // INT9 (AUDIT): a deposit's chunks, bounded by the wire's frame; COATS3D: POSE_RIDE - a peer on a horse rides the 3D one
-import { hasDaggerfallArrows } from '../combat/fpArm.js';   // MAC7 #2: the arrow bit on the wire - weaponRig's own read
+import { hasDaggerfallArrows } from '../combat/fpArm/fpArmParts.js';   // the arrow bit on the wire, read as weaponRig reads it
 import { drawText } from '../ui/text.js';   // ONLINE1: the session's status line
 import { RemotePlayers, composeLook, createSightCache } from '../net/remotePlayers.js';   // ONLINE1: the others, drawn; NAME1: and the sight test their names take, cached and hysteresised (AUDIT NAME1 F2/F5)
 import { createNameLayer, nameLayerWanted } from '../ui/nameLayer.js';   // NAME1 + BUBBLE1: the names and the chat bubbles, in the enhanced face; AUDIT NAME1 F7: and who gets that face
@@ -5501,7 +5501,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       labGrassField.invalidate(t[0], t[2], t[0] + TERRAIN_SIZE, t[2] + TERRAIN_SIZE);
     }
   }
-
 
   /** @param {{collectLoose?:boolean}} [opts] - A1: a season re-skin
    *  tears the pixel down and builds it again, but the reference never
@@ -15440,7 +15439,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  site guards - a player who turns Travel Options off has the
    *  classic travel map and classic fast travel, whole. */
   _travelUIHolder.ui = travelControlUI;   // AUDIT-TO1 F2: the holder the enchant ctx reads
-  const townWalk = createTownWalk({ built, state });   // OW-TOWN-WALK: the town a journey stands in, and its streets (scenes/townWalkHost.js)
+  const townWalk = createTownWalk({ built, state, cpuModels });   // the town a journey stands in, and its streets (scenes/townWalkHost.js), its solid models read from the meshes
   const tvTownPace = () => townWalk.townPace(state.worldCoords(player.pos));   // OW-TOWN-WALK: the pace of the town's streets the traveller stands in, or null (AUDIT OW-REVISITED L1-4: never a walled city's fields; IC-PACE: the Imperial City's its own)
   travelOptions = travelOptionsOn ? createTravelOptions({   // BOOT-TDZ: ASSIGNED here; the binding stands above the stream that reads it
     townKey: townWalk.townKey, townWay: townWalk.townWay,   // OW-TOWN-WALK: in a town, its streets first, at its pace
@@ -19507,9 +19506,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     },
   }) : null;
   // CHAP4b: the rank the playing character's seat gives it at a hall of `faction` where it stands - the politic region,
-  // as the chapter sheet's (AUDIT CHAP3 C6) - null offline, before the Roll's first word, or with no seat here
+  // as the chapter sheet's - null offline, before the Roll's first word, with no seat here, or where a chair is no rank (guild.seatRanks)
   const seatRankHere = (/** @type {number} */ faction) => {
-    if (!rollTracker?.held || rollTracker.stopped) return null;
+    if (!rollTracker?.held || rollTracker.stopped || !seatsHoldTopRanks()) return null;
     const px = playerTravelPixel();
     const region = (() => { try { return maps.getRegionIndexAt(px.x, px.y); } catch { return null; } })();
     return seatRankAt(rollTracker.seats, faction, region);
@@ -25242,7 +25241,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (!online.visible(p)) continue;   // AUDIT PSCALE1 NET-2: on the session's OWN clock (steadyNow, AUDIT ONLINE 3 F2) - performance.now() against its stamps never timed a silent peer out
       const h = peerBodies?.heightOf(p.id) || 0;
       if (h > 0) _peerHeights.set(p.id, h);
-      out.push({ id: p.id, feet: onlineToScene(p.shown), height: _peerHeights.get(p.id), cv: p.shown?.cv | 0 });   // INVIS-NET: and the peer's concealment, for the foes' senses
+      out.push({ id: p.id, feet: onlineToScene(p.shown), height: _peerHeights.get(p.id), cv: p.shown?.cv | 0, yaw: p.shown.yaw, wd: p.shown.wd, ...stealthOfShown(p.shown) });   // INVIS-NET: and the peer's concealment, for the foes' senses; its facing and sheath, for their retreat roll
     }
     // SLAM4: AND THE REMEMBERED HEIGHTS GO WITH THE PEERS. This map only
     // ever grew: every id that has ever stood in the room stayed in it for the life of the session. A twenty-minute
@@ -25913,7 +25912,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // the person). Both absent rather than 0, the wire's omission law.
       ...poseHandsOf(rig.playerWeapon.usingRightHand, rig.swing.hand),   // AUDIT MIXED-PAIR L4-3: and `ah`, the hand a pair's last strike was (net/wire.js poseHandsOf)
       wb: (() => { const l = liveLycanthropy(playerEntity); return l?.isTransformed ? (l.infectionType | 0) || undefined : undefined; })(),
-      cv: concealBits(playerEntity) || undefined,   // INVIS-NET: my magical concealment (1 invisible, 2 blending, 4 a shade), so the others draw me as DFU draws every concealed entity that is not the player - absent when none, the wire's omission law
+      ...stealthPoseOf(playerEntity, player.movingLessThanHalfSpeed !== false), cv: concealBits(playerEntity) || undefined,   // peer-senses.ts: my live Stealth and half-speed state for the foes another client runs; INVIS-NET: my magical concealment (1 invisible, 2 blending, 4 a shade), so the others draw me as DFU draws every concealed entity that is not the player - absent when none, the wire's omission law
       hl: waistLanternPoseBit(playerEntity.lightSource),   // HT-WAIST-NET: a lit lantern hung at the waist, so the others' Morrowind bodies hang it at the hip - absent otherwise, the wire's omission law
       lc: hasActiveEffect(playerEntity, 'light') ? 1 : undefined,   // PEERLIGHT2: my Light spell burns, so the others hang its candle before me - absent otherwise
       lt: torchPoseByte(playerEntity),   // PEERLIGHT1: my lit torch/lantern/candle, so it lights the others' world around me - absent while nothing burns
@@ -27142,33 +27141,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     },
   });
   wireOwnerClock([exteriorFoes, cityGuards], modes, () => online?.status === 'open' && online.othersHere > 0);   // OWNER-CLOCK (scenes/ownerCatchUp.js): while anyone else is in my room (on the street the 16-pixel cell, wider than the 3 pixels my foes frames are fanned across) the street's foes take my clamped frame in FOE-CATCHUP's steps - my player's pace, never past it - and every step of mine is marked on the clock my foes frames carry; HOST-CLOCK: the watch with them (its brains already ran on the street's clock), the mode machine's frames the catch-up's, and a building's and a dungeon's foes through the same page's catch-up from their own hosts
-  // AT2: AMBIENT TEXT CLAIMS ITS HOST. The mod is one GameObject made
-  // at load and never destroyed (systems/ambientText.js), so the slot
-  // holds STATE - the pace and the no-repeat index - across every door
-  // this host walks through. Everything below is a live read: the
-  // closures are called at the tick, not now.
-  setAmbientTextHost({
-    paused: () => gamePaused(),
-    say: (text, seconds) => townTalk.say(text, seconds),   // DaggerfallUI.AddHUDText(text, delay)
-    // AUDIT AT F5: PlayerEnterExit.IsPlayerInsideBuilding ALONE, off the
-    // mode - the one thing Update reads every frame. It used to be a
-    // field of `where()` below, so a quiet frame paid for the rect test
-    // and the CLIMATE.PAK lookup to learn a boolean.
-    insideBuilding: () => _mode() === 'interior',
-    where: () => {
-      const inside = modes?.insideContext?.() ?? { insideDungeon: false, dungeonType: 255 };
-      const px = playerTravelPixel();
-      return {
-        insideDungeon: inside.insideDungeon,
-        dungeonType: inside.dungeonType,
-        inLocationRect: _musicInLocationRect(),
-        locationType: _musicLocationType(),
-        isDay: !isNight(minuteNow()),                      // WorldTime.Now.IsDay
-        climateIndex: maps.getClimateIndex(px.x, px.y),    // PlayerGPS.CurrentClimateIndex
-        weather: currentWeather(),
-      };
-    },
-  });
   // U31 / StartGameBehaviour :392-401. The streamer is already at the
   // start pixel; put the player INSIDE that location's dungeon, which
   // is where a new Daggerfall character opens their eyes. DFU gates
@@ -29352,20 +29324,8 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     // HOME-YARD: the yards in line, and the owner's decorator on their lot - above the modal gate, so a door walked
     // through stands it down (its own frame reads the mode)
     yards?.frame({ dt, cam, overlayUp: !!townTalk.overlayActive });
-    // AT2: AmbientTextMod.Update. ABOVE THE MODAL GATE, for the same
-    // reason the holiday text is: it is a MonoBehaviour Update and DFU
-    // does not suspend those when you walk through a door. One tick
-    // here covers all three of this host's modes - the mod's own
-    // IsPlayerInsideBuilding arm is what silences it indoors, not a
-    // missing call - which is why worldModes.js, the interior host, is
-    // deliberately NOT wired: its frame is consumed BELOW this line.
-    // It sits above the torch sweep's own note rather than below it
-    // because AUDIT 66 F11 pins that sweep ADJACENT to the modal
-    // return, and a line between them reads to that pin as a sweep
-    // that has drifted back down the frame.
-    tickAmbientText();
     // QUEST1: the live-sync watch, at most every QUEST_SYNC_CHECK_MS - see its own definition above. AUDIT DISC28 QS-2:
-    // ABOVE THE MODAL GATE, as the ambient text above it is - ONE call covers exterior, interior and dungeon mode. It sat
+    // ABOVE THE MODAL GATE, as the yards above it are - ONE call covers exterior, interior and dungeon mode. It sat
     // below the exterior's quest tick, which the modal return never reaches, while the interior and the dungeon tick the
     // machine inside modes.frame: a shared quest finished in a house or a dungeon (The Courier's is in the residence)
     // told nobody until its player walked out, and a partner in the same house finished their own copy meanwhile. What
