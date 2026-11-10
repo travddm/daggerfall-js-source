@@ -172,7 +172,6 @@ test('MODS-ONLINE-2: a mod the player owns reaches no wire, no save and no roll'
     'seasons-iliac-bay': ['src/systems/seasonsIliacBay.js'],
     'weapon-widget': ['src/combat/weapon/weaponWidgetMotion.js'],
     'eye-of-the-beholder': ['src/player/eyeOfTheBeholder/eotbBody.js', 'src/player/eyeOfTheBeholder/eotbCamera.js'],
-    'ambient-text': ['src/systems/ambientText.js'],
     'immersive-footsteps': ['src/systems/immersiveFootsteps.js'],
     'better-ambience': ['src/systems/betterAmbience.js'],
     'shield-widget': ['src/combat/shieldWidget.js'],

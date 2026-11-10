@@ -208,6 +208,12 @@ Walked travel (autopilot) is the port's own: `travelRoute.js` `planRoute` (costs
 hands off to ships (see [naval.md](naval.md)). `src/systems/immersiveTravel.js` ports the Immersive Travel mod's
 carriage and sailor services.
 
+The mod's own journey (`beginTravel`) walks a straight line, as the mod does. With the mod pane's Avoid Obstacles
+key on (the default; a port key, off is the mod's beeline), the steering (`travelSteer.js`) feels its way at two heights
+over the feet, so a rail fence's rails are seen, and the journey walks the streets of every town it starts in or crosses
+on the town's grid (`townWalk.js`, `src/scenes/townWalkHost.js`). That journey grid covers the faces of the town's solid
+models (fences, walls, the town mods' pieces), which DFU's town grid does not hold; the residents' grid is unchanged.
+
 Map: `src/systems/map/mapTabs.js` (automap, town, world sheets), `mapWaypoints.js` (personal, party, guild
 waypoints); the surface is `src/ui/heldMap.js`. Horse and wagon: `src/systems/horse/horseCart.js` runs them,
 `horseCartLaw.js` holds the modes; `src/systems/wagon/` holds wagon kinds, seats, ropes, looks and upkeep.

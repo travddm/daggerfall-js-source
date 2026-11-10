@@ -92,7 +92,8 @@ test('FLOW3 the tests a change can move: the ones that import it, through any de
   const put = (p, text) => { mkdirSync(dirname(join(d, p)), { recursive: true }); writeFileSync(join(d, p), text); };
   put('src/a.js', "import { b } from './b.js';\nexport const a = b;\n");
   put('src/b.js', "import './c.js';\nexport const b = 1;\n");
-  put('src/c.js', 'export const c = 1;\n');
+  put('src/c.js', "import fs from './c.frag?raw';\nexport const c = fs;\n");
+  put('src/c.frag', '#version 300 es\n');
   put('src/lone.js', 'export const lone = 1;\n');
   put('test/a.test.js', "import { a } from '../src/a.js';\n");
   put('test/pin.test.js', "const text = read('src/c.js');\n");
@@ -101,7 +102,8 @@ test('FLOW3 the tests a change can move: the ones that import it, through any de
   put('test/other.test.js', "export {};\n");
   const tests = ['test/a.test.js', 'test/dyn.test.js', 'test/name.test.js', 'test/other.test.js', 'test/pin.test.js'];
   assert.deepEqual(importsOf('test/a.test.js', readFileSync(join(d, 'test/a.test.js'), 'utf8'), d), ['src/a.js']);
-  assert.deepEqual([...closureOf('test/a.test.js', d)].sort(), ['src/a.js', 'src/b.js', 'src/c.js', 'test/a.test.js']);
+  assert.deepEqual([...closureOf('test/a.test.js', d)].sort(), ['src/a.js', 'src/b.js', 'src/c.frag', 'src/c.js', 'test/a.test.js']);
+  assert.deepEqual(testsFor(['src/c.frag'], tests, d), ['test/a.test.js', 'test/dyn.test.js'], 'a shader file imported with ?raw');
   assert.deepEqual(testsFor(['src/c.js'], tests, d), ['test/a.test.js', 'test/dyn.test.js', 'test/pin.test.js'], 'two imports away, a dynamic import, a pin that reads it');
   assert.deepEqual(testsFor(['src/lone.js'], tests, d), ['test/name.test.js'], 'named in a cite');
   assert.deepEqual(testsFor(['test/other.test.js'], tests, d), ['test/other.test.js'], 'a changed test runs itself');

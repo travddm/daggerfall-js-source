@@ -1,6 +1,7 @@
 // ENDLESS-ARROWS:
 // A GENERAL STORE'S QUIVER NEVER EMPTIES (systems/shopStock.js) - a whole quiver on its counter at any quality, filled
 // back after every purchase that takes arrows, offline and online; every other storefront's sells out as SHOP-ARROWS says.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -74,7 +75,8 @@ test('AUDIT UPDATE E3: a counter quiver over the whole (DFU\'s own drawn arrows 
 });
 
 // AUDIT UPDATE II B2
-test('AUDIT UPDATE II B2: an arrow sold at a General Store\'s counter is paid for and never shelved, so a sale bought back never reads as arrows taken from its quiver; every other piece and shelf lands as STOLEN-GOODS says (mutants: the counter\'s arrows shelved; every shop\'s refused)', async () => {
+test('AUDIT UPDATE II B2: an arrow sold at a General Store\'s counter is paid for and never shelved, so a sale bought back never reads as arrows taken from its quiver; every other piece and shelf lands as STOLEN-GOODS says (mutants: the counter\'s arrows shelved; every shop\'s refused)', async (tc) => {
+  setPref('soldGoodsOnShelf', true); tc.after(() => setPref('soldGoodsOnShelf', false));   // sold goods stay on the shelf: the Features row, off by default
   const { landSoldAt } = await import('../../src/systems/shopStock.js');
   const shelf = stock(B.GeneralStore, 5);
   const [quiver] = arrows(shelf);

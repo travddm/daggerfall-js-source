@@ -40,9 +40,16 @@ const PREFS = Object.freeze({
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,
+  clawMetal: false,
+  gentleEquipBill: false,
+  legendaryEquipFree: false,
   lockpickTumblers: false,
   dressForThePart: false,
   guildProbation: false,
+  soldGoodsOnShelf: false,
+  absorptionLimits: false,
+  openingDamage: false,
+  eliteStacking: false,
   questlineRewards: true,
 });
 

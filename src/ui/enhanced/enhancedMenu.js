@@ -90,7 +90,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { statsHunt } from '../bounty/huntRank.js';   // HUNTERS-MARK (Bounty-Boards.md 12.3)
-import { fpArm, hasDaggerfallArrows } from '../../combat/fpArm.js';
+import { fpArm } from '../../combat/fpArm.js'; import { hasDaggerfallArrows } from '../../combat/fpArm/fpArmParts.js';
 import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1: the Standing page's Dress line
 import { questRail, shelvedRail, unloggedRail, journalLines, questTitleOf, QUEST_URGENT_SECONDS, remainWords } from '../quest/questRail.js';   // MAC-K2: the ONE quest walk, shared with the chronicle
 import { qlObjectivesBlock, qlOfferDetail, offerRowWords, qlLineDetail, lineStateWords, qlLadderDetail } from '../questlines/qlJournal.js';   // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
@@ -118,7 +118,7 @@ import {
 } from '../../systems/settings/settings.js';
 import { mostRecentRestorable, restorableSaves, firstRestorable, deleteSave, QUICK_SAVE_NAME, loadSlot, saveSlot } from '../../systems/save/saveSlots.js';
 import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E: Copy to offline changes lanes
-import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
+import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes, skyHasOwnClock } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
 import {
   realmIo, realmList, realmDelete, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
   sweepUnsent,
@@ -490,7 +490,7 @@ export function skyDayWords(nowMs = Date.now(), localTime = (ms) => new Date(ms)
   const at = (m) => { const v = ((m % 60) + 60) % 60; return `:${String(Math.floor(v)).padStart(2, '0')}${v % 1 ? ':30' : ''}`; };
   // L10N4: one sentence, one pattern - the midnight's two shapes are a select inside it, never a glued fragment
   const day = { onHour: m0 === 0 ? 'yes' : 'no', midnight: at(m0), dusk: at(m0 + 45) };
-  return nowMs >= turn
+  return !skyHasOwnClock() ? t('menu.online.oneClockDay', 'A day in the world is two hours of real time.') : nowMs >= turn   // one clock, as in DFU (time.skyClock)
     ? t('menu.online.skyDay', 'A day in the world is an hour of real time: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', day)
     : t('menu.online.skyDayUntil', 'A day in the world is two hours of real time until {turn}; from then on it is an hour: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', { ...day, turn: localTime(turn) });
 }
@@ -2204,9 +2204,8 @@ function helpCard(key) {
  * switch | enum | number | colour | text | blocked.
  *
  * A blocked row is DRAWN, greyed, with its reason one press away. That
- * is deliberate and it is the port's own standing rule: DFU ships
- * EnhancedCombatAI True and we run the classic path, so a working
- * toggle there would be a lying toggle.
+ * is deliberate and it is the port's own standing rule: a working
+ * toggle for a setting the port does not run would be a lying toggle.
  */
 // AUDIT F7: this read effectiveSettings() - a full merge of all 171
 // keys over the defaults - ONCE PER ROW, so the Game category rebuilt
