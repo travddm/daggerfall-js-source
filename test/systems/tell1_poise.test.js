@@ -287,7 +287,7 @@ test('TELL1: a paralysis still breaks a wind-up (DFU\'s CanAct), and no stagger 
 // ── what a staggered foe takes ─────────────────────────────────────
 
 test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\' tail end to end, a spell\'s landing (mutants: the tail never asks; the fold unregistered)', (tc) => {
-  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default (decision 13)
+  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default
   assert.ok(blowTakenNames().includes('tell-stagger'));
   const ent = { staggerUntil: 5 };
   T = 4;
