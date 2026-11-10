@@ -86,7 +86,7 @@ test('the schema file is the first migration, numbered files follow it, and each
 test('the schema holds the service\'s tables, and the account row its columns', () => {
   const raw = d1()._raw;
   assert.deepEqual(tablesOf(raw), TABLES);
-  assert.deepEqual(tablesOf(raw).filter((n) => n.startsWith('poi_')), [], 'the POI store\'s tables are dropped (0009_drop_poi.sql)');
+  assert.deepEqual(tablesOf(raw).filter((n) => n.startsWith('poi_')), [], 'the POI store\'s tables are dropped (0006_drop_poi.sql)');
   assert.deepEqual(columnsOf(raw, 'players').sort(), PLAYER_COLUMNS);
   assert.deepEqual(raw.prepare("SELECT type, COUNT(*) AS n FROM sqlite_master WHERE type = 'view' GROUP BY type").all(), [], 'no views');
 });
