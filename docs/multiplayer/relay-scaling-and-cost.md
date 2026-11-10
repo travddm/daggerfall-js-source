@@ -70,8 +70,8 @@ hub about parties (`partyHoldsOwner`), gate and Super Dungeon rooms reporting ki
 ## Cost: what keeps an object awake
 
 On the bills seen so far, Durable Object **duration** (wall time an object is active in memory) has been the largest
-line, ahead of D1 rows read and DO storage rows written. A hibernating object with idle sockets costs almost nothing. These things keep an object
-awake:
+line, ahead of D1 rows read and DO storage rows written. A hibernating object with idle sockets costs almost
+nothing. These things keep an object awake:
 
 | Source | Where | Effect |
 | --- | --- | --- |
@@ -96,8 +96,3 @@ Rules for new relay code:
 - `RoomMetrics` (`server/src/relayScale.js`) writes one Analytics Engine point per busy room per window
   (`METRICS_WINDOW_MS`, 5 min) to `METRICS`: room kind, version, sockets, hellos, frames, bytes in and out, poses,
   sends, reads, writes, refusals, foes-hold counters, cell moves. `_metricsTick` in `Room` calls it.
-- `.github/workflows/relay-load.yml` is a manual read-only workflow that queries those points (Analytics Engine
-  SQL).
-- `.github/workflows/do-active.yml` (manual, input `days`, 1 to 7) runs `tools/doActive.mjs`, which reads each
-  object's active time from Cloudflare's GraphQL dataset `durableObjectsPeriodicGroups` and writes a table to the job
-  summary. Use it to find objects that never sleep. It needs the `CLOUDFLARE_API_TOKEN` secret.

@@ -2204,9 +2204,8 @@ function helpCard(key) {
  * switch | enum | number | colour | text | blocked.
  *
  * A blocked row is DRAWN, greyed, with its reason one press away. That
- * is deliberate and it is the port's own standing rule: DFU ships
- * EnhancedCombatAI True and we run the classic path, so a working
- * toggle there would be a lying toggle.
+ * is deliberate and it is the port's own standing rule: a working
+ * toggle for a setting the port does not run would be a lying toggle.
  */
 // AUDIT F7: this read effectiveSettings() - a full merge of all 171
 // keys over the defaults - ONCE PER ROW, so the Game category rebuilt

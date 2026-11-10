@@ -474,8 +474,8 @@ export const FEATURES = Object.freeze([
   // one choice away and All off's. The words are AUDIT 59 F3's, kept
   // true by test/systems/ft5_enhancedai.test.js against the arc's own list of
   // what is still ahead. NOT a merge with DFU's Enhancements/
-  // EnhancedCombatAI ("Smarter Enemies", UNAVAILABLE in settings.js: the port runs the
-  // classic path only) - a different thing that shares half a name,
+  // EnhancedCombatAI ("Smarter Enemies", DFU's own setting, which this layer sits on top
+  // of) - a different thing that shares half a name,
   // which the note says outright so the two cannot be read as one.
   Object.freeze({
     id: 'enhanced-ai',

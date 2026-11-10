@@ -25418,7 +25418,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       if (!online.visible(p)) continue;   // AUDIT PSCALE1 NET-2: on the session's OWN clock (steadyNow, AUDIT ONLINE 3 F2) - performance.now() against its stamps never timed a silent peer out
       const h = peerBodies?.heightOf(p.id) || 0;
       if (h > 0) _peerHeights.set(p.id, h);
-      out.push({ id: p.id, feet: onlineToScene(p.shown), height: _peerHeights.get(p.id), cv: p.shown?.cv | 0 });   // INVIS-NET: and the peer's concealment, for the foes' senses
+      out.push({ id: p.id, feet: onlineToScene(p.shown), height: _peerHeights.get(p.id), cv: p.shown?.cv | 0, yaw: p.shown.yaw, wd: p.shown.wd });   // INVIS-NET: and the peer's concealment, for the foes' senses; its facing and sheath, for their retreat roll
     }
     // SLAM4: AND THE REMEMBERED HEIGHTS GO WITH THE PEERS. This map only
     // ever grew: every id that has ever stood in the room stayed in it for the life of the session. A twenty-minute
