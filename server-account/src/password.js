@@ -324,8 +324,8 @@ export const codeForHashing = (code) => canonicalCode(code);
 //
 // THE SAME COLUMN. `recovery_hash` holds `codes,<hash>,<hash>,...`, each
 // `<hash>` this file's own self-describing form (base64 and `$` - never
-// a comma). A row from before keeps its one PBKDF2 string, as ACC1c and
-// RECOVER-OP write it, and that string
+// a comma). A row from before keeps its one PBKDF2 string, as the first
+// recovery codes and the operator's reissue wrote it, and that string
 // still opens the account as the one code it is.
 //
 // AT THE CODE'S COST, NOT THE PASSWORD'S. The iterations are there to

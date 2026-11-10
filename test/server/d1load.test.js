@@ -1,4 +1,4 @@
-// D1-LOAD: how often the town seats read the account database (the witness rows, the weekly lease).
+// How often the town seats read the account database (the witness rows, the weekly lease).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
