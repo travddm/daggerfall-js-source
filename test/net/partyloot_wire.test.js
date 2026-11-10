@@ -27,6 +27,7 @@
 //     test/systems/partyloot.test.js's (OUTDOOR-LOOT D-2.1) - there is no body here that holds 33 pieces.
 // What is not here: a browser (tools/partyLootProbe.mjs plays the report in two), and buildDungeonContext itself, which
 // nothing in the tree can stand up outside one. Mutants: tools/mutants/partyloot_wire.json.
+import { stealthCheckRecord } from '../../src/characters/enemy/peer-senses.ts';   // the dungeon record writer's stealth field
 import { test, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -208,7 +209,7 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     quickLootTake: () => false, showPickups: null, lootPile: () => null, pileBody: () => null, RANDOM_TREASURE_ARCHIVE: 216, surfacePlayer: () => {},
     // the kill door's neighbours (test/systems/loot7check.test.js's killDoor): nothing here reads a loot law
     feudWeakBlow: () => false, blowClassOf: () => null, lastPlayerFeet: [0, 0, 0], foeDeps: null, audio: {},
-    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck: () => {}, markConcealedHit: () => {},
+    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, stealthCheckRecord, _peerSenses: { read: () => false }, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck: () => {}, markConcealedHit: () => {},
     handleAttackFromPlayer: () => {}, damageShieldPool: (e, n) => n, noteFighter: () => {}, PARTY_ME: 'me', partyFoeLoses: (f, n) => n,
     peerSoulTrapOf: () => null, attemptSoulTrap: () => ({ allowDeath: true }), isAzurasStarEquipped: () => false, fillEmptyTrap: () => false,
     hudText: { add: () => {} }, SOUL_TRAP_TEXT: {}, setEnemyAlert: () => {}, sayEnemyDied: () => null, playRareDrop: () => {}, addCorpseFood: () => {},

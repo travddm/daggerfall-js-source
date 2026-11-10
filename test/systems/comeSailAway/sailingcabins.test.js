@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { stealthOfShown } from '../../../src/characters/enemy/peer-senses.ts';   // peersNear's stealth fields, for the mounted function
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse } from 'acorn';
@@ -388,7 +389,7 @@ test('cabin peers are visible indoors; the owner remains hidden from deck actors
   const p = { id: 'owner', shown: { x: 1, y: 2, z: 3 } };
   const modes = { sailingCabin: null };
   const args = { online: { room: 'world:1,1', status: 'open', peers: new Map([[p.id, p]]), visible: () => true }, modes,
-    csaPeers: { isBelowDeck: () => true }, peerBodies: null, onlineToScene: (p) => [p.x, p.y, p.z] };
+    csaPeers: { isBelowDeck: () => true }, peerBodies: null, onlineToScene: (p) => [p.x, p.y, p.z], stealthOfShown };
   const near = new Function(...Object.keys(args), `const _peerHeights = new Map(); return (${worldFunction('peersNear')});`)(...Object.values(args));
   assert.deepEqual(near(), []); assert.equal(near({ presenceOnly: true })[0].id, 'owner');
   modes.sailingCabin = { uid: 101 };
