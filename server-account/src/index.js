@@ -2514,7 +2514,7 @@ const service = {
 };
 
 export default {
-  fetch: (request, env, exec) => localDoor(request, env) ?? measured(request, env, service.fetch, exec),   // AUDIT SAFE DISCORD-4: the ExecutionContext, for waitUntil
+  fetch: (request, env, exec) => localDoor(request, env) ?? measured(request, env, service.fetch, exec),   // the ExecutionContext, for waitUntil
   // SCALE4b: THE SERVICE'S OWN CLOCK - wrangler.toml's [triggers] crons, each firing its list (cron.js), the sweeps no
   // read runs any more and the settlements every read now nearly always finds done
   scheduled,
