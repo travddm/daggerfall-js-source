@@ -1,4 +1,4 @@
-# Production + experimental preview deploy: GitHub Pages via Actions.
+# Production deploy: GitHub Pages via Actions.
 #
 # Root always comes from main and keeps the house `npm run check` gate -
 # FLOW1 (2026-09-26): as verify.yml's parallel jobs (lint and the types,
@@ -7,16 +7,10 @@
 # not deploy a tree the shards did not see). `deploy` publishes only once
 # all of them passed. The same gate as one serial `npm run check` - it
 # was ~7 minutes of every deploy, the PR's check run over again.
-# The exact-face-atlas experiment is built separately and mounted beneath
-# /preview/exact-face-atlas/ so it can be opened on a phone without merging
-# experimental rendering code into production.
 #
 # IMPORTANT: only main is allowed to publish Pages. A preview-branch push used
 # to start a second Pages run in the same concurrency group, cancel the main
 # build, then fail the protected github-pages environment before any steps ran.
-# Main still checks out the preview branch below, so every main deploy carries
-# the latest preview without letting the preview branch deploy by itself.
-# Preview refresh: traced classic weapon/shield art on voxel held items.
 name: deploy
 
 on:
@@ -121,25 +115,6 @@ jobs:
         run: |
           mkdir -p site
           cp -a production/dist/. site/
-
-      - name: Checkout exact-face-atlas preview
-        uses: actions/checkout@v4
-        with:
-          ref: chatgpt/exact-face-atlas
-          path: exact-face-atlas
-
-      - name: Install preview dependencies
-        run: npm ci
-        working-directory: exact-face-atlas
-
-      - name: Build exact-face-atlas preview
-        run: npm run build
-        working-directory: exact-face-atlas
-
-      - name: Mount preview under production site
-        run: |
-          mkdir -p site/preview/exact-face-atlas
-          cp -a exact-face-atlas/dist/. site/preview/exact-face-atlas/
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
