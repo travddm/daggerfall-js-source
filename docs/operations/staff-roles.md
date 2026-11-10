@@ -58,6 +58,6 @@ Taking the role off the account stops its presses at once. The link grants nothi
 
 - A role taken off applies on the account's next request and the next token. A banned or cut account holds no role
   while the ban or cut stands.
-- The remaining `*_HANDLES` vars (`FOUNDER_HANDLES`, `HOURS_FIRST_HANDLES`, `DUNGEON_MASTER_HANDLES`, the Patreon tier
+- The remaining `*_HANDLES` vars (`HOURS_FIRST_HANDLES`, `DUNGEON_MASTER_HANDLES`, the Patreon tier
   lists) grant honorary **titles** and glyphs, not staff rights.
 - The staff panel's audit log records `admin-add`, `admin-remove`, `mod-add` and `mod-remove`.
