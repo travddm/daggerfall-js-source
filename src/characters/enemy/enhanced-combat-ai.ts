@@ -5,9 +5,24 @@
 // own Enhanced AI layer (ai/tactics.js, the `enhancedAI` pref) is a separate option on top of this one.
 //
 // Ported so far, the senses: the field of view, the lead on the target (target-prediction.ts), the rate of approach
-// and the melee reach (enemyAttack.js), and the runner-up target (enemyTargets.js).
+// and the melee reach (enemyAttack.js), and the runner-up target (enemyTargets.js); and the movement and strafing
+// (enhanced-movement.ts).
 
 import { getBool } from '../../systems/settings/settings.js';
+import { initEnhancedMovement, type MovingFoe } from './enhanced-movement.ts';
+// The stance writers, which the foe pools reach through the motor's import (enemyMotor.js), and the movement the
+// motor calls.
+export { writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from '../../player/player-stance.ts';
+export {
+  enhancedTick,
+  rangedStep,
+  evaluateMoveInForAttack,
+  setChangeStateTimer,
+  stopDistanceOf,
+  tickEnhancedTimers,
+  attackPace,
+  REEVALUATE_KNOCKBACK,
+} from './enhanced-movement.ts';
 
 /** Whether DFU's Enhanced Combat AI is on: the player's setting offline, the room's online. */
 export const enhancedCombatAIEnabled = (): boolean => getBool('Enhancements', 'EnhancedCombatAI');
@@ -48,6 +63,7 @@ export function initEnhancedCombatAI(ai: EnhancedCombatAIFields, option: unknown
   // Vector3.zero, which the classic secondary switch reads (enemyTargets.js runTargetMachine).
   ai.secondaryTargetPos = null;
   ai._inEarshot = false; // EnemySenses.targetInEarshot, which PredictNextTargetPos reads (:551)
+  initEnhancedMovement(ai as unknown as MovingFoe);
 }
 
 /**

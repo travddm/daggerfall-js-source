@@ -114,7 +114,7 @@ import { setMidScreenText, midScreenText } from '../ui/midScreenText.js';   // A
 // their bytes; this one module is ~16 KB of source.
 import { EnhancedEnemyAI, makeNavWorld } from '../ai/enhancedMotor.js';
 import { navGoalOn } from './interiorNav.js';   // INDOOR-WATCH AUDIT: the motor's off-mesh goal over the dungeon's own bake
-import { foeFrameDt, enhancedCombatAIEnabled } from '../characters/enemy/enemyMotor.js';   // FOE-CATCHUP: the one cap every pool hands its foes
+import { foeFrameDt, enhancedCombatAIEnabled, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from '../characters/enemy/enemyMotor.js';   // FOE-CATCHUP: the one cap every pool hands its foes
 import { ownerFoes } from './ownerCatchUp.js';   // HOST-CLOCK: the foes' step through the page's one catch-up (OWNER-CLOCK's parity)
 import { spaceFoes, spacingSkips, clearDoorways, actionDoorSpots, freeLodgedFeet, clearPast } from '../characters/foeSpacing.js';   // FOE-SPACING: the pack keeps apart; AUDIT TACT C7: and the doorways clear; FIELD BUGS 2026-10-04d CRATE-FREE: and no foe stands in a crate
 import { isStaleChunk, STALE_CHUNK_IN_PLAY_TEXT, STALE_CHUNK_IN_PLAY_SECONDS } from '../systems/staleChunk.js';   // DISC19-D: a chunk gone mid-session is said, not swallowed
@@ -5749,9 +5749,9 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       c.feet[0] = q.feet[0]; c.feet[1] = q.feet[1]; c.feet[2] = q.feet[2];
       c.height = Number.isFinite(q.height) && q.height > 0 ? q.height : CAPSULE_HEIGHT;
       c.health = 1;
-      c.cv = q.cv | 0;
+      c.cv = q.cv | 0; writePlayerYaw(q.id, q.yaw); writePlayerBowOrSheathed(q.id, q.wd === 0);   // the stance a foe's retreat roll reads: the pose's facing, and wd 0 is sheathed
     }
-    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); }
+    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); forgetPlayerStance(id); }
     return [..._peerCands.values()];
   }
   const peerCandidate = (id) => { peerCandidates(); return (typeof id === 'string' && _peerCands.get(id)) || null; };
