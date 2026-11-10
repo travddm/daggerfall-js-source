@@ -19,6 +19,7 @@ const PREFS = Object.freeze({
   crimeRecovery: 'x4',
   dungeonFires: true,
   weatherEvents: true,
+  etherSea: true,
   realForests: true,
   banthaJungle: true,
   tamrielLands: true,

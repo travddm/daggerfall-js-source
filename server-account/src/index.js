@@ -236,7 +236,6 @@ import { takeNetFeed, NET_FEED_PATH } from './staffNet.js';   // STAFF-PANEL5-FE
 import { takeReactionFeed, REACTION_FEED_PATH } from './staffReactions.js';   // STAFF-PANEL5-FEEDS: the bot check's episodes, their door in
 import { STAFF_FEED_SIG_HEADER, STAFF_FEED_MAX_BYTES } from '../../server/src/staffFeedLaw.js';
 import { crewHall, crewSign, crewRelease, CREW_STATUS } from './crewSigns.js';   // CREW-SIGNED: a crew hall's recruit signed once online
-import { seaSeasonBoard } from './seaSeason.js';   // SEA-SEASON: the sea's season boards
 import { titleWorn, glyphsOf, glyphsHidden, auraWorn, iconWorn } from './titles.js';
 import { withHonours } from './honours.js';   // SIGN-BATCH: the three games' honours on a badge's row, in one batch
 import { claimArena, arenaAttempt, arenaBoardOf, arenaTeam, arenaRatingOf, ARENA_HONOUR_PATHS, ARENA_RENOWN_REGION } from './arena.js';   // ARENA4: the arena's records, its board, its banners, and the honours the mint reads
@@ -1923,13 +1922,6 @@ const service = {
         const r = await act(ctx, who.player, body);
         if ('error' in r) return json({ error: r.error }, CREW_STATUS[r.error] ?? 400, origin);
         return json(r, 200, origin);
-      }
-
-      // SEA-SEASON: the season's deepest voyages and legends
-      // ended - read here; the figures come with each clean checkpoint (seaSeason.js, realm.js checkpointRealm)
-      if (path === '/v1/sea/season/board') {
-        if (request.method !== 'POST') return no('method', 405, origin);
-        return json(await seaSeasonBoard(ctx, who.player, body), 200, origin);
       }
 
       // ═══ PROF5: THE MARKET ══════════════════════════════════════════

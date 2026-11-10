@@ -85,7 +85,7 @@ test('serpent site wire: the `site` word - its day, its native point to the whol
     t: 'serpent',
     ...ok,
   });
-  assert.equal(RELAY_VERSION, 'world320');
+  assert.equal(RELAY_VERSION, 'world321');
 });
 
 // ═══ THE RELAY ═══

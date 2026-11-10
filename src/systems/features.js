@@ -39,7 +39,7 @@ import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
 import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW, TERRAIN_SLOPE_CUT_ROW, CLAW_METAL_ROW, LEGENDARY_EQUIP_FREE_ROW, GENTLE_EQUIP_BILL_ROW, SOLD_GOODS_ON_SHELF_ROW, ABSORPTION_LIMITS_ROW, OPENING_DAMAGE_ROW, ELITE_STACKING_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
-import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js'; import { SPAWNED_DUNGEONS_ROW } from './dungeon/spawned-dungeons-row.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js'; import { SPAWNED_DUNGEONS_ROW } from './dungeon/spawned-dungeons-row.js'; import { ELTHERIC_SEA_ROW } from './elthericSeaRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -901,7 +901,7 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'weatherEvents', initial: true, online: 'room' }),   // WEATHER2b: weatherSim.js weatherFieldOn; forced on online - one sky
-  }),
+  }), ELTHERIC_SEA_ROW,   // ETHER-SEA: its own switch, beside the weather
   // FOREST1: REAL
   // FORESTS - the wilderness's trees gathered into woods with open land
   // between them, in place of DFU's even scatter (world/terrain/terrainNature.js
