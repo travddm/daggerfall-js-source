@@ -50,7 +50,7 @@ import { cannotRemoveItemText } from '../createItem.js';
 // AUDIT 26: DaggerfallEntity.MaxEncumbrance, enchantment allowance and
 // all - :1417 reads playerEntity.MaxEncumbrance, not the bare formula.
 import { entityMaxEncumbrance } from '../../combat/formulas.js';
-import { pendingCarryKg } from './pendingCarry.js';   // CARRY-CLAIMS: a shared pile's takes still waiting for the host weigh too
+import { pendingCarryKg } from './pendingCarry.js';   // a shared pile's takes still waiting for the host weigh too
 import { makeItemPermanent } from '../quest/item.js';   // TransferItem's MakePermanent arm (:1502-1504)
 import { getBool } from '../settings/settings.js';   // GUI/CanDropQuestItems
 import { setLightSource } from '../lightSource.js';   // DISC7: the light in hand's one door

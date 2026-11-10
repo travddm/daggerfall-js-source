@@ -1,5 +1,5 @@
 // @ts-check
-// CARRY-CLAIMS: WEIGHT ON ITS WAY TO THE PACK. A take from a shared container online is a claim: the piece leaves the
+// Weight on its way to the pack. A take from a shared container online is a claim: the piece leaves the
 // pack while the room's authority judges it and comes back on the grant (scenes/roomLootHost.js for dungeon piles,
 // systems/loot/claimLedger.js for bodies outdoors and interiors). The pack alone then weighed less than what would land,
 // and a run of fast takes each passed the carry gate. DFU refuses a take past MaxEncumbrance

@@ -39,7 +39,7 @@ import { validLootList, LOOT_LIST_MAX, LOOT_NEWER_TAKE_TEXT } from '../systems/l
 import { peerHanded, notCarried } from '../systems/peerWord.js';
 import { roomState, judgeRoomClaim, composeRoomView, listMovesSince, liftPiece, pieceCount, roomClaimId, ROOM_BASE_MAX, ROOM_CLAIMS_MAX, ROOM_TAKEN_TEXT } from '../systems/roomLoot.js';
 import { createClaimLedger, LEGACY_ASK_KEEP_MS } from '../systems/loot/claimLedger.js';
-import { weighLedger } from '../systems/item/pendingCarry.js';   // CARRY-CLAIMS: my takes in flight weigh at the carry gate
+import { weighLedger } from '../systems/item/pendingCarry.js';   // my takes in flight weigh at the carry gate
 import { tokenGate, mintSharedStamp, CELL_FRAME_RECORDS_MAX } from '../net/wire.js';
 import {
   BODY_PEEK_REACH, PEEK_RETRY_MS, BODY_ASKS_PER_S, TAKES_PER_S, TAKE_WINDOW_MS, GRANT_BACK_MS, GRANT_FRAME_MAX, GENERATION_SPACE, BAD, HIDDEN,

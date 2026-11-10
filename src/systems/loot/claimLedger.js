@@ -23,7 +23,7 @@
 // LEGACY_ASK_KEEP_MS - with the puppet or without it (a room change, a swept owner).
 // Pure but for the player's hands. Not a DFU member: Daggerfall has one player.
 import { liftPiece, givePiece, ROOM_CLAIM_TIMEOUT_MS, ROOM_TAKEN_TEXT, ROOM_CLAIMS_MAX } from '../roomLoot.js';
-import { inFlightKg } from '../item/pendingCarry.js';   // CARRY-CLAIMS: what a claim in flight weighs
+import { inFlightKg } from '../item/pendingCarry.js';   // what a claim in flight weighs
 
 /** How long a claim waits for its verdict: any verdict inside it lands, past it the claim is given up. */
 export const CLAIM_KEEP_MS = 300_000;
@@ -97,7 +97,7 @@ export function createClaimLedger({ entity, say = () => {}, newId, keepMs = CLAI
     return { places, stored, puts: /** @type {any[]} */ ([]) };
   }
 
-  /** CARRY-CLAIMS: the kilograms the claims in flight will land (not answered, not lapsed: a lapsed piece is back in
+  /** The kilograms the claims in flight will land (not answered, not lapsed: a lapsed piece is back in
    *  its container's view), for the carry gate (systems/item/pendingCarry.js). */
   const pendingKg = () => inFlightKg(claims.values());
 

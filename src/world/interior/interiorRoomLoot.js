@@ -45,7 +45,7 @@ import {
   ROOM_ANSWERS_KEPT, ROOM_CLAIM_TIMEOUT_MS, ROOM_CLAIMS_MAX, ROOM_PUT_RESAY_MS, ROOM_TAKEN_TEXT,
 } from '../../systems/roomLoot.js';
 import { createClaimLedger, CLAIM_KEEP_MS } from '../../systems/loot/claimLedger.js';
-import { weighLedger } from '../../systems/item/pendingCarry.js';   // CARRY-CLAIMS: my takes in flight weigh at the carry gate
+import { weighLedger } from '../../systems/item/pendingCarry.js';   // my takes in flight weigh at the carry gate
 import { validLootList, LOOT_LIST_MAX } from '../../systems/loot/loot.js';
 import { markRoomCarried } from '../../systems/loot/roomCarriedList.js';
 import { neverPeerHanded, peerHanded } from '../../systems/peerWord.js';

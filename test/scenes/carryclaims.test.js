@@ -1,4 +1,4 @@
-// CARRY-CLAIMS: a take from a shared container online leaves the pack while the room's
+// A take from a shared container online leaves the pack while the room's
 // authority judges it (roomLootHost.js roomTake; claimLedger.js take), and the carry gate (itemTransfer.js planTake) read
 // the pack alone. Fast takes near the limit each passed, and the grants landed past it. DFU refuses a take past
 // MaxEncumbrance (DaggerfallInventoryWindow.cs CanCarryAmount), so the claims in flight now weigh at the gate. Driven
@@ -100,7 +100,7 @@ function windowTake(pile, piece) {
   return plan;
 }
 
-test("CARRY-CLAIMS: a joiner's take waiting for the host still weighs - the second 20 kg piece is refused at 30 kg, before and after the first leaves the pack as a claim", () => {
+test("A joiner's take waiting for the host still weighs - the second 20 kg piece is refused at 30 kg, before and after the first leaves the pack as a claim", () => {
   ready();
   const rec = hostWord();
   const b = client('b0b0-0002');
@@ -118,7 +118,7 @@ test("CARRY-CLAIMS: a joiner's take waiting for the host still weighs - the seco
   assert.equal(pile.includes(second), true, 'and stays in the pile');
 });
 
-test("CARRY-CLAIMS: a lapsed claim is back in the pile and weighs nothing; another player's weight never counts", () => {
+test("A lapsed claim is back in the pile and weighs nothing; another player's weight never counts", () => {
   ready();
   const rec = hostWord();
   const b = client('b0b0-0002');
@@ -142,7 +142,7 @@ test("CARRY-CLAIMS: a lapsed claim is back in the pile and weighs nothing; anoth
   );
 });
 
-test('CARRY-CLAIMS: the claim ledger of outdoor bodies and interiors weighs its claims in flight, answered and lapsed ones not', () => {
+test('The claim ledger of outdoor bodies and interiors weighs its claims in flight, answered and lapsed ones not', () => {
   ready();
   const entity = { ...playerEntity, items: [heavy('Anvil Torc')], stats: { ...playerEntity.stats } };
   const ledger = createClaimLedger({
