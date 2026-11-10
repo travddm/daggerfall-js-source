@@ -5567,9 +5567,8 @@ export function createWorldModes(host) {
         // the ONE derivation of WeatherManager's four public flags from
         // SetWeather's own switch. This arm used to spell two of them
         // inline off the weather enum - correct, and a second reading of
-        // a DFU member (ONE DFU MEMBER, ONE EXPORT). AT1 wrote the shared
-        // one for Ambient Text's WeatherKey and its record said this copy
-        // had been folded into it; it had not. It is now.
+        // a DFU member (ONE DFU MEMBER, ONE EXPORT). It now reads
+        // the shared one.
         //
         // AUDIT WAITS S1: read at the Yes, the sky the summoning is made
         // under - SUMMON-NAME's list can stand open while it turns.
@@ -13110,9 +13109,8 @@ export function createWorldModes(host) {
      *  IsPlayerInsideDungeon), which IsSameInterior asks for by name
      *  (:193, :197, :209). The outer host holds the map pixel.
      *
-     *  AT2: and `dungeonType` - PlayerEnterExit.Dungeon.Summary.DungeonType,
-     *  a third read off the same object, which Ambient Text's key needs
-     *  underground. It is the LOCATION's dungeon type because the only
+     *  and `dungeonType` - PlayerEnterExit.Dungeon.Summary.DungeonType,
+     *  a third read off the same object. It is the LOCATION's dungeon type because the only
      *  dungeon you can be inside is the one this pixel carries; it reads
      *  NoDungeon (255) in every other mode, as DFU's summary does before
      *  a dungeon is loaded. THE FOUR HOSTS: this is the interior host's

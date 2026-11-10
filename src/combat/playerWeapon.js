@@ -21,6 +21,7 @@
 // term, FormulaHelper.cs:602-609's order. Backstab is threaded by the host that
 // keeps facing bookkeeping on foes.
 
+import { LOCAL_PLAYER, writePlayerBowOrSheathed } from '../player/player-stance.ts';   // what a foe's retreat roll reads
 import {
   createWeaponMachine, machineAttack, machineStep, gestureDirection, strikeTicks, getMeleeWeaponAnimTime,
   MAX_GESTURE_SECONDS, BOW_DRAWN_HOLD_FRAME, machineCancelBowDraw, CLASSIC_UPDATE_INTERVAL,
@@ -704,6 +705,8 @@ export class PlayerWeapon {
     this.machine.isBow = t === WEAPON_TYPES.Bow;
     // ARROW2: the bow's idle frame is the setting's (FPSWeapon.cs:533-534) - read per step, as DFU reads Settings there
     this.machine.bowIdleDrawn = this.machine.isBow && !getBool('Controls', 'BowDrawback');
+    // DFU's "player with bow or weapon not out" (EnemyMotor.EvaluateMoveInForAttack :1260-1263), for a foe's retreat roll
+    writePlayerBowOrSheathed(LOCAL_PLAYER, this.machine.isBow || this.sheathed);
     const evs = machineStep(this.machine, dt, this.liveSpeed, this.animCtx?.() ?? null);
     // TWO-HANDS: a strike that ends is the one the next alternates from - its hand, and the machine time it ended
     if (evs.includes('done')) { this._lastHand = this.strike?.hand ?? this.leadHand; this._lastEnd = this.machine.now; this.strike = null; }
