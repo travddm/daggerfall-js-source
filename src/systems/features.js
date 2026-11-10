@@ -276,7 +276,6 @@ export const MOD_CURATED = Object.freeze({
     'GeneralOptions.AvoidObstacles', 'GeneralOptions.FirstPersonTravel',
     'GeneralOptions.FirstPersonTravelFollowsRoads',
   ]),
-  'ambient-text': Object.freeze(['textChance', 'interval', 'postTextInterval', 'textDisplayTime']),   // AT0: all four it ships - the mod is small enough that curation would only hide something
   // EOTB0: the mod ships FIFTY-FOUR keys across nine sections, so this
   // one IS curated, and the four are the ones a player reaches for
   // first: how far back the camera sits, which shoulder it sits over,
@@ -1140,12 +1139,6 @@ export const FEATURES = Object.freeze([
   modFeature('roleplay-realism-items', () => t('features.effect.gameLoads', 'Takes effect when the game next loads.'), 'loot'),   // RRI1: the template patches are merged at load (ItemHelper.LoadItemTemplates); the classes read their switches live; RRI2: the nine modules read theirs at each roll (a corpse, a shelf, a price), the starting kit and spellbook at the next character   // DW1: the atlas name is chosen at the weapon's load (FPSWeapon.cs:637-644), and the rig's cache key carries it
   modFeature('roleplay-realism', () => t('features.effect.gameLoads', 'Takes effect when the game next loads.'), 'loot'),   // RR1: the class enemies' appearance is written into the basics at load (RoleplayRealism.cs:186-189); every other arm reads its switch at the roll
   modFeature('handheld-torches', () => t('features.effect.atOnce', 'Takes effect at once.'), 'loot'),   // HT1: the component reads its switches every frame
-  // AT0: AMBIENT TEXT - `world`, because what it talks
-  // about is where you are. Its effect line is the mod's own pacing:
-  // off falls silent at once, and on hands the mod back a clock that
-  // has been running the whole time (AT1 - the interval keeps running
-  // while the mod is quiet, exactly as it does while you are indoors).
-  modFeature('ambient-text', () => t('features.effect.atOnce', 'Takes effect at once.'), 'interface'),   // FT18: was world
   // EOTB0: EYE OF THE BEHOLDER - third person for a
   // player with no Morrowind data. Filed under `world` rather than
   // `combat`: it changes where you see the whole game from, not how a
