@@ -35,7 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
-  world321: '9f70780ebed1b66666220767dd0260bdb20d7949385ab7b72d4b92b77a453ee1', // ETHER-SEA ROOM: the Eltheric Sea row's switch is pinned on in the server profile (officialProfile.ts); the lane no longer forces it
+  world321: '9f70780ebed1b66666220767dd0260bdb20d7949385ab7b72d4b92b77a453ee1', // The Eltheric Sea row's switch is pinned on in the server profile (officialProfile.ts); the lane no longer forces it
   world320: '8148f04a51c2ca4ef347aaabbe109b5bcad7805e68354edc6284d3285ae904a7', // HERALD REMOVED: the relay's Discord herald leaves core - no gate, serpent or Abyss Dungeon cards, and the Discord role and thread settings leave the relay's settings
   world319: '8e277658b5ae8d3eca9c7d9322053f1a311c7a9693cb1731786b5f82a519c736', // the locale catalog keeps every language for player-installed packs; a translation's source is `community`
   world318: 'cb13bad9c1b416a14858034860b93b087bb7474d667fccc04526306624f56086', // the Spawned dungeons switch is pinned off in the server profile (officialProfile.ts)

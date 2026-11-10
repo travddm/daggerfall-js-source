@@ -102,7 +102,7 @@ export const LOG_LIST_MAX = 32;
  *  remembered gathered (the newest). */
 export const ETHER_CHARTED_MAX = 4096;
 export const ETHER_HARVEST_KEEP = 128;
-/** ETHER-SEA: a new Eltheric record - nothing charted, ended or gathered, no crossing made. */
+/** A new Eltheric record - nothing charted, ended or gathered, no crossing made. */
 export const newEther = () => ({ charted: [], legends: {}, harvested: {}, from: null, crossings: 0, heard: [], fleets: [], wrack: [] });
 /** AUDIT SEA VENTURES D2, D4: the treasure fleet's sailings whose flagship the captain ended, the newest kept - one is
  *  three hours' sailing, so the last four are more than a sailing's whole life. */
@@ -239,7 +239,7 @@ export function createCaptainLedger() {
     },
     /** The way made at a helm (metres). */
     sailed(m) { if (Number.isFinite(m) && m > 0 && m < 1e5) log.sailed += m; },
-    /** The deepest an Eltheric voyage has gone (leagues past the Veil - ETHER-SEA, scenes/etherHost.js sight). */
+    /** The deepest an Eltheric voyage has gone (leagues past the Veil - scenes/etherHost.js sight). */
     deepest(d) {
       if (!Number.isFinite(d)) return;
       if (d > log.deepest) log.deepest = Math.floor(d);
