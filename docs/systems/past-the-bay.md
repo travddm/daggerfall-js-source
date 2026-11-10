@@ -57,9 +57,9 @@ pixels a side.
 
 ## Tests
 
-| Area | Test files |
-| --- | --- |
-| Towns | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js` |
+| Area                         | Test files                                                                                                                    |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Towns                        | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js`                    |
 | Frame, relief, places, roads | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js` |
 
 ## Traps
