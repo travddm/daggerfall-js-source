@@ -43,6 +43,20 @@ export const PROFILE_KEYS = Object.freeze({
     words: 'profile.repair.allowMagic',
     setting: 'Controls.AllowMagicRepairs',
   }),
+  // Whether foes run DFU's Enhanced Combat AI: every player in a room meets the same foes, so the room holds one
+  // answer. DFU ships True (defaults.ini EnhancedCombatAI); online plays DFU's value (characters/enemy/
+  // enhanced-combat-ai.ts).
+  'combat.enhancedAI': Object.freeze({
+    census: Object.freeze(['ON64'] as const),
+    feature: 'DFU-ECAI',
+    type: 'bool',
+    dfu: true,
+    online: true,
+    offline: Object.freeze({ setting: 'Enhancements.EnhancedCombatAI' }),
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.combat.enhancedAI',
+    setting: 'Enhancements.EnhancedCombatAI',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;

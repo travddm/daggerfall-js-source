@@ -92,7 +92,9 @@
 // corridor); and no frame casts more than MAX_FEELERS - a scan that would
 // is resumed next frame with the body held for the one it waits. A FEELER
 // IS NOT ONE RAY (TRAVEL-NAV2's audit): the collider probe casts it in
-// FEELER_LEG legs, so a feeler to the look-ahead at a hitching x100 is
+// FEELER_LEG legs, at two heights (FEELER_HEIGHT_HIGH; the timings below
+// were measured at one height, and two cast up to twice the rays), so a
+// feeler to the look-ahead at a hitching x100 is
 // dozens of raycastHit calls - measured over a forty-bucket town, 0.2 ms
 // a frame at the worst pace and 0.06 at an ordinary one.
 //
@@ -579,6 +581,13 @@ export function steerDrive(steer, drive, worldX, worldZ, autopilot, frame, probe
 /** How high above the feet a feeler runs: over anything the motor steps
  *  up (STEP_OFFSET), under everything it cannot. */
 export const FEELER_HEIGHT = STEP_OFFSET + 0.1;
+/** A feeler's second ray, above the first. A rail fence (ARCH3D 41206 and 41207, which a town mod stands round
+ *  its yards) is posts with a low rail 0.38-0.65 m and an upper rail 1.30-1.50 m over its foot. On ground a few
+ *  centimetres lower than the body's, the ray at FEELER_HEIGHT passes over the low rail and between the posts, so the
+ *  steering saw a fence as open ground and the body ground against it. This height meets the upper rail wherever the
+ *  low ray passes over the low one (the fence's foot up to about 0.2 m under the feet), and stays under the boards a
+ *  shop's sign hangs from 1.65 m (world/signSolid.js), which no body meets. */
+export const FEELER_HEIGHT_HIGH = 1.25;
 /** A feeler follows the ground in legs this long - a heightmap cell and a
  *  quarter (819.2 / 128 = 6.4), so the terrain between two samples is
  *  near enough a straight line. */
@@ -605,7 +614,9 @@ export const FEELER_RIDES = 4;
 const RIDE_NUDGE = 0.01;
 
 /** A probe over a real collider (player/collider.js): `feet()` the body's
- *  feet in scene space. Each feeler starts FEELER_HEIGHT over the feet,
+ *  feet in scene space. Each feeler is a ray at each of `heights` (FEELER_HEIGHT
+ *  and FEELER_HEIGHT_HIGH), and the nearest wall either meets is the feeler's.
+ *  Each ray starts its height over the feet,
  *  `lateral` metres to the right of the heading, and runs out in legs of
  *  FEELER_LEG whose ends ride FEELER_HEIGHT over the terrain
  *  (`collider.heightAt`) - so a house on a rise ahead is met at its wall,
@@ -615,7 +626,7 @@ const RIDE_NUDGE = 0.01;
  *  RIDDEN, so it hides nothing behind it (FEELER_RIDES). The origin, the
  *  direction and the hit are this probe's own, reused every call
  *  (collider.raycastHit's `out`). */
-export function createColliderProbe({ collider, feet, height = FEELER_HEIGHT, leg = FEELER_LEG }) {
+export function createColliderProbe({ collider, feet, heights = [FEELER_HEIGHT, FEELER_HEIGHT_HIGH], leg = FEELER_LEG }) {
   const o = [0, 0, 0];
   const d = [0, 0, 0];
   const hit = { dist: Infinity, key: null, normal: [0, 0, 0] };
@@ -624,6 +635,16 @@ export function createColliderProbe({ collider, feet, height = FEELER_HEIGHT, le
     const sx = at[0] + dirZ * lateral, sz = at[2] - dirX * lateral;   // right of (dirX, dirZ) is (dirZ, -dirX): motor.js's screen-right
     const g0 = collider.heightAt(at[0], at[2]);
     const level = !(at[1] - g0 <= ON_STRUCTURE);   // no ground under the feet (NaN, -Infinity) reads as a structure too
+    let nearest = Infinity;
+    for (let k = 0; k < heights.length; k++) {
+      const wall = castAt(at, sx, sz, dirX, dirZ, level, heights[k], Math.min(maxDist, nearest));
+      if (wall < nearest) nearest = wall;
+    }
+    return nearest;
+  };
+
+  /** One ray of a feeler, `height` over the feet: the distance out to the first wall it meets, or Infinity. */
+  function castAt(at, sx, sz, dirX, dirZ, level, height, maxDist) {
     let y0 = at[1] + height;
     let a = 0;
     while (a < maxDist) {
@@ -663,5 +684,5 @@ export function createColliderProbe({ collider, feet, height = FEELER_HEIGHT, le
       a = b; y0 = y1;
     }
     return Infinity;
-  };
+  }
 }
