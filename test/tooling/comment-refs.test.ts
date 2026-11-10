@@ -32,7 +32,7 @@ test('tagsIn leaves plain prose and technical names alone', () => {
     'ARENA2 holds the maps; ES2022 syntax',
     'Direct3D 11 (D3D11) and TES3 plugins',
     'ARCH3D.BSA holds the models, BLOCKS.BSA the city blocks',
-    'BODY00I0.IMG, TRAV0I00.IMG and BIOG00T0.TXT are images and text in ARENA2',
+    'BODY00I0.IMG, BANK00I0.IMG and BIOG00T0.TXT are images and text in ARENA2',
     'S0000001.QBN is a quest, CLASS00.CFG a class, ANIM0000.VID a video, FONT0003.FNT a font',
     'N0B20Y25.RMB is a city block, R0C10Y16.RDB a dungeon block, O0B2XY08.RMB another',
     'SKY00.DAT and WEAPON04.CFG',
