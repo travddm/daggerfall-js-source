@@ -18,7 +18,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { availableParallelism } from 'node:os';
-import { testFiles, readTimes, TIMES_FILE } from './testShards.mjs';
+import { testFiles, readTimes, runnerEnv, TIMES_FILE } from './testShards.mjs';
 import { isMain } from './lib/isMain.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -57,7 +57,7 @@ export function mergeDir(dir, root = ROOT) {
 function timeOne(file) {
   return new Promise((resolve) => {
     const t0 = process.hrtime.bigint();
-    const child = spawn(process.execPath, ['--test', file], { cwd: ROOT, stdio: 'ignore' });
+    const child = spawn(process.execPath, ['--test', file], { cwd: ROOT, stdio: 'ignore', env: runnerEnv(ROOT) });
     child.on('close', (code) => resolve({ file, ms: Math.round(Number(process.hrtime.bigint() - t0) / 1e6), code }));
   });
 }
