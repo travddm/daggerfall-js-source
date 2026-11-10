@@ -1,6 +1,6 @@
 // @ts-check
 // LW2: THE LIVING WORLD'S SWITCH - the Features row `living-world`
-// (systems/features.js), on by default, the enhanced lane's alone (LW0 decision 1): the classic skin, and the row off,
+// (systems/features.js), on by default, the enhanced lane's alone: the classic skin, and the row off,
 // keep DFU's PopulationManager walkers 1:1 (systems/town/townPopulation.js). Read where a town is built, so a change takes
 // effect when a town next loads.
 import { getPref } from '../uiPrefs.js';

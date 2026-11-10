@@ -445,7 +445,7 @@ export async function measure(db, nowS, days) {
     bands.push({ from: lo + 1, upTo: b.upTo, rate: b.rate, cap: b.cap, hours: n, quantiles, most, overs });
     lo = b.upTo;
   }
-  // AUDIT LW-II-2 S6 (Living World II decision 7: the patrons' gold "written where the wealth measure counts it"): the
+  // AUDIT LW-II-2 S6 (the patrons' gold is written where the wealth measure counts it): the
   // service's own faucets over the window - the gold it paid that no player paid (budget.js FAUCET_KINDS), each kind
   // named, none left unread (realm_faucets was written and nothing read it)
   const { results: paid = [] } = await db.prepare('SELECT kind, SUM(gold) AS gold, SUM(n) AS n FROM realm_faucets WHERE hour >= ?1 GROUP BY kind')

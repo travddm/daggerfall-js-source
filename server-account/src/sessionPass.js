@@ -30,7 +30,7 @@
 import { _b64url } from '../../src/net/identityToken.js';
 import { DB_FIRST_PRIMARY } from './service.js';
 
-/** How long a pass is good for (decision 4: five minutes - the relay's identity tokens already accept five). */
+/** How long a pass is good for (five minutes: the relay's identity tokens already accept five). */
 export const PASS_TTL_S = 300;
 /** A pass with this little left, or less, is not believed: the lookup answers, and a new pass rides back - so a page that
  *  asks as often as the heartbeat renews its pass before it lapses, and the lag is under PASS_TTL_S - PASS_RENEW_S. */

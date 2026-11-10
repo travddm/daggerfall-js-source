@@ -8,7 +8,7 @@
 
 /** THE BLOW POWERS' TOPS: each registry's most onto one blow (per cent), measured from today's records and laws. B1 (tame player
  *  power) rescaled the records themselves (the sets from +200 to +20, the loot's powers from +240 to +24); B5 finished the
- *  budget (decision 41: melee about x1.6, casters about x1.75) and rescaled every source again, the Firmament tree too, so no
+ *  budget (melee about x1.6, casters about x1.75) and rescaled every source again, the Firmament tree too, so no
  *  printed number is cut. */
 export const BLOW_TOPS = Object.freeze({ sigil: 3, sets: 6, loot: 8.5, firmament: 6, mastery: 7, martial: 4 });
 /** THE GUARDS' TOPS: each registry's most off one hurt (per cent), its guards multiplied; measured as the blow's are. */

@@ -2,7 +2,7 @@
 // QL3: WHAT AN
 // OUTCOME PAYS - the client's half. The service's half - silver, embers,
 // titles - is paid only against what the service witnessed (section 5.3, server-account/src/questlines.js);
-// nothing here mints an account currency (decision 8).
+// nothing here mints an account currency.
 //
 // THE GOLD stays DFU's formula (quest/item.js _createGold), times the outcome's factor (a tenth either way; DFU's own
 // scale when the Questline rewards row is off, questRewardsRow.js) - never below OUTCOME_GOLD_MIN

@@ -2,7 +2,7 @@
 // TOWN-ECON TE2 - THE PLAYERS' SHARE
 // OF A TOWN'S ECONOMY, as this service counts it.
 //
-// WITNESSED ACTS ONLY (TE0 decision 3): a town is raised by what this service saw happen there, never by gold -
+// WITNESSED ACTS ONLY: a town is raised by what this service saw happen there, never by gold -
 //   - its FOOTSTEPS: the relay's signed Watch ticks (src/net/watchReceipt.js), claimed by the account they name, at the
 //     town the registry holds for the tick's pixel (POST /v1/towns/watch);
 //   - TRADE at its players' traders: a market sale at a trader's stall (market.js marketBuy, at the listing's
