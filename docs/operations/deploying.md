@@ -34,9 +34,7 @@ ones, or let the next push to `main` retry them. Every deploy is idempotent.
 2. Runs `verify.yml` on it (without its own build) in parallel with the site build.
 3. Builds the site: `npm ci`, `npm run build` (Vite, `vite.config.js`, `base: './'`). The build writes the commit
    into `src/buildTag.js` (`prebuild`: `scripts/buildTag.mjs`) and restores the file after (`postbuild`).
-4. Adds a preview under `site/preview/`: a build of the branch `chatgpt/exact-face-atlas`. **A missing
-   `chatgpt/exact-face-atlas` branch fails the site deploy.** Remove the step when that preview is no longer wanted.
-5. Waits for the account service's version (above), then publishes with `actions/deploy-pages`.
+4. Waits for the account service's version (above), then publishes with `actions/deploy-pages`.
 
 Only one site deploy runs at a time; a newer push cancels an older run (`concurrency: pages`).
 
@@ -160,7 +158,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[placement] region` | Runs the Worker near the D1 primary. |
 | `[triggers] crons` | The service's own clock (`server-account/src/cron.js` `runCron`): sweeps and retention. |
 | `[vars] ACCOUNT_VERSION` | Must equal `ACCOUNT_VERSION` in `server-account/src/service.js`. |
-| `[vars] *_HANDLES`, `OWNER_KEYS` | `*_HANDLES`: comma-separated account handles for honorary titles only. `OWNER_KEYS`: the public key an Owner account signs in with first. Staff roles are not vars: see [Staff roles](staff-roles.md). |
+| `[vars] *_HANDLES` | Comma-separated account handles for honorary titles only. Staff roles are not vars: see [Staff roles](staff-roles.md). |
 | `[vars] *_OPEN`, `SEASON_ZERO_WEEK`, `DOMAINS_WEEK` | Feature switches and season schedule. |
 | `[vars] MOD_AI`, `MOD_AI_MODEL`, `MOD_AI_DAILY_MAX` | The chat-safety reviewer's mode and limits. |
 | `[vars] DISCORD_MOD_CHANNEL`, `DISCORD_PUBLIC_KEY`, `DISCORD_INVITE_URL` | The moderation bot's channel and interaction key. |

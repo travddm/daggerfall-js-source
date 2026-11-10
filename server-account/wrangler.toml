@@ -134,13 +134,6 @@ MODES_OFFERED = ""
 # remove Moderators, and the Discord moderators' queue links a Discord id to an account the same way.
 # The other *_HANDLES lists below grant a TITLE (a name beside a name), never a right to act on another player.
 #
-# STAFF-PANEL1: AN OWNER'S FIRST WAY IN - `handle:publicKey`, comma-separated, the key raw Ed25519 in base64url. The owner's own
-# staff panel extension minted the pair on their computer and holds the private half; this half only checks its signature,
-# so it is safe in a public repository. It is that owner's first way in; every other staff member is invited from the
-# panel. Empty: no owner can enrol (no key is a shut door, never an open one).
-# STAFF-PANEL1 (2026-10-22, mob pasted the key his panel showed): SirMcMobdon's first computer. Latty enrols by mob's invite,
-# or adds a pair here.
-OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"
 # SAFE1-SAFE8 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system";
 # bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY.
 #
@@ -149,13 +142,15 @@ OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"
 # hub applies and hands to its target's own client. Empty: the order lands on the target's next connection instead.
 # AUDIT SAFE RELAY S1: the order goes through the RELAY service binding below, which this address only names the path
 # for - one Worker fetching another's workers.dev address on the same account may be refused (Cloudflare's error 1042).
-RELAY_LAW_URL = "https://daggerfall-online.mackcothran.workers.dev/v1/law"
+# The host is the reserved `relay.invalid`: the binding reads only the path. A deploy without the RELAY binding must set
+# its own relay host here; `.invalid` never resolves, so no order leaves for another server.
+RELAY_LAW_URL = "https://relay.invalid/v1/law"
 # MOD_AI - SAFE5: the reviewer (src/modAi.js) - "off"; "shadow", which reads the relay's feed of public lines and the
 # reported cases and says its verdict beside each case, marked as a shadow's, and does nothing on it; or "on", which
-# also mutes for half an hour on its severest, surest verdicts. Shipped "shadow" (INT5's law, Mac's "Measure 7 days,
-# then enforce"): read what it says for a fortnight, then turn it on. It reads nothing until the deploy has put
-# ANTHROPIC_API_KEY beside it - a secret, from the repository's own secrets, never here.
-MOD_AI = "shadow"
+# also mutes for half an hour on its severest, surest verdicts. Shipped "off": "shadow" and "on" send
+# public chat lines and reported lines to Anthropic's Messages API, so an operator turns the reviewer on on purpose. It
+# reads nothing until ANTHROPIC_API_KEY is set beside it, as a secret, never here.
+MOD_AI = "off"
 # MOD_AI_MODEL: the model, empty for the current Haiku (src/modAi.js MOD_AI_MODEL_DEFAULT). MOD_AI_DAILY_MAX: its calls
 # a UTC day, empty for 1,500.
 MOD_AI_MODEL = ""
@@ -174,16 +169,6 @@ DISCORD_PUBLIC_KEY = "36e74945022f94ec7955a84ccccb270e63780100e558d30777742337b6
 # server's Discord invite the frozen player's Staff tab shows beside its Copy button (server-account/src/staffFreeze.js
 # discordInvite), so it changes without a game update. An https address; empty, the tab shows none.
 DISCORD_INVITE_URL = "https://discord.gg/QADbZYQ73j"
-# FOUNDER5 (2026-10-07, Mac: "Can we grant every account before sept 25th
-# the founder title"): THE FOUNDERS BY NAME. Founder is held by every
-# registered account that first played by the end of 24 September on any
-# clock (titles.js FOUNDER_UNTIL), and the service can only know that from
-# what it recorded. A player who played before then where it recorded
-# nothing - a guest's storage cleared, a character never saved to the
-# cloud - is named here: comma-separated handles, case-insensitive, the
-# same as the lines above. It only adds: a founder by the date holds the
-# title whether listed or not. Empty: nobody by name yet.
-FOUNDER_HANDLES = ""
 # HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant
 # them a unique different version of the aura, a title named Hour's First,
 # and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON - the
@@ -237,6 +222,9 @@ PROF_DAY_CAPS = "on"
 PROF_MASTERWORK_GATE = "on"
 # PROFESSION-CAPS: the gathered goods are priced on DFU's ingredient scale; "off" puts back the port's earlier scale.
 PROF_DFU_PRICES = "on"
+# A Master's work is Rare, so crafted gear stays below Legendary; "on" makes it Legendary, as before the cap (src/net/masterLaw.js
+# masterTierFor).
+PROF_MASTER_LEGENDARY = "off"
 # CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the Admins alone)
 # or "on". Shipped at "dev": the developers' realm characters keep their guild standing on the service first; everyone
 # else's stays the save's, as before CHAP1, until this line says "on". CHAP2a: and the halls' witness, a hall writ's

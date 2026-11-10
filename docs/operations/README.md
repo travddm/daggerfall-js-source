@@ -10,5 +10,7 @@ and their configuration, the desktop app release, and the manual workflows that 
 - [desktop-release.md](desktop-release.md) - the Electron app, the release workflow, version numbers, how the app
   updates, and patch notes.
 - [tools-index.md](tools-index.md) - hand-run tools in `tools/` that no script, workflow or other page names.
+- [operator-commands.md](operator-commands.md) - a self-hosted server's operator acts: staff roles, recovery codes,
+  server posts and realm rollbacks.
 - [staff-roles.md](staff-roles.md) - Admin, Moderator and Owner are account roles: who sets them, and how the
   operator sets the first Owner and links Discord moderators.
