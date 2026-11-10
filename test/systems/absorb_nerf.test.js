@@ -3,6 +3,7 @@
 // The law now: the item enchantment is a 50% roll; the Spell Absorption effect's chance caps at 50% and the Spell
 // Maker's chanceBase for it stops at 50; every absorb refunds HALF its points (floored); the career's Always keeps its
 // 100% (the Sorcerer has no regen) but refunds half too; the Eye of Mora set is untouched.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -38,7 +39,8 @@ test('ABSORB-NERF: the numbers', () => {
   assert.equal(SPELL_ABSORPTION_CHANCE_BASE_MAX, 50);
 });
 
-test('ABSORB-NERF: the AbsorbsSpells enchantment is a 50% roll, not DFU\'s flat always', () => {
+test('ABSORB-NERF: the AbsorbsSpells enchantment is a 50% roll, not DFU\'s flat always', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const t = target();
   const cost = effectCastingCost(damageEffect(), 0, t);
   assert.equal(tryAbsorption(damageEffect(), 0, t, { absorbing: true, rolls: roll(0.49) }), cost, 'a 49 absorbs');
@@ -47,7 +49,8 @@ test('ABSORB-NERF: the AbsorbsSpells enchantment is a 50% roll, not DFU\'s flat 
   assert.equal(tryAbsorption(damageEffect(), 0, t, { absorbing: false, rolls: roll(0) }), 0, 'no enchantment, no absorb');
 });
 
-test('ABSORB-NERF: the enchantment, live through applySpell (the entity\'s AbsorbsSpells fold)', () => {
+test('ABSORB-NERF: the enchantment, live through applySpell (the entity\'s AbsorbsSpells fold)', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const spell = { element: 0, rangeType: 0, effects: [damageEffect(20)] };
   const hit = target(SPELL_ABSORPTION.None, { _enchantMods: { absorbsSpells: true }, health: 500, maxHealth: 500 });
   const passed = applySpell(spell, 1, hit, { hurt: () => {} }, () => 0.9, { name: 'caster' });
@@ -58,7 +61,8 @@ test('ABSORB-NERF: the enchantment, live through applySpell (the entity\'s Absor
   assert.ok(out.absorbed > 0, 'a low roll: the bolt is absorbed');
 });
 
-test('ABSORB-NERF: the Spell Absorption effect\'s chance caps at 50%', () => {
+test('ABSORB-NERF: the Spell Absorption effect\'s chance caps at 50%', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   assert.equal(spellAbsorptionChance(target(0, { activeEffects: [absorbBuff(100)] })), 50, 'a 100% buff reads 50');
   assert.equal(spellAbsorptionChance(target(0, { level: 30, activeEffects: [absorbBuff(10, 10, 1)] })), 50,
     'a buff that grows past 50 with level stops at 50');
@@ -70,7 +74,8 @@ test('ABSORB-NERF: the Spell Absorption effect\'s chance caps at 50%', () => {
   assert.equal(tryAbsorption(damageEffect(), 0, t, { rolls: roll(0.50) }), 0, 'a 100% buff no longer always absorbs');
 });
 
-test('ABSORB-NERF: the Spell Maker\'s chanceBase for Spell Absorption stops at 50; every other range stands', () => {
+test('ABSORB-NERF: the Spell Maker\'s chanceBase for Spell Absorption stops at 50; every other range stands', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   assert.equal(SPELL_ABSORPTION_KEY, '20,255');
   assert.deepEqual(spinnerRange('chanceBase', '20,255'), [1, 50]);
   assert.deepEqual(spinnerRange('chanceBase', '21,255'), [1, 100], 'Spell Reflection keeps 100');
@@ -89,7 +94,8 @@ test('ABSORB-NERF: the Spell Maker\'s chanceBase for Spell Absorption stops at 5
   assert.equal(sp.effects[1].chanceBase, 100, 'the Spell Reflection beside it keeps 100');
 });
 
-test('ABSORB-NERF: the refund is half the points, floored (a 0 refund is fine)', () => {
+test('ABSORB-NERF: the refund is half the points, floored (a 0 refund is fine)', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   assert.equal(absorbRefund(20), 10);
   assert.equal(absorbRefund(21), 10);
   assert.equal(absorbRefund(1), 0);
@@ -116,4 +122,21 @@ test('ABSORB-NERF: the Eye of Mora set\'s own chance is untouched (only its refu
   } finally {
     registerAbsorptionChance('absorbNerfProbe', null);
   }
+});
+
+// DFU's absorption by default (EntityEffectManager.TryAbsorption): the limits above are the Features row's.
+test("by default an item that absorbs spells always absorbs, as DFU's flat always", () => {
+  const t = target();
+  const cost = effectCastingCost(damageEffect(), 0, t);
+  assert.equal(tryAbsorption(damageEffect(), 0, t, { absorbing: true, rolls: roll(0.99) }), cost);
+});
+
+test('by default the refund is the whole of the points drunk', () => {
+  assert.equal(absorbRefund(21), 21);
+  assert.equal(absorbRefund(0), 0);
+});
+
+test("by default a Spell Absorption effect reads its whole chance, and the Spell Maker's range is DFU's", () => {
+  assert.equal(spellAbsorptionChance(target(0, { activeEffects: [absorbBuff(100)] })), 100);
+  assert.deepEqual(spinnerRange('chanceBase', SPELL_ABSORPTION_KEY), SPINNER_RANGES.chanceBase);
 });

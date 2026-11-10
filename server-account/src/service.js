@@ -310,8 +310,8 @@ export const saveKey = (playerId, characterId, saveName, part) =>
  *  bound somebody raises by accident. */
 export const SAVE_MAX_BYTES = 4 * 1024 * 1024;
 
-/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only its own
- *  deploy sets (.github/workflows/realm-revive.yml); every call but /v1/health and /v1/pubkey is then refused 503. */
+/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only an
+ *  operator's deploy sets; every call but /v1/health and /v1/pubkey is then refused 503. */
 export const maintaining = (/** @type {any} */ env) => env?.MAINTENANCE === '1';
 export const SHOT_MAX_BYTES = 256 * 1024;
 /** Slots per ACCOUNT. An account at this bound is refused; its oldest
@@ -615,28 +615,6 @@ export const ROUTES = new Set([
 export function realmPathOf(path) {
   const m = typeof path === 'string' ? /^\/v1\/realm\/(r[0-9a-f]{20})\/data$/.exec(path) : null;
   return m ? { id: m[1] } : null;
-}
-
-/**
- * POI-1: THE POI STORE'S PATHS - `{ route, sha?, id? }`, or null for a path that
- * is not one. Matched as a save slot is, so the 404 knows them: `live` and an asset's GET are read without a session (a
- * live asset; a draft's needs a builder's), the rest behind one.
- *   GET /v1/poi/live | GET /v1/poi/asset/<sha> | PUT /v1/poi/asset/<sha>?kind=mesh|texture
- *   GET /v1/poi/me | /v1/poi/list | /v1/poi/queue | /v1/poi/doc/<id>
- *   PUT /v1/poi/draft { doc, base } | POST /v1/poi/{submit,withdraw,retire,review,rollback}
- * @param {string} path
- */
-export function poiPathOf(path) {
-  if (typeof path !== 'string' || !path.startsWith('/v1/poi/')) return null;
-  const rest = path.slice('/v1/poi/'.length);
-  if (['live', 'me', 'list', 'queue', 'draft', 'submit', 'withdraw', 'retire', 'review', 'rollback', 'shelf', 'unshelve'].includes(rest)) return { route: rest };
-  let m = /^asset\/([0-9a-f]{64})$/.exec(rest);
-  if (m) return { route: 'asset', sha: m[1] };
-  m = /^doc\/(poi-[0-9a-f]{12})$/.exec(rest);
-  if (m) return { route: 'doc', id: m[1] };
-  m = /^shelf\/(lib-[0-9a-f]{12})$/.exec(rest);   // POI-4b: one library entry
-  if (m) return { route: 'shelf', id: m[1] };
-  return null;
 }
 
 /** The routes a caller reaches WITHOUT a credential. Everything else

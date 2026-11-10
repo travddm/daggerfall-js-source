@@ -11,7 +11,6 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import * as acorn from 'acorn';
 import { riseLine, wrathLine, gateBossOf } from '../../../src/net/gate/gateLaw.js';
-import { omenPost, fellPost } from '../../../src/net/gate/gateHerald.js';
 import { GATE_NO_WORDS } from '../../../src/net/wire.js';
 import { fellLine, omenTimeLine, openTimeLine, sealTimeLine } from '../../../src/systems/gate/gateOmen.js';   // TIME1, at the merge: the three that name a time, in local time alone
 import { GATE_TEXT } from '../../../src/scenes/gate/gatePool.js';
@@ -27,7 +26,6 @@ import { SIGIL_STONE, SIGIL_STONE_TEMPLATE, sigilStone, nameEmbers, isSigilStone
 import { stonesText, BROKER_REFUSALS, DISMANTLED } from '../../../src/systems/sigil/sigilBroker.js';
 import { recoverSpoils, SPOILS_RECORD_V } from '../../../src/scenes/spoilsPool.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const ROOT = new URL('../../../', import.meta.url).pathname;
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
@@ -56,7 +54,7 @@ function shippedStrings() {
   return out;
 }
 
-test('WB12a the guard: no shipped string names an Oblivion Gate or a Sigil Stone - not a chat line, a card, a plaque, a Discord post, a refusal nor a console line (as DRAKES pinned the old currency\'s name) (mutants: an old line put back)', () => {
+test('WB12a the guard: no shipped string names an Oblivion Gate or a Sigil Stone - not a chat line, a card, a plaque, a refusal nor a console line (as DRAKES pinned the old currency\'s name) (mutants: an old line put back)', () => {
   const strings = shippedStrings();
   assert.ok(strings.length > 10000, `the walk read the tree (${strings.length} strings)`);
   const left = strings.filter(([, , s]) => OLD.test(s)).map(([f, l, s]) => `${f}:${l} ${JSON.stringify(s).slice(0, 80)}`);
@@ -71,18 +69,11 @@ test('WB12a the chat\'s lines (WB13b: each the event, where and when; TIME1, at 
   assert.equal(sealTimeLine({ near: 'Copperham', at: '16:52' }), 'The Covenant has sealed Dagon\'s Breach near Copperham. It collapses at 16:52 your time.');
   assert.equal(wrathLine({ near: 'Copperham', boss: 'Valkynaz Ruhn' }), 'The Covenant tears Dagon\'s Breach near Copperham shut. Valkynaz Ruhn is cast back into the Deadlands.');
   assert.equal(fellLine({ near: 'Copperham', boss: 'Valkynaz Ruhn', top: ['Mac', 'Bran'] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach near Copperham, struck down by Mac and Bran. The breach collapses.');
-  assert.equal(fellLine({ near: null, boss: 'Valkynaz Ruhn', top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'WB13b: a screen that never found the site says what Discord says');
+  assert.equal(fellLine({ near: null, boss: 'Valkynaz Ruhn', top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'WB13b: a screen that never found the site');
 });
 
-test('WB12a Discord: the omen post says Dagon\'s faithful open a breach and the Covenant seals it; his fall\'s post names Dagon\'s Breach and the breach collapsing; his title is his (mutants: the old post)', () => {
-  const day = 700, boss = gateBossOf(day);
-  const p = cardOf(omenPost({ day, place: 'Copperham, Wrothgarian Mountains' }));   // HERALD-CARDS: the omen's card - the breach's name its family, its opening and its seal its fields
-  assert.deepEqual([p.author, p.title, Object.keys(p.fields)], ['Dagon\'s Breach', 'The sky burns near Copperham, Wrothgarian Mountains', ['Opens', 'Seals', 'Where']]);
-  assert.match(p.fields.Opens, /^<t:\d+:t> \(<t:\d+:R>\)$/); assert.match(p.fields.Seals, /^<t:\d+:t>$/);
-  assert.ok(p.text.includes(`${boss.name} comes **`) && !p.text.includes('holds it'), 'WB13b: the marks in the chat\'s sentence');
-  assert.equal(boss.title, 'Warden of the Burning Gate', 'the faithful\'s name for the arch the breach wears stays his');
-  const f = cardOf(fellPost({ day, place: 'Copperham', top: ['Ann'], n: 1 }));
-  assert.deepEqual([f.author, f.title, f.text, f.fields], ['Dagon\'s Breach', `${boss.name} has fallen`, 'The breach collapses.', { Where: 'Near Copperham', 'Struck down by': 'Ann' }]);
+test('WB12a his title is his: the faithful\'s name for the arch the breach wears (mutants: the title renamed with the gate)', () => {
+  assert.equal(gateBossOf(700).title, 'Warden of the Burning Gate');
 });
 
 test('WB12a the names on screen: the plaque, the banner and the map\'s legend say Dagon\'s Breach; the marks card, the record, the Drakes line, the profile, the account\'s refusal, the Broker\'s plaque and her insignia speak of breaches; the notice card names it (mutants: a name left)', () => {

@@ -11,12 +11,12 @@
 // Realism: Items as the boot installs it.
 import '../modsOff.js';
 import { modsOff } from '../modsOff.js';
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createLycanthropyCurse, morphSelf } from '../../src/systems/lycanthropy.js';
 import { LYCANTHROPY_TYPES } from '../../src/systems/infection.js';
 import { isFullMoonFromMinutes, MINUTES_PER_DAY, CLASSIC_GAME_START_TIME } from '../../src/systems/gameDate.js';
-import { clawMetalDamage } from '../../src/combat/clawMetal.js';
+import { clawMetalDamage, CLAW_METAL_PREF } from '../../src/combat/clawMetal.js';
 import { duelAttackerOf, duelStub, resolveDuelStrike } from '../../src/combat/duelCombat.js';
 import { equipItem, equipTableOf, rebuildEquipState, EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { armorOfMaterial } from '../../src/combat/enemyEquipment.js';
@@ -25,6 +25,11 @@ import { setItemFields, mintCondition } from '../../src/systems/item/itemTemplat
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { installRoleplayRealismItems } from '../../src/systems/roleplayRealismItems/rriInstall.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Claws take gauntlet metal on. DFU's default (off) is test/combat/clawmetal_option.test.js.
+before(() => setPref(CLAW_METAL_PREF, true));
+after(() => setPref(CLAW_METAL_PREF, false));
 
 const QUIET = (() => {
   let m = CLASSIC_GAME_START_TIME;

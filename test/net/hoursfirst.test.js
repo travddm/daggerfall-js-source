@@ -1,5 +1,5 @@
 // HOURS-FIRST: THE FIRST GROUP TO BREAK AN ABYSS DUNGEON - the thirteen
-// accounts the first clear's claims name (sd_kills, slot 1, read by .github/workflows/sd-clears.yml). The title Hour's
+// accounts the first clear's claims name (sd_kills, slot 1). The title Hour's
 // First and its aura, The First Hour, held by name (server-account/src/titles.js HOURS_FIRST_HANDLES, a list in config,
 // the developers' law); the aura is The Turning Hour's wheel cast again in the first dawn's colours (render/auraRing.js),
 // its dial turning forward and the Hour's own mark ablaze. The gun rides the server's post (SERVER-POST).

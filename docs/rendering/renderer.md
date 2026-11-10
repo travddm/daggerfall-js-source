@@ -131,6 +131,11 @@ and `setGlassView` select the mode each frame. The shader text and rules are in 
 
 - Shader text is JavaScript template strings. The main world shaders are at the top of `renderer.js`; each pass keeps
   its own in its module.
+- A complete stage can live in a `.vert` or `.frag` file beside its module, imported with `?raw`
+  (`retroPass.js` imports `retro-pass.vert` and `retro-pass.frag`). Vite reads the file as text; under Node,
+  `tools/raw-import-hooks.ts` does the same. The files are checked out with LF line ends (`.gitattributes`), and CI
+  compiles each one with glslang (`tools/glsl-check.ts`). Move a module's shaders to files when you change that
+  module, not in a sweep.
 - Shared GLSL lives in leaf modules imported as strings: `fogGlsl.js` (`FOG_GLSL`, the one fog factor),
   `cloudShadow.js`, `orderedDither.js`, `meshAlpha.js`, `columnGlsl.js`, `hazeGlsl.js`, `snowCoverGlsl.js`,
   `roadEdgeGlsl.js`, `groundEdgeGlsl.js`, `ecotoneGlsl.js`, `lowPolyTreesGlsl.js`, `waterBedGlsl.js`,

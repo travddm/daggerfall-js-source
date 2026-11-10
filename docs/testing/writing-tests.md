@@ -16,7 +16,6 @@ one exists.
 | `test/formats/` | `src/formats/` (BSA, IMG, CFG and other file readers) |
 | `test/net/` | `src/net/` (the wire, online session, shared laws of relay and account service) |
 | `test/player/` | `src/player/` (motor, climbing, ground rays) |
-| `test/poi/` | `src/poi/` |
 | `test/render/` | `src/render/` |
 | `test/scenes/` | `src/scenes/` (the scene hosts and the modules they wire) |
 | `test/server/` | `server/src/` (relay) and `server-account/src/` (account service) |

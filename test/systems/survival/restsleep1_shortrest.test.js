@@ -4,6 +4,7 @@
 // night pays a third of a bed's rate; a debt past the twelve hours a night pays) kept the penalties for the whole ten
 // real minutes, at the fire. A short rest now pays the debt as a night of its kind would, through the minute law's own
 // pay, the tier's rough floor kept - and still moves no clock.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { sleepShortRest, stampNight, NIGHT_MINUTES, REST_ACT_TEXT } from '../../../src/systems/rest/restAct.js';
@@ -76,7 +77,8 @@ async function insideTheInterval(kind, tier, sleepDebt) {
   return { e, deps };
 }
 
-test('REST-SLEEP1 through the host\'s own bag: Drowsy at a fire inside the interval, a short rest wakes them rested - the attributes given back - and still moves no clock', async () => {
+test('REST-SLEEP1 through the host\'s own bag: Drowsy at a fire inside the interval, a short rest wakes them rested - the attributes given back - and still moves no clock', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const { e, deps } = await insideTheInterval(REST_KIND.Camp, 'hard', 9);
   assert.equal(sleepStage(e.survival.sleepDebt), 'drowsy');
   assert.equal(survivalStatMods(e.survival, null, ownMinutes(), { rules: HARD_RULES }).strength, -5, 'Drowsy: five off every attribute');
@@ -92,7 +94,8 @@ test('REST-SLEEP1 through the host\'s own bag: Drowsy at a fire inside the inter
   assert.equal(survivalStatMods(e.survival, null, ownMinutes(), { rules: HARD_RULES }).strength, undefined, 'no penalty left to wait out');
 });
 
-test('REST-SLEEP1 through the host\'s own bag: the short rest pays as its kind - Hard\'s rough ground four hours down to its floor; with the arc off there is no need to pay', async () => {
+test('REST-SLEEP1 through the host\'s own bag: the short rest pays as its kind - Hard\'s rough ground four hours down to its floor; with the arc off there is no need to pay', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const rough = await insideTheInterval(REST_KIND.Rough, 'hard', 9);
   rough.deps.setResting(true); rough.deps.restShort(); rough.deps.setResting(false);
   assert.equal(rough.e.survival.sleepDebt, 5, 'four hours paid on the ground, Tired still - the Bedroll\'s price, kept');
