@@ -1,6 +1,6 @@
-// Enemy senses + pursuit (C8 E2). Verbatim port of the CLASSIC path
-// (EnhancedCombatAI = false) from DFU EnemyMotor.cs / EnemySenses.cs /
-// EnemyAttack.cs (MIT, Daggerfall Workshop):
+// Enemy senses + pursuit (C8 E2). Port of DFU EnemyMotor.cs, EnemySenses.cs and EnemyAttack.cs (MIT, Daggerfall
+// Workshop). EnhancedCombatAI's enhanced side is ported in groups (enhanced-combat-ai.ts); the CLASSIC path
+// (EnhancedCombatAI = false) is verbatim:
 //   - sight = 4096 * MeshReader.GlobalScale, FOV 180, hearing 25
 //   - senses re-evaluate when the classic system timer (dt divided by
 //     0.0549254, the 0x46C memory-timer divisor) accumulates past 5
@@ -37,6 +37,7 @@
 // (IsBlending -> an 8%-per-classic-update see-through roll).
 
 import { GLOBAL_SCALE } from '../../world/meshReader.js';
+import { playerHalfOfStealthCheck, peerHalfOfStealthCheck, meetPeer, stealthBandHolds } from './stealth-check.ts';   // StealthCheck's player half, for a peer too
 import { dice100 } from '../../combat/formulas.js';   // PT1: Dice100 has ONE home and this file had written it out twice
 import { CLASSIC_UPDATE_INTERVAL } from '../weaponStates.js';   // single source (GameManager.cs:42)
 import { CAPSULE_HEIGHT, CAPSULE_RADIUS, DF_WALK_BASE } from '../../player/motor.js';           // single source
@@ -83,6 +84,9 @@ export const GIVE_UP_TICKS = 200;   // EnemyMotor.GiveUpTimer refill (classic ti
 import { GRAVITY, FIXED_DT, MAX_FRAME_DT, CLASSIC_TO_UNITY_RATIO, FALL_DAMAGE_THRESHOLD } from '../../player/motor.js';   // the shared fall rule + the P16 fixed-timestep law; CH3: the fall threshold single-sources with the player's
 import { wrapAngle } from '../../world/mat4.js';   // ONCRASH1: the port's one angle wrap, which cannot loop
 import { MOBILE_TYPES } from '../mobile/mobileTypes.js';
+import { predictNextTargetPos, leadInFeet } from './target-prediction.ts';   // EnemySenses.PredictNextTargetPos
+import { initEnhancedCombatAI, trackUnarmedRateOfApproach, enhancedTick, rangedStep, evaluateMoveInForAttack, setChangeStateTimer, stopDistanceOf, tickEnhancedTimers, attackPace, REEVALUATE_KNOCKBACK } from './enhanced-combat-ai.ts';   // DFU's Enhanced Combat AI: its senses, and its movement (enhanced-movement.ts)
+export { enhancedCombatAIEnabled, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from './enhanced-combat-ai.ts';   // the setting's reader and a peer's stance, for the foe pools
 import { coverDistance } from '../../ai/cover.js';   // TACT1: billboards are cover (sight, the clear shot)
 import { groundHit } from '../../player/groundRay.js';   // AUDIT GROUND-BOLT C1: the clear shot meets the terrain, as the shot does
 import { tacticsStep, tacticsNow, breakWindup } from '../../ai/tactics.js';   // TACT2: the tactics brain; TELL1: its clock, for the stagger's end
@@ -134,6 +138,7 @@ export const MOVE_YAW_GATE_DEG = 5.625;
 // up to 22.5deg off-face (the attack cone is 35.156, so it still
 // swings); the old 5.625 here made stopped foes micro-track.
 export const STOP_YAW_GATE_DEG = 22.5;
+const YAW_OPS = Object.freeze({ withinYaw, turnTowards, moveGateDeg: MOVE_YAW_GATE_DEG, lookGateDeg: STOP_YAW_GATE_DEG });   // the motor's turning, for enhanced-movement.ts (which does not import this file)
 export { DF_WALK_BASE };   // ONE HOME: player/motor.js, beside DF_CROUCH_BASE (wave 34 turned the import round)
 export const EYE_FRAC = 5 / 6;
 
@@ -264,14 +269,14 @@ export function turnTowards(yaw, dx, dz, maxDeg = CLASSIC_TURN_DEG) {
  * EnemySenses.CanSeeTarget:912-918 records an action door the sight
  * ray strikes first, which is what OpenDoors later consumes.
  */
-export function canSeeTarget(collider, feet, yaw, height, targetFeet, targetHeight = CAPSULE_HEIGHT, blockerOut = null, distIn = null, sightRadius = SIGHT_RADIUS) {
+export function canSeeTarget(collider, feet, yaw, height, targetFeet, targetHeight = CAPSULE_HEIGHT, blockerOut = null, distIn = null, sightRadius = SIGHT_RADIUS, fieldOfView = FIELD_OF_VIEW) {
   const dx = targetFeet[0] - feet[0], dz = targetFeet[2] - feet[2];
   // REVIEW 2026-09-05: the radius gate is distanceToTarget (EnemySenses.cs:881),
   // transform to transform - the caller's own measure when it has one.
   const dist = distIn ?? Math.hypot(dx, (targetFeet[1] + targetHeight / 2) - (feet[1] + height / 2), dz);
   const radius = Number.isFinite(sightRadius) && sightRadius > 0 ? sightRadius : SIGHT_RADIUS;   // CAMP-SIGHT: a per-foe override (wilderness camps), else DFU's own. P13: the S8 half-sight chameleon interim retired - concealment is the illusion gate now
   if (dist >= radius) return false;
-  if (!withinYaw(yaw, dx, dz, FIELD_OF_VIEW / 2)) return false;
+  if (!withinYaw(yaw, dx, dz, fieldOfView / 2)) return false;   // the enhanced AI's 190 (enhanced-combat-ai.ts)
   const eye = [feet[0], feet[1] + height * EYE_FRAC, feet[2]];
   const tEye = [targetFeet[0], targetFeet[1] + targetHeight * EYE_FRAC, targetFeet[2]];
   const ex = tEye[0] - eye[0], ey = tEye[1] - eye[1], ez = tEye[2] - eye[2];
@@ -387,7 +392,7 @@ export const DETOUR_ARRIVAL = 0.3;              // UpdateTimers zeroes the timer
 export const WALK_ARRIVE_M = 0.35;
 
 export class EnemyAI {
-  constructor(collider, feet, yawRad, { liveSpeed = 50, isHostile = true, height = CAPSULE_HEIGHT, seesThroughInvisibility = false, behaviour = 'General', mobileId = -1, waterSurfaceY = null, spawnDistanceType = 0, playerInside = true, isActionDoor = null, rolls = Math.random, hasBowAttack = false, canCastRangedSpell = null, hasMagickaToCast = null, centreOffset = null, vitals = null } = {}) {
+  constructor(collider, feet, yawRad, { liveSpeed = 50, isHostile = true, height = CAPSULE_HEIGHT, seesThroughInvisibility = false, behaviour = 'General', mobileId = -1, waterSurfaceY = null, spawnDistanceType = 0, playerInside = true, isActionDoor = null, rolls = Math.random, hasBowAttack = false, canCastRangedSpell = null, hasMagickaToCast = null, centreOffset = null, vitals = null, enhancedCombatAI } = {}) {
     this.collider = collider;
     /** ObstacleCheck's DaggerfallActionDoor arm (:1167-1176). The AI
      *  cannot resolve a collider bucket key to an action object - the
@@ -455,7 +460,7 @@ export class EnemyAI {
     // cannot; callers that own the entity pass a THUNK over
     // liveStat(entity, 'speed') and the read happens per step.
     this._liveSpeed = typeof liveSpeed === 'function' ? liveSpeed : () => liveSpeed;
-    this.seesThroughInvisibility = seesThroughInvisibility;
+    this.seesThroughInvisibility = seesThroughInvisibility; initEnhancedCombatAI(this, enhancedCombatAI, FIELD_OF_VIEW);   // DFU's Enhanced Combat AI: the pools pass the setting's reader, none is classic (one line: the lint ratchet caps this constructor)
     // MobileUnit.ClassicSpawnDistanceType (the marker's SoundIndex) and
     // PlayerEnterExit.IsPlayerInside - both feed the spawn-band recompute.
     this.spawnDistanceType = spawnDistanceType;
@@ -604,6 +609,7 @@ export class EnemyAI {
     // wave 35 - armed it is not, so it moved to _classicPostTarget
     // where the source keeps it.
     if (!senses) return;
+    this._playerEntity = senses.playerEntity ?? null;   // the retreat roll reads the player's level and paralysis
     const dxp = playerFeet[0] - this.feet[0], dzp = playerFeet[2] - this.feet[2];
     // AUDIT 62 F17: ONE transform-space y term feeds BOTH arguments.
     // EnemySenses.cs:288 `YDiffToPlayer = transform.position.y -
@@ -700,7 +706,7 @@ export class EnemyAI {
     // WORLD3 left unpatched, so the ray to a PEER was aimed at the LOCAL player's live capsule (0.9 crouched) planted
     // on the peer's feet, while _dist beside it already measured the peer's own.
     const _targetHeight = this._targetHeight();
-    this.inSight = canSeeTarget(this.collider, this.feet, this.yaw, this.height, playerFeet, _targetHeight, _blocker, this._dist, this.sightRadius);   // CAMP-SIGHT: undefined = SIGHT_RADIUS   // the sight-radius gate (:881) reads distanceToTarget
+    this.inSight = canSeeTarget(this.collider, this.feet, this.yaw, this.height, playerFeet, _targetHeight, _blocker, this._dist, this.sightRadius, this.fieldOfView);   // CAMP-SIGHT: undefined = SIGHT_RADIUS   // the sight-radius gate (:881) reads distanceToTarget
     this.doorKey = _blocker.key;
     // AUDIT 24 (the re-read): DFU's NON-HOSTILE MODE is a TARGET drop,
     // not an action skip. EnemySenses.Update:321-327 nulls `target`
@@ -728,6 +734,7 @@ export class EnemyAI {
       // It still owes the target-position memory, or a foe driven this way
       // never has a destination at all and HandleNoAction freezes it.
       this.detected = this.inSight || this._dist < HEARING_RADIUS;
+      this._inEarshot = false;   // the no-stealth path keeps no earshot of its own
       if (this.detected) {
         this.lastKnownTargetPos = [playerFeet[0], playerFeet[1], playerFeet[2]];
         this.lastHadLOSTimer = LAST_HAD_LOS_TICKS;
@@ -741,6 +748,7 @@ export class EnemyAI {
     const inEarshot = (this.detected && !this.inSight)
       ? canHearTarget(this.collider, this.feet, this.height, playerFeet, this._dist, this.centreOffset, this._targetCentreOffset())
       : false;
+    this._inEarshot = inEarshot;   // PredictNextTargetPos reads it (target-prediction.ts)
     // AUDIT 24 (wave 35): the TARGET-POSITION MEMORY, which the port did
     // not have at all - EnemySenses.cs:451-495. Sight or earshot writes
     // the live position and refills lastHadLOSTimer; a bare STEALTH
@@ -767,9 +775,9 @@ export class EnemyAI {
    *  player-encounter edge or the pacification roll it feeds. */
   _encounterEdge() {
     // AUDIT WORLD3 C4: a PEER is not my first meeting either - justEncountered's one consumer resolves the whole
-    // language check with the LOCAL player (its skill, its sheathed hand, its HUD line, its tally) and can stand the
-    // foe down on the host's roll for a foe that has only ever seen the joiner.
-    if (this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || this._targetCandidate.isPeer === true)) return;
+    // language check with the LOCAL player. The peer's meeting is recorded for it (meetPeer), and the peer rolls its
+    // own check on its own client (peer-senses.ts).
+    if (this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || meetPeer(this, this._targetCandidate))) return;
     if (!this.hasEncounteredPlayer) { this.hasEncounteredPlayer = true; this.justEncountered = true; }
   }
 
@@ -784,7 +792,8 @@ export class EnemyAI {
     // !EnhancedCombatAI` is true every pass, and PredictNextTargetPos is
     // called only inside the Enhanced guard at :496-501. So the port has
     // no lead prediction to write, and that is verbatim, not a gap.
-    this.predictedTargetPos = this.lastKnownTargetPos;
+    // DFU's Enhanced Combat AI keeps its prediction between passes and seeds it only while it is still ResetPlayerPos.
+    if (!this.enhancedCombatAI || this.predictedTargetPos === null) this.predictedTargetPos = this.lastKnownTargetPos;
     // :479-495, gated on targetPosPredict - a 0.0625s timer, which is the
     // classic-update interval; the port folds it onto the classic tick.
     // The DIFFERENCE is only taken across two CONSECUTIVE prediction
@@ -805,6 +814,8 @@ export class EnemyAI {
       } else {
         this.awareOfTargetForLastPrediction = false;
       }
+      // :496-501, sight or not: DFU's Enhanced Combat AI leads its target at its own walking speed
+      if (this.enhancedCombatAI) this.predictedTargetPos = leadInFeet(this, this.speed, SIGHT_RADIUS) ?? this.predictedTargetPos;
     }
   }
 
@@ -882,7 +893,7 @@ export class EnemyAI {
    *  scene's senses context, like PlayerEntity.TimeOfLastStealthCheck). */
   _stealthCheck(senses) {
     if (senses.insideDungeonCastle && !this.isHostile) return false;   // :619-621, the FIRST statement
-    if (!this.wouldBeSpawned) return false;
+    if (!stealthBandHolds(this, wouldBeSpawnedInClassic)) return false;   // stealth-check.ts: the band of the player checked
     if (this._dist > STEALTH_MAX_DISTANCE) return false;
     const gameMinutes = senses.gameMinutes ?? 0;
     if (gameMinutes === this._lastStealthMinute) return this.detected;
@@ -892,20 +903,11 @@ export class EnemyAI {
     // foe target (armed pools) rolls on its own live Stealth below.
     // AUDIT WORLD3 C5: a PEER takes neither half of the LOCAL player's stealth - not the half-speed minute skip, not
     // the encountered auto-detect, and above all not the TALLY (a foe hunting the joiner advanced the host's Stealth)
-    // and not senses.playerStealth against a distance measured to the joiner. Its own skill is a later slice's wire
-    // field; until then the candidate answers 0, the same fallback the foe arm below already takes.
+    // and not senses.playerStealth against a distance measured to the joiner. A peer takes its own half off its pose,
+    // and its Stealth rides the pose (`sk`), answered through its candidate's stealthOf (peer-senses.ts).
     const foeTarget = this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || this._targetCandidate.isPeer === true);
-    if (!foeTarget) {
-      if (senses.movingLessThanHalfSpeed) {
-        if ((gameMinutes & 1) === 1) return this.detected;
-      } else if (this.hasEncounteredPlayer) {
-        return true;
-      }
-      if (senses.sharedStealth && senses.sharedStealth.minute !== gameMinutes) {
-        senses.tallyStealth?.();
-        senses.sharedStealth.minute = gameMinutes;
-      }
-    }
+    const half = !foeTarget ? playerHalfOfStealthCheck(this, senses, gameMinutes) : this._targetCandidate.isPeer === true ? peerHalfOfStealthCheck(this, this._targetCandidate, gameMinutes) : undefined;   // stealth-check.ts
+    if (half !== undefined) return half;
     this._lastStealthMinute = gameMinutes;
     // CalculateStealthChance(distanceToTarget, target) reads the
     // TARGET's live Stealth (:654): the foe entity's uniform skill
@@ -922,87 +924,15 @@ export class EnemyAI {
   /** The controller CENTRE - DFU's `transform.position` for a
    *  CharacterController, which every probe below is written from. The
    *  port stores FEET. */
+  /** DFU's Enhanced Combat AI setting, read whenever it is asked, as DFU reads it every frame. */
+  get enhancedCombatAI() { return this._enhancedCombatAIOn() === true; }
+
   _centre() { return [this.feet[0], this.feet[1] + this.centreOffset, this.feet[2]]; }   // transform.position (REVIEW 2026-09-05: centreOffset, not height/2)
 
-  /**
-   * EnemySenses.PredictNextTargetPos (:541-616), the position the two
-   * shooting probes aim at - a LEAD, solved as a cone/line
-   * intersection against the target's own movement.
-   *
-   * Answers a CENTRE-space point (the target's feet plus half its
-   * capsule, the same lift `_getDestination` takes), or null for DFU's
-   * ResetPlayerPos sentinel - "nothing has ever been seen", which
-   * HasClearPathToShootProjectile reads as a refusal (:702-703).
-   *
-   * :551-560's FIRST arm is the only one reachable here. Both callers
-   * of this method sit behind `senses.TargetInSight` (DoRangedAttack's
-   * band condition, EnemyMotor.cs:572), so `targetInSight ||...` is
-   * true every time and `assumedCurrentPosition` is always
-   * lastKnownTargetPos; the else-arm's remembered no-lead prediction
-   * belongs to the one caller this port does not have,
-   * DaggerfallMissile's mid-flight re-aim. The field it feeds
-   * (predictedTargetPosWithoutLead) is still written at :612, because
-   * that write is what the arm would read.
-   *
-   * :563-570 is DFU's arithmetic quirk, kept: targetPosPredictTimer is
-   * zero only on the frame the prediction pass itself ran, so every
-   * other call divides ONE prediction interval's worth of movement by
-   * the SHORTER time since that pass and overstates the target's
-   * speed. It also rewrites lastPositionDiff as a side effect, and so
-   * does this.
-   */
+  /** EnemySenses.PredictNextTargetPos (:541-616): the lead on the target, in centre space, or null for
+   *  ResetPlayerPos (characters/enemy/target-prediction.ts). */
   predictNextTargetPos(interceptSpeed) {
-    if (this.lastKnownTargetPos === null) return null;   // ResetPlayerPos
-    if (this._predictedTargetPosWithoutLead === null) {
-      this._predictedTargetPosWithoutLead = [...this.lastKnownTargetPos];
-    }
-    const assumed = this.lastKnownTargetPos;
-    let divisor = CLASSIC_UPDATE_INTERVAL;   // predictionInterval (:34) = 0.0625
-    let diff = this.lastPositionDiff;
-    if (this._targetPosPredictTimer !== 0) {
-      divisor = this._targetPosPredictTimer;
-      const old = this.oldLastKnownTargetPos ?? assumed;
-      diff = [assumed[0] - old[0], assumed[1] - old[1], assumed[2] - old[2]];
-      this.lastPositionDiff = diff;
-    }
-    // The quadratic is solved centre-to-centre, as DFU's transform
-    // positions are; `assumed` is feet-space like every other position
-    // on this class, so it lifts by half the TARGET's capsule.
-    const c = this._centre();
-    const lift = this._targetCentreOffset();   // REVIEW 2026-09-05: the target's transform, not its capsule half
-    const d = [assumed[0] - c[0], assumed[1] + lift - c[1], assumed[2] - c[2]];
-    const v = [diff[0] / divisor, diff[1] / divisor, diff[2] / divisor];
-    const a = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) - interceptSpeed * interceptSpeed;
-    const b = 2 * (d[0] * v[0] + d[1] * v[1] + d[2] * v[2]);
-    const cc = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
-    const at = [assumed[0], assumed[1] + lift, assumed[2]];
-    let prediction = [at[0], at[1], at[2]];
-    let t = -1;
-    if (Math.abs(a) >= 1e-5) {
-      const disc = b * b - 4 * a * cc;
-      if (disc >= 0) {
-        // "find the minimal positive solution" (:586-591).
-        const discSqrt = Math.sqrt(disc) * Math.sign(a);
-        t = (-b - discSqrt) / (2 * a);
-        if (t < 0) t = (-b + discSqrt) / (2 * a);
-      }
-    } else if (Math.abs(b) >= 1e-5) {
-      t = -cc / b;   // the degenerate case (:597-598)
-    }
-    if (t >= 0) {
-      prediction = [at[0] + v[0] * t, at[1] + v[1] * t, at[2] + v[2] * t];
-      // :605-609 - "Don't predict target will move through obstacles".
-      let px = prediction[0] - at[0], py = prediction[1] - at[1], pz = prediction[2] - at[2];
-      const pl = Math.hypot(px, py, pz);
-      if (pl > 1e-9) {
-        px /= pl; py /= pl; pz /= pl;
-        if (Number.isFinite(this.collider.raycast(at, [px, py, pz], pl))) prediction = at;
-      }
-    }
-    // :612-613 - the no-lead prediction stored for the next pass, in
-    // this class's feet space.
-    this._predictedTargetPosWithoutLead = [assumed[0] + diff[0], assumed[1] + diff[1], assumed[2] + diff[2]];
-    return prediction;
+    return predictNextTargetPos(this, interceptSpeed, SIGHT_RADIUS);
   }
 
   /**
@@ -1233,6 +1163,7 @@ export class EnemyAI {
    *  decays, and is CUT SHORT the moment the foe is within 0.3 of the
    *  detour destination measured in the horizontal plane only. */
   _updateDetourTimers(dt, canAct) {
+    tickEnhancedTimers(this, dt);   // UpdateTimers' other three (:378-393), DFU's Enhanced Combat AI
     if (this.avoidObstaclesTimer > 0) this.avoidObstaclesTimer -= dt;
     if (this.avoidObstaclesTimer > 0 && canAct) {
       const c = this._centre();
@@ -1441,10 +1372,7 @@ export class EnemyAI {
   _doRangedAttack(dx, dz) {
     const inRange = this._dist > MIN_RANGED_DISTANCE && this._dist < MAX_RANGED_DISTANCE;
     if (!(inRange && this.inSight && this.detected && (this.hasBowAttack || this.canCastRangedSpell()))) return false;
-    // Within 22.5 degrees of the destination it shoots (the components'
-    // job); outside it, TurnToTarget. Either way it does not advance.
-    if (!withinYaw(this.yaw, dx, dz, STOP_YAW_GATE_DEG)) this.yaw = turnTowards(this.yaw, dx, dz);
-    this.moving = false;
+    rangedStep(this, dx, dz, YAW_OPS);   // it shoots within 22.5 degrees (the components' job), else turns; it may strafe
     return true;
   }
 
@@ -1461,9 +1389,7 @@ export class EnemyAI {
    *  acts and pursues gets its search ramp zeroed underneath it on
    *  every step and searches at multiplier 0 forever. */
   _handleNoAction(foeTarget = false) {
-    if ((!this.isHostile && !foeTarget) || this.giveUpTimer <= 0 || this.predictedTargetPos === null) {
-      this.searchMult = 0;
-    }
+    if ((!this.isHostile && !foeTarget) || this.giveUpTimer <= 0 || this.predictedTargetPos === null) { this.searchMult = 0; setChangeStateTimer(this); }   // :361: the timer is the enhanced AI's only
   }
 
   _classicTick(playerFeet, paused = false) {
@@ -1491,8 +1417,7 @@ export class EnemyAI {
     // the 2.25 literal at both sites, so two infighting foes each
     // halted 0.75 outside the 1.5 swing gate enemyAttack.js:"on the permissive"
     // already honours - a stand-off that never resolved.
-    this.stopDistance = (this._armedTargeting && this.target && !this.target.isPlayer)
-      ? CLASSIC_MELEE_DISTANCE_VS_AI : MELEE_DISTANCE;
+    this.stopDistance = stopDistanceOf(this, MELEE_DISTANCE, CLASSIC_MELEE_DISTANCE_VS_AI);   // enhanced AI: 1.7 (enhanced-movement.ts)
     // GetDestination (:528-565), all three arms since wave 35.
     const detouring = this.avoidObstaclesTimer > 0;
     this._getDestination(playerFeet);
@@ -1519,6 +1444,7 @@ export class EnemyAI {
     // DoRangedAttack reads senses.DistanceToTarget itself (:571-572),
     // so the detour state does not change what it measures.
     if (this._doRangedAttack(dx, dz)) return;
+    if (this.enhancedCombatAI) { enhancedTick(this, dx, dz, detouring, YAW_OPS); return; }   // DFU's Enhanced Combat AI: its own ladder (enhanced-movement.ts)
     // "If detouring, always attempt to move" (:481-484) - ahead of the
     // stop-distance test, which is why a detouring foe walks past its
     // own melee range to get round.
@@ -1671,6 +1597,7 @@ export class EnemyAI {
     }
     this.knockbackSpeed -= classicTicks * KB(KNOCKBACK_DECAY_PER_CLASSIC);
     if (this.knockbackSpeed < 0) this.knockbackSpeed = 0;
+    if (this.knockbackSpeed > KB(REEVALUATE_KNOCKBACK)) evaluateMoveInForAttack(this);   // "if a decent hit got in, reconsider" (:311-314)
     this._restGrounded = false;
   }
 
@@ -1990,7 +1917,7 @@ export class EnemyAI {
       // decrement (:443-449). A tick that ends with no target runs
       // NEITHER, which is why they sit together in one method.
       this._classicSenses(playerFeet, senses);
-      if (targeting) targeting(this, playerFeet, dt);
+      if (targeting) targeting(this, playerFeet, dt); else trackUnarmedRateOfApproach(this);   // EnemySenses' rate of approach (:353-370): the armed machine keeps its own
       if (!targeting || this.target != null) this._classicPostTarget(senses);
     }
     // EnemySenses.targetPosPredict (:249-257) is its own 0.0625s timer -
@@ -2207,7 +2134,7 @@ export class EnemyAI {
         if (this._tacDir) { this._tacDir = null; this._tacBlocked = true; this.moving = false; }   // TACT2: a wall or a drop behind it: it stands its ground (AUDIT TACT A1: and the brain hears of it; TACT5: for the rest of the classic tick too - never walked on the way it faces, into a detour)
         else this._findDetour(dir2d);
       } else {
-        const sp = this.speed * (this._tacDir ? this._tacSpeed : 1) * pace;   // TACT2: the brain's step at its share of a walk; ARENA-FIX 8: a walk to a mark at its pace (1 everywhere else - AUDIT PRE-MERGE 1003 D1: the walk's step's own, so none outlives the walk)
+        const sp = this.speed * (this._tacDir ? this._tacSpeed : 1) * pace * attackPace(this);   // TACT2: the brain's step at its share of a walk; ARENA-FIX 8: a walk to a mark at its pace (1 everywhere else - AUDIT PRE-MERGE 1003 D1: the walk's step's own, so none outlives the walk)
         dxm = dir2d[0] * sp * dt;
         dzm = dir2d[2] * sp * dt;
       }
@@ -2303,7 +2230,7 @@ export class EnemyAI {
    *  (and held the encounter cap), `inSight` kept its melee deciding, either one or `wouldBeSpawned` refused the
    *  player's rest (areEnemiesNearby). The first step after the hold senses afresh. */
   holdFrame() {
-    this.inSight = false; this.detected = false; this.wouldBeSpawned = false;
+    this.inSight = false; this.detected = false; this.wouldBeSpawned = false; this.peerSpawned = null;
   }
 
   /** AUDIT 68 S20-offset-ai-memory: the floating-origin recenter moves every WORLD position the motor holds, not the

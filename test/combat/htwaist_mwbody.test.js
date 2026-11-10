@@ -20,10 +20,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { pickLanternRecord, pickTorchRecord, assembleFirstPersonArm, poseAssembly, hangAffine, hangAnchor, MW_LIGHT_CARRY, MW_UNITS_PER_METER } from '../../src/formats/morrowind/mwFirstPerson.js';
-import {
-  createFpArm, resolveHipLanternPart, hipLanternPartPaths, hangHipLight, effectPlacement, hipLanternSize,
-  HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK,
-} from '../../src/combat/fpArm.js';
+import { createFpArm, hangHipLight, effectPlacement, hipLanternSize } from '../../src/combat/fpArm.js';
+import { resolveHipLanternPart, hipLanternPartPaths, HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK } from '../../src/combat/fpArm/fpArmParts.js';
 import { HIP_LANTERN_SPRITE } from '../../src/player/eyeOfTheBeholder/eotbLantern.js';
 import { fixtureFile, countingRenderer, hipLanternBodyDeps } from '../fixtures/mw/bodyRig.mjs';   // HT-WAIST-NET: the lantern body lives there once - the peers' pin builds the same rig
 import { createLanternSwing, lanternSwingMatrix, HIP_LANTERN_HEIGHT } from '../../src/systems/lanternSwing.js';

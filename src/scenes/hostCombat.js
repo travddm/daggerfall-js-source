@@ -40,7 +40,7 @@ import { bloodHit } from '../combat/blood/bloodDecals.js';   // BLOOD1b: the blo
 import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';
 import { ATTRACT_RADIUS, ignoreHumanSounds, attractStep } from '../characters/enemy/enemySounds.js';   // AUDIT 24 (wave 41); TELL2: a person's wind-up is a swing, not a voice
 import { enemyDisplayName, ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';   // AUDIT 24 (wave 42); TELL1: the bark a breaking blow wrings out
-import { getLocalizedEnemyName } from '../systems/textManager.js';   // L10N3e: the enemy's name in the player's language
+import { getLocalizedEnemyName, t } from '../systems/textManager.js';   // L10N3e: the enemy's name in the player's language
 import { windupHolds, windupStruck, tacticsNow, overreachOpen, poiseTrack, LOCAL_TARGET } from '../ai/tactics.js';   // TELL1: poise and the stagger; TELL2: the cues' clock; TELL4: the punish window
 import { blowK, blowWeight, behind, TELL } from '../ai/tells.js';   // TELL1: a blow's weight on the poise meter; TELL2: the cues' numbers
 import { BLOW } from '../ai/blowShapes.js';   // TELL6d: the aimed shot's speed
@@ -897,6 +897,9 @@ export function makeEnemiesHostile(foes) {
  * the entity being EnemyMonster or EnemyClass. `isQuestFoe` carries
  * the first; the pools only ever hold the second.
  */
+/** The line a failed language roll shows: the foe heard the player and was not swayed. */
+export const languageIgnoredText = (foeName) => t('combat.pacify.ignored', '{foe} ignores your words.', { foe: foeName });
+
 export function tryLanguagePacification(ai, entity, mobileType, playerEntity, {
   sheathed = false, enemyLanguageSkill, calculateEnemyPacification, say = () => {}, isQuestFoe = false,
 } = {}) {
@@ -914,17 +917,20 @@ export function tryLanguagePacification(ai, entity, mobileType, playerEntity, {
   // all three enemy pools share, so one read covers dungeon foes,
   // exterior foes and the city watch alike.
   const comprehend = comprehendLanguagesChance(playerEntity);
+  const foeName = getLocalizedEnemyName(mobileType, enemyDisplayName(mobileType) ?? 'The enemy');
   if (calculateEnemyPacification(playerEntity, lang, sheathed, undefined, comprehend)) {
     ai.isHostile = false;
     // languagePacified %e/%s. L10N3e: %e is GetLocalizedEnemyName's (EnemySenses.cs:519) - the name in the player's
     // language; the sentence around it is still the port's own (L10N3d's recorded difference from DFU's row).
-    say(`${getLocalizedEnemyName(mobileType, enemyDisplayName(mobileType) ?? 'The enemy')} is pacified by your ${SKILL_NAMES[lang]} skill.`);
+    say(`${foeName} is pacified by your ${SKILL_NAMES[lang]} skill.`);
     tallySkill(playerEntity, lang, 3);
     return { pacified: true, lang };
   }
   // :525-526 - a failed roll still counts as USING a monster tongue,
   // but Etiquette and Streetwise get nothing for being ignored.
   if (lang !== SKILLS.Etiquette && lang !== SKILLS.Streetwise) tallySkill(playerEntity, lang, 1);
+  // DFU says nothing on a failed roll, so the rule cannot be seen in play. This line shows it; it changes no outcome.
+  say(languageIgnoredText(foeName));
   return { pacified: false, lang };
 }
 

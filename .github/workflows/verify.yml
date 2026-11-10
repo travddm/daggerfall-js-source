@@ -88,6 +88,10 @@ jobs:
         run: node tools/lintRatchet.mjs --strict
       - name: Type-check
         run: npm run types
+      - name: Shaders compile
+        run: |
+          command -v glslangValidator >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq glslang-tools; }
+          node tools/glsl-check.ts
 
   times:
     name: the shards' times
