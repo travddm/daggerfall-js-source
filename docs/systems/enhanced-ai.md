@@ -201,10 +201,12 @@ blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
 - **Sparingly**: one wind-up near the player at a time (`BLOW_NEAR`, `windupNear`), a per-foe cooldown, and only from a
   melee token holder in reach (charge, leap and aimed shot from their own bands).
 - **Poise and stagger**: a winding-up foe takes no knockback; blow weight (`blowWeight`, weapon class `blowK`, back hits
-  `POISE_BACK`) fills its poise (`poiseOf`). Full, the wind-up breaks and the foe is staggered (`STAGGER_S`), taking
+  `POISE_BACK`) fills its poise (`poiseOf`). Full, the wind-up breaks and the foe is staggered (`STAGGER_S`). With the
+  "Openings take extra damage" row on (`ai/opening-damage.ts`, off by default, pinned off online) it takes
   `STAGGER_TAKEN` more. `windupStruck` in `tactics.js` runs the meter.
 - **Iron blows** (red, hatched) cannot be broken; they must be dodged.
-- **Punish window**: a missed blow leaves the foe overreached (`PUNISH_S`, takes `PUNISH_TAKEN` more). Leaving the shape
+- **Punish window**: a missed blow leaves the foe overreached (`PUNISH_S`; with the same row on it takes `PUNISH_TAKEN`
+  more). Leaving the shape
   in the last `TELL_LATE` s is a perfect dodge with a longer window.
 - **Patterns**: varied wind-up length, tracking lunges and charges, feints (`feints`; a feint never glints), chains.
 - **Landing effects**: `src/systems/blowEffects.js` (push, bleed, rattle, knock-down; `blowEffectOf`, `drainBlowEffects`).

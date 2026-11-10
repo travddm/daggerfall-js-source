@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world316: '87d95a0f47460b81c84519aafb0d25b9a5a6ad9967d21cd7380472a9a8e84712', // the official profile pins the Openings take extra damage row off (officialProfile.ts)
   world315: '2cd678bb145f96d724c29ad5b08ad2cc4854ca0f035ea8ab872d93dc8198e5ed', // the classic clock is the one online clock by default, a server profile rule in the relay's graph
   world314: 'f7baf3674ce008f3ba2f92be435814e37c37f4903a2f79a5f721856ba90faf7e', // the official profile pins the Absorption limits row off (officialProfile.ts)
   world313: '84b59a258ff5325e9b747c2638941aedf616ce37089315177ad147a0d74ec75e', // the official profile pins the Sold goods stay on the shelf row off (officialProfile.ts)
