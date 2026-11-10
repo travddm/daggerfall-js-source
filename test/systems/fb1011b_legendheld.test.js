@@ -16,6 +16,8 @@ import { classicCastingCost } from '../../src/systems/spellcost.js';
 import { LEGENDARIES, applyRarity } from '../../src/systems/loot/lootRarity.js';
 import { setItemFields, mintCondition } from '../../src/systems/item/itemTemplates.js';
 import { seededRng } from '../../src/systems/wind/wind.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
+import { GENTLE_EQUIP_BILL_PREF, LEGENDARY_EQUIP_FREE_PREF } from '../../src/systems/equipBill.js';
 
 const BUCKLER = 109;
 // a held spell as the CasterOnly Fortify of fb1009f (49 classic points at skill 40), standing at both params
@@ -24,10 +26,12 @@ const wearer = (items) => ({ name: 'W', isPlayer: true, health: 20, maxHealth: 3
 const AEGIS = LEGENDARIES.find((r) => r.id === 'aegis-of-dawn');
 /** The ladder's Aegis of Dawn on a leather Buckler, as a drop mints it. */
 const aegis = () => applyRarity(mintCondition(setItemFields({ group: 'Armor', templateIndex: BUCKLER, material: 0 })), 'legendary', seededRng(7), [AEGIS]);
+// legendaryEquipFree and gentleEquipBill are options, both on here; DFU's default is test/systems/equipbill_dfu.test.js.
 function withClock(fn) {
   const clock = { now: 100_000 };
   setDefaultEnchantCtx({ spellsByIndex: () => new Map([[AEGIS.enchantment.param, spell(AEGIS.enchantment.param)], [4, spell(4)]]), now: () => clock.now });
-  try { fn(clock); } finally { setDefaultEnchantCtx(null); }
+  for (const k of [GENTLE_EQUIP_BILL_PREF, LEGENDARY_EQUIP_FREE_PREF]) setPref(k, true);
+  try { fn(clock); } finally { setDefaultEnchantCtx(null); for (const k of [GENTLE_EQUIP_BILL_PREF, LEGENDARY_EQUIP_FREE_PREF]) setPref(k, false); }
 }
 
 test('LEGEND-HELD: the Aegis of Dawn goes on at the condition it had - its held spell cast, nothing billed; on, off and on again a day later, still nothing', () => withClock((clock) => {

@@ -44,7 +44,6 @@ import { paceControlsCss } from '../travel/travelPaceControls.js';   // PACE-DIA
 import { SERPENT_RING_MAP_CSS } from '../serpentMapMark.js';   // SERPENT-TIMERS: the sea serpent's row marked in its waters' own colour
 import { SD_RING_MAP_CSS } from '../superDungeon/sdMapMark.js';   // SD2c: the Super dungeon's row in its omen's brass
 import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js';   // STAR6: a fallen star's row in its violet
-import { heraldCss } from '../../net/herald/heraldCard.js';   // TIMERS2 / HERALD-CARDS: the gate's red, the one its Discord card wears
 import { TIER_MARKS, tierMarkCss } from '../lootTierMarks.js';   // LOOT-MARKS: the quick loot's tier gem and wash
 
 /**
@@ -2762,7 +2761,7 @@ ${badgeCss()}
    10px above the title of a live row (its clock three lines tall with the "Now") and 11px above a one-line row's */
 .px-timerswin .tm-name::before { content: '\\25c6'; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); font-size: 9px;
   line-height: 1; color: var(--tm-kind, #9c937d); }
-.px-timerswin .tm-gate { --tm-kind: ${heraldCss('gate')}; } .px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; } .px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; } .px-timerswin .tm-star { --tm-kind: ${STAR_VIOLET_CSS}; } .px-timerswin .tm-raid { --tm-kind: #f2c46b; } .px-timerswin .tm-battle { --tm-kind: #d98074; }
+.px-timerswin .tm-gate { --tm-kind: #e2554c; } .px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; } .px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; } .px-timerswin .tm-star { --tm-kind: ${STAR_VIOLET_CSS}; } .px-timerswin .tm-raid { --tm-kind: #f2c46b; } .px-timerswin .tm-battle { --tm-kind: #d98074; }
 .px-timerswin .tm-seat { --tm-kind: #c08a3e; } .px-timerswin .tm-reset { --tm-kind: #85a8a1; }
 .px-timerswin .tm-row.live { background: rgba(192,138,62,0.08); }
 .px-timerswin .tm-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }

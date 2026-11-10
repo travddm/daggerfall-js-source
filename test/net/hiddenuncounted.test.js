@@ -2,7 +2,7 @@
 // IN NO ONE'S COUNT, THEIR OWN INCLUDED. The relay already leaves a hidden socket out of every roster and count
 // (server/src/staffHidden.js, NAMED BY NOBODY - test/net/staffpanel5hidden_relay.test.js pins it), so every other game's
 // "Online - N" left them out; the hidden game's own list still drew its own row and counted it, one higher than everyone
-// else's. Over the real relay (the harness of staffmap_e2e.test.js): the session notes its hello's hidden mark
+// else's. Over the real relay: the session notes its hello's hidden mark
 // (net/online.js `hidden`) and the roster leaves its own row out (net/roster.js rosterRows), in every tab's source.
 // AUDIT HIDDEN-UNCOUNTED: and every count the relay says after the
 // welcome is read without a seat of mine (a join elsewhere, a count of nobody), the mark follows the socket the relay
@@ -13,8 +13,6 @@ import assert from 'node:assert/strict';
 
 import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, tokenHidden } from '../../src/net/online.js';
-import { relinkGame } from '../../src/scenes/staffFollowHost.js';
-import { tokenHidden as mapTokenHidden } from '../../src/net/staffMap.js';
 import { reconnectWave } from '../../src/net/reconnectWave.js';
 import { SOCIAL_ROOM } from '../../src/net/wire.js';
 import * as H from '../../src/net/hubShards.js';
@@ -155,7 +153,7 @@ test('HIDDEN-UNCOUNTED (AUDIT L1 = C2, L2): every count the relay says after the
   });
 });
 
-test('HIDDEN-UNCOUNTED (AUDIT L4, C N4): Hide me and Show myself mid-session, through the game\'s own relink (staffFollowHost.js relinkGame) - the mark and every screen\'s count follow the switch, 3 then 2 then 3, and my own row goes and comes back (mutants: a mark that sticks once hidden)', async () => {
+test('HIDDEN-UNCOUNTED (AUDIT L4, C N4): Hide me and Show myself mid-session, through a relink (the link left and opened again on a fresh token) - the mark and every screen\'s count follow the switch, 3 then 2 then 3, and my own row goes and comes back (mutants: a mark that sticks once hidden)', async () => {
   await world(async ({ signer, BridgeWS, Session, settle, tick }) => {
     let hideOn = false;   // the account service's switch: each mint reads it (server-account/src/staffHidden.js hiddenToken)
     const claims = () => (hideOn ? { s: 'HiddenSub0123456789abcde', n: 'Staff member', k: 'linked', hd: 1 } : { s: 'acct-staff-0003', n: 'Mob', k: 'linked' });
@@ -164,16 +162,17 @@ test('HIDDEN-UNCOUNTED (AUDIT L4, C N4): Hide me and Show myself mid-session, th
     const b = mk('plb-0002', async () => signer.token('plb-0002', { s: 'acct-b-0002', n: 'Beta', k: 'linked' }));
     const staff = mk('stf-0003', async () => signer.token('stf-0003', claims()));
     const all = [a, b, staff];
+    const relink = (link) => { const room = link.room; link.leave(); link.join(room); };
     const until = async (ok) => { for (let i = 0; i < 200 && !ok(); i++) { for (const s of all) { s.tick(); s.sendHubWho(); } await settle(); tick(250); } };
     const totals = () => all.map((s) => rosterRows(s).total);
     for (const s of all) s.join(SOCIAL_ROOM);
     await until(() => all.every((s) => s.welcomed) && totals().every((n) => n === 3));
     assert.deepEqual([staff.hidden, ...totals()], [false, 3, 3, 3], 'shown: a player');
-    hideOn = true; relinkGame(null, null, [staff]);
+    hideOn = true; relink(staff);
     await until(() => staff.welcomed && staff.hidden && totals().every((n) => n === 2));
     assert.deepEqual([staff.hidden, ...totals()], [true, 2, 2, 2], 'Hide me: counted by nobody, itself included');
     assert.equal(rosterRows(staff).rows.some((r) => r.me), false, 'no row of its own');
-    hideOn = false; relinkGame(null, null, [staff]);
+    hideOn = false; relink(staff);
     await until(() => staff.welcomed && !staff.hidden && totals().every((n) => n === 3));
     assert.deepEqual([staff.hidden, ...totals()], [false, 3, 3, 3], 'Show myself: a player again');
     assert.deepEqual(rosterRows(staff).rows.filter((r) => r.me).map((r) => r.id), ['stf-0003'], 'its own row back');
@@ -225,8 +224,7 @@ test('HIDDEN-UNCOUNTED: every tab\'s source carries the link\'s hidden mark - Pa
   assert.equal(placedRosterSource({ id: 'p1', name: 'P' }, 'Daggerfall').hidden, false, 'a link with no mark is shown');
 });
 
-test('HIDDEN-UNCOUNTED: the token\'s mark is one function - net/online.js reads it, net/staffMap.js hands the same one on', () => {
-  assert.equal(mapTokenHidden, tokenHidden);
+test('HIDDEN-UNCOUNTED: net/online.js reads the token\'s hidden mark', () => {
   const body = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
   assert.equal(tokenHidden(`v1.${body({ s: 'x', hd: 1 })}.sig`), true);
   assert.equal(tokenHidden(`v1.${body({ s: 'x' })}.sig`), false);

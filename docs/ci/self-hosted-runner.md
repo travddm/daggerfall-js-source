@@ -44,7 +44,6 @@ To view the site locally, build what the `site` job publishes and serve it:
 npm ci
 npm run pages:build              # tools/fetch-vendor.sh, then the production build, into scratch/pages-site
 npm run pages:preview            # http://localhost:4173/
-npm run pages:build -- --atlas   # also builds the chatgpt/exact-face-atlas preview and mounts it, as the workflow does
 ```
 
 The build needs network for the vendored files. `tools/pagesSite.mjs` limits open files on Windows, where Vite's build

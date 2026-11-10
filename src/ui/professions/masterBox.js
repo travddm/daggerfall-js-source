@@ -4,7 +4,7 @@
 // catalysts held and asked, the day's bound, and the last work's card. The service decides (masterWork.js); this asks
 // through the station's own craft door, so the fee, the chain and the kept act are a craft's.
 import {
-  MASTER_RANK, MASTER_LINES, MASTER_PROCS_MAX, MASTER_CATALYSTS, masterRecipe, masterTrackOf, masterOptions, masterChoiceRefusal, masterBand,
+  MASTER_RANK, MASTER_LINES, MASTER_PROCS_MAX, MASTER_CATALYSTS, masterRecipe, masterTrackOf, masterOptions, masterChoiceRefusal, masterBand, masterTierOfState,
 } from '../../net/masterLaw.js';
 import { recipeInputs } from '../../net/recipeLaw.js';   // AUDIT HORIZONTAL B4: the recipe's own goods, no stand-in
 import { chainPlan, chainNeeded, storesRoom } from '../../net/chainLaw.js';   // and the works that make them from raw, as the book runs them
@@ -31,9 +31,18 @@ export function masterPicks(station, r) {
 const pursuitWord = (/** @type {string} */ p) => (p === 'gathering' ? t('prof.master.from.gathering', 'Logging\'s rarest find')
   : p === 'sea' ? t('prof.master.from.sea', 'nets hauled at sea') : p === 'enchanting' ? t('prof.master.from.enchanting', 'Enchanting') : '');
 
-/** An option's words: its line at the band's two ends ("+20 to 40% damage"). @param {{ id: string, param?: any }} o */
-export function masterOptionWords(o) {
-  const band = masterBand(o.id);
+/** The tier the service makes a Master's work at (its state read's `master.tier`) - Rare unless it says
+ *  Legendary. @param {any} book @returns {'rare' | 'legendary'} */
+export const masterTierOf = (book) => masterTierOfState(book?.state);
+/** The box's note on what a Master's work is, at the tier. @param {'rare' | 'legendary'} tier */
+const masterAbout = (tier) => (tier === 'legendary'
+  ? t('prof.master.about', 'A Legendary piece with three lines you choose. Their values roll in the Legendary band. It carries no Legendary power.')
+  : t('prof.master.aboutRare', 'A Rare piece with three lines you choose. Their values roll in the Rare band.'));
+
+/** An option's words: its line at the band's two ends ("+20 to 40% damage"), at the tier's band.
+ *  @param {{ id: string, param?: any }} o @param {'rare' | 'legendary'} [tier] */
+export function masterOptionWords(o, tier = 'rare') {
+  const band = masterBand(o.id, tier);
   return band ? AFFIX_KINDS[o.id].label({ id: o.id, param: o.param, value: `${band[0]} to ${band[1]}` }) : o.id;
 }
 
@@ -75,7 +84,8 @@ export function drawMasterBox(box, kit, r, { station, book, state, free, rerende
   if (!masterRecipe(r) || (book?.track?.(masterTrackOf(r))?.rank ?? 0) < MASTER_RANK) return null;
   const sec = el('section', 'prof-master');
   sec.append(el('b', 'prof-master-head', t('prof.master.head', 'Master\'s work')));
-  sec.append(el('p', 'px-note', t('prof.master.about', 'A Legendary piece with three lines you choose. Their values roll in the Legendary band. It carries no Legendary power.')));
+  const tier = masterTierOf(book);
+  sec.append(el('p', 'px-note', masterAbout(tier)));
   const picks = masterPicks(station, r);
   const options = masterOptions(r);
   const busy = state.crafting === true;
@@ -94,7 +104,7 @@ export function drawMasterBox(box, kit, r, { station, book, state, free, rerende
       const group = /** @type {HTMLOptGroupElement} */ (el('optgroup'));
       group.label = String(word);
       for (const o of options.filter((x) => x.proc === proc)) {
-        const opt = /** @type {HTMLOptionElement} */ (el('option', null, masterOptionWords(o)));
+        const opt = /** @type {HTMLOptionElement} */ (el('option', null, masterOptionWords(o, tier)));
         opt.value = o.key;
         opt.disabled = others.includes(o.key) || (o.proc && procElsewhere);
         group.append(opt);
@@ -151,7 +161,7 @@ export function masterCard(kit, last, r) {
   card.setAttribute('role', 'status');
   let piece = null;
   try { piece = mintPieces(last)[0] ?? null; } catch { piece = null; }
-  card.append(el('b', 'prof-master-name', piece ? itemLongName(piece) : r.name), el('span', 'prof-master-tier', t('prof.master.legendary', 'Legendary')));
+  card.append(el('b', 'prof-master-name', piece ? itemLongName(piece) : r.name), el('span', 'prof-master-tier', piece?.rarity === 'legendary' ? t('prof.master.legendary', 'Legendary') : t('prof.master.rare', 'Rare')));
   const list = el('ul', 'prof-master-got');
   for (const a of last.lines) list.append(el('li', null, affixLabel(a)));
   card.append(list);

@@ -5187,7 +5187,7 @@ export function createWorldModes(host) {
         // F114: OwnsHouse per CURRENT region (DaggerfallBankManager.cs:136).
         ownsHouse: () => ownsHouse(playerEntity.houses ?? [], interiorBuilding?.regionIndex ?? 0),
         rankCeiling: host.rollPace?.(guild.factionId)?.ceiling ?? null,   // CHAP4b: 7 online while the Roll holds - 8 and 9 are seats; ROLL-PACE: and no further than its pace since joining
-        promoteWhenEarned: sharedClockOn() && !!host.rollPace?.(guild.factionId),   // PROMO-NOW: online, a promotion does not wait the 28 days - ROLL-PACE: while the Roll paces it
+        promoteWhenEarned: sharedClockOn() && !!host.rollPace?.(guild.factionId)?.promoteNow,   // the server profile's option (guild.promoteNow): no 28 days while the Roll paces it; else DFU's wait on the character's own clock
       }),
       // PROMO-NOW: online, the popup says what the next rank asks (the enhanced skin's line; the classic window is DFU's)
       rankNeeds: () => { const pace = sharedClockOn() ? host.rollPace?.(guild.factionId) ?? null : null; return sharedClockOn() ? rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships }) : null; },   // ROLL-PACE: and when the pace holds it; SEAT-LINE: read seated - a seat's own hall asks nothing more; STANDING-WORDS: the review's date and its book
@@ -5567,9 +5567,8 @@ export function createWorldModes(host) {
         // the ONE derivation of WeatherManager's four public flags from
         // SetWeather's own switch. This arm used to spell two of them
         // inline off the weather enum - correct, and a second reading of
-        // a DFU member (ONE DFU MEMBER, ONE EXPORT). AT1 wrote the shared
-        // one for Ambient Text's WeatherKey and its record said this copy
-        // had been folded into it; it had not. It is now.
+        // a DFU member (ONE DFU MEMBER, ONE EXPORT). It now reads
+        // the shared one.
         //
         // AUDIT WAITS S1: read at the Yes, the sky the summoning is made
         // under - SUMMON-NAME's list can stand open while it turns.
@@ -13110,9 +13109,8 @@ export function createWorldModes(host) {
      *  IsPlayerInsideDungeon), which IsSameInterior asks for by name
      *  (:193, :197, :209). The outer host holds the map pixel.
      *
-     *  AT2: and `dungeonType` - PlayerEnterExit.Dungeon.Summary.DungeonType,
-     *  a third read off the same object, which Ambient Text's key needs
-     *  underground. It is the LOCATION's dungeon type because the only
+     *  and `dungeonType` - PlayerEnterExit.Dungeon.Summary.DungeonType,
+     *  a third read off the same object. It is the LOCATION's dungeon type because the only
      *  dungeon you can be inside is the one this pixel carries; it reads
      *  NoDungeon (255) in every other mode, as DFU's summary does before
      *  a dungeon is loaded. THE FOUR HOSTS: this is the interior host's

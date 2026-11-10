@@ -793,16 +793,16 @@ export const rollPaceDays = (/** @type {unknown} */ sinceS, /** @type {number} *
  *  number - AUDIT CHAP S5's bound, read on the page), no more than its pace has paid since the membership began, and
  *  never a seat's. `standing` the Roll's `{ rep, since }` for the guild's faction - null before its first word, when no
  *  review promotes. */
-export function rollPromoteCeiling(/** @type {{ rep: unknown, since: unknown } | null} */ standing, /** @type {number} */ nowS) {
+export function rollPromoteCeiling(/** @type {{ rep: unknown, since: unknown } | null} */ standing, /** @type {number} */ nowS, book = ROLL_BOOK_RANK_MAX) {
   if (!standing) return 0;
   const paid = rollPaceDays(standing.since, nowS) * ROLL_GAIN_DAY_MAX;
-  return Math.min(ROLL_BOOK_RANK_MAX, rollRankCapOf(Math.min(rollRep(standing.rep), paid)));
+  return Math.min(book, rollRankCapOf(Math.min(rollRep(standing.rep), paid)));
 }
 
 /** The UTC days until the Roll's pace pays `rank`'s line (0: it has), or null where the pace is not what holds it - no
  *  standing yet, a rank past the book's, or the Roll's own reputation short of the line (the hall says that one). */
-export function rollPaceWait(/** @type {{ rep: unknown, since: unknown } | null} */ standing, /** @type {number} */ nowS, /** @type {number} */ rank) {
-  if (!standing || !(rank >= 0 && rank <= ROLL_BOOK_RANK_MAX)) return null;
+export function rollPaceWait(/** @type {{ rep: unknown, since: unknown } | null} */ standing, /** @type {number} */ nowS, /** @type {number} */ rank, book = ROLL_BOOK_RANK_MAX) {
+  if (!standing || !(rank >= 0 && rank <= book)) return null;
   const need = RANK_REQ_REPUTATION[rank];
   if (rollRep(standing.rep) < need) return null;
   return Math.max(0, Math.ceil(need / ROLL_GAIN_DAY_MAX) - rollPaceDays(standing.since, nowS));
@@ -913,7 +913,7 @@ export function seatedBook(/** @type {any} */ book, /** @type {string} */ key, /
 }
 /** THE BOOK HELD AT 7: each row of a Roll guild in `store`'s books (the mortal's and the vampire's) above
  *  ROLL_BOOK_RANK_MAX set to it; answers the guild factions it held. Run at the Roll's adoption. */
-export function rollBookCap(/** @type {any} */ store) {
+export function rollBookCap(/** @type {any} */ store, max = ROLL_BOOK_RANK_MAX) {
   if (!store || typeof store !== 'object') return [];
   const books = Object.hasOwn(store, 'mortal') && Object.hasOwn(store, 'vampire') ? [store.mortal, store.vampire] : [store];
   const held = new Set();
@@ -921,8 +921,8 @@ export function rollBookCap(/** @type {any} */ store) {
     if (!book || typeof book !== 'object') continue;
     for (const m of Object.values(book)) {
       const f = rollFactionOfGuild(m?.guild);
-      if (f == null || !(whole(m?.rank) > ROLL_BOOK_RANK_MAX)) continue;
-      m.rank = ROLL_BOOK_RANK_MAX;
+      if (f == null || !(whole(m?.rank) > max)) continue;
+      m.rank = max;
       held.add(f);
     }
   }

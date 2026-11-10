@@ -15,9 +15,6 @@
 //   host (`step`), its flagship's purse and the hub's word that it is down (`fleetEnded`, `hubWord`), its words; both on the
 //   chart (`chartWord`) and in a freeport harbourmaster's talk (`rumours`).
 //
-//   A FREEPORT HARBOURMASTER'S BOARDS (`office` - the tab's sections, spread into its model): the season's captains
-//   (SEA-SEASON, scenes/seaSeasonHost.js - `season`).
-//
 // deps = {
 //   live() -> bool          the sea stands (the sea's standing - online or offline)
 //   day() -> number         the day number of the shared clock (floor(raidNowMs() / WDUN_DAY_MS))
@@ -27,9 +24,6 @@
 //   state                   the streaming world's state (localFromWorld - a map pixel in the scene)
 //   link() -> OnlineSession | null   the social socket (sendSea)
 //   ether                   the ether host (scenes/etherHost.js): credit(n), mid(text, s), say(text, s)
-//   session                 the realm session (SEA-SEASON's: null - no realm character)
-//   character?() -> id      the realm character (its own - systems/characterId.js characterIdOf, when none is given)
-//   seasonDoor?             the season boards' service door (its own, when none is given)
 // }
 // ═══════════════════════════════════════════════════════════════════
 import { inEther, etherBandAt, compassPoint } from '../world/ethericSea.js';
@@ -41,10 +35,7 @@ import { setById } from '../systems/sigil/sigilSets.js';
 import { mintGood, goodById } from '../systems/naval/tradeGoods.js';
 import { STRAND_SITE, STRAND_YIELD } from './etherHost.js';
 import { NATIVE_PIXEL } from '../systems/seaRaiders.js';
-import { createSeaSeason } from './seaSeasonHost.js';
 import { t } from '../systems/textManager.js';
-import { characterIdOf } from '../systems/characterId.js';
-import { playerEntity } from '../characters/playerEntity.js';
 
 /** SEA-EVENTS: a storm's wrack site's id - a strand's, so the naval host floats and hauls it as one (`strand:wrack:n:slot`). */
 export const WRACK_SITE = `${STRAND_SITE}wrack:`;
@@ -222,9 +213,5 @@ export function createSeaVentures(deps) {
     else { const g = nextStorm(now); out.push(t('sea.rumour.stormNext', 'Sailors say an Aether storm will gather {way} of here in {min} minutes.', { way: wayTo(port && { x: port.px, y: port.py }, { x: g.x0, y: g.y0 }) || etherWayWord('north'), min: mins(g.start - now) })); }
     return out;
   }
-  /** The realm character I play (HOST-SPLIT, SEA VENTURES: its own, unless the host gives it). */
-  const character = deps.character ?? (() => characterIdOf(playerEntity));
-  // ── SEA-SEASON ─────────────────────────────────────────────────────────────────────────────────────────────────────
-  const season = createSeaSeason({ live, session: deps.session, character, door: deps.seasonDoor, now: clock });
-  return { vaultsNow, vaultHere, openSeaAt, chartWord: () => ({ ...chartWord(), ...eventsWord() }), stormWord, stormTurned, wrackSites, office: () => ({ season: season.office() }), gather, step, fleetEnded, hubWord, rumours, fleetList: (now = clock()) => fleetList(now, deps.pixel?.()) };
+  return { vaultsNow, vaultHere, openSeaAt, chartWord: () => ({ ...chartWord(), ...eventsWord() }), stormWord, stormTurned, wrackSites, gather, step, fleetEnded, hubWord, rumours, fleetList: (now = clock()) => fleetList(now, deps.pixel?.()) };
 }

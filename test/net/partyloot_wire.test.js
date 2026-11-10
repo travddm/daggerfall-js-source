@@ -27,6 +27,7 @@
 //     test/systems/partyloot.test.js's (OUTDOOR-LOOT D-2.1) - there is no body here that holds 33 pieces.
 // What is not here: a browser (tools/partyLootProbe.mjs plays the report in two), and buildDungeonContext itself, which
 // nothing in the tree can stand up outside one. Mutants: tools/mutants/partyloot_wire.json.
+import { stealthCheckRecord } from '../../src/characters/enemy/peer-senses.ts';   // the dungeon record writer's stealth field
 import { test, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -41,6 +42,7 @@ import { generateItems, addPileLootExtras, validLootList, LOOT_LIST_MAX, DUNGEON
 import { rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons, LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
 import { peerHanded, neverPeerHanded, notCarried } from '../../src/systems/peerWord.js';
 import { addItem, stacksWith, isGoldPieces, addGoldPieces } from '../../src/systems/inventory.js';
+import { weighClaims } from '../../src/systems/item/pendingCarry.js';
 import { isEquipped, unequipItem } from '../../src/systems/equip.js';
 import { planTake, applyTransfer } from '../../src/systems/item/itemTransfer.js';
 import { spawnEnemyLoot, rollRoomBonus } from '../../src/scenes/hostCombat.js';
@@ -192,6 +194,7 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     opts: { selfId: () => id, onActions: (data) => { told.push(JSON.parse(JSON.stringify(data))); return send(data); }, onLootClaimed: () => {}, partyLevels: () => partners, roomHost: () => seat(), onFoeHit: () => assert.fail('the host applies its own blows') },
     _sharedStamp: `st${seed}`, clearSurplus: () => {},
     addItem, stacksWith, isGoldPieces, addGoldPieces, isEquipped, unequipItem, neverPeerHanded, notCarried,   // AUDIT AUTO-HOLD: the give asks it (no realm session here: no filter)
+    weighClaims,   // the module weighs its claims in flight for the carry gate
     _wallNow: () => clock.t, performance: { now: () => clock.t }, respawnDue, validLootList, peerHanded, LOOT_LIST_MAX, LOOT_NEWER_TEXT, ENEMY_BASICS, corpseTextureOf,   // AUDIT DEX A1: the corpse mints read it
     isClassEnemyId, enemyEntityType,
     generateLootItems: generateItems, addPileLootExtras, rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons,
@@ -206,7 +209,7 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     quickLootTake: () => false, showPickups: null, lootPile: () => null, pileBody: () => null, RANDOM_TREASURE_ARCHIVE: 216, surfacePlayer: () => {},
     // the kill door's neighbours (test/systems/loot7check.test.js's killDoor): nothing here reads a loot law
     feudWeakBlow: () => false, blowClassOf: () => null, lastPlayerFeet: [0, 0, 0], foeDeps: null, audio: {},
-    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck: () => {}, markConcealedHit: () => {},
+    renownFoeStruck: () => {}, renownFoeDied: () => {}, reportPlayerKill: () => {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, stealthCheckRecord, _peerSenses: { read: () => false }, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck: () => {}, markConcealedHit: () => {},
     handleAttackFromPlayer: () => {}, damageShieldPool: (e, n) => n, noteFighter: () => {}, PARTY_ME: 'me', partyFoeLoses: (f, n) => n,
     peerSoulTrapOf: () => null, attemptSoulTrap: () => ({ allowDeath: true }), isAzurasStarEquipped: () => false, fillEmptyTrap: () => false,
     hudText: { add: () => {} }, SOUL_TRAP_TEXT: {}, setEnemyAlert: () => {}, sayEnemyDied: () => null, playRareDrop: () => {}, addCorpseFood: () => {},

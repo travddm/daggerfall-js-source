@@ -2,6 +2,7 @@
 // the REAL migrations (test/accountDb.mjs): the finds the service's own die decides and a day caps, the
 // sales under a request id, the Hearth Offerings set out, filled, taken from once a day and taken in, an orphan's cakes
 // sent home, and the festival's wardrobe - the titles, the aura and the profile icon, held only as the rows say.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
@@ -19,7 +20,9 @@ import { utcDay } from '../../src/net/marksLaw.js';
 const ON = { FESTIVAL_OPEN: 'on' };
 /** An instant inside the festival that is not a night the dead walk, one that is, and one after it. */
 const DAY_S = FESTIVALS[0].fromMs / 1000 + 3600;
-const NIGHT_S = (() => { for (let s = FESTIVALS[0].fromMs / 1000; s < FESTIVALS[0].toMs / 1000; s += 600) if (festivalNight(skyDayAt(s))) return s; return null; })();
+// The first night the dead walk on the sky's own clock (time.skyClock). Read inside a test that plays by that rule: with
+// one clock the sky's date is the world's, and the window's first night falls on a later UTC day than DAY_S.
+const firstSkyNight = () => { for (let s = FESTIVALS[0].fromMs / 1000; s < FESTIVALS[0].toMs / 1000; s += 600) if (festivalNight(skyDayAt(s))) return s; return null; };
 const AFTER_S = FESTIVALS[0].toMs / 1000 + 60;
 /** The die: a hit (every byte 0 - a roll of 0) or a miss (every byte 255). */
 const HIT = (/** @type {Uint8Array} */ b) => b.fill(0);
@@ -64,7 +67,8 @@ function interleaved(db, re, hook) {
   });
 }
 
-test('WITCH1 the routes and the switch: every festival route behind a session, FESTIVAL_OPEN off, dev or on', () => {
+test('WITCH1 the routes and the switch: every festival route behind a session, FESTIVAL_OPEN off, dev or on', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   for (const r of ['/v1/festival/mine', '/v1/festival/find', '/v1/festival/buy', '/v1/festival/town', '/v1/festival/offering/set',
     '/v1/festival/offering/fill', '/v1/festival/offering/take-in', '/v1/festival/offering/take', '/v1/account/icon']) assert.ok(ROUTES.has(r), r);
   assert.equal(festivalSwitchOf('on'), 'on');
@@ -74,11 +78,13 @@ test('WITCH1 the routes and the switch: every festival route behind a session, F
   assert.equal(festivalOpenFor({ handle: 'x' }, {}), false, 'unset is shut');
   assert.equal(festivalOpenFor({ handle: 'x' }, ON), true);
   assert.deepEqual(FEST_STATUS, { guest: 403, closed: 409, rate: 429, capped: 429 });
-  assert.ok(NIGHT_S != null, 'the festival holds a night the dead walk on the sky\'s clock');
+  assert.ok(firstSkyNight() != null, 'the festival holds a night the dead walk on the sky\'s clock');
   assert.equal(festivalNight(skyDayAt(DAY_S)), false);
 });
 
-test('WITCH1 A FIND: the service\'s die decides at the source\'s odds; a guest, a shut switch, the days\' end and a word that is no source are refused', async () => {
+test('WITCH1 A FIND: the service\'s die decides at the source\'s odds; a guest, a shut switch, the days\' end and a word that is no source are refused', async (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
+  const NIGHT_S = firstSkyNight();
   const { alice, player, ctx, row, S } = await stand();
   const g = await S.guest();
   assert.deepEqual(await findFestival(ctx(), { id: g.id, handle: null }, { source: 'foe' }, ON), { error: 'guest' });

@@ -148,9 +148,6 @@ player requests for D1.
   waits until the live relay serves the source's `RELAY_VERSION` or later (so the service
   never signs what the relay refuses; it gives up without deploying after about five and a half hours), and deploys.
 - **A service deploy drops nobody.** Sockets live on the relay, and requests are stateless.
-- Repair workflows (manual, same concurrency group `account-deploy`): `account-recovery.yml`,
-  `realm-revive.yml` (a D1 Time Travel restore), `realm-rollback.yml`, `guild-grant.yml`. `sd-clears.yml` and
-  `d1-load.yml` only read.
 
 ## Running and testing
 

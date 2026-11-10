@@ -5,6 +5,7 @@
 // sale - the palace's 10-16 its court forty-five, the library's 9-23 twenty-five. OL4's own record named the bank and
 // the library as the follow-up; the palace joins them. Offline, DFU's hours whole; residences and the house for sale
 // keep R1 online.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -77,7 +78,8 @@ test('OL6: the production default is the shared clock - with it standing and no 
   assert.equal(buildingIsUnlocked(at(BUILDING_TYPES.HouseForSale), { hour: 3 }), false, 'the house for sale keeps R1 online');
 });
 
-test('OL6: why - on the sky DFU\'s hours were a real-time lockout of 42.5 minutes in every real hour at the bank, 45 at the palace, 25 at the library', () => {
+test('OL6: why - on the sky DFU\'s hours were a real-time lockout of 42.5 minutes in every real hour at the bank, 45 at the palace, 25 at the library', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const realMinutesPerGameHour = 60 / (skyMinutesPerMsAt(Date.UTC(2026, 9, 7)) * 60_000);   // the sky's rate since SKY-SLOW
   assert.equal(realMinutesPerGameHour, 2.5);
   const lockout = (type) => (24 - (CLOSE_HOURS[type] - OPEN_HOURS[type])) * realMinutesPerGameHour;
