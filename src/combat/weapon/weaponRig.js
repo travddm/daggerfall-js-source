@@ -45,7 +45,7 @@ import { fieldOfView } from '../../ui/viewSettings.js';   // CLIMB-HANDS II: the
 // and runs untouched otherwise. The Morrowind arm below is an opt-in
 // layer that either draws whole or does not draw at all - there is no
 // state in which both reach the screen, and none in which neither does.
-import { fpArm, hasAmmoFor } from '../fpArm.js';
+import { fpArm } from '../fpArm.js'; import { hasAmmoFor } from '../fpArm/fpArmParts.js';
 import { ammoCountFor } from '../../systems/inventory.js';   // AUDIT 68 S27-ammoCount-dup: the quiver's count, from the spend law's own module
 import { getPref } from '../../systems/uiPrefs.js';   // MWA1: the arms switch
 import { morrowindDataCount, morrowindDataFingerprint, registerMorrowindData, morrowindDataCounted, countMorrowindArchives } from '../../scenes/dataSource.js';   // MWA1: are the archives attached; AUDIT 65 XL-6: and measured; MW-EARLY: and counted

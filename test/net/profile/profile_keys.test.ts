@@ -40,6 +40,19 @@ test("P0 ON60, THE FIRST KEY: repair.allowMagic is DFU false, online true, the p
   assert.equal(profileKeyOf('toString'), null, 'a name the object inherits is no key');
 });
 
+test('party.allowNoMentoring is a bool the client and the relay read, allowed online by default; a server may set it false', () => {
+  const key = profileKeyOf('party.allowNoMentoring');
+  assert.deepEqual(
+    [key?.type, key?.dfu, key?.online, key?.offline, key?.checkedBy],
+    ['bool', false, true, false, ['client', 'relay']],
+  );
+  assert.equal(resolveRules({})['party.allowNoMentoring'], true);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'party.allowNoMentoring': false } }), []);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'party.allowNoMentoring': 0 } }), [
+    'bad value for party.allowNoMentoring',
+  ]);
+});
+
 test('P0 A PROFILE READ AGAINST THE REGISTRY: another schema, an unknown key and a bad value are refused by name; the official profile is clean (mutants: unknown keys let through; values unchecked)', () => {
   assert.deepEqual(profileRuleErrors(OFFICIAL_PROFILE), []);
   assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'repair.allowMagic': false } }), []);
