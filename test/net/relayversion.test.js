@@ -48,7 +48,7 @@ const LAW = {
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
   world303: '4fc754a8d0c8b5e6924f4020314737053d761a020a6033dbc4f0f916d9783c8e', // TOWN-SEATS ROW: the Town seats switch is pinned on in the server profile (officialProfile.ts)
-  world308: 'd45abf5b7e84aa4b9974275480f45949534c6e2f444fd745123f6d1d8f16dd41', // a player's live Stealth and half-speed state on the pose, and a foe record's stealth-check minute (characters/enemy/peer-senses.ts)
+  world308: '30a5ebcda624ba4f53c6595d9977c22a6661fa7ace7794bab75905fb847f17ed', // a player's live Stealth and half-speed state on the pose, and a foe record's stealth-check minute (characters/enemy/peer-senses.ts)
   world302: 'cd7db4ace76a0f92962266b653af9af8feb08eb41e434f24049144d2682847e1', // SEAT CUT: Tides, Incursion Marks, Levy, gifts, Fealty and the Season titles leave; the works cost Marks alone
   world299: '1499885d9b7acea7843e3a972286da212e9c9aaf44f88a38ec96c7d837363c4c', // TERRAIN-CUT: the official profile pins the slope cut off (net/profile/officialProfile.ts `terrainSlopeCut`); the ground is unchanged
   world298: '376f332b8b831c5fc1f174e008dbdb262109a852d47aba46800e3542d33682ca',     // PORTENT-FOLD: the omen lines (rise, wrath, marks) go through the text core
