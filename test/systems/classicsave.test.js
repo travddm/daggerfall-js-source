@@ -1511,7 +1511,7 @@ import {
   LOAD_BUTTON_RECT, EXIT_BUTTON_RECT, LOAD_CLASSIC_IMG,
 } from '../../src/ui/loadClassicWindow.js';
 import {
-  importClimateWeathers, resetWeatherSim, tickWeather, currentWeatherEnum, WEATHER_ENUM, setSnowGroundLaw, currentWeatherRaw, setWeatherMapLaw,
+  importClimateWeathers, resetWeatherSim, tickWeather, currentWeatherEnum, WEATHER_ENUM, setSnowGroundLaw, currentWeatherRaw, setWeatherMapLaw, setWeatherFieldLaw,
 } from '../../src/systems/weather/weatherSim.js';
 import { bitmapToColor32 } from '../../src/formats/color32Order.js';
 import {
@@ -1582,13 +1582,15 @@ test('SAV3: importClimateWeathers - the imported array wears on the next tick, n
   resetWeatherSim(); setWeatherMapLaw(false);
 });
 
-test('SAV3: the Shadow save\'s weather bytes reach the sky on the classic lane - Woodlands reads slot 5', () => {
-  resetWeatherSim(); setWeatherMapLaw(false); setSnowGroundLaw(false);
+// With the Weather events row off (no weather field, no weather map) the classic lane is DFU's: the save's own array is
+// the sky. With the row on, the weather map is the sky everywhere, the same for every player, so no save's weather shows.
+test('SAV3: the Shadow save\'s weather bytes reach the sky with Weather events off - Woodlands reads slot 5', () => {
+  resetWeatherSim(); setWeatherFieldLaw(false); setWeatherMapLaw(false); setSnowGroundLaw(false);
   // SAVEVARS 0x17A2 in that save: [0, 2, 0x84, 5, 2, 6]; Daggerfall's region is Woodlands (231), the sixth slot.
   assert.equal(importClimateWeathers(convertClassicClimateWeathers(Uint8Array.of(0, 2, 0x84, 5, 2, 6))), true);
   tickWeather(0, 231, () => { throw new Error('a re-roll clobbered the imported array'); });
   assert.equal(currentWeatherEnum(), WEATHER_ENUM.thunder, 'classic 6 is DFU\'s Thunder after the 5<->6 swap');
-  resetWeatherSim(); setWeatherMapLaw(false);
+  resetWeatherSim(); setWeatherFieldLaw(null); setWeatherMapLaw(false);
 });
 
 test('SAV3: bitmapToColor32 grows the GetColor32 alphaIndex - -1 draws index 0 opaque', () => {
