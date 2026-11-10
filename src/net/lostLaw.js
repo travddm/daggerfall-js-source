@@ -23,7 +23,7 @@
 import { postItemHead, POST_BATCH_RE } from './postLaw.js';
 import { sdSpoilsSlot } from '../systems/superDungeon/sdSpoils.js';
 
-/** Every batch the Lost and Found writes begins so - and none the operator's workflow writes. */
+/** Every batch the Lost and Found writes begins so - and none the operator's post writes. */
 export const LOST_BATCH = 'lost-';
 /** A piece's place in its spoils is under this: so a kill can never hold more pieces in the post than this, whatever is
  *  asked (the largest spoils rolled stand well under it). */

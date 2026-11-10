@@ -782,11 +782,11 @@ const service = {
     }
 
     // HELD FOR MAINTENANCE. A history repair
-    // (.github/workflows/realm-revive.yml) rewinds the database for a minute to read what was lost, and puts it back;
-    // anything written in between would vanish with the rewind. So the job deploys this Worker with MAINTENANCE = "1"
+    // rewinds the database for a minute to read what was lost, and puts it back;
+    // anything written in between would vanish with the rewind. So a restore deploys this Worker with MAINTENANCE = "1"
     // first, and every call but the two above is refused for that minute - 503, which a playing tab's checkpoint waits
-    // out and sends again (systems/realmSaves.js), never a write that is silently lost. The job's own last step deploys
-    // it again without the switch; any deploy does.
+    // out and sends again (systems/realmSaves.js), never a write that is silently lost. Any deploy without the switch
+    // lifts it.
     if (maintaining(env)) return no('maintenance', 503, origin);
 
     // A PATH NOBODY SERVES IS A 404, and it is answered HERE - before
@@ -2235,7 +2235,7 @@ const service = {
 
       // SERVER-POST: THE SERVER'S POST - the developers' pieces to one account,
       // a registered one's alone (the letters' wall, its own word), each perhaps holding an item its reader claims into the
-      // online character being played (post.js). Read, claimed and thrown away here; written only by the operator's workflow.
+      // online character being played (post.js). Read, claimed and thrown away here; written only by the operator.
       if (path.startsWith('/v1/post/')) {
         if (accountKind(who.player) !== 'linked') return no('post-needs-account', 403, origin);
         if (path === '/v1/post/box') {
