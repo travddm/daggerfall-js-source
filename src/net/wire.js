@@ -1,4 +1,5 @@
 // @ts-check
+import { stealthPoseFields, stealthMinuteField } from './stealth-wire.ts';   // the pose's and the foe record's stealth fields
 import { validStaffEventIn } from './staffEvent/staffEventLaw.js';   // STAFF-EVENT: a staff event's word in
 import { readHelloLaws } from './helloLaws.ts';
 import { validStaffTeleportIn } from './staffTeleport.js';
@@ -879,7 +880,7 @@ export const MAP_PIXELS_Y = 500;
 export const SOCIAL_ACTS = Object.freeze({
   'friend.request': 'target', 'friend.accept': 'acct', 'friend.decline': 'acct', 'friend.cancel': 'acct', 'friend.remove': 'acct',
   'party.invite': 'target', 'party.accept': 'party', 'party.decline': 'party', 'party.leave': '', 'party.kick': 'acct',
-  'party.lead': 'acct',   // PARTY-LEAD (world162): the leader hands the lead to a member
+  'party.lead': 'acct', 'party.mentoring.off': '', 'party.mentoring.on': '',   // PARTY-LEAD (world162): the leader hands the lead to a member; the leader's no-mentoring switch
 });
 /** Every note the hub says, as a code the CLIENT puts words to (net/social.js noteText) - the relay writes no chat line. */
 export const NOTE_CODES = Object.freeze(['friend.requested', 'friend.accepted', 'party.invited', 'party.declined', 'party.joined', 'party.left', 'party.kicked', 'party.leader', 'party.lapsed']);
@@ -1359,6 +1360,7 @@ export function validFoeRecord(r) {
   // WORLD6b-iii(c): `o` how many items the corpse's pile holds (0 a live foe, an emptied body) - a peer's body is a loot
   // target while it says more than none; the pile itself travels in the owner's GRANT (a hit frame), never here
   if (r.o !== undefined) { if (!Number.isInteger(r.o) || r.o < 0 || r.o > 255) return null; out.o = r.o; }
+  Object.assign(out, stealthMinuteField(r.sc));   // `sc` the minute of the foe's last stealth check at the peer `g` names (stealth-wire.ts)
   // LOOT7 (the Loot arc): `cp` a CHAMPION's trait - its index in systems/champions.js CHAMPION_TRAITS (this file names
   // none of them: the relay reads it), absent for a foe that is none; the reader stands its puppet as the same champion
   if (r.cp !== undefined) { if (!Number.isInteger(r.cp) || r.cp < 0 || r.cp > CHAMPION_TRAIT_MAX) return null; out.cp = r.cp; }
@@ -1635,7 +1637,7 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  and the relay ship as one pair: a client joins only a relay whose welcome names this same version (relayMatches;
  *  net/online.js refuseVersion asks the player to reload the page otherwise). */
 // world290: F1 TAME-AI - a foe's blow carries no damage multiplier and a beast no longer flees. world289: the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget (B6). world288: GROUND_LAW 3 - the Bay's own locations stand on DFU's town ground again. world287: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone). world286: the relay checks what a kept PvP mode's clients say - an arena blow names the weapon in the striker's hand and a fist is worth no more than the best weapon, spells have reach and draw on a magicka pool, a siege's casts and heals the same, blows on the Gatehouse and the Ram keep the harm ceiling, a battle's ground is held near its first; a cell's or world's hello gate is spent after the token; /sd/open takes a signed token and is rate limited per account. world285 and before: integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world309';   // world309 (304 to 308 are held by open pull requests): the official profile pins the Sold goods stay on the shelf row off (`soldGoodsOnShelf`, net/profile/officialProfile.ts), so its hash `ph` moves. world303: the Town seats switch is pinned on in the server profile. world302: the seat system keeps its castles, regional Charters, fortifications, siege works, banner ribbons and Pacts, and loses Tides, Incursion Marks, the Levy, gifts, Fealty and the Season titles (the Crowned and Keeper titles leave the token's closed list). world299: TERRAIN-CUT - the official profile pins the slope cut off (`terrainSlopeCut`, net/profile/officialProfile.ts), so its hash `ph` moves; the ground and GROUND_LAW are unchanged. world298: PORTENT-FOLD - the omen lines (rise, wrath, marks) go through the text core. world297: the Revenants row's five fixed choices (who rises, spare, levels per rank, flight, return) are pinned in the server profile at their defaults. world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
+export const RELAY_VERSION = 'world309';   // world309 (304 to 308 are held by open pull requests): the official profile pins the Sold goods stay on the shelf row off (`soldGoodsOnShelf`, net/profile/officialProfile.ts), so its hash `ph` moves. world312: a failed quest costs DFU's reputation online, a server profile rule in the relay's graph. world311: a guild rank follows DFU's 28-day rule online, a server profile rule in the relay's graph. world310: a pile's gold follows DFU's level formula online, a server profile rule (loot.pileGold) in the relay's graph. world309: the shop's sale cap and the haggle's 0 to 100 range are server profile rules, in the relay's graph through profileKeys.ts. world308: a player's live Stealth (`sk`) and half-speed state (`hv`) ride the pose, and a foe record names the minute of its last stealth check at a peer (`sc`), so a foe another client runs makes DFU's StealthCheck against that player (net/stealth-wire.ts, characters/enemy/peer-senses.ts). world307: a party leader can set the party to no mentoring: the hub's party.mentoring.off and .on acts, the party view's nm, and the server profile's party.allowNoMentoring rule that can refuse the act. world306: a Cast-When-Held equip pays DFU's bill by default; Legendary items equip free and equipping never breaks items are options, pinned off in the server profile. world305: the werewolf claws' gauntlet metal is an option, off by default, pinned off in the server profile. world303: the Town seats switch is pinned on in the server profile. world302: the seat system keeps its castles, regional Charters, fortifications, siege works, banner ribbons and Pacts, and loses Tides, Incursion Marks, the Levy, gifts, Fealty and the Season titles (the Crowned and Keeper titles leave the token's closed list). world299: TERRAIN-CUT - the official profile pins the slope cut off (`terrainSlopeCut`, net/profile/officialProfile.ts), so its hash `ph` moves; the ground and GROUND_LAW are unchanged. world298: PORTENT-FOLD - the omen lines (rise, wrath, marks) go through the text core. world297: the Revenants row's five fixed choices (who rises, spare, levels per rank, flight, return) are pinned in the server profile at their defaults. world295: the relay serves its profile at /profile, names its hash `ph` in /health and every welcome, and refuses a hello on another profile or none. world294: CHARACTER MODES - the shared mode law offers modes by a server profile (net/modeLaw.js creatableModes, offeredFromList); the relay reads no mode yet. world293: CHARACTER MODES - the identity token carries a character's mode (md, net/modeLaw.js); the relay reads no mode yet. world292: the referee core moved out of net/siege/siegeRef.js into net/pvp/pvpRef.js and pvpCaps.js (F4b PVP-REF-LEAF); no behaviour change
 // world283: OPEN-WORLD PVP REMOVED - the `wild` and `wdun` frames, the `wref` referee word, the `remains` order and the zone's
 //   foe-bound stages are gone; the `sea` frame (`hi`, `fk` in; `st`, `fd` out - net/sea/fleetHub.js) keeps the treasure fleets' record.
 // world282: one version for client and relay - the per-feature relay gates are gone, and a welcome naming another
@@ -1944,7 +1946,7 @@ export const poseHandsOf = (usingRightHand, strikeHand) => ({ ...(usingRightHand
 /** A pose the room will relay, or null. */
 export function validPose(p) {
   if (!p || typeof p !== 'object') return null;
-  const { x, y, z, yaw, pitch, mv, wd, an, as, am, sr, cn, cr, ce, ar, fk, rd, rv, rc, hs, lh, ah, wb, dd, hl, lt, lc, hk, hp, hb, hq, hu, uq, cv, cl, cw, ck, cy, cd, st, ga, gb, gm, ts, ab } = p;
+  const { x, y, z, yaw, pitch, mv, wd, an, as, am, sr, cn, cr, ce, ar, fk, rd, rv, rc, hs, lh, ah, wb, dd, hl, lt, lc, hk, hp, hb, hq, hu, uq, cv, sk, hv, cl, cw, ck, cy, cd, st, ga, gb, gm, ts, ab } = p;
   if (![x, y, z, yaw, pitch].every(finite)) return null;
   if (Math.abs(x) > POSE_BOUND || Math.abs(z) > POSE_BOUND || Math.abs(y) > POSE_Y_BOUND) return null;
   // ONCRASH1: AN ANGLE IS BOUNDED LIKE EVERY OTHER FIELD. `finite` alone
@@ -2015,7 +2017,7 @@ export function validPose(p) {
     // IsAShade (Shadow) 4, normal or true power - so the others draw them as DFU draws every concealed entity that is
     // not the player (EntityConcealmentBehaviour: the renderer off) and their foes' senses read it (EnemySenses
     // .BlockedByIllusionEffect). OMITTED at 0 (validLook's `class` law): an unconcealed pose keeps its bytes.
-    ...(uint(cv, 7) ? { cv: uint(cv, 7) } : {}),
+    ...(uint(cv, 7) ? { cv: uint(cv, 7) } : {}), ...stealthPoseFields(sk, hv),   // and the live Stealth and half-speed state a foe's senses read (stealth-wire.ts)
     // CLIMB5: `cl` the player's CLIMB - 1
     // hanging from a lip, 2 climbing a face, 3 a move in flight (a mantle, a vault, a lower, a leap) - and `cw` the way
     // the body faces on it (the wall, or the move's way; player/motor.js climbPoseOf), an angle wrapped as the yaw is,
@@ -3323,7 +3325,7 @@ export function validPartyView(v) {
   const members = [];
   for (const r of v.members) { const row = validMemberRow(r); if (!row) return null; members.push(row); }
   if (!members.some((m) => m.acct === leader)) return null;   // the leader is a member: a view that says otherwise is no party
-  return { id, leader, members };
+  return { id, leader, members, ...(v.nm === 1 ? { nm: 1 } : {}) };   // `nm` 1: the leader set no mentoring
 }
 /** SOC1: AN INVITE as the hub hands it to the invited: the party, who asked, who is in it (PARTY_MAX at most, name and
  *  id alone - the invited is not yet a member and sees no pose), when, and when it lapses. Null for anything else. */
@@ -3803,8 +3805,6 @@ export const mintTradeSid = (rand = Math.random) => {
   while (s.length < 10) s += rand().toString(36).slice(2);
   return s.slice(0, 10).padEnd(10, '0');
 };
-
-
 
 // ═══ HCC-PARK - A PARKED TEAM OUTLIVES ITS OWNER'S PRESENCE ═══
 //

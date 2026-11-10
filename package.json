@@ -43,7 +43,7 @@
     "levelup": "node tools/levelUpProbe.mjs",
     "blood": "node tools/bloodProbe.mjs",
     "account": "node tools/accountProbe.mjs",
-    "load": "node tools/loadHarness.mjs",
+    "load": "node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs",
     "acctcard": "node tools/accountCardProbe.mjs",
     "savetile": "node tools/saveTileProbe.mjs",
     "chargenphone": "node tools/chargenPhoneProbe.mjs",
