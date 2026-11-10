@@ -96,6 +96,20 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.trade.haggleRange',
   }),
+  // How a dungeon treasure pile's gold is scaled online. DFU rolls it times the player's level
+  // (LootTables.GenerateLoot); 'flat' divides it back to level 1's (loot.js unlevelPileGold), so the hourly respawn
+  // does not pay a high level's gold again.
+  'loot.pileGold': Object.freeze({
+    census: Object.freeze(['ON16'] as const),
+    feature: 'REALM-P0.4',
+    type: 'enum',
+    values: Object.freeze(['dfu', 'flat'] as const),
+    dfu: 'dfu',
+    online: 'dfu',
+    offline: 'dfu',
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.loot.pileGold',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;

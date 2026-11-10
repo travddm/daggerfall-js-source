@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world310: '0d2cd05fd97ae86b9841b1eecae3d80b2b309c4538d0b1eb32e89b38c37f02f1', // a pile's gold follows DFU's level formula online, a server profile rule (loot.pileGold) in the relay's graph
   world309: 'a5532e3a65743f4a3ba970c6bcea04525603d889095ec7dfcbbac661664d8416', // the shop's sale cap and the haggle's 0 to 100 range are server profile rules, in the relay's graph through profileKeys.ts
   world277: '9f06f4c2c532d3d9d0183ea19f5bf4f81de59c34c9ca39925bcb6743c5ed8551',     // THE CLEANUP: the SUNBABY and ROCKET sky events, the Sky-Ketch, the tavern card games and King's Gambit, the SHOP, the guns and Elite Gates removed.
   world278: '44c9edab2ddeebe8c51c60afe58f252591f818d153a87c7b963757062961e975',
