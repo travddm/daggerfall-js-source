@@ -137,7 +137,7 @@ export function nightDone(book, now, t) {
 }
 
 /**
- * The night's word (the hub's `fell`, the herald's card): when it was said, the best three of the court that won first,
+ * The night's word (the hub's `fell`): when it was said, the best three of the court that won first,
  * the fighters of every court that won, the courts that won (`w`) and the courts the night held (`cs`).
  * @param {GateBook} book
  * @param {number} at

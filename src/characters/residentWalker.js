@@ -8,7 +8,7 @@
 // reads (`nameNPC`, `personFaceRecordId`, `guard`, `facingYaw`). It is a MobilePerson, so every seam that takes a
 // walker - the talk ray, the pickpocket, the watch's conversion, the trample - takes it unchanged.
 //
-// LW3: ARMED (`arm`). A resident walking out to the road, or home from it, in their gear (LW0 decision 5) wears their
+// LW3: ARMED (`arm`). A resident walking out to the road, or home from it, in their gear wears their
 // class's sprite instead - the enemy's own eight-way MobileUnit (characters/mobile/mobileUnit.js, the band's and the crew's
 // body) on its class archive - and their own outfit again when the walk is done.
 //

@@ -16,7 +16,7 @@
 // Everything here is the producer's: the account service's own town answer (the real Worker over node:sqlite, a hall
 // bought from a treasury, a home claimed on a realm record), the client registry that reads it (createOnlineHomes), and
 // the mode machine both town hosts build (worldModes), restoring a real room - GENRAS00 #1 as Beautiful Villages serves
-// it - and closing a real rest window over its own deps. `06-Systems/Online-Arc.md` HALL-FOLK.
+// it - and closing a real rest window over its own deps. HALL-FOLK.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

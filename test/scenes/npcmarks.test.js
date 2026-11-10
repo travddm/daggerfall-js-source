@@ -244,7 +244,7 @@ test('NPC-MARKS the quad stands square to the eye at the mark, never under MARK_
   close(fns.globals.gl_Position, [2 - MARK_HALF_M, 3, -10, 1], 'AUDIT NPC-MARKS R9: its bottom on the point, at any size - a far mark never sinks into the head');
 });
 
-// ═══ AUDIT NPC-MARKS ═══
+// AUDIT NPC-MARKS
 
 test('AUDIT NPC-MARKS L1: while FACTION.TXT loads its dict is the producer\'s empty Map - a route read then is not kept, and the coin comes when the row does', () => {
   const loading = new FactionFile().factionDict;   // what townTalk.factionDict answers between `new FactionFile()` and its load

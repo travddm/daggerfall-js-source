@@ -321,8 +321,7 @@ export const WHERE_TEXT = Object.freeze({
  *          here)" when the player stands in it.
  *   note   the place is named and the player's map is KNOWN not to have
  *          it: Daggerfall's answer is to ask - "Where is ...?" in talk,
- *          and an NPC marks it (06-Systems/Talk-Arc.md, THE COMPASS
- *          MARK). Never when the map was not asked (`onMap` null).
+ *          and an NPC marks it. Never when the map was not asked (`onMap` null).
  *   find   the target's own - the door's payload, or null.
  */
 export function targetWords(target) {

@@ -21,8 +21,12 @@ import { popAllowChange, POP_VISIBLE_RANGE } from '../../src/systems/town/townPo
 import { watchStep } from '../../src/scenes/livingWorld/livingWatch.js';
 import { setRaidingPartiesHost, raidFrame, restoreRaidSaveData, _resetRaidingParties, _raidRuntime, RAIDING_PARTIES_VENDOR } from '../../src/systems/raidingParties.js';
 import { setModSetting } from '../../src/systems/modSettings.js';
+import { setValue } from '../../src/systems/settings/settings.js';
 import { setSharedClock } from '../../src/systems/worldTick.js';
 import { MINUTES_PER_DAY } from '../../src/systems/gameDate.js';
+
+// These pins are the classic motor's walk: DFU's Enhanced Combat AI, on by default, lets a foe roll to back off, which can cost the guard the ground the pin measures.
+setValue('Enhancements', 'EnhancedCombatAI', false);
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const tick = () => new Promise((r) => setImmediate(r));

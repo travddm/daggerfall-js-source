@@ -7,7 +7,7 @@
 // to the screen: at 1440p the paper grew by a third and nothing on it did. THE MAP'S SCALE (ui/map/mapScale.js) inks the
 // sheet on the fitted paper over the scale, at full device resolution, and zooms the chrome by the same - Auto the
 // screen's height over 1080, or the player's own choice on the Interface tab's Maps row. The window's half is pinned in
-// test/ui/heldmap.test.js (MAP-SCALE). `01-Overview/bugs/Field-Bugs-2026-10-09e.md`.
+// test/ui/heldmap.test.js (MAP-SCALE).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

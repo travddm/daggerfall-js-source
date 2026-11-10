@@ -6,11 +6,11 @@
 //  - A TOWN is a MAPS location of type TownCity, TownHamlet or TownVillage (formats/mapsFile.js LOCATION_TYPES 0-2),
 //    its market cycle phased by its map pixel (`townKeyOf`); TE2's service keys it by its unsigned map id - the seats',
 //    the homes', the stalls' and the patrons' own.
-//  - THE BASELINE IS PURE (TE0 decision 2): the town's size, its own market cycle over real UTC days (a closed form,
+//  - THE BASELINE IS PURE: the town's size, its own market cycle over real UTC days (a closed form,
 //    phased by its pixel - a player away a month reads what one who stayed reads), its seat's Standing and Edict, and a
 //    raid at its gates. THE PLAYERS' SHARE (TE2, the account service's count of witnessed acts - the law's lines below,
 //    read by both ends) is an argument, bounded here to TOWN_PLAYERS_MAX.
-//  - THE PRICE (TE0 decision 4, an exception to the Economy arc's law 5, bounded): what a
+//  - THE PRICE (an exception to the Economy arc's law 5, bounded): what a
 //    counter ASKS moves by up to TOWN_PRICE_SWING each way; what it PAYS falls by the same share away from the middle,
 //    either way, and never rises - AUDIT TOWN-ECON LAW-1: a Booming town's counter never pays more than it asks, so the
 //    essentials' half (shopStock.js ESSENTIALS-HALF) breaks even there as it does at the region's price; with a seat's
@@ -21,7 +21,7 @@
 // (THE TOWN ECONOMY's row). Pure: no clock, no network, no DOM.
 // ═══════════════════════════════════════════════════════════════════
 
-import { seatTipOf, seatShopFactor, kingdomName, CROWN_SEAT_REGIONS, seatRegionOk, SEAT_PIXEL_SPAN } from './townSeatLaw.js';   // TE0 decision 5: a seat town's card, its area's holder; AUDIT TOWN-ECON UI-4: Market Day on the card's price
+import { seatTipOf, seatShopFactor, kingdomName, CROWN_SEAT_REGIONS, seatRegionOk, SEAT_PIXEL_SPAN } from './townSeatLaw.js';   // a seat town's card, its area's holder; AUDIT TOWN-ECON UI-4: Market Day on the card's price
 import { t } from '../systems/textManager.js';   // L10N4: the card's words in the player's language, each read when it is said
 import { CAPITAL_LANE } from '../world/capitalLane.js';   // BAY-LEFT-SEA: the staff audit's order - a capital's map id
 
@@ -148,7 +148,7 @@ export function townShopFactor(p, mode, seatFactor = 1) {
 // Witnessed acts at a town - its footsteps (the relay's signed Watch ticks), its players' traders' sales (the market's,
 // and LW15's patrons') and a raid driven from its gates - counted by the account service a town a day by source, each
 // account capped a town a day, and read back by every client as one share. The service and the client both read
-// these lines; nothing a player pays in gold moves a town (TE0 decision 3).
+// these lines; nothing a player pays in gold moves a town.
 
 /** The sources of a town's activity. SEA-TRADE: `sea`, a captain's dealing at its exchange. */
 export const TOWN_ECON_SOURCES = Object.freeze(['watch', 'trade', 'raid', 'sea']);

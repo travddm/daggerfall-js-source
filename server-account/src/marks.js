@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// MARKS1 - MARKS, AS THE SERVICE KEEPS THEM (bible/06-Systems/
-// Professions-Arc.md 10.5; the law both ends read is
+// MARKS1 - MARKS, AS THE SERVICE KEEPS THEM (docs/systems/professions.md; the law both ends read is
 // src/net/marksLaw.js).
 //
 // ═══ REGISTERED ONLY, AND BEHIND A SWITCH ══════════════════════════

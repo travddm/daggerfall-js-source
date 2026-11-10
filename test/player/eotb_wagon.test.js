@@ -19,7 +19,7 @@ import { mwCamera } from '../../src/player/mwCamera.js';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { trs } from '../../src/world/mat4.js';
 
-// ═══ EOTB-IL: THE CART ═══════════════════════════════════════════════
+// EOTB-IL: THE CART
 //
 // `SpawnWagon` / `UpdateWagon` / `CheckWagon`, the three rows the scope
 // ledger carried as NOT DONE ("ShowCart, the wagon that follows") until

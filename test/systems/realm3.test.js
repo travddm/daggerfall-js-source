@@ -9,7 +9,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   realmIo, realmCreate, realmPut, openRealmBoot, realmSummaryOf, realmRowAsSave, realmBootSearch,
   realmRefusalText, setRealmNotice, takeRealmNotice, REALM_NOTICE_KEY, REALM_ID_SHAPE, REALM_SAVED_TEXT, REALM_OFFLINE_TEXT,
@@ -63,7 +63,7 @@ async function device() {
   const env = { DB: d1(), SAVES: r2(), ACCOUNT_VERSION: 'test1' };
   const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
   const storage = fakeStorage();
-  storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   return { env, g, io: realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), env), storage }) };
 }
 

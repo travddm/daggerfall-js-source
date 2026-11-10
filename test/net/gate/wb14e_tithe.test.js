@@ -52,7 +52,7 @@ function titheFight(n = 3, ti = TI, md = null) {
 }
 const rise = (run) => run.until(T0 + OPENING_MS + TI + 2 * BRAIN_TICK_MS);
 
-// ═══ THE LAW ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('WB14e the night\'s draw: one gate in TITHE_ONE_IN carries a Tithe-Imp, its moment TITHE_AFTER_MS to TITHE_AFTER_MS + TITHE_SPREAD_MS after his wake, in whole seconds, the day\'s alone - never in the omen (mutants: every night; its moment past the spread)', () => {
   assert.deepEqual([TITHE_ONE_IN, TITHE_AFTER_MS, TITHE_SPREAD_MS], [5, 50_000, 100_000]);
@@ -199,7 +199,7 @@ test('WB14e beside the Legion-Lord\'s host it steps its own way - never a Ward-B
   assert.ok(run.out.some((o) => o.k === 'amv' && o.m.some((x) => x[0] === a.i)), 'it runs');
 });
 
-// ═══ THE RELAY AND THE WIRE ═══════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY AND THE WIRE
 
 test('WB14e the relay: a fight born with its night\'s moment (gateTitheOf), through the seam; a word with `to` goes to that fighter\'s sockets alone, without it (mutants: the tithe fanned to the court)', () => {
   assert.equal(GATE_SEAM.new({ day: 3, now: T0, wrathAt: WRATH, boss: 'ruhn', ti: 70_000 }).ti, 70_000);
@@ -209,7 +209,7 @@ test('WB14e the relay: a fight born with its night\'s moment (gateTitheOf), thro
   assert.equal(validGateOut({ k: 'adie', is: [1], w: 4, at: 9 }), null, 'no fifth way of going');
 });
 
-// ═══ THE SCREEN ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SCREEN
 
 test('WB14e the fold: my tithe kept on the state - through a state of the same fight, gone with a new one (mutants: the tithe lost at the next state; carried into another fight)', () => {
   const st = (d) => validGateOut({ ...stateOf(newFight(d, T0, WRATH, 'ruhn')), d });

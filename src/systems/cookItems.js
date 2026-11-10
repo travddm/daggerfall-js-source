@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF9 - A DISH IN THE PACK (bible/06-Systems/
-// Professions-Arc.md 9.3, 35): the piece a craft at the fire mints, and
+// PROF9 - A DISH IN THE PACK (docs/systems/professions.md): the piece a craft at the fire mints, and
 // what eating it does.
 //
 // THE PIECE. Template 685-688 (systems/professions/profTemplates.js - a Climates &

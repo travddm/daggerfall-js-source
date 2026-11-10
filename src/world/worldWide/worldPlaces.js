@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WW1 - THE WORLD'S PLACES: the one door the systems read the world's places
 // through, wherever they stand.
 //
@@ -25,7 +24,6 @@
 //    province's past the Bay (formats/mapsTables.js regionOfTheatre), -1 for a place no province holds.
 //
 // Pure: plain records in, answers out. Not a DFU member: DFU has the Bay and nothing past it. Ledger A (WW1).
-// ═══════════════════════════════════════════════════════════════════
 import { worldPixelKey, inWorldGrid, theatreAt, theatreOfArea, districtOfArea, areaAt, BAY_THEATRE, DISTRICT_PX, WORLD_PIXEL_SPAN } from './worldGrid.js';
 import { inBay } from '../tamriel/tamrielFrame.js';
 import { regionOfTheatre } from '../../formats/mapsTables.js';   // WW-R: a province's region

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WD3 - A TOWN'S HOMES IN ONE LAYOUT.
 //
 // A building key names a building only in one layout of its town, so a
@@ -13,7 +12,6 @@
 // claim writes with lives here, for both: homes.js reads halls.js (a
 // hall's heraldry, on its door), and the hall could not read it back
 // from homes.js without a cycle.
-// ═══════════════════════════════════════════════════════════════════
 import { HOME_LAYOUT_MODS, homeLayoutOk, homeLayoutsMatch } from '../../src/net/homeLaw.js';
 
 // WD3 (AUDIT WD3 R5): a town's homes in ONE layout, in the write itself - the claim's mods each in a home of the town

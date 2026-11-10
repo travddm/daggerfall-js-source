@@ -19,8 +19,7 @@
 // and half the moon, half the sun under the clouds' shadow), hazed as the far ring is. A tree under a pixel is drawn by its
 // share of one (a hash against its area), so a far wood keeps its coverage, never a blot of one-pixel points.
 //
-// THE SKYLINE (HORIZON-TREES, 2026-10-27; KPbICA through; bible/
-// 03-World/Tamriel.md RELIEF-PEAKS Cause 7). The far pass has no depth among its layers - the painter's order puts its
+// THE SKYLINE (HORIZON-TREES, 2026-10-27; KPbICA through). The far pass has no depth among its layers - the painter's order puts its
 // hills in front of one another, and the band is drawn last - so a band tree behind a nearer hill of the middle ring stood
 // over that hill's skyline. The middle ring's own heights (render/midRing.js, the drawn ground) ride to the band as a
 // texture (GROUND_UNIT), and each tree's sight line from the eye is marched over them (HORIZON_STEPS samples, the pixels

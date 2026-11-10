@@ -3,7 +3,7 @@
 // Addison Knox, on Discord: "An in-game mail system where players can send messages to offline players (e.g. notes,
 // contracts, invitations)."
 //
-// ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
+// WHAT THESE PINS ARE FOR
 //
 // A letter is words one player leaves for another who is NOT here, so every guarantee lives in the ACCOUNT SERVICE,
 // and every pin below that is about the service drives the REAL worker (server-account/src/index.js) over a real

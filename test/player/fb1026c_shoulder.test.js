@@ -1,6 +1,5 @@
 // MW-SHOULDER (FIELD BUGS 2026-10-26c, feature-feedback via eye of the beholder" mod) for morrowind 3rd person models ... because crosshair is located on top of
-// character's head and it is inconvenient to target something with ranged attacks"; bible/01-Overview/bugs/
-// Field-Bugs-2026-10-26c.md) - THE VIEW OVER THE SHOULDER, the player's option (player/mwCamera.js).
+// character's head and it is inconvenient to target something with ranged attacks") - THE VIEW OVER THE SHOULDER, the player's option (player/mwCamera.js).
 //
 // What is pinned: the camera's numbers; the focal transition's easing; the shoulder's state - the chosen shoulder, the combat offset
 // with a weapon or a spell out and in the water, at once on the frame third person or the option begins; the offset in

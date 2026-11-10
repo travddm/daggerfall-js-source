@@ -11,7 +11,7 @@
 // Its stock is the counter's own roll (shopStock.js stockShopShelf), seeded by the trip - the same all trip - and what
 // the character bought or took stays gone (their `wares`).
 //
-// A DEED ON THE ROAD (Living World II decision 5) is a crime against the REGION where the road runs, charged only when a
+// A DEED ON THE ROAD is a crime against the REGION where the road runs, charged only when a
 // witness reaches a town alive (`reportAt`: the party's next arrival - the town it set out for on the way out, home on
 // the way back); the character killing every witness first voids it.
 //

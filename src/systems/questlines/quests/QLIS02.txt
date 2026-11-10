@@ -1,7 +1,7 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE HARBOURMASTER'S WORD, step 2 of 3.
+-- QL15 (2026-10-19; docs/systems/quests.md): THE HARBOURMASTER'S WORD, step 2 of 3.
 -- Begun with the harbourmaster's word by a note (the line's runner starts it an hour after the first). The act: a
 -- cargo delivered (`ql act cargo-delivered 1` - systems/questlines/qlActs.js, a delivery contract off a harbourmaster's
--- board done, bible/03-World/Captains-Sea.md CAPT-BOARD); the bonus waits at the quay the cargo comes in to, so a
+-- board done, docs/systems/naval.md); the bonus waits at the quay the cargo comes in to, so a
 -- delivery never ends in a walk back. The giver is unnamed, as the registry's (qlLines.js "a harbourmaster").
 Quest: QLIS02
 DisplayName: A Hold Full

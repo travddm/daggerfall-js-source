@@ -19,6 +19,7 @@ const PREFS = Object.freeze({
   crimeRecovery: 'x4',
   dungeonFires: true,
   weatherEvents: true,
+  etherSea: true,
   realForests: true,
   banthaJungle: true,
   tamrielLands: true,
@@ -74,8 +75,6 @@ const MOD_KEYS = Object.freeze({
   }),
   // Levels the ground under its camps and stands collidable rock; its peaks do the same.
   'world-of-daggerfall': Object.freeze({ Enabled: true, Mountains: false }),
-  // Every owner's ship stands at the same map pixel, so its collidable deck props are shared ground.
-  'detailed-ships': Object.freeze({ Enabled: true }),
   // Lays the towns out again: players who disagree walk different streets, and a building key names different buildings.
   'beautiful-villages': Object.freeze({ Enabled: true }),
   'beautiful-cities': Object.freeze({ Enabled: true }),

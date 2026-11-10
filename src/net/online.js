@@ -218,13 +218,13 @@ export { HEARTBEAT_MS, PING_MS };
 export const KNOWN_MAX = SOCKETS_MAX * 2;
 /** AUDIT CONTRIB A2: the fallen remembered at once (one death per life) - the oldest goes first past this. */
 export const FALLEN_MAX = 256;
-/** The relay this port hosts (server/wrangler.toml). */
 /** AUDIT DROPS B3: the most senders the inbound trade gate keeps a bucket for before it forgets them all - a room holds SOCKETS_MAX at most, so an honest map never reaches it. */
 const TRADE_IN_SENDERS_MAX = 64;
 /** AUDIT 68 S14-quest-inbound-ungated: the quest shares one room passes a second - an honest hub's worst case, every
  *  other seat of my party sharing at the hub's own per-socket cooldown (QUEST_HUB_MIN_MS), with all of them at once for its burst. */
 const QUEST_IN_ROOM_HZ = ((PARTY_MAX - 1) * 1000) / QUEST_HUB_MIN_MS;
-export const DEFAULT_SERVER = 'wss://daggerfall-online.mackcothran.workers.dev';
+/** No built-in relay: the player enters one in Settings, Online, Relay. Workflows grep this line. */
+export const DEFAULT_SERVER = '';
 /** A peer silent this long is HIDDEN (out of range, or its socket is
  *  gone and the leave is on its way); only the room's leave removes it. */
 // RELAY-H1: DERIVED from the heartbeat, never a literal beside it. The silence law hides a peer this long after its
@@ -742,7 +742,7 @@ export class OnlineSession {
     this._wedBucket = null;       // LEGACY7 part three: my own wed frames out - wedGate's law
     this._inWedBuckets = new Map();   // LEGACY7 part three: the gate on wed frames coming in, per sender (`_directedIn`)
     this.onSea = null;            // SEA-EVENTS: (word) => void - the social room's word on the treasure fleets (wire.js validSeaOut)
-    this._gateSiteSaid = null;    // DISCORD-GATES: the socket and day my `site` last went on - once a socket and day (WW2: and gate - `{ ws, said }`, the gates said on it)
+    this._gateSiteSaid = null;    // the socket and day my `site` last went on - once a socket, day and gate (`{ ws, said }`, the gates said on it)
     this.arenaHeard = false;      // FIELD BUGS 2026-10-16b ARENA-WAIT: a primary welcome has come (sticky) - before it the arena on the online lane waits (scenes/arena/arenaOnline.js waiting)
     this.onArena = null;          // ARENA4: (word, room) => void - the hall's or a bout's word, projected by the wire's readArenaOut
     this._arenaBucket = null;     // ARENA4: my own arena words out - arenaGate's law
@@ -1776,8 +1776,8 @@ export class OnlineSession {
     return true;
   }
   /** SERPENT2: where this game found the serpent the clock is about (systems/serpent/serpentSite.js - its day, its native point
-   *  to the whole unit and the port it lies off), said to the hub, whose Discord herald names the place and posts the
-   *  kill at the site the most accounts agree on (net/serpent/serpentHerald.js). ONCE A SOCKET AND DAY (the gate's `site` law);
+   *  to the whole unit and the port it lies off), said to the hub, which tells every game the site the most accounts agree
+   *  on (net/serpent/serpent-site.ts serpentAtWord). ONCE A SOCKET AND DAY (the gate's `site` law);
    *  on the hub's socket alone, under the serpent frames' own bucket; true once it went. */
   sendSerpentSite(day, sx, sz, place) {
     if (this._serpentSiteSaid && this._serpentSiteSaid.ws === this._ws && this._serpentSiteSaid.d === day) return true;
@@ -2008,9 +2008,9 @@ export class OnlineSession {
     return true;
   }
 
-  /** DISCORD-GATES: where this game found the gate the clock is about (systems/gate/gateSite.js - its day, its map pixel and
-   *  its place), said to the hub, which names the place in its Discord posts once two accounts agree (net/gate/gateHerald.js).
-   *  ONCE A SOCKET AND DAY - a reconnect says it again, to a hub a deploy may have given a herald since. On the hub's
+  /** Where this game found the gate the clock is about (systems/gate/gateSite.js - its day, its map pixel and its place),
+   *  said to the hub, whose broken rite stands by the site two accounts agree on (net/gate/gate-site.ts).
+   *  ONCE A SOCKET AND DAY - a reconnect says it again, to a hub that may have restarted since. On the hub's
    *  socket alone, under the gate frames' own bucket; true once it went. */
   sendGateSite(day, px, py, place) {
     // WW2: once a socket and GATE - each lane's gate of a day is its own number, and said once on the socket
@@ -2817,7 +2817,7 @@ export class OnlineSession {
     return !!m && this._send({ t: 'cfg', ...m });
   }
 
-  /** SCALE5c (Mac's decision 2): a search of everyone online by name, down the hub link - its answer comes back through
+  /** SCALE5c: a search of everyone online by name, down the hub link - its answer comes back through
    *  `onFound`. False when this session is not the hub's, or the search is no search. */
   sendFind(q) {
     if (!isSocialRoom(this.room) || typeof q !== 'string') return false;
@@ -2847,7 +2847,7 @@ export class OnlineSession {
     this._boxAsks.set(t, now);
     return true;
   }
-  /** SCALE5c (Mac's decision 2): everyone online on every shard - asked at most every HUB_WHO_MS by a hub link on a
+  /** SCALE5c: everyone online on every shard - asked at most every HUB_WHO_MS by a hub link on a
    *  shard (the World tab asks while it is drawn), and only while the hub's count is no more than a roster says
    *  (CHAT_ROSTER_MAX); past it the list is let go. The answer is `hubOnline`. False when not asked. */
   sendHubWho() {
@@ -3692,7 +3692,7 @@ export class OnlineSession {
       // SCALE5c: the hub's count, moved by the other shards' joins and leaves - kept as a join's `n` keeps it
       if (primary && isChatRoom(room) && Number.isSafeInteger(m.n) && m.n >= this._seatN) this.roomCount = m.n > (this._rooms.get(room)?.size ?? 0) + this._seatN ? m.n : null;   // HIDDEN-UNCOUNTED: a hidden link's count has no seat of mine - and may be nobody (AUDIT L2)
     } else if (m.t === 'found') {
-      // SCALE5c (Mac's decision 2): the hub's answer to a search - each name through the wire's own readers
+      // SCALE5c: the hub's answer to a search - each name through the wire's own readers
       if (!primary || !isChatRoom(room) || !Array.isArray(m.l) || (!isSocialRoom(room) && m.all !== 1)) return;   // part two: a region's channel answers everyone online alone
       const read = (n) => m.l.slice(0, n).filter((p) => p && typeof p.id === 'string').map((p) => ({ id: p.id, name: sanitizeName(p.name), sub: subOf(p), ...readBadge(p) }));
       if (m.g === 1) { this.guildOnline = new Map(read(HUB_GUILD_WHO_MAX).map((p) => [p.id, p])); return; }   // the Guild tab's list

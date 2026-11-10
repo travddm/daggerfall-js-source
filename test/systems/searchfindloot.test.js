@@ -51,7 +51,7 @@ const REAL_NOW = Date.now;
 const clock = { t: Date.UTC(2027, 3, 1, 12, 0, 0) };
 afterEach(() => { Math.random = REAL_RANDOM; Date.now = REAL_NOW; setSharedClock(null); _resetSearchLedgerForTests(); setSearchParty(null); });
 
-// ═══ THE DUNGEON HOST'S DOORS, sliced (test/systems/partyloot.test.js's method) ═════════════════════════════════════
+// THE DUNGEON HOST'S DOORS, sliced (test/systems/partyloot.test.js's method)
 const FILES = ['src/scenes/dungeonContext.js', 'src/scenes/roomLootHost.js'].map((p) => { const src = rd(p); return { p, src, ast: acorn.parse(src, { ecmaVersion: 'latest', sourceType: 'module' }) }; });
 const [DC, RH] = FILES;
 function walk(n, fn) {
@@ -130,7 +130,7 @@ const scoped = (state) => new Proxy(state, {
 });
 const mount = (body, state) => new Function('__s', `with (__s) { ${body} }`)(scoped(state));
 
-// ═══ THE PARTY IN THE CRYPT ═════════════════════════════════════════════════════════════════════════════════════════
+// THE PARTY IN THE CRYPT
 /** A player's hub picture (fb1016b_graveparty.test.js's `picture`): `party` the accounts seated together, the first
  *  its leader. */
 const PLAYERS = { 'acct-ann': { name: 'Ann', peer: 'a0a0-0001' }, 'acct-bob': { name: 'Bob', peer: 'b0b0-0002' }, 'acct-dan': { name: 'Dan', peer: 'd0d0-0004' }, 'acct-eve': { name: 'Eve', peer: 'e0e0-0003' } };
@@ -271,7 +271,7 @@ function found() {
 const gold = (P) => P.entity.goldPieces | 0;
 const holds = (P, it) => (it.group === 'Currency' ? gold(P) : P.entity.items.filter((x) => alike(x, it)).length);
 
-// ═══ AC9 (a) - A STALE CLOSE NEVER BRINGS BACK A TAKEN PIECE ═══════════════════════════════════════════════════════
+// AC9 (a) - A STALE CLOSE NEVER BRINGS BACK A TAKEN PIECE
 
 test('AC9 (a): two partymates have Ann\'s find open; Ann takes a piece and closes; Bob closes untouched - the piece never comes back in any partymate\'s find, and Ann holds it once', () => {
   const s = found();
@@ -287,7 +287,7 @@ test('AC9 (a): two partymates have Ann\'s find open; Ann takes a piece and close
   assert.equal(holds(s.ann, X), had, 'and Ann holds it, once');
 });
 
-// ═══ AC9 (b) - A STALE CLOSE NEVER ERASES A PUT ═════════════════════════════════════════════════════════════════════
+// AC9 (b) - A STALE CLOSE NEVER ERASES A PUT
 
 test('AC9 (b): Ann\'s window stands open on the find; Bob opens it, puts a piece in and closes; Ann closes untouched - the piece stays in every partymate\'s find, once, and Bob holds it no more', () => {
   const s = found();
@@ -305,7 +305,7 @@ test('AC9 (b): Ann\'s window stands open on the find; Bob opens it, puts a piece
   assert.equal(s.bob.entity.items.some((it) => alike(it, Y)), false, 'and Bob holds it no more');
 });
 
-// ═══ AC9 (c) - TWO SEARCHES IN ONE BREATH CONVERGE ═════════════════════════════════════════════════════════════════
+// AC9 (c) - TWO SEARCHES IN ONE BREATH CONVERGE
 
 test('AC9 (c): Ann and Bob search one coffin in one breath (each finds on their own dice); both close their windows - every partymate ends with the same find', () => {
   const s = crypt();
@@ -320,7 +320,7 @@ test('AC9 (c): Ann and Bob search one coffin in one breath (each finds on their 
   assert.deepEqual(lists[2], lists[0], 'and Dan holds that find too');
 });
 
-// ═══ LOOT-BULK - Take all through the REAL window ═══════════════════════════════════════════════════════════════════
+// LOOT-BULK - Take all through the REAL window
 
 test('LOOT-BULK (AC9): Ann\'s Take all (the real window\'s bulk walk) under Bob\'s open window - Bob\'s untouched close never brings the find back: every partymate\'s find stays empty, and Ann holds each piece once', () => {
   resetPrefs(); globalThis.location = { search: '?skin=enhanced' };
@@ -344,7 +344,7 @@ test('LOOT-BULK (AC9): Ann\'s Take all (the real window\'s bulk walk) under Bob\
   });
 });
 
-// ═══ GUARD ═══════════════════════════════════════════════════════════════════════════════════════════════════════════
+// GUARD
 
 test('GRAVE-PARTY (guard - passes today): a stranger\'s search in the same crypt lands nothing on the party - her word is kept, unlanded, and the party\'s find stands as it was', () => {
   const s = found();
@@ -356,7 +356,7 @@ test('GRAVE-PARTY (guard - passes today): a stranger\'s search in the same crypt
   for (const p of s.all) assert.deepEqual(names(find(p)), names(s.theFind), `${p.id}: the party's find, untouched by a stranger's word`);
 });
 
-// ═══ SLICE 3 - T28-T30's REST: THE FIND IS A CARRIED KIND, JUDGED BY THE DUNGEON'S HOST ═════════════════════
+// SLICE 3 - T28-T30's REST: THE FIND IS A CARRIED KIND, JUDGED BY THE DUNGEON'S HOST
 // DESIGN.md section 5 and 8.2 (T28-T30), DESIGN-REVIEW D-1/D-1a and R-3. Outcomes only: where each piece is, for every player,
 // once the relay has been flushed - the way the find is carried (a base, takes, claims) is the build's own.
 const desc = (it) => `${it.name}x${it.stackCount ?? 1}`;
@@ -518,7 +518,7 @@ test('T30 / mixed builds: an OLDER build\'s whole-list word is a BIRTH when the 
   assert.equal(find(bob).some((it) => it.name === 'Mace'), false, 'and the Mace is still not back, though the older build\'s every word says it');
 });
 
-// ═══ SLICE 3, THE EDGES OF THE LAW (green with the fix; the first two are guards on what the law keeps) ════════════════════
+// SLICE 3, THE EDGES OF THE LAW (green with the fix; the first two are guards on what the law keeps)
 
 test('T29 (the loser\'s window): Bob\'s window stands open on his own find when Ann\'s EARLIER search of the coffin reaches him - what his window took of a roll that never was the room\'s is lifted back out of his pack and told, what it laid in comes home, and the list is the party\'s one find', () => {
   const s = crypt();
@@ -574,7 +574,7 @@ test('D-2.1 (a re-asked claim, guard): Bob\'s claim on the find is said again af
   for (const p of s.all) assert.equal(find(p).some((it) => it.name === X.name), false, `${p.id}: gone from the find`);
 });
 
-// ═══ AUDIT OUTDOOR-LOOT - TWO PARTIES, A SECOND SEARCH, WORLD8 ═════════════════════════════
+// AUDIT OUTDOOR-LOOT - TWO PARTIES, A SECOND SEARCH, WORLD8
 // D1: the seat judged every find in the room's ONE state an object, so a stranger's find of the coffin the seat's party had searched
 // was dropped whole (her take lifted and lapsed for good), and a stranger's search first hid the seat's party's own find from the
 // seat. A stranger's find is judged in a state of its own now (roomLootHost.js judgeStrangerFind). D2: only the FIRST word of a

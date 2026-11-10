@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-D: ILIAC PUDDLE NO MORE'S SWIM MOVEMENT
 // (OutdoorSwimMovementController.cs, jet082, 1.2.2) - every frame the
 // player swims ANYWHERE (the carved sea, or a dungeon's water: IsAnySwimming
@@ -15,7 +14,6 @@
 //   the FLOOR - outdoors only, the capsule's centre kept 0.18 m over the
 //     swimmable seafloor, or over the vanilla terrain of a distance-field
 //     pixel when the correction is 2.5 m or less (ClampAboveRenderedSeafloor).
-// ═══════════════════════════════════════════════════════════════════
 
 import { STROKE, strokeTempoScale, strokeFatigueCost, strokeDirection, strokeVelocity } from '../../world/deepWater/deepWaterSwim.js';
 import { maxFatigue } from '../../systems/statMods.js';

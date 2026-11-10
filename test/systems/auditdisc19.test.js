@@ -48,7 +48,7 @@ import { STALE_CHUNK_IN_PLAY_TEXT, STALE_CHUNK_IN_PLAY_SECONDS } from '../../src
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 
-// ═══ W: the watch ═════════════════════════════════════════════════════════════════════════════════════════════════
+// W: the watch
 const inside = () => true;
 const hunter = (target = PLAYER_TARGET) => ({ ai: { isHostile: true, target, feet: [1, 0, 1] }, entity: { team: 'Centaurs' } });
 
@@ -432,7 +432,7 @@ test('AUDIT DISC19 W4: the player\'s spells pass the town\'s defenders by - the 
   assert.deepEqual(struck(nearBlast.hurt), ['centaur'], 'a defender inside the radius of the blast is spared');
 });
 
-// ═══ S: the saves ═════════════════════════════════════════════════════════════════════════════════════════════════
+// S: the saves
 const T0 = 523530 + 10 * MINUTES_PER_DAY;
 const mortal = () => ({
   isPlayer: true, name: 'Mac', race: 'Nord', gender: 'male', level: 10, reflexes: 2,
@@ -496,7 +496,7 @@ test('AUDIT DISC19 S4: the revival stands an exhausted corpse up with the same f
   assert.equal(respawn.fatigue, respawnHealth(maxFatigue(respawn)), 'the respawn pays it too');
 });
 
-// ═══ E: the pick and the swing ════════════════════════════════════════════════════════════════════════════════════
+// E: the pick and the swing
 function boxMesh(min, max) {
   const [x0, y0, z0] = min, [x1, y1, z1] = max;
   const p = [x0, y0, z0, x1, y0, z0, x1, y1, z0, x0, y1, z0, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1];
@@ -580,7 +580,7 @@ test('AUDIT DISC19 E2: the mesh colliders are DFU\'s placed models - movers, spe
   assert.equal(hasMeshCollider(null), false);
 });
 
-// ═══ D and B ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// D and B
 test('AUDIT DISC19 D1: the stale-chunk notice fits one line of the classic panel and is said on the level\'s first frame, long enough to read', () => {
   assert.ok(STALE_CHUNK_IN_PLAY_TEXT.length <= 50, `${STALE_CHUNK_IN_PLAY_TEXT.length} characters`);
   assert.match(STALE_CHUNK_IN_PLAY_TEXT, /reload/i);

@@ -12,7 +12,6 @@
 //                    placed vanished (the one removed came back) for a minute
 //   YARD-RECENTRE  - the world's recentre runs after the yards' frame and before the draw: every yard drawn (and solid)
 //                    a whole pixel off for the crossing's frame
-// `01-Overview/bugs/Field-Bugs-2026-10-01.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

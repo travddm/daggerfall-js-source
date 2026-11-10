@@ -1,8 +1,6 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // GUILD-HALL-SALE - A HALL SOLD AT ITS DOOR, AS A HOME IS
-// (systems/online/onlineHomes.js hallSellable; bible/06-Systems/
-// Online-Arc.md GUILD-HALL-SALE). The hall's sale stood on the Guild tab
+// (systems/online/onlineHomes.js hallSellable). The hall's sale stood on the Guild tab
 // alone; its door lists "Sell it" to whom the service lets sell it
 // (`hallSell` - its guildmaster), on the plaque and in Info's menu as an
 // owner's home lists it, asks first at what it pays the treasury, and
@@ -17,7 +15,6 @@
 // stand no online home's door: scenes/world.js hands the guild book's
 // sale over (`guildHall.sell`); scenes/exterior.js and
 // scenes/dungeonContext.js open no online door, so no hall is sold there.
-// ═══════════════════════════════════════════════════════════════════
 import { ChoiceWindow } from '../ui/talkWindow.js';
 import { accountRefusalText } from '../net/accountClient.js';
 import { hallEntryTurnable, hallSellable, hallOwnerLines, hallSaleLines, hallSoldLine, hallYourGuild } from '../systems/online/onlineHomes.js';

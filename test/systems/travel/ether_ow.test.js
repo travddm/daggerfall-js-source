@@ -1,5 +1,5 @@
 // ETHER-OW (2026-10-13, the owner: "Also allow the player to zoom out into the overworld like in the Iliac Bay for easy
-// travel. Enemies should show on the world map just like in the bay"; bible/03-World/Eltheric-Ocean.md ETHER-OW) - THE
+// travel. Enemies should show on the world map just like in the bay") - THE
 // OVERWORLD PAST THE VEIL. The way up was the held map's Overworld door (TV1), and past the Veil the map's answer is the
 // Eltheric chart, which had none - so no captain there could rise. The view's own reads held the Bay: its places were the
 // Bay's dictionary's rows alone (an isle's port and ruin were bare ground to it), its load governor read every pixel off

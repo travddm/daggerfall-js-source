@@ -32,6 +32,7 @@
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,
+    "etherSea": true,
     "realForests": true,
     "banthaJungle": true,
     "tamrielLands": true,
@@ -68,9 +69,6 @@
     "world-of-daggerfall": {
       "Enabled": true,
       "Mountains": false
-    },
-    "detailed-ships": {
-      "Enabled": true
     },
     "beautiful-villages": {
       "Enabled": true

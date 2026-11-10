@@ -22,7 +22,7 @@ const rand = (b) => globalThis.crypto.getRandomValues(b);
 const T0 = 1_800_000_000;   // a clock hour's first second
 const player = async (db) => ({ id: (await createGuest({ db, subtle, rand, nowS: T0 }, { deviceLabel: null })).id });
 
-// ═══ RENOWN, COALESCED ═════════════════════════════════════════════════════════════════════════════════════════════
+// RENOWN, COALESCED
 
 test('SCALE4h the law: a report is soon while the hour is spent, the total or the room is not known, what waits reaches the room, or what waits completes the level - at the cap\'s total no rise is left; otherwise it waits (mutants: the spent hour unread; an unknown total read as known; an unknown room read as known; the room\'s edge strict; the rise unread; a rise at the cap)', () => {
   const at20 = renownXpFor(20) + 100;               // 100 into Renown 20, whose span is renownXpFor(21) - renownXpFor(20)
@@ -125,7 +125,7 @@ test('SCALE4h a fighter\'s hour, measured: Renown reported far less often at the
   } finally { console.warn = quiet; }
 });
 
-// ═══ THE SESSION'S TOUCH, HOURLY ═══════════════════════════════════════════════════════════════════════════════════
+// THE SESSION'S TOUCH, HOURLY
 
 test('SCALE4h a session is touched once an hour: within it nothing is written, at it both rows (mutants: the ten minutes back)', async () => {
   assert.equal(SESSION_TOUCH_S, 60 * 60);
@@ -138,7 +138,7 @@ test('SCALE4h a session is touched once an hour: within it nothing is written, a
   assert.equal(seen(), T0 + 3600, 'an hour on: touched');
 });
 
-// ═══ WHICH ROWS: THE METRICS ═══════════════════════════════════════════════════════════════════════════════════════
+// WHICH ROWS: THE METRICS
 
 /** A D1 whose statements answer D1's meta: each `all`/`run` its rows read and written, a batch's each - and a first()
  *  that says none, as D1's does. */

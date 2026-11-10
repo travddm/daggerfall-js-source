@@ -32,12 +32,15 @@ clock, and gets numbers or events back. Keep it that way; the tests depend on it
 - **Only the streaming world has a sea.** Interiors and dungeons (`src/scenes/worldModes.js`,
   `src/scenes/dungeonContext.js`) have none, and every transition, teleport and load empties the sea. The `?exterior`
   bench (`src/scenes/exterior.js`) has no Come Sail Away runtime and therefore no sea fight.
-- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; forced off online) plus
+- **Feature switches** (`src/systems/features.js`, row `naval-combat`): `naval` (off by default; online the server
+  profile decides it, see [Online](#online)) plus
   the drawer prefs `naval-ships` (few/some/many), `naval-boarders`, `naval-raid-prize`, `naval-aim-camera`,
   `naval-handling` (`responsive` or `classic`) and `naval-auto-repair`. `navalOn()` in `world.js` needs both the Come
   Sail Away runtime and the `naval` pref. With Come Sail Away off there is no sea fight.
 
 ## Boats and sailing (Come Sail Away)
+
+> Leaves core: the Come Sail Away mod (decision 99).
 
 - Five hulls (`HULL` in `src/systems/naval/navalShips.js`): Rowboat 0, Large Boat 1, Small Ship 2 (the galleon),
   Large Galley 3, Carrack 4. The hull table (names, prices, weights) is the leaf `comeSailAwayHulls.js`, so the account
@@ -62,6 +65,8 @@ are the enhanced sky's wind for clouds, grass, flora sway and rain; `windAudio.j
 not move the other. `csaLoadWind.js` makes sure a load that lands outdoors never keeps the indoor zero wind.
 
 ## The sea fight
+
+> Leaves core: a naval combat mod (decision 102).
 
 ### Ships and classes
 
@@ -179,15 +184,20 @@ Storm, treasure fleet on a shared clock), `seaVaults.js` and `seaSpoils.js` are 
 - Come Sail Away boats ride the owner's foes frame as `sa` (`comeSailAwayWire.js`): pose, sails, helm, lanterns, and a
   velocity for smooth leading. Peers can stand on another player's boat (`src/scenes/comeSailAway/comeSailAwayAboard.js`)
   but never sail or open it.
-- The sea fight is forced off online, so the `nv` frame below is sent only by an offline build with the `naval` pref
-  on, or by a test. The sea's ships ride as `nv` (`src/systems/naval/navalWire.js`): ships (`s`), volleys (`v`),
-  barrels (`b`), the owner's boat (`p`), notoriety (`n`), traffic density (`t`) and more. The relay reads nothing
+- The `naval` pref is a room pref (`online: 'room'`): online, the server profile's pin decides it for every player.
+  The official profile (`src/net/profile/officialProfile.ts`) pins `naval: false`, so online play has no sea fight
+  today. It is decided that naval PvE is allowed online and that a server opts in through its profile (decision 117
+  (21)). `navalOn()` reads the pref like any other, but no server profile pins it on yet, so the `nv` frame below is
+  sent only by an offline build with the `naval` pref on, or by a test. The sea's ships ride as `nv`
+  (`src/systems/naval/navalWire.js`): ships (`s`), volleys (`v`), barrels (`b`), the owner's boat (`p`), notoriety
+  (`n`), traffic density (`t`) and more. The relay reads nothing
   inside a foes frame, so naval changes need no relay change, and `navalWire.js` stays out of the relay's bundle.
 - One player **stands** the sea for everyone within `NAVAL_SHARE_RADIUS`: the lowest id among players on the water
   (the election in `src/systems/campEncounters.js`). Others show puppets eased toward the stander's word.
 - A ship is her seed. Her word carries a handover count (`gen`); of two claims the higher count wins, then the lower
   id. A ship is handed over when her stander leaves or when a player boards her.
-- Hits on another player's ship go to its owner (`navalHitData`, `validNavalHit`). Volleys carry their age, so a
+- A hit on a sea ship that another player stands goes to that player (`navalHitData`, `validNavalHit`). These are
+  the sea's AI ships; players do not fight each other at sea. Volleys carry their age, so a
   reader flies the balls from the same point in flight as the shooter.
 - Every field added to a record must keep older readers working: they read entries by position, and a shorter
   record must still parse (`validNavalRecord`).
@@ -212,8 +222,8 @@ The sea's AI ships are never saved: they are rolled again from the waters and th
   `test/systems/shipyards1*.test.js`, `test/systems/wa1_warmAshesShips.test.js`.
 - Harnesses: `test/csaScene.mjs` runs the real Come Sail Away runtime; `test/navalSea.mjs` and `test/navalRoom.mjs`
   build a sea and an online room for the naval host.
-- In game: buy a boat at a port's shipyard, turn on Naval Combat in the Features home, sail out and fight. Online has
-  boats and cargo but no sea fight.
+- In game: buy a boat at a port's shipyard, turn on Naval Combat in the Features home, sail out and fight. Online, under
+  the official profile, has boats and cargo but no sea fight.
 
 ## Known limits and traps
 

@@ -42,7 +42,7 @@ function reckoning() {
 /** A point on walkway `k` `along` metres from its start (court k's end). */
 const onWalk = (k, along) => ({ x: WALKS[k].ax + WALKS[k].ux * along, z: WALKS[k].az + WALKS[k].uz * along });
 
-// ═══ THE BRAIN (WB9b/c) ═══════════════════════════════════════════════════════════════════════════════════════════
+// THE BRAIN (WB9b/c)
 
 test('AUDIT WB9 brain F1 - no blow lands from outside the court he fights in: he chooses, aims at and waits for only those in it, so a caster on a laid walkway, or in a court he has left, struck him (three at the first court\'s rim took him from 66% to 33% while he answered nothing) - on him and on a crystal alike; within POSE_SLACK of its rim it lands (mutants: a blow on him from anywhere on the floor; a crystal\'s)', () => {
   const f = newFight(7, T0, T0 + 3_600_000, 'ruhn');
@@ -145,7 +145,7 @@ test('AUDIT WB9 brain F5 - a bound\'s word lays every walkway up to the court it
   assert.deepEqual(crossLaid({ xa: [40_000, 45_000] }, g), {}, 'both laid: nothing');
 });
 
-// ═══ THE COURT'S DRAWING (WB9c/e) ═════════════════════════════════════════════════════════════════════════════════
+// THE COURT'S DRAWING (WB9c/e)
 
 /** The telegraph's fragment stage run over a top-down grid (`step` metres a pixel), its derivatives taken as the GPU
  *  takes them - the difference across each 2x2 quad of whatever `fwidth` is asked of (two passes: the first records each
@@ -273,7 +273,7 @@ test('AUDIT WB9 court F4 - his shapes and his burning ground are drawn on over t
   assert.ok(fs({ uOnWalk: 0 }, rim) > 0, 'where the court\'s pass draws it');
 });
 
-// ═══ THE SPOILS (WB9f) ════════════════════════════════════════════════════════════════════════════════════════════
+// THE SPOILS (WB9f)
 
 test('AUDIT WB9 spoils F1 - every piece of a kept throw comes to rest on the court\'s floor over the REAL collider: the collider takes no hit nearer than a tenth of a millimetre, so a flight step begun that close above the floor missed it and the next began under it - about one kill in fifty (court 0, the fall at its heart, bearing pi/4, seed 35: the gold 292 m down); they fly over the floor they were kept to now (mutants: flown over the collider alone)', () => {
   const c = new Collider();
@@ -308,7 +308,7 @@ test('AUDIT WB9 spoils F2 - P or J pressed over a piece of his spoils is spent o
   assert.equal(pile.length, 2, 'E took the lit row alone');
 });
 
-// ═══ THE BODIES IN A CROWD (WB9h) ═════════════════════════════════════════════════════════════════════════════════
+// THE BODIES IN A CROWD (WB9h)
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 const settle = async (n = 8) => { for (let i = 0; i < n; i++) await flush(); };

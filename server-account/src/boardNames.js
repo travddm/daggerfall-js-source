@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT CARDS-6 D3 - A SEASON BOARD'S NAMES, EVERY HONOUR ON THEM.
 //
 // A season board badges its rows with every honour, as the token, a letter
@@ -11,7 +10,6 @@
 // withArenaHonoursAll - the Worker's kept words, never a count).
 //
 // Not a DFU member: Daggerfall Unity has no accounts.
-// ═══════════════════════════════════════════════════════════════════
 import { displayName } from './accounts.js';
 import { titleWorn, glyphsOf } from './titles.js';
 import { withArenaHonoursAll } from './arena.js';

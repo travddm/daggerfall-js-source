@@ -92,7 +92,7 @@ test('PROFILE-MENU: signed in, the card is a profile - the plate first, then the
   assert.ok(!form.all().some((n) => has(n, 'acctplate') || has(n, 'acctsec')));
 });
 
-test('PROFILE-MENU: the Record is a tile a deed, the duels with their share won drawn; each character\'s Renown drawn to its next level, a full bar at the cap; the Account keeps its facts and the Patreon link (mutants: the bar the losses\' share; the bar\'s max the level\'s whole; the cap an empty bar)', () => {
+test('PROFILE-MENU: the Record is a tile a deed, the duels with their share won drawn; each character\'s Renown drawn to its next level, a full bar at the cap; the Account keeps its facts (mutants: the bar the losses\' share; the bar\'s max the level\'s whole; the cap an empty bar)', () => {
   const { all } = draw();
   const record = all().find((n) => has(n, 'acctrecord'));
   assert.deepEqual(record.children.map((li) => li.children.slice(0, 2).map((c) => c.textContent)), [

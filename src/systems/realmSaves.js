@@ -3,7 +3,7 @@
 // REALM P1.2 — THE REALM'S CHARACTERS, CLIENT SIDE: the calls, and the
 // playing tab's session - its lease, its sequence and its checkpoints.
 //
-// decision 1, "Account service". The service's half is
+// The service's half is
 // server-account/src/realm.js; the plan is
 // section 2.
 //

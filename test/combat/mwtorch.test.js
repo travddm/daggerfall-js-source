@@ -78,7 +78,7 @@ test('MW-D51 resolveTorchPart / torchPartPaths: nothing unlit; a note, never a t
   // caller's `attitude`, and ActorAnimation::attach passes one for a LIGHT
   // alone (:97-103) and never for a weapon (:104-105) - an extra -90 about
   // X, which this port's own reference notes wrote down at
-  // 02-Formats/Morrowind-Rules.md:3228 and the code never applied. It
+  // docs/formats/morrowind.md and the code never applied. It
   // rides `preTransform`, the seam the arrow already uses, which is the
   // same place in the chain the reference's PAT sits.
   assert.deepEqual(ok.parts[0].preTransform, LIGHT_ATTITUDE);

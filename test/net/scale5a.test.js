@@ -36,7 +36,7 @@ async function onClock(fn) {
   try { return await quiet(() => fn({ now: () => clock, tick: (ms) => { clock += ms; } })); } finally { Date.now = realNow; }
 }
 
-// ═══ THE ORACLE: WHAT A WALK OF EVERY SOCKET ANSWERED ═════════════════════════════════════════════════════════════════
+// THE ORACLE: WHAT A WALK OF EVERY SOCKET ANSWERED
 
 /** `_socketsOf` as the walk built it before SCALE5a: every hello'd socket of the account in the index's order, the newest
  *  ACCOUNT_TABS_MAX by the hello's `since` when over the bound, one `except`ed. */
@@ -206,7 +206,7 @@ test('SCALE5a the join and the leave reach every hello\'d socket but the one the
   });
 });
 
-// ═══ AUDIT SCALE5a C1-C3: THE WORLD TAB'S COUNT PAST THE CUT ═════════════════════════════════════════════════════════════
+// AUDIT SCALE5a C1-C3: THE WORLD TAB'S COUNT PAST THE CUT
 
 /** The room's own count: hello'd sockets neither closed by the object nor said gone - the welcome's `n`. */
 function trueCount(room) { let n = 0; for (const [w, b] of room._all()) if (b.id && !room._dead.has(w) && !room._gone.has(w)) n++; return n; }
@@ -306,7 +306,7 @@ test('AUDIT SCALE5a (lens C, pre-existing): a room let go takes its count with i
   assert.equal(rosterRows(s).total, rosterRows(s).rows.length, 'and the tab counts what it lists');
 }));
 
-// ═══ THE BUSY REFUSAL THAT MINTS NOTHING ═══════════════════════════════════════════════════════════════════════════════
+// THE BUSY REFUSAL THAT MINTS NOTHING
 
 test('SCALE5a a hello the room\'s gate refuses busy closes 1013 with BUSY_TOKEN_UNREAD - and its token IS unspent: the same token opens the room once the gate refills, where a token a hello spent is refused (mutants: the reason never said; said by a gate asked after the token)', async () => {
   assert.equal(BUSY_TOKEN_UNREAD, 'busy, token unread');
@@ -395,7 +395,7 @@ test('AUDIT SCALE5a D4: a HALO hands its hello\'s token back on the same word - 
   assert.deepEqual(log.filter((e) => e[1] === 'world:3,12'), [['opened', 'world:3,12', 'TOKEN-world:3,12'], ['unopened', 'world:3,12', 'TOKEN-world:3,12']], 'the halo\'s token, handed back for the halo\'s room');
 });
 
-// ═══ THE SERPENT'S RECEIPT, ASKED ONCE ═════════════════════════════════════════════════════════════════════════════════
+// THE SERPENT'S RECEIPT, ASKED ONCE
 
 test('SCALE5a the hub asks storage for an account\'s serpent receipt once - a hello after it finds "none" kept - and a receipt written lets every "none" go, so the next hello is handed it (mutants: no "none" kept; the "none" kept past a write)', async () => {
   await onClock(async ({ tick, now }) => {

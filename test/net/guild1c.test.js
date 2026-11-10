@@ -34,7 +34,7 @@ import { RemotePlayers } from '../../src/net/remotePlayers.js';
 import { measureText } from '../../src/ui/text.js';
 import { createNameLayer } from '../../src/ui/nameLayer.js';
 import { profileView } from '../../src/ui/profileWindow.js';
-import { accountTokenMinter, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountTokenMinter, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { PEER_HEIGHT } from '../../src/net/remotePlayers.js';
 import { perspective, mirrorProjectionX, lookAt } from '../../src/world/mat4.js';
 import { r2, seatRealm } from '../realmSeat.mjs';   // AUDIT REALM2 S2: a founding is a realm character's, paid on its record
@@ -120,7 +120,7 @@ test('GUILD1c the wire: the guild frames are shapes only, as the renown order\'s
   assert.equal(readGuildTag({ gt: '<b>' }), null, 'a stranger\'s word about themselves');
   assert.equal(readGuildTag({ gt: ['HND'] }), null);
   assert.equal(readGuildTag({}), null);
-  assert.equal(RELAY_VERSION, 'world319');
+  assert.equal(RELAY_VERSION, 'world325');
   const g1 = guildGate(null, 1000);
   assert.equal(GUILD_ORDER_HZ_MAX, 1);
   assert.equal(g1.pass, true);
@@ -538,7 +538,7 @@ test('GUILD1c the chat: a Guild tab beside the Party tab - off the bar until the
 test('GUILD1c the minter and the point: the mint\'s answer hands my guild\'s tag to the page (null for none, nothing from a service before acct13), and a peer\'s tag rides the name point both faces read (mutants: the minter dropping the tag; the point without it)', async () => {
   let answer = { token: 'v1.t.s', name: 'Mac', kind: 'linked', title: null, glyphs: [], level: 10, xp: 6000, guild: 'HND' };
   const fetch = async () => ({ ok: true, status: 200, json: async () => answer });
-  const m = new Map([[SESSION_KEY, JSON.stringify({ id: 'p_me', name: 'Mac', kind: 'linked', sessionId: 's1', secret: 'SECRETSECRETSECRETSECRET' })]]);
+  const m = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: 'p_me', name: 'Mac', kind: 'linked', sessionId: 's1', secret: 'SECRETSECRETSECRETSECRET' })]]);
   const storage = { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v), removeItem: (k) => m.delete(k) };
   const issued = [];
   const mint = accountTokenMinter({ fetch, storage, onIssued: (w) => issued.push(w), character: () => 'char-aaaa' });

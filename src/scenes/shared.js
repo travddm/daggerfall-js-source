@@ -87,7 +87,6 @@ import { setMusicReplacements } from '../systems/musicReplacement.js';   // M-EX
 import { setSoundReplacements } from '../systems/soundReplacer.js';   // SNDREP1: the player's sound pack, on the same seam
 import { installDiverseWeaponsIcons } from '../combat/diverseWeapons/diverseWeaponsIcons.js';
 import { installRoleplayRealismItems } from '../systems/roleplayRealismItems/rriInstall.js';
-import { installDetailedShipsArt } from '../systems/detailedShips.js';   // DS1: Detailed Ships' pictures and xml scales
 import { installStudioArt } from '../systems/studioArt/studioArt.js';   // STUDIO1: the game's artists' own pictures
 import { installWarmAshesShips } from '../systems/warmAshesShips.js';   // WA1: Warm Ashes - Ships' quest list and save slot
 import { installRestItemLoot, litCandle, meditate, snuffCandle, draughtTaken, spendDraught, DRAUGHT_SPENT_MINUTES } from '../systems/rest/restItems.js';   // REST6: the seven that fill the gaps
@@ -920,13 +919,13 @@ export function tamrielLandOn(search) {
 export { tamrielLandsOn } from '../systems/landsSwitch.js';
 
 /** ETHER-SEA: THE ELTHERIC OCEAN STANDS - its ground streamed in the world's far box
- *  (world/ethericSea.js), its places, its ships and its way home through the Veil - in every game. AUDIT CAPTAIN'S SEA
- *  G2: a save made past the Veil threw on its load under the classic skin, where the sea did not stand; it stands there
- *  now, and its captain sails home. `?ether=off` the kill door (a save past the Veil then lands at the way home). No
- *  Features row: the crossing is the player's own choice each time it is offered. The world host reads it once, at its
+ *  (world/ethericSea.js), its places, its ships and its way home through the Veil - when the Features row `eltheric-sea`
+ *  is on (forced on online), under any skin. AUDIT CAPTAIN'S SEA G2: a save made past the Veil threw on its load under
+ *  the classic skin, where the sea did not stand; it stands there now when the row is on, and its captain sails home.
+ *  `?ether=off` the kill door (a save past the Veil then lands at the way home). The world host reads it once, at its
  *  mount. */
 export function etherSeaOn(search) {
-  return pageParam('ether', search) !== 'off';
+  return pageParam('ether', search) !== 'off' && !!(onlineForcedPref('etherSea', search) ?? getPref('etherSea'));
 }
 /** ETHER-CROSSING: THE CROSSING OUT, offered on the open Abecean - on the enhanced skin and online; the classic skin keeps
  *  DFU's own sea (no captain of it is asked out, and one already past the Veil sails home through it). */
@@ -1435,7 +1434,6 @@ export function ensureAudio(fetch = fetchBytes) {
   // Registration is a name list and a loader - no PNG is read until an
   // archive that has replacements is actually loaded.
   installImmersiveTravel();   // IT1: Carriage Drivers (8642) and Sailors (8643), and their Fast Travel - before the faction dictionary is built at the load
-  installDetailedShipsArt();   // DS1: archives 1210/1230 on the texture door (their pictures built from your own records at the archive's load) and the six xml scales
   installForaging();   // FORAGE1: the ForagingQuests list (before any quest bridge is built), the six tools' and five foods' UseItem, the seven pictures, Foraging_Tools
   installWarmAshesShips();   // WA1: the WA_Ships quest list (before any quest bridge is built - LoadQuestLists reads it) and the mod's save record
   installDiverseWeaponsIcons();   // DW3: before the archives load, so 233/234's preload carries the mod's icons

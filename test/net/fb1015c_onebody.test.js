@@ -4,7 +4,7 @@
 // of one player, the friend's own page seeing the copy.: a cell's room (`world:x,y`) and a
 // world room (a dungeon's `dungeon:m<id>`, a building's `interior:m<id>.<n>`) close an account's older socket when it
 // says hello again under another id (CLOSE_REPLACED, its leave said), as a gate's court, a siege's field and a Super
-// dungeon's realm already did (server/src/index.js the hello's one-socket law). `01-Overview/bugs/Field-Bugs-2026-10-15c.md`.
+// dungeon's realm already did (server/src/index.js the hello's one-socket law).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CLOSE_REPLACED } from '../../src/net/wire.js';

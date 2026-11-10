@@ -66,7 +66,7 @@ const ad = (o) => ({ i: 1, k: HOST.harrier, h: 45, m: 45, x: 0, z: 6, mv: null, 
 const settle = () => new Promise((r) => setImmediate(r));
 function clean() { destroyGateBossBar(); destroyGateMarksCard(); destroyGateGround(); }
 
-// ═══ W: THE PLAYER'S BLOWS ON HIS HOST ═════════════════════════════════════════════════════════════════════════════
+// W: THE PLAYER'S BLOWS ON HIS HOST
 
 const FIRE = { index: 7, name: 'Wizard\'s Fire', rangeType: 1, element: 0, effects: [] };
 const player = { isPlayer: true, level: 20, skills: new Array(40).fill(100), stats: { strength: 100, agility: 100, luck: 100, speed: 50 }, items: [], activeEffects: [], health: 100, maxHealth: 100 };
@@ -184,7 +184,7 @@ test('AUDIT WB11 W5 one of his host bleeds against its OWN whole - the stand-in\
   assert.match(read('src/combat/arrowFlight.js'), /bloodHit\(dmg, foe\.bloodOf \?\? foe\.entity, \{ fromPlayer: true, weapon: m\.weapon \?\? null \}\)/, 'the shaft\'s (every other foe its entity\'s, as ever)');
 });
 
-// ═══ B: THE BRAIN ══════════════════════════════════════════════════════════════════════════════════════════════════
+// B: THE BRAIN
 
 /** A wave of his host risen this beat, if any. */
 const waveOf = (out, k) => out.find((o) => o.k === 'ad' && o.w === k) ?? null;
@@ -276,7 +276,7 @@ test('AUDIT WB11 B3/R2 a blow on one of his host standing before a wave rises is
   assert.deepEqual(ah.h.find(([i]) => i === a.i), [a.i, Math.ceil(a.h)]);
 });
 
-// ═══ R: THE RELAY ══════════════════════════════════════════════════════════════════════════════════════════════════
+// R: THE RELAY
 
 test('AUDIT WB11 R1 a blow on one of his host - and on a crystal - keeps the beat as a blow on him does (AUDIT WBX R6): they returned before it, and a host struck by a fighter come back without a word stood frozen, never walking or Biting (mutant: the beat kept for him alone)', async () => {
   let DAY = 0;
@@ -306,7 +306,7 @@ test('AUDIT WB11 R1 a blow on one of his host - and on a crystal - keeps the bea
   }
 });
 
-// ═══ C: THE COURT'S CLIENT ═════════════════════════════════════════════════════════════════════════════════════════
+// C: THE COURT'S CLIENT
 
 test('AUDIT WB11 C1/C7 his host moves by its own mobile\'s law (characters/mobile/mobileUnit.js stateAnims and the flyer\'s clock): an Imp has no idle frames and idles and rises on its move loop at FLY_ANIM_SPEED; the winged Seducer idles at the flyer\'s clock; every look\'s tables are the port\'s own (mutants: the Imp on idle records it lacks; the Seducer at the walker\'s clock)', () => {
   for (const [key, table] of Object.entries(GBoss.HOST_LOOKS)) {
@@ -388,7 +388,7 @@ test('AUDIT WB11 C8 his host\'s shapes are refilled into their slots, never made
   out.forEach((q, k) => { assert.equal(q, first[k], 'the same slot'); assert.equal(q.origin, first[k].origin, 'its arrays too'); });
 });
 
-// ═══ U: THE BROWSER'S ══════════════════════════════════════════════════════════════════════════════════════════════
+// U: THE BROWSER'S
 
 test('AUDIT WB11 C9/U5 a Legion-Lord night\'s chart keeps its Host column on a narrow screen, in the place of the falls (it folded away whole; the patch said a Host column on those nights) (mutant: the column folded)', () => {
   const narrow = /@media \(max-width: 640px\), \(max-height: 480px\) \{([\s\S]*?)\n\}/.exec(DAMAGE_CHART_CSS)?.[1] ?? '';   // WB13c: a phone held sideways is narrow too
@@ -412,7 +412,7 @@ test('AUDIT WB11 U2 under the Burning a Ward-Bearer\'s Pulse - the disc that hur
   for (const a of ['rime', 'storm', 'venom']) assert.deepEqual(GBoss.hostPulseColor(GB.fightProfile([a, 'legion', 'echoing'])), GBoss.ASPECT_COLORS[a].nova, `${a}: his element's own`);
 });
 
-// ═══ D: THE RECORD ═════════════════════════════════════════════════════════════════════════════════════════════════
+// D: THE RECORD
 
 test('AUDIT WB11 D1 when the last Ward-Bearer falls his OWN ward follows for its breath (SHIELD_MS, Unyielding\'s 6 s - the signature cast under it): the court\'s words say it fails, never that it breaks - every blow in that breath still turned (mutants: "breaks" said; the breath dropped)', () => {
   assert.ok(!/breaks/.test(GH.COURT_HOST_TEXT.felled('Ann', 0)) && !/breaks/.test(GH.COURT_HOST_TEXT.crumbled));
@@ -545,7 +545,7 @@ test('AUDIT WB11 D7 the court\'s words of his host the slice\'s pins never read:
   assert.equal(bar.host, 'His host: 2', 'the foot counts his host');
 });
 
-// ═══ K: WHAT THE KILL RUN FOUND ════════════════════════════════════════════════════════════════════════════════════
+// K: WHAT THE KILL RUN FOUND
 
 test('AUDIT WB11 K1 (the kill run; main\'s since WB9b) a blow on him from his new court before the walkway into it is laid is refused - he lands there 2.4 s after the bound\'s word, the walkway is whole only at 5 s, and nobody can stand in the court between: the floor\'s check is the only one that turns it (`inCourt` passes), and no pin held it (mutant WB3-a-blow-from-off-the-court, its slack widened, survived)', () => {
   const f = fightOf(1, 30, null);

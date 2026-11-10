@@ -44,7 +44,7 @@ function underWay(hull, o = {}) {
   return h;
 }
 
-// ═══ XA1: THE OARS GATHER WAY; HER CANVAS'S WAY COMES OFF AT HER COAST ═════════════════════════════════════════════
+// XA1: THE OARS GATHER WAY; HER CANVAS'S WAY COMES OFF AT HER COAST
 
 test('AUDIT SHIPS 2 XA1 under the responsive helm the oars\' rate GATHERS way, and a way above what they make - her canvas\'s, no oar made it - is lost no slower than her coast: a galleon struck from full way and rowed on (the journey\'s autorun, a sea leg\'s oars) comes down to BOARD_SPEED as her coast does, in the rated wind and the sea\'s strongest; at the oars\' rate both ways (AUDIT SHIPS A5\'s autorun) she took 48 s and 400 m in the rated wind and 105 s and 1.6 km in the storm, and the journey\'s hand ran her aground on it; under the mod\'s own helm its own rate stands (mutants: the oars\' rate both ways)', () => {
   for (const len of [1.5, 3]) {
@@ -69,7 +69,7 @@ test('AUDIT SHIPS 2 XA1 under the responsive helm the oars\' rate GATHERS way, a
   near(oar, r.s.rt.properties.moveAccel(), 1e-9, 'under Classic: the oars\' rate both ways');
 });
 
-// ═══ XA7: HER CANVAS'S SHARE OF HER WAY ════════════════════════════════════════════════════════════════════════════
+// XA7: HER CANVAS'S SHARE OF HER WAY
 
 test('AUDIT SHIPS 2 XA7 a coast takes her rig\'s gain in the share of her way her canvas made (`sailWay`) - gathered under canvas, lost in its share, saved with her way: struck through the ladder\'s oars\' rung, or saved and loaded mid-coast, a galleon and a Large Boat coast as End strikes them; a frame of sail over her oars\' way coasts as her oars at rest do; a flag of the arm that drove her last coasted the first two ungained (19.6 s to 2.5 m/s, not 12.0) and the last gained (mutants: the whole gain on any share; the share not saved; gathered by any arm)', () => {
   for (const [hull, variant] of [[HULL.SmallShip, 0], [HULL.LargeBoat, 2]]) {
@@ -111,7 +111,7 @@ test('AUDIT SHIPS 2 XA7 a coast takes her rig\'s gain in the share of her way he
   assert.ok(HELM_WAY.coast > 1);
 });
 
-// ═══ XA5: THE HAUL'S BRAKE, ONE BOUND ══════════════════════════════════════════════════════════════════════════════
+// XA5: THE HAUL'S BRAKE, ONE BOUND
 
 test('AUDIT SHIPS 2 XA5 (BOARD-MAGNET, 2026-10-26: the heave-to retired with the ram) the grapples\' haul brake never asks past the runtime\'s own bound (CSA_BRAKE_MAX), so the stop it is reckoned by is the stop she makes: a galleon and a Carrack at full way on her beam and her quarter, in the rated wind and in the sea\'s strongest, come to rest within the haul - the ship hauled meets her lying still, wherever the wind left her way (a heave-to asked up to 47 m/s^2 and was braked at 20: a storm\'s Carrack ran 37 m where 20 was reckoned)', () => {
   for (const len of [1.5, 3]) for (const hull of [HULL.SmallShip, HULL.Carrack]) for (const off of [90, 135]) {
@@ -127,7 +127,7 @@ test('AUDIT SHIPS 2 XA5 (BOARD-MAGNET, 2026-10-26: the heave-to retired with the
   }
 });
 
-// ═══ XA6: A STORM SHIP'S WORD THROUGH THE DOOR ═════════════════════════════════════════════════════════════════════
+// XA6: A STORM SHIP'S WORD THROUGH THE DOOR
 
 test('AUDIT SHIPS 2 XA6 a boat\'s word is never dropped for her way: every way SAIL-FREE gives a galleon, a Carrack and a Large Galley - every heading, the rated wind to the sea\'s strongest - at an open journey\'s x60 and a road\'s x100 passes the door, and the door\'s bound covers the fastest of them at the Handling dials\' tenfold; the writer holds a way past it to it; at 64k natives a second, 27 m/s of way at x60, every reader dropped a storm galleon\'s word whole and her boats were gone from every screen (mutants: the old bound; the writer unheld)', () => {
   const toWire = (p) => [p[0] * SCENE_MAP_RATIO, p[1], p[2] * SCENE_MAP_RATIO];

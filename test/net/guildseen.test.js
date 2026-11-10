@@ -2,8 +2,7 @@
 // account's last play beat (ACC4's `played_at`), or its last authenticated call where it never beat - driven through
 // the real Worker over node:sqlite with every migration applied (server-account/src/guilds.js viewOf); the book's law
 // over it (net/guild/guildBook.js guildMemberOnline, guildSeenText) and a look that moves a stamp alone repainting nothing;
-// and the Members page's dot and line, read again on the live pass (ui/socialPanel.js). bible/11-Multiplayer/
-// Guild-Overhaul.md GUILD-SEEN.
+// and the Members page's dot and line, read again on the live pass (ui/socialPanel.js). GUILD-SEEN.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

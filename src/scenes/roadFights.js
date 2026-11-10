@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LW4b: THE FIGHT, STOOD - a beset party near the player, fought for
 // real and the player's to turn. Mac: NPCs "can encounter enemies in the overworld ... make friends or enemies".
 //
@@ -23,7 +22,6 @@
 // EVERY ALLOCATION HAS AN OWNER: each body stood is this layer's until the fight ends - taken out at its end (the
 // allies when the party walks on, the foes of a fight let go) or handed to the pool's own life (the foes of a fight
 // lost) - and `clear()` takes out every one (the host's teardown, a fast travel's sweep, the living world switched off).
-// ═══════════════════════════════════════════════════════════════════
 import { membersAt } from '../systems/livingWorld/trips.js';
 import { NATIVE_PER_M } from '../systems/livingWorld/trips.js';
 import { lwSeed, textSeed } from '../systems/livingWorld/seed.js';

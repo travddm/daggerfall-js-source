@@ -3,7 +3,7 @@
 //
 // The gate's site is the clock's and the map files' (net/gate/gateLaw.js rolls it; systems/gate/gateSite.js keeps it off every
 // location's neighbourhood and every spawned dungeon), and World of Daggerfall stands a site on 114,087 of the pixels left
-// - rock fields ~500 m across, mountains ~1.9 km, every model with its own collider (bible 03-World/World-Of-Daggerfall.md).
+// - rock fields ~500 m across, mountains ~1.9 km, every model with its own collider.
 // Nothing kept the two apart, so a day's gate could rise inside a boulder: its fire out of reach of the press and the step
 // (the rock's collider takes the ray and the body first), nobody fought, and the gate stood its whole schedule, sealed
 // hours and all, in a rock field. Over the shipped lists 3.5% of the spots a gate may take on a pixel the mod names stand

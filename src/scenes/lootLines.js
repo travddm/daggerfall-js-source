@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LOOT11 — A LINE OF LIGHT OVER EVERY FIND.
 //
 // The Loot arc (; - "tier beams on
@@ -22,7 +21,6 @@
 // the world as itself is its own find (`own`), its line out of its own
 // picture - the world boss's spoils' form - and the body or pile it lies
 // for no longer counts it toward its own line.
-// ═══════════════════════════════════════════════════════════════════
 
 import { SpoilsGlowRenderer } from '../render/spoilsGlow.js';
 import { bestRarity, RARITIES, lootRarityOn } from '../systems/loot/lootRarity.js';

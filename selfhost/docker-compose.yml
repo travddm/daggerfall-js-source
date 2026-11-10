@@ -17,6 +17,9 @@ services:
         GENERATE_FLAGS: ${GENERATE_FLAGS:-}
     image: dfo-selfhost:local
     env_file: .env
+    environment:
+      # The relay names its account service at /profile, so players enter only the relay's address.
+      ACCOUNT_SERVICE_URL: https://${DFO_ACCOUNTS_HOST:-accounts.localhost}
     volumes:
       - dfo-data:/data
     expose:

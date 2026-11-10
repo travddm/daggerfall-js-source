@@ -4,7 +4,7 @@
 // planner is HERE, not in the host: the host's one construction seam (TO-ROADS, test/systems/travel/fb0929d_toroads.test.js) is the
 // player's journey's, and a traveller's way is none of the player's settings.
 //
-// THE SAME WAY FOR EVERY READER (LW0 decision 2). A pair of towns is asked once, in ONE direction - the lower map id
+// THE SAME WAY FOR EVERY READER. A pair of towns is asked once, in ONE direction - the lower map id
 // first - and the other way is its reverse, so a party walks out and home on one line and every client walks it alike.
 // The ground is the game's own (the climate and the heightmap - the host's `ground()`, built without a player's
 // attached World of Daggerfall massifs, which only that player has), the roads the network the world draws (Hazelnut's

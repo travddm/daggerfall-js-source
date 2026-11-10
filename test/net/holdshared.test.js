@@ -1,7 +1,7 @@
 // HOLD-SHARED:
 // HOLD-SOLO (FIELD BUGS 2026-10-07b) and AUDIT FB1007b's H1-H5 reverted. Online, Privateer's Hold keys its shared world
 // room by its map id - `dungeon:m187853213` (net/online.js roomKeyFor) - as every dungeon does: its memory, foes, doors,
-// loot and presence are the room's again. `01-Overview/bugs/Field-Bugs-2026-10-07b.md` HOLD-SOLO says what was reverted.
+// loot and presence are the room's again. HOLD-SOLO says what was reverted.
 //
 // Fixtures from the producers: MapsFile's own pixel math for the location, worldModes.js's roomIdentity and world.js's
 // key block, staffDestination and chatSend executed from their source, the real roomKeyFor.

@@ -171,7 +171,7 @@ test('STAFF-EVENT: the hub\'s door verifies the order with its own key - a forge
   assert.deepEqual(await takeStaffEventLaw(hub, 7, Date.now()), { ok: false });
 });
 
-// ═══ THE ACCOUNT SERVICE ═══
+// THE ACCOUNT SERVICE
 const PASSWORD = 'a good long one';
 const RELAY = 'https://relay.example' + SAFE_LAW_PATH;
 const enc = new TextEncoder();

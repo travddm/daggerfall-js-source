@@ -1,8 +1,9 @@
 # World
 
-This page covers the overworld: terrain and its heightmap, landforms, roads, towns and cities, dungeons, places of
-interest, travel, and the map past the Iliac Bay. Ships and the sea are in [naval.md](naval.md); the clock, weather and
-seasons are in [time-and-weather.md](time-and-weather.md).
+This page covers the Iliac Bay overworld: terrain and its heightmap, landforms, roads, towns and cities, dungeons,
+wilderness encounters, discovery and travel. The land past the Bay is in [past-the-bay.md](past-the-bay.md).
+Ships and the sea are in [naval.md](naval.md); the clock, weather and seasons are in
+[time-and-weather.md](time-and-weather.md).
 
 ## Units and frames
 
@@ -34,8 +35,7 @@ both from the player's ARENA2 folder; nothing of it ships in the repository.
   `setLocationTiles`). These are ports of Daggerfall Unity's `TerrainHelper`.
 - `src/world/terrain/terrainSurface.js` builds the mesh and answers ground queries (`surfaceHeightAt`, `walkGroundAt`).
 - `src/world/terrain/terrain-quad-cut.ts` decides which diagonal each mesh quad is cut on. Every reader of the drawn
-  ground uses it: the index buffers, the height and normal reads, the water sheet and the placers. With the slope cut
-  on, it picks the diagonal from the pixel's samples, so a ridge or a valley is not folded into a row of teeth.
+  ground uses it: the index buffers, the height and normal reads, the water sheet and the placers.
 - `src/world/terrain/terrainNature.js`, `floraCover.js` and `jungleNature.js` scatter plants; `src/world/ecotone.js`
   makes the seam between two pixel climates wander.
 
@@ -44,19 +44,21 @@ Water levels: a height at or under `SCALED_OCEAN_ELEVATION` (27.2) is a water ti
 Departure: `src/world/perlin.js` uses Ken Perlin's improved noise, not Unity's `Mathf.PerlinNoise`. Terrain samples are
 therefore close to Daggerfall Unity's, not byte-equal.
 
-Departure, as an option: Unity cuts every terrain quad on one fixed diagonal, (x, z) to (x+1, z+1). The **Ground follows
-slopes** row (`terrainSlopeCut`, `src/systems/terrainSlopeCutRow.js`, off by default) cuts each quad on the diagonal
-that its ground follows instead. The world reads it once as it mounts. `TerrainGenClient` sets the module's switch on
-the main thread and sends it to the terrain worker at init, so the drawn, walked and water ground stay one surface. The
-classic skin keeps the fixed cut. Off costs nothing: every pixel of a stride draws one shared index set, uploaded once
-(`sharedTerrainIndices`). On, the worker builds each pixel's own set, and its buffer is freed with the surface.
-Online the room holds it: the official profile pins it off (`src/net/profile/officialProfile.ts`). Off, the ground
-is the one `GROUND_LAW` 3 records.
+Departure, as an option that stays in core (decision 103): Unity cuts every terrain quad on one fixed diagonal, (x, z)
+to (x+1, z+1). The **Ground follows slopes** row (`terrainSlopeCut`, `src/systems/terrainSlopeCutRow.js`, off by
+default) cuts each quad on the diagonal that its ground follows instead, so a ridge or a valley is not folded into a
+row of teeth. `terrainSlopeCutOn` (`src/systems/terrainSlopeCut.js`) reads it on the enhanced skin and online only,
+once as the world mounts. `TerrainGenClient` sends it to the terrain worker at init, so the drawn, walked and water
+ground stay one surface. Off, every pixel of a stride draws one shared index set (`sharedTerrainIndices`); on, each
+pixel builds its own. Online the room holds it: the server kit's default profile (`src/net/profile/officialProfile.ts`,
+named before decision 95) pins it off, the ground that `GROUND_LAW` 3 (`src/net/wire.js`) records.
 
 ## Landforms
 
 `src/world/landforms.js` (`createLandforms`, `landformLift`, `landformLiftField`) adds relief on top of the Daggerfall
-Unity kernel. It is not a Daggerfall Unity feature.
+Unity kernel. It is not a Daggerfall Unity feature. It is an option: the `landforms` Features row, on by default, held
+by the room online. It is an agreed design departure (decision 39); in the Bay remake, decision 47's generated ground
+replaces it over the beach knee, which is not built yet.
 
 - It lifts only the small-heightmap term (`reliefLift`). The large-heightmap hills and ground noise keep their scale.
 - It adds massifs (`src/world/peaks/massif.js`), sharp peaks (`peakField`) and snowcaps (`src/world/peaks/snowcap.js`).
@@ -69,9 +71,7 @@ Invariants:
   pixels that share an edge compute the same heights there.
 - At or under the beach knee (41.5) heights are Daggerfall Unity's unchanged, so coasts and water tiles do not move.
 - A location of Daggerfall's own map has every ground tile of its grid stamped and its rectangle flattened to the
-  pixel's mean, as in Daggerfall Unity (`setLocationTiles`, `blendLocationTerrain`). A location the port makes past the
-  Bay (`isPortMadeLocation`) is stamped and flattened to its outline instead (`blendShapedTerrain`). Capitals flatten
-  through `src/world/terrain/capitalRelief.js` and `capitalSea.js`.
+  pixel's mean, as in Daggerfall Unity (`setLocationTiles`, `blendLocationTerrain`).
 
 ## Streaming
 
@@ -80,13 +80,14 @@ Invariants:
 - The view radius is `landViewDistance` (`src/world/landView.js`): 1 to 6, default 5 (11 x 11 pixels). The classic lane
   caps at Daggerfall Unity's 4.
 - Builds go nearest-first (`nearestFirstFrom`). A failed build retries on `BUILD_RETRY_MS`.
-- The kernel runs in a module worker: `src/world/terrain/terrainGenWorker.js`, driven by `TerrainGenClient` in
-  `terrainGenClient.js`. `?terrainthread=off` runs the same kernel on the main thread. Results come back as transferred
-  typed arrays (`src/world/terrain/natureWire.js` packs nature).
+- The kernel runs in a module worker (`src/world/terrain/terrainGenWorker.js`, driven by `TerrainGenClient`);
+  `?terrainthread=off` runs it on the main thread.
 - Beyond the near grid, `src/world/terrain/midRingGrid.js` builds a mid ring (`MID_RADIUS` 14) and a far field
   (`FAR_RADIUS` 60) at lower resolution, streamed in bands.
 
 ## Roads
+
+> Leaves core: the Basic Roads mod (decision 99).
 
 The road network the player sees is Hazelnut's Basic Roads data, vendored as four 500,000-byte arrays in
 `vendor/roads-hazelnut/` (`roadData`, `trackData`, `riverData`, `streamData`). Each byte is one map pixel's
@@ -98,12 +99,9 @@ The road network the player sees is Hazelnut's Basic Roads data, vendored as fou
   returns `null` and the world draws without roads; it does not stop the boot.
 - `src/world/roadsCache.js` caches generated networks in IndexedDB under `GENERATOR_VERSION`. Bump it whenever the
   generator's output changes, or players keep stale roads.
-- `src/world/road/roadPainter.js` `paintRoads` is a port of Basic Roads' `PaintPath` (MIT). `roadCurves.js` smooths the
-  45 and 90 degree kinks, `roadEdge.js` blends paving into the ground, `roadVerge.js` and `roadClearance.js` keep trees
-  and props off the road, `roadLand.js` cuts land along routes and fords rivers.
-- Bridges: `src/world/road/roadBridges.js` and `bridgeModels.js`. Gate roads: `src/world/road/gateRoads.js`
-  `layGateRoads` runs a road from each town gate to the network.
-- Rivers and streams load but are off by default, as in the mod.
+- `src/world/road/roadPainter.js` `paintRoads` is a port of Basic Roads' `PaintPath` (MIT). The rest of
+  `src/world/road/` smooths kinks, blends paving, keeps flats off the road, cuts land, fords rivers, stands bridges and
+  lays gate roads (`gateRoads.js` `layGateRoads`). Rivers and streams load but are off by default, as in the mod.
 
 ## Towns and cities
 
@@ -117,42 +115,36 @@ A location is assembled by `layoutLocation` (`src/world/locationLayout.js`), a p
 - `src/world/staticBuildings.js`, `staticDoors.js`, `buildingNames.js`: bounds, doors, names. Interiors:
   `src/world/interior/`. `src/world/city/`: NPC walk grid (`cityNavigation.js`), gates by the clock, street lights.
 
-### Town shapes
+### Puddle drying
 
-Iliac Bay towns keep Daggerfall's grid, its own wall blocks (`WALLAA**`) and Daggerfall Unity's square town ground.
-Towns past the Bay get an outline, ground shaped to it, and round walls of their own:
+> Leaves core: with the Iliac Puddle No More mod (decision 99; decision 117 (23)).
 
-- `src/world/townShape.js` maps each block's AutoMap bytes to tiles (`townOccupancy`) and grows a noisy margin around the
-  buildings (`townShapeField`, `TOWN_SHAPE`).
-- `src/world/townOutline.js` turns the shape into outline cells (`outlineTownLocation`).
-- `src/world/townWalls.js` stands walls, towers and gates on the outline (`townWall`, `wallPieces`, `gatesOnStreets`),
-  using Daggerfall's wall models 444 to 446. `src/world/townGates.js` finds gates for the gate roads.
+`src/world/puddleDry.js` `dryPuddles` turns a town block's one-tile puddles and shallow-water pools into the ground
+around them. `src/formats/blocksFile.js` applies it to every RMB block it serves, with no setting; `readClassicBlock`
+returns the block as the BSA holds it. Decision 117 (23) ties it to the Iliac Puddle No More switch, so it leaves with
+that mod. That is not built yet.
 
-### Urban fabric
+### Townsfolk and town systems
 
-`src/world/urban/` dresses towns past the Bay: a province stone set (`townLook.js` `TOWN_LOOK`), province art styles
-(`urbanRecords.js`, archive 38500), and streets, yards and fences (`townFabric.js` `fabricPlan`,
-`townFabricModel.js`, `townFabricStand.js`). None of this is in Daggerfall Unity.
+The streets hold one of two populations, picked where a town is built (`src/scenes/pixelBuild.js`):
 
-### Capitals
+- **Living World** (`src/systems/livingWorld/`, the `living-world` Features row, on by default, each player's own
+  online): named townsfolk with homes, trades and daily routines, plus caravans, road travellers and outlaws. A
+  departure from Daggerfall Unity, kept for now (decision 23d). `livingWorldOn` (`livingSwitch.js`) is true only on
+  the enhanced skin.
+- **Classic walkers** (`src/systems/town/townPopulation.js` `TownPopulation`, `maxPopulationFor`): Daggerfall Unity's
+  `PopulationManager` wanderers. The game uses them when the row is off or on the classic skin.
 
-`src/world/tamrielCapitals.js` lists seven capitals: the Imperial City, Solitude, Mournhold, Alinor, Falinesti, Torval
-and Helstrom. Plans are in `src/world/capitalPlans.js` and `capitalSolitude.js`; landmarks in the `capital*.js` files.
-The Imperial City is its own build (`src/world/imperialCity.js`, `imperialBlocks.js`, `imperialFabric*.js`,
-`imperialPrebuild*.js`), `IMPERIAL_SPAN` 25 pixels a side.
+Beside them: guards answering threats (`src/systems/town/townWatch.js`), the town economy (`townEcon.js`), hub cities
+(`src/systems/region/regionHubs.js`, `marketHubs.js`), and region flags and faction power (`regionConditions.js`,
+`regionPower.js`, a port of `RegionPowerAndConditionsUpdate`).
 
-### Town and region systems
+### Town seats
 
-| File | Role |
-| --- | --- |
-| `src/systems/town/townPopulation.js` | Wandering townsfolk (`TownPopulation`, `maxPopulationFor`) |
-| `src/systems/town/townWatch.js` | Guards answering threats (`createTownWatch`) |
-| `src/systems/town/townEcon.js` | Town economy (`createTownEcon`) |
-| `src/systems/town/townSeats.js` | Seats of rule and palaces (`deriveTownSeats`) |
-| `src/systems/region/regionHubs.js`, `marketHubs.js` | Hub cities per region and province |
-| `src/systems/region/regionConditions.js`, `regionPower.js` | Region flags and faction power, port of `RegionPowerAndConditionsUpdate` |
+> Leaves core: the town seats mod (decisions 52 and 102).
 
-Trap: the province key is spelled `Sumurset` in `urbanRecords.js`, `townLook.js` and `tamrielCapitals.js`.
+`src/systems/town/townSeats.js` `deriveTownSeats` finds the seats of rule and palaces. The `town-seats` Features row
+(`townSeatsRow.js`, on by default, held by the room online) switches the system.
 
 ## Dungeons
 
@@ -162,8 +154,6 @@ starting block carries start markers and the exit door (model 70300). Only dunge
 
 - `src/world/actionSystem.js` `ActionSystem` runs action records (doors, movers, linked chains). Chain keys are
   namespaced per block instance, a departure from Daggerfall Unity that keeps two copies of a block apart.
-- Size: `src/world/smallerDungeons.js` `dungeonSizeFor` returns `small`, `medium` or `full`. Main-story dungeons,
-  capital castles and super dungeons are always full. `medium` is the port's own size.
 - Tier: `src/systems/dungeon/dungeonTier.js` `dungeonTier` returns `regular`, `elite` or `super`. Respawn times are in
   `src/systems/dungeon/dungeonRespawn.js`; offline, nothing respawns.
 - Spawned dungeons: `src/world/spawnedDungeons.js` rolls extra dungeons per map pixel from a hash and keeps a spawn
@@ -172,23 +162,45 @@ starting block carries start markers and the exit door (model 70300). Only dunge
 - Delve aids, all overlays on the same layout: dungeon sense (`src/systems/dungeon/dungeonSense.js`), the echo book of
   movers set going (`dungeonEcho.js`), and the way-out compass (`src/systems/wayOut.js`).
 
+### Dungeon size
+
+`src/world/smallerDungeons.js` `dungeonSizeFor` returns `small`, `medium` or `full`. Main-story dungeons, capital
+castles and super dungeons are always full. Offline the player picks: Daggerfall Unity's Smaller Dungeons setting
+(`small`), the `medium-dungeons` row (`medium`, the game's own size), or the `world-dungeon-sizes` row (each dungeon at
+its online size). Without any of them a dungeon is whole, as in Daggerfall Unity.
+
+Online, each dungeon gets `onlineDungeonSize`: one seeded draw on its map id, weighted small 1, medium 2, whole 5
+(`ONLINE_DUNGEON_SIZES`), the same on every client and every visit (decision 16). A quest's dungeon is the exception:
+online its markers are chosen on the whole dungeon, so `smallerDungeonsStateNow` stamps the quest `Disabled` (whole).
+
+### Dungeon campfire
+
+`src/world/dungeon/dungeonFires.js` `dungeonFirePlan` stands one permanent campfire at a dungeon's entrance, a rest
+point and a hearth; a palace gets none. The plan is pure over the layout, so every client stands the same fire. The
+`dungeon-fires` row (`src/systems/dungeonFiresRow.js`, on by default, held by the room online) switches it; off is
+Daggerfall Unity's dungeon with no fire. A small departure, cut to one entrance fire by decision 17a.
+
 ### Super dungeons
 
 A super dungeon (shown to players as an Abyss Dungeon) exists online only. The relay rules its lifecycle
-(`src/net/superDungeon/sdLaw.js`: gone, risen, found, fell). `src/systems/superDungeon/sdSite.js` picks a pixel near a
-great city and clones a large real dungeon as its template. Its rift leads to a made realm
-(`src/world/superDungeon/sdRealm.js`). `sdOmen.js` places the beacon and compass marks; `sdSlots.js` limits each
-account to one life per slot; `sdSpoils.js` rolls rewards. `sdScore.js` is music, not points.
+(`src/net/superDungeon/sdLaw.js`). `src/systems/superDungeon/sdSite.js` picks a pixel near a great city and clones a
+large real dungeon as its template; its rift leads to a made realm (`src/world/superDungeon/sdRealm.js`). `sdOmen.js`,
+`sdSlots.js`, `sdSpoils.js` and `sdScore.js` (music, not points) hold the rest.
 
-## Places of interest and discovery
+## Wilderness camps
+
+A departure, kept and made rarer by decision 15. `src/systems/campEncounters.js` adds a second roll beside Daggerfall
+Unity's lone wanderers (`src/systems/encounters.js`): each chunk entered has a `CAMP_CHANCE_ON_CHUNK_LOAD` (12.5%)
+chance to stand one group of two to four foes from the same encounter table, a camp or a pack. One member that notices
+the player wakes the rest. The `wilderness-camps` row (on by default, held by the room online) switches it.
+
+## Discovery
 
 - `src/systems/discovery.js` records what the player has found: `discoverLocation`, `discoverBuilding`,
   `discoveryKeyOf`. Bay places are keyed by the low 20 bits of the map id; made places
   (`src/world/placeIds.js` `isMadePlaceId`) by the whole id.
 - `src/world/locationKey.js` `locationKeyOf` builds the map-table key (temples, shops, guild halls) that "Where is" talk
   reads.
-- Editor-placed POIs are a separate system in `src/poi/` (`poiLaw.js`, `poiRuntime.js`, `poiService.js`), approved by
-  the realm and drawn with a map marker.
 
 ## Travel
 
@@ -202,11 +214,9 @@ account to one life per slot; `sdSpoils.js` rolls rewards. `sdScore.js` is music
   temple blessings applied. Arrival stands the player at the location's edge or start marker
   (`src/world/locationEntrance.js`).
 
-Walked travel (autopilot) is the port's own: `travelRoute.js` `planRoute` (costs road 1, track 1.6, open 3.5, capped by
-`ROUTE_MAX_EXPANSIONS`), `travelAutopilot.js`, `travelSteer.js`, `travelPace.js` (speed steps and caps),
-`travelPathMode.js` (`roads` or `free`). `travelThreat.js` and `travelBands.js` pace road threats. `travelPorts.js`
-hands off to ships (see [naval.md](naval.md)). `src/systems/immersiveTravel.js` ports the Immersive Travel mod's
-carriage and sailor services.
+Walked travel (autopilot) is the port's own: `travelRoute.js` `planRoute` (costs road 1, track 1.6, open 3.5),
+`travelAutopilot.js`, `travelSteer.js`, `travelPace.js`, `travelPathMode.js`, road threats in `travelThreat.js` and
+`travelBands.js`, and the hand-off to ships in `travelPorts.js` (see [naval.md](naval.md)).
 
 The mod's own journey (`beginTravel`) walks a straight line, as the mod does. With the mod pane's Avoid Obstacles
 key on (the default; a port key, off is the mod's beeline), the steering (`travelSteer.js`) feels its way at two heights
@@ -218,29 +228,12 @@ Map: `src/systems/map/mapTabs.js` (automap, town, world sheets), `mapWaypoints.j
 waypoints); the surface is `src/ui/heldMap.js`. Horse and wagon: `src/systems/horse/horseCart.js` runs them,
 `horseCartLaw.js` holds the modes; `src/systems/wagon/` holds wagon kinds, seats, ropes, looks and upkeep.
 
-## The map past the Iliac Bay
+### Immersive Travel
 
-The Tamriel trace past the Bay is being remade. This section describes the code as it stands.
+> Leaves core: the Immersive Travel mod (decision 99).
 
-- Frame: `src/world/tamriel/tamrielFrame.js`. One Tamriel pixel equals one Bay pixel; the Bay is offset, not scaled.
-  The continent is 6000 x 3750 pixels (`tamrielSize()`). At boot `fitBayToPicture` (`tamrielLand.js`) fits the Bay to
-  the player's map picture; read `tamrielFit()`, never `BAY_ORIGIN` directly.
-- Authored data: `src/world/tamriel/tamrielGeography.js` holds nine provinces as hand-authored rings, plus mountain
-  ranges, rivers, seas and cities. `tamrielWaters.js` holds lakes and carved rivers; `tamrielBiomes.js` the biome table.
-- Player data: `src/ui/tamrielTrace.js` `preloadTamrielTrace` reads `TMAP00I0.IMG`, `TAMRIEL2.IMG` and `MAP.PAL` from
-  ARENA2 and caches the trace in IndexedDB (`tamrielBootCache.js`).
-- Shipped bake: `src/world/tamriel/tamrielReliefData.js`, a generated relief module written by
-  `tools/bakeTamrielRelief.mjs` from `src/assets/tamriel/source/tamriel-heightmap.png`. Edit the bake, not the module.
-  If it fails to load, authored heights stand.
-- Runtime generation: ground (`tamrielGround.js`, `tamrielRaster.js`), relief (`tamrielRelief.js`), landforms
-  (`tamrielLandforms.js`), ground dress in a worker (`groundDress*.js`), places (`src/world/tamrielPlaces.js`,
-  `tamrielCountry.js`, `tamrielDungeons.js`) and roads (`src/world/tamrielRoads.js` in `tamrielRoadsWorker.js`, cached
-  through `roadsCache.js`). Nothing is read from Arena's own files.
-- The terrain worker streams ground past the Bay, so it can be walked. `src/systems/travel/pastBayTravel.js`
-  `pastBayJourney` refuses fast travel to it; teleports and Portal Stones
-  (`portalLandAt`) may land there.
-- Without the trace (`?tamrieltrace=off` or missing files), the authored continent stands and no places appear past
-  the Bay.
+`src/systems/immersiveTravel.js` ports the Immersive Travel 1.5 mod (`vendor/immersive-travel/`): carriages and
+drivers outside walled cities, and sailor services.
 
 ## Tests
 
@@ -249,11 +242,11 @@ The Tamriel trace past the Bay is being remade. This section describes the code 
 | Terrain and streaming | `test/world/terrain/terrain.test.js`, `test/world/terrain/terrainworker.test.js`, `test/world/streaming.test.js` |
 | Landforms | `test/world/terrain/landform6.test.js`, `test/world/terrain/auditlandforms.test.js`, `test/world/peaks2_massif.test.js` |
 | Roads | `test/world/road/roads.test.js`, `test/world/road/roadsReal.test.js`, `test/world/gateroads.test.js` |
-| Towns | `test/world/townoutline.test.js`, `test/world/townwalls.test.js`, `test/world/urban/urban3_fabric.test.js` |
-| Dungeons | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js` |
+| Towns | `test/world/puddledry.test.js`, `test/systems/livingWorld/` |
+| Dungeons | `test/world/dungeon.test.js`, `test/world/action.test.js`, `test/world/spawneddungeons.test.js`, `test/systems/ft1_smallerdungeons.test.js`, `test/systems/survival/rest3_dungeonfires.test.js` |
 | Delve, super dungeons | `test/systems/sense1_dungeonsense.test.js`, `test/systems/echo1_dungeonecho.test.js`, `test/systems/superDungeon/sd2_sdsite.test.js` |
+| Camps | `test/systems/camp1_groups.test.js`, `test/systems/camproll.test.js` |
 | Discovery, travel | `test/systems/audit26_discovery.test.js`, `test/systems/audit64_travel.test.js`, `test/ui/heldmap.test.js` |
-| Past the Bay | `test/world/tamriel2.test.js`, `test/world/tamrielrelief.test.js`, `test/tesa3_provinces.test.js`, `test/tesa4_roads.test.js` |
 
 Tests that read the map need ARENA2: run `sh tools/fetch-data.sh` and set `ARENA2_PATH`.
 
@@ -261,6 +254,8 @@ Tests that read the map need ARENA2: run `sh tools/fetch-data.sh` and set `ARENA
 
 - Terrain must stay a pure function of position. Any per-session or per-pixel randomness makes two neighbouring
   pixels disagree on their shared edge and opens seams.
-- The generated road network differs from Basic Roads. A failed vendor fetch silently changes the roads.
+- The generated road network differs from Basic Roads. A failed vendor fetch changes the roads with no error, and once
+  Basic Roads leaves core, the generated network is what a game without the mod draws.
 - Changing the town flatten or the beach knee moves coasts and building plinths everywhere.
-- `smallerDungeonsStateNow` returns `Disabled` online, whatever nearby comments say.
+- A dungeon's size online comes from `onlineDungeonSize`, not from `smallerDungeonsStateNow`. The second one is the
+  quest stamp only.

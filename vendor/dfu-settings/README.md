@@ -42,6 +42,5 @@ sections, keys and default values. The port implements DFU's typed
 getters verbatim, including their failure modes (a bad bool reads
 False; a bad clamped int reads `min`, not the default).
 
-Not every setting has a consumer in this port - see the settings row in
-`bible/01-Overview/Port-Ledger.md` section A, and the tier each key
+Not every setting has a consumer in this port - see the tier each key
 carries in `settings.js` (`live` / `stored` / `unavailable`).

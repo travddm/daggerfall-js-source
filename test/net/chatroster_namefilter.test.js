@@ -16,7 +16,7 @@ import { CHAT_CSS } from '../../src/ui/chatPanel.js';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const rd = (p) => readFileSync(join(root, p), 'utf8');
 
-// ═══ CHAT-R1: WHO IS HERE, AND IN WHAT ORDER ══════════════════════
+// CHAT-R1: WHO IS HERE, AND IN WHAT ORDER
 
 const session = (id, name, peers) => ({ id, name, peers: new Map(peers.map((p) => [p.id, p])) });
 
@@ -138,7 +138,7 @@ test('CHAT-R1: a name the filter refuses never reaches the roster either', () =>
   assert.deepEqual(r.rows.map((x) => x.name).sort(), ['Ann', FALLBACK_NAME, FALLBACK_NAME]);
 });
 
-// ═══ NAME-F1: THE FILTER ══════════════════════════════════════════
+// NAME-F1: THE FILTER
 
 test('NAME-F1: the words Mac reported are caught, however they are spelled', () => {
   for (const [name, word] of [
@@ -269,7 +269,7 @@ test('NAME-F1: a name with no letters AT ALL is refused - and the leet map decid
   assert.equal(nameAllowed('@@@'), true);
 });
 
-// ═══ NAME-F2: THE RELAY IS THE AUTHORITY ══════════════════════════
+// NAME-F2: THE RELAY IS THE AUTHORITY
 
 test('NAME-F2: sanitizeName replaces a refused name, so a modified client cannot publish one', () => {
   // THE HALF THAT HOLDS. The pane refuses at entry with a reason and
@@ -354,7 +354,7 @@ test('AUDIT-CHATR F2/F3: one ladder, one subject - and an empty ladder is Travel
   assert.equal(entryVerdict('---', 'Alfred').kind, 'empty');
 });
 
-// ═══ CHAT-R2: THE PANEL, DRIVEN ═══════════════════════════════════
+// CHAT-R2: THE PANEL, DRIVEN
 //
 // The roster and the hide button are DOM, so they are driven through
 // the same fake document `test/net/chat1.test.js` uses rather than read out

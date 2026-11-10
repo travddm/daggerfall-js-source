@@ -146,31 +146,31 @@ test('AUDIT SCALE II A-2 a call that is no bookmark read forgets the page\'s boo
   const answer = (mark = null) => json({}, 200, mark ? { 'x-d1-bookmark': mark } : {});
   forgetD1Bookmark();
   noteD1Bookmark(SEC, MARK(5));
-  await call({ fetch: async (u, i) => { asked.push([u, i.headers['x-d1-bookmark'] ?? null]); return answer(MARK(6)); }, secret: SEC }, '/v1/auth/token', {});
+  await call({ fetch: async (u, i) => { asked.push([u, i.headers['x-d1-bookmark'] ?? null]); return answer(MARK(6)); }, base: BASE, secret: SEC }, '/v1/auth/token', {});
   assert.deepEqual(asked.at(-1)[1], MARK(5), 'the mint is a bookmark read: it carries the bookmark');
   assert.equal(d1BookmarkFor(SEC), MARK(6), 'and its answer\'s position is kept');
   let during = 'unasked';
-  await call({ fetch: async (u, i) => { during = [i.headers['x-d1-bookmark'] ?? null, d1BookmarkFor(SEC)]; return answer(); }, secret: SEC }, '/v1/account/insignia', { item: 'x' });
+  await call({ fetch: async (u, i) => { during = [i.headers['x-d1-bookmark'] ?? null, d1BookmarkFor(SEC)]; return answer(); }, base: BASE, secret: SEC }, '/v1/account/insignia', { item: 'x' });
   assert.deepEqual(during, [null, null], 'a write carries none, and the page holds none while it is on the wire');
   assert.equal(d1BookmarkFor(SEC), null);
   // a read on the wire when a write is sent: its answer may predate the write, and is not kept
   noteD1Bookmark(SEC, MARK(5));
   const slow = deferred();
-  const reading = call({ fetch: () => slow.p, secret: SEC }, '/v1/heartbeat', { beat: true });
-  await call({ fetch: async () => answer(), secret: SEC }, '/v1/renown/xp', { xp: 1 });
+  const reading = call({ fetch: () => slow.p, base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
+  await call({ fetch: async () => answer(), base: BASE, secret: SEC }, '/v1/renown/xp', { xp: 1 });
   slow.resolve(answer(MARK(9)));
   assert.equal((await reading).ok, true);
   assert.equal(d1BookmarkFor(SEC), null, 'a read sent before the write keeps nothing it is answered after it');
   // a read answered while a write is on the wire is let go once the write is answered
   const writing = deferred();
-  const w = call({ fetch: () => writing.p, secret: SEC }, '/v1/renown/xp', { xp: 1 });
-  await call({ fetch: async () => answer(MARK(9)), secret: SEC }, '/v1/heartbeat', { beat: true });
+  const w = call({ fetch: () => writing.p, base: BASE, secret: SEC }, '/v1/renown/xp', { xp: 1 });
+  await call({ fetch: async () => answer(MARK(9)), base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.equal(d1BookmarkFor(SEC), MARK(9), 'a read sent after the write was sent keeps its answer for now');
   writing.resolve(answer());
   await w;
   assert.equal(d1BookmarkFor(SEC), null, 'and lets it go when the write is answered - it may have been read before the write landed');
   // a read alone keeps its answer (the law above is the write's, not every read's)
-  await call({ fetch: async () => answer(MARK(11)), secret: SEC }, '/v1/heartbeat', { beat: true });
+  await call({ fetch: async () => answer(MARK(11)), base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.equal(d1BookmarkFor(SEC), MARK(11));
 
   // the doors that write outside `call`: the realm's (a join, a checkpoint) and the cloud saves'
@@ -186,7 +186,7 @@ test('AUDIT SCALE II A-2 a call that is no bookmark read forgets the page\'s boo
     let held = 'unasked';
     await door(async () => {
       held = d1BookmarkFor(SEC);
-      await call({ fetch: async () => answer(MARK(21)), secret: SEC }, '/v1/heartbeat', { beat: true });   // a read answered meanwhile
+      await call({ fetch: async () => answer(MARK(21)), base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });   // a read answered meanwhile
       return json({ ok: true, id: 'x', lease: 'l', seq: 0, saves: [], characters: [] });
     });
     if (writes) {
@@ -213,29 +213,29 @@ test('AUDIT SCALE II A-6 C-7 a call that could not be made forgets the page\'s b
   };
   forgetD1Bookmark();
   noteD1Bookmark(SEC, '0000007f-0018eec1-00005100-e64ff3f326d6a57102822126be10d5fb');
-  const first = await call({ fetch: browser, secret: SEC }, '/v1/heartbeat', { beat: true });
+  const first = await call({ fetch: browser, base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.deepEqual(first, { ok: false, error: 'offline' });
   assert.ok(sent[0].includes('x-d1-bookmark'));
   assert.equal(d1BookmarkFor(SEC), null, 'a call that could not be made lets the bookmark go');
-  const second = await call({ fetch: browser, secret: SEC }, '/v1/heartbeat', { beat: true });
+  const second = await call({ fetch: browser, base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.equal(second.ok, true, 'the next call reaches the rolled-back service');
   assert.ok(!sent[1].includes('x-d1-bookmark'));
 
   // C-7: a bookmark read answered with no bookmark (acct111 says none, and its preflight would refuse the next)
   noteD1Bookmark(SEC, MARK(5));
   const quiet = async () => json({ ok: true });
-  await call({ fetch: quiet, secret: SEC }, '/v1/heartbeat', { beat: true });
+  await call({ fetch: quiet, base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.equal(d1BookmarkFor(SEC), null, 'a read answered with none lets the page\'s go');
   // ...under the same secret only: another session's kept one is not this answer's to drop
   noteD1Bookmark('secret-other-0123456789', MARK(5));
-  await call({ fetch: quiet, secret: SEC }, '/v1/heartbeat', { beat: true });
+  await call({ fetch: quiet, base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.equal(d1BookmarkFor('secret-other-0123456789'), MARK(5));
   // a malformed one is no bookmark and is never kept - and lets nothing go (SCALE4g's own law)
   noteD1Bookmark(SEC, MARK(5));
-  await call({ fetch: async () => json({}, 200, { 'x-d1-bookmark': 'not a bookmark!' }), secret: SEC }, '/v1/heartbeat', {});
+  await call({ fetch: async () => json({}, 200, { 'x-d1-bookmark': 'not a bookmark!' }), base: BASE, secret: SEC }, '/v1/heartbeat', {});
   assert.equal(d1BookmarkFor(SEC), MARK(5));
   // a 2xx whose body never came is `offline` too (MARKET-AUDIT P1's law): the bookmark goes with it
-  const cut = await call({ fetch: async () => new Response('{"beat":', { status: 200, headers: { 'content-type': 'application/json', 'x-d1-bookmark': MARK(6) } }), secret: SEC }, '/v1/heartbeat', { beat: true });
+  const cut = await call({ fetch: async () => new Response('{"beat":', { status: 200, headers: { 'content-type': 'application/json', 'x-d1-bookmark': MARK(6) } }), base: BASE, secret: SEC }, '/v1/heartbeat', { beat: true });
   assert.equal(cut.error, 'offline');
   assert.equal(d1BookmarkFor(SEC), null, 'an answer that never arrived whole forgets it');
   forgetD1Bookmark();
@@ -325,7 +325,7 @@ test('AUDIT SCALE II L4a a place in the sign-in line holds the next mint for the
   const who = await S.registered('Aldric');
   let down = false;
   const tab = async (u, i) => (down ? json({ error: 'server' }, 500) : S.fetch(u, { ...i, headers: { ...i.headers, 'cf-connecting-ip': '10.9.9.9' } }));
-  const q = await mintIdentity({ fetch: tab, secret: who.secret }, null);
+  const q = await mintIdentity({ fetch: tab, base: BASE, secret: who.secret }, null);
   assert.deepEqual({ error: q.error, position: q.position, wait: q.wait, status: q.status }, { error: 'queue', position: 1, wait: 10_000, status: 503 }, 'the call answers the line\'s place and wait');
   let clock = 1_000_000;
   const minter = client.accountTokenMinter({ fetch: tab, storage: sessionStorageOf(SESSION_KEY, who), now: () => clock, rand: () => 0.5 });

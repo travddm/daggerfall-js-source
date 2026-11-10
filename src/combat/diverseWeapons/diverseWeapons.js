@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW1 - DIVERSE WEAPONS 1.7.3 (RealAKP; script by RealAKP & Kirk.O, MIT)
 //
 //
@@ -32,7 +31,6 @@
 // customTexture) - and both take this law through the same two doors
 // below, because in DFU both read the same static and the same
 // TextureReplacement folder.
-// ═══════════════════════════════════════════════════════════════════
 
 import { modSetting, flattenModPreset } from '../../systems/modSettings.js';
 import { WEAPONS } from '../../characters/weapons.js';
@@ -179,8 +177,7 @@ export function atlasFileName(item, classic, enabled = moddedWeaponHUDAnimsEnabl
  * preset would throw away every strike frame the mod paints; so the
  * `w_` ask falls through to the plain one, and the preset means what
  * the mod's author meant by it. The port's own reading, said here
- * rather than buried: Weapon Widget's IL record (bible/05-Combat/
- * Weapon-Widget.md) names GetWeaponFilename and TryImportCifRci among
+ * rather than buried: Weapon Widget's IL record names GetWeaponFilename and TryImportCifRci among
  * the members the clone calls and does not name GetModdedWeaponFilename;
  * the clone's own atlas cache is keyed on the weapon's template
  * (LoadWeaponAtlas 0x29a8, `currentTemplateIndex`), which a per-class

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // HOME-PRICE (AUDIT HOME-PRICE E4/C4, 2026-10-04) — HOW A HOME'S GOLD IS SAID.
 //
 // The sums a home's lines say, and the account they say its gold moves in -
@@ -9,7 +8,6 @@
 // imports nothing: systems/online/onlineHomes.js, systems/homeRent.js,
 // systems/arena/arenaText.js and scenes/decor/decorTool.js all read it, and onlineHomes
 // already imports homeRent and arenaText.
-// ═══════════════════════════════════════════════════════════════════
 
 /** A sum of gold as every home's line says it - 250,000, never 250000 (HALL-GOLD's spelling). */
 export const goldSum = (n) => Number(n).toLocaleString('en-US');

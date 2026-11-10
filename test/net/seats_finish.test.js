@@ -1,6 +1,6 @@
 // AUDIT-SEATS: THE SEATS
-// ARC'S OPEN ITEMS, FINISHED - each test one item the bible had left NOT YET (,
-// `06-Systems/Online-Arc.md` AUDIT-SEATS). Driven through the real Worker over node:sqlite where the service is
+// ARC'S OPEN ITEMS, FINISHED - each test one item the bible had left NOT YET (AUDIT-SEATS).
+// Driven through the real Worker over node:sqlite where the service is
 // touched (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

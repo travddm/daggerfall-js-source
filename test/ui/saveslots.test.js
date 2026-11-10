@@ -154,7 +154,7 @@ test('SAV4: a realTime TIE keeps the first-enumerated key (FindMostRecentSave is
   assert.equal(findMostRecentSave(s), 0, 'the tie is not stolen by the later key');
 });
 
-// ═══════════════════ SAV4: the save/load window behaviors ═══════════════════
+// SAV4: the save/load window behaviors
 
 import {
   SaveWindow, MAIN_PANEL, SW_RECTS, SW_COLORS, SW_LIST_ROWS,

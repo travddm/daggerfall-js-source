@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   rollCampEncounter, rollCampEncounterOnChunkLoad, amGroupRollOwner, campWindowOpen, rollCampKind, rollCampChance,
-  rollCampChanceOnChunkLoad, CAMP_WINDOW_MINUTES, CAMP_WINDOW_REAL_MINUTES, CAMP_SIZE, PACK_SIZE, CAMP_SPACING,
+  rollCampChanceOnChunkLoad, campWindowMinutes, CAMP_WINDOW_REAL_MINUTES, CAMP_SIZE, PACK_SIZE, CAMP_SPACING,
   PACK_SPACING, CAMP_ALERT_RADIUS, PACK_ALERT_RADIUS, MIN_CAMP_SPAWN_DISTANCE, MAX_CAMP_SPAWN_DISTANCE,
   CAMP_CHANCE, CAMP_CHANCE_ON_CHUNK_LOAD, GROUP_ROLL_RADIUS, campAnchorSpot,
 } from '../../src/systems/campEncounters.js';
@@ -16,7 +16,7 @@ import { CLIMATES } from '../../src/formats/mapsFile.js';
 import { FEATURES } from '../../src/systems/features.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// ═══ CAMP1: WILDERNESS CAMPS AND PACKS ═════════════════════════════
+// CAMP1: WILDERNESS CAMPS AND PACKS
 //
 // Mac, 2026-09-17 ("daggerfalljsWildlifeSpawnsRespawn"): a rare group
 // encounter outdoors - a settled camp or a pack crossing your path -
@@ -52,8 +52,8 @@ const WILD = { inside: false, inLocationRect: false, preventEnemySpawns: false, 
 
 test('CAMP1: the window is 15 REAL minutes of play, stated in game minutes through the one clock rate, and opens on exactly those minutes', () => {
   assert.equal(CAMP_WINDOW_REAL_MINUTES, 15);
-  assert.equal(CAMP_WINDOW_MINUTES, 15 * 60 * CLASSIC_MINUTES_PER_SECOND);
-  assert.equal(CAMP_WINDOW_MINUTES, 180, 'TimeScale 12: 180 game minutes');
+  assert.equal(campWindowMinutes(), 15 * 60 * CLASSIC_MINUTES_PER_SECOND);
+  assert.equal(campWindowMinutes(), 180, 'TimeScale 12: 180 game minutes');
   assert.equal(campWindowOpen(0), true);
   assert.equal(campWindowOpen(179), false);
   assert.equal(campWindowOpen(180), true);
@@ -286,7 +286,7 @@ test('CAMP-REST by source: every time skip is spent through the tick as a rest, 
   assert.match(ef, /noTargetMode: campAsleep,[^\n]*\n\s*dropLocal: wildUnaware,/, 'the target machine leaves the player off its list for it (WILD-ALERT: and the local player alone for a wilderness foe that has not noticed a fast traveller - test/scenes/wildalert.test.js, test/systems/wildalertfix.test.js)');
 });
 
-// ═══ CAMP-FAR ══════════════════════════════════════════
+// CAMP-FAR
 //
 // The band moves out, and the
 // anchor gets its own placement law, because DFU's ring cannot reach:

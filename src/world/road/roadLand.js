@@ -128,7 +128,7 @@ export function landForRoutes(heights, water, keep, W, H, dials = VOYAGER_DIALS,
   return { height, shore, ford, grain, river: /** @type {?Float32Array} */ (null), d, step: landStep };
 }
 
-/** RIVER-FORDS (AUDIT RELEASE R1-3,; `03-World/Roads.md` RIVER-FORDS): A CARVED
+/** RIVER-FORDS (AUDIT RELEASE R1-3): A CARVED
  *  RIVER'S CHANNEL IS A FORD. CYRODIIL-WATERS carves its rivers narrower than a pixel inside the kernel, so the pixels'
  *  bytes carry none and the roads crossed them anywhere, along them too, priced as dry ground. Now a step onto a channel's
  *  pixel (world/tamriel/tamrielWaters.js riverRaster, the router's question) - or a diagonal between two, through the

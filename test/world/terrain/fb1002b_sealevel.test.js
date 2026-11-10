@@ -15,7 +15,7 @@
 // Every pin runs the real modules: the sampler's sea (world/terrain/terrainSampler.js), the mod's flatten, Unity's
 // SampleHeight (world/terrain/terrainSurface.js), Deep Waters' hole mask (world/deepWater/deepWaterFloor.js), world.js's own csaTerrainOf
 // lifted from its source, and Come Sail Away's runtime over the vendored hulls (test/csaScene.mjs). Each is red on the
-// record's own code (e2466e2bd). `01-Overview/bugs/Field-Bugs-2026-10-02b.md`.
+// record's own code (e2466e2bd).
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

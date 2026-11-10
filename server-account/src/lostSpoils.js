@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LOST-SPOILS - THE LOST AND FOUND, THE SERVICE'S SIDE.
 //
 // The owner: "I want to utilize the mailbox as a way to obtain lost
@@ -11,7 +10,7 @@
 // Found - each claimed from the mailbox as any gift is (post.js
 // claimPost), charged to the wealth budget as a floor's piece is.
 //
-// ═══ UNDER A KILL THE SERVICE RECORDED ═════════════════════════════
+// UNDER A KILL THE SERVICE RECORDED
 //
 // The client rolls the spoils; the service never did, and cannot (the
 // roll reads the player's mods and prefs as well as the seed). What the
@@ -21,7 +20,7 @@
 // - the client asks again: the receipt's own claim may still be on its
 // way). A row older than LOST_WINDOW_S takes none (`lost-spent`).
 //
-// ═══ ONCE A PIECE ══════════════════════════════════════════════════
+// ONCE A PIECE
 //
 // A piece's batch is its kill and its place in the spoils as rolled
 // (lostLaw.js lostBatchOf), under server_post's one-a-batch index: a
@@ -30,7 +29,6 @@
 // before any other check, so a send that landed is never refused later
 // (past the window, past the account's bound) into a second copy in the
 // pack. A place is under LOST_INDEX_MAX, so no kill holds more.
-// ═══════════════════════════════════════════════════════════════════
 import { itemFindings } from '../../src/systems/item/itemLaw.js';
 import { LOST_BATCH, LOST_WINDOW_S, LOST_WAITING_MAX, lostKillOf, lostBatchOf, lostPiecesOf } from '../../src/net/lostLaw.js';
 import { GILDED, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';

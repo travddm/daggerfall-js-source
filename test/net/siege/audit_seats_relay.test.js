@@ -2,7 +2,7 @@
 // ARC'S RELAY, AUDITED - every finding reproduced here before its fix and pinned after it, over the real Room on its fake
 // sockets (test/fakeRoom.mjs), the real referee (net/siege/siegeRef.js), the real receipts (net/siege/siegeReceipt.js) and, for the
 // late pass, the real account Worker (test/accountDb.mjs). 6.1-6.8, 7.3, 7.6, 9.2, 16;
-// `06-Systems/Online-Arc.md` PVP-REF, SEAT2a, CROWN1.
+// PVP-REF, SEAT2a, CROWN1.
 //
 //   R1  a climb is a step, and a point has a height        R6  a fighter back past the window collects its receipt
 //   R2  the step's allowance is carried, never re-earned   R7  the Watch ticks in the pose's own cell alone

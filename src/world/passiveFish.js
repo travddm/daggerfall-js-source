@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DW-E3: ILIAC PUDDLE NO MORE'S PASSIVE FISH - the species
 // and the laws a fish lives by, as pure functions (jet082, 1.2.2):
 // PassiveFishSpecies.cs, PassiveFishSpeciesCatalog.cs, PassiveFishSchool
@@ -29,7 +28,6 @@
 //
 // THE DRAWS. Every one is an unseeded UnityEngine.Random draw, and rides
 // the host's injectable roll (Port-Ledger A, the engine-PRNG rule).
-// ═══════════════════════════════════════════════════════════════════
 
 import { WATER_BIOME, climateToBiome } from './underwater/underwaterDecorations.js';
 import { rangeInt, rangeFloat } from '../systems/unleveledLoot.js';   // Random.Range(int, int) and (float, float)

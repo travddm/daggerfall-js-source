@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL3-PLAYERS - THE PANEL'S PLAYERS: a search over every account, online or not, by handle or character name (mob,
 // 03:23Z); one account's profile, read tab by tab; its devices and Sign out everywhere; and the rename of an offensive
 // handle or character name (the last was done by hand). Admins alone: Moderators have no profile screen
@@ -84,8 +83,6 @@ export const NAME_COPIES = Object.freeze([
   // account's own line naming a material spelled as its old handle is renamed too; name the kinds if that ever matters
   ['marks_ledger', 'who', 'actor = ?3'],
   ['town_seat_pledges', 'set_by'], ['town_seat_windows', 'set_by'], ['town_seat_hires', 'by_name'], ['town_seat_edicts', 'set_by'],
-  ['poi_revs', 'author_name', 'author = ?3'], ['poi_revs', 'reviewer_name', 'reviewer = ?3'], ['poi_shelf', 'by_name', 'by = ?3'], ['poi_shelf', 'updated_by'],
-  ['poi_shelf', 'gone_by'],
 ]);
 /** A character list read at most this many (D1 binds 100 a statement). */
 const CHARS_READ_MAX = 90;

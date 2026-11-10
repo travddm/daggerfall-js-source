@@ -91,7 +91,7 @@ test('AUDIT PRE-MERGE 0929 T2: the site is published only once the account servi
   assert.match(deployJob, /BASE: \$\{\{ needs\.site\.outputs\.account_base \}\}/);
   // the loop itself, over a service that answers as the real one does (`{ ok, v }`, index.js /v1/health)
   const loop = runBlock(deployJob, 'Wait for the account service to serve this build\'s version');
-  const against = (answers, { upto = 0 } = {}) => {
+  const against = (answers, { upto = 0, base = 'https://svc.invalid' } = {}) => {
     // each ask runs in the $( ) subshell the step puts it in, so the stub counts its asks in a file, not a variable;
     // `upto` cuts the loop's `seq` short (DEPLOY-WAIT: 1050 asks of stubs cost the suite twelve seconds) - the count
     // itself is read off the source below
@@ -101,9 +101,11 @@ sleep() { :; }
 ${upto ? `seq() { command seq 1 ${upto}; }\n` : ''}${loop}`;
     const calls = join(mkdtempSync(join(tmpdir(), 'a0929-')), 'calls');
     writeFileSync(calls, '');
-    const res = bash(script, { WANT: 'acct20', BASE: 'https://svc.invalid', CALLS: calls });
+    const res = bash(script, { WANT: 'acct20', BASE: base, CALLS: calls });
     return { status: res.status, asked: readFileSync(calls, 'utf8').trim().split('\n').filter(Boolean) };
   };
+  const none = against(['{"ok":true,"v":"acct19"}'], { base: '' });
+  assert.deepEqual([none.status, none.asked.length], [0, 0], 'no built-in account service (decision 116 (8)): nothing to wait on');
   const now = against(['{"ok":true,"v":"acct20"}']);
   assert.deepEqual([now.status, now.asked.length], [0, 1], 'a service already serving it: one request');
   assert.match(now.asked[0], /https:\/\/svc\.invalid\/v1\/health/);

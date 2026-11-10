@@ -9,7 +9,6 @@
 // desert towns (the real-data pin below): 5,166 of 11,701 houses refused a piece 1.5 m before their ground-floor door.
 // Now a building's ground is what its models' faces cover seen from above (modelFootRects - roofs, eaves, treads, never
 // a wall), recorded at the build beside the box (world.js `rects`), and the house and its neighbours are asked of that.
-// `01-Overview/bugs/Field-Bugs-2026-10-09.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

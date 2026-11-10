@@ -1,6 +1,6 @@
 // @ts-check
 // LW1: FRIENDS AND ENEMIES - how each resident of the living world
-// regards the player's character (LW0 decision 6: the world is shared; how it feels about you is yours).
+// regards the player's character (the world is shared; how it feels about you is yours).
 //
 // A REGARD per resident, from HOSTILE_AT and below to FRIEND_AT and above, kept by the resident's id (census.js:
 // `L<mapId>.<slot>` - the same person wherever they walk). Nothing is kept for a resident the player has not met: a
@@ -64,7 +64,7 @@ export const TALE_KINDS = Object.freeze(['home', 'routed', 'held']);
  *  (`wares`: the goods gone from its shelf and the coin its purse paid out, by trip, the WARES_MAX newest kept), the
  *  crimes a witness is carrying to a town (`reports`, REPORTS_MAX), and the escort the character is hired on (`escort`,
  *  one at a time) - each written into the save only once there is one (`road`, beside `people` and `turns`: an add-only
- *  key, decision 10). */
+ *  key). */
 export const WARES_MAX = 40;
 export const REPORTS_MAX = 40;
 /** AUDIT LW-II C10: a report's crime is one of the law's (crimes.js CRIMES, never None) and its region one of the map's

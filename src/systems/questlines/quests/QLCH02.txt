@@ -1,4 +1,4 @@
--- QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.1): THE COVENS' HOARD, step 2 of 3.
+-- QL12 (2026-10-19; docs/systems/quests.md): THE COVENS' HOARD, step 2 of 3.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner: Ysolde's words
 -- are in the journal at once. A coven lieutenant in a remote dungeon, as a Mages Guild quest sends one (M0B30Y04's
 -- `reveal` and `place foe`), named by the machine's own name banks (`=lieutenant_`, Foe.cs SetFoeName); the key is

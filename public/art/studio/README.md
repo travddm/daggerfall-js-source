@@ -4,8 +4,6 @@ This folder is where the game's artists put their pictures. Drop a PNG in your f
 replaces, and the game wears it: on the next load of the dev server, and on the site and the desktop app after the
 next deploy. There is no list to edit and no tool you have to run.
 
-The design record is `bible/07-Rendering/Studio-Art.md`.
-
 ## Your folder
 
 ```

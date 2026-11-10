@@ -22,7 +22,7 @@ test('GROUND-GATE the law is the ground: the shaped ground this tree stands (lan
   const { most, at } = groundMoved(recorded, groundPrint());
   assert.ok(most <= GROUND_PRINT_TOLERANCE_M,
     `THE GROUND MOVED under GROUND_LAW ${GROUND_LAW}: ${most} m at ${at}.\n`
-    + '  A copy on the old ground draws every peer on this one in the air (or under it) - bible/03-World/Landforms.md C2.\n'
+    + '  A copy on the old ground draws every peer on this one in the air (or under it).\n'
     + '  Bump GROUND_LAW in src/net/wire.js (and RELAY_VERSION: the relay refuses the old ground by it), then record the\n'
     + '  print: node tools/groundPrint.mjs --write. Every copy before the bump is turned away while groundGate is on.');
   assert.ok(Object.keys(recorded.cells).some((k) => k.startsWith('Desert@')), 'the Alik\'r\'s dunes among them - the report\'s ground');

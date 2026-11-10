@@ -62,7 +62,7 @@ export const GREAVES = 'Armor:104', SHORTSWORD = 'Weapons:116', GOLD = 'Currency
 export const PILE2 = () => generateItems('F', { level: 10, gender: 'male' }, lcg(8)).map((it) => ({ ...it }));
 export const BROADSWORD = 'Weapons:118', PINE = 'PlantIngredients1:14';
 
-// ═══ THE CELL: a clock, a relay stand-in and the players ═══════════════════════════════════════════════════════════
+// THE CELL: a clock, a relay stand-in and the players
 export const clock = { t: 1_000_000 };
 /** THE RELAY, as far as a pool's two lanes go: a hit is routed to its `to` (the relay reads no further - WORLD6b-iii(c)),
  *  each direction `from>to` as late as the test says; a foes frame goes to everyone else in the cell. The sender's door
@@ -194,7 +194,7 @@ export function streetPlayer(net, id, feet) {
   return p;
 }
 
-// ═══ A BUILDING: the interior pool as worldModes.js wires it, sliced out of the host ════════════════════════════════
+// A BUILDING: the interior pool as worldModes.js wires it, sliced out of the host
 /** The host and every module moved out of it (HOST-SPLIT), each parsed once. */
 const WM = ['src/scenes/worldModes.js', ...movedOutOf('src/scenes/worldModes.js')].map((p) => { const src = rd(p); return { p, src, ast: acorn.parse(src, { ecmaVersion: 'latest', sourceType: 'module' }) }; });
 function findIn(ast, pred) {
@@ -326,7 +326,7 @@ export async function offlineOwner() {
   };
 }
 
-// ═══ THE SCENE: Bob's foe falls, his party members stand over its body ═════════════════════════════════════════════
+// THE SCENE: Bob's foe falls, his party members stand over its body
 /** Bob (the owner) and the takers: Bob's foe stands - the takers see it alive first, as a party member in the field
  *  does - and falls with the PILE; every taker's puppet of it says so. Each taker stands at the body.
  *
@@ -516,7 +516,7 @@ export const plaque = (p, key) => resolveHover({ key, distance: 1, reach: 3.75 }
 export const saysEmpty = (f) => f?.kind === 'items' && f.empty === true;
 export const SETTLED_MS = 120_000;   // past every timeout the street has (TAKE_WINDOW_MS, GRANT_BACK_MS, FOES_STALE_MS) and any a fix adds, many times over
 
-// ═══ SCENARIO DRIVERS ═════════════════════════════════════════════════════════════════════════════════════════════════
+// SCENARIO DRIVERS
 /** Mac presses Bob's body through the window, choosing the Greaves; the owner's answer (`bob>mac`) or the ask
  *  (`mac>bob`) runs as late as the test says; once every timeout has passed each piece is in exactly one place. */
 export async function lateCase(where, { answerLate = 0, askLate = 0 } = {}) {

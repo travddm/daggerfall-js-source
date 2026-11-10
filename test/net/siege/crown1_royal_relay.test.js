@@ -4,7 +4,7 @@
 // DUEL1's ring, both whole on their marks; after the countdown the bout's two alone strike each other, every blow the
 // referee's, the ring held by the step; a fall ends it - the winner handed its signed `t1` receipt, the ladder counting
 // it (the same two three times a UTC day); a bout too long a draw, a fighter gone a walkover; the week's end closes it.
-// 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two).
+// 7.6; CROWN1 (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { royalRoomKey, siegeRoomKey, SIEGE_UNITS_PER_M, ROYAL_RING, ROYAL_PAIR_DAY_MAX, ROYAL_LADDER_SHOWN, ROYAL_RC_KEEP } from '../../../src/net/siege/siegeRef.js';

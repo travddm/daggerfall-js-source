@@ -44,7 +44,7 @@ const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const subtle = globalThis.crypto.subtle;
 const quiet = async (fn) => { const w = console.warn, i = console.info; console.warn = () => {}; console.info = () => {}; try { return await fn(); } finally { console.warn = w; console.info = i; } };
 
-// ═══ THE RIG ══════════════════════════════════════════════════════════════════════════════════════
+// THE RIG
 
 const D = 600;
 /** RAID-ROLL: the relay hears only a raid the day drew - A (the honest raid) and B are day D's own slots. */
@@ -75,7 +75,7 @@ const signing = async () => {
 };
 const ledgers = (r) => [...r.store.keys()].filter((k) => k.startsWith('raid:'));
 
-// ═══ THE LAW ══════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('AUDIT RAID R1/R5/R6 law: a raid key is canonical (no leading zero - forty spellings of one raid were forty rows); a raid is its whole tuple - its key and its signature (start, target, party, town pixel), which every honest machine computes alike; a word no day could roll is not sane (mutants: the old key law; the signature missing a field; sanity by the window alone)', () => {
   for (const ok of ['3:7:600', '0:0:0', '61:9999:9999999', '10:100:1']) assert.ok(RAID_KEY_RE.test(ok), ok);
@@ -109,7 +109,7 @@ test('AUDIT RAID R3 law: WHICH LEDGER GIVES ITS PLACE - never a cleansed one (it
   assert.equal(RAID_LEDGERS_MAX, 8); assert.equal(RAID_LEDGERS_BY_MAX, 2);
 });
 
-// ═══ THE RELAY ════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 test('AUDIT RAID R1 relay: A SOCKET\'S FIRST WORD NO LONGER DECIDES AN HONEST RAID - a word off the town\'s pixel makes nothing; a forged tuple on its own pixel is its own ledger and cleanse; the honest defenders\' words make theirs, count, and cleanse it at ITS target, and the cleanse carries its signature (mutants: the ledger made off the town; the key alone the ledger\'s identity; the cleanse unsigned)', async () => {
   const { pkcs8 } = await signing();
@@ -245,7 +245,7 @@ test('AUDIT RAID R7 relay: THE HUB\'S LIST IS WRITTEN BEFORE ITS COPY MOVES - a 
   });
 });
 
-// ═══ THE SESSION ══════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
 test('AUDIT RAID R8b session: A HALO SAYS FOR ITSELF - a raid word goes down a halo only when the halo\'s own relay keeps raids (a halo on an older object, a deploy under way, closed on the frame); the primary\'s word is the primary\'s (mutants: the halo sent on the primary\'s word)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
@@ -268,7 +268,7 @@ test('AUDIT RAID R8b session: A HALO SAYS FOR ITSELF - a raid word goes down a h
   } finally { console.info = log; }
 });
 
-// ═══ THE ACCOUNT SERVICE ══════════════════════════════════════════════════════════════════════════
+// THE ACCOUNT SERVICE
 
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
 function d1() {
@@ -365,7 +365,7 @@ test('AUDIT RAID R5 service: A RAID\'S RENOWN IS THE HOUR\'S - charged to the ac
   assert.equal(db._raw.prepare('SELECT renown_hour_xp AS x FROM players WHERE id = ?').get(B.id).x, 0, 'no place to pay: the hour untouched');
 });
 
-// ═══ THE DEVICE ═══════════════════════════════════════════════════════════════════════════════════
+// THE DEVICE
 
 const memStore = () => { const m = new Map(); return { get: (k) => (m.has(k) ? JSON.parse(m.get(k)) : undefined), set: (k, v) => m.set(k, JSON.stringify(v)), remove: (k) => m.delete(k), m }; };
 

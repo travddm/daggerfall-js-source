@@ -75,7 +75,7 @@ async function stand(extra = {}) {
   const caseOn = (who, cols = {}) => {
     const id = (++n).toString(16).padStart(16, 'c');
     const t = nowS();
-    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: 1, credible: 1, ai_state: 'off', discord_state: 'off', ...cols };
+    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: 1, credible: 1, ai_state: 'off', ...cols };
     raw.prepare(`INSERT INTO mod_cases (${Object.keys(row).join(', ')}) VALUES (${Object.keys(row).map(() => '?').join(', ')})`).run(...Object.values(row));
     return id;
   };

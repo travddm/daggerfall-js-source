@@ -4,7 +4,7 @@
 // two sides' rosters signed under 6.4's rules and their caps, closed ten minutes before the start; the Sellswords hired
 // by name with a fee escrowed, signed under the contract or withdrawn; the Seat tab's view of it all; the deploy
 // blackout's question. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// 6.3-6.5; `06-Systems/Online-Arc.md` SEAT2a.
+// 6.3-6.5; SEAT2a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DECOR-ROOMS.
 //
 // A HOUSE OF SEVERAL ROOMS, FOUND IN ITS OWN WALLS. Daggerfall builds a
@@ -27,7 +26,6 @@
 // the panel is up, never a hitch the moment it opens. Pure: the
 // collider's `raycastHit` and the interior's box are arguments.
 // Not a DFU member: Daggerfall Unity has no decorator. Ledger A.
-// ═══════════════════════════════════════════════════════════════════
 
 /** Metres between two samples of the floor. */
 export const DECOR_ROOM_CELL = 1;

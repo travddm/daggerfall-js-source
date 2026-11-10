@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // TOWN-ECON TE2 - THIS DEVICE'S HALF
 // OF THE PLAYERS' SHARE:
 //   - THE SHARES: every town's players' share as the account service answers it (/v1/towns/econ), read once a
@@ -16,7 +15,6 @@
 //     them at the port (TOWN_SEA_REACH_PX of it, TOWN_SEA_TICK_S old at most) - the tick kept, or held for the claim
 //     where it stands beside the town's pixel, and flagged `sea` in the claim. One tick vouches one dealing.
 // Online only: the world host builds none offline.
-// ═══════════════════════════════════════════════════════════════════
 import { readWatchReceipt } from './watchReceipt.js';
 import { jittered } from './backoff.js';   // a failed claim's wait, jittered as every book's is
 import { TOWN_WATCH_CLAIM_MAX, TOWN_ECON_KEPT_S, TOWN_SEA_REACH_PX, TOWN_SEA_TICK_S, townReportOf } from './townEconLaw.js';

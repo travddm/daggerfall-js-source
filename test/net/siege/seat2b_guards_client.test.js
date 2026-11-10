@@ -3,7 +3,7 @@
 // (the guards standing, a revolt's Captain and rebels, its result and its Honours), the session's foes (a guard an
 // attacker's, a rebel and the Captain a defender's; no heal reaches one; the Captain's fall and a fighter cut down said),
 // and the screen's driver - its looks, its acts, its bodies and batches (7.5, 7.7, 19;
-// src/net/siege/siegeLink.js, src/net/siege/siegeSession.js, src/scenes/siegeNpcs.js, src/scenes/world.js). `06-Systems/Online-Arc.md`
+// src/net/siege/siegeLink.js, src/net/siege/siegeSession.js, src/scenes/siegeNpcs.js, src/scenes/world.js).
 // SEAT2b part two (c).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

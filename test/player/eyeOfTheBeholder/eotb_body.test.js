@@ -19,7 +19,7 @@ const MOD = 'eye-of-the-beholder';
 const resetSettings = () => { _resetModSettings(); setModSetting(MOD, 'Graphics.LayeredGear', 0); };
 resetSettings();
 
-// ═══ EOTB5: THE BODY ON SCREEN ════════════════════════════════════
+// EOTB5: THE BODY ON SCREEN
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const viteConfig = readFileSync(join(root, 'vite.config.js'), 'utf8');

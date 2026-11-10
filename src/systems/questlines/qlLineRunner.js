@@ -19,7 +19,7 @@
 // LETTER-PACE: the next courier's hour counts from it). A step's quest is found by NAME on the
 // machine, never by uid, so a restart (QUEST-RESET - a new copy) or a quest set aside (QUEST-SHELF) is still the step.
 //
-// THE SERVICE'S PART (decision 8; net/questlineClaims.js). A step the service pays - a witnessed one or a title's - is
+// THE SERVICE'S PART (net/questlineClaims.js). A step the service pays - a witnessed one or a title's - is
 // CLAIMED twice, each claim saying its phase: `open` when it starts (the service writes the opening - the line's first
 // is its witness's window), `end` when it ends well (the service looks for its receipt, and pays the title). A claim the service could not answer - the network down, the switch shut - or an end it could not witness
 // yet - a receipt not claimed - is asked again: a minute apart CLAIM_TRIES times, then every CLAIM_SLOW_MS for as long

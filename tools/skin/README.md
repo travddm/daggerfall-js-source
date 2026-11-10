@@ -16,7 +16,7 @@ reduced to `skin-intensity.png`, and `snapRamp(ramp, i)` still supplies the race
 **Nothing here touches ARENA2.** The source is our own generated turnaround, so
 the output ships in the repo like `public/logo.png` and needs no data door. This
 is the first character texture in the project that is free of that constraint -
-see `01-Overview/Port-Doctrine.md`.
+see `docs/getting-started.md` ("Rules that hold everywhere").
 
 ## Stages
 

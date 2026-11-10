@@ -93,7 +93,7 @@ function toReckoning(run) {
   return run;
 }
 
-// ═══ THE LAW ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('WB14f the gaoler: a Ward-Bearer\'s body, Pulse and rising under another name; kind 7 on the wire; a captive only on a Captive night, each of its moments 0 until it comes; the knight the day\'s, a Dame drawn as Daggerfall\'s woman knight (mutants: a gaoler that walks; a captive on a plain night)', () => {
   const G = HOST_KINDS[HOST.gaoler], B = HOST_KINDS[HOST.bearer];
@@ -204,7 +204,7 @@ test('WB14f his freeing: a blow on a gaoler only from the Pen (the floor its bod
   assert.equal(run.out.filter((o) => o.k === 'st').at(-1).cp[2], at);
 });
 
-// ═══ THE WARD ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WARD
 
 test('WB14f the Covenant\'s ward: freed, the next Reckoning is given it at its word (`cpw`); it lands on none of the court - the relay counts nobody - where a Reckoning unwarded strikes each; and it is spent as it lands, said in the state (mutants: the ward given none; the judge counts it; spent before it lands)', () => {
   const run = freeHim(woken(captiveFight(3)));
@@ -263,7 +263,7 @@ test('WB14f a Reckoning broken before it lands gives the ward back - the next on
   assert.equal(late.f.cp.w, 0, 'too late for this one');
 });
 
-// ═══ THE WIRE AND THE FOLD ════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE AND THE FOLD
 
 test('WB14f the wire: the state\'s `cp` (five moments and counts, each 0 until it comes), `cpf` its moment, `cpw` the Reckoning\'s number - each bounded, every other field dropped; the fold holds the Captive by name and lays each word on it (mutants: a `cp` of any length; a `cpw` of no number; the freeing never folded)', () => {
   const st = stateOf(Object.assign(newFight(7, T0, WRATH, 'ruhn', null, ['captive'], null), { cp: { at: T0 + 16_000, n: 2, f: 0, w: 0, s: 0 } }));
@@ -286,7 +286,7 @@ test('WB14f the wire: the state\'s `cp` (five moments and counts, each 0 until i
   assert.equal(GATE_STATE_EMPTY.cp, null);
 });
 
-// ═══ ON MY SCREEN ═════════════════════════════════════════════════════════════════════════════════════════════════
+// ON MY SCREEN
 
 const reckonState = (w) => ({
   ...GATE_STATE_EMPTY, day: 7, boss: 'ruhn', phase: 3, hp: 900, max: 1000, wrathAt: 1e12, x: COURTS[2][0], z: COURTS[2][1], pt: ['captive'], ct: FLOOR.third,

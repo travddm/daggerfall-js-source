@@ -217,7 +217,7 @@ test('EL8: the perf readout - the door, the line, the meter without the extensio
   assert.equal(m.frame({ draws: 1 }), null);
 });
 
-// ═══ VC6d: the per-pass readout ══════════════════════════════════════
+// VC6d: the per-pass readout
 test('VC6d: `?perf=zones` - the spans TILE the frame, the frame\'s own clock stands down, and the meter is found by its context', () => {
   assert.equal(perfZones('?perf=zones'), true);
   assert.equal(perfZones('?air=off&perf=zones&x'), true);

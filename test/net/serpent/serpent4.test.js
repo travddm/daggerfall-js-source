@@ -43,7 +43,7 @@ function surfaced(f, t = T0) {
   return f;
 }
 
-// ═══ ITS WATERS OPEN UNTIL IT DIVES ════════════════════════════════════════════════════════════════
+// ITS WATERS OPEN UNTIL IT DIVES
 
 test('SERPENT4 its waters open until it dives ("The fact they block ships getting in after a while is stupid"): a newcomer is admitted from the rising through the storm\'s breaking to its dive and never after; the countdown counts to the dive from the rising (mutants: admission closed at the storm; admission past the dive; the countdown to the storm)', () => {
   const t = serpentTimes(363);
@@ -56,7 +56,7 @@ test('SERPENT4 its waters open until it dives ("The fact they block ships gettin
   assert.ok(joinSerpentFight(f, 'late', 'L', 20, HULL.Carrack, t.sealAt + 1, serpentAdmits(363, t.sealAt + 1)), 'the late ship joins');
 });
 
-// ═══ A SIXTH OFF ITS HEALTH, ITS THROWS AND THE CANVAS THEY TEAR HALVED ════════════════════════════════════
+// A SIXTH OFF ITS HEALTH, ITS THROWS AND THE CANVAS THEY TEAR HALVED
 
 test('SERPENT4 a sixth off its health ("the snake is way too strong") - each ship brings SERPENT_TTK_S (150) seconds of her reference broadside; its throws are half (SERPENT_THROW_X) and the canvas its blows and its crush tear half (SERPENT_CANVAS_X) - "pushed me away from the snake ... like sailing through molasse" (mutants: the old health; the whole throw; the whole canvas)', () => {
   assert.equal(SERPENT_TTK_S, 150);
@@ -75,7 +75,7 @@ test('SERPENT4 a sixth off its health ("the snake is way too strong") - each shi
   assert.equal(shipHurt(SERPENT_ATTACK_TABLE.roar, whole).hull, Math.round(SERPENT_ATTACK_TABLE.roar.hull * 1000 + SERPENT_ATTACK_TABLE.roar.base), 'its hull as it was');
 });
 
-// ═══ ITS GIRTH ════════════════════════════════════════════════════════════════════════════════════
+// ITS GIRTH
 
 test('SERPENT4 its girth ("make it huge", "hitting with slow projectiles + lag is a challenge"): every radius its first build\'s times SERPENT_GIRTH (1.6) - the great coils 12.5 m through - and every segment\'s box as wide as its radius, so a ball meets it a girth farther off; its length is as it was (mutants: the old girth; the box its old width)', () => {
   assert.equal(SERPENT_GIRTH, 1.6);
@@ -88,7 +88,7 @@ test('SERPENT4 its girth ("make it huge", "hitting with slow projectiles + lag i
   assert.equal(SERPENT_BRAIN_V, 3, 'a game before it aims at the old body - told to reload');
 });
 
-// ═══ WHO EARNS ════════════════════════════════════════════════════════════════════════════════════
+// WHO EARNS
 
 test('SERPENT4 who earns ("it sucks doing damage to the serpent and getting nothing from it if your not near the snake when it dies"): a part dealt (SERPENT_PART_SHARE of her share) earns a stander\'s hoard and SERPENT_RECEIPT_SHARE a dealer\'s, wherever she is at the kill; a quarter of the fight stood within SERPENT_STAND_R (600 m) earns; and the fight\'s kin - who came and earned nothing - are named for the hub (mutants: the dealer\'s bar for a stander; the old stand; the kin counting an earner)', () => {
   assert.deepEqual([SERPENT_PART_SHARE, SERPENT_RECEIPT_SHARE, SERPENT_STOOD_SHARE, SERPENT_STAND_R], [0.025, 0.06, 0.25, 600]);
@@ -142,7 +142,7 @@ test('SERPENT4 a party shares its kill ("Rewards based on party or individual da
   } finally { Date.now = realNow; }
 });
 
-// ═══ ITS GALE ═════════════════════════════════════════════════════════════════════════════════════
+// ITS GALE
 
 /** Her helm taken (a galleon), a wind of the rated strength blowing `off` degrees round from her bow's own way. */
 function helmOn({ off = 90, gale = null } = {}) {
@@ -192,7 +192,7 @@ test('SERPENT4 its gale ("make the wind go crazy where the serpent stands so we 
   assert.equal(R.host.gale(R.ship.boat), null, 'out of its waters');
 });
 
-// ═══ THE SHIPS' BUMPERS ═══════════════════════════════════════════════════════════════════════════
+// THE SHIPS' BUMPERS
 
 test('SERPENT4\'s bumpers RETIRED by HULL-PASS (Field-Bugs-2026-10-26d, "too many people out there bumping into each other ruining their shots"): the naval host adds nothing to the serpent\'s own drift and no bumper is left in its code - the source read, as these laws are (AUDIT FB1026d E11: that the serpent\'s waters, on the Bay\'s packet lanes, are never a PvP zone is Sea-Serpent.md\'s word, run against the world\'s lanes nowhere here)', () => {
   const naval = src('scenes/naval/navalHost.js');
@@ -200,7 +200,7 @@ test('SERPENT4\'s bumpers RETIRED by HULL-PASS (Field-Bugs-2026-10-26d, "too man
   assert.equal(/withBumpers|bumperDrift|BUMPER_GAIN/.test(naval.replace(/\/\*[\s\S]*?\*\//g, '')), false, 'no bumper in the code');
 });
 
-// ═══ A HAND'S OWN WEAPONS ═════════════════════════════════════════════════════════════════════════
+// A HAND'S OWN WEAPONS
 
 test('SERPENT4 a hand\'s own weapons ("also let players on the ship be able to hurt it"): a player aboard no ship of her own strikes it with her shafts and spells on a hand\'s purse (SERPENT_HAND_REF), from within SERPENT_HAND_REACH_M; on her own ship a hand\'s blow is not heard (her purse is her guns); her part is measured against SERPENT_HAND_SHARE; the wire carries the word\'s `r` (mutants: a hand\'s blow on the ship\'s purse; a captain\'s arrows heard; the hand\'s reach a gun\'s; a hand\'s part unmeasured)', () => {
   const f = surfaced(fightOf([HULL.SmallShip, -1]));
@@ -269,7 +269,7 @@ test('SERPENT4 a hand\'s weapons on the client: its segments are a hand\'s marks
   for (const wired of ['boxMarks: () => serpentHost?.handBoxes?.() ?? null,', 'castAtBox: (sp, q, caster) => serpentSpell.cast(sp, q, caster),', 'boxTargets: serpentHost?.handBoxes?.() ?? null,', 'onPlayerArrowHitBox: (m, t) => serpentArrowOn(m, t),']) assert.ok(world.includes(wired), wired);
 });
 
-// ═══ the client rig ═══════════════════════════════════════════════════════════════════════════════
+// the client rig
 
 function clientRig({ online = false } = {}) {
   let now = 50_000_000, feet = [60, 1, 0];

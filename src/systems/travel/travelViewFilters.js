@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // OW-FILTER - WHAT THE OVERWORLD SHOWS.
 //
 // The player's ask: "all the locations show cause a lot of clutters add a filers to the bottom right
@@ -24,7 +23,6 @@
 //   renown                   - the least Renown (online's level, the number boxed beside a name) a player shows at
 //   nodeKm                   - how far off a gathering group still shows, km (null: as far as they are gathered)
 // A player is shown while the Travellers switch is on, their kin's switch is on and their Renown reaches the floor.
-// ═══════════════════════════════════════════════════════════════════
 import { appStorage } from '../appStorage.js';
 import { FRIEND_CSS } from '../../net/social.js';   // OW-KIN: the friends' blue is the chat's own
 

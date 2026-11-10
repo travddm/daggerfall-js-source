@@ -38,7 +38,7 @@ const POSE = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, ts: 0 };
 const session = (FakeWS, o = {}) => { let t = o.t ?? 1_000_000; const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => t, rand: () => 0, presence: false, ...o.opts }); return { s, adv: (ms) => { t += ms; }, now: () => t }; };
 const finds = (ws) => ws.sent.filter((x) => JSON.parse(x).t === 'find');
 
-// ═══ C-1: `find` ONLY DOWN A WELCOMED SOCKET ══════════════════════════════════════════════════════════════════════
+// C-1: `find` ONLY DOWN A WELCOMED SOCKET
 
 test('AUDIT SCALE II C-1 a search and a guild ask go only down a socket its own welcome has answered: nothing before the welcome, both after it, and a new socket asks nothing until its own welcome; `/find` that is not sent says so (mutants: never reset at a socket; the line\'s words)', async () => {
   await quiet(() => {
@@ -66,7 +66,7 @@ test('AUDIT SCALE II C-1 a search and a guild ask go only down a socket its own 
   assert.match(WORLD, /if \(cmd\.kind === 'find'\) \{ findTab = tabId; const hub = chatLinks\?\.get\('world'\); if \(!hub\?\.sendFind\(cmd\.q\)\) note\(FIND_OFFLINE_TEXT\); return 'read'; \}/, 'the line says why');
 });
 
-// ═══ C-2: THE SHARD FALLBACK, AS A BROWSER FAILS A SOCKET ══════════════════════════════════════════════════════════
+// C-2: THE SHARD FALLBACK, AS A BROWSER FAILS A SOCKET
 
 test('AUDIT SCALE II C-2 a shard a relay refuses, failed as a browser fails it (`error`, then `close`), twice: the link goes to the bus; a shard socket that opened and dropped is no miss (mutants: the miss read off `status`; every close a miss)', async () => {
   await quiet(() => {
@@ -126,7 +126,7 @@ test('AUDIT SCALE II C-2 (found on the way, the same cause) a relay deploy\'s un
   });
 });
 
-// ═══ R3-4 and R3-10: THE LAYER ═════════════════════════════════════════════════════════════════════════════════════
+// R3-4 and R3-10: THE LAYER
 
 test('AUDIT SCALE II R3-4 a party\'s layer is asked of the cell the mate stands in, never a neighbour\'s: a mate in layer 3 of the next cell asks nothing of mine; the leader\'s first in my own; a mate indoors or without a layer, nothing (mutants: a neighbour\'s layer taken; the cell unread)', () => {
   const body = span(/const partyLayerAt = \(key\) => \{[\s\S]*?\n {2}\};/, 'partyLayerAt');
@@ -182,7 +182,7 @@ test('AUDIT SCALE II R3-10 a badge said again (rehello) asks the layer the old s
   });
 });
 
-// ═══ C-3 and C-4: THE HOUR ═════════════════════════════════════════════════════════════════════════════════════════
+// C-3 and C-4: THE HOUR
 
 const HOUR0 = 1_800_000_000_000;   // a clock hour's first instant (500,000 hours)
 /** The account service: a guest whose hour is real (server-account/src/renownTracks.js over node:sqlite). */
@@ -268,7 +268,7 @@ test('AUDIT SCALE II C-4 the host over the real service: six hours just under th
   assert.ok(reports <= 6 * 14, `${reports} reports in six hours - coalesced still (the minute's pace was 360)`);
 });
 
-// ═══ C-5: THE PAGE'S LAST WORD ═════════════════════════════════════════════════════════════════════════════════════
+// C-5: THE PAGE'S LAST WORD
 
 test('AUDIT SCALE II C-5 the page\'s last word carries every region\'s pending - a report each, its own id - and the held report LAST, so the service\'s last id is the one a page brought back sends again, answered a repeat: everything earned credited once (mutants: one region only; the held report first; a report\'s id shared)', async () => {
   const S = await service();
@@ -312,7 +312,7 @@ test('AUDIT SCALE II C-5 the page\'s last word carries every region\'s pending -
   assert.equal(kk.pending(), 350, 'the held 100 and the unsent 250');
 });
 
-// ═══ C-6: THE HUB'S LISTS GO WITH THE ROOM ═════════════════════════════════════════════════════════════════════════
+// C-6: THE HUB'S LISTS GO WITH THE ROOM
 
 test('AUDIT SCALE II C-6 the World, Region and Guild tabs\' lists of everyone online go with the room they were asked in - the seat taken, a refusal, a leave, another region - and the next room\'s welcome asks at once (mutants: kept past a terminal close; kept past a leave; the floors kept)', async () => {
   const names = (src) => rosterRows(src).rows.filter((r) => !r.me).map((r) => r.name);
@@ -366,7 +366,7 @@ test('AUDIT SCALE II C-6 the World, Region and Guild tabs\' lists of everyone on
   });
 });
 
-// ═══ D-7: A RECONNECT THAT NEVER OPENED IS NO WAVE (SCALE2c) ═══════════════════════════════════════════════════════
+// D-7: A RECONNECT THAT NEVER OPENED IS NO WAVE (SCALE2c)
 
 test('AUDIT SCALE II D-7 a page\'s sockets back at their wave\'s slot, failing again before they open (the relay not up yet): no second wave, each at the old retry - the cell, its halos and the hub; and the spread\'s cap exactly (mutants: an unopened primary a drop; an unopened halo a drop; the cap moved)', async () => {
   assert.equal(WAVE_SPREAD_MAX_MS, 40_000, 'the spread\'s cap (bible SCALE2c: 40 s, inside TOKEN_REUSE_MS)');
@@ -383,7 +383,7 @@ test('AUDIT SCALE II D-7 a page\'s sockets back at their wave\'s slot, failing a
   });
 });
 
-// ═══ D-8: A RISE REPORTED AT THE MINUTE'S PACE (SCALE4h) ═══════════════════════════════════════════════════════════
+// D-8: A RISE REPORTED AT THE MINUTE'S PACE (SCALE4h)
 
 test('AUDIT SCALE II D-8 a fighter at Renown 2 over the real Worker: each rise reported within RENOWN_REPORT_MS of the minute it was earned, the half hour\'s reports exactly as the law makes them (mutant: the rise rule unread)', async () => {
   const keep = console.warn; console.warn = () => {};

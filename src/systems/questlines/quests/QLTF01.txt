@@ -1,4 +1,4 @@
--- STAR8 (2026-10-20; bible/11-Multiplayer/Starfall.md section 7): THE THIRTEENTH OF FROSTFALL, step 1 of 4.
+-- STAR8 (2026-10-20): THE THIRTEENTH OF FROSTFALL, step 1 of 4.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner while the
 -- Starfall runs (`needs: ['starfall']`), never offered by a questor: the letter is the offer. A Wyrd Sister at a tavern's
 -- door hands it over - the Witches' Festival's vendors are Glenmoril's own (`ql act wyrd-met 1`, said as her window

@@ -3,7 +3,7 @@
 // from a drop is put at its camp at the door, never only at its `in` (B2); a contender back is counted with the room's
 // contenders (B3); an `in` answered once each SIEGE_IN_MS a socket, the roll call one pass over the sockets (B4); a
 // fighter whose place was taken still collects its held receipt after the result (B5). Over the real Room and its fake
-// sockets (test/fakeRoom.mjs). `06-Systems/Online-Arc.md` AUDIT SEATS-3.
+// sockets (test/fakeRoom.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_HEIGHT_M, SIEGE_NPC, SIEGE_FIGHTERS_MAX, siegeNpcAt, siegeNpcInReach, siegeOffGround, siegeStepLevel, siegeGroundOf, royalLevel, royalMarks, siegeCampPose } from '../../src/net/siege/siegeRef.js';
