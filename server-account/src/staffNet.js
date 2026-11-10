@@ -17,6 +17,7 @@
 // Read from the open panel only, never refreshed by itself: the screen asks when a staff member does.
 import { openStaffFeed, NET_FEED_V, NET_KINDS, NET_FEED_MS } from '../../server/src/staffFeedLaw.js';
 import { gatePublicKey } from './signing.js';
+import { whenOption, NOT_READ } from './operator-options.ts';
 import { displayName } from './accounts.js';
 
 /** The relay's door in - its STAFF_NET_FEED_URL names it (server/src/staffFeeds.js). */
@@ -44,7 +45,7 @@ const KIND_COLS = NET_KINDS.map((k) => `k_${k}`);
  * for one already kept), or `{ error }` (feed-closed: the service holds no relay key; feed-shape; feed-signature; feed-stale).
  * @param {{ db: any, nowS: number, subtle: SubtleCrypto }} ctx @param {any} env @param {Uint8Array} bytes @param {unknown} sig
  */
-export async function takeNetFeed({ db, nowS, subtle }, env, bytes, sig) {
+async function keepNetFeed({ db, nowS, subtle }, env, bytes, sig) {
   const opened = await openStaffFeed(NET_FEED_V, bytes, sig, await gatePublicKey(env, subtle), { subtle, nowMs: nowS * 1000 });
   if ('error' in opened) return opened;
   const b = opened.batch;
@@ -144,3 +145,10 @@ export const HOME_WATCH = Object.freeze({
     return { items: ranked.slice(0, n).map((p) => ({ level: p.level, why: p.why.join(' · '), sub: p.sub, name: p.name })), high: ranked.filter((p) => p.level === 'high').length, total: ranked.length };
   },
 });
+
+/**
+ * The relay's net feed in, kept only while the operator's option `feeds` is on; off, a batch is answered as taken and
+ * dropped, so the relay neither retries it nor logs a refusal.
+ * @param {any} ctx @param {any} env @param {Uint8Array} bytes @param {string|null} sig
+ */
+export const takeNetFeed = (ctx, env, bytes, sig) => whenOption(env, 'feeds', () => keepNetFeed(ctx, env, bytes, sig), NOT_READ);

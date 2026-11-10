@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { Collider } from '../../src/player/collider.js';
 import { toolRig, settle, all } from '../decorFakes.mjs';
 import { SEAT_HALL_DECOR_CAP, SEAT_HALL_CLEAR_M, SEAT_HALL_TEXT, seatHallOf } from '../../src/net/townSeatLaw.js';
-import { accountDecor, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountDecor, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
@@ -89,7 +89,7 @@ test('SEAT-HALL the decorator in the Charter Room (7.2): a piece in a smaller ro
 
 test('SEAT-HALL the account door: `seat` rides a list, a placement, a move and a removal named for the Charter Room, and no other (mutants: each dropped)', async () => {
   const posts = [];
-  const session = new Map([[SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
+  const session = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
   const door = accountDecor({ fetch: async (u, i) => { posts.push([new URL(u).pathname, JSON.parse(i.body)]); return { ok: true, status: 200, json: async () => ({ ok: true }) }; }, storage: { getItem: (k) => session.get(k) ?? null }, listWaitMs: 50 });
   const at = { mapId: 3021, buildingKey: 512, character: 'c1' };
   await door.list(3021, 512, true);

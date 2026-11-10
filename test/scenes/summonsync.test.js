@@ -6,6 +6,7 @@
 // who fights it, handed at a door out to the player nearest it, gone with an owner that left without a word. A shared
 // quest's foe keeps the party's law; a private quest's stays its player's own. Mounted over the context's own statements
 // (test/scenes/questparty3c.test.js's harness); the flag's retirement by source.
+import { stealthCheckRecord } from '../../src/characters/enemy/peer-senses.ts';   // the dungeon record writer's stealth field
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -19,7 +20,7 @@ import { PARTY_ME, noteFighter, foeFighters, partyFoeLoses, partyFoeHeals, party
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';   // AUDIT MW-NPC II K3: the dungeon context's look seed, in the mounted scope
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the mounted scope
 import { bossClockS } from '../../src/systems/bossTraits.js';
-const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };
+const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS, stealthCheckRecord, _peerSenses: { read: () => false } };
 import { partyOnlyQuestShare } from '../../src/scenes/quest/questFoeHost.js';   // QUEST-OWNER: the dungeon's quest seam, narrowed to the party (ownShare)
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
 

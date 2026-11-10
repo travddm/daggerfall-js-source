@@ -31,7 +31,7 @@ async function rig() {
   return { s, raw, aged, post, cases, lines };
 }
 
-test('GRANT7 THREE READERS\' ACCOUNTS IN TEN MINUTES OPEN THE CASE: two are not enough, a guest or a sprout does not count, and a timing word counts for nothing; the third opens a reviewer\'s case on the sender - one line under `grant`, the readers, the foes and why - and the Discord post due; no report is filed and nobody is muted (mutants: a guest counted; a timing word counted; the case a report\'s)', async () => {
+test('GRANT7 THREE READERS\' ACCOUNTS IN TEN MINUTES OPEN THE CASE: two are not enough, a guest or a sprout does not count, and a timing word counts for nothing; the third opens a reviewer\'s case on the sender - one line under `grant`, the readers, the foes and why - no report is filed and nobody is muted (mutants: a guest counted; a timing word counted; the case a report\'s)', async () => {
   assert.deepEqual([GRANT_CASE_READERS, GRANT_CASE_WINDOW_S, GRANT_CASE_TAB], [3, 600, 'grant']);
   const R = await rig();
   const bad = await R.aged('Badger'), ann = await R.aged('Annie'), bo = await R.aged('Bobby'), cy = await R.aged('Cyrus');

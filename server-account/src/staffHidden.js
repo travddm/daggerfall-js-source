@@ -13,10 +13,10 @@
 // session stood, and the relay drops every line a hidden socket says but the staff channel's (server/src/staffHidden.js
 // hiddenMay) - mob could not talk in chat, and his own game was in no room the pen tool's map reads. Now it is off until
 // pressed, for every member (`staff_hide_on` is the switch, default 0, keeping a Hide me pressed under the old default -
-// the audit log's newest `hide` row), and either way the press takes effect AT ONCE: the panel tells the open game, through
-// the staff hook's door (src/net/staffHook.js `relink`), to leave every room and open each again on a fresh token, which this
-// file's mint (hiddenToken) reads the switch for on the primary - hidden from that hello on, or shown. Show myself still
-// pushes its hide orders (hiddenEnd) for a game the panel cannot reach. What chat a hidden staff member may say is not
+// the audit log's newest `hide` row). The press takes effect at the game's next mint: this file's mint (hiddenToken)
+// reads the switch on the primary - hidden from that hello on, or shown. The game has no door that remakes its links at
+// the press: the staff panel extension's hook that did it is removed. Show myself still pushes its hide
+// orders (hiddenEnd), so the hidden sockets close at once. What chat a hidden staff member may say is not
 // decided yet (mob's call): the relay's half is server/src/staffHidden.js HIDDEN_CHAT and hiddenMay, the game's the mint's
 // `hidden` answer (src/net/accountClient.js mintFresh, which drops it today) and the chat's send (scenes/world.js chatSend).
 //
@@ -49,6 +49,7 @@ import { signingKey, gatePublicKey } from './signing.js';
 import { pushLaw } from './sanctions.js';
 import { staffRole, auditStatement, configKey, STAFF_IDLE_S } from './staff.js';
 import { followSubject } from './staffFollow.js';
+import { whenOption, NOT_READ } from './operator-options.ts';
 
 export const HIDDEN_ROUTES = Object.freeze(['/v1/staff/hide']);
 /** The name a hidden token carries - never the account's (wire.js sanitizeName keeps it as it is; a bare "Staff" it does not). */
@@ -103,7 +104,7 @@ const HIDDEN_SINCE_SQL = LAPSED_SQL.replace('SELECT 1 AS held FROM', () => `SELE
  * they sign in again (hidden again) or sign out or press Show myself (visible by their own word).
  * @param {any} ctx @param {any} env @param {any} player the mint's account row @param {CryptoKey} key the identity key
  */
-export async function hiddenToken(ctx, env, player, key) {
+async function mintHiddenToken(ctx, env, player, key) {
   const role = staffRole(player, env);
   if (!role) return null;   // every other account: nothing read, the bytes it always minted
   const { subtle, nowS } = ctx;
@@ -178,8 +179,7 @@ export async function staffHidden(ctx, env, path, body, who, audit) {
     audit('hide', null, { on: body.on }),
   ]);
   if (!on) await hiddenEnd(ctx, env, me.id);   // Show myself: the hidden sockets closed now, never shown
-  // STAFF-HIDE-TOGGLE: Hide me pushes nothing - the panel tells the game to remake its links (staffHook.js `relink`), and each
-  // new socket's mint reads the switch just written
+  // Hide me pushes nothing - each new socket's mint reads the switch just written
   return { hidden: body.on };
 }
 
@@ -188,7 +188,7 @@ export async function staffHidden(ctx, env, path, body, who, audit) {
  * whose session minted the subject. `{ ok }` or `{ error }`.
  * @param {any} ctx @param {any} env @param {Uint8Array} bytes @param {unknown} sig
  */
-export async function takeHiddenSeen(ctx, env, bytes, sig) {
+async function keepHiddenSeen(ctx, env, bytes, sig) {
   const { subtle, nowS } = ctx;
   const db = ctx.primary ?? ctx.db;
   const opened = await openHiddenSeen(bytes, sig, await gatePublicKey(env, subtle), { subtle, nowMs: nowS * 1000 });
@@ -203,3 +203,16 @@ export async function takeHiddenSeen(ctx, env, bytes, sig) {
   await auditStatement(db, nowS, { actor, role: actor ? staffRole(actor, env) : null, act: 'hidden-home', detail: { sub: s, room: r }, keyId: actor?.s_key ?? null, onceIn: 60 }).run();
   return { ok: true };
 }
+
+/**
+ * A staff member's hidden token, minted only while the operator's option `hidden` is on; off, every account gets null,
+ * the bytes a player always gets, so no socket is ever hidden.
+ * @param {any} ctx @param {any} env @param {any} player @param {any} key
+ */
+export const hiddenToken = (ctx, env, player, key) => whenOption(env, 'hidden', () => mintHiddenToken(ctx, env, player, key), null);
+
+/**
+ * The relay's note of a hidden socket in a private home, kept only while the option `hidden` is on; off, dropped.
+ * @param {any} ctx @param {any} env @param {Uint8Array} bytes @param {string|null} sig
+ */
+export const takeHiddenSeen = (ctx, env, bytes, sig) => whenOption(env, 'hidden', () => keepHiddenSeen(ctx, env, bytes, sig), NOT_READ);

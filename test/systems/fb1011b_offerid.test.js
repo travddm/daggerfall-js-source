@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import '../modsOff.js';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { ACCEPTED } from '../../src/net/legalLaw.js';
 import { createTradeManager } from '../../src/net/tradeSession.js';
 import { validTradeData } from '../../src/net/wire.js';
@@ -72,7 +72,7 @@ test('OFFER-ID through the realm: a Rare looted since the last checkpoint is off
   const tabs = {};
   for (const me of ['A', 'B']) {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const io = realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), env), storage });
     const char = await seatRealm(env, g.secret, ents[me].name, JSON.parse(snap(ents[me])));

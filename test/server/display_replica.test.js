@@ -73,12 +73,12 @@ test('DISPLAY-REPLICA: the page carries its bookmark on a display read and keeps
     const mark = `${n.toString(16).padStart(8, '0')}-00000000-00000000-${'0'.repeat(32)}`;
     return { ok: true, status: 200, headers: { get: (h) => (h === 'x-d1-bookmark' ? mark : 'application/json') }, json: async () => ({}) };
   };
-  await call({ fetch, secret }, '/v1/homes/town', { mapId: 1 });
+  await call({ fetch, base: 'https://accounts.invalid', secret }, '/v1/homes/town', { mapId: 1 });
   assert.ok(d1BookmarkFor(secret), 'a display read\'s answer: its position kept');
-  await call({ fetch, secret }, '/v1/homes/town', { mapId: 1 });
+  await call({ fetch, base: 'https://accounts.invalid', secret }, '/v1/homes/town', { mapId: 1 });
   assert.match(sent[1].mark ?? '', /^00000001-/, 'the next display read carries it');
-  await call({ fetch, secret }, '/v1/homes/claim', { mapId: 1 });
-  await call({ fetch, secret }, '/v1/homes/town', { mapId: 1 });
+  await call({ fetch, base: 'https://accounts.invalid', secret }, '/v1/homes/claim', { mapId: 1 });
+  await call({ fetch, base: 'https://accounts.invalid', secret }, '/v1/homes/town', { mapId: 1 });
   assert.equal(sent[3].mark, null, 'after a write: none - the primary first, which has the write');
   forgetD1Bookmark();
 });

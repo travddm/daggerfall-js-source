@@ -219,7 +219,7 @@ export function mergeTable(base, ours, theirs) {
 
 /** THE LANGUAGES (`--locales`): the English catalog read again off the merged source (tools/l10nExtract.mjs), then each
  *  other language's rows and meta merged three ways from the index's stages, in the catalog's order, keys it no longer
- *  holds dropped - what tools/l10nInSession.mjs writes. Run after every source conflict is resolved. */
+ *  holds dropped. Run after every source conflict is resolved. */
 async function mergeLocales(apply) {
   const { parseStringTableCsv, formatStringTableCsv } = await import('../src/systems/textManager.js');
   const stage = (n, p) => { try { return git('show', `:${n}:${p}`); } catch { return null; } };

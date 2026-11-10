@@ -11,21 +11,13 @@
 // This is the whole design and it is the repo's own law (DERIVED OVER
 // ENUMERATED) applied to the one place a grant is usually a row:
 //
-//   FOUNDER   your registered account first played by FOUNDER_UNTIL -
-//             its row's first contact, or (FOUNDER4) the first contact of
-//             a row it shares a character with (`first_played_at`) - or
-//             (FOUNDER5) your handle is in the service's FOUNDER_HANDLES.
 //   DEVELOPER your ACCOUNT holds the Admin role (`staff_admin`, migration 0002) - a column, never a name.
 //   SPROUT    your account is younger than SPROUT_S.
 //   DEV       the same role as the Developer title.
 //   DUNGEON MASTER, DISCIPLE, APOSTLE, HIEROPHANT (TITLE-N, 2026-09-24)
 //             your handle is in that title's own list in the config;
-//             each list grants the title AND its glyph. PATREON-LINK
-//             or, for the three Patreon tiers, the Patreon
-//             account you linked is an active patron entitled to that
-//             tier now (patreon.js) - Patreon's word, stored as WB9g's
-//             sale is, and read against the config at every ask.
-//   HERALD (HERALD, 2026-10-01) the same, and the Patreon tier's.
+//             each list grants the title AND its glyph.
+//   HERALD (HERALD, 2026-10-01) the same.
 //   GRAND CHAMPION, ARENA CHAMPION and THE LAUREL (ARENA4, 2026-10-02)
 //             the arena's rows (server-account/src/arena.js): a Grand
 //             Champion row the relay signed; the season's #1 of the
@@ -51,17 +43,11 @@
 //             off a living character's track, the sea's two off the
 //             serpents it helped slay (hunts.js masteryMarksRead).
 //
-// WHY THAT AND NOT A `grants` TABLE. Mac asked that "all current
-// players should be granted the founder title", and the obvious
-// reading is a migration that walks every row and writes one. A walk
-// like that is a fact recorded ONCE, at a moment nobody can re-derive:
-// a row added by hand afterwards has no founder flag and nothing says
-// why, a row restored from a backup has whatever the backup had, and
-// the question "who is a founder?" can only be answered by reading
-// 300,000 rows. A CUTOFF answers it in one line, gives the same set
-// today, and keeps giving the right answer tomorrow.
+// WHY THAT AND NOT A `grants` TABLE. A grant written into rows is a fact recorded ONCE, at a moment nobody can
+// re-derive: a row added by hand afterwards has no flag and nothing says why, and a row restored from a backup has
+// whatever the backup had. A rule read off the row gives the same set today and the right answer tomorrow.
 //
-// AND THE SPROUT IS THE SAME ARGUMENT WITH TEETH: a glyph that expires
+// THE SPROUT SHOWS IT: a glyph that expires
 // after two weeks, stored, needs something to come along and remove it.
 // That is a cron, and a cron is a thing that can stop running while
 // everything looks fine (AUDIT-ACC F9 settled exactly this for idle
@@ -78,7 +64,6 @@
 
 import { TITLES, GLYPHS, AURAS, ICONS, SEAT_TITLES, CHAPTER_TITLES } from '../../src/net/identityToken.js';
 import { insigniaHeld, insigniaKeys } from '../../src/net/insignia.js';   // WB9g: the Broker's insignia - a title and an aura bought
-import { patreonTitlesOf } from './patreon.js';   // PATREON-LINK: a Patreon tier's title, held by the pledge
 import { SD_HONOUR_TITLE, SD_HONOUR_AURA } from './sds.js';   // SD9b: the Hour's grants on the row
 import { SERPENT_HONOUR_TITLE, SERPENT_HONOUR_AURA } from './serpents.js';   // SERPENT5: the Old Coil's grants on the row
 import { LAMP_TITLE } from './lamp.js';   // LAMP-KEEPER II: I Love Lamp on the row
@@ -87,58 +72,9 @@ import { festivalWaresHeld, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN } from '../../src
 import { STAFF_GLYPHS } from '../../src/net/staffCommands.js';   // STAFF-PANEL2-FIX: the glyphs that open the staff's commands, none held while cut off
 import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MARKS-OF-MASTERY: the hunt's, a Master's and the sea's titles
 
-/** THE FOUNDER CUTOFF, and it is a date rather than a count because
- *  "all current players" is a statement about a MOMENT. Everyone who
- *  had registered when Mac asked for this holds it; nobody who
- *  registers after does, and no migration had to walk a table to say
- *  so. 2026-09-23T00:00:00Z - the end of the day he asked.
- *
- *  FOUNDER2: the SAME statement made
- *  again at a later moment, so the cutoff moves to the end of THIS day -
- *  2026-09-25T00:00:00Z - and every account registered since TITLE-R
- *  closed it is a founder too, with no row written. After it the title is
- *  closed again (TITLE-R's law). A guest still holds none: nothing to
- *  compare, and a founding title on a row one storage clear from gone was
- *  never anybody's.
- *
- *  FOUNDER3: the SAME instant, read off when the account FIRST PLAYED rather
- *  than when it registered (`firstPlayed`, below). The instant does not
- *  move, in either direction: nobody who holds it loses it.
- *
- *  FOUNDER4: the SAME instant again, and when the account first
- *  played may now be proven by ANOTHER row - one it shares a character
- *  with (`first_played_at`): a guest in one browser who
- *  registered in another place, the desktop app's own storage above all,
- *  first played when that guest did.
- *
- *  FOUNDER5: BEFORE THE 25TH WHEREVER THE PLAYER
- *  WAS. 00:00Z on the 25th is 8pm on the 24th in New York and 5pm in Los
- *  Angeles, so a player in the Americas who first played that evening -
- *  before the 25th on their own clock - held nothing. The instant moves to
- *  the end of the 24th on the last clock to reach the 25th (UTC-12):
- *  2026-09-25T12:00:00Z. It moves LATER only, so nobody who holds it loses
- *  it. And what no record proves, a name does: FOUNDER_HANDLES (below). */
-export const FOUNDER_UNTIL = 1_790_337_600;
-
-/** FOUNDER5: THE FOUNDERS BY NAME - the players who played before the 25th
- *  where no record the service keeps can say so (a guest's storage cleared,
- *  a character never saved to the cloud, play on a device that never
- *  linked to the account). A list in config, the developers' law: Mac
- *  grants one by a reviewed, deployed edit. It adds and never takes away -
- *  a founder by the date holds it whether or not they are listed. */
-export function founderHandles(env) {
-  return handleList(env?.FOUNDER_HANDLES);
-}
-
-/** FOUNDER5: is this player a founder by name? A guest has no handle, so
- *  it never is - Founder stays a registered account's alone. */
-export const isNamedFounder = (player, env) =>
-  typeof player?.handle === 'string' && !!player.handle
-  && founderHandles(env).has(player.handle.toLowerCase());
-
 /** HOURS-FIRST: THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
- *  accounts the first clear's claims name (sd_kills, slot 1; .github/workflows/sd-clears.yml read them). A list in config,
- *  the developers' law (FOUNDER5's): held while listed, and a guest - no handle - never is. It grants the title Hour's
+ *  accounts the first clear's claims name (sd_kills, slot 1). A list in config,
+ *  the developers' law: held while listed, and a guest - no handle - never is. It grants the title Hour's
  *  First and its aura, The First Hour, and no glyph (TIER_LISTS would owe one). */
 export function hoursFirstHandles(env) {
   return handleList(env?.HOURS_FIRST_HANDLES);
@@ -167,14 +103,12 @@ export function handleList(raw) {
  * "Dungeon Master is an orange title with its own glyph. This title
  * allows the user to use the /dm to message chat with orange text
  * (similar to /red). This goes strictly to the account SquidKamer" -
- * and "Disciple, Apostle, Hierophant are new patreon titles. These also
- * recieve their own unique glyphs. The account Dutchess will recieve
- * the Disciple title/glyph".
+ * and Disciple, Apostle and Hierophant, each with a glyph of its own.
  *
  * Each is a HANDLE LIST IN CONFIG, the developers' own law and for the
  * developers' reason: granting one is a reviewed, deployed edit, never
- * a reach into the live database - and a Patreon tier that lapses is a
- * handle taken off a list, gone from that player's next token. The
+ * a reach into the live database - and a handle taken off a list is
+ * gone from that player's next token. The
  * title is HELD and may be worn; the glyph beside it is TRUE, and so
  * is the Dungeon Master's /dm: the relay reads that right off the `dm`
  * glyph in the signed token, as /red reads `dev`.
@@ -184,8 +118,7 @@ export const TIER_LISTS = Object.freeze({
   disciple: 'DISCIPLE_HANDLES',
   apostle: 'APOSTLE_HANDLES',
   hierophant: 'HIEROPHANT_HANDLES',
-  // The Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and
-  // by this list for a handle the owners name.
+  // Between Disciple and Hierophant, held by this list for a handle the owners name.
   herald: 'HERALD_HANDLES',
 });
 /** The glyph each of those titles carries, in the vocabulary's words. */
@@ -198,17 +131,15 @@ export const TIER_AURA = Object.freeze({});
 /** STAFF-PANEL2-FIX (design doc, Weak spots: "Cutting off a staff member misses most doors" - "A stored suspended flag is
  *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, staff.js
  *  /v1/staff/cut) holds no staff role while it stands - not a developer, not a moderator, and no title whose glyph opens
- *  the staff's commands (net/staffCommands.js STAFF_GLYPHS) - so the panel, the game's /v1/mod doors, Discord and the
+ *  the staff's commands (net/staffCommands.js STAFF_GLYPHS) - so the panel, the game's /v1/mod doors and the
  *  next token's glyphs all read it at once. @param {any} player */
 export const staffSuspended = (player) => player?.staff_suspended === 1;
 
-/** Does this player hold that list's title? A guest holds none, for the developer's reason. PATREON-LINK: AND a Patreon tier's title is held
- *  by the pledge too - the account's linked Patreon membership, read against PATREON_TIERS (patreon.js) - so a patron
- *  needs no line here, and the lists stay for the titles Mac grants by name. */
+/** Does this player hold that list's title? A guest holds none, for the developer's reason. */
 export const holdsTier = (title, player, env) =>
   typeof player?.handle === 'string' && !!player.handle && Object.hasOwn(TIER_LISTS, title)
   && !(staffSuspended(player) && STAFF_GLYPHS.includes(TIER_GLYPH[/** @type {keyof typeof TIER_GLYPH} */ (title)]))
-  && (handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase()) || patreonTitlesOf(player, env).includes(title));
+  && handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase());
 
 /** STAFF-ROLES-BY-ACCOUNT: is this player an Admin (a developer)? The ROLE IS THE ACCOUNT'S (`staff_admin`, migration 0002),
  *  never a name's: a handle that a former staff member held grants nothing to whoever registers it. Read off the row at every
@@ -219,7 +150,7 @@ export const isDeveloper = (player, _env) =>
   && player.staff_admin === 1;
 
 /** STAFF-ROLES-BY-ACCOUNT: is this player an Owner? An Owner is an Admin whose row also says `staff_owner` (migration 0002),
- *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports and approves POIs. */
+ *  set only by the operator (tools/staffRole.mjs). The Owner reads the private reports. */
 export const isOwner = (player, env) => isDeveloper(player, env) && player.staff_owner === 1;
 
 /** MOD1: is this player a moderator? A guest cannot be, for the same reason a guest cannot be a developer. The role is
@@ -235,22 +166,6 @@ export const isModerator = (player, _env) =>
  *  stays the moderator list's alone: the dev mark already says more. */
 export const canModerate = (player, env) => isModerator(player, env) || isDeveloper(player, env);
 
-/** FOUNDER3: WHEN THIS ACCOUNT FIRST PLAYED. Founder was read off
- *  `registered_at`, and registering is only the moment a player chose a
- *  name: a player here as a guest since before the cutoff who registered
- *  after it held nothing (Field-Bugs 2026-09-26b, report 3). `created_at`
- *  is stamped at a row's first contact, guest or not, and registering is
- *  an upgrade IN PLACE of that same row, so it is still there. A
- *  row without one is judged by its registration, as before. FOUNDER4:
- *  AND `first_played_at` - the first contact of a row this one shares a
- *  character with, where it is earlier (founderLink.js says how a
- *  character is shared); a row without one is judged as before. */
-const firstPlayed = (player) => Math.min(
-  player.registered_at,
-  Number.isFinite(player.created_at) ? player.created_at : Infinity,
-  Number.isFinite(player.first_played_at) ? player.first_played_at : Infinity,   // FOUNDER4
-);
-
 /**
  * THE TITLES THIS PLAYER HOLDS, in the order they are offered.
  * @param {any} player the row
@@ -258,15 +173,6 @@ const firstPlayed = (player) => Math.min(
  */
 export function titlesHeld(player, env) {
   const held = [];
-  // FOUNDER IS FOR REGISTERED ACCOUNTS (Mac's own call when asked
-  // whether guests count): a guest row is device-bound and one storage
-  // clear from gone, so a founding title on one is a title that
-  // vanishes with a cleared browser and was never anybody's. FOUNDER3:
-  // judged by when the account first played, so that guest holds it the
-  // moment it registers. The guard stays first: D1 gives a guest a NULL
-  // `registered_at`, and Math.min reads null as 0.
-  if (Number.isFinite(player?.registered_at) && firstPlayed(player) <= FOUNDER_UNTIL) held.push('founder');
-  if (!held.includes('founder') && isNamedFounder(player, env)) held.push('founder');   // FOUNDER5: or by name
   if (isDeveloper(player, env)) held.push('developer');
   for (const t of Object.keys(TIER_LISTS)) if (holdsTier(t, player, env)) held.push(t);   // TITLE-N
   // WB9g: AND THE BROKER'S - a title bought with Sigil Stones, held because the sale is recorded on the row. A
@@ -281,7 +187,7 @@ export function titlesHeld(player, env) {
   // derived from the account's characters' seats (npcChapters.js chapterTitlesOfAccount), laid on the row as
   // `chapterTitles` for this request alone, while CHAPTER_TITLES is on
   if (Array.isArray(player?.chapterTitles)) for (const t of player.chapterTitles) if (CHAPTER_TITLES.includes(t) && !held.includes(t)) held.push(t);
-  // ARENA4: THE ARENA'S TWO, derived from the arena's rows as the founder is from a date -
+  // The arena's two titles, derived from the arena's rows -
   // read onto the row (`arena`, server-account/src/arena.js arenaHonoursOf) where a token is minted or a wardrobe shown.
   // The Grand Champion holds for good (a row only a relay-signed climb writes); the Arena Champion while the account is
   // the season's #1, so it passes to whoever takes the top and lapses by itself. A row read without them holds neither.

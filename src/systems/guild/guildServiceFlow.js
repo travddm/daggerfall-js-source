@@ -334,6 +334,8 @@ const reputationLine = (n, owed) => (owed > 0
   ? t('guild.rankNeeds.reputationOwed', 'Reputation {have} of {need} ({owed} more already earned, arriving at most {max} a real day)', { have: n.reputation, need: n.reputationNeed, owed, max: ROLL_GAIN_DAY_MAX })
   : t('guild.rankNeeds.reputation', 'Reputation {have} of {need}', { have: n.reputation, need: n.reputationNeed }));
 
+/** Whether the host's review promotes without the 28 days: the Roll paces it and the server profile says so. */
+const pacedWithoutWait = (ctx) => !!ctx?.pace?.promoteNow;
 /** PROMO-NOW (FIELD BUGS 2026-10-15, "passed 200 days still no promotion i meet the requirements"): the hall's line for
  *  a member - the next rank and what it asks that they do not yet have, as the review reads it (guilds.js rankNeeds):
  *  the guild's reputation, one guild skill at the high bar, a second at the low. The guild's own skills are named when
@@ -342,9 +344,9 @@ const reputationLine = (n, owed) => (owed > 0
 export function rankNeedsLines(entity, guild, memberships, store, ctx = null) {
   // STANDING-WORDS: the review's warnings first, whatever else the next rank asks - off the book the review reads
   // (`ctx.book`, the host's; the line's own book seats a seat's rank), and said even where no next rank is (L1-4); online
-  // while the Roll paces (`ctx.pace`) - exactly when the host's review promotes without the wait (worldModes
-  // promoteWhenEarned), so a probation may end sooner (AUDIT GUILD-WORDS II C-7)
-  const warnings = reviewWarnings(entity, guild, ctx?.book ?? memberships, store, ctx && { ...ctx, online: !!ctx.pace });
+  // while the Roll paces and the server profile waives the 28 days (`ctx.pace.promoteNow`, guild.promoteNow) - exactly when
+  // the host's review promotes without the wait (worldModes promoteWhenEarned), so a probation may end sooner (II C-7)
+  const warnings = reviewWarnings(entity, guild, ctx?.book ?? memberships, store, ctx && { ...ctx, online: pacedWithoutWait(ctx) });
   const n = rankNeeds(memberships, guild, entity, store, ctx);
   if (!n) return warnings.length ? warnings : null;
   const owed = standingOwedOf(guild.factionId);

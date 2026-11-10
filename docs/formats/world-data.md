@@ -12,7 +12,7 @@ mechanism. `MapsFile` and `BlocksFile` ask the door before they read a region, a
 the door has a replacement, the reader returns it instead.
 
 | File | Role |
-|---|---|
+| --- | --- |
 | `src/formats/worldData/worldDataDoor.js` | A leaf with one setter and one getter (`setWorldDataDoor`, `worldDataDoor`). The readers import only this, so there is no import cycle. Unset, every ask answers "no replacement". |
 | `src/formats/worldData/worldDataReplacement.js` | The door itself (DFU `WorldDataReplacement`). Registers files by DFU name, serves them, converts DFU JSON into the readers' camelCase structs (`locationFromJson`, `blockFromJson`, `rdbBlockFromJson`, `buildingReplacementFromJson`). `installWorldDataReplacement()` installs it on the leaf. |
 | `src/systems/worldDataVariants.js` | Which variant of a location, block or building is in force (DFU `WorldDataVariants`). Quests set variants with `worldupdate`. Location key is `locationIndex * 100 + regionIndex`. |
@@ -34,9 +34,11 @@ Building replacements apply to RMB blocks only.
 
 ### The gate
 
-Offline, the door is open when the setting `Enhancements/AssetInjection` is on (DFU's rule). Online it is always open,
-because world-data mods that the room owns change ground every player walks on (see `ONLINE_ROOM_MOD_KEYS` in
-`src/systems/online/onlineLane.js`). The gate is read once per game (`latchWorldDataDoor`): closing it mid-game would
+Offline, the door is open when the setting `Enhancements/AssetInjection` is on (DFU's rule). Online it is always open
+(`latchWorldDataDoor` reads `isOnlinePage()`), because world-data mods that the room owns change ground every player
+walks on. Which of those mods' keys the room owns comes from the server profile's pins (`activePins().modKeys` in
+`src/systems/online/serverProfile.ts`, read through `ONLINE_ROOM_MOD_KEYS` in `src/systems/online/onlineLane.js`). The
+gate is read once per game (`latchWorldDataDoor`): closing it mid-game would
 leave holes where a pack's new blocks stand. Each mod's own `Enabled` switch still decides its files.
 
 ### Load order
@@ -52,6 +54,9 @@ door also lays curated people and placements on every block it serves (`world/cu
 `world/curatedPlacements.js`).
 
 ## Why patches and packs exist
+
+The patch and pack formats (`worldDataPatch.js`, `worldDataPack.js`) stay in core as mod-API formats when the vendored
+mods leave (decision 117 (25)): a mod that ships world data uses them to carry its edits without Daggerfall's data.
 
 A DFU world-data file is mostly the classic block or location, serialized, with the author's edits in it. That is game
 data and cannot be in the repository. So the port vendors only the edit and rebuilds the file from the player's own
@@ -76,7 +81,7 @@ Vendored as `vendor/<mod>/WorldDataPatches/*.json`:
 Ops apply in order; each path is read against the document the earlier ops left:
 
 | Op | Meaning |
-|---|---|
+| --- | --- |
 | `s` | set a key, replace an element, or replace the root |
 | `d` | delete a key |
 | `i` | insert into an array |
@@ -116,7 +121,9 @@ Large town mods ship thousands of files. A pack holds the edit of every file onc
 
 ## Loading (`src/scenes/modWorldData.js`)
 
-`loadModWorldData()` runs before the first region loads, so the readers' synchronous asks find the files. It globs:
+`loadModWorldData()` runs before the first region loads, so the readers' synchronous asks find the files. It globs the
+following folders. They are transitional: every `vendor/` mod folder leaves the repository (decision 99), and its
+world data leaves with it.
 
 - `vendor/*/WorldData/*.json` (whole files a mod ships that contain no classic data);
 - `vendor/*/WorldDataPatches/*.json` (patches, rebuilt from the bound `BLOCKS.BSA` at load);

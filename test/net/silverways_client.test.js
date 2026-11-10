@@ -14,7 +14,7 @@ import { T0 } from '../accountDb.mjs';
 import { createMarksBook, MARKS_TEXT } from '../../src/net/marksBook.js';
 import { createRaidClaims } from '../../src/net/raid/raidClaims.js';
 import { createGateClaims } from '../../src/net/gate/gateClaims.js';
-import { accountWrits, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountWrits, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { createWritBook } from '../../src/net/writBook.js';
 import { mountNoticeBoard } from '../../src/ui/noticeWindow.js';
 import { GUILD_MARKS_LEDGER_WORDS } from '../../src/ui/socialPanel.js';
@@ -97,7 +97,7 @@ test('SILVER-WAYS the carriers: a counted raid says its town\'s line and then ev
 test('SILVER-WAYS the doors: a contract posted goes to /v1/writs/contract with the character and one request id kept for a press asked again; a withdrawal to /v1/writs/contract-withdraw; every refusal has its sentence (mutants: the route; the character unsent)', async () => {
   const asked = [];
   const fetch = async (u, i) => { asked.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response(JSON.stringify({ contract: { id: 'C1' } }), { status: 200 }); };
-  const storage = { getItem: (k) => (k === SESSION_KEY ? JSON.stringify({ secret: 's'.repeat(43), id: 'acct-1' }) : null) };
+  const storage = { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : k === SESSION_KEY ? JSON.stringify({ secret: 's'.repeat(43), id: 'acct-1' }) : null) };
   const door = accountWrits({ fetch, storage });
   const wb = createWritBook({ door, character: () => 'char-1', sleep: async () => {} });
   await wb.contract({ region: DF, kind: 'raid', pay: 20, deeds: 10 });

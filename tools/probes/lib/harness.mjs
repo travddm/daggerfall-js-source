@@ -157,7 +157,7 @@ export class Game {
           }
         });
       if (init) await this.context.addInitScript(init.fn, init.arg);
-      // hermetic: the game phones the live account service (/v1/poi/live) even offline; a probe never reaches it
+      // hermetic: a probe never reaches a service off this machine
       await this.context.route(
         (url) => !isLocal(url.href) && !/^(data|blob):/.test(url.protocol),
         (route) => route.abort('blockedbyclient'),

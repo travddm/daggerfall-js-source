@@ -73,7 +73,7 @@ import { REGION_NAMES } from '../formats/mapsTables.js';   // GUILD1d: where the
 import { CASTLE_PRICE, castleMay, castleLostRefund, castleSaleRefund, castleCityOf } from '../net/castleLaw.js';   // DOMAIN2: the castle's price, power and refunds; AUDIT TESA III E2-2: its city
 import { wagonItemName } from '../systems/wagon/wagonKinds.js';   // WAGONS2 (FINAL AUDIT): a marked wagon by its kind's name
 import { noteFirstUse } from '../systems/tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
-import { t, formatNumber } from '../systems/textManager.js';   // GUILD-UX: the storage pages' new words in the player's language; AUDIT DOMAINS C5: a castle's numbers
+import { t, formatNumber } from '../systems/textManager.js'; import { noMentoringLines, mentoringSwitch } from './partyMentoring.js';   // GUILD-UX: the storage pages' new words in the player's language; AUDIT DOMAINS C5: a castle's numbers
 import { levelShort } from '../systems/mentorText.js';   // MENTOR2: a member's level, short
 import { storeFilterAccepts, storeRarityAccepts, storeQuery, storeFilterOptions, storeRarityOptions } from './storeFilter.js';   // GUILD-UX: the stores' one filter
 import { showItemHover, hideItemHover } from './enhanced/enhancedInventory.js';   // GUILD-UX: the pack's one item card
@@ -260,7 +260,7 @@ export function armsWhy(h) {
 /** AUDIT SILVER-WAYS A3: the day's guild deeds, as the Guild tab says them (marksLaw.js MARKS_FAUCETS.deed). */
 export const guildDeedsText = (n, max) => `Guild deeds today: ${Math.max(0, Number(n) || 0)} of ${max}. When ${MARKS_FAUCETS.deed.members} members who joined at least ${Math.round(MARKS_FAUCETS.deed.tenureS / 86_400)} days ago defend the same town or close the same gate, the treasury earns ${marksText(MARKS_FAUCETS.deed.amount)}.`;
 /** GUILD1d: a treasury ledger line's verb - a deposit and a withdrawal, and the hall's own moves (`moved_kind`). */
-export const GUILD_LEDGER_WORDS = Object.freeze({ deposit: 'put in', withdraw: 'took out', hall: 'bought the hall for', 'hall-sale': 'sold the hall for', 'hall-piece': 'took down a hall piece, returned to the treasury:', rename: 'renamed the guild for', grant: 'awarded the guild' });   // AUDIT2 GUILD2: a rename's line read "put in" - a payment out said as one in; GUILD-GRANT: the operator's award (tools/grantGuildGold.mjs)
+export const GUILD_LEDGER_WORDS = Object.freeze({ deposit: 'put in', withdraw: 'took out', hall: 'bought the hall for', 'hall-sale': 'sold the hall for', 'hall-piece': 'took down a hall piece, returned to the treasury:', rename: 'renamed the guild for', grant: 'awarded the guild' });   // a rename is a payment out, so its line must not read "put in"; `grant` is the operator's award
 /** AUDIT GUILD1d R5: a Drakes ledger line's verb - a heraldry changed is the treasury paying, never a deposit. */
 export const GUILD_MARKS_LEDGER_WORDS = Object.freeze({
   deposit: 'put in', withdraw: 'took out', heraldry: 'changed the guild\'s arms for',   // AUDIT GUILD3 W6: the page is "Arms"
@@ -1072,10 +1072,10 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
       const noteOf = () => { try { return mentorNote() ?? ''; } catch { return ''; } };
       const note = el('div', 'dfsocial-empty dfsocial-mentor', noteOf());
       liveSubs.push({ el: note, of: noteOf });
-      out.push(note);
+      out.push(note, ...noMentoringLines(el, p));   // the line every member reads
       out.push(...journeyBody());   // PARTY-UI
       const leave = el('div', 'dfsocial-row');
-      leave.append(btn('Leave party', { warn: true, run: () => act({ k: 'party.leave' }) }));
+      leave.append(btn('Leave party', { warn: true, run: () => act({ k: 'party.leave' }) }), ...mentoringSwitch(btn, p, social.leads(), act));   // the leader's switch
       out.push(leave);
     }
     out.push(...invitesBody());

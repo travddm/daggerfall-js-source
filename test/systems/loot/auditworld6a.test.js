@@ -17,6 +17,7 @@
 // heartbeat (B8); the law admitted keys no end mints (B4) and spelt a
 // negative key two ways (B5); an interior's memory has its own, smaller
 // cap at both ends (B3); the stamp is twelve digits always (B7).
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -41,7 +42,8 @@ const ctxOf = () => ({
   actions: { records: [{ key: 'door:0', state: 'end', t: 1, failedSkillLevel: 3 }], restored: [], collectSaveData() { return this.records.map((r) => ({ ...r })); }, restoreSaveData(l) { this.restored.push(...l); }, applyRemote(l) { return l.length; } },
 });
 
-test('AUDIT WORLD6a A1 (THE ROOT): the memory composes through THE BAG THE MODE HANDS IN - minted by the pure half, its key spelled as the pure half reads it - so the building is published; the bag refuses to compose without a key, and an owned building has none', () => {
+test('AUDIT WORLD6a A1 (THE ROOT): the memory composes through THE BAG THE MODE HANDS IN - minted by the pure half, its key spelled as the pure half reads it - so the building is published; the bag refuses to compose without a key, and an owned building has none', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const bag = mintInteriorShared(interiorLocationKey(187853213, 4));
   assert.equal(bag.locationKey, 'interior:m187853213.4');
   assert.deepEqual(Object.keys(bag).sort(), ['applied', 'home', 'locationKey', 'net', 'openKey', 'openWin', 'owned', 'room', 'seen', 'stamp', 'tooBig', 'unreadable']);   // AUDIT SETS M2: `unreadable`   // HOME1: `home` - an online home's room carries no loot (home1.test.js)   //
@@ -70,7 +72,8 @@ test('AUDIT WORLD6a B1: the price is not the wire\'s - a landed item\'s value is
   assert.equal(validLootList([{ templateIndex: 1 }, { templateIndex: unknown }]), null, 'one refuses the list');
 });
 
-test('AUDIT WORLD6a A2/B2/A3: the stocked day is projected like the list - refused whole past tomorrow, when not a number, or negative; landed no earlier than the day the shelf already had; a frozen shelf cannot be sold to a client', () => {
+test('AUDIT WORLD6a A2/B2/A3: the stocked day is projected like the list - refused whole past tomorrow, when not a number, or negative; landed no earlier than the day the shelf already had; a frozen shelf cannot be sold to a client', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const today = 405100;
   const ctx = ctxOf();
   const seen = new Set();

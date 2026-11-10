@@ -1,3 +1,4 @@
+import { playFileByRules } from '../../profileRules.mjs'; // a server profile's rule keys, for one test file
 // WW5 (WW5; WW5 - the owner's call taken,
 // 2026-10-26: "Every single thing here needs to be addressed. No exceptions."): A COVEN NIGHT IN EVERY THEATRE. One coven a
 // night on the Bay was the Starfall whole - its sites the Bay's scan's (`W = 1000`, `px = id % W`), the wire's star word
@@ -12,8 +13,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   STAR_LANES, starLaneOf, starIndexOf, starOfLane, starOk, starTimes, starRoll, starSpotLocal, starHeldOrder, starLedgerSane, newStarLedger,
-  starNightAt, starInWindow, STAR_PER_NIGHT, STAR_SALT, STAR_HOUR_MS,
+  starNightAt, starInWindow, STAR_PER_NIGHT, STAR_SALT,
 } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayStartMs } from '../../../src/net/sky-days.ts';
 import {
   starWireOk, validStarIn, validStarOut, STAR_HELD_MAX, STAR_LANES_WIRE, STAR_STARS_MAX, SITE_EVENT_LANES, siteEventLaneOpen, siteEventPixelOk,
   RELAY_VERSION, WORLD_PIXEL_BOUND,
@@ -40,14 +42,16 @@ import { OnlineSession } from '../../../src/net/online.js';
 import { worldRoom, PIXEL_UNITS, SD_LANE_SPAN } from '../../../src/net/wire.js';
 import { fakeSocketClass } from '../../fakeSocket.mjs';
 
+playFileByRules({ 'time.skyClock': true }); // these pins stand on the sky clock's hourly night (a sky day is an hour at its default TimeScale)
+
 const src = (p) => codeOnly(readFileSync(new URL('../../../' + p, import.meta.url), 'utf8'));
 const FESTIVAL = FESTIVALS[0];
 const N = starNightAt(FESTIVAL.fromMs) + 30;
 const BAY_PX = [300, 200], PAST_PX = [1600, -120];
 
-// THE LAW BEFORE WW5, WRITTEN OUT
-/** The Bay's star instants before WW5: `n * STAR_HOUR_MS` and the night's three falls. */
-const oldFallAt = (n, k) => n * 3_600_000 + [-900_000, -450_000, 0][k];
+// ═══ THE LAW BEFORE WW5, WRITTEN OUT ════════════════════════════════════════════════════════════════════════════════
+/** The Bay's star instants before WW5: its night's midnight and the three falls round it (a sky day is an hour here). */
+const oldFallAt = (n, k) => skyDayStartMs(n) + [-900_000, -450_000, 0][k];
 /** The Bay's coven of a night before WW5 (starfallCovens.js starCovenOf, at e77eadc58f). */
 function oldCovenOf(n) {
   const len = STAR_COVENS.length;

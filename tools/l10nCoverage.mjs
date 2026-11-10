@@ -3,10 +3,10 @@
 //
 // This says, for every language the catalog
 // offers, how much of the game a player reads in it and whose words they are:
-//   - THE PORT'S OWN WORDS (Port_Strings): the English catalog's keys the language has a row for, split into the
-//     machine's (the pipeline's or an in-session draft, recorded in `Port_Strings.meta.json` and unedited since) and a
-//     person's (a row nobody drafted, or one edited after - tools/translate.mjs planRun's own ownership law), the rows
-//     still owed, and a person's rows whose English has moved since (stale, theirs to review);
+//   - THE PORT'S OWN WORDS (Port_Strings): the English catalog's keys the language has a row for, split into a
+//     machine's (recorded in `Port_Strings.meta.json` and unedited since; none since the machine translation tools were
+//     removed) and a person's (tools/lib/translation-rows.mjs planRun's ownership law), the rows still owed, and a
+//     person's rows whose English has moved since (stale, theirs to review);
 //   - A BUNDLED PACK (locales/<tag>/pack/, L10N6): its string tables' rows against Daggerfall Unity's English masters
 //     (vendor/dfu-text), and its quests and books - the text a player would otherwise install from their own files.
 // A pack a player installs is theirs and never in the tree, so it is not counted here; the game's Language row says
@@ -19,7 +19,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseStringTableCsv } from '../src/systems/textManager.js';
 import { LOCALE_CATALOG } from '../src/systems/localeCatalog.js';
-import { planRun } from './translate.mjs';
+import { planRun } from './lib/translation-rows.mjs';
 import { readBundledPack } from './l10nPack.mjs';
 import { isMain } from './lib/isMain.mjs';
 

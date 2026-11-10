@@ -30,15 +30,14 @@ const TABLES = [
   'mod_cases', 'mod_feed', 'mod_reports', 'motherlode_days', 'motherlode_strikes', 'motherlodes', 'node_harvests',
   'npc_chapter_backing', 'npc_chapter_history', 'npc_chapter_merit', 'npc_chapter_patron_bids', 'npc_chapter_seats',
   'npc_chapter_weeks', 'npc_chapters', 'npc_hall_regions', 'npc_hall_strikes', 'npc_receipt_credits', 'npc_rep_events',
-  'npc_roll', 'npc_roll_heads', 'piece_escrow', 'players', 'poi_assets', 'poi_docs', 'poi_feed', 'poi_rev_assets',
-  'poi_revs', 'poi_shelf', 'poi_upload_days', 'private_reports', 'products', 'prof_brews', 'prof_carried',
+  'npc_roll', 'npc_roll_heads', 'piece_escrow', 'players', 'private_reports', 'products', 'prof_brews', 'prof_carried',
   'prof_carried_gate', 'prof_choices', 'prof_crafts', 'prof_deposits', 'prof_disenchants', 'prof_masters',
   'prof_reforges', 'prof_silver_cloth', 'prof_smelts', 'prof_stock', 'prof_stores', 'prof_tempers', 'prof_tracks',
   'prof_unbruised', 'prof_withdrawals', 'progress_hours', 'progress_play', 'ql_steps', 'raid_cleanses', 'raid_spoils',
   'rate_limits', 'reaction_batches', 'realm_characters', 'realm_config', 'realm_faucets', 'realm_findings',
   'realm_repairs', 'realm_trades', 'realm_tx_guard', 'realm_unions', 'realm_wealth_hours', 'realm_wed_halves',
-  'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'sea_season', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils',
-  'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_discord', 'staff_events', 'staff_evidence',
+  'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils',
+  'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_events', 'staff_evidence',
   'staff_foe_rows', 'staff_invites', 'staff_keys', 'staff_limits', 'staff_messages', 'staff_net_batches',
   'staff_net_rows', 'staff_notes', 'staff_sessions', 'staff_settings', 'staff_watch', 'star_spoils', 'stars_held',
   'town_domain_witness', 'town_econ_acts', 'town_econ_days', 'town_econ_kept', 'town_econ_seen', 'town_econ_struck',
@@ -58,7 +57,7 @@ const PLAYER_COLUMNS = [
   'fest_cakes', 'fest_given', 'fest_taken', 'fest_wares', 'first_played_at', 'freeze_live', 'freeze_rev', 'frozen_at',
   'frozen_by', 'frozen_reason', 'frozen_until', 'glyphs_off', 'guest_name', 'handle', 'handle_lc', 'icon', 'id',
   'insignia', 'insignia_spent', 'lamp_title', 'last_seen', 'legal_accepted_at', 'mute_admin', 'muted_by',
-  'muted_until', 'name_as', 'password', 'patreon_at', 'patreon_status', 'patreon_tiers', 'patreon_user', 'played_at',
+  'muted_until', 'name_as', 'password', 'played_at',
   'played_s', 'privacy_version', 'ql_titles', 'recovery_hash', 'registered_at', 'renown_hour', 'renown_hour_xp',
   'renown_last_credit', 'sd_honours', 'serpent_honours', 'staff_admin', 'staff_hide', 'staff_hide_on', 'staff_mod', 'staff_owner', 'staff_suspended',
   'terms_version', 'title',
@@ -87,6 +86,7 @@ test('the schema file is the first migration, numbered files follow it, and each
 test('the schema holds the service\'s tables, and the account row its columns', () => {
   const raw = d1()._raw;
   assert.deepEqual(tablesOf(raw), TABLES);
+  assert.deepEqual(tablesOf(raw).filter((n) => n.startsWith('poi_')), [], 'the POI store\'s tables are dropped (0006_drop_poi.sql)');
   assert.deepEqual(columnsOf(raw, 'players').sort(), PLAYER_COLUMNS);
   assert.deepEqual(raw.prepare("SELECT type, COUNT(*) AS n FROM sqlite_master WHERE type = 'view' GROUP BY type").all(), [], 'no views');
 });
@@ -118,11 +118,10 @@ test('the version counters the triggers raise stand seeded, and a write moves th
   const raw = d1()._raw;
   assert.deepEqual({ ...raw.prepare('SELECT id, ver FROM arena_board_ver').get() }, { id: 1, ver: 1 });
   assert.deepEqual({ ...raw.prepare('SELECT id, gen FROM homes_gen').get() }, { id: 1, gen: 0 });
-  assert.deepEqual({ ...raw.prepare('SELECT k, v, at FROM poi_feed').get() }, { k: 'feed', v: 0, at: 0 });
   raw.prepare("INSERT INTO players (id, guest_name, created_at, last_seen) VALUES ('p1', 'Guest', 1, 1)").run();
   raw.prepare("INSERT INTO arena_members (player, banner, season, at) VALUES ('p1', 'red', 1, 1)").run();
   assert.equal(raw.prepare('SELECT ver FROM arena_board_ver WHERE id = 1').get().ver, 2, 'a member joined moves the arena board');
-  for (const t of TABLES.filter((n) => !['arena_board_ver', 'homes_gen', 'poi_feed', 'players', 'arena_members'].includes(n))) {
+  for (const t of TABLES.filter((n) => !['arena_board_ver', 'homes_gen', 'players', 'arena_members'].includes(n))) {
     assert.equal(raw.prepare(`SELECT COUNT(*) AS n FROM "${t}"`).get().n, 0, `${t} starts empty`);
   }
 });

@@ -45,6 +45,7 @@
 // key and a tap on the scrim leave through the door's own close. On the classic skins the window lays its own sheet,
 // the kit's rules cut to its selectors, so it wears the Enhanced Plus stone whichever UI is chosen (online forces the
 // enhanced lane, never necessarily its Plus face).
+import { seatsHoldTopRanks } from '../systems/guild/guild-rank-rule.ts';   // whether the chairs hold ranks 8 and 9 online (guild.seatRanks)
 import { closeOnOutsideTap } from './enhanced/enhancedOverlays.js';
 import { overlayAction, isTextEntryTarget } from './input.js';
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhanced/enhancedStyle.js';
@@ -145,10 +146,9 @@ export function chapterGuide() {
     ['What a chapter is', 'Every guild, including the Fighters and Mages Guilds, the temples and the knightly orders, keeps a chapter in each region where it has a hall. All players online share it. The cards below are this region\'s chapters. Join a guild at one of its halls and its chapters are yours.'],
     // STANDING-WORDS / SEAT-WORDS (Field-Bugs-2026-10-15g): the guide said what a chair is and never that a guild's own
     // review stops below it, nor how the standing itself moves online
-    // AUDIT GUILD-WORDS L1-5, L3-3: a chair's services are its own chapter's halls', for a member at 7 (seatedBook); L3-2,
-    // L3-4, L3-5: the pace a quest keeps and the real day, a receipt's first of the day; II C-3: no quest is said free of
-    // its guild's losses; II C-5: a chapter writ, yours or the chapter's; II C-8: the day turns at midnight UTC
-    [t('notice.chapters.rank.name', 'Your rank'), t('notice.chapters.rank.words', 'Your guild still promotes you as usual, up to rank {cap}. Ranks {officer} and {master} are the chairs (see below). A chair\'s services are at its own chapter\'s halls, for members at rank {cap}.', { cap: ROLL_BOOK_RANK_MAX, officer: SEAT_RANK.officer, master: SEAT_RANK.master })],
+    // The rank line follows guild.seatRanks (a chair's services at its own chapter's halls for a member at 7, or none); the
+    // pace a quest keeps and the real day, midnight UTC; a receipt's first of the day; a chapter writ, yours or the chapter's
+    [t('notice.chapters.rank.name', 'Your rank'), seatsHoldTopRanks() ? t('notice.chapters.rank.words', 'Your guild still promotes you as usual, up to rank {cap}. Ranks {officer} and {master} are the chairs (see below). A chair\'s services are at its own chapter\'s halls, for members at rank {cap}.', { cap: ROLL_BOOK_RANK_MAX, officer: SEAT_RANK.officer, master: SEAT_RANK.master }) : t('notice.chapters.rank.wordsRanks', 'Your guild promotes you as usual, up to rank {master}. The chairs (see below) are an honour and give no rank.', { master: SEAT_RANK.master })],
     [t('notice.chapters.standing.name', 'Standing'), t('notice.chapters.standing.words', 'Your standing with each of these guilds is kept online. Quests raise it by at most {max} a real day for each guild (days start at midnight UTC), and any more is paid on later days. On top of that, a chapter writ (yours or the chapter\'s) adds {writ}, and closing a Breach or defending a town adds {receipt} to each of your guilds with a chapter there ({writ} more for the first each day, if the chapter asks for it).', { max: ROLL_GAIN_DAY_MAX, writ: HALL_WRIT_REP, receipt: RECEIPT_REP })],
     ['Merit', `Your work for a chapter this week. You earn ${n(MERIT_WRIT)} for filling your own chapter writ (one a day, and bought goods earn none), and a share of ${n(MERIT_RECEIPT)} for each Dagon's Breach closed or raided town defended in the region. It counts after ${days(MERIT_TENURE_S)} real days in the guild, at most ${n(MERIT_CAP_WEEK)} an account a week in each chapter, and in only one chapter of each guild a week.`],
     // AUDIT PLAIN-UI W1: the whole of strengthAfter, failingWeekAfter, the Rivalry's swing and strengthSeasonEnd - "Merit

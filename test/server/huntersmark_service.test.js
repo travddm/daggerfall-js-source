@@ -11,8 +11,8 @@ import { standService, T0 } from '../accountDb.mjs';
 import { verifyToken } from '../../src/net/identityToken.js';
 import { bountyId, bountySlotKey } from '../../src/systems/bounty/bountyBoard.js';
 import {
-  huntGameDayAt, huntWeekAt, huntMarkId, huntClearOf, huntTierFits, masteryMarksOf, HUNT_CLEARS_DAY_MAX, HUNT_CLEAR_LATE_DAYS,
-  HUNT_RUNGS, HUNT_MARK_RUNG, HUNT_TITLES, MASTERY_TITLES, SEA_TITLES, MASTERY_MARKS, GAME_DAYS_PER_UTC_DAY,
+  huntGameDayAt, huntWeekAt, huntMarkId, huntClearOf, huntTierFits, masteryMarksOf, HUNT_CLEARS_DAY_MAX, huntClearLateDays,
+  HUNT_RUNGS, HUNT_MARK_RUNG, HUNT_TITLES, MASTERY_TITLES, SEA_TITLES, MASTERY_MARKS, gameDaysPerUtcDay,
 } from '../../src/net/huntLaw.js';
 import { PROF_XP_MAX } from '../../src/net/professionLaw.js';
 import { HUNT_INFLUENCE, HUNT_WEEK_CAP, accountSeatInfluence, ACCOUNT_SEAT_WEEK_CAP, seatWeekOf, seatWeekStartMs } from '../../src/net/townSeatLaw.js';
@@ -41,12 +41,12 @@ async function stand(t, env = { SEATS_OPEN: 'on' }) {
 test('HUNTERS-MARK THE LAW: a board clear inside the event clock\'s window, a mark of this week or the last, the level within reach of the trusted one; the day\'s ceiling measured, above any honest day (mutants: the window\'s edges; the ceiling; the tier\'s reach)', () => {
   const now = NOON * 1000;
   const today = huntGameDayAt(now);
-  assert.equal(GAME_DAYS_PER_UTC_DAY, 12, 'a game day every two real hours');
+  assert.equal(gameDaysPerUtcDay(), 12, 'a game day every two real hours');
   // (tools/huntPace.mjs, test/tooling/huntpace.test.js on the game's map)
   assert.equal(HUNT_CLEARS_DAY_MAX, 750);
   assert.deepEqual(huntClearOf(bountyId(today, 300, 200, 1, 7), now), { kind: 'board', id: bountyId(today, 300, 200, 1, 7), key: bountySlotKey(today, 300, 200, 1), level: 7, tier: 2 });
-  assert.equal(huntClearOf(bountyId(today - HUNT_CLEAR_LATE_DAYS, 300, 200, 1, 7), now).kind, 'board', 'a real day late: still taken');
-  assert.deepEqual(huntClearOf(bountyId(today - HUNT_CLEAR_LATE_DAYS - 1, 300, 200, 1, 7), now), { why: 'late' });
+  assert.equal(huntClearOf(bountyId(today - huntClearLateDays(), 300, 200, 1, 7), now).kind, 'board', 'a real day late: still taken');
+  assert.deepEqual(huntClearOf(bountyId(today - huntClearLateDays() - 1, 300, 200, 1, 7), now), { why: 'late' });
   assert.equal(huntClearOf(bountyId(today + 1, 300, 200, 1, 7), now).kind, 'board', 'the boards a minute ahead');
   assert.deepEqual(huntClearOf(bountyId(today + 2, 300, 200, 1, 7), now), { why: 'early' });
   const week = huntWeekAt(now);
@@ -98,7 +98,7 @@ test('HUNTERS-MARK THE LEDGER through the real Worker: a clear recorded once a c
   // REFUSED: no bounty's shape, a region out of law, a day the boards are past, the trusted level's reach
   assert.equal((await clear(mac, 'nothing')).body.error, 'hunt-id');
   assert.equal((await clear(mac, bountyId(day, 300, 200, 0, 3), { region: 999 })).body.error, 'hunt-id');
-  assert.equal((await clear(mac, bountyId(day - HUNT_CLEAR_LATE_DAYS - 1, 300, 200, 0, 3))).body.error, 'hunt-late');
+  assert.equal((await clear(mac, bountyId(day - huntClearLateDays() - 1, 300, 200, 0, 3))).body.error, 'hunt-late');
   assert.equal(raw.prepare('SELECT level_seen AS lv FROM realm_characters WHERE id = ?').get(mac.character).lv, 1, 'the seat\'s first save judged: level 1');
   raw.prepare('UPDATE realm_characters SET level_seen = 3 WHERE id = ?').run(mac.character);
   const far = await clear(mac, bountyId(day, 300, 200, 0, 9));

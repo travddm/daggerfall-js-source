@@ -4,8 +4,8 @@
 // his blows at their marked reach and takes them through the saving throw of his aspect's element; the ground his
 // landings leave is his aspect's and Scarring's; he stands as large as Colossal makes him, glows and sounds in his
 // aspect's colours and voice; his bar says his epithet and his trials, each attack by his aspect's name. The court says
-// his marks as a fighter steps through, his feeding on the fallen, each phase's turn in his aspect's words; the omen,
-// the map's card and the Discord herald name tonight's marks before the gate opens.
+// his marks as a fighter steps through, his feeding on the fallen, each phase's turn in his aspect's words; the omen
+// and the map's card name tonight's marks before the gate opens.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -24,8 +24,6 @@ import { aspectCss } from '../../../src/ui/gate/gateMarksView.js';   // WB13c: h
 import { createGateCourt, COURT_STRIKE_TEXT, COURT_MARKS_TEXT, courtPhaseCard, MARK_COLOR, FED_LATE_MS } from '../../../src/scenes/gate/gateCourt.js';
 import { courtToDungeon } from '../../../src/world/gate/gateArena.js';
 import { gateTip } from '../../../src/systems/gate/gateOmen.js';
-import { omenPost } from '../../../src/net/gate/gateHerald.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const W = (key, over = {}) => ({ i: 1, a: ATTACKS[key].id, at: 10000, x: 0, z: 0, yw: 0, tg: [], ...over });
@@ -239,7 +237,7 @@ test('WB8c the ground drawn and the bar: the telegraph shows Colossal\'s slam at
 
 // THE WORD BEFORE THE GATE
 
-test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\'s omen, each trial by name and in words), the map\'s card while he stands (his epithet and his trials), the Discord omen in the tables\' words alone (mutants: the card without them; a trial unsaid)', () => {
+test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\'s omen, each trial by name and in words), the map\'s card while he stands (his epithet and his trials) (mutants: the card without them; a trial unsaid)', () => {
   const day = 112;   // WB11a: the nine-trial rotation moved the Rime-Wrought, Colossal and Unyielding from day 3 to day 112
   assert.deepEqual(gateModsOf(day), ['rime', 'colossal', 'unyielding']);
   assert.equal(marksLine({ boss: 'Valkynaz Ruhn', md: gateModsOf(day) }), 'Valkynaz Ruhn comes the Rime-Wrought tonight, Colossal and Unyielding.', 'WB13b: by name - the card says what each does');
@@ -248,9 +246,6 @@ test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\
   const c = { site: { place: 'Copperham, Wrothgarian Mountains' }, phase: 'open', t: { day } };
   assert.deepEqual(gateTip(c, { to: 'seal', ms: 60_000 }), { title: 'Dagon\'s Breach', lines: ['Near Copperham, Wrothgarian Mountains', 'Open. Seals in 1:00', 'Valkynaz Ruhn, Warden of the Burning Gate', 'The Rime-Wrought - Colossal, Unyielding'] });   // PIN MOVED (VOICE2): the countdown a sentence of its own (Voice.md rule 5)
   assert.deepEqual(gateTip(c, null, 123).lines.at(-1), 'Valkynaz Ruhn has fallen', 'no marks once he has fallen');
-  const post = cardOf(omenPost({ day })).text;   // HERALD-CARDS: the card's text
-  assert.equal(post, 'The faithful work their rite nearby. Kill their Summoner before the breach opens. Valkynaz Ruhn comes **the Rime-Wrought** tonight, Colossal and Unyielding.', post);   // WB12d: the rite, a line
-  assert.ok(post.length < 2000);
   assert.ok(gateTimes(day).omenAt < gateTimes(day).openAt);
 });
 

@@ -248,20 +248,19 @@ const STAFF_LINE = { id: 'p2', name: 'Troll', text: 'gross', at: 2, sub: 'acct-t
 const staffRig = (glyphs, more = {}) => hostRig({ ...more, opts: { glyphs: () => glyphs, ...(more.opts ?? {}) } });
 const rowOf = (rows, label) => rows.find((x) => x.label === label);
 
-test('STAFF-PANEL2-CHATMENU THE ACTS BY ROLE (design 327-334): an Admin gets Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch; a Moderator the same less TP and Freeze; Follow only with the staff hook, TP only with /tp\'s door; each says whether the player can see it (mutants: Freeze for a Moderator; TP for a Moderator; Follow without the hook)', () => {
-  assert.deepEqual(hostNs.staffLineActs(['dev']), ['follow', 'tp', 'message', 'mute', 'freeze', 'ban', 'notes', 'watch']);
-  assert.deepEqual(hostNs.staffLineActs(['mod']), ['follow', 'message', 'mute', 'ban', 'notes', 'watch']);
+test('STAFF-PANEL2-CHATMENU THE ACTS BY ROLE (design 327-334): an Admin gets TP, Message, Mute, Freeze, Ban, Notes, Watch; a Moderator the same less TP and Freeze; TP only with /tp\'s door; each says whether the player can see it (mutants: Freeze for a Moderator; TP for a Moderator)', () => {
+  assert.deepEqual(hostNs.staffLineActs(['dev']), ['tp', 'message', 'mute', 'freeze', 'ban', 'notes', 'watch']);
+  assert.deepEqual(hostNs.staffLineActs(['mod']), ['message', 'mute', 'ban', 'notes', 'watch']);
   assert.deepEqual(hostNs.staffLineActs(['dev', 'mod']), hostNs.staffLineActs(['dev']));
   for (const g of [[], ['dm'], ['sprout', 'laurel'], null, 'dev']) assert.deepEqual(hostNs.staffLineActs(g), [], JSON.stringify(g));
-  const seams = { follow: () => () => {}, teleport: () => {} };
+  const seams = { teleport: () => {} };
   const labels = (glyphs, opts = seams) => staffRig(glyphs, { opts }).host.lineActions(STAFF_LINE).map((x) => x.label);
-  assert.deepEqual(labels(['dev']), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block']);
-  assert.deepEqual(labels(['mod']), ['Follow', 'Message on screen', 'Mute…', 'Ban…', 'Notes', 'Watch', 'Block']);
-  assert.deepEqual(labels(['dev'], {}), ['Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block'], 'no hook, no Follow; no door, no TP');
-  assert.deepEqual(labels(['dev'], { follow: () => null, teleport: () => {} }).slice(0, 1), ['TP'], 'a hook that is not there hides Follow');
+  assert.deepEqual(labels(['dev']), ['TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block']);
+  assert.deepEqual(labels(['mod']), ['Message on screen', 'Mute…', 'Ban…', 'Notes', 'Watch', 'Block']);
+  assert.deepEqual(labels(['dev'], {}), ['Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch', 'Block'], 'no door, no TP');
   const rows = staffRig(['dev'], { opts: seams }).host.lineActions(STAFF_LINE);
   const seen = 'The player can see this.', unseen = 'The player does not see this.';
-  assert.deepEqual(rows.slice(0, -1).map((x) => [x.label, x.title]), [['Follow', unseen], ['TP', seen], ['Message on screen', seen], ['Mute…', seen], ['Freeze', seen], ['Ban…', seen], ['Notes', unseen], ['Watch', unseen]]);
+  assert.deepEqual(rows.slice(0, -1).map((x) => [x.label, x.title]), [['TP', seen], ['Message on screen', seen], ['Mute…', seen], ['Freeze', seen], ['Ban…', seen], ['Notes', unseen], ['Watch', unseen]]);
   assert.deepEqual(staffRig(['dev'], { opts: seams }).host.lineActions({ ...STAFF_LINE, sub: 'x' }).map((x) => x.label), ['Block'], 'an account the wire\'s law cannot name gets no act');
 });
 
@@ -889,37 +888,25 @@ test('LEASE1 THE PAGE HANDS ITS HUB\'S LEASE TO EVERY ROOM IT HOLDS (net/roomLea
 });
 
 test('ROSTER-STAFF rosterActions (mob, 2026-10-24: "need to add follor to find a player in chat as well", over the chat\'s Find a player list): a roster row\'s staff acts are the line menu\'s, for the player the row names by socket - their account as a room here holds it, or the hub\'s lists (everyone online, a search\'s answer); none for a player, for a row no list names an account for, or for an id that is no id (mutants: the hub\'s list unread, the search unread, a player given the acts)', async () => {
-  let followed = null;
-  const r = staffRig(['dev'], { opts: { follow: () => (sub) => { followed = sub; return true; }, teleport: () => {} } });
+  const r = staffRig(['dev'], { opts: { teleport: () => {} } });
+  const mutedFor = async (id) => { rowOf(r.host.rosterActions(id), 'Mute…').menu[0].run(); await settle(); await settle(); return r.asked.at(-1)?.body?.target; };
   const rows = r.host.rosterActions('p2');
-  assert.deepEqual(rows.map((x) => x.label), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch'], 'a room here: the line menu\'s acts');
-  rowOf(rows, 'Follow').run();
-  await settle();
-  assert.equal(followed, 'acct-tro', 'by account');
+  assert.deepEqual(rows.map((x) => x.label), ['TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch'], 'a room here: the line menu\'s acts');
+  assert.equal(await mutedFor('p2'), 'acct-tro', 'by account');
   r.links[0].hubOnline = new Map([['p9', { id: 'p9', name: 'Far', sub: 'acct-far' }]]);
-  rowOf(r.host.rosterActions('p9'), 'Follow').run();
-  await settle();
-  assert.equal(followed, 'acct-far', 'everyone online on the hub');
+  assert.equal(await mutedFor('p9'), 'acct-far', 'everyone online on the hub');
   r.links[1].hubFound = { q: 'dee', l: [{ id: 'p7', name: 'Deep', sub: 'acct-deep' }], at: 1 };
-  rowOf(r.host.rosterActions('p7'), 'Follow').run();
-  await settle();
-  assert.equal(followed, 'acct-deep', 'a search\'s answer');
+  assert.equal(await mutedFor('p7'), 'acct-deep', 'a search\'s answer');
   assert.deepEqual(r.host.rosterActions('p-nobody'), [], 'no list names them: none');
   for (const bad of [null, '', 7]) assert.deepEqual(r.host.rosterActions(bad), []);
   assert.deepEqual(hostRig().host.rosterActions('p2'), [], 'a player: none');
 });
 
-test('STAFF-TAG-MENU playerActions: a tag\'s menu is the line menu\'s staff acts by socket and account (no Report, no Block), its Follow the staff view\'s own when given; none for a player or with no account (mutants: Report kept, the view\'s follow unused)', () => {
-  const seams = { follow: () => () => {}, teleport: () => {} };
-  const r = staffRig(['dev'], { opts: seams });
-  const followed = [];
-  const rows = r.host.playerActions({ id: 'p2', sub: 'acct-tro', name: 'Troll' }, (s) => followed.push(s));
-  assert.deepEqual(rows.map((x) => x.label), ['Follow', 'TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch']);
-  rowOf(rows, 'Follow').run();
-  return Promise.resolve().then(() => Promise.resolve()).then(() => {
-    assert.deepEqual(followed, ['acct-tro'], 'the view\'s own follow');
-    assert.deepEqual(hostRig().host.playerActions({ id: 'p2', sub: 'acct-tro', name: 'Troll' }), [], 'a player\'s page: none');
-    assert.deepEqual(r.host.playerActions({ id: 'p2', sub: 'not an id', name: 'Troll' }), [], 'no account: none');
-    assert.deepEqual(r.host.playerActions(null), []);
-  });
+test('STAFF-TAG-MENU playerActions: a player\'s staff acts by socket and account are the line menu\'s (no Report, no Block); none for a player or with no account (mutants: Report kept)', () => {
+  const r = staffRig(['dev'], { opts: { teleport: () => {} } });
+  const rows = r.host.playerActions({ id: 'p2', sub: 'acct-tro', name: 'Troll' });
+  assert.deepEqual(rows.map((x) => x.label), ['TP', 'Message on screen', 'Mute…', 'Freeze', 'Ban…', 'Notes', 'Watch']);
+  assert.deepEqual(hostRig().host.playerActions({ id: 'p2', sub: 'acct-tro', name: 'Troll' }), [], 'a player\'s page: none');
+  assert.deepEqual(r.host.playerActions({ id: 'p2', sub: 'not an id', name: 'Troll' }), [], 'no account: none');
+  assert.deepEqual(r.host.playerActions(null), []);
 });

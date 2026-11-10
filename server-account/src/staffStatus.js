@@ -125,7 +125,7 @@ async function cached(/** @type {string} */ key, /** @type {number} */ s, /** @t
 /** A Cloudflare account id: 32 hex, so nothing else reaches the SQL API's address. */
 const ACCOUNT_ID = /^[0-9a-f]{32}$/;
 /**
- * ONE QUESTION TO ANALYTICS ENGINE'S SQL API (as tools/d1Load.mjs asks it), with the token the service holds - or
+ * ONE QUESTION TO ANALYTICS ENGINE'S SQL API, with the token the service holds - or
  * `not-configured` without one.
  * @param {any} env @param {string} sql @returns {Promise<{ state: 'ok', rows: any[] }|{ state: 'missing'|'not-configured' }>}
  */
@@ -278,7 +278,7 @@ export async function statusNow(ctx, env) {
     registered: h ? num(h.registered) : null,
     tabs: L ? num(L.beats) : null,
   }, limits, { registered: fast.db, tabs: slow.load.state, rooms: slow.rooms.state }, Math.min(fast.at, slow.at), {
-    // each room kind's sockets over the window - an estimate from below, sockets not accounts (relayLoad.mjs says why)
+    // each room kind's sockets over the window - an estimate from below, sockets not accounts
     rooms: ok(slow.rooms) ? { basis: `${mins}-minute sockets`, kinds, dungeons: kinds.dungeon ?? 0, arenas: kinds.arena ?? 0 } : null,
     unmeasured: UNMEASURED,
   });

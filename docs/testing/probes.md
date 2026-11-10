@@ -1,8 +1,9 @@
 # Probes
 
 A probe is a script in `tools/` that checks what `node --test` cannot: layout and pixels in a real browser, a Worker
-running in real workerd, or the Electron shell. Probes are not part of `npm test` or CI. Run the probes that cover a
-change by hand, and before a visible change ships.
+running in real workerd, or the Electron shell. The probes on this page are not part of `npm test` or CI. Run the
+probes that cover a change by hand, and before a visible change ships. The end-to-end game probes are different: CI
+runs them (`.github/workflows/probes.yml`, [game-probes.md](game-probes.md)).
 
 ## Browser probes
 
@@ -75,6 +76,9 @@ screenshot.
 
 ## Account service probe
 
+This is a Cloudflare tool: it runs the service through wrangler, as the optional Cloudflare target deploys it. The
+self-host kit (`selfhost/`) runs its own workerd configuration, which this probe does not start.
+
 `npm run account` (`tools/accountProbe.mjs`) starts `server-account/` in a real workerd through `wrangler dev
 --local`. It applies the real migrations through wrangler's own ledger (`wrangler d1 migrations apply --local`) and
 drives the account lifecycle and a cloud-save round trip against workerd's local R2.
@@ -95,14 +99,17 @@ port (8811) is taken. `--local` has no network, no D1 limits and no cold start, 
 
 ## Load harness
 
+This is a Cloudflare tool: it starts both services through wrangler, as the optional Cloudflare target runs them, not
+through the self-host kit (`selfhost/`).
+
 `npm run load` (`tools/loadHarness.mjs`) runs a fleet of bots against the real relay and the real account service,
 both in local workerd. A bot is the client's own modules: it registers a guest, makes a realm character, opens the
 same rooms the world host opens as `OnlineSession`s, sends poses and chat, and makes the client's account calls on
 the client's own timers.
 
 ```sh
-node tools/loadHarness.mjs --bots 200 --minutes 5
-node tools/loadHarness.mjs --help      # every option and its default
+node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --bots 200 --minutes 5
+node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --help      # every option and its default
 ```
 
 It reports the relay's and the service's work per bot. Local numbers are relative: they compare two builds on one
@@ -126,5 +133,6 @@ installer's payload. See [../operations/desktop-release.md](../operations/deskto
 
 ## Other checks outside the suite
 
-- `tools/verify-deploy.mjs [url]`: after `npm run build`, polls the live site until it serves your build, by
-  content. HTTP 200 alone proves nothing, because a failed deploy leaves the previous build up.
+- `tools/verify-deploy.mjs [url]`: a Cloudflare tool. After `npm run build`, it polls a deployed site until it serves
+  your build, by content. HTTP 200 alone proves nothing, because a failed deploy leaves the previous build up. There
+  is no official live site (decision 95); the tool serves the optional Cloudflare target.

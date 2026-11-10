@@ -23,7 +23,8 @@ import { getBool, _resetForTests as resetSettings } from '../../../src/systems/s
 import { MOD_SETTINGS, onlineModSetting } from '../../../src/systems/modSettings.js';
 import { FEATURE_PREF_ONLINE } from '../../../src/systems/features.js';
 
-/** The base commit's lane tables (857275eee9), dumped by running its own onlineLane.js with its registry's answers. */
+/** The base commit's lane tables (857275eee9), dumped by running its own onlineLane.js with its registry's answers,
+ *  less the vendored mods removed since (docs/testing/vendored-mods-ratchet.md). */
 const BASE = JSON.parse(readFileSync(new URL('./online-lane-base.json', import.meta.url), 'utf8'));
 const OFFICIAL_PH = await profileHashOf(OFFICIAL_PROFILE);
 const withRules = (rules) => ({ ...OFFICIAL_PROFILE, rules });
@@ -35,7 +36,8 @@ afterEach(() => {
 
 test('P0 NO PLAY CHANGE: under the official profile the lane forces exactly what the base forced - every pref, every DFU setting, every mod key and every whole mod (mutants: a pin dropped in the move; a pin added; a whole mod freed)', () => {
   assert.deepEqual({ ...lane.ONLINE_FORCED_PREFS }, BASE.prefs);
-  assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_FORCED_SETTINGS)), BASE.settings);
+  // This port adds one setting to the base's: DFU's own Enhanced Combat AI, pinned at DFU's True (combat.enhancedAI).
+  assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_FORCED_SETTINGS)), { ...BASE.settings, Enhancements: { EnhancedCombatAI: 'True' } });
   assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_ROOM_MOD_KEYS)), BASE.modKeys);
   assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_WHOLE_MODS)), BASE.wholeMods);
   for (const [key, value] of Object.entries(BASE.prefs)) {
@@ -80,6 +82,7 @@ test("P0 ON60 END TO END ON THE SETTINGS READ PATH: online, AllowMagicRepairs is
     assert.equal(getBool('Controls', 'AllowMagicRepairs'), false);
     assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_FORCED_SETTINGS)), {
       Controls: { AllowMagicRepairs: 'False' },
+      Enhancements: { EnhancedCombatAI: 'True' },
     });
     g.location = { search: '' };
     assert.equal(lane.onlineForcedSetting('Controls', 'AllowMagicRepairs'), undefined, 'offline the store answers');

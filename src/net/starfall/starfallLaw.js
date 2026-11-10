@@ -3,10 +3,12 @@
 // when the stars fall, where in its pixel each lands, and the ledger a star's cell keeps while its coven comes for it.
 // Design: 4 and 5.
 //
-// A FUNCTION OF THE WALL CLOCK, AND NOTHING ELSE. The sky turns once a real hour, its midnight on the hour (net/skyLaw.js
-// SKY_SEGMENTS - TimeScale 24, aligned), and a night's three stars fall at fixed instants of that hour. The law reads
-// wall time alone, so the relay needs no sky (skyLaw.js is never the relay's - test/systems/time1_sky.test.js holds it
-// out); test/net/starfall/star1_law.test.js holds every star of a year of nights inside the sky's dark, read off the sky.
+// A FUNCTION OF THE WALL CLOCK, AND NOTHING ELSE. A night is a sky day: the sky is the world clock (a day every two real
+// hours at TimeScale 12), or, with the server profile's time.skyClock, the sky's own (a day every real hour at its
+// default TimeScale 24). A night's three stars fall at fixed instants of that day. The law reads wall time and the
+// profile's scales alone (net/sky-days.ts), so the relay needs no sky (skyLaw.js is never the relay's -
+// test/systems/time1_sky.test.js holds it out); test/net/starfall/star1_law.test.js holds every star of a year of nights
+// inside the sky's dark, read off the sky.
 //
 // THE LEDGER is the cell's (server/src/index.js `_star*`): what a star's defenders' words have moved - the gathering, each
 // wave and its breath, the master, the star's light, who defended - stepped on an ENCOUNTER CLOCK that runs only while
@@ -20,6 +22,7 @@
 import { PIXEL_UNITS, STAR_LEDGERS_MAX, STAR_LEDGERS_BY_MAX, STAR_IDLE_MS, STAR_WAVE_SIZE_OLD_MAX, siteEventLaneOpen, siteEventPixelOk } from '../wire.js';
 import { gateHash, PIXEL_M, GATE_SPOT_SPREAD_M } from '../gate/gateLaw.js';
 import { festivalOpen } from '../festivalLaw.js';   // the festival's one calendar (a leaf beside the holiday tables)
+import { skyDayMs, skyDayStartMs, skyDayAtOrAfter } from '../sky-days.ts';   // the sky's day on the wall clock
 
 // ═══ THE WINDOW ══════════════════════════════════════════════════════════════════════════════════════════════════════
 /** THE WITCHES' FESTIVAL'S DAYS - the Starfall is the festival's, so it runs while
@@ -29,19 +32,19 @@ import { festivalOpen } from '../festivalLaw.js';   // the festival's one calend
 export const starfallRuns = (/** @type {number} */ nowMs) => festivalOpen(nowMs);
 
 // ═══ THE NIGHT AND ITS STARS ═════════════════════════════════════════════════════════════════════════════════════════
-/** A sky day, real ms: TimeScale 24 (net/skyLaw.js SKY_SEGMENTS - the test reads the sky itself). */
-export const STAR_HOUR_MS = 3_600_000;
-/** Each star's landing, ms from its night's midnight: the sky's 18:00, 21:00 and 00:00 (the sky's day is an hour, so a
- *  sky hour is 150 000 ms). */
-export const STAR_FALLS_MS = Object.freeze([-900_000, -450_000, 0]);
+/** Each star's landing, as a part of a sky day from its night's midnight: the sky's 18:00, 21:00 and 00:00. */
+export const STAR_FALL_DAYS = Object.freeze([-1 / 4, -1 / 8, 0]);
+/** Star `i`'s landing, ms from its night's midnight: -900 000, -450 000 and 0 when the sky's day is an hour. */
+export const starFallOffsetMs = (/** @type {number} */ i) => Math.round(STAR_FALL_DAYS[i] * skyDayMs());
 /** The stars a night - the falls' own count. */
-export const STAR_PER_NIGHT = STAR_FALLS_MS.length;
+export const STAR_PER_NIGHT = STAR_FALL_DAYS.length;
 /** The omen runs this long before a landing: a new star burns over the region. */
 export const STAR_OMEN_MS = 90_000;
 /** The streak, this long before a landing: the star tears loose and comes down (the omen's last seconds). */
 export const STAR_STREAK_MS = 8_000;
-/** A star stands this long after it lands; unheld by then, the coven takes it. The night's last is dawn's. */
-export const STAR_LIFE_MS = 900_000;
+/** A star stands this long after it lands (a quarter of the sky's day, 900 000 ms when it is an hour); unheld by then,
+ *  the coven takes it. The night's last is dawn's. */
+export const starLifeMs = () => Math.round(skyDayMs() / 4);
 /** A word said in a star's last moment reaches the relay a moment after it (the rite's RITE_GRACE_MS): a ledger's words
  *  are heard this long past its deadline, and it is lost only then (starLostAt). */
 export const STAR_GRACE_MS = 2_000;
@@ -49,8 +52,8 @@ export const STAR_GRACE_MS = 2_000;
 export const STAR_AFTER_MS = 120_000;
 
 /** The night an instant stands in: the one whose midnight is the nearest hour at or after it, while its last star stands
- *  (its midnight plus STAR_LIFE_MS) - so the hour's first quarter is the night before's dawn. */
-export const starNightAt = (nowMs) => Math.ceil((nowMs - STAR_LIFE_MS - STAR_FALLS_MS[STAR_PER_NIGHT - 1]) / STAR_HOUR_MS);
+ *  (its midnight plus the star's life) - so the day's first quarter is the night before's dawn. */
+export const starNightAt = (nowMs) => skyDayAtOrAfter(nowMs - starLifeMs() - starFallOffsetMs(STAR_PER_NIGHT - 1));
 /**
  * WW5 (WW5): A COVEN NIGHT IN EVERY THEATRE - the Bay's, and each province's past it that
  * stands (net/wire.js SITE_EVENT_LANES: Cyrodiil's open zone none). One sky turns over the whole of Tamriel, so every
@@ -76,8 +79,9 @@ export const starOk = (n, k) => Number.isSafeInteger(n) && n > 0 && Number.isInt
  * @param {number} n the night @param {number} k the star
  */
 export function starTimes(n, k) {
-  const fallAt = n * STAR_HOUR_MS + STAR_FALLS_MS[starIndexOf(k)];   // WW5: every lane's star its place's instant
-  return { omenAt: fallAt - STAR_OMEN_MS, streakAt: fallAt - STAR_STREAK_MS, fallAt, endAt: fallAt + STAR_LIFE_MS, goneAt: fallAt + STAR_LIFE_MS + STAR_AFTER_MS };
+  const fallAt = skyDayStartMs(n) + starFallOffsetMs(starIndexOf(k));   // WW5: every lane's star its place's instant
+  const endAt = fallAt + starLifeMs();
+  return { omenAt: fallAt - STAR_OMEN_MS, streakAt: fallAt - STAR_STREAK_MS, fallAt, endAt, goneAt: endAt + STAR_AFTER_MS };
 }
 /** Whether a star of night `n` falls inside the window: its landing is the window's. */
 export const starInWindow = (n, k) => starOk(n, k) && starfallRuns(starTimes(n, k).fallAt);

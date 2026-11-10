@@ -49,7 +49,9 @@ check on what it receives.
 
 A pose is a JSON object with short keys: position, `ts` (a stamp modulo `POSE_TS_MOD`, 2^24), movement and animation
 fields (`POSE_DEFAULTS`: `mv`, `wd`, `an`, `as`, `am`, `sr`, `cn`, `cr`, `ce`, `ar`, `fk`), hand flags, dead flag
-`dd`, riding mode. `validPose` and `slimPose` define the accepted shape. The client sends up to `POSE_HZ` (10/s,
+`dd`, riding mode, concealment `cv`, and the player's live Stealth `sk` and half-speed state `hv`, which a foe that
+another client runs reads for DFU's stealth check (`src/net/stealth-wire.ts`). `validPose` and `slimPose` define the
+accepted shape. The client sends up to `POSE_HZ` (10/s,
 fewer in a crowd, `POSE_CROWD`); the relay allows `POSE_HZ_MAX` (20/s) and batches fan-out every `POSE_BATCH_MS`.
 
 ### Limits worth knowing
@@ -74,16 +76,16 @@ fewer in a crowd, `POSE_CROWD`); the relay allows `POSE_HZ_MAX` (20/s) and batch
 
 ## The relay version
 
-```js
-export const RELAY_VERSION = 'world277';   // src/net/wire.js
-```
+`RELAY_VERSION` in `src/net/wire.js` names the protocol. Its format is `world<N>`; `test/net/relayversion.test.js`
+checks that format. On the wire, `relayVersionOf` accepts any non-empty string of up to `RELAY_VERSION_MAX` (32)
+characters, and `relayMatches` requires it to equal the client's own. The version is read by:
 
-The format is `world<N>` (checked by `relayVersionOf` and by `test/net/relayversion.test.js`). It is read by:
-
-- the relay's `/health` and its `welcome` frame (`v`);
+- the relay's `/health`, its `/profile` and its `welcome` frame (`v`);
+- the profile door, which refuses a relay of another version before an online world boots;
 - `.github/workflows/relay-deploy.yml`, which deploys when the source version differs from the live one;
 - `.github/workflows/account-deploy.yml`, which waits until the relay at the client's `DEFAULT_SERVER` serves this
-  version (or a later one) before deploying the service, so the service never signs what the live relay refuses;
+  version (or a later one) before deploying the service, so the service never signs what the live relay refuses (with
+  `DEFAULT_SERVER` empty it waits on nothing);
 - the client, which joins only a relay of its own version (below).
 
 ### One version, client and relay
@@ -91,14 +93,25 @@ The format is `world<N>` (checked by `relayVersionOf` and by `test/net/relayvers
 The client and the relay ship as one pair, built from the same tree. There are no per-feature relay gates: the client
 sends every frame it knows to every relay it joins.
 
-On `welcome`, `src/net/online.js` compares `v` with its own `RELAY_VERSION` (`relayMatches` in `wire.js`). When they
-differ, or the welcome names no version, the session refuses the relay (`refuseVersion`): it leaves every room, sets
-`versionRefused`, and its status line asks the player to reload the page (`net.relayVersionMismatch`). A refused
-session never retries, rejoins or joins again; only a reload of the page, which loads the client that matches the
-deployed relay, brings it back. The presence session and every chat link apply the rule to their own welcomes.
+Two values must match before a client and a relay play together: the relay version and the profile hash `ph`. The
+version says both ends speak the same protocol. `ph` says both play by the same server profile, the data that holds
+the server's online rules (decisions 58 and 65). `ph` is the SHA-256 of the profile's canonical JSON, keys sorted at
+every depth (`profileHashOf`, `src/net/profile/profileHash.ts`), so every holder computes the same hash. The relay
+names its `ph` in `/health`, `/profile` and every welcome (see [relay.md](relay.md), The server profile).
 
-In the other direction, the hello carries law numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the cell
-tree's `of`). The relay refuses an older client build with `CLOSE_POLICY` and a reason such as `old ground`.
+On `welcome`, `src/net/online.js` checks `v` with `relayMatches` and `ph` with `profileMatches`
+(`src/systems/online/serverProfile.ts`, against the hash of the profile the page installed). When the version is
+missing or differs, or the hash differs from the page's, the session refuses the relay (`refuseVersion`): it leaves
+every room, sets `versionRefused`, and its status line asks the player to reload the page
+(`net.relayVersionMismatch` for the version, `net.profile.changed` for the profile). A refused session never
+retries, rejoins or joins again. Only a reload of the page, which fetches the relay's profile again and loads the
+client that matches the deployed relay, brings it back. The presence session and every chat link apply the rule to
+their own welcomes.
+
+In the other direction, the hello carries `ph` and the law numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`,
+`LOOT_HELLO_LAW`, the cell tree's `of`). The relay's hello doors (`server/src/helloDoor.ts`) refuse a hello on another
+profile with the reason `other rules`, and an older client build with a reason such as `old ground`, both with
+`CLOSE_POLICY`.
 
 ### The version hash test
 
@@ -107,7 +120,10 @@ the bytes of every file in it, and compares the hash to a table of `version -> s
 list of files in the graph. So:
 
 - **Any change to a file the relay bundles** (including client files under `src/net/` and the few `src/systems/` and
-  `src/assets/` files it reaches) fails the test until `RELAY_VERSION` moves and a new row is added.
+  `src/assets/` files it reaches) fails the test until `RELAY_VERSION` moves and a new row is added. The official
+  profile (`src/net/profile/officialProfile.ts`) is in the graph, so a change to the profile's rules is a relay change
+  too. The key registry (`profileKeys.ts`) is not: a key added with its default value does not change the profile or
+  its hash.
 - A change that adds or removes an import in the relay graph must also update the expected file list.
 - Old rows are never edited. Two versions cannot name the same bytes.
 

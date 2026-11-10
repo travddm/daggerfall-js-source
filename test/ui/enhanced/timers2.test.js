@@ -2,13 +2,14 @@
 // (systems/eventTimers.js TIMER_GROUPS, timerGroupOf, timerGroups: each row under what it is, each group in the list's
 // own order), the window (ui/enhanced/enhancedTimers.js: a head a group, how many are under way, a row under way saying
 // "Now", a bar showing every group or one alone, kept while the game runs, a group that empties handing the list back to
-// All) and the sheet (the gate's colour from its herald's family, the bar and the badge on Stone).
+// All) and the sheet (the gate's red and the rings' colours, the bar and the badge on Stone).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { eventTimerRows, TIMER_GROUPS, timerGroupOf, timerGroups } from '../../../src/systems/eventTimers.js';
 import { timersWindow, TIMER_KINDS, timerGroupTitle, timerGroupChip } from '../../../src/ui/enhanced/enhancedTimers.js';
 import { ENHANCED_CSS } from '../../../src/ui/enhanced/enhancedStyle.js';
-import { heraldCss } from '../../../src/net/herald/heraldCard.js';
+import { SERPENT_RING_MAP_CSS } from '../../../src/ui/serpentMapMark.js';
+import { SD_RING_MAP_CSS } from '../../../src/ui/superDungeon/sdMapMark.js';
 
 // Friday 2026-10-02 12:20 UTC - a Muster, a gate day, the Reckoning that evening (TIMERS1's own instant)
 const NOW = Date.UTC(2026, 9, 2, 12, 20, 0);
@@ -119,8 +120,11 @@ test('TIMERS2 the bar: All and a button for each group with a row, each its coun
   assert.deepEqual(all(again.root, 'tm-section-name').map((n) => n.textContent), ['World events', 'Town raids', 'Resets'], 'All, as the player last saw it - not the emptied group come back');
 });
 
-test('TIMERS2 the sheet: the gate\'s red the colour its Discord card wears, the bar and the badge styled, and Stone\'s light ground lifting the badge past 4.5:1 (mutants: the gate\'s a literal again)', () => {
-  assert.ok(ENHANCED_CSS.includes(`.px-timerswin .tm-gate { --tm-kind: ${heraldCss('gate')}; }`));
+test('TIMERS2 the sheet: the gate\'s red and the rings\' colours, the bar and the badge styled, and Stone\'s light ground lifting the badge past 4.5:1', () => {
+  assert.ok(ENHANCED_CSS.includes('.px-timerswin .tm-gate { --tm-kind: #e2554c; }'));
+  // the sea serpent's and the Abyss Dungeon's rows wear their rings' colours on the map
+  assert.ok(ENHANCED_CSS.includes(`.px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; }`));
+  assert.ok(ENHANCED_CSS.includes(`.px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; }`));
   for (const rule of ['.px-timerswin .tm-groups {', '.px-timerswin .tm-chip {', '.px-timerswin .tm-chip.on {', '.px-timerswin .tm-badge {', '.px-timerswin .tm-section-live {']) assert.ok(ENHANCED_CSS.includes(rule), rule);
   assert.match(ENHANCED_CSS, /@media \(max-width: 560px\) \{[^}]*\}\n  \.px-timerswin \.tm-count \{ font-size: 16px; \}\n[^\n]*\n  \.px-timerswin \.tm-row \{ flex-wrap: wrap; \}\n  \.px-timerswin \.tm-text \{ flex: 1 1 0; \}\n\}/, 'a row wraps on a phone, its words keeping the room beside the clock');
   assert.match(ENHANCED_CSS, /:root\[data-plus-theme="stone"\] \.px-timerswin \.tm-badge, :root\[data-plus-theme="stone"\] \.px-timerswin \.tm-section-live \{ color: #c8ffd6; \}/, 'TIMERS1\'s live green on Stone (7.1:1 over its panel, as timers1.test.js measures it)');

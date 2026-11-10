@@ -10,7 +10,7 @@ import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { REALM_TRADE_BODY_MAX } from '../../server-account/src/realmTrade.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   realmTradeHalfOf, halvesAgree, tradeableRecord, recordIsOffered, takeTradeGoods, settleRealmTrade, realmTradeRefusalText,
   REALM_TRADE_SID_RE, REALM_TRADE_TTL_S, GOLD_PIECES_TEMPLATE, TRADE_VOLATILE_FIELDS,
@@ -80,7 +80,7 @@ async function realm() {
   async function player() {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
     const storage = fakeStorage();
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const door = { mode: 'ok', inits: [] };
     const fetch = async (url, init) => {
       door.inits.push({ url, init });

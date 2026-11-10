@@ -99,7 +99,7 @@ const verdictText = (ai) => (ai && typeof ai === 'object'
 /**
  * STAFF-PANEL2-CHATMENU: THE ACTS A
  * STAFF MEMBER'S CHAT LINE MENU OFFERS IN PLACE OF REPORT, by their own glyphs as the service last issued them - the
- * design's in-game card. An Admin is a Developer (`dev`): Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch. A
+ * design's in-game card. An Admin is a Developer (`dev`): TP, Message, Mute, Freeze, Ban, Notes, Watch. A
  * Moderator wears the shield (`mod`): the same less TP and Freeze. Anyone else, a Dungeon Master included: none, and Report stays. The rows only open a
  * door: the account service, the relay and the Staff Panel each check the role again.
  * @param {unknown} glyphs @returns {string[]}
@@ -108,7 +108,7 @@ export function staffLineActs(glyphs) {
   const g = Array.isArray(glyphs) ? glyphs : [];
   const admin = g.includes('dev');
   if (!admin && !g.includes('mod')) return [];
-  return ['follow', ...(admin ? ['tp'] : []), 'message', 'mute', ...(admin ? ['freeze'] : []), 'ban', 'notes', 'watch'];
+  return [...(admin ? ['tp'] : []), 'message', 'mute', ...(admin ? ['freeze'] : []), 'ban', 'notes', 'watch'];
 }
 /** STAFF-PANEL2-CHATMENU: a line menu's mute lengths, minutes (30 min, 1 h, 1 day, 7 days - MOD1's bound, MUTE_MAX_MIN). */
 export const STAFF_MUTE_MINUTES = Object.freeze([30, 60, 24 * 60, 7 * 24 * 60]);
@@ -117,7 +117,7 @@ export const STAFF_BAN_DAYS = Object.freeze([1, 7, 30, 0]);
 /** STAFF-PANEL2-CHATMENU: the acts the player can see happen to them (TP: design, "the player can see this"). */
 const STAFF_SEEN = Object.freeze(['tp', 'message', 'mute', 'freeze', 'ban']);
 const STAFF_LABEL = Object.freeze({
-  follow: () => t('net.staffMenu.follow', 'Follow'), tp: () => t('net.staffMenu.tp', 'TP'), message: () => t('net.staffMenu.message', 'Message on screen'),
+  tp: () => t('net.staffMenu.tp', 'TP'), message: () => t('net.staffMenu.message', 'Message on screen'),
   mute: () => t('net.staffMenu.mute', 'Mute…'), freeze: () => t('net.staffMenu.freeze', 'Freeze'), ban: () => t('net.staffMenu.ban', 'Ban…'),
   notes: () => t('net.staffMenu.notes', 'Notes'), watch: () => t('net.staffMenu.watch', 'Watch'),
 });
@@ -136,8 +136,6 @@ const spanText = (min) => (min === 0 ? t('net.staffMenu.forGood', 'For good')
  * @param {() => any} [o.panel]  AUDIT SAFE CLIENT-12: the chat panel (ui/chatPanel.js), or null
  * @param {() => unknown} [o.glyphs]  STAFF-PANEL2-CHATMENU: my own glyphs as the service last issued them (world.js
  *   _staffGlyphs) - an Admin's or a Moderator's line menu carries their acts in place of Report (staffLineActs)
- * @param {() => ((sub: string) => unknown) | null} [o.follow]  STAFF-PANEL2-CHATMENU: the game staff hook's follow
- *   (net/staffHook.js), or null - no hook, no Follow row
  * @param {((id: string) => void) | null} [o.teleport]  STAFF-PANEL2-CHATMENU: /tp to a player's socket id (world.js
  *   runStaffCommand), or null - none, no TP row
  * @param {boolean} [o.touch]
@@ -150,7 +148,7 @@ const spanText = (min) => (min === 0 ? t('net.staffMenu.forGood', 'For good')
  * @param {(fn: () => void, ms: number) => any} [o.setTimer]  AUDIT SAFE CLIENT-8: the block list's retry clock
  * @param {(h: any) => void} [o.clearTimer]
  */
-export function createChatSafetyHost({ log, links, social = () => null, minter = () => null, panel = () => null, glyphs = () => [], follow = () => null, teleport = null, touch = isTouchDevice(), doc = globalThis.document, win = globalThis, register = registerOverlay,
+export function createChatSafetyHost({ log, links, social = () => null, minter = () => null, panel = () => null, glyphs = () => [], teleport = null, touch = isTouchDevice(), doc = globalThis.document, win = globalThis, register = registerOverlay,
   fetch = (u, i) => globalThis.fetch(u, i), storage = null, now = () => Date.now(), setTimer = (fn, ms) => setTimeout(fn, ms), clearTimer = (h) => clearTimeout(h) }) {
   /** @type {Map<string, string>} sub -> the name it was blocked under (the service's: the account's own) */
   const blocked = new Map();
@@ -416,14 +414,11 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
   /** STAFF-PANEL2-CHATMENU: a staff member's rows for one spoken line, each act by the line's ACCOUNT (`sub`, the relay's
    *  word beside the line), never by the name it showed (design weak spot "In-game cards match players by name"). A
    *  tooltip says whether the player can see it. */
-  const staffRows = (line, name, f = follow(), card = true) => {   // CHAT-FOLLOW-CARD: `card` false where the follow given hands its own
+  const staffRows = (line, name) => {
     const sub = line.sub;
     if (!ID_RE.test(sub)) return [];
     return staffLineActs(glyphs()).map((act) => {
       const row = { label: STAFF_LABEL[act](), title: STAFF_SEEN.includes(act) ? t('net.staffMenu.seen', 'The player can see this.') : t('net.staffMenu.unseen', 'The player does not see this.') };
-      // CHAT-FOLLOW-CARD: a follow that took hands the panel
-      // the followed player's card, as a tag's click does (scenes/staffViewHost.js go) - the same act word, no line said
-      if (act === 'follow') return typeof f === 'function' ? { ...row, run: () => { void Promise.resolve().then(() => f(sub)).then((ok) => { if (ok !== false && card) post('follow', sub, name); if (ok === false) sayActive(t('net.staffMenu.handed', 'Staff Panel: {act} {name}. Nothing opens without the Staff Panel extension.', { act: row.label, name })); }).catch((e) => sayActive(String(e?.message ?? e))); } } : null;   // false: no Staff Panel over this game (staffFollowHost.js follow), said as the panel's other acts say it
       if (act === 'tp') return typeof teleport === 'function' && typeof line.id === 'string' && line.id ? { ...row, run: () => tpTo(line) } : null;
       if (act === 'mute') return { ...row, menu: STAFF_MUTE_MINUTES.map((m) => ({ label: spanText(m), title: row.title, run: () => { void muteFor(sub, name, m); } })) };
       if (act === 'ban') return { ...row, menu: STAFF_BAN_DAYS.map((d) => ({ label: spanText(d * 1440), title: row.title, menu: banLevel(sub, name, d) })) };
@@ -436,7 +431,7 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
     /** STAFF-CHAT-RED: the voice an
      *  Admin's lines go out in (net/chatVoice.js) - made here, beside the glyphs and the mint's word it reads, and handed
      *  to the chat panel (ui/chatPanel.js `voice`) by the host. */
-    voice: createChatVoice({ glyphs, say, win }),
+    voice: createChatVoice({ glyphs, say }),
     /** The chat started: the log hears through the block list, every room's word is wired, and the list is read. */
     async start() {
       const l = log();
@@ -471,12 +466,11 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
      *  Moderator (`staff`) gets no Report - they act on a player, not report them. STAFF-PANEL2-CHATMENU: and gets the
      *  acts they use on players instead (staffRows), then Block. */
     /** STAFF-TAG-MENU: a player's staff acts by their
-     *  socket (`id`) and account (`sub`) - the chat line menu's own rows (staffRows), for the staff view's tag menu
-     *  (scenes/staffViewHost.js); `onFollow` its Follow when the view's own follow (which opens the panel's card) stands
-     *  for the chat's. None for a player's page. @param {{ id: string, sub: string, name: string }} p @param {(sub: string) => any} [onFollow] */
-    playerActions(p, onFollow) {
+     *  socket (`id`) and account (`sub`) - the chat line menu's own rows (staffRows), for a roster row (rosterActions).
+     *  None for a player's page. @param {{ id: string, sub: string, name: string }} p */
+    playerActions(p) {
       if (!staff() || !p) return [];
-      return staffRows({ id: p.id, sub: p.sub }, String(p.name ?? ''), onFollow ?? follow(), !onFollow);
+      return staffRows({ id: p.id, sub: p.sub }, String(p.name ?? ''));
     },
     /** ROSTER-STAFF: a roster row's staff acts - the line menu's own (staffRows) for the player the row names by socket, their
      *  account as a room here holds it, or the hub's lists (everyone online, the guild's, a search's answer). None for a
