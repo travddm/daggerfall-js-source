@@ -59,7 +59,7 @@ test('AUDIT SEA VENTURES E7: the season\'s boards never read: asking, never an e
 
 
 test('AUDIT SEA VENTURES B6: the day a season turns in counts for the old one - a world day past the turn, a save filing the season before\'s figures is read for it, its legends bounded by that whole season; past the day, never (mutants: the day, the season before, the legends\' bound)', () => {
-  assert.equal(seaWorldDayS, 7200);
+  assert.equal(seaWorldDayS(), 7200);
   const turn = seaSeasonStartS(2);
   const save = (n, deepest = 900, legends = 1) => ({ modData: { [SEA_SEASON_VENDOR]: { ether: { season: { n, deepest, legends } } } } });
   assert.deepEqual(seaSeasonFigures(save(1), turn + 60), { n: 1, deepest: 900, legends: 1 }, 'the season before, the turn\'s day');
