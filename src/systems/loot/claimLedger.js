@@ -23,6 +23,7 @@
 // LEGACY_ASK_KEEP_MS - with the puppet or without it (a room change, a swept owner).
 // Pure but for the player's hands. Not a DFU member: Daggerfall has one player.
 import { liftPiece, givePiece, ROOM_CLAIM_TIMEOUT_MS, ROOM_TAKEN_TEXT, ROOM_CLAIMS_MAX } from '../roomLoot.js';
+import { inFlightKg } from '../item/pendingCarry.js';   // what a claim in flight weighs
 
 /** How long a claim waits for its verdict: any verdict inside it lands, past it the claim is given up. */
 export const CLAIM_KEEP_MS = 300_000;
@@ -95,6 +96,10 @@ export function createClaimLedger({ entity, say = () => {}, newId, keepMs = CLAI
     }
     return { places, stored, puts: /** @type {any[]} */ ([]) };
   }
+
+  /** The kilograms the claims in flight will land (not answered, not lapsed: a lapsed piece is back in
+   *  its container's view), for the carry gate (systems/item/pendingCarry.js). */
+  const pendingKg = () => inFlightKg(claims.values());
 
   /** A verdict on a claim of this player's: the piece comes to the pack on a grant (no more than came out of it), a
    *  refusal is said unless a sibling claim on that place was granted, a withdrawn one lapses quietly. `from`, when the
@@ -186,5 +191,5 @@ export function createClaimLedger({ entity, say = () => {}, newId, keepMs = CLAI
   /** Everything forgotten - the pool is going away (after `keep` has said what goes with it). */
   function clear() { claims.clear(); won.clear(); asks.clear(); }
 
-  return { take, pending, resolve, due, keep, open, get, ask, askedWithin, landAsk, clear, get size() { return claims.size; } };
+  return { take, pending, pendingKg, resolve, due, keep, open, get, ask, askedWithin, landAsk, clear, get size() { return claims.size; } };
 }

@@ -24,7 +24,7 @@ import { markFoeStruck } from '../ui/hud/hudFoeTarget.js';   // PX30
 import { damageShieldPool, playerBlowCameToNothing } from '../characters/playerEntity.js';   // AUDIT 58: DecreaseHealth's shield hook is the BASE class's (DaggerfallEntity.cs:313-328)
 import { lycanthropeAttackVoice } from '../systems/lycanthropy.js';   // V4: the beast's attack voice
 import { copyEffectEntry } from '../systems/save/save.js';   // AUDIT 26 F216: the caster-stripping effect copy, one home
-import { EnemyAI, isBackFacing, withinYaw, MELEE_DISTANCE, foeFrameDt } from '../characters/enemy/enemyMotor.js';   // AUDIT WORLD6b-iii(a) B4: the puppet's cast is read against the owner's own bands
+import { EnemyAI, isBackFacing, withinYaw, MELEE_DISTANCE, foeFrameDt, enhancedCombatAIEnabled, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from '../characters/enemy/enemyMotor.js';   // AUDIT WORLD6b-iii(a) B4: the puppet's cast is read against the owner's own bands
 import { pilotFoe, pilotSteer } from '../systems/staffBossPilot.js';   // STAFF-PILOT: a staff member steering their event's mini boss
 import { EnhancedEnemyAI } from '../ai/enhancedMotor.js';   // FIELD BUGS 2026-10-16b INDOOR-WATCH: the routes, where the host hands a mesh (`nav`)
 import { getPref } from '../systems/uiPrefs.js';   // INDOOR-WATCH: the Enhanced AI switch, as the dungeon's construction sites read it
@@ -383,7 +383,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
   // alone here). A peer's hit on my foe carries the striker's feet and the blow's direction, so the foe turns on
   // the striker and the shove goes the way the blow went. Casts stay the owner's own: a foe whose target is a peer
   // does not cast (6b-iii).
-  const _peers = createPeerCandidates({ read: () => _net?.peers?.() ?? null, concealFlags: concealFlagsOfBits, capsuleHeight: CAPSULE_HEIGHT });
+  const _peers = createPeerCandidates({ read: () => _net?.peers?.() ?? null, concealFlags: concealFlagsOfBits, capsuleHeight: CAPSULE_HEIGHT, stance: { write: (id, yaw, sheathed) => { writePlayerYaw(id, yaw); writePlayerBowOrSheathed(id, sheathed); }, forget: forgetPlayerStance } });
   let _peerFrame = 0;   // the frame a blow's divert was taken in
 
   const activeCount = () => foes.filter((f) => !f.dead && !f.puppet && !f.placed && f.companion == null).length;   // AUDIT CC-A7: a companion is the player's, never one of the place's encounter slots   // WORLD6b: a puppet is its owner's, not this cap's; WOD3: nor is a foe a mod PLACED
@@ -519,7 +519,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       const facing = yaw ?? rolls() * Math.PI * 2;
       const ai = new (nav && getPref('enhancedAI') ? EnhancedEnemyAI : EnemyAI)(collider, pending.feet, facing, {   // INDOOR-WATCH: the switch chooses the motor where the room has a mesh; the bake is read per step
         nav: nav?.chf, navWorld: nav?.world, navGoal: nav?.goal, navSeed: (facing * 1000) | 0,   // the dungeon's three, its seed off the spawn's facing as its own; the room's goal for a player off its mesh (AUDIT W1)
-        liveSpeed: () => liveStat(entity, 'speed'),   // AUDIT 39: EnemyMotor.cs:432 re-reads LiveSpeed per FixedUpdate
+        liveSpeed: () => liveStat(entity, 'speed'), enhancedCombatAI: enhancedCombatAIEnabled,   // AUDIT 39: EnemyMotor.cs:432 re-reads LiveSpeed per FixedUpdate
         seesThroughInvisibility: basics.seesThroughInvisibility ?? false,
         behaviour, mobileId: mobileType,
         waterSurfaceY: waterLevelY ? () => waterLevelY() : null,   // DW-E4: blockWaterLevel, one level for the scene

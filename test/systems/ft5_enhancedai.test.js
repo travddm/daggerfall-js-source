@@ -5,9 +5,8 @@
 // - dungeons only, the crowd and the doors ahead - and one thing to
 // say that nothing said: it shares half a name with DFU's own
 // Enhancements/EnhancedCombatAI ("Smarter Enemies"), which is a
-// different feature the port does not run (Ledger A). Not a merge; the
-// row says so, and the DFU key stays in Settings as the unavailable
-// row it is.
+// different feature: DFU's own setting, which this layer sits on top of.
+// Not a merge; the DFU key stays in Settings.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -39,8 +38,8 @@ test('FT5: the note says what ships and names what it is not', () => {
     + 'ground: hit hard to stagger them or dodge. Red, hatched attacks can’t be stopped. Trees, rocks and crates block '
     + 'sight and missiles. Pathfinding works in dungeons only for now; towns, interiors and doors come later. Off keeps '
     + 'the classic behavior.');
-  // ...and the DFU key it names IS unavailable, in Settings, under that label
-  assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'unavailable');
-  assert.equal(featureForControl('settings', 'Enhancements/EnhancedCombatAI'), null, 'not rowed on the home - a row for a feature the port does not run would be a lie with a switch');
+  // ...and the DFU key it names is DFU's own setting, live in Settings, not a row on the home
+  assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'live');
+  assert.equal(featureForControl('settings', 'Enhancements/EnhancedCombatAI'), null, 'not rowed on the home: it is a DFU setting, not a port feature');
 });
 

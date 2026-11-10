@@ -11,7 +11,25 @@ import { readPeerStealth } from './peer-senses.ts';
  * A peer as the room reports it: its id, its feet in scene space, its capsule height, its concealment bits, and its live
  * Stealth and half-speed state.
  */
-export type PeerReport = { id?: unknown; feet?: unknown; height?: unknown; cv?: unknown; sk?: unknown; hv?: unknown };
+export type PeerReport = {
+  id?: unknown;
+  feet?: unknown;
+  height?: unknown;
+  cv?: unknown;
+  sk?: unknown;
+  hv?: unknown;
+  yaw?: unknown;
+  wd?: unknown;
+};
+
+/** Where a peer's stance goes for the foes' retreat roll (enemyMotor.js writePlayerYaw, writePlayerBowOrSheathed,
+ *  forgetPlayerStance). Handed in by the host, so this module does not import the enemy motor. */
+export type PeerStance = {
+  /** The peer's facing and whether its weapon is sheathed (its pose's `wd` 0), each frame it is seen. */
+  write: (id: string, yaw: unknown, sheathed: boolean) => void;
+  /** The peer left the room. */
+  forget: (id: string) => void;
+};
 
 export type PeerCandidate = {
   isPlayer: true;
@@ -37,6 +55,8 @@ export type PeerCandidatesDeps = {
   concealFlags: (bits: number) => unknown;
   /** The capsule height a peer without one stands at (player/motor.js CAPSULE_HEIGHT). */
   capsuleHeight: number;
+  /** Where each peer's stance is written, or nothing. */
+  stance?: PeerStance;
 };
 
 export type PeerCandidates = {
@@ -48,7 +68,7 @@ export type PeerCandidates = {
   nextFrame: () => number;
 };
 
-export function createPeerCandidates({ read, concealFlags, capsuleHeight }: PeerCandidatesDeps): PeerCandidates {
+export function createPeerCandidates({ read, concealFlags, capsuleHeight, stance }: PeerCandidatesDeps): PeerCandidates {
   const cands = new Map<string, PeerCandidate>();
   let frame = 0;
   let readAt = -1;
@@ -93,12 +113,14 @@ export function createPeerCandidates({ read, concealFlags, capsuleHeight }: Peer
       c.height = typeof q.height === 'number' && Number.isFinite(q.height) && q.height > 0 ? q.height : capsuleHeight;
       c.health = 1;
       c.cv = Number(q.cv) | 0;
+      stance?.write(q.id, q.yaw, q.wd === 0);
       readPeerStealth(c, q);
     }
     for (const [id, c] of cands) {
       if (seen.has(id)) continue;
       c.health = 0;
       cands.delete(id);
+      stance?.forget(id);
     }
     return [...cands.values()];
   }

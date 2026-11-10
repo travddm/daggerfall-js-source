@@ -372,8 +372,8 @@ test('WS1: the wiring, by source - the third-person build takes the addons and t
   assert.equal((fp.match(/ammoCount: ammoCount \?\? \(hasAmmo \? Number\.MAX_SAFE_INTEGER : 0\),/g) || []).length, 2, 'the build and the swap');
   assert.match(fp, /const swapped = new Set\(\['weapon', 'arrow', \.\.\.HOLSTER_SLOTS\]\);/);
   assert.match(fp, /bindPartsInto\(t\.arm, \[\.\.\.tResolved\.parts, \.\.\.tHolster\.parts\]\);/);
-  assert.equal((fp.match(/else if \(HOLSTER_SLOTS\.includes\(r\.slot\)\) r\.hidden = holsterHidden\(r\.slot, weaponShown, \{ arrowShown, tag: r\.piece\?\.tag \}\);/g) || []).length, 1, 'the world draw, with the round on the string');
-  assert.equal((fp.match(/else if \(HOLSTER_SLOTS\.includes\(r\.slot\)\) r\.hidden = holsterHidden\(r\.slot, true, \{ arrowShown, tag: r\.piece\?\.tag \}\);/g) || []).length, 1, 'the portrait: the weapon is in the hand');
+  assert.equal((fp.match(/else if \(HOLSTER_SLOTS\.includes\(r\.slot\)\) r\.hidden = holsterHidden\(r\.slot, ub\.weaponShown, \{ arrowShown: ub\.arrowShown, tag: r\.piece\?\.tag \}\);/g) || []).length, 1, 'the world draw, with the round on the string');
+  assert.equal((fp.match(/else if \(HOLSTER_SLOTS\.includes\(r\.slot\)\) r\.hidden = holsterHidden\(r\.slot, true, \{ arrowShown: ub\.arrowShown, tag: r\.piece\?\.tag \}\);/g) || []).length, 1, 'the portrait: the weapon is in the hand');
   assert.match(rd('src/systems/weaponSheathingAssets.js'), /\{ eager: true, query: '\?url', import: 'default' \}/, 'AUDIT-WS: the table is eager - no chunk per file');
   assert.match(fp, /sheathing = true, ammoCount = null,/);
   const rig = rd('src/combat/weapon/weaponRig.js');
