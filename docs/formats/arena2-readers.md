@@ -83,8 +83,12 @@ imports it (`server-account/src/market.js`, `server-account/src/professions.js`)
 BSA reader into the Worker.
 
 **`blocksFile.js` serves a block with port changes laid on.** The door may replace it, and an RMB's puddles are served
-dry (`world/puddleDry.js`). `readClassicBlock` returns the block as the BSA holds it, past both. Use it when you need
-the original (world-data patches do).
+dry. `readClassicBlock` returns the block as the BSA holds it, past both. Use it when you need the original (world-data
+patches do).
+
+**Puddle drying is a departure, not part of the reader.** `dryPuddles` (`src/world/puddleDry.js`) is the port's own
+change, applied in `blocksFile.js` to every RMB block with no setting read. It is decided that it is tied to the Iliac
+Puddle No More switch and leaves with that mod (decision 117 (23)); the code does not do that yet.
 
 **Departures are listed in headers.** `mapsFile.js` returns `null` where C# returns a default struct, memoizes
 `loadRegion`, and bounds a terminator scan at the record end. `bsaFile.js` bounds the name scan at the 14-byte field.

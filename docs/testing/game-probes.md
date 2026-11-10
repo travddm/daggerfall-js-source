@@ -44,11 +44,11 @@ npm run probes -- save pause     # the named probes
   `scratch/probe-shots/`, ignored by git).
 - A probe prints `ok` or `FAIL` for each check, and the run ends with one `PASS`/`FAIL` line for each probe. The exit
   status is 1 when any probe failed.
-- The old `npm run probes` (the enhanced menu and the feature rail) is now `npm run probes:ui`.
+- `npm run probes:ui` is a separate set: the enhanced menu and the feature rail.
 
 Probes drive a headless browser with the pointer lock answered inside the page (`lib/fakePointerLock.mjs`), so a run
 never takes the real mouse. Requests to hosts other than `localhost` and `127.0.0.1` are blocked: a probe never reaches
-the live services.
+a service outside the machine.
 
 ## Reading a failure
 
@@ -76,7 +76,9 @@ boot, and two read hooks. The repository is not changed. Every other probe runs 
 runner per probe, so the slowest probe (`online`) sets the wall time. It is not part of the `check` job. ARENA2 is
 downloaded once and cached. A `build` job builds the game once (and once more with the online probe's edits) and the
 probes download it (`PROBE_DIST`). Playwright's Chromium is cached by its version. The set does not run for a
-change that touches only documents (`*.md`, `docs/`); it also runs every night and on demand.
+change that touches only documents (`*.md`, `docs/`); it also runs every night and on demand. Running the probes on
+every pull request that touches `src/` is the agreed rule (decision 116 (10)); path-based guards are to narrow it
+later.
 
 To tell a flaky probe from a real fault, run one probe many times on CI (each run is its own runner):
 
