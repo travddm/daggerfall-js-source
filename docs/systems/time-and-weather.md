@@ -38,19 +38,39 @@ Online, nobody stores or moves the world clock. World time is a pure function of
 
 - The relay (`server/src/index.js`) puts its `now` in the welcome message. `src/net/online.js` turns it into
   `clockOffsetMs` (accepted only within 366 days of the local clock) and fires `onClock`.
-- `src/net/wire.js` `sharedClassicMinutes(nowMs)` maps wall time to classic minutes at `ONLINE_MINUTES_PER_MS` (the
-  same 12 game minutes per real minute). `setSharedClock` in `worldTick.js` installs it as the source.
+- `src/net/wire.js` `sharedClassicMinutes(nowMs)` maps wall time to classic minutes at `onlineMinutesPerMs()`: the server
+  profile's `time.worldScale` game minutes per real minute, 12 by default as in Daggerfall Unity's `TimeScale`.
+  `setSharedClock` in `worldTick.js` installs it as the source.
 - Every client computes the same time; nothing about the clock is sent after the welcome.
 
 There are three clocks online:
 
 | Clock | Function | Behaviour |
 | --- | --- | --- |
-| Event (world) clock | `worldMinutes()` | Wall-time function at 12x. Nobody can move it. |
-| Sky clock | `skyMinutes()` | The event clock, as Daggerfall Unity has one clock. A server profile can give the sky its own faster rate (`time.skyClock`: `SKY_SEGMENTS` in `src/net/skyLaw.js`, 24x, a day every real hour). |
+| Event (world) clock | `worldMinutes()` | Wall-time function at `time.worldScale` (12 by default). Nobody can move it. |
+| Sky clock | `skyMinutes()` | The event clock, as Daggerfall Unity has one clock. A server profile can give the sky its own faster rate (`time.skyClock`: `SKY_SEGMENTS` in `src/net/skyLaw.js`, at `time.skyScale`, 24 by default, a day every real hour). |
 | Own clock | `ownMinutes()` | Per character, saved. Runs with the world in play, runs ahead on rests and raises, stands while away or dead. |
 
 Offline all three are the same counter.
+
+### The scales are server-profile keys
+
+| Key | Default | Range | Read by |
+| --- | --- | --- | --- |
+| `time.worldScale` | 12 (DFU's TimeScale) | whole numbers 1 to 100 | the relay, the account Worker, every client |
+| `time.skyScale` | 24 | whole numbers 1 to 100 | the account Worker and every client, only while `time.skyClock` is true |
+
+- The relay sets the world scale from the official profile when it starts (`server/src/relayFacts.ts`); the account Worker
+  does the same when `src/net/skyLaw.js` loads; a client sets it when it installs the relay's profile
+  (`src/systems/online/serverProfile.ts`). Single player always plays at 12.
+- A profile names a scale in its `rules`; one that names none plays the defaults, so the profile's hash does not move.
+- The world's date is a function of the relay's wall time from a fixed start (`ONLINE_EPOCH_MS`). Changing
+  `time.worldScale` on a server with players moves the world's date at once, and with it every deadline kept in world
+  minutes. Set the scale before play.
+- The sky's midnights fall on the hour UTC only at `time.skyScale` 24 (`tools/skyCutover.mjs` lists the aligned instants).
+- Figures written for 12 do not follow the key yet: the Hunters' Mark game days in a UTC day (`GAME_DAYS_PER_UTC_DAY`),
+  the sea season's day and rise (`SEA_WORLD_DAY_S`, `SEA_LEGEND_RISE_S`), the court's round (`COURT_ROUND_MS`), the
+  camp encounter window (`CAMP_WINDOW_MINUTES`) and the Starfall's hourly nights.
 
 With the sky clock off (the default), the Starfall still falls on its own hourly nights (`src/net/starfall/starfallLaw.js`,
 the relay's wall-clock law), which then do not match the sky's nights.
