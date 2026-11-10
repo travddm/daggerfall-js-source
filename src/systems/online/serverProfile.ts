@@ -95,6 +95,14 @@ export function rule(name: string, search?: string): ProfileValue | undefined {
   return typeof key.offline === 'object' ? undefined : key.offline;
 }
 
+/**
+ * A rule's online value whatever this page's own query: the installed profile's, else the official profile's. For a law
+ * that is handed `online` itself, as the trade prices are (systems/shopStock.js calculateTradePrice).
+ */
+export function onlineRule(name: string): ProfileValue | undefined {
+  return rule(name, '?online');
+}
+
 /** Tests: nothing installed. */
 export function _resetProfileForTests(): void {
   installed = null;

@@ -59,6 +59,7 @@ import { findFactionByTypeAndRegion } from './talk/talk.js';           // S41: P
 import { MERCHANTS_FACTION_ID } from './guild/guilds.js';               // S41: FactionIDs.The_Merchants, one home
 import { turnOnConditionFlag, turnOffConditionFlag, REGION_FLAGS, REGION_COUNT } from './region/regionConditions.js';   // S42: the store S41's flag was waiting on
 import { isOnlinePage } from './online/onlineLane.js';   // REALM P0.4: online, a shop pays at most half what it asks
+import { onlineRule } from './online/serverProfile.ts';   // the server profile's trade keys (net/profile/profileKeys.ts)
 import { BAG_TEMPLATE, isBagItem } from '../net/bagLaw.js';   // BAG1: the Materials Bag, at every General Store online
 import { BOAT_PARTS_TEMPLATE, BOAT_DEED_TEMPLATE } from './comeSailAway/comeSailAwayItems.js';   // SHIPYARDS: a ship's parts and deed, which no shop buys - a port's shipyard does
 
@@ -854,8 +855,8 @@ export function calculateCost(baseValue, shopQuality, priceAdjustment = 1000, co
   return cost;
 }
 
-/** REALM P0.4: ONLINE A SHOP PAYS AT MOST HALF WHAT IT
- *  ASKS for the same piece. DFU's haggle can turn a counter's spread upside down - a quality-1 shop pays 125/256 of the
+/** The server profile's option (trade.saleCap, off by default: DFU's haggle online too). With it on, ONLINE A
+ *  SHOP PAYS AT MOST HALF WHAT IT ASKS for the same piece; off, a counter's piece sells back for no more than was paid. DFU's haggle can turn a counter's spread upside down - a quality-1 shop pays 125/256 of the
  *  cost to a seller with Mercantile 2 and asks 124/256 of a buyer - so buying a piece and selling it back made gold,
  *  and the regions' price walk paid a carrier. Offline, DFU's haggle stands. */
 export const ONLINE_SALE_SHARE = 0.5;
@@ -869,8 +870,8 @@ export const ONLINE_SALE_SHARE = 0.5;
  *  buyItemPrice, which every shelf's Buy walks - the guild shelves' too) - cost ONLINE_ESSENTIALS_PRICE_SCALE of
  *  their price online. Nothing else moves: repairs, training, spells, enchanting, houses and ships keep theirs.
  *  The half ROUNDS UP and a priced essential asks at least a gold - a free one (a holiday's, a knight's room) stays
- *  free. Rounding up is load-bearing for the potion: its sale online is capped at ONLINE_SALE_SHARE of the full ask,
- *  and ceil(cost/2) haggled is never under half the full cost haggled, so buying a potion to sell it back never pays.
+ *  free. A potion bought at half sells back for no more than was paid (the counter-paid mark); with the profile's sale cap,
+ *  rounding up keeps that without the mark: ceil(cost/2) haggled is never under ONLINE_SALE_SHARE of the full haggle.
  *  Offline, DFU's prices stand. */
 export const ONLINE_ESSENTIALS_PRICE_SCALE = 0.5;
 /** ESSENTIALS-HALF: an essential's price where the player stands - `price` offline, its rounded-up half (at least 1,
@@ -928,7 +929,7 @@ export const ONLINE_SALE_SKILL_WEIGHT = 0.5;
  *  -8,400,000 gold into the purse (a purchase as large paid the buyer).
  *  It divides now: the same number for every lot that never wrapped. */
 export function calculateTradePrice(cost, shopQuality, { mercantile = 0, personality = 50 } = {}, selling = false, { online = isOnlinePage() } = {}) {
-  if (online) {   // MERC-CAP: the haggle's own range
+  if (online && onlineRule('trade.haggleRange') === true) {   // MERC-CAP: the haggle's own range
     mercantile = Math.min(Math.max(mercantile, 0), ONLINE_HAGGLE_MAX);
     personality = Math.min(Math.max(personality, 0), ONLINE_HAGGLE_MAX);
   }
@@ -938,7 +939,7 @@ export function calculateTradePrice(cost, shopQuality, { mercantile = 0, persona
     dm = ((Math.trunc(((100 - merchantLevel) << 8) / 200) + 128) * (Math.trunc((mercantile << 8) / 200) + 128)) >> 8;
     dp = ((Math.trunc(((100 - merchantLevel) << 8) / 200) + 128) * (Math.trunc((personality << 8) / 200) + 128)) >> 8;
     const sale = Math.floor(((((179 * dm) >> 8) + ((51 * dp) >> 8)) * cost) / 256);   // TRADE-WRAP: never int32's wrap
-    if (!online) return sale;
+    if (!online || onlineRule('trade.saleCap') !== true) return sale;   // DFU's sale, unless the server profile caps it
     const best = { mercantile: ONLINE_HAGGLE_MAX, personality: ONLINE_HAGGLE_MAX };   // MERC-RISE: the best haggler this counter can meet
     const half = Math.floor(calculateTradePrice(cost, shopQuality, best, false) * ONLINE_SALE_SHARE);   // REALM P0.4; MERC-RISE: half the least it asks
     // MERC-SLOPE: under the half, where this seller's own offer stands against the best haggler's - at its weight
@@ -953,7 +954,6 @@ export function calculateTradePrice(cost, shopQuality, { mercantile = 0, persona
   dp = (((Math.trunc((merchantLevel << 8) / 200) + 128) * (Math.trunc(((100 - personality) << 8) / 200) + 128)) >> 8) << 6;
   return Math.floor(((((192 * dm) >> 8) + (dp >> 8)) * cost) / 256);   // TRADE-WRAP: never int32's wrap
 }
-
 
 // ── X6: THE SOUL GEM STOCK (the Mages Guild's Buy Soulgems service) ──
 //
