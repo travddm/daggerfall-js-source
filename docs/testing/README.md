@@ -11,5 +11,7 @@ outside the suite.
   town, travel, save and load, pause menu, two clients online), as the safety net for refactors of the host files.
 - [lint-ratchet.md](lint-ratchet.md) - the size, complexity, unused-code and `@ts-check` limits of production code,
   recorded as a ratchet that may only fall.
+- [vendored-mods-ratchet.md](vendored-mods-ratchet.md) - the count of each vendored mod's files and mentions, which
+  may only fall while the mods leave the repository.
 - [probes.md](probes.md) - the single-purpose Playwright probes, the account-service probe, the load harness
   and the desktop-shell probe: what they need and how to run one.
