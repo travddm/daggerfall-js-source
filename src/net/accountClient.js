@@ -1587,11 +1587,7 @@ export function accountTokenMinter({ fetch, storage, onIssued = null, character 
     },
     /** AUDIT SAFE CLIENT-2: THE HELD TOKEN LET GO - the relay said this account is banned
      *  (scenes/chatSafetyHost.js), and a token minted a moment before the ban opened every room a rejoin asked within
-     *  TOKEN_REUSE_MS. The next room mints, and the service refuses it.
-     *  STAFF-HIDE-TOGGLE: and Hide me or Show myself pressed
-     *  (scenes/staffFollowHost.js relinkGame) - a token signed before the press would open a room as the game was, so it
-     *  goes, and so does any mint still on its way (`forgets`): the next room asks the service, which reads the switch as
-     *  it stands now. */
+     *  TOKEN_REUSE_MS. The next room mints, and the service refuses it. A mint still on its way goes too (`forgets`). */
     forget: () => { held = null; forgets++; },
     /** DOOR-TOKEN: does this minter hold a token `room` would be handed now, nothing on the wire (the reuse law) - a
      *  session whose hello went without one asks again the moment it does (net/online.js). */

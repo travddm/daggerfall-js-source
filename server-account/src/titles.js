@@ -11,10 +11,6 @@
 // This is the whole design and it is the repo's own law (DERIVED OVER
 // ENUMERATED) applied to the one place a grant is usually a row:
 //
-//   FOUNDER   your registered account first played by FOUNDER_UNTIL -
-//             its row's first contact, or (FOUNDER4) the first contact of
-//             a row it shares a character with (`first_played_at`) - or
-//             (FOUNDER5) your handle is in the service's FOUNDER_HANDLES.
 //   DEVELOPER your ACCOUNT holds the Admin role (`staff_admin`, migration 0002) - a column, never a name.
 //   SPROUT    your account is younger than SPROUT_S.
 //   DEV       the same role as the Developer title.
@@ -51,17 +47,11 @@
 //             off a living character's track, the sea's two off the
 //             serpents it helped slay (hunts.js masteryMarksRead).
 //
-// WHY THAT AND NOT A `grants` TABLE. Mac asked that "all current
-// players should be granted the founder title", and the obvious
-// reading is a migration that walks every row and writes one. A walk
-// like that is a fact recorded ONCE, at a moment nobody can re-derive:
-// a row added by hand afterwards has no founder flag and nothing says
-// why, a row restored from a backup has whatever the backup had, and
-// the question "who is a founder?" can only be answered by reading
-// 300,000 rows. A CUTOFF answers it in one line, gives the same set
-// today, and keeps giving the right answer tomorrow.
+// WHY THAT AND NOT A `grants` TABLE. A grant written into rows is a fact recorded ONCE, at a moment nobody can
+// re-derive: a row added by hand afterwards has no flag and nothing says why, and a row restored from a backup has
+// whatever the backup had. A rule read off the row gives the same set today and the right answer tomorrow.
 //
-// AND THE SPROUT IS THE SAME ARGUMENT WITH TEETH: a glyph that expires
+// THE SPROUT SHOWS IT: a glyph that expires
 // after two weeks, stored, needs something to come along and remove it.
 // That is a cron, and a cron is a thing that can stop running while
 // everything looks fine (AUDIT-ACC F9 settled exactly this for idle
@@ -87,58 +77,9 @@ import { festivalWaresHeld, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN } from '../../src
 import { STAFF_GLYPHS } from '../../src/net/staffCommands.js';   // STAFF-PANEL2-FIX: the glyphs that open the staff's commands, none held while cut off
 import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MARKS-OF-MASTERY: the hunt's, a Master's and the sea's titles
 
-/** THE FOUNDER CUTOFF, and it is a date rather than a count because
- *  "all current players" is a statement about a MOMENT. Everyone who
- *  had registered when Mac asked for this holds it; nobody who
- *  registers after does, and no migration had to walk a table to say
- *  so. 2026-09-23T00:00:00Z - the end of the day he asked.
- *
- *  FOUNDER2: the SAME statement made
- *  again at a later moment, so the cutoff moves to the end of THIS day -
- *  2026-09-25T00:00:00Z - and every account registered since TITLE-R
- *  closed it is a founder too, with no row written. After it the title is
- *  closed again (TITLE-R's law). A guest still holds none: nothing to
- *  compare, and a founding title on a row one storage clear from gone was
- *  never anybody's.
- *
- *  FOUNDER3: the SAME instant, read off when the account FIRST PLAYED rather
- *  than when it registered (`firstPlayed`, below). The instant does not
- *  move, in either direction: nobody who holds it loses it.
- *
- *  FOUNDER4: the SAME instant again, and when the account first
- *  played may now be proven by ANOTHER row - one it shares a character
- *  with (`first_played_at`): a guest in one browser who
- *  registered in another place, the desktop app's own storage above all,
- *  first played when that guest did.
- *
- *  FOUNDER5: BEFORE THE 25TH WHEREVER THE PLAYER
- *  WAS. 00:00Z on the 25th is 8pm on the 24th in New York and 5pm in Los
- *  Angeles, so a player in the Americas who first played that evening -
- *  before the 25th on their own clock - held nothing. The instant moves to
- *  the end of the 24th on the last clock to reach the 25th (UTC-12):
- *  2026-09-25T12:00:00Z. It moves LATER only, so nobody who holds it loses
- *  it. And what no record proves, a name does: FOUNDER_HANDLES (below). */
-export const FOUNDER_UNTIL = 1_790_337_600;
-
-/** FOUNDER5: THE FOUNDERS BY NAME - the players who played before the 25th
- *  where no record the service keeps can say so (a guest's storage cleared,
- *  a character never saved to the cloud, play on a device that never
- *  linked to the account). A list in config, the developers' law: Mac
- *  grants one by a reviewed, deployed edit. It adds and never takes away -
- *  a founder by the date holds it whether or not they are listed. */
-export function founderHandles(env) {
-  return handleList(env?.FOUNDER_HANDLES);
-}
-
-/** FOUNDER5: is this player a founder by name? A guest has no handle, so
- *  it never is - Founder stays a registered account's alone. */
-export const isNamedFounder = (player, env) =>
-  typeof player?.handle === 'string' && !!player.handle
-  && founderHandles(env).has(player.handle.toLowerCase());
-
 /** HOURS-FIRST: THE FIRST GROUP TO BREAK AN ABYSS DUNGEON, by name - the
  *  accounts the first clear's claims name (sd_kills, slot 1; .github/workflows/sd-clears.yml read them). A list in config,
- *  the developers' law (FOUNDER5's): held while listed, and a guest - no handle - never is. It grants the title Hour's
+ *  the developers' law: held while listed, and a guest - no handle - never is. It grants the title Hour's
  *  First and its aura, The First Hour, and no glyph (TIER_LISTS would owe one). */
 export function hoursFirstHandles(env) {
   return handleList(env?.HOURS_FIRST_HANDLES);
@@ -235,22 +176,6 @@ export const isModerator = (player, _env) =>
  *  stays the moderator list's alone: the dev mark already says more. */
 export const canModerate = (player, env) => isModerator(player, env) || isDeveloper(player, env);
 
-/** FOUNDER3: WHEN THIS ACCOUNT FIRST PLAYED. Founder was read off
- *  `registered_at`, and registering is only the moment a player chose a
- *  name: a player here as a guest since before the cutoff who registered
- *  after it held nothing (Field-Bugs 2026-09-26b, report 3). `created_at`
- *  is stamped at a row's first contact, guest or not, and registering is
- *  an upgrade IN PLACE of that same row, so it is still there. A
- *  row without one is judged by its registration, as before. FOUNDER4:
- *  AND `first_played_at` - the first contact of a row this one shares a
- *  character with, where it is earlier (founderLink.js says how a
- *  character is shared); a row without one is judged as before. */
-const firstPlayed = (player) => Math.min(
-  player.registered_at,
-  Number.isFinite(player.created_at) ? player.created_at : Infinity,
-  Number.isFinite(player.first_played_at) ? player.first_played_at : Infinity,   // FOUNDER4
-);
-
 /**
  * THE TITLES THIS PLAYER HOLDS, in the order they are offered.
  * @param {any} player the row
@@ -258,15 +183,6 @@ const firstPlayed = (player) => Math.min(
  */
 export function titlesHeld(player, env) {
   const held = [];
-  // FOUNDER IS FOR REGISTERED ACCOUNTS (Mac's own call when asked
-  // whether guests count): a guest row is device-bound and one storage
-  // clear from gone, so a founding title on one is a title that
-  // vanishes with a cleared browser and was never anybody's. FOUNDER3:
-  // judged by when the account first played, so that guest holds it the
-  // moment it registers. The guard stays first: D1 gives a guest a NULL
-  // `registered_at`, and Math.min reads null as 0.
-  if (Number.isFinite(player?.registered_at) && firstPlayed(player) <= FOUNDER_UNTIL) held.push('founder');
-  if (!held.includes('founder') && isNamedFounder(player, env)) held.push('founder');   // FOUNDER5: or by name
   if (isDeveloper(player, env)) held.push('developer');
   for (const t of Object.keys(TIER_LISTS)) if (holdsTier(t, player, env)) held.push(t);   // TITLE-N
   // WB9g: AND THE BROKER'S - a title bought with Sigil Stones, held because the sale is recorded on the row. A
@@ -281,7 +197,7 @@ export function titlesHeld(player, env) {
   // derived from the account's characters' seats (npcChapters.js chapterTitlesOfAccount), laid on the row as
   // `chapterTitles` for this request alone, while CHAPTER_TITLES is on
   if (Array.isArray(player?.chapterTitles)) for (const t of player.chapterTitles) if (CHAPTER_TITLES.includes(t) && !held.includes(t)) held.push(t);
-  // ARENA4: THE ARENA'S TWO, derived from the arena's rows as the founder is from a date -
+  // The arena's two titles, derived from the arena's rows -
   // read onto the row (`arena`, server-account/src/arena.js arenaHonoursOf) where a token is minted or a wardrobe shown.
   // The Grand Champion holds for good (a row only a relay-signed climb writes); the Arena Champion while the account is
   // the season's #1, so it passes to whoever takes the top and lapses by itself. A row read without them holds neither.
