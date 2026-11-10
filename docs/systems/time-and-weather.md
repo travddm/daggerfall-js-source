@@ -87,7 +87,7 @@ Other rest files:
   the character's own clock eight hours at once (`NIGHT_HOURS` 8, due every `NIGHT_INTERVAL_MINUTES` 120 own
   minutes), plus ambush nights, channel heals and short sleeps. Decided replacement: rest wherever Daggerfall Unity's
   `CanRest` allows, with its hour choice on the character's own clock, no free full top-up, and fire-only rest as a
-  server-profile key (decision 62). Open pull request #143 builds it.
+  server-profile key (decision 62).
 - `src/systems/rest/restItems.js` and `restItemRows.js`: bedrolls, ember jars, firewood, tonics, salts. They belong to
   the survival arc and leave with it (below; decision 122 (10)).
 - `src/systems/rest/restWarning.js`: ailment lines shown before a rest.
