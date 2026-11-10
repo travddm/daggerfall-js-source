@@ -1031,7 +1031,7 @@ export const FEATURES = Object.freeze([
     group: 'world',
     title: 'Living world',
     note: 'Townsfolk have names, homes, trades and daily routines. They open their shops, meet and talk at the square '
-      + 'and the tavern, sleep at night and remember how you treated them. Everyone online sees the same people. '
+      + 'and the tavern, sleep at night and remember how you treated them. Online, each player chooses for themselves. '
       + 'Off fills the streets with the classic wandering strangers, who vanish at dusk.',
     effect: 'Takes effect when a town next loads.',
     kinds: Object.freeze(['enhanced']),
