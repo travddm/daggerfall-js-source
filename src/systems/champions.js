@@ -28,7 +28,7 @@
 // OFF IS DFU EXACTLY: with the loot-rarity row off, no champion stands.
 // ═══════════════════════════════════════════════════════════════════
 
-import { stepOnLayer } from './elite-stacking.ts';   // decision 125: a champion's step on its dungeon's layer
+import { stepOnLayer } from './elite-stacking.ts';   // a champion's step on its dungeon's layer
 import { lootRarityOn } from './loot/lootRarity.js';
 import { PROMOTION, promotionHash, promotionTierOf, promotionTrait, scalePromoted } from './foe-promotion.ts';   // the tier's numbers and the one roll/scale path
 import { foeTitle } from './foeTitle.js';   // FOE-TITLE: the names' one home

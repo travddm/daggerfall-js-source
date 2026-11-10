@@ -27,7 +27,7 @@ import { KNIGHT_CITY_WATCH } from '../characters/mobile/mobileTypes.js';   // EL
 import { ENEMY_BASICS, isClassEnemyId } from '../characters/enemy/enemyBasics.js';   // ELITE-FLOOR: a kind's own level, the same on every client
 import { WEAPON_MATERIALS } from '../characters/weapons.js';   // BOSS-HARD: Silver, the Troll's floor
 import { PROMOTION, markPromotions, scalePromoted } from './foe-promotion.ts';
-import { eliteMults, ELITE_DUNGEON_STACKED, SUPER_DUNGEON_STACKED } from './elite-stacking.ts';   // decision 124: no stacking by default
+import { eliteMults, ELITE_DUNGEON_STACKED, SUPER_DUNGEON_STACKED } from './elite-stacking.ts';   // no stacking by default
 import { CHAMPION_TRAITS } from './champions.js';   // the tier's numbers and the one scaling path
 import { renownOpens } from './sigil/sigil.js';   // RENOWN-GATE: the page's Renown, the door every Renown-woken power reads
 

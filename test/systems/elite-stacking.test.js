@@ -37,7 +37,7 @@ test('with the option on, an elite stacks on its dungeon: x7 and x2.6, x9 and x3
   assert.equal(e.damageScale, 3);
 });
 
-test("decision 125: a champion on a dungeon's layer gets only what passes it, stat by stat; with the row on, its whole step", (t) => {
+test("a champion on a dungeon's layer gets only what passes it, stat by stat; with the row on, its whole step", (t) => {
   assert.deepEqual(
     { ...stepOnLayer({ health: 1.68, damage: 1.15 }, 'elite') },
     { health: 1, damage: 1 },
@@ -59,7 +59,7 @@ test("decision 125: a champion on a dungeon's layer gets only what passes it, st
   assert.deepEqual({ ...stepOnLayer({ health: 1.4, damage: 1.15 }, 'super') }, { health: 1.4, damage: 1.15 });
 });
 
-test('decision 125, run: a champion in an Elite Dungeon stands at the dungeon layer, not above it', () => {
+test('a champion run in an Elite Dungeon stands at the dungeon layer, not above it', () => {
   const e = { level: 20, mobileType: 7, maxHealth: 200, health: 200, damageScale: 2, healthMult: 2 };
   assert.equal(applyChampion(e, 0, 'elite'), true);
   assert.equal(e.maxHealth, 200);

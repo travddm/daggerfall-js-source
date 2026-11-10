@@ -91,7 +91,7 @@ test('TELL1: poise - the kind\'s own health by its weight, by what it is (an eli
 });
 
 test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite, an Elite Dungeon\'s elite, a champion, a revenant, the dungeon\'s doubling, a rite\'s summoner, a sworn one (mutants: a site that forgets it)', async (tc) => {
-  setPref('eliteStacking', true); tc.after(() => setPref('eliteStacking', false));   // elites stack with the dungeon: the Features row, off by default (decision 124)
+  setPref('eliteStacking', true); tc.after(() => setPref('eliteStacking', false));   // elites stack with the dungeon: the Features row, off by default
   const e = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
   assert.equal(promoteEliteFoe(e, { checkLevel: false }), true);
   assert.equal(e.healthMult, 2); assert.equal(kindHealth(e), 40);

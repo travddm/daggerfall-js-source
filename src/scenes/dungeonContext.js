@@ -1423,7 +1423,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     entity.healthMult = (entity.healthMult ?? 1) * ELITE_HEALTH_SCALE;   // TELL1: what was stood on the kind's own health (its poise)
     entity.damageScale = ELITE_DAMAGE_SCALE;
     if (_oceanBand) applyOceanBand(entity, true);   // a vault of the deep: its band's factors in place of the elite step
-    entity.elite = true; applyChampion(entity, e.champion, _oceanBand ?? 'elite');   // LOOT7: an elite dungeon's champion - its scale against the dungeon's layer (decision 125)
+    entity.elite = true; applyChampion(entity, e.champion, _oceanBand ?? 'elite');   // LOOT7: an elite dungeon's champion - its scale against the dungeon's layer
   }
   /** An ocean dungeon's foe takes its band's health and blows (systems/sea/oceanBandDifficulty.js). `fromElite`: the elite
    *  dungeon's step was just laid on it, so it is taken back first and the band's laid in its place. */
