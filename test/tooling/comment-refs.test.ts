@@ -61,9 +61,44 @@ test('parseDiff reports added lines by new line number and the tags of removed l
     '@@ -20,0 +22,1 @@',
     '+// added',
   ].join('\n');
-  const { added, removedTags } = parseDiff(diff);
+  const { added, removed } = parseDiff(diff);
   assert.deepEqual(added.get('a.js'), [3, 4, 22]);
-  assert.deepEqual([...removedTags], ['SAFE8']);
+  assert.deepEqual([...(removed.get('a.js') ?? [])], [['SAFE8', 1]]);
+});
+
+test('findHits lets a tag pass as often as the change removes it, and no more', () => {
+  const text = ['// SAFE8: one', '// SAFE8: two', 'const x = 1;'].join('\n');
+  const oneRemovedTwoAdded = [
+    '--- a/a.js',
+    '+++ b/a.js',
+    '@@ -1,1 +1,2 @@',
+    '-// SAFE8: old',
+    '+// SAFE8: one',
+    '+// SAFE8: two',
+  ].join('\n');
+  assert.deepEqual(
+    findHits(oneRemovedTwoAdded, () => text).map((h) => [h.line, h.tag]),
+    [[2, 'SAFE8']],
+  );
+});
+
+test('findHits counts a tag removed in another file or a deleted file, once each', () => {
+  const diff = [
+    '--- a/old.js',
+    '+++ /dev/null',
+    '@@ -1,1 +0,0 @@',
+    '-// SAFE8: moved',
+    '--- /dev/null',
+    '+++ b/new.js',
+    '@@ -0,0 +1,2 @@',
+    '+// SAFE8: moved',
+    '+// SAFE8: copied',
+  ].join('\n');
+  const hits = findHits(diff, () => '// SAFE8: moved\n// SAFE8: copied\n');
+  assert.deepEqual(
+    hits.map((h) => [h.file, h.line]),
+    [['new.js', 2]],
+  );
 });
 
 test('findHits fails a new tagged comment and passes an old tag on a modified line', () => {

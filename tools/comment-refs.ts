@@ -4,9 +4,9 @@
 //
 //   node tools/comment-refs.ts [--base <ref>]     # default: $BASE_REF, else origin/feat/tamriel-review
 //
-// Only the lines the change adds are checked. A tag also passes when the same change removes a line that carries it,
-// so an old tag on a line you edit, or on a comment you move to another file, does not fail the check. A comment
-// without a tag on a new line never fails. Exit code 1 lists each added comment line and the tag it carries.
+// Only the lines the change adds are checked. A tag passes once for each time the same change removes it, so an old tag
+// on a line you edit, or on a comment you move to another file, does not fail the check, and a change that adds a tag
+// more often than it removes it does. A comment without a tag on a new line never fails. Exit code 1 lists each added comment line and the tag it carries.
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
@@ -20,7 +20,7 @@ const SKIPPED_PREFIXES = ['vendor/', 'node_modules/'];
 
 export type Tag = { kind: 'decision' | 'pull-request' | 'audit' | 'item'; tag: string };
 export type Hit = Tag & { file: string; line: number; text: string };
-export type DiffLines = { added: Map<string, number[]>; removedTags: Set<string> };
+export type DiffLines = { added: Map<string, number[]>; removed: Map<string, Map<string, number>> };
 
 // Technical names that look like item tags: a letter run with a digit, or capitals with a hyphen.
 const TECHNICAL_NAME =
@@ -103,30 +103,52 @@ export function commentLines(path: string, text: string): Map<number, string> {
   return lines;
 }
 
-/** The lines a zero-context unified diff adds (by file and new line number) and the tags its removed lines carry. */
+/**
+ * The lines a zero-context unified diff adds (by file and new line number) and how many times its removed lines carry
+ * each tag (by file, then tag).
+ */
 export function parseDiff(diff: string): DiffLines {
   const added = new Map<string, number[]>();
-  const removedTags = new Set<string>();
+  const removed = new Map<string, Map<string, number>>();
+  let oldFile = '';
   let file = '';
   let newLine = 0;
   for (const raw of diff.split('\n')) {
-    if (raw.startsWith('+++ ')) {
+    if (raw.startsWith('--- ')) {
+      oldFile = raw === '--- /dev/null' ? '' : raw.slice(6);
+    } else if (raw.startsWith('+++ ')) {
       file = raw === '+++ /dev/null' ? '' : raw.slice(6);
     } else if (raw.startsWith('@@')) {
       newLine = Number(/\+(\d+)/.exec(raw)?.[1] ?? 0);
     } else if (raw.startsWith('+') && file) {
       added.set(file, [...(added.get(file) ?? []), newLine]);
       newLine += 1;
-    } else if (raw.startsWith('-') && !raw.startsWith('--- ')) {
-      for (const { tag } of tagsIn(raw.slice(1))) removedTags.add(tag);
+    } else if (raw.startsWith('-')) {
+      const counts = removed.get(file || oldFile) ?? new Map<string, number>();
+      for (const { tag } of tagsIn(raw.slice(1))) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+      removed.set(file || oldFile, counts);
     }
   }
-  return { added, removedTags };
+  return { added, removed };
 }
 
-/** The added comment lines that carry a tag the change does not also remove. `read` returns a file's new text. */
+/**
+ * The added comment lines that carry a tag the change does not remove as often. A tag passes once for each time the
+ * change removes it, from the same file first, so a moved or reworded comment passes and a tag the change adds beyond
+ * what it removes does not. `read` returns a file's new text.
+ */
 export function findHits(diff: string, read: (file: string) => string): Hit[] {
-  const { added, removedTags } = parseDiff(diff);
+  const { added, removed } = parseDiff(diff);
+  const spend = (file: string, tag: string): boolean => {
+    for (const source of [file, ...removed.keys()]) {
+      const left = removed.get(source)?.get(tag) ?? 0;
+      if (left > 0) {
+        removed.get(source)?.set(tag, left - 1);
+        return true;
+      }
+    }
+    return false;
+  };
   const hits: Hit[] = [];
   for (const [file, lines] of added) {
     if (!isCheckedFile(file)) continue;
@@ -141,7 +163,7 @@ export function findHits(diff: string, read: (file: string) => string): Hit[] {
       const text = comments.get(line);
       if (!text) continue;
       for (const found of tagsIn(text)) {
-        if (!removedTags.has(found.tag)) hits.push({ ...found, file, line, text });
+        if (!spend(file, found.tag)) hits.push({ ...found, file, line, text });
       }
     }
   }
@@ -155,7 +177,7 @@ function git(args: string[], cwd: string): string {
 /** The hits of the working tree against the merge base with `base`, for the repository at `cwd`. */
 export function checkAgainst(base: string, cwd = process.cwd()): Hit[] {
   const mergeBase = git(['merge-base', base, 'HEAD'], cwd).trim();
-  const diff = git(['diff', '-U0', '--no-color', '--no-ext-diff', '--diff-filter=AMR', mergeBase], cwd);
+  const diff = git(['diff', '-U0', '--no-color', '--no-ext-diff', mergeBase], cwd);
   return findHits(diff, (file) => readFileSync(`${cwd}/${file}`, 'utf8'));
 }
 

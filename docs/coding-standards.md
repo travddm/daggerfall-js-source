@@ -71,7 +71,7 @@ asks. Do not duplicate those rules here. What they leave open, such as comments 
 
 `npm run comment-refs` (`tools/comment-refs.ts`) checks the comments that your branch adds. It fails an added comment
 line that cites a decision (`decision 104`), a pull request (`PR 130`, `#64`), an `AUDIT` tag or an upper-case item tag
-(`SAFE8`, `LOOT-GATE`, `P2.2b`), unless the same change removes a line that carries that tag. Old tags on lines you edit
+(`SAFE8`, `LOOT-GATE`, `P2.2b`), unless the same change removes that tag as often. Old tags on lines you edit
 or move pass; the fix for a failure is the reason in words, or no comment. Vendored code is skipped.
 
 ## TypeScript
