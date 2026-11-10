@@ -37,6 +37,8 @@ test('tagsIn leaves plain prose and technical names alone', () => {
     'N0B20Y25.RMB is a city block, R0C10Y16.RDB a dungeon block, O0B2XY08.RMB another',
     'SKY00.DAT and WEAPON04.CFG',
     'a color like #ff8800 or &#35; in HTML',
+    'HMAC-SHA256 and AES-256-GCM, BCP-47 tags, ISO-8859-1 text',
+    'GPL-3.0 code, AGPL-3 code, CC0 art and CC-BY-NC art',
     'the 3D model of a wagon, 2D map',
     'https://example.com/page#12abc',
   ]) {

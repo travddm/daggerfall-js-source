@@ -29,7 +29,7 @@ export type DiffLines = { added: Map<string, number[]>; removed: Map<string, Map
 
 // Technical names that look like item tags: a letter run with a digit, or capitals with a hyphen.
 const TECHNICAL_NAME =
-  /^(?:UTF-?(?:8|16|32)(?:LE|BE)?|SHA-?\d+|MD5|AES-?\d+|[HR]S\d+|ES\d+|RGBA?\d*|DXT\d|BC\d+|MP[34]|H26[45]|WEBGL\d?|ARENA2|ASD-STE100|STE100|ISO-?\d+|RFC\d+|IEEE\d+|WGS84|CRC\d+|X11|PCM\d+|FSB\d|CP\d+|F\d{1,2}|HTTP\d|IPV[46]|TLS\d+|SSL\d|I18N|L10N|A11Y|E2E|W3C|V8|EC2|S3|R2|D1|UV\d|LOD\d|R\d+F|RG\d+F?|NPC-?\d+|D3D\d+|TES\d|CSS\d?|HTML\d|PNG\d+|GIF\d+|BMP\d+|OGG|JSON\d?)$/;
+  /^(?:UTF-?(?:8|16|32)(?:LE|BE)?|SHA-?\d+|MD5|AES-?\d+|[HR]S\d+|ES\d+|RGBA?\d*|DXT\d|BC\d+|MP[34]|H26[45]|WEBGL\d?|ARENA2|ASD-STE100|STE100|ISO-?\d+(?:-\d+)?|BCP-?47|HMAC-SHA-?\d+|AES-?\d+(?:-[A-Z]+)?|A?GPL-?\d|CC0|CC-BY(?:-[A-Z]+)*|RFC\d+|IEEE\d+|WGS84|CRC\d+|X11|PCM\d+|FSB\d|CP\d+|F\d{1,2}|HTTP\d|IPV[46]|TLS\d+|SSL\d|I18N|L10N|A11Y|E2E|W3C|V8|EC2|S3|R2|D1|UV\d|LOD\d|R\d+F|RG\d+F?|NPC-?\d+|D3D\d+|TES\d|CSS\d?|HTML\d|PNG\d+|GIF\d+|BMP\d+|OGG|JSON\d?)$/;
 
 // Daggerfall's own file and archive names, as a comment writes them without the extension. The shapes come from the
 // files under ARENA2: `ARCH3D.BSA`, images and text (`BODY00I0.IMG`, `FMAP0I00.IMG`, `BIOG00T0.TXT`), quest files
