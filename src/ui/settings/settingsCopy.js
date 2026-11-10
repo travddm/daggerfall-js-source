@@ -284,7 +284,6 @@ export function helpOf(key) {
  *  them what they are actually playing. Nothing on this screen says
  *  unsupported, broken, missing or not implemented - pinned. */
 export const READOUT = Object.freeze({
-  'Enhancements/EnhancedCombatAI': 'classic',
   'Enhancements/AdvancedClimbing': 'classic',
   'Enhancements/LypyL_ModSystem': 'none',
   'Enhancements/CompressModdedTextures': 'none',
@@ -302,7 +301,6 @@ export const READOUT = Object.freeze({
 /** The sentence that says what you get INSTEAD - shown in the detail
  *  dialog. Every unavailable key has one. */
 export const INSTEAD = Object.freeze({
-  'Enhancements/EnhancedCombatAI': "You get the original game's enemy behavior.",
   'Enhancements/AdvancedClimbing': "You get the original game's climbing.",
   'Enhancements/LypyL_ModSystem': 'Nothing to add yet. Add-ons will be listed on this page when they arrive.',
   'Enhancements/CompressModdedTextures': 'Nothing to add yet. Add-ons will be listed on this page when they arrive.',
