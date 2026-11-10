@@ -79,8 +79,10 @@ Offline all three are the same counter.
 Other rest files:
 
 - `src/systems/rest/rest.js`: health, fatigue and magicka recovery rates; `exhaustionOutcome`.
-- `src/systems/rest/restAct.js`: the online night (`NIGHT_HOURS` 8, due every 120 own minutes), ambush nights, channel
-  heals and short sleeps.
+- `src/systems/rest/restAct.js`: the rest act, a server-profile option online (`rest.fireOnly`): rest only at a
+  fire or a bed, one night (`NIGHT_HOURS` 8) due every 120 own minutes, ambush nights, channel heals and short
+  sleeps, and a full top-up at the end. By default online rest is the window above, as in Daggerfall Unity, and
+  its hours pass on the character's own clock while the world's clock stands.
 - `src/systems/rest/restItems.js` and `restItemRows.js`: bedrolls, ember jars, firewood, tonics, salts.
 - `src/systems/rest/restWarning.js`: ailment lines shown before a rest.
 
