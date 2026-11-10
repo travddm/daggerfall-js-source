@@ -45,8 +45,8 @@ jobs:
           fi
           echo "lint, types, every test shard and the build passed"
 
-  # Formatting of the files this pull request adds, and Markdown and spelling of the ones it changes
-  # (docs/coding-standards.md). A job of its
+  # Formatting of the files this pull request adds, Markdown and spelling of the ones it changes, and decision, pull
+  # request and item tags in the comments it adds (docs/coding-standards.md). A job of its
   # own: `check` stays the lint, types, tests and build, and a branch rule may require this one too.
   standards:
     if: ${{ github.event_name == 'pull_request' }}
@@ -72,5 +72,9 @@ jobs:
           BASE_REF: origin/${{ github.base_ref }}
       - name: Spelling of the changed files
         run: npm run spell
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+      - name: References in the comments this pull request adds
+        run: npm run comment-refs
         env:
           BASE_REF: origin/${{ github.base_ref }}
