@@ -187,8 +187,6 @@ account to one life per slot; `sdSpoils.js` rolls rewards. `sdScore.js` is music
   (`src/world/placeIds.js` `isMadePlaceId`) by the whole id.
 - `src/world/locationKey.js` `locationKeyOf` builds the map-table key (temples, shops, guild halls) that "Where is" talk
   reads.
-- Editor-placed POIs are a separate system in `src/poi/` (`poiLaw.js`, `poiRuntime.js`, `poiService.js`), approved by
-  the realm and drawn with a map marker.
 
 ## Travel
 

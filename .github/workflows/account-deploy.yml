@@ -374,9 +374,6 @@ on:
       - "tools/discordModCommands.mjs"
       - "tools/lib/isMain.mjs"
       - "src/systems/legacy/revived.js"
-      - "src/poi/poiLaw.js"
-      - "src/poi/poiMesh.js"
-      - "src/poi/poiImage.js"
       - "server/src/staffFeedLaw.js"
       - "src/ui/touch/touchDevice.js"
   workflow_dispatch:

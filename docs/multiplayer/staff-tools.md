@@ -11,8 +11,7 @@ in [chat-safety.md](chat-safety.md).
 | Admin | `players.staff_admin` | `isDeveloper`; `staffRole` returns `admin` |
 | Moderator | `players.staff_mod` | `canModerate`; `staffRole` returns `moderator` |
 | Owner | `players.staff_owner` (and Admin) | `isOwner` |
-| Report reader, POI approver | an Owner | `isReportReader`, `poiRolesOf` |
-| POI builder | an Admin | `poiRolesOf` |
+| Report reader | an Owner | `isReportReader` |
 
 A role belongs to the account, never to a handle: registering a name grants nothing. The columns are read fresh on every
 request. An Owner is set only by the operator (`tools/staffRole.mjs`); an Owner adds and removes Admins
