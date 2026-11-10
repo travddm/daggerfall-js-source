@@ -74,9 +74,8 @@ const HOMONYMS = new Map([
   // reads a source the others cannot reach (the account Worker bundles groundRay.js and no terrain tile).
   ['groundAt', "the terrain's height off the live collider (player/groundRay.js) vs a pixel's heightmap (world/terrain/terrainNature.js)"],
   ['groundHit', "a spell's ray against the collider's terrain (player/groundRay.js) vs the travel view's pick over its height sampler (player/travelPick.js)"],
-  // TESA (the Arena arc, at its merge with main): three names main took for other things while the arc was on its
+  // TESA (the Arena arc, at its merge with main): two names main took for other things while the arc was on its
   // branch - none a DFU member, each read in its own folder.
-  ['regionOf', "a staff map's region of a traveller (net/staffMap.js) vs the roads past the Bay's region of a map pixel (world/tamrielRoads.js)"],
   ['arenaStanding', "the season book's arena standing of a player (systems/seasonBook.js) vs whether Arena's places stand past the Bay (world/arenaPlaces.js)"],
   ['levelOf', "the captain's tree's level of a star (systems/naval/captainTree.js) vs a tile's zoom level on the held map past the Bay (ui/tamrielTiles.js)"],
 ]);
