@@ -42,6 +42,7 @@
     "questlines": true,
     "questlineRewards": true,
     "wildernessCamps": true,
+    "spawnedDungeons": false,
     "naval": false
   },
   "settings": {

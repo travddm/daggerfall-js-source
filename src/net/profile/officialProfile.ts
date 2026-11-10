@@ -28,6 +28,7 @@ const PREFS = Object.freeze({
   climateBlend: true,
   questlines: true,
   wildernessCamps: true,
+  spawnedDungeons: false,
   naval: false,
   revenants: true,
   revenantWho: 'elite',

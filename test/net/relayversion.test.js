@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world318: 'cb13bad9c1b416a14858034860b93b087bb7474d667fccc04526306624f56086', // the Spawned dungeons switch is pinned off in the server profile (officialProfile.ts)
   world317: '4d9171291970064f95668f4d11ecbe8ab5f449009ed1ea6ec7d04f9a68ae750a', // the official profile pins the Elites stack row off (officialProfile.ts)
   world316: '87d95a0f47460b81c84519aafb0d25b9a5a6ad9967d21cd7380472a9a8e84712', // the official profile pins the Openings take extra damage row off (officialProfile.ts)
   world315: '2cd678bb145f96d724c29ad5b08ad2cc4854ca0f035ea8ab872d93dc8198e5ed', // the classic clock is the one online clock by default, a server profile rule in the relay's graph
