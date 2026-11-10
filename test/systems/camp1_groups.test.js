@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   rollCampEncounter, rollCampEncounterOnChunkLoad, amGroupRollOwner, campWindowOpen, rollCampKind, rollCampChance,
-  rollCampChanceOnChunkLoad, CAMP_WINDOW_MINUTES, CAMP_WINDOW_REAL_MINUTES, CAMP_SIZE, PACK_SIZE, CAMP_SPACING,
+  rollCampChanceOnChunkLoad, campWindowMinutes, CAMP_WINDOW_REAL_MINUTES, CAMP_SIZE, PACK_SIZE, CAMP_SPACING,
   PACK_SPACING, CAMP_ALERT_RADIUS, PACK_ALERT_RADIUS, MIN_CAMP_SPAWN_DISTANCE, MAX_CAMP_SPAWN_DISTANCE,
   CAMP_CHANCE, CAMP_CHANCE_ON_CHUNK_LOAD, GROUP_ROLL_RADIUS, campAnchorSpot,
 } from '../../src/systems/campEncounters.js';
@@ -52,8 +52,8 @@ const WILD = { inside: false, inLocationRect: false, preventEnemySpawns: false, 
 
 test('CAMP1: the window is 15 REAL minutes of play, stated in game minutes through the one clock rate, and opens on exactly those minutes', () => {
   assert.equal(CAMP_WINDOW_REAL_MINUTES, 15);
-  assert.equal(CAMP_WINDOW_MINUTES, 15 * 60 * CLASSIC_MINUTES_PER_SECOND);
-  assert.equal(CAMP_WINDOW_MINUTES, 180, 'TimeScale 12: 180 game minutes');
+  assert.equal(campWindowMinutes(), 15 * 60 * CLASSIC_MINUTES_PER_SECOND);
+  assert.equal(campWindowMinutes(), 180, 'TimeScale 12: 180 game minutes');
   assert.equal(campWindowOpen(0), true);
   assert.equal(campWindowOpen(179), false);
   assert.equal(campWindowOpen(180), true);

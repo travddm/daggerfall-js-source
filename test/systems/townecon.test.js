@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -146,7 +147,8 @@ test('TOWN-ECON the price (TE0 decision 4, Mac: "Wider swings, ±25%+"): a count
   assert.equal(ONLINE_ESSENTIALS_PRICE_SCALE, ONLINE_SALE_SHARE, 'the essentials\' half breaks even only where a counter\'s two factors are one (AUDIT LAW-1, below)');
 });
 
-test('TOWN-ECON AUDIT LAW-1: AN ESSENTIAL BOUGHT AND SOLD BACK AT ONE TOWN COUNTER NEVER PAYS - five firewood through the real trade walk (tradeCost, getTradePrice) online, the best haggler, every Prosperity, every shop quality, the region\'s index from 500 to 2,500, each factor applied as shopAdjustment applies it; at 51 a Booming town\'s ask fell under its pay and 134 of 140 counters paid (AUDIT TOWN-ECON 2 REC-6: since SEAT-LOOP\'s bound the walk no longer tells LAW-1\'s sale factor apart - its two mutants, TOWNECON-AUDIT-LAW1-sale-above-ask and TOWNECON-sale-rises, die in the price test)', () => {
+test('TOWN-ECON AUDIT LAW-1: AN ESSENTIAL BOUGHT AND SOLD BACK AT ONE TOWN COUNTER NEVER PAYS - five firewood through the real trade walk (tradeCost, getTradePrice) online, the best haggler, every Prosperity, every shop quality, the region\'s index from 500 to 2,500, each factor applied as shopAdjustment applies it; at 51 a Booming town\'s ask fell under its pay and 134 of 140 counters paid (AUDIT TOWN-ECON 2 REC-6: since SEAT-LOOP\'s bound the walk no longer tells LAW-1\'s sale factor apart - its two mutants, TOWNECON-AUDIT-LAW1-sale-above-ask and TOWNECON-sale-rises, die in the price test)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   const was = globalThis.location;
   globalThis.location = { search: '?online=1' };
   try {
@@ -164,7 +166,8 @@ test('TOWN-ECON AUDIT LAW-1: AN ESSENTIAL BOUGHT AND SOLD BACK AT ONE TOWN COUNT
   } finally { globalThis.location = was; }
 });
 
-test('TOWN-ECON SEAT-LOOP (Town-Economy-Arc 7.5, Mac: "Close it"): AN ESSENTIAL BOUGHT AND SOLD BACK AT A SEAT TOWN\'S COUNTER NEVER PAYS - a member\'s discount, a crown\'s, a loved Standing\'s and Market Day\'s, through the real trade walk online with the best haggler, at every Prosperity, quality and region index, and where the seat\'s place has no economy; before, five firewood at a quality-10 counter at the region\'s index cost 13 and sold for 15 on Market Day (mutants: TOWNECON-SEATLOOP-law-unbounded, TOWNECON-SEATLOOP-fallback-unbounded)', () => {
+test('TOWN-ECON SEAT-LOOP (Town-Economy-Arc 7.5, Mac: "Close it"): AN ESSENTIAL BOUGHT AND SOLD BACK AT A SEAT TOWN\'S COUNTER NEVER PAYS - a member\'s discount, a crown\'s, a loved Standing\'s and Market Day\'s, through the real trade walk online with the best haggler, at every Prosperity, quality and region index, and where the seat\'s place has no economy; before, five firewood at a quality-10 counter at the region\'s index cost 13 and sold for 15 on Market Day (mutants: TOWNECON-SEATLOOP-law-unbounded, TOWNECON-SEATLOOP-fallback-unbounded)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   const was = globalThis.location;
   globalThis.location = { search: '?online=1' };
   try {

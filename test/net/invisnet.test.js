@@ -9,7 +9,7 @@
 import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import * as acorn from 'acorn';
+import { createPeerCandidates } from '../../src/characters/enemy/peer-candidates.ts';
 
 import { validPose, poseChanged, parseClient } from '../../src/net/wire.js';
 import { lerpPose, OnlineSession } from '../../src/net/online.js';
@@ -98,26 +98,12 @@ test('INVIS-NET end to end: my invisibility leaves my session the moment it land
   } finally { console.info = info; }
 });
 
-// the dungeon's peer candidates, mounted over the context's own statements
+// the peer candidates the dungeon host and the exterior foe pool build (characters/enemy/peer-candidates.ts)
 const D = rd('src/scenes/dungeonContext.js');
-const AST = acorn.parse(D, { ecmaVersion: 'latest', sourceType: 'module' });
-function fnSrc(name) {
-  let hit = null;
-  (function walk(n) {
-    if (!n || typeof n.type !== 'string' || hit) return;
-    if (n.type === 'FunctionDeclaration' && n.id?.name === name) { hit = n; return; }
-    for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); }
-  })(AST);
-  assert.ok(hit, `src has function ${name}`);
-  return D.slice(hit.start, hit.end);
-}
-
 test('INVIS-NET foes: a peer candidate carries its concealment off its pose, so a foe\'s senses read a concealed peer as they read any concealed target - and it moves with the peer', () => {
   let list = [{ id: 'ghost-0001', feet: [1, 0, 1], height: 1.8, cv: 1, yaw: 1, wd: 0 }, { id: 'seer-0002', feet: [2, 0, 2], height: 1.8, yaw: 2, wd: 1 }];
-  const state = { opts: { peers: () => list }, _peerCands: new Map(), _peerRead: -1, _peerFrame: 0, CAPSULE_HEIGHT: 1.8, concealFlagsOfBits, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance };
-  const scoped = new Proxy(state, { has: (t, k) => k !== '__s', get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : globalThis[k])), set: (t, k, v) => { t[k] = v; return true; } });
-  const peerCandidates = new Function('__s', `with (__s) { ${fnSrc('peerCandidates')}\nreturn peerCandidates; }`)(scoped);
-  const cands = peerCandidates();
+  const peers = createPeerCandidates({ read: () => list, concealFlags: concealFlagsOfBits, capsuleHeight: 1.8, stance: { write: (id, yaw, sheathed) => { writePlayerYaw(id, yaw); writePlayerBowOrSheathed(id, sheathed); }, forget: forgetPlayerStance } });
+  const cands = peers.all();
   const ghost = cands.find((c) => c.id === 'ghost-0001'), seer = cands.find((c) => c.id === 'seer-0002');
   assert.deepEqual(ghost.concealment(), { invisible: true, blending: false, shade: false }, 'the invisible peer reads invisible');
   assert.deepEqual(seer.concealment(), { invisible: false, blending: false, shade: false }, 'an open one reads open');
@@ -125,20 +111,19 @@ test('INVIS-NET foes: a peer candidate carries its concealment off its pose, so 
   assert.deepEqual({ ...playerStanceOf('ghost-0001') }, { yaw: 1, bowOrSheathed: true }, 'wd 0: sheathed');
   assert.deepEqual({ ...playerStanceOf('seer-0002') }, { yaw: 2, bowOrSheathed: false }, 'wd 1: drawn');
   list = [{ id: 'ghost-0001', feet: [1, 0, 1], height: 1.8 }];
-  state._peerFrame++;
-  peerCandidates();
+  peers.nextFrame();
+  peers.all();
   assert.equal(ghost.concealment().invisible, false, 'the spell ended: the same candidate reads open');
   assert.equal(playerStanceOf('seer-0002').yaw, null, 'a peer that left: its stance is forgotten');
-  // the exterior pool reads the same way
-  const X = rd('src/scenes/exteriorFoes.js');
-  assert.match(X, /health: 1, cv: 0, concealment: \(\) => concealFlagsOfBits\(c\.cv\) \};/);
-  assert.match(X, /c\.health = 1;\n\s*c\.cv = q\.cv \| 0; writePlayerYaw\(q\.id, q\.yaw\); writePlayerBowOrSheathed\(q\.id, q\.wd === 0\);/);
+  // the dungeon and the exterior pool both build their candidates through the module
+  assert.match(D, /createPeerCandidates\(\{ read: \(\) => opts\.peers\?\.\(\) \?\? null, concealFlags: concealFlagsOfBits/);
+  assert.match(rd('src/scenes/exteriorFoes.js'), /createPeerCandidates\(\{ read: \(\) => _net\?\.peers\?\.\(\) \?\? null, concealFlags: concealFlagsOfBits/);
 });
 
 test('INVIS-NET by source: the host packs my concealment onto every pose; on the classic lane draws no rider, body, walker, sprite or name for a concealed peer (its cast still seen; INVIS-LOOK draws it translucent on the enhanced one); hands the foes the peer\'s bits; and a concealed peer is not there to press', () => {
   const w = hostText('src/scenes/world.js');
   const arm = w.slice(w.indexOf('    const arm = {\n      mv,'), w.indexOf('};   // the wire\'s move bit'));
-  assert.match(arm, /\n\s*cv: concealBits\(playerEntity\) \|\| undefined,/, 'the arm spread into every pose');
+  assert.match(arm, /\n\s*(?:\.\.\.stealthPoseOf\([^\n]*?\), )?cv: concealBits\(playerEntity\) \|\| undefined,/, 'the arm spread into every pose');
   // Boat map markers cache the adjusted poses before the existing concealment and render ordering.
   assert.match(w, /const drawable = isCellRoom\(online\.room\) && csaOn\(\) \? csaAboard\.glue\(online\.drawable\(\), [^\n]*\) : online\.drawable\(\);[^\n]*\n\s*_peerMapPoses\.clear\(\);\n\s*for \(const d of drawable\) if \(d\?\.shown\) _peerMapPoses\.set\(d\.id, d\.shown\);\n(?:\s*if \(hccOn\(\)\) hcc\.driverGlue\(drawable, \{ toWire: campToWire \}\);[^\n]*\n)?\s*const ranged = peerRange\.cut\(cabin \? drawable : drawable\.filter\(\(d\) => !csaPeers\.isBelowDeck\(d\.id\)\), [^\n]*\n\s*const visiblePeers = gateCrowd\.cut\(ranged, \{ on: modes\?\.gateArenaDay\?\.\(\) != null \|\| [^\n]*\}\);[^\n]*\n\s*peerCastVisuals\(visiblePeers\);[^\n]*\n(?:[^\n]*\n){0,5}?\s*const seen = \[\];\n\s*for \(const d of visiblePeers\) \{\n\s*const look = peerDraw\(d\.shown\?\.cv \| 0, veilOn, _veilT, d\.id\);\n\s*if \(look\.kind === 'hidden'\) \{ _hiddenPeers\.add\(d\.id\); continue; \}/, 'the cast off every peer, the draw off the seen - a concealed peer hidden where the look says so (the classic lane)');
   assert.match(w, /peerRiders\.sync\(seen, onlineToScene,/);
@@ -150,7 +135,7 @@ test('INVIS-NET by source: the host packs my concealment onto every pose; on the
   // off the whole list, the classic lane's invisible player walked behind a floating candle
   assert.match(w, /seen\.push\(d\);\n\s*\}\n\s*peerCandlesFrame\(seen, dt\);/, 'the candles off the seen');
   assert.doesNotMatch(w, /peerCandlesFrame\(drawable/, 'never off the whole list');
-  assert.match(w, /out\.push\(\{ id: p\.id, feet: onlineToScene\(p\.shown\), height: _peerHeights\.get\(p\.id\), cv: p\.shown\?\.cv \| 0(, [^}]*)? \}\);/, 'the peers the foes read carry it');   // and their facing and sheath (player/player-stance.ts)
+  assert.match(w, /out\.push\(\{ id: p\.id, feet: onlineToScene\(p\.shown\), height: _peerHeights\.get\(p\.id\), cv: p\.shown\?\.cv \| 0, yaw: p\.shown\.yaw, wd: p\.shown\.wd, \.\.\.stealthOfShown\(p\.shown\) \}\);/, 'the peers the foes read carry it, with their facing and sheath');
   assert.match(w, /pickPeerInFront\(eye, dir, openPeers\(peersNear\(\), isPartyMate\)\.filter\(crowdDrawnHere\), SOCIAL_REACH, rayPersonDistance\);/, 'the F door and the plaque skip a concealed peer (CONCEAL-MATE: a stranger - a mate stays open)');
 });
 

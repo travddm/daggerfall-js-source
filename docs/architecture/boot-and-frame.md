@@ -109,7 +109,7 @@ earlier step wrote.
 | 4 | `dt` (clamped to 0.1 s), `gamepad.tick(dt)`, look filter | |
 | 5 | `cameraRecoiler.update` | |
 | 6 | `onlineFrame(now, dt)` | Only when online and the player has spawned: sends look and pose, then `online.tick()`. |
-| 7 | Loading and foes: `syncInteriorLoad`, `syncLoading`, `tickTactics`, ambient text | |
+| 7 | Loading and foes: `syncInteriorLoad`, `syncLoading`, `tickTactics` | |
 | 8 | `modes.frame(dt, now)` | Interior, dungeon and modal arms draw here and the host returns. |
 | 9 | Exterior simulation: travel view, `player.update`, host module ticks (`gatherHost.tick`), season, ambience, wind, spawners, city gates | |
 | 10 | Render setup: `setFog`, `setLighting`, `setClearColor`, `renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME)` | |

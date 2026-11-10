@@ -92,7 +92,8 @@ test('TELL1: poise - the kind\'s own health by its weight, by what it is (an eli
   assert.equal(poiseOf({ maxHealth: 500, healthMult: 5, eliteFoe: true }, 600), 45, 'an elite orc of 100: 100 x 0.3 x 1.5');
 });
 
-test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite, an Elite Dungeon\'s elite, a champion, a revenant, the dungeon\'s doubling, a rite\'s summoner, a sworn one (mutants: a site that forgets it)', async () => {
+test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite, an Elite Dungeon\'s elite, a champion, a revenant, the dungeon\'s doubling, a rite\'s summoner, a sworn one (mutants: a site that forgets it)', async (tc) => {
+  setPref('eliteStacking', true); tc.after(() => setPref('eliteStacking', false));   // elites stack with the dungeon: the Features row, off by default
   const e = { maxHealth: 40, health: 40, level: 12, mobileType: M.Orc };
   assert.equal(promoteEliteFoe(e, { checkLevel: false }), true);
   assert.equal(e.healthMult, 2); assert.equal(kindHealth(e), 40);
@@ -288,7 +289,8 @@ test('TELL1: a paralysis still breaks a wind-up (DFU\'s CanAct), and no stagger 
 
 // ── what a staggered foe takes ─────────────────────────────────────
 
-test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\' tail end to end, a spell\'s landing (mutants: the tail never asks; the fold unregistered)', () => {
+test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\' tail end to end, a spell\'s landing (mutants: the tail never asks; the fold unregistered)', (tc) => {
+  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default
   assert.ok(blowTakenNames().includes('tell-stagger'));
   const ent = { staggerUntil: 5 };
   T = 4;
@@ -412,3 +414,10 @@ test('TELL1: the foe-vs-foe payload writes no knockback on a foe winding up - it
   assert.equal(windupDoor({ ...f, entity: f.ent }, 5, { striker: attacker, from: [0, 0, 0], weight: ORC_W }), 'stagger', '25 + 5 x 1.0 reaches 30 (hands: 18)');
 });
 
+
+test('DECISION 13: by default a staggered or overreached foe takes the blow it is dealt - no extra damage (ai/opening-damage.ts)', () => {
+  setTacticsClock(() => 10);
+  const open = { staggerUntil: 20, overreachUntil: 20 };
+  assert.equal(blowTakenScale({}, open), 1);
+  assert.equal(blowTaken(40, {}, open), 40);
+});

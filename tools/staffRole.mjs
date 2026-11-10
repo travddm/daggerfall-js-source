@@ -1,9 +1,7 @@
-// STAFF-ROLES-BY-ACCOUNT: THE OPERATOR'S WAY TO SET A STAFF ROLE - the first Owner and Admin, and the Discord links.
+// THE OPERATOR'S WAY TO SET A STAFF ROLE - the first Owner and Admin.
 //
 //   node tools/staffRole.mjs find <handle>                          the account id, when it registered, and its roles
 //   node tools/staffRole.mjs set <account id> owner|admin|moderator|none
-//   node tools/staffRole.mjs discord <account id> <discord user id>    link a Discord user to an account
-//   node tools/staffRole.mjs discord <account id> --remove             unlink every Discord user from an account
 //   add --local for the local D1 (wrangler dev), --print to show the SQL and run nothing
 //
 // Run from server-account/ (where wrangler finds wrangler.toml) by someone with deploy access to the Cloudflare account.
@@ -18,7 +16,6 @@ import { wranglerExec } from './lib/wranglerBindings.mjs';
 export const USAGE = [
   'usage: node tools/staffRole.mjs find <handle> [--local]',
   '       node tools/staffRole.mjs set <account id> owner|admin|moderator|none [--local] [--print]',
-  '       node tools/staffRole.mjs discord <account id> <discord user id>|--remove [--local] [--print]',
 ].join('\n');
 
 /** What each role sets: Owner implies Admin, and a role replaces the one before it. */
@@ -30,16 +27,14 @@ export const ROLE_COLUMNS = Object.freeze({
 });
 
 const HANDLE_RE = /^[^\s'";\\]{1,64}$/;
-const SNOWFLAKE_RE = /^\d{5,25}$/;
 
 /**
  * The statements one command runs, each a single SQL text with its values written in after a check that they are only
- * what they should be (an id of ID_RE's shape, a role name, digits) - never text from elsewhere.
+ * what they should be (an id of ID_RE's shape, a role name) - never text from elsewhere.
  * @param {string[]} args the command's words, flags removed
- * @param {number} nowS
  * @returns {{ sql: string[] } | { error: string }}
  */
-export function statementsFor(args, nowS) {
+export function statementsFor(args) {
   const [cmd, a, b] = args;
   if (cmd === 'find') {
     if (!a || !HANDLE_RE.test(a)) return { error: 'find needs a handle' };
@@ -63,26 +58,14 @@ export function statementsFor(args, nowS) {
       ],
     };
   }
-  if (cmd === 'discord') {
-    if (!a || !ID_RE.test(a)) return { error: 'discord needs an account id' };
-    if (b === '--remove') return { sql: [`DELETE FROM staff_discord WHERE player_id = '${a}'`] };
-    if (!b || !SNOWFLAKE_RE.test(b)) return { error: 'discord needs the Discord user id (digits) or --remove' };
-    return {
-      sql: [
-        `DELETE FROM staff_discord WHERE discord_id = '${b}' OR player_id = '${a}'`,
-        `INSERT INTO staff_discord (discord_id, player_id, created_at) SELECT '${b}', id, ${Math.floor(nowS)} FROM players WHERE id = '${a}' AND handle IS NOT NULL`,
-        `SELECT discord_id, player_id FROM staff_discord WHERE player_id = '${a}'`,
-      ],
-    };
-  }
   return { error: USAGE };
 }
 
 if (isMain(import.meta.url)) {
   const argv = process.argv.slice(2);
   const flags = new Set(argv.filter((x) => x === '--local' || x === '--print'));
-  const words = argv.filter((x) => !x.startsWith('--') || x === '--remove');
-  const plan = statementsFor(words, Date.now() / 1000);
+  const words = argv.filter((x) => !x.startsWith('--'));
+  const plan = statementsFor(words);
   if ('error' in plan) {
     console.error(plan.error);
     process.exit(2);

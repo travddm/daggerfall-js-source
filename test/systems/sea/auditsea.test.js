@@ -1,14 +1,11 @@
 // AUDIT SEA VENTURES - six cold lanes read SEA VENTURES at 886f2b4a6. Each finding fixed is pinned here by its id,
 // the failure it was driven through made to fail again - tools/mutants/auditsea.json. What remains is the sea's own:
-// the season's boards, the vaults' rooms, the treasure fleet and the storm, the Tidemail, Veilhaven's peace and the rise,
+// the vaults' rooms, the treasure fleet and the storm, the Tidemail, Veilhaven's peace and the rise,
 // and the sea's lines in the language of the moment.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { createSeaSeason, SEA_SEASON_FRESH_MS, SEA_SEASON_RETRY_MS } from '../../../src/scenes/seaSeasonHost.js';
-import { seasonText } from '../../../src/ui/naval/navalYardWindow.js';
-import { seaSeasonFigures, seaSeasonStartS, seaLegendsPossible, SEA_WORLD_DAY_S, SEA_SEASON_VENDOR } from '../../../src/net/sea/seaSeasonLaw.js';
 import { SOCIAL_ROOM, seaVaultRoomId, seaVaultRoomMapId, seaVaultMapId, seaVaultKey, seaRoomCell, SEA_VAULT_LANE, SEA_FLEET_OFFSET_MS, SEA_FLEET_SAIL_MS, SEA_FLEET_PERIOD_MS } from '../../../src/net/wire.js';
 import { FLEET_OFFSET_MS, FLEET_SAIL_MS } from '../../../src/systems/sea/seaEvents.js';
 import { etherPlaceId } from '../../../src/world/etherPlaces.js';
@@ -29,49 +26,8 @@ import * as CHART from '../../../src/ui/etherChartWindow.js';
 import * as tm from '../../../src/systems/textManager.js';
 
 const RC = 'r00000000000000000a01';
-const settle = async () => { for (let i = 0; i < 6; i++) await new Promise((r) => setImmediate(r)); };
-/** A realm session whose acts run at once over `seq`. */
-const sessionAt = (seq = 3) => ({ transact: (fn) => fn({ id: RC, lease: 'lease', seq }) });
 
 
-test('AUDIT SEA VENTURES E1: the season\'s board read the service refused is asked again SEA_SEASON_RETRY_MS on, doubling to the fresh wait - never at once from the paint that ends it, never a page frozen in its first refusal', async () => {
-  assert.deepEqual([SEA_SEASON_RETRY_MS, SEA_SEASON_FRESH_MS], [5_000, 60_000]);
-  let now = 1_000_000;
-  let seasonAsked = 0;
-  const s = createSeaSeason({ live: () => true, session: sessionAt(), character: () => RC, door: { board: async () => { seasonAsked++; return { ok: false, error: 'server' }; } }, now: () => now });
-  for (let i = 0; i < 200; i++) { s.office(); await settle(); }
-  assert.equal(seasonAsked, 1);
-  now += SEA_SEASON_RETRY_MS; s.office(); await settle();
-  assert.equal(seasonAsked, 2);
-  now += SEA_SEASON_RETRY_MS; s.office(); await settle();
-  assert.equal(seasonAsked, 2, 'the season\'s wait doubles too');
-});
-
-test('AUDIT SEA VENTURES E7: the season\'s boards never read: asking, never an empty season', async () => {
-  const now = 1_000_000;
-  const s = createSeaSeason({ live: () => true, session: sessionAt(), character: () => RC, door: { board: async () => ({ ok: false, error: 'offline' }) }, now: () => now });
-  s.office(); await settle();
-  const so = s.office();
-  assert.equal(so.asking, true);
-  assert.deepEqual(seasonText(so).lists, [], 'no lists - "no captain has sailed this season" is never said of boards unread');
-  assert.equal(so.line?.warn, true);
-});
-
-
-test('AUDIT SEA VENTURES B6: the day a season turns in counts for the old one - a world day past the turn, a save filing the season before\'s figures is read for it, its legends bounded by that whole season; past the day, never (mutants: the day, the season before, the legends\' bound)', () => {
-  assert.equal(SEA_WORLD_DAY_S, 7200);
-  const turn = seaSeasonStartS(2);
-  const save = (n, deepest = 900, legends = 1) => ({ modData: { [SEA_SEASON_VENDOR]: { ether: { season: { n, deepest, legends } } } } });
-  assert.deepEqual(seaSeasonFigures(save(1), turn + 60), { n: 1, deepest: 900, legends: 1 }, 'the season before, the turn\'s day');
-  assert.deepEqual(seaSeasonFigures(save(1), turn + SEA_WORLD_DAY_S - 1), { n: 1, deepest: 900, legends: 1 });
-  assert.equal(seaSeasonFigures(save(1), turn + SEA_WORLD_DAY_S), null, 'past the day: never');
-  assert.deepEqual(seaSeasonFigures(save(2), turn + 60), { n: 2, deepest: 900, legends: 1 }, 'the new season\'s too');
-  assert.equal(seaSeasonFigures(save(0), turn + 60), null, 'two seasons back: never');
-  const oldMost = seaLegendsPossible(turn - 1);
-  assert.ok(oldMost > seaLegendsPossible(turn + 60), 'the old season had more legends to end than the new one\'s first day');
-  assert.deepEqual(seaSeasonFigures(save(1, 0, oldMost), turn + 60)?.legends, oldMost, 'bounded by the old season\'s whole');
-  assert.equal(seaSeasonFigures(save(1, 0, oldMost + 1), turn + 60), null);
-});
 
 test('AUDIT SEA VENTURES D7: a vault of the deep stands in a room of its own lane - the one its gate let me into, or the day\'s I stand in - never its plain ruin\'s, and keeps no instance', () => {
   const [cx, cy] = [723, 240], place = etherPlaceId({ cx, cy }), H = seaVaultKey(cx, cy);

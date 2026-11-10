@@ -31,7 +31,7 @@ import { RARITIES } from '../../systems/loot/lootRarity.js';
 import { GatePassRenderer, GATE_PASS_PROGRAMS, gateSpinRate } from '../../render/gate/gatePass.js';   // WBX2: the portal's fire is the gate's own
 import { compiledPass, parallelCompile } from '../../render/glProgram.js';   // SHADER-STALL: the court's passes built once their programs are done
 import { gateArchProfile } from '../../world/gate/gateModel.js';
-import { ONLINE_MINUTES_PER_MS, GATE_HEAL_ROWS_MAX, GATE_HEAL_WIRE_MAX } from '../../net/wire.js';   // WBX7: a soul trap's rounds on the shared world's clock; GATE-HEAL: the heal word's bounds
+import { onlineMinutesPerMs, GATE_HEAL_ROWS_MAX, GATE_HEAL_WIRE_MAX } from '../../net/wire.js';   // WBX7: a soul trap's rounds on the shared world's clock; GATE-HEAL: the heal word's bounds
 import { spoilsLevel } from '../spoilsPool.js';   // AUDIT WBX S2: the spoils never rolled past the level the fight admitted
 import { bossBarModel, drawGateBossBar, BOSS_BAR_TEXT } from '../../ui/gate/gateBossBar.js';
 import { titleCardModel, drawGateTitleCard, TITLE_HOLD_MS } from '../../ui/gate/gateTitleCard.js';   // WB13e: the fight's beats, large
@@ -156,9 +156,9 @@ export const COURT_MARKS_TEXT = Object.freeze({
     return `${boss} feeds on the souls of ${ns.slice(0, -1).join(', ')} and ${ns[ns.length - 1]}.`;
   },
 });
-/** WBX7: a magic round on the shared world's clock, ms - one game minute (net/wire.js ONLINE_MINUTES_PER_MS: TimeScale
- *  12, five seconds) - so a soul trap laid on him lasts its rounds as it would on any foe in the same world. */
-export const COURT_ROUND_MS = Math.round(1 / ONLINE_MINUTES_PER_MS);
+/** WBX7: a magic round on the shared world's clock, ms - one game minute (five seconds at DFU's TimeScale 12, as the server
+ *  profile's time.worldScale says) - so a soul trap laid on him lasts its rounds as it would on any foe in the same world. */
+export const courtRoundMs = () => Math.round(1 / onlineMinutesPerMs());
 /** WBX4: his mark's ember, a little brighter than his glow's, so the floor under him reads at a glance - WB8b: his
  *  aspect's ember (MARK_COLOR the Burning Warden's). */
 export const markColorOf = (ember) => Object.freeze(ember.map((c) => Math.min(1, c * 1.1)));
@@ -1207,8 +1207,8 @@ export function createGateCourt({
     trapped({ chance, rounds } = {}) {
       const s = link.state(), t = now();
       if (!s || s.day === null || s.fell || s.wrath != null || !Number.isFinite(chance) || !(rounds > 0)) return false;
-      if (trapMark && t < trapMark.until) trapMark.until = Math.max(trapMark.until, t + rounds * COURT_ROUND_MS);
-      else trapMark = { chance, until: t + rounds * COURT_ROUND_MS, day: s.day };
+      if (trapMark && t < trapMark.until) trapMark.until = Math.max(trapMark.until, t + rounds * courtRoundMs());
+      else trapMark = { chance, until: t + rounds * courtRoundMs(), day: s.day };
       return true;
     },
     /**
