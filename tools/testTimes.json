@@ -735,7 +735,6 @@
  "test/systems/disc7.test.js": 944,
  "test/systems/disc8.test.js": 1433,
  "test/systems/discord5.test.js": 996,
- "test/net/gate/discordgates.test.js": 618,
  "test/systems/diseases.test.js": 749,
  "test/systems/dispel.test.js": 811,
  "test/systems/dispelmagic.test.js": 757,

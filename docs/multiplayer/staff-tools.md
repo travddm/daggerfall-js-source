@@ -49,7 +49,7 @@ and the realm screens.
 - `/tp <player>` goes to the relay (`server/src/staffTeleport.js`, `routeStaffTeleport`), which checks `isStaff` and
   answers the target's position to the asker only. Client: `src/net/staffTeleport.js`.
 - `/relay <setting> <value>` (developers, `mayRelayCfg`) changes relay settings stored on the hub (`relaycfg`), such
-  as Discord roles and threads, `bossBody`, `leaseDoor`, `grantMode`. Settings are read through
+  as `bossBody`, `leaseDoor`, `grantMode`. Settings are read through
   `/internal/relay/cfg`. See `src/net/relayCfg.js`.
 
 ## Follow, hidden mode and the map

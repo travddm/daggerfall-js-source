@@ -130,10 +130,3 @@ repository secrets to the Worker.
 
 To change the bot, change `discordCommands.js`, `discord.js` or `wrangler.toml` and merge. A person must still invite
 the bot, grant its channel permissions and roles, and rotate `DISCORD_BOT_TOKEN` in the repository secrets.
-
-### Relay announcements
-
-Separate from moderation, the relay posts event announcements (Oblivion gates, Super Dungeons, serpent) through a
-webhook (`GATE_DISCORD_WEBHOOK` secret; `heraldWebhook` in `server/src/index.js`, cards in
-`src/net/herald/heraldCard.js`). Ping roles and threads come from the `*_DISCORD_ROLE` and `*_DISCORD_THREAD` vars and
-can be changed in game with `/relay` (`src/net/relayCfg.js`).

@@ -11,7 +11,7 @@
 // WHERE IS THE CLIENT'S (systems/serpent/serpentSite.js): the lane is rolled here over the world's packet lanes (WW7-12,
 // scenes/naval/worldLanes.js `all` - the Bay's, the ones past it and across its edge, the
 // same list on every game that stands the land past the Bay; a game that does not takes the hub's word of the site the
-// accounts agree on, net/serpent/serpentHerald.js serpentAtWord), the spot along its way by the rolls below. The relay
+// accounts agree on, net/serpent/serpent-site.ts serpentAtWord), the spot along its way by the rolls below. The relay
 // never reads a map file; the fight lives in the cell room the site stands in (net/serpent/serpentBrain.js,
 // server/src/index.js), whichever socket of a player's - its own cell's or a halo's - reaches it.
 //

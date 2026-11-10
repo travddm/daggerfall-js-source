@@ -5,11 +5,11 @@ the order they keep, the Cloudflare configuration, the secrets, and the D1 migra
 
 ## The three parts
 
-| Part | Source | Host | Deployed by |
-| --- | --- | --- | --- |
-| Site (landing page at `/`, game at `/play/`, plus `terms/`, `privacy/` and lab pages) | `src/`, `index.html`, `play/`, `public/`; entries in `vite.config.js` `input` | GitHub Pages | `deploy.yml` |
-| Relay (multiplayer rooms, Durable Objects) | `server/` (`server/src/index.js`; shared law in `src/net/wire.js`) | Cloudflare Worker `daggerfall-online` | `relay-deploy.yml` |
-| Account service (accounts, tokens, saves, realm) | `server-account/` (`server-account/src/index.js`) | Cloudflare Worker `daggerfall-accounts`, one D1 database, one R2 bucket | `account-deploy.yml` |
+| Part                                                                                  | Source                                                                        | Host                                                                    | Deployed by          |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------- |
+| Site (landing page at `/`, game at `/play/`, plus `terms/`, `privacy/` and lab pages) | `src/`, `index.html`, `play/`, `public/`; entries in `vite.config.js` `input` | GitHub Pages                                                            | `deploy.yml`         |
+| Relay (multiplayer rooms, Durable Objects)                                            | `server/` (`server/src/index.js`; shared law in `src/net/wire.js`)            | Cloudflare Worker `daggerfall-online`                                   | `relay-deploy.yml`   |
+| Account service (accounts, tokens, saves, realm)                                      | `server-account/` (`server-account/src/index.js`)                             | Cloudflare Worker `daggerfall-accounts`, one D1 database, one R2 bucket | `account-deploy.yml` |
 
 A merge to `main` starts all three workflows, plus `release-desktop.yml`. Each one decides on its own whether it has
 work, and each one waits for the part it depends on.
@@ -109,7 +109,7 @@ Steps (every one is safe to re-run):
 13. Verifies the live service: `/v1/health` names this version, the gate public key is held, a password route runs
     on the platform, `/v1/pubkey` answers.
 14. Registers the Discord bot's commands and endpoint when `DISCORD_BOT_TOKEN` is set (`server-account/src/
-    discordCommands.js`, `tools/discordModCommands.mjs`).
+discordCommands.js`, `tools/discordModCommands.mjs`).
 
 A secret listing that cannot be read stops the job. It must never be read as "no secrets", because that would
 re-mint the signing pair.
@@ -144,7 +144,6 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[vars] IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S` | Verifies identity tokens. Must match the account service's key. |
 | `[vars] CELL_SPLIT_AT`, `CELL_MERGE_AT`, `*_DWELL_MS`, `REGION_SHARDS` | Crowd thresholds for splitting and merging cells. |
 | `[vars] *_FEED_URL`, `HIDDEN_SEEN_URL` | Account service endpoints the relay calls for moderation and staff feeds. |
-| `[vars] *_DISCORD_ROLE`, `*_DISCORD_THREAD` | Discord targets for event announcements; empty turns one off. |
 
 `server-account/wrangler.toml` (account service):
 

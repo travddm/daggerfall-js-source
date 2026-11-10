@@ -21672,7 +21672,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  above) - the site of the gate the clock is about (net/gate/gateLaw.js gateAt: from the last gate's collapse to this
    *  one's), the omen's own roll, so every client clears the same ground and the land is clear long before the omen
    *  names it. Nothing until the site's scan is done (it begins once the relay's clock is read); the day then read off
-   *  the relay's clock as the omen reads it, the last offset kept through a reconnect. DISCORD-GATES: the site kept
+   *  the relay's clock as the omen reads it, the last offset kept through a reconnect. The site kept
    *  beside it, for the hub's word below. */
   let _gateClearOf = { day: null, site: null, clear: null };
   const _gateClearSetOf = gateClearMemo();   // GATE-CLEAR: the set last made, made again only when what it is made of moves
@@ -21688,13 +21688,13 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // STAR-CLEAR: and every fallen star's, from its town's naming until it is gone (scenes/starfall/starfallHost.js starClears)
     return _gateClearSetOf(_gateClearOf.clear, starfall?.starClears() ?? null);
   };
-  /** DISCORD-GATES: THIS GAME'S WORD OF WHERE THE GATE STANDS, to the hub (net/online.js sendGateSite, once a socket and
+  /** THIS GAME'S WORD OF WHERE THE GATE STANDS, to the hub (net/online.js sendGateSite, once a socket and
    *  day): the clearing's own site - the gate the clock is about, from its scan's end on, ~85 real minutes before its
-   *  omen. The hub names the place in its Discord posts once two accounts agree (net/gate/gateHerald.js). */
+   *  omen. The broken rite stands by the site two accounts agree on (net/gate/gate-site.ts). */
   const reportGateSite = () => {
     const s = _gateClearNow() ? _gateClearOf.site : null;
     if (s) socialLink()?.sendGateSite?.(s.day, s.px, s.py, s.place);
-    // WW2: and each lane's past the Bay, from its omen on - the hub's herald posts such a gate only where accounts agree on it
+    // and each lane's past the Bay, from its omen on
     for (const { lane, c } of gateOmen?.currents() ?? []) if (lane && c.site) socialLink()?.sendGateSite?.(c.site.day, c.site.px, c.site.py, c.site.place);
   };
   /** AUDIT SD II (L5 F4): THE SPENT WORDS A POOL STILL OWES THE HUB (scenes/spoilsPool.js `resendSpent`) - said again
@@ -21724,7 +21724,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const gateFrame = () => {
     try { gateOmen?.frame(); } catch (e) { console.warn('[gate] frame', e?.message ?? e); }
     gateClaims?.tick();   // WB5b: what the account service has not counted yet, offered again on its own clock
-    if (gateOmen) reportGateSite();   // DISCORD-GATES: where the gate stands, to the hub
+    if (gateOmen) reportGateSite();   // where the gate stands, to the hub
     resendSpentWords();   // AUDIT SD II (L5 F4): the spent words a pool still owes the hub
     raidClaims?.tick();   // RAID4: and the raids' receipts, on theirs
     if (profBook?.state.open === true) { try { motherlodeBook?.tick({ sense: profBook.track('mining').specs?.[100] === 'motherlode-sense' }); } catch (e) { console.warn('[motherlode] frame', e?.message ?? e); } }   // PROF2b: the day's Motherlodes read, warned of and stood
