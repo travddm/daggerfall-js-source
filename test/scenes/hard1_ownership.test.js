@@ -164,6 +164,8 @@ const CONTEXTS = [
       detectFeed: 'createDetectFeed returns { tick } over a plain marker list - no GPU batch, no loop',
       _restDeps: 'a bag of thunks handed to the rest window; it owns nothing',
       win: 'a window, owned by the window stack that pushed it, not by the context',
+      _peers: 'createPeerCandidates holds a Map of the other players in the room as plain target records - no batch, mesh, loop or listener; it goes with the context',
+      _peerSenses: 'createPeerSensesLink returns { read } over closures of the host and holds nothing of its own - no batch, mesh, loop or listener',
       searchRoom: 'GRAVE-PARTY (FIELD BUGS 2026-10-16b): createSearchRoom holds a Map of strangers\' searched-object words (SEARCH_FOREIGN_MAX at most) - no batch, mesh, loop or listener; it goes with the context',
     },
   },

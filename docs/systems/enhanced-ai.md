@@ -21,6 +21,46 @@ The enhanced layer never replaces that motor. It hooks in at three points:
 With the switch off, `tacticsStep` returns false and writes nothing, the cover index answers nothing, and hosts build
 plain `EnemyAI`. The result is Daggerfall Unity's classic behaviour.
 
+DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies", `Enhancements/EnhancedCombatAI`, DFU's default on).
+The port runs it under the same name (decision 117): the foe pools hand each `EnemyAI` the setting's reader
+(`src/characters/enemy/enhanced-combat-ai.ts`), and online the server profile pins it at DFU's value
+(`combat.enhancedAI` in `src/net/profile/profileKeys.ts`). Its behaviours are ported in groups. In so far:
+
+- The senses: the 190-degree field of view, the lead on the target, the rate of approach in the melee reach, the
+  runner-up target.
+- Movement and strafing (`src/characters/enemy/enhanced-movement.ts`): a foe stands off at 1.7, rolls to close in or
+  back off on the level difference, strafes round its target, backs away when too close, walks while it turns, waits a
+  short reflex between changes, and walks at half speed while it attacks. A flyer or swimmer does not strafe or back
+  away yet.
+
+The retreat roll reads the player's facing and weapon from `src/player/player-stance.ts`, which the camera look and the
+screen weapon write, and a peer's from its pose (facing, and the sheath; a peer's bow and paralysis are not on the
+wire, so a foe treats a peer as not paralysed and with a weapon out).
+
+The Enhanced AI here is a separate option on top of it that shares half a name. With both on, `tacticsStep` runs first
+in the classic tick; when it takes the step, DFU's enhanced movement waits for the next tick.
+
+### Online: players on other clients
+
+Online, each foe runs on one client, its owner's, and its senses read every player in the room. DFU has one player, so
+its stealth check and its first-meeting language roll read that player's skills. The port gives each player on another
+client (a peer) the same rules, with no setting, because nothing here departs from DFU:
+
+- The peer's live Stealth and half-speed state ride its pose. The owner's foe rolls DFU's stealth chance against that
+  Stealth, skips odd minutes while the peer moves under half speed, and detects a met peer that moves faster
+  (`src/characters/enemy/stealth-check.ts`). The foe's record names the minute of its last check at the peer, and the
+  peer's own client tallies its Stealth once a minute, as DFU tallies the player's.
+- The first record that names the peer as the foe's target is the peer's first meeting. The peer's client rolls DFU's
+  language check with the peer's own skills and sheathed hand, and a success goes to the owner, which stands the foe
+  down as a pacified foe (`src/characters/enemy/peer-senses.ts`). A pacified foe ignores every player until one strikes
+  it, as in DFU.
+- A failed language roll shows a line ("Orc ignores your words."), in single player and online. DFU shows nothing; the line
+  changes no outcome.
+
+The stealth check runs only while the peer is inside the foe's classic spawn band. DFU's `WouldBeSpawnedInClassic` gate
+measures that band to its one player, so the port measures it to the peer the check is about, with a latch for each
+peer. The foe's own band, which the rest gate and the target machine read, stays measured to its owner's player.
+
 Departure from Daggerfall Unity: DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies"). This port does not
 implement it; the port runs DFU's classic path only. The Enhanced AI here is a separate design that shares half a name.
 
