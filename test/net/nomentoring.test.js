@@ -1,7 +1,8 @@
-// NO-MENTORING (decision #70): the party leader can set the party to "no mentoring". The hub's `party.mentoring.off` and
+// NO-MENTORING: the party leader can set the party to "no mentoring". The hub's `party.mentoring.off` and
 // `party.mentoring.on` acts are the leader's alone; the party view carries `nm: 1` while it stands; and the mentor host
 // (scenes/mentorHost.js) then mentors nobody, so the higher-level player fights at full strength and nobody gets the
-// pupil's training bonus. The panel's switch is test/net/soc3_socialpanel.test.js's.
+// pupil's training bonus. The server profile's `party.allowNoMentoring` rule lets a server keep every party mentored.
+// The panel's switch is test/net/soc3_socialpanel.test.js's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SOCIAL_ACTS, validSocialAct, validSocialFrame, validPartyView, SOCIAL_ROOM } from '../../src/net/wire.js';
@@ -9,6 +10,11 @@ import { fakeRoom } from '../fakeRoom.mjs';
 import { createMentorHost } from '../../src/scenes/mentorHost.js';
 import { MENTOR_JOIN_MS } from '../../src/systems/mentorMode.js';
 import { mentorEndedText } from '../../src/systems/mentorText.js';
+import { partyMentoring, noMentoringField, noMentoringAllowed } from '../../server/src/partyMentoring.js';
+import { mentoringSwitch, noMentoringAllowed as panelAllows } from '../../src/ui/partyMentoring.js';
+import { installProfile, _resetProfileForTests } from '../../src/systems/online/serverProfile.ts';
+import { OFFICIAL_PROFILE } from '../../src/net/profile/officialProfile.ts';
+import { resolveRules } from '../../src/net/profile/profileKeys.ts';
 
 test('NO-MENTORING wire: the two acts name nothing; a party view keeps nm 1 and drops any other value', () => {
   assert.deepEqual([SOCIAL_ACTS['party.mentoring.off'], SOCIAL_ACTS['party.mentoring.on']], ['', '']);
@@ -112,4 +118,55 @@ test('NO-MENTORING host: in a no-mentoring party the high-level member is themse
   host.frame(MENTOR_JOIN_MS * 5);
   host.frame(MENTOR_JOIN_MS * 6 + 1);
   assert.ok(me._mentor, 'the switch back: mentoring after the join wait');
+});
+
+/** A hub with one party, recording what the act stores and says. */
+function partyRoom(party) {
+  const room = { stored: [], said: [] };
+  room._myParty = async (me) => [party.members.includes(me) ? party : null];
+  room._putParty = async (p) => {
+    room.stored.push(p);
+  };
+  room._sayParty = async (p) => {
+    room.said.push(p);
+  };
+  return room;
+}
+
+test('NO-MENTORING profile rule, relay: with the rule off the leader is refused and nothing is stored; a stored nm leaves the view; the official profile allows it', async () => {
+  const off = resolveRules({ 'party.allowNoMentoring': false });
+  const official = resolveRules(OFFICIAL_PROFILE.rules);
+  assert.equal(noMentoringAllowed(official), true, 'the official profile allows the switch');
+  assert.equal(noMentoringAllowed(off), false);
+  const party = { id: 'party-1', leader: 'a', members: ['a', 'b'] };
+  const room = partyRoom(party);
+  assert.equal(await partyMentoring(room, 'a', {}, false, 0, off), 'this server keeps mentoring on');
+  assert.deepEqual([room.stored, room.said], [[], []], 'a refusal changes nothing');
+  assert.equal(await partyMentoring(room, 'a', {}, true, 0, off), null, 'turning mentoring back on is never refused');
+  assert.equal('nm' in room.stored.at(-1), false);
+  assert.equal(await partyMentoring(room, 'a', {}, false, 0, official), null);
+  assert.equal(room.stored.at(-1).nm, 1);
+  assert.deepEqual(noMentoringField({ ...party, nm: 1 }, official), { nm: 1 });
+  assert.deepEqual(noMentoringField({ ...party, nm: 1 }, off), {}, 'a party set before the rule changed is mentored');
+  assert.deepEqual(noMentoringField(party, official), {});
+});
+
+test('NO-MENTORING profile rule, client: the leader gets no switch when the installed profile sets the rule off, and gets it back under the official profile', () => {
+  const btn = (label) => ({ label });
+  const party = {};
+  try {
+    assert.equal(panelAllows(), true, 'nothing installed reads the official profile');
+    assert.equal(mentoringSwitch(btn, party, true, () => {}).length, 1);
+    installProfile({ ...OFFICIAL_PROFILE, rules: { 'party.allowNoMentoring': false } }, 'a'.repeat(64));
+    assert.equal(panelAllows(), false);
+    assert.deepEqual(
+      mentoringSwitch(btn, party, true, () => {}),
+      [],
+      'no switch for the leader',
+    );
+    installProfile(OFFICIAL_PROFILE, 'b'.repeat(64));
+    assert.equal(mentoringSwitch(btn, party, true, () => {}).length, 1);
+  } finally {
+    _resetProfileForTests();
+  }
 });

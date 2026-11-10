@@ -1,6 +1,6 @@
 // The key registry: one row per online rule a profile may set, each with DFU's value and today's online value. Data and
-// pure functions only, because the account Worker reads it: `offline` names a setting, and `words` is an l10n key. The
-// relay does not bundle it; the client checks a fetched profile against it.
+// pure functions only, because the account Worker and the relay read it: `offline` names a setting, and `words` is an
+// l10n key. The client checks a fetched profile against it; the relay resolves its own profile's rules with it.
 
 export type ProfileValue = boolean | number | string;
 
@@ -42,6 +42,19 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.repair.allowMagic',
     setting: 'Controls.AllowMagicRepairs',
+  }),
+  // Whether a party leader may set the party to no mentoring. A server owner who wants every party mentored turns it
+  // off. DFU has no parties and no mentor mode, and single player has no party, so `dfu` and `offline` are false: no
+  // switch, as in DFU.
+  'party.allowNoMentoring': Object.freeze({
+    census: Object.freeze(['ON67'] as const),
+    feature: 'NO-MENTORING',
+    type: 'bool',
+    dfu: false,
+    online: true,
+    offline: false,
+    checkedBy: Object.freeze(['client', 'relay'] as const),
+    words: 'profile.party.allowNoMentoring',
   }),
 } satisfies Record<string, ProfileKey>);
 

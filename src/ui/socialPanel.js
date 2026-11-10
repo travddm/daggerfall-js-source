@@ -1072,7 +1072,7 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
       const noteOf = () => { try { return mentorNote() ?? ''; } catch { return ''; } };
       const note = el('div', 'dfsocial-empty dfsocial-mentor', noteOf());
       liveSubs.push({ el: note, of: noteOf });
-      out.push(note, ...noMentoringLines(el, p));   // NO-MENTORING (decision #70): the line every member reads
+      out.push(note, ...noMentoringLines(el, p));   // NO-MENTORING: the line every member reads
       out.push(...journeyBody());   // PARTY-UI
       const leave = el('div', 'dfsocial-row');
       leave.append(btn('Leave party', { warn: true, run: () => act({ k: 'party.leave' }) }), ...mentoringSwitch(btn, p, social.leads(), act));   // NO-MENTORING: the leader's switch
