@@ -154,7 +154,7 @@ OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"
 RELAY_LAW_URL = "https://relay.invalid/v1/law"
 # MOD_AI - SAFE5: the reviewer (src/modAi.js) - "off"; "shadow", which reads the relay's feed of public lines and the
 # reported cases and says its verdict beside each case, marked as a shadow's, and does nothing on it; or "on", which
-# also mutes for half an hour on its severest, surest verdicts. Shipped "off" (decision 118 A5): "shadow" and "on" send
+# also mutes for half an hour on its severest, surest verdicts. Shipped "off": "shadow" and "on" send
 # public chat lines and reported lines to Anthropic's Messages API, so an operator turns the reviewer on on purpose. It
 # reads nothing until ANTHROPIC_API_KEY is set beside it, as a secret, never here.
 MOD_AI = "off"

@@ -1,6 +1,5 @@
-// The shipped configuration sends no chat to Anthropic and no feed or order to another server (decision 118 A5;
-// server feature audit, PR 2). Each test reads the [vars] of a wrangler.toml as a deploy reads them and runs the code
-// with those values.
+// The shipped configuration sends no chat to Anthropic and no feed or order to another server. Each test reads the
+// [vars] of a wrangler.toml as a deploy reads them and runs the code with those values.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
