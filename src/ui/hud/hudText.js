@@ -34,8 +34,8 @@
 // the top of the screen (ui/enhanced/enhancedHudText.js, retired); that was a
 // second enhanced face beside the notice panel ENH-NOTICE1 gave the
 // message box, and the lines the player most wanted in the panel -
-// Climates & Calories' hunger, thirst and cold, the Ambient Text
-// mod's street lines, the torches' burn-out, every skill-up and loot
+// Climates & Calories' hunger, thirst and cold, the
+// torches' burn-out, every skill-up and loot
 // tally - are exactly this class's rows (DaggerfallUI.AddHUDText, the
 // HUD-text kind, never a box). So each row is a TOAST in that stack
 // now (ui/enhanced/enhancedNotice.js drawEnhancedToasts): a panel of its own,

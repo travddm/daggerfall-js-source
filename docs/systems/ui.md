@@ -204,8 +204,8 @@ calls `runEnhancedMenu`) and the enhanced pause screen mount it. The classic pau
 - `locales/<tag>/Port_Strings.csv` holds each language (Daggerfall Unity's two-column format);
   `locales/README.md` explains it to translators. `tools/l10nExtract.mjs` writes `locales/en/Port_Strings.csv` from the
   source; `--check` fails when it is stale. Never edit the English catalog by hand.
-- `src/systems/localeCatalog.js` `LOCALE_CATALOG` lists the offered languages. Those marked `drafting` are offered only
-  when a translation pack covers them. Untranslated drafts are machine translations, and the game labels them so.
+- `src/systems/localeCatalog.js` `LOCALE_CATALOG` lists the languages the game can offer. One is offered when
+  `locales/` holds its reviewed translation or the player installs a translation pack for it.
 - `src/scenes/localeData.js` `initLocale` picks the language at boot (uiPrefs `language`, `?lang=` for one visit);
   `switchLocale` changes it in play. `qps-ploc` is a pseudo-locale that shows unrouted text.
 - Classic fonts hold ASCII only. `src/ui/localeFaces.js` registers a system-font face per script for every language but

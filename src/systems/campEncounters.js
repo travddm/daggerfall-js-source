@@ -45,7 +45,8 @@
 import { chooseRandomEnemy, resolveEncounterTableIndex, playerReading } from './encounters.js';
 import { encounterTable } from '../characters/encounterTableDoor.js';   // DEX3: the one table a group rolls from
 import { factionOf, SOLITARY_TYPES, NIGHT_ONLY_FACTIONS } from '../characters/mobile/mobileFactions.js';
-import { CLASSIC_MINUTES_PER_SECOND } from './worldTick.js';   // real-seconds -> game-minutes, so the cadence below can be stated in real play time
+import { CLASSIC_MINUTES_PER_SECOND, sharedClockOn } from './worldTick.js';   // real-seconds -> game-minutes, so the cadence below can be stated in real play time
+import { onlineTimeScale } from '../net/wire.js';   // online, the server profile's time.worldScale
 
 // A camp/pack seed roll that lands on a SOLITARY type (Dragonling,
 // Daedra, an Atronach, ...) gets this many extra tries at a normal
@@ -124,10 +125,13 @@ export const PACK_ALERT_RADIUS = PACK_SPACING * 2;
 // only advances 12 minutes per real minute (CLASSIC_MINUTES_PER_SECOND,
 // classic Daggerfall's own compression, ported verbatim), so a window
 // stated in game-minutes alone would drift out of what a real 15-minute
-// play session feels like. 15 * 60 * (12/60) = 180 game-minutes.
+// play session feels like. 15 * 60 * (12/60) = 180 game-minutes. Online the
+// clock runs at the server profile's time.worldScale (12 by default), so the
+// window is 15 game minutes for each unit of it.
 export const CAMP_WINDOW_REAL_MINUTES = 15;
-export const CAMP_WINDOW_MINUTES = CAMP_WINDOW_REAL_MINUTES * 60 * CLASSIC_MINUTES_PER_SECOND;   // 180
-export const campWindowOpen = (gameMinutes) => Math.floor(gameMinutes) % CAMP_WINDOW_MINUTES === 0;
+export const campWindowMinutes = () =>
+  sharedClockOn() ? CAMP_WINDOW_REAL_MINUTES * onlineTimeScale() : CAMP_WINDOW_REAL_MINUTES * 60 * CLASSIC_MINUTES_PER_SECOND;   // 180 at TimeScale 12
+export const campWindowOpen = (gameMinutes) => Math.floor(gameMinutes) % campWindowMinutes() === 0;
 
 // a CHECK on a reliable real-time cadence,
 // not a guaranteed spawn: every 15 real minutes of actual play (180

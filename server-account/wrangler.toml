@@ -130,15 +130,15 @@ MODES_OFFERED = ""
 # STAFF ROLES (Admin, Owner, Moderator) ARE COLUMNS OF THE ACCOUNT, NOT HANDLE LISTS (server-account/migrations/0002, titles.js,
 # staff.js). This file names no handle that holds a role: a name is free to whoever registers it first, so a name list was a way
 # in to bans, rollbacks and grants. An Owner sets the first Admin and Owner from a machine with deploy access, once:
-# docs/operations/staff-roles.md (tools/staffRole.mjs). Owners then add and remove Admins from the staff panel, Admins add and
-# remove Moderators, and the Discord moderators' queue links a Discord id to an account the same way.
+# docs/operations/staff-roles.md (tools/staffRole.mjs). Owners then add and remove Admins from the staff panel, and Admins add
+# and remove Moderators.
 # The other *_HANDLES lists below grant a TITLE (a name beside a name), never a right to act on another player.
 #
 # SAFE1-SAFE8 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system";
 # bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY.
 #
 # RELAY_LAW_URL - SAFE4: the relay's door for a mute or a ban decided with no moderator's client to carry its order to
-# the rooms (one from Discord, an automatic one): the relay's own host and SAFE_LAW_PATH (src/net/wire.js), which the
+# the rooms (one from the staff panel, an automatic one): the relay's own host and SAFE_LAW_PATH (src/net/wire.js), which the
 # hub applies and hands to its target's own client. Empty: the order lands on the target's next connection instead.
 # AUDIT SAFE RELAY S1: the order goes through the RELAY service binding below, which this address only names the path
 # for - one Worker fetching another's workers.dev address on the same account may be refused (Cloudflare's error 1042).
@@ -151,20 +151,14 @@ RELAY_LAW_URL = "https://relay.invalid/v1/law"
 # public chat lines and reported lines to Anthropic's Messages API, so an operator turns the reviewer on on purpose. It
 # reads nothing until ANTHROPIC_API_KEY is set beside it, as a secret, never here.
 MOD_AI = "off"
+# OPERATOR_OPTIONS (src/operator-options.ts): the operator's tools that core play does not need, each
+# off unless named here, comma-separated: census, economy, desk, status, follow, hidden, give, feeds, botcheck. "feeds"
+# and "botcheck" also need the relay's STAFF_NET_FEED_URL and REACTION_FEED_URL (server/wrangler.toml) set.
+OPERATOR_OPTIONS = ""
 # MOD_AI_MODEL: the model, empty for the current Haiku (src/modAi.js MOD_AI_MODEL_DEFAULT). MOD_AI_DAILY_MAX: its calls
 # a UTC day, empty for 1,500.
 MOD_AI_MODEL = ""
 MOD_AI_DAILY_MAX = ""
-# SAFE8: THE MODERATORS' QUEUE IN DISCORD (src/discord.js). DISCORD_MOD_CHANNEL: the private channel's id the bot posts
-# each case to. DISCORD_PUBLIC_KEY: the Discord application's public key (hex - not a secret), which every press and
-# /mod is signed with. Who may press is a `staff_discord` row (account id), not a var - a press is that account's act, and only
-# while it holds a staff role. The bot's token is DISCORD_BOT_TOKEN, a
-# secret the deploy puts, never here. Empty: no cards and no presses - the cases still gather, and the game's
-# /mute, /ban and /strikes still answer. The setup: bible/11-Multiplayer/Chat-Safety-Arc.md section 9.
-DISCORD_MOD_CHANNEL = "1560996671440293908"
-DISCORD_PUBLIC_KEY = "36e74945022f94ec7955a84ccccb270e63780100e558d30777742337b62de3e0"
-# DISCORD MODERATORS ARE LINKED BY ACCOUNT, NOT BY NAME: the `staff_discord` table binds a Discord user id to an account id
-# (tools/staffRole.mjs discord, docs/operations/staff-roles.md), and a press is that account's act only while it holds a staff role.
 # STAFF-PANEL5-FREEZE (2026-10-22, mob, 03:22Z; design doc "DFO Staff Panel: design", Freeze player): DISCORD_INVITE_URL - the
 # server's Discord invite the frozen player's Staff tab shows beside its Copy button (server-account/src/staffFreeze.js
 # discordInvite), so it changes without a game update. An https address; empty, the tab shows none.
@@ -172,8 +166,7 @@ DISCORD_INVITE_URL = "https://discord.gg/QADbZYQ73j"
 # HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant
 # them a unique different version of the aura, a title named Hour's First,
 # and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON - the
-# thirteen accounts the first clear's claims name (slot 1, read by
-# .github/workflows/sd-clears.yml). The title Hour's First and its aura, The
+# thirteen accounts the first clear's claims name (slot 1). The title Hour's First and its aura, The
 # First Hour (titles.js isHoursFirst). Comma-separated handles,
 # case-insensitive, the same as the lines above; held while listed.
 HOURS_FIRST_HANDLES = "aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDeeJew,mayaamano,Nirnroot,ofrizz,rosalina,ShikiX3,Temegast,Terra"
@@ -182,13 +175,9 @@ HOURS_FIRST_HANDLES = "aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDee
 # off the `dm` glyph in the signed token, as /red reads `dev`). "This
 # goes strictly to the account SquidKamer."
 DUNGEON_MASTER_HANDLES = "SquidKamer"
-# TITLE-N: the three Patreon tiers, lowest first - each list grants its
-# title and its glyph. Dutchess and Satranath are the first Disciples (Mac); a tier that
-# lapses is a handle taken off, gone from that player's next token.
-# PATREON-LINK (2026-10-01): a patron no longer needs a line here - they
-# link their own Patreon from the account card, and PATREON_TIERS below
-# grants the tier their pledge pays for. These lists stay for the titles
-# Mac grants by name (a comp, a patron who will not link).
+# Disciple, Apostle and Hierophant, lowest first - each list grants its
+# title and its glyph. Dutchess and Satranath are the first Disciples (Mac); a handle
+# taken off is gone from that player's next token.
 # 2026-09-26, Mac: "Grant Flylighter the disciple title/glyph".
 # 2026-09-29, Mac: "Add valenvalarys as a disciple ingame".
 DISCIPLE_HANDLES = "Dutchess,Satranath,Skibbster,Flylighter,valenvalarys"
@@ -223,6 +212,9 @@ PROF_DAY_CAPS = "on"
 PROF_MASTERWORK_GATE = "on"
 # PROFESSION-CAPS: the gathered goods are priced on DFU's ingredient scale; "off" puts back the port's earlier scale.
 PROF_DFU_PRICES = "on"
+# A Master's work is Rare, so crafted gear stays below Legendary; "on" makes it Legendary, as before the cap (src/net/masterLaw.js
+# masterTierFor).
+PROF_MASTER_LEGENDARY = "off"
 # CHAP1 (bible/11-Multiplayer/Chapters-Arc.md 3): THE ROLL by this switch - "off", "dev" (the Admins alone)
 # or "on". Shipped at "dev": the developers' realm characters keep their guild standing on the service first; everyone
 # else's stays the save's, as before CHAP1, until this line says "on". CHAP2a: and the halls' witness, a hall writ's
@@ -269,40 +261,10 @@ SEASON_ZERO_WEEK = "2"
 DOMAINS_WEEK = "6"
 # HERALD (2026-10-01, Mac: "Herald doesnt exist ingame yet" - "you'll need
 # to develop the herald title/glyph"): Herald - the azure title and the
-# herald's trumpet with its banner beside the name, the Patreon tier
-# between Disciple and Hierophant. Its patrons hold it by their pledge
-# (PATREON_TIERS below); a handle here grants the title and the glyph by
-# name, as every list above does. Empty: nobody by name yet.
+# herald's trumpet with its banner beside the name, between Disciple and
+# Hierophant. A handle here grants the title and the glyph by name, as
+# every list above does. Empty: nobody by name yet.
 HERALD_HANDLES = ""
-# PATREON-LINK (2026-10-01, Mac: "With patron and having to manually hand
-# out titles. Im running into a workflow where its really hard to keep up
-# with it"; asked, "Patreon auto-link"): A PATRON'S TITLE FOLLOWS THEIR
-# PLEDGE. A registered player presses Link Patreon on the account card,
-# and the tier their pledge pays for is a title they hold - upgraded,
-# downgraded and lapsed by Patreon's webhook (server-account/src/patreon.js).
-#
-# PATREON_CLIENT_ID is the Patreon API client's id - not a secret (it is in
-# every authorize URL). Mac's client (2026-10-01). The card offers no link
-# until the deploy has put the client's secret beside it - empty here is
-# off too. The two secrets are NOT here and must never be: the deploy puts
-# PATREON_CLIENT_SECRET and PATREON_WEBHOOK_SECRET from the repository's
-# own secrets (.github/workflows/account-deploy.yml), as it puts the keys.
-PATREON_CLIENT_ID = "xyF8_xJg78YwVgT0xRhs6uhPVeAdOzJu7_dcpaGqvqH-5DNdbLp-gugahtfgH-Ui"
-# Which Patreon tier grants which title: "<tier id>:<title>", comma-
-# separated, the titles disciple, apostle, herald and hierophant. A tier's id is
-# the number in its Join link on the Patreon page (`rid=`). A tier not
-# listed grants nothing; changing a line here moves every patron of that
-# tier on their next token, with nothing walked.
-# Mac's tiers (2026-10-01: "some titles dont have titles/glyphs ingame.
-# Heriophant is custom and Herald doesnt exist ingame yet. Supporter doesnt
-# recieve a title/glyph"): Disciple (29666211) is mapped, and Herald
-# (29666234) since HERALD gave it its title in the game. Supporter
-# (29701293) holds none.
-# HIEROPHANT-TIER (2026-10-17, Mac: "The $50 patreon tier doesnt have a
-# title/glyph ingame. The Heirophant"): Hierophant (29666221) is mapped
-# too - its pledge holds TITLE-N's Hierophant, the rose title and the
-# crown. A title made for one patron is still granted by name, beside it.
-PATREON_TIERS = "29666211:disciple,29666234:herald,29666221:hierophant"
 
 [[d1_databases]]
 binding = "DB"

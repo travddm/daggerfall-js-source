@@ -93,6 +93,10 @@ container, a shop. It also decides what closing the window owes the world (`clos
 
 `containers.js` identifies private house containers from furniture model ids, as DFU's `DaggerfallInterior` does.
 `containerLoot.js` raises DFU's `OnLootSpawned` event after a shelf or a house container is stocked.
+A shop shelf is the player's own, online too, as in DFU: rolled for the player when the day turns and sold out as it
+is bought. A server profile can make it the building's shared shelf instead (`shop.sharedShelf`,
+`shop-shelf-rule.ts`). A sold piece is gone, as DFU clears the merchant's basket; the "Sold goods stay on the shelf"
+Features row shelves it until the next restock, and online that row is pinned off.
 
 **Shared room loot.** Online, a dungeon's or building's container is one list for every player in the room
 (`roomLoot.js`):
@@ -123,9 +127,14 @@ it) sets how much of a humanoid foe's loot reaches its body: class foes, Orcs, C
 `dfu`, is DFU's whole table roll and whole worn kit. `cut` keeps a quarter of each, the game's earlier rule. Online the
 server profile pins the room to `dfu`.
 
-**Kill gold.** `kill-gold.ts` sets a killed foe's gold: the table's range times `1 + 1.5 ln(level)`, so gold grows
-early and flattens late (DFU multiplies by the level; Unleveled Loot made it flat). It applies where Unleveled Loot's
-death handler runs.
+**Drop shaping.** `foeLootCap.js` marks plain foes for their own rarity weights (the plain ladder), rolls a foe's kit at
+its death, and keeps a summon's body bare. It no longer caps how many items a foe drops (B4). Elite foes, champions,
+bosses and named foes stay off the plain ladder. `kill-gold.ts` sets a killed foe's gold: the table's range times
+`1 + 1.5 ln(level)`, so gold grows early and flattens late (DFU multiplies by the level; Unleveled Loot made it flat).
+It applies where Unleveled Loot's death handler runs. `renownLoot.js` scales the loot bonus with the roller's Renown
+online.
+A dungeon treasure pile's gold is the player's level times the table's roll, as in DFU, online too. A server profile
+can divide it back to level 1's gold online instead (`loot.pileGold` `flat`, `loot.js` `unlevelPileGold`).
 
 ## Banking
 
@@ -207,10 +216,11 @@ The Materials Bag (`src/systems/materialsBag.js`, `src/net/bagLaw.js`) belongs t
 
 ## Testing
 
-Run a file with `node --test <file>`. Start with `test/systems/inventory.test.js`, `itemTransfer.test.js`,
-`inventorySession.test.js`, `useitem.test.js`, `banking.test.js`, `pi1_physicalitems.test.js`,
-`unleveledLoot.test.js`, `lr1_lootrarity.test.js`, `lootgate1.test.js`, `gem1_sockets.test.js`, and the folders
-`test/systems/loot/` and `test/systems/item/`.
+Run a file with `node --test <file>`, with `NODE_OPTIONS` set as
+[getting-started.md](../getting-started.md#node-and-shader-files) shows. Start with `test/systems/inventory.test.js`, `itemTransfer.test.js`,
+`inventorySession.test.js`, `equiprestrictions.test.js`, `useitem.test.js`, `lr1_lootrarity.test.js`,
+`unleveledLoot.test.js`, `partyloot.test.js`, `quickloot.test.js`, and the folders `test/systems/loot/` and
+`test/systems/item/`. The `loot1`-`loot21` tests cover the ladder's features one by one.
 
 ## Traps
 

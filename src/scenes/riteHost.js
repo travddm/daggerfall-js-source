@@ -47,7 +47,7 @@ import { riteChestItems, riteChestOpened, markRiteChest, riteMemory, riteSeen } 
 import { trs } from '../world/mat4.js';
 
 const listOf = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] ?? '');
-/** Who broke it, as the Discord post names them (net/gate/gateHerald.js ritePost): the first few, and how many more. */
+/** Who broke it: the first few, and how many more. */
 const byWords = (by, n) => {
   const names = (Array.isArray(by) ? by : []).filter((x) => typeof x === 'string' && x).slice(0, GATE_TOP_MAX);
   const others = Number.isSafeInteger(n) ? Math.max(0, n - names.length) : 0;
@@ -56,7 +56,7 @@ const byWords = (by, n) => {
 
 /** The rite's words - each one thing. */
 export const RITE_TEXT = Object.freeze({
-  /** the hub's word of this screen's circle, while the rite holds (AUDIT WB12d D4: the Discord post's own sentence) */
+  /** the hub's word of this screen's circle, while the rite holds */
   broken: ({ near, by = [], n = 0 }) => `The faithful's rite is broken near ${near}${byWords(by, n)}.`,
   /** the opening, to a player near the faithful still standing - broken or not (AUDIT WB12d D6) */
   pass: 'The faithful pass into the breach.',

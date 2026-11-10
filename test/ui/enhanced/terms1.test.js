@@ -36,8 +36,8 @@ import { createGuest, register, legalRefusal } from '../../../server-account/src
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
 const DOCS = {
-  terms: { file: 'terms/index.html', url: TERMS_URL, version: TERMS_VERSION, sections: 16, title: 'Terms of Service' },
-  privacy: { file: 'privacy/index.html', url: PRIVACY_URL, version: PRIVACY_VERSION, sections: 18, title: 'Privacy Policy' },
+  terms: { file: 'terms/index.html', url: TERMS_URL, version: TERMS_VERSION, sections: 15, title: 'Terms of Service' },
+  privacy: { file: 'privacy/index.html', url: PRIVACY_URL, version: PRIVACY_VERSION, sections: 17, title: 'Privacy Policy' },
 };
 
 /** A document's WORDS: its article with the markup taken off. */
@@ -47,7 +47,7 @@ const wordsOf = (html) => html.slice(html.indexOf('<article>'), html.indexOf('</
 // ═══ THE DOCUMENTS ══════════════════════════════════════════════════
 
 test('TERMS1: each document is dated by its version - the Last Updated a reader sees IS what an account records', () => {
-  // The Terms mark a revision by their Last Updated date (section 15),
+  // The Terms mark a revision by their Last Updated date (section 14),
   // so that date is the version: the page, the form and the service can
   // only agree if the page's date and the law's constant are one fact.
   for (const [name, d] of Object.entries(DOCS)) {
@@ -81,8 +81,10 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
     // game too, the reporters' automatic mute named, the names a line's own words carry, the second review before a
     // mute, a letter from a blocked player undelivered, every retention said and the Discord copies deleted with the
     // case's; the Terms' agreement the game asks for, never one it enforces
-    terms: '62fd0b8a5477d53b0d2341ca0d1801743e9ac08b4716d28104704fff077b612f',
-    privacy: '4c152e82901b17a2a05688b7f38d812af56e5795bc6ac05467282d391c6d6a4a',
+    // Material in both - the Terms lose their donations section, the Policy its payments section, its two
+    // payment list items and the Discord moderation channel; later sections renumbered - so a new version, 2026-11-09
+    terms: 'bc3acaa4aadea29e13859bcb2b4ad6f9160a17accdb31d89fe1ed9926fd5a5c2',
+    privacy: '1756279fa050fe26cb998581439189200f6005d32270fd4ec6b0342e530afbfd',
   };
   for (const [name, d] of Object.entries(DOCS)) {
     const words = wordsOf(read(d.file));

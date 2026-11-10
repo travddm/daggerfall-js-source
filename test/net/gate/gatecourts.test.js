@@ -16,7 +16,6 @@ import { readReceipt, mintReceipt } from '../../../src/net/gate/gateReceipt.js';
 import { createGateLink } from '../../../src/net/gate/gateLink.js';
 import { courtFellLine, fellLine, createGateOmen, SEAL_SAY_HOLD_MS } from '../../../src/systems/gate/gateOmen.js';
 import { validStaffDestination, staffDestinationKey } from '../../../src/net/staffTeleport.js';
-import { fellPost } from '../../../src/net/gate/gateHerald.js';
 
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn, log: console.log }; console.info = console.warn = console.log = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
@@ -309,19 +308,16 @@ test('GATE-COURTS the relay: the night full - every court seated - a newcomer is
   });
 });
 
-test('GATE-COURTS the hub: a court\'s kill (`c`) said as `cf`, its receipts handed, neither kept nor the herald\'s; the night (`night`) is the gate\'s `fell`, kept and heralded once (mutants: a court\'s kill kept as the night; the herald told each court)', async () => {
+test('GATE-COURTS the hub: a court\'s kill (`c`) said as `cf`, its receipts handed, not kept; the night (`night`) is the gate\'s `fell`, kept with its courts (mutants: a court\'s kill kept as the night)', async () => {
   await night(async ({ hub }) => {
-    hub.env.GATE_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/123456789/abcDEF_-x';   // the herald on: what it is owed is read back
     const h = hub.connect(); await hub.hello(h, id(5));
     const door = (body) => hub.room.fetch(new Request(`https://relay.internal${GATE_INTERNAL_FELL}`, { method: 'POST', body: JSON.stringify(body) }));
     assert.equal((await door({ d: DAY, c: 3, at: 10, top: ['Ann'], n: 4, rc: [], here: [] })).status, 200);
     assert.deepEqual(gates(h, 'cf'), [{ t: 'gate', k: 'cf', at: 10, top: ['Ann'], n: 4, d: DAY, c: 3 }]);
     assert.equal(hub.store.get('gatefell'), undefined, 'a court\'s kill is not the night');
-    assert.equal(hub.store.get('herald'), undefined, 'nor owed to the channel');
     await door({ d: DAY, night: 1, at: 20, top: ['Ann'], n: 9, w: 2, cs: 3, rc: [], here: [] });
     assert.deepEqual(gates(h, 'fell'), [{ t: 'gate', k: 'fell', at: 20, top: ['Ann'], n: 9, d: DAY, w: 2, cs: 3 }]);
     assert.deepEqual(hub.store.get('gatefell'), { k: 'fell', at: 20, top: ['Ann'], n: 9, d: DAY, w: 2, cs: 3 }, 'kept for a hello');
-    assert.deepEqual(hub.store.get('herald')?.owe, { d: DAY, top: ['Ann'], n: 9, w: 2, cs: 3 }, 'and owed to the channel once, with its courts');
     const party = await hub.room.fetch(new Request(`https://relay.internal${GATE_INTERNAL_PARTY}`, { method: 'POST', body: JSON.stringify({ a: `acct-${id(5)}` }) }));
     assert.deepEqual(await party.json(), { m: [] }, 'one in no party: no mates');
     assert.equal((await hub.room.fetch(new Request(`https://relay.internal${GATE_INTERNAL_PARTY}`, { method: 'POST', body: '{}' }))).status, 400);
@@ -355,14 +351,11 @@ test('GATE-COURTS the link: `go` moves my room to that court for its day; a cour
   assert.deepEqual(quiet2, [null], 'a night heard with no court\'s kill before it: said, as every kill was');
 });
 
-test('GATE-COURTS the words: a court\'s kill by its number, where, and who struck - no collapse; a night of courts on Discord says the courts that won of the courts it held (mutants: the court\'s number; the collapse said for a court)', () => {
+test('GATE-COURTS the words: a court\'s kill by its number, where, and who struck - no collapse (mutants: the court\'s number; the collapse said for a court)', () => {
   assert.equal(courtFellLine({ near: 'Copperham', boss: 'Valkynaz Ruhn', top: ['Ann', 'Bran'], c: 2 }), "Valkynaz Ruhn has fallen in court 3 of Dagon's Breach near Copperham, struck down by Ann, Bran.");
   assert.equal(courtFellLine({ near: null, boss: 'Valkynaz Ruhn', top: [], c: 0 }), "Valkynaz Ruhn has fallen in court 1 of Dagon's Breach in the wilds.");
   assert.ok(!courtFellLine({ near: 'X', boss: 'B', top: [], c: 0 }).includes('collapses'), 'the breach stands for the other courts');
   assert.ok(fellLine({ near: 'X', boss: 'B', top: [] }).includes('The breach collapses.'), 'the night\'s own line keeps it');
-  const card = (o) => JSON.stringify(fellPost({ day: DAY, place: 'Copperham', top: ['Ann'], n: 9, ...o }));
-  assert.ok(card({ w: 2, cs: 3 }).includes(`${gateBossOf(DAY).name} has fallen in 2 of 3 courts`));
-  assert.ok(card({}).includes(`${gateBossOf(DAY).name} has fallen"`), 'a night of one court: the card as it was');
 });
 
 // ═══ AUDIT GATE-COURTS ════════════════════════════════════════════════════════════
@@ -598,7 +591,7 @@ test('AUDIT GATE-COURTS P7 the relay: a first court whose book outlives its figh
   });
 });
 
-test('AUDIT GATE-COURTS P8 the doors, the words and the bounds: the seat and court doors refuse what is not a seat or a court past the first; a newcomer sealed out and closed out in their own words; the night\'s `cs` bounded; the herald\'s post says its courts (mutants: the seat door unchecked; the court door takes the first; the count unchecked; sealed or closing one word; the courts dropped from the post; the courts dropped from the send; `cs` unbounded)', async () => {
+test('AUDIT GATE-COURTS P8 the doors, the words and the bounds: the seat and court doors refuse what is not a seat or a court past the first; a newcomer sealed out and closed out in their own words; the night\'s `cs` bounded (mutants: the seat door unchecked; the court door takes the first; the count unchecked; sealed or closing one word; `cs` unbounded)', async () => {
   assert.equal(validGateOut({ k: 'fell', d: DAY, at: 5, top: [], n: 1, cs: C.GATE_COURTS_MAX + 1 }), null, 'cs past the courts');
   await night(async ({ court, into, say, set }) => {
     const door = (path, body) => court(0).room.fetch(new Request(`https://relay.internal${path}`, { method: 'POST', body: JSON.stringify(body) }));
@@ -619,16 +612,6 @@ test('AUDIT GATE-COURTS P8 the doors, the words and the bounds: the seat and cou
     await say(R, a, inWord); await settle();
     assert.deepEqual(gates(a, 'no').map((m) => m.m), ['the gate is closing'], 'its Warden fallen: closing');
   });
-  const realFetch = globalThis.fetch, posts = [];
-  globalThis.fetch = async (url, init) => { posts.push(JSON.parse(init.body)); return { ok: true, status: 204 }; };
-  try {
-    await night(async ({ hub, fire }) => {
-      hub.env.GATE_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/123456789/abcDEF_-x';
-      await hub.room.fetch(new Request(`https://relay.internal${GATE_INTERNAL_FELL}`, { method: 'POST', body: JSON.stringify({ d: DAY, night: 1, at: Date.now(), top: ['Ann'], n: 9, w: 2, cs: 3, rc: [], here: [] }) }));
-      await hub.fire();
-    });
-  } finally { globalThis.fetch = realFetch; }
-  assert.ok(posts.some((p) => JSON.stringify(p).includes(`${gateBossOf(DAY).name} has fallen in 2 of 3 courts`)), 'the herald posted the night with its courts');
 });
 
 test('AUDIT GATE-COURTS C5/P10 the relay: a full night\'s watcher in a first court whose Warden has fallen is handed no fallen fight (it would stop asking); the watcher\'s party asked of the hub once a minute, not every ask (mutants: a fallen fight handed; the party asked every time)', async () => {
