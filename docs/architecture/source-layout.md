@@ -20,7 +20,7 @@ manual testing use.
 | `src/render/` | The WebGL2 renderer, its shaders and passes ([rendering/](../rendering/README.md)). |
 | `src/scenes/` | The scene hosts (`world.js`, `worldModes.js`, `dungeonContext.js`, `exterior.js`, `interior.js`, `dungeon.js`), the host modules they wire (`*Host.js` and others), and shared scene code (`shared.js`, `dataSource.js`, `dataPipeline.js`). |
 | `src/systems/` | Game rules that are neither combat nor online: items, quests, guilds, travel, time, weather, saving, sound, settings, preferences. About 60 feature folders. |
-| `src/tools/` | Code for the lab pages (`sky.html`, `water.html`, `studio.html` and others). Not loaded by the game. |
+| `src/tools/` | Code for the lab pages (`labs/sky.html`, `labs/water.html`, `labs/studio.html` and others). Not loaded by the game. |
 | `src/ui/` | Every window, menu and HUD element, classic and Enhanced; input (`input.js`), touch (`touch/`), the intro. |
 | `src/world/` | World assembly: terrain, blocks, locations, dungeons, buildings, water, roads, the map of Tamriel (`tamriel/`), the registry of places (`worldWide/`). |
 

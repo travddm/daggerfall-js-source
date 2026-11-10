@@ -66,7 +66,7 @@ An async read must store its result in the cache generation it started under.
 | `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling. |
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
-| `mwFirstPerson.js` | The first-person rules, the record extraction, and the diagnostics. Re-exported by `src/tools/mwInspect.js` for `mw-inspect.html`. |
+| `mwFirstPerson.js` | The first-person rules, the record extraction, and the diagnostics. |
 | `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
 | `mwWeaponAnim.js`, `mwAnimSources.js` | Which animation group a weapon type plays and the text keys that time a swing; which `.kf` files an actor plays from. |
 | `mwItemMap.js` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. |
@@ -90,9 +90,6 @@ An async read must store its result in the cache generation it started under.
   wealth tier so every client dresses a person the same way.
 - `src/characters/bodyMotion/`: walking, carrying and striking laws measured off each skeleton's rest pose.
 - `src/world/horseModel.js`: the 3D horse.
-- Tools: `mw-viewer.html` (`src/tools/mwViewer.js`) and `mw-inspect.html` read the player's files in the page and show
-  what parses; an unknown NIF record shows as its type name. Probes: `npm run mwinspect`, `mwarm`, `mwviewer`,
-  `mwattach`.
 
 ## Rules that are easy to get wrong
 

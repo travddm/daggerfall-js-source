@@ -7,7 +7,7 @@ import {
   skeletonReport, checkRequiredBones, FP_REQUIRED_BONES,
   assembleFirstPersonArm, shapeMatchesBone, placeAtBone, armPieceRows,
   poseAssembly, clipReport, clipUnionBounds,
-} from '../../../src/tools/mwInspect.js';
+} from '../../../src/formats/morrowind/mwFirstPerson.js';
 
 // MW-D: the diagnostic that should have existed before any renderer.
 // Fixtures are BUILT BY HAND here, byte by byte, from the layout recorded
@@ -583,8 +583,8 @@ test('MW-D7: the assembly carries what a re-pose needs, and nothing aliases', as
   for (const p of arm.pieces) {
     if (p.kind === 'skinned') {
       assert.ok(p.batch && p.batch.skin, 'a skinned piece keeps its batch - skinBatch needs it every frame');
-      // THE ALIASING HAZARD, and it is not theoretical: mwViewer.js:"Skinned batches are"
-      // copies the bind positions for exactly this reason. Alias these and
+      // THE ALIASING HAZARD, and it is not theoretical: the bind positions
+      // are copied for exactly this reason. Alias these and
       // each frame skins the PREVIOUS frame's output and the pose runs away.
       assert.notEqual(p.positions, p.batch.positions, 'and its output buffer is its own allocation');
     } else {

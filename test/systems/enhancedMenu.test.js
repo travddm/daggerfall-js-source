@@ -17,14 +17,14 @@ const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 const exists = (p) => { try { read(p); return true; } catch { return false; } };
 
 // ── ONE IMPLEMENTATION, TWO HOSTS ────────────────────────────────
-// The prototype at /menu.html and the game mount the SAME module. A
+// The prototype at /labs/menu.html and the game mount the SAME module. A
 // prototype carrying its own copy of the design is a prototype arguing
 // about a screen the player will never see, and the divergence would
 // be invisible until someone opened both at once.
 test('the prototype page carries no design of its own', () => {
-  const html = read('menu.html');
+  const html = read('labs/menu.html');
   assert.ok(!/--brass|--verdigris|\.railbtn|\.subbtn/.test(html),
-    'menu.html must not hold tokens or layout - they live in src/ui/enhanced/enhancedStyle.js');
+    'labs/menu.html must not hold tokens or layout - they live in src/ui/enhanced/enhancedStyle.js');
   assert.match(html, /src\/tools\/enhanced\/enhancedMenu\.js/);
 });
 

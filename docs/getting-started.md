@@ -141,13 +141,12 @@ Every entry is registered in `vite.config.js` under `build.rollupOptions.input`.
 | `index.html` | The landing page (`/`). Mounts no game code; `scripts/landingHtml.mjs` injects its palette, fonts and sky at build. |
 | `play/index.html` | The game (`/play/`). A canvas `#c` and `src/main.js`. |
 | `terms/index.html`, `privacy/index.html` | Legal pages. |
-| `sky.html`, `water.html` | Labs for the enhanced sky and the water surface (`src/tools/skyLab.js`, `src/tools/waterLab.js`). |
-| `viewer.html`, `mw-viewer.html`, `mw-inspect.html` | Paperdoll viewer, Morrowind mesh viewer and data inspector. |
-| `studio.html` | Art studio listing (`src/tools/studioLab.js`; its index is built by `scripts/studioArtIndex.mjs`). |
-| `menu.html`, `chargen.html`, `enhanced.html`, `levelup.html`, `growth.html`, `firmament.html` | UI labs for the Enhanced menu, character creation, level-up and the passive tree. |
-| `abyss.html` | A lab for scenes drawn by the game's renderer (`src/tools/abyssLab.js`). |
+| `labs/sky.html`, `labs/water.html` | Labs for the enhanced sky and the water surface (`src/tools/skyLab.js`, `src/tools/waterLab.js`). |
+| `labs/studio.html` | Art studio listing (`src/tools/studioLab.js`; its index is built by `scripts/studioArtIndex.mjs`). |
+| `labs/menu.html`, `labs/chargen.html`, `labs/levelup.html`, `labs/growth.html`, `labs/firmament.html` | UI labs for the Enhanced menu, character creation, level-up and the passive tree. |
+| `labs/abyss.html` | A lab for scenes drawn by the game's renderer (`src/tools/abyssLab.js`). |
 
-The labs are development aids. The player reaches only `index.html`, `play/index.html` and the legal pages.
+The labs, in `labs/`, are development aids. The player reaches only `index.html`, `play/index.html` and the legal pages.
 
 ## Repository layout
 

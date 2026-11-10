@@ -4300,7 +4300,7 @@ function go(id) {
 }
 
 // ── PX1: THE PIXEL HOME (Mac, 2026-08-27) ────────────────────────
-// The boot door's FACE. The prototype of record is menu-pixel.html;
+// The boot door's FACE. The prototype of record is the old pixel-menu prototype;
 // what shipped is its structure over the REAL sections: every row
 // navigates to the pane that already carries that section's laws
 // (Continue's restorable card, the Mods waiting-room, the rail-hole

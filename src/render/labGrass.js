@@ -4,8 +4,8 @@
 // max blades, no exceptions; height 54; none on roads, pathways, water,
 // or in winter).
 //
-// THE SHADERS ARE THE LAB'S, VERBATIM. Both stages are sliced out of
-// grass-proto.html by the pin at test time and compared as strings.
+// THE SHADERS ARE THE LAB'S, VERBATIM. The lab page is gone; both stages are
+// held to a fingerprint in test/render/labGrass.test.js instead.
 // One thing differs, and it is declared here in the open: the lab's
 // prelude defines `terrain(p)` as the lab's own noise ground; the game's
 // prelude defines `terrain(p)` as the root height the placer baked from
@@ -41,7 +41,7 @@ import { EL_CODEC_GLSL, EL_TONEMAP_GLSL, EL_ATTEN_GLSL, EL_MAX_LIGHTS, elDecode,
  * GRASS2: THE DEPARTURES FROM THE LAB, AS DATA.
  *
  * GR1's law was that the shaders are the lab's text byte for byte, and
- * the pin enforced it by slicing `grass-proto.html` at test time. That
+ * the pin enforced it against the lab page's text, now replaced by a fingerprint. That
  * law has been broken deliberately, three times (SWAY-SOFT made it a
  * fifth edit, GRASS6 having taken one back), and the honest way to
  * break it is to say exactly where rather than to loosen the pin: the

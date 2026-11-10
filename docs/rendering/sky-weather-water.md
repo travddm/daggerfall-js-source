@@ -64,7 +64,7 @@ passes of a map pixel and before the flats. With shadows on, the surface receive
 program. Deep-water and ocean-hole features have their own passes (`src/render/deepWatersRender.js`,
 `src/render/oceanHolesRender.js`).
 
-The lab page `water.html` (`src/tools/waterLab.js`) draws the water pass alone for tuning.
+The lab page `labs/water.html` (`src/tools/waterLab.js`) draws the water pass alone for tuning.
 
 ## Snow
 

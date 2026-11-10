@@ -18,7 +18,7 @@ import { headViewRef, HEAD_VIEW_TUNING } from '../../../src/formats/morrowind/mw
 //
 // What these pins can and cannot see, stated up front. The GL path - the
 // offscreen first-person pass, the composite, where the arm lands on
-// screen - is measured by tools/mwArmProbe.mjs in a real browser against
+// screen - needs a real browser against
 // a real WebGL2 context, because a node test cannot see a pixel. What is
 // here is the arithmetic and the structure underneath it, plus the source
 // laws whose failure a picture would not show.
@@ -316,10 +316,6 @@ test('MW-D8: the arm IMPORTS the assembly law, it does not carry a second copy o
     assert.ok(src.includes(fn), `${fn} is used`);
     assert.ok(!new RegExp(`function ${fn}\\b`).test(src), `and ${fn} is NOT redefined here`);
   }
-  // MW7 died of two ports of one rule drifting apart. The tools-side
-  // inspector re-exports the same module rather than owning a copy.
-  assert.match(rd('src/tools/mwInspect.js'), /export \* from '\.\.\/formats\/morrowind\/mwFirstPerson\.js';/,
-    'and the diagnostic page reads the same home through a shim');
 });
 
 // --- MW-D9: THE WEAPON ------------------------------------------------------
@@ -2611,14 +2607,6 @@ test('IG6: the arms are FIXED TO THE SCREEN by default - the owner\'s final call
     'the storage key is the v3 - the v2 value is abandoned with its button');
   const menu = readFileSync('src/ui/enhanced/enhancedMenu.js', 'utf8');
   assert.doesNotMatch(menu, /setFollowCamera|'Arms mode'/, 'MWA4: no switch and no mode row on the card');
-  // The probe measures BOTH modes: the law layers with the flag off,
-  // the shipped fix with it on (cy invariant under every look, the
-  // clamp-hard ones included, and under the bob).
-  const probe = readFileSync('tools/mwArmProbe.mjs', 'utf8');
-  assert.match(probe, /window\.__arm\.setFollowCamera\(false\);/, 'L5c/L5d measure the LAW with the flag off');
-  assert.match(probe, /window\.__arm\.setFollowCamera\(true\); \}\);/, 'L5e measures the shipped fix');
-  assert.match(probe, /Math\.abs\(fixHardUp\.cy - fixLevel\.cy\) < 0\.02 && Math\.abs\(fixHardDown\.cy - fixLevel\.cy\) < 0\.02/,
-    'and its assertion is INVARIANCE, clamp-hard looks included');
 });
 
 // ═══ MW-D37: the materials are colour truth; the dye picks the garment ═

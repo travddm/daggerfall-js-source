@@ -51,7 +51,7 @@
 // THE PAPERDOLL. The classic sheet composes it at DFU's (200,8) and
 // the prototype answers the same slot with a 28-node body schematic -
 // but that schematic is the INVENTORY's signature, it wants
-// tools/enhanced/enhancedVisuals.js and the three.js tag enhanced.html loads
+// tools/enhanced/enhancedVisuals.js and the three.js tag the old UI prototype page loads
 // from a CDN, and the port's doctrine has exactly one third-party
 // request in it already - the Ledger's THE ENHANCED SKIN'S WEB FONTS
 // row, which is another file's departure and not a claim of one here.

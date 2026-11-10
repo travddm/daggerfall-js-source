@@ -66,7 +66,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // of any classic sprite. No classic silhouette survives in them, which is
   // the question this list exists to ask. They are the first character
   // texture in the project that ships rather than loading through the data
-  // door, and the reason viewer.html no longer needs ARENA2 for its skin.
+  // door.
   // MAP0: THE HELD MAP'S SPRITE. Mac's own painting - two
   // gauntleted hands holding a blank parchment, 1448x1086 - and the
   // only picture the enhanced map will ship; the map itself is drawn

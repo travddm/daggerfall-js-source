@@ -184,7 +184,7 @@ test('villagers: hanging cloth names a real draped garment, dyed from the design
   // faces out from THAT GROUP's centre, so a zone naming both legs
   // thickens each leg separately and renders a tunic plus shorts,
   // never a gown. Hanging cloth belongs to pieces/draped.js, whose
-  // standoff grid clothSim.js swings. This pin fails if a design ever
+  // standoff grid hangs the cloth. This pin fails if a design ever
   // goes back to describing a gown as a zone.
   for (const d of VILLAGER_DESIGNS) {
     for (const z of [...d.zones, ...(d.armor ?? [])]) {

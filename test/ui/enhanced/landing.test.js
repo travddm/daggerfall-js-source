@@ -227,7 +227,7 @@ test('U60: the plugin is wired, touches only the root document, and stamps only 
   assert.equal(gamePage.html, '<html>game</html>', 'the game page\'s markup is untouched');
   assert.deepEqual(gamePage.tags.map((t) => [t.tag, t.attrs.rel]), [['link', 'icon']],
     'the game page gets the tab icon from this plugin and nothing else');
-  assert.equal(handler('<html>proto</html>', { path: '/menu.html' }), '<html>proto</html>',
+  assert.equal(handler('<html>proto</html>', { path: '/labs/menu.html' }), '<html>proto</html>',
     'a prototype page gets nothing');
   const dev = handler(landing, { path: LANDING_PATH, server: {} });
   assert.ok(dev.tags.some((t) => t.tag === 'style'), 'the dev serve gets the tokens');

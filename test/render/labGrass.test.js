@@ -1,45 +1,23 @@
-// GR1: the lab's grass, byte for byte, standing only where it may.
+// GR1: the grass shader text is held to a fingerprint, and the placer to the original law, standing only where it may.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { LAB_GRASS_HEAD, LAB_GRASS_VS, LAB_GRASS_FS, LAB_GRASS, LAB_DIM, placeLabGrass, grassRecordsOf, labBladeCorners, GRASS2_VS_EDITS, GAME_GRASS_VS, GAME_GRASS_FIELD, placeLabGrassCell, grassCellSeed, grassHash, grassVnoise, grassClump, bakedTint, LabGrassRenderer, GRASS_FAR_SEGMENTS, GRASS_PACK_BYTES, GRASS_CELL, grassPerCell, heightFloor, heightSpan, WIDTH_SPAN, LEAN_SPAN } from '../../src/render/labGrass.js';
 import { codeOnly } from '../codeOnly.mjs';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-const lab = () => readFileSync('grass-proto.html', 'utf8');
+const noComments = (t) => t.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
+const GRASS_SHADER_FINGERPRINT = '9aaf056a6d0c6864ada52f506267de1edc88b34c731116bc105b1a67cfe9a981';
 
 test('GR1/GRASS2/GRASS5/GRASS6: the shaders are the lab\u2019s own but for five DECLARED edits, and the port\u2019s height, range and byte layout are its own', () => {
-  const src = lab();
-  const vsStart = src.indexOf('layout(location=0) in vec2 aCorner;      // one blade quad, 0..1\nlayout(location=1) in vec4 aInst;        // xz, height, phase');
-  const vsEnd = src.indexOf('}`, HEAD + `', vsStart) + 1;
-  const fsStart = src.indexOf('in float vT; in float vTint; in float vFade; in float vLam; in float vSnow; in float vWet;', vsEnd);
-  const fsEnd = src.indexOf('}`);', fsStart) + 1;
-  assert.ok(vsStart > 0 && fsStart > 0);
-  // GRASS2: the vertex stage is the lab's text plus THREE DECLARED
-  // EDITS, and the pin is still byte-exact - it applies the edits to the
-  // lab's own slice and compares the result. A fourth change, or a
-  // fourth edit nobody declared, still fails here, which is the whole
-  // value of GR1's law: it is departed from on the record, never
-  // loosened. The comments around each edit are the port's own and are
-  // not compared; the CODE is.
-  const noComments = (t) => t.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-  let want = src.slice(vsStart, vsEnd);
-  assert.equal(GRASS2_VS_EDITS.length, 5, 'five departures, no more - a sixth is a decision, not a detail (GRASS6 took the tint edit back to the placer, so the lab\u2019s own vTint line compiles again; SWAY-SOFT, 2026-10-21, was Mac\u2019s decision: the softer sway)');
-  for (const e of GRASS2_VS_EDITS) {
-    assert.ok(want.includes(e.from), `the lab still carries the line this edit replaces: ${e.why}`);
-    assert.ok(e.why && e.why.length > 20, 'every departure says why, on the departure itself');
-    want = want.replace(e.from, e.to);
-  }
-  assert.equal(noComments(LAB_GRASS_VS), noComments(want), 'the vertex stage is the lab\u2019s text with the five declared edits, and nothing else');
-  // The port's comments are edited on their own and the lab's are not, so the fragment stage compares code only.
-  assert.equal(codeOnly(LAB_GRASS_FS), codeOnly(src.slice(fsStart, fsEnd)), 'the fragment stage is the lab\u2019s code, byte for byte - GRASS2 changed no fragment law');
-  const headStart = src.indexOf('const HEAD = `');
-  assert.equal(LAB_GRASS_HEAD, src.slice(headStart + 'const HEAD = `'.length, src.indexOf('`;', headStart)));
-  // the lab itself: height 54, and the maxima the game uses
-  assert.match(src, /const state = \{ density: 1200000, height: 54,/, 'the lab\u2019s default height is 54');
-  assert.match(src, /id="height" type="range" min="10" max="120" step="1" value="54"/);
-  assert.match(src, /id="density" type="range" min="20000" max="1200000"/);
-  assert.match(src, /id="range" type="range" min="10" max="200"/);
+  // The shader text is fingerprinted. The grass began as a lab page whose text the port had to keep byte for byte;
+  // that page is gone, so this hash of the game's own text takes over: it fails on any change to the vertex stage
+  // (comments dropped), the fragment stage (comments dropped) or the shared head. To change the shader on purpose,
+  // edit src/render/labGrass.js, run this test, and paste the hash it prints into GRASS_SHADER_FINGERPRINT.
+  const got = createHash('sha256').update([LAB_GRASS_HEAD, noComments(LAB_GRASS_VS), codeOnly(LAB_GRASS_FS)].join('\u0000')).digest('hex');
+  assert.equal(got, GRASS_SHADER_FINGERPRINT, `the grass shader text changed (new fingerprint ${got}); see the note above if that was on purpose`);
+  assert.equal(GRASS2_VS_EDITS.length, 5, 'five declared departures from the original shader text; a sixth is a decision, not a detail');
+  for (const e of GRASS2_VS_EDITS) assert.ok(e.why && e.why.length > 20, 'every departure says why, on the departure itself');
   // GRASS2: the lab's DENSITY is kept and its height and range are not.
   // `densitySpan` is the lab's own span, kept as the rate the field is
   // dense by, so pushing the range out never thins the grass.
@@ -54,11 +32,6 @@ test('GR1/GRASS2/GRASS5/GRASS6: the shaders are the lab\u2019s own but for five 
 });
 
 test('GR1: the placer is the lab\u2019s law - same seed, span, clustering, height, lean, tint, width', () => {
-  const src = lab();
-  const b = src.slice(src.indexOf('function build() {'), src.indexOf('const vao = gl.createVertexArray();', src.indexOf('function build() {')));
-  for (const law of ['let s = 0x2f6e2b1;', 'const SPAN = 210;', 'rr = rnd() * rnd() * 0.55', '(0.22 + rnd() * 0.42) * (state.height / 34)', '0.052 + rnd() * 0.055']) {
-    assert.ok(b.includes(law), `the lab's build carries: ${law}`);
-  }
   // the game's placer, run with everything kept, reproduces the lab's first blade exactly
   const g = placeLabGrass({ centre: [0, 0], keep: () => 0 });
   let s = 0x2f6e2b1;

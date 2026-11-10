@@ -37,8 +37,6 @@ export const NOT_IMPORTABLE = Object.freeze({
   'src/tools/enhanced/enhancedChargen.js': 'document at module scope',
   'src/tools/enhanced/enhancedMenu.js': 'document at module scope',
   'src/tools/enhanced/enhancedUI.js': 'document at module scope',
-  'src/tools/mwViewer.js': 'document at module scope',
-  'src/tools/paperdoll/paperdollViewer.js': 'document at module scope',
   'src/tools/skyLab.js': 'location at module scope',
   'src/tools/waterLab.js': 'location at module scope',   // WATER1: the water lab
   'src/tools/levelUpLab.js': 'document at module scope',   // LV1: the level-up lab

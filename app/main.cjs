@@ -1814,8 +1814,7 @@ ipcMain.on('launcher:act', async (e, msg) => {
 // THE NAVIGATION FENCES. The window carries a preload whose bridge
 // reads and writes the player's save files, so the one rule is: that
 // bridge never faces content we did not ship. Window-opens to
-// dagger:// are the game's own tool pages (mw-viewer, mw-inspect;
-// children do not inherit the preload); anything http(s) - the
+// dagger:// are the game's own pages (children do not inherit the preload); anything http(s) - the
 // credits' GitHub links - belongs in the system browser; everything
 // else is refused. Same law for in-place navigation, with the dev
 // server's own origin allowed when DAGGER_DEV_URL is driving.

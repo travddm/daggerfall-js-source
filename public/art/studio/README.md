@@ -41,14 +41,12 @@ letters, digits and `_ . -` only: no spaces, no accents, no `#` or `?`.
 
 **Finding the numbers.** There are two places:
 
-- **The studio page** (`studio.html` on the site or the dev server, or `node tools/studioArt.mjs`) lists the pictures of
+- **The studio page** (`labs/studio.html` on the site or the dev server, or `node tools/studioArt.mjs`) lists the pictures of
   the eight models the game paints itself: the wagons, carts and caravan, the three ships, the towns' hangings, the
   yards, the shipyard and lighthouse, and the LeFay monument. Each one has a download button, and its template is
   already named correctly: repaint it and drop it in your folder. These are painted from numbers, and the wagons' are
   recoloured for each paint, which is why they look the way they do.
 - **Daggerfall's own textures** use the same names, `<archive>_<record>-<frame>.png`, the ground's tiles included.
-  The archive sheet (`archive-sheet.html`) shows every record of a `TEXTURE.nnn` from your own copy of the game,
-  numbered.
 
 **Paints are separate pictures.** Each paint a wagon can wear is its own record: the cart's side boards are
 `38181_1-0` as built (weathered oak), `38181_101-0` red, `38181_201-0` blue, and so on. A paint with no picture of
