@@ -17,6 +17,9 @@ Each is printed for DFU, for this game, and as the ratio ours / DFU.
 
 ## How to run
 
+The harness reaches modules that import shader files, so set `NODE_OPTIONS` first
+([getting-started.md](../getting-started.md#node-and-shader-files)).
+
 ```bash
 node tools/balance/run.mjs --build warrior,mage --levels 1,12,30,45
 node tools/balance/run.mjs --layers -hero,-stats --md out.md --json out.json
