@@ -7,24 +7,34 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
 
 ## The rule and the gate
 
+> Leaves core: a Morrowind bodies mod (decision 117 (24)).
+
 - Morrowind is sold, not freeware. Its files never enter the repository or the build. The player attaches
-  `Morrowind.bsa`, the expansions, `Morrowind.esm` and any mod files through the Morrowind card of the enhanced menu (`morrowindCard` in
-  `src/ui/enhanced/enhancedMenu.js`, which also reports why a body was refused); they live only in IndexedDB
-  (store `morrowind`, see [arena2-data.md](arena2-data.md)).
+  `Morrowind.bsa`, the expansions, `Morrowind.esm` and any mod files through the Morrowind card of the enhanced menu
+  (`morrowindCard` in `src/ui/enhanced/enhancedMenu.js`, which also reports why a body was refused); they live only
+  in IndexedDB (store `morrowind`, see [arena2-data.md](arena2-data.md)).
 - The layer is on when the enhanced skin is on and Morrowind data is attached: `isEnhanced() && morrowindDataCount() > 0`.
   There is no separate switch for the player's own arms and body. NPC bodies also honour the pref `mwNpcBodies`
   (`characters/npcBodies.js`).
 - Without Morrowind data every character keeps the classic sprite or paperdoll. Every consumer must work in that state.
-- The reference is OpenMW (GPL). `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` state that OpenMW was used for
-  behaviour only and no code was ported. `mwTexture.js` was rewritten from the file-format documentation and the
-  behaviour of Morrowind data, without OpenMW code; `test/formats/morrowind/mwtexture_parity.test.js` holds it to the
-  answers of the module it replaced. The repository is MIT: do not copy OpenMW code. Read a module's header for its
-  own statement before you bring in more of OpenMW's logic.
+- The reference is OpenMW, which is GPL. The repository is MIT and stays MIT (decision 108), so no OpenMW code may be
+  copied. Part of this layer is not clean yet: it was ported from OpenMW code, and it is being rewritten from the
+  file-format documentation and the behaviour of Morrowind data before the repository goes public (decisions 25 and
+  108), each rewrite held to the old module's answers by a parity test.
+  - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
+    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js` and `mwAnimSources.js`.
+  - Still OpenMW-derived: `mwFirstPerson.js`, `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`),
+    `mwNifMesh.js` (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
+    `mwParticles.js`, `mwSpellFx.js`, `mwVfx.js`, and outside this folder parts of `src/combat/fpArm.js` and
+    `src/systems/weaponSheathing.js`. `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`)
+    only quote OpenMW in comments.
+
+  Do not add OpenMW logic to a derived module; change it only as part of its rewrite.
 
 ## Data plumbing (`src/scenes/dataSource.js`)
 
 | Function | Does |
-|---|---|
+| --- | --- |
 | `pickMorrowindFiles`, `storeMorrowindFiles` | Store `.bsa`, `.esm`, `.esp`, and loose `.nif .kf .dds .tga .wav`. Loose files are keyed by `mwLoosePath`: lower-case, from the first known root (`meshes/`, `textures/`, `sound/`, `icons/`, `bookart/`, `animations/`, ...). |
 | `registerMorrowindData` | Counts the stored archives at boot; bumps `morrowindDataGeneration()` when the stored set changed. |
 | `loadMorrowindArchives` | Opens every source as a `{ has, get, load, loaded }` archive, in lookup order (below). Cached per generation. |
@@ -47,7 +57,7 @@ An async read must store its result in the cache generation it started under.
 ## Readers (`src/formats/morrowind/`)
 
 | Module | Reads or does |
-|---|---|
+| --- | --- |
 | `mwBsaFile.js` | Morrowind BSA v0x100 (unrelated to Daggerfall's BSA). Paths normalized by `normalizeBsaPath`. |
 | `mwEsmFile.js` | TES3 `.esm`/`.esp`. Every record has a size, so unknown records are skipped and counted. Decodes `BODY`, `RACE`, `NPC_`, `CREA`; deleted records are dropped. Text is Windows-1252. |
 | `mwNifFile.js` | NIF 4.0.0.2 only. Records have no size field, so the reader is strict: an unknown record type throws with its name and index. |
@@ -56,7 +66,9 @@ An async read must store its result in the cache generation it started under.
 | `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling. |
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
-| `mwFirstPerson.js` | The first-person and body-assembly rules, the record extraction, and the diagnostics. Re-exported by `src/tools/mwInspect.js` for `mw-inspect.html`. |
+| `mwFirstPerson.js` | The first-person rules, the record extraction, and the diagnostics. Re-exported by `src/tools/mwInspect.js` for `mw-inspect.html`. |
+| `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
+| `mwWeaponAnim.js`, `mwAnimSources.js` | Which animation group a weapon type plays and the text keys that time a swing; which `.kf` files an actor plays from. |
 | `mwItemMap.js` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. |
 | `mwFaceMatch.js` | Pairs Daggerfall portraits with Morrowind heads and hairs. |
 | `mwCloakFit.js`, `mwPartClock.js` | Cloak fitting and parts that animate on their own clock (for example an arrow on a bow). |
@@ -66,7 +78,11 @@ An async read must store its result in the cache generation it started under.
 
 - `src/combat/fpArm.js`: `createFpArm()` builds and draws the player's arms and, in third person, the whole body
   (`drawThird`). It draws into the renderer's offscreen character pass with its own projection (first person has its
-  own field of view and a cleared depth buffer).
+  own field of view and a cleared depth buffer). Its helpers are in `src/combat/fpArm/`: `fpAnimState.js` (animation
+  state), `archiveBytes.js` (archive reads, the shared mesh copy and parse), `fpArmParts.js` (the weapon, arrow,
+  torch and hip lantern parts and the nodes they hang on), `buildRules.js` (the race scale and the shared
+  accumulation root), `animSlots.js` (the idle, movement, jump, hit and death slots) and `upperBody.js` (the weapon
+  and cast machine).
 - `src/combat/weapon/weaponRig.js`: builds the rig from the player's equip table.
 - `src/net/peer/peerBodies.js`: other players' bodies, one `createFpArm()` instance each, nearest first, capped, built
   one at a time.

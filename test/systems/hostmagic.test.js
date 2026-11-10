@@ -2,6 +2,7 @@
 // casting stack is unit-testable: dungeonContext carried it as scene
 // code with zero execution coverage, and the M-slice extraction hands
 // every law a headless pin. Sources cited in the module.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
@@ -275,7 +276,8 @@ test('hostMagic click seam: interceptAttack consumes the armed click; firePendin
   assert.equal(world.player.magicka < 500, true, 'the cast spent');
 });
 
-test('hostMagic magic-5 end to end: a self-cast refund never exceeds what it cost', () => {
+test('hostMagic magic-5 end to end: a self-cast refund never exceeds what it cost', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   // An Always-absorbing caster damage-bombs themself (rangeType 0):
   // the absorb tally would exceed the cast cost; the ctx-threaded
   // lastCastCost caps the refund, so magicka comes back EXACTLY even.

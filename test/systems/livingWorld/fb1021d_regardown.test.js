@@ -9,6 +9,7 @@
 // The real street (LivingTown over the test town, its talk path handing the relations the sky's living day) on the real
 // online sky (net/skyLaw.js skyClassicMinutes at wall instants), beside the character's own clock: twelve of its minutes a
 // real second while played, standing while logged off.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -60,7 +61,8 @@ function street(own = DAY_416 + 720) {
   return { at, sky, town, person, id: person.living.id, relations, play, away };
 }
 
-test('REGARD-OWN: the report - an evening of words, a day logged off, and the regard stands where it was left; ten evenings of a word a day reach a friend (the Courtship row) - on the sky every evening began at nought (mutants: the wrapper reading the caller\'s sky day, the host on createRelations)', () => {
+test('REGARD-OWN: the report - an evening of words, a day logged off, and the regard stands where it was left; ten evenings of a word a day reach a friend (the Courtship row) - on the sky every evening began at nought (mutants: the wrapper reading the caller\'s sky day, the host on createRelations)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const s = street();
   for (let h = 0; h < 3; h++) { s.town.talked(s.person); s.play(1); }
   const left = s.relations.regard(s.id);

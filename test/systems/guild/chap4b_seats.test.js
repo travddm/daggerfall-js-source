@@ -3,6 +3,7 @@
 // its own chapter's halls alone. The law against literals; the
 // review's ceiling through DFU's own updateRank and the popup's push effects; a seat's rank at the service gate; the tab
 // holding the book and saying the seats; the hosts' wiring.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -131,7 +132,8 @@ const door = (answers) => ({
 });
 const roll = (seats, extra = {}) => ({ ok: true, data: { roll: { seq: 1, factions: { [FIGHTERS]: 90 }, owed: {}, members: [{ f: FIGHTERS, rank: 7 }], seats, ...extra }, from: 1 } });
 
-test('CHAP4b the tab: each adoption holds the book at 7 (said once a hold) and keeps the seats - said as they stand at the first word, then as they move; none before the first word (mutants: the cap at adoption, the seats kept, the before)', async () => {
+test('CHAP4b the tab: each adoption holds the book at 7 (said once a hold) and keeps the seats - said as they stand at the first word, then as they move; none before the first word (mutants: the cap at adoption, the seats kept, the before)', async (tc) => {
+  playByRules(tc, { 'guild.seatRanks': true });   // the chairs hold ranks 8 and 9: the server profile's option
   const entity = {
     factionRep: storeWith(90),
     guildMemberships: { mortal: { FightersGuild: { guild: 'FightersGuild', rank: 9, lastRankChange: 0 } }, vampire: {} },

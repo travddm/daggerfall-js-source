@@ -38,6 +38,7 @@ import { castSchool } from './spellcost.js';   // SCHOOLS3: the school an effect
 import { raceById, raceByKey } from './races.js';   // L2-slice (magic-10): the racial immunity arm
 import { STAT_KEYS_ORDER, FATIGUE_MULTIPLIER, maxFatigue, increaseDrainMagnitude, liveStat } from './statMods.js';
 import { dice100 } from '../combat/formulas.js';
+import { hasActiveEffect } from './active-effects.ts';   // a leaf, so the foe AI reads it without this file's imports
 import { tryAbsorption, absorbRefund } from './absorption.js';
 import { identifyRefund } from './spell/identifyRefund.js';   // the refund priced as the cast was (a discount included)
 import { enemyGroupOf, NEARBY } from './nearbyObjects.js';   // X8: Pacify matches on DFU's EnemyGroups, the same table X4 ported
@@ -331,11 +332,7 @@ export const isCharmEffect = (e) => e.type === 34 && classicSub(e) === 255;
 export const spellSways = (sp) => (sp?.effects ?? []).some((e) => e && (isPacifyEffect(e) || isCharmEffect(e)));
 /** X7: Identify (40,255) - a window opener, not a lasting effect. */
 export const isIdentifyEffect = (e) => e.type === 40 && classicSub(e) === 255;
-/** presence = active; expired entries End on the NEXT tick pass (DFU shape). HELD-CONCEAL: an ENDED entry is not -
- *  DoConstantEffects runs no ConstantEffect once HasEnded (EntityEffectManager.cs:1693-1694), so it sets no flag. A worn
- *  item's concealment a blow broke stands ended on its item until the reroll (concealment.js). */
-export const hasActiveEffect = (entity, kind) =>
-  !!entity?.activeEffects?.some((a) => a.kind === kind && !a.ended);
+export { hasActiveEffect };   // its home is the leaf systems/active-effects.ts, which the foe AI reads
 /** CSA-I: Come Sail Away's WaterWalkingSilent (WaterWalkingSilent.cs) - an incumbent of its own kind, as its
  *  IsLikeKind keeps it from stacking onto the spell's Water Walking; no spell icon (ShowSpellIcon false). */
 export const WATER_WALKING_SILENT_KIND = 'waterWalkingSilent';

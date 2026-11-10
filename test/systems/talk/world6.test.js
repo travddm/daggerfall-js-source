@@ -14,6 +14,7 @@
 // keeping a building's memory and handing it to the next joiner, and still
 // ignoring a town's; the pure half (world/interior/interiorShared.js) composing,
 // projecting and landing on a bare context; and the hosts by source.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -80,7 +81,8 @@ const ctxOf = () => {
   return ctx;
 };
 
-test('WORLD6a: the pure half - the vocabulary is the cache\'s own keys, one spelling each; an opened container is said with what is left and the day it was stocked, a never-opened one is not, and one past the cap stays this player\'s own, said once', () => {
+test('WORLD6a: the pure half - the vocabulary is the cache\'s own keys, one spelling each; an opened container is said with what is left and the day it was stocked, a never-opened one is not, and one past the cap stays this player\'s own, said once', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   assert.equal(interiorLootKeyOf('shelf:0'), 'shelf:0'); assert.equal(interiorLootKeyOf('container:12'), 'container:12');
   for (const k of ['shelf:00', 'shelf:1e1', 'loot:0', 'corpse:1', 'droppedLoot:0', 'shelf:', 'shelf:123456', 3]) assert.equal(interiorLootKeyOf(k), null, String(k));
   const ctx = ctxOf();
@@ -95,7 +97,8 @@ test('WORLD6a: the pure half - the vocabulary is the cache\'s own keys, one spel
   assert.equal(warned.length, 1, 'said once'); assert.ok(tooBig.has('shelf:0'));
 });
 
-test('WORLD6a: the pure half - the room\'s word lands IN PLACE on an opened container, WHOLE on one this client never opened (a second reader adopts the first\'s roll), with the day it was stocked, and never under this player\'s open window', () => {
+test('WORLD6a: the pure half - the room\'s word lands IN PLACE on an opened container, WHOLE on one this client never opened (a second reader adopts the first\'s roll), with the day it was stocked, and never under this player\'s open window', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const ctx = ctxOf();
   const live = ctx.shelves[0].items;
   const seen = new Set();
@@ -115,7 +118,8 @@ test('WORLD6a: the pure half - the room\'s word lands IN PLACE on an opened cont
   assert.deepEqual(ctx.shelves[0].items, before, 'yours until you close it (AUDIT WORLD4 C1)');
 });
 
-test('WORLD6a: the pure half - the memory is the opened containers the room knows of and every action record\'s SHARED half; it lands once, projected, never its own or another building\'s; a refused act\'s keys are re-read current', () => {
+test('WORLD6a: the pure half - the memory is the opened containers the room knows of and every action record\'s SHARED half; it lands once, projected, never its own or another building\'s; a refused act\'s keys are re-read current', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const ctx = ctxOf();
   const seen = new Set(['shelf:0']);
   const shared = composeInteriorShared(ctx, { locationKey: 'interior:m5.9', stamp: 'me', seen });

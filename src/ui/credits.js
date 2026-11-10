@@ -301,15 +301,6 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['seasons-iliac-bay']),
     }),
     Object.freeze({
-      title: 'Ambient Text',
-      version: '1.8',
-      author: 'Regnier',
-      get what() { return t('credits.ambientText.what', 'Now and then, a short line about your surroundings: 918 written by the author, chosen by the kind of place or dungeon you are in, the hour and the weather. It stays quiet indoors and waits longer after each line.'); },
-      get terms() { return t('credits.ambientText.terms', 'Used with the author\u2019s permission, with the author\u2019s own lines.'); },
-      contact: 'forums.dfworkshop.net',
-      vendor: Object.freeze(['ambient-text']),
-    }),
-    Object.freeze({
       title: 'Eye Of The Beholder',
       version: '2.1',
       author: 'RedRoryOTheGlen',

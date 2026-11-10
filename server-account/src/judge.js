@@ -50,7 +50,7 @@ import { SKILL_HARD_CAP } from '../../src/systems/skillSoftcap.js';
 import { STAT_KEYS_ORDER } from '../../src/systems/statMods.js';
 import { pathFindings } from '../../src/systems/arcanePaths.js';   // SCHOOLS5: a save's specialisation
 import { isMasterWork, masterSignature, masterLinesOfRecord } from '../../src/net/masterLaw.js';   // MASTER-ART: a Master's work's lines, its record's
-import { readProductRecord } from '../../src/net/productRecord.js';
+import { readProductRecord, masterTierOfVersion } from '../../src/net/productRecord.js';
 
 /** The judge's version: the item law's, and its own character law beside it. */
 export const JUDGE_VERSION = ITEM_LAW_VERSION;
@@ -229,7 +229,7 @@ export function judgeSave(save, summary = null, o = {}) {
     list.forEach((/** @type {any} */ it, /** @type {number} */ i) => {
       items++;
       for (const code of findingsOf(it)) keep({ code, list: li, at: i, t: it?.templateIndex ?? null });
-      if (typeof it?.provenance === 'string' && PROVENANCE_RE.test(it.provenance)) provenances.push({ provenance: it.provenance, t: it.templateIndex, m: it.material, q: it.quality, w: worthless(it) ? 0 : itemWorth(it), ...(isMasterWork(it) ? { l: masterSignature(it.affixes) } : {}) });   // MASTER-ART: a Master's work's lines
+      if (typeof it?.provenance === 'string' && PROVENANCE_RE.test(it.provenance)) provenances.push({ provenance: it.provenance, t: it.templateIndex, m: it.material, q: it.quality, w: worthless(it) ? 0 : itemWorth(it), ...(isMasterWork(it) ? { l: `${it.rarity}|${masterSignature(it.affixes)}` } : {}) });   // MASTER-ART: a Master's work's lines, after its tier
     });
   });
   // INT7: THE ARMS - the most reach of the weapons in the pack the law takes, and whether a lawful bow is among them
@@ -265,10 +265,11 @@ export function ledgerPieces(/** @type {any} */ save) {
 
 /** MASTER-ART: the lines a record's Master's work mints, as one string - '' for a record that names none, so no piece
  *  claims a Master's lines on another craft's provenance. AUDIT HORIZONTAL B1: the values the record signs
- *  (masterLaw.js masterLinesOfRecord), never a roll of today's bands. @param {unknown} record */
+ *  (masterLaw.js masterLinesOfRecord), never a roll of today's bands. After the tier its version mints, so a
+ *  Rare record's piece cannot claim Legendary. @param {unknown} record */
 const recordLines = (record) => {
   const c = readProductRecord(record);
-  return c?.l ? masterSignature(masterLinesOfRecord(c.l) ?? []) : '';
+  return c?.l ? `${masterTierOfVersion(c.v)}|${masterSignature(masterLinesOfRecord(c.l) ?? [])}` : '';
 };
 /** How many provenances one statement asks about - D1 binds at most 100 a statement. */
 const PROVENANCE_CHUNK = 90;
