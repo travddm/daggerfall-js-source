@@ -17,7 +17,8 @@ let scale = DFU_TIME_SCALE;
 /** Sets the world clock's TimeScale (the server profile's `time.worldScale`). A value outside the bounds, or no number, is
  *  ignored, so a bad profile cannot stop the clock. The relay, the account Worker and each page call it before the clock is read. */
 export function setOnlineTimeScale(next: unknown): void {
-  if (typeof next === 'number' && Number.isFinite(next) && next >= TIME_SCALE_MIN && next <= TIME_SCALE_MAX) scale = next;
+  if (typeof next === 'number' && Number.isFinite(next) && next >= TIME_SCALE_MIN && next <= TIME_SCALE_MAX)
+    scale = next;
 }
 /** The world clock's TimeScale now. */
 export const onlineTimeScale = (): number => scale;
@@ -38,7 +39,13 @@ let skyScale = DEFAULT_SKY_TIME_SCALE;
  *  is off; a scale outside the bounds, or no number, leaves the scale where it was. Called where setOnlineTimeScale is. */
 export function setSkyClock(on: unknown, nextScale: unknown): void {
   skyOwnClock = on === true;
-  if (typeof nextScale === 'number' && Number.isFinite(nextScale) && nextScale >= TIME_SCALE_MIN && nextScale <= TIME_SCALE_MAX) skyScale = nextScale;
+  if (
+    typeof nextScale === 'number' &&
+    Number.isFinite(nextScale) &&
+    nextScale >= TIME_SCALE_MIN &&
+    nextScale <= TIME_SCALE_MAX
+  )
+    skyScale = nextScale;
 }
 /** Whether the sky runs on a clock of its own. */
 export const skyClockOn = (): boolean => skyOwnClock;
